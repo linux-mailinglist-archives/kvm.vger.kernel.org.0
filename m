@@ -2,140 +2,116 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id C6CCF569158
-	for <lists+kvm@lfdr.de>; Wed,  6 Jul 2022 20:03:36 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id DD6FB56917C
+	for <lists+kvm@lfdr.de>; Wed,  6 Jul 2022 20:13:57 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234139AbiGFSDe (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 6 Jul 2022 14:03:34 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49004 "EHLO
+        id S234364AbiGFSNy (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 6 Jul 2022 14:13:54 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57090 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233106AbiGFSDd (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 6 Jul 2022 14:03:33 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id E8384140CA
-        for <kvm@vger.kernel.org>; Wed,  6 Jul 2022 11:03:30 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1657130610;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=VBlFjIiB9ZC4gvoYyy90cQtMpZILwrGOgeqSFzZ8m1s=;
-        b=W2+30qm6LRxDKb5EdriLGiSA/CyflO8u+BQB5X3bVkT7OUUc0NKLyx4dZEXaE2apbtdNIw
-        O1FO/nhwIRDBfuQRDZsk7xwd/KLqhO1NtlB/x+q0oZRyGl9TEvTydgbxCEbFYeFxSPdtBi
-        e96WT8CnIyhXG8KEAZyTp8UttNaqni4=
-Received: from mail-il1-f199.google.com (mail-il1-f199.google.com
- [209.85.166.199]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-115-5S2y5H_dOXSD6GyP1c6ZnA-1; Wed, 06 Jul 2022 14:03:29 -0400
-X-MC-Unique: 5S2y5H_dOXSD6GyP1c6ZnA-1
-Received: by mail-il1-f199.google.com with SMTP id i8-20020a056e02152800b002dc3cddda9cso474120ilu.16
-        for <kvm@vger.kernel.org>; Wed, 06 Jul 2022 11:03:28 -0700 (PDT)
+        with ESMTP id S234374AbiGFSNt (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 6 Jul 2022 14:13:49 -0400
+Received: from mail-oa1-x2c.google.com (mail-oa1-x2c.google.com [IPv6:2001:4860:4864:20::2c])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2C4F3B7D6
+        for <kvm@vger.kernel.org>; Wed,  6 Jul 2022 11:13:48 -0700 (PDT)
+Received: by mail-oa1-x2c.google.com with SMTP id 586e51a60fabf-10bec750eedso14694254fac.8
+        for <kvm@vger.kernel.org>; Wed, 06 Jul 2022 11:13:48 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=7fWRDNeX9MMfp7ZEnj1zISls/i3Z9E63XbcmRmnrtV4=;
+        b=LSY5fpPHj4ODjWxLFsQ9CCFHdMccQXXVWbagQg8W6sKSpRG79C61MjDBvwdytJYiP1
+         v/sOP4TlMEi9u8iCMRIvpNMnk5MDT30+cGLjsGLXmiI2SiSk+7ojKAmmRyYdGZWz/gKH
+         jyRYhjWDLxcCB4tk8HADZx8VemvH77M4nBLeqNxfXlkrDsVzmXIYbSVch2LVL5RzMDXF
+         vgDLZUpSMPj2TdbmuXkGJ+Q5hphs9i9pMD+RX2jt5UxnqjSeof3u1cu4LqnFJDTTEb9j
+         +RIB3tV1O8+E3L3JcHABdZKK4JPWtxLMy0cLIOjyQdvA5UCtCUCXZ860tRxOYl3nVMLM
+         Yt/w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:in-reply-to
-         :references:organization:mime-version:content-transfer-encoding;
-        bh=VBlFjIiB9ZC4gvoYyy90cQtMpZILwrGOgeqSFzZ8m1s=;
-        b=b//NEkBE1PB6GEE3Sgmu/hrFYsobH9i62SZMeFbHxK8j3AdcjY4qjeKsCGJ9SBr9lX
-         cQJZ7vQNz5HDuNV0XAGW8/6zs3B+C2DUIlknHP81f9XNhCCPnsO1gz2ip6XGCn2DyEGE
-         PYIOrLQz5rnGY4rOW7+z5uNA5e/2Y7Gt9LtDtm7HAA1CutFHOvrb897bTWdqhq81RYpt
-         UTKBsTHFo4T91rW2QonnnomS1c2jFJguslg4ZqShLu/T0Bm6eZN1BsjqjBK9AQHZNl3u
-         /s+O4hrC1U2vNN8gwIGEc5N5xQPpn7q8byzNCVRe7rxxT8RgNLf7xb9bgy2FF89V69vG
-         hOJQ==
-X-Gm-Message-State: AJIora9gXFX5SM96aF1sGOTtkM7SNP4ksq448427GUEpkZ4eAu8VgP/N
-        FNPamNjNqTml7HWD7Anwj7SJWxjlUX295zrTFQHueTf+vJBheHrdWhGH/Q9quC5E0pWyWvb6s7u
-        DRBq9zKeYLmab
-X-Received: by 2002:a05:6638:218f:b0:33c:caf0:a61c with SMTP id s15-20020a056638218f00b0033ccaf0a61cmr26531489jaj.198.1657130608158;
-        Wed, 06 Jul 2022 11:03:28 -0700 (PDT)
-X-Google-Smtp-Source: AGRyM1tABH1Ic8RqUAALPXzLJn+RofmhnwMLRPJ18ZPWLjNFSi2aNVbpdWUQPpp6mJB+LAKijjE03g==
-X-Received: by 2002:a05:6638:218f:b0:33c:caf0:a61c with SMTP id s15-20020a056638218f00b0033ccaf0a61cmr26531473jaj.198.1657130607865;
-        Wed, 06 Jul 2022 11:03:27 -0700 (PDT)
-Received: from redhat.com ([38.15.36.239])
-        by smtp.gmail.com with ESMTPSA id co14-20020a0566383e0e00b0033efe711a37sm1538401jab.35.2022.07.06.11.03.26
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 06 Jul 2022 11:03:27 -0700 (PDT)
-Date:   Wed, 6 Jul 2022 12:03:25 -0600
-From:   Alex Williamson <alex.williamson@redhat.com>
-To:     Nicolin Chen <nicolinc@nvidia.com>
-Cc:     <joro@8bytes.org>, <will@kernel.org>, <marcan@marcan.st>,
-        <sven@svenpeter.dev>, <robin.murphy@arm.com>,
-        <robdclark@gmail.com>, <baolu.lu@linux.intel.com>,
-        <orsonzhai@gmail.com>, <baolin.wang7@gmail.com>,
-        <zhang.lyra@gmail.com>, <jean-philippe@linaro.org>,
-        <jgg@nvidia.com>, <kevin.tian@intel.com>,
-        <suravee.suthikulpanit@amd.com>, <alyssa@rosenzweig.io>,
-        <dwmw2@infradead.org>, <mjrosato@linux.ibm.com>,
-        <gerald.schaefer@linux.ibm.com>, <thierry.reding@gmail.com>,
-        <vdumpa@nvidia.com>, <jonathanh@nvidia.com>, <cohuck@redhat.com>,
-        <thunder.leizhen@huawei.com>, <christophe.jaillet@wanadoo.fr>,
-        <chenxiang66@hisilicon.com>, <john.garry@huawei.com>,
-        <yangyingliang@huawei.com>, <iommu@lists.linux.dev>,
-        <linux-kernel@vger.kernel.org>,
-        <linux-arm-kernel@lists.infradead.org>,
-        <linux-arm-msm@vger.kernel.org>, <linux-s390@vger.kernel.org>,
-        <linux-tegra@vger.kernel.org>,
-        <virtualization@lists.linux-foundation.org>, <kvm@vger.kernel.org>
-Subject: Re: [PATCH v5 0/5] cover-letter: Simplify vfio_iommu_type1
- attach/detach routine
-Message-ID: <20220706120325.4741ff34.alex.williamson@redhat.com>
-In-Reply-To: <YsXMMCX5LY/3IOtf@Asurada-Nvidia>
-References: <20220701214455.14992-1-nicolinc@nvidia.com>
-        <20220706114217.105f4f61.alex.williamson@redhat.com>
-        <YsXMMCX5LY/3IOtf@Asurada-Nvidia>
-Organization: Red Hat
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=7fWRDNeX9MMfp7ZEnj1zISls/i3Z9E63XbcmRmnrtV4=;
+        b=7SMKaN+dGnIQjQy/8RSxHo0/XG6arMMR0DCrcXJkz+9mqP6Wy3jJ4b1F7GZWDgR+Hx
+         8dHFiyvai/t2LTiX4Z+CWtbFnqNnRdTaP6+607vsACyz8DPsiaN6oaK74cwouKGHR13N
+         szMQqAbi/LslFbZG8uRRgy84LJRfjCamhf+JiKBkvsOvoyPOfAJjc/b/b+Texx5dONB6
+         YCFDErK/jNbRySYlCpwG1dYYQ25gXlK0cLyDK8Qyt1olZbXrcqzvqZqniQtftLSW++nj
+         ksmdTH+hD3vtzPpgE+PgGzNkDnBv4PAc7KQnNNHw4aEuClhEmBsYvMZZ/jggR0EhAItS
+         PwZQ==
+X-Gm-Message-State: AJIora8n0g77Nt2cgas6uPs164nGK30yYACprNeUy+3zCdHj7TmXIkBL
+        /v9c7AU2bpoeGwFN4+5Zt3uC5ifeET16BBobtVfeyg==
+X-Google-Smtp-Source: AGRyM1sMShOFtGknX+KfS0VwLuvS48QVMtsbgqt5zd+qQNVYk34Z62nVt80xNGcx+pAMuQL76YDfGHMvR1Efkb0SOic=
+X-Received: by 2002:a05:6870:56aa:b0:10b:f4fb:8203 with SMTP id
+ p42-20020a05687056aa00b0010bf4fb8203mr11908251oao.181.1657131227362; Wed, 06
+ Jul 2022 11:13:47 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-3.5 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,
-        SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=unavailable
-        autolearn_force=no version=3.4.6
+References: <20220621150902.46126-1-mlevitsk@redhat.com> <20220621150902.46126-12-mlevitsk@redhat.com>
+ <CALMp9eSe5jtvmOPWLYCcrMmqyVBeBkg90RwtR4bwxay99NAF3g@mail.gmail.com>
+ <42da1631c8cdd282e5d9cfd0698b6df7deed2daf.camel@redhat.com>
+ <CALMp9eRNZ8D5aRyUEkc7CORz-=bqzfVCSf6nOGZhqQfWfte0dw@mail.gmail.com> <289c2dd941ecbc3c32514fc0603148972524b22d.camel@redhat.com>
+In-Reply-To: <289c2dd941ecbc3c32514fc0603148972524b22d.camel@redhat.com>
+From:   Jim Mattson <jmattson@google.com>
+Date:   Wed, 6 Jul 2022 11:13:36 -0700
+Message-ID: <CALMp9eS2gxzWU1+OpfBTqCZsmyq8qoCW_Qs84xv=rGo1ranG1Q@mail.gmail.com>
+Subject: Re: [PATCH v2 11/11] KVM: x86: emulator/smm: preserve interrupt
+ shadow in SMRAM
+To:     Maxim Levitsky <mlevitsk@redhat.com>
+Cc:     kvm@vger.kernel.org, Sean Christopherson <seanjc@google.com>,
+        x86@kernel.org, Kees Cook <keescook@chromium.org>,
+        Dave Hansen <dave.hansen@linux.intel.com>,
+        linux-kernel@vger.kernel.org, "H. Peter Anvin" <hpa@zytor.com>,
+        Borislav Petkov <bp@alien8.de>, Joerg Roedel <joro@8bytes.org>,
+        Ingo Molnar <mingo@redhat.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>
+Content-Type: text/plain; charset="UTF-8"
+X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
+        T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL
+        autolearn=unavailable autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, 6 Jul 2022 10:53:52 -0700
-Nicolin Chen <nicolinc@nvidia.com> wrote:
+On Tue, Jul 5, 2022 at 6:38 AM Maxim Levitsky <mlevitsk@redhat.com> wrote:
 
-> On Wed, Jul 06, 2022 at 11:42:17AM -0600, Alex Williamson wrote:
-> 
-> > On Fri, 1 Jul 2022 14:44:50 -0700
-> > Nicolin Chen <nicolinc@nvidia.com> wrote:
-> >   
-> > > This is a preparatory series for IOMMUFD v2 patches. It enforces error
-> > > code -EMEDIUMTYPE in iommu_attach_device() and iommu_attach_group() when
-> > > an IOMMU domain and a device/group are incompatible. It also drops the
-> > > useless domain->ops check since it won't fail in current environment.
-> > >
-> > > These allow VFIO iommu code to simplify its group attachment routine, by
-> > > avoiding the extra IOMMU domain allocations and attach/detach sequences
-> > > of the old code.
-> > >
-> > > Worths mentioning the exact match for enforce_cache_coherency is removed
-> > > with this series, since there's very less value in doing that as KVM will
-> > > not be able to take advantage of it -- this just wastes domain memory.
-> > > Instead, we rely on Intel IOMMU driver taking care of that internally.
-> > >
-> > > This is on github:
-> > > https://github.com/nicolinc/iommufd/commits/vfio_iommu_attach  
-> > 
-> > How do you foresee this going in, I'm imagining Joerg would merge the
-> > first patch via the IOMMU tree and provide a topic branch that I'd
-> > merge into the vfio tree along with the remaining patches.  Sound
-> > right?  Thanks,  
-> 
-> We don't have any build dependency between the IOMMU change and
-> VFIO changes, yet, without the IOMMU one, any iommu_attach_group()
-> failure now would be a hard failure without a chance falling back
-> to a new_domain, which is slightly different from the current flow.
-> 
-> For a potential existing use case that relies on reusing existing
-> domain, I think it'd be safer to have Joerg acking the first change
-> so you merge them all? Thank!
+> Most of the SMI save state area is reserved, and the handler has no way of knowing
+> what CPU stored there, it can only access the fields that are reserved in the spec.
+>
+> Yes, if the SMI handler really insists it can see that the saved RIP points to an
+> instruction that follows the STI, but does that really matter? It is allowed by the
+> spec explicitly anyway.
 
-Works for me, I'll look for buy-in + ack from Joerg.  Thanks,
+I was just pointing out that the difference between blocking SMI and
+not blocking SMI is, in fact, observable.
 
-Alex
+> Plus our SMI layout (at least for 32 bit) doesn't confirm to the X86 spec anyway,
+> we as I found out flat out write over the fields that have other meaning in the X86 spec.
 
+Shouldn't we fix that?
+
+> Also I proposed to preserve the int shadow in internal kvm state and migrate
+> it in upper 4 bits of the 'shadow' field of struct kvm_vcpu_events.
+> Both Paolo and Sean proposed to store the int shadow in the SMRAM instead,
+> and you didn't object to this, and now after I refactored and implemented
+> the whole thing you suddently do.
+
+I did not see the prior conversations. I rarely get an opportunity to
+read the list.
+
+> However AMD just recently posted a VNMI patch series to avoid
+> single stepping the CPU when NMI is blocked due to the same reason, because
+> it is fragile.
+
+The vNMI feature isn't available in any shipping processor yet, is it?
+
+> Do you really want KVM to single step the guest in this case, to deliver the #SMI?
+> I can do it, but it is bound to cause lot of trouble.
+
+Perhaps you could document this as a KVM erratum...one of many
+involving virtual SMI delivery.
