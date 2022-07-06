@@ -2,31 +2,31 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 89501567EFD
-	for <lists+kvm@lfdr.de>; Wed,  6 Jul 2022 08:55:15 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 32AC2567F0A
+	for <lists+kvm@lfdr.de>; Wed,  6 Jul 2022 08:56:58 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230231AbiGFGzN (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 6 Jul 2022 02:55:13 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48464 "EHLO
+        id S230387AbiGFG4j (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 6 Jul 2022 02:56:39 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49766 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229477AbiGFGzM (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 6 Jul 2022 02:55:12 -0400
+        with ESMTP id S229530AbiGFG4i (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 6 Jul 2022 02:56:38 -0400
 Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:3::133])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8E21F1B79C;
-        Tue,  5 Jul 2022 23:55:10 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3653F1CB0A;
+        Tue,  5 Jul 2022 23:56:38 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
         d=infradead.org; s=bombadil.20210309; h=In-Reply-To:Content-Type:MIME-Version
         :References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
         Content-Transfer-Encoding:Content-ID:Content-Description;
-        bh=ik/uJsE+zpdPuUdS11m0Q/X6NmB5A5tIeaLT1FExMqk=; b=HHs4PsCAW1BgdmGMF7lVwPZBlR
-        WXelzySoHmOcfeyjYIDcxKxiSPrY3LgVkMWP06N+b1YMeIjqTQqibdKCLa3W3s6TISEEwPbYtz9hf
-        BuIfwbhWwKLUHmKXNlqKTzZIYUbxhMSDKDYDdgAErXVCEYOpTmfAM4yMn9tEpniYFBvxBn76mxl2y
-        bsyyRpfl1bgczxu9jW5/iSXW5sl1VvDaH7+wHUdC+IDz12TBfxUbxNt4TIWkoXcBraRCmAoI9xGPy
-        vLhJBjwY9NsA2OjzsrT2pWrhwOn/GsnSIQUmBOpgVrLFDDuEAHUBsL2PiXUaquNnBt0KfA6OTgFvJ
-        BQurlmbA==;
+        bh=/m24PsaB4Cz1aJpY2Cyju0n6At9XHWz5aCK5PGbqU1o=; b=X7/FBvhB9T2/CRNeMUuvEypKFb
+        mD4tslMhbVmzWVE7SzYN0fXxNPgmANxnjxT2D6qxg2jDjE0bROkrGdpPBFAyPSO8FHnKUCIG/tgPV
+        CMNagu0OUPgBs64PQS7P4nXbZgGlxj5VjAJ6nM6zqV7hQjSC6sKfZLLO0RJ0VL4NobI37zolQJAUN
+        cAgI2u0JmXW32Dyx1G0/S+Yv9wxomqBEfcd4FRBh8980GD/IG+cC0BSRiZbJJO4/EubgDPvK8J0WA
+        zOJSX/xDYsjpPpiNWA8VsEiOYtCIsjsjimpF4ualAySYR/TX0H9EHbt+3pK55aWBcTupeb+etyics
+        m5+ajWhg==;
 Received: from hch by bombadil.infradead.org with local (Exim 4.94.2 #2 (Red Hat Linux))
-        id 1o8yvy-006rFh-Ez; Wed, 06 Jul 2022 06:54:50 +0000
-Date:   Tue, 5 Jul 2022 23:54:50 -0700
+        id 1o8yxV-006rmp-Lm; Wed, 06 Jul 2022 06:56:25 +0000
+Date:   Tue, 5 Jul 2022 23:56:25 -0700
 From:   Christoph Hellwig <hch@infradead.org>
 To:     Nicolin Chen <nicolinc@nvidia.com>
 Cc:     kwankhede@nvidia.com, corbet@lwn.net, hca@linux.ibm.com,
@@ -45,14 +45,15 @@ Cc:     kwankhede@nvidia.com, corbet@lwn.net, hca@linux.ibm.com,
         linux-kernel@vger.kernel.org, linux-s390@vger.kernel.org,
         intel-gvt-dev@lists.freedesktop.org,
         intel-gfx@lists.freedesktop.org, dri-devel@lists.freedesktop.org
-Subject: Re: [RFT][PATCH v2 1/9] vfio: Make vfio_unpin_pages() return void
-Message-ID: <YsUxurAoglm7GmZP@infradead.org>
+Subject: Re: [RFT][PATCH v2 4/9] vfio: Pass in starting IOVA to
+ vfio_pin/unpin_pages API
+Message-ID: <YsUyGS7kct2BbiS8@infradead.org>
 References: <20220706062759.24946-1-nicolinc@nvidia.com>
- <20220706062759.24946-2-nicolinc@nvidia.com>
+ <20220706062759.24946-5-nicolinc@nvidia.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20220706062759.24946-2-nicolinc@nvidia.com>
+In-Reply-To: <20220706062759.24946-5-nicolinc@nvidia.com>
 X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
 X-Spam-Status: No, score=-2.8 required=5.0 tests=BAYES_00,DKIM_SIGNED,
         DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,SPF_HELO_NONE,
@@ -64,27 +65,10 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-> +void vfio_unpin_pages(struct vfio_device *device, unsigned long *user_pfn,
-> +		      int npage)
->  {
->  	struct vfio_container *container;
->  	struct vfio_iommu_driver *driver;
-> -	int ret;
->  
-> -	if (!user_pfn || !npage || !vfio_assert_device_open(device))
-> -		return -EINVAL;
-> +	if (WARN_ON_ONCE(!user_pfn || !npage || !vfio_assert_device_open(device)))
+> -		vfio_unpin_pages(&q->matrix_mdev->vdev, &q->saved_pfn, 1);
+> +		vfio_unpin_pages(&q->matrix_mdev->vdev, q->saved_pfn << PAGE_SHIFT, 1);
 
-This adds an overly long line.  Note that I think in general it is
-better to have an individual WARN_ON per condition anyway, as that
-allows to directly pinpoint what went wrong when it triggers.
-
-> +	if (WARN_ON_ONCE(unlikely(!driver || !driver->ops->unpin_pages)))
-> +		return;
-
-I'd just skip this check an let it crash.  If someone calls unpin
-on something totally random that wasn't even pinned we don't need to
-handle that gracefully.
+Overly long line here.
 
 Otherwise looks good:
 
