@@ -2,475 +2,179 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 1DF175690D1
-	for <lists+kvm@lfdr.de>; Wed,  6 Jul 2022 19:39:54 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 5DC795690E2
+	for <lists+kvm@lfdr.de>; Wed,  6 Jul 2022 19:42:43 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234009AbiGFRjg (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 6 Jul 2022 13:39:36 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56862 "EHLO
+        id S234055AbiGFRma (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 6 Jul 2022 13:42:30 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58780 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233975AbiGFRj1 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 6 Jul 2022 13:39:27 -0400
-Received: from NAM10-DM6-obe.outbound.protection.outlook.com (mail-dm6nam10on2053.outbound.protection.outlook.com [40.107.93.53])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 468A42AC67;
-        Wed,  6 Jul 2022 10:39:25 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=XdDatcXjPnY7Bz8x2dWVZM6kfiWj6LEN292j5e2k9byU5TjAFwV9YBBpQ6JKj8Gz3nQgiIoJfYDW/zcFvjwB4ZBTQrGDJtZGLfthzfiOP2/1IM3nSb5SMJTtwLqAi2OJx7TOSC/qiVkkFnnkPMjcNaksQGHsvphI2gtag2z+zKJUOO8XIdMFb4iyNHhcPOiHNLJ80CrvL0dvqECyDCMtPdt8mQtR4nlo1jZ3VA0+OMja5y3EK2hNhPOLo5ACHBtdgQhhcT1oA1Z7YH4v4Ydja8scze/dcgZGkAhRqw/keI7Buru/E9CCR4mJrgbIxUSAWO0j6RT1pXg9NrG2FkZT1w==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=G+qTDYZb6KlAgz7Q4gPvEG7viTPUVb70eJ7Qxw7X9fo=;
- b=grJN2XakLTW3Cyo4M9ZU1CudfQHadwaPFKIh3iUGyulLm7NCfrZAa6jxgErcc/rKhhuDg6fmORjcM/q6CJQ/dyzwe60IIUwIbQLGWrdabC+Y7VFHuzS+y4T+OgPw4/Yn1C2xhpgU1cOMHpUvnKlbzrPLXccffYg8VgLnjYd1gp7AMTmSK6K1jzgUY7kLNy16I4hmKEZovRN4VPQ3/lkKxadVA/oYpmtPe2O0gNuW6oJkUuZjGbsdMhApieJahWBtL4wybBndEVGKrCupY+tqnVhUSxdMaN2sqDE1W0eiC8BSV/dxiB9F23N4SFzS4vF4X0ZlCAYl9/Tu/sxk20q4HQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
- dkim=pass header.d=nvidia.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=G+qTDYZb6KlAgz7Q4gPvEG7viTPUVb70eJ7Qxw7X9fo=;
- b=SboWLEAWBEnzyxJmatQoTbUj8ar4KaEgOnvbVcK7f/4cH7lnO8EOfJggnbzz5H56x/hg/+BQmqaT6coNYNxAoofzqmtOHiYUWFn1eX+VrY8lXFzO/OhUTka6kkpmZjhMWKaagJyA8aXMlkUeKDPrrrlCXcVGSmIPwFY2TUFxwd8Mc4kBUvIUrTxI4utcbPgW6VQMMWomJrT0kM/bkIuBSDNf5y9MBDaOlpVIlLEM8/CH5BP1hmWA8k3s1if7Jm9Hc/bCgn8kG2eUcv+r6t4byR1R+67EDALFkIfwXBKEee0g+zJmCkNM2H86kMJ1722MDS9XzkykWcu6a8MpPgZlVg==
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nvidia.com;
-Received: from MN2PR12MB4206.namprd12.prod.outlook.com (2603:10b6:208:1d5::18)
- by BN8PR12MB3332.namprd12.prod.outlook.com (2603:10b6:408:66::10) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5395.15; Wed, 6 Jul
- 2022 17:39:23 +0000
-Received: from MN2PR12MB4206.namprd12.prod.outlook.com
- ([fe80::e16c:261d:891d:676c]) by MN2PR12MB4206.namprd12.prod.outlook.com
- ([fe80::e16c:261d:891d:676c%3]) with mapi id 15.20.5395.022; Wed, 6 Jul 2022
- 17:39:23 +0000
-Message-ID: <329db8e1-9d3c-a3ad-8c54-b6cf63a2690d@nvidia.com>
-Date:   Wed, 6 Jul 2022 23:09:05 +0530
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:91.0) Gecko/20100101
- Thunderbird/91.10.0
-Subject: Re: [RFT][PATCH v2 9/9] vfio: Replace phys_pfn with pages for
- vfio_pin_pages()
-Content-Language: en-US
-To:     Nicolin Chen <nicolinc@nvidia.com>, corbet@lwn.net,
-        hca@linux.ibm.com, gor@linux.ibm.com, agordeev@linux.ibm.com,
-        borntraeger@linux.ibm.com, svens@linux.ibm.com,
-        zhenyuw@linux.intel.com, zhi.a.wang@intel.com,
-        jani.nikula@linux.intel.com, joonas.lahtinen@linux.intel.com,
-        rodrigo.vivi@intel.com, tvrtko.ursulin@linux.intel.com,
-        airlied@linux.ie, daniel@ffwll.ch, farman@linux.ibm.com,
-        mjrosato@linux.ibm.com, pasic@linux.ibm.com, vneethv@linux.ibm.com,
-        oberpar@linux.ibm.com, freude@linux.ibm.com,
-        akrowiak@linux.ibm.com, jjherne@linux.ibm.com,
-        alex.williamson@redhat.com, cohuck@redhat.com, jgg@nvidia.com,
-        kevin.tian@intel.com, hch@infradead.org
-Cc:     jchrist@linux.ibm.com, kvm@vger.kernel.org,
-        linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org,
-        linux-s390@vger.kernel.org, intel-gvt-dev@lists.freedesktop.org,
-        intel-gfx@lists.freedesktop.org, dri-devel@lists.freedesktop.org,
-        Tarun Gupta <targupta@nvidia.com>,
-        Shounak Deshpande <shdeshpande@nvidia.com>,
-        Neo Jia <cjia@nvidia.com>
-References: <20220706062759.24946-1-nicolinc@nvidia.com>
- <20220706062759.24946-10-nicolinc@nvidia.com>
-X-Nvconfidentiality: public
-From:   Kirti Wankhede <kwankhede@nvidia.com>
-In-Reply-To: <20220706062759.24946-10-nicolinc@nvidia.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: MA0PR01CA0091.INDPRD01.PROD.OUTLOOK.COM
- (2603:1096:a01:ae::14) To MN2PR12MB4206.namprd12.prod.outlook.com
- (2603:10b6:208:1d5::18)
+        with ESMTP id S233941AbiGFRmY (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 6 Jul 2022 13:42:24 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 351F024094
+        for <kvm@vger.kernel.org>; Wed,  6 Jul 2022 10:42:23 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1657129342;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=Bm6ni0e0Z3ZqDaHM6VmzfCaa2VxT43x1YW4zQJliK1o=;
+        b=ARIhqBTzHZQ3VgDQMRTAdHi9Y8jPgiIXohT0OxHDSwtw6gl1N1h3ET1DRL3mNkdAKR4gl6
+        XQbWPvIJwfAF+rAqbPWyMz8zjxbXnMlgxddojke0zmTnLcIx8i0t1Pk9r4FXhENIQ8ANqy
+        gM0XkDbbUUOpgle8EGk3Q9y5Rv5Z12k=
+Received: from mail-il1-f197.google.com (mail-il1-f197.google.com
+ [209.85.166.197]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-437-opk7TiHhMZu_q7qFtdi3kw-1; Wed, 06 Jul 2022 13:42:21 -0400
+X-MC-Unique: opk7TiHhMZu_q7qFtdi3kw-1
+Received: by mail-il1-f197.google.com with SMTP id i8-20020a056e020d8800b002d931252904so8056173ilj.23
+        for <kvm@vger.kernel.org>; Wed, 06 Jul 2022 10:42:21 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:in-reply-to
+         :references:organization:mime-version:content-transfer-encoding;
+        bh=Bm6ni0e0Z3ZqDaHM6VmzfCaa2VxT43x1YW4zQJliK1o=;
+        b=f2Zy49NZYIQ/qLs6uFXkvSN76+BZJbUg3oA8KtgqYFIRyuF1KtWTG2MxwfLYEel3jj
+         jfWMN1fvRYWs0+f+I7q7APmYQtJNhl1V1HRA/Cd9XUJhGQX3ambEE3lRkBVTgVdBCaSj
+         J37NPK5qk30GPivaYwpZuKXGShKEL1Nwy7tJIcfZy+XvJ6ixaegv+lZfwJUOWkKqAiWl
+         CZo0QLVmhO/lufBXlWUoyOnQf1z3nyjJFzD4SBVLuEzoesN8txaQBS/Ag9kX9+OUlxwq
+         KhhiaQaAIOigOv8Crg38LQJ7zmUs+GznSf4ICyNvf8vOxYVO0+XnN9BWf9nZp2aUPIKO
+         JGxw==
+X-Gm-Message-State: AJIora9SVu5yishTEpiGAMqjlYSFjyxjpr2n52uILcPTfCy3QYUObAYr
+        qMO+WRP5zvR69WuKZ3RPaZi69AvXh9kmbj4GLFenJB66p4w/831jDxlYXDSGpZBxOBVo7OU88/J
+        kLdmWBJst6VYi
+X-Received: by 2002:a05:6e02:1be6:b0:2db:ea7f:10c4 with SMTP id y6-20020a056e021be600b002dbea7f10c4mr17220917ilv.248.1657129340280;
+        Wed, 06 Jul 2022 10:42:20 -0700 (PDT)
+X-Google-Smtp-Source: AGRyM1tKW5hHrIbN8D8MKAPlov0FsaTgJJCZrivyPi82ikNP5NQmibHb26OWtdHiMispm5nOi3tbJA==
+X-Received: by 2002:a05:6e02:1be6:b0:2db:ea7f:10c4 with SMTP id y6-20020a056e021be600b002dbea7f10c4mr17220872ilv.248.1657129339926;
+        Wed, 06 Jul 2022 10:42:19 -0700 (PDT)
+Received: from redhat.com ([38.15.36.239])
+        by smtp.gmail.com with ESMTPSA id i83-20020a6bb856000000b0065a47e16f53sm17005663iof.37.2022.07.06.10.42.18
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 06 Jul 2022 10:42:19 -0700 (PDT)
+Date:   Wed, 6 Jul 2022 11:42:17 -0600
+From:   Alex Williamson <alex.williamson@redhat.com>
+To:     Nicolin Chen <nicolinc@nvidia.com>
+Cc:     <joro@8bytes.org>, <will@kernel.org>, <marcan@marcan.st>,
+        <sven@svenpeter.dev>, <robin.murphy@arm.com>,
+        <robdclark@gmail.com>, <baolu.lu@linux.intel.com>,
+        <orsonzhai@gmail.com>, <baolin.wang7@gmail.com>,
+        <zhang.lyra@gmail.com>, <jean-philippe@linaro.org>,
+        <jgg@nvidia.com>, <kevin.tian@intel.com>,
+        <suravee.suthikulpanit@amd.com>, <alyssa@rosenzweig.io>,
+        <dwmw2@infradead.org>, <mjrosato@linux.ibm.com>,
+        <gerald.schaefer@linux.ibm.com>, <thierry.reding@gmail.com>,
+        <vdumpa@nvidia.com>, <jonathanh@nvidia.com>, <cohuck@redhat.com>,
+        <thunder.leizhen@huawei.com>, <christophe.jaillet@wanadoo.fr>,
+        <chenxiang66@hisilicon.com>, <john.garry@huawei.com>,
+        <yangyingliang@huawei.com>, <iommu@lists.linux.dev>,
+        <linux-kernel@vger.kernel.org>,
+        <linux-arm-kernel@lists.infradead.org>,
+        <linux-arm-msm@vger.kernel.org>, <linux-s390@vger.kernel.org>,
+        <linux-tegra@vger.kernel.org>,
+        <virtualization@lists.linux-foundation.org>, <kvm@vger.kernel.org>
+Subject: Re: [PATCH v5 0/5] cover-letter: Simplify vfio_iommu_type1
+ attach/detach routine
+Message-ID: <20220706114217.105f4f61.alex.williamson@redhat.com>
+In-Reply-To: <20220701214455.14992-1-nicolinc@nvidia.com>
+References: <20220701214455.14992-1-nicolinc@nvidia.com>
+Organization: Red Hat
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: ac75a45a-7d35-42ec-d08f-08da5f7676ad
-X-MS-TrafficTypeDiagnostic: BN8PR12MB3332:EE_
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: ryNq3Hl7V7/2qP+aKeU/dJi1QtJAqsA3bFg6iTlqpTldNd9+st3Pvy+nXdCgcPUDkim/y5SPKEgW1otGqS2hkqEQFRc3lbCMYW2Kmnqx7mb8vrl+0o50NmJavIH+lzuwgl+JtGQRR9Wk5fMaTE6DUXmR7w94dVIVYVLHTpSOD6pi1GYVn6c4F5VSVDPFm25AlidKImb3L2vy8HSyd4yrQ4c+3cxy6CY8pe5icbjrGYLOrzVRb/AyVB3ZIZMSJtlLDc1dsl3ED//YlXqHaXzYzh5qzKM3a7ZehCELCWgcmhoRBDnwOMl6D0gH3oZN64f0qih+daSuii9EOlVMDVqw1mix9erJGZXwQjneAbNs7HTqLr5izfiH2kLdocdLHVJuFm2GWvXJebzCJsfnZpWFYThkw2cRyXAN2zplYQ1NphamyVLRDVy+OXTV2K0iTD1YahyD4O3x/sF6KbYqHjc43PtvyTAOSovuhBDQaC0VXc0XwsKLzDBon8YbMROCc2PlB+kRRAqpdruwRyQZJ1ul0v7V8osO2BDefexnGev3qfrLyxTxylah0jRfNlVASCb7NbUIMK8Sj1l+VOz/r8COta3i2x3hibQvy2aTTkzwF9BRchXSJNrj/XKhbRrytGd7GdfVegi10vkABNKdp1ZT5POnVM5raTrAvNwrcjt0AuAEZKOg7ryFbLp/wTXLnQMDhzQ40AjLmNsLiCu6f78Lex2OkGScl22Vi47WJj5LkyoCgw/PEHW+NePi2LhRiW7H1Jh1+QpTuKEDxMj4+Qgl4AdCkm31as0YrOhVZEQNx17KHB+wd/TI8RrRMwaKrh8L1UJ2z8dANFOFv0MMwErEwMyXNynbQ681GYX9sQvjcRg=
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:MN2PR12MB4206.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230016)(4636009)(396003)(346002)(366004)(39860400002)(376002)(136003)(83380400001)(26005)(8676002)(4326008)(186003)(66556008)(66476007)(86362001)(478600001)(31696002)(6486002)(7406005)(30864003)(66946007)(5660300002)(8936002)(7416002)(921005)(38100700002)(41300700001)(2906002)(107886003)(2616005)(6666004)(55236004)(53546011)(54906003)(6506007)(316002)(6512007)(31686004)(36756003)(45980500001)(43740500002);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?V1ZFRmRYOSs4T3BPRTAzRDVtWDRGUXplblpjTldRK1FmWG9PYWNmWlcyWnR2?=
- =?utf-8?B?dzF4bW5aeHBZTmI1cXBwOGtuU0hJakFjZ0xXTWhqOWFwRzNUaklROWFBV2pz?=
- =?utf-8?B?UmwzanZOREtLWEoraFNFcU15bmlNYUR4d0FpaXQrOEhPcFZpdWpwMC9UV3Z4?=
- =?utf-8?B?bmVBb3ZnempqVjJTcDl6OXFCVEliWDVCNFlRT1kvSms5U3RROXY2TlRiUy80?=
- =?utf-8?B?R3QyTncrU0piV0Jzd2l1czBFcVBJcnFHZlBPaEdBNnNvNEZVcTY4dTBJL2Va?=
- =?utf-8?B?ZjNSOG9VWUJxWE1PYm1yemF1c2k4b1BXMHJJQjYzOHlKek9NeSsxa3E0STYy?=
- =?utf-8?B?cXFLRytEQ3hXT3Q2RVhOV2t3anM0bDJSWTkzMDR6eFY2aEMwaHc0bHVHSzBZ?=
- =?utf-8?B?d2NpbGFVbitreUVSSXpWTTdWNXRZYmFJS1dKb3NENjBVdlpMWHNYMlBUeGdv?=
- =?utf-8?B?aVl3cGpjZkVLeGlENWQreTg1cVlCUjRXMi93eFl2NHdpZGF4andSTEpuOXlz?=
- =?utf-8?B?aGVidDZJZ2Rqa1pMK29lbTZYeDczcytXU1Fyb1J2ZEVYWU5pdmgvSVF2YnhU?=
- =?utf-8?B?N3FDOTJvbmtUZXhUQlVHZ3lJbTgxRVZrMmNNT0tXZStrV1JFV0NqcGlSL0Qz?=
- =?utf-8?B?ZzV2Vi9pVmdmcW9CWGs1cDRyWkNVcS85UUFNV1VtNVI5dmpPWVZLS3pxSzcy?=
- =?utf-8?B?dDMyU25QL0dWQS9DR1hsaGVlREtKNm45N2xIVnNTUmdGTUN4eDFITkVRdTZn?=
- =?utf-8?B?ZXZGaXhMT3pGWi92NWlKelFLU0RrYzdwejRUNEdmNFQ1NnJsMnI3ZlB6UDlV?=
- =?utf-8?B?YWhMNFJKRnRoRWdpUVpUUm9JYzZRVzF6TGV2dTJSRXJScTlGeWVyYllYcHNO?=
- =?utf-8?B?R1E3UWhTVE1qMTJLWTVYUjVYSzFJQnpOL05NdHdGek84ekV0YVlkTmt4OU04?=
- =?utf-8?B?dUFOcjIvMjdxeUdCWWg1QXB5WVZmQXBnOXUvZVB5Vk52K2xoN2VCRXRhU01Z?=
- =?utf-8?B?ODB2bzE2cFpJcUxuc0UxUUwzVWRsWnNneitNL2FxTk1mUVprSlBzR2FDbEFO?=
- =?utf-8?B?SHZhbHhaUldPdURrd2xRWGhMQWVqViszQ3NteGxxVTJMckxtNEFQRXVUK2hI?=
- =?utf-8?B?QzFScElTV2lsUnBvbHNjT1ZvMUFoc0FXMlJkVnZ5aTZqMlBWVEZwejNWbjhS?=
- =?utf-8?B?NXVIVEQyMk1rOW9FNWpxUU1SbEUrRmpvc1JIWWhBMlo3c2tMQ2RGbVd6cG1o?=
- =?utf-8?B?TlhMM2lSallwNTJaYU1CTFhvT1dsSVVGNVluVWQySll0NkNYTzU5YjFqbDVK?=
- =?utf-8?B?VkIrbzFoV0loTjJSM2VDVmswbHB3b1kzSE8yd0tJM1JtOXFYbXF6QUdVMWsx?=
- =?utf-8?B?QjJONDlDYzZIek5iOEFCbFN3S2lhTkNmOHJJazdlVjBHRXB2M2pJRHRycWNV?=
- =?utf-8?B?cE1QbitnNTFjNkl2YzI4YUFNZ2Mya2pkelJpSzQxV04xd0xEbzZ2cVNiR0pu?=
- =?utf-8?B?WVo0ZXZjajBvMVNQRXFQSWpiSFluNjBSM1lDR3VyNE5KSzBiekgwZ1psdmNl?=
- =?utf-8?B?dDRlZmZGRzFORDZEWG9WTWVCUnA5SmN6KzhwTHBPbThHQjBrV3VQTDJSM0tE?=
- =?utf-8?B?V0c1dEZwY1N1RmkyZFl2SUNnZ0V1c2ZFalovSDE4U20vMVcrRlZHNG9iWkh6?=
- =?utf-8?B?RWd1RWZHVVFBK2lDTzJYQWMyMWxvdVpVRytWbUdKWkF4QWw1Rk54TVFEWUpi?=
- =?utf-8?B?SnZtVHU5eStiYWdxK3VQQ1NTUk1pOHU5MW4vdXQ5K3BXbXNDSTNReEFiNzho?=
- =?utf-8?B?a0gxTE5OQTlsUUR6QW9HVzZ1dnBxY0d3N1pIaHoxT0ZwRXRQV0NLZUVVcGJF?=
- =?utf-8?B?REpIcWJrQXZvR0NoL05BU1JHSlRRcUZyVGd4a2gyREJqdEhlaUVzOVRoMHUv?=
- =?utf-8?B?bFRiQjBPYUlxV0NOem9DT3R2RVV5Y3hiOXhWVEk0aVNPM0lJSE5EYXMvTURj?=
- =?utf-8?B?aTdrRjVac1kwTTUrdGxDeHphaHJmTjBoYy9pQUl6WU9VZjRBYzdTWjdaTWFm?=
- =?utf-8?B?Sno1M3EwSERFY0xQMDl6M25GQkYxdGo3S0RlVzJDSVFVSlN1ZGRyVDI1YklP?=
- =?utf-8?Q?PfXdqdyQjP6q4Omh+TMV+PblE?=
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: ac75a45a-7d35-42ec-d08f-08da5f7676ad
-X-MS-Exchange-CrossTenant-AuthSource: MN2PR12MB4206.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 06 Jul 2022 17:39:23.1978
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: NHSo8o/i4mspgaZX9+DEK8KDZwoHhjjP/BTiZcQw3NX0VG5cO+gAFk1o+FPt0zicz+Pabca+L94+Zzg6j1pcXw==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: BN8PR12MB3332
-X-Spam-Status: No, score=-1.8 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FORGED_SPF_HELO,
-        NICE_REPLY_A,RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,
-        SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no
-        version=3.4.6
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-Spam-Status: No, score=-3.5 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,
+        SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=unavailable
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+On Fri, 1 Jul 2022 14:44:50 -0700
+Nicolin Chen <nicolinc@nvidia.com> wrote:
 
-Reviewed-by: Kirti Wankhede <kwankhede@nvidia.com>
+> This is a preparatory series for IOMMUFD v2 patches. It enforces error
+> code -EMEDIUMTYPE in iommu_attach_device() and iommu_attach_group() when
+> an IOMMU domain and a device/group are incompatible. It also drops the
+> useless domain->ops check since it won't fail in current environment.
+> 
+> These allow VFIO iommu code to simplify its group attachment routine, by
+> avoiding the extra IOMMU domain allocations and attach/detach sequences
+> of the old code.
+> 
+> Worths mentioning the exact match for enforce_cache_coherency is removed
+> with this series, since there's very less value in doing that as KVM will
+> not be able to take advantage of it -- this just wastes domain memory.
+> Instead, we rely on Intel IOMMU driver taking care of that internally.
+> 
+> This is on github:
+> https://github.com/nicolinc/iommufd/commits/vfio_iommu_attach
 
-On 7/6/2022 11:57 AM, Nicolin Chen wrote:
-> Most of the callers of vfio_pin_pages() want "struct page *" and the
-> low-level mm code to pin pages returns a list of "struct page *" too.
-> So there's no gain in converting "struct page *" to PFN in between.
+How do you foresee this going in, I'm imagining Joerg would merge the
+first patch via the IOMMU tree and provide a topic branch that I'd
+merge into the vfio tree along with the remaining patches.  Sound
+right?  Thanks,
+
+Alex
+
+ 
+> Changelog
+> v5:
+>  * Rebased on top of Robin's "Simplify bus_type determination".
+>  * Fixed a wrong change returning -EMEDIUMTYPE in arm-smmu driver.
+>  * Added Baolu's "Reviewed-by".
+> v4:
+>  * Dropped -EMEDIUMTYPE change in mtk_v1 driver per Robin's input
+>  * Added Baolu's and Kevin's Reviewed-by lines
+> v3: https://lore.kernel.org/kvm/20220623200029.26007-1-nicolinc@nvidia.com/
+>  * Dropped all dev_err since -EMEDIUMTYPE clearly indicates what error.
+>  * Updated commit message of enforce_cache_coherency removing patch.
+>  * Updated commit message of domain->ops removing patch.
+>  * Replaced "goto out_unlock" with simply mutex_unlock() and return.
+>  * Added a line of comments for -EMEDIUMTYPE return check.
+>  * Moved iommu_get_msi_cookie() into alloc_attach_domain() as a cookie
+>    should be logically tied to the lifetime of a domain itself.
+>  * Added Kevin's "Reviewed-by".
+> v2: https://lore.kernel.org/kvm/20220616000304.23890-1-nicolinc@nvidia.com/
+>  * Added -EMEDIUMTYPE to more IOMMU drivers that fit the category.
+>  * Changed dev_err to dev_dbg for -EMEDIUMTYPE to avoid kernel log spam.
+>  * Dropped iommu_ops patch, and removed domain->ops in VFIO directly,
+>    since there's no mixed-driver use case that would fail the sanity.
+>  * Updated commit log of the patch removing enforce_cache_coherency.
+>  * Fixed a misplace of "num_non_pinned_groups--" in detach_group patch.
+>  * Moved "num_non_pinned_groups++" in PATCH-5 to the common path between
+>    domain-reusing and new-domain pathways, like the code previously did.
+>  * Fixed a typo in EMEDIUMTYPE patch.
+> v1: https://lore.kernel.org/kvm/20220606061927.26049-1-nicolinc@nvidia.com/
 > 
-> Replace the output parameter "phys_pfn" list with a "pages" list, to
-> simplify callers. This also allows us to replace the vfio_iommu_type1
-> implementation with a more efficient one.
+> Jason Gunthorpe (1):
+>   vfio/iommu_type1: Prefer to reuse domains vs match enforced cache
+>     coherency
 > 
-> For now, also update vfio_iommu_type1 to fit this new parameter too.
+> Nicolin Chen (4):
+>   iommu: Return -EMEDIUMTYPE for incompatible domain and device/group
+>   vfio/iommu_type1: Remove the domain->ops comparison
+>   vfio/iommu_type1: Clean up update_dirty_scope in detach_group()
+>   vfio/iommu_type1: Simplify group attachment
 > 
-> Signed-off-by: Nicolin Chen <nicolinc@nvidia.com>
-> ---
->   .../driver-api/vfio-mediated-device.rst       |  2 +-
->   drivers/gpu/drm/i915/gvt/kvmgt.c              | 19 ++++++-------------
->   drivers/s390/cio/vfio_ccw_cp.c                | 19 +++++++++----------
->   drivers/s390/crypto/vfio_ap_ops.c             |  6 +++---
->   drivers/vfio/vfio.c                           |  8 ++++----
->   drivers/vfio/vfio.h                           |  2 +-
->   drivers/vfio/vfio_iommu_type1.c               | 19 +++++++++++--------
->   include/linux/vfio.h                          |  2 +-
->   8 files changed, 36 insertions(+), 41 deletions(-)
+>  drivers/iommu/amd/iommu.c                   |   2 +-
+>  drivers/iommu/apple-dart.c                  |   4 +-
+>  drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3.c |  15 +-
+>  drivers/iommu/arm/arm-smmu/arm-smmu.c       |   5 +-
+>  drivers/iommu/arm/arm-smmu/qcom_iommu.c     |   9 +-
+>  drivers/iommu/intel/iommu.c                 |  10 +-
+>  drivers/iommu/iommu.c                       |  28 ++
+>  drivers/iommu/ipmmu-vmsa.c                  |   4 +-
+>  drivers/iommu/omap-iommu.c                  |   3 +-
+>  drivers/iommu/s390-iommu.c                  |   2 +-
+>  drivers/iommu/sprd-iommu.c                  |   6 +-
+>  drivers/iommu/tegra-gart.c                  |   2 +-
+>  drivers/iommu/virtio-iommu.c                |   3 +-
+>  drivers/vfio/vfio_iommu_type1.c             | 352 ++++++++++----------
+>  14 files changed, 229 insertions(+), 216 deletions(-)
 > 
-> diff --git a/Documentation/driver-api/vfio-mediated-device.rst b/Documentation/driver-api/vfio-mediated-device.rst
-> index ea32a0f13ddb..ba5fefcdae1a 100644
-> --- a/Documentation/driver-api/vfio-mediated-device.rst
-> +++ b/Documentation/driver-api/vfio-mediated-device.rst
-> @@ -263,7 +263,7 @@ The following APIs are provided for translating user pfn to host pfn in a VFIO
->   driver::
->   
->   	int vfio_pin_pages(struct vfio_device *device, dma_addr_t iova,
-> -				  int npage, int prot, unsigned long *phys_pfn);
-> +				  int npage, int prot, struct page **pages);
->   
->   	void vfio_unpin_pages(struct vfio_device *device, dma_addr_t iova,
->   				    int npage);
-> diff --git a/drivers/gpu/drm/i915/gvt/kvmgt.c b/drivers/gpu/drm/i915/gvt/kvmgt.c
-> index ea6041fa48ac..3a49471dcc16 100644
-> --- a/drivers/gpu/drm/i915/gvt/kvmgt.c
-> +++ b/drivers/gpu/drm/i915/gvt/kvmgt.c
-> @@ -239,7 +239,7 @@ static void gvt_unpin_guest_page(struct intel_vgpu *vgpu, unsigned long gfn,
->   static int gvt_pin_guest_page(struct intel_vgpu *vgpu, unsigned long gfn,
->   		unsigned long size, struct page **page)
->   {
-> -	unsigned long base_pfn = 0;
-> +	struct page *base_page = NULL;
->   	int total_pages;
->   	int npage;
->   	int ret;
-> @@ -251,26 +251,19 @@ static int gvt_pin_guest_page(struct intel_vgpu *vgpu, unsigned long gfn,
->   	 */
->   	for (npage = 0; npage < total_pages; npage++) {
->   		dma_addr_t cur_iova = (gfn + npage) << PAGE_SHIFT;
-> -		unsigned long pfn;
-> +		struct page *cur_page;
->   
->   		ret = vfio_pin_pages(&vgpu->vfio_device, cur_iova, 1,
-> -				     IOMMU_READ | IOMMU_WRITE, &pfn);
-> +				     IOMMU_READ | IOMMU_WRITE, &cur_page);
->   		if (ret != 1) {
->   			gvt_vgpu_err("vfio_pin_pages failed for iova %pad, ret %d\n",
->   				     &cur_iova, ret);
->   			goto err;
->   		}
->   
-> -		if (!pfn_valid(pfn)) {
-> -			gvt_vgpu_err("pfn 0x%lx is not mem backed\n", pfn);
-> -			npage++;
-> -			ret = -EFAULT;
-> -			goto err;
-> -		}
-> -
->   		if (npage == 0)
-> -			base_pfn = pfn;
-> -		else if (base_pfn + npage != pfn) {
-> +			base_page = cur_page;
-> +		else if (base_page + npage != cur_page) {
->   			gvt_vgpu_err("The pages are not continuous\n");
->   			ret = -EINVAL;
->   			npage++;
-> @@ -278,7 +271,7 @@ static int gvt_pin_guest_page(struct intel_vgpu *vgpu, unsigned long gfn,
->   		}
->   	}
->   
-> -	*page = pfn_to_page(base_pfn);
-> +	*page = base_page;
->   	return 0;
->   err:
->   	gvt_unpin_guest_page(vgpu, gfn, npage * PAGE_SIZE);
-> diff --git a/drivers/s390/cio/vfio_ccw_cp.c b/drivers/s390/cio/vfio_ccw_cp.c
-> index cd4ec4f6d6ff..8963f452f963 100644
-> --- a/drivers/s390/cio/vfio_ccw_cp.c
-> +++ b/drivers/s390/cio/vfio_ccw_cp.c
-> @@ -22,8 +22,8 @@
->   struct page_array {
->   	/* Array that stores pages need to pin. */
->   	dma_addr_t		*pa_iova;
-> -	/* Array that receives PFNs of the pages pinned. */
-> -	unsigned long		*pa_pfn;
-> +	/* Array that receives the pinned pages. */
-> +	struct page		**pa_page;
->   	/* Number of pages pinned from @pa_iova. */
->   	int			pa_nr;
->   };
-> @@ -68,19 +68,19 @@ static int page_array_alloc(struct page_array *pa, u64 iova, unsigned int len)
->   		return -EINVAL;
->   
->   	pa->pa_iova = kcalloc(pa->pa_nr,
-> -			      sizeof(*pa->pa_iova) + sizeof(*pa->pa_pfn),
-> +			      sizeof(*pa->pa_iova) + sizeof(*pa->pa_page),
->   			      GFP_KERNEL);
->   	if (unlikely(!pa->pa_iova)) {
->   		pa->pa_nr = 0;
->   		return -ENOMEM;
->   	}
-> -	pa->pa_pfn = (unsigned long *)&pa->pa_iova[pa->pa_nr];
-> +	pa->pa_page = (struct page **)&pa->pa_iova[pa->pa_nr];
->   
->   	pa->pa_iova[0] = iova;
-> -	pa->pa_pfn[0] = -1ULL;
-> +	pa->pa_page[0] = NULL;
->   	for (i = 1; i < pa->pa_nr; i++) {
->   		pa->pa_iova[i] = pa->pa_iova[i - 1] + PAGE_SIZE;
-> -		pa->pa_pfn[i] = -1ULL;
-> +		pa->pa_page[i] = NULL;
->   	}
->   
->   	return 0;
-> @@ -144,7 +144,7 @@ static int page_array_pin(struct page_array *pa, struct vfio_device *vdev)
->   
->   		ret = vfio_pin_pages(vdev, *first, npage,
->   				     IOMMU_READ | IOMMU_WRITE,
-> -				     &pa->pa_pfn[pinned]);
-> +				     &pa->pa_page[pinned]);
->   		if (ret < 0) {
->   			goto err_out;
->   		} else if (ret > 0 && ret != npage) {
-> @@ -195,7 +195,7 @@ static inline void page_array_idal_create_words(struct page_array *pa,
->   	 */
->   
->   	for (i = 0; i < pa->pa_nr; i++)
-> -		idaws[i] = pa->pa_pfn[i] << PAGE_SHIFT;
-> +		idaws[i] = page_to_phys(pa->pa_page[i]);
->   
->   	/* Adjust the first IDAW, since it may not start on a page boundary */
->   	idaws[0] += pa->pa_iova[0] & (PAGE_SIZE - 1);
-> @@ -246,8 +246,7 @@ static long copy_from_iova(struct vfio_device *vdev, void *to, u64 iova,
->   
->   	l = n;
->   	for (i = 0; i < pa.pa_nr; i++) {
-> -		struct page *page = pfn_to_page(pa.pa_pfn[i]);
-> -		void *from = kmap_local_page(page);
-> +		void *from = kmap_local_page(pa.pa_page[i]);
->   
->   		m = PAGE_SIZE;
->   		if (i == 0) {
-> diff --git a/drivers/s390/crypto/vfio_ap_ops.c b/drivers/s390/crypto/vfio_ap_ops.c
-> index 6945e0ddc08c..b0972ca0dfa3 100644
-> --- a/drivers/s390/crypto/vfio_ap_ops.c
-> +++ b/drivers/s390/crypto/vfio_ap_ops.c
-> @@ -234,9 +234,9 @@ static struct ap_queue_status vfio_ap_irq_enable(struct vfio_ap_queue *q,
->   	struct ap_qirq_ctrl aqic_gisa = {};
->   	struct ap_queue_status status = {};
->   	struct kvm_s390_gisa *gisa;
-> +	struct page *h_page;
->   	int nisc;
->   	struct kvm *kvm;
-> -	unsigned long h_pfn;
->   	phys_addr_t h_nib;
->   	dma_addr_t nib;
->   	int ret;
-> @@ -251,7 +251,7 @@ static struct ap_queue_status vfio_ap_irq_enable(struct vfio_ap_queue *q,
->   	}
->   
->   	ret = vfio_pin_pages(&q->matrix_mdev->vdev, nib, 1,
-> -			     IOMMU_READ | IOMMU_WRITE, &h_pfn);
-> +			     IOMMU_READ | IOMMU_WRITE, &h_page);
->   	switch (ret) {
->   	case 1:
->   		break;
-> @@ -267,7 +267,7 @@ static struct ap_queue_status vfio_ap_irq_enable(struct vfio_ap_queue *q,
->   	kvm = q->matrix_mdev->kvm;
->   	gisa = kvm->arch.gisa_int.origin;
->   
-> -	h_nib = (h_pfn << PAGE_SHIFT) | (nib & ~PAGE_MASK);
-> +	h_nib = page_to_phys(h_page) | (nib & ~PAGE_MASK);
->   	aqic_gisa.gisc = isc;
->   
->   	nisc = kvm_s390_gisc_register(kvm, isc);
-> diff --git a/drivers/vfio/vfio.c b/drivers/vfio/vfio.c
-> index b95ec2d78966..96b758e06c4a 100644
-> --- a/drivers/vfio/vfio.c
-> +++ b/drivers/vfio/vfio.c
-> @@ -1917,18 +1917,18 @@ EXPORT_SYMBOL(vfio_set_irqs_validate_and_prepare);
->    * @npage [in]   : count of pages to be pinned.  This count should not
->    *		   be greater VFIO_PIN_PAGES_MAX_ENTRIES.
->    * @prot [in]    : protection flags
-> - * @phys_pfn[out]: array of host PFNs
-> + * @pages[out]   : array of host pages
->    * Return error or number of pages pinned.
->    */
->   int vfio_pin_pages(struct vfio_device *device, dma_addr_t iova,
-> -		   int npage, int prot, unsigned long *phys_pfn)
-> +		   int npage, int prot, struct page **pages)
->   {
->   	struct vfio_container *container;
->   	struct vfio_group *group = device->group;
->   	struct vfio_iommu_driver *driver;
->   	int ret;
->   
-> -	if (!phys_pfn || !npage || !vfio_assert_device_open(device))
-> +	if (!pages || !npage || !vfio_assert_device_open(device))
->   		return -EINVAL;
->   
->   	if (npage > VFIO_PIN_PAGES_MAX_ENTRIES)
-> @@ -1943,7 +1943,7 @@ int vfio_pin_pages(struct vfio_device *device, dma_addr_t iova,
->   	if (likely(driver && driver->ops->pin_pages))
->   		ret = driver->ops->pin_pages(container->iommu_data,
->   					     group->iommu_group, iova,
-> -					     npage, prot, phys_pfn);
-> +					     npage, prot, pages);
->   	else
->   		ret = -ENOTTY;
->   
-> diff --git a/drivers/vfio/vfio.h b/drivers/vfio/vfio.h
-> index dbcd0e8c031b..dbfad8e20581 100644
-> --- a/drivers/vfio/vfio.h
-> +++ b/drivers/vfio/vfio.h
-> @@ -52,7 +52,7 @@ struct vfio_iommu_driver_ops {
->   				     struct iommu_group *group,
->   				     dma_addr_t user_iova,
->   				     int npage, int prot,
-> -				     unsigned long *phys_pfn);
-> +				     struct page **pages);
->   	void		(*unpin_pages)(void *iommu_data,
->   				       dma_addr_t user_iova, int npage);
->   	int		(*register_notifier)(void *iommu_data,
-> diff --git a/drivers/vfio/vfio_iommu_type1.c b/drivers/vfio/vfio_iommu_type1.c
-> index f10d0c4b1f26..de342d82b154 100644
-> --- a/drivers/vfio/vfio_iommu_type1.c
-> +++ b/drivers/vfio/vfio_iommu_type1.c
-> @@ -830,7 +830,7 @@ static int vfio_iommu_type1_pin_pages(void *iommu_data,
->   				      struct iommu_group *iommu_group,
->   				      dma_addr_t user_iova,
->   				      int npage, int prot,
-> -				      unsigned long *phys_pfn)
-> +				      struct page **pages)
->   {
->   	struct vfio_iommu *iommu = iommu_data;
->   	struct vfio_iommu_group *group;
-> @@ -840,7 +840,7 @@ static int vfio_iommu_type1_pin_pages(void *iommu_data,
->   	bool do_accounting;
->   	dma_addr_t iova;
->   
-> -	if (!iommu || !phys_pfn)
-> +	if (!iommu || !pages)
->   		return -EINVAL;
->   
->   	/* Supported for v2 version only */
-> @@ -879,6 +879,7 @@ static int vfio_iommu_type1_pin_pages(void *iommu_data,
->   	do_accounting = list_empty(&iommu->domain_list);
->   
->   	for (i = 0; i < npage; i++) {
-> +		unsigned long phys_pfn;
->   		struct vfio_pfn *vpfn;
->   
->   		iova = user_iova + PAGE_SIZE * i;
-> @@ -895,23 +896,25 @@ static int vfio_iommu_type1_pin_pages(void *iommu_data,
->   
->   		vpfn = vfio_iova_get_vfio_pfn(dma, iova);
->   		if (vpfn) {
-> -			phys_pfn[i] = vpfn->pfn;
-> +			pages[i] = pfn_to_page(vpfn->pfn);
->   			continue;
->   		}
->   
->   		remote_vaddr = dma->vaddr + (iova - dma->iova);
-> -		ret = vfio_pin_page_external(dma, remote_vaddr, &phys_pfn[i],
-> +		ret = vfio_pin_page_external(dma, remote_vaddr, &phys_pfn,
->   					     do_accounting);
->   		if (ret)
->   			goto pin_unwind;
->   
-> -		ret = vfio_add_to_pfn_list(dma, iova, phys_pfn[i]);
-> +		ret = vfio_add_to_pfn_list(dma, iova, phys_pfn);
->   		if (ret) {
-> -			if (put_pfn(phys_pfn[i], dma->prot) && do_accounting)
-> +			if (put_pfn(phys_pfn, dma->prot) && do_accounting)
->   				vfio_lock_acct(dma, -1, true);
->   			goto pin_unwind;
->   		}
->   
-> +		pages[i] = pfn_to_page(phys_pfn);
-> +
->   		if (iommu->dirty_page_tracking) {
->   			unsigned long pgshift = __ffs(iommu->pgsize_bitmap);
->   
-> @@ -934,14 +937,14 @@ static int vfio_iommu_type1_pin_pages(void *iommu_data,
->   	goto pin_done;
->   
->   pin_unwind:
-> -	phys_pfn[i] = 0;
-> +	pages[i] = NULL;
->   	for (j = 0; j < i; j++) {
->   		dma_addr_t iova;
->   
->   		iova = user_iova + PAGE_SIZE * j;
->   		dma = vfio_find_dma(iommu, iova, PAGE_SIZE);
->   		vfio_unpin_page_external(dma, iova, do_accounting);
-> -		phys_pfn[j] = 0;
-> +		pages[j] = NULL;
->   	}
->   pin_done:
->   	mutex_unlock(&iommu->lock);
-> diff --git a/include/linux/vfio.h b/include/linux/vfio.h
-> index 9108de34a79b..c76a2c492bbd 100644
-> --- a/include/linux/vfio.h
-> +++ b/include/linux/vfio.h
-> @@ -148,7 +148,7 @@ bool vfio_file_has_dev(struct file *file, struct vfio_device *device);
->   #define VFIO_PIN_PAGES_MAX_ENTRIES	(PAGE_SIZE/sizeof(unsigned long))
->   
->   int vfio_pin_pages(struct vfio_device *device, dma_addr_t iova,
-> -		   int npage, int prot, unsigned long *phys_pfn);
-> +		   int npage, int prot, struct page **pages);
->   void vfio_unpin_pages(struct vfio_device *device, dma_addr_t iova, int npage);
->   int vfio_dma_rw(struct vfio_device *device, dma_addr_t iova,
->   		void *data, size_t len, bool write);
+
