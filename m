@@ -2,143 +2,314 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 92B435690B9
-	for <lists+kvm@lfdr.de>; Wed,  6 Jul 2022 19:36:50 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 9E3C85690C4
+	for <lists+kvm@lfdr.de>; Wed,  6 Jul 2022 19:39:19 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231892AbiGFRgs (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 6 Jul 2022 13:36:48 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54754 "EHLO
+        id S233917AbiGFRjR (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 6 Jul 2022 13:39:17 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56622 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232679AbiGFRgq (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 6 Jul 2022 13:36:46 -0400
-Received: from mail-pl1-x62a.google.com (mail-pl1-x62a.google.com [IPv6:2607:f8b0:4864:20::62a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5BF5E1EAD5
-        for <kvm@vger.kernel.org>; Wed,  6 Jul 2022 10:36:45 -0700 (PDT)
-Received: by mail-pl1-x62a.google.com with SMTP id n10so14255044plp.0
-        for <kvm@vger.kernel.org>; Wed, 06 Jul 2022 10:36:45 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=n6GVhQmBGVKBhGa5woMm6aogTfqoCNqPgCzOl2ffqrA=;
-        b=e1xeUsyT+W+flSShjjnjyN4TfbfrsLh9Fog2om/V0KJWvgtiMuK0jePKuTI8hlaAHX
-         F+WQOOR1u9I03ck70NXzlfW2Ygp/WcfDkgRBchk7NZc7ZqXNjn4u3fDUoFwioxc1YUvK
-         d37Fx05W0yx3P7PROVg1GXABbwtaeqIPhrIiEO+0I80c0W53bDFXFkgwYgv+qOrQELuP
-         knK+IRouM8+hNF24Z5WPGNAVnI8ObiAWhbj1IEPrTV1rDci+wsq+4IR3OLINoGimlxfK
-         D+4cB9HnimksBtqJ2Rg97LOR/dbhF0dYnp2I4jX7mtF0XsBublRREU029Pl4DpQdNiNj
-         QCvQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=n6GVhQmBGVKBhGa5woMm6aogTfqoCNqPgCzOl2ffqrA=;
-        b=7Y3EPYNl94z2lyWlPxV1MOWtiaDy9EZ4BRjjbxVsOW36DDC49K9oa/3y2aRQFLnRM3
-         4vXOqT+8scdhaSTEGlChe5BW5SGECSLECzsRfpIH5ImwLaBy1bVdvUcV5rt7to2Tnm5r
-         YWsjcTKd073mdzsDrPjDnDCjiG2WfUVzvIL7B+Pv0xJK/ZPPSDP3spiHDonCpNsZfALq
-         qXghIVOIzXaJ7muXQdZWEnACVpakrPqKP/VrF7v3TO5sFyscRAzrmE1H8UdRzLoMGlXq
-         mqoRtZSpXJH2GQLn035aLhdFJgO7cS+d6YxqF+l8lMjGiLcZaQpPJbHACFxHl2Ug/wpr
-         K9aw==
-X-Gm-Message-State: AJIora+lAj4UgrXz+o65XauJn2gSILxA3EiO+PblGTm1dt+qU/B/5S5b
-        0iij9crYn1en11KxlbHmu+HqxA==
-X-Google-Smtp-Source: AGRyM1vjGjONL95pIBy9rQ/rmpXePKjqmhuUe9hjzvPPN9BnuEaq7l6jpCjoLYhkAbm/LaFvVtKcxA==
-X-Received: by 2002:a17:903:2443:b0:16a:29ac:27c2 with SMTP id l3-20020a170903244300b0016a29ac27c2mr46952180pls.46.1657129004700;
-        Wed, 06 Jul 2022 10:36:44 -0700 (PDT)
-Received: from google.com (123.65.230.35.bc.googleusercontent.com. [35.230.65.123])
-        by smtp.gmail.com with ESMTPSA id g15-20020a63564f000000b004129741dd9dsm1519871pgm.51.2022.07.06.10.36.43
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 06 Jul 2022 10:36:43 -0700 (PDT)
-Date:   Wed, 6 Jul 2022 17:36:39 +0000
-From:   Sean Christopherson <seanjc@google.com>
-To:     Maxim Levitsky <mlevitsk@redhat.com>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org, Oliver Upton <oupton@google.com>,
-        Peter Shier <pshier@google.com>
-Subject: Re: [PATCH v2 13/21] KVM: x86: Formalize blocking of nested pending
- exceptions
-Message-ID: <YsXIJ50adC+TVejy@google.com>
-References: <20220614204730.3359543-1-seanjc@google.com>
- <20220614204730.3359543-14-seanjc@google.com>
- <cd9be62e3c2018a4f779f65fed46954e9431e0b0.camel@redhat.com>
+        with ESMTP id S233905AbiGFRjN (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 6 Jul 2022 13:39:13 -0400
+Received: from NAM12-DM6-obe.outbound.protection.outlook.com (mail-dm6nam12on2068.outbound.protection.outlook.com [40.107.243.68])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B461720BD4;
+        Wed,  6 Jul 2022 10:39:11 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=Ks1UJl9wA6avTUGFtA3mcJaCVvbfpMlqBpRCaknvSoaM1xB8rty+L+a7fsLaJy+NjAuvK15WvJTpCYzvsgU2HZKp0eI8YoQFgbP5/zMHguP9WVf5qyWymqhegxTWnGkL6TiD2qe2mCaUiE0KpO0dhUxS6QTPQFzDXjjqL0TLCkeNgefkftz633+PIpL8FDmirgpUD62lE8nkNopEsyVErul2Lx4FQV9c7tX3QStv2hZJ/rYqdae1Xol8htAZ/bY8rakIBpoK9Lth/3/tSygQWG8rgYSw7EaDrxPIfbsIsZxODWZOXnqWxkAyFmG79nVcdZdiiRi3Q72NfAdXrwByXQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=u6ziMazrL2l45MPwaFk5Dt2cK55YBCC8qVIZb9KFD6o=;
+ b=Vw3xODCBGniV0f9C4Uq8wly2fM/AiG4yfKuEobIZ86fRBVYREcoC0G26hLeoxSu63eFLJ7aMpMilWVFE94/2MfoI74SJn8mgMToXhwNjVD4OYmDGCgX7mjcCVKU6XhATUSH/lHwYCokR1NlAjoTris93b8sq+Fq+4M8qBs4T7DNWTKUL9A9Qd7x7oGvPHBfQ/2wkp+z41hXrYTCQZ/j3sasZt9tluq1HxTDXLLKCEKCWWrP96eULTpIe5T7EUPFN422V9p1Hc9JHYQtboLNTXXFzZuqD4hkoPaj96xryFf21QaNFAwbsfnMnDtqpbtT8TNdGZE0N+ZkrelMTYG7TlA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
+ dkim=pass header.d=nvidia.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=u6ziMazrL2l45MPwaFk5Dt2cK55YBCC8qVIZb9KFD6o=;
+ b=hE0jn/mphFnyimiU/F0702EzeUaS33Rpo1WGwpgzFzOpHE3xZXAQCtMscZ+93ZiIv4bubVP7g1cHNPDQkrW/mr66zuDqk2vyi9DiwNUvytm+T4WwvIXuHwHDTeGH49lEZpJaKQO/9BRe4Sd1+Bkd2H/m+9UWSbPSSzMpmYOLOBErxu7c+/fKbwOmAP7pFXaCMHXHWHRwi7QhJAN0So0uz7i2hdDo5JhEMd3fCvdgQOiqFPkL+J+LbTyno9BM2fMq55M+KB9g24mocfZh3WJr2MLJ99vJU1Io5RVzffEdT28SoCaKEHn18vcqlrSh3SCKgrdSrjMO8oNb2AMg4ZU0nA==
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=nvidia.com;
+Received: from MN2PR12MB4206.namprd12.prod.outlook.com (2603:10b6:208:1d5::18)
+ by BYAPR12MB4776.namprd12.prod.outlook.com (2603:10b6:a03:10d::19) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5417.16; Wed, 6 Jul
+ 2022 17:39:08 +0000
+Received: from MN2PR12MB4206.namprd12.prod.outlook.com
+ ([fe80::e16c:261d:891d:676c]) by MN2PR12MB4206.namprd12.prod.outlook.com
+ ([fe80::e16c:261d:891d:676c%3]) with mapi id 15.20.5395.022; Wed, 6 Jul 2022
+ 17:39:07 +0000
+Message-ID: <e73fe624-6e87-673e-b023-80cb8a0cf5f4@nvidia.com>
+Date:   Wed, 6 Jul 2022 23:08:48 +0530
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:91.0) Gecko/20100101
+ Thunderbird/91.10.0
+Subject: Re: [RFT][PATCH v2 1/9] vfio: Make vfio_unpin_pages() return void
+Content-Language: en-US
+To:     Nicolin Chen <nicolinc@nvidia.com>, corbet@lwn.net,
+        hca@linux.ibm.com, gor@linux.ibm.com, agordeev@linux.ibm.com,
+        borntraeger@linux.ibm.com, svens@linux.ibm.com,
+        zhenyuw@linux.intel.com, zhi.a.wang@intel.com,
+        jani.nikula@linux.intel.com, joonas.lahtinen@linux.intel.com,
+        rodrigo.vivi@intel.com, tvrtko.ursulin@linux.intel.com,
+        airlied@linux.ie, daniel@ffwll.ch, farman@linux.ibm.com,
+        mjrosato@linux.ibm.com, pasic@linux.ibm.com, vneethv@linux.ibm.com,
+        oberpar@linux.ibm.com, freude@linux.ibm.com,
+        akrowiak@linux.ibm.com, jjherne@linux.ibm.com,
+        alex.williamson@redhat.com, cohuck@redhat.com, jgg@nvidia.com,
+        kevin.tian@intel.com, hch@infradead.org
+Cc:     jchrist@linux.ibm.com, kvm@vger.kernel.org,
+        linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org,
+        linux-s390@vger.kernel.org, intel-gvt-dev@lists.freedesktop.org,
+        intel-gfx@lists.freedesktop.org, dri-devel@lists.freedesktop.org,
+        Neo Jia <cjia@nvidia.com>, Tarun Gupta <targupta@nvidia.com>,
+        Shounak Deshpande <shdeshpande@nvidia.com>
+References: <20220706062759.24946-1-nicolinc@nvidia.com>
+ <20220706062759.24946-2-nicolinc@nvidia.com>
+From:   Kirti Wankhede <kwankhede@nvidia.com>
+X-Nvconfidentiality: public
+In-Reply-To: <20220706062759.24946-2-nicolinc@nvidia.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: MA0PR01CA0091.INDPRD01.PROD.OUTLOOK.COM
+ (2603:1096:a01:ae::14) To MN2PR12MB4206.namprd12.prod.outlook.com
+ (2603:10b6:208:1d5::18)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <cd9be62e3c2018a4f779f65fed46954e9431e0b0.camel@redhat.com>
-X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-        T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL
-        autolearn=unavailable autolearn_force=no version=3.4.6
+X-MS-PublicTrafficType: Email
+X-MS-Office365-Filtering-Correlation-Id: 9cbd5933-4a61-427b-f21b-08da5f766d63
+X-MS-TrafficTypeDiagnostic: BYAPR12MB4776:EE_
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: /HHzjo3hP4I0bzL48f8QuS3SoauEJx0mu/vP90MtuPqMTTB+yq5Qz7KkXoUGpFVLvCzb66+HyVQt1QnHSRwfCsNR15ILfTgqfCJsDCl9SCPdTpKR+U/F/b4t+WTkM2aEG6YBPnQBMYrHnMO+B/c968HUSMQHZWcAbSWk0xeyqK02D67jsMeIFtsasETntYxuxuQLSX7fipJn34R10WNgDK48WG03OA0QqBzVQ+PNUzl9m/pEJg+V5bhAghT4U59kMfe5lwzDXKg2pP0wP5JAkrUdo+oAgtak1KE5Dw/p+qkRgkhOA7GzwiBcWhQ81QbUb4MwruiXFzzQJuKs6YDeFwB7kP3FO9MNDnjG03oa5s3DRCTRyfO1ycGxT72PjzWsuLxBX/UXmn189wY0oO30q0w5KCMkMd87ucJ9LE+YY8Jzb6TEXDGwAJbyElfZmke3APBFwirhFtyj6gyOE5dtSd7rjiUieB7pmzAgYpfWjFAnEDisGOiVAr/VDhcYZ0vjm+7WlRFDQUrFvPXAO+m+HTVQFZ+Y5K6ugU5AK9DXM9fP0eNMa/YczKdId1RfCqNY86HDE8PGkyPLuTyxPIK2CVY96BpCRuCwywSaViFbseKdaW6Unz7azVZtfnO+otRClkxS7CkrPjNJCSuv5ZTnyNgXb43Cz0EMqHlayo6AmEySfk8/zdPxp1kcLt4OUgdPmvzqpYxGuSdsT4PQx/0lfp4q0Srm+o4ZFGWb8LQtW1bTTalwgKk4IPWyWUrL6SvBAYFlHMEG5qMF1xxnGcLyiRPsP3cTABYusb+AiQM0SoALh5IGNyPh8kA0LgPIeOOLlq7pCdAvIXdafjBcTdvkdUd2uOrMiwbq4fG5UX18LQY=
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:MN2PR12MB4206.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230016)(4636009)(396003)(376002)(366004)(136003)(39860400002)(346002)(2906002)(6666004)(41300700001)(316002)(2616005)(38100700002)(921005)(8676002)(36756003)(66946007)(31686004)(7416002)(4326008)(7406005)(5660300002)(66476007)(66556008)(6512007)(186003)(6486002)(31696002)(107886003)(6506007)(55236004)(53546011)(26005)(8936002)(54906003)(478600001)(83380400001)(86362001)(43740500002)(45980500001);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?QjB6dDhxN1dsNTdob21oVkpCN3lHVnAyM2VRVWpQT2FQcnNWSm4wSFR1SmIw?=
+ =?utf-8?B?T2dlNjhkS0F0QjFXVjcwR1JnRzhBZzVBL0orUDRWZ01pOExLTURsOHVMK25R?=
+ =?utf-8?B?YjlqeHpsWndoajVva3RXS3oxRFY5ZjBFcDdickRTaitaS0hXUm5tSmRZekxp?=
+ =?utf-8?B?c3RScVJ0Ym5rZkVLRTZaZmVWRUR6Nlg0eFNkUGtqUjNYSFJ2ajhSRTFDM2tu?=
+ =?utf-8?B?YVZLbEhJRVBvN0RvZW95c0xUNWdVdFVtVXozVlJSZmdpRFlhOFRxR2dNa3Qr?=
+ =?utf-8?B?K2NmYlRWTFRIVWY5NjQwemFVZW5DMUtkdnBPR0hMUS9iZW02NGJ2MVZXWG1B?=
+ =?utf-8?B?Wm1QbzBqNXBmK2pRRjEzdlAycXI4S3F6T1hqMDJOMmRSVGxnUCtGWmtsUjNx?=
+ =?utf-8?B?UGR4MlErdFdETGJQVEFWeDhCSVpoZ21MSDJvTVppa0ZTK1J2Qi9hemFPWDMz?=
+ =?utf-8?B?VkFaTVFyZlQwRkFOTWZibzVBSGJIblJEV1ZNUU85YkJpUjhwdDhQR1FZc3pr?=
+ =?utf-8?B?cWNCZmhqeWNocmY0Ykh5UmI0YjkzclJyUHZBSmNlWjZRdjBUV2xPNlU2SVgz?=
+ =?utf-8?B?ekJSYTlWZHJzd2NYUnBPNVcvNkF1eUNRc055OFJrZ0dicTR6S0wwcFpZUWls?=
+ =?utf-8?B?NlFITksxb2s0NG5GTVQ5QjdkL1BIelRzRERvSnZjUE9mLzhrSWpxWmYvVDhm?=
+ =?utf-8?B?OVBEZnVEU0dqZ3pPNHY1N0x4clBuUjJ5a25HeDNVNC81VXlVajhIUzBDY2NC?=
+ =?utf-8?B?aTNXeTJkRXBrOUd3MFNhWnFvOXY0RU5PMExBUzZhcGxJSGtsbXNEc2J3bEJn?=
+ =?utf-8?B?T1RLSlZzYTFFeHRNV2dOYlQ4bWRyYlNwTmFDMjlYYUI4QXI1bHo3bW1Ua0hW?=
+ =?utf-8?B?cnNSeEpHNWM3cnlSWjJPUWgwcTNyK0tXOGtjVmZMcHM4MzhHVEM2aHBpL080?=
+ =?utf-8?B?cjdFODBGbGVCS3pWMmRTMUpZb3JWSWEybWVDYjhaWjhqbEVIaU42RGFCNUhP?=
+ =?utf-8?B?ay8wOFpwSDhJaEVUdVZBQnQ3NXZ6S0RlNVVKN2lBeGJVbHhwT0ZvTEg5OHdV?=
+ =?utf-8?B?ZnNyRmkxcTRVZFQ4UC9SeHdiazhRMFlNRTBmbGg2anVtOFRHaE5qL0FyS2RM?=
+ =?utf-8?B?QU5TQnF2YnM4dnd6MGY0VGFVckY3akloZmZxak5vTmtaZVM0R0k2UlpwYVAy?=
+ =?utf-8?B?Uy8yemRiSnoyMXl2bWJqYjVNQk5rR0ZuWmEyaEhyOWtwSjZaeW5wdzBiYm5R?=
+ =?utf-8?B?ZHorNlM1WlBCSWtISHJDeC9CMnBMazllS2hUcVVVTE9zcXUvVlp6T0ZXSVl3?=
+ =?utf-8?B?clFBSjVPa2FRTkZTeEI1cUdkQjZxdHp5VjJGUWl6YTBnckhrM3BDYTV6czVY?=
+ =?utf-8?B?WFNHcnpJRFpkVFJ0TW9NU21ldkhob1R0U1pjTll6c0I0NTFGMkxLYndHOGlW?=
+ =?utf-8?B?MXREUzBYNzV6bHE0NE9KZXlhUE5KYUhBTG8wUm1BWmNJU05CdXYycnpEZFR3?=
+ =?utf-8?B?QkRlekhYWjlwK0l2a294VmRMQnN0eVN6NWVoUGRlL3c4ZUV1NkpxanhGKzlR?=
+ =?utf-8?B?MXhnVURQMG5sRnc5cnZMYWxrRWFMb25WV3pPaTgxbnBwYWVvTXdFWnhTckQr?=
+ =?utf-8?B?UlZQUXJrdDloUmNZYXFobnBQc09oc1N1eCtOY25VWmJSRVEzdmg4RXpoUklV?=
+ =?utf-8?B?SUxlamhubXlWek9QRUlLVk0zZnZnYWdPS0laSEt5YXN3dlJVY1RXbTV4YmhR?=
+ =?utf-8?B?NVBna0NCVnVMM1B2WXNNVDNnT0lsRGw4OUZwdUpzK3Y2WlFZNUR1NW03WUV5?=
+ =?utf-8?B?VklZeFc1NmFKMXh3d1Jha0JFbGI5L2NmN3NqVXdsakJVNzVSVkxpZFlkVHBw?=
+ =?utf-8?B?YVphWmU4Q2Q0bHFhY0cvR2xUYVNxNWxNRWVyVXFVMWordkpFeVI2aGRIUVBH?=
+ =?utf-8?B?a1o3NE5ZanI2WEV0cFdmSFR4dWxydUlFOTV6TFFac0U2ZEw1aml3bmVRT0Vy?=
+ =?utf-8?B?ekMwK1VrS2JFbkgvc1BRd3dTVWNaTVdZbm8wN0NYT2NBazFId09uemhOdVNJ?=
+ =?utf-8?B?dGk0NGFoRCtYS1BSNFdGUnJnaEZybjE1SFBnRVJ6VStVR3phL25PYlNCbi85?=
+ =?utf-8?Q?HOj932Yx2scXgPADdwpFMMxWa?=
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 9cbd5933-4a61-427b-f21b-08da5f766d63
+X-MS-Exchange-CrossTenant-AuthSource: MN2PR12MB4206.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 06 Jul 2022 17:39:07.5829
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: JXYwEWXS8AgUN579iYSQQ5gNXYd9fELIB4Xv7GvLpq9WNDvz5d8PwzAVoYHa0KX2xIB7RsI6Qo71TA584COUkw==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: BYAPR12MB4776
+X-Spam-Status: No, score=-1.8 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FORGED_SPF_HELO,
+        NICE_REPLY_A,RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,
+        SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no
+        version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Jul 06, 2022, Maxim Levitsky wrote:
-> On Tue, 2022-06-14 at 20:47 +0000, Sean Christopherson wrote:
-> > Capture nested_run_pending as block_pending_exceptions so that the logic
-> > of why exceptions are blocked only needs to be documented once instead of
-> > at every place that employs the logic.
-> > 
-> > No functional change intended.
-> > 
-> > Signed-off-by: Sean Christopherson <seanjc@google.com>
-> > ---
-> >  arch/x86/kvm/svm/nested.c | 20 ++++++++++----------
-> >  arch/x86/kvm/vmx/nested.c | 23 ++++++++++++-----------
-> >  2 files changed, 22 insertions(+), 21 deletions(-)
-> > 
-> > diff --git a/arch/x86/kvm/svm/nested.c b/arch/x86/kvm/svm/nested.c
-> > index 471d40e97890..460161e67ce5 100644
-> > --- a/arch/x86/kvm/svm/nested.c
-> > +++ b/arch/x86/kvm/svm/nested.c
-> > @@ -1347,10 +1347,16 @@ static inline bool nested_exit_on_init(struct vcpu_svm *svm)
-> >  
-> >  static int svm_check_nested_events(struct kvm_vcpu *vcpu)
-> >  {
-> > -	struct vcpu_svm *svm = to_svm(vcpu);
-> > -	bool block_nested_events =
-> > -		kvm_event_needs_reinjection(vcpu) || svm->nested.nested_run_pending;
-> >  	struct kvm_lapic *apic = vcpu->arch.apic;
-> > +	struct vcpu_svm *svm = to_svm(vcpu);
-> > +	/*
-> > +	 * Only a pending nested run blocks a pending exception.  If there is a
-> > +	 * previously injected event, the pending exception occurred while said
-> > +	 * event was being delivered and thus needs to be handled.
-> > +	 */
-> 
-> Tiny nitpick about the comment:
-> 
-> One can say that if there is an injected event, this means that we
-> are in the middle of handling it, thus we are not on instruction boundary,
-> and thus we don't process events (e.g interrupts).
-> 
-> So maybe write something like that?
 
-Hmm, that's another way to look at things.  My goal with the comment was to try
-and call out that any pending exception is a continuation of the injected event,
-i.e. that the injected event won't be lost.  Talking about instruction boundaries
-only explains why non-exception events are blocked, it doesn't explain why exceptions
-are _not_ blocked.
+Reviewed-by: Kirti Wankhede <kwankhede@nvidia.com>
 
-I'll add a second comment above block_nested_events to capture the instruction
-boundary angle.
-
-> > +	bool block_nested_exceptions = svm->nested.nested_run_pending;
-> > +	bool block_nested_events = block_nested_exceptions ||
-> > +				   kvm_event_needs_reinjection(vcpu);
+On 7/6/2022 11:57 AM, Nicolin Chen wrote:
+> There's only one caller that checks its return value with a WARN_ON_ONCE,
+> while all other callers do not check return value at all. So simplify the
+> API to return void by embedding similar WARN_ON_ONCEs.
 > 
-> Tiny nitpick: I don't like that much the name 'nested' as
-> it can also mean a nested exception (e.g exception that
-> happened while jumping to an exception  handler).
+> Suggested-by: Christoph Hellwig <hch@infradead.org>
+> Signed-off-by: Nicolin Chen <nicolinc@nvidia.com>
+> ---
+>   .../driver-api/vfio-mediated-device.rst       |  2 +-
+>   drivers/gpu/drm/i915/gvt/kvmgt.c              |  5 +---
+>   drivers/vfio/vfio.c                           | 24 ++++++++-----------
+>   drivers/vfio/vfio.h                           |  2 +-
+>   drivers/vfio/vfio_iommu_type1.c               | 16 ++++++-------
+>   include/linux/vfio.h                          |  4 ++--
+>   6 files changed, 23 insertions(+), 30 deletions(-)
 > 
-> Here we mean just exception/events for the guest, so I would suggest
-> to just drop the word 'nested'.
-
-I don't disagree, but I'd prefer to keep the current naming because the helper
-itself is *_check_nested_events().  I'm not opposed to renaming things in the
-future, but I don't want to do that in this series.
+> diff --git a/Documentation/driver-api/vfio-mediated-device.rst b/Documentation/driver-api/vfio-mediated-device.rst
+> index 1c57815619fd..b0fdf76b339a 100644
+> --- a/Documentation/driver-api/vfio-mediated-device.rst
+> +++ b/Documentation/driver-api/vfio-mediated-device.rst
+> @@ -265,7 +265,7 @@ driver::
+>   	int vfio_pin_pages(struct vfio_device *device, unsigned long *user_pfn,
+>   				  int npage, int prot, unsigned long *phys_pfn);
+>   
+> -	int vfio_unpin_pages(struct vfio_device *device, unsigned long *user_pfn,
+> +	void vfio_unpin_pages(struct vfio_device *device, unsigned long *user_pfn,
+>   				    int npage);
+>   
+>   These functions call back into the back-end IOMMU module by using the pin_pages
+> diff --git a/drivers/gpu/drm/i915/gvt/kvmgt.c b/drivers/gpu/drm/i915/gvt/kvmgt.c
+> index e2f6c56ab342..8c67c9aba82d 100644
+> --- a/drivers/gpu/drm/i915/gvt/kvmgt.c
+> +++ b/drivers/gpu/drm/i915/gvt/kvmgt.c
+> @@ -231,18 +231,15 @@ static void intel_gvt_cleanup_vgpu_type_groups(struct intel_gvt *gvt)
+>   static void gvt_unpin_guest_page(struct intel_vgpu *vgpu, unsigned long gfn,
+>   		unsigned long size)
+>   {
+> -	struct drm_i915_private *i915 = vgpu->gvt->gt->i915;
+>   	int total_pages;
+>   	int npage;
+> -	int ret;
+>   
+>   	total_pages = roundup(size, PAGE_SIZE) / PAGE_SIZE;
+>   
+>   	for (npage = 0; npage < total_pages; npage++) {
+>   		unsigned long cur_gfn = gfn + npage;
+>   
+> -		ret = vfio_unpin_pages(&vgpu->vfio_device, &cur_gfn, 1);
+> -		drm_WARN_ON(&i915->drm, ret != 1);
+> +		vfio_unpin_pages(&vgpu->vfio_device, &cur_gfn, 1);
+>   	}
+>   }
+>   
+> diff --git a/drivers/vfio/vfio.c b/drivers/vfio/vfio.c
+> index 61e71c1154be..01f45ec70a3d 100644
+> --- a/drivers/vfio/vfio.c
+> +++ b/drivers/vfio/vfio.c
+> @@ -1959,31 +1959,27 @@ EXPORT_SYMBOL(vfio_pin_pages);
+>    *		   PFNs should not be greater than VFIO_PIN_PAGES_MAX_ENTRIES.
+>    * @npage [in]   : count of elements in user_pfn array.  This count should not
+>    *                 be greater than VFIO_PIN_PAGES_MAX_ENTRIES.
+> - * Return error or number of pages unpinned.
+>    */
+> -int vfio_unpin_pages(struct vfio_device *device, unsigned long *user_pfn,
+> -		     int npage)
+> +void vfio_unpin_pages(struct vfio_device *device, unsigned long *user_pfn,
+> +		      int npage)
+>   {
+>   	struct vfio_container *container;
+>   	struct vfio_iommu_driver *driver;
+> -	int ret;
+>   
+> -	if (!user_pfn || !npage || !vfio_assert_device_open(device))
+> -		return -EINVAL;
+> +	if (WARN_ON_ONCE(!user_pfn || !npage || !vfio_assert_device_open(device)))
+> +		return;
+>   
+> -	if (npage > VFIO_PIN_PAGES_MAX_ENTRIES)
+> -		return -E2BIG;
+> +	if (WARN_ON_ONCE(npage > VFIO_PIN_PAGES_MAX_ENTRIES))
+> +		return;
+>   
+>   	/* group->container cannot change while a vfio device is open */
+>   	container = device->group->container;
+>   	driver = container->iommu_driver;
+> -	if (likely(driver && driver->ops->unpin_pages))
+> -		ret = driver->ops->unpin_pages(container->iommu_data, user_pfn,
+> -					       npage);
+> -	else
+> -		ret = -ENOTTY;
+>   
+> -	return ret;
+> +	if (WARN_ON_ONCE(unlikely(!driver || !driver->ops->unpin_pages)))
+> +		return;
+> +
+> +	driver->ops->unpin_pages(container->iommu_data, user_pfn, npage);
+>   }
+>   EXPORT_SYMBOL(vfio_unpin_pages);
+>   
+> diff --git a/drivers/vfio/vfio.h b/drivers/vfio/vfio.h
+> index a67130221151..bef4edf58138 100644
+> --- a/drivers/vfio/vfio.h
+> +++ b/drivers/vfio/vfio.h
+> @@ -53,7 +53,7 @@ struct vfio_iommu_driver_ops {
+>   				     unsigned long *user_pfn,
+>   				     int npage, int prot,
+>   				     unsigned long *phys_pfn);
+> -	int		(*unpin_pages)(void *iommu_data,
+> +	void		(*unpin_pages)(void *iommu_data,
+>   				       unsigned long *user_pfn, int npage);
+>   	int		(*register_notifier)(void *iommu_data,
+>   					     unsigned long *events,
+> diff --git a/drivers/vfio/vfio_iommu_type1.c b/drivers/vfio/vfio_iommu_type1.c
+> index c13b9290e357..08613edaf722 100644
+> --- a/drivers/vfio/vfio_iommu_type1.c
+> +++ b/drivers/vfio/vfio_iommu_type1.c
+> @@ -948,20 +948,19 @@ static int vfio_iommu_type1_pin_pages(void *iommu_data,
+>   	return ret;
+>   }
+>   
+> -static int vfio_iommu_type1_unpin_pages(void *iommu_data,
+> -					unsigned long *user_pfn,
+> -					int npage)
+> +static void vfio_iommu_type1_unpin_pages(void *iommu_data,
+> +					 unsigned long *user_pfn, int npage)
+>   {
+>   	struct vfio_iommu *iommu = iommu_data;
+>   	bool do_accounting;
+>   	int i;
+>   
+> -	if (!iommu || !user_pfn || npage <= 0)
+> -		return -EINVAL;
+> +	if (WARN_ON_ONCE(!iommu || !user_pfn || npage <= 0))
+> +		return;
+>   
+>   	/* Supported for v2 version only */
+> -	if (!iommu->v2)
+> -		return -EACCES;
+> +	if (WARN_ON_ONCE(!iommu->v2))
+> +		return;
+>   
+>   	mutex_lock(&iommu->lock);
+>   
+> @@ -979,7 +978,8 @@ static int vfio_iommu_type1_unpin_pages(void *iommu_data,
+>   	}
+>   
+>   	mutex_unlock(&iommu->lock);
+> -	return i > 0 ? i : -EINVAL;
+> +
+> +	WARN_ON_ONCE(i != npage);
+>   }
+>   
+>   static long vfio_sync_unpin(struct vfio_dma *dma, struct vfio_domain *domain,
+> diff --git a/include/linux/vfio.h b/include/linux/vfio.h
+> index 49580fa2073a..d0844ecdc961 100644
+> --- a/include/linux/vfio.h
+> +++ b/include/linux/vfio.h
+> @@ -149,8 +149,8 @@ bool vfio_file_has_dev(struct file *file, struct vfio_device *device);
+>   
+>   int vfio_pin_pages(struct vfio_device *device, unsigned long *user_pfn,
+>   		   int npage, int prot, unsigned long *phys_pfn);
+> -int vfio_unpin_pages(struct vfio_device *device, unsigned long *user_pfn,
+> -		     int npage);
+> +void vfio_unpin_pages(struct vfio_device *device, unsigned long *user_pfn,
+> +		      int npage);
+>   int vfio_dma_rw(struct vfio_device *device, dma_addr_t user_iova,
+>   		void *data, size_t len, bool write);
+>   
