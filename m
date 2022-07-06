@@ -2,40 +2,40 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 9E8A4569047
+	by mail.lfdr.de (Postfix) with ESMTP id 56ADB569046
 	for <lists+kvm@lfdr.de>; Wed,  6 Jul 2022 19:05:49 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233364AbiGFRFb (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 6 Jul 2022 13:05:31 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58944 "EHLO
+        id S233548AbiGFRFm (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 6 Jul 2022 13:05:42 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59036 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233404AbiGFRFa (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 6 Jul 2022 13:05:30 -0400
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 527162A701
-        for <kvm@vger.kernel.org>; Wed,  6 Jul 2022 10:05:29 -0700 (PDT)
+        with ESMTP id S233088AbiGFRFl (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 6 Jul 2022 13:05:41 -0400
+Received: from ams.source.kernel.org (ams.source.kernel.org [IPv6:2604:1380:4601:e00::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2D7C22A700
+        for <kvm@vger.kernel.org>; Wed,  6 Jul 2022 10:05:40 -0700 (PDT)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id E3EAA61E73
-        for <kvm@vger.kernel.org>; Wed,  6 Jul 2022 17:05:28 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 52E9BC341CA;
-        Wed,  6 Jul 2022 17:05:28 +0000 (UTC)
+        by ams.source.kernel.org (Postfix) with ESMTPS id DAF4FB81DA3
+        for <kvm@vger.kernel.org>; Wed,  6 Jul 2022 17:05:38 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id A34A7C341CB;
+        Wed,  6 Jul 2022 17:05:37 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1657127128;
-        bh=cAGDdMafS96wyO8t0APfVo42s5sH9E1PNKcQhcywh9o=;
+        s=k20201202; t=1657127137;
+        bh=P3kpZG27EOyzbwnUFwH5BLDPgYgJ78A4FsqFCISXKZo=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=ETUdP8MmWLSUngYkXd6YnUzRYpnTa7YsN9A5guSSXY8VLWmkb7nFARl5QrVhd1vO1
-         OgwR1xcAsgKNCVjEIYnqUSuz7MZPVdv8Ex0JWtQvSg0WW1ZZgbgIgwXDxQRD9Ckl/p
-         oR9lS6Epazg24il2PDNBlJw7cnN43iWDhxtP1wSP2ZIKmkdbaidXB1RVike5KvOCBg
-         Iop8btiY4f4DF1aHiomZBQ5zWZRUR3YrQfIrrVwVK85t6wcM8z7K9VCN+eEE3or9kE
-         eg+jJzsnIlJH0ztMDO9nHNhO62XIMOH7EhL3c3N74y6YpXi9b/WT03j1wkPt/6Je7q
-         vKbvJousjCMZw==
+        b=Vqu5DalMdRnEDhgbuskmb6WmTuIgFlmTrPC46S/MqAVFP0alUHkC5DabEui53L97O
+         B5+efJst85W36SgIBUmJYtAhYgLf7McMaEYMwwpCFdvzpU7k6erywFpw0dhpcaESE5
+         J0bSVBfOO99ILmANESFiM8/Vl9koa3LP3BSziV0CbkwPIqllYMfHdD1xkaev2gcDfV
+         SZpOMmc3XuobZUgoMJzmUgadVBU+2bNxpxc5+Oyzy+L+mP/ZAyr38y3qpkCDMKQJyU
+         pMPmvgy0q6f2aXuoUefVbbIHxGx2ZodSrv/UL1TZNERV/5H4xE15jU41PEU4s+GdRd
+         zY5jtvJdwtGCQ==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=why.lan)
         by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
         (Exim 4.95)
         (envelope-from <maz@kernel.org>)
-        id 1o987M-005h9i-WE;
+        id 1o987N-005h9i-8D;
         Wed, 06 Jul 2022 17:43:13 +0100
 From:   Marc Zyngier <maz@kernel.org>
 To:     kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org,
@@ -45,9 +45,9 @@ Cc:     James Morse <james.morse@arm.com>,
         Alexandru Elisei <alexandru.elisei@arm.com>,
         Oliver Upton <oliver.upton@linux.dev>,
         Schspa Shi <schspa@gmail.com>, kernel-team@android.com
-Subject: [PATCH 11/19] KVM: arm64: vgic-v3: Use u32 to manage the line level from userspace
-Date:   Wed,  6 Jul 2022 17:42:56 +0100
-Message-Id: <20220706164304.1582687-12-maz@kernel.org>
+Subject: [PATCH 12/19] KVM: arm64: vgic-v3: Consolidate userspace access for MMIO registers
+Date:   Wed,  6 Jul 2022 17:42:57 +0100
+Message-Id: <20220706164304.1582687-13-maz@kernel.org>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20220706164304.1582687-1-maz@kernel.org>
 References: <20220706164304.1582687-1-maz@kernel.org>
@@ -67,110 +67,191 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Despite the userspace ABI clearly defining the bits dealt with by
-KVM_DEV_ARM_VGIC_GRP_LEVEL_INFO as a __u32, the kernel uses a u64.
+For userspace accesses to GICv3 MMIO registers (and related data),
+vgic_v3_{get,set}_attr are littered with {get,put}_user() calls,
+making it hard to audit and reason about.
 
-Use a u32 to match the userspace ABI, which will subsequently lead
-to some simplifications.
+Consolidate all userspace accesses in vgic_v3_attr_regs_access(),
+makeing the code far simpler to audit.
 
 Signed-off-by: Marc Zyngier <maz@kernel.org>
 ---
- arch/arm64/kvm/vgic/vgic-kvm-device.c | 6 +++++-
- arch/arm64/kvm/vgic/vgic-mmio-v3.c    | 2 +-
- arch/arm64/kvm/vgic/vgic-mmio.c       | 6 +++---
- arch/arm64/kvm/vgic/vgic-mmio.h       | 4 ++--
- arch/arm64/kvm/vgic/vgic.h            | 2 +-
- 5 files changed, 12 insertions(+), 8 deletions(-)
+ arch/arm64/kvm/vgic/vgic-kvm-device.c | 104 ++++++++++----------------
+ 1 file changed, 38 insertions(+), 66 deletions(-)
 
 diff --git a/arch/arm64/kvm/vgic/vgic-kvm-device.c b/arch/arm64/kvm/vgic/vgic-kvm-device.c
-index d8269300632d..01285ee5cdf0 100644
+index 01285ee5cdf0..925875722027 100644
 --- a/arch/arm64/kvm/vgic/vgic-kvm-device.c
 +++ b/arch/arm64/kvm/vgic/vgic-kvm-device.c
-@@ -570,10 +570,14 @@ static int vgic_v3_attr_regs_access(struct kvm_device *dev,
+@@ -512,18 +512,18 @@ int vgic_v3_parse_attr(struct kvm_device *dev, struct kvm_device_attr *attr,
+  *
+  * @dev:      kvm device handle
+  * @attr:     kvm device attribute
+- * @reg:      address the value is read or written
+  * @is_write: true if userspace is writing a register
+  */
+ static int vgic_v3_attr_regs_access(struct kvm_device *dev,
+ 				    struct kvm_device_attr *attr,
+-				    u64 *reg, bool is_write)
++				    bool is_write)
+ {
+ 	struct vgic_reg_attr reg_attr;
+ 	gpa_t addr;
+ 	struct kvm_vcpu *vcpu;
++	bool uaccess;
++	u32 val;
+ 	int ret;
+-	u32 tmp32;
+ 
+ 	ret = vgic_v3_parse_attr(dev, attr, &reg_attr);
+ 	if (ret)
+@@ -532,6 +532,21 @@ static int vgic_v3_attr_regs_access(struct kvm_device *dev,
+ 	vcpu = reg_attr.vcpu;
+ 	addr = reg_attr.addr;
+ 
++	switch (attr->group) {
++	case KVM_DEV_ARM_VGIC_GRP_CPU_SYSREGS:
++		/* Sysregs uaccess is performed by the sysreg handling code */
++		uaccess = false;
++		break;
++	default:
++		uaccess = true;
++	}
++
++	if (uaccess && is_write) {
++		u32 __user *uaddr = (u32 __user *)(unsigned long)attr->addr;
++		if (get_user(val, uaddr))
++			return -EFAULT;
++	}
++
+ 	mutex_lock(&dev->kvm->lock);
+ 
+ 	if (unlikely(!vgic_initialized(dev->kvm))) {
+@@ -546,20 +561,10 @@ static int vgic_v3_attr_regs_access(struct kvm_device *dev,
+ 
+ 	switch (attr->group) {
+ 	case KVM_DEV_ARM_VGIC_GRP_DIST_REGS:
+-		if (is_write)
+-			tmp32 = *reg;
+-
+-		ret = vgic_v3_dist_uaccess(vcpu, is_write, addr, &tmp32);
+-		if (!is_write)
+-			*reg = tmp32;
++		ret = vgic_v3_dist_uaccess(vcpu, is_write, addr, &val);
+ 		break;
+ 	case KVM_DEV_ARM_VGIC_GRP_REDIST_REGS:
+-		if (is_write)
+-			tmp32 = *reg;
+-
+-		ret = vgic_v3_redist_uaccess(vcpu, is_write, addr, &tmp32);
+-		if (!is_write)
+-			*reg = tmp32;
++		ret = vgic_v3_redist_uaccess(vcpu, is_write, addr, &val);
+ 		break;
+ 	case KVM_DEV_ARM_VGIC_GRP_CPU_SYSREGS:
+ 		ret = vgic_v3_cpu_sysregs_uaccess(vcpu, attr, is_write);
+@@ -570,14 +575,10 @@ static int vgic_v3_attr_regs_access(struct kvm_device *dev,
  		info = (attr->attr & KVM_DEV_ARM_VGIC_LINE_LEVEL_INFO_MASK) >>
  			KVM_DEV_ARM_VGIC_LINE_LEVEL_INFO_SHIFT;
  		if (info == VGIC_LEVEL_INFO_LINE_LEVEL) {
-+			if (is_write)
-+				tmp32 = *reg;
+-			if (is_write)
+-				tmp32 = *reg;
  			intid = attr->attr &
  				KVM_DEV_ARM_VGIC_LINE_LEVEL_INTID_MASK;
  			ret = vgic_v3_line_level_info_uaccess(vcpu, is_write,
--							      intid, reg);
-+							      intid, &tmp32);
-+			if (!is_write)
-+				*reg = tmp32;
+-							      intid, &tmp32);
+-			if (!is_write)
+-				*reg = tmp32;
++							      intid, &val);
  		} else {
  			ret = -EINVAL;
  		}
-diff --git a/arch/arm64/kvm/vgic/vgic-mmio-v3.c b/arch/arm64/kvm/vgic/vgic-mmio-v3.c
-index a2ff73899976..91201f743033 100644
---- a/arch/arm64/kvm/vgic/vgic-mmio-v3.c
-+++ b/arch/arm64/kvm/vgic/vgic-mmio-v3.c
-@@ -1154,7 +1154,7 @@ int vgic_v3_redist_uaccess(struct kvm_vcpu *vcpu, bool is_write,
+@@ -591,6 +592,13 @@ static int vgic_v3_attr_regs_access(struct kvm_device *dev,
+ 	unlock_all_vcpus(dev->kvm);
+ out:
+ 	mutex_unlock(&dev->kvm->lock);
++
++	if (!ret && uaccess && !is_write) {
++		u32 __user *uaddr = (u32 __user *)(unsigned long)attr->addr;
++		if (put_user(val, uaddr))
++			ret = -EFAULT;
++	}
++
+ 	return ret;
  }
  
- int vgic_v3_line_level_info_uaccess(struct kvm_vcpu *vcpu, bool is_write,
--				    u32 intid, u64 *val)
-+				    u32 intid, u32 *val)
- {
- 	if (intid % 32)
- 		return -EINVAL;
-diff --git a/arch/arm64/kvm/vgic/vgic-mmio.c b/arch/arm64/kvm/vgic/vgic-mmio.c
-index 997d0fce2088..b32d434c1d4a 100644
---- a/arch/arm64/kvm/vgic/vgic-mmio.c
-+++ b/arch/arm64/kvm/vgic/vgic-mmio.c
-@@ -775,10 +775,10 @@ void vgic_mmio_write_config(struct kvm_vcpu *vcpu,
+@@ -605,30 +613,12 @@ static int vgic_v3_set_attr(struct kvm_device *dev,
+ 
+ 	switch (attr->group) {
+ 	case KVM_DEV_ARM_VGIC_GRP_DIST_REGS:
+-	case KVM_DEV_ARM_VGIC_GRP_REDIST_REGS: {
+-		u32 __user *uaddr = (u32 __user *)(long)attr->addr;
+-		u32 tmp32;
+-		u64 reg;
+-
+-		if (get_user(tmp32, uaddr))
+-			return -EFAULT;
+-
+-		reg = tmp32;
+-		return vgic_v3_attr_regs_access(dev, attr, &reg, true);
+-	}
++	case KVM_DEV_ARM_VGIC_GRP_REDIST_REGS:
++		return vgic_v3_attr_regs_access(dev, attr, true);
+ 	case KVM_DEV_ARM_VGIC_GRP_CPU_SYSREGS:
+-		return vgic_v3_attr_regs_access(dev, attr, NULL, true);
+-	case KVM_DEV_ARM_VGIC_GRP_LEVEL_INFO: {
+-		u32 __user *uaddr = (u32 __user *)(long)attr->addr;
+-		u64 reg;
+-		u32 tmp32;
+-
+-		if (get_user(tmp32, uaddr))
+-			return -EFAULT;
+-
+-		reg = tmp32;
+-		return vgic_v3_attr_regs_access(dev, attr, &reg, true);
+-	}
++		return vgic_v3_attr_regs_access(dev, attr, true);
++	case KVM_DEV_ARM_VGIC_GRP_LEVEL_INFO:
++		return vgic_v3_attr_regs_access(dev, attr, true);
+ 	case KVM_DEV_ARM_VGIC_GRP_CTRL: {
+ 		int ret;
+ 
+@@ -662,30 +652,12 @@ static int vgic_v3_get_attr(struct kvm_device *dev,
+ 
+ 	switch (attr->group) {
+ 	case KVM_DEV_ARM_VGIC_GRP_DIST_REGS:
+-	case KVM_DEV_ARM_VGIC_GRP_REDIST_REGS: {
+-		u32 __user *uaddr = (u32 __user *)(long)attr->addr;
+-		u64 reg;
+-		u32 tmp32;
+-
+-		ret = vgic_v3_attr_regs_access(dev, attr, &reg, false);
+-		if (ret)
+-			return ret;
+-		tmp32 = reg;
+-		return put_user(tmp32, uaddr);
+-	}
++	case KVM_DEV_ARM_VGIC_GRP_REDIST_REGS:
++		return vgic_v3_attr_regs_access(dev, attr, false);
+ 	case KVM_DEV_ARM_VGIC_GRP_CPU_SYSREGS:
+-		return vgic_v3_attr_regs_access(dev, attr, NULL, false);
+-	case KVM_DEV_ARM_VGIC_GRP_LEVEL_INFO: {
+-		u32 __user *uaddr = (u32 __user *)(long)attr->addr;
+-		u64 reg;
+-		u32 tmp32;
+-
+-		ret = vgic_v3_attr_regs_access(dev, attr, &reg, false);
+-		if (ret)
+-			return ret;
+-		tmp32 = reg;
+-		return put_user(tmp32, uaddr);
+-	}
++		return vgic_v3_attr_regs_access(dev, attr, false);
++	case KVM_DEV_ARM_VGIC_GRP_LEVEL_INFO:
++		return vgic_v3_attr_regs_access(dev, attr, false);
  	}
+ 	return -ENXIO;
  }
- 
--u64 vgic_read_irq_line_level_info(struct kvm_vcpu *vcpu, u32 intid)
-+u32 vgic_read_irq_line_level_info(struct kvm_vcpu *vcpu, u32 intid)
- {
- 	int i;
--	u64 val = 0;
-+	u32 val = 0;
- 	int nr_irqs = vcpu->kvm->arch.vgic.nr_spis + VGIC_NR_PRIVATE_IRQS;
- 
- 	for (i = 0; i < 32; i++) {
-@@ -798,7 +798,7 @@ u64 vgic_read_irq_line_level_info(struct kvm_vcpu *vcpu, u32 intid)
- }
- 
- void vgic_write_irq_line_level_info(struct kvm_vcpu *vcpu, u32 intid,
--				    const u64 val)
-+				    const u32 val)
- {
- 	int i;
- 	int nr_irqs = vcpu->kvm->arch.vgic.nr_spis + VGIC_NR_PRIVATE_IRQS;
-diff --git a/arch/arm64/kvm/vgic/vgic-mmio.h b/arch/arm64/kvm/vgic/vgic-mmio.h
-index 6082d4b66d39..5b490a4dfa5e 100644
---- a/arch/arm64/kvm/vgic/vgic-mmio.h
-+++ b/arch/arm64/kvm/vgic/vgic-mmio.h
-@@ -207,10 +207,10 @@ void vgic_mmio_write_config(struct kvm_vcpu *vcpu,
- int vgic_uaccess(struct kvm_vcpu *vcpu, struct vgic_io_device *dev,
- 		 bool is_write, int offset, u32 *val);
- 
--u64 vgic_read_irq_line_level_info(struct kvm_vcpu *vcpu, u32 intid);
-+u32 vgic_read_irq_line_level_info(struct kvm_vcpu *vcpu, u32 intid);
- 
- void vgic_write_irq_line_level_info(struct kvm_vcpu *vcpu, u32 intid,
--				    const u64 val);
-+				    const u32 val);
- 
- unsigned int vgic_v2_init_dist_iodev(struct vgic_io_device *dev);
- 
-diff --git a/arch/arm64/kvm/vgic/vgic.h b/arch/arm64/kvm/vgic/vgic.h
-index c23118467a35..0c8da72953f0 100644
---- a/arch/arm64/kvm/vgic/vgic.h
-+++ b/arch/arm64/kvm/vgic/vgic.h
-@@ -249,7 +249,7 @@ int vgic_v3_cpu_sysregs_uaccess(struct kvm_vcpu *vcpu,
- 				struct kvm_device_attr *attr, bool is_write);
- int vgic_v3_has_cpu_sysregs_attr(struct kvm_vcpu *vcpu, struct kvm_device_attr *attr);
- int vgic_v3_line_level_info_uaccess(struct kvm_vcpu *vcpu, bool is_write,
--				    u32 intid, u64 *val);
-+				    u32 intid, u32 *val);
- int kvm_register_vgic_device(unsigned long type);
- void vgic_set_vmcr(struct kvm_vcpu *vcpu, struct vgic_vmcr *vmcr);
- void vgic_get_vmcr(struct kvm_vcpu *vcpu, struct vgic_vmcr *vmcr);
 -- 
 2.34.1
 
