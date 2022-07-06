@@ -2,64 +2,72 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id A1EA856922F
-	for <lists+kvm@lfdr.de>; Wed,  6 Jul 2022 20:50:59 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id E63E2569273
+	for <lists+kvm@lfdr.de>; Wed,  6 Jul 2022 21:15:09 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233961AbiGFSuz (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 6 Jul 2022 14:50:55 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33108 "EHLO
+        id S233861AbiGFTPH (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 6 Jul 2022 15:15:07 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48172 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232596AbiGFSux (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 6 Jul 2022 14:50:53 -0400
+        with ESMTP id S233471AbiGFTPE (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 6 Jul 2022 15:15:04 -0400
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id E892D25C5B
-        for <kvm@vger.kernel.org>; Wed,  6 Jul 2022 11:50:51 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 2BF54237CC
+        for <kvm@vger.kernel.org>; Wed,  6 Jul 2022 12:15:03 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1657133450;
+        s=mimecast20190719; t=1657134901;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=6VXm7agXtiv+U3vrTaDHt2nr+7qTTcMzlC2o0102s4c=;
-        b=eTKA0ionBGRk7dPZAaPddlur09ih6LrXE7/lzMWi7e31AqUQuLw4k2JKhTJnT9AEez0BsH
-        oEgIYPYK0vNDUguZfGWdhHn2GH/YIe24Ma4DioH96oWmip9YtjFCty8MIsxRmEuaJOaXUx
-        +ZrETb5gqlg/+JEt+sfsJ6uKYVQ0JG4=
-Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
- [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
+        bh=fe2Xwz5G0SOLEGSbWZeizefklyOtEuVCF/HmgAiG5W8=;
+        b=NOClT1bnzEoubqinkjt6Ke9Hy9ieDcOFJAa9+eIkZtytdYPX5DzL7JLmT+cAaJ4pjlKykF
+        fl+oAzh3mgqJxfa6ODwvoNtEewtRYT1q6meLl4XpvrNWJgenXRz4+7G//CPgLCvxs2q/DA
+        Q0VXi75W0gnaP8Mag0SyxWpp7onrTsY=
+Received: from mail-il1-f199.google.com (mail-il1-f199.google.com
+ [209.85.166.199]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-213-Te3BkxTNPBKv-FuUOUFLOg-1; Wed, 06 Jul 2022 14:50:47 -0400
-X-MC-Unique: Te3BkxTNPBKv-FuUOUFLOg-1
-Received: from smtp.corp.redhat.com (int-mx09.intmail.prod.int.rdu2.redhat.com [10.11.54.9])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id EB193811E81;
-        Wed,  6 Jul 2022 18:50:46 +0000 (UTC)
-Received: from starship (unknown [10.40.194.38])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 994A8492C3B;
-        Wed,  6 Jul 2022 18:50:40 +0000 (UTC)
-Message-ID: <7160446153df8710f78db8e0d0e135a583b13e0b.camel@redhat.com>
-Subject: Re: [PATCH v2 02/21] KVM: VMX: Drop bits 31:16 when shoving
- exception error code into VMCS
-From:   Maxim Levitsky <mlevitsk@redhat.com>
-To:     Sean Christopherson <seanjc@google.com>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org, Oliver Upton <oupton@google.com>,
-        Peter Shier <pshier@google.com>
-Date:   Wed, 06 Jul 2022 21:50:39 +0300
-In-Reply-To: <YsW0ZDkfVywkQEJO@google.com>
-References: <20220614204730.3359543-1-seanjc@google.com>
-         <20220614204730.3359543-3-seanjc@google.com>
-         <df72cfcdda55b594d6bbbd9b5b0e2b229dc6c718.camel@redhat.com>
-         <YsW0ZDkfVywkQEJO@google.com>
-Content-Type: text/plain; charset="UTF-8"
-User-Agent: Evolution 3.36.5 (3.36.5-2.fc32) 
+ us-mta-617-QKprkdCsNtSh16LqRem9ZQ-1; Wed, 06 Jul 2022 15:15:00 -0400
+X-MC-Unique: QKprkdCsNtSh16LqRem9ZQ-1
+Received: by mail-il1-f199.google.com with SMTP id i2-20020a056e021d0200b002d8ff49e7c4so8085024ila.8
+        for <kvm@vger.kernel.org>; Wed, 06 Jul 2022 12:15:00 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:in-reply-to
+         :references:organization:mime-version:content-transfer-encoding;
+        bh=fe2Xwz5G0SOLEGSbWZeizefklyOtEuVCF/HmgAiG5W8=;
+        b=QLT2+XJF5/p8UNYn5mIGy7gRHuiG/5yC3QQwyRlT8xOKBpml84e2g18iJfacMnCFeu
+         //+wDrWnzWN2IEGZuqY/q0OGP4VANoh3e1ICqcZHDZEB0p3u2ZAaosvT4qTClFNC4xFY
+         lYqD/1CQbZo42gQK9qjkC5HlBEWV9DrW1SoNgFNZxY45Pw9sSp/igHhQBUkySZ2hgp2R
+         px1DxyN8PBTH0iPsdynGTDnXM6JJTwYujKQ6NM/Gz3HRtTXEiJkKxxJXtdg5qCWpSU+z
+         9XfB3IzxIiMMl1RYEAETrWdszwJ4+f95NMjvZ+z4JxXJ2gD7lCsSNsUxSUtGFXYXIUCh
+         Exng==
+X-Gm-Message-State: AJIora9JdxhgYNg4VRH+UIMQ+J7F76w744nIqNTEwsP/aBVqDjulnMCY
+        29iE+l181WJOWhpoyoKHQL6W714IucgSnzuvpLzzqk62z6h/ySt9q1u9oMl+2S7EClxV03qFFXJ
+        IfYCxvz93Rg8B
+X-Received: by 2002:a05:6638:f81:b0:33c:5393:c0ff with SMTP id h1-20020a0566380f8100b0033c5393c0ffmr25986099jal.231.1657134899820;
+        Wed, 06 Jul 2022 12:14:59 -0700 (PDT)
+X-Google-Smtp-Source: AGRyM1uU5DNOvzd0f8YLcM9RN/fjk8aTWDGW1pdOba6lI2hg5z6GFsfHePI/n1aNOqFJfFXMJ9bwLg==
+X-Received: by 2002:a05:6638:f81:b0:33c:5393:c0ff with SMTP id h1-20020a0566380f8100b0033c5393c0ffmr25986091jal.231.1657134899640;
+        Wed, 06 Jul 2022 12:14:59 -0700 (PDT)
+Received: from redhat.com ([38.15.36.239])
+        by smtp.gmail.com with ESMTPSA id g93-20020a028566000000b003319a68d2f5sm16176468jai.125.2022.07.06.12.14.58
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 06 Jul 2022 12:14:58 -0700 (PDT)
+Date:   Wed, 6 Jul 2022 13:14:56 -0600
+From:   Alex Williamson <alex.williamson@redhat.com>
+To:     Deming Wang <wangdeming@inspur.com>
+Cc:     <cohuck@redhat.com>, <kvm@vger.kernel.org>,
+        <linux-kernel@vger.kernel.org>,
+        Alexey Kardashevskiy <aik@ozlabs.ru>
+Subject: Re: [PATCH] vfio/spapr_tce: Remove the unused parameters container
+Message-ID: <20220706131456.3c08c2b7.alex.williamson@redhat.com>
+In-Reply-To: <20220702064613.5293-1-wangdeming@inspur.com>
+References: <20220702064613.5293-1-wangdeming@inspur.com>
+Organization: Red Hat
 MIME-Version: 1.0
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.85 on 10.11.54.9
 X-Spam-Status: No, score=-3.5 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,
         SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham
@@ -70,40 +78,62 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, 2022-07-06 at 16:12 +0000, Sean Christopherson wrote:
-> On Wed, Jul 06, 2022, Maxim Levitsky wrote:
-> > On Tue, 2022-06-14 at 20:47 +0000, Sean Christopherson wrote:
-> > > Deliberately truncate the exception error code when shoving it into the
-> > > VMCS (VM-Entry field for vmcs01 and vmcs02, VM-Exit field for vmcs12).
-> > > Intel CPUs are incapable of handling 32-bit error codes and will never
-> > > generate an error code with bits 31:16, but userspace can provide an
-> > > arbitrary error code via KVM_SET_VCPU_EVENTS.  Failure to drop the bits
-> > > on exception injection results in failed VM-Entry, as VMX disallows
-> > > setting bits 31:16.  Setting the bits on VM-Exit would at best confuse
-> > > L1, and at worse induce a nested VM-Entry failure, e.g. if L1 decided to
-> > > reinject the exception back into L2.
-> > 
-> > Wouldn't it be better to fail KVM_SET_VCPU_EVENTS instead if it tries
-> > to set error code with uppper 16 bits set?
-> 
-> No, because AMD CPUs generate error codes with bits 31:16 set.  KVM "supports"
-> cross-vendor live migration, so outright rejecting is not an option.
-> 
-> > Or if that is considered ABI breakage, then KVM_SET_VCPU_EVENTS code
-> > can truncate the user given value to 16 bit.
-> 
-> Again, AMD, and more specifically SVM, allows bits 31:16 to be non-zero, so
-> truncation is only correct for VMX.  I say "VMX" instead of "Intel" because
-> architecturally the Intel CPUs do have 32-bit error codes, it's just the VMX
-> architecture that doesn't allow injection of 32-bit values.
-> 
+On Sat, 2 Jul 2022 02:46:13 -0400
+Deming Wang <wangdeming@inspur.com> wrote:
 
-Oh, I see AMD uses bit 31 for RMP (from SEV-SNP) page fault,
-Thanks for the explanation!
+> The parameter of container has been unused for tce_iommu_unuse_page.
+> So, we should delete it.
+> 
+> Signed-off-by: Deming Wang <wangdeming@inspur.com>
+> ---
+>  drivers/vfio/vfio_iommu_spapr_tce.c | 9 ++++-----
+>  1 file changed, 4 insertions(+), 5 deletions(-)
 
-You might want to add this piece of info somewhere as a comment if you wish.
+I'll give Alexey a chance to ack this, but agree that it seems this arg
+has never had any purpose.  Perhaps a debugging remnant.  Thanks,
 
-Thanks,
-Best regards,
-	Maxim Levitsky
+Alex
+
+> 
+> diff --git a/drivers/vfio/vfio_iommu_spapr_tce.c b/drivers/vfio/vfio_iommu_spapr_tce.c
+> index 708a95e61831..ea3d17a94e94 100644
+> --- a/drivers/vfio/vfio_iommu_spapr_tce.c
+> +++ b/drivers/vfio/vfio_iommu_spapr_tce.c
+> @@ -378,8 +378,7 @@ static void tce_iommu_release(void *iommu_data)
+>  	kfree(container);
+>  }
+>  
+> -static void tce_iommu_unuse_page(struct tce_container *container,
+> -		unsigned long hpa)
+> +static void tce_iommu_unuse_page(unsigned long hpa)
+>  {
+>  	struct page *page;
+>  
+> @@ -474,7 +473,7 @@ static int tce_iommu_clear(struct tce_container *container,
+>  			continue;
+>  		}
+>  
+> -		tce_iommu_unuse_page(container, oldhpa);
+> +		tce_iommu_unuse_page(oldhpa);
+>  	}
+>  
+>  	iommu_tce_kill(tbl, firstentry, pages);
+> @@ -524,7 +523,7 @@ static long tce_iommu_build(struct tce_container *container,
+>  		ret = iommu_tce_xchg_no_kill(container->mm, tbl, entry + i,
+>  				&hpa, &dirtmp);
+>  		if (ret) {
+> -			tce_iommu_unuse_page(container, hpa);
+> +			tce_iommu_unuse_page(hpa);
+>  			pr_err("iommu_tce: %s failed ioba=%lx, tce=%lx, ret=%ld\n",
+>  					__func__, entry << tbl->it_page_shift,
+>  					tce, ret);
+> @@ -532,7 +531,7 @@ static long tce_iommu_build(struct tce_container *container,
+>  		}
+>  
+>  		if (dirtmp != DMA_NONE)
+> -			tce_iommu_unuse_page(container, hpa);
+> +			tce_iommu_unuse_page(hpa);
+>  
+>  		tce += IOMMU_PAGE_SIZE(tbl);
+>  	}
 
