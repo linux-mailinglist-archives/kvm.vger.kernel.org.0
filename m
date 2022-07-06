@@ -2,69 +2,64 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id A2C4F569489
-	for <lists+kvm@lfdr.de>; Wed,  6 Jul 2022 23:36:05 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 0F17F569526
+	for <lists+kvm@lfdr.de>; Thu,  7 Jul 2022 00:17:45 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230029AbiGFVgE (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 6 Jul 2022 17:36:04 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57072 "EHLO
+        id S234158AbiGFWRn (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 6 Jul 2022 18:17:43 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55780 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231479AbiGFVgC (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 6 Jul 2022 17:36:02 -0400
-Received: from mail-pg1-x52f.google.com (mail-pg1-x52f.google.com [IPv6:2607:f8b0:4864:20::52f])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B43EBE8C
-        for <kvm@vger.kernel.org>; Wed,  6 Jul 2022 14:36:01 -0700 (PDT)
-Received: by mail-pg1-x52f.google.com with SMTP id o18so13818651pgu.9
-        for <kvm@vger.kernel.org>; Wed, 06 Jul 2022 14:36:01 -0700 (PDT)
+        with ESMTP id S230424AbiGFWRl (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 6 Jul 2022 18:17:41 -0400
+Received: from mail-ot1-x334.google.com (mail-ot1-x334.google.com [IPv6:2607:f8b0:4864:20::334])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2A73A2B185
+        for <kvm@vger.kernel.org>; Wed,  6 Jul 2022 15:17:40 -0700 (PDT)
+Received: by mail-ot1-x334.google.com with SMTP id t26-20020a9d775a000000b006168f7563daso12773475otl.2
+        for <kvm@vger.kernel.org>; Wed, 06 Jul 2022 15:17:40 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=E//5ZA8uzfUdBafNOuQKisK6Qx4fv09+u0puRM54Yd4=;
-        b=WYNY3+EZM7O23aAqdPFVrW/DUF8fqtHeku8lTPTokWqu4qo5ihKYdUaHcZWbwvv/uk
-         8pSXVp4lrwvMkWw/I3pmkDXmnaHZGzkKLQfFWknorNkRdOAZ34z44bGUwMJFTFtav0az
-         gm4V27G3TiZgAd6SfIrgB9fz0EOxM2PT3QKrjXYqlTNYE/nVNyiGONlx9/iQi7rRbONh
-         /hlEJz3SBbw/A6hPaYmMguUx2TWyvJ5D43pCulKKsZ+mosv9JeeNvxWS8RbOy2/4uIVU
-         gwHVRrlkgfaDmSmmD1HpaixNY4NrKhE4Mc0jzJ3HGiknRzhAmLsbIGxApWqP6xhzhjwU
-         Sung==
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=1EMMmqphd91Ju+K/4EV2gpB3SCsQxfnUR4WTRXFnUaw=;
+        b=JUAKZLgflnGvGeY8IT6zP5OMaHQ6VMe5txVcGNkWPkN5pW8lnvNe1NeuVhmEOa7le7
+         +CTn3Yy1P35wIc/RxOoOX7e5EFrgzZ6N/3dFbKln656S4EK1O2pVJcP/23F0Ia8hvY9/
+         8+FE7oy1Igk8AS8hxlWEURY23hpln8UL9PdP8Zta9mpwgCTklHMay6n8UeTbSxAu940m
+         5yZg8qnF5+qmTqyRm8V6NP68KoBw+huVP03/30Tg4RfF9i9oBocSxaSxEu7zdLtWK11K
+         mfp/qiX/28WzZSheMJhBqXiKnpx3AkF9dVh+IEFM93tYahd7YP3+K3ZASvKhzzJXWG9/
+         I9UA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=E//5ZA8uzfUdBafNOuQKisK6Qx4fv09+u0puRM54Yd4=;
-        b=vjINuh1AhcZ2d953xRoJ8aQnsb6D1WJXCAf/bTZfzgTHVSs+KIhtqZ448nWJddXEE9
-         Y7oaxeL4M4hxU66gUaMUMf9qQC6l8N0qvqKoNfJ30lE2maFtPNSHEMOgVFCaFH8s5gQa
-         nnHWBkcSTTPhVgYU4DKG6ZU53tSF+5NbHRomDQeIGfQfC/h61wZdsqQLU7aY/S+XATBZ
-         wEsbwtwixvm686ut+KmAd0qxGMx6gR8fbuJLrfKk5GozBUmCMsQT7HkSRWXdZa3nlQGj
-         rq4eBtt9SO0ImVg3CQmUwv8Cu9CDmPriEFrfhZXVNoZo6gB/gNo2j4yx7H+o6S6YMVOu
-         aPiA==
-X-Gm-Message-State: AJIora+zX0vlGaZYKgJ4vkZ6yINRYJ5AMI1zG3hhPm3FaWVEalIHnvYE
-        ki+QvHnAI0BeU4KQ84l04H2ksQ==
-X-Google-Smtp-Source: AGRyM1vTi5E2bFkpKPPnm+ygtjra8noxOqMQi4yVuvfE/qj8l2tXrHYCvXKpy5UhaMgSliBROIV24A==
-X-Received: by 2002:a05:6a00:80d:b0:525:520a:1736 with SMTP id m13-20020a056a00080d00b00525520a1736mr48216477pfk.36.1657143361099;
-        Wed, 06 Jul 2022 14:36:01 -0700 (PDT)
-Received: from google.com (123.65.230.35.bc.googleusercontent.com. [35.230.65.123])
-        by smtp.gmail.com with ESMTPSA id i1-20020a17090a718100b001ef87123615sm7423406pjk.37.2022.07.06.14.36.00
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 06 Jul 2022 14:36:00 -0700 (PDT)
-Date:   Wed, 6 Jul 2022 21:35:56 +0000
-From:   Sean Christopherson <seanjc@google.com>
-To:     Vitaly Kuznetsov <vkuznets@redhat.com>
-Cc:     kvm@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>,
-        Anirudh Rayabharam <anrayabh@linux.microsoft.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Maxim Levitsky <mlevitsk@redhat.com>,
-        linux-hyperv@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v2 06/28] KVM: nVMX: Introduce
- KVM_CAP_HYPERV_ENLIGHTENED_VMCS2
-Message-ID: <YsYAPL1UUKJB3/MJ@google.com>
-References: <20220629150625.238286-1-vkuznets@redhat.com>
- <20220629150625.238286-7-vkuznets@redhat.com>
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=1EMMmqphd91Ju+K/4EV2gpB3SCsQxfnUR4WTRXFnUaw=;
+        b=Z24XFMEZGukMTGGCPgl4Ir6AtX9LO3cMvvql2aPgd1v4f7CM2vpmf8MLzkKZrL2XIJ
+         x7DpQgmj7gejjAKb7lT06UH4LsK2ySyfOE7nax7Fu6EfKpmnpoxc2QZCU4lOVsKWvR5y
+         zxVFdhJSfR4A2R7GckyBPGSt/PbVdcveOaYU2B+90zyvNFoajiVi9xtA2Q8enk2yuocX
+         VuO02WqgTjr3vx5icR71pfw5TktllaZxxmoeRMhQaSKtEkFXQyJgYSF8KegDvU1AsBeE
+         MjjJn+dERDPyfTT6jSUVFpqnsdDfrrGLoFn48LhbHb3D1xFiST7kMEGLUjT+AZtZZPyU
+         Bdkg==
+X-Gm-Message-State: AJIora8JZO41DK1IUaEGrNHpvKgmKm5yqzI2XZxiFLdeNKusW8hSeVDG
+        fv5uO6hkLdG7ve2M8//I7HUJIGBCLDGwqvKRidGiRQ==
+X-Google-Smtp-Source: AGRyM1viMzcYHYxWXxBukv/4+pwjZlKWOv7GADlAvy/iHMvt/m9eaoK6woLeA+AiCgYd3MktCPiMnYzCuKkAekLu8IM=
+X-Received: by 2002:a05:6830:14:b0:616:dcbd:e53e with SMTP id
+ c20-20020a056830001400b00616dcbde53emr17979803otp.267.1657145859328; Wed, 06
+ Jul 2022 15:17:39 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20220629150625.238286-7-vkuznets@redhat.com>
+References: <20220614204730.3359543-1-seanjc@google.com> <20220614204730.3359543-4-seanjc@google.com>
+In-Reply-To: <20220614204730.3359543-4-seanjc@google.com>
+From:   Jim Mattson <jmattson@google.com>
+Date:   Wed, 6 Jul 2022 15:17:28 -0700
+Message-ID: <CALMp9eTEkt5nGZDT1qnn1sD5Ft_O_keKomDDiyeWLcPo2Xap7A@mail.gmail.com>
+Subject: Re: [PATCH v2 03/21] KVM: x86: Don't check for code breakpoints when
+ emulating on exception
+To:     Sean Christopherson <seanjc@google.com>
+Cc:     Paolo Bonzini <pbonzini@redhat.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org, Oliver Upton <oupton@google.com>,
+        Peter Shier <pshier@google.com>
+Content-Type: text/plain; charset="UTF-8"
 X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
         ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
@@ -76,29 +71,29 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Jun 29, 2022, Vitaly Kuznetsov wrote:
-> Turns out Enlightened VMCS can gain new fields without version change
-> and KVM_CAP_HYPERV_ENLIGHTENED_VMCS which KVM currently has cant's
-> handle this reliably. In particular, just updating the current definition
-> of eVMCSv1 with the new fields and adjusting the VMX MSR filtering will
-> inevitably break live migration to older KVMs. Note: enabling eVMCS and
-> setting VMX feature MSR can happen in any order.
-> 
-> Introduce a notion of KVM internal "Enlightened VMCS revision" and add
-> a new capability allowing to add fields to Enlightened VMCS while keeping
-> its version.
+On Tue, Jun 14, 2022 at 1:47 PM Sean Christopherson <seanjc@google.com> wrote:
+>
+> Don't check for code breakpoints during instruction emulation if the
+> emulation was triggered by exception interception.  Code breakpoints are
+> the highest priority fault-like exception, and KVM only emulates on
+> exceptions that are fault-like.  Thus, if hardware signaled a different
+> exception, then the vCPU is already passed the stage of checking for
+> hardware breakpoints.
+>
+> This is likely a glorified nop in terms of functionality, and is more for
+> clarification and is technically an optimization.  Intel's SDM explicitly
+> states vmcs.GUEST_RFLAGS.RF on exception interception is the same as the
+> value that would have been saved on the stack had the exception not been
+> intercepted, i.e. will be '1' due to all fault-like exceptions setting RF
+> to '1'.  AMD says "guest state saved ... is the processor state as of the
+> moment the intercept triggers", but that begs the question, "when does
+> the intercept trigger?".
 
-Bumping a "minor" version number in KVM is going to be a nightmare.  KVM is going
-to be stuck "supporting" old revisions in perpetuity, and userspace will be forced
-to keep track of which features are available with which arbitrary revision (is
-that information even communicated to userspace?).
+IIRC, AMD does not prematurely clobber EFLAGS.RF on an intercepted exception.
 
-I think a more maintainable approach would be to expose the "filtered" VMX MSRs to
-userspace, e.g. add KVM_GET_EVMCS_VMX_MSRS.  Then KVM just needs to document what
-the "filters" are for KVM versions that don't support KVM_GET_EVMCS_VMX_MSRS.
-KVM itself doesn't need to maintain version information because it's userspace's
-responsibility to ensure that userspace doesn't try to migrate to a KVM that doesn't
-support the desired feature set.
+This is actually a big deal with shadow paging. On Intel, the
+hypervisor can't fully squash a #PF and restart the guest instruction
+after filling in the shadow page table entry...not easily, anyway.
 
-That also avoids messes like unnecessarily blocking migration from "incompatible"
-revisions when running on hardware that doesn't even support the control.
+(OTOH, AMD does prematurely clobber DR6 and DR7 on an intercepted #DB.
+So, no one should be celebrating!)
