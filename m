@@ -2,64 +2,69 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 0F17F569526
-	for <lists+kvm@lfdr.de>; Thu,  7 Jul 2022 00:17:45 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 18AB0569549
+	for <lists+kvm@lfdr.de>; Thu,  7 Jul 2022 00:27:19 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234158AbiGFWRn (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 6 Jul 2022 18:17:43 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55780 "EHLO
+        id S233884AbiGFW1P (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 6 Jul 2022 18:27:15 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33588 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230424AbiGFWRl (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 6 Jul 2022 18:17:41 -0400
-Received: from mail-ot1-x334.google.com (mail-ot1-x334.google.com [IPv6:2607:f8b0:4864:20::334])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2A73A2B185
-        for <kvm@vger.kernel.org>; Wed,  6 Jul 2022 15:17:40 -0700 (PDT)
-Received: by mail-ot1-x334.google.com with SMTP id t26-20020a9d775a000000b006168f7563daso12773475otl.2
-        for <kvm@vger.kernel.org>; Wed, 06 Jul 2022 15:17:40 -0700 (PDT)
+        with ESMTP id S233466AbiGFW1O (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 6 Jul 2022 18:27:14 -0400
+Received: from mail-pf1-x42d.google.com (mail-pf1-x42d.google.com [IPv6:2607:f8b0:4864:20::42d])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 62FCA2AE34
+        for <kvm@vger.kernel.org>; Wed,  6 Jul 2022 15:27:13 -0700 (PDT)
+Received: by mail-pf1-x42d.google.com with SMTP id 70so571509pfx.1
+        for <kvm@vger.kernel.org>; Wed, 06 Jul 2022 15:27:13 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=1EMMmqphd91Ju+K/4EV2gpB3SCsQxfnUR4WTRXFnUaw=;
-        b=JUAKZLgflnGvGeY8IT6zP5OMaHQ6VMe5txVcGNkWPkN5pW8lnvNe1NeuVhmEOa7le7
-         +CTn3Yy1P35wIc/RxOoOX7e5EFrgzZ6N/3dFbKln656S4EK1O2pVJcP/23F0Ia8hvY9/
-         8+FE7oy1Igk8AS8hxlWEURY23hpln8UL9PdP8Zta9mpwgCTklHMay6n8UeTbSxAu940m
-         5yZg8qnF5+qmTqyRm8V6NP68KoBw+huVP03/30Tg4RfF9i9oBocSxaSxEu7zdLtWK11K
-         mfp/qiX/28WzZSheMJhBqXiKnpx3AkF9dVh+IEFM93tYahd7YP3+K3ZASvKhzzJXWG9/
-         I9UA==
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=8En5VcDzJpRZUJVBlGHl7Q0Kg1P7kPCrXjhE+LYfN5M=;
+        b=kUIIVGCvERQEwyak3xqYOSlBxS1t7NuI8dhRO8VQaU9LIJ4OHWPVFlkNrzzG8/4+4h
+         9bMaqgsk8h471N0EWcKC28ueATACcd427UQJ08RGW/XfwbnTa9KOCj6Gj5+JKtgkIYNg
+         mV42Sjkr8T7U+CFhVFGY2RkyxyF1dHwogJs/8kX8bMg77uOzJehO6zidjkXV+rS4rx28
+         aX5yARkMcygsr/w43e7dqgSElHUG8h+okUWK+0TP0E7BCzKWbPcwMXc08LxXEtzyKbNl
+         9oG04V8LDumUHN+BuX8c1em1gW0L+Y2EwVQw3ihOm5eJlblVDdaqBA/R8rsisN0ySVGr
+         ownA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=1EMMmqphd91Ju+K/4EV2gpB3SCsQxfnUR4WTRXFnUaw=;
-        b=Z24XFMEZGukMTGGCPgl4Ir6AtX9LO3cMvvql2aPgd1v4f7CM2vpmf8MLzkKZrL2XIJ
-         x7DpQgmj7gejjAKb7lT06UH4LsK2ySyfOE7nax7Fu6EfKpmnpoxc2QZCU4lOVsKWvR5y
-         zxVFdhJSfR4A2R7GckyBPGSt/PbVdcveOaYU2B+90zyvNFoajiVi9xtA2Q8enk2yuocX
-         VuO02WqgTjr3vx5icR71pfw5TktllaZxxmoeRMhQaSKtEkFXQyJgYSF8KegDvU1AsBeE
-         MjjJn+dERDPyfTT6jSUVFpqnsdDfrrGLoFn48LhbHb3D1xFiST7kMEGLUjT+AZtZZPyU
-         Bdkg==
-X-Gm-Message-State: AJIora8JZO41DK1IUaEGrNHpvKgmKm5yqzI2XZxiFLdeNKusW8hSeVDG
-        fv5uO6hkLdG7ve2M8//I7HUJIGBCLDGwqvKRidGiRQ==
-X-Google-Smtp-Source: AGRyM1viMzcYHYxWXxBukv/4+pwjZlKWOv7GADlAvy/iHMvt/m9eaoK6woLeA+AiCgYd3MktCPiMnYzCuKkAekLu8IM=
-X-Received: by 2002:a05:6830:14:b0:616:dcbd:e53e with SMTP id
- c20-20020a056830001400b00616dcbde53emr17979803otp.267.1657145859328; Wed, 06
- Jul 2022 15:17:39 -0700 (PDT)
-MIME-Version: 1.0
-References: <20220614204730.3359543-1-seanjc@google.com> <20220614204730.3359543-4-seanjc@google.com>
-In-Reply-To: <20220614204730.3359543-4-seanjc@google.com>
-From:   Jim Mattson <jmattson@google.com>
-Date:   Wed, 6 Jul 2022 15:17:28 -0700
-Message-ID: <CALMp9eTEkt5nGZDT1qnn1sD5Ft_O_keKomDDiyeWLcPo2Xap7A@mail.gmail.com>
-Subject: Re: [PATCH v2 03/21] KVM: x86: Don't check for code breakpoints when
- emulating on exception
-To:     Sean Christopherson <seanjc@google.com>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=8En5VcDzJpRZUJVBlGHl7Q0Kg1P7kPCrXjhE+LYfN5M=;
+        b=I91g7H/sWUwcHiWPh2lzn6KDBy+pLlGASQlkk8zqhm0Dk2zx+kBi5rhjLmYHq39fc5
+         2YppKlcJvXn6msxS6DTI8+Y8TWnxLid1xbUER3Pr5Rkgb+EK9oURtuUksUiNDAC/YHIN
+         uivxX3paK4vWzy1XYDnjrY3AaXI87LokWqK8Q7pSX58P5/AlVQ5V4NZ44uYfebhlVBUx
+         Dt7q+97ijWOuUq0swrtURJFmBPaQXIDyQeyVdaceVyjfAzEvn7wgOPxAp2fTJZBQkfnn
+         9kK+VfLhVePe6mAlbVMeYWrahkyIBHAPxN3XgQpYvrm7L+45llE7gZo5ZwO7weNkFDQa
+         BvAQ==
+X-Gm-Message-State: AJIora8WKuKrSUFZ+UFOQ29xZ62yXvFUOQ6Cr1gFvjIEYAgtW9L8B1eF
+        NRhIUuRbmmtKKll7ZCz8zkqBJw==
+X-Google-Smtp-Source: AGRyM1vHvu+U2FyKN0UOsLIZn0q60hIVl9H32PwcOuMvAe5bhsFNxwgb8QQ+Rs8X2STgT9XFwF4Qyw==
+X-Received: by 2002:a17:902:f708:b0:153:839f:bf2c with SMTP id h8-20020a170902f70800b00153839fbf2cmr49549892plo.113.1657146432846;
+        Wed, 06 Jul 2022 15:27:12 -0700 (PDT)
+Received: from google.com (123.65.230.35.bc.googleusercontent.com. [35.230.65.123])
+        by smtp.gmail.com with ESMTPSA id e17-20020aa798d1000000b00525496442ccsm25310656pfm.216.2022.07.06.15.27.12
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 06 Jul 2022 15:27:12 -0700 (PDT)
+Date:   Wed, 6 Jul 2022 22:27:08 +0000
+From:   Sean Christopherson <seanjc@google.com>
+To:     Vitaly Kuznetsov <vkuznets@redhat.com>
+Cc:     kvm@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>,
+        Anirudh Rayabharam <anrayabh@linux.microsoft.com>,
         Wanpeng Li <wanpengli@tencent.com>,
-        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org, Oliver Upton <oupton@google.com>,
-        Peter Shier <pshier@google.com>
-Content-Type: text/plain; charset="UTF-8"
+        Jim Mattson <jmattson@google.com>,
+        Maxim Levitsky <mlevitsk@redhat.com>,
+        linux-hyperv@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v2 13/28] KVM: VMX: Get rid of eVMCS specific VMX
+ controls sanitization
+Message-ID: <YsYMPCr3/ig0xPFj@google.com>
+References: <20220629150625.238286-1-vkuznets@redhat.com>
+ <20220629150625.238286-14-vkuznets@redhat.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20220629150625.238286-14-vkuznets@redhat.com>
 X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
         ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
@@ -71,29 +76,13 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Jun 14, 2022 at 1:47 PM Sean Christopherson <seanjc@google.com> wrote:
->
-> Don't check for code breakpoints during instruction emulation if the
-> emulation was triggered by exception interception.  Code breakpoints are
-> the highest priority fault-like exception, and KVM only emulates on
-> exceptions that are fault-like.  Thus, if hardware signaled a different
-> exception, then the vCPU is already passed the stage of checking for
-> hardware breakpoints.
->
-> This is likely a glorified nop in terms of functionality, and is more for
-> clarification and is technically an optimization.  Intel's SDM explicitly
-> states vmcs.GUEST_RFLAGS.RF on exception interception is the same as the
-> value that would have been saved on the stack had the exception not been
-> intercepted, i.e. will be '1' due to all fault-like exceptions setting RF
-> to '1'.  AMD says "guest state saved ... is the processor state as of the
-> moment the intercept triggers", but that begs the question, "when does
-> the intercept trigger?".
+On Wed, Jun 29, 2022, Vitaly Kuznetsov wrote:
+> With the updated eVMCSv1 definition, there's no known 'problematic'
+> controls which are exposed in VMX control MSRs but are not present in
+> eVMCSv1. Get rid of the filtering.
 
-IIRC, AMD does not prematurely clobber EFLAGS.RF on an intercepted exception.
+Ah, this patch is confusing until one realizes that this is dropping the "filtering"
+for what controls/features _KVM_ uses, whereas nested_evmcs_filter_control_msr()
+filters controls that are presented to L1.
 
-This is actually a big deal with shadow paging. On Intel, the
-hypervisor can't fully squash a #PF and restart the guest instruction
-after filling in the shadow page table entry...not easily, anyway.
-
-(OTOH, AMD does prematurely clobber DR6 and DR7 on an intercepted #DB.
-So, no one should be celebrating!)
+Can you add something to clarify that in the changelog?
