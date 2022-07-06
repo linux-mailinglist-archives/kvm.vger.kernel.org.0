@@ -2,117 +2,148 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 500DA568F84
-	for <lists+kvm@lfdr.de>; Wed,  6 Jul 2022 18:45:54 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 3E7EA568F9B
+	for <lists+kvm@lfdr.de>; Wed,  6 Jul 2022 18:48:39 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234132AbiGFQp3 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 6 Jul 2022 12:45:29 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39136 "EHLO
+        id S233629AbiGFQsh (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 6 Jul 2022 12:48:37 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42946 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234178AbiGFQpY (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 6 Jul 2022 12:45:24 -0400
-Received: from mail-pj1-x1030.google.com (mail-pj1-x1030.google.com [IPv6:2607:f8b0:4864:20::1030])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D625428E20
-        for <kvm@vger.kernel.org>; Wed,  6 Jul 2022 09:45:22 -0700 (PDT)
-Received: by mail-pj1-x1030.google.com with SMTP id fz10so9641237pjb.2
-        for <kvm@vger.kernel.org>; Wed, 06 Jul 2022 09:45:22 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=8qMqNPKdwEB+Xj55W1lFVgPi5kuDOPaSuG9HBIEp++0=;
-        b=LmnZ/QbsPiVvbhlR+0zsAWB1dPXgA0N55j2iDxMMu/VF/aLnqXjS2x+LtThefPrNT5
-         D50MgQKn+2JgIuBjTsjA2UHACE+WUmOI53oXTyK9ZGWjOCHBcvohtRS/+HBFuagKYQDk
-         td1tya88QXz2LPsV8ZOV7r0W46UqVOqh4zo2C/bRTrW8Y+yFSjziQhUgnRb573WyqlHG
-         2UCpaF24qJwnhq6xXUUAbaKhmE7JXf/Sr1UWmCDss4rESRHxiOAnI75HsolAgrTiiXQo
-         qyQL37dwX16wyKc32eB6XoUb1pRntRYX0eR08vMMgUa+krX7ZzxztJg+gX+hmoml8L52
-         HebA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=8qMqNPKdwEB+Xj55W1lFVgPi5kuDOPaSuG9HBIEp++0=;
-        b=06X4SsG3Uglrw0nbtlQRweKyn9fYyVbjy0RaCnd3KmdHHJOgV7vnFAN5ze9FRQNjSW
-         uCVHWZYwMO4QtPnGlPuKMl8S0ntySVZMrUW4SjsFs4FtTsBn2JThZPNlazl9KxMgQ+1s
-         36KpgsK51du1zv4hxnk9KVGRD3bXQ/eqsDOfkvRQphqvw9ZvI1HFO5wQjSh9yjl+4ImA
-         uUjasPPcrYrsIuP2V3e3G73YVgr0w6B20ewMTjmlb5A0iSFvy9TN88PAcifE90SFg4lg
-         dwxnke3BEcynXHSiqSeB1YIXFGzxW1i+irUjC9DcjJh4Fx1mrUVSVjuemnrsBDpj38Be
-         clVA==
-X-Gm-Message-State: AJIora8E2Y+VQM0XnJpUPOTeLgTd7jt59f3nvp3qwG9g58YmWgR5BKNB
-        GAKmLlwA8yo3LLG8Rx/BczVFPA==
-X-Google-Smtp-Source: AGRyM1sTasdxEfmgq5i+f38pCD1K7Ikdjn0kmJ10W4PbQjK+Jxjw+EkUnz+pSaD/hHsOxyhR1U0sWg==
-X-Received: by 2002:a17:902:f543:b0:16a:54c6:78c0 with SMTP id h3-20020a170902f54300b0016a54c678c0mr46544913plf.22.1657125921966;
-        Wed, 06 Jul 2022 09:45:21 -0700 (PDT)
-Received: from google.com (123.65.230.35.bc.googleusercontent.com. [35.230.65.123])
-        by smtp.gmail.com with ESMTPSA id p22-20020a1709027ed600b0016a0fe1a1fbsm26057570plb.220.2022.07.06.09.45.21
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 06 Jul 2022 09:45:21 -0700 (PDT)
-Date:   Wed, 6 Jul 2022 16:45:17 +0000
-From:   Sean Christopherson <seanjc@google.com>
-To:     Maxim Levitsky <mlevitsk@redhat.com>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org, Oliver Upton <oupton@google.com>,
-        Peter Shier <pshier@google.com>
-Subject: Re: [PATCH v2 09/21] KVM: nVMX: Unconditionally clear mtf_pending on
- nested VM-Exit
-Message-ID: <YsW8He/1b1xBWLwz@google.com>
-References: <20220614204730.3359543-1-seanjc@google.com>
- <20220614204730.3359543-10-seanjc@google.com>
- <599b352e16c970885d3f6bfaf7d1a254627ef5dd.camel@redhat.com>
-MIME-Version: 1.0
+        with ESMTP id S233312AbiGFQsb (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 6 Jul 2022 12:48:31 -0400
+Received: from NAM11-BN8-obe.outbound.protection.outlook.com (mail-bn8nam11on2040.outbound.protection.outlook.com [40.107.236.40])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E01E02982B;
+        Wed,  6 Jul 2022 09:48:29 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=GgjmwqnoC+iRb73ndm6B34r6hGN6AV4B+wOJ3ILijq22zOVN+xyNg8o+DAxxcrWCz/eGkXULepSLggNBa9JjWW1agHpaR8Heo7jC9EGMA3whC/XinGW92pop78XtHDADAg9NDjywEpcRayRgpidUUHVJyMQa0L605MIL1J8ncKXaspD4pGap2NqS8+ZjBBcYaTeFdDct43sESN21NQANh6QbFmzh7BJuJ+XfZpecVIyCNuinpTiLjoa47TqMiSVYu08GKyxOLLL6bXDNiJRPsBqkYYvJLUTFGL5n2fUOyrQ22vSl/yRvVq1VDVQC53WNR3qjQgbGINBd9j26E0jGmw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=lPPutliEJ+0V/YhgP5gAbAUE15jlkz3Q7cjOflgbR1w=;
+ b=fSQfo4ddv9pFYUzeufpJICVc9ec+LIyIcrVXVoLGP+ENhWcogQndY1KEkQ2LJPBj518rrym5exMapwNGyG5iMvW57A4GoS3H+TmX+T9E9nzDSHBNUMLsaInvrC3BjsddI73nTSWmc//N9xYQOXlK1uZb6kTWkjcuGCNZxdy05v7E+B8zasY7W3PByozZnvW+EZIjPcJkRpBSHjrzt1WkG66zDPAW6boouXyp3HVp8+60uUn2BeKnCqjOcQIovJtdMlg6rCUXcBUN9kWTNNZ7HXvR7/z1B6OBRa1MRi3TIG+/+qZh3xEiYc/WipgPdFA4wC+6NZI359VbirXgYba5Sw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
+ dkim=pass header.d=nvidia.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=lPPutliEJ+0V/YhgP5gAbAUE15jlkz3Q7cjOflgbR1w=;
+ b=TkQGzFKWC+RZCvfdKV1a5IFsy0sNzws8lrUIn1HUEyHuPd13xiFmuQeIHrpxNSSdqP1dGtkyDXPuMQnZyKSYBbLO61jImRrdhERgV1MtcmYsCgA3rjQ8JzPqr1mSubehdmfdUsju3YWfp3zMybt9jdi08gkeMzsV78Flj77+VEQQ6yBUf0aVWlxMLcNfsnF+wY2xb7EnGDv5NcPaWktLMtz2uPIUaB2lrJgJl3/ieaEe2kColbrUQUA3Jaf2XZq66ttw0EQoukZHsSo5s9FsMJhbMtQHuKO8MpQRVirW4/IOFh/yLcBr1Bsjk/bJ0/Sv10rCo0AmwVptytob+iCBZw==
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=nvidia.com;
+Received: from MN2PR12MB4192.namprd12.prod.outlook.com (2603:10b6:208:1d5::15)
+ by BN6PR1201MB0226.namprd12.prod.outlook.com (2603:10b6:405:56::22) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5417.15; Wed, 6 Jul
+ 2022 16:48:28 +0000
+Received: from MN2PR12MB4192.namprd12.prod.outlook.com
+ ([fe80::ac35:7c4b:3282:abfb]) by MN2PR12MB4192.namprd12.prod.outlook.com
+ ([fe80::ac35:7c4b:3282:abfb%3]) with mapi id 15.20.5395.021; Wed, 6 Jul 2022
+ 16:48:28 +0000
+Date:   Wed, 6 Jul 2022 13:48:26 -0300
+From:   Jason Gunthorpe <jgg@nvidia.com>
+To:     Nicolin Chen <nicolinc@nvidia.com>
+Cc:     kwankhede@nvidia.com, corbet@lwn.net, hca@linux.ibm.com,
+        gor@linux.ibm.com, agordeev@linux.ibm.com,
+        borntraeger@linux.ibm.com, svens@linux.ibm.com,
+        zhenyuw@linux.intel.com, zhi.a.wang@intel.com,
+        jani.nikula@linux.intel.com, joonas.lahtinen@linux.intel.com,
+        rodrigo.vivi@intel.com, tvrtko.ursulin@linux.intel.com,
+        airlied@linux.ie, daniel@ffwll.ch, farman@linux.ibm.com,
+        mjrosato@linux.ibm.com, pasic@linux.ibm.com, vneethv@linux.ibm.com,
+        oberpar@linux.ibm.com, freude@linux.ibm.com,
+        akrowiak@linux.ibm.com, jjherne@linux.ibm.com,
+        alex.williamson@redhat.com, cohuck@redhat.com,
+        kevin.tian@intel.com, hch@infradead.org, jchrist@linux.ibm.com,
+        kvm@vger.kernel.org, linux-doc@vger.kernel.org,
+        linux-kernel@vger.kernel.org, linux-s390@vger.kernel.org,
+        intel-gvt-dev@lists.freedesktop.org,
+        intel-gfx@lists.freedesktop.org, dri-devel@lists.freedesktop.org
+Subject: Re: [RFT][PATCH v2 2/9] vfio/ap: Pass in physical address of ind to
+ ap_aqic()
+Message-ID: <20220706164826.GI693670@nvidia.com>
+References: <20220706062759.24946-1-nicolinc@nvidia.com>
+ <20220706062759.24946-3-nicolinc@nvidia.com>
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <599b352e16c970885d3f6bfaf7d1a254627ef5dd.camel@redhat.com>
-X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-        T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL
-        autolearn=ham autolearn_force=no version=3.4.6
+In-Reply-To: <20220706062759.24946-3-nicolinc@nvidia.com>
+X-ClientProxiedBy: BL0PR0102CA0034.prod.exchangelabs.com
+ (2603:10b6:207:18::47) To MN2PR12MB4192.namprd12.prod.outlook.com
+ (2603:10b6:208:1d5::15)
+MIME-Version: 1.0
+X-MS-PublicTrafficType: Email
+X-MS-Office365-Filtering-Correlation-Id: 15b60f44-8f5c-453f-ae38-08da5f6f5986
+X-MS-TrafficTypeDiagnostic: BN6PR1201MB0226:EE_
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: V9n6oBr3mkAUn6cXcmH86R4pgnr99VD7TifDTsxg2LOVLT+3qh8Yc/J1MSL6//rbqDCJA/BEK/8PQp46W99VIS/fQnSb0Vx1X9XrJWeGWVkNsb9lqXwBASI+CHYX6JMeo9D+WZVxJJOUyhBqAXbzvbcpEXDSaU3Jw70XftpSARAkl7UnClyOp84MRklrXhukBysKuDr5lS6hfiKM6uyVc8xQsZH22vWHKW2qN/3c4WWFtrK8bcoQC7CHPcTvGtaU1cAThEku0URCILI0y8jqI6b2vMVNn1xnEf4cq/nbEb35gKy45HNg8B8vNusl9E3sN3eonnNFCgtMHuVp557BszZZLl5D8tLMAV0j9YB7u/C5/Ajs201ho5RvwI8Uh6vgpHX1eAQry2rMoMOq4ubmRmA+IdNukxUJJjLvBaYlzEoHQaPVzG0CKOfkgqnzkaQGg3Q2S15gRXLHeyyvKh0VeDYogTgJnfR1IYpcT3wN8/ARgZd6NsyOr5g+R04GdJk1Gk7a1QExCKZNszovMhYwABxxdKDUSxqVYtYztEeeeOjD0ixjhIet1+l4RMcu8lWNuh/lLXIjYvUIs2dZ8K1I0aDXWJjbfYVvfvPeLwwUVHAxcuRWi9zGyIr4VQRrqKKVWbp1vyvd2r48eCT2b9pcABStoHzsNcR6WxzfsyYyT3b9Hy/TK5+2nYNxSFDjHJkKgnIPqpbV5hcFvBlSqPvEglRE660jtGS/EOiwhoScQ83cQrXrQ8L4ty7LI6vX0hd/rbmGZmhucI2g9ZANwEiy6Tf5b4TC8pT1jCMXGzhlFsiT79+flR6vWQI/60XTtySP
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:MN2PR12MB4192.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230016)(4636009)(346002)(136003)(376002)(39860400002)(396003)(366004)(4744005)(7406005)(83380400001)(6486002)(478600001)(2906002)(86362001)(7416002)(1076003)(2616005)(186003)(6506007)(36756003)(26005)(38100700002)(66476007)(66556008)(66946007)(8676002)(6512007)(4326008)(41300700001)(6862004)(33656002)(8936002)(316002)(5660300002)(37006003)(6636002)(27376004);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?ZGCnwihkDqbwISy5V0SvlKFprj1rBBZZac7EEzKsoRlRJsBug4tkQMmXx8yI?=
+ =?us-ascii?Q?EZrXikGQpHMONgG4h9hk/l2zK2gSPGI+W2FzajYwi1g5zOm/ss5ejLSxS0WS?=
+ =?us-ascii?Q?W8Rt7PUY4pv/xvRZBir4L2iNys9CWqogK1bp0Ab9ZPsmQtjb8rfTwzzP1Ifv?=
+ =?us-ascii?Q?6sBAnBabhgwRipOhNEfNJH590ja2McYmPOWXbUkMh8fGO7zNgggeRD89rBiO?=
+ =?us-ascii?Q?+7DmVuCJ8pnf3zbu8yXG3o+s60bnSadyX5a+/NXGCfDXVC13CjxKb/4wdwXn?=
+ =?us-ascii?Q?vMqGLA8VXm0dvJaqNDDebXq11OJNCBQdx23Ol5LMl+VLIelk6TGecj0sJn18?=
+ =?us-ascii?Q?KsUPoBII4LhtFTn3jrXmPywE465+xfFAI9VLjynqJe+4v4tnzkH0fTGjZ+ol?=
+ =?us-ascii?Q?T6/TZpcitGGjvd4IQ/3qXR5QWVQ1/AuZu1eSc+eapi/kXrRrQiv1F4VREgon?=
+ =?us-ascii?Q?ZAAu5SP25N0zfOI0Q9bSNqeuQ1b4GULDUvsc4YUFRSWXoNrx26lRepw5S/RC?=
+ =?us-ascii?Q?cSpcgDTwCjzKniZpmp5YZqLckwXP2Kiorwew/0NqD5MVrWUbURAfWcn4BTFH?=
+ =?us-ascii?Q?wkeRQ+PrLiDx9VbZKMOhBtyB+N3TrfguQ/d0T0tTH7Vp0OkRECWbAnHmzI15?=
+ =?us-ascii?Q?lL/aDmh/8OvbIJBCMU5UnbJrCDpRW7Chh3J7wmjBRZiPf7LGiDMWjBzflh/h?=
+ =?us-ascii?Q?5wxQsqeTcUuDnxlh5rSmrFIobbfcTSrSrZjOUO5b/4ZVFgCtm/aAOcObWN4u?=
+ =?us-ascii?Q?GPvyRE0OQw8DbBQVwcRy+70kkhV02EWNvlaKPZ++zLemJ7lSSezumzxi/Bo2?=
+ =?us-ascii?Q?9OVcZatN+/BvNMW5c8yDWUacA0N6SdjMYI2887NE6X1lAekLAgOtPn2jKNCh?=
+ =?us-ascii?Q?azRsuyvXWN04FzpI1AeHuwmZ7V+S2cd+6sZFw8v/Tk9QnDhlgxalzwRARDpg?=
+ =?us-ascii?Q?URVeaI0XpCv/c4LG7oiDwkPCi8thPXvbxh1CLdVfNbfy7Ukj8k45AgJ/vFku?=
+ =?us-ascii?Q?PMvswf+Iya1CWRkr9VNWWsleEJx9fAL1UO5B6B0hyrwmbLhiMLqxcJygs0Dl?=
+ =?us-ascii?Q?/Yy4YPIg2tfhnFOgnG1gbl2oxqpI6tWPsSCrWoN3dk59vwOFQIQQxZSJZtVe?=
+ =?us-ascii?Q?/t1tjGSK86/d6x6agxfo6J/91788qVBJoBmPlA1O4mYz9367QOGCJrdsPSyp?=
+ =?us-ascii?Q?GnluSOtCQ1hIzbSGtqx+5+KBKBPeeqbFeJchwbtop3+KXAfp2UO21pAfawDJ?=
+ =?us-ascii?Q?AmRJMtoJeAtg5i6/3Ujy3+nAhHsXCCmBih+66+obmWSPPCGCpWsNa60xDqjq?=
+ =?us-ascii?Q?QzHsNJs59ZHh5S4P+cXkLAr3b7KNRCk2crR8MpiRvVv4PAhDQF1dvgFA0bcq?=
+ =?us-ascii?Q?efjfLTqQ7eM3OdpH0urLoRQvQXLepJM0dpt1H4TjsQ2iML+OHf+VBb1vM9uG?=
+ =?us-ascii?Q?igXDymVqQGNB0ZTI/ES3dU5bs0NXIwVSCLXyCXVInU+e0uRkfPj0DDRSmVzC?=
+ =?us-ascii?Q?Dfiu3s3TxjkMSGs+g7mMsdExCOfKCLgVBjpCHhsZvir4yrxRrVS/sx6HRs7A?=
+ =?us-ascii?Q?LYM9Dn16p/y8FlngDHrm++hql7Eq+MSaMOyiJKoj?=
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 15b60f44-8f5c-453f-ae38-08da5f6f5986
+X-MS-Exchange-CrossTenant-AuthSource: MN2PR12MB4192.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 06 Jul 2022 16:48:28.0615
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: bGW6N3rIhZO39L15t6TLrAgijjJaea6q1dbARNqAPducAPChX1vJIHp24Eejm8T9
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: BN6PR1201MB0226
+X-Spam-Status: No, score=-1.8 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FORGED_SPF_HELO,
+        RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_NONE,
+        T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Jul 06, 2022, Maxim Levitsky wrote:
-> On Tue, 2022-06-14 at 20:47 +0000, Sean Christopherson wrote:
-> > Clear mtf_pending on nested VM-Exit instead of handling the clear on a
-> > case-by-case basis in vmx_check_nested_events().  The pending MTF should
-> > rever survive nested VM-Exit, as it is a property of KVM's run of the
-> ^^ typo: never
+On Tue, Jul 05, 2022 at 11:27:52PM -0700, Nicolin Chen wrote:
+> The ap_aqic() is called by vfio_ap_irq_enable() where it passes in a
+> virt value that's casted from a physical address "h_nib". Inside the
+> ap_aqic(), it does virt_to_phys() again.
 > 
-> Also it is not clear what the 'case by case' means.
+> Since ap_aqic() needs a physical address, let's just pass in a pa of
+> ind directly. So change the "ind" to "pa_ind".
 > 
-> I see that the vmx_check_nested_events always clears it unless nested run is pending
-> or we re-inject an event.
+> Reviewed-by: Harald Freudenberger <freude@linux.ibm.com>
+> Signed-off-by: Nicolin Chen <nicolinc@nvidia.com>
+> ---
+>  arch/s390/include/asm/ap.h        | 6 +++---
+>  drivers/s390/crypto/ap_queue.c    | 2 +-
+>  drivers/s390/crypto/vfio_ap_ops.c | 7 ++++---
+>  3 files changed, 8 insertions(+), 7 deletions(-)
 
-Those two "unless ..." are the "cases".  The point I'm trying to make in the changelog
-is that there's no need for any conditional logic whatsoever.
+Reviewed-by: Jason Gunthorpe <jgg@nvidia.com>
 
-> > @@ -3927,6 +3919,9 @@ static int vmx_check_nested_events(struct kvm_vcpu *vcpu)
-> >  		clear_bit(KVM_APIC_INIT, &apic->pending_events);
-> >  		if (vcpu->arch.mp_state != KVM_MP_STATE_INIT_RECEIVED)
-> >  			nested_vmx_vmexit(vcpu, EXIT_REASON_INIT_SIGNAL, 0, 0);
-> > +
-> > +		/* MTF is discarded if the vCPU is in WFS. */
-> > +		vmx->nested.mtf_pending = false;
-> >  		return 0;
-> 
-> I guess MTF should also be discarded if we enter SMM, and I see that
-> VMX also enter SMM with a pseudo VM exit (in vmx_enter_smm) which
-> will clear the MTF. Good.
-
-No, a pending MTF should be preserved across SMI.  It's not a regression because
-KVM incorrectly prioritizes MTF (and trap-like #DBs) over SMI (and because if KVM
-did prioritize SMI, the existing code would also drop the pending MTF).  Note, this
-isn't the only flaw that needs to be addressed in order to correctly prioritize SMIs,
-e.g. KVM_{G,S}ET_NESTED_STATE would need to save/restore a pending MTF if the vCPU is
-in SMM after an SMI that arrived while L2 was active.
-
-Tangentially related, KVM's pseudo VM-Exit on SMI emulation is completely wrong[*].
-
-[*] https://lore.kernel.org/all/Yobt1XwOfb5M6Dfa@google.com
+Jason
