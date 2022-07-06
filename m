@@ -2,40 +2,40 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id A2EF4569033
-	for <lists+kvm@lfdr.de>; Wed,  6 Jul 2022 19:05:21 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 2B4B6569042
+	for <lists+kvm@lfdr.de>; Wed,  6 Jul 2022 19:05:48 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231693AbiGFRFS (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 6 Jul 2022 13:05:18 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58828 "EHLO
+        id S233519AbiGFRFg (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 6 Jul 2022 13:05:36 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58994 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231454AbiGFRFR (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 6 Jul 2022 13:05:17 -0400
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B82E62A700
-        for <kvm@vger.kernel.org>; Wed,  6 Jul 2022 10:05:16 -0700 (PDT)
+        with ESMTP id S233496AbiGFRFf (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 6 Jul 2022 13:05:35 -0400
+Received: from ams.source.kernel.org (ams.source.kernel.org [145.40.68.75])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5A4E62A701
+        for <kvm@vger.kernel.org>; Wed,  6 Jul 2022 10:05:34 -0700 (PDT)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id 5375D61E73
-        for <kvm@vger.kernel.org>; Wed,  6 Jul 2022 17:05:16 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id B6824C3411C;
-        Wed,  6 Jul 2022 17:05:15 +0000 (UTC)
+        by ams.source.kernel.org (Postfix) with ESMTPS id 178E3B81E4C
+        for <kvm@vger.kernel.org>; Wed,  6 Jul 2022 17:05:33 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id B2827C341C8;
+        Wed,  6 Jul 2022 17:05:31 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1657127115;
-        bh=zgRDna+JT0ihS8l+P7EzSsz4c34XT3kVcOWf0LX/Eeo=;
+        s=k20201202; t=1657127131;
+        bh=Eo9E4Nefyu/Kf+UJWebrylD0pKTMwvYjQaj9htsyQe8=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=NI7Hefb8YGq5b0z46Lkj86OubKFbgqJ5jZd2SEMdcxMFBNkuxU75htUasnJ4fs9cK
-         qsir9nsJNF3M7vy5HMUlYXyt9pE7kg7+RzERmGYAbMLt48JbWavvo9ncMbK/FVIsNB
-         w00puHzjK5r3O8xsFmUaF3krpPOvsQ6aFqpU5OVz2rqeoh0EICKAelK1EBfWVVRSt3
-         FSVIMkOhHJHgPGhsxubXXiLPDt0uvD+YQFpzlII/v384VCE0W8CEZxF9YlUK8SzTfx
-         4Rs/3e9sxzhH41As3QfpO+UTqnzsSTP3TCsco2DZa9pcg6LSR0GtupIXNSyeumzigh
-         +v9KgseeiYHpw==
+        b=hRmbHljJgJEVO+HqXEZGu487VsQfX7AGbih8FpxCRrSwrg7J7LdtqXQ12Nj6Bqn5B
+         JAgziUhqyGutnTWVUmiO3iabG2VYhs/thU4Y5c2/ygtMPxCLszjYUtuCOc023yyE9W
+         uExYCn0F293j4jmXKO6y1GtqOG7IJ8gGC+VDvmRjNbYAOUwwvy6YA4OBURZ9KFDaah
+         A6sBEJjjORU6+FdQUnv6IQTNHhokEvC7whp/NN7wZIXO8mtCt6TrmcZZEHZsTKm0Nq
+         l6b4HDvElmb9IxjZ2HVCQaKBVhvq5W3dBMFDHafYpg3OnPlr4W3nluL7yG9BxtOBAt
+         alINKA+9NKIOw==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=why.lan)
         by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
         (Exim 4.95)
         (envelope-from <maz@kernel.org>)
-        id 1o987O-005h9i-IM;
+        id 1o987O-005h9i-Oa;
         Wed, 06 Jul 2022 17:43:14 +0100
 From:   Marc Zyngier <maz@kernel.org>
 To:     kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org,
@@ -45,9 +45,9 @@ Cc:     James Morse <james.morse@arm.com>,
         Alexandru Elisei <alexandru.elisei@arm.com>,
         Oliver Upton <oliver.upton@linux.dev>,
         Schspa Shi <schspa@gmail.com>, kernel-team@android.com
-Subject: [PATCH 18/19] KVM: arm64: Descope kvm_arm_sys_reg_{get,set}_reg()
-Date:   Wed,  6 Jul 2022 17:43:03 +0100
-Message-Id: <20220706164304.1582687-19-maz@kernel.org>
+Subject: [PATCH 19/19] KVM: arm64: Get rid or outdated comments
+Date:   Wed,  6 Jul 2022 17:43:04 +0100
+Message-Id: <20220706164304.1582687-20-maz@kernel.org>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20220706164304.1582687-1-maz@kernel.org>
 References: <20220706164304.1582687-1-maz@kernel.org>
@@ -67,50 +67,33 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Having kvm_arm_sys_reg_get_reg and co in kvm_host.h gives the
-impression that these functions are free to be called from
-anywhere.
+Once apon a time, the 32bit KVM/arm port was the reference, while
+the arm64 version was the new kid on the block, without a clear
+future... This was a long time ago.
 
-Not quite. They really are tied to out internal sysreg handling,
-and they would be better off in the sys_regs.h header, which is
-private. kvm_host.h could also get a bit of a diet, so let's
-just do that.
+"The times, they are a-changing."
 
 Signed-off-by: Marc Zyngier <maz@kernel.org>
 ---
- arch/arm64/include/asm/kvm_host.h | 2 --
- arch/arm64/kvm/sys_regs.h         | 3 ++-
- 2 files changed, 2 insertions(+), 3 deletions(-)
+ arch/arm64/kvm/sys_regs.c | 5 -----
+ 1 file changed, 5 deletions(-)
 
-diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
-index de32152cea04..0c9c85981a8e 100644
---- a/arch/arm64/include/asm/kvm_host.h
-+++ b/arch/arm64/include/asm/kvm_host.h
-@@ -620,8 +620,6 @@ int kvm_arm_set_reg(struct kvm_vcpu *vcpu, const struct kvm_one_reg *reg);
+diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
+index d3ac0cd1c2e2..8dc93d372d4f 100644
+--- a/arch/arm64/kvm/sys_regs.c
++++ b/arch/arm64/kvm/sys_regs.c
+@@ -34,11 +34,6 @@
+ #include "trace.h"
  
- unsigned long kvm_arm_num_sys_reg_descs(struct kvm_vcpu *vcpu);
- int kvm_arm_copy_sys_reg_indices(struct kvm_vcpu *vcpu, u64 __user *uindices);
--int kvm_arm_sys_reg_get_reg(struct kvm_vcpu *vcpu, const struct kvm_one_reg *);
--int kvm_arm_sys_reg_set_reg(struct kvm_vcpu *vcpu, const struct kvm_one_reg *);
- 
- int __kvm_arm_vcpu_get_events(struct kvm_vcpu *vcpu,
- 			      struct kvm_vcpu_events *events);
-diff --git a/arch/arm64/kvm/sys_regs.h b/arch/arm64/kvm/sys_regs.h
-index 49517f58deb5..a8c4cc32eb9a 100644
---- a/arch/arm64/kvm/sys_regs.h
-+++ b/arch/arm64/kvm/sys_regs.h
-@@ -194,9 +194,10 @@ const struct sys_reg_desc *get_reg_by_id(u64 id,
- 					 const struct sys_reg_desc table[],
- 					 unsigned int num);
- 
-+int kvm_arm_sys_reg_get_reg(struct kvm_vcpu *vcpu, const struct kvm_one_reg *);
-+int kvm_arm_sys_reg_set_reg(struct kvm_vcpu *vcpu, const struct kvm_one_reg *);
- int kvm_sys_reg_get_user(struct kvm_vcpu *vcpu, const struct kvm_one_reg *reg,
- 			 const struct sys_reg_desc table[], unsigned int num);
--
- int kvm_sys_reg_set_user(struct kvm_vcpu *vcpu, const struct kvm_one_reg *reg,
- 			 const struct sys_reg_desc table[], unsigned int num);
- 
+ /*
+- * All of this file is extremely similar to the ARM coproc.c, but the
+- * types are different. My gut feeling is that it should be pretty
+- * easy to merge, but that would be an ABI breakage -- again. VFP
+- * would also need to be abstracted.
+- *
+  * For AArch32, we only take care of what is being trapped. Anything
+  * that has to do with init and userspace access has to go via the
+  * 64bit interface.
 -- 
 2.34.1
 
