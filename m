@@ -2,121 +2,104 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 115BD568167
-	for <lists+kvm@lfdr.de>; Wed,  6 Jul 2022 10:29:25 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 98D9F568642
+	for <lists+kvm@lfdr.de>; Wed,  6 Jul 2022 12:56:46 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232138AbiGFI1t (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 6 Jul 2022 04:27:49 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36226 "EHLO
+        id S233169AbiGFK4o (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 6 Jul 2022 06:56:44 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40526 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232426AbiGFI11 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 6 Jul 2022 04:27:27 -0400
-Received: from mga02.intel.com (mga02.intel.com [134.134.136.20])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 180FF240BF;
-        Wed,  6 Jul 2022 01:26:35 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1657095997; x=1688631997;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=XcUkjLL+YpWw11P834waxgWm/NgeT+vT/ACdu5U5CAo=;
-  b=bXM4SmRunfF2UdZ6n2adSVce6ocOAHH1xRPLAz10BV2oKs9zugqpZkDy
-   8i33755KPbazt9wepKm6IEY9asDygjbALi4nVDTUKElkJVhrytr9AY+iK
-   DMtg4aMn8kiGYKQ7RxwoeO+ZVSKw/DE6Sjp0yXxFaFrmSlRLnyJ59JWqW
-   cjfUGgcV7pYTkEupEnsOMoikiq642Z/9e8cVFbFRWfd57+w97Id6rkxlE
-   94y5G41P/YmbhWo6wHoy7WDEtgDB0Kc0o2RORHR3+CCPMpgcTA6faftRQ
-   9/d2CCGhHdmRTsZuRYjZLmND6Cb8Tax3SjIOkgKFBb0QbNGSwZ/WayQXC
-   g==;
-X-IronPort-AV: E=McAfee;i="6400,9594,10399"; a="272467402"
-X-IronPort-AV: E=Sophos;i="5.92,249,1650956400"; 
-   d="scan'208";a="272467402"
-Received: from orsmga006.jf.intel.com ([10.7.209.51])
-  by orsmga101.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 06 Jul 2022 01:26:34 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.92,249,1650956400"; 
-   d="scan'208";a="567968372"
-Received: from chaop.bj.intel.com ([10.240.192.101])
-  by orsmga006.jf.intel.com with ESMTP; 06 Jul 2022 01:26:16 -0700
-From:   Chao Peng <chao.p.peng@linux.intel.com>
-To:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
-        linux-mm@kvack.org, linux-fsdevel@vger.kernel.org,
-        linux-api@vger.kernel.org, linux-doc@vger.kernel.org,
-        qemu-devel@nongnu.org, linux-kselftest@vger.kernel.org
-Cc:     Paolo Bonzini <pbonzini@redhat.com>,
-        Jonathan Corbet <corbet@lwn.net>,
-        Sean Christopherson <seanjc@google.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        x86@kernel.org, "H . Peter Anvin" <hpa@zytor.com>,
-        Hugh Dickins <hughd@google.com>,
-        Jeff Layton <jlayton@kernel.org>,
-        "J . Bruce Fields" <bfields@fieldses.org>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        Shuah Khan <shuah@kernel.org>, Mike Rapoport <rppt@kernel.org>,
-        Steven Price <steven.price@arm.com>,
-        "Maciej S . Szmigiero" <mail@maciej.szmigiero.name>,
-        Vlastimil Babka <vbabka@suse.cz>,
-        Vishal Annapurve <vannapurve@google.com>,
-        Yu Zhang <yu.c.zhang@linux.intel.com>,
-        Chao Peng <chao.p.peng@linux.intel.com>,
-        "Kirill A . Shutemov" <kirill.shutemov@linux.intel.com>,
-        luto@kernel.org, jun.nakajima@intel.com, dave.hansen@intel.com,
-        ak@linux.intel.com, david@redhat.com, aarcange@redhat.com,
-        ddutile@redhat.com, dhildenb@redhat.com,
-        Quentin Perret <qperret@google.com>,
-        Michael Roth <michael.roth@amd.com>, mhocko@suse.com,
-        Muchun Song <songmuchun@bytedance.com>
-Subject: [PATCH v7 14/14] memfd_create.2: Describe MFD_INACCESSIBLE flag
-Date:   Wed,  6 Jul 2022 16:20:16 +0800
-Message-Id: <20220706082016.2603916-15-chao.p.peng@linux.intel.com>
-X-Mailer: git-send-email 2.25.1
-In-Reply-To: <20220706082016.2603916-1-chao.p.peng@linux.intel.com>
-References: <20220706082016.2603916-1-chao.p.peng@linux.intel.com>
+        with ESMTP id S232377AbiGFK4m (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 6 Jul 2022 06:56:42 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id EBFC327CF0
+        for <kvm@vger.kernel.org>; Wed,  6 Jul 2022 03:56:39 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1657104998;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=Z/wJBIQMjQXHihYW5LMkQtlLCNLD2Wr07KvMl7IsHW4=;
+        b=EZgP9vbru6aNLDiq4P9R6cBxVDO2AJOtsoHopn9+NZqOH5Pli2AVLqRIYSgzHcFCOFesYg
+        QwjbVB2Akch5Q1l+GoH6E+YzTnMsp3ECXdqSOO7w5Ot6qbvSirhVUqq8tPAeeE/IQ7LbsK
+        2lOvLS3TqhuAmU0tztHofzUJZAn6Ptk=
+Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
+ [209.85.128.72]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-654-3LK_uJJFNPaPbpItZboZng-1; Wed, 06 Jul 2022 06:56:37 -0400
+X-MC-Unique: 3LK_uJJFNPaPbpItZboZng-1
+Received: by mail-wm1-f72.google.com with SMTP id 130-20020a1c0288000000b003a18127d11aso7129316wmc.6
+        for <kvm@vger.kernel.org>; Wed, 06 Jul 2022 03:56:37 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
+         :content-language:to:cc:references:from:in-reply-to
+         :content-transfer-encoding;
+        bh=Z/wJBIQMjQXHihYW5LMkQtlLCNLD2Wr07KvMl7IsHW4=;
+        b=Akz9Z2SPz/YQKOl4y50Z0bb+cHNxx2tUlP+jn6AL0XwEWAFOF94aEsxf5vWTF/pRVo
+         2iftHCO1CzFHaP+xTNTy1CRaWblj+JIy0aoqa/nzV2c59vX3dtVuPfOpbsXGJlszLq3/
+         98Z866lZpbbnZ+W5+FbMWahMQQ7h+ir2gbNok0XboWQaEpJjrCTB2SZCIrU+NqOyl8pr
+         N9YRGC2eZbJtctr/38e22hxaGkLwdqFZ58sF1e6n1SUGXZEZmlxW9mc7g/050d13KbmG
+         +cngiBbQlu++CokElLf6nDp0SjWkJasHtXqQAGnhqaLU7xqa9My9MRGFaEVHcImkkMjC
+         d/9w==
+X-Gm-Message-State: AJIora+TanJO7GHEpx8nV9YdRO7qeKddkeGeMueY8SiagKEFnbZnuNIr
+        XuLjjvA2MD0brJJ9DaXl0JoNVlCEVNAlZkHa+WrW0iZvmwbjx1tl8u0MwEYSpGwRKkrZF3UcfH5
+        1t8iES/rBANN2
+X-Received: by 2002:adf:d845:0:b0:21d:7aad:4802 with SMTP id k5-20020adfd845000000b0021d7aad4802mr3960296wrl.298.1657104996676;
+        Wed, 06 Jul 2022 03:56:36 -0700 (PDT)
+X-Google-Smtp-Source: AGRyM1tVRo3xdQzziMgNyy3w+U0LX+6pVPdWBhaUjBqu26EhEo4yp8pMXXkY8E7GbEjBz4b071ZXcw==
+X-Received: by 2002:adf:d845:0:b0:21d:7aad:4802 with SMTP id k5-20020adfd845000000b0021d7aad4802mr3960271wrl.298.1657104996459;
+        Wed, 06 Jul 2022 03:56:36 -0700 (PDT)
+Received: from [192.168.0.5] (ip-109-43-176-21.web.vodafone.de. [109.43.176.21])
+        by smtp.gmail.com with ESMTPSA id r11-20020adfce8b000000b0021d77625d90sm3176005wrn.79.2022.07.06.03.56.35
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 06 Jul 2022 03:56:36 -0700 (PDT)
+Message-ID: <932d0d05-5518-da8b-ef9f-986cf6b613e0@redhat.com>
+Date:   Wed, 6 Jul 2022 12:56:35 +0200
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-5.0 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
-        RCVD_IN_MSPIKE_H3,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE,
-        T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.10.0
+Subject: Re: [PATCH] s390x: split migration test into vector and gs test
+Content-Language: en-US
+To:     Nico Boehr <nrb@linux.ibm.com>, kvm@vger.kernel.org,
+        linux-s390@vger.kernel.org
+Cc:     frankja@linux.ibm.com, imbrenda@linux.ibm.com
+References: <20220704133002.791395-1-nrb@linux.ibm.com>
+From:   Thomas Huth <thuth@redhat.com>
+In-Reply-To: <20220704133002.791395-1-nrb@linux.ibm.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Spam-Status: No, score=-2.8 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
+        RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Signed-off-by: Chao Peng <chao.p.peng@linux.intel.com>
----
- man2/memfd_create.2 | 13 +++++++++++++
- 1 file changed, 13 insertions(+)
+On 04/07/2022 15.30, Nico Boehr wrote:
+> Since we now have a few more migration tests, let's split migration.c
+> into two files for vector and gs facilities. Since guarded-storage and vector
+> facilities can be en-/disabled independant of each other, this simplifies the
+> code a bit and makes it clear what the scope of the tests is.
+> 
+> Signed-off-by: Nico Boehr <nrb@linux.ibm.com>
+> ---
+>   s390x/Makefile                         |   3 +-
+>   s390x/migration-gs.c                   | 122 +++++++++++++++++++++++++
+>   s390x/{migration.c => migration-vec.c} |  54 +----------
+>   s390x/unittests.cfg                    |  15 ++-
+>   4 files changed, 136 insertions(+), 58 deletions(-)
+>   create mode 100644 s390x/migration-gs.c
+>   rename s390x/{migration.c => migration-vec.c} (77%)
 
-diff --git a/man2/memfd_create.2 b/man2/memfd_create.2
-index 89e9c4136..2698222ae 100644
---- a/man2/memfd_create.2
-+++ b/man2/memfd_create.2
-@@ -101,6 +101,19 @@ meaning that no other seals can be set on the file.
- .\" FIXME Why is the MFD_ALLOW_SEALING behavior not simply the default?
- .\" Is it worth adding some text explaining this?
- .TP
-+.BR MFD_INACCESSIBLE
-+Disallow userspace access through ordinary MMU accesses via
-+.BR read (2),
-+.BR write (2)
-+and
-+.BR mmap (2).
-+The file size cannot be changed once initialized.
-+This flag cannot coexist with
-+.B MFD_ALLOW_SEALING
-+and when this flag is set, the initial set of seals will be
-+.B F_SEAL_SEAL,
-+meaning that no other seals can be set on the file.
-+.TP
- .BR MFD_HUGETLB " (since Linux 4.14)"
- .\" commit 749df87bd7bee5a79cef073f5d032ddb2b211de8
- The anonymous file will be created in the hugetlbfs filesystem using
--- 
-2.17.1
+Makes sense.
+
+Acked-by: Thomas Huth <thuth@redhat.com>
+
+PS: Please have a look at the end of the README.md file to see how to set a 
+better default subjectprefix for k-u-t patches. Thanks!
 
