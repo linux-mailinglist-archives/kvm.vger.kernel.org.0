@@ -2,136 +2,112 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id BBD79568E6C
-	for <lists+kvm@lfdr.de>; Wed,  6 Jul 2022 17:55:30 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 113E9568EA7
+	for <lists+kvm@lfdr.de>; Wed,  6 Jul 2022 18:09:24 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232239AbiGFPy5 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 6 Jul 2022 11:54:57 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52692 "EHLO
+        id S229824AbiGFQJV (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 6 Jul 2022 12:09:21 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36476 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232544AbiGFPyy (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 6 Jul 2022 11:54:54 -0400
-Received: from NAM04-DM6-obe.outbound.protection.outlook.com (mail-dm6nam04on2051.outbound.protection.outlook.com [40.107.102.51])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6350FC41;
-        Wed,  6 Jul 2022 08:54:53 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=ADll2Sb2WK4Y+Pab5LX/iobxwFTf2YpX7czZMU2LnGivIwAvyuyWg3eJAWSpU41O0dnJQ26/YWBlxdDJ8BLU8wH4LZGmv/jgEHZrzpcbMhLX73lQu5NhOPwDPsWPIq888ipREaR+cX/hOCGS6QnVfKShCjB4YhGeDZTyMJ+h1YsouOp+6CAA701cwGR6Yi1MwNbiM9AnanUm6rAlE5oWzEEpmoqe23skqwukkNTMu8cNOhX9RnK6dc9nOIHDOLxz0ZxZzqaoE984rz6hu8GDiDw6kXt+rGszP3xPdUHeL3levBOnsmZZSiJKY0jqJBoPr1GdynqlBn4Q1BE6e7Jubw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=OClUjcB2or6x3cMJyYLCNmEzKFa31B1yRRBHLirGXmo=;
- b=ZJtqin/XP8nv+P0dq5VADAQrD+SpFcins+p2+xS7tW/jvKCIolCA5N0DCTG5BrNCFgaNGasimKJm05czsGJIk54QYZ8fypW/uybaYlEryf5exnGj4Cjjb/T7SRAy0eSynR79v9YknBVNWuHYebGm7+ZyQ8r6eqELinLRJ27TqL+fc+WpuOZ5wJ6qZw8MTGJ5MEgRnlb3LJ331Flt50WtgXIbYEkCEJPexwJN7aV7jp8kCuBVgbZxQbMq+/hxuKclvtMIGViGZUT4Qkjo2P8GcDiw5tBcpAixGL7jmFr7eJetszD1Z4+FCPTcDXU/winoWG7//YzOQOEZg3FFb0LgRQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
- 12.22.5.234) smtp.rcpttodomain=linux.ibm.com smtp.mailfrom=nvidia.com;
- dmarc=pass (p=reject sp=reject pct=100) action=none header.from=nvidia.com;
- dkim=none (message not signed); arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=OClUjcB2or6x3cMJyYLCNmEzKFa31B1yRRBHLirGXmo=;
- b=UWMSWnWheAswvbILmSIP1zJqh8/7dpLiTJuR9LYuW3S6xPZEOKLXhc59MVBUkE9R9T4jpSN67cmUPDPvE++lhs7Rf4x6Dm+/4Xb5nijjoo4GVw2/bRQWMaeIuMQA80ySLN9mF6wUSdsfyKpgp2//ObkKpysd1Gkt6nu7S6ryOHucKbajBy/C7nUllMG/z3XS1hTJA58HUZk0jwS6PAWGr6dGjOybo8myAkmksEl73QrD1tZ2WCEcw54506QIpsIqbvNKJ4AfL5O44lXCKzVOXzb/puwkSXISLi+hiwubNuxi45DBi536paMSAaIHPOTiD9kt99fSwDhgkJ1ifBaOoQ==
-Received: from DM5PR07CA0106.namprd07.prod.outlook.com (2603:10b6:4:ae::35) by
- BN6PR1201MB0195.namprd12.prod.outlook.com (2603:10b6:405:53::23) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5417.16; Wed, 6 Jul
- 2022 15:54:52 +0000
-Received: from DM6NAM11FT044.eop-nam11.prod.protection.outlook.com
- (2603:10b6:4:ae:cafe::41) by DM5PR07CA0106.outlook.office365.com
- (2603:10b6:4:ae::35) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5395.17 via Frontend
- Transport; Wed, 6 Jul 2022 15:54:51 +0000
-X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 12.22.5.234)
- smtp.mailfrom=nvidia.com; dkim=none (message not signed)
- header.d=none;dmarc=pass action=none header.from=nvidia.com;
-Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
- 12.22.5.234 as permitted sender) receiver=protection.outlook.com;
- client-ip=12.22.5.234; helo=mail.nvidia.com; pr=C
-Received: from mail.nvidia.com (12.22.5.234) by
- DM6NAM11FT044.mail.protection.outlook.com (10.13.173.185) with Microsoft SMTP
- Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384) id
- 15.20.5417.15 via Frontend Transport; Wed, 6 Jul 2022 15:54:51 +0000
-Received: from rnnvmail202.nvidia.com (10.129.68.7) by DRHQMAIL101.nvidia.com
- (10.27.9.10) with Microsoft SMTP Server (TLS) id 15.0.1497.32; Wed, 6 Jul
- 2022 15:54:51 +0000
-Received: from rnnvmail202.nvidia.com (10.129.68.7) by rnnvmail202.nvidia.com
- (10.129.68.7) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.986.26; Wed, 6 Jul 2022
- 08:54:50 -0700
-Received: from Asurada-Nvidia (10.127.8.14) by mail.nvidia.com (10.129.68.7)
- with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.986.26 via Frontend
- Transport; Wed, 6 Jul 2022 08:54:48 -0700
-Date:   Wed, 6 Jul 2022 08:54:46 -0700
-From:   Nicolin Chen <nicolinc@nvidia.com>
-To:     Christoph Hellwig <hch@infradead.org>
-CC:     <kwankhede@nvidia.com>, <corbet@lwn.net>, <hca@linux.ibm.com>,
-        <gor@linux.ibm.com>, <agordeev@linux.ibm.com>,
-        <borntraeger@linux.ibm.com>, <svens@linux.ibm.com>,
-        <zhenyuw@linux.intel.com>, <zhi.a.wang@intel.com>,
-        <jani.nikula@linux.intel.com>, <joonas.lahtinen@linux.intel.com>,
-        <rodrigo.vivi@intel.com>, <tvrtko.ursulin@linux.intel.com>,
-        <airlied@linux.ie>, <daniel@ffwll.ch>, <farman@linux.ibm.com>,
-        <mjrosato@linux.ibm.com>, <pasic@linux.ibm.com>,
-        <vneethv@linux.ibm.com>, <oberpar@linux.ibm.com>,
-        <freude@linux.ibm.com>, <akrowiak@linux.ibm.com>,
-        <jjherne@linux.ibm.com>, <alex.williamson@redhat.com>,
-        <cohuck@redhat.com>, <jgg@nvidia.com>, <kevin.tian@intel.com>,
-        <jchrist@linux.ibm.com>, <kvm@vger.kernel.org>,
-        <linux-doc@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
-        <linux-s390@vger.kernel.org>,
-        <intel-gvt-dev@lists.freedesktop.org>,
-        <intel-gfx@lists.freedesktop.org>,
-        <dri-devel@lists.freedesktop.org>
-Subject: Re: [RFT][PATCH v2 4/9] vfio: Pass in starting IOVA to
- vfio_pin/unpin_pages API
-Message-ID: <YsWwRhGlCkiQhlY3@Asurada-Nvidia>
-References: <20220706062759.24946-1-nicolinc@nvidia.com>
- <20220706062759.24946-5-nicolinc@nvidia.com>
- <YsUyGS7kct2BbiS8@infradead.org>
+        with ESMTP id S229786AbiGFQJU (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 6 Jul 2022 12:09:20 -0400
+Received: from sender-of-o53.zoho.in (sender-of-o53.zoho.in [103.117.158.53])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A0AE91C11B
+        for <kvm@vger.kernel.org>; Wed,  6 Jul 2022 09:09:18 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1657123709; cv=none; 
+        d=zohomail.in; s=zohoarc; 
+        b=bCxlYm4suJNYv2M6uYFNxMsQhk6/POSg1cOB0ESuKrpLYl/bsscV9je5cQa52b5y6xHuNgJ04dBNyn6hfNstRXNQJAhjIzJcd9cmkgalnX9J3Xb0mjYpCIh18VVzFLo4PKEOQOnWcWknUEelnH1xPt1p92MR7VVEJOETVrtqFfM=
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zohomail.in; s=zohoarc; 
+        t=1657123709; h=Content-Type:Content-Transfer-Encoding:Cc:Date:From:In-Reply-To:MIME-Version:Message-ID:References:Subject:To; 
+        bh=6Y8LK1qS5agG+TVmUp1luDaM68CD3qpjUAGeZA+LQoU=; 
+        b=Wa+cWnm2J/iRf5W9Nou6payIME4QqF/wBOJroXpRTz8dSdwZBU1tkOlmaQYuo2Q2TVKZcT3j1HAXYFWFfHeXIcie6xkATGLdj7STCTm+YPRSShiDzn5J7w9r25J6pXlyzlPm9Zy/mykP7rrmmSzX+OAYbweWnj8fAJlwNkxm5q0=
+ARC-Authentication-Results: i=1; mx.zohomail.in;
+        dkim=pass  header.i=siddh.me;
+        spf=pass  smtp.mailfrom=code@siddh.me;
+        dmarc=pass header.from=<code@siddh.me>
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; t=1657123709;
+        s=zmail; d=siddh.me; i=code@siddh.me;
+        h=Date:Date:From:From:To:To:Cc:Cc:Message-ID:In-Reply-To:References:Subject:Subject:MIME-Version:Content-Type:Content-Transfer-Encoding:Message-Id:Reply-To;
+        bh=6Y8LK1qS5agG+TVmUp1luDaM68CD3qpjUAGeZA+LQoU=;
+        b=Zhy5ck3uHv62JGoBQ7kz3xnp4hoSmuOcq6EGW3X5B6s5/Nd4jGxTieVO6oXH8qSG
+        4BehLqF8TOARGOPMXn0MkCVNT312SQjOw1F693mGkVPXNOkXuf//aiUpvewCvkQo2H4
+        uMmsNQzioiJv9yrKvea5wUoh4l3j8sXHTCJiiMTo=
+Received: from mail.zoho.in by mx.zoho.in
+        with SMTP id 1657123698370505.12292601010483; Wed, 6 Jul 2022 21:38:18 +0530 (IST)
+Date:   Wed, 06 Jul 2022 21:38:18 +0530
+From:   Siddh Raman Pant <code@siddh.me>
+To:     "Jue Wang" <juew@google.com>
+Cc:     "Paolo Bonzini" <pbonzini@redhat.com>,
+        "Sean Christopherson" <seanjc@google.com>,
+        "Jim Mattson" <jmattson@google.com>,
+        "Xiaoyao Li" <xiaoyao.li@intel.com>,
+        "Vitaly Kuznetsov" <vkuznets@redhat.com>,
+        "Wanpeng Li" <wanpengli@tencent.com>,
+        "Joerg Roedel" <joro@8bytes.org>,
+        "David Matlack" <dmatlack@google.com>,
+        "Tony Luck" <tony.luck@intel.com>, "kvm" <kvm@vger.kernel.org>,
+        "Jiaqi Yan" <jiaqiyan@google.com>
+Message-ID: <181d444f6af.29bf72881043891.3933915344389495767@siddh.me>
+In-Reply-To: <20220706145957.32156-2-juew@google.com>
+References: <20220706145957.32156-1-juew@google.com> <20220706145957.32156-2-juew@google.com>
+Subject: Re: [PATCH v2 2/2] KVM: x86: Fix access to vcpu->arch.apic when the
+ irqchip is not in kernel
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Disposition: inline
-In-Reply-To: <YsUyGS7kct2BbiS8@infradead.org>
-X-EOPAttributedMessage: 0
-X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: e39b936a-f7f4-4c15-9020-08da5f67dccb
-X-MS-TrafficTypeDiagnostic: BN6PR1201MB0195:EE_
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: TFOaZNeb5Sx9nNmCgifQETXEhO2iYyRAQiHMxij2hnM+iQl1HjJKOhH4Qw+QBI1LfQR8zu42Cvpuxj5vf05iMlphLzryVWZZ2azP4dVarYthpdQT700u/43w8/gojymDBpNjcpxAX3RspkcjagXqhX7LZ5UB4yyMiQUQ+EoJ3MVNOpD1HVehxlCIejBbh3DmkhYIsN3utfc7085lyBr/G1VlZDZmiiBrXfONiSkf2JwCj22Z0kpi0Yl3a7dP6vmaTnSedkOG/5VekAiVqciGVbI+frrbeUk7LM94p7oxLj8Ttvpc9WLTDrCTuVKK2vC0oNK3omPQ+4yzaXHBkF2s7jjJ4RC5Xo766XkP4DBIpUOorm0QTyg1YIb0hOwtTRlwgexG+06WAl781qhGSOXDht20YkXX7wro71Btx2Kd3X2WB9UrWuWg8EHql6k1g9zPAKjVIjcxgwUQYCDBbWdlb9GkA5OhXAMGTVelQVzfufSxsrclhZPqCSWxeZjXzXL53TQNH67BZQoVcErvw0sOd0FX3VOhxeQI9th5/621szQbsPI3SMrr6R9lYHK/cdLaUv6AiFCgfQJJWmda4PK8NPf5vNDIpv5kr0+xrkYbS9ZSAgU3j+U63Lq4VaC7x99EbQ4KpIh+3eLh3Ln78hazL3VzeEzxX/PO3/gVMCLczJGlaBHmeZlCzUE0/zMPdZMjlgxa8uZTiiGo7n44GDKrWE0dlf1YleF5p7gGtthP8RL8GC885HxUzg2mmLQrEYNU/5Y34ycCP+nGOPL/CQ+W4kBYyoJsRsiLROrA2WOCKae1qh57Uvh2hiCPCHp2C9w7FqwKbkDGpZ3AWHuX2v4TRqUYuP8NgtYdfSXchVoZmrA=
-X-Forefront-Antispam-Report: CIP:12.22.5.234;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:InfoNoRecords;CAT:NONE;SFS:(13230016)(4636009)(136003)(346002)(39860400002)(396003)(376002)(46966006)(36840700001)(40470700004)(5660300002)(82740400003)(356005)(2906002)(81166007)(41300700001)(4326008)(8676002)(70206006)(70586007)(36860700001)(82310400005)(186003)(4744005)(478600001)(316002)(8936002)(86362001)(40480700001)(40460700003)(7406005)(7416002)(9686003)(55016003)(26005)(47076005)(426003)(336012)(6916009)(54906003)(33716001)(36900700001);DIR:OUT;SFP:1101;
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 06 Jul 2022 15:54:51.5538
- (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: e39b936a-f7f4-4c15-9020-08da5f67dccb
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[12.22.5.234];Helo=[mail.nvidia.com]
-X-MS-Exchange-CrossTenant-AuthSource: DM6NAM11FT044.eop-nam11.prod.protection.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Anonymous
-X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: BN6PR1201MB0195
-X-Spam-Status: No, score=-1.8 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FORGED_SPF_HELO,
-        RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_NONE,
-        T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 7bit
+Importance: Medium
+User-Agent: Zoho Mail
+X-Mailer: Zoho Mail
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,URIBL_RED autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Jul 05, 2022 at 11:56:25PM -0700, Christoph Hellwig wrote:
-> > -		vfio_unpin_pages(&q->matrix_mdev->vdev, &q->saved_pfn, 1);
-> > +		vfio_unpin_pages(&q->matrix_mdev->vdev, q->saved_pfn << PAGE_SHIFT, 1);
+On Wed, 06 Jul 2022 20:29:57 +0530  Jue Wang <juew@google.com> wrote
+> Fix an access to vcpu->arch.apic when KVM_X86_SETUP_MCE is called
+> without KVM_CREATE_IRQCHIP called or KVM_CAP_SPLIT_IRQCHIP is
+> enabled.
 > 
-> Overly long line here.
+> Reported-by: https://syzkaller.appspot.com/bug?id=10b9b238e087a6c9bef2cc48bee2375f58fabbfc
+> 
+> Fixes: 4b903561ec49 ("KVM: x86: Add Corrected Machine Check Interrupt (CMCI) emulation to lapic.")
+> Signed-off-by: Jue Wang <juew@google.com>
+> ---
+>  arch/x86/kvm/x86.c | 5 +++--
+>  1 file changed, 3 insertions(+), 2 deletions(-)
+> 
 
-The following PATCH-5 drops the "<< PAGE_SHIFT", addressing this.
+The syzkaller dashboard says to use the following line:
+Reported-by: syzbot+8cdad6430c24f396f158@syzkaller.appspotmail.com
 
-To not wrapping and unwrapping a line back and forth, I think we
-are fine here?
 
-> Reviewed-by: Christoph Hellwig <hch@lst.de>
+Tested-by: Siddh Raman Pant <code@siddh.me>
 
-Will add to v3. Thanks for the review!
+Thanks,
+Siddh
+
+> diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+> index 4322a1365f74..5913f90ec3f2 100644
+> --- a/arch/x86/kvm/x86.c
+> +++ b/arch/x86/kvm/x86.c
+> @@ -4820,8 +4820,9 @@ static int kvm_vcpu_ioctl_x86_setup_mce(struct kvm_vcpu *vcpu,
+>          if (mcg_cap & MCG_CMCI_P)
+>              vcpu->arch.mci_ctl2_banks[bank] = 0;
+>      }
+> -    vcpu->arch.apic->nr_lvt_entries =
+> -        KVM_APIC_MAX_NR_LVT_ENTRIES - !(mcg_cap & MCG_CMCI_P);
+> +    if (lapic_in_kernel(vcpu))
+> +        vcpu->arch.apic->nr_lvt_entries =
+> +            KVM_APIC_MAX_NR_LVT_ENTRIES - !(mcg_cap & MCG_CMCI_P);
+>  
+>      static_call(kvm_x86_setup_mce)(vcpu);
+>  out:
+> -- 
+> 2.37.0.rc0.161.g10f37bed90-goog
+> 
+> 
