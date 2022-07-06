@@ -2,210 +2,87 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id B4C805695A1
-	for <lists+kvm@lfdr.de>; Thu,  7 Jul 2022 01:11:47 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 8301156969D
+	for <lists+kvm@lfdr.de>; Thu,  7 Jul 2022 01:52:58 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233982AbiGFXLp (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 6 Jul 2022 19:11:45 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57968 "EHLO
+        id S234783AbiGFXwE (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 6 Jul 2022 19:52:04 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34086 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230029AbiGFXLo (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 6 Jul 2022 19:11:44 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 7D6C71CFC2
-        for <kvm@vger.kernel.org>; Wed,  6 Jul 2022 16:11:42 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1657149101;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=HIFp6H7U8H4zLlvFPiQ4cosgxwJdUp4h1jCTeNzWHAk=;
-        b=K1gIGB6QZQqcmAy/N2W2UjabMdd5vCXIEqaCm5bv9s0TZS1sCLxApoAjfvlejsMJXUeW7L
-        NmZJA39Jnxl5EGcJVZNCEuHpGZImnB0defDhEyJI9JZ59/ElLN7aw/13Py/961QqUJOE0c
-        ryEmefYMEACQqO984UnhMNjg5Nzp5Js=
-Received: from mail-il1-f197.google.com (mail-il1-f197.google.com
- [209.85.166.197]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-635-j2KOqJJ6Pv--4Y2-KC4IpQ-1; Wed, 06 Jul 2022 19:11:40 -0400
-X-MC-Unique: j2KOqJJ6Pv--4Y2-KC4IpQ-1
-Received: by mail-il1-f197.google.com with SMTP id b11-20020a92340b000000b002d3dbbc7b15so8374967ila.5
-        for <kvm@vger.kernel.org>; Wed, 06 Jul 2022 16:11:40 -0700 (PDT)
+        with ESMTP id S234622AbiGFXwC (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 6 Jul 2022 19:52:02 -0400
+Received: from mail-oi1-x229.google.com (mail-oi1-x229.google.com [IPv6:2607:f8b0:4864:20::229])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2B23F2D1E1
+        for <kvm@vger.kernel.org>; Wed,  6 Jul 2022 16:52:02 -0700 (PDT)
+Received: by mail-oi1-x229.google.com with SMTP id w62so54998oie.3
+        for <kvm@vger.kernel.org>; Wed, 06 Jul 2022 16:52:02 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=BL7W23oHq0JL/M8TNGzxaqsF4OCN+5iCjxJ+fwRF/M8=;
+        b=W7Bxxt3rS48fnDgjqLePmCkjfVy8mPWiRP1Ek/okWVaAlUCn9Beu2Yhhpq72FX22vI
+         2clQpJeMjPH/7FGZvt/ndKFWuhQAp2+/Rdk+EBYzZwwF26S9vXx0yJPTmat8wT8VtZ6x
+         MSIy3jbrFXJEuTg8x394WsVqxD3/olXhh5Hw19OancK78mDmiOxvuSoXhPhHZaMo3lSa
+         fx91Gj1tf35/hxtpIRDHBpqSRJbvJlebuNDuE6RBjb2poG9ivmkGPHEIFSlscl4uJklc
+         6SA3V8WcYy35GE5a9VgfKvV9f1/fsFP2re5yYG11rwR4X97SI/LY5CBo+ezoqqpjwwnD
+         I6rQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:in-reply-to
-         :references:organization:mime-version:content-transfer-encoding;
-        bh=HIFp6H7U8H4zLlvFPiQ4cosgxwJdUp4h1jCTeNzWHAk=;
-        b=6Lclczi9+DHLWxCAsYoPoX8ECGf2h2aKTYn+XCX1hYCydoBW6hicn+sg/g29QPpoTa
-         m2nWsQjMU/l3Gr58p5I8dATKfHO+JTyUoiY19OI/UkGs6hRO3xNA73/b6omo0jv6gWGz
-         bFpfbv2jo4ZxGdI+GmI5q9R5rPF+3wYFOXdWssTdsNy7rWlLaqN6aSezRB08KLk27Pwi
-         Sy/TVl9Jhj1KSf86mnXcH/MHDFzQRacmNaYzvVDmPkY508Z993zA+aWwMUoGD3ImNWBZ
-         sKXa1KPWuL4TBaBBH6Fpq4ddJa4lWVhmu9PDlA3KbwPSZrw+oLj92SDjN+Rz4dWZPjqB
-         aEnQ==
-X-Gm-Message-State: AJIora+0WRzH1XtXVP9zCkXP/KLbSWsu70KlUPbddKjIrL0yggTPJxNB
-        syyXp1WXmMjtcSUXeyxfJrJtUITAqGXssmhJLIxsy9gBI1yF8g/1XrYx09GPI63RQqmZsGVvbtF
-        YiM91huheCHEX
-X-Received: by 2002:a6b:c941:0:b0:672:734f:d05f with SMTP id z62-20020a6bc941000000b00672734fd05fmr21700442iof.87.1657149099784;
-        Wed, 06 Jul 2022 16:11:39 -0700 (PDT)
-X-Google-Smtp-Source: AGRyM1sUYXLuk3UWGNawVyOpx/TmaNJ2nFfBX9aQU/SF56aO/Kg2TRfjIV+nR5aoaDdS7GE946l1hw==
-X-Received: by 2002:a6b:c941:0:b0:672:734f:d05f with SMTP id z62-20020a6bc941000000b00672734fd05fmr21700422iof.87.1657149099536;
-        Wed, 06 Jul 2022 16:11:39 -0700 (PDT)
-Received: from redhat.com ([38.15.36.239])
-        by smtp.gmail.com with ESMTPSA id u125-20020a022383000000b0033ebbb649fasm5678501jau.101.2022.07.06.16.11.38
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 06 Jul 2022 16:11:39 -0700 (PDT)
-Date:   Wed, 6 Jul 2022 17:11:37 -0600
-From:   Alex Williamson <alex.williamson@redhat.com>
-To:     Yishai Hadas <yishaih@nvidia.com>
-Cc:     <jgg@nvidia.com>, <saeedm@nvidia.com>, <kvm@vger.kernel.org>,
-        <netdev@vger.kernel.org>, <kuba@kernel.org>,
-        <kevin.tian@intel.com>, <joao.m.martins@oracle.com>,
-        <leonro@nvidia.com>, <maorg@nvidia.com>, <cohuck@redhat.com>
-Subject: Re: [PATCH V1 vfio 03/11] vfio: Introduce DMA logging uAPIs
-Message-ID: <20220706171137.47e4aa10.alex.williamson@redhat.com>
-In-Reply-To: <20220705102740.29337-4-yishaih@nvidia.com>
-References: <20220705102740.29337-1-yishaih@nvidia.com>
-        <20220705102740.29337-4-yishaih@nvidia.com>
-Organization: Red Hat
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=BL7W23oHq0JL/M8TNGzxaqsF4OCN+5iCjxJ+fwRF/M8=;
+        b=Mlf8nKxnD/vnzozDIr1y3H9nTVALFwXqgy3dk7UwKajoZOvx+h+OmKSn/ybAsPsEMt
+         gl1tpKk5/2gepPbh/+xwY/QPwH3qsJXOCVDUJ+VwUODoV4aZnsn0jqijmTxXcal+l6Nn
+         V+ghvVncek1vKNa1Gx6y0Vgv7vCaMwjtR57atqdyZJ+x98QLLsFvv6aI/+K8HqDwWogd
+         ERYnvIOyT9cf9iF8yMBEh+7wsWegdoHlv/+r3Y+bUeShEliZCO9BU+Z/6ruhms/BLNls
+         JhzE87EY9J2Ldhk0PdgmpfgMWQkInCPm5nqZs2tSTyRQzO4RNWbW176SWJjn3HvB1vRI
+         QRXg==
+X-Gm-Message-State: AJIora8OIg8d4kjgDOj+nNbgSAKXRPWYT5XAMJbbEryM7BxC3luT0xYm
+        zIwYB2RKgj/w7xtb1dNTmsA57LW5JVNJlb98Cp+esg==
+X-Google-Smtp-Source: AGRyM1uu9XjOrKLX28cVqi4dnKMz2RP55IVUsLf3ms+qDAp/4RaMrlk+119BjbDPEHCq2pfyEQKg2yD6xs8AXxbxhNc=
+X-Received: by 2002:a05:6808:2124:b0:335:7483:f62d with SMTP id
+ r36-20020a056808212400b003357483f62dmr764472oiw.112.1657151521323; Wed, 06
+ Jul 2022 16:52:01 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-3.5 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,
-        SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham
-        autolearn_force=no version=3.4.6
+References: <20220614204730.3359543-1-seanjc@google.com> <20220614204730.3359543-6-seanjc@google.com>
+In-Reply-To: <20220614204730.3359543-6-seanjc@google.com>
+From:   Jim Mattson <jmattson@google.com>
+Date:   Wed, 6 Jul 2022 16:51:50 -0700
+Message-ID: <CALMp9eSH1O8keAVxZzfdvV1vu0AJBhaXVUfkSgYgCPOoSB5=Jw@mail.gmail.com>
+Subject: Re: [PATCH v2 05/21] KVM: nVMX: Prioritize TSS T-flag #DBs over
+ Monitor Trap Flag
+To:     Sean Christopherson <seanjc@google.com>
+Cc:     Paolo Bonzini <pbonzini@redhat.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org, Oliver Upton <oupton@google.com>,
+        Peter Shier <pshier@google.com>
+Content-Type: text/plain; charset="UTF-8"
+X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
+        T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, 5 Jul 2022 13:27:32 +0300
-Yishai Hadas <yishaih@nvidia.com> wrote:
+On Tue, Jun 14, 2022 at 1:47 PM Sean Christopherson <seanjc@google.com> wrote:
+>
+> Service TSS T-flag #DBs prior to pending MTFs, as such #DBs are higher
+> priority than MTF.  KVM itself doesn't emulate TSS #DBs, and any such
 
-> DMA logging allows a device to internally record what DMAs the device is
-> initiating and report them back to userspace. It is part of the VFIO
-> migration infrastructure that allows implementing dirty page tracking
-> during the pre copy phase of live migration. Only DMA WRITEs are logged,
-> and this API is not connected to VFIO_DEVICE_FEATURE_MIG_DEVICE_STATE.
-> 
-> This patch introduces the DMA logging involved uAPIs.
-> 
-> It uses the FEATURE ioctl with its GET/SET/PROBE options as of below.
-> 
-> It exposes a PROBE option to detect if the device supports DMA logging.
-> It exposes a SET option to start device DMA logging in given IOVAs
-> ranges.
-> It exposes a SET option to stop device DMA logging that was previously
-> started.
-> It exposes a GET option to read back and clear the device DMA log.
-> 
-> Extra details exist as part of vfio.h per a specific option.
-> 
-> Signed-off-by: Yishai Hadas <yishaih@nvidia.com>
-> Signed-off-by: Jason Gunthorpe <jgg@nvidia.com>
-> ---
->  include/uapi/linux/vfio.h | 79 +++++++++++++++++++++++++++++++++++++++
->  1 file changed, 79 insertions(+)
-> 
-> diff --git a/include/uapi/linux/vfio.h b/include/uapi/linux/vfio.h
-> index 733a1cddde30..81475c3e7c92 100644
-> --- a/include/uapi/linux/vfio.h
-> +++ b/include/uapi/linux/vfio.h
-> @@ -986,6 +986,85 @@ enum vfio_device_mig_state {
->  	VFIO_DEVICE_STATE_RUNNING_P2P = 5,
->  };
->  
-> +/*
-> + * Upon VFIO_DEVICE_FEATURE_SET start device DMA logging.
-> + * VFIO_DEVICE_FEATURE_PROBE can be used to detect if the device supports
-> + * DMA logging.
-> + *
-> + * DMA logging allows a device to internally record what DMAs the device is
-> + * initiating and report them back to userspace. It is part of the VFIO
-> + * migration infrastructure that allows implementing dirty page tracking
-> + * during the pre copy phase of live migration. Only DMA WRITEs are logged,
-> + * and this API is not connected to VFIO_DEVICE_FEATURE_MIG_DEVICE_STATE.
-> + *
-> + * When DMA logging is started a range of IOVAs to monitor is provided and the
-> + * device can optimize its logging to cover only the IOVA range given. Each
-> + * DMA that the device initiates inside the range will be logged by the device
-> + * for later retrieval.
-> + *
-> + * page_size is an input that hints what tracking granularity the device
-> + * should try to achieve. If the device cannot do the hinted page size then it
-> + * should pick the next closest page size it supports. On output the device
-> + * will return the page size it selected.
-> + *
-> + * ranges is a pointer to an array of
-> + * struct vfio_device_feature_dma_logging_range.
-> + */
-> +struct vfio_device_feature_dma_logging_control {
-> +	__aligned_u64 page_size;
-> +	__u32 num_ranges;
-> +	__u32 __reserved;
-> +	__aligned_u64 ranges;
-> +};
+Is there a KVM erratum for that?
 
-num_ranges probably has a limit below 2^32-1, is it device specific?
-How does the user learn the limit?
+> exceptions injected from L1 will be handled by hardware (or morphed to
+> a fault-like exception if injection fails), but theoretically userspace
+> could pend a TSS T-flag #DB in conjunction with a pending MTF.
+>
+> Note, there's no known use case this fixes, it's purely to be technically
+> correct with respect to Intel's SDM.
 
-Presumably new ranges cannot be added while logging is already enabled,
-should we build this limitation into the uAPI or might some devices
-have the ability to dynamically add and remove logging ranges?  Thanks,
-
-Alex
-
-> +
-> +struct vfio_device_feature_dma_logging_range {
-> +	__aligned_u64 iova;
-> +	__aligned_u64 length;
-> +};
-> +
-> +#define VFIO_DEVICE_FEATURE_DMA_LOGGING_START 3
-> +
-> +/*
-> + * Upon VFIO_DEVICE_FEATURE_SET stop device DMA logging that was started
-> + * by VFIO_DEVICE_FEATURE_DMA_LOGGING_START
-> + */
-> +#define VFIO_DEVICE_FEATURE_DMA_LOGGING_STOP 4
-> +
-> +/*
-> + * Upon VFIO_DEVICE_FEATURE_GET read back and clear the device DMA log
-> + *
-> + * Query the device's DMA log for written pages within the given IOVA range.
-> + * During querying the log is cleared for the IOVA range.
-> + *
-> + * bitmap is a pointer to an array of u64s that will hold the output bitmap
-> + * with 1 bit reporting a page_size unit of IOVA. The mapping of IOVA to bits
-> + * is given by:
-> + *  bitmap[(addr - iova)/page_size] & (1ULL << (addr % 64))
-> + *
-> + * The input page_size can be any power of two value and does not have to
-> + * match the value given to VFIO_DEVICE_FEATURE_DMA_LOGGING_START. The driver
-> + * will format its internal logging to match the reporting page size, possibly
-> + * by replicating bits if the internal page size is lower than requested.
-> + *
-> + * Bits will be updated in bitmap using atomic or to allow userspace to
-> + * combine bitmaps from multiple trackers together. Therefore userspace must
-> + * zero the bitmap before doing any reports.
-> + *
-> + * If any error is returned userspace should assume that the dirty log is
-> + * corrupted and restart.
-> + *
-> + * If DMA logging is not enabled, an error will be returned.
-> + *
-> + */
-> +struct vfio_device_feature_dma_logging_report {
-> +	__aligned_u64 iova;
-> +	__aligned_u64 length;
-> +	__aligned_u64 page_size;
-> +	__aligned_u64 bitmap;
-> +};
-> +
-> +#define VFIO_DEVICE_FEATURE_DMA_LOGGING_REPORT 5
-> +
->  /* -------- API for Type1 VFIO IOMMU -------- */
->  
->  /**
-
+A test would be nice. :-)
