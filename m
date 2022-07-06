@@ -2,59 +2,59 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id CF069568DFA
-	for <lists+kvm@lfdr.de>; Wed,  6 Jul 2022 17:50:56 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id E6DD8568E13
+	for <lists+kvm@lfdr.de>; Wed,  6 Jul 2022 17:51:04 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232981AbiGFPsT (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 6 Jul 2022 11:48:19 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43722 "EHLO
+        id S234307AbiGFPs3 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 6 Jul 2022 11:48:29 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43500 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233190AbiGFPr6 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 6 Jul 2022 11:47:58 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 50B3F2A244
-        for <kvm@vger.kernel.org>; Wed,  6 Jul 2022 08:40:49 -0700 (PDT)
+        with ESMTP id S234087AbiGFPsD (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 6 Jul 2022 11:48:03 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id BF39B33E2D
+        for <kvm@vger.kernel.org>; Wed,  6 Jul 2022 08:40:57 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1657122048;
+        s=mimecast20190719; t=1657122056;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=Kw+hePrwDbzDiEREmLImOf93xliKHYFU7TLXwcjNYt0=;
-        b=hUE1mYZSWlHItNs6sxfnXPS6EFxerqOp8ISLGYlxaxxIBx+xzy2w+MoFRw/nEtKSf5VB4I
-        qt1UAq2HLmQysJ3K/UYC/m6k58nO46aTOWvGNTuCLqj3Eg3i7jfRDeE9abEyd6EiRJ9abm
-        7D3VyBkBBHKoa26Tz1B2WsgEI/fzZcQ=
-Received: from mail-il1-f198.google.com (mail-il1-f198.google.com
- [209.85.166.198]) by relay.mimecast.com with ESMTP with STARTTLS
+        bh=j2ouW0IJ50/LD/W4uln9u2YiN3e6DrWUMY1mn0yrjIw=;
+        b=VmJr/XVWaiNA0kkPGTxTT3dktPtLnK+qStj7Mr610uUFhnPz+bCgsFO4QnDMo3UVY7LxPy
+        Glg+8TCEWp3LK5Qc8PuY9ChS5Vb2xQyJoNKbrKbX8NlT7ljSIVPhMnKnuRN9VFjY9ijhZj
+        Mgt6JXiaj/tU8uTYFYAq2o4JQq5XLgo=
+Received: from mail-il1-f200.google.com (mail-il1-f200.google.com
+ [209.85.166.200]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-84-rDJ68GRJNWObXF7RQAVw2g-1; Wed, 06 Jul 2022 11:40:46 -0400
-X-MC-Unique: rDJ68GRJNWObXF7RQAVw2g-1
-Received: by mail-il1-f198.google.com with SMTP id k10-20020a056e021a8a00b002dacb91b6ebso7773876ilv.1
-        for <kvm@vger.kernel.org>; Wed, 06 Jul 2022 08:40:46 -0700 (PDT)
+ us-mta-281-LvbS3N0tMzWa65cffbqnDA-1; Wed, 06 Jul 2022 11:40:53 -0400
+X-MC-Unique: LvbS3N0tMzWa65cffbqnDA-1
+Received: by mail-il1-f200.google.com with SMTP id j17-20020a056e02219100b002d955e89a54so7869373ila.11
+        for <kvm@vger.kernel.org>; Wed, 06 Jul 2022 08:40:53 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:date:from:to:cc:subject:message-id:in-reply-to
          :references:organization:mime-version:content-transfer-encoding;
-        bh=Kw+hePrwDbzDiEREmLImOf93xliKHYFU7TLXwcjNYt0=;
-        b=bLbrRPT19l1NGUNwDg6LbnJvsgrW1fdw+wdRmTWXklUUzYLZ3E3HQ+3IMVvVoCG9Ak
-         SZOczkmCXVMyH3o2tBHrGrP1gD6Gr5sxz7D9w79Tb1LTPcCflka77fBf0h5LrbeFQE56
-         QHPhVq1nkmbzHhGnpaUGjQr36JLl9M57ZGILjh542nnSdvV89kktMrWy82CjAeyKpQVh
-         EeCMGclfCfgVkZSAPsk2216F15KrHMqWM+QZxMJpXdeecUbF5lhCjRwS0PHnFLx4qCHV
-         auFB/Am2WBG9b+FYiMg7xel46scGmBj87DPCNoQKsGrJ2eXPsFboq67Wr85JYz4nteWj
-         k6GA==
-X-Gm-Message-State: AJIora+j3uxMul93PS+H0DctDka9F+qHS95nvpxNu1RVX/7apjuKsLLe
-        4NtQ/TqJR4uR0W6MXYtVDX3RPO7pnrJPONGe1WvSJO3L7MZRiRYyjJHOezwrEtv425U873Nj3Om
-        rhE/La+t++Xkq
-X-Received: by 2002:a05:6e02:1b8d:b0:2dc:32dc:a03d with SMTP id h13-20020a056e021b8d00b002dc32dca03dmr2819809ili.261.1657122045312;
-        Wed, 06 Jul 2022 08:40:45 -0700 (PDT)
-X-Google-Smtp-Source: AGRyM1tJknWA5fe5K/3hOcpi9Lvkw/Sr30glLgGICdmPgj3KJLKzuRHboplxHCnha46TsS2+ft6XbQ==
-X-Received: by 2002:a05:6e02:1b8d:b0:2dc:32dc:a03d with SMTP id h13-20020a056e021b8d00b002dc32dca03dmr2819788ili.261.1657122044997;
-        Wed, 06 Jul 2022 08:40:44 -0700 (PDT)
+        bh=j2ouW0IJ50/LD/W4uln9u2YiN3e6DrWUMY1mn0yrjIw=;
+        b=uh+BmTuQIqbHAqIvGKrC0ul8FXmXJzqtWzbT5IpztXqJIgKCvwuL5nK30D6xQbB1VI
+         JIpLPjbI099faXe4t+RAfPcX6eMBaUcuyopQqBPgz8KIIRy12hgcDktRcydq1EAGOqUI
+         18NO5qhBcu9Of6XgpHu/YGeSRWwwKQWBC0+M0pWY01btN4I7X9XpXTvupTXHeM+9UNkE
+         l9LQ0V4SGlkPEfUNA5LjoKTBXvhKIN0AwbL8aAnzPHvbStrXlMznftNghe1D2zMayWhH
+         1fZ3rvW+mpYsVdSLjinjENwR/19aoW0JH/Rh4MFAVDvCvQARqFzAWKvafqnTk2EKKymJ
+         B1gA==
+X-Gm-Message-State: AJIora8TcxB+0gqAtnJ06lE1B5kXqeR8sN+/M/sDVuTmd9LG8UN+Z0q4
+        m/+qYo8R0GNZRBduxnSMFrG3Gm/wHYTNJ2E5O6Pt0gR0GY7mfxLqpIgV0khj9pUdsfTidn1ZACd
+        8/JXRE2GmUJTf
+X-Received: by 2002:a05:6e02:12ea:b0:2da:bb5b:bcc5 with SMTP id l10-20020a056e0212ea00b002dabb5bbcc5mr23192249iln.173.1657122052909;
+        Wed, 06 Jul 2022 08:40:52 -0700 (PDT)
+X-Google-Smtp-Source: AGRyM1tcoOJLG0ui9DJlli5fa1i8aU2HEA0SyRv0Q4XlNsbA+kQEcNsL6A+fZcImvzWzfsQBUSpTjg==
+X-Received: by 2002:a05:6e02:12ea:b0:2da:bb5b:bcc5 with SMTP id l10-20020a056e0212ea00b002dabb5bbcc5mr23192237iln.173.1657122052658;
+        Wed, 06 Jul 2022 08:40:52 -0700 (PDT)
 Received: from redhat.com ([38.15.36.239])
-        by smtp.gmail.com with ESMTPSA id a17-20020a056e0208b100b002d955fab9dbsm14702119ilt.23.2022.07.06.08.40.44
+        by smtp.gmail.com with ESMTPSA id d12-20020a0566022bec00b0066958ec56d9sm17003884ioy.40.2022.07.06.08.40.50
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 06 Jul 2022 08:40:44 -0700 (PDT)
-Date:   Wed, 6 Jul 2022 09:39:59 -0600
+        Wed, 06 Jul 2022 08:40:51 -0700 (PDT)
+Date:   Wed, 6 Jul 2022 09:40:07 -0600
 From:   Alex Williamson <alex.williamson@redhat.com>
 To:     Abhishek Sahu <abhsahu@nvidia.com>
 Cc:     Cornelia Huck <cohuck@redhat.com>,
@@ -67,18 +67,18 @@ Cc:     Cornelia Huck <cohuck@redhat.com>,
         Bjorn Helgaas <bhelgaas@google.com>,
         <linux-kernel@vger.kernel.org>, <kvm@vger.kernel.org>,
         <linux-pm@vger.kernel.org>, <linux-pci@vger.kernel.org>
-Subject: Re: [PATCH v4 2/6] vfio: Add a new device feature for the power
- management
-Message-ID: <20220706093959.3bd2cbbb.alex.williamson@redhat.com>
-In-Reply-To: <20220701110814.7310-3-abhsahu@nvidia.com>
+Subject: Re: [PATCH v4 3/6] vfio: Increment the runtime PM usage count
+ during IOCTL call
+Message-ID: <20220706094007.12c33d63.alex.williamson@redhat.com>
+In-Reply-To: <20220701110814.7310-4-abhsahu@nvidia.com>
 References: <20220701110814.7310-1-abhsahu@nvidia.com>
-        <20220701110814.7310-3-abhsahu@nvidia.com>
+        <20220701110814.7310-4-abhsahu@nvidia.com>
 Organization: Red Hat
 MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-2.8 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+X-Spam-Status: No, score=-3.5 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,
         SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=unavailable
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
@@ -87,123 +87,202 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, 1 Jul 2022 16:38:10 +0530
+On Fri, 1 Jul 2022 16:38:11 +0530
 Abhishek Sahu <abhsahu@nvidia.com> wrote:
 
-> This patch adds the new feature VFIO_DEVICE_FEATURE_POWER_MANAGEMENT
-> for the power management in the header file. The implementation for the
-> same will be added in the subsequent patches.
+> The vfio-pci based driver will have runtime power management
+> support where the user can put the device into the low power state
+> and then PCI devices can go into the D3cold state. If the device is
+> in the low power state and the user issues any IOCTL, then the
+> device should be moved out of the low power state first. Once
+> the IOCTL is serviced, then it can go into the low power state again.
+> The runtime PM framework manages this with help of usage count.
 > 
-> With the standard registers, all power states cannot be achieved. The
-> platform-based power management needs to be involved to go into the
-> lowest power state. For all the platform-based power management, this
-> device feature can be used.
+> One option was to add the runtime PM related API's inside vfio-pci
+> driver but some IOCTL (like VFIO_DEVICE_FEATURE) can follow a
+> different path and more IOCTL can be added in the future. Also, the
+> runtime PM will be added for vfio-pci based drivers variant currently,
+> but the other VFIO based drivers can use the same in the
+> future. So, this patch adds the runtime calls runtime-related API in
+> the top-level IOCTL function itself.
+>
+> For the VFIO drivers which do not have runtime power management
+> support currently, the runtime PM API's won't be invoked. Only for
+> vfio-pci based drivers currently, the runtime PM API's will be invoked
+> to increment and decrement the usage count.
+
+Variant drivers can easily opt-out of runtime pm support by performing
+a gratuitous pm-get in their device-open function.
+ 
+> Taking this usage count incremented while servicing IOCTL will make
+> sure that the user won't put the device into low power state when any
+> other IOCTL is being serviced in parallel. Let's consider the
+> following scenario:
 > 
-> This device feature uses flags to specify the different operations. In
-> the future, if any more power management functionality is needed then
-> a new flag can be added to it. It supports both GET and SET operations.
+>  1. Some other IOCTL is called.
+>  2. The user has opened another device instance and called the power
+>     management IOCTL for the low power entry.
+>  3. The power management IOCTL moves the device into the low power state.
+>  4. The other IOCTL finishes.
+> 
+> If we don't keep the usage count incremented then the device
+> access will happen between step 3 and 4 while the device has already
+> gone into the low power state.
+> 
+> The runtime PM API's should not be invoked for
+> VFIO_DEVICE_FEATURE_POWER_MANAGEMENT since this IOCTL itself performs
+> the runtime power management entry and exit for the VFIO device.
+
+I think the one-shot interface I proposed in the previous patch avoids
+the need for special handling for these feature ioctls.  Thanks,
+
+Alex
+ 
+> The pm_runtime_resume_and_get() will be the first call so its error
+> should not be propagated to user space directly. For example, if
+> pm_runtime_resume_and_get() can return -EINVAL for the cases where the
+> user has passed the correct argument. So the
+> pm_runtime_resume_and_get() errors have been masked behind -EIO.
 > 
 > Signed-off-by: Abhishek Sahu <abhsahu@nvidia.com>
 > ---
->  include/uapi/linux/vfio.h | 55 +++++++++++++++++++++++++++++++++++++++
->  1 file changed, 55 insertions(+)
+>  drivers/vfio/vfio.c | 82 ++++++++++++++++++++++++++++++++++++++++-----
+>  1 file changed, 74 insertions(+), 8 deletions(-)
 > 
-> diff --git a/include/uapi/linux/vfio.h b/include/uapi/linux/vfio.h
-> index 733a1cddde30..7e00de5c21ea 100644
-> --- a/include/uapi/linux/vfio.h
-> +++ b/include/uapi/linux/vfio.h
-> @@ -986,6 +986,61 @@ enum vfio_device_mig_state {
->  	VFIO_DEVICE_STATE_RUNNING_P2P = 5,
+> diff --git a/drivers/vfio/vfio.c b/drivers/vfio/vfio.c
+> index 61e71c1154be..61a8d9f7629a 100644
+> --- a/drivers/vfio/vfio.c
+> +++ b/drivers/vfio/vfio.c
+> @@ -32,6 +32,7 @@
+>  #include <linux/vfio.h>
+>  #include <linux/wait.h>
+>  #include <linux/sched/signal.h>
+> +#include <linux/pm_runtime.h>
+>  #include "vfio.h"
+>  
+>  #define DRIVER_VERSION	"0.3"
+> @@ -1333,6 +1334,39 @@ static const struct file_operations vfio_group_fops = {
+>  	.release	= vfio_group_fops_release,
 >  };
 >  
 > +/*
-> + * Perform power management-related operations for the VFIO device.
-> + *
-> + * The low power feature uses platform-based power management to move the
-> + * device into the low power state.  This low power state is device-specific.
-> + *
-> + * This device feature uses flags to specify the different operations.
-> + * It supports both the GET and SET operations.
-> + *
-> + * - VFIO_PM_LOW_POWER_ENTER flag moves the VFIO device into the low power
-> + *   state with platform-based power management.  This low power state will be
-> + *   internal to the VFIO driver and the user will not come to know which power
-> + *   state is chosen.  Once the user has moved the VFIO device into the low
-> + *   power state, then the user should not do any device access without moving
-> + *   the device out of the low power state.
-
-Except we're wrapping device accesses to make this possible.  This
-should probably describe how any discrete access will wake the device
-but ongoing access through mmaps will generate user faults.
-
-> + *
-> + * - VFIO_PM_LOW_POWER_EXIT flag moves the VFIO device out of the low power
-> + *    state.  This flag should only be set if the user has previously put the
-> + *    device into low power state with the VFIO_PM_LOW_POWER_ENTER flag.
-
-Indenting.
-
-> + *
-> + * - VFIO_PM_LOW_POWER_ENTER and VFIO_PM_LOW_POWER_EXIT are mutually exclusive.
-> + *
-> + * - VFIO_PM_LOW_POWER_REENTERY_DISABLE flag is only valid with
-> + *   VFIO_PM_LOW_POWER_ENTER.  If there is any access for the VFIO device on
-> + *   the host side, then the device will be moved out of the low power state
-> + *   without the user's guest driver involvement.  Some devices require the
-> + *   user's guest driver involvement for each low-power entry.  If this flag is
-> + *   set, then the re-entry to the low power state will be disabled, and the
-> + *   host kernel will not move the device again into the low power state.
-> + *   The VFIO driver internally maintains a list of devices for which low
-> + *   power re-entry is disabled by default and for those devices, the
-> + *   re-entry will be disabled even if the user has not set this flag
-> + *   explicitly.
-
-Wrong polarity.  The kernel should not maintain the policy.  By default
-every wakeup, whether from host kernel accesses or via user accesses
-that do a pm-get should signal a wakeup to userspace.  Userspace needs
-to opt-out of that wakeup to let the kernel automatically re-enter low
-power and userspace needs to maintain the policy for which devices it
-wants that to occur.
-
-> + *
-> + * For the IOCTL call with VFIO_DEVICE_FEATURE_GET:
-> + *
-> + * - VFIO_PM_LOW_POWER_ENTER will be set if the user has put the device into
-> + *   the low power state, otherwise, VFIO_PM_LOW_POWER_EXIT will be set.
-> + *
-> + * - If the device is in a normal power state currently, then
-> + *   VFIO_PM_LOW_POWER_REENTERY_DISABLE will be set for the devices where low
-> + *   power re-entry is disabled by default.  If the device is in the low power
-> + *   state currently, then VFIO_PM_LOW_POWER_REENTERY_DISABLE will be set
-> + *   according to the current transition.
-
-Very confusing semantics.
-
-What if the feature SET ioctl took an eventfd and that eventfd was one
-time use.  Calling the ioctl would setup the eventfd to notify the user
-on wakeup and call pm-put.  Any access to the device via host, ioctl,
-or region would be wrapped in pm-get/put and the pm-resume handler
-would perform the matching pm-get to balance the feature SET and signal
-the eventfd.  If the user opts-out by not providing a wakeup eventfd,
-then the pm-resume handler does not perform a pm-get.  Possibly we
-could even allow mmap access if a wake-up eventfd is provided.  The
-feature GET ioctl would be used to exit low power behavior and would be
-a no-op if the wakeup eventfd had already been signaled.  Thanks,
-
-Alex
-
+> + * Wrapper around pm_runtime_resume_and_get().
+> + * Return error code on failure or 0 on success.
 > + */
-> +struct vfio_device_feature_power_management {
-> +	__u32	flags;
-> +#define VFIO_PM_LOW_POWER_ENTER			(1 << 0)
-> +#define VFIO_PM_LOW_POWER_EXIT			(1 << 1)
-> +#define VFIO_PM_LOW_POWER_REENTERY_DISABLE	(1 << 2)
-> +	__u32	reserved;
-> +};
+> +static inline int vfio_device_pm_runtime_get(struct vfio_device *device)
+> +{
+> +	struct device *dev = device->dev;
 > +
-> +#define VFIO_DEVICE_FEATURE_POWER_MANAGEMENT	3
+> +	if (dev->driver && dev->driver->pm) {
+> +		int ret;
 > +
->  /* -------- API for Type1 VFIO IOMMU -------- */
+> +		ret = pm_runtime_resume_and_get(dev);
+> +		if (ret < 0) {
+> +			dev_info_ratelimited(dev,
+> +				"vfio: runtime resume failed %d\n", ret);
+> +			return -EIO;
+> +		}
+> +	}
+> +
+> +	return 0;
+> +}
+> +
+> +/*
+> + * Wrapper around pm_runtime_put().
+> + */
+> +static inline void vfio_device_pm_runtime_put(struct vfio_device *device)
+> +{
+> +	struct device *dev = device->dev;
+> +
+> +	if (dev->driver && dev->driver->pm)
+> +		pm_runtime_put(dev);
+> +}
+> +
+>  /*
+>   * VFIO Device fd
+>   */
+> @@ -1607,6 +1641,8 @@ static int vfio_ioctl_device_feature(struct vfio_device *device,
+>  {
+>  	size_t minsz = offsetofend(struct vfio_device_feature, flags);
+>  	struct vfio_device_feature feature;
+> +	int ret = 0;
+> +	u16 feature_cmd;
 >  
->  /**
+>  	if (copy_from_user(&feature, arg, minsz))
+>  		return -EFAULT;
+> @@ -1626,28 +1662,51 @@ static int vfio_ioctl_device_feature(struct vfio_device *device,
+>  	    (feature.flags & VFIO_DEVICE_FEATURE_GET))
+>  		return -EINVAL;
+>  
+> -	switch (feature.flags & VFIO_DEVICE_FEATURE_MASK) {
+> +	feature_cmd = feature.flags & VFIO_DEVICE_FEATURE_MASK;
+> +
+> +	/*
+> +	 * The VFIO_DEVICE_FEATURE_POWER_MANAGEMENT itself performs the runtime
+> +	 * power management entry and exit for the VFIO device, so the runtime
+> +	 * PM API's should not be called for this feature.
+> +	 */
+> +	if (feature_cmd != VFIO_DEVICE_FEATURE_POWER_MANAGEMENT) {
+> +		ret = vfio_device_pm_runtime_get(device);
+> +		if (ret)
+> +			return ret;
+> +	}
+> +
+> +	switch (feature_cmd) {
+>  	case VFIO_DEVICE_FEATURE_MIGRATION:
+> -		return vfio_ioctl_device_feature_migration(
+> +		ret = vfio_ioctl_device_feature_migration(
+>  			device, feature.flags, arg->data,
+>  			feature.argsz - minsz);
+> +		break;
+>  	case VFIO_DEVICE_FEATURE_MIG_DEVICE_STATE:
+> -		return vfio_ioctl_device_feature_mig_device_state(
+> +		ret = vfio_ioctl_device_feature_mig_device_state(
+>  			device, feature.flags, arg->data,
+>  			feature.argsz - minsz);
+> +		break;
+>  	default:
+>  		if (unlikely(!device->ops->device_feature))
+> -			return -EINVAL;
+> -		return device->ops->device_feature(device, feature.flags,
+> -						   arg->data,
+> -						   feature.argsz - minsz);
+> +			ret = -EINVAL;
+> +		else
+> +			ret = device->ops->device_feature(
+> +				device, feature.flags, arg->data,
+> +				feature.argsz - minsz);
+> +		break;
+>  	}
+> +
+> +	if (feature_cmd != VFIO_DEVICE_FEATURE_POWER_MANAGEMENT)
+> +		vfio_device_pm_runtime_put(device);
+> +
+> +	return ret;
+>  }
+>  
+>  static long vfio_device_fops_unl_ioctl(struct file *filep,
+>  				       unsigned int cmd, unsigned long arg)
+>  {
+>  	struct vfio_device *device = filep->private_data;
+> +	int ret;
+>  
+>  	switch (cmd) {
+>  	case VFIO_DEVICE_FEATURE:
+> @@ -1655,7 +1714,14 @@ static long vfio_device_fops_unl_ioctl(struct file *filep,
+>  	default:
+>  		if (unlikely(!device->ops->ioctl))
+>  			return -EINVAL;
+> -		return device->ops->ioctl(device, cmd, arg);
+> +
+> +		ret = vfio_device_pm_runtime_get(device);
+> +		if (ret)
+> +			return ret;
+> +
+> +		ret = device->ops->ioctl(device, cmd, arg);
+> +		vfio_device_pm_runtime_put(device);
+> +		return ret;
+>  	}
+>  }
+>  
 
