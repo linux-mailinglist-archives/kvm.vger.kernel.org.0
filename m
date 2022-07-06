@@ -2,154 +2,138 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 8212556927E
-	for <lists+kvm@lfdr.de>; Wed,  6 Jul 2022 21:17:40 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 6312156928D
+	for <lists+kvm@lfdr.de>; Wed,  6 Jul 2022 21:22:19 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234132AbiGFTRg (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 6 Jul 2022 15:17:36 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49724 "EHLO
+        id S233921AbiGFTWJ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 6 Jul 2022 15:22:09 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52918 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233534AbiGFTRf (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 6 Jul 2022 15:17:35 -0400
-Received: from mail-pl1-x62f.google.com (mail-pl1-x62f.google.com [IPv6:2607:f8b0:4864:20::62f])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B8CFE248CD
-        for <kvm@vger.kernel.org>; Wed,  6 Jul 2022 12:17:34 -0700 (PDT)
-Received: by mail-pl1-x62f.google.com with SMTP id p9so4282395plr.11
-        for <kvm@vger.kernel.org>; Wed, 06 Jul 2022 12:17:34 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=ZjEGOm6kee36npEJu+b6kQDUwPzHaM9d3/gdsO10A3o=;
-        b=JBmKOjwv6JurVrCp1jbxVixSqXLF0Sb1dFg8JNOdJ+fwNcPBzQlQn3tn4npjxXVIAV
-         SMXfrIYC1s7mVn2dvjhB0eIRyJFsLPDfTeECp8Xoz9OOif2Tbx6LEY3/uV80I/w2EUfp
-         2PymuDBaHeeyOy65/N0JZu+CiLRMYUtd4Sv9WWbw3CeYIDJwm2kJS68xyNtkvt0wBEJV
-         vbNNi60hCxI9Sc5sH3Wo2sGB4T2Rdw9dv/k+tl95h8UctppFSCBE4DP1IFA/qJ7WWw8W
-         ASrzo6LZ49VRz1A3Vlp+dUXvviM466LA8jFo5XqC13HA8mIP7rD0HR1kq5kwUmKgaAaT
-         AwaQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=ZjEGOm6kee36npEJu+b6kQDUwPzHaM9d3/gdsO10A3o=;
-        b=sL8E/TJwmQ+6ei5AE2q61ATLC4w0rmwGIdDBRM7Gk4SMUAAqSKrcNYi1myVMWp0jg4
-         LxTWbSvwfOcrxHQWhlceoXI9EjjRul6uc5DX/a74t05GZ2pC0YmdMapf8+QrrY1c1rE1
-         TmEgyojXRqUwCMNKlFdBwpblFr1P0KfLCn9HUA/AjHf96Qy2LkKpJFnV9r+YRLR0kBuO
-         xMZWYKZUv01vcxeGtyVVzMtiXfTIndjmh0GnK3ok4SXpNrCcyZOpmLUd0LsqPW+FJLY9
-         ioIAZotBR4Wd43akb0bx7PtuuGgrsbStp3vS1TPBYoWEp5Mvp/U6FraeHNQEKWjX9s3/
-         DWMg==
-X-Gm-Message-State: AJIora/VwpeXmDx5BlS1yzwnqHoXKyGtvhzx2IMawFRUAqB/bmqei82o
-        2Q7pHsxfahjtxdVm4B+f2ED26Q==
-X-Google-Smtp-Source: AGRyM1vOOz2sO95rdkMXCWcipyRGk4AXIxqT4D+nvbdPOQ8Tgsc6ZH6eLd494oQu0sAcs8gpAmxTDg==
-X-Received: by 2002:a17:902:d292:b0:16b:e6a4:5768 with SMTP id t18-20020a170902d29200b0016be6a45768mr16270752plc.128.1657135054004;
-        Wed, 06 Jul 2022 12:17:34 -0700 (PDT)
-Received: from google.com (123.65.230.35.bc.googleusercontent.com. [35.230.65.123])
-        by smtp.gmail.com with ESMTPSA id mz5-20020a17090b378500b001ef88c30fbbsm7163752pjb.49.2022.07.06.12.17.33
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 06 Jul 2022 12:17:33 -0700 (PDT)
-Date:   Wed, 6 Jul 2022 19:17:29 +0000
-From:   Sean Christopherson <seanjc@google.com>
-To:     Will Deacon <will@kernel.org>
-Cc:     kvmarm@lists.cs.columbia.edu, Ard Biesheuvel <ardb@kernel.org>,
-        Alexandru Elisei <alexandru.elisei@arm.com>,
-        Andy Lutomirski <luto@amacapital.net>,
-        Catalin Marinas <catalin.marinas@arm.com>,
-        James Morse <james.morse@arm.com>,
-        Chao Peng <chao.p.peng@linux.intel.com>,
-        Quentin Perret <qperret@google.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
-        Michael Roth <michael.roth@amd.com>,
-        Mark Rutland <mark.rutland@arm.com>,
-        Fuad Tabba <tabba@google.com>,
-        Oliver Upton <oliver.upton@linux.dev>,
-        Marc Zyngier <maz@kernel.org>, kernel-team@android.com,
-        kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org
-Subject: Re: [PATCH v2 00/24] KVM: arm64: Introduce pKVM shadow state at EL2
-Message-ID: <YsXfyVp6sg5XRVAp@google.com>
-References: <20220630135747.26983-1-will@kernel.org>
+        with ESMTP id S233917AbiGFTWH (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 6 Jul 2022 15:22:07 -0400
+Received: from NAM11-CO1-obe.outbound.protection.outlook.com (mail-co1nam11on2047.outbound.protection.outlook.com [40.107.220.47])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CF93525E98;
+        Wed,  6 Jul 2022 12:22:05 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=ma0BQwdFkrw6VVHAzlZEryQrJMg0hKNOyuZNadKd7Xr9mByX5YMGxQxPSRHQyPI5Np0BGSz23ee9qcp1XymYi0uCwNnmnWSUi/+8Bk6Ne5SAFwpsQtjvLA5ur07oLgc4ZdRKrvGoiRgRQTwo/WznPjzALL1kfo3/mDcPYgXG6R+0/7gPjI4/09KiG1NFs8DeDPD+qvKUJqAaPzqDOOPNDmQ4jn56S/AWSnE7atDq9DBZe3QWlchVa+11gD6gaYthqOY/N1BZzfsp9RmDovwv66q6oNNBnr4UG+Py9msnex1zvrrhnk7nmImXBgBRCrqZTsjDLJGwmKPonOOhb7fjpg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=NeZwEm/1KRVzduBRmFgNgutF607+1j9ieydRtDVGNns=;
+ b=UPPaQPlOh4REZluaNEt0fk/UpXAT2uNI42qqcJu05dACZqEj2zYPMlEtzdF0omV5VbUF+hg2/iDlXWxl/b4iR/i2DpbhQ85W0kdUzKdC0KtuuX6tilbBSGsMA72gtSEsPLKZOqVK0Cc4ab44f+OotaATsmrqUxbYhUCTdVWbqwjPqEPTq21melSslMSoT3phDheE8dbcQq7+QRrs+DBFuBlZeCIglntpUYWBudG7WmowUz/FP94sUfftrjYbirP1latiARpnDitXYopx9iEmDslZpgZblXbGdDkT6TaTRgnSyyFt5dfk45dfDE4punUhb/AWUAzx3bmil9fLujsIDA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
+ 12.22.5.235) smtp.rcpttodomain=linux.ibm.com smtp.mailfrom=nvidia.com;
+ dmarc=pass (p=reject sp=reject pct=100) action=none header.from=nvidia.com;
+ dkim=none (message not signed); arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=NeZwEm/1KRVzduBRmFgNgutF607+1j9ieydRtDVGNns=;
+ b=Jcoxtu8AINzcYTP4YZRB/JOfIbtfpKp3fwxGQkewz21PkpFLY2/bEdL4NnRaS17N1vTIF+F/c7Zkg2VghxGBP39V6/yqx/o/x45pez/hqCChEzRqgRSNGL7z6rVJaZ3LLgg0KYIUnmBR2ee7VLbBxMIna0gaCW+ib39xNJULVLOIIQIte6tskiEY633G/rBvOL7avX9vaz61bXIE2NsPmxNBeoHno4IbsCLJoI1oxoHx3VLJalgQLUODxIYh42RtTMzXJ64ONvA3YOHJD6EiVb5HYLyfPpNKVwd08RUrO75koFoOiKD27bL7IDwg+gYBGEumGVbchbHPYPGiH144xg==
+Received: from MW4PR03CA0229.namprd03.prod.outlook.com (2603:10b6:303:b9::24)
+ by BY5PR12MB4934.namprd12.prod.outlook.com (2603:10b6:a03:1db::18) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5395.15; Wed, 6 Jul
+ 2022 19:22:04 +0000
+Received: from CO1NAM11FT065.eop-nam11.prod.protection.outlook.com
+ (2603:10b6:303:b9::4) by MW4PR03CA0229.outlook.office365.com
+ (2603:10b6:303:b9::24) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5417.15 via Frontend
+ Transport; Wed, 6 Jul 2022 19:22:04 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 12.22.5.235)
+ smtp.mailfrom=nvidia.com; dkim=none (message not signed)
+ header.d=none;dmarc=pass action=none header.from=nvidia.com;
+Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
+ 12.22.5.235 as permitted sender) receiver=protection.outlook.com;
+ client-ip=12.22.5.235; helo=mail.nvidia.com; pr=C
+Received: from mail.nvidia.com (12.22.5.235) by
+ CO1NAM11FT065.mail.protection.outlook.com (10.13.174.62) with Microsoft SMTP
+ Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384) id
+ 15.20.5417.15 via Frontend Transport; Wed, 6 Jul 2022 19:22:03 +0000
+Received: from rnnvmail202.nvidia.com (10.129.68.7) by DRHQMAIL107.nvidia.com
+ (10.27.9.16) with Microsoft SMTP Server (TLS) id 15.0.1497.32; Wed, 6 Jul
+ 2022 19:22:03 +0000
+Received: from rnnvmail202.nvidia.com (10.129.68.7) by rnnvmail202.nvidia.com
+ (10.129.68.7) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.986.26; Wed, 6 Jul 2022
+ 12:22:02 -0700
+Received: from Asurada-Nvidia (10.127.8.14) by mail.nvidia.com (10.129.68.7)
+ with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.986.26 via Frontend
+ Transport; Wed, 6 Jul 2022 12:22:00 -0700
+Date:   Wed, 6 Jul 2022 12:21:59 -0700
+From:   Nicolin Chen <nicolinc@nvidia.com>
+To:     Jason Gunthorpe <jgg@nvidia.com>
+CC:     <kwankhede@nvidia.com>, <corbet@lwn.net>, <hca@linux.ibm.com>,
+        <gor@linux.ibm.com>, <agordeev@linux.ibm.com>,
+        <borntraeger@linux.ibm.com>, <svens@linux.ibm.com>,
+        <zhenyuw@linux.intel.com>, <zhi.a.wang@intel.com>,
+        <jani.nikula@linux.intel.com>, <joonas.lahtinen@linux.intel.com>,
+        <rodrigo.vivi@intel.com>, <tvrtko.ursulin@linux.intel.com>,
+        <airlied@linux.ie>, <daniel@ffwll.ch>, <farman@linux.ibm.com>,
+        <mjrosato@linux.ibm.com>, <pasic@linux.ibm.com>,
+        <vneethv@linux.ibm.com>, <oberpar@linux.ibm.com>,
+        <freude@linux.ibm.com>, <akrowiak@linux.ibm.com>,
+        <jjherne@linux.ibm.com>, <alex.williamson@redhat.com>,
+        <cohuck@redhat.com>, <kevin.tian@intel.com>, <hch@infradead.org>,
+        <jchrist@linux.ibm.com>, <kvm@vger.kernel.org>,
+        <linux-doc@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+        <linux-s390@vger.kernel.org>,
+        <intel-gvt-dev@lists.freedesktop.org>,
+        <intel-gfx@lists.freedesktop.org>,
+        <dri-devel@lists.freedesktop.org>
+Subject: Re: [RFT][PATCH v2 4/9] vfio: Pass in starting IOVA to
+ vfio_pin/unpin_pages API
+Message-ID: <YsXg10vCMBMaOM9V@Asurada-Nvidia>
+References: <20220706062759.24946-1-nicolinc@nvidia.com>
+ <20220706062759.24946-5-nicolinc@nvidia.com>
+ <20220706174923.GL693670@nvidia.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset="us-ascii"
 Content-Disposition: inline
-In-Reply-To: <20220630135747.26983-1-will@kernel.org>
-X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-        T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL
-        autolearn=ham autolearn_force=no version=3.4.6
+In-Reply-To: <20220706174923.GL693670@nvidia.com>
+X-EOPAttributedMessage: 0
+X-MS-PublicTrafficType: Email
+X-MS-Office365-Filtering-Correlation-Id: fb61a67b-efd5-4113-fb72-08da5f84cf0f
+X-MS-TrafficTypeDiagnostic: BY5PR12MB4934:EE_
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: e/pqWNJ20i8pZ3TizkQWtvkb8gVJcKQFxD7L758uvczAszrwUMFWUZ/iWzUaMW8aq5KlP0MmrTr0WRdb2QmkrmpwaZXbazQFqI+n5Fi+p8PAXOvbwR2zQDJ3AhXRQZpjhPOADXkCWCJVlyb2cnxHpHV5r/+S5Q96+q/OZjfGnCcD4+d6kOIpYFfY8tzv9bKf0Vpwecc4hcL7sVo7cf93KTnxtJWiENMFn3Zj6rxqKeZdomPT84aAGnMIsSH9Vyi0JeTJFr0n+WbtCFsMxLB6q/tObgY6Lb3qhCM+L9akGL/ovp1tom7kxKSL1v1nE0fpML0Yxf+tDepvN0IKnYPfowhrSXEwPO9ywrKXMQwy2yJd49/jOWywOk1kMGgjHCJoSm7x2t4guRhbyRROZoEnoeLrn3A81pvEqk5FJIOCw9dmLaDCmnqjw1tQUvBh1ewBCuTjzYYhNoJFwuhoCwIWRovp1tTFn6fCJnVnK3rz69agDn2C6Khkl5mvcpOiLFTX+gci3/YrhkM/gu47KWJxedRkhMRznSmKNnFpkQeWwbtgA9JHbne5QDu1hL37dBwhPEIaajueF8czj9dH1RQ60MGpXK7GahUTWIVeNRE0TEK6pU0h3HPI2Inb3l+rIe2yovOmjfOzkv+clKbkmtsbctoQQQVhuBOgP7hcJFGuWqaRI/Cm3T9b+M6kDW4kiiTbxfD6wQdRe6SReQR5saCSzWxcS6khZoBmm3xblXnmDofniXk2SV0YE/LzoMTCgDfZ8uLEWSOon+Giml96jBl37rglT4BNn+je/2us+eUrWxqnwRika5iRZw1OFxv8naukBmgeWNki1fNZLngX4E2XyvMfo1SbI68of0/oaV6JOlI=
+X-Forefront-Antispam-Report: CIP:12.22.5.235;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:InfoNoRecords;CAT:NONE;SFS:(13230016)(4636009)(39860400002)(136003)(376002)(396003)(346002)(36840700001)(40470700004)(46966006)(36860700001)(82310400005)(5660300002)(40460700003)(33716001)(478600001)(356005)(82740400003)(6862004)(86362001)(7406005)(41300700001)(7416002)(2906002)(81166007)(8936002)(316002)(4744005)(336012)(4326008)(6636002)(70586007)(70206006)(8676002)(47076005)(40480700001)(55016003)(54906003)(186003)(26005)(9686003)(426003)(36900700001);DIR:OUT;SFP:1101;
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 06 Jul 2022 19:22:03.9505
+ (UTC)
+X-MS-Exchange-CrossTenant-Network-Message-Id: fb61a67b-efd5-4113-fb72-08da5f84cf0f
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[12.22.5.235];Helo=[mail.nvidia.com]
+X-MS-Exchange-CrossTenant-AuthSource: CO1NAM11FT065.eop-nam11.prod.protection.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Anonymous
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: BY5PR12MB4934
+X-Spam-Status: No, score=-1.8 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FORGED_SPF_HELO,
+        RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_NONE,
+        T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Jun 30, 2022, Will Deacon wrote:
-> Hi everyone,
+On Wed, Jul 06, 2022 at 02:49:23PM -0300, Jason Gunthorpe wrote:
+> On Tue, Jul 05, 2022 at 11:27:54PM -0700, Nicolin Chen wrote:
 > 
-> This series has been extracted from the pKVM base support series (aka
-> "pKVM mega-patch") previously posted here:
+> >  These functions call back into the back-end IOMMU module by using the pin_pages
+> > diff --git a/drivers/gpu/drm/i915/gvt/kvmgt.c b/drivers/gpu/drm/i915/gvt/kvmgt.c
+> > index 8c67c9aba82d..ea6041fa48ac 100644
+> > --- a/drivers/gpu/drm/i915/gvt/kvmgt.c
+> > +++ b/drivers/gpu/drm/i915/gvt/kvmgt.c
+
+> > +	vfio_unpin_pages(&vgpu->vfio_device, gfn << PAGE_SHIFT,
+> > +			 roundup(size, PAGE_SIZE) / PAGE_SIZE);
 > 
->   https://lore.kernel.org/kvmarm/20220519134204.5379-1-will@kernel.org/
-> 
-> Unlike that more comprehensive series, this one is fairly fundamental
-> and does not introduce any new ABI commitments, leaving questions
-> involving the management of guest private memory and the creation of
-> protected VMs for future work. Instead, this series extends the pKVM EL2
-> code so that it can dynamically instantiate and manage VM shadow
-> structures without the host being able to access them directly. These
-> shadow structures consist of a shadow VM, a set of shadow vCPUs and the
-> stage-2 page-table and the pages used to hold them are returned to the
-> host when the VM is destroyed.
-> 
-> The last patch is marked as RFC because, although it plumbs in the
-> shadow state, it is woefully inefficient and copies to/from the host
-> state on every vCPU run. Without the last patch, the new structures are
-> unused but we move considerably closer to isolating guests from the
-> host.
+> These maths are DIV_ROUND_UP()
 
-...
-
->  arch/arm64/include/asm/kvm_asm.h              |   6 +-
->  arch/arm64/include/asm/kvm_host.h             |  65 +++
->  arch/arm64/include/asm/kvm_hyp.h              |   3 +
->  arch/arm64/include/asm/kvm_pgtable.h          |   8 +
->  arch/arm64/include/asm/kvm_pkvm.h             |  38 ++
->  arch/arm64/kernel/image-vars.h                |  15 -
->  arch/arm64/kvm/arm.c                          |  40 +-
->  arch/arm64/kvm/hyp/hyp-constants.c            |   3 +
->  arch/arm64/kvm/hyp/include/nvhe/gfp.h         |   6 +-
->  arch/arm64/kvm/hyp/include/nvhe/mem_protect.h |  19 +-
->  arch/arm64/kvm/hyp/include/nvhe/memory.h      |  26 +-
->  arch/arm64/kvm/hyp/include/nvhe/mm.h          |  18 +-
->  arch/arm64/kvm/hyp/include/nvhe/pkvm.h        |  70 +++
->  arch/arm64/kvm/hyp/include/nvhe/spinlock.h    |  10 +-
->  arch/arm64/kvm/hyp/nvhe/cache.S               |  11 +
->  arch/arm64/kvm/hyp/nvhe/hyp-main.c            | 105 +++-
->  arch/arm64/kvm/hyp/nvhe/hyp-smp.c             |   2 +
->  arch/arm64/kvm/hyp/nvhe/mem_protect.c         | 456 +++++++++++++++++-
->  arch/arm64/kvm/hyp/nvhe/mm.c                  | 136 +++++-
->  arch/arm64/kvm/hyp/nvhe/page_alloc.c          |  42 +-
->  arch/arm64/kvm/hyp/nvhe/pkvm.c                | 438 +++++++++++++++++
->  arch/arm64/kvm/hyp/nvhe/setup.c               |  96 ++--
->  arch/arm64/kvm/hyp/pgtable.c                  |   9 +
->  arch/arm64/kvm/mmu.c                          |  26 +
->  arch/arm64/kvm/pkvm.c                         | 121 ++++-
->  25 files changed, 1625 insertions(+), 144 deletions(-)
->  create mode 100644 arch/arm64/kvm/hyp/include/nvhe/pkvm.h
-
-The lack of documentation and the rather terse changelogs make this really hard
-to review for folks that aren't intimately familiar with pKVM.  I have a decent
-idea of the end goal of "shadowing", but that's mostly because of my involvement in
-similar x86 projects.  Nothing in the changelogs ever explains _why_ pKVM uses
-shadows.
-
-I put "shadowing" in quotes because if the unstrusted host is aware that the VM
-and vCPU it is manipulating aren't the "real" VMs/vCPUs, and there is an explicit API
-between the untrusted host and pKVM for creating/destroying VMs/vCPUs, then I would
-argue that it's not truly shadowing, especially if pKVM uses data/values verbatim
-and only verifies correctness/safety.  It's definitely a nit, but for future readers
-I think overloading "shadowing" could be confusing.
-
-And beyond the basics, IMO pKVM needs a more formal definition of exactly what
-guest state is protected/hidden from the untrusted host.  Peeking at the mega series,
-there are a huge pile of patches that result in "gradual reduction of EL2 trust in
-host data", but I couldn't any documentation that defines what that end result is.
+Actually I see two places in this file doing the same roundup.
+So I am going to add a prep patch in v3 to fix them separately.
