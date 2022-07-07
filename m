@@ -2,89 +2,166 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 4429356A86F
-	for <lists+kvm@lfdr.de>; Thu,  7 Jul 2022 18:41:37 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 41CA656A880
+	for <lists+kvm@lfdr.de>; Thu,  7 Jul 2022 18:45:30 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235872AbiGGQkP (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 7 Jul 2022 12:40:15 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50160 "EHLO
+        id S236204AbiGGQpD (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 7 Jul 2022 12:45:03 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55016 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235636AbiGGQkN (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 7 Jul 2022 12:40:13 -0400
-Received: from mail-pf1-x433.google.com (mail-pf1-x433.google.com [IPv6:2607:f8b0:4864:20::433])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A535B6323
-        for <kvm@vger.kernel.org>; Thu,  7 Jul 2022 09:40:12 -0700 (PDT)
-Received: by mail-pf1-x433.google.com with SMTP id w185so16775807pfb.4
-        for <kvm@vger.kernel.org>; Thu, 07 Jul 2022 09:40:12 -0700 (PDT)
+        with ESMTP id S235804AbiGGQpA (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 7 Jul 2022 12:45:00 -0400
+Received: from smtp-fw-80007.amazon.com (smtp-fw-80007.amazon.com [99.78.197.218])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C13F723BC7
+        for <kvm@vger.kernel.org>; Thu,  7 Jul 2022 09:44:58 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=yD9JOmzp/dFDreTYsU04JyTwToOKdMohWmxTbaY6njU=;
-        b=DKgr4DUtPFkc2YDiqeIjerue3AdI7QvRfGK/IvbHd5WNTyaO9jlMo3t7VDNIsgycBd
-         t6lQ87zUS2Pl9GJwRhjoGWGceAce6eVnnyxitqo+Eu/Xz6OmKcSmrDovq2/kK3RmsXdV
-         4Zfim6Y0ZksMG/veV2zgbBBog0DqiGhbWO+r9Zf1/uquXY+OPCTFiD69FwWkhS4iQPWc
-         isKhI1Ls+LByweIbakofzyOp7saougvp7qWNGpDu/aFrNFfG2Q7M4lH04daUChzK80Hu
-         Nb4IOaA1dNWe/SQrp94mkgbyfb8qGJO4J5uEYBdK49Z06hXbDSRWKRiMd89ea36xMfa6
-         FH2A==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=yD9JOmzp/dFDreTYsU04JyTwToOKdMohWmxTbaY6njU=;
-        b=YM+QpPCEdVJ56C2tFj5Em+SYrDIXw180AoMPgtvQYsRIqnZeLtjjeXhGj7DMslfWD3
-         qH/h42tJXcbYIlskKMQqSP+1MTd4aiqhxxytEcX9Kq1288Fo6UaO1PFxZXDw1kVvGFHK
-         rboKCdi1BwGZn9ymAEQLbA8hi8Dn7ituxbbL7d4HKcCYV976ONaBGipIabZyj3d1JEKT
-         VlP8j+SY440F2MEuPmbr6G7X2DIzjBlSA7ncPtdYfNobgY7k/fL0CdLzsvRqCWCR+FWh
-         NDMWV7J8d5GX2NprorHqBJPRW/p1ZQ8m7wEh9hDB0cwVB3RKQ8ukhCrRTTdHxRDtaEpk
-         UxDg==
-X-Gm-Message-State: AJIora97XBgtaszPRpqukzaiHtxU09hHQFjVLHibPS1AQbMIc7p+nye8
-        892Dy6AgWEYzS4wL2X4HMS04Zw==
-X-Google-Smtp-Source: AGRyM1uRun8/gyQJJismerB54U/dXNI8KUubj/l+07lYiNiUSieBPfgfo3nCJCkX+KWvZ5rnxkhc/Q==
-X-Received: by 2002:a17:90b:4f4e:b0:1ef:ab40:b345 with SMTP id pj14-20020a17090b4f4e00b001efab40b345mr6235651pjb.226.1657212012079;
-        Thu, 07 Jul 2022 09:40:12 -0700 (PDT)
-Received: from google.com (123.65.230.35.bc.googleusercontent.com. [35.230.65.123])
-        by smtp.gmail.com with ESMTPSA id oa1-20020a17090b1bc100b001ec84b0f199sm3505764pjb.1.2022.07.07.09.40.11
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 07 Jul 2022 09:40:11 -0700 (PDT)
-Date:   Thu, 7 Jul 2022 16:40:07 +0000
-From:   Sean Christopherson <seanjc@google.com>
-To:     Vitaly Kuznetsov <vkuznets@redhat.com>
-Cc:     kvm@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>,
-        Anirudh Rayabharam <anrayabh@linux.microsoft.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Maxim Levitsky <mlevitsk@redhat.com>,
-        linux-hyperv@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v2 06/28] KVM: nVMX: Introduce
- KVM_CAP_HYPERV_ENLIGHTENED_VMCS2
-Message-ID: <YscMZ2eU92fkDowB@google.com>
-References: <20220629150625.238286-1-vkuznets@redhat.com>
- <20220629150625.238286-7-vkuznets@redhat.com>
- <YsYAPL1UUKJB3/MJ@google.com>
- <87o7y1qm5t.fsf@redhat.com>
- <YscHNur0OsViyyDJ@google.com>
+  d=amazon.de; i=@amazon.de; q=dns/txt; s=amazon201209;
+  t=1657212298; x=1688748298;
+  h=from:to:cc:subject:date:message-id:in-reply-to:
+   references:mime-version:content-transfer-encoding;
+  bh=n5aFrbgZVOv9YibM8gxKX0A6aIY0of/HyM6iRyJ+n0M=;
+  b=V4BTNX7DbE4T9NAk25D4SN+3An4yF5f3wxpEEn6CaYyVr77vTBIaUtY0
+   Ehu8ddFWKo+TzN0DtpP02jyWte5uOqEhmyEaJvmr5mFtmWa0Bp7GcOQmx
+   HQGUti1S16OUjU6LknDKOItNPMtOpecagEJ1DkwCt6qklwY5jgKGfRvIT
+   0=;
+X-IronPort-AV: E=Sophos;i="5.92,253,1650931200"; 
+   d="scan'208";a="105919799"
+Received: from pdx4-co-svc-p1-lb2-vlan3.amazon.com (HELO email-inbound-relay-iad-1a-c92fe759.us-east-1.amazon.com) ([10.25.36.214])
+  by smtp-border-fw-80007.pdx80.corp.amazon.com with ESMTP; 07 Jul 2022 16:44:38 +0000
+Received: from EX13D18EUC002.ant.amazon.com (iad12-ws-svc-p26-lb9-vlan2.iad.amazon.com [10.40.163.34])
+        by email-inbound-relay-iad-1a-c92fe759.us-east-1.amazon.com (Postfix) with ESMTPS id 2C5AAC0298;
+        Thu,  7 Jul 2022 16:44:35 +0000 (UTC)
+Received: from uff0320b8bd5a51.ant.amazon.com (10.43.161.187) by
+ EX13D18EUC002.ant.amazon.com (10.43.164.50) with Microsoft SMTP Server (TLS)
+ id 15.0.1497.36; Thu, 7 Jul 2022 16:44:29 +0000
+From:   Simon Veith <sveith@amazon.de>
+To:     <dwmw2@infradead.org>
+CC:     <dff@amazon.com>, <jmattson@google.com>, <joro@8bytes.org>,
+        <kvm@vger.kernel.org>, <oupton@google.com>, <pbonzini@redhat.com>,
+        <seanjc@google.com>, <sveith@amazon.de>, <tglx@linutronix.de>,
+        <vkuznets@redhat.com>, <wanpengli@tencent.com>,
+        David Woodhouse <dwmw@amazon.co.uk>
+Subject: [PATCH 1/2] KVM: x86: add KVM clock time reference arg to kvm_write_tsc()
+Date:   Thu, 7 Jul 2022 18:43:25 +0200
+Message-ID: <20220707164326.394601-1-sveith@amazon.de>
+X-Mailer: git-send-email 2.25.1
+In-Reply-To: <0e2a26715dc3c1fb383af2f4ced6c9e1cf40b95b.camel@infradead.org>
+References: <0e2a26715dc3c1fb383af2f4ced6c9e1cf40b95b.camel@infradead.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <YscHNur0OsViyyDJ@google.com>
-X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-        T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL
-        autolearn=unavailable autolearn_force=no version=3.4.6
+X-Originating-IP: [10.43.161.187]
+X-ClientProxiedBy: EX13D46UWC001.ant.amazon.com (10.43.162.126) To
+ EX13D18EUC002.ant.amazon.com (10.43.164.50)
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
+X-Spam-Status: No, score=-5.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
+        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Jul 07, 2022, Sean Christopherson wrote:
-> On Thu, Jul 07, 2022, Vitaly Kuznetsov wrote:
-> > luckily, Microsoft added a new PV CPUID feature bit inidicating the support
-> > for the new features in eVMCSv1 so KVM can just observe whether the bit was
-> > set by VMM or not and filter accordingly.
-> 
-> If there's a CPUID feature bit, why does KVM need to invent its own revision scheme?
+The Time Stamp Counter (TSC) value register can be set to an absolute
+value using the KVM_SET_MSRS ioctl, which calls kvm_synchronize_tsc()
+internally.
 
-Doh, just saw your other mail.
+Since this is a per-vCPU register, and vCPUs are often managed by
+separate threads, setting a uniform TSC value across all vCPUs is
+challenging: After live migration, for example, the TSC value may need
+to be adjusted to account for the migration downtime. Ideally, we would
+want each vCPU to be adjusted by the same offset; but if we compute the
+offset centrally, the TSC value may become out of date due to scheduling
+delays by the time that each vCPU thread gets around to issuing
+KVM_SET_MSRS.
+
+In preparation for the next patch, this change adds an optional, KVM
+clock based time reference argument to kvm_synchronize_tsc(). This
+argument, if present, is understood to mean "the TSC value being written
+was valid at this corresponding KVM clock time point".
+
+kvm_synchronize_tsc() will then use this clock reference to adjust the
+TSC value being written for any delays that have been incurred since the
+provided TSC value was valid.
+
+Co-developed-by: David Woodhouse <dwmw@amazon.co.uk>
+Signed-off-by: Simon Veith <sveith@amazon.de>
+---
+ arch/x86/kvm/x86.c | 22 +++++++++++++++++-----
+ 1 file changed, 17 insertions(+), 5 deletions(-)
+
+diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+index 1910e1e78b15..a44d083f1bf9 100644
+--- a/arch/x86/kvm/x86.c
++++ b/arch/x86/kvm/x86.c
+@@ -2629,7 +2629,7 @@ static void __kvm_synchronize_tsc(struct kvm_vcpu *vcpu, u64 offset, u64 tsc,
+ 	kvm_track_tsc_matching(vcpu);
+ }
+ 
+-static void kvm_synchronize_tsc(struct kvm_vcpu *vcpu, u64 data)
++static void kvm_synchronize_tsc(struct kvm_vcpu *vcpu, u64 data, u64 *kvm_ns)
+ {
+ 	struct kvm *kvm = vcpu->kvm;
+ 	u64 offset, ns, elapsed;
+@@ -2638,12 +2638,24 @@ static void kvm_synchronize_tsc(struct kvm_vcpu *vcpu, u64 data)
+ 	bool synchronizing = false;
+ 
+ 	raw_spin_lock_irqsave(&kvm->arch.tsc_write_lock, flags);
+-	offset = kvm_compute_l1_tsc_offset(vcpu, data);
+ 	ns = get_kvmclock_base_ns();
++
++	if (kvm_ns) {
++		/*
++		 * We have been provided a KVM clock reference time point at
++		 * which this TSC value was correct.
++		 * Use this time point to compensate for any delays that were
++		 * incurred since that TSC value was valid.
++		 */
++		s64 delta_ns = ns + vcpu->kvm->arch.kvmclock_offset - *kvm_ns;
++		data += nsec_to_cycles(vcpu, (u64)delta_ns);
++	}
++
++	offset = kvm_compute_l1_tsc_offset(vcpu, data);
+ 	elapsed = ns - kvm->arch.last_tsc_nsec;
+ 
+ 	if (vcpu->arch.virtual_tsc_khz) {
+-		if (data == 0) {
++		if (data == 0 && !kvm_ns) {
+ 			/*
+ 			 * detection of vcpu initialization -- need to sync
+ 			 * with other vCPUs. This particularly helps to keep
+@@ -3581,7 +3593,7 @@ int kvm_set_msr_common(struct kvm_vcpu *vcpu, struct msr_data *msr_info)
+ 		break;
+ 	case MSR_IA32_TSC:
+ 		if (msr_info->host_initiated) {
+-			kvm_synchronize_tsc(vcpu, data);
++			kvm_synchronize_tsc(vcpu, data, NULL);
+ 		} else {
+ 			u64 adj = kvm_compute_l1_tsc_offset(vcpu, data) - vcpu->arch.l1_tsc_offset;
+ 			adjust_tsc_offset_guest(vcpu, adj);
+@@ -11392,7 +11404,7 @@ void kvm_arch_vcpu_postcreate(struct kvm_vcpu *vcpu)
+ 	if (mutex_lock_killable(&vcpu->mutex))
+ 		return;
+ 	vcpu_load(vcpu);
+-	kvm_synchronize_tsc(vcpu, 0);
++	kvm_synchronize_tsc(vcpu, 0, NULL);
+ 	vcpu_put(vcpu);
+ 
+ 	/* poll control enabled by default */
+-- 
+2.25.1
+
+
+
+
+Amazon Development Center Germany GmbH
+Krausenstr. 38
+10117 Berlin
+Geschaeftsfuehrung: Christian Schlaeger, Jonathan Weiss
+Eingetragen am Amtsgericht Charlottenburg unter HRB 149173 B
+Sitz: Berlin
+Ust-ID: DE 289 237 879
+
+
+
