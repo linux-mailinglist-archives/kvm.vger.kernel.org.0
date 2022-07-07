@@ -2,131 +2,143 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id D9C3F569E45
-	for <lists+kvm@lfdr.de>; Thu,  7 Jul 2022 11:06:57 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id A06A7569E68
+	for <lists+kvm@lfdr.de>; Thu,  7 Jul 2022 11:17:20 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234768AbiGGJGz (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 7 Jul 2022 05:06:55 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50076 "EHLO
+        id S235136AbiGGJRJ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 7 Jul 2022 05:17:09 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57920 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234118AbiGGJGy (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 7 Jul 2022 05:06:54 -0400
-Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E5F1E25C54;
-        Thu,  7 Jul 2022 02:06:53 -0700 (PDT)
-Received: from pps.filterd (m0127361.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.17.1.5/8.17.1.5) with ESMTP id 2677DUGm030511;
-        Thu, 7 Jul 2022 09:06:51 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
- mime-version : subject : to : cc : references : from : in-reply-to :
- content-type : content-transfer-encoding; s=pp1;
- bh=kgjOMPa6yjbwXLxBTAuadJII4LMA9XeBw81yHIcCvLU=;
- b=j9nzWRfXC8ksk64ANKkeeKtDbP7d/nJ0AJbzToUYhtAhaB7QbSd6k/kJcecI1/r7Q8c6
- Ml915/7lIGE1j9LOL93VmARr8L/2olCifAAsMCxSAfak9VdPOu6QhN64rQ1YFO1oLhv+
- NcmEdeoywIRYULn3Z+qpEP1UABd4i2h472xDDm5SYqYZFyyP05OQjpOaEfCsuSR6QJg2
- g/al2ZWFoWL/cTY5G6WbUv7JD7DLiSwSMql1jabHAtR+cINQNdyKCBlauWpCGSzSfbb4
- nkosibNJDY8Om1FZN6XBmJWIDdLkaD0pJo5sLeN+xOSHAIHdVPSjlI2xeOhcLZkpr/QV uw== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3h5twfax1q-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 07 Jul 2022 09:06:51 +0000
-Received: from m0127361.ppops.net (m0127361.ppops.net [127.0.0.1])
-        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 2677aHSB040599;
-        Thu, 7 Jul 2022 09:06:51 GMT
-Received: from ppma03ams.nl.ibm.com (62.31.33a9.ip4.static.sl-reverse.com [169.51.49.98])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3h5twfax0y-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 07 Jul 2022 09:06:50 +0000
-Received: from pps.filterd (ppma03ams.nl.ibm.com [127.0.0.1])
-        by ppma03ams.nl.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 26795vGx003843;
-        Thu, 7 Jul 2022 09:06:49 GMT
-Received: from b06cxnps4076.portsmouth.uk.ibm.com (d06relay13.portsmouth.uk.ibm.com [9.149.109.198])
-        by ppma03ams.nl.ibm.com with ESMTP id 3h4ujsjass-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 07 Jul 2022 09:06:49 +0000
-Received: from d06av21.portsmouth.uk.ibm.com (d06av21.portsmouth.uk.ibm.com [9.149.105.232])
-        by b06cxnps4076.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 26796j8v20709634
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Thu, 7 Jul 2022 09:06:46 GMT
-Received: from d06av21.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id DE6A35204F;
-        Thu,  7 Jul 2022 09:06:45 +0000 (GMT)
-Received: from [9.171.47.29] (unknown [9.171.47.29])
-        by d06av21.portsmouth.uk.ibm.com (Postfix) with ESMTP id 698AC5204E;
-        Thu,  7 Jul 2022 09:06:45 +0000 (GMT)
-Message-ID: <e1ead3e4-9e7d-f026-485b-157d7dc004d3@linux.ibm.com>
-Date:   Thu, 7 Jul 2022 11:06:45 +0200
+        with ESMTP id S229827AbiGGJRI (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 7 Jul 2022 05:17:08 -0400
+Received: from mail-lj1-x22a.google.com (mail-lj1-x22a.google.com [IPv6:2a00:1450:4864:20::22a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 773672CDC8
+        for <kvm@vger.kernel.org>; Thu,  7 Jul 2022 02:17:07 -0700 (PDT)
+Received: by mail-lj1-x22a.google.com with SMTP id q8so9007512ljj.10
+        for <kvm@vger.kernel.org>; Thu, 07 Jul 2022 02:17:07 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=semihalf.com; s=google;
+        h=subject:to:cc:references:from:message-id:date:user-agent
+         :mime-version:in-reply-to:content-language:content-transfer-encoding;
+        bh=/fAHdbM1uPlELc6a0eYo+FaRMYkae/BwCdgI2iati1g=;
+        b=laDsms3/f5c4LWDo23dohXuDJXmDridYbbdWFSZi2GrVaYKuzSF6L+GXvr/04SGnGa
+         ifUwdautGuTaCbWcAvU1d9y+Sgi1yhvTlBhstyVmPaWsa1cBerJYL6rnae7D6g+iViin
+         dVaAcOYN1JKIx0fir3kdfvBeMuN1mE86juubxEwnl+EGmsnm+HY3/skhbAqNsiU7j0MU
+         sAmDGOlr4RB7g792HgVf6A9m8ZY+JTPO80WPeveHQ3VtWogr4hkLKQ8oWcv9d/XR6iv1
+         AV270b6ADiZPT829HkmNJNI/XQkTddIhxh4buyFNET588v/XFEJ7bDwNNVf+EZia5alB
+         mL/g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=/fAHdbM1uPlELc6a0eYo+FaRMYkae/BwCdgI2iati1g=;
+        b=vE8wPDHQXPNDbnwUfYN43feruwiEY4JKwFL7oQhAiRYRdC0Cx8QucqnyWOh/WGkphX
+         Crx6paWMxYyNLpybOHFin4A7tDpQARNsO4dKZjUigNG5wOHptnIIhBCSITDdfNBrlvRp
+         eW5j5eh6M6D+8hmUBkvmdXepm5O1G3pCGUTLYp2TWZu1XPan6DhPa2fjn2frZKeWfELc
+         HknkzbhRw2CcCxXGu9fWGhPQoZi+AHg6UuOH0470rrgznJiNbBiFy6inUeA3EmrqLpQs
+         DVin9lHT08M5QiUjP9JGSrTVjClSsYGGvX0qCK9VZPfo0zrOjUn4Lk8OYnobKQ982+IC
+         YbeA==
+X-Gm-Message-State: AJIora+1FFwESgZvw37kXB1ctillcaOixrrjhqkXptE74PTRCRzJ8Rbb
+        E5GKEBsuiBKakvpoaBD92JQEYA==
+X-Google-Smtp-Source: AGRyM1uZvDJ/nlVP2F5avaYgvrkZjqCSwxdGzvNC9k1T9LstGmmQl4v1vBaNGTEHn7eTbnKroHXqVg==
+X-Received: by 2002:a2e:9d97:0:b0:25d:3809:b295 with SMTP id c23-20020a2e9d97000000b0025d3809b295mr7327648ljj.172.1657185425838;
+        Thu, 07 Jul 2022 02:17:05 -0700 (PDT)
+Received: from ?IPv6:2a02:a31b:33d:9c00:463a:87e3:44fc:2b2f? ([2a02:a31b:33d:9c00:463a:87e3:44fc:2b2f])
+        by smtp.gmail.com with ESMTPSA id c18-20020ac25f72000000b00486d8a63c07sm669350lfc.121.2022.07.07.02.15.34
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 07 Jul 2022 02:15:53 -0700 (PDT)
+Subject: Re: Add vfio-platform support for ONESHOT irq forwarding?
+To:     eric.auger@redhat.com, Micah Morton <mortonm@chromium.org>
+Cc:     Alex Williamson <alex.williamson@redhat.com>, kvm@vger.kernel.org,
+        Sean Christopherson <seanjc@google.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Rong L Liu <rong.l.liu@intel.com>,
+        Tomasz Nowicki <tn@semihalf.com>,
+        Grzegorz Jaszczyk <jaz@semihalf.com>,
+        Dmitry Torokhov <dtor@google.com>
+References: <CAJ-EccMWBJAzwECcJtFh9kXwtVVezWv_Zd0vcqPMPwKk=XFqYQ@mail.gmail.com>
+ <20210125133611.703c4b90@omen.home.shazbot.org>
+ <c57d94ca-5674-7aa7-938a-aa6ec9db2830@redhat.com>
+ <CAJ-EccPf0+1N_dhNTGctJ7gT2GUmsQnt==CXYKSA-xwMvY5NLg@mail.gmail.com>
+ <8ab9378e-1eb3-3cf3-a922-1c63bada6fd8@redhat.com>
+ <CAJ-EccP=ZhCqjW3Pb06X0N=YCjexURzzxNjoN_FEx3mcazK3Cw@mail.gmail.com>
+ <CAJ-EccNAHGHZjYvT8LV9h8oWvVe+YvcD0dwF7e5grxymhi5Pug@mail.gmail.com>
+ <99d0e32c-e4eb-5223-a342-c5178a53b692@redhat.com>
+ <31420943-8c5f-125c-a5ee-d2fde2700083@semihalf.com>
+ <0a974041-0c61-e98b-d335-76f94618b5a7@redhat.com>
+From:   Dmytro Maluka <dmy@semihalf.com>
+Message-ID: <d6f3205c-6229-3b58-cdc2-a5d0f6cfb98f@semihalf.com>
+Date:   Thu, 7 Jul 2022 11:15:33 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.13.0
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.10.0
-Subject: Re: [PATCH v3 00/11] s390/vfio-ccw rework
+In-Reply-To: <0a974041-0c61-e98b-d335-76f94618b5a7@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-US
-To:     Jason Gunthorpe <jgg@nvidia.com>
-Cc:     Eric Farman <farman@linux.ibm.com>,
-        Matthew Rosato <mjrosato@linux.ibm.com>,
-        Alex Williamson <alex.williamson@redhat.com>,
-        Cornelia Huck <cohuck@redhat.com>,
-        Halil Pasic <pasic@linux.ibm.com>, kvm@vger.kernel.org,
-        linux-s390@vger.kernel.org, Kirti Wankhede <kwankhede@nvidia.com>,
-        Paolo Bonzini <pbonzini@redhat.com>
-References: <20220630203647.2529815-1-farman@linux.ibm.com>
- <20220630234411.GM693670@nvidia.com>
- <e8f1748eb1bae3e90521b0d5d4471266f4ea7c98.camel@linux.ibm.com>
- <f21307d9-6490-c39d-cff0-2a50c5f1cb35@linux.ibm.com>
- <20220704112511.GO693670@nvidia.com>
-From:   Christian Borntraeger <borntraeger@linux.ibm.com>
-In-Reply-To: <20220704112511.GO693670@nvidia.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-ORIG-GUID: dnid-XhmVeYI25EmBWvlJInu2VSmR5dU
-X-Proofpoint-GUID: NAb9ZlT0ubbNZIX2xwoGHF-gXYWTE9Wq
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.205,Aquarius:18.0.883,Hydra:6.0.517,FMLib:17.11.122.1
- definitions=2022-07-07_06,2022-06-28_01,2022-06-22_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxlogscore=999
- suspectscore=0 clxscore=1015 phishscore=0 bulkscore=0 mlxscore=0
- spamscore=0 priorityscore=1501 adultscore=0 malwarescore=0 impostorscore=0
- lowpriorityscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2206140000 definitions=main-2207070036
-X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,
-        SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no
-        version=3.4.6
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_DNSWL_NONE,
+        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+Hi Eric,
 
-
-Am 04.07.22 um 13:25 schrieb Jason Gunthorpe:
-> On Fri, Jul 01, 2022 at 02:48:25PM +0200, Christian Borntraeger wrote:
-> 
->> Am 01.07.22 um 14:40 schrieb Eric Farman:
->>> On Thu, 2022-06-30 at 20:44 -0300, Jason Gunthorpe wrote:
->>>> On Thu, Jun 30, 2022 at 10:36:36PM +0200, Eric Farman wrote:
->>>>> Here's an updated pass through the first chunk of vfio-ccw rework.
->>>>>
->>>>> As with v2, this is all internal to vfio-ccw, with the exception of
->>>>> the removal of mdev_uuid from include/linux/mdev.h in patch 1.
->>>>>
->>>>> There is one conflict with the vfio-next branch [2], on patch 6.
->>>>
->>>> What tree do you plan to take it through?
->>>
->>> Don't know. I know Matt's PCI series has a conflict with this same
->>> patch also, but I haven't seen resolution to that. @Christian,
->>> thoughts?
+On 7/7/22 10:25 AM, Eric Auger wrote:
+>> Again, this doesn't seem to be true. Just as explained in my above
+>> reply to Alex, the guest deactivates (EOI) the vIRQ already after the
+>> completion of the vIRQ hardirq handler, not the vIRQ thread.
 >>
->>
->> What about me making a topic branch that it being merged by Alex AND the KVM tree
->> so that each of the conflicts can be solved in that way?
-> 
-> It make sense, I would base it on Alex's VFIO tree just to avoid
-> some conflicts in the first place. Matt can rebase on this, so lets
-> get things going?
+>> So VFIO unmask handler gets called too early, before the interrupt
+>> gets serviced and acked in the vIRQ thread.
+> Fair enough, on vIRQ hardirq handler the physical IRQ gets unmasked.
+> This event occurs on guest EOI, which triggers the resamplefd. But what
+> is the state of the vIRQ? Isn't it stil masked until the vIRQ thread
+> completes, preventing the physical IRQ from being propagated to the guest?
 
-So yes. Lets rebase on VFIO-next. Ideally Alex would then directly pick Eric
-patches.
+Even if vIRQ is still masked by the time when 
+vfio_automasked_irq_handler() signals the eventfd (which in itself is 
+not guaranteed, I guess), I believe KVM is buffering this event, so 
+after the vIRQ is unmasked, this new IRQ will be injected to the guest 
+anyway.
+
+>> It seems the obvious fix is to postpone sending irq ack notifications
+>> in KVM from EOI to unmask (for oneshot interrupts only). Luckily, we
+>> don't need to provide KVM with the info that the given interrupt is
+>> oneshot. KVM can just find it out from the fact that the interrupt is
+>> masked at the time of EOI.
+> you mean the vIRQ right?
+
+Right.
+
+> Before going further and we invest more time in that thread, please
+> could you give us additional context info and confidence
+> in/understanding of the stakes. This thread is from Jan 2021 and was
+> discontinued for a while. vfio-platform currently only is enabled on ARM
+> and maintained for very few devices which properly implement reset
+> callbacks and duly use an underlying IOMMU.
+
+Sure. We are not really using vfio-platform for the devices we are 
+concerned with, since those are not DMA capable devices, and some of 
+them are not really platform devices but I2C or SPI devices. Instead we 
+are using (hopefully temporarily) Micah's module for forwarding 
+arbitrary IRQs [1][2] which mostly reimplements the VFIO irq forwarding 
+mechanism.
+
+Also with a few simple hacks I managed to use vfio-platform for the same 
+thing (just as a PoC) and confirmed, unsurprisingly, that the problems 
+with oneshot interrupts are observed with vfio-platform as well.
+
+[1] 
+https://chromium.googlesource.com/chromiumos/third_party/kernel/+/refs/heads/chromeos-5.10-manatee/virt/lib/platirqforward.c
+
+[2] 
+https://lkml.kernel.org/kvm/CAJ-EccPU8KpU96PM2PtroLjdNVDbvnxwKwWJr2B+RBKuXEr7Vw@mail.gmail.com/T/
+
+Thanks,
+Dmytro
