@@ -2,104 +2,138 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 6C0FD56ABDC
-	for <lists+kvm@lfdr.de>; Thu,  7 Jul 2022 21:30:31 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 52BB056ABEB
+	for <lists+kvm@lfdr.de>; Thu,  7 Jul 2022 21:38:11 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235965AbiGGTaa (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 7 Jul 2022 15:30:30 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47136 "EHLO
+        id S236055AbiGGTiJ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 7 Jul 2022 15:38:09 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51150 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S236179AbiGGTa0 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 7 Jul 2022 15:30:26 -0400
-Received: from mail-pg1-x52c.google.com (mail-pg1-x52c.google.com [IPv6:2607:f8b0:4864:20::52c])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 31DC926AC7
-        for <kvm@vger.kernel.org>; Thu,  7 Jul 2022 12:30:26 -0700 (PDT)
-Received: by mail-pg1-x52c.google.com with SMTP id s27so20248781pga.13
-        for <kvm@vger.kernel.org>; Thu, 07 Jul 2022 12:30:26 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=7X+8JGW1uNiGyJFuWhjxVYDvmw+5zjyFaO0LL98jJNs=;
-        b=f3jXwLVz2z3coCJPhg3sCWYTft0tpmBGhJfNSzx9uubtpEK5/zCnpoceqqn+2baexp
-         UOG/qaD/IdGjB5RFbgMAsXUmDxM5p50x32BaxHkCasLSuA6G90ibOyNyL20B4lP7y2mn
-         VtJNn2LWPhW+SHv+sp0CQVNP6PVZatmtJ8urY/tzTCb3Tj7KJt+zUPY/G64BKNgDG6ef
-         1T0QitOGrMhzoC4XOhuaJhrH6cA0qAi/BOcr2hvXzngEWFzYbPqaojK6z9G3ZA+5pF68
-         OOmPZ3YSKwU4uEPAC0ePkXef1HBj5UMyDcy07XWQB3+LPDRqQS2WompLZYaIu6H7T456
-         wNZg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=7X+8JGW1uNiGyJFuWhjxVYDvmw+5zjyFaO0LL98jJNs=;
-        b=t4G06LqM0f0945Slvubtx0Rf6fFDYOk6djfnfGptfz4Vwc2VMN4MSHpyDVn1Cp4CUL
-         NuSx8vsColfyvdRjvWZhXPTTImOW+sMLcTdTXNA5SoF66rSZ5GiLfK6+hHaR3RVtID05
-         ZFpNQnAKCA/d2h20fmi6YLOdImyqzNY6xneimYTUxgjOzm5kDsXM9ysMpxxnWuzSOwJU
-         aSVMS5mc2ImCinvyEtmjaTLERvH5AGwBD+M64Gag0HzZoihoBHE4ypClZsw7iiV35DDY
-         rk6Q0MELe2HqvCplYxeQrJ2YQBfZFW4rCv4liGMLrGyIheimwwxvFhv+POeLHMlErJ1G
-         lMxg==
-X-Gm-Message-State: AJIora/HMd1DAhkYuvVTcQ4Kv1V/O2i2XF7febKz+iWUsozMGN9ldrjg
-        P7SgOGJDId2TQ4/bIiCiy2HA1A==
-X-Google-Smtp-Source: AGRyM1ugIK1dp8lBkhHZvJzvmmKPHEtOABiIXVxNedJp6c66Y2uykzFwihBhwKUnh8y/mnoaPSqUUQ==
-X-Received: by 2002:a17:903:20f:b0:16b:d01c:d689 with SMTP id r15-20020a170903020f00b0016bd01cd689mr32034998plh.92.1657222225556;
-        Thu, 07 Jul 2022 12:30:25 -0700 (PDT)
-Received: from google.com (123.65.230.35.bc.googleusercontent.com. [35.230.65.123])
-        by smtp.gmail.com with ESMTPSA id x124-20020a626382000000b00525231e15ccsm27409785pfb.113.2022.07.07.12.30.24
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 07 Jul 2022 12:30:25 -0700 (PDT)
-Date:   Thu, 7 Jul 2022 19:30:21 +0000
-From:   Sean Christopherson <seanjc@google.com>
-To:     Vitaly Kuznetsov <vkuznets@redhat.com>
-Cc:     Jim Mattson <jmattson@google.com>, kvm@vger.kernel.org,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Anirudh Rayabharam <anrayabh@linux.microsoft.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Maxim Levitsky <mlevitsk@redhat.com>,
-        linux-hyperv@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v2 22/28] KVM: VMX: Clear controls obsoleted by EPT at
- runtime, not setup
-Message-ID: <Ysc0TZaKxweEaelb@google.com>
-References: <20220629150625.238286-1-vkuznets@redhat.com>
- <20220629150625.238286-23-vkuznets@redhat.com>
- <CALMp9eRA0v6BK6KG81ZE_iLKF6VNXxemN=E4gAE4AM-V4gkdHQ@mail.gmail.com>
- <87wncpotqv.fsf@redhat.com>
+        with ESMTP id S231875AbiGGTiE (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 7 Jul 2022 15:38:04 -0400
+Received: from mga12.intel.com (mga12.intel.com [192.55.52.136])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6009C2A70A;
+        Thu,  7 Jul 2022 12:38:03 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1657222683; x=1688758683;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=aHrPmGRc5fy9j72/df86+pvlt4cuHptP8n9fnKrcDVY=;
+  b=I9Jx71FUfZp7ZPZVy8e4HOgkh1QYJv6IHdiILs42ip2nj2qRbtXIFdeu
+   iIA1iFynKXJ4+3cFdoPC7k9/U+UOQ2zpW0TYSn29gT6gcYJsPGgcbyVcL
+   fXnx7BP74IoZaI60psnQl9f9Q9wtBWRiN2IXShTPV0CqhljI0Nbg6fFUi
+   t0FHN6fngR7eJebboqfrVoyEu9n3oM26tdGKSb0Q+IdUlB9IORKZ/xxix
+   Km+iZPiGIOIHkeL92Hk7dvC3Pghhzov8w/TTRH8CgxPQW3s7qPHd8Vv/5
+   2GLSRJyN/DHOUOpwjJTioZhjlTodrSaUSaMAUt38ZOnwsA/mwLLse4oWO
+   g==;
+X-IronPort-AV: E=McAfee;i="6400,9594,10401"; a="263889050"
+X-IronPort-AV: E=Sophos;i="5.92,253,1650956400"; 
+   d="scan'208";a="263889050"
+Received: from orsmga002.jf.intel.com ([10.7.209.21])
+  by fmsmga106.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 07 Jul 2022 12:38:02 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.92,253,1650956400"; 
+   d="scan'208";a="593857176"
+Received: from lkp-server01.sh.intel.com (HELO 68b931ab7ac1) ([10.239.97.150])
+  by orsmga002.jf.intel.com with ESMTP; 07 Jul 2022 12:37:59 -0700
+Received: from kbuild by 68b931ab7ac1 with local (Exim 4.95)
+        (envelope-from <lkp@intel.com>)
+        id 1o9XK3-000MNO-1h;
+        Thu, 07 Jul 2022 19:37:59 +0000
+Date:   Fri, 8 Jul 2022 03:37:32 +0800
+From:   kernel test robot <lkp@intel.com>
+To:     Dan Carpenter <error27@gmail.com>, Jason Gunthorpe <jgg@ziepe.ca>
+Cc:     kbuild-all@lists.01.org, Yishai Hadas <yishaih@nvidia.com>,
+        Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>,
+        Kevin Tian <kevin.tian@intel.com>,
+        Alex Williamson <alex.williamson@redhat.com>,
+        Cornelia Huck <cohuck@redhat.com>,
+        Leon Romanovsky <leon@kernel.org>, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org, kernel-janitors@vger.kernel.org
+Subject: Re: [PATCH] vfio/mlx5: clean up overflow check
+Message-ID: <202207080331.FTVSHxW8-lkp@intel.com>
+References: <YsbzgQQ4bg6v+iTS@kili>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <87wncpotqv.fsf@redhat.com>
-X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-        T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL
-        autolearn=ham autolearn_force=no version=3.4.6
+In-Reply-To: <YsbzgQQ4bg6v+iTS@kili>
+X-Spam-Status: No, score=-5.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
+        SPF_HELO_PASS,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Jul 07, 2022, Vitaly Kuznetsov wrote:
-> Jim Mattson <jmattson@google.com> writes:
-> 
-> > On Wed, Jun 29, 2022 at 8:07 AM Vitaly Kuznetsov <vkuznets@redhat.com> wrote:
-> >>
-> >> From: Sean Christopherson <seanjc@google.com>
-> >>
-> >> Clear the CR3 and INVLPG interception controls at runtime based on
-> >> whether or not EPT is being _used_, as opposed to clearing the bits at
-> >> setup if EPT is _supported_ in hardware, and then restoring them when EPT
-> >> is not used.  Not mucking with the base config will allow using the base
-> >> config as the starting point for emulating the VMX capability MSRs.
-> >>
-> >> Signed-off-by: Sean Christopherson <seanjc@google.com>
-> >> Signed-off-by: Vitaly Kuznetsov <vkuznets@redhat.com>
-> > Nit: These controls aren't "obsoleted" by EPT; they're just no longer
-> > required.
+Hi Dan,
 
-Isn't that the definition of "obsolete"?  They're "no longer in use" when KVM
-enables EPT.
+Thank you for the patch! Perhaps something to improve:
 
-> I'm going to update the subject line to "KVM: VMX: Clear controls
-> unneded with EPT at runtime, not setup" retaining your authorship in v3
+[auto build test WARNING on awilliam-vfio/next]
+[also build test WARNING on rdma/for-next linus/master v5.19-rc5 next-20220707]
+[If your patch is applied to the wrong git tree, kindly drop us a note.
+And when submitting patch, we suggest to use '--base' as documented in
+https://git-scm.com/docs/git-format-patch#_base_tree_information]
 
-That's fine, though s/unneded/unneeded.
+url:    https://github.com/intel-lab-lkp/linux/commits/Dan-Carpenter/vfio-mlx5-clean-up-overflow-check/20220707-225657
+base:   https://github.com/awilliam/linux-vfio.git next
+config: i386-allyesconfig (https://download.01.org/0day-ci/archive/20220708/202207080331.FTVSHxW8-lkp@intel.com/config)
+compiler: gcc-11 (Debian 11.3.0-3) 11.3.0
+reproduce (this is a W=1 build):
+        # https://github.com/intel-lab-lkp/linux/commit/44607f8f3817e1af6622db7d70ad5bc457b8f203
+        git remote add linux-review https://github.com/intel-lab-lkp/linux
+        git fetch --no-tags linux-review Dan-Carpenter/vfio-mlx5-clean-up-overflow-check/20220707-225657
+        git checkout 44607f8f3817e1af6622db7d70ad5bc457b8f203
+        # save the config file
+        mkdir build_dir && cp config build_dir/.config
+        make W=1 O=build_dir ARCH=i386 SHELL=/bin/bash drivers/vfio/pci/mlx5/
+
+If you fix the issue, kindly add following tag where applicable
+Reported-by: kernel test robot <lkp@intel.com>
+
+All warnings (new ones prefixed by >>):
+
+   In file included from include/linux/device.h:29,
+                    from drivers/vfio/pci/mlx5/main.c:6:
+   drivers/vfio/pci/mlx5/main.c: In function 'mlx5vf_resume_write':
+>> include/linux/overflow.h:67:22: warning: comparison of distinct pointer types lacks a cast
+      67 |         (void) (&__a == &__b);                  \
+         |                      ^~
+   drivers/vfio/pci/mlx5/main.c:282:13: note: in expansion of macro 'check_add_overflow'
+     282 |             check_add_overflow(len, (unsigned long)*pos, &requested_length))
+         |             ^~~~~~~~~~~~~~~~~~
+   include/linux/overflow.h:68:22: warning: comparison of distinct pointer types lacks a cast
+      68 |         (void) (&__a == __d);                   \
+         |                      ^~
+   drivers/vfio/pci/mlx5/main.c:282:13: note: in expansion of macro 'check_add_overflow'
+     282 |             check_add_overflow(len, (unsigned long)*pos, &requested_length))
+         |             ^~~~~~~~~~~~~~~~~~
+
+
+vim +67 include/linux/overflow.h
+
+9b80e4c4ddaca35 Kees Cook        2020-08-12  54  
+f0907827a8a9152 Rasmus Villemoes 2018-05-08  55  /*
+f0907827a8a9152 Rasmus Villemoes 2018-05-08  56   * For simplicity and code hygiene, the fallback code below insists on
+f0907827a8a9152 Rasmus Villemoes 2018-05-08  57   * a, b and *d having the same type (similar to the min() and max()
+f0907827a8a9152 Rasmus Villemoes 2018-05-08  58   * macros), whereas gcc's type-generic overflow checkers accept
+f0907827a8a9152 Rasmus Villemoes 2018-05-08  59   * different types. Hence we don't just make check_add_overflow an
+f0907827a8a9152 Rasmus Villemoes 2018-05-08  60   * alias for __builtin_add_overflow, but add type checks similar to
+f0907827a8a9152 Rasmus Villemoes 2018-05-08  61   * below.
+f0907827a8a9152 Rasmus Villemoes 2018-05-08  62   */
+9b80e4c4ddaca35 Kees Cook        2020-08-12  63  #define check_add_overflow(a, b, d) __must_check_overflow(({	\
+f0907827a8a9152 Rasmus Villemoes 2018-05-08  64  	typeof(a) __a = (a);			\
+f0907827a8a9152 Rasmus Villemoes 2018-05-08  65  	typeof(b) __b = (b);			\
+f0907827a8a9152 Rasmus Villemoes 2018-05-08  66  	typeof(d) __d = (d);			\
+f0907827a8a9152 Rasmus Villemoes 2018-05-08 @67  	(void) (&__a == &__b);			\
+f0907827a8a9152 Rasmus Villemoes 2018-05-08  68  	(void) (&__a == __d);			\
+f0907827a8a9152 Rasmus Villemoes 2018-05-08  69  	__builtin_add_overflow(__a, __b, __d);	\
+9b80e4c4ddaca35 Kees Cook        2020-08-12  70  }))
+f0907827a8a9152 Rasmus Villemoes 2018-05-08  71  
+
+-- 
+0-DAY CI Kernel Test Service
+https://01.org/lkp
