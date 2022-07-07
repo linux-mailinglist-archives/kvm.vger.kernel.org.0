@@ -2,170 +2,104 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 29AFC56A92D
-	for <lists+kvm@lfdr.de>; Thu,  7 Jul 2022 19:12:57 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id A89B156A931
+	for <lists+kvm@lfdr.de>; Thu,  7 Jul 2022 19:14:52 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236527AbiGGRMz (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 7 Jul 2022 13:12:55 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52294 "EHLO
+        id S235640AbiGGROs (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 7 Jul 2022 13:14:48 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53790 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232016AbiGGRMy (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 7 Jul 2022 13:12:54 -0400
-Received: from NAM11-DM6-obe.outbound.protection.outlook.com (mail-dm6nam11on2079.outbound.protection.outlook.com [40.107.223.79])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 590955A2F7;
-        Thu,  7 Jul 2022 10:12:53 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=eOA2TMoJwhQqk7dk2MaH7pX7OpMCkb983yqolPrTtCBK5Q3QkA5zInsXUWEyLeAJ3Ei22GuC8cbDnq3zIyrl3OC5QIlaqRTMrSjr63/YotUbHS6nsXCgmmtU/xuSeq9boDDvBdYHWuU6IeSCADdYjqA6OtJY4k7h6PjuuctFbLRYigQu5SFV7owqh8jyZb8wzk0bIOidvpiLaJWfyE3rerWAIVE2FRJcWUwYD39nFuml2EgR/WUscClfyRRFRGwPpjyyD2cIJyk2oQdLSd6+cJA5P8PR1FfOi8bKfSx+CJ5WYaYJuZcZw1x/xF0RNX4SKj/8zoqeI4KTHJMEJXXIRw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=zCm6O0YicY8j1qKhujU6AubwGfSH1urWRCyC+VTLzdw=;
- b=lNd6KWSv5ijBFZY7bNvNbgdS5dP47bSUr7Bf2SuEHgseKI76uJe8+TSKVgwlY81qw9zE6f4IQ2DpRPelwDUjRTRjdgGfueeU9JMZPnkhugN+1/TUyM4WBNtHQpXV0wsIwvssXFJ/xvNU6whUAv+zKzzpqi8zzCCBNzOJMG/RCuZVBD2SeyZzYSGSz1M1xDSfwJBMN2OYI/Netor+/tjFE5IisnVoOM3WkFbei0ip6jKAdaNyEUurr8NGueWDetMEeNXIMRYuj0/TLzsFqv+637GxZ8E2J98gEg+2UyE/F9H4cZIGtW/t8cvGA1g07ULDR7qAmBa0h+QA7AL0arGxvw==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
- 12.22.5.236) smtp.rcpttodomain=linux.ibm.com smtp.mailfrom=nvidia.com;
- dmarc=pass (p=reject sp=reject pct=100) action=none header.from=nvidia.com;
- dkim=none (message not signed); arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=zCm6O0YicY8j1qKhujU6AubwGfSH1urWRCyC+VTLzdw=;
- b=B2uak7AWNTdkMEDQeGcqYaPIo2P6AcYAP7pRU3aE7f6Y8RELGR3YDQIa2fD1glwDNVg5tRtmr6E5DmCOoGcxDppWKNnhyQ1i2lDPv+mLg4UTqFvqjv+KdeGU71mFCRwx5fxkjlOplV6mYVC+/DI/QGXivtWqQYDrAdm0DP3XqcpckL1pjWl3uNCKy4fSyUpcJC2hdGldu74UIrHTGoDE+Nn6RYXWQ17ZRzSlPs8zgvQNmNsqrneYe+h3T3qnnbTCKqWcb1O7kCQwnq7fTvYXqnQwOV5Xj9QpyV6l3NJ/OdjkxUAwrZJ2n5GB8DQPMLH3ULTpVMSSrIgRAvxPTTeO4A==
-Received: from BN9PR03CA0550.namprd03.prod.outlook.com (2603:10b6:408:138::15)
- by BL0PR12MB5537.namprd12.prod.outlook.com (2603:10b6:208:1cc::12) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5417.16; Thu, 7 Jul
- 2022 17:12:51 +0000
-Received: from BN8NAM11FT068.eop-nam11.prod.protection.outlook.com
- (2603:10b6:408:138:cafe::dd) by BN9PR03CA0550.outlook.office365.com
- (2603:10b6:408:138::15) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5417.15 via Frontend
- Transport; Thu, 7 Jul 2022 17:12:51 +0000
-X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 12.22.5.236)
- smtp.mailfrom=nvidia.com; dkim=none (message not signed)
- header.d=none;dmarc=pass action=none header.from=nvidia.com;
-Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
- 12.22.5.236 as permitted sender) receiver=protection.outlook.com;
- client-ip=12.22.5.236; helo=mail.nvidia.com; pr=C
-Received: from mail.nvidia.com (12.22.5.236) by
- BN8NAM11FT068.mail.protection.outlook.com (10.13.177.69) with Microsoft SMTP
- Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384) id
- 15.20.5417.15 via Frontend Transport; Thu, 7 Jul 2022 17:12:51 +0000
-Received: from drhqmail202.nvidia.com (10.126.190.181) by
- DRHQMAIL109.nvidia.com (10.27.9.19) with Microsoft SMTP Server (TLS) id
- 15.0.1497.32; Thu, 7 Jul 2022 17:12:44 +0000
-Received: from drhqmail202.nvidia.com (10.126.190.181) by
- drhqmail202.nvidia.com (10.126.190.181) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.986.26; Thu, 7 Jul 2022 10:12:43 -0700
-Received: from Asurada-Nvidia (10.127.8.9) by mail.nvidia.com (10.126.190.181)
- with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.986.26 via Frontend
- Transport; Thu, 7 Jul 2022 10:12:42 -0700
-Date:   Thu, 7 Jul 2022 10:12:41 -0700
-From:   Nicolin Chen <nicolinc@nvidia.com>
-To:     "Tian, Kevin" <kevin.tian@intel.com>
-CC:     "kwankhede@nvidia.com" <kwankhede@nvidia.com>,
-        "corbet@lwn.net" <corbet@lwn.net>,
-        "hca@linux.ibm.com" <hca@linux.ibm.com>,
-        "gor@linux.ibm.com" <gor@linux.ibm.com>,
-        "agordeev@linux.ibm.com" <agordeev@linux.ibm.com>,
-        "borntraeger@linux.ibm.com" <borntraeger@linux.ibm.com>,
-        "svens@linux.ibm.com" <svens@linux.ibm.com>,
-        "zhenyuw@linux.intel.com" <zhenyuw@linux.intel.com>,
-        "Wang, Zhi A" <zhi.a.wang@intel.com>,
-        "jani.nikula@linux.intel.com" <jani.nikula@linux.intel.com>,
-        "joonas.lahtinen@linux.intel.com" <joonas.lahtinen@linux.intel.com>,
-        "Vivi, Rodrigo" <rodrigo.vivi@intel.com>,
-        "tvrtko.ursulin@linux.intel.com" <tvrtko.ursulin@linux.intel.com>,
-        "airlied@linux.ie" <airlied@linux.ie>,
-        "daniel@ffwll.ch" <daniel@ffwll.ch>,
-        "farman@linux.ibm.com" <farman@linux.ibm.com>,
-        "mjrosato@linux.ibm.com" <mjrosato@linux.ibm.com>,
-        "pasic@linux.ibm.com" <pasic@linux.ibm.com>,
-        "vneethv@linux.ibm.com" <vneethv@linux.ibm.com>,
-        "oberpar@linux.ibm.com" <oberpar@linux.ibm.com>,
-        "freude@linux.ibm.com" <freude@linux.ibm.com>,
-        "akrowiak@linux.ibm.com" <akrowiak@linux.ibm.com>,
-        "jjherne@linux.ibm.com" <jjherne@linux.ibm.com>,
-        "alex.williamson@redhat.com" <alex.williamson@redhat.com>,
-        "cohuck@redhat.com" <cohuck@redhat.com>,
-        "jgg@nvidia.com" <jgg@nvidia.com>,
-        "hch@infradead.org" <hch@infradead.org>,
-        "jchrist@linux.ibm.com" <jchrist@linux.ibm.com>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "linux-doc@vger.kernel.org" <linux-doc@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "linux-s390@vger.kernel.org" <linux-s390@vger.kernel.org>,
-        "intel-gvt-dev@lists.freedesktop.org" 
-        <intel-gvt-dev@lists.freedesktop.org>,
-        "intel-gfx@lists.freedesktop.org" <intel-gfx@lists.freedesktop.org>,
-        "dri-devel@lists.freedesktop.org" <dri-devel@lists.freedesktop.org>
-Subject: Re: [RFT][PATCH v2 1/9] vfio: Make vfio_unpin_pages() return void
-Message-ID: <YscUCe+2sXdDiQWq@Asurada-Nvidia>
-References: <20220706062759.24946-1-nicolinc@nvidia.com>
- <20220706062759.24946-2-nicolinc@nvidia.com>
- <BN9PR11MB527643D01DFF0AFCED1614488C839@BN9PR11MB5276.namprd11.prod.outlook.com>
+        with ESMTP id S235503AbiGGROr (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 7 Jul 2022 13:14:47 -0400
+Received: from mail-pf1-x436.google.com (mail-pf1-x436.google.com [IPv6:2607:f8b0:4864:20::436])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 308EA31389
+        for <kvm@vger.kernel.org>; Thu,  7 Jul 2022 10:14:46 -0700 (PDT)
+Received: by mail-pf1-x436.google.com with SMTP id n12so20741910pfq.0
+        for <kvm@vger.kernel.org>; Thu, 07 Jul 2022 10:14:46 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=iAlPKThjN3KI+X1ZKU+QfTbzAP64Rk03pVBqEtTAkec=;
+        b=WU9PdWSiqG8Ah6C4Wuy5KYkGrJAm1XzRHtMYQrf5owlj5ULolEDy920IAGfqMLmfOk
+         t0fpJCKYrIs/HfGMfmIwTgc8Onq5Z5rbm7lNnbbUpsHHND9IirP0SQASpiqOKDMEZiuL
+         hBMzUvM8+M8+ajW9BYvG4LWH6wgBgrWpP2FfJGMf2tFiM3f+G0eaAS1jhdhEtkkbm8uA
+         MiDwzFT1LwoaB1Em9Pdkq03X/72LB+/FkLahdQaNYn+/st7gEKhetw0uVPD7LErRbhLP
+         8HFkU7Ox9aBtg5sLpQzAFjUM/D8zBnc/0vGENKk3V65tX1qrPMQstqh5RHFFZkqU5Gjf
+         0XmQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=iAlPKThjN3KI+X1ZKU+QfTbzAP64Rk03pVBqEtTAkec=;
+        b=iv4wDC5TfPkIO6icE0q0k3rfOvZrkr3BDcON3uKlAap1psUswBCQo8JaWQr7Zb/jUS
+         lZbjK0/WXzCRISNr1WVeLxSrvZaQNjQ5QePY9DFsVPFTmhLfMRIzJognyuRWBPMWrw68
+         Rr3EuE6Jeq38ko188Jd4P+RpmCGT1Bs2xej5lsL28JAd89Sm0D90qE2EfrdKDrz/fy4w
+         vAv1d5HHlSFWTnPKOEgfamWdtU9UE/d5o6ySuvcAcA6B4blCnlJUIy/sD4xzzM3vIOTg
+         kVoMfOO8niYE00o5ZydeENgjfhyUblBgVqedv4tAE90+1oiMFVgCe2dwEXSO6FoSe2oK
+         ItGQ==
+X-Gm-Message-State: AJIora+SXNoAXID/K14eiII9eBcAPX8pc1QxYASOomi/p0yCjkMVsQm8
+        54usaSnOpVNMPbj3EPEUFs9fEQ==
+X-Google-Smtp-Source: AGRyM1vRMXFbdMFd71YenWcBALVLWZrn6kdo+9kkxLz5dRL69HIiwXUwSkTvZ7zMH1demR/UaBFHoA==
+X-Received: by 2002:a17:90a:cc18:b0:1ef:839e:45b0 with SMTP id b24-20020a17090acc1800b001ef839e45b0mr6441542pju.156.1657214085599;
+        Thu, 07 Jul 2022 10:14:45 -0700 (PDT)
+Received: from google.com (123.65.230.35.bc.googleusercontent.com. [35.230.65.123])
+        by smtp.gmail.com with ESMTPSA id p9-20020a1709026b8900b0016372486febsm27989231plk.297.2022.07.07.10.14.44
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 07 Jul 2022 10:14:44 -0700 (PDT)
+Date:   Thu, 7 Jul 2022 17:14:40 +0000
+From:   Sean Christopherson <seanjc@google.com>
+To:     Jim Mattson <jmattson@google.com>
+Cc:     Paolo Bonzini <pbonzini@redhat.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org, Oliver Upton <oupton@google.com>,
+        Peter Shier <pshier@google.com>
+Subject: Re: [PATCH v2 05/21] KVM: nVMX: Prioritize TSS T-flag #DBs over
+ Monitor Trap Flag
+Message-ID: <YscUgGElDEPIkIEo@google.com>
+References: <20220614204730.3359543-1-seanjc@google.com>
+ <20220614204730.3359543-6-seanjc@google.com>
+ <CALMp9eSH1O8keAVxZzfdvV1vu0AJBhaXVUfkSgYgCPOoSB5=Jw@mail.gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <BN9PR11MB527643D01DFF0AFCED1614488C839@BN9PR11MB5276.namprd11.prod.outlook.com>
-X-EOPAttributedMessage: 0
-X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: 5e1701f9-9a97-420b-a2bb-08da603becb1
-X-MS-TrafficTypeDiagnostic: BL0PR12MB5537:EE_
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: E3EtjXtySVw3iVeC8HyiwgH+GKSQdY2D8G1Z1uIA8rJprqRgHtvkPdg8LmBSW2yRshP+LUXWq5YXekymlB3Uqe1+9j2GeBElOFeUYinAQ4/TuWZ+GUNCOqONr1L28g99oVfEkI0Gifj/9OX+D1/OlF4VP107R7SrMXGKKPD1z24FUzKSl8e4oZ6jndIoXqiSxUt4WuEjSpefcX8l14r6Z275lq786cPLUQEikndm2aZEX8+ptJ0zLB0d+jwplY0XRhmU+mQSrfG9GoDQf+3nu6aI3LbEm4gB/5GuiC1XGqAqtRkMdVVHLVSHyuWK3frp6ZcDaHPS3LI+2sM+WhN1iRmBtk6wzsBAMMnZWZZ107OwAgwL2BSgwS/csuPzgUQ47qIaJaMEEjE8n4YsKwAtxj/1xeEmzc9mSfJ3heI0iKr1MTlDArrbRw3c711feX37ZgjXUoF0baafOCQrzUL1mS9QqwpJBpY7R+T3ybsHEUxDkaHB+NhFN9R5bReezutEusQ8PvIuVN7IKX98Q0KISATmPHjz3Zi9E27ruwB3CeB49DydcDlqfhhHf5QH1i6AyED/z0ZCmmf607ZXDyOba9g58NUBjnAKQ/hNOmOe99H6XheYesk0zlJD/c7iz3L2ANhvO7Wu8Zn+BAIu3Po9sGRTr4/2Xn7z7YEJoR4JurhLI7QiCWftlcs5aG5H+M8dV21VtPSvduw2zCXifdIY6R/bW1QdFihXv/+DLboNHCPeuQbkmj6WxH/PYXU+z4W0xV9/myO7PAMoxqPRKo+BoFdioo9y2DssvlEIIrqGANedBRZoy7/h7MOCQKqRmJHnFrf9cxyu4Rjae4hYopuHxZ3IxzbUeJ4ZXWCFN3eVyItaamohRaNuR2UPOIF/OH6O
-X-Forefront-Antispam-Report: CIP:12.22.5.236;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:InfoNoRecords;CAT:NONE;SFS:(13230016)(4636009)(396003)(39860400002)(136003)(346002)(376002)(36840700001)(40470700004)(46966006)(7416002)(7406005)(8936002)(82740400003)(186003)(70206006)(70586007)(5660300002)(47076005)(6862004)(2906002)(426003)(336012)(33716001)(8676002)(356005)(4326008)(36860700001)(26005)(55016003)(9686003)(82310400005)(478600001)(41300700001)(81166007)(86362001)(54906003)(40480700001)(316002)(40460700003)(36900700001)(67856001);DIR:OUT;SFP:1101;
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 07 Jul 2022 17:12:51.5029
- (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: 5e1701f9-9a97-420b-a2bb-08da603becb1
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[12.22.5.236];Helo=[mail.nvidia.com]
-X-MS-Exchange-CrossTenant-AuthSource: BN8NAM11FT068.eop-nam11.prod.protection.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Anonymous
-X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: BL0PR12MB5537
-X-Spam-Status: No, score=-1.8 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FORGED_SPF_HELO,
-        RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_NONE,
-        T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
+In-Reply-To: <CALMp9eSH1O8keAVxZzfdvV1vu0AJBhaXVUfkSgYgCPOoSB5=Jw@mail.gmail.com>
+X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
+        T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Jul 07, 2022 at 08:42:28AM +0000, Tian, Kevin wrote:
-> External email: Use caution opening links or attachments
-> 
-> 
-> > From: Nicolin Chen <nicolinc@nvidia.com>
-> > Sent: Wednesday, July 6, 2022 2:28 PM
+On Wed, Jul 06, 2022, Jim Mattson wrote:
+> On Tue, Jun 14, 2022 at 1:47 PM Sean Christopherson <seanjc@google.com> wrote:
 > >
-> > There's only one caller that checks its return value with a WARN_ON_ONCE,
-> > while all other callers do not check return value at all. So simplify the
-> > API to return void by embedding similar WARN_ON_ONCEs.
+> > Service TSS T-flag #DBs prior to pending MTFs, as such #DBs are higher
+> > priority than MTF.  KVM itself doesn't emulate TSS #DBs, and any such
 > 
-> While this change keeps the similar effect as before it leads to different
-> policy for same type of errors between pin and unpin paths:
+> Is there a KVM erratum for that?
 
-I think it's because of the policy that an undo function should not
-fail. Meanwhile, indulging faulty inputs isn't good either.
+Nope, just this hilarious TODO:
 
-> e.g.
-> 
-> vfio_unpin_pages():
->         if (WARN_ON_ONCE(!user_pfn || !npage || !vfio_assert_device_open(device)))
->                 return;
-> 
-> vfio_pin_pages():
->         if (!user_pfn || !phys_pfn || !npage ||
->             !vfio_assert_device_open(device))
->                 return -EINVAL;
-> 
-> It sounds a bit weird when reading related code...
+	/*
+	 * TODO: What about debug traps on tss switch?
+	 *       Are we supposed to inject them and update dr6?
+	 */
 
-Any better way to handle this?
+> > exceptions injected from L1 will be handled by hardware (or morphed to
+> > a fault-like exception if injection fails), but theoretically userspace
+> > could pend a TSS T-flag #DB in conjunction with a pending MTF.
+> >
+> > Note, there's no known use case this fixes, it's purely to be technically
+> > correct with respect to Intel's SDM.
+> 
+> A test would be nice. :-)
+
+LOL, yeah, but ensuring userspace-injected TSS T-bit #DBs work isn't exactly on
+my list of top 100 things to look at.
