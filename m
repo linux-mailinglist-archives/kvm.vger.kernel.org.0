@@ -2,186 +2,113 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id A097156ABF1
-	for <lists+kvm@lfdr.de>; Thu,  7 Jul 2022 21:38:59 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 0211C56AC24
+	for <lists+kvm@lfdr.de>; Thu,  7 Jul 2022 21:49:06 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236117AbiGGTi4 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 7 Jul 2022 15:38:56 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52334 "EHLO
+        id S235961AbiGGTra (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 7 Jul 2022 15:47:30 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57706 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231875AbiGGTix (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 7 Jul 2022 15:38:53 -0400
-Received: from NAM12-MW2-obe.outbound.protection.outlook.com (mail-mw2nam12on2042.outbound.protection.outlook.com [40.107.244.42])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9E4952D1D6;
-        Thu,  7 Jul 2022 12:38:51 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=HwoRsytEuwtSNxaVT7Zn9thspwO5RAzWKNov3fjFlo6XETQS5WB88tOBl25jX+VBHl+0lY0EmcXtfbuButeX3B9RCkdFdsnC6rT4RIJBm++g/x7leAY52SEwB9DX74e7QrsH4qmdNzkMeJSatxvGMy1xxeFStSdkAfYE9TpKVYH/VMbBXWjhJ3t1I6txbHQ9RJhcSp/GF8fp8yzJWeJjdKychNiHtN0qt7dqffOfuG8hPM3vHTZyKfFy2p5qPxu19ae6rb7b4XrkCDy+ix2C3XvB/LXFqRwXbmExlXmsZtdRMgrNtW3XXaoLIXX4SQ775YkHwXVtwJK4Rko7vejS1Q==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=a1r2MXbwEU03ktEYKpbwsl7haoYcDTi0f+THMD5LQyI=;
- b=GegeAxHsdtuyzTae440EIRWL8sKdDFn5ENTs3kGUnyPnbrWHYh0VHdreG5x0oCigiQzIQ1LQPg2HOPSquhsIov+msB8Ej5ZA3b6VS82e/xYCXXKN6wVALqgtEkjGPVcJFwRCfd9LVwShZVelR7vskG/XqEfKw/XdiQI9idbxPfh0EiskaxG/glZfri+xtskraFMGIXWzXGpJVY2ndD/1EY3wtGIdUddSbYsIwAs/VNRAJdXlpkbhA1MDaN/g/nWhCNTBYKNSn8zR5Kz3zPmFAzcNHOfFn9/fHW6PItsCA7AvKsOQY8Jns4KMU3eV+Vc0fcsFwwv2pKb93B0Ipm3oTA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
- 12.22.5.235) smtp.rcpttodomain=linux.ibm.com smtp.mailfrom=nvidia.com;
- dmarc=pass (p=reject sp=reject pct=100) action=none header.from=nvidia.com;
- dkim=none (message not signed); arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=a1r2MXbwEU03ktEYKpbwsl7haoYcDTi0f+THMD5LQyI=;
- b=EqjDfcbpK2o10ltQQntOQWUemMvWiHjdjrPD2gLaGq9GyxirN5VY6nClIrJWhU1GdY/hSqFQTUIu1g6yCvr7zeeL4PjrmbxRXTV6YviLc1znHHaQRaSgeRxdaDjpwkDCw1iyCY2SCUZtRwm2qFV547WDGtF4p38jw+89BjhfQTESnmviQCyly3LdCq6RxMKp/MAPJYg4bn0z+gn/HPNtkOfgDXPMrhzQgGaDC9zP9cyD3qHaGhdXN1R5j+lxyHoJSJ4iTUZdrp0yM0KirXvxpLwH7SkhyHRbeyHAyiniOO5QY22Q3laRz7AryyeQQ4ZBkpPFJlX2EFUHWLXdRRf1gA==
-Received: from MW4PR03CA0352.namprd03.prod.outlook.com (2603:10b6:303:dc::27)
- by DM4PR12MB6135.namprd12.prod.outlook.com (2603:10b6:8:ac::5) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.5395.22; Thu, 7 Jul 2022 19:38:50 +0000
-Received: from CO1NAM11FT057.eop-nam11.prod.protection.outlook.com
- (2603:10b6:303:dc:cafe::bd) by MW4PR03CA0352.outlook.office365.com
- (2603:10b6:303:dc::27) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5395.14 via Frontend
- Transport; Thu, 7 Jul 2022 19:38:50 +0000
-X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 12.22.5.235)
- smtp.mailfrom=nvidia.com; dkim=none (message not signed)
- header.d=none;dmarc=pass action=none header.from=nvidia.com;
-Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
- 12.22.5.235 as permitted sender) receiver=protection.outlook.com;
- client-ip=12.22.5.235; helo=mail.nvidia.com; pr=C
-Received: from mail.nvidia.com (12.22.5.235) by
- CO1NAM11FT057.mail.protection.outlook.com (10.13.174.205) with Microsoft SMTP
- Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384) id
- 15.20.5417.15 via Frontend Transport; Thu, 7 Jul 2022 19:38:49 +0000
-Received: from drhqmail203.nvidia.com (10.126.190.182) by
- DRHQMAIL107.nvidia.com (10.27.9.16) with Microsoft SMTP Server (TLS) id
- 15.0.1497.32; Thu, 7 Jul 2022 19:38:49 +0000
-Received: from drhqmail201.nvidia.com (10.126.190.180) by
- drhqmail203.nvidia.com (10.126.190.182) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.986.26; Thu, 7 Jul 2022 12:38:49 -0700
-Received: from Asurada-Nvidia (10.127.8.9) by mail.nvidia.com (10.126.190.180)
- with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.986.26 via Frontend
- Transport; Thu, 7 Jul 2022 12:38:47 -0700
-Date:   Thu, 7 Jul 2022 12:38:46 -0700
-From:   Nicolin Chen <nicolinc@nvidia.com>
-To:     Jason Gunthorpe <jgg@nvidia.com>
-CC:     "Tian, Kevin" <kevin.tian@intel.com>,
-        "kwankhede@nvidia.com" <kwankhede@nvidia.com>,
-        "corbet@lwn.net" <corbet@lwn.net>,
-        "hca@linux.ibm.com" <hca@linux.ibm.com>,
-        "gor@linux.ibm.com" <gor@linux.ibm.com>,
-        "agordeev@linux.ibm.com" <agordeev@linux.ibm.com>,
-        "borntraeger@linux.ibm.com" <borntraeger@linux.ibm.com>,
-        "svens@linux.ibm.com" <svens@linux.ibm.com>,
-        "zhenyuw@linux.intel.com" <zhenyuw@linux.intel.com>,
-        "Wang, Zhi A" <zhi.a.wang@intel.com>,
-        "jani.nikula@linux.intel.com" <jani.nikula@linux.intel.com>,
-        "joonas.lahtinen@linux.intel.com" <joonas.lahtinen@linux.intel.com>,
-        "Vivi, Rodrigo" <rodrigo.vivi@intel.com>,
-        "tvrtko.ursulin@linux.intel.com" <tvrtko.ursulin@linux.intel.com>,
-        "airlied@linux.ie" <airlied@linux.ie>,
-        "daniel@ffwll.ch" <daniel@ffwll.ch>,
-        "farman@linux.ibm.com" <farman@linux.ibm.com>,
-        "mjrosato@linux.ibm.com" <mjrosato@linux.ibm.com>,
-        "pasic@linux.ibm.com" <pasic@linux.ibm.com>,
-        "vneethv@linux.ibm.com" <vneethv@linux.ibm.com>,
-        "oberpar@linux.ibm.com" <oberpar@linux.ibm.com>,
-        "freude@linux.ibm.com" <freude@linux.ibm.com>,
-        "akrowiak@linux.ibm.com" <akrowiak@linux.ibm.com>,
-        "jjherne@linux.ibm.com" <jjherne@linux.ibm.com>,
-        "alex.williamson@redhat.com" <alex.williamson@redhat.com>,
-        "cohuck@redhat.com" <cohuck@redhat.com>,
-        "hch@infradead.org" <hch@infradead.org>,
-        "jchrist@linux.ibm.com" <jchrist@linux.ibm.com>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "linux-doc@vger.kernel.org" <linux-doc@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "linux-s390@vger.kernel.org" <linux-s390@vger.kernel.org>,
-        "intel-gvt-dev@lists.freedesktop.org" 
-        <intel-gvt-dev@lists.freedesktop.org>,
-        "intel-gfx@lists.freedesktop.org" <intel-gfx@lists.freedesktop.org>,
-        "dri-devel@lists.freedesktop.org" <dri-devel@lists.freedesktop.org>
-Subject: Re: [RFT][PATCH v2 1/9] vfio: Make vfio_unpin_pages() return void
-Message-ID: <Ysc2RnPC+CsyhPhf@Asurada-Nvidia>
-References: <20220706062759.24946-1-nicolinc@nvidia.com>
- <20220706062759.24946-2-nicolinc@nvidia.com>
- <BN9PR11MB527643D01DFF0AFCED1614488C839@BN9PR11MB5276.namprd11.prod.outlook.com>
- <YscUCe+2sXdDiQWq@Asurada-Nvidia>
- <20220707192210.GC1705032@nvidia.com>
+        with ESMTP id S236819AbiGGTr0 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 7 Jul 2022 15:47:26 -0400
+Received: from mail-pg1-x534.google.com (mail-pg1-x534.google.com [IPv6:2607:f8b0:4864:20::534])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 49E235C96D
+        for <kvm@vger.kernel.org>; Thu,  7 Jul 2022 12:47:24 -0700 (PDT)
+Received: by mail-pg1-x534.google.com with SMTP id 145so20335511pga.12
+        for <kvm@vger.kernel.org>; Thu, 07 Jul 2022 12:47:24 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=wYQ800eqwpu2fPAkSKvWHrzDSIMg2+p71H5ky/Bd6zg=;
+        b=imcqetEL9JvDBADGN8tKcjm7KKJn7Yx0sKKQaGSANVC9iXk8TJ88Q8mMsgMzAXN7Dw
+         vcu3tTnYMvuSisZ1aJC3BC628/9mMgLjpo1obHm5HsV801DMBi+wOzft9gOOlopUx/Wr
+         p2ARYlLmkmKJYj87CBoGbCL4pbiKAo//1FTznVmFYH+ojjLXdU2J4VyJk9BC7wlID2Lc
+         IQjVI8EUcD28yLlr7YSTCIkcI/9iGLP3nARIgbVKMWmLIk1vg2aycVRiThk9lyIbmWRJ
+         61/dllSqFZ6LLHHl+9Io1w2C5cFjFNsqVxyOu5xKHW30uTslzwh3VvFl0vcwbJb1fIZq
+         4QEg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=wYQ800eqwpu2fPAkSKvWHrzDSIMg2+p71H5ky/Bd6zg=;
+        b=d94Pye6u1QX5Ox6LgVG+swewD8PxKB8L4ASICCRmR6ZhFgC1GlgxQsTmqOMwt/4+GM
+         n1CTtzYAr/9gEZu0/lsCe0IIUEtNQcTi2Hj9CiFcmUDVX4EnxBLv0vAs3wvNjFJjvLv6
+         8quxL59cCV5a/wokwjQLWE9oWZaH0Yg97PIepIoeRdk3p8Cuwe8713K2JJYk09U8TOKw
+         1A+PYIuOfwqRbdsiqT3raX+k5sWZbV4q1CpfDVwGD3VFTayBKbxtQy0K+1/Km61SKOPq
+         fczVVRhnngzxpv6PbOiuqzaAv+Hz8fwiE9oLbzsTZq00LAQIQMNKcGmkT3o+Fh7Iw1ig
+         brCQ==
+X-Gm-Message-State: AJIora9T+pRlaImBEDjB6W9qC74lYVouGBnjFTaY4daF3J2yz92G/5h0
+        fwMMf2noh1D0pJE1x7p4V7yRaA==
+X-Google-Smtp-Source: AGRyM1seOimHaIGaLza/MlXpk0vUD0uoJe5sBB5cIN+LlfbPMDV0RL/QjCbwKAjkbVX0wDEZu9nGPA==
+X-Received: by 2002:a17:902:7049:b0:16b:bf58:ded2 with SMTP id h9-20020a170902704900b0016bbf58ded2mr36990649plt.98.1657223243653;
+        Thu, 07 Jul 2022 12:47:23 -0700 (PDT)
+Received: from google.com (123.65.230.35.bc.googleusercontent.com. [35.230.65.123])
+        by smtp.gmail.com with ESMTPSA id 132-20020a62198a000000b0051bc5f4df1csm27301291pfz.154.2022.07.07.12.47.23
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 07 Jul 2022 12:47:23 -0700 (PDT)
+Date:   Thu, 7 Jul 2022 19:47:19 +0000
+From:   Sean Christopherson <seanjc@google.com>
+To:     Jim Mattson <jmattson@google.com>
+Cc:     kvm@vger.kernel.org, pbonzini@redhat.com
+Subject: Re: [PATCH v2] KVM: VMX: Move VM-exit RSB stuffing out of line
+Message-ID: <Ysc4R3JDqnIFUfZ6@google.com>
+References: <20220630225424.1389578-1-jmattson@google.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20220707192210.GC1705032@nvidia.com>
-X-EOPAttributedMessage: 0
-X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: 53b255a2-ec61-46d6-b2c4-08da6050510a
-X-MS-TrafficTypeDiagnostic: DM4PR12MB6135:EE_
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: D0weu0ebx0jct5GHyy/fUkzDLKHwsyeH9+JTP4amYNPBOiZAkBPUjw/pMI2jksSZBAWsd9/Ve1SoB+vtw1xlUgxTqfYtUZWCCjWUU56YFfIzudZGEUuah6AZCu1K9UKa3Xt60/H9OfQjdla0axGV5Kk5Im3Uip2w2MK9mmoMZoVr2iX7X53XGfwPsYqN89Njjz2Tq4WjR364RcSRuZ9JsycGF33ZunuID3PWEe9QMsAUFm1grUntH6jx3BRT/sw4wOv6lG+8eFfOPz0P+oFtqYQHSNv3ZIsSxHiN1woQMI4y/csvEijHYFwMsvT7DvUirp11QKPbjFDYhnEPmt5jXZXcDJNVUYMhzSZizYBfHGk3pfLqY9zL8PPuh1JJxReLx4XXT+Ig8eyI3SN3AZ6hCbYpUEVD9Vxh/Ew9Xne4WdE2FLMKtx1tqjxaY3hDXczZ9AS12o7ArUKxgifR0vHqztYyUDppRFUrg1wlV005cqhh/+65J+Gv/IiNSBpAt1DsH0aa/4MI2Q5b7/4dxjgbOWKE1ItPoZxg9LPwsIjKA5Xtd5ogCHOU/KJlDTn5eWD0Ph13Not8QpBqGhLXbo1W4IOUfenp56oaQhBQgaSqo8bn+ylLFZhI62pEY0ccvUHdfr2rlnSuA/g5t24EhIHpj3exQvtiONAgZvmkgDB5TBwKVY9ZU3um7OMYFY2lNaXcl/U41H7BNvz9Hr3WpBu1Gz2cPqP/jN78BbuZnyejGMOaTpnYH3oGKqc+TqmsPpczf9Wv1nEd6/5OBwJsaQr/WlUSFID9ulFDzR6sI+rx3PzRm3pqnaOx57cLg4BNmqmDccYtLgCgTqt9GelvQzCrH1kStcrli+uSHty0+zygEbrWqpS+wYDRrCRdtu0arSCj
-X-Forefront-Antispam-Report: CIP:12.22.5.235;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:InfoNoRecords;CAT:NONE;SFS:(13230016)(4636009)(136003)(376002)(39860400002)(396003)(346002)(40470700004)(46966006)(36840700001)(40460700003)(33716001)(7416002)(54906003)(4326008)(40480700001)(6636002)(7406005)(9686003)(356005)(55016003)(5660300002)(6862004)(26005)(86362001)(70206006)(8936002)(82740400003)(70586007)(316002)(81166007)(478600001)(82310400005)(186003)(8676002)(47076005)(41300700001)(2906002)(36860700001)(336012)(426003)(36900700001)(67856001);DIR:OUT;SFP:1101;
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 07 Jul 2022 19:38:49.8402
- (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: 53b255a2-ec61-46d6-b2c4-08da6050510a
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[12.22.5.235];Helo=[mail.nvidia.com]
-X-MS-Exchange-CrossTenant-AuthSource: CO1NAM11FT057.eop-nam11.prod.protection.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Anonymous
-X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM4PR12MB6135
-X-Spam-Status: No, score=-1.8 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FORGED_SPF_HELO,
-        RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_NONE,
-        T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
+In-Reply-To: <20220630225424.1389578-1-jmattson@google.com>
+X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
+        T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Jul 07, 2022 at 04:22:10PM -0300, Jason Gunthorpe wrote:
-> On Thu, Jul 07, 2022 at 10:12:41AM -0700, Nicolin Chen wrote:
-> > On Thu, Jul 07, 2022 at 08:42:28AM +0000, Tian, Kevin wrote:
-> > > External email: Use caution opening links or attachments
-> > > 
-> > > 
-> > > > From: Nicolin Chen <nicolinc@nvidia.com>
-> > > > Sent: Wednesday, July 6, 2022 2:28 PM
-> > > >
-> > > > There's only one caller that checks its return value with a WARN_ON_ONCE,
-> > > > while all other callers do not check return value at all. So simplify the
-> > > > API to return void by embedding similar WARN_ON_ONCEs.
-> > > 
-> > > While this change keeps the similar effect as before it leads to different
-> > > policy for same type of errors between pin and unpin paths:
-> > 
-> > I think it's because of the policy that an undo function should not
-> > fail. Meanwhile, indulging faulty inputs isn't good either.
-> > 
-> > > e.g.
-> > > 
-> > > vfio_unpin_pages():
-> > >         if (WARN_ON_ONCE(!user_pfn || !npage || !vfio_assert_device_open(device)))
-> > >                 return;
-> > > 
-> > > vfio_pin_pages():
-> > >         if (!user_pfn || !phys_pfn || !npage ||
-> > >             !vfio_assert_device_open(device))
-> > >                 return -EINVAL;
-> > > 
-> > > It sounds a bit weird when reading related code...
-> > 
-> > Any better way to handle this?
+On Thu, Jun 30, 2022, Jim Mattson wrote:
+> RSB-stuffing after VM-exit is only needed for legacy CPUs without
+> eIBRS. Move the RSB-stuffing code out of line to avoid the JMP on
+> modern CPUs.
+
+The shortlog and this sentence need to be updated, the stuffing code is still
+in-line, but the JMP is being dropped.
+
+> Note that CPUs that are subject to SpectreRSB attacks need
+> RSB-stuffing on VM-exit whether or not RETPOLINE is in use as a
+> SpectreBTB mitigation. However, I am leaving the existing mitigation
+> strategy alone.
 > 
-> They should all be WARN_ON's, that is the standard pattern to assert
-> that function arguments must be correctly formed.
-
-OK. I can change that. I assume that, not confined to arguments,
-we might want to have a WARN_ON for the return value check also.
-
-> I would also drop the tests that obviously will oops on their on
-> anyone, like NULL pointer checks. This is a semi-performance path.
-
-OK. I will simply remove those NULL pointer checks. Actually,
-that !user_pfn check is gone anyway in the following patch, as
-user_pfn is replaced with iova.
+> Signed-off-by: Jim Mattson <jmattson@google.com>
+> ---
+>  arch/x86/kvm/vmx/vmenter.S | 4 ++--
+>  1 file changed, 2 insertions(+), 2 deletions(-)
+> 
+> diff --git a/arch/x86/kvm/vmx/vmenter.S b/arch/x86/kvm/vmx/vmenter.S
+> index 435c187927c4..ea5986b96004 100644
+> --- a/arch/x86/kvm/vmx/vmenter.S
+> +++ b/arch/x86/kvm/vmx/vmenter.S
+> @@ -76,7 +76,8 @@ SYM_FUNC_END(vmx_vmenter)
+>   */
+>  SYM_FUNC_START(vmx_vmexit)
+>  #ifdef CONFIG_RETPOLINE
+> -	ALTERNATIVE "jmp .Lvmexit_skip_rsb", "", X86_FEATURE_RETPOLINE
+> +	ALTERNATIVE "RET", "", X86_FEATURE_RETPOLINE
+> +
+>  	/* Preserve guest's RAX, it's used to stuff the RSB. */
+>  	push %_ASM_AX
+>  
+> @@ -87,7 +88,6 @@ SYM_FUNC_START(vmx_vmexit)
+>  	or $1, %_ASM_AX
+>  
+>  	pop %_ASM_AX
+> -.Lvmexit_skip_rsb:
+>  #endif
+>  	RET
+>  SYM_FUNC_END(vmx_vmexit)
+> -- 
+> 2.37.0.rc0.161.g10f37bed90-goog
+> 
