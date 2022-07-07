@@ -2,692 +2,156 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id E0580569A4E
-	for <lists+kvm@lfdr.de>; Thu,  7 Jul 2022 08:16:42 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 9F6D3569A5C
+	for <lists+kvm@lfdr.de>; Thu,  7 Jul 2022 08:19:52 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233584AbiGGGQh (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 7 Jul 2022 02:16:37 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51674 "EHLO
+        id S234588AbiGGGRx (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 7 Jul 2022 02:17:53 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52262 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229538AbiGGGQg (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 7 Jul 2022 02:16:36 -0400
-Received: from mga07.intel.com (mga07.intel.com [134.134.136.100])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0415C25C73;
-        Wed,  6 Jul 2022 23:16:34 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1657174595; x=1688710595;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=S1gxl9QNP92rxHSgjwoIyBpCcRhav2jyNz2mqbwGwrI=;
-  b=MmKglUU0sb6xP+UwsoRWWq4DPuBc4B9Kvp+QFaqlDePwSR2RMoTQwiBu
-   Z2IVRGIp1z2SafQ+eVouDAxicBTUCkebSy36wGAg+HWYHx3GmyQMYTnEY
-   pHsNpCFOf2UGgnFWfFDPBzwxJGxa8m9u5y3P1HWXE5Q9UbAntJApHzNN/
-   bApftswumlJzIk1dU6pU4aB8mfuBjcGBPAWt9eCY8RSDQPiMe1QFs5Vo2
-   obiY6ipaPp6lBlLi/YbFPmAu5TI+KafDN6omjdCLjimDwQAFcrMSy6umM
-   z2TE2GbD6smJ1DJT+1e6oYSUL1zunZQNMXX3ArsrAssdxdIOS4Il3jgIW
-   Q==;
-X-IronPort-AV: E=McAfee;i="6400,9594,10400"; a="347925992"
-X-IronPort-AV: E=Sophos;i="5.92,252,1650956400"; 
-   d="scan'208";a="347925992"
-Received: from fmsmga008.fm.intel.com ([10.253.24.58])
-  by orsmga105.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 06 Jul 2022 23:16:32 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.92,252,1650956400"; 
-   d="scan'208";a="650997353"
-Received: from yy-desk-7060.sh.intel.com (HELO localhost) ([10.239.159.76])
-  by fmsmga008.fm.intel.com with ESMTP; 06 Jul 2022 23:16:30 -0700
-Date:   Thu, 7 Jul 2022 14:16:29 +0800
-From:   Yuan Yao <yuan.yao@linux.intel.com>
-To:     isaku.yamahata@intel.com
-Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
-        isaku.yamahata@gmail.com, Paolo Bonzini <pbonzini@redhat.com>,
-        Sean Christopherson <sean.j.christopherson@intel.com>,
-        Kai Huang <kai.huang@intel.com>
-Subject: Re: [PATCH v7 022/102] KVM: TDX: create/destroy VM structure
-Message-ID: <20220707061629.io5mf3riswn3fwvr@yy-desk-7060>
-References: <cover.1656366337.git.isaku.yamahata@intel.com>
- <aa3b9b81f257d4d177ab25cb78a222d6297de97f.1656366338.git.isaku.yamahata@intel.com>
+        with ESMTP id S229538AbiGGGRv (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 7 Jul 2022 02:17:51 -0400
+Received: from NAM10-MW2-obe.outbound.protection.outlook.com (mail-mw2nam10on2065.outbound.protection.outlook.com [40.107.94.65])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EADCB275E4;
+        Wed,  6 Jul 2022 23:17:50 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=bwdODXa7IOtSbBe3SSzLbmkbZ2MvNcDsq0DSDALWkwPd2X8QVeYVxVbhhzSpxQoC2IxQ523Wdy9q6Y3U4M4vCP7aegnof6DDW6lpeoqcb7xC4EIsSJ3nqisD2O3WQw2R/WMK6tysuyP3W2UrJxzVL+oI5JPZEK5xtN88WC4vUbyWon1wqxvkFUz8eU+3GM3dSVC6vQJ/BJLZ4lSNMbdulChjklnZ4i9j7gP+bGADJwXVuuvHjxXaN4iJfTQFwiWXJjKHe5l6ol5kxsi+74FNuuaLDDSwYqnWDhM0i7e9ZeZWl4fpGEJTxR6SZ5N06B+3C2f9p3GQg6YWyTD+v+HJXg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=Sxhwa67gU2p5f6Jk9J++Fz8LYJZ3fWZGHdj6ExbkvQo=;
+ b=VXvOA+H4kT7Aw5vKrw6ozmisgiMszyoYS9I/FiswbW/UYJj8XOrvk9J4Z2l8qE+IP1qfPBnoy6SPTSTqsMZRrucevTlLaGELzkQKZcF7bFVtR9Z3zNvqu9a9guAk4YwZa5+dAmdtznmsYozEF97IH3Th2J1gMHNitSmmj6llRk5R9+EKiOoohBoCL+SEvMp/MOM5BpkVfL6A1cvVj/zEjlSwpVB4WCzC8kzKsR/7jFJgG0dJ0e82ry+hpuj/R78oMpqjIaEm1p7DuRbNhnSduxTsLsfVaZpur7uHE/PVFpn2FX1I1UAhFuTUfupUkKst3AS/fyKVNMWk9Ontn4IGUQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
+ 12.22.5.234) smtp.rcpttodomain=linux.ibm.com smtp.mailfrom=nvidia.com;
+ dmarc=pass (p=reject sp=reject pct=100) action=none header.from=nvidia.com;
+ dkim=none (message not signed); arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=Sxhwa67gU2p5f6Jk9J++Fz8LYJZ3fWZGHdj6ExbkvQo=;
+ b=GOoZP2/PB+2gkDOGFNqpZTMQxMJkzCnE5Om0m5ykev1RUl/O7d4c/Fe9VFqa31JEYC8ncoaJ4x1iAe1IH/pGMTuepYqKuPS2B6SGw9PCk60YAACBXuDNj1m0f9uL++j65O21MMHz69BHsc8VlADZSuNFxT7v76+9f/xXKebNJ/TLgmiMOSdNXDQPtyWPDs0onnTKEanKRAWFuQxVUEdCr6O8/Ejs0gsooMJpmGKeKio4HgPndXLzxVjvseo3jmBEHLBqmqnZ77RpRjClLlRYtQWziolurb5A081XW8tWa95finomAKDEQqRRoazWvo5Os6EC2ltGD+RcFbv5jSZ31Q==
+Received: from BN6PR13CA0048.namprd13.prod.outlook.com (2603:10b6:404:13e::34)
+ by BY5PR12MB5512.namprd12.prod.outlook.com (2603:10b6:a03:1df::16) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5395.14; Thu, 7 Jul
+ 2022 06:17:48 +0000
+Received: from BN8NAM11FT054.eop-nam11.prod.protection.outlook.com
+ (2603:10b6:404:13e:cafe::90) by BN6PR13CA0048.outlook.office365.com
+ (2603:10b6:404:13e::34) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5417.14 via Frontend
+ Transport; Thu, 7 Jul 2022 06:17:47 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 12.22.5.234)
+ smtp.mailfrom=nvidia.com; dkim=none (message not signed)
+ header.d=none;dmarc=pass action=none header.from=nvidia.com;
+Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
+ 12.22.5.234 as permitted sender) receiver=protection.outlook.com;
+ client-ip=12.22.5.234; helo=mail.nvidia.com; pr=C
+Received: from mail.nvidia.com (12.22.5.234) by
+ BN8NAM11FT054.mail.protection.outlook.com (10.13.177.102) with Microsoft SMTP
+ Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384) id
+ 15.20.5417.15 via Frontend Transport; Thu, 7 Jul 2022 06:17:47 +0000
+Received: from rnnvmail203.nvidia.com (10.129.68.9) by DRHQMAIL101.nvidia.com
+ (10.27.9.10) with Microsoft SMTP Server (TLS) id 15.0.1497.32; Thu, 7 Jul
+ 2022 06:17:46 +0000
+Received: from rnnvmail204.nvidia.com (10.129.68.6) by rnnvmail203.nvidia.com
+ (10.129.68.9) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.986.26; Wed, 6 Jul 2022
+ 23:17:46 -0700
+Received: from Asurada-Nvidia (10.127.8.14) by mail.nvidia.com (10.129.68.6)
+ with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.986.26 via Frontend
+ Transport; Wed, 6 Jul 2022 23:17:44 -0700
+Date:   Wed, 6 Jul 2022 23:17:43 -0700
+From:   Nicolin Chen <nicolinc@nvidia.com>
+To:     "Tian, Kevin" <kevin.tian@intel.com>
+CC:     "kwankhede@nvidia.com" <kwankhede@nvidia.com>,
+        "corbet@lwn.net" <corbet@lwn.net>,
+        "hca@linux.ibm.com" <hca@linux.ibm.com>,
+        "gor@linux.ibm.com" <gor@linux.ibm.com>,
+        "agordeev@linux.ibm.com" <agordeev@linux.ibm.com>,
+        "borntraeger@linux.ibm.com" <borntraeger@linux.ibm.com>,
+        "svens@linux.ibm.com" <svens@linux.ibm.com>,
+        "zhenyuw@linux.intel.com" <zhenyuw@linux.intel.com>,
+        "Wang, Zhi A" <zhi.a.wang@intel.com>,
+        "jani.nikula@linux.intel.com" <jani.nikula@linux.intel.com>,
+        "joonas.lahtinen@linux.intel.com" <joonas.lahtinen@linux.intel.com>,
+        "Vivi, Rodrigo" <rodrigo.vivi@intel.com>,
+        "tvrtko.ursulin@linux.intel.com" <tvrtko.ursulin@linux.intel.com>,
+        "airlied@linux.ie" <airlied@linux.ie>,
+        "daniel@ffwll.ch" <daniel@ffwll.ch>,
+        "farman@linux.ibm.com" <farman@linux.ibm.com>,
+        "mjrosato@linux.ibm.com" <mjrosato@linux.ibm.com>,
+        "pasic@linux.ibm.com" <pasic@linux.ibm.com>,
+        "vneethv@linux.ibm.com" <vneethv@linux.ibm.com>,
+        "oberpar@linux.ibm.com" <oberpar@linux.ibm.com>,
+        "freude@linux.ibm.com" <freude@linux.ibm.com>,
+        "akrowiak@linux.ibm.com" <akrowiak@linux.ibm.com>,
+        "jjherne@linux.ibm.com" <jjherne@linux.ibm.com>,
+        "alex.williamson@redhat.com" <alex.williamson@redhat.com>,
+        "cohuck@redhat.com" <cohuck@redhat.com>,
+        "jgg@nvidia.com" <jgg@nvidia.com>,
+        "hch@infradead.org" <hch@infradead.org>,
+        "linux-s390@vger.kernel.org" <linux-s390@vger.kernel.org>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "linux-doc@vger.kernel.org" <linux-doc@vger.kernel.org>,
+        "intel-gfx@lists.freedesktop.org" <intel-gfx@lists.freedesktop.org>,
+        "jchrist@linux.ibm.com" <jchrist@linux.ibm.com>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "dri-devel@lists.freedesktop.org" <dri-devel@lists.freedesktop.org>,
+        "intel-gvt-dev@lists.freedesktop.org" 
+        <intel-gvt-dev@lists.freedesktop.org>,
+        "Xu, Terrence" <terrence.xu@intel.com>
+Subject: Re: [RFT][PATCH v2 0/9] Update vfio_pin/unpin_pages API
+Message-ID: <YsZ6h/XGX1RpXQQL@Asurada-Nvidia>
+References: <20220706062759.24946-1-nicolinc@nvidia.com>
+ <BN9PR11MB52768822A11C158214C6A6A48C839@BN9PR11MB5276.namprd11.prod.outlook.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset="us-ascii"
 Content-Disposition: inline
-In-Reply-To: <aa3b9b81f257d4d177ab25cb78a222d6297de97f.1656366338.git.isaku.yamahata@intel.com>
-User-Agent: NeoMutt/20171215
-X-Spam-Status: No, score=-5.0 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,SPF_HELO_NONE,
-        SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no
-        version=3.4.6
+In-Reply-To: <BN9PR11MB52768822A11C158214C6A6A48C839@BN9PR11MB5276.namprd11.prod.outlook.com>
+X-EOPAttributedMessage: 0
+X-MS-PublicTrafficType: Email
+X-MS-Office365-Filtering-Correlation-Id: 5aea160c-e4d3-49d4-3f2f-08da5fe069b2
+X-MS-TrafficTypeDiagnostic: BY5PR12MB5512:EE_
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: K7vsBHlVdEAVYoOXSCJVgavi4Xz+fz6sevdZZKv/kH+/J1MkS4HyTqUN9m8Bb3dHTlT6DtDb3Tk0+JB/nwaS34qdEBkJHGhCQ05qgXS0rVM74XwEOngFBdDEbIojk8rHjoMIviOHSE5bngUk/oAwePJnipUpOoayxXVQgPp51qT8sEKFDqVzno/EG41IkBCQg3CG+W2K2bbVe4tUTnRlfWxatM75hRq93OH4Iww9my4oar9OTzXsRwwfjqK6VPEVOoHoik7EnKGe7FHvd2CFkm8df+czVqxOT5EB79EoHzbyJ9UJj0/8fCaHKdbrIwHKY3q1RNuTntJPCLdb1NwC39OjD0U1MXAikrS6DHWK1jO92O7QAJEOxAdGGXQ/tDR+mHMlGt2YbvDO0FxMSDJRSe40px3/hud/1X/lwc7gsiCpEFocO+5EDgxqc7SCWus706CJwK6ieThwRfZjkYk1M7cIWFmgFHL3L0EhuLoZq5jiPgg+ZXHvZzlSbJ0Xsy21ghttP1bG3UhjJGwR4ErPHAADY6iRWTUN+nQbPpdcFL/ditwitF5Am1HTVvXlgHjlFMGQPpAbkF3jb4UUgL3/InYdSTJRQdYFIUUyrYQBewUEKwJi0P07vH/ov7NTJdeszOYo20jgrwq0qkgtqFhKpht12XGCZ58jpAI2N+9HMtc921MzCteuN2cd9Fba8oCHtxUESkPGfJ0gl+uJdjThTUk2rx2jPnL7TB9MZXHJIKcJKQZPdUciOkrM6UeZQHOlhJC47im8590fzU+ahYfU8a5PvqjQ+nMmh7w3KXPyCvOeYXoE2AI41/Uy3oGWAKClrK23cdzp11StYT5M1Ww0/HYUrefP4yf60yQ5uCZvXBlxv0CtxBoDmWI+qWHFRtdTFJw1Ya1f3lrY41abgEcXA4CrhiiUS5csuerTmJ74nbLCFaVkLjx1cp7TZuRnNswO
+X-Forefront-Antispam-Report: CIP:12.22.5.234;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:InfoNoRecords;CAT:NONE;SFS:(13230016)(4636009)(39860400002)(376002)(396003)(136003)(346002)(46966006)(36840700001)(40470700004)(966005)(478600001)(40480700001)(33716001)(186003)(4326008)(2906002)(41300700001)(54906003)(6862004)(356005)(316002)(47076005)(8936002)(7416002)(4744005)(55016003)(5660300002)(7406005)(336012)(82740400003)(82310400005)(81166007)(426003)(26005)(86362001)(9686003)(8676002)(83380400001)(70586007)(70206006)(36860700001)(40460700003)(36900700001);DIR:OUT;SFP:1101;
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 07 Jul 2022 06:17:47.5073
+ (UTC)
+X-MS-Exchange-CrossTenant-Network-Message-Id: 5aea160c-e4d3-49d4-3f2f-08da5fe069b2
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[12.22.5.234];Helo=[mail.nvidia.com]
+X-MS-Exchange-CrossTenant-AuthSource: BN8NAM11FT054.eop-nam11.prod.protection.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Anonymous
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: BY5PR12MB5512
+X-Spam-Status: No, score=-1.8 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FORGED_SPF_HELO,
+        RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_NONE,
+        T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Jun 27, 2022 at 02:53:14PM -0700, isaku.yamahata@intel.com wrote:
-> From: Sean Christopherson <sean.j.christopherson@intel.com>
->
-> As the first step to create TDX guest, create/destroy VM struct.  Assign
-> TDX private Host Key ID (HKID) to the TDX guest for memory encryption and
-> allocate extra pages for the TDX guest. On destruction, free allocated
-> pages, and HKID.
->
-> Before tearing down private page tables, TDX requires some resources of the
-> guest TD to be destroyed (i.e. keyID must have been reclaimed, etc).  Add
-> flush_shadow_all_private callback before tearing down private page tables
-> for it.
->
-> Add a second kvm_x86_ops hook in kvm_arch_destroy_vm() to support TDX's
-> destruction path, which needs to first put the VM into a teardown state,
-> then free per-vCPU resources, and finally free per-VM resources.
->
-> Co-developed-by: Kai Huang <kai.huang@intel.com>
-> Signed-off-by: Kai Huang <kai.huang@intel.com>
-> Signed-off-by: Sean Christopherson <sean.j.christopherson@intel.com>
-> Signed-off-by: Isaku Yamahata <isaku.yamahata@intel.com>
-> ---
->  arch/x86/include/asm/kvm-x86-ops.h |   2 +
->  arch/x86/include/asm/kvm_host.h    |   2 +
->  arch/x86/kvm/vmx/main.c            |  34 ++-
->  arch/x86/kvm/vmx/tdx.c             | 376 +++++++++++++++++++++++++++++
->  arch/x86/kvm/vmx/tdx.h             |   2 +
->  arch/x86/kvm/vmx/tdx_errno.h       |   2 +-
->  arch/x86/kvm/vmx/x86_ops.h         |  11 +
->  arch/x86/kvm/x86.c                 |   8 +
->  8 files changed, 433 insertions(+), 4 deletions(-)
->
-> diff --git a/arch/x86/include/asm/kvm-x86-ops.h b/arch/x86/include/asm/kvm-x86-ops.h
-> index a97cdb203a16..fbb2c6746066 100644
-> --- a/arch/x86/include/asm/kvm-x86-ops.h
-> +++ b/arch/x86/include/asm/kvm-x86-ops.h
-> @@ -21,7 +21,9 @@ KVM_X86_OP(has_emulated_msr)
->  KVM_X86_OP(vcpu_after_set_cpuid)
->  KVM_X86_OP(is_vm_type_supported)
->  KVM_X86_OP(vm_init)
-> +KVM_X86_OP_OPTIONAL(flush_shadow_all_private)
->  KVM_X86_OP_OPTIONAL(vm_destroy)
-> +KVM_X86_OP_OPTIONAL(vm_free)
->  KVM_X86_OP_OPTIONAL_RET0(vcpu_precreate)
->  KVM_X86_OP(vcpu_create)
->  KVM_X86_OP(vcpu_free)
-> diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
-> index 089e0a4de926..80df346af117 100644
-> --- a/arch/x86/include/asm/kvm_host.h
-> +++ b/arch/x86/include/asm/kvm_host.h
-> @@ -1438,7 +1438,9 @@ struct kvm_x86_ops {
->  	bool (*is_vm_type_supported)(unsigned long vm_type);
->  	unsigned int vm_size;
->  	int (*vm_init)(struct kvm *kvm);
-> +	void (*flush_shadow_all_private)(struct kvm *kvm);
->  	void (*vm_destroy)(struct kvm *kvm);
-> +	void (*vm_free)(struct kvm *kvm);
->
->  	/* Create, but do not attach this VCPU */
->  	int (*vcpu_precreate)(struct kvm *kvm);
-> diff --git a/arch/x86/kvm/vmx/main.c b/arch/x86/kvm/vmx/main.c
-> index 47bfa94e538e..6a93b19a8b06 100644
-> --- a/arch/x86/kvm/vmx/main.c
-> +++ b/arch/x86/kvm/vmx/main.c
-> @@ -39,18 +39,44 @@ static int __init vt_post_hardware_enable_setup(void)
->  	return 0;
->  }
->
-> +static void vt_hardware_unsetup(void)
-> +{
-> +	tdx_hardware_unsetup();
-> +	vmx_hardware_unsetup();
-> +}
-> +
->  static int vt_vm_init(struct kvm *kvm)
->  {
->  	if (is_td(kvm))
-> -		return -EOPNOTSUPP;	/* Not ready to create guest TD yet. */
-> +		return tdx_vm_init(kvm);
->
->  	return vmx_vm_init(kvm);
->  }
->
-> +static void vt_flush_shadow_all_private(struct kvm *kvm)
-> +{
-> +	if (is_td(kvm))
-> +		return tdx_mmu_release_hkid(kvm);
-> +}
-> +
-> +static void vt_vm_destroy(struct kvm *kvm)
-> +{
-> +	if (is_td(kvm))
-> +		return;
-> +
-> +	vmx_vm_destroy(kvm);
-> +}
-> +
-> +static void vt_vm_free(struct kvm *kvm)
-> +{
-> +	if (is_td(kvm))
-> +		return tdx_vm_free(kvm);
-> +}
-> +
->  struct kvm_x86_ops vt_x86_ops __initdata = {
->  	.name = "kvm_intel",
->
-> -	.hardware_unsetup = vmx_hardware_unsetup,
-> +	.hardware_unsetup = vt_hardware_unsetup,
->  	.check_processor_compatibility = vmx_check_processor_compatibility,
->
->  	.hardware_enable = vmx_hardware_enable,
-> @@ -60,7 +86,9 @@ struct kvm_x86_ops vt_x86_ops __initdata = {
->  	.is_vm_type_supported = vt_is_vm_type_supported,
->  	.vm_size = sizeof(struct kvm_vmx),
->  	.vm_init = vt_vm_init,
-> -	.vm_destroy = vmx_vm_destroy,
-> +	.flush_shadow_all_private = vt_flush_shadow_all_private,
-> +	.vm_destroy = vt_vm_destroy,
-> +	.vm_free = vt_vm_free,
->
->  	.vcpu_precreate = vmx_vcpu_precreate,
->  	.vcpu_create = vmx_vcpu_create,
-> diff --git a/arch/x86/kvm/vmx/tdx.c b/arch/x86/kvm/vmx/tdx.c
-> index 3675f7de2735..63f3c7a02cc8 100644
-> --- a/arch/x86/kvm/vmx/tdx.c
-> +++ b/arch/x86/kvm/vmx/tdx.c
-> @@ -31,9 +31,367 @@ struct tdx_capabilities {
->  	struct tdx_cpuid_config cpuid_configs[TDX_MAX_NR_CPUID_CONFIGS];
->  };
->
-> +/*
-> + * Key id globally used by TDX module: TDX module maps TDR with this TDX global
-> + * key id.  TDR includes key id assigned to the TD.  Then TDX module maps other
-> + * TD-related pages with the assigned key id.  TDR requires this TDX global key
-> + * id for cache flush unlike other TD-related pages.
-> + */
-> +static u32 tdx_global_keyid __read_mostly;
-> +
->  /* Capabilities of KVM + the TDX module. */
->  static struct tdx_capabilities tdx_caps;
->
-> +/*
-> + * Some TDX SEAMCALLs (TDH.MNG.CREATE, TDH.PHYMEM.CACHE.WB,
-> + * TDH.MNG.KEY.RECLAIMID, TDH.MNG.KEY.FREEID etc) tries to acquire a global lock
-> + * internally in TDX module.  If failed, TDX_OPERAND_BUSY is returned without
-> + * spinning or waiting due to a constraint on execution time.  It's caller's
-> + * responsibility to avoid race (or retry on TDX_OPERAND_BUSY).  Use this mutex
-> + * to avoid race in TDX module because the kernel knows better about scheduling.
-> + */
-> +static DEFINE_MUTEX(tdx_lock);
-> +static struct mutex *tdx_mng_key_config_lock;
-> +
-> +static __always_inline hpa_t set_hkid_to_hpa(hpa_t pa, u16 hkid)
-> +{
-> +	pa &= ~hkid_mask;
-> +	pa |= (u64)hkid << hkid_start_pos;
-> +
-> +	return pa;
-> +}
-> +
-> +static inline bool is_td_created(struct kvm_tdx *kvm_tdx)
-> +{
-> +	return kvm_tdx->tdr.added;
-> +}
-> +
-> +static inline void tdx_hkid_free(struct kvm_tdx *kvm_tdx)
-> +{
-> +	tdx_keyid_free(kvm_tdx->hkid);
-> +	kvm_tdx->hkid = -1;
-> +}
-> +
-> +static inline bool is_hkid_assigned(struct kvm_tdx *kvm_tdx)
-> +{
-> +	return kvm_tdx->hkid > 0;
-> +}
-> +
-> +static void tdx_clear_page(unsigned long page)
-> +{
-> +	const void *zero_page = (const void *) __va(page_to_phys(ZERO_PAGE(0)));
-> +	unsigned long i;
-> +
-> +	/*
-> +	 * Zeroing the page is only necessary for systems with MKTME-i:
-> +	 * when re-assign one page from old keyid to a new keyid, MOVDIR64B is
-> +	 * required to clear/write the page with new keyid to prevent integrity
-> +	 * error when read on the page with new keyid.
-> +	 */
-> +	if (!static_cpu_has(X86_FEATURE_MOVDIR64B))
-> +		return;
-> +
-> +	for (i = 0; i < 4096; i += 64)
-> +		/* MOVDIR64B [rdx], es:rdi */
-> +		asm (".byte 0x66, 0x0f, 0x38, 0xf8, 0x3a"
-> +		     : : "d" (zero_page), "D" (page + i) : "memory");
-> +}
-> +
-> +static int tdx_reclaim_page(unsigned long va, hpa_t pa, bool do_wb, u16 hkid)
-> +{
-> +	struct tdx_module_output out;
-> +	u64 err;
-> +
-> +	err = tdh_phymem_page_reclaim(pa, &out);
-> +	if (WARN_ON_ONCE(err)) {
-> +		pr_tdx_error(TDH_PHYMEM_PAGE_RECLAIM, err, &out);
-> +		return -EIO;
-> +	}
-> +
-> +	if (do_wb) {
-> +		err = tdh_phymem_page_wbinvd(set_hkid_to_hpa(pa, hkid));
-> +		if (WARN_ON_ONCE(err)) {
-> +			pr_tdx_error(TDH_PHYMEM_PAGE_WBINVD, err, NULL);
-> +			return -EIO;
-> +		}
-> +	}
-> +
-> +	tdx_clear_page(va);
-> +	return 0;
-> +}
-> +
-> +static int tdx_alloc_td_page(struct tdx_td_page *page)
-> +{
-> +	page->va = __get_free_page(GFP_KERNEL_ACCOUNT);
-> +	if (!page->va)
-> +		return -ENOMEM;
-> +
-> +	page->pa = __pa(page->va);
-> +	return 0;
-> +}
-> +
-> +static void tdx_mark_td_page_added(struct tdx_td_page *page)
-> +{
-> +	WARN_ON_ONCE(page->added);
-> +	page->added = true;
-> +}
-> +
-> +static void tdx_reclaim_td_page(struct tdx_td_page *page)
-> +{
-> +	if (page->added) {
-> +		/*
-> +		 * TDCX are being reclaimed.  TDX module maps TDCX with HKID
-> +		 * assigned to the TD.  Here the cache associated to the TD
-> +		 * was already flushed by TDH.PHYMEM.CACHE.WB before here, So
-> +		 * cache doesn't need to be flushed again.
-> +		 */
-> +		if (tdx_reclaim_page(page->va, page->pa, false, 0))
-> +			return;
-> +
-> +		page->added = false;
-> +	}
-> +	free_page(page->va);
-> +}
-> +
-> +static int tdx_do_tdh_phymem_cache_wb(void *param)
-> +{
-> +	u64 err = 0;
-> +
-> +	do {
-> +		err = tdh_phymem_cache_wb(!!err);
-> +	} while (err == TDX_INTERRUPTED_RESUMABLE);
-> +
-> +	/* Other thread may have done for us. */
-> +	if (err == TDX_NO_HKID_READY_TO_WBCACHE)
-> +		err = TDX_SUCCESS;
-> +	if (WARN_ON_ONCE(err)) {
-> +		pr_tdx_error(TDH_PHYMEM_CACHE_WB, err, NULL);
-> +		return -EIO;
-> +	}
-> +
-> +	return 0;
-> +}
-> +
-> +void tdx_mmu_release_hkid(struct kvm *kvm)
-> +{
-> +	struct kvm_tdx *kvm_tdx = to_kvm_tdx(kvm);
-> +	cpumask_var_t packages;
-> +	bool cpumask_allocated;
-> +	u64 err;
-> +	int ret;
-> +	int i;
-> +
-> +	if (!is_hkid_assigned(kvm_tdx))
-> +		return;
-> +
-> +	if (!is_td_created(kvm_tdx))
-> +		goto free_hkid;
-> +
-> +	cpumask_allocated = zalloc_cpumask_var(&packages, GFP_KERNEL);
-> +	cpus_read_lock();
-> +	for_each_online_cpu(i) {
-> +		if (cpumask_allocated &&
-> +			cpumask_test_and_set_cpu(topology_physical_package_id(i),
-> +						packages))
-> +			continue;
-> +
-> +		/*
-> +		 * We can destroy multiple the guest TDs simultaneously.
-> +		 * Prevent tdh_phymem_cache_wb from returning TDX_BUSY by
-> +		 * serialization.
-> +		 */
-> +		mutex_lock(&tdx_lock);
-> +		ret = smp_call_on_cpu(i, tdx_do_tdh_phymem_cache_wb, NULL, 1);
-> +		mutex_unlock(&tdx_lock);
-> +		if (ret)
-> +			break;
-> +	}
-> +	cpus_read_unlock();
-> +	free_cpumask_var(packages);
-> +
-> +	mutex_lock(&tdx_lock);
-> +	err = tdh_mng_key_freeid(kvm_tdx->tdr.pa);
-> +	mutex_unlock(&tdx_lock);
-> +	if (WARN_ON_ONCE(err)) {
-> +		pr_tdx_error(TDH_MNG_KEY_FREEID, err, NULL);
-> +		pr_err("tdh_mng_key_freeid failed. HKID %d is leaked.\n",
-> +			kvm_tdx->hkid);
-> +		return;
-> +	}
-> +
-> +free_hkid:
-> +	tdx_hkid_free(kvm_tdx);
-> +}
-> +
-> +void tdx_vm_free(struct kvm *kvm)
-> +{
-> +	struct kvm_tdx *kvm_tdx = to_kvm_tdx(kvm);
-> +	int i;
-> +
-> +	/* Can't reclaim or free TD pages if teardown failed. */
-> +	if (is_hkid_assigned(kvm_tdx))
-> +		return;
-> +
-> +	for (i = 0; i < tdx_caps.tdcs_nr_pages; i++)
-> +		tdx_reclaim_td_page(&kvm_tdx->tdcs[i]);
-> +	kfree(kvm_tdx->tdcs);
-> +
-> +	/*
-> +	 * TDX module maps TDR with TDX global HKID.  TDX module may access TDR
-> +	 * while operating on TD (Especially reclaiming TDCS).  Cache flush with
-> +	 * TDX global HKID is needed.
-> +	 */
-> +	if (kvm_tdx->tdr.added &&
-> +		tdx_reclaim_page(kvm_tdx->tdr.va, kvm_tdx->tdr.pa, true,
-> +				tdx_global_keyid))
-> +		return;
-> +
-> +	free_page(kvm_tdx->tdr.va);
-> +}
-> +
-> +static int tdx_do_tdh_mng_key_config(void *param)
-> +{
-> +	hpa_t *tdr_p = param;
-> +	u64 err;
-> +
-> +	do {
-> +		err = tdh_mng_key_config(*tdr_p);
-> +
-> +		/*
-> +		 * If it failed to generate a random key, retry it because this
-> +		 * is typically caused by an entropy error of the CPU's random
-> +		 * number generator.
-> +		 */
-> +	} while (err == TDX_KEY_GENERATION_FAILED);
-> +
-> +	if (WARN_ON_ONCE(err)) {
-> +		pr_tdx_error(TDH_MNG_KEY_CONFIG, err, NULL);
-> +		return -EIO;
-> +	}
-> +
-> +	return 0;
-> +}
-> +
-> +int tdx_vm_init(struct kvm *kvm)
-> +{
-> +	struct kvm_tdx *kvm_tdx = to_kvm_tdx(kvm);
-> +	cpumask_var_t packages;
-> +	int ret, i;
-> +	u64 err;
-> +
-> +	/* vCPUs can't be created until after KVM_TDX_INIT_VM. */
-> +	kvm->max_vcpus = 0;
-> +
-> +	kvm_tdx->hkid = tdx_keyid_alloc();
-> +	if (kvm_tdx->hkid < 0)
-> +		return -EBUSY;
-> +
-> +	ret = tdx_alloc_td_page(&kvm_tdx->tdr);
-> +	if (ret)
-> +		goto free_hkid;
-> +
-> +	kvm_tdx->tdcs = kcalloc(tdx_caps.tdcs_nr_pages, sizeof(*kvm_tdx->tdcs),
-> +				GFP_KERNEL_ACCOUNT);
-> +	if (!kvm_tdx->tdcs)
-> +		goto free_tdr;
-> +	for (i = 0; i < tdx_caps.tdcs_nr_pages; i++) {
-> +		ret = tdx_alloc_td_page(&kvm_tdx->tdcs[i]);
-> +		if (ret)
-> +			goto free_tdcs;
-> +	}
-> +
-> +	/*
-> +	 * Acquire global lock to avoid TDX_OPERAND_BUSY:
-> +	 * TDH.MNG.CREATE and other APIs try to lock the global Key Owner
-> +	 * Table (KOT) to track the assigned TDX private HKID.  It doesn't spin
-> +	 * to acquire the lock, returns TDX_OPERAND_BUSY instead, and let the
-> +	 * caller to handle the contention.  This is because of time limitation
-> +	 * usable inside the TDX module and OS/VMM knows better about process
-> +	 * scheduling.
-> +	 *
-> +	 * APIs to acquire the lock of KOT:
-> +	 * TDH.MNG.CREATE, TDH.MNG.KEY.FREEID, TDH.MNG.VPFLUSHDONE, and
-> +	 * TDH.PHYMEM.CACHE.WB.
-> +	 */
-> +	mutex_lock(&tdx_lock);
-> +	err = tdh_mng_create(kvm_tdx->tdr.pa, kvm_tdx->hkid);
-> +	mutex_unlock(&tdx_lock);
-> +	if (WARN_ON_ONCE(err)) {
-> +		pr_tdx_error(TDH_MNG_CREATE, err, NULL);
-> +		ret = -EIO;
-> +		goto free_tdcs;
-> +	}
-> +	tdx_mark_td_page_added(&kvm_tdx->tdr);
-> +
-> +	if (!zalloc_cpumask_var(&packages, GFP_KERNEL)) {
-> +		ret = -ENOMEM;
-> +		goto free_tdcs;
-> +	}
-> +	cpus_read_lock();
-> +	for_each_online_cpu(i) {
-> +		int pkg = topology_physical_package_id(i);
-> +
-> +		if (cpumask_test_and_set_cpu(pkg, packages))
-> +			continue;
-> +
-> +		/*
-> +		 * Program the memory controller in the package with an
-> +		 * encryption key associated to a TDX private host key id
-> +		 * assigned to this TDR.  Concurrent operations on same memory
-> +		 * controller results in TDX_OPERAND_BUSY.  Avoid this race by
-> +		 * mutex.
-> +		 */
-> +		mutex_lock(&tdx_mng_key_config_lock[pkg]);
-> +		ret = smp_call_on_cpu(i, tdx_do_tdh_mng_key_config,
-> +				      &kvm_tdx->tdr.pa, true);
-> +		mutex_unlock(&tdx_mng_key_config_lock[pkg]);
-> +		if (ret)
-> +			break;
-> +	}
-> +	cpus_read_unlock();
-> +	free_cpumask_var(packages);
-> +	if (ret)
-> +		goto teardown;
-> +
-> +	for (i = 0; i < tdx_caps.tdcs_nr_pages; i++) {
-> +		err = tdh_mng_addcx(kvm_tdx->tdr.pa, kvm_tdx->tdcs[i].pa);
-> +		if (WARN_ON_ONCE(err)) {
-> +			pr_tdx_error(TDH_MNG_ADDCX, err, NULL);
-> +			ret = -EIO;
-> +			goto teardown;
-> +		}
-> +		tdx_mark_td_page_added(&kvm_tdx->tdcs[i]);
-> +	}
-> +
-> +	/*
-> +	 * Note, TDH_MNG_INIT cannot be invoked here.  TDH_MNG_INIT requires a dedicated
-> +	 * ioctl() to define the configure CPUID values for the TD.
-> +	 */
-> +	return 0;
-> +
-> +	/*
-> +	 * The sequence for freeing resources from a partially initialized TD
-> +	 * varies based on where in the initialization flow failure occurred.
-> +	 * Simply use the full teardown and destroy, which naturally play nice
-> +	 * with partial initialization.
-> +	 */
-> +teardown:
-> +	tdx_mmu_release_hkid(kvm);
-> +	tdx_vm_free(kvm);
-> +	return ret;
-> +
-> +free_tdcs:
-> +	/* @i points at the TDCS page that failed allocation. */
-> +	for (--i; i >= 0; i--)
-> +		free_page(kvm_tdx->tdcs[i].va);
-> +	kfree(kvm_tdx->tdcs);
-> +free_tdr:
-> +	free_page(kvm_tdx->tdr.va);
-> +free_hkid:
-> +	tdx_hkid_free(kvm_tdx);
-> +	return ret;
-> +}
-> +
->  int __init tdx_module_setup(void)
->  {
->  	const struct tdsysinfo_struct *tdsysinfo;
-> @@ -48,6 +406,8 @@ int __init tdx_module_setup(void)
->  		return ret;
->  	}
->
-> +	tdx_global_keyid = tdx_get_global_keyid();
+On Thu, Jul 07, 2022 at 06:08:45AM +0000, Tian, Kevin wrote:
 
-I remember there's another static variable also named
-"tdx_global_keyid" in arch/x86/virt/vmx/tdx/tdx.c ?
-We can just use tdx_get_global_keyid() here without introducing
-another static variable.
+> > Request for testing: I only did build for s390 and i915 code, so it'd
+> > be nice to have people who have environment to run sanity accordingly.
+> >
+> 
+> +Terrence who is testing it for i915 now...
 
-> +
->  	tdsysinfo = tdx_get_sysinfo();
->  	if (tdsysinfo->num_cpuid_config > TDX_MAX_NR_CPUID_CONFIGS)
->  		return -EIO;
-> @@ -81,7 +441,9 @@ bool tdx_is_vm_type_supported(unsigned long type)
->
->  int __init tdx_hardware_setup(struct kvm_x86_ops *x86_ops)
->  {
-> +	int max_pkgs;
->  	u32 max_pa;
-> +	int i;
->
->  	if (!enable_ept) {
->  		pr_warn("Cannot enable TDX with EPT disabled\n");
-> @@ -97,6 +459,14 @@ int __init tdx_hardware_setup(struct kvm_x86_ops *x86_ops)
->  	if (WARN_ON_ONCE(x86_ops->tlb_remote_flush))
->  		return -EIO;
->
-> +	max_pkgs = topology_max_packages();
-> +	tdx_mng_key_config_lock = kcalloc(max_pkgs, sizeof(*tdx_mng_key_config_lock),
-> +				   GFP_KERNEL);
-> +	if (!tdx_mng_key_config_lock)
-> +		return -ENOMEM;
-> +	for (i = 0; i < max_pkgs; i++)
-> +		mutex_init(&tdx_mng_key_config_lock[i]);
-> +
->  	max_pa = cpuid_eax(0x80000008) & 0xff;
->  	hkid_start_pos = boot_cpu_data.x86_phys_bits;
->  	hkid_mask = GENMASK_ULL(max_pa - 1, hkid_start_pos);
-> @@ -105,3 +475,9 @@ int __init tdx_hardware_setup(struct kvm_x86_ops *x86_ops)
->
->  	return 0;
->  }
-> +
-> +void tdx_hardware_unsetup(void)
-> +{
-> +	/* kfree accepts NULL. */
-> +	kfree(tdx_mng_key_config_lock);
-> +}
-> diff --git a/arch/x86/kvm/vmx/tdx.h b/arch/x86/kvm/vmx/tdx.h
-> index f50d37f3fc9c..8058b6b153f8 100644
-> --- a/arch/x86/kvm/vmx/tdx.h
-> +++ b/arch/x86/kvm/vmx/tdx.h
-> @@ -19,6 +19,8 @@ struct kvm_tdx {
->
->  	struct tdx_td_page tdr;
->  	struct tdx_td_page *tdcs;
-> +
-> +	int hkid;
->  };
->
->  struct vcpu_tdx {
-> diff --git a/arch/x86/kvm/vmx/tdx_errno.h b/arch/x86/kvm/vmx/tdx_errno.h
-> index 5c878488795d..590fcfdd1899 100644
-> --- a/arch/x86/kvm/vmx/tdx_errno.h
-> +++ b/arch/x86/kvm/vmx/tdx_errno.h
-> @@ -12,11 +12,11 @@
->  #define TDX_SUCCESS				0x0000000000000000ULL
->  #define TDX_NON_RECOVERABLE_VCPU		0x4000000100000000ULL
->  #define TDX_INTERRUPTED_RESUMABLE		0x8000000300000000ULL
-> -#define TDX_LIFECYCLE_STATE_INCORRECT		0xC000060700000000ULL
->  #define TDX_VCPU_NOT_ASSOCIATED			0x8000070200000000ULL
->  #define TDX_KEY_GENERATION_FAILED		0x8000080000000000ULL
->  #define TDX_KEY_STATE_INCORRECT			0xC000081100000000ULL
->  #define TDX_KEY_CONFIGURED			0x0000081500000000ULL
-> +#define TDX_NO_HKID_READY_TO_WBCACHE		0x0000082100000000ULL
->  #define TDX_EPT_WALK_FAILED			0xC0000B0000000000ULL
->
->  /*
-> diff --git a/arch/x86/kvm/vmx/x86_ops.h b/arch/x86/kvm/vmx/x86_ops.h
-> index dbfd0e43fd89..663fd8d4063f 100644
-> --- a/arch/x86/kvm/vmx/x86_ops.h
-> +++ b/arch/x86/kvm/vmx/x86_ops.h
-> @@ -131,9 +131,20 @@ void vmx_setup_mce(struct kvm_vcpu *vcpu);
->  #ifdef CONFIG_INTEL_TDX_HOST
->  int __init tdx_hardware_setup(struct kvm_x86_ops *x86_ops);
->  bool tdx_is_vm_type_supported(unsigned long type);
-> +void tdx_hardware_unsetup(void);
-> +
-> +int tdx_vm_init(struct kvm *kvm);
-> +void tdx_mmu_release_hkid(struct kvm *kvm);
-> +void tdx_vm_free(struct kvm *kvm);
->  #else
->  static inline int tdx_hardware_setup(struct kvm_x86_ops *x86_ops) { return 0; }
->  static inline bool tdx_is_vm_type_supported(unsigned long type) { return false; }
-> +static inline void tdx_hardware_unsetup(void) {}
-> +
-> +static inline int tdx_vm_init(struct kvm *kvm) { return -EOPNOTSUPP; }
-> +static inline void tdx_mmu_release_hkid(struct kvm *kvm) {}
-> +static inline void tdx_flush_shadow_all_private(struct kvm *kvm) {}
-> +static inline void tdx_vm_free(struct kvm *kvm) {}
->  #endif
->
->  #endif /* __KVM_X86_VMX_X86_OPS_H */
-> diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-> index 96dc8f52a137..320f902eaf9e 100644
-> --- a/arch/x86/kvm/x86.c
-> +++ b/arch/x86/kvm/x86.c
-> @@ -12057,6 +12057,7 @@ void kvm_arch_destroy_vm(struct kvm *kvm)
->  	kvm_page_track_cleanup(kvm);
->  	kvm_xen_destroy_vm(kvm);
->  	kvm_hv_destroy_vm(kvm);
-> +	static_call_cond(kvm_x86_vm_free)(kvm);
->  }
->
->  static void memslot_rmap_free(struct kvm_memory_slot *slot)
-> @@ -12321,6 +12322,13 @@ void kvm_arch_commit_memory_region(struct kvm *kvm,
->
->  void kvm_arch_flush_shadow_all(struct kvm *kvm)
->  {
-> +	/*
-> +	 * kvm_mmu_zap_all() zaps both private and shared page tables.  Before
-> +	 * tearing down private page tables, TDX requires some TD resources to
-> +	 * be destroyed (i.e. keyID must have been reclaimed, etc).  Invoke
-> +	 * kvm_x86_flush_shadow_all_private() for this.
-> +	 */
-> +	static_call_cond(kvm_x86_flush_shadow_all_private)(kvm);
->  	kvm_mmu_zap_all(kvm);
->  }
->
-> --
-> 2.25.1
->
+Hi Terrence, would it be possible for you to pull v3 to test on?
+https://github.com/nicolinc/iommufd/commits/dev/vfio_pin_pages-v3
+
+They are basically same but there's a new DIV_ROUND_UP change,
+which shouldn't result in any functional difference, IMHO. If
+v3 passes, I can simply add your Tested-by when I respin it.
+
+Thanks
+Nic
