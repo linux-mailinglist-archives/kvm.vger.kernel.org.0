@@ -2,89 +2,91 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id A7749569D33
-	for <lists+kvm@lfdr.de>; Thu,  7 Jul 2022 10:26:10 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id DB639569D47
+	for <lists+kvm@lfdr.de>; Thu,  7 Jul 2022 10:26:16 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235485AbiGGITA (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 7 Jul 2022 04:19:00 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60464 "EHLO
+        id S230120AbiGGIWR (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 7 Jul 2022 04:22:17 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38750 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235186AbiGGISE (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 7 Jul 2022 04:18:04 -0400
-Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 63DCA32EF0;
-        Thu,  7 Jul 2022 01:16:51 -0700 (PDT)
-Received: from pps.filterd (m0098399.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.17.1.5/8.17.1.5) with ESMTP id 2678C16Z003607;
-        Thu, 7 Jul 2022 08:16:51 GMT
+        with ESMTP id S234560AbiGGIVj (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 7 Jul 2022 04:21:39 -0400
+Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8A3664F66A;
+        Thu,  7 Jul 2022 01:20:51 -0700 (PDT)
+Received: from pps.filterd (m0098417.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.17.1.5/8.17.1.5) with ESMTP id 2677pvB6023351;
+        Thu, 7 Jul 2022 08:20:50 GMT
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
  mime-version : subject : to : cc : references : from : in-reply-to :
  content-type : content-transfer-encoding; s=pp1;
- bh=huLa6BBmIJqqnkXB6gz8rthVwcy/GkzaeAXZsM2Mtrc=;
- b=pzrvhtoeX51s5CggSTnzeWIIz23PnzXWd5M6PaCOMAuXQ1woCTASAP/eF2tCYWMtbxRx
- UJXZ0EK+ww2bLvSaa18tiMjAnkTa7MAHOhT9endjAuNYJCT1dC3CwUClAfyNprKfxlwK
- RpB3/KEsX8LdWCE90pCGZo/2Cvq7awOTbkiqk0NX5WkcfuZK4j+XD89wwZdsAqZTh9d9
- jLcZZR0qZltLRhPHnP6s6VJWqOquUmRvwBoXgmPG/THN7Wkk6lWY68/Y2LpYe8dRUv31
- J4yQ911Zrk1ntDsZ89syf3DQr9ARiwIeyl3k6U3Wh6eYh3+fu3++De9r+FM+tPwT/Ib5 7w== 
+ bh=uhsofTH+kMsWpnDHUVDrRNYi2PtbCX3drvdW21czUB0=;
+ b=P/qyTVtpd7vVZMfaQftpPQ94cgNaFWbIdhPfaZ1EyvEmV61AEzVLCWBP36lnq3g4SE3Y
+ 75SRJdAVtxTDA4EvBMtIjI4Z9Ny58zc+s5U+25IWD1v3vLQYSFHY0LsrI3r4LzlhtQwq
+ nxYPNQe7JFyRO1wk0aT4VnAjNNK/Jf7ieUwRG5T08np/tXaQEVKRhiNXoslwJ4PojV1V
+ HOQ1QPzRP0qRNEqap7sj6ISvAdyQiB4xOlmOsre8f8m69tIgeiUIRcq+yTWibnxi0rdF
+ s4FOQVHsTxQ2y6bRysQ0NVhQV/ND6wK5CAD9jaz9Wkm4ef9qmKp0jRJoB0VsnsO842a7 gA== 
 Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3h5ury044q-1
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3h5ufjrr5w-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 07 Jul 2022 08:16:51 +0000
-Received: from m0098399.ppops.net (m0098399.ppops.net [127.0.0.1])
-        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 2678Cn4t005617;
-        Thu, 7 Jul 2022 08:16:50 GMT
-Received: from ppma04ams.nl.ibm.com (63.31.33a9.ip4.static.sl-reverse.com [169.51.49.99])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3h5ury043v-1
+        Thu, 07 Jul 2022 08:20:50 +0000
+Received: from m0098417.ppops.net (m0098417.ppops.net [127.0.0.1])
+        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 2677rNV2027487;
+        Thu, 7 Jul 2022 08:20:49 GMT
+Received: from ppma03ams.nl.ibm.com (62.31.33a9.ip4.static.sl-reverse.com [169.51.49.98])
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3h5ufjrr5g-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 07 Jul 2022 08:16:50 +0000
-Received: from pps.filterd (ppma04ams.nl.ibm.com [127.0.0.1])
-        by ppma04ams.nl.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 26785u2c011427;
-        Thu, 7 Jul 2022 08:16:48 GMT
-Received: from b06cxnps4075.portsmouth.uk.ibm.com (d06relay12.portsmouth.uk.ibm.com [9.149.109.197])
-        by ppma04ams.nl.ibm.com with ESMTP id 3h4v4jt8ha-1
+        Thu, 07 Jul 2022 08:20:49 +0000
+Received: from pps.filterd (ppma03ams.nl.ibm.com [127.0.0.1])
+        by ppma03ams.nl.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 26785qqa020870;
+        Thu, 7 Jul 2022 08:20:47 GMT
+Received: from b06avi18626390.portsmouth.uk.ibm.com (b06avi18626390.portsmouth.uk.ibm.com [9.149.26.192])
+        by ppma03ams.nl.ibm.com with ESMTP id 3h4ujsj8w9-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 07 Jul 2022 08:16:48 +0000
+        Thu, 07 Jul 2022 08:20:47 +0000
 Received: from d06av25.portsmouth.uk.ibm.com (d06av25.portsmouth.uk.ibm.com [9.149.105.61])
-        by b06cxnps4075.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 2678GjPP20578606
+        by b06avi18626390.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 2678JQxD23920962
         (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Thu, 7 Jul 2022 08:16:45 GMT
+        Thu, 7 Jul 2022 08:19:26 GMT
 Received: from d06av25.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 2BC1511C04C;
-        Thu,  7 Jul 2022 08:16:45 +0000 (GMT)
+        by IMSVA (Postfix) with ESMTP id BAD7311C04C;
+        Thu,  7 Jul 2022 08:20:44 +0000 (GMT)
 Received: from d06av25.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id CDCC011C04A;
-        Thu,  7 Jul 2022 08:16:44 +0000 (GMT)
+        by IMSVA (Postfix) with ESMTP id 48F0011C04A;
+        Thu,  7 Jul 2022 08:20:44 +0000 (GMT)
 Received: from [9.145.178.7] (unknown [9.145.178.7])
         by d06av25.portsmouth.uk.ibm.com (Postfix) with ESMTP;
-        Thu,  7 Jul 2022 08:16:44 +0000 (GMT)
-Message-ID: <f471d1a8-54b7-b858-1324-c62d0d20623c@linux.ibm.com>
-Date:   Thu, 7 Jul 2022 10:16:44 +0200
+        Thu,  7 Jul 2022 08:20:44 +0000 (GMT)
+Message-ID: <52f4af7b-5c11-c62f-1ef8-0b20b8a0c127@linux.ibm.com>
+Date:   Thu, 7 Jul 2022 10:20:43 +0200
 MIME-Version: 1.0
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
  Thunderbird/91.9.0
 Subject: Re: [kvm-unit-tests PATCH v2 1/8] s390x: uv-host: Add access checks
  for donated memory
 Content-Language: en-US
-To:     Claudio Imbrenda <imbrenda@linux.ibm.com>
-Cc:     kvm390 mailing list <kvm390-list@tuxmaker.boeblingen.de.ibm.com>,
-        kvm@vger.kernel.org, linux-s390@vger.kernel.org, thuth@redhat.com,
-        seiden@linux.ibm.com, nrb@linux.ibm.com, scgl@linux.ibm.com
+To:     Steffen Eiden <seiden@linux.ibm.com>,
+        kvm390 mailing list 
+        <kvm390-list@tuxmaker.boeblingen.de.ibm.com>
+Cc:     kvm@vger.kernel.org, linux-s390@vger.kernel.org,
+        imbrenda@linux.ibm.com, thuth@redhat.com, nrb@linux.ibm.com,
+        scgl@linux.ibm.com
 References: <20220706064024.16573-1-frankja@linux.ibm.com>
  <20220706064024.16573-2-frankja@linux.ibm.com>
- <20220706183346.2a027e8b@p-imbrenda>
+ <c8dcbb5c-73c0-be3d-8727-a376220007fa@linux.ibm.com>
 From:   Janosch Frank <frankja@linux.ibm.com>
-In-Reply-To: <20220706183346.2a027e8b@p-imbrenda>
+In-Reply-To: <c8dcbb5c-73c0-be3d-8727-a376220007fa@linux.ibm.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 X-TM-AS-GCONF: 00
-X-Proofpoint-ORIG-GUID: gN-JG6IymdFSXArNkdzxwPdUvmWKiE0D
-X-Proofpoint-GUID: CaYVEnbnFUAdwkbhHgyds2G89gN-2Z4j
+X-Proofpoint-ORIG-GUID: uTXOPoJQqTtPKVOdZIdcj3GKl56JdLA0
+X-Proofpoint-GUID: 6YntzCZotqfrMohhiC_hovTHQtFRvHrb
 X-Proofpoint-Virus-Version: vendor=baseguard
  engine=ICAP:2.0.205,Aquarius:18.0.883,Hydra:6.0.517,FMLib:17.11.122.1
  definitions=2022-07-07_06,2022-06-28_01,2022-06-22_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxscore=0 impostorscore=0
- suspectscore=0 bulkscore=0 spamscore=0 phishscore=0 clxscore=1015
- priorityscore=1501 mlxlogscore=999 adultscore=0 malwarescore=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501
+ phishscore=0 spamscore=0 clxscore=1015 mlxlogscore=999 malwarescore=0
+ bulkscore=0 adultscore=0 impostorscore=0 suspectscore=0 mlxscore=0
  lowpriorityscore=0 classifier=spam adjust=0 reason=mlx scancount=1
  engine=8.12.0-2206140000 definitions=main-2207070031
 X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
@@ -97,25 +99,25 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 7/6/22 18:33, Claudio Imbrenda wrote:
-> On Wed,  6 Jul 2022 06:40:17 +0000
-> Janosch Frank <frankja@linux.ibm.com> wrote:
+On 7/7/22 10:11, Steffen Eiden wrote:
+> Hi Janosch,
 > 
+> On 7/6/22 08:40, Janosch Frank wrote:
 >> Let's check if the UV really protected all the memory we donated.
 >>
 >> Signed-off-by: Janosch Frank <frankja@linux.ibm.com>
 >> ---
->>   s390x/uv-host.c | 29 +++++++++++++++++++++++++++++
->>   1 file changed, 29 insertions(+)
+>>    s390x/uv-host.c | 29 +++++++++++++++++++++++++++++
+>>    1 file changed, 29 insertions(+)
 >>
 >> diff --git a/s390x/uv-host.c b/s390x/uv-host.c
 >> index a1a6d120..983cb4a1 100644
 >> --- a/s390x/uv-host.c
 >> +++ b/s390x/uv-host.c
 >> @@ -43,6 +43,24 @@ static void cpu_loop(void)
->>   	for (;;) {}
->>   }
->>   
+>>    	for (;;) {}
+>>    }
+>>    
 >> +/*
 >> + * Checks if a memory area is protected as secure memory.
 >> + * Will return true if all pages are protected, false otherwise.
@@ -125,51 +127,27 @@ On 7/6/22 18:33, Claudio Imbrenda wrote:
 >> +	while (len) {
 >> +		expect_pgm_int();
 >> +		*access_ptr += 42;
-> 
-> I'm surprised this works, you will get an (expected) exception when
-> reading from the pointer, and then you should get another one (at this
-> point unexpected) when writing
-> 
-
-Let me introduce you to "AGSI" add grand storage immediate.
-But I get your point, inline assembly would make this much more explicit.
-
 >> +		if (clear_pgm_int() != PGM_INT_CODE_SECURE_STOR_ACCESS)
 >> +			return false;
 >> +		access_ptr += PAGE_SIZE / sizeof(access_ptr);
 >> +		len -= PAGE_SIZE;
+> If someone uses this function with 'len' not being a multiple of
+> PAGE_SIZE this test does not for what is was intended by testing more
+> memory than expected.
+> 
+> I suggest adding an explicit assert at the beginning of the function
+> that ensures 'len' is a multiple of PAGE_SIZE.
+
+Sure
+
+> 
 >> +	}
 >> +
 >> +	return true;
 >> +}
 >> +
->>   static struct cmd_list cmds[] = {
->>   	{ "init", UVC_CMD_INIT_UV, sizeof(struct uv_cb_init), BIT_UVC_CMD_INIT_UV },
->>   	{ "create conf", UVC_CMD_CREATE_SEC_CONF, sizeof(struct uv_cb_cgc), BIT_UVC_CMD_CREATE_SEC_CONF },
->> @@ -194,6 +212,10 @@ static void test_cpu_create(void)
->>   	report(rc == 0 && uvcb_csc.header.rc == UVC_RC_EXECUTED &&
->>   	       uvcb_csc.cpu_handle, "success");
->>   
->> +	rc = access_check_3d((uint64_t *)uvcb_csc.stor_origin,
->> +			     uvcb_qui.cpu_stor_len);
->> +	report(rc, "Storage protection");
->> +
->>   	tmp = uvcb_csc.stor_origin;
->>   	uvcb_csc.stor_origin = (unsigned long)memalign(PAGE_SIZE, uvcb_qui.cpu_stor_len);
->>   	rc = uv_call(0, (uint64_t)&uvcb_csc);
->> @@ -292,6 +314,13 @@ static void test_config_create(void)
->>   	rc = uv_call(0, (uint64_t)&uvcb_cgc);
->>   	report(rc == 0 && uvcb_cgc.header.rc == UVC_RC_EXECUTED, "successful");
->>   
->> +	rc = access_check_3d((uint64_t *)uvcb_cgc.conf_var_stor_origin, vsize);
->> +	report(rc, "Base storage protection");
->> +
->> +	rc = access_check_3d((uint64_t *)uvcb_cgc.conf_base_stor_origin,
->> +			     uvcb_qui.conf_base_phys_stor_len);
->> +	report(rc, "Variable storage protection");
->> +
->>   	uvcb_cgc.header.rc = 0;
->>   	uvcb_cgc.header.rrc = 0;
->>   	tmp = uvcb_cgc.guest_handle;
 > 
+> [snip]
+> 
+> Steffen
 
