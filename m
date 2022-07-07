@@ -2,74 +2,183 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 3784C569D72
-	for <lists+kvm@lfdr.de>; Thu,  7 Jul 2022 10:30:40 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 7D5C1569DA6
+	for <lists+kvm@lfdr.de>; Thu,  7 Jul 2022 10:42:45 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235173AbiGGI1F (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 7 Jul 2022 04:27:05 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46240 "EHLO
+        id S235084AbiGGIme (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 7 Jul 2022 04:42:34 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56850 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231693AbiGGI1D (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 7 Jul 2022 04:27:03 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 2C4DE1A3BB
-        for <kvm@vger.kernel.org>; Thu,  7 Jul 2022 01:27:02 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1657182421;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=hyQUq78HZYV0U5amrGZK5Au62aqwa+QCBY5NRkOA5vM=;
-        b=Za1c3dchr9VjWfrfMwzbmap30VjOuSjq8jpKqxO9feLQkidfcNtGkfSjYRLrw51CdMSVyZ
-        l44mgb8yrPR6nw82yuQHX1wVC+3EzdKglDHla7aTQdVHH5nWJLpiQjnkSR/zQ2waM5ZAk4
-        fvM/tVl90P8vzI3fQNWZwyxjYvzfwjo=
-Received: from mail-ej1-f69.google.com (mail-ej1-f69.google.com
- [209.85.218.69]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-500-VPVHcE1HOYOsyCBYrhgCRw-1; Thu, 07 Jul 2022 04:26:59 -0400
-X-MC-Unique: VPVHcE1HOYOsyCBYrhgCRw-1
-Received: by mail-ej1-f69.google.com with SMTP id nb10-20020a1709071c8a00b006e8f89863ceso4460408ejc.18
-        for <kvm@vger.kernel.org>; Thu, 07 Jul 2022 01:26:59 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:from:to:cc:subject:in-reply-to:references:date
-         :message-id:mime-version;
-        bh=hyQUq78HZYV0U5amrGZK5Au62aqwa+QCBY5NRkOA5vM=;
-        b=nHstMgWlkoaMfNUkjrp32xUbtm9CzXlFIN12s7xS/KeHElPknkrfzFZYKKQtqB/rOn
-         sAiMlfzHc6suXa7FbC2vy2hqPSvDVwLQv5oMxVsT2v8ReAOyQWS7t2MQPxeWbPW2Go+g
-         q5IoMRTSJ7W/WkIUKJlFNEvXEoxJnBI0GEuKLpEUiIkCPPAzziTQNttmTz3l2J0HT2Mz
-         lfU+LA+pYrP5hKE8LYkC1GoGYr1czRlsy0yrvRGubvqQWnW+ynmxPVmwfVVqf5Qq/7NB
-         o7V9DOyZrMWsS0rHQ7kMQVmlflhqtc+xq0u3FuuBim+uPzyOyu+WhCFnprgZfiWVWhvR
-         AE3w==
-X-Gm-Message-State: AJIora8jAsOXRygjjCj0hKlEoWAbKI+eBVXT2CUOg1/zdAwHC3AJuU80
-        EbSMAlXy48bL+hQJk6Og9m1gpfHPuXTFCq7KtZKAkvzFEN2dNtzYvxC9oJLnQywRrbmSkYso2QZ
-        moLP/RsZl1C4cfJjkYpC8AqLHWuVfIO+ZCB46Ylf0mwp3FN/AsMjD/vtYhqvugXwm
-X-Received: by 2002:a05:6402:c0b:b0:43a:25ff:ff08 with SMTP id co11-20020a0564020c0b00b0043a25ffff08mr32234935edb.148.1657182418796;
-        Thu, 07 Jul 2022 01:26:58 -0700 (PDT)
-X-Google-Smtp-Source: AGRyM1uvaDV9BbuUE121Sm+1DSqPLexh4d8iG52AgkDo+XRYCQ8whzlmbqjuBkwqDmHZx8J/VKLzYA==
-X-Received: by 2002:a05:6402:c0b:b0:43a:25ff:ff08 with SMTP id co11-20020a0564020c0b00b0043a25ffff08mr32234901edb.148.1657182418538;
-        Thu, 07 Jul 2022 01:26:58 -0700 (PDT)
-Received: from fedora (nat-2.ign.cz. [91.219.240.2])
-        by smtp.gmail.com with ESMTPSA id eo7-20020a056402530700b0043a78236cd2sm5689000edb.89.2022.07.07.01.26.57
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 07 Jul 2022 01:26:58 -0700 (PDT)
-From:   Vitaly Kuznetsov <vkuznets@redhat.com>
-To:     Wang Guangju <wangguangju@baidu.com>
-Cc:     linux-kernel@vger.kernel.org, wangguangju@baidu.com,
-        seanjc@google.com, pbonzini@redhat.com, jmattson@google.com,
-        wanpengli@tencent.com, bp@alien8.de, joro@8bytes.org,
-        suravee.suthikulpanit@amd.com, hpa@zytor.com, tglx@linutronix.de,
-        mingo@redhat.com, kvm@vger.kernel.org
-Subject: Re: [PATCH] KVM: x86: Add EOI exit bitmap handlers for Hyper-V
- SynIC vectors
-In-Reply-To: <20220705083732.168-1-wangguangju@baidu.com>
-References: <20220705083732.168-1-wangguangju@baidu.com>
-Date:   Thu, 07 Jul 2022 10:26:56 +0200
-Message-ID: <87v8s9qqen.fsf@redhat.com>
+        with ESMTP id S229827AbiGGImd (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 7 Jul 2022 04:42:33 -0400
+Received: from mga11.intel.com (mga11.intel.com [192.55.52.93])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3F69C112E;
+        Thu,  7 Jul 2022 01:42:33 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1657183353; x=1688719353;
+  h=from:to:cc:subject:date:message-id:references:
+   in-reply-to:content-transfer-encoding:mime-version;
+  bh=0/fqLmI7qJTokHP14KeCe0rfUeYYD68w6VO7Am9TbdM=;
+  b=kEfdgN3mUme1UuZCqdLCzp3yqFtGBNRvPr26AvhcD7Mw0zX+K6g9KKxs
+   hAa1oLZzbXi5IGC0+MWf1lHTsni43BR/vSh0gIOLMddvjSNeUJIhsvf5c
+   zD7F3Jy/S14L+emQz6SMAYelPBaNOUI+JwQnF4+08J0/Hx3snrxc0NC7m
+   +oSNN2NBN/O8u4lkcYEdw11NtB4qfvQJnbS9/IuIA2JiXGMXP+eyTt4Gp
+   ms2LCcfghZc/h5h+BVoqJHJg5oW772o8H6Gc6K+LRP1Or9C0jlyo+B3sC
+   HRWGSS91MsLRYxaJ8KzBnviidkM7T8N7DBw9ereGy5yi3nO13SfbJcfCV
+   g==;
+X-IronPort-AV: E=McAfee;i="6400,9594,10400"; a="281517753"
+X-IronPort-AV: E=Sophos;i="5.92,252,1650956400"; 
+   d="scan'208";a="281517753"
+Received: from fmsmga007.fm.intel.com ([10.253.24.52])
+  by fmsmga102.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 07 Jul 2022 01:42:32 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.92,252,1650956400"; 
+   d="scan'208";a="597954229"
+Received: from orsmsx604.amr.corp.intel.com ([10.22.229.17])
+  by fmsmga007.fm.intel.com with ESMTP; 07 Jul 2022 01:42:31 -0700
+Received: from orsmsx611.amr.corp.intel.com (10.22.229.24) by
+ ORSMSX604.amr.corp.intel.com (10.22.229.17) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2308.27; Thu, 7 Jul 2022 01:42:30 -0700
+Received: from orsmsx608.amr.corp.intel.com (10.22.229.21) by
+ ORSMSX611.amr.corp.intel.com (10.22.229.24) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2308.27; Thu, 7 Jul 2022 01:42:30 -0700
+Received: from orsedg603.ED.cps.intel.com (10.7.248.4) by
+ orsmsx608.amr.corp.intel.com (10.22.229.21) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2308.27 via Frontend Transport; Thu, 7 Jul 2022 01:42:30 -0700
+Received: from NAM11-DM6-obe.outbound.protection.outlook.com (104.47.57.173)
+ by edgegateway.intel.com (134.134.137.100) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2308.27; Thu, 7 Jul 2022 01:42:29 -0700
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=MgjMFCjPAdnkzHplep5OJjIwcJVtsYuRh16mdBRwbczm9JadBwkmnWt1MSkpNkfNV7OpUdX38k4h9sFUpw859zlIycVcEimhm0MyRv9c70poM474E6AQLD7ZUOZccWZOst7ykNkf5TN5v0dRLlcXvFEMjDpthQWsVq1z7CWZg3dENbzT5SAMZcdVfOKXH/twXqOrraryOuuFEgc0n35sHkoLbfPnj9AlOqyDzzBwYBaGxLYPer2a16TL9lr8OlD+6br5zdFChVTeU6lzx3XPCmAa29kg++qqeu/nz5gUJ4Y/9EQ6BTZ3owGzDwqEO+Pp1Ga3E/qt+rCqw/PomlvJxQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=6FjMsp5Pcakqnbew0Z0H3HdHj3S2H7AgFuo/fxGr9gc=;
+ b=iCjfmXPlObCsMcV8Nq11BkTNQX1a+dJrO0RkPHfbwx74aKrU4chpwjoYeDlbMEvmCWzf2KEb0IkFFuutBkONGv1HEQ2AXZvyLHG5aN9ZdjE3lmEKAOp0+cCczxpMKN1VLfdCXtvxn37ECvaKOWdiyw+tNlC08LtREaFcV4ARwoAQ1uSy01bA2ruM2tflBRQ21vC4t8E8/v1ZcL4C3YDJJ4WZo3b7Twqqy9lGlBuC1Bpj2ltIatnEZAZyrpWaX9iiExHopAWDgWaVw9Hxxl9bMZiL6P0laLM9hxHejUUo7GydXYFPnt7rAfIPe9CuJCULkCRbN3H5mGSJqxbPB2sa4Q==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Received: from BN9PR11MB5276.namprd11.prod.outlook.com (2603:10b6:408:135::18)
+ by SN6PR11MB2654.namprd11.prod.outlook.com (2603:10b6:805:54::31) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5395.17; Thu, 7 Jul
+ 2022 08:42:28 +0000
+Received: from BN9PR11MB5276.namprd11.prod.outlook.com
+ ([fe80::8435:5a99:1e28:b38c]) by BN9PR11MB5276.namprd11.prod.outlook.com
+ ([fe80::8435:5a99:1e28:b38c%2]) with mapi id 15.20.5395.021; Thu, 7 Jul 2022
+ 08:42:28 +0000
+From:   "Tian, Kevin" <kevin.tian@intel.com>
+To:     Nicolin Chen <nicolinc@nvidia.com>,
+        "kwankhede@nvidia.com" <kwankhede@nvidia.com>,
+        "corbet@lwn.net" <corbet@lwn.net>,
+        "hca@linux.ibm.com" <hca@linux.ibm.com>,
+        "gor@linux.ibm.com" <gor@linux.ibm.com>,
+        "agordeev@linux.ibm.com" <agordeev@linux.ibm.com>,
+        "borntraeger@linux.ibm.com" <borntraeger@linux.ibm.com>,
+        "svens@linux.ibm.com" <svens@linux.ibm.com>,
+        "zhenyuw@linux.intel.com" <zhenyuw@linux.intel.com>,
+        "Wang, Zhi A" <zhi.a.wang@intel.com>,
+        "jani.nikula@linux.intel.com" <jani.nikula@linux.intel.com>,
+        "joonas.lahtinen@linux.intel.com" <joonas.lahtinen@linux.intel.com>,
+        "Vivi, Rodrigo" <rodrigo.vivi@intel.com>,
+        "tvrtko.ursulin@linux.intel.com" <tvrtko.ursulin@linux.intel.com>,
+        "airlied@linux.ie" <airlied@linux.ie>,
+        "daniel@ffwll.ch" <daniel@ffwll.ch>,
+        "farman@linux.ibm.com" <farman@linux.ibm.com>,
+        "mjrosato@linux.ibm.com" <mjrosato@linux.ibm.com>,
+        "pasic@linux.ibm.com" <pasic@linux.ibm.com>,
+        "vneethv@linux.ibm.com" <vneethv@linux.ibm.com>,
+        "oberpar@linux.ibm.com" <oberpar@linux.ibm.com>,
+        "freude@linux.ibm.com" <freude@linux.ibm.com>,
+        "akrowiak@linux.ibm.com" <akrowiak@linux.ibm.com>,
+        "jjherne@linux.ibm.com" <jjherne@linux.ibm.com>,
+        "alex.williamson@redhat.com" <alex.williamson@redhat.com>,
+        "cohuck@redhat.com" <cohuck@redhat.com>,
+        "jgg@nvidia.com" <jgg@nvidia.com>,
+        "hch@infradead.org" <hch@infradead.org>
+CC:     "jchrist@linux.ibm.com" <jchrist@linux.ibm.com>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "linux-doc@vger.kernel.org" <linux-doc@vger.kernel.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "linux-s390@vger.kernel.org" <linux-s390@vger.kernel.org>,
+        "intel-gvt-dev@lists.freedesktop.org" 
+        <intel-gvt-dev@lists.freedesktop.org>,
+        "intel-gfx@lists.freedesktop.org" <intel-gfx@lists.freedesktop.org>,
+        "dri-devel@lists.freedesktop.org" <dri-devel@lists.freedesktop.org>
+Subject: RE: [RFT][PATCH v2 1/9] vfio: Make vfio_unpin_pages() return void
+Thread-Topic: [RFT][PATCH v2 1/9] vfio: Make vfio_unpin_pages() return void
+Thread-Index: AQHYkQGZdvHyN+uRrkKQFdPKxVWBWq1ylc3w
+Date:   Thu, 7 Jul 2022 08:42:28 +0000
+Message-ID: <BN9PR11MB527643D01DFF0AFCED1614488C839@BN9PR11MB5276.namprd11.prod.outlook.com>
+References: <20220706062759.24946-1-nicolinc@nvidia.com>
+ <20220706062759.24946-2-nicolinc@nvidia.com>
+In-Reply-To: <20220706062759.24946-2-nicolinc@nvidia.com>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+dlp-version: 11.6.500.17
+dlp-product: dlpe-windows
+dlp-reaction: no-action
+authentication-results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+x-ms-publictraffictype: Email
+x-ms-office365-filtering-correlation-id: b9ffb10b-cfbb-46d7-e396-08da5ff49fd8
+x-ms-traffictypediagnostic: SN6PR11MB2654:EE_
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam: BCL:0;
+x-microsoft-antispam-message-info: 9msCuaf3DB+OEHMxJ4IGBDWpW3UUrMR1Q4VitYy8YHf6BK48bKBv8XHGCVJfDNMtgJvMEd6q0tgORX/JhrAq6FKP05ASymiIYZxzApraldXy7koJNbBXPQZlT1jz2DFv7/fbvUDXPZmJYu1N6l1XgQ7oo1J701SqF9J/3XKcjv1PQN884WBDxSgB+2HNU37FTjx2wLAMTUPkPShZvfuF2gTld3D5p1USvZHwKcbqycoAR79oIJo3+AjH/EcJptJ6Z6bcQ+ylSGJzyobvz75J9SXHDAmUh/UNpMobSlwx1TTLCItFcPwkn05wL0FA0p3FRQzRiFY9rq8vGN/qJB/cXnGtl8iXERxCTmyxkQyMZ8S/Id8n5YEjeuiYwwiwkqSU3e+VEFeC28CP0BshFF+NmSaiXLfVtWeurZRVs50Qqmjo91J9RjGU+KvcuN7rjZDpVRdeZU17oWkQqWoQiYQ2Pa0J8rY9FumAjdbC3sItcNScRJXHSG+1OQFHQE/QiEgBOpodrkCDOS4PkgZIKaVYvqOkstLcT5b3SfY9W00VWLGTaPhdtl95zOQzAOz7zsHCCfoh+wgE93AwFQH2lmtgzHc9+RoF6AMmh85lMkkzPF35vNz09kTaNfJ5FbozFyY6M1XObOGbwAKcjD9J/bzhYmbnA8lACBIaxSRDXnc7Pex2M97WhScEx4QpFns6cE/OZuSdj2qEj54MNbusZef6MP/5aXHS67Gc+9FK8GhePia/ltXLOfShEDJtrvHZs8yTenWlIudlNXcRYkE65DlspncwjqZ54ghONlScqqRLnlPjFzGhD2HFKAdvClFZ7tcNTpvkWQDJdxTpG9ed1h6e2A==
+x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BN9PR11MB5276.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230016)(346002)(396003)(376002)(39860400002)(366004)(136003)(9686003)(6506007)(82960400001)(26005)(478600001)(7696005)(71200400001)(186003)(38070700005)(38100700002)(33656002)(122000001)(55016003)(2906002)(8676002)(76116006)(66446008)(54906003)(921005)(52536014)(86362001)(8936002)(7416002)(5660300002)(41300700001)(316002)(110136005)(4326008)(66946007)(4744005)(66556008)(66476007)(64756008)(7406005);DIR:OUT;SFP:1102;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0: =?us-ascii?Q?ifi9pI2UPNeDVW2a5CRmSvnQFTtss3PdaL80N/CqSRW/9+WR8cMlL5mJPwWp?=
+ =?us-ascii?Q?vtAuZ/6DHIGsppZSinZizQttf9k5yDrx6FcNw9cUxp2ouJjmnUKp65QcVBFg?=
+ =?us-ascii?Q?OZOg8J5f9MTode8oQnEAnTyUNeGIo64fesz9cxh+EbVlfXdnsy/1CaPvipRs?=
+ =?us-ascii?Q?sX1Yq3gpVKylCfGf7USTcibyXhrFQkkh8/moncCJieFW4K1NFkr68tav8DRW?=
+ =?us-ascii?Q?Pat8z+E3GFEu3OQoQEfMGGG/rR619EuBBK8UV31MLuLM6ouETvmfJ6D388WS?=
+ =?us-ascii?Q?1SqDuq99ov1fhayvXsqyehv62zcDGwjENP7YGj1bRVLiEn99pXI+gs3cIIW5?=
+ =?us-ascii?Q?ruecI4/28TjKsK75seTXEZw+2/XLgbMuqqVe7LI6icED/F5HhJJMdb6Za1aO?=
+ =?us-ascii?Q?77DKYtXHTaOxR5mdZ3Izv9cWyD3MW9nTWIiOm0fN7yEg8hvsq2blJ2xcvSmI?=
+ =?us-ascii?Q?IkhEB4thZ0OukSQAaWD1JaN1SusR8fAOaMG4gZkhRm3kcyUpBpliMBwN6vmk?=
+ =?us-ascii?Q?qArjFQBgtRvJwUdWvIHPLP+MImqS7PXkqNTsX5b+iCgeyZGHm8KbDQxQ/Nn2?=
+ =?us-ascii?Q?CsVjTuBk1X4N8k9MMJhqwMWnVCCf+SeTl8up2RzDh/Tkx9/UNtqYVvGcNEg0?=
+ =?us-ascii?Q?dak1U6oBIKTMRDFOY3BI2qt9WQme0e/zff64/b9TpHqid8jLccnRJzszXpvR?=
+ =?us-ascii?Q?LotZz8VOP4I2MCBZ/m0ljbu9gbCgAVK4hm8TwJcUaLTCfa1zFbAiS/LxwJAf?=
+ =?us-ascii?Q?JSNJk3LhI4ZdLJ/2oV/GjI1/h6IHas1mlB9NDBpI3EhqKsav2M0bflP1q58f?=
+ =?us-ascii?Q?L8rioKt+rdy0xpagAQcl5BZLukotUjg81nKCiWafYg5ENUZhsvNROmWY1JkF?=
+ =?us-ascii?Q?mOkmpGDqUZFQzEQwG/A/JMGyvJU75QnzytVqNimH3ga0YwRMBCP77VxshnMd?=
+ =?us-ascii?Q?J6WSnpQr53VuX0jmnd3GR2VylfPVyxzZhisBiJavzVpLuYDXqUVoEY20rjkl?=
+ =?us-ascii?Q?Gyh3hni0Ej2q/Ng4Y8WEZ5gPTlZKC9PSQX08gv3FqZv3Ece4f8z+DqAyPejE?=
+ =?us-ascii?Q?1XJz/HJeMR//Q8AGRWFtLLMu04ceSt5uEL6+/Gcem1KzsGWZUvDIMkmCByws?=
+ =?us-ascii?Q?kv/fzUwqm7H51ui4j4mXjzIpglqgry3FFX5VE3S69FeiDe+Kpya7PdE1pNnW?=
+ =?us-ascii?Q?pdilU5MpHPv0yMijEAnsFQkC251HFEq5gDOVTf93nBeF9HLoETKTDwI6FcNs?=
+ =?us-ascii?Q?gdu7+RAjhExlQUg5glAFYLOiPo1sLRaIKrzCxBdQtfwK1xrjXlukq3or4dK4?=
+ =?us-ascii?Q?K0lZt8UzmnOhOpUVX8A022tcva7jW09fzjoOqM3AtZRN3G3jIf/itXSEN0/f?=
+ =?us-ascii?Q?04D/f8oCpQcJET3fKBoBAjs3Do57nyepTFn5iXQj2rb9AzHu6dbAB8TEDCeZ?=
+ =?us-ascii?Q?NIoA5drWi327m/bJf5Fwvj1HSsPo8VrKjH05BdtpeCGSxrTiGiQx8adFOg/4?=
+ =?us-ascii?Q?OercA1I+xICib35M5YXoPfkOETpysLJZGHMhbLuadxz5uLT5YcYDCVMDAaI3?=
+ =?us-ascii?Q?bOdHJUJbnQz66CqZakUnZ7xV7kWPwpYF+feI6+w5?=
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
 MIME-Version: 1.0
-Content-Type: text/plain
-X-Spam-Status: No, score=-2.8 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: BN9PR11MB5276.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: b9ffb10b-cfbb-46d7-e396-08da5ff49fd8
+X-MS-Exchange-CrossTenant-originalarrivaltime: 07 Jul 2022 08:42:28.4328
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: QNgmliOFzpcd2fL/IpMuPCEs3ph5n3ns3ECRYbGFeWgs/9gvpD026Da0K64Fiz+MF9RP8qXLfrynUSUSXrELWw==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SN6PR11MB2654
+X-OriginatorOrg: intel.com
+X-Spam-Status: No, score=-7.8 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_HI,
         SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
@@ -78,112 +187,25 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Wang Guangju <wangguangju@baidu.com> writes:
+> From: Nicolin Chen <nicolinc@nvidia.com>
+> Sent: Wednesday, July 6, 2022 2:28 PM
+>=20
+> There's only one caller that checks its return value with a WARN_ON_ONCE,
+> while all other callers do not check return value at all. So simplify the
+> API to return void by embedding similar WARN_ON_ONCEs.
 
-> From: wangguangju <wangguangju@baidu.com>
->
-> Hyper-V SynIC vectors were added into EOI exit bitmap in func
-> synic_set_sint().But when the Windows VM VMEXIT due to
-> EXIT_REASON_EOI_INDUCED, there are no EOI exit bitmap handlers
-> for Hyper-V SynIC vectors.
+While this change keeps the similar effect as before it leads to different
+policy for same type of errors between pin and unpin paths:
 
-My take:
+e.g.
 
-"When EOI virtualization is performed on VMX,
-kvm_apic_set_eoi_accelerated() is called upon EXIT_REASON_EOI_INDUCED
-but unlike its non-accelerated apic_set_eoi() sibling, Hyper-V SINT
-vectors are left unhandled.
-"
+vfio_unpin_pages():
+	if (WARN_ON_ONCE(!user_pfn || !npage || !vfio_assert_device_open(device)))
+		return;
 
->
-> This patch fix it.
->
-> Change-Id: I2404ebf7bda60326be3f6786e0e34e63aa81bbd4
+vfio_pin_pages():
+	if (!user_pfn || !phys_pfn || !npage ||
+	    !vfio_assert_device_open(device))
+		return -EINVAL;
 
-In case this is not something publicly available it doesn't belong to
-kernel changelog as it doesn't bring any value.
-
-> Signed-off-by: wangguangju <wangguangju@baidu.com>
-> ---
->  arch/x86/kvm/lapic.c | 4 ++++
->  1 file changed, 4 insertions(+)
->
-> diff --git a/arch/x86/kvm/lapic.c b/arch/x86/kvm/lapic.c
-> index 0e68b4c..59096f8 100644
-> --- a/arch/x86/kvm/lapic.c
-> +++ b/arch/x86/kvm/lapic.c
-> @@ -1303,6 +1303,10 @@ void kvm_apic_set_eoi_accelerated(struct kvm_vcpu *vcpu, int vector)
->  
->  	trace_kvm_eoi(apic, vector);
->  
-> +	if (to_hv_vcpu(apic->vcpu) &&
-> +	    test_bit(vector, to_hv_synic(apic->vcpu)->vec_bitmap))
-> +		kvm_hv_synic_send_eoi(apic->vcpu, vector);
-> +
->  	kvm_ioapic_send_eoi(apic, vector);
->  	kvm_make_request(KVM_REQ_EVENT, apic->vcpu);
-
-
-This whole part:
-
-	if (to_hv_vcpu(apic->vcpu) &&
-	    test_bit(vector, to_hv_synic(apic->vcpu)->vec_bitmap))
-		kvm_hv_synic_send_eoi(apic->vcpu, vector);
-
-	kvm_ioapic_send_eoi(apic, vector);
-	kvm_make_request(KVM_REQ_EVENT, apic->vcpu);
-
-could be split into an inline function, something like (completely
-untested):
-
-diff --git a/arch/x86/kvm/lapic.c b/arch/x86/kvm/lapic.c
-index 6ff17d5a2ae3..9d19c7c738c0 100644
---- a/arch/x86/kvm/lapic.c
-+++ b/arch/x86/kvm/lapic.c
-@@ -1269,6 +1269,16 @@ static void kvm_ioapic_send_eoi(struct kvm_lapic *apic, int vector)
-        kvm_ioapic_update_eoi(apic->vcpu, vector, trigger_mode);
- }
- 
-+static inline void apic_set_eoi_vector(struct kvm_lapic *apic, int vector)
-+{
-+       if (to_hv_vcpu(apic->vcpu) &&
-+           test_bit(vector, to_hv_synic(apic->vcpu)->vec_bitmap))
-+               kvm_hv_synic_send_eoi(apic->vcpu, vector);
-+
-+       kvm_ioapic_send_eoi(apic, vector);
-+       kvm_make_request(KVM_REQ_EVENT, apic->vcpu);
-+}
-+
- static int apic_set_eoi(struct kvm_lapic *apic)
- {
-        int vector = apic_find_highest_isr(apic);
-@@ -1285,12 +1295,8 @@ static int apic_set_eoi(struct kvm_lapic *apic)
-        apic_clear_isr(vector, apic);
-        apic_update_ppr(apic);
- 
--       if (to_hv_vcpu(apic->vcpu) &&
--           test_bit(vector, to_hv_synic(apic->vcpu)->vec_bitmap))
--               kvm_hv_synic_send_eoi(apic->vcpu, vector);
-+       apic_set_eoi_vector(apic, vector);
- 
--       kvm_ioapic_send_eoi(apic, vector);
--       kvm_make_request(KVM_REQ_EVENT, apic->vcpu);
-        return vector;
- }
- 
-@@ -1304,8 +1310,7 @@ void kvm_apic_set_eoi_accelerated(struct kvm_vcpu *vcpu, int vector)
- 
-        trace_kvm_eoi(apic, vector);
- 
--       kvm_ioapic_send_eoi(apic, vector);
--       kvm_make_request(KVM_REQ_EVENT, apic->vcpu);
-+       apic_set_eoi_vector(apic, vector);
- }
- EXPORT_SYMBOL_GPL(kvm_apic_set_eoi_accelerated);
-
-
->  }
-
--- 
-Vitaly
-
+It sounds a bit weird when reading related code...
