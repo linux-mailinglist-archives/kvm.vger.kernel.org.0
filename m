@@ -2,365 +2,154 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 74BAF56A4AB
-	for <lists+kvm@lfdr.de>; Thu,  7 Jul 2022 15:58:50 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 0A99656A4BA
+	for <lists+kvm@lfdr.de>; Thu,  7 Jul 2022 15:59:16 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235535AbiGGN40 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 7 Jul 2022 09:56:26 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53130 "EHLO
+        id S235734AbiGGN6x (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 7 Jul 2022 09:58:53 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54736 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S236145AbiGGN4T (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 7 Jul 2022 09:56:19 -0400
-Received: from ozlabs.ru (ozlabs.ru [107.174.27.60])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id D92F419C1E;
-        Thu,  7 Jul 2022 06:56:16 -0700 (PDT)
-Received: from fstn1-p1.ozlabs.ibm.com. (localhost [IPv6:::1])
-        by ozlabs.ru (Postfix) with ESMTP id AEA7A804E7;
-        Thu,  7 Jul 2022 09:56:05 -0400 (EDT)
-From:   Alexey Kardashevskiy <aik@ozlabs.ru>
-To:     linuxppc-dev@lists.ozlabs.org
-Cc:     Alexey Kardashevskiy <aik@ozlabs.ru>,
-        Robin Murphy <robin.murphy@arm.com>,
-        Michael Ellerman <mpe@ellerman.id.au>,
-        Joerg Roedel <jroedel@suse.de>, Joel Stanley <joel@jms.id.au>,
-        Jason Gunthorpe <jgg@ziepe.ca>,
-        Alex Williamson <alex.williamson@redhat.com>,
-        "Oliver O'Halloran" <oohall@gmail.com>, kvm-ppc@vger.kernel.org,
-        kvm@vger.kernel.org, Jason Gunthorpe <jgg@nvidia.com>,
-        Daniel Henrique Barboza <danielhb413@gmail.com>,
-        Fabiano Rosas <farosas@linux.ibm.com>,
-        Murilo Opsfelder Araujo <muriloo@linux.ibm.com>,
-        Nicholas Piggin <npiggin@gmail.com>
-Subject: [PATCH kernel] powerpc/iommu: Add iommu_ops to report capabilities and allow blocking domains
-Date:   Thu,  7 Jul 2022 23:55:52 +1000
-Message-Id: <20220707135552.3688927-1-aik@ozlabs.ru>
-X-Mailer: git-send-email 2.30.2
-MIME-Version: 1.0
+        with ESMTP id S236389AbiGGN5s (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 7 Jul 2022 09:57:48 -0400
+Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DE582193EF;
+        Thu,  7 Jul 2022 06:57:47 -0700 (PDT)
+Received: from pps.filterd (m0098409.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.17.1.5/8.17.1.5) with ESMTP id 267Da68u015737;
+        Thu, 7 Jul 2022 13:57:45 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=from : to : cc : subject
+ : date : message-id : content-transfer-encoding : mime-version; s=pp1;
+ bh=22vAzVTYg1CLa9eVhzFm60aPk3tsXO0cO+FHybkseuI=;
+ b=Zsst4XTMGkTqMWDBDj04Te+uHYhAFtoVU8f62ZkP1AOTqGMzJjdXoTjgGxpSJsehddNA
+ TLxoztXyyPvv993eYweEFM0N85Uvk3+eWH9Wn+ikYkg+U0Y/W5ANLIEfUGn2r2yzh2A+
+ 4QNn9Pc23NthcVXMZvGVJVGItFU5zs8IxmySbHFUpmcn+JSDSjsA6ZGBkAtJ8bt1fp4F
+ XOpc90oaa6Xw8uE4GPqehmcrZBeovQiFBVWQ0BwKSkAQEAmlGacXeKwpy1eJS6p+BUJu
+ EeItnKkM3e8ea6d3VVUMtAQdODlJBxZsSiPi8IUHzWCgjcX+HP3qnXgk9Np693X1iUwM cg== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3h5wy6dnjx-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Thu, 07 Jul 2022 13:57:45 +0000
+Received: from m0098409.ppops.net (m0098409.ppops.net [127.0.0.1])
+        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 267DaKs7016611;
+        Thu, 7 Jul 2022 13:57:45 GMT
+Received: from ppma06ams.nl.ibm.com (66.31.33a9.ip4.static.sl-reverse.com [169.51.49.102])
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3h5wy6dnj1-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Thu, 07 Jul 2022 13:57:44 +0000
+Received: from pps.filterd (ppma06ams.nl.ibm.com [127.0.0.1])
+        by ppma06ams.nl.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 267DuEnw000450;
+        Thu, 7 Jul 2022 13:57:42 GMT
+Received: from b06avi18626390.portsmouth.uk.ibm.com (b06avi18626390.portsmouth.uk.ibm.com [9.149.26.192])
+        by ppma06ams.nl.ibm.com with ESMTP id 3h4usd2ny1-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Thu, 07 Jul 2022 13:57:42 +0000
+Received: from d06av26.portsmouth.uk.ibm.com (d06av26.portsmouth.uk.ibm.com [9.149.105.62])
+        by b06avi18626390.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 267DuKMv23789988
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Thu, 7 Jul 2022 13:56:21 GMT
+Received: from d06av26.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 68554AE045;
+        Thu,  7 Jul 2022 13:57:39 +0000 (GMT)
+Received: from d06av26.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 565B3AE051;
+        Thu,  7 Jul 2022 13:57:39 +0000 (GMT)
+Received: from tuxmaker.boeblingen.de.ibm.com (unknown [9.152.85.9])
+        by d06av26.portsmouth.uk.ibm.com (Postfix) with ESMTPS;
+        Thu,  7 Jul 2022 13:57:39 +0000 (GMT)
+Received: by tuxmaker.boeblingen.de.ibm.com (Postfix, from userid 4958)
+        id 1312EE0231; Thu,  7 Jul 2022 15:57:39 +0200 (CEST)
+From:   Eric Farman <farman@linux.ibm.com>
+To:     Alex Williamson <alex.williamson@redhat.com>
+Cc:     Matthew Rosato <mjrosato@linux.ibm.com>,
+        Jason Gunthorpe <jgg@nvidia.com>,
+        Cornelia Huck <cohuck@redhat.com>,
+        Halil Pasic <pasic@linux.ibm.com>, kvm@vger.kernel.org,
+        linux-s390@vger.kernel.org, Eric Farman <farman@linux.ibm.com>,
+        Kirti Wankhede <kwankhede@nvidia.com>
+Subject: [PATCH v4 00/11] s390/vfio-ccw rework
+Date:   Thu,  7 Jul 2022 15:57:26 +0200
+Message-Id: <20220707135737.720765-1-farman@linux.ibm.com>
+X-Mailer: git-send-email 2.34.1
+X-TM-AS-GCONF: 00
+X-Proofpoint-ORIG-GUID: YGG39jb5B7NPSCKcAYu4rBZbAEBOIyiU
+X-Proofpoint-GUID: 8r3eaBlMlQHE3yOMZ5gnoquAZwRIDKcX
 Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,SPF_HELO_PASS,
-        SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no
-        version=3.4.6
+X-Proofpoint-UnRewURL: 0 URL was un-rewritten
+MIME-Version: 1.0
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.205,Aquarius:18.0.883,Hydra:6.0.517,FMLib:17.11.122.1
+ definitions=2022-07-07_09,2022-06-28_01,2022-06-22_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501
+ spamscore=0 clxscore=1015 adultscore=0 lowpriorityscore=0 impostorscore=0
+ bulkscore=0 phishscore=0 suspectscore=0 mlxscore=0 mlxlogscore=999
+ malwarescore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2206140000 definitions=main-2207070053
+X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_EF,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_PASS,
+        T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Historically PPC64 managed to avoid using iommu_ops. The VFIO driver
-uses a SPAPR TCE sub-driver and all iommu_ops uses were kept in
-the Type1 VFIO driver. Recent development though has added a coherency
-capability check to the generic part of VFIO and essentially disabled
-VFIO on PPC64; the similar story about iommu_group_dma_owner_claimed().
+Alex,
 
-This adds an iommu_ops stub which reports support for cache
-coherency. Because bus_set_iommu() triggers IOMMU probing of PCI devices,
-this provides minimum code for the probing to not crash.
+Here's a final pass through some of the vfio-ccw rework.
+I'm hoping that because of the intersection with the extern
+removal, you could grab this directly? [1]
 
-Because now we have to set iommu_ops to the system (bus_set_iommu() or
-iommu_device_register()), this requires the POWERNV PCI setup to happen
-after bus_register(&pci_bus_type) which is postcore_initcall
-TODO: check if it still works, read sha1, for more details:
-https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit/?id=5537fcb319d016ce387
+There were no code changes since v3, I simply rebased this
+onto your linux-vfio/next tree, currently on commit 7654a8881a54
+("Merge branches
+ 'v5.20/vfio/migration-enhancements-v3',
+ 'v5.20/vfio/simplify-bus_type-determination-v3',
+ 'v5.20/vfio/check-vfio_register_iommu_driver-return-v2',
+ 'v5.20/vfio/check-iommu_group_set_name_return-v1',
+ 'v5.20/vfio/clear-caps-buf-v3',
+ 'v5.20/vfio/remove-useless-judgement-v1' and
+ 'v5.20/vfio/move-device_open-count-v2'
+ into
+ v5.20/vfio/next")
 
-Because setting the ops triggers probing, this does not work well with
-iommu_group_add_device(), hence the move to iommu_probe_device().
+v3->v4:
+ - Rebased to vfio/next tree
+   - Tweak patch 6 to fit with extern removal
+   - The rest applied directly
+ - [MR] Added r-b's (Thank you!)
+ - [EF] Add a comment about cp_free() call in fsm_notoper()
+v3: https://lore.kernel.org/r/20220630203647.2529815-1-farman@linux.ibm.com/
+v2: https://lore.kernel.org/r/20220615203318.3830778-1-farman@linux.ibm.com/
+v1: https://lore.kernel.org/r/20220602171948.2790690-1-farman@linux.ibm.com/
 
-Because iommu_probe_device() does not take the group (which is why
-we had the helper in the first place), this adds
-pci_controller_ops::device_group.
+Footnotes:
+[1] https://lore.kernel.org/r/e1ead3e4-9e7d-f026-485b-157d7dc004d3@linux.ibm.com/
 
-So, basically there is one iommu_device per PHB and devices are added to
-groups indirectly via series of calls inside the IOMMU code.
+Cc: Kirti Wankhede <kwankhede@nvidia.com>
 
-pSeries is out of scope here (a minor fix needed for barely supported
-platform in regard to VFIO).
+Eric Farman (10):
+  vfio/ccw: Fix FSM state if mdev probe fails
+  vfio/ccw: Do not change FSM state in subchannel event
+  vfio/ccw: Remove private->mdev
+  vfio/ccw: Pass enum to FSM event jumptable
+  vfio/ccw: Flatten MDEV device (un)register
+  vfio/ccw: Update trace data for not operational event
+  vfio/ccw: Create an OPEN FSM Event
+  vfio/ccw: Create a CLOSE FSM event
+  vfio/ccw: Refactor vfio_ccw_mdev_reset
+  vfio/ccw: Move FSM open/close to MDEV open/close
 
-The previous discussion is here:
-https://patchwork.ozlabs.org/project/kvm-ppc/patch/20220701061751.1955857-1-aik@ozlabs.ru/
+Michael Kawano (1):
+  vfio/ccw: Remove UUID from s390 debug log
 
-Fixes: e8ae0e140c05 ("vfio: Require that devices support DMA cache coherence")
-Fixes: 70693f470848 ("vfio: Set DMA ownership for VFIO devices")
-Cc: Oliver O'Halloran <oohall@gmail.com>
-Cc: Robin Murphy <robin.murphy@arm.com>
-Cc: Jason Gunthorpe <jgg@nvidia.com>
-Cc: Alex Williamson <alex.williamson@redhat.com>
-Cc: Daniel Henrique Barboza <danielhb413@gmail.com>
-Cc: Fabiano Rosas <farosas@linux.ibm.com>
-Cc: Murilo Opsfelder Araujo <muriloo@linux.ibm.com>
-Cc: Nicholas Piggin <npiggin@gmail.com>
-Signed-off-by: Alexey Kardashevskiy <aik@ozlabs.ru>
----
+ drivers/s390/cio/vfio_ccw_async.c   |  1 -
+ drivers/s390/cio/vfio_ccw_drv.c     | 59 +++++------------
+ drivers/s390/cio/vfio_ccw_fsm.c     | 99 ++++++++++++++++++++++++-----
+ drivers/s390/cio/vfio_ccw_ops.c     | 77 +++++++---------------
+ drivers/s390/cio/vfio_ccw_private.h |  9 +--
+ include/linux/mdev.h                |  5 --
+ 6 files changed, 125 insertions(+), 125 deletions(-)
 
-
-does it make sense to have this many callbacks, or
-the generic IOMMU code can safely operate without some
-(given I add some more checks for !NULL)? thanks,
-
-
----
- arch/powerpc/include/asm/iommu.h          |   2 +
- arch/powerpc/include/asm/pci-bridge.h     |   7 ++
- arch/powerpc/kernel/iommu.c               | 106 +++++++++++++++++++++-
- arch/powerpc/kernel/pci-common.c          |   2 +-
- arch/powerpc/platforms/powernv/pci-ioda.c |  40 ++++++++
- 5 files changed, 155 insertions(+), 2 deletions(-)
-
-diff --git a/arch/powerpc/include/asm/iommu.h b/arch/powerpc/include/asm/iommu.h
-index 7e29c73e3dd4..4bdae0ee29d0 100644
---- a/arch/powerpc/include/asm/iommu.h
-+++ b/arch/powerpc/include/asm/iommu.h
-@@ -215,6 +215,8 @@ extern long iommu_tce_xchg_no_kill(struct mm_struct *mm,
- 		enum dma_data_direction *direction);
- extern void iommu_tce_kill(struct iommu_table *tbl,
- 		unsigned long entry, unsigned long pages);
-+
-+extern const struct iommu_ops spapr_tce_iommu_ops;
- #else
- static inline void iommu_register_group(struct iommu_table_group *table_group,
- 					int pci_domain_number,
-diff --git a/arch/powerpc/include/asm/pci-bridge.h b/arch/powerpc/include/asm/pci-bridge.h
-index c85f901227c9..338a45b410b4 100644
---- a/arch/powerpc/include/asm/pci-bridge.h
-+++ b/arch/powerpc/include/asm/pci-bridge.h
-@@ -8,6 +8,7 @@
- #include <linux/list.h>
- #include <linux/ioport.h>
- #include <linux/numa.h>
-+#include <linux/iommu.h>
- 
- struct device_node;
- 
-@@ -44,6 +45,9 @@ struct pci_controller_ops {
- #endif
- 
- 	void		(*shutdown)(struct pci_controller *hose);
-+
-+	struct iommu_group *(*device_group)(struct pci_controller *hose,
-+					    struct pci_dev *pdev);
- };
- 
- /*
-@@ -131,6 +135,9 @@ struct pci_controller {
- 	struct irq_domain	*dev_domain;
- 	struct irq_domain	*msi_domain;
- 	struct fwnode_handle	*fwnode;
-+
-+	/* iommu_ops support */
-+	struct iommu_device	iommu;
- };
- 
- /* These are used for config access before all the PCI probing
-diff --git a/arch/powerpc/kernel/iommu.c b/arch/powerpc/kernel/iommu.c
-index 7e56ddb3e0b9..c4c7eb596fef 100644
---- a/arch/powerpc/kernel/iommu.c
-+++ b/arch/powerpc/kernel/iommu.c
-@@ -1138,6 +1138,8 @@ EXPORT_SYMBOL_GPL(iommu_release_ownership);
- 
- int iommu_add_device(struct iommu_table_group *table_group, struct device *dev)
- {
-+	int ret;
-+
- 	/*
- 	 * The sysfs entries should be populated before
- 	 * binding IOMMU group. If sysfs entries isn't
-@@ -1156,7 +1158,10 @@ int iommu_add_device(struct iommu_table_group *table_group, struct device *dev)
- 	pr_debug("%s: Adding %s to iommu group %d\n",
- 		 __func__, dev_name(dev),  iommu_group_id(table_group->group));
- 
--	return iommu_group_add_device(table_group->group, dev);
-+	ret = iommu_probe_device(dev);
-+	dev_info(dev, "probed with %d\n", ret);
-+
-+	return ret;
- }
- EXPORT_SYMBOL_GPL(iommu_add_device);
- 
-@@ -1176,4 +1181,103 @@ void iommu_del_device(struct device *dev)
- 	iommu_group_remove_device(dev);
- }
- EXPORT_SYMBOL_GPL(iommu_del_device);
-+
-+/*
-+ * A simple iommu_ops to allow less cruft in generic VFIO code.
-+ */
-+static bool spapr_tce_iommu_capable(enum iommu_cap cap)
-+{
-+	switch (cap) {
-+	case IOMMU_CAP_CACHE_COHERENCY:
-+		return true;
-+	default:
-+		break;
-+	}
-+
-+	return false;
-+}
-+
-+static struct iommu_domain *spapr_tce_iommu_domain_alloc(unsigned int type)
-+{
-+	struct iommu_domain *domain;
-+
-+	if (type != IOMMU_DOMAIN_BLOCKED)
-+		return NULL;
-+
-+	domain = kzalloc(sizeof(*domain), GFP_KERNEL);
-+	if (!domain)
-+		return NULL;
-+
-+	domain->geometry.aperture_start = 0;
-+	domain->geometry.aperture_end = ~0ULL;
-+	domain->geometry.force_aperture = true;
-+
-+	return domain;
-+}
-+
-+static struct iommu_device *spapr_tce_iommu_probe_device(struct device *dev)
-+{
-+	struct pci_dev *pdev;
-+	struct pci_controller *hose;
-+
-+	/* Weirdly iommu_device_register() assigns the same ops to all buses */
-+	if (!dev_is_pci(dev))
-+		return ERR_PTR(-EPERM);
-+
-+	pdev = to_pci_dev(dev);
-+	hose = pdev->bus->sysdata;
-+	return &hose->iommu;
-+}
-+
-+static void spapr_tce_iommu_release_device(struct device *dev)
-+{
-+}
-+
-+static bool spapr_tce_iommu_is_attach_deferred(struct device *dev)
-+{
-+	return false;
-+}
-+
-+static struct iommu_group *spapr_tce_iommu_device_group(struct device *dev)
-+{
-+	struct pci_controller *hose;
-+	struct pci_dev *pdev;
-+
-+	/* Weirdly iommu_device_register() assigns the same ops to all buses */
-+	if (!dev_is_pci(dev))
-+		return ERR_PTR(-EPERM);
-+
-+	pdev = to_pci_dev(dev);
-+	hose = pdev->bus->sysdata;
-+
-+	if (!hose->controller_ops.device_group)
-+		return ERR_PTR(-ENOENT);
-+
-+	return hose->controller_ops.device_group(hose, pdev);
-+}
-+
-+static int spapr_tce_iommu_attach_dev(struct iommu_domain *dom,
-+				      struct device *dev)
-+{
-+	return 0;
-+}
-+
-+static void spapr_tce_iommu_detach_dev(struct iommu_domain *dom,
-+				       struct device *dev)
-+{
-+}
-+
-+const struct iommu_ops spapr_tce_iommu_ops = {
-+	.capable = spapr_tce_iommu_capable,
-+	.domain_alloc = spapr_tce_iommu_domain_alloc,
-+	.probe_device = spapr_tce_iommu_probe_device,
-+	.release_device = spapr_tce_iommu_release_device,
-+	.device_group = spapr_tce_iommu_device_group,
-+	.is_attach_deferred = spapr_tce_iommu_is_attach_deferred,
-+	.default_domain_ops = &(const struct iommu_domain_ops) {
-+		.attach_dev = spapr_tce_iommu_attach_dev,
-+		.detach_dev = spapr_tce_iommu_detach_dev,
-+	}
-+};
-+
- #endif /* CONFIG_IOMMU_API */
-diff --git a/arch/powerpc/kernel/pci-common.c b/arch/powerpc/kernel/pci-common.c
-index 068410cd54a3..72ca5afba0c0 100644
---- a/arch/powerpc/kernel/pci-common.c
-+++ b/arch/powerpc/kernel/pci-common.c
-@@ -1714,4 +1714,4 @@ static int __init discover_phbs(void)
- 
- 	return 0;
- }
--core_initcall(discover_phbs);
-+postcore_initcall_sync(discover_phbs);
-diff --git a/arch/powerpc/platforms/powernv/pci-ioda.c b/arch/powerpc/platforms/powernv/pci-ioda.c
-index 5e65d983e257..d5139d003794 100644
---- a/arch/powerpc/platforms/powernv/pci-ioda.c
-+++ b/arch/powerpc/platforms/powernv/pci-ioda.c
-@@ -2912,6 +2912,25 @@ static void pnv_pci_ioda_dma_bus_setup(struct pci_bus *bus)
- 	}
- }
- 
-+static struct iommu_group *pnv_pci_device_group(struct pci_controller *hose,
-+						struct pci_dev *pdev)
-+{
-+	struct pnv_phb *phb = hose->private_data;
-+	struct pnv_ioda_pe *pe;
-+
-+	if (WARN_ON(!phb))
-+		return ERR_PTR(-ENODEV);
-+
-+	pe = pnv_pci_bdfn_to_pe(phb, pdev->devfn | (pdev->bus->number << 8));
-+	if (!pe)
-+		return ERR_PTR(-ENODEV);
-+
-+	if (!pe->table_group.group)
-+		return ERR_PTR(-ENODEV);
-+
-+	return pe->table_group.group;
-+}
-+
- static const struct pci_controller_ops pnv_pci_ioda_controller_ops = {
- 	.dma_dev_setup		= pnv_pci_ioda_dma_dev_setup,
- 	.dma_bus_setup		= pnv_pci_ioda_dma_bus_setup,
-@@ -2922,6 +2941,7 @@ static const struct pci_controller_ops pnv_pci_ioda_controller_ops = {
- 	.setup_bridge		= pnv_pci_fixup_bridge_resources,
- 	.reset_secondary_bus	= pnv_pci_reset_secondary_bus,
- 	.shutdown		= pnv_pci_ioda_shutdown,
-+	.device_group		= pnv_pci_device_group,
- };
- 
- static const struct pci_controller_ops pnv_npu_ocapi_ioda_controller_ops = {
-@@ -2932,6 +2952,20 @@ static const struct pci_controller_ops pnv_npu_ocapi_ioda_controller_ops = {
- 	.shutdown		= pnv_pci_ioda_shutdown,
- };
- 
-+static struct attribute *spapr_tce_iommu_attrs[] = {
-+	NULL,
-+};
-+
-+static struct attribute_group spapr_tce_iommu_group = {
-+	.name = "spapr-tce-iommu",
-+	.attrs = spapr_tce_iommu_attrs,
-+};
-+
-+static const struct attribute_group *spapr_tce_iommu_groups[] = {
-+	&spapr_tce_iommu_group,
-+	NULL,
-+};
-+
- static void __init pnv_pci_init_ioda_phb(struct device_node *np,
- 					 u64 hub_id, int ioda_type)
- {
-@@ -3199,6 +3233,12 @@ static void __init pnv_pci_init_ioda_phb(struct device_node *np,
- 
- 	/* create pci_dn's for DT nodes under this PHB */
- 	pci_devs_phb_init_dynamic(hose);
-+
-+	iommu_device_sysfs_add(&hose->iommu, hose->parent,
-+			       spapr_tce_iommu_groups, "iommu%lld", phb_id);
-+	rc = iommu_device_register(&hose->iommu, &spapr_tce_iommu_ops, hose->parent);
-+	if (rc)
-+		pr_warn("iommu_device_register returned %ld\n", rc);
- }
- 
- void __init pnv_pci_init_ioda2_phb(struct device_node *np)
 -- 
-2.30.2
+2.34.1
 
