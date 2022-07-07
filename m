@@ -2,402 +2,175 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 850DC56975C
-	for <lists+kvm@lfdr.de>; Thu,  7 Jul 2022 03:24:21 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id E54155697DB
+	for <lists+kvm@lfdr.de>; Thu,  7 Jul 2022 04:18:56 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233884AbiGGBYQ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 6 Jul 2022 21:24:16 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57172 "EHLO
+        id S231826AbiGGCSz (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 6 Jul 2022 22:18:55 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33938 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230401AbiGGBYQ (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 6 Jul 2022 21:24:16 -0400
-Received: from mail-pf1-x435.google.com (mail-pf1-x435.google.com [IPv6:2607:f8b0:4864:20::435])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8C0A12E69D
-        for <kvm@vger.kernel.org>; Wed,  6 Jul 2022 18:24:14 -0700 (PDT)
-Received: by mail-pf1-x435.google.com with SMTP id e16so3560712pfm.11
-        for <kvm@vger.kernel.org>; Wed, 06 Jul 2022 18:24:14 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=jm6MNJ4PUeFGXCysHHlUvWN5v/r1IZgjyPPIqu8Gq+Q=;
-        b=J+lg/ay9COuQmgl/sC4wOhbAs5ZmvxHh7mh8gKQMluH0rudvbNzX0EpWZAwyi1I29/
-         7MTwvEJZR79d3n4CLE3FATyP0MgVJKSaJXW1FhpN2p5juERqwxbMMETELeoorujYvrqU
-         TqRK/RF++T2KsPL5i27b0kId/ljkMhng1wX3oKjx1T4ZqfbtCaIgn9sCHDmFnSjpUe3u
-         E+LFuKspjRjRZITy53HJZgfjtX1JNBn2AGcha33gr4jMHfdWJSKwvo/FfJRmyjHPRmmq
-         12HPgHnBgf6FvQVlzGFxoI8R8orhtsWwPvJcXl7I3rN+doG0DKwEv60ICDOvHtuiX14M
-         +Q2A==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=jm6MNJ4PUeFGXCysHHlUvWN5v/r1IZgjyPPIqu8Gq+Q=;
-        b=pRotXNgPK7mahWoMDdwNoxJVWFUHxMOq9Frg0qwOHYBv9gVhgGwxKH1IX2iP2Xh7A8
-         gWA9A+isNA6QfPMlPR3BJeitnIhgD+JS6pSGCr7ehA6hi5oSwTYeEmKFOkv5QmauQhIW
-         4ZgjyiOKWTfjRNWY+RK8oqQyv1jqbGyOiJB688etL2tf0f4jjAiN9Da/dIVtjQoVwCst
-         xf4PL7wy+LuJJfNukDjjNKpQpCLgQ263a4is8JW4YUNpYQbs+fLyvqfezicAJkF5WIXp
-         IFjULaTu/u+6eVCPUKEDnirp5oG7yb1SMb+lOkyFllypoF6p4AnXfYAJI1G1pMjjoD/n
-         bEpQ==
-X-Gm-Message-State: AJIora9CT96VWBIyDWaTpK/w9V7bnvMbZu9+vcSU8C26bz71RlnAYNEX
-        91rjnqPhXGxIsI+Y2WbDDQd8gg==
-X-Google-Smtp-Source: AGRyM1te5gRmdptsT0znO/K3dDQVEhCDlihM5xaOgJmfPMN6HLYr/tvffuIZqqYEH+8fZieoekHrGA==
-X-Received: by 2002:aa7:8890:0:b0:525:85db:c0d1 with SMTP id z16-20020aa78890000000b0052585dbc0d1mr50903584pfe.69.1657157053713;
-        Wed, 06 Jul 2022 18:24:13 -0700 (PDT)
-Received: from google.com (123.65.230.35.bc.googleusercontent.com. [35.230.65.123])
-        by smtp.gmail.com with ESMTPSA id u17-20020a170902e5d100b0016bea2a0a8dsm6579200plf.91.2022.07.06.18.24.13
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 06 Jul 2022 18:24:13 -0700 (PDT)
-Date:   Thu, 7 Jul 2022 01:24:09 +0000
-From:   Sean Christopherson <seanjc@google.com>
-To:     Maxim Levitsky <mlevitsk@redhat.com>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org, Oliver Upton <oupton@google.com>,
-        Peter Shier <pshier@google.com>
-Subject: Re: [PATCH v2 17/21] KVM: x86: Morph pending exceptions to pending
- VM-Exits at queue time
-Message-ID: <YsY1ud2ZaZq9wvfI@google.com>
-References: <20220614204730.3359543-1-seanjc@google.com>
- <20220614204730.3359543-18-seanjc@google.com>
- <5eaf496d71b2c8fd321c013c9d1787d4c34d1100.camel@redhat.com>
+        with ESMTP id S230124AbiGGCSx (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 6 Jul 2022 22:18:53 -0400
+Received: from mga07.intel.com (mga07.intel.com [134.134.136.100])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B258F2CE37;
+        Wed,  6 Jul 2022 19:18:52 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1657160332; x=1688696332;
+  h=from:to:cc:subject:date:message-id:references:
+   in-reply-to:content-transfer-encoding:mime-version;
+  bh=wRf5HHViihY5OJxA8zOe7qJAlaZwJ8amNpuj1uFi3NM=;
+  b=NI5d0E2v3GTbfpKrcWzxosG6CgyoIbFnKm3FFrqEtq076VCQ+DwJ3TgF
+   zXj3MGPlmDt2e7hyrjdAm3GiVzE9ZACn1BvTzy3JBsC9k5r3MIU4n66AJ
+   5DTr8poklHt4cz+A01QtwASSeHria9Lw76bBB2x3+c7PB0iSYTKZyGLQy
+   A5XOwLIGytpQ4drserPNeFQL+CahQo3Szhl4aBpnyKNz3LzC8d2DA9qdj
+   BGrzBdARuzl8qcYbcg/275sryBlAayTzfFdan8/aIgd8Ds9GdT3BrTQ+d
+   2kdJ1NeN3azawl2KcBkbZWVDjaMXBAUzwgGiB0Z8XXDy6R3L12+E0HWj7
+   g==;
+X-IronPort-AV: E=McAfee;i="6400,9594,10400"; a="347896040"
+X-IronPort-AV: E=Sophos;i="5.92,251,1650956400"; 
+   d="scan'208";a="347896040"
+Received: from fmsmga002.fm.intel.com ([10.253.24.26])
+  by orsmga105.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 06 Jul 2022 19:18:50 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.92,251,1650956400"; 
+   d="scan'208";a="696340211"
+Received: from orsmsx606.amr.corp.intel.com ([10.22.229.19])
+  by fmsmga002.fm.intel.com with ESMTP; 06 Jul 2022 19:18:50 -0700
+Received: from orsmsx609.amr.corp.intel.com (10.22.229.22) by
+ ORSMSX606.amr.corp.intel.com (10.22.229.19) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2308.27; Wed, 6 Jul 2022 19:18:49 -0700
+Received: from ORSEDG602.ED.cps.intel.com (10.7.248.7) by
+ orsmsx609.amr.corp.intel.com (10.22.229.22) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2308.27 via Frontend Transport; Wed, 6 Jul 2022 19:18:49 -0700
+Received: from NAM11-CO1-obe.outbound.protection.outlook.com (104.47.56.173)
+ by edgegateway.intel.com (134.134.137.103) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2308.27; Wed, 6 Jul 2022 19:18:49 -0700
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=SPItBu5cfv6xgGkBpyLVKJ4HQhtBH925wS24uEHfm49E8SkCTePg/vZ7gylFweKiJetUlpJTgW5y0jmJBKkVQ/iagTEfD8pzUdfBb8aev7bZQ2BGI6a0MAFZWoLkpYTuuyd7VZyipCp2uF+8tBpk7mF0UL6l71fp41zIzaB6pAfmn0KwHcnXcFIHDyq+13y3EMXxL9xhTtnpK0oq0s4VQWNtpleoRzQcBXZMsqzowZjd0QCgIn4ahMMJDWfAXkMFZ6XX9V6J1tHUVIuk53VKQk1LE4C64C4m7/g7Uu/oBxQ3IoLdL9JyksDak/tzuUxI5hY/+DalzsKg6aNtMgRwjg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=wRf5HHViihY5OJxA8zOe7qJAlaZwJ8amNpuj1uFi3NM=;
+ b=R90G7tXNI/fq3ryGG7bKENOHqe5FQK4BR3uRBweqcVEVFwj7qKM5D/1eV9PdA+NVokBxNOpMjRLnSB07K6Xw8IoGrBxQzrPD4hHS6USs7Uzdh58EUjJyztOiQQFkGfCYhDiRageuHnwiH/O6EwOF1Be3l71g7Xz1GCNaM4ufgvJCIoj1aVxYeZmeGN6wi4ldg319sMKUfH/S6uzN88eOP2pCq05bTVP4s1rLhySwR8HHNtwqiASo1hkk85WFV6PtTaxcqX2oYBX4J0ysJiVvcGr/6jIrdhtIqDrhmZsQDtvakhVWpoydKMFH+iW//bsM9KYOLXIafWSfUNwi0DemTQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Received: from BN9PR11MB5276.namprd11.prod.outlook.com (2603:10b6:408:135::18)
+ by DM4PR11MB5325.namprd11.prod.outlook.com (2603:10b6:5:390::19) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5395.14; Thu, 7 Jul
+ 2022 02:18:48 +0000
+Received: from BN9PR11MB5276.namprd11.prod.outlook.com
+ ([fe80::8435:5a99:1e28:b38c]) by BN9PR11MB5276.namprd11.prod.outlook.com
+ ([fe80::8435:5a99:1e28:b38c%2]) with mapi id 15.20.5395.021; Thu, 7 Jul 2022
+ 02:18:48 +0000
+From:   "Tian, Kevin" <kevin.tian@intel.com>
+To:     Christoph Hellwig <hch@lst.de>,
+        Kirti Wankhede <kwankhede@nvidia.com>,
+        Tony Krowiak <akrowiak@linux.ibm.com>,
+        Halil Pasic <pasic@linux.ibm.com>,
+        Jason Herne <jjherne@linux.ibm.com>,
+        Eric Farman <farman@linux.ibm.com>,
+        Matthew Rosato <mjrosato@linux.ibm.com>,
+        Zhenyu Wang <zhenyuw@linux.intel.com>,
+        "Wang, Zhi A" <zhi.a.wang@intel.com>,
+        "Alex Williamson" <alex.williamson@redhat.com>
+CC:     "linux-s390@vger.kernel.org" <linux-s390@vger.kernel.org>,
+        "intel-gvt-dev@lists.freedesktop.org" 
+        <intel-gvt-dev@lists.freedesktop.org>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        Jason Gunthorpe <jgg@nvidia.com>
+Subject: RE: [PATCH 02/15] drm/i915/gvt: simplify vgpu configuration
+ management
+Thread-Topic: [PATCH 02/15] drm/i915/gvt: simplify vgpu configuration
+ management
+Thread-Index: AQHYkQv6clwefJwWfEC3io0iEkXc761yLZLg
+Date:   Thu, 7 Jul 2022 02:18:48 +0000
+Message-ID: <BN9PR11MB527630AA9318183CFF05F9E08C839@BN9PR11MB5276.namprd11.prod.outlook.com>
+References: <20220706074219.3614-1-hch@lst.de>
+ <20220706074219.3614-3-hch@lst.de>
+In-Reply-To: <20220706074219.3614-3-hch@lst.de>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+authentication-results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+x-ms-publictraffictype: Email
+x-ms-office365-filtering-correlation-id: 52cc841a-8869-4139-9ea8-08da5fbf06e6
+x-ms-traffictypediagnostic: DM4PR11MB5325:EE_
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam: BCL:0;
+x-microsoft-antispam-message-info: JrJgaPRsirdP3aF7p/2ZZbNIC+H1bXpBZyOXGI92c0DSer2mXC0NRGjQ0iyYmjFvcr8Mj9f6l4rR345XpFKUidgDnw8bNtdYt2sexCD7Mq+k2UZ3pL2TXN1vqz8DYFk7URmw3UlOX487tqJ9o/5k0Au96UYtcrUMbp9IQX35cLPBCUV9szgDJnNahCnW76n3K8SIViHjc5UZgMZ8QQLwLeGFAojxCwgEB2q6MN8/pS03C7YfxDC7SBHsnaZGuFGXjK2Uh0YYCNoorAoUM8JzdAXGGsJztv18jc34DiAFjDgldXSvV3SJ7nDuqA8IW/gOMpvqsDAWF4hUNqOwYHFXySGUHVqPvVbTi6m/+SBcYduYldH/LmtS9xXGTy5fF9hZ2ao1hqhcoxvmUCbrJQuJDj6tC7BPx87xbu/SZc7XUU70yxbw+qJT9eE9XIxNSLRtFHoJdDrgCn5atuhLACKtNAxa2Q+cibrcC2QMpZdcHEw9hC0K5TiMg8Bi63cub3tAb7S0Ks5iGvrZdIW3N9/zFdiiMbXkthg2H3XUhPFvG8YPW/LDp1bCmOp4mfL/40dYNl/cjSevaduBbI8dGNaa4QHqfmaI8Ht5oXKH7Y4j6ltLY5K1nWcaeqw8oAsmEI2WHjJrqnS76DZQliv++5DVpljR8LewfBJ5tYJkSsGHLog0eIA6YObcz2k4sPmQ5CcIXHVvGtLQ0+4WO76VD8v8zcd8hJgTEEdb8+aYxbGxOUVXCrqG6USxuVZG5ECvECTuveGYJiKcsQj2TNwkCiX92cSukK4TWsLS8XHXzse7X1yvd3ByjIkwFOBOp+hFPbgWYcmOIVJIpWgTn3vURvEvtA==
+x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BN9PR11MB5276.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230016)(376002)(39860400002)(346002)(366004)(396003)(136003)(2906002)(55016003)(41300700001)(54906003)(8936002)(38100700002)(316002)(6506007)(7696005)(110136005)(71200400001)(66476007)(33656002)(66446008)(86362001)(478600001)(52536014)(64756008)(186003)(8676002)(26005)(4326008)(38070700005)(921005)(9686003)(122000001)(82960400001)(5660300002)(66556008)(7416002)(66946007)(4744005)(76116006);DIR:OUT;SFP:1102;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0: =?us-ascii?Q?WwNko3fFatUePRaERVxb5ysZCKwwb1qCSPGU1q7a07o4WAxprlt3sT2Y4CQ2?=
+ =?us-ascii?Q?OGt88MPcY+BpqjgQ98Ykz97QIa9BhtRJMOW6iHhLLAkHa/mkinHe3nN7Sovt?=
+ =?us-ascii?Q?sFf+qesotTQ2iAcSZWkEh/3IfRCdyPPtxeKPJvUh0YXskuqIVFQ0tQZQ4n42?=
+ =?us-ascii?Q?Q4dAgDCGkhlu6SmsqLpmwziMXc1h7r0VYeTDx9aBgE3ZubM8eyssY1bW9NVJ?=
+ =?us-ascii?Q?LPEi8TWxMPFQrsM7oDjREm1Y9t1wICLv9hM4HXeZhtOe+v4QIXU8uUe/e9z9?=
+ =?us-ascii?Q?SJOQKASUuTxAjHSs6xzvEql0ZlGL7kHW886/p2y5QVBunbRJzyw25deFlxn7?=
+ =?us-ascii?Q?KUno1oWkYNjXbHYnpVcvCN8EP7UJ/GVT2BpM+2wdcTokvZxDUgR74QBrsxfi?=
+ =?us-ascii?Q?bv9CZXgXvXTr7aDhd8Td0TQHE/bLNw6KWgDe8kjnQmF2qcPszI6l5TmlWdpR?=
+ =?us-ascii?Q?aC6G1/MBRb9DvuNNMuQxduPWFp+7o6g1dKaqiSyb7v2f5gHhj6379j4npuuT?=
+ =?us-ascii?Q?AICDvSZLLzKPHTwo2h/fM/maGLLwBIWVnyOSw+D35f+CF0jumdxeTwnt535c?=
+ =?us-ascii?Q?UEr/qzIcNPuAp7gyDNNf0MqqIW9GjpMmxOaOf4Y7unU2/6cCX7UHSHijj+2e?=
+ =?us-ascii?Q?6bbBHbKey/qmw7tYEE8MuMdXAt/YhJGxKY3sStHzKlmqn9mwUYJrVgNHjxcd?=
+ =?us-ascii?Q?MXpfTmpDu4beJFSv8N4T5bSEsQxEr2bQxEjmZ3qPEbZxKOeMOFmHPZBgRDDB?=
+ =?us-ascii?Q?/WGiRfQXUabIbVRyCZy840zssKhUx3lwpK4xOwupleOa0bLca5Qy95XHU/ut?=
+ =?us-ascii?Q?g4MOw0x4nwaTC5/6+lm47xKQ1FI8ndXmOn5uUJBc+9F+89XTNRG7EGvBEiL7?=
+ =?us-ascii?Q?ZMwYohlDSyNXpTIiv3dclJgY0ZRr4YNftcR+yYeZc9j5O5moOXiRQGfwdpku?=
+ =?us-ascii?Q?2hzqJA88elPuExs7Dlpj1aUmltY+y9xFgS86UWsfQ84zNg772adIUKdUNtGG?=
+ =?us-ascii?Q?Bsl1h0JMzstBmWP829gzV9h9BpWD3y+7VWo0CwTVKKdDm/vXtXxVjsx7iC7l?=
+ =?us-ascii?Q?Cd8z7aKrZah3aY31N2xDF0C8fTtw0zAszRzsta42dlKwZRN46Wr944kz0JxX?=
+ =?us-ascii?Q?+HCISiZgxeMxj+Fb5ZO+d5GhOdcBF7QNTbVybSKWo/91alUYWGYyvESMoHp9?=
+ =?us-ascii?Q?y88pefUofY+FhQCNPPh4ckBXKEcmqzvWgiUy+u+rpfSf41mAqXWTqVFDBTZe?=
+ =?us-ascii?Q?MmevPEIoqkw5QtvB41n+spC8ISi3yJGmTZnC+9WJEF/SXjKVBzYjcwhFga1U?=
+ =?us-ascii?Q?VinGxIAdFwRnHyBeeUcK6SppfWC62Krw8jYpeiWRJ4QKxFfuVz5WyrEThpKD?=
+ =?us-ascii?Q?rLV8//OPCuAa3OXCGv2HXAzNimJM9oLxl/WTajC9gGx0Dc+ZwvN5h8RKIzjx?=
+ =?us-ascii?Q?4WgWzbKx01c5Pbj/+JenBDcJQesy/M3RZ/H9/ozfK4wrzLrB6N2aSJg0Lb5Y?=
+ =?us-ascii?Q?hThJ2iky+aMO+u1NO+4zAswoLGg+1MnJ4B8Pv1Z3IX9ewEswSNQrDyu5bt/j?=
+ =?us-ascii?Q?a7E9ZZCCcHR47Q0NcHNkK/lILc0M1vpFJxPYjGFR?=
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <5eaf496d71b2c8fd321c013c9d1787d4c34d1100.camel@redhat.com>
-X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-        T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL
-        autolearn=ham autolearn_force=no version=3.4.6
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: BN9PR11MB5276.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 52cc841a-8869-4139-9ea8-08da5fbf06e6
+X-MS-Exchange-CrossTenant-originalarrivaltime: 07 Jul 2022 02:18:48.5047
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: gPtIow/fEjnioR4r+AUV0QKLcmRmNirb2GtEnCqORs5ZhLus12aaV3Ev0JP9VfvyVygPWaym3QiXLXMDoAtyEQ==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM4PR11MB5325
+X-OriginatorOrg: intel.com
+X-Spam-Status: No, score=-5.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
+        SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Jul 06, 2022, Maxim Levitsky wrote:
-> > @@ -1618,9 +1620,9 @@ struct kvm_x86_ops {
-> >  
-> >  struct kvm_x86_nested_ops {
-> >         void (*leave_nested)(struct kvm_vcpu *vcpu);
-> > +       bool (*is_exception_vmexit)(struct kvm_vcpu *vcpu, u8 vector,
-> > +                                   u32 error_code);
-> >         int (*check_events)(struct kvm_vcpu *vcpu);
-> > -       bool (*handle_page_fault_workaround)(struct kvm_vcpu *vcpu,
-> > -                                            struct x86_exception *fault);
-> 
-> I think that since this patch is already quite large, it would make sense
-> to split the removal of workaround/hack code to patch after this one?
+> From: Christoph Hellwig
+> Sent: Wednesday, July 6, 2022 3:42 PM
+>=20
+> Instead of copying the information from the vgpu_types arrays into each
+> intel_vgpu_type structure, just reference this constant information
+> with a pointer to the already existing data structure, and pass it into
+> the low-level VGPU creation helpers intead of copying the data into yet
+> anothe params data structure.
+>=20
+> Signed-off-by: Christoph Hellwig <hch@lst.de>
+> Reviewed-by: Jason Gunthorpe <jgg@nvidia.com>
+> Reviewed-by: Zhenyu Wang <zhenyuw@linux.intel.com>
 
-Hmm, at a glance it seems doable, but I'd prefer to keep it as a single patch, in
-no small part because I don't want to risking creating a transient bug whether KVM
-blows up during bisection due to some weird interaction.  IMO, keeping the #PF hack
-for a single patch would yield nonsensical code for that one patch.  It's a lot of
-code, but logically the changes are very much a single thing.
-
-> > @@ -3870,14 +3845,24 @@ static void nested_vmx_inject_exception_vmexit(struct kvm_vcpu *vcpu,
-> >   * from the emulator (because such #DBs are fault-like and thus don't trigger
-> >   * actions that fire on instruction retire).
-> >   */
-> > -static inline unsigned long vmx_get_pending_dbg_trap(struct kvm_vcpu *vcpu)
-> > +static unsigned long vmx_get_pending_dbg_trap(struct kvm_queued_exception *ex)
-> Any reason to remove the inline?
-
-Mainly to avoid an unnecessarily long line, and because generally speaking local
-static functions shouldn't be tagged inline.  The compiler is almost always smarter
-than humans when it comes to inlining (or not).
-
-> >  {
-> > -       if (!vcpu->arch.exception.pending ||
-> > -           vcpu->arch.exception.vector != DB_VECTOR)
-> > +       if (!ex->pending || ex->vector != DB_VECTOR)
-> >                 return 0;
-> >  
-> >         /* General Detect #DBs are always fault-like. */
-> > -       return vcpu->arch.exception.payload & ~DR6_BD;
-> > +       return ex->payload & ~DR6_BD;
-> > +}
-
-...
-
-> This comment also probably should go to a separate patch to reduce this patch size.
-
-I'll split it out.
-
-> Other than that, this is a _very_ good idea to add it to KVM, although
-> maybe we should put it in Documentation folder instead?
-> (but I don't have a strong preference on this)
-
-I definitely want a comment in KVM that's relatively close to the code.  I'm not
-opposed to also adding something in Documentation, but I'd want that to be an "and"
-not an "or".
-
-> >  static int vmx_check_nested_events(struct kvm_vcpu *vcpu)
-> >  {
-> >         struct kvm_lapic *apic = vcpu->arch.apic;
-> >         struct vcpu_vmx *vmx = to_vmx(vcpu);
-> > -       unsigned long exit_qual;
-> >         /*
-> >          * Only a pending nested run blocks a pending exception.  If there is a
-> >          * previously injected event, the pending exception occurred while said
-> > @@ -3943,19 +4011,20 @@ static int vmx_check_nested_events(struct kvm_vcpu *vcpu)
-> >                 /* Fallthrough, the SIPI is completely ignored. */
-> >         }
-> >  
-> > -       /*
-> > -        * Process exceptions that are higher priority than Monitor Trap Flag:
-> > -        * fault-like exceptions, TSS T flag #DB (not emulated by KVM, but
-> > -        * could theoretically come in from userspace), and ICEBP (INT1).
-> > -        */
-> > +       if (vcpu->arch.exception_vmexit.pending &&
-> > +           !vmx_is_low_priority_db_trap(&vcpu->arch.exception_vmexit)) {
-> > +               if (block_nested_exceptions)
-> > +                       return -EBUSY;
-> > +
-> > +               nested_vmx_inject_exception_vmexit(vcpu);
-> > +               return 0;
-> > +       }
-> 
-> > +
-> >         if (vcpu->arch.exception.pending &&
-> > -           !(vmx_get_pending_dbg_trap(vcpu) & ~DR6_BT)) {
-> > +           !vmx_is_low_priority_db_trap(&vcpu->arch.exception)) {
-> Small nitpick: vmx_is_low_priority_db_trap refactoring could be done in a separate patch
-
-Ya, will do.  No idea why I didn't do that.
-
-> + Maybe it would be nice to add a WARN_ON_ONCE check here that this exception
-> is not intercepted by the guest
->
-> >                 if (block_nested_exceptions)
-> >                         return -EBUSY;
-> > -               if (!nested_vmx_check_exception(vcpu, &exit_qual))
-> > -                       goto no_vmexit;
-> > -               nested_vmx_inject_exception_vmexit(vcpu, exit_qual);
-> > -               return 0;
-> > +               goto no_vmexit;
-> >         }
-> >  
-> >         if (vmx->nested.mtf_pending) {
-> > @@ -3966,13 +4035,18 @@ static int vmx_check_nested_events(struct kvm_vcpu *vcpu)
-> >                 return 0;
-> >         }
-> >  
-> > +       if (vcpu->arch.exception_vmexit.pending) {
-> > +               if (block_nested_exceptions)
-> > +                       return -EBUSY;
-> 
-> And here add a WARN_ON_ONCE check that it is intercepted.
-
-I like the idea of sanity check, but I really don't want to splatter them in both
-VMX and SVM, and it's a bit kludgy to implement the checks in common code.  I'll
-play with it and see if I can figure out a decent solution.
-
-> > @@ -618,18 +633,31 @@ static void kvm_multiple_exception(struct kvm_vcpu *vcpu,
-> >  
-> >         kvm_make_request(KVM_REQ_EVENT, vcpu);
-> >  
-> > +       /*
-> > +        * If the exception is destined for L2 and isn't being reinjected,
-> > +        * morph it to a VM-Exit if L1 wants to intercept the exception.  A
-> > +        * previously injected exception is not checked because it was checked
-> > +        * when it was original queued, and re-checking is incorrect if _L1_
-> > +        * injected the exception, in which case it's exempt from interception.
-> > +        */
-> > +       if (!reinject && is_guest_mode(vcpu) &&
-> > +           kvm_x86_ops.nested_ops->is_exception_vmexit(vcpu, nr, error_code)) {
-> > +               kvm_queue_exception_vmexit(vcpu, nr, has_error, error_code,
-> > +                                          has_payload, payload);
-> > +               return;
-> > +       }
-> > +
-> >         if (!vcpu->arch.exception.pending && !vcpu->arch.exception.injected) {
-> >         queue:
-> >                 if (reinject) {
-> >                         /*
-> > -                        * On vmentry, vcpu->arch.exception.pending is only
-> > -                        * true if an event injection was blocked by
-> > -                        * nested_run_pending.  In that case, however,
-> > -                        * vcpu_enter_guest requests an immediate exit,
-> > -                        * and the guest shouldn't proceed far enough to
-> > -                        * need reinjection.
-> > +                        * On VM-Entry, an exception can be pending if and only
-> > +                        * if event injection was blocked by nested_run_pending.
-> > +                        * In that case, however, vcpu_enter_guest() requests an
-> > +                        * immediate exit, and the guest shouldn't proceed far
-> > +                        * enough to need reinjection.
-> 
-> Now that I had read the Jim's document on event priorities, I think we can
-> update the comment:
->
-> On VMX we set expired preemption timer, and on SVM we do self IPI, thus pend a real interrupt.
-> Both events should have higher priority than processing the injected event
-
-No, they don't.  Injected events (exceptions, IRQs, NMIs, etc...) "occur" as part
-of the VMRUN/VMLAUNCH/VMRESUME, i.e. are vectored before an interrupt window is
-opened at the next instruction boundary.  E.g. if the hypervisor intercepts an
-exception and then reflects it back into the guest, any pending event must not be
-recognized until after the injected exception is delivered, otherwise the event
-would, from the guest's perspective, arrive in the middle of an instruction.
-
-This is calling out something slightly different.  What it's saying is that if
-there was a pending exception, then KVM should _not_ have injected said pending
-exception and instead should have requested an immediate exit.  That "immediate
-exit" should have forced a VM-Exit before the CPU could fetch a new instruction,
-and thus before the guest could trigger an exception that would require reinjection.
-
-The "immediate exit" trick works because all events with higher priority than the
-VMX preeemption timer (or IRQ) are guaranteed to exit, e.g. a hardware SMI can't
-cause a fault in the guest.
-
-Though there might be an edge case with vmcs12.GUEST_PENDING_DBG_EXCEPTIONS that
-could result in a #DB => #PF interception + reinjection when using shadow paging.
-Maybe.
-
-> (This is something I didn't find in the Intel/AMD docs, so I might be wrong here)
-> thus the CPU will not attempt to process the injected event 
-> (via EVENTINJ on SVM, or via VM_ENTRY_INTR_INFO_FIELD) and instead just straight copy
-> them back to exit_int_info/IDT_VECTORING_INFO_FIELD)
-> 
-> So in this case the event will actually be re-injected, but no new exception can
-> be generated since we will re-execute the VMRUN/VMRESUME instruction.
-> 
-> 
-> >                          */
-> > -                       WARN_ON_ONCE(vcpu->arch.exception.pending);
-> > +                       WARN_ON_ONCE(kvm_is_exception_pending(vcpu));
-> >                         vcpu->arch.exception.injected = true;
-> >                         if (WARN_ON_ONCE(has_payload)) {
-> >                                 /*
-> > @@ -732,20 +760,22 @@ static int complete_emulated_insn_gp(struct kvm_vcpu *vcpu, int err)
-> >  void kvm_inject_page_fault(struct kvm_vcpu *vcpu, struct x86_exception *fault)
-> >  {
-> >         ++vcpu->stat.pf_guest;
-> > -       vcpu->arch.exception.nested_apf =
-> > -               is_guest_mode(vcpu) && fault->async_page_fault;
-> > -       if (vcpu->arch.exception.nested_apf) {
-> > -               vcpu->arch.apf.nested_apf_token = fault->address;
-> > -               kvm_queue_exception_e(vcpu, PF_VECTOR, fault->error_code);
-> > -       } else {
-> > +
-> > +       /*
-> > +        * Async #PF in L2 is always forwarded to L1 as a VM-Exit regardless of
-> > +        * whether or not L1 wants to intercept "regular" #PF.
-> 
-> We might want to also mention that the L1 has to opt-in to this
-> (vcpu->arch.apf.delivery_as_pf_vmexit), but the fact that we are
-> here, means that it did opt-in
-> 
-> (otherwise kvm_can_deliver_async_pf won't return true).
-> 
-> A WARN_ON_ONCE(!vcpu->arch.apf.delivery_as_pf_vmexit) would be
-> nice to also check this in the runtime.
-
-Eh, I'm not convinced this would be a worthwhile WARN, the logic is fully contained
-in kvm_can_deliver_async_pf() and I don't see that changing, i.e. odds of breaking
-this are very, very low.  At some point we just have to trust that we don't suck
-that much :-)
-
-> Also note that AFAIK, qemu doesn't opt-in for this feature sadly,
-> thus this code is not tested (unless there is some unit test).
-> 
-> 
-> > +        */
-> > +       if (is_guest_mode(vcpu) && fault->async_page_fault)
-> > +               kvm_queue_exception_vmexit(vcpu, PF_VECTOR,
-> > +                                          true, fault->error_code,
-> > +                                          true, fault->address);
-> > +       else
-> >                 kvm_queue_exception_e_p(vcpu, PF_VECTOR, fault->error_code,
-> >                                         fault->address);
-> > -       }
-> >  }
-> >  EXPORT_SYMBOL_GPL(kvm_inject_page_fault);
-> >  
-> > -/* Returns true if the page fault was immediately morphed into a VM-Exit. */
-> > -bool kvm_inject_emulated_page_fault(struct kvm_vcpu *vcpu,
-> > +void kvm_inject_emulated_page_fault(struct kvm_vcpu *vcpu,
-> >                                     struct x86_exception *fault)
-> >  {
-> >         struct kvm_mmu *fault_mmu;
-> > @@ -763,26 +793,7 @@ bool kvm_inject_emulated_page_fault(struct kvm_vcpu *vcpu,
-> >                 kvm_mmu_invalidate_gva(vcpu, fault_mmu, fault->address,
-> >                                        fault_mmu->root.hpa);
-> >  
-> > -       /*
-> > -        * A workaround for KVM's bad exception handling.  If KVM injected an
-> > -        * exception into L2, and L2 encountered a #PF while vectoring the
-> > -        * injected exception, manually check to see if L1 wants to intercept
-> > -        * #PF, otherwise queuing the #PF will lead to #DF or a lost exception.
-> > -        * In all other cases, defer the check to nested_ops->check_events(),
-> > -        * which will correctly handle priority (this does not).  Note, other
-> > -        * exceptions, e.g. #GP, are theoretically affected, #PF is simply the
-> > -        * most problematic, e.g. when L0 and L1 are both intercepting #PF for
-> > -        * shadow paging.
-> > -        *
-> > -        * TODO: Rewrite exception handling to track injected and pending
-> > -        *       (VM-Exit) exceptions separately.
-> > -        */
-> > -       if (unlikely(vcpu->arch.exception.injected && is_guest_mode(vcpu)) &&
-> > -           kvm_x86_ops.nested_ops->handle_page_fault_workaround(vcpu, fault))
-> > -               return true;
-> > -
-> >         fault_mmu->inject_page_fault(vcpu, fault);
-> > -       return false;
-> >  }
-> >  EXPORT_SYMBOL_GPL(kvm_inject_emulated_page_fault);
-> >  
-> > @@ -4752,7 +4763,7 @@ static int kvm_vcpu_ready_for_interrupt_injection(struct kvm_vcpu *vcpu)
-> >         return (kvm_arch_interrupt_allowed(vcpu) &&
-> >                 kvm_cpu_accept_dm_intr(vcpu) &&
-> >                 !kvm_event_needs_reinjection(vcpu) &&
-> > -               !vcpu->arch.exception.pending);
-> > +               !kvm_is_exception_pending(vcpu));
-> >  }
-> >  
-> >  static int kvm_vcpu_ioctl_interrupt(struct kvm_vcpu *vcpu,
-> > @@ -4881,13 +4892,27 @@ static int kvm_vcpu_ioctl_x86_set_mce(struct kvm_vcpu *vcpu,
-> >  static void kvm_vcpu_ioctl_x86_get_vcpu_events(struct kvm_vcpu *vcpu,
-> >                                                struct kvm_vcpu_events *events)
-> >  {
-> > -       struct kvm_queued_exception *ex = &vcpu->arch.exception;
-> > +       struct kvm_queued_exception *ex;
-> >  
-> >         process_nmi(vcpu);
-> >  
-> >         if (kvm_check_request(KVM_REQ_SMI, vcpu))
-> >                 process_smi(vcpu);
-> >  
-> > +       /*
-> > +        * KVM's ABI only allows for one exception to be migrated.  Luckily,
-> > +        * the only time there can be two queued exceptions is if there's a
-> > +        * non-exiting _injected_ exception, and a pending exiting exception.
-> > +        * In that case, ignore the VM-Exiting exception as it's an extension
-> > +        * of the injected exception.
-> > +        */
-> 
-> I think that we will lose the injected exception, thus will only deliver after
-> the migration the VM-exiting exception but without the correct IDT_VECTORING_INFO_FIELD/exit_int_info.
-> 
-> It's not that big deal and can be fixed by extending this API, with a new cap,
-> as I did in my patches. This can be done later, but the above comment
-> which tries to justify it, should be updated to mention that it is wrong.
-
-No?  The below will migrate the pending VM-Exit if and only if there's no pending
-or injected exception.  The pending VM-Exit is dropped, and in theory could be
-lost if something fixes the underlying exception (that results in VM-Exit) before
-the guest is resumed, but that's ok.  If the exception was somehow fixed then the
-exception was inherently non-deterministic anyways, i.e. the guest can't have
-guaranteed that it would occur.
-
-Or did I misunderstand?
-
-> > +       if (vcpu->arch.exception_vmexit.pending &&
-> > +           !vcpu->arch.exception.pending &&
-> > +           !vcpu->arch.exception.injected)
-> > +               ex = &vcpu->arch.exception_vmexit;
-> > +       else
-> > +               ex = &vcpu->arch.exception;
+Reviewed-by: Kevin Tian <kevin.tian@intel.com>
