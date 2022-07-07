@@ -2,57 +2,100 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id B92E2569868
-	for <lists+kvm@lfdr.de>; Thu,  7 Jul 2022 04:55:41 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id B4CE2569897
+	for <lists+kvm@lfdr.de>; Thu,  7 Jul 2022 05:08:47 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234837AbiGGCzk (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 6 Jul 2022 22:55:40 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57022 "EHLO
+        id S234177AbiGGDIq (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 6 Jul 2022 23:08:46 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39882 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234177AbiGGCzj (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 6 Jul 2022 22:55:39 -0400
-Received: from mga18.intel.com (mga18.intel.com [134.134.136.126])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C04D92E9FE;
-        Wed,  6 Jul 2022 19:55:37 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1657162537; x=1688698537;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=OhSAiO9mbEhXvYhE0pGpnWKw0ZwQssOlGAsoAGUyDZs=;
-  b=KHuOSALxenM0eGfZy+11RTiENZEBBpwhD9atpsiHKf2A98GSN/tLB7lw
-   Ji8/S7/bGgKRYs1Spp+JgEvifHfuJAYrAh20aKmobzJePnsRfd3R3cM8S
-   0eHznkdQoRDV4bsmEDQZzIxVeqkG0LzjuRYxJRyXs35DWbWG85Bc+hmAZ
-   HXzcSfT02+0TlPyPO/TPDffenypAZw3f17XgKPtRUvV90OCUa0fDIezc0
-   T49527q3jU1eo0JkVTfjBPXJPjw1dijfRwkeWUazMiE1VA2/KZA8DAUv5
-   pKmSOzSkpkQsJaCm1Mu9PVbRPGTZMGUQ++OWPY39VJR5jyIuJe6vCNrrE
-   A==;
-X-IronPort-AV: E=McAfee;i="6400,9594,10400"; a="266945500"
-X-IronPort-AV: E=Sophos;i="5.92,251,1650956400"; 
-   d="scan'208";a="266945500"
-Received: from orsmga007.jf.intel.com ([10.7.209.58])
-  by orsmga106.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 06 Jul 2022 19:55:37 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.92,251,1650956400"; 
-   d="scan'208";a="591040884"
-Received: from yy-desk-7060.sh.intel.com (HELO localhost) ([10.239.159.76])
-  by orsmga007.jf.intel.com with ESMTP; 06 Jul 2022 19:55:35 -0700
-Date:   Thu, 7 Jul 2022 10:55:35 +0800
-From:   Yuan Yao <yuan.yao@linux.intel.com>
-To:     isaku.yamahata@intel.com
-Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
-        isaku.yamahata@gmail.com, Paolo Bonzini <pbonzini@redhat.com>
-Subject: Re: [PATCH v7 013/102] KVM: TDX: Make TDX VM type supported
-Message-ID: <20220707025535.7vn6ifx4wq52qwes@yy-desk-7060>
-References: <cover.1656366337.git.isaku.yamahata@intel.com>
- <038362fa9e89312ff72c01ab3ae3bbbf522c3592.1656366338.git.isaku.yamahata@intel.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <038362fa9e89312ff72c01ab3ae3bbbf522c3592.1656366338.git.isaku.yamahata@intel.com>
-User-Agent: NeoMutt/20171215
-X-Spam-Status: No, score=-2.7 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_EF,SPF_HELO_NONE,SPF_NONE,
+        with ESMTP id S233486AbiGGDIo (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 6 Jul 2022 23:08:44 -0400
+Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E270E2CDDC;
+        Wed,  6 Jul 2022 20:08:42 -0700 (PDT)
+Received: from pps.filterd (m0098399.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.17.1.5/8.17.1.5) with ESMTP id 2672gUYQ003610;
+        Thu, 7 Jul 2022 03:08:34 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : subject :
+ from : to : cc : date : in-reply-to : references : content-type :
+ mime-version : content-transfer-encoding; s=pp1;
+ bh=8k3OO9j+mkkof9qZY6Qf3sWinwElu0bAUUq4uBqS3NQ=;
+ b=bEGZMgnoEhXJbA0VRcRNql8xp4kAXqyU8rqLkIt+0H0gnKglwU6KsePWCdnDtgK0E6kH
+ Mfdykae5cncqJlO9GlhYRWoBM7HBe2dOQIIPWLEltqpeM4/1F5bleWx95+DeQUizLrJx
+ Yi/FjW7XicN44UTw+cDLPKGkO9Ty2i54cUzPYltNxOXOaMXUtVQI26J9BeMGIv7P1uUV
+ +Nr7EmjHZvhO0aPmR8ymQ7csgfruRzqfP53y5vv9Eiuaiz70lgBw+F05AtRwEQaKf1/s
+ 4FItpCkHIF8NqnbVPT6OZ0QTp5XkTiJTAqHcbtairilKO+cjV7ObUwJde5eOaizjXnJV ww== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3h5pxd8fx6-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Thu, 07 Jul 2022 03:08:33 +0000
+Received: from m0098399.ppops.net (m0098399.ppops.net [127.0.0.1])
+        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 2672oJBm003265;
+        Thu, 7 Jul 2022 03:08:33 GMT
+Received: from ppma01wdc.us.ibm.com (fd.55.37a9.ip4.static.sl-reverse.com [169.55.85.253])
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3h5pxd8fwq-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Thu, 07 Jul 2022 03:08:33 +0000
+Received: from pps.filterd (ppma01wdc.us.ibm.com [127.0.0.1])
+        by ppma01wdc.us.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 26737c7I008529;
+        Thu, 7 Jul 2022 03:08:31 GMT
+Received: from b03cxnp07029.gho.boulder.ibm.com (b03cxnp07029.gho.boulder.ibm.com [9.17.130.16])
+        by ppma01wdc.us.ibm.com with ESMTP id 3h4ud1rpe9-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Thu, 07 Jul 2022 03:08:31 +0000
+Received: from b03ledav004.gho.boulder.ibm.com (b03ledav004.gho.boulder.ibm.com [9.17.130.235])
+        by b03cxnp07029.gho.boulder.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 26738UDf33816886
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Thu, 7 Jul 2022 03:08:30 GMT
+Received: from b03ledav004.gho.boulder.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id A6CA77805F;
+        Thu,  7 Jul 2022 03:08:30 +0000 (GMT)
+Received: from b03ledav004.gho.boulder.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 192FA7805E;
+        Thu,  7 Jul 2022 03:08:29 +0000 (GMT)
+Received: from farman-thinkpad-t470p (unknown [9.211.38.121])
+        by b03ledav004.gho.boulder.ibm.com (Postfix) with ESMTP;
+        Thu,  7 Jul 2022 03:08:28 +0000 (GMT)
+Message-ID: <27e9ef873a00dde07373155e76615437136106c4.camel@linux.ibm.com>
+Subject: Re: [PATCH 04/15] vfio/mdev: embedd struct mdev_parent in the
+ parent data structure
+From:   Eric Farman <farman@linux.ibm.com>
+To:     Christoph Hellwig <hch@lst.de>,
+        Kirti Wankhede <kwankhede@nvidia.com>,
+        Tony Krowiak <akrowiak@linux.ibm.com>,
+        Halil Pasic <pasic@linux.ibm.com>,
+        Jason Herne <jjherne@linux.ibm.com>,
+        Matthew Rosato <mjrosato@linux.ibm.com>,
+        Zhenyu Wang <zhenyuw@linux.intel.com>,
+        Zhi Wang <zhi.a.wang@intel.com>,
+        Alex Williamson <alex.williamson@redhat.com>,
+        Vineeth Vijayan <vneethv@linux.ibm.com>,
+        Peter Oberparleiter <oberpar@linux.ibm.com>
+Cc:     Jason Gunthorpe <jgg@nvidia.com>, kvm@vger.kernel.org,
+        linux-s390@vger.kernel.org, intel-gvt-dev@lists.freedesktop.org,
+        Kevin Tian <kevin.tian@intel.com>
+Date:   Wed, 06 Jul 2022 23:08:28 -0400
+In-Reply-To: <20220706074219.3614-5-hch@lst.de>
+References: <20220706074219.3614-1-hch@lst.de>
+         <20220706074219.3614-5-hch@lst.de>
+Content-Type: text/plain; charset="UTF-8"
+X-Mailer: Evolution 3.28.5 (3.28.5-18.el8) 
+Mime-Version: 1.0
+Content-Transfer-Encoding: 7bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: xIe5AyBoDK-EaInfg1GOeXgZZhU1riBu
+X-Proofpoint-ORIG-GUID: TGT4V90yAiRVtZrE97A3CYb77cU67q0o
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.205,Aquarius:18.0.883,Hydra:6.0.517,FMLib:17.11.122.1
+ definitions=2022-07-07_01,2022-06-28_01,2022-06-22_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 bulkscore=0 impostorscore=0
+ adultscore=0 malwarescore=0 clxscore=1011 priorityscore=1501
+ lowpriorityscore=0 spamscore=0 mlxscore=0 mlxlogscore=999 phishscore=0
+ suspectscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2206140000 definitions=main-2207070007
+X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_EF,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_PASS,
         T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -60,135 +103,668 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Jun 27, 2022 at 02:53:05PM -0700, isaku.yamahata@intel.com wrote:
-> From: Isaku Yamahata <isaku.yamahata@intel.com>
->
-> NOTE: This patch is in position of the patch series for developers to be
-> able to test codes during the middle of the patch series although this
-> patch series doesn't provide functional features until the all the patches
-> of this patch series.  When merging this patch series, this patch can be
-> moved to the end.
->
-> As first step TDX VM support, return that TDX VM type supported to device
-> model, e.g. qemu.  The callback to create guest TD is vm_init callback for
-> KVM_CREATE_VM.  Add a place holder function and call a function to
-> initialize TDX module on demand because in that callback VMX is enabled by
-> hardware_enable callback (vmx_hardware_enable).
-
-if the "initialize TDX module on demand" means calling tdx_init() then
-it's already done in kvm_init() ->
-kvm_arch_post_hardware_enable_setup from patch 11, so may need commit
-messsage update here.
-
->
-> Signed-off-by: Isaku Yamahata <isaku.yamahata@intel.com>
+On Wed, 2022-07-06 at 09:42 +0200, Christoph Hellwig wrote:
+> Simplify mdev_{un}register_device by requiring the caller to pass in
+> a structure allocate as part of the parent device structure.  This
+> removes the need for a list of parents and the separate mdev_parent
+> refcount as we can simplify rely on the reference to the parent
+> device.
+> 
+> Signed-off-by: Christoph Hellwig <hch@lst.de>
+> Reviewed-by: Jason Gunthorpe <jgg@nvidia.com>
+> Reviewed-by: Kevin Tian <kevin.tian@intel.com>
 > ---
->  arch/x86/kvm/vmx/main.c    | 18 ++++++++++++++++--
->  arch/x86/kvm/vmx/tdx.c     |  6 ++++++
->  arch/x86/kvm/vmx/vmx.c     |  5 -----
->  arch/x86/kvm/vmx/x86_ops.h |  3 ++-
->  4 files changed, 24 insertions(+), 8 deletions(-)
->
-> diff --git a/arch/x86/kvm/vmx/main.c b/arch/x86/kvm/vmx/main.c
-> index 7be4941e4c4d..47bfa94e538e 100644
-> --- a/arch/x86/kvm/vmx/main.c
-> +++ b/arch/x86/kvm/vmx/main.c
-> @@ -10,6 +10,12 @@
->  static bool __read_mostly enable_tdx = IS_ENABLED(CONFIG_INTEL_TDX_HOST);
->  module_param_named(tdx, enable_tdx, bool, 0444);
->
-> +static bool vt_is_vm_type_supported(unsigned long type)
-> +{
-> +	return type == KVM_X86_DEFAULT_VM ||
-> +		(enable_tdx && tdx_is_vm_type_supported(type));
-> +}
-> +
->  static __init int vt_hardware_setup(void)
+>  .../driver-api/vfio-mediated-device.rst       |  12 +-
+>  Documentation/s390/vfio-ap.rst                |   2 +-
+>  Documentation/s390/vfio-ccw.rst               |   2 +-
+>  drivers/gpu/drm/i915/gvt/gvt.h                |   2 +
+>  drivers/gpu/drm/i915/gvt/kvmgt.c              |   5 +-
+>  drivers/s390/cio/cio.h                        |   2 +
+>  drivers/s390/cio/vfio_ccw_ops.c               |   6 +-
+
+(@Vineeth, @Peter FYI regarding struct subchannel)
+
+I haven't had a chance to look at this series with enough focus, but
+the change to cio.h (here, and patch 5) caught my eye. I would've
+expected the "parent" to be struct vfio_ccw_private, instead of the
+subchannel.
+
+Eric
+
+>  drivers/s390/crypto/vfio_ap_ops.c             |   5 +-
+>  drivers/s390/crypto/vfio_ap_private.h         |   1 +
+>  drivers/vfio/mdev/mdev_core.c                 | 120 ++++----------
+> ----
+>  drivers/vfio/mdev/mdev_private.h              |  23 ----
+>  drivers/vfio/mdev/mdev_sysfs.c                |   4 +-
+>  include/linux/mdev.h                          |  15 ++-
+>  samples/vfio-mdev/mbochs.c                    |   5 +-
+>  samples/vfio-mdev/mdpy.c                      |   5 +-
+>  samples/vfio-mdev/mtty.c                      |   6 +-
+>  16 files changed, 69 insertions(+), 146 deletions(-)
+> 
+> diff --git a/Documentation/driver-api/vfio-mediated-device.rst
+> b/Documentation/driver-api/vfio-mediated-device.rst
+> index 1c57815619fdf..62a82afce161b 100644
+> --- a/Documentation/driver-api/vfio-mediated-device.rst
+> +++ b/Documentation/driver-api/vfio-mediated-device.rst
+> @@ -60,19 +60,19 @@ devices as examples, as these devices are the
+> first devices to use this module::
+>       |  MDEV CORE    |
+>       |   MODULE      |
+>       |   mdev.ko     |
+> -     | +-----------+ |  mdev_register_device() +--------------+
+> +     | +-----------+ |  mdev_register_parent() +--------------+
+>       | |           | +<------------------------+              |
+>       | |           | |                         |  nvidia.ko   |<->
+> physical
+>       | |           | +----------------------
+> -->+              |    device
+>       | |           | |        callbacks        +--------------+
+>       | | Physical  | |
+> -     | |  device   | |  mdev_register_device() +--------------+
+> +     | |  device   | |  mdev_register_parent() +--------------+
+>       | | interface | |<------------------------+              |
+>       | |           | |                         |  i915.ko     |<->
+> physical
+>       | |           | +----------------------
+> -->+              |    device
+>       | |           | |        callbacks        +--------------+
+>       | |           | |
+> -     | |           | |  mdev_register_device() +--------------+
+> +     | |           | |  mdev_register_parent() +--------------+
+>       | |           | +<------------------------+              |
+>       | |           | |                         | ccw_device.ko|<->
+> physical
+>       | |           | +----------------------
+> -->+              |    device
+> @@ -127,8 +127,8 @@ vfio_device_ops.
+>  When a driver wants to add the GUID creation sysfs to an existing
+> device it has
+>  probe'd to then it should call::
+>  
+> -    int mdev_register_device(struct device *dev,
+> -                             struct mdev_driver *mdev_driver);
+> +    int mdev_register_parent(struct mdev_parent *parent, struct
+> device *dev,
+> +			struct mdev_driver *mdev_driver);
+>  
+>  This will provide the 'mdev_supported_types/XX/create' files which
+> can then be
+>  used to trigger the creation of a mdev_device. The created
+> mdev_device will be
+> @@ -136,7 +136,7 @@ attached to the specified driver.
+>  
+>  When the driver needs to remove itself it calls::
+>  
+> -    void mdev_unregister_device(struct device *dev);
+> +    void mdev_unregister_parent(struct mdev_parent *parent);
+>  
+>  Which will unbind and destroy all the created mdevs and remove the
+> sysfs files.
+>  
+> diff --git a/Documentation/s390/vfio-ap.rst
+> b/Documentation/s390/vfio-ap.rst
+> index f57ae621f33e8..37e16158c7fbf 100644
+> --- a/Documentation/s390/vfio-ap.rst
+> +++ b/Documentation/s390/vfio-ap.rst
+> @@ -299,7 +299,7 @@ of the VFIO AP mediated matrix device driver::
+>     |  MDEV CORE  |
+>     |   MODULE    |
+>     |   mdev.ko   |
+> -   | +---------+ | mdev_register_device() +--------------+
+> +   | +---------+ | mdev_register_parent() +--------------+
+>     | |Physical | +<-----------------------+              |
+>     | | device  | |                        |  vfio_ap.ko  |<-> matrix
+>     | |interface| +----------------------->+              |    device
+> diff --git a/Documentation/s390/vfio-ccw.rst
+> b/Documentation/s390/vfio-ccw.rst
+> index 8aad08a8b8a50..ea928a3806f43 100644
+> --- a/Documentation/s390/vfio-ccw.rst
+> +++ b/Documentation/s390/vfio-ccw.rst
+> @@ -156,7 +156,7 @@ Below is a high Level block diagram::
+>   |  MDEV CORE  |
+>   |   MODULE    |
+>   |   mdev.ko   |
+> - | +---------+ | mdev_register_device() +--------------+
+> + | +---------+ | mdev_register_parent() +--------------+
+>   | |Physical | +<-----------------------+              |
+>   | | device  | |                        |  vfio_ccw.ko |<->
+> subchannel
+>   | |interface| +----------------------->+              |     device
+> diff --git a/drivers/gpu/drm/i915/gvt/gvt.h
+> b/drivers/gpu/drm/i915/gvt/gvt.h
+> index 392c2ad49d376..bbf0116671ecb 100644
+> --- a/drivers/gpu/drm/i915/gvt/gvt.h
+> +++ b/drivers/gpu/drm/i915/gvt/gvt.h
+> @@ -36,6 +36,7 @@
+>  #include <uapi/linux/pci_regs.h>
+>  #include <linux/kvm_host.h>
+>  #include <linux/vfio.h>
+> +#include <linux/mdev.h>
+>  
+>  #include "i915_drv.h"
+>  #include "intel_gvt.h"
+> @@ -338,6 +339,7 @@ struct intel_gvt {
+>  	struct intel_gvt_workload_scheduler scheduler;
+>  	struct notifier_block
+> shadow_ctx_notifier_block[I915_NUM_ENGINES];
+>  	DECLARE_HASHTABLE(cmd_table, GVT_CMD_HASH_BITS);
+> +	struct mdev_parent parent;
+>  	struct intel_vgpu_type *types;
+>  	unsigned int num_types;
+>  	struct intel_vgpu *idle_vgpu;
+> diff --git a/drivers/gpu/drm/i915/gvt/kvmgt.c
+> b/drivers/gpu/drm/i915/gvt/kvmgt.c
+> index 85e1393d8e55c..e9dba4c0fe6b5 100644
+> --- a/drivers/gpu/drm/i915/gvt/kvmgt.c
+> +++ b/drivers/gpu/drm/i915/gvt/kvmgt.c
+> @@ -1958,7 +1958,7 @@ static void intel_gvt_clean_device(struct
+> drm_i915_private *i915)
+>  	if (drm_WARN_ON(&i915->drm, !gvt))
+>  		return;
+>  
+> -	mdev_unregister_device(i915->drm.dev);
+> +	mdev_unregister_parent(&gvt->parent);
+>  	intel_gvt_cleanup_vgpu_type_groups(gvt);
+>  	intel_gvt_destroy_idle_vgpu(gvt->idle_vgpu);
+>  	intel_gvt_clean_vgpu_types(gvt);
+> @@ -2063,7 +2063,8 @@ static int intel_gvt_init_device(struct
+> drm_i915_private *i915)
+>  	if (ret)
+>  		goto out_destroy_idle_vgpu;
+>  
+> -	ret = mdev_register_device(i915->drm.dev,
+> &intel_vgpu_mdev_driver);
+> +	ret = mdev_register_parent(&gvt->parent, i915->drm.dev,
+> +				   &intel_vgpu_mdev_driver);
+>  	if (ret)
+>  		goto out_cleanup_vgpu_type_groups;
+>  
+> diff --git a/drivers/s390/cio/cio.h b/drivers/s390/cio/cio.h
+> index fa8df50bb49e3..22be5ac7d23c1 100644
+> --- a/drivers/s390/cio/cio.h
+> +++ b/drivers/s390/cio/cio.h
+> @@ -5,6 +5,7 @@
+>  #include <linux/mutex.h>
+>  #include <linux/device.h>
+>  #include <linux/mod_devicetable.h>
+> +#include <linux/mdev.h>
+>  #include <asm/chpid.h>
+>  #include <asm/cio.h>
+>  #include <asm/fcx.h>
+> @@ -108,6 +109,7 @@ struct subchannel {
+>  	 * frees it.  Use driver_set_override() to set or clear it.
+>  	 */
+>  	const char *driver_override;
+> +	struct mdev_parent parent;
+>  } __attribute__ ((aligned(8)));
+>  
+>  DECLARE_PER_CPU_ALIGNED(struct irb, cio_irb);
+> diff --git a/drivers/s390/cio/vfio_ccw_ops.c
+> b/drivers/s390/cio/vfio_ccw_ops.c
+> index b49e2e9db2dc6..9192a21085ce4 100644
+> --- a/drivers/s390/cio/vfio_ccw_ops.c
+> +++ b/drivers/s390/cio/vfio_ccw_ops.c
+> @@ -11,7 +11,6 @@
+>   */
+>  
+>  #include <linux/vfio.h>
+> -#include <linux/mdev.h>
+>  #include <linux/nospec.h>
+>  #include <linux/slab.h>
+>  
+> @@ -660,10 +659,11 @@ struct mdev_driver vfio_ccw_mdev_driver = {
+>  
+>  int vfio_ccw_mdev_reg(struct subchannel *sch)
 >  {
->  	int ret;
-> @@ -33,6 +39,14 @@ static int __init vt_post_hardware_enable_setup(void)
->  	return 0;
+> -	return mdev_register_device(&sch->dev, &vfio_ccw_mdev_driver);
+> +	return mdev_register_parent(&sch->parent, &sch->dev,
+> +				    &vfio_ccw_mdev_driver);
 >  }
->
-> +static int vt_vm_init(struct kvm *kvm)
-> +{
-> +	if (is_td(kvm))
-> +		return -EOPNOTSUPP;	/* Not ready to create guest TD yet. */
-> +
-> +	return vmx_vm_init(kvm);
-> +}
-> +
->  struct kvm_x86_ops vt_x86_ops __initdata = {
->  	.name = "kvm_intel",
->
-> @@ -43,9 +57,9 @@ struct kvm_x86_ops vt_x86_ops __initdata = {
->  	.hardware_disable = vmx_hardware_disable,
->  	.has_emulated_msr = vmx_has_emulated_msr,
->
-> -	.is_vm_type_supported = vmx_is_vm_type_supported,
-> +	.is_vm_type_supported = vt_is_vm_type_supported,
->  	.vm_size = sizeof(struct kvm_vmx),
-> -	.vm_init = vmx_vm_init,
-> +	.vm_init = vt_vm_init,
->  	.vm_destroy = vmx_vm_destroy,
->
->  	.vcpu_precreate = vmx_vcpu_precreate,
-> diff --git a/arch/x86/kvm/vmx/tdx.c b/arch/x86/kvm/vmx/tdx.c
-> index 9cb36716b0f3..3675f7de2735 100644
-> --- a/arch/x86/kvm/vmx/tdx.c
-> +++ b/arch/x86/kvm/vmx/tdx.c
-> @@ -73,6 +73,12 @@ int __init tdx_module_setup(void)
->  	return 0;
->  }
->
-> +bool tdx_is_vm_type_supported(unsigned long type)
-> +{
-> +	/* enable_tdx check is done by the caller. */
-> +	return type == KVM_X86_TDX_VM;
-> +}
-> +
->  int __init tdx_hardware_setup(struct kvm_x86_ops *x86_ops)
+>  
+>  void vfio_ccw_mdev_unreg(struct subchannel *sch)
 >  {
->  	u32 max_pa;
-> diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
-> index 5ba62f8b42ce..b30d73d28e75 100644
-> --- a/arch/x86/kvm/vmx/vmx.c
-> +++ b/arch/x86/kvm/vmx/vmx.c
-> @@ -7281,11 +7281,6 @@ int vmx_vcpu_create(struct kvm_vcpu *vcpu)
->  	return err;
+> -	mdev_unregister_device(&sch->dev);
+> +	mdev_unregister_parent(&sch->parent);
 >  }
->
-> -bool vmx_is_vm_type_supported(unsigned long type)
+> diff --git a/drivers/s390/crypto/vfio_ap_ops.c
+> b/drivers/s390/crypto/vfio_ap_ops.c
+> index a7d2a95796d36..834945150dc9f 100644
+> --- a/drivers/s390/crypto/vfio_ap_ops.c
+> +++ b/drivers/s390/crypto/vfio_ap_ops.c
+> @@ -1485,7 +1485,8 @@ int vfio_ap_mdev_register(void)
+>  	if (ret)
+>  		return ret;
+>  
+> -	ret = mdev_register_device(&matrix_dev->device,
+> &vfio_ap_matrix_driver);
+> +	ret = mdev_register_parent(&matrix_dev->parent, &matrix_dev-
+> >device,
+> +				   &vfio_ap_matrix_driver);
+>  	if (ret)
+>  		goto err_driver;
+>  	return 0;
+> @@ -1497,6 +1498,6 @@ int vfio_ap_mdev_register(void)
+>  
+>  void vfio_ap_mdev_unregister(void)
+>  {
+> -	mdev_unregister_device(&matrix_dev->device);
+> +	mdev_unregister_parent(&matrix_dev->parent);
+>  	mdev_unregister_driver(&vfio_ap_matrix_driver);
+>  }
+> diff --git a/drivers/s390/crypto/vfio_ap_private.h
+> b/drivers/s390/crypto/vfio_ap_private.h
+> index 6616aa83347ad..0191f6bc973a4 100644
+> --- a/drivers/s390/crypto/vfio_ap_private.h
+> +++ b/drivers/s390/crypto/vfio_ap_private.h
+> @@ -45,6 +45,7 @@ struct ap_matrix_dev {
+>  	struct list_head mdev_list;
+>  	struct mutex lock;
+>  	struct ap_driver  *vfio_ap_drv;
+> +	struct mdev_parent parent;
+>  };
+>  
+>  extern struct ap_matrix_dev *matrix_dev;
+> diff --git a/drivers/vfio/mdev/mdev_core.c
+> b/drivers/vfio/mdev/mdev_core.c
+> index 2c32923fbad27..fa05ac3396950 100644
+> --- a/drivers/vfio/mdev/mdev_core.c
+> +++ b/drivers/vfio/mdev/mdev_core.c
+> @@ -18,8 +18,6 @@
+>  #define DRIVER_AUTHOR		"NVIDIA Corporation"
+>  #define DRIVER_DESC		"Mediated device Core Driver"
+>  
+> -static LIST_HEAD(parent_list);
+> -static DEFINE_MUTEX(parent_list_lock);
+>  static struct class_compat *mdev_bus_compat_class;
+>  
+>  static LIST_HEAD(mdev_list);
+> @@ -61,28 +59,6 @@ struct device *mtype_get_parent_dev(struct
+> mdev_type *mtype)
+>  }
+>  EXPORT_SYMBOL(mtype_get_parent_dev);
+>  
+> -/* Should be called holding parent_list_lock */
+> -static struct mdev_parent *__find_parent_device(struct device *dev)
 > -{
-> -	return type == KVM_X86_DEFAULT_VM;
+> -	struct mdev_parent *parent;
+> -
+> -	list_for_each_entry(parent, &parent_list, next) {
+> -		if (parent->dev == dev)
+> -			return parent;
+> -	}
+> -	return NULL;
 > -}
 > -
->  #define L1TF_MSG_SMT "L1TF CPU bug present and SMT on, data leak possible. See CVE-2018-3646 and https://www.kernel.org/doc/html/latest/admin-guide/hw-vuln/l1tf.html for details.\n"
->  #define L1TF_MSG_L1D "L1TF CPU bug present and virtualization mitigation disabled, data leak possible. See CVE-2018-3646 and https://www.kernel.org/doc/html/latest/admin-guide/hw-vuln/l1tf.html for details.\n"
->
-> diff --git a/arch/x86/kvm/vmx/x86_ops.h b/arch/x86/kvm/vmx/x86_ops.h
-> index a5e85eb4e183..dbfd0e43fd89 100644
-> --- a/arch/x86/kvm/vmx/x86_ops.h
-> +++ b/arch/x86/kvm/vmx/x86_ops.h
-> @@ -25,7 +25,6 @@ void vmx_hardware_unsetup(void);
->  int vmx_check_processor_compatibility(void);
->  int vmx_hardware_enable(void);
->  void vmx_hardware_disable(void);
-> -bool vmx_is_vm_type_supported(unsigned long type);
->  int vmx_vm_init(struct kvm *kvm);
->  void vmx_vm_destroy(struct kvm *kvm);
->  int vmx_vcpu_precreate(struct kvm *kvm);
-> @@ -131,8 +130,10 @@ void vmx_setup_mce(struct kvm_vcpu *vcpu);
->
->  #ifdef CONFIG_INTEL_TDX_HOST
->  int __init tdx_hardware_setup(struct kvm_x86_ops *x86_ops);
-> +bool tdx_is_vm_type_supported(unsigned long type);
->  #else
->  static inline int tdx_hardware_setup(struct kvm_x86_ops *x86_ops) { return 0; }
-> +static inline bool tdx_is_vm_type_supported(unsigned long type) { return false; }
->  #endif
->
->  #endif /* __KVM_X86_VMX_X86_OPS_H */
-> --
-> 2.25.1
->
+> -void mdev_release_parent(struct kref *kref)
+> -{
+> -	struct mdev_parent *parent = container_of(kref, struct
+> mdev_parent,
+> -						  ref);
+> -	struct device *dev = parent->dev;
+> -
+> -	kfree(parent);
+> -	put_device(dev);
+> -}
+> -
+>  /* Caller must hold parent unreg_sem read or write lock */
+>  static void mdev_device_remove_common(struct mdev_device *mdev)
+>  {
+> @@ -105,125 +81,73 @@ static int mdev_device_remove_cb(struct device
+> *dev, void *data)
+>  }
+>  
+>  /*
+> - * mdev_register_device : Register a device
+> + * mdev_register_parent: Register a device as parent for mdevs
+> + * @parent: parent structure registered
+>   * @dev: device structure representing parent device.
+>   * @mdev_driver: Device driver to bind to the newly created mdev
+>   *
+> - * Add device to list of registered parent devices.
+> + * Registers the @parent stucture as a parent for mdev types and
+> thus mdev
+> + * devices.  The caller needs to hold a reference on @dev that must
+> not be
+> + * released until after the call to mdev_unregister_parent().
+> + *
+>   * Returns a negative value on error, otherwise 0.
+>   */
+> -int mdev_register_device(struct device *dev, struct mdev_driver
+> *mdev_driver)
+> +int mdev_register_parent(struct mdev_parent *parent, struct device
+> *dev,
+> +		struct mdev_driver *mdev_driver)
+>  {
+> -	int ret;
+> -	struct mdev_parent *parent;
+>  	char *env_string = "MDEV_STATE=registered";
+>  	char *envp[] = { env_string, NULL };
+> +	int ret;
+>  
+>  	/* check for mandatory ops */
+>  	if (!mdev_driver->supported_type_groups)
+>  		return -EINVAL;
+>  
+> -	dev = get_device(dev);
+> -	if (!dev)
+> -		return -EINVAL;
+> -
+> -	mutex_lock(&parent_list_lock);
+> -
+> -	/* Check for duplicate */
+> -	parent = __find_parent_device(dev);
+> -	if (parent) {
+> -		parent = NULL;
+> -		ret = -EEXIST;
+> -		goto add_dev_err;
+> -	}
+> -
+> -	parent = kzalloc(sizeof(*parent), GFP_KERNEL);
+> -	if (!parent) {
+> -		ret = -ENOMEM;
+> -		goto add_dev_err;
+> -	}
+> -
+> -	kref_init(&parent->ref);
+> +	memset(parent, 0, sizeof(*parent));
+>  	init_rwsem(&parent->unreg_sem);
+> -
+>  	parent->dev = dev;
+>  	parent->mdev_driver = mdev_driver;
+>  
+>  	if (!mdev_bus_compat_class) {
+>  		mdev_bus_compat_class =
+> class_compat_register("mdev_bus");
+> -		if (!mdev_bus_compat_class) {
+> -			ret = -ENOMEM;
+> -			goto add_dev_err;
+> -		}
+> +		if (!mdev_bus_compat_class)
+> +			return -ENOMEM;
+>  	}
+>  
+>  	ret = parent_create_sysfs_files(parent);
+>  	if (ret)
+> -		goto add_dev_err;
+> +		return ret;
+>  
+>  	ret = class_compat_create_link(mdev_bus_compat_class, dev,
+> NULL);
+>  	if (ret)
+>  		dev_warn(dev, "Failed to create compatibility class
+> link\n");
+>  
+> -	list_add(&parent->next, &parent_list);
+> -	mutex_unlock(&parent_list_lock);
+> -
+>  	dev_info(dev, "MDEV: Registered\n");
+>  	kobject_uevent_env(&dev->kobj, KOBJ_CHANGE, envp);
+> -
+>  	return 0;
+> -
+> -add_dev_err:
+> -	mutex_unlock(&parent_list_lock);
+> -	if (parent)
+> -		mdev_put_parent(parent);
+> -	else
+> -		put_device(dev);
+> -	return ret;
+>  }
+> -EXPORT_SYMBOL(mdev_register_device);
+> +EXPORT_SYMBOL(mdev_register_parent);
+>  
+>  /*
+> - * mdev_unregister_device : Unregister a parent device
+> - * @dev: device structure representing parent device.
+> - *
+> - * Remove device from list of registered parent devices. Give a
+> chance to free
+> - * existing mediated devices for given device.
+> + * mdev_unregister_parent : Unregister a parent device
+> + * @parent: parent structure to unregister
+>   */
+> -
+> -void mdev_unregister_device(struct device *dev)
+> +void mdev_unregister_parent(struct mdev_parent *parent)
+>  {
+> -	struct mdev_parent *parent;
+>  	char *env_string = "MDEV_STATE=unregistered";
+>  	char *envp[] = { env_string, NULL };
+>  
+> -	mutex_lock(&parent_list_lock);
+> -	parent = __find_parent_device(dev);
+> -
+> -	if (!parent) {
+> -		mutex_unlock(&parent_list_lock);
+> -		return;
+> -	}
+> -	dev_info(dev, "MDEV: Unregistering\n");
+> -
+> -	list_del(&parent->next);
+> -	mutex_unlock(&parent_list_lock);
+> +	dev_info(parent->dev, "MDEV: Unregistering\n");
+>  
+>  	down_write(&parent->unreg_sem);
+> -
+> -	class_compat_remove_link(mdev_bus_compat_class, dev, NULL);
+> -
+> -	device_for_each_child(dev, NULL, mdev_device_remove_cb);
+> -
+> +	class_compat_remove_link(mdev_bus_compat_class, parent->dev,
+> NULL);
+> +	device_for_each_child(parent->dev, NULL,
+> mdev_device_remove_cb);
+>  	parent_remove_sysfs_files(parent);
+>  	up_write(&parent->unreg_sem);
+>  
+> -	mdev_put_parent(parent);
+> -
+> -	/* We still have the caller's reference to use for the uevent
+> */
+> -	kobject_uevent_env(&dev->kobj, KOBJ_CHANGE, envp);
+> +	kobject_uevent_env(&parent->dev->kobj, KOBJ_CHANGE, envp);
+>  }
+> -EXPORT_SYMBOL(mdev_unregister_device);
+> +EXPORT_SYMBOL(mdev_unregister_parent);
+>  
+>  static void mdev_device_release(struct device *dev)
+>  {
+> diff --git a/drivers/vfio/mdev/mdev_private.h
+> b/drivers/vfio/mdev/mdev_private.h
+> index 7c9fc79f3d838..297f911fdc890 100644
+> --- a/drivers/vfio/mdev/mdev_private.h
+> +++ b/drivers/vfio/mdev/mdev_private.h
+> @@ -13,17 +13,6 @@
+>  int  mdev_bus_register(void);
+>  void mdev_bus_unregister(void);
+>  
+> -struct mdev_parent {
+> -	struct device *dev;
+> -	struct mdev_driver *mdev_driver;
+> -	struct kref ref;
+> -	struct list_head next;
+> -	struct kset *mdev_types_kset;
+> -	struct list_head type_list;
+> -	/* Synchronize device creation/removal with parent
+> unregistration */
+> -	struct rw_semaphore unreg_sem;
+> -};
+> -
+>  struct mdev_type {
+>  	struct kobject kobj;
+>  	struct kobject *devices_kobj;
+> @@ -48,16 +37,4 @@ void mdev_remove_sysfs_files(struct mdev_device
+> *mdev);
+>  int mdev_device_create(struct mdev_type *kobj, const guid_t *uuid);
+>  int  mdev_device_remove(struct mdev_device *dev);
+>  
+> -void mdev_release_parent(struct kref *kref);
+> -
+> -static inline void mdev_get_parent(struct mdev_parent *parent)
+> -{
+> -	kref_get(&parent->ref);
+> -}
+> -
+> -static inline void mdev_put_parent(struct mdev_parent *parent)
+> -{
+> -	kref_put(&parent->ref, mdev_release_parent);
+> -}
+> -
+>  #endif /* MDEV_PRIVATE_H */
+> diff --git a/drivers/vfio/mdev/mdev_sysfs.c
+> b/drivers/vfio/mdev/mdev_sysfs.c
+> index 4bfbf49aaa66a..b71ffc5594870 100644
+> --- a/drivers/vfio/mdev/mdev_sysfs.c
+> +++ b/drivers/vfio/mdev/mdev_sysfs.c
+> @@ -81,7 +81,7 @@ static void mdev_type_release(struct kobject *kobj)
+>  
+>  	pr_debug("Releasing group %s\n", kobj->name);
+>  	/* Pairs with the get in add_mdev_supported_type() */
+> -	mdev_put_parent(type->parent);
+> +	put_device(type->parent->dev);
+>  	kfree(type);
+>  }
+>  
+> @@ -110,7 +110,7 @@ static struct mdev_type
+> *add_mdev_supported_type(struct mdev_parent *parent,
+>  	type->kobj.kset = parent->mdev_types_kset;
+>  	type->parent = parent;
+>  	/* Pairs with the put in mdev_type_release() */
+> -	mdev_get_parent(parent);
+> +	get_device(parent->dev);
+>  	type->type_group_id = type_group_id;
+>  
+>  	ret = kobject_init_and_add(&type->kobj, &mdev_type_ktype, NULL,
+> diff --git a/include/linux/mdev.h b/include/linux/mdev.h
+> index 555c1d015b5f0..327ce3e5c6b5f 100644
+> --- a/include/linux/mdev.h
+> +++ b/include/linux/mdev.h
+> @@ -23,6 +23,16 @@ struct mdev_device {
+>  	bool active;
+>  };
+>  
+> +/* embedded into the struct device that the mdev devices hang off */
+> +struct mdev_parent {
+> +	struct device *dev;
+> +	struct mdev_driver *mdev_driver;
+> +	struct kset *mdev_types_kset;
+> +	struct list_head type_list;
+> +	/* Synchronize device creation/removal with parent
+> unregistration */
+> +	struct rw_semaphore unreg_sem;
+> +};
+> +
+>  static inline struct mdev_device *to_mdev_device(struct device *dev)
+>  {
+>  	return container_of(dev, struct mdev_device, dev);
+> @@ -75,8 +85,9 @@ static inline const guid_t *mdev_uuid(struct
+> mdev_device *mdev)
+>  
+>  extern struct bus_type mdev_bus_type;
+>  
+> -int mdev_register_device(struct device *dev, struct mdev_driver
+> *mdev_driver);
+> -void mdev_unregister_device(struct device *dev);
+> +int mdev_register_parent(struct mdev_parent *parent, struct device
+> *dev,
+> +		struct mdev_driver *mdev_driver);
+> +void mdev_unregister_parent(struct mdev_parent *parent);
+>  
+>  int mdev_register_driver(struct mdev_driver *drv);
+>  void mdev_unregister_driver(struct mdev_driver *drv);
+> diff --git a/samples/vfio-mdev/mbochs.c b/samples/vfio-mdev/mbochs.c
+> index d0d1bb7747240..30b3643b3b389 100644
+> --- a/samples/vfio-mdev/mbochs.c
+> +++ b/samples/vfio-mdev/mbochs.c
+> @@ -128,6 +128,7 @@ static dev_t		mbochs_devt;
+>  static struct class	*mbochs_class;
+>  static struct cdev	mbochs_cdev;
+>  static struct device	mbochs_dev;
+> +static struct mdev_parent mbochs_parent;
+>  static atomic_t mbochs_avail_mbytes;
+>  static const struct vfio_device_ops mbochs_dev_ops;
+>  
+> @@ -1456,7 +1457,7 @@ static int __init mbochs_dev_init(void)
+>  	if (ret)
+>  		goto err_class;
+>  
+> -	ret = mdev_register_device(&mbochs_dev, &mbochs_driver);
+> +	ret = mdev_register_parent(&mbochs_parent, &mbochs_dev,
+> &mbochs_driver);
+>  	if (ret)
+>  		goto err_device;
+>  
+> @@ -1477,7 +1478,7 @@ static int __init mbochs_dev_init(void)
+>  static void __exit mbochs_dev_exit(void)
+>  {
+>  	mbochs_dev.bus = NULL;
+> -	mdev_unregister_device(&mbochs_dev);
+> +	mdev_unregister_parent(&mbochs_parent);
+>  
+>  	device_unregister(&mbochs_dev);
+>  	mdev_unregister_driver(&mbochs_driver);
+> diff --git a/samples/vfio-mdev/mdpy.c b/samples/vfio-mdev/mdpy.c
+> index 0c4ca1f4be7ed..132bb055628a6 100644
+> --- a/samples/vfio-mdev/mdpy.c
+> +++ b/samples/vfio-mdev/mdpy.c
+> @@ -83,6 +83,7 @@ static dev_t		mdpy_devt;
+>  static struct class	*mdpy_class;
+>  static struct cdev	mdpy_cdev;
+>  static struct device	mdpy_dev;
+> +static struct mdev_parent mdpy_parent;
+>  static u32		mdpy_count;
+>  static const struct vfio_device_ops mdpy_dev_ops;
+>  
+> @@ -765,7 +766,7 @@ static int __init mdpy_dev_init(void)
+>  	if (ret)
+>  		goto err_class;
+>  
+> -	ret = mdev_register_device(&mdpy_dev, &mdpy_driver);
+> +	ret = mdev_register_parent(&mdpy_parent, &mdpy_dev,
+> &mdpy_driver);
+>  	if (ret)
+>  		goto err_device;
+>  
+> @@ -786,7 +787,7 @@ static int __init mdpy_dev_init(void)
+>  static void __exit mdpy_dev_exit(void)
+>  {
+>  	mdpy_dev.bus = NULL;
+> -	mdev_unregister_device(&mdpy_dev);
+> +	mdev_unregister_parent(&mdpy_parent);
+>  
+>  	device_unregister(&mdpy_dev);
+>  	mdev_unregister_driver(&mdpy_driver);
+> diff --git a/samples/vfio-mdev/mtty.c b/samples/vfio-mdev/mtty.c
+> index 4f5a6f2d3629d..8ba5f6084a093 100644
+> --- a/samples/vfio-mdev/mtty.c
+> +++ b/samples/vfio-mdev/mtty.c
+> @@ -72,6 +72,7 @@ static struct mtty_dev {
+>  	struct cdev	vd_cdev;
+>  	struct idr	vd_idr;
+>  	struct device	dev;
+> +	struct mdev_parent parent;
+>  } mtty_dev;
+>  
+>  struct mdev_region_info {
+> @@ -1350,7 +1351,8 @@ static int __init mtty_dev_init(void)
+>  	if (ret)
+>  		goto err_class;
+>  
+> -	ret = mdev_register_device(&mtty_dev.dev, &mtty_driver);
+> +	ret = mdev_register_parent(&mtty_dev.parent, &mtty_dev.dev,
+> +				   &mtty_driver);
+>  	if (ret)
+>  		goto err_device;
+>  	return 0;
+> @@ -1370,7 +1372,7 @@ static int __init mtty_dev_init(void)
+>  static void __exit mtty_dev_exit(void)
+>  {
+>  	mtty_dev.dev.bus = NULL;
+> -	mdev_unregister_device(&mtty_dev.dev);
+> +	mdev_unregister_parent(&mtty_dev.parent);
+>  
+>  	device_unregister(&mtty_dev.dev);
+>  	idr_destroy(&mtty_dev.vd_idr);
+
