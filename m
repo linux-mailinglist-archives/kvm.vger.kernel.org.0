@@ -2,164 +2,173 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id B439D56A7DC
-	for <lists+kvm@lfdr.de>; Thu,  7 Jul 2022 18:18:33 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 70CDF56A85E
+	for <lists+kvm@lfdr.de>; Thu,  7 Jul 2022 18:39:32 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236276AbiGGQSG (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 7 Jul 2022 12:18:06 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57598 "EHLO
+        id S236371AbiGGQiX (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 7 Jul 2022 12:38:23 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45676 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S236194AbiGGQSE (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 7 Jul 2022 12:18:04 -0400
-Received: from mail-pf1-x434.google.com (mail-pf1-x434.google.com [IPv6:2607:f8b0:4864:20::434])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BA57715814
-        for <kvm@vger.kernel.org>; Thu,  7 Jul 2022 09:18:03 -0700 (PDT)
-Received: by mail-pf1-x434.google.com with SMTP id w185so16654424pfb.4
-        for <kvm@vger.kernel.org>; Thu, 07 Jul 2022 09:18:03 -0700 (PDT)
+        with ESMTP id S236362AbiGGQhZ (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 7 Jul 2022 12:37:25 -0400
+Received: from mail-pf1-x430.google.com (mail-pf1-x430.google.com [IPv6:2607:f8b0:4864:20::430])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C771C564DA
+        for <kvm@vger.kernel.org>; Thu,  7 Jul 2022 09:37:23 -0700 (PDT)
+Received: by mail-pf1-x430.google.com with SMTP id y9so6252328pff.12
+        for <kvm@vger.kernel.org>; Thu, 07 Jul 2022 09:37:23 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
         h=date:from:to:cc:subject:message-id:references:mime-version
          :content-disposition:in-reply-to;
-        bh=g4b8V9nVein02SaaRGxSEkwK4bSbPWw2wYDtDzzfHkA=;
-        b=S1wqm/1JGuzFumHfm8KgkZ/ZmuKwtDo7fOVy8TDe4S/6DZZF3DOLf/U+gCQWD7X5dW
-         mOlMPSMknLjb/VmC2bG7nJf/9Oyzf7DWQ5dfsGmm0+816UKihjMTzDE4R7trWFTzTZeR
-         NWvkfug0M9MD2cvqAjyz2cOMPYl1YxrQSj9H5UTOUFTo3AddFXwj+fk6Cw58HSbuADVc
-         rmx1tsUG28aI4sdXBlAgR9llS9ESRbYQcIbH3zOCC8h+hIP1vOJGTApjsKon1xSF0J0/
-         5MAOO5uFIvqcZ61Yybujt6Q0k/6WH1YWdQIbTnVc2y7815JWlP4Uk2siX41L4Xknj8uj
-         ZsdQ==
+        bh=X4ZyDiG49m0gnXusM/3dJ8XamBzjgE2+uil3Jq1hmaM=;
+        b=E49ZDCU676w+NcIsmk9E+mGQXW5bd97e4i4BXXPm4oNU/aLtXV8kdNULp4X9AedxTQ
+         VucxtgaBbhw9x6MrrQvMpIYHUk6qdm9q05sGeZzSyIfGpHNFeDZCpKWqkMStzd2sJ467
+         NKAFg1EfJHYtSm3kYr8+ukxMnVAPC/sjQ58j6HLDSiuHgHgfUtv2/amHrI3MUAApgyXm
+         4ozd+IQPs5wcoAb/3Cid0jeoSL1vKU7rlHqsVs/cnIviQfkOpVKYuYCMWOn/V/CXvHDa
+         xACQqg/P0s2cXSuXxvfdjtZpbDy+TQVQ6ZnEHFOLoXMm6TA5vU6DOLDlrqFrn4u4UuNF
+         upqA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:date:from:to:cc:subject:message-id:references
          :mime-version:content-disposition:in-reply-to;
-        bh=g4b8V9nVein02SaaRGxSEkwK4bSbPWw2wYDtDzzfHkA=;
-        b=oti8UT1AfI58G5YwRoHPkuVf8kAz+y/Ln8bUR7NMVIAsbZowOPVwq6jjnJiOUnDf9V
-         hLQeJNdyaDrYEzOuxSuwM2o7xs/ALpKTwF+7QDQW8jXrQE0duBOm+53/A7psoNCSv6Cj
-         m7woYf+46s9gY5S2rVfElXK00Y3+L9+1Ybsc2OyefeXuAv+KXiBLlKt3lBBnk8Ggk8Va
-         cq2PhIQKVdvux3dpvQKbbdHmXqH3X9m/+LhF95UnqcBITLRdRISV1wdOUdMmcC3bWgRC
-         tLxhvs7eShNszlqbxI1ZB0hEo35sjnnRgFFWT87UnFH9pxHTfMyKHf3NCrw3HZhVM0F5
-         0ccw==
-X-Gm-Message-State: AJIora+TrNK3+m1OR6/6D1XnoyD8UNqAWH5loKsqpsAIh1XXAka3fd4/
-        AwLfvbHxsVaECnz5E8yTSTS6T/JEoKww2Q==
-X-Google-Smtp-Source: AGRyM1uBhqcLgaC/a3j9kzPspaK/sXU9dO4WK60ec34W+P36XvLkfgxxzr991p2xaa3KxJ2iq2PdCg==
-X-Received: by 2002:a17:90a:db96:b0:1ef:8c86:eb09 with SMTP id h22-20020a17090adb9600b001ef8c86eb09mr6043973pjv.22.1657210683045;
-        Thu, 07 Jul 2022 09:18:03 -0700 (PDT)
+        bh=X4ZyDiG49m0gnXusM/3dJ8XamBzjgE2+uil3Jq1hmaM=;
+        b=BVewZovyJlzvnoyusH4vqDLukdKHLvb8qhLfanBp3HAVRaXx+BuXsGFZTeiU8d+EJQ
+         3PMTP2QDTGdIufIvbSinWvV4uLTVYtC0TZMbHGAHr+kZKUexS45lNcfoYx1+6VZ2Se9c
+         mhfhQqs6n6Sl2JKeZ58G6lrgO/s9fC5GCIZALXFIOlhbT/go63mIAEDQuZiJJxuywpZw
+         FWz8jJuG+gcFmijatcfSm2gnCmy9XDMTSuOLn3FetkPQfuE6Bne9vHYtWaxKMCiCbYhe
+         +N9ebwloMgUhcubukeZjevojpB6YdkZlZaQKjspdNcAHVLRrTYCsnEMaX2YMwcSzTqOA
+         OV2Q==
+X-Gm-Message-State: AJIora985QFQSADV6s7zHkiIy+Bxu/JQxwCe+RNEUxhUgw8RjcuoeXnq
+        e/Yy8dj6ROkcpkUDZPXTvj26zQ==
+X-Google-Smtp-Source: AGRyM1uFgEAF/n3ZL8SgaHP0it5sEiGezafpwXHFouNd511hUumx1la2tvv7rjI5pniBlsKFFDXt+Q==
+X-Received: by 2002:a63:4558:0:b0:411:442a:b740 with SMTP id u24-20020a634558000000b00411442ab740mr39047805pgk.540.1657211843101;
+        Thu, 07 Jul 2022 09:37:23 -0700 (PDT)
 Received: from google.com (123.65.230.35.bc.googleusercontent.com. [35.230.65.123])
-        by smtp.gmail.com with ESMTPSA id cq13-20020a056a00330d00b005255489187fsm27060777pfb.135.2022.07.07.09.18.02
+        by smtp.gmail.com with ESMTPSA id p22-20020a1709027ed600b001690d398401sm28412267plb.88.2022.07.07.09.37.22
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 07 Jul 2022 09:18:02 -0700 (PDT)
-Date:   Thu, 7 Jul 2022 16:17:58 +0000
+        Thu, 07 Jul 2022 09:37:22 -0700 (PDT)
+Date:   Thu, 7 Jul 2022 16:37:18 +0000
 From:   Sean Christopherson <seanjc@google.com>
-To:     Vitaly Kuznetsov <vkuznets@redhat.com>
-Cc:     kvm@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>,
-        Anirudh Rayabharam <anrayabh@linux.microsoft.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Maxim Levitsky <mlevitsk@redhat.com>,
-        linux-hyperv@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v2 06/28] KVM: nVMX: Introduce
- KVM_CAP_HYPERV_ENLIGHTENED_VMCS2
-Message-ID: <YscHNur0OsViyyDJ@google.com>
-References: <20220629150625.238286-1-vkuznets@redhat.com>
- <20220629150625.238286-7-vkuznets@redhat.com>
- <YsYAPL1UUKJB3/MJ@google.com>
- <87o7y1qm5t.fsf@redhat.com>
+To:     Wang Guangju <wangguangju@baidu.com>
+Cc:     pbonzini@redhat.com, vkuznets@redhat.com, jmattson@google.com,
+        wanpengli@tencent.com, bp@alien8.de, joro@8bytes.org,
+        suravee.suthikulpanit@amd.com, hpa@zytor.com, tglx@linutronix.de,
+        mingo@redhat.com, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org, chukaiping <chukaiping@baidu.com>
+Subject: Re: [PATCH] KVM: x86: Add EOI_INDUCED exit handlers for Hyper-V
+ SynIC vectors
+Message-ID: <YscLvipHbNx+Wy9y@google.com>
+References: <20220707122854.87-1-wangguangju@baidu.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <87o7y1qm5t.fsf@redhat.com>
+In-Reply-To: <20220707122854.87-1-wangguangju@baidu.com>
 X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
         ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
         T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL
-        autolearn=ham autolearn_force=no version=3.4.6
+        autolearn=unavailable autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Jul 07, 2022, Vitaly Kuznetsov wrote:
-> Sean Christopherson <seanjc@google.com> writes:
+This isn't adding a handler so much as it's signaling EOI for SynIC vectors. Maybe?
+
+  KVM: x86: Send EOI to SynIC vectors on accelerated EOI-induced VM-Exits
+
+On Thu, Jul 07, 2022, Wang Guangju wrote:
+> From: chukaiping <chukaiping@baidu.com>
 > 
-> > On Wed, Jun 29, 2022, Vitaly Kuznetsov wrote:
-> >> Turns out Enlightened VMCS can gain new fields without version change
-> >> and KVM_CAP_HYPERV_ENLIGHTENED_VMCS which KVM currently has cant's
-> >> handle this reliably. In particular, just updating the current definition
-> >> of eVMCSv1 with the new fields and adjusting the VMX MSR filtering will
-> >> inevitably break live migration to older KVMs. Note: enabling eVMCS and
-> >> setting VMX feature MSR can happen in any order.
-> >> 
-> >> Introduce a notion of KVM internal "Enlightened VMCS revision" and add
-> >> a new capability allowing to add fields to Enlightened VMCS while keeping
-> >> its version.
-> >
-> > Bumping a "minor" version number in KVM is going to be a nightmare.  KVM is going
-> > to be stuck "supporting" old revisions in perpetuity, and userspace will be forced
-> > to keep track of which features are available with which arbitrary revision (is
-> > that information even communicated to userspace?).
+> When EOI virtualization is performed on VMX,
+> kvm_apic_set_eoi_accelerated() is called upon
+> EXIT_REASON_EOI_INDUCED but unlike its non-accelerated
+> apic_set_eoi() sibling, Hyper-V SINT vectors are
+> left unhandled.
+
+Wrap changelogs closer to ~75 chars.
+
+> This patch fix it, and add a new helper function to
+> handle both IOAPIC and Hyper-V SINT vectors.
+
+Avoid "this patch" and simply state what change is being made.  E.g.
+
+
+  Send EOI to Hyper-V SINT vectors when handling acclerated EOI-induced
+  VM-Exits.  KVM Hyper-V needs to handle the SINT EOI irrespective of
+  whether the EOI is acclerated or not.
+
+Fixes: 5c919412fe61 ("kvm/x86: Hyper-V synthetic interrupt controller")
+
+and probably Cc: stable@vger.kernel.org?
+
+> Suggested-by: Vitaly Kuznetsov <vkuznets@redhat.com>
+> Signed-off-by: wangguangju <wangguangju@baidu.com>
+> ---
+>  arch/x86/kvm/lapic.c | 19 ++++++++++++-------
+>  1 file changed, 12 insertions(+), 7 deletions(-)
 > 
-> My brain is certainly tainted with how we enable this in QEMU but why
-> would userspace be interested in which features are actually filtered
-> out?
+> diff --git a/arch/x86/kvm/lapic.c b/arch/x86/kvm/lapic.c
+> index f03facc..e046afe 100644
+> --- a/arch/x86/kvm/lapic.c
+> +++ b/arch/x86/kvm/lapic.c
+> @@ -1269,6 +1269,16 @@ static void kvm_ioapic_send_eoi(struct kvm_lapic *apic, int vector)
+>  	kvm_ioapic_update_eoi(apic->vcpu, vector, trigger_mode);
+>  }
+>  
+> +static inline void apic_set_eoi_vector(struct kvm_lapic *apic, int vector)
+> +{
+> +	if (to_hv_vcpu(apic->vcpu) &&
+> +	    test_bit(vector, to_hv_synic(apic->vcpu)->vec_bitmap))
+> +		kvm_hv_synic_send_eoi(apic->vcpu, vector);
+> +
+> +	kvm_ioapic_send_eoi(apic, vector);
+> +	kvm_make_request(KVM_REQ_EVENT, apic->vcpu);
+> +}
 
-For all the same reasons userspace wants to know what hardware features are
-supported by hardware and KVM.
-
-> Currently (again, by QEMU), eVMCS is treated as a purely software
-> feature. When enabled, certain controls are filtered out "under the
-> hood" as VMX MSRs reported to VMM remain unfiltered (see
-> '!msr_info->host_initiated' in vmx_get_msr()). Same stays true with any
-> new revision: VMM's job is just to check that a) all hardware features
-> are supported on both source and destination and b) the requested 'eVMCS
-> revision' is supported by both. No need to know what's filtered out and
-> what isn't.
-
-But users will inevitably want to know exactly what features a platform supports
-for a given configuration.  E.g. if KVM only supported pre-configured CPU models,
-KVM would need to document what features are supported by each model, and userspace
-would have very little flexibility in terms of what features are exposed to the
-guest.  That's an exaggerated example as there are far more CPUID features than
-eVMCS features, but it's the same underlying concept.
-
-> > I think a more maintainable approach would be to expose the "filtered" VMX MSRs to
-> > userspace, e.g. add KVM_GET_EVMCS_VMX_MSRS.  Then KVM just needs to document what
-> > the "filters" are for KVM versions that don't support KVM_GET_EVMCS_VMX_MSRS.
-> > KVM itself doesn't need to maintain version information because it's userspace's
-> > responsibility to ensure that userspace doesn't try to migrate to a KVM that doesn't
-> > support the desired feature set.
-> 
-> That would be a reasonable (but complex for VMM) approach too but I
-> don't think we need this (and this patch introducing 'eVMCS revisions'
-> to this matter):
-
-But userspace already has to deal with that complexity in raw VMX MSRs.  The
-filtered values will always be a subset of the unfiltered values, so if eVMCS
-will be exposed to the guest, userspace can simply treat the filtered set as the
-baseline supported set, i.e. the userspace logic could simply be:
-
-	if (expose_evmcs)
-		get_evmcs_vmx_msrs(&msrs);
-	else
-		get_vmx_msrs(&msrs);
+Rather than add a third helper, what about renaming kvm_apic_set_eoi_accelerated()
+and having the non-accelerated helper call the "acclerated" version?  That will
+document the delta between the non-accelerated patch and the accelerated path.
+The only hiccup is tracing, but that's easy to resolve (or we could just not trace
+if there's no valid vector to EOI), e.g.
 
 
-Userspace will need to take on more complexity if userspace wants to expose features
-that are supported in hardware but not with eVMCS active, but I don't see the point
-in doing so because AFAICT KVM will just override and filter the VMX MSRs anyways
-when eVMCS is enabled, i.e. userspace _can't_ expose the unfiltered VMX MSRs to the
-guest when eVMCS is enabled.
+/*
+ * Send EOI for a valid vector.  The caller, or hardware when this is invoked
+ * after an accelerated EOI VM-Exit, is responsible for updating the vISR and
+ * vPPR.
+ */
+void kvm_apic_set_eoi(struct kvm_lapic *apic, int vector)
+{
+	trace_kvm_eoi(apic, vector);
 
-> luckily, Microsoft added a new PV CPUID feature bit inidicating the support
-> for the new features in eVMCSv1 so KVM can just observe whether the bit was
-> set by VMM or not and filter accordingly.
+	if (to_hv_vcpu(apic->vcpu) &&
+	    test_bit(vector, to_hv_synic(apic->vcpu)->vec_bitmap))
+		kvm_hv_synic_send_eoi(apic->vcpu, vector);
 
-If there's a CPUID feature bit, why does KVM need to invent its own revision scheme?
+	kvm_ioapic_send_eoi(apic, vector);
+	kvm_make_request(KVM_REQ_EVENT, apic->vcpu);
+}
+EXPORT_SYMBOL_GPL(kvm_apic_set_eoi);
 
-> > That also avoids messes like unnecessarily blocking migration from "incompatible"
-> > revisions when running on hardware that doesn't even support the control.
-> 
-> Well yea, in case the difference between 'eVMCS revisions' is void
-> because the hardware doesn't support these, it would still be possible
-> to migrate to an older KVM which doesn't support the new revision but
-> I'd stay strict: if a newer revision was requested it must be supported,
-> no matter the hardware.
+static int apic_set_eoi(struct kvm_lapic *apic)
+{
+	int vector = apic_find_highest_isr(apic);
+
+	/*
+	 * Not every write EOI will has corresponding ISR,
+	 * one example is when Kernel check timer on setup_IO_APIC
+	 */
+	if (vector == -1) {
+		trace_kvm_eoi(apic, vector);   <---- maybe just drop this?
+		return vector;
+	}
+
+	apic_clear_isr(vector, apic);
+	apic_update_ppr(apic);
+
+	kvm_apic_set_eoi(apic, vector);
+
+	return vector;
+}
