@@ -2,207 +2,221 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 9CFED5699AB
-	for <lists+kvm@lfdr.de>; Thu,  7 Jul 2022 07:06:44 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id ADFF65699C0
+	for <lists+kvm@lfdr.de>; Thu,  7 Jul 2022 07:17:18 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235083AbiGGFGl (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 7 Jul 2022 01:06:41 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40492 "EHLO
+        id S234936AbiGGFRJ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 7 Jul 2022 01:17:09 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45810 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234872AbiGGFGk (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 7 Jul 2022 01:06:40 -0400
-Received: from mail-lj1-x235.google.com (mail-lj1-x235.google.com [IPv6:2a00:1450:4864:20::235])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6CE803121B
-        for <kvm@vger.kernel.org>; Wed,  6 Jul 2022 22:06:39 -0700 (PDT)
-Received: by mail-lj1-x235.google.com with SMTP id i17so16096535ljj.12
-        for <kvm@vger.kernel.org>; Wed, 06 Jul 2022 22:06:39 -0700 (PDT)
+        with ESMTP id S234919AbiGGFRE (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 7 Jul 2022 01:17:04 -0400
+Received: from mail-vs1-xe35.google.com (mail-vs1-xe35.google.com [IPv6:2607:f8b0:4864:20::e35])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 24C1E31234
+        for <kvm@vger.kernel.org>; Wed,  6 Jul 2022 22:17:03 -0700 (PDT)
+Received: by mail-vs1-xe35.google.com with SMTP id o185so4692752vsc.7
+        for <kvm@vger.kernel.org>; Wed, 06 Jul 2022 22:17:03 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=ventanamicro.com; s=google;
+        d=google.com; s=20210112;
         h=mime-version:references:in-reply-to:from:date:message-id:subject:to
          :cc;
-        bh=qR9n1AXHGwoI9Ra7xwNbBAU0oY2jf+UCf20mhPrPNso=;
-        b=gQ4KMln/WlWGDHmdRD96WLahdU/SpigGyBU9zTz6wg3wVjttzAphiiE2e+6hna0huh
-         Dw+De/qy0X2d4bRxT3PXZiXjD5eU3EGQBQ614i+L8WYMyWpKIo4qfKKopjUnmqkvVF/P
-         jYHpjTNv+4XfEq05Ej9kweVoDpJKzRHc2LJ9oyrsARaQ2NU+Xo7pgfQaL1xR9xTNnrvf
-         Jyg74PZJCvN5DxFWjZqaL/wFS8rhkxa5Jr+XGZZRPGLk3+UQcRyS6cNVW+TAxE1FZWBW
-         EIVok9dO7/qVJTZI62pALZBb2ju5k4e9Ls7ba2Dh7EQy+cn5h/1VuF0/X7uLxgfCAV12
-         lTGw==
+        bh=78VvqqeGGhzujgkUxwnpYoL4c4XN7DDS4lxQpLU4nvU=;
+        b=ngY6+5JOojjN1GcAOXKIFriMglWIoZmmf2cAlLrGPALF+QbWeW/0XbSEf+TZ97Dux5
+         lqb/41JuwsCNPoTiLutzeCXYgRWssDCNgaZzS7JWvvLUXJ6XmV6vgcO1KdyBfi7iYq+9
+         R5RAAulKwm7Qm7F/YQlcCvzyo1eYkh4Gdf+hxkZ1X9pXguLgq9VxsIMFaxivEakSLHLj
+         83Y8iU5YIbnIxVDRaRMpkt9TdiXrxq7skete619N+rnNdR//vgHFc0TGJw0gNqXeeOd6
+         sNiR2MZdOst8QL5Gb0mn0mc0a7hQvLuPCrRvlwO6BHGoyaG8bYqefNKOTCZrgRQTcYXU
+         g8WQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:mime-version:references:in-reply-to:from:date
          :message-id:subject:to:cc;
-        bh=qR9n1AXHGwoI9Ra7xwNbBAU0oY2jf+UCf20mhPrPNso=;
-        b=rTe2dJ/Q4zFbppUtrk4CUTlsYeZnrdiZhoRA+KvaU4aSlZ6YX2gy+/MvkC5oSp3bUW
-         5WybZ8mErDufDjjJiIXMlrK653uj2yaJUdOhpgvdTg5kuQMqa+aos9xS/Oszm+GwHm0B
-         O/OUJumD5VKz17H+PDahGXCI6e7bso55e1JCP14tm47QJFwPFJz+fx+8KLwJ6+WDrkJu
-         fe/wGhLNpWOkcQZNSKSBynT+1z2/zTWiHjSCRljLC0kOa4JPnmg06G+iCxGa+MBEApun
-         6Z3UQJnyqTu0o4MHeYJ8OBOaKl7qCcBmbYv7Kv/JZIomujDxwFMcxz1EGSypZTI4SNpz
-         xwsA==
-X-Gm-Message-State: AJIora/f/7wcClQkd+9uDZQDC6zIlwzOewaL0twq+IG0j/KeIuLirwP6
-        EpOGFLECu5DzrZcYnTYLIOX+mvnpQzQbibjYac+obaznZgMx0g==
-X-Google-Smtp-Source: AGRyM1vZhkDy4UwW2shgqoRhVTKc6zfQ35Wh8zG97gJmGVq3j+k/UhzzeuF3LEU/VpH+4dZ0/fAnn7n3/LV1is1FjC0=
-X-Received: by 2002:a2e:8558:0:b0:25a:a2f3:b69b with SMTP id
- u24-20020a2e8558000000b0025aa2f3b69bmr24264657ljj.24.1657170397672; Wed, 06
- Jul 2022 22:06:37 -0700 (PDT)
+        bh=78VvqqeGGhzujgkUxwnpYoL4c4XN7DDS4lxQpLU4nvU=;
+        b=DUUMXMwHn4wr9bqKz+3+vemUP2oT8hdVAUpre0WjjxasX/w9d5BRPJhZSFcbm3pQ6K
+         twQ4PCBAzcCHDwpNOnHaFwxPX5Oyg0iKxmo6tybu39Y4efMcMFtFecZ01Y3TAstP8RZQ
+         RDst2ujaE2WxgBNXn8XLSpBPVniia6fPBsRV/LwwqaZeWYgIr+Mip1/8+KeEyeGE5pgN
+         ZulLrC5XJr2hPpxhevvBdxb/PTefF8HC8/jOy71HwZd1RwhJ7JBWiKFXfc19N+rVhKsz
+         EZSzR4A4i0kr9yeM9ppR3tF6SKX9iXns6J3P1uCsZkxkADBTTUIpipbS22ORRmYjaGh/
+         vLCA==
+X-Gm-Message-State: AJIora8IFPwEV62L6l6vhY4QvjNT8LJjnhMD1cXYm3HKLGzd5zsvtj6h
+        mheFrUrt60cnpctvvDwwZ1xNRI218arcOASkAC80gA==
+X-Google-Smtp-Source: AGRyM1vVS0K94KTjakbjtLBu0kFtsRQN9XX9G7FKNJYewAaeG6AxXLcIw9hRoUT38sLaanq1PHd8w9CVjEDhyese92s=
+X-Received: by 2002:a67:f553:0:b0:357:c2b:8408 with SMTP id
+ z19-20020a67f553000000b003570c2b8408mr4591742vsn.51.1657171021509; Wed, 06
+ Jul 2022 22:17:01 -0700 (PDT)
 MIME-Version: 1.0
-References: <CAEUhbmWqMPakKs+nYOHiib=U9O6gZpmsBMqhUgaqkLmNe5jr_w@mail.gmail.com>
-In-Reply-To: <CAEUhbmWqMPakKs+nYOHiib=U9O6gZpmsBMqhUgaqkLmNe5jr_w@mail.gmail.com>
-From:   Anup Patel <apatel@ventanamicro.com>
-Date:   Thu, 7 Jul 2022 10:36:25 +0530
-Message-ID: <CAK9=C2VEqHfieOVeLPCt66xtp77YgaXk64chuw9Ku0zX4UQABw@mail.gmail.com>
-Subject: Re: U-Boot S-mode payload does not boot with a multicore
- configuration in RISC-V QEMU/KVM
-To:     Bin Meng <bmeng.cn@gmail.com>
-Cc:     linux-riscv <linux-riscv@lists.infradead.org>,
-        kvm-riscv@lists.infradead.org, KVM General <kvm@vger.kernel.org>,
-        Heinrich Schuchardt <heinrich.schuchardt@canonical.com>
+References: <20220706164304.1582687-1-maz@kernel.org> <20220706164304.1582687-2-maz@kernel.org>
+ <CAAeT=FzLaOnHP51SedG-0C8H90UPEtW+qLm2L2k_73hu66fSwg@mail.gmail.com>
+In-Reply-To: <CAAeT=FzLaOnHP51SedG-0C8H90UPEtW+qLm2L2k_73hu66fSwg@mail.gmail.com>
+From:   Reiji Watanabe <reijiw@google.com>
+Date:   Wed, 6 Jul 2022 22:16:45 -0700
+Message-ID: <CAAeT=Fwd0Vq6J6SN_-kfAJgqbVzJV-j2oP4q1MLrNy_0Prvriw@mail.gmail.com>
+Subject: Re: [PATCH 01/19] KVM: arm64: Add get_reg_by_id() as a sys_reg_desc
+ retrieving helper
+To:     Marc Zyngier <maz@kernel.org>
+Cc:     kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org,
+        Linux ARM <linux-arm-kernel@lists.infradead.org>,
+        Schspa Shi <schspa@gmail.com>, kernel-team@android.com,
+        Oliver Upton <oliver.upton@linux.dev>
 Content-Type: text/plain; charset="UTF-8"
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
-        autolearn_force=no version=3.4.6
+X-Spam-Status: No, score=-15.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
+        T_SCC_BODY_TEXT_LINE,URI_DOTEDU,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL
+        autolearn=no autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Jul 7, 2022 at 10:19 AM Bin Meng <bmeng.cn@gmail.com> wrote:
+On Wed, Jul 6, 2022 at 9:05 PM Reiji Watanabe <reijiw@google.com> wrote:
 >
-> Hi Anup,
+> Hi Marc,
 >
-> U-Boot S-mode payload does not boot with RISC-V KVM on the QEMU 'virt'
-> multicore machine. With QEMU TCG it can boot.
+> On Wed, Jul 6, 2022 at 9:43 AM Marc Zyngier <maz@kernel.org> wrote:
+> >
+> > find_reg_by_id() requires a sys_reg_param as input, which most
+> > users provide as a on-stack variable, but don't make any use of
+> > the result.
+> >
+> > Provide a helper that doesn't have this requirement and simplify
+> > the callers (all but one).
+> >
+> > Signed-off-by: Marc Zyngier <maz@kernel.org>
+> > ---
+> >  arch/arm64/kvm/sys_regs.c        | 28 +++++++++++++++++-----------
+> >  arch/arm64/kvm/sys_regs.h        |  4 ++++
+> >  arch/arm64/kvm/vgic-sys-reg-v3.c |  8 ++------
+> >  3 files changed, 23 insertions(+), 17 deletions(-)
+> >
+> > diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
+> > index c06c0477fab5..1f410283c592 100644
+> > --- a/arch/arm64/kvm/sys_regs.c
+> > +++ b/arch/arm64/kvm/sys_regs.c
+> > @@ -2650,21 +2650,29 @@ const struct sys_reg_desc *find_reg_by_id(u64 id,
+> >         return find_reg(params, table, num);
+> >  }
+> >
+> > +const struct sys_reg_desc *get_reg_by_id(u64 id,
+> > +                                        const struct sys_reg_desc table[],
+> > +                                        unsigned int num)
+> > +{
+> > +       struct sys_reg_params params;
+> > +
+> > +       if (!index_to_params(id, &params))
+> > +               return NULL;
+> > +
+> > +       return find_reg(&params, table, num);
+> > +}
 >
-> I am using the latest v5.19-rc5 kernel, along with QEMU 7.0.0 and
-> U-Boot v2022.04:
+> Since all the callers of get_reg_id() specify ARRAY_SIZE(array) for
+> the 3rd argument, and I think future callers of it are also likely to
+> do the same, perhaps it might be more convenient if we make get_reg_id()
+> a wrapper macro like below (and rename "get_reg_by_id()" to
+> "__get_reg_by_id()") ?
 >
-> Reproduce steps:
->
-> U-Boot S-mode payload is built from U-Boot v2022.04:
-> $ make qemu-riscv64_smode_defconfig; make
->
-> The host 5.19-rc5 kernel is running on top of QEMU 7.0.0 on an x86 machine.
->
-> Use QEMU to launch the VM:
-> # qemu-system-riscv64 -M virt -accel kvm -m 2G -smp 2 -nographic
-> -kernel u-boot -device virtio-net-device,netdev=eth0 -netdev
-> user,id=eth0,hostfwd=tcp::8022-:22
->
-> U-Boot gets stuck during boot, logs below:
->
-> U-Boot 2022.04 (Jul 07 2022 - 11:23:28 +0800)
-> CPU: rv64imafdc
-> Model: riscv-virtio,qemu
-> DRAM: 2 GiB
-> Core: 17 devices, 9 uclasses, devicetree: board
-> Flash: <========== stuck here, and QEMU is completely unresponsive
-> (Ctrl+A, C is ignored)
->
-> The kernel reports:
->
-> [ 484.351698] INFO: task qemu-system-ris:1765 blocked for more than 120 seconds.
-> [ 484.360285] Not tainted 5.19.0-rc5-custom #1
-> [ 484.360871] "echo 0 > /proc/sys/kernel/hung_task_timeout_secs"
-> disables this message.
-> [ 484.362560] task:qemu-system-ris state:D stack: 0 pid: 1765 ppid:
-> 1515 flags:0x00000000
-> [ 484.363785] Call Trace:
-> [ 484.363930] [] schedule+0x50/0xb2
-> [ 484.364758] [] schedule_timeout+0x10c/0x13c
-> [ 484.364806] [] __wait_for_common+0x148/0x226
-> [ 484.364840] [] wait_for_completion+0x2e/0x36
-> [ 484.364871] [] __synchronize_srcu.part.0+0x88/0xe2
-> [ 484.364918] [] synchronize_srcu_expedited+0x3a/0x44
-> [ 484.364952] [] kvm_swap_active_memslots+0x186/0x1ea
-> [ 484.364985] [] kvm_set_memslot+0x1fc/0x39c
-> [ 484.365014] [] __kvm_set_memory_region+0x144/0x30c
-> [ 484.365043] [] kvm_vm_ioctl+0x20a/0xc82
-> [ 484.365075] [] sys_ioctl+0x98/0xb2
-> [ 484.365135] [] ret_from_syscall+0x0/0x2
->
-> The QEMU vcpu thread backtrace is:
->
-> #0 __GI___ioctl (fd=, request=request@entry=1075883590) at
-> ../sysdeps/unix/sysv/linux/ioctl.c:35
-> #1 0x00aaaaaab8b916ae in kvm_vm_ioctl (s=s@entry=0xaaaaaaf1ec3e00,
-> type=type@entry=1075883590) at ../accel/kvm/kvm-all.c:3035
-> #2 0x00aaaaaab8b93572 in kvm_set_user_memory_region
-> (slot=slot@entry=0xffffffaa5d90a0, new=new@entry=false,
-> kml=0xaaaaaaf1ec4eb0, kml=) at ../accel/kvm/kvm-all.c:379
-> #3 0x00aaaaaab8b93862 in kvm_set_phys_mem (kml=0xaaaaaaf1ec4eb0,
-> section=section@entry=0xffffffaa513b70, add=, add@entry=false) at
-> ../accel/kvm/kvm-all.c:1413
-> #4 0x00aaaaaab8b93a30 in kvm_region_del (listener=,
-> section=0xffffffaa513b70) at ../accel/kvm/kvm-all.c:1511
-> #5 0x00aaaaaab8ad780c in address_space_update_topology_pass
-> (as=as@entry=0xaaaaaab90b87a0 ,
-> old_view=old_view@entry=0xaaaaaaf1f42c40,
-> new_view=new_view@entry=0xffffff1c001400, adding=adding@entry=fa
-> lse) at ../softmmu/memory.c:948
-> #6 0x00aaaaaab8ad7a2a in address_space_set_flatview
-> (as=0xaaaaaab90b87a0 ) at ../softmmu/memory.c:1050
-> #7 0x00aaaaaab8ada508 in memory_region_transaction_commit () at
-> ../softmmu/memory.c:1103
-> #8 0x00aaaaaab8adb6ee in memory_region_rom_device_set_romd
-> (mr=mr@entry=0xaaaaaaf22d6fe0, romd_mode=romd_mode@entry=false) at
-> ../softmmu/memory.c:2289
-> #9 0x00aaaaaab8951e1a in pflash_write (be=0, width=1, value=240,
-> offset=0, pfl=0xaaaaaaf22d6c30) at ../hw/block/pflash_cfi01.c:451
-> #10 pflash_mem_write_with_attrs (opaque=0xaaaaaaf22d6c30, addr=0,
-> value=, len=, attrs=...) at ../hw/block/pflash_cfi01.c:682
-> #11 0x00aaaaaab8ad5fa2 in access_with_adjusted_size
-> (addr=addr@entry=0, value=value@entry=0xffffffaa513dc8,
-> size=size@entry=1, access_size_min=, access_size_max=,
-> access_fn=0xaaaaaab8ad7d06 <
-> memory_region_write_with_attrs_accessor>, mr=0xaaaaaaf22d6fe0,
-> attrs=...) at ../softmmu/memory.c:554
-> #12 0x00aaaaaab8ad92ba in memory_region_dispatch_write
-> (mr=mr@entry=0xaaaaaaf22d6fe0, addr=addr@entry=0, data=,
-> data@entry=240, op=, attrs=attrs@entry=...) at
-> ../softmmu/memory.c:1521
-> #13 0x00aaaaaab8adee88 in flatview_write_continue
-> (fv=fv@entry=0xaaaaaaf1f42c40, addr=addr@entry=536870912,
-> attrs=attrs@entry=..., ptr=ptr@entry=0xffffffab730028,
-> len=len@entry=1, addr1=, l=,
-> mr=0xaaaaaaf22d6fe0) at ../softmmu/physmem.c:2814
-> #14 0x00aaaaaab8adf0d8 in flatview_write (fv=0xaaaaaaf1f42c40,
-> addr=536870912, attrs=..., buf=0xffffffab730028, len=len@entry=1) at
-> ../softmmu/physmem.c:2856
-> #15 0x00aaaaaab8ae1eca in address_space_write (len=1,
-> buf=0xffffffab730028, attrs=..., addr=536870912, as=0xaaaaaab90b87a0 )
-> at ../softmmu/physmem.c:2952
-> #16 address_space_rw (as=0xaaaaaab90b87a0 , addr=536870912, attrs=...,
-> attrs@entry=..., buf=buf@entry=0xffffffab730028, len=1, is_write=) at
-> ../softmmu/physmem.c:2962
-> #17 0x00aaaaaab8b94a3e in kvm_cpu_exec
-> (cpu=cpu@entry=0xaaaaaaf1ec92f0) at ../accel/kvm/kvm-all.c:2929
-> #18 0x00aaaaaab8b95572 in kvm_vcpu_thread_fn
-> (arg=arg@entry=0xaaaaaaf1ec92f0) at ../accel/kvm/kvm-accel-ops.c:49
-> #19 0x00aaaaaab8ca280a in qemu_thread_start (args=) at
-> ../util/qemu-thread-posix.c:556
-> #20 0x00ffffffab2cf5a6 in start_thread (arg=) at ./nptl/pthread_create.c:442
-> #21 0x00ffffffab31ba02 in __thread_start () at
-> ../sysdeps/unix/sysv/linux/riscv/clone.S:85
->
-> Based on above 2 logs, we can see the QEMU vcpu thread is blocked at KVM ioctl
-> KVM_SET_USER_MEMORY_REGION, and on the kernel side the ioctl call is
-> blocked at synchronize_srcu_expedited() so that ioctl never returns
-> back to the user land.
->
-> If I single step the QEMU instance starting from a breakpoint at
-> pflash_write(), the ioctl call of KVM_SET_USER_MEMORY_REGION does not
-> block, and U-Boot can boot eventually.
->
-> If I remove "-smp 2" from the QEMU command line when launching the VM,
-> U-Boot boots without any problem. Of course removing "-accel kvm"
-> works too.
->
-> It looks to me there is a locking timing issue in the RISC-V KVM
-> kernel when an SMP guest is launched. Any ideas?
+> #define get_reg_id(id, table)   __get_reg_id(id, table, ARRAY_SIZE(table))
 
-To further isolate the problem, does it work if QEMU does not generate
-the pflash DT node ?
+Looking at the following patches, let me withdraw this comment... Instead,
 
-Regards,
-Anup
+Reviewed-by: Reiji Watanabe <reijiw@google.com>
+
+Thank you,
+Reiji
+
+
+>
+> > +
+> >  /* Decode an index value, and find the sys_reg_desc entry. */
+> >  static const struct sys_reg_desc *index_to_sys_reg_desc(struct kvm_vcpu *vcpu,
+> >                                                     u64 id)
+> >  {
+> >         const struct sys_reg_desc *r;
+> > -       struct sys_reg_params params;
+> >
+> >         /* We only do sys_reg for now. */
+> >         if ((id & KVM_REG_ARM_COPROC_MASK) != KVM_REG_ARM64_SYSREG)
+> >                 return NULL;
+> >
+> > -       if (!index_to_params(id, &params))
+> > -               return NULL;
+> > -
+> > -       r = find_reg(&params, sys_reg_descs, ARRAY_SIZE(sys_reg_descs));
+> > +       r = get_reg_by_id(id, sys_reg_descs, ARRAY_SIZE(sys_reg_descs));
+> >
+> >         /* Not saved in the sys_reg array and not otherwise accessible? */
+> >         if (r && !(r->reg || r->get_user))
+> > @@ -2723,11 +2731,10 @@ static int reg_to_user(void __user *uaddr, const u64 *val, u64 id)
+> >
+> >  static int get_invariant_sys_reg(u64 id, void __user *uaddr)
+> >  {
+> > -       struct sys_reg_params params;
+> >         const struct sys_reg_desc *r;
+> >
+> > -       r = find_reg_by_id(id, &params, invariant_sys_regs,
+> > -                          ARRAY_SIZE(invariant_sys_regs));
+> > +       r = get_reg_by_id(id, invariant_sys_regs,
+> > +                         ARRAY_SIZE(invariant_sys_regs));
+> >         if (!r)
+> >                 return -ENOENT;
+> >
+> > @@ -2736,13 +2743,12 @@ static int get_invariant_sys_reg(u64 id, void __user *uaddr)
+> >
+> >  static int set_invariant_sys_reg(u64 id, void __user *uaddr)
+> >  {
+> > -       struct sys_reg_params params;
+> >         const struct sys_reg_desc *r;
+> >         int err;
+> >         u64 val = 0; /* Make sure high bits are 0 for 32-bit regs */
+> >
+> > -       r = find_reg_by_id(id, &params, invariant_sys_regs,
+> > -                          ARRAY_SIZE(invariant_sys_regs));
+> > +       r = get_reg_by_id(id, invariant_sys_regs,
+> > +                         ARRAY_SIZE(invariant_sys_regs));
+> >         if (!r)
+> >                 return -ENOENT;
+> >
+> > diff --git a/arch/arm64/kvm/sys_regs.h b/arch/arm64/kvm/sys_regs.h
+> > index aee8ea054f0d..ce30ed9566ae 100644
+> > --- a/arch/arm64/kvm/sys_regs.h
+> > +++ b/arch/arm64/kvm/sys_regs.h
+> > @@ -195,6 +195,10 @@ const struct sys_reg_desc *find_reg_by_id(u64 id,
+> >                                           const struct sys_reg_desc table[],
+> >                                           unsigned int num);
+> >
+> > +const struct sys_reg_desc *get_reg_by_id(u64 id,
+> > +                                        const struct sys_reg_desc table[],
+> > +                                        unsigned int num);
+> > +
+> >  #define AA32(_x)       .aarch32_map = AA32_##_x
+> >  #define Op0(_x)        .Op0 = _x
+> >  #define Op1(_x)        .Op1 = _x
+> > diff --git a/arch/arm64/kvm/vgic-sys-reg-v3.c b/arch/arm64/kvm/vgic-sys-reg-v3.c
+> > index 07d5271e9f05..644acda33c7c 100644
+> > --- a/arch/arm64/kvm/vgic-sys-reg-v3.c
+> > +++ b/arch/arm64/kvm/vgic-sys-reg-v3.c
+> > @@ -263,14 +263,10 @@ static const struct sys_reg_desc gic_v3_icc_reg_descs[] = {
+> >  int vgic_v3_has_cpu_sysregs_attr(struct kvm_vcpu *vcpu, bool is_write, u64 id,
+> >                                 u64 *reg)
+> >  {
+> > -       struct sys_reg_params params;
+> >         u64 sysreg = (id & KVM_DEV_ARM_VGIC_SYSREG_MASK) | KVM_REG_SIZE_U64;
+> >
+> > -       params.regval = *reg;
+> > -       params.is_write = is_write;
+> > -
+> > -       if (find_reg_by_id(sysreg, &params, gic_v3_icc_reg_descs,
+> > -                             ARRAY_SIZE(gic_v3_icc_reg_descs)))
+> > +       if (get_reg_by_id(sysreg, gic_v3_icc_reg_descs,
+> > +                         ARRAY_SIZE(gic_v3_icc_reg_descs)))
+> >                 return 0;
+> >
+> >         return -ENXIO;
+> > --
+> > 2.34.1
+> >
+> > _______________________________________________
+> > kvmarm mailing list
+> > kvmarm@lists.cs.columbia.edu
+> > https://lists.cs.columbia.edu/mailman/listinfo/kvmarm
