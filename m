@@ -2,74 +2,106 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id CD7FE56A5C5
-	for <lists+kvm@lfdr.de>; Thu,  7 Jul 2022 16:46:33 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 1BF7256A634
+	for <lists+kvm@lfdr.de>; Thu,  7 Jul 2022 16:54:35 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235026AbiGGOqX (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 7 Jul 2022 10:46:23 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39630 "EHLO
+        id S235850AbiGGOya (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 7 Jul 2022 10:54:30 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49028 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230102AbiGGOqV (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 7 Jul 2022 10:46:21 -0400
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id B075926115;
-        Thu,  7 Jul 2022 07:46:20 -0700 (PDT)
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id D784E113E;
-        Thu,  7 Jul 2022 07:46:20 -0700 (PDT)
-Received: from [10.57.85.108] (unknown [10.57.85.108])
-        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 8D6E43F66F;
-        Thu,  7 Jul 2022 07:46:19 -0700 (PDT)
-Message-ID: <435b8da4-0db0-9111-badd-3fbdfd6045d5@arm.com>
-Date:   Thu, 7 Jul 2022 15:46:14 +0100
+        with ESMTP id S235453AbiGGOyQ (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 7 Jul 2022 10:54:16 -0400
+Received: from mail-pf1-x42d.google.com (mail-pf1-x42d.google.com [IPv6:2607:f8b0:4864:20::42d])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8106B5A45D
+        for <kvm@vger.kernel.org>; Thu,  7 Jul 2022 07:53:18 -0700 (PDT)
+Received: by mail-pf1-x42d.google.com with SMTP id n12so19939055pfq.0
+        for <kvm@vger.kernel.org>; Thu, 07 Jul 2022 07:53:18 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=ventanamicro.com; s=google;
+        h=from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=2/cSQRYg50JuMF0k4CiBLOOMScUk3mXsGoE8DMLTmGQ=;
+        b=er9nqWUP8eP6usOXt23apNRzaB+sp9s0z7ZvXZctGj3Om3+CrQ463jXIqaq0Olo7cA
+         eLVU8m4qvUPEKhD35qoudlMRRWzhftZF2RzvL1qICwipTKw6ml05b8wHU8hudZEuGfON
+         +xDaFvG1KOiNdB6l6W4oYPYwTd3zUsifB5zQzeTYpLjCnllDQv9fv4dSmKe5BQIPOInq
+         juBSjYjMYn3KOEJKZGUW/wKoq0bI1MT2nuOZ3Wa43ilVxvbgUDkKdKBBAYtJq5UewcQg
+         nCDZMgk0ulSCy9Ded1j4Vm1hK33lAQREgPfY7MB3Wh3rBZjOfUpWcmfX2KahyaibpiRz
+         fZ0Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=2/cSQRYg50JuMF0k4CiBLOOMScUk3mXsGoE8DMLTmGQ=;
+        b=7z+NO07aEs05yFHiilTmYAix2Bi/+0llbzI5rOghSh7A8k/PvMm1hOCITrnFVs7pw5
+         NdesWoP+ZuLec8fcbTQ7J5Vx0MZRPRf00ZBGmpe/EGJvTifW8z6CGe+hANX6Ga9iaG7g
+         7NzXG3gFCKdUYtE/RlkustNOFsHGLugmgCMt6RQ7UC6Azrs02pXP7BOsaYBKcQQU0E0I
+         kYWFLoXW9C8q61uDArJGlYrOyESLRO/8UUA3q4BjlYLup3re2d4MLV3YJsBd18Kbkvga
+         Bx/dooWsftFewCAQMxlpMmOIhyKYg3T3bp//scnRXT2D42on0aAkd9aL5l8E2INExtxK
+         8Akw==
+X-Gm-Message-State: AJIora8y3UHk+q6K6Frw6FObxcufkExpimF227+3lCUmA8XLKzDsjmcw
+        Eb2lwvaVgRy0/UFFdU+f33roEg==
+X-Google-Smtp-Source: AGRyM1vOJj+bmEomGF03XvBXPTdyrfwYNBaHdnZBlfX7sgIfcCWLhyRtqza8tkvG3CxVepetxWkL0Q==
+X-Received: by 2002:a17:903:110c:b0:168:fa61:1440 with SMTP id n12-20020a170903110c00b00168fa611440mr52729714plh.149.1657205596753;
+        Thu, 07 Jul 2022 07:53:16 -0700 (PDT)
+Received: from anup-ubuntu64-vm.. ([223.226.40.162])
+        by smtp.gmail.com with ESMTPSA id b26-20020aa7951a000000b0052535e7c489sm27144231pfp.114.2022.07.07.07.53.12
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 07 Jul 2022 07:53:16 -0700 (PDT)
+From:   Anup Patel <apatel@ventanamicro.com>
+To:     Paolo Bonzini <pbonzini@redhat.com>,
+        Atish Patra <atishp@atishpatra.org>
+Cc:     Palmer Dabbelt <palmer@dabbelt.com>,
+        Paul Walmsley <paul.walmsley@sifive.com>,
+        Alistair Francis <Alistair.Francis@wdc.com>,
+        Anup Patel <anup@brainfault.org>, kvm@vger.kernel.org,
+        kvm-riscv@lists.infradead.org, linux-riscv@lists.infradead.org,
+        linux-kernel@vger.kernel.org, Anup Patel <apatel@ventanamicro.com>
+Subject: [PATCH 0/5] KVM RISC-V Svpbmt support
+Date:   Thu,  7 Jul 2022 20:22:43 +0530
+Message-Id: <20220707145248.458771-1-apatel@ventanamicro.com>
+X-Mailer: git-send-email 2.34.1
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Windows NT 10.0; rv:91.0) Gecko/20100101
- Thunderbird/91.11.0
-Subject: Re: [PATCH] vdpa: Use device_iommu_capable()
-Content-Language: en-GB
-From:   Robin Murphy <robin.murphy@arm.com>
-To:     mst@redhat.com, jasowang@redhat.com
-Cc:     netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
-        kvm@vger.kernel.org, virtualization@lists.linux-foundation.org
-References: <548e316fa282ce513fabb991a4c4d92258062eb5.1654688822.git.robin.murphy@arm.com>
-In-Reply-To: <548e316fa282ce513fabb991a4c4d92258062eb5.1654688822.git.robin.murphy@arm.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-6.9 required=5.0 tests=BAYES_00,NICE_REPLY_A,
-        RCVD_IN_DNSWL_HI,SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE
-        autolearn=ham autolearn_force=no version=3.4.6
+Content-Transfer-Encoding: 8bit
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=unavailable
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 2022-06-08 12:48, Robin Murphy wrote:
-> Use the new interface to check the capability for our device
-> specifically.
+This series extends KVM RISC-V to detect and use Svpbmt for both
+G-stage (hypervisor) and VS-stage (guest) page table.
 
-Just checking in case this got lost - vdpa is now the only remaining 
-iommu_capable() user in linux-next, and I'd like to be able to remove 
-the old interface next cycle.
+The corresponding KVMTOOL patches used for testing this series
+can be found in riscv_svpbmt_sstc_v1 branch at:
+https://github.com/avpatel/kvmtool.git
 
-Thanks,
-Robin.
+These patches can also be found in riscv_kvm_svpbmt_v1 branch at:
+https://github.com/avpatel/linux.git
 
-> Signed-off-by: Robin Murphy <robin.murphy@arm.com>
-> ---
->   drivers/vhost/vdpa.c | 2 +-
->   1 file changed, 1 insertion(+), 1 deletion(-)
-> 
-> diff --git a/drivers/vhost/vdpa.c b/drivers/vhost/vdpa.c
-> index 935a1d0ddb97..4cfebcc24a03 100644
-> --- a/drivers/vhost/vdpa.c
-> +++ b/drivers/vhost/vdpa.c
-> @@ -1074,7 +1074,7 @@ static int vhost_vdpa_alloc_domain(struct vhost_vdpa *v)
->   	if (!bus)
->   		return -EFAULT;
->   
-> -	if (!iommu_capable(bus, IOMMU_CAP_CACHE_COHERENCY))
-> +	if (!device_iommu_capable(dma_dev, IOMMU_CAP_CACHE_COHERENCY))
->   		return -ENOTSUPP;
->   
->   	v->domain = iommu_domain_alloc(bus);
+Alexandre Ghiti (1):
+  riscv: Fix missing PAGE_PFN_MASK
+
+Anup Patel (4):
+  KVM: Add gfp_custom flag in struct kvm_mmu_memory_cache
+  RISC-V: KVM: Add G-stage ioremap() and iounmap() functions
+  RISC-V: KVM: Use PAGE_KERNEL_IO in kvm_riscv_gstage_ioremap()
+  RISC-V: KVM: Add support for Svpbmt inside Guest/VM
+
+ arch/riscv/include/asm/csr.h        | 16 ++++++++++++++++
+ arch/riscv/include/asm/kvm_host.h   |  5 +++++
+ arch/riscv/include/asm/pgtable-64.h | 12 ++++++------
+ arch/riscv/include/asm/pgtable.h    |  6 +++---
+ arch/riscv/include/uapi/asm/kvm.h   |  1 +
+ arch/riscv/kvm/mmu.c                | 22 ++++++++++++++++------
+ arch/riscv/kvm/vcpu.c               | 16 ++++++++++++++++
+ include/linux/kvm_types.h           |  1 +
+ virt/kvm/kvm_main.c                 |  4 +++-
+ 9 files changed, 67 insertions(+), 16 deletions(-)
+
+-- 
+2.34.1
+
