@@ -2,51 +2,51 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id BD80456AFEC
-	for <lists+kvm@lfdr.de>; Fri,  8 Jul 2022 03:52:54 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 789C556B03C
+	for <lists+kvm@lfdr.de>; Fri,  8 Jul 2022 03:54:20 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237000AbiGHBeb (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 7 Jul 2022 21:34:31 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48970 "EHLO
+        id S235956AbiGHBxy (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 7 Jul 2022 21:53:54 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34092 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S236978AbiGHBea (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 7 Jul 2022 21:34:30 -0400
-Received: from mga07.intel.com (mga07.intel.com [134.134.136.100])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D6EF572EEE;
-        Thu,  7 Jul 2022 18:34:29 -0700 (PDT)
+        with ESMTP id S229620AbiGHBxx (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 7 Jul 2022 21:53:53 -0400
+Received: from mga03.intel.com (mga03.intel.com [134.134.136.65])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0683B72EFD;
+        Thu,  7 Jul 2022 18:53:52 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1657244069; x=1688780069;
+  t=1657245233; x=1688781233;
   h=message-id:subject:from:to:cc:date:in-reply-to:
    references:content-transfer-encoding:mime-version;
-  bh=Q0hvsnX7RVkuwvneu2Zqjjl/dVg/+ONMLULG1th9+jg=;
-  b=EgI9kvdaA3IoRAGFuuZs8MS/41LkwidzKmT1DEfS+maBU2vTpjPFUMOq
-   tEVQytJI7r+4uobRu5yxjG1OJU4A94qLB0LbsuA97DEbKWG5L75mRIm+8
-   aFFxtRpBzKtny5Tna1sswjIn3nvaURkl2qEuV1PUSeGY6ww/EKbRtzR1p
-   zNnS3nJ/xYXIw3EEP6Z0Kd8mcNl/rVsFrd56T8JliaeC9bfKUEUBSE+5L
-   Y34YYjx7I356dgt5jE2UZ3Hpr3BYkDw/UfTd/Oa7/6mVdVzp70HWUTy8a
-   Aw42fA0qGuP69DT/kBiyytPVBGTj7Xw5MgR1RvuyIYl4rZYucSpBxmWlS
-   Q==;
-X-IronPort-AV: E=McAfee;i="6400,9594,10401"; a="348146469"
+  bh=uTGZ96H/Vcyezi1QcFNAgzqip6ZdDz289/RtCx8IjWQ=;
+  b=J3zUVe0xBTioYG+PcBp0SH21Bc9nzDf6pjqGJ26Jx4c7/Qs48DaFCCqV
+   McWWsVYwkdB/Z8o6hsDbsysEjux9IDwyDBks7zgdNmPfGBG+7HVa3AQe/
+   3MQltKPvEsy8Jx7xLLFolJkH2x/E6MUuwn4uUkW7HvknqPd0sDmmzAsz8
+   NDCMXu0DoQJA1l78CsoVb9io80mie9goQxuOmRHiqirlryc5Hc66QUmSx
+   lCpWLzektH2HmkiEnVDT1zMF4NexJAZexv8qgKan7x6WZksLpbucS7eBe
+   06PVHsO4KC9VjFA8xVFX13RpP8CVaKaJMRH3ktxFKKvCx+EiXpWB7fKP7
+   w==;
+X-IronPort-AV: E=McAfee;i="6400,9594,10401"; a="285292629"
 X-IronPort-AV: E=Sophos;i="5.92,254,1650956400"; 
-   d="scan'208";a="348146469"
-Received: from fmsmga005.fm.intel.com ([10.253.24.32])
-  by orsmga105.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 07 Jul 2022 18:34:29 -0700
+   d="scan'208";a="285292629"
+Received: from fmsmga006.fm.intel.com ([10.253.24.20])
+  by orsmga103.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 07 Jul 2022 18:53:52 -0700
 X-IronPort-AV: E=Sophos;i="5.92,254,1650956400"; 
-   d="scan'208";a="920816315"
+   d="scan'208";a="840136748"
 Received: from pantones-mobl1.amr.corp.intel.com (HELO khuang2-desk.gar.corp.intel.com) ([10.212.54.208])
-  by fmsmga005-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 07 Jul 2022 18:34:23 -0700
-Message-ID: <7f27a51961d212c17933b39ea0b5b884c2939ff9.camel@intel.com>
-Subject: Re: [PATCH v7 101/102] Documentation/virtual/kvm: Document on Trust
- Domain Extensions(TDX)
+  by fmsmga006-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 07 Jul 2022 18:53:50 -0700
+Message-ID: <873d12c1ebe3a64e3f11133308df064f2b581d8e.camel@intel.com>
+Subject: Re: [PATCH v7 032/102] KVM: x86/mmu: introduce config for PRIVATE
+ KVM MMU
 From:   Kai Huang <kai.huang@intel.com>
 To:     isaku.yamahata@intel.com, kvm@vger.kernel.org,
         linux-kernel@vger.kernel.org
 Cc:     isaku.yamahata@gmail.com, Paolo Bonzini <pbonzini@redhat.com>
-Date:   Fri, 08 Jul 2022 13:34:20 +1200
-In-Reply-To: <9e54fa1ac03df3cd2fb7a2e64d3cffc35d4f097e.1656366338.git.isaku.yamahata@intel.com>
+Date:   Fri, 08 Jul 2022 13:53:48 +1200
+In-Reply-To: <fa5a472216f0394fab06e2fee29d42fdc1ed33af.1656366338.git.isaku.yamahata@intel.com>
 References: <cover.1656366337.git.isaku.yamahata@intel.com>
-         <9e54fa1ac03df3cd2fb7a2e64d3cffc35d4f097e.1656366338.git.isaku.yamahata@intel.com>
+         <fa5a472216f0394fab06e2fee29d42fdc1ed33af.1656366338.git.isaku.yamahata@intel.com>
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 User-Agent: Evolution 3.44.2 (3.44.2-1.fc36) 
@@ -61,42 +61,33 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+On Mon, 2022-06-27 at 14:53 -0700, isaku.yamahata@intel.com wrote:
+> From: Isaku Yamahata <isaku.yamahata@intel.com>
+>=20
+> To Keep the case of non TDX intact, introduce a new config option for
+> private KVM MMU support.  At the moment, this is synonym for
+> CONFIG_INTEL_TDX_HOST && CONFIG_KVM_INTEL.  The new flag make it clear
+> that the config is only for x86 KVM MMU.
 
-> +
-> +- Wrapping kvm x86_ops: The current choice
-> +  Introduce dedicated file for arch/x86/kvm/vmx/main.c (the name,
-> +  main.c, is just chosen to show main entry points for callbacks.) and
-> +  wrapper functions around all the callbacks with
-> +  "if (is-tdx) tdx-callback() else vmx-callback()".
-> +
-> +  Pros:
-> +  - No major change in common x86 KVM code. The change is (mostly)
-> +    contained under arch/x86/kvm/vmx/.
-> +  - When TDX is disabled(CONFIG_INTEL_TDX_HOST=3Dn), the overhead is
-> +    optimized out.
-> +  - Micro optimization by avoiding function pointer.
-> +  Cons:
-> +  - Many boiler plates in arch/x86/kvm/vmx/main.c.
-> +
-> +Alternative:
-> +- Introduce another callback layer under arch/x86/kvm/vmx.
-> +  Pros:
-> +  - No major change in common x86 KVM code. The change is (mostly)
-> +    contained under arch/x86/kvm/vmx/.
-> +  - clear separation on callbacks.
-> +  Cons:
-> +  - overhead in VMX even when TDX is disabled(CONFIG_INTEL_TDX_HOST=3Dn)=
-.
-> +
+What is the "new flag"?
 
-Why putting "Alternative" in the documentation?  You may put it to the cove=
-r
-letter so people can judge whether the design is reasonable, but it should =
-not
-be in the documentation.
-
---=20
-Thanks,
--Kai
-
+>=20
+> Signed-off-by: Isaku Yamahata <isaku.yamahata@intel.com>
+> ---
+>  arch/x86/kvm/Kconfig | 4 ++++
+>  1 file changed, 4 insertions(+)
+>=20
+> diff --git a/arch/x86/kvm/Kconfig b/arch/x86/kvm/Kconfig
+> index e3cbd7706136..5a59abc83179 100644
+> --- a/arch/x86/kvm/Kconfig
+> +++ b/arch/x86/kvm/Kconfig
+> @@ -129,4 +129,8 @@ config KVM_XEN
+>  config KVM_EXTERNAL_WRITE_TRACKING
+>  	bool
+> =20
+> +config KVM_MMU_PRIVATE
+> +	def_bool y
+> +	depends on INTEL_TDX_HOST && KVM_INTEL
+> +
+>  endif # VIRTUALIZATION
 
