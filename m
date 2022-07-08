@@ -2,81 +2,66 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id B139556B3E1
-	for <lists+kvm@lfdr.de>; Fri,  8 Jul 2022 09:56:00 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id A88C456B416
+	for <lists+kvm@lfdr.de>; Fri,  8 Jul 2022 10:08:30 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237500AbiGHHz5 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 8 Jul 2022 03:55:57 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59620 "EHLO
+        id S237631AbiGHIFe (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 8 Jul 2022 04:05:34 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40686 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S237317AbiGHHzy (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 8 Jul 2022 03:55:54 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id B47367E00B
-        for <kvm@vger.kernel.org>; Fri,  8 Jul 2022 00:55:50 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1657266949;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=HAAKsCoSYhF/bkc1lBCytOqkp21Aily9JDFQCiAKZoo=;
-        b=EF2gUvM+OfAnuQa7AleYtnVIkHzL61D7CMp4mnNSkVdMbfV4t6nPpWtdQvOnCCDyuvbPyu
-        eLp9hsKm51EuWC/B0+ErAV8UBWl6m5wM85RL6FFYeeeslX+WWbTd9Ps2qnyHHFOx+Ld/CW
-        OtFli1xxerM6dZgiZT3McNo0LHQW9M4=
-Received: from mail-ed1-f69.google.com (mail-ed1-f69.google.com
- [209.85.208.69]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-571-1L6vxng_PgGB4qRDCaBiAA-1; Fri, 08 Jul 2022 03:55:48 -0400
-X-MC-Unique: 1L6vxng_PgGB4qRDCaBiAA-1
-Received: by mail-ed1-f69.google.com with SMTP id y6-20020a056402270600b00433940d207eso12154689edd.1
-        for <kvm@vger.kernel.org>; Fri, 08 Jul 2022 00:55:48 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:from:to:cc:subject:in-reply-to:references:date
-         :message-id:mime-version;
-        bh=HAAKsCoSYhF/bkc1lBCytOqkp21Aily9JDFQCiAKZoo=;
-        b=lTpokMTsfD0oelsgtsCowu5eDnBSLlGQ5mC+2u/MfnJ+/NODVMeIeiqDaEuhU3pNsN
-         SfEAilvUapncdLLfhTFjRKyCQZmIxBFvbrT8f1xYFU3RNKe0lFMVLjYX26S2OVv9BqGX
-         PzmzIYA2dUSBGBNuekIoOn3b3CcGzvKCv2nEDbW4UNC7FFu/JpWYbEIiVD+aRdYjmG8j
-         cfmks4cJUn1RatD2DcmIbNQpwhOLj8gYO7HT4ZMTtphunb6eoUsVqjIWwf3HsF2EPA74
-         grPuRJ7HLmZEBfIHCFmuTawUd12in8xirSLyNaXc2fQxzm+iBeH2pbKYI62uM3M2OoE+
-         kG3A==
-X-Gm-Message-State: AJIora/AeGYtrK13SgIa9DYYoM+R/h1k2UT6dAgh1LwUpNsjHisjJiYW
-        /vDZKSGuOMDUR1FtElII8j3/G23PpZ1sVkyhytCMbeOjsLZvzRw9gfYnKI80dHAgTAu+ZSNgZMV
-        cpKpJgmcM52YJ
-X-Received: by 2002:a17:906:9bde:b0:72b:2e5:deb5 with SMTP id de30-20020a1709069bde00b0072b02e5deb5mr2313704ejc.21.1657266947327;
-        Fri, 08 Jul 2022 00:55:47 -0700 (PDT)
-X-Google-Smtp-Source: AGRyM1spvCJWZP6FKE/wq/QU7UVcLahUIL6ee/g2jmNHTxTrCbpxOQC9KoxkC1SeyW5GOmLz61H/Yw==
-X-Received: by 2002:a17:906:9bde:b0:72b:2e5:deb5 with SMTP id de30-20020a1709069bde00b0072b02e5deb5mr2313692ejc.21.1657266947080;
-        Fri, 08 Jul 2022 00:55:47 -0700 (PDT)
-Received: from fedora (nat-2.ign.cz. [91.219.240.2])
-        by smtp.gmail.com with ESMTPSA id f3-20020a170906138300b0072124df085bsm20087328ejc.15.2022.07.08.00.55.46
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 08 Jul 2022 00:55:46 -0700 (PDT)
-From:   Vitaly Kuznetsov <vkuznets@redhat.com>
-To:     Sean Christopherson <seanjc@google.com>,
-        Jim Mattson <jmattson@google.com>
-Cc:     kvm@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>,
-        Anirudh Rayabharam <anrayabh@linux.microsoft.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Maxim Levitsky <mlevitsk@redhat.com>,
-        linux-hyperv@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v2 22/28] KVM: VMX: Clear controls obsoleted by EPT at
- runtime, not setup
-In-Reply-To: <YsdSfP7xmMcLv8i9@google.com>
-References: <20220629150625.238286-1-vkuznets@redhat.com>
- <20220629150625.238286-23-vkuznets@redhat.com>
- <CALMp9eRA0v6BK6KG81ZE_iLKF6VNXxemN=E4gAE4AM-V4gkdHQ@mail.gmail.com>
- <87wncpotqv.fsf@redhat.com> <Ysc0TZaKxweEaelb@google.com>
- <CALMp9eTrtFd-pcEeWvyAs7eYe1R1FPvGr0pjQNP8o8F0YHhg8A@mail.gmail.com>
- <YsdSfP7xmMcLv8i9@google.com>
-Date:   Fri, 08 Jul 2022 09:55:45 +0200
-Message-ID: <87tu7sox6m.fsf@redhat.com>
-MIME-Version: 1.0
-Content-Type: text/plain
-X-Spam-Status: No, score=-3.5 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,
-        SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham
+        with ESMTP id S237317AbiGHIFc (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 8 Jul 2022 04:05:32 -0400
+Received: from ams.source.kernel.org (ams.source.kernel.org [145.40.68.75])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C95FF80489
+        for <kvm@vger.kernel.org>; Fri,  8 Jul 2022 01:05:31 -0700 (PDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by ams.source.kernel.org (Postfix) with ESMTPS id 7C901B80139
+        for <kvm@vger.kernel.org>; Fri,  8 Jul 2022 08:05:30 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 23ADFC341C8;
+        Fri,  8 Jul 2022 08:05:29 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1657267529;
+        bh=QtAuw959KuTNtR8cxJBTQZYkriCeywcshOCm/oZxxx0=;
+        h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+        b=Beg0f7gbAlHooxeO1KGbh7oDxPWT+OnCe9cSa/R044hKFWZFckT7cIklOCP1QmW/k
+         IbuOO0z69OvMJ55MQAakcflrglXbQlA0b23rY9uGguSClMJzsbfFXxevInYepP/g16
+         ZNW8nJQAMhbQtD8YUoomCj5dSTHS1yNTH939EkrgJAueMblB+c5bH2sM/ThhIW2ouG
+         A8m/dlmkKBtGvOEC4yIaP3jCYlc64dUvhmanOuvGk/uhqIKUI1b/eqeXSv1iHyLkAn
+         eOCXS7XjDNEpEdjj6Uvu6m35ccVMI9hmjSvybStlC6YXqH0zxecySxnIhdqxWt8xwW
+         7HrI+tjpS7QYg==
+Received: from [213.208.244.172] (helo=wait-a-minute.misterjones.org)
+        by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+        (Exim 4.95)
+        (envelope-from <maz@kernel.org>)
+        id 1o9izO-0065zO-PW;
+        Fri, 08 Jul 2022 09:05:27 +0100
+Date:   Fri, 08 Jul 2022 09:05:25 +0100
+Message-ID: <87sfnckp16.wl-maz@kernel.org>
+From:   Marc Zyngier <maz@kernel.org>
+To:     Reiji Watanabe <reijiw@google.com>
+Cc:     kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org,
+        Linux ARM <linux-arm-kernel@lists.infradead.org>,
+        Schspa Shi <schspa@gmail.com>, kernel-team@android.com,
+        Oliver Upton <oliver.upton@linux.dev>
+Subject: Re: [PATCH 04/19] KVM: arm64: Push checks for 64bit registers into the low-level accessors
+In-Reply-To: <CAAeT=Fz9+1=EV6fwqVMSncOj_9y7eRuuv1+P92MXbP1GOJeZaA@mail.gmail.com>
+References: <20220706164304.1582687-1-maz@kernel.org>
+        <20220706164304.1582687-5-maz@kernel.org>
+        <CAAeT=Fz9+1=EV6fwqVMSncOj_9y7eRuuv1+P92MXbP1GOJeZaA@mail.gmail.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/27.1
+ (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 213.208.244.172
+X-SA-Exim-Rcpt-To: reijiw@google.com, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, schspa@gmail.com, kernel-team@android.com, oliver.upton@linux.dev
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+X-Spam-Status: No, score=-7.8 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_HI,
+        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -84,52 +69,43 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Sean Christopherson <seanjc@google.com> writes:
+On Fri, 08 Jul 2022 07:13:36 +0100,
+Reiji Watanabe <reijiw@google.com> wrote:
+> 
+> Hi Marc,
+> 
+> On Wed, Jul 6, 2022 at 9:43 AM Marc Zyngier <maz@kernel.org> wrote:
+> >
+> > Make sure the check occurs on every paths where we can pick
+> > a sysreg from userspace, including the GICv3 paths.
+> >
+> > Signed-off-by: Marc Zyngier <maz@kernel.org>
+> > ---
+> >  arch/arm64/kvm/sys_regs.c | 10 ++++------
+> >  1 file changed, 4 insertions(+), 6 deletions(-)
+> >
+> > diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
+> > index 0fbdb21a3600..89e7eddea937 100644
+> > --- a/arch/arm64/kvm/sys_regs.c
+> > +++ b/arch/arm64/kvm/sys_regs.c
+> > @@ -2656,6 +2656,10 @@ const struct sys_reg_desc *get_reg_by_id(u64 id,
+> >  {
+> >         struct sys_reg_params params;
+> >
+> > +       /* 64 bit is the only way */
+> > +       if (KVM_REG_SIZE(id) != sizeof(__u64))
+> > +               return NULL;
+> 
+> This doesn't seem to be necessary since the equivalent check
+> is done by index_to_params().
 
-> On Thu, Jul 07, 2022, Jim Mattson wrote:
->> On Thu, Jul 7, 2022 at 12:30 PM Sean Christopherson <seanjc@google.com> wrote:
->> >
->> > On Thu, Jul 07, 2022, Vitaly Kuznetsov wrote:
->> > > Jim Mattson <jmattson@google.com> writes:
->> > >
->> > > > On Wed, Jun 29, 2022 at 8:07 AM Vitaly Kuznetsov <vkuznets@redhat.com> wrote:
->> > > >>
->> > > >> From: Sean Christopherson <seanjc@google.com>
->> > > >>
->> > > >> Clear the CR3 and INVLPG interception controls at runtime based on
->> > > >> whether or not EPT is being _used_, as opposed to clearing the bits at
->> > > >> setup if EPT is _supported_ in hardware, and then restoring them when EPT
->> > > >> is not used.  Not mucking with the base config will allow using the base
->> > > >> config as the starting point for emulating the VMX capability MSRs.
->> > > >>
->> > > >> Signed-off-by: Sean Christopherson <seanjc@google.com>
->> > > >> Signed-off-by: Vitaly Kuznetsov <vkuznets@redhat.com>
->> > > > Nit: These controls aren't "obsoleted" by EPT; they're just no longer
->> > > > required.
->
-> Actually, they're still required if unrestricted guest isn't supported.
->
->> > Isn't that the definition of "obsolete"?  They're "no longer in use" when KVM
->> > enables EPT.
->> 
->> There are still reasons to use them aside from shadow page table
->> maintenance. For example, malware analysis may be interested in
->> intercepting CR3 changes to track process context (and to
->> enable/disable costly monitoring). EPT doesn't render these events
->> "obsolete," because you can't intercept these events using EPT.
->
-> Fair enough, I was using "EPT" in the "KVM is using EPT" sense.  But even that's
-> wrong as KVM intercepts CR3 accesses when EPT is enabled, but unrestricted guest
-> is disabled and the guest disables paging.
->
-> Vitaly, since the CR3 fields are still technically "needed", maybe just be
-> explicit?
->
->   KVM: VMX: Adjust CR3/INVPLG interception for EPT=y at runtime, not setup
->
+Ah, well spotted. Amusing how many times we check for the same thing!
 
-Sounds good, adjusted!
+I'll simplify the patch and amend the commit message.
+
+Thanks,
+
+	M.
 
 -- 
-Vitaly
-
+Without deviation from the norm, progress is not possible.
