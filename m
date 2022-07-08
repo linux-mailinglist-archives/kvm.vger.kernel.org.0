@@ -2,186 +2,104 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id B9D2156BDF3
-	for <lists+kvm@lfdr.de>; Fri,  8 Jul 2022 18:09:07 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 7937956BD57
+	for <lists+kvm@lfdr.de>; Fri,  8 Jul 2022 18:08:16 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238841AbiGHPym (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 8 Jul 2022 11:54:42 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39050 "EHLO
+        id S238536AbiGHP52 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 8 Jul 2022 11:57:28 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40730 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S238813AbiGHPyk (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 8 Jul 2022 11:54:40 -0400
-Received: from mail-lf1-x129.google.com (mail-lf1-x129.google.com [IPv6:2a00:1450:4864:20::129])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E74F270E5F
-        for <kvm@vger.kernel.org>; Fri,  8 Jul 2022 08:54:37 -0700 (PDT)
-Received: by mail-lf1-x129.google.com with SMTP id d12so13702960lfq.12
-        for <kvm@vger.kernel.org>; Fri, 08 Jul 2022 08:54:37 -0700 (PDT)
+        with ESMTP id S238878AbiGHP5U (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 8 Jul 2022 11:57:20 -0400
+Received: from mail-pg1-x534.google.com (mail-pg1-x534.google.com [IPv6:2607:f8b0:4864:20::534])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 594857435C
+        for <kvm@vger.kernel.org>; Fri,  8 Jul 2022 08:57:16 -0700 (PDT)
+Received: by mail-pg1-x534.google.com with SMTP id bf13so9645495pgb.11
+        for <kvm@vger.kernel.org>; Fri, 08 Jul 2022 08:57:16 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc:content-transfer-encoding;
-        bh=/os5t3S4cPsz3I/S9Mj4qyigjvCHgQQtkEVeDgJ05RM=;
-        b=PsBVmJ6R6GowUlEMeEe8ZRY8jb52v2WfXzscfT5jLoCOQsbZ36cbawSyHAtGiHnafj
-         HaFtIhvPwrjTsy3gBfiNpXk6CLJYS++w+8CYIEoISvqmxuuVetqxorhjsydgFa23mZKQ
-         5/cnrNL72sWZGEGfjILngANqq9MIg3cWbdiTWVR/h5IQrycCXuvQ4YGYcrr2ICC+JjoL
-         DyDSxQSfjivojcSr1c9UT0BUbasRhFYlNTGM0VY5acbNpT07M1F5BIlW4gQlVvfNsmya
-         l77+tZgU/wKnuxcPYeZ/vqIStbc7H1V+E0CACaXVs84rluFvh1bSyYJPimKqQ++dB94y
-         p0rw==
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=BUQQx0dJ/n8uKfupk6kp7f/sUkdarp1GLkk1tnlVSBY=;
+        b=Vl3k9+d0sp5+4kJbhmNJ5y/L6xhpGCzFkbLS+wxpzvlLqFHxhwwsEPJrX17kTYmC02
+         uItaEbxFDVyqDIYKCR3tF+geEHiI7VYOLAb2pmcCwP+4DGos/O9C2mRImknnYU8mDKSO
+         8bHgCx6ORqBIJq4PwCga5LnrV20tHZDeGSke2yUeWs4HiWQufwq7peaQBfm+OJktlX1E
+         8EMGUe51M/SedensFHbwbJhJjAhmD7Ia/A6guzem7YuE2X5YLAwKbf9ztcMvFywg6cEz
+         bLDCO73whmni/K1F2im/Nguw9OKo8IZMkTms6unsiH1/A/xWB2Y0s8xyhF+dbgU1TGTB
+         /t/A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc:content-transfer-encoding;
-        bh=/os5t3S4cPsz3I/S9Mj4qyigjvCHgQQtkEVeDgJ05RM=;
-        b=tO7gnZtEbWlL/QSKUqVwwQ11z7t6FRJgUmc97FEQkd1uSsL2a/880AzFKaoLq1n9GX
-         ktPjC6q8C/uLnfHWMtxYyy6XOdrmEmRzQmuis8Za6ZvR1rwHvmLHdGEdYPc+ovhLr4w7
-         PvchhinN8uBXsix5U9GgRfYjbQkFFQvdsX4QOxf+Kxy6CGzKqbxqkca1EBp7hEDKXhJd
-         pTwk+xTb0iVnoLNnPjl3ENHAskTrxuVw6UBhWty60DmGT1YyM+inAABZjjhILid4WLW6
-         U9tc6bNgL0GuasbGMK9NMJTo1+cpD5C685h4ZQChVPK2s89YJZdgnEvjQPgW2EKZMUAu
-         qh2Q==
-X-Gm-Message-State: AJIora8McN5se6eLTfAas00Oz8MKspNKvTSEBkmHpAWmL/bL21KPecf+
-        LtLcU13ewb0r9Hu1+j/S7EAwqztF6X5SokpzZU9HM7Y2miv7GY8V
-X-Google-Smtp-Source: AGRyM1vakIVeDaj9C17a1elb+iyUeaYTA/kg2lyv8/76nZi9IF95NVCr4t6HVeEbFti0eBxcXliDfOCnMI7CCXuWRVI=
-X-Received: by 2002:a05:6512:a8c:b0:484:73f8:704d with SMTP id
- m12-20020a0565120a8c00b0048473f8704dmr3076083lfu.193.1657295675981; Fri, 08
- Jul 2022 08:54:35 -0700 (PDT)
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=BUQQx0dJ/n8uKfupk6kp7f/sUkdarp1GLkk1tnlVSBY=;
+        b=DmzXNzpq6R3uPZtqbTwHGi4QwKD0m6lukT3o/WIXxlEFQABqd94RA4nl2cs/TkH0Ta
+         BVxEPImvBekIEJeJTDaMZyt0UbWk5w7FJ3Re68Z/fCbQ9OJHR1JMiHMQavG8g3VWoD5J
+         mn0XO5qhjUAuZBlK8iuWyp22iYPeq3Nxoy3fIwiHqJxAdZ9kGLMAnkgXsRrAnPH7B9yA
+         D9Sc+ju3s0eYoRhUmp4wcUTLktMW0FCICuGyZ3qeFcX6C3d/s0N+GwwyQphPM40o0QEK
+         6kgXhL65E+ISKZlUEFeaGyTG7d6BW3tTz3VW4UKrzgAWkCR31QWqRohDkT3n62w8u///
+         xpgQ==
+X-Gm-Message-State: AJIora9vYB06Z1F3hLSyqnrPT0R2NcGqo6BHhh94RyMwkBl2nUjAV/QR
+        fyRiT/HKu2EX4pAwAw+tt13VEg==
+X-Google-Smtp-Source: AGRyM1uZ+5ixBiV0vC0hqQLKQiXX1rOtpkXgaGdgXMa9Fn6j2NU9ZcMsP7WkerLLpLiWI9rWSafqMw==
+X-Received: by 2002:a05:6a00:1687:b0:518:6c6b:6a9a with SMTP id k7-20020a056a00168700b005186c6b6a9amr4401458pfc.81.1657295835761;
+        Fri, 08 Jul 2022 08:57:15 -0700 (PDT)
+Received: from google.com (123.65.230.35.bc.googleusercontent.com. [35.230.65.123])
+        by smtp.gmail.com with ESMTPSA id s10-20020a170902ea0a00b0016c1efb9195sm2210955plg.298.2022.07.08.08.57.15
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 08 Jul 2022 08:57:15 -0700 (PDT)
+Date:   Fri, 8 Jul 2022 15:57:12 +0000
+From:   Sean Christopherson <seanjc@google.com>
+To:     Yang Weijiang <weijiang.yang@intel.com>
+Cc:     pbonzini@redhat.com, kvm@vger.kernel.org
+Subject: Re: [kvm-unit-tests PATCH v5 3/3] x86: Check platform vPMU
+ capabilities before run lbr tests
+Message-ID: <YshT2I8/lb8oU1a5@google.com>
+References: <20220708051119.124100-1-weijiang.yang@intel.com>
+ <20220708051119.124100-3-weijiang.yang@intel.com>
 MIME-Version: 1.0
-References: <cover.1655761627.git.ashish.kalra@amd.com> <7845d453af6344d0b156493eb4555399aad78615.1655761627.git.ashish.kalra@amd.com>
- <CAMkAt6oGzqoMxN5ws9QZ9P1q5Rah92bb4V2KSYBgi0guMGUKAQ@mail.gmail.com>
- <SN6PR12MB2767CC5405E25A083E76CFFB8EB49@SN6PR12MB2767.namprd12.prod.outlook.com>
- <CAMkAt6pdoMY1yV+kcUzOftD2WKS8sQy-R2b=Aty8wS-gGp-21Q@mail.gmail.com> <SN6PR12MB276787F711EE80D3546431848E839@SN6PR12MB2767.namprd12.prod.outlook.com>
-In-Reply-To: <SN6PR12MB276787F711EE80D3546431848E839@SN6PR12MB2767.namprd12.prod.outlook.com>
-From:   Peter Gonda <pgonda@google.com>
-Date:   Fri, 8 Jul 2022 09:54:24 -0600
-Message-ID: <CAMkAt6oea8CfjupTRBS1CQQogaixNakF1+KjSZ-+bhRBRj3GvQ@mail.gmail.com>
-Subject: Re: [PATCH Part2 v6 35/49] KVM: SVM: Remove the long-lived GHCB host map
-To:     "Kalra, Ashish" <Ashish.Kalra@amd.com>
-Cc:     "the arch/x86 maintainers" <x86@kernel.org>,
-        LKML <linux-kernel@vger.kernel.org>,
-        kvm list <kvm@vger.kernel.org>,
-        "linux-coco@lists.linux.dev" <linux-coco@lists.linux.dev>,
-        "linux-mm@kvack.org" <linux-mm@kvack.org>,
-        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Joerg Roedel <jroedel@suse.de>,
-        "Lendacky, Thomas" <Thomas.Lendacky@amd.com>,
-        "H. Peter Anvin" <hpa@zytor.com>, Ard Biesheuvel <ardb@kernel.org>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Sean Christopherson <seanjc@google.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Jim Mattson <jmattson@google.com>,
-        Andy Lutomirski <luto@kernel.org>,
-        Dave Hansen <dave.hansen@linux.intel.com>,
-        Sergio Lopez <slp@redhat.com>,
-        Peter Zijlstra <peterz@infradead.org>,
-        Srinivas Pandruvada <srinivas.pandruvada@linux.intel.com>,
-        David Rientjes <rientjes@google.com>,
-        Dov Murik <dovmurik@linux.ibm.com>,
-        Tobin Feldman-Fitzthum <tobin@ibm.com>,
-        Borislav Petkov <bp@alien8.de>,
-        "Roth, Michael" <Michael.Roth@amd.com>,
-        Vlastimil Babka <vbabka@suse.cz>,
-        "Kirill A . Shutemov" <kirill@shutemov.name>,
-        Andi Kleen <ak@linux.intel.com>,
-        Tony Luck <tony.luck@intel.com>, Marc Orr <marcorr@google.com>,
-        Sathyanarayanan Kuppuswamy 
-        <sathyanarayanan.kuppuswamy@linux.intel.com>,
-        Alper Gun <alpergun@google.com>,
-        "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
-        "jarkko@kernel.org" <jarkko@kernel.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20220708051119.124100-3-weijiang.yang@intel.com>
 X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
         ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
         T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL
-        autolearn=unavailable autolearn_force=no version=3.4.6
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Jul 7, 2022 at 2:31 PM Kalra, Ashish <Ashish.Kalra@amd.com> wrote:
->
-> [AMD Official Use Only - General]
->
-> Hello Peter,
->
-> >> >There is a perf cost to this suggestion but it might make accessing
-> >> >the GHCB safer for KVM. Have you thought about just using
-> >> >kvm_read_guest() or copy_from_user() to fully copy out the GCHB into =
-a KVM owned buffer, then copying it back before the VMRUN. That way the KVM=
- doesn't need to guard against page_state_changes on the GHCBs, that could =
-be a perf ?>>improvement in a follow up.
-> >>
-> >> Along with the performance costs you mentioned, the main concern here
-> >> will be the GHCB write-back path (copying it back) before VMRUN: this
-> >> will again hit the issue we have currently with
-> >> kvm_write_guest() / copy_to_user(), when we use it to sync the scratch
-> >> buffer back to GHCB. This can fail if guest RAM is mapped using huge-p=
-age(s) and RMP is 4K. Please refer to the patch/fix mentioned below, kvm_wr=
-ite_guest() potentially can fail before VMRUN in case of SNP :
-> >>
-> >> commit 94ed878c2669532ebae8eb9b4503f19aa33cd7aa
-> >> Author: Ashish Kalra <ashish.kalra@amd.com>
-> >> Date:   Mon Jun 6 22:28:01 2022 +0000
-> >>
-> >>     KVM: SVM: Sync the GHCB scratch buffer using already mapped ghcb
-> >>
-> >>    Using kvm_write_guest() to sync the GHCB scratch buffer can fail
-> >>     due to host mapping being 2M, but RMP being 4K. The page fault han=
-dling
-> >>     in do_user_addr_fault() fails to split the 2M page to handle RMP f=
-ault due
-> >>     to it being called here in a non-preemptible context. Instead use
-> >>     the already kernel mapped ghcb to sync the scratch buffer when the
-> >>     scratch buffer is contained within the GHCB.
->
-> >Ah I didn't see that issue thanks for the pointer.
->
-> >The patch description says "When SEV-SNP is enabled the mapped GPA needs=
- to be protected against a page state change." since if the guest were to c=
-onvert the GHCB page to private when the host is using the GHCB the host co=
-uld get an RMP violation right?
->
-> Right.
->
-> >That RMP violation would cause the host to crash unless we use some copy=
-_to_user() type protections.
->
-> As such copy_to_user() will only swallow the RMP violation and return fai=
-lure, so the host can retry the write.
->
-> > I don't see anything mechanism for this patch to add the page state cha=
-nge protection discussed. Can't another vCPU still convert the GHCB to priv=
-ate?
->
-> We do have the protections for GHCB getting mapped to private specificall=
-y, there are new post_{map|unmap}_gfn functions added to verify if it is sa=
-fe to map
-> GHCB pages. There is a PSC spinlock added which protects again page state=
- change for these mapped pages.
-> Below is the reference to this patch:
-> https://lore.kernel.org/lkml/cover.1655761627.git.ashish.kalra@amd.com/T/=
-#mafcaac7296eb9a92c0ea58730dbd3ca47a8e0756
->
-> But do note that there is protection only for GHCB pages and there is a n=
-eed to add generic post_{map,unmap}_gfn() ops that can be used to verify
-> that it's safe to map a given guest page in the hypervisor. This is a TOD=
-O right now and probably this is something which UPM can address more clean=
-ly.
+On Fri, Jul 08, 2022, Yang Weijiang wrote:
+> Use new helper to check whether pmu is available and Perfmon/Debug
+> capbilities are supported before read MSR_IA32_PERF_CAPABILITIES to
+> avoid test failure. The issue can be captured when enable_pmu=0.
+> 
+> Suggested-by: Sean Christopherson <seanjc@google.com>
+> Signed-off-by: Yang Weijiang <weijiang.yang@intel.com>
+> 
+> ---
+> 
+> v5:
+>  Use new helpers to check pmu availability and get pmu version.[Sean]
+> 
+>  lib/x86/processor.h |  1 +
+>  x86/pmu_lbr.c       | 31 ++++++++++++-------------------
 
-Thank you Ashish. I had missed that.
+What about x86/pmu.c?  It has pretty much all the same issues.
 
-Can you help me understand why its OK to use kvm_write_guest() for the
-|snp_certs_data| inside of snp_handle_ext_guest_request() in patch
-42/49? I would have thought we'd have the same 2M vs 4K mapping
-issues.
+> @@ -74,19 +62,24 @@ int main(int ac, char **av)
+>  		return 0;
+>  	}
+>  
+> -	perf_cap = rdmsr(MSR_IA32_PERF_CAPABILITIES);
+> -	eax.full = id.a;
+> -
+> -	if (!eax.split.version_id) {
+> +	if (!cpu_has_pmu()) {
+>  		printf("No pmu is detected!\n");
 
->
-> >I was wrong about the importance of this though seanjc@ walked me throug=
-h how UPM will solve this issue so no worries about this until the series i=
-s rebased on to UPM.
->
-> Thanks,
-> Ashish
+Please opportunistically switch these to report_skip() (and drop the \n), or fix
+them in patch 1 too.  Either way is fine.  And obviously use report_skip() for
+the new PDCM check.
