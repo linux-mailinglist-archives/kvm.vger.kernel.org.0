@@ -2,54 +2,58 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 5369056C55F
-	for <lists+kvm@lfdr.de>; Sat,  9 Jul 2022 02:30:01 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id D906A56C54E
+	for <lists+kvm@lfdr.de>; Sat,  9 Jul 2022 02:29:55 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S239386AbiGHXXN (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 8 Jul 2022 19:23:13 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56250 "EHLO
+        id S237177AbiGHXXO (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 8 Jul 2022 19:23:14 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56268 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S237480AbiGHXXJ (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 8 Jul 2022 19:23:09 -0400
-Received: from mail-pl1-x64a.google.com (mail-pl1-x64a.google.com [IPv6:2607:f8b0:4864:20::64a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 65B2E419B8
-        for <kvm@vger.kernel.org>; Fri,  8 Jul 2022 16:23:08 -0700 (PDT)
-Received: by mail-pl1-x64a.google.com with SMTP id i5-20020a170902c94500b0016a644a6008so39558pla.1
-        for <kvm@vger.kernel.org>; Fri, 08 Jul 2022 16:23:08 -0700 (PDT)
+        with ESMTP id S238896AbiGHXXK (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 8 Jul 2022 19:23:10 -0400
+Received: from mail-pg1-x549.google.com (mail-pg1-x549.google.com [IPv6:2607:f8b0:4864:20::549])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3814B419B8
+        for <kvm@vger.kernel.org>; Fri,  8 Jul 2022 16:23:10 -0700 (PDT)
+Received: by mail-pg1-x549.google.com with SMTP id 189-20020a6309c6000000b0041249d53b04so94211pgj.22
+        for <kvm@vger.kernel.org>; Fri, 08 Jul 2022 16:23:10 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
-        h=reply-to:date:message-id:mime-version:subject:from:to:cc;
-        bh=+6AcP1HWw661Qpr+lBZwEqnetiODARhUxEJKO0pVxWU=;
-        b=j/tiBmyZblQHV+HNo+8wJ4bia1A4rlEbbmJw7VT15wepVlBA4N3bOcEu5H7Sa5994x
-         L0yl+Csc6g1gSFJUeVfxdH9pf4Q4QkPqD17crVXXtT6VyIFLPhUIRF4tV5cfbfkU6wam
-         1JlFyQmvSc9lyOtPpXudz0Zkr7v11SbJJupEeV4n9D4geJC0CEoj7cSGQ3bNEwYLytGp
-         L52TxW867lXpOW5wNg5ZbMqr7Lwc9o3yi0HB9dxcWi5xKC6iGwRYB0OIGEEbKvhhmjsm
-         8ZDo5kSt11btuPU8dH8kPUbsE4W+27qYlWWWi6VvnVEoqoxAX7/BPMj5f3Lyy2FYmRvM
-         W53Q==
+        h=reply-to:date:in-reply-to:message-id:mime-version:references
+         :subject:from:to:cc;
+        bh=GZ1bIqQ5uxtRbXqyYGz3rmRapEwhTBX1fk0bLa5NCD4=;
+        b=PdWMG3dWy27dhMxJ4fqhuUZFohehK7E4Tp3pHRYmschBb1kzWcKfgVOr9q9uY8HpMr
+         FZTDb3sBk3YA8sWIKMgqJIb7XQL2xpao3uxQH5RRErz8f0/WLFlDlmyJ531cNZsvP8cf
+         cKtW279ZBgJh764HrljzXRrRKh12txodwcWkpAjvgNGnL0Y/AG0so6PxtEi8sKA0v/Nd
+         LKey8WhlWjRgmFVApbD09U0wTObR3BoarmZvXRl1PTjT13+xqWUSjiFjBFhcumLLri7/
+         W8/33NGK2hLPO0wFT9ux9crf6/r0Kg8EthpSsCNrcDbYNU90gDBXwUYe6r2i2dy8HcZF
+         SzlQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:reply-to:date:message-id:mime-version:subject
-         :from:to:cc;
-        bh=+6AcP1HWw661Qpr+lBZwEqnetiODARhUxEJKO0pVxWU=;
-        b=S/rqmNaNdgR0HjoPpfjUa8WUGdUpBbRavQbeB+H0COz0EKHZNjBPpsczLXIfAdHs3M
-         WtCrpOtDfnZDj+z68d5N9ugN3D0zUI4UvZr83wGYhelDiqKThgSBB0en5HROJ0dl89iD
-         nEJhZgxrOsTBT1NpWWe17EmrwVmIsTT1AiuJ8BT/QXLGNCujHQuBpPJq5KeJtijmSeKU
-         bVSb2Yl4Y+qdPrLWi8mru/r/VHfHZ2v9DmzkYEn0nIgMUIgRhlm6ahJ7loK8C8H2Hrgy
-         +rxTKNdr2lEbGaHV6ZdEJ0tM5YKGlAK3oR3lEoGxpVoYWNw2sYB7sdfB25Rw9Plw3Rzt
-         HGJQ==
-X-Gm-Message-State: AJIora8k/Uqn+x8X9GNa6C8VspBZCes8UxHOC9HUbECem3TG0OiKy+nd
-        KiAI3VdKvhWyPOqJ0X3hasxWTqAVWS2t
-X-Google-Smtp-Source: AGRyM1sMnSAK5x1LioJXvUOqDZwyZnrYbj/8VTx9+GqrlJTmSFDKn1x7xTu9SL5jVQzzY+TCHZA1W8+Brf/3
+        h=x-gm-message-state:reply-to:date:in-reply-to:message-id
+         :mime-version:references:subject:from:to:cc;
+        bh=GZ1bIqQ5uxtRbXqyYGz3rmRapEwhTBX1fk0bLa5NCD4=;
+        b=Yl3v1cGd/ZxuxX47tkAQ3wDkgsmIYXOVcnDOFcBHhGx3/X4WYA79Zhe37GbZlWiZaw
+         YuuAajzrY0QDqZamYeG7mFlY+V+VMiCliGQbw3jo5MIqyGwA9imMIAuzYqOxCxarTK/0
+         lmWMKF3wBkJ2QCUdSsjQU//mrVoiRzho4cDREQlTupGmQbd34pZvNRxz7WYwTiDAGQE+
+         KHXEfR9qfH0koD9WCYSHDLDYuUCL+c1mMxWRBQJQONQqbV/0vINNvR6/Ic36SuSrHi4p
+         sSxsSbDRIg+paVtfkC4GphzZtAqIIZJNjhYOgC+538fIhMA6nCIyRc/OvfkZi+YCIktQ
+         diUw==
+X-Gm-Message-State: AJIora/+7cNOdAWYQNLdYgeiAKkfh8Nu+oCF5DcpgXmat7b05qL0yg1B
+        5zHwjgNDYibn+gb/0mduJovA6xuxsYAz
+X-Google-Smtp-Source: AGRyM1ujHh+SJnjS2KWyxXlc9BTRfZQ8ci3eKldrE8Ql4k3uN5KiObZLfq6wc5hjwI48Mcooms476LvUC13T
 X-Received: from mizhang-super.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:1071])
- (user=mizhang job=sendgmr) by 2002:a63:ea05:0:b0:411:f94f:b80f with SMTP id
- c5-20020a63ea05000000b00411f94fb80fmr5116719pgi.189.1657322587944; Fri, 08
- Jul 2022 16:23:07 -0700 (PDT)
+ (user=mizhang job=sendgmr) by 2002:a05:6a00:ac7:b0:528:7acb:e445 with SMTP id
+ c7-20020a056a000ac700b005287acbe445mr6314370pfl.14.1657322589790; Fri, 08 Jul
+ 2022 16:23:09 -0700 (PDT)
 Reply-To: Mingwei Zhang <mizhang@google.com>
-Date:   Fri,  8 Jul 2022 23:23:02 +0000
-Message-Id: <20220708232304.1001099-1-mizhang@google.com>
+Date:   Fri,  8 Jul 2022 23:23:03 +0000
+In-Reply-To: <20220708232304.1001099-1-mizhang@google.com>
+Message-Id: <20220708232304.1001099-2-mizhang@google.com>
 Mime-Version: 1.0
+References: <20220708232304.1001099-1-mizhang@google.com>
 X-Mailer: git-send-email 2.37.0.144.g8ac04bfd2-goog
-Subject: [PATCH 0/2] Extend KVM trace_kvm_nested_vmrun() to support VMX
+Subject: [PATCH 1/2] KVM: nested/x86: update trace_kvm_nested_vmrun() to
+ suppot VMX
 From:   Mingwei Zhang <mizhang@google.com>
 To:     Paolo Bonzini <pbonzini@redhat.com>
 Cc:     Sean Christopherson <seanjc@google.com>,
@@ -70,24 +74,101 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-This patch set update trace_kvm_nested_vmrun() to support VMX:
- - Change the print of EPT/NPT enabled boolean to print of nested
-   EPT/NPT address in the trace;
- - Add a caller from vmx/nested.c.
- - Fix some minor format fixes from the callsites and Update the trace
-   output naming according to the x86 vendor.
+Update trace_kvm_nested_vmrun() to support VMX by adding a new field 'isa';
+update the output to print out VMX/SVM related naming respectively,
+eg., vmcb vs. vmcs; npt vs. ept.
 
-David Matlack (1):
-  kvm: nVMX: add tracepoint for kvm:kvm_nested_vmrun
+In addition, print nested EPT/NPT address instead of the 1bit of nested
+ept/npt on/off. This should convey more information in the trace. When
+nested ept/npt is not used, simply print "0x0" so that we don't lose any
+information.
 
-Mingwei Zhang (1):
-  KVM: nested/x86: update trace_kvm_nested_vmrun() to suppot VMX
+Opportunistically update the call site of trace_kvm_nested_vmrun() to make
+one line per parameter.
 
- arch/x86/kvm/svm/nested.c |  4 +++-
- arch/x86/kvm/trace.h      | 19 +++++++++++++------
- arch/x86/kvm/vmx/nested.c |  9 +++++++++
- 3 files changed, 25 insertions(+), 7 deletions(-)
+Signed-off-by: Mingwei Zhang <mizhang@google.com>
+---
+ arch/x86/kvm/svm/nested.c |  7 +++++--
+ arch/x86/kvm/trace.h      | 29 ++++++++++++++++++++---------
+ 2 files changed, 25 insertions(+), 11 deletions(-)
 
+diff --git a/arch/x86/kvm/svm/nested.c b/arch/x86/kvm/svm/nested.c
+index ba7cd26f438f..8581164b6808 100644
+--- a/arch/x86/kvm/svm/nested.c
++++ b/arch/x86/kvm/svm/nested.c
+@@ -724,11 +724,14 @@ int enter_svm_guest_mode(struct kvm_vcpu *vcpu, u64 vmcb12_gpa,
+ 	struct vcpu_svm *svm = to_svm(vcpu);
+ 	int ret;
+ 
+-	trace_kvm_nested_vmrun(svm->vmcb->save.rip, vmcb12_gpa,
++	trace_kvm_nested_vmrun(svm->vmcb->save.rip,
++			       vmcb12_gpa,
+ 			       vmcb12->save.rip,
+ 			       vmcb12->control.int_ctl,
+ 			       vmcb12->control.event_inj,
+-			       vmcb12->control.nested_ctl);
++			       vmcb12->control.nested_ctl,
++			       vmcb12->control.nested_cr3,
++			       KVM_ISA_SVM);
+ 
+ 	trace_kvm_nested_intercepts(vmcb12->control.intercepts[INTERCEPT_CR] & 0xffff,
+ 				    vmcb12->control.intercepts[INTERCEPT_CR] >> 16,
+diff --git a/arch/x86/kvm/trace.h b/arch/x86/kvm/trace.h
+index de4762517569..aac4c8bd2c3a 100644
+--- a/arch/x86/kvm/trace.h
++++ b/arch/x86/kvm/trace.h
+@@ -580,8 +580,10 @@ TRACE_EVENT(kvm_pv_eoi,
+  */
+ TRACE_EVENT(kvm_nested_vmrun,
+ 	    TP_PROTO(__u64 rip, __u64 vmcb, __u64 nested_rip, __u32 int_ctl,
+-		     __u32 event_inj, bool npt),
+-	    TP_ARGS(rip, vmcb, nested_rip, int_ctl, event_inj, npt),
++		     __u32 event_inj, bool npt_enabled, __u64 npt_addr,
++		     __u32 isa),
++	    TP_ARGS(rip, vmcb, nested_rip, int_ctl, event_inj, npt_enabled,
++		    npt_addr, isa),
+ 
+ 	TP_STRUCT__entry(
+ 		__field(	__u64,		rip		)
+@@ -589,7 +591,9 @@ TRACE_EVENT(kvm_nested_vmrun,
+ 		__field(	__u64,		nested_rip	)
+ 		__field(	__u32,		int_ctl		)
+ 		__field(	__u32,		event_inj	)
+-		__field(	bool,		npt		)
++		__field(	bool,		npt_enabled	)
++		__field(	__u64,		npt_addr	)
++		__field(	__u32,		isa		)
+ 	),
+ 
+ 	TP_fast_assign(
+@@ -598,14 +602,21 @@ TRACE_EVENT(kvm_nested_vmrun,
+ 		__entry->nested_rip	= nested_rip;
+ 		__entry->int_ctl	= int_ctl;
+ 		__entry->event_inj	= event_inj;
+-		__entry->npt		= npt;
++		__entry->npt_enabled	= npt_enabled;
++		__entry->npt_addr	= npt_addr;
++		__entry->isa		= isa;
+ 	),
+ 
+-	TP_printk("rip: 0x%016llx vmcb: 0x%016llx nrip: 0x%016llx int_ctl: 0x%08x "
+-		  "event_inj: 0x%08x npt: %s",
+-		__entry->rip, __entry->vmcb, __entry->nested_rip,
+-		__entry->int_ctl, __entry->event_inj,
+-		__entry->npt ? "on" : "off")
++	TP_printk("rip: 0x%016llx %s: 0x%016llx nested rip: 0x%016llx "
++		  "int_ctl: 0x%08x event_inj: 0x%08x nested %s: 0x%016llx",
++		__entry->rip,
++		__entry->isa == KVM_ISA_VMX ? "vmcs" : "vmcb",
++		__entry->vmcb,
++		__entry->nested_rip,
++		__entry->int_ctl,
++		__entry->event_inj,
++		__entry->isa == KVM_ISA_VMX ? "ept" : "npt",
++		__entry->npt_enabled ? __entry->npt_addr : 0x0)
+ );
+ 
+ TRACE_EVENT(kvm_nested_intercepts,
 -- 
 2.37.0.144.g8ac04bfd2-goog
 
