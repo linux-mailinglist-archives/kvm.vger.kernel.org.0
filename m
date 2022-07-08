@@ -2,59 +2,57 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 9F3AD56C470
-	for <lists+kvm@lfdr.de>; Sat,  9 Jul 2022 01:15:48 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 3F3DE56C33C
+	for <lists+kvm@lfdr.de>; Sat,  9 Jul 2022 01:14:12 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238855AbiGHXEE (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 8 Jul 2022 19:04:04 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44966 "EHLO
+        id S239049AbiGHXEP (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 8 Jul 2022 19:04:15 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45156 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S237520AbiGHXED (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 8 Jul 2022 19:04:03 -0400
-Received: from mail-vs1-xe2c.google.com (mail-vs1-xe2c.google.com [IPv6:2607:f8b0:4864:20::e2c])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5A11F37199
-        for <kvm@vger.kernel.org>; Fri,  8 Jul 2022 16:04:02 -0700 (PDT)
-Received: by mail-vs1-xe2c.google.com with SMTP id d187so22526022vsd.10
-        for <kvm@vger.kernel.org>; Fri, 08 Jul 2022 16:04:02 -0700 (PDT)
+        with ESMTP id S237520AbiGHXEO (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 8 Jul 2022 19:04:14 -0400
+Received: from mail-vs1-xe31.google.com (mail-vs1-xe31.google.com [IPv6:2607:f8b0:4864:20::e31])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A2D273139F
+        for <kvm@vger.kernel.org>; Fri,  8 Jul 2022 16:04:13 -0700 (PDT)
+Received: by mail-vs1-xe31.google.com with SMTP id o13so16954vsn.4
+        for <kvm@vger.kernel.org>; Fri, 08 Jul 2022 16:04:13 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
         h=mime-version:references:in-reply-to:from:date:message-id:subject:to
          :cc;
-        bh=Ibwq3Y6+sPRoptrmKqieJnTu1vXCJ5pC3WFZxR8P4fc=;
-        b=YMpy6sOl3ytCXl2B/aO/fumKNEVDOQAI7CayXg9owawzYUSnSFrtJLGhHG56wJrPpS
-         f5yoFkz8x/HPg/eRbpT5XpdJAc/lXyo/Ox3AKmb9Lfr5mryc2EEch0WIEa6y/+Ke7DcJ
-         26+4uHRQWgwXzsW2Ky1Phy9vVZ+paF1bOaSMeBQmC+WqzBHL/1XvK+yGifTKcrs277fa
-         mlBLj1afSCRcaoyuubo9AK64p9uQG8BX1M3OgbPKhHBEpoqXVxoUxDdEvQiFlIaHDfy0
-         LqNRWFZtaZrwiQkwkQpJEQvK44ofFBkqcurQB2Dlzj7TmRN9NGn1crcMzG5HR7FUOGrr
-         r8FQ==
+        bh=fmbyHH+uaaf4PYgNAAvPhBsKLgcv7KBCVLIB8moDOnc=;
+        b=ow8tZcCIFqJ/sbss3pnexex/9tbTMWYJtYo2+PPY5JmeMo+fbCL6clLQ5SUQOHT7lR
+         +V9JMIa/zGJlDcz4sxUDOIhQ3pbyhJBrBP8KrLDM7iIpgB6Hw10hvS56z07TYd71xtbj
+         WiLR4bdFzU2kGgvsOdQ87DsW9ZuhrC2PYDd09KSrT9TdBPUV1HeaW6+++rbwT7ARL9DT
+         ZMYXRLBN5v0ATN0eMVGUdsXhO9RiDO4vmjSGNwD2WcqGNGnZ3DyRD/DkcwRCAkXv98CA
+         Rx7+uyuzV/+ZOHvQfwRu9Ob1t4/ganFwit0NVmjA1PQKfykIJOZn5zUHjx8dgosaLLLc
+         +yWw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:mime-version:references:in-reply-to:from:date
          :message-id:subject:to:cc;
-        bh=Ibwq3Y6+sPRoptrmKqieJnTu1vXCJ5pC3WFZxR8P4fc=;
-        b=3i8xgyqtD/3cDmCkyCCYf3Jv1fkWNdSa82V/tkefn+Jis4IhN9I5Xy1Qw+EMeZniRd
-         pomo3LHwYJenFTXcwK++UEVbk32AV2TSL0mN0CpmArjBaYtEqFEdUWUntJHIpKxToXzj
-         C5wLRnSrZdLzJBFB4bkSLtX1Pt/WYzB6ZWbrph+ag46wD5CsgCV65C9JD2IXhVA1amCc
-         W/KT9id8/9Rw2pvu1KZVPlwYO1+lzerCCgSU69AwMs5PKF6/xNvkRVTaGn6ngJ+5XmoG
-         sGfvV1Ylcerc2yflUjCrtfwAZh9EroTTkMDkKVmCBK4IJyOt4Udq8coO1DDsHV4sWQbk
-         vhTg==
-X-Gm-Message-State: AJIora8BhI6fyHa0Fm9oVbGdM1U96kzsgl5scEJM/h7C6TRXUQb/L1Ew
-        gmf6XGW4kBu+8OdF9Y+pKgQyh7RnVRQfYcaUuJIVsw==
-X-Google-Smtp-Source: AGRyM1vqMri5C1ekPowbg9IeMKeeCd9tRHDLqJm13jwa2sIBw+XNbLJxjDNVf4Zepb23k6RDA1242bwlMleI+QL/LXQ=
-X-Received: by 2002:a67:c002:0:b0:354:43c2:9245 with SMTP id
- v2-20020a67c002000000b0035443c29245mr2516535vsi.35.1657321440459; Fri, 08 Jul
- 2022 16:04:00 -0700 (PDT)
+        bh=fmbyHH+uaaf4PYgNAAvPhBsKLgcv7KBCVLIB8moDOnc=;
+        b=ogikB3KQsVtheBCQ/S3yd7XhuoYyiGmfWw3pTePxLtru+Ih+tQTzAyih9kOZMaN5Bt
+         rrIzAPjlDe1N+huA00QRS/yx4sdB+dSa1X+xwD/pktmLRD7hfa6qN74L+eIsi9Wwpfgp
+         RAO9wqDQPqTRXR9iO/RtHpHrYL/clNqSyxVrcX/9VlDVcHOfSgXJrVXaA3ehRuBBBfdk
+         SGHfx8YXuFZ7K2rDl8PMy5Wv2+dWb5exW/TDja3+7ns3GMJi0qTSdcCbeI/JFBFMK1X0
+         5IkpSZCxoF2/7ZpHflVY7H5KhuCjwc+jFPvaufs/mok81Ummh4DyFiWe87ma9pm9K6D5
+         X79w==
+X-Gm-Message-State: AJIora/v+zfLdCpYGki/5TV9SSlYeUKRx7LKo8+ahsJn55LnW8wzVRGZ
+        K/HIyARH+o7MF/QVlxXkg0vnT+dK+iR8ClHt/yeO9A==
+X-Google-Smtp-Source: AGRyM1tVOuLFpQdcMS9R3QNxMS8qL41pbX8NfOtsi479WHEb/YvXkQZIjnDxNp4LH2C43RprM+7+OtGtN648GAosnRM=
+X-Received: by 2002:a67:d71e:0:b0:357:3543:be5b with SMTP id
+ p30-20020a67d71e000000b003573543be5bmr2692860vsj.13.1657321452555; Fri, 08
+ Jul 2022 16:04:12 -0700 (PDT)
 MIME-Version: 1.0
-References: <20220706145957.32156-1-juew@google.com> <20220706145957.32156-2-juew@google.com>
- <Ysi2yH+PJZe+i5DT@google.com>
-In-Reply-To: <Ysi2yH+PJZe+i5DT@google.com>
+References: <20220706145957.32156-1-juew@google.com> <Ysi1/pldBpdtUt8y@google.com>
+In-Reply-To: <Ysi1/pldBpdtUt8y@google.com>
 From:   Jue Wang <juew@google.com>
-Date:   Fri, 8 Jul 2022 16:03:49 -0700
-Message-ID: <CAPcxDJ69geB4J4hLOwnjMh__3xr2J7-zfq_i=w7gRhexXoWaCQ@mail.gmail.com>
-Subject: Re: [PATCH v2 2/2] KVM: x86: Fix access to vcpu->arch.apic when the
- irqchip is not in kernel
-To:     Sean Christopherson <seanjc@google.com>,
-        Jue Wang <wangjue.smth@gmail.com>
+Date:   Fri, 8 Jul 2022 16:04:01 -0700
+Message-ID: <CAPcxDJ7AH_ko9A=PH=19yOE8=7=CzHQ5tSrN-O9yCUppuBEznQ@mail.gmail.com>
+Subject: Re: [PATCH v2 1/2] KVM: x86: Initialize nr_lvt_entries to a proper
+ default value
+To:     Sean Christopherson <seanjc@google.com>
 Cc:     Paolo Bonzini <pbonzini@redhat.com>,
         Jim Mattson <jmattson@google.com>,
         Xiaoyao Li <xiaoyao.li@intel.com>,
@@ -81,123 +79,78 @@ Thanks Sean.
 
 +cc another email to stay in the loop.
 
-On Fri, Jul 8, 2022 at 3:59 PM Sean Christopherson <seanjc@google.com> wrote:
+On Fri, Jul 8, 2022 at 3:56 PM Sean Christopherson <seanjc@google.com> wrote:
 >
 > On Wed, Jul 06, 2022, Jue Wang wrote:
-> > Fix an access to vcpu->arch.apic when KVM_X86_SETUP_MCE is called
-> > without KVM_CREATE_IRQCHIP called or KVM_CAP_SPLIT_IRQCHIP is
-> > enabled.
-> >
-> > Reported-by: https://syzkaller.appspot.com/bug?id=10b9b238e087a6c9bef2cc48bee2375f58fabbfc
+> > Set the default value of nr_lvt_entries to KVM_APIC_MAX_NR_LVT_ENTRIES-1
+> > to address the cases when KVM_X86_SETUP_MCE is not called.
 > >
 > > Fixes: 4b903561ec49 ("KVM: x86: Add Corrected Machine Check Interrupt (CMCI) emulation to lapic.")
 > > Signed-off-by: Jue Wang <juew@google.com>
 > > ---
-> >  arch/x86/kvm/x86.c | 5 +++--
-> >  1 file changed, 3 insertions(+), 2 deletions(-)
+> >  arch/x86/kvm/lapic.c | 1 +
+> >  1 file changed, 1 insertion(+)
 > >
-> > diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-> > index 4322a1365f74..5913f90ec3f2 100644
-> > --- a/arch/x86/kvm/x86.c
-> > +++ b/arch/x86/kvm/x86.c
-> > @@ -4820,8 +4820,9 @@ static int kvm_vcpu_ioctl_x86_setup_mce(struct kvm_vcpu *vcpu,
-> >               if (mcg_cap & MCG_CMCI_P)
-> >                       vcpu->arch.mci_ctl2_banks[bank] = 0;
-> >       }
-> > -     vcpu->arch.apic->nr_lvt_entries =
-> > -             KVM_APIC_MAX_NR_LVT_ENTRIES - !(mcg_cap & MCG_CMCI_P);
-> > +     if (lapic_in_kernel(vcpu))
-> > +             vcpu->arch.apic->nr_lvt_entries =
-> > +                     KVM_APIC_MAX_NR_LVT_ENTRIES - !(mcg_cap & MCG_CMCI_P);
+> > diff --git a/arch/x86/kvm/lapic.c b/arch/x86/kvm/lapic.c
+> > index 8537b66cc646..257366b8e3ae 100644
+> > --- a/arch/x86/kvm/lapic.c
+> > +++ b/arch/x86/kvm/lapic.c
+> > @@ -2524,6 +2524,7 @@ int kvm_create_lapic(struct kvm_vcpu *vcpu, int timer_advance_ns)
+> >
+> >       vcpu->arch.apic = apic;
+> >
+> > +     apic->nr_lvt_entries = KVM_APIC_MAX_NR_LVT_ENTRIES - 1;
 >
-> This is incomplete.  If there's a "new" LVT entry, then it needs to be initialized
-> (masked), and the APIC version needs to be updated to reflect the up-to-date number
-> of LVT entries.
->
-> This is what I came up with, again compile tested only, will formally post next
-> week.
+> This works, but I don't love the subtle math nor the reliance on mcg_cap.MCG_CMCI_P
+> being clear by default.  I'll properly post the below patch next week (compile tested
+> only at this point).
 >
 > From: Sean Christopherson <seanjc@google.com>
-> Date: Fri, 8 Jul 2022 15:48:10 -0700
-> Subject: [PATCH] KVM: x86: Fix handling of APIC LVT updates when userspace
->  changes MCG_CAP
+> Date: Fri, 8 Jul 2022 15:38:51 -0700
+> Subject: [PATCH] KVM: x86: Initialize number of APIC LVT entries during APIC
+>  creation
 >
-> Add a helper to update KVM's in-kernel local APIC in response to MCG_CAP
-> being changed by userspace to fix multiple bugs.  First and foremost,
-> KVM needs to check that there's an in-kernel APIC prior to dereferencing
-> vcpu->arch.apic.  Beyond that, any "new" LVT entries need to be masked,
-> and the APIC version register needs to be updated as it reports out the
-> number of LVT entries.
+> Initialize the number of LVT entries during APIC creation, else the field
+> will be incorrectly left '0' if userspace never invokes KVM_X86_SETUP_MCE.
+>
+> Add and use a helper to calculate the number of entries even though
+> MCG_CMCI_P is not set by default in vcpu->arch.mcg_cap.  Relying on that
+> to always be true is unnecessarily risky, and subtle/confusing as well.
 >
 > Fixes: 4b903561ec49 ("KVM: x86: Add Corrected Machine Check Interrupt (CMCI) emulation to lapic.")
-> Reported-by: syzbot+8cdad6430c24f396f158@syzkaller.appspotmail.com
-> Cc: Siddh Raman Pant <code@siddh.me>
+> Reported-by: Xiaoyao Li <xiaoyao.li@intel.com>
 > Cc: Jue Wang <juew@google.com>
 > Signed-off-by: Sean Christopherson <seanjc@google.com>
 > ---
->  arch/x86/kvm/lapic.c | 19 +++++++++++++++++++
->  arch/x86/kvm/lapic.h |  1 +
->  arch/x86/kvm/x86.c   |  4 ++--
->  3 files changed, 22 insertions(+), 2 deletions(-)
+>  arch/x86/kvm/lapic.c | 7 +++++++
+>  1 file changed, 7 insertions(+)
 >
 > diff --git a/arch/x86/kvm/lapic.c b/arch/x86/kvm/lapic.c
-> index 1540d01ecb67..50354c7a2dc1 100644
+> index 6ff17d5a2ae3..1540d01ecb67 100644
 > --- a/arch/x86/kvm/lapic.c
 > +++ b/arch/x86/kvm/lapic.c
-> @@ -433,6 +433,25 @@ void kvm_apic_set_version(struct kvm_vcpu *vcpu)
->         kvm_lapic_set_reg(apic, APIC_LVR, v);
+> @@ -405,6 +405,11 @@ static inline bool kvm_lapic_lvt_supported(struct kvm_lapic *apic, int lvt_index
+>         return apic->nr_lvt_entries > lvt_index;
 >  }
 >
-> +void kvm_apic_after_set_mcg_cap(struct kvm_vcpu *vcpu)
+> +static inline int kvm_apic_calc_nr_lvt_entries(struct kvm_vcpu *vcpu)
 > +{
-> +       int nr_lvt_entries = kvm_apic_calc_nr_lvt_entries(vcpu);
-> +       struct kvm_lapic *apic = vcpu->arch.apic;
-> +       int i;
-> +
-> +       if (!lapic_in_kernel(vcpu) || nr_lvt_entries == apic->nr_lvt_entries)
-> +               return;
-> +
-> +       /* Initialize/mask any "new" LVT entries. */
-> +       for (i = apic->nr_lvt_entries; i < nr_lvt_entries; i++)
-> +               kvm_lapic_set_reg(apic, APIC_LVTx(i), APIC_LVT_MASKED);
-> +
-> +       apic->nr_lvt_entries = nr_lvt_entries;
-> +
-> +       /* The number of LVT entries is reflected in the version register. */
-> +       kvm_apic_set_version(vcpu);
+> +       return KVM_APIC_MAX_NR_LVT_ENTRIES - !(vcpu->arch.mcg_cap & MCG_CMCI_P);
 > +}
 > +
->  static const unsigned int apic_lvt_mask[KVM_APIC_MAX_NR_LVT_ENTRIES] = {
->         [LVT_TIMER] = LVT_MASK,      /* timer mode mask added at runtime */
->         [LVT_THERMAL_MONITOR] = LVT_MASK | APIC_MODE_MASK,
-> diff --git a/arch/x86/kvm/lapic.h b/arch/x86/kvm/lapic.h
-> index 762bf6163798..117a46df5cc1 100644
-> --- a/arch/x86/kvm/lapic.h
-> +++ b/arch/x86/kvm/lapic.h
-> @@ -99,6 +99,7 @@ void kvm_lapic_set_base(struct kvm_vcpu *vcpu, u64 value);
->  u64 kvm_lapic_get_base(struct kvm_vcpu *vcpu);
->  void kvm_recalculate_apic_map(struct kvm *kvm);
->  void kvm_apic_set_version(struct kvm_vcpu *vcpu);
-> +void kvm_apic_after_set_mcg_cap(struct kvm_vcpu *vcpu);
->  bool kvm_apic_match_dest(struct kvm_vcpu *vcpu, struct kvm_lapic *source,
->                            int shorthand, unsigned int dest, int dest_mode);
->  int kvm_apic_compare_prio(struct kvm_vcpu *vcpu1, struct kvm_vcpu *vcpu2);
-> diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-> index fb37d11dec2d..801c3cfd3db5 100644
-> --- a/arch/x86/kvm/x86.c
-> +++ b/arch/x86/kvm/x86.c
-> @@ -4893,8 +4893,8 @@ static int kvm_vcpu_ioctl_x86_setup_mce(struct kvm_vcpu *vcpu,
->                 if (mcg_cap & MCG_CMCI_P)
->                         vcpu->arch.mci_ctl2_banks[bank] = 0;
+>  void kvm_apic_set_version(struct kvm_vcpu *vcpu)
+>  {
+>         struct kvm_lapic *apic = vcpu->arch.apic;
+> @@ -2561,6 +2566,8 @@ int kvm_create_lapic(struct kvm_vcpu *vcpu, int timer_advance_ns)
 >         }
-> -       vcpu->arch.apic->nr_lvt_entries =
-> -               KVM_APIC_MAX_NR_LVT_ENTRIES - !(mcg_cap & MCG_CMCI_P);
+>         apic->vcpu = vcpu;
+>
+> +       apic->nr_lvt_entries = kvm_apic_calc_nr_lvt_entries(vcpu);
 > +
-> +       kvm_apic_after_set_mcg_cap(vcpu);
+>         hrtimer_init(&apic->lapic_timer.timer, CLOCK_MONOTONIC,
+>                      HRTIMER_MODE_ABS_HARD);
+>         apic->lapic_timer.timer.function = apic_timer_fn;
 >
->         static_call(kvm_x86_setup_mce)(vcpu);
->  out:
->
-> base-commit: 03d84f96890662681feee129cf92491f49247d28
+> base-commit: 4a627b0b162b9495f3646caa6edb0e0f97d8f2de
 > --
 >
