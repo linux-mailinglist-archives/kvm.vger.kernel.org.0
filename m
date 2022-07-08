@@ -2,143 +2,202 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id F3FF956B72D
-	for <lists+kvm@lfdr.de>; Fri,  8 Jul 2022 12:22:36 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 8575756B73A
+	for <lists+kvm@lfdr.de>; Fri,  8 Jul 2022 12:25:44 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237887AbiGHKUE (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 8 Jul 2022 06:20:04 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34738 "EHLO
+        id S237443AbiGHKZg (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 8 Jul 2022 06:25:36 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38372 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S237238AbiGHKUA (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 8 Jul 2022 06:20:00 -0400
-Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A060717A81;
-        Fri,  8 Jul 2022 03:19:59 -0700 (PDT)
-Received: from pps.filterd (m0187473.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.17.1.5/8.17.1.5) with ESMTP id 2688xWGs008172;
-        Fri, 8 Jul 2022 10:19:59 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
- mime-version : subject : to : cc : references : from : in-reply-to :
- content-type : content-transfer-encoding; s=pp1;
- bh=bW9JBEzsOEDxvb2JZ3DBwyir+3Nbs7sDSYJpTSxvyAQ=;
- b=LQIP1LqptsbkCtp3QmR5oJdtXpAIFJ/5YefTBkeytay/ktDC+nNyYPxychIdyaA2cHBY
- 9SdFoAVDX0Eb9XM48dOsXC0e5xWchw6Vs90267mfL1i0APFTIN9ARfxyt2YWnIaG8ZDe
- S3ItXT+kqXU50OE91A5T71T8y/C0XRdBeysjXW3NNyr46xDxLjmxCzsc/xLFtYw5CAdo
- NXcsZjv8SXlMF82PSpxOnhbpYdZWqjocLFOryUPGD9l7qc5k5tEFF8YFRg7Qg/fPKeTs
- JCAVnImw1DU4zuho4vH6evxl0hHvk/15zrCrL7+pBQl/PONFuj3qynem0iUr8ApT2AjB 3g== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3h6hbya60s-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Fri, 08 Jul 2022 10:19:59 +0000
-Received: from m0187473.ppops.net (m0187473.ppops.net [127.0.0.1])
-        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 268A3uFh028627;
-        Fri, 8 Jul 2022 10:19:58 GMT
-Received: from ppma03fra.de.ibm.com (6b.4a.5195.ip4.static.sl-reverse.com [149.81.74.107])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3h6hbya601-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Fri, 08 Jul 2022 10:19:58 +0000
-Received: from pps.filterd (ppma03fra.de.ibm.com [127.0.0.1])
-        by ppma03fra.de.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 268A6diu001154;
-        Fri, 8 Jul 2022 10:19:56 GMT
-Received: from b06cxnps4074.portsmouth.uk.ibm.com (d06relay11.portsmouth.uk.ibm.com [9.149.109.196])
-        by ppma03fra.de.ibm.com with ESMTP id 3h4v8qjtnn-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Fri, 08 Jul 2022 10:19:56 +0000
-Received: from d06av21.portsmouth.uk.ibm.com (d06av21.portsmouth.uk.ibm.com [9.149.105.232])
-        by b06cxnps4074.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 268AJqcq17236318
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Fri, 8 Jul 2022 10:19:52 GMT
-Received: from d06av21.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 3A88A5204F;
-        Fri,  8 Jul 2022 10:19:52 +0000 (GMT)
-Received: from [9.145.3.110] (unknown [9.145.3.110])
-        by d06av21.portsmouth.uk.ibm.com (Postfix) with ESMTP id DB2E85204E;
-        Fri,  8 Jul 2022 10:19:51 +0000 (GMT)
-Message-ID: <a92806fd-ea5e-b3ab-5045-746932dedd36@linux.ibm.com>
-Date:   Fri, 8 Jul 2022 12:19:51 +0200
+        with ESMTP id S236895AbiGHKZe (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 8 Jul 2022 06:25:34 -0400
+Received: from mga03.intel.com (mga03.intel.com [134.134.136.65])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 670A322BFB;
+        Fri,  8 Jul 2022 03:25:33 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1657275933; x=1688811933;
+  h=message-id:subject:from:to:cc:date:in-reply-to:
+   references:content-transfer-encoding:mime-version;
+  bh=Q+E4LoDet/Mx5+pBeJs1uVYlUAFyEaQJKSz+LHQc2b4=;
+  b=Z2D4Vle85WLNIJK3rtEYxeiMnqVuuezFYHveHVjXyXbUNaWg4Ir5nkJ3
+   6Bt7/wg/zBvP/rGUHTL049+eDbTk0ywjjgX5rzsiQStjmUtdGb4xQiY9M
+   BLujtJ76dsOR9xEnFQtaANSvlbZ68G14Tw3v0E6j/uAJLmgQjc9jYPkOM
+   okAhVh1+dK5CzrZXM5jQEgsF9K2iL+tiriKWwA2jd5ADiv48AE/xmVvaq
+   3ldqYoh9YhvX7UZmBDLx63wrL1iaIhFpcmX0pV15bEyhACx5q4/Db+Mcy
+   0MVwDa0Lvo71d41Xo85fcNRIBHVz7C7J0XlZRB9tv7YHd0lsja9xaIqT6
+   g==;
+X-IronPort-AV: E=McAfee;i="6400,9594,10401"; a="285378336"
+X-IronPort-AV: E=Sophos;i="5.92,255,1650956400"; 
+   d="scan'208";a="285378336"
+Received: from orsmga001.jf.intel.com ([10.7.209.18])
+  by orsmga103.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 08 Jul 2022 03:25:09 -0700
+X-IronPort-AV: E=Sophos;i="5.92,255,1650956400"; 
+   d="scan'208";a="626664222"
+Received: from pantones-mobl1.amr.corp.intel.com (HELO khuang2-desk.gar.corp.intel.com) ([10.212.54.208])
+  by orsmga001-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 08 Jul 2022 03:25:07 -0700
+Message-ID: <5085857e16cdb133803ee3edf3b1e8b776b2a7b1.camel@intel.com>
+Subject: Re: [PATCH v7 050/102] KVM: VMX: Split out guts of EPT violation to
+ common/exposed function
+From:   Kai Huang <kai.huang@intel.com>
+To:     isaku.yamahata@intel.com, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+Cc:     isaku.yamahata@gmail.com, Paolo Bonzini <pbonzini@redhat.com>,
+        Sean Christopherson <sean.j.christopherson@intel.com>
+Date:   Fri, 08 Jul 2022 22:25:05 +1200
+In-Reply-To: <5202bef37eb1d9683891f29ccba182bbdceafca4.1656366338.git.isaku.yamahata@intel.com>
+References: <cover.1656366337.git.isaku.yamahata@intel.com>
+         <5202bef37eb1d9683891f29ccba182bbdceafca4.1656366338.git.isaku.yamahata@intel.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+User-Agent: Evolution 3.44.2 (3.44.2-1.fc36) 
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.8.0
-Subject: Re: [kvm-unit-tests PATCH v2 8/8] s390x: uv-host: Fix init storage
- origin and length check
-Content-Language: en-US
-To:     Janosch Frank <frankja@linux.ibm.com>,
-        kvm390 mailing list 
-        <kvm390-list@tuxmaker.boeblingen.de.ibm.com>
-Cc:     kvm@vger.kernel.org, linux-s390@vger.kernel.org,
-        imbrenda@linux.ibm.com, thuth@redhat.com, nrb@linux.ibm.com,
-        scgl@linux.ibm.com
-References: <20220706064024.16573-1-frankja@linux.ibm.com>
- <20220706064024.16573-9-frankja@linux.ibm.com>
-From:   Steffen Eiden <seiden@linux.ibm.com>
-Organization: IBM
-In-Reply-To: <20220706064024.16573-9-frankja@linux.ibm.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-ORIG-GUID: eAnnRqXm8Go88j7lVbrXh5sCFtcOhilo
-X-Proofpoint-GUID: yTy_CEti0oI99S9Xz5TJTSFQxz8hQmqf
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.205,Aquarius:18.0.883,Hydra:6.0.517,FMLib:17.11.122.1
- definitions=2022-07-08_08,2022-06-28_01,2022-06-22_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 suspectscore=0 spamscore=0
- clxscore=1015 priorityscore=1501 adultscore=0 phishscore=0 malwarescore=0
- bulkscore=0 impostorscore=0 mlxscore=0 lowpriorityscore=0 mlxlogscore=999
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2206140000
- definitions=main-2207080036
-X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,
-        SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no
-        version=3.4.6
+X-Spam-Status: No, score=-5.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
+        SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-
-
-On 7/6/22 08:40, Janosch Frank wrote:
-> The origin and length are masked with the HPAGE_MASK and PAGE_MASK
-> respectively so adding a few bytes doesn't matter at all.
-> 
-> Signed-off-by: Janosch Frank <frankja@linux.ibm.com>
-Reviewed-by: Steffen Eiden <seiden@linux.ibm.com>
+On Mon, 2022-06-27 at 14:53 -0700, isaku.yamahata@intel.com wrote:
+> From: Sean Christopherson <sean.j.christopherson@intel.com>
+>=20
+> The difference of TDX EPT violation is how to retrieve information, GPA,
+> and exit qualification.  To share the code to handle EPT violation, split
+> out the guts of EPT violation handler so that VMX/TDX exit handler can ca=
+ll
+> it after retrieving GPA and exit qualification.
+>=20
+> Signed-off-by: Sean Christopherson <sean.j.christopherson@intel.com>
+> Signed-off-by: Isaku Yamahata <isaku.yamahata@intel.com>
+> Reviewed-by: Paolo Bonzini <pbonzini@redhat.com>
 > ---
->   s390x/uv-host.c | 19 ++++++++++++-------
->   1 file changed, 12 insertions(+), 7 deletions(-)
-> 
-> diff --git a/s390x/uv-host.c b/s390x/uv-host.c
-> index 1ed8ded1..b1412a20 100644
-> --- a/s390x/uv-host.c
-> +++ b/s390x/uv-host.c
-> @@ -516,17 +516,22 @@ static void test_init(void)
->   	       "storage invalid length");
->   	uvcb_init.stor_len += 8;
->   
-> -	uvcb_init.stor_origin =  get_max_ram_size() + 8;
-> +	/* Storage origin is 1MB aligned, the length is 4KB aligned */
-> +	uvcb_init.stor_origin = get_max_ram_size();
->   	rc = uv_call(0, (uint64_t)&uvcb_init);
-> -	report(rc == 1 && uvcb_init.header.rc == 0x104,
-> +	report(rc == 1 && (uvcb_init.header.rc == 0x104 || uvcb_init.header.rc == 0x105),
->   	       "storage origin invalid");
->   	uvcb_init.stor_origin = mem;
->   
-> -	uvcb_init.stor_origin = get_max_ram_size() - 8;
-> -	rc = uv_call(0, (uint64_t)&uvcb_init);
-> -	report(rc == 1 && uvcb_init.header.rc == 0x105,
-> -	       "storage + length invalid");
-> -	uvcb_init.stor_origin = mem;
-> +	if (uvcb_init.stor_len >= HPAGE_SIZE) {
-> +		uvcb_init.stor_origin = get_max_ram_size() - HPAGE_SIZE;
-> +		rc = uv_call(0, (uint64_t)&uvcb_init);
-> +		report(rc == 1 && uvcb_init.header.rc == 0x105,
-> +		       "storage + length invalid");
-> +		uvcb_init.stor_origin = mem;
-> +	} else {
-> +		report_skip("storage + length invalid, stor_len < HPAGE_SIZE");
-> +	}
->   
->   	uvcb_init.stor_origin = 1UL << 30;
->   	rc = uv_call(0, (uint64_t)&uvcb_init);
+>  arch/x86/kvm/vmx/common.h | 33 +++++++++++++++++++++++++++++++++
+>  arch/x86/kvm/vmx/vmx.c    | 32 ++++++--------------------------
+>  2 files changed, 39 insertions(+), 26 deletions(-)
+>  create mode 100644 arch/x86/kvm/vmx/common.h
+>=20
+> diff --git a/arch/x86/kvm/vmx/common.h b/arch/x86/kvm/vmx/common.h
+> new file mode 100644
+> index 000000000000..235908f3e044
+> --- /dev/null
+> +++ b/arch/x86/kvm/vmx/common.h
+> @@ -0,0 +1,33 @@
+> +/* SPDX-License-Identifier: GPL-2.0-only */
+> +#ifndef __KVM_X86_VMX_COMMON_H
+> +#define __KVM_X86_VMX_COMMON_H
+> +
+> +#include <linux/kvm_host.h>
+> +
+> +#include "mmu.h"
+> +
+> +static inline int __vmx_handle_ept_violation(struct kvm_vcpu *vcpu, gpa_=
+t gpa,
+> +					     unsigned long exit_qualification)
+> +{
+> +	u64 error_code;
+> +
+> +	/* Is it a read fault? */
+> +	error_code =3D (exit_qualification & EPT_VIOLATION_ACC_READ)
+> +		     ? PFERR_USER_MASK : 0;
+> +	/* Is it a write fault? */
+> +	error_code |=3D (exit_qualification & EPT_VIOLATION_ACC_WRITE)
+> +		      ? PFERR_WRITE_MASK : 0;
+> +	/* Is it a fetch fault? */
+> +	error_code |=3D (exit_qualification & EPT_VIOLATION_ACC_INSTR)
+> +		      ? PFERR_FETCH_MASK : 0;
+> +	/* ept page table entry is present? */
+> +	error_code |=3D (exit_qualification & EPT_VIOLATION_RWX_MASK)
+> +		      ? PFERR_PRESENT_MASK : 0;
+> +
+> +	error_code |=3D (exit_qualification & EPT_VIOLATION_GVA_TRANSLATED) !=
+=3D 0 ?
+> +	       PFERR_GUEST_FINAL_MASK : PFERR_GUEST_PAGE_MASK;
+> +
+> +	return kvm_mmu_page_fault(vcpu, gpa, error_code, NULL, 0);
+> +}
+> +
+> +#endif /* __KVM_X86_VMX_COMMON_H */
+> diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
+> index e3d304b14df0..2f1dc06aec3c 100644
+> --- a/arch/x86/kvm/vmx/vmx.c
+> +++ b/arch/x86/kvm/vmx/vmx.c
+> @@ -50,6 +50,7 @@
+>  #include <asm/vmx.h>
+> =20
+>  #include "capabilities.h"
+> +#include "common.h"
+>  #include "cpuid.h"
+>  #include "evmcs.h"
+>  #include "hyperv.h"
+> @@ -5578,11 +5579,10 @@ static int handle_task_switch(struct kvm_vcpu *vc=
+pu)
+> =20
+>  static int handle_ept_violation(struct kvm_vcpu *vcpu)
+>  {
+> -	unsigned long exit_qualification;
+> -	gpa_t gpa;
+> -	u64 error_code;
+> +	unsigned long exit_qualification =3D vmx_get_exit_qual(vcpu);
+> +	gpa_t gpa =3D vmcs_read64(GUEST_PHYSICAL_ADDRESS);
+> =20
+> -	exit_qualification =3D vmx_get_exit_qual(vcpu);
+> +	trace_kvm_page_fault(gpa, exit_qualification);
+> =20
+>  	/*
+>  	 * EPT violation happened while executing iret from NMI,
+> @@ -5591,29 +5591,9 @@ static int handle_ept_violation(struct kvm_vcpu *v=
+cpu)
+>  	 * AAK134, BY25.
+>  	 */
+>  	if (!(to_vmx(vcpu)->idt_vectoring_info & VECTORING_INFO_VALID_MASK) &&
+> -			enable_vnmi &&
+> -			(exit_qualification & INTR_INFO_UNBLOCK_NMI))
+> +	    enable_vnmi && (exit_qualification & INTR_INFO_UNBLOCK_NMI))
+
+Why this code change?
+
+With this removed:
+
+Reviewed-by: Kai Huang <kai.huang@intel.com>
+
+>  		vmcs_set_bits(GUEST_INTERRUPTIBILITY_INFO, GUEST_INTR_STATE_NMI);
+> =20
+> -	gpa =3D vmcs_read64(GUEST_PHYSICAL_ADDRESS);
+> -	trace_kvm_page_fault(gpa, exit_qualification);
+> -
+> -	/* Is it a read fault? */
+> -	error_code =3D (exit_qualification & EPT_VIOLATION_ACC_READ)
+> -		     ? PFERR_USER_MASK : 0;
+> -	/* Is it a write fault? */
+> -	error_code |=3D (exit_qualification & EPT_VIOLATION_ACC_WRITE)
+> -		      ? PFERR_WRITE_MASK : 0;
+> -	/* Is it a fetch fault? */
+> -	error_code |=3D (exit_qualification & EPT_VIOLATION_ACC_INSTR)
+> -		      ? PFERR_FETCH_MASK : 0;
+> -	/* ept page table entry is present? */
+> -	error_code |=3D (exit_qualification & EPT_VIOLATION_RWX_MASK)
+> -		      ? PFERR_PRESENT_MASK : 0;
+> -
+> -	error_code |=3D (exit_qualification & EPT_VIOLATION_GVA_TRANSLATED) !=
+=3D 0 ?
+> -	       PFERR_GUEST_FINAL_MASK : PFERR_GUEST_PAGE_MASK;
+> -
+>  	vcpu->arch.exit_qualification =3D exit_qualification;
+> =20
+>  	/*
+> @@ -5627,7 +5607,7 @@ static int handle_ept_violation(struct kvm_vcpu *vc=
+pu)
+>  	if (unlikely(allow_smaller_maxphyaddr && kvm_vcpu_is_illegal_gpa(vcpu, =
+gpa)))
+>  		return kvm_emulate_instruction(vcpu, 0);
+> =20
+> -	return kvm_mmu_page_fault(vcpu, gpa, error_code, NULL, 0);
+> +	return __vmx_handle_ept_violation(vcpu, gpa, exit_qualification);
+>  }
+> =20
+>  static int handle_ept_misconfig(struct kvm_vcpu *vcpu)
+
