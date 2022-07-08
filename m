@@ -2,62 +2,58 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id B68D456AFB2
-	for <lists+kvm@lfdr.de>; Fri,  8 Jul 2022 03:07:23 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id BD80456AFEC
+	for <lists+kvm@lfdr.de>; Fri,  8 Jul 2022 03:52:54 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236692AbiGHBAK (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 7 Jul 2022 21:00:10 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59094 "EHLO
+        id S237000AbiGHBeb (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 7 Jul 2022 21:34:31 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48970 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S236054AbiGHBAJ (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 7 Jul 2022 21:00:09 -0400
-Received: from baidu.com (mx20.baidu.com [111.202.115.85])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 82F11183A3;
-        Thu,  7 Jul 2022 18:00:08 -0700 (PDT)
-Received: from BC-Mail-Ex18.internal.baidu.com (unknown [172.31.51.12])
-        by Forcepoint Email with ESMTPS id CBCCE2E67E316B519FAF;
-        Fri,  8 Jul 2022 09:00:05 +0800 (CST)
-Received: from BC-Mail-Ex25.internal.baidu.com (172.31.51.19) by
- BC-Mail-Ex18.internal.baidu.com (172.31.51.12) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id
- 15.1.2308.20; Fri, 8 Jul 2022 09:00:07 +0800
-Received: from BC-Mail-Ex25.internal.baidu.com ([172.31.51.19]) by
- BC-Mail-Ex25.internal.baidu.com ([172.31.51.19]) with mapi id 15.01.2308.020;
- Fri, 8 Jul 2022 09:00:07 +0800
-From:   "Wang,Guangju" <wangguangju@baidu.com>
-To:     Sean Christopherson <seanjc@google.com>
-CC:     "pbonzini@redhat.com" <pbonzini@redhat.com>,
-        "vkuznets@redhat.com" <vkuznets@redhat.com>,
-        "jmattson@google.com" <jmattson@google.com>,
-        "wanpengli@tencent.com" <wanpengli@tencent.com>,
-        "bp@alien8.de" <bp@alien8.de>, "joro@8bytes.org" <joro@8bytes.org>,
-        "suravee.suthikulpanit@amd.com" <suravee.suthikulpanit@amd.com>,
-        "hpa@zytor.com" <hpa@zytor.com>,
-        "tglx@linutronix.de" <tglx@linutronix.de>,
-        "mingo@redhat.com" <mingo@redhat.com>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "Chu,Kaiping" <chukaiping@baidu.com>
-Subject: =?gb2312?B?tPC4tDogW1BBVENIXSBLVk06IHg4NjogQWRkIEVPSV9JTkRVQ0VEIGV4aXQg?=
- =?gb2312?Q?handlers_for_Hyper-V_SynIC_vectors?=
-Thread-Topic: [PATCH] KVM: x86: Add EOI_INDUCED exit handlers for Hyper-V
- SynIC vectors
-Thread-Index: AQHYkf0ndxqgj4EsMEqsgQUTLQABEa1ylY4AgAESAGA=
-Date:   Fri, 8 Jul 2022 01:00:07 +0000
-Message-ID: <4068ff4962154900a6a3535454f4706e@baidu.com>
-References: <20220707122854.87-1-wangguangju@baidu.com>
- <YscLvipHbNx+Wy9y@google.com>
-In-Reply-To: <YscLvipHbNx+Wy9y@google.com>
-Accept-Language: zh-CN, en-US
-Content-Language: zh-CN
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-x-originating-ip: [172.22.192.211]
-Content-Type: text/plain; charset="gb2312"
-Content-Transfer-Encoding: base64
+        with ESMTP id S236978AbiGHBea (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 7 Jul 2022 21:34:30 -0400
+Received: from mga07.intel.com (mga07.intel.com [134.134.136.100])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D6EF572EEE;
+        Thu,  7 Jul 2022 18:34:29 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1657244069; x=1688780069;
+  h=message-id:subject:from:to:cc:date:in-reply-to:
+   references:content-transfer-encoding:mime-version;
+  bh=Q0hvsnX7RVkuwvneu2Zqjjl/dVg/+ONMLULG1th9+jg=;
+  b=EgI9kvdaA3IoRAGFuuZs8MS/41LkwidzKmT1DEfS+maBU2vTpjPFUMOq
+   tEVQytJI7r+4uobRu5yxjG1OJU4A94qLB0LbsuA97DEbKWG5L75mRIm+8
+   aFFxtRpBzKtny5Tna1sswjIn3nvaURkl2qEuV1PUSeGY6ww/EKbRtzR1p
+   zNnS3nJ/xYXIw3EEP6Z0Kd8mcNl/rVsFrd56T8JliaeC9bfKUEUBSE+5L
+   Y34YYjx7I356dgt5jE2UZ3Hpr3BYkDw/UfTd/Oa7/6mVdVzp70HWUTy8a
+   Aw42fA0qGuP69DT/kBiyytPVBGTj7Xw5MgR1RvuyIYl4rZYucSpBxmWlS
+   Q==;
+X-IronPort-AV: E=McAfee;i="6400,9594,10401"; a="348146469"
+X-IronPort-AV: E=Sophos;i="5.92,254,1650956400"; 
+   d="scan'208";a="348146469"
+Received: from fmsmga005.fm.intel.com ([10.253.24.32])
+  by orsmga105.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 07 Jul 2022 18:34:29 -0700
+X-IronPort-AV: E=Sophos;i="5.92,254,1650956400"; 
+   d="scan'208";a="920816315"
+Received: from pantones-mobl1.amr.corp.intel.com (HELO khuang2-desk.gar.corp.intel.com) ([10.212.54.208])
+  by fmsmga005-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 07 Jul 2022 18:34:23 -0700
+Message-ID: <7f27a51961d212c17933b39ea0b5b884c2939ff9.camel@intel.com>
+Subject: Re: [PATCH v7 101/102] Documentation/virtual/kvm: Document on Trust
+ Domain Extensions(TDX)
+From:   Kai Huang <kai.huang@intel.com>
+To:     isaku.yamahata@intel.com, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+Cc:     isaku.yamahata@gmail.com, Paolo Bonzini <pbonzini@redhat.com>
+Date:   Fri, 08 Jul 2022 13:34:20 +1200
+In-Reply-To: <9e54fa1ac03df3cd2fb7a2e64d3cffc35d4f097e.1656366338.git.isaku.yamahata@intel.com>
+References: <cover.1656366337.git.isaku.yamahata@intel.com>
+         <9e54fa1ac03df3cd2fb7a2e64d3cffc35d4f097e.1656366338.git.isaku.yamahata@intel.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+User-Agent: Evolution 3.44.2 (3.44.2-1.fc36) 
 MIME-Version: 1.0
-X-Spam-Status: No, score=-2.6 required=5.0 tests=BAYES_00,RCVD_IN_DNSWL_LOW,
-        SPF_HELO_PASS,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
+X-Spam-Status: No, score=-5.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
+        SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -65,13 +61,42 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-PiBSYXRoZXIgdGhhbiBhZGQgYSB0aGlyZCBoZWxwZXIsIHdoYXQgYWJvdXQgcmVuYW1pbmcga3Zt
-X2FwaWNfc2V0X2VvaV9hY2NlbGVyYXRlZCgpIGFuZCBoYXZpbmcgdGhlIG5vbi1hY2NlbGVyYXRl
-ZCBoZWxwZXIgY2FsbCB0aGUgImFjY2xlcmF0ZWQiIHZlcnNpb24/ICBUaGF0IHdpbGwgZG9jdW1l
-bnQgdGhlIGRlbHRhIGJldHdlZW4gdGhlIG5vbi1hY2NlbGVyYXRlZCBwYXRjaCBhbmQgdGhlIGFj
-Y2VsZXJhdGVkIHBhdGguDQo+IFRoZSBvbmx5IGhpY2N1cCBpcyB0cmFjaW5nLCBidXQgdGhhdCdz
-IGVhc3kgdG8gcmVzb2x2ZSAob3Igd2UgY291bGQganVzdCBub3QgdHJhY2UgaWYgdGhlcmUncyBu
-byB2YWxpZCB2ZWN0b3IgdG8gRU9JKSwgZS5nLg0KDQpZZWFoLCByZW5hbWUgdGhlIGZ1bmN0aW9u
-IGFuZCBpbnRlZ3JhdGUgdHdvIHBhdGhzIGxvb2tzIGNsZWFyZXIgYW5kIGVhc2llciB0byB1bmRl
-cnN0YW5kPw0KVGhhbmtzIFNlYW4gZm9yIHRoZSBzdWdnZXN0aW9uLCBJIHdpbGwgc2VuZCBhIG5l
-dyBwYXRjaCB3aXRoIGEgbmV3IHN1YmplY3QgYW5kIGNoYW5nZWxvZy4NCg0KLS0NCldhbmcNCg0K
+
+> +
+> +- Wrapping kvm x86_ops: The current choice
+> +  Introduce dedicated file for arch/x86/kvm/vmx/main.c (the name,
+> +  main.c, is just chosen to show main entry points for callbacks.) and
+> +  wrapper functions around all the callbacks with
+> +  "if (is-tdx) tdx-callback() else vmx-callback()".
+> +
+> +  Pros:
+> +  - No major change in common x86 KVM code. The change is (mostly)
+> +    contained under arch/x86/kvm/vmx/.
+> +  - When TDX is disabled(CONFIG_INTEL_TDX_HOST=3Dn), the overhead is
+> +    optimized out.
+> +  - Micro optimization by avoiding function pointer.
+> +  Cons:
+> +  - Many boiler plates in arch/x86/kvm/vmx/main.c.
+> +
+> +Alternative:
+> +- Introduce another callback layer under arch/x86/kvm/vmx.
+> +  Pros:
+> +  - No major change in common x86 KVM code. The change is (mostly)
+> +    contained under arch/x86/kvm/vmx/.
+> +  - clear separation on callbacks.
+> +  Cons:
+> +  - overhead in VMX even when TDX is disabled(CONFIG_INTEL_TDX_HOST=3Dn)=
+.
+> +
+
+Why putting "Alternative" in the documentation?  You may put it to the cove=
+r
+letter so people can judge whether the design is reasonable, but it should =
+not
+be in the documentation.
+
+--=20
+Thanks,
+-Kai
+
+
