@@ -2,210 +2,204 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id E5A8956B8A5
-	for <lists+kvm@lfdr.de>; Fri,  8 Jul 2022 13:35:36 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 7956556B8AE
+	for <lists+kvm@lfdr.de>; Fri,  8 Jul 2022 13:39:46 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237964AbiGHLdn (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 8 Jul 2022 07:33:43 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59886 "EHLO
+        id S237813AbiGHLjm (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 8 Jul 2022 07:39:42 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36210 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S237568AbiGHLdl (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 8 Jul 2022 07:33:41 -0400
-Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 60FBD13E83;
-        Fri,  8 Jul 2022 04:33:39 -0700 (PDT)
-Received: from pps.filterd (m0098404.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.17.1.5/8.17.1.5) with ESMTP id 268AhpgP003069;
-        Fri, 8 Jul 2022 11:33:37 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
- mime-version : subject : to : cc : references : from : in-reply-to :
- content-type : content-transfer-encoding; s=pp1;
- bh=7xrOGjIsWAEbDM49IOKliT1dOZH/keObOYt2wLlK0qA=;
- b=lgIy1DXzsv9XlaV49r6vIDkrbcCTa8rwbkcshFDm/DFh9dmsEtSfOrfwX/mw5MeComim
- JMnrHubTwR5O3oCddXwwV6XkCOoEit3JbXvlRhVP9b+oIQGbsLflNV1QfsqEHtJTYMLn
- rZi6wQMefNafk8EnDnWajx4Ie3fLayCPBvUO6umQnij6bKRpRbwGpnfJqXDlbM4+sBkF
- MdjVYQbdFZUliusvtXLQKYxSfHH1XNwidUdDjdcEbVGSi9oFAIykadmdoqfgtsbPGsn8
- p0xKpxzMqOpmDB1GEjxM6ezwt2h6b+9+tVWjE3gnG4uAoZIy+3bRD3xXGRduJ4A3gobX pw== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3h6k36h357-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Fri, 08 Jul 2022 11:33:36 +0000
-Received: from m0098404.ppops.net (m0098404.ppops.net [127.0.0.1])
-        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 268AkiXe018085;
-        Fri, 8 Jul 2022 11:33:36 GMT
-Received: from ppma05fra.de.ibm.com (6c.4a.5195.ip4.static.sl-reverse.com [149.81.74.108])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3h6k36h34e-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Fri, 08 Jul 2022 11:33:36 +0000
-Received: from pps.filterd (ppma05fra.de.ibm.com [127.0.0.1])
-        by ppma05fra.de.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 268BL1cW024404;
-        Fri, 8 Jul 2022 11:33:33 GMT
-Received: from b06avi18878370.portsmouth.uk.ibm.com (b06avi18878370.portsmouth.uk.ibm.com [9.149.26.194])
-        by ppma05fra.de.ibm.com with ESMTP id 3h4uk9aw5q-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Fri, 08 Jul 2022 11:33:33 +0000
-Received: from d06av22.portsmouth.uk.ibm.com (d06av22.portsmouth.uk.ibm.com [9.149.105.58])
-        by b06avi18878370.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 268BXdUk28377420
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Fri, 8 Jul 2022 11:33:39 GMT
-Received: from d06av22.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 063694C04A;
-        Fri,  8 Jul 2022 11:33:30 +0000 (GMT)
-Received: from d06av22.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id F0CDB4C040;
-        Fri,  8 Jul 2022 11:33:28 +0000 (GMT)
-Received: from [9.171.9.15] (unknown [9.171.9.15])
-        by d06av22.portsmouth.uk.ibm.com (Postfix) with ESMTP;
-        Fri,  8 Jul 2022 11:33:28 +0000 (GMT)
-Message-ID: <aa48903f-1354-6cca-4a52-86c073d3071d@linux.ibm.com>
-Date:   Fri, 8 Jul 2022 13:33:28 +0200
+        with ESMTP id S237765AbiGHLjj (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 8 Jul 2022 07:39:39 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id B3648248E0
+        for <kvm@vger.kernel.org>; Fri,  8 Jul 2022 04:39:37 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1657280376;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=yNVgEcpzM+/vCThcvSnZLW7eVIEstg9RdMdX8L07Sh8=;
+        b=YTPEHZGGnO9dcMmYG5IGYZ4xkHktHPx3+BhYSpkrfwG6cW8JPHtPI3QeYhJdAN/Q1PyEgG
+        QqVULC9nFp5FRnBdvMJCkKCJoKxVQ0s8aoDI4pETvygFt55O4A3LK2fzl7Qgym/Cj849j/
+        dy9XqP3dJYENWTKE+B4dYeeKWr1/8ag=
+Received: from mail-qk1-f197.google.com (mail-qk1-f197.google.com
+ [209.85.222.197]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-526-oYsj8hJONWKSABa0B0E8ow-1; Fri, 08 Jul 2022 07:39:22 -0400
+X-MC-Unique: oYsj8hJONWKSABa0B0E8ow-1
+Received: by mail-qk1-f197.google.com with SMTP id bs42-20020a05620a472a00b006b550b57229so4691763qkb.15
+        for <kvm@vger.kernel.org>; Fri, 08 Jul 2022 04:39:22 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc:content-transfer-encoding;
+        bh=yNVgEcpzM+/vCThcvSnZLW7eVIEstg9RdMdX8L07Sh8=;
+        b=IrTaHdC0xu3BbNphr8YSmkDKG3+vuUbCEi3A9Mz2eihzOp6MrX11OFHM6XtlMZgRzZ
+         MoHjfsY7AMC0CoViHFYRtwGaNdPCl4NEzxelr68pfurGo3X7x6jg/Lec9nkkesb7m5bT
+         q3Gvply9J+NTGtzJgWmmI7I9vn4HeJfjiniyNL9SayvqVrxLFyNQ7td/Iv099Ncl832H
+         mhXt50JHlkRizlsItEtEQQbYjtTT/NC3P+YGImacs7YZYWZDWqyy78nX6LGmMDdNHqZm
+         EO74m9itVQUU3UhG88a5HN4LuZC8h6eaRBT8noee08/J8ggUaXq37CynfOTZCJd0cbym
+         j10w==
+X-Gm-Message-State: AJIora+1FPhrGNYWxGsxqny926fFdsG3do5blA4DJ3qPqowXJxLu2HFd
+        tl7nCPoNnWdNMoy8xiZ/uftzDK6Rd6X+gx+erPLolW637um4wz5Xf5NjyeWaYYoS96ybJCXJJKW
+        HXC2YKj0WGYRZxVywRRT46WAEnY9W
+X-Received: by 2002:ac8:5b51:0:b0:317:3513:cf60 with SMTP id n17-20020ac85b51000000b003173513cf60mr2417324qtw.495.1657280362062;
+        Fri, 08 Jul 2022 04:39:22 -0700 (PDT)
+X-Google-Smtp-Source: AGRyM1soiGPuYi6lPEQoes6ARy4+/8RPHSCSMZr4aOnahYYSe/CRsKbh0ARoAmkh8O+3KdBJ8y9F4eA5swcgFXLLDQ8=
+X-Received: by 2002:ac8:5b51:0:b0:317:3513:cf60 with SMTP id
+ n17-20020ac85b51000000b003173513cf60mr2417280qtw.495.1657280361792; Fri, 08
+ Jul 2022 04:39:21 -0700 (PDT)
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.10.0
-Subject: Re: [PATCH v9 00/21] KVM: s390: enable zPCI for interpretive
- execution
-Content-Language: en-US
-To:     Matthew Rosato <mjrosato@linux.ibm.com>,
-        linux-s390@vger.kernel.org, alex.williamson@redhat.com,
-        pbonzini@redhat.com, hca@linux.ibm.com, gor@linux.ibm.com
-Cc:     cohuck@redhat.com, schnelle@linux.ibm.com, farman@linux.ibm.com,
-        pmorel@linux.ibm.com, gerald.schaefer@linux.ibm.com,
-        agordeev@linux.ibm.com, svens@linux.ibm.com, frankja@linux.ibm.com,
-        david@redhat.com, imbrenda@linux.ibm.com, vneethv@linux.ibm.com,
-        oberpar@linux.ibm.com, freude@linux.ibm.com, thuth@redhat.com,
-        pasic@linux.ibm.com, corbet@lwn.net, jgg@nvidia.com,
-        kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
-        linux-doc@vger.kernel.org
-References: <20220606203325.110625-1-mjrosato@linux.ibm.com>
-From:   Christian Borntraeger <borntraeger@linux.ibm.com>
-In-Reply-To: <20220606203325.110625-1-mjrosato@linux.ibm.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: Z-nYG6kolGfyHIgz53xS4AXPTi2GZbpd
-X-Proofpoint-ORIG-GUID: CrcPjwB1UDjtQA3cAPI_RM46Rsj7S50E
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.205,Aquarius:18.0.883,Hydra:6.0.517,FMLib:17.11.122.1
- definitions=2022-07-08_08,2022-07-08_01,2022-06-22_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501
- bulkscore=0 phishscore=0 mlxlogscore=999 spamscore=0 suspectscore=0
- malwarescore=0 mlxscore=0 adultscore=0 lowpriorityscore=0 impostorscore=0
- clxscore=1015 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2206140000 definitions=main-2207080042
-X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,
-        SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no
-        version=3.4.6
+References: <20220623160738.632852-1-eperezma@redhat.com> <20220623160738.632852-3-eperezma@redhat.com>
+ <20220628134340.5fla7surd34bwnq3@sgarzare-redhat>
+In-Reply-To: <20220628134340.5fla7surd34bwnq3@sgarzare-redhat>
+From:   Eugenio Perez Martin <eperezma@redhat.com>
+Date:   Fri, 8 Jul 2022 13:38:45 +0200
+Message-ID: <CAJaqyWd8yNdfGEDJ3Zesruh_Q0_9u_j80pad-FUA=oK=mvnLGQ@mail.gmail.com>
+Subject: Re: [PATCH v6 2/4] vhost-vdpa: introduce SUSPEND backend feature bit
+To:     Stefano Garzarella <sgarzare@redhat.com>
+Cc:     netdev <netdev@vger.kernel.org>, Jason Wang <jasowang@redhat.com>,
+        linux-kernel <linux-kernel@vger.kernel.org>,
+        virtualization <virtualization@lists.linux-foundation.org>,
+        kvm list <kvm@vger.kernel.org>,
+        "Michael S. Tsirkin" <mst@redhat.com>,
+        Parav Pandit <parav@nvidia.com>,
+        Christophe JAILLET <christophe.jaillet@wanadoo.fr>,
+        Cindy Lu <lulu@redhat.com>,
+        "Kamde, Tanuj" <tanuj.kamde@amd.com>,
+        Si-Wei Liu <si-wei.liu@oracle.com>,
+        "Uminski, Piotr" <Piotr.Uminski@intel.com>,
+        habetsm.xilinx@gmail.com, "Dawar, Gautam" <gautam.dawar@amd.com>,
+        Pablo Cascon Katchadourian <pabloc@xilinx.com>,
+        Zhu Lingshan <lingshan.zhu@intel.com>,
+        Laurent Vivier <lvivier@redhat.com>,
+        Longpeng <longpeng2@huawei.com>,
+        Dinan Gunawardena <dinang@xilinx.com>,
+        Martin Petrus Hubertus Habets <martinh@xilinx.com>,
+        Martin Porter <martinpo@xilinx.com>,
+        Eli Cohen <elic@nvidia.com>, ecree.xilinx@gmail.com,
+        Wu Zongyong <wuzongyong@linux.alibaba.com>,
+        Dan Carpenter <dan.carpenter@oracle.com>,
+        Harpreet Singh Anand <hanand@xilinx.com>,
+        Xie Yongji <xieyongji@bytedance.com>,
+        Zhang Min <zhang.min9@zte.com.cn>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Spam-Status: No, score=-2.8 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=unavailable
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+On Tue, Jun 28, 2022 at 3:43 PM Stefano Garzarella <sgarzare@redhat.com> wr=
+ote:
+>
+> On Thu, Jun 23, 2022 at 06:07:36PM +0200, Eugenio P=C3=A9rez wrote:
+> >Userland knows if it can suspend the device or not by checking this feat=
+ure
+> >bit.
+> >
+> >It's only offered if the vdpa driver backend implements the suspend()
+> >operation callback, and to offer it or userland to ack it if the backend
+> >does not offer that callback is an error.
+>
+> Should we document in the previous patch that the callback must be
+> implemented only if the drive/device support it?
+>
 
-Am 06.06.22 um 22:33 schrieb Matthew Rosato:
-> Enable interpretive execution of zPCI instructions + adapter interruption
-> forwarding for s390x KVM vfio-pci.  This is done by triggering a routine
-> when the VFIO group is associated with the KVM guest, transmitting to
-> firmware a special token (GISA designation) to enable that specific guest
-> for interpretive execution on that zPCI device.  Load/store interpreation
-> enablement is then controlled by userspace (based upon whether or not a
-> SHM bit is placed in the virtual function handle).  Adapter Event
-> Notification interpretation is controlled from userspace via a new KVM
-> ioctl.
-> 
-> By allowing intepretation of zPCI instructions and firmware delivery of
-> interrupts to guests, we can reduce the frequency of guest SIE exits for
-> zPCI.
-> 
->  From the perspective of guest configuration, you passthrough zPCI devices
-> in the same manner as before, with intepretation support being used by
-> default if available in kernel+qemu.
-> 
-> Will follow up with a link the most recent QEMU series.
-> 
-> Changelog v8->v9:
-> - Rebase on top of 5.19-rc1, adjust ioctl and capability defines
-> - s/kzdev = 0/kzdev = NULL/ (Alex)
-> - rename vfio_pci_zdev_open to vfio_pci_zdev_open_device (Jason)
-> - rename vfio_pci_zdev_release to vfio_pci_zdev_close_device (Jason)
-> - make vfio_pci_zdev_close_device return void, instead WARN_ON or ignore
->    errors in lower level function (kvm_s390_pci_unregister_kvm) (Jason)
-> - remove notifier accidentally left in struct zpci_dev + associated
->    include statment (Jason)
-> - Remove patch 'KVM: s390: introduce CPU feature for zPCI Interpretation'
->    based on discussion in QEMU thread.
-> 
-> Matthew Rosato (21):
->    s390/sclp: detect the zPCI load/store interpretation facility
->    s390/sclp: detect the AISII facility
->    s390/sclp: detect the AENI facility
->    s390/sclp: detect the AISI facility
->    s390/airq: pass more TPI info to airq handlers
->    s390/airq: allow for airq structure that uses an input vector
->    s390/pci: externalize the SIC operation controls and routine
->    s390/pci: stash associated GISA designation
->    s390/pci: stash dtsm and maxstbl
->    vfio/pci: introduce CONFIG_VFIO_PCI_ZDEV_KVM
->    KVM: s390: pci: add basic kvm_zdev structure
->    KVM: s390: pci: do initial setup for AEN interpretation
->    KVM: s390: pci: enable host forwarding of Adapter Event Notifications
->    KVM: s390: mechanism to enable guest zPCI Interpretation
->    KVM: s390: pci: provide routines for enabling/disabling interrupt
->      forwarding
->    KVM: s390: pci: add routines to start/stop interpretive execution
->    vfio-pci/zdev: add open/close device hooks
->    vfio-pci/zdev: add function handle to clp base capability
->    vfio-pci/zdev: different maxstbl for interpreted devices
->    KVM: s390: add KVM_S390_ZPCI_OP to manage guest zPCI devices
->    MAINTAINERS: additional files related kvm s390 pci passthrough
-> 
->   Documentation/virt/kvm/api.rst   |  47 +++
->   MAINTAINERS                      |   1 +
->   arch/s390/include/asm/airq.h     |   7 +-
->   arch/s390/include/asm/kvm_host.h |  23 ++
->   arch/s390/include/asm/pci.h      |  11 +
->   arch/s390/include/asm/pci_clp.h  |   9 +-
->   arch/s390/include/asm/pci_insn.h |  29 +-
->   arch/s390/include/asm/sclp.h     |   4 +
->   arch/s390/include/asm/tpi.h      |  13 +
->   arch/s390/kvm/Makefile           |   1 +
->   arch/s390/kvm/interrupt.c        |  96 ++++-
->   arch/s390/kvm/kvm-s390.c         |  83 +++-
->   arch/s390/kvm/kvm-s390.h         |  10 +
->   arch/s390/kvm/pci.c              | 690 +++++++++++++++++++++++++++++++
->   arch/s390/kvm/pci.h              |  88 ++++
->   arch/s390/pci/pci.c              |  16 +
->   arch/s390/pci/pci_clp.c          |   7 +
->   arch/s390/pci/pci_insn.c         |   4 +-
->   arch/s390/pci/pci_irq.c          |  48 ++-
->   drivers/s390/char/sclp_early.c   |   4 +
->   drivers/s390/cio/airq.c          |  12 +-
->   drivers/s390/cio/qdio_thinint.c  |   6 +-
->   drivers/s390/crypto/ap_bus.c     |   9 +-
->   drivers/s390/virtio/virtio_ccw.c |   6 +-
->   drivers/vfio/pci/Kconfig         |  11 +
->   drivers/vfio/pci/Makefile        |   2 +-
->   drivers/vfio/pci/vfio_pci_core.c |  10 +-
->   drivers/vfio/pci/vfio_pci_zdev.c |  35 +-
->   include/linux/sched/user.h       |   3 +-
->   include/linux/vfio_pci_core.h    |  12 +-
->   include/uapi/linux/kvm.h         |  31 ++
->   include/uapi/linux/vfio_zdev.h   |   7 +
->   32 files changed, 1279 insertions(+), 56 deletions(-)
->   create mode 100644 arch/s390/kvm/pci.c
->   create mode 100644 arch/s390/kvm/pci.h
+It's marked as optional in the doc, following other optional callbacks
+like set_group_asid for example. But I'm ok with documenting this
+behavior further.
 
-So I pulled this into a topic branch and will merge that into kvms390/next. We can
-merge this topic  branch into vfio-next and/or s390-next when the conflicts get
-to complicated.
+> The rest LGTM although I have a doubt whether it is better to move this
+> patch after patch 3, or merge it with patch 3, for bisectability since
+> we enable the feature here but if the userspace calls ioctl() with
+> VHOST_VDPA_SUSPEND we reply back that it is not supported.
+>
 
-While pulling I fixed up the numbers for the capability to
+I'm fine with moving it, but we will have that behavior with all the
+devices anyway. Regarding userspace, we just replace ENOIOCTL with
+EOPNOTSUPP. Or I'm missing something?
 
-#define KVM_CAP_S390_ZPCI_OP 221
+Thanks!
 
-and the doc number to
+> Thanks,
+> Stefano
+>
+> >
+> >Signed-off-by: Eugenio P=C3=A9rez <eperezma@redhat.com>
+> >---
+> > drivers/vhost/vdpa.c             | 16 +++++++++++++++-
+> > include/uapi/linux/vhost_types.h |  2 ++
+> > 2 files changed, 17 insertions(+), 1 deletion(-)
+> >
+> >diff --git a/drivers/vhost/vdpa.c b/drivers/vhost/vdpa.c
+> >index 23dcbfdfa13b..3d636e192061 100644
+> >--- a/drivers/vhost/vdpa.c
+> >+++ b/drivers/vhost/vdpa.c
+> >@@ -347,6 +347,14 @@ static long vhost_vdpa_set_config(struct vhost_vdpa=
+ *v,
+> >       return 0;
+> > }
+> >
+> >+static bool vhost_vdpa_can_suspend(const struct vhost_vdpa *v)
+> >+{
+> >+      struct vdpa_device *vdpa =3D v->vdpa;
+> >+      const struct vdpa_config_ops *ops =3D vdpa->config;
+> >+
+> >+      return ops->suspend;
+> >+}
+> >+
+> > static long vhost_vdpa_get_features(struct vhost_vdpa *v, u64 __user *f=
+eaturep)
+> > {
+> >       struct vdpa_device *vdpa =3D v->vdpa;
+> >@@ -577,7 +585,11 @@ static long vhost_vdpa_unlocked_ioctl(struct file *=
+filep,
+> >       if (cmd =3D=3D VHOST_SET_BACKEND_FEATURES) {
+> >               if (copy_from_user(&features, featurep, sizeof(features))=
+)
+> >                       return -EFAULT;
+> >-              if (features & ~VHOST_VDPA_BACKEND_FEATURES)
+> >+              if (features & ~(VHOST_VDPA_BACKEND_FEATURES |
+> >+                               BIT_ULL(VHOST_BACKEND_F_SUSPEND)))
+> >+                      return -EOPNOTSUPP;
+> >+              if ((features & BIT_ULL(VHOST_BACKEND_F_SUSPEND)) &&
+> >+                   !vhost_vdpa_can_suspend(v))
+> >                       return -EOPNOTSUPP;
+> >               vhost_set_backend_features(&v->vdev, features);
+> >               return 0;
+> >@@ -628,6 +640,8 @@ static long vhost_vdpa_unlocked_ioctl(struct file *f=
+ilep,
+> >               break;
+> >       case VHOST_GET_BACKEND_FEATURES:
+> >               features =3D VHOST_VDPA_BACKEND_FEATURES;
+> >+              if (vhost_vdpa_can_suspend(v))
+> >+                      features |=3D BIT_ULL(VHOST_BACKEND_F_SUSPEND);
+> >               if (copy_to_user(featurep, &features, sizeof(features)))
+> >                       r =3D -EFAULT;
+> >               break;
+> >diff --git a/include/uapi/linux/vhost_types.h b/include/uapi/linux/vhost=
+_types.h
+> >index 634cee485abb..1bdd6e363f4c 100644
+> >--- a/include/uapi/linux/vhost_types.h
+> >+++ b/include/uapi/linux/vhost_types.h
+> >@@ -161,5 +161,7 @@ struct vhost_vdpa_iova_range {
+> >  * message
+> >  */
+> > #define VHOST_BACKEND_F_IOTLB_ASID  0x3
+> >+/* Device can be suspended */
+> >+#define VHOST_BACKEND_F_SUSPEND  0x4
+> >
+> > #endif
+> >--
+> >2.31.1
+> >
+>
 
-4.137 KVM_S390_ZPCI_OP
-
-to minize struggle when doing backports.
