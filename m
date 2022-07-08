@@ -2,217 +2,137 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 4E46E56B8E8
-	for <lists+kvm@lfdr.de>; Fri,  8 Jul 2022 13:55:40 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 5EF3656B8EF
+	for <lists+kvm@lfdr.de>; Fri,  8 Jul 2022 13:55:42 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238184AbiGHLxz (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 8 Jul 2022 07:53:55 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50104 "EHLO
+        id S238148AbiGHLz3 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 8 Jul 2022 07:55:29 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51232 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S238157AbiGHLxw (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 8 Jul 2022 07:53:52 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 39B199A69C
-        for <kvm@vger.kernel.org>; Fri,  8 Jul 2022 04:53:51 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1657281230;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=Au8fEXSHsSDgZjvjm3vRIhqvVQgLVoiU4uVaHChEFQg=;
-        b=UJvcD9mYao8CmUOx3fhWQU3Nu0xXMRU6OpuLF/eSOrm4qV6RlUgMJcQ+qc8Ize6KSe/1jc
-        N0l/CJjIkgJaJ718uSnD2qzDN9at3AIWvTnsMveFjObZUL+4RjhcFD9E08F9emQA4fMEfU
-        IwnkV4BsJiC3qUUiGJd06M3KrKC20DI=
-Received: from mail-qk1-f199.google.com (mail-qk1-f199.google.com
- [209.85.222.199]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-320-Xh4_Ebt-MLuB_qbz-MJM7A-1; Fri, 08 Jul 2022 07:53:43 -0400
-X-MC-Unique: Xh4_Ebt-MLuB_qbz-MJM7A-1
-Received: by mail-qk1-f199.google.com with SMTP id de4-20020a05620a370400b006a9711bd9f8so20578083qkb.9
-        for <kvm@vger.kernel.org>; Fri, 08 Jul 2022 04:53:43 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc:content-transfer-encoding;
-        bh=Au8fEXSHsSDgZjvjm3vRIhqvVQgLVoiU4uVaHChEFQg=;
-        b=cppbE2JAHe0V2bF5upCKaVbV/oW9uh7TV419srUO7tKW0O0L2X8bWNlEKe5bj688yT
-         IGxjlKnOUqBEZQEOTXcZFR5bVK5bZsbASX/FIeUMuH7OKexuITyv19R9lu3ybSQXws03
-         K0+0AKbQhvBoVlhRq3VA8RQ+G7vi+v5FNJuJvEUGMaqc87gqkNjhU6HMZggK4+1A0Mdk
-         TrlRVuPcimXpB0nGPA3VJfp0td8eH/X+phWrbVlkz0kuUHe7L0DH/5covOZ0vHKYV/Do
-         94Gss9XnuF+T7z3a4gYeZnnlUDfJsgpfWKe6ZUgTsU3LtZuzCbwtABMCbC/8XWvOJsTq
-         jjjQ==
-X-Gm-Message-State: AJIora94LVWmf2fr9Kb+wTh0Jgx712tReRwhgrhCLur7qhgr4w/O9pJb
-        fZhfCJLxOME378BCoBmSwPkrt0k08HJpBdbCEYRDlGDewrUj2ZUKrgBomVeN2UAaJHtf5AJ34VL
-        VlS4lZ82YRwjkEwuw7CHU9AN2upOg
-X-Received: by 2002:a05:620a:4256:b0:6ab:54c4:cf9 with SMTP id w22-20020a05620a425600b006ab54c40cf9mr1909690qko.234.1657281222906;
-        Fri, 08 Jul 2022 04:53:42 -0700 (PDT)
-X-Google-Smtp-Source: AGRyM1tC3cyQOULJED59oav9eoO/aainINzErGzXB1UQy8CCVH0EIiUdYz+pAt3GXdZU/oPzHvGXC8+JPi42expVyN4=
-X-Received: by 2002:a05:620a:4256:b0:6ab:54c4:cf9 with SMTP id
- w22-20020a05620a425600b006ab54c40cf9mr1909661qko.234.1657281222529; Fri, 08
- Jul 2022 04:53:42 -0700 (PDT)
+        with ESMTP id S238081AbiGHLz2 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 8 Jul 2022 07:55:28 -0400
+Received: from NAM10-MW2-obe.outbound.protection.outlook.com (mail-mw2nam10on2066.outbound.protection.outlook.com [40.107.94.66])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B3AD19A6B5;
+        Fri,  8 Jul 2022 04:55:26 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=VX3SS6J5gKjbz9VAdaciYe3AsJ+BSPcpcZagJFMfytDT7L2FDHRjQ1YidcKxwNJc+Wipay4ORkiCm3pjSb8Z3T22n53ZMpPeynvVYXjlTfDosuWqYj2MHTX/LPWdqkS2RSDbyA9P806I7TRkBZ4YiUt8CWVoV2FGaa9cIviKn12LuB0rkSJ/7AwO/miIrDTBndXbTi2Mdh/LbP9fJ1vdUTjBdNhEhlpbbnbUz5Epd3UNxb1DWYVlqQbT0WMb30jz9EBq7/WnKUiuPFSvrd3BSFAyxMQeuTMNjQSOqhlfDrnTWrre8/bowNyCRzN2ompxTPqrV6vLSQWcC1SXzB6WeA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=aJ8Di6UMyvfYpnUrsVhYP2vKWk2Hgnr868Q/MV6x/Nc=;
+ b=Sh2lADQniEN28UB6hs7RchGxLY1p7CFNON8NUhTdI+TWQq34OdbwYPa7yPQPlhKZY4yU7LkezyJ993q8OA2ZFD++ySkUpHKYSl8gusPCIsuK8RR8axZ2+C2oowLq0rzwZG57T2R2XRaoou0psmcM9jOLcDR3J0UFOvirtc/gwRT4bACtXF72Ass8Vl8Rav6itQbcQSzv6K51/f3qqkdA4cqhotQCSeSvj2SAeD8VZBwzGMp0pbHTrmvpYt3sKvtlB7NpQnI0UpbbdCeWI8zpXpG0ed0RiCR/VC/pXwmHjlYhsFSA10MBK3mHBNqhP/Zlnnry6HKjEh4P2ivvErusGA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
+ dkim=pass header.d=nvidia.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=aJ8Di6UMyvfYpnUrsVhYP2vKWk2Hgnr868Q/MV6x/Nc=;
+ b=Pm0Qh+halAPnn1c/w9JIVxCOpSIGqt1mLcsStGUG8QE/8qeQhTIZRCAr8VqgIJTyr1zYrgtiYW5WJoWtBTcyDVHxrTOwKg9R+ZrVgyD0uacw9OrdzAs5jSBnvTeXWolzdHjQX+K1NFqRaOZdWSz/tWJMoP8r9kwSUZ99mPvRYL/h1U2oQK2BpDbuSUyTsEWsieqQ16r+t2krYfEbYUoZJ5yUL/2BUYbfwhL1KAbMPRiOH0QRS1/d0YQp6bIe1tPqJVOuNRIXGvMe8eNhpKxGHntLrkXpTVQj17Q5Ay2QewCnRQ3QbjuTb0wC4B4w/QFHACWJVy7Ff+ie5HX3S4JCHw==
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=nvidia.com;
+Received: from MN2PR12MB4192.namprd12.prod.outlook.com (2603:10b6:208:1d5::15)
+ by CY4PR1201MB0166.namprd12.prod.outlook.com (2603:10b6:910:24::23) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5395.19; Fri, 8 Jul
+ 2022 11:55:23 +0000
+Received: from MN2PR12MB4192.namprd12.prod.outlook.com
+ ([fe80::ac35:7c4b:3282:abfb]) by MN2PR12MB4192.namprd12.prod.outlook.com
+ ([fe80::ac35:7c4b:3282:abfb%3]) with mapi id 15.20.5417.016; Fri, 8 Jul 2022
+ 11:55:23 +0000
+Date:   Fri, 8 Jul 2022 08:55:22 -0300
+From:   Jason Gunthorpe <jgg@nvidia.com>
+To:     Alexey Kardashevskiy <aik@ozlabs.ru>
+Cc:     linuxppc-dev@lists.ozlabs.org, Robin Murphy <robin.murphy@arm.com>,
+        Michael Ellerman <mpe@ellerman.id.au>,
+        Joerg Roedel <jroedel@suse.de>, Joel Stanley <joel@jms.id.au>,
+        Alex Williamson <alex.williamson@redhat.com>,
+        Oliver O'Halloran <oohall@gmail.com>, kvm-ppc@vger.kernel.org,
+        kvm@vger.kernel.org,
+        Daniel Henrique Barboza <danielhb413@gmail.com>,
+        Fabiano Rosas <farosas@linux.ibm.com>,
+        Murilo Opsfelder Araujo <muriloo@linux.ibm.com>,
+        Nicholas Piggin <npiggin@gmail.com>
+Subject: Re: [PATCH kernel] powerpc/iommu: Add iommu_ops to report
+ capabilities and allow blocking domains
+Message-ID: <20220708115522.GD1705032@nvidia.com>
+References: <20220707135552.3688927-1-aik@ozlabs.ru>
+ <20220707151002.GB1705032@nvidia.com>
+ <bb8f4c93-6cbc-0106-d4c1-1f3c0751fbba@ozlabs.ru>
+ <bbe29694-66a3-275b-5a79-71237ad7388f@ozlabs.ru>
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <bbe29694-66a3-275b-5a79-71237ad7388f@ozlabs.ru>
+X-ClientProxiedBy: MN2PR08CA0026.namprd08.prod.outlook.com
+ (2603:10b6:208:239::31) To MN2PR12MB4192.namprd12.prod.outlook.com
+ (2603:10b6:208:1d5::15)
 MIME-Version: 1.0
-References: <20220623160738.632852-1-eperezma@redhat.com> <20220623160738.632852-4-eperezma@redhat.com>
- <CACGkMEt6YQvtyYwkYVxmZ01pZJK9PMFM2oPTVttPZ_kZDY-9Jw@mail.gmail.com>
-In-Reply-To: <CACGkMEt6YQvtyYwkYVxmZ01pZJK9PMFM2oPTVttPZ_kZDY-9Jw@mail.gmail.com>
-From:   Eugenio Perez Martin <eperezma@redhat.com>
-Date:   Fri, 8 Jul 2022 13:53:06 +0200
-Message-ID: <CAJaqyWfGXu8k7JN1gCPdUXS2_Dct73w4wS_SdB3aLqVCWJqJQg@mail.gmail.com>
-Subject: Re: [PATCH v6 3/4] vhost-vdpa: uAPI to suspend the device
-To:     Jason Wang <jasowang@redhat.com>
-Cc:     netdev <netdev@vger.kernel.org>,
-        linux-kernel <linux-kernel@vger.kernel.org>,
-        virtualization <virtualization@lists.linux-foundation.org>,
-        kvm <kvm@vger.kernel.org>, "Michael S. Tsirkin" <mst@redhat.com>,
-        Parav Pandit <parav@nvidia.com>,
-        Christophe JAILLET <christophe.jaillet@wanadoo.fr>,
-        Cindy Lu <lulu@redhat.com>,
-        "Kamde, Tanuj" <tanuj.kamde@amd.com>,
-        Si-Wei Liu <si-wei.liu@oracle.com>,
-        "Uminski, Piotr" <Piotr.Uminski@intel.com>,
-        habetsm.xilinx@gmail.com, "Dawar, Gautam" <gautam.dawar@amd.com>,
-        Pablo Cascon Katchadourian <pabloc@xilinx.com>,
-        Zhu Lingshan <lingshan.zhu@intel.com>,
-        Laurent Vivier <lvivier@redhat.com>,
-        Longpeng <longpeng2@huawei.com>,
-        Dinan Gunawardena <dinang@xilinx.com>,
-        Martin Petrus Hubertus Habets <martinh@xilinx.com>,
-        Martin Porter <martinpo@xilinx.com>,
-        Eli Cohen <elic@nvidia.com>, ecree.xilinx@gmail.com,
-        Wu Zongyong <wuzongyong@linux.alibaba.com>,
-        Stefano Garzarella <sgarzare@redhat.com>,
-        Dan Carpenter <dan.carpenter@oracle.com>,
-        Harpreet Singh Anand <hanand@xilinx.com>,
-        Xie Yongji <xieyongji@bytedance.com>,
-        Zhang Min <zhang.min9@zte.com.cn>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Spam-Status: No, score=-2.8 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=unavailable
-        autolearn_force=no version=3.4.6
+X-MS-PublicTrafficType: Email
+X-MS-Office365-Filtering-Correlation-Id: ff740019-9b06-4cf4-02f0-08da60d8bd63
+X-MS-TrafficTypeDiagnostic: CY4PR1201MB0166:EE_
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: LeORyceJoBo6WzvmQ1kKzCixHlIHH7PGuoiOBUj+3wZ1R1Gk4NT4du7B2m0PbzKIvlMhhyJVj2QW1QUKXGEuVGz4PLFTydxVZTIA8wXOcjFsXew9sf0rIAfYWWvyFu5lHTYsDVuErwSWT/K+eAZiEUsf8Uf4jm50IuEZuL0e/+tDR5YTDXFgFDheucvWPSa8h9m4ZyH5Qo2og/u00/BmZWdOprcfrzrniyQoDKLrHlPIahZZCi5TsLVi6jE1A3w64FlnLwS4oLPUjSKnzZCnR8+dMO/fdAb5Y7Ph7UU5+x3TF6fbB4lAaETIZws2T7We/qYvbAYDQY+AiuQ8xnXYacBIkA4eNrmvQfwW/7F1ozstbUfNnvNduukbxeyzperEUNcua39ah2Y+iZkicaYnlo7AmEbFgBSBTzMS6mHJ7xBJkxf+iiEWyleeT1gSTngAgA6rh9DCW31GFhTlfv36wNHdyiq0y7jhYB6IrQ1TWrxGp5t5/tyuGcPYz8ur0wZhAkWs6ZZemSBYNsYIg+fD4UqROOTS7PuGM9eMuIv159FOwTaCF+AyXAizBn69CmKpZu2o2ablplZNzulie0ptEoGF2b0p4jKXcVw61Vf+KgGUPXVSrYtACrf26k1nmcbyHq2FtyqwZrrWHVVsMDPt4xxa+VT5+yeVK0loe2x/jvxhorpA8eeQSvijx/wFGUfAArrxuXxEuePBg+VkkiznAanxjME+zmxENLPTb1okQjiLI+rxNDz21BtaCRgrL2TX
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:MN2PR12MB4192.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230016)(4636009)(396003)(39860400002)(376002)(346002)(366004)(136003)(4326008)(66556008)(186003)(66476007)(66946007)(54906003)(8676002)(2906002)(6916009)(26005)(36756003)(6512007)(1076003)(83380400001)(2616005)(6506007)(41300700001)(33656002)(86362001)(5660300002)(6486002)(316002)(4744005)(8936002)(38100700002)(478600001)(7416002);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?WvYFbIEKxMDnbHEJLvbhPPKiWasniebTwWH7ZLo6U8XjFFu1Taye7SQ879R6?=
+ =?us-ascii?Q?vZjxI9WlFvSzFPY0O8qd+ku9r8aYeQbokr9v8Hc7AHf9v83A203TaLfFva3e?=
+ =?us-ascii?Q?+B6SL+g9tcCeG8XOqH6ta1PhTxCptrTjEWe+dlMuzBbyF1IWr79fTfYFwTwW?=
+ =?us-ascii?Q?2eUTTkoqstT+IKy8i4Jc3S5m5xxp7q8ezSS5eztDuhK+L4Y3yaJLQlvQotvn?=
+ =?us-ascii?Q?nCEAjZfKUoMLdADNTc950l+hFc/XpsRUigalWex6R1WYEw/zpSkZxgJ8LyM4?=
+ =?us-ascii?Q?u5HyEtEJXbpSGD/GKc4gqnrqsoHFd2mWk/BKq6xAyz9Mq0Qu+GREhEp2oknk?=
+ =?us-ascii?Q?7yXY+0/qYsmGkSJLiBWn1sivMtxIIk48b0+RSdhDpac+f2zA9DMKZsnOU1Gu?=
+ =?us-ascii?Q?ye7q61451UD1Xu0LFHyf0qroZAC+z1AYQ++xh3tFw6Y1TFOm9lbv23TAfe1q?=
+ =?us-ascii?Q?SrJv+Dkuuoiz/Car51iXIyCI90gYFNuoB2rTd3OmBu4T2Kp8lcTYFUCo3/1O?=
+ =?us-ascii?Q?b8Fw6ohREmMjoQa6rraD/1AuM7z5NRi5Yj5p1DKf2oakFxmwU5/YWmdp0+NB?=
+ =?us-ascii?Q?aM0yA4J93XA4uYAMq99HBjhY5bVvS7KpMXs02fMgd2j/6Q2VwCuQfDW8FANA?=
+ =?us-ascii?Q?1NmKhSurkBrre/GrRefCHH2sZ+G9sEyQsU2VhHtfNetVdMURCeEovaznpZyS?=
+ =?us-ascii?Q?OmN/40iVumY0bfrHWi9zEerefOefASQFdl119AW1OYUNeHu2bqMysGD1n5CA?=
+ =?us-ascii?Q?DyINnunPf+wSnrcaSeNFl5KJXt60pxXOQDtPaIkRNouWxTMWNoydp4zafHCf?=
+ =?us-ascii?Q?aapiAtimSE0NFSXZtVuZBBU+02aILShTqWq6eJUiphwRpBjPvHa12DPTAYVW?=
+ =?us-ascii?Q?IdJ92LYOClPz3eKPeEyKRP9dNkeISnllXkWK0dttIs2+AnvNoS8zpDDni+Yw?=
+ =?us-ascii?Q?Ohv2l9XNtb41Dm3hjLLK1GMpfJeX4xrQZS0JE4U3lw6OI0StmZCte5sjRNSj?=
+ =?us-ascii?Q?7PZLiH4dy4GP7XiluSK7Wu0vGPg1T8+OhXvJxqFi6fnewdy0tv/hUP50Db3Z?=
+ =?us-ascii?Q?hEdS0TbHrlKnJ5TTWpfUh1KeCvotczWWfzq5njmwQgDQRjWo7r6/iSy9BC5G?=
+ =?us-ascii?Q?z6QEgZxnnlmrorAEwWq6pv7cL6yWwDTPggACj9jjFWVfrYRkiqB29lUfp5N1?=
+ =?us-ascii?Q?ehHcZDvhbahUZpP9v2J1lU5t+oGkzv81yMr/F7wCqMfT5l+OXcYgiOCms+oo?=
+ =?us-ascii?Q?sov3e8M9QfHH+oZvHhLVUGvz9Ws799HjvMoBP+VVodMQmiD8jyWE84qBwQ6+?=
+ =?us-ascii?Q?wa7WMVzJvSE9LmOXswmb1SQT6UIb4Fl4nAA/COmFAu45Kjh2Bks4RyBWghp+?=
+ =?us-ascii?Q?s08GdIhePQPPOSVNr++Wr0QV6P47KPZrQ9DmXpm9r8yI9/EB4OMzD6tSk9Yh?=
+ =?us-ascii?Q?cban07Ck7Xq6U4+UAhF+4lOC1zHXZdkhn+ERpd245yG04qkqLHoTRmjJ2vCB?=
+ =?us-ascii?Q?SSmi02Snvh9tH4Xaj7E0LARnZWdC3nvlty9qE3vzYiULLu6fR5myHFSfLhMh?=
+ =?us-ascii?Q?CGQ8CpZNCiuMSlVM0jwt/r5tT+VGujNPkDBhNuAq?=
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: ff740019-9b06-4cf4-02f0-08da60d8bd63
+X-MS-Exchange-CrossTenant-AuthSource: MN2PR12MB4192.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 08 Jul 2022 11:55:23.4337
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: 1azNz0eqGsLapxi5RoFN+O8xllo/5E27e9wAg6cELlNTqcc9WfHCuSZqlxwRG/mV
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: CY4PR1201MB0166
+X-Spam-Status: No, score=-1.8 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FORGED_SPF_HELO,
+        RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_NONE,
+        T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Jun 29, 2022 at 6:16 AM Jason Wang <jasowang@redhat.com> wrote:
->
-> On Fri, Jun 24, 2022 at 12:08 AM Eugenio P=C3=A9rez <eperezma@redhat.com>=
- wrote:
-> >
-> > The ioctl adds support for suspending the device from userspace.
-> >
-> > This is a must before getting virtqueue indexes (base) for live migrati=
-on,
-> > since the device could modify them after userland gets them. There are
-> > individual ways to perform that action for some devices
-> > (VHOST_NET_SET_BACKEND, VHOST_VSOCK_SET_RUNNING, ...) but there was no
-> > way to perform it for any vhost device (and, in particular, vhost-vdpa)=
-.
-> >
-> > After a successful return of the ioctl call the device must not process
-> > more virtqueue descriptors. The device can answer to read or writes of
-> > config fields as if it were not suspended. In particular, writing to
-> > "queue_enable" with a value of 1 will not make the device start
-> > processing buffers of the virtqueue.
-> >
-> > Signed-off-by: Eugenio P=C3=A9rez <eperezma@redhat.com>
-> > ---
-> >  drivers/vhost/vdpa.c       | 19 +++++++++++++++++++
-> >  include/uapi/linux/vhost.h | 14 ++++++++++++++
-> >  2 files changed, 33 insertions(+)
-> >
-> > diff --git a/drivers/vhost/vdpa.c b/drivers/vhost/vdpa.c
-> > index 3d636e192061..7fa671ac4bdf 100644
-> > --- a/drivers/vhost/vdpa.c
-> > +++ b/drivers/vhost/vdpa.c
-> > @@ -478,6 +478,22 @@ static long vhost_vdpa_get_vqs_count(struct vhost_=
-vdpa *v, u32 __user *argp)
-> >         return 0;
-> >  }
-> >
-> > +/* After a successful return of ioctl the device must not process more
-> > + * virtqueue descriptors. The device can answer to read or writes of c=
-onfig
-> > + * fields as if it were not suspended. In particular, writing to "queu=
-e_enable"
-> > + * with a value of 1 will not make the device start processing buffers=
-.
-> > + */
-> > +static long vhost_vdpa_suspend(struct vhost_vdpa *v)
-> > +{
-> > +       struct vdpa_device *vdpa =3D v->vdpa;
-> > +       const struct vdpa_config_ops *ops =3D vdpa->config;
-> > +
-> > +       if (!ops->suspend)
-> > +               return -EOPNOTSUPP;
-> > +
-> > +       return ops->suspend(vdpa);
-> > +}
-> > +
-> >  static long vhost_vdpa_vring_ioctl(struct vhost_vdpa *v, unsigned int =
-cmd,
-> >                                    void __user *argp)
-> >  {
-> > @@ -654,6 +670,9 @@ static long vhost_vdpa_unlocked_ioctl(struct file *=
-filep,
-> >         case VHOST_VDPA_GET_VQS_COUNT:
-> >                 r =3D vhost_vdpa_get_vqs_count(v, argp);
-> >                 break;
-> > +       case VHOST_VDPA_SUSPEND:
-> > +               r =3D vhost_vdpa_suspend(v);
-> > +               break;
-> >         default:
-> >                 r =3D vhost_dev_ioctl(&v->vdev, cmd, argp);
-> >                 if (r =3D=3D -ENOIOCTLCMD)
-> > diff --git a/include/uapi/linux/vhost.h b/include/uapi/linux/vhost.h
-> > index cab645d4a645..6d9f45163155 100644
-> > --- a/include/uapi/linux/vhost.h
-> > +++ b/include/uapi/linux/vhost.h
-> > @@ -171,4 +171,18 @@
-> >  #define VHOST_VDPA_SET_GROUP_ASID      _IOW(VHOST_VIRTIO, 0x7C, \
-> >                                              struct vhost_vring_state)
-> >
-> > +/* Suspend or resume a device so it does not process virtqueue request=
-s anymore
-> > + *
-> > + * After the return of ioctl with suspend !=3D 0, the device must fini=
-sh any
-> > + * pending operations like in flight requests.
->
-> I'm not sure we should mandate the flush here. This probably blocks us
-> from adding inflight descriptor reporting in the future.
->
+On Fri, Jul 08, 2022 at 04:34:55PM +1000, Alexey Kardashevskiy wrote:
 
-That's right. Maybe we should add a flags argument to allow not to
-flush in flight descriptors in the future? Or maybe the right solution
-is to discard that requirement and to mandate in_order to be
-migratable at the moment?
+> For now I'll add a comment in spapr_tce_iommu_attach_dev() that it is fine
+> to do nothing as tce_iommu_take_ownership() and
+> tce_iommu_take_ownership_ddw() take care of not having active DMA mappings.
 
-Thanks!
+That will still cause a security problem because
+tce_iommu_take_ownership()/etc are called too late. This is the moment
+in the flow when the ownershift must change away from the DMA API that
+power implements and to VFIO, not later.
 
-> Thanks
->
-> It must also preserve all the
-> > + * necessary state (the virtqueue vring base plus the possible device =
-specific
-> > + * states) that is required for restoring in the future. The device mu=
-st not
-> > + * change its configuration after that point.
-> > + *
-> > + * After the return of ioctl with suspend =3D=3D 0, the device can con=
-tinue
-> > + * processing buffers as long as typical conditions are met (vq is ena=
-bled,
-> > + * DRIVER_OK status bit is enabled, etc).
-> > + */
-> > +#define VHOST_VDPA_SUSPEND             _IOW(VHOST_VIRTIO, 0x7D, int)
-> > +
-> >  #endif
-> > --
-> > 2.31.1
-> >
->
-
+Jason
