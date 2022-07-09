@@ -2,235 +2,117 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id A4EA856C6E0
-	for <lists+kvm@lfdr.de>; Sat,  9 Jul 2022 06:26:41 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 8EC7F56C70E
+	for <lists+kvm@lfdr.de>; Sat,  9 Jul 2022 06:55:25 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229508AbiGIE0i (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sat, 9 Jul 2022 00:26:38 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59700 "EHLO
+        id S229549AbiGIEzY (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sat, 9 Jul 2022 00:55:24 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45622 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229496AbiGIE0b (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sat, 9 Jul 2022 00:26:31 -0400
-Received: from mail-pl1-x62a.google.com (mail-pl1-x62a.google.com [IPv6:2607:f8b0:4864:20::62a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3A60EDFB8;
-        Fri,  8 Jul 2022 21:26:30 -0700 (PDT)
-Received: by mail-pl1-x62a.google.com with SMTP id f11so380493plr.4;
-        Fri, 08 Jul 2022 21:26:30 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=wblxU4ocX/6b7hDTeD8JaMDf+To2t7CvwCLO5H9GvsE=;
-        b=EeqPE2CrKN+kONWxDFSM7+E3+N5RHT+v5JkHhvJIPY8wOjsSUwXCrWaGuzRtlk05zm
-         GGin0I+CEMC18DH9ZDL/k+cuGRbO6TF5Bg5P6RHBmh5xI8oglkgQLbbUdveOCcfHd6Cc
-         HUIr3SrOPsaPHx/5evo00JtyP3HjCRRKK2Ech5WDoMYfECR67CBOcFLI+NHyIR9dY3Zy
-         qYxezJCG6MeuIIwvLtdscAO9K+uB0qAAzcPhs4/MFQNw0E8ZkvK/AuSm7/OFACXXgrdf
-         CXSbPtjTp9f53F35kRSInDk6XyH8USHI2zDGIMdhoMtw4zj8dmz8m1zlboC9giV4PFdr
-         VW1g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=wblxU4ocX/6b7hDTeD8JaMDf+To2t7CvwCLO5H9GvsE=;
-        b=Q38YGyTNAAP2GDKASITtaw4zlQhBKaORKYqmxNenvTpsUt8ZAEvYYOd4ClF41EDuLn
-         Cr5vU8OD6QRfGrAJBSgTik3857XAtiIXSKB/yB3fWBt9hMeIgyhnG/HPDuYRbkE54hZ8
-         yghXzcZ+rnhAWkCmBveYd6EL+drCUztEzmzJ28L2WAHlVKNlYompP0be9s75FzPw5pOC
-         NVTkRqVMKN2MxdOOLwsfEWGIPcETurp9NiMpOqpORQDnY2/0eh0HaEbd0WxLVT7L1DRY
-         /Km9Oj9yzhEeuN7RytsnD8FmtVgAmOqnv2tZ2+4wGGLBM0clttr3/K/O++EXGcKBFi/4
-         w4TQ==
-X-Gm-Message-State: AJIora+Snn+yQpVa1Gi135Quq4nUAOq/JFegcJSLHQXcS7ugBmBcIrWe
-        2WRThDBW4ODyLUusHu0dO+ZXUZqjo5U=
-X-Google-Smtp-Source: AGRyM1thrTlZvy977uJjAuibEgWKaF0aYWH3JEJQJHBkWlP6wtka5PCgbctI/8N1WZ+bJgc75RNu4Q==
-X-Received: by 2002:a17:902:9301:b0:16a:1c68:f8d6 with SMTP id bc1-20020a170902930100b0016a1c68f8d6mr7105053plb.72.1657340789768;
-        Fri, 08 Jul 2022 21:26:29 -0700 (PDT)
-Received: from debian.me (subs02-180-214-232-88.three.co.id. [180.214.232.88])
-        by smtp.gmail.com with ESMTPSA id f8-20020a17090ab94800b001ef42b3c5besm254697pjw.23.2022.07.08.21.26.28
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 08 Jul 2022 21:26:29 -0700 (PDT)
-Received: by debian.me (Postfix, from userid 1000)
-        id 4CC9C100151; Sat,  9 Jul 2022 11:26:26 +0700 (WIB)
-Date:   Sat, 9 Jul 2022 11:26:26 +0700
-From:   Bagas Sanjaya <bagasdotme@gmail.com>
-To:     linux-doc@vger.kernel.org
-Cc:     Paolo Bonzini <pbonzini@redhat.com>,
-        Jonathan Corbet <corbet@lwn.net>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        Dave Hansen <dave.hansen@linux.intel.com>,
-        "H. Peter Anvin" <hpa@zytor.com>,
-        Isaku Yamahata <isaku.yamahata@intel.com>,
-        Kai Huang <kai.huang@intel.com>, x86@kernel.org,
-        kvm@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH 08/12] Documentation: kvm: tdx-tdp-mmu: Properly format
- nested list for EPT state machine
-Message-ID: <YskDcli+Lg6uKzYX@debian.me>
-References: <20220709042037.21903-1-bagasdotme@gmail.com>
- <20220709042037.21903-9-bagasdotme@gmail.com>
+        with ESMTP id S229528AbiGIEzS (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sat, 9 Jul 2022 00:55:18 -0400
+Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:3::133])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 21764140D5;
+        Fri,  8 Jul 2022 21:55:18 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=bombadil.20210309; h=Content-Transfer-Encoding:
+        MIME-Version:Message-Id:Date:Subject:Cc:To:From:Sender:Reply-To:Content-Type:
+        Content-ID:Content-Description:In-Reply-To:References;
+        bh=spTIKNEibGt8r3DPfP/HyGXmF3cU6IiWCcjdld1t2CY=; b=Ib47I4t4FFGn8i0C65C5Xuf/+Z
+        oy8kwC1O7+FvVzvr6xEtdiBNTzrNAH+uG/DOLXbBwAsii5BtXCyw3AbU96NH0c1brxGhP7+gKoUzc
+        L0AZAIsCBmaV0QzdpmbX856qUKEEcqoef2q0fItyB2umgqhdCbM7xtFNXh1o48lWT5ldaxlf6LgtC
+        vsUpezPF7X3Tnhp91dD9Wz5H4Yf4259veNpnkB12bbez26beovNIzcogeOAUK8qMj2BlXz/mf11X2
+        xUVfZQz1DYiEwvOAO+xIn73lkelBLVMFTUT+cqvSaO8sUxMyKcIPshC+yv+2v0NwqMpHuKoSv9fyt
+        XFjHfIOw==;
+Received: from 213-225-4-185.nat.highway.a1.net ([213.225.4.185] helo=localhost)
+        by bombadil.infradead.org with esmtpsa (Exim 4.94.2 #2 (Red Hat Linux))
+        id 1oA2UY-006zrk-0v; Sat, 09 Jul 2022 04:54:54 +0000
+From:   Christoph Hellwig <hch@lst.de>
+To:     Kirti Wankhede <kwankhede@nvidia.com>,
+        Tony Krowiak <akrowiak@linux.ibm.com>,
+        Halil Pasic <pasic@linux.ibm.com>,
+        Jason Herne <jjherne@linux.ibm.com>,
+        Eric Farman <farman@linux.ibm.com>,
+        Matthew Rosato <mjrosato@linux.ibm.com>,
+        Zhenyu Wang <zhenyuw@linux.intel.com>,
+        Zhi Wang <zhi.a.wang@intel.com>,
+        Alex Williamson <alex.williamson@redhat.com>
+Cc:     Jason Gunthorpe <jgg@nvidia.com>, kvm@vger.kernel.org,
+        linux-s390@vger.kernel.org, intel-gvt-dev@lists.freedesktop.org
+Subject: simplify the mdev interface v6
+Date:   Sat,  9 Jul 2022 06:54:36 +0200
+Message-Id: <20220709045450.609884-1-hch@lst.de>
+X-Mailer: git-send-email 2.30.2
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20220709042037.21903-9-bagasdotme@gmail.com>
-X-Spam-Status: No, score=-0.6 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
-        RCVD_IN_DNSWL_NONE,RCVD_IN_SORBS_WEB,SPF_HELO_NONE,SPF_PASS,
-        T_SCC_BODY_TEXT_LINE autolearn=no autolearn_force=no version=3.4.6
+Content-Transfer-Encoding: 8bit
+X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
+X-Spam-Status: No, score=-2.5 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_EF,HEADER_FROM_DIFFERENT_DOMAINS,
+        RCVD_IN_DNSWL_LOW,SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Sat, Jul 09, 2022 at 11:20:34AM +0700, Bagas Sanjaya wrote:
->  The state machine of EPT entry
->  ------------------------------
-> -(private EPT entry, shared EPT entry) =
-> -        (non-present, non-present):             private mapping is allowed
-> -        (present, non-present):                 private mapping is mapped
-> -        (non-present | SPTE_SHARED_MASK, non-present | SPTE_SHARED_MASK):
-> -                                                shared mapping is allowed
-> -        (non-present | SPTE_SHARED_MASK, present | SPTE_SHARED_MASK):
-> -                                                shared mapping is mapped
-> -        (present | SPTE_SHARED_MASK, any)       invalid combination
-> +* (private EPT entry, shared EPT entry)
->  
-> -* map_gpa(private GPA): Mark the region that private GPA is allowed(NEW)
-> -        private EPT entry: clear SPTE_SHARED_MASK
-> -          present: nop
-> -          non-present: nop
-> -          non-present | SPTE_SHARED_MASK -> non-present (clear SPTE_SHARED_MASK)
-> +  * (non-present, non-present):
-> +       private mapping is allowed
-> +  * (present, non-present):
-> +       private mapping is mapped
-> +  * (non-present | SPTE_SHARED_MASK, non-present | SPTE_SHARED_MASK):
-> +       shared mapping is allowed
-> +  * (non-present | SPTE_SHARED_MASK, present | SPTE_SHARED_MASK):
-> +       shared mapping is mapped
-> +  * (present | SPTE_SHARED_MASK, any):
-> +       invalid combination
->  
-> -        shared EPT entry: zap the entry, clear SPTE_SHARED_MASK
-> -          present: invalid
-> -          non-present -> non-present: nop
-> -          present | SPTE_SHARED_MASK -> non-present
-> -          non-present | SPTE_SHARED_MASK -> non-present
-> +* map_gpa (private GPA): Mark the region that private GPA is allowed(NEW)
->  
-> -* map_gpa(shared GPA): Mark the region that shared GPA is allowed(NEW)
-> -        private EPT entry: zap and set SPTE_SHARED_MASK
-> -          present     -> non-present | SPTE_SHARED_MASK
-> -          non-present -> non-present | SPTE_SHARED_MASK
-> -          non-present | SPTE_SHARED_MASK: nop
-> +  * private EPT entry: clear SPTE_SHARED_MASK
->  
-> -        shared EPT entry: set SPTE_SHARED_MASK
-> -          present: invalid
-> -          non-present -> non-present | SPTE_SHARED_MASK
-> -          present | SPTE_SHARED_MASK -> present | SPTE_SHARED_MASK: nop
-> -          non-present | SPTE_SHARED_MASK -> non-present | SPTE_SHARED_MASK: nop
-> +    * present: nop
-> +    * non-present: nop
-> +    * non-present | SPTE_SHARED_MASK -> non-present (clear SPTE_SHARED_MASK)
->  
-> -* map(private GPA)
-> -        private EPT entry
-> -          present: nop
-> -          non-present -> present
-> -          non-present | SPTE_SHARED_MASK: nop. looping on EPT violation(NEW)
-> +  * shared EPT entry: zap the entry, clear SPTE_SHARED_MASK
->  
-> -        shared EPT entry: nop
-> +    * present: invalid
-> +    * non-present -> non-present: nop
-> +    * present | SPTE_SHARED_MASK -> non-present
-> +    * non-present | SPTE_SHARED_MASK -> non-present
->  
-> -* map(shared GPA)
-> -        private EPT entry: nop
-> +* map_gpa (shared GPA): Mark the region that shared GPA is allowed(NEW)
->  
-> -        shared EPT entry
-> -          present: invalid
-> -          present | SPTE_SHARED_MASK: nop
-> -          non-present | SPTE_SHARED_MASK -> present | SPTE_SHARED_MASK
-> -          non-present: nop. looping on EPT violation(NEW)
-> +  * private EPT entry: zap and set SPTE_SHARED_MASK
->  
-> -* zap(private GPA)
-> -        private EPT entry: zap the entry with keeping SPTE_SHARED_MASK
-> -          present -> non-present
-> -          present | SPTE_SHARED_MASK: invalid
-> -          non-present: nop as is_shadow_present_pte() is checked
-> -          non-present | SPTE_SHARED_MASK: nop as is_shadow_present_pte() is
-> -                                          checked
-> +    * present     -> non-present | SPTE_SHARED_MASK
-> +    * non-present -> non-present | SPTE_SHARED_MASK
-> +    * non-present | SPTE_SHARED_MASK: nop
->  
-> -        shared EPT entry: nop
-> +  * shared EPT entry: set SPTE_SHARED_MASK
->  
-> -* zap(shared GPA)
-> -        private EPT entry: nop
-> +    * present: invalid
-> +    * non-present -> non-present | SPTE_SHARED_MASK
-> +    * present | SPTE_SHARED_MASK -> present | SPTE_SHARED_MASK: nop
-> +    * non-present | SPTE_SHARED_MASK -> non-present | SPTE_SHARED_MASK: nop
->  
-> -        shared EPT entry: zap
-> -          any -> non-present
-> -          present: invalid
-> -          present | SPTE_SHARED_MASK -> non-present | SPTE_SHARED_MASK
-> -          non-present: nop as is_shadow_present_pte() is checked
-> -          non-present | SPTE_SHARED_MASK: nop as is_shadow_present_pte() is
-> -                                          checked
-> +* map (private GPA)
-> +
-> +  * private EPT entry
-> +
-> +    * present: nop
-> +    * non-present -> present
-> +    * non-present | SPTE_SHARED_MASK: nop. looping on EPT violation(NEW)
-> +
-> +  * shared EPT entry: nop
-> +
-> +* map (shared GPA)
-> +
-> +  * private EPT entry: nop
-> +
-> +  * shared EPT entry:
-> +
-> +    * present: invalid
-> +    * present | SPTE_SHARED_MASK: nop
-> +    * non-present | SPTE_SHARED_MASK -> present | SPTE_SHARED_MASK
-> +    * non-present: nop. looping on EPT violation(NEW)
-> +
-> +* zap (private GPA)
-> +
-> +  * private EPT entry: zap the entry with keeping SPTE_SHARED_MASK
-> +
-> +    * present -> non-present
-> +    * present | SPTE_SHARED_MASK: invalid
-> +    * non-present: nop as is_shadow_present_pte() is checked
-> +    * non-present | SPTE_SHARED_MASK: nop as is_shadow_present_pte() is
-> +      checked
-> +
-> +  * shared EPT entry: nop
-> +
-> +* zap (shared GPA)
-> +
-> +  * private EPT entry: nop
-> +
-> +  * shared EPT entry: zap
-> +
-> +    * any -> non-present
-> +    * present: invalid
-> +    * present | SPTE_SHARED_MASK -> non-present | SPTE_SHARED_MASK
-> +    * non-present: nop as is_shadow_present_pte() is checked
-> +    * non-present | SPTE_SHARED_MASK: nop as is_shadow_present_pte() is
-> +      checked
+Hi all,
 
-IMO, the state machine lists above should have used tables instead.
+this series signigicantly simplies the mdev driver interface by following
+the patterns for device model interaction used elsewhere in the kernel.
 
--- 
-An old man doll... just what I always wanted! - Clara
+Changes since v5:
+ - rebased to the latest vfio/next branch
+ - drop the last patch again
+ - make sure show_available_instances works properly for the internallly
+   tracked case
+
+Changes since v4:
+ - move the kobject_put later in mdev_device_release 
+ - add a Fixes tag for the first patch
+ - add another patch to remove an extra kobject_get/put
+
+Changes since v3:
+ - make the sysfs_name and pretty_name fields pointers instead of arrays
+ - add an i915 cleanup to prepare for the above
+
+Changes since v2:
+ - rebased to vfio/next
+ - fix a pre-existing memory leak in i915 instead of making it worse
+ - never manipulate if ->available_instances if drv->get_available is
+   provided
+ - keep a parent reference for the mdev_type
+ - keep a few of the sysfs.c helper function around
+ - improve the documentation for the parent device lifetime
+ - minor spellig / formatting fixes
+
+Changes since v1:
+ - embedd the mdev_parent into a different sub-structure in i916
+ - remove headers now inclued by mdev.h from individual source files
+ - pass an array of mdev_types to mdev_register_parent
+ - add additional patches to implement all attributes on the
+   mdev_type in the core code
+
+Diffstat:
+ Documentation/driver-api/vfio-mediated-device.rst |   26 +-
+ Documentation/s390/vfio-ap.rst                    |    2 
+ Documentation/s390/vfio-ccw.rst                   |    2 
+ drivers/gpu/drm/i915/gvt/aperture_gm.c            |   20 +-
+ drivers/gpu/drm/i915/gvt/gvt.h                    |   42 ++--
+ drivers/gpu/drm/i915/gvt/kvmgt.c                  |  168 ++++-------------
+ drivers/gpu/drm/i915/gvt/vgpu.c                   |  210 +++++++---------------
+ drivers/s390/cio/cio.h                            |    4 
+ drivers/s390/cio/vfio_ccw_drv.c                   |   12 -
+ drivers/s390/cio/vfio_ccw_ops.c                   |   51 -----
+ drivers/s390/cio/vfio_ccw_private.h               |    2 
+ drivers/s390/crypto/vfio_ap_ops.c                 |   68 +------
+ drivers/s390/crypto/vfio_ap_private.h             |    6 
+ drivers/vfio/mdev/mdev_core.c                     |  190 ++++---------------
+ drivers/vfio/mdev/mdev_driver.c                   |    7 
+ drivers/vfio/mdev/mdev_private.h                  |   32 ---
+ drivers/vfio/mdev/mdev_sysfs.c                    |  189 ++++++++++---------
+ include/linux/mdev.h                              |   77 ++++----
+ samples/vfio-mdev/mbochs.c                        |  103 +++-------
+ samples/vfio-mdev/mdpy.c                          |  115 +++---------
+ samples/vfio-mdev/mtty.c                          |   94 +++------
+ 21 files changed, 463 insertions(+), 957 deletions(-)
