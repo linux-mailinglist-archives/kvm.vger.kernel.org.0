@@ -2,448 +2,436 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id B9B4F56C72C
-	for <lists+kvm@lfdr.de>; Sat,  9 Jul 2022 06:56:13 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 6153F56C79C
+	for <lists+kvm@lfdr.de>; Sat,  9 Jul 2022 08:55:32 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229639AbiGIE4M (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sat, 9 Jul 2022 00:56:12 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46674 "EHLO
+        id S229549AbiGIGza (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sat, 9 Jul 2022 02:55:30 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47914 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229538AbiGIE4D (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sat, 9 Jul 2022 00:56:03 -0400
-Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:3::133])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 17FF78AEFF;
-        Fri,  8 Jul 2022 21:55:54 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=bombadil.20210309; h=Content-Transfer-Encoding:
-        MIME-Version:References:In-Reply-To:Message-Id:Date:Subject:Cc:To:From:Sender
-        :Reply-To:Content-Type:Content-ID:Content-Description;
-        bh=m56yHUKrdas+0RX/UQ0I5KmgxDmNIVKM/y5ApiUcij4=; b=np0Dvs4AwMZ6pLn+MQf5tyu+Iz
-        sgSpXB/iStglC7UIroX3rBjXG5b3BIRHI4tGP9/lR9gw0RwxL3nGQJ4tEjqmG+uJ8+rouTn9gjH2o
-        IjRJbdJckvUOFbBC9iBd0+rWI2EhBY08jvSJkuReEaUtCsd3hEkoxCM2EWc5QXuze8MEfeaHW1F36
-        ZAJPX0yX1dHczwGCMluUbcIVpwyhVVfwXtnvT6svYLCJugbH+vqrjpL6LfVTeaHnGuxHeZpge9OaZ
-        lPqq2cWDyP280cfXG68tvNCUEl9PVEcprxU7czSD5N0B6nmB173lLJ13lRdMA1gihtLhHrdPrP7lp
-        /OHPYSIA==;
-Received: from 213-225-4-185.nat.highway.a1.net ([213.225.4.185] helo=localhost)
-        by bombadil.infradead.org with esmtpsa (Exim 4.94.2 #2 (Red Hat Linux))
-        id 1oA2VS-0070Ci-E9; Sat, 09 Jul 2022 04:55:51 +0000
-From:   Christoph Hellwig <hch@lst.de>
-To:     Kirti Wankhede <kwankhede@nvidia.com>,
-        Tony Krowiak <akrowiak@linux.ibm.com>,
-        Halil Pasic <pasic@linux.ibm.com>,
-        Jason Herne <jjherne@linux.ibm.com>,
-        Eric Farman <farman@linux.ibm.com>,
-        Matthew Rosato <mjrosato@linux.ibm.com>,
-        Zhenyu Wang <zhenyuw@linux.intel.com>,
-        Zhi Wang <zhi.a.wang@intel.com>,
-        Alex Williamson <alex.williamson@redhat.com>
-Cc:     Jason Gunthorpe <jgg@nvidia.com>, kvm@vger.kernel.org,
-        linux-s390@vger.kernel.org, intel-gvt-dev@lists.freedesktop.org,
-        Kevin Tian <kevin.tian@intel.com>
-Subject: [PATCH 14/14] vfio/mdev: add mdev available instance checking to the core
-Date:   Sat,  9 Jul 2022 06:54:50 +0200
-Message-Id: <20220709045450.609884-15-hch@lst.de>
-X-Mailer: git-send-email 2.30.2
-In-Reply-To: <20220709045450.609884-1-hch@lst.de>
-References: <20220709045450.609884-1-hch@lst.de>
+        with ESMTP id S229463AbiGIGz3 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sat, 9 Jul 2022 02:55:29 -0400
+Received: from mail-ua1-x933.google.com (mail-ua1-x933.google.com [IPv6:2607:f8b0:4864:20::933])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9165568737
+        for <kvm@vger.kernel.org>; Fri,  8 Jul 2022 23:55:25 -0700 (PDT)
+Received: by mail-ua1-x933.google.com with SMTP id c7so253401uak.1
+        for <kvm@vger.kernel.org>; Fri, 08 Jul 2022 23:55:25 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=z370ap4icG/n0mxZ/T8cY/FFE6FKmCsSpzWEo9sy9Uk=;
+        b=F87ojCFIut+zTKYaLJ0ZxMChAgHzHvxOOO6h2bQ925a4NvkKaAyTF3aYtl2/zaL9px
+         Lh/IN/v3B/yhyyn7IYThNntoHuB+ySUclxZXH9ismhSFSSNb89AirHeO9qzIf8ZAh/G/
+         d2bEyUFbr22oUHqjGrXx2iiqgu1Ek8s6yD8bQFyNnsF5JRL8SXG4EOvEJmP44bb09AB/
+         tMZMH34tEXC4//owLG+FRaLiE71Ivq4vF/qJrs+c2CdPQq5F8lswEB4zniNONvRV0ShR
+         0mhTLOPSreJhONNoBw9Jy63tr7JuU+26ojQp55xDJcEFehApDNSIr01Um9euCFh3v0pU
+         n8Yg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=z370ap4icG/n0mxZ/T8cY/FFE6FKmCsSpzWEo9sy9Uk=;
+        b=n6/qui4gl1jPRJ9glyrAGUooa7F7fhDY5sPFFng24WvplK+i5VzdX9kphYNkTxCMtH
+         tlK0BZT75Rxtb+0jZUFnMURDFwtLOjclj+QKrVkw3kGI7KrzQCqVXgxNN+9ulSFwgNHU
+         TIweRw1WRSb4iEtN/dQ4Ak+GhRcXcTSN5RbEJuPIqPy38NItmYEHR77RdsjkwURVKSnG
+         ZEVqAOVc3ttMn0+ArkhfSHefDnAQpmcAiA9xZdfh2dRgEzIo8kdoFc4dBbIqLifn6nJR
+         r3Us9lj+zhvvu8b0ytopr8gnVzK+CtpozlpDUPZVT0+jRsK1Sh9xfv0rnTI6g9FMZz0G
+         Nf9g==
+X-Gm-Message-State: AJIora9XrHv8jgarZlfKYrPwDE3EyswLYyRFcdpPmTUiXtY3yROSZjY7
+        CSOkNkpT14+yW135dwID55bda46igThLmT5KTp/jzVFFbnuldw==
+X-Google-Smtp-Source: AGRyM1uD59U9cfBJ0MdM/PafhlqeV+I3o0BpWowt3O+nRXcoB5eL6fWMp4RjnDA43VjT+2YgHYDFcRR1MvktnwREJew=
+X-Received: by 2002:a05:6130:90:b0:362:891c:edef with SMTP id
+ x16-20020a056130009000b00362891cedefmr3019255uaf.106.1657349724506; Fri, 08
+ Jul 2022 23:55:24 -0700 (PDT)
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
-X-Spam-Status: No, score=-2.5 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_EF,HEADER_FROM_DIFFERENT_DOMAINS,
-        RCVD_IN_DNSWL_LOW,SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE
-        autolearn=ham autolearn_force=no version=3.4.6
+References: <20220706164304.1582687-1-maz@kernel.org> <20220706164304.1582687-6-maz@kernel.org>
+In-Reply-To: <20220706164304.1582687-6-maz@kernel.org>
+From:   Reiji Watanabe <reijiw@google.com>
+Date:   Fri, 8 Jul 2022 23:55:08 -0700
+Message-ID: <CAAeT=FzW78rn-_rXRg2t_RpwBQ1Ap-ugtqE-vb-P6YyGO++VRA@mail.gmail.com>
+Subject: Re: [PATCH 05/19] KVM: arm64: Consolidate sysreg userspace accesses
+To:     Marc Zyngier <maz@kernel.org>
+Cc:     kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org,
+        Linux ARM <linux-arm-kernel@lists.infradead.org>,
+        Schspa Shi <schspa@gmail.com>, kernel-team@android.com,
+        Oliver Upton <oliver.upton@linux.dev>
+Content-Type: text/plain; charset="UTF-8"
+X-Spam-Status: No, score=-15.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
+        T_SCC_BODY_TEXT_LINE,URI_DOTEDU,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL
+        autolearn=no autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-From: Jason Gunthorpe <jgg@nvidia.com>
+Hi Marc,
 
-Many of the mdev drivers use a simple counter for keeping track of the
-available instances. Move this code to the core code and store the counter
-in the mdev_parent. Implement it using correct locking, fixing mdpy.
+On Wed, Jul 6, 2022 at 9:43 AM Marc Zyngier <maz@kernel.org> wrote:
+>
+> Until now, the .set_user and .get_user callbacks have to implement
+> (directly or not) the userspace memory accesses. Although this gives
+> us maximem flexibility, this is also a maintenance burden, making it
+> hard to audit, and I'd feel much better if it was all located in
+> a single place.
+>
+> So let's do just that, simplifying most of the function signatures
+> in the process (the callbacks are now only concerned with the
+> data itself, and not with userspace).
+>
+> Signed-off-by: Marc Zyngier <maz@kernel.org>
+> ---
+>  arch/arm64/kvm/sys_regs.c | 162 ++++++++++++++------------------------
+>  arch/arm64/kvm/sys_regs.h |   4 +-
+>  2 files changed, 63 insertions(+), 103 deletions(-)
+>
+> diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
+> index 89e7eddea937..1ce439eed3d8 100644
+> --- a/arch/arm64/kvm/sys_regs.c
+> +++ b/arch/arm64/kvm/sys_regs.c
+> @@ -321,16 +321,8 @@ static bool trap_oslsr_el1(struct kvm_vcpu *vcpu,
+>  }
+>
+>  static int set_oslsr_el1(struct kvm_vcpu *vcpu, const struct sys_reg_desc *rd,
+> -                        const struct kvm_one_reg *reg, void __user *uaddr)
+> +                        u64 val)
+>  {
+> -       u64 id = sys_reg_to_index(rd);
+> -       u64 val;
+> -       int err;
+> -
+> -       err = reg_from_user(&val, uaddr, id);
+> -       if (err)
+> -               return err;
+> -
+>         /*
+>          * The only modifiable bit is the OSLK bit. Refuse the write if
+>          * userspace attempts to change any other bit in the register.
+> @@ -451,22 +443,16 @@ static bool trap_bvr(struct kvm_vcpu *vcpu,
+>  }
+>
+>  static int set_bvr(struct kvm_vcpu *vcpu, const struct sys_reg_desc *rd,
+> -               const struct kvm_one_reg *reg, void __user *uaddr)
+> +                  u64 val)
+>  {
+> -       __u64 *r = &vcpu->arch.vcpu_debug_state.dbg_bvr[rd->CRm];
+> -
+> -       if (copy_from_user(r, uaddr, KVM_REG_SIZE(reg->id)) != 0)
+> -               return -EFAULT;
+> +       vcpu->arch.vcpu_debug_state.dbg_bvr[rd->CRm] = val;
+>         return 0;
+>  }
+>
+>  static int get_bvr(struct kvm_vcpu *vcpu, const struct sys_reg_desc *rd,
+> -       const struct kvm_one_reg *reg, void __user *uaddr)
+> +                  u64 *val)
+>  {
+> -       __u64 *r = &vcpu->arch.vcpu_debug_state.dbg_bvr[rd->CRm];
+> -
+> -       if (copy_to_user(uaddr, r, KVM_REG_SIZE(reg->id)) != 0)
+> -               return -EFAULT;
+> +       *val = vcpu->arch.vcpu_debug_state.dbg_bvr[rd->CRm];
+>         return 0;
+>  }
+>
+> @@ -493,23 +479,16 @@ static bool trap_bcr(struct kvm_vcpu *vcpu,
+>  }
+>
+>  static int set_bcr(struct kvm_vcpu *vcpu, const struct sys_reg_desc *rd,
+> -               const struct kvm_one_reg *reg, void __user *uaddr)
+> +                  u64 val)
+>  {
+> -       __u64 *r = &vcpu->arch.vcpu_debug_state.dbg_bcr[rd->CRm];
+> -
+> -       if (copy_from_user(r, uaddr, KVM_REG_SIZE(reg->id)) != 0)
+> -               return -EFAULT;
+> -
+> +       vcpu->arch.vcpu_debug_state.dbg_bcr[rd->CRm] = val;
+>         return 0;
+>  }
+>
+>  static int get_bcr(struct kvm_vcpu *vcpu, const struct sys_reg_desc *rd,
+> -       const struct kvm_one_reg *reg, void __user *uaddr)
+> +                  u64 *val)
+>  {
+> -       __u64 *r = &vcpu->arch.vcpu_debug_state.dbg_bcr[rd->CRm];
+> -
+> -       if (copy_to_user(uaddr, r, KVM_REG_SIZE(reg->id)) != 0)
+> -               return -EFAULT;
+> +       *val = vcpu->arch.vcpu_debug_state.dbg_bcr[rd->CRm];
+>         return 0;
+>  }
+>
+> @@ -537,22 +516,16 @@ static bool trap_wvr(struct kvm_vcpu *vcpu,
+>  }
+>
+>  static int set_wvr(struct kvm_vcpu *vcpu, const struct sys_reg_desc *rd,
+> -               const struct kvm_one_reg *reg, void __user *uaddr)
+> +                  u64 val)
+>  {
+> -       __u64 *r = &vcpu->arch.vcpu_debug_state.dbg_wvr[rd->CRm];
+> -
+> -       if (copy_from_user(r, uaddr, KVM_REG_SIZE(reg->id)) != 0)
+> -               return -EFAULT;
+> +       vcpu->arch.vcpu_debug_state.dbg_wvr[rd->CRm] = val;
+>         return 0;
+>  }
+>
+>  static int get_wvr(struct kvm_vcpu *vcpu, const struct sys_reg_desc *rd,
+> -       const struct kvm_one_reg *reg, void __user *uaddr)
+> +                  u64 *val)
+>  {
+> -       __u64 *r = &vcpu->arch.vcpu_debug_state.dbg_wvr[rd->CRm];
+> -
+> -       if (copy_to_user(uaddr, r, KVM_REG_SIZE(reg->id)) != 0)
+> -               return -EFAULT;
+> +       *val = vcpu->arch.vcpu_debug_state.dbg_wvr[rd->CRm];
+>         return 0;
+>  }
+>
+> @@ -579,22 +552,16 @@ static bool trap_wcr(struct kvm_vcpu *vcpu,
+>  }
+>
+>  static int set_wcr(struct kvm_vcpu *vcpu, const struct sys_reg_desc *rd,
+> -               const struct kvm_one_reg *reg, void __user *uaddr)
+> +                  u64 val)
+>  {
+> -       __u64 *r = &vcpu->arch.vcpu_debug_state.dbg_wcr[rd->CRm];
+> -
+> -       if (copy_from_user(r, uaddr, KVM_REG_SIZE(reg->id)) != 0)
+> -               return -EFAULT;
+> +       vcpu->arch.vcpu_debug_state.dbg_wcr[rd->CRm] = val;
+>         return 0;
+>  }
+>
+>  static int get_wcr(struct kvm_vcpu *vcpu, const struct sys_reg_desc *rd,
+> -       const struct kvm_one_reg *reg, void __user *uaddr)
+> +                  u64 *val)
+>  {
+> -       __u64 *r = &vcpu->arch.vcpu_debug_state.dbg_wcr[rd->CRm];
+> -
+> -       if (copy_to_user(uaddr, r, KVM_REG_SIZE(reg->id)) != 0)
+> -               return -EFAULT;
+> +       *val = vcpu->arch.vcpu_debug_state.dbg_wcr[rd->CRm];
+>         return 0;
+>  }
+>
+> @@ -1227,16 +1194,9 @@ static unsigned int sve_visibility(const struct kvm_vcpu *vcpu,
+>
+>  static int set_id_aa64pfr0_el1(struct kvm_vcpu *vcpu,
+>                                const struct sys_reg_desc *rd,
+> -                              const struct kvm_one_reg *reg, void __user *uaddr)
+> +                              u64 val)
+>  {
+> -       const u64 id = sys_reg_to_index(rd);
+>         u8 csv2, csv3;
+> -       int err;
+> -       u64 val;
+> -
+> -       err = reg_from_user(&val, uaddr, id);
+> -       if (err)
+> -               return err;
+>
+>         /*
+>          * Allow AA64PFR0_EL1.CSV2 to be set from userspace as long as
+> @@ -1262,7 +1222,7 @@ static int set_id_aa64pfr0_el1(struct kvm_vcpu *vcpu,
+>                 return -EINVAL;
+>
+>         vcpu->kvm->arch.pfr0_csv2 = csv2;
+> -       vcpu->kvm->arch.pfr0_csv3 = csv3 ;
+> +       vcpu->kvm->arch.pfr0_csv3 = csv3;
+>
+>         return 0;
+>  }
+> @@ -1275,27 +1235,17 @@ static int set_id_aa64pfr0_el1(struct kvm_vcpu *vcpu,
+>   * to be changed.
+>   */
+>  static int __get_id_reg(const struct kvm_vcpu *vcpu,
+> -                       const struct sys_reg_desc *rd, void __user *uaddr,
+> +                       const struct sys_reg_desc *rd, u64 *val,
+>                         bool raz)
+>  {
+> -       const u64 id = sys_reg_to_index(rd);
+> -       const u64 val = read_id_reg(vcpu, rd, raz);
+> -
+> -       return reg_to_user(uaddr, &val, id);
+> +       *val = read_id_reg(vcpu, rd, raz);
+> +       return 0;
+>  }
+>
+>  static int __set_id_reg(const struct kvm_vcpu *vcpu,
+> -                       const struct sys_reg_desc *rd, void __user *uaddr,
+> +                       const struct sys_reg_desc *rd, u64 val,
+>                         bool raz)
+>  {
+> -       const u64 id = sys_reg_to_index(rd);
+> -       int err;
+> -       u64 val;
+> -
+> -       err = reg_from_user(&val, uaddr, id);
+> -       if (err)
+> -               return err;
+> -
+>         /* This is what we mean by invariant: you can't change it. */
+>         if (val != read_id_reg(vcpu, rd, raz))
+>                 return -EINVAL;
+> @@ -1304,47 +1254,37 @@ static int __set_id_reg(const struct kvm_vcpu *vcpu,
+>  }
+>
+>  static int get_id_reg(struct kvm_vcpu *vcpu, const struct sys_reg_desc *rd,
+> -                     const struct kvm_one_reg *reg, void __user *uaddr)
+> +                     u64 *val)
+>  {
+>         bool raz = sysreg_visible_as_raz(vcpu, rd);
+>
+> -       return __get_id_reg(vcpu, rd, uaddr, raz);
+> +       return __get_id_reg(vcpu, rd, val, raz);
+>  }
+>
+>  static int set_id_reg(struct kvm_vcpu *vcpu, const struct sys_reg_desc *rd,
+> -                     const struct kvm_one_reg *reg, void __user *uaddr)
+> +                     u64 val)
+>  {
+>         bool raz = sysreg_visible_as_raz(vcpu, rd);
+>
+> -       return __set_id_reg(vcpu, rd, uaddr, raz);
+> +       return __set_id_reg(vcpu, rd, val, raz);
+>  }
+>
+>  static int set_raz_id_reg(struct kvm_vcpu *vcpu, const struct sys_reg_desc *rd,
+> -                         const struct kvm_one_reg *reg, void __user *uaddr)
+> +                         u64 val)
+>  {
+> -       return __set_id_reg(vcpu, rd, uaddr, true);
+> +       return __set_id_reg(vcpu, rd, val, true);
+>  }
+>
+>  static int get_raz_reg(struct kvm_vcpu *vcpu, const struct sys_reg_desc *rd,
+> -                      const struct kvm_one_reg *reg, void __user *uaddr)
+> +                      u64 *val)
+>  {
+> -       const u64 id = sys_reg_to_index(rd);
+> -       const u64 val = 0;
+> -
+> -       return reg_to_user(uaddr, &val, id);
+> +       *val = 0;
+> +       return 0;
+>  }
+>
+>  static int set_wi_reg(struct kvm_vcpu *vcpu, const struct sys_reg_desc *rd,
+> -                     const struct kvm_one_reg *reg, void __user *uaddr)
+> +                     u64 val)
+>  {
+> -       int err;
+> -       u64 val;
+> -
+> -       /* Perform the access even if we are going to ignore the value */
+> -       err = reg_from_user(&val, uaddr, sys_reg_to_index(rd));
+> -       if (err)
+> -               return err;
+> -
+>         return 0;
+>  }
+>
+> @@ -2854,17 +2794,28 @@ static int demux_c15_set(u64 id, void __user *uaddr)
+>  int kvm_sys_reg_get_user(struct kvm_vcpu *vcpu, const struct kvm_one_reg *reg,
+>                          const struct sys_reg_desc table[], unsigned int num)
+>  {
+> -       void __user *uaddr = (void __user *)(unsigned long)reg->addr;
+> +       u64 __user *uaddr = (u64 __user *)(unsigned long)reg->addr;
+>         const struct sys_reg_desc *r;
+> +       u64 val;
+> +       int ret;
+>
+>         r = id_to_sys_reg_desc(vcpu, reg->id, table, num);
+>         if (!r)
+>                 return -ENOENT;
+>
+> -       if (r->get_user)
+> -               return (r->get_user)(vcpu, r, reg, uaddr);
+> +       if (r->get_user) {
+> +               ret = (r->get_user)(vcpu, r, &val);
+> +       } else {
+> +               val = __vcpu_sys_reg(vcpu, r->reg);
+> +               ret = 0;
+> +       }
+> +
+> +       if (!ret) {
+> +               if (put_user(val, uaddr))
+> +                       ret = -EFAULT;
 
-Drivers just provide the value in the mdev_driver at registration time
-and the core code takes care of maintaining it and exposing the value in
-sysfs.
+Nit: Since put_user() returns -EFAULT when it fails,
+we can simply set 'ret' to the return value from put_user().
+(same for get_user())
 
-Signed-off-by: Jason Gunthorpe <jgg@nvidia.com>
-[hch: count instances per-parent instead of per-type, use an atomic_t
- to avoid taking mdev_list_lock in the show method]
-Signed-off-by: Christoph Hellwig <hch@lst.de>
-Reviewed-by: Kevin Tian <kevin.tian@intel.com>
-Reviewed-by: Kirti Wankhede <kwankhede@nvidia.com>
----
- drivers/s390/cio/vfio_ccw_drv.c       |  1 -
- drivers/s390/cio/vfio_ccw_ops.c       | 14 +-------------
- drivers/s390/cio/vfio_ccw_private.h   |  2 --
- drivers/s390/crypto/vfio_ap_ops.c     | 21 +++------------------
- drivers/s390/crypto/vfio_ap_private.h |  2 --
- drivers/vfio/mdev/mdev_core.c         | 17 ++++++++++++++---
- drivers/vfio/mdev/mdev_sysfs.c        |  5 ++++-
- include/linux/mdev.h                  |  3 +++
- samples/vfio-mdev/mdpy.c              | 23 ++++-------------------
- 9 files changed, 29 insertions(+), 59 deletions(-)
+Reviewed-by: Reiji Watanabe <reijiw@google.com>
 
-diff --git a/drivers/s390/cio/vfio_ccw_drv.c b/drivers/s390/cio/vfio_ccw_drv.c
-index a088baffb1c5d..6605b4239f887 100644
---- a/drivers/s390/cio/vfio_ccw_drv.c
-+++ b/drivers/s390/cio/vfio_ccw_drv.c
-@@ -141,7 +141,6 @@ static struct vfio_ccw_private *vfio_ccw_alloc_private(struct subchannel *sch)
- 	INIT_LIST_HEAD(&private->crw);
- 	INIT_WORK(&private->io_work, vfio_ccw_sch_io_todo);
- 	INIT_WORK(&private->crw_work, vfio_ccw_crw_todo);
--	atomic_set(&private->avail, 1);
- 
- 	private->cp.guest_cp = kcalloc(CCWCHAIN_LEN_MAX, sizeof(struct ccw1),
- 				       GFP_KERNEL);
-diff --git a/drivers/s390/cio/vfio_ccw_ops.c b/drivers/s390/cio/vfio_ccw_ops.c
-index 3cbc6165c2f2c..f9b5a320f224a 100644
---- a/drivers/s390/cio/vfio_ccw_ops.c
-+++ b/drivers/s390/cio/vfio_ccw_ops.c
-@@ -58,13 +58,6 @@ static int vfio_ccw_mdev_notifier(struct notifier_block *nb,
- 	return NOTIFY_DONE;
- }
- 
--static unsigned int vfio_ccw_get_available(struct mdev_type *mtype)
--{
--	struct vfio_ccw_private *private = dev_get_drvdata(mtype->parent->dev);
--
--	return atomic_read(&private->avail);
--}
--
- static int vfio_ccw_mdev_probe(struct mdev_device *mdev)
- {
- 	struct vfio_ccw_private *private = dev_get_drvdata(mdev->dev.parent);
-@@ -73,9 +66,6 @@ static int vfio_ccw_mdev_probe(struct mdev_device *mdev)
- 	if (private->state == VFIO_CCW_STATE_NOT_OPER)
- 		return -ENODEV;
- 
--	if (atomic_dec_if_positive(&private->avail) < 0)
--		return -EPERM;
--
- 	memset(&private->vdev, 0, sizeof(private->vdev));
- 	vfio_init_group_dev(&private->vdev, &mdev->dev,
- 			    &vfio_ccw_dev_ops);
-@@ -93,7 +83,6 @@ static int vfio_ccw_mdev_probe(struct mdev_device *mdev)
- 
- err_atomic:
- 	vfio_uninit_group_dev(&private->vdev);
--	atomic_inc(&private->avail);
- 	return ret;
- }
- 
-@@ -111,7 +100,6 @@ static void vfio_ccw_mdev_remove(struct mdev_device *mdev)
- 	vfio_ccw_fsm_event(private, VFIO_CCW_EVENT_CLOSE);
- 
- 	vfio_uninit_group_dev(&private->vdev);
--	atomic_inc(&private->avail);
- }
- 
- static int vfio_ccw_mdev_open_device(struct vfio_device *vdev)
-@@ -592,6 +580,7 @@ static const struct vfio_device_ops vfio_ccw_dev_ops = {
- 
- struct mdev_driver vfio_ccw_mdev_driver = {
- 	.device_api = VFIO_DEVICE_API_CCW_STRING,
-+	.max_instances = 1,
- 	.driver = {
- 		.name = "vfio_ccw_mdev",
- 		.owner = THIS_MODULE,
-@@ -599,5 +588,4 @@ struct mdev_driver vfio_ccw_mdev_driver = {
- 	},
- 	.probe = vfio_ccw_mdev_probe,
- 	.remove = vfio_ccw_mdev_remove,
--	.get_available = vfio_ccw_get_available,
- };
-diff --git a/drivers/s390/cio/vfio_ccw_private.h b/drivers/s390/cio/vfio_ccw_private.h
-index abac532bf03eb..7da2392714b85 100644
---- a/drivers/s390/cio/vfio_ccw_private.h
-+++ b/drivers/s390/cio/vfio_ccw_private.h
-@@ -72,7 +72,6 @@ struct vfio_ccw_crw {
-  * @sch: pointer to the subchannel
-  * @state: internal state of the device
-  * @completion: synchronization helper of the I/O completion
-- * @avail: available for creating a mediated device
-  * @nb: notifier for vfio events
-  * @io_region: MMIO region to input/output I/O arguments/results
-  * @io_mutex: protect against concurrent update of I/O regions
-@@ -95,7 +94,6 @@ struct vfio_ccw_private {
- 	struct subchannel	*sch;
- 	int			state;
- 	struct completion	*completion;
--	atomic_t		avail;
- 	struct notifier_block	nb;
- 	struct ccw_io_region	*io_region;
- 	struct mutex		io_mutex;
-diff --git a/drivers/s390/crypto/vfio_ap_ops.c b/drivers/s390/crypto/vfio_ap_ops.c
-index edeec11c56560..69ed88fdaf383 100644
---- a/drivers/s390/crypto/vfio_ap_ops.c
-+++ b/drivers/s390/crypto/vfio_ap_ops.c
-@@ -461,14 +461,9 @@ static int vfio_ap_mdev_probe(struct mdev_device *mdev)
- 	struct ap_matrix_mdev *matrix_mdev;
- 	int ret;
- 
--	if ((atomic_dec_if_positive(&matrix_dev->available_instances) < 0))
--		return -EPERM;
--
- 	matrix_mdev = kzalloc(sizeof(*matrix_mdev), GFP_KERNEL);
--	if (!matrix_mdev) {
--		ret = -ENOMEM;
--		goto err_dec_available;
--	}
-+	if (!matrix_mdev)
-+		return -ENOMEM;
- 	vfio_init_group_dev(&matrix_mdev->vdev, &mdev->dev,
- 			    &vfio_ap_matrix_dev_ops);
- 
-@@ -491,8 +486,6 @@ static int vfio_ap_mdev_probe(struct mdev_device *mdev)
- 	mutex_unlock(&matrix_dev->lock);
- 	vfio_uninit_group_dev(&matrix_mdev->vdev);
- 	kfree(matrix_mdev);
--err_dec_available:
--	atomic_inc(&matrix_dev->available_instances);
- 	return ret;
- }
- 
-@@ -508,12 +501,6 @@ static void vfio_ap_mdev_remove(struct mdev_device *mdev)
- 	mutex_unlock(&matrix_dev->lock);
- 	vfio_uninit_group_dev(&matrix_mdev->vdev);
- 	kfree(matrix_mdev);
--	atomic_inc(&matrix_dev->available_instances);
--}
--
--static unsigned int vfio_ap_mdev_get_available(struct mdev_type *mtype)
--{
--	return atomic_read(&matrix_dev->available_instances);
- }
- 
- struct vfio_ap_queue_reserved {
-@@ -1427,6 +1414,7 @@ static const struct vfio_device_ops vfio_ap_matrix_dev_ops = {
- 
- static struct mdev_driver vfio_ap_matrix_driver = {
- 	.device_api = VFIO_DEVICE_API_AP_STRING,
-+	.max_instances = MAX_ZDEV_ENTRIES_EXT,
- 	.driver = {
- 		.name = "vfio_ap_mdev",
- 		.owner = THIS_MODULE,
-@@ -1435,15 +1423,12 @@ static struct mdev_driver vfio_ap_matrix_driver = {
- 	},
- 	.probe = vfio_ap_mdev_probe,
- 	.remove = vfio_ap_mdev_remove,
--	.get_available = vfio_ap_mdev_get_available,
- };
- 
- int vfio_ap_mdev_register(void)
- {
- 	int ret;
- 
--	atomic_set(&matrix_dev->available_instances, MAX_ZDEV_ENTRIES_EXT);
--
- 	ret = mdev_register_driver(&vfio_ap_matrix_driver);
- 	if (ret)
- 		return ret;
-diff --git a/drivers/s390/crypto/vfio_ap_private.h b/drivers/s390/crypto/vfio_ap_private.h
-index 5dc5050d03791..b808b343b771f 100644
---- a/drivers/s390/crypto/vfio_ap_private.h
-+++ b/drivers/s390/crypto/vfio_ap_private.h
-@@ -28,7 +28,6 @@
-  * struct ap_matrix_dev - Contains the data for the matrix device.
-  *
-  * @device:	generic device structure associated with the AP matrix device
-- * @available_instances: number of mediated matrix devices that can be created
-  * @info:	the struct containing the output from the PQAP(QCI) instruction
-  * @mdev_list:	the list of mediated matrix devices created
-  * @lock:	mutex for locking the AP matrix device. This lock will be
-@@ -40,7 +39,6 @@
-  */
- struct ap_matrix_dev {
- 	struct device device;
--	atomic_t available_instances;
- 	struct ap_config_info info;
- 	struct list_head mdev_list;
- 	struct mutex lock;
-diff --git a/drivers/vfio/mdev/mdev_core.c b/drivers/vfio/mdev/mdev_core.c
-index 93f8caf2e5f77..2d0302995d7b7 100644
---- a/drivers/vfio/mdev/mdev_core.c
-+++ b/drivers/vfio/mdev/mdev_core.c
-@@ -70,6 +70,7 @@ int mdev_register_parent(struct mdev_parent *parent, struct device *dev,
- 	parent->mdev_driver = mdev_driver;
- 	parent->types = types;
- 	parent->nr_types = nr_types;
-+	atomic_set(&parent->available_instances, mdev_driver->max_instances);
- 
- 	if (!mdev_bus_compat_class) {
- 		mdev_bus_compat_class = class_compat_register("mdev_bus");
-@@ -115,14 +116,17 @@ EXPORT_SYMBOL(mdev_unregister_parent);
- static void mdev_device_release(struct device *dev)
- {
- 	struct mdev_device *mdev = to_mdev_device(dev);
--
--	/* Pairs with the get in mdev_device_create() */
--	kobject_put(&mdev->type->kobj);
-+	struct mdev_parent *parent = mdev->type->parent;
- 
- 	mutex_lock(&mdev_list_lock);
- 	list_del(&mdev->next);
-+	if (!parent->mdev_driver->get_available)
-+		atomic_inc(&parent->available_instances);
- 	mutex_unlock(&mdev_list_lock);
- 
-+	/* Pairs with the get in mdev_device_create() */
-+	kobject_put(&mdev->type->kobj);
-+
- 	dev_dbg(&mdev->dev, "MDEV: destroying\n");
- 	kfree(mdev);
- }
-@@ -144,6 +148,13 @@ int mdev_device_create(struct mdev_type *type, const guid_t *uuid)
- 		}
- 	}
- 
-+	if (!drv->get_available) {
-+		if (atomic_dec_and_test(&parent->available_instances)) {
-+			mutex_unlock(&mdev_list_lock);
-+			return -EUSERS;
-+		}
-+	}
-+
- 	mdev = kzalloc(sizeof(*mdev), GFP_KERNEL);
- 	if (!mdev) {
- 		mutex_unlock(&mdev_list_lock);
-diff --git a/drivers/vfio/mdev/mdev_sysfs.c b/drivers/vfio/mdev/mdev_sysfs.c
-index c5cd035d591d0..af51c1cdb7d40 100644
---- a/drivers/vfio/mdev/mdev_sysfs.c
-+++ b/drivers/vfio/mdev/mdev_sysfs.c
-@@ -108,7 +108,10 @@ static ssize_t available_instances_show(struct mdev_type *mtype,
- {
- 	struct mdev_driver *drv = mtype->parent->mdev_driver;
- 
--	return sysfs_emit(buf, "%u\n", drv->get_available(mtype));
-+	if (drv->get_available)
-+		return sysfs_emit(buf, "%u\n", drv->get_available(mtype));
-+	return sysfs_emit(buf, "%u\n",
-+			  atomic_read(&mtype->parent->available_instances));
- }
- static MDEV_TYPE_ATTR_RO(available_instances);
- 
-diff --git a/include/linux/mdev.h b/include/linux/mdev.h
-index 33674cb5ed5d4..139d05b26f820 100644
---- a/include/linux/mdev.h
-+++ b/include/linux/mdev.h
-@@ -45,6 +45,7 @@ struct mdev_parent {
- 	struct rw_semaphore unreg_sem;
- 	struct mdev_type **types;
- 	unsigned int nr_types;
-+	atomic_t available_instances;
- };
- 
- static inline struct mdev_device *to_mdev_device(struct device *dev)
-@@ -55,6 +56,7 @@ static inline struct mdev_device *to_mdev_device(struct device *dev)
- /**
-  * struct mdev_driver - Mediated device driver
-  * @device_api: string to return for the device_api sysfs
-+ * @max_instances: maximum number of instances supported (optional)
-  * @probe: called when new device created
-  * @remove: called when device removed
-  * @get_available: Return the max number of instances that can be created
-@@ -63,6 +65,7 @@ static inline struct mdev_device *to_mdev_device(struct device *dev)
-  **/
- struct mdev_driver {
- 	const char *device_api;
-+	unsigned int max_instances;
- 	int (*probe)(struct mdev_device *dev);
- 	void (*remove)(struct mdev_device *dev);
- 	unsigned int (*get_available)(struct mdev_type *mtype);
-diff --git a/samples/vfio-mdev/mdpy.c b/samples/vfio-mdev/mdpy.c
-index 250b7ea2df2e4..7f7ac5491407e 100644
---- a/samples/vfio-mdev/mdpy.c
-+++ b/samples/vfio-mdev/mdpy.c
-@@ -42,11 +42,6 @@
- 
- MODULE_LICENSE("GPL v2");
- 
--static int max_devices = 4;
--module_param_named(count, max_devices, int, 0444);
--MODULE_PARM_DESC(count, "number of " MDPY_NAME " devices");
--
--
- #define MDPY_TYPE_1 "vga"
- #define MDPY_TYPE_2 "xga"
- #define MDPY_TYPE_3 "hd"
-@@ -93,7 +88,6 @@ static struct class	*mdpy_class;
- static struct cdev	mdpy_cdev;
- static struct device	mdpy_dev;
- static struct mdev_parent mdpy_parent;
--static u32		mdpy_count;
- static const struct vfio_device_ops mdpy_dev_ops;
- 
- /* State of each mdev device */
-@@ -234,9 +228,6 @@ static int mdpy_probe(struct mdev_device *mdev)
- 	u32 fbsize;
- 	int ret;
- 
--	if (mdpy_count >= max_devices)
--		return -ENOMEM;
--
- 	mdev_state = kzalloc(sizeof(struct mdev_state), GFP_KERNEL);
- 	if (mdev_state == NULL)
- 		return -ENOMEM;
-@@ -265,8 +256,6 @@ static int mdpy_probe(struct mdev_device *mdev)
- 	mdpy_create_config_space(mdev_state);
- 	mdpy_reset(mdev_state);
- 
--	mdpy_count++;
--
- 	ret = vfio_register_emulated_iommu_dev(&mdev_state->vdev);
- 	if (ret)
- 		goto err_mem;
-@@ -293,8 +282,6 @@ static void mdpy_remove(struct mdev_device *mdev)
- 	kfree(mdev_state->vconfig);
- 	vfio_uninit_group_dev(&mdev_state->vdev);
- 	kfree(mdev_state);
--
--	mdpy_count--;
- }
- 
- static ssize_t mdpy_read(struct vfio_device *vdev, char __user *buf,
-@@ -658,11 +645,6 @@ static ssize_t mdpy_show_description(struct mdev_type *mtype, char *buf)
- 		       type->width, type->height);
- }
- 
--static unsigned int mdpy_get_available(struct mdev_type *mtype)
--{
--	return max_devices - mdpy_count;
--}
--
- static const struct vfio_device_ops mdpy_dev_ops = {
- 	.read = mdpy_read,
- 	.write = mdpy_write,
-@@ -672,6 +654,7 @@ static const struct vfio_device_ops mdpy_dev_ops = {
- 
- static struct mdev_driver mdpy_driver = {
- 	.device_api = VFIO_DEVICE_API_PCI_STRING,
-+	.max_instances = 4,
- 	.driver = {
- 		.name = "mdpy",
- 		.owner = THIS_MODULE,
-@@ -680,7 +663,6 @@ static struct mdev_driver mdpy_driver = {
- 	},
- 	.probe = mdpy_probe,
- 	.remove	= mdpy_remove,
--	.get_available = mdpy_get_available,
- 	.show_description = mdpy_show_description,
- };
- 
-@@ -757,5 +739,8 @@ static void __exit mdpy_dev_exit(void)
- 	mdpy_class = NULL;
- }
- 
-+module_param_named(count, mdpy_driver.max_instances, int, 0444);
-+MODULE_PARM_DESC(count, "number of " MDPY_NAME " devices");
-+
- module_init(mdpy_dev_init)
- module_exit(mdpy_dev_exit)
--- 
-2.30.2
+I like this fix!
 
+Thank you,
+Reiji
+
+> +       }
+>
+> -       return reg_to_user(uaddr, &__vcpu_sys_reg(vcpu, r->reg), reg->id);
+> +       return ret;
+>  }
+>
+>  int kvm_arm_sys_reg_get_reg(struct kvm_vcpu *vcpu, const struct kvm_one_reg *reg)
+> @@ -2886,17 +2837,26 @@ int kvm_arm_sys_reg_get_reg(struct kvm_vcpu *vcpu, const struct kvm_one_reg *reg
+>  int kvm_sys_reg_set_user(struct kvm_vcpu *vcpu, const struct kvm_one_reg *reg,
+>                          const struct sys_reg_desc table[], unsigned int num)
+>  {
+> -       void __user *uaddr = (void __user *)(unsigned long)reg->addr;
+> +       u64 __user *uaddr = (u64 __user *)(unsigned long)reg->addr;
+>         const struct sys_reg_desc *r;
+> +       u64 val;
+> +       int ret;
+> +
+> +       if (get_user(val, uaddr))
+> +               return -EFAULT;
+>
+>         r = id_to_sys_reg_desc(vcpu, reg->id, table, num);
+>         if (!r)
+>                 return -ENOENT;
+>
+> -       if (r->set_user)
+> -               return (r->set_user)(vcpu, r, reg, uaddr);
+> +       if (r->set_user) {
+> +               ret = (r->set_user)(vcpu, r, val);
+> +       } else {
+> +               __vcpu_sys_reg(vcpu, r->reg) = val;
+> +               ret = 0;
+> +       }
+>
+> -       return reg_from_user(&__vcpu_sys_reg(vcpu, r->reg), uaddr, reg->id);
+> +       return ret;
+>  }
+>
+>  int kvm_arm_sys_reg_set_reg(struct kvm_vcpu *vcpu, const struct kvm_one_reg *reg)
+> diff --git a/arch/arm64/kvm/sys_regs.h b/arch/arm64/kvm/sys_regs.h
+> index 4fb6d59e7874..b8b576a2af2b 100644
+> --- a/arch/arm64/kvm/sys_regs.h
+> +++ b/arch/arm64/kvm/sys_regs.h
+> @@ -75,9 +75,9 @@ struct sys_reg_desc {
+>
+>         /* Custom get/set_user functions, fallback to generic if NULL */
+>         int (*get_user)(struct kvm_vcpu *vcpu, const struct sys_reg_desc *rd,
+> -                       const struct kvm_one_reg *reg, void __user *uaddr);
+> +                       u64 *val);
+>         int (*set_user)(struct kvm_vcpu *vcpu, const struct sys_reg_desc *rd,
+> -                       const struct kvm_one_reg *reg, void __user *uaddr);
+> +                       u64 val);
+>
+>         /* Return mask of REG_* runtime visibility overrides */
+>         unsigned int (*visibility)(const struct kvm_vcpu *vcpu,
+> --
+> 2.34.1
+>
+> _______________________________________________
+> kvmarm mailing list
+> kvmarm@lists.cs.columbia.edu
+> https://lists.cs.columbia.edu/mailman/listinfo/kvmarm
