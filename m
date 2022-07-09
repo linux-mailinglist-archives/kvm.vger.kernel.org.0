@@ -2,80 +2,160 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 47BD756C7A0
-	for <lists+kvm@lfdr.de>; Sat,  9 Jul 2022 09:00:00 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 7996456C8E0
+	for <lists+kvm@lfdr.de>; Sat,  9 Jul 2022 12:09:48 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229598AbiGIG76 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sat, 9 Jul 2022 02:59:58 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50222 "EHLO
+        id S229757AbiGIKHr (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sat, 9 Jul 2022 06:07:47 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:32840 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229481AbiGIG76 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sat, 9 Jul 2022 02:59:58 -0400
-Received: from mail-vs1-xe29.google.com (mail-vs1-xe29.google.com [IPv6:2607:f8b0:4864:20::e29])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 77A2A774AF
-        for <kvm@vger.kernel.org>; Fri,  8 Jul 2022 23:59:57 -0700 (PDT)
-Received: by mail-vs1-xe29.google.com with SMTP id 189so584483vsh.2
-        for <kvm@vger.kernel.org>; Fri, 08 Jul 2022 23:59:57 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=HaPegW27H93Qf4TuxECcq/yCoVA6MfE/QOnVJszZDqA=;
-        b=Lkv82oUqjvx4Bsq9AtLaUds17K8rvpLSqlVTwzEriO+7DAVVH66sFzMkvAUGaWd/kU
-         gwVuwFKFD88nJ5O4pZoIxtg1lhPUARBkvmy+v0uiswS2j0T/Xs1cWWFlB/Xwm9gKbMF1
-         9LdwLGg3eYo0Og81xf32dTXWkZtwvExnAmDmqBZAVLlzXmIR00QcirlEByuOKO4S7OBa
-         fNGpR3C8b/A4BfNfDeki405qB7XJhjS746SRczj0m3Vl7i7QR3RAbN26P+vjxsUqvm0d
-         /UNbQQIYkbDS/RPA40vb+LVvrsrFohjok+eDSgXFmCXuc2ODIyYBBNzjCrPQ6GtJfIXk
-         WTsA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=HaPegW27H93Qf4TuxECcq/yCoVA6MfE/QOnVJszZDqA=;
-        b=IhOXDGNRbXC5NT9ztxdm+AxrBoMepsDOo6oKBIYuphN4mGLQ+Aq2fj2eWjoHOeJ7D+
-         T1ap75IklsAcIabiQAdbrJ64cX+qDKLi9HrTCICc1yLFyd2LU9uznPVgzPU7o3rkY04d
-         O920uWTFwe9NIM/WzrDHh2GPlPXRCYhoWprt/j9o7FwTFphMfQgm25HpofPvRxTiPB7Y
-         LWREDVm/qjddPihJUwVcyQwQnD9tXYTflqC2p0qKuDi6Oy1XWu3amAPi14nnmuqnvORX
-         k6DOgrjK7Z9e159KqvF3+ECQ/0aR1V1kcBio91hSLR4/pSlsR5uhLp176mVnWXqvcrNU
-         mRFw==
-X-Gm-Message-State: AJIora+nvp7TFm57tIJ/BRuiBrBkXOkb37wROLVtBuGTAYVtSKok5ZiN
-        vej1PNC9pyNcYyyWdHrfVUwk1ohl5gaJix/d4l0flA==
-X-Google-Smtp-Source: AGRyM1siUKjCQ234FL+iWMyc7JxnpRG4THdhKQrLHWHdu6Z5JHZJxU9jxDzxB/Hqk+PLOrefUUydrBpwTKwsKgw61xs=
-X-Received: by 2002:a05:6102:cc6:b0:356:3c5c:beb5 with SMTP id
- g6-20020a0561020cc600b003563c5cbeb5mr3066937vst.80.1657349996519; Fri, 08 Jul
- 2022 23:59:56 -0700 (PDT)
+        with ESMTP id S229723AbiGIKHo (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sat, 9 Jul 2022 06:07:44 -0400
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 509CF4B4B8;
+        Sat,  9 Jul 2022 03:07:41 -0700 (PDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id E898E60E84;
+        Sat,  9 Jul 2022 10:07:39 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3EAE2C341C7;
+        Sat,  9 Jul 2022 10:07:39 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1657361259;
+        bh=KJtmXylkYfBUCP9nKw3ANSOdLovVVTpFPXktiDmYhX8=;
+        h=From:To:Cc:Subject:Date:From;
+        b=LnWbmh+eLrmzEUuOUtwt1Zk7RPhAHxviv/xN1zz17DDCm7ZZ2jcjIeAUW4KTxMXed
+         KM6hlnyvwgcE/ucoKBLNi3lTI0HLQorkZBQKDriJ83QapG5TazYrBSO0s5jpBgI518
+         zjHSfekRlLlgNoH4pC8Bvx7SWcUhuyyANeCxHX9hJfkXhijte2QxQFmBhEqOt4NAki
+         WRxJiBGp9FbjYtPunI+ANm5ybjHbUrO7XEI2HfTHJrTDCbiOpxKJM0muKF/npo2L8i
+         8btVRvA0c3zQa7eBwzLXG2Hotce3pbtGp96wKaC+VQwn/aYfgAwZb7CnJrfDBP08B6
+         LAxmYYMrturXw==
+Received: from mchehab by mail.kernel.org with local (Exim 4.95)
+        (envelope-from <mchehab@kernel.org>)
+        id 1oA7N9-004EGQ-BD;
+        Sat, 09 Jul 2022 11:07:35 +0100
+From:   Mauro Carvalho Chehab <mchehab@kernel.org>
+To:     Linux Doc Mailing List <linux-doc@vger.kernel.org>
+Cc:     Mauro Carvalho Chehab <mchehab@kernel.org>,
+        Mauro Carvalho Chehab <mchehab+huawei@kernel.org>,
+        linux-kernel@vger.kernel.org, Jonathan Corbet <corbet@lwn.net>,
+        =?UTF-8?q?Christian=20K=C3=B6nig?= <christian.koenig@amd.com>,
+        "David S. Miller" <davem@davemloft.net>,
+        "H. Peter Anvin" <hpa@zytor.com>,
+        =?UTF-8?q?Krzysztof=20Wilczy=C5=84ski?= <kw@linux.com>,
+        "Theodore Ts'o" <tytso@mit.edu>, Alex Shi <alexs@kernel.org>,
+        Alexander Potapenko <glider@google.com>,
+        Alexander Viro <viro@zeniv.linux.org.uk>,
+        Andreas Dilger <adilger.kernel@dilger.ca>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        Andrey Grodzovsky <andrey.grodzovsky@amd.com>,
+        Borislav Petkov <bp@alien8.de>,
+        Daniel Vetter <daniel@ffwll.ch>,
+        Dave Hansen <dave.hansen@linux.intel.com>,
+        David Airlie <airlied@linux.ie>,
+        Dmitry Vyukov <dvyukov@google.com>,
+        Eric Dumazet <edumazet@google.com>,
+        Ingo Molnar <mingo@redhat.com>,
+        Jakub Kicinski <kuba@kernel.org>, Leo Yan <leo.yan@linaro.org>,
+        Marc Kleine-Budde <mkl@pengutronix.de>,
+        Marco Elver <elver@google.com>,
+        Mathieu Poirier <mathieu.poirier@linaro.org>,
+        Max Staudt <max@enpas.org>,
+        Mike Kravetz <mike.kravetz@oracle.com>,
+        Mike Leach <mike.leach@linaro.org>,
+        Muchun Song <songmuchun@bytedance.com>,
+        Paolo Abeni <pabeni@redhat.com>,
+        Sumit Semwal <sumit.semwal@linaro.org>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Wolfgang Grandegger <wg@grandegger.com>,
+        Yanteng Si <siyanteng@loongson.cn>, coresight@lists.linaro.org,
+        dri-devel@lists.freedesktop.org, kasan-dev@googlegroups.com,
+        kvm@vger.kernel.org, linaro-mm-sig@lists.linaro.org,
+        linux-arm-kernel@lists.infradead.org, linux-cachefs@redhat.com,
+        linux-can@vger.kernel.org, linux-ext4@vger.kernel.org,
+        linux-fsdevel@vger.kernel.org, linux-media@vger.kernel.org,
+        linux-mm@kvack.org, linux-pci@vger.kernel.org,
+        linux-sgx@vger.kernel.org, netdev@vger.kernel.org, x86@kernel.org
+Subject: [PATCH v3 00/21] Update Documentation/ cross references and fix issues
+Date:   Sat,  9 Jul 2022 11:07:13 +0100
+Message-Id: <cover.1657360984.git.mchehab@kernel.org>
+X-Mailer: git-send-email 2.36.1
 MIME-Version: 1.0
-References: <20220706164304.1582687-1-maz@kernel.org> <20220706164304.1582687-4-maz@kernel.org>
-In-Reply-To: <20220706164304.1582687-4-maz@kernel.org>
-From:   Reiji Watanabe <reijiw@google.com>
-Date:   Fri, 8 Jul 2022 23:59:40 -0700
-Message-ID: <CAAeT=Fx0Xr7cGxO64vMUH0uKg1upeOZ3Tvu-1av7ro_+AbTi+g@mail.gmail.com>
-Subject: Re: [PATCH 03/19] KVM: arm64: Introduce generic get_user/set_user
- helpers for system registers
-To:     Marc Zyngier <maz@kernel.org>
-Cc:     kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org,
-        Linux ARM <linux-arm-kernel@lists.infradead.org>,
-        Schspa Shi <schspa@gmail.com>, kernel-team@android.com,
-        Oliver Upton <oliver.upton@linux.dev>
-Content-Type: text/plain; charset="UTF-8"
-X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-        T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL
-        autolearn=ham autolearn_force=no version=3.4.6
+Content-Transfer-Encoding: 8bit
+X-Spam-Status: No, score=-7.8 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_HI,
+        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Jul 6, 2022 at 9:43 AM Marc Zyngier <maz@kernel.org> wrote:
->
-> The userspace access to the system registers is done using helpers
-> that hardcode the table that is looked up. extract some generic
-> helpers from this, moving the handling of hidden sysregs into
-> the core code.
->
-> Signed-off-by: Marc Zyngier <maz@kernel.org>
+This series fix almost all fixable issues when building the html docs at
+linux-next (next-20220608):
 
-Reviewed-by: Reiji Watanabe <reijiw@google.com>
+- Address some broken cross-references;
+- Fix kernel-doc warnings;
+- Fix bad tags on ReST files.
+
+With this series applied, plus other pending patches that should hopefully
+be merged in time for the next merge window, htmldocs build will produce
+just 4 warnings with Sphinx 2.4.4.
+
+Sphinx >=3 will produce some extra false-positive warnings due to conflicts
+between structs and functions sharing the same name. Hopefully this will
+be fixed either on a new Sphinx 5.x version or Sphinx 6.0.
+
+Mauro Carvalho Chehab (21):
+  docs: networking: update netdevices.rst reference
+  docs: update vmalloced-kernel-stacks.rst reference
+  docs: update vmemmap_dedup.rst reference
+  docs: zh_CN: page_migration: fix reference to mm index.rst
+  dt-bindings: arm: update arm,coresight-cpu-debug.yaml reference
+  x86/sgx: fix kernel-doc markups
+  fscache: fix kernel-doc documentation
+  fs: namei: address some kernel-doc issues
+  drm/scheduler: fix a kernel-doc warning
+  drm/scheduler: add a missing kernel-doc parameter
+  kfence: fix a kernel-doc parameter
+  genalloc: add a description for start_addr parameter
+  textsearch: document list inside struct ts_ops
+  dcache: fix a kernel-doc warning
+  docs: ext4: blockmap.rst: fix a broken table
+  docs: PCI: pci-vntb-function.rst: Properly include ascii artwork
+  docs: PCI: pci-vntb-howto.rst: fix a title markup
+  docs: virt: kvm: fix a title markup at api.rst
+  docs: ABI: sysfs-bus-nvdimm
+  docs: leds: index.rst: add leds-qcom-lpg to it
+  Documentation: coresight: fix binding wildcards
+
+ Documentation/ABI/testing/sysfs-bus-nvdimm             |  2 ++
+ Documentation/PCI/endpoint/pci-vntb-function.rst       |  2 +-
+ Documentation/PCI/endpoint/pci-vntb-howto.rst          |  2 +-
+ Documentation/filesystems/ext4/blockmap.rst            |  2 +-
+ Documentation/leds/index.rst                           |  1 +
+ Documentation/trace/coresight/coresight-cpu-debug.rst  |  2 +-
+ Documentation/trace/coresight/coresight.rst            |  2 +-
+ Documentation/translations/zh_CN/mm/page_migration.rst |  2 +-
+ .../translations/zh_CN/mm/vmalloced-kernel-stacks.rst  |  2 +-
+ Documentation/virt/kvm/api.rst                         |  6 +++---
+ arch/x86/include/uapi/asm/sgx.h                        | 10 ++++++++--
+ drivers/gpu/drm/scheduler/sched_main.c                 |  1 +
+ drivers/net/can/can327.c                               |  2 +-
+ fs/namei.c                                             |  3 +++
+ include/drm/gpu_scheduler.h                            |  1 +
+ include/linux/dcache.h                                 |  2 +-
+ include/linux/fscache.h                                |  4 ++--
+ include/linux/genalloc.h                               |  1 +
+ include/linux/kfence.h                                 |  1 +
+ include/linux/textsearch.h                             |  1 +
+ mm/hugetlb_vmemmap.h                                   |  2 +-
+ 21 files changed, 34 insertions(+), 17 deletions(-)
+
+-- 
+2.36.1
+
+
