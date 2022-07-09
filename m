@@ -2,60 +2,72 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 401B656C8E9
-	for <lists+kvm@lfdr.de>; Sat,  9 Jul 2022 12:18:12 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 2161756C953
+	for <lists+kvm@lfdr.de>; Sat,  9 Jul 2022 14:07:26 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229505AbiGIKSK (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sat, 9 Jul 2022 06:18:10 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42522 "EHLO
+        id S229469AbiGIMHY (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sat, 9 Jul 2022 08:07:24 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37044 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229470AbiGIKSJ (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sat, 9 Jul 2022 06:18:09 -0400
-Received: from gandalf.ozlabs.org (mail.ozlabs.org [IPv6:2404:9400:2221:ea00::3])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 219AE3CBF9;
-        Sat,  9 Jul 2022 03:18:08 -0700 (PDT)
-Received: from authenticated.ozlabs.org (localhost [127.0.0.1])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange ECDHE (P-256) server-signature RSA-PSS (4096 bits) server-digest SHA256)
-        (No client certificate requested)
-        by mail.ozlabs.org (Postfix) with ESMTPSA id 4Lg5gw4PS4z4xn3;
-        Sat,  9 Jul 2022 20:18:04 +1000 (AEST)
-From:   Michael Ellerman <patch-notifications@ellerman.id.au>
-To:     linuxppc-dev@lists.ozlabs.org, Alexey Kardashevskiy <aik@ozlabs.ru>
-Cc:     kvm@vger.kernel.org, kvm-ppc@vger.kernel.org,
-        Frederic Barrat <fbarrat@linux.ibm.com>
-In-Reply-To: <20220628080228.1508847-1-aik@ozlabs.ru>
-References: <20220628080228.1508847-1-aik@ozlabs.ru>
-Subject: Re: [PATCH kernel] KVM: PPC: Do not warn when userspace asked for too big TCE table
-Message-Id: <165736167184.12236.12724791428724317908.b4-ty@ellerman.id.au>
-Date:   Sat, 09 Jul 2022 20:14:31 +1000
+        with ESMTP id S229448AbiGIMHX (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sat, 9 Jul 2022 08:07:23 -0400
+Received: from mail-vs1-xe2f.google.com (mail-vs1-xe2f.google.com [IPv6:2607:f8b0:4864:20::e2f])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EDF17371BF
+        for <kvm@vger.kernel.org>; Sat,  9 Jul 2022 05:07:22 -0700 (PDT)
+Received: by mail-vs1-xe2f.google.com with SMTP id d187so924185vsd.10
+        for <kvm@vger.kernel.org>; Sat, 09 Jul 2022 05:07:22 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=mime-version:sender:from:date:message-id:subject:to;
+        bh=jxNGQ1VJJ8xK6WwefPrA3m5Fd0FF5gJlzU9B8KV6EkM=;
+        b=nIGy0G9CTDVnTCJtBUTkriUbTuiENt3OJU03gAO5TXYNB6AlPTeYBwtiNQIaOH8KUU
+         cefPgxbcxjTLNURWBxsRFLoCbyGhtVmm34vw47wdd8S6fYJbc9pQo365uziZ8BkglCKV
+         qBWRfTew2YsEQVAVTLNiOFyOpRkoQpHACEt1AK+POJXyd1GhzmJD14WxkjrBOixHNYLu
+         qvTyzxk2LT1BDE+6lWI76XQHqDItxccIUB/V/wSLoHqf+KYMpfFy4d5GbBg873g0IPWB
+         pqROAga3HJsLTVm3EhBWyzTNWQ+uaCBDcL8QGGHUWMV1fCV4l80UyX/KLPSMu9K0hdRQ
+         DL9A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:mime-version:sender:from:date:message-id:subject
+         :to;
+        bh=jxNGQ1VJJ8xK6WwefPrA3m5Fd0FF5gJlzU9B8KV6EkM=;
+        b=Qylb5vWkBkmZDBzi4DSL7WEXtdEnietlVRFIn1mOXYQRI3rS1ubhDP3Hh9jxtvmcCH
+         3Q9vYV8VqSWc7cM4L47tu7ndJiGkJBNcAPpEeLwG0JtK55JyQ7KBJHbi9+P9GoaniUlc
+         OUA/VQ4kUwX5nvaQkT+jpqdpo6W2s8OmJkEofd8EFATLyB30Px3ctqm0DfJYU2B61NCN
+         W5MESDBqEzbOkoHA6CXKGcDIAwPfkvsRXygE8U7WdqJdXUaoFP4FmBlD3y3al/3DS04f
+         6GWBFPBeBFaArQ77GkAPLhouxGjtGTmJq4TMlx8Xo3m/qohio7VtZwwRaUYsftagJ16p
+         fVLQ==
+X-Gm-Message-State: AJIora/KRs1hTLBbkgnAczZDcGrQfZYPMePj3Up+ORGMtaR8gM6rNhIv
+        y657qlc5N22oSwZu2iDlNCGTZ0OZZ2S8mjlvfQ==
+X-Google-Smtp-Source: AGRyM1taTP1im2PQbroUsraZ2N8oQbSt1hRa6kPktX1L57dFx7qIvV4ydtWu8Vh5MYAZ9lSFiQg3Zp0cPqO3VHYKGNQ=
+X-Received: by 2002:a67:c21a:0:b0:354:37d7:aaf8 with SMTP id
+ i26-20020a67c21a000000b0035437d7aaf8mr3351424vsj.30.1657368442076; Sat, 09
+ Jul 2022 05:07:22 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-2.6 required=5.0 tests=BAYES_00,RCVD_IN_DNSWL_LOW,
-        SPF_HELO_PASS,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
+Sender: varonjames145@gmail.com
+Received: by 2002:a59:a38f:0:b0:2d2:5e81:a10d with HTTP; Sat, 9 Jul 2022
+ 05:07:19 -0700 (PDT)
+From:   "Mrs. Rabi Affason Marcus" <affasonrabi@gmail.com>
+Date:   Sat, 9 Jul 2022 05:07:19 -0700
+X-Google-Sender-Auth: SB9hnpiRLJZTmrBh_AfCZCmHC6Y
+Message-ID: <CANr=4hvcadFgJ0_NAO_a9oXYp_uR6hW9+suJih-YXAR4HrVCHQ@mail.gmail.com>
+Subject: PLEASE CONFIRM MY PREVIOUS MAIL FOR MORE INFORMATION.
+To:     undisclosed-recipients:;
+Content-Type: text/plain; charset="UTF-8"
+X-Spam-Status: No, score=4.3 required=5.0 tests=BAYES_50,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_ENVFROM_END_DIGIT,
+        FREEMAIL_FROM,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,SUBJ_ALL_CAPS,
+        T_HK_NAME_FM_MR_MRS,T_SCC_BODY_TEXT_LINE,UNDISC_MONEY autolearn=no
         autolearn_force=no version=3.4.6
+X-Spam-Level: ****
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, 28 Jun 2022 18:02:28 +1000, Alexey Kardashevskiy wrote:
-> KVM manages emulated TCE tables for guest LIOBNs by a two level table
-> which maps up to 128TiB with 16MB IOMMU pages (enabled in QEMU by default)
-> and MAX_ORDER=11 (the kernel's default). Note that the last level of
-> the table is allocated when actual TCE is updated.
-> 
-> However these tables are created via ioctl() on kvmfd and the userspace
-> can trigger WARN_ON_ONCE_GFP(order >= MAX_ORDER, gfp) in mm/page_alloc.c
-> and flood dmesg.
-> 
-> [...]
-
-Applied to powerpc/topic/ppc-kvm.
-
-[1/1] KVM: PPC: Do not warn when userspace asked for too big TCE table
-      https://git.kernel.org/powerpc/c/4dee21e0f2520f5032b0abce0ecae593a71bd19d
-
-cheers
+Good morning from here this morning my dear, how are you doing today?
+My name is Mrs. Rabi Affason Marcus; Please I want to confirm if you
+get my previous mail concerning the Humanitarian Gesture Project that
+I need your assistance to execute? Please I wait for your candid
+response.
