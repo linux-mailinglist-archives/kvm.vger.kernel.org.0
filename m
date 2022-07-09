@@ -2,53 +2,53 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id D61BB56C6AE
-	for <lists+kvm@lfdr.de>; Sat,  9 Jul 2022 06:22:40 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 8300256C68F
+	for <lists+kvm@lfdr.de>; Sat,  9 Jul 2022 06:21:23 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229656AbiGIEV1 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sat, 9 Jul 2022 00:21:27 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53282 "EHLO
+        id S229577AbiGIEVU (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sat, 9 Jul 2022 00:21:20 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53266 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229489AbiGIEVT (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sat, 9 Jul 2022 00:21:19 -0400
-Received: from mail-pf1-x433.google.com (mail-pf1-x433.google.com [IPv6:2607:f8b0:4864:20::433])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 798284E63A;
+        with ESMTP id S229471AbiGIEVS (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sat, 9 Jul 2022 00:21:18 -0400
+Received: from mail-pl1-x631.google.com (mail-pl1-x631.google.com [IPv6:2607:f8b0:4864:20::631])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 21E8B4E62C;
         Fri,  8 Jul 2022 21:21:17 -0700 (PDT)
-Received: by mail-pf1-x433.google.com with SMTP id x184so635339pfx.2;
+Received: by mail-pl1-x631.google.com with SMTP id p16so397659plo.0;
         Fri, 08 Jul 2022 21:21:17 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
         h=from:to:cc:subject:date:message-id:in-reply-to:references
          :mime-version:content-transfer-encoding;
-        bh=kqgIf//8Dsl2ovKoNOr5TejvwiroTvJl6z8lZ1nXLAM=;
-        b=Usw0VXUMjNukfejaUnXIB/Vzmd2l1UiAb2WfP4Q7LdDheS5mNfYmk6pTkv8u6Klc/7
-         0Ooi9So+aPuDD9nC3tHcZXKB5ONHBfKFZk/7a+CFpsVl2pQo8NbtYC5Br5kmi8718iUK
-         70vvL6czsqWCMJUkTbpmJxu3GMnZOhFadG1NkBb22fz3+VJIOLeRT3AT1TltyItI7ywT
-         9OIOJEkfZ7IRzyg+3SXtV5wwPLfHM9b61jkesevh5qyLDlcvfEeyVpXCE/8wB0V+T5E3
-         jq1tLgwfEffn07CUDmMg2Cp3fOYjvFqkYOjciuACHOHczbAli9cv2Q5xj75KyUAKRPOQ
-         3VlA==
+        bh=ycgZMvq2EVogDaqogTrk1vbctpDqtsq51oWL+KX1fwE=;
+        b=IUDAVGaP5i3wsy3MP7idxdjv/VjJdS+DB+cAE3/YgLZLVDuWvQB9rVuxzkECFqDnUs
+         RKd8CYxxe2w3QYWEaaoyivVcPG29K32MEkFPDK9ivuexTkUrQqm6IY9gq4wcCW199PIS
+         WQ2GI28IgKCEhda632Rr1HUJJOioldYc17bWyhoKqfMfajnHBczDGV/vk8wZjRkMoHA9
+         HboWCIZ1UYh/OhQqsjXMnt4rJ0MbWEzzPeF30lwAvWAU9549IigCdM10XeYWlaqKCL6G
+         8Y4iDGHxfkyayiuDvhbZaUt8O9vPgy4f/UDazRQCO3clor3TQ2PTTwsP+aPbJNjmTI1M
+         4yPQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
          :references:mime-version:content-transfer-encoding;
-        bh=kqgIf//8Dsl2ovKoNOr5TejvwiroTvJl6z8lZ1nXLAM=;
-        b=dfiA02IfVdkMgX5JXoRAvQop4KkbACWqvV87XqGBqSNKdGuQyoEqtXyNEUegsRyw9j
-         Klqu4czR0uQqEi6pxRZ7XUu8ILreCbBkBjARDhMFU66Rd/QDD5Ak1AmcEk8Fdj4xBD7a
-         AiV0it1BhXAfqvv9O+H6tfpV/cYPhFao7RONdMoz4JUAD2d2dZNNHQzcjarItUie8mGT
-         9DfOvFY6O2UU3Z3y7G/hC9fgJMOGyb9TUNLfkmVgbB3nEB91g/UhzeQEw69YmAzOFFUi
-         zY7BBi60cKP0HM5GxiTlxonbHvDIVMKXVQxkbmQ9rR38m4tEdI0pbfPQ/aX4XnSy8Ub9
-         /nSA==
-X-Gm-Message-State: AJIora9KYhPOCuHPEr4N1eV1GbxPyUnBKAcKJBPDV9aUWtEE3rfHgEjE
-        0I6wNMVMIV/GTwGK6+CLFNQ=
-X-Google-Smtp-Source: AGRyM1uaifn+sBYgGLh8V7LYIVrg6zY7zfcgJlqWMsGptHsp8J2gb+VBTHjpdj48qGOH+OiPgJv7AQ==
-X-Received: by 2002:a63:8641:0:b0:413:8c07:4ebf with SMTP id x62-20020a638641000000b004138c074ebfmr6136013pgd.604.1657340476917;
+        bh=ycgZMvq2EVogDaqogTrk1vbctpDqtsq51oWL+KX1fwE=;
+        b=yPcoPsDqxo9AKwk8fJR0CcCoGZtcmYMF+G5iWa23CzqLCEQOkhjH6xENrPK/xNAHMi
+         XW6Qgp9BlnuDtEMVS/vdxGLlHyipI+Y5ktJHgnnq+vlvbsSH2Uc0nu0Q1g+WFWS22KI/
+         Dt+5KDvAAciUTtqJfKk8grP1PZZfa+mX5dmHK5n9SDosWe/2p0HG+YgPKOL+qEPqbtzF
+         lC7wfy+Jw9m3I1EQ3snC+UKdoxOtLNfTGaLkCNw72qE7eRyUtr/+EFmY3LlGY32wY29B
+         VbBxgmHibQ2CxYccbAy3ymKHB/cfYVEeoAjZHC1DIoZcqQGdOnP+osdC2uUk7j+Gj2oc
+         vfRg==
+X-Gm-Message-State: AJIora8lbgfuMSySafkOsZmth8T8CZDAkYyjOxRVnRFGIh0sRJOwU/tq
+        D0Ufas0hAxmZMBiq8tA/Coo=
+X-Google-Smtp-Source: AGRyM1u3R/Bf4/mPqH1iFvrcy+Oj5Qvhdsg7oo64sXJHUcB+TfJl++7Ezz2mL+4sZEqgogHTXga2Ag==
+X-Received: by 2002:a17:902:eccf:b0:16b:f555:d42e with SMTP id a15-20020a170902eccf00b0016bf555d42emr6858192plh.75.1657340476542;
         Fri, 08 Jul 2022 21:21:16 -0700 (PDT)
 Received: from debian.me (subs02-180-214-232-88.three.co.id. [180.214.232.88])
-        by smtp.gmail.com with ESMTPSA id m6-20020a1709026bc600b0016c325141d2sm287884plt.15.2022.07.08.21.21.14
+        by smtp.gmail.com with ESMTPSA id q17-20020a170902f35100b0016bf803341asm332158ple.146.2022.07.08.21.21.14
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
         Fri, 08 Jul 2022 21:21:15 -0700 (PDT)
 Received: by debian.me (Postfix, from userid 1000)
-        id C22FD103874; Sat,  9 Jul 2022 11:21:10 +0700 (WIB)
+        id E3A411039B1; Sat,  9 Jul 2022 11:21:10 +0700 (WIB)
 From:   Bagas Sanjaya <bagasdotme@gmail.com>
 To:     linux-doc@vger.kernel.org
 Cc:     Paolo Bonzini <pbonzini@redhat.com>,
@@ -61,9 +61,9 @@ Cc:     Paolo Bonzini <pbonzini@redhat.com>,
         Kai Huang <kai.huang@intel.com>, x86@kernel.org,
         kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
         Bagas Sanjaya <bagasdotme@gmail.com>
-Subject: [PATCH 04/12] Documentation: kvm: tdx: Use bullet list for public kvm trees
-Date:   Sat,  9 Jul 2022 11:20:30 +0700
-Message-Id: <20220709042037.21903-5-bagasdotme@gmail.com>
+Subject: [PATCH 05/12] Documentation: kvm: tdx: title typofix
+Date:   Sat,  9 Jul 2022 11:20:31 +0700
+Message-Id: <20220709042037.21903-6-bagasdotme@gmail.com>
 X-Mailer: git-send-email 2.37.0
 In-Reply-To: <20220709042037.21903-1-bagasdotme@gmail.com>
 References: <20220709042037.21903-1-bagasdotme@gmail.com>
@@ -79,34 +79,28 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-The 8th external reference (public trees), doesn't have bullet list for
-listing, so the reference is rendered as continous paragraph instead.
-
-Use bullet list for the reference.
+The page title contains misspelled "Dodmain" instead of "Domain" and
+missing space before abbreviation parentheses. Fix both mistakes.
 
 Fixes: 9e54fa1ac03df3 ("Documentation/virtual/kvm: Document on Trust Domain Extensions(TDX)")
 Signed-off-by: Bagas Sanjaya <bagasdotme@gmail.com>
 ---
- Documentation/virt/kvm/intel-tdx.rst | 6 ++++--
- 1 file changed, 4 insertions(+), 2 deletions(-)
+ Documentation/virt/kvm/intel-tdx.rst | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
 diff --git a/Documentation/virt/kvm/intel-tdx.rst b/Documentation/virt/kvm/intel-tdx.rst
-index 7371e152021621..1e3ad0ca2925bf 100644
+index 1e3ad0ca2925bf..5288631c80122d 100644
 --- a/Documentation/virt/kvm/intel-tdx.rst
 +++ b/Documentation/virt/kvm/intel-tdx.rst
-@@ -417,8 +417,10 @@ References
- .. [7] Intel TDX Virtual Firmware Design Guide
-    https://software.intel.com/content/dam/develop/external/us/en/documents/tdx-virtual-firmware-design-guide-rev-1.
- .. [8] intel public github
--   kvm TDX branch: https://github.com/intel/tdx/tree/kvm
--   TDX guest branch: https://github.com/intel/tdx/tree/guest
-+
-+   * kvm TDX branch: https://github.com/intel/tdx/tree/kvm
-+   * TDX guest branch: https://github.com/intel/tdx/tree/guest
-+
- .. [9] tdvf
-     https://github.com/tianocore/edk2-staging/tree/TDVF
- .. [10] KVM forum 2020: Intel Virtualization Technology Extensions to
+@@ -1,7 +1,7 @@
+ .. SPDX-License-Identifier: GPL-2.0
+ 
+ ===================================
+-Intel Trust Dodmain Extensions(TDX)
++Intel Trust Domain Extensions (TDX)
+ ===================================
+ 
+ Overview
 -- 
 An old man doll... just what I always wanted! - Clara
 
