@@ -2,69 +2,52 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 3EF6656C662
-	for <lists+kvm@lfdr.de>; Sat,  9 Jul 2022 05:28:35 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id D941256C683
+	for <lists+kvm@lfdr.de>; Sat,  9 Jul 2022 05:52:37 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229490AbiGID2c (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 8 Jul 2022 23:28:32 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55872 "EHLO
+        id S229577AbiGIDwb (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 8 Jul 2022 23:52:31 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40628 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229453AbiGID2b (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 8 Jul 2022 23:28:31 -0400
-Received: from alexa-out-sd-02.qualcomm.com (alexa-out-sd-02.qualcomm.com [199.106.114.39])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DFB756BC26;
-        Fri,  8 Jul 2022 20:28:26 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-  d=quicinc.com; i=@quicinc.com; q=dns/txt; s=qcdkim;
-  t=1657337306; x=1688873306;
-  h=message-id:date:mime-version:subject:to:cc:references:
-   from:in-reply-to:content-transfer-encoding;
-  bh=vs1tdf74lU0YUImAAcNBcLxGTg77qAoLk254Htgr/CI=;
-  b=CFi8e+mvUIV9UKffw92QfpOjA1p8B3+3APmI+C83WWotPWoArW4TB3ss
-   3Rka1osO+qFJuhdLWTNqfwVk1SaC3LkElcreQcSO1IR9tG30ScFzTo3Nt
-   o379YOQwXTIUx/Jp/6EvUlsDi+0tFezw/BzO3Oa+xYM559LSYTjaF33CX
-   o=;
-Received: from unknown (HELO ironmsg02-sd.qualcomm.com) ([10.53.140.142])
-  by alexa-out-sd-02.qualcomm.com with ESMTP; 08 Jul 2022 20:28:26 -0700
-X-QCInternal: smtphost
-Received: from nasanex01c.na.qualcomm.com ([10.47.97.222])
-  by ironmsg02-sd.qualcomm.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 08 Jul 2022 20:28:26 -0700
-Received: from nalasex01a.na.qualcomm.com (10.47.209.196) by
- nasanex01c.na.qualcomm.com (10.47.97.222) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.986.22; Fri, 8 Jul 2022 20:28:25 -0700
-Received: from [10.111.182.196] (10.49.16.6) by nalasex01a.na.qualcomm.com
- (10.47.209.196) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.986.22; Fri, 8 Jul 2022
- 20:28:24 -0700
-Message-ID: <847485d7-0b4b-43f2-c115-d3afeac4ed6b@quicinc.com>
-Date:   Fri, 8 Jul 2022 20:28:22 -0700
+        with ESMTP id S229472AbiGIDw3 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 8 Jul 2022 23:52:29 -0400
+Received: from mail-il1-f198.google.com (mail-il1-f198.google.com [209.85.166.198])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DE00885D6C
+        for <kvm@vger.kernel.org>; Fri,  8 Jul 2022 20:52:27 -0700 (PDT)
+Received: by mail-il1-f198.google.com with SMTP id u9-20020a056e021a4900b002dc685a1c13so306040ilv.19
+        for <kvm@vger.kernel.org>; Fri, 08 Jul 2022 20:52:27 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:mime-version:date:message-id:subject:from:to;
+        bh=bzP6aJ1hpqBF9+fXYAHOKSQcB1ckT2syqlbwROuJMRY=;
+        b=FMZXl9jtffHHBH/RM0ihSvu0EkXkYuHbb5FlvSisCe8rn53KiQ2l/sznIl57l63ABd
+         gEEoDFUI32t/32qatxdUD5WdwF3MzTs//g0WQJIo++tZDI/bTUbEzf2VwTFDdTz/1B0g
+         NSVPRYKEm5vmF1QlQL9AQZUKQ1ImZuPEtZH+CcDIXTHu4EgMmCpxDSY2XUz36oqD3gko
+         6qpLWG/EnG7ktVWbDzk7MDYAUeNnOI5cxxOlp1ywOI38vftgkpQS1b45XhaOHi400cBJ
+         FyX1+OZOUs/1umWYjhBv82kEIU7RS5sw5/RpFps5q/khWk99IiKFhaoyq5WM7+qiQbx2
+         FJrg==
+X-Gm-Message-State: AJIora8VE6pF2LOqafwHAfZzV/Qzv22ZhwWWpSoOQX0HBnJVLRzqvhTh
+        8u/Grw64Pj5NlLaRxBhSxmdhy4jujW5RXkRx6bhFKcbLMSue
+X-Google-Smtp-Source: AGRyM1s20bdFdcGAOgksWJX1dSTZprzEMVajKOK9qR7Pfaa+5+ZtE6c0MfCR03S3qF7nB95HpU/30qF+Ihnx024TLC5pn1U/mPY8
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:91.0) Gecko/20100101
- Thunderbird/91.8.1
-Subject: Re: [RFC 0/3] SCMI Vhost and Virtio backend implementation
-Content-Language: en-US
-To:     Cristian Marussi <cristian.marussi@arm.com>,
-        Neeraj Upadhyay <quic_neeraju@quicinc.com>
-CC:     <mst@redhat.com>, <jasowang@redhat.com>, <sudeep.holla@arm.com>,
-        <quic_sramana@quicinc.com>, <vincent.guittot@linaro.org>,
-        <linux-arm-kernel@lists.infradead.org>, <kvm@vger.kernel.org>,
-        <virtualization@lists.linux-foundation.org>,
-        <linux-kernel@vger.kernel.org>,
-        Souvik Chakravarty <Souvik.Chakravarty@arm.com>,
-        Stephen Boyd <sboyd@kernel.org>
-References: <20220609071956.5183-1-quic_neeraju@quicinc.com>
- <Yqdxz9lZo5qedTG4@e120937-lin>
-From:   Mike Tipton <quic_mdtipton@quicinc.com>
-In-Reply-To: <Yqdxz9lZo5qedTG4@e120937-lin>
-Content-Type: text/plain; charset="UTF-8"; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Originating-IP: [10.49.16.6]
-X-ClientProxiedBy: nalasex01b.na.qualcomm.com (10.47.209.197) To
- nalasex01a.na.qualcomm.com (10.47.209.196)
-X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_DNSWL_MED,
-        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
+X-Received: by 2002:a05:6602:2c01:b0:65d:d998:680c with SMTP id
+ w1-20020a0566022c0100b0065dd998680cmr3702130iov.132.1657338747229; Fri, 08
+ Jul 2022 20:52:27 -0700 (PDT)
+Date:   Fri, 08 Jul 2022 20:52:27 -0700
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <0000000000004d1b5605e3573f8e@google.com>
+Subject: [syzbot] INFO: rcu detected stall in dummy_timer (4)
+From:   syzbot <syzbot+879882be5b42e60d4d98@syzkaller.appspotmail.com>
+To:     bp@alien8.de, dave.hansen@linux.intel.com, hpa@zytor.com,
+        kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+        mingo@redhat.com, pbonzini@redhat.com,
+        syzkaller-bugs@googlegroups.com, tglx@linutronix.de,
+        vkuznets@redhat.com, wanpengli@tencent.com, x86@kernel.org
+Content-Type: text/plain; charset="UTF-8"
+X-Spam-Status: No, score=0.8 required=5.0 tests=BAYES_00,FROM_LOCAL_HEX,
+        HEADER_FROM_DIFFERENT_DOMAINS,RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,
+        SORTED_RECIPS,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=no
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -72,304 +55,402 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-I'll let Neeraj respond to more of the core backend details and policy 
-enforcement options, but I can provide some details for our prototype 
-clock protocol handler. Note that it's a pretty simple proof-of-concept 
-handler that's implemented entirely outside of the common clock 
-framework. It operates as just another client to the framework. This 
-approach has some limitations. And a more full-featured implementation 
-could benefit from being implemented in the clock framework itself. But 
-that level of support hasn't been necessary for our purposes yet.
+Hello,
 
-On 6/13/2022 10:20 AM, Cristian Marussi wrote:
-> +CC: Souvik
-> 
-> On Thu, Jun 09, 2022 at 12:49:53PM +0530, Neeraj Upadhyay wrote:
->> This RFC series, provides ARM System Control and Management Interface (SCMI)
->> protocol backend implementation for Virtio transport. The purpose of this
-> 
-> Hi Neeraj,
-> 
-> Thanks for this work, I only glanced through the series at first to
-> grasp a general understanding of it (without goind into much details for
-> now) and I'd have a few questions/concerns that I'll noted down below.
-> 
-> I focused mainly on the backend server aims/functionalities/issues ignoring
-> at first the vhost-scmi entry-point since the vost-scmi accelerator is just
-> a (more-or-less) standard means of configuring and grabbing SCMI traffic
-> from the VMs into the Host Kernel and so I found more interesting at first
-> to understand what we can do with such traffic at first.
-> (IOW the vhost-scmi layer is welcome but remain to see what to do with it...)
-> 
->> feature is to provide para-virtualized interfaces to guest VMs, to various
->> hardware blocks like clocks, regulators. This allows the guest VMs to
->> communicate their resource needs to the host, in the absence of direct
->> access to those resources.
-> 
-> In an SCMI stack the agents (like VMs) issue requests to an SCMI platform
-> backend that is in charge of policying and armonizing such requests
-> eventually denying some of these (possibly malicious) while allowing others
-> (possibly armonizing/merging such reqs); with your solution basically the
-> SCMI backend in Kernel marshals/conveys all of such SCMI requests to the
-> proper Linux Kernel subsystem that is usually in charge of it, using
-> dedicated protocol handlers that basically translates SCMI requests to
-> Linux APIs calls to the Host. (I may have oversimplified or missed
-> something...)
-> 
-> At the price of a bit of overhead and code-duplication introduced by
-> this SCMI Backend you can indeed leverage the existing mechanisms for
-> resource accounting and sharing included in such Linux subsystems (like
-> Clock framework), and that's nice and useful, BUT how do you policy/filter
-> (possibly dinamically as VMs come and go) what these VMs can see and do
-> with these resources ?
-> 
+syzbot found the following issue on:
 
-Currently, our only level of filtering is for which clocks we choose to 
-expose over SCMI. Those chosen clocks are exposed to all VMs equally. 
-The clock protocol handler exposes a registration function, which we 
-call from our clock drivers. Which clocks we register are currently 
-hardcoded in the drivers themselves. We often want to register all the 
-clocks in a given driver, since we have separate drivers for each clock 
-controller and many clock controllers are already dedicated to a 
-particular core or subsystem. So if that core or subsystem needs to be 
-controlled by a VM, then we give the VM all of its clocks. This can mean 
-exposing a large number of clocks (in the hundreds).
+HEAD commit:    c1084b6c5620 Merge tag 'soc-fixes-5.19-2' of git://git.ker..
+git tree:       upstream
+console output: https://syzkaller.appspot.com/x/log.txt?x=127615f4080000
+kernel config:  https://syzkaller.appspot.com/x/.config?x=f3bf7765b1ebd721
+dashboard link: https://syzkaller.appspot.com/bug?extid=879882be5b42e60d4d98
+compiler:       Debian clang version 13.0.1-++20220126092033+75e33f71c2da-1~exp1~20220126212112.63, GNU ld (GNU Binutils for Debian) 2.35.2
+syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=11ef6948080000
+C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=13c44524080000
+
+Bisection is inconclusive: the issue happens on the oldest tested release.
+
+bisection log:  https://syzkaller.appspot.com/x/bisect.txt?x=16a1bf04080000
+final oops:     https://syzkaller.appspot.com/x/report.txt?x=15a1bf04080000
+console output: https://syzkaller.appspot.com/x/log.txt?x=11a1bf04080000
+
+IMPORTANT: if you fix the issue, please add the following tag to the commit:
+Reported-by: syzbot+879882be5b42e60d4d98@syzkaller.appspotmail.com
+
+imon 3-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 5-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 4-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 3-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 4-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+rcu: INFO: rcu_preempt self-detected stall on CPU
+rcu: 	1-...!: (1 GPs behind) idle=a7b/1/0x4000000000000000 softirq=26067/26069 fqs=3 
+	(t=10500 jiffies g=29121 q=209 ncpus=2)
+rcu: rcu_preempt kthread starved for 10494 jiffies! g29121 f0x0 RCU_GP_WAIT_FQS(5) ->state=0x0 ->cpu=0
+rcu: 	Unless rcu_preempt kthread gets sufficient CPU time, OOM is now expected behavior.
+rcu: RCU grace-period kthread stack dump:
+task:rcu_preempt     state:R  running task     stack:26424 pid:   16 ppid:     2 flags:0x00004000
+Call Trace:
+ <TASK>
+ context_switch kernel/sched/core.c:5146 [inline]
+ __schedule+0x957/0xe20 kernel/sched/core.c:6458
+ schedule+0xeb/0x1b0 kernel/sched/core.c:6530
+ schedule_timeout+0x1b9/0x300 kernel/time/timer.c:1935
+ rcu_gp_fqs_loop+0x2b9/0xfb0 kernel/rcu/tree.c:1999
+ rcu_gp_kthread+0xa5/0x360 kernel/rcu/tree.c:2187
+ kthread+0x266/0x300 kernel/kthread.c:376
+ ret_from_fork+0x1f/0x30
+ </TASK>
+rcu: Stack dump where RCU GP kthread last ran:
+Sending NMI from CPU 1 to CPUs 0:
+NMI backtrace for cpu 0
+CPU: 0 PID: 4628 Comm: syz-executor415 Not tainted 5.19.0-rc5-syzkaller-00049-gc1084b6c5620 #0
+Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 06/29/2022
+RIP: 0010:native_safe_halt arch/x86/include/asm/irqflags.h:51 [inline]
+RIP: 0010:arch_safe_halt arch/x86/include/asm/irqflags.h:89 [inline]
+RIP: 0010:kvm_wait+0x1b0/0x1f0 arch/x86/kernel/kvm.c:1067
+Code: 4c 89 e0 48 c1 e8 03 42 8a 04 28 84 c0 75 41 45 8a 34 24 e8 12 05 53 00 44 3a 74 24 1c 75 10 66 90 0f 00 2d f2 05 4f 09 fb f4 <e9> cc fe ff ff fb e9 c6 fe ff ff 44 89 e1 80 e1 07 38 c1 0f 8c 57
+RSP: 0018:ffffc9000475f960 EFLAGS: 00000246
+RAX: c1a516943b300f00 RBX: 1ffff920008ebf30 RCX: ffffffff816825e8
+RDX: dffffc0000000000 RSI: ffffffff8a8d22c0 RDI: ffffffff8ae99700
+RBP: ffffc9000475fa30 R08: dffffc0000000000 R09: fffffbfff1fa9204
+R10: fffffbfff1fa9204 R11: 1ffffffff1fa9203 R12: ffff888144f9ea10
+R13: dffffc0000000000 R14: 1ffff920008ebf03 R15: ffffc9000475f9a0
+FS:  00005555558e1300(0000) GS:ffff8880b9a00000(0000) knlGS:0000000000000000
+CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+CR2: 00007f88c0e041f0 CR3: 0000000018135000 CR4: 00000000003506f0
+DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
+DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
+Call Trace:
+ <TASK>
+ pv_wait arch/x86/include/asm/paravirt.h:603 [inline]
+ pv_wait_head_or_lock kernel/locking/qspinlock_paravirt.h:470 [inline]
+ __pv_queued_spin_lock_slowpath+0x70d/0xc60 kernel/locking/qspinlock.c:511
+ pv_queued_spin_lock_slowpath arch/x86/include/asm/paravirt.h:591 [inline]
+ queued_spin_lock_slowpath+0x42/0x50 arch/x86/include/asm/qspinlock.h:51
+ queued_spin_lock include/asm-generic/qspinlock.h:114 [inline]
+ do_raw_spin_lock+0x264/0x360 kernel/locking/spinlock_debug.c:115
+ spin_lock include/linux/spinlock.h:349 [inline]
+ kset_find_obj+0x2e/0x110 lib/kobject.c:881
+ module_add_driver+0x1b1/0x2e0 drivers/base/module.c:48
+ bus_add_driver+0x393/0x600 drivers/base/bus.c:622
+ driver_register+0x2e9/0x3e0 drivers/base/driver.c:240
+ usb_gadget_register_driver_owner+0xd9/0x230 drivers/usb/gadget/udc/core.c:1558
+ raw_ioctl_run+0xbd/0x300 drivers/usb/gadget/legacy/raw_gadget.c:546
+ raw_ioctl+0x163/0xc20 drivers/usb/gadget/legacy/raw_gadget.c:1253
+ vfs_ioctl fs/ioctl.c:51 [inline]
+ __do_sys_ioctl fs/ioctl.c:870 [inline]
+ __se_sys_ioctl+0xfb/0x170 fs/ioctl.c:856
+ do_syscall_x64 arch/x86/entry/common.c:50 [inline]
+ do_syscall_64+0x2b/0x70 arch/x86/entry/common.c:80
+ entry_SYSCALL_64_after_hwframe+0x46/0xb0
+RIP: 0033:0x7f88c0e2f467
+Code: 3c 1c 48 f7 d8 49 39 c4 72 b8 e8 c4 47 02 00 85 c0 78 bd 48 83 c4 08 4c 89 e0 5b 41 5c c3 0f 1f 44 00 00 b8 10 00 00 00 0f 05 <48> 3d 01 f0 ff ff 73 01 c3 48 c7 c1 c0 ff ff ff f7 d8 64 89 01 48
+RSP: 002b:00007ffc3099d248 EFLAGS: 00000246 ORIG_RAX: 0000000000000010
+RAX: ffffffffffffffda RBX: 00007ffc3099e2a0 RCX: 00007f88c0e2f467
+RDX: 0000000000000000 RSI: 0000000000005501 RDI: 0000000000000003
+RBP: 0000000000000000 R08: 000000000000ffff R09: 000000000000000b
+R10: 00007ffc3099d2c0 R11: 0000000000000246 R12: 00007ffc3099d270
+R13: 0000000000000000 R14: 00007f88c0ea2440 R15: 0000000000000003
+ </TASK>
+INFO: NMI handler (nmi_cpu_backtrace_handler) took too long to run: 1.011 msecs
+NMI backtrace for cpu 1
+CPU: 1 PID: 4627 Comm: syz-executor415 Not tainted 5.19.0-rc5-syzkaller-00049-gc1084b6c5620 #0
+Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 06/29/2022
+Call Trace:
+ <IRQ>
+ __dump_stack lib/dump_stack.c:88 [inline]
+ dump_stack_lvl+0x1e3/0x2cb lib/dump_stack.c:106
+ nmi_cpu_backtrace+0x473/0x4a0 lib/nmi_backtrace.c:111
+ nmi_trigger_cpumask_backtrace+0x168/0x280 lib/nmi_backtrace.c:62
+ trigger_single_cpu_backtrace include/linux/nmi.h:164 [inline]
+ rcu_dump_cpu_stacks+0x236/0x3a0 kernel/rcu/tree_stall.h:371
+ print_cpu_stall kernel/rcu/tree_stall.h:667 [inline]
+ check_cpu_stall kernel/rcu/tree_stall.h:751 [inline]
+ rcu_pending kernel/rcu/tree.c:3977 [inline]
+ rcu_sched_clock_irq+0xfee/0x19d0 kernel/rcu/tree.c:2675
+ update_process_times+0x148/0x1b0 kernel/time/timer.c:1839
+ tick_sched_handle kernel/time/tick-sched.c:243 [inline]
+ tick_sched_timer+0x377/0x540 kernel/time/tick-sched.c:1480
+ __run_hrtimer kernel/time/hrtimer.c:1685 [inline]
+ __hrtimer_run_queues+0x4cb/0xa60 kernel/time/hrtimer.c:1749
+ hrtimer_interrupt+0x3a6/0xfd0 kernel/time/hrtimer.c:1811
+ local_apic_timer_interrupt arch/x86/kernel/apic/apic.c:1095 [inline]
+ __sysvec_apic_timer_interrupt+0xf9/0x280 arch/x86/kernel/apic/apic.c:1112
+ sysvec_apic_timer_interrupt+0x3e/0xb0 arch/x86/kernel/apic/apic.c:1106
+ asm_sysvec_apic_timer_interrupt+0x1b/0x20
+RIP: 0010:__raw_spin_unlock_irqrestore include/linux/spinlock_api_smp.h:152 [inline]
+RIP: 0010:_raw_spin_unlock_irqrestore+0xd4/0x130 kernel/locking/spinlock.c:194
+Code: 9c 8f 44 24 20 42 80 3c 23 00 74 08 4c 89 f7 e8 72 31 a6 f7 f6 44 24 21 02 75 4e 41 f7 c7 00 02 00 00 74 01 fb bf 01 00 00 00 <e8> c7 cd 27 f7 65 8b 05 c8 37 ce 75 85 c0 74 3f 48 c7 04 24 0e 36
+RSP: 0018:ffffc900001e07e0 EFLAGS: 00000206
+RAX: d93f2df2dd9f9600 RBX: 1ffff9200003c100 RCX: ffffffff816825e8
+RDX: dffffc0000000000 RSI: ffffffff8a8d22c0 RDI: 0000000000000001
+RBP: ffffc900001e0870 R08: dffffc0000000000 R09: fffffbfff1fa921b
+R10: fffffbfff1fa921b R11: 1ffffffff1fa921a R12: dffffc0000000000
+R13: 1ffff9200003c0fc R14: ffffc900001e0800 R15: 0000000000000246
+ dummy_timer+0x301c/0x3110
+ call_timer_fn+0xf5/0x210 kernel/time/timer.c:1474
+ expire_timers kernel/time/timer.c:1519 [inline]
+ __run_timers+0x76a/0x980 kernel/time/timer.c:1790
+ run_timer_softirq+0x63/0xf0 kernel/time/timer.c:1803
+ __do_softirq+0x382/0x793 kernel/softirq.c:571
+ __irq_exit_rcu+0xec/0x170 kernel/softirq.c:650
+ irq_exit_rcu+0x5/0x20 kernel/softirq.c:662
+ sysvec_apic_timer_interrupt+0x91/0xb0 arch/x86/kernel/apic/apic.c:1106
+ </IRQ>
+ <TASK>
+ asm_sysvec_apic_timer_interrupt+0x1b/0x20
+RIP: 0010:strcmp+0x39/0xa0 lib/string.c:347
+Code: bf 00 00 00 00 00 fc ff df 31 db 66 0f 1f 44 00 00 49 8d 3c 1c 48 89 f8 48 c1 e8 03 42 0f b6 04 38 84 c0 75 29 41 0f b6 2c 1c <49> 8d 3c 1e 48 89 f8 48 c1 e8 03 42 0f b6 04 38 84 c0 75 20 41 3a
+RSP: 0018:ffffc900044dfc10 EFLAGS: 00000246
+RAX: 0000000000000000 RBX: 0000000000000000 RCX: ffff88802065bb00
+RDX: 0000000000000000 RSI: ffffffff8b478fc0 RDI: ffff888016e8bf50
+RBP: 0000000000000073 R08: ffffffff846362b6 R09: fffff5200089bf78
+R10: fffff5200089bf79 R11: 1ffff9200089bf78 R12: ffff888016e8bf50
+R13: ffff8881458e3a80 R14: ffffffff8b478fc0 R15: dffffc0000000000
+ kset_find_obj+0x7b/0x110 lib/kobject.c:884
+ module_add_driver+0x1b1/0x2e0 drivers/base/module.c:48
+ bus_add_driver+0x393/0x600 drivers/base/bus.c:622
+ driver_register+0x2e9/0x3e0 drivers/base/driver.c:240
+ usb_gadget_register_driver_owner+0xd9/0x230 drivers/usb/gadget/udc/core.c:1558
+ raw_ioctl_run+0xbd/0x300 drivers/usb/gadget/legacy/raw_gadget.c:546
+ raw_ioctl+0x163/0xc20 drivers/usb/gadget/legacy/raw_gadget.c:1253
+ vfs_ioctl fs/ioctl.c:51 [inline]
+ __do_sys_ioctl fs/ioctl.c:870 [inline]
+ __se_sys_ioctl+0xfb/0x170 fs/ioctl.c:856
+ do_syscall_x64 arch/x86/entry/common.c:50 [inline]
+ do_syscall_64+0x2b/0x70 arch/x86/entry/common.c:80
+ entry_SYSCALL_64_after_hwframe+0x46/0xb0
+RIP: 0033:0x7f88c0e2f467
+
+================================
+WARNING: inconsistent lock state
+5.19.0-rc5-syzkaller-00049-gc1084b6c5620 #0 Not tainted
+--------------------------------
+inconsistent {HARDIRQ-ON-W} -> {IN-HARDIRQ-W} usage.
+syz-executor415/4627 [HC1[1]:SC1[1]:HE0:SE0] takes:
+ffffffff8cbed438 (vmap_area_lock){?.+.}-{2:2}, at: spin_lock include/linux/spinlock.h:349 [inline]
+ffffffff8cbed438 (vmap_area_lock){?.+.}-{2:2}, at: find_vmap_area+0x1d/0x120 mm/vmalloc.c:1805
+{HARDIRQ-ON-W} state was registered at:
+  lock_acquire+0x1a7/0x400 kernel/locking/lockdep.c:5665
+  __raw_spin_lock include/linux/spinlock_api_smp.h:133 [inline]
+  _raw_spin_lock+0x2a/0x40 kernel/locking/spinlock.c:154
+  spin_lock include/linux/spinlock.h:349 [inline]
+  alloc_vmap_area+0x18bb/0x1ae0 mm/vmalloc.c:1586
+  __get_vm_area_node+0x18a/0x380 mm/vmalloc.c:2453
+  get_vm_area_caller+0x45/0x50 mm/vmalloc.c:2506
+  __ioremap_caller+0x510/0x920 arch/x86/mm/ioremap.c:280
+  acpi_os_ioremap include/acpi/acpi_io.h:13 [inline]
+  acpi_map drivers/acpi/osl.c:296 [inline]
+  acpi_os_map_iomem+0x226/0x4b0 drivers/acpi/osl.c:355
+  acpi_tb_acquire_table+0xf5/0x25d drivers/acpi/acpica/tbdata.c:142
+  acpi_tb_validate_table drivers/acpi/acpica/tbdata.c:317 [inline]
+  acpi_tb_validate_temp_table+0xa6/0x10b drivers/acpi/acpica/tbdata.c:400
+  acpi_tb_verify_temp_table+0x82/0x8ed drivers/acpi/acpica/tbdata.c:504
+  acpi_reallocate_root_table+0x328/0x584 drivers/acpi/acpica/tbxface.c:180
+  acpi_early_init+0xdb/0x536 drivers/acpi/bus.c:1200
+  start_kernel+0x40b/0x55b init/main.c:1098
+  secondary_startup_64_no_verify+0xcf/0xdb
+irq event stamp: 78847
+hardirqs last  enabled at (78846): [<ffffffff8a3436eb>] __raw_spin_unlock_irqrestore include/linux/spinlock_api_smp.h:151 [inline]
+hardirqs last  enabled at (78846): [<ffffffff8a3436eb>] _raw_spin_unlock_irqrestore+0x8b/0x130 kernel/locking/spinlock.c:194
+hardirqs last disabled at (78847): [<ffffffff8a2b421a>] sysvec_apic_timer_interrupt+0xa/0xb0 arch/x86/kernel/apic/apic.c:1106
+softirqs last  enabled at (0): [<ffffffff814f65c0>] copy_process+0x1530/0x3fa0 kernel/fork.c:2185
+softirqs last disabled at (799): [<ffffffff81519a4c>] __irq_exit_rcu+0xec/0x170 kernel/softirq.c:650
+
+other info that might help us debug this:
+ Possible unsafe locking scenario:
+
+       CPU0
+       ----
+  lock(vmap_area_lock);
+  <Interrupt>
+    lock(vmap_area_lock);
+
+ *** DEADLOCK ***
+
+3 locks held by syz-executor415/4627:
+ #0: ffff888144f9ea28 (&k->list_lock){+.+.}-{2:2}, at: spin_lock include/linux/spinlock.h:349 [inline]
+ #0: ffff888144f9ea28 (&k->list_lock){+.+.}-{2:2}, at: kset_find_obj+0x2e/0x110 lib/kobject.c:881
+ #1: ffffc900001e0be0 ((&dum_hcd->timer)){+.-.}-{0:0}, at: lockdep_copy_map include/linux/lockdep.h:41 [inline]
+ #1: ffffc900001e0be0 ((&dum_hcd->timer)){+.-.}-{0:0}, at: call_timer_fn+0xbb/0x210 kernel/time/timer.c:1464
+ #2: ffffffff8cb23258 (rcu_node_0){-.-.}-{2:2}, at: rcu_dump_cpu_stacks+0xa5/0x3a0 kernel/rcu/tree_stall.h:366
+
+stack backtrace:
+CPU: 1 PID: 4627 Comm: syz-executor415 Not tainted 5.19.0-rc5-syzkaller-00049-gc1084b6c5620 #0
+Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 06/29/2022
+Call Trace:
+ <IRQ>
+ __dump_stack lib/dump_stack.c:88 [inline]
+ dump_stack_lvl+0x1e3/0x2cb lib/dump_stack.c:106
+ mark_lock_irq+0xb20/0xf00
+ mark_lock+0x21c/0x350 kernel/locking/lockdep.c:4632
+ mark_usage kernel/locking/lockdep.c:4524 [inline]
+ __lock_acquire+0xb43/0x1f80 kernel/locking/lockdep.c:5007
+ lock_acquire+0x1a7/0x400 kernel/locking/lockdep.c:5665
+ __raw_spin_lock include/linux/spinlock_api_smp.h:133 [inline]
+ _raw_spin_lock+0x2a/0x40 kernel/locking/spinlock.c:154
+ spin_lock include/linux/spinlock.h:349 [inline]
+ find_vmap_area+0x1d/0x120 mm/vmalloc.c:1805
+ check_heap_object+0x30/0x820 mm/usercopy.c:176
+ __check_object_size+0xad/0x210 mm/usercopy.c:250
+ check_object_size include/linux/thread_info.h:199 [inline]
+ __copy_from_user_inatomic include/linux/uaccess.h:62 [inline]
+ copy_from_user_nmi+0x98/0x100 arch/x86/lib/usercopy.c:47
+ copy_code arch/x86/kernel/dumpstack.c:91 [inline]
+ show_opcodes+0xa2/0x120 arch/x86/kernel/dumpstack.c:121
+ show_ip arch/x86/kernel/dumpstack.c:144 [inline]
+ show_iret_regs+0x2f/0x60 arch/x86/kernel/dumpstack.c:149
+ __show_regs+0x29/0x500 arch/x86/kernel/process_64.c:74
+ show_regs_if_on_stack arch/x86/kernel/dumpstack.c:167 [inline]
+ show_trace_log_lvl+0x562/0x630 arch/x86/kernel/dumpstack.c:292
+ __dump_stack lib/dump_stack.c:88 [inline]
+ dump_stack_lvl+0x1e3/0x2cb lib/dump_stack.c:106
+ nmi_cpu_backtrace+0x473/0x4a0 lib/nmi_backtrace.c:111
+ nmi_trigger_cpumask_backtrace+0x168/0x280 lib/nmi_backtrace.c:62
+ trigger_single_cpu_backtrace include/linux/nmi.h:164 [inline]
+ rcu_dump_cpu_stacks+0x236/0x3a0 kernel/rcu/tree_stall.h:371
+ print_cpu_stall kernel/rcu/tree_stall.h:667 [inline]
+ check_cpu_stall kernel/rcu/tree_stall.h:751 [inline]
+ rcu_pending kernel/rcu/tree.c:3977 [inline]
+ rcu_sched_clock_irq+0xfee/0x19d0 kernel/rcu/tree.c:2675
+ update_process_times+0x148/0x1b0 kernel/time/timer.c:1839
+ tick_sched_handle kernel/time/tick-sched.c:243 [inline]
+ tick_sched_timer+0x377/0x540 kernel/time/tick-sched.c:1480
+ __run_hrtimer kernel/time/hrtimer.c:1685 [inline]
+ __hrtimer_run_queues+0x4cb/0xa60 kernel/time/hrtimer.c:1749
+ hrtimer_interrupt+0x3a6/0xfd0 kernel/time/hrtimer.c:1811
+ local_apic_timer_interrupt arch/x86/kernel/apic/apic.c:1095 [inline]
+ __sysvec_apic_timer_interrupt+0xf9/0x280 arch/x86/kernel/apic/apic.c:1112
+ sysvec_apic_timer_interrupt+0x3e/0xb0 arch/x86/kernel/apic/apic.c:1106
+ asm_sysvec_apic_timer_interrupt+0x1b/0x20
+RIP: 0010:__raw_spin_unlock_irqrestore include/linux/spinlock_api_smp.h:152 [inline]
+RIP: 0010:_raw_spin_unlock_irqrestore+0xd4/0x130 kernel/locking/spinlock.c:194
+Code: 9c 8f 44 24 20 42 80 3c 23 00 74 08 4c 89 f7 e8 72 31 a6 f7 f6 44 24 21 02 75 4e 41 f7 c7 00 02 00 00 74 01 fb bf 01 00 00 00 <e8> c7 cd 27 f7 65 8b 05 c8 37 ce 75 85 c0 74 3f 48 c7 04 24 0e 36
+RSP: 0018:ffffc900001e07e0 EFLAGS: 00000206
+RAX: d93f2df2dd9f9600 RBX: 1ffff9200003c100 RCX: ffffffff816825e8
+RDX: dffffc0000000000 RSI: ffffffff8a8d22c0 RDI: 0000000000000001
+RBP: ffffc900001e0870 R08: dffffc0000000000 R09: fffffbfff1fa921b
+R10: fffffbfff1fa921b R11: 1ffffffff1fa921a R12: dffffc0000000000
+R13: 1ffff9200003c0fc R14: ffffc900001e0800 R15: 0000000000000246
+ dummy_timer+0x301c/0x3110
+ call_timer_fn+0xf5/0x210 kernel/time/timer.c:1474
+ expire_timers kernel/time/timer.c:1519 [inline]
+ __run_timers+0x76a/0x980 kernel/time/timer.c:1790
+ run_timer_softirq+0x63/0xf0 kernel/time/timer.c:1803
+ __do_softirq+0x382/0x793 kernel/softirq.c:571
+ __irq_exit_rcu+0xec/0x170 kernel/softirq.c:650
+ irq_exit_rcu+0x5/0x20 kernel/softirq.c:662
+ sysvec_apic_timer_interrupt+0x91/0xb0 arch/x86/kernel/apic/apic.c:1106
+ </IRQ>
+ <TASK>
+ asm_sysvec_apic_timer_interrupt+0x1b/0x20
+RIP: 0010:strcmp+0x39/0xa0 lib/string.c:347
+Code: bf 00 00 00 00 00 fc ff df 31 db 66 0f 1f 44 00 00 49 8d 3c 1c 48 89 f8 48 c1 e8 03 42 0f b6 04 38 84 c0 75 29 41 0f b6 2c 1c <49> 8d 3c 1e 48 89 f8 48 c1 e8 03 42 0f b6 04 38 84 c0 75 20 41 3a
+RSP: 0018:ffffc900044dfc10 EFLAGS: 00000246
+RAX: 0000000000000000 RBX: 0000000000000000 RCX: ffff88802065bb00
+RDX: 0000000000000000 RSI: ffffffff8b478fc0 RDI: ffff888016e8bf50
+RBP: 0000000000000073 R08: ffffffff846362b6 R09: fffff5200089bf78
+R10: fffff5200089bf79 R11: 1ffff9200089bf78 R12: ffff888016e8bf50
+R13: ffff8881458e3a80 R14: ffffffff8b478fc0 R15: dffffc0000000000
+ kset_find_obj+0x7b/0x110 lib/kobject.c:884
+ module_add_driver+0x1b1/0x2e0 drivers/base/module.c:48
+ bus_add_driver+0x393/0x600 drivers/base/bus.c:622
+ driver_register+0x2e9/0x3e0 drivers/base/driver.c:240
+ usb_gadget_register_driver_owner+0xd9/0x230 drivers/usb/gadget/udc/core.c:1558
+ raw_ioctl_run+0xbd/0x300 drivers/usb/gadget/legacy/raw_gadget.c:546
+ raw_ioctl+0x163/0xc20 drivers/usb/gadget/legacy/raw_gadget.c:1253
+ vfs_ioctl fs/ioctl.c:51 [inline]
+ __do_sys_ioctl fs/ioctl.c:870 [inline]
+ __se_sys_ioctl+0xfb/0x170 fs/ioctl.c:856
+ do_syscall_x64 arch/x86/entry/common.c:50 [inline]
+ do_syscall_64+0x2b/0x70 arch/x86/entry/common.c:80
+ entry_SYSCALL_64_after_hwframe+0x46/0xb0
+RIP: 0033:0x7f88c0e2f467
+Code: 3c 1c 48 f7 d8 49 39 c4 72 b8 e8 c4 47 02 00 85 c0 78 bd 48 83 c4 08 4c 89 e0 5b 41 5c c3 0f 1f 44 00 00 b8 10 00 00 00 0f 05 <48> 3d 01 f0 ff ff 73 01 c3 48 c7 c1 c0 ff ff ff f7 d8 64 89 01 48
+RSP: 002b:00007ffc3099d248 EFLAGS: 00000246 ORIG_RAX: 0000000000000010
+RAX: ffffffffffffffda RBX: 00007ffc3099e2a0 RCX: 00007f88c0e2f467
+RDX: 0000000000000000 RSI: 0000000000005501 RDI: 0000000000000003
+RBP: 0000000000000000 R08: 000000000000ffff R09: 000000000000000b
+R10: 00007ffc3099d2c0 R11: 0000000000000246 R12: 00007ffc3099d270
+R13: 0000000000000000 R14: 00007f88c0ea2440 R15: 0000000000000003
+ </TASK>
+Code: 3c 1c 48 f7 d8 49 39 c4 72 b8 e8 c4 47 02 00 85 c0 78 bd 48 83 c4 08 4c 89 e0 5b 41 5c c3 0f 1f 44 00 00 b8 10 00 00 00 0f 05 <48> 3d 01 f0 ff ff 73 01 c3 48 c7 c1 c0 ff ff ff f7 d8 64 89 01 48
+RSP: 002b:00007ffc3099d248 EFLAGS: 00000246 ORIG_RAX: 0000000000000010
+RAX: ffffffffffffffda RBX: 00007ffc3099e2a0 RCX: 00007f88c0e2f467
+RDX: 0000000000000000 RSI: 0000000000005501 RDI: 0000000000000003
+RBP: 0000000000000000 R08: 000000000000ffff R09: 000000000000000b
+R10: 00007ffc3099d2c0 R11: 0000000000000246 R12: 00007ffc3099d270
+R13: 0000000000000000 R14: 00007f88c0ea2440 R15: 0000000000000003
+ </TASK>
+imon 5-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 3-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 4-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 3-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 5-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 5-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 6-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 2-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 5-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 4-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 1-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 2-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 5-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 4-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 2-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 2-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 2-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 2-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 3-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 2-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 3-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 3-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 3-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 5-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 1-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 6-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 2-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 2-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 2-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 2-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 3-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 2-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 3-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 5-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 4-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 6-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+----------------
+Code disassembly (best guess):
+   0:	4c 89 e0             	mov    %r12,%rax
+   3:	48 c1 e8 03          	shr    $0x3,%rax
+   7:	42 8a 04 28          	mov    (%rax,%r13,1),%al
+   b:	84 c0                	test   %al,%al
+   d:	75 41                	jne    0x50
+   f:	45 8a 34 24          	mov    (%r12),%r14b
+  13:	e8 12 05 53 00       	callq  0x53052a
+  18:	44 3a 74 24 1c       	cmp    0x1c(%rsp),%r14b
+  1d:	75 10                	jne    0x2f
+  1f:	66 90                	xchg   %ax,%ax
+  21:	0f 00 2d f2 05 4f 09 	verw   0x94f05f2(%rip)        # 0x94f061a
+  28:	fb                   	sti
+  29:	f4                   	hlt
+* 2a:	e9 cc fe ff ff       	jmpq   0xfffffefb <-- trapping instruction
+  2f:	fb                   	sti
+  30:	e9 c6 fe ff ff       	jmpq   0xfffffefb
+  35:	44 89 e1             	mov    %r12d,%ecx
+  38:	80 e1 07             	and    $0x7,%cl
+  3b:	38 c1                	cmp    %al,%cl
+  3d:	0f                   	.byte 0xf
+  3e:	8c                   	.byte 0x8c
+  3f:	57                   	push   %rdi
 
 
-> ... MORE importantly how do you protect the Host (or another VM) from
-> unacceptable (or possibly malicious) requests conveyed from one VM request
-> vqueue into the Linux subsystems (like clocks) ?
-> 
+---
+This report is generated by a bot. It may contain errors.
+See https://goo.gl/tpsmEJ for more information about syzbot.
+syzbot engineers can be reached at syzkaller@googlegroups.com.
 
-The clock protocol handler tracks its own reference counts for each 
-clock that's been registered with it. It'll only enable clocks through 
-the host framework when the reference count increases from 0 -> 1, and 
-it'll only disable clocks through host framework when the reference 
-count decreases from 1 -> 0. And since the clock framework has its own 
-internal reference counts, then it's not possible for a VM to disable 
-clocks that the host itself has enabled.
-
-We don't support frequency aggregation, so a VM could override the 
-frequency request of another VM or of the host. We could support max 
-aggregation across VMs, so that a VM couldn't reduce the frequency below 
-what another VM has requested. But without clock framework changes, we 
-can't aggregate with the local host clients. So a VM could reduce the 
-frequency below what the host has requested.
-
-Generally speaking we don't expect more than one entity (VM or host) to 
-control a given clock at a time. But all we can currently enforce is 
-that clocks only turn off when *all* entities (including the the host) 
-request them to be off.
-
-
-> I saw you have added a good deal of DT bindings for the backend
-> describing protocols, so you could just expose only some protocols via
-> the backend (if I get it right) but you cannot anyway selectively expose
-> only a subset of resources to the different agents, so, if you expose the
-> clock protocol, that will be visible by any VMs and an agent could potentially
-> kill the Host or mount some clock related attack acting on the right clock.
-> (I mean you cannot describe in the Host DT a number X of clocks to be
-> supported by the Host Linux Clock framework BUT then expose selectively to
-> the SCMI agents only a subset Y < X to shield the Host from misbehaviour...
-> ...at least not in a dynamic way avoiding to bake a fixed policy into
-> the backend...or maybe I'm missing how you can do that, in such a case
-> please explain...)
-> 
-> Moreover, in a normal SCMI stack the server resides out of reach from the
-> OSPM agents since the server, wherever it sits, has the last word and can
-> deny and block unreasonable/malicious requests while armonizing others: this
-> means the typical SCMI platform fw is configured in such a way that clearly
-> defines a set of policies to be enforced between the access of the various
-> agents. (and it can reside in the trusted codebase given its 'reduced'
-> size...even though this policies are probably at the moment not so
-> dynamically modificable there either...)
-> 
-> With your approach of a Linux Kernel based SCMI platform backend you are
-> certainly using all the good and well proven mechanisms offered by the
-> Kernel to share and co-ordinate access to such resources, which is good
-> (.. even though Linux is not so small in term of codebase to be used as
-> a TCB to tell the truth :D), BUT I don't see the same level of policying
-> or filtering applied anywhere in the proposed RFCs, especially to protect
-> the Host which at the end is supposed to use the same Linux subsystems and
-> possibly share some of those resources for its own needs.
-> 
-> I saw the Base protocol basic implementation you provided to expose the
-> supported backend protocols to the VMs, it would be useful to see how
-> you plan to handle something like the Clock protocol you mention in the
-> example below. (if you have Clock protocol backend that as WIP already
-> would be interesting to see it...)
-> 
-> Another issue/criticality that comes to my mind is how do you gather in
-> general basic resources states/descriptors from the existing Linux subsystems
-> (even leaving out any policying concerns): as an example, how do you gather
-> from the Host Clock framework the list of available clocks and their rates
-> descriptors that you're going expose to a specific VMs once this latter will
-> issue the related SCMI commands to get to know which SCMI Clock domain are
-> available ?
-> (...and I mean in a dynamic way not using a builtin per-platform baked set of
->   resources known to be made available... I doubt that any sort of DT
->   description would be accepted in this regards ...)
-> 
-
-As mentioned, the list of clocks we choose to expose are currently 
-hardcoded in the clock drivers outside of the clock framework. There is 
-no dynamic policy in place.
-
-For supported rates, we currently just implement the 
-CLOCK_DESCRIBE_RATES command using rate ranges, rather than lists of 
-discrete rates (num_rates_flags[12] = 1). And we just communicate the 
-full u32 range 0..U32_MAX with step_size=1. We do this for simplicity. 
-Many of our clocks only support a small list of discrete rates (though 
-some support large ranges). If a VM requests a rate not aligned to these 
-discrete rates, then we'll just round up to what the host supports. We 
-currently operate under the assumption that the VM knows what it needs 
-and doesn't need to query the specific supported rates from the host. 
-That's fine for our current use cases, at least. Publishing 
-clock-specific rate lists and/or proper ranges would be more complicated 
-and require some amount of clock framework changes to get this information.
-
-
->>
->> 1. Architecture overview
->> ---------------------
->>
->> Below diagram shows the overall software architecture of SCMI communication
->> between guest VM and the host software. In this diagram, guest is a linux
->> VM; also, host uses KVM linux.
->>
->>           GUEST VM                   HOST
->>   +--------------------+    +---------------------+    +--------------+
->>   |   a. Device A      |    |   k. Device B       |    |      PLL     |
->>   |  (Clock consumer)  |    |  (Clock consumer)   |    |              |
->>   +--------------------+    +---------------------+    +--------------+
->>            |                         |                         ^
->>            v                         v                         |
->>   +--------------------+    +---------------------+    +-----------------+
->>   | b. Clock Framework |    | j. Clock Framework  | -->| l. Clock Driver |
->>   +-- -----------------+    +---------------------+    +-----------------+
->>            |                         ^
->>            v                         |
->>   +--------------------+    +------------------------+
->>   |  c. SCMI Clock     |    | i. SCMI Virtio Backend |
->>   +--------------------+    +------------------------+
->>            |                         ^
->>            v                         |
->>   +--------------------+    +----------------------+
->>   |  d. SCMI Virtio    |    |   h. SCMI Vhost      |<-----------+
->>   +--------------------+    +----------------------+            |
->>            |                         ^                          |
->>            v                         |                          |
->> +-------------------------------------------------+    +-----------------+
->> |              e. Virtio Infra                    |    |    g. VMM       |
->> +-------------------------------------------------+    +-----------------+
->>            |                         ^                           ^
->>            v                         |                           |
->> +-------------------------------------------------+             |
->> |                f. Hypervisor                    |-------------
->> +-------------------------------------------------+
->>
-> 
-> Looking at the above schema and thinking out loud where any dynamic
-> policying against the resources can fit (..and trying desperately NOT to push
-> that into the Kernel too :P...) ... I think that XEN was trying something similar
-> (with a real backend SCMI platform FW at the end of the pipe though I think...) and
-> in their case the per-VMs resource allocation was performed using SCMI
-> BASE_SET_DEVICE_PERMISSIONS commands issued by the Hypervisor/VMM itself
-> I think or by a Dom0 elected as a trusted agent and so allowed to configure
-> such resource partitioning ...
-> 
-> https://www.mail-archive.com/xen-devel@lists.xenproject.org/msg113868.html
-> 
-> ...maybe a similar approach, with some sort of SCMI Trusted Agent living within
-> the VMM and in charge of directing such resources' partitioning between
-> VMs by issuing BASE_SET_DEVICE_PERMISSIONS towards the Kernel SCMI Virtio
-> Backend, could help keeping at least the policy bits related to the VMs out of
-> the kernel/DTs and possibly dynamically configurable following VMs lifecycle.
-> 
-> Even though, in our case ALL the resource management by device ID would have to
-> happen in the Kernel SCMI backend at the end, given that is where the SCMI
-> platform resides indeed, BUT at least you could keep the effective policy out of
-> kernel space, doing something like:
-> 
-> 1. VMM/TrustedAgent query Kernel_SCMI_Virtio_backend for available resources
-> 
-> 2. VMM/TrustedAg decides resources allocation between VMs (and/or possibly the Host
->     based on some configured policy)
-> 
-> 3. VMM/TrustedAgent issues BASE_SET_DEVICE_PERMISSIONS/PROTOCOLS to the
->     Kernel_SCMI_Virtio_backend
-> 
-> 4. Kernel_SCMI_Virtio_backend enforces resource partioning and sharing
->     when processing subsequent VMs SCMI requests coming via Vhost-SCMI
-> 
-> ...where the TrustedAgent here could be (I guess) the VMM or the Host or
-> both with different level of privilege if you don't want the VMM to be able
-> to configure resources access for the whole Host.
-> 
->> a. Device A             This is the client kernel driver in guest VM,
->>                          for ex. diplay driver, which uses standard
->>                          clock framework APIs to vote for a clock.
->>
->> b. Clock Framework      Underlying kernel clock framework on
->>                          guest.
->>
->> c. SCMI Clock           SCMI interface based clock driver.
->>
->> d. SCMI Virtio          Underlying SCMI framework, using Virtio as
->>                          transport driver.
->>
->> e. Virtio Infra         Virtio drivers on guest VM. These drivers
->>                          initiate virtqueue requests over Virtio
->>                          transport (MMIO/PCI), and forwards response
->>                          to SCMI Virtio registered callbacks.
->>
->> f. Hypervisor           Hosted Hypervisor (KVM for ex.), which traps
->>                          and forwards requests on virtqueue ring
->>                          buffers to the VMM.
->>
->> g. VMM                  Virtual Machine Monitor, running on host userspace,
->>                          which manages the lifecycle of guest VMs, and forwards
->>                          guest initiated virtqueue requests as IOCTLs to the
->>                          Vhost driver on host.
->>
->> h. SCMI Vhost           In kernel driver, which handles SCMI virtqueue
->>                          requests from guest VMs. This driver forwards the
->>                          requests to SCMI Virtio backend driver, and returns
->>                          the response from backend, over the virtqueue ring
->>                          buffers.
->>
->> i. SCMI Virtio Backend  SCMI backend, which handles the incoming SCMI messages
->>                          from SCMI Vhost driver, and forwards them to the
->>                          backend protocols like clock and voltage protocols.
->>                          The backend protocols uses the host apis for those
->>                          resources like clock APIs provided by clock framework,
->>                          to vote/request for the resource. The response from
->>                          the host api is parceled into a SCMI response message,
->>                          and is returned to the SCMI Vhost driver. The SCMI
->>                          Vhost driver in turn, returns the reponse over the
->>                          Virtqueue reponse buffers.
->>
-> 
-> Last but not least, this SCMI Virtio Backend layer in charge of
-> processing incoming SCMI packets, interfacing with the Linux subsystems
-> final backend and building SCMI replies from Linux will introduce a
-> certain level of code/funcs duplication given that this same SCMI basic
-> processing capabilities have been already baked in the SCMI stacks found in
-> SCP and in TF-A (.. and maybe a few other other proprietary backends)...
-> 
-> ... but this is something maybe to be addressed in general in a
-> different context not something that can be addressed by this series.
-> 
-> Sorry for the usual flood of words :P ... I'll have a more in deep
-> review of the series in the next days, for now I wanted just to share my
-> concerns and (maybe wrong) understanding and see what you or Sudeep and
-> Souvik think about.
-> 
-> Thanks,
-> Cristian
-> 
-> 
-> _______________________________________________
-> linux-arm-kernel mailing list
-> linux-arm-kernel@lists.infradead.org
-> http://lists.infradead.org/mailman/listinfo/linux-arm-kernel
+syzbot will keep track of this issue. See:
+https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
+For information about bisection process see: https://goo.gl/tpsmEJ#bisection
+syzbot can test patches for this issue, for details see:
+https://goo.gl/tpsmEJ#testing-patches
