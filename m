@@ -2,54 +2,58 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 64108570E45
-	for <lists+kvm@lfdr.de>; Tue, 12 Jul 2022 01:28:15 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 38EB4570E47
+	for <lists+kvm@lfdr.de>; Tue, 12 Jul 2022 01:28:19 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230125AbiGKX2N (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 11 Jul 2022 19:28:13 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47678 "EHLO
+        id S230505AbiGKX2P (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 11 Jul 2022 19:28:15 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47704 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229752AbiGKX2L (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 11 Jul 2022 19:28:11 -0400
-Received: from mail-pg1-x549.google.com (mail-pg1-x549.google.com [IPv6:2607:f8b0:4864:20::549])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E179D89ABA
-        for <kvm@vger.kernel.org>; Mon, 11 Jul 2022 16:28:10 -0700 (PDT)
-Received: by mail-pg1-x549.google.com with SMTP id h190-20020a636cc7000000b003fd5d5452cfso2448594pgc.8
-        for <kvm@vger.kernel.org>; Mon, 11 Jul 2022 16:28:10 -0700 (PDT)
+        with ESMTP id S230229AbiGKX2N (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 11 Jul 2022 19:28:13 -0400
+Received: from mail-pf1-x449.google.com (mail-pf1-x449.google.com [IPv6:2607:f8b0:4864:20::449])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B0B4A8AB08
+        for <kvm@vger.kernel.org>; Mon, 11 Jul 2022 16:28:12 -0700 (PDT)
+Received: by mail-pf1-x449.google.com with SMTP id cu3-20020a056a00448300b0052ae559108fso225134pfb.9
+        for <kvm@vger.kernel.org>; Mon, 11 Jul 2022 16:28:12 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
-        h=reply-to:date:message-id:mime-version:subject:from:to:cc;
-        bh=DOykPfZhOOv0A0SN4H+uKTFYCJTV7QKNGrNlJuhxp84=;
-        b=DhjR00I2EIl9ur7w4+92haoVAvaSmx6M50NPQsvNeU4+2tdO//RaVDVPR9uhkYpuHI
-         g3FZM3me5poAWnd3bHGWSsGgmUrWdgd1C7lYar8J4jADipoGzXBNot27/DEM/yjiGRtA
-         korePGbE9xdv0s0COoYaVOJFTrzIPmVsxTcmPoKSEx5L/40neFymhoWoaEFrBup7lThU
-         FO70qtZLjWU4939rLwfGJQll0oW/NIs3apt4Xm+GBbDIyyIM5IQsankaVpEobaf+uF+t
-         FuHOYgKiNCxGBSf21EuO3EB7Ey+Ps2nDX+IZEq0AIwzi3HLmsmK7Fs27nUIq+tf/IBWQ
-         tvOw==
+        h=reply-to:date:in-reply-to:message-id:mime-version:references
+         :subject:from:to:cc;
+        bh=Y4c9+hRyXDtn+HmMTY8LBUAXVpb8i20If3SwC4b4N10=;
+        b=GOCG7wXwJDxav8DI1JKokVLWSeeeAe5t3C9q4/j0GVaKqzLkuo38RYOe27JrYuldnh
+         cQqaShlay2vxnFPl8uPzovSvzyQDlwGosD1hsPkBswnfl1Cb42jlFMT93jdKLD3BR5Zd
+         ai/QhN2ho/28LYidGARFUjr6DEM6TlNjDv+MRMcY+r6DjBaFbTAoy8wonS/hHVu7DS7I
+         UFB6VpfIDXNUFnic5AsuTCR0wwTGtehvYa+BOa+UCbkbhT6/qf4suunrKOGAClZozuqQ
+         qEAppRWbpavzENbRUC+WpnMwKO0CzbcPV7tLbO1zuOwAtkJVQSGWwecH+CYEnYRSiHSb
+         1CiQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:reply-to:date:message-id:mime-version:subject
-         :from:to:cc;
-        bh=DOykPfZhOOv0A0SN4H+uKTFYCJTV7QKNGrNlJuhxp84=;
-        b=Xu6ePg85usZzMT11u45YAcgnz5I/KYtaF2M3vRZ3mFzDo1zcnp1QDFCvAtYTswFlBT
-         ZyYgP/sDf25I0I+PLy6pSjn9wbdWywd1tyD+0MxCHCRG4PmsqgbA5J1S/sV27YRXDY/7
-         WuixBmPwaowz7K7ab+8mcfzL06UUTPmIHYvdPM4BPeZHvJI/Bc5cZVJTPH90GTHDSwRA
-         +p/WnYzz8oI0IPBB3SU/ke/C/RRS7tILnn5Z24ZuiqgHWDsJZVO+EI+6R8d8erlKjLZ2
-         vZRlTK/ENtc66Zuu3TDUyXJcdAd6dF8Ba+4rRHCrfX5QrSOgHoNDedtGp1CG5qjFl6/i
-         BLWA==
-X-Gm-Message-State: AJIora+vbICoRLzzKjwWLFpCxLJ0g/9wRgH/8eZ//L5+avt+ObNqDFnh
-        vwXDSEYET7ji15ZRyp1U7p4JP5mUzx8=
-X-Google-Smtp-Source: AGRyM1vDkuLDhPZPzDb+e7RX9GzZoroE4ub/CuME1ey11DpIJVbkNuemy4Wcx9+RbAEgfHM7hxMRV9bWBg4=
+        h=x-gm-message-state:reply-to:date:in-reply-to:message-id
+         :mime-version:references:subject:from:to:cc;
+        bh=Y4c9+hRyXDtn+HmMTY8LBUAXVpb8i20If3SwC4b4N10=;
+        b=6UrvUb0eRcKKEuAyJJGewMywoPi16ryBuVMSWrHftJMPFPty24GL7jBAe1WjiYBlrd
+         5Vrv3t6PICsB+jUX9Y1K/1GI1Fnv63KlrhTa9VZHPMqpvTgK9ihdPwQ9IpOxEjUp5wup
+         XpEc/eVqhiut7SEo2qWsWJVYDnmHcaGVcfOnepaFyXafx5kozXUSjm/X9dSnrM4Q7BOv
+         RGjjSuOpq136qIVIG9nc08u2NQI4eQbdTlLNFG4Sg+rpoEaDmC+OxDggnYIKm24g7v7Q
+         T4dtPLOnzEOwdTEKY2nksBXvf82UrDMeoDvZVTYgDnME52c+8sLLJ5TtRYsKSTb0D0zv
+         JbBQ==
+X-Gm-Message-State: AJIora8upNbrlrmkrHd34YrgJzSR5eGPu3Ujz/41hCwefaEmPu76ugSP
+        PZjrim96Yhv0lQMSS+mqiZYT1A1d8+E=
+X-Google-Smtp-Source: AGRyM1sTdQbj7QIQ49xadb6Yn8ZwM1BxYmn+FDHHDGJJ26V47pzTBaXpM6yfN2XMfH4QjPGtQA+AXCFvb0c=
 X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a17:902:b598:b0:168:f664:f1cb with SMTP id
- a24-20020a170902b59800b00168f664f1cbmr21014227pls.26.1657582090526; Mon, 11
- Jul 2022 16:28:10 -0700 (PDT)
+ (user=seanjc job=sendgmr) by 2002:a05:6a00:27a6:b0:52a:e089:e777 with SMTP id
+ bd38-20020a056a0027a600b0052ae089e777mr2824888pfb.53.1657582092309; Mon, 11
+ Jul 2022 16:28:12 -0700 (PDT)
 Reply-To: Sean Christopherson <seanjc@google.com>
-Date:   Mon, 11 Jul 2022 23:27:47 +0000
-Message-Id: <20220711232750.1092012-1-seanjc@google.com>
+Date:   Mon, 11 Jul 2022 23:27:48 +0000
+In-Reply-To: <20220711232750.1092012-1-seanjc@google.com>
+Message-Id: <20220711232750.1092012-2-seanjc@google.com>
 Mime-Version: 1.0
+References: <20220711232750.1092012-1-seanjc@google.com>
 X-Mailer: git-send-email 2.37.0.144.g8ac04bfd2-goog
-Subject: [PATCH 0/3] KVM: x86: Fix fault-related bugs in LTR/LLDT emulation
+Subject: [PATCH 1/3] KVM: x86: Mark TSS busy during LTR emulation _after_ all
+ fault checks
 From:   Sean Christopherson <seanjc@google.com>
 To:     Sean Christopherson <seanjc@google.com>,
         Paolo Bonzini <pbonzini@redhat.com>
@@ -61,37 +65,68 @@ Content-Type: text/plain; charset="UTF-8"
 X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
         SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL
-        autolearn=ham autolearn_force=no version=3.4.6
+        autolearn=unavailable autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Patch 1 fixes a bug found by syzkaller where KVM attempts to set the
-TSS.busy bit during LTR before checking that the new TSS.base is valid.
+Wait to mark the TSS as busy during LTR emulation until after all fault
+checks for the LTR have passed.  Specifically, don't mark the TSS busy if
+the new TSS base is non-canonical.
 
-Patch 2 fixes a bug found by inspection (when reading the APM to verify
-the non-canonical logic is correct) where KVM doesn't provide the correct
-error code if the new TSS.base is non-canonical.
+Opportunistically drop the one-off !seg_desc.PRESENT check for TR as the
+only reason for the early check was to avoid marking a !PRESENT TSS as
+busy, i.e. the common !PRESENT is now done before setting the busy bit.
 
-Patch 3 makes the "dangling userspace I/O" WARN_ON two separate WARN_ON_ONCE
-so that a KVM bug doesn't spam the kernel log (keeping the WARN is desirable
-specifically to detect these types of bugs).
+Fixes: e37a75a13cda ("KVM: x86: Emulator ignores LDTR/TR extended base on LLDT/LTR")
+Reported-by: syzbot+760a73552f47a8cd0fd9@syzkaller.appspotmail.com
+Cc: stable@vger.kernel.org
+Cc: Tetsuo Handa <penguin-kernel@i-love.sakura.ne.jp>
+Cc: Hou Wenlong <houwenlong.hwl@antgroup.com>
+Signed-off-by: Sean Christopherson <seanjc@google.com>
+---
+ arch/x86/kvm/emulate.c | 19 +++++++++----------
+ 1 file changed, 9 insertions(+), 10 deletions(-)
 
-Sean Christopherson (3):
-  KVM: x86: Mark TSS busy during LTR emulation _after_ all fault checks
-  KVM: x86: Set error code to segment selector on LLDT/LTR non-canonical
-    #GP
-  KVM: x86: WARN only once if KVM leaves a dangling userspace I/O
-    request
-
- arch/x86/kvm/emulate.c | 23 +++++++++++------------
- arch/x86/kvm/x86.c     |  6 ++++--
- 2 files changed, 15 insertions(+), 14 deletions(-)
-
-
-base-commit: b9b71f43683ae9d76b0989249607bbe8c9eb6c5c
+diff --git a/arch/x86/kvm/emulate.c b/arch/x86/kvm/emulate.c
+index 39ea9138224c..09e4b67b881f 100644
+--- a/arch/x86/kvm/emulate.c
++++ b/arch/x86/kvm/emulate.c
+@@ -1699,16 +1699,6 @@ static int __load_segment_descriptor(struct x86_emulate_ctxt *ctxt,
+ 	case VCPU_SREG_TR:
+ 		if (seg_desc.s || (seg_desc.type != 1 && seg_desc.type != 9))
+ 			goto exception;
+-		if (!seg_desc.p) {
+-			err_vec = NP_VECTOR;
+-			goto exception;
+-		}
+-		old_desc = seg_desc;
+-		seg_desc.type |= 2; /* busy */
+-		ret = ctxt->ops->cmpxchg_emulated(ctxt, desc_addr, &old_desc, &seg_desc,
+-						  sizeof(seg_desc), &ctxt->exception);
+-		if (ret != X86EMUL_CONTINUE)
+-			return ret;
+ 		break;
+ 	case VCPU_SREG_LDTR:
+ 		if (seg_desc.s || seg_desc.type != 2)
+@@ -1749,6 +1739,15 @@ static int __load_segment_descriptor(struct x86_emulate_ctxt *ctxt,
+ 				((u64)base3 << 32), ctxt))
+ 			return emulate_gp(ctxt, 0);
+ 	}
++
++	if (seg == VCPU_SREG_TR) {
++		old_desc = seg_desc;
++		seg_desc.type |= 2; /* busy */
++		ret = ctxt->ops->cmpxchg_emulated(ctxt, desc_addr, &old_desc, &seg_desc,
++						  sizeof(seg_desc), &ctxt->exception);
++		if (ret != X86EMUL_CONTINUE)
++			return ret;
++	}
+ load:
+ 	ctxt->ops->set_segment(ctxt, selector, &seg_desc, base3, seg);
+ 	if (desc)
 -- 
 2.37.0.144.g8ac04bfd2-goog
 
