@@ -2,49 +2,49 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id C5DA156FE9C
-	for <lists+kvm@lfdr.de>; Mon, 11 Jul 2022 12:14:55 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 7D9D756FEAC
+	for <lists+kvm@lfdr.de>; Mon, 11 Jul 2022 12:15:39 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232969AbiGKKOx (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 11 Jul 2022 06:14:53 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53934 "EHLO
+        id S233302AbiGKKO4 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 11 Jul 2022 06:14:56 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49596 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230350AbiGKKOC (ORCPT <rfc822;kvm@vger.kernel.org>);
+        with ESMTP id S230448AbiGKKOC (ORCPT <rfc822;kvm@vger.kernel.org>);
         Mon, 11 Jul 2022 06:14:02 -0400
 Received: from mga04.intel.com (mga04.intel.com [192.55.52.120])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0FF824A83E;
-        Mon, 11 Jul 2022 02:34:14 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4760C7AB0C;
+        Mon, 11 Jul 2022 02:34:15 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
   t=1657532055; x=1689068055;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=TSgiek8mItA/pqYjGSTKdQzP4Ez5i64yAdOC7OFZUIs=;
-  b=SURf09ATeTys7j7+58Z5OYjDXO2/HPgKK1iJ3C/gs/jHy6geL7itkRdC
-   VuPNT0j3Ih34gpLErZGPcz/WAdHtHT/GQUuJYBydYY61JnDOqC9hwUfAZ
-   e4nNCY13dja9K8+3cFPjnjhwYcTt8zYQNCXHR/UcV+Zo26vOEsv9IjLHa
-   sCf6iFeyP0jyTKryrZNkG6g3rWr2zG70EFBn8wrrG/VHBMXgXliy7H74n
-   fkfxNkB5v+q2OrUxHiB0c1l45Oq4tXTM71JAWQ2SrLzFU0pLjomCHruzi
-   wLixdce8P1JxhUlA379XGHVaM9Yi6CtCkYy7et3BUh5d8vL+GfO1TlkNt
-   g==;
-X-IronPort-AV: E=McAfee;i="6400,9594,10404"; a="283371733"
+  bh=OO5OSxWtcVi19UaKG1wG+Lbf+qENiVNRyjc3YIAVR6Y=;
+  b=RC+CLjSgYzKiXm4P6oI0cxWwyyl9lXoQjo/WFWqG8wUYd9IJ6yy5goH5
+   sBJMerIpdMCoq0uf5lVUgd3CNe+PMm1Y5AhzhixTsQmhotYfXKteZ8pVY
+   Ou4+lN5rcTiQUo33KG5eK7SF6AIEr4758KhE06NUv7o4WbISyoR6KlgAM
+   ++21CWlI6beaUHV7LW6JklWPq23IWdsNVyJ8nfrCSUS+ZjL1MwLzAO6uz
+   Ca3euZfwDvKsAIJ/W+VBGk1YL4WKBX1FUH7MJJvY5T8ywoqXkHdCTJaqQ
+   d8cjXr0bvsOz36Nqr53Du6lBVYqO5RMeAQ+hTwjJuMEysVn6eWjkvH0UL
+   w==;
+X-IronPort-AV: E=McAfee;i="6400,9594,10404"; a="283371740"
 X-IronPort-AV: E=Sophos;i="5.92,262,1650956400"; 
-   d="scan'208";a="283371733"
+   d="scan'208";a="283371740"
 Received: from fmsmga008.fm.intel.com ([10.253.24.58])
-  by fmsmga104.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 11 Jul 2022 02:33:57 -0700
+  by fmsmga104.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 11 Jul 2022 02:33:59 -0700
 X-IronPort-AV: E=Sophos;i="5.92,262,1650956400"; 
-   d="scan'208";a="652387281"
+   d="scan'208";a="652387290"
 Received: from ahunter6-mobl1.ger.corp.intel.com (HELO ahunter-VirtualBox.home\044ger.corp.intel.com) ([10.252.51.111])
-  by fmsmga008-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 11 Jul 2022 02:33:55 -0700
+  by fmsmga008-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 11 Jul 2022 02:33:57 -0700
 From:   Adrian Hunter <adrian.hunter@intel.com>
 To:     Arnaldo Carvalho de Melo <acme@kernel.org>
 Cc:     Jiri Olsa <jolsa@redhat.com>, Namhyung Kim <namhyung@kernel.org>,
         Ian Rogers <irogers@google.com>,
         Andi Kleen <ak@linux.intel.com>, linux-kernel@vger.kernel.org,
         kvm@vger.kernel.org
-Subject: [PATCH 32/35] perf intel-pt: Determine guest thread from guest sideband
-Date:   Mon, 11 Jul 2022 12:32:15 +0300
-Message-Id: <20220711093218.10967-33-adrian.hunter@intel.com>
+Subject: [PATCH 33/35] perf intel-pt: Add machine_pid and vcpu to auxtrace_error
+Date:   Mon, 11 Jul 2022 12:32:16 +0300
+Message-Id: <20220711093218.10967-34-adrian.hunter@intel.com>
 X-Mailer: git-send-email 2.25.1
 In-Reply-To: <20220711093218.10967-1-adrian.hunter@intel.com>
 References: <20220711093218.10967-1-adrian.hunter@intel.com>
@@ -61,114 +61,76 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Prior to decoding, determine what guest thread, if any, is running.
+When decoding with guest sideband information, for VMX non-root (NR)
+i.e. guest errors, replace the host (hypervisor) pid/tid with guest values,
+and provide also the new machine_pid and vcpu values.
 
 Signed-off-by: Adrian Hunter <adrian.hunter@intel.com>
 ---
- tools/perf/util/intel-pt.c | 69 ++++++++++++++++++++++++++++++++++++--
- 1 file changed, 67 insertions(+), 2 deletions(-)
+ tools/perf/util/intel-pt.c | 26 ++++++++++++++++++++------
+ 1 file changed, 20 insertions(+), 6 deletions(-)
 
 diff --git a/tools/perf/util/intel-pt.c b/tools/perf/util/intel-pt.c
-index dc2af64f9e31..a08c2f059d5a 100644
+index a08c2f059d5a..143a096b567b 100644
 --- a/tools/perf/util/intel-pt.c
 +++ b/tools/perf/util/intel-pt.c
-@@ -196,6 +196,10 @@ struct intel_pt_queue {
- 	struct machine *guest_machine;
- 	struct thread *guest_thread;
- 	struct thread *unknown_guest_thread;
-+	pid_t guest_machine_pid;
-+	pid_t guest_pid;
-+	pid_t guest_tid;
-+	int vcpu;
- 	bool exclude_kernel;
- 	bool have_sample;
- 	u64 time;
-@@ -759,8 +763,13 @@ static int intel_pt_walk_next_insn(struct intel_pt_insn *intel_pt_insn,
- 	cpumode = intel_pt_nr_cpumode(ptq, *ip, nr);
- 
- 	if (nr) {
--		if ((!symbol_conf.guest_code && cpumode != PERF_RECORD_MISC_GUEST_KERNEL) ||
--		    intel_pt_get_guest(ptq)) {
-+		if (ptq->pt->have_guest_sideband) {
-+			if (!ptq->guest_machine || ptq->guest_machine_pid != ptq->pid) {
-+				intel_pt_log("ERROR: guest sideband but no guest machine\n");
-+				return -EINVAL;
-+			}
-+		} else if ((!symbol_conf.guest_code && cpumode != PERF_RECORD_MISC_GUEST_KERNEL) ||
-+			   intel_pt_get_guest(ptq)) {
- 			intel_pt_log("ERROR: no guest machine\n");
- 			return -EINVAL;
- 		}
-@@ -1385,6 +1394,55 @@ static void intel_pt_first_timestamp(struct intel_pt *pt, u64 timestamp)
- 	}
+@@ -2404,7 +2404,8 @@ static int intel_pt_synth_iflag_chg_sample(struct intel_pt_queue *ptq)
  }
  
-+static int intel_pt_get_guest_from_sideband(struct intel_pt_queue *ptq)
-+{
-+	struct machines *machines = &ptq->pt->session->machines;
-+	struct machine *machine;
-+	pid_t machine_pid = ptq->pid;
-+	pid_t tid;
-+	int vcpu;
-+
-+	if (machine_pid <= 0)
-+		return 0; /* Not a guest machine */
-+
-+	machine = machines__find(machines, machine_pid);
-+	if (!machine)
-+		return 0; /* Not a guest machine */
-+
-+	if (ptq->guest_machine != machine) {
-+		ptq->guest_machine = NULL;
-+		thread__zput(ptq->guest_thread);
-+		thread__zput(ptq->unknown_guest_thread);
-+
-+		ptq->unknown_guest_thread = machine__find_thread(machine, 0, 0);
-+		if (!ptq->unknown_guest_thread)
-+			return -1;
-+		ptq->guest_machine = machine;
-+	}
-+
-+	vcpu = ptq->thread ? ptq->thread->guest_cpu : -1;
-+	if (vcpu < 0)
-+		return -1;
-+
-+	tid = machine__get_current_tid(machine, vcpu);
-+
-+	if (ptq->guest_thread && ptq->guest_thread->tid != tid)
-+		thread__zput(ptq->guest_thread);
-+
-+	if (!ptq->guest_thread) {
-+		ptq->guest_thread = machine__find_thread(machine, -1, tid);
-+		if (!ptq->guest_thread)
-+			return -1;
-+	}
-+
-+	ptq->guest_machine_pid = machine_pid;
-+	ptq->guest_pid = ptq->guest_thread->pid_;
-+	ptq->guest_tid = tid;
-+	ptq->vcpu = vcpu;
-+
-+	return 0;
-+}
-+
- static void intel_pt_set_pid_tid_cpu(struct intel_pt *pt,
- 				     struct auxtrace_queue *queue)
+ static int intel_pt_synth_error(struct intel_pt *pt, int code, int cpu,
+-				pid_t pid, pid_t tid, u64 ip, u64 timestamp)
++				pid_t pid, pid_t tid, u64 ip, u64 timestamp,
++				pid_t machine_pid, int vcpu)
  {
-@@ -1405,6 +1463,13 @@ static void intel_pt_set_pid_tid_cpu(struct intel_pt *pt,
- 		if (queue->cpu == -1)
- 			ptq->cpu = ptq->thread->cpu;
- 	}
-+
-+	if (pt->have_guest_sideband && intel_pt_get_guest_from_sideband(ptq)) {
-+		ptq->guest_machine_pid = 0;
-+		ptq->guest_pid = -1;
-+		ptq->guest_tid = -1;
-+		ptq->vcpu = -1;
+ 	union perf_event event;
+ 	char msg[MAX_AUXTRACE_ERROR_MSG];
+@@ -2421,8 +2422,9 @@ static int intel_pt_synth_error(struct intel_pt *pt, int code, int cpu,
+ 
+ 	intel_pt__strerror(code, msg, MAX_AUXTRACE_ERROR_MSG);
+ 
+-	auxtrace_synth_error(&event.auxtrace_error, PERF_AUXTRACE_ERROR_ITRACE,
+-			     code, cpu, pid, tid, ip, msg, timestamp);
++	auxtrace_synth_guest_error(&event.auxtrace_error, PERF_AUXTRACE_ERROR_ITRACE,
++				   code, cpu, pid, tid, ip, msg, timestamp,
++				   machine_pid, vcpu);
+ 
+ 	err = perf_session__deliver_synth_event(pt->session, &event, NULL);
+ 	if (err)
+@@ -2437,11 +2439,22 @@ static int intel_ptq_synth_error(struct intel_pt_queue *ptq,
+ {
+ 	struct intel_pt *pt = ptq->pt;
+ 	u64 tm = ptq->timestamp;
++	pid_t machine_pid = 0;
++	pid_t pid = ptq->pid;
++	pid_t tid = ptq->tid;
++	int vcpu = -1;
+ 
+ 	tm = pt->timeless_decoding ? 0 : tsc_to_perf_time(tm, &pt->tc);
+ 
+-	return intel_pt_synth_error(pt, state->err, ptq->cpu, ptq->pid,
+-				    ptq->tid, state->from_ip, tm);
++	if (pt->have_guest_sideband && state->from_nr) {
++		machine_pid = ptq->guest_machine_pid;
++		vcpu = ptq->vcpu;
++		pid = ptq->guest_pid;
++		tid = ptq->guest_tid;
 +	}
++
++	return intel_pt_synth_error(pt, state->err, ptq->cpu, pid, tid,
++				    state->from_ip, tm, machine_pid, vcpu);
  }
  
- static void intel_pt_sample_flags(struct intel_pt_queue *ptq)
+ static int intel_pt_next_tid(struct intel_pt *pt, struct intel_pt_queue *ptq)
+@@ -3028,7 +3041,8 @@ static int intel_pt_process_timeless_sample(struct intel_pt *pt,
+ static int intel_pt_lost(struct intel_pt *pt, struct perf_sample *sample)
+ {
+ 	return intel_pt_synth_error(pt, INTEL_PT_ERR_LOST, sample->cpu,
+-				    sample->pid, sample->tid, 0, sample->time);
++				    sample->pid, sample->tid, 0, sample->time,
++				    sample->machine_pid, sample->vcpu);
+ }
+ 
+ static struct intel_pt_queue *intel_pt_cpu_to_ptq(struct intel_pt *pt, int cpu)
 -- 
 2.25.1
 
