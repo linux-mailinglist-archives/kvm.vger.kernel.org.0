@@ -2,49 +2,49 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 9CAE156FE8A
-	for <lists+kvm@lfdr.de>; Mon, 11 Jul 2022 12:13:53 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 7678156FE8C
+	for <lists+kvm@lfdr.de>; Mon, 11 Jul 2022 12:14:06 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233002AbiGKKNu (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 11 Jul 2022 06:13:50 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49492 "EHLO
+        id S234754AbiGKKOE (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 11 Jul 2022 06:14:04 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49596 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231124AbiGKKMp (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 11 Jul 2022 06:12:45 -0400
+        with ESMTP id S232645AbiGKKNQ (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 11 Jul 2022 06:13:16 -0400
 Received: from mga04.intel.com (mga04.intel.com [192.55.52.120])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2179C25C42;
-        Mon, 11 Jul 2022 02:33:56 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C754E78DE1;
+        Mon, 11 Jul 2022 02:33:59 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1657532037; x=1689068037;
+  t=1657532039; x=1689068039;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=sNOtXZ/ZqAQGHU78sN2eiVBlBE+Lr8Bl1OTmXBpdym0=;
-  b=gQgnJ88vCmj5AEM7uzK5Y96WOLFiq4pmtzErD/wqaFxfNXH/tV0h5eZD
-   YI0yyJvwappeSawjFrFSIUQ5gTt7uwS5glOHD4x+wA/PVZWYYwbWRyo+W
-   8d0MM20EPrH4gz8kX7ZGeVIRYVfH2SIpYsoM+kRsTvDAkLOhhcOK3Bfdb
-   8bRc0vTYnGtFBNDAN8Whxh7DzfkCTbwtwLTP4Fb3c2wa3sc20X09Q7Kpp
-   Ux6jYA7kexp72EVpdhQNBSjdD25ZzF/hL0WEngiFRXHXUVk5yTMWpS7sd
-   late51ONtB/PNypXCAY7XNQfkLBNQ4Dr4DQp8YGpeQjn0V2qPBgDWPNEO
-   Q==;
-X-IronPort-AV: E=McAfee;i="6400,9594,10404"; a="283371666"
+  bh=7AhT+PNqMolTOw2rvSOOX8l8IWfC7G90SMfb8ikqPGU=;
+  b=A4X1I7P5qq673L3Lyn9oyzE2VOGyAOlUcPX89mP02aKaz5AdVnL58c+k
+   O53QKP1hHeu7mp4qa9CeHw6MGS0ye5uuqTFRW0ZlBUNstm2IKPs1P+/XX
+   nOzBHRKm8kVpilw4FDj+tho5NQGOeeLPfMZrIhGV+qCx45bCG5qTeVPs8
+   GCXc+SuhQTO6/mEJOaztie+eNm/SVWNDWVrFH3rd1n3XZSHbTbVof68jq
+   wMRbGHCrLgQuMayOF72429jhdkdw0N6jXIOyouTPCXebu5tu12lG0TAok
+   pHZSSVNW1ZniGYy8CJ36e6ui3SF0K1VbCrUpkqmWaUJeF+Uvch2K4p3L9
+   g==;
+X-IronPort-AV: E=McAfee;i="6400,9594,10404"; a="283371674"
 X-IronPort-AV: E=Sophos;i="5.92,262,1650956400"; 
-   d="scan'208";a="283371666"
+   d="scan'208";a="283371674"
 Received: from fmsmga008.fm.intel.com ([10.253.24.58])
-  by fmsmga104.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 11 Jul 2022 02:33:40 -0700
+  by fmsmga104.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 11 Jul 2022 02:33:43 -0700
 X-IronPort-AV: E=Sophos;i="5.92,262,1650956400"; 
-   d="scan'208";a="652387226"
+   d="scan'208";a="652387238"
 Received: from ahunter6-mobl1.ger.corp.intel.com (HELO ahunter-VirtualBox.home\044ger.corp.intel.com) ([10.252.51.111])
-  by fmsmga008-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 11 Jul 2022 02:33:38 -0700
+  by fmsmga008-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 11 Jul 2022 02:33:41 -0700
 From:   Adrian Hunter <adrian.hunter@intel.com>
 To:     Arnaldo Carvalho de Melo <acme@kernel.org>
 Cc:     Jiri Olsa <jolsa@redhat.com>, Namhyung Kim <namhyung@kernel.org>,
         Ian Rogers <irogers@google.com>,
         Andi Kleen <ak@linux.intel.com>, linux-kernel@vger.kernel.org,
         kvm@vger.kernel.org
-Subject: [PATCH 25/35] perf machine: Use realloc_array_as_needed() in machine__set_current_tid()
-Date:   Mon, 11 Jul 2022 12:32:08 +0300
-Message-Id: <20220711093218.10967-26-adrian.hunter@intel.com>
+Subject: [PATCH 26/35] perf tools: Handle injected guest kernel mmap event
+Date:   Mon, 11 Jul 2022 12:32:09 +0300
+Message-Id: <20220711093218.10967-27-adrian.hunter@intel.com>
 X-Mailer: git-send-email 2.25.1
 In-Reply-To: <20220711093218.10967-1-adrian.hunter@intel.com>
 References: <20220711093218.10967-1-adrian.hunter@intel.com>
@@ -61,76 +61,56 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Prepare machine__set_current_tid() for use with guest machines that do
-not currently have a machine->env->nr_cpus_avail value by making use of
-realloc_array_as_needed().
+If a kernel mmap event was recorded inside a guest and injected into a host
+perf.data file, then it will match a host mmap_name not a guest mmap_name,
+see machine__set_mmap_name(). So try matching a host mmap_name in that
+case.
 
 Signed-off-by: Adrian Hunter <adrian.hunter@intel.com>
 ---
- tools/perf/util/machine.c | 26 +++++++-------------------
- tools/perf/util/machine.h |  1 +
- 2 files changed, 8 insertions(+), 19 deletions(-)
+ tools/perf/util/machine.c | 15 ++++++++++++---
+ 1 file changed, 12 insertions(+), 3 deletions(-)
 
 diff --git a/tools/perf/util/machine.c b/tools/perf/util/machine.c
-index 009061852808..27d1a38f44c3 100644
+index 27d1a38f44c3..8f657225fb02 100644
 --- a/tools/perf/util/machine.c
 +++ b/tools/perf/util/machine.c
-@@ -3174,9 +3174,7 @@ int machines__for_each_thread(struct machines *machines,
+@@ -1742,6 +1742,7 @@ static int machine__process_kernel_mmap_event(struct machine *machine,
+ 	struct map *map;
+ 	enum dso_space_type dso_space;
+ 	bool is_kernel_mmap;
++	const char *mmap_name = machine->mmap_name;
  
- pid_t machine__get_current_tid(struct machine *machine, int cpu)
- {
--	int nr_cpus = min(machine->env->nr_cpus_avail, MAX_NR_CPUS);
--
--	if (cpu < 0 || cpu >= nr_cpus || !machine->current_tid)
-+	if (cpu < 0 || (size_t)cpu >= machine->current_tid_sz)
- 		return -1;
+ 	/* If we have maps from kcore then we do not need or want any others */
+ 	if (machine__uses_kcore(machine))
+@@ -1752,8 +1753,16 @@ static int machine__process_kernel_mmap_event(struct machine *machine,
+ 	else
+ 		dso_space = DSO_SPACE__KERNEL_GUEST;
  
- 	return machine->current_tid[cpu];
-@@ -3186,26 +3184,16 @@ int machine__set_current_tid(struct machine *machine, int cpu, pid_t pid,
- 			     pid_t tid)
- {
- 	struct thread *thread;
--	int nr_cpus = min(machine->env->nr_cpus_avail, MAX_NR_CPUS);
-+	const pid_t init_val = -1;
+-	is_kernel_mmap = memcmp(xm->name, machine->mmap_name,
+-				strlen(machine->mmap_name) - 1) == 0;
++	is_kernel_mmap = memcmp(xm->name, mmap_name, strlen(mmap_name) - 1) == 0;
++	if (!is_kernel_mmap && !machine__is_host(machine)) {
++		/*
++		 * If the event was recorded inside the guest and injected into
++		 * the host perf.data file, then it will match a host mmap_name,
++		 * so try that - see machine__set_mmap_name().
++		 */
++		mmap_name = "[kernel.kallsyms]";
++		is_kernel_mmap = memcmp(xm->name, mmap_name, strlen(mmap_name) - 1) == 0;
++	}
+ 	if (xm->name[0] == '/' ||
+ 	    (!is_kernel_mmap && xm->name[0] == '[')) {
+ 		map = machine__addnew_module_map(machine, xm->start,
+@@ -1767,7 +1776,7 @@ static int machine__process_kernel_mmap_event(struct machine *machine,
+ 			dso__set_build_id(map->dso, bid);
  
- 	if (cpu < 0)
- 		return -EINVAL;
- 
--	if (!machine->current_tid) {
--		int i;
--
--		machine->current_tid = calloc(nr_cpus, sizeof(pid_t));
--		if (!machine->current_tid)
--			return -ENOMEM;
--		for (i = 0; i < nr_cpus; i++)
--			machine->current_tid[i] = -1;
--	}
--
--	if (cpu >= nr_cpus) {
--		pr_err("Requested CPU %d too large. ", cpu);
--		pr_err("Consider raising MAX_NR_CPUS\n");
--		return -EINVAL;
--	}
-+	if (realloc_array_as_needed(machine->current_tid,
-+				    machine->current_tid_sz,
-+				    (unsigned int)cpu,
-+				    &init_val))
-+		return -ENOMEM;
- 
- 	machine->current_tid[cpu] = tid;
- 
-diff --git a/tools/perf/util/machine.h b/tools/perf/util/machine.h
-index d40b23c71420..609e24e329d1 100644
---- a/tools/perf/util/machine.h
-+++ b/tools/perf/util/machine.h
-@@ -57,6 +57,7 @@ struct machine {
- 	struct map	  *vmlinux_map;
- 	u64		  kernel_start;
- 	pid_t		  *current_tid;
-+	size_t		  current_tid_sz;
- 	union { /* Tool specific area */
- 		void	  *priv;
- 		u64	  db_id;
+ 	} else if (is_kernel_mmap) {
+-		const char *symbol_name = (xm->name + strlen(machine->mmap_name));
++		const char *symbol_name = xm->name + strlen(mmap_name);
+ 		/*
+ 		 * Should be there already, from the build-id table in
+ 		 * the header.
 -- 
 2.25.1
 
