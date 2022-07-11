@@ -2,49 +2,49 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 0459C56FE9A
+	by mail.lfdr.de (Postfix) with ESMTP id C5DA156FE9C
 	for <lists+kvm@lfdr.de>; Mon, 11 Jul 2022 12:14:55 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232500AbiGKKOw (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 11 Jul 2022 06:14:52 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49578 "EHLO
+        id S232969AbiGKKOx (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 11 Jul 2022 06:14:53 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53934 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234710AbiGKKOB (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 11 Jul 2022 06:14:01 -0400
+        with ESMTP id S230350AbiGKKOC (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 11 Jul 2022 06:14:02 -0400
 Received: from mga04.intel.com (mga04.intel.com [192.55.52.120])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 00F3011C29;
-        Mon, 11 Jul 2022 02:34:12 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0FF824A83E;
+        Mon, 11 Jul 2022 02:34:14 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1657532053; x=1689068053;
+  t=1657532055; x=1689068055;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=O3190nooY039Ty/FrmVIXqbtnejrADzOmSlS4bX40V0=;
-  b=cBsJ2ZAZxW7cX55oCOWiUmpW1OpqIEPhfNQ7R4LDe9fl/+k0vPMrJOS8
-   OZ8jZSbC8tCKLFP/XppEEQdEM2Ki+J6ffF1HWrL0//+f4IVotOSOe1vh5
-   lhG6HjJeR/1nE8pfDCLSqcyQ0/tTQDVE6YsK0ufptf7V9v4GI/q+b/FP+
-   3teZvohcrMQi6xhiuwKDiRhsVSw6QENQxYrXCxPsHaXz0S/8KNIsjlfpH
-   aphkpN/JfsPVtKd+ke/LWJwcJ+HuWOkXpoA5ZlF+NjTA3n+akNhC1qZyF
-   NT8EuZxeZTLgHiDWDHrGFtPFuu0iYQ8OVcw4xpS/Cg8AR46uv8qjnuCD5
-   Q==;
-X-IronPort-AV: E=McAfee;i="6400,9594,10404"; a="283371722"
+  bh=TSgiek8mItA/pqYjGSTKdQzP4Ez5i64yAdOC7OFZUIs=;
+  b=SURf09ATeTys7j7+58Z5OYjDXO2/HPgKK1iJ3C/gs/jHy6geL7itkRdC
+   VuPNT0j3Ih34gpLErZGPcz/WAdHtHT/GQUuJYBydYY61JnDOqC9hwUfAZ
+   e4nNCY13dja9K8+3cFPjnjhwYcTt8zYQNCXHR/UcV+Zo26vOEsv9IjLHa
+   sCf6iFeyP0jyTKryrZNkG6g3rWr2zG70EFBn8wrrG/VHBMXgXliy7H74n
+   fkfxNkB5v+q2OrUxHiB0c1l45Oq4tXTM71JAWQ2SrLzFU0pLjomCHruzi
+   wLixdce8P1JxhUlA379XGHVaM9Yi6CtCkYy7et3BUh5d8vL+GfO1TlkNt
+   g==;
+X-IronPort-AV: E=McAfee;i="6400,9594,10404"; a="283371733"
 X-IronPort-AV: E=Sophos;i="5.92,262,1650956400"; 
-   d="scan'208";a="283371722"
+   d="scan'208";a="283371733"
 Received: from fmsmga008.fm.intel.com ([10.253.24.58])
-  by fmsmga104.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 11 Jul 2022 02:33:54 -0700
+  by fmsmga104.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 11 Jul 2022 02:33:57 -0700
 X-IronPort-AV: E=Sophos;i="5.92,262,1650956400"; 
-   d="scan'208";a="652387275"
+   d="scan'208";a="652387281"
 Received: from ahunter6-mobl1.ger.corp.intel.com (HELO ahunter-VirtualBox.home\044ger.corp.intel.com) ([10.252.51.111])
-  by fmsmga008-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 11 Jul 2022 02:33:52 -0700
+  by fmsmga008-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 11 Jul 2022 02:33:55 -0700
 From:   Adrian Hunter <adrian.hunter@intel.com>
 To:     Arnaldo Carvalho de Melo <acme@kernel.org>
 Cc:     Jiri Olsa <jolsa@redhat.com>, Namhyung Kim <namhyung@kernel.org>,
         Ian Rogers <irogers@google.com>,
         Andi Kleen <ak@linux.intel.com>, linux-kernel@vger.kernel.org,
         kvm@vger.kernel.org
-Subject: [PATCH 31/35] perf intel-pt: Disable sync switch with guest sideband
-Date:   Mon, 11 Jul 2022 12:32:14 +0300
-Message-Id: <20220711093218.10967-32-adrian.hunter@intel.com>
+Subject: [PATCH 32/35] perf intel-pt: Determine guest thread from guest sideband
+Date:   Mon, 11 Jul 2022 12:32:15 +0300
+Message-Id: <20220711093218.10967-33-adrian.hunter@intel.com>
 X-Mailer: git-send-email 2.25.1
 In-Reply-To: <20220711093218.10967-1-adrian.hunter@intel.com>
 References: <20220711093218.10967-1-adrian.hunter@intel.com>
@@ -61,76 +61,114 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-The sync_switch facility attempts to better synchronize context switches
-with the Intel PT trace, however it is not designed for guest machine
-context switches, so disable it when guest sideband is detected.
+Prior to decoding, determine what guest thread, if any, is running.
 
 Signed-off-by: Adrian Hunter <adrian.hunter@intel.com>
 ---
- tools/perf/util/intel-pt.c | 29 +++++++++++++++++++++++++++++
- 1 file changed, 29 insertions(+)
+ tools/perf/util/intel-pt.c | 69 ++++++++++++++++++++++++++++++++++++--
+ 1 file changed, 67 insertions(+), 2 deletions(-)
 
 diff --git a/tools/perf/util/intel-pt.c b/tools/perf/util/intel-pt.c
-index 98b097fec476..dc2af64f9e31 100644
+index dc2af64f9e31..a08c2f059d5a 100644
 --- a/tools/perf/util/intel-pt.c
 +++ b/tools/perf/util/intel-pt.c
-@@ -74,6 +74,7 @@ struct intel_pt {
- 	bool data_queued;
- 	bool est_tsc;
- 	bool sync_switch;
-+	bool sync_switch_not_supported;
- 	bool mispred_all;
- 	bool use_thread_stack;
- 	bool callstack;
-@@ -2638,6 +2639,9 @@ static void intel_pt_enable_sync_switch(struct intel_pt *pt)
- {
- 	unsigned int i;
+@@ -196,6 +196,10 @@ struct intel_pt_queue {
+ 	struct machine *guest_machine;
+ 	struct thread *guest_thread;
+ 	struct thread *unknown_guest_thread;
++	pid_t guest_machine_pid;
++	pid_t guest_pid;
++	pid_t guest_tid;
++	int vcpu;
+ 	bool exclude_kernel;
+ 	bool have_sample;
+ 	u64 time;
+@@ -759,8 +763,13 @@ static int intel_pt_walk_next_insn(struct intel_pt_insn *intel_pt_insn,
+ 	cpumode = intel_pt_nr_cpumode(ptq, *ip, nr);
  
-+	if (pt->sync_switch_not_supported)
-+		return;
-+
- 	pt->sync_switch = true;
- 
- 	for (i = 0; i < pt->queues.nr_queues; i++) {
-@@ -2649,6 +2653,23 @@ static void intel_pt_enable_sync_switch(struct intel_pt *pt)
+ 	if (nr) {
+-		if ((!symbol_conf.guest_code && cpumode != PERF_RECORD_MISC_GUEST_KERNEL) ||
+-		    intel_pt_get_guest(ptq)) {
++		if (ptq->pt->have_guest_sideband) {
++			if (!ptq->guest_machine || ptq->guest_machine_pid != ptq->pid) {
++				intel_pt_log("ERROR: guest sideband but no guest machine\n");
++				return -EINVAL;
++			}
++		} else if ((!symbol_conf.guest_code && cpumode != PERF_RECORD_MISC_GUEST_KERNEL) ||
++			   intel_pt_get_guest(ptq)) {
+ 			intel_pt_log("ERROR: no guest machine\n");
+ 			return -EINVAL;
+ 		}
+@@ -1385,6 +1394,55 @@ static void intel_pt_first_timestamp(struct intel_pt *pt, u64 timestamp)
  	}
  }
  
-+static void intel_pt_disable_sync_switch(struct intel_pt *pt)
++static int intel_pt_get_guest_from_sideband(struct intel_pt_queue *ptq)
 +{
-+	unsigned int i;
++	struct machines *machines = &ptq->pt->session->machines;
++	struct machine *machine;
++	pid_t machine_pid = ptq->pid;
++	pid_t tid;
++	int vcpu;
 +
-+	pt->sync_switch = false;
++	if (machine_pid <= 0)
++		return 0; /* Not a guest machine */
 +
-+	for (i = 0; i < pt->queues.nr_queues; i++) {
-+		struct auxtrace_queue *queue = &pt->queues.queue_array[i];
-+		struct intel_pt_queue *ptq = queue->priv;
++	machine = machines__find(machines, machine_pid);
++	if (!machine)
++		return 0; /* Not a guest machine */
 +
-+		if (ptq) {
-+			ptq->sync_switch = false;
-+			intel_pt_next_tid(pt, ptq);
-+		}
++	if (ptq->guest_machine != machine) {
++		ptq->guest_machine = NULL;
++		thread__zput(ptq->guest_thread);
++		thread__zput(ptq->unknown_guest_thread);
++
++		ptq->unknown_guest_thread = machine__find_thread(machine, 0, 0);
++		if (!ptq->unknown_guest_thread)
++			return -1;
++		ptq->guest_machine = machine;
 +	}
++
++	vcpu = ptq->thread ? ptq->thread->guest_cpu : -1;
++	if (vcpu < 0)
++		return -1;
++
++	tid = machine__get_current_tid(machine, vcpu);
++
++	if (ptq->guest_thread && ptq->guest_thread->tid != tid)
++		thread__zput(ptq->guest_thread);
++
++	if (!ptq->guest_thread) {
++		ptq->guest_thread = machine__find_thread(machine, -1, tid);
++		if (!ptq->guest_thread)
++			return -1;
++	}
++
++	ptq->guest_machine_pid = machine_pid;
++	ptq->guest_pid = ptq->guest_thread->pid_;
++	ptq->guest_tid = tid;
++	ptq->vcpu = vcpu;
++
++	return 0;
 +}
 +
- /*
-  * To filter against time ranges, it is only necessary to look at the next start
-  * or end time.
-@@ -3090,6 +3111,14 @@ static int intel_pt_guest_context_switch(struct intel_pt *pt,
- 
- 	pt->have_guest_sideband = true;
- 
-+	/*
-+	 * sync_switch cannot handle guest machines at present, so just disable
-+	 * it.
-+	 */
-+	pt->sync_switch_not_supported = true;
-+	if (pt->sync_switch)
-+		intel_pt_disable_sync_switch(pt);
+ static void intel_pt_set_pid_tid_cpu(struct intel_pt *pt,
+ 				     struct auxtrace_queue *queue)
+ {
+@@ -1405,6 +1463,13 @@ static void intel_pt_set_pid_tid_cpu(struct intel_pt *pt,
+ 		if (queue->cpu == -1)
+ 			ptq->cpu = ptq->thread->cpu;
+ 	}
 +
- 	if (out)
- 		return 0;
++	if (pt->have_guest_sideband && intel_pt_get_guest_from_sideband(ptq)) {
++		ptq->guest_machine_pid = 0;
++		ptq->guest_pid = -1;
++		ptq->guest_tid = -1;
++		ptq->vcpu = -1;
++	}
+ }
  
+ static void intel_pt_sample_flags(struct intel_pt_queue *ptq)
 -- 
 2.25.1
 
