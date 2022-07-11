@@ -2,163 +2,100 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 61D0E56D69D
-	for <lists+kvm@lfdr.de>; Mon, 11 Jul 2022 09:21:15 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 43FA956D45F
+	for <lists+kvm@lfdr.de>; Mon, 11 Jul 2022 07:48:52 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229999AbiGKHVO (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 11 Jul 2022 03:21:14 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41196 "EHLO
+        id S229536AbiGKFst (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 11 Jul 2022 01:48:49 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41148 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230042AbiGKHVJ (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 11 Jul 2022 03:21:09 -0400
-Received: from mga18.intel.com (mga18.intel.com [134.134.136.126])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B85C2DF46
-        for <kvm@vger.kernel.org>; Mon, 11 Jul 2022 00:21:08 -0700 (PDT)
+        with ESMTP id S229469AbiGKFss (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 11 Jul 2022 01:48:48 -0400
+Received: from mga12.intel.com (mga12.intel.com [192.55.52.136])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 49CC415FCC;
+        Sun, 10 Jul 2022 22:48:47 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1657524068; x=1689060068;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=/lBamZVQjssKaCrXr1DnOw2Xu7R6jcPqr2nr+gHAVs4=;
-  b=dru2HtxJ1l19BoH904wAoAHyxzZAscC+t9TsIKKyWiF9+UVMDJYrX4Yb
-   UwMhcIufRK0Ilyhs/WVMlnClulzRcheWukFnABTuUv1zfIB2uPxVBfYzk
-   grtdpLfgQJQrW24L5r7ukzoFeXt6nRQG3JVXyUE9f8aTVJ5t2JsSXr2fa
-   Eq0frE+08CvyIVF0JXKY/zc51byjrQwwNanrYOp8XhTQqNXRYsqs8jAwn
-   p+pCqW9F5khm7kd7wPEQSvO3R9gCSWehBaSyZwKC1v4hO9HPjApvpQLNK
-   o3poRtbnsnw1oZYPm/o3rDX5oOaskObfaTZjTXU7IGGlLlZe0KfU+gJZB
-   w==;
-X-IronPort-AV: E=McAfee;i="6400,9594,10404"; a="267636833"
+  t=1657518527; x=1689054527;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=nJ8PlUBoQwoeShO3ziyubBuG2AA62mhcNqL/Nkw5+kg=;
+  b=X85//BZqeOUqbF6OOFzYdQ8dJjFqifi4pNcmUDAcqFNCuZEetTNyOUT0
+   pt6imWpgfsGEpqRZ0XciucJtpZuZc+bP+wWsM6cM1YYVmfzvkkZ6ZdZN3
+   KPZExkLO7IVjU4iK44LoIG3Kkv16+CkqaFYfDn+yulZCxd84wmqy+G5Py
+   tUBvMgDMMPjplDFoDztm7CVGSF6lsLyzPXQdRw9MQZHm1Pmv9fEH29mUT
+   8lDKF0sZF7moTuUNC42ou/GWnIG93hHVuI7QRfEMXx5e9Yfs/6/z4jVKL
+   xweF1l8BghffHqcYI+f7MI8CkDO9IaH8LXtvDC2pz4RMofbzislXh+AnB
+   Q==;
+X-IronPort-AV: E=McAfee;i="6400,9594,10404"; a="264357379"
 X-IronPort-AV: E=Sophos;i="5.92,262,1650956400"; 
-   d="scan'208";a="267636833"
-Received: from orsmga001.jf.intel.com ([10.7.209.18])
-  by orsmga106.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 11 Jul 2022 00:20:57 -0700
+   d="scan'208";a="264357379"
+Received: from fmsmga007.fm.intel.com ([10.253.24.52])
+  by fmsmga106.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 10 Jul 2022 22:48:46 -0700
+X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="5.92,262,1650956400"; 
-   d="scan'208";a="627392557"
-Received: from embargo.jf.intel.com ([10.165.9.183])
-  by orsmga001-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 11 Jul 2022 00:20:57 -0700
-From:   Yang Weijiang <weijiang.yang@intel.com>
-To:     seanjc@google.com, pbonzini@redhat.com, kvm@vger.kernel.org
-Cc:     Yang Weijiang <weijiang.yang@intel.com>
-Subject: [kvm-unit-tests PATCH 4/4] x86: Check platform pmu capabilities before run lbr tests
-Date:   Mon, 11 Jul 2022 00:18:41 -0400
-Message-Id: <20220711041841.126648-5-weijiang.yang@intel.com>
-X-Mailer: git-send-email 2.27.0
-In-Reply-To: <20220711041841.126648-1-weijiang.yang@intel.com>
-References: <20220711041841.126648-1-weijiang.yang@intel.com>
+   d="scan'208";a="598921065"
+Received: from yy-desk-7060.sh.intel.com (HELO localhost) ([10.239.159.76])
+  by fmsmga007.fm.intel.com with ESMTP; 10 Jul 2022 22:48:45 -0700
+Date:   Mon, 11 Jul 2022 13:48:44 +0800
+From:   Yuan Yao <yuan.yao@linux.intel.com>
+To:     isaku.yamahata@intel.com
+Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+        isaku.yamahata@gmail.com, Paolo Bonzini <pbonzini@redhat.com>
+Subject: Re: [PATCH v7 043/102] KVM: x86/mmu: Focibly use TDP MMU for TDX
+Message-ID: <20220711054844.wb34vvqf74wkb2jp@yy-desk-7060>
+References: <cover.1656366337.git.isaku.yamahata@intel.com>
+ <c198d2be26aa9a041176826cf86b51a337427783.1656366338.git.isaku.yamahata@intel.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-1.1 required=5.0 tests=BAYES_00,DATE_IN_PAST_03_06,
-        DKIMWL_WL_HIGH,DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=no
-        autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <c198d2be26aa9a041176826cf86b51a337427783.1656366338.git.isaku.yamahata@intel.com>
+User-Agent: NeoMutt/20171215
+X-Spam-Status: No, score=-4.9 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,SPF_HELO_PASS,
+        SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no
+        version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Use new helper to check whether pmu is available and Perfmon/Debug
-capbilities are supported before read MSR_IA32_PERF_CAPABILITIES to
-avoid test failure. The issue can be captured when enable_pmu=0.
+On Mon, Jun 27, 2022 at 02:53:35PM -0700, isaku.yamahata@intel.com wrote:
+> From: Isaku Yamahata <isaku.yamahata@intel.com>
+>
+> In this patch series, TDX supports only TDP MMU and doesn't support legacy
+> MMU.  Forcibly use TDP MMU for TDX irrelevant of kernel parameter to
+> disable TDP MMU.
+>
+> Signed-off-by: Isaku Yamahata <isaku.yamahata@intel.com>
+> ---
+>  arch/x86/kvm/mmu/tdp_mmu.c | 9 +++++++--
+>  1 file changed, 7 insertions(+), 2 deletions(-)
+>
+> diff --git a/arch/x86/kvm/mmu/tdp_mmu.c b/arch/x86/kvm/mmu/tdp_mmu.c
+> index 82f1bfac7ee6..7eb41b176d1e 100644
+> --- a/arch/x86/kvm/mmu/tdp_mmu.c
+> +++ b/arch/x86/kvm/mmu/tdp_mmu.c
+> @@ -18,8 +18,13 @@ int kvm_mmu_init_tdp_mmu(struct kvm *kvm)
+>  {
+>  	struct workqueue_struct *wq;
+>
+> -	if (!tdp_enabled || !READ_ONCE(tdp_mmu_enabled))
+> -		return 0;
+> +	/*
+> +	 *  Because TDX supports only TDP MMU, forcibly use TDP MMU in the case
+> +	 *  of TDX.
+> +	 */
+> +	if (kvm->arch.vm_type != KVM_X86_TDX_VM &&
+> +		(!tdp_enabled || !READ_ONCE(tdp_mmu_enabled)))
+> +		return false;
 
-Suggested-by: Sean Christopherson <seanjc@google.com>
-Signed-off-by: Yang Weijiang <weijiang.yang@intel.com>
----
- lib/x86/processor.h |  1 +
- x86/pmu_lbr.c       | 33 +++++++++++++--------------------
- 2 files changed, 14 insertions(+), 20 deletions(-)
+Please return 0 here for int return value type.
 
-diff --git a/lib/x86/processor.h b/lib/x86/processor.h
-index b772cf3..c192a25 100644
---- a/lib/x86/processor.h
-+++ b/lib/x86/processor.h
-@@ -146,6 +146,7 @@ static inline bool is_intel(void)
-  */
- #define	X86_FEATURE_MWAIT		(CPUID(0x1, 0, ECX, 3))
- #define	X86_FEATURE_VMX			(CPUID(0x1, 0, ECX, 5))
-+#define	X86_FEATURE_PDCM		(CPUID(0x1, 0, ECX, 15))
- #define	X86_FEATURE_PCID		(CPUID(0x1, 0, ECX, 17))
- #define	X86_FEATURE_MOVBE		(CPUID(0x1, 0, ECX, 22))
- #define	X86_FEATURE_TSC_DEADLINE_TIMER	(CPUID(0x1, 0, ECX, 24))
-diff --git a/x86/pmu_lbr.c b/x86/pmu_lbr.c
-index 688634d..22c8c69 100644
---- a/x86/pmu_lbr.c
-+++ b/x86/pmu_lbr.c
-@@ -15,6 +15,7 @@
- #define MSR_LBR_SELECT		0x000001c8
- 
- volatile int count;
-+u32 lbr_from, lbr_to;
- 
- static noinline int compute_flag(int i)
- {
-@@ -38,18 +39,6 @@ static noinline int lbr_test(void)
- 	return 0;
- }
- 
--union cpuid10_eax {
--	struct {
--		unsigned int version_id:8;
--		unsigned int num_counters:8;
--		unsigned int bit_width:8;
--		unsigned int mask_length:8;
--	} split;
--	unsigned int full;
--} eax;
--
--u32 lbr_from, lbr_to;
--
- static void init_lbr(void *index)
- {
- 	wrmsr(lbr_from + *(int *) index, 0);
-@@ -63,7 +52,6 @@ static bool test_init_lbr_from_exception(u64 index)
- 
- int main(int ac, char **av)
- {
--	struct cpuid id = cpuid(10);
- 	u64 perf_cap;
- 	int max, i;
- 
-@@ -74,19 +62,24 @@ int main(int ac, char **av)
- 		return 0;
- 	}
- 
--	perf_cap = rdmsr(MSR_IA32_PERF_CAPABILITIES);
--	eax.full = id.a;
-+	if (!cpu_has_pmu()) {
-+		report_skip("No pmu is detected!");
-+		return report_summary();
-+	}
- 
--	if (!eax.split.version_id) {
--		printf("No pmu is detected!\n");
-+	if (!this_cpu_has(X86_FEATURE_PDCM)) {
-+		report_skip("Perfmon/Debug Capabilities MSR isn't supported.");
- 		return report_summary();
- 	}
-+
-+	perf_cap = rdmsr(MSR_IA32_PERF_CAPABILITIES);
-+
- 	if (!(perf_cap & PMU_CAP_LBR_FMT)) {
--		printf("No LBR is detected!\n");
-+		report_skip("(Architectural) LBR is not supported.");
- 		return report_summary();
- 	}
- 
--	printf("PMU version:		 %d\n", eax.split.version_id);
-+	printf("PMU version:		 %d\n", pmu_version());
- 	printf("LBR version:		 %ld\n", perf_cap & PMU_CAP_LBR_FMT);
- 
- 	/* Look for LBR from and to MSRs */
-@@ -98,7 +91,7 @@ int main(int ac, char **av)
- 	}
- 
- 	if (test_init_lbr_from_exception(0)) {
--		printf("LBR on this platform is not supported!\n");
-+		report_skip("LBR on this platform is not supported!");
- 		return report_summary();
- 	}
- 
--- 
-2.31.1
-
+>
+>  	wq = alloc_workqueue("kvm", WQ_UNBOUND|WQ_MEM_RECLAIM|WQ_CPU_INTENSIVE, 0);
+>  	if (!wq)
+> --
+> 2.25.1
+>
