@@ -2,153 +2,121 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 1C8D95706E1
-	for <lists+kvm@lfdr.de>; Mon, 11 Jul 2022 17:23:01 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id A5251570713
+	for <lists+kvm@lfdr.de>; Mon, 11 Jul 2022 17:28:22 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229998AbiGKPW7 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 11 Jul 2022 11:22:59 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47794 "EHLO
+        id S229792AbiGKP2V (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 11 Jul 2022 11:28:21 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52444 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229470AbiGKPW6 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 11 Jul 2022 11:22:58 -0400
-Received: from mail-pg1-x52b.google.com (mail-pg1-x52b.google.com [IPv6:2607:f8b0:4864:20::52b])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5B1C45C9C5
-        for <kvm@vger.kernel.org>; Mon, 11 Jul 2022 08:22:57 -0700 (PDT)
-Received: by mail-pg1-x52b.google.com with SMTP id f11so4134260pgj.7
-        for <kvm@vger.kernel.org>; Mon, 11 Jul 2022 08:22:57 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=rIXkilLQfgOtYP5k9HiwJCc9d8sCaA9fTRl5ayd2YSU=;
-        b=oeRT2pv5AEhh1wGL8y0oDKKzorx5yHv43t0Sgjd9q8R/C7iaG9Y19Jj1kcyIz6Uc87
-         7zWboOGTmnx4k6fgHqwUheXR12fXtVNHmZQJe4P/zf2hlUgHvu8Y0WbhEBpnO5RBcnp/
-         CezdnHbdBvVV+A5ZKTnyKUInqz03eCw8xtgfopQOpiYxWFNrl0E2Eh8wYhFLWEEhJba9
-         jI4dqMNm2jUAZGFM7/Dng++crAgg1uvMRUmmkuEUGAuFiuOk9uk5UxDUB2TNpJSfyyRd
-         YXZyivdkHGCKWvUOWyW/tUrPXMc7uHjrJO39KWSLaJ4BH1Lr0iGHnN1nTaZvfb3CAi+L
-         z2ww==
+        with ESMTP id S229545AbiGKP2U (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 11 Jul 2022 11:28:20 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 2817C275C0
+        for <kvm@vger.kernel.org>; Mon, 11 Jul 2022 08:28:15 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1657553294;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=AQ9AFgjAq9AFWyJhWhhuGWEoRzdPmRiYM2CqArRFNmo=;
+        b=IuLweYScR4mLFkhU/v4xp5cwrizEPSs0cXl4i0azFTuffSvYTpCc1PXTMORiApbHFWfQ5j
+        Br0FbhrFEtqpLDqOf3LtiniobO2eXw+GsDIwK9WqFbIVYEZbNbdiqvTHCCsKjYL/peHwKp
+        FmZvqmtV8Mvc7b75vZcDATfuijX/wyI=
+Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
+ [209.85.221.69]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-605-sZRYSwjUOV--3C-eegOFiQ-1; Mon, 11 Jul 2022 11:28:12 -0400
+X-MC-Unique: sZRYSwjUOV--3C-eegOFiQ-1
+Received: by mail-wr1-f69.google.com with SMTP id l11-20020adfbd8b000000b0021d754b84c5so744625wrh.17
+        for <kvm@vger.kernel.org>; Mon, 11 Jul 2022 08:28:11 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=rIXkilLQfgOtYP5k9HiwJCc9d8sCaA9fTRl5ayd2YSU=;
-        b=kPP2WogXPpHldR8d7kEudVph7eduspKUDVH5UzKVe4x3Ly8hSr2uX8veLNRjkb/3ul
-         5FCQ2Ul/y0izU7GQsU7dKfXb9GxZ0WfCyCTWiG0XwJRf32zMWM0CfHpkYueqMrNAE3G0
-         svXI3/+YaztL6ka7hUK89bJMLDiK4EKqkagOqT1T5o4LP5jT223LV3cfEhsSzXXNLpWp
-         PG2tNfmXpWuTYe0ZQFQIk+nqeba3MJdT3RaAg7rQp22SvdUs5gzhMvONowzi8vvtvjFD
-         msF/B+HwQkOeJ7ZvcA7Vsq6fRcEY14yD9zYbef0Z2RTIB1sTiAWJfND/riglVWy8/bY8
-         BN6A==
-X-Gm-Message-State: AJIora/mRKUNiy4heh+A893poQXBB8rdTmXgIpMYNktrmJzFYj++ztcC
-        NHPBxTiT3soxoOIhD1CQHIfM7A==
-X-Google-Smtp-Source: AGRyM1uE4KGa7kyqDXzFm8D0UcGEJEKZug+68fWnZi8mRNj5u1umxmG99NPR4HdgrlHuYs+5fQTfXw==
-X-Received: by 2002:a05:6a00:1501:b0:525:79a7:aa4 with SMTP id q1-20020a056a00150100b0052579a70aa4mr19083236pfu.44.1657552976720;
-        Mon, 11 Jul 2022 08:22:56 -0700 (PDT)
-Received: from google.com (123.65.230.35.bc.googleusercontent.com. [35.230.65.123])
-        by smtp.gmail.com with ESMTPSA id 129-20020a630787000000b00415e89dd738sm3189922pgh.77.2022.07.11.08.22.56
+         :mime-version:content-disposition:in-reply-to:user-agent;
+        bh=AQ9AFgjAq9AFWyJhWhhuGWEoRzdPmRiYM2CqArRFNmo=;
+        b=ko3cX3zEqA+5iPfvCjM7jdhfkkyl+cjAq2tcMKO3vEVhSXtDp41/N3RHkeTRiqOCbQ
+         H8JFH/GRUJP3kyylHiMGyYyhnDdDn/09PcdIgD1jbVnBOmI/olveVqbAidYpOK0SseXi
+         tvzfY0HvVv2n5nYNXfRoGhr00r2HVmPaYOxUs2C+H1blpwknbRmpRdcR+b0/6494IkqW
+         vYE+lnAUyRsiHj6+GHb7qOpBHvSkgfzVfenPpaxy+4UaxZAlkGIJ5wXjhd9qa8JFkLeS
+         Cix3Az+F7X6w+UKxkK99Ag9vicy55cV08+51dvIVbCpMescdsAtT3utAKdNwWqkcOV+7
+         J68g==
+X-Gm-Message-State: AJIora9yuN+W6QyXHAAP/7tvGqUNYaMmEv+7NOkmHVe9Cnb9XkIgVOSh
+        tAThW7Wkk3ySU2MF3psn7WgPlxTuUBFlX6ipMQv8B2ESdHDM/IVDoVXGgOXzypmtWYfr+IQlWYy
+        LkoYhZTTce0uG
+X-Received: by 2002:a5d:47a8:0:b0:21b:a318:2c31 with SMTP id 8-20020a5d47a8000000b0021ba3182c31mr17271983wrb.463.1657553290622;
+        Mon, 11 Jul 2022 08:28:10 -0700 (PDT)
+X-Google-Smtp-Source: AGRyM1umoOE6F3TF/C4rCdhEN4YxFLp/CjqND8ZeK2+w2mCDb4Dh3IREsmxv9tEeCNjhbEJdT4uSfw==
+X-Received: by 2002:a5d:47a8:0:b0:21b:a318:2c31 with SMTP id 8-20020a5d47a8000000b0021ba3182c31mr17271965wrb.463.1657553290404;
+        Mon, 11 Jul 2022 08:28:10 -0700 (PDT)
+Received: from work-vm (cpc109025-salf6-2-0-cust480.10-2.cable.virginm.net. [82.30.61.225])
+        by smtp.gmail.com with ESMTPSA id j16-20020adfff90000000b0021d76a1b0e3sm6039975wrr.6.2022.07.11.08.28.09
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 11 Jul 2022 08:22:56 -0700 (PDT)
-Date:   Mon, 11 Jul 2022 15:22:52 +0000
-From:   Sean Christopherson <seanjc@google.com>
-To:     Maxim Levitsky <mlevitsk@redhat.com>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org, Oliver Upton <oupton@google.com>,
-        Peter Shier <pshier@google.com>
-Subject: Re: [PATCH v2 17/21] KVM: x86: Morph pending exceptions to pending
- VM-Exits at queue time
-Message-ID: <YsxATIxJjYrrg7nc@google.com>
-References: <20220614204730.3359543-1-seanjc@google.com>
- <20220614204730.3359543-18-seanjc@google.com>
- <5eaf496d71b2c8fd321c013c9d1787d4c34d1100.camel@redhat.com>
- <YsY1ud2ZaZq9wvfI@google.com>
- <6fad40967afa4a7ed74c0f4158c8e841b1384318.camel@redhat.com>
+        Mon, 11 Jul 2022 08:28:09 -0700 (PDT)
+Date:   Mon, 11 Jul 2022 16:28:07 +0100
+From:   "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+To:     Cornelia Huck <cohuck@redhat.com>
+Cc:     Peter Maydell <peter.maydell@linaro.org>,
+        Thomas Huth <thuth@redhat.com>,
+        Laurent Vivier <lvivier@redhat.com>,
+        Eric Auger <eauger@redhat.com>,
+        Juan Quintela <quintela@redhat.com>, qemu-arm@nongnu.org,
+        qemu-devel@nongnu.org, kvm@vger.kernel.org
+Subject: Re: [PATCH RFC v2 0/2] arm: enable MTE for QEMU + kvm
+Message-ID: <YsxBh3bJmbF8MvsJ@work-vm>
+References: <20220707161656.41664-1-cohuck@redhat.com>
+ <YswkdVeESqf5sknQ@work-vm>
+ <87o7xv660k.fsf@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <6fad40967afa4a7ed74c0f4158c8e841b1384318.camel@redhat.com>
-X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-        T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL
-        autolearn=ham autolearn_force=no version=3.4.6
+In-Reply-To: <87o7xv660k.fsf@redhat.com>
+User-Agent: Mutt/2.2.6 (2022-06-05)
+X-Spam-Status: No, score=-3.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,
+        SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Sun, Jul 10, 2022, Maxim Levitsky wrote:
-> On Thu, 2022-07-07 at 01:24 +0000, Sean Christopherson wrote:
-> > On Wed, Jul 06, 2022, Maxim Levitsky wrote:
-> > > Other than that, this is a _very_ good idea to add it to KVM, although
-> > > maybe we should put it in Documentation folder instead?
-> > > (but I don't have a strong preference on this)
-> > 
-> > I definitely want a comment in KVM that's relatively close to the code.  I'm not
-> > opposed to also adding something in Documentation, but I'd want that to be an "and"
-> > not an "or".
+* Cornelia Huck (cohuck@redhat.com) wrote:
+> On Mon, Jul 11 2022, "Dr. David Alan Gilbert" <dgilbert@redhat.com> wrote:
 > 
-> Also makes sense. 
+> > * Cornelia Huck (cohuck@redhat.com) wrote:
+> >> For kvm, mte stays off by default; this is because migration is not yet
+> >> supported (postcopy will need an extension of the kernel interface, possibly
+> >> an extension of the userfaultfd interface), and turning on mte will add a
+> >> migration blocker.
+> >
+> > My assumption was that a normal migration would need something as well
+> > to retrieve and place the MTE flags; albeit not atomically.
 > 
-> I do think that it is worthwhile to also add a comment about the way KVM
-> handles exceptions, which means that inject_pending_event is not always called on instruction
-> boundary. When we have a pending/injected exception we have first to get rid of it,
-> and only then we will be on instruction boundary.
+> There's KVM_ARM_MTE_COPY_TAGS, which should be sufficient to move tags
+> around for normal migration.
+> 
+> >
+> >> My biggest question going forward is actually concerning migration; I gather
+> >> that we should not bother adding something unless postcopy is working as well?
+> >
+> > I don't think that restriction is fair on you; just make sure
+> > postcopy_ram_supported_by_host gains an arch call and fails cleanly;
+> > that way if anyone tries to enable postcopy they'll find out with a
+> > clean fail.
+> 
+> Ok, if simply fencing off postcopy is fine, we can try to move forward
+> with what we have now. The original attempt at
+> https://lore.kernel.org/all/881871e8394fa18a656dfb105d42e6099335c721.1615972140.git.haibo.xu@linaro.org/
+> hooked itself directly into common code; maybe we should rather copy the
+> approach used for s390 storage keys (extra "device") instead?
 
-Yeah, though it's not like KVM has much of a choice, e.g. intercepted=>reflected
-exceptions must be injected during instruction execution.  I wouldn't be opposed
-to renaming inject_pending_event() if someone can come up with a decent alternative
-that's sufficiently descriptive but not comically verbose.
+I don't understand how a separate device would keep the idea of page
+changed flags coherent with the main RAM that the tags correspond to.
 
-kvm_check_events() to pair with kvm_check_nested_events()?  kvm_check_and_inject_events()?  
+Dave
 
-> And to be sure that we will inject pending interrupts on the closest instruction
-> boundary, we actually open an interrupt/smi/nmi window there.
-> > This is calling out something slightly different.  What it's saying is that if
-> > there was a pending exception, then KVM should _not_ have injected said pending
-> > exception and instead should have requested an immediate exit.  That "immediate
-> > exit" should have forced a VM-Exit before the CPU could fetch a new instruction,
-> > and thus before the guest could trigger an exception that would require reinjection.
-> > 
-> > The "immediate exit" trick works because all events with higher priority than the
-> > VMX preeemption timer (or IRQ) are guaranteed to exit, e.g. a hardware SMI can't
-> > cause a fault in the guest.
-> 
-> Yes it all makes sense now. It really helps thinking in terms of instruction boundary.
-> 
-> However, that makes me think: Can that actually happen?
+-- 
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
 
-I don't think KVM can get itself in that state, but I believe userspace could force
-it by using KVM_SET_VCPU_EVENTS + KVM_SET_NESTED_STATE.
-
-> A pending exception can only be generated by KVM itself (nested hypervisor,
-> and CPU reflected exceptions/interrupts are all injected).
-> 
-> If VMRUN/VMRESUME has a pending exception, it means that it itself generated it,
-> in which case we won't be entering the guest, but rather jump to the
-> exception handler, and thus nested run will not be pending.
-
-Notably, SVM handles single-step #DBs on VMRUN in the nested VM-Exit path.  That's
-the only exception that I can think of off the top of my head that can be coincident
-with a successful VM-Entry (ignoring things like NMI=>#PF).
-
-> We can though have pending NMI/SMI/interrupts.
-> 
-> Also just a note about injected exceptions/interrupts during VMRUN/VMRESUME.
-> 
-> If nested_run_pending is true, then the injected exception due to the same
-> reasoning can not come from VMRUN/VMRESUME. It can come from nested hypevisor's EVENTINJ,
-> but in this case we currently just copy it from vmcb12/vmcs12 to vmcb02/vmcs02,
-> without touching vcpu->arch.interrupt.
-> 
-> Luckily this doesn't cause issues because when the nested run is pending
-> we don't inject anything to the guest.
-> 
-> If nested_run_pending is false however, the opposite is true. The EVENTINJ
-> will be already delivered, and we can only have injected exception/interrupt
-> that come from the cpu itself via exit_int_info/IDT_VECTORING_INFO_FIELD which
-> we will copy back as injected interrupt/exception to 'vcpu->arch.exception/interrupt'.
-> and later re-inject, next time we run the same VMRUN instruction.
