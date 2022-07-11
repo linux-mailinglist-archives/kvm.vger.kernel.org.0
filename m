@@ -2,169 +2,77 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 2F413570D7C
-	for <lists+kvm@lfdr.de>; Tue, 12 Jul 2022 00:41:43 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 39F0E570D85
+	for <lists+kvm@lfdr.de>; Tue, 12 Jul 2022 00:44:08 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231218AbiGKWlk (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 11 Jul 2022 18:41:40 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39818 "EHLO
+        id S230297AbiGKWn6 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 11 Jul 2022 18:43:58 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41706 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229707AbiGKWlj (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 11 Jul 2022 18:41:39 -0400
-Received: from NAM12-BN8-obe.outbound.protection.outlook.com (mail-bn8nam12on2046.outbound.protection.outlook.com [40.107.237.46])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 96AD052DCD;
-        Mon, 11 Jul 2022 15:41:37 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=aKE+FMMZKVL6SfmObCAWf3IgnXA7AMhM4dBNtwsoGc2jNExn8xRmzWoAIxYfiMpGZK8hcxV4ZVpQHkfNpsu7zIjP9UUxJaia1afn7IdqticO/MCMvCaE2Vg8v5WfUJaNwvdZHULbb2p/7QG4gbppi5NJVtDjMC+qrQATcAMYl8NqpdJ2COZDuoRzXCkuMpknCeg18o8diY1qssQA4bDHn+5eRea+BSYtQ//pC2bIj3cTS8hUDsFlnE3QA1uoNOhk9AL7GBfrAcBC/p/cwjXArs7qWsWcTO+qokl8OUnDS0tBgmmfXlYoV60TgPJiKjTQk5VlNST/CyOW+B1yzfmzPQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=OtVpm/MxpE14sKaaNhhD1KQzVZFTzeDA+mZMpl/ND3k=;
- b=DB0Fz3iWszSMc2umwhzyw2XUaDXvy5hL+E+4XWhfi0gGYr+bIHzg59RdOH27FElSiUb5efH36zx3f4Pnlw6hZqz8OJqOy+NT8YTw7gsWgqLYEzVPKWAv7wU7iP5GCUs231Kzk1+dGMP33RIPY9ReLJjeNUvBe6sw1w+u3Mgmd6Gf+mLEBHP1yuacIcY8ecVFVf9mn8txQ2N1PBdW0o8N8okVUegt35rP81BuWW/tuKZkWvlPfddNfolJ3EpBEg1bR8q13H0jvCuJahdN7KOpRf+IoMt5+6jndEfwdSIcIzRT3/9iVpucSrbVQVcGCy7SHzM41Ong7mGk6k8EzW3m6w==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
- header.d=amd.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=OtVpm/MxpE14sKaaNhhD1KQzVZFTzeDA+mZMpl/ND3k=;
- b=YyRaEKwW1unGr279ht9YRif3X3R7FQF9xYbU6XvMgR2C5IojZQKzHh2XLRc44nlQn6vFIJ4uyY6jEI0oTSI2g8oj+6jU/vWT8pQgSOYJ0SUIwExBKQhCp2i6S7HM9573oy4Y/e4OWD8MC5VzI9P4V2w6hGfiOZK/Ddo/2bsGYvk=
-Received: from SN6PR12MB2767.namprd12.prod.outlook.com (2603:10b6:805:75::23)
- by BN9PR12MB5209.namprd12.prod.outlook.com (2603:10b6:408:11a::22) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5417.20; Mon, 11 Jul
- 2022 22:41:35 +0000
-Received: from SN6PR12MB2767.namprd12.prod.outlook.com
- ([fe80::8953:6baa:97bb:a15d]) by SN6PR12MB2767.namprd12.prod.outlook.com
- ([fe80::8953:6baa:97bb:a15d%7]) with mapi id 15.20.5417.016; Mon, 11 Jul 2022
- 22:41:35 +0000
-From:   "Kalra, Ashish" <Ashish.Kalra@amd.com>
-To:     Peter Gonda <pgonda@google.com>
-CC:     the arch/x86 maintainers <x86@kernel.org>,
-        LKML <linux-kernel@vger.kernel.org>,
-        kvm list <kvm@vger.kernel.org>,
-        "linux-coco@lists.linux.dev" <linux-coco@lists.linux.dev>,
-        Linux Memory Management List <linux-mm@kvack.org>,
-        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Joerg Roedel <jroedel@suse.de>,
-        "Lendacky, Thomas" <Thomas.Lendacky@amd.com>,
-        "H. Peter Anvin" <hpa@zytor.com>, Ard Biesheuvel <ardb@kernel.org>,
+        with ESMTP id S229606AbiGKWnx (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 11 Jul 2022 18:43:53 -0400
+Received: from mail-pl1-x635.google.com (mail-pl1-x635.google.com [IPv6:2607:f8b0:4864:20::635])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7065B205E5
+        for <kvm@vger.kernel.org>; Mon, 11 Jul 2022 15:43:52 -0700 (PDT)
+Received: by mail-pl1-x635.google.com with SMTP id f11so5683632plr.4
+        for <kvm@vger.kernel.org>; Mon, 11 Jul 2022 15:43:52 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=yYIT4+JM9WjxzEKuVUw9xKwWpXL5bdh0tMvz2dYew/Q=;
+        b=UyunWXv4VEh8X/Ly622zEpTk0dS8yXYDVIHDP0gNLt3pgrRut7Dw6DCTIVIFsGyqRe
+         YuOk0xfTslV6WFp2YqFpM56Wm/sVrwjVdoXdTxe+QAxKwCj2dg6etcS6R06WJpA5+onM
+         X9LkVyXwoMq7ywuA3mKQp4HLthPPahPPwBn7/dDAmexGcFMss7HIiwK2J3qnqxMWi4bw
+         3bCD7k/PhPHpy6EUgXeac1DaXODcRGKnOjAdujuZnwoPttKHbxtezXgH5QuZRil+Augl
+         CrlNafLwSDsajPbrmzqIHg1gpyLWKHKOWZtSYRE0NJnQIi/cLv55EpDYXFEzj4DoszLR
+         goUg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=yYIT4+JM9WjxzEKuVUw9xKwWpXL5bdh0tMvz2dYew/Q=;
+        b=TcBirhRF7WXWHhpxIa/Is+n4pH993vMB9dGbUsBA/+P1jsivZlyWSxJ470aep0fEzb
+         bg8TkY0dEMHVWykoFyXvR2DTvIdXit70lj+aLqfwJUYgUukWJbIX3jLlC7kosHMtzsFp
+         xV1Q/SppltAnmv9fw80sVYtXRDHJrAhtKhKWYlS8ieAMXWb6ial1TW5LwQDUxcraFrlY
+         wVgOHUELH983rgrT80vMPZtA4rVPaT39IqLuCTWArpvLe0K8I0OB/jyCiagtLjGIjWyY
+         5fjHCgJkVLDzOqKND1/C0Ktg7q61uRQ51UAWDJDoz2thXzABwpCJS0WmKdacSCnRlzrW
+         4d/A==
+X-Gm-Message-State: AJIora9TQzjjT6wVoxqjJ7Q2eMRZPs8zyCTeBtBVsMeip6kew/om8JCP
+        cGRIRhE3OU1d+5hMTkQfPvsrWQ==
+X-Google-Smtp-Source: AGRyM1vVN5RURJcRMZ2Tuwg7h//I5HmL/+RuSIUJuF7/v5XjO0+4xaCWMmb5vz0+LvdQ6mdHY8yRBg==
+X-Received: by 2002:a17:90a:fb8d:b0:1ef:8d22:35e with SMTP id cp13-20020a17090afb8d00b001ef8d22035emr649801pjb.229.1657579431565;
+        Mon, 11 Jul 2022 15:43:51 -0700 (PDT)
+Received: from google.com (123.65.230.35.bc.googleusercontent.com. [35.230.65.123])
+        by smtp.gmail.com with ESMTPSA id k1-20020a170902694100b0016a79b69f91sm5258935plt.26.2022.07.11.15.43.50
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 11 Jul 2022 15:43:51 -0700 (PDT)
+Date:   Mon, 11 Jul 2022 22:43:47 +0000
+From:   Sean Christopherson <seanjc@google.com>
+To:     Paul Durrant <pdurrant@amazon.com>
+Cc:     x86@kernel.org, kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+        David Woodhouse <dwmw2@infradead.org>,
         Paolo Bonzini <pbonzini@redhat.com>,
-        Sean Christopherson <seanjc@google.com>,
         Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
         Jim Mattson <jmattson@google.com>,
-        Andy Lutomirski <luto@kernel.org>,
+        Joerg Roedel <joro@8bytes.org>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
         Dave Hansen <dave.hansen@linux.intel.com>,
-        Sergio Lopez <slp@redhat.com>,
-        Peter Zijlstra <peterz@infradead.org>,
-        Srinivas Pandruvada <srinivas.pandruvada@linux.intel.com>,
-        David Rientjes <rientjes@google.com>,
-        Dov Murik <dovmurik@linux.ibm.com>,
-        Tobin Feldman-Fitzthum <tobin@ibm.com>,
-        Borislav Petkov <bp@alien8.de>,
-        "Roth, Michael" <Michael.Roth@amd.com>,
-        Vlastimil Babka <vbabka@suse.cz>,
-        "Kirill A . Shutemov" <kirill@shutemov.name>,
-        Andi Kleen <ak@linux.intel.com>,
-        Tony Luck <tony.luck@intel.com>, Marc Orr <marcorr@google.com>,
-        Sathyanarayanan Kuppuswamy 
-        <sathyanarayanan.kuppuswamy@linux.intel.com>,
-        Alper Gun <alpergun@google.com>,
-        "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
-        "jarkko@kernel.org" <jarkko@kernel.org>
-Subject: RE: [PATCH Part2 v6 28/49] KVM: SVM: Add KVM_SEV_SNP_LAUNCH_FINISH
- command
-Thread-Topic: [PATCH Part2 v6 28/49] KVM: SVM: Add KVM_SEV_SNP_LAUNCH_FINISH
- command
-Thread-Index: AQHYlS9F8Lv7wrs5NE6SmQ1dqRz5cK15oJ+w
-Date:   Mon, 11 Jul 2022 22:41:35 +0000
-Message-ID: <SN6PR12MB27672AA31E96179256235C338E879@SN6PR12MB2767.namprd12.prod.outlook.com>
-References: <cover.1655761627.git.ashish.kalra@amd.com>
- <6a513cf79bf71c479dbd72165faf1d804d77b3af.1655761627.git.ashish.kalra@amd.com>
- <CAMkAt6obGwyiJh7J34Vt8tC+XXMNm8YPrv4gV=TVoF2Xga5GjQ@mail.gmail.com>
-In-Reply-To: <CAMkAt6obGwyiJh7J34Vt8tC+XXMNm8YPrv4gV=TVoF2Xga5GjQ@mail.gmail.com>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-msip_labels: MSIP_Label_4342314e-0df4-4b58-84bf-38bed6170a0f_Enabled=true;
- MSIP_Label_4342314e-0df4-4b58-84bf-38bed6170a0f_SetDate=2022-07-11T20:33:37Z;
- MSIP_Label_4342314e-0df4-4b58-84bf-38bed6170a0f_Method=Standard;
- MSIP_Label_4342314e-0df4-4b58-84bf-38bed6170a0f_Name=General;
- MSIP_Label_4342314e-0df4-4b58-84bf-38bed6170a0f_SiteId=3dd8961f-e488-4e60-8e11-a82d994e183d;
- MSIP_Label_4342314e-0df4-4b58-84bf-38bed6170a0f_ActionId=c4c7b04a-7635-4db7-927f-1c57d5cc5f3a;
- MSIP_Label_4342314e-0df4-4b58-84bf-38bed6170a0f_ContentBits=1
-msip_label_4342314e-0df4-4b58-84bf-38bed6170a0f_enabled: true
-msip_label_4342314e-0df4-4b58-84bf-38bed6170a0f_setdate: 2022-07-11T22:41:33Z
-msip_label_4342314e-0df4-4b58-84bf-38bed6170a0f_method: Standard
-msip_label_4342314e-0df4-4b58-84bf-38bed6170a0f_name: General
-msip_label_4342314e-0df4-4b58-84bf-38bed6170a0f_siteid: 3dd8961f-e488-4e60-8e11-a82d994e183d
-msip_label_4342314e-0df4-4b58-84bf-38bed6170a0f_actionid: 2d22016b-3d85-4fea-9347-ae5b8e6bb5f8
-msip_label_4342314e-0df4-4b58-84bf-38bed6170a0f_contentbits: 0
-authentication-results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=amd.com;
-x-ms-publictraffictype: Email
-x-ms-office365-filtering-correlation-id: 70541fe2-f9bf-44e9-ac3b-08da638e8278
-x-ms-traffictypediagnostic: BN9PR12MB5209:EE_
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info: HMmjAVTGVvXuJviqe0bzYQvwG9wg5hcKNnVYVDuc3kpXbAOUVHe7fScTeQM2lhUeCUe/jVnjJIIw+ghVONuR/cv0pRfbqxtQR/6/jfpIsFKhIf4B4+yjgbbts/zI5EkAZVrVybsoFlc+hewuSZmvo7pwyvZDNfTqbEtLh6ulMq/UlOqbid2Lf1G1ga40n2iyYmnG5bQnHdpa8TXAsvUahvCSzvbOiGjcT1wbpsbSb2sg/93WKGqyoLVprm0E9yvTGtACxANaKdpJukL6OqVfLeVGMhiLLDduu+7v3F/xSdt4IJR0vyCHs4e2IaYWGWGHxYBMTQg23tLUkEJJz4AZWYF4oV29HSrnfPzLf29gXFEP17kato+JTmUbuZwiXPiotQhf4n7YU9n24hQxs4WSUyT+RUN8wvEzNQ+pmcbozKKS4zgoEKKdI1Ovr56ah2Xw6dmaxH8Sz/G3haD0sCwaKZU3xIvTnU8alTqGnKeI+LWz+RpCplm/+Q3A6DPiwcPBwqqQJSMrgRLte0xE7FkKR0ZGnAJUYIf37kwOT/B59sIDSHkVnhOERGmMOXeH1omqCX0Kf84196by74kG5iYm+OFz4CEhIeXUZIdqv0NDibczzO51y7BfKM1lKo/jJ9Top1pThXYM7wTNzUT7C7lMLMptbnsIWYOjhIo9AA+11FWRnNfUHRrViNl5qhxb+LDDYpb4BMDwphaOGESoJryf+D2jBCnfpXhgKZjHLxgUqOasYkY33MUxfbCd2LN6x6qNa8BcQiECUJTIRUXNXv2Ui8u68EW35Ye0u4OaCQjWz94wchqsdYVAvgxlGmMaYz4q
-x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SN6PR12MB2767.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230016)(4636009)(376002)(346002)(39860400002)(366004)(136003)(396003)(6506007)(7696005)(54906003)(9686003)(8936002)(26005)(41300700001)(76116006)(83380400001)(5660300002)(71200400001)(7416002)(64756008)(66476007)(316002)(66946007)(66556008)(186003)(2906002)(52536014)(7406005)(6916009)(4326008)(38070700005)(55016003)(8676002)(66446008)(86362001)(38100700002)(478600001)(33656002)(122000001);DIR:OUT;SFP:1101;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0: =?utf-8?B?NXJOYkltbUhUUmprMXBvbnJZaWRnOHJ5S21RSXltRnVDdkN2TFNVSDlwL01O?=
- =?utf-8?B?cWZxMVgvV0N5Nk1BUEY3OEtoakxXU0ltVmRGQkcrd1BRVjc5cE9kbUNOdjJZ?=
- =?utf-8?B?N0hDc3R5SXRvUlhoTmhDbXM0N09ETEpZWGExeTVIOFExQnFuNHdTL3VuWCtU?=
- =?utf-8?B?aUdyemk2QTFKZENjcHZtUVhnL2dxS01NYWFQcms5S1pRYUIvUUpQakZ5d3dQ?=
- =?utf-8?B?TmVKeU1EUjhocko0TU15YkFDSll0OHFyU2dsU0d5cTBodXFwdi9JL1AwMnZ6?=
- =?utf-8?B?aEcyUEV2cU82cDRFd3B1TUVEZi95S2FCdW9rN0s2eVpFUTU2RVYxNFNjRFlZ?=
- =?utf-8?B?UGp0aEhKRWNPRjlOSkREcVJLZ043MDJ2TTN2VkM3azBRZ0g2emMrMUR5UWFM?=
- =?utf-8?B?TTZlL3pmbDg5ZTdvcENZY1pVVEtlZUt1dFNGSVRpVjBDWVZLYnNxNUU3ejF2?=
- =?utf-8?B?MWlvNzVrc3lRbzhwdEhrYlNZaldsYnZsandpUVhPaUwvOW8wK2xmWDZaOHFy?=
- =?utf-8?B?aGZuNFJlOGFCeWQwbDIrMXNZOVoweEdkellsV2d5aTN5MlJqb0VGR3BVU2hN?=
- =?utf-8?B?V1RWcVVwSDJnVG9WSDJjTzNVVFRxZGhhdDVuVUF5eWVqRHhmanNqblBobG1m?=
- =?utf-8?B?S2JyS3E3YlE0L3FnRlp1S0NYVFd3MjlCWXliNWxpandnUzhyeXgzRS8vR1lu?=
- =?utf-8?B?RW5CS25pVzlZNWEvS0hEcWZscmdHQndzTytDbURHdTh0TVRDcG03Umg4NWFk?=
- =?utf-8?B?bUNJajljb21ub2hFYm1IUFdqZytZVlYwZ0RhYUFrOVRRS0dOUHdkdWxaOGdp?=
- =?utf-8?B?b1dlZndUN2Nhd0xiMWF6T3YvWmUvd3hKY2x6eFBPU3NYWGVuRkk1ZHRvQy9h?=
- =?utf-8?B?ZG9JTkJWRitmYVBKTEdwMENsNXZ1aGVaMWxiZVEyVFpzRWVpeHR2Q1lGTEwr?=
- =?utf-8?B?ZldQZlM0eTZFYnExbXhmWkJFREFQN3NKV3VZc2hFelVIU0FLbDRNV2tvek9a?=
- =?utf-8?B?N2FLNG9XQWNJR1ZyMXNpNXQ4VTZCVHNDSWE5eVRoU0VuTnF6M2hFZnJtRVIv?=
- =?utf-8?B?eWZhYXNNR1kvRkdmb28vWWRiRlh0U1B0Q0FYNEJPOEVNTTNsWDgycVRWWC9S?=
- =?utf-8?B?Zm45Vk1KcmZrZ3BsV3RhR3dMUy8veVZlc0hEMFBRSDg2ajVFdU1DYjhDQTVW?=
- =?utf-8?B?UU5Zb0VUQmJ1ZjlodjhQN0FjMkhlQXVpWDlTRE5CaU9VMnQzUVMxQnU5Y3NQ?=
- =?utf-8?B?L3UvM09zVkFTVnNTYzlBZ20rVlEzOW9wWjl4UWR5RzJRUXlPN3ZneDlKM0h4?=
- =?utf-8?B?L3FCU1hkT0ZqbDVjNk1DT2Q4dWNrNGhaSEt0Zm1UYUxnT0dHYnVBVGtKY2tF?=
- =?utf-8?B?MW13UFRvdHBaREhLdFhBNkJvUmtZZWZyNmFvRWR1R3VUanM0RGU3dmpsdzFy?=
- =?utf-8?B?d3dZV2JuYzJ3dmZyTUwxNmtpd0hJM0NDZ2lFWFdPb1BIVlF5QWtOSHhHcWI5?=
- =?utf-8?B?TWQ2czNSQjdXd0xHNnhEYUQ0UTBsWW54a2FLMXkxS3gzcHlySDlwNTRGNGwy?=
- =?utf-8?B?TDZaa0laUFJkSmxPSFF3U3cvRFF0aWJQamZBemxpenlTVmtTVUtDbFh3WWdS?=
- =?utf-8?B?dGNWTGsyaUZkSFBFZStHTVFyOW45VE5JNXdjRUVvajhKOSs1TDVjL1ZCdzBk?=
- =?utf-8?B?dGoyWVMyYW9PZGJDQlNaWkRDdEtiMmFlQjN4Q01kVmtFS1l6dGZsNzlld2RS?=
- =?utf-8?B?QjdVSnQ5aXBoTFNWOWR5S0NIOWY1dnFZbTUvYVVQU3pac0Ruc0RSRTlFaTF1?=
- =?utf-8?B?bDhjTlhMcnVsRjZrTVVaSnl3eEVSK0lGVTBtd05hczlkOGt3UUlaZjk5Sk5T?=
- =?utf-8?B?bWEzOWh2NjUyd2FzelpLQXJuUmtaSk1iMVVVakl2c242a05JTldhOHJrZW9p?=
- =?utf-8?B?Nnk3eldoWlZEMlBmVlg0eWJTTmgzdit5d0R1RXVmVndxQmZqc3dHOWhEdEo3?=
- =?utf-8?B?K3IyTVhWRlJ1M2FvUGdTMThTajAwVVRiMGhjOXRoa0ViS3EvWTE0NWlncWhj?=
- =?utf-8?B?d1MwSWNWWnIvY3lRZitlMk0xR1B1WUFNOVpnT2ZIcytVVWVGRlRoTmluRHhK?=
- =?utf-8?Q?fSLw=3D?=
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
+        "H. Peter Anvin" <hpa@zytor.com>
+Subject: Re: [PATCH v5] KVM: x86/xen: Update Xen CPUID Leaf 4 (tsc info)
+ sub-leaves, if present
+Message-ID: <YsynoyUb4zrMBhRU@google.com>
+References: <20220629130514.15780-1-pdurrant@amazon.com>
 MIME-Version: 1.0
-X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: SN6PR12MB2767.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 70541fe2-f9bf-44e9-ac3b-08da638e8278
-X-MS-Exchange-CrossTenant-originalarrivaltime: 11 Jul 2022 22:41:35.1330
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 3dd8961f-e488-4e60-8e11-a82d994e183d
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: u2B8AAgnkaNV2w+5Hjzqmz8SpRBcfrGQtGs+ixnl8KaHG7zN22P5ak2v47WrIK6oi49C88dYMMpWGb3hzZKqtg==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: BN9PR12MB5209
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_PASS,T_SCC_BODY_TEXT_LINE
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20220629130514.15780-1-pdurrant@amazon.com>
+X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
+        T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL
         autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -172,64 +80,239 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-W0FNRCBPZmZpY2lhbCBVc2UgT25seSAtIEdlbmVyYWxdDQoNCkhlbGxvIFBldGVyLA0KDQo+PiBU
-aGUgS1ZNX1NFVl9TTlBfTEFVTkNIX0ZJTklTSCBmaW5hbGl6ZSB0aGUgY3J5cHRvZ3JhcGhpYyBk
-aWdlc3QgYW5kIA0KPj4gc3RvcmVzIGl0IGFzIHRoZSBtZWFzdXJlbWVudCBvZiB0aGUgZ3Vlc3Qg
-YXQgbGF1bmNoLg0KPj4NCj4+IFdoaWxlIGZpbmFsaXppbmcgdGhlIGxhdW5jaCBmbG93LCBpdCBh
-bHNvIGlzc3VlcyB0aGUgTEFVTkNIX1VQREFURSANCj4+IGNvbW1hbmQgdG8gZW5jcnlwdCB0aGUg
-Vk1TQSBwYWdlcy4NCg0KPkdpdmVuIHRoZSBndWVzdCB1c2VzIHRoZSBTTlAgTkFFIEFQIGJvb3Qg
-cHJvdG9jb2wgd2Ugd2VyZSBleHBlY3RpbmcgdGhhdCB0aGVyZSB3b3VsZCBiZSBzb21lIG9wdGlv
-biB0byBhZGQgdkNQVXMgdG8gdGhlIFZNIGJ1dCBtYXJrIHRoZW0gYXMgInBlbmRpbmcgQVAgYm9v
-dCBjcmVhdGlvbiBwcm90b2NvbCIgc3RhdGUuIFRoaXMgd291bGQgYWxsb3cgdGhlIExhdW5jaERp
-Z2VzdCBvZiBhIFZNIGRvZXNuJ3QgY2hhbmdlID5qdXN0IGJlY2F1c2UgaXRzIHZDUFUgY291bnQg
-Y2hhbmdlcy4gV291bGQgaXQgYmUgcG9zc2libGUgdG8gYWRkIGEgbmV3IGFkZCBhbiBhcmd1bWVu
-dCB0byBLVk1fU05QX0xBVU5DSF9GSU5JU0ggdG8gdGVsbCBpdCB3aGljaCB2Q1BVcyB0byBMQVVO
-Q0hfVVBEQVRFIFZNU0EgcGFnZXMgZm9yIG9yIHNpbWlsYXJseSBhIG5ldyBhcmd1bWVudCBmb3Ig
-S1ZNX0NSRUFURV9WQ1BVPw0KDQpCdXQgZG9uJ3Qgd2Ugd2FudC9uZWVkIHRvIG1lYXN1cmUgYWxs
-IHZDUFVzIHVzaW5nIExBVU5DSF9VUERBVEVfVk1TQSBiZWZvcmUgd2UgaXNzdWUgU05QX0xBVU5D
-SF9GSU5JU0ggY29tbWFuZCA/DQoNCklmIHdlIGFyZSBnb2luZyB0byBhZGQgdkNQVXMgYW5kIG1h
-cmsgdGhlbSBhcyAicGVuZGluZyBBUCBib290IGNyZWF0aW9uIiBzdGF0ZSB0aGVuIGhvdyBhcmUg
-d2UgZ29pbmcgdG8gZG8gTEFVTkNIX1VQREFURV9WTVNBcyBmb3IgdGhlbSBhZnRlciBTTlBfTEFV
-TkNIX0ZJTklTSCA/DQoNCmludCBzbnBfbGF1bmNoX3VwZGF0ZV92bXNhKHN0cnVjdCBrdm0gKmt2
-bSwgc3RydWN0IGt2bV9zZXZfY21kIA0KPj4gKyphcmdwKSB7DQo+PiArICAgICAgIHN0cnVjdCBr
-dm1fc2V2X2luZm8gKnNldiA9ICZ0b19rdm1fc3ZtKGt2bSktPnNldl9pbmZvOw0KPj4gKyAgICAg
-ICBzdHJ1Y3Qgc2V2X2RhdGFfc25wX2xhdW5jaF91cGRhdGUgZGF0YSA9IHt9Ow0KPj4gKyAgICAg
-ICBpbnQgaSwgcmV0Ow0KPj4gKw0KPj4gKyAgICAgICBkYXRhLmdjdHhfcGFkZHIgPSBfX3BzcF9w
-YShzZXYtPnNucF9jb250ZXh0KTsNCj4+ICsgICAgICAgZGF0YS5wYWdlX3R5cGUgPSBTTlBfUEFH
-RV9UWVBFX1ZNU0E7DQo+PiArDQo+PiArICAgICAgIGZvciAoaSA9IDA7IGkgPCBrdm0tPmNyZWF0
-ZWRfdmNwdXM7IGkrKykgew0KPj4gKyAgICAgICAgICAgICAgIHN0cnVjdCB2Y3B1X3N2bSAqc3Zt
-ID0gDQo+PiArIHRvX3N2bSh4YV9sb2FkKCZrdm0tPnZjcHVfYXJyYXksIGkpKTsNCg0KPiBXaHkg
-YXJlIHdlIGl0ZXJhdGluZyBvdmVyIHxjcmVhdGVkX3ZjcHVzfCByYXRoZXIgdGhhbiB1c2luZyBr
-dm1fZm9yX2VhY2hfdmNwdT8NCg0KWWVzIHdlIHNob3VsZCBiZSB1c2luZyBrdm1fZm9yX2VhY2hf
-dmNwdSgpLCB0aGF0IHdpbGwgYWxzbyBoZWxwIGF2b2lkIHRvdWNoaW5nIGltcGxlbWVudGF0aW9u
-DQpzcGVjaWZpYyBkZXRhaWxzIGFuZCBoaWRlIGNvbXBsZXhpdGllcyBzdWNoIGFzIHhhX2xvYWQo
-KSwgbG9ja2luZyByZXF1aXJlbWVudHMsIGV0Yy4NCg0KQWRkaXRpb25hbGx5LCBrdm1fZm9yX2Vh
-Y2hfdmNwdSgpIHdvcmtzIG9uIG9ubGluZV9jcHVzLCBidXQgSSB0aGluayB0aGF0IGlzIHdoYXQg
-d2Ugc2hvdWxkDQpiZSBjb25zaWRlcmluZyBhdCBMQVVOQ0hfVVBEQVRFX1ZNU0EgdGltZSwgdmlh
-LWEtdmlzIGNyZWF0ZWRfdmNwdXMuDQoNCj4+ICsgICAgICAgICAgICAgICB1NjQgcGZuID0gX19w
-YShzdm0tPnNldl9lcy52bXNhKSA+PiBQQUdFX1NISUZUOw0KPj4gKw0KPj4gKyAgICAgICAgICAg
-ICAgIC8qIFBlcmZvcm0gc29tZSBwcmUtZW5jcnlwdGlvbiBjaGVja3MgYWdhaW5zdCB0aGUgVk1T
-QSAqLw0KPj4gKyAgICAgICAgICAgICAgIHJldCA9IHNldl9lc19zeW5jX3Ztc2Eoc3ZtKTsNCj4+
-ICsgICAgICAgICAgICAgICBpZiAocmV0KQ0KPj4gKyAgICAgICAgICAgICAgICAgICAgICAgcmV0
-dXJuIHJldDsNCg0KPkRvIHdlIG5lZWQgdG8gdGFrZSB0aGUgJ3ZjcHUtPm11dGV4JyBsb2NrIGJl
-Zm9yZSBtb2RpZnlpbmcgdGhlIHZjcHUsbGlrZSB3ZSBkbyBmb3IgU0VWLUVTIGluIHNldl9sYXVu
-Y2hfdXBkYXRlX3Ztc2EoKT8NCg0KVGhpcyBpcyB1c2luZyB0aGUgcGVyLWNwdSB2Y3B1X3N2bSBz
-dHJ1Y3R1cmUsICBidXQgd2UgbWF5IG5lZWQgdG8gZ3VhcmQgYWdhaW5zdCB0aGUgS1ZNIHZDUFUg
-aW9jdGwgcmVxdWVzdHMsIHNvIHllcyBpdCBpcw0Kc2FmZXIgdG8gdGFrZSB0aGUgJ3ZjcHUtPm11
-dGV4JyBsb2NrIGhlcmUuIA0KDQo+PiArICAgICAgIC8qDQo+PiArICAgICAgICAqIElmIGl0cyBh
-biBTTlAgZ3Vlc3QsIHRoZW4gVk1TQSB3YXMgYWRkZWQgaW4gdGhlIFJNUCBlbnRyeSBhcw0KPj4g
-KyAgICAgICAgKiBhIGd1ZXN0IG93bmVkIHBhZ2UuIFRyYW5zaXRpb24gdGhlIHBhZ2UgdG8gaHlw
-ZXJ2aXNvciBzdGF0ZQ0KPj4gKyAgICAgICAgKiBiZWZvcmUgcmVsZWFzaW5nIGl0IGJhY2sgdG8g
-dGhlIHN5c3RlbS4NCj4+ICsgICAgICAgICogQWxzbyB0aGUgcGFnZSBpcyByZW1vdmVkIGZyb20g
-dGhlIGtlcm5lbCBkaXJlY3QgbWFwLCBzbyBmbHVzaCBpdA0KPj4gKyAgICAgICAgKiBsYXRlciBh
-ZnRlciBpdCBpcyB0cmFuc2l0aW9uZWQgYmFjayB0byBoeXBlcnZpc29yIHN0YXRlIGFuZA0KPj4g
-KyAgICAgICAgKiByZXN0b3JlZCBpbiB0aGUgZGlyZWN0IG1hcC4NCj4+ICsgICAgICAgICovDQo+
-PiArICAgICAgIGlmIChzZXZfc25wX2d1ZXN0KHZjcHUtPmt2bSkpIHsNCj4+ICsgICAgICAgICAg
-ICAgICB1NjQgcGZuID0gX19wYShzdm0tPnNldl9lcy52bXNhKSA+PiBQQUdFX1NISUZUOw0KPj4g
-Kw0KPj4gKyAgICAgICAgICAgICAgIGlmIChob3N0X3JtcF9tYWtlX3NoYXJlZChwZm4sIFBHX0xF
-VkVMXzRLLCBmYWxzZSkpDQo+PiArICAgICAgICAgICAgICAgICAgICAgICBnb3RvIHNraXBfdm1z
-YV9mcmVlOw0KDQo+V2h5IG5vdCBjYWxsIGhvc3Rfcm1wX21ha2Vfc2hhcmVkIHdpdGggbGVhaz09
-dHJ1ZT8gVGhpcyBvbGQgVk1TQSBwYWdlIGlzIG5vdyB1bnVzYWJsZSBJSVVDLg0KDQpZZXMgdGhl
-IG9sZCBWTVNBIHBhZ2UgaXMgbm93IHVuYXZhaWxhYmxlIGFuZCBsb3N0LCBzbyBtYWtlcyBzZW5z
-ZSB0byBjYWxsIGhvc3Rfcm1wX21ha2Vfc2hhcmVkKCkgd2l0aCBsZWFrPT10cnVlLg0KDQpUaGFu
-a3MsDQpBc2hpc2gNCg==
+On Wed, Jun 29, 2022, Paul Durrant wrote:
+> diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
+> index 88a3026ee163..abb0a39f60eb 100644
+> --- a/arch/x86/include/asm/kvm_host.h
+> +++ b/arch/x86/include/asm/kvm_host.h
+> @@ -638,6 +638,7 @@ struct kvm_vcpu_xen {
+>  	struct hrtimer timer;
+>  	int poll_evtchn;
+>  	struct timer_list poll_timer;
+> +	u32 cpuid_tsc_info;
+
+I would prefer to follow vcpu->arch.kvm_cpuid_base and capture the base CPUID
+function.  I have a hard time believing this will be the only case where KVM needs
+to query XEN CPUID leafs.  And cpuid_tsc_info is a confusing name given the helper
+kvm_xen_setup_tsc_info(); it's odd to see a "setup" helper immediately consume a
+variable with the same name.
+
+It'll incur another CPUID lookup in the update path to check the limit, but again
+that should be a rare operation so it doesn't seem too onerous.
+
+> diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+> index 031678eff28e..29ed665c51db 100644
+> --- a/arch/x86/kvm/x86.c
+> +++ b/arch/x86/kvm/x86.c
+> @@ -3110,6 +3110,7 @@ static int kvm_guest_time_update(struct kvm_vcpu *v)
+>  				   &vcpu->hv_clock.tsc_shift,
+>  				   &vcpu->hv_clock.tsc_to_system_mul);
+>  		vcpu->hw_tsc_khz = tgt_tsc_khz;
+> +		kvm_xen_setup_tsc_info(v);
+
+Any objection to s/setup/update?  KVM Xen uses "setup" for things like configuring
+the event channel using userspace input, whereas this is purely updating existing
+data structures.
+
+>  	}
+>  
+>  	vcpu->hv_clock.tsc_timestamp = tsc_timestamp;
+> diff --git a/arch/x86/kvm/xen.c b/arch/x86/kvm/xen.c
+> index 610beba35907..c84424d5c8b6 100644
+> --- a/arch/x86/kvm/xen.c
+> +++ b/arch/x86/kvm/xen.c
+> @@ -10,6 +10,9 @@
+>  #include "xen.h"
+>  #include "hyperv.h"
+>  #include "lapic.h"
+> +#include "cpuid.h"
+> +
+> +#include <asm/xen/cpuid.h>
+>  
+>  #include <linux/eventfd.h>
+>  #include <linux/kvm_host.h>
+> @@ -1855,3 +1858,51 @@ void kvm_xen_destroy_vm(struct kvm *kvm)
+>  	if (kvm->arch.xen_hvm_config.msr)
+>  		static_branch_slow_dec_deferred(&kvm_xen_enabled);
+>  }
+> +
+> +void kvm_xen_after_set_cpuid(struct kvm_vcpu *vcpu)
+> +{
+> +	u32 base = 0;
+> +	u32 limit;
+> +	u32 function;
+> +
+> +	vcpu->arch.xen.cpuid_tsc_info = 0;
+> +
+> +	for_each_possible_hypervisor_cpuid_base(function) {
+> +		struct kvm_cpuid_entry2 *entry = kvm_find_cpuid_entry(vcpu, function, 0);
+> +
+> +		if (entry &&
+> +		    entry->ebx == XEN_CPUID_SIGNATURE_EBX &&
+> +		    entry->ecx == XEN_CPUID_SIGNATURE_ECX &&
+> +		    entry->edx == XEN_CPUID_SIGNATURE_EDX) {
+> +			base = function;
+> +			limit = entry->eax;
+> +			break;
+> +		}
+> +	}
+> +	if (!base)
+> +		return;
+
+Rather than open code a variant of kvm_update_kvm_cpuid_base(), that helper can
+be tweaked to take a signature.  Along with a patch to provide a #define for Xen's
+signature as a string, this entire function becomes a one-liner.
+
+If the below looks ok (won't compile, needs prep patches), I'll test and post a
+proper mini-series.
+
+---
+ arch/x86/include/asm/kvm_host.h |  1 +
+ arch/x86/kvm/cpuid.c            |  2 ++
+ arch/x86/kvm/x86.c              |  1 +
+ arch/x86/kvm/xen.c              | 30 ++++++++++++++++++++++++++++++
+ arch/x86/kvm/xen.h              | 22 +++++++++++++++++++++-
+ 5 files changed, 55 insertions(+), 1 deletion(-)
+
+diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
+index de5a149d0971..b2565d05fc86 100644
+--- a/arch/x86/include/asm/kvm_host.h
++++ b/arch/x86/include/asm/kvm_host.h
+@@ -638,6 +638,7 @@ struct kvm_vcpu_xen {
+ 	struct hrtimer timer;
+ 	int poll_evtchn;
+ 	struct timer_list poll_timer;
++	u32 cpuid_base;
+ };
+
+ struct kvm_vcpu_arch {
+diff --git a/arch/x86/kvm/cpuid.c b/arch/x86/kvm/cpuid.c
+index 0abe3adc9ae3..54ed51799b8d 100644
+--- a/arch/x86/kvm/cpuid.c
++++ b/arch/x86/kvm/cpuid.c
+@@ -25,6 +25,7 @@
+ #include "mmu.h"
+ #include "trace.h"
+ #include "pmu.h"
++#include "xen.h"
+
+ /*
+  * Unlike "struct cpuinfo_x86.x86_capability", kvm_cpu_caps doesn't need to be
+@@ -309,6 +310,7 @@ static void kvm_vcpu_after_set_cpuid(struct kvm_vcpu *vcpu)
+ 	    __cr4_reserved_bits(guest_cpuid_has, vcpu);
+
+ 	kvm_hv_set_cpuid(vcpu);
++	kvm_xen_after_set_cpuid(vcpu);
+
+ 	/* Invoke the vendor callback only after the above state is updated. */
+ 	static_call(kvm_x86_vcpu_after_set_cpuid)(vcpu);
+diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+index 567d13405445..a624293c66c8 100644
+--- a/arch/x86/kvm/x86.c
++++ b/arch/x86/kvm/x86.c
+@@ -3110,6 +3110,7 @@ static int kvm_guest_time_update(struct kvm_vcpu *v)
+ 				   &vcpu->hv_clock.tsc_shift,
+ 				   &vcpu->hv_clock.tsc_to_system_mul);
+ 		vcpu->hw_tsc_khz = tgt_tsc_khz;
++		kvm_xen_update_tsc_info(v);
+ 	}
+
+ 	vcpu->hv_clock.tsc_timestamp = tsc_timestamp;
+diff --git a/arch/x86/kvm/xen.c b/arch/x86/kvm/xen.c
+index 610beba35907..3fc0c194b813 100644
+--- a/arch/x86/kvm/xen.c
++++ b/arch/x86/kvm/xen.c
+@@ -10,6 +10,9 @@
+ #include "xen.h"
+ #include "hyperv.h"
+ #include "lapic.h"
++#include "cpuid.h"
++
++#include <asm/xen/cpuid.h>
+
+ #include <linux/eventfd.h>
+ #include <linux/kvm_host.h>
+@@ -1855,3 +1858,30 @@ void kvm_xen_destroy_vm(struct kvm *kvm)
+ 	if (kvm->arch.xen_hvm_config.msr)
+ 		static_branch_slow_dec_deferred(&kvm_xen_enabled);
+ }
++
++void kvm_xen_update_tsc_info(struct kvm_vcpu *vcpu)
++{
++	struct kvm_cpuid_entry2 *entry;
++	u32 function;
++
++	if (!vcpu->arch.xen.cpuid_base)
++		return;
++
++	entry = kvm_find_cpuid_entry(vcpu, vcpu->arch.xen.cpuid_base, 0);
++	if (WARN_ON_ONCE(!entry))
++		return;
++
++	function = vcpu->arch.xen.cpuid_base | XEN_CPUID_LEAF(3);
++	if (function > entry->eax)
++		return;
++
++	entry = kvm_find_cpuid_entry(vcpu, function, 1);
++	if (entry) {
++		entry->ecx = vcpu->arch.hv_clock.tsc_to_system_mul;
++		entry->edx = vcpu->arch.hv_clock.tsc_shift;
++	}
++
++	entry = kvm_find_cpuid_entry(vcpu, function, 2);
++	if (entry)
++		entry->eax = vcpu->arch.hw_tsc_khz;
++}
+diff --git a/arch/x86/kvm/xen.h b/arch/x86/kvm/xen.h
+index 532a535a9e99..b8161b99b82a 100644
+--- a/arch/x86/kvm/xen.h
++++ b/arch/x86/kvm/xen.h
+@@ -9,9 +9,14 @@
+ #ifndef __ARCH_X86_KVM_XEN_H__
+ #define __ARCH_X86_KVM_XEN_H__
+
+-#ifdef CONFIG_KVM_XEN
+ #include <linux/jump_label_ratelimit.h>
+
++#include <asm/xen/cpuid.h>
++
++#include "cpuid.h"
++
++#ifdef CONFIG_KVM_XEN
++
+ extern struct static_key_false_deferred kvm_xen_enabled;
+
+ int __kvm_xen_has_interrupt(struct kvm_vcpu *vcpu);
+@@ -32,6 +37,13 @@ int kvm_xen_set_evtchn_fast(struct kvm_xen_evtchn *xe,
+ int kvm_xen_setup_evtchn(struct kvm *kvm,
+ 			 struct kvm_kernel_irq_routing_entry *e,
+ 			 const struct kvm_irq_routing_entry *ue);
++void kvm_xen_update_tsc_info(struct kvm_vcpu *vcpu);
++
++static inline void kvm_xen_after_set_cpuid(struct kvm_vcpu *vcpu)
++{
++	vcpu->arch.xen.cpuid_base =
++		kvm_get_hypervisor_cpuid_base(vcpu, XEN_CPUID_SIGNATURE);
++}
+
+ static inline bool kvm_xen_msr_enabled(struct kvm *kvm)
+ {
+@@ -135,6 +147,14 @@ static inline bool kvm_xen_timer_enabled(struct kvm_vcpu *vcpu)
+ {
+ 	return false;
+ }
++
++static inline void kvm_xen_after_set_cpuid(struct kvm_vcpu *vcpu)
++{
++}
++
++static inline void kvm_xen_update_tsc_info(struct kvm_vcpu *vcpu)
++{
++}
+ #endif
+
+ int kvm_xen_hypercall(struct kvm_vcpu *vcpu);
+
+base-commit: b08b2f54c49d8f96a22107c444d500dff73ec2a6
+--
+
