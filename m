@@ -2,114 +2,130 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id E71B7572016
-	for <lists+kvm@lfdr.de>; Tue, 12 Jul 2022 17:58:50 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 4EB3F57215F
+	for <lists+kvm@lfdr.de>; Tue, 12 Jul 2022 18:50:37 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230159AbiGLP6s (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 12 Jul 2022 11:58:48 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38870 "EHLO
+        id S233286AbiGLQue (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 12 Jul 2022 12:50:34 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39918 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229976AbiGLP6q (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 12 Jul 2022 11:58:46 -0400
-Received: from mail-pf1-x433.google.com (mail-pf1-x433.google.com [IPv6:2607:f8b0:4864:20::433])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1A2B6A46B
-        for <kvm@vger.kernel.org>; Tue, 12 Jul 2022 08:58:43 -0700 (PDT)
-Received: by mail-pf1-x433.google.com with SMTP id d10so7822842pfd.9
-        for <kvm@vger.kernel.org>; Tue, 12 Jul 2022 08:58:43 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=3NuNGzPX7l2+4H4FqXMF3G2Iv4qIhgXKrczFI5RGpVE=;
-        b=KobxG4F8v+qthtwpu7gbH2IQkDOCkXPPXTqHgHWNsvq6z38hgkKWUYINThYxJYBVjw
-         evvB8xnHRoaczS8dHVfibY8iwBGTIYBP/5sj2W++9tP+LqoVuRSit+KlkFTWZYE14FGm
-         C2r93ude/BoVRbzYL2mrDbdViI5aPXPl/pmDUdQgLowPuNBHh3cifa+dXlE4ddNA82J2
-         86z3wVU4x3sIlHFaUNkJCa7sM6UBMTldfXCp+PiGW1t/5M9Ym9LVF+k125IPnqHOZ3JQ
-         eDJcyXznBLiNyIh6oVr53sd8I9Xh+dcoAN5clFw3PfNtUQAifbjMnu39wUAYk+FqbPb6
-         J8WA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=3NuNGzPX7l2+4H4FqXMF3G2Iv4qIhgXKrczFI5RGpVE=;
-        b=h8QTXvNcT3blwtI1rbud0wQj8Uz/giiT826AuUdMzAqfZSX0lNH0kRHyZCcOv8w36K
-         kJDm3X6gWoV2XPezZ8ZY0OEunoN5WySkW3txZ5Y5KVJvFVZDTsJC1LDpP4VWPea3LO6N
-         JJRtakPeQz/DHpVSO46QtnAmXlEYWCDKOdTYKQqZ3mZyxPWaB2Juzb+5u5gKaHiUFluo
-         eshsQw+Cak8PhP4nHoChdxKFQUwBCKimVxd/Yvc+LDHIMXmzFaZdwmQko0CW82uzmgiY
-         6QF9lSz2yjPGEbV8Kix91KF95EIPGvMHR3A0W4qYcBaM4f3fsiXgQ5qX49xSxJn8Z/Ee
-         wZEA==
-X-Gm-Message-State: AJIora+dI0/Z9g+9UjDuFJtF6LkYXFIuwk5oc4A/V4MG2E2vL2z22NBI
-        9zMeKA+Lk9Gq4AWWb0Zbg3fuHA==
-X-Google-Smtp-Source: AGRyM1sxLANce1xqGhsht71y51IJWGaCzyWUoPHm08yJixijPHX2pu2nnl4Pm3GBexyPjWUZpfXJNg==
-X-Received: by 2002:a05:6a00:22d6:b0:52a:b9fc:4c88 with SMTP id f22-20020a056a0022d600b0052ab9fc4c88mr18633914pfj.3.1657641522504;
-        Tue, 12 Jul 2022 08:58:42 -0700 (PDT)
-Received: from google.com (123.65.230.35.bc.googleusercontent.com. [35.230.65.123])
-        by smtp.gmail.com with ESMTPSA id w1-20020a1709026f0100b0016b953872a7sm6963581plk.201.2022.07.12.08.58.41
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 12 Jul 2022 08:58:41 -0700 (PDT)
-Date:   Tue, 12 Jul 2022 15:58:37 +0000
-From:   Sean Christopherson <seanjc@google.com>
-To:     Maxim Levitsky <mlevitsk@redhat.com>
-Cc:     Wang Guangju <wangguangju@baidu.com>, pbonzini@redhat.com,
-        vkuznets@redhat.com, jmattson@google.com, wanpengli@tencent.com,
-        bp@alien8.de, joro@8bytes.org, suravee.suthikulpanit@amd.com,
-        hpa@zytor.com, tglx@linutronix.de, mingo@redhat.com,
-        kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
-        stable@vger.kernel.org, lirongqing@baidu.com
-Subject: Re: [PATCH v3] KVM: x86: Send EOI to SynIC vectors on accelerated
- EOI-induced VM-Exits
-Message-ID: <Ys2aLfYFfyQO0R86@google.com>
-References: <20220712123210.89-1-wangguangju@baidu.com>
- <6dcd11aefcd817ee0f8603328886df3023a98fa5.camel@redhat.com>
+        with ESMTP id S233117AbiGLQub (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 12 Jul 2022 12:50:31 -0400
+Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4C9EBBFAF5;
+        Tue, 12 Jul 2022 09:50:31 -0700 (PDT)
+Received: from pps.filterd (m0098421.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.17.1.5/8.17.1.5) with ESMTP id 26CGYjQq019509;
+        Tue, 12 Jul 2022 16:50:30 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=date : from : to : cc :
+ subject : message-id : in-reply-to : references : mime-version :
+ content-type : content-transfer-encoding; s=pp1;
+ bh=xjAnb8qlwRMbf2xQ5A62DQEEJAj4/WVGnU3seC1PADg=;
+ b=exmFT6HmIUKakoRRMVlqXCNuhsP+pCTbDzysMYKGgthvGrRDy2I77IDmCbwh1fouGJf7
+ UJwSejfcLB+fJB5Fh4oZOhRiTmemBNw92JP008EtKeF0sCzG911igWjv6RZuoIbq7oSQ
+ o+O+CB3oJkN3LY9KH8Bdb4rIuiGQiQInKtl4pfwut9Md8dtjYYOjTHITMCP+5rP544lg
+ f9WRGiVy18a5U/P6ulrKSWSSCr8jZ4UWgNDQrZ9YGXHmhiVifP9BmRySlnQBbMITbwC2
+ 5GGMDOqW1pEzinAcHWzh7pM4lD+mB3GvYjACcq3j1Ldl1uaMFuSB7YFoFRSJnjMbf2y2 ew== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3h9b2fk7sp-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Tue, 12 Jul 2022 16:50:30 +0000
+Received: from m0098421.ppops.net (m0098421.ppops.net [127.0.0.1])
+        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 26CFt7ga001859;
+        Tue, 12 Jul 2022 16:50:29 GMT
+Received: from ppma04fra.de.ibm.com (6a.4a.5195.ip4.static.sl-reverse.com [149.81.74.106])
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3h9b2fk7rw-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Tue, 12 Jul 2022 16:50:29 +0000
+Received: from pps.filterd (ppma04fra.de.ibm.com [127.0.0.1])
+        by ppma04fra.de.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 26CGLuED025284;
+        Tue, 12 Jul 2022 16:50:27 GMT
+Received: from b06cxnps3075.portsmouth.uk.ibm.com (d06relay10.portsmouth.uk.ibm.com [9.149.109.195])
+        by ppma04fra.de.ibm.com with ESMTP id 3h99s78645-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Tue, 12 Jul 2022 16:50:27 +0000
+Received: from d06av24.portsmouth.uk.ibm.com (d06av24.portsmouth.uk.ibm.com [9.149.105.60])
+        by b06cxnps3075.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 26CGoO2514549474
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Tue, 12 Jul 2022 16:50:24 GMT
+Received: from d06av24.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 2D5C542041;
+        Tue, 12 Jul 2022 16:50:24 +0000 (GMT)
+Received: from d06av24.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id AF45F4203F;
+        Tue, 12 Jul 2022 16:50:23 +0000 (GMT)
+Received: from p-imbrenda (unknown [9.145.1.61])
+        by d06av24.portsmouth.uk.ibm.com (Postfix) with ESMTP;
+        Tue, 12 Jul 2022 16:50:23 +0000 (GMT)
+Date:   Mon, 11 Jul 2022 15:25:30 +0200
+From:   Claudio Imbrenda <imbrenda@linux.ibm.com>
+To:     Christian Borntraeger <borntraeger@linux.ibm.com>
+Cc:     KVM <kvm@vger.kernel.org>, Janosch Frank <frankja@linux.ibm.com>,
+        David Hildenbrand <david@redhat.com>,
+        linux-s390 <linux-s390@vger.kernel.org>,
+        Thomas Huth <thuth@redhat.com>,
+        Heiko Carstens <hca@linux.ibm.com>,
+        Vasily Gorbik <gor@linux.ibm.com>,
+        Alexander Gordeev <agordeev@linux.ibm.com>,
+        Janis Schoetterl-Glausch <scgl@linux.ibm.com>
+Subject: Re: [PATCH 1/1] KVM: s390: Add facility 197 to the white list
+Message-ID: <20220711152530.396e44bf@p-imbrenda>
+In-Reply-To: <754d4ea2-8a1a-9b09-50c1-f877696b81f2@linux.ibm.com>
+References: <20220711115108.6494-1-borntraeger@linux.ibm.com>
+        <754d4ea2-8a1a-9b09-50c1-f877696b81f2@linux.ibm.com>
+Organization: IBM
+X-Mailer: Claws Mail 4.1.0 (GTK 3.24.34; x86_64-redhat-linux-gnu)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <6dcd11aefcd817ee0f8603328886df3023a98fa5.camel@redhat.com>
-X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-        T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL
-        autolearn=unavailable autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-ORIG-GUID: j62oFqgCUmQ5NWRRomwCgq3fmyeFo6Oa
+X-Proofpoint-GUID: SXu__R6_d2Q399bmmKGA2xq-CROozL-U
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.205,Aquarius:18.0.883,Hydra:6.0.517,FMLib:17.11.122.1
+ definitions=2022-07-12_10,2022-07-12_01,2022-06-22_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 spamscore=0 clxscore=1015
+ bulkscore=0 mlxscore=0 priorityscore=1501 impostorscore=0 mlxlogscore=999
+ suspectscore=0 adultscore=0 lowpriorityscore=0 malwarescore=0 phishscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2206140000
+ definitions=main-2207120065
+X-Spam-Status: No, score=-0.7 required=5.0 tests=BAYES_00,DATE_IN_PAST_24_48,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_EF,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,
+        SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=no autolearn_force=no
+        version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Jul 12, 2022, Maxim Levitsky wrote:
-> On Tue, 2022-07-12 at 20:32 +0800, Wang Guangju wrote:
-> > When EOI virtualization is performed on VMX, kvm_apic_set_eoi_accelerated()
-> > is called upon EXIT_REASON_EOI_INDUCED but unlike its non-accelerated
-> > apic_set_eoi() sibling, Hyper-V SINT vectors are left unhandled.
+On Mon, 11 Jul 2022 15:11:30 +0200
+Christian Borntraeger <borntraeger@linux.ibm.com> wrote:
+
+> Am 11.07.22 um 13:51 schrieb Christian Borntraeger:
+> > z16 also provides facility 197 (The processor-activity-instrumentation
+> > extension 1). Lets add it to KVM.
 > > 
-> > Send EOI to Hyper-V SINT vectors when handling acclerated EOI-induced
-> > VM-Exits. KVM Hyper-V needs to handle the SINT EOI irrespective of whether
-> > the EOI is acclerated or not.
-> 
-> How does this relate to the AutoEOI feature, and the fact that on AVIC,
-> it can't intercept EOI at all (*)?
-> 
-> Best regards,
-> 	Maxim Levitsky
-> 
-> 
-> (*) AVIC does intercept EOI write but only for level triggered interrupts.
+> > Signed-off-by: Christian Borntraeger <borntraeger@linux.ibm.com>
 
-If there are one or more AutoEOI vectors, KVM disables AVIC.  Which begs the question
-of why SVM doesn't disable the AVIC if there's an edge-triggered I/O APIC interrupt
-that has a notifier, which is where kvm_hv_notify_acked_sint() eventually ends up.
-vmx_load_eoi_exitmap() sets the EOI intercept for all such vectors, and for _all_
-SynIC vectors (see vcpu_load_eoi_exitmap()), but AFAICT SVM relies purely on the
-level-triggered behavior.
+Reviewed-by: Claudio Imbrenda <imbrenda@linux.ibm.com>
 
-KVM manually disables AVIC for PIT reinjection, which uses an ack notifier;
-AFAICT that's a one-off hack to workaround AVIC not playing nice with notifiers.
+> > ---
+> >   arch/s390/tools/gen_facilities.c | 1 +
+> >   1 file changed, 1 insertion(+)
+> > 
+> > diff --git a/arch/s390/tools/gen_facilities.c b/arch/s390/tools/gen_facilities.c
+> > index 530dd941d140..cb0aff5c0187 100644
+> > --- a/arch/s390/tools/gen_facilities.c
+> > +++ b/arch/s390/tools/gen_facilities.c
+> > @@ -111,6 +111,7 @@ static struct facility_def facility_defs[] = {
+> >   			193, /* bear enhancement facility */
+> >   			194, /* rdp enhancement facility */
+> >   			196, /* processor activity instrumentation facility */
+> > +			197, /* processor activity instrumentation extension 1 */
+> >   			-1  /* END */
+> >   		}
+> >   	},  
+> 
+> Unless there are complaints, I will queue this with "white list" -> "allow list" and "lets" -> "let's".
 
-So yeah, it seems like the proper fix would be to add svm_load_eoi_exitmap() and
-replace the PIT inhibit with a generic ACK inhibit that is set if there is at least
-one edge-triggered vector present in the eoi_exit_bitmap.
-
-Tangentially related to all of this, it's bizarre/confusing the KVM_CREATE_PIT{2}
-is allowed regardless of whether or not the I/O APIC is in-kernel.  I don't see
-how it can possibly work since create_pit_timer() silently does nothing if the I/O
-APIC isn't in-kernel.
