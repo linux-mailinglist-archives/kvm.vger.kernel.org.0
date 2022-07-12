@@ -2,581 +2,810 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 37EDA571F6A
-	for <lists+kvm@lfdr.de>; Tue, 12 Jul 2022 17:34:22 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 9153C571FA1
+	for <lists+kvm@lfdr.de>; Tue, 12 Jul 2022 17:40:23 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234040AbiGLPeU (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 12 Jul 2022 11:34:20 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41882 "EHLO
+        id S234165AbiGLPkW (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 12 Jul 2022 11:40:22 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49214 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234179AbiGLPeG (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 12 Jul 2022 11:34:06 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 49AE92AC62
-        for <kvm@vger.kernel.org>; Tue, 12 Jul 2022 08:34:04 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1657640043;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=f9kf1ckw1rlUf0fyGqNwCgXapmgRhAV3++WtF3YofFw=;
-        b=UGMTTERPc1igyMM2pIzUtICc7cMwQ74lPrhmscvYGEt9eHmBAZCGJuvCgtRgdwaEtnuwc1
-        J/6zTPsP4wZzFrmc00Mc4d8fNTedUGL8BODnytF20mPM2uul5E/4m0Nx68+Izh7hdK4oFd
-        de8bnD3dIJGQY7IOQb7UtgbMSJ82osM=
-Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
- [209.85.221.69]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-646-2XeFXPLtO0qyWz7zABV4og-1; Tue, 12 Jul 2022 11:34:01 -0400
-X-MC-Unique: 2XeFXPLtO0qyWz7zABV4og-1
-Received: by mail-wr1-f69.google.com with SMTP id n10-20020a5d6b8a000000b0021da91e4a64so1258428wrx.8
-        for <kvm@vger.kernel.org>; Tue, 12 Jul 2022 08:34:01 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:message-id:subject:from:to:cc:date:in-reply-to
-         :references:user-agent:mime-version:content-transfer-encoding;
-        bh=f9kf1ckw1rlUf0fyGqNwCgXapmgRhAV3++WtF3YofFw=;
-        b=XH4V0E1SKH6xFWb1wrvaqiKBYfrjlugTZM0kQKTcF5gSsTbENhO9k5Y6ts4QJD+Nxa
-         9912jUNzNcF/v8a9DAwBa+BcQ2ZMxLuItHELcrbtbYpegNeK+VCiKtNzAcGvqzNgGyUj
-         rNCAp3apU940jL01akXbWWnxUC4+KCnHzM1iGgPVH1UcX+/ty24mOa0IH3KJUrrMAlHq
-         QhO5oS+sZhZZkRwC132s1i58/tmnEiOinUmCxjxJF8HL0riyqkHLZ7p2Io8nLu/OXX3V
-         tZpx7GSUAeUkBdMazfquIBq+5J5my6vbhKdnjy02iFfjhNLngpDEHY0fx2kSglz3Mlna
-         vG/A==
-X-Gm-Message-State: AJIora9+9qpHZjy8cLe+JksZQHQMgnfB1wJOPCXZ2kQgvGfZLHGOfOOb
-        pKZQLnO8/jxU3ocgTE0IJ/SQQ76TuhssKV86CBJvcPmLsyDhv3Xns/wrVldXXP0Bv8vwMjguEGu
-        X0X1d2tcw72Hg
-X-Received: by 2002:a1c:f018:0:b0:3a0:3f8d:d71e with SMTP id a24-20020a1cf018000000b003a03f8dd71emr4708798wmb.104.1657640040401;
-        Tue, 12 Jul 2022 08:34:00 -0700 (PDT)
-X-Google-Smtp-Source: AGRyM1tqiUSHGdZ73iLnFi4+Vk0ccmrwl9m7jAtRn4V0Rw+gTQkDcipSqikqAPPiHK/6Veo6fMXIxw==
-X-Received: by 2002:a1c:f018:0:b0:3a0:3f8d:d71e with SMTP id a24-20020a1cf018000000b003a03f8dd71emr4708759wmb.104.1657640039968;
-        Tue, 12 Jul 2022 08:33:59 -0700 (PDT)
-Received: from [10.35.4.238] (bzq-82-81-161-50.red.bezeqint.net. [82.81.161.50])
-        by smtp.gmail.com with ESMTPSA id ay38-20020a05600c1e2600b003a2cf1ba9e2sm10243607wmb.6.2022.07.12.08.33.58
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 12 Jul 2022 08:33:59 -0700 (PDT)
-Message-ID: <8a1ff7338f1252d75ff96c3518f16742919f92d7.camel@redhat.com>
-Subject: Re: [PATCH v2] KVM: x86: Add dedicated helper to get CPUID entry
- with significant index
-From:   Maxim Levitsky <mlevitsk@redhat.com>
-To:     Sean Christopherson <seanjc@google.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>
-Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org
-Date:   Tue, 12 Jul 2022 18:33:57 +0300
-In-Reply-To: <20220712000645.1144186-1-seanjc@google.com>
-References: <20220712000645.1144186-1-seanjc@google.com>
-Content-Type: text/plain; charset="UTF-8"
-User-Agent: Evolution 3.40.4 (3.40.4-5.fc34) 
+        with ESMTP id S234175AbiGLPkU (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 12 Jul 2022 11:40:20 -0400
+Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 21104C1767
+        for <kvm@vger.kernel.org>; Tue, 12 Jul 2022 08:40:18 -0700 (PDT)
+Received: from pps.filterd (m0127361.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.17.1.5/8.17.1.5) with ESMTP id 26CEI9NG034384;
+        Tue, 12 Jul 2022 15:40:10 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
+ mime-version : from : subject : to : cc : references : in-reply-to :
+ content-type : content-transfer-encoding; s=pp1;
+ bh=MtVp0SEc4aFV9Avx3+9IiyZVdRJ9oua091aBCdfdw8U=;
+ b=C4E4mXH5hQ1cKm3AhxWjtbq7MtEhcTamdOHXeV5BKsM2LFAi9EvCat0yOeu4nzqi83EI
+ qSEllt1Kc2vKuXxdVDDdnQNvs8J7keG9JBiMJZzyk9LoOuYkX016lzpe59dcuV+xzRdX
+ ULGpMFLR8qrNlO1plI2dQR20sOfHraUDT/BMCzPVsvO8jq8Hzcy0pjqk/CC0EYT1YLRp
+ KeyW/nlwiHrhx+8gbB3ozpiubPUFat9xm/W+E7oP8zakWvi/a9M25X6AqzTvY3dOmB48
+ gZk6D9qHZaoXM3CCgcUv/L5ZDgGN15WCjXhISnYEC+SnwMVLujamGUvP02GMvFeXdaNP jw== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3h9akqtbuf-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Tue, 12 Jul 2022 15:40:10 +0000
+Received: from m0127361.ppops.net (m0127361.ppops.net [127.0.0.1])
+        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 26CEoLGQ028915;
+        Tue, 12 Jul 2022 15:40:09 GMT
+Received: from ppma05fra.de.ibm.com (6c.4a.5195.ip4.static.sl-reverse.com [149.81.74.108])
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3h9akqtbt9-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Tue, 12 Jul 2022 15:40:09 +0000
+Received: from pps.filterd (ppma05fra.de.ibm.com [127.0.0.1])
+        by ppma05fra.de.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 26CFaHKM004083;
+        Tue, 12 Jul 2022 15:40:07 GMT
+Received: from b06avi18626390.portsmouth.uk.ibm.com (b06avi18626390.portsmouth.uk.ibm.com [9.149.26.192])
+        by ppma05fra.de.ibm.com with ESMTP id 3h71a8uabd-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Tue, 12 Jul 2022 15:40:07 +0000
+Received: from b06wcsmtp001.portsmouth.uk.ibm.com (b06wcsmtp001.portsmouth.uk.ibm.com [9.149.105.160])
+        by b06avi18626390.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 26CFcY9323331264
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Tue, 12 Jul 2022 15:38:34 GMT
+Received: from b06wcsmtp001.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 3F60FA405F;
+        Tue, 12 Jul 2022 15:40:03 +0000 (GMT)
+Received: from b06wcsmtp001.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 6E831A405B;
+        Tue, 12 Jul 2022 15:40:02 +0000 (GMT)
+Received: from [9.171.74.161] (unknown [9.171.74.161])
+        by b06wcsmtp001.portsmouth.uk.ibm.com (Postfix) with ESMTP;
+        Tue, 12 Jul 2022 15:40:02 +0000 (GMT)
+Message-ID: <de92ef17-3a17-df44-97aa-19e67d1d5b3d@linux.ibm.com>
+Date:   Tue, 12 Jul 2022 17:40:02 +0200
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-2.7 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham
-        autolearn_force=no version=3.4.6
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.10.0
+From:   Janis Schoetterl-Glausch <scgl@linux.ibm.com>
+Subject: Re: [PATCH v8 02/12] s390x/cpu_topology: CPU topology objects and
+ structures
+To:     Pierre Morel <pmorel@linux.ibm.com>, qemu-s390x@nongnu.org
+Cc:     qemu-devel@nongnu.org, borntraeger@de.ibm.com, pasic@linux.ibm.com,
+        richard.henderson@linaro.org, david@redhat.com, thuth@redhat.com,
+        cohuck@redhat.com, mst@redhat.com, pbonzini@redhat.com,
+        kvm@vger.kernel.org, ehabkost@redhat.com,
+        marcel.apfelbaum@gmail.com, eblake@redhat.com, armbru@redhat.com,
+        seiden@linux.ibm.com, nrb@linux.ibm.com, frankja@linux.ibm.com
+References: <20220620140352.39398-1-pmorel@linux.ibm.com>
+ <20220620140352.39398-3-pmorel@linux.ibm.com>
+Content-Language: en-US
+In-Reply-To: <20220620140352.39398-3-pmorel@linux.ibm.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-ORIG-GUID: dOjpKtB6Qc66Htt7w1oEUF-ub471AoXV
+X-Proofpoint-GUID: KfZ-dI4IAV2X9OQEqeCc9VFealjd70M6
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.205,Aquarius:18.0.883,Hydra:6.0.517,FMLib:17.11.122.1
+ definitions=2022-07-12_08,2022-07-12_01,2022-06-22_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 adultscore=0 mlxlogscore=999
+ malwarescore=0 mlxscore=0 impostorscore=0 suspectscore=0 bulkscore=0
+ priorityscore=1501 lowpriorityscore=0 spamscore=0 clxscore=1015
+ phishscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2206140000 definitions=main-2207120059
+X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,
+        SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no
+        version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, 2022-07-12 at 00:06 +0000, Sean Christopherson wrote:
-> Add a second CPUID helper, kvm_find_cpuid_entry_index(), to handle KVM
-> queries for CPUID leaves whose index _may_ be significant, and drop the
-> index param from the existing kvm_find_cpuid_entry().  Add a WARN in the
-> inner helper, cpuid_entry2_find(), to detect attempts to retrieve a CPUID
-> entry whose index is significant without explicitly providing an index.
+On 6/20/22 16:03, Pierre Morel wrote:
+> We use new objects to have a dynamic administration of the CPU topology.
+> The highest level object in this implementation is the s390 book and
+> in this first implementation of CPU topology for S390 we have a single
+> book.
+> The book is built as a SYSBUS bridge during the CPU initialization.
+> Other objects, sockets and core will be built after the parsing
+> of the QEMU -smp argument.
 > 
-> Using an explicit magic number and letting callers omit the index avoids
-> confusion by eliminating the myriad cases where KVM specifies '0' as a
-> dummy value.
+> Every object under this single book will be build dynamically
+> immediately after a CPU has be realized if it is needed.
+> The CPU will fill the sockets once after the other, according to the
+> number of core per socket defined during the smp parsing.
 > 
-> Suggested-by: Paolo Bonzini <pbonzini@redhat.com>
-> Signed-off-by: Sean Christopherson <seanjc@google.com>
+> Each CPU inside a socket will be represented by a bit in a 64bit
+> unsigned long. Set on plug and clear on unplug of a CPU.
+> 
+> For the S390 CPU topology, thread and cores are merged into
+> topology cores and the number of topology cores is the multiplication
+> of cores by the numbers of threads.
+> 
+> Signed-off-by: Pierre Morel <pmorel@linux.ibm.com>
 > ---
+>  hw/s390x/cpu-topology.c         | 391 ++++++++++++++++++++++++++++++++
+>  hw/s390x/meson.build            |   1 +
+>  hw/s390x/s390-virtio-ccw.c      |   6 +
+>  include/hw/s390x/cpu-topology.h |  74 ++++++
+>  target/s390x/cpu.h              |  47 ++++
+>  5 files changed, 519 insertions(+)
+>  create mode 100644 hw/s390x/cpu-topology.c
+>  create mode 100644 include/hw/s390x/cpu-topology.h
 > 
-> v2: Rebased to kvm/queue.
-> 
-> v1: https://lore.kernel.org/all/20211022002006.1425701-1-seanjc@google.com
-> 
->  arch/x86/kvm/cpuid.c         | 71 ++++++++++++++++++++++++++----------
->  arch/x86/kvm/cpuid.h         | 16 ++++----
->  arch/x86/kvm/hyperv.c        |  8 ++--
->  arch/x86/kvm/svm/svm.c       |  2 +-
->  arch/x86/kvm/vmx/pmu_intel.c |  4 +-
->  arch/x86/kvm/vmx/sgx.c       |  8 ++--
->  arch/x86/kvm/vmx/vmx.c       |  6 +--
->  arch/x86/kvm/x86.c           |  2 +-
->  8 files changed, 75 insertions(+), 42 deletions(-)
-> 
-> diff --git a/arch/x86/kvm/cpuid.c b/arch/x86/kvm/cpuid.c
-> index d47222ab8e6e..10247528b59b 100644
-> --- a/arch/x86/kvm/cpuid.c
-> +++ b/arch/x86/kvm/cpuid.c
-> @@ -67,9 +67,17 @@ u32 xstate_required_size(u64 xstate_bv, bool compacted)
->  #define F feature_bit
->  #define SF(name) (boot_cpu_has(X86_FEATURE_##name) ? F(name) : 0)
->  
+> diff --git a/hw/s390x/cpu-topology.c b/hw/s390x/cpu-topology.c
+> new file mode 100644
+> index 0000000000..0fd6f08084
+> --- /dev/null
+> +++ b/hw/s390x/cpu-topology.c
+> @@ -0,0 +1,391 @@
 > +/*
-> + * Magic value used by KVM when querying userspace-provided CPUID entries and
-> + * doesn't care about the CPIUD index because the index of the function in
-> + * question is not significant.  Note, this magic value must have at least one
-> + * bit set in bits[63:32] and must be consumed as a u64 by cpuid_entry2_find()
-> + * to avoid false positives when processing guest CPUID input.
+> + * CPU Topology
+> + *
+> + * Copyright 2022 IBM Corp.
+
+Should be Copyright IBM Corp. 2022, and maybe even have a year range.
+
+> + * Author(s): Pierre Morel <pmorel@linux.ibm.com>
+> +
+> + * This work is licensed under the terms of the GNU GPL, version 2 or (at
+> + * your option) any later version. See the COPYING file in the top-level
+> + * directory.
 > + */
-> +#define KVM_CPUID_INDEX_NOT_SIGNIFICANT -1ull
->  
->  static inline struct kvm_cpuid_entry2 *cpuid_entry2_find(
-> -       struct kvm_cpuid_entry2 *entries, int nent, u32 function, u32 index)
-> +       struct kvm_cpuid_entry2 *entries, int nent, u32 function, u64 index)
-How I wish that this would be just called EAX and ECX... Anyway....
-
->  {
->         struct kvm_cpuid_entry2 *e;
->         int i;
-> @@ -77,9 +85,22 @@ static inline struct kvm_cpuid_entry2 *cpuid_entry2_find(
->         for (i = 0; i < nent; i++) {
->                 e = &entries[i];
->  
-> -               if (e->function == function &&
-> -                   (!(e->flags & KVM_CPUID_FLAG_SIGNIFCANT_INDEX) || e->index == index))
-> +               if (e->function != function)
-> +                       continue;
 > +
-> +               /*
-> +                * If the index isn't significant, use the first entry with a
-> +                * matching function.  It's userspace's responsibilty to not
-> +                * provide "duplicate" entries in all cases.
-> +                */
-> +               if (!(e->flags & KVM_CPUID_FLAG_SIGNIFCANT_INDEX) || e->index == index)
->                         return e;
+> +#include "qemu/osdep.h"
+> +#include "qapi/error.h"
+> +#include "qemu/error-report.h"
+> +#include "hw/sysbus.h"
+> +#include "hw/s390x/cpu-topology.h"
+> +#include "hw/qdev-properties.h"
+> +#include "hw/boards.h"
+> +#include "qemu/typedefs.h"
+> +#include "target/s390x/cpu.h"
+> +#include "hw/s390x/s390-virtio-ccw.h"
 > +
-> +               /*
-> +                * Function matches and index is significant; not specifying an
-> +                * exact index in this case is a KVM bug.
-> +                */
-Nitpick: Why KVM bug? Bad userspace can also provide a index-significant entry for cpuid
-leaf for which index is not significant in the x86 spec.
-
-
-We could arrange a table of all known leaves and for each leaf if it has an index
-in the x86 spec, and warn/reject the userspace CPUID info if it doesn't match.
-
-
-
-> +               WARN_ON_ONCE(index == KVM_CPUID_INDEX_NOT_SIGNIFICANT);
->         }
->  
->         return NULL;
-> @@ -96,7 +117,8 @@ static int kvm_check_cpuid(struct kvm_vcpu *vcpu,
->          * The existing code assumes virtual address is 48-bit or 57-bit in the
->          * canonical address checks; exit if it is ever changed.
->          */
-> -       best = cpuid_entry2_find(entries, nent, 0x80000008, 0);
-> +       best = cpuid_entry2_find(entries, nent, 0x80000008,
-> +                                KVM_CPUID_INDEX_NOT_SIGNIFICANT);
-OK.
-
->         if (best) {
->                 int vaddr_bits = (best->eax & 0xff00) >> 8;
->  
-> @@ -151,7 +173,7 @@ static void kvm_update_kvm_cpuid_base(struct kvm_vcpu *vcpu)
->         vcpu->arch.kvm_cpuid_base = 0;
->  
->         for_each_possible_hypervisor_cpuid_base(function) {
-> -               entry = kvm_find_cpuid_entry(vcpu, function, 0);
-> +               entry = kvm_find_cpuid_entry(vcpu, function);
-KVM leaves have no index indeed.
-TIL: I didn't knew that KVM leaves can be offset like that.
-
->  
->                 if (entry) {
->                         u32 signature[3];
-> @@ -177,7 +199,8 @@ static struct kvm_cpuid_entry2 *__kvm_find_kvm_cpuid_features(struct kvm_vcpu *v
->         if (!base)
->                 return NULL;
->  
-> -       return cpuid_entry2_find(entries, nent, base | KVM_CPUID_FEATURES, 0);
-> +       return cpuid_entry2_find(entries, nent, base | KVM_CPUID_FEATURES,
-> +                                KVM_CPUID_INDEX_NOT_SIGNIFICANT);
-Same.
->  }
->  
->  static struct kvm_cpuid_entry2 *kvm_find_kvm_cpuid_features(struct kvm_vcpu *vcpu)
-> @@ -219,7 +242,7 @@ static void __kvm_update_cpuid_runtime(struct kvm_vcpu *vcpu, struct kvm_cpuid_e
->         struct kvm_cpuid_entry2 *best;
->         u64 guest_supported_xcr0 = cpuid_get_supported_xcr0(entries, nent);
->  
-> -       best = cpuid_entry2_find(entries, nent, 1, 0);
-> +       best = cpuid_entry2_find(entries, nent, 1, KVM_CPUID_INDEX_NOT_SIGNIFICANT);
-
-Leaf 1, no index indeed.
-
-Offtopic: I wonder why we call this 'best'?
-
-
->         if (best) {
->                 /* Update OSXSAVE bit */
->                 if (boot_cpu_has(X86_FEATURE_XSAVE))
-> @@ -250,7 +273,7 @@ static void __kvm_update_cpuid_runtime(struct kvm_vcpu *vcpu, struct kvm_cpuid_e
->                 best->eax &= ~(1 << KVM_FEATURE_PV_UNHALT);
->  
->         if (!kvm_check_has_quirk(vcpu->kvm, KVM_X86_QUIRK_MISC_ENABLE_NO_MWAIT)) {
-> -               best = cpuid_entry2_find(entries, nent, 0x1, 0);
-> +               best = cpuid_entry2_find(entries, nent, 0x1, KVM_CPUID_INDEX_NOT_SIGNIFICANT);
->                 if (best)
->                         cpuid_entry_change(best, X86_FEATURE_MWAIT,
->                                            vcpu->arch.ia32_misc_enable_msr &
-Leaf 1 again, OK.
-
-
-> @@ -285,7 +308,7 @@ static void kvm_vcpu_after_set_cpuid(struct kvm_vcpu *vcpu)
->         struct kvm_cpuid_entry2 *best;
->         u64 guest_supported_xcr0;
->  
-> -       best = kvm_find_cpuid_entry(vcpu, 1, 0);
-> +       best = kvm_find_cpuid_entry(vcpu, 1);
-Leaf 1 again, OK.
->         if (best && apic) {
->                 if (cpuid_entry_has(best, X86_FEATURE_TSC_DEADLINE_TIMER))
->                         apic->lapic_timer.timer_mode_mask = 3 << 17;
-> @@ -325,10 +348,10 @@ int cpuid_query_maxphyaddr(struct kvm_vcpu *vcpu)
->  {
->         struct kvm_cpuid_entry2 *best;
->  
-> -       best = kvm_find_cpuid_entry(vcpu, 0x80000000, 0);
-> +       best = kvm_find_cpuid_entry(vcpu, 0x80000000);
-
-Leaf 0x80000000, OK.
->         if (!best || best->eax < 0x80000008)
->                 goto not_found;
-> -       best = kvm_find_cpuid_entry(vcpu, 0x80000008, 0);
-> +       best = kvm_find_cpuid_entry(vcpu, 0x80000008);
-Leaf 0x80000000, OK.
-
->         if (best)
->                 return best->eax & 0xff;
->  not_found:
-> @@ -1302,12 +1325,20 @@ int kvm_dev_ioctl_get_cpuid(struct kvm_cpuid2 *cpuid,
->         return r;
->  }
->  
-> -struct kvm_cpuid_entry2 *kvm_find_cpuid_entry(struct kvm_vcpu *vcpu,
-> -                                             u32 function, u32 index)
-> +struct kvm_cpuid_entry2 *kvm_find_cpuid_entry_index(struct kvm_vcpu *vcpu,
-> +                                                   u32 function, u32 index)
-Nitpick: could you fix the indention while at it?
->  {
->         return cpuid_entry2_find(vcpu->arch.cpuid_entries, vcpu->arch.cpuid_nent,
->                                  function, index);
->  }
-> +EXPORT_SYMBOL_GPL(kvm_find_cpuid_entry_index);
-> +
-> +struct kvm_cpuid_entry2 *kvm_find_cpuid_entry(struct kvm_vcpu *vcpu,
-> +                                             u32 function)
+> +/*
+> + * s390_create_cores:
+> + * @ms: Machine state
+> + * @socket: the socket on which to create the core set
+> + * @origin: the origin offset of the first core of the set
+> + * @errp: Error pointer
+> + *
+> + * returns a pointer to the created S390TopologyCores structure
+> + *
+> + * On error: return NULL
+> + */
+> +static S390TopologyCores *s390_create_cores(MachineState *ms,
+> +                                            S390TopologySocket *socket,
+> +                                            int origin, Error **errp)
 > +{
-> +       return cpuid_entry2_find(vcpu->arch.cpuid_entries, vcpu->arch.cpuid_nent,
-> +                                function, KVM_CPUID_INDEX_NOT_SIGNIFICANT);
+> +    DeviceState *dev;
+> +    S390TopologyCores *cores;
+> +
+> +    if (socket->bus->num_children >= ms->smp.cores * ms->smp.threads) {
+> +        error_setg(errp, "Unable to create more cores.");
+> +        return NULL;
+> +    }
+
+Why/How can this happen?
+The "location" of the CPU is a function of core_id and the same CPU should not be added twice.
+If it's to enforce a limit on the smp arguments that should happen earlier in my opinion.
+If it's necessary, you could also make the message more verbose and add ", maximum number reached".
+> +
+> +    dev = qdev_new(TYPE_S390_TOPOLOGY_CORES);
+> +    qdev_realize_and_unref(dev, socket->bus, &error_fatal);
+
+As a result of this, the order of cores in the socket bus is the creation order, correct?
+So newest first and not ordered by the origin (since we can hot plug CPUs), correct?
+> +
+> +    cores = S390_TOPOLOGY_CORES(dev);
+> +    cores->origin = origin;
+
+I must admit that I haven't fully grokked the qemu object model, yet, but I'd be more comfortable
+if you unref'ed cores after you set the origin.
+Does the socket bus own the object after you unref it? Does it then make sense to return cores
+after unref'ing it?
+But then we don't support CPU unplug, so the object shouldn't just vanish.
+
+> +    socket->cnt += 1;
+
+cnt++ to be consistent with create_socket below.
+> +
+> +    return cores;
 > +}
->  EXPORT_SYMBOL_GPL(kvm_find_cpuid_entry);
->  
->  /*
-> @@ -1344,7 +1375,7 @@ get_out_of_range_cpuid_entry(struct kvm_vcpu *vcpu, u32 *fn_ptr, u32 index)
->         struct kvm_cpuid_entry2 *basic, *class;
->         u32 function = *fn_ptr;
->  
-> -       basic = kvm_find_cpuid_entry(vcpu, 0, 0);
-> +       basic = kvm_find_cpuid_entry(vcpu, 0);
-Leaf 0, OK.
->         if (!basic)
->                 return NULL;
->  
-> @@ -1353,11 +1384,11 @@ get_out_of_range_cpuid_entry(struct kvm_vcpu *vcpu, u32 *fn_ptr, u32 index)
->                 return NULL;
->  
->         if (function >= 0x40000000 && function <= 0x4fffffff)
-> -               class = kvm_find_cpuid_entry(vcpu, function & 0xffffff00, 0);
-> +               class = kvm_find_cpuid_entry(vcpu, function & 0xffffff00);
->         else if (function >= 0xc0000000)
-> -               class = kvm_find_cpuid_entry(vcpu, 0xc0000000, 0);
-> +               class = kvm_find_cpuid_entry(vcpu, 0xc0000000);
->         else
-> -               class = kvm_find_cpuid_entry(vcpu, function & 0x80000000, 0);
-> +               class = kvm_find_cpuid_entry(vcpu, function & 0x80000000);
-This assumes that all the classes has first entry whose EAX specifies max leaf
-for this class. True for sure for basic and extended features, don't know
-if true for hypervisor and Centaur entries. Seems OK.
+> +
+> +/*
+> + * s390_create_socket:
+> + * @ms: Machine state
+> + * @book: the book on which to create the socket
+> + * @id: the socket id
+> + * @errp: Error pointer
+> + *
+> + * returns a pointer to the created S390TopologySocket structure
+> + *
+> + * On error: return NULL
+> + */
+> +static S390TopologySocket *s390_create_socket(MachineState *ms,
+> +                                              S390TopologyBook *book,
+> +                                              int id, Error **errp)
+> +{
 
+Same questions/comments as above.
 
->  
->         if (class && function <= class->eax)
->                 return NULL;
-> @@ -1375,7 +1406,7 @@ get_out_of_range_cpuid_entry(struct kvm_vcpu *vcpu, u32 *fn_ptr, u32 index)
->          * the effective CPUID entry is the max basic leaf.  Note, the index of
->          * the original requested leaf is observed!
->          */
-> -       return kvm_find_cpuid_entry(vcpu, basic->eax, index);
-> +       return kvm_find_cpuid_entry_index(vcpu, basic->eax, index);
->  }
->  
->  bool kvm_cpuid(struct kvm_vcpu *vcpu, u32 *eax, u32 *ebx,
-> @@ -1385,7 +1416,7 @@ bool kvm_cpuid(struct kvm_vcpu *vcpu, u32 *eax, u32 *ebx,
->         struct kvm_cpuid_entry2 *entry;
->         bool exact, used_max_basic = false;
->  
-> -       entry = kvm_find_cpuid_entry(vcpu, function, index);
-> +       entry = kvm_find_cpuid_entry_index(vcpu, function, index);
->         exact = !!entry;
->  
->         if (!entry && !exact_only) {
-> @@ -1414,7 +1445,7 @@ bool kvm_cpuid(struct kvm_vcpu *vcpu, u32 *eax, u32 *ebx,
->                  * exists. EDX can be copied from any existing index.
->                  */
->                 if (function == 0xb || function == 0x1f) {
-> -                       entry = kvm_find_cpuid_entry(vcpu, function, 1);
-> +                       entry = kvm_find_cpuid_entry_index(vcpu, function, 1);
->                         if (entry) {
->                                 *ecx = index & 0xff;
->                                 *edx = entry->edx;
-> diff --git a/arch/x86/kvm/cpuid.h b/arch/x86/kvm/cpuid.h
-> index ac72aabba981..b1658c0de847 100644
-> --- a/arch/x86/kvm/cpuid.h
-> +++ b/arch/x86/kvm/cpuid.h
-> @@ -13,8 +13,10 @@ void kvm_set_cpu_caps(void);
->  
->  void kvm_update_cpuid_runtime(struct kvm_vcpu *vcpu);
->  void kvm_update_pv_runtime(struct kvm_vcpu *vcpu);
-> +struct kvm_cpuid_entry2 *kvm_find_cpuid_entry_index(struct kvm_vcpu *vcpu,
-> +                                                   u32 function, u32 index);
->  struct kvm_cpuid_entry2 *kvm_find_cpuid_entry(struct kvm_vcpu *vcpu,
-> -                                             u32 function, u32 index);
-> +                                             u32 function);
->  int kvm_dev_ioctl_get_cpuid(struct kvm_cpuid2 *cpuid,
->                             struct kvm_cpuid_entry2 __user *entries,
->                             unsigned int type);
-> @@ -76,7 +78,7 @@ static __always_inline u32 *guest_cpuid_get_register(struct kvm_vcpu *vcpu,
->         const struct cpuid_reg cpuid = x86_feature_cpuid(x86_feature);
->         struct kvm_cpuid_entry2 *entry;
->  
-> -       entry = kvm_find_cpuid_entry(vcpu, cpuid.function, cpuid.index);
-> +       entry = kvm_find_cpuid_entry_index(vcpu, cpuid.function, cpuid.index);
->         if (!entry)
->                 return NULL;
->  
-> @@ -109,7 +111,7 @@ static inline bool guest_cpuid_is_amd_or_hygon(struct kvm_vcpu *vcpu)
->  {
->         struct kvm_cpuid_entry2 *best;
->  
-> -       best = kvm_find_cpuid_entry(vcpu, 0, 0);
-> +       best = kvm_find_cpuid_entry(vcpu, 0);
-OK
->         return best &&
->                (is_guest_vendor_amd(best->ebx, best->ecx, best->edx) ||
->                 is_guest_vendor_hygon(best->ebx, best->ecx, best->edx));
-> @@ -119,7 +121,7 @@ static inline bool guest_cpuid_is_intel(struct kvm_vcpu *vcpu)
->  {
->         struct kvm_cpuid_entry2 *best;
->  
-> -       best = kvm_find_cpuid_entry(vcpu, 0, 0);
-OK
-> +       best = kvm_find_cpuid_entry(vcpu, 0);
->         return best && is_guest_vendor_intel(best->ebx, best->ecx, best->edx);
->  }
->  
-> @@ -127,7 +129,7 @@ static inline int guest_cpuid_family(struct kvm_vcpu *vcpu)
->  {
->         struct kvm_cpuid_entry2 *best;
->  
-> -       best = kvm_find_cpuid_entry(vcpu, 0x1, 0);
-OK
-> +       best = kvm_find_cpuid_entry(vcpu, 0x1);
->         if (!best)
->                 return -1;
->  
-> @@ -138,7 +140,7 @@ static inline int guest_cpuid_model(struct kvm_vcpu *vcpu)
->  {
->         struct kvm_cpuid_entry2 *best;
->  
-> -       best = kvm_find_cpuid_entry(vcpu, 0x1, 0);
-OK
-> +       best = kvm_find_cpuid_entry(vcpu, 0x1);
->         if (!best)
->                 return -1;
->  
-> @@ -154,7 +156,7 @@ static inline int guest_cpuid_stepping(struct kvm_vcpu *vcpu)
->  {
->         struct kvm_cpuid_entry2 *best;
->  
-> -       best = kvm_find_cpuid_entry(vcpu, 0x1, 0);
-OK
-> +       best = kvm_find_cpuid_entry(vcpu, 0x1);
->         if (!best)
->                 return -1;
->  
-> diff --git a/arch/x86/kvm/hyperv.c b/arch/x86/kvm/hyperv.c
-> index e2e95a6fccfd..ed804447589c 100644
-> --- a/arch/x86/kvm/hyperv.c
-> +++ b/arch/x86/kvm/hyperv.c
-> @@ -1992,7 +1992,7 @@ void kvm_hv_set_cpuid(struct kvm_vcpu *vcpu)
->         struct kvm_cpuid_entry2 *entry;
->         struct kvm_vcpu_hv *hv_vcpu;
->  
-> -       entry = kvm_find_cpuid_entry(vcpu, HYPERV_CPUID_INTERFACE, 0);
-> +       entry = kvm_find_cpuid_entry(vcpu, HYPERV_CPUID_INTERFACE);
+> +    DeviceState *dev;
+> +    S390TopologySocket *socket;
+> +
+> +    if (book->bus->num_children >= ms->smp.sockets) {
+> +        error_setg(errp, "Unable to create more sockets.");
+> +        return NULL;
+> +    }
+> +
+> +    dev = qdev_new(TYPE_S390_TOPOLOGY_SOCKET);
+> +    qdev_realize_and_unref(dev, book->bus, &error_fatal);
+> +
+> +    socket = S390_TOPOLOGY_SOCKET(dev);
+> +    socket->socket_id = id;
+> +    book->cnt++;
+> +
+> +    return socket;
+> +}
+> +
+> +/*
+> + * s390_get_cores:
+> + * @ms: Machine state
+> + * @socket: the socket to search into
+> + * @origin: the origin specified for the S390TopologyCores
+> + * @errp: Error pointer
+> + *
+> + * returns a pointer to a S390TopologyCores structure within a socket having
+> + * the specified origin.
+> + * First search if the socket is already containing the S390TopologyCores
+> + * structure and if not create one with this origin.
+> + */
+> +static S390TopologyCores *s390_get_cores(MachineState *ms,
+> +                                         S390TopologySocket *socket,
+> +                                         int origin, Error **errp)
+> +{
+> +    S390TopologyCores *cores;
+> +    BusChild *kid;
+> +
+> +    QTAILQ_FOREACH(kid, &socket->bus->children, sibling) {
+> +        cores = S390_TOPOLOGY_CORES(kid->child);
+> +        if (cores->origin == origin) {
+> +            return cores;
+> +        }
+> +    }
+> +    return s390_create_cores(ms, socket, origin, errp);
 
-None of HV cpuids have index, so all look OK.
+I think calling create here is unintuative.
+You only use get_cores once when creating a new cpu, I think doing
 
->         if (entry && entry->eax == HYPERV_CPUID_SIGNATURE_EAX) {
->                 vcpu->arch.hyperv_enabled = true;
->         } else {
-> @@ -2005,7 +2005,7 @@ void kvm_hv_set_cpuid(struct kvm_vcpu *vcpu)
->  
->         hv_vcpu = to_hv_vcpu(vcpu);
->  
-> -       entry = kvm_find_cpuid_entry(vcpu, HYPERV_CPUID_FEATURES, 0);
-> +       entry = kvm_find_cpuid_entry(vcpu, HYPERV_CPUID_FEATURES);
->         if (entry) {
->                 hv_vcpu->cpuid_cache.features_eax = entry->eax;
->                 hv_vcpu->cpuid_cache.features_ebx = entry->ebx;
-> @@ -2016,7 +2016,7 @@ void kvm_hv_set_cpuid(struct kvm_vcpu *vcpu)
->                 hv_vcpu->cpuid_cache.features_edx = 0;
->         }
->  
-> -       entry = kvm_find_cpuid_entry(vcpu, HYPERV_CPUID_ENLIGHTMENT_INFO, 0);
-> +       entry = kvm_find_cpuid_entry(vcpu, HYPERV_CPUID_ENLIGHTMENT_INFO);
->         if (entry) {
->                 hv_vcpu->cpuid_cache.enlightenments_eax = entry->eax;
->                 hv_vcpu->cpuid_cache.enlightenments_ebx = entry->ebx;
-> @@ -2025,7 +2025,7 @@ void kvm_hv_set_cpuid(struct kvm_vcpu *vcpu)
->                 hv_vcpu->cpuid_cache.enlightenments_ebx = 0;
->         }
->  
-> -       entry = kvm_find_cpuid_entry(vcpu, HYPERV_CPUID_SYNDBG_PLATFORM_CAPABILITIES, 0);
-> +       entry = kvm_find_cpuid_entry(vcpu, HYPERV_CPUID_SYNDBG_PLATFORM_CAPABILITIES);
->         if (entry)
->                 hv_vcpu->cpuid_cache.syndbg_cap_eax = entry->eax;
->         else
-> diff --git a/arch/x86/kvm/svm/svm.c b/arch/x86/kvm/svm/svm.c
-> index 37ce061dfc76..d2fa008b04ad 100644
-> --- a/arch/x86/kvm/svm/svm.c
-> +++ b/arch/x86/kvm/svm/svm.c
-> @@ -4193,7 +4193,7 @@ static void svm_vcpu_after_set_cpuid(struct kvm_vcpu *vcpu)
->  
->         /* For sev guests, the memory encryption bit is not reserved in CR3.  */
->         if (sev_guest(vcpu->kvm)) {
-> -               best = kvm_find_cpuid_entry(vcpu, 0x8000001F, 0);
-> +               best = kvm_find_cpuid_entry(vcpu, 0x8000001F);
+    cores = s390_get_cores(ms, socket, origin, errp);
+    if (!cores) {
+        cores = s390_create_cores(...);
+    ]
+    if (!cores) {
+        return false;
+    }
 
->                 if (best)
->                         vcpu->arch.reserved_gpa_bits &= ~(1UL << (best->ebx & 0x3f));
-OK.
+is more straight forward and readable.
+> +}
+> +
+> +/*
+> + * s390_get_socket:
+> + * @ms: Machine state
+> + * @book: The book to search into
+> + * @socket_id: the identifier of the socket to search for
+> + * @errp: Error pointer
+> + *
+> + * returns a pointer to a S390TopologySocket structure within a book having
+> + * the specified socket_id.
+> + * First search if the book is already containing the S390TopologySocket
+> + * structure and if not create one with this socket_id.
+> + */
+> +static S390TopologySocket *s390_get_socket(MachineState *ms,
+> +                                           S390TopologyBook *book,
+> +                                           int socket_id, Error **errp)
+> +{
+> +    S390TopologySocket *socket;
+> +    BusChild *kid;
+> +
+> +    QTAILQ_FOREACH(kid, &book->bus->children, sibling) {
+> +        socket = S390_TOPOLOGY_SOCKET(kid->child);
+> +        if (socket->socket_id == socket_id) {
+> +            return socket;
+> +        }
+> +    }
+> +    return s390_create_socket(ms, book, socket_id, errp);
 
->         }
-> diff --git a/arch/x86/kvm/vmx/pmu_intel.c b/arch/x86/kvm/vmx/pmu_intel.c
-> index 53ccba896e77..4bc098fbec31 100644
-> --- a/arch/x86/kvm/vmx/pmu_intel.c
-> +++ b/arch/x86/kvm/vmx/pmu_intel.c
-> @@ -531,7 +531,7 @@ static void intel_pmu_refresh(struct kvm_vcpu *vcpu)
->         pmu->pebs_enable_mask = ~0ull;
->         pmu->pebs_data_cfg_mask = ~0ull;
->  
-> -       entry = kvm_find_cpuid_entry(vcpu, 0xa, 0);
-> +       entry = kvm_find_cpuid_entry(vcpu, 0xa);
-OK
->         if (!entry || !vcpu->kvm->arch.enable_pmu)
->                 return;
->         eax.full = entry->eax;
-> @@ -577,7 +577,7 @@ static void intel_pmu_refresh(struct kvm_vcpu *vcpu)
->                 pmu->global_ovf_ctrl_mask &=
->                                 ~MSR_CORE_PERF_GLOBAL_OVF_CTRL_TRACE_TOPA_PMI;
->  
-> -       entry = kvm_find_cpuid_entry(vcpu, 7, 0);
-> +       entry = kvm_find_cpuid_entry_index(vcpu, 7, 0);
->         if (entry &&
->             (boot_cpu_has(X86_FEATURE_HLE) || boot_cpu_has(X86_FEATURE_RTM)) &&
->             (entry->ebx & (X86_FEATURE_HLE|X86_FEATURE_RTM))) {
-> diff --git a/arch/x86/kvm/vmx/sgx.c b/arch/x86/kvm/vmx/sgx.c
-> index 35e7ec91ae86..d1cc7244bede 100644
-> --- a/arch/x86/kvm/vmx/sgx.c
-> +++ b/arch/x86/kvm/vmx/sgx.c
-> @@ -148,8 +148,8 @@ static int __handle_encls_ecreate(struct kvm_vcpu *vcpu,
->         u8 max_size_log2;
->         int trapnr, ret;
->  
-> -       sgx_12_0 = kvm_find_cpuid_entry(vcpu, 0x12, 0);
-> -       sgx_12_1 = kvm_find_cpuid_entry(vcpu, 0x12, 1);
-> +       sgx_12_0 = kvm_find_cpuid_entry_index(vcpu, 0x12, 0);
-> +       sgx_12_1 = kvm_find_cpuid_entry_index(vcpu, 0x12, 1);
->         if (!sgx_12_0 || !sgx_12_1) {
->                 kvm_prepare_emulation_failure_exit(vcpu);
->                 return 0;
-> @@ -431,7 +431,7 @@ static bool sgx_intercept_encls_ecreate(struct kvm_vcpu *vcpu)
->         if (!vcpu->kvm->arch.sgx_provisioning_allowed)
->                 return true;
->  
-> -       guest_cpuid = kvm_find_cpuid_entry(vcpu, 0x12, 0);
-> +       guest_cpuid = kvm_find_cpuid_entry_index(vcpu, 0x12, 0);
->         if (!guest_cpuid)
->                 return true;
->  
-> @@ -439,7 +439,7 @@ static bool sgx_intercept_encls_ecreate(struct kvm_vcpu *vcpu)
->         if (guest_cpuid->ebx != ebx || guest_cpuid->edx != edx)
->                 return true;
->  
-> -       guest_cpuid = kvm_find_cpuid_entry(vcpu, 0x12, 1);
-> +       guest_cpuid = kvm_find_cpuid_entry_index(vcpu, 0x12, 1);
->         if (!guest_cpuid)
->                 return true;
->  
-> diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
-> index c30115b9cb33..74ca64e97643 100644
-> --- a/arch/x86/kvm/vmx/vmx.c
-> +++ b/arch/x86/kvm/vmx/vmx.c
-> @@ -7428,7 +7428,7 @@ static void nested_vmx_cr_fixed1_bits_update(struct kvm_vcpu *vcpu)
->                 vmx->nested.msrs.cr4_fixed1 |= (_cr4_mask);     \
->  } while (0)
->  
-> -       entry = kvm_find_cpuid_entry(vcpu, 0x1, 0);
-> +       entry = kvm_find_cpuid_entry(vcpu, 0x1);
-OK.
->         cr4_fixed1_update(X86_CR4_VME,        edx, feature_bit(VME));
->         cr4_fixed1_update(X86_CR4_PVI,        edx, feature_bit(VME));
->         cr4_fixed1_update(X86_CR4_TSD,        edx, feature_bit(TSC));
-> @@ -7444,7 +7444,7 @@ static void nested_vmx_cr_fixed1_bits_update(struct kvm_vcpu *vcpu)
->         cr4_fixed1_update(X86_CR4_PCIDE,      ecx, feature_bit(PCID));
->         cr4_fixed1_update(X86_CR4_OSXSAVE,    ecx, feature_bit(XSAVE));
->  
-> -       entry = kvm_find_cpuid_entry(vcpu, 0x7, 0);
-> +       entry = kvm_find_cpuid_entry_index(vcpu, 0x7, 0);
->         cr4_fixed1_update(X86_CR4_FSGSBASE,   ebx, feature_bit(FSGSBASE));
->         cr4_fixed1_update(X86_CR4_SMEP,       ebx, feature_bit(SMEP));
->         cr4_fixed1_update(X86_CR4_SMAP,       ebx, feature_bit(SMAP));
-> @@ -7479,7 +7479,7 @@ static void update_intel_pt_cfg(struct kvm_vcpu *vcpu)
->         int i;
->  
->         for (i = 0; i < PT_CPUID_LEAVES; i++) {
-> -               best = kvm_find_cpuid_entry(vcpu, 0x14, i);
-> +               best = kvm_find_cpuid_entry_index(vcpu, 0x14, i);
->                 if (!best)
->                         return;
->                 vmx->pt_desc.caps[CPUID_EAX + i*PT_CPUID_REGS_NUM] = best->eax;
-> diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-> index 567d13405445..329875d2ccf2 100644
-> --- a/arch/x86/kvm/x86.c
-> +++ b/arch/x86/kvm/x86.c
-> @@ -11731,7 +11731,7 @@ void kvm_vcpu_reset(struct kvm_vcpu *vcpu, bool init_event)
->          * i.e. it's impossible for kvm_find_cpuid_entry() to find a valid entry
->          * on RESET.  But, go through the motions in case that's ever remedied.
->          */
-> -       cpuid_0x1 = kvm_find_cpuid_entry(vcpu, 1, 0);
-> +       cpuid_0x1 = kvm_find_cpuid_entry(vcpu, 1);
-OK.
->         kvm_rdx_write(vcpu, cpuid_0x1 ? cpuid_0x1->eax : 0x600);
->  
->         static_call(kvm_x86_vcpu_reset)(vcpu, init_event);
-> 
-> base-commit: b9b71f43683ae9d76b0989249607bbe8c9eb6c5c
+As above.
 
+> +}
+> +
+> +/*
+> + * s390_topology_new_cpu:
+> + * @core_id: the core ID is machine wide
+> + *
+> + * We have a single book returned by s390_get_topology(),
+> + * then we build the hierarchy on demand.
+> + * Note that we do not destroy the hierarchy on error creating
+> + * an entry in the topology, we just keep it empty.
+> + * We do not need to worry about not finding a topology level
+> + * entry this would have been caught during smp parsing.
+> + */
+> +bool s390_topology_new_cpu(MachineState *ms, int core_id, Error **errp)
+> +{
+> +    S390TopologyBook *book;
+> +    S390TopologySocket *socket;
+> +    S390TopologyCores *cores;
+> +    int nb_cores_per_socket;
 
-Best regards,
-	Maxim Levitsky
+num_cores_per_socket instead?
+
+> +    int origin, bit;
+> +
+> +    book = s390_get_topology();
+> +
+> +    nb_cores_per_socket = ms->smp.cores * ms->smp.threads;
+
+We don't support the multithreading facility, do we?
+So, I think we should assert smp.threads == 1 somewhere.
+In any case I think the correct expression would round the threads up to the next power of 2,
+because the core_id has the thread id in the lower bits, but threads per core doesn't need to be
+a power of 2 according to the architecture.
+
+> +
+> +    socket = s390_get_socket(ms, book, core_id / nb_cores_per_socket, errp);
+> +    if (!socket) {
+> +        return false;
+> +    }
+> +
+> +    /*
+> +     * At the core level, each CPU is represented by a bit in a 64bit
+> +     * unsigned long. Set on plug and clear on unplug of a CPU.
+> +     * The firmware assume that all CPU in the core description have the same
+> +     * type, polarization and are all dedicated or shared.
+> +     * In the case a socket contains CPU with different type, polarization
+> +     * or dedication then they will be defined in different CPU containers.
+> +     * Currently we assume all CPU are identical and the only reason to have
+> +     * several S390TopologyCores inside a socket is to have more than 64 CPUs
+> +     * in that case the origin field, representing the offset of the first CPU
+> +     * in the CPU container allows to represent up to the maximal number of
+> +     * CPU inside several CPU containers inside the socket container.
+> +     */
+> +    origin = 64 * (core_id / 64);
+> +
+> +    cores = s390_get_cores(ms, socket, origin, errp);
+> +    if (!cores) {
+> +        return false;
+> +    }
+> +
+> +    bit = 63 - (core_id - origin);
+> +    set_bit(bit, &cores->mask);
+> +    cores->origin = origin;
+
+This is redundant, origin is already set.
+Also I think you should generally pass the core_id and not the origin.
+Then on construction you can also set the bit.
+
+> +
+> +    return true;
+> +}
+> +
+> +/*
+> + * Setting the first topology: 1 book, 1 socket
+> + * This is enough for 64 cores if the topology is flat (single socket)
+> + */
+> +void s390_topology_setup(MachineState *ms)
+> +{
+> +    DeviceState *dev;
+> +
+> +    /* Create BOOK bridge device */
+> +    dev = qdev_new(TYPE_S390_TOPOLOGY_BOOK);
+> +    object_property_add_child(qdev_get_machine(),
+> +                              TYPE_S390_TOPOLOGY_BOOK, OBJECT(dev));
+
+Why add it to the machine instead of directly using a static?
+So it's visible to the user via info qtree or something?
+Would that even be the appropriate location to show that?
+
+> +    sysbus_realize_and_unref(SYS_BUS_DEVICE(dev), &error_fatal);
+> +}
+> +
+> +S390TopologyBook *s390_get_topology(void)
+> +{
+> +    static S390TopologyBook *book;
+> +
+> +    if (!book) {
+> +        book = S390_TOPOLOGY_BOOK(
+> +            object_resolve_path(TYPE_S390_TOPOLOGY_BOOK, NULL));
+> +        assert(book != NULL);
+> +    }
+> +
+> +    return book;
+> +}
+> +
+> +/* --- CORES Definitions --- */
+> +
+> +static Property s390_topology_cores_properties[] = {
+> +    DEFINE_PROP_BOOL("dedicated", S390TopologyCores, dedicated, false),
+> +    DEFINE_PROP_UINT8("polarity", S390TopologyCores, polarity,
+> +                      S390_TOPOLOGY_POLARITY_H),
+> +    DEFINE_PROP_UINT8("cputype", S390TopologyCores, cputype,
+> +                      S390_TOPOLOGY_CPU_TYPE),
+> +    DEFINE_PROP_UINT16("origin", S390TopologyCores, origin, 0),
+> +    DEFINE_PROP_UINT64("mask", S390TopologyCores, mask, 0),
+> +    DEFINE_PROP_END_OF_LIST(),
+> +};
+> +
+> +static void cpu_cores_class_init(ObjectClass *oc, void *data)
+> +{
+> +    DeviceClass *dc = DEVICE_CLASS(oc);
+> +    HotplugHandlerClass *hc = HOTPLUG_HANDLER_CLASS(oc);
+> +
+> +    device_class_set_props(dc, s390_topology_cores_properties);
+> +    hc->unplug = qdev_simple_device_unplug_cb;
+> +    dc->bus_type = TYPE_S390_TOPOLOGY_SOCKET_BUS;
+> +    dc->desc = "topology cpu entry";
+> +}
+> +
+> +static const TypeInfo cpu_cores_info = {
+> +    .name          = TYPE_S390_TOPOLOGY_CORES,
+> +    .parent        = TYPE_DEVICE,
+> +    .instance_size = sizeof(S390TopologyCores),
+> +    .class_init    = cpu_cores_class_init,
+> +    .interfaces = (InterfaceInfo[]) {
+> +        { TYPE_HOTPLUG_HANDLER },
+
+Why implement the hotplug interface? That is not actually supported, is it?
+> +        { }
+> +    }
+> +};
+> +
+> +static char *socket_bus_get_dev_path(DeviceState *dev)
+> +{
+> +    S390TopologySocket *socket = S390_TOPOLOGY_SOCKET(dev);
+> +    DeviceState *book = dev->parent_bus->parent;
+> +    char *id = qdev_get_dev_path(book);
+> +    char *ret;
+> +
+> +    if (id) {
+> +        ret = g_strdup_printf("%s:%02d", id, socket->socket_id);
+> +        g_free(id);
+> +    } else {
+> +        ret = g_strdup_printf("_:%02d", socket->socket_id);
+
+How can this case occur? Sockets get attached to the book bus immediately after creation, correct?
+
+> +    }
+> +
+> +    return ret;
+> +}
+> +
+> +static void socket_bus_class_init(ObjectClass *oc, void *data)
+> +{
+> +    BusClass *k = BUS_CLASS(oc);
+> +
+> +    k->get_dev_path = socket_bus_get_dev_path;
+> +    k->max_dev = S390_MAX_SOCKETS;
+
+This is the bus the cores are attached to, correct?
+Is this constant badly named, or should this be MAX_CORES (which doesn't exist)?
+How does this limit get enforced?
+Why is there a limit in the first place? I don't see one defined by STSI, other than having to fit in a u8.
+> +}
+> +
+> +static const TypeInfo socket_bus_info = {
+> +    .name = TYPE_S390_TOPOLOGY_SOCKET_BUS,
+> +    .parent = TYPE_BUS,
+> +    .instance_size = 0,
+
+After a bit of grepping it seems to me that omitting that field is more common that setting it to 0.
+
+> +    .class_init = socket_bus_class_init,
+> +};
+> +
+> +static void s390_socket_device_realize(DeviceState *dev, Error **errp)
+> +{
+> +    S390TopologySocket *socket = S390_TOPOLOGY_SOCKET(dev);
+> +    BusState *bus;
+> +
+> +    bus = qbus_new(TYPE_S390_TOPOLOGY_SOCKET_BUS, dev,
+> +                   TYPE_S390_TOPOLOGY_SOCKET_BUS);
+> +    qbus_set_hotplug_handler(bus, OBJECT(dev));
+> +    socket->bus = bus;
+> +}
+> +
+> +static void socket_class_init(ObjectClass *oc, void *data)
+> +{
+> +    DeviceClass *dc = DEVICE_CLASS(oc);
+> +    HotplugHandlerClass *hc = HOTPLUG_HANDLER_CLASS(oc);
+> +
+> +    hc->unplug = qdev_simple_device_unplug_cb;
+> +    set_bit(DEVICE_CATEGORY_BRIDGE, dc->categories);
+> +    dc->bus_type = TYPE_S390_TOPOLOGY_BOOK_BUS;
+> +    dc->realize = s390_socket_device_realize;
+> +    dc->desc = "topology socket";
+> +}
+> +
+> +static const TypeInfo socket_info = {
+> +    .name          = TYPE_S390_TOPOLOGY_SOCKET,
+> +    .parent        = TYPE_DEVICE,
+> +    .instance_size = sizeof(S390TopologySocket),
+> +    .class_init    = socket_class_init,
+> +    .interfaces = (InterfaceInfo[]) {
+> +        { TYPE_HOTPLUG_HANDLER },
+> +        { }
+> +    }
+> +};
+> +
+> +static char *book_bus_get_dev_path(DeviceState *dev)
+> +{
+> +    return g_strdup("00");
+> +}
+> +
+> +static void book_bus_class_init(ObjectClass *oc, void *data)
+> +{
+> +    BusClass *k = BUS_CLASS(oc);
+> +
+> +    k->get_dev_path = book_bus_get_dev_path;
+> +    k->max_dev = S390_MAX_BOOKS;
+
+Same question as for socket_bus_class_init here.
+
+> +}
+> +
+> +static const TypeInfo book_bus_info = {
+> +    .name = TYPE_S390_TOPOLOGY_BOOK_BUS,
+> +    .parent = TYPE_BUS,
+> +    .instance_size = 0,
+> +    .class_init = book_bus_class_init,
+> +};
+> +
+> +static void s390_book_device_realize(DeviceState *dev, Error **errp)
+> +{
+> +    S390TopologyBook *book = S390_TOPOLOGY_BOOK(dev);
+> +    BusState *bus;
+> +
+> +    bus = qbus_new(TYPE_S390_TOPOLOGY_BOOK_BUS, dev,
+> +                   TYPE_S390_TOPOLOGY_BOOK_BUS);
+> +    qbus_set_hotplug_handler(bus, OBJECT(dev));
+> +    book->bus = bus;
+> +}
+> +
+> +static void book_class_init(ObjectClass *oc, void *data)
+> +{
+> +    DeviceClass *dc = DEVICE_CLASS(oc);
+> +    HotplugHandlerClass *hc = HOTPLUG_HANDLER_CLASS(oc);
+> +
+> +    hc->unplug = qdev_simple_device_unplug_cb;
+> +    set_bit(DEVICE_CATEGORY_BRIDGE, dc->categories);
+> +    dc->realize = s390_book_device_realize;
+> +    dc->desc = "topology book";
+> +}
+> +
+> +static const TypeInfo book_info = {
+> +    .name          = TYPE_S390_TOPOLOGY_BOOK,
+> +    .parent        = TYPE_SYS_BUS_DEVICE,
+> +    .instance_size = sizeof(S390TopologyBook),
+> +    .class_init    = book_class_init,
+> +    .interfaces = (InterfaceInfo[]) {
+> +        { TYPE_HOTPLUG_HANDLER },
+> +        { }
+> +    }
+> +};
+> +
+> +static void topology_register(void)
+> +{
+> +    type_register_static(&cpu_cores_info);
+> +    type_register_static(&socket_bus_info);
+> +    type_register_static(&socket_info);
+> +    type_register_static(&book_bus_info);
+> +    type_register_static(&book_info);
+> +}
+> +
+> +type_init(topology_register);
+> diff --git a/hw/s390x/meson.build b/hw/s390x/meson.build
+> index feefe0717e..3592fa952b 100644
+> --- a/hw/s390x/meson.build
+> +++ b/hw/s390x/meson.build
+> @@ -2,6 +2,7 @@ s390x_ss = ss.source_set()
+>  s390x_ss.add(files(
+>    'ap-bridge.c',
+>    'ap-device.c',
+> +  'cpu-topology.c',
+>    'ccw-device.c',
+>    'css-bridge.c',
+>    'css.c',
+> diff --git a/hw/s390x/s390-virtio-ccw.c b/hw/s390x/s390-virtio-ccw.c
+> index cc3097bfee..a586875b24 100644
+> --- a/hw/s390x/s390-virtio-ccw.c
+> +++ b/hw/s390x/s390-virtio-ccw.c
+> @@ -43,6 +43,7 @@
+>  #include "sysemu/sysemu.h"
+>  #include "hw/s390x/pv.h"
+>  #include "migration/blocker.h"
+> +#include "hw/s390x/cpu-topology.h"
+>  
+>  static Error *pv_mig_blocker;
+>  
+> @@ -89,6 +90,7 @@ static void s390_init_cpus(MachineState *machine)
+>      /* initialize possible_cpus */
+>      mc->possible_cpu_arch_ids(machine);
+>  
+> +    s390_topology_setup(machine);
+>      for (i = 0; i < machine->smp.cpus; i++) {
+>          s390x_new_cpu(machine->cpu_type, i, &error_fatal);
+>      }
+> @@ -306,6 +308,10 @@ static void s390_cpu_plug(HotplugHandler *hotplug_dev,
+>      g_assert(!ms->possible_cpus->cpus[cpu->env.core_id].cpu);
+>      ms->possible_cpus->cpus[cpu->env.core_id].cpu = OBJECT(dev);
+>  
+> +    if (!s390_topology_new_cpu(ms, cpu->env.core_id, errp)) {
+> +        return;
+> +    }
+> +
+>      if (dev->hotplugged) {
+>          raise_irq_cpu_hotplug();
+>      }
+> diff --git a/include/hw/s390x/cpu-topology.h b/include/hw/s390x/cpu-topology.h
+> new file mode 100644
+> index 0000000000..beec61706c
+> --- /dev/null
+> +++ b/include/hw/s390x/cpu-topology.h
+> @@ -0,0 +1,74 @@
+> +/*
+> + * CPU Topology
+> + *
+> + * Copyright 2022 IBM Corp.
+
+Same issue as with .c copyright notice.
+> + *
+> + * This work is licensed under the terms of the GNU GPL, version 2 or (at
+> + * your option) any later version. See the COPYING file in the top-level
+> + * directory.
+> + */
+> +#ifndef HW_S390X_CPU_TOPOLOGY_H
+> +#define HW_S390X_CPU_TOPOLOGY_H
+> +
+> +#include "hw/qdev-core.h"
+> +#include "qom/object.h"
+> +
+> +#define S390_TOPOLOGY_CPU_TYPE    0x03
+
+This is the IFL type, right? If so the name should reflect it.
+> +
+> +#define S390_TOPOLOGY_POLARITY_H  0x00
+> +#define S390_TOPOLOGY_POLARITY_VL 0x01
+> +#define S390_TOPOLOGY_POLARITY_VM 0x02
+> +#define S390_TOPOLOGY_POLARITY_VH 0x03
+
+Why not use an enum?
+> +
+> +#define TYPE_S390_TOPOLOGY_CORES "topology cores"
+
+Seems to me that using a - instead of a space is the usual way of doing things.
+> +    /*
+> +     * Each CPU inside a socket will be represented by a bit in a 64bit
+> +     * unsigned long. Set on plug and clear on unplug of a CPU.
+> +     * All CPU inside a mask share the same dedicated, polarity and
+> +     * cputype values.
+> +     * The origin is the offset of the first CPU in a mask.
+> +     */
+> +struct S390TopologyCores {
+> +    DeviceState parent_obj;
+> +    int id;
+> +    bool dedicated;
+> +    uint8_t polarity;
+> +    uint8_t cputype;
+
+Why not snake_case for cpu type?
+
+> +    uint16_t origin;
+> +    uint64_t mask;
+> +    int cnt;
+
+num_cores instead ?
+
+> +};
+> +typedef struct S390TopologyCores S390TopologyCores;
+> +OBJECT_DECLARE_SIMPLE_TYPE(S390TopologyCores, S390_TOPOLOGY_CORES)
+> +
+> +#define TYPE_S390_TOPOLOGY_SOCKET "topology socket"
+> +#define TYPE_S390_TOPOLOGY_SOCKET_BUS "socket-bus"
+> +struct S390TopologySocket {
+> +    DeviceState parent_obj;
+> +    BusState *bus;
+> +    int socket_id;
+> +    int cnt;
+> +};
+> +typedef struct S390TopologySocket S390TopologySocket;
+> +OBJECT_DECLARE_SIMPLE_TYPE(S390TopologySocket, S390_TOPOLOGY_SOCKET)
+> +#define S390_MAX_SOCKETS 4
+> +
+> +#define TYPE_S390_TOPOLOGY_BOOK "topology book"
+> +#define TYPE_S390_TOPOLOGY_BOOK_BUS "book-bus"
+> +struct S390TopologyBook {
+> +    SysBusDevice parent_obj;
+> +    BusState *bus;
+> +    int book_id;
+> +    int cnt;
+> +};
+> +typedef struct S390TopologyBook S390TopologyBook;
+> +OBJECT_DECLARE_SIMPLE_TYPE(S390TopologyBook, S390_TOPOLOGY_BOOK)
+> +#define S390_MAX_BOOKS 1
+> +
+> +S390TopologyBook *s390_init_topology(void);
+> +
+> +S390TopologyBook *s390_get_topology(void);
+> +void s390_topology_setup(MachineState *ms);
+> +bool s390_topology_new_cpu(MachineState *ms, int core_id, Error **errp);
+> +
+> +#endif
+> diff --git a/target/s390x/cpu.h b/target/s390x/cpu.h
+> index 7d6d01325b..216adfde26 100644
+> --- a/target/s390x/cpu.h
+> +++ b/target/s390x/cpu.h
+
+I think these definitions should be moved to the STSI patch since they're not used in this one.
+
+> @@ -565,6 +565,53 @@ typedef union SysIB {
+>  } SysIB;
+>  QEMU_BUILD_BUG_ON(sizeof(SysIB) != 4096);
+>  
+> +/* CPU type Topology List Entry */
+> +typedef struct SysIBTl_cpu {
+> +        uint8_t nl;
+> +        uint8_t reserved0[3];
+> +        uint8_t reserved1:5;
+> +        uint8_t dedicated:1;
+> +        uint8_t polarity:2;
+> +        uint8_t type;
+> +        uint16_t origin;
+> +        uint64_t mask;
+> +} SysIBTl_cpu;
+> +QEMU_BUILD_BUG_ON(sizeof(SysIBTl_cpu) != 16);
+> +
+> +/* Container type Topology List Entry */
+> +typedef struct SysIBTl_container {
+> +        uint8_t nl;
+> +        uint8_t reserved[6];
+> +        uint8_t id;
+> +} QEMU_PACKED SysIBTl_container;
+> +QEMU_BUILD_BUG_ON(sizeof(SysIBTl_container) != 8);
+> +
+> +/* Generic Topology List Entry */
+> +typedef union SysIBTl_entry {
+> +        uint8_t nl;
+> +        SysIBTl_container container;
+> +        SysIBTl_cpu cpu;
+> +} SysIBTl_entry;
+
+I don't like this union, it's only used in SysIB_151x below and that's misleading,
+because the entries are packed without padding, but the union members have different
+sizes.
+
+> +
+> +#define TOPOLOGY_NR_MAG  6
+> +#define TOPOLOGY_NR_MAG6 0
+> +#define TOPOLOGY_NR_MAG5 1
+> +#define TOPOLOGY_NR_MAG4 2
+> +#define TOPOLOGY_NR_MAG3 3
+> +#define TOPOLOGY_NR_MAG2 4
+> +#define TOPOLOGY_NR_MAG1 5
+> +/* Configuration topology */
+> +typedef struct SysIB_151x {
+> +    uint8_t  res0[2];
+> +    uint16_t length;
+> +    uint8_t  mag[TOPOLOGY_NR_MAG];
+> +    uint8_t  res1;
+> +    uint8_t  mnest;
+> +    uint32_t res2;
+> +    SysIBTl_entry tle[0];
+
+I think this should just be a uint64_t[] or uint64_t[0], whichever is QEMU style.
+> +} SysIB_151x;
+> +QEMU_BUILD_BUG_ON(sizeof(SysIB_151x) != 16);
+> +
+>  /* MMU defines */
+>  #define ASCE_ORIGIN           (~0xfffULL) /* segment table origin             */
+>  #define ASCE_SUBSPACE         0x200       /* subspace group control           */
 
