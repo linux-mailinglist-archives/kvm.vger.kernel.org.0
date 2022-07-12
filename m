@@ -2,142 +2,132 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 5DB60571D34
-	for <lists+kvm@lfdr.de>; Tue, 12 Jul 2022 16:45:44 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id B76F2571D5F
+	for <lists+kvm@lfdr.de>; Tue, 12 Jul 2022 16:54:20 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233698AbiGLOpm (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 12 Jul 2022 10:45:42 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38726 "EHLO
+        id S233542AbiGLOyR (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 12 Jul 2022 10:54:17 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48384 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233703AbiGLOpd (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 12 Jul 2022 10:45:33 -0400
-Received: from mail-lf1-x12b.google.com (mail-lf1-x12b.google.com [IPv6:2a00:1450:4864:20::12b])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B69342D1C9
-        for <kvm@vger.kernel.org>; Tue, 12 Jul 2022 07:45:31 -0700 (PDT)
-Received: by mail-lf1-x12b.google.com with SMTP id t25so14319618lfg.7
-        for <kvm@vger.kernel.org>; Tue, 12 Jul 2022 07:45:31 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc:content-transfer-encoding;
-        bh=Nsh70CDuTz6nymq/Aq/whTzK7x/oeKxt1w/vVgLpJB8=;
-        b=d6kJSkKHZ1XmZiSD2xZ2+ZUO8U6tly4xce6EUsqYoobWB45jyqSqEgyCzbCCSnK1vx
-         duoNKCMJEExeOkEbElM0SuXLpxcnuQQW84rZu30wZblW9sbFxgtST/rBgQGytP7Lmf37
-         8Cfdns9+0C1WZdpQ6AXCL+zsjJWfNri8CxS3opAWhkPsQT0KPGVgz0vbXpqr0F56buuC
-         C8IwZ3efp29FWDR3fB8Jjqj/yD3BjHa4acTwHrupwww1Yhyl4veBtTuaSAOaW04+HG1X
-         NpaXfEwQpcLUAVGl0VE7hAGFlfNn0FHtrHwLC8zXjTG7OH4dw1+YlU95m/mbnRd1XPFE
-         XYvg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc:content-transfer-encoding;
-        bh=Nsh70CDuTz6nymq/Aq/whTzK7x/oeKxt1w/vVgLpJB8=;
-        b=rnf4tjH7wOPvUhJCjx4wteI9QX7oc9krd6VVVaxFhzcqPAI9bqov+CIl9GK46d/Q9t
-         H1e28MEyFJYrcrf3EjByGGd1l2W6AQGRde9h7ImHmfC7NzQD30uZmMBAj5Cm12NSQ3NY
-         HmB9w3rnOt3dZk2GqT08h3IfgCjhaJWxbgdiCU+Q/F0Fdf8L/jpva8qXXgIpq4HpEi8V
-         NKsr0J7O66TjGVGtovvKJVwZo0+t2y3WM58NR9s6mBWAVbMIZBqt9EiWjpJdhq3A2b5A
-         93PGedyFPMTShsJZ+eM0XKDWqmIPaZxXE9BwQfwvmhXbajXJEc0rwxp79JEzujG2T+P9
-         6OEA==
-X-Gm-Message-State: AJIora+3+SXnl8PdYnc/HdwoEIUPxnxr8adBpRKBDJeqWnwnrrWL7wmw
-        MBxynLqH1yTWAnF1c5RAmMRTb5NP5+cpk0RfRG+mjVMJQ/d+HYh9
-X-Google-Smtp-Source: AGRyM1sCO7xey4g490fNvKLe/V6ld5tqO+f24a8WZxnW+d8T1nfbiqvw9BOh9iWoT0SemRpaF2zoauHiFINf2/zLsPo=
-X-Received: by 2002:a05:6512:44c:b0:489:f71a:a34e with SMTP id
- y12-20020a056512044c00b00489f71aa34emr1736044lfk.402.1657637129877; Tue, 12
- Jul 2022 07:45:29 -0700 (PDT)
-MIME-Version: 1.0
-References: <cover.1655761627.git.ashish.kalra@amd.com> <6a513cf79bf71c479dbd72165faf1d804d77b3af.1655761627.git.ashish.kalra@amd.com>
- <CAMkAt6obGwyiJh7J34Vt8tC+XXMNm8YPrv4gV=TVoF2Xga5GjQ@mail.gmail.com> <SN6PR12MB27672AA31E96179256235C338E879@SN6PR12MB2767.namprd12.prod.outlook.com>
-In-Reply-To: <SN6PR12MB27672AA31E96179256235C338E879@SN6PR12MB2767.namprd12.prod.outlook.com>
-From:   Peter Gonda <pgonda@google.com>
-Date:   Tue, 12 Jul 2022 08:45:18 -0600
-Message-ID: <CAMkAt6ryLr6a5iQnwZQT3hqwEpZpb7bn-T8SDY6=5zYs_5NBow@mail.gmail.com>
-Subject: Re: [PATCH Part2 v6 28/49] KVM: SVM: Add KVM_SEV_SNP_LAUNCH_FINISH command
+        with ESMTP id S233812AbiGLOyL (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 12 Jul 2022 10:54:11 -0400
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 56ED620BDD;
+        Tue, 12 Jul 2022 07:54:10 -0700 (PDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id E881460C1A;
+        Tue, 12 Jul 2022 14:54:09 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id C65F4C341C0;
+        Tue, 12 Jul 2022 14:54:08 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1657637649;
+        bh=VkRGH3NNN+HIyw30NEGUMWuNTYMnRNznF6Yoz8xWvHE=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=h60oAnU1aXZaRC7VpVhzHcRhXIV0KfZ9Zm2lzo6YT5TOw0wuZD1nO+KNGFKijNu34
+         lZMJhtnZZrJ70MJD808JKzGh4pRAxRdcL3a0ILc5SyRdisTaoaN366Hej78Ejbb9hU
+         qQhKS8myxFGhQucR5emZKGxqwZouBqiCzh1hvojeRta93T3o+ZLOqYTTNwDbuWGHvN
+         S3zKyxs52kUBo0yn5c18FEEkQbZthkLG59WuRvdr7PYWgFvCS36XTvHf6rkyjxirCj
+         k0YNOyFS/olS3uOxmKphzfuDqxHtU9n41plGVYyb8bHq3C+1p8JS2e/sLZOKzUb4Ym
+         xn26XlW9iX5Lw==
+Date:   Tue, 12 Jul 2022 17:54:05 +0300
+From:   Jarkko Sakkinen <jarkko@kernel.org>
 To:     "Kalra, Ashish" <Ashish.Kalra@amd.com>
-Cc:     "the arch/x86 maintainers" <x86@kernel.org>,
-        LKML <linux-kernel@vger.kernel.org>,
-        kvm list <kvm@vger.kernel.org>,
+Cc:     "x86@kernel.org" <x86@kernel.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
         "linux-coco@lists.linux.dev" <linux-coco@lists.linux.dev>,
-        Linux Memory Management List <linux-mm@kvack.org>,
-        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Joerg Roedel <jroedel@suse.de>,
+        "linux-mm@kvack.org" <linux-mm@kvack.org>,
+        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
+        "tglx@linutronix.de" <tglx@linutronix.de>,
+        "mingo@redhat.com" <mingo@redhat.com>,
+        "jroedel@suse.de" <jroedel@suse.de>,
         "Lendacky, Thomas" <Thomas.Lendacky@amd.com>,
-        "H. Peter Anvin" <hpa@zytor.com>, Ard Biesheuvel <ardb@kernel.org>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Sean Christopherson <seanjc@google.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Jim Mattson <jmattson@google.com>,
-        Andy Lutomirski <luto@kernel.org>,
-        Dave Hansen <dave.hansen@linux.intel.com>,
-        Sergio Lopez <slp@redhat.com>,
-        Peter Zijlstra <peterz@infradead.org>,
-        Srinivas Pandruvada <srinivas.pandruvada@linux.intel.com>,
-        David Rientjes <rientjes@google.com>,
-        Dov Murik <dovmurik@linux.ibm.com>,
-        Tobin Feldman-Fitzthum <tobin@ibm.com>,
-        Borislav Petkov <bp@alien8.de>,
+        "hpa@zytor.com" <hpa@zytor.com>,
+        "ardb@kernel.org" <ardb@kernel.org>,
+        "pbonzini@redhat.com" <pbonzini@redhat.com>,
+        "seanjc@google.com" <seanjc@google.com>,
+        "vkuznets@redhat.com" <vkuznets@redhat.com>,
+        "jmattson@google.com" <jmattson@google.com>,
+        "luto@kernel.org" <luto@kernel.org>,
+        "dave.hansen@linux.intel.com" <dave.hansen@linux.intel.com>,
+        "slp@redhat.com" <slp@redhat.com>,
+        "pgonda@google.com" <pgonda@google.com>,
+        "peterz@infradead.org" <peterz@infradead.org>,
+        "srinivas.pandruvada@linux.intel.com" 
+        <srinivas.pandruvada@linux.intel.com>,
+        "rientjes@google.com" <rientjes@google.com>,
+        "dovmurik@linux.ibm.com" <dovmurik@linux.ibm.com>,
+        "tobin@ibm.com" <tobin@ibm.com>, "bp@alien8.de" <bp@alien8.de>,
         "Roth, Michael" <Michael.Roth@amd.com>,
-        Vlastimil Babka <vbabka@suse.cz>,
-        "Kirill A . Shutemov" <kirill@shutemov.name>,
-        Andi Kleen <ak@linux.intel.com>,
-        Tony Luck <tony.luck@intel.com>, Marc Orr <marcorr@google.com>,
-        Sathyanarayanan Kuppuswamy 
+        "vbabka@suse.cz" <vbabka@suse.cz>,
+        "kirill@shutemov.name" <kirill@shutemov.name>,
+        "ak@linux.intel.com" <ak@linux.intel.com>,
+        "tony.luck@intel.com" <tony.luck@intel.com>,
+        "marcorr@google.com" <marcorr@google.com>,
+        "sathyanarayanan.kuppuswamy@linux.intel.com" 
         <sathyanarayanan.kuppuswamy@linux.intel.com>,
-        Alper Gun <alpergun@google.com>,
-        "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
-        "jarkko@kernel.org" <jarkko@kernel.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-        T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL
-        autolearn=unavailable autolearn_force=no version=3.4.6
+        "alpergun@google.com" <alpergun@google.com>,
+        "dgilbert@redhat.com" <dgilbert@redhat.com>
+Subject: Re: [PATCH Part2 v6 09/49] x86/fault: Add support to handle the RMP
+ fault for user address
+Message-ID: <Ys2LDaKFE9+aoZKr@kernel.org>
+References: <cover.1655761627.git.ashish.kalra@amd.com>
+ <0ecb0a4781be933fcadeb56a85070818ef3566e7.1655761627.git.ashish.kalra@amd.com>
+ <Ys1hrq+vFbxRJbra@kernel.org>
+ <SN6PR12MB27676FD80E6B20D6B8459EC28E869@SN6PR12MB2767.namprd12.prod.outlook.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <SN6PR12MB27676FD80E6B20D6B8459EC28E869@SN6PR12MB2767.namprd12.prod.outlook.com>
+X-Spam-Status: No, score=-7.7 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_HI,
+        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Jul 11, 2022 at 4:41 PM Kalra, Ashish <Ashish.Kalra@amd.com> wrote:
->
+On Tue, Jul 12, 2022 at 02:29:18PM +0000, Kalra, Ashish wrote:
 > [AMD Official Use Only - General]
->
-> Hello Peter,
->
-> >> The KVM_SEV_SNP_LAUNCH_FINISH finalize the cryptographic digest and
-> >> stores it as the measurement of the guest at launch.
-> >>
-> >> While finalizing the launch flow, it also issues the LAUNCH_UPDATE
-> >> command to encrypt the VMSA pages.
->
-> >Given the guest uses the SNP NAE AP boot protocol we were expecting that=
- there would be some option to add vCPUs to the VM but mark them as "pendin=
-g AP boot creation protocol" state. This would allow the LaunchDigest of a =
-VM doesn't change >just because its vCPU count changes. Would it be possibl=
-e to add a new add an argument to KVM_SNP_LAUNCH_FINISH to tell it which vC=
-PUs to LAUNCH_UPDATE VMSA pages for or similarly a new argument for KVM_CRE=
-ATE_VCPU?
->
-> But don't we want/need to measure all vCPUs using LAUNCH_UPDATE_VMSA befo=
-re we issue SNP_LAUNCH_FINISH command ?
->
-> If we are going to add vCPUs and mark them as "pending AP boot creation" =
-state then how are we going to do LAUNCH_UPDATE_VMSAs for them after SNP_LA=
-UNCH_FINISH ?
+> 
+> >> +static int handle_user_rmp_page_fault(struct pt_regs *regs, unsigned long error_code,
+> >> +				      unsigned long address)
+> >> +{
+> >> +	int rmp_level, level;
+> >> +	pte_t *pte;
+> >> +	u64 pfn;
+> >> +
+> >> +	pte = lookup_address_in_mm(current->mm, address, &level);
+> 
+> >As discussed in [1], the lookup should be done in kvm->mm, along the lines of host_pfn_mapping_level().
+> 
+> With lookup_address_in_mm() now removed in 5.19, this is now using
+> lookup_address_in_pgd() though still using non init-mm, and as mentioned
+> here in [1], it makes sense to not use lookup_address_in_pgd() as it does
+> not play nice with userspace mappings, e.g. doesn't disable IRQs to block
+> TLB shootdowns and doesn't use READ_ONCE() to ensure an upper level entry
+> isn't converted to a huge page between checking the PAGE_SIZE bit and
+> grabbing the address of the next level down.
+> 
+> But is KVM going to provide its own variant of lookup_address_in_pgd()
+> that is safe for use with user addresses, i.e., a generic version of
+> lookup_address() on kvm->mm or we need to duplicate page table walking
+> code of host_pfn_mapping_level() ?
 
-If I understand correctly we don't need or even want the APs to be
-LAUNCH_UPDATE_VMSA'd. LAUNCH_UPDATEing all the VMSAs causes VMs with
-different numbers of vCPUs to have different launch digests. Its my
-understanding the SNP AP Creation protocol was to solve this so that
-VMs with different vcpu counts have the same launch digest.
+It's probably cpen coded for the sole reason that there is only one
+call site, i.e. there has not been rational reason to have a helper
+function.
 
-Looking at patch "[Part2,v6,44/49] KVM: SVM: Support SEV-SNP AP
-Creation NAE event" and section "4.1.9 SNP AP Creation" of the GHCB
-spec. There is no need to mark the LAUNCH_UPDATE the AP's VMSA or mark
-the vCPUs runnable. Instead we can do that only for the BSP. Then in
-the guest UEFI the BSP can: create new VMSAs from guest pages,
-RMPADJUST them into the RMP state VMSA, then use the SNP AP Creation
-NAE to get the hypervisor to mark them runnable. I believe this is all
-setup in the UEFI patch:
-https://www.mail-archive.com/devel@edk2.groups.io/msg38460.html.
+Helpers are usually created only in-need basis, and since the need
+comes from this patch set, it should include a patch, which simply
+encapsulates it into a helper.
+
+> 
+> Thanks,
+> Ashish
+
+BR, Jarkko
