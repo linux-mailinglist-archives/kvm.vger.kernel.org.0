@@ -2,182 +2,189 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 1001A5711E9
-	for <lists+kvm@lfdr.de>; Tue, 12 Jul 2022 07:44:17 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id D3F0C571211
+	for <lists+kvm@lfdr.de>; Tue, 12 Jul 2022 08:01:18 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229735AbiGLFoP (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 12 Jul 2022 01:44:15 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54330 "EHLO
+        id S231514AbiGLGBQ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 12 Jul 2022 02:01:16 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36252 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229670AbiGLFoM (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 12 Jul 2022 01:44:12 -0400
-Received: from NAM11-BN8-obe.outbound.protection.outlook.com (mail-bn8nam11on2041.outbound.protection.outlook.com [40.107.236.41])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A26A0186F1;
-        Mon, 11 Jul 2022 22:44:11 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=eIv558AtD5JyBAZzDYbJV7IwLoG6N9gJ6GglHObSTB7T8LEW8rzm2vN7bdltll34sah2IcQlTju3QNOBS8zh+8nTUiZWo95T0inrXEYAjtB6jMpRWYiPtNCGhbriAoxbLaVKJSGuZ5K9m99mOUMiedrB0F7PStAtxHapZR3J5Se74aqkHqGrIExUyOHljRmAWtLzWQ71Iw4bXFncNpMqP1GNGib+jcmIvV3LwnaL5iQrLzIQ1F32r+QyGP5+6XHwnlvEjfkgToRhEKzscBfNjESfCTwEABc9+1s4XKWD1s+7ZLTEv8N9VETkeIaegeNu3scHwgCjsqQCa6Y8FXNf5g==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=cqa7BZiS5fKvQxw5/cc3sdwLicEWAFWev657NrCkfs0=;
- b=nDAOW/sB+xq8GONg2VFp1ksYXClWqAMmMlLfGGwm2B5HXbo/sbJM+D99Qc66MtxufwHO3OgMEP9qBI0+8IdikIlK8vLEd1aZ7HvC/407OCiafa4JVr78vc0CyYeb0Uo3S2CRM8pwsOdHWWejHST/+Cj9Fw3Y+7qKkhiPojBQzTwVYuEFrmn1OotliXlu72n1pfgdlz18X+8WH6sN2nSMGQbYL5JLLHPW9ys29yXp4nsoZ2WHAOfcsCQ0+s947LmHM27IVtIkqFWB+664XpSwl84yRVc01qdp2PEvbi4FcO7ADA3Z1zR36jMm5AScoQaT+teQxuJZJyzhy3zCFV06Mw==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
- dkim=pass header.d=nvidia.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=cqa7BZiS5fKvQxw5/cc3sdwLicEWAFWev657NrCkfs0=;
- b=pMTaRe0gmF6nvM9FPrgG1AhhiHSAWq4K+ZN7BqiQRrkETZ0Y2r5I97h1crP/+EAV3Z8W1nBb0yjdh6rkrkFE312z5P+QsxXPQ1n6n4ZJwEOpQQxMd3ESTBEejRlUge1MU8e87PSY88wf4p85ig9Ec4S1roxrO3iUjKyAsVcSWdI0juhwKBhF+NFjzyhYOzmGQKCPARegsw2Tx1VVbWzzVWnCmEUhv+8d7VS54cc98spl//x9gLwDWLyUoOV7DJiSxYH17D0Yx9cuFHXTjEFIBIWxBWwI2q3y8rA+HLgDJtpCPTNkZuH1YLupjxhY0JcE2V0PBWxOHvKlASOA2G62kA==
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nvidia.com;
-Received: from MN2PR12MB4192.namprd12.prod.outlook.com (2603:10b6:208:1d5::15)
- by DM5PR1201MB2488.namprd12.prod.outlook.com (2603:10b6:3:e1::15) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5417.23; Tue, 12 Jul
- 2022 05:44:09 +0000
-Received: from MN2PR12MB4192.namprd12.prod.outlook.com
- ([fe80::ac35:7c4b:3282:abfb]) by MN2PR12MB4192.namprd12.prod.outlook.com
- ([fe80::ac35:7c4b:3282:abfb%3]) with mapi id 15.20.5417.026; Tue, 12 Jul 2022
- 05:44:09 +0000
-Date:   Tue, 12 Jul 2022 02:44:05 -0300
-From:   Jason Gunthorpe <jgg@nvidia.com>
-To:     Alexey Kardashevskiy <aik@ozlabs.ru>
-Cc:     linuxppc-dev@lists.ozlabs.org, Robin Murphy <robin.murphy@arm.com>,
-        Michael Ellerman <mpe@ellerman.id.au>,
-        Joerg Roedel <jroedel@suse.de>, Joel Stanley <joel@jms.id.au>,
+        with ESMTP id S229515AbiGLGBP (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 12 Jul 2022 02:01:15 -0400
+Received: from mga09.intel.com (mga09.intel.com [134.134.136.24])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 56A8B31DE4;
+        Mon, 11 Jul 2022 23:01:14 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1657605674; x=1689141674;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=niSDj7COpCoIbSKZJ94NOMMTydgv1jKW5ap9HCOE6ds=;
+  b=ScRPWeh6QhuO5JW2FZN8s+9k8g4iycDVm81o7oKcroWOJjz8CV3fs7dB
+   7xva8a2DPvpTIv+pDHvUa+XRUUi5eFMNQQ1ZOqHSxoPlMxRSefjSKUyVs
+   TtELhwTmeS5al12WrCnMCtuwVB5LGZrE2fisVewNNQ7BhMfom/PeHS8po
+   H7qrHXh5trtXBsScUxTU56O+iwyUcJFUmR1Mnb+dEidCm3w4/X6pk1pnC
+   fRMZTEeQUQlesD/IURO037WX/y8KE1K78StKafjmTeill2zTua9jx+Mq7
+   MqVE3RgmXzzaSFk8HGVVs1Etv+IKcua1VFCu13ucCGP3xVYw/wD48+rxg
+   A==;
+X-IronPort-AV: E=McAfee;i="6400,9594,10405"; a="285588889"
+X-IronPort-AV: E=Sophos;i="5.92,264,1650956400"; 
+   d="scan'208";a="285588889"
+Received: from orsmga001.jf.intel.com ([10.7.209.18])
+  by orsmga102.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 11 Jul 2022 23:01:05 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.92,264,1650956400"; 
+   d="scan'208";a="627773540"
+Received: from lkp-server02.sh.intel.com (HELO 8708c84be1ad) ([10.239.97.151])
+  by orsmga001.jf.intel.com with ESMTP; 11 Jul 2022 23:01:01 -0700
+Received: from kbuild by 8708c84be1ad with local (Exim 4.95)
+        (envelope-from <lkp@intel.com>)
+        id 1oB8xB-0001n3-6O;
+        Tue, 12 Jul 2022 06:01:01 +0000
+Date:   Tue, 12 Jul 2022 14:00:40 +0800
+From:   kernel test robot <lkp@intel.com>
+To:     Dan Carpenter <error27@gmail.com>, Jason Gunthorpe <jgg@ziepe.ca>
+Cc:     llvm@lists.linux.dev, kbuild-all@lists.01.org,
+        Yishai Hadas <yishaih@nvidia.com>,
+        Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>,
+        Kevin Tian <kevin.tian@intel.com>,
         Alex Williamson <alex.williamson@redhat.com>,
-        Oliver O'Halloran <oohall@gmail.com>, kvm-ppc@vger.kernel.org,
-        kvm@vger.kernel.org,
-        Daniel Henrique Barboza <danielhb413@gmail.com>,
-        Fabiano Rosas <farosas@linux.ibm.com>,
-        Murilo Opsfelder Araujo <muriloo@linux.ibm.com>,
-        Nicholas Piggin <npiggin@gmail.com>,
-        David Gibson <david@gibson.dropbear.id.au>
-Subject: Re: [PATCH kernel] powerpc/iommu: Add iommu_ops to report
- capabilities and allow blocking domains
-Message-ID: <20220712054405.GA4027@nvidia.com>
-References: <20220707151002.GB1705032@nvidia.com>
- <bb8f4c93-6cbc-0106-d4c1-1f3c0751fbba@ozlabs.ru>
- <bbe29694-66a3-275b-5a79-71237ad7388f@ozlabs.ru>
- <20220708115522.GD1705032@nvidia.com>
- <8329c51a-601e-0d93-41b4-2eb8524c9bcb@ozlabs.ru>
- <Yspx307fxRXT67XG@nvidia.com>
- <861e8bd1-9f04-2323-9b39-d1b46bf99711@ozlabs.ru>
- <64bc8c04-2162-2e4b-6556-03b9dde051e2@ozlabs.ru>
- <YsxwDTBLxyo5W3uQ@nvidia.com>
- <b39583f2-e054-8fc7-430c-d52bf6ed5016@ozlabs.ru>
+        Cornelia Huck <cohuck@redhat.com>,
+        Leon Romanovsky <leon@kernel.org>, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org, kernel-janitors@vger.kernel.org
+Subject: Re: [PATCH] vfio/mlx5: clean up overflow check
+Message-ID: <202207121350.fs2JOFWt-lkp@intel.com>
+References: <YsbzgQQ4bg6v+iTS@kili>
+MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <b39583f2-e054-8fc7-430c-d52bf6ed5016@ozlabs.ru>
-X-ClientProxiedBy: LO6P123CA0039.GBRP123.PROD.OUTLOOK.COM
- (2603:10a6:600:2fe::19) To MN2PR12MB4192.namprd12.prod.outlook.com
- (2603:10b6:208:1d5::15)
-MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: 40be6efc-fbfa-4a1f-d83a-08da63c98a7a
-X-MS-TrafficTypeDiagnostic: DM5PR1201MB2488:EE_
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: NEnkr4gd2HEZER5VTYhUfJvp3WT4WUj/ldJjG5im+eZJL6KBcwCPQJX+gBT+V8UzAd+FpKArq4msJYgGYVso8OMJ04XHjkWA0KP5frYlhBbZ1ldEYUekLt+LThDOQ7twvB+stBSjJbZXnNUOpus/BxoUmYy4ENoE9xSd0Ib7MkXAGmOAPNF//Sq691IJpMIhpDsHA4uxbVgucRN6Ro80em6rjMNMZhJqn/Qf3LHMht5LzDz79rLa9bd1T/hM+2CqTDXFsejZ4DkzuND4h2C6OLwfs3iRUZ7FQxjD6pYBmo/60xLOunbsHC9sMbOrYmPLcmVlXsYQCpwWgQM0COIKik9EkQPxaW+FlrdG0UaSFH7tDZInkoZBpWryOdWP8RLwJpOS8AvXcRdAY7bL4R+lFciFZF+6YuqoTMqwYs4YvSrNKoyqwGEbcswbRt0ddKGqKusVvbeL0Ba50wtOLbV6jvoMtbOptoSDz9EJTu2yiSljE1tCkYbFTyxy5Urr3xNszQ0vMdVWZCLurMHo3HrbDNWqqJrKBPhZLBUvU/CjcVHy+BEZHgx3uRFBIQl3oyAom6V8EzyTn5Wpq7TScftspxB8FbuTgABWJPdE0fNSyvxc8BkceLkhv1bBqd1bMLPICIRfSqhoFiYL2VTNX3GRNLhFnIXjC/s1ZyXu1OvpVfQ3yxQguwcAp0/+t6cq/BxD6x3ADgL3GO+vHEPYZnBNMxqbVvA3MYmip7E9+lcHak8V2R+xCT2iipk2qPPZOJjatHAaiKfbdidhgQ1J+AV/ktFGLLQOfBJ6dHPOsFDIrugl3/RnCspR+fICorUvpInp8J+1EGnREnUlZrU34fcF2Q==
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:MN2PR12MB4192.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230016)(4636009)(346002)(39860400002)(366004)(136003)(396003)(376002)(54906003)(8936002)(2906002)(6512007)(6666004)(86362001)(966005)(6486002)(478600001)(26005)(41300700001)(6506007)(2616005)(53546011)(7416002)(1076003)(33656002)(4326008)(316002)(6916009)(38100700002)(186003)(8676002)(36756003)(83380400001)(5660300002)(66476007)(66946007)(66556008);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?ME1wbRJIvQt4Wh10OlQf0wgW3gUFUWSM7vrtQ6pxqdwhptP76LWMjZyPRPmE?=
- =?us-ascii?Q?vjWPwwn8Dd+NwaqQxm0at+q4enZOUHtOCMY+mRpxbDf1/YYmdgobYo9c01Nm?=
- =?us-ascii?Q?YTjSWJ1LfkqdzrEUfBBWxbp884qggX8A/t2U7ByNzg/w3nY6XcqQ6up4JX2J?=
- =?us-ascii?Q?Kbsb34yCe872l6Y8CsWDP94tNZ4Hy1vFYloz3V7b0akKWzszjGZqjX38D80J?=
- =?us-ascii?Q?nKi7e7SSQbNxKX/f5LUdlSmaTbvCvq7IuUJsFiAm/lxlODes5hD1Mpcac8pD?=
- =?us-ascii?Q?rIof3bC7wu16U3rIH81tGM/zokGDH028ulkbWFApyA6LzN/FoUXZViYwK4bF?=
- =?us-ascii?Q?kgN08rE7w3N8oIS8rspobpBGW1dwH8BfVhRpCY3yY9ID9gfMtbGRSjW/pFyS?=
- =?us-ascii?Q?hzS7jstcI8SHql0IEsFul3HicIFZhBNb+roShzujHDwqmXakE+MNLveuylkY?=
- =?us-ascii?Q?UTVAywFhKSHotPWsILTp5SwJzEqSAlr1wtJNnGSnPs82FNpVQWPaiSCJJTT5?=
- =?us-ascii?Q?7cqyuK91VkUsK5WwFadb129SFWxnQOD7AhsDwj+nTvdHdMZu7QyOM0XVL1tJ?=
- =?us-ascii?Q?R3mpaHQLg/oVKHwtPVn/fG/miw5gLq3wWogC8sUI/Ba/5e64MSa+8G7J0NY6?=
- =?us-ascii?Q?r3vafDG/CbqcUfIiAES/2dSOkS90Ud8VS/IzRwo+o1nsCUqIGyYOwpqWtdxJ?=
- =?us-ascii?Q?lh1Qu92ylKPmAHZ2X3HsL9zkp7tKDXZnistq7sBspVqA/805zKRu+eIKYzJY?=
- =?us-ascii?Q?UAjQakbf1uCMPuFU+XhNb0eJE+xX4eVNzJzMUg4+M7PuiisvSPLFWjEB472x?=
- =?us-ascii?Q?TJWyVTIY6QaZO773cXrKB/fFT/aIfV9hcITjdB5TRq7CMantRNbP5jw7Pzo2?=
- =?us-ascii?Q?vIvZRtazrSursdoeA0yIe/HYhtQRjVzmyCBdg3/W/JbawcUxJOQOw7l5nLb1?=
- =?us-ascii?Q?+YDn5bG3zZ0n8/ptsfppT5Abx/Ct5J7b3xrUvH/uXiQGauhXSdH6hqv5N0uo?=
- =?us-ascii?Q?buZQBuuu0xc9yZE5o7+kAQu0bEyJn7upBpxg85AMsrySngIzAYitIdM5IYNO?=
- =?us-ascii?Q?31jxUhdyfDJkD4S56zZF+J3NXolxlgV4sJ7JAMwvaZygup9PKQozlNfYfx6A?=
- =?us-ascii?Q?hRl/PvRI+fy2j7bF4/awtPRjBq5ObKCVBkp1V2ouj4TG3nrYxg7iR/+JyULk?=
- =?us-ascii?Q?DdAq3HP/lbRf0QvS7OWNag2UWQCO9uF/eVQN5MO5BWe5AOK4ubtLkO74OFEa?=
- =?us-ascii?Q?5r+CG6ZTBlh90r6tFX2Em9by58fHx4S9e3fpD1ybMzK18PY6WNrNX0MQIIbY?=
- =?us-ascii?Q?42CQSdLa4OouIZAMowGQWFLmxh/mU+Bv0lY6zptiCdOTPwE5S/b/ghH7AJMo?=
- =?us-ascii?Q?zocIVxV7RpapuZhk47eDw+fl8HZmYvkkDzXBHNkFsKcQSTpJaZ3IO3N9qqFr?=
- =?us-ascii?Q?v+4owVfVj4pfnEB6nG13nTb/m+Mm7GcKsoxdTvGim8YK2ux4x6gdsCfeXxfO?=
- =?us-ascii?Q?hvpXTRu13lI5esHtf4SC+D7c79skU6efNBqfq3HDiCF3zHES5wTolL6YV73m?=
- =?us-ascii?Q?n/zC0S/ESLWamMgKhgs=3D?=
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 40be6efc-fbfa-4a1f-d83a-08da63c98a7a
-X-MS-Exchange-CrossTenant-AuthSource: MN2PR12MB4192.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 12 Jul 2022 05:44:09.0791
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: XVArzL5p2pgcYcwcGIqiOVBKUYvesKgLXc0c6L/hwipbyo/4l8ZjWUvF0xac2hOm
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM5PR1201MB2488
-X-Spam-Status: No, score=-1.7 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FORGED_SPF_HELO,
-        RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_NONE,
-        T_SCC_BODY_TEXT_LINE autolearn=no autolearn_force=no version=3.4.6
+In-Reply-To: <YsbzgQQ4bg6v+iTS@kili>
+X-Spam-Status: No, score=-5.0 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
+        RCVD_IN_MSPIKE_H3,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE,
+        T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Jul 12, 2022 at 12:27:17PM +1000, Alexey Kardashevskiy wrote:
-> 
-> 
-> On 7/12/22 04:46, Jason Gunthorpe wrote:
-> > On Mon, Jul 11, 2022 at 11:24:32PM +1000, Alexey Kardashevskiy wrote:
-> > 
-> > > I really think that for 5.19 we should really move this blocked domain
-> > > business to Type1 like this:
-> > > 
-> > > https://github.com/aik/linux/commit/96f80c8db03b181398ad355f6f90e574c3ada4bf
-> > 
-> > This creates the same security bug for power we are discussing here. If you
-> 
-> How so? attach_dev() on power makes uninitalizes DMA setup for the group on
-> the hardware level, any other DMA user won't be able to initiate DMA.
+Hi Dan,
 
-We removed all the code from VFIO that prevented dma driver conflicts
-and lowered into the new APIs. You have to use these new APIs or
-there are problems with exclusivity of the group.
+Thank you for the patch! Perhaps something to improve:
 
-The previous code that was allowing power to work safely doesn't exist
-any more, which is why you can't just ignore these apis for
-type2.
+[auto build test WARNING on awilliam-vfio/next]
+[also build test WARNING on rdma/for-next linus/master v5.19-rc6 next-20220711]
+[If your patch is applied to the wrong git tree, kindly drop us a note.
+And when submitting patch, we suggest to use '--base' as documented in
+https://git-scm.com/docs/git-format-patch#_base_tree_information]
 
-They have nothing to do with the vfio 'type', they are all about
-arbitrating who gets to use the group or not and making a safe hand
-off protocol from one group owner to the other. Since power says it
-has groups it must implement the sharing protocol for groups.
+url:    https://github.com/intel-lab-lkp/linux/commits/Dan-Carpenter/vfio-mlx5-clean-up-overflow-check/20220707-225657
+base:   https://github.com/awilliam/linux-vfio.git next
+config: i386-allyesconfig (https://download.01.org/0day-ci/archive/20220712/202207121350.fs2JOFWt-lkp@intel.com/config)
+compiler: clang version 15.0.0 (https://github.com/llvm/llvm-project 6ce63e267aab79ca87bf63453d34dd3909ab978d)
+reproduce (this is a W=1 build):
+        wget https://raw.githubusercontent.com/intel/lkp-tests/master/sbin/make.cross -O ~/bin/make.cross
+        chmod +x ~/bin/make.cross
+        # https://github.com/intel-lab-lkp/linux/commit/44607f8f3817e1af6622db7d70ad5bc457b8f203
+        git remote add linux-review https://github.com/intel-lab-lkp/linux
+        git fetch --no-tags linux-review Dan-Carpenter/vfio-mlx5-clean-up-overflow-check/20220707-225657
+        git checkout 44607f8f3817e1af6622db7d70ad5bc457b8f203
+        # save the config file
+        mkdir build_dir && cp config build_dir/.config
+        COMPILER_INSTALL_PATH=$HOME/0day COMPILER=clang make.cross W=1 O=build_dir ARCH=i386 SHELL=/bin/bash drivers/hid/ drivers/md/ drivers/vfio/pci/mlx5/
 
-> > don't want to fix it then lets just merge this iommu_ops patch as is rather than
-> > mangle the core code.
-> 
-> The core code should not be assuming iommu_ops != NULL, Type1 should, I
-> thought it is the whole point of having Type1, why is not it the case
-> anymore?
+If you fix the issue, kindly add following tag where applicable
+Reported-by: kernel test robot <lkp@intel.com>
 
-Architectures should not be creating iommu groups without providing
-proper iommu subsystem support. The half baked use of the iommu
-subsystem in power is the problem here.
+All warnings (new ones prefixed by >>):
 
-Adding the ops and starting to use the subsystem properly is the
-correct thing to do, even if you can't complete every corner right
-now. At least the issues are limited to arch code and can be fixed by
-arch maintainers.
+>> drivers/vfio/pci/mlx5/main.c:282:6: warning: comparison of distinct pointer types ('typeof (len) *' (aka 'unsigned int *') and 'typeof ((unsigned long)*pos) *' (aka 'unsigned long *')) [-Wcompare-distinct-pointer-types]
+               check_add_overflow(len, (unsigned long)*pos, &requested_length))
+               ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   include/linux/overflow.h:67:15: note: expanded from macro 'check_add_overflow'
+           (void) (&__a == &__b);                  \
+                   ~~~~ ^  ~~~~
+>> drivers/vfio/pci/mlx5/main.c:282:6: warning: comparison of distinct pointer types ('typeof (len) *' (aka 'unsigned int *') and 'typeof (&requested_length)' (aka 'unsigned long *')) [-Wcompare-distinct-pointer-types]
+               check_add_overflow(len, (unsigned long)*pos, &requested_length))
+               ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   include/linux/overflow.h:68:15: note: expanded from macro 'check_add_overflow'
+           (void) (&__a == __d);                   \
+                   ~~~~ ^  ~~~
+   2 warnings generated.
 
-I think the patch you have here is fine to fix vfio on power and it
-should simply be merged for v5.19 and power folks can further work on
-this in the later cycles.
 
-Jason
+vim +282 drivers/vfio/pci/mlx5/main.c
+
+   269	
+   270	static ssize_t mlx5vf_resume_write(struct file *filp, const char __user *buf,
+   271					   size_t len, loff_t *pos)
+   272	{
+   273		struct mlx5_vf_migration_file *migf = filp->private_data;
+   274		unsigned long requested_length;
+   275		ssize_t done = 0;
+   276	
+   277		if (pos)
+   278			return -ESPIPE;
+   279		pos = &filp->f_pos;
+   280	
+   281		if (*pos < 0 || *pos > ULONG_MAX ||
+ > 282		    check_add_overflow(len, (unsigned long)*pos, &requested_length))
+   283			return -EINVAL;
+   284	
+   285		if (requested_length > MAX_MIGRATION_SIZE)
+   286			return -ENOMEM;
+   287	
+   288		mutex_lock(&migf->lock);
+   289		if (migf->disabled) {
+   290			done = -ENODEV;
+   291			goto out_unlock;
+   292		}
+   293	
+   294		if (migf->allocated_length < requested_length) {
+   295			done = mlx5vf_add_migration_pages(
+   296				migf,
+   297				DIV_ROUND_UP(requested_length - migf->allocated_length,
+   298					     PAGE_SIZE));
+   299			if (done)
+   300				goto out_unlock;
+   301		}
+   302	
+   303		while (len) {
+   304			size_t page_offset;
+   305			struct page *page;
+   306			size_t page_len;
+   307			u8 *to_buff;
+   308			int ret;
+   309	
+   310			page_offset = (*pos) % PAGE_SIZE;
+   311			page = mlx5vf_get_migration_page(migf, *pos - page_offset);
+   312			if (!page) {
+   313				if (done == 0)
+   314					done = -EINVAL;
+   315				goto out_unlock;
+   316			}
+   317	
+   318			page_len = min_t(size_t, len, PAGE_SIZE - page_offset);
+   319			to_buff = kmap_local_page(page);
+   320			ret = copy_from_user(to_buff + page_offset, buf, page_len);
+   321			kunmap_local(to_buff);
+   322			if (ret) {
+   323				done = -EFAULT;
+   324				goto out_unlock;
+   325			}
+   326			*pos += page_len;
+   327			len -= page_len;
+   328			done += page_len;
+   329			buf += page_len;
+   330			migf->total_length += page_len;
+   331		}
+   332	out_unlock:
+   333		mutex_unlock(&migf->lock);
+   334		return done;
+   335	}
+   336	
+
+-- 
+0-DAY CI Kernel Test Service
+https://01.org/lkp
