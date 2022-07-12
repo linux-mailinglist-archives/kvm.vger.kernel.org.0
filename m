@@ -2,95 +2,170 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 0A80A571399
-	for <lists+kvm@lfdr.de>; Tue, 12 Jul 2022 09:55:30 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id ED7CC5713EB
+	for <lists+kvm@lfdr.de>; Tue, 12 Jul 2022 10:04:54 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232408AbiGLHz2 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 12 Jul 2022 03:55:28 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57282 "EHLO
+        id S232543AbiGLIEw (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 12 Jul 2022 04:04:52 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37116 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232519AbiGLHzY (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 12 Jul 2022 03:55:24 -0400
-Received: from mail-pf1-x42a.google.com (mail-pf1-x42a.google.com [IPv6:2607:f8b0:4864:20::42a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D95BC9D502;
-        Tue, 12 Jul 2022 00:55:23 -0700 (PDT)
-Received: by mail-pf1-x42a.google.com with SMTP id a15so6800500pfv.13;
-        Tue, 12 Jul 2022 00:55:23 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=jB0/sBewzpAG176RgBmVCEhPfPoNVC+csgcU/c7Q6og=;
-        b=IRoSMJWbprULskG7mdeaOOmkltqpld0mdJe52BBdf4hD/lxcPWweBCqOpxoRSj3Ye1
-         QEkZXSnZLxNnwjWz1F1scbwAMHncxgphl3kngkzvsNIoYOz43RAEfRnB1ajveSdLYi9Y
-         n0Eft1Nm3zNWZyYSqieS/NqwmgWvuPmpd1fMnNEXeBj6yQKxz1ksKZdOZ7hWHF2f+c5X
-         PrQ2VP/MfufZzl0bThMhX0HuRLgYMGgYASqSPG0g3hDbDzLg/7sLV4KhOagh7JcqmsNR
-         sZOtrnTID3W/cL07uzXsUtQ1zwjlTOcs3a6+/Fo/juf7CMA2QdNnUQB1a81FIgI7F4EJ
-         VcIg==
+        with ESMTP id S232531AbiGLIEr (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 12 Jul 2022 04:04:47 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id E9E06DF1C
+        for <kvm@vger.kernel.org>; Tue, 12 Jul 2022 01:04:44 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1657613084;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=Zk3S2xAdR/7hGTN3JMUGrzoWncg4Rn0Aa+mjreKRU3I=;
+        b=GOnGazXFNv5PYDYjT5qn82BELBYNxZbVnTX3qIfldpLEVcUxeH61KwEITRuAuDvFmEJnwE
+        vfFnqgDKMniiwyqm/wqhsSSi2KspnGYJiiG6xW7F05NsZluDX8s517jdFuP5AcO3WUqnUD
+        0E53wAvfZZrVT5gYlZD/nkvJjmiOq30=
+Received: from mail-lj1-f198.google.com (mail-lj1-f198.google.com
+ [209.85.208.198]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-600-S5Xxmon8Pm-xQtCa2bV1fg-1; Tue, 12 Jul 2022 04:04:36 -0400
+X-MC-Unique: S5Xxmon8Pm-xQtCa2bV1fg-1
+Received: by mail-lj1-f198.google.com with SMTP id bj24-20020a2eaa98000000b0025d50c169ccso1252754ljb.9
+        for <kvm@vger.kernel.org>; Tue, 12 Jul 2022 01:04:36 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=jB0/sBewzpAG176RgBmVCEhPfPoNVC+csgcU/c7Q6og=;
-        b=QTva4428mzBOx6gSyZbO3MMkrZK9IcyXevGlrLotfQ8vnjz9m7u22d0boskHT64EQx
-         2TS+PIbDwa7Uycn3IC3ABnKiABykSNjJLDxHyg8x8LLkMxUeqQg4ij3wMQO+Su4eh6+P
-         /veYQpUwNSZq/kvHkRztXj+8kbyVPrC2+4ZIuMgZqMwyzwPkloCEUiUClfMqCNX/Joa/
-         bUCCuxyymce4ZuWatHcs2GyF74yGqUanE2IqyvtjqGZojB6jZNlueFP1G/Ytvcl0/boF
-         6HdWcZyRZpsxVtNYp5VJmluE8oHR5X0j1jn8ozRtVBw+DAdr5UeiVb8TVrQlMhtzQ0lH
-         NTqQ==
-X-Gm-Message-State: AJIora9StDcfj1minMyEmW73D6SnsssHMleWCtdvXZQUrAd1hphkV5AK
-        idAYjuM6T/mfzqrPcvVf5hE=
-X-Google-Smtp-Source: AGRyM1uRJjALwfLCu9+aM4GVOdCC5GDtgrbVABOzNKHa+qPSzzLz0XhgMVRBRkQKUCGnPbRqadoZcA==
-X-Received: by 2002:a05:6a00:2410:b0:528:be6e:8c2e with SMTP id z16-20020a056a00241000b00528be6e8c2emr22496038pfh.31.1657612523274;
-        Tue, 12 Jul 2022 00:55:23 -0700 (PDT)
-Received: from localhost (fmdmzpr02-ext.fm.intel.com. [192.55.54.37])
-        by smtp.gmail.com with ESMTPSA id q5-20020a170902a3c500b00163f8eb7eb3sm6069166plb.196.2022.07.12.00.55.22
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 12 Jul 2022 00:55:22 -0700 (PDT)
-Date:   Tue, 12 Jul 2022 00:55:21 -0700
-From:   Isaku Yamahata <isaku.yamahata@gmail.com>
-To:     Kai Huang <kai.huang@intel.com>
-Cc:     isaku.yamahata@intel.com, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org, isaku.yamahata@gmail.com,
-        Paolo Bonzini <pbonzini@redhat.com>
-Subject: Re: [PATCH v7 029/102] KVM: TDX: allocate/free TDX vcpu structure
-Message-ID: <20220712075521.GI1379820@ls.amr.corp.intel.com>
-References: <cover.1656366337.git.isaku.yamahata@intel.com>
- <dad0333516bcdb0fdeccc9d1483299aeae8d80fd.1656366338.git.isaku.yamahata@intel.com>
- <2ecd255ac85fac7ffa1b90975c9e08f11ddee149.camel@intel.com>
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc:content-transfer-encoding;
+        bh=Zk3S2xAdR/7hGTN3JMUGrzoWncg4Rn0Aa+mjreKRU3I=;
+        b=P6mJ6rZiUK94x8xm2kfN98Qt2GYQx2zLY2UTaPkrN1lFUx2349YxBunqNaxsFlf1tL
+         S229jEwNyYev9bzbMelzaP1dheUOMxrcfwUrs3dI5aGiw63rijo1QXuvt/I57GmitW6P
+         NB7V5gjvf8ubvCPB4Ambf6vyavnzPnVnIDyhDQlfA7L56P8Kqv9n+szEIVGTu67swYqw
+         4pkGsFHlqEXTGgVnuYHoEtNlY0VqBRkBeCtGTUZKm+tutFKbqBMx8SGCMYW+7blZX+IS
+         rfiqjMj9H1L3tFT60nvcboR+/vWGRNBK6TSx4uHClT3tg7DTTSIfE8GSyeuOt/Mpt28+
+         uueA==
+X-Gm-Message-State: AJIora9t21EAF7HypZfGZjXvyp5GM+sSfajso6N5QO6u12TP33M1P4fO
+        Wo6xN8hkZt387QZAujhVTu2ym8E+XWsotT+QXy+FDd68HO5oVAbbmZw9u4TuvLzZ2rtU890JJJR
+        PvGQOTJCtm0am6igIwQrPURaK8GmV
+X-Received: by 2002:a05:6512:3b8e:b0:481:1a75:452 with SMTP id g14-20020a0565123b8e00b004811a750452mr15293730lfv.238.1657613075130;
+        Tue, 12 Jul 2022 01:04:35 -0700 (PDT)
+X-Google-Smtp-Source: AGRyM1vFL+N9RzhXFr/ks5hqi5WjMGbUNrOhsaPrmrfRg/JxZpXDwQSu5M2XKsRZPR3L6Fkftxrqt8icOOXsoZFhCZE=
+X-Received: by 2002:a05:6512:3b8e:b0:481:1a75:452 with SMTP id
+ g14-20020a0565123b8e00b004811a750452mr15293702lfv.238.1657613074923; Tue, 12
+ Jul 2022 01:04:34 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <2ecd255ac85fac7ffa1b90975c9e08f11ddee149.camel@intel.com>
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
-        RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
-        autolearn=ham autolearn_force=no version=3.4.6
+References: <20220623160738.632852-1-eperezma@redhat.com> <20220623160738.632852-2-eperezma@redhat.com>
+ <CACGkMEv+yFLCzo-K7eSaVPJqLCa5SxfVCmB=piQ3+6R3=oDz-w@mail.gmail.com> <CAJaqyWcsesMV5DSs7sCrsJmZX=QED7p7UXa_7H=1UHfQTnKS6w@mail.gmail.com>
+In-Reply-To: <CAJaqyWcsesMV5DSs7sCrsJmZX=QED7p7UXa_7H=1UHfQTnKS6w@mail.gmail.com>
+From:   Jason Wang <jasowang@redhat.com>
+Date:   Tue, 12 Jul 2022 16:04:23 +0800
+Message-ID: <CACGkMEsr=2LjU1-UDV1SF9vJPty2003YKORHZMSr1W-p9eNr+A@mail.gmail.com>
+Subject: Re: [PATCH v6 1/4] vdpa: Add suspend operation
+To:     Eugenio Perez Martin <eperezma@redhat.com>
+Cc:     netdev <netdev@vger.kernel.org>,
+        linux-kernel <linux-kernel@vger.kernel.org>,
+        virtualization <virtualization@lists.linux-foundation.org>,
+        kvm <kvm@vger.kernel.org>, "Michael S. Tsirkin" <mst@redhat.com>,
+        Parav Pandit <parav@nvidia.com>,
+        Christophe JAILLET <christophe.jaillet@wanadoo.fr>,
+        Cindy Lu <lulu@redhat.com>,
+        "Kamde, Tanuj" <tanuj.kamde@amd.com>,
+        Si-Wei Liu <si-wei.liu@oracle.com>,
+        "Uminski, Piotr" <Piotr.Uminski@intel.com>,
+        habetsm.xilinx@gmail.com, "Dawar, Gautam" <gautam.dawar@amd.com>,
+        Pablo Cascon Katchadourian <pabloc@xilinx.com>,
+        Zhu Lingshan <lingshan.zhu@intel.com>,
+        Laurent Vivier <lvivier@redhat.com>,
+        Longpeng <longpeng2@huawei.com>,
+        Dinan Gunawardena <dinang@xilinx.com>,
+        Martin Petrus Hubertus Habets <martinh@xilinx.com>,
+        Martin Porter <martinpo@xilinx.com>,
+        Eli Cohen <elic@nvidia.com>, ecree.xilinx@gmail.com,
+        Wu Zongyong <wuzongyong@linux.alibaba.com>,
+        Stefano Garzarella <sgarzare@redhat.com>,
+        Dan Carpenter <dan.carpenter@oracle.com>,
+        Harpreet Singh Anand <hanand@xilinx.com>,
+        Xie Yongji <xieyongji@bytedance.com>,
+        Zhang Min <zhang.min9@zte.com.cn>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Spam-Status: No, score=-2.7 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=unavailable
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Jun 28, 2022 at 11:34:55PM +1200,
-Kai Huang <kai.huang@intel.com> wrote:
+On Fri, Jul 8, 2022 at 7:31 PM Eugenio Perez Martin <eperezma@redhat.com> w=
+rote:
+>
+> On Wed, Jun 29, 2022 at 6:10 AM Jason Wang <jasowang@redhat.com> wrote:
+> >
+> > On Fri, Jun 24, 2022 at 12:07 AM Eugenio P=C3=A9rez <eperezma@redhat.co=
+m> wrote:
+> > >
+> > > This operation is optional: It it's not implemented, backend feature =
+bit
+> > > will not be exposed.
+> >
+> > A question, do we allow suspending a device without DRIVER_OK?
+> >
+>
+> That should be invalid. In particular, vdpa_sim will resume in that
+> case, but I guess it would depend on the device.
 
-> On Mon, 2022-06-27 at 14:53 -0700, isaku.yamahata@intel.com wrote:
-> > From: Isaku Yamahata <isaku.yamahata@intel.com>
-> > 
-> > The next step of TDX guest creation is to create vcpu.  Allocate TDX vcpu
-> > structures, initialize it.  Allocate pages of TDX vcpu for the TDX module.
-> > 
-> > In the case of the conventional case, cpuid is empty at the initialization.
-> > and cpuid is configured after the vcpu initialization.  Because TDX
-> > supports only X2APIC mode, cpuid is forcibly initialized to support X2APIC
-> > on the vcpu initialization.
-> 
-> The patch title and commit message of this patch are identical to the previous
-> patch.
-> 
-> What happened? Did you forget to squash two patches together?
+Yes, and that will match our virtio spec patch (STOP bit).
 
-Forgot to squash this patch into the previous patch. Will fix it.
--- 
-Isaku Yamahata <isaku.yamahata@gmail.com>
+>
+> Do you think it should be controlled in the vdpa frontend code?
+
+The vdpa bus should validate this at least.
+
+Thanks
+
+>
+> Thanks!
+>
+> > Thanks
+> >
+> > >
+> > > Signed-off-by: Eugenio P=C3=A9rez <eperezma@redhat.com>
+> > > ---
+> > >  include/linux/vdpa.h | 4 ++++
+> > >  1 file changed, 4 insertions(+)
+> > >
+> > > diff --git a/include/linux/vdpa.h b/include/linux/vdpa.h
+> > > index 7b4a13d3bd91..d282f464d2f1 100644
+> > > --- a/include/linux/vdpa.h
+> > > +++ b/include/linux/vdpa.h
+> > > @@ -218,6 +218,9 @@ struct vdpa_map_file {
+> > >   * @reset:                     Reset device
+> > >   *                             @vdev: vdpa device
+> > >   *                             Returns integer: success (0) or error=
+ (< 0)
+> > > + * @suspend:                   Suspend or resume the device (optiona=
+l)
+> > > + *                             @vdev: vdpa device
+> > > + *                             Returns integer: success (0) or error=
+ (< 0)
+> > >   * @get_config_size:           Get the size of the configuration spa=
+ce includes
+> > >   *                             fields that are conditional on featur=
+e bits.
+> > >   *                             @vdev: vdpa device
+> > > @@ -319,6 +322,7 @@ struct vdpa_config_ops {
+> > >         u8 (*get_status)(struct vdpa_device *vdev);
+> > >         void (*set_status)(struct vdpa_device *vdev, u8 status);
+> > >         int (*reset)(struct vdpa_device *vdev);
+> > > +       int (*suspend)(struct vdpa_device *vdev);
+> > >         size_t (*get_config_size)(struct vdpa_device *vdev);
+> > >         void (*get_config)(struct vdpa_device *vdev, unsigned int off=
+set,
+> > >                            void *buf, unsigned int len);
+> > > --
+> > > 2.31.1
+> > >
+> >
+>
+
