@@ -2,386 +2,321 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 72B505714BD
-	for <lists+kvm@lfdr.de>; Tue, 12 Jul 2022 10:37:34 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 6EB7C57150A
+	for <lists+kvm@lfdr.de>; Tue, 12 Jul 2022 10:48:09 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232271AbiGLIha (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 12 Jul 2022 04:37:30 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39060 "EHLO
+        id S232552AbiGLIsH (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 12 Jul 2022 04:48:07 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48934 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229559AbiGLIh3 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 12 Jul 2022 04:37:29 -0400
-Received: from smtp-fw-9103.amazon.com (smtp-fw-9103.amazon.com [207.171.188.200])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 220505071A;
-        Tue, 12 Jul 2022 01:37:28 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-  d=amazon.co.uk; i=@amazon.co.uk; q=dns/txt;
-  s=amazon201209; t=1657615047; x=1689151047;
-  h=from:to:cc:date:message-id:references:in-reply-to:
-   content-transfer-encoding:mime-version:subject;
-  bh=56fb1kGCypchDcbHSpub023hR1OiGEKMXvxgJ3v2G1M=;
-  b=m6r8ikRmXmVDdYQtriq7VpH6IrKoD6NeUqp2ic91xfbcPE9yRofzGh6e
-   1sfQuGrbTm5QaAN/lIyr1CR7p894TrYVHh2MZTqH+GmwEfZAgBfvNAJJB
-   0Hq13FQZ7Hg40P9LXiVa6Lt0GsalDUOCq7LzuYrPEBSgZE3qNSzQzlkwm
-   8=;
-X-IronPort-AV: E=Sophos;i="5.92,265,1650931200"; 
-   d="scan'208";a="1033119265"
-Subject: RE: [PATCH v5] KVM: x86/xen: Update Xen CPUID Leaf 4 (tsc info) sub-leaves,
- if present
-Thread-Topic: [PATCH v5] KVM: x86/xen: Update Xen CPUID Leaf 4 (tsc info) sub-leaves,
- if present
-Received: from pdx4-co-svc-p1-lb2-vlan3.amazon.com (HELO email-inbound-relay-pdx-2a-11a39b7d.us-west-2.amazon.com) ([10.25.36.214])
-  by smtp-border-fw-9103.sea19.amazon.com with ESMTP; 12 Jul 2022 08:37:10 +0000
-Received: from EX13D32EUC002.ant.amazon.com (pdx1-ws-svc-p6-lb9-vlan3.pdx.amazon.com [10.236.137.198])
-        by email-inbound-relay-pdx-2a-11a39b7d.us-west-2.amazon.com (Postfix) with ESMTPS id 6D21A42D31;
-        Tue, 12 Jul 2022 08:37:10 +0000 (UTC)
-Received: from EX13D32EUC003.ant.amazon.com (10.43.164.24) by
- EX13D32EUC002.ant.amazon.com (10.43.164.94) with Microsoft SMTP Server (TLS)
- id 15.0.1497.36; Tue, 12 Jul 2022 08:37:09 +0000
-Received: from EX13D32EUC003.ant.amazon.com ([10.43.164.24]) by
- EX13D32EUC003.ant.amazon.com ([10.43.164.24]) with mapi id 15.00.1497.036;
- Tue, 12 Jul 2022 08:37:09 +0000
-From:   "Durrant, Paul" <pdurrant@amazon.co.uk>
-To:     Sean Christopherson <seanjc@google.com>
-CC:     "x86@kernel.org" <x86@kernel.org>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        David Woodhouse <dwmw2@infradead.org>,
-        "Paolo Bonzini" <pbonzini@redhat.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        "Joerg Roedel" <joro@8bytes.org>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        Dave Hansen <dave.hansen@linux.intel.com>,
-        "H. Peter Anvin" <hpa@zytor.com>
-Thread-Index: AQHYlXfZ7mCZjdwoh0Oy8SwBeicg4K16ZByA
-Date:   Tue, 12 Jul 2022 08:37:09 +0000
-Message-ID: <369c3e9e02f947e2a2b0c093cbddc99c@EX13D32EUC003.ant.amazon.com>
-References: <20220629130514.15780-1-pdurrant@amazon.com>
- <YsynoyUb4zrMBhRU@google.com>
-In-Reply-To: <YsynoyUb4zrMBhRU@google.com>
-Accept-Language: en-GB, en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-x-ms-exchange-transport-fromentityheader: Hosted
-x-originating-ip: [10.43.165.192]
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+        with ESMTP id S231847AbiGLIsC (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 12 Jul 2022 04:48:02 -0400
+Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3B782A7D55;
+        Tue, 12 Jul 2022 01:48:00 -0700 (PDT)
+Received: from pps.filterd (m0098396.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.17.1.5/8.17.1.5) with ESMTP id 26C8gEuY009153;
+        Tue, 12 Jul 2022 08:48:00 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
+ mime-version : subject : to : cc : references : from : in-reply-to :
+ content-type : content-transfer-encoding; s=pp1;
+ bh=JQb6QhvjEkSpcAlK74e2eCcFVu/xgzyf3jRwv6C1T7Y=;
+ b=WOtDfxBgKHvpP32ffXqLsmyqs0+aKBmaTH/Ri2B32PFxbFE7r0S7EQmZi0A20P0ZyQzG
+ omd1PEdnu6hH09UEnjFYqBZQuHsOPVGw1uxGQUmATGdsXmJV4P2lYgpjP0cbQvs3n6Pb
+ BUr3e8Md/lbjP31d/XYeW1HBFaf9PeI4JmffGQR7ndDXztKAYQgJ8OjIaROrpbzoi3nJ
+ VNOE2gIp8RL2bYoKGqp36qdKGExupW5+pCAsuT1WmbB5Z/TMgVth+kebCEsHhALW6dsI
+ XiWn6cnMsZ13OZeXK95bVH2uAd0z8B+PxmzYsixi5VfUO12BYqUVSbNlYVx+bC93qNy5 xg== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3h95nyr46k-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Tue, 12 Jul 2022 08:48:00 +0000
+Received: from m0098396.ppops.net (m0098396.ppops.net [127.0.0.1])
+        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 26C8gP2B009793;
+        Tue, 12 Jul 2022 08:47:58 GMT
+Received: from ppma05fra.de.ibm.com (6c.4a.5195.ip4.static.sl-reverse.com [149.81.74.108])
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3h95nyr45r-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Tue, 12 Jul 2022 08:47:58 +0000
+Received: from pps.filterd (ppma05fra.de.ibm.com [127.0.0.1])
+        by ppma05fra.de.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 26C8LfIB005353;
+        Tue, 12 Jul 2022 08:47:56 GMT
+Received: from b06cxnps3074.portsmouth.uk.ibm.com (d06relay09.portsmouth.uk.ibm.com [9.149.109.194])
+        by ppma05fra.de.ibm.com with ESMTP id 3h71a8twnu-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Tue, 12 Jul 2022 08:47:56 +0000
+Received: from d06av24.portsmouth.uk.ibm.com (d06av24.portsmouth.uk.ibm.com [9.149.105.60])
+        by b06cxnps3074.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 26C8lrPR14025196
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Tue, 12 Jul 2022 08:47:53 GMT
+Received: from d06av24.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id F39004203F;
+        Tue, 12 Jul 2022 08:47:52 +0000 (GMT)
+Received: from d06av24.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 47F7142041;
+        Tue, 12 Jul 2022 08:47:52 +0000 (GMT)
+Received: from [9.171.80.212] (unknown [9.171.80.212])
+        by d06av24.portsmouth.uk.ibm.com (Postfix) with ESMTP;
+        Tue, 12 Jul 2022 08:47:52 +0000 (GMT)
+Message-ID: <87c5514b-4971-b283-912c-573ab1b4d636@linux.ibm.com>
+Date:   Tue, 12 Jul 2022 10:47:51 +0200
 MIME-Version: 1.0
-X-Spam-Status: No, score=-12.5 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
-        RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,
-        USER_IN_DEF_SPF_WL autolearn=ham autolearn_force=no version=3.4.6
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.10.0
+Subject: Re: [PATCH v12 3/3] KVM: s390: resetting the Topology-Change-Report
+Content-Language: en-US
+To:     Pierre Morel <pmorel@linux.ibm.com>, kvm@vger.kernel.org
+Cc:     linux-s390@vger.kernel.org, linux-kernel@vger.kernel.org,
+        borntraeger@de.ibm.com, frankja@linux.ibm.com, cohuck@redhat.com,
+        david@redhat.com, thuth@redhat.com, imbrenda@linux.ibm.com,
+        hca@linux.ibm.com, gor@linux.ibm.com, wintera@linux.ibm.com,
+        seiden@linux.ibm.com, nrb@linux.ibm.com
+References: <20220711084148.25017-1-pmorel@linux.ibm.com>
+ <20220711084148.25017-4-pmorel@linux.ibm.com>
+ <58016efc-9053-b743-05d6-4ace4dcdc2a8@linux.ibm.com>
+ <a268d8b7-bbd8-089d-896c-e4e3e4167e46@linux.ibm.com>
+From:   Janis Schoetterl-Glausch <scgl@linux.ibm.com>
+In-Reply-To: <a268d8b7-bbd8-089d-896c-e4e3e4167e46@linux.ibm.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: 4Unvko8qoHDKevA7KGznd6TevaYevcuf
+X-Proofpoint-ORIG-GUID: Q2faS6ljWJDqAK0ufFOAC8tjReIgcgBM
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.205,Aquarius:18.0.883,Hydra:6.0.517,FMLib:17.11.122.1
+ definitions=2022-07-12_05,2022-07-08_01,2022-06-22_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 lowpriorityscore=0
+ spamscore=0 clxscore=1015 phishscore=0 mlxscore=0 mlxlogscore=999
+ impostorscore=0 adultscore=0 malwarescore=0 bulkscore=0 priorityscore=1501
+ suspectscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2206140000 definitions=main-2207120033
+X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,
+        SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no
+        version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-> -----Original Message-----
-> From: Sean Christopherson <seanjc@google.com>
-> Sent: 12 July 2022 00:44
-> To: Durrant, Paul <pdurrant@amazon.co.uk>
-> Cc: x86@kernel.org; kvm@vger.kernel.org; linux-kernel@vger.kernel.org; Da=
-vid Woodhouse
-> <dwmw2@infradead.org>; Paolo Bonzini <pbonzini@redhat.com>; Vitaly Kuznet=
-sov <vkuznets@redhat.com>;
-> Wanpeng Li <wanpengli@tencent.com>; Jim Mattson <jmattson@google.com>; Jo=
-erg Roedel <joro@8bytes.org>;
-> Thomas Gleixner <tglx@linutronix.de>; Ingo Molnar <mingo@redhat.com>; Bor=
-islav Petkov <bp@alien8.de>;
-> Dave Hansen <dave.hansen@linux.intel.com>; H. Peter Anvin <hpa@zytor.com>
-> Subject: RE: [EXTERNAL][PATCH v5] KVM: x86/xen: Update Xen CPUID Leaf 4 (=
-tsc info) sub-leaves, if
-> present
->=20
-> CAUTION: This email originated from outside of the organization. Do not c=
-lick links or open
-> attachments unless you can confirm the sender and know the content is saf=
-e.
->=20
->=20
->=20
-> On Wed, Jun 29, 2022, Paul Durrant wrote:
-> > diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm=
-_host.h
-> > index 88a3026ee163..abb0a39f60eb 100644
-> > --- a/arch/x86/include/asm/kvm_host.h
-> > +++ b/arch/x86/include/asm/kvm_host.h
-> > @@ -638,6 +638,7 @@ struct kvm_vcpu_xen {
-> >       struct hrtimer timer;
-> >       int poll_evtchn;
-> >       struct timer_list poll_timer;
-> > +     u32 cpuid_tsc_info;
->=20
-> I would prefer to follow vcpu->arch.kvm_cpuid_base and capture the base C=
-PUID
-> function.  I have a hard time believing this will be the only case where =
-KVM needs
-> to query XEN CPUID leafs.  And cpuid_tsc_info is a confusing name given t=
-he helper
-> kvm_xen_setup_tsc_info(); it's odd to see a "setup" helper immediately co=
-nsume a
-> variable with the same name.
+On 7/12/22 09:24, Pierre Morel wrote:
+> 
+> 
+> On 7/11/22 15:22, Janis Schoetterl-Glausch wrote:
+>> On 7/11/22 10:41, Pierre Morel wrote:
+>>> During a subsystem reset the Topology-Change-Report is cleared.
+>>>
+>>> Let's give userland the possibility to clear the MTCR in the case
+>>> of a subsystem reset.
+>>>
+>>> To migrate the MTCR, we give userland the possibility to
+>>> query the MTCR state.
+>>>
+>>> We indicate KVM support for the CPU topology facility with a new
+>>> KVM capability: KVM_CAP_S390_CPU_TOPOLOGY.
+>>>
+>>> Signed-off-by: Pierre Morel <pmorel@linux.ibm.com>
+>>
+>> Reviewed-by: Janis Schoetterl-Glausch <scgl@linux.ibm.com>
+>>
+> 
+> Thanks!
+> 
+>> See nits/comments below.
+>>
+>>> ---
+>>>   Documentation/virt/kvm/api.rst   | 25 ++++++++++++++
+>>>   arch/s390/include/uapi/asm/kvm.h |  1 +
+>>>   arch/s390/kvm/kvm-s390.c         | 56 ++++++++++++++++++++++++++++++++
+>>>   include/uapi/linux/kvm.h         |  1 +
+>>>   4 files changed, 83 insertions(+)
+>>>
+>>> diff --git a/Documentation/virt/kvm/api.rst b/Documentation/virt/kvm/api.rst
+>>> index 11e00a46c610..5e086125d8ad 100644
+>>> --- a/Documentation/virt/kvm/api.rst
+>>> +++ b/Documentation/virt/kvm/api.rst
+>>> @@ -7956,6 +7956,31 @@ should adjust CPUID leaf 0xA to reflect that the PMU is disabled.
+>>>   When enabled, KVM will exit to userspace with KVM_EXIT_SYSTEM_EVENT of
+>>>   type KVM_SYSTEM_EVENT_SUSPEND to process the guest suspend request.
+>>>   +8.37 KVM_CAP_S390_CPU_TOPOLOGY
+>>> +------------------------------
+>>> +
+>>> +:Capability: KVM_CAP_S390_CPU_TOPOLOGY
+>>> +:Architectures: s390
+>>> +:Type: vm
+>>> +
+>>> +This capability indicates that KVM will provide the S390 CPU Topology
+>>> +facility which consist of the interpretation of the PTF instruction for
+>>> +the function code 2 along with interception and forwarding of both the
+>>> +PTF instruction with function codes 0 or 1 and the STSI(15,1,x)
+>>
+>> Is the architecture allowed to extend STSI without a facility?
+>> If so, if we say here that STSI 15.1.x is passed to user space, then
+>> I think we should have a
+>>
+>> if (sel1 != 1)
+>>     goto out_no_data;
+>>
+>> or maybe even
+>>
+>> if (sel1 != 1 || sel2 < 2 || sel2 > 6)
+>>     goto out_no_data;
+>>
+>> in priv.c
+> 
+> I am not a big fan of doing everything in the kernel.
+> Here we have no performance issue since it is an error of the guest if it sends a wrong selector.
+> 
+I agree, but I didn't suggest it for performance reasons.
+I was thinking about future proofing, that is if the architecture is extended.
+We don't know if future extensions are best handled in the kernel or user space,
+so if we prevent it from going to user space, we can defer the decision to when we know more.
+But that's only relevant if STSI can be extended without a capability, which is why I asked about that.
 
-Sure. It is rather shrink-to-fit at the moment... no problem with capturing=
- the base.
+> Even testing the facility or PV in the kernel is for my opinion arguable in the case we do not do any treatment in the kernel.
+> 
+> I do not see what it brings to us, it increase the LOCs and makes the implementation less easy to evolve.
+> 
+> 
+>>
+>>> +instruction to the userland hypervisor.
+>>> +
+>>> +The stfle facility 11, CPU Topology facility, should not be indicated
+>>> +to the guest without this capability.
+>>> +
+>>> +When this capability is present, KVM provides a new attribute group
+>>> +on vm fd, KVM_S390_VM_CPU_TOPOLOGY.
+>>> +This new attribute allows to get, set or clear the Modified Change
+>>
+>> get or set, now that there is no explicit clear anymore.
+> 
+> Yes now it is a set to 0 but the action of clearing remains.
+> 
+>>
+>>> +Topology Report (MTCR) bit of the SCA through the kvm_device_attr
+>>> +structure.> +
+>>> +When getting the Modified Change Topology Report value, the attr->addr
+>>
+>> When getting/setting the...
+>>
+>>> +must point to a byte where the value will be stored.
+>>
+>> ... will be stored/retrieved from.
+> 
+> OK
 
->=20
-> It'll incur another CPUID lookup in the update path to check the limit, b=
-ut again
-> that should be a rare operation so it doesn't seem too onerous.
->=20
+Wait no, I didn't get how that works. You're passing the value via attr->attr, not reading it from addr.
+> 
+> 
+>>> +
+>>>   9. Known KVM API problems
+>>>   =========================
+>>>   diff --git a/arch/s390/include/uapi/asm/kvm.h b/arch/s390/include/uapi/asm/kvm.h
+>>> index 7a6b14874d65..a73cf01a1606 100644
+>>> --- a/arch/s390/include/uapi/asm/kvm.h
+>>> +++ b/arch/s390/include/uapi/asm/kvm.h
+>>> @@ -74,6 +74,7 @@ struct kvm_s390_io_adapter_req {
+>>>   #define KVM_S390_VM_CRYPTO        2
+>>>   #define KVM_S390_VM_CPU_MODEL        3
+>>>   #define KVM_S390_VM_MIGRATION        4
+>>> +#define KVM_S390_VM_CPU_TOPOLOGY    5
+>>>     /* kvm attributes for mem_ctrl */
+>>>   #define KVM_S390_VM_MEM_ENABLE_CMMA    0
+>>> diff --git a/arch/s390/kvm/kvm-s390.c b/arch/s390/kvm/kvm-s390.c
+>>> index 70436bfff53a..b18e0b940b26 100644
+>>> --- a/arch/s390/kvm/kvm-s390.c
+>>> +++ b/arch/s390/kvm/kvm-s390.c
+>>> @@ -606,6 +606,9 @@ int kvm_vm_ioctl_check_extension(struct kvm *kvm, long ext)
+>>>       case KVM_CAP_S390_PROTECTED:
+>>>           r = is_prot_virt_host();
+>>>           break;
+>>> +    case KVM_CAP_S390_CPU_TOPOLOGY:
+>>> +        r = test_facility(11);
+>>> +        break;
+>>>       default:
+>>>           r = 0;
+>>>       }
+>>> @@ -817,6 +820,20 @@ int kvm_vm_ioctl_enable_cap(struct kvm *kvm, struct kvm_enable_cap *cap)
+>>>           icpt_operexc_on_all_vcpus(kvm);
+>>>           r = 0;
+>>>           break;
+>>> +    case KVM_CAP_S390_CPU_TOPOLOGY:
+>>> +        r = -EINVAL;
+>>> +        mutex_lock(&kvm->lock);
+>>> +        if (kvm->created_vcpus) {
+>>> +            r = -EBUSY;
+>>> +        } else if (test_facility(11)) {
+>>> +            set_kvm_facility(kvm->arch.model.fac_mask, 11);
+>>> +            set_kvm_facility(kvm->arch.model.fac_list, 11);
+>>> +            r = 0;
+>>> +        }
+>>> +        mutex_unlock(&kvm->lock);
+>>> +        VM_EVENT(kvm, 3, "ENABLE: CAP_S390_CPU_TOPOLOGY %s",
+>>> +             r ? "(not available)" : "(success)");
+>>> +        break;
+>>>       default:
+>>>           r = -EINVAL;
+>>>           break;
+>>> @@ -1717,6 +1734,36 @@ static void kvm_s390_update_topology_change_report(struct kvm *kvm, bool val)
+>>>       read_unlock(&kvm->arch.sca_lock);
+>>>   }
+>>>   +static int kvm_s390_set_topology(struct kvm *kvm, struct kvm_device_attr *attr)
+>>
+>> kvm_s390_set_topology_changed maybe?
+>> kvm_s390_get_topology_changed below then.
+> 
 
-We could capture the limit leaf in the general case. It's not Xen-specific =
-after all.
+I won't insist on it, but I do think it's more readable.
 
-> > diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-> > index 031678eff28e..29ed665c51db 100644
-> > --- a/arch/x86/kvm/x86.c
-> > +++ b/arch/x86/kvm/x86.c
-> > @@ -3110,6 +3110,7 @@ static int kvm_guest_time_update(struct kvm_vcpu =
-*v)
-> >                                  &vcpu->hv_clock.tsc_shift,
-> >                                  &vcpu->hv_clock.tsc_to_system_mul);
-> >               vcpu->hw_tsc_khz =3D tgt_tsc_khz;
-> > +             kvm_xen_setup_tsc_info(v);
->=20
-> Any objection to s/setup/update?  KVM Xen uses "setup" for things like co=
-nfiguring
-> the event channel using userspace input, whereas this is purely updating =
-existing
-> data structures.
->=20
-
-Sure.
-
-> >       }
-> >
-> >       vcpu->hv_clock.tsc_timestamp =3D tsc_timestamp;
-> > diff --git a/arch/x86/kvm/xen.c b/arch/x86/kvm/xen.c
-> > index 610beba35907..c84424d5c8b6 100644
-> > --- a/arch/x86/kvm/xen.c
-> > +++ b/arch/x86/kvm/xen.c
-> > @@ -10,6 +10,9 @@
-> >  #include "xen.h"
-> >  #include "hyperv.h"
-> >  #include "lapic.h"
-> > +#include "cpuid.h"
-> > +
-> > +#include <asm/xen/cpuid.h>
-> >
-> >  #include <linux/eventfd.h>
-> >  #include <linux/kvm_host.h>
-> > @@ -1855,3 +1858,51 @@ void kvm_xen_destroy_vm(struct kvm *kvm)
-> >       if (kvm->arch.xen_hvm_config.msr)
-> >               static_branch_slow_dec_deferred(&kvm_xen_enabled);
-> >  }
-> > +
-> > +void kvm_xen_after_set_cpuid(struct kvm_vcpu *vcpu)
-> > +{
-> > +     u32 base =3D 0;
-> > +     u32 limit;
-> > +     u32 function;
-> > +
-> > +     vcpu->arch.xen.cpuid_tsc_info =3D 0;
-> > +
-> > +     for_each_possible_hypervisor_cpuid_base(function) {
-> > +             struct kvm_cpuid_entry2 *entry =3D kvm_find_cpuid_entry(v=
-cpu, function, 0);
-> > +
-> > +             if (entry &&
-> > +                 entry->ebx =3D=3D XEN_CPUID_SIGNATURE_EBX &&
-> > +                 entry->ecx =3D=3D XEN_CPUID_SIGNATURE_ECX &&
-> > +                 entry->edx =3D=3D XEN_CPUID_SIGNATURE_EDX) {
-> > +                     base =3D function;
-> > +                     limit =3D entry->eax;
-> > +                     break;
-> > +             }
-> > +     }
-> > +     if (!base)
-> > +             return;
->=20
-> Rather than open code a variant of kvm_update_kvm_cpuid_base(), that help=
-er can
-> be tweaked to take a signature.  Along with a patch to provide a #define =
-for Xen's
-> signature as a string, this entire function becomes a one-liner.
->=20
-
-Sure, but as said above, we could make capturing the limit part of the gene=
-ral function too. It could even be extended to capture the Hyper-V base/lim=
-it too.
-As for defining the sig as a string... I guess it would be neater to use th=
-e values from the Xen header, but it'll probably make the code more ugly so=
- a secondary definition is reasonable.
-
-> If the below looks ok (won't compile, needs prep patches), I'll test and =
-post a
-> proper mini-series.
-
-Ok. Thanks,
-
-  Paul
-
->=20
-> ---
->  arch/x86/include/asm/kvm_host.h |  1 +
->  arch/x86/kvm/cpuid.c            |  2 ++
->  arch/x86/kvm/x86.c              |  1 +
->  arch/x86/kvm/xen.c              | 30 ++++++++++++++++++++++++++++++
->  arch/x86/kvm/xen.h              | 22 +++++++++++++++++++++-
->  5 files changed, 55 insertions(+), 1 deletion(-)
->=20
-> diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_h=
-ost.h
-> index de5a149d0971..b2565d05fc86 100644
-> --- a/arch/x86/include/asm/kvm_host.h
-> +++ b/arch/x86/include/asm/kvm_host.h
-> @@ -638,6 +638,7 @@ struct kvm_vcpu_xen {
->         struct hrtimer timer;
->         int poll_evtchn;
->         struct timer_list poll_timer;
-> +       u32 cpuid_base;
->  };
->=20
->  struct kvm_vcpu_arch {
-> diff --git a/arch/x86/kvm/cpuid.c b/arch/x86/kvm/cpuid.c
-> index 0abe3adc9ae3..54ed51799b8d 100644
-> --- a/arch/x86/kvm/cpuid.c
-> +++ b/arch/x86/kvm/cpuid.c
-> @@ -25,6 +25,7 @@
->  #include "mmu.h"
->  #include "trace.h"
->  #include "pmu.h"
-> +#include "xen.h"
->=20
->  /*
->   * Unlike "struct cpuinfo_x86.x86_capability", kvm_cpu_caps doesn't need=
- to be
-> @@ -309,6 +310,7 @@ static void kvm_vcpu_after_set_cpuid(struct kvm_vcpu =
-*vcpu)
->             __cr4_reserved_bits(guest_cpuid_has, vcpu);
->=20
->         kvm_hv_set_cpuid(vcpu);
-> +       kvm_xen_after_set_cpuid(vcpu);
->=20
->         /* Invoke the vendor callback only after the above state is updat=
-ed. */
->         static_call(kvm_x86_vcpu_after_set_cpuid)(vcpu);
-> diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-> index 567d13405445..a624293c66c8 100644
-> --- a/arch/x86/kvm/x86.c
-> +++ b/arch/x86/kvm/x86.c
-> @@ -3110,6 +3110,7 @@ static int kvm_guest_time_update(struct kvm_vcpu *v=
-)
->                                    &vcpu->hv_clock.tsc_shift,
->                                    &vcpu->hv_clock.tsc_to_system_mul);
->                 vcpu->hw_tsc_khz =3D tgt_tsc_khz;
-> +               kvm_xen_update_tsc_info(v);
->         }
->=20
->         vcpu->hv_clock.tsc_timestamp =3D tsc_timestamp;
-> diff --git a/arch/x86/kvm/xen.c b/arch/x86/kvm/xen.c
-> index 610beba35907..3fc0c194b813 100644
-> --- a/arch/x86/kvm/xen.c
-> +++ b/arch/x86/kvm/xen.c
-> @@ -10,6 +10,9 @@
->  #include "xen.h"
->  #include "hyperv.h"
->  #include "lapic.h"
-> +#include "cpuid.h"
-> +
-> +#include <asm/xen/cpuid.h>
->=20
->  #include <linux/eventfd.h>
->  #include <linux/kvm_host.h>
-> @@ -1855,3 +1858,30 @@ void kvm_xen_destroy_vm(struct kvm *kvm)
->         if (kvm->arch.xen_hvm_config.msr)
->                 static_branch_slow_dec_deferred(&kvm_xen_enabled);
->  }
-> +
-> +void kvm_xen_update_tsc_info(struct kvm_vcpu *vcpu)
-> +{
-> +       struct kvm_cpuid_entry2 *entry;
-> +       u32 function;
-> +
-> +       if (!vcpu->arch.xen.cpuid_base)
-> +               return;
-> +
-> +       entry =3D kvm_find_cpuid_entry(vcpu, vcpu->arch.xen.cpuid_base, 0=
-);
-> +       if (WARN_ON_ONCE(!entry))
-> +               return;
-> +
-> +       function =3D vcpu->arch.xen.cpuid_base | XEN_CPUID_LEAF(3);
-> +       if (function > entry->eax)
-> +               return;
-> +
-> +       entry =3D kvm_find_cpuid_entry(vcpu, function, 1);
-> +       if (entry) {
-> +               entry->ecx =3D vcpu->arch.hv_clock.tsc_to_system_mul;
-> +               entry->edx =3D vcpu->arch.hv_clock.tsc_shift;
-> +       }
-> +
-> +       entry =3D kvm_find_cpuid_entry(vcpu, function, 2);
-> +       if (entry)
-> +               entry->eax =3D vcpu->arch.hw_tsc_khz;
-> +}
-> diff --git a/arch/x86/kvm/xen.h b/arch/x86/kvm/xen.h
-> index 532a535a9e99..b8161b99b82a 100644
-> --- a/arch/x86/kvm/xen.h
-> +++ b/arch/x86/kvm/xen.h
-> @@ -9,9 +9,14 @@
->  #ifndef __ARCH_X86_KVM_XEN_H__
->  #define __ARCH_X86_KVM_XEN_H__
->=20
-> -#ifdef CONFIG_KVM_XEN
->  #include <linux/jump_label_ratelimit.h>
->=20
-> +#include <asm/xen/cpuid.h>
-> +
-> +#include "cpuid.h"
-> +
-> +#ifdef CONFIG_KVM_XEN
-> +
->  extern struct static_key_false_deferred kvm_xen_enabled;
->=20
->  int __kvm_xen_has_interrupt(struct kvm_vcpu *vcpu);
-> @@ -32,6 +37,13 @@ int kvm_xen_set_evtchn_fast(struct kvm_xen_evtchn *xe,
->  int kvm_xen_setup_evtchn(struct kvm *kvm,
->                          struct kvm_kernel_irq_routing_entry *e,
->                          const struct kvm_irq_routing_entry *ue);
-> +void kvm_xen_update_tsc_info(struct kvm_vcpu *vcpu);
-> +
-> +static inline void kvm_xen_after_set_cpuid(struct kvm_vcpu *vcpu)
-> +{
-> +       vcpu->arch.xen.cpuid_base =3D
-> +               kvm_get_hypervisor_cpuid_base(vcpu, XEN_CPUID_SIGNATURE);
-> +}
->=20
->  static inline bool kvm_xen_msr_enabled(struct kvm *kvm)
->  {
-> @@ -135,6 +147,14 @@ static inline bool kvm_xen_timer_enabled(struct kvm_=
-vcpu *vcpu)
->  {
->         return false;
->  }
-> +
-> +static inline void kvm_xen_after_set_cpuid(struct kvm_vcpu *vcpu)
-> +{
-> +}
-> +
-> +static inline void kvm_xen_update_tsc_info(struct kvm_vcpu *vcpu)
-> +{
-> +}
->  #endif
->=20
->  int kvm_xen_hypercall(struct kvm_vcpu *vcpu);
->=20
-> base-commit: b08b2f54c49d8f96a22107c444d500dff73ec2a6
-> --
+> No strong opinion, if you prefer I change this.
+> 
+>>
+>>> +{
+>>> +    if (!test_kvm_facility(kvm, 11))
+>>> +        return -ENXIO;
+>>> +
+>>> +    kvm_s390_update_topology_change_report(kvm, !!attr->attr);
+>>> +    return 0;
+>>> +}
+>>> +
+>>> +static int kvm_s390_get_topology(struct kvm *kvm, struct kvm_device_attr *attr)
+>>> +{
+>>> +    union sca_utility utility;
+>>> +    struct bsca_block *sca;
+>>> +    __u8 topo;
+>>> +
+>>> +    if (!test_kvm_facility(kvm, 11))
+>>> +        return -ENXIO;
+>>> +
+>>> +    read_lock(&kvm->arch.sca_lock);
+>>> +    sca = kvm->arch.sca;
+>>> +    utility.val = READ_ONCE(sca->utility.val);
+>>
+>> I don't think you need the READ_ONCE anymore, now that there is a lock it should act as a compile barrier.
+> 
+> I think you are right.
+> 
+>>> +    read_unlock(&kvm->arch.sca_lock);
+>>> +    topo = utility.mtcr;
+>>> +
+>>> +    if (copy_to_user((void __user *)attr->addr, &topo, sizeof(topo)))
+>>
+>> Why void not u8?
+> 
+> I like to say we write on "topo" with the size of "topo".
+> So we do not need to verify the effective size of topo.
+> But I understand, it is a UAPI, setting u8 in the copy_to_user makes sense too.
+> For my personal opinion, I would have prefer that userland tell us the size it awaits even here, for this special case, since we use a byte, we can not do really wrong.
+You're right, it doesn't make a difference.
+What about doing put_user(topo, (u8 *)attr->addr)), seems more straight forward.
+> 
+>>
+>>> +        return -EFAULT;
+>>> +
+>>> +    return 0;
+>>> +}
+>>> +
+>> [...]
+>>
+> 
 
