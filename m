@@ -2,80 +2,46 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 893CC5719BD
-	for <lists+kvm@lfdr.de>; Tue, 12 Jul 2022 14:19:20 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 98437571A69
+	for <lists+kvm@lfdr.de>; Tue, 12 Jul 2022 14:48:05 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230332AbiGLMTS (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 12 Jul 2022 08:19:18 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37250 "EHLO
+        id S233206AbiGLMsE (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 12 Jul 2022 08:48:04 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35040 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231902AbiGLMTM (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 12 Jul 2022 08:19:12 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id E05C513E37
-        for <kvm@vger.kernel.org>; Tue, 12 Jul 2022 05:19:11 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1657628351;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=D/fC+rsuewsmYyokkHN4davc+n6pcIuIFkioCEI5EXs=;
-        b=JhJSW0CQMGfFfYFc0lWYcSjeAG81CnnzBy1EeNZ5hjPgSRfV2tNMhw9h7HMxgdmll4BRxH
-        Sbo9c/fVj0PvRjO288KRxa7+kTM4LOhYSK3eOx29cZ7DNVhCRzD/p3wXEPp+6gDxlPO9E+
-        cqlTmi23ClI6JGlaKmv6ymyXMq/GDFA=
-Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
- [209.85.128.70]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-625-GO2iXpGIPcufRQTG4r0QQQ-1; Tue, 12 Jul 2022 08:19:09 -0400
-X-MC-Unique: GO2iXpGIPcufRQTG4r0QQQ-1
-Received: by mail-wm1-f70.google.com with SMTP id 2-20020a1c0202000000b003a2cfab44eeso6642102wmc.6
-        for <kvm@vger.kernel.org>; Tue, 12 Jul 2022 05:19:09 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:from:to:cc:subject:in-reply-to:references:date
-         :message-id:mime-version:content-transfer-encoding;
-        bh=D/fC+rsuewsmYyokkHN4davc+n6pcIuIFkioCEI5EXs=;
-        b=lMzpVfkWN2YRcI8Sbc0yxOEvK+fDVzZErweIiTu6nrHH6O9RawcDIHnW+trKZWxt3q
-         aB40v+UkcyD1Dnk44yMkfrUQIzYFr8lunBwKexksSywvGLvMBIPzjJun81NFUTSbWTJq
-         N+MfhmRASwmM8CBM6sKbIDtZMf29B/GxOnG8F4uI+K2106CjTj0g7I4uiQA34fjAkuSe
-         YKBnOFBBkysPRTDX10D0ZLBUNmDf8rovwULUJKp/48GrG470qedCBqpNyXq62pdvFwLp
-         eO+lT7Ub01RhUROshD6mSH850NaRpHsxmus+RJl8KoYuitoXGtZhGJ9WItjQibzKpNQf
-         LDRw==
-X-Gm-Message-State: AJIora9DPgR7R2gf/AnXeZ3fdVwacihLUDjQbQUzostK5IdNomL7D0A9
-        jVmkJ5kBsn6aEHTGLN9rDmx5CDMNG8yL2f/4dvVlV0511nGtWBYbc2WsCrbYddvb9y/J966PQws
-        XkyZugGTk42My
-X-Received: by 2002:a05:600c:3845:b0:3a2:c04d:5ff9 with SMTP id s5-20020a05600c384500b003a2c04d5ff9mr3619769wmr.74.1657628348621;
-        Tue, 12 Jul 2022 05:19:08 -0700 (PDT)
-X-Google-Smtp-Source: AGRyM1tSAiVrHcowqDbe7dPEm4sreDyxs47ZG63PfIWwugXmlHXOLYhohrraQDJqffTNnuGllHv/ag==
-X-Received: by 2002:a05:600c:3845:b0:3a2:c04d:5ff9 with SMTP id s5-20020a05600c384500b003a2c04d5ff9mr3619748wmr.74.1657628348428;
-        Tue, 12 Jul 2022 05:19:08 -0700 (PDT)
-Received: from fedora (nat-2.ign.cz. [91.219.240.2])
-        by smtp.gmail.com with ESMTPSA id j5-20020adff545000000b0021d864d4461sm8090767wrp.83.2022.07.12.05.19.07
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 12 Jul 2022 05:19:07 -0700 (PDT)
-From:   Vitaly Kuznetsov <vkuznets@redhat.com>
-To:     Maxim Levitsky <mlevitsk@redhat.com>, kvm@vger.kernel.org
-Cc:     Anirudh Rayabharam <anrayabh@linux.microsoft.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        linux-hyperv@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Sean Christopherson <seanjc@google.com>
-Subject: Re: [PATCH v3 03/25] x86/hyperv: Update 'struct
- hv_enlightened_vmcs' definition
-In-Reply-To: <6cf5812083ebfa18ba52563527298cb8b91f7fab.camel@redhat.com>
-References: <20220708144223.610080-1-vkuznets@redhat.com>
- <20220708144223.610080-4-vkuznets@redhat.com>
- <6cf5812083ebfa18ba52563527298cb8b91f7fab.camel@redhat.com>
-Date:   Tue, 12 Jul 2022 14:19:06 +0200
-Message-ID: <874jzmplqd.fsf@redhat.com>
+        with ESMTP id S233009AbiGLMsD (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 12 Jul 2022 08:48:03 -0400
+X-Greylist: delayed 933 seconds by postgrey-1.37 at lindbergh.monkeyblade.net; Tue, 12 Jul 2022 05:48:02 PDT
+Received: from baidu.com (mx20.baidu.com [111.202.115.85])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 097ABB31D5;
+        Tue, 12 Jul 2022 05:48:02 -0700 (PDT)
+Received: from BC-Mail-Ex25.internal.baidu.com (unknown [172.31.51.19])
+        by Forcepoint Email with ESMTPS id C99EE6BA46BF116996BE;
+        Tue, 12 Jul 2022 20:32:25 +0800 (CST)
+Received: from FB9D8C53FFFC188.internal.baidu.com (172.31.62.15) by
+ BC-Mail-Ex25.internal.baidu.com (172.31.51.19) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id
+ 15.1.2308.20; Tue, 12 Jul 2022 20:32:27 +0800
+From:   Wang Guangju <wangguangju@baidu.com>
+To:     <seanjc@google.com>, <pbonzini@redhat.com>, <vkuznets@redhat.com>,
+        <jmattson@google.com>, <wanpengli@tencent.com>, <bp@alien8.de>,
+        <joro@8bytes.org>, <suravee.suthikulpanit@amd.com>,
+        <hpa@zytor.com>, <tglx@linutronix.de>, <mingo@redhat.com>,
+        <kvm@vger.kernel.org>
+CC:     <linux-kernel@vger.kernel.org>, <stable@vger.kernel.org>,
+        <wangguangju@baidu.com>, <lirongqing@baidu.com>
+Subject: [PATCH v3] KVM: x86: Send EOI to SynIC vectors on accelerated EOI-induced VM-Exits
+Date:   Tue, 12 Jul 2022 20:32:10 +0800
+Message-ID: <20220712123210.89-1-wangguangju@baidu.com>
+X-Mailer: git-send-email 2.25.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-X-Spam-Status: No, score=-3.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,
-        SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=unavailable
+Content-Transfer-Encoding: 7BIT
+Content-Type:   text/plain; charset=US-ASCII
+X-Originating-IP: [172.31.62.15]
+X-ClientProxiedBy: BC-Mail-Ex27.internal.baidu.com (172.31.51.21) To
+ BC-Mail-Ex25.internal.baidu.com (172.31.51.19)
+X-Spam-Status: No, score=-2.6 required=5.0 tests=BAYES_00,RCVD_IN_DNSWL_LOW,
+        SPF_HELO_PASS,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -83,110 +49,143 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Maxim Levitsky <mlevitsk@redhat.com> writes:
+When EOI virtualization is performed on VMX, kvm_apic_set_eoi_accelerated()
+is called upon EXIT_REASON_EOI_INDUCED but unlike its non-accelerated
+apic_set_eoi() sibling, Hyper-V SINT vectors are left unhandled.
 
-> On Fri, 2022-07-08 at 16:42 +0200, Vitaly Kuznetsov wrote:
->> Updated Hyper-V Enlightened VMCS specification lists several new
->> fields for the following features:
->>=20
->> - PerfGlobalCtrl
->> - EnclsExitingBitmap
->> - Tsc Scaling
->> - GuestLbrCtl
->> - CET
->> - SSP
->>=20
->> Update the definition. The updated definition is available only when
->> CPUID.0x4000000A.EBX BIT(0) is '1'. Add a define for it as well.
->>=20
->> Note: The latest TLFS is available at
->> https://docs.microsoft.com/en-us/virtualization/hyper-v-on-windows/tlfs/=
-tlfs
->>=20
->> Signed-off-by: Vitaly Kuznetsov <vkuznets@redhat.com>
->> ---
->>  arch/x86/include/asm/hyperv-tlfs.h | 18 ++++++++++++++++--
->>  1 file changed, 16 insertions(+), 2 deletions(-)
->>=20
->> diff --git a/arch/x86/include/asm/hyperv-tlfs.h b/arch/x86/include/asm/h=
-yperv-tlfs.h
->> index 6f0acc45e67a..6f2c3cdacdf4 100644
->> --- a/arch/x86/include/asm/hyperv-tlfs.h
->> +++ b/arch/x86/include/asm/hyperv-tlfs.h
->> @@ -138,6 +138,9 @@
->>  #define HV_X64_NESTED_GUEST_MAPPING_FLUSH		BIT(18)
->>  #define HV_X64_NESTED_MSR_BITMAP			BIT(19)
->>=20=20
->
-> Maybe add a comment that this is undocumented + what that cpuid bit does?
->
->> +/* Nested quirks. These are HYPERV_CPUID_NESTED_FEATURES.EBX bits. */
->> +#define HV_X64_NESTED_EVMCS1_2022_UPDATE		BIT(0)
->> +
->>  /*
->>   * This is specific to AMD and specifies that enlightened TLB flush is
->>   * supported. If guest opts in to this feature, ASID invalidations only
->> @@ -559,9 +562,20 @@ struct hv_enlightened_vmcs {
->>  	u64 partition_assist_page;
->>  	u64 padding64_4[4];
->>  	u64 guest_bndcfgs;
->> -	u64 padding64_5[7];
->> +	u64 guest_ia32_perf_global_ctrl;
->> +	u64 guest_ia32_s_cet;
->> +	u64 guest_ssp;
->> +	u64 guest_ia32_int_ssp_table_addr;
->> +	u64 guest_ia32_lbr_ctl;
->> +	u64 padding64_5[2];
->
-> This change looks OK
->
->>  	u64 xss_exit_bitmap;
->> -	u64 padding64_6[7];
->> +	u64 host_ia32_perf_global_ctrl;
->> +	u64 encls_exiting_bitmap;
->> +	u64 tsc_multiplier;
->> +	u64 host_ia32_s_cet;
->> +	u64 host_ssp;
->> +	u64 host_ia32_int_ssp_table_addr;
->> +	u64 padding64_6;
->
-> I think we have a mistake here:
->
-> UINT64 XssExitingBitmap;
-> UINT64 EnclsExitingBitmap;
-> UINT64 HostPerfGlobalCtrl;
-> UINT64 TscMultiplier;
-> UINT64 HostSCet;
-> UINT64 HostSsp;
-> UINT64 HostInterruptSspTableAddr;
-> UINT64 Rsvd8;
->
->
-> I think you need to swap encls_exiting_bitmap and host_ia32_perf_global_c=
-trl
->
-> I used=C2=A0https://docs.microsoft.com/en-us/virtualization/hyper-v-on-wi=
-ndows/tlfs/datatypes/hv_vmx_enlightened_vmcs
-> as the reference.=C2=A0
+Send EOI to Hyper-V SINT vectors when handling acclerated EOI-induced
+VM-Exits. KVM Hyper-V needs to handle the SINT EOI irrespective of whether
+the EOI is acclerated or not.
 
-Oh, nice catch, thanks! I have no idea how this mistake crept in. A
-conspiracy theory: maybe the online version of TLFS was updated
-under our feet? :-)
+Rename kvm_apic_set_eoi_accelerated() to kvm_apic_set_eoi() and let the
+non-accelerated helper call the "acclerated" version. That will document
+the delta between the non-accelerated path and the accelerated path.
+In addition, guarantee to trace even if there's no valid vector to EOI in
+the non-accelerated path in order to keep the semantics of the function
+intact.
 
-v4 is coming to rescue.
+Fixes: 5c919412fe61 ("kvm/x86: Hyper-V synthetic interrupt controller")
+Cc: <stable@vger.kernel.org>
+Tested-by: Wang Guangju <wangguangju@baidu.com>
+Suggested-by: Sean Christopherson <seanjc@google.com>
+Suggested-by: Vitaly Kuznetsov <vkuznets@redhat.com>
+Co-developed-by: Li Rongqing <lirongqing@baidu.com>
+Signed-off-by: Wang Guangju <wangguangju@baidu.com>
+---
+ v1 -> v2: Updated the commit message and implement a new inline function
+ of apic_set_eoi_vector()
 
->
->
-> Best regards,
-> 	Maxim Levitsky
->
->
->>  } __packed;
->>=20=20
->>  #define HV_VMX_ENLIGHTENED_CLEAN_FIELD_NONE			0
->
->
+ v2 -> v3: Updated the subject and commit message, drop func 
+ apic_set_eoi_vector() and rename kvm_apic_set_eoi_accelerated() 
+ to kvm_apic_set_eoi()
 
---=20
-Vitaly
+ arch/x86/kvm/lapic.c   | 45 ++++++++++++++++++++++-----------------------
+ arch/x86/kvm/lapic.h   |  2 +-
+ arch/x86/kvm/vmx/vmx.c |  3 ++-
+ 3 files changed, 25 insertions(+), 25 deletions(-)
+
+diff --git a/arch/x86/kvm/lapic.c b/arch/x86/kvm/lapic.c
+index f03facc..b2e72ab 100644
+--- a/arch/x86/kvm/lapic.c
++++ b/arch/x86/kvm/lapic.c
+@@ -1269,46 +1269,45 @@ static void kvm_ioapic_send_eoi(struct kvm_lapic *apic, int vector)
+ 	kvm_ioapic_update_eoi(apic->vcpu, vector, trigger_mode);
+ }
+ 
++/*
++ * Send EOI for a valid vector.  The caller, or hardware when this is invoked
++ * after an accelerated EOI VM-Exit, is responsible for updating the vISR and
++ * vPPR.
++ */
++void kvm_apic_set_eoi(struct kvm_lapic *apic, int vector)
++{
++	trace_kvm_eoi(apic, vector);
++
++	if (to_hv_vcpu(apic->vcpu) &&
++	    test_bit(vector, to_hv_synic(apic->vcpu)->vec_bitmap))
++		kvm_hv_synic_send_eoi(apic->vcpu, vector);
++
++	kvm_ioapic_send_eoi(apic, vector);
++	kvm_make_request(KVM_REQ_EVENT, apic->vcpu);
++}
++EXPORT_SYMBOL_GPL(kvm_apic_set_eoi);
++
+ static int apic_set_eoi(struct kvm_lapic *apic)
+ {
+ 	int vector = apic_find_highest_isr(apic);
+ 
+-	trace_kvm_eoi(apic, vector);
+-
+ 	/*
+ 	 * Not every write EOI will has corresponding ISR,
+ 	 * one example is when Kernel check timer on setup_IO_APIC
+ 	 */
+-	if (vector == -1)
++	if (vector == -1) {
++		trace_kvm_eoi(apic, vector);
+ 		return vector;
++	}
+ 
+ 	apic_clear_isr(vector, apic);
+ 	apic_update_ppr(apic);
+ 
+-	if (to_hv_vcpu(apic->vcpu) &&
+-	    test_bit(vector, to_hv_synic(apic->vcpu)->vec_bitmap))
+-		kvm_hv_synic_send_eoi(apic->vcpu, vector);
++	kvm_apic_set_eoi(apic, vector);
+ 
+-	kvm_ioapic_send_eoi(apic, vector);
+-	kvm_make_request(KVM_REQ_EVENT, apic->vcpu);
+ 	return vector;
+ }
+ 
+-/*
+- * this interface assumes a trap-like exit, which has already finished
+- * desired side effect including vISR and vPPR update.
+- */
+-void kvm_apic_set_eoi_accelerated(struct kvm_vcpu *vcpu, int vector)
+-{
+-	struct kvm_lapic *apic = vcpu->arch.apic;
+-
+-	trace_kvm_eoi(apic, vector);
+-
+-	kvm_ioapic_send_eoi(apic, vector);
+-	kvm_make_request(KVM_REQ_EVENT, apic->vcpu);
+-}
+-EXPORT_SYMBOL_GPL(kvm_apic_set_eoi_accelerated);
+-
+ void kvm_apic_send_ipi(struct kvm_lapic *apic, u32 icr_low, u32 icr_high)
+ {
+ 	struct kvm_lapic_irq irq;
+diff --git a/arch/x86/kvm/lapic.h b/arch/x86/kvm/lapic.h
+index 762bf61..48260fa 100644
+--- a/arch/x86/kvm/lapic.h
++++ b/arch/x86/kvm/lapic.h
+@@ -126,7 +126,7 @@ u64 kvm_get_lapic_tscdeadline_msr(struct kvm_vcpu *vcpu);
+ void kvm_set_lapic_tscdeadline_msr(struct kvm_vcpu *vcpu, u64 data);
+ 
+ void kvm_apic_write_nodecode(struct kvm_vcpu *vcpu, u32 offset);
+-void kvm_apic_set_eoi_accelerated(struct kvm_vcpu *vcpu, int vector);
++void kvm_apic_set_eoi(struct kvm_lapic *apic, int vector);
+ 
+ int kvm_lapic_set_vapic_addr(struct kvm_vcpu *vcpu, gpa_t vapic_addr);
+ void kvm_lapic_sync_from_vapic(struct kvm_vcpu *vcpu);
+diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
+index 9258468..f8b9eb1 100644
+--- a/arch/x86/kvm/vmx/vmx.c
++++ b/arch/x86/kvm/vmx/vmx.c
+@@ -5519,9 +5519,10 @@ static int handle_apic_eoi_induced(struct kvm_vcpu *vcpu)
+ {
+ 	unsigned long exit_qualification = vmx_get_exit_qual(vcpu);
+ 	int vector = exit_qualification & 0xff;
++	struct kvm_lapic *apic = vcpu->arch.apic;
+ 
+ 	/* EOI-induced VM exit is trap-like and thus no need to adjust IP */
+-	kvm_apic_set_eoi_accelerated(vcpu, vector);
++	kvm_apic_set_eoi(apic, vector);
+ 	return 1;
+ }
+ 
+-- 
+2.9.4
 
