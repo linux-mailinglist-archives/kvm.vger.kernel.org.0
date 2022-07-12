@@ -2,166 +2,202 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 021C657203B
-	for <lists+kvm@lfdr.de>; Tue, 12 Jul 2022 18:04:44 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 0B962572111
+	for <lists+kvm@lfdr.de>; Tue, 12 Jul 2022 18:36:43 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233892AbiGLQE3 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 12 Jul 2022 12:04:29 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45238 "EHLO
+        id S231342AbiGLQgl (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 12 Jul 2022 12:36:41 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51084 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234226AbiGLQEV (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 12 Jul 2022 12:04:21 -0400
-Received: from mail-lf1-x12e.google.com (mail-lf1-x12e.google.com [IPv6:2a00:1450:4864:20::12e])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EE01D2314D
-        for <kvm@vger.kernel.org>; Tue, 12 Jul 2022 09:04:19 -0700 (PDT)
-Received: by mail-lf1-x12e.google.com with SMTP id d12so14694061lfq.12
-        for <kvm@vger.kernel.org>; Tue, 12 Jul 2022 09:04:19 -0700 (PDT)
+        with ESMTP id S233559AbiGLQgP (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 12 Jul 2022 12:36:15 -0400
+Received: from mail-pg1-x531.google.com (mail-pg1-x531.google.com [IPv6:2607:f8b0:4864:20::531])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1AA62D31D9
+        for <kvm@vger.kernel.org>; Tue, 12 Jul 2022 09:35:42 -0700 (PDT)
+Received: by mail-pg1-x531.google.com with SMTP id 23so8053969pgc.8
+        for <kvm@vger.kernel.org>; Tue, 12 Jul 2022 09:35:42 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc:content-transfer-encoding;
-        bh=c0RcQSLjeYCnLvxH8el7ACbuvLKqs4ymAPhMSssf3fo=;
-        b=rgy8GpGjigNewPkDfawGIyJhs5SthypU/zUHIYssEnhqMMiqNAKc4ezJ19mpUkfSMy
-         nHlnPMccqvaAAhX/ySaXKSzNEJ+RUL0TBhSHaW0HqHGvmgX2wxKuTd+jA0VHIQPZ9QFF
-         a6LEAvMbeWy1+vmRd8d6u+JJ7f13B0rTgQTdohwT7+APFsOdcZJnmvacai86xywgvwxZ
-         kEZYabnYpVeCuAKxSwQRmTLVQyoTaFQAZoagdzVEMYGEcN4G14TusnppOWvHU3N4UMpc
-         t6xNmt5QTEm/TElgI+kc11twOzYFn1L/5P2tE2Iy6Q0EvlpQEc4560MbpDvwkPfROLHC
-         yEdQ==
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:content-transfer-encoding:in-reply-to;
+        bh=pNpgR7KjQZurbGbWyaYhBlQrOEKytoR8yRHws8TVBHE=;
+        b=GdmkU9SQ/Luh/zyi5KlOBPHktypKoYVIDapjas/WdAlmty0F0pzGAW+hR+UJUy7lK7
+         Bx0s4LcoTaCRMOlNLONekoxEfQOhToyqHbxHrpG7Fb+WayJ0KJ+UTxKm5/0j0gIk+gcP
+         37WPz5ZMtQU3zAHIDquIPoQjniYsFEzWa/2OVcVz3oJR1KvggRIVdsJCkBUTw1cicYQV
+         0aFk1D46NLMpnbCsQzAuefQGtUQ0BTvCAGuRdBfFP3rAh/uneG+AhKtSIzCrI3FaPGL6
+         wR0yAyOGDKMGqjTMZMemJld3SPpC4F5C6th2Nms2SNE3NAp4SjG6e+H+SlgV+5vkTVm5
+         L7dA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc:content-transfer-encoding;
-        bh=c0RcQSLjeYCnLvxH8el7ACbuvLKqs4ymAPhMSssf3fo=;
-        b=rgqwulUuvBVgdCNQEf6D2OrqdGet9BXdHx9l9l4vJGlq1uOT6VwWV0dVIflee2vlh+
-         6JK9SSlLUuSS2Wd3QO3ZH9WXKHa4z6oTfnKK0OAEm/7X3GA4pp4mUtYuPvuFJjqz5+Gh
-         7HVYnWWVXzyu8EnQFAfThWuOri2D7hSV/qaQuCZrYS4pWRbwlLZANA4xBYTW2Kxq2wo4
-         sVEuDRZWz19fknanpuypbItEFpfGMza6oeYPKX+4QQbQTp+nbfdY34Ei/AQaPCoH8/bP
-         wPrVDbBTjCvE1iFDsR4zD8n3FvHJlaiVuixZSV5pPWe6CCAkjMK/3H5UWTfgnwrS1ADv
-         jFAw==
-X-Gm-Message-State: AJIora+fiVKP/770De5d1UAkyTboo2KBaAVPWO2US+HxEv8535CKOE4X
-        uH4TXzvwAULe6fovbZ75kjM2tbChHkHZWlulyhiakw==
-X-Google-Smtp-Source: AGRyM1ve5bKkRgY91JODr6G0KYNj14IUXmUe2XTmEOY9UMxbgvLVrQb6DVioXtQ4vfZSOB7V9pobKh55jgw4lPONCfA=
-X-Received: by 2002:a05:6512:32c5:b0:481:1822:c41f with SMTP id
- f5-20020a05651232c500b004811822c41fmr16158485lfg.373.1657641857910; Tue, 12
- Jul 2022 09:04:17 -0700 (PDT)
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:content-transfer-encoding
+         :in-reply-to;
+        bh=pNpgR7KjQZurbGbWyaYhBlQrOEKytoR8yRHws8TVBHE=;
+        b=ik3lnS7f6fbGNA176STP6d/NNNESW3Lt5/uccodX6dcC/bf9B7hkWOxMmWJtOlc2AL
+         5wZzJ6SPZJRpsui2AIGptJSNj1Th5Oj+3/CYtj+GbBgCPhDM754jxH0TyxJKe9cAKn1k
+         CXQNCZyW1pDUMnEBas2L3K1VB6MthxaVVCdavwo5W/dfSfXr6lA6yrzbDNOOFoPNMf5L
+         icBWqW5Q+YN3mKuyf4UPdpAy21psx5X8jM0KXJaasUE/LES67y2DY+qxgDe2mHAAe6Xr
+         LUslGqHcT8nxBHysTLZf4G45qaHZhLzco/mLF6Ho2oUNSLh+g5lrB8Fgd/nxAlj1UloU
+         XG+g==
+X-Gm-Message-State: AJIora/MXa2D81PNWv4X7DIPEmTtwVig6PK6XJDJhdysaiPkmjZYXLWU
+        FVcLtfLe8pTuf6lahsQnQV6cSg==
+X-Google-Smtp-Source: AGRyM1vZhE6tnkL4CzrnqfWOAJrF64lL6s+95FL6N4OVYNlp7L0wFtuLgl1JEoSoNwTKVmVT2HESQQ==
+X-Received: by 2002:a63:c15:0:b0:411:f92a:8ec7 with SMTP id b21-20020a630c15000000b00411f92a8ec7mr20993517pgl.86.1657643742090;
+        Tue, 12 Jul 2022 09:35:42 -0700 (PDT)
+Received: from google.com (123.65.230.35.bc.googleusercontent.com. [35.230.65.123])
+        by smtp.gmail.com with ESMTPSA id h11-20020a170902680b00b0016a11750b50sm7005007plk.16.2022.07.12.09.35.40
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 12 Jul 2022 09:35:40 -0700 (PDT)
+Date:   Tue, 12 Jul 2022 16:35:36 +0000
+From:   Sean Christopherson <seanjc@google.com>
+To:     Maxim Levitsky <mlevitsk@redhat.com>
+Cc:     Paolo Bonzini <pbonzini@redhat.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v2] KVM: x86: Add dedicated helper to get CPUID entry
+ with significant index
+Message-ID: <Ys2i2B/jt5yDsAKj@google.com>
+References: <20220712000645.1144186-1-seanjc@google.com>
+ <8a1ff7338f1252d75ff96c3518f16742919f92d7.camel@redhat.com>
 MIME-Version: 1.0
-References: <cover.1655761627.git.ashish.kalra@amd.com> <6a513cf79bf71c479dbd72165faf1d804d77b3af.1655761627.git.ashish.kalra@amd.com>
- <CAMkAt6obGwyiJh7J34Vt8tC+XXMNm8YPrv4gV=TVoF2Xga5GjQ@mail.gmail.com>
- <SN6PR12MB27672AA31E96179256235C338E879@SN6PR12MB2767.namprd12.prod.outlook.com>
- <CAMkAt6ryLr6a5iQnwZQT3hqwEpZpb7bn-T8SDY6=5zYs_5NBow@mail.gmail.com> <SN6PR12MB2767D8C552388D438D9F88268E869@SN6PR12MB2767.namprd12.prod.outlook.com>
-In-Reply-To: <SN6PR12MB2767D8C552388D438D9F88268E869@SN6PR12MB2767.namprd12.prod.outlook.com>
-From:   Peter Gonda <pgonda@google.com>
-Date:   Tue, 12 Jul 2022 10:04:05 -0600
-Message-ID: <CAMkAt6pO3knGsvctewCC1z0K0c5jfgpTzGhB3Ujvc-xCYcEojQ@mail.gmail.com>
-Subject: Re: [PATCH Part2 v6 28/49] KVM: SVM: Add KVM_SEV_SNP_LAUNCH_FINISH command
-To:     "Kalra, Ashish" <Ashish.Kalra@amd.com>
-Cc:     "the arch/x86 maintainers" <x86@kernel.org>,
-        LKML <linux-kernel@vger.kernel.org>,
-        kvm list <kvm@vger.kernel.org>,
-        "linux-coco@lists.linux.dev" <linux-coco@lists.linux.dev>,
-        Linux Memory Management List <linux-mm@kvack.org>,
-        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Joerg Roedel <jroedel@suse.de>,
-        "Lendacky, Thomas" <Thomas.Lendacky@amd.com>,
-        "H. Peter Anvin" <hpa@zytor.com>, Ard Biesheuvel <ardb@kernel.org>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Sean Christopherson <seanjc@google.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Jim Mattson <jmattson@google.com>,
-        Andy Lutomirski <luto@kernel.org>,
-        Dave Hansen <dave.hansen@linux.intel.com>,
-        Sergio Lopez <slp@redhat.com>,
-        Peter Zijlstra <peterz@infradead.org>,
-        Srinivas Pandruvada <srinivas.pandruvada@linux.intel.com>,
-        David Rientjes <rientjes@google.com>,
-        Dov Murik <dovmurik@linux.ibm.com>,
-        Tobin Feldman-Fitzthum <tobin@ibm.com>,
-        Borislav Petkov <bp@alien8.de>,
-        "Roth, Michael" <Michael.Roth@amd.com>,
-        Vlastimil Babka <vbabka@suse.cz>,
-        "Kirill A . Shutemov" <kirill@shutemov.name>,
-        Andi Kleen <ak@linux.intel.com>,
-        Tony Luck <tony.luck@intel.com>, Marc Orr <marcorr@google.com>,
-        Sathyanarayanan Kuppuswamy 
-        <sathyanarayanan.kuppuswamy@linux.intel.com>,
-        Alper Gun <alpergun@google.com>,
-        "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
-        "jarkko@kernel.org" <jarkko@kernel.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <8a1ff7338f1252d75ff96c3518f16742919f92d7.camel@redhat.com>
 X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
         ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
         T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL
-        autolearn=ham autolearn_force=no version=3.4.6
+        autolearn=unavailable autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Jul 12, 2022 at 9:22 AM Kalra, Ashish <Ashish.Kalra@amd.com> wrote:
->
-> [AMD Official Use Only - General]
->
-> Hello Peter,
->
-> >> >Given the guest uses the SNP NAE AP boot protocol we were expecting t=
-hat there would be some option to add vCPUs to the VM but mark them as "pen=
-ding AP boot creation protocol" state. This would allow the LaunchDigest of=
- a VM doesn't change >just because its vCPU count changes. Would it be poss=
-ible to add a new add an argument to KVM_SNP_LAUNCH_FINISH to tell it which=
- vCPUs to LAUNCH_UPDATE VMSA pages for or similarly a new argument for KVM_=
-CREATE_VCPU?
-> >>
-> >> But don't we want/need to measure all vCPUs using LAUNCH_UPDATE_VMSA b=
-efore we issue SNP_LAUNCH_FINISH command ?
-> >>
-> >> If we are going to add vCPUs and mark them as "pending AP boot creatio=
-n" state then how are we going to do LAUNCH_UPDATE_VMSAs for them after SNP=
-_LAUNCH_FINISH ?
->
-> >If I understand correctly we don't need or even want the APs to be LAUNC=
-H_UPDATE_VMSA'd. LAUNCH_UPDATEing all the VMSAs causes VMs with different n=
-umbers of vCPUs to have different launch digests. Its my understanding the =
-SNP AP >Creation protocol was to solve this so that VMs with different vcpu=
- counts have the same launch digest.
->
-> >Looking at patch "[Part2,v6,44/49] KVM: SVM: Support SEV-SNP AP Creation=
- NAE event" and section "4.1.9 SNP AP Creation" of the GHCB spec. There is =
-no need to mark the LAUNCH_UPDATE the AP's VMSA or mark the vCPUs runnable.=
- Instead we >can do that only for the BSP. Then in the guest UEFI the BSP c=
-an: create new VMSAs from guest pages, RMPADJUST them into the RMP state VM=
-SA, then use the SNP AP Creation NAE to get the hypervisor to mark them run=
-nable. I believe this is all >setup in the UEFI patch:
-> >https://nam11.safelinks.protection.outlook.com/?url=3Dhttps%3A%2F%2Fwww.=
-mail-archive.com%2Fdevel%40edk2.groups.io%2Fmsg38460.html&amp;data=3D05%7C0=
-1%7CAshish.Kalra%40amd.com%7Ca40178ac6f284a9e33aa08da64152baa%>7C3dd8961fe4=
-884e608e11a82d994e183d%7C0%7C0%7C637932339382401133%7CUnknown%7CTWFpbGZsb3d=
-8eyJWIjoiMC4wLjAwMDAiLCJQIjoiV2luMzIiLCJBTiI6Ik1haWwiLCJXVCI6Mn0%3D%7C3000%=
-7C%7C%7C&amp;sdata=3DZaiHHo9S24f9BB6E%>2FjexOt5TdKJQXxQDJI5QoYdDDHc%3D&amp;=
-reserved=3D0.
->
-> Yes, I discussed the same with Tom, and this will be supported going forw=
-ard, only the BSP will need to go through the LAUNCH_UPDATE_VMSA and at run=
-time the guest can dynamically create more APs using the SNP AP Creation NA=
-E event.
->
-> Now, coming back to the original question, why do we need a separate vCPU=
- count argument for SNP_LAUNCH_FINISH, won't the statically created vCPUs i=
-n kvm->created_vcpus/online_vcpus be sufficient for that, any dynamically c=
-reated
-> vCPU's won't be part of the initial measurement or LaunchDigest of the VM=
-, right ?
+On Tue, Jul 12, 2022, Maxim Levitsky wrote:
+> On Tue, 2022-07-12 at 00:06 +0000, Sean Christopherson wrote:
+> >  static inline struct kvm_cpuid_entry2 *cpuid_entry2_find(
+> > -       struct kvm_cpuid_entry2 *entries, int nent, u32 function, u32 index)
+> > +       struct kvm_cpuid_entry2 *entries, int nent, u32 function, u64 index)
+> How I wish that this would be just called EAX and ECX... Anyway....
 
-Are you suggesting that QEMU will KVM_CREATE_VCPU the BSP, then
-LAUNCH_FINISH, then KVM_CREATE_VCPU all the APs to their VMSAs were
-not LAUNCH_UPDATED? If so, it seems annoying to have to create vCPUs
-at different times to get their VMSAs into different states. That's
-why I was suggesting some other mechanism so we can continue to
-KVM_CREATE_VCPU all the vCPUs at the same time.
+Heh, I strongly disagree.  EAX and ECX are how the CPUID instruction specifies
+the function and index, CPUID the lookup itself operates on function+index,
+e.g. there are plenty of situations where KVM queries CPUID info without the
+inputs coming from EAX/ECX.
 
->
-> Thanks,
-> Ashish
+> >  {
+> >         struct kvm_cpuid_entry2 *e;
+> >         int i;
+> > @@ -77,9 +85,22 @@ static inline struct kvm_cpuid_entry2 *cpuid_entry2_find(
+> >         for (i = 0; i < nent; i++) {
+> >                 e = &entries[i];
+> >  
+> > -               if (e->function == function &&
+> > -                   (!(e->flags & KVM_CPUID_FLAG_SIGNIFCANT_INDEX) || e->index == index))
+> > +               if (e->function != function)
+> > +                       continue;
+> > +
+> > +               /*
+> > +                * If the index isn't significant, use the first entry with a
+> > +                * matching function.  It's userspace's responsibilty to not
+> > +                * provide "duplicate" entries in all cases.
+> > +                */
+> > +               if (!(e->flags & KVM_CPUID_FLAG_SIGNIFCANT_INDEX) || e->index == index)
+> >                         return e;
+> > +
+> > +               /*
+> > +                * Function matches and index is significant; not specifying an
+> > +                * exact index in this case is a KVM bug.
+> > +                */
+> Nitpick: Why KVM bug? Bad userspace can also provide a index-significant entry for cpuid
+> leaf for which index is not significant in the x86 spec.
+
+Ugh, you're right.
+
+> We could arrange a table of all known leaves and for each leaf if it has an index
+> in the x86 spec, and warn/reject the userspace CPUID info if it doesn't match.
+
+We have such a table, cpuid_function_is_indexed().  The alternative would be to
+do:
+
+		WARN_ON_ONCE(index == KVM_CPUID_INDEX_NOT_SIGNIFICANT &&
+			     cpuid_function_is_indexed(function));
+
+The problem with rejecting userspace CPUID on mismatch is that it could break
+userspace :-/  Of course, this entire patch would also break userspace to some
+extent, e.g. if userspace is relying on an exact match on index==0.  The only
+difference being the guest lookups with an exact index would still work.
+
+I think the restriction we could put in place would be that userspace can make
+a leaf more relaxed, e.g. to play nice if userspace forgets to set the SIGNFICANT
+flag, but rejects attempts to make guest CPUID more restrictive, i.e. disallow
+setting the SIGNFICANT flag on leafs that KVM doesn't enumerate as significant.
+
+> > +               WARN_ON_ONCE(index == KVM_CPUID_INDEX_NOT_SIGNIFICANT);
+> >         }
+> >  
+> >         return NULL;
+> > @@ -96,7 +117,8 @@ static int kvm_check_cpuid(struct kvm_vcpu *vcpu,
+> >          * The existing code assumes virtual address is 48-bit or 57-bit in the
+> >          * canonical address checks; exit if it is ever changed.
+> >          */
+> > -       best = cpuid_entry2_find(entries, nent, 0x80000008, 0);
+> > +       best = cpuid_entry2_find(entries, nent, 0x80000008,
+> > +                                KVM_CPUID_INDEX_NOT_SIGNIFICANT);
+> OK.
+
+Thanks for looking through all these!
+
+> >  static struct kvm_cpuid_entry2 *kvm_find_kvm_cpuid_features(struct kvm_vcpu *vcpu)
+> > @@ -219,7 +242,7 @@ static void __kvm_update_cpuid_runtime(struct kvm_vcpu *vcpu, struct kvm_cpuid_e
+> >         struct kvm_cpuid_entry2 *best;
+> >         u64 guest_supported_xcr0 = cpuid_get_supported_xcr0(entries, nent);
+> >  
+> > -       best = cpuid_entry2_find(entries, nent, 1, 0);
+> > +       best = cpuid_entry2_find(entries, nent, 1, KVM_CPUID_INDEX_NOT_SIGNIFICANT);
+> 
+> Leaf 1, no index indeed.
+> 
+> Offtopic: I wonder why we call this 'best'?
+
+Awful, awful historic code.  IIRC, for functions whose index is not significant,
+KVM would iterate over all entries and look for an exact function+index match
+anyways.  If there was at least one partial match (function match only) but no
+full match, KVM would use the first partial match, which it called the "best" match.
+
+We've been slowly/opportunistically killing off the "best" terminology.
+
+> > -struct kvm_cpuid_entry2 *kvm_find_cpuid_entry(struct kvm_vcpu *vcpu,
+> > -                                             u32 function, u32 index)
+> > +struct kvm_cpuid_entry2 *kvm_find_cpuid_entry_index(struct kvm_vcpu *vcpu,
+> > +                                                   u32 function, u32 index)
+> Nitpick: could you fix the indention while at it?
+
+The indentation is correct, it's only the diff that appears misaligned.
+
+> > @@ -1353,11 +1384,11 @@ get_out_of_range_cpuid_entry(struct kvm_vcpu *vcpu, u32 *fn_ptr, u32 index)
+> >                 return NULL;
+> >  
+> >         if (function >= 0x40000000 && function <= 0x4fffffff)
+> > -               class = kvm_find_cpuid_entry(vcpu, function & 0xffffff00, 0);
+> > +               class = kvm_find_cpuid_entry(vcpu, function & 0xffffff00);
+> >         else if (function >= 0xc0000000)
+> > -               class = kvm_find_cpuid_entry(vcpu, 0xc0000000, 0);
+> > +               class = kvm_find_cpuid_entry(vcpu, 0xc0000000);
+> >         else
+> > -               class = kvm_find_cpuid_entry(vcpu, function & 0x80000000, 0);
+> > +               class = kvm_find_cpuid_entry(vcpu, function & 0x80000000);
+> This assumes that all the classes has first entry whose EAX specifies max leaf
+> for this class. True for sure for basic and extended features, don't know
+> if true for hypervisor and Centaur entries. Seems OK.
+
+It holds true for all known hypervisors.  There's no formal definition for using
+0x400000yy as the hypervisor range, but the de facto standard is to use EBX, ECX,
+and EDX for the signature, and EAX for the max leaf.
+
+The Centaur behavior is very much a guess, but odds are it's a correct guess.  When
+I added the Centaur code, I spent far too much time trying (and failing) to hunt
+down documentation.  
+
