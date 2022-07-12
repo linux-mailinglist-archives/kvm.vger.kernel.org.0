@@ -2,130 +2,259 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 98AAC571C82
-	for <lists+kvm@lfdr.de>; Tue, 12 Jul 2022 16:28:34 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 0EF9C571CA0
+	for <lists+kvm@lfdr.de>; Tue, 12 Jul 2022 16:30:16 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229919AbiGLO23 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 12 Jul 2022 10:28:29 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43106 "EHLO
+        id S232877AbiGLOaO (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 12 Jul 2022 10:30:14 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48320 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229787AbiGLO2I (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 12 Jul 2022 10:28:08 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 8B833B9DA2
-        for <kvm@vger.kernel.org>; Tue, 12 Jul 2022 07:28:00 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1657636079;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=ZYHjDyHRUCfENuUw1YAFJ33SC7QGQxArlza+HDxiHoc=;
-        b=M+zMupxSQBDBYj0UIMIxz023jTxtoryxc+/X/h2oqHqYQ6Fjx4W/HF5YtZ/XdaDkW1uD5t
-        7rv5BgRWaqe6en6dX3MHIdXVvr5wuOniAnq7RzkVVVftLVT1OEMMQLjUcIHRCHBCCf87Nf
-        P0vThjDxOGg6PuUiFQwgzvdr6bozkLE=
-Received: from mail-qt1-f200.google.com (mail-qt1-f200.google.com
- [209.85.160.200]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-78-jaRxUyoiON6P9TCZVwY1jw-1; Tue, 12 Jul 2022 10:27:58 -0400
-X-MC-Unique: jaRxUyoiON6P9TCZVwY1jw-1
-Received: by mail-qt1-f200.google.com with SMTP id ey13-20020a05622a4c0d00b0031ec4d66fc9so191402qtb.21
-        for <kvm@vger.kernel.org>; Tue, 12 Jul 2022 07:27:58 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:message-id:subject:from:to:cc:date:in-reply-to
-         :references:user-agent:mime-version:content-transfer-encoding;
-        bh=ZYHjDyHRUCfENuUw1YAFJ33SC7QGQxArlza+HDxiHoc=;
-        b=dL1EJC2WordCVdqBUHUCjLQjd8qaw+nhk18w2LflFO/ZAba5KybVCCgIx0F24D7xW2
-         sN3FE8TAiRzRDg+qQePQaRddD2VbMF+SMt2oCLjClocdeJ9mTPVYWr62Z4WUJDjxzflR
-         mhLGUJ5CEBOxa4HY/uehh98evZd8uusmGJOFnTOlYmlY4JVTtDLr+UZGOiqAU/CdDSjy
-         8zl46DqVfEQ2vX3oMpO9q9l4KTtyj9LpJcL5Q2M2+poUZt+3lSx3D03darcsxURSfdhk
-         jj6/q/KbSTySDnTVKpxhENNLuf96X7ErhGBuCnmBGsNP5X0iA/BhoFO7JOuO3AfRljlN
-         US8A==
-X-Gm-Message-State: AJIora8/QWvT10VcAyU3ZeTuUjP4pWJuuG/5y92+zh+UEik/zIVV8x9x
-        pKMRfn1asaGlEX/4L5tLgUmxpLad3iT1bnDBGkaZ2gQqLAdhFniIcAXihgVASQwdazAfYEnvjV8
-        QVmih6ctJREOe
-X-Received: by 2002:ad4:5ecb:0:b0:473:6181:4a23 with SMTP id jm11-20020ad45ecb000000b0047361814a23mr10713349qvb.17.1657636078018;
-        Tue, 12 Jul 2022 07:27:58 -0700 (PDT)
-X-Google-Smtp-Source: AGRyM1tUMyMFGKWXzHGloySmQayJm5YD9ab0hOL9dwX7wDj4Knm+oQErb26Ep1Oc8MEI68R7YUTjdw==
-X-Received: by 2002:ad4:5ecb:0:b0:473:6181:4a23 with SMTP id jm11-20020ad45ecb000000b0047361814a23mr10713333qvb.17.1657636077796;
-        Tue, 12 Jul 2022 07:27:57 -0700 (PDT)
-Received: from [10.35.4.238] (bzq-82-81-161-50.red.bezeqint.net. [82.81.161.50])
-        by smtp.gmail.com with ESMTPSA id s7-20020a05620a254700b006a6b374d8bbsm9828944qko.69.2022.07.12.07.27.55
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 12 Jul 2022 07:27:56 -0700 (PDT)
-Message-ID: <ee479e42605d3ed3276b66da69179dbfbcb05dbc.camel@redhat.com>
-Subject: Re: [PATCH] KVM: nVMX: Always enable TSC scaling for L2 when it was
- enabled for L1
-From:   Maxim Levitsky <mlevitsk@redhat.com>
-To:     Vitaly Kuznetsov <vkuznets@redhat.com>, kvm@vger.kernel.org,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Sean Christopherson <seanjc@google.com>
-Cc:     Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>, linux-kernel@vger.kernel.org
-Date:   Tue, 12 Jul 2022 17:27:53 +0300
-In-Reply-To: <20220712135009.952805-1-vkuznets@redhat.com>
-References: <20220712135009.952805-1-vkuznets@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
-User-Agent: Evolution 3.40.4 (3.40.4-5.fc34) 
+        with ESMTP id S233175AbiGLOaB (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 12 Jul 2022 10:30:01 -0400
+Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0EAEE2191;
+        Tue, 12 Jul 2022 07:30:00 -0700 (PDT)
+Received: from pps.filterd (m0098399.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.17.1.5/8.17.1.5) with ESMTP id 26CDJ0E9006969;
+        Tue, 12 Jul 2022 14:28:54 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
+ mime-version : subject : to : cc : references : from : in-reply-to :
+ content-type : content-transfer-encoding; s=pp1;
+ bh=OdfZSqJJ97Yxoj48Ckzbfof+fH1pBkaPsxXBN/SYXLE=;
+ b=Z6qbMB5EQ1l9GEjAMFA0+VqVwNQeTeZOV4j5siWedAhE/e2Y2RsPEEOv5Fh3PvTNj8LE
+ TeF0tdX3uOYk9Bz/aRuLGA/iGcUWqmhttyD+QVV+tupAa80MK5uxK0OjhHRfNuHxB6Kn
+ ATZ5Hvs2I0YnXd855Vj0v+dmU2J2/3MALf4BsO+xyvX5kaBLmyK+nIixS5G4YQLuXTUk
+ ilhEat3gC72UvqtbsLG/v2w2FQuW3ZUzlR+789ppxo+ocVhwBNY0KS6pXLLjgqx0PcZn
+ +vzKNg4KKzga1J1eNPR+lREpgvx8vySKhroScgURLQ48TTojjEIwBDg8RDReCXPJkl7f zA== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3h99r01xrn-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Tue, 12 Jul 2022 14:28:53 +0000
+Received: from m0098399.ppops.net (m0098399.ppops.net [127.0.0.1])
+        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 26CDKOsM014679;
+        Tue, 12 Jul 2022 14:28:53 GMT
+Received: from ppma03wdc.us.ibm.com (ba.79.3fa9.ip4.static.sl-reverse.com [169.63.121.186])
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3h99r01xq9-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Tue, 12 Jul 2022 14:28:52 +0000
+Received: from pps.filterd (ppma03wdc.us.ibm.com [127.0.0.1])
+        by ppma03wdc.us.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 26CEL4gs032549;
+        Tue, 12 Jul 2022 14:28:51 GMT
+Received: from b01cxnp23034.gho.pok.ibm.com (b01cxnp23034.gho.pok.ibm.com [9.57.198.29])
+        by ppma03wdc.us.ibm.com with ESMTP id 3h71a9e87y-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Tue, 12 Jul 2022 14:28:51 +0000
+Received: from b01ledav001.gho.pok.ibm.com (b01ledav001.gho.pok.ibm.com [9.57.199.106])
+        by b01cxnp23034.gho.pok.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 26CESo4225100754
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Tue, 12 Jul 2022 14:28:50 GMT
+Received: from b01ledav001.gho.pok.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 7FA8E28058;
+        Tue, 12 Jul 2022 14:28:50 +0000 (GMT)
+Received: from b01ledav001.gho.pok.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id C8FBC28059;
+        Tue, 12 Jul 2022 14:28:48 +0000 (GMT)
+Received: from [9.65.200.23] (unknown [9.65.200.23])
+        by b01ledav001.gho.pok.ibm.com (Postfix) with ESMTP;
+        Tue, 12 Jul 2022 14:28:48 +0000 (GMT)
+Message-ID: <c1662fda-c87c-e204-dddd-e6159c8aa104@linux.ibm.com>
+Date:   Tue, 12 Jul 2022 10:28:48 -0400
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-2.7 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham
-        autolearn_force=no version=3.4.6
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.10.0
+Subject: Re: [PATCH v3 06/10] vfio/ap: Change saved_pfn to saved_iova
+Content-Language: en-US
+To:     Nicolin Chen <nicolinc@nvidia.com>, kwankhede@nvidia.com,
+        corbet@lwn.net, hca@linux.ibm.com, gor@linux.ibm.com,
+        agordeev@linux.ibm.com, borntraeger@linux.ibm.com,
+        svens@linux.ibm.com, zhenyuw@linux.intel.com, zhi.a.wang@intel.com,
+        jani.nikula@linux.intel.com, joonas.lahtinen@linux.intel.com,
+        rodrigo.vivi@intel.com, tvrtko.ursulin@linux.intel.com,
+        airlied@linux.ie, daniel@ffwll.ch, farman@linux.ibm.com,
+        mjrosato@linux.ibm.com, pasic@linux.ibm.com, vneethv@linux.ibm.com,
+        oberpar@linux.ibm.com, freude@linux.ibm.com, jjherne@linux.ibm.com,
+        alex.williamson@redhat.com, cohuck@redhat.com, jgg@nvidia.com,
+        kevin.tian@intel.com, hch@infradead.org
+Cc:     jchrist@linux.ibm.com, kvm@vger.kernel.org,
+        linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org,
+        linux-s390@vger.kernel.org, intel-gvt-dev@lists.freedesktop.org,
+        intel-gfx@lists.freedesktop.org, dri-devel@lists.freedesktop.org,
+        terrence.xu@intel.com
+References: <20220708224427.1245-1-nicolinc@nvidia.com>
+ <20220708224427.1245-7-nicolinc@nvidia.com>
+From:   Anthony Krowiak <akrowiak@linux.ibm.com>
+In-Reply-To: <20220708224427.1245-7-nicolinc@nvidia.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: _j6ePaBx9pKp0DXjWFutlwf2W9WPoPd7
+X-Proofpoint-ORIG-GUID: Z2Erh4ovuh4-1QaA8MtuoCaVso489d7K
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.205,Aquarius:18.0.883,Hydra:6.0.517,FMLib:17.11.122.1
+ definitions=2022-07-12_08,2022-07-12_01,2022-06-22_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 bulkscore=0
+ priorityscore=1501 phishscore=0 suspectscore=0 mlxlogscore=999
+ impostorscore=0 mlxscore=0 clxscore=1015 spamscore=0 malwarescore=0
+ lowpriorityscore=0 adultscore=0 classifier=spam adjust=0 reason=mlx
+ scancount=1 engine=8.12.0-2206140000 definitions=main-2207120055
+X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,
+        SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no
+        version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, 2022-07-12 at 15:50 +0200, Vitaly Kuznetsov wrote:
-> Windows 10/11 guests with Hyper-V role (WSL2) enabled are observed to
-> hang upon boot or shortly after when a non-default TSC frequency was
-> set for L1. The issue is observed on a host where TSC scaling is
-> supported. The problem appears to be that Windows doesn't use TSC
-> frequency for its guests even when the feature is advertised and KVM
-> filters SECONDARY_EXEC_TSC_SCALING out when creating L2 controls from
-> L1's. This leads to L2 running with the default frequency (matching
-> host's) while L1 is running with an altered one.
+Reviewed-by: Tony Krowiak <akrowiak@linux.ibm.com>
 
-Ouch.
-
-I guess that needs a Fixes tag?
-
-Fixes: d041b5ea93352b ("KVM: nVMX: Enable nested TSC scaling")
-
-Also this is thankfully Intel specific, because in AMD you can't enable
-TSC scaling - there is just an MSR with default value of 1.0,
-which one can change if TSC scaling is supported in CPUID.
-
-Reviewed-by: Maxim Levitsky <mlevitsk@redhat.com>
-Best regards,
-	Maxim Levitsky
-
-
-> 
-> Keep SECONDARY_EXEC_TSC_SCALING in secondary exec controls for L2 when
-> it was set for L1. TSC_MULTIPLIER is already correctly computed and
-> written by prepare_vmcs02().
-> 
-> Signed-off-by: Vitaly Kuznetsov <vkuznets@redhat.com>
+On 7/8/22 6:44 PM, Nicolin Chen wrote:
+> The vfio_ap_ops code maintains both nib address and its PFN, which
+> is redundant, merely because vfio_pin/unpin_pages API wanted pfn.
+> Since vfio_pin/unpin_pages() now accept "iova", change "saved_pfn"
+> to "saved_iova" and remove pfn in the vfio_ap_validate_nib().
+>
+> Reviewed-by: Jason Gunthorpe <jgg@nvidia.com>
+> Tested-by: Eric Farman <farman@linux.ibm.com>
+> Signed-off-by: Nicolin Chen <nicolinc@nvidia.com>
 > ---
->  arch/x86/kvm/vmx/nested.c | 1 -
->  1 file changed, 1 deletion(-)
-> 
-> diff --git a/arch/x86/kvm/vmx/nested.c b/arch/x86/kvm/vmx/nested.c
-> index 778f82015f03..bfa366938c49 100644
-> --- a/arch/x86/kvm/vmx/nested.c
-> +++ b/arch/x86/kvm/vmx/nested.c
-> @@ -2284,7 +2284,6 @@ static void prepare_vmcs02_early(struct vcpu_vmx *vmx, struct loaded_vmcs *vmcs0
->                                   SECONDARY_EXEC_VIRTUAL_INTR_DELIVERY |
->                                   SECONDARY_EXEC_APIC_REGISTER_VIRT |
->                                   SECONDARY_EXEC_ENABLE_VMFUNC |
-> -                                 SECONDARY_EXEC_TSC_SCALING |
->                                   SECONDARY_EXEC_DESC);
->  
->                 if (nested_cpu_has(vmcs12,
-
-
+>   drivers/s390/crypto/vfio_ap_ops.c     | 42 +++++++++++----------------
+>   drivers/s390/crypto/vfio_ap_private.h |  4 +--
+>   2 files changed, 19 insertions(+), 27 deletions(-)
+>
+> diff --git a/drivers/s390/crypto/vfio_ap_ops.c b/drivers/s390/crypto/vfio_ap_ops.c
+> index 8a2018ab3cf0..e8856a7e151c 100644
+> --- a/drivers/s390/crypto/vfio_ap_ops.c
+> +++ b/drivers/s390/crypto/vfio_ap_ops.c
+> @@ -112,7 +112,7 @@ static void vfio_ap_wait_for_irqclear(int apqn)
+>    *
+>    * Unregisters the ISC in the GIB when the saved ISC not invalid.
+>    * Unpins the guest's page holding the NIB when it exists.
+> - * Resets the saved_pfn and saved_isc to invalid values.
+> + * Resets the saved_iova and saved_isc to invalid values.
+>    */
+>   static void vfio_ap_free_aqic_resources(struct vfio_ap_queue *q)
+>   {
+> @@ -123,9 +123,9 @@ static void vfio_ap_free_aqic_resources(struct vfio_ap_queue *q)
+>   		kvm_s390_gisc_unregister(q->matrix_mdev->kvm, q->saved_isc);
+>   		q->saved_isc = VFIO_AP_ISC_INVALID;
+>   	}
+> -	if (q->saved_pfn && !WARN_ON(!q->matrix_mdev)) {
+> -		vfio_unpin_pages(&q->matrix_mdev->vdev, q->saved_pfn << PAGE_SHIFT, 1);
+> -		q->saved_pfn = 0;
+> +	if (q->saved_iova && !WARN_ON(!q->matrix_mdev)) {
+> +		vfio_unpin_pages(&q->matrix_mdev->vdev, q->saved_iova, 1);
+> +		q->saved_iova = 0;
+>   	}
+>   }
+>   
+> @@ -189,27 +189,19 @@ static struct ap_queue_status vfio_ap_irq_disable(struct vfio_ap_queue *q)
+>    *
+>    * @vcpu: the object representing the vcpu executing the PQAP(AQIC) instruction.
+>    * @nib: the location for storing the nib address.
+> - * @g_pfn: the location for storing the page frame number of the page containing
+> - *	   the nib.
+>    *
+>    * When the PQAP(AQIC) instruction is executed, general register 2 contains the
+>    * address of the notification indicator byte (nib) used for IRQ notification.
+> - * This function parses the nib from gr2 and calculates the page frame
+> - * number for the guest of the page containing the nib. The values are
+> - * stored in @nib and @g_pfn respectively.
+> - *
+> - * The g_pfn of the nib is then validated to ensure the nib address is valid.
+> + * This function parses and validates the nib from gr2.
+>    *
+>    * Return: returns zero if the nib address is a valid; otherwise, returns
+>    *	   -EINVAL.
+>    */
+> -static int vfio_ap_validate_nib(struct kvm_vcpu *vcpu, unsigned long *nib,
+> -				unsigned long *g_pfn)
+> +static int vfio_ap_validate_nib(struct kvm_vcpu *vcpu, dma_addr_t *nib)
+>   {
+>   	*nib = vcpu->run->s.regs.gprs[2];
+> -	*g_pfn = *nib >> PAGE_SHIFT;
+>   
+> -	if (kvm_is_error_hva(gfn_to_hva(vcpu->kvm, *g_pfn)))
+> +	if (kvm_is_error_hva(gfn_to_hva(vcpu->kvm, *nib >> PAGE_SHIFT)))
+>   		return -EINVAL;
+>   
+>   	return 0;
+> @@ -239,34 +231,34 @@ static struct ap_queue_status vfio_ap_irq_enable(struct vfio_ap_queue *q,
+>   						 int isc,
+>   						 struct kvm_vcpu *vcpu)
+>   {
+> -	unsigned long nib;
+>   	struct ap_qirq_ctrl aqic_gisa = {};
+>   	struct ap_queue_status status = {};
+>   	struct kvm_s390_gisa *gisa;
+>   	int nisc;
+>   	struct kvm *kvm;
+> -	unsigned long g_pfn, h_pfn;
+> +	unsigned long h_pfn;
+>   	phys_addr_t h_nib;
+> +	dma_addr_t nib;
+>   	int ret;
+>   
+>   	/* Verify that the notification indicator byte address is valid */
+> -	if (vfio_ap_validate_nib(vcpu, &nib, &g_pfn)) {
+> -		VFIO_AP_DBF_WARN("%s: invalid NIB address: nib=%#lx, g_pfn=%#lx, apqn=%#04x\n",
+> -				 __func__, nib, g_pfn, q->apqn);
+> +	if (vfio_ap_validate_nib(vcpu, &nib)) {
+> +		VFIO_AP_DBF_WARN("%s: invalid NIB address: nib=%pad, apqn=%#04x\n",
+> +				 __func__, &nib, q->apqn);
+>   
+>   		status.response_code = AP_RESPONSE_INVALID_ADDRESS;
+>   		return status;
+>   	}
+>   
+> -	ret = vfio_pin_pages(&q->matrix_mdev->vdev, g_pfn << PAGE_SHIFT, 1,
+> +	ret = vfio_pin_pages(&q->matrix_mdev->vdev, nib, 1,
+>   			     IOMMU_READ | IOMMU_WRITE, &h_pfn);
+>   	switch (ret) {
+>   	case 1:
+>   		break;
+>   	default:
+>   		VFIO_AP_DBF_WARN("%s: vfio_pin_pages failed: rc=%d,"
+> -				 "nib=%#lx, g_pfn=%#lx, apqn=%#04x\n",
+> -				 __func__, ret, nib, g_pfn, q->apqn);
+> +				 "nib=%pad, apqn=%#04x\n",
+> +				 __func__, ret, &nib, q->apqn);
+>   
+>   		status.response_code = AP_RESPONSE_INVALID_ADDRESS;
+>   		return status;
+> @@ -296,12 +288,12 @@ static struct ap_queue_status vfio_ap_irq_enable(struct vfio_ap_queue *q,
+>   	case AP_RESPONSE_NORMAL:
+>   		/* See if we did clear older IRQ configuration */
+>   		vfio_ap_free_aqic_resources(q);
+> -		q->saved_pfn = g_pfn;
+> +		q->saved_iova = nib;
+>   		q->saved_isc = isc;
+>   		break;
+>   	case AP_RESPONSE_OTHERWISE_CHANGED:
+>   		/* We could not modify IRQ setings: clear new configuration */
+> -		vfio_unpin_pages(&q->matrix_mdev->vdev, g_pfn << PAGE_SHIFT, 1);
+> +		vfio_unpin_pages(&q->matrix_mdev->vdev, nib, 1);
+>   		kvm_s390_gisc_unregister(kvm, isc);
+>   		break;
+>   	default:
+> diff --git a/drivers/s390/crypto/vfio_ap_private.h b/drivers/s390/crypto/vfio_ap_private.h
+> index a26efd804d0d..479b205179bd 100644
+> --- a/drivers/s390/crypto/vfio_ap_private.h
+> +++ b/drivers/s390/crypto/vfio_ap_private.h
+> @@ -102,13 +102,13 @@ struct ap_matrix_mdev {
+>    * struct vfio_ap_queue - contains the data associated with a queue bound to the
+>    *			  vfio_ap device driver
+>    * @matrix_mdev: the matrix mediated device
+> - * @saved_pfn: the guest PFN pinned for the guest
+> + * @saved_iova: the notification indicator byte (nib) address
+>    * @apqn: the APQN of the AP queue device
+>    * @saved_isc: the guest ISC registered with the GIB interface
+>    */
+>   struct vfio_ap_queue {
+>   	struct ap_matrix_mdev *matrix_mdev;
+> -	unsigned long saved_pfn;
+> +	dma_addr_t saved_iova;
+>   	int	apqn;
+>   #define VFIO_AP_ISC_INVALID 0xff
+>   	unsigned char saved_isc;
