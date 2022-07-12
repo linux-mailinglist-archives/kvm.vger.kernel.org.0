@@ -2,82 +2,80 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id DC65E5719B4
-	for <lists+kvm@lfdr.de>; Tue, 12 Jul 2022 14:17:06 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 893CC5719BD
+	for <lists+kvm@lfdr.de>; Tue, 12 Jul 2022 14:19:20 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233168AbiGLMRA (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 12 Jul 2022 08:17:00 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33454 "EHLO
+        id S230332AbiGLMTS (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 12 Jul 2022 08:19:18 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37250 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231136AbiGLMQj (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 12 Jul 2022 08:16:39 -0400
+        with ESMTP id S231902AbiGLMTM (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 12 Jul 2022 08:19:12 -0400
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 81BFC4F1AE
-        for <kvm@vger.kernel.org>; Tue, 12 Jul 2022 05:16:38 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id E05C513E37
+        for <kvm@vger.kernel.org>; Tue, 12 Jul 2022 05:19:11 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1657628197;
+        s=mimecast20190719; t=1657628351;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=JLtO+utoG4qodCG1Q0xb9T25+vkomgAJIsg2wmf1+Qw=;
-        b=PDGRw1cQZS3O7uLIqS9WUS9foX0A1BXr92/Zm2RJHESPTf6Sy/Ktz9IyCx2zS12VE1gd7H
-        hDQRXlUBUWtJnKpjCsYfA08jwAgtWbEAQ58RQhQZqGbclcyyt2qJ+oKGclj2B/IRTGiJ4w
-        enkvl4WIxI59IcBcIY4VJz5siHMC41A=
-Received: from mail-qv1-f71.google.com (mail-qv1-f71.google.com
- [209.85.219.71]) by relay.mimecast.com with ESMTP with STARTTLS
+        bh=D/fC+rsuewsmYyokkHN4davc+n6pcIuIFkioCEI5EXs=;
+        b=JhJSW0CQMGfFfYFc0lWYcSjeAG81CnnzBy1EeNZ5hjPgSRfV2tNMhw9h7HMxgdmll4BRxH
+        Sbo9c/fVj0PvRjO288KRxa7+kTM4LOhYSK3eOx29cZ7DNVhCRzD/p3wXEPp+6gDxlPO9E+
+        cqlTmi23ClI6JGlaKmv6ymyXMq/GDFA=
+Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
+ [209.85.128.70]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-329-rs-guK8yPOSi6qnIy7Kcaw-1; Tue, 12 Jul 2022 08:16:36 -0400
-X-MC-Unique: rs-guK8yPOSi6qnIy7Kcaw-1
-Received: by mail-qv1-f71.google.com with SMTP id oo28-20020a056214451c00b004732e817c96so1713581qvb.22
-        for <kvm@vger.kernel.org>; Tue, 12 Jul 2022 05:16:36 -0700 (PDT)
+ us-mta-625-GO2iXpGIPcufRQTG4r0QQQ-1; Tue, 12 Jul 2022 08:19:09 -0400
+X-MC-Unique: GO2iXpGIPcufRQTG4r0QQQ-1
+Received: by mail-wm1-f70.google.com with SMTP id 2-20020a1c0202000000b003a2cfab44eeso6642102wmc.6
+        for <kvm@vger.kernel.org>; Tue, 12 Jul 2022 05:19:09 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:message-id:subject:from:to:cc:date:in-reply-to
-         :references:user-agent:mime-version:content-transfer-encoding;
-        bh=JLtO+utoG4qodCG1Q0xb9T25+vkomgAJIsg2wmf1+Qw=;
-        b=6aCs+6GxPIP5tjiGj0PWPiSi2XELIq3xkhOPxYzPGFsi5x2h6+RiE4sBJx1bqJMWun
-         Adws63+bhDvXnWvRmcpapgdt07EfG0BWfUBx2THVIPCcuDrMFYwLPt7TnaNEHJoKpLZs
-         skhyaN2fj9PF4/uznBbDjQ57y4EwF52QGJ1m1gvnfCZyblw9kJAb5XRIdV7ZVuvjeP4V
-         wpeNuCdGsA/9tXBpxfcdCKuRy12ZLigWKtvOJP97l1mIspMcMW7ZGBuQDmsc3N8ET4Rp
-         O7QVbrtwhi8Q0ARtBTXZHbZVL7LpazKXUOU9LqvAdZPcxUxfIEGKQiZtzOnZ/f5zs995
-         l/3g==
-X-Gm-Message-State: AJIora9C9VdYkL12K+Oe334PH6uHFFD29mJ6IyjMO9INbQ2B+Gfpd5IL
-        jr3DxTP2UImNpF89MwQs4EXgi82FGMVaVvKE5r4YJllryzlTNsb/lxqD9q3D/19lbtp+cnbUhIk
-        EOfLyg/9Urxof
-X-Received: by 2002:a05:620a:492:b0:6b5:a6ec:b4f3 with SMTP id 18-20020a05620a049200b006b5a6ecb4f3mr1159265qkr.639.1657628196056;
-        Tue, 12 Jul 2022 05:16:36 -0700 (PDT)
-X-Google-Smtp-Source: AGRyM1tPS/8+mFo5fVP722REZ/gG45yh2vdOMTH4yFSkeOH+JPVynHXqJpxpi+fNcWAI6npEJ4tpTg==
-X-Received: by 2002:a05:620a:492:b0:6b5:a6ec:b4f3 with SMTP id 18-20020a05620a049200b006b5a6ecb4f3mr1159234qkr.639.1657628195727;
-        Tue, 12 Jul 2022 05:16:35 -0700 (PDT)
-Received: from [10.35.4.238] (bzq-82-81-161-50.red.bezeqint.net. [82.81.161.50])
-        by smtp.gmail.com with ESMTPSA id h4-20020ac846c4000000b00304ea0a86cesm7100977qto.81.2022.07.12.05.16.33
+        h=x-gm-message-state:from:to:cc:subject:in-reply-to:references:date
+         :message-id:mime-version:content-transfer-encoding;
+        bh=D/fC+rsuewsmYyokkHN4davc+n6pcIuIFkioCEI5EXs=;
+        b=lMzpVfkWN2YRcI8Sbc0yxOEvK+fDVzZErweIiTu6nrHH6O9RawcDIHnW+trKZWxt3q
+         aB40v+UkcyD1Dnk44yMkfrUQIzYFr8lunBwKexksSywvGLvMBIPzjJun81NFUTSbWTJq
+         N+MfhmRASwmM8CBM6sKbIDtZMf29B/GxOnG8F4uI+K2106CjTj0g7I4uiQA34fjAkuSe
+         YKBnOFBBkysPRTDX10D0ZLBUNmDf8rovwULUJKp/48GrG470qedCBqpNyXq62pdvFwLp
+         eO+lT7Ub01RhUROshD6mSH850NaRpHsxmus+RJl8KoYuitoXGtZhGJ9WItjQibzKpNQf
+         LDRw==
+X-Gm-Message-State: AJIora9DPgR7R2gf/AnXeZ3fdVwacihLUDjQbQUzostK5IdNomL7D0A9
+        jVmkJ5kBsn6aEHTGLN9rDmx5CDMNG8yL2f/4dvVlV0511nGtWBYbc2WsCrbYddvb9y/J966PQws
+        XkyZugGTk42My
+X-Received: by 2002:a05:600c:3845:b0:3a2:c04d:5ff9 with SMTP id s5-20020a05600c384500b003a2c04d5ff9mr3619769wmr.74.1657628348621;
+        Tue, 12 Jul 2022 05:19:08 -0700 (PDT)
+X-Google-Smtp-Source: AGRyM1tSAiVrHcowqDbe7dPEm4sreDyxs47ZG63PfIWwugXmlHXOLYhohrraQDJqffTNnuGllHv/ag==
+X-Received: by 2002:a05:600c:3845:b0:3a2:c04d:5ff9 with SMTP id s5-20020a05600c384500b003a2c04d5ff9mr3619748wmr.74.1657628348428;
+        Tue, 12 Jul 2022 05:19:08 -0700 (PDT)
+Received: from fedora (nat-2.ign.cz. [91.219.240.2])
+        by smtp.gmail.com with ESMTPSA id j5-20020adff545000000b0021d864d4461sm8090767wrp.83.2022.07.12.05.19.07
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 12 Jul 2022 05:16:35 -0700 (PDT)
-Message-ID: <f9be9f7293ed366d750fa3fa7bb257d4f1b03891.camel@redhat.com>
-Subject: Re: [PATCH v3 11/25] KVM: VMX: Get rid of eVMCS specific VMX
- controls sanitization
-From:   Maxim Levitsky <mlevitsk@redhat.com>
-To:     Vitaly Kuznetsov <vkuznets@redhat.com>, kvm@vger.kernel.org
+        Tue, 12 Jul 2022 05:19:07 -0700 (PDT)
+From:   Vitaly Kuznetsov <vkuznets@redhat.com>
+To:     Maxim Levitsky <mlevitsk@redhat.com>, kvm@vger.kernel.org
 Cc:     Anirudh Rayabharam <anrayabh@linux.microsoft.com>,
         Wanpeng Li <wanpengli@tencent.com>,
         Jim Mattson <jmattson@google.com>,
         linux-hyperv@vger.kernel.org, linux-kernel@vger.kernel.org,
         Paolo Bonzini <pbonzini@redhat.com>,
         Sean Christopherson <seanjc@google.com>
-Date:   Tue, 12 Jul 2022 15:16:31 +0300
-In-Reply-To: <877d4iplyp.fsf@redhat.com>
+Subject: Re: [PATCH v3 03/25] x86/hyperv: Update 'struct
+ hv_enlightened_vmcs' definition
+In-Reply-To: <6cf5812083ebfa18ba52563527298cb8b91f7fab.camel@redhat.com>
 References: <20220708144223.610080-1-vkuznets@redhat.com>
-         <20220708144223.610080-12-vkuznets@redhat.com>
-         <f1d030d7db4aaf3075fe625799b99ae335fc9f60.camel@redhat.com>
-         <877d4iplyp.fsf@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
-User-Agent: Evolution 3.40.4 (3.40.4-5.fc34) 
+ <20220708144223.610080-4-vkuznets@redhat.com>
+ <6cf5812083ebfa18ba52563527298cb8b91f7fab.camel@redhat.com>
+Date:   Tue, 12 Jul 2022 14:19:06 +0200
+Message-ID: <874jzmplqd.fsf@redhat.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 X-Spam-Status: No, score=-3.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,
-        SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham
+        SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=unavailable
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -85,107 +83,110 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, 2022-07-12 at 14:14 +0200, Vitaly Kuznetsov wrote:
-> Maxim Levitsky <mlevitsk@redhat.com> writes:
-> 
-> > On Fri, 2022-07-08 at 16:42 +0200, Vitaly Kuznetsov wrote:
-> > > With the updated eVMCSv1 definition, there's no known 'problematic'
-> > > controls which are exposed in VMX control MSRs but are not present in
-> > > eVMCSv1. Get rid of VMX control MSRs filtering for KVM on Hyper-V.
-> > 
-> > If I understand correctly we are taking about running KVM as a nested guest of Hyper-V here:
-> > 
-> > Don't we need to check the new CPUID bit and only then use the new fields of eVMCS,
-> > aka check that the 'cpu' supports the updated eVMCS version?
-> > 
-> 
-> I've checked various Hyper-V versions available around and it seems
-> there's no need for that: these new features are exposed in VMX control
-> MSRs only when the updated eVMCS is supported.
+Maxim Levitsky <mlevitsk@redhat.com> writes:
 
-Makes sense now. Might be worth a comment somewhere.
+> On Fri, 2022-07-08 at 16:42 +0200, Vitaly Kuznetsov wrote:
+>> Updated Hyper-V Enlightened VMCS specification lists several new
+>> fields for the following features:
+>>=20
+>> - PerfGlobalCtrl
+>> - EnclsExitingBitmap
+>> - Tsc Scaling
+>> - GuestLbrCtl
+>> - CET
+>> - SSP
+>>=20
+>> Update the definition. The updated definition is available only when
+>> CPUID.0x4000000A.EBX BIT(0) is '1'. Add a define for it as well.
+>>=20
+>> Note: The latest TLFS is available at
+>> https://docs.microsoft.com/en-us/virtualization/hyper-v-on-windows/tlfs/=
+tlfs
+>>=20
+>> Signed-off-by: Vitaly Kuznetsov <vkuznets@redhat.com>
+>> ---
+>>  arch/x86/include/asm/hyperv-tlfs.h | 18 ++++++++++++++++--
+>>  1 file changed, 16 insertions(+), 2 deletions(-)
+>>=20
+>> diff --git a/arch/x86/include/asm/hyperv-tlfs.h b/arch/x86/include/asm/h=
+yperv-tlfs.h
+>> index 6f0acc45e67a..6f2c3cdacdf4 100644
+>> --- a/arch/x86/include/asm/hyperv-tlfs.h
+>> +++ b/arch/x86/include/asm/hyperv-tlfs.h
+>> @@ -138,6 +138,9 @@
+>>  #define HV_X64_NESTED_GUEST_MAPPING_FLUSH		BIT(18)
+>>  #define HV_X64_NESTED_MSR_BITMAP			BIT(19)
+>>=20=20
+>
+> Maybe add a comment that this is undocumented + what that cpuid bit does?
+>
+>> +/* Nested quirks. These are HYPERV_CPUID_NESTED_FEATURES.EBX bits. */
+>> +#define HV_X64_NESTED_EVMCS1_2022_UPDATE		BIT(0)
+>> +
+>>  /*
+>>   * This is specific to AMD and specifies that enlightened TLB flush is
+>>   * supported. If guest opts in to this feature, ASID invalidations only
+>> @@ -559,9 +562,20 @@ struct hv_enlightened_vmcs {
+>>  	u64 partition_assist_page;
+>>  	u64 padding64_4[4];
+>>  	u64 guest_bndcfgs;
+>> -	u64 padding64_5[7];
+>> +	u64 guest_ia32_perf_global_ctrl;
+>> +	u64 guest_ia32_s_cet;
+>> +	u64 guest_ssp;
+>> +	u64 guest_ia32_int_ssp_table_addr;
+>> +	u64 guest_ia32_lbr_ctl;
+>> +	u64 padding64_5[2];
+>
+> This change looks OK
+>
+>>  	u64 xss_exit_bitmap;
+>> -	u64 padding64_6[7];
+>> +	u64 host_ia32_perf_global_ctrl;
+>> +	u64 encls_exiting_bitmap;
+>> +	u64 tsc_multiplier;
+>> +	u64 host_ia32_s_cet;
+>> +	u64 host_ssp;
+>> +	u64 host_ia32_int_ssp_table_addr;
+>> +	u64 padding64_6;
+>
+> I think we have a mistake here:
+>
+> UINT64 XssExitingBitmap;
+> UINT64 EnclsExitingBitmap;
+> UINT64 HostPerfGlobalCtrl;
+> UINT64 TscMultiplier;
+> UINT64 HostSCet;
+> UINT64 HostSsp;
+> UINT64 HostInterruptSspTableAddr;
+> UINT64 Rsvd8;
+>
+>
+> I think you need to swap encls_exiting_bitmap and host_ia32_perf_global_c=
+trl
+>
+> I used=C2=A0https://docs.microsoft.com/en-us/virtualization/hyper-v-on-wi=
+ndows/tlfs/datatypes/hv_vmx_enlightened_vmcs
+> as the reference.=C2=A0
 
-Best regards,
-	Maxim Levitsky
+Oh, nice catch, thanks! I have no idea how this mistake crept in. A
+conspiracy theory: maybe the online version of TLFS was updated
+under our feet? :-)
 
-> 
-> We can, in theory, preserve the filtering for non-updated eVMCS verison
-> but I'd vote for putting a WARN_ON() or something around: we can
-> eventually get rid of it in case we don't get any reports.
-> 
-> > Best regards,
-> >         Maxim Levitsky
-> > 
-> > 
-> > 
-> > > 
-> > > Note: VMX control MSRs filtering for Hyper-V on KVM
-> > > (nested_evmcs_filter_control_msr()) stays as even the updated eVMCSv1
-> > > definition doesn't have all the features implemented by KVM and some
-> > > fields are still missing. Moreover, nested_evmcs_filter_control_msr()
-> > > has to support the original eVMCSv1 version when VMM wishes so.
-> > > 
-> > > Signed-off-by: Vitaly Kuznetsov <vkuznets@redhat.com>
-> > > ---
-> > >  arch/x86/kvm/vmx/evmcs.c | 13 -------------
-> > >  arch/x86/kvm/vmx/evmcs.h |  1 -
-> > >  arch/x86/kvm/vmx/vmx.c   |  5 -----
-> > >  3 files changed, 19 deletions(-)
-> > > 
-> > > diff --git a/arch/x86/kvm/vmx/evmcs.c b/arch/x86/kvm/vmx/evmcs.c
-> > > index 52a53debd806..b5cfbf7d487b 100644
-> > > --- a/arch/x86/kvm/vmx/evmcs.c
-> > > +++ b/arch/x86/kvm/vmx/evmcs.c
-> > > @@ -320,19 +320,6 @@ const struct evmcs_field vmcs_field_to_evmcs_1[] = {
-> > >  };
-> > >  const unsigned int nr_evmcs_1_fields = ARRAY_SIZE(vmcs_field_to_evmcs_1);
-> > >  
-> > > -#if IS_ENABLED(CONFIG_HYPERV)
-> > > -__init void evmcs_sanitize_exec_ctrls(struct vmcs_config *vmcs_conf)
-> > > -{
-> > > -       vmcs_conf->cpu_based_exec_ctrl &= ~EVMCS1_UNSUPPORTED_EXEC_CTRL;
-> > > -       vmcs_conf->pin_based_exec_ctrl &= ~EVMCS1_UNSUPPORTED_PINCTRL;
-> > > -       vmcs_conf->cpu_based_2nd_exec_ctrl &= ~EVMCS1_UNSUPPORTED_2NDEXEC;
-> > > -       vmcs_conf->cpu_based_3rd_exec_ctrl = 0;
-> > > -
-> > > -       vmcs_conf->vmexit_ctrl &= ~EVMCS1_UNSUPPORTED_VMEXIT_CTRL;
-> > > -       vmcs_conf->vmentry_ctrl &= ~EVMCS1_UNSUPPORTED_VMENTRY_CTRL;
-> > > -}
-> > > -#endif
-> > > -
-> > >  bool nested_enlightened_vmentry(struct kvm_vcpu *vcpu, u64 *evmcs_gpa)
-> > >  {
-> > >         struct hv_vp_assist_page assist_page;
-> > > diff --git a/arch/x86/kvm/vmx/evmcs.h b/arch/x86/kvm/vmx/evmcs.h
-> > > index 4b809c79ae63..0feac101cce4 100644
-> > > --- a/arch/x86/kvm/vmx/evmcs.h
-> > > +++ b/arch/x86/kvm/vmx/evmcs.h
-> > > @@ -203,7 +203,6 @@ static inline void evmcs_load(u64 phys_addr)
-> > >         vp_ap->enlighten_vmentry = 1;
-> > >  }
-> > >  
-> > > -__init void evmcs_sanitize_exec_ctrls(struct vmcs_config *vmcs_conf);
-> > >  #else /* !IS_ENABLED(CONFIG_HYPERV) */
-> > >  static __always_inline void evmcs_write64(unsigned long field, u64 value) {}
-> > >  static inline void evmcs_write32(unsigned long field, u32 value) {}
-> > > diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
-> > > index b4915d841357..dd905ad72637 100644
-> > > --- a/arch/x86/kvm/vmx/vmx.c
-> > > +++ b/arch/x86/kvm/vmx/vmx.c
-> > > @@ -2689,11 +2689,6 @@ static __init int setup_vmcs_config(struct vmcs_config *vmcs_conf,
-> > >         vmcs_conf->vmexit_ctrl         = _vmexit_control;
-> > >         vmcs_conf->vmentry_ctrl        = _vmentry_control;
-> > >  
-> > > -#if IS_ENABLED(CONFIG_HYPERV)
-> > > -       if (enlightened_vmcs)
-> > > -               evmcs_sanitize_exec_ctrls(vmcs_conf);
-> > > -#endif
-> > > -
-> > >         return 0;
-> > >  }
-> > >  
-> > 
-> > 
-> 
+v4 is coming to rescue.
 
+>
+>
+> Best regards,
+> 	Maxim Levitsky
+>
+>
+>>  } __packed;
+>>=20=20
+>>  #define HV_VMX_ENLIGHTENED_CLEAN_FIELD_NONE			0
+>
+>
+
+--=20
+Vitaly
 
