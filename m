@@ -2,57 +2,57 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 3F19857299D
-	for <lists+kvm@lfdr.de>; Wed, 13 Jul 2022 01:03:45 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 62AD657299F
+	for <lists+kvm@lfdr.de>; Wed, 13 Jul 2022 01:04:17 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233668AbiGLXDn (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 12 Jul 2022 19:03:43 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34668 "EHLO
+        id S230010AbiGLXEQ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 12 Jul 2022 19:04:16 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35674 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229750AbiGLXDk (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 12 Jul 2022 19:03:40 -0400
-Received: from mail-oi1-x234.google.com (mail-oi1-x234.google.com [IPv6:2607:f8b0:4864:20::234])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8EB8DBC00
-        for <kvm@vger.kernel.org>; Tue, 12 Jul 2022 16:03:39 -0700 (PDT)
-Received: by mail-oi1-x234.google.com with SMTP id u68so2664740oie.0
-        for <kvm@vger.kernel.org>; Tue, 12 Jul 2022 16:03:39 -0700 (PDT)
+        with ESMTP id S230470AbiGLXEO (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 12 Jul 2022 19:04:14 -0400
+Received: from mail-oa1-x32.google.com (mail-oa1-x32.google.com [IPv6:2001:4860:4864:20::32])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2CA862A41B
+        for <kvm@vger.kernel.org>; Tue, 12 Jul 2022 16:04:14 -0700 (PDT)
+Received: by mail-oa1-x32.google.com with SMTP id 586e51a60fabf-10bf634bc50so12163444fac.3
+        for <kvm@vger.kernel.org>; Tue, 12 Jul 2022 16:04:14 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
         h=mime-version:references:in-reply-to:from:date:message-id:subject:to
          :cc;
-        bh=qHwuHViFSN86tj0ChYoibxcY4E2c7D4JyTppJFZI4so=;
-        b=Lhh55GnSdOjPhbJGduTnxEGnWccw6kHOeEeY08jAZgJe0VqjmPoBdTPnONumi/pAun
-         p+cHg4gHnhGSvibmw9wIMHwGbOMlbmWVVet0lyBNoQFKw49iIOLl44zlrlp+lgOkWr4N
-         nI06n4Ji3hwluei1aEEzHQyZHr8WFbhVYRiJlwQVHmUD64NqpTZjoyhfvNHbS2GCc5aR
-         uNpAcmjt7Eo2ZLV4iQ/jGK1hfJ4aVbxJui0znZqX9547wQXUukqWF8+PFEtZcDsj6osq
-         cNrlBGb2ZoHRdeHJDRKTLI+onjdNABpheW4De5nAankciyk7viUqVbyzzoaaEs5liuGY
-         qvhw==
+        bh=0kilpuaWkkH1jWKZwcnpv75y3bBAyVMGJWLT8pq7Zew=;
+        b=ZBE5KGyRMkxibp5iaQK1l2yLFQs3jMAWpu5gwk0mkKX4ubei8nAy3KENVxr6zAoHjv
+         GxxAukLzTPcow4xb39vYwDGdcaSRPa60fmvrQz7t5M+INg1M5ckPSC915vA9q2vN94AD
+         /SGqziGRgsU+lRLMnfhy3E5QN+LwNKSm54tmpu0mNnq5YnUHuf05goqCVAxNqaaAiN6B
+         kCkPthpHgFI7wBZw9z3V/ubta+xmhbhQHRM/O5EcP+46woLYQpwn+fg2Dj/B6KQdkz8q
+         cxYdjJT7Re3j22yGvnr+ktEYQOKJ6wkxisMXfv/a2tIwVaodgTZvM0zkiXaKA3U/CSDX
+         wuPw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:mime-version:references:in-reply-to:from:date
          :message-id:subject:to:cc;
-        bh=qHwuHViFSN86tj0ChYoibxcY4E2c7D4JyTppJFZI4so=;
-        b=fuIV6lbfjxFQA74Ghag9fGHMwH+iwDjOIRjpKwFzHI2RPvtr3NUKh7vDVZzMt3whZY
-         f+wsLMOGfYx6vpOr/OZGW7gcQorHCEyPIR9wU0kAkALlaMM1Rysp4b+0CkrCbjMoxQfs
-         9ipVBmp9dgLBdYpG0r0Nng1GWzO2KjA3eob0l9WD223/urnzGeTvCtuJWwIZgNtoAKz/
-         KGAXGPXQoJ5V0MCibzE5RmCfmWcAuNytN7ENGr7Eiq++FenFu7B+0Ystl1JwTePdtIcK
-         Hq3E4imE2Kvf1fGQhYWPo+LYM7QlgPFMpwPuK4B6cbC6us3f8eBG+M8jpSd9p+E1bMRF
-         x5Vg==
-X-Gm-Message-State: AJIora8FUbnKIm6UwfWA5LwVO0NWsHKTRl5QJq1Rmfjn7GUgYA0lgpzv
-        iFyouPjKZLA2KKvtQvmh0k2o6DF/nDV1fJVBAAHuNQ==
-X-Google-Smtp-Source: AGRyM1sv6/a3j0mcFzaoNZorrDTb4kx9QsLkQ7zFGrGqxGPqVxoEEPKoh5NgLCA2o5UhH33aMTJl+s4tUNJhAnFoewI=
-X-Received: by 2002:aca:e043:0:b0:32e:1ad1:2d4 with SMTP id
- x64-20020acae043000000b0032e1ad102d4mr3357976oig.235.1657667018762; Tue, 12
- Jul 2022 16:03:38 -0700 (PDT)
+        bh=0kilpuaWkkH1jWKZwcnpv75y3bBAyVMGJWLT8pq7Zew=;
+        b=Bx+DxOzyN39Ti7c43QsHzP2wc4FCg4MjrFYUe0tqG1T6objvyePmI502VDXU3kHKLI
+         x6AJHLArRvIIRh789BC7s8sfDNww1Aav5dxDn2cbPSDLAJmwCQ7+NLIAuLPt4uD1sBR2
+         aYJCjAFFrjMI79dSXYspP8nglXroqFLSQ22CxMcq4gpu24J4s+JB5tUJp71a0QuNxhuN
+         2CXBjxCiF0IOmNA2L5ZFsxkcUxwy8SyDqeOJJoY80wDrUdUbME7wtZodjE/NEtvh4xOh
+         hrz+6OBc1LU3Ahri2aD810W4NyvinVbF82bhNBXw5iqDWJFDcQOlmSg2ChZDF6Hz5VdS
+         NFgg==
+X-Gm-Message-State: AJIora9GK6H8rmevNURKnFb70Mb8TyEOZmYchxG7Te+nOiaEK2hIrAnb
+        rZT8gaCKFkPlQqbfSty9W8weF4b4DgOJq+IlrFlWAA==
+X-Google-Smtp-Source: AGRyM1uYZ+G3f4X735Xr0IJWdBmvb830WjZ9bkBphZtyS8Anj7WjdMlYQpZtxJ6khjfO5cktyObZb/GpgNs5V7B3uuU=
+X-Received: by 2002:a05:6870:d349:b0:f5:e9ea:5200 with SMTP id
+ h9-20020a056870d34900b000f5e9ea5200mr3194460oag.235.1657667052905; Tue, 12
+ Jul 2022 16:04:12 -0700 (PDT)
 MIME-Version: 1.0
 References: <20220628220938.3657876-1-yosryahmed@google.com>
- <20220628220938.3657876-2-yosryahmed@google.com> <YsdJPeVOqlj4cf2a@google.com>
-In-Reply-To: <YsdJPeVOqlj4cf2a@google.com>
+ <20220628220938.3657876-3-yosryahmed@google.com> <YsdLVBtl16mx3+Ot@google.com>
+In-Reply-To: <YsdLVBtl16mx3+Ot@google.com>
 From:   Yosry Ahmed <yosryahmed@google.com>
-Date:   Tue, 12 Jul 2022 16:03:02 -0700
-Message-ID: <CAJD7tkYE+pZdk=-psEP_Rq_1CmDjY7Go+s1LXm-ctryWvUdgLA@mail.gmail.com>
-Subject: Re: [PATCH v6 1/4] mm: add NR_SECONDARY_PAGETABLE to count secondary
- page table uses.
+Date:   Tue, 12 Jul 2022 16:03:37 -0700
+Message-ID: <CAJD7tkZ-r7O1AD8kAUgoY0Y2RNQkBpbtmtKpq68xN4PO=fzPnw@mail.gmail.com>
+Subject: Re: [PATCH v6 2/4] KVM: mmu: add a helper to account memory used by
+ KVM MMU.
 To:     Sean Christopherson <seanjc@google.com>
 Cc:     Tejun Heo <tj@kernel.org>, Johannes Weiner <hannes@cmpxchg.org>,
         Zefan Li <lizefan.x@bytedance.com>,
@@ -87,62 +87,49 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Thanks for taking another look at this!
-
-On Thu, Jul 7, 2022 at 1:59 PM Sean Christopherson <seanjc@google.com> wrote:
+On Thu, Jul 7, 2022 at 2:08 PM Sean Christopherson <seanjc@google.com> wrote:
 >
 > On Tue, Jun 28, 2022, Yosry Ahmed wrote:
-> > We keep track of several kernel memory stats (total kernel memory, page
-> > tables, stack, vmalloc, etc) on multiple levels (global, per-node,
-> > per-memcg, etc). These stats give insights to users to how much memory
-> > is used by the kernel and for what purposes.
+> > Add a helper to account pages used by KVM for page tables in memory
+> > secondary pagetable stats. This function will be used by subsequent
+> > patches in different archs.
 > >
-> > Currently, memory used by kvm mmu is not accounted in any of those
+> > Signed-off-by: Yosry Ahmed <yosryahmed@google.com>
+> > ---
+> >  include/linux/kvm_host.h | 10 ++++++++++
+> >  1 file changed, 10 insertions(+)
+> >
+> > diff --git a/include/linux/kvm_host.h b/include/linux/kvm_host.h
+> > index 3b40f8d68fbb1..032821d77e920 100644
+> > --- a/include/linux/kvm_host.h
+> > +++ b/include/linux/kvm_host.h
+> > @@ -2241,6 +2241,16 @@ static inline void kvm_handle_signal_exit(struct kvm_vcpu *vcpu)
+> >  }
+> >  #endif /* CONFIG_KVM_XFER_TO_GUEST_WORK */
+> >
+> > +/*
+> > + * If more than one page is being (un)accounted, @virt must be the address of
+> > + * the first page of a block of pages what were allocated together (i.e
+> > + * accounted together).
 >
-> Nit, capitalize KVM (mainly to be consistent).
+> Sorry for the belated thoughts...
 >
-> > @@ -1085,6 +1086,9 @@ KernelStack
-> >                Memory consumed by the kernel stacks of all tasks
-> >  PageTables
-> >                Memory consumed by userspace page tables
-> > +SecPageTables
-> > +              Memory consumed by secondary page tables, this currently
-> > +           currently includes KVM mmu allocations on x86 and arm64.
->
-> Nit, this line has a tab instead of eight spaces.  Not sure if it actually matters,
-> there are plenty of tabs elsewhere in the file, but all the entries in this block
-> use only spaces.
->
-
-Will fix it.
-
-> > diff --git a/include/linux/mmzone.h b/include/linux/mmzone.h
-> > index aab70355d64f3..13190d298c986 100644
-> > --- a/include/linux/mmzone.h
-> > +++ b/include/linux/mmzone.h
-> > @@ -216,6 +216,7 @@ enum node_stat_item {
-> >       NR_KERNEL_SCS_KB,       /* measured in KiB */
-> >  #endif
-> >       NR_PAGETABLE,           /* used for pagetables */
-> > +     NR_SECONDARY_PAGETABLE, /* secondary pagetables, e.g. kvm shadow pagetables */
->
-> Nit, s/kvm/KVM, and drop the "shadow", which might be misinterpreted as saying KVM
-> pagetables are only accounted when KVM is using shadow paging.  KVM's usage of "shadow"
-> is messy, so I totally understand why you included it, but in this case it's unnecessary
-> and potentially confusing.
->
-> And finally, something that's not a nit.  Should this be wrapped with CONFIG_KVM
-> (using IS_ENABLED() because KVM can be built as a module)?  That could be removed
-> if another non-KVM secondary MMU user comes along, but until then, #ifdeffery for
-> stats the depend on a single feature seems to be the status quo for this code.
+> If you spin a v7, can you add a note to call out that mod_lruvec_page_state() is
+> itself thread-safe?  Caught my eye because the TDP MMU usage happens while holding
+> mmu_lock for read.
 >
 
-I will #ifdef the stat, but I will emphasize in the docs that is
-currently *only* used for KVM so that it makes sense if users without
-KVM don't see the stat at all. I will also remove the stat from
-show_free_areas() in mm/page_alloc.c as it seems like none of the
-#ifdefed stats show up there.
+Sure! I will send a v7 anyway to address the comments on patch 1. Thanks!
 
-> >  #ifdef CONFIG_SWAP
-> >       NR_SWAPCACHE,
-> >  #endif
+> > + */
+> > +static inline void kvm_account_pgtable_pages(void *virt, int nr)
+> > +{
+> > +     mod_lruvec_page_state(virt_to_page(virt), NR_SECONDARY_PAGETABLE, nr);
+> > +}
+> > +
+> >  /*
+> >   * This defines how many reserved entries we want to keep before we
+> >   * kick the vcpu to the userspace to avoid dirty ring full.  This
+> > --
+> > 2.37.0.rc0.161.g10f37bed90-goog
+> >
