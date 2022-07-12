@@ -2,113 +2,118 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id B7EA8570FFA
-	for <lists+kvm@lfdr.de>; Tue, 12 Jul 2022 04:08:04 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 8C26657102C
+	for <lists+kvm@lfdr.de>; Tue, 12 Jul 2022 04:27:30 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231180AbiGLCHl (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 11 Jul 2022 22:07:41 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48992 "EHLO
+        id S230036AbiGLC13 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 11 Jul 2022 22:27:29 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33502 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230219AbiGLCHc (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 11 Jul 2022 22:07:32 -0400
-Received: from mail-pf1-x44a.google.com (mail-pf1-x44a.google.com [IPv6:2607:f8b0:4864:20::44a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 12F557CB4F
-        for <kvm@vger.kernel.org>; Mon, 11 Jul 2022 19:07:31 -0700 (PDT)
-Received: by mail-pf1-x44a.google.com with SMTP id y37-20020a056a001ca500b00528bbf82c1eso1605738pfw.10
-        for <kvm@vger.kernel.org>; Mon, 11 Jul 2022 19:07:31 -0700 (PDT)
+        with ESMTP id S229782AbiGLC12 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 11 Jul 2022 22:27:28 -0400
+Received: from mail-pl1-x634.google.com (mail-pl1-x634.google.com [IPv6:2607:f8b0:4864:20::634])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0CFFF7358C
+        for <kvm@vger.kernel.org>; Mon, 11 Jul 2022 19:27:26 -0700 (PDT)
+Received: by mail-pl1-x634.google.com with SMTP id q5so6024813plr.11
+        for <kvm@vger.kernel.org>; Mon, 11 Jul 2022 19:27:26 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=reply-to:date:in-reply-to:message-id:mime-version:references
-         :subject:from:to:cc;
-        bh=wC4daWuN72ntGNvsqnVV6vq+bt1gw7NePoqDxLLGrS8=;
-        b=CVfLrEPTwIaX/ki4UHYkP2ZYB4PdTx80sHad8DGQnCFvjKorZ6JfnaYRfzbWOIJvW2
-         itUY2sdVixbqHdbUNb5j7uQy41tHY1uo4vwY590DpNkmxAyfP6T71U64XE0p6rGWRPOQ
-         4zULpdTPLDYFSAHe/VMpzNp5llohVFJbfQ0d+HDFFlr8op2cZywsn81iw+nSBCDzAxmu
-         yUKf9e3Zh+S0hmBwRzIRA6wH5eaLxpZGN7G2g1skjxWOxRxEChRb0GcasYGWdF5itqR9
-         12CwWrVUW6QLDxrLrkDXRmgoK7wacQgV/NLz2Agxy0kIgSDFUko16nV+OJ5j3+h2O3Pv
-         gjOw==
+        d=ozlabs-ru.20210112.gappssmtp.com; s=20210112;
+        h=message-id:date:mime-version:user-agent:subject:content-language:to
+         :cc:references:from:in-reply-to:content-transfer-encoding;
+        bh=aZB3UGhgPcDW1xV3kcl8kwXBo405C0t8FD0AZJD9BPE=;
+        b=FOgGspsoBmU9j5Y9NmWK0vgVrEvFYwYk83edHfZHMIXqyKE6c0upC2vWfBw27zveUV
+         vvXAl6YuNf3vYqsn7BtvNOHA5zuIUcwQPHneit6IdDDLOk0QTrVSCXRxXmqp6e0SxO9J
+         qv751qwBjSkkIH9/6zm/NqfhoNjGadD+3c9SToEaa3cnZRlHuiduMRrftxN1Y/KcyLbn
+         Qxs4PQoyuIOfqHYnhZ/cnT56JfJG3nDVmGEikAMJaWR6+74RDOqHombWs7odOl7XmFCm
+         NvB9LWUQj89CwEJOOfVwHQwgaJvgRLOMZVwRzD8ZnsFTVsqbYQfuclB3O07Iu2Mh3rgQ
+         RLbA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:reply-to:date:in-reply-to:message-id
-         :mime-version:references:subject:from:to:cc;
-        bh=wC4daWuN72ntGNvsqnVV6vq+bt1gw7NePoqDxLLGrS8=;
-        b=QZk40YXKNjCj7HPOsFKBwtmU9ScvLEONOJK4yV50PUInscjKmGK5S4bf7EI/WZ2XlS
-         dZ2eWzT4Of4EIPvNFOYvWOashFKl4jhvzw2JMGiL+3L9NiJc2Oc24wzp4UH74NvxoSaD
-         Pe3RQcuQIAnffGyAC3s8A2BIa204nNUFZnVXUQqklrtl2V/m76k3zJoyeKQA8J5t2911
-         WH8QMAHMQA9MrzcJ+t+AD4FT5akAj8XwbwUW07FLPibJ5A7TNJJxXKuElSe6SJzQvQez
-         sycwGAargI3vpisCqGQH5F8SvrLqdvfXdyhuEw64wjwDVSAvsLD3GEmgzIhabySMQmRi
-         GkWA==
-X-Gm-Message-State: AJIora+JKMRP3GR/PfF9blNLWMPXlFd1EC4QLqZAnSfudH4TJg+WAbHL
-        aVhmGDUEpLU+WsPXDqtcEOuvgRokd/g=
-X-Google-Smtp-Source: AGRyM1tamDaouxIjsR84u7D+TdWg376mrBI9rco87Xf1xz5mM8bsjTYhZ9LZN+mcQ4ZJ0rEVThTJZqUAw5g=
-X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a17:90a:249:b0:1e0:a8a3:3c6c with SMTP id
- t9-20020a17090a024900b001e0a8a33c6cmr40863pje.0.1657591651230; Mon, 11 Jul
- 2022 19:07:31 -0700 (PDT)
-Reply-To: Sean Christopherson <seanjc@google.com>
-Date:   Tue, 12 Jul 2022 02:07:24 +0000
-In-Reply-To: <20220712020724.1262121-1-seanjc@google.com>
-Message-Id: <20220712020724.1262121-4-seanjc@google.com>
-Mime-Version: 1.0
-References: <20220712020724.1262121-1-seanjc@google.com>
-X-Mailer: git-send-email 2.37.0.144.g8ac04bfd2-goog
-Subject: [PATCH v3 3/3] KVM: x86/mmu: Fix typo and tweak comment for
- split_desc_cache capacity
-From:   Sean Christopherson <seanjc@google.com>
-To:     Sean Christopherson <seanjc@google.com>,
-        Paolo Bonzini <pbonzini@redhat.com>
-Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
-        David Matlack <dmatlack@google.com>
-Content-Type: text/plain; charset="UTF-8"
-X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL
-        autolearn=ham autolearn_force=no version=3.4.6
+        h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
+         :content-language:to:cc:references:from:in-reply-to
+         :content-transfer-encoding;
+        bh=aZB3UGhgPcDW1xV3kcl8kwXBo405C0t8FD0AZJD9BPE=;
+        b=cU7hSMaRdYefyPXja43QyWocl8SNaR2afe4FdHhbGLuf7r4LehBurKHXYqu+AYbwS7
+         izj+KrcbCUYMqMM7Ck4TBG5xa9lXnD75EBop2ZKE4+OvpGMkewWv15ZHjKZnEjilqXX2
+         rKqgXHaWty72pOybu7o1661wCBYxtU+cpfQJlk/UhnqDjIbQk6yfCYhhwVl0/VcC4bVw
+         Mw1sW7KQ0dJGC89XcRvAnpgP1kmqnOax+wwCswZHUtdJm+RZnZnN88SzE1CZplbuNxhN
+         EXnQVzp2+DGV/2ceGFO4kdZ7sFJAmXy3OybeHhXrnahe1VpbB52HNbU2vrs0snLMNeqo
+         FwiQ==
+X-Gm-Message-State: AJIora+pm4rTD4W79HKuZ/YaZ98NZLFZd6XSp1EbL9e4IbDRP8nK27vO
+        yg/uSG5dl7adNB4nk3xxUVYZXw==
+X-Google-Smtp-Source: AGRyM1sD9tHZyJixe85jL9snzEsUc0wIr1LqiIXQCwAcr3ekxqscZ41QdpY1hOTPrKnVI5X8+XXKrA==
+X-Received: by 2002:a17:902:d48a:b0:16b:f0be:4e15 with SMTP id c10-20020a170902d48a00b0016bf0be4e15mr21573742plg.155.1657592845557;
+        Mon, 11 Jul 2022 19:27:25 -0700 (PDT)
+Received: from [10.61.2.177] (110-175-254-242.static.tpgi.com.au. [110.175.254.242])
+        by smtp.gmail.com with ESMTPSA id mr2-20020a17090b238200b001ef8912f763sm5486466pjb.7.2022.07.11.19.27.19
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 11 Jul 2022 19:27:24 -0700 (PDT)
+Message-ID: <b39583f2-e054-8fc7-430c-d52bf6ed5016@ozlabs.ru>
+Date:   Tue, 12 Jul 2022 12:27:17 +1000
+MIME-Version: 1.0
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:103.0) Gecko/20100101
+ Thunderbird/103.0
+Subject: Re: [PATCH kernel] powerpc/iommu: Add iommu_ops to report
+ capabilities and allow blocking domains
+Content-Language: en-US
+To:     Jason Gunthorpe <jgg@nvidia.com>
+Cc:     linuxppc-dev@lists.ozlabs.org, Robin Murphy <robin.murphy@arm.com>,
+        Michael Ellerman <mpe@ellerman.id.au>,
+        Joerg Roedel <jroedel@suse.de>, Joel Stanley <joel@jms.id.au>,
+        Alex Williamson <alex.williamson@redhat.com>,
+        Oliver O'Halloran <oohall@gmail.com>, kvm-ppc@vger.kernel.org,
+        kvm@vger.kernel.org,
+        Daniel Henrique Barboza <danielhb413@gmail.com>,
+        Fabiano Rosas <farosas@linux.ibm.com>,
+        Murilo Opsfelder Araujo <muriloo@linux.ibm.com>,
+        Nicholas Piggin <npiggin@gmail.com>,
+        David Gibson <david@gibson.dropbear.id.au>
+References: <20220707135552.3688927-1-aik@ozlabs.ru>
+ <20220707151002.GB1705032@nvidia.com>
+ <bb8f4c93-6cbc-0106-d4c1-1f3c0751fbba@ozlabs.ru>
+ <bbe29694-66a3-275b-5a79-71237ad7388f@ozlabs.ru>
+ <20220708115522.GD1705032@nvidia.com>
+ <8329c51a-601e-0d93-41b4-2eb8524c9bcb@ozlabs.ru>
+ <Yspx307fxRXT67XG@nvidia.com>
+ <861e8bd1-9f04-2323-9b39-d1b46bf99711@ozlabs.ru>
+ <64bc8c04-2162-2e4b-6556-03b9dde051e2@ozlabs.ru>
+ <YsxwDTBLxyo5W3uQ@nvidia.com>
+From:   Alexey Kardashevskiy <aik@ozlabs.ru>
+In-Reply-To: <YsxwDTBLxyo5W3uQ@nvidia.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,NICE_REPLY_A,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
+        T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Remove a spurious closing paranthesis and tweak the comment about the
-cache capacity for PTE descriptors (rmaps) eager page splitting to tone
-down the assertion slightly, and to call out that topup requires dropping
-mmu_lock, which is the real motivation for avoiding topup (as opposed to
-memory usage).
 
-Cc: David Matlack <dmatlack@google.com>
-Signed-off-by: Sean Christopherson <seanjc@google.com>
----
- arch/x86/kvm/mmu/mmu.c | 15 ++++++++-------
- 1 file changed, 8 insertions(+), 7 deletions(-)
 
-diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
-index 7a65e57b9b41..52664c3caaab 100644
---- a/arch/x86/kvm/mmu/mmu.c
-+++ b/arch/x86/kvm/mmu/mmu.c
-@@ -6125,14 +6125,15 @@ static int topup_split_caches(struct kvm *kvm)
- {
- 	/*
- 	 * Allocating rmap list entries when splitting huge pages for nested
--	 * MMUs is uncommon as KVM needs to allocate if and only if there is
-+	 * MMUs is uncommon as KVM needs to use a list if and only if there is
- 	 * more than one rmap entry for a gfn, i.e. requires an L1 gfn to be
--	 * aliased by multiple L2 gfns.  Aliasing gfns when using TDP is very
--	 * atypical for VMMs; a few gfns are often aliased during boot, e.g.
--	 * when remapping firmware, but aliasing rarely occurs post-boot).  If
--	 * there is only one rmap entry, rmap->val points directly at that one
--	 * entry and doesn't need to allocate a list.  Buffer the cache by the
--	 * default capacity so that KVM doesn't have to topup the cache if it
-+	 * aliased by multiple L2 gfns and/or from multiple nested roots with
-+	 * different roles.  Aliasing gfns when using TDP is atypical for VMMs;
-+	 * a few gfns are often aliased during boot, e.g. when remapping BIOS,
-+	 * but aliasing rarely occurs post-boot or for many gfns.  If there is
-+	 * only one rmap entry, rmap->val points directly at that one entry and
-+	 * doesn't need to allocate a list.  Buffer the cache by the default
-+	 * capacity so that KVM doesn't have to drop mmu_lock to topup if KVM
- 	 * encounters an aliased gfn or two.
- 	 */
- 	const int capacity = SPLIT_DESC_CACHE_MIN_NR_OBJECTS +
+On 7/12/22 04:46, Jason Gunthorpe wrote:
+> On Mon, Jul 11, 2022 at 11:24:32PM +1000, Alexey Kardashevskiy wrote:
+> 
+>> I really think that for 5.19 we should really move this blocked domain
+>> business to Type1 like this:
+>>
+>> https://github.com/aik/linux/commit/96f80c8db03b181398ad355f6f90e574c3ada4bf
+> 
+> This creates the same security bug for power we are discussing here. If you
+
+How so? attach_dev() on power makes uninitalizes DMA setup for the group 
+on the hardware level, any other DMA user won't be able to initiate DMA.
+
+
+> don't want to fix it then lets just merge this iommu_ops patch as is rather than
+> mangle the core code.
+
+The core code should not be assuming iommu_ops != NULL, Type1 should, I 
+thought it is the whole point of having Type1, why is not it the case 
+anymore?
+
+
 -- 
-2.37.0.144.g8ac04bfd2-goog
-
+Alexey
