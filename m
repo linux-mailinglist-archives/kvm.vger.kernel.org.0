@@ -2,105 +2,107 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id EE6165727BB
-	for <lists+kvm@lfdr.de>; Tue, 12 Jul 2022 22:51:14 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 8856B5728DC
+	for <lists+kvm@lfdr.de>; Tue, 12 Jul 2022 23:56:36 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233766AbiGLUvG (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 12 Jul 2022 16:51:06 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54242 "EHLO
+        id S229800AbiGLV4e (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 12 Jul 2022 17:56:34 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51872 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233790AbiGLUvE (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 12 Jul 2022 16:51:04 -0400
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 17CC6252B6
-        for <kvm@vger.kernel.org>; Tue, 12 Jul 2022 13:51:04 -0700 (PDT)
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 495B7165C;
-        Tue, 12 Jul 2022 13:51:04 -0700 (PDT)
-Received: from [192.168.5.23] (unknown [172.31.20.19])
-        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id D3DF03F70D;
-        Tue, 12 Jul 2022 13:51:02 -0700 (PDT)
-Message-ID: <7e3810f6-5fc9-3a29-71c7-1610b8300c1e@arm.com>
-Date:   Tue, 12 Jul 2022 21:50:51 +0100
+        with ESMTP id S229681AbiGLV4d (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 12 Jul 2022 17:56:33 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 8165E41D21
+        for <kvm@vger.kernel.org>; Tue, 12 Jul 2022 14:56:32 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1657662991;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=s/3T4vxNFVONPISbNOnbcOQJiMW1pUHoPXX64SqOHNQ=;
+        b=YJyEoWoUEyPhKwnS91fBy/Aeiaxn95j1fQeV3i0F6vTCaaNNcBbLBm3jlgVQ/lx0mN9Qr3
+        MNYHOc3K0fF8OW7ORqiETaDe8JkhYOwa9Q9tw3x8yAL15/o7Lg807x34tqX+x8S7UCDs64
+        muVyBDD1RCT9vvmL4uCt2GoOV4ktBqA=
+Received: from mail-qt1-f200.google.com (mail-qt1-f200.google.com
+ [209.85.160.200]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-621-2kWp0bUQMIS-D_PU39TWzg-1; Tue, 12 Jul 2022 17:56:30 -0400
+X-MC-Unique: 2kWp0bUQMIS-D_PU39TWzg-1
+Received: by mail-qt1-f200.google.com with SMTP id v13-20020a05622a014d00b0031ea4c5d35dso7711701qtw.9
+        for <kvm@vger.kernel.org>; Tue, 12 Jul 2022 14:56:30 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=s/3T4vxNFVONPISbNOnbcOQJiMW1pUHoPXX64SqOHNQ=;
+        b=PxxlJivem6JC871/sfxvmqEVzMVbz2FSpwhyAYDQXLe30FvANZLSs0NjdLg8RkmnYC
+         yKUsUi7sU71IBGEKmAVdJrRmqiRTwk9dIUDP92D486rzEsUiJM+UjZveDYwTvkmpxc98
+         7z006X8FxYIyy9txwjMutelKBmFx/osyUYKEpJkjBr5cLHOAbXJ+vfPGyvDm84ugnDA2
+         Mgat3ZiKQjQk1Iz3JaT0izJINzMDERZzhS3cEazFA1dyiEGRoAvxS4lKZPncl0OFcx1O
+         pbw/hSlxID2b8EVe4qeJWjAsyPzHson4DvBIZmbuxlCnN5qAjGQ/cK4w43WV4AMZCNDk
+         0PsQ==
+X-Gm-Message-State: AJIora8CT7OY7j9DsBTnluX/5U13p11eRJdX/c6e+SofyenJ0Ag/Idzx
+        LFf5brTzwl8KFQZ3NAOcTBUfaYvjH0qS3zzBR18sp0LZsKShbomyBTD8xOfkDz1CIyAXe+aJ26U
+        rvkZV0HCKauH3
+X-Received: by 2002:ac8:4e94:0:b0:31b:f600:b59f with SMTP id 20-20020ac84e94000000b0031bf600b59fmr79259qtp.527.1657662990013;
+        Tue, 12 Jul 2022 14:56:30 -0700 (PDT)
+X-Google-Smtp-Source: AGRyM1vLwHaf4xn2tp3fYNXeTJIBe+MYbyQyS/7FEmpJ8XMqS+OfIe5Kxxt5cbR0Cnx3qgruuFWobw==
+X-Received: by 2002:ac8:4e94:0:b0:31b:f600:b59f with SMTP id 20-20020ac84e94000000b0031bf600b59fmr79250qtp.527.1657662989829;
+        Tue, 12 Jul 2022 14:56:29 -0700 (PDT)
+Received: from xz-m1.local (bras-base-aurron9127w-grc-37-74-12-30-48.dsl.bell.ca. [74.12.30.48])
+        by smtp.gmail.com with ESMTPSA id cm23-20020a05622a251700b0031bed25394csm8390535qtb.3.2022.07.12.14.56.28
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 12 Jul 2022 14:56:29 -0700 (PDT)
+Date:   Tue, 12 Jul 2022 17:56:28 -0400
+From:   Peter Xu <peterx@redhat.com>
+To:     Sean Christopherson <seanjc@google.com>
+Cc:     Paolo Bonzini <pbonzini@redhat.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+Subject: Re: [PATCH 2/4] KVM: x86/mmu: Defer "full" MMU setup until after
+ vendor hardware_setup()
+Message-ID: <Ys3uDJ90dBeFFbka@xz-m1.local>
+References: <20220624232735.3090056-1-seanjc@google.com>
+ <20220624232735.3090056-3-seanjc@google.com>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:91.0)
- Gecko/20100101 Thunderbird/91.11.0
-Subject: Re: [kvm-unit-tests PATCH v3 25/27] arm64: Add support for efi in
- Makefile
-Content-Language: en-GB
-To:     Alexandru Elisei <alexandru.elisei@arm.com>
-Cc:     kvm@vger.kernel.org, andrew.jones@linux.dev, drjones@redhat.com,
-        pbonzini@redhat.com, jade.alglave@arm.com, ricarkol@google.com
-References: <20220630100324.3153655-1-nikos.nikoleris@arm.com>
- <20220630100324.3153655-26-nikos.nikoleris@arm.com>
- <Ys15pk9rhYr3BS7i@monolith.localdoman>
-From:   Nikos Nikoleris <nikos.nikoleris@arm.com>
-In-Reply-To: <Ys15pk9rhYr3BS7i@monolith.localdoman>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-6.9 required=5.0 tests=BAYES_00,NICE_REPLY_A,
-        RCVD_IN_DNSWL_HI,SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE
-        autolearn=ham autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20220624232735.3090056-3-seanjc@google.com>
+X-Spam-Status: No, score=-3.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,
+        SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi Alex,
+On Fri, Jun 24, 2022 at 11:27:33PM +0000, Sean Christopherson wrote:
+> @@ -11937,6 +11932,10 @@ int kvm_arch_hardware_setup(void *opaque)
+>  
+>  	kvm_ops_update(ops);
+>  
+> +	r = kvm_mmu_hardware_setup();
+> +	if (r)
+> +		goto out_unsetup;
+> +
+>  	kvm_register_perf_callbacks(ops->handle_intel_pt_intr);
+>  
+>  	if (!kvm_cpu_cap_has(X86_FEATURE_XSAVES))
+> @@ -11960,12 +11959,18 @@ int kvm_arch_hardware_setup(void *opaque)
+>  	kvm_caps.default_tsc_scaling_ratio = 1ULL << kvm_caps.tsc_scaling_ratio_frac_bits;
+>  	kvm_init_msr_list();
+>  	return 0;
+> +
+> +out_unsetup:
+> +	static_call(kvm_x86_hardware_unsetup)();
 
-On 12/07/2022 14:39, Alexandru Elisei wrote:
-> Hi,
-> 
-> On Thu, Jun 30, 2022 at 11:03:22AM +0100, Nikos Nikoleris wrote:
->> Users can now build kvm-unit-tests as efi apps by supplying an extra
->> argument when invoking configure:
->>
->> $> ./configure --enable-efi
->>
->> This patch is based on an earlier version by
->> Andrew Jones <drjones@redhat.com>
->>
->> Signed-off-by: Nikos Nikoleris <nikos.nikoleris@arm.com>
->> Reviewed-by: Ricardo Koller <ricarkol@google.com>
->> ---
->>   configure           | 15 ++++++++++++---
->>   arm/Makefile.arm    |  6 ++++++
->>   arm/Makefile.arm64  | 18 ++++++++++++++----
->>   arm/Makefile.common | 45 ++++++++++++++++++++++++++++++++++-----------
->>   4 files changed, 66 insertions(+), 18 deletions(-)
->>
->> diff --git a/configure b/configure
->> index 5b7daac..2ff9881 100755
->> --- a/configure
->> +++ b/configure
-> [..]
->> @@ -218,6 +223,10 @@ else
->>           echo "arm64 doesn't support page size of $page_size"
->>           usage
->>       fi
->> +    if [ "$efi" = 'y' ] && [ "$page_size" != "4096" ]; then
->> +        echo "efi must use 4K pages"
->> +        exit 1
-> 
-> Why this restriction?
-> 
-> The Makefile compiles kvm-unit-tests to run as an UEFI app, it doesn't
-> compile UEFI itself. As far as I can tell, UEFI is designed to run payloads
-> with larger page size (it would be pretty silly to not be able to boot a
-> kernel built for 16k or 64k pages with UEFI).
-> 
-> Is there some limitation that I'm missing?
-> 
+Should this be kvm_mmu_hardware_unsetup()?  Or did I miss something?..
 
-Technically, we could allow 16k or 64k granules. But to do that we would 
-have to handle cases where the memory map we get from EFI cannot be 
-remapped with the new granules. For example, a region might be 12kB and 
-mapping it with 16k or 64k granules without moving it is impossible.
+-- 
+Peter Xu
 
-Thanks,
-
-Nikos
-
-> Thanks,
-> Alex
