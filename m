@@ -2,102 +2,153 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 0BF5457122A
-	for <lists+kvm@lfdr.de>; Tue, 12 Jul 2022 08:15:14 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id D0669571232
+	for <lists+kvm@lfdr.de>; Tue, 12 Jul 2022 08:21:14 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231591AbiGLGPJ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 12 Jul 2022 02:15:09 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43816 "EHLO
+        id S230029AbiGLGVE (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 12 Jul 2022 02:21:04 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46416 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229515AbiGLGPH (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 12 Jul 2022 02:15:07 -0400
-Received: from mga05.intel.com (mga05.intel.com [192.55.52.43])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5356381482;
-        Mon, 11 Jul 2022 23:15:06 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1657606506; x=1689142506;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=e8t4m3KSkmOMZJqJPmnwIUB4x8PWpY13C+jIK4OpPdk=;
-  b=Bj4lOYyS8/pHcS3o6u0RNabm8fWNib0glCPlLCyC/20bkyxhzQk9q7pj
-   C3ipmiJZqC7Y74N2j7sG2lUV0v7pvfCH0bVhy6/wDE/5UiNaQC0FPfn/U
-   JofedWty7gdu59OR+Yu5NPe1rY/wbaummpn09NHJ92ySX0vFUzo2eocIN
-   0Sm2ZppPFGV0hR4a+Ob4+2fLfVnFGxqR6OyB0+uv9V+hNLwjvjPm+saFT
-   ZKmi7k0xezKJDQV17FJ2C8jcNfCEdW+FkjgLTwBzXQuR1UfvQE5owqcVY
-   FRc+rG3g4hWLQqgWwfCEpApnZBIlxpcxcvJhMjS5jPjMxI/EjGmYKk6wc
-   A==;
-X-IronPort-AV: E=McAfee;i="6400,9594,10405"; a="371157329"
-X-IronPort-AV: E=Sophos;i="5.92,264,1650956400"; 
-   d="scan'208";a="371157329"
-Received: from orsmga008.jf.intel.com ([10.7.209.65])
-  by fmsmga105.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 11 Jul 2022 23:15:05 -0700
-X-IronPort-AV: E=Sophos;i="5.92,264,1650956400"; 
-   d="scan'208";a="622378386"
-Received: from gao-cwp.sh.intel.com (HELO gao-cwp) ([10.239.159.23])
-  by orsmga008-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 11 Jul 2022 23:15:03 -0700
-Date:   Tue, 12 Jul 2022 14:14:45 +0800
-From:   Chao Gao <chao.gao@intel.com>
+        with ESMTP id S229529AbiGLGVC (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 12 Jul 2022 02:21:02 -0400
+Received: from mail-pf1-x431.google.com (mail-pf1-x431.google.com [IPv6:2607:f8b0:4864:20::431])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 09B6F27CDD;
+        Mon, 11 Jul 2022 23:21:02 -0700 (PDT)
+Received: by mail-pf1-x431.google.com with SMTP id y141so6658029pfb.7;
+        Mon, 11 Jul 2022 23:21:02 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=bx3MPpelMzbitGLIyxLDh2fGMbGWVYznWb1v2pR0G4g=;
+        b=K7sx4HpQOnZ2tqwecKJciEPZ+Sq6Keos+O2P8HBMjqT1WNzlnJ3m7GTR+7fxeNOZ5g
+         kFqIjrpYPo79Ou580X83Oja84/LatkO95IWEgpR3DpmYmz+A7z0lmdgIbosZdtw7Ug09
+         pQ9DDUpEWuE8SoqHaHYC7/JRpMPKMEEAPu1PWay14Zg9OJhaOIaSKe7+YwGuwoorbF2q
+         eVlQrQkjq6amXqrzC4RSn3tjRdFGppR9PY968YMyc/1gtlbaV6isJfWMW9r6q/WQLdz8
+         37/T+JEOocrKc/M/vI9gyxJrssae/5EHCHitfPpwbA15ECSMY/qIYZwA45vrAkLWHmnU
+         8n7A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=bx3MPpelMzbitGLIyxLDh2fGMbGWVYznWb1v2pR0G4g=;
+        b=C4odZtBSzZEhDp7CdJD89GEsYPLva+39GmtiuSS2eD0ToN6Ehx9vDIe4fwKul6zkJR
+         xMueTGhdFyaPHt9xaqeOoHD5rstplyoMkefO/qnEfH8wyP8MWnCUT5QEVV0Zwgn3nSVn
+         zEgUtG8lJBm7Mu/SXsQpB7kikvluZUkbsTSGufem7w4vAQHHcMdHLjdv757d4ekxKmzg
+         keQYSqXopi/B+UfzsxqxhAMo4XsOia9oOSeqtaVw25CbR3VpdvG3TwzCspflGuPIlz8z
+         twq4dp2t96hhA2s6X8MhCBTYaC4dXZiWfC+dV56aCpOGg/Wn3DX09KjEy179KmbtKmCS
+         x9xA==
+X-Gm-Message-State: AJIora/szpZOUEkvgyuZURHu/NCzVQ13XM2jQAiOu7p+2BICCGZg76y6
+        BtmsV/ETwyiOY/mv6ypsVMM=
+X-Google-Smtp-Source: AGRyM1syDquBiOAq3UmONWV8b17cnwWp272YV1Lku4eMV4qQsY8d7In4xlOwTzBdbx9t6SnMZegHgQ==
+X-Received: by 2002:a05:6a00:10d3:b0:4fe:5d:75c8 with SMTP id d19-20020a056a0010d300b004fe005d75c8mr22612479pfu.6.1657606861395;
+        Mon, 11 Jul 2022 23:21:01 -0700 (PDT)
+Received: from localhost (fmdmzpr02-ext.fm.intel.com. [192.55.54.37])
+        by smtp.gmail.com with ESMTPSA id t13-20020a1709027fcd00b0016c09e23b21sm5813138plb.215.2022.07.11.23.21.00
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 11 Jul 2022 23:21:00 -0700 (PDT)
+Date:   Mon, 11 Jul 2022 23:21:00 -0700
+From:   Isaku Yamahata <isaku.yamahata@gmail.com>
 To:     Yuan Yao <yuan.yao@linux.intel.com>
 Cc:     isaku.yamahata@intel.com, kvm@vger.kernel.org,
         linux-kernel@vger.kernel.org, isaku.yamahata@gmail.com,
-        Paolo Bonzini <pbonzini@redhat.com>
-Subject: Re: [PATCH v7 053/102] KVM: TDX: don't request
- KVM_REQ_APIC_PAGE_RELOAD
-Message-ID: <20220712061439.GA28707@gao-cwp>
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Sean Christopherson <sean.j.christopherson@intel.com>,
+        Kai Huang <kai.huang@intel.com>
+Subject: Re: [PATCH v7 022/102] KVM: TDX: create/destroy VM structure
+Message-ID: <20220712062100.GG1379820@ls.amr.corp.intel.com>
 References: <cover.1656366337.git.isaku.yamahata@intel.com>
- <bcdcc4175321ff570a198aa55f8ac035de2add1f.1656366338.git.isaku.yamahata@intel.com>
- <20220712034743.glrfvpx54ja6jrzg@yy-desk-7060>
+ <aa3b9b81f257d4d177ab25cb78a222d6297de97f.1656366338.git.isaku.yamahata@intel.com>
+ <20220707061629.io5mf3riswn3fwvr@yy-desk-7060>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <20220712034743.glrfvpx54ja6jrzg@yy-desk-7060>
-User-Agent: Mutt/1.9.4 (2018-02-28)
-X-Spam-Status: No, score=-5.0 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
-        SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham
-        autolearn_force=no version=3.4.6
+In-Reply-To: <20220707061629.io5mf3riswn3fwvr@yy-desk-7060>
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
+        RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Jul 12, 2022 at 11:47:43AM +0800, Yuan Yao wrote:
->On Mon, Jun 27, 2022 at 02:53:45PM -0700, isaku.yamahata@intel.com wrote:
->> From: Isaku Yamahata <isaku.yamahata@intel.com>
->>
->> TDX doesn't need APIC page depending on vapic and its callback is
->> WARN_ON_ONCE(is_tdx).  To avoid unnecessary overhead and WARN_ON_ONCE(),
->> skip requesting KVM_REQ_APIC_PAGE_RELOAD when TD.
+On Thu, Jul 07, 2022 at 02:16:29PM +0800,
+Yuan Yao <yuan.yao@linux.intel.com> wrote:
 
-!kvm_gfn_shared_mask() doesn't ensure the VM is a TD. Right?
+> On Mon, Jun 27, 2022 at 02:53:14PM -0700, isaku.yamahata@intel.com wrote:
+> > diff --git a/arch/x86/kvm/vmx/tdx.c b/arch/x86/kvm/vmx/tdx.c
+> > index 3675f7de2735..63f3c7a02cc8 100644
+> > --- a/arch/x86/kvm/vmx/tdx.c
+> > +++ b/arch/x86/kvm/vmx/tdx.c
+...
+> >  int __init tdx_module_setup(void)
+> >  {
+> >  	const struct tdsysinfo_struct *tdsysinfo;
+> > @@ -48,6 +406,8 @@ int __init tdx_module_setup(void)
+> >  		return ret;
+> >  	}
+> >
+> > +	tdx_global_keyid = tdx_get_global_keyid();
+> 
+> I remember there's another static variable also named
+> "tdx_global_keyid" in arch/x86/virt/vmx/tdx/tdx.c ?
+> We can just use tdx_get_global_keyid() here without introducing
+> another static variable.
 
->>
->>
->> Signed-off-by: Isaku Yamahata <isaku.yamahata@intel.com>
->> ---
->>  arch/x86/kvm/x86.c | 3 ++-
->>  1 file changed, 2 insertions(+), 1 deletion(-)
->>
->> diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
->> index 8f57dfb2a8c9..c90ec611de2f 100644
->> --- a/arch/x86/kvm/x86.c
->> +++ b/arch/x86/kvm/x86.c
->> @@ -10042,7 +10042,8 @@ void kvm_arch_mmu_notifier_invalidate_range(struct kvm *kvm,
->>  	 * Update it when it becomes invalid.
->>  	 */
->>  	apic_address = gfn_to_hva(kvm, APIC_DEFAULT_PHYS_BASE >> PAGE_SHIFT);
->> -	if (start <= apic_address && apic_address < end)
->> +	if (start <= apic_address && apic_address < end &&
->> +	    !kvm_gfn_shared_mask(kvm))
->
->Minor: please condier to check kvm_gfn_shared_mask(kvm) before range,
->means firstly check is or not, then suitable or not.
->
->>  		kvm_make_all_cpus_request(kvm, KVM_REQ_APIC_PAGE_RELOAD);
->>  }
->>
->> --
->> 2.25.1
->>
+Hmm, it can be done by exporting the variable itself.
+
+ static inline int tdx_keyid_alloc(void) { return -EOPNOTSUPP; }
+ static inline void tdx_keyid_free(int keyid) { }
+diff --git a/arch/x86/kvm/vmx/tdx.c b/arch/x86/kvm/vmx/tdx.c
+index c1d41350e021..71f6d026bfd2 100644
+--- a/arch/x86/kvm/vmx/tdx.c
++++ b/arch/x86/kvm/vmx/tdx.c
+@@ -43,14 +43,6 @@ struct tdx_capabilities {
+        struct tdx_cpuid_config cpuid_configs[TDX_MAX_NR_CPUID_CONFIGS];
+ };
+ 
+-/*
+- * Key id globally used by TDX module: TDX module maps TDR with this TDX global
+- * key id.  TDR includes key id assigned to the TD.  Then TDX module maps other
+- * TD-related pages with the assigned key id.  TDR requires this TDX global key
+- * id for cache flush unlike other TD-related pages.
+- */
+-static u32 tdx_global_keyid __read_mostly;
+-
+ /* Capabilities of KVM + the TDX module. */
+ static struct tdx_capabilities tdx_caps;
+ 
+@@ -3572,8 +3564,6 @@ int __init tdx_module_setup(void)
+                return ret;
+        }
+ 
+-       tdx_global_keyid = tdx_get_global_keyid();
+-
+        tdsysinfo = tdx_get_sysinfo();
+        if (tdsysinfo->num_cpuid_config > TDX_MAX_NR_CPUID_CONFIGS)
+                return -EIO;
+diff --git a/arch/x86/virt/vmx/tdx/tdx.c b/arch/x86/virt/vmx/tdx/tdx.c
+index ea35230f0814..68ddcb06c7f1 100644
+--- a/arch/x86/virt/vmx/tdx/tdx.c
++++ b/arch/x86/virt/vmx/tdx/tdx.c
+@@ -65,13 +65,8 @@ static struct cmr_info tdx_cmr_array[MAX_CMRS] __aligned(CMR_INFO_ARRAY_ALIGNMEN
+ static int tdx_cmr_num;
+ 
+ /* TDX module global KeyID.  Used in TDH.SYS.CONFIG ABI. */
+-static u32 __read_mostly tdx_global_keyid;
+-
+-u32 tdx_get_global_keyid(void)
+-{
+-       return tdx_global_keyid;
+-}
+-EXPORT_SYMBOL_GPL(tdx_get_global_keyid);
++u32 tdx_global_keyid __ro_after_init;
++EXPORT_SYMBOL_GPL(tdx_global_keyid);
+ 
+ u32 tdx_get_num_keyid(void)
+ {
+
+-- 
+Isaku Yamahata <isaku.yamahata@gmail.com>
