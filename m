@@ -2,189 +2,238 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id D3F0C571211
-	for <lists+kvm@lfdr.de>; Tue, 12 Jul 2022 08:01:18 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 6A48F571226
+	for <lists+kvm@lfdr.de>; Tue, 12 Jul 2022 08:12:03 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231514AbiGLGBQ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 12 Jul 2022 02:01:16 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36252 "EHLO
+        id S230358AbiGLGMB (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 12 Jul 2022 02:12:01 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42320 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229515AbiGLGBP (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 12 Jul 2022 02:01:15 -0400
-Received: from mga09.intel.com (mga09.intel.com [134.134.136.24])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 56A8B31DE4;
-        Mon, 11 Jul 2022 23:01:14 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1657605674; x=1689141674;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=niSDj7COpCoIbSKZJ94NOMMTydgv1jKW5ap9HCOE6ds=;
-  b=ScRPWeh6QhuO5JW2FZN8s+9k8g4iycDVm81o7oKcroWOJjz8CV3fs7dB
-   7xva8a2DPvpTIv+pDHvUa+XRUUi5eFMNQQ1ZOqHSxoPlMxRSefjSKUyVs
-   TtELhwTmeS5al12WrCnMCtuwVB5LGZrE2fisVewNNQ7BhMfom/PeHS8po
-   H7qrHXh5trtXBsScUxTU56O+iwyUcJFUmR1Mnb+dEidCm3w4/X6pk1pnC
-   fRMZTEeQUQlesD/IURO037WX/y8KE1K78StKafjmTeill2zTua9jx+Mq7
-   MqVE3RgmXzzaSFk8HGVVs1Etv+IKcua1VFCu13ucCGP3xVYw/wD48+rxg
-   A==;
-X-IronPort-AV: E=McAfee;i="6400,9594,10405"; a="285588889"
-X-IronPort-AV: E=Sophos;i="5.92,264,1650956400"; 
-   d="scan'208";a="285588889"
-Received: from orsmga001.jf.intel.com ([10.7.209.18])
-  by orsmga102.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 11 Jul 2022 23:01:05 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.92,264,1650956400"; 
-   d="scan'208";a="627773540"
-Received: from lkp-server02.sh.intel.com (HELO 8708c84be1ad) ([10.239.97.151])
-  by orsmga001.jf.intel.com with ESMTP; 11 Jul 2022 23:01:01 -0700
-Received: from kbuild by 8708c84be1ad with local (Exim 4.95)
-        (envelope-from <lkp@intel.com>)
-        id 1oB8xB-0001n3-6O;
-        Tue, 12 Jul 2022 06:01:01 +0000
-Date:   Tue, 12 Jul 2022 14:00:40 +0800
-From:   kernel test robot <lkp@intel.com>
-To:     Dan Carpenter <error27@gmail.com>, Jason Gunthorpe <jgg@ziepe.ca>
-Cc:     llvm@lists.linux.dev, kbuild-all@lists.01.org,
-        Yishai Hadas <yishaih@nvidia.com>,
-        Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>,
-        Kevin Tian <kevin.tian@intel.com>,
-        Alex Williamson <alex.williamson@redhat.com>,
-        Cornelia Huck <cohuck@redhat.com>,
-        Leon Romanovsky <leon@kernel.org>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org, kernel-janitors@vger.kernel.org
-Subject: Re: [PATCH] vfio/mlx5: clean up overflow check
-Message-ID: <202207121350.fs2JOFWt-lkp@intel.com>
-References: <YsbzgQQ4bg6v+iTS@kili>
+        with ESMTP id S229515AbiGLGMA (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 12 Jul 2022 02:12:00 -0400
+Received: from mail-vs1-xe2a.google.com (mail-vs1-xe2a.google.com [IPv6:2607:f8b0:4864:20::e2a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C3FF24BD18
+        for <kvm@vger.kernel.org>; Mon, 11 Jul 2022 23:11:56 -0700 (PDT)
+Received: by mail-vs1-xe2a.google.com with SMTP id j65so6898142vsc.3
+        for <kvm@vger.kernel.org>; Mon, 11 Jul 2022 23:11:56 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=oNG734zoDtC7NjitR5PLwxoioCjGns2LqBTR0a3CYV8=;
+        b=ORjbC77+qKSDkdBvLMkjAEgg2Wz8k1ktfLsxZ/KOS4nV6H5DWIBueB7OzSPgn0QdlR
+         owRlKyREZG59FjJOCP+KB/Z/XAymTz6GYCNW3T00Odb2/cfLtFTdwtr24RuoyIWYXnE4
+         C9j2n5uFPQ16SsQGovleMzyvrixugJI365eKYjziv6L40lAUnyd/6Wrrl3ZU0DYRHiOY
+         +GugYoKPuLG5Eyv1Ca54lb8tdfq0XoUaafC6WERUO0jEti2D9lkF8r32mpOZg1HhR/vA
+         lCEOTrxM0Zl9MDsrtfUPLPCH0PUntvxeoe8nfgmFakbEY5Gp1v7opzj5a/smdH7RhwJb
+         Az3g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=oNG734zoDtC7NjitR5PLwxoioCjGns2LqBTR0a3CYV8=;
+        b=OHEpPfIstO5YChBTVvlNG4j+KtgK1UHv8hRTYvBWcBqf+jW9DZYtIoBM1jfhQwYez+
+         xybmndaHpxyGArgtVIX+kkLVoSUjhqMMBAwDHH9NSmG+BJz7ivlYcKYdrMvbgHOPWkCn
+         J8AOkqZYQWBAV0XrPe47FLAmRG2iTPv2GInBXL8Bmp8EUaRfkdKkk2t8+ZvwRYUvLf1g
+         ZVPosl3WDER+JuokZgPn80ajQ2l5FgE1I8UJIsGXCbZ/xH3x44GCVtdj8MGCTtRsT8SV
+         EvXjLXpX+2f2oMKJGz3q38rQuNBceXEAQnzlRIeIYNwyFjnior3CsuHJp7fx1f2qwK+e
+         6MIA==
+X-Gm-Message-State: AJIora+VuU/IUEiQYQH+Zv/13DlJ6++qCdJNMx2V1NCztPJRsHXuLmpo
+        +SeiZidNRuW6VFa24qS9NMu03gLzS0vYoH35KUgNhw==
+X-Google-Smtp-Source: AGRyM1uZuk9p6VgkE/lOIAz85oIVBg15JoI9cn0o1yYc8xVs13NTcbMepH/XALs37ObggkcLEnqHq0j/SSsPQJYrJCQ=
+X-Received: by 2002:a67:5c41:0:b0:356:20ab:2f29 with SMTP id
+ q62-20020a675c41000000b0035620ab2f29mr8229234vsb.63.1657606315823; Mon, 11
+ Jul 2022 23:11:55 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <YsbzgQQ4bg6v+iTS@kili>
-X-Spam-Status: No, score=-5.0 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
-        RCVD_IN_MSPIKE_H3,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE,
-        T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
+References: <20220706164304.1582687-1-maz@kernel.org> <20220706164304.1582687-9-maz@kernel.org>
+In-Reply-To: <20220706164304.1582687-9-maz@kernel.org>
+From:   Reiji Watanabe <reijiw@google.com>
+Date:   Mon, 11 Jul 2022 23:11:39 -0700
+Message-ID: <CAAeT=FwLxFnVq3T313CM__5j9e1d-5rRDeTwdZVqsbX0LM3ywA@mail.gmail.com>
+Subject: Re: [PATCH 08/19] KVM: arm64: vgic-v3: Push user access into vgic_v3_cpu_sysregs_uaccess()
+To:     Marc Zyngier <maz@kernel.org>
+Cc:     kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org,
+        Linux ARM <linux-arm-kernel@lists.infradead.org>,
+        Schspa Shi <schspa@gmail.com>, kernel-team@android.com,
+        Oliver Upton <oliver.upton@linux.dev>
+Content-Type: text/plain; charset="UTF-8"
+X-Spam-Status: No, score=-15.9 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
+        T_SCC_BODY_TEXT_LINE,URI_DOTEDU,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL
+        autolearn=no autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi Dan,
+Hi Marc,
 
-Thank you for the patch! Perhaps something to improve:
+On Wed, Jul 6, 2022 at 9:43 AM Marc Zyngier <maz@kernel.org> wrote:
+>
+> In order to start making the vgic sysreg access from userspace
+> similar to all the other sysregs, push the userspace memory
+> access one level down into vgic_v3_cpu_sysregs_uaccess().
+>
+> The next step will be to rely on the sysreg infrastructure
+> to perform this task.
+>
+> Signed-off-by: Marc Zyngier <maz@kernel.org>
+> ---
+>  arch/arm64/kvm/vgic-sys-reg-v3.c      | 22 +++++++++++++------
+>  arch/arm64/kvm/vgic/vgic-kvm-device.c | 31 ++++++---------------------
+>  arch/arm64/kvm/vgic/vgic.h            |  4 ++--
+>  3 files changed, 23 insertions(+), 34 deletions(-)
+>
+> diff --git a/arch/arm64/kvm/vgic-sys-reg-v3.c b/arch/arm64/kvm/vgic-sys-reg-v3.c
+> index 85a5e1d15e9f..8c56e285fde9 100644
+> --- a/arch/arm64/kvm/vgic-sys-reg-v3.c
+> +++ b/arch/arm64/kvm/vgic-sys-reg-v3.c
+> @@ -278,15 +278,21 @@ int vgic_v3_has_cpu_sysregs_attr(struct kvm_vcpu *vcpu, struct kvm_device_attr *
+>         return -ENXIO;
+>  }
+>
+> -int vgic_v3_cpu_sysregs_uaccess(struct kvm_vcpu *vcpu, bool is_write, u64 id,
+> -                               u64 *reg)
+> +int vgic_v3_cpu_sysregs_uaccess(struct kvm_vcpu *vcpu,
+> +                               struct kvm_device_attr *attr,
+> +                               bool is_write)
+>  {
+> +       u64 __user *uaddr = (u64 __user *)(long)attr->addr;
+>         struct sys_reg_params params;
+>         const struct sys_reg_desc *r;
+> -       u64 sysreg = (id & KVM_DEV_ARM_VGIC_SYSREG_MASK) | KVM_REG_SIZE_U64;
+> +       u64 sysreg;
+>
+> -       if (is_write)
+> -               params.regval = *reg;
+> +       sysreg = (attr->attr & KVM_DEV_ARM_VGIC_SYSREG_MASK) | KVM_REG_SIZE_U64;
 
-[auto build test WARNING on awilliam-vfio/next]
-[also build test WARNING on rdma/for-next linus/master v5.19-rc6 next-20220711]
-[If your patch is applied to the wrong git tree, kindly drop us a note.
-And when submitting patch, we suggest to use '--base' as documented in
-https://git-scm.com/docs/git-format-patch#_base_tree_information]
-
-url:    https://github.com/intel-lab-lkp/linux/commits/Dan-Carpenter/vfio-mlx5-clean-up-overflow-check/20220707-225657
-base:   https://github.com/awilliam/linux-vfio.git next
-config: i386-allyesconfig (https://download.01.org/0day-ci/archive/20220712/202207121350.fs2JOFWt-lkp@intel.com/config)
-compiler: clang version 15.0.0 (https://github.com/llvm/llvm-project 6ce63e267aab79ca87bf63453d34dd3909ab978d)
-reproduce (this is a W=1 build):
-        wget https://raw.githubusercontent.com/intel/lkp-tests/master/sbin/make.cross -O ~/bin/make.cross
-        chmod +x ~/bin/make.cross
-        # https://github.com/intel-lab-lkp/linux/commit/44607f8f3817e1af6622db7d70ad5bc457b8f203
-        git remote add linux-review https://github.com/intel-lab-lkp/linux
-        git fetch --no-tags linux-review Dan-Carpenter/vfio-mlx5-clean-up-overflow-check/20220707-225657
-        git checkout 44607f8f3817e1af6622db7d70ad5bc457b8f203
-        # save the config file
-        mkdir build_dir && cp config build_dir/.config
-        COMPILER_INSTALL_PATH=$HOME/0day COMPILER=clang make.cross W=1 O=build_dir ARCH=i386 SHELL=/bin/bash drivers/hid/ drivers/md/ drivers/vfio/pci/mlx5/
-
-If you fix the issue, kindly add following tag where applicable
-Reported-by: kernel test robot <lkp@intel.com>
-
-All warnings (new ones prefixed by >>):
-
->> drivers/vfio/pci/mlx5/main.c:282:6: warning: comparison of distinct pointer types ('typeof (len) *' (aka 'unsigned int *') and 'typeof ((unsigned long)*pos) *' (aka 'unsigned long *')) [-Wcompare-distinct-pointer-types]
-               check_add_overflow(len, (unsigned long)*pos, &requested_length))
-               ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-   include/linux/overflow.h:67:15: note: expanded from macro 'check_add_overflow'
-           (void) (&__a == &__b);                  \
-                   ~~~~ ^  ~~~~
->> drivers/vfio/pci/mlx5/main.c:282:6: warning: comparison of distinct pointer types ('typeof (len) *' (aka 'unsigned int *') and 'typeof (&requested_length)' (aka 'unsigned long *')) [-Wcompare-distinct-pointer-types]
-               check_add_overflow(len, (unsigned long)*pos, &requested_length))
-               ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-   include/linux/overflow.h:68:15: note: expanded from macro 'check_add_overflow'
-           (void) (&__a == __d);                   \
-                   ~~~~ ^  ~~~
-   2 warnings generated.
+Why don't you use attr_to_id() here ?
 
 
-vim +282 drivers/vfio/pci/mlx5/main.c
+> +
+> +       if (is_write) {
+> +               if (get_user(params.regval, uaddr))
+> +                       return -EFAULT;
+> +       }
+>         params.is_write = is_write;
+>
+>         r = find_reg_by_id(sysreg, &params, gic_v3_icc_reg_descs,
+> @@ -297,8 +303,10 @@ int vgic_v3_cpu_sysregs_uaccess(struct kvm_vcpu *vcpu, bool is_write, u64 id,
+>         if (!r->access(vcpu, &params, r))
+>                 return -EINVAL;
+>
+> -       if (!is_write)
+> -               *reg = params.regval;
+> +       if (!is_write) {
+> +               if (put_user(params.regval, uaddr))
+> +                       return -EFAULT;
+> +       }
+>
+>         return 0;
+>  }
+> diff --git a/arch/arm64/kvm/vgic/vgic-kvm-device.c b/arch/arm64/kvm/vgic/vgic-kvm-device.c
+> index c6d52a1fd9c8..d8269300632d 100644
+> --- a/arch/arm64/kvm/vgic/vgic-kvm-device.c
+> +++ b/arch/arm64/kvm/vgic/vgic-kvm-device.c
+> @@ -561,14 +561,9 @@ static int vgic_v3_attr_regs_access(struct kvm_device *dev,
+>                 if (!is_write)
+>                         *reg = tmp32;
+>                 break;
+> -       case KVM_DEV_ARM_VGIC_GRP_CPU_SYSREGS: {
+> -               u64 regid;
+> -
+> -               regid = (attr->attr & KVM_DEV_ARM_VGIC_SYSREG_INSTR_MASK);
+> -               ret = vgic_v3_cpu_sysregs_uaccess(vcpu, is_write,
+> -                                                 regid, reg);
+> +       case KVM_DEV_ARM_VGIC_GRP_CPU_SYSREGS:
+> +               ret = vgic_v3_cpu_sysregs_uaccess(vcpu, attr, is_write);
 
-   269	
-   270	static ssize_t mlx5vf_resume_write(struct file *filp, const char __user *buf,
-   271					   size_t len, loff_t *pos)
-   272	{
-   273		struct mlx5_vf_migration_file *migf = filp->private_data;
-   274		unsigned long requested_length;
-   275		ssize_t done = 0;
-   276	
-   277		if (pos)
-   278			return -ESPIPE;
-   279		pos = &filp->f_pos;
-   280	
-   281		if (*pos < 0 || *pos > ULONG_MAX ||
- > 282		    check_add_overflow(len, (unsigned long)*pos, &requested_length))
-   283			return -EINVAL;
-   284	
-   285		if (requested_length > MAX_MIGRATION_SIZE)
-   286			return -ENOMEM;
-   287	
-   288		mutex_lock(&migf->lock);
-   289		if (migf->disabled) {
-   290			done = -ENODEV;
-   291			goto out_unlock;
-   292		}
-   293	
-   294		if (migf->allocated_length < requested_length) {
-   295			done = mlx5vf_add_migration_pages(
-   296				migf,
-   297				DIV_ROUND_UP(requested_length - migf->allocated_length,
-   298					     PAGE_SIZE));
-   299			if (done)
-   300				goto out_unlock;
-   301		}
-   302	
-   303		while (len) {
-   304			size_t page_offset;
-   305			struct page *page;
-   306			size_t page_len;
-   307			u8 *to_buff;
-   308			int ret;
-   309	
-   310			page_offset = (*pos) % PAGE_SIZE;
-   311			page = mlx5vf_get_migration_page(migf, *pos - page_offset);
-   312			if (!page) {
-   313				if (done == 0)
-   314					done = -EINVAL;
-   315				goto out_unlock;
-   316			}
-   317	
-   318			page_len = min_t(size_t, len, PAGE_SIZE - page_offset);
-   319			to_buff = kmap_local_page(page);
-   320			ret = copy_from_user(to_buff + page_offset, buf, page_len);
-   321			kunmap_local(to_buff);
-   322			if (ret) {
-   323				done = -EFAULT;
-   324				goto out_unlock;
-   325			}
-   326			*pos += page_len;
-   327			len -= page_len;
-   328			done += page_len;
-   329			buf += page_len;
-   330			migf->total_length += page_len;
-   331		}
-   332	out_unlock:
-   333		mutex_unlock(&migf->lock);
-   334		return done;
-   335	}
-   336	
+Nit: Since @reg that is passed to vgic_v3_attr_regs_access() will be NULL
+for KVM_DEV_ARM_VGIC_GRP_CPU_SYSREGS, I think it would be more clear
+if you could update the comment for vgic_v3_attr_regs_access accordingly.
 
--- 
-0-DAY CI Kernel Test Service
-https://01.org/lkp
+----
+/*
+ * vgic_v3_attr_regs_access - allows user space to access VGIC v3 state
+ *
+ * @dev:      kvm device handle
+ * @attr:     kvm device attribute
+ * @reg:      address the value is read or written
+   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+ * @is_write: true if userspace is writing a register
+ */
+static int vgic_v3_attr_regs_access(struct kvm_device *dev,
+                                    struct kvm_device_attr *attr,
+                                    u64 *reg, bool is_write)
+----
+
+Thank you,
+Reiji
+
+
+>                 break;
+> -       }
+>         case KVM_DEV_ARM_VGIC_GRP_LEVEL_INFO: {
+>                 unsigned int info, intid;
+>
+> @@ -617,15 +612,8 @@ static int vgic_v3_set_attr(struct kvm_device *dev,
+>                 reg = tmp32;
+>                 return vgic_v3_attr_regs_access(dev, attr, &reg, true);
+>         }
+> -       case KVM_DEV_ARM_VGIC_GRP_CPU_SYSREGS: {
+> -               u64 __user *uaddr = (u64 __user *)(long)attr->addr;
+> -               u64 reg;
+> -
+> -               if (get_user(reg, uaddr))
+> -                       return -EFAULT;
+> -
+> -               return vgic_v3_attr_regs_access(dev, attr, &reg, true);
+> -       }
+> +       case KVM_DEV_ARM_VGIC_GRP_CPU_SYSREGS:
+> +               return vgic_v3_attr_regs_access(dev, attr, NULL, true);
+>         case KVM_DEV_ARM_VGIC_GRP_LEVEL_INFO: {
+>                 u32 __user *uaddr = (u32 __user *)(long)attr->addr;
+>                 u64 reg;
+> @@ -681,15 +669,8 @@ static int vgic_v3_get_attr(struct kvm_device *dev,
+>                 tmp32 = reg;
+>                 return put_user(tmp32, uaddr);
+>         }
+> -       case KVM_DEV_ARM_VGIC_GRP_CPU_SYSREGS: {
+> -               u64 __user *uaddr = (u64 __user *)(long)attr->addr;
+> -               u64 reg;
+> -
+> -               ret = vgic_v3_attr_regs_access(dev, attr, &reg, false);
+> -               if (ret)
+> -                       return ret;
+> -               return put_user(reg, uaddr);
+> -       }
+> +       case KVM_DEV_ARM_VGIC_GRP_CPU_SYSREGS:
+> +               return vgic_v3_attr_regs_access(dev, attr, NULL, false);
+>         case KVM_DEV_ARM_VGIC_GRP_LEVEL_INFO: {
+>                 u32 __user *uaddr = (u32 __user *)(long)attr->addr;
+>                 u64 reg;
+> diff --git a/arch/arm64/kvm/vgic/vgic.h b/arch/arm64/kvm/vgic/vgic.h
+> index ffc2d3c81b28..c23118467a35 100644
+> --- a/arch/arm64/kvm/vgic/vgic.h
+> +++ b/arch/arm64/kvm/vgic/vgic.h
+> @@ -245,8 +245,8 @@ int vgic_v3_dist_uaccess(struct kvm_vcpu *vcpu, bool is_write,
+>                          int offset, u32 *val);
+>  int vgic_v3_redist_uaccess(struct kvm_vcpu *vcpu, bool is_write,
+>                          int offset, u32 *val);
+> -int vgic_v3_cpu_sysregs_uaccess(struct kvm_vcpu *vcpu, bool is_write,
+> -                        u64 id, u64 *val);
+> +int vgic_v3_cpu_sysregs_uaccess(struct kvm_vcpu *vcpu,
+> +                               struct kvm_device_attr *attr, bool is_write);
+>  int vgic_v3_has_cpu_sysregs_attr(struct kvm_vcpu *vcpu, struct kvm_device_attr *attr);
+>  int vgic_v3_line_level_info_uaccess(struct kvm_vcpu *vcpu, bool is_write,
+>                                     u32 intid, u64 *val);
+> --
+> 2.34.1
+>
+> _______________________________________________
+> kvmarm mailing list
+> kvmarm@lists.cs.columbia.edu
+> https://lists.cs.columbia.edu/mailman/listinfo/kvmarm
