@@ -2,44 +2,79 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 90C29571A93
-	for <lists+kvm@lfdr.de>; Tue, 12 Jul 2022 14:55:25 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id B15E4571B62
+	for <lists+kvm@lfdr.de>; Tue, 12 Jul 2022 15:34:31 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230055AbiGLMzY (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 12 Jul 2022 08:55:24 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42828 "EHLO
+        id S233001AbiGLNe2 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 12 Jul 2022 09:34:28 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49438 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229715AbiGLMzW (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 12 Jul 2022 08:55:22 -0400
-Received: from szxga08-in.huawei.com (szxga08-in.huawei.com [45.249.212.255])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 68256AB6AB;
-        Tue, 12 Jul 2022 05:55:21 -0700 (PDT)
-Received: from kwepemi500016.china.huawei.com (unknown [172.30.72.55])
-        by szxga08-in.huawei.com (SkyGuard) with ESMTP id 4Lj0yz4JJYz1L8sH;
-        Tue, 12 Jul 2022 20:52:43 +0800 (CST)
-Received: from [10.40.193.166] (10.40.193.166) by
- kwepemi500016.china.huawei.com (7.221.188.220) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2375.24; Tue, 12 Jul 2022 20:55:16 +0800
-From:   "chenxiang (M)" <chenxiang66@hisilicon.com>
-To:     Alex Williamson <alex.williamson@redhat.com>, <maz@kernel.org>,
-        <pbonzini@redhat.com>
-CC:     <kvm@vger.kernel.org>, chenxiang via <qemu-devel@nongnu.org>,
-        linux-kernel <linux-kernel@vger.kernel.org>
-Subject: [QUESTION] Exception print when enabling GICv4
-Message-ID: <6d6d61fb-6241-4e1e-ddff-8ae8be96f9ff@hisilicon.com>
-Date:   Tue, 12 Jul 2022 20:55:16 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:45.0) Gecko/20100101
- Thunderbird/45.2.0
+        with ESMTP id S233068AbiGLNe0 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 12 Jul 2022 09:34:26 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 0CD27B23D4
+        for <kvm@vger.kernel.org>; Tue, 12 Jul 2022 06:34:24 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1657632864;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=JgAcjPtcpgNCqfpVZQXf86mfKwE3gQAGcZaJHiCWMKk=;
+        b=ReWYX6C9ABSaYjNuCCCgEkUnczggQ+afTZuKYeDC6v2wC9rvvCYktEynNFn4cCtxXhM9iW
+        Y+hl5hx8RQgdR+uTSHBn8QVrTkWmUzqn1Yr42OEs26+RiVuS7gZ0/ubCjy/8QZkqvHoXg1
+        QCUBLxHobI0u0rGRjTdmDtHelXM3y9Q=
+Received: from mail-qk1-f197.google.com (mail-qk1-f197.google.com
+ [209.85.222.197]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-634-wRNbo61CNb2jxhBtNnu2zg-1; Tue, 12 Jul 2022 09:34:23 -0400
+X-MC-Unique: wRNbo61CNb2jxhBtNnu2zg-1
+Received: by mail-qk1-f197.google.com with SMTP id bi1-20020a05620a318100b006b572361789so7846092qkb.10
+        for <kvm@vger.kernel.org>; Tue, 12 Jul 2022 06:34:23 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:message-id:subject:from:to:cc:date:in-reply-to
+         :references:user-agent:mime-version:content-transfer-encoding;
+        bh=JgAcjPtcpgNCqfpVZQXf86mfKwE3gQAGcZaJHiCWMKk=;
+        b=amPkLgQw6pHI2u2wDNbtBHCBVF6s256ewKadDRyisd6QIix9Vd2RQqfetlo3b/f0bi
+         hLEKX8mvVRJGHqFODv2b9rV7YLG+cX12ULbxnCYJ+KLmKQ0LD5vMWa533hTF8o1vyegt
+         UnhWF2EKeUm35qPGhsqmj5bX5i8Vshv9kmpwFyrePrkuaNQ3wpsDXwnHmFUy24Rlr2Xc
+         cU1TDh0Ctp1oM/UmQmxOm7CX5dQR70pUPPaBW1bjwk27hGLPviIyDLvEkuRl0TcbHDoR
+         1XmyGK3aoAmCE2Og35oRNeu33nqEf+aGjfg7I9NZGKxp+wUR99jjs0uHTQulJsOh2kCl
+         aAlw==
+X-Gm-Message-State: AJIora+gUlbaE5hq8sU1ilYKGaTKQF038Zg93eVxw/ZNgrmNjzQIoUs2
+        h09PdNXFSur9oeThZWvMa00DPh4rFRrtGCQWMxjr1HoBz7F26thPjnFLmz+3q/SzwUT8UvrVUDd
+        aBGtdiFjhA7iP
+X-Received: by 2002:a05:620a:4507:b0:6af:348b:85fe with SMTP id t7-20020a05620a450700b006af348b85femr15472596qkp.629.1657632862389;
+        Tue, 12 Jul 2022 06:34:22 -0700 (PDT)
+X-Google-Smtp-Source: AGRyM1tt12hXbsGNmSGrHijJdRfb2UWBkKIk2+Hj7xIUXmNIV/+XqGFV5QYF/4rRDFpC+66nbAiX1Q==
+X-Received: by 2002:a05:620a:4507:b0:6af:348b:85fe with SMTP id t7-20020a05620a450700b006af348b85femr15472560qkp.629.1657632862055;
+        Tue, 12 Jul 2022 06:34:22 -0700 (PDT)
+Received: from [10.35.4.238] (bzq-82-81-161-50.red.bezeqint.net. [82.81.161.50])
+        by smtp.gmail.com with ESMTPSA id a187-20020ae9e8c4000000b006b5517da3casm8706942qkg.22.2022.07.12.06.34.19
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 12 Jul 2022 06:34:21 -0700 (PDT)
+Message-ID: <649b5c71b5ad40e3c74f76c86ad0ca89f9dac3e1.camel@redhat.com>
+Subject: Re: [PATCH 3/3] KVM: x86: WARN only once if KVM leaves a dangling
+ userspace I/O request
+From:   Maxim Levitsky <mlevitsk@redhat.com>
+To:     Sean Christopherson <seanjc@google.com>,
+        Paolo Bonzini <pbonzini@redhat.com>
+Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+        syzbot+760a73552f47a8cd0fd9@syzkaller.appspotmail.com,
+        Tetsuo Handa <penguin-kernel@i-love.sakura.ne.jp>,
+        Hou Wenlong <houwenlong.hwl@antgroup.com>
+Date:   Tue, 12 Jul 2022 16:34:18 +0300
+In-Reply-To: <20220711232750.1092012-4-seanjc@google.com>
+References: <20220711232750.1092012-1-seanjc@google.com>
+         <20220711232750.1092012-4-seanjc@google.com>
+Content-Type: text/plain; charset="UTF-8"
+User-Agent: Evolution 3.40.4 (3.40.4-5.fc34) 
 MIME-Version: 1.0
-Content-Type: text/plain; charset="UTF-8"; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Originating-IP: [10.40.193.166]
-X-ClientProxiedBy: dggems706-chm.china.huawei.com (10.3.19.183) To
- kwepemi500016.china.huawei.com (7.221.188.220)
-X-CFilter-Loop: Reflected
-X-Spam-Status: No, score=-4.2 required=5.0 tests=BAYES_00,RCVD_IN_DNSWL_MED,
-        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
+Content-Transfer-Encoding: 8bit
+X-Spam-Status: No, score=-2.7 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -47,43 +82,52 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi,
-I encounter a issue related to GICv4 enable on ARM64 platform (kernel 
-5.19-rc4, qemu 6.2.0):
-We have a accelaration module whose VF has 3 MSI interrupts, and we 
-passthrough it to virtual machine with following steps:
+On Mon, 2022-07-11 at 23:27 +0000, Sean Christopherson wrote:
+> Change a WARN_ON() to separate WARN_ON_ONCE() if KVM has an outstanding
+> PIO or MMIO request without an associated callback, i.e. if KVM queued a
+> userspace I/O exit but didn't actually exit to userspace before moving
+> on to something else.  Warning on every KVM_RUN risks spamming the kernel
+> if KVM gets into a bad state.  Opportunistically split the WARNs so that
+> it's easier to triage failures when a WARN fires.
+> 
+> Deliberately do not use KVM_BUG_ON(), i.e. don't kill the VM.  While the
+> WARN is all but guaranteed to fire if and only if there's a KVM bug, a
+> dangling I/O request does not present a danger to KVM (that flag is truly
+> truly consumed only in a single emulator path), and any such bug is
+> unlikely to be fatal to the VM (KVM essentially failed to do something it
+> shouldn't have tried to do in the first place).  In other words, note the
+> bug, but let the VM keep running.
+> 
+> Signed-off-by: Sean Christopherson <seanjc@google.com>
+> ---
+>  arch/x86/kvm/x86.c | 6 ++++--
+>  1 file changed, 4 insertions(+), 2 deletions(-)
+> 
+> diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+> index 567d13405445..50dc55996416 100644
+> --- a/arch/x86/kvm/x86.c
+> +++ b/arch/x86/kvm/x86.c
+> @@ -10847,8 +10847,10 @@ int kvm_arch_vcpu_ioctl_run(struct kvm_vcpu *vcpu)
+>                 r = cui(vcpu);
+>                 if (r <= 0)
+>                         goto out;
+> -       } else
+> -               WARN_ON(vcpu->arch.pio.count || vcpu->mmio_needed);
+> +       } else {
+> +               WARN_ON_ONCE(vcpu->arch.pio.count);
+> +               WARN_ON_ONCE(vcpu->mmio_needed);
+> +       }
+>  
+>         if (kvm_run->immediate_exit) {
+>                 r = -EINTR;
 
-echo 0000:79:00.1 > /sys/bus/pci/drivers/hisi_hpre/unbind
-echo vfio-pci > 
-/sys/devices/pci0000\:78/0000\:78\:00.0/0000\:79\:00.1/driver_override
-echo 0000:79:00.1 > /sys/bus/pci/drivers_probe
+At some point in the future, the checkpatch.pl should start to WARN the
+patch submitter if WARN_ON and not WARN_ON_ONCE was used ;-)
 
-Then we boot VM with "-device vfio-pci,host=79:00.1,id=net0 \".
-When insmod the driver which registers 3 PCI MSI interrupts in VM,  some 
-exception print occur as following:
+It already bugs the user about BUG_ON ;-)
 
-vfio-pci 0000:3a:00.1: irq bypass producer (token 000000008f08224d) 
-registration fails: 66311
-
-I find that bit[6:4] of register PCI_MSI_FLAGS is 2 (4 MSI interrupts) 
-though we only register 3 PCI MSI interrupt,
-
-and only 3 MSI interrupt is activated at last.
-It allocates 4 vectors in function vfio_msi_enable() (qemu)  as it reads 
-the register PCI_MSI_FLAGS.
-Later it will  call system call VFIO_DEVICE_SET_IRQS to set forwarding 
-for those interrupts
-using function kvm_vgic_v4_set_forrwarding() as GICv4 is enabled. For 
-interrupt 0~2, it success to set forwarding as they are already activated,
-but for the 4th interrupt, it is not activated, so ite is not found in 
-function vgic_its_resolve_lpi(), so above printk occurs.
-
-It seems that we only allocate and activate 3 MSI interrupts in guest 
-while it tried to set forwarding for 4 MSI interrupts in host.
-Do you have any idea about this issue?
-
+Reviewed-by: Maxim Levitsky <mlevitsk@redhat.com>
 
 Best regards,
-
-Xiang Chen
+	Maxim Levitsky
 
