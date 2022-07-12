@@ -2,61 +2,61 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 6F4E65718EC
-	for <lists+kvm@lfdr.de>; Tue, 12 Jul 2022 13:51:37 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 63EB4571907
+	for <lists+kvm@lfdr.de>; Tue, 12 Jul 2022 13:53:01 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232554AbiGLLvf (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 12 Jul 2022 07:51:35 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34730 "EHLO
+        id S232730AbiGLLws (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 12 Jul 2022 07:52:48 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35512 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230244AbiGLLvd (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 12 Jul 2022 07:51:33 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 021F2B31F6
-        for <kvm@vger.kernel.org>; Tue, 12 Jul 2022 04:51:30 -0700 (PDT)
+        with ESMTP id S232714AbiGLLw3 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 12 Jul 2022 07:52:29 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id C78C6B521A
+        for <kvm@vger.kernel.org>; Tue, 12 Jul 2022 04:51:55 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1657626689;
+        s=mimecast20190719; t=1657626714;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=VpMSN19JfZbDsQBGsM5q3hUeCYalwJXgpAY79QE0LRc=;
-        b=OlCRRMmzkOU5gfhOYUHNnXP4OxViXhlEIDbF6dVaGfiDlZgKMoCcQeujkgPBOy3w4XzHpL
-        lGW0OeEIzOY/kPmveBNvvKHmqrnIkHCdu2Y2niF2MI0wla3Ah3ecN+MJZIW5+fdDIzOJmj
-        SHijmRgw7CSNyfS00YkWyRXjFVReBgo=
-Received: from mail-qk1-f198.google.com (mail-qk1-f198.google.com
- [209.85.222.198]) by relay.mimecast.com with ESMTP with STARTTLS
+        bh=lJt34wYL23qHhqMiKTsYFaw21Mxmb1U5E0uo3Jh2TRY=;
+        b=IeqRz1kidAbKZlyqQuS7sSYd0va4uK/p8dDT7Aftm311qDywGZEYWMsg5HAaiYRaTmpW3b
+        7ipwEu+Sk1bY5RV/g+0vUE9j2vGSt77I8U1kJ7yMOcXBBkALwSQmH3Y4EVguon1WPfmKsG
+        CS1kFpRxNsGXVfj1ezAX85J6srPS86o=
+Received: from mail-qk1-f199.google.com (mail-qk1-f199.google.com
+ [209.85.222.199]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-491-bLuBQyeKOl2ES7YEkjPv_g-1; Tue, 12 Jul 2022 07:51:29 -0400
-X-MC-Unique: bLuBQyeKOl2ES7YEkjPv_g-1
-Received: by mail-qk1-f198.google.com with SMTP id bj31-20020a05620a191f00b006b5a69786fcso817481qkb.15
-        for <kvm@vger.kernel.org>; Tue, 12 Jul 2022 04:51:28 -0700 (PDT)
+ us-mta-624-LSU7B_CqP5SUJyd_KeeK8Q-1; Tue, 12 Jul 2022 07:51:50 -0400
+X-MC-Unique: LSU7B_CqP5SUJyd_KeeK8Q-1
+Received: by mail-qk1-f199.google.com with SMTP id bk12-20020a05620a1a0c00b006b194656099so7582435qkb.5
+        for <kvm@vger.kernel.org>; Tue, 12 Jul 2022 04:51:49 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:message-id:subject:from:to:cc:date:in-reply-to
          :references:user-agent:mime-version:content-transfer-encoding;
-        bh=VpMSN19JfZbDsQBGsM5q3hUeCYalwJXgpAY79QE0LRc=;
-        b=vSGkBAUbodwVMnZiESYimG6M8WkrjimhdZlIl2guJRykR7h+Ft4SppiiOx85G8u3AF
-         hRbrPK3oxpSZzApoOeI3kvUFVE/Lwe1u8qa8sv15+qi480KfTXiruPLT20zTY6r9MPzD
-         17Y/1509cpfMw9fYqwLuLbPi2WAA5yU0ILo7UEOIQSpgy6A5b0Srkrm8vka+S/44Z4C8
-         f2TgJagByBa/bU3Gt9sKtt/lnFNq8sLXKmMthJsbKha7vgqJExhwcavhUmpwwKY64VY/
-         EzcxpiJ+VaqtZDJPOsd9lw34yZZUmdU3Ne0Z0VriHcALq57/bhZctMr/KFQ+r9IzvCoo
-         knyw==
-X-Gm-Message-State: AJIora8ijD3PKYAub+VvXeiGEcjyUO5IujN8FxTfyPBV7N77N57WTyVK
-        5Q0NaVQm8iuVcF11PfPlFdfGVskJ4cXMVFAjjv2bmix1qqZp3kusmYqcXJVQBvMtUT9w9tSEl7L
-        e2lcbNOA+SOus
-X-Received: by 2002:ac8:5fc6:0:b0:31e:b87b:66b6 with SMTP id k6-20020ac85fc6000000b0031eb87b66b6mr5495073qta.113.1657626688046;
-        Tue, 12 Jul 2022 04:51:28 -0700 (PDT)
-X-Google-Smtp-Source: AGRyM1uC1suIks7htniWcFZcv5Q71PyP6lVZTePxvkpmzxL3fu7tO6X4FXbrP8SjlWR0BwlnAvrSaA==
-X-Received: by 2002:ac8:5fc6:0:b0:31e:b87b:66b6 with SMTP id k6-20020ac85fc6000000b0031eb87b66b6mr5495059qta.113.1657626687829;
-        Tue, 12 Jul 2022 04:51:27 -0700 (PDT)
+        bh=lJt34wYL23qHhqMiKTsYFaw21Mxmb1U5E0uo3Jh2TRY=;
+        b=FL2vnXYlTnVRSMapyrV1sw7qXTMkF3Yjq0M6I3VzSVNn9gvpcIIwGe+ZZm9qdEu8Kt
+         kvpidi3wL7liV+Dr/evgWZ4wtbuzKdS9PbzalutKqYsoBgbZZSNzEeYGnkPsZ4MA+Jdw
+         uZ1a28ZuYszAFREs75IaQ1kqmSiFJ9jUJujuTViighLeuZPgrZnWsPPhUWvgxnLFBdCM
+         cEKpZ7CxjWI0EXbml2Z5fs//MMOQqN4AgdKufTA22/EJQZMNIN2Xd2Xol9WXaO0SVZur
+         e3gBFArilhJSJvkTY93jtiDtGV+ZhmdKL1tLK4i10Ceq97zuiNwFH1fPvg+jga7FzGpR
+         T2kA==
+X-Gm-Message-State: AJIora9EZgwZWD0n/8qYPXXaYVD/wstf0ZSlLcX17CQibhJ2mYEKnFXb
+        LXHEksJMIw6C3NSYuateo1S4XwDmZ7EK6D4XOkVVwWyt3gTZiyTvaAzymkTyoQ1g0T0SubOIGyA
+        kAKEfM6Apc7+a
+X-Received: by 2002:ac8:580f:0:b0:31d:403e:9dd2 with SMTP id g15-20020ac8580f000000b0031d403e9dd2mr17810848qtg.245.1657626709038;
+        Tue, 12 Jul 2022 04:51:49 -0700 (PDT)
+X-Google-Smtp-Source: AGRyM1sfzW/HS+DgXkouauxFV7OY0AYI78cdEPBP3JoT8e1O8OBxPAfrh2D4NWntWrbLwzxZqv5+sQ==
+X-Received: by 2002:ac8:580f:0:b0:31d:403e:9dd2 with SMTP id g15-20020ac8580f000000b0031d403e9dd2mr17810830qtg.245.1657626708795;
+        Tue, 12 Jul 2022 04:51:48 -0700 (PDT)
 Received: from [10.35.4.238] (bzq-82-81-161-50.red.bezeqint.net. [82.81.161.50])
-        by smtp.gmail.com with ESMTPSA id y20-20020a37f614000000b006b55036fd3fsm8441957qkj.70.2022.07.12.04.51.25
+        by smtp.gmail.com with ESMTPSA id k143-20020a37a195000000b006b1fe4a103dsm8666859qke.51.2022.07.12.04.51.46
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 12 Jul 2022 04:51:27 -0700 (PDT)
-Message-ID: <74dbbe45ff8208c7900228842dda289453e6970c.camel@redhat.com>
-Subject: Re: [PATCH v3 05/25] KVM: nVMX: Support several new fields in
- eVMCSv1
+        Tue, 12 Jul 2022 04:51:48 -0700 (PDT)
+Message-ID: <26e7784ff4ee91a8d41d217dcb5f3e0e0ce6e470.camel@redhat.com>
+Subject: Re: [PATCH v3 06/25] KVM: x86: hyper-v: Cache
+ HYPERV_CPUID_NESTED_FEATURES CPUID leaf
 From:   Maxim Levitsky <mlevitsk@redhat.com>
 To:     Vitaly Kuznetsov <vkuznets@redhat.com>, kvm@vger.kernel.org,
         Paolo Bonzini <pbonzini@redhat.com>,
@@ -65,16 +65,16 @@ Cc:     Anirudh Rayabharam <anrayabh@linux.microsoft.com>,
         Wanpeng Li <wanpengli@tencent.com>,
         Jim Mattson <jmattson@google.com>,
         linux-hyperv@vger.kernel.org, linux-kernel@vger.kernel.org
-Date:   Tue, 12 Jul 2022 14:51:24 +0300
-In-Reply-To: <20220708144223.610080-6-vkuznets@redhat.com>
+Date:   Tue, 12 Jul 2022 14:51:44 +0300
+In-Reply-To: <20220708144223.610080-7-vkuznets@redhat.com>
 References: <20220708144223.610080-1-vkuznets@redhat.com>
-         <20220708144223.610080-6-vkuznets@redhat.com>
+         <20220708144223.610080-7-vkuznets@redhat.com>
 Content-Type: text/plain; charset="UTF-8"
 User-Agent: Evolution 3.40.4 (3.40.4-5.fc34) 
 MIME-Version: 1.0
 Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-3.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,
+X-Spam-Status: No, score=-2.7 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
         SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=unavailable
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
@@ -84,95 +84,61 @@ List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
 On Fri, 2022-07-08 at 16:42 +0200, Vitaly Kuznetsov wrote:
-> Enlightened VMCS v1 definition was updated with new fields, add
-> support for them for Hyper-V on KVM.
-> 
-> Note: SSP, CET and Guest LBR features are not supported by KVM yet
-> and 'struct vmcs12' has no corresponding fields.
+> KVM has to check guest visible HYPERV_CPUID_NESTED_FEATURES.EBX CPUID
+> leaf to know with Enlightened VMCS definition to use (original or 2022
+> update). Cache the leaf along with other Hyper-V CPUID feature leaves
+> to make the check quick.
 > 
 > Signed-off-by: Vitaly Kuznetsov <vkuznets@redhat.com>
 > ---
->  arch/x86/kvm/vmx/nested.c | 31 +++++++++++++++++++++++++++++++
->  1 file changed, 31 insertions(+)
+>  arch/x86/include/asm/kvm_host.h | 2 ++
+>  arch/x86/kvm/hyperv.c           | 9 +++++++++
+>  2 files changed, 11 insertions(+)
 > 
-> diff --git a/arch/x86/kvm/vmx/nested.c b/arch/x86/kvm/vmx/nested.c
-> index 778f82015f03..4fc84f0f5875 100644
-> --- a/arch/x86/kvm/vmx/nested.c
-> +++ b/arch/x86/kvm/vmx/nested.c
-> @@ -1603,6 +1603,10 @@ static void copy_enlightened_to_vmcs12(struct vcpu_vmx *vmx, u32 hv_clean_fields
->  		vmcs12->guest_rflags = evmcs->guest_rflags;
->  		vmcs12->guest_interruptibility_info =
->  			evmcs->guest_interruptibility_info;
-> +		/*
-> +		 * Not present in struct vmcs12:
-> +		 * vmcs12->guest_ssp = evmcs->guest_ssp;
-> +		 */
->  	}
+> diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
+> index de5a149d0971..077ec9cf3169 100644
+> --- a/arch/x86/include/asm/kvm_host.h
+> +++ b/arch/x86/include/asm/kvm_host.h
+> @@ -616,6 +616,8 @@ struct kvm_vcpu_hv {
+>  		u32 enlightenments_eax; /* HYPERV_CPUID_ENLIGHTMENT_INFO.EAX */
+>  		u32 enlightenments_ebx; /* HYPERV_CPUID_ENLIGHTMENT_INFO.EBX */
+>  		u32 syndbg_cap_eax; /* HYPERV_CPUID_SYNDBG_PLATFORM_CAPABILITIES.EAX */
+> +		u32 nested_eax; /* HYPERV_CPUID_NESTED_FEATURES.EAX */
+> +		u32 nested_ebx; /* HYPERV_CPUID_NESTED_FEATURES.EBX */
+>  	} cpuid_cache;
+>  };
 >  
->  	if (unlikely(!(hv_clean_fields &
-> @@ -1649,6 +1653,13 @@ static void copy_enlightened_to_vmcs12(struct vcpu_vmx *vmx, u32 hv_clean_fields
->  		vmcs12->host_fs_selector = evmcs->host_fs_selector;
->  		vmcs12->host_gs_selector = evmcs->host_gs_selector;
->  		vmcs12->host_tr_selector = evmcs->host_tr_selector;
-> +		vmcs12->host_ia32_perf_global_ctrl = evmcs->host_ia32_perf_global_ctrl;
-> +		/*
-> +		 * Not present in struct vmcs12:
-> +		 * vmcs12->host_ia32_s_cet = evmcs->host_ia32_s_cet;
-> +		 * vmcs12->host_ssp = evmcs->host_ssp;
-> +		 * vmcs12->host_ia32_int_ssp_table_addr = evmcs->host_ia32_int_ssp_table_addr;
-> +		 */
->  	}
+> diff --git a/arch/x86/kvm/hyperv.c b/arch/x86/kvm/hyperv.c
+> index e08189211d9a..b666902da4d9 100644
+> --- a/arch/x86/kvm/hyperv.c
+> +++ b/arch/x86/kvm/hyperv.c
+> @@ -2030,6 +2030,15 @@ void kvm_hv_set_cpuid(struct kvm_vcpu *vcpu)
+>  		hv_vcpu->cpuid_cache.syndbg_cap_eax = entry->eax;
+>  	else
+>  		hv_vcpu->cpuid_cache.syndbg_cap_eax = 0;
+> +
+> +	entry = kvm_find_cpuid_entry(vcpu, HYPERV_CPUID_NESTED_FEATURES, 0);
+> +	if (entry) {
+> +		hv_vcpu->cpuid_cache.nested_eax = entry->eax;
+> +		hv_vcpu->cpuid_cache.nested_ebx = entry->ebx;
+> +	} else {
+> +		hv_vcpu->cpuid_cache.nested_eax = 0;
+> +		hv_vcpu->cpuid_cache.nested_ebx = 0;
+> +	}
+>  }
 >  
->  	if (unlikely(!(hv_clean_fields &
-> @@ -1716,6 +1727,8 @@ static void copy_enlightened_to_vmcs12(struct vcpu_vmx *vmx, u32 hv_clean_fields
->  		vmcs12->tsc_offset = evmcs->tsc_offset;
->  		vmcs12->virtual_apic_page_addr = evmcs->virtual_apic_page_addr;
->  		vmcs12->xss_exit_bitmap = evmcs->xss_exit_bitmap;
-> +		vmcs12->encls_exiting_bitmap = evmcs->encls_exiting_bitmap;
-> +		vmcs12->tsc_multiplier = evmcs->tsc_multiplier;
->  	}
->  
->  	if (unlikely(!(hv_clean_fields &
-> @@ -1763,6 +1776,13 @@ static void copy_enlightened_to_vmcs12(struct vcpu_vmx *vmx, u32 hv_clean_fields
->  		vmcs12->guest_bndcfgs = evmcs->guest_bndcfgs;
->  		vmcs12->guest_activity_state = evmcs->guest_activity_state;
->  		vmcs12->guest_sysenter_cs = evmcs->guest_sysenter_cs;
-> +		vmcs12->guest_ia32_perf_global_ctrl = evmcs->guest_ia32_perf_global_ctrl;
-> +		/*
-> +		 * Not present in struct vmcs12:
-> +		 * vmcs12->guest_ia32_s_cet = evmcs->guest_ia32_s_cet;
-> +		 * vmcs12->guest_ia32_lbr_ctl = evmcs->guest_ia32_lbr_ctl;
-> +		 * vmcs12->guest_ia32_int_ssp_table_addr = evmcs->guest_ia32_int_ssp_table_addr;
-> +		 */
->  	}
->  
->  	/*
-> @@ -1865,12 +1885,23 @@ static void copy_vmcs12_to_enlightened(struct vcpu_vmx *vmx)
->  	 * evmcs->vm_exit_msr_store_count = vmcs12->vm_exit_msr_store_count;
->  	 * evmcs->vm_exit_msr_load_count = vmcs12->vm_exit_msr_load_count;
->  	 * evmcs->vm_entry_msr_load_count = vmcs12->vm_entry_msr_load_count;
-> +	 * evmcs->guest_ia32_perf_global_ctrl = vmcs12->guest_ia32_perf_global_ctrl;
-> +	 * evmcs->host_ia32_perf_global_ctrl = vmcs12->host_ia32_perf_global_ctrl;
-> +	 * evmcs->encls_exiting_bitmap = vmcs12->encls_exiting_bitmap;
-> +	 * evmcs->tsc_multiplier = vmcs12->tsc_multiplier;
->  	 *
->  	 * Not present in struct vmcs12:
->  	 * evmcs->exit_io_instruction_ecx = vmcs12->exit_io_instruction_ecx;
->  	 * evmcs->exit_io_instruction_esi = vmcs12->exit_io_instruction_esi;
->  	 * evmcs->exit_io_instruction_edi = vmcs12->exit_io_instruction_edi;
->  	 * evmcs->exit_io_instruction_eip = vmcs12->exit_io_instruction_eip;
-> +	 * evmcs->host_ia32_s_cet = vmcs12->host_ia32_s_cet;
-> +	 * evmcs->host_ssp = vmcs12->host_ssp;
-> +	 * evmcs->host_ia32_int_ssp_table_addr = vmcs12->host_ia32_int_ssp_table_addr;
-> +	 * evmcs->guest_ia32_s_cet = vmcs12->guest_ia32_s_cet;
-> +	 * evmcs->guest_ia32_lbr_ctl = vmcs12->guest_ia32_lbr_ctl;
-> +	 * evmcs->guest_ia32_int_ssp_table_addr = vmcs12->guest_ia32_int_ssp_table_addr;
-> +	 * evmcs->guest_ssp = vmcs12->guest_ssp;
->  	 */
->  
->  	evmcs->guest_es_selector = vmcs12->guest_es_selector;
+>  int kvm_hv_set_enforce_cpuid(struct kvm_vcpu *vcpu, bool enforce)
 
-Looks good.
+
+Small Nitpick:
+
+If I understand correctly, the kvm_find_cpuid_entry can fail if the userspace didn't provide the
+cpuid entry.
+
+Since the code that deals with failback is now repeated 3 times, how about some wrapper function that
+will return all zeros for a non present cpuid entry?
+
+That can be done later of course, so
 
 Reviewed-by: Maxim Levitsky <mlevitsk@redhat.com>
 
