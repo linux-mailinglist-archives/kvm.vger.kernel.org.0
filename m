@@ -2,80 +2,63 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 98AA857193E
-	for <lists+kvm@lfdr.de>; Tue, 12 Jul 2022 13:57:49 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 9785D571944
+	for <lists+kvm@lfdr.de>; Tue, 12 Jul 2022 13:58:29 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233039AbiGLL5s (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 12 Jul 2022 07:57:48 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37372 "EHLO
+        id S233020AbiGLL61 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 12 Jul 2022 07:58:27 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44134 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231902AbiGLL5Y (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 12 Jul 2022 07:57:24 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 225C0B6281
-        for <kvm@vger.kernel.org>; Tue, 12 Jul 2022 04:57:20 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1657627039;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=olaRyc5m79LX2YhKauQNe+T3doYLi+ybnhrejxK98CE=;
-        b=TJ1AxfvxO6K1rnNK4A9c/Bv0dApp/g7D/rfJtq4bEGomcrNMuPGKJtbhJYPgON5WNInuFC
-        InREvzyXccyp9IHk1rx5sKo3WilEaTHoiLNaJ7/SBA90RfPEaREWYvp8E68fTrv8TPdd7U
-        CtRFa7t8qAO8xXxM2UsaXiRMF8OfJyA=
-Received: from mail-qk1-f198.google.com (mail-qk1-f198.google.com
- [209.85.222.198]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-543-vpg5sqAdMXaGx7unHO6XzA-1; Tue, 12 Jul 2022 07:57:18 -0400
-X-MC-Unique: vpg5sqAdMXaGx7unHO6XzA-1
-Received: by mail-qk1-f198.google.com with SMTP id bq33-20020a05620a46a100b006b579909e2eso6460765qkb.17
-        for <kvm@vger.kernel.org>; Tue, 12 Jul 2022 04:57:17 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:message-id:subject:from:to:cc:date:in-reply-to
-         :references:user-agent:mime-version:content-transfer-encoding;
-        bh=olaRyc5m79LX2YhKauQNe+T3doYLi+ybnhrejxK98CE=;
-        b=gGt/oMKxnzeJfTSQwc5P+ft5xoGf2N7vUNHkJl/GAYmtoSmL7zEv/whdiBXG9OaK4D
-         IYU6xsHIFq93lrruDgEW9A/P9aszqNQDFl0U9JvMzI73fkTGJQHan6Km8TcU4JBXACSe
-         qh+/9czPZ/gS75ekDEEv8wAAWxdJWkRyITxxVN5swrdcOBx0UyA728hcSuTvVXM/JshV
-         en/FmzBNQB3b6JnuZiaFpRV4n1glD6UnD9WuYdLaRY7H13byuzlvPEsOokfRQ1r6eAfU
-         84yrEepKgJaHwCUYMYMo5QlMs2RvkzhiLk0gp1YTIYeOCvxsOKQ3kxVAB3zocit7X4+M
-         v8dg==
-X-Gm-Message-State: AJIora8QLA8o3ugAqouNk6dTHflOB6FFpwLiwn0QTY2ccXiyNdISDXpn
-        yG9/no6ql738YQ5EkhxjS4YbePtLeEG8p8MDkT4XdPd6PNAZ4T4bG1OVwoKWA2TgVC897wMl5ne
-        io9E9A9BVIg4m
-X-Received: by 2002:ac8:5a4a:0:b0:31e:c15f:c1f9 with SMTP id o10-20020ac85a4a000000b0031ec15fc1f9mr1802431qta.12.1657627037538;
-        Tue, 12 Jul 2022 04:57:17 -0700 (PDT)
-X-Google-Smtp-Source: AGRyM1urHh4ODy0b6XiDk4WThbx6/yS3IFDPugQq8wMUsZi0/m+3IrBehtXOQ128Owji6o19BTZj8A==
-X-Received: by 2002:ac8:5a4a:0:b0:31e:c15f:c1f9 with SMTP id o10-20020ac85a4a000000b0031ec15fc1f9mr1802350qta.12.1657627036023;
-        Tue, 12 Jul 2022 04:57:16 -0700 (PDT)
-Received: from [10.35.4.238] (bzq-82-81-161-50.red.bezeqint.net. [82.81.161.50])
-        by smtp.gmail.com with ESMTPSA id n7-20020ae9c307000000b006a34a22bc60sm8400241qkg.9.2022.07.12.04.57.13
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 12 Jul 2022 04:57:15 -0700 (PDT)
-Message-ID: <031867fe65f26f7e2d37cc41ec071b3aea98ee90.camel@redhat.com>
-Subject: Re: [PATCH v3 17/25] KVM: VMX: Add missing VMEXIT controls to
- vmcs_config
-From:   Maxim Levitsky <mlevitsk@redhat.com>
-To:     Vitaly Kuznetsov <vkuznets@redhat.com>, kvm@vger.kernel.org,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Sean Christopherson <seanjc@google.com>
-Cc:     Anirudh Rayabharam <anrayabh@linux.microsoft.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        linux-hyperv@vger.kernel.org, linux-kernel@vger.kernel.org
-Date:   Tue, 12 Jul 2022 14:57:11 +0300
-In-Reply-To: <20220708144223.610080-18-vkuznets@redhat.com>
-References: <20220708144223.610080-1-vkuznets@redhat.com>
-         <20220708144223.610080-18-vkuznets@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
-User-Agent: Evolution 3.40.4 (3.40.4-5.fc34) 
+        with ESMTP id S233007AbiGLL6O (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 12 Jul 2022 07:58:14 -0400
+Received: from ams.source.kernel.org (ams.source.kernel.org [145.40.68.75])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2F082F59D;
+        Tue, 12 Jul 2022 04:57:41 -0700 (PDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by ams.source.kernel.org (Postfix) with ESMTPS id 96B93B81819;
+        Tue, 12 Jul 2022 11:57:39 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id C170DC3411C;
+        Tue, 12 Jul 2022 11:57:37 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1657627058;
+        bh=I2isUddvIfyYxIILfJHOITCIxJP3S9I3oDgIC7Pbt48=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=UP4OLaoPDWXgj0dQ5SMvidVyDcHYo0UKYj4XJOmtvCHOPh6dezwodkVVzqkSuOAhO
+         mjIPVQxOA5IeO7i1+9fa9Zeu5RmHUNS5KUgNXFtbnPV/C6cWiMx0Psfe8dLKB9vYpI
+         WR8Ww4F8fyYRVQ+p+hIc0kMhJETRI7O4hef8Uum+8SA9UiuzFV8I9jxqZyqCx+j5zo
+         0ojzM6fGKuuJbz/CcLv2U0MKM71XellXJdmbtvgp0vV8yMnUv7hEQzT60hN662MMRz
+         JxrDUpqzXzqqQDOhjjWSpmX/J6GokjnlgFKZkHzYgBq/Xd1HO8KzPT3W0eYBxJRo1C
+         a8EB/1Zu3bP8A==
+Date:   Tue, 12 Jul 2022 14:57:34 +0300
+From:   Jarkko Sakkinen <jarkko@kernel.org>
+To:     Ashish Kalra <Ashish.Kalra@amd.com>
+Cc:     x86@kernel.org, linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        linux-coco@lists.linux.dev, linux-mm@kvack.org,
+        linux-crypto@vger.kernel.org, tglx@linutronix.de, mingo@redhat.com,
+        jroedel@suse.de, thomas.lendacky@amd.com, hpa@zytor.com,
+        ardb@kernel.org, pbonzini@redhat.com, seanjc@google.com,
+        vkuznets@redhat.com, jmattson@google.com, luto@kernel.org,
+        dave.hansen@linux.intel.com, slp@redhat.com, pgonda@google.com,
+        peterz@infradead.org, srinivas.pandruvada@linux.intel.com,
+        rientjes@google.com, dovmurik@linux.ibm.com, tobin@ibm.com,
+        bp@alien8.de, michael.roth@amd.com, vbabka@suse.cz,
+        kirill@shutemov.name, ak@linux.intel.com, tony.luck@intel.com,
+        marcorr@google.com, sathyanarayanan.kuppuswamy@linux.intel.com,
+        alpergun@google.com, dgilbert@redhat.com
+Subject: Re: [PATCH Part2 v6 09/49] x86/fault: Add support to handle the RMP
+ fault for user address
+Message-ID: <Ys1hrq+vFbxRJbra@kernel.org>
+References: <cover.1655761627.git.ashish.kalra@amd.com>
+ <0ecb0a4781be933fcadeb56a85070818ef3566e7.1655761627.git.ashish.kalra@amd.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-3.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,
-        SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=unavailable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <0ecb0a4781be933fcadeb56a85070818ef3566e7.1655761627.git.ashish.kalra@amd.com>
+X-Spam-Status: No, score=-7.7 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_HI,
+        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -83,56 +66,23 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, 2022-07-08 at 16:42 +0200, Vitaly Kuznetsov wrote:
-> As a preparation to reusing the result of setup_vmcs_config() in
-> nested VMX MSR setup, add the VMEXIT controls which KVM doesn't
-> use but supports for nVMX to KVM_OPT_VMX_VM_EXIT_CONTROLS and
-> filter them out in vmx_vmexit_ctrl().
-> 
-> No functional change intended.
-> 
-> Reviewed-by: Jim Mattson <jmattson@google.com>
-> Signed-off-by: Vitaly Kuznetsov <vkuznets@redhat.com>
-> ---
->  arch/x86/kvm/vmx/vmx.c | 4 ++++
->  arch/x86/kvm/vmx/vmx.h | 3 +++
->  2 files changed, 7 insertions(+)
-> 
-> diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
-> index d7170990f469..2fb89bdcbbd8 100644
-> --- a/arch/x86/kvm/vmx/vmx.c
-> +++ b/arch/x86/kvm/vmx/vmx.c
-> @@ -4196,6 +4196,10 @@ static u32 vmx_vmexit_ctrl(void)
->  {
->         u32 vmexit_ctrl = vmcs_config.vmexit_ctrl;
->  
-> +       /* Not used by KVM but supported for nesting. */
-> +       vmexit_ctrl &= ~(VM_EXIT_SAVE_IA32_PAT | VM_EXIT_SAVE_IA32_EFER |
-> +                        VM_EXIT_SAVE_VMX_PREEMPTION_TIMER);
+On Mon, Jun 20, 2022 at 11:03:43PM +0000, Ashish Kalra wrote:
+> +/*
+> + * Return 1 if the caller need to retry, 0 if it the address need to be split
+> + * in order to resolve the fault.
+> + */
+> +static int handle_user_rmp_page_fault(struct pt_regs *regs, unsigned long error_code,
+> +				      unsigned long address)
+> +{
+> +	int rmp_level, level;
+> +	pte_t *pte;
+> +	u64 pfn;
 > +
->         if (vmx_pt_mode_is_system())
->                 vmexit_ctrl &= ~(VM_EXIT_PT_CONCEAL_PIP |
->                                  VM_EXIT_CLEAR_IA32_RTIT_CTL);
-> diff --git a/arch/x86/kvm/vmx/vmx.h b/arch/x86/kvm/vmx/vmx.h
-> index 89eaab3495a6..e9c392398f1b 100644
-> --- a/arch/x86/kvm/vmx/vmx.h
-> +++ b/arch/x86/kvm/vmx/vmx.h
-> @@ -498,8 +498,11 @@ static inline u8 vmx_get_rvi(void)
->  #endif
->  #define KVM_OPT_VMX_VM_EXIT_CONTROLS                           \
->               (VM_EXIT_LOAD_IA32_PERF_GLOBAL_CTRL |             \
-> +             VM_EXIT_SAVE_IA32_PAT |                           \
->               VM_EXIT_LOAD_IA32_PAT |                           \
-> +             VM_EXIT_SAVE_IA32_EFER |                          \
->               VM_EXIT_LOAD_IA32_EFER |                          \
-> +             VM_EXIT_SAVE_VMX_PREEMPTION_TIMER |               \
->               VM_EXIT_CLEAR_BNDCFGS |                           \
->               VM_EXIT_PT_CONCEAL_PIP |                          \
->               VM_EXIT_CLEAR_IA32_RTIT_CTL)
+> +	pte = lookup_address_in_mm(current->mm, address, &level);
 
+As discussed in [1], the lookup should be done in kvm->mm, along the
+lines of host_pfn_mapping_level().
 
-Reviewed-by: Maxim Levitsky <mlevitsk@redhat.com>
-
-Best regards,
-	Maxim Levitsky
-
+[1] https://lore.kernel.org/kvm/YmwIi3bXr%2F1yhYV%2F@google.com/ 
+|
+BR, Jarkko
