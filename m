@@ -2,46 +2,63 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 98437571A69
-	for <lists+kvm@lfdr.de>; Tue, 12 Jul 2022 14:48:05 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 7266E571A12
+	for <lists+kvm@lfdr.de>; Tue, 12 Jul 2022 14:34:05 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233206AbiGLMsE (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 12 Jul 2022 08:48:04 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35040 "EHLO
+        id S232297AbiGLMeE (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 12 Jul 2022 08:34:04 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51214 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233009AbiGLMsD (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 12 Jul 2022 08:48:03 -0400
-X-Greylist: delayed 933 seconds by postgrey-1.37 at lindbergh.monkeyblade.net; Tue, 12 Jul 2022 05:48:02 PDT
-Received: from baidu.com (mx20.baidu.com [111.202.115.85])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 097ABB31D5;
-        Tue, 12 Jul 2022 05:48:02 -0700 (PDT)
-Received: from BC-Mail-Ex25.internal.baidu.com (unknown [172.31.51.19])
-        by Forcepoint Email with ESMTPS id C99EE6BA46BF116996BE;
-        Tue, 12 Jul 2022 20:32:25 +0800 (CST)
-Received: from FB9D8C53FFFC188.internal.baidu.com (172.31.62.15) by
- BC-Mail-Ex25.internal.baidu.com (172.31.51.19) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id
- 15.1.2308.20; Tue, 12 Jul 2022 20:32:27 +0800
-From:   Wang Guangju <wangguangju@baidu.com>
-To:     <seanjc@google.com>, <pbonzini@redhat.com>, <vkuznets@redhat.com>,
-        <jmattson@google.com>, <wanpengli@tencent.com>, <bp@alien8.de>,
-        <joro@8bytes.org>, <suravee.suthikulpanit@amd.com>,
-        <hpa@zytor.com>, <tglx@linutronix.de>, <mingo@redhat.com>,
-        <kvm@vger.kernel.org>
-CC:     <linux-kernel@vger.kernel.org>, <stable@vger.kernel.org>,
-        <wangguangju@baidu.com>, <lirongqing@baidu.com>
-Subject: [PATCH v3] KVM: x86: Send EOI to SynIC vectors on accelerated EOI-induced VM-Exits
-Date:   Tue, 12 Jul 2022 20:32:10 +0800
-Message-ID: <20220712123210.89-1-wangguangju@baidu.com>
-X-Mailer: git-send-email 2.25.1
+        with ESMTP id S229691AbiGLMeC (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 12 Jul 2022 08:34:02 -0400
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 803405FB4;
+        Tue, 12 Jul 2022 05:34:01 -0700 (PDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id 1754C616AF;
+        Tue, 12 Jul 2022 12:34:01 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id F14B1C341C8;
+        Tue, 12 Jul 2022 12:33:59 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1657629240;
+        bh=9DjX9o6ibssfN2gVfTH2pbVMipRj/UkB3PPyZA75DLc=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=XCdKNUuRGjW9rRR0xnr8jYvOUe05Iuaci0Az7i0qa/N7392kbXhDQcOTEWElhi5jE
+         6HK6icZCWNZCpC4q3LQ1iT2ud7LV14A/VOLk7SOoNTEW+FLFU5rl1J/GPOF1scyQKr
+         CQaJO8PtaGbulZdGcLg1SB75oPB6jvgVZk+CydYqVg6jiDP1IgRQf2xDgDMLPnchsV
+         6oxB9FpN/ZqFq8Ffx6uybtcggIDqvya5PUeFGfE6dG2diC/tD35aFY+N9qoQrMsX8T
+         41aU/Gl0mawE3ShnsZtjXC4GfXVxG15vJkbXBPCTmqHlS0d5H/ljEasTJbEtpSAGzS
+         8Ahr0dc6hjxmw==
+Date:   Tue, 12 Jul 2022 15:33:57 +0300
+From:   Jarkko Sakkinen <jarkko@kernel.org>
+To:     Ashish Kalra <Ashish.Kalra@amd.com>
+Cc:     x86@kernel.org, linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        linux-coco@lists.linux.dev, linux-mm@kvack.org,
+        linux-crypto@vger.kernel.org, tglx@linutronix.de, mingo@redhat.com,
+        jroedel@suse.de, thomas.lendacky@amd.com, hpa@zytor.com,
+        ardb@kernel.org, pbonzini@redhat.com, seanjc@google.com,
+        vkuznets@redhat.com, jmattson@google.com, luto@kernel.org,
+        dave.hansen@linux.intel.com, slp@redhat.com, pgonda@google.com,
+        peterz@infradead.org, srinivas.pandruvada@linux.intel.com,
+        rientjes@google.com, dovmurik@linux.ibm.com, tobin@ibm.com,
+        bp@alien8.de, michael.roth@amd.com, vbabka@suse.cz,
+        kirill@shutemov.name, ak@linux.intel.com, tony.luck@intel.com,
+        marcorr@google.com, sathyanarayanan.kuppuswamy@linux.intel.com,
+        alpergun@google.com, dgilbert@redhat.com
+Subject: Re: [PATCH Part2 v6 41/49] KVM: SVM: Add support to handle the RMP
+ nested page fault
+Message-ID: <Ys1qNQNqek5MdG3v@kernel.org>
+References: <cover.1655761627.git.ashish.kalra@amd.com>
+ <d7decd3cb48d962da086afb65feb94a124e5c537.1655761627.git.ashish.kalra@amd.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 7BIT
-Content-Type:   text/plain; charset=US-ASCII
-X-Originating-IP: [172.31.62.15]
-X-ClientProxiedBy: BC-Mail-Ex27.internal.baidu.com (172.31.51.21) To
- BC-Mail-Ex25.internal.baidu.com (172.31.51.19)
-X-Spam-Status: No, score=-2.6 required=5.0 tests=BAYES_00,RCVD_IN_DNSWL_LOW,
-        SPF_HELO_PASS,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <d7decd3cb48d962da086afb65feb94a124e5c537.1655761627.git.ashish.kalra@amd.com>
+X-Spam-Status: No, score=-7.7 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_HI,
+        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -49,143 +66,45 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-When EOI virtualization is performed on VMX, kvm_apic_set_eoi_accelerated()
-is called upon EXIT_REASON_EOI_INDUCED but unlike its non-accelerated
-apic_set_eoi() sibling, Hyper-V SINT vectors are left unhandled.
+On Mon, Jun 20, 2022 at 11:13:03PM +0000, Ashish Kalra wrote:
+> From: Brijesh Singh <brijesh.singh@amd.com>
+> 
+> When SEV-SNP is enabled in the guest, the hardware places restrictions on
+> all memory accesses based on the contents of the RMP table. When hardware
+> encounters RMP check failure caused by the guest memory access it raises
+> the #NPF. The error code contains additional information on the access
+> type. See the APM volume 2 for additional information.
+> 
+> Signed-off-by: Brijesh Singh <brijesh.singh@amd.com>
+> ---
+>  arch/x86/kvm/svm/sev.c | 76 ++++++++++++++++++++++++++++++++++++++++++
+>  arch/x86/kvm/svm/svm.c | 14 +++++---
+>  2 files changed, 86 insertions(+), 4 deletions(-)
+> 
+> diff --git a/arch/x86/kvm/svm/sev.c b/arch/x86/kvm/svm/sev.c
+> index 4ed90331bca0..7fc0fad87054 100644
+> --- a/arch/x86/kvm/svm/sev.c
+> +++ b/arch/x86/kvm/svm/sev.c
+> @@ -4009,3 +4009,79 @@ void sev_post_unmap_gfn(struct kvm *kvm, gfn_t gfn, kvm_pfn_t pfn)
+>  
+>  	spin_unlock(&sev->psc_lock);
+>  }
+> +
+> +void handle_rmp_page_fault(struct kvm_vcpu *vcpu, gpa_t gpa, u64 error_code)
+> +{
+> +	int rmp_level, npt_level, rc, assigned;
+> +	struct kvm *kvm = vcpu->kvm;
+> +	gfn_t gfn = gpa_to_gfn(gpa);
+> +	bool need_psc = false;
+> +	enum psc_op psc_op;
+> +	kvm_pfn_t pfn;
+> +	bool private;
+> +
+> +	write_lock(&kvm->mmu_lock);
+> +
+> +	if (unlikely(!kvm_mmu_get_tdp_walk(vcpu, gpa, &pfn, &npt_level)))
 
-Send EOI to Hyper-V SINT vectors when handling acclerated EOI-induced
-VM-Exits. KVM Hyper-V needs to handle the SINT EOI irrespective of whether
-the EOI is acclerated or not.
+This function does not exist. Should it be kvm_mmu_get_tdp_page?
 
-Rename kvm_apic_set_eoi_accelerated() to kvm_apic_set_eoi() and let the
-non-accelerated helper call the "acclerated" version. That will document
-the delta between the non-accelerated path and the accelerated path.
-In addition, guarantee to trace even if there's no valid vector to EOI in
-the non-accelerated path in order to keep the semantics of the function
-intact.
-
-Fixes: 5c919412fe61 ("kvm/x86: Hyper-V synthetic interrupt controller")
-Cc: <stable@vger.kernel.org>
-Tested-by: Wang Guangju <wangguangju@baidu.com>
-Suggested-by: Sean Christopherson <seanjc@google.com>
-Suggested-by: Vitaly Kuznetsov <vkuznets@redhat.com>
-Co-developed-by: Li Rongqing <lirongqing@baidu.com>
-Signed-off-by: Wang Guangju <wangguangju@baidu.com>
----
- v1 -> v2: Updated the commit message and implement a new inline function
- of apic_set_eoi_vector()
-
- v2 -> v3: Updated the subject and commit message, drop func 
- apic_set_eoi_vector() and rename kvm_apic_set_eoi_accelerated() 
- to kvm_apic_set_eoi()
-
- arch/x86/kvm/lapic.c   | 45 ++++++++++++++++++++++-----------------------
- arch/x86/kvm/lapic.h   |  2 +-
- arch/x86/kvm/vmx/vmx.c |  3 ++-
- 3 files changed, 25 insertions(+), 25 deletions(-)
-
-diff --git a/arch/x86/kvm/lapic.c b/arch/x86/kvm/lapic.c
-index f03facc..b2e72ab 100644
---- a/arch/x86/kvm/lapic.c
-+++ b/arch/x86/kvm/lapic.c
-@@ -1269,46 +1269,45 @@ static void kvm_ioapic_send_eoi(struct kvm_lapic *apic, int vector)
- 	kvm_ioapic_update_eoi(apic->vcpu, vector, trigger_mode);
- }
- 
-+/*
-+ * Send EOI for a valid vector.  The caller, or hardware when this is invoked
-+ * after an accelerated EOI VM-Exit, is responsible for updating the vISR and
-+ * vPPR.
-+ */
-+void kvm_apic_set_eoi(struct kvm_lapic *apic, int vector)
-+{
-+	trace_kvm_eoi(apic, vector);
-+
-+	if (to_hv_vcpu(apic->vcpu) &&
-+	    test_bit(vector, to_hv_synic(apic->vcpu)->vec_bitmap))
-+		kvm_hv_synic_send_eoi(apic->vcpu, vector);
-+
-+	kvm_ioapic_send_eoi(apic, vector);
-+	kvm_make_request(KVM_REQ_EVENT, apic->vcpu);
-+}
-+EXPORT_SYMBOL_GPL(kvm_apic_set_eoi);
-+
- static int apic_set_eoi(struct kvm_lapic *apic)
- {
- 	int vector = apic_find_highest_isr(apic);
- 
--	trace_kvm_eoi(apic, vector);
--
- 	/*
- 	 * Not every write EOI will has corresponding ISR,
- 	 * one example is when Kernel check timer on setup_IO_APIC
- 	 */
--	if (vector == -1)
-+	if (vector == -1) {
-+		trace_kvm_eoi(apic, vector);
- 		return vector;
-+	}
- 
- 	apic_clear_isr(vector, apic);
- 	apic_update_ppr(apic);
- 
--	if (to_hv_vcpu(apic->vcpu) &&
--	    test_bit(vector, to_hv_synic(apic->vcpu)->vec_bitmap))
--		kvm_hv_synic_send_eoi(apic->vcpu, vector);
-+	kvm_apic_set_eoi(apic, vector);
- 
--	kvm_ioapic_send_eoi(apic, vector);
--	kvm_make_request(KVM_REQ_EVENT, apic->vcpu);
- 	return vector;
- }
- 
--/*
-- * this interface assumes a trap-like exit, which has already finished
-- * desired side effect including vISR and vPPR update.
-- */
--void kvm_apic_set_eoi_accelerated(struct kvm_vcpu *vcpu, int vector)
--{
--	struct kvm_lapic *apic = vcpu->arch.apic;
--
--	trace_kvm_eoi(apic, vector);
--
--	kvm_ioapic_send_eoi(apic, vector);
--	kvm_make_request(KVM_REQ_EVENT, apic->vcpu);
--}
--EXPORT_SYMBOL_GPL(kvm_apic_set_eoi_accelerated);
--
- void kvm_apic_send_ipi(struct kvm_lapic *apic, u32 icr_low, u32 icr_high)
- {
- 	struct kvm_lapic_irq irq;
-diff --git a/arch/x86/kvm/lapic.h b/arch/x86/kvm/lapic.h
-index 762bf61..48260fa 100644
---- a/arch/x86/kvm/lapic.h
-+++ b/arch/x86/kvm/lapic.h
-@@ -126,7 +126,7 @@ u64 kvm_get_lapic_tscdeadline_msr(struct kvm_vcpu *vcpu);
- void kvm_set_lapic_tscdeadline_msr(struct kvm_vcpu *vcpu, u64 data);
- 
- void kvm_apic_write_nodecode(struct kvm_vcpu *vcpu, u32 offset);
--void kvm_apic_set_eoi_accelerated(struct kvm_vcpu *vcpu, int vector);
-+void kvm_apic_set_eoi(struct kvm_lapic *apic, int vector);
- 
- int kvm_lapic_set_vapic_addr(struct kvm_vcpu *vcpu, gpa_t vapic_addr);
- void kvm_lapic_sync_from_vapic(struct kvm_vcpu *vcpu);
-diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
-index 9258468..f8b9eb1 100644
---- a/arch/x86/kvm/vmx/vmx.c
-+++ b/arch/x86/kvm/vmx/vmx.c
-@@ -5519,9 +5519,10 @@ static int handle_apic_eoi_induced(struct kvm_vcpu *vcpu)
- {
- 	unsigned long exit_qualification = vmx_get_exit_qual(vcpu);
- 	int vector = exit_qualification & 0xff;
-+	struct kvm_lapic *apic = vcpu->arch.apic;
- 
- 	/* EOI-induced VM exit is trap-like and thus no need to adjust IP */
--	kvm_apic_set_eoi_accelerated(vcpu, vector);
-+	kvm_apic_set_eoi(apic, vector);
- 	return 1;
- }
- 
--- 
-2.9.4
+BR, Jarkko
 
