@@ -2,81 +2,94 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id C8FCE57117B
-	for <lists+kvm@lfdr.de>; Tue, 12 Jul 2022 06:34:58 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 5461C5711B4
+	for <lists+kvm@lfdr.de>; Tue, 12 Jul 2022 07:07:44 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231247AbiGLEe5 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 12 Jul 2022 00:34:57 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50028 "EHLO
+        id S230319AbiGLFHn (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 12 Jul 2022 01:07:43 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36404 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229451AbiGLEe4 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 12 Jul 2022 00:34:56 -0400
-Received: from mail-vs1-xe36.google.com (mail-vs1-xe36.google.com [IPv6:2607:f8b0:4864:20::e36])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CD0885FAE0
-        for <kvm@vger.kernel.org>; Mon, 11 Jul 2022 21:34:54 -0700 (PDT)
-Received: by mail-vs1-xe36.google.com with SMTP id j65so6766458vsc.3
-        for <kvm@vger.kernel.org>; Mon, 11 Jul 2022 21:34:54 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=2G5DDdHN65V5QCqoc0hJXGvC6ZBJU+ZGuB0i5a889f4=;
-        b=gKNWeGGUaQbxlF/L3rMRsDc2PhkbPzfLIFYAaRskfX4H9ypCvtdaYj7/rKQhk/y48h
-         I9lsunvlZ8+Lsu86JBzxKJe5GniCyQfdac1lq2hTuBzxAoTfRHSK175NJBKZgkCrvwyy
-         /fqzEh4zeK8tI+doDU04fUKl72XtLDsWx5ynhU4LGDzbrFRmTg08uJpftEIy0LvmD7kI
-         Mt65vAQGOiFmtOSbRMChgtjfNLKh3JwhWghlaiHIDe7oLuWsAWGMd7F6JfLWV5nPMZ7I
-         0HV4q6xtkcGn760H6Yzh1D8/YeEliuC+WIcHceUIlzzqF+Qizo3ER3AZJgR61gErc0Dm
-         HmLQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=2G5DDdHN65V5QCqoc0hJXGvC6ZBJU+ZGuB0i5a889f4=;
-        b=IORGP4cWAnb2DJoS2+kMLxkuJHTdFg7FTryPcvwn7Vt+9nfJ9bQPIXDJM1pIPdE569
-         Y94hSJwCsFULoejqO5/aLEbz86713g73fK4XcheFcSxjkTmgr5UeTSUhP73s7pKIo5Tq
-         xDWdUGWNKkHNfeK23J2IFpBj2iUtZNr4Ib3cuTQp/3KcY9ACf0yscm6SBlCAwPRZhVRk
-         oTO1eFGDzhtqvxTUTwZE1RnO+IozLQDEwmtUHOqPAxxpsPSZx99M0kBFSnhBb1mfOuiX
-         dAgWwksdrEWkxPEkmRkD8batItBFbU5sMSjXa//TGuz3I6PHlI/sPdjpsvOsjOfQmytl
-         NGMA==
-X-Gm-Message-State: AJIora/6a/YyBKcubZyxGvD+MfoCfhUy9FwiDQxJAz+1c0XPLy7dLuT6
-        mODZQRTM7we41XlNAA000YluzzqDpVB88DZRT2yxKQ==
-X-Google-Smtp-Source: AGRyM1vFWfnJO1N1oFZN8adTtTYjnWcRgKILoGUSyraLENahV/H1J4Vhbb0NTk1cOJ+a1timJoWqAJKzx/qEXEuDLsY=
-X-Received: by 2002:a05:6102:2126:b0:357:6663:a469 with SMTP id
- f6-20020a056102212600b003576663a469mr2533719vsg.58.1657600493938; Mon, 11 Jul
- 2022 21:34:53 -0700 (PDT)
+        with ESMTP id S229518AbiGLFHk (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 12 Jul 2022 01:07:40 -0400
+Received: from mga05.intel.com (mga05.intel.com [192.55.52.43])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 16A692F39E;
+        Mon, 11 Jul 2022 22:07:40 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1657602460; x=1689138460;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=sKkU5tclbj1atbJcHwSP7zmsBQzx3Y2Qup5ImaPKP18=;
+  b=MpX7EFRD5i8eihkye77SKaTpIA0fT2J+pFPsd6ZZeNScq6eBtLTTrfS0
+   jA51qwx56QUCK9EvfA0ve3ONJYHjty+kV56kEMHzZ/q1xR88sTDQaTTEE
+   4G/G6usO9SSWzubKMocsXYd8uAAu4W8COCXwxQ5Eqs0zSz0uvG3YBOic+
+   RuTE/ruL/vFvWTp7rgk3APc6YKnU/gpdE503xQaMSNkvcZwaFZcV9h7T1
+   2MrhXbKABBjgisx5U8yJMkGv6Q9jRDGvGg25c7/idssLSwMxx9le4S/Yr
+   z6uhJwLaAFh7jeMGS0fDuVERzcWm/qm/SQ0jdT5oHoF1CgTFO6Mzt5Cep
+   A==;
+X-IronPort-AV: E=McAfee;i="6400,9594,10405"; a="371147894"
+X-IronPort-AV: E=Sophos;i="5.92,264,1650956400"; 
+   d="scan'208";a="371147894"
+Received: from fmsmga008.fm.intel.com ([10.253.24.58])
+  by fmsmga105.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 11 Jul 2022 22:07:39 -0700
+X-IronPort-AV: E=Sophos;i="5.92,264,1650956400"; 
+   d="scan'208";a="652757351"
+Received: from gao-cwp.sh.intel.com (HELO gao-cwp) ([10.239.159.23])
+  by fmsmga008-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 11 Jul 2022 22:07:38 -0700
+Date:   Tue, 12 Jul 2022 13:07:20 +0800
+From:   Chao Gao <chao.gao@intel.com>
+To:     Isaku Yamahata <isaku.yamahata@gmail.com>
+Cc:     isaku.yamahata@intel.com, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>,
+        chao.p.peng@intel.com
+Subject: Re: [PATCH v7 000/102] KVM TDX basic feature support
+Message-ID: <20220712050714.GA26573@gao-cwp>
+References: <cover.1656366337.git.isaku.yamahata@intel.com>
+ <20220711151701.GA1375147@ls.amr.corp.intel.com>
 MIME-Version: 1.0
-References: <20220706164304.1582687-1-maz@kernel.org> <20220706164304.1582687-7-maz@kernel.org>
-In-Reply-To: <20220706164304.1582687-7-maz@kernel.org>
-From:   Reiji Watanabe <reijiw@google.com>
-Date:   Mon, 11 Jul 2022 21:34:38 -0700
-Message-ID: <CAAeT=FyqHFciAqBtD4K1-HFW4nefBovRyLX6uv=31sGsGk5ufQ@mail.gmail.com>
-Subject: Re: [PATCH 06/19] KVM: arm64: Get rid of reg_from/to_user()
-To:     Marc Zyngier <maz@kernel.org>
-Cc:     kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org,
-        Linux ARM <linux-arm-kernel@lists.infradead.org>,
-        Schspa Shi <schspa@gmail.com>, kernel-team@android.com,
-        Oliver Upton <oliver.upton@linux.dev>
-Content-Type: text/plain; charset="UTF-8"
-X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-        T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL
-        autolearn=ham autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20220711151701.GA1375147@ls.amr.corp.intel.com>
+User-Agent: Mutt/1.9.4 (2018-02-28)
+X-Spam-Status: No, score=-5.0 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
+        SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Jul 6, 2022 at 9:43 AM Marc Zyngier <maz@kernel.org> wrote:
+On Mon, Jul 11, 2022 at 08:17:01AM -0700, Isaku Yamahata wrote:
+>Hi. Because my description on large page support was terse, I wrote up more
+>detailed one.  Any feedback/thoughts on large page support?
 >
-> These helpers are only used by the invariant stuff now, and while
-> they pretend to support non-64bit registers, this only serves as
-> a way to scare the casual reviewer...
+>TDP MMU large page support design
 >
-> Replace these helpers with our good friends get/put_user(), and
-> don't look back.
->
-> Signed-off-by: Marc Zyngier <maz@kernel.org>
+>Two main discussion points
+>* how to track page status. private vs shared, no-largepage vs can-be-largepage
 
-Reviewed-by: Reiji Watanabe <reijiw@google.com>
+...
+
+>
+>Tracking private/shared and large page mappable
+>-----------------------------------------------
+>VMM needs to track that page is mapped as private or shared at 4KB granularity.
+>For efficiency of EPT violation path (****), at 2MB and 1GB level, VMM should
+>track the page can be mapped as a large page (regarding private/shared).  VMM
+>updates it on MapGPA and references it on the EPT violation path. (****)
+
+Isaku,
+
++ Peng Chao
+
+Doesn't UPM guarantee that 2MB/1GB large page in CR3 should be either all
+private or all shared?
+
+KVM always retrieves the mapping level in CR3 and enforces that EPT's
+page level is not greater than that in CR3. My point is if UPM already enforces
+no mixed pages in a large page, then KVM needn't do that again (UPM can
+be trusted).
+
+Maybe I am misunderstanding something?
