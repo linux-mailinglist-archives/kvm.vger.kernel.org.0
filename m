@@ -2,111 +2,159 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id B04A8570F35
-	for <lists+kvm@lfdr.de>; Tue, 12 Jul 2022 03:07:54 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 4E961570F4E
+	for <lists+kvm@lfdr.de>; Tue, 12 Jul 2022 03:13:21 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231379AbiGLBHw (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 11 Jul 2022 21:07:52 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34742 "EHLO
+        id S229712AbiGLBNT (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 11 Jul 2022 21:13:19 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39512 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229633AbiGLBHv (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 11 Jul 2022 21:07:51 -0400
-Received: from mail-pj1-x102d.google.com (mail-pj1-x102d.google.com [IPv6:2607:f8b0:4864:20::102d])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0CCE827FFF;
-        Mon, 11 Jul 2022 18:07:50 -0700 (PDT)
-Received: by mail-pj1-x102d.google.com with SMTP id fz10so6270120pjb.2;
-        Mon, 11 Jul 2022 18:07:50 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=mime-version:subject:from:in-reply-to:date:cc
-         :content-transfer-encoding:message-id:references:to;
-        bh=ypHMFXn2YcaaY0AHuBIgk51BYFs/v71Cwy5/0gPeK/s=;
-        b=dprawehKM255mpHjv2LvRV9r7DqT89cmjcUNjBYT50xteRnjmIoWBNBWamqcfPSZDo
-         UUGpiMlUY835A7PsSGcfBOtRNVoOjyTQgXradmnDPaBTla0uzAfxF9Zhd1pNAmaSYyTH
-         KcCnbTzkHSuAhrPmqoIBWQi7JkX7jsS4ntfcUdEnVu36rD2FL1ZPe3oXFAhnV8dsNEQ3
-         6LMjH52IhekqLnIXq7vv0JR6nobm/XLYMckYVaIi8CW2TuTDEzXPM2/B2VFnhpeJIXEF
-         pXQrABnnJAMGOYBtPOgdvqnvcVUsgIcOJGJdEup1Jwmxk/bTNGfgTnodTgySbbHpS9NT
-         YNMw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:subject:from:in-reply-to:date:cc
-         :content-transfer-encoding:message-id:references:to;
-        bh=ypHMFXn2YcaaY0AHuBIgk51BYFs/v71Cwy5/0gPeK/s=;
-        b=vrAGd9fhr99VNXYBws6eLZVcsrAoZQzalzPaJAMmbPZTcbbRYugbpuxXc6GZo2XquH
-         57rgq2E+Kdn/uToxSGNGMnb3CSvSYPtylDJhCcxZ7JEfLzUBuzdnAqqClJPlPBZV4I9e
-         9cazbvAzEKbjHM4stM7Qxk3hQ98lDMmEH++4cnsLQuZEli171PaitympLou8JNxhrw2V
-         Z8AXqNh8EwYGW437bv0KntKIbY8YaJFIMUs5EZmaaNJjnUG6068Jv1sLDhxhgsX3RLxt
-         OPRtfFbdOw5M2EpYbLVY8hLVXlWtXcKZBqMEy5oYCyYK0Vv7Vt/9qtskRO/8ygQukuag
-         4s5w==
-X-Gm-Message-State: AJIora8FLoFo24fXp0JBhgZY3vXcpsfUcaDi9cpldrC+DlxhchPUtIwG
-        pH5eahA6PSRe/VDJYpSqho0=
-X-Google-Smtp-Source: AGRyM1tuySMa992JVPAaBz05oHL2gAY/HgT/wzJjOIpgpZ5baQPIPETMaeVDHZGpChmgXF3RgHDfRA==
-X-Received: by 2002:a17:90b:4a90:b0:1f0:4059:b2e5 with SMTP id lp16-20020a17090b4a9000b001f04059b2e5mr1231262pjb.241.1657588069342;
-        Mon, 11 Jul 2022 18:07:49 -0700 (PDT)
-Received: from smtpclient.apple (c-24-6-216-183.hsd1.ca.comcast.net. [24.6.216.183])
-        by smtp.gmail.com with ESMTPSA id q11-20020aa7982b000000b005289fad1bbesm5546838pfl.94.2022.07.11.18.07.48
-        (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
-        Mon, 11 Jul 2022 18:07:48 -0700 (PDT)
-Content-Type: text/plain;
-        charset=utf-8
-Mime-Version: 1.0 (Mac OS X Mail 16.0 \(3696.100.31\))
-Subject: Re: [PATCH 0/3] KVM: x86: Fix fault-related bugs in LTR/LLDT
- emulation
-From:   Nadav Amit <nadav.amit@gmail.com>
-In-Reply-To: <20220711232750.1092012-1-seanjc@google.com>
-Date:   Mon, 11 Jul 2022 18:07:47 -0700
-Cc:     Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org,
-        syzbot+760a73552f47a8cd0fd9@syzkaller.appspotmail.com,
-        Tetsuo Handa <penguin-kernel@i-love.sakura.ne.jp>,
-        Hou Wenlong <houwenlong.hwl@antgroup.com>
+        with ESMTP id S231350AbiGLBNP (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 11 Jul 2022 21:13:15 -0400
+Received: from mga18.intel.com (mga18.intel.com [134.134.136.126])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F07F9509E0;
+        Mon, 11 Jul 2022 18:13:14 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1657588394; x=1689124394;
+  h=message-id:subject:from:to:cc:date:in-reply-to:
+   references:content-transfer-encoding:mime-version;
+  bh=T2p2PDep+Jk58poJbivNq6gYM425mMNK9DXK1/lNMbk=;
+  b=O1klND3sQ5G+JenV/YWfV4N6Zx0By/DRQn4SSIKsqguUwg0WAQhSasN6
+   SaBNilchfloBHcFUdd+Gm81FlzA2CifhTvcmdJ2TVDHSLn/HZdL82x/fI
+   wckOX8y/0M38LTUJ0vQ/h4+rt+WVfU6jnQrr8EpkiJV2p4CT1cN5mbd4S
+   0Vdo9PDFd9KMc2rO6QRzZO3NntN+bfE+XIDnjSJPxluGZUtR6IBkH2OwK
+   gz4VMNdfoMdq8IG4LLrP/XrfniYK50MtdFPsUG8kJg+3N2WBySAFd9zIH
+   CWg4eU91E8u+Ieepa1Njwx+V8kWCYUkSvSxAVGzD58eq0/gaS9hHnKCNs
+   Q==;
+X-IronPort-AV: E=McAfee;i="6400,9594,10405"; a="267848276"
+X-IronPort-AV: E=Sophos;i="5.92,264,1650956400"; 
+   d="scan'208";a="267848276"
+Received: from orsmga002.jf.intel.com ([10.7.209.21])
+  by orsmga106.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 11 Jul 2022 18:13:14 -0700
+X-IronPort-AV: E=Sophos;i="5.92,264,1650956400"; 
+   d="scan'208";a="595103198"
+Received: from snaskant-mobl.amr.corp.intel.com (HELO khuang2-desk.gar.corp.intel.com) ([10.212.60.27])
+  by orsmga002-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 11 Jul 2022 18:13:12 -0700
+Message-ID: <d495a777f31df86271f1c4511b2f521adfa867d1.camel@intel.com>
+Subject: Re: [PATCH v7 011/102] KVM: TDX: Initialize TDX module when loading
+ kvm_intel.ko
+From:   Kai Huang <kai.huang@intel.com>
+To:     Isaku Yamahata <isaku.yamahata@gmail.com>
+Cc:     isaku.yamahata@intel.com, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>,
+        Sean Christopherson <seanjc@google.com>
+Date:   Tue, 12 Jul 2022 13:13:10 +1200
+In-Reply-To: <20220712004640.GD1379820@ls.amr.corp.intel.com>
+References: <cover.1656366337.git.isaku.yamahata@intel.com>
+         <d933e5f16ff8cb58020f1479b7af35196f0ef61e.1656366338.git.isaku.yamahata@intel.com>
+         <81ea5068b890400ca4064781f7d2221826701020.camel@intel.com>
+         <20220712004640.GD1379820@ls.amr.corp.intel.com>
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
-Message-Id: <103BF4B8-2ABE-4CB1-9361-F386D820E554@gmail.com>
-References: <20220711232750.1092012-1-seanjc@google.com>
-To:     Sean Christopherson <seanjc@google.com>
-X-Mailer: Apple Mail (2.3696.100.31)
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
-        RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
-        autolearn=ham autolearn_force=no version=3.4.6
+User-Agent: Evolution 3.44.2 (3.44.2-1.fc36) 
+MIME-Version: 1.0
+X-Spam-Status: No, score=-2.7 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,SPF_HELO_NONE,
+        SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no
+        version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Jul 11, 2022, at 4:27 PM, Sean Christopherson <seanjc@google.com> =
-wrote:
-
-> Patch 1 fixes a bug found by syzkaller where KVM attempts to set the
-> TSS.busy bit during LTR before checking that the new TSS.base is =
-valid.
+On Mon, 2022-07-11 at 17:46 -0700, Isaku Yamahata wrote:
+> On Tue, Jun 28, 2022 at 04:31:35PM +1200,
+> Kai Huang <kai.huang@intel.com> wrote:
 >=20
-> Patch 2 fixes a bug found by inspection (when reading the APM to =
-verify
-> the non-canonical logic is correct) where KVM doesn't provide the =
-correct
-> error code if the new TSS.base is non-canonical.
+> > On Mon, 2022-06-27 at 14:53 -0700, isaku.yamahata@intel.com wrote:
+> > > From: Isaku Yamahata <isaku.yamahata@intel.com>
+> > >=20
+> > > To use TDX functionality, TDX module needs to be loaded and initializ=
+ed.
+> > > A TDX host patch series[1] implements the detection of the TDX module=
+,
+> > > tdx_detect() and its initialization, tdx_init().
+> >=20
+> > "A TDX host patch series[1]" really isn't a commit message material.  Y=
+ou can
+> > put it to the cover letter, but not here.
+> >=20
+> > Also tdx_detect() is removed in latest code.
 >=20
-> Patch 3 makes the "dangling userspace I/O" WARN_ON two separate =
-WARN_ON_ONCE
-> so that a KVM bug doesn't spam the kernel log (keeping the WARN is =
-desirable
-> specifically to detect these types of bugs).
+> How about the followings?
+>=20
+>     KVM: TDX: Initialize TDX module when loading kvm_intel.ko
 
-Hi Sean,
+Personally don't like kvm_intel.ko in title (or changelog), but will leave =
+to
+maintainers.
 
-If/when you find that I screwed up, would you be kind enough to cc me?
+>    =20
+>     To use TDX functionality, TDX module needs to be loaded and initializ=
+ed.
+>     This patch is to call a function, tdx_init(), when loading kvm_intel.=
+ko.
 
-Very likely I won=E2=80=99t be able to assist too much in fixing the =
-bugs under my
-current affiliation, but it is always interesting to see the escapees of
-Intel=E2=80=99s validation tools=E2=80=A6 ;-)
+Could you add explain why we need to init TDX module when loading KVM modul=
+e?
 
-Only if you can.
+You don't have to say "call a function, tdx_init()", which can be easily se=
+en in
+the code. =20
 
-Thanks,
-Nadav
+>    =20
+>     Add a hook, kvm_arch_post_hardware_enable_setup, to module initializa=
+tion
+>     while hardware is enabled, i.e. after hardware_enable_all() and befor=
+e
+>     hardware_disable_all().  Because TDX requires all present CPUs to ena=
+ble
+>     VMX (VMXON).
 
-[ p.s. - please use my gmail account for the matter ]
+Please explicitly say it is a replacement of the default __weak version, so
+people can know there's already a default one.  Otherwise people may wonder=
+ why
+this isn't called in this patch (i.e. I skipped patch 03 as it looks not
+directly related to TDX).
 
+That being said, why cannot you send out that patch separately but have to
+include it into TDX series?
+
+Looking at it, the only thing that is related to TDX is an empty
+kvm_arch_post_hardware_enable_setup() with a comment saying TDX needs to do
+something there.  This logic has nothing to do with the actual job in that
+patch.=20
+
+So why cannot we introduce that __weak version in this patch, so that the r=
+est
+of it can be non-TDX related at all and can be upstreamed separately?
+
+>=20
+> > > diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+> > > index 30af2bd0b4d5..fb7a33fbc136 100644
+> > > --- a/arch/x86/kvm/x86.c
+> > > +++ b/arch/x86/kvm/x86.c
+> > > @@ -11792,6 +11792,14 @@ int kvm_arch_hardware_setup(void *opaque)
+> > >  	return 0;
+> > >  }
+> > > =20
+> > > +int kvm_arch_post_hardware_enable_setup(void *opaque)
+> > > +{
+> > > +	struct kvm_x86_init_ops *ops =3D opaque;
+> > > +	if (ops->post_hardware_enable_setup)
+> > > +		return ops->post_hardware_enable_setup();
+> > > +	return 0;
+> > > +}
+> > > +
+> >=20
+> > Where is this kvm_arch_post_hardware_enable_setup() called?
+> >=20
+> > Shouldn't the code change which calls it be part of this patch?
+>=20
+> The patch of "4/102 KVM: Refactor CPU compatibility check on module
+> initialiization" introduces it.  Because the patch affects multiple archs
+> (mips, x86, poerpc, s390, and arm), I deliberately put it in early.
+
+It's patch 03, but not 04.  And see above.
