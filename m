@@ -2,61 +2,61 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id B15E4571B62
-	for <lists+kvm@lfdr.de>; Tue, 12 Jul 2022 15:34:31 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id C41CE571B66
+	for <lists+kvm@lfdr.de>; Tue, 12 Jul 2022 15:35:22 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233001AbiGLNe2 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 12 Jul 2022 09:34:28 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49438 "EHLO
+        id S233112AbiGLNfS (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 12 Jul 2022 09:35:18 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50370 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233068AbiGLNe0 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 12 Jul 2022 09:34:26 -0400
+        with ESMTP id S229843AbiGLNfQ (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 12 Jul 2022 09:35:16 -0400
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 0CD27B23D4
-        for <kvm@vger.kernel.org>; Tue, 12 Jul 2022 06:34:24 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 5CD6FB4184
+        for <kvm@vger.kernel.org>; Tue, 12 Jul 2022 06:35:15 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1657632864;
+        s=mimecast20190719; t=1657632914;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=JgAcjPtcpgNCqfpVZQXf86mfKwE3gQAGcZaJHiCWMKk=;
-        b=ReWYX6C9ABSaYjNuCCCgEkUnczggQ+afTZuKYeDC6v2wC9rvvCYktEynNFn4cCtxXhM9iW
-        Y+hl5hx8RQgdR+uTSHBn8QVrTkWmUzqn1Yr42OEs26+RiVuS7gZ0/ubCjy/8QZkqvHoXg1
-        QCUBLxHobI0u0rGRjTdmDtHelXM3y9Q=
-Received: from mail-qk1-f197.google.com (mail-qk1-f197.google.com
- [209.85.222.197]) by relay.mimecast.com with ESMTP with STARTTLS
+        bh=AYDTpVfeHq/kcDxEOQn4ahOzHHQ5F5sUW+bY6Ncfdw0=;
+        b=cCl/b4Q/lHd9IMWyq9GbZwgFAAJiqBLryDX1W0kaLowHYHS8PEFBcvJJNEfzdQ1xrlXQ8q
+        U9JROZaLsg9e8tLj8ORA+m1K5GxBD0it3nydMmht5PXj0+OADW91eo1I3/q5J3o94WtHk3
+        33uul3zxlVm/DhYgNg9geRlH/lR9h3I=
+Received: from mail-qk1-f200.google.com (mail-qk1-f200.google.com
+ [209.85.222.200]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-634-wRNbo61CNb2jxhBtNnu2zg-1; Tue, 12 Jul 2022 09:34:23 -0400
-X-MC-Unique: wRNbo61CNb2jxhBtNnu2zg-1
-Received: by mail-qk1-f197.google.com with SMTP id bi1-20020a05620a318100b006b572361789so7846092qkb.10
-        for <kvm@vger.kernel.org>; Tue, 12 Jul 2022 06:34:23 -0700 (PDT)
+ us-mta-204-VKIqxhpaPhqEl2glVsv7Bg-1; Tue, 12 Jul 2022 09:35:13 -0400
+X-MC-Unique: VKIqxhpaPhqEl2glVsv7Bg-1
+Received: by mail-qk1-f200.google.com with SMTP id bq33-20020a05620a46a100b006b579909e2eso6649420qkb.17
+        for <kvm@vger.kernel.org>; Tue, 12 Jul 2022 06:35:13 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:message-id:subject:from:to:cc:date:in-reply-to
          :references:user-agent:mime-version:content-transfer-encoding;
-        bh=JgAcjPtcpgNCqfpVZQXf86mfKwE3gQAGcZaJHiCWMKk=;
-        b=amPkLgQw6pHI2u2wDNbtBHCBVF6s256ewKadDRyisd6QIix9Vd2RQqfetlo3b/f0bi
-         hLEKX8mvVRJGHqFODv2b9rV7YLG+cX12ULbxnCYJ+KLmKQ0LD5vMWa533hTF8o1vyegt
-         UnhWF2EKeUm35qPGhsqmj5bX5i8Vshv9kmpwFyrePrkuaNQ3wpsDXwnHmFUy24Rlr2Xc
-         cU1TDh0Ctp1oM/UmQmxOm7CX5dQR70pUPPaBW1bjwk27hGLPviIyDLvEkuRl0TcbHDoR
-         1XmyGK3aoAmCE2Og35oRNeu33nqEf+aGjfg7I9NZGKxp+wUR99jjs0uHTQulJsOh2kCl
-         aAlw==
-X-Gm-Message-State: AJIora+gUlbaE5hq8sU1ilYKGaTKQF038Zg93eVxw/ZNgrmNjzQIoUs2
-        h09PdNXFSur9oeThZWvMa00DPh4rFRrtGCQWMxjr1HoBz7F26thPjnFLmz+3q/SzwUT8UvrVUDd
-        aBGtdiFjhA7iP
-X-Received: by 2002:a05:620a:4507:b0:6af:348b:85fe with SMTP id t7-20020a05620a450700b006af348b85femr15472596qkp.629.1657632862389;
-        Tue, 12 Jul 2022 06:34:22 -0700 (PDT)
-X-Google-Smtp-Source: AGRyM1tt12hXbsGNmSGrHijJdRfb2UWBkKIk2+Hj7xIUXmNIV/+XqGFV5QYF/4rRDFpC+66nbAiX1Q==
-X-Received: by 2002:a05:620a:4507:b0:6af:348b:85fe with SMTP id t7-20020a05620a450700b006af348b85femr15472560qkp.629.1657632862055;
-        Tue, 12 Jul 2022 06:34:22 -0700 (PDT)
+        bh=AYDTpVfeHq/kcDxEOQn4ahOzHHQ5F5sUW+bY6Ncfdw0=;
+        b=fS1qnqPMwMEj67uSpI8/EDuTjgzXK8Gx1pddEMhWyDYqTkjwYKyyxM0+tDo2tdSzjg
+         0wJVNjzSZBpekpR8Owltp8p06gvmsqk8vXLeFtxqQZANOffzWsbU8g/5URHx5dUtDR6k
+         zT982tAv/yJ3iHaNFGiKMuy2aJ3d3eZhO5HR142ayuRzDF3lEtREEYe0Zq/jAFy9jvSQ
+         0Nj2uUT0cehXHLcR4n+mBvkJO5nrMI8aQZr5WLag8qVz5l8dEa9frvzs36oqk1YL+ADG
+         iNTb2A9X6e/IepW9BcdcogfLQfoaFdI73qkiRQTy3CrJ5QTEAPfBTnycvtz/Iipl3pZT
+         iA+w==
+X-Gm-Message-State: AJIora8ajusl2rICwJH4BhhgwICnDUDOcOkC7b+3E+r9mwSBukVzt96k
+        mSdkXgh+8k6OYlmqb05u8a0BNOCWF/hPSslXlPWtDlE5bh+z9cz0MXLoijH7sASTPLlFBudPgN/
+        SVLPnm374c5wl
+X-Received: by 2002:a05:620a:294d:b0:6b3:bb34:ecf2 with SMTP id n13-20020a05620a294d00b006b3bb34ecf2mr14838036qkp.181.1657632912659;
+        Tue, 12 Jul 2022 06:35:12 -0700 (PDT)
+X-Google-Smtp-Source: AGRyM1vtMFCzLrA3SwwmG1gbgi57BoQRxTT2NzAoIxVA3+ubZEEcf4EGzm6Q/kg/e6cmwGmzZS8wvQ==
+X-Received: by 2002:a05:620a:294d:b0:6b3:bb34:ecf2 with SMTP id n13-20020a05620a294d00b006b3bb34ecf2mr14838011qkp.181.1657632912295;
+        Tue, 12 Jul 2022 06:35:12 -0700 (PDT)
 Received: from [10.35.4.238] (bzq-82-81-161-50.red.bezeqint.net. [82.81.161.50])
-        by smtp.gmail.com with ESMTPSA id a187-20020ae9e8c4000000b006b5517da3casm8706942qkg.22.2022.07.12.06.34.19
+        by smtp.gmail.com with ESMTPSA id x9-20020a05620a448900b006a79479657fsm9407335qkp.108.2022.07.12.06.35.10
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 12 Jul 2022 06:34:21 -0700 (PDT)
-Message-ID: <649b5c71b5ad40e3c74f76c86ad0ca89f9dac3e1.camel@redhat.com>
-Subject: Re: [PATCH 3/3] KVM: x86: WARN only once if KVM leaves a dangling
- userspace I/O request
+        Tue, 12 Jul 2022 06:35:11 -0700 (PDT)
+Message-ID: <8307c007823eac899d3a017d1616e0d08a653185.camel@redhat.com>
+Subject: Re: [PATCH 1/3] KVM: x86: Mark TSS busy during LTR emulation
+ _after_ all fault checks
 From:   Maxim Levitsky <mlevitsk@redhat.com>
 To:     Sean Christopherson <seanjc@google.com>,
         Paolo Bonzini <pbonzini@redhat.com>
@@ -64,10 +64,10 @@ Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
         syzbot+760a73552f47a8cd0fd9@syzkaller.appspotmail.com,
         Tetsuo Handa <penguin-kernel@i-love.sakura.ne.jp>,
         Hou Wenlong <houwenlong.hwl@antgroup.com>
-Date:   Tue, 12 Jul 2022 16:34:18 +0300
-In-Reply-To: <20220711232750.1092012-4-seanjc@google.com>
+Date:   Tue, 12 Jul 2022 16:35:08 +0300
+In-Reply-To: <20220711232750.1092012-2-seanjc@google.com>
 References: <20220711232750.1092012-1-seanjc@google.com>
-         <20220711232750.1092012-4-seanjc@google.com>
+         <20220711232750.1092012-2-seanjc@google.com>
 Content-Type: text/plain; charset="UTF-8"
 User-Agent: Evolution 3.40.4 (3.40.4-5.fc34) 
 MIME-Version: 1.0
@@ -83,51 +83,74 @@ List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
 On Mon, 2022-07-11 at 23:27 +0000, Sean Christopherson wrote:
-> Change a WARN_ON() to separate WARN_ON_ONCE() if KVM has an outstanding
-> PIO or MMIO request without an associated callback, i.e. if KVM queued a
-> userspace I/O exit but didn't actually exit to userspace before moving
-> on to something else.  Warning on every KVM_RUN risks spamming the kernel
-> if KVM gets into a bad state.  Opportunistically split the WARNs so that
-> it's easier to triage failures when a WARN fires.
-> 
-> Deliberately do not use KVM_BUG_ON(), i.e. don't kill the VM.  While the
-> WARN is all but guaranteed to fire if and only if there's a KVM bug, a
-> dangling I/O request does not present a danger to KVM (that flag is truly
-> truly consumed only in a single emulator path), and any such bug is
-> unlikely to be fatal to the VM (KVM essentially failed to do something it
-> shouldn't have tried to do in the first place).  In other words, note the
-> bug, but let the VM keep running.
-> 
-> Signed-off-by: Sean Christopherson <seanjc@google.com>
-> ---
->  arch/x86/kvm/x86.c | 6 ++++--
->  1 file changed, 4 insertions(+), 2 deletions(-)
-> 
-> diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-> index 567d13405445..50dc55996416 100644
-> --- a/arch/x86/kvm/x86.c
-> +++ b/arch/x86/kvm/x86.c
-> @@ -10847,8 +10847,10 @@ int kvm_arch_vcpu_ioctl_run(struct kvm_vcpu *vcpu)
->                 r = cui(vcpu);
->                 if (r <= 0)
->                         goto out;
-> -       } else
-> -               WARN_ON(vcpu->arch.pio.count || vcpu->mmio_needed);
-> +       } else {
-> +               WARN_ON_ONCE(vcpu->arch.pio.count);
-> +               WARN_ON_ONCE(vcpu->mmio_needed);
-> +       }
->  
->         if (kvm_run->immediate_exit) {
->                 r = -EINTR;
+> Wait to mark the TSS as busy during LTR emulation until after all fault
+> checks for the LTR have passed.  Specifically, don't mark the TSS busy if
+> the new TSS base is non-canonical.
 
-At some point in the future, the checkpatch.pl should start to WARN the
-patch submitter if WARN_ON and not WARN_ON_ONCE was used ;-)
 
-It already bugs the user about BUG_ON ;-)
+Took me a while to notice it but I see the canonical check now, so the patch
+makes sense, and so:
 
 Reviewed-by: Maxim Levitsky <mlevitsk@redhat.com>
 
+Unrelated, but I do wonder why we use cmpxchg_emulated for setting the busy bit, while we use
+write_segment_descriptor to set the accessed bit.
+
+
 Best regards,
 	Maxim Levitsky
+
+> 
+> Opportunistically drop the one-off !seg_desc.PRESENT check for TR as the
+> only reason for the early check was to avoid marking a !PRESENT TSS as
+> busy, i.e. the common !PRESENT is now done before setting the busy bit.
+> 
+> Fixes: e37a75a13cda ("KVM: x86: Emulator ignores LDTR/TR extended base on LLDT/LTR")
+> Reported-by: syzbot+760a73552f47a8cd0fd9@syzkaller.appspotmail.com
+> Cc: stable@vger.kernel.org
+> Cc: Tetsuo Handa <penguin-kernel@i-love.sakura.ne.jp>
+> Cc: Hou Wenlong <houwenlong.hwl@antgroup.com>
+> Signed-off-by: Sean Christopherson <seanjc@google.com>
+> ---
+>  arch/x86/kvm/emulate.c | 19 +++++++++----------
+>  1 file changed, 9 insertions(+), 10 deletions(-)
+> 
+> diff --git a/arch/x86/kvm/emulate.c b/arch/x86/kvm/emulate.c
+> index 39ea9138224c..09e4b67b881f 100644
+> --- a/arch/x86/kvm/emulate.c
+> +++ b/arch/x86/kvm/emulate.c
+> @@ -1699,16 +1699,6 @@ static int __load_segment_descriptor(struct x86_emulate_ctxt *ctxt,
+>         case VCPU_SREG_TR:
+>                 if (seg_desc.s || (seg_desc.type != 1 && seg_desc.type != 9))
+>                         goto exception;
+> -               if (!seg_desc.p) {
+> -                       err_vec = NP_VECTOR;
+> -                       goto exception;
+> -               }
+> -               old_desc = seg_desc;
+> -               seg_desc.type |= 2; /* busy */
+> -               ret = ctxt->ops->cmpxchg_emulated(ctxt, desc_addr, &old_desc, &seg_desc,
+> -                                                 sizeof(seg_desc), &ctxt->exception);
+> -               if (ret != X86EMUL_CONTINUE)
+> -                       return ret;
+>                 break;
+>         case VCPU_SREG_LDTR:
+>                 if (seg_desc.s || seg_desc.type != 2)
+> @@ -1749,6 +1739,15 @@ static int __load_segment_descriptor(struct x86_emulate_ctxt *ctxt,
+>                                 ((u64)base3 << 32), ctxt))
+>                         return emulate_gp(ctxt, 0);
+>         }
+> +
+> +       if (seg == VCPU_SREG_TR) {
+> +               old_desc = seg_desc;
+> +               seg_desc.type |= 2; /* busy */
+> +               ret = ctxt->ops->cmpxchg_emulated(ctxt, desc_addr, &old_desc, &seg_desc,
+> +                                                 sizeof(seg_desc), &ctxt->exception);
+> +               if (ret != X86EMUL_CONTINUE)
+> +                       return ret;
+> +       }
+>  load:
+>         ctxt->ops->set_segment(ctxt, selector, &seg_desc, base3, seg);
+>         if (desc)
+
 
