@@ -2,70 +2,80 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 388B8572986
-	for <lists+kvm@lfdr.de>; Wed, 13 Jul 2022 00:53:58 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 3F19857299D
+	for <lists+kvm@lfdr.de>; Wed, 13 Jul 2022 01:03:45 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233797AbiGLWxz (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 12 Jul 2022 18:53:55 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58240 "EHLO
+        id S233668AbiGLXDn (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 12 Jul 2022 19:03:43 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34668 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233269AbiGLWxx (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 12 Jul 2022 18:53:53 -0400
-Received: from mail-pg1-x532.google.com (mail-pg1-x532.google.com [IPv6:2607:f8b0:4864:20::532])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 108F11F2F9
-        for <kvm@vger.kernel.org>; Tue, 12 Jul 2022 15:53:53 -0700 (PDT)
-Received: by mail-pg1-x532.google.com with SMTP id p11so2125579pgr.12
-        for <kvm@vger.kernel.org>; Tue, 12 Jul 2022 15:53:53 -0700 (PDT)
+        with ESMTP id S229750AbiGLXDk (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 12 Jul 2022 19:03:40 -0400
+Received: from mail-oi1-x234.google.com (mail-oi1-x234.google.com [IPv6:2607:f8b0:4864:20::234])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8EB8DBC00
+        for <kvm@vger.kernel.org>; Tue, 12 Jul 2022 16:03:39 -0700 (PDT)
+Received: by mail-oi1-x234.google.com with SMTP id u68so2664740oie.0
+        for <kvm@vger.kernel.org>; Tue, 12 Jul 2022 16:03:39 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=HWyKOm/lcyOl8O084SO+nkGRnokYrR/9NGWVH+hUDX4=;
-        b=h4tI4WQeJW4ZlggcTTxIV2rlia7CgUC+TlJS2Qn7HRmeUb6ioW4RQ+jAnFKRBDw3WD
-         Tny5mKocjRuYN89ZNEv2dLFBqcRyeBVd7dfE2a5a1QSMGSytubKQYebtGc9q5Ph/LOIg
-         bx76WIHxmOHQMtE0Aq0NmlLxSvSfWz2kvi+VTLmoo5CdsczV8sfwxM/EeD2e99t74vRS
-         nEz0MpWixLmPkVsEIDaIceoLD0Xkbot2rf5EHLW/pye25u7lADX2BeiCVUcpkhP3Y2wC
-         nt800T6U6m/S7IMp9MLELHxODFKkBFaeJmekb6Czx+L65wglqHqxneQ2p8FAr9VKEem5
-         k8iA==
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=qHwuHViFSN86tj0ChYoibxcY4E2c7D4JyTppJFZI4so=;
+        b=Lhh55GnSdOjPhbJGduTnxEGnWccw6kHOeEeY08jAZgJe0VqjmPoBdTPnONumi/pAun
+         p+cHg4gHnhGSvibmw9wIMHwGbOMlbmWVVet0lyBNoQFKw49iIOLl44zlrlp+lgOkWr4N
+         nI06n4Ji3hwluei1aEEzHQyZHr8WFbhVYRiJlwQVHmUD64NqpTZjoyhfvNHbS2GCc5aR
+         uNpAcmjt7Eo2ZLV4iQ/jGK1hfJ4aVbxJui0znZqX9547wQXUukqWF8+PFEtZcDsj6osq
+         cNrlBGb2ZoHRdeHJDRKTLI+onjdNABpheW4De5nAankciyk7viUqVbyzzoaaEs5liuGY
+         qvhw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=HWyKOm/lcyOl8O084SO+nkGRnokYrR/9NGWVH+hUDX4=;
-        b=Tfr2E+5QP24F3uDCNMjPjepvvkACvrJmw1mV1NZCGD8+Y6h5zfLuuYb7IsASXhrase
-         Rz4ftF4cOQLgf9MRDb/2Gu4gN/lNS62AtlsHno7AvH80zeeW/2Hu5reF3uoakagnBsmh
-         PicOnMui34wzDlLhwiNf1jZN2yWvrR1kDyVmN6Ogq+NcXKyAyRpLyMtGy7zid/ByV0UN
-         fDgxOEOrlsQYlvqsWV/PPRP0ZU+JoElTKxbUeazSrSWsElG1u8y6FRNgdhmyQCYjRdoP
-         +uxHb6rScG44RsEfHo8sJWrvCEA+TrPlUAbcfUqO0zbEtE+XEjtuxg8BK2YTKMFiz0DR
-         A81Q==
-X-Gm-Message-State: AJIora/8Zs4SSgoCt8FVO6bAA9tkQhqBCnG43c7B5mwxzqxaRPnfAzle
-        B/yLm5q+d1N/WVXlbzd1s5bRrA==
-X-Google-Smtp-Source: AGRyM1tUNzl8R21w5j4v3UwvX46aUMLMnpea0GKpu/4WmjWWElzK+uGAo21woDWYSl9jIPcvxCwQHA==
-X-Received: by 2002:a63:ea45:0:b0:415:fa9a:ae71 with SMTP id l5-20020a63ea45000000b00415fa9aae71mr437116pgk.285.1657666432444;
-        Tue, 12 Jul 2022 15:53:52 -0700 (PDT)
-Received: from google.com (123.65.230.35.bc.googleusercontent.com. [35.230.65.123])
-        by smtp.gmail.com with ESMTPSA id n30-20020aa7985e000000b00528d41a998csm7532065pfq.15.2022.07.12.15.53.52
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 12 Jul 2022 15:53:52 -0700 (PDT)
-Date:   Tue, 12 Jul 2022 22:53:48 +0000
-From:   Sean Christopherson <seanjc@google.com>
-To:     Peter Xu <peterx@redhat.com>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>,
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=qHwuHViFSN86tj0ChYoibxcY4E2c7D4JyTppJFZI4so=;
+        b=fuIV6lbfjxFQA74Ghag9fGHMwH+iwDjOIRjpKwFzHI2RPvtr3NUKh7vDVZzMt3whZY
+         f+wsLMOGfYx6vpOr/OZGW7gcQorHCEyPIR9wU0kAkALlaMM1Rysp4b+0CkrCbjMoxQfs
+         9ipVBmp9dgLBdYpG0r0Nng1GWzO2KjA3eob0l9WD223/urnzGeTvCtuJWwIZgNtoAKz/
+         KGAXGPXQoJ5V0MCibzE5RmCfmWcAuNytN7ENGr7Eiq++FenFu7B+0Ystl1JwTePdtIcK
+         Hq3E4imE2Kvf1fGQhYWPo+LYM7QlgPFMpwPuK4B6cbC6us3f8eBG+M8jpSd9p+E1bMRF
+         x5Vg==
+X-Gm-Message-State: AJIora8FUbnKIm6UwfWA5LwVO0NWsHKTRl5QJq1Rmfjn7GUgYA0lgpzv
+        iFyouPjKZLA2KKvtQvmh0k2o6DF/nDV1fJVBAAHuNQ==
+X-Google-Smtp-Source: AGRyM1sv6/a3j0mcFzaoNZorrDTb4kx9QsLkQ7zFGrGqxGPqVxoEEPKoh5NgLCA2o5UhH33aMTJl+s4tUNJhAnFoewI=
+X-Received: by 2002:aca:e043:0:b0:32e:1ad1:2d4 with SMTP id
+ x64-20020acae043000000b0032e1ad102d4mr3357976oig.235.1657667018762; Tue, 12
+ Jul 2022 16:03:38 -0700 (PDT)
+MIME-Version: 1.0
+References: <20220628220938.3657876-1-yosryahmed@google.com>
+ <20220628220938.3657876-2-yosryahmed@google.com> <YsdJPeVOqlj4cf2a@google.com>
+In-Reply-To: <YsdJPeVOqlj4cf2a@google.com>
+From:   Yosry Ahmed <yosryahmed@google.com>
+Date:   Tue, 12 Jul 2022 16:03:02 -0700
+Message-ID: <CAJD7tkYE+pZdk=-psEP_Rq_1CmDjY7Go+s1LXm-ctryWvUdgLA@mail.gmail.com>
+Subject: Re: [PATCH v6 1/4] mm: add NR_SECONDARY_PAGETABLE to count secondary
+ page table uses.
+To:     Sean Christopherson <seanjc@google.com>
+Cc:     Tejun Heo <tj@kernel.org>, Johannes Weiner <hannes@cmpxchg.org>,
+        Zefan Li <lizefan.x@bytedance.com>,
+        Marc Zyngier <maz@kernel.org>,
+        James Morse <james.morse@arm.com>,
+        Alexandru Elisei <alexandru.elisei@arm.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
         Vitaly Kuznetsov <vkuznets@redhat.com>,
         Wanpeng Li <wanpengli@tencent.com>,
         Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-Subject: Re: [PATCH 3/4] KVM: x86/mmu: Shrink pte_list_desc size when KVM is
- using TDP
-Message-ID: <Ys37fNK6uQ+YTcBh@google.com>
-References: <20220624232735.3090056-1-seanjc@google.com>
- <20220624232735.3090056-4-seanjc@google.com>
- <Ys33RtxeDz0egEM0@xz-m1.local>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <Ys33RtxeDz0egEM0@xz-m1.local>
+        Joerg Roedel <joro@8bytes.org>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        Michal Hocko <mhocko@kernel.org>,
+        Roman Gushchin <roman.gushchin@linux.dev>,
+        Shakeel Butt <shakeelb@google.com>,
+        Oliver Upton <oupton@google.com>, Huang@google.com,
+        Shaoqin <shaoqin.huang@intel.com>,
+        Cgroups <cgroups@vger.kernel.org>,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+        linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
+        kvm@vger.kernel.org, Linux-MM <linux-mm@kvack.org>
+Content-Type: text/plain; charset="UTF-8"
 X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
         ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
@@ -77,58 +87,62 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Jul 12, 2022, Peter Xu wrote:
-> On Fri, Jun 24, 2022 at 11:27:34PM +0000, Sean Christopherson wrote:
-> > Dynamically size struct pte_list_desc's array of sptes based on whether
-> > or not KVM is using TDP.  Commit dc1cff969101 ("KVM: X86: MMU: Tune
-> > PTE_LIST_EXT to be bigger") bumped the number of entries in order to
-> > improve performance when using shadow paging, but its analysis that the
-> > larger size would not affect TDP was wrong.  Consuming pte_list_desc
-> > objects for nested TDP is indeed rare, but _allocating_ objects is not,
-> > as KVM allocates 40 objects for each per-vCPU cache.  Reducing the size
-> > from 128 bytes to 32 bytes reduces that per-vCPU cost from 5120 bytes to
-> > 1280, and also provides similar savings when eager page splitting for
-> > nested MMUs kicks in.
-> > 
-> > The per-vCPU overhead could be further reduced by using a custom, smaller
-> > capacity for the per-vCPU caches, but that's more of an "and" than
-> > an "or" change, e.g. it wouldn't help the eager page split use case.
-> > 
-> > Set the list size to the bare minimum without completely defeating the
-> > purpose of an array (and because pte_list_add() assumes the array is at
-> > least two entries deep).  A larger size, e.g. 4, would reduce the number
-> > of "allocations", but those "allocations" only become allocations in
-> > truth if a single vCPU depletes its cache to where a topup is needed,
-> > i.e. if a single vCPU "allocates" 30+ lists.  Conversely, those 2 extra
-> > entries consume 16 bytes * 40 * nr_vcpus in the caches the instant nested
-> > TDP is used.
-> > 
-> > In the unlikely event that performance of aliased gfns for nested TDP
-> > really is (or becomes) a priority for oddball workloads, KVM could add a
-> > knob to let the admin tune the array size for their environment.
-> > 
-> > Note, KVM also unnecessarily tops up the per-vCPU caches even when not
-> > using rmaps; this can also be addressed separately.
-> 
-> The only possible way of using pte_list_desc when tdp=1 is when the
-> hypervisor tries to map the same host pages with different GPAs?
+Thanks for taking another look at this!
 
-Yes, if by "host pages" you mean L1 GPAs.  It happens if the L1 VMM maps multiple
-L2 GFNs to a single L1 GFN, in which case KVM's nTDP shadow MMU needs to rmap
-that single L1 GFN to multiple L2 GFNs.
+On Thu, Jul 7, 2022 at 1:59 PM Sean Christopherson <seanjc@google.com> wrote:
+>
+> On Tue, Jun 28, 2022, Yosry Ahmed wrote:
+> > We keep track of several kernel memory stats (total kernel memory, page
+> > tables, stack, vmalloc, etc) on multiple levels (global, per-node,
+> > per-memcg, etc). These stats give insights to users to how much memory
+> > is used by the kernel and for what purposes.
+> >
+> > Currently, memory used by kvm mmu is not accounted in any of those
+>
+> Nit, capitalize KVM (mainly to be consistent).
+>
+> > @@ -1085,6 +1086,9 @@ KernelStack
+> >                Memory consumed by the kernel stacks of all tasks
+> >  PageTables
+> >                Memory consumed by userspace page tables
+> > +SecPageTables
+> > +              Memory consumed by secondary page tables, this currently
+> > +           currently includes KVM mmu allocations on x86 and arm64.
+>
+> Nit, this line has a tab instead of eight spaces.  Not sure if it actually matters,
+> there are plenty of tabs elsewhere in the file, but all the entries in this block
+> use only spaces.
+>
 
-> And we don't really have a real use case of that, or.. do we?
+Will fix it.
 
-QEMU does it during boot/pre-boot when BIOS remaps the flash region into the lower
-1mb, i.e. aliases high GPAs to low GPAs.
+> > diff --git a/include/linux/mmzone.h b/include/linux/mmzone.h
+> > index aab70355d64f3..13190d298c986 100644
+> > --- a/include/linux/mmzone.h
+> > +++ b/include/linux/mmzone.h
+> > @@ -216,6 +216,7 @@ enum node_stat_item {
+> >       NR_KERNEL_SCS_KB,       /* measured in KiB */
+> >  #endif
+> >       NR_PAGETABLE,           /* used for pagetables */
+> > +     NR_SECONDARY_PAGETABLE, /* secondary pagetables, e.g. kvm shadow pagetables */
+>
+> Nit, s/kvm/KVM, and drop the "shadow", which might be misinterpreted as saying KVM
+> pagetables are only accounted when KVM is using shadow paging.  KVM's usage of "shadow"
+> is messy, so I totally understand why you included it, but in this case it's unnecessary
+> and potentially confusing.
+>
+> And finally, something that's not a nit.  Should this be wrapped with CONFIG_KVM
+> (using IS_ENABLED() because KVM can be built as a module)?  That could be removed
+> if another non-KVM secondary MMU user comes along, but until then, #ifdeffery for
+> stats the depend on a single feature seems to be the status quo for this code.
+>
 
-> Sorry to start with asking questions, it's just that if we know that
-> pte_list_desc is probably not gonna be used then could we simply skip the
-> cache layer as a whole?  IOW, we don't make the "array size of pte list
-> desc" dynamic, instead we make the whole "pte list desc cache layer"
-> dynamic.  Is it possible?
+I will #ifdef the stat, but I will emphasize in the docs that is
+currently *only* used for KVM so that it makes sense if users without
+KVM don't see the stat at all. I will also remove the stat from
+show_free_areas() in mm/page_alloc.c as it seems like none of the
+#ifdefed stats show up there.
 
-Not really?  It's theoretically possible, but it'd require pre-checking that aren't
-aliases, and to do that race free we'd have to do it under mmu_lock, which means
-having to support bailing from the page fault to topup the cache.  The memory
-overhead for the cache isn't so significant that it's worth that level of complexity.
+> >  #ifdef CONFIG_SWAP
+> >       NR_SWAPCACHE,
+> >  #endif
