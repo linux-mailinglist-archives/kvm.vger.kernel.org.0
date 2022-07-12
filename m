@@ -2,223 +2,133 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id DA10B572148
-	for <lists+kvm@lfdr.de>; Tue, 12 Jul 2022 18:45:04 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 7278A572192
+	for <lists+kvm@lfdr.de>; Tue, 12 Jul 2022 19:09:29 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233369AbiGLQpD (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 12 Jul 2022 12:45:03 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35538 "EHLO
+        id S232999AbiGLRJ2 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 12 Jul 2022 13:09:28 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53614 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231192AbiGLQpB (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 12 Jul 2022 12:45:01 -0400
-Received: from ams.source.kernel.org (ams.source.kernel.org [IPv6:2604:1380:4601:e00::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 418201177;
-        Tue, 12 Jul 2022 09:45:00 -0700 (PDT)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by ams.source.kernel.org (Postfix) with ESMTPS id E461EB81A8F;
-        Tue, 12 Jul 2022 16:44:58 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1BB16C3411C;
-        Tue, 12 Jul 2022 16:44:57 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1657644297;
-        bh=A9wVtPl9xSGq+0nbgHMGXdDdz52JColikvRDP/5TqlE=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=XXX4SivkRl90RB6ZxgtEMS08z8/6YjIM5XA75D7z1E9vNByWl7rCmFp5eVcgVf4Nx
-         UKBnlg6BV1w9O29ltCPFR/NAby6C/mX8oHYedjNesUTLy6VPIHNXon8JXxKtK5f4K6
-         fMF9e6tqTy+L0n8cEbTXok+izu3bdKO1Om51m2mqyyW9SmenkxbH9hAqZlVKUp+apk
-         0WrCii8LqESl3x32sCaiT5f46qfz9/do8S2tCCNH8u8rXj/hsvwZeQXEXkHgoFEFJD
-         oJj3JRasbFoXgwJM+qQwvqtkD9a9AsjwNSdKwLrkjz1eTSBQZ/PqUs3GHDgpGo+j9T
-         rah9KjVLyKZaQ==
-Date:   Tue, 12 Jul 2022 19:44:54 +0300
-From:   Jarkko Sakkinen <jarkko@kernel.org>
-To:     Ashish Kalra <Ashish.Kalra@amd.com>
-Cc:     x86@kernel.org, linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-        linux-coco@lists.linux.dev, linux-mm@kvack.org,
-        linux-crypto@vger.kernel.org, tglx@linutronix.de, mingo@redhat.com,
-        jroedel@suse.de, thomas.lendacky@amd.com, hpa@zytor.com,
-        ardb@kernel.org, pbonzini@redhat.com, seanjc@google.com,
-        vkuznets@redhat.com, jmattson@google.com, luto@kernel.org,
-        dave.hansen@linux.intel.com, slp@redhat.com, pgonda@google.com,
-        peterz@infradead.org, srinivas.pandruvada@linux.intel.com,
-        rientjes@google.com, dovmurik@linux.ibm.com, tobin@ibm.com,
-        bp@alien8.de, michael.roth@amd.com, vbabka@suse.cz,
-        kirill@shutemov.name, ak@linux.intel.com, tony.luck@intel.com,
-        marcorr@google.com, sathyanarayanan.kuppuswamy@linux.intel.com,
-        alpergun@google.com, dgilbert@redhat.com
-Subject: Re: [PATCH Part2 v6 29/49] KVM: X86: Keep the NPT and RMP page level
- in sync
-Message-ID: <Ys2lBp03iuvuvTmG@kernel.org>
-References: <cover.1655761627.git.ashish.kalra@amd.com>
- <ae4475bc740eb0b9d031a76412b0117339794139.1655761627.git.ashish.kalra@amd.com>
+        with ESMTP id S229537AbiGLRJ0 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 12 Jul 2022 13:09:26 -0400
+Received: from mail-pf1-x430.google.com (mail-pf1-x430.google.com [IPv6:2607:f8b0:4864:20::430])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1A8D522509
+        for <kvm@vger.kernel.org>; Tue, 12 Jul 2022 10:09:26 -0700 (PDT)
+Received: by mail-pf1-x430.google.com with SMTP id e16so7992833pfm.11
+        for <kvm@vger.kernel.org>; Tue, 12 Jul 2022 10:09:26 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:content-transfer-encoding:in-reply-to;
+        bh=2A19SFZc712Zr90/HxHXBLZXts62Gst8gLFaGLjAnSo=;
+        b=VYS1kepNgU6dnPULTf1c3ax9LyR/C7eQbkjFEvadxbv9o9m6kfbFvC1BoeZS1b0LAV
+         mbcpKkIgA2JX4BuPkUV/0ROYsqBHa8doX4iC3k2YuHrsA+o/DrJSDdlwBAYhQ8CYbLvf
+         LftumPHX/MpRJsVLKHdPZhJchYT4iAmy3tC6e8vwK1eHycnlA01r2IloCJdoZSz3+taY
+         Ek6jSpMuENPgYFC8OJpUsFH5a2HDPxxtP7qTXIVQEocYAbEPyVEP+TNsiP+lyBUdwWmk
+         U44ZhQCRlc1LP8T6ZY6zPmIfp3BxaGEU6S449HEib+qJwAP57Cq9gtS4GcyWZlQLdjT+
+         ZcCQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:content-transfer-encoding
+         :in-reply-to;
+        bh=2A19SFZc712Zr90/HxHXBLZXts62Gst8gLFaGLjAnSo=;
+        b=mH6D89buWJOefbSFb85ES7YEDUxbPcWF8TjTJ3/GTHNy5juKOsOboZU+fbICx5cVww
+         6dz2VxI5/L7Gr3r+EfyKbjqOCAD1a77kz8K/XJX6tqfPHbyY/5ZmYc0Ue+nB+T/McYOx
+         6rp5+3L+oKhGYkwwAQ/MTmWYJtkRuCqOEMnVcCMHD96xmNG24XSz7NW4ADP3JgVas1iC
+         nhABi3b80Rf09nVvV9KQvOB8IE/aDnYyi8XYpzigxXbkP5vvNiq2da5RGohRb8OGvVeJ
+         ttahWXqbmLcPYQkX6C0VU+D4mz7c8nDspyBYKFqf1+uykZlKEM+bIxWxJVhLKy0YSksE
+         eNTg==
+X-Gm-Message-State: AJIora+E6ehJhpq012i+uWFNuhnwIXOlC3DyNLSXGRkYsuj/Q9qlm6OJ
+        9wxNXuf+Qtyf5md0/XjwtueCzw==
+X-Google-Smtp-Source: AGRyM1uDTwQhRA0wYlzqevNp90NEff4OOswH9hUdtXRdhhORyeGNTBKDWZ2uoQOrknjumvz4R5sSXA==
+X-Received: by 2002:a05:6a00:f85:b0:52a:c718:ff9 with SMTP id ct5-20020a056a000f8500b0052ac7180ff9mr14298591pfb.85.1657645765469;
+        Tue, 12 Jul 2022 10:09:25 -0700 (PDT)
+Received: from google.com (123.65.230.35.bc.googleusercontent.com. [35.230.65.123])
+        by smtp.gmail.com with ESMTPSA id b13-20020a170903228d00b0016c35b21901sm6745429plh.195.2022.07.12.10.09.24
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 12 Jul 2022 10:09:24 -0700 (PDT)
+Date:   Tue, 12 Jul 2022 17:09:21 +0000
+From:   Sean Christopherson <seanjc@google.com>
+To:     Maxim Levitsky <mlevitsk@redhat.com>
+Cc:     Paolo Bonzini <pbonzini@redhat.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v2] KVM: x86: Add dedicated helper to get CPUID entry
+ with significant index
+Message-ID: <Ys2qwUmEJaJnsj6r@google.com>
+References: <20220712000645.1144186-1-seanjc@google.com>
+ <8a1ff7338f1252d75ff96c3518f16742919f92d7.camel@redhat.com>
+ <Ys2i2B/jt5yDsAKj@google.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=iso-8859-1
 Content-Disposition: inline
-In-Reply-To: <ae4475bc740eb0b9d031a76412b0117339794139.1655761627.git.ashish.kalra@amd.com>
-X-Spam-Status: No, score=-7.7 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_HI,
-        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
-        autolearn_force=no version=3.4.6
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <Ys2i2B/jt5yDsAKj@google.com>
+X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
+        T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-s/X86/x86/
-
-On Mon, Jun 20, 2022 at 11:08:57PM +0000, Ashish Kalra wrote:
-> From: Brijesh Singh <brijesh.singh@amd.com>
+On Tue, Jul 12, 2022, Sean Christopherson wrote:
+> On Tue, Jul 12, 2022, Maxim Levitsky wrote:
+> > On Tue, 2022-07-12 at 00:06 +0000, Sean Christopherson wrote:
+> > > +               /*
+> > > +                * Function matches and index is significant; not specifying an
+> > > +                * exact index in this case is a KVM bug.
+> > > +                */
+> > Nitpick: Why KVM bug? Bad userspace can also provide a index-significant entry for cpuid
+> > leaf for which index is not significant in the x86 spec.
 > 
-> When running an SEV-SNP VM, the sPA used to index the RMP entry is
-> obtained through the NPT translation (gva->gpa->spa). The NPT page
-> level is checked against the page level programmed in the RMP entry.
-> If the page level does not match, then it will cause a nested page
-> fault with the RMP bit set to indicate the RMP violation.
+> Ugh, you're right.
 > 
-> Signed-off-by: Brijesh Singh <brijesh.singh@amd.com>
-> ---
->  arch/x86/include/asm/kvm-x86-ops.h |  1 +
->  arch/x86/include/asm/kvm_host.h    |  1 +
->  arch/x86/kvm/mmu/mmu.c             |  5 ++++
->  arch/x86/kvm/svm/sev.c             | 46 ++++++++++++++++++++++++++++++
->  arch/x86/kvm/svm/svm.c             |  1 +
->  arch/x86/kvm/svm/svm.h             |  1 +
->  6 files changed, 55 insertions(+)
+> > We could arrange a table of all known leaves and for each leaf if it has an index
+> > in the x86 spec, and warn/reject the userspace CPUID info if it doesn't match.
 > 
-> diff --git a/arch/x86/include/asm/kvm-x86-ops.h b/arch/x86/include/asm/kvm-x86-ops.h
-> index a66292dae698..e0068e702692 100644
-> --- a/arch/x86/include/asm/kvm-x86-ops.h
-> +++ b/arch/x86/include/asm/kvm-x86-ops.h
-> @@ -129,6 +129,7 @@ KVM_X86_OP(complete_emulated_msr)
->  KVM_X86_OP(vcpu_deliver_sipi_vector)
->  KVM_X86_OP_OPTIONAL_RET0(vcpu_get_apicv_inhibit_reasons);
->  KVM_X86_OP(alloc_apic_backing_page)
-> +KVM_X86_OP_OPTIONAL(rmp_page_level_adjust)
->  
->  #undef KVM_X86_OP
->  #undef KVM_X86_OP_OPTIONAL
-> diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
-> index 0205e2944067..2748c69609e3 100644
-> --- a/arch/x86/include/asm/kvm_host.h
-> +++ b/arch/x86/include/asm/kvm_host.h
-> @@ -1514,6 +1514,7 @@ struct kvm_x86_ops {
->  	unsigned long (*vcpu_get_apicv_inhibit_reasons)(struct kvm_vcpu *vcpu);
->  
->  	void *(*alloc_apic_backing_page)(struct kvm_vcpu *vcpu);
-> +	void (*rmp_page_level_adjust)(struct kvm *kvm, kvm_pfn_t pfn, int *level);
->  };
->  
->  struct kvm_x86_nested_ops {
-> diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
-> index c623019929a7..997318ecebd1 100644
-> --- a/arch/x86/kvm/mmu/mmu.c
-> +++ b/arch/x86/kvm/mmu/mmu.c
-> @@ -43,6 +43,7 @@
->  #include <linux/hash.h>
->  #include <linux/kern_levels.h>
->  #include <linux/kthread.h>
-> +#include <linux/sev.h>
->  
->  #include <asm/page.h>
->  #include <asm/memtype.h>
-> @@ -2824,6 +2825,10 @@ static int host_pfn_mapping_level(struct kvm *kvm, gfn_t gfn, kvm_pfn_t pfn,
->  	if (unlikely(!pte))
->  		return PG_LEVEL_4K;
->  
-> +	/* Adjust the page level based on the SEV-SNP RMP page level. */
-> +	if (kvm_x86_ops.rmp_page_level_adjust)
-> +		static_call(kvm_x86_rmp_page_level_adjust)(kvm, pfn, &level);
-> +
->  	return level;
->  }
->  
-> diff --git a/arch/x86/kvm/svm/sev.c b/arch/x86/kvm/svm/sev.c
-> index a5b90469683f..91d3d24e60d2 100644
-> --- a/arch/x86/kvm/svm/sev.c
-> +++ b/arch/x86/kvm/svm/sev.c
-> @@ -3597,3 +3597,49 @@ struct page *snp_safe_alloc_page(struct kvm_vcpu *vcpu)
->  
->  	return pfn_to_page(pfn);
->  }
-> +
-> +static bool is_pfn_range_shared(kvm_pfn_t start, kvm_pfn_t end)
-> +{
-> +	int level;
-> +
-> +	while (end > start) {
-> +		if (snp_lookup_rmpentry(start, &level) != 0)
-> +			return false;
-> +		start++;
-> +	}
-> +
-> +	return true;
-> +}
-> +
-> +void sev_rmp_page_level_adjust(struct kvm *kvm, kvm_pfn_t pfn, int *level)
-
-Would not do harm to document this, given that it is not a static
-fuction.
-
-> +{
-> +	int rmp_level, assigned;
-> +
-> +	if (!cpu_feature_enabled(X86_FEATURE_SEV_SNP))
-> +		return;
-> +
-> +	assigned = snp_lookup_rmpentry(pfn, &rmp_level);
-> +	if (unlikely(assigned < 0))
-> +		return;
-> +
-> +	if (!assigned) {
-> +		/*
-> +		 * If all the pages are shared then no need to keep the RMP
-> +		 * and NPT in sync.
-> +		 */
-> +		pfn = pfn & ~(PTRS_PER_PMD - 1);
-> +		if (is_pfn_range_shared(pfn, pfn + PTRS_PER_PMD))
-> +			return;
-> +	}
-> +
-> +	/*
-> +	 * The hardware installs 2MB TLB entries to access to 1GB pages,
-> +	 * therefore allow NPT to use 1GB pages when pfn was added as 2MB
-> +	 * in the RMP table.
-> +	 */
-> +	if (rmp_level == PG_LEVEL_2M && (*level == PG_LEVEL_1G))
-> +		return;
-> +
-> +	/* Adjust the level to keep the NPT and RMP in sync */
-> +	*level = min_t(size_t, *level, rmp_level);
-> +}
-> diff --git a/arch/x86/kvm/svm/svm.c b/arch/x86/kvm/svm/svm.c
-> index b4bd64f94d3a..18e2cd4d9559 100644
-> --- a/arch/x86/kvm/svm/svm.c
-> +++ b/arch/x86/kvm/svm/svm.c
-> @@ -4734,6 +4734,7 @@ static struct kvm_x86_ops svm_x86_ops __initdata = {
->  	.vcpu_get_apicv_inhibit_reasons = avic_vcpu_get_apicv_inhibit_reasons,
->  
->  	.alloc_apic_backing_page = svm_alloc_apic_backing_page,
-> +	.rmp_page_level_adjust = sev_rmp_page_level_adjust,
->  };
->  
->  /*
-> diff --git a/arch/x86/kvm/svm/svm.h b/arch/x86/kvm/svm/svm.h
-> index 71c011af098e..7782312a1cda 100644
-> --- a/arch/x86/kvm/svm/svm.h
-> +++ b/arch/x86/kvm/svm/svm.h
-> @@ -673,6 +673,7 @@ void sev_vcpu_deliver_sipi_vector(struct kvm_vcpu *vcpu, u8 vector);
->  void sev_es_prepare_switch_to_guest(struct sev_es_save_area *hostsa);
->  void sev_es_unmap_ghcb(struct vcpu_svm *svm);
->  struct page *snp_safe_alloc_page(struct kvm_vcpu *vcpu);
-> +void sev_rmp_page_level_adjust(struct kvm *kvm, kvm_pfn_t pfn, int *level);
->  
->  /* vmenter.S */
->  
-> -- 
-> 2.25.1
+> We have such a table, cpuid_function_is_indexed().  The alternative would be to
+> do:
 > 
+> 		WARN_ON_ONCE(index == KVM_CPUID_INDEX_NOT_SIGNIFICANT &&
+> 			     cpuid_function_is_indexed(function));
+> 
+> The problem with rejecting userspace CPUID on mismatch is that it could break
+> userspace :-/  Of course, this entire patch would also break userspace to some
+> extent, e.g. if userspace is relying on an exact match on index==0.  The only
+> difference being the guest lookups with an exact index would still work.
+> 
+> I think the restriction we could put in place would be that userspace can make
+> a leaf more relaxed, e.g. to play nice if userspace forgets to set the SIGNFICANT
+> flag, but rejects attempts to make guest CPUID more restrictive, i.e. disallow
+> setting the SIGNFICANT flag on leafs that KVM doesn't enumerate as significant.
+> 
+> > > +               WARN_ON_ONCE(index == KVM_CPUID_INDEX_NOT_SIGNIFICANT);
 
+Actually, better idea.  Let userspace do whatever, and have direct KVM lookups
+for functions that architecturally don't have a significant index use the first
+entry even if userspace set the SIGNIFICANT flag.  That will mostly maintain
+backwards compatibility, the only thing that would break is if userspace set the
+SIGNIFICANT flag _and_ provided a non-zero index _and_ relied on KVM to not match
+the entry.
 
-BR, Jarkko
+We could still enforce matching in the future, but it wouldn't be a prerequisite
+for this cleanup.
+
+		/*
+		 * Similarly, use the first matching entry if KVM is doing a
+		 * lookup (as opposed to emulating CPUID) for a function that's
+		 * architecturally defined as not having a significant index.
+		 */
+		if (index == KVM_CPUID_INDEX_NOT_SIGNIFICANT) {
+			/*
+			 * Direct lookups from KVM should not diverge from what
+			 * KVM defines internally (the architectural behavior).
+			 */
+			WARN_ON_ONCE(cpuid_function_is_indexed(function));
+			return e;
+		}
