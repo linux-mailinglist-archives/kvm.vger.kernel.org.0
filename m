@@ -2,53 +2,57 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 7AB87570EA0
-	for <lists+kvm@lfdr.de>; Tue, 12 Jul 2022 02:10:54 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 5AEED570EA1
+	for <lists+kvm@lfdr.de>; Tue, 12 Jul 2022 02:10:56 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231260AbiGLAKw (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 11 Jul 2022 20:10:52 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46040 "EHLO
+        id S231182AbiGLAKy (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 11 Jul 2022 20:10:54 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46078 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229716AbiGLAKv (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 11 Jul 2022 20:10:51 -0400
-Received: from mail-yw1-x114a.google.com (mail-yw1-x114a.google.com [IPv6:2607:f8b0:4864:20::114a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5E190422C9
-        for <kvm@vger.kernel.org>; Mon, 11 Jul 2022 17:10:50 -0700 (PDT)
-Received: by mail-yw1-x114a.google.com with SMTP id 00721157ae682-31c9d560435so56820757b3.21
-        for <kvm@vger.kernel.org>; Mon, 11 Jul 2022 17:10:50 -0700 (PDT)
+        with ESMTP id S229716AbiGLAKx (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 11 Jul 2022 20:10:53 -0400
+Received: from mail-pl1-x649.google.com (mail-pl1-x649.google.com [IPv6:2607:f8b0:4864:20::649])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AF7ED41D2C
+        for <kvm@vger.kernel.org>; Mon, 11 Jul 2022 17:10:52 -0700 (PDT)
+Received: by mail-pl1-x649.google.com with SMTP id m5-20020a170902768500b0016a1c410f6cso4651358pll.13
+        for <kvm@vger.kernel.org>; Mon, 11 Jul 2022 17:10:52 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
-        h=date:message-id:mime-version:subject:from:to:cc;
-        bh=c6tE9FSTjLeW1DF9aaU2MnGuUgTm/OgjsymJvQgYO64=;
-        b=q7yEuu3wxjd1FpnVuoPWrLmkJ1//9pwSP872/0TyEiqITyWDdBVx//pOYGzc6P3j7A
-         gAfi66HDkWAe9kLirQ7OrPRyknf83wOzfIPK+5Nufku4tFqdSY63/oGb37a/meIoj6/Y
-         wNN+8BMJySIhcWUvF78q6VKWRnizh1f8T4lHzxijPbQJ2vuMRH3fVUcJloxopNcUQwjO
-         z3fca+Ja78cAt1UEogZ22OrdL1gtDtDfWEXnEEuQ57rRqi4eXneAolpziaKaXcytmXEp
-         Cx4fBDiyi2XdFXbTRKo/4LDB4LZZCp3Zb9ufWxwFiDjPLg7bmY4mu7Feo2rVqq14W5sp
-         Pm0w==
+        h=date:in-reply-to:message-id:mime-version:references:subject:from:to
+         :cc;
+        bh=rkL0rI7YYkksMhFhqsYdPkoMpCHhDlCfTv9yglLwc+k=;
+        b=rNQWOy/f/nHCM16uCxYeWL6CR3adPm28PwG7nOyHJHo9V+KiSte5mfrKg3x4RhVweK
+         s71CNmaLzSdcWDw6w1gdZRNuRyx05CfRo17Py0ONfbBmfBghpQDh65qlKB2ca3WDWDKs
+         zW/h8vdTNxJSC1cBaZ/W+/5Ybu+5Q5E4Fd22pV1K+8fh7wPdaXqF5XnTAjw9np//p93+
+         LypjNN1M2CViUpSMC0kNxOfzZ6sulQ3XQ2JQASB7DXNH3Fw5aja7LrBmobBpJzTi+uJm
+         OJ6+jf8m1JzVtT2z1XBVhZ2wOVhoDvmYNNVQBoton/xSbwMX+RZljEuXvHKZewirMyaI
+         l0Zg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:message-id:mime-version:subject:from:to:cc;
-        bh=c6tE9FSTjLeW1DF9aaU2MnGuUgTm/OgjsymJvQgYO64=;
-        b=PC71yf0aReAqsix1DA5v1YqtcdBht8Oed4Pb6JVoVBkqi3nKOwcmVXCiqxiAEDQLyo
-         ldtsrsnkHCAYZ2QjSAyearccwnm8Ls54js4bOeSNsrrKso3UzXuMMbORAnmMyACYvnc/
-         40Wey4QUAzSd1Gy9+Ju9wJS+4GHh5BUu73vUSinSsUCNyjREKMFpLlYEHYz/y7eQZj6f
-         sHxgGsDcAUSJAx4ZIgtz89+MH33FDzateD7GFblrwykrMrc4WyYyao+alMnyh1kCvN0L
-         wd8d9EmWeH0yAv/SO91IVDG1YWCBvHg4y8bwrNowluiCv27ZNQ1ilBDV3zLaZtvQ0xsl
-         aTUQ==
-X-Gm-Message-State: AJIora9eQOKjvk+cr09kjLI+i1MbYBi/XjQyGxYycTn3iK7s4cC6dc5c
-        j9LT2vWaCjJWgJecl4s/sHWsdjQyPf1/UbKpSdp47D1EnSg3/AgE+z0GeGT4qbfgTJXsPFdYMY+
-        aGxqita4dwQxOhvnzdwuVL6vD4v99k0As9XXQLQjUQkq9vVGpJMflZRPdc0Xxl9si3ucf
-X-Google-Smtp-Source: AGRyM1t9eTTvQdL29qAptuHIH5uH6YBIgF4C0dz2m9PxfAccNstsDuk7sLmc5pbKCHMp14eVsPB0aS3y3GTprKKI
+        h=x-gm-message-state:date:in-reply-to:message-id:mime-version
+         :references:subject:from:to:cc;
+        bh=rkL0rI7YYkksMhFhqsYdPkoMpCHhDlCfTv9yglLwc+k=;
+        b=HP0cVyRmkwzGuKeE+fB5yQ47R0aZwCyEo+5PPTihuL1AvBFfL4CUiywJCHiZuX7Hzm
+         9QToMgJN3e4W2d8r/a6TzIT2A+bX1yOfbVXUhYmb54hoBSw/2gHv60MXMxpMNiBW6pgJ
+         MJnWIr7zbHJvZDVcch3jVHfJCq6zYHLb9QNi/Z1mWMDMH1sNoEq1Gw9WmWNIqtDvlWXI
+         CXBfpVEBHf9rxMNm31rDlt2Bz5pgE7r/zcWjdUDGBl4syRirz+6P+JRQtC1FKgOI6AsR
+         Sy2OteaaNJ7APEgCkMpcouB+SPluEO86OnwcKaO5k/maJ35N9Naei1OBUd1xqhXviKZu
+         Il+g==
+X-Gm-Message-State: AJIora930pcgOzyPcua5GsOZu/gRuSXYyK6U6Gd43kvINNDNZtNS0Sk3
+        NI0vYOyNEEyRvpzHDPIaAyGbky3lS/TyReLbyOGctJOIWDpdldNjS3v8CF6djh4c6d874iegCA7
+        BSxJiKfk4LvTZDdYEn0pj4FEDivv50fqHZpMxUeWK23uEqCz1R/W4JyPU3jxwacdS0oLD
+X-Google-Smtp-Source: AGRyM1teM9wvEko26Po9aADbWJbDearNWus55TOLyjPzTpxWLXxny9Jgmsmesj68Ke2NiTBDGcPnRSkMIK159soD
 X-Received: from aaronlewis.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:2675])
- (user=aaronlewis job=sendgmr) by 2002:a0d:f602:0:b0:31d:a033:3438 with SMTP
- id g2-20020a0df602000000b0031da0333438mr15161ywf.39.1657584649678; Mon, 11
- Jul 2022 17:10:49 -0700 (PDT)
-Date:   Tue, 12 Jul 2022 00:10:43 +0000
-Message-Id: <20220712001045.2364298-1-aaronlewis@google.com>
+ (user=aaronlewis job=sendgmr) by 2002:a05:6a00:170a:b0:52a:d3d4:3852 with
+ SMTP id h10-20020a056a00170a00b0052ad3d43852mr6794332pfc.19.1657584652097;
+ Mon, 11 Jul 2022 17:10:52 -0700 (PDT)
+Date:   Tue, 12 Jul 2022 00:10:44 +0000
+In-Reply-To: <20220712001045.2364298-1-aaronlewis@google.com>
+Message-Id: <20220712001045.2364298-2-aaronlewis@google.com>
 Mime-Version: 1.0
+References: <20220712001045.2364298-1-aaronlewis@google.com>
 X-Mailer: git-send-email 2.37.0.144.g8ac04bfd2-goog
-Subject: [PATCH v2 0/2] MSR Filtering documentation updates
+Subject: [PATCH v2 1/2] KVM: x86: fix documentation for KVM_X86_SET_MSR_FILTER
 From:   Aaron Lewis <aaronlewis@google.com>
 To:     kvm@vger.kernel.org
 Cc:     pbonzini@redhat.com, jmattson@google.com, seanjc@google.com,
@@ -64,21 +68,156 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Fix and update documentation for MSR Filtering.  Then, add a commit to
-prevent MSRs that are not allow to be filtered from being sent to
-userspace.
+Two copies of KVM_X86_SET_MSR_FILTER somehow managed to make it's way
+into the documentation.  Remove one copy and merge the difference from
+the removed copy into the copy that's being kept.
 
-v1 -> v2
- - Removed patch 3 "KVM: x86: Don't deflect MSRs to userspace that
-   can't be filtered";
+Fixes: fd49e8ee70b3 ("Merge branch 'kvm-sev-cgroup' into HEAD")
+Signed-off-by: Aaron Lewis <aaronlewis@google.com>
+---
+ Documentation/virt/kvm/api.rst | 115 +++------------------------------
+ 1 file changed, 8 insertions(+), 107 deletions(-)
 
-Aaron Lewis (2):
-  KVM: x86: fix documentation for KVM_X86_SET_MSR_FILTER
-  KVM: x86: update documentation for MSR filtering
-
- Documentation/virt/kvm/api.rst | 132 +++++++--------------------------
- 1 file changed, 25 insertions(+), 107 deletions(-)
-
+diff --git a/Documentation/virt/kvm/api.rst b/Documentation/virt/kvm/api.rst
+index bafaeedd455c..5c651a4e4e2c 100644
+--- a/Documentation/virt/kvm/api.rst
++++ b/Documentation/virt/kvm/api.rst
+@@ -4074,7 +4074,7 @@ Queues an SMI on the thread's vcpu.
+ 4.97 KVM_X86_SET_MSR_FILTER
+ ----------------------------
+ 
+-:Capability: KVM_X86_SET_MSR_FILTER
++:Capability: KVM_CAP_X86_MSR_FILTER
+ :Architectures: x86
+ :Type: vm ioctl
+ :Parameters: struct kvm_msr_filter
+@@ -4173,8 +4173,12 @@ If an MSR access is not permitted through the filtering, it generates a
+ allows user space to deflect and potentially handle various MSR accesses
+ into user space.
+ 
+-If a vCPU is in running state while this ioctl is invoked, the vCPU may
+-experience inconsistent filtering behavior on MSR accesses.
++Note, invoking this ioctl while a vCPU is running is inherently racy.  However,
++KVM does guarantee that vCPUs will see either the previous filter or the new
++filter, e.g. MSRs with identical settings in both the old and new filter will
++have deterministic behavior.
++
++
+ 
+ 4.98 KVM_CREATE_SPAPR_TCE_64
+ ----------------------------
+@@ -5287,110 +5291,7 @@ KVM_PV_DUMP
+     authentication tag all of which are needed to decrypt the dump at a
+     later time.
+ 
+-
+-4.126 KVM_X86_SET_MSR_FILTER
+-----------------------------
+-
+-:Capability: KVM_CAP_X86_MSR_FILTER
+-:Architectures: x86
+-:Type: vm ioctl
+-:Parameters: struct kvm_msr_filter
+-:Returns: 0 on success, < 0 on error
+-
+-::
+-
+-  struct kvm_msr_filter_range {
+-  #define KVM_MSR_FILTER_READ  (1 << 0)
+-  #define KVM_MSR_FILTER_WRITE (1 << 1)
+-	__u32 flags;
+-	__u32 nmsrs; /* number of msrs in bitmap */
+-	__u32 base;  /* MSR index the bitmap starts at */
+-	__u8 *bitmap; /* a 1 bit allows the operations in flags, 0 denies */
+-  };
+-
+-  #define KVM_MSR_FILTER_MAX_RANGES 16
+-  struct kvm_msr_filter {
+-  #define KVM_MSR_FILTER_DEFAULT_ALLOW (0 << 0)
+-  #define KVM_MSR_FILTER_DEFAULT_DENY  (1 << 0)
+-	__u32 flags;
+-	struct kvm_msr_filter_range ranges[KVM_MSR_FILTER_MAX_RANGES];
+-  };
+-
+-flags values for ``struct kvm_msr_filter_range``:
+-
+-``KVM_MSR_FILTER_READ``
+-
+-  Filter read accesses to MSRs using the given bitmap. A 0 in the bitmap
+-  indicates that a read should immediately fail, while a 1 indicates that
+-  a read for a particular MSR should be handled regardless of the default
+-  filter action.
+-
+-``KVM_MSR_FILTER_WRITE``
+-
+-  Filter write accesses to MSRs using the given bitmap. A 0 in the bitmap
+-  indicates that a write should immediately fail, while a 1 indicates that
+-  a write for a particular MSR should be handled regardless of the default
+-  filter action.
+-
+-``KVM_MSR_FILTER_READ | KVM_MSR_FILTER_WRITE``
+-
+-  Filter both read and write accesses to MSRs using the given bitmap. A 0
+-  in the bitmap indicates that both reads and writes should immediately fail,
+-  while a 1 indicates that reads and writes for a particular MSR are not
+-  filtered by this range.
+-
+-flags values for ``struct kvm_msr_filter``:
+-
+-``KVM_MSR_FILTER_DEFAULT_ALLOW``
+-
+-  If no filter range matches an MSR index that is getting accessed, KVM will
+-  fall back to allowing access to the MSR.
+-
+-``KVM_MSR_FILTER_DEFAULT_DENY``
+-
+-  If no filter range matches an MSR index that is getting accessed, KVM will
+-  fall back to rejecting access to the MSR. In this mode, all MSRs that should
+-  be processed by KVM need to explicitly be marked as allowed in the bitmaps.
+-
+-This ioctl allows user space to define up to 16 bitmaps of MSR ranges to
+-specify whether a certain MSR access should be explicitly filtered for or not.
+-
+-If this ioctl has never been invoked, MSR accesses are not guarded and the
+-default KVM in-kernel emulation behavior is fully preserved.
+-
+-Calling this ioctl with an empty set of ranges (all nmsrs == 0) disables MSR
+-filtering. In that mode, ``KVM_MSR_FILTER_DEFAULT_DENY`` is invalid and causes
+-an error.
+-
+-As soon as the filtering is in place, every MSR access is processed through
+-the filtering except for accesses to the x2APIC MSRs (from 0x800 to 0x8ff);
+-x2APIC MSRs are always allowed, independent of the ``default_allow`` setting,
+-and their behavior depends on the ``X2APIC_ENABLE`` bit of the APIC base
+-register.
+-
+-If a bit is within one of the defined ranges, read and write accesses are
+-guarded by the bitmap's value for the MSR index if the kind of access
+-is included in the ``struct kvm_msr_filter_range`` flags.  If no range
+-cover this particular access, the behavior is determined by the flags
+-field in the kvm_msr_filter struct: ``KVM_MSR_FILTER_DEFAULT_ALLOW``
+-and ``KVM_MSR_FILTER_DEFAULT_DENY``.
+-
+-Each bitmap range specifies a range of MSRs to potentially allow access on.
+-The range goes from MSR index [base .. base+nmsrs]. The flags field
+-indicates whether reads, writes or both reads and writes are filtered
+-by setting a 1 bit in the bitmap for the corresponding MSR index.
+-
+-If an MSR access is not permitted through the filtering, it generates a
+-#GP inside the guest. When combined with KVM_CAP_X86_USER_SPACE_MSR, that
+-allows user space to deflect and potentially handle various MSR accesses
+-into user space.
+-
+-Note, invoking this ioctl with a vCPU is running is inherently racy.  However,
+-KVM does guarantee that vCPUs will see either the previous filter or the new
+-filter, e.g. MSRs with identical settings in both the old and new filter will
+-have deterministic behavior.
+-
+-4.127 KVM_XEN_HVM_SET_ATTR
++4.126 KVM_XEN_HVM_SET_ATTR
+ --------------------------
+ 
+ :Capability: KVM_CAP_XEN_HVM / KVM_XEN_HVM_CONFIG_SHARED_INFO
 -- 
 2.37.0.144.g8ac04bfd2-goog
 
