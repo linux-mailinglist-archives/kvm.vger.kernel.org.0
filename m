@@ -2,57 +2,78 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 290FB572949
-	for <lists+kvm@lfdr.de>; Wed, 13 Jul 2022 00:27:24 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 10D03572962
+	for <lists+kvm@lfdr.de>; Wed, 13 Jul 2022 00:36:00 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233445AbiGLW1W (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 12 Jul 2022 18:27:22 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42338 "EHLO
+        id S233559AbiGLWf5 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 12 Jul 2022 18:35:57 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47904 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231600AbiGLW1V (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 12 Jul 2022 18:27:21 -0400
-Received: from mga03.intel.com (mga03.intel.com [134.134.136.65])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B93AEB23EC
-        for <kvm@vger.kernel.org>; Tue, 12 Jul 2022 15:27:20 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1657664840; x=1689200840;
-  h=message-id:subject:from:to:cc:date:in-reply-to:
-   references:content-transfer-encoding:mime-version;
-  bh=yh2cM9e0V8TmchkEozlXwftQLG030kPsULbAQou6uK4=;
-  b=Yb3sJ6rS7iBprp81Z9yqL5J8/SsdzLTVpzQT48lxivZf9fP3cq6SHAxu
-   N+fLtgIGYbE3sca0ht+PO143bpSHh5bONR0/LszA8FagHo0rjl5Vl/MY1
-   U+7mQMx0LWVBLzoQ+kFgf78yV2pmoZ+IJx9sJgGixXF40HSo0544FNcTW
-   XFDZMUePdUuwpROb2KY9CK6CX+kmOdXzwc4OorJ4KcyO/58I+VJHeXEKQ
-   Jp1dYACcYNdnvPUxfy7Ty7U0iWMIOQIz92zgRicfzrnSxNYYLAoLkHC8O
-   rv8haQmh9k2AGvxU2trttDVGZbJAXwc2Q7n3ITCoe4PqQRqHR4Jj30ws3
-   Q==;
-X-IronPort-AV: E=McAfee;i="6400,9594,10406"; a="286187187"
-X-IronPort-AV: E=Sophos;i="5.92,266,1650956400"; 
-   d="scan'208";a="286187187"
-Received: from orsmga003.jf.intel.com ([10.7.209.27])
-  by orsmga103.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 12 Jul 2022 15:27:20 -0700
-X-IronPort-AV: E=Sophos;i="5.92,266,1650956400"; 
-   d="scan'208";a="545599593"
-Received: from ssamal-mobl1.amr.corp.intel.com (HELO khuang2-desk.gar.corp.intel.com) ([10.212.34.210])
-  by orsmga003-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 12 Jul 2022 15:27:19 -0700
-Message-ID: <94dda3255545bb5dbb5f76a81d5189d382c1d187.camel@intel.com>
-Subject: Re: [PATCH] KVM, x86/mmu: Fix the comment around
- kvm_tdp_mmu_zap_leafs()
-From:   Kai Huang <kai.huang@intel.com>
+        with ESMTP id S233026AbiGLWf4 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 12 Jul 2022 18:35:56 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 43C1FC3AEE
+        for <kvm@vger.kernel.org>; Tue, 12 Jul 2022 15:35:55 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1657665354;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=OETO5+tmZb+tFwem9JGI1S5zgmLmT7/eQERlYvFc98w=;
+        b=gsldbmtjRWur6DXE8I7G3gKdqd1c7v4ww2uv5FaEfa+aFmN2OJwLv0O7c+EHJwTNUtHH44
+        jxLt+tnEnh64xs8QnDMZ3XWgkhn6I7CaVPPkIAPKJBpDytfggRQNbo47tYkkeuaUspbY5b
+        Ud7sX6+P+ncHIwunxQ9FkBYIQbOc1I4=
+Received: from mail-qv1-f72.google.com (mail-qv1-f72.google.com
+ [209.85.219.72]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-451-fWi4oqVAMU-S-RpuF87eWg-1; Tue, 12 Jul 2022 18:35:53 -0400
+X-MC-Unique: fWi4oqVAMU-S-RpuF87eWg-1
+Received: by mail-qv1-f72.google.com with SMTP id od5-20020a0562142f0500b00473838e0feeso1747889qvb.9
+        for <kvm@vger.kernel.org>; Tue, 12 Jul 2022 15:35:52 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=OETO5+tmZb+tFwem9JGI1S5zgmLmT7/eQERlYvFc98w=;
+        b=aduUjRjxeZTWXV+avJ+VWGHuYlzuDzihnYNWCJDnO16E2lGXVer+Ze2hq4GmsuAsTR
+         wDbxAA+DAx3lc33mxFpAR57PWUnsGHqK+iSB+AT2Xu17fvHly3H+gQh/WeboyZTGT7vb
+         cDcd8jJNK4yY8ygxxt5Ev0r+d8O9qbhx3o5pYY1HbpJmbfebEB8e+8gFOHqHjkJvgT6T
+         CHVz8w23lpSEVATD6VKOEA9L59XGrh7D05pwtfTtjaPJ5FRrRgD+aTO1zyStiQ5YywS1
+         SSPKT0FbG6sOpoETd/p9HXHd1qJnw1zXnnPBCJhmptcanzs1YrfBb2hYWzxN7k/mFWbC
+         gK6w==
+X-Gm-Message-State: AJIora/+9kAZD6jGKTZDpBMp+a6jgFvhvfpsAR9I1yEk0O5Fip/LzPxb
+        v1n+k2lEuVvTiMQA67JpXLfe9sUoRSYtkUX6PPbKorKnO1PrgNvG6GcGr4N5TpvKBBZgjWDOUNf
+        P4zHG4cN+ERmq
+X-Received: by 2002:ac8:5892:0:b0:31e:bc96:b262 with SMTP id t18-20020ac85892000000b0031ebc96b262mr235192qta.285.1657665352473;
+        Tue, 12 Jul 2022 15:35:52 -0700 (PDT)
+X-Google-Smtp-Source: AGRyM1smlOYFtZYL1XDGm2X8xRHSp0Ztii6UFQzBq/ilGtKJ8FDnGcOq3+rS+TJz2xUlNGGzxeRC/Q==
+X-Received: by 2002:ac8:5892:0:b0:31e:bc96:b262 with SMTP id t18-20020ac85892000000b0031ebc96b262mr235176qta.285.1657665352261;
+        Tue, 12 Jul 2022 15:35:52 -0700 (PDT)
+Received: from xz-m1.local (bras-base-aurron9127w-grc-37-74-12-30-48.dsl.bell.ca. [74.12.30.48])
+        by smtp.gmail.com with ESMTPSA id v8-20020ac873c8000000b00317ccf991a3sm8096681qtp.19.2022.07.12.15.35.50
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 12 Jul 2022 15:35:51 -0700 (PDT)
+Date:   Tue, 12 Jul 2022 18:35:50 -0400
+From:   Peter Xu <peterx@redhat.com>
 To:     Sean Christopherson <seanjc@google.com>
-Cc:     kvm@vger.kernel.org, pbonzini@redhat.com, bgardon@google.com
-Date:   Wed, 13 Jul 2022 10:27:17 +1200
-In-Reply-To: <Ys2zrXTDiWkeIwGm@google.com>
-References: <20220712030835.286052-1-kai.huang@intel.com>
-         <Ys2zrXTDiWkeIwGm@google.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-User-Agent: Evolution 3.44.2 (3.44.2-1.fc36) 
+Cc:     Paolo Bonzini <pbonzini@redhat.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+Subject: Re: [PATCH 3/4] KVM: x86/mmu: Shrink pte_list_desc size when KVM is
+ using TDP
+Message-ID: <Ys33RtxeDz0egEM0@xz-m1.local>
+References: <20220624232735.3090056-1-seanjc@google.com>
+ <20220624232735.3090056-4-seanjc@google.com>
 MIME-Version: 1.0
-X-Spam-Status: No, score=-5.0 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
-        SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20220624232735.3090056-4-seanjc@google.com>
+X-Spam-Status: No, score=-3.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,
+        SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=unavailable
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -60,82 +81,49 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, 2022-07-12 at 17:47 +0000, Sean Christopherson wrote:
-> On Tue, Jul 12, 2022, Kai Huang wrote:
-> > Now kvm_tdp_mmu_zap_leafs() only zaps leaf SPTEs but not any non-root
-> > pages within that GFN range anymore, so the comment isn't right.
-> >=20
-> > Fixes: f47e5bbbc92f ("KVM: x86/mmu: Zap only TDP MMU leafs in zap range=
- and mmu_notifier unmap")
-> > Signed-off-by: Kai Huang <kai.huang@intel.com>
-> > ---
-> >  arch/x86/kvm/mmu/tdp_mmu.c | 7 +++----
-> >  1 file changed, 3 insertions(+), 4 deletions(-)
-> >=20
-> > diff --git a/arch/x86/kvm/mmu/tdp_mmu.c b/arch/x86/kvm/mmu/tdp_mmu.c
-> > index f3a430d64975..7692e6273462 100644
-> > --- a/arch/x86/kvm/mmu/tdp_mmu.c
-> > +++ b/arch/x86/kvm/mmu/tdp_mmu.c
-> > @@ -969,10 +969,9 @@ static bool tdp_mmu_zap_leafs(struct kvm *kvm, str=
-uct kvm_mmu_page *root,
-> >  }
-> > =20
-> >  /*
-> > - * Tears down the mappings for the range of gfns, [start, end), and fr=
-ees the
-> > - * non-root pages mapping GFNs strictly within that range. Returns tru=
-e if
-> > - * SPTEs have been cleared and a TLB flush is needed before releasing =
-the
-> > - * MMU lock.
-> > + * Zap leafs SPTEs for the range of gfns, [start, end) for all roots. =
-Returns
-> > + * true if SPTEs have been cleared and a TLB flush is needed before re=
-leasing
-> > + * the MMU lock.
->=20
-> What about shifting the comment from tdp_mmu_zap_leafs() instead of dupli=
-cating it?
-> tdp_mmu_zap_leafs() is static and kvm_tdp_mmu_zap_leafs() is the sole cal=
-ler.  And
-> opportunistically tweak the blurb about SPTEs being cleared to (a) say "z=
-apped"
-> instead of "cleared" because "cleared" will be wrong if/when KVM sets SUP=
-PRESS_VE,
-> and (b) to clarify that a flush is needed if and only if a SPTE has been =
-zapped
-> since MMU lock was last acquired.
->=20
-> E.g.
->=20
-> /*
->  * If can_yield is true, will release the MMU lock and reschedule if the
->  * scheduler needs the CPU or there is contention on the MMU lock. If thi=
-s
->  * function cannot yield, it will not release the MMU lock or reschedule =
-and
->  * the caller must ensure it does not supply too large a GFN range, or th=
-e
->  * operation can cause a soft lockup.
->  */
-> static bool tdp_mmu_zap_leafs(struct kvm *kvm, struct kvm_mmu_page *root,
-> 			      gfn_t start, gfn_t end, bool can_yield, bool flush)
->=20
-> /*
->  * Zap leafs SPTEs for the range of gfns, [start, end), for all roots.  R=
-eturns
->  * true if a TLB flush is needed before releasing the MMU lock, i.e. if o=
-ne or
->  * more SPTEs were zapped since the MMU lock was last acquired.
->  */
-> bool kvm_tdp_mmu_zap_leafs(struct kvm *kvm, int as_id, gfn_t start, gfn_t=
- end,
-> 			   bool can_yield, bool flush)
+On Fri, Jun 24, 2022 at 11:27:34PM +0000, Sean Christopherson wrote:
+> Dynamically size struct pte_list_desc's array of sptes based on whether
+> or not KVM is using TDP.  Commit dc1cff969101 ("KVM: X86: MMU: Tune
+> PTE_LIST_EXT to be bigger") bumped the number of entries in order to
+> improve performance when using shadow paging, but its analysis that the
+> larger size would not affect TDP was wrong.  Consuming pte_list_desc
+> objects for nested TDP is indeed rare, but _allocating_ objects is not,
+> as KVM allocates 40 objects for each per-vCPU cache.  Reducing the size
+> from 128 bytes to 32 bytes reduces that per-vCPU cost from 5120 bytes to
+> 1280, and also provides similar savings when eager page splitting for
+> nested MMUs kicks in.
+> 
+> The per-vCPU overhead could be further reduced by using a custom, smaller
+> capacity for the per-vCPU caches, but that's more of an "and" than
+> an "or" change, e.g. it wouldn't help the eager page split use case.
+> 
+> Set the list size to the bare minimum without completely defeating the
+> purpose of an array (and because pte_list_add() assumes the array is at
+> least two entries deep).  A larger size, e.g. 4, would reduce the number
+> of "allocations", but those "allocations" only become allocations in
+> truth if a single vCPU depletes its cache to where a topup is needed,
+> i.e. if a single vCPU "allocates" 30+ lists.  Conversely, those 2 extra
+> entries consume 16 bytes * 40 * nr_vcpus in the caches the instant nested
+> TDP is used.
+> 
+> In the unlikely event that performance of aliased gfns for nested TDP
+> really is (or becomes) a priority for oddball workloads, KVM could add a
+> knob to let the admin tune the array size for their environment.
+> 
+> Note, KVM also unnecessarily tops up the per-vCPU caches even when not
+> using rmaps; this can also be addressed separately.
 
-Yes looks better.  Will send out  a new patch soon.  Thanks.
+The only possible way of using pte_list_desc when tdp=1 is when the
+hypervisor tries to map the same host pages with different GPAs?
 
---=20
-Thanks,
--Kai
+And we don't really have a real use case of that, or.. do we?
 
+Sorry to start with asking questions, it's just that if we know that
+pte_list_desc is probably not gonna be used then could we simply skip the
+cache layer as a whole?  IOW, we don't make the "array size of pte list
+desc" dynamic, instead we make the whole "pte list desc cache layer"
+dynamic.  Is it possible?
+
+-- 
+Peter Xu
 
