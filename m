@@ -2,58 +2,54 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 62AD657299F
-	for <lists+kvm@lfdr.de>; Wed, 13 Jul 2022 01:04:17 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 0159C5729A8
+	for <lists+kvm@lfdr.de>; Wed, 13 Jul 2022 01:06:04 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230010AbiGLXEQ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 12 Jul 2022 19:04:16 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35674 "EHLO
+        id S233598AbiGLXGA (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 12 Jul 2022 19:06:00 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36846 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230470AbiGLXEO (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 12 Jul 2022 19:04:14 -0400
-Received: from mail-oa1-x32.google.com (mail-oa1-x32.google.com [IPv6:2001:4860:4864:20::32])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2CA862A41B
-        for <kvm@vger.kernel.org>; Tue, 12 Jul 2022 16:04:14 -0700 (PDT)
-Received: by mail-oa1-x32.google.com with SMTP id 586e51a60fabf-10bf634bc50so12163444fac.3
-        for <kvm@vger.kernel.org>; Tue, 12 Jul 2022 16:04:14 -0700 (PDT)
+        with ESMTP id S231935AbiGLXF7 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 12 Jul 2022 19:05:59 -0400
+Received: from mail-pj1-x102c.google.com (mail-pj1-x102c.google.com [IPv6:2607:f8b0:4864:20::102c])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B53CB60533
+        for <kvm@vger.kernel.org>; Tue, 12 Jul 2022 16:05:57 -0700 (PDT)
+Received: by mail-pj1-x102c.google.com with SMTP id o3-20020a17090a744300b001ef8f7f3dddso718904pjk.3
+        for <kvm@vger.kernel.org>; Tue, 12 Jul 2022 16:05:57 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=0kilpuaWkkH1jWKZwcnpv75y3bBAyVMGJWLT8pq7Zew=;
-        b=ZBE5KGyRMkxibp5iaQK1l2yLFQs3jMAWpu5gwk0mkKX4ubei8nAy3KENVxr6zAoHjv
-         GxxAukLzTPcow4xb39vYwDGdcaSRPa60fmvrQz7t5M+INg1M5ckPSC915vA9q2vN94AD
-         /SGqziGRgsU+lRLMnfhy3E5QN+LwNKSm54tmpu0mNnq5YnUHuf05goqCVAxNqaaAiN6B
-         kCkPthpHgFI7wBZw9z3V/ubta+xmhbhQHRM/O5EcP+46woLYQpwn+fg2Dj/B6KQdkz8q
-         cxYdjJT7Re3j22yGvnr+ktEYQOKJ6wkxisMXfv/a2tIwVaodgTZvM0zkiXaKA3U/CSDX
-         wuPw==
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=xf3o/FVcDrWTjqM4SU9OE71B6I+xuW/GFj0iZmpmQbg=;
+        b=Z6IZzY9s3jOmwMJHCnOHfcd/X/fC5gga+f0/GnThBBONKEbR0I2NH1Ty6iOIdsZmZK
+         aNZ+3HOLhzAiz/Mid2qzpPjGI4JFUuI7nGA4w+vhGU8t1Ok9afcoe/Jc3y3eYW+ViOab
+         rveEgyZkqCy1hZZW8DMIBAUqyENo2A5JOeC+C7DZWne1sV1Bng0215Kup44rqee7ljzP
+         3+jP61rUQdp8Ls05woP3XU1jDYEQHcMan6eZ/rjuZCWJI/jS6HIryjgTfUh27QyF+0Qr
+         HwRYJrJFek+4g2OqMsbQb+YRG+J8VOZMzWxz6CtFgnDzWRb8c+R5L/pvuutOzNOqXTJT
+         5rDQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=0kilpuaWkkH1jWKZwcnpv75y3bBAyVMGJWLT8pq7Zew=;
-        b=Bx+DxOzyN39Ti7c43QsHzP2wc4FCg4MjrFYUe0tqG1T6objvyePmI502VDXU3kHKLI
-         x6AJHLArRvIIRh789BC7s8sfDNww1Aav5dxDn2cbPSDLAJmwCQ7+NLIAuLPt4uD1sBR2
-         aYJCjAFFrjMI79dSXYspP8nglXroqFLSQ22CxMcq4gpu24J4s+JB5tUJp71a0QuNxhuN
-         2CXBjxCiF0IOmNA2L5ZFsxkcUxwy8SyDqeOJJoY80wDrUdUbME7wtZodjE/NEtvh4xOh
-         hrz+6OBc1LU3Ahri2aD810W4NyvinVbF82bhNBXw5iqDWJFDcQOlmSg2ChZDF6Hz5VdS
-         NFgg==
-X-Gm-Message-State: AJIora9GK6H8rmevNURKnFb70Mb8TyEOZmYchxG7Te+nOiaEK2hIrAnb
-        rZT8gaCKFkPlQqbfSty9W8weF4b4DgOJq+IlrFlWAA==
-X-Google-Smtp-Source: AGRyM1uYZ+G3f4X735Xr0IJWdBmvb830WjZ9bkBphZtyS8Anj7WjdMlYQpZtxJ6khjfO5cktyObZb/GpgNs5V7B3uuU=
-X-Received: by 2002:a05:6870:d349:b0:f5:e9ea:5200 with SMTP id
- h9-20020a056870d34900b000f5e9ea5200mr3194460oag.235.1657667052905; Tue, 12
- Jul 2022 16:04:12 -0700 (PDT)
-MIME-Version: 1.0
-References: <20220628220938.3657876-1-yosryahmed@google.com>
- <20220628220938.3657876-3-yosryahmed@google.com> <YsdLVBtl16mx3+Ot@google.com>
-In-Reply-To: <YsdLVBtl16mx3+Ot@google.com>
-From:   Yosry Ahmed <yosryahmed@google.com>
-Date:   Tue, 12 Jul 2022 16:03:37 -0700
-Message-ID: <CAJD7tkZ-r7O1AD8kAUgoY0Y2RNQkBpbtmtKpq68xN4PO=fzPnw@mail.gmail.com>
-Subject: Re: [PATCH v6 2/4] KVM: mmu: add a helper to account memory used by
- KVM MMU.
-To:     Sean Christopherson <seanjc@google.com>
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=xf3o/FVcDrWTjqM4SU9OE71B6I+xuW/GFj0iZmpmQbg=;
+        b=3SX98/XJ4z1nacZ2FcGWJ//yOXInQ0w4/Nq3y2Ts+tahYWUHFZkWXAVRXGcLCCP1Vn
+         ZW94lO1uP+nuaAE37uxq0FvAibmu/qCsgwwTXAbtE4URWGJLHeoQNcHAq2ZH8NJO8/rS
+         QwEd8EzNbrbTXoalrKIpH6oBcL+m/9Yl8Q/0pXUYsqvB3Au/rvVJAaimHdyJYcLWy41+
+         Y6ckA8acwgcUh2fRZ4YPiZvFcVZTxOdqW9enQ2Hp59/zmOhidS1ih/2FABOPez2dBAR5
+         WCgdOAgHmEeuK9T7Wr+DA9D8BoGRtdokpSr/I+5+sTxTbI3yLk58BzHkFt8XUIa2SwGR
+         zZQA==
+X-Gm-Message-State: AJIora82Y6D4AiUmCrW+xSytQmjhQx1hEcquFOiy5I/GrEK7jn45IRdv
+        RhcLPHHBXwFW9Dqh6iOJuf/BQw==
+X-Google-Smtp-Source: AGRyM1vgSDMytGaDjecq2tqtXq4s3MkrfSl0jPwry11NPVDZdGzL7EkgDGCSpo3Mk+AMiarqH+bA+Q==
+X-Received: by 2002:a17:903:2cb:b0:14f:4fb6:2fb0 with SMTP id s11-20020a17090302cb00b0014f4fb62fb0mr555392plk.172.1657667157162;
+        Tue, 12 Jul 2022 16:05:57 -0700 (PDT)
+Received: from google.com (123.65.230.35.bc.googleusercontent.com. [35.230.65.123])
+        by smtp.gmail.com with ESMTPSA id x4-20020a17090ad68400b001f069352d73sm121393pju.25.2022.07.12.16.05.56
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 12 Jul 2022 16:05:56 -0700 (PDT)
+Date:   Tue, 12 Jul 2022 23:05:53 +0000
+From:   Sean Christopherson <seanjc@google.com>
+To:     Yosry Ahmed <yosryahmed@google.com>
 Cc:     Tejun Heo <tj@kernel.org>, Johannes Weiner <hannes@cmpxchg.org>,
         Zefan Li <lizefan.x@bytedance.com>,
         Marc Zyngier <maz@kernel.org>,
@@ -75,61 +71,60 @@ Cc:     Tejun Heo <tj@kernel.org>, Johannes Weiner <hannes@cmpxchg.org>,
         Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
         linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
         kvm@vger.kernel.org, Linux-MM <linux-mm@kvack.org>
-Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [PATCH v6 1/4] mm: add NR_SECONDARY_PAGETABLE to count secondary
+ page table uses.
+Message-ID: <Ys3+UTTC4Qgbm7pQ@google.com>
+References: <20220628220938.3657876-1-yosryahmed@google.com>
+ <20220628220938.3657876-2-yosryahmed@google.com>
+ <YsdJPeVOqlj4cf2a@google.com>
+ <CAJD7tkYE+pZdk=-psEP_Rq_1CmDjY7Go+s1LXm-ctryWvUdgLA@mail.gmail.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CAJD7tkYE+pZdk=-psEP_Rq_1CmDjY7Go+s1LXm-ctryWvUdgLA@mail.gmail.com>
 X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
         ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
         T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL
-        autolearn=ham autolearn_force=no version=3.4.6
+        autolearn=unavailable autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Jul 7, 2022 at 2:08 PM Sean Christopherson <seanjc@google.com> wrote:
->
-> On Tue, Jun 28, 2022, Yosry Ahmed wrote:
-> > Add a helper to account pages used by KVM for page tables in memory
-> > secondary pagetable stats. This function will be used by subsequent
-> > patches in different archs.
+On Tue, Jul 12, 2022, Yosry Ahmed wrote:
+> Thanks for taking another look at this!
+> 
+> On Thu, Jul 7, 2022 at 1:59 PM Sean Christopherson <seanjc@google.com> wrote:
 > >
-> > Signed-off-by: Yosry Ahmed <yosryahmed@google.com>
-> > ---
-> >  include/linux/kvm_host.h | 10 ++++++++++
-> >  1 file changed, 10 insertions(+)
+> > On Tue, Jun 28, 2022, Yosry Ahmed wrote:
+> > > diff --git a/include/linux/mmzone.h b/include/linux/mmzone.h
+> > > index aab70355d64f3..13190d298c986 100644
+> > > --- a/include/linux/mmzone.h
+> > > +++ b/include/linux/mmzone.h
+> > > @@ -216,6 +216,7 @@ enum node_stat_item {
+> > >       NR_KERNEL_SCS_KB,       /* measured in KiB */
+> > >  #endif
+> > >       NR_PAGETABLE,           /* used for pagetables */
+> > > +     NR_SECONDARY_PAGETABLE, /* secondary pagetables, e.g. kvm shadow pagetables */
 > >
-> > diff --git a/include/linux/kvm_host.h b/include/linux/kvm_host.h
-> > index 3b40f8d68fbb1..032821d77e920 100644
-> > --- a/include/linux/kvm_host.h
-> > +++ b/include/linux/kvm_host.h
-> > @@ -2241,6 +2241,16 @@ static inline void kvm_handle_signal_exit(struct kvm_vcpu *vcpu)
-> >  }
-> >  #endif /* CONFIG_KVM_XFER_TO_GUEST_WORK */
+> > Nit, s/kvm/KVM, and drop the "shadow", which might be misinterpreted as saying KVM
+> > pagetables are only accounted when KVM is using shadow paging.  KVM's usage of "shadow"
+> > is messy, so I totally understand why you included it, but in this case it's unnecessary
+> > and potentially confusing.
 > >
-> > +/*
-> > + * If more than one page is being (un)accounted, @virt must be the address of
-> > + * the first page of a block of pages what were allocated together (i.e
-> > + * accounted together).
->
-> Sorry for the belated thoughts...
->
-> If you spin a v7, can you add a note to call out that mod_lruvec_page_state() is
-> itself thread-safe?  Caught my eye because the TDP MMU usage happens while holding
-> mmu_lock for read.
->
+> > And finally, something that's not a nit.  Should this be wrapped with CONFIG_KVM
+> > (using IS_ENABLED() because KVM can be built as a module)?  That could be removed
+> > if another non-KVM secondary MMU user comes along, but until then, #ifdeffery for
+> > stats the depend on a single feature seems to be the status quo for this code.
+> >
+> 
+> I will #ifdef the stat, but I will emphasize in the docs that is
+> currently *only* used for KVM so that it makes sense if users without
+> KVM don't see the stat at all. I will also remove the stat from
+> show_free_areas() in mm/page_alloc.c as it seems like none of the
+> #ifdefed stats show up there.
 
-Sure! I will send a v7 anyway to address the comments on patch 1. Thanks!
-
-> > + */
-> > +static inline void kvm_account_pgtable_pages(void *virt, int nr)
-> > +{
-> > +     mod_lruvec_page_state(virt_to_page(virt), NR_SECONDARY_PAGETABLE, nr);
-> > +}
-> > +
-> >  /*
-> >   * This defines how many reserved entries we want to keep before we
-> >   * kick the vcpu to the userspace to avoid dirty ring full.  This
-> > --
-> > 2.37.0.rc0.161.g10f37bed90-goog
-> >
+It's might be worth getting someone from mm/ to weigh in before going through the
+trouble, my suggestion/question is based purely on the existing code.
