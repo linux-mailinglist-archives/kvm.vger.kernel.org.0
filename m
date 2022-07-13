@@ -2,133 +2,115 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 5CD13573132
-	for <lists+kvm@lfdr.de>; Wed, 13 Jul 2022 10:34:41 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 26722573138
+	for <lists+kvm@lfdr.de>; Wed, 13 Jul 2022 10:35:24 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235593AbiGMIej (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 13 Jul 2022 04:34:39 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43882 "EHLO
+        id S234905AbiGMIfV (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 13 Jul 2022 04:35:21 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45174 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235599AbiGMIe2 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 13 Jul 2022 04:34:28 -0400
-Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 127799C246;
-        Wed, 13 Jul 2022 01:34:27 -0700 (PDT)
-Received: from pps.filterd (m0098399.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.17.1.5/8.17.1.5) with ESMTP id 26D7DlBq003605;
-        Wed, 13 Jul 2022 08:34:26 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
- mime-version : subject : to : cc : references : from : in-reply-to :
- content-type : content-transfer-encoding; s=pp1;
- bh=d1V82yQlwjqpMUJ5k4dTMJp3PzuooeX+wrvhExobG0U=;
- b=ImAA7f+l7+Msp2P93jOy7JuK6nh+DWEF0anaUi47G9iXOzeOf3onXJ82buYzs5V/XHnZ
- XmlWZWeq5oWN+d0OBnv2V/XpuYWYY11QrvkqeXp05inGsCCvary5Ic91HOAhZ756NhzI
- oF//a1dyt6EYnMA6WZduo4IKZrp8uxz4rZRPAb+9FowfJpuRIAkQur8PMpS0X6bx60Qt
- droPes76qpxfLCpnSJpMgnk6f+Ryz4klOENbq7eVq2+o341jzGafPScoIbLpEV5h+9VN
- 2mGoP3KfmkjotKX8lB84iBi4wEJNJYcu6vIL5JCFR+PX+Tr32+xlm7fzCgjAF3TSNmNa tg== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3h99r0sfu9-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Wed, 13 Jul 2022 08:34:26 +0000
-Received: from m0098399.ppops.net (m0098399.ppops.net [127.0.0.1])
-        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 26D8PKM3025192;
-        Wed, 13 Jul 2022 08:34:25 GMT
-Received: from ppma01fra.de.ibm.com (46.49.7a9f.ip4.static.sl-reverse.com [159.122.73.70])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3h99r0sfn7-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Wed, 13 Jul 2022 08:34:25 +0000
-Received: from pps.filterd (ppma01fra.de.ibm.com [127.0.0.1])
-        by ppma01fra.de.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 26D8KpFO001616;
-        Wed, 13 Jul 2022 08:34:21 GMT
-Received: from b06cxnps4074.portsmouth.uk.ibm.com (d06relay11.portsmouth.uk.ibm.com [9.149.109.196])
-        by ppma01fra.de.ibm.com with ESMTP id 3h71a8vmng-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Wed, 13 Jul 2022 08:34:21 +0000
-Received: from d06av24.portsmouth.uk.ibm.com (d06av24.portsmouth.uk.ibm.com [9.149.105.60])
-        by b06cxnps4074.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 26D8YI0v22348200
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Wed, 13 Jul 2022 08:34:18 GMT
-Received: from d06av24.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 0599C42042;
-        Wed, 13 Jul 2022 08:34:18 +0000 (GMT)
-Received: from d06av24.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 518AB4203F;
-        Wed, 13 Jul 2022 08:34:17 +0000 (GMT)
-Received: from [9.145.184.105] (unknown [9.145.184.105])
-        by d06av24.portsmouth.uk.ibm.com (Postfix) with ESMTP;
-        Wed, 13 Jul 2022 08:34:17 +0000 (GMT)
-Message-ID: <899e5148-8e65-8260-6f3c-546b4f5a650f@linux.ibm.com>
-Date:   Wed, 13 Jul 2022 10:34:16 +0200
+        with ESMTP id S235582AbiGMIfT (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 13 Jul 2022 04:35:19 -0400
+Received: from mail-pg1-x52f.google.com (mail-pg1-x52f.google.com [IPv6:2607:f8b0:4864:20::52f])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 31D40A58CF;
+        Wed, 13 Jul 2022 01:35:18 -0700 (PDT)
+Received: by mail-pg1-x52f.google.com with SMTP id s27so9805389pga.13;
+        Wed, 13 Jul 2022 01:35:18 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=Y/A0MX75zTaXhVdAEkMhemH3gBjt/Nk1zEMUdzVlPtg=;
+        b=UHmjjrOXfoP7fxm9CtN+JpxL5X27TGGRa4RYkeDqUWFRwC8cO1PcDYMXSvEfshzH6I
+         +6/hNL0DV51m/lzDnsJ2TLPxU0OXa3EEgXL7OMFVijxVOt4nwrVWhpXYaXsdx9BpE5rV
+         sKBIhbHqLxT6qj3F55YgSPgdUpVl9VDufh3eOY4K6PslQPnbtLA/dLP+nFKVEiu0MGgU
+         +VV4Va4Ul45CK5+mJCJdHO6+jef95Js/K3bRrwzhuyvQ346g0jlL4TA2xlbg9RarfCNC
+         msHK3JH2/e/5jq5bmucw3+N6L64YV2WyrGHr/3/t/XKZeYJ9wiY4ixv5gkrfi5/xsWxl
+         Bp0g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=Y/A0MX75zTaXhVdAEkMhemH3gBjt/Nk1zEMUdzVlPtg=;
+        b=gJVOsiXRmzwLqyz8dWVhjvoizF9HPcGWPrPCPBr8MCDYWUhvb4h95jOjN2nGO1ID4d
+         LcFYA9RFCNSyacy/Q/83hHp+4/4/o2eFT91H2bfULV9eBBS8/v3bhhOV4Xn3ojZh6N+5
+         iOPH7dfuQKnzfvB+xOelUlev9qit84TAS+n3xZsUgyEMoCL2Tnq5o95fjjXEUMoECABT
+         UFZK1CWJRTwtaBbKzrUkCWIELj2qMSRB9xJZdeGMUIFktHVl5xvDs7rJ3CkahnnAWnFg
+         65pb+DZDFchppVehfaijT28MfjRVsL9tHiA7qLsN4IYgPtntvM4rIdV66KbKXyZ+/B0s
+         SoxA==
+X-Gm-Message-State: AJIora+OR76LOde2mIyG3DfTlWgHL4k4/L0RY9K9Nq4yjerrcXk9uo3p
+        FWpADqwrgvli7sOtXxJ6ZWaNzcmuU/w=
+X-Google-Smtp-Source: AGRyM1uR3dbgTxYj0lU6KDjUpNErZuR9b4kpTGTEfToeEkm3OSJPSdu6wB53ehz3r7hDonHtBCb5sA==
+X-Received: by 2002:a62:1cc8:0:b0:52a:ee9e:b735 with SMTP id c191-20020a621cc8000000b0052aee9eb735mr2205555pfc.42.1657701317502;
+        Wed, 13 Jul 2022 01:35:17 -0700 (PDT)
+Received: from localhost (fmdmzpr02-ext.fm.intel.com. [192.55.54.37])
+        by smtp.gmail.com with ESMTPSA id i14-20020a170902c94e00b0016c4331e61csm6244399pla.137.2022.07.13.01.35.16
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 13 Jul 2022 01:35:16 -0700 (PDT)
+Date:   Wed, 13 Jul 2022 01:35:15 -0700
+From:   Isaku Yamahata <isaku.yamahata@gmail.com>
+To:     Kai Huang <kai.huang@intel.com>
+Cc:     isaku.yamahata@intel.com, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org, isaku.yamahata@gmail.com,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Sean Christopherson <sean.j.christopherson@intel.com>
+Subject: Re: [PATCH v7 035/102] KVM: x86/mmu: Explicitly check for MMIO spte
+ in fast page fault
+Message-ID: <20220713083515.GQ1379820@ls.amr.corp.intel.com>
+References: <cover.1656366337.git.isaku.yamahata@intel.com>
+ <71e4c19d1dff8135792e6c5a17d3a483bc99875b.1656366338.git.isaku.yamahata@intel.com>
+ <cfeb3b8b02646b073d5355495ec8842ac33aeae5.camel@intel.com>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.9.0
-Subject: Re: [PATCH v12 2/3] KVM: s390: guest support for topology function
-Content-Language: en-US
-To:     Pierre Morel <pmorel@linux.ibm.com>,
-        Janis Schoetterl-Glausch <scgl@linux.ibm.com>,
-        kvm@vger.kernel.org
-Cc:     linux-s390@vger.kernel.org, linux-kernel@vger.kernel.org,
-        borntraeger@de.ibm.com, cohuck@redhat.com, david@redhat.com,
-        thuth@redhat.com, imbrenda@linux.ibm.com, hca@linux.ibm.com,
-        gor@linux.ibm.com, wintera@linux.ibm.com, seiden@linux.ibm.com,
-        nrb@linux.ibm.com
-References: <20220711084148.25017-1-pmorel@linux.ibm.com>
- <20220711084148.25017-3-pmorel@linux.ibm.com>
- <92c6d13c-4494-de56-83f4-9d7384444008@linux.ibm.com>
- <1884bc26-b91b-83a7-7f8b-96b6090a0bac@linux.ibm.com>
- <6124248a-24be-b43a-f827-b6bebf9e7f3d@linux.ibm.com>
- <5c3d9637-7739-1323-8630-433ff8cb4dc4@linux.ibm.com>
-From:   Janosch Frank <frankja@linux.ibm.com>
-In-Reply-To: <5c3d9637-7739-1323-8630-433ff8cb4dc4@linux.ibm.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: base64
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: HR-EGR8ZxR55fs0wCDbhaHqk_WsAgFmr
-X-Proofpoint-ORIG-GUID: UlRAFTx--TVwF_GpxPj6oyCVWkjppV2Y
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.205,Aquarius:18.0.883,Hydra:6.0.517,FMLib:17.11.122.1
- definitions=2022-07-12_14,2022-07-13_01,2022-06-22_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 bulkscore=0
- priorityscore=1501 phishscore=0 suspectscore=0 mlxlogscore=999
- impostorscore=0 mlxscore=0 clxscore=1015 spamscore=0 malwarescore=0
- lowpriorityscore=0 adultscore=0 classifier=spam adjust=0 reason=mlx
- scancount=1 engine=8.12.0-2206140000 definitions=main-2207130035
-X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,
-        SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no
-        version=3.4.6
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <cfeb3b8b02646b073d5355495ec8842ac33aeae5.camel@intel.com>
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
+        RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Wy4uLl0NCj4+Pj4+ICAgwqAgKy8qKg0KPj4+Pj4gKyAqIGt2bV9zMzkwX3VwZGF0ZV90b3Bv
-bG9neV9jaGFuZ2VfcmVwb3J0IC0gdXBkYXRlIENQVSB0b3BvbG9neSBjaGFuZ2UgcmVwb3J0
-DQo+Pj4+PiArICogQGt2bTogZ3Vlc3QgS1ZNIGRlc2NyaXB0aW9uDQo+Pj4+PiArICogQHZh
-bDogc2V0IG9yIGNsZWFyIHRoZSBNVENSIGJpdA0KPj4+Pj4gKyAqDQo+Pj4+PiArICogVXBk
-YXRlcyB0aGUgTXVsdGlwcm9jZXNzb3IgVG9wb2xvZ3ktQ2hhbmdlLVJlcG9ydCBiaXQgdG8g
-c2lnbmFsDQo+Pj4+PiArICogdGhlIGd1ZXN0IHdpdGggYSB0b3BvbG9neSBjaGFuZ2UuDQo+
-Pj4+PiArICogVGhpcyBpcyBvbmx5IHJlbGV2YW50IGlmIHRoZSB0b3BvbG9neSBmYWNpbGl0
-eSBpcyBwcmVzZW50Lg0KPj4+Pj4gKyAqDQo+Pj4+PiArICogVGhlIFNDQSB2ZXJzaW9uLCBi
-c2NhIG9yIGVzY2EsIGRvZXNuJ3QgbWF0dGVyIGFzIG9mZnNldCBpcyB0aGUgc2FtZS4NCj4+
-Pj4+ICsgKi8NCj4+Pj4+ICtzdGF0aWMgdm9pZCBrdm1fczM5MF91cGRhdGVfdG9wb2xvZ3lf
-Y2hhbmdlX3JlcG9ydChzdHJ1Y3Qga3ZtICprdm0sIGJvb2wgdmFsKQ0KPj4+Pj4gK3sNCj4+
-Pj4+ICvCoMKgwqAgdW5pb24gc2NhX3V0aWxpdHkgbmV3LCBvbGQ7DQo+Pj4+PiArwqDCoMKg
-IHN0cnVjdCBic2NhX2Jsb2NrICpzY2E7DQo+Pj4+PiArDQo+Pj4+PiArwqDCoMKgIHJlYWRf
-bG9jaygma3ZtLT5hcmNoLnNjYV9sb2NrKTsNCj4+Pj4+ICvCoMKgwqAgZG8gew0KPj4+Pj4g
-K8KgwqDCoMKgwqDCoMKgIHNjYSA9IGt2bS0+YXJjaC5zY2E7DQo+Pj4+DQo+Pj4+IEkgZmlu
-ZCB0aGlzIGFzc2lnbm1lbnQgYmVpbmcgaW4gdGhlIGxvb3AgdW5pbnR1aXRpdmUsIGJ1dCBp
-dCBzaG91bGQgbm90IG1ha2UgYSBkaWZmZXJlbmNlLg0KPj4+DQo+Pj4gVGhlIHByaWNlIHdv
-dWxkIGJlIGFuIHVnbHkgY2FzdC4NCj4+DQo+PiBJIGRvbid0IGdldCB3aGF0IHlvdSBtZWFu
-LiBOb3RoaW5nIGFib3V0IHRoZSB0eXBlcyBjaGFuZ2VzIGlmIHlvdSBtb3ZlIGl0IGJlZm9y
-ZSB0aGUgbG9vcC4NCj4gDQo+IFllcyByaWdodCwgZGlkIHdyb25nIHVuZGVyc3RhbmQuDQo+
-IEl0IGlzIGJldHRlciBiZWZvcmUuDQpXaXRoIHRoZSBhc3NpZ25tZW50IG1vdmVkIG9uZSBs
-aW5lIHVwOg0KUmV2aWV3ZWQtYnk6IEphbm9zY2ggRnJhbmsgPGZyYW5ramFAbGludXguaWJt
-LmNvbT4NCg0KPiANCj4+Pg0KPj4+DQo+Pj4+DQo+Pj4+PiArwqDCoMKgwqDCoMKgwqAgb2xk
-ID0gUkVBRF9PTkNFKHNjYS0+dXRpbGl0eSk7DQo+Pj4+PiArwqDCoMKgwqDCoMKgwqAgbmV3
-ID0gb2xkOw0KPj4+Pj4gK8KgwqDCoMKgwqDCoMKgIG5ldy5tdGNyID0gdmFsOw0KPj4+Pj4g
-K8KgwqDCoCB9IHdoaWxlIChjbXB4Y2hnKCZzY2EtPnV0aWxpdHkudmFsLCBvbGQudmFsLCBu
-ZXcudmFsKSAhPSBvbGQudmFsKTsNCj4+Pj4+ICvCoMKgwqAgcmVhZF91bmxvY2soJmt2bS0+
-YXJjaC5zY2FfbG9jayk7DQo+Pj4+PiArfQ0KPj4+Pj4gKw0KPj4+PiBbLi4uXQ0KPj4+Pg0K
-Pj4+DQo+Pj4NCj4+DQo+IA0KDQo=
+On Thu, Jun 30, 2022 at 11:37:15PM +1200,
+Kai Huang <kai.huang@intel.com> wrote:
+
+> On Mon, 2022-06-27 at 14:53 -0700, isaku.yamahata@intel.com wrote:
+> > From: Sean Christopherson <sean.j.christopherson@intel.com>
+> > 
+> > Explicitly check for an MMIO spte in the fast page fault flow.  TDX will
+> > use a not-present entry for MMIO sptes, which can be mistaken for an
+> > access-tracked spte since both have SPTE_SPECIAL_MASK set.
+> 
+> SPTE_SPECIAL_MASK has been removed in latest KVM code.  The changelog needs
+> update.
+
+It was renamed to SPTE_TDP_AD_MASK. not removed.
+
+
+> In fact, if I understand correctly, I don't think this changelog is correct:
+
+> The existing code doesn't check is_mmio_spte() because:
+> 
+> 1) If MMIO caching is enabled, MMIO fault is always handled in
+> handle_mmio_page_fault() before reaching here; 
+>
+> 2) If MMIO caching is disabled, is_shadow_present_pte() always returns false for
+> MMIO spte, and is_mmio_spte() also always return false for MMIO spte, so there's
+> no need check here.
+> 
+> "A non-present entry for MMIO spte" doesn't necessarily mean
+> is_shadow_present_pte() will return true for it, and there's no explanation at
+> all that for TDX guest a MMIO spte could reach here and is_shadow_present_pte()
+> returns true for it.
+
+Although it was needed, I noticed the following commit made this patch
+unnecessary.  So I'll drop this patch. Kudos to Sean.
+
+edea7c4fc215c7ee1cc98363b016ad505cbac9f7
+"KVM: x86/mmu: Use a dedicated bit to track shadow/MMU-present SPTEs"
+
+-- 
+Isaku Yamahata <isaku.yamahata@gmail.com>
