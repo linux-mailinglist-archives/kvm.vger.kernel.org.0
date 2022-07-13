@@ -2,81 +2,146 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 6A2B3572E5C
-	for <lists+kvm@lfdr.de>; Wed, 13 Jul 2022 08:46:12 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id A96DB572E93
+	for <lists+kvm@lfdr.de>; Wed, 13 Jul 2022 08:57:03 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233269AbiGMGqL (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 13 Jul 2022 02:46:11 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44294 "EHLO
+        id S233854AbiGMG5B (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 13 Jul 2022 02:57:01 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53438 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231589AbiGMGqJ (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 13 Jul 2022 02:46:09 -0400
-Received: from mail-vs1-xe30.google.com (mail-vs1-xe30.google.com [IPv6:2607:f8b0:4864:20::e30])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4F21FDF3A5
-        for <kvm@vger.kernel.org>; Tue, 12 Jul 2022 23:46:08 -0700 (PDT)
-Received: by mail-vs1-xe30.google.com with SMTP id i186so9895589vsc.9
-        for <kvm@vger.kernel.org>; Tue, 12 Jul 2022 23:46:08 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=eVhC/3eC5T+uVY5zCPqJvEHAiZQx991cN+OGRmvdPJ4=;
-        b=R2tlFJo7b92QRtPKgzqkJ7RZkVZ64HxIrmYSKOcn98ummWgwZOep3MNQ0ANWNxgsX4
-         CLmUFuc8SccnfpSjG2SJKnWsNnr+se/++AM4yV37ysq65KpqkBSFtELhmuw4rX0tC8ka
-         HSOX8qtjeirynX7RSruFMax3bZARnKRfpATEDI6W7DTENR7y8mb+lIuh13N8/j59Ip09
-         VvxTSs18jQhoGAcQY5F3N9Sp4gMQLx8d6EzCfLg0JE2brKOUhMFa3I9G6kuIUz2rX69N
-         DMPBxWfgxvGBXL8fbBZnLw9tmjGp+PPM+ReRly+sBKcwoRmqWs3b5Uy5fuCYCtHYD9ne
-         8PoA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=eVhC/3eC5T+uVY5zCPqJvEHAiZQx991cN+OGRmvdPJ4=;
-        b=OcFJqCZj7DpUG+a+0gkUZmzgXQAYHOvk98Ng5Y+rTkBuQuvk6N0jO1vEkYDgXVCZIR
-         ZED7WfytltivHsEmuzIqqlXbM2IrNXO9fU9h6BZBGgBPYH7yVqtIt3BhO0A0nh6PRguT
-         /TI25UNqbn7zp6qvs2ZUuhdCT4Gccs4y9T+FAuNRz1zHOuSRfJb+ITeSQSTLgJJ5eyLu
-         pT5292MmoAdbZwhO9MW6M6a8/I5hicWfbPGCzZy6giWEhU88cYr9xJPno9el5D0A5Akv
-         aGue4awgGnC5YHUDa9G4gzb6uOv5cL5NAXw3hrcYu4rG6tXje9CfQuPBcjsjkva9XfJo
-         4kMQ==
-X-Gm-Message-State: AJIora+Vap5zzbTU0YcMpXeTK5u1qHISjs711KaxNZ6MkO0iGAYakt4p
-        cYUFP4mv/lVX6o2bOHxqX0V8aOUWXgJ6Pe7A5Zcx4A==
-X-Google-Smtp-Source: AGRyM1vAIc+192gcPmhZ/OUxmzIY9hA9We6tz01rgpw9y2ihdWpQBLwpMt1VyVjBA74EqAPZkTaTemOlXd0RKxVwCxk=
-X-Received: by 2002:a67:b24c:0:b0:356:c997:1cf0 with SMTP id
- s12-20020a67b24c000000b00356c9971cf0mr522722vsh.9.1657694767428; Tue, 12 Jul
- 2022 23:46:07 -0700 (PDT)
-MIME-Version: 1.0
-References: <20220706164304.1582687-1-maz@kernel.org> <20220706164304.1582687-12-maz@kernel.org>
-In-Reply-To: <20220706164304.1582687-12-maz@kernel.org>
-From:   Reiji Watanabe <reijiw@google.com>
-Date:   Tue, 12 Jul 2022 23:45:51 -0700
-Message-ID: <CAAeT=FwQtdDY6RAnjx=gJjghvZwF8ud_dCu+ymcKiHD6fm2-Sg@mail.gmail.com>
-Subject: Re: [PATCH 11/19] KVM: arm64: vgic-v3: Use u32 to manage the line
- level from userspace
-To:     Marc Zyngier <maz@kernel.org>
-Cc:     kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org,
-        Linux ARM <linux-arm-kernel@lists.infradead.org>,
-        Schspa Shi <schspa@gmail.com>, kernel-team@android.com,
-        Oliver Upton <oliver.upton@linux.dev>
-Content-Type: text/plain; charset="UTF-8"
-X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-        T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL
-        autolearn=ham autolearn_force=no version=3.4.6
+        with ESMTP id S229487AbiGMG5A (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 13 Jul 2022 02:57:00 -0400
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A0B8613D6A;
+        Tue, 12 Jul 2022 23:56:55 -0700 (PDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id 3BDBB611A5;
+        Wed, 13 Jul 2022 06:56:55 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id A0D6AC34114;
+        Wed, 13 Jul 2022 06:56:54 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1657695414;
+        bh=DKPBIy5G1EM3xhqzMqfJWRNGFPADJwakpp4q2L0oBi4=;
+        h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+        b=r4+vtgJ/BjF/IHHR46dA/3SZPJjB5AcuGaE29qnGPKYUd83wfoHSn5NLmyD6fKD6h
+         wSfTI81txXPJiV22p36SnJ+pKJmu6mpcEeVKpw7sH+ENSnhHY3L16hbOviV3hDbiNh
+         Y5qNjZDqTybvJC9nb3nHFPQZ5GIvlKLOJxGT/Qry3m6FjvIf4BYyYYD9dpCEjUZnvO
+         RuWS9ddu/EBANk5tBwso7AacLcyxfg8TbCcR+WKg1VWoAF9QZaAa5ma+D3dqMx0mOl
+         xqGdPNUIcFHPU9Fobfk8o4mjHZVMLnUS1a7Z95Sh2Yn+qG3QRvHRZxWInlJcdh4SKa
+         KaWyiEBpUf5QA==
+Received: from ip-185-104-136-29.ptr.icomera.net ([185.104.136.29] helo=wait-a-minute.misterjones.org)
+        by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+        (Exim 4.95)
+        (envelope-from <maz@kernel.org>)
+        id 1oBWIm-0078fU-85;
+        Wed, 13 Jul 2022 07:56:52 +0100
+Date:   Wed, 13 Jul 2022 07:56:42 +0100
+Message-ID: <87cze9lcut.wl-maz@kernel.org>
+From:   Marc Zyngier <maz@kernel.org>
+To:     "chenxiang (M)" <chenxiang66@hisilicon.com>
+Cc:     Alex Williamson <alex.williamson@redhat.com>,
+        <pbonzini@redhat.com>, <kvm@vger.kernel.org>,
+        chenxiang via <qemu-devel@nongnu.org>,
+        linux-kernel <linux-kernel@vger.kernel.org>
+Subject: Re: [QUESTION] Exception print when enabling GICv4
+In-Reply-To: <13e4fde9-05e9-f492-a2b6-20d567eb2920@hisilicon.com>
+References: <6d6d61fb-6241-4e1e-ddff-8ae8be96f9ff@hisilicon.com>
+        <87bktu1hfj.wl-maz@kernel.org>
+        <13e4fde9-05e9-f492-a2b6-20d567eb2920@hisilicon.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/27.1
+ (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+X-SA-Exim-Connect-IP: 185.104.136.29
+X-SA-Exim-Rcpt-To: chenxiang66@hisilicon.com, alex.williamson@redhat.com, pbonzini@redhat.com, kvm@vger.kernel.org, qemu-devel@nongnu.org, linux-kernel@vger.kernel.org
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+X-Spam-Status: No, score=-7.7 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_HI,
+        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Jul 6, 2022 at 10:05 AM Marc Zyngier <maz@kernel.org> wrote:
->
-> Despite the userspace ABI clearly defining the bits dealt with by
-> KVM_DEV_ARM_VGIC_GRP_LEVEL_INFO as a __u32, the kernel uses a u64.
->
-> Use a u32 to match the userspace ABI, which will subsequently lead
-> to some simplifications.
->
-> Signed-off-by: Marc Zyngier <maz@kernel.org>
+On Wed, 13 Jul 2022 07:02:10 +0100,
+"chenxiang (M)" <chenxiang66@hisilicon.com> wrote:
+>=20
+> Hi Marc,
+>=20
+> Thank you for your reply.
+>=20
+> =E5=9C=A8 2022/7/12 23:25, Marc Zyngier =E5=86=99=E9=81=93:
+> > Hi Xiang,
+> >=20
+> > On Tue, 12 Jul 2022 13:55:16 +0100,
+> > "chenxiang (M)" <chenxiang66@hisilicon.com> wrote:
+> >> Hi,
+> >> I encounter a issue related to GICv4 enable on ARM64 platform (kernel
+> >> 5.19-rc4, qemu 6.2.0):
+> >> We have a accelaration module whose VF has 3 MSI interrupts, and we
+> >> passthrough it to virtual machine with following steps:
+> >>=20
+> >> echo 0000:79:00.1 > /sys/bus/pci/drivers/hisi_hpre/unbind
+> >> echo vfio-pci >
+> >> /sys/devices/pci0000\:78/0000\:78\:00.0/0000\:79\:00.1/driver_override
+> >> echo 0000:79:00.1 > /sys/bus/pci/drivers_probe
+> >>=20
+> >> Then we boot VM with "-device vfio-pci,host=3D79:00.1,id=3Dnet0 \".
+> >> When insmod the driver which registers 3 PCI MSI interrupts in VM,
+> >> some exception print occur as following:
+> >>=20
+> >> vfio-pci 0000:3a:00.1: irq bypass producer (token 000000008f08224d)
+> >> registration fails: 66311
+> >>=20
+> >> I find that bit[6:4] of register PCI_MSI_FLAGS is 2 (4 MSI interrupts)
+> >> though we only register 3 PCI MSI interrupt,
+> >>=20
+> >> and only 3 MSI interrupt is activated at last.
+> >> It allocates 4 vectors in function vfio_msi_enable() (qemu)  as it
+> >> reads the register PCI_MSI_FLAGS.
+> >> Later it will  call system call VFIO_DEVICE_SET_IRQS to set forwarding
+> >> for those interrupts
+> >> using function kvm_vgic_v4_set_forrwarding() as GICv4 is enabled. For
+> >> interrupt 0~2, it success to set forwarding as they are already
+> >> activated,
+> >> but for the 4th interrupt, it is not activated, so ite is not found in
+> >> function vgic_its_resolve_lpi(), so above printk occurs.
+> >>=20
+> >> It seems that we only allocate and activate 3 MSI interrupts in guest
+> >> while it tried to set forwarding for 4 MSI interrupts in host.
+> >> Do you have any idea about this issue?
+> > I have a hunch: QEMU cannot know that the guest is only using 3 MSIs
+> > out of the 4 that the device can use, and PCI/Multi-MSI only has a
+> > single enable bit for all MSIs. So it probably iterates over all
+> > possible MSIs and enable the forwarding. Since the guest has only
+> > created 3 mappings in the virtual ITS, the last call fails. I would
+> > expect the guest to still work properly though.
+>=20
+> Yes, that's the reason of exception print.
+> Is it possible for QEMU to get the exact number of interrupts guest is
+> using? It seems not.
 
-Reviewed-by: Reiji Watanabe <reijiw@google.com>
+Not really. Or rather, this is a pretty involved process: you'd need
+to stop the guest, perform a save operation on the ITS (as if you were
+doing a migration), and then introspect the ITS tables to find whether
+there is a mapping for each of the possible events generated by the
+device. Clearly, that's overkill.
+
+A better approach would be to be able to retrieve an individual
+mapping, using a new API that would be similar to KVM_SIGNAL_MSI. It
+would take the same kvm_msi structure as input, and retrieving the
+{LPI, CPU} pair or an error if there is no mapping.
+
+Thanks,
+
+	M.
+
+--=20
+Without deviation from the norm, progress is not possible.
