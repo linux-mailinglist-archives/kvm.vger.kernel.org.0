@@ -2,37 +2,67 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 36428572DD5
-	for <lists+kvm@lfdr.de>; Wed, 13 Jul 2022 08:02:50 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 4E516572DE9
+	for <lists+kvm@lfdr.de>; Wed, 13 Jul 2022 08:10:01 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234107AbiGMGCt (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 13 Jul 2022 02:02:49 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41224 "EHLO
+        id S234232AbiGMGJ7 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 13 Jul 2022 02:09:59 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46754 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230445AbiGMGCr (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 13 Jul 2022 02:02:47 -0400
-Received: from gandalf.ozlabs.org (mail.ozlabs.org [IPv6:2404:9400:2221:ea00::3])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 01D4A5006E;
-        Tue, 12 Jul 2022 23:02:45 -0700 (PDT)
-Received: from authenticated.ozlabs.org (localhost [127.0.0.1])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange ECDHE (P-256) server-signature RSA-PSS (4096 bits) server-digest SHA256)
-        (No client certificate requested)
-        by mail.ozlabs.org (Postfix) with ESMTPSA id 4LjRqM46T0z4xZD;
-        Wed, 13 Jul 2022 16:02:39 +1000 (AEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=canb.auug.org.au;
-        s=201702; t=1657692161;
-        bh=EizAc07LAFfcO/KRLoZZdNMjii3lpN/aMpY4/BYi71I=;
-        h=Date:From:To:Cc:Subject:From;
-        b=nNM3gYhOqPb3sxn1bPbCGSeQDRc8ldfgQK7wbOYaSpF66lw/0IoOLngiXwcbvUNlX
-         xJRXIHnRv0AexotmDeromG7WpZ7wGgB/0rTjLOEnTsoHDZzUbqJ1fRuaujX7fm2BRZ
-         L777q77MG91LM7WF01t5c7O0I+wFjTZU7KKJWslEoaCTo/OJxwHzPJfq1jGlZvlRGm
-         Ss5rIahSmijIw2omG21xDzD8vIlVou41oBBtU2v4b2V0+ZyIaCZBvA3ETHZtThfCOV
-         518cq0iJN7RNQbWMZoCtnV/QBvDVsuqQtOd48U300ANTEEknxeXhSnN2qSTq/J5S0t
-         sxNKDtzmjJwGw==
-Date:   Wed, 13 Jul 2022 16:02:38 +1000
-From:   Stephen Rothwell <sfr@canb.auug.org.au>
-To:     Paolo Bonzini <pbonzini@redhat.com>, KVM <kvm@vger.kernel.org>
+        with ESMTP id S234005AbiGMGJ5 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 13 Jul 2022 02:09:57 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 04622C7485
+        for <kvm@vger.kernel.org>; Tue, 12 Jul 2022 23:09:56 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1657692596;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=rycGqxN/Gg4LcgOpWK/Qy+DWH4iGydCM0L3/eUzUN/k=;
+        b=PU5vk46Mh3Ne75EJXg4gH+flQ/JQ+Ha8bRQrIs+yKbgZJHExfdraGcij089pxLKEX8+rI0
+        jbucv5V/U/AWK3v6ZSCfFDfI0NRLhDdnoMJHDb2I4KGGHYmYoZU0EkeJOAWsQOuWbeFB3H
+        cPDnBZvrK2oHrTe0h6d4kqsv8NfeyLg=
+Received: from mail-ed1-f72.google.com (mail-ed1-f72.google.com
+ [209.85.208.72]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-78-yK0Y7FyxN-SGMnUNsMLXtg-1; Wed, 13 Jul 2022 02:09:54 -0400
+X-MC-Unique: yK0Y7FyxN-SGMnUNsMLXtg-1
+Received: by mail-ed1-f72.google.com with SMTP id s17-20020a056402521100b0043ade613038so4429765edd.17
+        for <kvm@vger.kernel.org>; Tue, 12 Jul 2022 23:09:54 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
+         :content-language:to:cc:references:from:in-reply-to
+         :content-transfer-encoding;
+        bh=rycGqxN/Gg4LcgOpWK/Qy+DWH4iGydCM0L3/eUzUN/k=;
+        b=W2mGZghgBkezxlEuB8hm8yJWGpuPDu466H9ANqHQ59YcEqkUZjAvai/LUM9LZfSp29
+         2Okr0ZUF/e87L65p4XlxbP6Al381m8swRi6/s6I9GYG0A4yioJ1v+JRE94l4u2lsmvkw
+         Gs8U+HMhMqRhGBAz2khEq7VqJ9cKuTVc/P5jrO9tsmx33vDi0LtAkqaxEKr9WVMbqdR0
+         DgHrBvnYiymHZkv/vN6oOQFkwtg4lcbfmWlHRTxwTg43C3AbTDdUHgfbzGXVo99WXR8W
+         ERYOwYdMsTQvxYunXgME4f7/JYSOaJioleBGgC7Q6KPj9B7UAgOAUxckMnoTKMybHEDN
+         7iuw==
+X-Gm-Message-State: AJIora+Z5m5VFbB1+NuWG0MBs8Mnpr2Ffmm7rvPk63p/jeq1s7tN2mQl
+        XvjmwBWFZzklhY0eBnyE1GO1Xm3T+x7+bA9DXvT6UbAGevypsAzhQrmklmdr6GqtsmWpQsKOX8x
+        x9dQcQVK1UNRd
+X-Received: by 2002:a17:906:8475:b0:72b:12c7:effe with SMTP id hx21-20020a170906847500b0072b12c7effemr1745558ejc.337.1657692593451;
+        Tue, 12 Jul 2022 23:09:53 -0700 (PDT)
+X-Google-Smtp-Source: AGRyM1ul7GlkRy7udbTX/Vs/6L1EBonL23POvjBUN7N0DNV2mt6ZMpvJB3ZgWypD78EGz8spBLMv7w==
+X-Received: by 2002:a17:906:8475:b0:72b:12c7:effe with SMTP id hx21-20020a170906847500b0072b12c7effemr1745544ejc.337.1657692593275;
+        Tue, 12 Jul 2022 23:09:53 -0700 (PDT)
+Received: from ?IPV6:2001:b07:6468:f312:9af8:e5f5:7516:fa89? ([2001:b07:6468:f312:9af8:e5f5:7516:fa89])
+        by smtp.googlemail.com with ESMTPSA id ky18-20020a170907779200b00715a02874acsm4516224ejc.35.2022.07.12.23.09.51
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 12 Jul 2022 23:09:52 -0700 (PDT)
+Message-ID: <c2a3fc9c-82e7-939c-b183-6dd57ccf9444@redhat.com>
+Date:   Wed, 13 Jul 2022 08:09:49 +0200
+MIME-Version: 1.0
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.10.0
+Subject: Re: linux-next: manual merge of the kvm tree with Linus' tree
+Content-Language: en-US
+To:     Stephen Rothwell <sfr@canb.auug.org.au>, KVM <kvm@vger.kernel.org>
 Cc:     Borislav Petkov <bp@suse.de>, Josh Poimboeuf <jpoimboe@kernel.org>,
         Kan Liang <kan.liang@linux.intel.com>,
         Like Xu <likexu@tencent.com>,
@@ -40,90 +70,35 @@ Cc:     Borislav Petkov <bp@suse.de>, Josh Poimboeuf <jpoimboe@kernel.org>,
         Linux Next Mailing List <linux-next@vger.kernel.org>,
         Luwei Kang <luwei.kang@intel.com>,
         "Peter Zijlstra (Intel)" <peterz@infradead.org>
-Subject: linux-next: manual merge of the kvm tree with Linus' tree
-Message-ID: <20220713160238.3bfcdb26@canb.auug.org.au>
-MIME-Version: 1.0
-Content-Type: multipart/signed; boundary="Sig_/ZHKigaZCMFOD5BtFXR=nl80";
- protocol="application/pgp-signature"; micalg=pgp-sha256
-X-Spam-Status: No, score=-2.7 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,RCVD_IN_DNSWL_LOW,SPF_HELO_PASS,SPF_PASS,
-        T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
+References: <20220713160238.3bfcdb26@canb.auug.org.au>
+From:   Paolo Bonzini <pbonzini@redhat.com>
+In-Reply-To: <20220713160238.3bfcdb26@canb.auug.org.au>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Spam-Status: No, score=-2.7 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
+        RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE
+        autolearn=unavailable autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
---Sig_/ZHKigaZCMFOD5BtFXR=nl80
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: quoted-printable
+On 7/13/22 08:02, Stephen Rothwell wrote:
+> I didn't know if the new includes needed to be prefixed with "../"
+> as well ... I though it was better safe than sorry.
 
-Hi all,
+If it compiles, it's perfect. :)
 
-Today's linux-next merge of the kvm tree got a conflict in:
+Thanks, I'll check it out and report to Linus the reason for the conflict.
 
-  arch/x86/kvm/vmx/capabilities.h
+Paolo
 
-between commit:
+> I fixed it up (see below) and can carry the fix as necessary. This
+> is now fixed as far as linux-next is concerned, but any non trivial
+> conflicts should be mentioned to your upstream maintainer when your tree
+> is submitted for merging.  You may also want to consider cooperating
+> with the maintainer of the conflicting tree to minimise any particularly
+> complex conflicts.
 
-  07853adc29a0 ("KVM: VMX: Prevent RSB underflow before vmenter")
-
-from Linus' tree and commits:
-
-  cf8e55fe50df ("KVM: x86/pmu: Expose CPUIDs feature bits PDCM, DS, DTES64")
-  6ef25aa0a961 ("KVM: x86/pmu: Restrict advanced features based on module e=
-nable_pmu")
-
-from the kvm tree.
-
-I didn't know if the new includes needed to be prefixed with "../"
-as well ... I though it was better safe than sorry.
-
-I fixed it up (see below) and can carry the fix as necessary. This
-is now fixed as far as linux-next is concerned, but any non trivial
-conflicts should be mentioned to your upstream maintainer when your tree
-is submitted for merging.  You may also want to consider cooperating
-with the maintainer of the conflicting tree to minimise any particularly
-complex conflicts.
-
---=20
-Cheers,
-Stephen Rothwell
-
-diff --cc arch/x86/kvm/vmx/capabilities.h
-index c0e24826a86f,069d8d298e1d..000000000000
---- a/arch/x86/kvm/vmx/capabilities.h
-+++ b/arch/x86/kvm/vmx/capabilities.h
-@@@ -4,8 -4,10 +4,10 @@@
- =20
-  #include <asm/vmx.h>
- =20
- -#include "lapic.h"
- -#include "x86.h"
- -#include "pmu.h"
- -#include "cpuid.h"
- +#include "../lapic.h"
- +#include "../x86.h"
-++#include "../pmu.h"
-++#include "../cpuid.h"
- =20
-  extern bool __read_mostly enable_vpid;
-  extern bool __read_mostly flexpriority_enabled;
-
---Sig_/ZHKigaZCMFOD5BtFXR=nl80
-Content-Type: application/pgp-signature
-Content-Description: OpenPGP digital signature
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEENIC96giZ81tWdLgKAVBC80lX0GwFAmLOX/4ACgkQAVBC80lX
-0Gy/3wf5AazZxPj4X8/DKHUmsdcwhIzbvB/LLirWIHbO37UqcDpmZGqFdeujf98j
-CsTdftXRhA55iE8HITLrvnsTaggoj/W9yrGH6vfYwOvnCLPu4lSQ5YA8IPPe628x
-TF2GJeV7G2NcpCcrxEapJ8RxiwQlYZLj2bwl6XHViCrd7LKbtQJ9qi7S0kn1z5X1
-NqwygQjGElySzjYJvn7kww82qcrFgrC1SC/xZsWJSVZDtdsc0NDEqp25ZpWXcJde
-cbH+Khv2L2nQwHABYcQktC6P6tHih9s/pijzdwP3EZ9xQFG7c6+Rk1Z34zi46CLY
-rDLbeNT3bIbBzEpLtMjLe9GTVKliRQ==
-=7gAS
------END PGP SIGNATURE-----
-
---Sig_/ZHKigaZCMFOD5BtFXR=nl80--
