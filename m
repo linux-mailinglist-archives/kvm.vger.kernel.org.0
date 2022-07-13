@@ -2,121 +2,129 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 2A5A5573E93
-	for <lists+kvm@lfdr.de>; Wed, 13 Jul 2022 23:11:42 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id BA020574036
+	for <lists+kvm@lfdr.de>; Thu, 14 Jul 2022 01:52:36 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231409AbiGMVLl (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 13 Jul 2022 17:11:41 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33744 "EHLO
+        id S231743AbiGMXwe (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 13 Jul 2022 19:52:34 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58746 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S236931AbiGMVLk (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 13 Jul 2022 17:11:40 -0400
-Received: from mail-pg1-x535.google.com (mail-pg1-x535.google.com [IPv6:2607:f8b0:4864:20::535])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D0BAA33371
-        for <kvm@vger.kernel.org>; Wed, 13 Jul 2022 14:11:39 -0700 (PDT)
-Received: by mail-pg1-x535.google.com with SMTP id 23so11543245pgc.8
-        for <kvm@vger.kernel.org>; Wed, 13 Jul 2022 14:11:39 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=Gm6WM9hDERFO+8ASfgwNqGJkZQjABrHSoY+dp8PEOqA=;
-        b=A0tW7cBYVTBbk4/OGxo7p7TX9vbmu3nihl3xRQxabibyWP8JCSwapJDOv0U5ez/B7q
-         9ZpqLuxj222EyJrfebfx83YvFysxF3AVeuBHvPoeneEz/dTgdIO78Ap47jLgPAJ1C2u0
-         C68Ct0nJvS/dKmykmI5xJMtsvxiG6MkYcMz5U+Hrpm6KCK/7kNFuBKnvG9/u0M3U9QDb
-         a9bHLWC1DOgGxxnPa7Gl5ygccxj6S3DKTjsKmGQqRdg/F6+wDEFTMfJVzwx+WgvUzLj7
-         PsD+5WvkpayUOB/XoYR/kHDArYhHqmfv3m71jkg88AIbOYpkZJHQy+0W+8y/Gjbr6Pb5
-         ttAw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=Gm6WM9hDERFO+8ASfgwNqGJkZQjABrHSoY+dp8PEOqA=;
-        b=wFiQMyy8vX3tcUzYP6O/HyOSM/aYfb2qEOlit3ZTbID3TeSPZYmyshGCQYgvNLWM0R
-         jrJqHYwzuI/6fjd3u2hClZeBMBaZWh+j6uBi+eAF9RWF9ZI/2OwKbNoA/tsv0NX6nAmp
-         Us39zS8kZiyzOHegXgcdy/ynUdBWAC+cqT/OM6YoszIYwuGuTUygT8J1X62TgRKA+7mG
-         yov5NpPrnPK+IEDCKIIZmMx9C9CAbHM0coIPuJZwcxg6M3aG0Wl02EuaSZu0p2+fuZad
-         FDxGsNcNFEgMN9jqhqFUqjhLFIgAjvR54AwjYO32sPl+50X7OtZ3IRA5beKkaHM6HCd3
-         BClw==
-X-Gm-Message-State: AJIora+XyW9p/Toz63qqEoaXa7ILHhlH6PsT78HCTX1jDZ0FJe25xMR0
-        Jh/wHjijwoa+cjgx2PzRg2V9LA==
-X-Google-Smtp-Source: AGRyM1vnNMUj1Yojr03HQ23q3BKKyDBLNwlrE0ptf5QVzHWvINAz08pbCRuFm0bnJQpWgleIKveIiQ==
-X-Received: by 2002:a63:854a:0:b0:419:64c6:5f9e with SMTP id u71-20020a63854a000000b0041964c65f9emr4628625pgd.139.1657746698979;
-        Wed, 13 Jul 2022 14:11:38 -0700 (PDT)
-Received: from google.com (123.65.230.35.bc.googleusercontent.com. [35.230.65.123])
-        by smtp.gmail.com with ESMTPSA id z9-20020aa79e49000000b005253bf1e4d0sm9303668pfq.24.2022.07.13.14.11.38
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 13 Jul 2022 14:11:38 -0700 (PDT)
-Date:   Wed, 13 Jul 2022 21:11:34 +0000
-From:   Sean Christopherson <seanjc@google.com>
-To:     Jinpu Wang <jinpu.wang@ionos.com>
-Cc:     Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        stable <stable@vger.kernel.org>, Sasha Levin <sashal@kernel.org>,
-        kvm@vger.kernel.org
-Subject: Re: 5.10.131-rc1 crash with int3: RIP 0010:xaddw_ax_dx+0x9/0x10 [kvm]
-Message-ID: <Ys81Bor99YlUrM0k@google.com>
-References: <CAMGffEm9y0wnn8LNS9Qo3obPhs0GD5iJZ0WejFzC4baGPDsYTw@mail.gmail.com>
- <CAMGffEnTobhKvwKcRTnSz1JgNBVeTTtbOvP2OtAMgceqOOhN4A@mail.gmail.com>
- <Ys7CFYqA62YcIFiT@kroah.com>
- <CAMGffEmdqz-ggqkHOwddu7bTPBs47tY-5cSi58qvYwPmxrYumg@mail.gmail.com>
+        with ESMTP id S230371AbiGMXwc (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 13 Jul 2022 19:52:32 -0400
+Received: from mga05.intel.com (mga05.intel.com [192.55.52.43])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 31ABE52DF2;
+        Wed, 13 Jul 2022 16:52:31 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1657756351; x=1689292351;
+  h=date:from:to:cc:subject:message-id:reply-to:references:
+   mime-version:in-reply-to;
+  bh=d4b95Nutiv+fVkeoTmmbeGdels6G19ALZ7QCpFCTTwc=;
+  b=ec0iUFs99XSrMBcTD4mfXpTGHIwEqAsiwpuU0GWzLKvYLXib/Azi8/Ly
+   9SiWuFCJyvAZfo7rLKu5nf79sZvP+XJ6uh10Bz4eaKKMTjP83DO/NRwwk
+   m2H19M4PddgwWJsAoRb8+MPNz4kFHILwnuhNGexn3kqyeiEwcLlDCXmaR
+   f/0qxuApQRvbaQdu1Pxx0cgYHtScpq0DVs3CUY6sQAG+li45pLMiuilKj
+   9aEC94fvRy0+sWgWzOfKcnrFNwVTXXH0vp4CRxjh+iFcQB6PrH+VabVvQ
+   mFbVzKYeTFIA9a93CFf+yAD4urjaNXi2VrlFY5v1J6eCWO7OiDlGD4o6Y
+   w==;
+X-IronPort-AV: E=McAfee;i="6400,9594,10407"; a="371685475"
+X-IronPort-AV: E=Sophos;i="5.92,269,1650956400"; 
+   d="scan'208";a="371685475"
+Received: from orsmga007.jf.intel.com ([10.7.209.58])
+  by fmsmga105.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 13 Jul 2022 16:52:30 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.92,269,1650956400"; 
+   d="scan'208";a="593176855"
+Received: from chaop.bj.intel.com (HELO localhost) ([10.240.192.101])
+  by orsmga007.jf.intel.com with ESMTP; 13 Jul 2022 16:52:20 -0700
+Date:   Thu, 14 Jul 2022 07:49:03 +0800
+From:   Chao Peng <chao.p.peng@linux.intel.com>
+To:     "Gupta, Pankaj" <pankaj.gupta@amd.com>
+Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+        linux-mm@kvack.org, linux-fsdevel@vger.kernel.org,
+        linux-api@vger.kernel.org, linux-doc@vger.kernel.org,
+        qemu-devel@nongnu.org, linux-kselftest@vger.kernel.org,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Jonathan Corbet <corbet@lwn.net>,
+        Sean Christopherson <seanjc@google.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+        x86@kernel.org, "H . Peter Anvin" <hpa@zytor.com>,
+        Hugh Dickins <hughd@google.com>,
+        Jeff Layton <jlayton@kernel.org>,
+        "J . Bruce Fields" <bfields@fieldses.org>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        Shuah Khan <shuah@kernel.org>, Mike Rapoport <rppt@kernel.org>,
+        Steven Price <steven.price@arm.com>,
+        "Maciej S . Szmigiero" <mail@maciej.szmigiero.name>,
+        Vlastimil Babka <vbabka@suse.cz>,
+        Vishal Annapurve <vannapurve@google.com>,
+        Yu Zhang <yu.c.zhang@linux.intel.com>,
+        "Kirill A . Shutemov" <kirill.shutemov@linux.intel.com>,
+        luto@kernel.org, jun.nakajima@intel.com, dave.hansen@intel.com,
+        ak@linux.intel.com, david@redhat.com, aarcange@redhat.com,
+        ddutile@redhat.com, dhildenb@redhat.com,
+        Quentin Perret <qperret@google.com>,
+        Michael Roth <michael.roth@amd.com>, mhocko@suse.com,
+        Muchun Song <songmuchun@bytedance.com>
+Subject: Re: [PATCH v7 04/14] mm/shmem: Support memfile_notifier
+Message-ID: <20220713234903.GA2881285@chaop.bj.intel.com>
+Reply-To: Chao Peng <chao.p.peng@linux.intel.com>
+References: <20220706082016.2603916-1-chao.p.peng@linux.intel.com>
+ <20220706082016.2603916-5-chao.p.peng@linux.intel.com>
+ <c4112b84-9359-d4c8-1852-0057c074607c@amd.com>
+ <20220713074458.GB2831541@chaop.bj.intel.com>
+ <74097857-1908-2ff2-1e54-bf7e658ea6c6@amd.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <CAMGffEmdqz-ggqkHOwddu7bTPBs47tY-5cSi58qvYwPmxrYumg@mail.gmail.com>
-X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-        T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL
-        autolearn=unavailable autolearn_force=no version=3.4.6
+In-Reply-To: <74097857-1908-2ff2-1e54-bf7e658ea6c6@amd.com>
+X-Spam-Status: No, score=-4.9 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,SPF_HELO_NONE,
+        SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no
+        version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Jul 13, 2022, Jinpu Wang wrote:
-> On Wed, Jul 13, 2022 at 3:01 PM Greg Kroah-Hartman
-> <gregkh@linuxfoundation.org> wrote:
-> >
-> > On Wed, Jul 13, 2022 at 02:26:44PM +0200, Jinpu Wang wrote:
-> > > On Wed, Jul 13, 2022 at 12:49 PM Jinpu Wang <jinpu.wang@ionos.com> wrote:
-> > > > #5.10.131-1+feature+linux+5.10.y+20220712.1850+30f4172c~deb11
-
-...
-
-> > > > [ 1895.979325] Call Trace:
-> > > > [ 1895.979325]  ? fastop+0x59/0xa0 [kvm]
-> > > > [ 1895.979326]  ? x86_emulate_insn+0x73a/0xe00 [kvm]
-> > > > [ 1895.979326]  ? x86_emulate_instruction+0x2d0/0x750 [kvm]
-> > > > [ 1895.979326]  ? vmx_vcpu_load+0x21/0x70 [kvm_intel]
-> > > > [ 1895.979327]  ? complete_emulated_mmio+0x236/0x310 [kvm]
-> > > > [ 1895.979327]  ? kvm_arch_vcpu_ioctl_run+0x1744/0x1920 [kvm]
-> > > > [ 1895.979327]  ? kvm_vcpu_ioctl+0x211/0x5a0 [kvm]
-> > > > [ 1895.979328]  ? __fget_files+0x79/0xb0
-> > > > [ 1895.979328]  ? __fget_files+0x79/0xb0
-> > > > [ 1895.979328]  ? __x64_sys_ioctl+0x8b/0xc0
-> > > > [ 1895.979329]  ? do_syscall_64+0x33/0x40
-> > > > [ 1895.979329]  ? entry_SYSCALL_64_after_hwframe+0x61/0xc6
-
-...
-
-> > > > Is this bug known, any hint how to fix it?
-> > > I did more tests on different Servers, so far all the machine
-> > > checked(Skylake/Icelake/Haswell/Broadwell/EPYC) crash immediately
-> > > except AMD Opteron.
-> > > kvm-unit-tests succeeded without regression.
-> >
-> > Same issue on Linus's tree right now as well?  Or does that pass just
-> > fine?
+On Wed, Jul 13, 2022 at 12:01:13PM +0200, Gupta, Pankaj wrote:
 > 
-> Hi Greg,
+> > > > +#ifdef CONFIG_MIGRATION
+> > > > +static int shmem_migrate_page(struct address_space *mapping,
+> > > > +			      struct page *newpage, struct page *page,
+> > > > +			      enum migrate_mode mode)
+> > > > +{
+> > > > +	struct inode *inode = mapping->host;
+> > > > +	struct shmem_inode_info *info = SHMEM_I(inode);
+> > > > +
+> > > > +	if (info->memfile_node.flags & MEMFILE_F_UNMOVABLE)
+> > > > +		return -EOPNOTSUPP;
+> > > > +	return migrate_page(mapping, newpage, page, mode);
+> > > 
+> > > Wondering how well page migrate would work for private pages
+> > > on shmem memfd based backend?
+> > 
+> >  From high level:
+> >    - KVM unset MEMFILE_F_UNMOVABLE bit to indicate it capable of
+> >      migrating a page.
+> >    - Introduce new 'migrate' callback(s) to memfile_notifier_ops for KVM
+> >      to register.
+> >    - The callback is hooked to migrate_page() here.
+> >    - Once page migration requested, shmem calls into the 'migrate'
+> >      callback(s) to perform additional steps for encrypted memory (For
+> >      TDX we will call TDH.MEM.PAGE.RELOCATE).
 > 
-> I haven't try linus tree, but just tried 5.15.55-rc1 on Intel Skylake,
-> it crashed the same.
+> Yes, that would require additional (protocol specific) handling for private
+> pages. Was trying to find where "MEMFILE_F_UNMOVABLE" flag is set currently?
+
+It's set with memfile_register_notifier() in patch 13.
+
 > 
-> I will give Linus tree a try.
-
-Looks like fastop() got broken by the retbleed mitigations, i.e. this isn't unique
-to stable trees.
-
-https://lore.kernel.org/all/20220713171241.184026-1-cascardo@canonical.com
+> Thanks,
+> Pankaj
