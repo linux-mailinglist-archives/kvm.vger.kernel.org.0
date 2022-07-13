@@ -2,81 +2,48 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id A1A50572DD1
-	for <lists+kvm@lfdr.de>; Wed, 13 Jul 2022 08:00:17 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id B2FAE572DD2
+	for <lists+kvm@lfdr.de>; Wed, 13 Jul 2022 08:02:20 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231917AbiGMGAQ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 13 Jul 2022 02:00:16 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39840 "EHLO
+        id S232841AbiGMGCS (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 13 Jul 2022 02:02:18 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40698 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230445AbiGMGAN (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 13 Jul 2022 02:00:13 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 3EEA654660
-        for <kvm@vger.kernel.org>; Tue, 12 Jul 2022 23:00:13 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1657692012;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=fAB+fzgqpii87zwJYPvAgT3WrxuSqJ6Z616wMWBAEuA=;
-        b=eYddPereKqbwxseiLRREjVLbueJNCFgdqywSFS6KIWHs/Z1cPduhon3cZIY4rnOPVr/Jf2
-        o5XBQLit/DuvimwWWes4PEbJwEexCfjC45yt6Eh08m+6HMP13UtCddMoopb7u1SGh7pfvp
-        I26sWAVh5Ff/n2svizC5PRymA/NiobU=
-Received: from mail-ed1-f69.google.com (mail-ed1-f69.google.com
- [209.85.208.69]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-540-a6c9kh2ZMEqI9hj5_vZWhw-1; Wed, 13 Jul 2022 02:00:06 -0400
-X-MC-Unique: a6c9kh2ZMEqI9hj5_vZWhw-1
-Received: by mail-ed1-f69.google.com with SMTP id z5-20020a05640235c500b0043ae18edeeeso4037908edc.5
-        for <kvm@vger.kernel.org>; Tue, 12 Jul 2022 23:00:06 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:message-id:date:mime-version:user-agent
-         :content-language:to:cc:references:from:subject:in-reply-to
-         :content-transfer-encoding;
-        bh=fAB+fzgqpii87zwJYPvAgT3WrxuSqJ6Z616wMWBAEuA=;
-        b=mhk+ima/43pgUaslLq+qUvlKpBfg4Z8tiV/GKDYgYIROTC41DdoYZnhkngIG+x0UAB
-         y1DKDOz6cdqW0FKZ3DoxiK+yB0z4SPPT7rsijRAgCb2alUJDpOkW/Vn3wffHwBDgnw7Z
-         9454NHRikRw9Eux1ybmh7LLYI/R7Kn5Kyh77UXMapWl8ZTZEMk4edHryIyH+KOcvszxr
-         g+MA3xk9kZ21d0rerLYwYQipX3Bsn9aFltakMmu5Zv9QnxBvNqv5T9VX6GrcIAJsnkmJ
-         yE6wdqRiC5WGa7vBeNTUhvz+SePQ8QwG8T0KQQYeM2FpJFuvZEB6Qo2NUsAljQ6w2L/O
-         RR+Q==
-X-Gm-Message-State: AJIora/1mMbmZ2XGHbXlTaNDJaaBK8US74OLuWYiz7KL63+4p9be/VFi
-        tpxXMZmmvmh9yX505Aqb+ih9cHTt002emCFHcRjhCQvkZiTQcYsoq3K2lTES64z3tl7dBqD+K8l
-        9L8H1b2v3xouE
-X-Received: by 2002:a17:907:7f8e:b0:726:41df:cbc6 with SMTP id qk14-20020a1709077f8e00b0072641dfcbc6mr1838116ejc.230.1657692005044;
-        Tue, 12 Jul 2022 23:00:05 -0700 (PDT)
-X-Google-Smtp-Source: AGRyM1tRIZh3VheoWSCPA14LoWhV4jqxvo/RDpgqW20v0Gpf4kuo3kp2wtRzRQC6r1uN2p0xfLziOw==
-X-Received: by 2002:a17:907:7f8e:b0:726:41df:cbc6 with SMTP id qk14-20020a1709077f8e00b0072641dfcbc6mr1838098ejc.230.1657692004835;
-        Tue, 12 Jul 2022 23:00:04 -0700 (PDT)
-Received: from ?IPV6:2001:b07:6468:f312:9af8:e5f5:7516:fa89? ([2001:b07:6468:f312:9af8:e5f5:7516:fa89])
-        by smtp.googlemail.com with ESMTPSA id bd27-20020a056402207b00b0043a21e3b4a5sm7341454edb.40.2022.07.12.23.00.02
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 12 Jul 2022 23:00:03 -0700 (PDT)
-Message-ID: <01ec025d-fbde-5e58-2221-a368d4e1bb3a@redhat.com>
-Date:   Wed, 13 Jul 2022 08:00:02 +0200
+        with ESMTP id S230445AbiGMGCR (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 13 Jul 2022 02:02:17 -0400
+Received: from szxga02-in.huawei.com (szxga02-in.huawei.com [45.249.212.188])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A6D114F6AC;
+        Tue, 12 Jul 2022 23:02:16 -0700 (PDT)
+Received: from kwepemi500016.china.huawei.com (unknown [172.30.72.53])
+        by szxga02-in.huawei.com (SkyGuard) with ESMTP id 4LjRkY2gqlzVfp7;
+        Wed, 13 Jul 2022 13:58:29 +0800 (CST)
+Received: from [10.40.193.166] (10.40.193.166) by
+ kwepemi500016.china.huawei.com (7.221.188.220) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2375.24; Wed, 13 Jul 2022 14:02:10 +0800
+Subject: Re: [QUESTION] Exception print when enabling GICv4
+To:     Marc Zyngier <maz@kernel.org>
+References: <6d6d61fb-6241-4e1e-ddff-8ae8be96f9ff@hisilicon.com>
+ <87bktu1hfj.wl-maz@kernel.org>
+CC:     Alex Williamson <alex.williamson@redhat.com>,
+        <pbonzini@redhat.com>, <kvm@vger.kernel.org>,
+        chenxiang via <qemu-devel@nongnu.org>,
+        linux-kernel <linux-kernel@vger.kernel.org>
+From:   "chenxiang (M)" <chenxiang66@hisilicon.com>
+Message-ID: <13e4fde9-05e9-f492-a2b6-20d567eb2920@hisilicon.com>
+Date:   Wed, 13 Jul 2022 14:02:10 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:45.0) Gecko/20100101
+ Thunderbird/45.2.0
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.10.0
-Content-Language: en-US
-To:     Anup Patel <anup@brainfault.org>
-Cc:     Palmer Dabbelt <palmer@dabbelt.com>,
-        Atish Patra <atishp@atishpatra.org>,
-        KVM General <kvm@vger.kernel.org>,
-        "open list:KERNEL VIRTUAL MACHINE FOR RISC-V (KVM/riscv)" 
-        <kvm-riscv@lists.infradead.org>,
-        linux-riscv <linux-riscv@lists.infradead.org>
-References: <CAAhSdy1CAtr=mAVFtduTcED_Sjp2=4duQwgL5syxZ-sYM6SoWQ@mail.gmail.com>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-Subject: Re: [GIT PULL] KVM/riscv fixes for 5.19, take #2
-In-Reply-To: <CAAhSdy1CAtr=mAVFtduTcED_Sjp2=4duQwgL5syxZ-sYM6SoWQ@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-2.7 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
-        RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE
+In-Reply-To: <87bktu1hfj.wl-maz@kernel.org>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
+Content-Transfer-Encoding: 8bit
+X-Originating-IP: [10.40.193.166]
+X-ClientProxiedBy: dggems703-chm.china.huawei.com (10.3.19.180) To
+ kwepemi500016.china.huawei.com (7.221.188.220)
+X-CFilter-Loop: Reflected
+X-Spam-Status: No, score=-4.2 required=5.0 tests=BAYES_00,NICE_REPLY_A,
+        RCVD_IN_DNSWL_MED,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
         autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -84,21 +51,64 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 7/13/22 07:47, Anup Patel wrote:
-> Hi Paolo,
-> 
-> We have two more fixes for 5.19 which were discovered recently:
-> 1) Fix missing PAGE_PFN_MASK
-> 2) Fix SRCU deadlock caused by kvm_riscv_check_vcpu_requests()
+Hi Marc,
 
-Pulled, thanks.
+Thank you for your reply.
 
-For the latter, my suggestion is to remove KVM_REQ_SLEEP completely and 
-key the waiting on kvm_arch_vcpu_runnable using kvm_vcpu_halt or 
-kvm_vcpu_block.
+在 2022/7/12 23:25, Marc Zyngier 写道:
+> Hi Xiang,
+>
+> On Tue, 12 Jul 2022 13:55:16 +0100,
+> "chenxiang (M)" <chenxiang66@hisilicon.com> wrote:
+>> Hi,
+>> I encounter a issue related to GICv4 enable on ARM64 platform (kernel
+>> 5.19-rc4, qemu 6.2.0):
+>> We have a accelaration module whose VF has 3 MSI interrupts, and we
+>> passthrough it to virtual machine with following steps:
+>>
+>> echo 0000:79:00.1 > /sys/bus/pci/drivers/hisi_hpre/unbind
+>> echo vfio-pci >
+>> /sys/devices/pci0000\:78/0000\:78\:00.0/0000\:79\:00.1/driver_override
+>> echo 0000:79:00.1 > /sys/bus/pci/drivers_probe
+>>
+>> Then we boot VM with "-device vfio-pci,host=79:00.1,id=net0 \".
+>> When insmod the driver which registers 3 PCI MSI interrupts in VM,
+>> some exception print occur as following:
+>>
+>> vfio-pci 0000:3a:00.1: irq bypass producer (token 000000008f08224d)
+>> registration fails: 66311
+>>
+>> I find that bit[6:4] of register PCI_MSI_FLAGS is 2 (4 MSI interrupts)
+>> though we only register 3 PCI MSI interrupt,
+>>
+>> and only 3 MSI interrupt is activated at last.
+>> It allocates 4 vectors in function vfio_msi_enable() (qemu)  as it
+>> reads the register PCI_MSI_FLAGS.
+>> Later it will  call system call VFIO_DEVICE_SET_IRQS to set forwarding
+>> for those interrupts
+>> using function kvm_vgic_v4_set_forrwarding() as GICv4 is enabled. For
+>> interrupt 0~2, it success to set forwarding as they are already
+>> activated,
+>> but for the 4th interrupt, it is not activated, so ite is not found in
+>> function vgic_its_resolve_lpi(), so above printk occurs.
+>>
+>> It seems that we only allocate and activate 3 MSI interrupts in guest
+>> while it tried to set forwarding for 4 MSI interrupts in host.
+>> Do you have any idea about this issue?
+> I have a hunch: QEMU cannot know that the guest is only using 3 MSIs
+> out of the 4 that the device can use, and PCI/Multi-MSI only has a
+> single enable bit for all MSIs. So it probably iterates over all
+> possible MSIs and enable the forwarding. Since the guest has only
+> created 3 mappings in the virtual ITS, the last call fails. I would
+> expect the guest to still work properly though.
 
-Also, I only had a quick look but it seems like vcpu->arch.pause is 
-never written?
+Yes, that's the reason of exception print.
+Is it possible for QEMU to get the exact number of interrupts guest is 
+using? It seems not.
 
-Paolo
+>
+> Thanks,
+>
+> 	M.
+>
 
