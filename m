@@ -2,113 +2,128 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id B2FAE572DD2
-	for <lists+kvm@lfdr.de>; Wed, 13 Jul 2022 08:02:20 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 36428572DD5
+	for <lists+kvm@lfdr.de>; Wed, 13 Jul 2022 08:02:50 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232841AbiGMGCS (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 13 Jul 2022 02:02:18 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40698 "EHLO
+        id S234107AbiGMGCt (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 13 Jul 2022 02:02:49 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41224 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230445AbiGMGCR (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 13 Jul 2022 02:02:17 -0400
-Received: from szxga02-in.huawei.com (szxga02-in.huawei.com [45.249.212.188])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A6D114F6AC;
-        Tue, 12 Jul 2022 23:02:16 -0700 (PDT)
-Received: from kwepemi500016.china.huawei.com (unknown [172.30.72.53])
-        by szxga02-in.huawei.com (SkyGuard) with ESMTP id 4LjRkY2gqlzVfp7;
-        Wed, 13 Jul 2022 13:58:29 +0800 (CST)
-Received: from [10.40.193.166] (10.40.193.166) by
- kwepemi500016.china.huawei.com (7.221.188.220) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2375.24; Wed, 13 Jul 2022 14:02:10 +0800
-Subject: Re: [QUESTION] Exception print when enabling GICv4
-To:     Marc Zyngier <maz@kernel.org>
-References: <6d6d61fb-6241-4e1e-ddff-8ae8be96f9ff@hisilicon.com>
- <87bktu1hfj.wl-maz@kernel.org>
-CC:     Alex Williamson <alex.williamson@redhat.com>,
-        <pbonzini@redhat.com>, <kvm@vger.kernel.org>,
-        chenxiang via <qemu-devel@nongnu.org>,
-        linux-kernel <linux-kernel@vger.kernel.org>
-From:   "chenxiang (M)" <chenxiang66@hisilicon.com>
-Message-ID: <13e4fde9-05e9-f492-a2b6-20d567eb2920@hisilicon.com>
-Date:   Wed, 13 Jul 2022 14:02:10 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:45.0) Gecko/20100101
- Thunderbird/45.2.0
+        with ESMTP id S230445AbiGMGCr (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 13 Jul 2022 02:02:47 -0400
+Received: from gandalf.ozlabs.org (mail.ozlabs.org [IPv6:2404:9400:2221:ea00::3])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 01D4A5006E;
+        Tue, 12 Jul 2022 23:02:45 -0700 (PDT)
+Received: from authenticated.ozlabs.org (localhost [127.0.0.1])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange ECDHE (P-256) server-signature RSA-PSS (4096 bits) server-digest SHA256)
+        (No client certificate requested)
+        by mail.ozlabs.org (Postfix) with ESMTPSA id 4LjRqM46T0z4xZD;
+        Wed, 13 Jul 2022 16:02:39 +1000 (AEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=canb.auug.org.au;
+        s=201702; t=1657692161;
+        bh=EizAc07LAFfcO/KRLoZZdNMjii3lpN/aMpY4/BYi71I=;
+        h=Date:From:To:Cc:Subject:From;
+        b=nNM3gYhOqPb3sxn1bPbCGSeQDRc8ldfgQK7wbOYaSpF66lw/0IoOLngiXwcbvUNlX
+         xJRXIHnRv0AexotmDeromG7WpZ7wGgB/0rTjLOEnTsoHDZzUbqJ1fRuaujX7fm2BRZ
+         L777q77MG91LM7WF01t5c7O0I+wFjTZU7KKJWslEoaCTo/OJxwHzPJfq1jGlZvlRGm
+         Ss5rIahSmijIw2omG21xDzD8vIlVou41oBBtU2v4b2V0+ZyIaCZBvA3ETHZtThfCOV
+         518cq0iJN7RNQbWMZoCtnV/QBvDVsuqQtOd48U300ANTEEknxeXhSnN2qSTq/J5S0t
+         sxNKDtzmjJwGw==
+Date:   Wed, 13 Jul 2022 16:02:38 +1000
+From:   Stephen Rothwell <sfr@canb.auug.org.au>
+To:     Paolo Bonzini <pbonzini@redhat.com>, KVM <kvm@vger.kernel.org>
+Cc:     Borislav Petkov <bp@suse.de>, Josh Poimboeuf <jpoimboe@kernel.org>,
+        Kan Liang <kan.liang@linux.intel.com>,
+        Like Xu <likexu@tencent.com>,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+        Linux Next Mailing List <linux-next@vger.kernel.org>,
+        Luwei Kang <luwei.kang@intel.com>,
+        "Peter Zijlstra (Intel)" <peterz@infradead.org>
+Subject: linux-next: manual merge of the kvm tree with Linus' tree
+Message-ID: <20220713160238.3bfcdb26@canb.auug.org.au>
 MIME-Version: 1.0
-In-Reply-To: <87bktu1hfj.wl-maz@kernel.org>
-Content-Type: text/plain; charset="UTF-8"; format=flowed
-Content-Transfer-Encoding: 8bit
-X-Originating-IP: [10.40.193.166]
-X-ClientProxiedBy: dggems703-chm.china.huawei.com (10.3.19.180) To
- kwepemi500016.china.huawei.com (7.221.188.220)
-X-CFilter-Loop: Reflected
-X-Spam-Status: No, score=-4.2 required=5.0 tests=BAYES_00,NICE_REPLY_A,
-        RCVD_IN_DNSWL_MED,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
-        autolearn=ham autolearn_force=no version=3.4.6
+Content-Type: multipart/signed; boundary="Sig_/ZHKigaZCMFOD5BtFXR=nl80";
+ protocol="application/pgp-signature"; micalg=pgp-sha256
+X-Spam-Status: No, score=-2.7 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,RCVD_IN_DNSWL_LOW,SPF_HELO_PASS,SPF_PASS,
+        T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi Marc,
+--Sig_/ZHKigaZCMFOD5BtFXR=nl80
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: quoted-printable
 
-Thank you for your reply.
+Hi all,
 
-在 2022/7/12 23:25, Marc Zyngier 写道:
-> Hi Xiang,
->
-> On Tue, 12 Jul 2022 13:55:16 +0100,
-> "chenxiang (M)" <chenxiang66@hisilicon.com> wrote:
->> Hi,
->> I encounter a issue related to GICv4 enable on ARM64 platform (kernel
->> 5.19-rc4, qemu 6.2.0):
->> We have a accelaration module whose VF has 3 MSI interrupts, and we
->> passthrough it to virtual machine with following steps:
->>
->> echo 0000:79:00.1 > /sys/bus/pci/drivers/hisi_hpre/unbind
->> echo vfio-pci >
->> /sys/devices/pci0000\:78/0000\:78\:00.0/0000\:79\:00.1/driver_override
->> echo 0000:79:00.1 > /sys/bus/pci/drivers_probe
->>
->> Then we boot VM with "-device vfio-pci,host=79:00.1,id=net0 \".
->> When insmod the driver which registers 3 PCI MSI interrupts in VM,
->> some exception print occur as following:
->>
->> vfio-pci 0000:3a:00.1: irq bypass producer (token 000000008f08224d)
->> registration fails: 66311
->>
->> I find that bit[6:4] of register PCI_MSI_FLAGS is 2 (4 MSI interrupts)
->> though we only register 3 PCI MSI interrupt,
->>
->> and only 3 MSI interrupt is activated at last.
->> It allocates 4 vectors in function vfio_msi_enable() (qemu)  as it
->> reads the register PCI_MSI_FLAGS.
->> Later it will  call system call VFIO_DEVICE_SET_IRQS to set forwarding
->> for those interrupts
->> using function kvm_vgic_v4_set_forrwarding() as GICv4 is enabled. For
->> interrupt 0~2, it success to set forwarding as they are already
->> activated,
->> but for the 4th interrupt, it is not activated, so ite is not found in
->> function vgic_its_resolve_lpi(), so above printk occurs.
->>
->> It seems that we only allocate and activate 3 MSI interrupts in guest
->> while it tried to set forwarding for 4 MSI interrupts in host.
->> Do you have any idea about this issue?
-> I have a hunch: QEMU cannot know that the guest is only using 3 MSIs
-> out of the 4 that the device can use, and PCI/Multi-MSI only has a
-> single enable bit for all MSIs. So it probably iterates over all
-> possible MSIs and enable the forwarding. Since the guest has only
-> created 3 mappings in the virtual ITS, the last call fails. I would
-> expect the guest to still work properly though.
+Today's linux-next merge of the kvm tree got a conflict in:
 
-Yes, that's the reason of exception print.
-Is it possible for QEMU to get the exact number of interrupts guest is 
-using? It seems not.
+  arch/x86/kvm/vmx/capabilities.h
 
->
-> Thanks,
->
-> 	M.
->
+between commit:
 
+  07853adc29a0 ("KVM: VMX: Prevent RSB underflow before vmenter")
+
+from Linus' tree and commits:
+
+  cf8e55fe50df ("KVM: x86/pmu: Expose CPUIDs feature bits PDCM, DS, DTES64")
+  6ef25aa0a961 ("KVM: x86/pmu: Restrict advanced features based on module e=
+nable_pmu")
+
+from the kvm tree.
+
+I didn't know if the new includes needed to be prefixed with "../"
+as well ... I though it was better safe than sorry.
+
+I fixed it up (see below) and can carry the fix as necessary. This
+is now fixed as far as linux-next is concerned, but any non trivial
+conflicts should be mentioned to your upstream maintainer when your tree
+is submitted for merging.  You may also want to consider cooperating
+with the maintainer of the conflicting tree to minimise any particularly
+complex conflicts.
+
+--=20
+Cheers,
+Stephen Rothwell
+
+diff --cc arch/x86/kvm/vmx/capabilities.h
+index c0e24826a86f,069d8d298e1d..000000000000
+--- a/arch/x86/kvm/vmx/capabilities.h
++++ b/arch/x86/kvm/vmx/capabilities.h
+@@@ -4,8 -4,10 +4,10 @@@
+ =20
+  #include <asm/vmx.h>
+ =20
+ -#include "lapic.h"
+ -#include "x86.h"
+ -#include "pmu.h"
+ -#include "cpuid.h"
+ +#include "../lapic.h"
+ +#include "../x86.h"
+++#include "../pmu.h"
+++#include "../cpuid.h"
+ =20
+  extern bool __read_mostly enable_vpid;
+  extern bool __read_mostly flexpriority_enabled;
+
+--Sig_/ZHKigaZCMFOD5BtFXR=nl80
+Content-Type: application/pgp-signature
+Content-Description: OpenPGP digital signature
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEENIC96giZ81tWdLgKAVBC80lX0GwFAmLOX/4ACgkQAVBC80lX
+0Gy/3wf5AazZxPj4X8/DKHUmsdcwhIzbvB/LLirWIHbO37UqcDpmZGqFdeujf98j
+CsTdftXRhA55iE8HITLrvnsTaggoj/W9yrGH6vfYwOvnCLPu4lSQ5YA8IPPe628x
+TF2GJeV7G2NcpCcrxEapJ8RxiwQlYZLj2bwl6XHViCrd7LKbtQJ9qi7S0kn1z5X1
+NqwygQjGElySzjYJvn7kww82qcrFgrC1SC/xZsWJSVZDtdsc0NDEqp25ZpWXcJde
+cbH+Khv2L2nQwHABYcQktC6P6tHih9s/pijzdwP3EZ9xQFG7c6+Rk1Z34zi46CLY
+rDLbeNT3bIbBzEpLtMjLe9GTVKliRQ==
+=7gAS
+-----END PGP SIGNATURE-----
+
+--Sig_/ZHKigaZCMFOD5BtFXR=nl80--
