@@ -2,57 +2,57 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 45D1E573592
+	by mail.lfdr.de (Postfix) with ESMTP id 90498573593
 	for <lists+kvm@lfdr.de>; Wed, 13 Jul 2022 13:36:38 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236193AbiGMLge (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 13 Jul 2022 07:36:34 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58012 "EHLO
+        id S236199AbiGMLgf (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 13 Jul 2022 07:36:35 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58016 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S236120AbiGMLgb (ORCPT <rfc822;kvm@vger.kernel.org>);
+        with ESMTP id S236122AbiGMLgb (ORCPT <rfc822;kvm@vger.kernel.org>);
         Wed, 13 Jul 2022 07:36:31 -0400
 Received: from mx0a-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1E64B1020BC;
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 923B9102722;
         Wed, 13 Jul 2022 04:36:29 -0700 (PDT)
 Received: from pps.filterd (m0098420.ppops.net [127.0.0.1])
-        by mx0b-001b2d01.pphosted.com (8.17.1.5/8.17.1.5) with ESMTP id 26DBL2jK023099;
+        by mx0b-001b2d01.pphosted.com (8.17.1.5/8.17.1.5) with ESMTP id 26DBLQqT023526;
         Wed, 13 Jul 2022 11:36:28 GMT
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=from : to : cc : subject
  : date : message-id : in-reply-to : references : mime-version :
  content-transfer-encoding; s=pp1;
- bh=+RfADs1rGHcuraQl9V4+h6l3S1fxveOM4tk7lNVwkcs=;
- b=ZZIxR1s63h9hG6LGevkCrhmqhjjq6A63f55RSzC2GPyqmBqGxGRpKYqTxi4/xyo/bUHI
- A+Efo/rkHEA+jovez/YujloN35Zd854+oOEk9KInbhYLBJre+rnbhz1e9/uHcqO75f43
- +uNfZLio0dEHSQzfcaUljLL00wMcPGX7NUG6tx28P1Yg9KagpJKZdF0uFa0HRS83nVSN
- mFJjCqporFn/VPxe17zlh7empMCFcjJqVl+L/WlP7ud7mNK92pp1RKjvnOYoMa9A3YVn
- ML2nm4zQw1pOM2D/Q0DpYHJckFWfUQ7C2DYOnnEnzbcaxu1+ZEZpU8sZPG364yUYmQ/g pg== 
+ bh=rFXL5Z38uPZ4gU1+y6hkT7AR9bjyyQrBbbckGUP5koA=;
+ b=bc27VY+cGhewoAUXM4D/oar5TCUxDH63FIeIjBTMylP/uJ/0G/JWtQaARrRyXnWveFLV
+ jpHJXpgRAao3sFsrdGBN7P4x+7znsivsapdCpttGd3dashiWdDmW+rpt0+4gPPP0+Ne2
+ PDkPKfS096ss9JmVIDxHfVqrjTjh93aqOkKkZKHj2tXRIOBwiG49l+tXTcesTL4V7PKV
+ 169I9RBQC/7xvnkku1vqsmYiNdXyqemU4vwV5GaiFINGQPHWLrhHom6Ewx0Sbbc7qqsr
+ jPqv1d6cwP6CSm3yQUEr3vdHzaFwSBZCWBFH6VcM4cuSNbaLhgDuqU1HClJm3knk7psW vw== 
 Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0b-001b2d01.pphosted.com (PPS) with ESMTPS id 3h9w3q8aba-1
+        by mx0b-001b2d01.pphosted.com (PPS) with ESMTPS id 3h9w3q8abq-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
         Wed, 13 Jul 2022 11:36:28 +0000
 Received: from m0098420.ppops.net (m0098420.ppops.net [127.0.0.1])
-        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 26DBMvlo027285;
-        Wed, 13 Jul 2022 11:36:27 GMT
-Received: from ppma06ams.nl.ibm.com (66.31.33a9.ip4.static.sl-reverse.com [169.51.49.102])
-        by mx0b-001b2d01.pphosted.com (PPS) with ESMTPS id 3h9w3q8aa5-1
+        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 26DBPbm8006898;
+        Wed, 13 Jul 2022 11:36:28 GMT
+Received: from ppma02fra.de.ibm.com (47.49.7a9f.ip4.static.sl-reverse.com [159.122.73.71])
+        by mx0b-001b2d01.pphosted.com (PPS) with ESMTPS id 3h9w3q8aae-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
         Wed, 13 Jul 2022 11:36:27 +0000
-Received: from pps.filterd (ppma06ams.nl.ibm.com [127.0.0.1])
-        by ppma06ams.nl.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 26DBaA7D013316;
+Received: from pps.filterd (ppma02fra.de.ibm.com [127.0.0.1])
+        by ppma02fra.de.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 26DBZPMN001133;
         Wed, 13 Jul 2022 11:36:26 GMT
-Received: from b06cxnps4076.portsmouth.uk.ibm.com (d06relay13.portsmouth.uk.ibm.com [9.149.109.198])
-        by ppma06ams.nl.ibm.com with ESMTP id 3h70xhwkpf-1
+Received: from b06avi18878370.portsmouth.uk.ibm.com (b06avi18878370.portsmouth.uk.ibm.com [9.149.26.194])
+        by ppma02fra.de.ibm.com with ESMTP id 3h71a8mup1-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Wed, 13 Jul 2022 11:36:25 +0000
+        Wed, 13 Jul 2022 11:36:26 +0000
 Received: from d06av25.portsmouth.uk.ibm.com (d06av25.portsmouth.uk.ibm.com [9.149.105.61])
-        by b06cxnps4076.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 26DBaMht19726748
+        by b06avi18878370.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 26DBaXag33030524
         (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Wed, 13 Jul 2022 11:36:22 GMT
+        Wed, 13 Jul 2022 11:36:33 GMT
 Received: from d06av25.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id D6BCB11C04A;
-        Wed, 13 Jul 2022 11:36:22 +0000 (GMT)
+        by IMSVA (Postfix) with ESMTP id 2514011C054;
+        Wed, 13 Jul 2022 11:36:23 +0000 (GMT)
 Received: from d06av25.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 9FE2711C04C;
+        by IMSVA (Postfix) with ESMTP id E31A911C050;
         Wed, 13 Jul 2022 11:36:22 +0000 (GMT)
 Received: from t35lp63.lnxne.boe (unknown [9.152.108.100])
         by d06av25.portsmouth.uk.ibm.com (Postfix) with ESMTP;
@@ -60,17 +60,17 @@ Received: from t35lp63.lnxne.boe (unknown [9.152.108.100])
 From:   Nico Boehr <nrb@linux.ibm.com>
 To:     kvm@vger.kernel.org, linux-s390@vger.kernel.org
 Cc:     frankja@linux.ibm.com, imbrenda@linux.ibm.com, thuth@redhat.com
-Subject: [kvm-unit-tests PATCH v1 2/4] s390x: smp: move sigp calls with invalid cpu address to array
-Date:   Wed, 13 Jul 2022 13:36:19 +0200
-Message-Id: <20220713113621.14778-3-nrb@linux.ibm.com>
+Subject: [kvm-unit-tests PATCH v1 3/4] s390x: smp: use an array for sigp calls
+Date:   Wed, 13 Jul 2022 13:36:20 +0200
+Message-Id: <20220713113621.14778-4-nrb@linux.ibm.com>
 X-Mailer: git-send-email 2.35.3
 In-Reply-To: <20220713113621.14778-1-nrb@linux.ibm.com>
 References: <20220713113621.14778-1-nrb@linux.ibm.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-TM-AS-GCONF: 00
-X-Proofpoint-ORIG-GUID: ngh41nVuVWKbelR6izGBdlyXj1VBugsZ
-X-Proofpoint-GUID: nF2OIH7C_4BsclLD0EUbZutb5yl4p_79
+X-Proofpoint-ORIG-GUID: 43P6-9FKvQfzGDP3frBT9Tylx-vn1jN6
+X-Proofpoint-GUID: dU3Qp-17jvOomMOo89MxG9j-B3gl9etF
 X-Proofpoint-Virus-Version: vendor=baseguard
  engine=ICAP:2.0.205,Aquarius:18.0.883,Hydra:6.0.517,FMLib:17.11.122.1
  definitions=2022-07-12_14,2022-07-13_02,2022-06-22_01
@@ -88,68 +88,191 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-We have the nice array to test SIGP calls with invalid CPU addresses.
-Move the SIGP cases there to eliminate some of the duplicated code in
-test_emcall and test_cond_emcall.
+Tests for the SIGP calls are quite similar, so we have a lot of code
+duplication right now. Since upcoming changes will add more cases,
+refactor the code to iterate over an array, similarily as we already do
+for test_invalid().
 
-Since adding coverage for invalid CPU addresses in the ecall case is now
-trivial, do that as well.
+The receiving CPU is disabled for IO interrupts. This makes sure the
+conditional emergency signal is accepted and doesn't hurt the other
+orders.
 
 Signed-off-by: Nico Boehr <nrb@linux.ibm.com>
 ---
- s390x/smp.c | 18 +++---------------
- 1 file changed, 3 insertions(+), 15 deletions(-)
+ s390x/smp.c | 130 ++++++++++++++++++----------------------------------
+ 1 file changed, 44 insertions(+), 86 deletions(-)
 
 diff --git a/s390x/smp.c b/s390x/smp.c
-index 6d474d0d4f99..ea811087587e 100644
+index ea811087587e..857eae206daa 100644
 --- a/s390x/smp.c
 +++ b/s390x/smp.c
-@@ -30,6 +30,9 @@ static const struct sigp_invalid_cases cases_invalid_cpu_addr[] = {
- 	{ SIGP_STOP,                  "stop with invalid CPU address" },
- 	{ SIGP_START,                 "start with invalid CPU address" },
- 	{ SIGP_CPU_RESET,             "reset with invalid CPU address" },
-+	{ SIGP_COND_EMERGENCY_SIGNAL, "conditional emcall with invalid CPU address" },
-+	{ SIGP_EMERGENCY_SIGNAL,      "emcall with invalid CPU address" },
-+	{ SIGP_EXTERNAL_CALL,         "ecall with invalid CPU address" },
- 	{ INVALID_ORDER_CODE,         "invalid order code and CPU address" },
- 	{ SIGP_SENSE,                 "sense with invalid CPU address" },
- 	{ SIGP_STOP_AND_STORE_STATUS, "stop and store status with invalid CPU address" },
-@@ -337,7 +340,6 @@ static void emcall(void)
- static void test_emcall(void)
+@@ -43,6 +43,20 @@ static const struct sigp_invalid_cases cases_valid_cpu_addr[] = {
+ 
+ static uint32_t cpu1_prefix;
+ 
++struct sigp_call_cases {
++	char name[20];
++	int call;
++	uint16_t ext_int_expected_type;
++	uint32_t cr0_bit;
++	bool supports_pv;
++};
++static const struct sigp_call_cases cases_sigp_call[] = {
++	{ "emcall",      SIGP_EMERGENCY_SIGNAL,      0x1201, CTL0_EMERGENCY_SIGNAL, true },
++	{ "cond emcall", SIGP_COND_EMERGENCY_SIGNAL, 0x1201, CTL0_EMERGENCY_SIGNAL, false },
++	{ "ecall",       SIGP_EXTERNAL_CALL,         0x1202, CTL0_EXTERNAL_CALL,    true },
++};
++static const struct sigp_call_cases *current_sigp_call_case;
++
+ static void test_invalid(void)
  {
- 	struct psw psw;
--	int cc;
- 	psw.mask = extract_psw_mask();
- 	psw.addr = (unsigned long)emcall;
+ 	const struct sigp_invalid_cases *c;
+@@ -289,105 +303,51 @@ static void test_set_prefix(void)
  
-@@ -351,13 +353,6 @@ static void test_emcall(void)
- 	wait_for_flag();
- 	smp_cpu_stop(1);
- 
--	report_prefix_push("invalid CPU address");
--
--	cc = sigp(INVALID_CPU_ADDRESS, SIGP_EMERGENCY_SIGNAL, 0, NULL);
--	report(cc == 3, "CC = 3");
--
--	report_prefix_pop();
--
- 	report_prefix_pop();
  }
  
-@@ -376,13 +371,6 @@ static void test_cond_emcall(void)
- 		goto out;
- 	}
- 
--	report_prefix_push("invalid CPU address");
+-static void ecall(void)
+-{
+-	unsigned long mask;
 -
--	cc = sigp(INVALID_CPU_ADDRESS, SIGP_COND_EMERGENCY_SIGNAL, 0, NULL);
--	report(cc == 3, "CC = 3");
+-	expect_ext_int();
+-	ctl_set_bit(0, CTL0_EXTERNAL_CALL);
+-	mask = extract_psw_mask();
+-	mask |= PSW_MASK_EXT;
+-	load_psw_mask(mask);
+-	set_flag(1);
+-	while (lowcore.ext_int_code != 0x1202) { mb(); }
+-	report_pass("received");
+-	set_flag(1);
+-}
+-
+-static void test_ecall(void)
+-{
+-	struct psw psw;
+-	psw.mask = extract_psw_mask();
+-	psw.addr = (unsigned long)ecall;
+-
+-	report_prefix_push("ecall");
+-	set_flag(0);
+-
+-	smp_cpu_start(1, psw);
+-	wait_for_flag();
+-	set_flag(0);
+-	smp_sigp(1, SIGP_EXTERNAL_CALL, 0, NULL);
+-	wait_for_flag();
+-	smp_cpu_stop(1);
+-	report_prefix_pop();
+-}
+-
+-static void emcall(void)
++static void call_received(void)
+ {
+ 	unsigned long mask;
+ 
+ 	expect_ext_int();
+-	ctl_set_bit(0, CTL0_EMERGENCY_SIGNAL);
++	ctl_set_bit(0, current_sigp_call_case->cr0_bit);
+ 	mask = extract_psw_mask();
+ 	mask |= PSW_MASK_EXT;
++	/* make sure conditional emergency is accepted by disabling IO interrupts */
++	mask &= ~PSW_MASK_IO;
+ 	load_psw_mask(mask);
+ 	set_flag(1);
+-	while (lowcore.ext_int_code != 0x1201) { mb(); }
++	while (lowcore.ext_int_code != current_sigp_call_case->ext_int_expected_type)
++		mb();
+ 	report_pass("received");
+ 	set_flag(1);
+ }
+ 
+-static void test_emcall(void)
++static void test_calls(void)
+ {
++	int i;
+ 	struct psw psw;
+-	psw.mask = extract_psw_mask();
+-	psw.addr = (unsigned long)emcall;
+-
+-	report_prefix_push("emcall");
+-	set_flag(0);
+-
+-	smp_cpu_start(1, psw);
+-	wait_for_flag();
+-	set_flag(0);
+-	smp_sigp(1, SIGP_EMERGENCY_SIGNAL, 0, NULL);
+-	wait_for_flag();
+-	smp_cpu_stop(1);
+-
+-	report_prefix_pop();
+-}
+-
+-static void test_cond_emcall(void)
+-{
+-	uint32_t status = 0;
+-	struct psw psw;
+-	int cc;
+-	psw.mask = extract_psw_mask() & ~PSW_MASK_IO;
+-	psw.addr = (unsigned long)emcall;
+-
+-	report_prefix_push("conditional emergency call");
+ 
+-	if (uv_os_is_guest()) {
+-		report_skip("unsupported under PV");
+-		goto out;
++	for (i = 0; i < ARRAY_SIZE(cases_sigp_call); i++) {
++		current_sigp_call_case = &cases_sigp_call[i];
++
++		report_prefix_push(current_sigp_call_case->name);
++		if (!current_sigp_call_case->supports_pv && uv_os_is_guest()) {
++			report_skip("Not supported under PV");
++			report_prefix_pop();
++			continue;
++		}
++
++		set_flag(0);
++		psw.mask = extract_psw_mask();
++		psw.addr = (unsigned long)call_received;
++
++		smp_cpu_start(1, psw);
++		wait_for_flag();
++		set_flag(0);
++		smp_sigp(1, current_sigp_call_case->call, 0, NULL);
++		wait_for_flag();
++		smp_cpu_stop(1);
++		report_prefix_pop();
+ 	}
+-
+-	report_prefix_push("success");
+-	set_flag(0);
+-
+-	smp_cpu_start(1, psw);
+-	wait_for_flag();
+-	set_flag(0);
+-	cc = smp_sigp(1, SIGP_COND_EMERGENCY_SIGNAL, 0, &status);
+-	report(!cc, "CC = 0");
+-
+-	wait_for_flag();
+-	smp_cpu_stop(1);
 -
 -	report_prefix_pop();
 -
- 	report_prefix_push("success");
- 	set_flag(0);
+-out:
+-	report_prefix_pop();
+-
+ }
  
+ static void test_sense_running(void)
+@@ -511,9 +471,7 @@ int main(void)
+ 	test_stop_store_status();
+ 	test_store_status();
+ 	test_set_prefix();
+-	test_ecall();
+-	test_emcall();
+-	test_cond_emcall();
++	test_calls();
+ 	test_sense_running();
+ 	test_reset();
+ 	test_reset_initial();
 -- 
 2.35.3
 
