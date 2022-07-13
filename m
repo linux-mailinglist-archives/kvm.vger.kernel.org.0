@@ -2,60 +2,60 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 50FC557364F
+	by mail.lfdr.de (Postfix) with ESMTP id E2C28573651
 	for <lists+kvm@lfdr.de>; Wed, 13 Jul 2022 14:26:09 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236397AbiGMMZn (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 13 Jul 2022 08:25:43 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43396 "EHLO
+        id S236411AbiGMMZp (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 13 Jul 2022 08:25:45 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43712 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S236373AbiGMMZg (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 13 Jul 2022 08:25:36 -0400
-Received: from mail-pg1-x529.google.com (mail-pg1-x529.google.com [IPv6:2607:f8b0:4864:20::529])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4C8D8C1FED;
-        Wed, 13 Jul 2022 05:25:34 -0700 (PDT)
-Received: by mail-pg1-x529.google.com with SMTP id 73so10270312pgb.10;
-        Wed, 13 Jul 2022 05:25:34 -0700 (PDT)
+        with ESMTP id S236387AbiGMMZn (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 13 Jul 2022 08:25:43 -0400
+Received: from mail-pf1-x429.google.com (mail-pf1-x429.google.com [IPv6:2607:f8b0:4864:20::429])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3AA5FCC7BF;
+        Wed, 13 Jul 2022 05:25:37 -0700 (PDT)
+Received: by mail-pf1-x429.google.com with SMTP id x184so10102106pfx.2;
+        Wed, 13 Jul 2022 05:25:37 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
         h=from:to:cc:subject:date:message-id:in-reply-to:references
          :mime-version:content-transfer-encoding;
-        bh=LXqovdDSl/MXsNZWjftmy81y+mPSnXdzim3KrCIDlE0=;
-        b=LLUGPEi/RmbpZwk9P9m5HPEB9sm6XJcxnSoyd8dxAk1RNNLJ4kiniTUwgPSb0SOGsM
-         kP+pNwDVu/sTpyz6I3D/+OMo6wkcGTfbDIRFNQ691ukX50uy0TldoRp8f4t0i9vvxOzH
-         80ChLc51D1OvQtifYaQiYdhlY71ZzVH4iI0PPvhDUdqEMt49vaXvOzPsk+nlGDBD8GEe
-         SJmwD0W3bG9akHMxtA7QQzlCpwE4MGD2Z64Xa527qvNuflNkm74pUzI7MYDf0YeXcycX
-         6Yw8pLPAeUttos0Pqjkze0stGX3eqjEUcqHG3fv//3b6A5eCuYtiOmloxFrTqD6Z+69U
-         S9nA==
+        bh=vMzQD9O55lJzNyZFNJ1xoHaqPwdV3msqkHZ+m49+h34=;
+        b=WydBXzVEYu/cVe7J6XyAmfLhj+dAt0yf5xvx+xbKudRn2JX+4II6KY09dQg67oIUj/
+         9T01SiKabL7tUSW/s1ymM1a5mrBIJDpbjDKCHJOYtAGdTwdmCGMfMU96c9OZfdb1k4gd
+         r2abQ4UZnmkdQv800qzAcvG1NEyqWIVoCt+1KWYhGVD0sanZivzkJjDGTLjDc6zGUpDX
+         1jQbR7CMXxBXsp0MduVqg9D/exfIA6EfJQyVOL03aBqELQZSgmSfueu/RxzfgPK5RDlI
+         nWO8fjH2tXhbbA0oA6DVl78qt4j+GDWG1Sx8HeRl58rcjCba9naJ5qMoCOdU5PA9tYPo
+         Scfw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
          :references:mime-version:content-transfer-encoding;
-        bh=LXqovdDSl/MXsNZWjftmy81y+mPSnXdzim3KrCIDlE0=;
-        b=HOVViA/Y5RW1/ssLS2ONKdAJwYxQR4Wr+sGQNogb8Z3xOtfLg5u63pvB4JENer/qDN
-         7ZbPkPsBvNFf8wgzM54BFRDwFIB10sqb5BfRSuvktUzSz/+WcyHgHZ2NqbB3xgsKO8L+
-         PJBw7ydjr5rS2ErUtC1kyfedoc/kLtytcoLFQErYFWpkNw0mZ4FgxfUOAe7FC9IPpnlg
-         VEk/IYPa9sg29ZbVsXK2IhxQ2GiBKB4BxHhMr/DzqYTqgsgk/OKYuKgTyrKIIdB0d/91
-         9eXL0aUVSwnkZF8kyXrQ4bxgMweNdXWxrNm60/iu0RCmemuBMv77+cyDdK9kuVaHnjh1
-         Z9JQ==
-X-Gm-Message-State: AJIora+G6OsmxC3mUktNwv5byABEqLj8osQqo+4KK2NnKiRjBPY0ZDpX
-        M0KY3MoZ/5qKGQDgRWNcUIc=
-X-Google-Smtp-Source: AGRyM1sk8JQ44ful7LGxlOnlp8i/NXsMnI/Tct++/5RfdnANJujj/ifyPCW1uswJ2UUvzKZRMWYw3w==
-X-Received: by 2002:a63:df49:0:b0:412:58fe:2332 with SMTP id h9-20020a63df49000000b0041258fe2332mr2603882pgj.505.1657715134057;
-        Wed, 13 Jul 2022 05:25:34 -0700 (PDT)
+        bh=vMzQD9O55lJzNyZFNJ1xoHaqPwdV3msqkHZ+m49+h34=;
+        b=lCw3KRe5YuMYLU9ByJxH15AMvkj7uh1UZiu+cJKEXPRzyRd4Rtt+g1zmWYgN7QMn4w
+         +p1ANOJHkC7pi8AN2U60XmtThqW7SG4UfPC6T/aQWdLXFGLp6BEUb2IBhWRyC2tjVBhc
+         gcrsmBsaftfaJUeR01L7daqc9/9+dLdmnA7M5I1zChJiai6Bs1cJytZceFZduSrCmFQl
+         n92uEfqmii25CmPaVizB5zv4UjOtblzBS/4w7ITWTg8CyOUtVKoetfX16e3lNiUwnu+9
+         ItjXgcuIDDZbEluNB2TASOYgaHpzMPorE78Ml9FAbA7XWeuyFaKv9BuprLcGiw4h/xjn
+         yCkA==
+X-Gm-Message-State: AJIora8Y2sLcn63H8xzEpLWdjqhrRN4Hd+iJy4JQNbZfR8LG0Fp4gUly
+        Zs9AsgURhXxJ9iYn7hd9jtazcLxYFno=
+X-Google-Smtp-Source: AGRyM1tY8so1ixNTckOPXhzC2LOBUE2mscDc3wZqmnE/E+iykXN/TgGwaDMgSj9CKy2VCVzGNiD/2Q==
+X-Received: by 2002:a05:6a00:1589:b0:52a:eb00:71d8 with SMTP id u9-20020a056a00158900b0052aeb0071d8mr2850797pfk.38.1657715136251;
+        Wed, 13 Jul 2022 05:25:36 -0700 (PDT)
 Received: from localhost.localdomain ([103.7.29.32])
-        by smtp.gmail.com with ESMTPSA id m7-20020a170902bb8700b0016bf1ed3489sm8719233pls.143.2022.07.13.05.25.32
+        by smtp.gmail.com with ESMTPSA id m7-20020a170902bb8700b0016bf1ed3489sm8719233pls.143.2022.07.13.05.25.34
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 13 Jul 2022 05:25:33 -0700 (PDT)
+        Wed, 13 Jul 2022 05:25:35 -0700 (PDT)
 From:   Like Xu <like.xu.linux@gmail.com>
 X-Google-Original-From: Like Xu <likexu@tencent.com>
 To:     Sean Christopherson <seanjc@google.com>,
         Paolo Bonzini <pbonzini@redhat.com>
 Cc:     Jim Mattson <jmattson@google.com>, linux-kernel@vger.kernel.org,
         kvm@vger.kernel.org, Like Xu <likexu@tencent.com>
-Subject: [PATCH 3/7] KVM: x86/pmu: Avoid setting BIT_ULL(-1) to pmu->host_cross_mapped_mask
-Date:   Wed, 13 Jul 2022 20:25:02 +0800
-Message-Id: <20220713122507.29236-4-likexu@tencent.com>
+Subject: [PATCH 4/7] KVM: x86/pmu: Not to generate PEBS records for emulated instructions
+Date:   Wed, 13 Jul 2022 20:25:03 +0800
+Message-Id: <20220713122507.29236-5-likexu@tencent.com>
 X-Mailer: git-send-email 2.37.0
 In-Reply-To: <20220713122507.29236-1-likexu@tencent.com>
 References: <20220713122507.29236-1-likexu@tencent.com>
@@ -73,47 +73,49 @@ X-Mailing-List: kvm@vger.kernel.org
 
 From: Like Xu <likexu@tencent.com>
 
-In the extreme case of host counters multiplexing and contention, the
-perf_event requested by the guest's pebs counter is not allocated to any
-actual physical counter, in which case hw.idx is bookkept as -1,
-resulting in an out-of-bounds access to host_cross_mapped_mask.
+The KVM accumulate an enabeld counter for at least INSTRUCTIONS or
+BRANCH_INSTRUCTION hw event from any KVM emulated instructions,
+generating emulated overflow interrupt on counter overflow, which
+in theory should also happen when the PEBS counter overflows but
+it currently lacks this part of the underlying support (e.g. through
+software injection of records in the irq context or a lazy approach).
 
-Fixes: 854250329c02 ("KVM: x86/pmu: Disable guest PEBS temporarily in two rare situations")
+In this case, KVM skips the injection of this BUFFER_OVF PMI (effectively
+dropping one PEBS record) and let the overflow counter move on. The loss
+of a single sample does not introduce a loss of accuracy, but is easily
+noticeable for certain specific instructions.
+
+This issue is expected to be addressed along with the issue
+of PEBS cross-mapped counters with a slow-path proposal.
+
+Fixes: 79f3e3b58386 ("KVM: x86/pmu: Reprogram PEBS event to emulate guest PEBS counter")
 Signed-off-by: Like Xu <likexu@tencent.com>
 ---
- arch/x86/kvm/vmx/pmu_intel.c | 11 +++++------
- 1 file changed, 5 insertions(+), 6 deletions(-)
+ arch/x86/kvm/pmu.c | 11 ++++++++---
+ 1 file changed, 8 insertions(+), 3 deletions(-)
 
-diff --git a/arch/x86/kvm/vmx/pmu_intel.c b/arch/x86/kvm/vmx/pmu_intel.c
-index 53ccba896e77..1588627974fa 100644
---- a/arch/x86/kvm/vmx/pmu_intel.c
-+++ b/arch/x86/kvm/vmx/pmu_intel.c
-@@ -783,20 +783,19 @@ static void intel_pmu_cleanup(struct kvm_vcpu *vcpu)
- void intel_pmu_cross_mapped_check(struct kvm_pmu *pmu)
- {
- 	struct kvm_pmc *pmc = NULL;
--	int bit;
-+	int bit, hw_idx;
+diff --git a/arch/x86/kvm/pmu.c b/arch/x86/kvm/pmu.c
+index 02f9e4f245bd..08ee0fed63d5 100644
+--- a/arch/x86/kvm/pmu.c
++++ b/arch/x86/kvm/pmu.c
+@@ -106,9 +106,14 @@ static inline void __kvm_perf_overflow(struct kvm_pmc *pmc, bool in_pmi)
+ 		return;
  
- 	for_each_set_bit(bit, (unsigned long *)&pmu->global_ctrl,
- 			 X86_PMC_IDX_MAX) {
- 		pmc = intel_pmc_idx_to_pmc(pmu, bit);
- 
- 		if (!pmc || !pmc_speculative_in_use(pmc) ||
--		    !intel_pmc_is_enabled(pmc))
-+		    !intel_pmc_is_enabled(pmc) || !pmc->perf_event)
- 			continue;
- 
--		if (pmc->perf_event && pmc->idx != pmc->perf_event->hw.idx) {
--			pmu->host_cross_mapped_mask |=
--				BIT_ULL(pmc->perf_event->hw.idx);
--		}
-+		hw_idx = pmc->perf_event->hw.idx;
-+		if (hw_idx != pmc->idx && hw_idx != -1)
-+			pmu->host_cross_mapped_mask |= BIT_ULL(hw_idx);
+ 	if (pmc->perf_event && pmc->perf_event->attr.precise_ip) {
+-		/* Indicate PEBS overflow PMI to guest. */
+-		skip_pmi = __test_and_set_bit(GLOBAL_STATUS_BUFFER_OVF_BIT,
+-					      (unsigned long *)&pmu->global_status);
++		if (!in_pmi) {
++			/* The emulated instructions does not generate PEBS records. */
++			skip_pmi = true;
++		} else {
++			/* Indicate PEBS overflow PMI to guest. */
++			skip_pmi = __test_and_set_bit(GLOBAL_STATUS_BUFFER_OVF_BIT,
++						      (unsigned long *)&pmu->global_status);
++		}
+ 	} else {
+ 		__set_bit(pmc->idx, (unsigned long *)&pmu->global_status);
  	}
- }
- 
 -- 
 2.37.0
 
