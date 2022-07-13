@@ -2,345 +2,130 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id B8A7E57348C
-	for <lists+kvm@lfdr.de>; Wed, 13 Jul 2022 12:46:20 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 88AC2573493
+	for <lists+kvm@lfdr.de>; Wed, 13 Jul 2022 12:49:46 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235858AbiGMKqQ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 13 Jul 2022 06:46:16 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39818 "EHLO
+        id S235194AbiGMKtk (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 13 Jul 2022 06:49:40 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42976 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235367AbiGMKqM (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 13 Jul 2022 06:46:12 -0400
-Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A7A82FD50E;
-        Wed, 13 Jul 2022 03:46:10 -0700 (PDT)
-Received: from pps.filterd (m0098409.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.17.1.5/8.17.1.5) with ESMTP id 26DAfjkd019030;
-        Wed, 13 Jul 2022 10:46:10 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=from : to : cc : subject
- : date : message-id : in-reply-to : references : mime-version :
- content-transfer-encoding; s=pp1;
- bh=VShakflKqOhgpf9KOSeyccP2KhhThbHK6Fc4r0nQKbI=;
- b=fMGC61sWg3XaB6RhXyFdCUbZl/wN+OqvccaXoW4IW3rESK4tV1ybfYtZJbYCeq7ayRBH
- v7V6G4ForS8TBff5Xndp4d9dWCLt7UYNM2YHxN4/Jl+1nPQOJxSsPUtHaMppBIk2lTAp
- M7SNfJdIzWxPfZMBbORqKsHzCXmga8wpxZuJQEBvbwv/M5BVC9evY1qytY4ptXg50/74
- Nqkpo4MTwabHsPYEg4ChZAUO3HqtBs4cDAEApL48sNn8gLM/93iuXG2D8dywXOmOUr3o
- rjut5HWAcHuNpWWGNznNjgCV/oeUtMu1IE2bOaiYmSUpp+8BhhRlTysIYL1OcR6MmPPl 4A== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3h9vh402q3-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Wed, 13 Jul 2022 10:46:10 +0000
-Received: from m0098409.ppops.net (m0098409.ppops.net [127.0.0.1])
-        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 26DAggFj031688;
-        Wed, 13 Jul 2022 10:46:09 GMT
-Received: from ppma06ams.nl.ibm.com (66.31.33a9.ip4.static.sl-reverse.com [169.51.49.102])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3h9vh402p6-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Wed, 13 Jul 2022 10:46:09 +0000
-Received: from pps.filterd (ppma06ams.nl.ibm.com [127.0.0.1])
-        by ppma06ams.nl.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 26DAaMdx029733;
-        Wed, 13 Jul 2022 10:46:07 GMT
-Received: from b06cxnps4075.portsmouth.uk.ibm.com (d06relay12.portsmouth.uk.ibm.com [9.149.109.197])
-        by ppma06ams.nl.ibm.com with ESMTP id 3h70xhwhqn-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Wed, 13 Jul 2022 10:46:07 +0000
-Received: from d06av23.portsmouth.uk.ibm.com (d06av23.portsmouth.uk.ibm.com [9.149.105.59])
-        by b06cxnps4075.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 26DAk4Yg22675870
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Wed, 13 Jul 2022 10:46:04 GMT
-Received: from d06av23.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 690B2A4040;
-        Wed, 13 Jul 2022 10:46:04 +0000 (GMT)
-Received: from d06av23.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 0D585A404D;
-        Wed, 13 Jul 2022 10:46:04 +0000 (GMT)
-Received: from localhost.localdomain (unknown [9.145.0.75])
-        by d06av23.portsmouth.uk.ibm.com (Postfix) with ESMTP;
-        Wed, 13 Jul 2022 10:46:03 +0000 (GMT)
-From:   Claudio Imbrenda <imbrenda@linux.ibm.com>
-To:     kvm@vger.kernel.org
-Cc:     linux-s390@vger.kernel.org, frankja@linux.ibm.com,
-        scgl@linux.ibm.com, nrb@linux.ibm.com, thuth@redhat.com
-Subject: [kvm-unit-tests PATCH v3 3/3] lib: s390x: better smp interrupt checks
-Date:   Wed, 13 Jul 2022 12:45:57 +0200
-Message-Id: <20220713104557.168113-4-imbrenda@linux.ibm.com>
-X-Mailer: git-send-email 2.36.1
-In-Reply-To: <20220713104557.168113-1-imbrenda@linux.ibm.com>
-References: <20220713104557.168113-1-imbrenda@linux.ibm.com>
+        with ESMTP id S231944AbiGMKte (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 13 Jul 2022 06:49:34 -0400
+Received: from mail-ej1-x62a.google.com (mail-ej1-x62a.google.com [IPv6:2a00:1450:4864:20::62a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0EA63F54CA
+        for <kvm@vger.kernel.org>; Wed, 13 Jul 2022 03:49:33 -0700 (PDT)
+Received: by mail-ej1-x62a.google.com with SMTP id ez10so19111753ejc.13
+        for <kvm@vger.kernel.org>; Wed, 13 Jul 2022 03:49:32 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=ionos.com; s=google;
+        h=mime-version:from:date:message-id:subject:to;
+        bh=r82sZLPk4860cUIh5NofMI8eXCvpYvER6zpBYWjDvi8=;
+        b=cD3YQ5v5QR4R6sm+vZWZd+pybrxu82Usvg9Iuud8NPX6r40CwJrfG+Ksadc16BS2ck
+         Nj+8a/64drZr775iIPBSP8ZRY4CORmQryFL6TW6iveXQUGKhJvrZ41eol4ghD2PXlD4v
+         a7cQpCLpfXG2kWeBqvQB/AEzkj6WC7l/3PUXtOedpwxmACdDJqzPysJzHdVAqBusMLgQ
+         J+gX6t5j4GsxCoXGnUS+a50rLdzy/m6D2oqUC50N0nUFwpsAbxaazeTPSUMk4IiayxP1
+         4w35iUN1HOMoVbqnBWvcxhjGoI5NLFBKzf/5duTIjObOzHJyi7Y4w+mV51x09PR9UnqF
+         D1Kg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:mime-version:from:date:message-id:subject:to;
+        bh=r82sZLPk4860cUIh5NofMI8eXCvpYvER6zpBYWjDvi8=;
+        b=GuFYMnBlWdHvX1R5eTsiHIRgiIkIKn284vmFkOgtZgAShyKz5rI06yS2JQGaSpN9cJ
+         BNaG9DsPRtRQuzeYTrT0UV/wXm89ZZf60krERcca+iYp51TM50D/a8IQoCcFrZXuegsk
+         QkaN5Nt6YRmYdQY0bdGYv1zt/B8mUktS1H1GpROAEvbGgp5OMJgNFgRdN08G1pZ7m35C
+         pJ0eyvlksZfHFRPIc3U+KhDbQMNU6B6POV0Ph8i7g4aky6gQwIKkyYL5uwfZQ+D3r2qA
+         +xB7pKgp+7dReywBPm71FRsxCkkNzlgMx3ZxCIw7CgtPtOwQsOwnzW1lur2/51HE9Ml6
+         lZ3Q==
+X-Gm-Message-State: AJIora/JtSlmY9LPNvD8R/HsQyeIuu1EOvYS3u3OJCqfbpmeQTUdA0Ap
+        CA0E44gV1vOJM+omxDcTRIywf7L4vaTItswiFPJ+uIk3axuUpQ==
+X-Google-Smtp-Source: AGRyM1uxUH0CEZCFhwLVyxN6YvXL6LlHH1V0EBH9oBv8LDIC0cUpeFGOJkhla3KdZvuib4Ccxa6q6PpaSsnulS42OBA=
+X-Received: by 2002:a17:906:9bdd:b0:72b:3cab:eade with SMTP id
+ de29-20020a1709069bdd00b0072b3cabeademr2852492ejc.58.1657709371580; Wed, 13
+ Jul 2022 03:49:31 -0700 (PDT)
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-ORIG-GUID: TSMkadYlUG5WoU_cny29RMz3uZfTOD0a
-X-Proofpoint-GUID: uqqHbn3COZtiKFhkFlpQpMk7FQ4flRAy
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.205,Aquarius:18.0.883,Hydra:6.0.517,FMLib:17.11.122.1
- definitions=2022-07-12_14,2022-07-13_02,2022-06-22_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 impostorscore=0 adultscore=0
- priorityscore=1501 mlxscore=0 phishscore=0 lowpriorityscore=0
- malwarescore=0 spamscore=0 clxscore=1015 suspectscore=0 mlxlogscore=938
- bulkscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2206140000 definitions=main-2207130043
-X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_EF,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_PASS,
-        T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
+From:   Jinpu Wang <jinpu.wang@ionos.com>
+Date:   Wed, 13 Jul 2022 12:49:21 +0200
+Message-ID: <CAMGffEm9y0wnn8LNS9Qo3obPhs0GD5iJZ0WejFzC4baGPDsYTw@mail.gmail.com>
+Subject: 5.10.131-rc1 crash with int3: RIP 0010:xaddw_ax_dx+0x9/0x10 [kvm]
+To:     stable <stable@vger.kernel.org>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        Sasha Levin <sashal@kernel.org>, kvm@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Use per-CPU flags and callbacks for Program and Extern interrupts,
-instead of global variables.
+Hi, all,
 
-This allows for more accurate error handling; a CPU waiting for an
-interrupt will not have it "stolen" by a different CPU that was not
-supposed to wait for one, and now two CPUs can wait for interrupts at
-the same time.
+When I test with 5.10.131-rc1 with kvm-uint-tests on Intel Broadwell
+and Skylake server, it panic also immediately with following call
+trace:
 
-This will significantly improve error reporting and debugging when
-things go wrong.
+[ 1867.769328] APIC base relocation is unsupported by KVM
+[ 1895.977424] kvm: emulating exchange as write
+[ 1895.979316] int3: 0000 [#1] SMP
+[ 1895.979317] CPU: 40 PID: 14811 Comm: qemu-6.1 Kdump: loaded
+Tainted: G           O      5.10.131-pserver
+#5.10.131-1+feature+linux+5.10.y+20220712.1850+30f4172c~deb11
+[ 1895.979317] Hardware name: Supermicro SBI-7228R-T2F2/B10DRT-IBF2,
+BIOS 3.0a 03/05/2018
+[ 1895.979318] RIP: 0010:xaddw_ax_dx+0x9/0x10 [kvm]
+[ 1895.979318] Code: 00 0f bb d0 c3 cc cc cc cc 48 0f bb d0 c3 cc cc
+cc cc 0f 1f 80 00 00 00 00 0f c0 d0 c3 cc cc cc cc 66 0f c1 d0 c3 cc
+cc cc cc <0f> 1f 80 00 00 00 00 0f c1 d0 c3 cc cc cc cc 48 0f c1 d0 c3
+cc cc
+[ 1895.979319] RSP: 0018:ffffab6e63c6fd30 EFLAGS: 00000202
+[ 1895.979320] RAX: 0000000089abcdef RBX: 0000000000000001 RCX: 0000000000000000
+[ 1895.979321] RDX: 0000000076543210 RSI: ffffffffc0f3e4a0 RDI: 0000000000000200
+[ 1895.979321] RBP: ffff997c29c214e0 R08: ffff997c29c214e0 R09: 0000000000000002
+[ 1895.979321] R10: 0000000000000001 R11: 0000000000000000 R12: ffffffffc0f73540
+[ 1895.979322] R13: 0000000000000000 R14: ffff997c29c214e0 R15: 0000000000000000
+[ 1895.979322] FS:  00007fc44a5a3700(0000) GS:ffff999a7fc80000(0000)
+knlGS:0000000000000000
+[ 1895.979322] CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+[ 1895.979323] CR2: 0000000000000000 CR3: 000000012bf16004 CR4: 00000000003726e0
+[ 1895.979324] DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
+[ 1895.979324] DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
+[ 1895.979325] Call Trace:
+[ 1895.979325]  ? fastop+0x59/0xa0 [kvm]
+[ 1895.979326]  ? x86_emulate_insn+0x73a/0xe00 [kvm]
+[ 1895.979326]  ? x86_emulate_instruction+0x2d0/0x750 [kvm]
+[ 1895.979326]  ? vmx_vcpu_load+0x21/0x70 [kvm_intel]
+[ 1895.979327]  ? complete_emulated_mmio+0x236/0x310 [kvm]
+[ 1895.979327]  ? kvm_arch_vcpu_ioctl_run+0x1744/0x1920 [kvm]
+[ 1895.979327]  ? kvm_vcpu_ioctl+0x211/0x5a0 [kvm]
+[ 1895.979328]  ? __fget_files+0x79/0xb0
+[ 1895.979328]  ? __fget_files+0x79/0xb0
+[ 1895.979328]  ? __x64_sys_ioctl+0x8b/0xc0
+[ 1895.979329]  ? do_syscall_64+0x33/0x40
+[ 1895.979329]  ? entry_SYSCALL_64_after_hwframe+0x61/0xc6
+[ 1895.979329] Modules linked in: nfnetlink_cttimeout nft_nat
+nft_counter nft_chain_nat nft_meta_bridge bridge openvswitch nsh
+nf_conncount nf_nat dummy nf_log_ipv6 nf_log_ipv4 nf_log_common
+nft_log nft_limit rnbd_client(O) intel_rapl_msr rtrs_client(O)
+intel_rapl_common rtrs_core(O) ib_ipoib rdma_ucm rdma_cm iw_cm ib_cm
+ib_umad sb_edac x86_pkg_temp_thermal coretemp kvm_intel mlx4_ib nft_ct
+kvm nf_conntrack ib_uverbs nf_defrag_ipv6 ib_core nf_defrag_ipv4
+irqbypass crc32_pclmul aesni_intel sd_mod libaes t10_pi crypto_simd
+crc_t10dif nf_tables crct10dif_generic cryptd glue_helper
+crct10dif_pclmul crct10dif_common vhost_net sg rapl intel_cstate
+nfnetlink tun(O) ethoip6_pmtud(O) vhost vhost_iotlb ahci tap iTCO_wdt
+libahci input_leds mei_me libata iTCO_vendor_support mlx4_core ioatdma
+scsi_mod led_class watchdog evdev acpi_ipmi mei ipmi_si 8021q garp stp
+mrp llc ipmi_devintf ipmi_msghandler acpi_power_meter acpi_pad button
+fuse ip_tables x_tables autofs4 loop raid10 raid456 async_raid6_recov
+[ 1895.979349]  async_memcpy async_pq async_xor async_tx xor raid6_pq
+libcrc32c raid1 raid0 linear md_mod crc32c_intel igb i2c_i801
+i2c_algo_bit i2c_smbus xhci_pci dca lpc_ich ptp i2c_core mfd_core
+pps_core xhci_hcd
 
-Both program interrupts and external interrupts are now CPU-bound, even
-though some external interrupts are floating (notably, the SCLP
-interrupt). In those cases, the testcases should mask interrupts and/or
-expect them appropriately according to need.
+Is this bug known, any hint how to fix it?
 
-Signed-off-by: Claudio Imbrenda <imbrenda@linux.ibm.com>
----
- lib/s390x/asm/arch_def.h | 16 ++++++++++-
- lib/s390x/smp.h          |  8 +-----
- lib/s390x/interrupt.c    | 57 +++++++++++++++++++++++++++++-----------
- lib/s390x/smp.c          | 11 ++++++++
- 4 files changed, 69 insertions(+), 23 deletions(-)
-
-diff --git a/lib/s390x/asm/arch_def.h b/lib/s390x/asm/arch_def.h
-index b3282367..03578277 100644
---- a/lib/s390x/asm/arch_def.h
-+++ b/lib/s390x/asm/arch_def.h
-@@ -41,6 +41,17 @@ struct psw {
- 	uint64_t	addr;
- };
- 
-+struct cpu {
-+	struct lowcore *lowcore;
-+	uint64_t *stack;
-+	void (*pgm_cleanup_func)(void);
-+	uint16_t addr;
-+	uint16_t idx;
-+	bool active;
-+	bool pgm_int_expected;
-+	bool ext_int_expected;
-+};
-+
- #define AS_PRIM				0
- #define AS_ACCR				1
- #define AS_SECN				2
-@@ -125,7 +136,8 @@ struct lowcore {
- 	uint8_t		pad_0x0280[0x0308 - 0x0280];	/* 0x0280 */
- 	uint64_t	sw_int_crs[16];			/* 0x0308 */
- 	struct psw	sw_int_psw;			/* 0x0388 */
--	uint8_t		pad_0x0310[0x11b0 - 0x0398];	/* 0x0398 */
-+	struct cpu *	this_cpu;			/* 0x0398 */
-+	uint8_t		pad_0x03a0[0x11b0 - 0x03a0];	/* 0x03a0 */
- 	uint64_t	mcck_ext_sa_addr;		/* 0x11b0 */
- 	uint8_t		pad_0x11b8[0x1200 - 0x11b8];	/* 0x11b8 */
- 	uint64_t	fprs_sa[16];			/* 0x1200 */
-@@ -148,6 +160,8 @@ _Static_assert(sizeof(struct lowcore) == 0x1900, "Lowcore size");
- 
- extern struct lowcore lowcore;
- 
-+#define THIS_CPU (lowcore.this_cpu)
-+
- #define PGM_INT_CODE_OPERATION			0x01
- #define PGM_INT_CODE_PRIVILEGED_OPERATION	0x02
- #define PGM_INT_CODE_EXECUTE			0x03
-diff --git a/lib/s390x/smp.h b/lib/s390x/smp.h
-index df184cb8..f4ae973d 100644
---- a/lib/s390x/smp.h
-+++ b/lib/s390x/smp.h
-@@ -12,13 +12,6 @@
- 
- #include <asm/arch_def.h>
- 
--struct cpu {
--	struct lowcore *lowcore;
--	uint64_t *stack;
--	uint16_t addr;
--	bool active;
--};
--
- struct cpu_status {
-     uint64_t    fprs[16];                       /* 0x0000 */
-     uint64_t    grs[16];                        /* 0x0080 */
-@@ -52,5 +45,6 @@ int smp_cpu_setup(uint16_t idx, struct psw psw);
- void smp_teardown(void);
- void smp_setup(void);
- int smp_sigp(uint16_t idx, uint8_t order, unsigned long parm, uint32_t *status);
-+struct lowcore *smp_get_lowcore(uint16_t idx);
- 
- #endif
-diff --git a/lib/s390x/interrupt.c b/lib/s390x/interrupt.c
-index 6da20c44..4151635f 100644
---- a/lib/s390x/interrupt.c
-+++ b/lib/s390x/interrupt.c
-@@ -15,25 +15,36 @@
- #include <fault.h>
- #include <asm/page.h>
- 
--static bool pgm_int_expected;
--static bool ext_int_expected;
--static void (*pgm_cleanup_func)(void);
--
-+/**
-+ * expect_pgm_int - Expect a program interrupt on the current CPU.
-+ */
- void expect_pgm_int(void)
- {
--	pgm_int_expected = true;
-+	THIS_CPU->pgm_int_expected = true;
- 	lowcore.pgm_int_code = 0;
- 	lowcore.trans_exc_id = 0;
- 	mb();
- }
- 
-+/**
-+ * expect_ext_int - Expect an external interrupt on the current CPU.
-+ */
- void expect_ext_int(void)
- {
--	ext_int_expected = true;
-+	THIS_CPU->ext_int_expected = true;
- 	lowcore.ext_int_code = 0;
- 	mb();
- }
- 
-+/**
-+ * clear_pgm_int - Clear program interrupt information
-+ *
-+ * Clear program interrupt information, including the expected program
-+ * interrupt flag.
-+ * No program interrupts are expected after calling this function.
-+ *
-+ * Return: the program interrupt code before clearing
-+ */
- uint16_t clear_pgm_int(void)
- {
- 	uint16_t code;
-@@ -42,10 +53,17 @@ uint16_t clear_pgm_int(void)
- 	code = lowcore.pgm_int_code;
- 	lowcore.pgm_int_code = 0;
- 	lowcore.trans_exc_id = 0;
--	pgm_int_expected = false;
-+	THIS_CPU->pgm_int_expected = false;
- 	return code;
- }
- 
-+/**
-+ * check_pgm_int_code - Check the program interrupt code on the current CPU.
-+ * @code the expected program interrupt code on the current CPU
-+ *
-+ * Check and report if the program interrupt on the current CPU matches the
-+ * expected one.
-+ */
- void check_pgm_int_code(uint16_t code)
- {
- 	mb();
-@@ -54,9 +72,19 @@ void check_pgm_int_code(uint16_t code)
- 	       lowcore.pgm_int_code);
- }
- 
-+/**
-+ * register_pgm_cleanup_func - Register a cleanup function for progam
-+ * interrupts for the current CPU.
-+ * @f the cleanup function to be registered on the current CPU
-+ *
-+ * Register a cleanup function to be called at the end of the normal
-+ * interrupt handling for program interrupts for this CPU.
-+ *
-+ * Pass NULL to unregister a previously registered cleanup function.
-+ */
- void register_pgm_cleanup_func(void (*f)(void))
- {
--	pgm_cleanup_func = f;
-+	THIS_CPU->pgm_cleanup_func = f;
- }
- 
- static void fixup_pgm_int(struct stack_frame_int *stack)
-@@ -183,24 +211,23 @@ static void print_pgm_info(struct stack_frame_int *stack)
- 
- void handle_pgm_int(struct stack_frame_int *stack)
- {
--	if (!pgm_int_expected) {
-+	if (!THIS_CPU->pgm_int_expected) {
- 		/* Force sclp_busy to false, otherwise we will loop forever */
- 		sclp_handle_ext();
- 		print_pgm_info(stack);
- 	}
- 
--	pgm_int_expected = false;
-+	THIS_CPU->pgm_int_expected = false;
- 
--	if (pgm_cleanup_func)
--		(*pgm_cleanup_func)();
-+	if (THIS_CPU->pgm_cleanup_func)
-+		THIS_CPU->pgm_cleanup_func();
- 	else
- 		fixup_pgm_int(stack);
- }
- 
- void handle_ext_int(struct stack_frame_int *stack)
- {
--	if (!ext_int_expected &&
--	    lowcore.ext_int_code != EXT_IRQ_SERVICE_SIG) {
-+	if (!THIS_CPU->ext_int_expected && lowcore.ext_int_code != EXT_IRQ_SERVICE_SIG) {
- 		report_abort("Unexpected external call interrupt (code %#x): on cpu %d at %#lx",
- 			     lowcore.ext_int_code, stap(), lowcore.ext_old_psw.addr);
- 		return;
-@@ -210,7 +237,7 @@ void handle_ext_int(struct stack_frame_int *stack)
- 		stack->crs[0] &= ~(1UL << 9);
- 		sclp_handle_ext();
- 	} else {
--		ext_int_expected = false;
-+		THIS_CPU->ext_int_expected = false;
- 	}
- 
- 	if (!(stack->crs[0] & CR0_EXTM_MASK))
-diff --git a/lib/s390x/smp.c b/lib/s390x/smp.c
-index a0495cd9..0d98c17d 100644
---- a/lib/s390x/smp.c
-+++ b/lib/s390x/smp.c
-@@ -39,6 +39,15 @@ int smp_query_num_cpus(void)
- 	return sclp_get_cpu_num();
- }
- 
-+struct lowcore *smp_get_lowcore(uint16_t idx)
-+{
-+	if (THIS_CPU->idx == idx)
-+		return &lowcore;
-+
-+	check_idx(idx);
-+	return cpus[idx].lowcore;
-+}
-+
- int smp_sigp(uint16_t idx, uint8_t order, unsigned long parm, uint32_t *status)
- {
- 	check_idx(idx);
-@@ -253,6 +262,7 @@ static int smp_cpu_setup_nolock(uint16_t idx, struct psw psw)
- 
- 	/* Copy all exception psws. */
- 	memcpy(lc, cpus[0].lowcore, 512);
-+	lc->this_cpu = &cpus[idx];
- 
- 	/* Setup stack */
- 	cpus[idx].stack = (uint64_t *)alloc_pages(2);
-@@ -325,6 +335,7 @@ void smp_setup(void)
- 	for (i = 0; i < num; i++) {
- 		cpus[i].addr = entry[i].address;
- 		cpus[i].active = false;
-+		cpus[i].idx = i;
- 		/*
- 		 * Fill in the boot CPU. If the boot CPU is not at index 0,
- 		 * swap it with the one at index 0. This guarantees that the
--- 
-2.36.1
-
+Thanks!
+Jinpu Wang @ IONOS
