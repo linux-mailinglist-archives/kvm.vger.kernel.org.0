@@ -2,61 +2,87 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 00360572F63
-	for <lists+kvm@lfdr.de>; Wed, 13 Jul 2022 09:40:44 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id C53D0572F93
+	for <lists+kvm@lfdr.de>; Wed, 13 Jul 2022 09:48:55 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234757AbiGMHkn (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 13 Jul 2022 03:40:43 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36990 "EHLO
+        id S234892AbiGMHsx (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 13 Jul 2022 03:48:53 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44154 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234255AbiGMHki (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 13 Jul 2022 03:40:38 -0400
-Received: from mga17.intel.com (mga17.intel.com [192.55.52.151])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 45AB6E587D;
-        Wed, 13 Jul 2022 00:40:34 -0700 (PDT)
+        with ESMTP id S234860AbiGMHs3 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 13 Jul 2022 03:48:29 -0400
+Received: from mga12.intel.com (mga12.intel.com [192.55.52.136])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B524BE6332;
+        Wed, 13 Jul 2022 00:48:26 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1657698034; x=1689234034;
+  t=1657698506; x=1689234506;
   h=date:from:to:cc:subject:message-id:reply-to:references:
    mime-version:in-reply-to;
-  bh=p6S9d0eoOccrcr2x6G9e4hJJ9OVvTKahjywxJ3zVPng=;
-  b=XF5ri1fOs/6Jvmk8nzWU+eFMmyngz64N+h0AiMmI15I/JOvtRZbKjjok
-   gAjBaVh8D315dLNQg3r4/oAEGav2tx+LRsFG8K7dRQNxtqHLLx63SMfZN
-   zbYURaW0u1rCbJXHuT+LhTeSrunTciBeHObNuFX5BVn6JjX3zDNkhCNK+
-   w7rU0nFpU7FrEqOGs95tMBukML2Jw7vIJHqpmbLJSAgPYBl43GtFj2waL
-   DAusmCTdsd5/eHiVGSB/3/AM3uuIf7dlAxq0bnZZZebYYnZgdSk7T2gSs
-   MROEGaPjwmQILxySVhuocg9D6JGOL0aSNbpMU0zs9UCfwS57yqeFrYo0x
-   w==;
-X-IronPort-AV: E=McAfee;i="6400,9594,10406"; a="265549705"
+  bh=nUfcHt/iaf3oMSfMyzHxGwWsSmqpbvlJ2JFwYR1oe/M=;
+  b=C4cP7E864jxiXG8f7VB1bNxdXYNG12yHhsNZlDN4+uGv70+0xztfKFhO
+   ukHKXBXu1kiraU7YIGFaenCfBQGF12+KplTVGTDE5pjFlrAu2bDNCandl
+   T8Gh5bxOsB80l3NLxqG6z6o9q05NfddgX+xdoHTH0wbzeRopuEji/FJ9O
+   MwxqbvPhvp/R0Aa9j5ooO1/+8VEZcN8BFz79RyuF1bCjNSfbolylaS6ak
+   3jek3LsAlr7oCc3JOixWVJ2yp1nVSNT/Z744IJKJtHKlCR9BADxTEcqGY
+   aWaRfqH/L7MwQmC9R5lpqwIhG9Z7JXfVNTLoRxoejPMuwEDoiR1ICVjeX
+   Q==;
+X-IronPort-AV: E=McAfee;i="6400,9594,10406"; a="264928758"
 X-IronPort-AV: E=Sophos;i="5.92,267,1650956400"; 
-   d="scan'208";a="265549705"
+   d="scan'208";a="264928758"
 Received: from fmsmga003.fm.intel.com ([10.253.24.29])
-  by fmsmga107.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 13 Jul 2022 00:40:27 -0700
+  by fmsmga106.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 13 Jul 2022 00:48:25 -0700
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="5.92,267,1650956400"; 
-   d="scan'208";a="685065350"
+   d="scan'208";a="685067167"
 Received: from chaop.bj.intel.com (HELO localhost) ([10.240.192.101])
-  by FMSMGA003.fm.intel.com with ESMTP; 13 Jul 2022 00:40:25 -0700
-Date:   Wed, 13 Jul 2022 15:37:07 +0800
+  by FMSMGA003.fm.intel.com with ESMTP; 13 Jul 2022 00:48:16 -0700
+Date:   Wed, 13 Jul 2022 15:44:58 +0800
 From:   Chao Peng <chao.p.peng@linux.intel.com>
-To:     Isaku Yamahata <isaku.yamahata@gmail.com>
-Cc:     Chao Gao <chao.gao@intel.com>, isaku.yamahata@intel.com,
-        kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Paolo Bonzini <pbonzini@redhat.com>, chao.p.peng@intel.com
-Subject: Re: [PATCH v7 000/102] KVM TDX basic feature support
-Message-ID: <20220713073707.GA2831541@chaop.bj.intel.com>
+To:     "Gupta, Pankaj" <pankaj.gupta@amd.com>
+Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+        linux-mm@kvack.org, linux-fsdevel@vger.kernel.org,
+        linux-api@vger.kernel.org, linux-doc@vger.kernel.org,
+        qemu-devel@nongnu.org, linux-kselftest@vger.kernel.org,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Jonathan Corbet <corbet@lwn.net>,
+        Sean Christopherson <seanjc@google.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+        x86@kernel.org, "H . Peter Anvin" <hpa@zytor.com>,
+        Hugh Dickins <hughd@google.com>,
+        Jeff Layton <jlayton@kernel.org>,
+        "J . Bruce Fields" <bfields@fieldses.org>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        Shuah Khan <shuah@kernel.org>, Mike Rapoport <rppt@kernel.org>,
+        Steven Price <steven.price@arm.com>,
+        "Maciej S . Szmigiero" <mail@maciej.szmigiero.name>,
+        Vlastimil Babka <vbabka@suse.cz>,
+        Vishal Annapurve <vannapurve@google.com>,
+        Yu Zhang <yu.c.zhang@linux.intel.com>,
+        "Kirill A . Shutemov" <kirill.shutemov@linux.intel.com>,
+        luto@kernel.org, jun.nakajima@intel.com, dave.hansen@intel.com,
+        ak@linux.intel.com, david@redhat.com, aarcange@redhat.com,
+        ddutile@redhat.com, dhildenb@redhat.com,
+        Quentin Perret <qperret@google.com>,
+        Michael Roth <michael.roth@amd.com>, mhocko@suse.com,
+        Muchun Song <songmuchun@bytedance.com>
+Subject: Re: [PATCH v7 04/14] mm/shmem: Support memfile_notifier
+Message-ID: <20220713074458.GB2831541@chaop.bj.intel.com>
 Reply-To: Chao Peng <chao.p.peng@linux.intel.com>
-References: <cover.1656366337.git.isaku.yamahata@intel.com>
- <20220711151701.GA1375147@ls.amr.corp.intel.com>
- <20220712050714.GA26573@gao-cwp>
- <20220712105419.GB2805143@chaop.bj.intel.com>
- <20220712172250.GJ1379820@ls.amr.corp.intel.com>
+References: <20220706082016.2603916-1-chao.p.peng@linux.intel.com>
+ <20220706082016.2603916-5-chao.p.peng@linux.intel.com>
+ <c4112b84-9359-d4c8-1852-0057c074607c@amd.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20220712172250.GJ1379820@ls.amr.corp.intel.com>
+In-Reply-To: <c4112b84-9359-d4c8-1852-0057c074607c@amd.com>
 X-Spam-Status: No, score=-4.9 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,SPF_HELO_NONE,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,SPF_HELO_PASS,
         SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no
         version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
@@ -65,74 +91,66 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Jul 12, 2022 at 10:22:50AM -0700, Isaku Yamahata wrote:
-> On Tue, Jul 12, 2022 at 06:54:19PM +0800,
-> Chao Peng <chao.p.peng@linux.intel.com> wrote:
-> 
-> > On Tue, Jul 12, 2022 at 01:07:20PM +0800, Chao Gao wrote:
-> > > On Mon, Jul 11, 2022 at 08:17:01AM -0700, Isaku Yamahata wrote:
-> > > >Hi. Because my description on large page support was terse, I wrote up more
-> > > >detailed one.  Any feedback/thoughts on large page support?
-> > > >
-> > > >TDP MMU large page support design
-> > > >
-> > > >Two main discussion points
-> > > >* how to track page status. private vs shared, no-largepage vs can-be-largepage
-> > > 
-> > > ...
-> > > 
-> > > >
-> > > >Tracking private/shared and large page mappable
-> > > >-----------------------------------------------
-> > > >VMM needs to track that page is mapped as private or shared at 4KB granularity.
-> > > >For efficiency of EPT violation path (****), at 2MB and 1GB level, VMM should
-> > > >track the page can be mapped as a large page (regarding private/shared).  VMM
-> > > >updates it on MapGPA and references it on the EPT violation path. (****)
-> > > 
-> > > Isaku,
-> > > 
-> > > + Peng Chao
-> > > 
-> > > Doesn't UPM guarantee that 2MB/1GB large page in CR3 should be either all
-> > > private or all shared?
-> > > 
-> > > KVM always retrieves the mapping level in CR3 and enforces that EPT's
-> > > page level is not greater than that in CR3. My point is if UPM already enforces
-> > > no mixed pages in a large page, then KVM needn't do that again (UPM can
-> > > be trusted).
+On Tue, Jul 12, 2022 at 08:02:34PM +0200, Gupta, Pankaj wrote:
+> On 7/6/2022 10:20 AM, Chao Peng wrote:
+> > From: "Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>
 > > 
-> > The backing store in the UMP can tell KVM which page level it can
-> > support for a given private gpa, similar to host_pfn_mapping_level() for
-> > shared address.
-> >
-> > However, this solely represents the backing store's capability, KVM
-> > still needs additional info to decide whether that can be safely mapped
-> > as 2M/1G, e.g. all the following pages in the 2M/1G range should be all
-> > private, currently this is not something backing store can tell.
-> 
-> This argument applies to shared GPA.  The shared pages is backed by normal file
-> mapping with UPM.  When KVM is mapping shared GPA, the same check is needed.  So
-> I think KVM has to track all private or all shared or no-largepage at 2MB/1GB
-> level.  If UPM tracks shared-or-private at 4KB level, probably KVM may not need to
-> track it at 4KB level.
+> > Implement shmem as a memfile_notifier backing store. Essentially it
+> > interacts with the memfile_notifier feature flags for userspace
+> > access/page migration/page reclaiming and implements the necessary
+> > memfile_backing_store callbacks.
+> > 
+> > Signed-off-by: Kirill A. Shutemov <kirill.shutemov@linux.intel.com>
+> > Signed-off-by: Chao Peng <chao.p.peng@linux.intel.com>
+> > ---
+> >   include/linux/shmem_fs.h |   2 +
+> >   mm/shmem.c               | 109 ++++++++++++++++++++++++++++++++++++++-
+> >   2 files changed, 110 insertions(+), 1 deletion(-)
+...
 
-Right, the same also applies to shared memory. All the info we need is
-whether pages of a 2M range is all private/shared but not mixed. UPM v7
-has code tracking that in KVM and previously versions we track that in
-the backing store which has been discussed not a good idea.
+> > +#ifdef CONFIG_MIGRATION
+> > +static int shmem_migrate_page(struct address_space *mapping,
+> > +			      struct page *newpage, struct page *page,
+> > +			      enum migrate_mode mode)
+> > +{
+> > +	struct inode *inode = mapping->host;
+> > +	struct shmem_inode_info *info = SHMEM_I(inode);
+> > +
+> > +	if (info->memfile_node.flags & MEMFILE_F_UNMOVABLE)
+> > +		return -EOPNOTSUPP;
+> > +	return migrate_page(mapping, newpage, page, mode);
+> 
+> Wondering how well page migrate would work for private pages
+> on shmem memfd based backend?
+
+From high level:
+  - KVM unset MEMFILE_F_UNMOVABLE bit to indicate it capable of
+    migrating a page.
+  - Introduce new 'migrate' callback(s) to memfile_notifier_ops for KVM
+    to register.
+  - The callback is hooked to migrate_page() here.
+  - Once page migration requested, shmem calls into the 'migrate'
+    callback(s) to perform additional steps for encrypted memory (For
+    TDX we will call TDH.MEM.PAGE.RELOCATE).
 
 Chao
 > 
-> 
-> > Actually, in UPM v7 we let KVM record this info so one possible solution
-> > is making use of it.
-> > 
-> >   https://lkml.org/lkml/2022/7/6/259
-> > 
-> > Then to map a page as 2M, KVM needs to check:
-> >   - Memory backing store support that level
-> >   - All pages in 2M range are private as we recorded through
-> >     KVM_MEMORY_ENCRYPT_{UN,}REG_REGION
-> >   - No existing partial 4K map(s) in 2M range
-> -- 
-> Isaku Yamahata <isaku.yamahata@gmail.com>
+> > +}
+> > +#endif
+> > +
+> >   const struct address_space_operations shmem_aops = {
+> >   	.writepage	= shmem_writepage,
+> >   	.dirty_folio	= noop_dirty_folio,
+> > @@ -3814,7 +3872,7 @@ const struct address_space_operations shmem_aops = {
+> >   	.write_end	= shmem_write_end,
+> >   #endif
+> >   #ifdef CONFIG_MIGRATION
+> > -	.migratepage	= migrate_page,
+> > +	.migratepage	= shmem_migrate_page,
+> >   #endif
+> >   	.error_remove_page = shmem_error_remove_page,
+> >   };
+> > @@ -3931,6 +3989,51 @@ static struct file_system_type shmem_fs_type = {
+> >   	.fs_flags	= FS_USERNS_MOUNT,
+> >   };
+ 
