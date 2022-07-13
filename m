@@ -2,88 +2,88 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 956535735C6
-	for <lists+kvm@lfdr.de>; Wed, 13 Jul 2022 13:48:00 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 92C9F5735D3
+	for <lists+kvm@lfdr.de>; Wed, 13 Jul 2022 13:51:00 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236220AbiGMLr7 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 13 Jul 2022 07:47:59 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39900 "EHLO
+        id S231237AbiGMLu7 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 13 Jul 2022 07:50:59 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42458 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235683AbiGMLr6 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 13 Jul 2022 07:47:58 -0400
-Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 41FA21034C1;
-        Wed, 13 Jul 2022 04:47:57 -0700 (PDT)
-Received: from pps.filterd (m0098410.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.17.1.5/8.17.1.5) with ESMTP id 26DBfg8n005697;
-        Wed, 13 Jul 2022 11:47:57 GMT
+        with ESMTP id S234751AbiGMLu6 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 13 Jul 2022 07:50:58 -0400
+Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2DD7EE4778;
+        Wed, 13 Jul 2022 04:50:58 -0700 (PDT)
+Received: from pps.filterd (m0098417.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.17.1.5/8.17.1.5) with ESMTP id 26DBhoVk013834;
+        Wed, 13 Jul 2022 11:50:57 GMT
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
  mime-version : subject : to : cc : references : from : in-reply-to :
  content-type : content-transfer-encoding; s=pp1;
- bh=YUcXbHF2D5TectjvD8UtAZFzWDowWtVLnU8a9jUiZ6A=;
- b=olObYkUGBcmtEAY+cNb12fJxAG1CCU+0H6eJ/wZod0fMQFuE5+RgIMj3KDmr1DwgSVJh
- I+fHdeYc3Dh2aB1c2+RZfMrITQHRdtWvsXZtPXIu5ccJgFxVi0mX4lcLXRYfXFeq38/b
- IOmMQH2s9AAzcYWeSAmGHfjuIvzH7mUTI8qG+Zl6nIsfZXhmgOI7wkXVHVaavVBwVcKD
- I/BU5WeVPsiMIDv23bWQyS7EI5by7T486EZFmTCUuYdsuF7kzjnmzUBBW7SaelIwdGLk
- XELLIAUAmpt1iug/dXp5ev1uAG/qkM8UicV9Ye8sQk3yBPiA4DTdTyZEpdGkhD8xpoul +Q== 
+ bh=/UkvCuVr9MoZkBSPPZJKsdueVOvbPYo5SPwghB6eRCg=;
+ b=BQCq1GdfJEyhZ9wku/7qiWtyr+xOC82sDKv4Whzb4VrCdGSiKXcPkfUN4IoWUunPtp6/
+ cUeWBI7L6K51UqiW+vX+3v7GlxA8t96FuPAnH2nO+kixUohiJ2xG+c7aLkMU472z0WRX
+ c0w6UOxr7H9g9lMivaSrQ9ZssCdU5cwRa3N3wbc9KcfKL4ckDWPk2raMcJ0muXlNY3R+
+ HrtBPG9K6WZdGE1xkgIPyrenV4umGi6DgNOhT0NDogjy7PE4tFmFTSWxIlAKS9LtfP00
+ p2HyWgq2GClbo9bkwYvGbi2F4GFvKTyMbQU9rc9IdfORfbtH1zelaDd73713UB46VQAl zA== 
 Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3h9wd8r417-1
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3h9we4g53y-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Wed, 13 Jul 2022 11:47:56 +0000
-Received: from m0098410.ppops.net (m0098410.ppops.net [127.0.0.1])
-        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 26DBhqlh016322;
-        Wed, 13 Jul 2022 11:47:56 GMT
-Received: from ppma04ams.nl.ibm.com (63.31.33a9.ip4.static.sl-reverse.com [169.51.49.99])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3h9wd8r40n-1
+        Wed, 13 Jul 2022 11:50:57 +0000
+Received: from m0098417.ppops.net (m0098417.ppops.net [127.0.0.1])
+        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 26DBjFA4018326;
+        Wed, 13 Jul 2022 11:50:56 GMT
+Received: from ppma03fra.de.ibm.com (6b.4a.5195.ip4.static.sl-reverse.com [149.81.74.107])
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3h9we4g538-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Wed, 13 Jul 2022 11:47:56 +0000
-Received: from pps.filterd (ppma04ams.nl.ibm.com [127.0.0.1])
-        by ppma04ams.nl.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 26DBa9wx015125;
-        Wed, 13 Jul 2022 11:47:54 GMT
-Received: from b06cxnps3075.portsmouth.uk.ibm.com (d06relay10.portsmouth.uk.ibm.com [9.149.109.195])
-        by ppma04ams.nl.ibm.com with ESMTP id 3h8rrn2gw5-1
+        Wed, 13 Jul 2022 11:50:56 +0000
+Received: from pps.filterd (ppma03fra.de.ibm.com [127.0.0.1])
+        by ppma03fra.de.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 26DBb5WV010214;
+        Wed, 13 Jul 2022 11:50:54 GMT
+Received: from b06cxnps4076.portsmouth.uk.ibm.com (d06relay13.portsmouth.uk.ibm.com [9.149.109.198])
+        by ppma03fra.de.ibm.com with ESMTP id 3h71a8m6nd-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Wed, 13 Jul 2022 11:47:53 +0000
-Received: from d06av24.portsmouth.uk.ibm.com (d06av24.portsmouth.uk.ibm.com [9.149.105.60])
-        by b06cxnps3075.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 26DBlpYH10944870
+        Wed, 13 Jul 2022 11:50:54 +0000
+Received: from d06av24.portsmouth.uk.ibm.com (mk.ibm.com [9.149.105.60])
+        by b06cxnps4076.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 26DBopQc17629450
         (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Wed, 13 Jul 2022 11:47:51 GMT
+        Wed, 13 Jul 2022 11:50:51 GMT
 Received: from d06av24.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id E696542041;
-        Wed, 13 Jul 2022 11:47:50 +0000 (GMT)
+        by IMSVA (Postfix) with ESMTP id 6379442041;
+        Wed, 13 Jul 2022 11:50:51 +0000 (GMT)
 Received: from d06av24.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 8D5764203F;
-        Wed, 13 Jul 2022 11:47:50 +0000 (GMT)
+        by IMSVA (Postfix) with ESMTP id 16B254203F;
+        Wed, 13 Jul 2022 11:50:51 +0000 (GMT)
 Received: from [9.145.184.105] (unknown [9.145.184.105])
         by d06av24.portsmouth.uk.ibm.com (Postfix) with ESMTP;
-        Wed, 13 Jul 2022 11:47:50 +0000 (GMT)
-Message-ID: <9a24dd78-6ad2-bb5d-d100-2133a63f2e14@linux.ibm.com>
-Date:   Wed, 13 Jul 2022 13:47:50 +0200
+        Wed, 13 Jul 2022 11:50:51 +0000 (GMT)
+Message-ID: <f9435b7b-2d28-a060-8ea7-bbce6b3a30e3@linux.ibm.com>
+Date:   Wed, 13 Jul 2022 13:50:50 +0200
 MIME-Version: 1.0
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
  Thunderbird/91.9.0
-Subject: Re: [kvm-unit-tests PATCH v3 1/3] lib: s390x: add functions to set
- and clear PSW bits
+Subject: Re: [kvm-unit-tests PATCH v3 2/3] s390x: skey.c: rework the interrupt
+ handler
 Content-Language: en-US
 To:     Claudio Imbrenda <imbrenda@linux.ibm.com>, kvm@vger.kernel.org
 Cc:     linux-s390@vger.kernel.org, scgl@linux.ibm.com, nrb@linux.ibm.com,
         thuth@redhat.com
 References: <20220713104557.168113-1-imbrenda@linux.ibm.com>
- <20220713104557.168113-2-imbrenda@linux.ibm.com>
+ <20220713104557.168113-3-imbrenda@linux.ibm.com>
 From:   Janosch Frank <frankja@linux.ibm.com>
-In-Reply-To: <20220713104557.168113-2-imbrenda@linux.ibm.com>
+In-Reply-To: <20220713104557.168113-3-imbrenda@linux.ibm.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: BAXXd3hhiv-1oaCB2QS5cj8e7gZTrc2M
-X-Proofpoint-ORIG-GUID: SofLe5AjzruuOxfenSwP2sUMoFLp1VFN
+X-Proofpoint-ORIG-GUID: 4y-O7YPFx8eFtg1udBjbCZAu_XBISWvx
+X-Proofpoint-GUID: GopPccvSygoXSJYLZyittnvqjlwB6T0k
 X-Proofpoint-Virus-Version: vendor=baseguard
  engine=ICAP:2.0.205,Aquarius:18.0.883,Hydra:6.0.517,FMLib:17.11.122.1
  definitions=2022-07-12_14,2022-07-13_02,2022-06-22_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 adultscore=0 spamscore=0
- bulkscore=0 impostorscore=0 malwarescore=0 suspectscore=0 mlxlogscore=999
- priorityscore=1501 phishscore=0 clxscore=1015 mlxscore=0
- lowpriorityscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 suspectscore=0 clxscore=1015
+ spamscore=0 adultscore=0 priorityscore=1501 phishscore=0
+ lowpriorityscore=0 impostorscore=0 bulkscore=0 mlxlogscore=999 mlxscore=0
+ malwarescore=0 classifier=spam adjust=0 reason=mlx scancount=1
  engine=8.12.0-2206140000 definitions=main-2207130047
 X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
         DKIM_VALID,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,
@@ -96,285 +96,69 @@ List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
 On 7/13/22 12:45, Claudio Imbrenda wrote:
-> Add some functions to set and/or clear bits in the PSW.
+> The skey test currently uses a cleanup function to work around the
+> issues that arise when the lowcore is not mapped, since the interrupt
+> handler needs to access it.
 > 
-> Also introduce PSW_MASK_KEY and re-order the PSW_MASK_* constants so
-> they are descending in value.
-> 
-> This should improve code readability.
+> Instead of a cleanup function, simply disable DAT for the interrupt
+> handler for the tests that remap page 0. This is needed in preparation
+> of and upcoming patch that will cause the interrupt handler to read
+> from lowcore before calling the cleanup function.
 > 
 > Signed-off-by: Claudio Imbrenda <imbrenda@linux.ibm.com>
 
-Reviewed-by: Janosch Frank <frankja@linux.ibm.com>
+Acked-by: Janosch Frank <frankja@linux.ibm.com>
 
 > ---
->   lib/s390x/asm/arch_def.h | 45 +++++++++++++++++++++++++++++++++-------
->   lib/s390x/asm/pgtable.h  |  2 --
->   lib/s390x/mmu.c          | 14 +------------
->   lib/s390x/sclp.c         |  7 +------
->   s390x/diag288.c          |  6 ++----
->   s390x/selftest.c         |  4 ++--
->   s390x/skrf.c             | 12 +++--------
->   s390x/smp.c              | 18 +++-------------
->   8 files changed, 50 insertions(+), 58 deletions(-)
+>   s390x/skey.c | 23 ++++++++---------------
+>   1 file changed, 8 insertions(+), 15 deletions(-)
 > 
-> diff --git a/lib/s390x/asm/arch_def.h b/lib/s390x/asm/arch_def.h
-> index 78b257b7..b3282367 100644
-> --- a/lib/s390x/asm/arch_def.h
-> +++ b/lib/s390x/asm/arch_def.h
-> @@ -46,9 +46,10 @@ struct psw {
->   #define AS_SECN				2
->   #define AS_HOME				3
->   
-> -#define PSW_MASK_EXT			0x0100000000000000UL
-> -#define PSW_MASK_IO			0x0200000000000000UL
->   #define PSW_MASK_DAT			0x0400000000000000UL
-> +#define PSW_MASK_IO			0x0200000000000000UL
-> +#define PSW_MASK_EXT			0x0100000000000000UL
-> +#define PSW_MASK_KEY			0x00F0000000000000UL
->   #define PSW_MASK_WAIT			0x0002000000000000UL
->   #define PSW_MASK_PSTATE			0x0001000000000000UL
->   #define PSW_MASK_EA			0x0000000100000000UL
-> @@ -313,6 +314,40 @@ static inline void load_psw_mask(uint64_t mask)
->   		: "+r" (tmp) :  "a" (&psw) : "memory", "cc" );
+> diff --git a/s390x/skey.c b/s390x/skey.c
+> index 445476a0..d2752328 100644
+> --- a/s390x/skey.c
+> +++ b/s390x/skey.c
+> @@ -250,19 +250,6 @@ static void set_prefix_key_1(uint32_t *prefix_ptr)
+>   	);
 >   }
 >   
-> +/**
-> + * psw_mask_clear_bits - clears bits from the current PSW mask
-> + * @clear: bitmask of bits that will be cleared
-> + */
-> +static inline void psw_mask_clear_bits(uint64_t clear)
-> +{
-> +	load_psw_mask(extract_psw_mask() & ~clear);
-> +}
-> +
-> +/**
-> + * psw_mask_set_bits - sets bits on the current PSW mask
-> + * @set: bitmask of bits that will be set
-> + */
-> +static inline void psw_mask_set_bits(uint64_t set)
-> +{
-> +	load_psw_mask(extract_psw_mask() | set);
-> +}
-> +
-> +/**
-> + * enable_dat - enable the DAT bit in the current PSW
-> + */
-> +static inline void enable_dat(void)
-> +{
-> +	psw_mask_set_bits(PSW_MASK_DAT);
-> +}
-> +
-> +/**
-> + * disable_dat - disable the DAT bit in the current PSW
-> + */
-> +static inline void disable_dat(void)
-> +{
-> +	psw_mask_clear_bits(PSW_MASK_DAT);
-> +}
-> +
->   static inline void wait_for_interrupt(uint64_t irq_mask)
->   {
->   	uint64_t psw_mask = extract_psw_mask();
-> @@ -327,11 +362,7 @@ static inline void wait_for_interrupt(uint64_t irq_mask)
->   
->   static inline void enter_pstate(void)
->   {
-> -	uint64_t mask;
-> -
-> -	mask = extract_psw_mask();
-> -	mask |= PSW_MASK_PSTATE;
-> -	load_psw_mask(mask);
-> +	psw_mask_set_bits(PSW_MASK_PSTATE);
->   }
->   
->   static inline void leave_pstate(void)
-> diff --git a/lib/s390x/asm/pgtable.h b/lib/s390x/asm/pgtable.h
-> index f166dcc6..7b556ad9 100644
-> --- a/lib/s390x/asm/pgtable.h
-> +++ b/lib/s390x/asm/pgtable.h
-> @@ -247,6 +247,4 @@ static inline void idte_pgdp(unsigned long vaddr, pgdval_t *pgdp)
->   	idte((unsigned long)(pgdp - pgd_index(vaddr)) | ASCE_DT_REGION1, vaddr);
->   }
->   
-> -void configure_dat(int enable);
-> -
->   #endif /* _ASMS390X_PGTABLE_H_ */
-> diff --git a/lib/s390x/mmu.c b/lib/s390x/mmu.c
-> index c9f8754c..b474d702 100644
-> --- a/lib/s390x/mmu.c
-> +++ b/lib/s390x/mmu.c
-> @@ -29,18 +29,6 @@
->   
->   static pgd_t *table_root;
->   
-> -void configure_dat(int enable)
+> -/*
+> - * We remapped page 0, making the lowcore inaccessible, which breaks the normal
+> - * handler and breaks skipping the faulting instruction.
+> - * Just disable dynamic address translation to make things work.
+> - */
+> -static void dat_fixup_pgm_int(void)
 > -{
-> -	uint64_t mask;
+> -	uint64_t psw_mask = extract_psw_mask();
 > -
-> -	if (enable)
-> -		mask = extract_psw_mask() | PSW_MASK_DAT;
-> -	else
-> -		mask = extract_psw_mask() & ~PSW_MASK_DAT;
-> -
-> -	load_psw_mask(mask);
+> -	psw_mask &= ~PSW_MASK_DAT;
+> -	load_psw_mask(psw_mask);
 > -}
 > -
->   static void mmu_enable(pgd_t *pgtable)
->   {
->   	const uint64_t asce = __pa(pgtable) | ASCE_DT_REGION1 |
-> @@ -51,7 +39,7 @@ static void mmu_enable(pgd_t *pgtable)
->   	assert(stctg(1) == asce);
+>   #define PREFIX_AREA_SIZE (PAGE_SIZE * 2)
+>   static char lowcore_tmp[PREFIX_AREA_SIZE] __attribute__((aligned(PREFIX_AREA_SIZE)));
 >   
->   	/* enable dat (primary == 0 set as default) */
-> -	configure_dat(1);
-> +	enable_dat();
->   
->   	/* we can now also use DAT unconditionally in our PGM handler */
->   	lowcore.pgm_new_psw.mask |= PSW_MASK_DAT;
-> diff --git a/lib/s390x/sclp.c b/lib/s390x/sclp.c
-> index b8204c5f..a806cdb3 100644
-> --- a/lib/s390x/sclp.c
-> +++ b/lib/s390x/sclp.c
-> @@ -48,13 +48,8 @@ static void mem_init(phys_addr_t mem_end)
->   
->   void sclp_setup_int(void)
->   {
-> -	uint64_t mask;
-> -
->   	ctl_set_bit(0, CTL0_SERVICE_SIGNAL);
-> -
-> -	mask = extract_psw_mask();
-> -	mask |= PSW_MASK_EXT;
-> -	load_psw_mask(mask);
-> +	psw_mask_set_bits(PSW_MASK_EXT);
->   }
->   
->   void sclp_handle_ext(void)
-> diff --git a/s390x/diag288.c b/s390x/diag288.c
-> index e414865b..46dc0ed8 100644
-> --- a/s390x/diag288.c
-> +++ b/s390x/diag288.c
-> @@ -78,16 +78,14 @@ static void test_priv(void)
->   
->   static void test_bite(void)
->   {
-> -	uint64_t mask, time;
-> +	uint64_t time;
->   
->   	/* If watchdog doesn't bite, the cpu timer does */
->   	asm volatile("stck %0" : "=Q" (time) : : "cc");
->   	time += (uint64_t)(16000 * 1000) << 12;
->   	asm volatile("sckc %0" : : "Q" (time));
->   	ctl_set_bit(0, CTL0_CLOCK_COMPARATOR);
-> -	mask = extract_psw_mask();
-> -	mask |= PSW_MASK_EXT;
-> -	load_psw_mask(mask);
-> +	psw_mask_set_bits(PSW_MASK_EXT);
->   
->   	/* Arm watchdog */
->   	lowcore.restart_new_psw.mask = extract_psw_mask() & ~PSW_MASK_EXT;
-> diff --git a/s390x/selftest.c b/s390x/selftest.c
-> index 239bc5e3..13fd36bc 100644
-> --- a/s390x/selftest.c
-> +++ b/s390x/selftest.c
-> @@ -64,9 +64,9 @@ static void test_malloc(void)
->   	report(tmp != tmp2, "allocated memory addresses differ");
->   
->   	expect_pgm_int();
-> -	configure_dat(0);
-> +	disable_dat();
->   	*tmp = 987654321;
-> -	configure_dat(1);
-> +	enable_dat();
->   	check_pgm_int_code(PGM_INT_CODE_ADDRESSING);
->   
->   	free(tmp);
-> diff --git a/s390x/skrf.c b/s390x/skrf.c
-> index 1a811894..26f70b4e 100644
-> --- a/s390x/skrf.c
-> +++ b/s390x/skrf.c
-> @@ -63,11 +63,9 @@ static void test_pfmf(void)
->   
->   static void test_psw_key(void)
->   {
-> -	uint64_t psw_mask = extract_psw_mask() | 0xF0000000000000UL;
-> -
->   	report_prefix_push("psw key");
->   	expect_pgm_int();
-> -	load_psw_mask(psw_mask);
-> +	psw_mask_set_bits(PSW_MASK_KEY);
->   	check_pgm_int_code(PGM_INT_CODE_SPECIAL_OPERATION);
+> @@ -318,7 +305,13 @@ static void test_set_prefix(void)
+>   	report(get_prefix() == old_prefix, "did not set prefix");
 >   	report_prefix_pop();
->   }
-> @@ -140,17 +138,13 @@ static void ecall_cleanup(void)
->   /* Set a key into the external new psw mask and open external call masks */
->   static void ecall_setup(void)
->   {
-> -	uint64_t mask;
-> -
->   	register_pgm_cleanup_func(ecall_cleanup);
->   	expect_pgm_int();
->   	/* Put a skey into the ext new psw */
-> -	lowcore.ext_new_psw.mask = 0x00F0000000000000UL | PSW_MASK_64;
-> +	lowcore.ext_new_psw.mask = PSW_MASK_KEY | PSW_MASK_64;
->   	/* Open up ext masks */
->   	ctl_set_bit(0, CTL0_EXTERNAL_CALL);
-> -	mask = extract_psw_mask();
-> -	mask |= PSW_MASK_EXT;
-> -	load_psw_mask(mask);
-> +	psw_mask_set_bits(PSW_MASK_EXT);
->   	/* Tell cpu 0 that we're ready */
->   	set_flag(1);
->   }
-> diff --git a/s390x/smp.c b/s390x/smp.c
-> index 6d474d0d..0df4751f 100644
-> --- a/s390x/smp.c
-> +++ b/s390x/smp.c
-> @@ -288,13 +288,9 @@ static void test_set_prefix(void)
 >   
->   static void ecall(void)
->   {
-> -	unsigned long mask;
-> -
->   	expect_ext_int();
->   	ctl_set_bit(0, CTL0_EXTERNAL_CALL);
-> -	mask = extract_psw_mask();
-> -	mask |= PSW_MASK_EXT;
-> -	load_psw_mask(mask);
-> +	psw_mask_set_bits(PSW_MASK_EXT);
->   	set_flag(1);
->   	while (lowcore.ext_int_code != 0x1202) { mb(); }
->   	report_pass("received");
-> @@ -321,13 +317,9 @@ static void test_ecall(void)
+> -	register_pgm_cleanup_func(dat_fixup_pgm_int);
+> +	/*
+> +	 * Page 0 will be remapped, making the lowcore inaccessible, which
+> +	 * breaks the normal handler and breaks skipping the faulting
+> +	 * instruction. Disable dynamic address translation for the
+> +	 * interrupt handler to make things work.
+> +	 */
+> +	lowcore.pgm_new_psw.mask &= ~PSW_MASK_DAT;
 >   
->   static void emcall(void)
->   {
-> -	unsigned long mask;
-> -
->   	expect_ext_int();
->   	ctl_set_bit(0, CTL0_EMERGENCY_SIGNAL);
-> -	mask = extract_psw_mask();
-> -	mask |= PSW_MASK_EXT;
-> -	load_psw_mask(mask);
-> +	psw_mask_set_bits(PSW_MASK_EXT);
->   	set_flag(1);
->   	while (lowcore.ext_int_code != 0x1201) { mb(); }
->   	report_pass("received");
-> @@ -466,14 +458,10 @@ static void test_reset_initial(void)
+>   	report_prefix_push("remapped page, fetch protection");
+>   	set_prefix(old_prefix);
+> @@ -356,7 +349,7 @@ static void test_set_prefix(void)
+>   	report_prefix_pop();
 >   
->   static void test_local_ints(void)
->   {
-> -	unsigned long mask;
-> -
->   	/* Open masks for ecall and emcall */
->   	ctl_set_bit(0, CTL0_EXTERNAL_CALL);
->   	ctl_set_bit(0, CTL0_EMERGENCY_SIGNAL);
-> -	mask = extract_psw_mask();
-> -	mask |= PSW_MASK_EXT;
-> -	load_psw_mask(mask);
-> +	psw_mask_set_bits(PSW_MASK_EXT);
->   	set_flag(1);
->   }
->   
+>   	ctl_clear_bit(0, CTL0_FETCH_PROTECTION_OVERRIDE);
+> -	register_pgm_cleanup_func(NULL);
+> +	lowcore.pgm_new_psw.mask |= PSW_MASK_DAT;
+>   	report_prefix_pop();
+>   	set_storage_key(pagebuf, 0x00, 0);
+>   	report_prefix_pop();
 
