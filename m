@@ -2,138 +2,137 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 19A1D572F31
-	for <lists+kvm@lfdr.de>; Wed, 13 Jul 2022 09:27:53 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 00360572F63
+	for <lists+kvm@lfdr.de>; Wed, 13 Jul 2022 09:40:44 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234329AbiGMH1v (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 13 Jul 2022 03:27:51 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54084 "EHLO
+        id S234757AbiGMHkn (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 13 Jul 2022 03:40:43 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36990 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229968AbiGMH1p (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 13 Jul 2022 03:27:45 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 5B826E304A
-        for <kvm@vger.kernel.org>; Wed, 13 Jul 2022 00:27:44 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1657697263;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=dhZTYpLxnL2bZiylFvckcQJP6YV2ZgP2bcqRIrr9Yeg=;
-        b=XskLZE+onCDJqPnvdz5ozpXtaAWU9iv5fzBs3RgR9KKSch49ozSuz6rFfU8EOP2uDA/14t
-        uRfk3N4EKFxY8sFqAtHbJWAmbQBdP7YfkDsjxu3OE4MYzeU2rGDKI/3P3yym7K/y/CsbOu
-        A+6dpxWq4aL5m/OTuUEBgKjuhifl0q4=
-Received: from mail-ed1-f71.google.com (mail-ed1-f71.google.com
- [209.85.208.71]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-473-a1weE9MINgS_qVTVtkLiDg-1; Wed, 13 Jul 2022 03:27:42 -0400
-X-MC-Unique: a1weE9MINgS_qVTVtkLiDg-1
-Received: by mail-ed1-f71.google.com with SMTP id z20-20020a05640240d400b0043a82d9d65fso7719065edb.0
-        for <kvm@vger.kernel.org>; Wed, 13 Jul 2022 00:27:41 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
-         :content-language:to:cc:references:from:in-reply-to
-         :content-transfer-encoding;
-        bh=dhZTYpLxnL2bZiylFvckcQJP6YV2ZgP2bcqRIrr9Yeg=;
-        b=dmJGYco1Lpl/LXv4uOV3IREZp4jmFFGn5lMVJRtbjdu9arrbJfOrjWa5TcA/hEDMbJ
-         oC7qOG8TTlSqPyv1GelZoMR3KUXFceG+0akFWfy+Q8x4k+ijL6Qeqd9PTd6ROH7MnOAv
-         aeeWYBdwzlU6E5OwpX/I6VxneTwbaoz7Rk31tx+NZStKL6JAMj4V9XvI+1Ux8er9TdXN
-         NpMdNa6oYqMkR+GtlKZouEIPay0DUkde1H5sxNNCeJ7YJnrL0yeApK8YH3bACp5x1mJu
-         G2TCb52KgqKbIh3qsso1/e/Vb+0okWQtWpg8UNPoH1oaQjhRZZmuQgLgy7EAyQKtVZqA
-         /GNg==
-X-Gm-Message-State: AJIora8p41eWPCLuUG1cjSd+UI05isH8bx/jEPsloFTIO/OABBJnQvc9
-        +fPoy3rkJYxTmc6kud1a9gwWxelgqV58bcy4P71VGY3sOCQ0OJ8fC0Kul51jxK/qcLV0Ufqcm+H
-        7ZWKWy217St2D
-X-Received: by 2002:a17:906:604f:b0:718:e9e8:9d2a with SMTP id p15-20020a170906604f00b00718e9e89d2amr2007864ejj.315.1657697260862;
-        Wed, 13 Jul 2022 00:27:40 -0700 (PDT)
-X-Google-Smtp-Source: AGRyM1viPdgz1OQQGbA5i2sFD4rjvppVT3kLlNuMm2yZyN2OpoiNndAz/uOwH0Gal0wbA7eTVo3Nmw==
-X-Received: by 2002:a17:906:604f:b0:718:e9e8:9d2a with SMTP id p15-20020a170906604f00b00718e9e89d2amr2007854ejj.315.1657697260658;
-        Wed, 13 Jul 2022 00:27:40 -0700 (PDT)
-Received: from ?IPV6:2001:b07:6468:f312:9af8:e5f5:7516:fa89? ([2001:b07:6468:f312:9af8:e5f5:7516:fa89])
-        by smtp.googlemail.com with ESMTPSA id y25-20020a170906471900b0072b91a3d7e9sm736295ejq.28.2022.07.13.00.27.39
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 13 Jul 2022 00:27:40 -0700 (PDT)
-Message-ID: <5610de7f-5a28-288a-b6bc-9ad7a36e27be@redhat.com>
-Date:   Wed, 13 Jul 2022 09:27:38 +0200
+        with ESMTP id S234255AbiGMHki (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 13 Jul 2022 03:40:38 -0400
+Received: from mga17.intel.com (mga17.intel.com [192.55.52.151])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 45AB6E587D;
+        Wed, 13 Jul 2022 00:40:34 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1657698034; x=1689234034;
+  h=date:from:to:cc:subject:message-id:reply-to:references:
+   mime-version:in-reply-to;
+  bh=p6S9d0eoOccrcr2x6G9e4hJJ9OVvTKahjywxJ3zVPng=;
+  b=XF5ri1fOs/6Jvmk8nzWU+eFMmyngz64N+h0AiMmI15I/JOvtRZbKjjok
+   gAjBaVh8D315dLNQg3r4/oAEGav2tx+LRsFG8K7dRQNxtqHLLx63SMfZN
+   zbYURaW0u1rCbJXHuT+LhTeSrunTciBeHObNuFX5BVn6JjX3zDNkhCNK+
+   w7rU0nFpU7FrEqOGs95tMBukML2Jw7vIJHqpmbLJSAgPYBl43GtFj2waL
+   DAusmCTdsd5/eHiVGSB/3/AM3uuIf7dlAxq0bnZZZebYYnZgdSk7T2gSs
+   MROEGaPjwmQILxySVhuocg9D6JGOL0aSNbpMU0zs9UCfwS57yqeFrYo0x
+   w==;
+X-IronPort-AV: E=McAfee;i="6400,9594,10406"; a="265549705"
+X-IronPort-AV: E=Sophos;i="5.92,267,1650956400"; 
+   d="scan'208";a="265549705"
+Received: from fmsmga003.fm.intel.com ([10.253.24.29])
+  by fmsmga107.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 13 Jul 2022 00:40:27 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.92,267,1650956400"; 
+   d="scan'208";a="685065350"
+Received: from chaop.bj.intel.com (HELO localhost) ([10.240.192.101])
+  by FMSMGA003.fm.intel.com with ESMTP; 13 Jul 2022 00:40:25 -0700
+Date:   Wed, 13 Jul 2022 15:37:07 +0800
+From:   Chao Peng <chao.p.peng@linux.intel.com>
+To:     Isaku Yamahata <isaku.yamahata@gmail.com>
+Cc:     Chao Gao <chao.gao@intel.com>, isaku.yamahata@intel.com,
+        kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Paolo Bonzini <pbonzini@redhat.com>, chao.p.peng@intel.com
+Subject: Re: [PATCH v7 000/102] KVM TDX basic feature support
+Message-ID: <20220713073707.GA2831541@chaop.bj.intel.com>
+Reply-To: Chao Peng <chao.p.peng@linux.intel.com>
+References: <cover.1656366337.git.isaku.yamahata@intel.com>
+ <20220711151701.GA1375147@ls.amr.corp.intel.com>
+ <20220712050714.GA26573@gao-cwp>
+ <20220712105419.GB2805143@chaop.bj.intel.com>
+ <20220712172250.GJ1379820@ls.amr.corp.intel.com>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.10.0
-Subject: Re: [GIT PULL] KVM/riscv fixes for 5.19, take #2
-Content-Language: en-US
-To:     Anup Patel <anup@brainfault.org>
-Cc:     Palmer Dabbelt <palmer@dabbelt.com>,
-        Atish Patra <atishp@atishpatra.org>,
-        KVM General <kvm@vger.kernel.org>,
-        "open list:KERNEL VIRTUAL MACHINE FOR RISC-V (KVM/riscv)" 
-        <kvm-riscv@lists.infradead.org>,
-        linux-riscv <linux-riscv@lists.infradead.org>
-References: <CAAhSdy1CAtr=mAVFtduTcED_Sjp2=4duQwgL5syxZ-sYM6SoWQ@mail.gmail.com>
- <01ec025d-fbde-5e58-2221-a368d4e1bb3a@redhat.com>
- <CAAhSdy2gR3dtBHO0Q7+1xgMCytYkJgmuT6xiQ+WQiorQPMRUXA@mail.gmail.com>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-In-Reply-To: <CAAhSdy2gR3dtBHO0Q7+1xgMCytYkJgmuT6xiQ+WQiorQPMRUXA@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-3.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
-        RCVD_IN_DNSWL_LOW,SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE
-        autolearn=ham autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20220712172250.GJ1379820@ls.amr.corp.intel.com>
+X-Spam-Status: No, score=-4.9 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,SPF_HELO_NONE,
+        SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no
+        version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 7/13/22 09:17, Anup Patel wrote:
-> On Wed, Jul 13, 2022 at 11:30 AM Paolo Bonzini <pbonzini@redhat.com> wrote:
->>
->> On 7/13/22 07:47, Anup Patel wrote:
->>> Hi Paolo,
->>>
->>> We have two more fixes for 5.19 which were discovered recently:
->>> 1) Fix missing PAGE_PFN_MASK
->>> 2) Fix SRCU deadlock caused by kvm_riscv_check_vcpu_requests()
->>
->> Pulled, thanks.
->>
->> For the latter, my suggestion is to remove KVM_REQ_SLEEP completely and
->> key the waiting on kvm_arch_vcpu_runnable using kvm_vcpu_halt or
->> kvm_vcpu_block.
+On Tue, Jul 12, 2022 at 10:22:50AM -0700, Isaku Yamahata wrote:
+> On Tue, Jul 12, 2022 at 06:54:19PM +0800,
+> Chao Peng <chao.p.peng@linux.intel.com> wrote:
 > 
-> We are using KVM_REQ_SLEEP for VCPU hotplug. The secondary
-> VCPUs will block until woken-up by using an SBI call from other VCPU.
-> This is different from blocking on WFI where VCPU will wake-up upon
-> any interrupt.
-
-Yes, I understand.  The idea is to have something like
-
-	if (kvm_arch_vcpu_runnable())
-		vcpu_enter_guest(vcpu);
-	else
-		kvm_vcpu_block(vcpu);
-
-instead of using KVM_REQ_SLEEP to enter the blocking loop.  This works 
-for both WFI and hotplug, the only difference between the two cases is 
-the event that changes kvm_arch_vcpu_runnable() to true.
-
-Paolo
-
-> I agree with your suggestion, we should definitely use kvm_vcpu_block()
-> here.
+> > On Tue, Jul 12, 2022 at 01:07:20PM +0800, Chao Gao wrote:
+> > > On Mon, Jul 11, 2022 at 08:17:01AM -0700, Isaku Yamahata wrote:
+> > > >Hi. Because my description on large page support was terse, I wrote up more
+> > > >detailed one.  Any feedback/thoughts on large page support?
+> > > >
+> > > >TDP MMU large page support design
+> > > >
+> > > >Two main discussion points
+> > > >* how to track page status. private vs shared, no-largepage vs can-be-largepage
+> > > 
+> > > ...
+> > > 
+> > > >
+> > > >Tracking private/shared and large page mappable
+> > > >-----------------------------------------------
+> > > >VMM needs to track that page is mapped as private or shared at 4KB granularity.
+> > > >For efficiency of EPT violation path (****), at 2MB and 1GB level, VMM should
+> > > >track the page can be mapped as a large page (regarding private/shared).  VMM
+> > > >updates it on MapGPA and references it on the EPT violation path. (****)
+> > > 
+> > > Isaku,
+> > > 
+> > > + Peng Chao
+> > > 
+> > > Doesn't UPM guarantee that 2MB/1GB large page in CR3 should be either all
+> > > private or all shared?
+> > > 
+> > > KVM always retrieves the mapping level in CR3 and enforces that EPT's
+> > > page level is not greater than that in CR3. My point is if UPM already enforces
+> > > no mixed pages in a large page, then KVM needn't do that again (UPM can
+> > > be trusted).
+> > 
+> > The backing store in the UMP can tell KVM which page level it can
+> > support for a given private gpa, similar to host_pfn_mapping_level() for
+> > shared address.
+> >
+> > However, this solely represents the backing store's capability, KVM
+> > still needs additional info to decide whether that can be safely mapped
+> > as 2M/1G, e.g. all the following pages in the 2M/1G range should be all
+> > private, currently this is not something backing store can tell.
 > 
->>
->> Also, I only had a quick look but it seems like vcpu->arch.pause is
->> never written?
-> 
-> Yes, the vcpu->arch.pause is redundant. I will remove it.
-> 
->>
->> Paolo
->>
-> 
-> Thanks,
-> Anup
-> 
+> This argument applies to shared GPA.  The shared pages is backed by normal file
+> mapping with UPM.  When KVM is mapping shared GPA, the same check is needed.  So
+> I think KVM has to track all private or all shared or no-largepage at 2MB/1GB
+> level.  If UPM tracks shared-or-private at 4KB level, probably KVM may not need to
+> track it at 4KB level.
 
+Right, the same also applies to shared memory. All the info we need is
+whether pages of a 2M range is all private/shared but not mixed. UPM v7
+has code tracking that in KVM and previously versions we track that in
+the backing store which has been discussed not a good idea.
+
+Chao
+> 
+> 
+> > Actually, in UPM v7 we let KVM record this info so one possible solution
+> > is making use of it.
+> > 
+> >   https://lkml.org/lkml/2022/7/6/259
+> > 
+> > Then to map a page as 2M, KVM needs to check:
+> >   - Memory backing store support that level
+> >   - All pages in 2M range are private as we recorded through
+> >     KVM_MEMORY_ENCRYPT_{UN,}REG_REGION
+> >   - No existing partial 4K map(s) in 2M range
+> -- 
+> Isaku Yamahata <isaku.yamahata@gmail.com>
