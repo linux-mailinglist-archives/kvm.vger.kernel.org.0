@@ -2,66 +2,67 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 84162573CA7
-	for <lists+kvm@lfdr.de>; Wed, 13 Jul 2022 20:41:32 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 9F065573CAB
+	for <lists+kvm@lfdr.de>; Wed, 13 Jul 2022 20:45:47 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236799AbiGMSlb (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 13 Jul 2022 14:41:31 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43200 "EHLO
+        id S236732AbiGMSpp (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 13 Jul 2022 14:45:45 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45602 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S236817AbiGMSl1 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 13 Jul 2022 14:41:27 -0400
-Received: from mail-ej1-x62f.google.com (mail-ej1-x62f.google.com [IPv6:2a00:1450:4864:20::62f])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4798D2F643
-        for <kvm@vger.kernel.org>; Wed, 13 Jul 2022 11:41:26 -0700 (PDT)
-Received: by mail-ej1-x62f.google.com with SMTP id b11so21366885eju.10
-        for <kvm@vger.kernel.org>; Wed, 13 Jul 2022 11:41:26 -0700 (PDT)
+        with ESMTP id S236706AbiGMSpo (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 13 Jul 2022 14:45:44 -0400
+Received: from mail-ej1-x62e.google.com (mail-ej1-x62e.google.com [IPv6:2a00:1450:4864:20::62e])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3E7D92C139
+        for <kvm@vger.kernel.org>; Wed, 13 Jul 2022 11:45:43 -0700 (PDT)
+Received: by mail-ej1-x62e.google.com with SMTP id va17so21478449ejb.0
+        for <kvm@vger.kernel.org>; Wed, 13 Jul 2022 11:45:43 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=linux-foundation.org; s=google;
         h=mime-version:references:in-reply-to:from:date:message-id:subject:to
          :cc;
-        bh=KifgCMjgebK/NLp6nn+G8EJhgQBv0NBPfKiflov1mlU=;
-        b=WXkiCM2m7cWXxt53oQNuRjMlHN9tRHeiD9hdMvRX9/jmGDWKVCpWfb/ymYf0GUrQkn
-         2gcUvM0fppN4jvlrJBHSQ6kMpDV+0P4G+reqg6RPyFytwCdFGVuiwifzJXcN+e0T0eK3
-         apqVZARbdC+XmrVpwiiRoZeHilhOPB7mXQ0Jw=
+        bh=PTaNdUVQ+FmmgGgyaGPbQquf7hxH0Xo9Q96HHi4sep8=;
+        b=L73SZ+mHgtriwniSrAhSkxjXKDDXd0WPgqFSlQUlKk5euLzrMbPjkEmJ9R+ZsDkWsH
+         g0Meu4SIWMqSxjGIrdgkCgnmWaUXM68miVezQGPM9PXgHGoW1g8lxifty3vtR7bbVqJ1
+         7asnHsF2ys8kx0XarbxrDW+2kekvsiZEVyWFI=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:mime-version:references:in-reply-to:from:date
          :message-id:subject:to:cc;
-        bh=KifgCMjgebK/NLp6nn+G8EJhgQBv0NBPfKiflov1mlU=;
-        b=M0D2mHNyGZsGsFiQ5W/Ne8AMGaS/NStStS+kYD/bYznlyEGsv8zqXa53wKN+ojCWxM
-         4DWfKZhzfUjdOZdPrl774ppic+Ibb3KvABCQ0wcXCD/v80ESXWTVIaG/2o/bnsxZvKWX
-         3fjrVJSwL9hbn4xs2i4d1VpAwj/RKZyQmachZ1h0j+J2mGRRY4OoPJ6gaAJpcun8XNgH
-         eyLLBWVpmy0zKKkypYpGvDCy/AKaqzGDU5FCoxDFzjGnZSEjQ3kgT7qq6G7mkbnXi1sF
-         2l+s2dsUD5SE8SUelUeBJUmWTPu9OnK6ItygMgOQFPJcmmlXlWMsgYaVLD8Fj7tzyZM/
-         J0vQ==
-X-Gm-Message-State: AJIora8v8UGyT6gAdY013RnZxI0H1Dnljm3lWgoW6/sCwHnApCis81bD
-        V07naP4j0KNDN7DF6k5hdrVWTeZV6J9iU2KTPws=
-X-Google-Smtp-Source: AGRyM1vcnuNH2KLxMeQGsK2Baocu1Omt9Nu8P5s9OJ1oKR98BBr9UP+7E0/ZPbMiwSdxmz3WXXUggw==
-X-Received: by 2002:a17:906:dc8f:b0:725:28d1:422d with SMTP id cs15-20020a170906dc8f00b0072528d1422dmr4724076ejc.131.1657737684494;
-        Wed, 13 Jul 2022 11:41:24 -0700 (PDT)
+        bh=PTaNdUVQ+FmmgGgyaGPbQquf7hxH0Xo9Q96HHi4sep8=;
+        b=LfinGnPGKGWfXPQUFVVOY4GZr7CRfTfBSJjCKLEutXNrVA6ZHp+FgJ7k+se03LIhSc
+         ieTgslnWGcHpVyGUJiFvEBtAB8h/zfdgvLI7Mkj3O1nL8f/E0z3DILlGV/EauuHm+ivo
+         56qPYOSLBpvGTj4Lq0PNxAiAfOff49Td7l2fxDn6Xnqm0vCI4MdUe33H7sDBPsq6mHPZ
+         W69rXIwnwM4EP1EONwfZGt9yw7/phj2P5ml3P9XRF2gFIXsgfcF9nXlvXcxgizkhhV/Z
+         P+U7Bf08uCFbpGGWZOWKRc4SJNM6YYq3faBN6GUcp+C9W/tjPEpxVQFFE/GnCwP2VrPT
+         LovQ==
+X-Gm-Message-State: AJIora+DTxlxNXpD6DaavHkzB0gU6kbN2yRPJ3LmEHtUJQI6mUDMjr/W
+        vwEQ25v/AJLR2P9ihiNrUULn075v06Js3V8abYs=
+X-Google-Smtp-Source: AGRyM1tB0JlIizlpgymWR7A1ryy1/Wq2rmGvub+32NjXtIdmWxPMh34Xg3rjNRslIfRKcmOwXJXeEw==
+X-Received: by 2002:a17:907:7348:b0:72b:44bf:96b6 with SMTP id dq8-20020a170907734800b0072b44bf96b6mr5009444ejc.7.1657737941543;
+        Wed, 13 Jul 2022 11:45:41 -0700 (PDT)
 Received: from mail-wr1-f51.google.com (mail-wr1-f51.google.com. [209.85.221.51])
-        by smtp.gmail.com with ESMTPSA id ky18-20020a170907779200b00715a02874acsm5217475ejc.35.2022.07.13.11.41.24
+        by smtp.gmail.com with ESMTPSA id z8-20020a1709063a0800b006febce7081bsm1441524eje.163.2022.07.13.11.45.41
         for <kvm@vger.kernel.org>
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 13 Jul 2022 11:41:24 -0700 (PDT)
-Received: by mail-wr1-f51.google.com with SMTP id r10so10562205wrv.4
-        for <kvm@vger.kernel.org>; Wed, 13 Jul 2022 11:41:24 -0700 (PDT)
-X-Received: by 2002:a5d:544b:0:b0:21d:70cb:b4a2 with SMTP id
- w11-20020a5d544b000000b0021d70cbb4a2mr4440805wrv.281.1657737218805; Wed, 13
- Jul 2022 11:33:38 -0700 (PDT)
+        Wed, 13 Jul 2022 11:45:41 -0700 (PDT)
+Received: by mail-wr1-f51.google.com with SMTP id o4so16739581wrh.3
+        for <kvm@vger.kernel.org>; Wed, 13 Jul 2022 11:45:41 -0700 (PDT)
+X-Received: by 2002:a05:6000:180f:b0:21d:68f8:c4ac with SMTP id
+ m15-20020a056000180f00b0021d68f8c4acmr4766164wrh.193.1657737619653; Wed, 13
+ Jul 2022 11:40:19 -0700 (PDT)
 MIME-Version: 1.0
 References: <20220712183238.844813653@linuxfoundation.org> <CA+G9fYtntg7=zWSs-dm+n_AUr_u0eBOU0zrwWqMeXZ+SF6_bLw@mail.gmail.com>
- <eb63e4ce-843f-c840-060e-6e15defd3c4d@roeck-us.net>
-In-Reply-To: <eb63e4ce-843f-c840-060e-6e15defd3c4d@roeck-us.net>
+ <eb63e4ce-843f-c840-060e-6e15defd3c4d@roeck-us.net> <CAHk-=wj5cOA+fbGeV15kvwe6YGT54Wsk8F2UGoekVQLTPJz_pw@mail.gmail.com>
+In-Reply-To: <CAHk-=wj5cOA+fbGeV15kvwe6YGT54Wsk8F2UGoekVQLTPJz_pw@mail.gmail.com>
 From:   Linus Torvalds <torvalds@linux-foundation.org>
-Date:   Wed, 13 Jul 2022 11:33:22 -0700
-X-Gmail-Original-Message-ID: <CAHk-=wj5cOA+fbGeV15kvwe6YGT54Wsk8F2UGoekVQLTPJz_pw@mail.gmail.com>
-Message-ID: <CAHk-=wj5cOA+fbGeV15kvwe6YGT54Wsk8F2UGoekVQLTPJz_pw@mail.gmail.com>
+Date:   Wed, 13 Jul 2022 11:40:03 -0700
+X-Gmail-Original-Message-ID: <CAHk-=wgq1soM4gudypWLVQdYuvJbXn38LtvJMtnLZX+RTypqLg@mail.gmail.com>
+Message-ID: <CAHk-=wgq1soM4gudypWLVQdYuvJbXn38LtvJMtnLZX+RTypqLg@mail.gmail.com>
 Subject: Re: [PATCH 5.15 00/78] 5.15.55-rc1 review
 To:     Guenter Roeck <linux@roeck-us.net>,
         Peter Zijlstra <peterz@infradead.org>,
-        Borislav Petkov <bp@suse.de>
+        Borislav Petkov <bp@suse.de>,
+        Thadeu Lima de Souza Cascardo <cascardo@canonical.com>
 Cc:     Naresh Kamboju <naresh.kamboju@linaro.org>,
         Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
         kvm list <kvm@vger.kernel.org>,
@@ -93,65 +94,24 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Jul 13, 2022 at 6:34 AM Guenter Roeck <linux@roeck-us.net> wrote:
+On Wed, Jul 13, 2022 at 11:33 AM Linus Torvalds
+<torvalds@linux-foundation.org> wrote:
 >
-> Looking into the log, I don't think that message is related to the crash.
+> So I think that that is where the "xaddw_ax_dx+8" comes from: some
+> code assumes that FASTOP_SIZE is 8, but that xaddw_ax_dx case was
+> actually 9 bytes and thus got that "int3 + padding" in the next 8
+> bytes.
 >
-> ...
-> [  105.653777] Modules linked in: x86_pkg_temp_thermal
-> [  105.902123] ---[ end trace cec99cae36bcbfd7 ]---
-> [  105.902124] RIP: 0010:xaddw_ax_dx+0x9/0x10    <--- crash
-> [  105.902126] Code: 00 0f bb d0 c3 cc cc cc cc 48 0f bb d0 c3 cc cc
+> The whole kvm x86 emulation thing is quite complicated and has lots
+> of instruction size #defines and magic.
+>
+> I'm not familiar enough with it to go "Ahh, it's obviously XYZ", but
+> I'm sure PeterZ and Borislav know exactly what's going on.
 
-Yeah, the code you snipped, shows
+And I see that Thadeau already figured it out:
 
-  20: 66 0f c1 d0          xadd   %dx,%ax
-  24: c3                    ret
-  25: cc                    int3
-  26: cc                    int3
-  27: cc                    int3
-  28: cc                    int3
-  29:* 0f 1f 80 00 00 00 00 nopl   0x0(%rax) <-- trapping instruction
-  30: 0f c1 d0              xadd   %edx,%eax
-  33: c3                    ret
-  34: cc                    int3
-  35: cc                    int3
-  36: cc                    int3
-  37: cc                    int3
-  38: 48 0f c1 d0          xadd   %rdx,%rax
-  3c: c3                    ret
-  3d: cc                    int3
+  https://lore.kernel.org/all/20220713171241.184026-1-cascardo@canonical.com/
 
-and that's a bit odd.
+So presumably we need that patch everywhere.
 
-It says "xaddw_ax_dx+0x9/0x10", but I think somebody jumped to
-"xaddw_ax_dx+8", hit the 'int3', and the RIP points to the next
-instruction (because that's how int3 works).
-
-And the fastop code says:
-
- * fastop functions have a special calling convention:
-...
- * Moreover, they are all exactly FASTOP_SIZE bytes long,
-
-but that is clearly *NOT* the case for xaddw_ax_dx, because it's 16
-bytes in size, and the other ones are 8 bytes. That's where the "nopl"
-comes from: it's the alignment instruction to the next fastop
-function.
-
-Compare that to the word-sized 'xaddl' case rigth afterwards: that one
-*is* just 8 bytes in size, so the 64-byte 'xaddq' comes 8 bytes aftrer
-it, and there's no 7-byte padding nop-instruction.
-
-So I think that that is where the "xaddw_ax_dx+8" comes from: some
-code assumes that FASTOP_SIZE is 8, but that xaddw_ax_dx case was
-actually 9 bytes and thus got that "int3 + padding" in the next 8
-bytes.
-
-The whole kvm x86 emulation thiing is quite complicated and has lots
-of instruction size #defines and magic.
-
-I'm not familiar enough with it to go "Ahh, it's obviously XYZ", but
-I'm sure PeterZ and Borislav know exactly what's going on.
-
-                 Linus
+              Linus
