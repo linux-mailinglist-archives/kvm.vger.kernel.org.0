@@ -2,127 +2,167 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 9F2685749B2
-	for <lists+kvm@lfdr.de>; Thu, 14 Jul 2022 11:53:04 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 6E6595749D8
+	for <lists+kvm@lfdr.de>; Thu, 14 Jul 2022 11:57:50 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237609AbiGNJxD (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 14 Jul 2022 05:53:03 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:32954 "EHLO
+        id S237883AbiGNJ5s (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 14 Jul 2022 05:57:48 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36512 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S237147AbiGNJxB (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 14 Jul 2022 05:53:01 -0400
-Received: from desiato.infradead.org (desiato.infradead.org [IPv6:2001:8b0:10b:1:d65d:64ff:fe57:4e05])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BA9CDE7E;
-        Thu, 14 Jul 2022 02:53:00 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=desiato.20200630; h=In-Reply-To:Content-Type:MIME-Version:
-        References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
-        Content-Transfer-Encoding:Content-ID:Content-Description;
-        bh=RXOON8J5cdaMRGNYYzIEKyaAcGIubDWbXh4Ksvavg9I=; b=dK0DngAMpUPBlwIqTfJMEe8snz
-        rXYIB14WiawccAS/FcJ32iHHcgQd2oUqXSGIfOJzGgcFgDfZQrGZoH9JQ9jZPeE3hx7vnjqP5qMvW
-        rdjbdwteUct8rlPsRXZc5Bz/F2qQnNjgpDF2Z/HyUsSSWbVXfMhn2xI+dIoo9/YY9a/QvHC+VU3qh
-        +eNaRk4WNlUb+nNWux3ux4jQEinG7j8RLVcPAqr/a7Qbhq3ftUtTF3FTQbVFDIF2U7W0zyyv6383h
-        WD6g0sAyLa7Og3vnavdJ0vgN40HgZMvnnpJ3rIPZPigs2WnzF190TslfKCk+ldy2ih434OLPF+3lI
-        PxBV6r7g==;
-Received: from j130084.upc-j.chello.nl ([24.132.130.84] helo=worktop.programming.kicks-ass.net)
-        by desiato.infradead.org with esmtpsa (Exim 4.94.2 #2 (Red Hat Linux))
-        id 1oBvWb-003oMV-UQ; Thu, 14 Jul 2022 09:52:50 +0000
-Received: by worktop.programming.kicks-ass.net (Postfix, from userid 1000)
-        id 533D0980120; Thu, 14 Jul 2022 11:52:49 +0200 (CEST)
-Date:   Thu, 14 Jul 2022 11:52:49 +0200
-From:   Peter Zijlstra <peterz@infradead.org>
-To:     Thadeu Lima de Souza Cascardo <cascardo@canonical.com>
-Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org, x86@kernel.org,
-        stable@vger.kernel.org,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        Naresh Kamboju <naresh.kamboju@linaro.org>,
-        Borislav Petkov <bp@suse.de>,
-        Josh Poimboeuf <jpoimboe@kernel.org>,
+        with ESMTP id S229986AbiGNJ5b (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 14 Jul 2022 05:57:31 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 1C9AF50040
+        for <kvm@vger.kernel.org>; Thu, 14 Jul 2022 02:57:23 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1657792642;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=due5AmS56nwKHQURWRio6Jj0V5YHWUHW3moonKZbp+k=;
+        b=XbjtAppqdL0Rn9G17Soll7jGZSA4lg7LvjagYZgXvoKLBxbxrDOCUeTFFu7DkyEqoZVAi3
+        8mkZiOMfgSOxUXmFBAFUR4RGhX6tcyAmNPXDoB/nYT+vtQG/kH8FpYfh/OfJ83v3p31JTD
+        7n3jEcfsEnSqFZ2petpUn3eOu/SYpuc=
+Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
+ [209.85.128.70]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-164-vRNTPLUdOt2R2n0NO-Vo6w-1; Thu, 14 Jul 2022 05:57:18 -0400
+X-MC-Unique: vRNTPLUdOt2R2n0NO-Vo6w-1
+Received: by mail-wm1-f70.google.com with SMTP id 23-20020a05600c229700b003a2eda0c59cso529982wmf.7
+        for <kvm@vger.kernel.org>; Thu, 14 Jul 2022 02:57:18 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:message-id:subject:from:to:cc:date:in-reply-to
+         :references:user-agent:mime-version:content-transfer-encoding;
+        bh=due5AmS56nwKHQURWRio6Jj0V5YHWUHW3moonKZbp+k=;
+        b=ZLeIu2cu3l/cMq+7SD1roF5QLkm5h2BvrupFFkmgDCWSakBCWRkef21GRETW8zyEHp
+         GlBToM/Az/LvzIHhA4AKiKod9S/Xf37AM4S4yLmT+ASWywqq8IvGAiIFVkqhkR7obXti
+         hM8vwuO/cmrLcvk1vbNpWFEf/ZtNtB1FwbmiXGppUGQX0apjS/YkeZtOoFSCKyfnQLEw
+         b5ECfyQivzVcls98IUhJTeJcrTzVMcJNEOqBxMC5gJP7b0wnyl2CVm4yhvdmjsAqmF0t
+         CyQO/WuQVjEQZ0QdKGRA6qt7f09KBlb3QeHFNfyxkANvYvpAZL07p1xVXI8O9kHUett2
+         LuxQ==
+X-Gm-Message-State: AJIora+v9w8x7Wza8E8dBdpkiH5oJg9DDdVlqGliC4TMJvCYiPN0LSk1
+        wiiJ/aVYp2SOnrDyfZGmPCJp9CZXNAVg2b/4eGg8bdWEUB1EuE77gpCCe5XLIhRHpj+Vxklza+r
+        p8eo00if25H99
+X-Received: by 2002:a5d:6e8d:0:b0:21d:7adc:7102 with SMTP id k13-20020a5d6e8d000000b0021d7adc7102mr7322826wrz.9.1657792637714;
+        Thu, 14 Jul 2022 02:57:17 -0700 (PDT)
+X-Google-Smtp-Source: AGRyM1thfI/HeBALlz1MpWK7X8M2igq3/FhpwNnjJ1ZYgqajB1pTOb1ykpm1uWMRTuBXxCFL8QuxDg==
+X-Received: by 2002:a5d:6e8d:0:b0:21d:7adc:7102 with SMTP id k13-20020a5d6e8d000000b0021d7adc7102mr7322802wrz.9.1657792637491;
+        Thu, 14 Jul 2022 02:57:17 -0700 (PDT)
+Received: from [10.35.4.238] (bzq-82-81-161-50.red.bezeqint.net. [82.81.161.50])
+        by smtp.gmail.com with ESMTPSA id o12-20020adfca0c000000b0021dbaa4f38dsm1287018wrh.18.2022.07.14.02.57.15
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 14 Jul 2022 02:57:16 -0700 (PDT)
+Message-ID: <aff0dd9ba5d5730435a92e6a90dc15bb6eae5977.camel@redhat.com>
+Subject: Re: [PATCH v4 03/25] x86/hyperv: Update 'struct
+ hv_enlightened_vmcs' definition
+From:   Maxim Levitsky <mlevitsk@redhat.com>
+To:     Vitaly Kuznetsov <vkuznets@redhat.com>, kvm@vger.kernel.org,
         Paolo Bonzini <pbonzini@redhat.com>,
-        Linux Kernel Functional Testing <lkft@linaro.org>
-Subject: Re: [PATCH] x86/kvm: fix FASTOP_SIZE when return thunks are enabled
-Message-ID: <Ys/ncSnSFEST4fgL@worktop.programming.kicks-ass.net>
-References: <20220713171241.184026-1-cascardo@canonical.com>
+        Sean Christopherson <seanjc@google.com>
+Cc:     Anirudh Rayabharam <anrayabh@linux.microsoft.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        linux-hyperv@vger.kernel.org, linux-kernel@vger.kernel.org
+Date:   Thu, 14 Jul 2022 12:57:15 +0300
+In-Reply-To: <20220714091327.1085353-4-vkuznets@redhat.com>
+References: <20220714091327.1085353-1-vkuznets@redhat.com>
+         <20220714091327.1085353-4-vkuznets@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
+User-Agent: Evolution 3.40.4 (3.40.4-5.fc34) 
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20220713171241.184026-1-cascardo@canonical.com>
-X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,SPF_HELO_NONE,
-        SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no
-        version=3.4.6
+Content-Transfer-Encoding: 8bit
+X-Spam-Status: No, score=-2.7 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=unavailable
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Jul 13, 2022 at 02:12:41PM -0300, Thadeu Lima de Souza Cascardo wrote:
-> The return thunk call makes the fastop functions larger, just like IBT
-> does. Consider a 16-byte FASTOP_SIZE when CONFIG_RETHUNK is enabled.
+On Thu, 2022-07-14 at 11:13 +0200, Vitaly Kuznetsov wrote:
+> Updated Hyper-V Enlightened VMCS specification lists several new
+> fields for the following features:
 > 
-> Otherwise, functions will be incorrectly aligned and when computing their
-> position for differently sized operators, they will executed in the middle
-> or end of a function, which may as well be an int3, leading to a crash
-> like:
-
-Bah.. I did the SETcc stuff, but then forgot about the FASTOP :/
-
-  af2e140f3420 ("x86/kvm: Fix SETcc emulation for return thunks")
-
-> Fixes: aa3d480315ba ("x86: Use return-thunk in asm code")
-> Signed-off-by: Thadeu Lima de Souza Cascardo <cascardo@canonical.com>
-> Cc: Peter Zijlstra (Intel) <peterz@infradead.org>
-> Cc: Borislav Petkov <bp@suse.de>
-> Cc: Josh Poimboeuf <jpoimboe@kernel.org>
-> Cc: Paolo Bonzini <pbonzini@redhat.com>
-> Reported-by: Linux Kernel Functional Testing <lkft@linaro.org>
+> - PerfGlobalCtrl
+> - EnclsExitingBitmap
+> - Tsc Scaling
+> - GuestLbrCtl
+> - CET
+> - SSP
+> 
+> Update the definition. The updated definition is available only when
+> CPUID.0x4000000A.EBX BIT(0) is '1'. Add a define for it as well.
+> 
+> Note: The latest TLFS is available at
+> https://docs.microsoft.com/en-us/virtualization/hyper-v-on-windows/tlfs/tlfs
+> 
+> Signed-off-by: Vitaly Kuznetsov <vkuznets@redhat.com>
 > ---
->  arch/x86/kvm/emulate.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
+>  arch/x86/include/asm/hyperv-tlfs.h | 26 ++++++++++++++++++++++++--
+>  1 file changed, 24 insertions(+), 2 deletions(-)
 > 
-> diff --git a/arch/x86/kvm/emulate.c b/arch/x86/kvm/emulate.c
-> index db96bf7d1122..d779eea1052e 100644
-> --- a/arch/x86/kvm/emulate.c
-> +++ b/arch/x86/kvm/emulate.c
-> @@ -190,7 +190,7 @@
->  #define X16(x...) X8(x), X8(x)
->  
->  #define NR_FASTOP (ilog2(sizeof(ulong)) + 1)
-> -#define FASTOP_SIZE (8 * (1 + HAS_KERNEL_IBT))
-> +#define FASTOP_SIZE (8 * (1 + (HAS_KERNEL_IBT | IS_ENABLED(CONFIG_RETHUNK))))
+> diff --git a/arch/x86/include/asm/hyperv-tlfs.h b/arch/x86/include/asm/hyperv-tlfs.h
+> index 6f0acc45e67a..ebc27017fa48 100644
+> --- a/arch/x86/include/asm/hyperv-tlfs.h
+> +++ b/arch/x86/include/asm/hyperv-tlfs.h
+> @@ -138,6 +138,17 @@
+>  #define HV_X64_NESTED_GUEST_MAPPING_FLUSH              BIT(18)
+>  #define HV_X64_NESTED_MSR_BITMAP                       BIT(19)
+>  
+> +/*
+> + * Nested quirks. These are HYPERV_CPUID_NESTED_FEATURES.EBX bits.
+> + *
+> + * Note: HV_X64_NESTED_EVMCS1_2022_UPDATE is not currently documented in any
+> + * published TLFS version. When the bit is set, nested hypervisor can use
+> + * 'updated' eVMCSv1 specification (perf_global_ctrl, s_cet, ssp, lbr_ctl,
+> + * encls_exiting_bitmap, tsc_multiplier fields which were missing in 2016
+> + * specification).
+> + */
+> +#define HV_X64_NESTED_EVMCS1_2022_UPDATE               BIT(0)
+> +
+>  /*
+>   * This is specific to AMD and specifies that enlightened TLB flush is
+>   * supported. If guest opts in to this feature, ASID invalidations only
+> @@ -559,9 +570,20 @@ struct hv_enlightened_vmcs {
+>         u64 partition_assist_page;
+>         u64 padding64_4[4];
+>         u64 guest_bndcfgs;
+> -       u64 padding64_5[7];
+> +       u64 guest_ia32_perf_global_ctrl;
+> +       u64 guest_ia32_s_cet;
+> +       u64 guest_ssp;
+> +       u64 guest_ia32_int_ssp_table_addr;
+> +       u64 guest_ia32_lbr_ctl;
+> +       u64 padding64_5[2];
+>         u64 xss_exit_bitmap;
+> -       u64 padding64_6[7];
+> +       u64 encls_exiting_bitmap;
+> +       u64 host_ia32_perf_global_ctrl;
+> +       u64 tsc_multiplier;
+> +       u64 host_ia32_s_cet;
+> +       u64 host_ssp;
+> +       u64 host_ia32_int_ssp_table_addr;
+> +       u64 padding64_6;
+>  } __packed;
+>  
+>  #define HV_VMX_ENLIGHTENED_CLEAN_FIELD_NONE                    0
 
-Would it make sense to do something like this instead?
+All look good now.
 
----
- arch/x86/kvm/emulate.c | 10 ++++++----
- 1 file changed, 6 insertions(+), 4 deletions(-)
+I really don't like the new 'online' TLFS spec - as you said,
+they can indeed change it any moment without any traces.
 
-diff --git a/arch/x86/kvm/emulate.c b/arch/x86/kvm/emulate.c
-index db96bf7d1122..b4305d2dcc51 100644
---- a/arch/x86/kvm/emulate.c
-+++ b/arch/x86/kvm/emulate.c
-@@ -189,8 +189,12 @@
- #define X8(x...) X4(x), X4(x)
- #define X16(x...) X8(x), X8(x)
- 
--#define NR_FASTOP (ilog2(sizeof(ulong)) + 1)
--#define FASTOP_SIZE (8 * (1 + HAS_KERNEL_IBT))
-+#define NR_FASTOP	(ilog2(sizeof(ulong)) + 1)
-+#define RET_LENGTH	(1 + (4 * IS_ENABLED(CONFIG_RETHUNK)) + \
-+			 IS_ENABLED(CONFIG_SLS))
-+#define FASTOP_LENGTH	(7 + ENDBR_INSN_SIZE + RET_LENGTH)
-+#define FASTOP_SIZE	(8 << ((FASTOP_LENGTH > 8) & 1) << ((FASTOP_LENGTH > 16) & 1))
-+static_assert(FASTOP_LENGTH <= FASTOP_SIZE);
- 
- struct opcode {
- 	u64 flags;
-@@ -442,8 +446,6 @@ static int fastop(struct x86_emulate_ctxt *ctxt, fastop_t fop);
-  * RET | JMP __x86_return_thunk	[1,5 bytes; CONFIG_RETHUNK]
-  * INT3				[1 byte; CONFIG_SLS]
-  */
--#define RET_LENGTH	(1 + (4 * IS_ENABLED(CONFIG_RETHUNK)) + \
--			 IS_ENABLED(CONFIG_SLS))
- #define SETCC_LENGTH	(ENDBR_INSN_SIZE + 3 + RET_LENGTH)
- #define SETCC_ALIGN	(4 << ((SETCC_LENGTH > 4) & 1) << ((SETCC_LENGTH > 8) & 1))
- static_assert(SETCC_LENGTH <= SETCC_ALIGN);
+Seems it was done with good intentions, and it much easier to use,
+but they should also provide a PDF, or at least some form or archive of
+these web pages.
+
+Reviewed-by: Maxim Levitsky <mlevitsk@redhat.com>
+
+Best regards,
+	Maxim Levitsky
+
+
