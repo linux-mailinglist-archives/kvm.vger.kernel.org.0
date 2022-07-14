@@ -2,40 +2,40 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 1262B5751EC
-	for <lists+kvm@lfdr.de>; Thu, 14 Jul 2022 17:35:34 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 87D9B5751E7
+	for <lists+kvm@lfdr.de>; Thu, 14 Jul 2022 17:35:32 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S240349AbiGNPfd (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 14 Jul 2022 11:35:33 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40112 "EHLO
+        id S239865AbiGNPf3 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 14 Jul 2022 11:35:29 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40132 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S240316AbiGNPfZ (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 14 Jul 2022 11:35:25 -0400
+        with ESMTP id S240239AbiGNPfY (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 14 Jul 2022 11:35:24 -0400
 Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C12673CBFD
-        for <kvm@vger.kernel.org>; Thu, 14 Jul 2022 08:35:24 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BD670481EB
+        for <kvm@vger.kernel.org>; Thu, 14 Jul 2022 08:35:22 -0700 (PDT)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id 5D36761F32
-        for <kvm@vger.kernel.org>; Thu, 14 Jul 2022 15:35:24 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id BCC62C3411C;
-        Thu, 14 Jul 2022 15:35:23 +0000 (UTC)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id 5A75161F20
+        for <kvm@vger.kernel.org>; Thu, 14 Jul 2022 15:35:22 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id BD9EEC34114;
+        Thu, 14 Jul 2022 15:35:21 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1657812923;
-        bh=ewFZDRbbTUSr1/RjHEhxuF5bx6bfhbtmusxOWTcVpCI=;
+        s=k20201202; t=1657812921;
+        bh=uKTZ7q/gsQNMYQ24/tzAJ7rKkKRt7Y+oaSKj6tJVeR4=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=SsGdmmQxlag22n9+IC2c7Vq7/1EoxwUJ1bOrfTn1a7X5UfCaZlnu2y/H10lLUInnX
-         YnIOt/dwIH9eHngc9UzTfmczDy7SFq2/hq14uC8syglUevYXLUeMKigSlfAKnwIZoU
-         vWgVbKsc0saFqR4wWSgOkPcVolefTHP7of2+WDI75tP8e+wseBBDHz628QP9ockhDd
-         kBSTMAyP5nJhLnxkZJrzmLpvG6Zi3vVjv7c/WnqOnhP7pxbTD/a/K20kFSUitECXUc
-         NcryuXUnlX4I34KoiP4LH72quXV0pqZvRhNMqOfjJZ4domzY1Mp4VcQcfza6nvVf2G
-         Xw4ixWVe+Y/HA==
+        b=RrPs/FEmrW+sYs9pCj4v3DxZdgeh0I8Tsvr048Y43pDwIVadWBGn7fZxVv2WjLaNu
+         T5uI8onoV0BhrfHGkS2Ue6999gcxx7u932j6Wwe4S29XjjyZW8SvK8NZPEIdnna9pz
+         lsjXfcPPlRM4mfAYkV90V/XzjtN7ZPcbd+anUMXKIxdJu/HuVPawbAXHGiYZXLeA3B
+         m6/rwDltjUyWE6T8yk2CMBqDUwPblc/iiY/2+ckdID/3ktzJ3AqwufDuR/WPNBNCJq
+         XjEBrGFnmQrcM0dpEGK2bWEEtvauB2aFC4uKX/xP35Wsw4+P37+pAulfS8Vk5HFmQP
+         Wr6JfflRY5odA==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=why.lan)
         by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
         (Exim 4.95)
         (envelope-from <maz@kernel.org>)
-        id 1oC0dk-007UVL-LK;
+        id 1oC0dk-007UVL-TY;
         Thu, 14 Jul 2022 16:20:32 +0100
 From:   Marc Zyngier <maz@kernel.org>
 To:     kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org,
@@ -46,9 +46,9 @@ Cc:     James Morse <james.morse@arm.com>,
         Oliver Upton <oliver.upton@linux.dev>,
         Reiji Watanabe <reijiw@google.com>,
         Schspa Shi <schspa@gmail.com>, kernel-team@android.com
-Subject: [PATCH v2 17/20] KVM: arm64: vgic: Tidy-up calls to vgic_{get,set}_common_attr()
-Date:   Thu, 14 Jul 2022 16:20:21 +0100
-Message-Id: <20220714152024.1673368-18-maz@kernel.org>
+Subject: [PATCH v2 18/20] KVM: arm64: Get rid of find_reg_by_id()
+Date:   Thu, 14 Jul 2022 16:20:22 +0100
+Message-Id: <20220714152024.1673368-19-maz@kernel.org>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20220714152024.1673368-1-maz@kernel.org>
 References: <20220714152024.1673368-1-maz@kernel.org>
@@ -68,161 +68,52 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-The userspace accessors have an early call to vgic_{get,set}_common_attr()
-that makes the code hard to follow. Move it to the default: clause of
-the decoding switch statement, which results in a nice cleanup.
+This helper doesn't have a user anymore, let's get rid of it.
 
-This requires us to move the handling of the pending table into the
-common handling, even if it is strictly a GICv3 feature (it has the
-benefit of keeping the whole control group handling in the same
-function).
-
-Also cleanup vgic_v3_{get,set}_attr() while we're at it, deduplicating
-the calls to vgic_v3_attr_regs_access().
-
-Suggested-by: Reiji Watanabe <reijiw@google.com>
 Signed-off-by: Marc Zyngier <maz@kernel.org>
 ---
- arch/arm64/kvm/vgic/vgic-kvm-device.c | 78 +++++++++------------------
- 1 file changed, 26 insertions(+), 52 deletions(-)
+ arch/arm64/kvm/sys_regs.c | 11 -----------
+ arch/arm64/kvm/sys_regs.h |  5 -----
+ 2 files changed, 16 deletions(-)
 
-diff --git a/arch/arm64/kvm/vgic/vgic-kvm-device.c b/arch/arm64/kvm/vgic/vgic-kvm-device.c
-index 011171dc41c5..edeac2380591 100644
---- a/arch/arm64/kvm/vgic/vgic-kvm-device.c
-+++ b/arch/arm64/kvm/vgic/vgic-kvm-device.c
-@@ -246,6 +246,24 @@ static int vgic_set_common_attr(struct kvm_device *dev,
- 			r = vgic_init(dev->kvm);
- 			mutex_unlock(&dev->kvm->lock);
- 			return r;
-+		case KVM_DEV_ARM_VGIC_SAVE_PENDING_TABLES:
-+			/*
-+			 * OK, this one isn't common at all, but we
-+			 * want to handle all control group attributes
-+			 * in a single place.
-+			 */
-+			if (vgic_check_type(dev->kvm, KVM_DEV_TYPE_ARM_VGIC_V3))
-+				return -ENXIO;
-+			mutex_lock(&dev->kvm->lock);
-+
-+			if (!lock_all_vcpus(dev->kvm)) {
-+				mutex_unlock(&dev->kvm->lock);
-+				return -EBUSY;
-+			}
-+			r = vgic_v3_save_pending_tables(dev->kvm);
-+			unlock_all_vcpus(dev->kvm);
-+			mutex_unlock(&dev->kvm->lock);
-+			return r;
- 		}
- 		break;
+diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
+index 379478eecfaa..7ab67a7fc0d8 100644
+--- a/arch/arm64/kvm/sys_regs.c
++++ b/arch/arm64/kvm/sys_regs.c
+@@ -2577,17 +2577,6 @@ static bool index_to_params(u64 id, struct sys_reg_params *params)
  	}
-@@ -427,37 +445,25 @@ static int vgic_v2_attr_regs_access(struct kvm_device *dev,
- static int vgic_v2_set_attr(struct kvm_device *dev,
- 			    struct kvm_device_attr *attr)
- {
--	int ret;
--
--	ret = vgic_set_common_attr(dev, attr);
--	if (ret != -ENXIO)
--		return ret;
--
- 	switch (attr->group) {
- 	case KVM_DEV_ARM_VGIC_GRP_DIST_REGS:
- 	case KVM_DEV_ARM_VGIC_GRP_CPU_REGS:
- 		return vgic_v2_attr_regs_access(dev, attr, true);
-+	default:
-+		return vgic_set_common_attr(dev, attr);
- 	}
--
--	return -ENXIO;
  }
  
- static int vgic_v2_get_attr(struct kvm_device *dev,
- 			    struct kvm_device_attr *attr)
- {
--	int ret;
+-const struct sys_reg_desc *find_reg_by_id(u64 id,
+-					  struct sys_reg_params *params,
+-					  const struct sys_reg_desc table[],
+-					  unsigned int num)
+-{
+-	if (!index_to_params(id, params))
+-		return NULL;
 -
--	ret = vgic_get_common_attr(dev, attr);
--	if (ret != -ENXIO)
--		return ret;
+-	return find_reg(params, table, num);
+-}
 -
- 	switch (attr->group) {
- 	case KVM_DEV_ARM_VGIC_GRP_DIST_REGS:
- 	case KVM_DEV_ARM_VGIC_GRP_CPU_REGS:
- 		return vgic_v2_attr_regs_access(dev, attr, false);
-+	default:
-+		return vgic_get_common_attr(dev, attr);
- 	}
--
--	return -ENXIO;
+ const struct sys_reg_desc *get_reg_by_id(u64 id,
+ 					 const struct sys_reg_desc table[],
+ 					 unsigned int num)
+diff --git a/arch/arm64/kvm/sys_regs.h b/arch/arm64/kvm/sys_regs.h
+index b8b576a2af2b..49517f58deb5 100644
+--- a/arch/arm64/kvm/sys_regs.h
++++ b/arch/arm64/kvm/sys_regs.h
+@@ -190,11 +190,6 @@ find_reg(const struct sys_reg_params *params, const struct sys_reg_desc table[],
+ 	return __inline_bsearch((void *)pval, table, num, sizeof(table[0]), match_sys_reg);
  }
  
- static int vgic_v2_has_attr(struct kvm_device *dev,
-@@ -618,61 +624,29 @@ static int vgic_v3_attr_regs_access(struct kvm_device *dev,
- static int vgic_v3_set_attr(struct kvm_device *dev,
- 			    struct kvm_device_attr *attr)
- {
--	int ret;
+-const struct sys_reg_desc *find_reg_by_id(u64 id,
+-					  struct sys_reg_params *params,
+-					  const struct sys_reg_desc table[],
+-					  unsigned int num);
 -
--	ret = vgic_set_common_attr(dev, attr);
--	if (ret != -ENXIO)
--		return ret;
--
- 	switch (attr->group) {
- 	case KVM_DEV_ARM_VGIC_GRP_DIST_REGS:
- 	case KVM_DEV_ARM_VGIC_GRP_REDIST_REGS:
--		return vgic_v3_attr_regs_access(dev, attr, true);
- 	case KVM_DEV_ARM_VGIC_GRP_CPU_SYSREGS:
--		return vgic_v3_attr_regs_access(dev, attr, true);
- 	case KVM_DEV_ARM_VGIC_GRP_LEVEL_INFO:
- 		return vgic_v3_attr_regs_access(dev, attr, true);
--	case KVM_DEV_ARM_VGIC_GRP_CTRL: {
--		int ret;
--
--		switch (attr->attr) {
--		case KVM_DEV_ARM_VGIC_SAVE_PENDING_TABLES:
--			mutex_lock(&dev->kvm->lock);
--
--			if (!lock_all_vcpus(dev->kvm)) {
--				mutex_unlock(&dev->kvm->lock);
--				return -EBUSY;
--			}
--			ret = vgic_v3_save_pending_tables(dev->kvm);
--			unlock_all_vcpus(dev->kvm);
--			mutex_unlock(&dev->kvm->lock);
--			return ret;
--		}
--		break;
--	}
-+	default:
-+		return vgic_set_common_attr(dev, attr);
- 	}
--	return -ENXIO;
- }
- 
- static int vgic_v3_get_attr(struct kvm_device *dev,
- 			    struct kvm_device_attr *attr)
- {
--	int ret;
--
--	ret = vgic_get_common_attr(dev, attr);
--	if (ret != -ENXIO)
--		return ret;
--
- 	switch (attr->group) {
- 	case KVM_DEV_ARM_VGIC_GRP_DIST_REGS:
- 	case KVM_DEV_ARM_VGIC_GRP_REDIST_REGS:
--		return vgic_v3_attr_regs_access(dev, attr, false);
- 	case KVM_DEV_ARM_VGIC_GRP_CPU_SYSREGS:
--		return vgic_v3_attr_regs_access(dev, attr, false);
- 	case KVM_DEV_ARM_VGIC_GRP_LEVEL_INFO:
- 		return vgic_v3_attr_regs_access(dev, attr, false);
-+	default:
-+		return vgic_get_common_attr(dev, attr);
- 	}
--	return -ENXIO;
- }
- 
- static int vgic_v3_has_attr(struct kvm_device *dev,
+ const struct sys_reg_desc *get_reg_by_id(u64 id,
+ 					 const struct sys_reg_desc table[],
+ 					 unsigned int num);
 -- 
 2.34.1
 
