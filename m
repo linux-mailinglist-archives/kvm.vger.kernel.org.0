@@ -2,41 +2,41 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 1E87A574812
-	for <lists+kvm@lfdr.de>; Thu, 14 Jul 2022 11:14:07 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 78EDF574810
+	for <lists+kvm@lfdr.de>; Thu, 14 Jul 2022 11:14:06 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237792AbiGNJOB (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 14 Jul 2022 05:14:01 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35852 "EHLO
+        id S237866AbiGNJOD (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 14 Jul 2022 05:14:03 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36172 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S237791AbiGNJNs (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 14 Jul 2022 05:13:48 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 875CF5F56
-        for <kvm@vger.kernel.org>; Thu, 14 Jul 2022 02:13:47 -0700 (PDT)
+        with ESMTP id S237804AbiGNJNv (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 14 Jul 2022 05:13:51 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 243FC101EB
+        for <kvm@vger.kernel.org>; Thu, 14 Jul 2022 02:13:49 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1657790026;
+        s=mimecast20190719; t=1657790028;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=FKgds0yCW63Fm75RE7cov5eu8kqmNA9zEFDIYKGcaWM=;
-        b=LCG3c1BSfZ0jjAJIr1kO2HdNCHZ1rQ9fGjyjSiV1SmuS4/+cg/uSj66yQsL/vERi9r01wr
-        Xi/t2PGIZO9kk3MNYy/ChKcqO8LGb6OhnfkPKuPfnaWtTbF4Y8pah52FDKKqIbgqd3I5kQ
-        oDpMQOYHKFmJ0/z9bzL7SFhkIVElyZU=
-Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
- [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
+        bh=WWnZMuOiNOxV4y5n13xEbB3VoK6AwgRUiY+UTOUdEwY=;
+        b=eE6yMCaoS8K55OPzIBT13V7of43DDymVzULAKLLHi0lNqLbi2rSH+1tZdRhiBl523MIdCN
+        0FSJfvHSggg2zxr6pjjznI2tK5aCUER9PEfDEfo1KdA1wwVokZOfRTpGrXAgj0Qtsn1QhV
+        liZnLEafidErGoQZIQImTaCfNgPrLn4=
+Received: from mimecast-mx02.redhat.com (mx3-rdu2.redhat.com
+ [66.187.233.73]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-304-ujK4qpuuOrewxrQbKyJWeQ-1; Thu, 14 Jul 2022 05:13:43 -0400
-X-MC-Unique: ujK4qpuuOrewxrQbKyJWeQ-1
+ us-mta-257-Dzf1HZ7WN3WCQWmCPMplRw-1; Thu, 14 Jul 2022 05:13:45 -0400
+X-MC-Unique: Dzf1HZ7WN3WCQWmCPMplRw-1
 Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.rdu2.redhat.com [10.11.54.6])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id E930485A581;
-        Thu, 14 Jul 2022 09:13:42 +0000 (UTC)
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 4BC0B3C01DE2;
+        Thu, 14 Jul 2022 09:13:45 +0000 (UTC)
 Received: from fedora.redhat.com (unknown [10.40.194.135])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id E0F722166B26;
-        Thu, 14 Jul 2022 09:13:40 +0000 (UTC)
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 4C3692166B26;
+        Thu, 14 Jul 2022 09:13:43 +0000 (UTC)
 From:   Vitaly Kuznetsov <vkuznets@redhat.com>
 To:     kvm@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>,
         Sean Christopherson <seanjc@google.com>
@@ -45,18 +45,18 @@ Cc:     Anirudh Rayabharam <anrayabh@linux.microsoft.com>,
         Jim Mattson <jmattson@google.com>,
         Maxim Levitsky <mlevitsk@redhat.com>,
         linux-hyperv@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: [PATCH v4 05/25] KVM: nVMX: Support several new fields in eVMCSv1
-Date:   Thu, 14 Jul 2022 11:13:07 +0200
-Message-Id: <20220714091327.1085353-6-vkuznets@redhat.com>
+Subject: [PATCH v4 06/25] KVM: x86: hyper-v: Cache HYPERV_CPUID_NESTED_FEATURES CPUID leaf
+Date:   Thu, 14 Jul 2022 11:13:08 +0200
+Message-Id: <20220714091327.1085353-7-vkuznets@redhat.com>
 In-Reply-To: <20220714091327.1085353-1-vkuznets@redhat.com>
 References: <20220714091327.1085353-1-vkuznets@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain
 Content-Transfer-Encoding: 8bit
 X-Scanned-By: MIMEDefang 2.78 on 10.11.54.6
-X-Spam-Status: No, score=-2.7 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham
+X-Spam-Status: No, score=-3.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,
+        SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=unavailable
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -64,94 +64,78 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Enlightened VMCS v1 definition was updated with new fields, add
-support for them for Hyper-V on KVM.
+KVM has to check guest visible HYPERV_CPUID_NESTED_FEATURES.EBX CPUID
+leaf to know which Enlightened VMCS definition to use (original or 2022
+update). Cache the leaf along with other Hyper-V CPUID feature leaves
+to make the check quick.
 
-Note: SSP, CET and Guest LBR features are not supported by KVM yet
-and 'struct vmcs12' has no corresponding fields.
+While on it, wipe the whole 'hv_vcpu->cpuid_cache' with memset() instead
+of having to zero each particular member when the corresponding CPUID entry
+was not found.
 
-Reviewed-by: Maxim Levitsky <mlevitsk@redhat.com>
 Signed-off-by: Vitaly Kuznetsov <vkuznets@redhat.com>
 ---
- arch/x86/kvm/vmx/nested.c | 31 +++++++++++++++++++++++++++++++
- 1 file changed, 31 insertions(+)
+ arch/x86/include/asm/kvm_host.h |  2 ++
+ arch/x86/kvm/hyperv.c           | 17 ++++++++---------
+ 2 files changed, 10 insertions(+), 9 deletions(-)
 
-diff --git a/arch/x86/kvm/vmx/nested.c b/arch/x86/kvm/vmx/nested.c
-index 778f82015f03..4fc84f0f5875 100644
---- a/arch/x86/kvm/vmx/nested.c
-+++ b/arch/x86/kvm/vmx/nested.c
-@@ -1603,6 +1603,10 @@ static void copy_enlightened_to_vmcs12(struct vcpu_vmx *vmx, u32 hv_clean_fields
- 		vmcs12->guest_rflags = evmcs->guest_rflags;
- 		vmcs12->guest_interruptibility_info =
- 			evmcs->guest_interruptibility_info;
-+		/*
-+		 * Not present in struct vmcs12:
-+		 * vmcs12->guest_ssp = evmcs->guest_ssp;
-+		 */
+diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
+index de5a149d0971..077ec9cf3169 100644
+--- a/arch/x86/include/asm/kvm_host.h
++++ b/arch/x86/include/asm/kvm_host.h
+@@ -616,6 +616,8 @@ struct kvm_vcpu_hv {
+ 		u32 enlightenments_eax; /* HYPERV_CPUID_ENLIGHTMENT_INFO.EAX */
+ 		u32 enlightenments_ebx; /* HYPERV_CPUID_ENLIGHTMENT_INFO.EBX */
+ 		u32 syndbg_cap_eax; /* HYPERV_CPUID_SYNDBG_PLATFORM_CAPABILITIES.EAX */
++		u32 nested_eax; /* HYPERV_CPUID_NESTED_FEATURES.EAX */
++		u32 nested_ebx; /* HYPERV_CPUID_NESTED_FEATURES.EBX */
+ 	} cpuid_cache;
+ };
+ 
+diff --git a/arch/x86/kvm/hyperv.c b/arch/x86/kvm/hyperv.c
+index e08189211d9a..a8e4944ca110 100644
+--- a/arch/x86/kvm/hyperv.c
++++ b/arch/x86/kvm/hyperv.c
+@@ -2005,31 +2005,30 @@ void kvm_hv_set_cpuid(struct kvm_vcpu *vcpu)
+ 
+ 	hv_vcpu = to_hv_vcpu(vcpu);
+ 
++	memset(&hv_vcpu->cpuid_cache, 0, sizeof(hv_vcpu->cpuid_cache));
++
+ 	entry = kvm_find_cpuid_entry(vcpu, HYPERV_CPUID_FEATURES, 0);
+ 	if (entry) {
+ 		hv_vcpu->cpuid_cache.features_eax = entry->eax;
+ 		hv_vcpu->cpuid_cache.features_ebx = entry->ebx;
+ 		hv_vcpu->cpuid_cache.features_edx = entry->edx;
+-	} else {
+-		hv_vcpu->cpuid_cache.features_eax = 0;
+-		hv_vcpu->cpuid_cache.features_ebx = 0;
+-		hv_vcpu->cpuid_cache.features_edx = 0;
  	}
  
- 	if (unlikely(!(hv_clean_fields &
-@@ -1649,6 +1653,13 @@ static void copy_enlightened_to_vmcs12(struct vcpu_vmx *vmx, u32 hv_clean_fields
- 		vmcs12->host_fs_selector = evmcs->host_fs_selector;
- 		vmcs12->host_gs_selector = evmcs->host_gs_selector;
- 		vmcs12->host_tr_selector = evmcs->host_tr_selector;
-+		vmcs12->host_ia32_perf_global_ctrl = evmcs->host_ia32_perf_global_ctrl;
-+		/*
-+		 * Not present in struct vmcs12:
-+		 * vmcs12->host_ia32_s_cet = evmcs->host_ia32_s_cet;
-+		 * vmcs12->host_ssp = evmcs->host_ssp;
-+		 * vmcs12->host_ia32_int_ssp_table_addr = evmcs->host_ia32_int_ssp_table_addr;
-+		 */
+ 	entry = kvm_find_cpuid_entry(vcpu, HYPERV_CPUID_ENLIGHTMENT_INFO, 0);
+ 	if (entry) {
+ 		hv_vcpu->cpuid_cache.enlightenments_eax = entry->eax;
+ 		hv_vcpu->cpuid_cache.enlightenments_ebx = entry->ebx;
+-	} else {
+-		hv_vcpu->cpuid_cache.enlightenments_eax = 0;
+-		hv_vcpu->cpuid_cache.enlightenments_ebx = 0;
  	}
  
- 	if (unlikely(!(hv_clean_fields &
-@@ -1716,6 +1727,8 @@ static void copy_enlightened_to_vmcs12(struct vcpu_vmx *vmx, u32 hv_clean_fields
- 		vmcs12->tsc_offset = evmcs->tsc_offset;
- 		vmcs12->virtual_apic_page_addr = evmcs->virtual_apic_page_addr;
- 		vmcs12->xss_exit_bitmap = evmcs->xss_exit_bitmap;
-+		vmcs12->encls_exiting_bitmap = evmcs->encls_exiting_bitmap;
-+		vmcs12->tsc_multiplier = evmcs->tsc_multiplier;
- 	}
+ 	entry = kvm_find_cpuid_entry(vcpu, HYPERV_CPUID_SYNDBG_PLATFORM_CAPABILITIES, 0);
+ 	if (entry)
+ 		hv_vcpu->cpuid_cache.syndbg_cap_eax = entry->eax;
+-	else
+-		hv_vcpu->cpuid_cache.syndbg_cap_eax = 0;
++
++	entry = kvm_find_cpuid_entry(vcpu, HYPERV_CPUID_NESTED_FEATURES, 0);
++	if (entry) {
++		hv_vcpu->cpuid_cache.nested_eax = entry->eax;
++		hv_vcpu->cpuid_cache.nested_ebx = entry->ebx;
++	}
+ }
  
- 	if (unlikely(!(hv_clean_fields &
-@@ -1763,6 +1776,13 @@ static void copy_enlightened_to_vmcs12(struct vcpu_vmx *vmx, u32 hv_clean_fields
- 		vmcs12->guest_bndcfgs = evmcs->guest_bndcfgs;
- 		vmcs12->guest_activity_state = evmcs->guest_activity_state;
- 		vmcs12->guest_sysenter_cs = evmcs->guest_sysenter_cs;
-+		vmcs12->guest_ia32_perf_global_ctrl = evmcs->guest_ia32_perf_global_ctrl;
-+		/*
-+		 * Not present in struct vmcs12:
-+		 * vmcs12->guest_ia32_s_cet = evmcs->guest_ia32_s_cet;
-+		 * vmcs12->guest_ia32_lbr_ctl = evmcs->guest_ia32_lbr_ctl;
-+		 * vmcs12->guest_ia32_int_ssp_table_addr = evmcs->guest_ia32_int_ssp_table_addr;
-+		 */
- 	}
- 
- 	/*
-@@ -1865,12 +1885,23 @@ static void copy_vmcs12_to_enlightened(struct vcpu_vmx *vmx)
- 	 * evmcs->vm_exit_msr_store_count = vmcs12->vm_exit_msr_store_count;
- 	 * evmcs->vm_exit_msr_load_count = vmcs12->vm_exit_msr_load_count;
- 	 * evmcs->vm_entry_msr_load_count = vmcs12->vm_entry_msr_load_count;
-+	 * evmcs->guest_ia32_perf_global_ctrl = vmcs12->guest_ia32_perf_global_ctrl;
-+	 * evmcs->host_ia32_perf_global_ctrl = vmcs12->host_ia32_perf_global_ctrl;
-+	 * evmcs->encls_exiting_bitmap = vmcs12->encls_exiting_bitmap;
-+	 * evmcs->tsc_multiplier = vmcs12->tsc_multiplier;
- 	 *
- 	 * Not present in struct vmcs12:
- 	 * evmcs->exit_io_instruction_ecx = vmcs12->exit_io_instruction_ecx;
- 	 * evmcs->exit_io_instruction_esi = vmcs12->exit_io_instruction_esi;
- 	 * evmcs->exit_io_instruction_edi = vmcs12->exit_io_instruction_edi;
- 	 * evmcs->exit_io_instruction_eip = vmcs12->exit_io_instruction_eip;
-+	 * evmcs->host_ia32_s_cet = vmcs12->host_ia32_s_cet;
-+	 * evmcs->host_ssp = vmcs12->host_ssp;
-+	 * evmcs->host_ia32_int_ssp_table_addr = vmcs12->host_ia32_int_ssp_table_addr;
-+	 * evmcs->guest_ia32_s_cet = vmcs12->guest_ia32_s_cet;
-+	 * evmcs->guest_ia32_lbr_ctl = vmcs12->guest_ia32_lbr_ctl;
-+	 * evmcs->guest_ia32_int_ssp_table_addr = vmcs12->guest_ia32_int_ssp_table_addr;
-+	 * evmcs->guest_ssp = vmcs12->guest_ssp;
- 	 */
- 
- 	evmcs->guest_es_selector = vmcs12->guest_es_selector;
+ int kvm_hv_set_enforce_cpuid(struct kvm_vcpu *vcpu, bool enforce)
 -- 
 2.35.3
 
