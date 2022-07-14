@@ -2,181 +2,138 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 310A1575044
-	for <lists+kvm@lfdr.de>; Thu, 14 Jul 2022 16:04:37 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 17589575076
+	for <lists+kvm@lfdr.de>; Thu, 14 Jul 2022 16:12:29 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S239109AbiGNOE1 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 14 Jul 2022 10:04:27 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36298 "EHLO
+        id S240434AbiGNOM1 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 14 Jul 2022 10:12:27 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49916 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S240441AbiGNOEM (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 14 Jul 2022 10:04:12 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id DCB43658D
-        for <kvm@vger.kernel.org>; Thu, 14 Jul 2022 07:03:10 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1657807390;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=7XtdxK0LWmb1Jf+89i4Nsc+LkvKFkGHcgSyZX0xXxyI=;
-        b=aZiKQzDzdkT5eFTdeOVcaf1+2ljWPKw7p67CtXGPhM5qlYLjYny+pSJzcU4QI9A05I5zMG
-        Z9rq98Ye6+6jp019RYqIrDvmYN2YPMAnTgOmS2d+DfJlrG5ZxK3bQ/JW9S+QS2ts+qCsxa
-        8HNuxIgZgMAcAy8Pp0HMpatjRADiTNk=
-Received: from mail-ed1-f72.google.com (mail-ed1-f72.google.com
- [209.85.208.72]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-570-02pdPv8vOu6cIf4xxJThVw-1; Thu, 14 Jul 2022 10:03:08 -0400
-X-MC-Unique: 02pdPv8vOu6cIf4xxJThVw-1
-Received: by mail-ed1-f72.google.com with SMTP id f13-20020a0564021e8d00b00437a2acb543so1571251edf.7
-        for <kvm@vger.kernel.org>; Thu, 14 Jul 2022 07:03:08 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
-         :content-language:to:cc:references:from:in-reply-to
-         :content-transfer-encoding;
-        bh=7XtdxK0LWmb1Jf+89i4Nsc+LkvKFkGHcgSyZX0xXxyI=;
-        b=uYVDXHy7XgWgmY0CGdY8Gx8LCig5IV9E8T7OKoXBDhfXYERAh8dxZDdSJAafsbE83Q
-         K/VqxxvEjgQWuEt6w4I1vauRL93IKth7i9T7exRsyqy7Ud+wN83/BgMjc6hAbCCDs9hT
-         k/68vrYrFaw2javstZJrdmcDgVOJAcAOzcl7ZkKKrhGJ3q/OzvKl8iaIbbOviGWcL86x
-         tBC7nK/VCMqmnjtr3UV7RFWvMHA4/GPIdD6xRJwBBjTNSGyXQqQkHK+1u5e+cR05Vz0M
-         8+3HwegOUK+7E8j20ir0tlEp0tabFV8UKkSSN66Hw/W7brT9ofKsg/luTH/G7GXPS7C9
-         YbBQ==
-X-Gm-Message-State: AJIora/kfasxcGjTya1HZGwQjFQJzVsvjt4y01XCPWFT07IRx0LhytcX
-        pvBc/0L4L/jcpg4bjBS1u2XpTxXOyJdcB0UJFrT+aINPvuV98BT2vDv0baHSuvWxpxKdBpAJrKR
-        jcx8njFdEflhx
-X-Received: by 2002:a05:6402:40ce:b0:43a:918d:a73f with SMTP id z14-20020a05640240ce00b0043a918da73fmr12619747edb.387.1657807387226;
-        Thu, 14 Jul 2022 07:03:07 -0700 (PDT)
-X-Google-Smtp-Source: AGRyM1t8bK5AXcuJxMiU/pYnK7wAsXNRmsbk7m7pn+eL/yzuEBAI/N/AVsUo8KbNwnQSVLyg0gEIxA==
-X-Received: by 2002:a05:6402:40ce:b0:43a:918d:a73f with SMTP id z14-20020a05640240ce00b0043a918da73fmr12619713edb.387.1657807386962;
-        Thu, 14 Jul 2022 07:03:06 -0700 (PDT)
-Received: from ?IPV6:2001:b07:6468:f312:9af8:e5f5:7516:fa89? ([2001:b07:6468:f312:9af8:e5f5:7516:fa89])
-        by smtp.googlemail.com with ESMTPSA id b10-20020a1709063caa00b0072ee79bb8ebsm228499ejh.126.2022.07.14.07.03.02
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 14 Jul 2022 07:03:06 -0700 (PDT)
-Message-ID: <cd5d029c-b396-45ef-917b-92e054659623@redhat.com>
-Date:   Thu, 14 Jul 2022 16:03:00 +0200
+        with ESMTP id S240350AbiGNOMV (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 14 Jul 2022 10:12:21 -0400
+Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1E42654C82;
+        Thu, 14 Jul 2022 07:12:08 -0700 (PDT)
+Received: from pps.filterd (m0098409.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.17.1.5/8.17.1.5) with ESMTP id 26ECaxI7031958;
+        Thu, 14 Jul 2022 14:12:07 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
+ mime-version : to : cc : references : from : subject : in-reply-to :
+ content-type : content-transfer-encoding; s=pp1;
+ bh=678zjVBjiVOwXHJhZQpMbyH65qlU4B7o72itmKDXWz4=;
+ b=te6WQXJeFPgHlUAS9ZTh+d4mlFG3Li/FNiCHg2MKyRcXiz5XRi4LtTI6WGiOP+ohnXgg
+ ss8DfGPO1hHnLgg5hbIfDIUXWp++LD1mvuRL2RCgHQ7tdgCcUvlq8F0u3qCp3IdVVKWV
+ QSxhEJ5C+xA9MRjuTMiFlwR9SsKjva7Nh3kUnv8mX0g/r12twz01WULtwiJVukhwGQV/
+ oHEWfzWgK2xqV49nFH5xZMIJrs8RnsSHaxWWngNz3nbynwtzOQrlHw5mtBaZhIpRfnFd
+ 1o7bznvsaU78uRgkua3IWBhHLPPD1W1H1ePspi09Jpw+5qkBv4nbuPpFzhw1cy6t1J3h GA== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3hak32aq4s-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Thu, 14 Jul 2022 14:12:07 +0000
+Received: from m0098409.ppops.net (m0098409.ppops.net [127.0.0.1])
+        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 26EE08NI028291;
+        Thu, 14 Jul 2022 14:12:07 GMT
+Received: from ppma03fra.de.ibm.com (6b.4a.5195.ip4.static.sl-reverse.com [149.81.74.107])
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3hak32aq3q-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Thu, 14 Jul 2022 14:12:07 +0000
+Received: from pps.filterd (ppma03fra.de.ibm.com [127.0.0.1])
+        by ppma03fra.de.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 26EE5Q8k015181;
+        Thu, 14 Jul 2022 14:12:04 GMT
+Received: from b06cxnps3074.portsmouth.uk.ibm.com (d06relay09.portsmouth.uk.ibm.com [9.149.109.194])
+        by ppma03fra.de.ibm.com with ESMTP id 3h71a8necr-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Thu, 14 Jul 2022 14:12:04 +0000
+Received: from b06wcsmtp001.portsmouth.uk.ibm.com (b06wcsmtp001.portsmouth.uk.ibm.com [9.149.105.160])
+        by b06cxnps3074.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 26EEC1BS24904102
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Thu, 14 Jul 2022 14:12:01 GMT
+Received: from b06wcsmtp001.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 5BC23A405B;
+        Thu, 14 Jul 2022 14:12:01 +0000 (GMT)
+Received: from b06wcsmtp001.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 97DC4A4054;
+        Thu, 14 Jul 2022 14:12:00 +0000 (GMT)
+Received: from [9.145.62.186] (unknown [9.145.62.186])
+        by b06wcsmtp001.portsmouth.uk.ibm.com (Postfix) with ESMTP;
+        Thu, 14 Jul 2022 14:12:00 +0000 (GMT)
+Message-ID: <541d85d3-4864-583c-ff33-d0f566770c9f@linux.ibm.com>
+Date:   Thu, 14 Jul 2022 16:12:00 +0200
 MIME-Version: 1.0
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.10.0
-Subject: Re: [PATCH] KVM: selftests: Double check on the current CPU in
- rseq_test
+ Thunderbird/91.9.0
 Content-Language: en-US
-To:     Gavin Shan <gshan@redhat.com>, kvmarm@lists.cs.columbia.edu
-Cc:     kvm@vger.kernel.org, linux-kselftest@vger.kernel.org,
-        linux-kernel@vger.kernel.org, seanjc@google.com,
-        mathieu.desnoyers@efficios.com, shuah@kernel.org, maz@kernel.org,
-        oliver.upton@linux.dev, shan.gavin@gmail.com
-References: <20220714080642.3376618-1-gshan@redhat.com>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-In-Reply-To: <20220714080642.3376618-1-gshan@redhat.com>
+To:     Pierre Morel <pmorel@linux.ibm.com>, kvm@vger.kernel.org
+Cc:     linux-s390@vger.kernel.org, linux-kernel@vger.kernel.org,
+        borntraeger@de.ibm.com, cohuck@redhat.com, david@redhat.com,
+        thuth@redhat.com, imbrenda@linux.ibm.com, hca@linux.ibm.com,
+        gor@linux.ibm.com, wintera@linux.ibm.com, seiden@linux.ibm.com,
+        nrb@linux.ibm.com, scgl@linux.ibm.com
+References: <20220714101824.101601-1-pmorel@linux.ibm.com>
+ <20220714101824.101601-3-pmorel@linux.ibm.com>
+From:   Janosch Frank <frankja@linux.ibm.com>
+Subject: Re: [PATCH v13 2/2] KVM: s390: resetting the Topology-Change-Report
+In-Reply-To: <20220714101824.101601-3-pmorel@linux.ibm.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-2.7 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
-        RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE
-        autolearn=ham autolearn_force=no version=3.4.6
+X-TM-AS-GCONF: 00
+X-Proofpoint-ORIG-GUID: HMjFGSPX4U6Gaf9HY3xHKcarm35HOhcO
+X-Proofpoint-GUID: VoOHqQY2O1Xi0R0dvQYg7TLmBxfjvtZF
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.205,Aquarius:18.0.883,Hydra:6.0.517,FMLib:17.11.122.1
+ definitions=2022-07-14_10,2022-07-14_01,2022-06-22_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 lowpriorityscore=0
+ impostorscore=0 phishscore=0 malwarescore=0 adultscore=0 mlxscore=0
+ bulkscore=0 spamscore=0 mlxlogscore=999 clxscore=1015 suspectscore=0
+ priorityscore=1501 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2206140000 definitions=main-2207140060
+X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,
+        SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no
+        version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 7/14/22 10:06, Gavin Shan wrote:
-> In rseq_test, there are two threads created. Those two threads are
-> 'main' and 'migration_thread' separately. We also have the assumption
-> that non-migration status on 'migration-worker' thread guarantees the
-> same non-migration status on 'main' thread. Unfortunately, the assumption
-> isn't true. The 'main' thread can be migrated from one CPU to another
-> one between the calls to sched_getcpu() and READ_ONCE(__rseq.cpu_id).
-> The following assert is raised eventually because of the mismatched
-> CPU numbers.
+On 7/14/22 12:18, Pierre Morel wrote:
+> During a subsystem reset the Topology-Change-Report is cleared.
 > 
-> The issue can be reproduced on arm64 system occasionally.
-
-Hmm, this does not seem a correct patch - the threads are already 
-synchronizing using seq_cnt, like this:
-
-	migration			main
-	----------------------		--------------------------------
-	seq_cnt = 1
-	smp_wmb()
-					snapshot = 0
-					smp_rmb()
-					cpu = sched_getcpu() reads 23
-	sched_setaffinity()
-					rseq_cpu = __rseq.cpuid reads 35
-					smp_rmb()
-					snapshot != seq_cnt -> retry
-	smp_wmb()
-	seq_cnt = 2
-
-sched_setaffinity() is guaranteed to block until the task is enqueued on 
-an allowed CPU.
-
-Can you check that smp_rmb() and smp_wmb() generate correct instructions 
-on arm64?
-
-Paolo
-
->    host# uname -r
->    5.19.0-rc6-gavin+
->    host# # cat /proc/cpuinfo | grep processor | tail -n 1
->    processor    : 223
->    host# pwd
->    /home/gavin/sandbox/linux.main/tools/testing/selftests/kvm
->    host# for i in `seq 1 100`;   \
->          do echo "--------> $i"; \
->          ./rseq_test; sleep 3;   \
->          done
->    --------> 1
->    --------> 2
->    --------> 3
->    --------> 4
->    --------> 5
->    --------> 6
->    ==== Test Assertion Failure ====
->      rseq_test.c:265: rseq_cpu == cpu
->      pid=3925 tid=3925 errno=4 - Interrupted system call
->         1  0x0000000000401963: main at rseq_test.c:265 (discriminator 2)
->         2  0x0000ffffb044affb: ?? ??:0
->         3  0x0000ffffb044b0c7: ?? ??:0
->         4  0x0000000000401a6f: _start at ??:?
->      rseq CPU = 4, sched CPU = 27
+> Let's give userland the possibility to clear the MTCR in the case
+> of a subsystem reset.
 > 
-> This fixes the issue by double-checking on the current CPU after
-> call to READ_ONCE(__rseq.cpu_id) and restarting the test if the
-> two consecutive CPU numbers aren't euqal.
+> To migrate the MTCR, we give userland the possibility to
+> query the MTCR state.
 > 
-> Fixes: 61e52f1630f5 ("KVM: selftests: Add a test for KVM_RUN+rseq to detect task migration bugs")
-> Signed-off-by: Gavin Shan <gshan@redhat.com>
-> ---
->   tools/testing/selftests/kvm/rseq_test.c | 5 +++--
->   1 file changed, 3 insertions(+), 2 deletions(-)
+> We indicate KVM support for the CPU topology facility with a new
+> KVM capability: KVM_CAP_S390_CPU_TOPOLOGY.
 > 
-> diff --git a/tools/testing/selftests/kvm/rseq_test.c b/tools/testing/selftests/kvm/rseq_test.c
-> index 4158da0da2bb..74709dd9f5b2 100644
-> --- a/tools/testing/selftests/kvm/rseq_test.c
-> +++ b/tools/testing/selftests/kvm/rseq_test.c
-> @@ -207,7 +207,7 @@ int main(int argc, char *argv[])
->   {
->   	int r, i, snapshot;
->   	struct kvm_vm *vm;
-> -	u32 cpu, rseq_cpu;
-> +	u32 cpu, rseq_cpu, last_cpu;
+> Signed-off-by: Pierre Morel <pmorel@linux.ibm.com>
+> Reviewed-by: Janis Schoetterl-Glausch <scgl@linux.ibm.com>
+
+Nit below, but:
+Reviewed-by: Janosch Frank <frankja@linux.ibm.com>
+
+> --- a/include/uapi/linux/kvm.h
+> +++ b/include/uapi/linux/kvm.h
+> @@ -1158,6 +1158,7 @@ struct kvm_ppc_resize_hpt {
+>   #define KVM_CAP_SYSTEM_EVENT_DATA 215
+>   #define KVM_CAP_ARM_SYSTEM_SUSPEND 216
+>   #define KVM_CAP_S390_PROTECTED_DUMP 217
+> +#define KVM_CAP_S390_CPU_TOPOLOGY 218
+>   #define KVM_CAP_S390_ZPCI_OP 221
+
+Using 222 and moving it a line down might make more sense as 218 is 
+KVM_CAP_X86_TRIPLE_FAULT_EVENT.
+
+Can you fix this and push both patches to devel?
+Also send the fixed patch as a reply to this message so I can pick it 
+from the list.
+
+next and devel have diverted a bit so I will need to fix this up for 
+next, same for the Documentation entry which will be 6.39 instead of 6.38.
+
 >   
->   	/* Tell stdout not to buffer its content */
->   	setbuf(stdout, NULL);
-> @@ -259,8 +259,9 @@ int main(int argc, char *argv[])
->   			smp_rmb();
->   			cpu = sched_getcpu();
->   			rseq_cpu = READ_ONCE(__rseq.cpu_id);
-> +			last_cpu = sched_getcpu();
->   			smp_rmb();
-> -		} while (snapshot != atomic_read(&seq_cnt));
-> +		} while (snapshot != atomic_read(&seq_cnt) || cpu != last_cpu);
->   
->   		TEST_ASSERT(rseq_cpu == cpu,
->   			    "rseq CPU = %d, sched CPU = %d\n", rseq_cpu, cpu);
+>   #ifdef KVM_CAP_IRQ_ROUTING
 
