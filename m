@@ -2,160 +2,152 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 42FEF5740BB
-	for <lists+kvm@lfdr.de>; Thu, 14 Jul 2022 03:04:05 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 89BC55740DA
+	for <lists+kvm@lfdr.de>; Thu, 14 Jul 2022 03:13:07 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231214AbiGNBDy (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 13 Jul 2022 21:03:54 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45444 "EHLO
+        id S231769AbiGNBLe (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 13 Jul 2022 21:11:34 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50734 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229735AbiGNBDx (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 13 Jul 2022 21:03:53 -0400
-Received: from mail-pg1-x531.google.com (mail-pg1-x531.google.com [IPv6:2607:f8b0:4864:20::531])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 692981209A
-        for <kvm@vger.kernel.org>; Wed, 13 Jul 2022 18:03:51 -0700 (PDT)
-Received: by mail-pg1-x531.google.com with SMTP id q82so145544pgq.6
-        for <kvm@vger.kernel.org>; Wed, 13 Jul 2022 18:03:51 -0700 (PDT)
+        with ESMTP id S231737AbiGNBLV (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 13 Jul 2022 21:11:21 -0400
+Received: from mail-yb1-xb49.google.com (mail-yb1-xb49.google.com [IPv6:2607:f8b0:4864:20::b49])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4F2E220BD3
+        for <kvm@vger.kernel.org>; Wed, 13 Jul 2022 18:11:20 -0700 (PDT)
+Received: by mail-yb1-xb49.google.com with SMTP id i9-20020a258b09000000b0066efe437da6so365264ybl.5
+        for <kvm@vger.kernel.org>; Wed, 13 Jul 2022 18:11:20 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=iYjvT9/K+PJOYO+PKYqApFIeqrzKMwdmFTyx44M/bUw=;
-        b=s9pNVCwJpiRtqZOHmC9JoqSbIHVFh0WcP6GlOiQEvWpNg9ctAYIL9TC74ZHJwDmQbr
-         ujX1YfT+IVTqR8HVG+hTZliHN024gh9S9Pg203g/w/Bao0+j+IoHioLNgvk11I+ChPBk
-         HBHnskhUnzqC/Gn8ign5LtntTGXrnDE107IPN5/vDkLHTKg5XJ/pfYVAF5ISWRKbRMkD
-         b4xbcglZ2QBxniVLRlcKW864QEwH+3hXRWfFtaWOj9jOLSfGgLSTEhToYfsI6cPh/sfk
-         HO7/3PgNobJRxm1haK+WNfLJm+yjw8/yi9baTclGMlllGg2hKHJB+0zk4WjqcoAqIKYT
-         UlOA==
+        h=reply-to:date:message-id:mime-version:subject:from:to:cc;
+        bh=0hF6tID653Wj3gfhMGdt71PhFpkNsHCuIdaPZ9N7avk=;
+        b=VdIRqVCRrKff6mYZG982d30mdg85GCCASxOzqnKGD6SIG1BDYD5Csh1GrHtAE1kgtN
+         tsGu/bgawpMLO/NzphBybKGqYH85NWg6sbhbxf/UOs0MMfIhtZ1VgDT9lf5nUqFOAio0
+         Gh8LkEX7e4JJf7XJJoy2/TZ874kAItjXy4tCYr7wKjOU0tOJhiJQTc0JbedfGmCh0qbX
+         +0XjoFQ6hii9ALYRACAUkwASnGb6OyctwEc5Q4PmCqLpfr9o4aZLIY4G1D5nzlYzrINK
+         gxYUOsvZuIDv4dFXvnFoTw3Y0O7L6LH4j9xJsoWGo5dcCpZhEojZgW/W6l41FCx3cVOG
+         CVtg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=iYjvT9/K+PJOYO+PKYqApFIeqrzKMwdmFTyx44M/bUw=;
-        b=dY8g8yvvWq7hrKtyFTkvNgFRmFzB3gOeyK94utZitPtRTHLFCvcW9cUeEi4xfIjQ6h
-         QtUVeuitAvZ2a8Z/XTsWxpP99cEjTkKIhcCB6W3gj1OiFAMAZQdXSWCvan0YBF+COZta
-         w1Dwi86RkL0aAXRScx9rcaxRAtzDzETSU8tPZKeECkLdTzPQMFvI+cG9gGkz3Airhi4t
-         kOA8B0OFVUn7UrdnY67qkk8KiGnAgFxCapeqt8PUZxgrYHnJkItFmUz/G7WMbwWs0sJA
-         Dz2G8jVUHJf9xDdpPIhhwiMml5CKaFsvZ0s0E8KF3YrvfpUcWgNo/YCmfL6VAC3hvuy1
-         U58g==
-X-Gm-Message-State: AJIora/uThPQAuY7ZFxzEQRpySqWr2s7Gi8WmBLSXjooNWWfBdLcKege
-        /xqZM1iJIcq/EVv78Wmpb+2Yf8GKtlWR/A==
-X-Google-Smtp-Source: AGRyM1uX6QB+BfDKrubdH5R5fP1CmDIQfDrAae3pIvHrIcWjLL7rkJKM2XvtWMxxzpr6bK6W8KlqTA==
-X-Received: by 2002:a62:e10d:0:b0:52a:b77e:8bd3 with SMTP id q13-20020a62e10d000000b0052ab77e8bd3mr5810419pfh.66.1657760630794;
-        Wed, 13 Jul 2022 18:03:50 -0700 (PDT)
-Received: from google.com (123.65.230.35.bc.googleusercontent.com. [35.230.65.123])
-        by smtp.gmail.com with ESMTPSA id g21-20020aa796b5000000b005289cade5b0sm170538pfk.124.2022.07.13.18.03.49
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 13 Jul 2022 18:03:49 -0700 (PDT)
-Date:   Thu, 14 Jul 2022 01:03:46 +0000
+        h=x-gm-message-state:reply-to:date:message-id:mime-version:subject
+         :from:to:cc;
+        bh=0hF6tID653Wj3gfhMGdt71PhFpkNsHCuIdaPZ9N7avk=;
+        b=DplhW+oMFM3PfgsB4oppVlY/lgMe2/YGKg6Q3zAJlAfythAZoSYZUim3O2b+fuomgI
+         GL6ubSc+lX6eZUCltm6819fcoxMIQV7WQ7LuYM8LmAQC7MujjAGiHPMHA9/5/qdzKx8j
+         e4oa6YGouWW5VRy/cU8YulwknqXHnHCOvH1I+WsCOo7qwgFKFdPFpfkDKyDhA2moy4zu
+         42pdVwTad1unimVjtBRz7zSfVLtziR4pj4K/G0+K3nWbXxhfxGBR3N4LIGpm2dJgeM+u
+         bDwLGvwsBi1+Ug1WoGB1Z6gnVzh19RDnCHzL0mXfaQAkXbmomoyL6F+cGOnUmwM68To4
+         Y7Mg==
+X-Gm-Message-State: AJIora+J3iNnR4x9IekNG+WYzCwwo11XUnQrF7NL4FQ9jfrOdyzhiPQx
+        YYHaW+rDEdMmRUAc+arA4IR1HxV2ifA=
+X-Google-Smtp-Source: AGRyM1uH0z+R05anGU3HrhqscXx5O45ExUEGXquffB8+WAd5hRzyYoLS+h9s+kmbdLyNMeszMGoVasfb9CA=
+X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
+ (user=seanjc job=sendgmr) by 2002:a81:3904:0:b0:310:cc3:15a2 with SMTP id
+ g4-20020a813904000000b003100cc315a2mr7246667ywa.447.1657761079625; Wed, 13
+ Jul 2022 18:11:19 -0700 (PDT)
+Reply-To: Sean Christopherson <seanjc@google.com>
+Date:   Thu, 14 Jul 2022 01:11:15 +0000
+Message-Id: <20220714011115.3135828-1-seanjc@google.com>
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.37.0.144.g8ac04bfd2-goog
+Subject: [PATCH v2] KVM: selftests: Use "a" and "d" to set EAX/EDX for wrmsr_safe()
 From:   Sean Christopherson <seanjc@google.com>
-To:     isaku.yamahata@intel.com
+To:     Sean Christopherson <seanjc@google.com>,
+        Paolo Bonzini <pbonzini@redhat.com>
 Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
-        isaku.yamahata@gmail.com, Paolo Bonzini <pbonzini@redhat.com>
-Subject: Re: [PATCH v7 000/102] KVM TDX basic feature support
-Message-ID: <Ys9rcnyIZlUc76iG@google.com>
-References: <cover.1656366337.git.isaku.yamahata@intel.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <cover.1656366337.git.isaku.yamahata@intel.com>
-X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-        T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL
-        autolearn=unavailable autolearn_force=no version=3.4.6
+        Vitaly Kuznetsov <vkuznets@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
+X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Jun 27, 2022, isaku.yamahata@intel.com wrote:
-> From: Isaku Yamahata <isaku.yamahata@intel.com>
-> 
-> KVM TDX basic feature support
-> 
-> Hello.  This is v7 the patch series vof KVM TDX support.
-> This is based on v5.19-rc1 + kvm/queue branch + TDX HOST patch series.
-> The tree can be found at https://github.com/intel/tdx/tree/kvm-upstream
-> How to run/test: It's describe at https://github.com/intel/tdx/wiki/TDX-KVM
-> 
-> Major changes from v6:
-> - rebased to v5.19 base
-> 
-> TODO:
-> - integrate fd-based guest memory. As the discussion is still on-going, I
->   intentionally dropped fd-based guest memory support yet.  The integration can
->   be found at https://github.com/intel/tdx/tree/kvm-upstream-workaround.
-> - 2M large page support. It's work-in-progress.
-> For large page support, there are several design choices. Here is the design options.
-> Any thoughts/feedback?
+From: Vitaly Kuznetsov <vkuznets@redhat.com>
 
-Apologies, I didn't read beyond the intro paragraph.  In case something like this
-comes up again, it's probably best to send a standalone email tagged RFC, I doubt
-I'm the only one that missed this embedded RFC.
+Do not use GCC's "A" constraint to load EAX:EDX in wrmsr_safe().  Per
+GCC's documenation on x86-specific constraints, "A" will not actually
+load a 64-bit value into EAX:EDX on x86-64.
 
-> KVM MMU Large page support for TDX
- 
+  The a and d registers. This class is used for instructions that return
+  double word results in the ax:dx register pair. Single word values will
+  be allocated either in ax or dx. For example on i386 the following
+  implements rdtsc:
+
+  unsigned long long rdtsc (void)
+  {
+    unsigned long long tick;
+    __asm__ __volatile__("rdtsc":"=A"(tick));
+    return tick;
+  }
+
+  This is not correct on x86-64 as it would allocate tick in either ax or
+  dx. You have to use the following variant instead:
+
+  unsigned long long rdtsc (void)
+  {
+    unsigned int tickl, tickh;
+    __asm__ __volatile__("rdtsc":"=a"(tickl),"=d"(tickh));
+    return ((unsigned long long)tickh << 32)|tickl;
+  }
+
+Because a u64 fits in a single 64-bit register, using "A" for selftests,
+which are 64-bit only, results in GCC loading the value into either RAX
+or RDX instead of splitting it across EAX:EDX.
+
+E.g.:
+
+  kvm_exit:             reason MSR_WRITE rip 0x402919 info 0 0
+  kvm_msr:              msr_write 40000118 = 0x60000000001 (#GP)
 ...
 
-> * options to track private or shared
-> At each page size (4KB, 2MB, and 1GB), track private, shared, or mixed (2MB and
-> 1GB case). For 4KB each page, 1 bit per page is needed. private or shared.  For
-> large pages (2MB and 1GB), 2 bits per large page is needed. (private, shared, or
-> mixed).  When resolving KVM page fault, we don't want to check the lower-size
-> pages to check if the given GPA can be a large for performance.  On MapGPA check
-> it instead.
-> 
-> Option A). enhance kvm_arch_memory_slot
->   enum kvm_page_type {
->        KVM_PAGE_TYPE_INVALID,
->        KVM_PAGE_TYPE_SHARED,
->        KVM_PAGE_TYPE_PRIVATE,
->        KVM_PAGE_TYPE_MIXED,
->   };
-> 
->   struct kvm_page_attr {
->        enum kvm_page_type type;
->   };
-> 
->  struct kvm_arch_memory_slot {
->  +      struct kvm_page_attr *page_attr[KVM_NR_PAGE_SIZES];
-> 
-> Option B). steal one more bit SPTE_MIXED_MASK in addition to SPTE_SHARED_MASK
-> If !SPTE_MIXED_MASK, it can be large page.
-> 
-> Option C). use SPTE_SHARED_MASK and kvm_mmu_page::mixed bitmap
-> kvm_mmu_page::mixed bitmap of 1GB, root indicates mixed for 2MB, 1GB.
-> 
-> 
-> * comparison
-> A).
-> + straightforward to implement
-> + SPTE_SHARED_MASK isn't needed
-> - memory overhead compared to B). or C).
-> - more memory reference on KVM page fault
-> 
-> B).
-> + simpler than C) (complex than A)?)
-> + efficient on KVM page fault. (only SPTE reference)
-> + low memory overhead
-> - Waste precious SPTE bits.
-> 
-> C).
-> + efficient on KVM page fault. (only SPTE reference)
-> + low memory overhead
-> - complicates MapGPA
-> - scattered data structure
+With "A":
 
-Option D). track shared regions in an Xarray, update kvm_arch_memory_slot.lpage_info
-on insertion/removal to (dis)allow hugepages as needed.
+  48 8b 43 08          	mov    0x8(%rbx),%rax
+  49 b9 ba da ca ba 0a 	movabs $0xabacadaba,%r9
+  00 00 00
+  4c 8d 15 07 00 00 00 	lea    0x7(%rip),%r10        # 402f44 <guest_msr+0x34>
+  4c 8d 1d 06 00 00 00 	lea    0x6(%rip),%r11        # 402f4a <guest_msr+0x3a>
+  0f 30                 wrmsr
 
-  + efficient on KVM page fault (no new lookups)
-  + zero memory overhead (assuming KVM has to eat the cost of the Xarray anyways)
-  + straightforward to implement
-  + can (and should) be merged as part of the UPM series
+With "a"/"d":
 
-I believe xa_for_each_range() can be used to see if a given 2mb/1gb range is
-completely covered (fully shared) or not covered at all (fully private), but I'm
-not 100% certain that xa_for_each_range() works the way I think it does.
+  48 8b 53 08             mov    0x8(%rbx),%rdx
+  89 d0                   mov    %edx,%eax
+  48 c1 ea 20             shr    $0x20,%rdx
+  49 b9 ba da ca ba 0a    movabs $0xabacadaba,%r9
+  00 00 00
+  4c 8d 15 07 00 00 00    lea    0x7(%rip),%r10        # 402fc3 <guest_msr+0xb3>
+  4c 8d 1d 06 00 00 00    lea    0x6(%rip),%r11        # 402fc9 <guest_msr+0xb9>
+  0f 30                   wrmsr
+
+Fixes: 3b23054cd3f5 ("KVM: selftests: Add x86-64 support for exception fixup")
+Signed-off-by: Vitaly Kuznetsov <vkuznets@redhat.com>
+Link: https://gcc.gnu.org/onlinedocs/gcc/Machine-Constraints.html#Machine-Constraints
+[sean: use "& -1u", provide GCC blurb and link to documentation]
+Signed-off-by: Sean Christopherson <seanjc@google.com>
+---
+ tools/testing/selftests/kvm/include/x86_64/processor.h | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/tools/testing/selftests/kvm/include/x86_64/processor.h b/tools/testing/selftests/kvm/include/x86_64/processor.h
+index 79dcf6be1b47..71e942ffac77 100644
+--- a/tools/testing/selftests/kvm/include/x86_64/processor.h
++++ b/tools/testing/selftests/kvm/include/x86_64/processor.h
+@@ -612,7 +612,7 @@ static inline uint8_t rdmsr_safe(uint32_t msr, uint64_t *val)
+ 
+ static inline uint8_t wrmsr_safe(uint32_t msr, uint64_t val)
+ {
+-	return kvm_asm_safe("wrmsr", "A"(val), "c"(msr));
++	return kvm_asm_safe("wrmsr", "a"(val & -1u), "d"(val >> 32), "c"(msr));
+ }
+ 
+ uint64_t vm_get_page_table_entry(struct kvm_vm *vm, struct kvm_vcpu *vcpu,
+
+base-commit: b624ae35418ce9424f639f8ffa2568e7674c262b
+-- 
+2.37.0.144.g8ac04bfd2-goog
+
