@@ -2,78 +2,68 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 7FC07575414
-	for <lists+kvm@lfdr.de>; Thu, 14 Jul 2022 19:33:48 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 710FD575419
+	for <lists+kvm@lfdr.de>; Thu, 14 Jul 2022 19:35:09 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238811AbiGNRdp (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 14 Jul 2022 13:33:45 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57644 "EHLO
+        id S232593AbiGNRfH (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 14 Jul 2022 13:35:07 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59282 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229496AbiGNRdj (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 14 Jul 2022 13:33:39 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 68BB8A1BD
-        for <kvm@vger.kernel.org>; Thu, 14 Jul 2022 10:33:38 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1657820017;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=0uihKaBOQkwF5deCzOTDYRhxxtwy14Pizt+T/pVs9Yg=;
-        b=al4VYPA/9NyqMpBTtyejfFfvv2l/VPXDlHPVE9Tw3sCbPDljAlmZlYJ5nqcYBqAhE0fG7u
-        2wOd35TOLfBcnMdo8VUhPCuuCAqCNeEBxHu4dl4xBsHAGuAFT2bwCI+w2kytGnVcK9ZVmD
-        guysOigrijNTrH94hbRM8oLa+NBOBsk=
-Received: from mail-ej1-f72.google.com (mail-ej1-f72.google.com
- [209.85.218.72]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-7-QHXfrxL8OQ6esTcqctJluQ-1; Thu, 14 Jul 2022 13:33:36 -0400
-X-MC-Unique: QHXfrxL8OQ6esTcqctJluQ-1
-Received: by mail-ej1-f72.google.com with SMTP id qb28-20020a1709077e9c00b0072af6ccc1aeso955937ejc.6
-        for <kvm@vger.kernel.org>; Thu, 14 Jul 2022 10:33:35 -0700 (PDT)
+        with ESMTP id S234085AbiGNRfD (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 14 Jul 2022 13:35:03 -0400
+Received: from mail-pf1-x429.google.com (mail-pf1-x429.google.com [IPv6:2607:f8b0:4864:20::429])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F00495F9B4
+        for <kvm@vger.kernel.org>; Thu, 14 Jul 2022 10:34:59 -0700 (PDT)
+Received: by mail-pf1-x429.google.com with SMTP id l124so2459207pfl.8
+        for <kvm@vger.kernel.org>; Thu, 14 Jul 2022 10:34:59 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=+UmeF/zKy2EgY/Ayp0ssdqVszmHBG40XC+IoVrGUUC8=;
+        b=TtTfFW50heWz3M9KmxpIh5ZORSxDEqdFk/6cZryo6xJ24fHcNAQul/WdDaJ2NOzxvN
+         bjY2uLV1sfBNc+UqEWjQ64T3gKKRFKM8XzUd9o5VSG6TFIKivhhtjowpmcXXFpa8a+vj
+         fztns+Y5GE4Ntm5tDH8iiSJGnLnXe+MwJCatnWi7hPb+81oY7mud/1VhFRoKup7AxL2t
+         KynkRq48LT9HSW+eDx56DEh93P86qkdOYzFGx/Gl9sfiM0zEfDK3ieIhMuzB9WrpAqh0
+         WX0EdSW1ivvNTxdzRluVBeg6sInXRN1Xpw7O+ukoWxhPq86RjaaapxclxjvIQGrea+bq
+         nyNA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
-         :content-language:to:cc:references:from:in-reply-to
-         :content-transfer-encoding;
-        bh=0uihKaBOQkwF5deCzOTDYRhxxtwy14Pizt+T/pVs9Yg=;
-        b=u4+ecoZoKfrRyvb9wDnvwLqbvjC4p3bIrIVr0MP/d2T5oBYKikuT3v5reooCwkz66H
-         hBHwtwy0Qb+sxii/8MCMVbkyKiZib9QwI6si0sJz+vAnf9zX5HTLCeHwG9dfaob/d8bi
-         fpLLuPY+zZSeLcQoIRpaA8gbMBjV9MKNDahTQMDTbPDCz+c8XL+NhS4u4nOSrEU8pZKk
-         lxTG+t2lTM/P41+VOwWZjlWqBtmk57VnHQvN75yCwSL96Z5DS8HXF3HuRL2GL4303bhR
-         YMTkbbceGhDZajkjgTfX5m6yJI16ze5vWjhrMhLztgqwOwyZnWKpMfb6Xz9bCxkiSRQM
-         FNVA==
-X-Gm-Message-State: AJIora+V8yV/F8R9oPrVAQp6Mo4L4hLKWPGchmpL7yppoQYpRm+2b591
-        Ws1esxo/lZAQDe4EgY6FQkYDk4otrD8l/GLjFu5RjRAjfnxVGrui0RkKwycH6HjZm2NWyxeE9Gb
-        bEcMfY9S4iHIj
-X-Received: by 2002:a05:6402:3214:b0:43a:b36f:a0b4 with SMTP id g20-20020a056402321400b0043ab36fa0b4mr13821021eda.122.1657820014768;
-        Thu, 14 Jul 2022 10:33:34 -0700 (PDT)
-X-Google-Smtp-Source: AGRyM1vV0UoPqphONFgcUdCBs8koMta1HObDMznrSBqqIdYHhspB9/PNO5wIYVZMH94ltjorGpco5g==
-X-Received: by 2002:a05:6402:3214:b0:43a:b36f:a0b4 with SMTP id g20-20020a056402321400b0043ab36fa0b4mr13821007eda.122.1657820014534;
-        Thu, 14 Jul 2022 10:33:34 -0700 (PDT)
-Received: from ?IPV6:2001:b07:6468:f312:9af8:e5f5:7516:fa89? ([2001:b07:6468:f312:9af8:e5f5:7516:fa89])
-        by smtp.googlemail.com with ESMTPSA id h27-20020a170906719b00b0072aeaa1bb5esm920080ejk.211.2022.07.14.10.33.33
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 14 Jul 2022 10:33:33 -0700 (PDT)
-Message-ID: <747332db-189a-2f58-4a2c-6a40eb631af8@redhat.com>
-Date:   Thu, 14 Jul 2022 19:33:33 +0200
-MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.10.0
-Subject: Re: [PATCH 0/5] KVM: x86: Clean up rmap zap helpers
-Content-Language: en-US
-To:     Sean Christopherson <seanjc@google.com>
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=+UmeF/zKy2EgY/Ayp0ssdqVszmHBG40XC+IoVrGUUC8=;
+        b=2afQdiGBVIFUk2yyxOwz32SEXFIVEtsVP/tU6IoHfp9BLG34BJro/BrgXUhZHhW8gK
+         eS1zqJ7QU4vkmEqecEeNcdPQ4g6Fj5z3Ezt9A99RIfQNPSLEH3dthqxKSW7xXHqLCyKW
+         grk4kzYQO201Es8kZOqXuxaeynF9LNGV1Zn2W8KfOehxz6K2P4mOdVMaxz1s2GIFs0fT
+         jnRxGkukjww9M3aHGRUFrraggjQcrL4FX9DTcLbvgnHt+7hICjlvD3uWP3yIC/1KZN3k
+         byremTkA+KyK0CeUTJupED3RXEoH04uRJfZq8sOR2mLsDeVNiyhhx4S1M4zBoQw1JQpY
+         jDww==
+X-Gm-Message-State: AJIora99HLgIqDyacUOheZJk46bxTpZpbZ+Oozjy0DZMWYabFL8l4fFu
+        6ireQglMZ7t6daXwCqaR24isww==
+X-Google-Smtp-Source: AGRyM1vMS0BYzCICryLdhnZpwZ/tZ8VfMPREYr7Rc1DD1+INoY0hqkDBjpk2sqmML/l3SQwg/E7EvA==
+X-Received: by 2002:a63:5810:0:b0:40d:77fb:1c25 with SMTP id m16-20020a635810000000b0040d77fb1c25mr8578514pgb.570.1657820099344;
+        Thu, 14 Jul 2022 10:34:59 -0700 (PDT)
+Received: from google.com (123.65.230.35.bc.googleusercontent.com. [35.230.65.123])
+        by smtp.gmail.com with ESMTPSA id u1-20020a634701000000b004168945bdf4sm1565942pga.66.2022.07.14.10.34.58
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 14 Jul 2022 10:34:58 -0700 (PDT)
+Date:   Thu, 14 Jul 2022 17:34:55 +0000
+From:   Sean Christopherson <seanjc@google.com>
+To:     Paolo Bonzini <pbonzini@redhat.com>
 Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH 0/5] KVM: x86: Clean up rmap zap helpers
+Message-ID: <YtBTv4IVPtb+aXQV@google.com>
 References: <20220712015558.1247978-1-seanjc@google.com>
  <bc2c1af3-33ec-d97e-f604-12a991c7cd5e@redhat.com>
  <YtBR/x3CAEavwzMI@google.com>
-From:   Paolo Bonzini <pbonzini@redhat.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 In-Reply-To: <YtBR/x3CAEavwzMI@google.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-3.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
-        RCVD_IN_DNSWL_LOW,SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE
+X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
+        T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL
         autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -81,17 +71,64 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 7/14/22 19:27, Sean Christopherson wrote:
+On Thu, Jul 14, 2022, Sean Christopherson wrote:
+> On Thu, Jul 14, 2022, Paolo Bonzini wrote:
+> > On 7/12/22 03:55, Sean Christopherson wrote:
+> > > Clean up the rmap helpers (mostly renames) to yield a more coherent set of
+> > > APIs, and to purge the irritating and inconsistent "rmapp" (p is for pointer)
+> > > nomenclature.
+> > > 
+> > > Patch 1 is a tangentially related fix for a benign bug.
+> > > 
+> > > Sean Christopherson (5):
+> > >    KVM: x86/mmu: Return a u64 (the old SPTE) from
+> > >      mmu_spte_clear_track_bits()
+> > >    KVM: x86/mmu: Rename rmap zap helpers to better show relationships
+> > >    KVM: x86/mmu: Remove underscores from __pte_list_remove()
+> > >    KVM: x86/mmu: Use innermost rmap zap helper when recycling rmaps
+> > >    KVM: x86/mmu: Drop the "p is for pointer" from rmap helpers
+> > > 
+> > >   arch/x86/kvm/mmu/mmu.c | 73 +++++++++++++++++++++---------------------
+> > >   1 file changed, 36 insertions(+), 37 deletions(-)
+> > > 
+> > > 
+> > > base-commit: b9b71f43683ae9d76b0989249607bbe8c9eb6c5c
+> > 
+> > I'm not sure I dig the ____, I'll take a closer look tomorrow or next week
+> > since it's dinner time here.
 > 
->    pte_list_remove  => kvm_zap_one_rmap_spte
->    pte_list_destroy => kvm_zap_all_rmap_sptes
+> Yeah, I'm not a fan of it either.  And rereading things, my proposed names also
+> create an inconsistency; the zap path is the only user of kvm_handle_gfn_range()
+> that uses a plural "rmaps".
+> 
+>   $ git grep kvm_handle_gfn_range
+>   arch/x86/kvm/mmu/mmu.c:static __always_inline bool kvm_handle_gfn_range(struct kvm *kvm,
+>   arch/x86/kvm/mmu/mmu.c:         flush = kvm_handle_gfn_range(kvm, range, kvm_zap_rmaps);
+>   arch/x86/kvm/mmu/mmu.c:         flush = kvm_handle_gfn_range(kvm, range, kvm_set_pte_rmap);
+>   arch/x86/kvm/mmu/mmu.c:         young = kvm_handle_gfn_range(kvm, range, kvm_age_rmap);
+>   arch/x86/kvm/mmu/mmu.c:         young = kvm_handle_gfn_range(kvm, range, kvm_test_age_rmap);
+> 
+> Make "rmaps" plural is probably a mistake.  The helper zaps multiple SPTEs for a
+> given rmap list, but from a certain point of view it's just a single "rmap".
+> 
+> What about:
+> 
+>   kvm_zap_rmapp => kvm_zap_rmap    // to align with kvm_handle_gfn_range() usage
+>   kvm_zap_rmap  => __kvm_zap_rmap  // to pair with kvm_zap_rmap()
+>   
+> and
+> 
+>   pte_list_remove  => kvm_zap_one_rmap_spte  
+>   pte_list_destroy => kvm_zap_all_rmap_sptes
 > 
 > That will yield a better series too, as I can move patch 5 to be patch 2, then
 > split what was patch 2 (the rename) into separate patches to first align kvm_zap_rmap()
 > and __kvm_zap_rmap(), and then rename the pte_list_remove/destroy helpers.
 
-Yeah, sounds good (I also was looking into moving patch 5 and possibly 
-even patch 4 more towards the beginning).
+And also:
 
-Paolo
+  __kvm_zap_rmaps => kvm_rmap_zap_gfn_range
 
+instead of renaming it to __kvm_zap_gfn_range() to make it clear that it zaps only
+rmap-based MMUs, to align with kvm_rmap_zap_collapsible_sptes(), and to avoid the
+plural "rmaps".
