@@ -2,120 +2,141 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 52164574563
-	for <lists+kvm@lfdr.de>; Thu, 14 Jul 2022 08:59:24 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 23DC857456E
+	for <lists+kvm@lfdr.de>; Thu, 14 Jul 2022 09:01:42 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234312AbiGNG7U (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 14 Jul 2022 02:59:20 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41206 "EHLO
+        id S232847AbiGNHBk (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 14 Jul 2022 03:01:40 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42676 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231828AbiGNG7K (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 14 Jul 2022 02:59:10 -0400
-Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CAD242B190;
-        Wed, 13 Jul 2022 23:59:07 -0700 (PDT)
-Received: from pps.filterd (m0098421.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.17.1.5/8.17.1.5) with ESMTP id 26E6hmqE029727;
-        Thu, 14 Jul 2022 06:59:07 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
- mime-version : to : cc : references : from : subject : in-reply-to :
- content-type : content-transfer-encoding; s=pp1;
- bh=GeT64NfS5k2tAgpLSlglGCY4PhITfWskpQ5HmZ6QoX0=;
- b=llRSFn46x1quPK2wDOzYtg4bRovel3Od3mm+NjR7etSyuLFCYTZdEjKlxMzmj5X686DE
- aJEDEQJ5ptUSKLJe4ccGIHUMLjsbgv4CiScPQmTIyFW+9noxNc5/aSAxUopTqJPqtddj
- IjVoNK+rh/3c9qer5S9Vm7InluTtCikAO+Az49Vos6fJhysoHA7KfaLOX+hM7A1PZoiK
- G+yo49sM6DMJSYeL59zHRR4d7yTfYEHCdSRGeTCuIfMNhPi/HsVwiWJ5K1dEjuwIkLFv
- V8t9WjXx8DIthy3b4F5Y6u9XIUO9NUxPqggDb3CnO0X4dPJmyYoPGb/NUD19Orww3RIc nA== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3hae4frak9-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 14 Jul 2022 06:59:06 +0000
-Received: from m0098421.ppops.net (m0098421.ppops.net [127.0.0.1])
-        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 26E6nwxg023864;
-        Thu, 14 Jul 2022 06:59:06 GMT
-Received: from ppma06fra.de.ibm.com (48.49.7a9f.ip4.static.sl-reverse.com [159.122.73.72])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3hae4frajq-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 14 Jul 2022 06:59:06 +0000
-Received: from pps.filterd (ppma06fra.de.ibm.com [127.0.0.1])
-        by ppma06fra.de.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 26E6rSpI004319;
-        Thu, 14 Jul 2022 06:59:04 GMT
-Received: from b06avi18626390.portsmouth.uk.ibm.com (b06avi18626390.portsmouth.uk.ibm.com [9.149.26.192])
-        by ppma06fra.de.ibm.com with ESMTP id 3h8ncnh5vr-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 14 Jul 2022 06:59:04 +0000
-Received: from b06wcsmtp001.portsmouth.uk.ibm.com (b06wcsmtp001.portsmouth.uk.ibm.com [9.149.105.160])
-        by b06avi18626390.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 26E6vS6b22020368
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Thu, 14 Jul 2022 06:57:28 GMT
-Received: from b06wcsmtp001.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 18C19A4054;
-        Thu, 14 Jul 2022 06:59:01 +0000 (GMT)
-Received: from b06wcsmtp001.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 9FA22A405C;
-        Thu, 14 Jul 2022 06:59:00 +0000 (GMT)
-Received: from [9.145.62.186] (unknown [9.145.62.186])
-        by b06wcsmtp001.portsmouth.uk.ibm.com (Postfix) with ESMTP;
-        Thu, 14 Jul 2022 06:59:00 +0000 (GMT)
-Message-ID: <abed8069-220a-ee32-b4fa-3cff935b539c@linux.ibm.com>
-Date:   Thu, 14 Jul 2022 08:59:00 +0200
-MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.9.0
-Content-Language: en-US
-To:     Claudio Imbrenda <imbrenda@linux.ibm.com>, kvm@vger.kernel.org
-Cc:     borntraeger@de.ibm.com, thuth@redhat.com, pasic@linux.ibm.com,
-        david@redhat.com, linux-s390@vger.kernel.org,
-        linux-kernel@vger.kernel.org, scgl@linux.ibm.com,
-        mimu@linux.ibm.com, nrb@linux.ibm.com
-References: <20220628135619.32410-1-imbrenda@linux.ibm.com>
-From:   Janosch Frank <frankja@linux.ibm.com>
-Subject: Re: [PATCH v12 00/18] KVM: s390: pv: implement lazy destroy for
- reboot
-In-Reply-To: <20220628135619.32410-1-imbrenda@linux.ibm.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: XNyKNM8aZ2gI7zY6NPWPZb6wPeL7o6gm
-X-Proofpoint-ORIG-GUID: eCzD25cLDywZLHhs-OJ0w9_idvUGfNkH
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.205,Aquarius:18.0.883,Hydra:6.0.517,FMLib:17.11.122.1
- definitions=2022-07-14_04,2022-07-13_03,2022-06-22_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501
- impostorscore=0 malwarescore=0 clxscore=1015 bulkscore=0 spamscore=0
- phishscore=0 adultscore=0 mlxscore=0 mlxlogscore=972 lowpriorityscore=0
- suspectscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2206140000 definitions=main-2207140025
-X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,
-        SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no
-        version=3.4.6
+        with ESMTP id S229928AbiGNHBh (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 14 Jul 2022 03:01:37 -0400
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CAD1E2B62E
+        for <kvm@vger.kernel.org>; Thu, 14 Jul 2022 00:01:36 -0700 (PDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id 65B2861B48
+        for <kvm@vger.kernel.org>; Thu, 14 Jul 2022 07:01:36 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id C1271C34114;
+        Thu, 14 Jul 2022 07:01:35 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1657782095;
+        bh=I6nKqehx8IlVE8OdjnnvBPhclf2olmzRtsOCDRBmX+4=;
+        h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+        b=XRVW22wxADxr4PD6x5AtVgCmHCuNbW0CyHbwoaRgkVeegCt0+NPXnuZafarxP/Wfa
+         b7k5uJM5TqFRvFvhCvfOL43Q4YQhgvSJJJr1Q0ioKlZCBPtQx5fZT8kEk74ctJA080
+         H+tfza9hkAokZdCRzPrSL/03wUtCaxrAoYqDpR3Nzpj/sgGmPpYvkS5OwdSpBtjzOl
+         pBS0kzpPo//uybeJGaQVxSPepHEO89QabgdWOiAgY9V9J6sETR2nWDqBaPDLGfx4ks
+         VbOa7vj3gQUoWG0Ss3sUeJuu9jKDINqHE2OTwHp6tBfKrdKQ2R5vfrdCpLmhTBrNb+
+         mKUEScmJE20yQ==
+Received: from ip-185-104-136-29.ptr.icomera.net ([185.104.136.29] helo=wait-a-minute.misterjones.org)
+        by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+        (Exim 4.95)
+        (envelope-from <maz@kernel.org>)
+        id 1oBsqq-007NWI-2M;
+        Thu, 14 Jul 2022 08:01:33 +0100
+Date:   Thu, 14 Jul 2022 08:01:21 +0100
+Message-ID: <877d4gyy7y.wl-maz@kernel.org>
+From:   Marc Zyngier <maz@kernel.org>
+To:     Reiji Watanabe <reijiw@google.com>
+Cc:     kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org,
+        Linux ARM <linux-arm-kernel@lists.infradead.org>,
+        Schspa Shi <schspa@gmail.com>, kernel-team@android.com,
+        Oliver Upton <oliver.upton@linux.dev>
+Subject: Re: [PATCH 15/19] KVM: arm64: vgic-v2: Add helper for legacy dist/cpuif base address setting
+In-Reply-To: <CAAeT=FzgBpwcf7oEGeCLCHO+XadP+i7vyPFWx6VJxmiWC94-7g@mail.gmail.com>
+References: <20220706164304.1582687-1-maz@kernel.org>
+        <20220706164304.1582687-16-maz@kernel.org>
+        <CAAeT=FzgBpwcf7oEGeCLCHO+XadP+i7vyPFWx6VJxmiWC94-7g@mail.gmail.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/27.1
+ (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.104.136.29
+X-SA-Exim-Rcpt-To: reijiw@google.com, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, schspa@gmail.com, kernel-team@android.com, oliver.upton@linux.dev
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+X-Spam-Status: No, score=-7.7 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_HI,
+        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 6/28/22 15:56, Claudio Imbrenda wrote:
-> Previously, when a protected VM was rebooted or when it was shut down,
-> its memory was made unprotected, and then the protected VM itself was
-> destroyed. Looping over the whole address space can take some time,
-> considering the overhead of the various Ultravisor Calls (UVCs). This
-> means that a reboot or a shutdown would take a potentially long amount
-> of time, depending on the amount of used memory.
+On Thu, 14 Jul 2022 07:37:25 +0100,
+Reiji Watanabe <reijiw@google.com> wrote:
 > 
-> This patchseries implements a deferred destroy mechanism for protected
-> guests. When a protected guest is destroyed, its memory can be cleared
-> in background, allowing the guest to restart or terminate significantly
-> faster than before.
+> Hi Marc,
 > 
+> On Wed, Jul 6, 2022 at 10:05 AM Marc Zyngier <maz@kernel.org> wrote:
+> >
+> > We carry a legacy interface to set the base addresses for GICv2.
+> > As this is currently plumbed into the same handling code as
+> > the modern interface, it limits the evolution we can make there.
+> >
+> > Add a helper dedicated to this handling, with a view of maybe
+> > removing this in the future.
+> >
+> > Signed-off-by: Marc Zyngier <maz@kernel.org>
+> > ---
+> >  arch/arm64/kvm/arm.c                  | 11 ++-------
+> >  arch/arm64/kvm/vgic/vgic-kvm-device.c | 32 +++++++++++++++++++++++++++
+> >  include/kvm/arm_vgic.h                |  1 +
+> >  3 files changed, 35 insertions(+), 9 deletions(-)
+> >
+> > diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
+> > index 83a7f61354d3..bf39570c0aef 100644
+> > --- a/arch/arm64/kvm/arm.c
+> > +++ b/arch/arm64/kvm/arm.c
+> > @@ -1414,18 +1414,11 @@ void kvm_arch_flush_remote_tlbs_memslot(struct kvm *kvm,
+> >  static int kvm_vm_ioctl_set_device_addr(struct kvm *kvm,
+> >                                         struct kvm_arm_device_addr *dev_addr)
+> >  {
+> > -       unsigned long dev_id, type;
+> > -
+> > -       dev_id = (dev_addr->id & KVM_ARM_DEVICE_ID_MASK) >>
+> > -               KVM_ARM_DEVICE_ID_SHIFT;
+> > -       type = (dev_addr->id & KVM_ARM_DEVICE_TYPE_MASK) >>
+> > -               KVM_ARM_DEVICE_TYPE_SHIFT;
+> > -
+> > -       switch (dev_id) {
+> > +       switch (FIELD_GET(KVM_ARM_DEVICE_ID_MASK, dev_addr->id)) {
+> >         case KVM_ARM_DEVICE_VGIC_V2:
+> >                 if (!vgic_present)
+> >                         return -ENXIO;
+> > -               return kvm_vgic_addr(kvm, type, &dev_addr->addr, true);
+> > +               return kvm_set_legacy_vgic_v2_addr(kvm, dev_addr);
+> >         default:
+> >                 return -ENODEV;
+> >         }
+> > diff --git a/arch/arm64/kvm/vgic/vgic-kvm-device.c b/arch/arm64/kvm/vgic/vgic-kvm-device.c
+> > index fbbd0338c782..0dfd277b9058 100644
+> > --- a/arch/arm64/kvm/vgic/vgic-kvm-device.c
+> > +++ b/arch/arm64/kvm/vgic/vgic-kvm-device.c
+> > @@ -41,6 +41,38 @@ static int vgic_check_type(struct kvm *kvm, int type_needed)
+> >                 return 0;
+> >  }
+> >
+> > +int kvm_set_legacy_vgic_v2_addr(struct kvm *kvm, struct kvm_arm_device_addr *dev_addr)
+> > +{
+> > +       struct vgic_dist *vgic = &kvm->arch.vgic;
+> > +       int r;
+> > +
+> > +       mutex_lock(&kvm->lock);
+> > +       switch (FIELD_GET(KVM_ARM_DEVICE_ID_MASK, dev_addr->id)) {
+> 
+> Shouldn't this be KVM_ARM_DEVICE_TYPE_MASK (not KVM_ARM_DEVICE_ID_MASK) ?
 
-Patches 1-12 have spent a considerable amount of time in the CI and I'd 
-like to queue them to be able to focus on the rest of the series.
+Damn, you just ruined my attempt at deprecating this API ;-). More
+seriously, thanks for catching this one!
 
-Patch 9 will need two small fixups since there are two conflicts where a 
-line was introduced before your addition of the include and the struct 
-kvm_s390_pv mmu_notifier member. I.e. it's more of a patch history 
-problem than a real conflict.
+	M.
 
-I'd fix that up when queuing if you're ok with it?
+-- 
+Without deviation from the norm, progress is not possible.
