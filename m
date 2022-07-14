@@ -2,270 +2,161 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id D1C36574BB6
-	for <lists+kvm@lfdr.de>; Thu, 14 Jul 2022 13:21:18 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id AF4E4574C49
+	for <lists+kvm@lfdr.de>; Thu, 14 Jul 2022 13:36:47 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237501AbiGNLVR (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 14 Jul 2022 07:21:17 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57816 "EHLO
+        id S238965AbiGNLgp (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 14 Jul 2022 07:36:45 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49508 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230016AbiGNLVP (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 14 Jul 2022 07:21:15 -0400
-Received: from mx0a-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BF46A481DE
-        for <kvm@vger.kernel.org>; Thu, 14 Jul 2022 04:21:14 -0700 (PDT)
-Received: from pps.filterd (m0098420.ppops.net [127.0.0.1])
-        by mx0b-001b2d01.pphosted.com (8.17.1.5/8.17.1.5) with ESMTP id 26EAqiDS004039;
-        Thu, 14 Jul 2022 11:21:07 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
- subject : to : cc : references : from : in-reply-to : content-type :
- content-transfer-encoding : mime-version; s=pp1;
- bh=m6cWFl3Hik2P5p9wusVYLgzyLUQU9xvTeNQlHIeYYiA=;
- b=OqVrJMAAKgxmpvuwnL6vaGldem/Y7XCmSCoSrDQSqCgh8qDTKE5vyDN99bgtav2hAry2
- fSbDvoKZvs6yStI8QT5i123AwHATi9kskI0FZXnlwNkDQUtG9VzuMt3NL9b8nrQshZt7
- XravwpvhN2eBHx+2zTitcSSxAshnj+pj1L3+nH4+2Tg5FOKV37gHUT0fDgNIeRPXIJEE
- VXL6OH2DeBPE9DAXQBjo4dufmpKudZFFlf9B+OCgasuIcSDBJNmll9wlvLAMhSppZtFa
- cdTRSLGGIPg+u79gaLoIfw7LejCirH6vsg3lY2nvi2sMNaTjOttHYUp9uj3aIxSTl3qQ OA== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0b-001b2d01.pphosted.com (PPS) with ESMTPS id 3hahsd8mxu-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 14 Jul 2022 11:21:06 +0000
-Received: from m0098420.ppops.net (m0098420.ppops.net [127.0.0.1])
-        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 26EBL6Kv003505;
-        Thu, 14 Jul 2022 11:21:06 GMT
-Received: from ppma06ams.nl.ibm.com (66.31.33a9.ip4.static.sl-reverse.com [169.51.49.102])
-        by mx0b-001b2d01.pphosted.com (PPS) with ESMTPS id 3hahsd8mx8-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 14 Jul 2022 11:21:06 +0000
-Received: from pps.filterd (ppma06ams.nl.ibm.com [127.0.0.1])
-        by ppma06ams.nl.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 26EBKKwm005152;
-        Thu, 14 Jul 2022 11:21:04 GMT
-Received: from b06cxnps4076.portsmouth.uk.ibm.com (d06relay13.portsmouth.uk.ibm.com [9.149.109.198])
-        by ppma06ams.nl.ibm.com with ESMTP id 3h70xhy0vj-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 14 Jul 2022 11:21:04 +0000
-Received: from d06av26.portsmouth.uk.ibm.com (d06av26.portsmouth.uk.ibm.com [9.149.105.62])
-        by b06cxnps4076.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 26EBL16C21430714
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Thu, 14 Jul 2022 11:21:01 GMT
-Received: from d06av26.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 31ADDAE04D;
-        Thu, 14 Jul 2022 11:21:01 +0000 (GMT)
-Received: from d06av26.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 3B04AAE045;
-        Thu, 14 Jul 2022 11:21:00 +0000 (GMT)
-Received: from [9.171.80.107] (unknown [9.171.80.107])
-        by d06av26.portsmouth.uk.ibm.com (Postfix) with ESMTP;
-        Thu, 14 Jul 2022 11:21:00 +0000 (GMT)
-Message-ID: <4fef46f1-f43f-665f-47dc-89107385572e@linux.ibm.com>
-Date:   Thu, 14 Jul 2022 13:25:42 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.3.0
-Subject: Re: [PATCH v8 02/12] s390x/cpu_topology: CPU topology objects and
- structures
-Content-Language: en-US
-To:     Janis Schoetterl-Glausch <scgl@linux.ibm.com>,
-        qemu-s390x@nongnu.org
-Cc:     qemu-devel@nongnu.org, borntraeger@de.ibm.com, pasic@linux.ibm.com,
-        richard.henderson@linaro.org, david@redhat.com, thuth@redhat.com,
-        cohuck@redhat.com, mst@redhat.com, pbonzini@redhat.com,
-        kvm@vger.kernel.org, ehabkost@redhat.com,
-        marcel.apfelbaum@gmail.com, eblake@redhat.com, armbru@redhat.com,
-        seiden@linux.ibm.com, nrb@linux.ibm.com, frankja@linux.ibm.com
-References: <20220620140352.39398-1-pmorel@linux.ibm.com>
- <20220620140352.39398-3-pmorel@linux.ibm.com>
- <de92ef17-3a17-df44-97aa-19e67d1d5b3d@linux.ibm.com>
- <5215ca74-e71c-73df-69c9-d2522e082706@linux.ibm.com>
- <53698be8-0eab-8dc2-2d54-df2a89e1092f@linux.ibm.com>
-From:   Pierre Morel <pmorel@linux.ibm.com>
-In-Reply-To: <53698be8-0eab-8dc2-2d54-df2a89e1092f@linux.ibm.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: SPfpJbwU5bhYAW07ijRPeap34uDVie7e
-X-Proofpoint-ORIG-GUID: yc8nGrP8dbYNJGiQQYxyA2ER08ms3JOz
-Content-Transfer-Encoding: 8bit
-X-Proofpoint-UnRewURL: 0 URL was un-rewritten
+        with ESMTP id S239003AbiGNLgi (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 14 Jul 2022 07:36:38 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 4CF645A452
+        for <kvm@vger.kernel.org>; Thu, 14 Jul 2022 04:36:35 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1657798594;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=yzJge1CDFiz3CXcKr0tL6QkQC9brq6bIgDLKquTU284=;
+        b=GDxHXksQfOf/kWrm0VOuG1MTN2vu0CmyhGLMLW/dNhwaYBau4hibBIW550BoAEkkayq6DQ
+        982j0TfDNGMAX6cV8UoBOabN3t7uOt8vVkw/mHBD8NZIYs2DENtMg0sRtJEQi4womzZZrg
+        B4dZlnFSe0LIhzLLHKtR3/EHlH3P9DQ=
+Received: from mail-ed1-f70.google.com (mail-ed1-f70.google.com
+ [209.85.208.70]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-28-jpcvQlEMNuij4aTYnob3lA-1; Thu, 14 Jul 2022 07:36:27 -0400
+X-MC-Unique: jpcvQlEMNuij4aTYnob3lA-1
+Received: by mail-ed1-f70.google.com with SMTP id f9-20020a056402354900b0043a902b7452so1330373edd.13
+        for <kvm@vger.kernel.org>; Thu, 14 Jul 2022 04:36:27 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
+         :content-language:to:cc:references:from:in-reply-to
+         :content-transfer-encoding;
+        bh=yzJge1CDFiz3CXcKr0tL6QkQC9brq6bIgDLKquTU284=;
+        b=vnajKAHe4L/RDluNhnx55iTvTyfB4Mw/tV92usjLX2SqnWKXB2uKjY1ry7U9Vdh8M0
+         Gji6EVRuhI7KLN8iWUFu/RXrYpMSZfX6crXM/MdKiFMT8BUJWm0+4A98OG003P4OYC/F
+         orHjRPZ3QdGQEIgEqdaEY757sJWTG8xyCZDsykCAOLy2zgo3XhDzZKfLYbFfEMUFk2B+
+         qPAK6liJVvzeOFVeT5sm+prkoiCqvsnTsXLA38BPHnaKcPVC7VEmoE50eSaKWoiWat3+
+         UIYZxEIyuvgrUmoe3jsj49qmmXYOz4FFip9pyaynhgOSSAu6k9RlRSVQ/ENSHD72/Vg5
+         Ajag==
+X-Gm-Message-State: AJIora+SkIPxPvZfhyrHDwIRxY8V1x0RHwZaPUhT6fO8V/x8PWwpKzrj
+        ta2hIAPe0qgmtJXjjUfkNjGkDjQyoaL8v+LNF1NDPQJ1tcWBxb2zjruSRNNZdVErSFFXWPDA3MX
+        +syidcjTWen6y
+X-Received: by 2002:a17:906:c152:b0:726:35bd:b3bd with SMTP id dp18-20020a170906c15200b0072635bdb3bdmr8547618ejc.201.1657798586266;
+        Thu, 14 Jul 2022 04:36:26 -0700 (PDT)
+X-Google-Smtp-Source: AGRyM1soMs6ib0bGsSIDUbevpTdLCHlVeXmj1/9cy57IT8JvY+ym0ohu3hRr8eg8qnRzm5l28Qe84Q==
+X-Received: by 2002:a17:906:c152:b0:726:35bd:b3bd with SMTP id dp18-20020a170906c15200b0072635bdb3bdmr8547605ejc.201.1657798586018;
+        Thu, 14 Jul 2022 04:36:26 -0700 (PDT)
+Received: from ?IPV6:2001:b07:6468:f312:9af8:e5f5:7516:fa89? ([2001:b07:6468:f312:9af8:e5f5:7516:fa89])
+        by smtp.googlemail.com with ESMTPSA id by28-20020a0564021b1c00b0043acddee068sm881292edb.83.2022.07.14.04.36.23
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 14 Jul 2022 04:36:25 -0700 (PDT)
+Message-ID: <976510d2-c7ad-2108-27e0-4c3b82c210f1@redhat.com>
+Date:   Thu, 14 Jul 2022 13:36:22 +0200
 MIME-Version: 1.0
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.205,Aquarius:18.0.883,Hydra:6.0.517,FMLib:17.11.122.1
- definitions=2022-07-14_08,2022-07-14_01,2022-06-22_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 clxscore=1015
- priorityscore=1501 bulkscore=0 spamscore=0 impostorscore=0 mlxscore=0
- lowpriorityscore=0 phishscore=0 adultscore=0 mlxlogscore=999
- suspectscore=0 malwarescore=0 classifier=spam adjust=0 reason=mlx
- scancount=1 engine=8.12.0-2206140000 definitions=main-2207140046
-X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,
-        SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no
-        version=3.4.6
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.10.0
+Subject: Re: [PATCH] x86/kvm: fix FASTOP_SIZE when return thunks are enabled
+Content-Language: en-US
+To:     Peter Zijlstra <peterz@infradead.org>,
+        Thadeu Lima de Souza Cascardo <cascardo@canonical.com>
+Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org, x86@kernel.org,
+        stable@vger.kernel.org,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        Naresh Kamboju <naresh.kamboju@linaro.org>,
+        Borislav Petkov <bp@suse.de>,
+        Josh Poimboeuf <jpoimboe@kernel.org>,
+        Linux Kernel Functional Testing <lkft@linaro.org>
+References: <20220713171241.184026-1-cascardo@canonical.com>
+ <Ys/ncSnSFEST4fgL@worktop.programming.kicks-ass.net>
+From:   Paolo Bonzini <pbonzini@redhat.com>
+In-Reply-To: <Ys/ncSnSFEST4fgL@worktop.programming.kicks-ass.net>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Spam-Status: No, score=-2.7 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
+        RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE
+        autolearn=unavailable autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-
-
-On 7/14/22 12:38, Janis Schoetterl-Glausch wrote:
-> On 7/13/22 16:59, Pierre Morel wrote:
+On 7/14/22 11:52, Peter Zijlstra wrote:
+> On Wed, Jul 13, 2022 at 02:12:41PM -0300, Thadeu Lima de Souza Cascardo wrote:
+>> The return thunk call makes the fastop functions larger, just like IBT
+>> does. Consider a 16-byte FASTOP_SIZE when CONFIG_RETHUNK is enabled.
 >>
+>> Otherwise, functions will be incorrectly aligned and when computing their
+>> position for differently sized operators, they will executed in the middle
+>> or end of a function, which may as well be an int3, leading to a crash
+>> like:
+> 
+> Bah.. I did the SETcc stuff, but then forgot about the FASTOP :/
+> 
+>    af2e140f3420 ("x86/kvm: Fix SETcc emulation for return thunks")
+> 
+>> Fixes: aa3d480315ba ("x86: Use return-thunk in asm code")
+>> Signed-off-by: Thadeu Lima de Souza Cascardo <cascardo@canonical.com>
+>> Cc: Peter Zijlstra (Intel) <peterz@infradead.org>
+>> Cc: Borislav Petkov <bp@suse.de>
+>> Cc: Josh Poimboeuf <jpoimboe@kernel.org>
+>> Cc: Paolo Bonzini <pbonzini@redhat.com>
+>> Reported-by: Linux Kernel Functional Testing <lkft@linaro.org>
+>> ---
+>>   arch/x86/kvm/emulate.c | 2 +-
+>>   1 file changed, 1 insertion(+), 1 deletion(-)
 >>
->> On 7/12/22 17:40, Janis Schoetterl-Glausch wrote:
->>> On 6/20/22 16:03, Pierre Morel wrote:
-
+>> diff --git a/arch/x86/kvm/emulate.c b/arch/x86/kvm/emulate.c
+>> index db96bf7d1122..d779eea1052e 100644
+>> --- a/arch/x86/kvm/emulate.c
+>> +++ b/arch/x86/kvm/emulate.c
+>> @@ -190,7 +190,7 @@
+>>   #define X16(x...) X8(x), X8(x)
+>>   
+>>   #define NR_FASTOP (ilog2(sizeof(ulong)) + 1)
+>> -#define FASTOP_SIZE (8 * (1 + HAS_KERNEL_IBT))
+>> +#define FASTOP_SIZE (8 * (1 + (HAS_KERNEL_IBT | IS_ENABLED(CONFIG_RETHUNK))))
 > 
-> [...]
-> 
->>>> +}
->>>> +
->>>> +/*
->>>> + * s390_topology_new_cpu:
->>>> + * @core_id: the core ID is machine wide
->>>> + *
->>>> + * We have a single book returned by s390_get_topology(),
->>>> + * then we build the hierarchy on demand.
->>>> + * Note that we do not destroy the hierarchy on error creating
->>>> + * an entry in the topology, we just keep it empty.
->>>> + * We do not need to worry about not finding a topology level
->>>> + * entry this would have been caught during smp parsing.
->>>> + */
->>>> +bool s390_topology_new_cpu(MachineState *ms, int core_id, Error **errp)
->>>> +{
->>>> +    S390TopologyBook *book;
->>>> +    S390TopologySocket *socket;
->>>> +    S390TopologyCores *cores;
->>>> +    int nb_cores_per_socket;
->>>
->>> num_cores_per_socket instead?
->>>
->>>> +    int origin, bit;
->>>> +
->>>> +    book = s390_get_topology();
->>>> +
->>>> +    nb_cores_per_socket = ms->smp.cores * ms->smp.threads;
->>>
->>> We don't support the multithreading facility, do we?
->>> So, I think we should assert smp.threads == 1 somewhere.
->>> In any case I think the correct expression would round the threads up to the next power of 2,
->>> because the core_id has the thread id in the lower bits, but threads per core doesn't need to be
->>> a power of 2 according to the architecture.
->>
->> That is right.
->> I will add that.
-> 
-> Add the assert?
-> It should probably be somewhere else.
+> Would it make sense to do something like this instead?
 
-That is sure.
-I thought about put a fatal error report during the initialization in 
-the s390_topology_setup()
-
-> And you can set thread > 1 today, so we'd need to handle that. (increase the number of cpus instead and print a warning?)
-> 
-> [...]
-
-this would introduce arch dependencies in the hw/core/
-I think that the error report for Z is enough.
-
-So once we support Multithreading in the guest we can adjust it easier 
-without involving the common code.
-
-Or we can introduce a thread_supported in SMPCompatProps, which would be 
-good.
-I would prefer to propose this outside of the series and suppress the 
-fatal error once it is adopted.
-
-> 
->>>> +
->>>> +/*
->>>> + * Setting the first topology: 1 book, 1 socket
->>>> + * This is enough for 64 cores if the topology is flat (single socket)
->>>> + */
->>>> +void s390_topology_setup(MachineState *ms)
->>>> +{
->>>> +    DeviceState *dev;
->>>> +
->>>> +    /* Create BOOK bridge device */
->>>> +    dev = qdev_new(TYPE_S390_TOPOLOGY_BOOK);
->>>> +    object_property_add_child(qdev_get_machine(),
->>>> +                              TYPE_S390_TOPOLOGY_BOOK, OBJECT(dev));
->>>
->>> Why add it to the machine instead of directly using a static?
->>
->> For my opinion it is a characteristic of the machine.
->>
->>> So it's visible to the user via info qtree or something?
->>
->> It is already visible to the user on info qtree.
->>
->>> Would that even be the appropriate location to show that?
->>
->> That is a very good question and I really appreciate if we discuss on the design before diving into details.
->>
->> The idea is to have the architecture details being on qtree as object so we can plug new drawers/books/socket/cores and in the future when the infrastructure allows it unplug them.
-> 
-> Would it not be more accurate to say that we plug in new cpus only?
-> Since you need to specify the topology up front with -smp and it cannot change after.
-
-smp specify the maximum we can have.
-I thought we can add dynamically elements inside this maximum set.
-
-> So that all is static, books/sockets might be completely unpopulated, but they still exist in a way.
-> As far as I understand, STSI only allows for cpus to change, nothing above it.
-
-I thought we want to plug new books or drawers but I may be wrong.
-
->>
->> There is a info numa (info cpus does not give a lot info) to give information on nodes but AFAIU, a node is more a theoritical that can be used above the virtual architecture, sockets/cores, to specify characteristics like distance and associated memory.
-> 
-> https://qemu.readthedocs.io/en/latest/interop/qemu-qmp-ref.html#qapidoc-2391
-> shows that the relevant information can be queried via qmp.
-> When I tried it on s390x it only showed the core_id, but we should be able to add the rest.
-
-yes, sure.
-
-> 
-> 
-> Am I correct in my understanding, that there are two reasons to have the hierarchy objects:
-> 1. Caching the topology instead of computing it when STSI is called
-> 2. So they show up in info qtree
-> 
-> ?
-
-and have the possibility to add the objects dynamically. yes
+Yes, definitely.  Applied with a small tweak to make FASTOP_LENGTH
+more similar to SETCC_LENGTH:
+  
+diff --git a/arch/x86/kvm/emulate.c b/arch/x86/kvm/emulate.c
+index db96bf7d1122..0a15b0fec6d9 100644
+--- a/arch/x86/kvm/emulate.c
++++ b/arch/x86/kvm/emulate.c
+@@ -189,8 +189,12 @@
+  #define X8(x...) X4(x), X4(x)
+  #define X16(x...) X8(x), X8(x)
+  
+-#define NR_FASTOP (ilog2(sizeof(ulong)) + 1)
+-#define FASTOP_SIZE (8 * (1 + HAS_KERNEL_IBT))
++#define NR_FASTOP	(ilog2(sizeof(ulong)) + 1)
++#define RET_LENGTH	(1 + (4 * IS_ENABLED(CONFIG_RETHUNK)) + \
++			 IS_ENABLED(CONFIG_SLS))
++#define FASTOP_LENGTH	(ENDBR_INSN_SIZE + 7 + RET_LENGTH)
++#define FASTOP_SIZE	(8 << ((FASTOP_LENGTH > 8) & 1) << ((FASTOP_LENGTH > 16) & 1))
++static_assert(FASTOP_LENGTH <= FASTOP_SIZE);
+  
+  struct opcode {
+  	u64 flags;
+@@ -442,8 +446,6 @@ static int fastop(struct x86_emulate_ctxt *ctxt, fastop_t fop);
+   * RET | JMP __x86_return_thunk	[1,5 bytes; CONFIG_RETHUNK]
+   * INT3				[1 byte; CONFIG_SLS]
+   */
+-#define RET_LENGTH	(1 + (4 * IS_ENABLED(CONFIG_RETHUNK)) + \
+-			 IS_ENABLED(CONFIG_SLS))
+  #define SETCC_LENGTH	(ENDBR_INSN_SIZE + 3 + RET_LENGTH)
+  #define SETCC_ALIGN	(4 << ((SETCC_LENGTH > 4) & 1) << ((SETCC_LENGTH > 8) & 1))
+  static_assert(SETCC_LENGTH <= SETCC_ALIGN);
 
 
-> [...]
-> 
->>
->>>> +    /*
->>>> +     * Each CPU inside a socket will be represented by a bit in a 64bit
->>>> +     * unsigned long. Set on plug and clear on unplug of a CPU.
->>>> +     * All CPU inside a mask share the same dedicated, polarity and
->>>> +     * cputype values.
->>>> +     * The origin is the offset of the first CPU in a mask.
->>>> +     */
->>>> +struct S390TopologyCores {
->>>> +    DeviceState parent_obj;
->>>> +    int id;
->>>> +    bool dedicated;
->>>> +    uint8_t polarity;
->>>> +    uint8_t cputype;
->>>
->>> Why not snake_case for cpu type?
->>
->> I do not understand what you mean.
-> 
-> I'm suggesting s/cputype/cpu_type/
+Paolo
 
-ok
-
-
-Thanks,
-
-regards,
-Pierre
-
--- 
-Pierre Morel
-IBM Lab Boeblingen
