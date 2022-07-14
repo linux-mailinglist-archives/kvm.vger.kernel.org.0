@@ -2,69 +2,72 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 16138575295
-	for <lists+kvm@lfdr.de>; Thu, 14 Jul 2022 18:15:54 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id F1EDF575352
+	for <lists+kvm@lfdr.de>; Thu, 14 Jul 2022 18:48:13 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238850AbiGNQPv (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 14 Jul 2022 12:15:51 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44768 "EHLO
+        id S240497AbiGNQrk (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 14 Jul 2022 12:47:40 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42890 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232478AbiGNQPt (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 14 Jul 2022 12:15:49 -0400
-Received: from mail-ed1-x52c.google.com (mail-ed1-x52c.google.com [IPv6:2a00:1450:4864:20::52c])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 800E961B00
-        for <kvm@vger.kernel.org>; Thu, 14 Jul 2022 09:15:47 -0700 (PDT)
-Received: by mail-ed1-x52c.google.com with SMTP id e15so3077131edj.2
-        for <kvm@vger.kernel.org>; Thu, 14 Jul 2022 09:15:47 -0700 (PDT)
+        with ESMTP id S240501AbiGNQrV (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 14 Jul 2022 12:47:21 -0400
+Received: from mail-ej1-x62b.google.com (mail-ej1-x62b.google.com [IPv6:2a00:1450:4864:20::62b])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 459E119039;
+        Thu, 14 Jul 2022 09:45:30 -0700 (PDT)
+Received: by mail-ej1-x62b.google.com with SMTP id z23so4435614eju.8;
+        Thu, 14 Jul 2022 09:45:30 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=govIWRa7qaOV2WIczJDqmAkYPYMG/67BzPW5XLlKyvc=;
-        b=wwHDSW/azHUQ/dXzI4ImC8W7hItZhAmo8R0SiTyuuX/fYrhKkvqv3mVUr49+xTpUby
-         9gn1VHxei66XkaRiu+VGyDuu4+GSld5MF8susPqmvURu8hnhGCXdUo/BSMSg3Tn4mab0
-         AKIfp2W1bZ2YyxjaxFIfgAd5n6K1A6LC7UBBV9i4Ugl4g4BRDBOaj0EhfiJZownauzkV
-         D+G3ZVhCZ9g698PJnHdoBLJCRmrQ2gaHD6Xrnw+wNPHZ7OHRMzYFLtKfutecE6Ezemet
-         ILPzTdfaIQqJnWCXVn8HJ1NVEnJ8gVhHdS4czxVUj2+zjzhKg/lV5mxsI1gQIL+KPwLY
-         p/eg==
+        d=gmail.com; s=20210112;
+        h=sender:message-id:date:mime-version:user-agent:subject
+         :content-language:to:cc:references:from:in-reply-to
+         :content-transfer-encoding;
+        bh=hhxIWNbzrgE/4mMvH3ENhNTONUeqoY/2MuWDy67vgak=;
+        b=JeRIQYogWxTP7m+CyHQWOmmYu9LcGJBf9gdIglPrxd7QCli6YzRtV9SUWnPcaDcUfs
+         dtjfW8wjbQNPUNuePp7TDaE+ApuVYMSI2yKVcOMMdShGqwmRJKcfIbSUziOTv41muYIM
+         JwFHjRnw3YdHIB/aJbSmn1CiYFLsu3HcC8EhTt4dXCdnSeBkdn6MktdFcxwjPZYFVr8Q
+         jvrQc2pHoVLVO29N3o0zZUvRi8oIPfuYV1kfOx0IK1ksOl8lin/Lwb7fYJI8Wk0Av0dC
+         JIU9pcuR9EH6ai3CYiGvLjMwiL2KmF6NtjvcWTSdO2RZIOffY7cHrqbSotcKD5KNNLuW
+         DXyQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=govIWRa7qaOV2WIczJDqmAkYPYMG/67BzPW5XLlKyvc=;
-        b=oze/WG1xWXBOhPJdBMdf8z46QYg5ancpMT0k2UQrbQlGuJRcmEND4OKAk+s6rY8ayQ
-         MfJC5sf7CD9cGmvVQbtWD3CRVCvjnZHTjwk+2V+oRj+oD0urwjGnf66sojrTztGAXNgZ
-         p+5CJ3MQ6rrsl9oLzbwqUn3zvBNui+oYenDgzqLpuTEgPS0UnRwgMyWx7xTfwlljppnj
-         Bn8ew18AhGegucBoDwjTsMsLnhEP/cA9lvWeAIm8lP8m+9CqOr578knbUWmiUzc2wKSU
-         ieHVnME36QkybnaVUtlfPBXzVS0OaR/vTiqTIVCjbtL4QjMadX9JTFUiWn5oFkXQt4Sz
-         aUWA==
-X-Gm-Message-State: AJIora8SSs0GjlyGm4WIchiyAVgQZ7xSzqWfzY/tQUv8Chm+xby6qfLB
-        skPdmePKacRYfObdfz+4jU+e+ZxRwR76ApFwY2a4TA==
-X-Google-Smtp-Source: AGRyM1uRlQZY0lm6PlIZv8ZWPALNPT1WMYOIzlf7AeIvGx0GX2B+25LAtwrQYAbWLB7amc6FGJVkRbDm5tkd3xZByjE=
-X-Received: by 2002:aa7:d5d7:0:b0:43a:6eda:464a with SMTP id
- d23-20020aa7d5d7000000b0043a6eda464amr13313083eds.193.1657815345955; Thu, 14
- Jul 2022 09:15:45 -0700 (PDT)
+        h=x-gm-message-state:sender:message-id:date:mime-version:user-agent
+         :subject:content-language:to:cc:references:from:in-reply-to
+         :content-transfer-encoding;
+        bh=hhxIWNbzrgE/4mMvH3ENhNTONUeqoY/2MuWDy67vgak=;
+        b=c4I7nqtNI/40zKJP71Pz/AM1LkttcaRo7hO6QqsrkiUfMVeSgKcqShO8vNY9ozKiVG
+         7gYTJ3ItcOg5jeSTOzOcfwJ1JyErIq11nROCLbs1tw26aT75bzVg2Nz/rtcDyDDVpzGF
+         qZCvyJ5KAzunQIDlUEirYzLl01QzZaYEJWtT/FlZQcfX5HW1tMmzzhORRj0/2FRyi5wU
+         NSrPDX9OYSnCwilCutF1v4ypFiAie95dBq6JGDlT1loP2b2d+OBW0n5TUEmJuCpC4/KV
+         PhaF4A8HaScGYxrybTyNlgaAgUkJi1isAk6brlwjfPS6xChw5r3d091m/auhc1jhPE24
+         jprQ==
+X-Gm-Message-State: AJIora/smS1Rh9kG4BuLVBTmwpQP1QBwuseRcT3aXs2UAm2sHDqXDNKh
+        cXqcV2ivy35uwm2OHuUOhXBTlJpdsIc=
+X-Google-Smtp-Source: AGRyM1tqOzj/60GEr+33fLXoqzb/CRFI3uqNFX7HBU77x45YOmmBmz+qwFRTOZ3e2n3ukqWQe2Q/jw==
+X-Received: by 2002:a17:907:2854:b0:72b:8f44:26a3 with SMTP id el20-20020a170907285400b0072b8f4426a3mr9566677ejc.96.1657817128297;
+        Thu, 14 Jul 2022 09:45:28 -0700 (PDT)
+Received: from ?IPV6:2001:b07:6468:f312:9af8:e5f5:7516:fa89? ([2001:b07:6468:f312:9af8:e5f5:7516:fa89])
+        by smtp.googlemail.com with ESMTPSA id t10-20020a05640203ca00b0043a26e3db72sm1341586edw.54.2022.07.14.09.45.27
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 14 Jul 2022 09:45:27 -0700 (PDT)
+Sender: Paolo Bonzini <paolo.bonzini@gmail.com>
+Message-ID: <bc2c1af3-33ec-d97e-f604-12a991c7cd5e@redhat.com>
+Date:   Thu, 14 Jul 2022 18:45:25 +0200
 MIME-Version: 1.0
-References: <20220713171241.184026-1-cascardo@canonical.com>
- <Ys/ncSnSFEST4fgL@worktop.programming.kicks-ass.net> <976510d2-c7ad-2108-27e0-4c3b82c210f1@redhat.com>
-In-Reply-To: <976510d2-c7ad-2108-27e0-4c3b82c210f1@redhat.com>
-From:   Naresh Kamboju <naresh.kamboju@linaro.org>
-Date:   Thu, 14 Jul 2022 21:45:34 +0530
-Message-ID: <CA+G9fYvxR8+4cajcCBbPRuhR1tnuBmrLxosSOMzPg7CjxQU35w@mail.gmail.com>
-Subject: Re: [PATCH] x86/kvm: fix FASTOP_SIZE when return thunks are enabled
-To:     Paolo Bonzini <pbonzini@redhat.com>
-Cc:     Peter Zijlstra <peterz@infradead.org>,
-        Thadeu Lima de Souza Cascardo <cascardo@canonical.com>,
-        kvm@vger.kernel.org, linux-kernel@vger.kernel.org, x86@kernel.org,
-        stable@vger.kernel.org,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        Borislav Petkov <bp@suse.de>,
-        Josh Poimboeuf <jpoimboe@kernel.org>,
-        Linux Kernel Functional Testing <lkft@linaro.org>
-Content-Type: text/plain; charset="UTF-8"
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=unavailable
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.10.0
+Subject: Re: [PATCH 0/5] KVM: x86: Clean up rmap zap helpers
+Content-Language: en-US
+To:     Sean Christopherson <seanjc@google.com>
+Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org
+References: <20220712015558.1247978-1-seanjc@google.com>
+From:   Paolo Bonzini <pbonzini@redhat.com>
+In-Reply-To: <20220712015558.1247978-1-seanjc@google.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Spam-Status: No, score=-1.5 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_EF,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+        HEADER_FROM_DIFFERENT_DOMAINS,NICE_REPLY_A,RCVD_IN_DNSWL_NONE,
+        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=no
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -72,89 +75,31 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi Paolo,
+On 7/12/22 03:55, Sean Christopherson wrote:
+> Clean up the rmap helpers (mostly renames) to yield a more coherent set of
+> APIs, and to purge the irritating and inconsistent "rmapp" (p is for pointer)
+> nomenclature.
+> 
+> Patch 1 is a tangentially related fix for a benign bug.
+> 
+> Sean Christopherson (5):
+>    KVM: x86/mmu: Return a u64 (the old SPTE) from
+>      mmu_spte_clear_track_bits()
+>    KVM: x86/mmu: Rename rmap zap helpers to better show relationships
+>    KVM: x86/mmu: Remove underscores from __pte_list_remove()
+>    KVM: x86/mmu: Use innermost rmap zap helper when recycling rmaps
+>    KVM: x86/mmu: Drop the "p is for pointer" from rmap helpers
+> 
+>   arch/x86/kvm/mmu/mmu.c | 73 +++++++++++++++++++++---------------------
+>   1 file changed, 36 insertions(+), 37 deletions(-)
+> 
+> 
+> base-commit: b9b71f43683ae9d76b0989249607bbe8c9eb6c5c
 
-On Thu, 14 Jul 2022 at 17:06, Paolo Bonzini <pbonzini@redhat.com> wrote:
->
-> On 7/14/22 11:52, Peter Zijlstra wrote:
-> > On Wed, Jul 13, 2022 at 02:12:41PM -0300, Thadeu Lima de Souza Cascardo wrote:
-> >> The return thunk call makes the fastop functions larger, just like IBT
-> >> does. Consider a 16-byte FASTOP_SIZE when CONFIG_RETHUNK is enabled.
-> >>
-> >> Otherwise, functions will be incorrectly aligned and when computing their
-> >> position for differently sized operators, they will executed in the middle
-> >> or end of a function, which may as well be an int3, leading to a crash
-> >> like:
-> >
-> > Bah.. I did the SETcc stuff, but then forgot about the FASTOP :/
-> >
-> >    af2e140f3420 ("x86/kvm: Fix SETcc emulation for return thunks")
-> >
-> >> Fixes: aa3d480315ba ("x86: Use return-thunk in asm code")
-> >> Signed-off-by: Thadeu Lima de Souza Cascardo <cascardo@canonical.com>
-> >> Cc: Peter Zijlstra (Intel) <peterz@infradead.org>
-> >> Cc: Borislav Petkov <bp@suse.de>
-> >> Cc: Josh Poimboeuf <jpoimboe@kernel.org>
-> >> Cc: Paolo Bonzini <pbonzini@redhat.com>
-> >> Reported-by: Linux Kernel Functional Testing <lkft@linaro.org>
+I'm not sure I dig the ____, I'll take a closer look tomorrow or next 
+week since it's dinner time here.
 
-Tested-by: Linux Kernel Functional Testing <lkft@linaro.org>
+I'm pushing what you and I collected over the past 3 weeks, for now I 
+only checked that it compiles.
 
-> >> ---
-> >>   arch/x86/kvm/emulate.c | 2 +-
-> >>   1 file changed, 1 insertion(+), 1 deletion(-)
-> >>
-> >> diff --git a/arch/x86/kvm/emulate.c b/arch/x86/kvm/emulate.c
-> >> index db96bf7d1122..d779eea1052e 100644
-> >> --- a/arch/x86/kvm/emulate.c
-> >> +++ b/arch/x86/kvm/emulate.c
-> >> @@ -190,7 +190,7 @@
-> >>   #define X16(x...) X8(x), X8(x)
-> >>
-> >>   #define NR_FASTOP (ilog2(sizeof(ulong)) + 1)
-> >> -#define FASTOP_SIZE (8 * (1 + HAS_KERNEL_IBT))
-> >> +#define FASTOP_SIZE (8 * (1 + (HAS_KERNEL_IBT | IS_ENABLED(CONFIG_RETHUNK))))
-> >
-> > Would it make sense to do something like this instead?
->
-> Yes, definitely.  Applied with a small tweak to make FASTOP_LENGTH
-> more similar to SETCC_LENGTH:
->
-> diff --git a/arch/x86/kvm/emulate.c b/arch/x86/kvm/emulate.c
-> index db96bf7d1122..0a15b0fec6d9 100644
-> --- a/arch/x86/kvm/emulate.c
-> +++ b/arch/x86/kvm/emulate.c
-> @@ -189,8 +189,12 @@
->   #define X8(x...) X4(x), X4(x)
->   #define X16(x...) X8(x), X8(x)
->
-> -#define NR_FASTOP (ilog2(sizeof(ulong)) + 1)
-> -#define FASTOP_SIZE (8 * (1 + HAS_KERNEL_IBT))
-> +#define NR_FASTOP      (ilog2(sizeof(ulong)) + 1)
-> +#define RET_LENGTH     (1 + (4 * IS_ENABLED(CONFIG_RETHUNK)) + \
-> +                        IS_ENABLED(CONFIG_SLS))
-> +#define FASTOP_LENGTH  (ENDBR_INSN_SIZE + 7 + RET_LENGTH)
-> +#define FASTOP_SIZE    (8 << ((FASTOP_LENGTH > 8) & 1) << ((FASTOP_LENGTH > 16) & 1))
-> +static_assert(FASTOP_LENGTH <= FASTOP_SIZE);
->
->   struct opcode {
->         u64 flags;
-> @@ -442,8 +446,6 @@ static int fastop(struct x86_emulate_ctxt *ctxt, fastop_t fop);
->    * RET | JMP __x86_return_thunk       [1,5 bytes; CONFIG_RETHUNK]
->    * INT3                               [1 byte; CONFIG_SLS]
->    */
-> -#define RET_LENGTH     (1 + (4 * IS_ENABLED(CONFIG_RETHUNK)) + \
-> -                        IS_ENABLED(CONFIG_SLS))
->   #define SETCC_LENGTH  (ENDBR_INSN_SIZE + 3 + RET_LENGTH)
->   #define SETCC_ALIGN   (4 << ((SETCC_LENGTH > 4) & 1) << ((SETCC_LENGTH > 8) & 1))
->   static_assert(SETCC_LENGTH <= SETCC_ALIGN);
->
->
-> Paolo
-
-Applied your patch and tested on top of the mainline kernel and
-tested kvm-unit-tests and reported kernel panic fixed.
-
-https://lkft.validation.linaro.org/scheduler/job/5284626
-
-- Naresh
+Paolo
