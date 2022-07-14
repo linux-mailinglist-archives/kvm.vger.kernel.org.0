@@ -2,54 +2,54 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 23DC857456E
-	for <lists+kvm@lfdr.de>; Thu, 14 Jul 2022 09:01:42 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id E387F574588
+	for <lists+kvm@lfdr.de>; Thu, 14 Jul 2022 09:10:30 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232847AbiGNHBk (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 14 Jul 2022 03:01:40 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42676 "EHLO
+        id S235364AbiGNHK1 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 14 Jul 2022 03:10:27 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48144 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229928AbiGNHBh (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 14 Jul 2022 03:01:37 -0400
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CAD1E2B62E
-        for <kvm@vger.kernel.org>; Thu, 14 Jul 2022 00:01:36 -0700 (PDT)
+        with ESMTP id S231365AbiGNHKZ (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 14 Jul 2022 03:10:25 -0400
+Received: from ams.source.kernel.org (ams.source.kernel.org [145.40.68.75])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8CFCE2BB19
+        for <kvm@vger.kernel.org>; Thu, 14 Jul 2022 00:10:24 -0700 (PDT)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id 65B2861B48
-        for <kvm@vger.kernel.org>; Thu, 14 Jul 2022 07:01:36 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id C1271C34114;
-        Thu, 14 Jul 2022 07:01:35 +0000 (UTC)
+        by ams.source.kernel.org (Postfix) with ESMTPS id 19D60B821F0
+        for <kvm@vger.kernel.org>; Thu, 14 Jul 2022 07:10:23 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9947BC34114;
+        Thu, 14 Jul 2022 07:10:21 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1657782095;
-        bh=I6nKqehx8IlVE8OdjnnvBPhclf2olmzRtsOCDRBmX+4=;
+        s=k20201202; t=1657782621;
+        bh=OW93xADmWIzkDjXJ3YhYksqVTv8k3OC+JR+fKsAdSus=;
         h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-        b=XRVW22wxADxr4PD6x5AtVgCmHCuNbW0CyHbwoaRgkVeegCt0+NPXnuZafarxP/Wfa
-         b7k5uJM5TqFRvFvhCvfOL43Q4YQhgvSJJJr1Q0ioKlZCBPtQx5fZT8kEk74ctJA080
-         H+tfza9hkAokZdCRzPrSL/03wUtCaxrAoYqDpR3Nzpj/sgGmPpYvkS5OwdSpBtjzOl
-         pBS0kzpPo//uybeJGaQVxSPepHEO89QabgdWOiAgY9V9J6sETR2nWDqBaPDLGfx4ks
-         VbOa7vj3gQUoWG0Ss3sUeJuu9jKDINqHE2OTwHp6tBfKrdKQ2R5vfrdCpLmhTBrNb+
-         mKUEScmJE20yQ==
+        b=Ob+epD8tkC8LjXI5bnJBB2af7jTHev4W+29rVw34ICgjtHVm2vjijZFoa+YMUiJUw
+         +zX2ztSj9yg5u+xdMgXpRCKhf0t7OIezQfrBc4+qHTFy/tEscUu6u1YMwIpAf9oTek
+         BaXAWHLfAYD8oe18fv05E4p+1buIVl5t33aq0vA3qaTslUg+/wTROuMo7Ci7x6CLSw
+         mnU+43FS4TpiNS/t3imnQljheGTBS4i7CtSJVNkyzzJy3DSoOUZ2YG+qBNBmZNXwME
+         bK6XL4YVnCEtQsDfopdxyfcFS9QYWJKYd11FWiYyEmCcPLiphVzC8zHaL1VJ4jfWSP
+         p/RRWdr4vaKJA==
 Received: from ip-185-104-136-29.ptr.icomera.net ([185.104.136.29] helo=wait-a-minute.misterjones.org)
         by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
         (Exim 4.95)
         (envelope-from <maz@kernel.org>)
-        id 1oBsqq-007NWI-2M;
-        Thu, 14 Jul 2022 08:01:33 +0100
-Date:   Thu, 14 Jul 2022 08:01:21 +0100
-Message-ID: <877d4gyy7y.wl-maz@kernel.org>
+        id 1oBszD-007Ndf-LE;
+        Thu, 14 Jul 2022 08:10:19 +0100
+Date:   Thu, 14 Jul 2022 08:09:32 +0100
+Message-ID: <875yk0yxub.wl-maz@kernel.org>
 From:   Marc Zyngier <maz@kernel.org>
 To:     Reiji Watanabe <reijiw@google.com>
 Cc:     kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org,
         Linux ARM <linux-arm-kernel@lists.infradead.org>,
         Schspa Shi <schspa@gmail.com>, kernel-team@android.com,
         Oliver Upton <oliver.upton@linux.dev>
-Subject: Re: [PATCH 15/19] KVM: arm64: vgic-v2: Add helper for legacy dist/cpuif base address setting
-In-Reply-To: <CAAeT=FzgBpwcf7oEGeCLCHO+XadP+i7vyPFWx6VJxmiWC94-7g@mail.gmail.com>
+Subject: Re: [PATCH 13/19] KVM: arm64: vgic-v2: Consolidate userspace access for MMIO registers
+In-Reply-To: <CAAeT=Fx9CbiJStMJcQ=-iwoLhAQGcwPbW==b0yHxkd3hmcXjiQ@mail.gmail.com>
 References: <20220706164304.1582687-1-maz@kernel.org>
-        <20220706164304.1582687-16-maz@kernel.org>
-        <CAAeT=FzgBpwcf7oEGeCLCHO+XadP+i7vyPFWx6VJxmiWC94-7g@mail.gmail.com>
+        <20220706164304.1582687-14-maz@kernel.org>
+        <CAAeT=Fx9CbiJStMJcQ=-iwoLhAQGcwPbW==b0yHxkd3hmcXjiQ@mail.gmail.com>
 User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
  FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/27.1
  (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
@@ -69,72 +69,131 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, 14 Jul 2022 07:37:25 +0100,
+On Thu, 14 Jul 2022 05:43:27 +0100,
 Reiji Watanabe <reijiw@google.com> wrote:
 > 
 > Hi Marc,
 > 
 > On Wed, Jul 6, 2022 at 10:05 AM Marc Zyngier <maz@kernel.org> wrote:
 > >
-> > We carry a legacy interface to set the base addresses for GICv2.
-> > As this is currently plumbed into the same handling code as
-> > the modern interface, it limits the evolution we can make there.
-> >
-> > Add a helper dedicated to this handling, with a view of maybe
-> > removing this in the future.
+> > Align the GICv2 MMIO accesses from userspace with the way the GICv3
+> > code is now structured.
 > >
 > > Signed-off-by: Marc Zyngier <maz@kernel.org>
 > > ---
-> >  arch/arm64/kvm/arm.c                  | 11 ++-------
-> >  arch/arm64/kvm/vgic/vgic-kvm-device.c | 32 +++++++++++++++++++++++++++
-> >  include/kvm/arm_vgic.h                |  1 +
-> >  3 files changed, 35 insertions(+), 9 deletions(-)
+> >  arch/arm64/kvm/vgic/vgic-kvm-device.c | 40 ++++++++++++---------------
+> >  1 file changed, 18 insertions(+), 22 deletions(-)
 > >
-> > diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
-> > index 83a7f61354d3..bf39570c0aef 100644
-> > --- a/arch/arm64/kvm/arm.c
-> > +++ b/arch/arm64/kvm/arm.c
-> > @@ -1414,18 +1414,11 @@ void kvm_arch_flush_remote_tlbs_memslot(struct kvm *kvm,
-> >  static int kvm_vm_ioctl_set_device_addr(struct kvm *kvm,
-> >                                         struct kvm_arm_device_addr *dev_addr)
-> >  {
-> > -       unsigned long dev_id, type;
-> > -
-> > -       dev_id = (dev_addr->id & KVM_ARM_DEVICE_ID_MASK) >>
-> > -               KVM_ARM_DEVICE_ID_SHIFT;
-> > -       type = (dev_addr->id & KVM_ARM_DEVICE_TYPE_MASK) >>
-> > -               KVM_ARM_DEVICE_TYPE_SHIFT;
-> > -
-> > -       switch (dev_id) {
-> > +       switch (FIELD_GET(KVM_ARM_DEVICE_ID_MASK, dev_addr->id)) {
-> >         case KVM_ARM_DEVICE_VGIC_V2:
-> >                 if (!vgic_present)
-> >                         return -ENXIO;
-> > -               return kvm_vgic_addr(kvm, type, &dev_addr->addr, true);
-> > +               return kvm_set_legacy_vgic_v2_addr(kvm, dev_addr);
-> >         default:
-> >                 return -ENODEV;
-> >         }
 > > diff --git a/arch/arm64/kvm/vgic/vgic-kvm-device.c b/arch/arm64/kvm/vgic/vgic-kvm-device.c
-> > index fbbd0338c782..0dfd277b9058 100644
+> > index 925875722027..ddead333c232 100644
 > > --- a/arch/arm64/kvm/vgic/vgic-kvm-device.c
 > > +++ b/arch/arm64/kvm/vgic/vgic-kvm-device.c
-> > @@ -41,6 +41,38 @@ static int vgic_check_type(struct kvm *kvm, int type_needed)
-> >                 return 0;
+> > @@ -348,17 +348,18 @@ bool lock_all_vcpus(struct kvm *kvm)
+> >   *
+> >   * @dev:      kvm device handle
+> >   * @attr:     kvm device attribute
+> > - * @reg:      address the value is read or written
+> >   * @is_write: true if userspace is writing a register
+> >   */
+> >  static int vgic_v2_attr_regs_access(struct kvm_device *dev,
+> >                                     struct kvm_device_attr *attr,
+> > -                                   u32 *reg, bool is_write)
+> > +                                   bool is_write)
+> >  {
+> > +       u32 __user *uaddr = (u32 __user *)(unsigned long)attr->addr;
+> >         struct vgic_reg_attr reg_attr;
+> >         gpa_t addr;
+> >         struct kvm_vcpu *vcpu;
+> >         int ret;
+> > +       u32 val;
+> >
+> >         ret = vgic_v2_parse_attr(dev, attr, &reg_attr);
+> >         if (ret)
+> > @@ -367,6 +368,10 @@ static int vgic_v2_attr_regs_access(struct kvm_device *dev,
+> >         vcpu = reg_attr.vcpu;
+> >         addr = reg_attr.addr;
+> >
+> > +       if (is_write)
+> > +               if (get_user(val, uaddr))
+> > +                       return -EFAULT;
+> > +
+> >         mutex_lock(&dev->kvm->lock);
+> >
+> >         ret = vgic_init(dev->kvm);
+> > @@ -380,10 +385,10 @@ static int vgic_v2_attr_regs_access(struct kvm_device *dev,
+> >
+> >         switch (attr->group) {
+> >         case KVM_DEV_ARM_VGIC_GRP_CPU_REGS:
+> > -               ret = vgic_v2_cpuif_uaccess(vcpu, is_write, addr, reg);
+> > +               ret = vgic_v2_cpuif_uaccess(vcpu, is_write, addr, &val);
+> >                 break;
+> >         case KVM_DEV_ARM_VGIC_GRP_DIST_REGS:
+> > -               ret = vgic_v2_dist_uaccess(vcpu, is_write, addr, reg);
+> > +               ret = vgic_v2_dist_uaccess(vcpu, is_write, addr, &val);
+> >                 break;
+> >         default:
+> >                 ret = -EINVAL;
+> > @@ -393,6 +398,11 @@ static int vgic_v2_attr_regs_access(struct kvm_device *dev,
+> >         unlock_all_vcpus(dev->kvm);
+> >  out:
+> >         mutex_unlock(&dev->kvm->lock);
+> > +
+> > +       if (!ret && !is_write)
+> > +               if (put_user(val, uaddr))
+> > +                       ret = -EFAULT;
+> > +
+> >         return ret;
 > >  }
 > >
-> > +int kvm_set_legacy_vgic_v2_addr(struct kvm *kvm, struct kvm_arm_device_addr *dev_addr)
-> > +{
-> > +       struct vgic_dist *vgic = &kvm->arch.vgic;
-> > +       int r;
-> > +
-> > +       mutex_lock(&kvm->lock);
-> > +       switch (FIELD_GET(KVM_ARM_DEVICE_ID_MASK, dev_addr->id)) {
+> > @@ -407,15 +417,8 @@ static int vgic_v2_set_attr(struct kvm_device *dev,
+> >
+> >         switch (attr->group) {
+> >         case KVM_DEV_ARM_VGIC_GRP_DIST_REGS:
+> > -       case KVM_DEV_ARM_VGIC_GRP_CPU_REGS: {
+> > -               u32 __user *uaddr = (u32 __user *)(long)attr->addr;
+> > -               u32 reg;
+> > -
+> > -               if (get_user(reg, uaddr))
+> > -                       return -EFAULT;
+> > -
+> > -               return vgic_v2_attr_regs_access(dev, attr, &reg, true);
+> > -       }
+> > +       case KVM_DEV_ARM_VGIC_GRP_CPU_REGS:
+> > +               return vgic_v2_attr_regs_access(dev, attr, true);
+> >         }
+> >
+> >         return -ENXIO;
+> > @@ -432,15 +435,8 @@ static int vgic_v2_get_attr(struct kvm_device *dev,
+> >
+> >         switch (attr->group) {
+> >         case KVM_DEV_ARM_VGIC_GRP_DIST_REGS:
+> > -       case KVM_DEV_ARM_VGIC_GRP_CPU_REGS: {
+> > -               u32 __user *uaddr = (u32 __user *)(long)attr->addr;
+> > -               u32 reg = 0;
+> > -
+> > -               ret = vgic_v2_attr_regs_access(dev, attr, &reg, false);
+> > -               if (ret)
+> > -                       return ret;
+> > -               return put_user(reg, uaddr);
+> > -       }
+> > +       case KVM_DEV_ARM_VGIC_GRP_CPU_REGS:
+> > +               return vgic_v2_attr_regs_access(dev, attr, false);
+> >         }
+> >
+> >         return -ENXIO;
 > 
-> Shouldn't this be KVM_ARM_DEVICE_TYPE_MASK (not KVM_ARM_DEVICE_ID_MASK) ?
+> For vgic_v2_{set,get}_attr(), perhaps it might be even simpler
+> to call vgic_{set,get}_common_attr() from the "default" case
+> of "switch (attr->group)".
+> This is not directly related to this patch though:)
 
-Damn, you just ruined my attempt at deprecating this API ;-). More
-seriously, thanks for catching this one!
+Indeed. This also applies to v3, and there is a couple more cleanups
+that can be added. I'll add that as an extra patch, as the result is
+rather nice.
+
+> Reviewed-by: Reiji Watanabe <reijiw@google.com>
+
+Thanks,
 
 	M.
 
