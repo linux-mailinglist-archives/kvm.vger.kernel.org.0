@@ -2,140 +2,97 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id B2BB95745C5
-	for <lists+kvm@lfdr.de>; Thu, 14 Jul 2022 09:16:41 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id E4B7C57463B
+	for <lists+kvm@lfdr.de>; Thu, 14 Jul 2022 09:56:27 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234573AbiGNHQj (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 14 Jul 2022 03:16:39 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51430 "EHLO
+        id S237208AbiGNH40 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 14 Jul 2022 03:56:26 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54550 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230163AbiGNHQf (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 14 Jul 2022 03:16:35 -0400
-Received: from mail-ej1-x632.google.com (mail-ej1-x632.google.com [IPv6:2a00:1450:4864:20::632])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0E3F464F3
-        for <kvm@vger.kernel.org>; Thu, 14 Jul 2022 00:16:34 -0700 (PDT)
-Received: by mail-ej1-x632.google.com with SMTP id dn9so1774022ejc.7
-        for <kvm@vger.kernel.org>; Thu, 14 Jul 2022 00:16:33 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=ionos.com; s=google;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=EQybo/mazhxMtTGDkUYLtW7YqQjdHytFSKMWIUktp7Y=;
-        b=d0t45VsacujveQ1Wbw+8kJppeMT4oBRwrnHJc5niW+JN5hKi2+w6CtcYcyeNZy6G2u
-         dEHaxNaZ3lF2sPjottqApmcaflK4v4ApaVApCRvj3V5H6/TfIhNa0lzcwzkIZDxeBlSI
-         2debgcqeNHjAdD58AceU4k89Wa6DnwFGtWRqwxcMIZtbZrNcddOIEm72fnKprSiSd3+d
-         p95n4/bALpxsfNjaJ1XpJFHAwpqXRzC9jRqoLZC3GD1roSaH3xbiWEEg3TAVJy/XHTvN
-         TyKh0ytQc+lfU1sLydq/sBxfvgKtvLiJ11uN0jkDhRQFeSwdU41zqa9NjdAFRBz560Nc
-         yKNw==
+        with ESMTP id S235310AbiGNH4Y (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 14 Jul 2022 03:56:24 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 8D98DBDE
+        for <kvm@vger.kernel.org>; Thu, 14 Jul 2022 00:56:23 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1657785381;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=SE9eAN5X+ShMxtdmF41zDz1yLtEpxxR36zmsks8hPS0=;
+        b=cXGfdvXzsY3YJ1qv6UoZHxJ4cEUrr8xWfdykgUAeD32dZqkbPD7qCU8PvAUI7FP2xGi7O6
+        EdXW47cdF9CuMrBEo1CTn3u+ZN6hFnHTXkTiSzqdETPcGIs7qOhg/ZfKP5i07SgEismp1w
+        +bSfCfzhxneowe1s85dPsA62Ba+vh6k=
+Received: from mail-ed1-f71.google.com (mail-ed1-f71.google.com
+ [209.85.208.71]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-414-pHryeRSaPzyNGH5FZtr7Mg-1; Thu, 14 Jul 2022 03:55:54 -0400
+X-MC-Unique: pHryeRSaPzyNGH5FZtr7Mg-1
+Received: by mail-ed1-f71.google.com with SMTP id w13-20020a05640234cd00b0043a991fb3f3so1008116edc.3
+        for <kvm@vger.kernel.org>; Thu, 14 Jul 2022 00:55:48 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=EQybo/mazhxMtTGDkUYLtW7YqQjdHytFSKMWIUktp7Y=;
-        b=Z13cBBxouAtaeJxAY7o7K3cE/w/j13reTHda8K/iSo4YaAV7WY5z7JBl4C70D0Pjrt
-         ghXUE2iYnt5pcE9pi5Y8x/wuGMoN5cOrlJ5zygYU7F+urBlzDqkhjk5Dk8FdYM1c3LOx
-         QVzXLoQIMNA3NabryK5a5gmJGVfGsx/ebKVQ+JTPGX5BQekGxNQISeLdiCU+cgLOd2a/
-         HkHJLYQGD2I+gGk2rvYayaBub14mAuQpcV7WQW5Qq0irKcq241p5fmaRme+qH0PLkGUF
-         zCdl9gA3jvMNofIMR0Zq2PIP92jcjFeTJVEuWmzyX0WnH9Vmbi1EzlCqrgZt6fy+9XrJ
-         j1HQ==
-X-Gm-Message-State: AJIora+ZDvy50N4Nudz+Ooidev/hln1M/P1Guf2nl57UpDcXq1zYsTpw
-        DuXccik1hBjjofAZUQ7vsXAqkarpZ4Xp4REumRu+0g==
-X-Google-Smtp-Source: AGRyM1voA8NMtQEOdGczAdieyK2B7k8X/4dsXZ8MlAJApwx1KhWFIhSPlEElA0Xr24VkrlO5A7TIjYYq/QfBLQj3SeA=
-X-Received: by 2002:a17:906:8a69:b0:72b:40d3:7b6c with SMTP id
- hy9-20020a1709068a6900b0072b40d37b6cmr7372491ejc.624.1657782992615; Thu, 14
- Jul 2022 00:16:32 -0700 (PDT)
+        h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
+         :content-language:to:cc:references:from:in-reply-to
+         :content-transfer-encoding;
+        bh=SE9eAN5X+ShMxtdmF41zDz1yLtEpxxR36zmsks8hPS0=;
+        b=QiVtBKRgUZBU7aE0CE6DVSoYEfXQq/z17cnKn++FE+4TItxWiLW6Dl8ehJgStMlDoV
+         HP/DvE1TpbPmyDF0VVT3HZNATj0OlstS0FrrSuYgeNN94n5Mb5l2zOc0Y/qGaPhn84c1
+         N0velQHj4N/QVqI2/twSxF5hId6aYyXbnbVNV8rRiuvzVHWyjKlSwLR2mlhGiYeVn0KC
+         Q/ZX0eeDXqdsHR7rWPS1VaPsnXvcAKOTFpe+syOdZ6xuksYCgz7T4yG4/dP7NvNivWyB
+         YqQ77QAUUHmOwgj5qjfRf8XJbRzy+/dTtVPz8yeNzKVxF8Ki0Mzn7z2xL5My4RH5tQJc
+         0y2A==
+X-Gm-Message-State: AJIora9bj1I9OYND4iLmbwwOBgZlqGxjpEoMxjajKvi1XjgkIFPFxgbf
+        tyX3ZC9IJ2P4F/vOSJSvFAJvJQ1Wo+XOZNnl5NzUAwF0UL6rHctqNLxwBEQxl2AHr4Y/gMVQ3Ja
+        rYGd+BuYSSApR
+X-Received: by 2002:a05:6402:34c1:b0:43a:bd7a:898a with SMTP id w1-20020a05640234c100b0043abd7a898amr10764876edc.426.1657785344688;
+        Thu, 14 Jul 2022 00:55:44 -0700 (PDT)
+X-Google-Smtp-Source: AGRyM1um/IMU8CKiTuPcepZAnSTRYoRBRZ2ZH0kI9/eLTdxlSioknmf1mGAkVR3V+y/TA4I2nzD2xg==
+X-Received: by 2002:a05:6402:34c1:b0:43a:bd7a:898a with SMTP id w1-20020a05640234c100b0043abd7a898amr10764856edc.426.1657785344487;
+        Thu, 14 Jul 2022 00:55:44 -0700 (PDT)
+Received: from ?IPV6:2001:b07:6468:f312:5e2c:eb9a:a8b6:fd3e? ([2001:b07:6468:f312:5e2c:eb9a:a8b6:fd3e])
+        by smtp.googlemail.com with ESMTPSA id kv10-20020a17090778ca00b0072eddc468absm385354ejc.134.2022.07.14.00.55.43
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 14 Jul 2022 00:55:43 -0700 (PDT)
+Message-ID: <52ef13d4-068d-bd2c-11aa-c7053798aee9@redhat.com>
+Date:   Thu, 14 Jul 2022 09:55:42 +0200
 MIME-Version: 1.0
-References: <CAMGffEm9y0wnn8LNS9Qo3obPhs0GD5iJZ0WejFzC4baGPDsYTw@mail.gmail.com>
- <CAMGffEnTobhKvwKcRTnSz1JgNBVeTTtbOvP2OtAMgceqOOhN4A@mail.gmail.com>
- <Ys7CFYqA62YcIFiT@kroah.com> <CAMGffEmdqz-ggqkHOwddu7bTPBs47tY-5cSi58qvYwPmxrYumg@mail.gmail.com>
- <Ys81Bor99YlUrM0k@google.com>
-In-Reply-To: <Ys81Bor99YlUrM0k@google.com>
-From:   Jinpu Wang <jinpu.wang@ionos.com>
-Date:   Thu, 14 Jul 2022 09:16:22 +0200
-Message-ID: <CAMGffEmRC2FWp=U5Bbbp4B+gb-OPsaz-NSAcr50dtmkGHY-ViQ@mail.gmail.com>
-Subject: Re: 5.10.131-rc1 crash with int3: RIP 0010:xaddw_ax_dx+0x9/0x10 [kvm]
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.10.0
+Subject: Re: [PATCH v2 0/9] KVM: x86/MMU: Optimize disabling dirty logging
+Content-Language: en-US
 To:     Sean Christopherson <seanjc@google.com>
-Cc:     Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        stable <stable@vger.kernel.org>, Sasha Levin <sashal@kernel.org>,
-        kvm@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham
-        autolearn_force=no version=3.4.6
+Cc:     Ben Gardon <bgardon@google.com>, linux-kernel@vger.kernel.org,
+        kvm@vger.kernel.org, Peter Xu <peterx@redhat.com>,
+        David Matlack <dmatlack@google.com>,
+        Jim Mattson <jmattson@google.com>,
+        David Dunn <daviddunn@google.com>,
+        Jing Zhang <jingzhangos@google.com>,
+        Junaid Shahid <junaids@google.com>
+References: <20220321224358.1305530-1-bgardon@google.com>
+ <dba0ecc8-90ae-975f-7a27-3049d6951ba0@redhat.com>
+ <YszQcBy1RwGmkkht@google.com>
+From:   Paolo Bonzini <pbonzini@redhat.com>
+In-Reply-To: <YszQcBy1RwGmkkht@google.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Spam-Status: No, score=-2.7 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
+        RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE
+        autolearn=unavailable autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Jul 13, 2022 at 11:11 PM Sean Christopherson <seanjc@google.com> wrote:
->
-> On Wed, Jul 13, 2022, Jinpu Wang wrote:
-> > On Wed, Jul 13, 2022 at 3:01 PM Greg Kroah-Hartman
-> > <gregkh@linuxfoundation.org> wrote:
-> > >
-> > > On Wed, Jul 13, 2022 at 02:26:44PM +0200, Jinpu Wang wrote:
-> > > > On Wed, Jul 13, 2022 at 12:49 PM Jinpu Wang <jinpu.wang@ionos.com> wrote:
-> > > > > #5.10.131-1+feature+linux+5.10.y+20220712.1850+30f4172c~deb11
->
-> ...
->
-> > > > > [ 1895.979325] Call Trace:
-> > > > > [ 1895.979325]  ? fastop+0x59/0xa0 [kvm]
-> > > > > [ 1895.979326]  ? x86_emulate_insn+0x73a/0xe00 [kvm]
-> > > > > [ 1895.979326]  ? x86_emulate_instruction+0x2d0/0x750 [kvm]
-> > > > > [ 1895.979326]  ? vmx_vcpu_load+0x21/0x70 [kvm_intel]
-> > > > > [ 1895.979327]  ? complete_emulated_mmio+0x236/0x310 [kvm]
-> > > > > [ 1895.979327]  ? kvm_arch_vcpu_ioctl_run+0x1744/0x1920 [kvm]
-> > > > > [ 1895.979327]  ? kvm_vcpu_ioctl+0x211/0x5a0 [kvm]
-> > > > > [ 1895.979328]  ? __fget_files+0x79/0xb0
-> > > > > [ 1895.979328]  ? __fget_files+0x79/0xb0
-> > > > > [ 1895.979328]  ? __x64_sys_ioctl+0x8b/0xc0
-> > > > > [ 1895.979329]  ? do_syscall_64+0x33/0x40
-> > > > > [ 1895.979329]  ? entry_SYSCALL_64_after_hwframe+0x61/0xc6
->
-> ...
->
-> > > > > Is this bug known, any hint how to fix it?
-> > > > I did more tests on different Servers, so far all the machine
-> > > > checked(Skylake/Icelake/Haswell/Broadwell/EPYC) crash immediately
-> > > > except AMD Opteron.
-> > > > kvm-unit-tests succeeded without regression.
-> > >
-> > > Same issue on Linus's tree right now as well?  Or does that pass just
-> > > fine?
-> >
-> > Hi Greg,
-> >
-> > I haven't try linus tree, but just tried 5.15.55-rc1 on Intel Skylake,
-> > it crashed the same.
-> >
-> > I will give Linus tree a try.
->
-> Looks like fastop() got broken by the retbleed mitigations, i.e. this isn't unique
-> to stable trees.
->
-> https://lore.kernel.org/all/20220713171241.184026-1-cascardo@canonical.com
-Hi Sean,
+On 7/12/22 03:37, Sean Christopherson wrote:
+> This fell through the cracks.  Ben is on a long vacation, I'll find my copy of
+> the Necronomicon and do a bit of resurrection, and address the feedback from v2
+> along the way.
 
-Thanks for the link, I will give it a try, to apply to kernel  5.10, I
-adapted it a bit to
+This was superseded by the simple patch to zap only the leaves I think?
 
-diff --git a/arch/x86/kvm/emulate.c b/arch/x86/kvm/emulate.c
-index 59e5d79f5c34..aa7b5adac633 100644
---- a/arch/x86/kvm/emulate.c
-+++ b/arch/x86/kvm/emulate.c
-@@ -189,7 +189,7 @@
- #define X16(x...) X8(x), X8(x)
+Paolo
 
- #define NR_FASTOP (ilog2(sizeof(ulong)) + 1)
--#define FASTOP_SIZE 8
-+#define FASTOP_SIZE (8 * (1 + (IS_ENABLED(CONFIG_RETHUNK))))
-
- struct opcode {
-        u64 flags : 56;
-
-With it, kvm-unit-tests is working again, no gression found.
-
-Thanks!
