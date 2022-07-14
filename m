@@ -2,122 +2,162 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id BA2D5575138
-	for <lists+kvm@lfdr.de>; Thu, 14 Jul 2022 16:58:12 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id E99C357515D
+	for <lists+kvm@lfdr.de>; Thu, 14 Jul 2022 17:03:02 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S239633AbiGNO6J (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 14 Jul 2022 10:58:09 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35462 "EHLO
+        id S237998AbiGNPDB (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 14 Jul 2022 11:03:01 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41134 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S239574AbiGNO6H (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 14 Jul 2022 10:58:07 -0400
-Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 894515C9E0
-        for <kvm@vger.kernel.org>; Thu, 14 Jul 2022 07:58:06 -0700 (PDT)
-Received: from pps.filterd (m0098396.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.17.1.5/8.17.1.5) with ESMTP id 26EDsJ6t007767;
-        Thu, 14 Jul 2022 14:58:01 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
- mime-version : subject : to : cc : references : from : in-reply-to :
- content-type : content-transfer-encoding; s=pp1;
- bh=uybCWJGQKRNmU0OAnHjQ5WuN8GG3V5NcHeMnPksEyc4=;
- b=nPih358fyOC2gOtSJ1twRji55XJFmuBTjK+G895ahTf7FAA1vSCvv/MvwP7B8w+4PCBd
- N5p8qD5NDzGK4KEfIS2SVqqFmRrWlZPV55piMPacs6jTw2xu074xRNPkIediuWEiuzSK
- 1LZgqTCmdutiP6C0H7dk0HPTSeNN6bAVXUZYArUUAx+ZNncMjYg047qZhYtbQKwtXYuw
- 8FHDGZEkbXyOpJvRk5UdZnIDo13Nu7uRGRGGpzmnL41MVhcs+20tK9mttRutGURcjqHX
- EDzlv8jWv73j/CD1da3WLGJ/R25jqpdxI6q+/UiipUv4y7XQuQOb72U8LT+eQNdnRw5h bw== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3hame89n7k-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 14 Jul 2022 14:58:01 +0000
-Received: from m0098396.ppops.net (m0098396.ppops.net [127.0.0.1])
-        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 26EEw1fM006685;
-        Thu, 14 Jul 2022 14:58:01 GMT
-Received: from ppma06ams.nl.ibm.com (66.31.33a9.ip4.static.sl-reverse.com [169.51.49.102])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3hame89n6p-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 14 Jul 2022 14:58:00 +0000
-Received: from pps.filterd (ppma06ams.nl.ibm.com [127.0.0.1])
-        by ppma06ams.nl.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 26EEoLqh023074;
-        Thu, 14 Jul 2022 14:57:58 GMT
-Received: from b06avi18878370.portsmouth.uk.ibm.com (b06avi18878370.portsmouth.uk.ibm.com [9.149.26.194])
-        by ppma06ams.nl.ibm.com with ESMTP id 3h70xhy8eq-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 14 Jul 2022 14:57:58 +0000
-Received: from d06av23.portsmouth.uk.ibm.com (d06av23.portsmouth.uk.ibm.com [9.149.105.59])
-        by b06avi18878370.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 26EEw6jV26870250
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Thu, 14 Jul 2022 14:58:06 GMT
-Received: from d06av23.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 2483BA4040;
-        Thu, 14 Jul 2022 14:57:55 +0000 (GMT)
-Received: from d06av23.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id AD097A4051;
-        Thu, 14 Jul 2022 14:57:46 +0000 (GMT)
-Received: from [9.171.84.216] (unknown [9.171.84.216])
-        by d06av23.portsmouth.uk.ibm.com (Postfix) with ESMTP;
-        Thu, 14 Jul 2022 14:57:46 +0000 (GMT)
-Message-ID: <3a821cd1-b8a0-e737-5279-8ef55e58a77f@linux.ibm.com>
-Date:   Thu, 14 Jul 2022 16:57:46 +0200
+        with ESMTP id S238532AbiGNPC7 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 14 Jul 2022 11:02:59 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 99807606A2
+        for <kvm@vger.kernel.org>; Thu, 14 Jul 2022 08:02:58 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1657810977;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=NqsAwSpdF/R7wwQnaO/szXDTM83lVGdVmUrcXsOO7iA=;
+        b=GTiINQgM13dl6Edg8RJJXPVOENegGtQqv/w1lpDGQin2I3P3vURX1lCuOZDp/5+naTleIV
+        nlklM0pCKak911RrMKtBYNyNwzec9lQLXlsuWmdUrt71lh9wKpeKLtJR0A7RSfqOd0qMBj
+        kFSZDtdjAwYUHb7aqwWu2kU4BqGO4Os=
+Received: from mail-ed1-f70.google.com (mail-ed1-f70.google.com
+ [209.85.208.70]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-589-6aCROGRBMMuLiZ2aVSLmLw-1; Thu, 14 Jul 2022 11:02:55 -0400
+X-MC-Unique: 6aCROGRBMMuLiZ2aVSLmLw-1
+Received: by mail-ed1-f70.google.com with SMTP id w13-20020a05640234cd00b0043a991fb3f3so1683083edc.3
+        for <kvm@vger.kernel.org>; Thu, 14 Jul 2022 08:02:55 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:from:to:cc:subject:in-reply-to:references:date
+         :message-id:mime-version:content-transfer-encoding;
+        bh=NqsAwSpdF/R7wwQnaO/szXDTM83lVGdVmUrcXsOO7iA=;
+        b=Cc1du1asiUq6KPt22UkBkhlO9ezk4Usxf4I++PWkKLQJMnCW1NoGaEgacuQ/+K/LsX
+         0+yBx19yX4Nf9lQEo+aNqro6bWzltnzkPfUXb5Sxb0p4pUMUjxJI22acSyTdL1F5tRhe
+         dqapKirmoy61thcxWJRWCwPgA8S8wyIz0jSS6FD9p3/GCy/FrTvFryDAPlZXq8Mj2A5g
+         QRbQMjOGZrng0cClxd/bV9iG4AAlXYpEaMLIIcSCz5c50e4gKPVH2Vv4B1DvWsgkf3q0
+         ZOPjPzYmqRHxjWGBYwEt0KnLTrFpyVcg1n6LfR3sPwa7u9uev1IxB1yhQwthF/rVpGDZ
+         izMQ==
+X-Gm-Message-State: AJIora9p3hlP+vi180YqQzB1J/iAXL8SXoDRkkyRAsgi4k5lo6Lf5Mrv
+        5hl2BOimUBo8iHJLVkaWdhPJOwb1iTqH6J9YJE5CgV1Y78APGbDcTSa2ONkFjJk4CxJMGaHEFTr
+        4jnsY7arcwkZ4
+X-Received: by 2002:a17:907:3e07:b0:72e:e1e2:1415 with SMTP id hp7-20020a1709073e0700b0072ee1e21415mr2577002ejc.596.1657810974494;
+        Thu, 14 Jul 2022 08:02:54 -0700 (PDT)
+X-Google-Smtp-Source: AGRyM1voM4036pGNdZE1gcb3qjiqVEqfZY8qFFV56JNgSHwHf7wwl2ewT8Gg8bBEGhKTBarV4JamiA==
+X-Received: by 2002:a17:907:3e07:b0:72e:e1e2:1415 with SMTP id hp7-20020a1709073e0700b0072ee1e21415mr2576976ejc.596.1657810974249;
+        Thu, 14 Jul 2022 08:02:54 -0700 (PDT)
+Received: from fedora (nat-2.ign.cz. [91.219.240.2])
+        by smtp.gmail.com with ESMTPSA id h13-20020aa7c94d000000b0043ab36d6019sm1183260edt.9.2022.07.14.08.02.53
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 14 Jul 2022 08:02:53 -0700 (PDT)
+From:   Vitaly Kuznetsov <vkuznets@redhat.com>
+To:     Maxim Levitsky <mlevitsk@redhat.com>, kvm@vger.kernel.org
+Cc:     Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        linux-kernel@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>,
+        Sean Christopherson <seanjc@google.com>
+Subject: Re: [PATCH 0/3] KVM: x86: Hyper-V invariant TSC control feature
+In-Reply-To: <00c0442718a4f07c2f0ad9524cc5b13e59693c68.camel@redhat.com>
+References: <20220713150532.1012466-1-vkuznets@redhat.com>
+ <00c0442718a4f07c2f0ad9524cc5b13e59693c68.camel@redhat.com>
+Date:   Thu, 14 Jul 2022 17:02:52 +0200
+Message-ID: <8735f3ohyb.fsf@redhat.com>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.10.0
-Subject: Re: [PATCH v8 08/12] s390x/cpu_topology: implementing numa for the
- s390x topology
-Content-Language: en-US
-To:     Pierre Morel <pmorel@linux.ibm.com>, qemu-s390x@nongnu.org
-Cc:     qemu-devel@nongnu.org, borntraeger@de.ibm.com, pasic@linux.ibm.com,
-        richard.henderson@linaro.org, david@redhat.com, thuth@redhat.com,
-        cohuck@redhat.com, mst@redhat.com, pbonzini@redhat.com,
-        kvm@vger.kernel.org, ehabkost@redhat.com,
-        marcel.apfelbaum@gmail.com, eblake@redhat.com, armbru@redhat.com,
-        seiden@linux.ibm.com, nrb@linux.ibm.com, frankja@linux.ibm.com
-References: <20220620140352.39398-1-pmorel@linux.ibm.com>
- <20220620140352.39398-9-pmorel@linux.ibm.com>
-From:   Janis Schoetterl-Glausch <scgl@linux.ibm.com>
-In-Reply-To: <20220620140352.39398-9-pmorel@linux.ibm.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: ep_XZITM-z0Mg8GeoK2FTcAVaFBG4uDq
-X-Proofpoint-ORIG-GUID: D6hF0RvvpIEj6j5ZvKUMfMK-tH1tU32k
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.205,Aquarius:18.0.883,Hydra:6.0.517,FMLib:17.11.122.1
- definitions=2022-07-14_10,2022-07-14_01,2022-06-22_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 spamscore=0 clxscore=1015
- mlxscore=0 suspectscore=0 bulkscore=0 mlxlogscore=999 phishscore=0
- priorityscore=1501 impostorscore=0 malwarescore=0 lowpriorityscore=0
- adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2206140000 definitions=main-2207140062
-X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,
-        SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no
-        version=3.4.6
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+X-Spam-Status: No, score=-3.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,
+        SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=unavailable
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 6/20/22 16:03, Pierre Morel wrote:
-> S390x CPU Topology allows a non uniform repartition of the CPU
-> inside the topology containers, sockets, books and drawers.
-> 
-> We use numa to place the CPU inside the right topology container
-> and report the non uniform topology to the guest.
-> 
-> Note that s390x needs CPU0 to belong to the topology and consequently
-> all topology must include CPU0.
-> 
-> We accept a partial QEMU numa definition, in that case undefined CPUs
-> are added to free slots in the topology starting with slot 0 and going
-> up.
+Maxim Levitsky <mlevitsk@redhat.com> writes:
 
-I don't understand why doing it this way, via numa, makes sense for us.
-We report the topology to the guest via STSI, which tells the guest
-what the topology "tree" looks like. We don't report any numa distances to the guest.
-The natural way to specify where a cpu is added to the vm, seems to me to be
-by specify the socket, book, ... IDs when doing a device_add or via -device on 
-the command line.
+> On Wed, 2022-07-13 at 17:05 +0200, Vitaly Kuznetsov wrote:
+>> Normally, genuine Hyper-V doesn't expose architectural invariant TSC
+>> (CPUID.80000007H:EDX[8]) to its guests by default. A special PV MSR
+>> (HV_X64_MSR_TSC_INVARIANT_CONTROL, 0x40000118) and corresponding CPUID
+>> feature bit (CPUID.0x40000003.EAX[15]) were introduced. When bit 0 of the
+>> PV MSR is set, invariant TSC bit starts to show up in CPUID. When the=20
+>> feature is exposed to Hyper-V guests, reenlightenment becomes unneeded.
+>
+> If I understood the feature correctly from the code, it allows the HyperV=
+, or in this
+> case KVM acting as HyperV, to avoid unconditionally exposing the invltsc =
+bit
+> in CPUID, but rather let the guest know that it can opt-in into this,
+> by giving the guest another CPUID bit to indicate this ability
+> and a MSR which the guest uses to opt-in.
+>
+> Are there known use cases of this, are there guests which won't opt-in?
+>
 
-[...]
+Linux prior to dce7cd62754b and some older Windows guests I guess.
+
+>>=20
+>> Note: strictly speaking, KVM doesn't have to have the feature as exposing
+>> raw invariant TSC bit (CPUID.80000007H:EDX[8]) also seems to work for
+>> modern Windows versions. The feature is, however, tiny and straitforward
+>> and gives additional flexibility so why not.
+>
+> This means that KVM can also just unconditionally expose the invtsc bit
+> to the guest, and the guest still uses it.
+
+Yes, this feature doesn't bring much by itself (at least with modern
+Windows versions). I've implemented it while debugging what ended up
+being=20
+https://lore.kernel.org/kvm/20220712135009.952805-1-vkuznets@redhat.com/
+(so the issue wasn't enlightenments related after all) but as I think it
+may come handy some day so why keeping it in my private stash.
+
+>
+>
+> Nitpick: It might be worth it to document it a bit better somewhere,
+> as I tried to do in this mail.
+
+TLFS sounds like the right place for it but ... it's not there... oh well.
+
+>
+>
+> Best regards,
+> 	Maxim Levitsky
+>
+>>=20
+>> Vitaly Kuznetsov (3):
+>> =C2=A0 KVM: x86: Hyper-V invariant TSC control
+>> =C2=A0 KVM: selftests: Fix wrmsr_safe()
+>> =C2=A0 KVM: selftests: Test Hyper-V invariant TSC control
+>>=20
+>> =C2=A0arch/x86/include/asm/kvm_host.h=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 |=C2=A0 1 +
+>> =C2=A0arch/x86/kvm/cpuid.c=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 |=C2=A0 7 ++
+>> =C2=A0arch/x86/kvm/hyperv.c=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0 | 19 +++++
+>> =C2=A0arch/x86/kvm/hyperv.h=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0 | 15 ++++
+>> =C2=A0arch/x86/kvm/x86.c=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 |=C2=A0 4 +-
+>> =C2=A0.../selftests/kvm/include/x86_64/processor.h=C2=A0 |=C2=A0 2 +-
+>> =C2=A0.../selftests/kvm/x86_64/hyperv_features.c=C2=A0=C2=A0=C2=A0 | 73 =
+++++++++++++++++++-
+>> =C2=A07 files changed, 115 insertions(+), 6 deletions(-)
+>>=20
+>
+>
+
+--=20
+Vitaly
+
