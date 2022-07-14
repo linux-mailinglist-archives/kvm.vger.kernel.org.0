@@ -2,60 +2,66 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 0BFA2574218
-	for <lists+kvm@lfdr.de>; Thu, 14 Jul 2022 06:10:07 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id B0E8457421E
+	for <lists+kvm@lfdr.de>; Thu, 14 Jul 2022 06:12:19 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232500AbiGNEKF (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 14 Jul 2022 00:10:05 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42784 "EHLO
+        id S233162AbiGNEMR (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 14 Jul 2022 00:12:17 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43998 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229473AbiGNEKD (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 14 Jul 2022 00:10:03 -0400
-Received: from mga01.intel.com (mga01.intel.com [192.55.52.88])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EED4D25286;
-        Wed, 13 Jul 2022 21:10:01 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1657771801; x=1689307801;
-  h=message-id:date:mime-version:subject:to:cc:references:
-   from:in-reply-to:content-transfer-encoding;
-  bh=xgW+RSwfAkGWbvNjSF0gjO7vzwiF7RQdF9S7yWDKep8=;
-  b=M7+5brGzyd8YvBJ7+zdcGbYN9u7ZEgiWiXwaUKfSxv+b+xTW6LlGy96o
-   sXkaV4ssqznG2C3B/Yn+JIV9K7rVpIl7X2du+w8vMz5uHVcP0SvgFoJIi
-   RoADaTv4Q8+xjhv61mh34aGy0+eAOZi8Uk8cvlJhll6uiMXvLfWxXnBDc
-   sPxOirUjI0eYokVyR7J4bFOYxJISH8nA0n9Gh8wNGA8X3hA9gBISnBGul
-   ZboDSn7d1EjkOyR3rJuJs9/RwFor8PQYilFm6FNTe07qP+YxcvmcWlAtq
-   AuP5n2OWVDEYDiKspwok30YODBfuVsxliadO6z4llMrgDLCTH1ovQ8old
-   w==;
-X-IronPort-AV: E=McAfee;i="6400,9594,10407"; a="311057966"
-X-IronPort-AV: E=Sophos;i="5.92,269,1650956400"; 
-   d="scan'208";a="311057966"
-Received: from fmsmga004.fm.intel.com ([10.253.24.48])
-  by fmsmga101.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 13 Jul 2022 21:10:01 -0700
-X-IronPort-AV: E=Sophos;i="5.92,269,1650956400"; 
-   d="scan'208";a="663625782"
-Received: from xiaoyaol-hp-g830.ccr.corp.intel.com (HELO [10.249.170.180]) ([10.249.170.180])
-  by fmsmga004-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 13 Jul 2022 21:10:00 -0700
-Message-ID: <dc2cfd5e-8212-dfc7-28cd-9e3a1d63c638@intel.com>
-Date:   Thu, 14 Jul 2022 12:09:57 +0800
+        with ESMTP id S229473AbiGNEMP (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 14 Jul 2022 00:12:15 -0400
+Received: from mail-vs1-xe2e.google.com (mail-vs1-xe2e.google.com [IPv6:2607:f8b0:4864:20::e2e])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 14756275E6
+        for <kvm@vger.kernel.org>; Wed, 13 Jul 2022 21:12:14 -0700 (PDT)
+Received: by mail-vs1-xe2e.google.com with SMTP id s1so413879vsr.12
+        for <kvm@vger.kernel.org>; Wed, 13 Jul 2022 21:12:14 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=zEaLJX6S+5YvYcIkKQJtiP2svusPKIStGeqUFKW6f3U=;
+        b=ZTbfM9Y+dMFvfF13OC4AR5kTUKBIDrUa+Le7sBHkaJuHsS+ZSMLef0DSuivVx1r/O7
+         /AlaHQYPpIaVLLtVVUP41rSeb8jrDT6X0dFep8FB85XRucQPnd/uFMgqKmt5zPtCkrMg
+         WTQkAsU4S1d3f5BK63arXG8fCFE0KEmW2tSc/TvZ+vezkDz8gfeay9Rur1aIMkWhbhx7
+         d5936R86uO6gLko5s0VnXwBu1v3tr2GC4q8xMzpw+pv+8vxNIXAFTxHFTQLfpUW8Yl0r
+         PNq3IzGt72jJdTcA1hIzOX7vSbSqU96qNpRehKAyG7phT7bN83XwbNLaJdPCzm0azUCb
+         RreQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=zEaLJX6S+5YvYcIkKQJtiP2svusPKIStGeqUFKW6f3U=;
+        b=KeXqqsvMOTZF9zTUMwK0aJ4b7k3egDxMkSHb+XUWIVM1XQOYBzVREuMPAtWVB5pk6C
+         mr6nJCbBVSJczHyvfNzixr64S+SLJufH0NjCzHHCMgSy/9Po9xg233d/vtQIQc6F4J73
+         5XKsvb8cMCepK2JfjPBAhviujS00MtPih9tYSCdXnAk9Xd605f8uoPPrZNdlv+zL+FYL
+         e9NWMtjrqwa1OqG8n7W5BZUlvux2KN6BDiJkQY2aqqenoS4+AHkGGBzyQ6aCsiTBycAS
+         T6268FiuJbOlAv96lpPCWI+JU61kk6wdLRQtfPEreNeFrNLZvydlFkfSC5S0YwXiSxTc
+         ZRaw==
+X-Gm-Message-State: AJIora/lbdfwM7WHPKGlM32ZcLcd1IMHwbZ7JLJDTTJwOq42NmznJRBb
+        tZCdaCUraSwwlRuihRn1pp0qUOwXMPusA+a+M3HfqQ==
+X-Google-Smtp-Source: AGRyM1to9RnV8FNlt2WrIvg6MUdYykCobiFcxVrnd4PiT6rzfBKrQcqwcReszcf2lgnCX97QNGeFleY5Sgb+zj53VI8=
+X-Received: by 2002:a67:b24c:0:b0:356:c997:1cf0 with SMTP id
+ s12-20020a67b24c000000b00356c9971cf0mr2640501vsh.9.1657771933106; Wed, 13 Jul
+ 2022 21:12:13 -0700 (PDT)
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:91.0) Gecko/20100101
- Firefox/91.0 Thunderbird/91.11.0
-Subject: Re: [PATCH v7 000/102] KVM TDX basic feature support
-Content-Language: en-US
-To:     Sean Christopherson <seanjc@google.com>, isaku.yamahata@intel.com
-Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
-        isaku.yamahata@gmail.com, Paolo Bonzini <pbonzini@redhat.com>
-References: <cover.1656366337.git.isaku.yamahata@intel.com>
- <Ys9rcnyIZlUc76iG@google.com>
-From:   Xiaoyao Li <xiaoyao.li@intel.com>
-In-Reply-To: <Ys9rcnyIZlUc76iG@google.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-5.7 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,HK_RANDOM_ENVFROM,
-        HK_RANDOM_FROM,NICE_REPLY_A,RCVD_IN_DNSWL_HI,RCVD_IN_MSPIKE_H3,
-        RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE
+References: <20220706164304.1582687-1-maz@kernel.org> <20220706164304.1582687-13-maz@kernel.org>
+In-Reply-To: <20220706164304.1582687-13-maz@kernel.org>
+From:   Reiji Watanabe <reijiw@google.com>
+Date:   Wed, 13 Jul 2022 21:11:57 -0700
+Message-ID: <CAAeT=Fx61zZ7Z8Jbm5iAJf6V1GO2HihUZRnO3fGvT8c7spaDzQ@mail.gmail.com>
+Subject: Re: [PATCH 12/19] KVM: arm64: vgic-v3: Consolidate userspace access
+ for MMIO registers
+To:     Marc Zyngier <maz@kernel.org>
+Cc:     kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org,
+        Linux ARM <linux-arm-kernel@lists.infradead.org>,
+        Schspa Shi <schspa@gmail.com>, kernel-team@android.com,
+        Oliver Upton <oliver.upton@linux.dev>
+Content-Type: text/plain; charset="UTF-8"
+X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
+        T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL
         autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -63,111 +69,18 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 7/14/2022 9:03 AM, Sean Christopherson wrote:
-> On Mon, Jun 27, 2022, isaku.yamahata@intel.com wrote:
->> From: Isaku Yamahata <isaku.yamahata@intel.com>
->>
->> KVM TDX basic feature support
->>
->> Hello.  This is v7 the patch series vof KVM TDX support.
->> This is based on v5.19-rc1 + kvm/queue branch + TDX HOST patch series.
->> The tree can be found at https://github.com/intel/tdx/tree/kvm-upstream
->> How to run/test: It's describe at https://github.com/intel/tdx/wiki/TDX-KVM
->>
->> Major changes from v6:
->> - rebased to v5.19 base
->>
->> TODO:
->> - integrate fd-based guest memory. As the discussion is still on-going, I
->>    intentionally dropped fd-based guest memory support yet.  The integration can
->>    be found at https://github.com/intel/tdx/tree/kvm-upstream-workaround.
->> - 2M large page support. It's work-in-progress.
->> For large page support, there are several design choices. Here is the design options.
->> Any thoughts/feedback?
-> 
-> Apologies, I didn't read beyond the intro paragraph.  In case something like this
-> comes up again, it's probably best to send a standalone email tagged RFC, I doubt
-> I'm the only one that missed this embedded RFC.
-> 
->> KVM MMU Large page support for TDX
->   
-> ...
-> 
->> * options to track private or shared
->> At each page size (4KB, 2MB, and 1GB), track private, shared, or mixed (2MB and
->> 1GB case). For 4KB each page, 1 bit per page is needed. private or shared.  For
->> large pages (2MB and 1GB), 2 bits per large page is needed. (private, shared, or
->> mixed).  When resolving KVM page fault, we don't want to check the lower-size
->> pages to check if the given GPA can be a large for performance.  On MapGPA check
->> it instead.
->>
->> Option A). enhance kvm_arch_memory_slot
->>    enum kvm_page_type {
->>         KVM_PAGE_TYPE_INVALID,
->>         KVM_PAGE_TYPE_SHARED,
->>         KVM_PAGE_TYPE_PRIVATE,
->>         KVM_PAGE_TYPE_MIXED,
->>    };
->>
->>    struct kvm_page_attr {
->>         enum kvm_page_type type;
->>    };
->>
->>   struct kvm_arch_memory_slot {
->>   +      struct kvm_page_attr *page_attr[KVM_NR_PAGE_SIZES];
->>
->> Option B). steal one more bit SPTE_MIXED_MASK in addition to SPTE_SHARED_MASK
->> If !SPTE_MIXED_MASK, it can be large page.
+On Wed, Jul 6, 2022 at 10:05 AM Marc Zyngier <maz@kernel.org> wrote:
+>
+> For userspace accesses to GICv3 MMIO registers (and related data),
+> vgic_v3_{get,set}_attr are littered with {get,put}_user() calls,
+> making it hard to audit and reason about.
+>
+> Consolidate all userspace accesses in vgic_v3_attr_regs_access(),
+> makeing the code far simpler to audit.
 
-I don't think this is a good option, since it requires all the mappings 
-exist all the time both in shared spte tree and private spte tree.
+Nit: s/makeing/making/
 
->> Option C). use SPTE_SHARED_MASK and kvm_mmu_page::mixed bitmap
->> kvm_mmu_page::mixed bitmap of 1GB, root indicates mixed for 2MB, 1GB.
->>
->>
->> * comparison
->> A).
->> + straightforward to implement
->> + SPTE_SHARED_MASK isn't needed
->> - memory overhead compared to B). or C).
->> - more memory reference on KVM page fault
->>
->> B).
->> + simpler than C) (complex than A)?)
->> + efficient on KVM page fault. (only SPTE reference)
->> + low memory overhead
->> - Waste precious SPTE bits.
->>
->> C).
->> + efficient on KVM page fault. (only SPTE reference)
->> + low memory overhead
->> - complicates MapGPA
->> - scattered data structure
-> 
-> Option D). track shared regions in an Xarray, update kvm_arch_memory_slot.lpage_info
-> on insertion/removal to (dis)allow hugepages as needed.
+>
+> Signed-off-by: Marc Zyngier <maz@kernel.org>
 
-UPM v7[1] introduces "struct xarray mem_attr_array" to track the 
-shared/private attr of a range.
-
-So in kvm_vm_ioctl_set_encrypted_region() it needs to
-
-- increase the lpage_info counter when a 2m/1g range changed from 
-identical to mixed, and
-
-- decrease the counter when mixed -> identical
-
-[1]: 
-https://lore.kernel.org/all/20220706082016.2603916-12-chao.p.peng@linux.intel.com/
-
-> 
->    + efficient on KVM page fault (no new lookups)
->    + zero memory overhead (assuming KVM has to eat the cost of the Xarray anyways)
->    + straightforward to implement
->    + can (and should) be merged as part of the UPM series
-> 
-> I believe xa_for_each_range() can be used to see if a given 2mb/1gb range is
-> completely covered (fully shared) or not covered at all (fully private), but I'm
-> not 100% certain that xa_for_each_range() works the way I think it does.
-
+Reviewed-by: Reiji Watanabe <reijiw@google.com>
