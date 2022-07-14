@@ -2,152 +2,140 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 783715751F8
-	for <lists+kvm@lfdr.de>; Thu, 14 Jul 2022 17:37:14 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id D52D25751FD
+	for <lists+kvm@lfdr.de>; Thu, 14 Jul 2022 17:38:29 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S239300AbiGNPhM (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 14 Jul 2022 11:37:12 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42320 "EHLO
+        id S239593AbiGNPi1 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 14 Jul 2022 11:38:27 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43250 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231145AbiGNPhL (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 14 Jul 2022 11:37:11 -0400
-Received: from mail-pl1-x64a.google.com (mail-pl1-x64a.google.com [IPv6:2607:f8b0:4864:20::64a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F16014AD7E
-        for <kvm@vger.kernel.org>; Thu, 14 Jul 2022 08:37:09 -0700 (PDT)
-Received: by mail-pl1-x64a.google.com with SMTP id k18-20020a170902c41200b0016c40543af4so380181plk.0
-        for <kvm@vger.kernel.org>; Thu, 14 Jul 2022 08:37:09 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=reply-to:date:message-id:mime-version:subject:from:to:cc;
-        bh=JkRA3Mpa+i25bXGiM48nrv2DUtxPE5vPtImMAiVJCCQ=;
-        b=Esfd8MNtNxWYJPcYQ/wED/Laa6sCw2myW6KT2u8A6wlFKhJXSNSKfH3clFKTZA9/OI
-         1+9sB2Ng3bA3kwy9+0cqTgDXvINhiOPmf6pk+0wLY986MmcP6YOr8hUVDyYUf/1LrAAi
-         7B67RFadbzS8uMub4k4GdRtSAjq6tiUpPLPhWT5/eeSt9ksNQDdFkLXXMDIsnQPRWPGS
-         VeTMT7cR1xl0/FyGhapM84G0P5Bm7JYoT8t5Hb1v9Brddav7LLEpoG6I6NBpgKJnpVcA
-         f7c+GXAHCQ9lM4FQmjYyXNvDakR1e+npIwTA2JDiSUdG/kNePxk8sbvbIoyqL+wOQsFq
-         3wow==
+        with ESMTP id S231968AbiGNPiX (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 14 Jul 2022 11:38:23 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 1CE0D5F122
+        for <kvm@vger.kernel.org>; Thu, 14 Jul 2022 08:38:22 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1657813101;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=P5Z13oVcpp8qclm0mCwL8Kzfkdtg4fQqLSWyr/f5fA0=;
+        b=YMA54hyqurxvwlEq7MZBgN/kmr10EvpacYmCAG9uVF/S1tj4xknEPI9RF3zRaiUCuwAfx+
+        v1kp4UpRQ+LWYF7xOw0R6vsa5avD3a0jiZboFArHV+31S8L7bpYrIT/Vp8perCllYqkGxn
+        sISBAlUgo1NiFRzGaThiLDSA3fjQccQ=
+Received: from mail-ed1-f72.google.com (mail-ed1-f72.google.com
+ [209.85.208.72]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-588-KeQkUvZrPBuuQzEia2KjyQ-1; Thu, 14 Jul 2022 11:38:20 -0400
+X-MC-Unique: KeQkUvZrPBuuQzEia2KjyQ-1
+Received: by mail-ed1-f72.google.com with SMTP id z5-20020a05640235c500b0043ae18edeeeso1729107edc.5
+        for <kvm@vger.kernel.org>; Thu, 14 Jul 2022 08:38:20 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:reply-to:date:message-id:mime-version:subject
-         :from:to:cc;
-        bh=JkRA3Mpa+i25bXGiM48nrv2DUtxPE5vPtImMAiVJCCQ=;
-        b=auIewyzzXI0xJoatyDvOQ7uG3P5lddhFmXgXrf3xiPSU9FO6P5MkXE3fNaU5cTYCL1
-         LnuD/iSMqcR1JgTz39ONclIbfNr7dX3PhbyQMhvkQ+oCgEw0pcTPzcGkw4pifRch0U+A
-         d2e5Tg23nD1SXZPUWByqVVrGgFLxpeSirfQr072yCTqxmbXgm6qxWUP1T/8wlucYIi75
-         Hv8s729mDqqL4mcC5i5D3IOXlpZORoSOU3kGHddaMtTsdBggNeqxyjyEK+FA3l0Eg7lL
-         CQTH8aXflGYPY+8YEkHohGIK93YCtyq+4TGPNTliVdI2j3tSPjxvhYd7mDm1r05mdTMy
-         OKxA==
-X-Gm-Message-State: AJIora9qelTMdz/fso6iJyG3J/3ORtChuly4BPOxlB8020l1jIv81K0H
-        xNNvUfctpElRZZjE0kb1kgrg/darkIE=
-X-Google-Smtp-Source: AGRyM1te2o3cMfktLglQrxa1ovvTodM+d9kHChmo9hfTBQpm8nd+VQWhs3W1f4B7/eBJjtZy3k1LKzSdG9A=
-X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a05:6a00:99f:b0:52a:dd61:a50f with SMTP id
- u31-20020a056a00099f00b0052add61a50fmr8894806pfg.9.1657813029533; Thu, 14 Jul
- 2022 08:37:09 -0700 (PDT)
-Reply-To: Sean Christopherson <seanjc@google.com>
-Date:   Thu, 14 Jul 2022 15:37:07 +0000
-Message-Id: <20220714153707.3239119-1-seanjc@google.com>
-Mime-Version: 1.0
-X-Mailer: git-send-email 2.37.0.144.g8ac04bfd2-goog
-Subject: [PATCH] KVM: x86: Restrict get_mt_mask() to a u8, use KVM_X86_OP_OPTIONAL_RET0
-From:   Sean Christopherson <seanjc@google.com>
-To:     Sean Christopherson <seanjc@google.com>,
-        Paolo Bonzini <pbonzini@redhat.com>
-Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL
-        autolearn=unavailable autolearn_force=no version=3.4.6
+        h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
+         :content-language:to:cc:references:from:in-reply-to
+         :content-transfer-encoding;
+        bh=P5Z13oVcpp8qclm0mCwL8Kzfkdtg4fQqLSWyr/f5fA0=;
+        b=ReF8eDcWKQ0iHTHjTVUjpPa1jtiNtUrb2+ssmLMapIfEtPZ2wq16TlTxlhRjrirKjO
+         dxEQziIVtZ023AwgA4LytsNOGtiaIpFzzsM+BNo5Wqh3LZO14UV5U+jdGMoq0MLaJD7z
+         F0zp5WV3l5fChjI4WKSewnsDhY0yzRrTa9VlzDJPjk6zDfmUXXNvGcpgLnNG5MHj4oBr
+         cwiH+fkC0W4Kg8FMmqydoJW1C52P1+CmgAx6uZfSlwVnqtA4qHY4q12P4jbKyH9l9Xai
+         CJVk6Vite6GArqObQsXbYLfoYH3EEeG+yUzVkKhbZ5oDam5wRglOqPTqZYpOL5yMSGOY
+         5zNA==
+X-Gm-Message-State: AJIora/MvBPkOXnm8aJIGGbPWKFIozvxq2SJnXasKgI/sgjG51LSLgp2
+        pw3bKIlTC/IhZVBPsDBmeyxvqy1RpQ1AgYbOmzo2X//dTfvRNGU6Wky2W44ZjnGtY4i1kIwtrup
+        hkHvY7L7clghT
+X-Received: by 2002:a05:6402:228f:b0:43a:896:e4f0 with SMTP id cw15-20020a056402228f00b0043a0896e4f0mr12803954edb.81.1657813098562;
+        Thu, 14 Jul 2022 08:38:18 -0700 (PDT)
+X-Google-Smtp-Source: AGRyM1snZBx2XNszb4BuZBM78HEgBogAgCQ6gRW/x0MeMQhgt7EzwojStlVPIYxjVhTfL3dfr64PNg==
+X-Received: by 2002:a05:6402:228f:b0:43a:896:e4f0 with SMTP id cw15-20020a056402228f00b0043a0896e4f0mr12803929edb.81.1657813098348;
+        Thu, 14 Jul 2022 08:38:18 -0700 (PDT)
+Received: from ?IPV6:2001:b07:6468:f312:9af8:e5f5:7516:fa89? ([2001:b07:6468:f312:9af8:e5f5:7516:fa89])
+        by smtp.googlemail.com with ESMTPSA id sa42-20020a1709076d2a00b007081282cbd8sm821831ejc.76.2022.07.14.08.38.16
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 14 Jul 2022 08:38:17 -0700 (PDT)
+Message-ID: <dbce7bba-12ac-1df5-c81b-32392830f77d@redhat.com>
+Date:   Thu, 14 Jul 2022 17:38:16 +0200
+MIME-Version: 1.0
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.10.0
+Subject: Re: [PATCH v2] KVM: x86: Add dedicated helper to get CPUID entry with
+ significant index
+Content-Language: en-US
+To:     Maxim Levitsky <mlevitsk@redhat.com>,
+        Sean Christopherson <seanjc@google.com>
+Cc:     Vitaly Kuznetsov <vkuznets@redhat.com>, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+References: <20220712000645.1144186-1-seanjc@google.com>
+ <8a1ff7338f1252d75ff96c3518f16742919f92d7.camel@redhat.com>
+ <Ys2i2B/jt5yDsAKj@google.com> <Ys2qwUmEJaJnsj6r@google.com>
+ <087db845684c18af112e396172598172c7cc9980.camel@redhat.com>
+From:   Paolo Bonzini <pbonzini@redhat.com>
+In-Reply-To: <087db845684c18af112e396172598172c7cc9980.camel@redhat.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-Spam-Status: No, score=-2.7 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
+        RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Restrict get_mt_mask() to a u8 and reintroduce using a RET0 static_call
-for the SVM implementation.  EPT stores the memtype information in the
-lower 8 bits (bits 6:3 to be precise), and even returns a shifted u8
-without an explicit cast to a larger type; there's no need to return a
-full u64.
+On 7/14/22 12:58, Maxim Levitsky wrote:
+> On Tue, 2022-07-12 at 17:09 +0000, Sean Christopherson wrote:
+>> On Tue, Jul 12, 2022, Sean Christopherson wrote:
+>>> On Tue, Jul 12, 2022, Maxim Levitsky wrote:
+>>>> On Tue, 2022-07-12 at 00:06 +0000, Sean Christopherson wrote:
+>>>>> +               /*
+>>>>> +                * Function matches and index is significant; not specifying an
+>>>>> +                * exact index in this case is a KVM bug.
+>>>>> +                */
+>>>> Nitpick: Why KVM bug? Bad userspace can also provide a index-significant entry for cpuid
+>>>> leaf for which index is not significant in the x86 spec.
+>>>
+>>> Ugh, you're right.
+>>>
+>>>> We could arrange a table of all known leaves and for each leaf if it has an index
+>>>> in the x86 spec, and warn/reject the userspace CPUID info if it doesn't match.
+>>>
+>>> We have such a table, cpuid_function_is_indexed().  The alternative would be to
+>>> do:
+>>>
+>>>                  WARN_ON_ONCE(index == KVM_CPUID_INDEX_NOT_SIGNIFICANT &&
+>>>                               cpuid_function_is_indexed(function));
+>>>
+>>> The problem with rejecting userspace CPUID on mismatch is that it could break
+>>> userspace :-/  Of course, this entire patch would also break userspace to some
+>>> extent, e.g. if userspace is relying on an exact match on index==0.  The only
+>>> difference being the guest lookups with an exact index would still work.
+>>>
+>>> I think the restriction we could put in place would be that userspace can make
+>>> a leaf more relaxed, e.g. to play nice if userspace forgets to set the SIGNFICANT
+>>> flag, but rejects attempts to make guest CPUID more restrictive, i.e. disallow
+>>> setting the SIGNFICANT flag on leafs that KVM doesn't enumerate as significant.
+>>>
+>>>>> +               WARN_ON_ONCE(index == KVM_CPUID_INDEX_NOT_SIGNIFICANT);
+>>
+>> Actually, better idea.  Let userspace do whatever, and have direct KVM lookups
+>> for functions that architecturally don't have a significant index use the first
+>> entry even if userspace set the SIGNIFICANT flag.  That will mostly maintain
+>> backwards compatibility, the only thing that would break is if userspace set the
+>> SIGNIFICANT flag _and_ provided a non-zero index _and_ relied on KVM to not match
+>> the entry.
+> 
+> Makes sense as well.
 
-Note, RET0 doesn't play nice with a u64 return on 32-bit kernels, see
-commit bf07be36cd88 ("KVM: x86: do not use KVM_X86_OP_OPTIONAL_RET0 for
-get_mt_mask").
+Squashed and queued, thanks.
 
-Signed-off-by: Sean Christopherson <seanjc@google.com>
----
- arch/x86/include/asm/kvm-x86-ops.h | 2 +-
- arch/x86/include/asm/kvm_host.h    | 2 +-
- arch/x86/kvm/svm/svm.c             | 6 ------
- arch/x86/kvm/vmx/vmx.c             | 2 +-
- 4 files changed, 3 insertions(+), 9 deletions(-)
+Regarding function and index, I never remember the "function" name, but 
+it's pretty obvious that the index is ecx so there's no ambiguity.  And 
+using different names for inputs and outputs makes it clear that there 
+are no games with in/out parameters.
 
-diff --git a/arch/x86/include/asm/kvm-x86-ops.h b/arch/x86/include/asm/kvm-x86-ops.h
-index 6f2f1affbb78..51f777071584 100644
---- a/arch/x86/include/asm/kvm-x86-ops.h
-+++ b/arch/x86/include/asm/kvm-x86-ops.h
-@@ -88,7 +88,7 @@ KVM_X86_OP(deliver_interrupt)
- KVM_X86_OP_OPTIONAL(sync_pir_to_irr)
- KVM_X86_OP_OPTIONAL_RET0(set_tss_addr)
- KVM_X86_OP_OPTIONAL_RET0(set_identity_map_addr)
--KVM_X86_OP(get_mt_mask)
-+KVM_X86_OP_OPTIONAL_RET0(get_mt_mask)
- KVM_X86_OP(load_mmu_pgd)
- KVM_X86_OP(has_wbinvd_exit)
- KVM_X86_OP(get_l2_tsc_offset)
-diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
-index de5a149d0971..fa4b2392fba0 100644
---- a/arch/x86/include/asm/kvm_host.h
-+++ b/arch/x86/include/asm/kvm_host.h
-@@ -1546,7 +1546,7 @@ struct kvm_x86_ops {
- 	int (*sync_pir_to_irr)(struct kvm_vcpu *vcpu);
- 	int (*set_tss_addr)(struct kvm *kvm, unsigned int addr);
- 	int (*set_identity_map_addr)(struct kvm *kvm, u64 ident_addr);
--	u64 (*get_mt_mask)(struct kvm_vcpu *vcpu, gfn_t gfn, bool is_mmio);
-+	u8 (*get_mt_mask)(struct kvm_vcpu *vcpu, gfn_t gfn, bool is_mmio);
- 
- 	void (*load_mmu_pgd)(struct kvm_vcpu *vcpu, hpa_t root_hpa,
- 			     int root_level);
-diff --git a/arch/x86/kvm/svm/svm.c b/arch/x86/kvm/svm/svm.c
-index 37ce061dfc76..19af6dacfc5b 100644
---- a/arch/x86/kvm/svm/svm.c
-+++ b/arch/x86/kvm/svm/svm.c
-@@ -4158,11 +4158,6 @@ static bool svm_has_emulated_msr(struct kvm *kvm, u32 index)
- 	return true;
- }
- 
--static u64 svm_get_mt_mask(struct kvm_vcpu *vcpu, gfn_t gfn, bool is_mmio)
--{
--	return 0;
--}
--
- static void svm_vcpu_after_set_cpuid(struct kvm_vcpu *vcpu)
- {
- 	struct vcpu_svm *svm = to_svm(vcpu);
-@@ -4814,7 +4809,6 @@ static struct kvm_x86_ops svm_x86_ops __initdata = {
- 	.check_apicv_inhibit_reasons = avic_check_apicv_inhibit_reasons,
- 	.apicv_post_state_restore = avic_apicv_post_state_restore,
- 
--	.get_mt_mask = svm_get_mt_mask,
- 	.get_exit_info = svm_get_exit_info,
- 
- 	.vcpu_after_set_cpuid = svm_vcpu_after_set_cpuid,
-diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
-index c30115b9cb33..c895a3b6824d 100644
---- a/arch/x86/kvm/vmx/vmx.c
-+++ b/arch/x86/kvm/vmx/vmx.c
-@@ -7352,7 +7352,7 @@ static int __init vmx_check_processor_compat(void)
- 	return 0;
- }
- 
--static u64 vmx_get_mt_mask(struct kvm_vcpu *vcpu, gfn_t gfn, bool is_mmio)
-+static u8 vmx_get_mt_mask(struct kvm_vcpu *vcpu, gfn_t gfn, bool is_mmio)
- {
- 	u8 cache;
- 
-
-base-commit: b9b71f43683ae9d76b0989249607bbe8c9eb6c5c
--- 
-2.37.0.144.g8ac04bfd2-goog
+Paolo
+Paolo
 
