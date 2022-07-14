@@ -2,84 +2,117 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 73FAF5755D1
-	for <lists+kvm@lfdr.de>; Thu, 14 Jul 2022 21:27:08 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 87D425755D9
+	for <lists+kvm@lfdr.de>; Thu, 14 Jul 2022 21:36:45 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S240446AbiGNT1H (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 14 Jul 2022 15:27:07 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60428 "EHLO
+        id S240148AbiGNTgm (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 14 Jul 2022 15:36:42 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37080 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232306AbiGNT1G (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 14 Jul 2022 15:27:06 -0400
-Received: from mail.skyhub.de (mail.skyhub.de [IPv6:2a01:4f8:190:11c2::b:1457])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 609CB49B5A;
-        Thu, 14 Jul 2022 12:27:04 -0700 (PDT)
-Received: from [127.0.0.1] (dynamic-002-247-249-041.2.247.pool.telefonica.de [2.247.249.41])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-        (No client certificate requested)
-        by mail.skyhub.de (SuperMail on ZX Spectrum 128k) with ESMTPSA id 3C4FA1EC0434;
-        Thu, 14 Jul 2022 21:26:58 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alien8.de; s=dkim;
-        t=1657826818;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=Z4MQJTZj6BmKFE8enGCuKKJcgI7E41yi2bEFmH/f2RE=;
-        b=WKZJWjPprl/ocjkLjPori4zBGFj2SBPEhyTAfzDr1Ks4lBVL8yIT4mZbt/PR+Ks+M52R4M
-        elaR0vHa3qV9grOTlmkZZFb/yyGRPvnYwfvlWuN5yei8RzKiCWr/9QtwZuuC7jE1kiaPTz
-        oOCh3xgqvApT0Xo/rmM2Rm687SYBfp4=
-Date:   Thu, 14 Jul 2022 19:26:54 +0000
-From:   Boris Petkov <bp@alien8.de>
-To:     Linus Torvalds <torvalds@linux-foundation.org>,
-        Peter Zijlstra <peterz@infradead.org>
-CC:     Paolo Bonzini <pbonzini@redhat.com>,
-        Guenter Roeck <linux@roeck-us.net>,
-        Thadeu Lima de Souza Cascardo <cascardo@canonical.com>,
-        Naresh Kamboju <naresh.kamboju@linaro.org>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        Slade Watkins <slade@sladewatkins.com>,
-        Florian Fainelli <f.fainelli@gmail.com>,
-        Dave Hansen <dave.hansen@linux.intel.com>,
-        X86 ML <x86@kernel.org>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        kvm list <kvm@vger.kernel.org>,
-        Jon Hunter <jonathanh@nvidia.com>,
-        Sudip Mukherjee <sudipm.mukherjee@gmail.com>,
-        patches@kernelci.org, Sean Christopherson <seanjc@google.com>,
-        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-        Shuah Khan <shuah@kernel.org>, stable <stable@vger.kernel.org>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, lkft-triage@lists.linaro.org,
-        Pavel Machek <pavel@denx.de>, "H. Peter Anvin" <hpa@zytor.com>,
-        =?ISO-8859-1?Q?Alex_Benn=E9e?= <alex.bennee@linaro.org>,
-        Anders Roxell <anders.roxell@linaro.org>
-Subject: Re: [PATCH 5.15 00/78] 5.15.55-rc1 review
-In-Reply-To: <CAHk-=whYia1fnjJFiJ59xZv4ROqqTfG4crQNWxb71JYJf5B-Lg@mail.gmail.com>
-References: <20220712183238.844813653@linuxfoundation.org> <CA+G9fYtntg7=zWSs-dm+n_AUr_u0eBOU0zrwWqMeXZ+SF6_bLw@mail.gmail.com> <eb63e4ce-843f-c840-060e-6e15defd3c4d@roeck-us.net> <CAHk-=wj5cOA+fbGeV15kvwe6YGT54Wsk8F2UGoekVQLTPJz_pw@mail.gmail.com> <CAHk-=wgq1soM4gudypWLVQdYuvJbXn38LtvJMtnLZX+RTypqLg@mail.gmail.com> <Ys/bYJ2bLVfNBjFI@nazgul.tnic> <6b4337f4-d1de-7ba3-14e8-3ad0f9b18788@redhat.com> <8BEC3365-FC09-46C5-8211-518657C0308E@alien8.de> <CAHk-=wj4vtoWZPMXJU-B9qW1zLHsoA1Qb2P0NW=UFhZmrCrf9Q@mail.gmail.com> <YtBQutgSh2j3mFNB@worktop.programming.kicks-ass.net> <CAHk-=wjAouqJQ=C4XZVUmWEV9kerNzbOkK9OeErpHshNkcR=gQ@mail.gmail.com> <CAHk-=whYia1fnjJFiJ59xZv4ROqqTfG4crQNWxb71JYJf5B-Lg@mail.gmail.com>
-Message-ID: <6210C171-BBBD-4FC4-B5FF-68D715941501@alien8.de>
+        with ESMTP id S229986AbiGNTgl (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 14 Jul 2022 15:36:41 -0400
+Received: from mail-pg1-x531.google.com (mail-pg1-x531.google.com [IPv6:2607:f8b0:4864:20::531])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EF84357E37
+        for <kvm@vger.kernel.org>; Thu, 14 Jul 2022 12:36:40 -0700 (PDT)
+Received: by mail-pg1-x531.google.com with SMTP id h132so2466959pgc.10
+        for <kvm@vger.kernel.org>; Thu, 14 Jul 2022 12:36:40 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=gsRk7t2Fg8fNdp4dpl5BvpQeyL4GIWzZfCIoGVEvJGs=;
+        b=hh1/yTdZnCsVTYD0aANJOlF973VdVa5cXEwdjStzWlwFZx2sB6o/npf0HjLO96VXXX
+         8/VfayIFFH+ueKb3Bd54td2xLD2QkQl4r58+4SiLqR8BhgUlYyNo0QBK2FXD/6Fk6Jg3
+         N4xYe1IEHXBkHxp2nRqECxvEAOpO3Kp87CdcOeV20LnPIhuKL4f1Cl95eAjcd8vIZJSt
+         jJGRGXb297hjV9l4jpCRETrsCNvDGhtlJOXaN+8w5Fqig1p0UEGXMoJSovJWFnHpjfQn
+         /bQEFW1JtymD3IOPyOvtVuyKRmxPdvROYaTaNsHiOJl0GR+bs59ZbMejxOnDrCzbBQY3
+         XRUQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=gsRk7t2Fg8fNdp4dpl5BvpQeyL4GIWzZfCIoGVEvJGs=;
+        b=LnP3yZ3KfeszD3OfVWOCpzDJEAteGDEQPz/wyNpT6/qRZ7feuFxsd5f7ht67b8WxLa
+         KLN5E3W0dTOfTMV7VKERnUDtnaLM82wxvNvuJGwh928DmPI80x3JuAN5pZ40FZdCNBKz
+         iKBAD6QJqOFUPgoP2LzZxZBlVvkgfpeMnQ8TeePi7TcbNcnJelOOBDqqfwwoNcCKuswA
+         l/gJtswU2pJ6Cutc7l6DYdKUifsKFTwQPDn6p94wJW8XGxx+tQoJH/wOjnMnvYi7Z1bd
+         MqhNzmDWiKIGcCwb2EyNBWHNgQVQR0DHc7Kx5cDCVvmI/SgFQiLu5fRMJsO8vAmHxJro
+         QfZA==
+X-Gm-Message-State: AJIora9JPaSCF1RRORBqA/V6uIGzQjBukfV6aWB8gGwzAKY5/HcG3T/f
+        seJcGjyQmXWWLwYPD7pBM22BzyA/0XLstw==
+X-Google-Smtp-Source: AGRyM1tT5lHblTli/9Mhvqlr+lDrujYvNGGf1erzZXg7w0/tgIkpMzNgEHD+oCWSoZfuw3mNNaZR1w==
+X-Received: by 2002:a05:6a00:1704:b0:525:714b:5c77 with SMTP id h4-20020a056a00170400b00525714b5c77mr9910448pfc.29.1657827400359;
+        Thu, 14 Jul 2022 12:36:40 -0700 (PDT)
+Received: from google.com (123.65.230.35.bc.googleusercontent.com. [35.230.65.123])
+        by smtp.gmail.com with ESMTPSA id b31-20020a631b1f000000b0041282c423e6sm1711103pgb.71.2022.07.14.12.36.39
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 14 Jul 2022 12:36:39 -0700 (PDT)
+Date:   Thu, 14 Jul 2022 19:36:36 +0000
+From:   Sean Christopherson <seanjc@google.com>
+To:     "Yang, Weijiang" <weijiang.yang@intel.com>
+Cc:     Paolo Bonzini <pbonzini@redhat.com>,
+        Peter Zijlstra <peterz@infradead.org>, x86@kernel.org,
+        kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+        rick.p.edgecombe@intel.com
+Subject: Re: [PATCH 00/19] Refresh queued CET virtualization series
+Message-ID: <YtBwRIiZi262hHiE@google.com>
+References: <20220616084643.19564-1-weijiang.yang@intel.com>
+ <YqsB9upUystxvl+d@hirez.programming.kicks-ass.net>
+ <62d4f7f0-e7b2-83ad-a2c7-a90153129da2@redhat.com>
+ <Yqs7qjjbqxpw62B/@hirez.programming.kicks-ass.net>
+ <8a38488d-fb6e-72f9-3529-b098a97d8c97@redhat.com>
+ <2855f8a9-1f77-0265-f02c-b7d584bd8990@intel.com>
 MIME-Version: 1.0
-Content-Type: text/plain;
- charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,SPF_HELO_NONE,SPF_PASS,
-        T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <2855f8a9-1f77-0265-f02c-b7d584bd8990@intel.com>
+X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
+        T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On July 14, 2022 6:16:40 PM UTC, Linus Torvalds <torvalds@linux-foundation=
-=2Eorg> wrote:
->So yeah, it would be less dense, but do we care? Wouldn't the "this is
->really simple" be a nice thing? It's not like there are a ton of those
->fastop functions anyway=2E 128 of them? Plus 16 of the "setCC" ones?
+On Sat, Jun 18, 2022, Yang, Weijiang wrote:
+> 
+> On 6/16/2022 11:28 PM, Paolo Bonzini wrote:
+> > If you build with !X86_KERNEL_IBT, KVM can still rely on the FPU state
+> > for U_CET state, and S_CET is saved/restored via the VMCS independent of
+> > X86_KERNEL_IBT.
+> 
+> A fundamental question is, should KVM always honor host CET enablement
+> before expose the feature to guest? i.e., check X86_KERNEL_IBT and
+> X86_SHADOW_STACK.
 
-I definitely like simple=2E
+If there is a legitimate use case to NOT require host enablement and it's 100%
+safe to do so (within requiring hacks to the core kernel), then there's no hard
+requirement that says KVM can't virtualize a feature that's not used by the host.
 
-Along with a comment why we have this magic 16 there=2E
+It's definitely uncommon; unless I'm forgetting features, LA57 is the only feature
+that KVM fully virtualizes (as opposed to emulates in software) without requiring
+host enablement.  Ah, and good ol' MPX, which is probably the best prior are since
+it shares the same XSAVE+VMCS for user+supervisor state management.  So more than
+one, but still not very many.
 
---=20
-Sent from a small device: formatting sux and brevity is inevitable=2E 
+But, requiring host "support" is the de facto standard largely because features
+tend to fall into one of three categories:
+
+  1. The feature is always available, i.e. doesn't have a software enable/disable
+     flag.
+
+  2. The feature isn't explicitly disabled in cpufeatures / x86_capability even
+     if it's not used by the host.  E.g. MONITOR/MWAIT comes to mind where the
+     host can be configured to not use MWAIT for idle, but it's still reported
+     as supported (and for that case, KVM does have to explicitly guard against
+     X86_BUG_MONITOR).
+
+  3. Require some amount of host support, e.g. exposing XSAVE without the kernel
+     knowing how to save/restore all that state wouldn't end well.
+
+In other words, virtualizing a feature if it's disabled in the host is allowed,
+but it's rare because there just aren't many features where doing so is possible
+_and_ necessary.
