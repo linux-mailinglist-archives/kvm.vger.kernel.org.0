@@ -2,68 +2,63 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 8E0D85740A7
-	for <lists+kvm@lfdr.de>; Thu, 14 Jul 2022 02:52:37 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 42FEF5740BB
+	for <lists+kvm@lfdr.de>; Thu, 14 Jul 2022 03:04:05 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230457AbiGNAwa (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 13 Jul 2022 20:52:30 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39230 "EHLO
+        id S231214AbiGNBDy (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 13 Jul 2022 21:03:54 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45444 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230142AbiGNAw3 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 13 Jul 2022 20:52:29 -0400
-Received: from mail-pg1-x52b.google.com (mail-pg1-x52b.google.com [IPv6:2607:f8b0:4864:20::52b])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6FA2913D49
-        for <kvm@vger.kernel.org>; Wed, 13 Jul 2022 17:52:28 -0700 (PDT)
-Received: by mail-pg1-x52b.google.com with SMTP id r186so137405pgr.2
-        for <kvm@vger.kernel.org>; Wed, 13 Jul 2022 17:52:28 -0700 (PDT)
+        with ESMTP id S229735AbiGNBDx (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 13 Jul 2022 21:03:53 -0400
+Received: from mail-pg1-x531.google.com (mail-pg1-x531.google.com [IPv6:2607:f8b0:4864:20::531])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 692981209A
+        for <kvm@vger.kernel.org>; Wed, 13 Jul 2022 18:03:51 -0700 (PDT)
+Received: by mail-pg1-x531.google.com with SMTP id q82so145544pgq.6
+        for <kvm@vger.kernel.org>; Wed, 13 Jul 2022 18:03:51 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
         h=date:from:to:cc:subject:message-id:references:mime-version
          :content-disposition:in-reply-to;
-        bh=H4muTwTgTj/3OhnwCnsvELB7YAIn9AMy7WICw3/QJ4w=;
-        b=DZ0JsVJaoBMRYe7xi/4MtG11T2qpS+rcVen/o5oYAJBWsYnQe6mluRAmiel0TmHCNB
-         GIWXyVWINduz3/4fpvL1o0Qyazayyj7YpCQ5KpNuI90jGAmjEXCXhGorB8viqm9zIsho
-         u7gmktA3rbS6kCc8mTP+2WS7DexOgtfmu1lPTG25pNUysEFZpuYtkWnfwuPCoGhalbgX
-         4MvXSMqV7cfMOTHqeWB9GLdJb/U0GQANzfvqDgIyVP18RJYBeYUzLhTLoCHcWd3rpDEH
-         hkuPFgVStsZc/X2C/Wye3q0bjnW5mngZKBEHwHl4pO4q6nR5tu891xEL2AIDSBVDZ12L
-         F1IA==
+        bh=iYjvT9/K+PJOYO+PKYqApFIeqrzKMwdmFTyx44M/bUw=;
+        b=s9pNVCwJpiRtqZOHmC9JoqSbIHVFh0WcP6GlOiQEvWpNg9ctAYIL9TC74ZHJwDmQbr
+         ujX1YfT+IVTqR8HVG+hTZliHN024gh9S9Pg203g/w/Bao0+j+IoHioLNgvk11I+ChPBk
+         HBHnskhUnzqC/Gn8ign5LtntTGXrnDE107IPN5/vDkLHTKg5XJ/pfYVAF5ISWRKbRMkD
+         b4xbcglZ2QBxniVLRlcKW864QEwH+3hXRWfFtaWOj9jOLSfGgLSTEhToYfsI6cPh/sfk
+         HO7/3PgNobJRxm1haK+WNfLJm+yjw8/yi9baTclGMlllGg2hKHJB+0zk4WjqcoAqIKYT
+         UlOA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:date:from:to:cc:subject:message-id:references
          :mime-version:content-disposition:in-reply-to;
-        bh=H4muTwTgTj/3OhnwCnsvELB7YAIn9AMy7WICw3/QJ4w=;
-        b=jVYqi7A50Z65vJMtN3bGDMU/agRnEZnPVfXWrusQrRjh/glIsTBr+8SJ2tf2Dpf0Oj
-         9JLZ06hJf18E+txFbbJGl0T1rB0FFKf1871oabMyxFSnkC/dhv/Cg2nmu/6Ops/lxboG
-         HCI5ZsoaO1Hpw57QpAnhuWizw/ZDMNB4LuE4466Mri75vEqnWfD4XEiT+p062riwHLVW
-         mSjm2TPqiKgo/dneEK/65fJqlR1cBogUjt121fWTqzehYaSS1Hqfp0PbPnI67h7t40Nq
-         VIaPq7XJrz1xjj+YlDKxuUUaHbHLj6foOjLvr6ctnwaR1jgS1cxgH2dmpi0q1FjSIgEV
-         JDjA==
-X-Gm-Message-State: AJIora/s3Y09BIZDWjpDlLjJJjp3UOabQnl3l3hqzhRSpbve0lYZv1Ad
-        1ITIeKYzUP8TylIAhRX1ftkiRQ==
-X-Google-Smtp-Source: AGRyM1vfTV94aQO3q8/sedYOGeQM5m9Kb1aEJf1L6HYk2kAOq5ucZILxkJ41cMvtYV7fdO7dP8z9OA==
-X-Received: by 2002:a05:6a00:2189:b0:52b:86c:26cc with SMTP id h9-20020a056a00218900b0052b086c26ccmr5735373pfi.44.1657759947798;
-        Wed, 13 Jul 2022 17:52:27 -0700 (PDT)
+        bh=iYjvT9/K+PJOYO+PKYqApFIeqrzKMwdmFTyx44M/bUw=;
+        b=dY8g8yvvWq7hrKtyFTkvNgFRmFzB3gOeyK94utZitPtRTHLFCvcW9cUeEi4xfIjQ6h
+         QtUVeuitAvZ2a8Z/XTsWxpP99cEjTkKIhcCB6W3gj1OiFAMAZQdXSWCvan0YBF+COZta
+         w1Dwi86RkL0aAXRScx9rcaxRAtzDzETSU8tPZKeECkLdTzPQMFvI+cG9gGkz3Airhi4t
+         kOA8B0OFVUn7UrdnY67qkk8KiGnAgFxCapeqt8PUZxgrYHnJkItFmUz/G7WMbwWs0sJA
+         Dz2G8jVUHJf9xDdpPIhhwiMml5CKaFsvZ0s0E8KF3YrvfpUcWgNo/YCmfL6VAC3hvuy1
+         U58g==
+X-Gm-Message-State: AJIora/uThPQAuY7ZFxzEQRpySqWr2s7Gi8WmBLSXjooNWWfBdLcKege
+        /xqZM1iJIcq/EVv78Wmpb+2Yf8GKtlWR/A==
+X-Google-Smtp-Source: AGRyM1uX6QB+BfDKrubdH5R5fP1CmDIQfDrAae3pIvHrIcWjLL7rkJKM2XvtWMxxzpr6bK6W8KlqTA==
+X-Received: by 2002:a62:e10d:0:b0:52a:b77e:8bd3 with SMTP id q13-20020a62e10d000000b0052ab77e8bd3mr5810419pfh.66.1657760630794;
+        Wed, 13 Jul 2022 18:03:50 -0700 (PDT)
 Received: from google.com (123.65.230.35.bc.googleusercontent.com. [35.230.65.123])
-        by smtp.gmail.com with ESMTPSA id l13-20020a170903120d00b0016bedecdd65sm42055plh.159.2022.07.13.17.52.27
+        by smtp.gmail.com with ESMTPSA id g21-20020aa796b5000000b005289cade5b0sm170538pfk.124.2022.07.13.18.03.49
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 13 Jul 2022 17:52:27 -0700 (PDT)
-Date:   Thu, 14 Jul 2022 00:52:23 +0000
+        Wed, 13 Jul 2022 18:03:49 -0700 (PDT)
+Date:   Thu, 14 Jul 2022 01:03:46 +0000
 From:   Sean Christopherson <seanjc@google.com>
-To:     Vitaly Kuznetsov <vkuznets@redhat.com>
-Cc:     kvm@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Maxim Levitsky <mlevitsk@redhat.com>,
-        linux-kernel@vger.kernel.org
-Subject: Re: [PATCH 2/3] KVM: selftests: Fix wrmsr_safe()
-Message-ID: <Ys9ox+sMPdnGlEMP@google.com>
-References: <20220713150532.1012466-1-vkuznets@redhat.com>
- <20220713150532.1012466-3-vkuznets@redhat.com>
- <Ys7nkBcfYlSuF7rt@google.com>
+To:     isaku.yamahata@intel.com
+Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+        isaku.yamahata@gmail.com, Paolo Bonzini <pbonzini@redhat.com>
+Subject: Re: [PATCH v7 000/102] KVM TDX basic feature support
+Message-ID: <Ys9rcnyIZlUc76iG@google.com>
+References: <cover.1656366337.git.isaku.yamahata@intel.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <Ys7nkBcfYlSuF7rt@google.com>
+In-Reply-To: <cover.1656366337.git.isaku.yamahata@intel.com>
 X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
         ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
@@ -75,63 +70,92 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Jul 13, 2022, Sean Christopherson wrote:
-> On Wed, Jul 13, 2022, Vitaly Kuznetsov wrote:
-> > It seems to be a misconception that "A" places an u64 operand to
-> > EAX:EDX, at least with GCC11.
+On Mon, Jun 27, 2022, isaku.yamahata@intel.com wrote:
+> From: Isaku Yamahata <isaku.yamahata@intel.com>
 > 
-> It's not a misconception, it's just that the "A" trick only works for 32-bit
-> binaries.  For 64-bit, the 64-bit integer fits into "rax" without needing to spill
-> into "rdx".
+> KVM TDX basic feature support
 > 
-> I swear I had fixed this, but apparently I had only done that locally and never
-> pushed/posted the changes :-/
+> Hello.  This is v7 the patch series vof KVM TDX support.
+> This is based on v5.19-rc1 + kvm/queue branch + TDX HOST patch series.
+> The tree can be found at https://github.com/intel/tdx/tree/kvm-upstream
+> How to run/test: It's describe at https://github.com/intel/tdx/wiki/TDX-KVM
+> 
+> Major changes from v6:
+> - rebased to v5.19 base
+> 
+> TODO:
+> - integrate fd-based guest memory. As the discussion is still on-going, I
+>   intentionally dropped fd-based guest memory support yet.  The integration can
+>   be found at https://github.com/intel/tdx/tree/kvm-upstream-workaround.
+> - 2M large page support. It's work-in-progress.
+> For large page support, there are several design choices. Here is the design options.
+> Any thoughts/feedback?
 
-Ugh, I have a feeling I fixed RDMSR and then forgot about WRSMR.
+Apologies, I didn't read beyond the intro paragraph.  In case something like this
+comes up again, it's probably best to send a standalone email tagged RFC, I doubt
+I'm the only one that missed this embedded RFC.
 
-> > While writing a new test, I've noticed that wrmsr_safe() tries putting
-> > garbage to the upper bits of the MSR, e.g.:
-> > 
-> >   kvm_exit:             reason MSR_WRITE rip 0x402919 info 0 0
-> >   kvm_msr:              msr_write 40000118 = 0x60000000001 (#GP)
-> > ...
-> > when it was supposed to write '1'. Apparently, "A" works the same as
-> > "a" and not as EAX/EDX. Here's the relevant disassembled part:
-> > 
-> > With "A":
-> > 
-> > 	48 8b 43 08          	mov    0x8(%rbx),%rax
-> > 	49 b9 ba da ca ba 0a 	movabs $0xabacadaba,%r9
-> > 	00 00 00
-> > 	4c 8d 15 07 00 00 00 	lea    0x7(%rip),%r10        # 402f44 <guest_msr+0x34>
-> > 	4c 8d 1d 06 00 00 00 	lea    0x6(%rip),%r11        # 402f4a <guest_msr+0x3a>
-> > 	0f 30                	wrmsr
-> > 
-> > With "a"/"d":
-> > 
-> > 	48 8b 43 08          	mov    0x8(%rbx),%rax
-> > 	48 89 c2             	mov    %rax,%rdx
-> > 	48 c1 ea 20          	shr    $0x20,%rdx
+> KVM MMU Large page support for TDX
+ 
+...
 
-Huh.  This is wrong.  RAX is loaded with the full 64-bit value.  It doesn't matter
-for WRMSR because WRMSR only consumes EAX, but it's wrong.  I can't for the life
-of me figure out why casting to a u32 doesn't force the compiler to truncate the
-value.  Truncation in other places most definitely works, and the compiler loads
-only EAX and EDX when using a hardcoded value, e.g. -1ull, so the input isn't
-messed up.  There's no 32-bit loads of EAX, so no implicit truncation of RAX[63:32].
+> * options to track private or shared
+> At each page size (4KB, 2MB, and 1GB), track private, shared, or mixed (2MB and
+> 1GB case). For 4KB each page, 1 bit per page is needed. private or shared.  For
+> large pages (2MB and 1GB), 2 bits per large page is needed. (private, shared, or
+> mixed).  When resolving KVM page fault, we don't want to check the lower-size
+> pages to check if the given GPA can be a large for performance.  On MapGPA check
+> it instead.
+> 
+> Option A). enhance kvm_arch_memory_slot
+>   enum kvm_page_type {
+>        KVM_PAGE_TYPE_INVALID,
+>        KVM_PAGE_TYPE_SHARED,
+>        KVM_PAGE_TYPE_PRIVATE,
+>        KVM_PAGE_TYPE_MIXED,
+>   };
+> 
+>   struct kvm_page_attr {
+>        enum kvm_page_type type;
+>   };
+> 
+>  struct kvm_arch_memory_slot {
+>  +      struct kvm_page_attr *page_attr[KVM_NR_PAGE_SIZES];
+> 
+> Option B). steal one more bit SPTE_MIXED_MASK in addition to SPTE_SHARED_MASK
+> If !SPTE_MIXED_MASK, it can be large page.
+> 
+> Option C). use SPTE_SHARED_MASK and kvm_mmu_page::mixed bitmap
+> kvm_mmu_page::mixed bitmap of 1GB, root indicates mixed for 2MB, 1GB.
+> 
+> 
+> * comparison
+> A).
+> + straightforward to implement
+> + SPTE_SHARED_MASK isn't needed
+> - memory overhead compared to B). or C).
+> - more memory reference on KVM page fault
+> 
+> B).
+> + simpler than C) (complex than A)?)
+> + efficient on KVM page fault. (only SPTE reference)
+> + low memory overhead
+> - Waste precious SPTE bits.
+> 
+> C).
+> + efficient on KVM page fault. (only SPTE reference)
+> + low memory overhead
+> - complicates MapGPA
+> - scattered data structure
 
-gcc-{7,9,11} and clang-13 generate the same code, so either it's a really
-longstanding bug, or maybe some funky undocumented behavior?
+Option D). track shared regions in an Xarray, update kvm_arch_memory_slot.lpage_info
+on insertion/removal to (dis)allow hugepages as needed.
 
-If I use
+  + efficient on KVM page fault (no new lookups)
+  + zero memory overhead (assuming KVM has to eat the cost of the Xarray anyways)
+  + straightforward to implement
+  + can (and should) be merged as part of the UPM series
 
-	return kvm_asm_safe("wrmsr", "a"(val & -1u), "d"(val >> 32), "c"(msr));
-
-then the result is as expected:
-
-  48 8b 53 08             mov    0x8(%rbx),%rdx
-  89 d0                   mov    %edx,%eax
-  48 c1 ea 20             shr    $0x20,%rdx
-
-I'll post a v2 of just this patch on your behalf, I also reworded the changelog
-to include the gcc documentation that talks about the behavior of "A".
+I believe xa_for_each_range() can be used to see if a given 2mb/1gb range is
+completely covered (fully shared) or not covered at all (fully private), but I'm
+not 100% certain that xa_for_each_range() works the way I think it does.
