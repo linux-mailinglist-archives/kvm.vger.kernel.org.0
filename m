@@ -2,72 +2,62 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id BA2365751EB
-	for <lists+kvm@lfdr.de>; Thu, 14 Jul 2022 17:35:33 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 783715751F8
+	for <lists+kvm@lfdr.de>; Thu, 14 Jul 2022 17:37:14 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S240337AbiGNPf2 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 14 Jul 2022 11:35:28 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40110 "EHLO
+        id S239300AbiGNPhM (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 14 Jul 2022 11:37:12 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42320 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S240189AbiGNPfW (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 14 Jul 2022 11:35:22 -0400
-Received: from mail-pl1-x636.google.com (mail-pl1-x636.google.com [IPv6:2607:f8b0:4864:20::636])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 30FD948C8F
-        for <kvm@vger.kernel.org>; Thu, 14 Jul 2022 08:35:20 -0700 (PDT)
-Received: by mail-pl1-x636.google.com with SMTP id r1so731553plo.10
-        for <kvm@vger.kernel.org>; Thu, 14 Jul 2022 08:35:20 -0700 (PDT)
+        with ESMTP id S231145AbiGNPhL (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 14 Jul 2022 11:37:11 -0400
+Received: from mail-pl1-x64a.google.com (mail-pl1-x64a.google.com [IPv6:2607:f8b0:4864:20::64a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F16014AD7E
+        for <kvm@vger.kernel.org>; Thu, 14 Jul 2022 08:37:09 -0700 (PDT)
+Received: by mail-pl1-x64a.google.com with SMTP id k18-20020a170902c41200b0016c40543af4so380181plk.0
+        for <kvm@vger.kernel.org>; Thu, 14 Jul 2022 08:37:09 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=jw1a9NtjnOcexhTaceVUjWOdMbEAyVZWH2rm/Z273eI=;
-        b=YHnEONUUADoF25ewKQsfvyaT/jYYsD0ZZqw3dUFMQPFDIqP6QxU1Gpb0D0zhBERlk4
-         VKYPTedjmR1o9+0RrFfJrMtLJAhnh2jkFQK7FHEckQH6vNf18NIQmbFu1N+i+GcmKMEt
-         awvouvFnp4VVllw+8MZfUeMwz05GBkwWr7fX6y5KGYwKHq/XaaOPCiJOwB4MzUKgrij5
-         2gvb97v1hB5c9mpWrDOHarQOn0UTpIKtgNpN/EwC9h2gVpIJW1UcgrH1N/lH7uZgaaNP
-         kwJpnIKnP6HcP+iRMzRfB/NmzYruha9ZqRvaW3/u19SVpoTlenWU6qcMRSmyNA8OobMB
-         8zQA==
+        h=reply-to:date:message-id:mime-version:subject:from:to:cc;
+        bh=JkRA3Mpa+i25bXGiM48nrv2DUtxPE5vPtImMAiVJCCQ=;
+        b=Esfd8MNtNxWYJPcYQ/wED/Laa6sCw2myW6KT2u8A6wlFKhJXSNSKfH3clFKTZA9/OI
+         1+9sB2Ng3bA3kwy9+0cqTgDXvINhiOPmf6pk+0wLY986MmcP6YOr8hUVDyYUf/1LrAAi
+         7B67RFadbzS8uMub4k4GdRtSAjq6tiUpPLPhWT5/eeSt9ksNQDdFkLXXMDIsnQPRWPGS
+         VeTMT7cR1xl0/FyGhapM84G0P5Bm7JYoT8t5Hb1v9Brddav7LLEpoG6I6NBpgKJnpVcA
+         f7c+GXAHCQ9lM4FQmjYyXNvDakR1e+npIwTA2JDiSUdG/kNePxk8sbvbIoyqL+wOQsFq
+         3wow==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=jw1a9NtjnOcexhTaceVUjWOdMbEAyVZWH2rm/Z273eI=;
-        b=QECmF3NqZ2K3heeklV5ErjcxvS6nFACq51Xk5Hy9wsm8vQSn4QyOEa+zRbkxFwlZMY
-         zAR6jg3BNaNusyDtTJaMs66QfByV2xT+IqnnY7lR3yx+V9PScHJC1RGxK0cOcnFcQ4m3
-         pRXM9xQ2KN8c3dSxTVVwQ2MNS6uDCfFoDk2Trz0NQBPbg64Vk3NiijjgX0XJsH7A3XeG
-         4gqdMzRvK6Sj574a0g+ao3ceP3kY9bB2N2ZVT1WUo8rJigUryYzqGCLOv0qAexXVon8G
-         yp8sEtV3Q39TOjwM7yssfEnYIcLYASiLAdvHqcyYsEjM2IfXmVBHJ2nK6MPwF3BuWR73
-         Iyqw==
-X-Gm-Message-State: AJIora9MQAu3zjsaoXhNCno6zAOZswJJYlbppWr3wpBCBOvxtVKK31QT
-        JBTEktam1uQbbKxjI4OXL+xlmQ==
-X-Google-Smtp-Source: AGRyM1vgNMOGyztZqnYxoIF9PKBibGcaOhduSNpBg1CPhgLHMpeyBynnCEbmfS68T5oS+8JWZemjrA==
-X-Received: by 2002:a17:902:a388:b0:16b:d52b:a038 with SMTP id x8-20020a170902a38800b0016bd52ba038mr8872152pla.56.1657812919607;
-        Thu, 14 Jul 2022 08:35:19 -0700 (PDT)
-Received: from google.com (123.65.230.35.bc.googleusercontent.com. [35.230.65.123])
-        by smtp.gmail.com with ESMTPSA id mm18-20020a17090b359200b001efa35356besm3836222pjb.28.2022.07.14.08.35.18
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 14 Jul 2022 08:35:19 -0700 (PDT)
-Date:   Thu, 14 Jul 2022 15:35:15 +0000
+        h=x-gm-message-state:reply-to:date:message-id:mime-version:subject
+         :from:to:cc;
+        bh=JkRA3Mpa+i25bXGiM48nrv2DUtxPE5vPtImMAiVJCCQ=;
+        b=auIewyzzXI0xJoatyDvOQ7uG3P5lddhFmXgXrf3xiPSU9FO6P5MkXE3fNaU5cTYCL1
+         LnuD/iSMqcR1JgTz39ONclIbfNr7dX3PhbyQMhvkQ+oCgEw0pcTPzcGkw4pifRch0U+A
+         d2e5Tg23nD1SXZPUWByqVVrGgFLxpeSirfQr072yCTqxmbXgm6qxWUP1T/8wlucYIi75
+         Hv8s729mDqqL4mcC5i5D3IOXlpZORoSOU3kGHddaMtTsdBggNeqxyjyEK+FA3l0Eg7lL
+         CQTH8aXflGYPY+8YEkHohGIK93YCtyq+4TGPNTliVdI2j3tSPjxvhYd7mDm1r05mdTMy
+         OKxA==
+X-Gm-Message-State: AJIora9qelTMdz/fso6iJyG3J/3ORtChuly4BPOxlB8020l1jIv81K0H
+        xNNvUfctpElRZZjE0kb1kgrg/darkIE=
+X-Google-Smtp-Source: AGRyM1te2o3cMfktLglQrxa1ovvTodM+d9kHChmo9hfTBQpm8nd+VQWhs3W1f4B7/eBJjtZy3k1LKzSdG9A=
+X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
+ (user=seanjc job=sendgmr) by 2002:a05:6a00:99f:b0:52a:dd61:a50f with SMTP id
+ u31-20020a056a00099f00b0052add61a50fmr8894806pfg.9.1657813029533; Thu, 14 Jul
+ 2022 08:37:09 -0700 (PDT)
+Reply-To: Sean Christopherson <seanjc@google.com>
+Date:   Thu, 14 Jul 2022 15:37:07 +0000
+Message-Id: <20220714153707.3239119-1-seanjc@google.com>
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.37.0.144.g8ac04bfd2-goog
+Subject: [PATCH] KVM: x86: Restrict get_mt_mask() to a u8, use KVM_X86_OP_OPTIONAL_RET0
 From:   Sean Christopherson <seanjc@google.com>
-To:     Paolo Bonzini <pbonzini@redhat.com>
-Cc:     Gavin Shan <gshan@redhat.com>, kvmarm@lists.cs.columbia.edu,
-        kvm@vger.kernel.org, linux-kselftest@vger.kernel.org,
-        linux-kernel@vger.kernel.org, mathieu.desnoyers@efficios.com,
-        shuah@kernel.org, maz@kernel.org, oliver.upton@linux.dev,
-        shan.gavin@gmail.com
-Subject: Re: [PATCH] KVM: selftests: Double check on the current CPU in
- rseq_test
-Message-ID: <YtA3s0VRj3x7vO7B@google.com>
-References: <20220714080642.3376618-1-gshan@redhat.com>
- <cd5d029c-b396-45ef-917b-92e054659623@redhat.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <cd5d029c-b396-45ef-917b-92e054659623@redhat.com>
-X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-        T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL
+To:     Sean Christopherson <seanjc@google.com>,
+        Paolo Bonzini <pbonzini@redhat.com>
+Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL
         autolearn=unavailable autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -75,44 +65,89 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Jul 14, 2022, Paolo Bonzini wrote:
-> On 7/14/22 10:06, Gavin Shan wrote:
-> > In rseq_test, there are two threads created. Those two threads are
-> > 'main' and 'migration_thread' separately. We also have the assumption
-> > that non-migration status on 'migration-worker' thread guarantees the
-> > same non-migration status on 'main' thread. Unfortunately, the assumption
-> > isn't true. The 'main' thread can be migrated from one CPU to another
-> > one between the calls to sched_getcpu() and READ_ONCE(__rseq.cpu_id).
-> > The following assert is raised eventually because of the mismatched
-> > CPU numbers.
-> > 
-> > The issue can be reproduced on arm64 system occasionally.
-> 
-> Hmm, this does not seem a correct patch - the threads are already
-> synchronizing using seq_cnt, like this:
-> 
-> 	migration			main
-> 	----------------------		--------------------------------
-> 	seq_cnt = 1
-> 	smp_wmb()
-> 					snapshot = 0
-> 					smp_rmb()
-> 					cpu = sched_getcpu() reads 23
-> 	sched_setaffinity()
-> 					rseq_cpu = __rseq.cpuid reads 35
-> 					smp_rmb()
-> 					snapshot != seq_cnt -> retry
-> 	smp_wmb()
-> 	seq_cnt = 2
-> 
-> sched_setaffinity() is guaranteed to block until the task is enqueued on an
-> allowed CPU.
+Restrict get_mt_mask() to a u8 and reintroduce using a RET0 static_call
+for the SVM implementation.  EPT stores the memtype information in the
+lower 8 bits (bits 6:3 to be precise), and even returns a shifted u8
+without an explicit cast to a larger type; there's no need to return a
+full u64.
 
-Yes, and retrying could suppress detection of kernel bugs that this test is intended
-to catch.
+Note, RET0 doesn't play nice with a u64 return on 32-bit kernels, see
+commit bf07be36cd88 ("KVM: x86: do not use KVM_X86_OP_OPTIONAL_RET0 for
+get_mt_mask").
 
-> Can you check that smp_rmb() and smp_wmb() generate correct instructions on
-> arm64?
+Signed-off-by: Sean Christopherson <seanjc@google.com>
+---
+ arch/x86/include/asm/kvm-x86-ops.h | 2 +-
+ arch/x86/include/asm/kvm_host.h    | 2 +-
+ arch/x86/kvm/svm/svm.c             | 6 ------
+ arch/x86/kvm/vmx/vmx.c             | 2 +-
+ 4 files changed, 3 insertions(+), 9 deletions(-)
 
-That seems like the most likely scenario (or a kernel bug), I distinctly remember
-the barriers provided by tools/ being rather bizarre.
+diff --git a/arch/x86/include/asm/kvm-x86-ops.h b/arch/x86/include/asm/kvm-x86-ops.h
+index 6f2f1affbb78..51f777071584 100644
+--- a/arch/x86/include/asm/kvm-x86-ops.h
++++ b/arch/x86/include/asm/kvm-x86-ops.h
+@@ -88,7 +88,7 @@ KVM_X86_OP(deliver_interrupt)
+ KVM_X86_OP_OPTIONAL(sync_pir_to_irr)
+ KVM_X86_OP_OPTIONAL_RET0(set_tss_addr)
+ KVM_X86_OP_OPTIONAL_RET0(set_identity_map_addr)
+-KVM_X86_OP(get_mt_mask)
++KVM_X86_OP_OPTIONAL_RET0(get_mt_mask)
+ KVM_X86_OP(load_mmu_pgd)
+ KVM_X86_OP(has_wbinvd_exit)
+ KVM_X86_OP(get_l2_tsc_offset)
+diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
+index de5a149d0971..fa4b2392fba0 100644
+--- a/arch/x86/include/asm/kvm_host.h
++++ b/arch/x86/include/asm/kvm_host.h
+@@ -1546,7 +1546,7 @@ struct kvm_x86_ops {
+ 	int (*sync_pir_to_irr)(struct kvm_vcpu *vcpu);
+ 	int (*set_tss_addr)(struct kvm *kvm, unsigned int addr);
+ 	int (*set_identity_map_addr)(struct kvm *kvm, u64 ident_addr);
+-	u64 (*get_mt_mask)(struct kvm_vcpu *vcpu, gfn_t gfn, bool is_mmio);
++	u8 (*get_mt_mask)(struct kvm_vcpu *vcpu, gfn_t gfn, bool is_mmio);
+ 
+ 	void (*load_mmu_pgd)(struct kvm_vcpu *vcpu, hpa_t root_hpa,
+ 			     int root_level);
+diff --git a/arch/x86/kvm/svm/svm.c b/arch/x86/kvm/svm/svm.c
+index 37ce061dfc76..19af6dacfc5b 100644
+--- a/arch/x86/kvm/svm/svm.c
++++ b/arch/x86/kvm/svm/svm.c
+@@ -4158,11 +4158,6 @@ static bool svm_has_emulated_msr(struct kvm *kvm, u32 index)
+ 	return true;
+ }
+ 
+-static u64 svm_get_mt_mask(struct kvm_vcpu *vcpu, gfn_t gfn, bool is_mmio)
+-{
+-	return 0;
+-}
+-
+ static void svm_vcpu_after_set_cpuid(struct kvm_vcpu *vcpu)
+ {
+ 	struct vcpu_svm *svm = to_svm(vcpu);
+@@ -4814,7 +4809,6 @@ static struct kvm_x86_ops svm_x86_ops __initdata = {
+ 	.check_apicv_inhibit_reasons = avic_check_apicv_inhibit_reasons,
+ 	.apicv_post_state_restore = avic_apicv_post_state_restore,
+ 
+-	.get_mt_mask = svm_get_mt_mask,
+ 	.get_exit_info = svm_get_exit_info,
+ 
+ 	.vcpu_after_set_cpuid = svm_vcpu_after_set_cpuid,
+diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
+index c30115b9cb33..c895a3b6824d 100644
+--- a/arch/x86/kvm/vmx/vmx.c
++++ b/arch/x86/kvm/vmx/vmx.c
+@@ -7352,7 +7352,7 @@ static int __init vmx_check_processor_compat(void)
+ 	return 0;
+ }
+ 
+-static u64 vmx_get_mt_mask(struct kvm_vcpu *vcpu, gfn_t gfn, bool is_mmio)
++static u8 vmx_get_mt_mask(struct kvm_vcpu *vcpu, gfn_t gfn, bool is_mmio)
+ {
+ 	u8 cache;
+ 
+
+base-commit: b9b71f43683ae9d76b0989249607bbe8c9eb6c5c
+-- 
+2.37.0.144.g8ac04bfd2-goog
+
