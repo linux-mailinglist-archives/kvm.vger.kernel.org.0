@@ -2,192 +2,84 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 66F9A5755C9
-	for <lists+kvm@lfdr.de>; Thu, 14 Jul 2022 21:22:16 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 73FAF5755D1
+	for <lists+kvm@lfdr.de>; Thu, 14 Jul 2022 21:27:08 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S240218AbiGNTWM (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 14 Jul 2022 15:22:12 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57266 "EHLO
+        id S240446AbiGNT1H (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 14 Jul 2022 15:27:07 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60428 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S240104AbiGNTWL (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 14 Jul 2022 15:22:11 -0400
-Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 86AFE4598E
-        for <kvm@vger.kernel.org>; Thu, 14 Jul 2022 12:22:06 -0700 (PDT)
-Received: from pps.filterd (m0098417.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.17.1.5/8.17.1.5) with ESMTP id 26EJ63Wr010465;
-        Thu, 14 Jul 2022 19:21:59 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
- mime-version : subject : to : cc : references : from : in-reply-to :
- content-type : content-transfer-encoding; s=pp1;
- bh=MG7O88yiW2GOcl6J8Wymi5f93H9cXEeMeux3fKnqwZ0=;
- b=l6BBicIiGldGpYooJ29if9zDySsgr82970/scr6TpXkf2o9FIXMEbyRX4ehxDEvgPBur
- xIM49WhA+sYgzDfeFjVKDLYqO45kpvztvr4cOsui8AufIGEfOhSjby0EiawcwWkS35Da
- xMA5MJiCOGjeJxOP533ExDVP3GHPVTWpU/fzv3tmUYhqZivRw0kUzH745pVZjpEPV8PR
- QFjzUIKOUfW+ly5eFus2QPNrwld7Hm/ThniO5ZnEQDP0b0i2bY8D3cYQun2nXATXT44P
- bC2DF4qUPycfLSrZGomg3eFjWoABoB5V+d0r0Z7yx8MGnZRtZbFME/tDn95Scl4WDLPY uw== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3has0nr9hg-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 14 Jul 2022 19:21:59 +0000
-Received: from m0098417.ppops.net (m0098417.ppops.net [127.0.0.1])
-        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 26EJLwWX010585;
-        Thu, 14 Jul 2022 19:21:58 GMT
-Received: from ppma06ams.nl.ibm.com (66.31.33a9.ip4.static.sl-reverse.com [169.51.49.102])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3has0nr9gr-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 14 Jul 2022 19:21:58 +0000
-Received: from pps.filterd (ppma06ams.nl.ibm.com [127.0.0.1])
-        by ppma06ams.nl.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 26EJKMZw008204;
-        Thu, 14 Jul 2022 19:21:56 GMT
-Received: from b06cxnps4074.portsmouth.uk.ibm.com (d06relay11.portsmouth.uk.ibm.com [9.149.109.196])
-        by ppma06ams.nl.ibm.com with ESMTP id 3h70xhyfp7-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 14 Jul 2022 19:21:56 +0000
-Received: from d06av26.portsmouth.uk.ibm.com (d06av26.portsmouth.uk.ibm.com [9.149.105.62])
-        by b06cxnps4074.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 26EJLr9016974288
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Thu, 14 Jul 2022 19:21:53 GMT
-Received: from d06av26.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 10BA4AE04D;
-        Thu, 14 Jul 2022 19:21:53 +0000 (GMT)
-Received: from d06av26.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id E9D68AE045;
-        Thu, 14 Jul 2022 19:21:51 +0000 (GMT)
-Received: from [9.171.80.107] (unknown [9.171.80.107])
-        by d06av26.portsmouth.uk.ibm.com (Postfix) with ESMTP;
-        Thu, 14 Jul 2022 19:21:51 +0000 (GMT)
-Message-ID: <14a44966-474e-17f5-4e9e-01a94c02c289@linux.ibm.com>
-Date:   Thu, 14 Jul 2022 21:26:34 +0200
+        with ESMTP id S232306AbiGNT1G (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 14 Jul 2022 15:27:06 -0400
+Received: from mail.skyhub.de (mail.skyhub.de [IPv6:2a01:4f8:190:11c2::b:1457])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 609CB49B5A;
+        Thu, 14 Jul 2022 12:27:04 -0700 (PDT)
+Received: from [127.0.0.1] (dynamic-002-247-249-041.2.247.pool.telefonica.de [2.247.249.41])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+        (No client certificate requested)
+        by mail.skyhub.de (SuperMail on ZX Spectrum 128k) with ESMTPSA id 3C4FA1EC0434;
+        Thu, 14 Jul 2022 21:26:58 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alien8.de; s=dkim;
+        t=1657826818;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=Z4MQJTZj6BmKFE8enGCuKKJcgI7E41yi2bEFmH/f2RE=;
+        b=WKZJWjPprl/ocjkLjPori4zBGFj2SBPEhyTAfzDr1Ks4lBVL8yIT4mZbt/PR+Ks+M52R4M
+        elaR0vHa3qV9grOTlmkZZFb/yyGRPvnYwfvlWuN5yei8RzKiCWr/9QtwZuuC7jE1kiaPTz
+        oOCh3xgqvApT0Xo/rmM2Rm687SYBfp4=
+Date:   Thu, 14 Jul 2022 19:26:54 +0000
+From:   Boris Petkov <bp@alien8.de>
+To:     Linus Torvalds <torvalds@linux-foundation.org>,
+        Peter Zijlstra <peterz@infradead.org>
+CC:     Paolo Bonzini <pbonzini@redhat.com>,
+        Guenter Roeck <linux@roeck-us.net>,
+        Thadeu Lima de Souza Cascardo <cascardo@canonical.com>,
+        Naresh Kamboju <naresh.kamboju@linaro.org>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        Slade Watkins <slade@sladewatkins.com>,
+        Florian Fainelli <f.fainelli@gmail.com>,
+        Dave Hansen <dave.hansen@linux.intel.com>,
+        X86 ML <x86@kernel.org>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        kvm list <kvm@vger.kernel.org>,
+        Jon Hunter <jonathanh@nvidia.com>,
+        Sudip Mukherjee <sudipm.mukherjee@gmail.com>,
+        patches@kernelci.org, Sean Christopherson <seanjc@google.com>,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+        Shuah Khan <shuah@kernel.org>, stable <stable@vger.kernel.org>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, lkft-triage@lists.linaro.org,
+        Pavel Machek <pavel@denx.de>, "H. Peter Anvin" <hpa@zytor.com>,
+        =?ISO-8859-1?Q?Alex_Benn=E9e?= <alex.bennee@linaro.org>,
+        Anders Roxell <anders.roxell@linaro.org>
+Subject: Re: [PATCH 5.15 00/78] 5.15.55-rc1 review
+In-Reply-To: <CAHk-=whYia1fnjJFiJ59xZv4ROqqTfG4crQNWxb71JYJf5B-Lg@mail.gmail.com>
+References: <20220712183238.844813653@linuxfoundation.org> <CA+G9fYtntg7=zWSs-dm+n_AUr_u0eBOU0zrwWqMeXZ+SF6_bLw@mail.gmail.com> <eb63e4ce-843f-c840-060e-6e15defd3c4d@roeck-us.net> <CAHk-=wj5cOA+fbGeV15kvwe6YGT54Wsk8F2UGoekVQLTPJz_pw@mail.gmail.com> <CAHk-=wgq1soM4gudypWLVQdYuvJbXn38LtvJMtnLZX+RTypqLg@mail.gmail.com> <Ys/bYJ2bLVfNBjFI@nazgul.tnic> <6b4337f4-d1de-7ba3-14e8-3ad0f9b18788@redhat.com> <8BEC3365-FC09-46C5-8211-518657C0308E@alien8.de> <CAHk-=wj4vtoWZPMXJU-B9qW1zLHsoA1Qb2P0NW=UFhZmrCrf9Q@mail.gmail.com> <YtBQutgSh2j3mFNB@worktop.programming.kicks-ass.net> <CAHk-=wjAouqJQ=C4XZVUmWEV9kerNzbOkK9OeErpHshNkcR=gQ@mail.gmail.com> <CAHk-=whYia1fnjJFiJ59xZv4ROqqTfG4crQNWxb71JYJf5B-Lg@mail.gmail.com>
+Message-ID: <6210C171-BBBD-4FC4-B5FF-68D715941501@alien8.de>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.3.0
-Subject: Re: [PATCH v8 02/12] s390x/cpu_topology: CPU topology objects and
- structures
-Content-Language: en-US
-To:     Janis Schoetterl-Glausch <scgl@linux.ibm.com>,
-        qemu-s390x@nongnu.org
-Cc:     qemu-devel@nongnu.org, borntraeger@de.ibm.com, pasic@linux.ibm.com,
-        richard.henderson@linaro.org, david@redhat.com, thuth@redhat.com,
-        cohuck@redhat.com, mst@redhat.com, pbonzini@redhat.com,
-        kvm@vger.kernel.org, ehabkost@redhat.com,
-        marcel.apfelbaum@gmail.com, eblake@redhat.com, armbru@redhat.com,
-        seiden@linux.ibm.com, nrb@linux.ibm.com, frankja@linux.ibm.com
-References: <20220620140352.39398-1-pmorel@linux.ibm.com>
- <20220620140352.39398-3-pmorel@linux.ibm.com>
- <de92ef17-3a17-df44-97aa-19e67d1d5b3d@linux.ibm.com>
- <5215ca74-e71c-73df-69c9-d2522e082706@linux.ibm.com>
- <53698be8-0eab-8dc2-2d54-df2a89e1092f@linux.ibm.com>
- <4fef46f1-f43f-665f-47dc-89107385572e@linux.ibm.com>
- <0a4ab4e8-e628-0865-0198-384b4fcc88de@linux.ibm.com>
-From:   Pierre Morel <pmorel@linux.ibm.com>
-In-Reply-To: <0a4ab4e8-e628-0865-0198-384b4fcc88de@linux.ibm.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-ORIG-GUID: lXhazBK6dldPjYMzqEOObmgaJdL3x51s
-X-Proofpoint-GUID: xpcLAIX0w7LAsWmNY6QIdPcEH_BM-sd1
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.205,Aquarius:18.0.883,Hydra:6.0.517,FMLib:17.11.122.1
- definitions=2022-07-14_17,2022-07-14_01,2022-06-22_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 malwarescore=0 phishscore=0
- adultscore=0 suspectscore=0 mlxlogscore=999 mlxscore=0 clxscore=1015
- priorityscore=1501 lowpriorityscore=0 spamscore=0 bulkscore=0
- impostorscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2206140000 definitions=main-2207140083
-X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,
-        SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no
-        version=3.4.6
+Content-Type: text/plain;
+ charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,SPF_HELO_NONE,SPF_PASS,
+        T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+On July 14, 2022 6:16:40 PM UTC, Linus Torvalds <torvalds@linux-foundation=
+=2Eorg> wrote:
+>So yeah, it would be less dense, but do we care? Wouldn't the "this is
+>really simple" be a nice thing? It's not like there are a ton of those
+>fastop functions anyway=2E 128 of them? Plus 16 of the "setCC" ones?
 
+I definitely like simple=2E
 
-On 7/14/22 14:50, Janis Schoetterl-Glausch wrote:
-> On 7/14/22 13:25, Pierre Morel wrote:
-> 
-> [...]
-> 
->>
->> That is sure.
->> I thought about put a fatal error report during the initialization in the s390_topology_setup()
->>
->>> And you can set thread > 1 today, so we'd need to handle that. (increase the number of cpus instead and print a warning?)
->>>
->>> [...]
->>
->> this would introduce arch dependencies in the hw/core/
->> I think that the error report for Z is enough.
->>
->> So once we support Multithreading in the guest we can adjust it easier without involving the common code.
->>
->> Or we can introduce a thread_supported in SMPCompatProps, which would be good.
->> I would prefer to propose this outside of the series and suppress the fatal error once it is adopted.
->>
-> 
-> Yeah, could be a separate series, but then the question remains what you in this one, that is
-> if you change the code so it would be correct if multithreading were supported.
+Along with a comment why we have this magic 16 there=2E
 
-I would like to first not support multi-thread and do a fatal error if 
-threads are defined or implicitly defined as different of 1.
-
-I prefer to keep multithreading for later, I did not have a look at all 
-the implications for the moment.
-
->>>
->>>>>> +
->>>>>> +/*
->>>>>> + * Setting the first topology: 1 book, 1 socket
->>>>>> + * This is enough for 64 cores if the topology is flat (single socket)
->>>>>> + */
->>>>>> +void s390_topology_setup(MachineState *ms)
->>>>>> +{
->>>>>> +    DeviceState *dev;
->>>>>> +
->>>>>> +    /* Create BOOK bridge device */
->>>>>> +    dev = qdev_new(TYPE_S390_TOPOLOGY_BOOK);
->>>>>> +    object_property_add_child(qdev_get_machine(),
->>>>>> +                              TYPE_S390_TOPOLOGY_BOOK, OBJECT(dev));
->>>>>
->>>>> Why add it to the machine instead of directly using a static?
->>>>
->>>> For my opinion it is a characteristic of the machine.
->>>>
->>>>> So it's visible to the user via info qtree or something?
->>>>
->>>> It is already visible to the user on info qtree.
->>>>
->>>>> Would that even be the appropriate location to show that?
->>>>
->>>> That is a very good question and I really appreciate if we discuss on the design before diving into details.
->>>>
->>>> The idea is to have the architecture details being on qtree as object so we can plug new drawers/books/socket/cores and in the future when the infrastructure allows it unplug them.
->>>
->>> Would it not be more accurate to say that we plug in new cpus only?
->>> Since you need to specify the topology up front with -smp and it cannot change after.
->>
->> smp specify the maximum we can have.
->> I thought we can add dynamically elements inside this maximum set.
->>
->>> So that all is static, books/sockets might be completely unpopulated, but they still exist in a way.
->>> As far as I understand, STSI only allows for cpus to change, nothing above it.
->>
->> I thought we want to plug new books or drawers but I may be wrong.
-> 
-> So you want to be able to plug in, for example, a socket without any cpus in it?
-> I'm not seeing anything in the description of STSI that forbids having empty containers
-> or containers with a cpu entry without any cpus. But I don't know why that would be useful.
-> And if you don't want empty containers, then the container will just show up when plugging in the cpu.
-
-You already convinced me, it is a non sense and, anyway, building every 
-container when a cpu is added is how it works with the current 
-implementation.
-
-
--- 
-Pierre Morel
-IBM Lab Boeblingen
+--=20
+Sent from a small device: formatting sux and brevity is inevitable=2E 
