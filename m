@@ -2,157 +2,146 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id CF3BA575683
-	for <lists+kvm@lfdr.de>; Thu, 14 Jul 2022 22:45:15 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id C2A42575690
+	for <lists+kvm@lfdr.de>; Thu, 14 Jul 2022 22:48:14 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S240733AbiGNUpO (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 14 Jul 2022 16:45:14 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56514 "EHLO
+        id S232580AbiGNUsL (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 14 Jul 2022 16:48:11 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59172 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S240895AbiGNUpJ (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 14 Jul 2022 16:45:09 -0400
-Received: from mail-lj1-x22d.google.com (mail-lj1-x22d.google.com [IPv6:2a00:1450:4864:20::22d])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9B6C167585
-        for <kvm@vger.kernel.org>; Thu, 14 Jul 2022 13:45:08 -0700 (PDT)
-Received: by mail-lj1-x22d.google.com with SMTP id 19so3544919ljz.4
-        for <kvm@vger.kernel.org>; Thu, 14 Jul 2022 13:45:08 -0700 (PDT)
+        with ESMTP id S231858AbiGNUsJ (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 14 Jul 2022 16:48:09 -0400
+Received: from mail-pj1-x1032.google.com (mail-pj1-x1032.google.com [IPv6:2607:f8b0:4864:20::1032])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 216C46D54C
+        for <kvm@vger.kernel.org>; Thu, 14 Jul 2022 13:48:09 -0700 (PDT)
+Received: by mail-pj1-x1032.google.com with SMTP id v4-20020a17090abb8400b001ef966652a3so9699774pjr.4
+        for <kvm@vger.kernel.org>; Thu, 14 Jul 2022 13:48:09 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linux-foundation.org; s=google;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=TExNSZ/s/035rcwvcGhKf8b3mCtg1+8MAx2E+0mZs0k=;
-        b=QlimJt9jnXA9WGUrrQpsyCnanjLLw2jppJeg8tlDJyUjoU7EVZkhjwQfw1utPbJFYw
-         V2J/VhZUmpGT/0AOkO/cGcOvDnr/166nGbtK/23TIpPRTkOHY0byi1fwM5PVz2v65CaC
-         CGxmh6/85iCwDd/Ru/CPAYbK8QhOpNrWTrRyY=
+        d=google.com; s=20210112;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=mSRou1PhzsYjm7k/grZYwfjL/pwkxUatLT38df/fPoI=;
+        b=pBGoXZdTh2ue9+c7H3VZEU5J6f4gMUBXHGUoPjJIGhDY8uAT3LxEHkL5gR2z/kKn2O
+         /oWTpOYtUTH9PwycJPyXH6pqnqvsUY14Q7KT0+0ky554VNtXa06Joa2XYzKiw9cUrtdS
+         6LNeVAmlGJRMquH8hyrvz/nBpeXuYZ9W6sZ8X2/5oAwJmQAIn5CTAkTekW92AD0CSFTo
+         FgJRK9M68Jj5c9QZCkzHnkZheJs5YiGK99a6nEEThYpBSAz8J1Z+AkYS2TtcS+2mGpze
+         yIZk6lZqJlkb3eKaHScjqar0vR7OKJBii/ZgsoTFlbp8Zrmd28UXpqQX876L8wd6MeRT
+         HGFA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=TExNSZ/s/035rcwvcGhKf8b3mCtg1+8MAx2E+0mZs0k=;
-        b=hLNo4+84wGRLCdxw9cBXd556WMgLLkBmZXsBdTNQkbTTpV7FMb+1LGlIbW4EtrF6gv
-         XKL1EPa2Tzz1vPEkn+0Wd+lnKPCmTXdgvs0c12mgyB+8s7vDE0D9rY1WcmPWwE7oPMli
-         Q4P3viwMGlvAB+zHN1JAYu9G2bldOjKHqvO6guqh6sRXI0Thc0BnDe0vGx1ECt0BoB1v
-         YxbmwxL09QpwWi2w4cgXNZ6bXDNp1lbNHDp8V73M9b/E/cnoo9SfSQRjUKM4EbWZqlS4
-         UB6CoDiiV+oTeP5bQNnxJ2fPRmarXalspag1848yxpYnHt4ii2C5j6JHhcCfwHK9qes2
-         0NJw==
-X-Gm-Message-State: AJIora/LZT7N58id66Gh0bthPk4L8Ix7uR+nYtp7pB0Sul/NFwYsJeV8
-        vDsE3TQru6Sgh2w4cXOuJ/GXtAZRQkAtHvgbkqY=
-X-Google-Smtp-Source: AGRyM1u7Ji3ZLTym8jtECxnl0pfof5Bun8Gip8N4Y0osClN0iriSMm0fsde3goFLnvRwGrMHBu0xbw==
-X-Received: by 2002:a2e:9ccc:0:b0:25d:96da:42c1 with SMTP id g12-20020a2e9ccc000000b0025d96da42c1mr2993559ljj.498.1657831506635;
-        Thu, 14 Jul 2022 13:45:06 -0700 (PDT)
-Received: from mail-lj1-f182.google.com (mail-lj1-f182.google.com. [209.85.208.182])
-        by smtp.gmail.com with ESMTPSA id d25-20020a19e619000000b00489c7fb668dsm522014lfh.182.2022.07.14.13.45.06
-        for <kvm@vger.kernel.org>
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 14 Jul 2022 13:45:06 -0700 (PDT)
-Received: by mail-lj1-f182.google.com with SMTP id x10so3072088ljj.11
-        for <kvm@vger.kernel.org>; Thu, 14 Jul 2022 13:45:06 -0700 (PDT)
-X-Received: by 2002:a05:6000:1f8c:b0:21d:7e98:51ba with SMTP id
- bw12-20020a0560001f8c00b0021d7e9851bamr9427301wrb.442.1657831181447; Thu, 14
- Jul 2022 13:39:41 -0700 (PDT)
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=mSRou1PhzsYjm7k/grZYwfjL/pwkxUatLT38df/fPoI=;
+        b=o3ScRdg01r/NM8qOZpn/jlhFHHwKbMmG/zml9Ybh6exaGgg69a1aDBVE4NsbLJupNd
+         RnJhwNIHVkzKnSqClA7PZz8W0e53/rrgQ+eaOlpOggoTxrjAp+f9a+KnirlaYLBlKJHS
+         Ho2sxPQhWtUU9+EA8onJvhA/r0sfgyO9ov3dIuMUT4wOzY1bn/j531/7+PiRZWOTCrea
+         2Lk2JbXg/6YOnlrRpP68d2FmQjafQtAH4+UijZIcH+LBzb1/y3jZ7cnRdDq02Ur/GD+r
+         fB+vqAvhFm/ABQRXZDbFI0pT/LQNV0iLeipzVu2/qmVLGlyW+A2W9tqQ88wtvgis0cws
+         7J0Q==
+X-Gm-Message-State: AJIora/ImQk+kvAlYHW+rLNhbXWhEb05OywmFlMNMLb5YEnCMw2taRS0
+        6Ht7H/1jV/fBTk2Ub12QVyxHyw==
+X-Google-Smtp-Source: AGRyM1t6lm6gtW7mhlQX+tJ8yq+NHR/YlGDlJZGmx0AZnqYEErBsfIaRObkiVIjHGPdA9qtPK4nKGw==
+X-Received: by 2002:a17:903:451:b0:16c:b873:4a8 with SMTP id iw17-20020a170903045100b0016cb87304a8mr2962140plb.47.1657831688513;
+        Thu, 14 Jul 2022 13:48:08 -0700 (PDT)
+Received: from google.com (123.65.230.35.bc.googleusercontent.com. [35.230.65.123])
+        by smtp.gmail.com with ESMTPSA id p13-20020a63e64d000000b0040c9df2b060sm1831377pgj.30.2022.07.14.13.48.07
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 14 Jul 2022 13:48:07 -0700 (PDT)
+Date:   Thu, 14 Jul 2022 20:48:04 +0000
+From:   Sean Christopherson <seanjc@google.com>
+To:     Peter Xu <peterx@redhat.com>
+Cc:     Shivam Kumar <shivam.kumar1@nutanix.com>,
+        Marc Zyngier <maz@kernel.org>, pbonzini@redhat.com,
+        james.morse@arm.com, borntraeger@linux.ibm.com, david@redhat.com,
+        kvm@vger.kernel.org, Shaju Abraham <shaju.abraham@nutanix.com>,
+        Manish Mishra <manish.mishra@nutanix.com>,
+        Anurag Madnawat <anurag.madnawat@nutanix.com>
+Subject: Re: [PATCH v4 1/4] KVM: Implement dirty quota-based throttling of
+ vcpus
+Message-ID: <YtCBBI+rU+UQNm4p@google.com>
+References: <20220521202937.184189-2-shivam.kumar1@nutanix.com>
+ <87h75fmmkj.wl-maz@kernel.org>
+ <bf24e007-23fd-2582-ec0c-5e79ab0c7d56@nutanix.com>
+ <878rqomnfr.wl-maz@kernel.org>
+ <Yo+gTbo5uqqAMjjX@google.com>
+ <877d68mfqv.wl-maz@kernel.org>
+ <Yo+82LjHSOdyxKzT@google.com>
+ <b75013cb-0d40-569a-8a31-8ebb7cf6c541@nutanix.com>
+ <2e5198b3-54ea-010e-c418-f98054befe1b@nutanix.com>
+ <YtBanRozLuP9qoWs@xz-m1.local>
 MIME-Version: 1.0
-References: <20220712183238.844813653@linuxfoundation.org> <CA+G9fYtntg7=zWSs-dm+n_AUr_u0eBOU0zrwWqMeXZ+SF6_bLw@mail.gmail.com>
- <eb63e4ce-843f-c840-060e-6e15defd3c4d@roeck-us.net> <CAHk-=wj5cOA+fbGeV15kvwe6YGT54Wsk8F2UGoekVQLTPJz_pw@mail.gmail.com>
- <CAHk-=wgq1soM4gudypWLVQdYuvJbXn38LtvJMtnLZX+RTypqLg@mail.gmail.com>
- <Ys/bYJ2bLVfNBjFI@nazgul.tnic> <CAHk-=wjdafFUFwwQNvNQY_D32CBXnp6_V=DL2FpbbdstVxafow@mail.gmail.com>
- <YtBLe5AziniDm/Wt@nazgul.tnic>
-In-Reply-To: <YtBLe5AziniDm/Wt@nazgul.tnic>
-From:   Linus Torvalds <torvalds@linux-foundation.org>
-Date:   Thu, 14 Jul 2022 13:39:25 -0700
-X-Gmail-Original-Message-ID: <CAHk-=wghZB60WCh5M_Y0n1qGYbg-1fvWFnU-bV-4j1bQM1qE5A@mail.gmail.com>
-Message-ID: <CAHk-=wghZB60WCh5M_Y0n1qGYbg-1fvWFnU-bV-4j1bQM1qE5A@mail.gmail.com>
-Subject: Re: [PATCH 5.15 00/78] 5.15.55-rc1 review
-To:     Borislav Petkov <bp@alien8.de>
-Cc:     Guenter Roeck <linux@roeck-us.net>,
-        Peter Zijlstra <peterz@infradead.org>,
-        Thadeu Lima de Souza Cascardo <cascardo@canonical.com>,
-        Naresh Kamboju <naresh.kamboju@linaro.org>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        kvm list <kvm@vger.kernel.org>,
-        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-        stable <stable@vger.kernel.org>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        Shuah Khan <shuah@kernel.org>, patches@kernelci.org,
-        lkft-triage@lists.linaro.org, Pavel Machek <pavel@denx.de>,
-        Jon Hunter <jonathanh@nvidia.com>,
-        Florian Fainelli <f.fainelli@gmail.com>,
-        Sudip Mukherjee <sudipm.mukherjee@gmail.com>,
-        Slade Watkins <slade@sladewatkins.com>,
-        Sean Christopherson <seanjc@google.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>,
-        Dave Hansen <dave.hansen@linux.intel.com>,
-        X86 ML <x86@kernel.org>, "H. Peter Anvin" <hpa@zytor.com>,
-        =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>,
-        Anders Roxell <anders.roxell@linaro.org>
-Content-Type: text/plain; charset="UTF-8"
-X-Spam-Status: No, score=-1.8 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-        RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
-        autolearn=no autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <YtBanRozLuP9qoWs@xz-m1.local>
+X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
+        T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Jul 14, 2022 at 10:02 AM Borislav Petkov <bp@alien8.de> wrote:
+On Thu, Jul 14, 2022, Peter Xu wrote:
+> Hi, Shivam,
+> 
+> On Tue, Jul 05, 2022 at 12:51:01PM +0530, Shivam Kumar wrote:
+> > Hi, here's a summary of what needs to be changed and what should be kept as
+> > it is (purely my opinion based on the discussions we have had so far):
+> > 
+> > i) Moving the dirty quota check to mark_page_dirty_in_slot. Use kvm requests
+> > in dirty quota check. I hope that the ceiling-based approach, with proper
+> > documentation and an ioctl exposed for resetting 'dirty_quota' and
+> > 'pages_dirtied', is good enough. Please post your suggestions if you think
+> > otherwise.
+> 
+> An ioctl just for this could be an overkill to me.
 >
-> On Thu, Jul 14, 2022 at 09:51:40AM -0700, Linus Torvalds wrote:
-> > Oh, absolutely. Doing an -rc7 is normal.
->
-> Good. I'm gathering all the fallout fixes and will send them to you on
-> Sunday, if nothing unexpected happens.
+> Currently you exposes only "quota" to kvm_run, then when vmexit you have
+> exit fields contain both "quota" and "count".  I always think it's a bit
+> redundant.
+> 
+> What I'm thinking is:
+> 
+>   (1) Expose both "quota" and "count" in kvm_run, then:
+> 
+>       "quota" should only be written by userspace and read by kernel.
+>       "count" should only be written by kernel and read by the userspace. [*]
+> 
+>       [*] One special case is when the userspace found that there's risk of
+>       quota & count overflow, then the userspace:
+> 
+>         - Kick the vcpu out (so the kernel won't write to "count" anymore)
+>         - Update both "quota" and "count" to safe values
+>         - Resume the KVM_RUN
+> 
+>   (2) When quota reached, we don't need to copy quota/count in vmexit
+>       fields, since the userspace can read the realtime values in kvm_run.
+> 
+> Would this work?
 
-Btw, I assume that includes the clang fix for the
-x86_spec_ctrl_current section attribute.
+Technically, yes, practically speaking, no.  If KVM doesn't provide the quota
+that _KVM_ saw at the time of exit, then there's no sane way to audit KVM exits
+due to KVM_EXIT_DIRTY_QUOTA_EXHAUSTED.  Providing the quota ensure userspace sees
+sane, coherent data if there's a race between KVM checking the quota and userspace
+updating the quota.  If KVM doesn't provide the quota, then userspace can see an
+exit with "count < quota".
 
-That's kind of personally embarrassing that it slipped through: I do
-all my normal test builds that I actually *boot* with clang.
+Even if userspace is ok with such races, it will be extremely difficult to detect
+KVM issues if we mess something up because such behavior would have to be allowed
+by KVM's ABI.
 
-But since I kept all of the embargoed stuff outside my normal trees,
-it also meant that the test builds I did didn't have my "this is my
-clang tree" stuff in it.
+> > ii) The change in VMX's handle_invalid_guest_state() remains as it is.
+> > iii) For now, we are lazily updating dirty quota, i.e. we are updating it
+> > only when the vcpu exits to userspace with the exit reason
+> > KVM_EXIT_DIRTY_QUOTA_EXHAUSTED.
+> 
+> At least with above design, IMHO we can update kvm_run.quota in real time
+> without kicking vcpu threads (the quota only increases except the reset
+> phase for overflow).  Or is there any other reason you need to kick vcpu
+> out when updating quota?
 
-And so I - like apparently everybody else - only did those builds with gcc.
-
-And gcc for some reason doesn't care about this whole "you redeclared
-that variable with a different attribute" thing.
-
-And sadly, our percpu accessor functions don't verify these things
-either, so you can write code like this:
-
-    unsigned long myvariable;
-
-    unsigned long test_fn(void)
-    {
-        return this_cpu_read(myvariable);
-    }
-
-and the compiler will not complain about anything at all, and happily
-generate completely nonsensical code like
-
-        movq %gs:myvariable(%rip), %rax
-
-for it, which will do entirely the wrong thing because 'myvariable'
-wasn't allocated in the percpu section.
-
-In the 'x86_spec_ctrl_current' case, that nonsensical code _worked_
-(with gcc), because despite the declaration being for a regular
-variable, the actual definition was in the proper segment.
-
-But that 'myvariable' thing above does end up being another example of
-how we are clearly missing some type checkng in this area.
-
-I'm not sure if there's any way to get that section mismatch at
-compile-time at all. For the static declarations, we could just make
-DECLARE_PER_CPU() add some prefix/postfix to the name (and obviously
-then do it at use time too).
-
-We have that '__pcpu_scope_##name' thing to make sure of globally
-unique naming due to the whole weak type thing. I wonder if we could
-do something similar to verify that "yes, this has been declared as a
-percpu variable" at use time?
-
-                   Linus
+I'm not convinced overflow is actually possible.  IMO the current (v4) patch but
+with a REQUEST instead of an in-line check is sufficient.
