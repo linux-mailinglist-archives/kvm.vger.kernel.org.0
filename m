@@ -2,137 +2,270 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id B4BD5574B7E
-	for <lists+kvm@lfdr.de>; Thu, 14 Jul 2022 13:06:58 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id D1C36574BB6
+	for <lists+kvm@lfdr.de>; Thu, 14 Jul 2022 13:21:18 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238608AbiGNLG4 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 14 Jul 2022 07:06:56 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47094 "EHLO
+        id S237501AbiGNLVR (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 14 Jul 2022 07:21:17 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57816 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S237879AbiGNLGy (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 14 Jul 2022 07:06:54 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 261A8DA9
-        for <kvm@vger.kernel.org>; Thu, 14 Jul 2022 04:06:54 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1657796813;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=y8wXm24tfJNe6NPosFaatJWUdYNSg5mujV72lboWyy8=;
-        b=V97qSS2TSDfudYwuPQpcVcdoxPU6JHfy+DMiXVQ1Ewh0hJhqHib+QuTi9XcwmvuJMaK+rs
-        tww4XzrfDXDnGPoyMgN70uP/UgeuG2Z7cK0RNP+Qkux2ginAglvpMYtL18HM+7IyYKpGJM
-        WSNcNuxPFAZ3Gw961mrcpQfuhAYWza4=
-Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
- [209.85.221.69]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-178-Th3oFRyRNL-13EyxPWjGxA-1; Thu, 14 Jul 2022 07:06:52 -0400
-X-MC-Unique: Th3oFRyRNL-13EyxPWjGxA-1
-Received: by mail-wr1-f69.google.com with SMTP id j23-20020adfb317000000b0021d7986c07eso472425wrd.2
-        for <kvm@vger.kernel.org>; Thu, 14 Jul 2022 04:06:52 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:message-id:subject:from:to:cc:date:in-reply-to
-         :references:user-agent:mime-version:content-transfer-encoding;
-        bh=y8wXm24tfJNe6NPosFaatJWUdYNSg5mujV72lboWyy8=;
-        b=z7hpnymRX9tVbm1VGajqcsATGl2Lqgy4rW1CBbzBevULofPpZAdCbz3sySMfvu448n
-         xXVT1ZIbsz4Wx6U2V8xiYA9pGElOg9kmCC2HGdQwYMn7nEOlyNpDch/Ul3wJYsvcpz+k
-         iqcWrO7RVStbm1TMSQVJPU3kMFStMtUm/ulbG9xdjWCeS5z4k34BIAjiKsgtwataOBX5
-         U7QH5+1WdKWqyGnx1vtMdmoAM4qnCdhgQpYYjdo2AREEmoAwB097T1qyhGo/g8mLsMzh
-         h9IiSLOb5v20I9yo7s3FP9Ksoj2A9KABAVyJ00NebW7Ju7+iI69vW+7VkFgw3imMG6/j
-         wseg==
-X-Gm-Message-State: AJIora9UfTmjVYeAaFWVNucvCuxj/MTEaJIXalUawrRLYHzJd98JFEYm
-        qlSTB8eaJJK+fW6cCaj4HQRKnvXFTHjGnIel2ULwZZ7n42K6Z0arx5t2s9N5eKr/5bi+2/Oexld
-        OzWb2aoVzT0Gaa4RcTPVWIyKLyw5GBW2bLC8FgQUWrjGkSMA2o46gCQD4llOBsL3E
-X-Received: by 2002:a1c:2b86:0:b0:3a3:7fb:52d9 with SMTP id r128-20020a1c2b86000000b003a307fb52d9mr36220wmr.86.1657796810862;
-        Thu, 14 Jul 2022 04:06:50 -0700 (PDT)
-X-Google-Smtp-Source: AGRyM1t/xbT4d5N+qH3qzW75qqZhQnw3n8R4cmUcRmhYPK4Jai8/idmpKmVaJDhefqTviUCY4WtgTg==
-X-Received: by 2002:a1c:2b86:0:b0:3a3:7fb:52d9 with SMTP id r128-20020a1c2b86000000b003a307fb52d9mr36171wmr.86.1657796810558;
-        Thu, 14 Jul 2022 04:06:50 -0700 (PDT)
-Received: from [10.35.4.238] (bzq-82-81-161-50.red.bezeqint.net. [82.81.161.50])
-        by smtp.gmail.com with ESMTPSA id z11-20020a05600c0a0b00b003a033177655sm5819383wmp.29.2022.07.14.04.06.48
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 14 Jul 2022 04:06:49 -0700 (PDT)
-Message-ID: <a866e044713be1ab3f446775934ec15541c39726.camel@redhat.com>
-Subject: Re: [PATCH v2 00/11] SMM emulation and interrupt shadow fixes
-From:   Maxim Levitsky <mlevitsk@redhat.com>
-To:     kvm@vger.kernel.org
-Cc:     Sean Christopherson <seanjc@google.com>, x86@kernel.org,
-        Kees Cook <keescook@chromium.org>,
-        Dave Hansen <dave.hansen@linux.intel.com>,
-        linux-kernel@vger.kernel.org, "H. Peter Anvin" <hpa@zytor.com>,
-        Borislav Petkov <bp@alien8.de>, Joerg Roedel <joro@8bytes.org>,
-        Ingo Molnar <mingo@redhat.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>
-Date:   Thu, 14 Jul 2022 14:06:47 +0300
-In-Reply-To: <20220621150902.46126-1-mlevitsk@redhat.com>
-References: <20220621150902.46126-1-mlevitsk@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
-User-Agent: Evolution 3.40.4 (3.40.4-5.fc34) 
-MIME-Version: 1.0
+        with ESMTP id S230016AbiGNLVP (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 14 Jul 2022 07:21:15 -0400
+Received: from mx0a-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BF46A481DE
+        for <kvm@vger.kernel.org>; Thu, 14 Jul 2022 04:21:14 -0700 (PDT)
+Received: from pps.filterd (m0098420.ppops.net [127.0.0.1])
+        by mx0b-001b2d01.pphosted.com (8.17.1.5/8.17.1.5) with ESMTP id 26EAqiDS004039;
+        Thu, 14 Jul 2022 11:21:07 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
+ subject : to : cc : references : from : in-reply-to : content-type :
+ content-transfer-encoding : mime-version; s=pp1;
+ bh=m6cWFl3Hik2P5p9wusVYLgzyLUQU9xvTeNQlHIeYYiA=;
+ b=OqVrJMAAKgxmpvuwnL6vaGldem/Y7XCmSCoSrDQSqCgh8qDTKE5vyDN99bgtav2hAry2
+ fSbDvoKZvs6yStI8QT5i123AwHATi9kskI0FZXnlwNkDQUtG9VzuMt3NL9b8nrQshZt7
+ XravwpvhN2eBHx+2zTitcSSxAshnj+pj1L3+nH4+2Tg5FOKV37gHUT0fDgNIeRPXIJEE
+ VXL6OH2DeBPE9DAXQBjo4dufmpKudZFFlf9B+OCgasuIcSDBJNmll9wlvLAMhSppZtFa
+ cdTRSLGGIPg+u79gaLoIfw7LejCirH6vsg3lY2nvi2sMNaTjOttHYUp9uj3aIxSTl3qQ OA== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0b-001b2d01.pphosted.com (PPS) with ESMTPS id 3hahsd8mxu-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Thu, 14 Jul 2022 11:21:06 +0000
+Received: from m0098420.ppops.net (m0098420.ppops.net [127.0.0.1])
+        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 26EBL6Kv003505;
+        Thu, 14 Jul 2022 11:21:06 GMT
+Received: from ppma06ams.nl.ibm.com (66.31.33a9.ip4.static.sl-reverse.com [169.51.49.102])
+        by mx0b-001b2d01.pphosted.com (PPS) with ESMTPS id 3hahsd8mx8-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Thu, 14 Jul 2022 11:21:06 +0000
+Received: from pps.filterd (ppma06ams.nl.ibm.com [127.0.0.1])
+        by ppma06ams.nl.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 26EBKKwm005152;
+        Thu, 14 Jul 2022 11:21:04 GMT
+Received: from b06cxnps4076.portsmouth.uk.ibm.com (d06relay13.portsmouth.uk.ibm.com [9.149.109.198])
+        by ppma06ams.nl.ibm.com with ESMTP id 3h70xhy0vj-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Thu, 14 Jul 2022 11:21:04 +0000
+Received: from d06av26.portsmouth.uk.ibm.com (d06av26.portsmouth.uk.ibm.com [9.149.105.62])
+        by b06cxnps4076.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 26EBL16C21430714
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Thu, 14 Jul 2022 11:21:01 GMT
+Received: from d06av26.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 31ADDAE04D;
+        Thu, 14 Jul 2022 11:21:01 +0000 (GMT)
+Received: from d06av26.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 3B04AAE045;
+        Thu, 14 Jul 2022 11:21:00 +0000 (GMT)
+Received: from [9.171.80.107] (unknown [9.171.80.107])
+        by d06av26.portsmouth.uk.ibm.com (Postfix) with ESMTP;
+        Thu, 14 Jul 2022 11:21:00 +0000 (GMT)
+Message-ID: <4fef46f1-f43f-665f-47dc-89107385572e@linux.ibm.com>
+Date:   Thu, 14 Jul 2022 13:25:42 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.3.0
+Subject: Re: [PATCH v8 02/12] s390x/cpu_topology: CPU topology objects and
+ structures
+Content-Language: en-US
+To:     Janis Schoetterl-Glausch <scgl@linux.ibm.com>,
+        qemu-s390x@nongnu.org
+Cc:     qemu-devel@nongnu.org, borntraeger@de.ibm.com, pasic@linux.ibm.com,
+        richard.henderson@linaro.org, david@redhat.com, thuth@redhat.com,
+        cohuck@redhat.com, mst@redhat.com, pbonzini@redhat.com,
+        kvm@vger.kernel.org, ehabkost@redhat.com,
+        marcel.apfelbaum@gmail.com, eblake@redhat.com, armbru@redhat.com,
+        seiden@linux.ibm.com, nrb@linux.ibm.com, frankja@linux.ibm.com
+References: <20220620140352.39398-1-pmorel@linux.ibm.com>
+ <20220620140352.39398-3-pmorel@linux.ibm.com>
+ <de92ef17-3a17-df44-97aa-19e67d1d5b3d@linux.ibm.com>
+ <5215ca74-e71c-73df-69c9-d2522e082706@linux.ibm.com>
+ <53698be8-0eab-8dc2-2d54-df2a89e1092f@linux.ibm.com>
+From:   Pierre Morel <pmorel@linux.ibm.com>
+In-Reply-To: <53698be8-0eab-8dc2-2d54-df2a89e1092f@linux.ibm.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: SPfpJbwU5bhYAW07ijRPeap34uDVie7e
+X-Proofpoint-ORIG-GUID: yc8nGrP8dbYNJGiQQYxyA2ER08ms3JOz
 Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-2.7 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=unavailable
-        autolearn_force=no version=3.4.6
+X-Proofpoint-UnRewURL: 0 URL was un-rewritten
+MIME-Version: 1.0
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.205,Aquarius:18.0.883,Hydra:6.0.517,FMLib:17.11.122.1
+ definitions=2022-07-14_08,2022-07-14_01,2022-06-22_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 clxscore=1015
+ priorityscore=1501 bulkscore=0 spamscore=0 impostorscore=0 mlxscore=0
+ lowpriorityscore=0 phishscore=0 adultscore=0 mlxlogscore=999
+ suspectscore=0 malwarescore=0 classifier=spam adjust=0 reason=mlx
+ scancount=1 engine=8.12.0-2206140000 definitions=main-2207140046
+X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,
+        SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no
+        version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, 2022-06-21 at 18:08 +0300, Maxim Levitsky wrote:
-> This patch series is a result of long debug work to find out why
-> sometimes guests with win11 secure boot
-> were failing during boot.
-> 
-> During writing a unit test I found another bug, turns out
-> that on rsm emulation, if the rsm instruction was done in real
-> or 32 bit mode, KVM would truncate the restored RIP to 32 bit.
-> 
-> I also refactored the way we write SMRAM so it is easier
-> now to understand what is going on.
-> 
-> The main bug in this series which I fixed is that we
-> allowed #SMI to happen during the STI interrupt shadow,
-> and we did nothing to both reset it on #SMI handler
-> entry and restore it on RSM.
-> 
-> Best regards,
->         Maxim Levitsky
-> 
-> Maxim Levitsky (11):
->   KVM: x86: emulator: em_sysexit should update ctxt->mode
->   KVM: x86: emulator: introduce update_emulation_mode
->   KVM: x86: emulator: remove assign_eip_near/far
->   KVM: x86: emulator: update the emulation mode after rsm
->   KVM: x86: emulator: update the emulation mode after CR0 write
->   KVM: x86: emulator/smm: number of GPRs in the SMRAM image depends on
->     the image format
->   KVM: x86: emulator/smm: add structs for KVM's smram layout
->   KVM: x86: emulator/smm: use smram struct for 32 bit smram load/restore
->   KVM: x86: emulator/smm: use smram struct for 64 bit smram load/restore
->   KVM: x86: SVM: use smram structs
->   KVM: x86: emulator/smm: preserve interrupt shadow in SMRAM
-> 
->  arch/x86/include/asm/kvm_host.h |   6 -
->  arch/x86/kvm/emulate.c          | 305 ++++++++++++++++----------------
->  arch/x86/kvm/kvm_emulate.h      | 146 +++++++++++++++
->  arch/x86/kvm/svm/svm.c          |  28 +--
->  arch/x86/kvm/x86.c              | 162 ++++++++---------
->  5 files changed, 394 insertions(+), 253 deletions(-)
-> 
-> -- 
-> 2.26.3
-> 
-> 
-A kind ping on these patches.
 
-Best regards,
-	Maxim Levitsky
 
+On 7/14/22 12:38, Janis Schoetterl-Glausch wrote:
+> On 7/13/22 16:59, Pierre Morel wrote:
+>>
+>>
+>> On 7/12/22 17:40, Janis Schoetterl-Glausch wrote:
+>>> On 6/20/22 16:03, Pierre Morel wrote:
+
+> 
+> [...]
+> 
+>>>> +}
+>>>> +
+>>>> +/*
+>>>> + * s390_topology_new_cpu:
+>>>> + * @core_id: the core ID is machine wide
+>>>> + *
+>>>> + * We have a single book returned by s390_get_topology(),
+>>>> + * then we build the hierarchy on demand.
+>>>> + * Note that we do not destroy the hierarchy on error creating
+>>>> + * an entry in the topology, we just keep it empty.
+>>>> + * We do not need to worry about not finding a topology level
+>>>> + * entry this would have been caught during smp parsing.
+>>>> + */
+>>>> +bool s390_topology_new_cpu(MachineState *ms, int core_id, Error **errp)
+>>>> +{
+>>>> +    S390TopologyBook *book;
+>>>> +    S390TopologySocket *socket;
+>>>> +    S390TopologyCores *cores;
+>>>> +    int nb_cores_per_socket;
+>>>
+>>> num_cores_per_socket instead?
+>>>
+>>>> +    int origin, bit;
+>>>> +
+>>>> +    book = s390_get_topology();
+>>>> +
+>>>> +    nb_cores_per_socket = ms->smp.cores * ms->smp.threads;
+>>>
+>>> We don't support the multithreading facility, do we?
+>>> So, I think we should assert smp.threads == 1 somewhere.
+>>> In any case I think the correct expression would round the threads up to the next power of 2,
+>>> because the core_id has the thread id in the lower bits, but threads per core doesn't need to be
+>>> a power of 2 according to the architecture.
+>>
+>> That is right.
+>> I will add that.
+> 
+> Add the assert?
+> It should probably be somewhere else.
+
+That is sure.
+I thought about put a fatal error report during the initialization in 
+the s390_topology_setup()
+
+> And you can set thread > 1 today, so we'd need to handle that. (increase the number of cpus instead and print a warning?)
+> 
+> [...]
+
+this would introduce arch dependencies in the hw/core/
+I think that the error report for Z is enough.
+
+So once we support Multithreading in the guest we can adjust it easier 
+without involving the common code.
+
+Or we can introduce a thread_supported in SMPCompatProps, which would be 
+good.
+I would prefer to propose this outside of the series and suppress the 
+fatal error once it is adopted.
+
+> 
+>>>> +
+>>>> +/*
+>>>> + * Setting the first topology: 1 book, 1 socket
+>>>> + * This is enough for 64 cores if the topology is flat (single socket)
+>>>> + */
+>>>> +void s390_topology_setup(MachineState *ms)
+>>>> +{
+>>>> +    DeviceState *dev;
+>>>> +
+>>>> +    /* Create BOOK bridge device */
+>>>> +    dev = qdev_new(TYPE_S390_TOPOLOGY_BOOK);
+>>>> +    object_property_add_child(qdev_get_machine(),
+>>>> +                              TYPE_S390_TOPOLOGY_BOOK, OBJECT(dev));
+>>>
+>>> Why add it to the machine instead of directly using a static?
+>>
+>> For my opinion it is a characteristic of the machine.
+>>
+>>> So it's visible to the user via info qtree or something?
+>>
+>> It is already visible to the user on info qtree.
+>>
+>>> Would that even be the appropriate location to show that?
+>>
+>> That is a very good question and I really appreciate if we discuss on the design before diving into details.
+>>
+>> The idea is to have the architecture details being on qtree as object so we can plug new drawers/books/socket/cores and in the future when the infrastructure allows it unplug them.
+> 
+> Would it not be more accurate to say that we plug in new cpus only?
+> Since you need to specify the topology up front with -smp and it cannot change after.
+
+smp specify the maximum we can have.
+I thought we can add dynamically elements inside this maximum set.
+
+> So that all is static, books/sockets might be completely unpopulated, but they still exist in a way.
+> As far as I understand, STSI only allows for cpus to change, nothing above it.
+
+I thought we want to plug new books or drawers but I may be wrong.
+
+>>
+>> There is a info numa (info cpus does not give a lot info) to give information on nodes but AFAIU, a node is more a theoritical that can be used above the virtual architecture, sockets/cores, to specify characteristics like distance and associated memory.
+> 
+> https://qemu.readthedocs.io/en/latest/interop/qemu-qmp-ref.html#qapidoc-2391
+> shows that the relevant information can be queried via qmp.
+> When I tried it on s390x it only showed the core_id, but we should be able to add the rest.
+
+yes, sure.
+
+> 
+> 
+> Am I correct in my understanding, that there are two reasons to have the hierarchy objects:
+> 1. Caching the topology instead of computing it when STSI is called
+> 2. So they show up in info qtree
+> 
+> ?
+
+and have the possibility to add the objects dynamically. yes
+
+
+> [...]
+> 
+>>
+>>>> +    /*
+>>>> +     * Each CPU inside a socket will be represented by a bit in a 64bit
+>>>> +     * unsigned long. Set on plug and clear on unplug of a CPU.
+>>>> +     * All CPU inside a mask share the same dedicated, polarity and
+>>>> +     * cputype values.
+>>>> +     * The origin is the offset of the first CPU in a mask.
+>>>> +     */
+>>>> +struct S390TopologyCores {
+>>>> +    DeviceState parent_obj;
+>>>> +    int id;
+>>>> +    bool dedicated;
+>>>> +    uint8_t polarity;
+>>>> +    uint8_t cputype;
+>>>
+>>> Why not snake_case for cpu type?
+>>
+>> I do not understand what you mean.
+> 
+> I'm suggesting s/cputype/cpu_type/
+
+ok
+
+
+Thanks,
+
+regards,
+Pierre
+
+-- 
+Pierre Morel
+IBM Lab Boeblingen
