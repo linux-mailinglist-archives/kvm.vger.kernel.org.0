@@ -2,63 +2,160 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 6AADC57445C
-	for <lists+kvm@lfdr.de>; Thu, 14 Jul 2022 07:12:33 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 781DC574465
+	for <lists+kvm@lfdr.de>; Thu, 14 Jul 2022 07:14:26 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233529AbiGNFMX (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 14 Jul 2022 01:12:23 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57036 "EHLO
+        id S233930AbiGNFOF (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 14 Jul 2022 01:14:05 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59260 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232896AbiGNFMO (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 14 Jul 2022 01:12:14 -0400
-Received: from mail-pj1-x1032.google.com (mail-pj1-x1032.google.com [IPv6:2607:f8b0:4864:20::1032])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4B1A0DF9
-        for <kvm@vger.kernel.org>; Wed, 13 Jul 2022 22:12:12 -0700 (PDT)
-Received: by mail-pj1-x1032.google.com with SMTP id j1-20020a17090aeb0100b001ef777a7befso5503544pjz.0
-        for <kvm@vger.kernel.org>; Wed, 13 Jul 2022 22:12:12 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=from:to:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=VgLiDAoYPcyypxhVX2l7GXZojd0Jyq/z4Rx4mAw3tsQ=;
-        b=m3KM/rmFzvvLB01H+2/fkgsJFvy24PbwNLddwsE/idDO6/3Oh9cZ1cV58Uvp0cdUjE
-         tzbkgrpMdB1W88srKe228Z+wFk96QgiaH9VGzEV86we3Mc8KLxghb8OYbux9zisL34lX
-         k/nLg1U0q972N9wBh2WzxQ4D0DU0x7KGRyaUz6Kw+Uln7AY4+oTItovDvSSayDw7CfZH
-         2EliZU6jTdAjjFtq6dyrLsVx8ybWrKkPCJsn8HLFzcjl1swjz83SBzoZ3vixFIsxJ67D
-         tilNu51jm2z29ixLiBYT9uzs13N3IUKzTUB7JymGtkkaCso2IqSlar2SVsQNenXCHLTo
-         DIdA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:from:to:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=VgLiDAoYPcyypxhVX2l7GXZojd0Jyq/z4Rx4mAw3tsQ=;
-        b=lumBdAboGYhI/SuSkPt4ntPlCdDBK14wJjlU3cumOxMyUkqxSjiLP82LLOJeknM8/I
-         vq+yZ/SX0KWxD/1u6ri4phNOJh2Wz9JcpC4l11Kh7UmiawBEUJqpsbQh2vB5pj1aDlXe
-         FAHc3xwdlK5u6vR+ytKwZQyhtrMXF/AtVjRtDES+Ea5J4sDKUBoDXEED1wkDkYGNE1LN
-         tzTO/QsZR7pR4hcjRK5j6RnQqC7FKCLn7Yu5r2xMJWLg/6DHtDvnS6SnHii8UF5GV37c
-         sLCdK+z1X1FVytDavapAuZnbJlJA99uYNXNbxUg1Hd7WaDHpbG2Qzi8NhjeV0aCkYKmY
-         32/Q==
-X-Gm-Message-State: AJIora+BaoAN0eEiWLBIApNezMTtdbTWESzovQj0z3JSanHaWuT6NdJO
-        zWVgWhPof9zagjZUtTEE3AICEyohBC0+hk5XWWM=
-X-Google-Smtp-Source: AGRyM1ukdksMdqEQjf8gs+xueyVQb03Kl01AXQ+Ri+j8lpAYKHsFW+TisB7XjBMhtrkeSFr7+JR8Mw==
-X-Received: by 2002:a17:90b:3cf:b0:1ef:8a69:9ad1 with SMTP id go15-20020a17090b03cf00b001ef8a699ad1mr7836177pjb.114.1657775531624;
-        Wed, 13 Jul 2022 22:12:11 -0700 (PDT)
-Received: from localhost.localdomain ([47.246.98.188])
-        by smtp.gmail.com with ESMTPSA id x89-20020a17090a6c6200b001e2f892b352sm2538925pjj.45.2022.07.13.22.12.09
-        (version=TLS1_3 cipher=TLS_CHACHA20_POLY1305_SHA256 bits=256/256);
-        Wed, 13 Jul 2022 22:12:11 -0700 (PDT)
-From:   SU Hang <darcysail@gmail.com>
-X-Google-Original-From: SU Hang <darcy.sh@antgroup.com>
-To:     darcy.sh@antgroup.com, pbonzini@redhat.com, kvm@vger.kernel.org
-Subject: [kvm-unit-tests PATCH] x86: amd: pmu: test performance counter on AMD
-Date:   Thu, 14 Jul 2022 13:12:06 +0800
-Message-Id: <20220714051206.19070-1-darcy.sh@antgroup.com>
-X-Mailer: git-send-email 2.32.1 (Apple Git-133)
+        with ESMTP id S233478AbiGNFOD (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 14 Jul 2022 01:14:03 -0400
+Received: from NAM10-BN7-obe.outbound.protection.outlook.com (mail-bn7nam10on2077.outbound.protection.outlook.com [40.107.92.77])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 58E521AF39;
+        Wed, 13 Jul 2022 22:14:01 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=konCyrcv1WTttlX98x1x4ibySLYZ9wQSiW28Wm9Wvgtym2DKnikFoYLRpNCE3ajZdlaMbHwlH18XnMlHKhqReiRNeP4gpwIieOXQ6C7M8yos1TbXLrzj0GKp3EVUf8j55NjC5o9YaCC1RERwuOpTiAGD37RWwyAwvTrBiw92o5N1l9lMw0V+NtmrRsBBX1RJmO95l/0lgDNqaaGmwslCwmlrho9X5P2g8V2hus2bOU/r1W9sWM95hSzrCILZWDLiOgpIIw7ay43lZAaJ6VowhXwHcedznlEDTc8sQ5B2a9FLGiKTDPBaedVyaBVHsFE/BSjakc1NgjIT8+qV9TrLpQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=hD6U9IBmIvIpZco/ZjWYvMR6AW/yL3LBjjbeei/n1Fg=;
+ b=YOWWOO0aLtPmACS0HhXe7Xw7k9NpQjF5wT9ol3xgY9n5KRB2erqQeQary01l0fRipxLFCOs7OkifHp3euF/2G7U7lO2qBJ0iXcUsXbUSYVzyrax0RaKv0Ept5/df2jpr8DNad8POvSJogexnbLF85/QpTgHq1yRa2NS7uefdkGs0zFcg52NQNTQgGHPoXM0OBu71kWMWbYnodiR8w6k2zrD03yLtJUgUz7UENsaOETLiiJeRrmcmQ+9L+YvkbV0HIApPksY5HwfUZm9sLG4vx8u3ajJSNNhT0/NI8BOCu4TKZksoUyFJm7Cj2/0J6+GHSNYpKTFD+56E1B43kkJjjw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
+ header.d=amd.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=hD6U9IBmIvIpZco/ZjWYvMR6AW/yL3LBjjbeei/n1Fg=;
+ b=Nj4tza8y8R+6LS9mn6xgNUM9+y+xAdj/FmdxMHvRKvb9kN/22XlyTzzrEKoU3MrE87/ZWzeuQhl6DNf8bDvV+j+ahpOb4/d3AuL831sRFc8tZjl0DqaqpU2slofBToDEwYIy6LV+ME6V1c9tBqYMT2AzrSuz2v7RPo21P1LABKk=
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=amd.com;
+Received: from CY4PR1201MB0181.namprd12.prod.outlook.com
+ (2603:10b6:910:1f::11) by MWHPR1201MB0125.namprd12.prod.outlook.com
+ (2603:10b6:301:55::12) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5417.23; Thu, 14 Jul
+ 2022 05:13:58 +0000
+Received: from CY4PR1201MB0181.namprd12.prod.outlook.com
+ ([fe80::1001:3c79:9504:8d6a]) by CY4PR1201MB0181.namprd12.prod.outlook.com
+ ([fe80::1001:3c79:9504:8d6a%10]) with mapi id 15.20.5417.026; Thu, 14 Jul
+ 2022 05:13:58 +0000
+Message-ID: <1ea62889-1919-bee9-2314-68ead1e72f06@amd.com>
+Date:   Thu, 14 Jul 2022 07:13:45 +0200
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:91.0) Gecko/20100101
+ Thunderbird/91.10.0
+Subject: Re: [PATCH v7 00/14] KVM: mm: fd-based approach for supporting KVM
+ guest private memory
+Content-Language: en-US
+To:     Andy Lutomirski <luto@kernel.org>,
+        Chao Peng <chao.p.peng@linux.intel.com>
+Cc:     kvm list <kvm@vger.kernel.org>,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+        linux-mm@kvack.org, linux-fsdevel@vger.kernel.org,
+        Linux API <linux-api@vger.kernel.org>,
+        linux-doc@vger.kernel.org, qemu-devel@nongnu.org,
+        linux-kselftest@vger.kernel.org,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Jonathan Corbet <corbet@lwn.net>,
+        Sean Christopherson <seanjc@google.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+        the arch/x86 maintainers <x86@kernel.org>,
+        "H. Peter Anvin" <hpa@zytor.com>, Hugh Dickins <hughd@google.com>,
+        Jeff Layton <jlayton@kernel.org>,
+        "J . Bruce Fields" <bfields@fieldses.org>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        Shuah Khan <shuah@kernel.org>, Mike Rapoport <rppt@kernel.org>,
+        Steven Price <steven.price@arm.com>,
+        "Maciej S . Szmigiero" <mail@maciej.szmigiero.name>,
+        Vlastimil Babka <vbabka@suse.cz>,
+        Vishal Annapurve <vannapurve@google.com>,
+        Yu Zhang <yu.c.zhang@linux.intel.com>,
+        "Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>,
+        "Nakajima, Jun" <jun.nakajima@intel.com>,
+        Dave Hansen <dave.hansen@intel.com>,
+        Andi Kleen <ak@linux.intel.com>,
+        David Hildenbrand <david@redhat.com>, aarcange@redhat.com,
+        ddutile@redhat.com, dhildenb@redhat.com,
+        Quentin Perret <qperret@google.com>,
+        Michael Roth <michael.roth@amd.com>,
+        Michal Hocko <mhocko@suse.com>,
+        Muchun Song <songmuchun@bytedance.com>
+References: <20220706082016.2603916-1-chao.p.peng@linux.intel.com>
+ <b1c12a4b-46f7-081b-242f-005a8824aad1@amd.com>
+ <20220713075738.GC2831541@chaop.bj.intel.com>
+ <13d25d2e-ff79-5762-ddb8-87df56f5cbcf@amd.com>
+ <b0c726d4-2ad3-47e7-90cf-d67b36e7d59e@www.fastmail.com>
+From:   "Gupta, Pankaj" <pankaj.gupta@amd.com>
+In-Reply-To: <b0c726d4-2ad3-47e7-90cf-d67b36e7d59e@www.fastmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: FR3P281CA0141.DEUP281.PROD.OUTLOOK.COM
+ (2603:10a6:d10:95::14) To CY4PR1201MB0181.namprd12.prod.outlook.com
+ (2603:10b6:910:1f::11)
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+X-MS-PublicTrafficType: Email
+X-MS-Office365-Filtering-Correlation-Id: 645cd842-6567-4380-cfb1-08da6557a7d2
+X-MS-TrafficTypeDiagnostic: MWHPR1201MB0125:EE_
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: 4csyfLAYsd6P4UUfpRKifEt1TIWtD3v12UD4IJ3SdU8AwvR2XzNYjsDI931SmvAwrZXZBI9/W0ub4/9gctqYfM4mEHt0IM2V4Oumjhn4jHRmgNvv8OAnopZBYE7YsteXSBy/Nl9/yIft60mZ1nYkzuvS03l1As8/+KtmT4d2P0ohYAUQ99I4BsZoNTgCq37mHA4YOijYjT0hQgfgWP/0b+DZMtWGwTUC4XIIPFBee2YIiL1m+re+ylTo2sn93CxjWSa1AWkYbCDlrmabpXa2pOkabB5RzjYShaAAAFckBSHCz2pg+N2Ce8lIonEMKjT8s1yfa/x2WM6iR/auQWeko97YRsHxtj8uV+xff5qNkCOw7O5hUUizSv94vDYvUtpEhh+ITO0euzv6751dpB0yAsAZZ41otgktcn+XkxSQd3nCve6KB/44e8IeT7fkqEQ3YiaaQgv5MJFqgKGv8cXw3ds+1M/qYAgbHrLRQ9pM5nQECmLD0C4SW3YiugeT7U0cKvF7cwwIYDFdOHKKdf42WdxCgViguJjQn0TcnGPADG7CsFD5otrqT9pPeyHbYT3zNiQXZkpF2ChVjf5DZEtRdnc1ALYSMom3mHhCGyK1ZRJy1f4tkdhPClG8S+gOphetRjf2Fsp2oWx/XWrn3auNew0cMSP0Fo+Lj2PUQ8WHoI2V7V0tVwPOuolESuSk9++bodaZ3FPILPcuBGztQCq93QxoAFnE04gkzp98UOrj7G/Hur9rBXL5hHs5RhxhTNV10HaOeXuW8LZYyWPRESnqmjGRGlYe9cn9EVW7C8O0rBR1XoXhfNDSI0yCeGL7jhEobVpVywvwBStaNCOXu1DxEA==
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CY4PR1201MB0181.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230016)(4636009)(346002)(136003)(39860400002)(396003)(366004)(376002)(5660300002)(54906003)(6486002)(6506007)(478600001)(2906002)(316002)(6666004)(31686004)(26005)(41300700001)(6512007)(110136005)(36756003)(31696002)(2616005)(38100700002)(4326008)(66556008)(7416002)(8676002)(7406005)(86362001)(8936002)(186003)(66476007)(66946007)(43740500002)(45980500001);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?M0hFMkN6QmdCS2JtZ0hVTUdWSStrMTBqcWloTFJCeHVaLzk0dS81bzlNUzVl?=
+ =?utf-8?B?SE9LSTNtMjBnQ1Zqb1E2ODhyOUhwYTlZMGRpZEt1bSs5QmhkS1Z0eHpEaUpZ?=
+ =?utf-8?B?Ylp1SURWOFRJNzg0OEtpMTg3N3ZDaTZob1BxclptR1pmdUM5dVdvQXYvZ0RX?=
+ =?utf-8?B?UmpuVTBxc014YVBFaURRVnU4WERwWHhkV3M0MUgxU2tYWEhuWVRyNGp5Y3lh?=
+ =?utf-8?B?RS9paFhYUG5CNGRramNFWUZyOXZLdHBjVGVxcFlKQ2hnaWhtYlhJemJneDFW?=
+ =?utf-8?B?NkE3SVg4NXA1MHZuZkRWbDc4QXFQN0NqRzVSRWV1NHhHOE0yNk84QUdBK1Nt?=
+ =?utf-8?B?ZStHM08zWmVCakticFFjb1RqdU9WNnBpU0k3K2pmeDROTng1TDJLaVlWQ01y?=
+ =?utf-8?B?SzhsTDZzazdQMnpvbGRXRzc5Qy9aeDA3UWFSSXlGMGxUMGQrNWd0UWtDNGFY?=
+ =?utf-8?B?b2QzY0JWRzk3bmhIYUlhejFjWnM1QlRLekUrUlZQRUg4aExmV1RIZmdlSXZO?=
+ =?utf-8?B?NWpJYUxuRDc2MysxN2Q5T3ZrNCtzeUF2bE9jRHhSREpPdGZvd2hZcWdkZjJq?=
+ =?utf-8?B?djlIYXZyU2MwbDhVbjhkbnRtNGFYbVdKb1hNblM4NklKZ2NQN0VJcXhXTDIx?=
+ =?utf-8?B?UjdUMTIzdVE2UHRmdGNwbnRHdGxlYkVEdEtldVd1ejNlb0ozaWlkWnJDcnlo?=
+ =?utf-8?B?UVdUSC9DZkdXZHhUQkRuTit1REhtcGNsTVFzcC9HQkVWcXFwazFVVWtYL2g4?=
+ =?utf-8?B?bmlLMnkvbEF1ZDMzZld0akd6T3RONExtUGVmcDNDZHI0UzJxeG9QeHJsVW1z?=
+ =?utf-8?B?cVFGYXV4V3pkTjBOblJpalU2OVAvRlJlRTIza203MTVYeXg0VWYrRWs0VFhI?=
+ =?utf-8?B?MTQwMFhWRmk0dU5tV0J4REU5Ujhwdk9QWkJoRFZDZUpHWTlVN3Y5dGI3TGRE?=
+ =?utf-8?B?VXErdGhzNDZ2MzRUU2tLdmNrejBGS3VzTmdxUlU1eWdRSDRsOGFka0RlbHIw?=
+ =?utf-8?B?dDUrSS8xMWNPQU1lS0VwTFlhK1E2TTU2eUlRZTkwSXZIbkRGczc0c3diVFNz?=
+ =?utf-8?B?VlNCbGdHMVlJKzRDNHJYOXIrQnBMZGl3cVQ3MTluOFVqYzd4UnhJVWRpWWhI?=
+ =?utf-8?B?VElkK3pCamdZS2NpcEdvam1oNDlFdEthR1RwejlSMmxkSVBFS3BmQVRiL2ZT?=
+ =?utf-8?B?b0lmbjcraXl0THc1SXo1WE9LNGVMVlNjYmJXVkErSVhUaEFMUERjYTZCb244?=
+ =?utf-8?B?bjZXNGo3T1VtYXEvMEd3WlRRUVJnbkpxNUx5RHZuZTNXdUFmenpaVlp4YXVx?=
+ =?utf-8?B?N2k0bEk1S1pzNVV1S0xRVEw0dU9IS2lrckhyYnlGQ1htdE8yVTE2UCtCZ2Jw?=
+ =?utf-8?B?ektlU29NcE1BTTNGQ3p6aFF1T0xiRlZTelhub2RmTHR4Uno5ckZGM2t3SmV5?=
+ =?utf-8?B?N2JsZ05Va3ZtdzRHbXFhbWFjRG1UTlZtWllVSGJxVmZYRTZOZSs5Z3FVbkh3?=
+ =?utf-8?B?SGFKK3g5MmFLMjZ3Tjg0U09nbENjRGFueVdRMlJYQkIrL0R4NnFSdUtRZXZ0?=
+ =?utf-8?B?WkxTcGpQRjdKUzhULzZPUDArRDQwY0FYWnRwdllLQlF0UzdwTllVaThpRGhY?=
+ =?utf-8?B?VGVmTFhQS2FuUUFNRTdpWFoxenlzQ1VNSWM1bjhTZ044dndKeXljS3RUVm9C?=
+ =?utf-8?B?a1pqQkVwZEJBT1hTWFFWM0IwZGF6cnNCTmgrRU92ZURDNkxDdnFCdEVGVGJM?=
+ =?utf-8?B?OXY1NEpTbkFudGJyb05pVlhZcFJZU1BKUk5mYUhKOW5JcUhSaFJGVVB1d05a?=
+ =?utf-8?B?dkxLdDhGcGhkTmRkTEwzVWF1ZWwvOUtmQy9QdzhaMFZ5UEJnWEUyRjIyRUoy?=
+ =?utf-8?B?ck9xRjhvaklUcWVRZmhUNFBXZ3dtUGFldDdLcDdzTCs2UkZ4aTNjdzBINlI1?=
+ =?utf-8?B?ZnJLYTFlZHFKMkFLWmRIQURJYWNVTjB5cHhhM0l0cTRrVGR3QjJkZjJ6cjFz?=
+ =?utf-8?B?dlZVczdlU2MwSVYySU41eEVURDc5bTV6eE1MbmI5TFl1VWNydzRIOEp5clZM?=
+ =?utf-8?B?S1FXdURLL1d2OUF6U1ZWVXdVaE95UU1xS1YzaTlsVS9hcmpjc1h2WUd6aUkv?=
+ =?utf-8?Q?NGB60gtRlVuHbAiAMW47wt3k2?=
+X-OriginatorOrg: amd.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 645cd842-6567-4380-cfb1-08da6557a7d2
+X-MS-Exchange-CrossTenant-AuthSource: CY4PR1201MB0181.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 14 Jul 2022 05:13:58.1954
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: jSo8tyoFrdbO1GSnn4cUz3L7p2d30PquK8O3PuhfZPdd7P3wQiUugSGJUn/F4Vnl7sMjVcB+4krFhCFhVQwOYw==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: MWHPR1201MB0125
 X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
-        RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_DNSWL_NONE,
+        RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_PASS,T_SCC_BODY_TEXT_LINE
         autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -66,491 +163,47 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-This test adds performance counter test for AMD CPU, it tests old
-performance legacy 4 counters [1] since Family 6(that is AMD K7 CPU),
-and new 6 counters [2] since Family 21 (15H).
 
-And because AMD doesn't have some MSRs(e.g. MSR_CORE_PERF_GLOBAL_STATUS)
-and fixed counters as Intel, simply disable corresponding statements
-or cases.
+>>>>> This is the v7 of this series which tries to implement the fd-based KVM
+>>>>> guest private memory. The patches are based on latest kvm/queue branch
+>>>>> commit:
+>>>>>
+>>>>>      b9b71f43683a (kvm/queue) KVM: x86/mmu: Buffer nested MMU
+>>>>> split_desc_cache only by default capacity
+>>>>>
+>>>>> Introduction
+>>>>> ------------
+>>>>> In general this patch series introduce fd-based memslot which provides
+>>>>> guest memory through memory file descriptor fd[offset,size] instead of
+>>>>> hva/size. The fd can be created from a supported memory filesystem
+>>>>> like tmpfs/hugetlbfs etc. which we refer as memory backing store. KVM
+>>>>
+>>>> Thinking a bit, As host side fd on tmpfs or shmem will store memory on host
+>>>> page cache instead of mapping pages into userspace address space. Can we hit
+>>>> double (un-coordinated) page cache problem with this when guest page cache
+>>>> is also used?
+>>>
+>>> This is my understanding: in host it will be indeed in page cache (in
+>>> current shmem implementation) but that's just the way it allocates and
+>>> provides the physical memory for the guest. In guest, guest OS will not
+>>> see this fd (absolutely), it only sees guest memory, on top of which it
+>>> can build its own page cache system for its own file-mapped content but
+>>> that is unrelated to host page cache.
+>>
+>> yes. If guest fills its page cache with file backed memory, this at host
+>> side(on shmem fd backend) will also fill the host page cache fast. This
+>> can have an impact on performance of guest VM's if host goes to memory
+>> pressure situation sooner. Or else we end up utilizing way less System
+>> RAM.
+> 
+> Is this in any meaningful way different from a regular VM?
 
-Another thing worth mentioning is, AMD perf counter doesn't support
-select 'reference cycle', disable it too.
+After thinking a bit, Seems 'No'. Except the reclaim decisions system 
+would take under memory pressure and also will have to see how well this 
+gets stitched with memory tiers in future. But all these are future topics.
 
-> refs[1]: MSRC001_000[4...7] [Performance Event Counter [3:0]] (Core::X86::Msr::PERF_LEGACY_CTR)
-> refs[2]: MSRC001_020[1...B] [Performance Event Counter [5:0]] (Core::X86::Msr::PERF_CTR)
+Sorry! for the noise.
 
-Signed-off-by: SU Hang <darcy.sh@antgroup.com>
----
- lib/x86/msr.h |  23 +++++
- x86/pmu.c     | 251 ++++++++++++++++++++++++++++++++++++++++----------
- 2 files changed, 223 insertions(+), 51 deletions(-)
-
-diff --git a/lib/x86/msr.h b/lib/x86/msr.h
-index fa1c0c8..a8aa907 100644
---- a/lib/x86/msr.h
-+++ b/lib/x86/msr.h
-@@ -129,6 +129,29 @@
- #define MSR_AMD64_IBSDCPHYSAD		0xc0011039
- #define MSR_AMD64_IBSCTL		0xc001103a
- 
-+/* Fam 15h MSRs */
-+#define MSR_F15H_PERF_CTL		0xc0010200
-+#define MSR_F15H_PERF_CTL0		MSR_F15H_PERF_CTL
-+#define MSR_F15H_PERF_CTL1		(MSR_F15H_PERF_CTL + 2)
-+#define MSR_F15H_PERF_CTL2		(MSR_F15H_PERF_CTL + 4)
-+#define MSR_F15H_PERF_CTL3		(MSR_F15H_PERF_CTL + 6)
-+#define MSR_F15H_PERF_CTL4		(MSR_F15H_PERF_CTL + 8)
-+#define MSR_F15H_PERF_CTL5		(MSR_F15H_PERF_CTL + 10)
-+
-+#define MSR_F15H_PERF_CTR		0xc0010201
-+#define MSR_F15H_PERF_CTR0		MSR_F15H_PERF_CTR
-+#define MSR_F15H_PERF_CTR1		(MSR_F15H_PERF_CTR + 2)
-+#define MSR_F15H_PERF_CTR2		(MSR_F15H_PERF_CTR + 4)
-+#define MSR_F15H_PERF_CTR3		(MSR_F15H_PERF_CTR + 6)
-+#define MSR_F15H_PERF_CTR4		(MSR_F15H_PERF_CTR + 8)
-+#define MSR_F15H_PERF_CTR5		(MSR_F15H_PERF_CTR + 10)
-+
-+#define MSR_F15H_NB_PERF_CTL		0xc0010240
-+#define MSR_F15H_NB_PERF_CTR		0xc0010241
-+#define MSR_F15H_PTSC			0xc0010280
-+#define MSR_F15H_IC_CFG			0xc0011021
-+#define MSR_F15H_EX_CFG			0xc001102c
-+
- /* Fam 10h MSRs */
- #define MSR_FAM10H_MMIO_CONF_BASE	0xc0010058
- #define FAM10H_MMIO_CONF_ENABLE		(1<<0)
-diff --git a/x86/pmu.c b/x86/pmu.c
-index a46bdbf..dcb462d 100644
---- a/x86/pmu.c
-+++ b/x86/pmu.c
-@@ -83,7 +83,9 @@ struct pmu_event {
- 	uint32_t unit_sel;
- 	int min;
- 	int max;
--} gp_events[] = {
-+} * gp_events;
-+
-+struct pmu_event intel_gp_event[] = {
- 	{"core cycles", 0x003c, 1*N, 50*N},
- 	{"instructions", 0x00c0, 10*N, 10.2*N},
- 	{"ref cycles", 0x013c, 1*N, 30*N},
-@@ -91,16 +93,26 @@ struct pmu_event {
- 	{"llc misses", 0x412e, 1, 1*N},
- 	{"branches", 0x00c4, 1*N, 1.1*N},
- 	{"branch misses", 0x00c5, 0, 0.1*N},
--}, fixed_events[] = {
-+};
-+struct pmu_event amd_gp_event[] = {
-+	{ "core cycles", 0x0076, 1 * N, 50 * N },
-+	{ "instructions", 0x00c0, 10 * N, 10.9 * N },
-+	{ "llc references", 0x028f, 1, 5 * N },
-+	{ "branches", 0x00c2, 1 * N, 1.1 * N },
-+	{ "branch misses", 0x00c3, 0, 0.1 * N },
-+};
-+struct pmu_event fixed_events[] = {
- 	{"fixed 1", MSR_CORE_PERF_FIXED_CTR0, 10*N, 10.2*N},
- 	{"fixed 2", MSR_CORE_PERF_FIXED_CTR0 + 1, 1*N, 30*N},
- 	{"fixed 3", MSR_CORE_PERF_FIXED_CTR0 + 2, 0.1*N, 30*N}
- };
- 
- #define PMU_CAP_FW_WRITES	(1ULL << 13)
--static u64 gp_counter_base = MSR_IA32_PERFCTR0;
-+static u64 gp_counter_base;
- 
- static int num_counters;
-+static int num_gp_event;
-+static bool is_intel_chip;
- 
- char *buf;
- 
-@@ -134,6 +146,9 @@ static bool check_irq(void)
- 
- static bool is_gp(pmu_counter_t *evt)
- {
-+	/* MSR_F15H_PERF_CTR == 0xc0010201
-+	 * MSR_K7_PERFCTR0   == 0xc0010004
-+	 * both happened to greater than MSR_IA32_PMC0. */
- 	return evt->ctr < MSR_CORE_PERF_FIXED_CTR0 ||
- 		evt->ctr >= MSR_IA32_PMC0;
- }
-@@ -149,7 +164,8 @@ static struct pmu_event* get_counter_event(pmu_counter_t *cnt)
- 	if (is_gp(cnt)) {
- 		int i;
- 
--		for (i = 0; i < sizeof(gp_events)/sizeof(gp_events[0]); i++)
-+		for (i = 0; i < num_gp_event; i++)
-+
- 			if (gp_events[i].unit_sel == (cnt->config & 0xffff))
- 				return &gp_events[i];
- 	} else
-@@ -161,6 +177,8 @@ static struct pmu_event* get_counter_event(pmu_counter_t *cnt)
- static void global_enable(pmu_counter_t *cnt)
- {
- 	cnt->idx = event_to_global_idx(cnt);
-+	if (!is_intel_chip)
-+		return;
- 
- 	wrmsr(MSR_CORE_PERF_GLOBAL_CTRL, rdmsr(MSR_CORE_PERF_GLOBAL_CTRL) |
- 			(1ull << cnt->idx));
-@@ -168,6 +186,8 @@ static void global_enable(pmu_counter_t *cnt)
- 
- static void global_disable(pmu_counter_t *cnt)
- {
-+	if (!is_intel_chip)
-+		return;
- 	wrmsr(MSR_CORE_PERF_GLOBAL_CTRL, rdmsr(MSR_CORE_PERF_GLOBAL_CTRL) &
- 			~(1ull << cnt->idx));
- }
-@@ -176,14 +196,19 @@ static void global_disable(pmu_counter_t *cnt)
- static void start_event(pmu_counter_t *evt)
- {
-     wrmsr(evt->ctr, evt->count);
--    if (is_gp(evt))
--	    wrmsr(MSR_P6_EVNTSEL0 + event_to_global_idx(evt),
--			    evt->config | EVNTSEL_EN);
--    else {
-+	if (is_gp(evt)) {
-+		uint64_t sel;
-+		if (is_intel_chip)
-+			sel = MSR_P6_EVNTSEL0;
-+		else if (gp_counter_base == MSR_F15H_PERF_CTR)
-+			sel = MSR_F15H_PERF_CTL;
-+		else
-+			sel = MSR_K7_EVNTSEL0;
-+		wrmsr(sel + event_to_global_idx(evt), evt->config | EVNTSEL_EN);
-+	} else {
- 	    uint32_t ctrl = rdmsr(MSR_CORE_PERF_FIXED_CTR_CTRL);
- 	    int shift = (evt->ctr - MSR_CORE_PERF_FIXED_CTR0) * 4;
- 	    uint32_t usrospmi = 0;
--
- 	    if (evt->config & EVNTSEL_OS)
- 		    usrospmi |= (1 << 0);
- 	    if (evt->config & EVNTSEL_USR)
-@@ -200,10 +225,16 @@ static void start_event(pmu_counter_t *evt)
- static void stop_event(pmu_counter_t *evt)
- {
- 	global_disable(evt);
--	if (is_gp(evt))
--		wrmsr(MSR_P6_EVNTSEL0 + event_to_global_idx(evt),
--				evt->config & ~EVNTSEL_EN);
--	else {
-+	if (is_gp(evt)) {
-+		uint64_t sel;
-+		if (is_intel_chip)
-+			sel = MSR_P6_EVNTSEL0;
-+		else if (gp_counter_base == MSR_F15H_PERF_CTR)
-+			sel = MSR_F15H_PERF_CTL;
-+		else
-+			sel = MSR_K7_EVNTSEL0;
-+		wrmsr(sel + event_to_global_idx(evt), evt->config & ~EVNTSEL_EN);
-+	} else {
- 		uint32_t ctrl = rdmsr(MSR_CORE_PERF_FIXED_CTR_CTRL);
- 		int shift = (evt->ctr - MSR_CORE_PERF_FIXED_CTR0) * 4;
- 		wrmsr(MSR_CORE_PERF_FIXED_CTR_CTRL, ctrl & ~(0xf << shift));
-@@ -241,10 +272,16 @@ static void check_gp_counter(struct pmu_event *evt)
- 	};
- 	int i;
- 
--	for (i = 0; i < num_counters; i++, cnt.ctr++) {
-+	for (i = 0; i < num_counters; i++) {
- 		cnt.count = 0;
- 		measure(&cnt, 1);
- 		report(verify_event(cnt.count, evt), "%s-%d", evt->name, i);
-+		if (gp_counter_base == MSR_F15H_PERF_CTR)
-+			/* The counter MSRs are interleaved with the event select MSRs,
-+			 * since Family 15H. */
-+			cnt.ctr += 2;
-+		else
-+			cnt.ctr++;
- 	}
- }
- 
-@@ -252,7 +289,7 @@ static void check_gp_counters(void)
- {
- 	int i;
- 
--	for (i = 0; i < sizeof(gp_events)/sizeof(gp_events[0]); i++)
-+	for (i = 0; i < num_gp_event; i++)
- 		if (!(ebx.full & (1 << i)))
- 			check_gp_counter(&gp_events[i]);
- 		else
-@@ -288,7 +325,12 @@ static void check_counters_many(void)
- 		cnt[n].count = 0;
- 		cnt[n].ctr = gp_counter_base + n;
- 		cnt[n].config = EVNTSEL_OS | EVNTSEL_USR |
--			gp_events[i % ARRAY_SIZE(gp_events)].unit_sel;
-+				gp_events[i % num_gp_event].unit_sel;
-+
-+		if (gp_counter_base == MSR_F15H_PERF_CTR)
-+			/* The counter MSRs are interleaved with the event select MSRs,
-+			 * since Family 15H. */
-+			cnt[i].ctr += n;
- 		n++;
- 	}
- 	for (i = 0; i < edx.split.num_counters_fixed; i++) {
-@@ -311,6 +353,7 @@ static void check_counter_overflow(void)
- {
- 	uint64_t count;
- 	int i;
-+	int loop_times;
- 	pmu_counter_t cnt = {
- 		.ctr = gp_counter_base,
- 		.config = EVNTSEL_OS | EVNTSEL_USR | gp_events[1].unit_sel /* instructions */,
-@@ -319,18 +362,34 @@ static void check_counter_overflow(void)
- 	measure(&cnt, 1);
- 	count = cnt.count;
- 
--	/* clear status before test */
--	wrmsr(MSR_CORE_PERF_GLOBAL_OVF_CTRL, rdmsr(MSR_CORE_PERF_GLOBAL_STATUS));
-+	if (is_intel_chip)
-+		/* clear status before test */
-+		wrmsr(MSR_CORE_PERF_GLOBAL_OVF_CTRL,
-+		      rdmsr(MSR_CORE_PERF_GLOBAL_STATUS));
- 
- 	report_prefix_push("overflow");
- 
--	for (i = 0; i < num_counters + 1; i++, cnt.ctr++) {
-+	if (is_intel_chip)
-+		loop_times = num_counters + 1;
-+	else
-+		/* AMD CPU doesn't have fixed counters. */
-+		loop_times = num_counters;
-+	for (i = 0; i < loop_times; i++) {
- 		uint64_t status;
- 		int idx;
- 
--		cnt.count = 1 - count;
--		if (gp_counter_base == MSR_IA32_PMC0)
-+		if (is_intel_chip) {
-+			cnt.count = 1 - count;
-+			if (gp_counter_base == MSR_IA32_PMC0)
-+				cnt.count &= (1ull << eax.split.bit_width) - 1;
-+		} else {
-+			/* KVM fails to accurate count on AMD CPU,
-+			 * due to instructions in hypervisor when set
-+			 * AMD64_EVENTSEL_GUESTONLY bit?
-+			 */
-+			cnt.count = 1 - count * 0.5;
- 			cnt.count &= (1ull << eax.split.bit_width) - 1;
-+		}
- 
- 		if (i == num_counters) {
- 			cnt.ctr = fixed_events[0].unit_sel;
-@@ -343,13 +402,21 @@ static void check_counter_overflow(void)
- 			cnt.config &= ~EVNTSEL_INT;
- 		idx = event_to_global_idx(&cnt);
- 		measure(&cnt, 1);
--		report(cnt.count == 1, "cntr-%d", i);
--		status = rdmsr(MSR_CORE_PERF_GLOBAL_STATUS);
--		report(status & (1ull << idx), "status-%d", i);
--		wrmsr(MSR_CORE_PERF_GLOBAL_OVF_CTRL, status);
--		status = rdmsr(MSR_CORE_PERF_GLOBAL_STATUS);
--		report(!(status & (1ull << idx)), "status clear-%d", i);
-+		if (is_intel_chip) {
-+			report(cnt.count == 1, "cntr-%d", i);
-+			status = rdmsr(MSR_CORE_PERF_GLOBAL_STATUS);
-+			report(status & (1ull << idx), "status-%d", i);
-+			wrmsr(MSR_CORE_PERF_GLOBAL_OVF_CTRL, status);
-+			status = rdmsr(MSR_CORE_PERF_GLOBAL_STATUS);
-+			report(!(status & (1ull << idx)), "status clear-%d", i);
-+		}
- 		report(check_irq() == (i % 2), "irq-%d", i);
-+		if (gp_counter_base == MSR_F15H_PERF_CTR)
-+			/* The counter MSRs are interleaved with the event select MSRs,
-+			 * since Family 15H. */
-+			cnt.ctr += 2;
-+		else
-+			cnt.ctr++;
- 	}
- 
- 	report_prefix_pop();
-@@ -381,9 +448,13 @@ static void do_rdpmc_fast(void *ptr)
- 
- static void check_rdpmc(void)
- {
--	uint64_t val = 0xff0123456789ull;
- 	bool exc;
- 	int i;
-+	uint64_t val;
-+	if (is_intel_chip)
-+		val = 0xff0123456789ull;
-+	else
-+		val = 0xffff0123456789ull;
- 
- 	report_prefix_push("rdpmc");
- 
-@@ -406,7 +477,10 @@ static void check_rdpmc(void)
- 		/* Mask according to the number of supported bits */
- 		x &= (1ull << eax.split.bit_width) - 1;
- 
--		wrmsr(gp_counter_base + i, val);
-+		if (gp_counter_base == MSR_F15H_PERF_CTR)
-+			wrmsr(gp_counter_base + i * 2, val);
-+		else
-+			wrmsr(gp_counter_base + i, val);
- 		report(rdpmc(i) == x, "cntr-%d", i);
- 
- 		exc = test_for_exception(GP_VECTOR, do_rdpmc_fast, &cnt);
-@@ -453,9 +527,10 @@ static void check_running_counter_wrmsr(void)
- 	stop_event(&evt);
- 	report(evt.count < gp_events[1].min, "cntr");
- 
--	/* clear status before overflow test */
--	wrmsr(MSR_CORE_PERF_GLOBAL_OVF_CTRL,
--	      rdmsr(MSR_CORE_PERF_GLOBAL_STATUS));
-+	if (is_intel_chip)
-+		/* clear status before overflow test */
-+		wrmsr(MSR_CORE_PERF_GLOBAL_OVF_CTRL,
-+		      rdmsr(MSR_CORE_PERF_GLOBAL_STATUS));
- 
- 	evt.count = 0;
- 	start_event(&evt);
-@@ -468,8 +543,10 @@ static void check_running_counter_wrmsr(void)
- 
- 	loop();
- 	stop_event(&evt);
--	status = rdmsr(MSR_CORE_PERF_GLOBAL_STATUS);
--	report(status & 1, "status");
-+	if (is_intel_chip) {
-+		status = rdmsr(MSR_CORE_PERF_GLOBAL_STATUS);
-+		report(status & 1, "status");
-+	}
- 
- 	report_prefix_pop();
- }
-@@ -605,6 +682,45 @@ static void  check_gp_counters_write_width(void)
- 	}
- }
- 
-+static void check_amd_gp_counters_write_width(void)
-+{
-+	u64 val_64 = 0xffffff0123456789ull;
-+	u64 val_32 = val_64 & ((1ull << 32) - 1);
-+	u64 val_max_width = val_64 & ((1ull << eax.split.bit_width) - 1);
-+	int i;
-+
-+	/* There are 4 legacy counters, and 6 core PerfMon counters,
-+	 * select the less one. */
-+	int legacy_num_counter = 4;
-+	for (i = 0; i < legacy_num_counter; i++) {
-+		wrmsr(MSR_K7_PERFCTR0 + i, val_32);
-+		assert(rdmsr(MSR_K7_PERFCTR0 + i) == val_32);
-+		assert(rdmsr(MSR_F15H_PERF_CTR + 2 * i) == val_32);
-+
-+		wrmsr(MSR_K7_PERFCTR0 + i, val_max_width);
-+		assert(rdmsr(MSR_K7_PERFCTR0 + i) == val_max_width);
-+		assert(rdmsr(MSR_F15H_PERF_CTR + 2 * i) == val_max_width);
-+
-+		wrmsr(MSR_K7_PERFCTR0 + i, val_64);
-+		assert(rdmsr(MSR_K7_PERFCTR0 + i) == val_max_width);
-+		assert(rdmsr(MSR_F15H_PERF_CTR + 2 * i) == val_max_width);
-+	}
-+
-+	for (i = 0; i < legacy_num_counter; i++) {
-+		wrmsr(MSR_F15H_PERF_CTR + 2 * i, val_32);
-+		assert(rdmsr(MSR_K7_PERFCTR0 + i) == val_32);
-+		assert(rdmsr(MSR_F15H_PERF_CTR + 2 * i) == val_32);
-+
-+		wrmsr(MSR_F15H_PERF_CTR + 2 * i, val_max_width);
-+		assert(rdmsr(MSR_K7_PERFCTR0 + i) == val_max_width);
-+		assert(rdmsr(MSR_F15H_PERF_CTR + 2 * i) == val_max_width);
-+
-+		wrmsr(MSR_F15H_PERF_CTR + 2 * i, val_64);
-+		assert(rdmsr(MSR_K7_PERFCTR0 + i) == val_max_width);
-+		assert(rdmsr(MSR_F15H_PERF_CTR + 2 * i) == val_max_width);
-+	}
-+}
-+
- /*
-  * Per the SDM, reference cycles are currently implemented using the
-  * core crystal clock, TSC, or bus clock. Calibrate to the TSC
-@@ -655,27 +771,47 @@ static void set_ref_cycle_expectations(void)
- 
- int main(int ac, char **av)
- {
--	struct cpuid id = cpuid(10);
--
--	setup_vm();
--	handle_irq(PC_VECTOR, cnt_overflow);
--	buf = malloc(N*64);
-+	struct cpuid id;
-+	is_intel_chip = is_intel();
-+	if (is_intel_chip) {
-+		id = cpuid(10);
-+		eax.full = id.a;
-+		ebx.full = id.b;
-+		edx.full = id.d;
-+		gp_counter_base = MSR_IA32_PERFCTR0;
-+		gp_events = (struct pmu_event *)&intel_gp_event;
-+		num_gp_event = ARRAY_SIZE(intel_gp_event);
-+		if (!eax.split.version_id) {
-+			printf("No pmu is detected!\n");
-+			return report_summary();
-+		}
- 
--	eax.full = id.a;
--	ebx.full = id.b;
--	edx.full = id.d;
-+		if (eax.split.version_id == 1) {
-+			printf("PMU version 1 is not supported\n");
-+			return report_summary();
-+		}
-+	} else {
-+		gp_counter_base = MSR_K7_PERFCTR0;
-+		gp_events = (struct pmu_event *)&amd_gp_event;
-+		num_gp_event = ARRAY_SIZE(amd_gp_event);
-+		id = cpuid(1);
-+		/* Performance-monitoring supported from K7 and later. */
-+		if (((id.a & 0xf00) >> 8) < 6) {
-+			printf("No pmu is detected!\n");
-+			return report_summary();
-+		}
- 
--	if (!eax.split.version_id) {
--		printf("No pmu is detected!\n");
--		return report_summary();
-+		edx.split.num_counters_fixed = 0;
-+		eax.split.num_counters = 4;
-+		eax.split.bit_width = 48;
- 	}
- 
--	if (eax.split.version_id == 1) {
--		printf("PMU version 1 is not supported\n");
--		return report_summary();
--	}
-+	setup_vm();
-+	handle_irq(PC_VECTOR, cnt_overflow);
-+	buf = malloc(N * 64);
- 
--	set_ref_cycle_expectations();
-+	if (is_intel_chip)
-+		set_ref_cycle_expectations();
- 
- 	printf("PMU version:         %d\n", eax.split.version_id);
- 	printf("GP counters:         %d\n", eax.split.num_counters);
-@@ -693,7 +829,20 @@ int main(int ac, char **av)
- 	} else {
- 		check_counters();
- 
--		if (rdmsr(MSR_IA32_PERF_CAPABILITIES) & PMU_CAP_FW_WRITES) {
-+		if (!is_intel_chip) {
-+			id = raw_cpuid(0x80000001, 0);
-+			if (id.c & (1 << 23))
-+				/* support core perfmon */
-+				gp_counter_base = MSR_F15H_PERF_CTR;
-+
-+			eax.split.num_counters = 6;
-+			num_counters = eax.split.num_counters;
-+			report_prefix_push("core perf");
-+			check_counters();
-+			check_amd_gp_counters_write_width();
-+		}
-+
-+		if (is_intel_chip && rdmsr(MSR_IA32_PERF_CAPABILITIES) & PMU_CAP_FW_WRITES) {
- 			gp_counter_base = MSR_IA32_PMC0;
- 			report_prefix_push("full-width writes");
- 			check_counters();
--- 
-2.32.1 (Apple Git-133)
+Thanks,
+Pankaj
 
