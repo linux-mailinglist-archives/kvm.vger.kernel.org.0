@@ -2,130 +2,169 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 51AFC575783
-	for <lists+kvm@lfdr.de>; Fri, 15 Jul 2022 00:19:18 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 5DDCF575785
+	for <lists+kvm@lfdr.de>; Fri, 15 Jul 2022 00:19:31 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S241108AbiGNWTQ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 14 Jul 2022 18:19:16 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39010 "EHLO
+        id S241113AbiGNWTZ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 14 Jul 2022 18:19:25 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39120 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S241080AbiGNWTK (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 14 Jul 2022 18:19:10 -0400
-Received: from mail-pj1-x1035.google.com (mail-pj1-x1035.google.com [IPv6:2607:f8b0:4864:20::1035])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 688541FCD6
-        for <kvm@vger.kernel.org>; Thu, 14 Jul 2022 15:19:09 -0700 (PDT)
-Received: by mail-pj1-x1035.google.com with SMTP id t5-20020a17090a6a0500b001ef965b262eso4370014pjj.5
-        for <kvm@vger.kernel.org>; Thu, 14 Jul 2022 15:19:09 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=7S4OyX7jxNdZTtoluQBkHlYCbrXzOUsDcIYAnp8PkF8=;
-        b=JReXxHF9LvhmSk2uaPFYgL3Ww3vjdrL4PGgqPE+0h57H2+lKyjyt5WL76+aX9dxMEV
-         kTMoRmYy2Sx5sPAFilA+S7K7eriDH+/7+fFL55XBsnQUGbjhbxZ1+4IAknzHLYmzsaBE
-         SouITTBB1Q/rRXkv4hAbz0f+9Fx37O74MK8wbaVv0DiwBjOzH7IDd2Ckn6odw67zk88W
-         bMeHnF3hF2tI1OFHC/1K2eUUNMZLg5q+Ez38uYzntjFYCYqseSLQTyrP/pxaI5ZUZtdN
-         eVUM34q/pjo52FsVtlZjiAbiynBjfN5DZq3qoMFpXJ74X0Yzc3CheHmCEOMZirDeZO+L
-         TPwQ==
+        with ESMTP id S241079AbiGNWTT (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 14 Jul 2022 18:19:19 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 27192201B1
+        for <kvm@vger.kernel.org>; Thu, 14 Jul 2022 15:19:17 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1657837156;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=4G9IwM3+cIcTTAWec47K+7HkIXA9vq/H/84QHGv7+B4=;
+        b=hQeQawrTSx2Q5riOIxYYy38fkRrWv/XrDpBH5FUtx/t1gswmtBUxOOt4MgZFZctH4wAUxN
+        W3z6hQEYVQVUDahJC0IjbfqkNl1GmVcZUI864fpa+WWDQOlbbG1tSTLn/KkWVErN8MXbzp
+        x9q3ZcYrfx/0qZgrHIDItlHs6MSBaDk=
+Received: from mail-qv1-f70.google.com (mail-qv1-f70.google.com
+ [209.85.219.70]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-534-Wamv7TCJOx-lPZHzpSTR7w-1; Thu, 14 Jul 2022 18:19:10 -0400
+X-MC-Unique: Wamv7TCJOx-lPZHzpSTR7w-1
+Received: by mail-qv1-f70.google.com with SMTP id m11-20020a0cfbab000000b004738181b474so2068428qvp.6
+        for <kvm@vger.kernel.org>; Thu, 14 Jul 2022 15:19:10 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:date:from:to:cc:subject:message-id:references
          :mime-version:content-disposition:in-reply-to;
-        bh=7S4OyX7jxNdZTtoluQBkHlYCbrXzOUsDcIYAnp8PkF8=;
-        b=P9L38hyOUYqNcHU2XM8VyIzeUO10rFKTQ55i1BE4uuW+YRfBQB7mbx4jNUjZgycs+p
-         PW2AfBlzl/srMerNtWTW23J2rB+10RBmPmWHzWoOuPVLP13ofliXChvjM3cr95anOdQd
-         L217+uDfOfuE+U5xiBvk3K7dvRjmGE0pGJu4PtO+I9p16mvknFtwmx1yYwx1QNd3XXSQ
-         tzdyN252U/50W452K1iccH4OfVxWN46OnKaZrqdWfyqWHc+XnEO3OtxM/Ww+Vxuf/T7H
-         zJyn3z6+GGFhP9GIo2IGvIzJdVVDrGDbhbyxdwlWXpdnoUvdEnpflV/VYzU8pYrwCdYT
-         SwjQ==
-X-Gm-Message-State: AJIora93qFj+dIKqMRxNZhLawFuX8G0rD8UKu+0dKhF1M9xE7jSHFhQ5
-        vp9SaqKBCQWAMRaMPk7nu71eVQ==
-X-Google-Smtp-Source: AGRyM1vqvzFPgF5HqMszLzMiggefbwmwiMWWdiL8g8famC5eLaGfINNS2DTJU0PYsXmJICCZW2quiQ==
-X-Received: by 2002:a17:90b:33c9:b0:1f0:35be:3038 with SMTP id lk9-20020a17090b33c900b001f035be3038mr17929217pjb.61.1657837148782;
-        Thu, 14 Jul 2022 15:19:08 -0700 (PDT)
-Received: from google.com (123.65.230.35.bc.googleusercontent.com. [35.230.65.123])
-        by smtp.gmail.com with ESMTPSA id f62-20020a623841000000b005252680aa30sm2247225pfa.3.2022.07.14.15.19.08
+        bh=4G9IwM3+cIcTTAWec47K+7HkIXA9vq/H/84QHGv7+B4=;
+        b=K2KvKCDA4JSLvk0N65d9E4C1O7dG3+++PMAFGsBQbo/wLVcnLYcvn+4jntUNMtW0L6
+         +GyHrM8a6BThoX/yoZFp9t+axZ4p4boCt/3pWCE+utYNsfS3UtPqwdviAnuvho8otcWh
+         KR8shwTgOQKSmK2cDVvioArqDEKtIy+UqvkmGCmKhd5XV6HugYM/wlx46gJZjyOPBizq
+         vBeJPpLS9ZAcuLLNdo35r6RkYDxe8l6qKAlUjEUFwiA9h7NMXz1wEFF+EgST8miTPGb6
+         jfAC0MyT1lWAgAsLSCeyGk4L4IM5CPTOU+OEpQQjXBL9hNbd3eMQffV1o5F2ToUcLw6k
+         fZ5Q==
+X-Gm-Message-State: AJIora+ladyybJNmtckgSSLRlLFpiEatqHzgpH+8B/uzEGIxP5iMGuxJ
+        HTnMRf4KfoekA75KlavT1ZXgOHnj0yIoF3pTEB3RyKd3hGbDY7ZUQfAgXD5DRwGjqk+Sc3ZERAq
+        Y7NZ07DPo0BEW
+X-Received: by 2002:a05:620a:3ce:b0:6b5:b62c:c9f8 with SMTP id r14-20020a05620a03ce00b006b5b62cc9f8mr7907083qkm.620.1657837149883;
+        Thu, 14 Jul 2022 15:19:09 -0700 (PDT)
+X-Google-Smtp-Source: AGRyM1vwZrO0GihtDgq3EOhbb4qDRj6P5Nol5ssW4M5GH+QZGE5/1VlBVR7bhMtw32nZrPGard3qVw==
+X-Received: by 2002:a05:620a:3ce:b0:6b5:b62c:c9f8 with SMTP id r14-20020a05620a03ce00b006b5b62cc9f8mr7907068qkm.620.1657837149627;
+        Thu, 14 Jul 2022 15:19:09 -0700 (PDT)
+Received: from xz-m1.local (bras-base-aurron9127w-grc-37-74-12-30-48.dsl.bell.ca. [74.12.30.48])
+        by smtp.gmail.com with ESMTPSA id r17-20020ac85211000000b0031bf4dd8a39sm2453456qtn.56.2022.07.14.15.19.08
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
         Thu, 14 Jul 2022 15:19:08 -0700 (PDT)
-Date:   Thu, 14 Jul 2022 22:19:05 +0000
-From:   Sean Christopherson <seanjc@google.com>
-To:     Lai Jiangshan <jiangshanlai@gmail.com>
-Cc:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Maxim Levitsky <mlevitsk@redhat.com>,
-        Lai Jiangshan <jiangshan.ljs@antgroup.com>
-Subject: Re: [PATCH 03/12] KVM: X86/MMU: Split a part of kvm_unsync_page() as
- kvm_mmu_page_mark_unsync()
-Message-ID: <YtCWWV0RGKcZvW+C@google.com>
-References: <20220605064342.309219-1-jiangshanlai@gmail.com>
- <20220605064342.309219-4-jiangshanlai@gmail.com>
+Date:   Thu, 14 Jul 2022 18:19:07 -0400
+From:   Peter Xu <peterx@redhat.com>
+To:     Sean Christopherson <seanjc@google.com>
+Cc:     Shivam Kumar <shivam.kumar1@nutanix.com>,
+        Marc Zyngier <maz@kernel.org>, pbonzini@redhat.com,
+        james.morse@arm.com, borntraeger@linux.ibm.com, david@redhat.com,
+        kvm@vger.kernel.org, Shaju Abraham <shaju.abraham@nutanix.com>,
+        Manish Mishra <manish.mishra@nutanix.com>,
+        Anurag Madnawat <anurag.madnawat@nutanix.com>
+Subject: Re: [PATCH v4 1/4] KVM: Implement dirty quota-based throttling of
+ vcpus
+Message-ID: <YtCWW2OfbI4+r1L3@xz-m1.local>
+References: <87h75fmmkj.wl-maz@kernel.org>
+ <bf24e007-23fd-2582-ec0c-5e79ab0c7d56@nutanix.com>
+ <878rqomnfr.wl-maz@kernel.org>
+ <Yo+gTbo5uqqAMjjX@google.com>
+ <877d68mfqv.wl-maz@kernel.org>
+ <Yo+82LjHSOdyxKzT@google.com>
+ <b75013cb-0d40-569a-8a31-8ebb7cf6c541@nutanix.com>
+ <2e5198b3-54ea-010e-c418-f98054befe1b@nutanix.com>
+ <YtBanRozLuP9qoWs@xz-m1.local>
+ <YtCBBI+rU+UQNm4p@google.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <20220605064342.309219-4-jiangshanlai@gmail.com>
-X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-        T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL
-        autolearn=ham autolearn_force=no version=3.4.6
+In-Reply-To: <YtCBBI+rU+UQNm4p@google.com>
+X-Spam-Status: No, score=-2.7 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Sun, Jun 05, 2022, Lai Jiangshan wrote:
-> From: Lai Jiangshan <jiangshan.ljs@antgroup.com>
+On Thu, Jul 14, 2022 at 08:48:04PM +0000, Sean Christopherson wrote:
+> On Thu, Jul 14, 2022, Peter Xu wrote:
+> > Hi, Shivam,
+> > 
+> > On Tue, Jul 05, 2022 at 12:51:01PM +0530, Shivam Kumar wrote:
+> > > Hi, here's a summary of what needs to be changed and what should be kept as
+> > > it is (purely my opinion based on the discussions we have had so far):
+> > > 
+> > > i) Moving the dirty quota check to mark_page_dirty_in_slot. Use kvm requests
+> > > in dirty quota check. I hope that the ceiling-based approach, with proper
+> > > documentation and an ioctl exposed for resetting 'dirty_quota' and
+> > > 'pages_dirtied', is good enough. Please post your suggestions if you think
+> > > otherwise.
+> > 
+> > An ioctl just for this could be an overkill to me.
+> >
+> > Currently you exposes only "quota" to kvm_run, then when vmexit you have
+> > exit fields contain both "quota" and "count".  I always think it's a bit
+> > redundant.
+> > 
+> > What I'm thinking is:
+> > 
+> >   (1) Expose both "quota" and "count" in kvm_run, then:
+> > 
+> >       "quota" should only be written by userspace and read by kernel.
+> >       "count" should only be written by kernel and read by the userspace. [*]
+> > 
+> >       [*] One special case is when the userspace found that there's risk of
+> >       quota & count overflow, then the userspace:
+> > 
+> >         - Kick the vcpu out (so the kernel won't write to "count" anymore)
+> >         - Update both "quota" and "count" to safe values
+> >         - Resume the KVM_RUN
+> > 
+> >   (2) When quota reached, we don't need to copy quota/count in vmexit
+> >       fields, since the userspace can read the realtime values in kvm_run.
+> > 
+> > Would this work?
 > 
-> Make it as the opposite function of kvm_mmu_page_clear_unsync().
+> Technically, yes, practically speaking, no.  If KVM doesn't provide the quota
+> that _KVM_ saw at the time of exit, then there's no sane way to audit KVM exits
+> due to KVM_EXIT_DIRTY_QUOTA_EXHAUSTED.  Providing the quota ensure userspace sees
+> sane, coherent data if there's a race between KVM checking the quota and userspace
+> updating the quota.  If KVM doesn't provide the quota, then userspace can see an
+> exit with "count < quota".
+
+This is rare false positive which should be acceptable in this case (the
+same as vmexit with count==quota but we just planned to boost the quota),
+IMHO it's better than always kicking the vcpu, since the overhead for such
+false is only a vmexit but nothing else.
+
 > 
-> Signed-off-by: Lai Jiangshan <jiangshan.ljs@antgroup.com>
-> ---
->  arch/x86/kvm/mmu/mmu.c | 6 +++++-
->  1 file changed, 5 insertions(+), 1 deletion(-)
+> Even if userspace is ok with such races, it will be extremely difficult to detect
+> KVM issues if we mess something up because such behavior would have to be allowed
+> by KVM's ABI.
+
+Could you elaborate?  We have quite a few places sharing these between
+user/kernel on kvm_run, no?
+
 > 
-> diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
-> index c20981dfc4fd..cc0207e26f6e 100644
-> --- a/arch/x86/kvm/mmu/mmu.c
-> +++ b/arch/x86/kvm/mmu/mmu.c
-> @@ -2529,12 +2529,16 @@ static int kvm_mmu_unprotect_page_virt(struct kvm_vcpu *vcpu, gva_t gva)
->  	return r;
->  }
->  
-> -static void kvm_unsync_page(struct kvm *kvm, struct kvm_mmu_page *sp)
-> +static void kvm_mmu_page_mark_unsync(struct kvm *kvm, struct kvm_mmu_page *sp)
-
-The existing code is anything but consistent, but I think I prefer the pattern:
-
-	kvm_mmu_<action>_<target>_<flag>
-
-I.e. kvm_mmu_mark_page_unsync() + kvm_mmu_unmark_page_unsync() to yield:
-
-	kvm_mmu_mark_page_unsync(kvm, sp);
-	kvm_mmu_mark_parents_unsync(sp);
-
-so that at least this code will be consistent with itself.
-
->  {
->  	trace_kvm_mmu_unsync_page(sp);
->  	++kvm->stat.mmu_unsync;
->  	sp->unsync = 1;
-> +}
->  
-> +static void kvm_unsync_page(struct kvm *kvm, struct kvm_mmu_page *sp)
-
-Rather than keep kvm_unsync_page(), what about just open coding the calls in
-mmu_try_to_unsync_pages()?  I can't imagine we'll ever have a second caller.
-
-There won't be a direct pair to kvm_sync_page(), but that's not necessarily a bad
-thing since they are really direct opposites anyway.
-
-> +{
-> +	kvm_mmu_page_mark_unsync(kvm, sp);
->  	kvm_mmu_mark_parents_unsync(sp);
->  }
->  
-> -- 
-> 2.19.1.6.gb485710b
+> > > ii) The change in VMX's handle_invalid_guest_state() remains as it is.
+> > > iii) For now, we are lazily updating dirty quota, i.e. we are updating it
+> > > only when the vcpu exits to userspace with the exit reason
+> > > KVM_EXIT_DIRTY_QUOTA_EXHAUSTED.
+> > 
+> > At least with above design, IMHO we can update kvm_run.quota in real time
+> > without kicking vcpu threads (the quota only increases except the reset
+> > phase for overflow).  Or is there any other reason you need to kick vcpu
+> > out when updating quota?
 > 
+> I'm not convinced overflow is actually possible.
+
+Yeah from that part I second you.  I don't really think it'll even happen
+in practise, but I'd still like to make sure we won't introduce an ioctl
+for the overflow only.
+
+-- 
+Peter Xu
+
