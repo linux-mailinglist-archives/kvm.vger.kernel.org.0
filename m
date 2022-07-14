@@ -2,138 +2,192 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 96EA4575540
-	for <lists+kvm@lfdr.de>; Thu, 14 Jul 2022 20:44:02 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 66F9A5755C9
+	for <lists+kvm@lfdr.de>; Thu, 14 Jul 2022 21:22:16 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S240357AbiGNSn7 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 14 Jul 2022 14:43:59 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58644 "EHLO
+        id S240218AbiGNTWM (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 14 Jul 2022 15:22:12 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57266 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S240796AbiGNSn4 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 14 Jul 2022 14:43:56 -0400
-Received: from mail-pg1-x52b.google.com (mail-pg1-x52b.google.com [IPv6:2607:f8b0:4864:20::52b])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0D342A474
-        for <kvm@vger.kernel.org>; Thu, 14 Jul 2022 11:43:54 -0700 (PDT)
-Received: by mail-pg1-x52b.google.com with SMTP id f65so2337574pgc.12
-        for <kvm@vger.kernel.org>; Thu, 14 Jul 2022 11:43:54 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=NM1N+SJFgizKrF/VDg0MKydtM78EiQvOFsnpZnvX3qg=;
-        b=oh5g80uM7crOAblJXnNWoNPT3HtxmbTitG9x4iY+K+V+9OTCUwiY5ZA6pbiBe3g3fz
-         +urKkk58m9ilC4O0qSuUYQ4V/VuFAu0ryvw/FGyGryuiVgrAYOqpJpwT/HEJ9XW+tOJG
-         7qqI0fpElAq1rpZqKYG76TiJDDBebduoxY/ywpEdQD1zHvVO/lasKi9skCWOgeMCq/P4
-         aOds+CB+12RlAQpqeSL28wghjugi48HENwgTX6tTNX/85ZcCu/V/dfPS5G+tlHWdVOGW
-         eOiHCNxK1OecQGfJm5DGRLp89HM7oWbwT23oyfb0dlZtq6FDCaCkF9+tamb1OJ+87a+t
-         CkrQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=NM1N+SJFgizKrF/VDg0MKydtM78EiQvOFsnpZnvX3qg=;
-        b=Y5gktiejWaSkTUXSt0DlYXTXlQEDr15a1zum21cKbmFoA2uuSHk/WMsl3LV3kGDULQ
-         iXp4XqQrRr/1wd+ge8euK+MgN1Ir0JLemkr7zN5zJl9brFbVrGvOKqi2HOYPdnxDKt+T
-         eRoVCLlbleAcNmqFFA6/PAXLPEhVN9KWrKNXpmC+3IHye1r2xz7WmvgeNQdBKHHo+nKY
-         3caerdWpiFoa3KQxFoS3HGaRV0r7PtsgPl1hpJjup58TozaGiw5XkiIl2KB7eIQr5p0U
-         J9tU0aRlxtKTN7MWRdGDdowaoY3i7rbVnd3fn+PurVrNNpsUPyxMP+OzdY7zO1rq4nb2
-         BCrw==
-X-Gm-Message-State: AJIora98edPHWPqUxDnseFJS6OumKBu20DkkilemdQd92hCJXUHuW1Tu
-        bHTcdqVTRNjP7AfVn5bGvNwEBg==
-X-Google-Smtp-Source: AGRyM1tJHk2vdawvBGjykM6agl14tlz78HVXz2hLMb3XQ16iJitcC29Z3972WLVMDJB2B9YK8kI/BA==
-X-Received: by 2002:a63:dd43:0:b0:416:8be5:94d6 with SMTP id g3-20020a63dd43000000b004168be594d6mr8980723pgj.450.1657824234247;
-        Thu, 14 Jul 2022 11:43:54 -0700 (PDT)
-Received: from google.com (123.65.230.35.bc.googleusercontent.com. [35.230.65.123])
-        by smtp.gmail.com with ESMTPSA id 64-20020a620443000000b005289a50e4c2sm2049045pfe.23.2022.07.14.11.43.53
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 14 Jul 2022 11:43:53 -0700 (PDT)
-Date:   Thu, 14 Jul 2022 18:43:50 +0000
-From:   Sean Christopherson <seanjc@google.com>
-To:     Peter Xu <peterx@redhat.com>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-Subject: Re: [PATCH 3/4] KVM: x86/mmu: Shrink pte_list_desc size when KVM is
- using TDP
-Message-ID: <YtBj5noXqagqYBVs@google.com>
-References: <20220624232735.3090056-1-seanjc@google.com>
- <20220624232735.3090056-4-seanjc@google.com>
- <Ys33RtxeDz0egEM0@xz-m1.local>
- <Ys37fNK6uQ+YTcBh@google.com>
- <Ys4Qx1RxmWrtQ8it@xz-m1.local>
+        with ESMTP id S240104AbiGNTWL (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 14 Jul 2022 15:22:11 -0400
+Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 86AFE4598E
+        for <kvm@vger.kernel.org>; Thu, 14 Jul 2022 12:22:06 -0700 (PDT)
+Received: from pps.filterd (m0098417.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.17.1.5/8.17.1.5) with ESMTP id 26EJ63Wr010465;
+        Thu, 14 Jul 2022 19:21:59 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
+ mime-version : subject : to : cc : references : from : in-reply-to :
+ content-type : content-transfer-encoding; s=pp1;
+ bh=MG7O88yiW2GOcl6J8Wymi5f93H9cXEeMeux3fKnqwZ0=;
+ b=l6BBicIiGldGpYooJ29if9zDySsgr82970/scr6TpXkf2o9FIXMEbyRX4ehxDEvgPBur
+ xIM49WhA+sYgzDfeFjVKDLYqO45kpvztvr4cOsui8AufIGEfOhSjby0EiawcwWkS35Da
+ xMA5MJiCOGjeJxOP533ExDVP3GHPVTWpU/fzv3tmUYhqZivRw0kUzH745pVZjpEPV8PR
+ QFjzUIKOUfW+ly5eFus2QPNrwld7Hm/ThniO5ZnEQDP0b0i2bY8D3cYQun2nXATXT44P
+ bC2DF4qUPycfLSrZGomg3eFjWoABoB5V+d0r0Z7yx8MGnZRtZbFME/tDn95Scl4WDLPY uw== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3has0nr9hg-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Thu, 14 Jul 2022 19:21:59 +0000
+Received: from m0098417.ppops.net (m0098417.ppops.net [127.0.0.1])
+        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 26EJLwWX010585;
+        Thu, 14 Jul 2022 19:21:58 GMT
+Received: from ppma06ams.nl.ibm.com (66.31.33a9.ip4.static.sl-reverse.com [169.51.49.102])
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3has0nr9gr-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Thu, 14 Jul 2022 19:21:58 +0000
+Received: from pps.filterd (ppma06ams.nl.ibm.com [127.0.0.1])
+        by ppma06ams.nl.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 26EJKMZw008204;
+        Thu, 14 Jul 2022 19:21:56 GMT
+Received: from b06cxnps4074.portsmouth.uk.ibm.com (d06relay11.portsmouth.uk.ibm.com [9.149.109.196])
+        by ppma06ams.nl.ibm.com with ESMTP id 3h70xhyfp7-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Thu, 14 Jul 2022 19:21:56 +0000
+Received: from d06av26.portsmouth.uk.ibm.com (d06av26.portsmouth.uk.ibm.com [9.149.105.62])
+        by b06cxnps4074.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 26EJLr9016974288
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Thu, 14 Jul 2022 19:21:53 GMT
+Received: from d06av26.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 10BA4AE04D;
+        Thu, 14 Jul 2022 19:21:53 +0000 (GMT)
+Received: from d06av26.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id E9D68AE045;
+        Thu, 14 Jul 2022 19:21:51 +0000 (GMT)
+Received: from [9.171.80.107] (unknown [9.171.80.107])
+        by d06av26.portsmouth.uk.ibm.com (Postfix) with ESMTP;
+        Thu, 14 Jul 2022 19:21:51 +0000 (GMT)
+Message-ID: <14a44966-474e-17f5-4e9e-01a94c02c289@linux.ibm.com>
+Date:   Thu, 14 Jul 2022 21:26:34 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <Ys4Qx1RxmWrtQ8it@xz-m1.local>
-X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-        T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL
-        autolearn=unavailable autolearn_force=no version=3.4.6
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.3.0
+Subject: Re: [PATCH v8 02/12] s390x/cpu_topology: CPU topology objects and
+ structures
+Content-Language: en-US
+To:     Janis Schoetterl-Glausch <scgl@linux.ibm.com>,
+        qemu-s390x@nongnu.org
+Cc:     qemu-devel@nongnu.org, borntraeger@de.ibm.com, pasic@linux.ibm.com,
+        richard.henderson@linaro.org, david@redhat.com, thuth@redhat.com,
+        cohuck@redhat.com, mst@redhat.com, pbonzini@redhat.com,
+        kvm@vger.kernel.org, ehabkost@redhat.com,
+        marcel.apfelbaum@gmail.com, eblake@redhat.com, armbru@redhat.com,
+        seiden@linux.ibm.com, nrb@linux.ibm.com, frankja@linux.ibm.com
+References: <20220620140352.39398-1-pmorel@linux.ibm.com>
+ <20220620140352.39398-3-pmorel@linux.ibm.com>
+ <de92ef17-3a17-df44-97aa-19e67d1d5b3d@linux.ibm.com>
+ <5215ca74-e71c-73df-69c9-d2522e082706@linux.ibm.com>
+ <53698be8-0eab-8dc2-2d54-df2a89e1092f@linux.ibm.com>
+ <4fef46f1-f43f-665f-47dc-89107385572e@linux.ibm.com>
+ <0a4ab4e8-e628-0865-0198-384b4fcc88de@linux.ibm.com>
+From:   Pierre Morel <pmorel@linux.ibm.com>
+In-Reply-To: <0a4ab4e8-e628-0865-0198-384b4fcc88de@linux.ibm.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-ORIG-GUID: lXhazBK6dldPjYMzqEOObmgaJdL3x51s
+X-Proofpoint-GUID: xpcLAIX0w7LAsWmNY6QIdPcEH_BM-sd1
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.205,Aquarius:18.0.883,Hydra:6.0.517,FMLib:17.11.122.1
+ definitions=2022-07-14_17,2022-07-14_01,2022-06-22_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 malwarescore=0 phishscore=0
+ adultscore=0 suspectscore=0 mlxlogscore=999 mlxscore=0 clxscore=1015
+ priorityscore=1501 lowpriorityscore=0 spamscore=0 bulkscore=0
+ impostorscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2206140000 definitions=main-2207140083
+X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,
+        SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no
+        version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Jul 12, 2022, Peter Xu wrote:
-> On Tue, Jul 12, 2022 at 10:53:48PM +0000, Sean Christopherson wrote:
-> > On Tue, Jul 12, 2022, Peter Xu wrote:
-> > > On Fri, Jun 24, 2022 at 11:27:34PM +0000, Sean Christopherson wrote:
-> > > Sorry to start with asking questions, it's just that if we know that
-> > > pte_list_desc is probably not gonna be used then could we simply skip the
-> > > cache layer as a whole?  IOW, we don't make the "array size of pte list
-> > > desc" dynamic, instead we make the whole "pte list desc cache layer"
-> > > dynamic.  Is it possible?
-> > 
-> > Not really?  It's theoretically possible, but it'd require pre-checking that aren't
-> > aliases, and to do that race free we'd have to do it under mmu_lock, which means
-> > having to support bailing from the page fault to topup the cache.  The memory
-> > overhead for the cache isn't so significant that it's worth that level of complexity.
+
+
+On 7/14/22 14:50, Janis Schoetterl-Glausch wrote:
+> On 7/14/22 13:25, Pierre Morel wrote:
 > 
-> Ah, okay..
+> [...]
 > 
-> So the other question is I'm curious how fundamentally this extra
-> complexity could help us to save spaces.
+>>
+>> That is sure.
+>> I thought about put a fatal error report during the initialization in the s390_topology_setup()
+>>
+>>> And you can set thread > 1 today, so we'd need to handle that. (increase the number of cpus instead and print a warning?)
+>>>
+>>> [...]
+>>
+>> this would introduce arch dependencies in the hw/core/
+>> I think that the error report for Z is enough.
+>>
+>> So once we support Multithreading in the guest we can adjust it easier without involving the common code.
+>>
+>> Or we can introduce a thread_supported in SMPCompatProps, which would be good.
+>> I would prefer to propose this outside of the series and suppress the fatal error once it is adopted.
+>>
 > 
-> The thing is IIUC slub works in page sizes, so at least one slub cache eats
-> one page which is 4096 anyway.  In our case if there was 40 objects
-> allocated for 14 entries array, are you sure it'll still be 40 objects but
-> only smaller?
+> Yeah, could be a separate series, but then the question remains what you in this one, that is
+> if you change the code so it would be correct if multithreading were supported.
 
-Definitely not 100% positive.
+I would like to first not support multi-thread and do a fatal error if 
+threads are defined or implicitly defined as different of 1.
 
-> I'd thought after the change each obj is smaller but slub could have cached
-> more objects since min slub size is 4k for x86.
+I prefer to keep multithreading for later, I did not have a look at all 
+the implications for the moment.
 
-
-> I don't remember the details of the eager split work on having per-vcpu
-
-The eager split logic uses a single per-VM cache, but it's large (513 entries).
-
-> caches, but I'm also wondering if we cannot drop the whole cache layer
-> whether we can selectively use slub in this case, then we can cache much
-> less assuming we will use just less too.
+>>>
+>>>>>> +
+>>>>>> +/*
+>>>>>> + * Setting the first topology: 1 book, 1 socket
+>>>>>> + * This is enough for 64 cores if the topology is flat (single socket)
+>>>>>> + */
+>>>>>> +void s390_topology_setup(MachineState *ms)
+>>>>>> +{
+>>>>>> +    DeviceState *dev;
+>>>>>> +
+>>>>>> +    /* Create BOOK bridge device */
+>>>>>> +    dev = qdev_new(TYPE_S390_TOPOLOGY_BOOK);
+>>>>>> +    object_property_add_child(qdev_get_machine(),
+>>>>>> +                              TYPE_S390_TOPOLOGY_BOOK, OBJECT(dev));
+>>>>>
+>>>>> Why add it to the machine instead of directly using a static?
+>>>>
+>>>> For my opinion it is a characteristic of the machine.
+>>>>
+>>>>> So it's visible to the user via info qtree or something?
+>>>>
+>>>> It is already visible to the user on info qtree.
+>>>>
+>>>>> Would that even be the appropriate location to show that?
+>>>>
+>>>> That is a very good question and I really appreciate if we discuss on the design before diving into details.
+>>>>
+>>>> The idea is to have the architecture details being on qtree as object so we can plug new drawers/books/socket/cores and in the future when the infrastructure allows it unplug them.
+>>>
+>>> Would it not be more accurate to say that we plug in new cpus only?
+>>> Since you need to specify the topology up front with -smp and it cannot change after.
+>>
+>> smp specify the maximum we can have.
+>> I thought we can add dynamically elements inside this maximum set.
+>>
+>>> So that all is static, books/sockets might be completely unpopulated, but they still exist in a way.
+>>> As far as I understand, STSI only allows for cpus to change, nothing above it.
+>>
+>> I thought we want to plug new books or drawers but I may be wrong.
 > 
-> Currently:
-> 
-> 	r = kvm_mmu_topup_memory_cache(&vcpu->arch.mmu_pte_list_desc_cache,
-> 				       1 + PT64_ROOT_MAX_LEVEL + PTE_PREFETCH_NUM);
-> 
-> We could have the pte list desc cache layer to be managed manually
-> (e.g. using kmalloc()?) for tdp=1, then we'll at least in control of how
-> many objects we cache?  Then with a limited number of objects, the wasted
-> memory is much reduced too.
+> So you want to be able to plug in, for example, a socket without any cpus in it?
+> I'm not seeing anything in the description of STSI that forbids having empty containers
+> or containers with a cpu entry without any cpus. But I don't know why that would be useful.
+> And if you don't want empty containers, then the container will just show up when plugging in the cpu.
 
-I suspect that, without implementing something that looks an awful lot like the
-kmem caches, manually handling allocations would degrade performance for shadow
-paging and nested MMUs.
+You already convinced me, it is a non sense and, anyway, building every 
+container when a cpu is added is how it works with the current 
+implementation.
 
-> I think I'm fine with current approach too, but only if it really helps
-> reduce memory footprint as we expected.
 
-Yeah, I'll get numbers before sending v2 (which will be quite some time at this
-point).
+-- 
+Pierre Morel
+IBM Lab Boeblingen
