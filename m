@@ -2,97 +2,133 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id E4B7C57463B
-	for <lists+kvm@lfdr.de>; Thu, 14 Jul 2022 09:56:27 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id E52AC5744D3
+	for <lists+kvm@lfdr.de>; Thu, 14 Jul 2022 08:07:18 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237208AbiGNH40 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 14 Jul 2022 03:56:26 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54550 "EHLO
+        id S231611AbiGNGHR (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 14 Jul 2022 02:07:17 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35298 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235310AbiGNH4Y (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 14 Jul 2022 03:56:24 -0400
+        with ESMTP id S230061AbiGNGHQ (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 14 Jul 2022 02:07:16 -0400
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 8D98DBDE
-        for <kvm@vger.kernel.org>; Thu, 14 Jul 2022 00:56:23 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 258A03057A
+        for <kvm@vger.kernel.org>; Wed, 13 Jul 2022 23:07:16 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1657785381;
+        s=mimecast20190719; t=1657778835;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=SE9eAN5X+ShMxtdmF41zDz1yLtEpxxR36zmsks8hPS0=;
-        b=cXGfdvXzsY3YJ1qv6UoZHxJ4cEUrr8xWfdykgUAeD32dZqkbPD7qCU8PvAUI7FP2xGi7O6
-        EdXW47cdF9CuMrBEo1CTn3u+ZN6hFnHTXkTiSzqdETPcGIs7qOhg/ZfKP5i07SgEismp1w
-        +bSfCfzhxneowe1s85dPsA62Ba+vh6k=
-Received: from mail-ed1-f71.google.com (mail-ed1-f71.google.com
- [209.85.208.71]) by relay.mimecast.com with ESMTP with STARTTLS
+         content-transfer-encoding:content-transfer-encoding;
+        bh=0Iv/of2lWJhY6Wq6eUx2wF1MOm6COuhI4THcs0fOz4c=;
+        b=fPzFMdNmjwuCC96UL0wdRD9AkBLOSBVSRC2qhVYd4DqeonmMWLVERZY6dkWe7BH/F7VX5M
+        6LpqHTqTztJRheIPcDrZMdBMSMwxnwVxGzhNaVSN5HlWpUKjQlLpq1sMxo+lT/AfLNF7vl
+        TTgm/L08V7AoQHT4DTJjpNyI9yP1PzM=
+Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
+ [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-414-pHryeRSaPzyNGH5FZtr7Mg-1; Thu, 14 Jul 2022 03:55:54 -0400
-X-MC-Unique: pHryeRSaPzyNGH5FZtr7Mg-1
-Received: by mail-ed1-f71.google.com with SMTP id w13-20020a05640234cd00b0043a991fb3f3so1008116edc.3
-        for <kvm@vger.kernel.org>; Thu, 14 Jul 2022 00:55:48 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
-         :content-language:to:cc:references:from:in-reply-to
-         :content-transfer-encoding;
-        bh=SE9eAN5X+ShMxtdmF41zDz1yLtEpxxR36zmsks8hPS0=;
-        b=QiVtBKRgUZBU7aE0CE6DVSoYEfXQq/z17cnKn++FE+4TItxWiLW6Dl8ehJgStMlDoV
-         HP/DvE1TpbPmyDF0VVT3HZNATj0OlstS0FrrSuYgeNN94n5Mb5l2zOc0Y/qGaPhn84c1
-         N0velQHj4N/QVqI2/twSxF5hId6aYyXbnbVNV8rRiuvzVHWyjKlSwLR2mlhGiYeVn0KC
-         Q/ZX0eeDXqdsHR7rWPS1VaPsnXvcAKOTFpe+syOdZ6xuksYCgz7T4yG4/dP7NvNivWyB
-         YqQ77QAUUHmOwgj5qjfRf8XJbRzy+/dTtVPz8yeNzKVxF8Ki0Mzn7z2xL5My4RH5tQJc
-         0y2A==
-X-Gm-Message-State: AJIora9bj1I9OYND4iLmbwwOBgZlqGxjpEoMxjajKvi1XjgkIFPFxgbf
-        tyX3ZC9IJ2P4F/vOSJSvFAJvJQ1Wo+XOZNnl5NzUAwF0UL6rHctqNLxwBEQxl2AHr4Y/gMVQ3Ja
-        rYGd+BuYSSApR
-X-Received: by 2002:a05:6402:34c1:b0:43a:bd7a:898a with SMTP id w1-20020a05640234c100b0043abd7a898amr10764876edc.426.1657785344688;
-        Thu, 14 Jul 2022 00:55:44 -0700 (PDT)
-X-Google-Smtp-Source: AGRyM1um/IMU8CKiTuPcepZAnSTRYoRBRZ2ZH0kI9/eLTdxlSioknmf1mGAkVR3V+y/TA4I2nzD2xg==
-X-Received: by 2002:a05:6402:34c1:b0:43a:bd7a:898a with SMTP id w1-20020a05640234c100b0043abd7a898amr10764856edc.426.1657785344487;
-        Thu, 14 Jul 2022 00:55:44 -0700 (PDT)
-Received: from ?IPV6:2001:b07:6468:f312:5e2c:eb9a:a8b6:fd3e? ([2001:b07:6468:f312:5e2c:eb9a:a8b6:fd3e])
-        by smtp.googlemail.com with ESMTPSA id kv10-20020a17090778ca00b0072eddc468absm385354ejc.134.2022.07.14.00.55.43
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 14 Jul 2022 00:55:43 -0700 (PDT)
-Message-ID: <52ef13d4-068d-bd2c-11aa-c7053798aee9@redhat.com>
-Date:   Thu, 14 Jul 2022 09:55:42 +0200
+ us-mta-568-xg7vNdqMMFWLrvckPTivMg-1; Thu, 14 Jul 2022 02:07:10 -0400
+X-MC-Unique: xg7vNdqMMFWLrvckPTivMg-1
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.rdu2.redhat.com [10.11.54.2])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id B956E802D1C;
+        Thu, 14 Jul 2022 06:07:09 +0000 (UTC)
+Received: from gshan.redhat.com (vpn2-54-37.bne.redhat.com [10.64.54.37])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id 6237140E80E0;
+        Thu, 14 Jul 2022 06:07:05 +0000 (UTC)
+From:   Gavin Shan <gshan@redhat.com>
+To:     kvmarm@lists.cs.columbia.edu
+Cc:     kvm@vger.kernel.org, linux-kselftest@vger.kernel.org,
+        linux-kernel@vger.kernel.org, seanjc@google.com,
+        mathieu.desnoyers@efficios.com, shuah@kernel.org, maz@kernel.org,
+        oliver.upton@linux.dev, pbonzini@redhat.com, shan.gavin@gmail.com
+Subject: [PATCH] KVM: selftests: Double check on the current CPU in rseq_test
+Date:   Thu, 14 Jul 2022 16:06:42 +0800
+Message-Id: <20220714080642.3376618-1-gshan@redhat.com>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.10.0
-Subject: Re: [PATCH v2 0/9] KVM: x86/MMU: Optimize disabling dirty logging
-Content-Language: en-US
-To:     Sean Christopherson <seanjc@google.com>
-Cc:     Ben Gardon <bgardon@google.com>, linux-kernel@vger.kernel.org,
-        kvm@vger.kernel.org, Peter Xu <peterx@redhat.com>,
-        David Matlack <dmatlack@google.com>,
-        Jim Mattson <jmattson@google.com>,
-        David Dunn <daviddunn@google.com>,
-        Jing Zhang <jingzhangos@google.com>,
-        Junaid Shahid <junaids@google.com>
-References: <20220321224358.1305530-1-bgardon@google.com>
- <dba0ecc8-90ae-975f-7a27-3049d6951ba0@redhat.com>
- <YszQcBy1RwGmkkht@google.com>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-In-Reply-To: <YszQcBy1RwGmkkht@google.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 2.84 on 10.11.54.2
 X-Spam-Status: No, score=-2.7 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
-        RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE
-        autolearn=unavailable autolearn_force=no version=3.4.6
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=unavailable
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 7/12/22 03:37, Sean Christopherson wrote:
-> This fell through the cracks.  Ben is on a long vacation, I'll find my copy of
-> the Necronomicon and do a bit of resurrection, and address the feedback from v2
-> along the way.
+In rseq_test, there are two threads created. Those two threads are
+'main' and 'migration_thread' separately. We also have the assumption
+that non-migration status on 'migration-worker' thread guarantees the
+same non-migration status on 'main' thread. Unfortunately, the assumption
+isn't true. The 'main' thread can be migrated from one CPU to another
+one between the calls to sched_getcpu() and READ_ONCE(__rseq.cpu_id).
+The following assert is raised eventually because of the mismatched
+CPU numbers.
 
-This was superseded by the simple patch to zap only the leaves I think?
+The issue can be reproduced on arm64 system occasionally.
 
-Paolo
+  host# uname -r
+  5.19.0-rc6-gavin+
+  host# # cat /proc/cpuinfo | grep processor | tail -n 1
+  processor    : 223
+  host# pwd
+  /home/gavin/sandbox/linux.main/tools/testing/selftests/kvm
+  host# for i in `seq 1 100`;   \
+        do echo "--------> $i"; \
+        ./rseq_test; sleep 3;   \
+        done
+  --------> 1
+  --------> 2
+  --------> 3
+  --------> 4
+  --------> 5
+  --------> 6
+  ==== Test Assertion Failure ====
+    rseq_test.c:265: rseq_cpu == cpu
+    pid=3925 tid=3925 errno=4 - Interrupted system call
+       1  0x0000000000401963: main at rseq_test.c:265 (discriminator 2)
+       2  0x0000ffffb044affb: ?? ??:0
+       3  0x0000ffffb044b0c7: ?? ??:0
+       4  0x0000000000401a6f: _start at ??:?
+    rseq CPU = 4, sched CPU = 27
+
+This fixes the issue by double-checking on the current CPU after
+call to READ_ONCE(__rseq.cpu_id) and restarting the test if the
+two consecutive CPU numbers aren't euqal.
+
+Fixes: 61e52f1630f5 ("KVM: selftests: Add a test for KVM_RUN+rseq to detect task migration bugs")
+Signed-off-by: Gavin Shan <gshan@redhat.com>
+---
+ tools/testing/selftests/kvm/rseq_test.c | 5 +++--
+ 1 file changed, 3 insertions(+), 2 deletions(-)
+
+diff --git a/tools/testing/selftests/kvm/rseq_test.c b/tools/testing/selftests/kvm/rseq_test.c
+index 4158da0da2bb..74709dd9f5b2 100644
+--- a/tools/testing/selftests/kvm/rseq_test.c
++++ b/tools/testing/selftests/kvm/rseq_test.c
+@@ -207,7 +207,7 @@ int main(int argc, char *argv[])
+ {
+ 	int r, i, snapshot;
+ 	struct kvm_vm *vm;
+-	u32 cpu, rseq_cpu;
++	u32 cpu, rseq_cpu, last_cpu;
+ 
+ 	/* Tell stdout not to buffer its content */
+ 	setbuf(stdout, NULL);
+@@ -259,8 +259,9 @@ int main(int argc, char *argv[])
+ 			smp_rmb();
+ 			cpu = sched_getcpu();
+ 			rseq_cpu = READ_ONCE(__rseq.cpu_id);
++			last_cpu = sched_getcpu();
+ 			smp_rmb();
+-		} while (snapshot != atomic_read(&seq_cnt));
++		} while (snapshot != atomic_read(&seq_cnt) || cpu != last_cpu);
+ 
+ 		TEST_ASSERT(rseq_cpu == cpu,
+ 			    "rseq CPU = %d, sched CPU = %d\n", rseq_cpu, cpu);
+-- 
+2.23.0
 
