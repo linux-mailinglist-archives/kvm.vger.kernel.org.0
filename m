@@ -2,99 +2,141 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 5252E5757C1
-	for <lists+kvm@lfdr.de>; Fri, 15 Jul 2022 00:41:50 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id A1E5F5757EA
+	for <lists+kvm@lfdr.de>; Fri, 15 Jul 2022 01:16:02 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S240698AbiGNWlr (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 14 Jul 2022 18:41:47 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50866 "EHLO
+        id S240867AbiGNXPu (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 14 Jul 2022 19:15:50 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39494 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229448AbiGNWlq (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 14 Jul 2022 18:41:46 -0400
-Received: from vps-vb.mhejs.net (vps-vb.mhejs.net [37.28.154.113])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 47B3E71BE5;
-        Thu, 14 Jul 2022 15:41:43 -0700 (PDT)
-Received: from MUA
-        by vps-vb.mhejs.net with esmtps  (TLS1.2) tls TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256
-        (Exim 4.94.2)
-        (envelope-from <mail@maciej.szmigiero.name>)
-        id 1oC7W3-0001Ki-Qf; Fri, 15 Jul 2022 00:41:03 +0200
-Message-ID: <84646f56-dcb0-b0f8-f485-eb0d69a84c9c@maciej.szmigiero.name>
-Date:   Fri, 15 Jul 2022 00:40:58 +0200
-MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.9.0
-Content-Language: en-US
-To:     Maxim Levitsky <mlevitsk@redhat.com>
-Cc:     Thomas Gleixner <tglx@linutronix.de>,
-        Borislav Petkov <bp@alien8.de>,
-        "H. Peter Anvin" <hpa@zytor.com>,
+        with ESMTP id S240811AbiGNXPt (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 14 Jul 2022 19:15:49 -0400
+Received: from mail-pl1-x630.google.com (mail-pl1-x630.google.com [IPv6:2607:f8b0:4864:20::630])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 576D070E57
+        for <kvm@vger.kernel.org>; Thu, 14 Jul 2022 16:15:48 -0700 (PDT)
+Received: by mail-pl1-x630.google.com with SMTP id 5so1736264plk.9
+        for <kvm@vger.kernel.org>; Thu, 14 Jul 2022 16:15:48 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=1uA4mMpLpcRR07bw1byaro66HK9+gzc14ZtiPZ8jfjA=;
+        b=As7pQ8CUT32Bd1LIq4AKb1ELuwXk+Tg1MdC1AUysMK9njWTOlc0OAsXlYWtrr15WJk
+         t5DF7RJsJdX2IR1vzbg0HicaP5A2owgtHNkeSnINSoyTDbi8Ql5QDPkxKyD4dfoUrGJo
+         tRetXkr7kWDTsVcYinNmDFQ39nrnuRrxNd5E4wCVyv1itFi0ABg2+6qKEqwMEprgc893
+         TSEFRiVf74mGYfN6ZZqIzL20etl7QHWiX4IciOkajGrieYbSwPZ+5UYHPMkPzIMhAkbL
+         PcIKqJiZwDSy4YkQnQ7E94tuNJCizdBQWm0M7qr2DoUzRPC9iCHDUTY0QU51B8YEZlMw
+         S2RA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=1uA4mMpLpcRR07bw1byaro66HK9+gzc14ZtiPZ8jfjA=;
+        b=FSpOLccrsxAuo73SqF6GARTZdyhUXphgVn2o9WHbH5etQ2mUIWo2spR9z+iCaOnmCr
+         d6VeLuM+kkZ4sYq7eVpwYi0B1p2R4Xwo6vn3oemvoxTu7jTVBl1/MQZNoEd/ZLXCjmM6
+         VRODKdJiZUqcI3pqPs7dyjPa4kKQddoUqvXh3+6mgdbIElYgsRXgjTNI5I6as6E6eDFA
+         i48v8fhWDdrw1FwQeOJjCwpiPhCNzWkT0w2pHzWIWUAY5Cok6278QXlmBW3Wvnz07viM
+         v+XkWdl/QeFBQnBXsX6qUnzCR3JVRS5i8VM2tKrePuWSWI268RJ1ySFvAR+PVwCXLcSo
+         NhXg==
+X-Gm-Message-State: AJIora/OpxmG79XM/GtVl9bAiV+HDd/5k620YXXVpRp7BwKkkFtqzS13
+        Er+ps+Rfm4W5mz5fzyrAbw48fA==
+X-Google-Smtp-Source: AGRyM1uZbC7z2IBVQIZHYd+INOO841VeEdfsy+WMFnXkM1+47oPPD8//WDi92rKva1HNS7Gb3v0yVQ==
+X-Received: by 2002:a17:90a:c4f:b0:1df:a178:897f with SMTP id u15-20020a17090a0c4f00b001dfa178897fmr12107587pje.19.1657840547725;
+        Thu, 14 Jul 2022 16:15:47 -0700 (PDT)
+Received: from google.com (123.65.230.35.bc.googleusercontent.com. [35.230.65.123])
+        by smtp.gmail.com with ESMTPSA id m5-20020a170902db0500b001677d4a9654sm2016703plx.265.2022.07.14.16.15.46
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 14 Jul 2022 16:15:47 -0700 (PDT)
+Date:   Thu, 14 Jul 2022 23:15:42 +0000
+From:   Sean Christopherson <seanjc@google.com>
+To:     Lai Jiangshan <jiangshanlai@gmail.com>
+Cc:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
         Paolo Bonzini <pbonzini@redhat.com>,
         Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Sean Christopherson <seanjc@google.com>,
-        Joerg Roedel <joro@8bytes.org>, Ingo Molnar <mingo@redhat.com>,
-        Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org,
-        linux-kernel@vger.kernel.org, Jim Mattson <jmattson@google.com>,
-        kvm@vger.kernel.org
-References: <20220714124453.188655-1-mlevitsk@redhat.com>
- <52d44630-21ad-1291-4185-40d5728eaea6@maciej.szmigiero.name>
- <034401953bc935d997c143153938edb1034b52cd.camel@redhat.com>
-From:   "Maciej S. Szmigiero" <mail@maciej.szmigiero.name>
-Subject: Re: [PATCH] KVM: SVM: fix task switch emulation on INTn instruction.
-In-Reply-To: <034401953bc935d997c143153938edb1034b52cd.camel@redhat.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,NICE_REPLY_A,
-        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
-        autolearn_force=no version=3.4.6
+        Maxim Levitsky <mlevitsk@redhat.com>,
+        Lai Jiangshan <jiangshan.ljs@antgroup.com>
+Subject: Re: [PATCH 04/12] KVM: X86/MMU: Remove mmu_pages_clear_parents()
+Message-ID: <YtCjnvTkx1wtsuLn@google.com>
+References: <20220605064342.309219-1-jiangshanlai@gmail.com>
+ <20220605064342.309219-5-jiangshanlai@gmail.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20220605064342.309219-5-jiangshanlai@gmail.com>
+X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
+        T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 14.07.2022 15:57, Maxim Levitsky wrote:
-> On Thu, 2022-07-14 at 15:50 +0200, Maciej S. Szmigiero wrote:
->> On 14.07.2022 14:44, Maxim Levitsky wrote:
->>> Recently KVM's SVM code switched to re-injecting software interrupt events,
->>> if something prevented their delivery.
->>>
->>> Task switch due to task gate in the IDT, however is an exception
->>> to this rule, because in this case, INTn instruction causes
->>> a task switch intercept and its emulation completes the INTn
->>> emulation as well.
->>>
->>> Add a missing case to task_switch_interception for that.
->>>
->>> This fixes 32 bit kvm unit test taskswitch2.
->>>
->>> Fixes: 7e5b5ef8dca322 ("KVM: SVM: Re-inject INTn instead of retrying the insn on "failure"")
->>>
->>> Signed-off-by: Maxim Levitsky <mlevitsk@redhat.com>
->>> ---
->>
->> That's a good catch, your patch looks totally sensible to me.
->> People running Win 3.x or OS/2 on top of KVM will surely be grateful for it :)
+For the shortlog, I really want to capture the net effect.  It took me a lot of
+staring and reading (and hopefully not misreading) to figure out that this is a
+glorified nop.
+
+  KVM: x86/mmu: Update unsync children metadata via recursion, not bottom-up walk
+
+On Sun, Jun 05, 2022, Lai Jiangshan wrote:
+> From: Lai Jiangshan <jiangshan.ljs@antgroup.com>
 > 
-> Yes and also people who run 32 bit kvm unit tests :)
-
-It looks like more people need to do this regularly :)
-
-> BTW, I do have a win98 VM which I run once in a while under KVM.
-> On Intel it works very well, on AMD, only works without NPT and without MMU
-> pre-fetching, due to fact that the OS doesn't correctly invalidate TLB entries.
-
-Interesting, maybe it is related to some operation in 90s CPUs implicitly
-invalidating (or just replacing) enough TLB entries to actually make it work
-(usually) - just a guess.
-
-> I do need to test KVM with OS/2 on one of the weekends.... ;-)
+> mmu_unsync_walk() is designed to be workable in a pagetable which has
+> unsync child bits set in the shadow pages in the pagetable but without
+> any unsync shadow pages.
 > 
-> Thanks for the review,
-> 	Best regards,
-> 		Maxim Levitsky
-> 
+> This can be resulted when the unsync shadow pages of a pagetable
+> can be walked from other pagetables and have been synced or zapped
+> when other pagetables are synced or zapped.
+>
+> So mmu_pages_clear_parents() is not required even when the callers of
+> mmu_unsync_walk() zap or sync the pagetable.
 
-Thanks,
-Maciej
+There's one other critical piece that it took me a quite some time to suss out
+from the code: the @parent passed to mmu_sync_children() _is_ updated because
+mmu_sync_children() loops on mmu_unsync_walk().  It's only the parents of @parent
+that are not updated, but they weren't updated anyways because mmu_pages_clear_parents()
+doesn't operate on the parents of @parent.
+
+> So remove mmu_pages_clear_parents() and the child bits can be cleared in
+> the next call of mmu_unsync_walk() in one go.
+
+Ah, I missed (over and over) that the "next call" is the one right mmu_sync_children()
+and mmu_unsync_walk(), not a future call.
+
+Because I kept losing track of which pagetable was which, how about this for
+a changelog?
+
+  When syncing a shadow page with unsync children, do not update the
+  "unsync children" metadata from the bottom up, and instead defer the
+  update to the next "iteration" of mmu_unsync_walk() (all users of
+  mmu_unsync_walk() loop until it returns "no unsync children").
+
+  mmu_unsync_walk() is designed to handle the scenario where a shadow page
+  has a false positive on having unsync children, i.e. unsync_children can
+  be elevated without any child shadow pages actually being unsync.
+
+  Such a scenario already occurs when a child is synced or zapped by a
+  different walk of the page tables, i.e. with a different set of parents,
+  as unmarking parents is done only for the current walk.
+
+  Note, mmu_pages_clear_parents() doesn't update parents of @parent, so
+  there's no change in functionality from that perspective.
+
+  Removing mmu_pages_clear_parents() allows for further simplifying
+  mmu_unsync_walk(), including removing the struct mmu_page_path since
+  mmu_pages_clear_parents() was the only the function is the only user of it.
+
+With a cleaned up shortlog+changelog, and assuming I didn't misread everything...
+
+Reviewed-by: Sean Christopherson <seanjc@google.com>
+
+> 
+> Removing mmu_pages_clear_parents() allows for further simplifying
+> mmu_unsync_walk() including removing the struct mmu_page_path since
+> the function is the only user of it.
+> 
+> Signed-off-by: Lai Jiangshan <jiangshan.ljs@antgroup.com>
+> ---
