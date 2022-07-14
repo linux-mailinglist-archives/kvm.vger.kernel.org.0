@@ -2,105 +2,123 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 0078C5753F5
-	for <lists+kvm@lfdr.de>; Thu, 14 Jul 2022 19:22:39 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 9197C575408
+	for <lists+kvm@lfdr.de>; Thu, 14 Jul 2022 19:27:49 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232608AbiGNRWf (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 14 Jul 2022 13:22:35 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50048 "EHLO
+        id S239522AbiGNR1h (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 14 Jul 2022 13:27:37 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53426 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229496AbiGNRWe (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 14 Jul 2022 13:22:34 -0400
-Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BEBA54F642;
-        Thu, 14 Jul 2022 10:22:33 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=casper.20170209; h=In-Reply-To:Content-Type:MIME-Version:
-        References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
-        Content-Transfer-Encoding:Content-ID:Content-Description;
-        bh=htDFA1Y7dlEasSYr1rXrw+KJdNZ2vQTs/F4G7+dnxHc=; b=vF7uoe/sCJwSIeJJcf4y6HPKM2
-        Q3yipjaZYv0Hmbou/nWc9Iy5EkFsMo+uDuFtNRjlgF9TyVfjrjcmF9BpPxq2VBZ5qauRgwsK8IrVi
-        83yuE0iiD52ag2wAsQdie4D8f+5aRmsf+ZGGjqIi/cmVrxCUVEB2hQREKYgCHcpjTr2fby2czP3rC
-        W/V8zgXnXHl+hDE111cklWOQhqbKxMcFNBRzldUrIE2sfJMyre3XWmkSuiGpYvzcXljmNPBJCKB6k
-        3GsnI3G4n4h7z46pDkwqFMt5vZLUAr0WiAuPU9F1RdmUf4AY80A5pwqkSi1GK9LjfdgQxFAVpjDy5
-        ivJO228w==;
-Received: from j130084.upc-j.chello.nl ([24.132.130.84] helo=worktop.programming.kicks-ass.net)
-        by casper.infradead.org with esmtpsa (Exim 4.94.2 #2 (Red Hat Linux))
-        id 1oC2XM-009XzV-3L; Thu, 14 Jul 2022 17:22:04 +0000
-Received: by worktop.programming.kicks-ass.net (Postfix, from userid 1000)
-        id AD80B980185; Thu, 14 Jul 2022 19:22:02 +0200 (CEST)
-Date:   Thu, 14 Jul 2022 19:22:02 +0200
-From:   Peter Zijlstra <peterz@infradead.org>
-To:     Linus Torvalds <torvalds@linux-foundation.org>
-Cc:     Boris Petkov <bp@alien8.de>, Paolo Bonzini <pbonzini@redhat.com>,
-        Guenter Roeck <linux@roeck-us.net>,
-        Thadeu Lima de Souza Cascardo <cascardo@canonical.com>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        Naresh Kamboju <naresh.kamboju@linaro.org>,
-        Florian Fainelli <f.fainelli@gmail.com>,
-        kvm list <kvm@vger.kernel.org>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        Dave Hansen <dave.hansen@linux.intel.com>,
-        stable <stable@vger.kernel.org>,
-        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-        Pavel Machek <pavel@denx.de>,
-        Jon Hunter <jonathanh@nvidia.com>,
-        Sudip Mukherjee <sudipm.mukherjee@gmail.com>,
-        Slade Watkins <slade@sladewatkins.com>, patches@kernelci.org,
-        Sean Christopherson <seanjc@google.com>,
-        Shuah Khan <shuah@kernel.org>, Ingo Molnar <mingo@redhat.com>,
-        Thomas Gleixner <tglx@linutronix.de>, X86 ML <x86@kernel.org>,
-        lkft-triage@lists.linaro.org,
-        Alex =?iso-8859-1?Q?Benn=E9e?= <alex.bennee@linaro.org>,
-        "H. Peter Anvin" <hpa@zytor.com>,
-        Anders Roxell <anders.roxell@linaro.org>
-Subject: Re: [PATCH 5.15 00/78] 5.15.55-rc1 review
-Message-ID: <YtBQutgSh2j3mFNB@worktop.programming.kicks-ass.net>
-References: <20220712183238.844813653@linuxfoundation.org>
- <CA+G9fYtntg7=zWSs-dm+n_AUr_u0eBOU0zrwWqMeXZ+SF6_bLw@mail.gmail.com>
- <eb63e4ce-843f-c840-060e-6e15defd3c4d@roeck-us.net>
- <CAHk-=wj5cOA+fbGeV15kvwe6YGT54Wsk8F2UGoekVQLTPJz_pw@mail.gmail.com>
- <CAHk-=wgq1soM4gudypWLVQdYuvJbXn38LtvJMtnLZX+RTypqLg@mail.gmail.com>
- <Ys/bYJ2bLVfNBjFI@nazgul.tnic>
- <6b4337f4-d1de-7ba3-14e8-3ad0f9b18788@redhat.com>
- <8BEC3365-FC09-46C5-8211-518657C0308E@alien8.de>
- <CAHk-=wj4vtoWZPMXJU-B9qW1zLHsoA1Qb2P0NW=UFhZmrCrf9Q@mail.gmail.com>
+        with ESMTP id S238905AbiGNR1d (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 14 Jul 2022 13:27:33 -0400
+Received: from mail-pj1-x1029.google.com (mail-pj1-x1029.google.com [IPv6:2607:f8b0:4864:20::1029])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2729B5F128
+        for <kvm@vger.kernel.org>; Thu, 14 Jul 2022 10:27:32 -0700 (PDT)
+Received: by mail-pj1-x1029.google.com with SMTP id v4-20020a17090abb8400b001ef966652a3so9237445pjr.4
+        for <kvm@vger.kernel.org>; Thu, 14 Jul 2022 10:27:32 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=utH2IS/VTX5JTS0QLCXRVyshNaT5RNL5Nc+i8BDtLmk=;
+        b=rF12YwCEfFYueQbJLNdKUdSIPn3X/JN/wNW9JmI7PR/QSVfskRk9FLorv09enmrJEt
+         yere3bNl9k4wIiAy3UIFX0nhGyeL3iiGzOo2xq5kJmAnDswrTOs6XPnVlRD4QWiQVwqr
+         K1xBzJ0W/PDTuXHhjpGY7naObopY8/99iO1nXeOpgjmKlZUu05KTMg4j5BpdP5+oKLdN
+         sR+Di65OwzZDZGewiMDnB8pr79dCMheqPr7XCMwS5NhOJKExYEDtSjDpfzAxDTWp89BU
+         ET586gz+4uGrx4JfHzaZY/s1jVKBQbHZYv6l+rfWTc1+MEX+8vffY7kdUGBXWMUrwTnZ
+         WLlg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=utH2IS/VTX5JTS0QLCXRVyshNaT5RNL5Nc+i8BDtLmk=;
+        b=ho1JkPkMOQ3u4Q/45cIjUxiGMP+O+bxRMG/UZqEL1l9iCc2lHyHUL8FwCo6SgDfnuh
+         0+RCpQx+zVi6jqKYeMtHSg7tM0f1K7I9s8YQc5oI8PE5I/6d82WhdbmFa797ECDQxJaX
+         wm70zE/iYGXkvuxeDHLVML+3X0hxfVWZiLNAvPk1zB5+vczM/7DsYlgW1krTDWMVfWQ1
+         ccXuJcXwL1jgno+XUmkh/yZmb72GBtB2tsYLbQbLIuYRwLOz7LPoZ/9ZTdBQGQzTfKUJ
+         xbuCSwAtpcpiiRKbLYtrizl6PX6ydYwQuIenmbzJiALTwiNZTwCHLHT/bl420xwfTzMT
+         zCFQ==
+X-Gm-Message-State: AJIora/K7sQf97XvAL3OZr1bBENVw3SZqscNLi05ExlgDlwC7QVCMDwv
+        Ob/qrQq3dvpuvk44uoT/FaicBw==
+X-Google-Smtp-Source: AGRyM1tZbMvh/IPB79aNcE/pjioSN87QQMJthXMeW7P+2OiAXSUEst9UtSeRYRzH1N/wOQJpKs+fAw==
+X-Received: by 2002:a17:903:244d:b0:16c:52f1:ceb with SMTP id l13-20020a170903244d00b0016c52f10cebmr9808645pls.120.1657819651493;
+        Thu, 14 Jul 2022 10:27:31 -0700 (PDT)
+Received: from google.com (123.65.230.35.bc.googleusercontent.com. [35.230.65.123])
+        by smtp.gmail.com with ESMTPSA id ik5-20020a170902ab0500b00168b113f222sm1726733plb.173.2022.07.14.10.27.30
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 14 Jul 2022 10:27:30 -0700 (PDT)
+Date:   Thu, 14 Jul 2022 17:27:27 +0000
+From:   Sean Christopherson <seanjc@google.com>
+To:     Paolo Bonzini <pbonzini@redhat.com>
+Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH 0/5] KVM: x86: Clean up rmap zap helpers
+Message-ID: <YtBR/x3CAEavwzMI@google.com>
+References: <20220712015558.1247978-1-seanjc@google.com>
+ <bc2c1af3-33ec-d97e-f604-12a991c7cd5e@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <CAHk-=wj4vtoWZPMXJU-B9qW1zLHsoA1Qb2P0NW=UFhZmrCrf9Q@mail.gmail.com>
-X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,SPF_HELO_NONE,
-        SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no
-        version=3.4.6
+In-Reply-To: <bc2c1af3-33ec-d97e-f604-12a991c7cd5e@redhat.com>
+X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
+        T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Jul 14, 2022 at 10:02:57AM -0700, Linus Torvalds wrote:
+On Thu, Jul 14, 2022, Paolo Bonzini wrote:
+> On 7/12/22 03:55, Sean Christopherson wrote:
+> > Clean up the rmap helpers (mostly renames) to yield a more coherent set of
+> > APIs, and to purge the irritating and inconsistent "rmapp" (p is for pointer)
+> > nomenclature.
+> > 
+> > Patch 1 is a tangentially related fix for a benign bug.
+> > 
+> > Sean Christopherson (5):
+> >    KVM: x86/mmu: Return a u64 (the old SPTE) from
+> >      mmu_spte_clear_track_bits()
+> >    KVM: x86/mmu: Rename rmap zap helpers to better show relationships
+> >    KVM: x86/mmu: Remove underscores from __pte_list_remove()
+> >    KVM: x86/mmu: Use innermost rmap zap helper when recycling rmaps
+> >    KVM: x86/mmu: Drop the "p is for pointer" from rmap helpers
+> > 
+> >   arch/x86/kvm/mmu/mmu.c | 73 +++++++++++++++++++++---------------------
+> >   1 file changed, 36 insertions(+), 37 deletions(-)
+> > 
+> > 
+> > base-commit: b9b71f43683ae9d76b0989249607bbe8c9eb6c5c
+> 
+> I'm not sure I dig the ____, I'll take a closer look tomorrow or next week
+> since it's dinner time here.
 
-> I like Peter's more obvious use of FASTYOP_LENGTH, but this is just disgusting:
-> 
->     #define FASTOP_SIZE (8 << ((FASTOP_LENGTH > 8) & 1) <<
-> ((FASTOP_LENGTH > 16) & 1))
-> 
-> I mean, I understand what it's doing, but just two lines above it the
-> code has a "ilog2()" use that already depends on the fact that you can
-> use ilog2() as a constant compile-time expression.
-> 
-> And guess what? The code could just use roundup_pow_of_two(), which is
-> designed exactly like ilog2() to be used for compile-time constant
-> values.
+Yeah, I'm not a fan of it either.  And rereading things, my proposed names also
+create an inconsistency; the zap path is the only user of kvm_handle_gfn_range()
+that uses a plural "rmaps".
 
-But NR_FASTOP isn't used in ASM.
+  $ git grep kvm_handle_gfn_range
+  arch/x86/kvm/mmu/mmu.c:static __always_inline bool kvm_handle_gfn_range(struct kvm *kvm,
+  arch/x86/kvm/mmu/mmu.c:         flush = kvm_handle_gfn_range(kvm, range, kvm_zap_rmaps);
+  arch/x86/kvm/mmu/mmu.c:         flush = kvm_handle_gfn_range(kvm, range, kvm_set_pte_rmap);
+  arch/x86/kvm/mmu/mmu.c:         young = kvm_handle_gfn_range(kvm, range, kvm_age_rmap);
+  arch/x86/kvm/mmu/mmu.c:         young = kvm_handle_gfn_range(kvm, range, kvm_test_age_rmap);
 
-> So the code should just use
-> 
->     #define FASTOP_SIZE roundup_pow_of_two(FASTOP_LENGTH)
-> 
-> and be a lot more legible, wouldn't it?
+Make "rmaps" plural is probably a mistake.  The helper zaps multiple SPTEs for a
+given rmap list, but from a certain point of view it's just a single "rmap".
 
-If only :/ FASTOP_SIZE is used in ASM, which means we've got to play by
-GNU-as rules, and them are aweful.
+What about:
+
+  kvm_zap_rmapp => kvm_zap_rmap    // to align with kvm_handle_gfn_range() usage
+  kvm_zap_rmap  => __kvm_zap_rmap  // to pair with kvm_zap_rmap()
+  
+and
+
+  pte_list_remove  => kvm_zap_one_rmap_spte  
+  pte_list_destroy => kvm_zap_all_rmap_sptes
+
+That will yield a better series too, as I can move patch 5 to be patch 2, then
+split what was patch 2 (the rename) into separate patches to first align kvm_zap_rmap()
+and __kvm_zap_rmap(), and then rename the pte_list_remove/destroy helpers.
