@@ -2,361 +2,233 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 70EBD574ACF
-	for <lists+kvm@lfdr.de>; Thu, 14 Jul 2022 12:38:48 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 3442B574B4D
+	for <lists+kvm@lfdr.de>; Thu, 14 Jul 2022 12:57:42 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236782AbiGNKiq (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 14 Jul 2022 06:38:46 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47172 "EHLO
+        id S238131AbiGNK5l (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 14 Jul 2022 06:57:41 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37792 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229986AbiGNKio (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 14 Jul 2022 06:38:44 -0400
-Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CAF8DBC15
-        for <kvm@vger.kernel.org>; Thu, 14 Jul 2022 03:38:42 -0700 (PDT)
-Received: from pps.filterd (m0098399.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.17.1.5/8.17.1.5) with ESMTP id 26EAHgfR012169;
-        Thu, 14 Jul 2022 10:38:35 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
- subject : to : cc : references : from : in-reply-to : content-type :
- content-transfer-encoding : mime-version; s=pp1;
- bh=c89MAotbpP7mjF1epLU+aLmU1IY6LwLuqqJtSPn1gAE=;
- b=USGyc9xpdjlQEDodf2dZ3C9KeKhYuoT5fVDQgEkspv+TDcJpXNS02Bm0TzxuZRtLqfeL
- 1nBfaz3D2E+jJF0GFm4zd1xy+EnZl0nnr9Bv9l+GScwM7UEFmMmnKgabkIbnuBhvb6uP
- nq7VxU4NyNM25XKtHXjWuwk1juUCYTlEdmMk/ODrVkfQcq7hSHps/2FJVTvrXA+3uCLi
- bU4u+twv/l4xpkyWMELhI+pTADJarb62ikthmyJfi6h2B9WaDJUmfNy4Vyn0rw7K0DfY
- UZ7/wCru5QdBB2R/btUbDU1xo8Z5bP2xJcPMD9rwJDQbBZrs6uMo1KVDXvFp0kg4Z3Gg sg== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3hag372jk2-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 14 Jul 2022 10:38:34 +0000
-Received: from m0098399.ppops.net (m0098399.ppops.net [127.0.0.1])
-        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 26EAc58Z022646;
-        Thu, 14 Jul 2022 10:38:34 GMT
-Received: from ppma03fra.de.ibm.com (6b.4a.5195.ip4.static.sl-reverse.com [149.81.74.107])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3hag372jj6-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 14 Jul 2022 10:38:34 +0000
-Received: from pps.filterd (ppma03fra.de.ibm.com [127.0.0.1])
-        by ppma03fra.de.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 26EAb16L001650;
-        Thu, 14 Jul 2022 10:38:31 GMT
-Received: from b06avi18626390.portsmouth.uk.ibm.com (b06avi18626390.portsmouth.uk.ibm.com [9.149.26.192])
-        by ppma03fra.de.ibm.com with ESMTP id 3h71a8n83m-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 14 Jul 2022 10:38:31 +0000
-Received: from d06av22.portsmouth.uk.ibm.com (d06av22.portsmouth.uk.ibm.com [9.149.105.58])
-        by b06avi18626390.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 26EAatRg19071360
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Thu, 14 Jul 2022 10:36:55 GMT
-Received: from d06av22.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 250614C059;
-        Thu, 14 Jul 2022 10:38:28 +0000 (GMT)
-Received: from d06av22.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 61D1D4C052;
-        Thu, 14 Jul 2022 10:38:27 +0000 (GMT)
-Received: from [9.171.83.159] (unknown [9.171.83.159])
-        by d06av22.portsmouth.uk.ibm.com (Postfix) with ESMTP;
-        Thu, 14 Jul 2022 10:38:25 +0000 (GMT)
-Message-ID: <53698be8-0eab-8dc2-2d54-df2a89e1092f@linux.ibm.com>
-Date:   Thu, 14 Jul 2022 12:38:25 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.10.0
-Subject: Re: [PATCH v8 02/12] s390x/cpu_topology: CPU topology objects and
- structures
-Content-Language: en-US
-To:     Pierre Morel <pmorel@linux.ibm.com>, qemu-s390x@nongnu.org
-Cc:     qemu-devel@nongnu.org, borntraeger@de.ibm.com, pasic@linux.ibm.com,
-        richard.henderson@linaro.org, david@redhat.com, thuth@redhat.com,
-        cohuck@redhat.com, mst@redhat.com, pbonzini@redhat.com,
-        kvm@vger.kernel.org, ehabkost@redhat.com,
-        marcel.apfelbaum@gmail.com, eblake@redhat.com, armbru@redhat.com,
-        seiden@linux.ibm.com, nrb@linux.ibm.com, frankja@linux.ibm.com
-References: <20220620140352.39398-1-pmorel@linux.ibm.com>
- <20220620140352.39398-3-pmorel@linux.ibm.com>
- <de92ef17-3a17-df44-97aa-19e67d1d5b3d@linux.ibm.com>
- <5215ca74-e71c-73df-69c9-d2522e082706@linux.ibm.com>
-From:   Janis Schoetterl-Glausch <scgl@linux.ibm.com>
-In-Reply-To: <5215ca74-e71c-73df-69c9-d2522e082706@linux.ibm.com>
-Content-Type: text/plain; charset=UTF-8
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: LJtljS1SePpbEbLskks8qTd6anDqdpBm
-X-Proofpoint-ORIG-GUID: 5EDr__c9F7_eNmz-BK1V4j_J3Y0nmfSR
-Content-Transfer-Encoding: 8bit
-X-Proofpoint-UnRewURL: 0 URL was un-rewritten
+        with ESMTP id S231484AbiGNK5k (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 14 Jul 2022 06:57:40 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id E9B42558FA
+        for <kvm@vger.kernel.org>; Thu, 14 Jul 2022 03:57:37 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1657796257;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=AWPkftNINeppgUpPoshL3adDOP1bEUd/uT+PYson8KY=;
+        b=ZceoqNiQM/f6XkJhFQO1ndRTt8aCeTYNyWCIP+jsBJOSfx+4DFSd5UzIOZN8KbJydGj9k9
+        66iNASo/eKOnBC7nKTTRjVVWXgUI8hu4q1HMePRAURCmQHQeP+G6xFy+WLZUoGuPlaOO9y
+        c5cHGLiG3rF+dVwJuwD1w1QkJfOwvNg=
+Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
+ [209.85.128.71]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-631-PFDK1J0nMdC-EV0LIv7V9A-1; Thu, 14 Jul 2022 06:57:35 -0400
+X-MC-Unique: PFDK1J0nMdC-EV0LIv7V9A-1
+Received: by mail-wm1-f71.google.com with SMTP id 23-20020a05600c229700b003a2eda0c59cso591444wmf.7
+        for <kvm@vger.kernel.org>; Thu, 14 Jul 2022 03:57:35 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:message-id:subject:from:to:cc:date:in-reply-to
+         :references:user-agent:mime-version:content-transfer-encoding;
+        bh=AWPkftNINeppgUpPoshL3adDOP1bEUd/uT+PYson8KY=;
+        b=Qj0uS/Hcm0lYC3rdD++b3U8ORrts0wXLLGQUxSSUXW+sUubewLbVrSEmpYltDevveh
+         kUq1RiQYQcm2NyE3izU+pugbxnKseyNGf7X0JWcUKxKZnOyeYINVg6HmsRB3QVSjv8f4
+         nCL4LzPuFb/wamxbl2oE6e/HAVE5KSg60Z4h3D5Vgg2vnpOUXK2xUwkwuEC9K1Z8z+uW
+         Axb7twv91D1t2bCBQwySkOxV6WW/kjZOKdnEtGaAels6C51XPZWzk85OrEA4ysUBF/Iu
+         dpcYaTwbsDnFMWdRxL5oWnoma0CxtwwD9dqea27xpBYEdnkNF1Rv6Ia7akwitibbl7hF
+         bEuQ==
+X-Gm-Message-State: AJIora+j6R0pkEcZCc1bbVo2XW/+rZQPdXP/HXPgybtQ9eGkmLzcSBk4
+        vA7VPKKsMC8bH2j1ZCllR6ytCDSc5rxEJuFbqnbg0mvQ/JQWLBu4zoKSpPMo5eURPG7MVqmjrTQ
+        1K0dVeZMcjB+m
+X-Received: by 2002:adf:fe0d:0:b0:21d:81f3:854a with SMTP id n13-20020adffe0d000000b0021d81f3854amr7467244wrr.540.1657796254208;
+        Thu, 14 Jul 2022 03:57:34 -0700 (PDT)
+X-Google-Smtp-Source: AGRyM1vsN6Idmpm252Ogd3KnFbeGIDMdjsGqpNyidkS2H62Pg4xDB7zbJ3CHlAcKF5dGW+qa/dp01A==
+X-Received: by 2002:adf:fe0d:0:b0:21d:81f3:854a with SMTP id n13-20020adffe0d000000b0021d81f3854amr7467222wrr.540.1657796253911;
+        Thu, 14 Jul 2022 03:57:33 -0700 (PDT)
+Received: from [10.35.4.238] (bzq-82-81-161-50.red.bezeqint.net. [82.81.161.50])
+        by smtp.gmail.com with ESMTPSA id i16-20020adfb650000000b0021b866397a7sm1150480wre.1.2022.07.14.03.57.32
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 14 Jul 2022 03:57:33 -0700 (PDT)
+Message-ID: <eeed31d55f20561f9ef06afa40f0fa9d7f3032af.camel@redhat.com>
+Subject: Re: [PATCH v2] KVM: x86: Add dedicated helper to get CPUID entry
+ with significant index
+From:   Maxim Levitsky <mlevitsk@redhat.com>
+To:     Sean Christopherson <seanjc@google.com>
+Cc:     Paolo Bonzini <pbonzini@redhat.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+Date:   Thu, 14 Jul 2022 13:57:31 +0300
+In-Reply-To: <Ys2i2B/jt5yDsAKj@google.com>
+References: <20220712000645.1144186-1-seanjc@google.com>
+         <8a1ff7338f1252d75ff96c3518f16742919f92d7.camel@redhat.com>
+         <Ys2i2B/jt5yDsAKj@google.com>
+Content-Type: text/plain; charset="UTF-8"
+User-Agent: Evolution 3.40.4 (3.40.4-5.fc34) 
 MIME-Version: 1.0
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.205,Aquarius:18.0.883,Hydra:6.0.517,FMLib:17.11.122.1
- definitions=2022-07-14_08,2022-07-14_01,2022-06-22_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 adultscore=0 suspectscore=0
- priorityscore=1501 mlxlogscore=999 phishscore=0 malwarescore=0 bulkscore=0
- clxscore=1015 impostorscore=0 lowpriorityscore=0 spamscore=0 mlxscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2206140000
- definitions=main-2207140044
-X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,
-        SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no
-        version=3.4.6
+Content-Transfer-Encoding: 8bit
+X-Spam-Status: No, score=-3.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,
+        SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=unavailable
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 7/13/22 16:59, Pierre Morel wrote:
+On Tue, 2022-07-12 at 16:35 +0000, Sean Christopherson wrote:
+> On Tue, Jul 12, 2022, Maxim Levitsky wrote:
+> > On Tue, 2022-07-12 at 00:06 +0000, Sean Christopherson wrote:
+> > >  static inline struct kvm_cpuid_entry2 *cpuid_entry2_find(
+> > > -       struct kvm_cpuid_entry2 *entries, int nent, u32 function, u32 index)
+> > > +       struct kvm_cpuid_entry2 *entries, int nent, u32 function, u64 index)
+> > How I wish that this would be just called EAX and ECX... Anyway....
 > 
-> 
-> On 7/12/22 17:40, Janis Schoetterl-Glausch wrote:
->> On 6/20/22 16:03, Pierre Morel wrote:
->>> We use new objects to have a dynamic administration of the CPU topology.
->>> The highest level object in this implementation is the s390 book and
->>> in this first implementation of CPU topology for S390 we have a single
->>> book.
->>> The book is built as a SYSBUS bridge during the CPU initialization.
->>> Other objects, sockets and core will be built after the parsing
->>> of the QEMU -smp argument.
->>>
->>> Every object under this single book will be build dynamically
->>> immediately after a CPU has be realized if it is needed.
->>> The CPU will fill the sockets once after the other, according to the
->>> number of core per socket defined during the smp parsing.
->>>
->>> Each CPU inside a socket will be represented by a bit in a 64bit
->>> unsigned long. Set on plug and clear on unplug of a CPU.
->>>
->>> For the S390 CPU topology, thread and cores are merged into
->>> topology cores and the number of topology cores is the multiplication
->>> of cores by the numbers of threads.
->>>
->>> Signed-off-by: Pierre Morel <pmorel@linux.ibm.com>
->>> ---
->>>   hw/s390x/cpu-topology.c         | 391 ++++++++++++++++++++++++++++++++
->>>   hw/s390x/meson.build            |   1 +
->>>   hw/s390x/s390-virtio-ccw.c      |   6 +
->>>   include/hw/s390x/cpu-topology.h |  74 ++++++
->>>   target/s390x/cpu.h              |  47 ++++
->>>   5 files changed, 519 insertions(+)
->>>   create mode 100644 hw/s390x/cpu-topology.c
->>>   create mode 100644 include/hw/s390x/cpu-topology.h
->>>
+> Heh, I strongly disagree.  EAX and ECX are how the CPUID instruction specifies
+> the function and index, CPUID the lookup itself operates on function+index,
+> e.g. there are plenty of situations where KVM queries CPUID info without the
+> inputs coming from EAX/ECX.
 
-[...]
-
->>> +}
->>> +
->>> +/*
->>> + * s390_topology_new_cpu:
->>> + * @core_id: the core ID is machine wide
->>> + *
->>> + * We have a single book returned by s390_get_topology(),
->>> + * then we build the hierarchy on demand.
->>> + * Note that we do not destroy the hierarchy on error creating
->>> + * an entry in the topology, we just keep it empty.
->>> + * We do not need to worry about not finding a topology level
->>> + * entry this would have been caught during smp parsing.
->>> + */
->>> +bool s390_topology_new_cpu(MachineState *ms, int core_id, Error **errp)
->>> +{
->>> +    S390TopologyBook *book;
->>> +    S390TopologySocket *socket;
->>> +    S390TopologyCores *cores;
->>> +    int nb_cores_per_socket;
->>
->> num_cores_per_socket instead?
->>
->>> +    int origin, bit;
->>> +
->>> +    book = s390_get_topology();
->>> +
->>> +    nb_cores_per_socket = ms->smp.cores * ms->smp.threads;
->>
->> We don't support the multithreading facility, do we?
->> So, I think we should assert smp.threads == 1 somewhere.
->> In any case I think the correct expression would round the threads up to the next power of 2,
->> because the core_id has the thread id in the lower bits, but threads per core doesn't need to be
->> a power of 2 according to the architecture.
-> 
-> That is right.
-> I will add that.
-
-Add the assert?
-It should probably be somewhere else.
-And you can set thread > 1 today, so we'd need to handle that. (increase the number of cpus instead and print a warning?)
-
-[...]
-
->>> +
->>> +/*
->>> + * Setting the first topology: 1 book, 1 socket
->>> + * This is enough for 64 cores if the topology is flat (single socket)
->>> + */
->>> +void s390_topology_setup(MachineState *ms)
->>> +{
->>> +    DeviceState *dev;
->>> +
->>> +    /* Create BOOK bridge device */
->>> +    dev = qdev_new(TYPE_S390_TOPOLOGY_BOOK);
->>> +    object_property_add_child(qdev_get_machine(),
->>> +                              TYPE_S390_TOPOLOGY_BOOK, OBJECT(dev));
->>
->> Why add it to the machine instead of directly using a static?
-> 
-> For my opinion it is a characteristic of the machine.
-> 
->> So it's visible to the user via info qtree or something?
-> 
-> It is already visible to the user on info qtree.
-> 
->> Would that even be the appropriate location to show that?
-> 
-> That is a very good question and I really appreciate if we discuss on the design before diving into details.
-> 
-> The idea is to have the architecture details being on qtree as object so we can plug new drawers/books/socket/cores and in the future when the infrastructure allows it unplug them.
-
-Would it not be more accurate to say that we plug in new cpus only?
-Since you need to specify the topology up front with -smp and it cannot change after.
-So that all is static, books/sockets might be completely unpopulated, but they still exist in a way.
-As far as I understand, STSI only allows for cpus to change, nothing above it.
-> 
-> There is a info numa (info cpus does not give a lot info) to give information on nodes but AFAIU, a node is more a theoritical that can be used above the virtual architecture, sockets/cores, to specify characteristics like distance and associated memory.
-
-https://qemu.readthedocs.io/en/latest/interop/qemu-qmp-ref.html#qapidoc-2391
-shows that the relevant information can be queried via qmp.
-When I tried it on s390x it only showed the core_id, but we should be able to add the rest.
-
-
-Am I correct in my understanding, that there are two reasons to have the hierarchy objects:
-1. Caching the topology instead of computing it when STSI is called
-2. So they show up in info qtree
-
-?
+Just a matter of taste I guess - note that outputs of CPUID instructions are always called
+as registers (EAX/EBX/ECX/EDX). But anyway it doesn't really mattter to me.
 
 > 
-> As I understand it can be used above socket and for us above books or drawers too like in:
+> > >  {
+> > >         struct kvm_cpuid_entry2 *e;
+> > >         int i;
+> > > @@ -77,9 +85,22 @@ static inline struct kvm_cpuid_entry2 *cpuid_entry2_find(
+> > >         for (i = 0; i < nent; i++) {
+> > >                 e = &entries[i];
+> > >  
+> > > -               if (e->function == function &&
+> > > -                   (!(e->flags & KVM_CPUID_FLAG_SIGNIFCANT_INDEX) || e->index == index))
+> > > +               if (e->function != function)
+> > > +                       continue;
+> > > +
+> > > +               /*
+> > > +                * If the index isn't significant, use the first entry with a
+> > > +                * matching function.  It's userspace's responsibilty to not
+> > > +                * provide "duplicate" entries in all cases.
+> > > +                */
+> > > +               if (!(e->flags & KVM_CPUID_FLAG_SIGNIFCANT_INDEX) || e->index == index)
+> > >                         return e;
+> > > +
+> > > +               /*
+> > > +                * Function matches and index is significant; not specifying an
+> > > +                * exact index in this case is a KVM bug.
+> > > +                */
+> > Nitpick: Why KVM bug? Bad userspace can also provide a index-significant entry for cpuid
+> > leaf for which index is not significant in the x86 spec.
 > 
-> -numa cpu,node-id=0,socket-id=0
+> Ugh, you're right.
 > 
-> All cores in socket 0 belong to node 0
+> > We could arrange a table of all known leaves and for each leaf if it has an index
+> > in the x86 spec, and warn/reject the userspace CPUID info if it doesn't match.
 > 
-> or
-> -numa cpu,node-id=1,drawer-id=1
+> We have such a table, cpuid_function_is_indexed().  The alternative would be to
+> do:
 > 
-> all cores from all sockets of drawer 1 belong to node 1
+>                 WARN_ON_ONCE(index == KVM_CPUID_INDEX_NOT_SIGNIFICANT &&
+>                              cpuid_function_is_indexed(function));
 > 
+> The problem with rejecting userspace CPUID on mismatch is that it could break
+> userspace :-/  Of course, this entire patch would also break userspace to some
+> extent, e.g. if userspace is relying on an exact match on index==0.  The only
+> difference being the guest lookups with an exact index would still work.
 > 
-> As there is no info socket, I think that for now we do not need an info book/drawer we have everything in qtree.
-> 
-> 
->>
+> I think the restriction we could put in place would be that userspace can make
+> a leaf more relaxed, e.g. to play nice if userspace forgets to set the SIGNFICANT
+> flag, but rejects attempts to make guest CPUID more restrictive, i.e. disallow
+> setting the SIGNFICANT flag on leafs that KVM doesn't enumerate as significant.
 
-[...]
+Makes sense.
 
 > 
->>> +    /*
->>> +     * Each CPU inside a socket will be represented by a bit in a 64bit
->>> +     * unsigned long. Set on plug and clear on unplug of a CPU.
->>> +     * All CPU inside a mask share the same dedicated, polarity and
->>> +     * cputype values.
->>> +     * The origin is the offset of the first CPU in a mask.
->>> +     */
->>> +struct S390TopologyCores {
->>> +    DeviceState parent_obj;
->>> +    int id;
->>> +    bool dedicated;
->>> +    uint8_t polarity;
->>> +    uint8_t cputype;
->>
->> Why not snake_case for cpu type?
+> > > +               WARN_ON_ONCE(index == KVM_CPUID_INDEX_NOT_SIGNIFICANT);
+> > >         }
+> > >  
+> > >         return NULL;
+> > > @@ -96,7 +117,8 @@ static int kvm_check_cpuid(struct kvm_vcpu *vcpu,
+> > >          * The existing code assumes virtual address is 48-bit or 57-bit in the
+> > >          * canonical address checks; exit if it is ever changed.
+> > >          */
+> > > -       best = cpuid_entry2_find(entries, nent, 0x80000008, 0);
+> > > +       best = cpuid_entry2_find(entries, nent, 0x80000008,
+> > > +                                KVM_CPUID_INDEX_NOT_SIGNIFICANT);
+> > OK.
 > 
-> I do not understand what you mean.
+> Thanks for looking through all these!
+No problem!
+> 
+> > >  static struct kvm_cpuid_entry2 *kvm_find_kvm_cpuid_features(struct kvm_vcpu *vcpu)
+> > > @@ -219,7 +242,7 @@ static void __kvm_update_cpuid_runtime(struct kvm_vcpu *vcpu, struct kvm_cpuid_e
+> > >         struct kvm_cpuid_entry2 *best;
+> > >         u64 guest_supported_xcr0 = cpuid_get_supported_xcr0(entries, nent);
+> > >  
+> > > -       best = cpuid_entry2_find(entries, nent, 1, 0);
+> > > +       best = cpuid_entry2_find(entries, nent, 1, KVM_CPUID_INDEX_NOT_SIGNIFICANT);
+> > 
+> > Leaf 1, no index indeed.
+> > 
+> > Offtopic: I wonder why we call this 'best'?
+> 
+> Awful, awful historic code.  IIRC, for functions whose index is not significant,
+> KVM would iterate over all entries and look for an exact function+index match
+> anyways.  If there was at least one partial match (function match only) but no
+> full match, KVM would use the first partial match, which it called the "best" match.
+> 
+> We've been slowly/opportunistically killing off the "best" terminology.
 
-I'm suggesting s/cputype/cpu_type/
-> 
->>
->>> +    uint16_t origin;
->>> +    uint64_t mask;
->>> +    int cnt;
->>
->> num_cores instead ?
-> 
-> I suppress this it is unused
-> 
->>
+Thanks for the explanation. I also noticed that you removed recently the 'stateful'
+CPUID code. Good riddance!
 
-[...]
+> 
+> > > -struct kvm_cpuid_entry2 *kvm_find_cpuid_entry(struct kvm_vcpu *vcpu,
+> > > -                                             u32 function, u32 index)
+> > > +struct kvm_cpuid_entry2 *kvm_find_cpuid_entry_index(struct kvm_vcpu *vcpu,
+> > > +                                                   u32 function, u32 index)
+> > Nitpick: could you fix the indention while at it?
+> 
+> The indentation is correct, it's only the diff that appears misaligned.
 
->>> @@ -565,6 +565,53 @@ typedef union SysIB {
->>>   } SysIB;
->>>   QEMU_BUILD_BUG_ON(sizeof(SysIB) != 4096);
->>>   +/* CPU type Topology List Entry */
->>> +typedef struct SysIBTl_cpu {
->>> +        uint8_t nl;
->>> +        uint8_t reserved0[3];
->>> +        uint8_t reserved1:5;
->>> +        uint8_t dedicated:1;
->>> +        uint8_t polarity:2;
->>> +        uint8_t type;
->>> +        uint16_t origin;
->>> +        uint64_t mask;
->>> +} SysIBTl_cpu;
->>> +QEMU_BUILD_BUG_ON(sizeof(SysIBTl_cpu) != 16);
->>> +
->>> +/* Container type Topology List Entry */
->>> +typedef struct SysIBTl_container {
->>> +        uint8_t nl;
->>> +        uint8_t reserved[6];
->>> +        uint8_t id;
->>> +} QEMU_PACKED SysIBTl_container;
->>> +QEMU_BUILD_BUG_ON(sizeof(SysIBTl_container) != 8);
->>> +
->>> +/* Generic Topology List Entry */
->>> +typedef union SysIBTl_entry {
->>> +        uint8_t nl;
->>> +        SysIBTl_container container;
->>> +        SysIBTl_cpu cpu;
->>> +} SysIBTl_entry;
->>
->> I don't like this union, it's only used in SysIB_151x below and that's misleading,
->> because the entries are packed without padding, but the union members have different
->> sizes.
-> 
-> the entries have different sizes 64bits and 128bits.
-> I do not understand why they should be padded.
+I think I already heard about this once, I will try to not forget and keep
+that in mind next time I notice this. Sorry!
 
-I way saying that in the SYSIB there is no padding, but the size of the union is 16,
-so two container entries in the array would have padding, which is misleading.
-There is no actual problem, since the array is not actually used as such.
 > 
-> However, the union here is useless. will remove it.
+> > > @@ -1353,11 +1384,11 @@ get_out_of_range_cpuid_entry(struct kvm_vcpu *vcpu, u32 *fn_ptr, u32 index)
+> > >                 return NULL;
+> > >  
+> > >         if (function >= 0x40000000 && function <= 0x4fffffff)
+> > > -               class = kvm_find_cpuid_entry(vcpu, function & 0xffffff00, 0);
+> > > +               class = kvm_find_cpuid_entry(vcpu, function & 0xffffff00);
+> > >         else if (function >= 0xc0000000)
+> > > -               class = kvm_find_cpuid_entry(vcpu, 0xc0000000, 0);
+> > > +               class = kvm_find_cpuid_entry(vcpu, 0xc0000000);
+> > >         else
+> > > -               class = kvm_find_cpuid_entry(vcpu, function & 0x80000000, 0);
+> > > +               class = kvm_find_cpuid_entry(vcpu, function & 0x80000000);
+> > This assumes that all the classes has first entry whose EAX specifies max leaf
+> > for this class. True for sure for basic and extended features, don't know
+> > if true for hypervisor and Centaur entries. Seems OK.
 > 
->>
->>> +
->>> +#define TOPOLOGY_NR_MAG  6
->>> +#define TOPOLOGY_NR_MAG6 0
->>> +#define TOPOLOGY_NR_MAG5 1
->>> +#define TOPOLOGY_NR_MAG4 2
->>> +#define TOPOLOGY_NR_MAG3 3
->>> +#define TOPOLOGY_NR_MAG2 4
->>> +#define TOPOLOGY_NR_MAG1 5
->>> +/* Configuration topology */
->>> +typedef struct SysIB_151x {
->>> +    uint8_t  res0[2];
->>> +    uint16_t length;
->>> +    uint8_t  mag[TOPOLOGY_NR_MAG];
->>> +    uint8_t  res1;
->>> +    uint8_t  mnest;
->>> +    uint32_t res2;
->>> +    SysIBTl_entry tle[0];
->>
->> I think this should just be a uint64_t[] or uint64_t[0], whichever is QEMU style.
+> It holds true for all known hypervisors.  There's no formal definition for using
+> 0x400000yy as the hypervisor range, but the de facto standard is to use EBX, ECX,
+> and EDX for the signature, and EAX for the max leaf.
 > 
-> ok
+> The Centaur behavior is very much a guess, but odds are it's a correct guess.  When
+> I added the Centaur code, I spent far too much time trying (and failing) to hunt
+> down documentation. 
+
+I understand very well what you mean.
+
+Best regards,
+	Maxim Levitsky
+
 > 
->>> +} SysIB_151x;
->>> +QEMU_BUILD_BUG_ON(sizeof(SysIB_151x) != 16);
->>> +
->>>   /* MMU defines */
->>>   #define ASCE_ORIGIN           (~0xfffULL) /* segment table origin             */
->>>   #define ASCE_SUBSPACE         0x200       /* subspace group control           */
->>
-> 
+
 
