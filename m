@@ -2,78 +2,90 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id AA809574B4F
-	for <lists+kvm@lfdr.de>; Thu, 14 Jul 2022 12:58:27 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 2CE1D574B53
+	for <lists+kvm@lfdr.de>; Thu, 14 Jul 2022 12:59:45 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238218AbiGNK6Z (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 14 Jul 2022 06:58:25 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38380 "EHLO
+        id S231376AbiGNK7m (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 14 Jul 2022 06:59:42 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40310 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232080AbiGNK6X (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 14 Jul 2022 06:58:23 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id A42F6564CD
-        for <kvm@vger.kernel.org>; Thu, 14 Jul 2022 03:58:22 -0700 (PDT)
+        with ESMTP id S229923AbiGNK7k (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 14 Jul 2022 06:59:40 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id A6E994B4BA
+        for <kvm@vger.kernel.org>; Thu, 14 Jul 2022 03:59:39 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1657796301;
+        s=mimecast20190719; t=1657796378;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=nM5yVanzRJTIfs3jtPwCWDlU85jtUwSjBS8/j3385bI=;
-        b=ZKq1Of6Mpec9NSGo7VabF21JWTRy/CkKeAx5Wi411faPjdwFa6XENFQV1J0LLk2ITG8SZM
-        MHNZF5bLz/16cn5upjISBLwHXGd9VvAKvH3391kgrgTgXGlzl/cRsHVxTsMMQA6B8a77UT
-        otoy4NbuY5Kj5HMN66dhIu5r1sbztFQ=
-Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
- [209.85.128.71]) by relay.mimecast.com with ESMTP with STARTTLS
+        bh=FavxfYWL200Y0rn9Lp1shFMwNCXImob7qzskzLrDddU=;
+        b=BPqFl6XBrS/puoPtu0IhUT9YQNgq2jftW/TpYMBAlt7Ax09byn11w8oo/7Ew6njvgwRJ1P
+        Z3fR4DUpJiQnftIOp8CvWhZsBAU0MRH108Xi1daDLq3vR1+jSkXpE8ggp5icyBI607rlGl
+        jmM/xoyCDAnmrlqmCEUS0O6yUQ1KA6I=
+Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
+ [209.85.128.69]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-634-DAmkMQ29MS2II3Vz6NJgjg-1; Thu, 14 Jul 2022 06:58:20 -0400
-X-MC-Unique: DAmkMQ29MS2II3Vz6NJgjg-1
-Received: by mail-wm1-f71.google.com with SMTP id v123-20020a1cac81000000b003a02a3f0beeso2488200wme.3
-        for <kvm@vger.kernel.org>; Thu, 14 Jul 2022 03:58:20 -0700 (PDT)
+ us-mta-385-qXaIW0qlOpqzZaQpfJqpWg-1; Thu, 14 Jul 2022 06:59:37 -0400
+X-MC-Unique: qXaIW0qlOpqzZaQpfJqpWg-1
+Received: by mail-wm1-f69.google.com with SMTP id k62-20020a1ca141000000b003a2e342a55bso503913wme.1
+        for <kvm@vger.kernel.org>; Thu, 14 Jul 2022 03:59:37 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:message-id:subject:from:to:cc:date:in-reply-to
          :references:user-agent:mime-version:content-transfer-encoding;
-        bh=nM5yVanzRJTIfs3jtPwCWDlU85jtUwSjBS8/j3385bI=;
-        b=mqhIlWtuteK3yiH5XCfoIhJCKNdcsr5NqM4FOsKpIpT0aCiN0Kv7HDIHyYb6nSzWVg
-         kt7Ycox7nFaXE1N9KcAzsHzouGMFp+N4RrT7Jb6zIHyzOjNOyBkkQHo5HsORIGAkZGbH
-         VTi4j46Sela1+h/YOUOQN9N51qt1Nqv9GNI7y9w0OKVY4PpfbMRgLZbiwn+Aht58XuBl
-         iATvLmfLZuIUfwy/SqnYHgYfdDSsyvz/fXqK7LIjYAWhkx4xy/Re3zoNN7ifi81BO6Rf
-         rNvMN51F+D/WCiCx3DOHrhkpt9IX42TJlHsv/ls/ZKu+xwA/ff4SuV9GtVRwGI4h8WPk
-         KrLA==
-X-Gm-Message-State: AJIora+7KpfKBomqNiTiU/YuC0+NxvWK6J/aYmHkQDT+9Sg2zFwNr8M6
-        Xvac2bnUfOPnm/WGSOBYSNaGh2D209xZmNp+TuOK2AXoEgkzCnkvdOVpzEEohC8wAmnfN1NwfhY
-        W/FBL8A5Zb1dg
-X-Received: by 2002:a5d:5985:0:b0:21d:b6b6:4434 with SMTP id n5-20020a5d5985000000b0021db6b64434mr7579271wri.111.1657796299359;
-        Thu, 14 Jul 2022 03:58:19 -0700 (PDT)
-X-Google-Smtp-Source: AGRyM1uAEUQ0kwm+yiiE9dw/IiB5F2EY4Xbq86kJCUcxpug/0Urvuhaq7E6wyYQ1FXFo7snQYDcNxg==
-X-Received: by 2002:a5d:5985:0:b0:21d:b6b6:4434 with SMTP id n5-20020a5d5985000000b0021db6b64434mr7579253wri.111.1657796299087;
-        Thu, 14 Jul 2022 03:58:19 -0700 (PDT)
+        bh=FavxfYWL200Y0rn9Lp1shFMwNCXImob7qzskzLrDddU=;
+        b=03tkGF4qQExz9+ohrnECN9/RUohO0uN2fwHqYFulzcGWkr7A0aEGLUGhBJyjpFG7jm
+         647VWBwcS3vCaTmLa6MpAlBUD5Lrpmqh1DNP1v/XLriKLV8zGgiJzfx9l1NRQCEaUIzh
+         ULo2GOMNkh/a39z7UjLRP2bEThDWbXtTrfx3TlwYRTG25X11ud2fIH9jgAK5TRCJLA51
+         NRy2hFQA6o3vEP6AIV4RmY/BjsuCkNJmG7FfieBs1WsHlLpwySXSiHzdiotWhH2AUcuE
+         W5RsQLiYX6AEbzaY1sz/Pi0ScI2qiipURw3esQPtPXmutCpAZSVEUTbpRUXSvnhd6Phv
+         awmQ==
+X-Gm-Message-State: AJIora+5AmvTMRBkQni7Puw0EnCGGO+H0WMjBPPYX8PdJeMfZmKEOZ8x
+        O0KO2lPOuyDakQ/0NKOU7+bF2ts4a9ndGRokFhNUqLGPzkAZkK0vChyALvs/iDrtDbz3AMM0eyn
+        472tKZcOnJo+N
+X-Received: by 2002:a5d:47a4:0:b0:21d:99b2:9434 with SMTP id 4-20020a5d47a4000000b0021d99b29434mr8238619wrb.597.1657796376744;
+        Thu, 14 Jul 2022 03:59:36 -0700 (PDT)
+X-Google-Smtp-Source: AGRyM1vMFeyb0UzdUzINxZqK//aaNWZxJ8umYEnULpjLkJUb8f7TOKCnyWQdEJVvreAIVsbJGvW6Mg==
+X-Received: by 2002:a5d:47a4:0:b0:21d:99b2:9434 with SMTP id 4-20020a5d47a4000000b0021d99b29434mr8238592wrb.597.1657796376512;
+        Thu, 14 Jul 2022 03:59:36 -0700 (PDT)
 Received: from [10.35.4.238] (bzq-82-81-161-50.red.bezeqint.net. [82.81.161.50])
-        by smtp.gmail.com with ESMTPSA id d13-20020adffbcd000000b0021d9591c64fsm1212994wrs.33.2022.07.14.03.58.18
+        by smtp.gmail.com with ESMTPSA id d13-20020adffbcd000000b0021d9591c64fsm1215600wrs.33.2022.07.14.03.59.33
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 14 Jul 2022 03:58:18 -0700 (PDT)
-Message-ID: <087db845684c18af112e396172598172c7cc9980.camel@redhat.com>
-Subject: Re: [PATCH v2] KVM: x86: Add dedicated helper to get CPUID entry
- with significant index
+        Thu, 14 Jul 2022 03:59:35 -0700 (PDT)
+Message-ID: <7f8d7a318bde9f290b5d782e63c8d27b3a6cdb40.camel@redhat.com>
+Subject: Re: [PATCH 5.15 00/78] 5.15.55-rc1 review
 From:   Maxim Levitsky <mlevitsk@redhat.com>
-To:     Sean Christopherson <seanjc@google.com>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-Date:   Thu, 14 Jul 2022 13:58:17 +0300
-In-Reply-To: <Ys2qwUmEJaJnsj6r@google.com>
-References: <20220712000645.1144186-1-seanjc@google.com>
-         <8a1ff7338f1252d75ff96c3518f16742919f92d7.camel@redhat.com>
-         <Ys2i2B/jt5yDsAKj@google.com> <Ys2qwUmEJaJnsj6r@google.com>
+To:     Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+Cc:     Naresh Kamboju <naresh.kamboju@linaro.org>,
+        kvm list <kvm@vger.kernel.org>, linux-kernel@vger.kernel.org,
+        stable@vger.kernel.org, torvalds@linux-foundation.org,
+        akpm@linux-foundation.org, linux@roeck-us.net, shuah@kernel.org,
+        patches@kernelci.org, lkft-triage@lists.linaro.org, pavel@denx.de,
+        jonathanh@nvidia.com, f.fainelli@gmail.com,
+        sudipm.mukherjee@gmail.com, slade@sladewatkins.com,
+        Sean Christopherson <seanjc@google.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+        Dave Hansen <dave.hansen@linux.intel.com>,
+        X86 ML <x86@kernel.org>, "H. Peter Anvin" <hpa@zytor.com>,
+        Alex =?ISO-8859-1?Q?Benn=E9e?= <alex.bennee@linaro.org>,
+        Anders Roxell <anders.roxell@linaro.org>
+Date:   Thu, 14 Jul 2022 13:59:33 +0300
+In-Reply-To: <Ys/qHw7E/6gWqEbN@kroah.com>
+References: <20220712183238.844813653@linuxfoundation.org>
+         <CA+G9fYtntg7=zWSs-dm+n_AUr_u0eBOU0zrwWqMeXZ+SF6_bLw@mail.gmail.com>
+         <1a143d949dc333666374cf14fae4496045f77db4.camel@redhat.com>
+         <Ys/qHw7E/6gWqEbN@kroah.com>
 Content-Type: text/plain; charset="UTF-8"
 User-Agent: Evolution 3.40.4 (3.40.4-5.fc34) 
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-2.7 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=unavailable
+X-Spam-Status: No, score=-3.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,
+        SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -81,69 +93,61 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, 2022-07-12 at 17:09 +0000, Sean Christopherson wrote:
-> On Tue, Jul 12, 2022, Sean Christopherson wrote:
-> > On Tue, Jul 12, 2022, Maxim Levitsky wrote:
-> > > On Tue, 2022-07-12 at 00:06 +0000, Sean Christopherson wrote:
-> > > > +               /*
-> > > > +                * Function matches and index is significant; not specifying an
-> > > > +                * exact index in this case is a KVM bug.
-> > > > +                */
-> > > Nitpick: Why KVM bug? Bad userspace can also provide a index-significant entry for cpuid
-> > > leaf for which index is not significant in the x86 spec.
+On Thu, 2022-07-14 at 12:04 +0200, Greg Kroah-Hartman wrote:
+> On Thu, Jul 14, 2022 at 12:50:10PM +0300, Maxim Levitsky wrote:
+> > On Wed, 2022-07-13 at 18:22 +0530, Naresh Kamboju wrote:
+> > > On Wed, 13 Jul 2022 at 00:17, Greg Kroah-Hartman
+> > > <gregkh@linuxfoundation.org> wrote:
+> > > > 
+> > > > This is the start of the stable review cycle for the 5.15.55 release.
+> > > > There are 78 patches in this series, all will be posted as a response
+> > > > to this one.  If anyone has any issues with these being applied, please
+> > > > let me know.
+> > > > 
+> > > > Responses should be made by Thu, 14 Jul 2022 18:32:19 +0000.
+> > > > Anything received after that time might be too late.
+> > > > 
+> > > > The whole patch series can be found in one patch at:
+> > > >         https://www.kernel.org/pub/linux/kernel/v5.x/stable-review/patch-5.15.55-rc1.gz
+> > > > or in the git tree and branch at:
+> > > >         git://git.kernel.org/pub/scm/linux/kernel/git/stable/linux-stable-rc.git linux-5.15.y
+> > > > and the diffstat can be found below.
+> > > > 
+> > > > thanks,
+> > > > 
+> > > > greg k-h
+> > > 
+> > > Results from Linaro’s test farm.
+> > > Regressions on x86_64.
+> > > 
+> > > Reported-by: Linux Kernel Functional Testing <lkft@linaro.org>
+> > > 
+> > > 1) Kernel panic noticed on device x86_6 while running kvm-unit-tests.
+> > >    - APIC base relocation is unsupported by KVM
 > > 
-> > Ugh, you're right.
+> > My 0.2 cent:
 > > 
-> > > We could arrange a table of all known leaves and for each leaf if it has an index
-> > > in the x86 spec, and warn/reject the userspace CPUID info if it doesn't match.
-> > 
-> > We have such a table, cpuid_function_is_indexed().  The alternative would be to
-> > do:
-> > 
-> >                 WARN_ON_ONCE(index == KVM_CPUID_INDEX_NOT_SIGNIFICANT &&
-> >                              cpuid_function_is_indexed(function));
-> > 
-> > The problem with rejecting userspace CPUID on mismatch is that it could break
-> > userspace :-/  Of course, this entire patch would also break userspace to some
-> > extent, e.g. if userspace is relying on an exact match on index==0.  The only
-> > difference being the guest lookups with an exact index would still work.
-> > 
-> > I think the restriction we could put in place would be that userspace can make
-> > a leaf more relaxed, e.g. to play nice if userspace forgets to set the SIGNFICANT
-> > flag, but rejects attempts to make guest CPUID more restrictive, i.e. disallow
-> > setting the SIGNFICANT flag on leafs that KVM doesn't enumerate as significant.
-> > 
-> > > > +               WARN_ON_ONCE(index == KVM_CPUID_INDEX_NOT_SIGNIFICANT);
+> > APIC base relocation warning is harmless, and I removed it 5.19 kernel:
+> > https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit/?h=v5.19-rc6&id=3743c2f0251743b8ae968329708bbbeefff244cf
 > 
-> Actually, better idea.  Let userspace do whatever, and have direct KVM lookups
-> for functions that architecturally don't have a significant index use the first
-> entry even if userspace set the SIGNIFICANT flag.  That will mostly maintain
-> backwards compatibility, the only thing that would break is if userspace set the
-> SIGNIFICANT flag _and_ provided a non-zero index _and_ relied on KVM to not match
-> the entry.
+> Nice, but doesn't look relevant for stable trees.
+> 
+> > The 'emulating exchange as write' is also something that KVM unit tests trigger
+> > normally although this warning recently did signal a real and very nasty bug, which I fixed in this commit:
+> > https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit/?h=v5.19-rc6&id=33fbe6befa622c082f7d417896832856814bdde0
+> 
+> Already in the 5.18.2 release, doesn't look all that relevant for 5.15,
+> odd that it is showing up on 5.15.
 
-Makes sense as well.
+Yep, I also think so - I just wanted to point out the source of these warnings.
 
 Best regards,
 	Maxim Levitsky
 
 > 
-> We could still enforce matching in the future, but it wouldn't be a prerequisite
-> for this cleanup.
+> thanks,
 > 
->                 /*
->                  * Similarly, use the first matching entry if KVM is doing a
->                  * lookup (as opposed to emulating CPUID) for a function that's
->                  * architecturally defined as not having a significant index.
->                  */
->                 if (index == KVM_CPUID_INDEX_NOT_SIGNIFICANT) {
->                         /*
->                          * Direct lookups from KVM should not diverge from what
->                          * KVM defines internally (the architectural behavior).
->                          */
->                         WARN_ON_ONCE(cpuid_function_is_indexed(function));
->                         return e;
->                 }
+> greg k-h
 > 
 
 
