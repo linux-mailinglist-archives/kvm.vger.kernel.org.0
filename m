@@ -2,101 +2,141 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id BC6925753A2
-	for <lists+kvm@lfdr.de>; Thu, 14 Jul 2022 19:02:35 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 99D405753B1
+	for <lists+kvm@lfdr.de>; Thu, 14 Jul 2022 19:03:36 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S239359AbiGNRCd (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 14 Jul 2022 13:02:33 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34084 "EHLO
+        id S240023AbiGNRDT (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 14 Jul 2022 13:03:19 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35108 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232491AbiGNRCb (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 14 Jul 2022 13:02:31 -0400
-Received: from mail.skyhub.de (mail.skyhub.de [5.9.137.197])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1076B5721D;
-        Thu, 14 Jul 2022 10:02:30 -0700 (PDT)
-Received: from nazgul.tnic (unknown [213.235.133.110])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by mail.skyhub.de (SuperMail on ZX Spectrum 128k) with ESMTPSA id D23681EC0513;
-        Thu, 14 Jul 2022 19:02:23 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alien8.de; s=dkim;
-        t=1657818144;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:in-reply-to:in-reply-to:  references:references;
-        bh=0GRgQQRhSQyl2gobdZAwwP+EFKkYqBFGJjhmFPW3yPQ=;
-        b=YIzSUhRvcJR7wKTM4+79/lg+XaSrcqKLiugT7KWvJAVE4crRVVS2+CAS0dOC1x50DomQPp
-        FLPw9Jf//9OqB6bjZ0h84x8sq3bmQEEheHqUl2nq2ub+J0lLz5x7tBvKxetgaNF88MZF25
-        D7VtiZ2gar85UrNH3ao0GdoZeX1erhc=
-Date:   Thu, 14 Jul 2022 19:00:46 +0200
-From:   Borislav Petkov <bp@alien8.de>
-To:     Linus Torvalds <torvalds@linux-foundation.org>
-Cc:     Guenter Roeck <linux@roeck-us.net>,
+        with ESMTP id S233854AbiGNRDS (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 14 Jul 2022 13:03:18 -0400
+Received: from mail-ed1-x52b.google.com (mail-ed1-x52b.google.com [IPv6:2a00:1450:4864:20::52b])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4F8DA558F2
+        for <kvm@vger.kernel.org>; Thu, 14 Jul 2022 10:03:17 -0700 (PDT)
+Received: by mail-ed1-x52b.google.com with SMTP id g1so3202888edb.12
+        for <kvm@vger.kernel.org>; Thu, 14 Jul 2022 10:03:17 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linux-foundation.org; s=google;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=Pm+iphli5RRfa4JmHeh81lVBkwRMzWQKLMKTsw18lMo=;
+        b=Z6ZquADLYu4uMwnTfB77Llp499vJAhe+VRkqcHP7yOsgzWOu9zDeuVv569iCGwq/TN
+         n14hSaPCbUQ38LjnNOasq8gCvSbs/42WYABjzHa4Zob3/Bzo6643Bg7S4R0uqisbfoYa
+         ihvN3aq2+yGj/oCPRE7nev9NxH4BVy6V92VdA=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=Pm+iphli5RRfa4JmHeh81lVBkwRMzWQKLMKTsw18lMo=;
+        b=dM9MFCPGNijFf4Fqx0eL8lh20WtyjNfDSr3WrrsiO2VUpstMds5pI3EiyV4AbI5dWg
+         Pl7GYJPSAO9pPiFErFCggae48s24biO4NgEbiLEFr0Z79ebM8Vb7WQ2dBuNLqDo2W63/
+         ayHgvjeBMtRjA4iyjAWXb8GoprZducoOTOpwvgs+l2C6NA1WfGLWclvdZTc95hzTgPiw
+         4r11wLg8tDTx9rcPtM3Ou8d+gfDcNnM7t0tHlWqeun5qqkMLqQ/+/mOZQaLyO3XMAwQs
+         VFAaxc/OrajCa/0zEpUqp9kYR9sfK2ebEzOXMpMHE4zHAG1CCLdjGeFRZ457TS2RkXrU
+         USqQ==
+X-Gm-Message-State: AJIora8kGKHlHxSi1s8WAmFNghfWRROXqmiprrzrDVvvBj+EE6DVMJzF
+        MIxVT78SW7sWS8bnOloiQO+5vgoDuRGYNQnjkEk=
+X-Google-Smtp-Source: AGRyM1tgpsoFZsR6xaaLjG0AEelQ1nYpqWetwhpqtx3g62G5tCwYSXdclkOMUwJyOsKIrgqZVfxULw==
+X-Received: by 2002:a05:6402:354a:b0:43a:d32f:cc62 with SMTP id f10-20020a056402354a00b0043ad32fcc62mr13275838edd.48.1657818195681;
+        Thu, 14 Jul 2022 10:03:15 -0700 (PDT)
+Received: from mail-wr1-f41.google.com (mail-wr1-f41.google.com. [209.85.221.41])
+        by smtp.gmail.com with ESMTPSA id h17-20020a50ed91000000b0043a6df72c11sm1346806edr.63.2022.07.14.10.03.13
+        for <kvm@vger.kernel.org>
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 14 Jul 2022 10:03:14 -0700 (PDT)
+Received: by mail-wr1-f41.google.com with SMTP id bk26so3372790wrb.11
+        for <kvm@vger.kernel.org>; Thu, 14 Jul 2022 10:03:13 -0700 (PDT)
+X-Received: by 2002:a5d:544b:0:b0:21d:70cb:b4a2 with SMTP id
+ w11-20020a5d544b000000b0021d70cbb4a2mr8990916wrv.281.1657818193135; Thu, 14
+ Jul 2022 10:03:13 -0700 (PDT)
+MIME-Version: 1.0
+References: <20220712183238.844813653@linuxfoundation.org> <CA+G9fYtntg7=zWSs-dm+n_AUr_u0eBOU0zrwWqMeXZ+SF6_bLw@mail.gmail.com>
+ <eb63e4ce-843f-c840-060e-6e15defd3c4d@roeck-us.net> <CAHk-=wj5cOA+fbGeV15kvwe6YGT54Wsk8F2UGoekVQLTPJz_pw@mail.gmail.com>
+ <CAHk-=wgq1soM4gudypWLVQdYuvJbXn38LtvJMtnLZX+RTypqLg@mail.gmail.com>
+ <Ys/bYJ2bLVfNBjFI@nazgul.tnic> <6b4337f4-d1de-7ba3-14e8-3ad0f9b18788@redhat.com>
+ <8BEC3365-FC09-46C5-8211-518657C0308E@alien8.de>
+In-Reply-To: <8BEC3365-FC09-46C5-8211-518657C0308E@alien8.de>
+From:   Linus Torvalds <torvalds@linux-foundation.org>
+Date:   Thu, 14 Jul 2022 10:02:57 -0700
+X-Gmail-Original-Message-ID: <CAHk-=wj4vtoWZPMXJU-B9qW1zLHsoA1Qb2P0NW=UFhZmrCrf9Q@mail.gmail.com>
+Message-ID: <CAHk-=wj4vtoWZPMXJU-B9qW1zLHsoA1Qb2P0NW=UFhZmrCrf9Q@mail.gmail.com>
+Subject: Re: [PATCH 5.15 00/78] 5.15.55-rc1 review
+To:     Boris Petkov <bp@alien8.de>
+Cc:     Paolo Bonzini <pbonzini@redhat.com>,
+        Guenter Roeck <linux@roeck-us.net>,
         Peter Zijlstra <peterz@infradead.org>,
         Thadeu Lima de Souza Cascardo <cascardo@canonical.com>,
-        Naresh Kamboju <naresh.kamboju@linaro.org>,
         Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        kvm list <kvm@vger.kernel.org>,
-        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-        stable <stable@vger.kernel.org>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        Shuah Khan <shuah@kernel.org>, patches@kernelci.org,
-        lkft-triage@lists.linaro.org, Pavel Machek <pavel@denx.de>,
-        Jon Hunter <jonathanh@nvidia.com>,
+        Naresh Kamboju <naresh.kamboju@linaro.org>,
         Florian Fainelli <f.fainelli@gmail.com>,
-        Sudip Mukherjee <sudipm.mukherjee@gmail.com>,
-        Slade Watkins <slade@sladewatkins.com>,
-        Sean Christopherson <seanjc@google.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>,
+        kvm list <kvm@vger.kernel.org>,
+        Andrew Morton <akpm@linux-foundation.org>,
         Dave Hansen <dave.hansen@linux.intel.com>,
-        X86 ML <x86@kernel.org>, "H. Peter Anvin" <hpa@zytor.com>,
-        Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>,
+        stable <stable@vger.kernel.org>,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+        Pavel Machek <pavel@denx.de>,
+        Jon Hunter <jonathanh@nvidia.com>,
+        Sudip Mukherjee <sudipm.mukherjee@gmail.com>,
+        Slade Watkins <slade@sladewatkins.com>, patches@kernelci.org,
+        Sean Christopherson <seanjc@google.com>,
+        Shuah Khan <shuah@kernel.org>, Ingo Molnar <mingo@redhat.com>,
+        Thomas Gleixner <tglx@linutronix.de>, X86 ML <x86@kernel.org>,
+        lkft-triage@lists.linaro.org,
+        =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>,
+        "H. Peter Anvin" <hpa@zytor.com>,
         Anders Roxell <anders.roxell@linaro.org>
-Subject: Re: [PATCH 5.15 00/78] 5.15.55-rc1 review
-Message-ID: <YtBLe5AziniDm/Wt@nazgul.tnic>
-References: <20220712183238.844813653@linuxfoundation.org>
- <CA+G9fYtntg7=zWSs-dm+n_AUr_u0eBOU0zrwWqMeXZ+SF6_bLw@mail.gmail.com>
- <eb63e4ce-843f-c840-060e-6e15defd3c4d@roeck-us.net>
- <CAHk-=wj5cOA+fbGeV15kvwe6YGT54Wsk8F2UGoekVQLTPJz_pw@mail.gmail.com>
- <CAHk-=wgq1soM4gudypWLVQdYuvJbXn38LtvJMtnLZX+RTypqLg@mail.gmail.com>
- <Ys/bYJ2bLVfNBjFI@nazgul.tnic>
- <CAHk-=wjdafFUFwwQNvNQY_D32CBXnp6_V=DL2FpbbdstVxafow@mail.gmail.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <CAHk-=wjdafFUFwwQNvNQY_D32CBXnp6_V=DL2FpbbdstVxafow@mail.gmail.com>
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,SPF_HELO_NONE,SPF_PASS,
-        T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset="UTF-8"
+X-Spam-Status: No, score=-1.8 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+        RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
+        autolearn=no autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Jul 14, 2022 at 09:51:40AM -0700, Linus Torvalds wrote:
-> Oh, absolutely. Doing an -rc7 is normal.
+On Thu, Jul 14, 2022 at 7:46 AM Boris Petkov <bp@alien8.de> wrote:
+>
+> On July 14, 2022 1:46:53 PM UTC, Paolo Bonzini <pbonzini@redhat.com> wrote:
+> >Please leave that one out as Peter suggested a better fix and I have that queued for Linus.
+>
+> Already zapped.
 
-Good. I'm gathering all the fallout fixes and will send them to you on
-Sunday, if nothing unexpected happens.
+I like Peter's more obvious use of FASTYOP_LENGTH, but this is just disgusting:
 
-> Right now the question isn't whether an rc7 happens, but whether we'll
-> need an rc8. We'll see.
+    #define FASTOP_SIZE (8 << ((FASTOP_LENGTH > 8) & 1) <<
+((FASTOP_LENGTH > 16) & 1))
 
-Right, we'll see what additional fallout happens next week. I'll try to
-Cc you on such reports so that you're aware.
+I mean, I understand what it's doing, but just two lines above it the
+code has a "ilog2()" use that already depends on the fact that you can
+use ilog2() as a constant compile-time expression.
 
-> Oh, I do hate the hw-embargoed stuff that doesn't get all the usual
-> testing in all our automation.
+And guess what? The code could just use roundup_pow_of_two(), which is
+designed exactly like ilog2() to be used for compile-time constant
+values.
 
-Tell me about it.
+So the code should just use
 
-Thx.
+    #define FASTOP_SIZE roundup_pow_of_two(FASTOP_LENGTH)
 
--- 
-Regards/Gruss,
-    Boris.
+and be a lot more legible, wouldn't it?
 
-https://people.kernel.org/tglx/notes-about-netiquette
+Because I don't think there is anything magical about the length
+"8/16/32". It's purely "aligned and big enough to contain
+FASTOP_LENGTH".
+
+And then the point of that
+
+    static_assert(FASTOP_LENGTH <= FASTOP_SIZE);
+
+just goes away, because there are no subtle math issues there any more.
+
+In fact, the remaining question is just "where did the 7 come from" in
+
+    #define FASTOP_LENGTH (7 + ENDBR_INSN_SIZE + RET_LENGTH)
+
+because other than that it all looks fairly straightforward.
+
+              Linus
