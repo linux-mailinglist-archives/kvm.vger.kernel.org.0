@@ -2,69 +2,68 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 99D405753B1
-	for <lists+kvm@lfdr.de>; Thu, 14 Jul 2022 19:03:36 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 122A65753C8
+	for <lists+kvm@lfdr.de>; Thu, 14 Jul 2022 19:12:15 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S240023AbiGNRDT (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 14 Jul 2022 13:03:19 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35108 "EHLO
+        id S240410AbiGNRML (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 14 Jul 2022 13:12:11 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41628 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233854AbiGNRDS (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 14 Jul 2022 13:03:18 -0400
-Received: from mail-ed1-x52b.google.com (mail-ed1-x52b.google.com [IPv6:2a00:1450:4864:20::52b])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4F8DA558F2
-        for <kvm@vger.kernel.org>; Thu, 14 Jul 2022 10:03:17 -0700 (PDT)
-Received: by mail-ed1-x52b.google.com with SMTP id g1so3202888edb.12
-        for <kvm@vger.kernel.org>; Thu, 14 Jul 2022 10:03:17 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linux-foundation.org; s=google;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=Pm+iphli5RRfa4JmHeh81lVBkwRMzWQKLMKTsw18lMo=;
-        b=Z6ZquADLYu4uMwnTfB77Llp499vJAhe+VRkqcHP7yOsgzWOu9zDeuVv569iCGwq/TN
-         n14hSaPCbUQ38LjnNOasq8gCvSbs/42WYABjzHa4Zob3/Bzo6643Bg7S4R0uqisbfoYa
-         ihvN3aq2+yGj/oCPRE7nev9NxH4BVy6V92VdA=
+        with ESMTP id S240090AbiGNRMJ (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 14 Jul 2022 13:12:09 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id A9A8B4C607
+        for <kvm@vger.kernel.org>; Thu, 14 Jul 2022 10:12:08 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1657818727;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=HjWNjW2j61ucjIjN1Yf39Thjioq1zyAsNONdyKe2ob0=;
+        b=NfJmaqUOF/VyVcxoJGzXGNSm0Rdg5u0Lcpn64hGrUjt6ioJZ25FE/2fEHIywIjXKg4We8u
+        muwh3gYGoyfiTiT2X6ZTTnW99RniZM0DuVwp93L4CWqCFNNqIMMmxrEh6TxQ2UIjN6m6MG
+        FzQNw3A8AtyznPehVER4UlpJP32ZSxM=
+Received: from mail-ej1-f72.google.com (mail-ej1-f72.google.com
+ [209.85.218.72]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-623-KOsJS_7vNxO06D1kZZqDqA-1; Thu, 14 Jul 2022 13:12:06 -0400
+X-MC-Unique: KOsJS_7vNxO06D1kZZqDqA-1
+Received: by mail-ej1-f72.google.com with SMTP id x2-20020a1709065ac200b006d9b316257fso956239ejs.12
+        for <kvm@vger.kernel.org>; Thu, 14 Jul 2022 10:12:06 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=Pm+iphli5RRfa4JmHeh81lVBkwRMzWQKLMKTsw18lMo=;
-        b=dM9MFCPGNijFf4Fqx0eL8lh20WtyjNfDSr3WrrsiO2VUpstMds5pI3EiyV4AbI5dWg
-         Pl7GYJPSAO9pPiFErFCggae48s24biO4NgEbiLEFr0Z79ebM8Vb7WQ2dBuNLqDo2W63/
-         ayHgvjeBMtRjA4iyjAWXb8GoprZducoOTOpwvgs+l2C6NA1WfGLWclvdZTc95hzTgPiw
-         4r11wLg8tDTx9rcPtM3Ou8d+gfDcNnM7t0tHlWqeun5qqkMLqQ/+/mOZQaLyO3XMAwQs
-         VFAaxc/OrajCa/0zEpUqp9kYR9sfK2ebEzOXMpMHE4zHAG1CCLdjGeFRZ457TS2RkXrU
-         USqQ==
-X-Gm-Message-State: AJIora8kGKHlHxSi1s8WAmFNghfWRROXqmiprrzrDVvvBj+EE6DVMJzF
-        MIxVT78SW7sWS8bnOloiQO+5vgoDuRGYNQnjkEk=
-X-Google-Smtp-Source: AGRyM1tgpsoFZsR6xaaLjG0AEelQ1nYpqWetwhpqtx3g62G5tCwYSXdclkOMUwJyOsKIrgqZVfxULw==
-X-Received: by 2002:a05:6402:354a:b0:43a:d32f:cc62 with SMTP id f10-20020a056402354a00b0043ad32fcc62mr13275838edd.48.1657818195681;
-        Thu, 14 Jul 2022 10:03:15 -0700 (PDT)
-Received: from mail-wr1-f41.google.com (mail-wr1-f41.google.com. [209.85.221.41])
-        by smtp.gmail.com with ESMTPSA id h17-20020a50ed91000000b0043a6df72c11sm1346806edr.63.2022.07.14.10.03.13
-        for <kvm@vger.kernel.org>
+        h=x-gm-message-state:message-id:date:mime-version:user-agent
+         :content-language:to:cc:references:from:subject:in-reply-to
+         :content-transfer-encoding;
+        bh=HjWNjW2j61ucjIjN1Yf39Thjioq1zyAsNONdyKe2ob0=;
+        b=oLp27V6w4bYYYw61sQtgJrc945PQZvJYnPVe/kB4jQEs4MYbtei/iQCq9bi4Dyf59W
+         g9GLnw0vNWjgDMyiTZg9SbPxIO8WIgEBNmdbfbSmGzGKFao6kfQSt5WJxbK4ITkscCJ1
+         uGfMT4lTo/eki5wLmXfKTGJ9xKQ22uPs2iNeY2U00d9V+iIMneZgdqbDVDFd4ZSUvDzN
+         /qJceHWJBeZyu9WW5Vz++S3q3XVHxSWCbXTaKjn3ZexZbme+Bzu5+hDl39wdwQbLiTn9
+         wkfb2k/tsrj0zisgfsl50e9e7s+O8G2r86sqxbIGvauJ5xf4NlO5tXFnhVCCL14NYaax
+         SgAw==
+X-Gm-Message-State: AJIora/aZBoi7yWwCqHDujAM8kTiMyyHiqtFQLgFejMDp1D0GJWFiD7/
+        pTuyIQgXje6t0l8I3ZeqaHu6NyVu3ayZF57qd0rzHs4rUJM4x75PFU41MU1zLOkPOR0MVWakodF
+        3yF0ELSa05avf
+X-Received: by 2002:a17:906:98c8:b0:72b:41dc:c271 with SMTP id zd8-20020a17090698c800b0072b41dcc271mr9951330ejb.36.1657818725038;
+        Thu, 14 Jul 2022 10:12:05 -0700 (PDT)
+X-Google-Smtp-Source: AGRyM1s4QWugzGtCYIVhcQOfjMkddqnFDUCHwgwKB/hRFje6kOt4GvXPs1eutx8bZ864l4FIGpiklA==
+X-Received: by 2002:a17:906:98c8:b0:72b:41dc:c271 with SMTP id zd8-20020a17090698c800b0072b41dcc271mr9951310ejb.36.1657818724813;
+        Thu, 14 Jul 2022 10:12:04 -0700 (PDT)
+Received: from ?IPV6:2001:b07:6468:f312:9af8:e5f5:7516:fa89? ([2001:b07:6468:f312:9af8:e5f5:7516:fa89])
+        by smtp.googlemail.com with ESMTPSA id n6-20020aa7c786000000b0043787ad7cfasm1362571eds.22.2022.07.14.10.12.01
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 14 Jul 2022 10:03:14 -0700 (PDT)
-Received: by mail-wr1-f41.google.com with SMTP id bk26so3372790wrb.11
-        for <kvm@vger.kernel.org>; Thu, 14 Jul 2022 10:03:13 -0700 (PDT)
-X-Received: by 2002:a5d:544b:0:b0:21d:70cb:b4a2 with SMTP id
- w11-20020a5d544b000000b0021d70cbb4a2mr8990916wrv.281.1657818193135; Thu, 14
- Jul 2022 10:03:13 -0700 (PDT)
+        Thu, 14 Jul 2022 10:12:04 -0700 (PDT)
+Message-ID: <19b6f502-94f2-621a-4c30-fe9641474669@redhat.com>
+Date:   Thu, 14 Jul 2022 19:12:00 +0200
 MIME-Version: 1.0
-References: <20220712183238.844813653@linuxfoundation.org> <CA+G9fYtntg7=zWSs-dm+n_AUr_u0eBOU0zrwWqMeXZ+SF6_bLw@mail.gmail.com>
- <eb63e4ce-843f-c840-060e-6e15defd3c4d@roeck-us.net> <CAHk-=wj5cOA+fbGeV15kvwe6YGT54Wsk8F2UGoekVQLTPJz_pw@mail.gmail.com>
- <CAHk-=wgq1soM4gudypWLVQdYuvJbXn38LtvJMtnLZX+RTypqLg@mail.gmail.com>
- <Ys/bYJ2bLVfNBjFI@nazgul.tnic> <6b4337f4-d1de-7ba3-14e8-3ad0f9b18788@redhat.com>
- <8BEC3365-FC09-46C5-8211-518657C0308E@alien8.de>
-In-Reply-To: <8BEC3365-FC09-46C5-8211-518657C0308E@alien8.de>
-From:   Linus Torvalds <torvalds@linux-foundation.org>
-Date:   Thu, 14 Jul 2022 10:02:57 -0700
-X-Gmail-Original-Message-ID: <CAHk-=wj4vtoWZPMXJU-B9qW1zLHsoA1Qb2P0NW=UFhZmrCrf9Q@mail.gmail.com>
-Message-ID: <CAHk-=wj4vtoWZPMXJU-B9qW1zLHsoA1Qb2P0NW=UFhZmrCrf9Q@mail.gmail.com>
-Subject: Re: [PATCH 5.15 00/78] 5.15.55-rc1 review
-To:     Boris Petkov <bp@alien8.de>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>,
-        Guenter Roeck <linux@roeck-us.net>,
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.10.0
+Content-Language: en-US
+To:     Linus Torvalds <torvalds@linux-foundation.org>,
+        Boris Petkov <bp@alien8.de>
+Cc:     Guenter Roeck <linux@roeck-us.net>,
         Peter Zijlstra <peterz@infradead.org>,
         Thadeu Lima de Souza Cascardo <cascardo@canonical.com>,
         Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
@@ -83,60 +82,82 @@ Cc:     Paolo Bonzini <pbonzini@redhat.com>,
         Shuah Khan <shuah@kernel.org>, Ingo Molnar <mingo@redhat.com>,
         Thomas Gleixner <tglx@linutronix.de>, X86 ML <x86@kernel.org>,
         lkft-triage@lists.linaro.org,
-        =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>,
+        =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>,
         "H. Peter Anvin" <hpa@zytor.com>,
         Anders Roxell <anders.roxell@linaro.org>
-Content-Type: text/plain; charset="UTF-8"
-X-Spam-Status: No, score=-1.8 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-        RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
-        autolearn=no autolearn_force=no version=3.4.6
+References: <20220712183238.844813653@linuxfoundation.org>
+ <CA+G9fYtntg7=zWSs-dm+n_AUr_u0eBOU0zrwWqMeXZ+SF6_bLw@mail.gmail.com>
+ <eb63e4ce-843f-c840-060e-6e15defd3c4d@roeck-us.net>
+ <CAHk-=wj5cOA+fbGeV15kvwe6YGT54Wsk8F2UGoekVQLTPJz_pw@mail.gmail.com>
+ <CAHk-=wgq1soM4gudypWLVQdYuvJbXn38LtvJMtnLZX+RTypqLg@mail.gmail.com>
+ <Ys/bYJ2bLVfNBjFI@nazgul.tnic>
+ <6b4337f4-d1de-7ba3-14e8-3ad0f9b18788@redhat.com>
+ <8BEC3365-FC09-46C5-8211-518657C0308E@alien8.de>
+ <CAHk-=wj4vtoWZPMXJU-B9qW1zLHsoA1Qb2P0NW=UFhZmrCrf9Q@mail.gmail.com>
+From:   Paolo Bonzini <pbonzini@redhat.com>
+Subject: Re: [PATCH 5.15 00/78] 5.15.55-rc1 review
+In-Reply-To: <CAHk-=wj4vtoWZPMXJU-B9qW1zLHsoA1Qb2P0NW=UFhZmrCrf9Q@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Spam-Status: No, score=-3.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
+        RCVD_IN_DNSWL_LOW,SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE
+        autolearn=unavailable autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Jul 14, 2022 at 7:46 AM Boris Petkov <bp@alien8.de> wrote:
->
-> On July 14, 2022 1:46:53 PM UTC, Paolo Bonzini <pbonzini@redhat.com> wrote:
-> >Please leave that one out as Peter suggested a better fix and I have that queued for Linus.
->
-> Already zapped.
+On 7/14/22 19:02, Linus Torvalds wrote:
+> And guess what? The code could just use roundup_pow_of_two(), which is
+> designed exactly like ilog2() to be used for compile-time constant
+> values.
+> 
+> So the code should just use
+> 
+>      #define FASTOP_SIZE roundup_pow_of_two(FASTOP_LENGTH)
+> 
+> and be a lot more legible, wouldn't it?
+> 
+> Because I don't think there is anything magical about the length
+> "8/16/32". It's purely "aligned and big enough to contain
+> FASTOP_LENGTH".
 
-I like Peter's more obvious use of FASTYOP_LENGTH, but this is just disgusting:
+roundup_pow_of_two unfortunately is not enough for stringizing 
+FASTOP_SIZE into an asm statement. :(
 
-    #define FASTOP_SIZE (8 << ((FASTOP_LENGTH > 8) & 1) <<
-((FASTOP_LENGTH > 16) & 1))
+	#define __FOP_FUNC(name) \
+	        ".align " __stringify(FASTOP_SIZE) " \n\t" \
+	        ".type " name ", @function \n\t" \
+	        name ":\n\t" \
+	        ASM_ENDBR
 
-I mean, I understand what it's doing, but just two lines above it the
-code has a "ilog2()" use that already depends on the fact that you can
-use ilog2() as a constant compile-time expression.
+The shifts are what we came up with for the SETCC thunks when ENDBR and 
+SLS made them grew beyond 4 bytes; Peter's patch is reusing the trick 
+for the fastop thunks.
 
-And guess what? The code could just use roundup_pow_of_two(), which is
-designed exactly like ilog2() to be used for compile-time constant
-values.
+> Because I don't think there is anything magical about the length
+> "8/16/32". It's purely "aligned and big enough to contain
+> FASTOP_LENGTH".
 
-So the code should just use
+I agree with that, it's only limited to 8/16/32 to keep the macro to a 
+decent size.
 
-    #define FASTOP_SIZE roundup_pow_of_two(FASTOP_LENGTH)
+> And then the point of that
+> 
+>     static_assert(FASTOP_LENGTH <= FASTOP_SIZE);
+> 
+> just goes away, because there are no subtle math issues there any more.
+> 
+> In fact, the remaining question is just "where did the 7 come from" in
+> 
+>     #define FASTOP_LENGTH (7 + ENDBR_INSN_SIZE + RET_LENGTH)
 
-and be a lot more legible, wouldn't it?
+The 7 is an upper limit to the length of the code between endbr and ret.
+There's no particular reason to limit to 7, but it allows using an 
+alignment of 8 in the smallest case (no thunks, no SLS, no endbr) where 
+you just have ".align 8; ...; ret".
 
-Because I don't think there is anything magical about the length
-"8/16/32". It's purely "aligned and big enough to contain
-FASTOP_LENGTH".
+Paolo
 
-And then the point of that
-
-    static_assert(FASTOP_LENGTH <= FASTOP_SIZE);
-
-just goes away, because there are no subtle math issues there any more.
-
-In fact, the remaining question is just "where did the 7 come from" in
-
-    #define FASTOP_LENGTH (7 + ENDBR_INSN_SIZE + RET_LENGTH)
-
-because other than that it all looks fairly straightforward.
-
-              Linus
