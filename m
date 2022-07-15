@@ -2,69 +2,63 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 1E5DC576A89
-	for <lists+kvm@lfdr.de>; Sat, 16 Jul 2022 01:18:23 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 8ECB7576A8F
+	for <lists+kvm@lfdr.de>; Sat, 16 Jul 2022 01:21:34 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231483AbiGOXSM (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 15 Jul 2022 19:18:12 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45116 "EHLO
+        id S232240AbiGOXVR (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 15 Jul 2022 19:21:17 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47852 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231163AbiGOXSI (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 15 Jul 2022 19:18:08 -0400
-Received: from mail-pj1-x1036.google.com (mail-pj1-x1036.google.com [IPv6:2607:f8b0:4864:20::1036])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3176890D91
-        for <kvm@vger.kernel.org>; Fri, 15 Jul 2022 16:18:08 -0700 (PDT)
-Received: by mail-pj1-x1036.google.com with SMTP id z12-20020a17090a7b8c00b001ef84000b8bso12874753pjc.1
-        for <kvm@vger.kernel.org>; Fri, 15 Jul 2022 16:18:08 -0700 (PDT)
+        with ESMTP id S232157AbiGOXVL (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 15 Jul 2022 19:21:11 -0400
+Received: from mail-pg1-x549.google.com (mail-pg1-x549.google.com [IPv6:2607:f8b0:4864:20::549])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7D66692857
+        for <kvm@vger.kernel.org>; Fri, 15 Jul 2022 16:21:10 -0700 (PDT)
+Received: by mail-pg1-x549.google.com with SMTP id bd7-20020a656e07000000b00412a946da8eso3399242pgb.20
+        for <kvm@vger.kernel.org>; Fri, 15 Jul 2022 16:21:10 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=XbW4ugQp+4Ks3aPPXecdjoIRykNNddTdltbpwPKe1dg=;
-        b=AqupWTdfkCcwL2MkYOsMqRrMSV/a7tM0rRAIbHGRtwELMYjOPNPvTxm9ck4bRZ1LJL
-         C+GsN6QPyU9IZu0yfL5Hgm1h0+17s2LZYsOW91bZ6cFdcMh0EGwB9pERCkCjGIgHX/sA
-         75BbexmZoonEtKYsSNhYrh0PfX2kPtAIYusu0mprQ9KgDHOH6ThMFDC7dh/Ta9g3cGv4
-         apb0wR/PWrWT6FsSLLxOb7Cgiqk2/C7Kh/1JjLL8dtlUWesUmYgAYWlNbkKGoi0qk97N
-         jNwyZJjwpHDaYJnzuklojThL047k0a1K2rL3VK54fbnn8WNi0fun1SE3rTUCQe5gRGNH
-         7Eng==
+        h=reply-to:date:message-id:mime-version:subject:from:to:cc;
+        bh=3P3Bs+udSQsz1sUF6b+IjzihKr791n8qO5rKr7yYqSE=;
+        b=VAVneBoVZS7wuVCC3aUBkJFUZzF0WCarFPBNN4kA6OH/iochWiQiaPSvniKfnAf+YG
+         dZtuls0lliPtyKtiiA4cwGjh2ERAZqLms+8VAt5QR0ieI7qPZB2JPcJQ0jjrmCN+HBxa
+         4jRzzEv5cIjBSbHZKlIfwG3XxeI0Rx2YYAu1Lc97xnzed66QaB1GOI9o49Jnt53NuAu6
+         mN6+1aK+S/J+Vwr3SzuvCdiL7AodCdLjjYqKg6WogcxbQ+gXqXPGXDnZNSpGcUl7iay3
+         gPGwEnOVaXesnGLeoT49N3DuNWJOYuGkeS7F/HVJzZth9+lQEbCFlUM0jPpcmsZmj5P8
+         V0jQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=XbW4ugQp+4Ks3aPPXecdjoIRykNNddTdltbpwPKe1dg=;
-        b=5VAm7P5IL2O8x4OkimaoAvBwQ3IuttVsKTQwVmcVatjYlf0hj6tzgmPuCj4+Xz3ly7
-         2XIJVdmG/QvC7ip1tH9Ri2rZkLHjCcf8QYeeDQYN3OyAZrbTWZ7jYBtORcj7b+FgSesV
-         oyWAecmrkLtxYUA9EulhrDuebVntIes3/snwJM5+tlYjmqQwv4I2mp66BCb+hVZQU32v
-         /lyHUx+OKMCWGqvN0tiglMpgXIIL5QKwh2fesahe8suHTcE6eqXTfiPCL27LzSnURHBa
-         lP7ErctAYOIrqzeGc9dJqrqP+RgXFc+bc3JS/PSWu7WZuO8a8MLD8j0lcvOz03CTI8CE
-         EjLg==
-X-Gm-Message-State: AJIora+sHMewPjQnB6KNgPFNqdNyEAR6jTnq5V7pJUs89UxdKnPNzjdF
-        V0z3YDyZ/6flqA0taKkBT6mlemAIJE0YQg==
-X-Google-Smtp-Source: AGRyM1tgMaamoYyeQMvHcg5nmNj0M22GhP3i8TJXo4psF2lgAUpv4/BagImN3kbzKBXY+aA3OoWDJA==
-X-Received: by 2002:a17:902:c64b:b0:16b:d51a:dc24 with SMTP id s11-20020a170902c64b00b0016bd51adc24mr15965401pls.48.1657927087608;
-        Fri, 15 Jul 2022 16:18:07 -0700 (PDT)
-Received: from google.com (123.65.230.35.bc.googleusercontent.com. [35.230.65.123])
-        by smtp.gmail.com with ESMTPSA id f13-20020a170902ce8d00b0016c1a1c1405sm4204066plg.222.2022.07.15.16.18.06
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 15 Jul 2022 16:18:06 -0700 (PDT)
-Date:   Fri, 15 Jul 2022 23:18:03 +0000
+        h=x-gm-message-state:reply-to:date:message-id:mime-version:subject
+         :from:to:cc;
+        bh=3P3Bs+udSQsz1sUF6b+IjzihKr791n8qO5rKr7yYqSE=;
+        b=V9ZOSOffa940MmBlSB541+7hO+69ZOprW80B0k6WEcf/7K8n4EjLaZaUzmAM+3zuP4
+         WB98WNcmmoz3z+oxvIgLL5YAR1M9+aP2QePAUaBbOBLQctY4HLZUXtKnqxi8qr0qH2l7
+         YdtsuKnHaq7hLE3S5qDBDAF4b0spGlc23vT2ewPOA1lZBGXAQyWT/6NPMVWgcr7bPbTX
+         wRqTtkiE8Mur0IonaRoz1a7/pHoE52QPdrLHAoDEZCiN7B/KvihSsw9ULvDFVon14BJp
+         MLRWNUjqj0Lcdc7aIoelQjtGEqrYLBxiEEifP0KwURGeQDZuJQV8GQ6J9Rb381wcQSxY
+         lMCw==
+X-Gm-Message-State: AJIora8qw3GVnxiKoqtV5u49aKXBRJ9RoiO0xraRhUhvfzOSAGzTBO4C
+        1ks6NhxTk3i+mWJy6gNSBmb/ZCs/ghE=
+X-Google-Smtp-Source: AGRyM1upZZkkOKDTARRJzNwIaT/POrzwuzwSs1Kl9kDJrRql3nC8/r1FEQQqKVfyugyXaZvb4zbRhDESNrw=
+X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
+ (user=seanjc job=sendgmr) by 2002:a17:902:760f:b0:16c:ae59:c9b2 with SMTP id
+ k15-20020a170902760f00b0016cae59c9b2mr10707642pll.0.1657927270100; Fri, 15
+ Jul 2022 16:21:10 -0700 (PDT)
+Reply-To: Sean Christopherson <seanjc@google.com>
+Date:   Fri, 15 Jul 2022 23:21:03 +0000
+Message-Id: <20220715232107.3775620-1-seanjc@google.com>
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.37.0.170.g444d1eabd0-goog
+Subject: [PATCH 0/4] Huge page related cleanups
 From:   Sean Christopherson <seanjc@google.com>
-To:     Jim Mattson <jmattson@google.com>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-Subject: Re: [PATCH 1/4] KVM: x86: Reject loading KVM if host.PAT[0] != WB
-Message-ID: <YtH1q3C4F+LAEDTf@google.com>
-References: <20220715230016.3762909-1-seanjc@google.com>
- <20220715230016.3762909-2-seanjc@google.com>
- <CALMp9eQdzZK4ZAyQZXUWff_zuRRdr=ugkujWfFrt9dP8uFcs=Q@mail.gmail.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <CALMp9eQdzZK4ZAyQZXUWff_zuRRdr=ugkujWfFrt9dP8uFcs=Q@mail.gmail.com>
-X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-        USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=unavailable
+To:     Sean Christopherson <seanjc@google.com>,
+        Paolo Bonzini <pbonzini@redhat.com>
+Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Mingwei Zhang <mizhang@google.com>
+Content-Type: text/plain; charset="UTF-8"
+X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL autolearn=ham
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -72,21 +66,44 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Jul 15, 2022, Jim Mattson wrote:
-> On Fri, Jul 15, 2022 at 4:02 PM Sean Christopherson <seanjc@google.com> wrote:
-> >
-> > Reject KVM if entry '0' in the host's IA32_PAT MSR is not programmed to
-> > writeback (WB) memtype.  KVM subtly relies on IA32_PAT entry '0' to be
-> > programmed to WB by leaving the PAT bits in shadow paging and NPT SPTEs
-> > as '0'.  If something other than WB is in PAT[0], at _best_ guests will
-> > suffer very poor performance, and at worst KVM will crash the system by
-> > breaking cache-coherency expecations (e.g. using WC for guest memory).
-> >
-> > Signed-off-by: Sean Christopherson <seanjc@google.com>
-> > ---
-> What if someone changes the host's PAT to violate this rule *after*
-> kvm is loaded?
+Simplify (hopefully it's simpler) zapping collapsible SPTEs by first
+simplifying retrieving the host mapping level.  KVM currently requires
+memory be backed by a refcounted struct page in order to be mapped as
+a huge page.  This requires KVM to acquire the pfn that corresponds to
+the gfn/hva before checking whether or not the gfn/hva can be mapped
+huge.
 
-Then KVM (and probably many other things in the kernel) is hosed.  The same argument
-(that KVM isn't paranoid enough) can likely be made for a number of MSRs and critical
-registers.
+Dropping that requirement allow the "zap collapsible" path to detect
+that a shadow page can be zapped without having to first bottom out on
+leaf entries.  This could theoretically be a minor performance win,
+e.g. then KVM doesn't need to walk all not-present leaf SPTEs to find
+out that a shadow page has no children.  In basic testing I didn't see
+any meaningful difference (the actual zapping dominates).
+
+There are also potential use cases for allow any mappings to be huge,
+e.g. GPU buffers (IIUC).  Dropping the struct page requirement makes
+KVM play nice with those.
+
+This is most definitely post-5.20 material.
+
+Sean Christopherson (4):
+  KVM: x86/mmu: Don't require refcounted "struct page" to create huge
+    SPTEs
+  KVM: x86/mmu: Document the "rules" for using host_pfn_mapping_level()
+  KVM: x86/mmu: Don't bottom out on leafs when zapping collapsible SPTEs
+  KVM: selftests: Add an option to run vCPUs while disabling dirty
+    logging
+
+ arch/x86/kvm/mmu/mmu.c                        | 65 ++++++++++++-------
+ arch/x86/kvm/mmu/mmu_internal.h               |  2 +-
+ arch/x86/kvm/mmu/tdp_iter.c                   |  9 ---
+ arch/x86/kvm/mmu/tdp_iter.h                   |  1 -
+ arch/x86/kvm/mmu/tdp_mmu.c                    | 61 ++++++++---------
+ .../selftests/kvm/dirty_log_perf_test.c       | 30 ++++++++-
+ 6 files changed, 94 insertions(+), 74 deletions(-)
+
+
+base-commit: 8031d87aa9953ddeb047a5356ebd0b240c30f233
+-- 
+2.37.0.170.g444d1eabd0-goog
+
