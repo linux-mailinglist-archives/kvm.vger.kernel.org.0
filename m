@@ -2,54 +2,58 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 597E357684D
-	for <lists+kvm@lfdr.de>; Fri, 15 Jul 2022 22:42:38 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 0AC85576850
+	for <lists+kvm@lfdr.de>; Fri, 15 Jul 2022 22:42:43 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230054AbiGOUmh (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 15 Jul 2022 16:42:37 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57828 "EHLO
+        id S230199AbiGOUmi (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 15 Jul 2022 16:42:38 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57844 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229471AbiGOUmf (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 15 Jul 2022 16:42:35 -0400
-Received: from mail-pl1-x649.google.com (mail-pl1-x649.google.com [IPv6:2607:f8b0:4864:20::649])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EFB965B04F
-        for <kvm@vger.kernel.org>; Fri, 15 Jul 2022 13:42:34 -0700 (PDT)
-Received: by mail-pl1-x649.google.com with SMTP id e11-20020a17090301cb00b0016c3375abd3so2570929plh.3
-        for <kvm@vger.kernel.org>; Fri, 15 Jul 2022 13:42:34 -0700 (PDT)
+        with ESMTP id S230010AbiGOUmh (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 15 Jul 2022 16:42:37 -0400
+Received: from mail-pj1-x1049.google.com (mail-pj1-x1049.google.com [IPv6:2607:f8b0:4864:20::1049])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6176363922
+        for <kvm@vger.kernel.org>; Fri, 15 Jul 2022 13:42:36 -0700 (PDT)
+Received: by mail-pj1-x1049.google.com with SMTP id v19-20020a17090abb9300b001ef7bbd5a28so5795550pjr.0
+        for <kvm@vger.kernel.org>; Fri, 15 Jul 2022 13:42:36 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
-        h=reply-to:date:message-id:mime-version:subject:from:to:cc;
-        bh=I/QtSIUAt/ll33VekTJLh62H8IcuJ8z6tut6BxZsMlM=;
-        b=fyGq4PDW6nNQF4AgVR2GWsJutzb8REI7X30M+jAdJvMXKIiLqLV5+41RoSH2TGMyke
-         In+cj7mPYK0r2awY7X/evjcY1kdNfY5xPXJX6mKoMWvW0p4NbdxM4tS3pqpygfvoilha
-         niWGT/MtkjgADD6uIh8CZcOLymPLPPYO+HH5SnFUYjuDVL7HF3fRUMp600ZRo64UzB3e
-         jYHhdk8F3/6eRvz9JbkcvSpg3wg1t3jEsVc/NV7alHZUvcf59/mzzwHxk8lHlKbElHUG
-         XrjEh9gsJNP8BGFl6FJs6w8e1tPTPfWlWQ29EuF9fElc/jZ3mhk9iZVa8yPXnhaWavgs
-         YCLg==
+        h=reply-to:date:in-reply-to:message-id:mime-version:references
+         :subject:from:to:cc;
+        bh=wPnZg/weEXDMrhZ6n4kyBPhV/0y1/e3H5B3IYu4XWF8=;
+        b=kL+/QFKDFfHHa2pgMd2n57g67SH56QIHlNyzEEpgivSulybkQnQEJVhZms0TIltHzX
+         YanVPCAW9kq18DZ033z657a3P1S/+yTRqtyWbMUWNHBSrqC8bOaZudpmpMIAiU5eeKxN
+         EK73geAcL9a8nvZbF+DvOhzOZpnZIZCge+IlpMpwETikBih5dS15EjEFJRAouIC0kpXr
+         Hrn0oOTVuh50pyxn+VfCGUtyKrZAD/LFojoheRITBQLjZBtvqnWoyer8mEDjoEFibQp2
+         tje+D3oyJOPTgJ+FIrbV5VVA4ldayawW9NxUR9/y1S0fmSnbOMGcA4lgaI24qQTqSvUZ
+         fgWg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:reply-to:date:message-id:mime-version:subject
-         :from:to:cc;
-        bh=I/QtSIUAt/ll33VekTJLh62H8IcuJ8z6tut6BxZsMlM=;
-        b=DE5iZzkWCBdEoOSieOe8XDb3fTvu6VtjTRcEH7AEHUxXseljtUlMQ0j8YW5vTe4w+i
-         92IgwGqjemH+DnBDHOdIHuW1NAuLyGehiWyAgIBMyBRoxgfJiatKp2BmXphov/HG2J//
-         kUMM22tqkNFwNIvhHJmkc04Ec152VfpTNZ4jx+NLL1//8I1KgREu8LD74sJWupnJHzsx
-         fWdfyDh4FJab75hj5zfCXbZSxC29MjOhnXwWBkZ/Os/YJg+dn/T4V2LiGKcdaXNijm19
-         eOeXzcfV2LVMCZxx8tvCrvnzxeHk6SHcnot1NxQNDMbH+7PcDTjmPS/39oWu9UsjKAOa
-         z6Dw==
-X-Gm-Message-State: AJIora+iLgf30XI2/DkkS8VfxIgii/0u6DSqjOWpeR7K4kAwny6WgckZ
-        jeEWG6iH3nLbIOZH/0XP5rwLlcFDO30=
-X-Google-Smtp-Source: AGRyM1sFgmYzLtmfKLJLV5nfuc4k+8wI40y5q4ho5M0nFm/EHMVCPOr80cRtiKWNrD4WZI42WiPdfLuL+9Y=
+        h=x-gm-message-state:reply-to:date:in-reply-to:message-id
+         :mime-version:references:subject:from:to:cc;
+        bh=wPnZg/weEXDMrhZ6n4kyBPhV/0y1/e3H5B3IYu4XWF8=;
+        b=YwDXErkB5odkKRAgm5G9zrFEJSCWnTI4QxOX8dHgeD8FAgCRCpS+7yX71HiZBbQY45
+         zWJRS4+jaM8JnyeK+njrTKF9iUVhWGJzHKMYocOj2s8Ns1XleFcESE2syQByRr1gBO38
+         cz1HsoyCqczm4j4zsED1I/r8A2JSRhpYxdoSF3dWWEQowMLMBUC2VeTETM+1nsi5qbqC
+         Djfi+1Vxu5us10sEFqM2LqGZ95hkltjBH2Eugm5G9VTFqirep0PIPeFw7z2FlIYW+ZY3
+         87PcJxfNxzgcenjt1J/cFitelqsWXhn58WhLezZGdun44UqTCnlrnVSb1Un5UfmoCbWu
+         +0Sw==
+X-Gm-Message-State: AJIora9So1NNs6rKNYrExTTZGxFfnAky1/KFprZUVelquATaNh/st+hr
+        iLOaBsbZcY8SMP8iF3+tgiNz6fj/6eE=
+X-Google-Smtp-Source: AGRyM1tOruFNn3/TWHRtsDXTOSPK6qWy/lHTC7NRHc9MhPhSrIFA8RJpO4OPdt5NP7OIhlA25Esj07e+g7Q=
 X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a17:90a:f8ce:b0:1ef:798c:ae03 with SMTP id
- l14-20020a17090af8ce00b001ef798cae03mr24290306pjd.8.1657917754552; Fri, 15
- Jul 2022 13:42:34 -0700 (PDT)
+ (user=seanjc job=sendgmr) by 2002:a17:902:eb8c:b0:16b:f104:71bc with SMTP id
+ q12-20020a170902eb8c00b0016bf10471bcmr15317039plg.30.1657917755968; Fri, 15
+ Jul 2022 13:42:35 -0700 (PDT)
 Reply-To: Sean Christopherson <seanjc@google.com>
-Date:   Fri, 15 Jul 2022 20:42:02 +0000
-Message-Id: <20220715204226.3655170-1-seanjc@google.com>
+Date:   Fri, 15 Jul 2022 20:42:03 +0000
+In-Reply-To: <20220715204226.3655170-1-seanjc@google.com>
+Message-Id: <20220715204226.3655170-2-seanjc@google.com>
 Mime-Version: 1.0
+References: <20220715204226.3655170-1-seanjc@google.com>
 X-Mailer: git-send-email 2.37.0.170.g444d1eabd0-goog
-Subject: [PATCH v2 00/24] KVM: x86: Event/exception fixes and cleanups
+Subject: [PATCH v2 01/24] KVM: nVMX: Unconditionally purge queued/injected
+ events on nested "exit"
 From:   Sean Christopherson <seanjc@google.com>
 To:     Sean Christopherson <seanjc@google.com>,
         Paolo Bonzini <pbonzini@redhat.com>
@@ -61,7 +65,7 @@ Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
 Content-Type: text/plain; charset="UTF-8"
 X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL autolearn=unavailable
+        SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL autolearn=ham
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -69,87 +73,68 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-The main goal of this series is to fix KVM's longstanding bug of not
-honoring L1's exception intercepts wants when handling an exception that
-occurs during delivery of a different exception.  E.g. if L0 and L1 are
-using shadow paging, and L2 hits a #PF, and then hits another #PF while
-vectoring the first #PF due to _L1_ not having a shadow page for the IDT,
-KVM needs to check L1's intercepts before morphing the #PF => #PF => #DF
-so that the #PF is routed to L1, not injected into L2 as a #DF.
+Drop pending exceptions and events queued for re-injection when leaving
+nested guest mode, even if the "exit" is due to VM-Fail, SMI, or forced
+by host userspace.  Failure to purge events could result in an event
+belonging to L2 being injected into L1.
 
-nVMX has hacked around the bug for years by overriding the #PF injector
-for shadow paging to go straight to VM-Exit, and nSVM has started doing
-the same.  The hacks mostly work, but they're incomplete, confusing, and
-lead to other hacky code, e.g. bailing from the emulator because #PF
-injection forced a VM-Exit and suddenly KVM is back in L1.
+This _should_ never happen for VM-Fail as all events should be blocked by
+nested_run_pending, but it's possible if KVM, not the L1 hypervisor, is
+the source of VM-Fail when running vmcs02.
 
-Maxim, I believe I addressed all of your comments, holler if I missed
-something.
+SMI is a nop (barring unknown bugs) as recognition of SMI and thus entry
+to SMM is blocked by pending exceptions and re-injected events.
 
-v2:
- - Collect reviews. [Maxim, Jim]
- - Split a few patches into more consumable chunks. [Maxim]
- - Document that KVM doesn't correctly handle SMI+MTF (or SMI priority). [Maxim]
- - Add comment to document the instruction boundary (event window) aspect
-   of block_nested_events. [Maxim]
- - Add a patch to rename inject_pending_events() and add a comment to
-   document KVM's not-quite-architecturally-correct handing of instruction
-   boundaries and asynchronous events. [Maxim]
+Forced exit is definitely buggy, but has likely gone unnoticed because
+userspace probably follows the forced exit with KVM_SET_VCPU_EVENTS (or
+some other ioctl() that purges the queue).
 
-v1: https://lore.kernel.org/all/20220614204730.3359543-1-seanjc@google.com
+Fixes: 4f350c6dbcb9 ("kvm: nVMX: Handle deferred early VMLAUNCH/VMRESUME failure properly")
+Cc: stable@vger.kernel.org
+Signed-off-by: Sean Christopherson <seanjc@google.com>
+Reviewed-by: Jim Mattson <jmattson@google.com>
+Reviewed-by: Maxim Levitsky <mlevitsk@redhat.com>
+---
+ arch/x86/kvm/vmx/nested.c | 19 +++++++++++--------
+ 1 file changed, 11 insertions(+), 8 deletions(-)
 
-Sean Christopherson (24):
-  KVM: nVMX: Unconditionally purge queued/injected events on nested
-    "exit"
-  KVM: VMX: Drop bits 31:16 when shoving exception error code into VMCS
-  KVM: x86: Don't check for code breakpoints when emulating on exception
-  KVM: nVMX: Treat General Detect #DB (DR7.GD=1) as fault-like
-  KVM: nVMX: Prioritize TSS T-flag #DBs over Monitor Trap Flag
-  KVM: x86: Treat #DBs from the emulator as fault-like (code and
-    DR7.GD=1)
-  KVM: x86: Use DR7_GD macro instead of open coding check in emulator
-  KVM: nVMX: Ignore SIPI that arrives in L2 when vCPU is not in WFS
-  KVM: nVMX: Unconditionally clear mtf_pending on nested VM-Exit
-  KVM: VMX: Inject #PF on ENCLS as "emulated" #PF
-  KVM: x86: Rename kvm_x86_ops.queue_exception to inject_exception
-  KVM: x86: Make kvm_queued_exception a properly named, visible struct
-  KVM: x86: Formalize blocking of nested pending exceptions
-  KVM: x86: Use kvm_queue_exception_e() to queue #DF
-  KVM: x86: Hoist nested event checks above event injection logic
-  KVM: x86: Evaluate ability to inject SMI/NMI/IRQ after potential
-    VM-Exit
-  KVM: nVMX: Add a helper to identify low-priority #DB traps
-  KVM: nVMX: Document priority of all known events on Intel CPUs
-  KVM: x86: Morph pending exceptions to pending VM-Exits at queue time
-  KVM: x86: Treat pending TRIPLE_FAULT requests as pending exceptions
-  KVM: VMX: Update MTF and ICEBP comments to document KVM's subtle
-    behavior
-  KVM: x86: Rename inject_pending_events() to
-    kvm_check_and_inject_events()
-  KVM: selftests: Use uapi header to get VMX and SVM exit reasons/codes
-  KVM: selftests: Add an x86-only test to verify nested exception
-    queueing
-
- arch/x86/include/asm/kvm-x86-ops.h            |   2 +-
- arch/x86/include/asm/kvm_host.h               |  35 +-
- arch/x86/kvm/emulate.c                        |   3 +-
- arch/x86/kvm/svm/nested.c                     | 110 ++---
- arch/x86/kvm/svm/svm.c                        |  20 +-
- arch/x86/kvm/vmx/nested.c                     | 329 ++++++++-----
- arch/x86/kvm/vmx/sgx.c                        |   2 +-
- arch/x86/kvm/vmx/vmx.c                        |  53 ++-
- arch/x86/kvm/x86.c                            | 450 ++++++++++++------
- arch/x86/kvm/x86.h                            |  11 +-
- tools/testing/selftests/kvm/.gitignore        |   1 +
- tools/testing/selftests/kvm/Makefile          |   1 +
- .../selftests/kvm/include/x86_64/svm_util.h   |   7 +-
- .../selftests/kvm/include/x86_64/vmx.h        |  51 +-
- .../kvm/x86_64/nested_exceptions_test.c       | 295 ++++++++++++
- 15 files changed, 950 insertions(+), 420 deletions(-)
- create mode 100644 tools/testing/selftests/kvm/x86_64/nested_exceptions_test.c
-
-
-base-commit: 8031d87aa9953ddeb047a5356ebd0b240c30f233
+diff --git a/arch/x86/kvm/vmx/nested.c b/arch/x86/kvm/vmx/nested.c
+index bfa366938c49..8c2c81406248 100644
+--- a/arch/x86/kvm/vmx/nested.c
++++ b/arch/x86/kvm/vmx/nested.c
+@@ -4250,14 +4250,6 @@ static void prepare_vmcs12(struct kvm_vcpu *vcpu, struct vmcs12 *vmcs12,
+ 			nested_vmx_abort(vcpu,
+ 					 VMX_ABORT_SAVE_GUEST_MSR_FAIL);
+ 	}
+-
+-	/*
+-	 * Drop what we picked up for L2 via vmx_complete_interrupts. It is
+-	 * preserved above and would only end up incorrectly in L1.
+-	 */
+-	vcpu->arch.nmi_injected = false;
+-	kvm_clear_exception_queue(vcpu);
+-	kvm_clear_interrupt_queue(vcpu);
+ }
+ 
+ /*
+@@ -4596,6 +4588,17 @@ void nested_vmx_vmexit(struct kvm_vcpu *vcpu, u32 vm_exit_reason,
+ 		WARN_ON_ONCE(nested_early_check);
+ 	}
+ 
++	/*
++	 * Drop events/exceptions that were queued for re-injection to L2
++	 * (picked up via vmx_complete_interrupts()), as well as exceptions
++	 * that were pending for L2.  Note, this must NOT be hoisted above
++	 * prepare_vmcs12(), events/exceptions queued for re-injection need to
++	 * be captured in vmcs12 (see vmcs12_save_pending_event()).
++	 */
++	vcpu->arch.nmi_injected = false;
++	kvm_clear_exception_queue(vcpu);
++	kvm_clear_interrupt_queue(vcpu);
++
+ 	vmx_switch_vmcs(vcpu, &vmx->vmcs01);
+ 
+ 	/* Update any VMCS fields that might have changed while L2 ran */
 -- 
 2.37.0.170.g444d1eabd0-goog
 
