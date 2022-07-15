@@ -2,57 +2,58 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 7ADFE57687A
-	for <lists+kvm@lfdr.de>; Fri, 15 Jul 2022 22:45:00 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 73D48576874
+	for <lists+kvm@lfdr.de>; Fri, 15 Jul 2022 22:44:58 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232146AbiGOUo4 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 15 Jul 2022 16:44:56 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59404 "EHLO
+        id S231587AbiGOUoU (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 15 Jul 2022 16:44:20 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59498 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231953AbiGOUoM (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 15 Jul 2022 16:44:12 -0400
-Received: from mail-yb1-xb4a.google.com (mail-yb1-xb4a.google.com [IPv6:2607:f8b0:4864:20::b4a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C20AB88CCE
-        for <kvm@vger.kernel.org>; Fri, 15 Jul 2022 13:43:23 -0700 (PDT)
-Received: by mail-yb1-xb4a.google.com with SMTP id j11-20020a05690212cb00b006454988d225so4689744ybu.10
-        for <kvm@vger.kernel.org>; Fri, 15 Jul 2022 13:43:23 -0700 (PDT)
+        with ESMTP id S231753AbiGOUnk (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 15 Jul 2022 16:43:40 -0400
+Received: from mail-pl1-x64a.google.com (mail-pl1-x64a.google.com [IPv6:2607:f8b0:4864:20::64a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 80D6788CF5
+        for <kvm@vger.kernel.org>; Fri, 15 Jul 2022 13:43:13 -0700 (PDT)
+Received: by mail-pl1-x64a.google.com with SMTP id q4-20020a170902dac400b0016becde3dfbso2616127plx.17
+        for <kvm@vger.kernel.org>; Fri, 15 Jul 2022 13:43:13 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
         h=reply-to:date:in-reply-to:message-id:mime-version:references
          :subject:from:to:cc;
-        bh=2grwD2pqg1sxYXcK+HVM+ohwaiXkYZih7UZ5+Lm+UA8=;
-        b=mrr793MIN2aX39/3UbyY+w/PEXSu88iSs9Cxa6dG/JSEX4WIP2LwKUStKBOKtpKET0
-         DH4uUo9trdchWqAOXlxsa3JT//olYNlF802xtNxcmli4qchJ7CcMnKTGt/0Eqi/ZCRMT
-         dJbv6DNg3mj7kpXXZpW0+pRCfq2o8whlQ/uhjN0OFwVi1Y/WPX0vL7R57eaMRXazPmbb
-         8WgKZPg/Ho5XayHksDpk/GwmIoBYjBkxVtI9uku6/uobSAY67/w7BqO6xpODx+g4l4XY
-         x5hMcmaUTgk3dAVQu3z2VSAdDtr5X2TNDDpvIvClvAoShy1ZxiQgMHsS/mBBIIvLh9E2
-         a7/Q==
+        bh=+/Hl6diEcpv68R5ZyPgxncUp9rh4Fpf21LQcaLalimI=;
+        b=FC0ju37p+E7liqnc4QvCx8YksJDlX3SEDPJZQCjJ9NM7lo7DhYgwlsOWyFImudR+3C
+         wLrVHyNKArsfRlEYh7YELRgseYxZ7NbmJr6F7GZZAk3MaqGiN/u3M7SktqSUw5j/eir7
+         I8MhxwXDDcH5ODfwkNtr8p4YcFiJzQJe5QyHRwnklJoKbcPtXcQ6wIHdcVvVGlaejni+
+         7uE6ircmjv6egRz7Km6R0EatynA4wMDaL5STDf0k4hK+Jq+a2qdNCSl+QjrC+qXWakCw
+         /Z7zYC5goZzVsMv885TqramLAlQHPJ6p+fWxzwpfSEQabwTm9prFNaIIZb9TGj8TbGka
+         wULA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:reply-to:date:in-reply-to:message-id
          :mime-version:references:subject:from:to:cc;
-        bh=2grwD2pqg1sxYXcK+HVM+ohwaiXkYZih7UZ5+Lm+UA8=;
-        b=hABOXdZ8y9CsK5LwJSDyCSh6GvIpLVjelIBKOyhTlcIQoFOSoAWukLeL/XvlQEQldJ
-         L9+czbVw/29Cn2ZBlktx24BZKquFvON2Gtc2xfxsapkha1/ps3mKmG8+C/aYsIvy0o/S
-         M2wN2l9XLY9A4PUhxMr4MaNuNleJ2Z/woho82GKKqRHH2NQDJmg5f0St5d2KA7NEgf5M
-         f+xkRUxmsbzEMzCLZpzXnXI+WSlRXlRY3XWh6skNeOjMhAI2gVuwA6i1l9EdX5JZtPRz
-         Q2tVMJ4s18nfC4gjobHjDca/zDTsPQqQ+tudIupVPnak6g+LxnoZA0Q7qa6JEFmdne3b
-         9UEA==
-X-Gm-Message-State: AJIora90y3P/4qHiH3lu5lJNjtanLP9Y+WkqxgYRUojPKQIJBczRDZjs
-        guJrCceAjNl4l2iDND/xDNSwFvEw900=
-X-Google-Smtp-Source: AGRyM1uWYV0KoE/V/MAPgGPnRCPIVzJuOf5OC7zQ44OX+HWzdlso/gfxbS/8x/qaUBY5zlVJKopTrsh1JJM=
+        bh=+/Hl6diEcpv68R5ZyPgxncUp9rh4Fpf21LQcaLalimI=;
+        b=5IiKaMT9xF2pvANdrBx5Ogy+o/eYQpObWi+AuLzW4MdnYeM3LPz6mIqrRFCYo6ZKWs
+         gsEUZL4QFxaPn0T3QoxzJ0CElCmn477Ed1jTLpJb2MUuDB5y4vZ/yxjeoZZgA4QiKVs/
+         h/zkhwvKnX5ADZtmzGhk2G6G1eDwx3aDPvPXyghTasa3Jyj0vFZRzoVP/laakfOq+2NM
+         +qJ1jn+2dzIA10lL72GLAQ2ZBZuYOVSKmE7rNNV6K+u5WU5muuub/6q/f8zE3IbEwVOk
+         2JFMQwrXHWVDmLRVHyQd+m99xvEoh1kHX9o8k/L3i7ju3dxopLuy7SpSK0nRx54ULTpj
+         h+OQ==
+X-Gm-Message-State: AJIora9lWBy3RbqF6PCi7gDl7ee9mhS3V7ggmvGobzH3rV0q40UkLKta
+        5Wh0wGV/VKdIefJC2p7z6xUOOnb2IW4=
+X-Google-Smtp-Source: AGRyM1vcO8jYRjq9TX4fOwss+c/pHBOk+ai+EFZgri7cHuMtD7JFri6OxYrNuLLu1npI2t2mL6cELq/R4/o=
 X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a81:1148:0:b0:31c:ad1f:774f with SMTP id
- 69-20020a811148000000b0031cad1f774fmr17334413ywr.13.1657917791055; Fri, 15
- Jul 2022 13:43:11 -0700 (PDT)
+ (user=seanjc job=sendgmr) by 2002:aa7:9e84:0:b0:52a:e224:a0d0 with SMTP id
+ p4-20020aa79e84000000b0052ae224a0d0mr15921474pfq.13.1657917793159; Fri, 15
+ Jul 2022 13:43:13 -0700 (PDT)
 Reply-To: Sean Christopherson <seanjc@google.com>
-Date:   Fri, 15 Jul 2022 20:42:24 +0000
+Date:   Fri, 15 Jul 2022 20:42:25 +0000
 In-Reply-To: <20220715204226.3655170-1-seanjc@google.com>
-Message-Id: <20220715204226.3655170-23-seanjc@google.com>
+Message-Id: <20220715204226.3655170-24-seanjc@google.com>
 Mime-Version: 1.0
 References: <20220715204226.3655170-1-seanjc@google.com>
 X-Mailer: git-send-email 2.37.0.170.g444d1eabd0-goog
-Subject: [PATCH v2 22/24] KVM: x86: Rename inject_pending_events() to kvm_check_and_inject_events()
+Subject: [PATCH v2 23/24] KVM: selftests: Use uapi header to get VMX and SVM
+ exit reasons/codes
 From:   Sean Christopherson <seanjc@google.com>
 To:     Sean Christopherson <seanjc@google.com>,
         Paolo Bonzini <pbonzini@redhat.com>
@@ -64,7 +65,7 @@ Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
 Content-Type: text/plain; charset="UTF-8"
 X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL autolearn=unavailable
+        SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL autolearn=ham
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -72,122 +73,107 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Rename inject_pending_events() to kvm_check_and_inject_events() in order
-to capture the fact that it handles more than just pending events, and to
-(mostly) align with kvm_check_nested_events(), which omits the "inject"
-for brevity.
-
-Add a comment above kvm_check_and_inject_events() to provide a high-level
-synopsis, and to document a virtualization hole (KVM erratum if you will)
-that exists due to KVM not strictly tracking instruction boundaries with
-respect to coincident instruction restarts and asynchronous events.
-
-No functional change inteded.
+Include the vmx.h and svm.h uapi headers that KVM so kindly provides
+instead of manually defining all the same exit reasons/code.
 
 Signed-off-by: Sean Christopherson <seanjc@google.com>
+Reviewed-by: Maxim Levitsky <mlevitsk@redhat.com>
 ---
- arch/x86/kvm/svm/nested.c |  2 +-
- arch/x86/kvm/svm/svm.c    |  2 +-
- arch/x86/kvm/x86.c        | 46 ++++++++++++++++++++++++++++++++++++---
- 3 files changed, 45 insertions(+), 5 deletions(-)
+ .../selftests/kvm/include/x86_64/svm_util.h   |  7 +--
+ .../selftests/kvm/include/x86_64/vmx.h        | 51 +------------------
+ 2 files changed, 4 insertions(+), 54 deletions(-)
 
-diff --git a/arch/x86/kvm/svm/nested.c b/arch/x86/kvm/svm/nested.c
-index 0a8ee5f28319..028e180a74b6 100644
---- a/arch/x86/kvm/svm/nested.c
-+++ b/arch/x86/kvm/svm/nested.c
-@@ -1310,7 +1310,7 @@ static void nested_svm_inject_exception_vmexit(struct kvm_vcpu *vcpu)
- 		else
- 			vmcb->control.exit_info_2 = vcpu->arch.cr2;
- 	} else if (ex->vector == DB_VECTOR) {
--		/* See inject_pending_event.  */
-+		/* See kvm_check_and_inject_events().  */
- 		kvm_deliver_exception_payload(vcpu, ex);
+diff --git a/tools/testing/selftests/kvm/include/x86_64/svm_util.h b/tools/testing/selftests/kvm/include/x86_64/svm_util.h
+index a339b537a575..7aee6244ab6a 100644
+--- a/tools/testing/selftests/kvm/include/x86_64/svm_util.h
++++ b/tools/testing/selftests/kvm/include/x86_64/svm_util.h
+@@ -9,15 +9,12 @@
+ #ifndef SELFTEST_KVM_SVM_UTILS_H
+ #define SELFTEST_KVM_SVM_UTILS_H
  
- 		if (vcpu->arch.dr7 & DR7_GD) {
-diff --git a/arch/x86/kvm/svm/svm.c b/arch/x86/kvm/svm/svm.c
-index a336517b563e..95bdf127d531 100644
---- a/arch/x86/kvm/svm/svm.c
-+++ b/arch/x86/kvm/svm/svm.c
-@@ -3518,7 +3518,7 @@ void svm_complete_interrupt_delivery(struct kvm_vcpu *vcpu, int delivery_mode,
++#include <asm/svm.h>
++
+ #include <stdint.h>
+ #include "svm.h"
+ #include "processor.h"
  
- 	/* Note, this is called iff the local APIC is in-kernel. */
- 	if (!READ_ONCE(vcpu->arch.apic->apicv_active)) {
--		/* Process the interrupt via inject_pending_event */
-+		/* Process the interrupt via kvm_check_and_inject_events(). */
- 		kvm_make_request(KVM_REQ_EVENT, vcpu);
- 		kvm_vcpu_kick(vcpu);
- 		return;
-diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-index b924afb76b72..69b9725beff3 100644
---- a/arch/x86/kvm/x86.c
-+++ b/arch/x86/kvm/x86.c
-@@ -9691,7 +9691,47 @@ static void kvm_inject_exception(struct kvm_vcpu *vcpu)
- 	static_call(kvm_x86_inject_exception)(vcpu);
- }
+-#define SVM_EXIT_EXCP_BASE	0x040
+-#define SVM_EXIT_HLT		0x078
+-#define SVM_EXIT_MSR		0x07c
+-#define SVM_EXIT_VMMCALL	0x081
+-
+ struct svm_test_data {
+ 	/* VMCB */
+ 	struct vmcb *vmcb; /* gva */
+diff --git a/tools/testing/selftests/kvm/include/x86_64/vmx.h b/tools/testing/selftests/kvm/include/x86_64/vmx.h
+index 99fa1410964c..e4206f69b716 100644
+--- a/tools/testing/selftests/kvm/include/x86_64/vmx.h
++++ b/tools/testing/selftests/kvm/include/x86_64/vmx.h
+@@ -8,6 +8,8 @@
+ #ifndef SELFTEST_KVM_VMX_H
+ #define SELFTEST_KVM_VMX_H
  
--static int inject_pending_event(struct kvm_vcpu *vcpu, bool *req_immediate_exit)
-+/*
-+ * Check for any event (interrupt or exception) that is ready to be injected,
-+ * and if there is at least one event, inject the event with the highest
-+ * priority.  This handles both "pending" events, i.e. events that have never
-+ * been injected into the guest, and "injected" events, i.e. events that were
-+ * injected as part of a previous VM-Enter, but weren't successfully delivered
-+ * and need to be re-injected.
-+ *
-+ * Note, this is not guaranteed to be invoked on a guest instruction boundary,
-+ * i.e. doesn't guarantee that there's an event window in the guest.  KVM must
-+ * be able to inject exceptions in the "middle" of an instruction, and so must
-+ * also be able to re-inject NMIs and IRQs in the middle of an instruction.
-+ * I.e. for exceptions and re-injected events, NOT invoking this on instruction
-+ * boundaries is necessary and correct.
-+ *
-+ * For simplicity, KVM uses a single path to inject all events (except events
-+ * that are injected directly from L1 to L2) and doesn't explicitly track
-+ * instruction boundaries for asynchronous events.  However, because VM-Exits
-+ * that can occur during instruction execution typically result in KVM skipping
-+ * the instruction or injecting an exception, e.g. instruction and exception
-+ * intercepts, and because pending exceptions have higher priority than pending
-+ * interrupts, KVM still honors instruction boundaries in most scenarios.
-+ *
-+ * But, if a VM-Exit occurs during instruction execution, and KVM does NOT skip
-+ * the instruction or inject an exception, then KVM can incorrecty inject a new
-+ * asynchrounous event if the event became pending after the CPU fetched the
-+ * instruction (in the guest).  E.g. if a page fault (#PF, #NPF, EPT violation)
-+ * occurs and is resolved by KVM, a coincident NMI, SMI, IRQ, etc... can be
-+ * injected on the restarted instruction instead of being deferred until the
-+ * instruction completes.
-+ *
-+ * In practice, this virtualization hole is unlikely to be observed by the
-+ * guest, and even less likely to cause functional problems.  To detect the
-+ * hole, the guest would have to trigger an event on a side effect of an early
-+ * phase of instruction execution, e.g. on the instruction fetch from memory.
-+ * And for it to be a functional problem, the guest would need to depend on the
-+ * ordering between that side effect, the instruction completing, _and_ the
-+ * delivery of the asynchronous event.
-+ */
-+static int kvm_check_and_inject_events(struct kvm_vcpu *vcpu,
-+				       bool *req_immediate_exit)
- {
- 	bool can_inject;
- 	int r;
-@@ -10170,7 +10210,7 @@ void kvm_vcpu_update_apicv(struct kvm_vcpu *vcpu)
- 	 * When APICv gets disabled, we may still have injected interrupts
- 	 * pending. At the same time, KVM_REQ_EVENT may not be set as APICv was
- 	 * still active when the interrupt got accepted. Make sure
--	 * inject_pending_event() is called to check for that.
-+	 * kvm_check_and_inject_events() is called to check for that.
- 	 */
- 	if (!apic->apicv_active)
- 		kvm_make_request(KVM_REQ_EVENT, vcpu);
-@@ -10467,7 +10507,7 @@ static int vcpu_enter_guest(struct kvm_vcpu *vcpu)
- 			goto out;
- 		}
++#include <asm/vmx.h>
++
+ #include <stdint.h>
+ #include "processor.h"
+ #include "apic.h"
+@@ -100,55 +102,6 @@
+ #define VMX_EPT_VPID_CAP_AD_BITS		0x00200000
  
--		r = inject_pending_event(vcpu, &req_immediate_exit);
-+		r = kvm_check_and_inject_events(vcpu, &req_immediate_exit);
- 		if (r < 0) {
- 			r = 0;
- 			goto out;
+ #define EXIT_REASON_FAILED_VMENTRY	0x80000000
+-#define EXIT_REASON_EXCEPTION_NMI	0
+-#define EXIT_REASON_EXTERNAL_INTERRUPT	1
+-#define EXIT_REASON_TRIPLE_FAULT	2
+-#define EXIT_REASON_INTERRUPT_WINDOW	7
+-#define EXIT_REASON_NMI_WINDOW		8
+-#define EXIT_REASON_TASK_SWITCH		9
+-#define EXIT_REASON_CPUID		10
+-#define EXIT_REASON_HLT			12
+-#define EXIT_REASON_INVD		13
+-#define EXIT_REASON_INVLPG		14
+-#define EXIT_REASON_RDPMC		15
+-#define EXIT_REASON_RDTSC		16
+-#define EXIT_REASON_VMCALL		18
+-#define EXIT_REASON_VMCLEAR		19
+-#define EXIT_REASON_VMLAUNCH		20
+-#define EXIT_REASON_VMPTRLD		21
+-#define EXIT_REASON_VMPTRST		22
+-#define EXIT_REASON_VMREAD		23
+-#define EXIT_REASON_VMRESUME		24
+-#define EXIT_REASON_VMWRITE		25
+-#define EXIT_REASON_VMOFF		26
+-#define EXIT_REASON_VMON		27
+-#define EXIT_REASON_CR_ACCESS		28
+-#define EXIT_REASON_DR_ACCESS		29
+-#define EXIT_REASON_IO_INSTRUCTION	30
+-#define EXIT_REASON_MSR_READ		31
+-#define EXIT_REASON_MSR_WRITE		32
+-#define EXIT_REASON_INVALID_STATE	33
+-#define EXIT_REASON_MWAIT_INSTRUCTION	36
+-#define EXIT_REASON_MONITOR_INSTRUCTION 39
+-#define EXIT_REASON_PAUSE_INSTRUCTION	40
+-#define EXIT_REASON_MCE_DURING_VMENTRY	41
+-#define EXIT_REASON_TPR_BELOW_THRESHOLD 43
+-#define EXIT_REASON_APIC_ACCESS		44
+-#define EXIT_REASON_EOI_INDUCED		45
+-#define EXIT_REASON_EPT_VIOLATION	48
+-#define EXIT_REASON_EPT_MISCONFIG	49
+-#define EXIT_REASON_INVEPT		50
+-#define EXIT_REASON_RDTSCP		51
+-#define EXIT_REASON_PREEMPTION_TIMER	52
+-#define EXIT_REASON_INVVPID		53
+-#define EXIT_REASON_WBINVD		54
+-#define EXIT_REASON_XSETBV		55
+-#define EXIT_REASON_APIC_WRITE		56
+-#define EXIT_REASON_INVPCID		58
+-#define EXIT_REASON_PML_FULL		62
+-#define EXIT_REASON_XSAVES		63
+-#define EXIT_REASON_XRSTORS		64
+-#define LAST_EXIT_REASON		64
+ 
+ enum vmcs_field {
+ 	VIRTUAL_PROCESSOR_ID		= 0x00000000,
 -- 
 2.37.0.170.g444d1eabd0-goog
 
