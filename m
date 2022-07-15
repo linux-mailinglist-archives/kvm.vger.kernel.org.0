@@ -2,62 +2,64 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 3F057575BC3
-	for <lists+kvm@lfdr.de>; Fri, 15 Jul 2022 08:46:01 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 29572575BF2
+	for <lists+kvm@lfdr.de>; Fri, 15 Jul 2022 09:02:51 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231806AbiGOGol (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 15 Jul 2022 02:44:41 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54428 "EHLO
+        id S229462AbiGOG7v (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 15 Jul 2022 02:59:51 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36186 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230151AbiGOGoj (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 15 Jul 2022 02:44:39 -0400
-Received: from mail-ua1-x934.google.com (mail-ua1-x934.google.com [IPv6:2607:f8b0:4864:20::934])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 63A8621266
-        for <kvm@vger.kernel.org>; Thu, 14 Jul 2022 23:44:38 -0700 (PDT)
-Received: by mail-ua1-x934.google.com with SMTP id r25so1485557uap.7
-        for <kvm@vger.kernel.org>; Thu, 14 Jul 2022 23:44:38 -0700 (PDT)
+        with ESMTP id S231180AbiGOG7r (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 15 Jul 2022 02:59:47 -0400
+Received: from mail-vs1-xe32.google.com (mail-vs1-xe32.google.com [IPv6:2607:f8b0:4864:20::e32])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 706461A042
+        for <kvm@vger.kernel.org>; Thu, 14 Jul 2022 23:59:45 -0700 (PDT)
+Received: by mail-vs1-xe32.google.com with SMTP id t127so3495596vsb.8
+        for <kvm@vger.kernel.org>; Thu, 14 Jul 2022 23:59:45 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
         h=mime-version:references:in-reply-to:from:date:message-id:subject:to
          :cc;
-        bh=p6aDTSAubguJZg+3J+aZpS+pct8nChj++g4A7S8KF7M=;
-        b=Jnbw9hVnECgNwloAV8Mr84FXTmguVIg5NfAo3mkCvlZ4hKp8wmbAxT8ZXMLH50tbHb
-         2AtcqfP7CDR/M2LkGerzE4RjbEo3t0+wZ9znySMf0cboWxAHISnGNymaU4u4n+DgDwhw
-         xYDBbeKC7uGCempsmTNjSBbKGkPxxwW3Lqd2C0PTh/i165tqfnkbP9i7mbujFw+EPnEZ
-         0W1uYTZ92SNd5HFvJYLmeUvWHvtwMq0ad8SjNTIwuNai2ZMDD4PXZt1XZSsnuQ2QBtGi
-         BNiQD6ngvkYHgXMzozebc4+/+kt2uNmiAg7HN/zBnwKI+0QIme1wAPU4861wQ7qFEZXb
-         9YRg==
+        bh=9v+qQ9/0tophHLrpQx//eLF1ttOOmYgqB9pEWD7iCw8=;
+        b=F/CzcXUe47hIrpdFe66HlTftbGIk3QG1VLgQR0e/kqDeRjJZqyht9j/9IvttzcDOKc
+         8SdPSN0Kd4DBRuyWwKxmq9PquMUBkjATg9mBiLQRchfOlNI/WkOOsA7wZ1Ba4LYS5eCS
+         6Cd4holvVZXLFRIkLG83JbXSbd46nvhDcpcsDhFj3WNfErI/6BCkbytd9pje7gmudF3D
+         aPE9yGHNWT+YZzJcKN+sscbCJOZoGDvO7S2QxUpF6lE5TwfmcSBT0vxBTv+8Imz5sK/d
+         PlslhVNu0DtIVJVfx898W5RRIH66GjzNG0ftjH5zJ5sL5CkdfoY0TQGBe0aVGmuGVaGz
+         wH0Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:mime-version:references:in-reply-to:from:date
          :message-id:subject:to:cc;
-        bh=p6aDTSAubguJZg+3J+aZpS+pct8nChj++g4A7S8KF7M=;
-        b=Y24+qzM7jKHmPNoRxWsxHA3ObQvDaUmRFbOwCOLgA8EnPBTs3SlAwL2sNdeAH6USOa
-         cSzC7mxcW4sYDnUtkLY56CjhqOhFZ5ny4SvCabYtbYjaeAafmwVRHTKptO+FDIYu+PRj
-         0L+s99c+n964FnxKEy9MB5ZOMSPru4lToZmoKMk5Oov33kpXLAFtjP+z+xwuZOwyBcFX
-         4UG721IsRdHNBUQNHuXC2wXuJbWJmWJEDp9Zv1GSJWF+7loUud/yhu8sc4NUH4Igcd3J
-         YDF6Fhl6M1SWRR9XX5jx0OMyugMQUQdZA5CFnwNGBXIHrANp+6WqpGP7rPQDbRlVb6EM
-         IuUQ==
-X-Gm-Message-State: AJIora+frou+1eB+YgBGDnDiPHimmYTm30qk+zZyzYqP/LV8xg9NkvhQ
-        5Sol+vO+LKQ+JjDryBRzZ46DK21k+vXjNPW73mbWGA==
-X-Google-Smtp-Source: AGRyM1uWE0AM135v8bgmHTfGGyyoJpV55Gqxr8UiXmUhCXS1dGfLbxzAYnRhlP4kgcMpR7lq+JXvgxe6eP5xZy9syp8=
-X-Received: by 2002:a05:6130:90:b0:362:891c:edef with SMTP id
- x16-20020a056130009000b00362891cedefmr5471902uaf.106.1657867477456; Thu, 14
- Jul 2022 23:44:37 -0700 (PDT)
+        bh=9v+qQ9/0tophHLrpQx//eLF1ttOOmYgqB9pEWD7iCw8=;
+        b=sx4XmKCqdXlxQBvHHb/J0ogOXA15Xc0vTRlUCypaWNxctjLWZxPBypZy2Atq0Zifnm
+         z6R0Ab31/F/pxD7RUEJxubSvWj3msGNs0pMXNEOBPt4yBaTHzHBhB3DkHpOezgGzJFU6
+         q5hCc+x2NcduwjBi+zb9IiLGC0iPfOwusjQePkz2AMKSRdfFvXnismhXeU6nrN6d9e5y
+         A0JJ5i25peIHhxVGtQWT6QxJnX71MA3Uk34oOS5/CgVrZpZyHWO4z1ZspgeCoOXyd9ML
+         YLFyg7DZ0W+YTMCRt0JosuxiHWvpXzHDHpuDB0DYMscw4sDk0xh+JqCosaXygrf2wy7v
+         f4wQ==
+X-Gm-Message-State: AJIora+RWZ1iRcpgsPhzt/V+GZNTlFK6hDhdJyBvFM/9P8S8Ae1cwxBU
+        AwBSM0BQSuQWbqLDk838sUngXW6S+7t7Lll7PJvp4w==
+X-Google-Smtp-Source: AGRyM1sr0ShmlCy9/t1KZMf7KxdwU27MRr25tDvj76kxV+HvQRAvDwCn4B8rEbmPyJX67PTEmVUXT/b7MtCYpd4he1o=
+X-Received: by 2002:a67:5c41:0:b0:356:20ab:2f29 with SMTP id
+ q62-20020a675c41000000b0035620ab2f29mr5284432vsb.63.1657868384547; Thu, 14
+ Jul 2022 23:59:44 -0700 (PDT)
 MIME-Version: 1.0
-References: <20220706164304.1582687-1-maz@kernel.org> <20220706164304.1582687-16-maz@kernel.org>
- <CAAeT=FzgBpwcf7oEGeCLCHO+XadP+i7vyPFWx6VJxmiWC94-7g@mail.gmail.com> <877d4gyy7y.wl-maz@kernel.org>
-In-Reply-To: <877d4gyy7y.wl-maz@kernel.org>
+References: <20220714152024.1673368-1-maz@kernel.org> <20220714152024.1673368-5-maz@kernel.org>
+In-Reply-To: <20220714152024.1673368-5-maz@kernel.org>
 From:   Reiji Watanabe <reijiw@google.com>
-Date:   Thu, 14 Jul 2022 23:44:21 -0700
-Message-ID: <CAAeT=FwwO5=v3vLJ0qAw3V0NaPEnPeP1VmgLXXBL4jdm80aeew@mail.gmail.com>
-Subject: Re: [PATCH 15/19] KVM: arm64: vgic-v2: Add helper for legacy
- dist/cpuif base address setting
+Date:   Thu, 14 Jul 2022 23:59:28 -0700
+Message-ID: <CAAeT=Fxqc7PN6K+T8P7LwZQSWMFivpyosPDaRnJtGQMJcHi8wg@mail.gmail.com>
+Subject: Re: [PATCH v2 04/20] KVM: arm64: Rely on index_to_param() for size
+ checks on userspace access
 To:     Marc Zyngier <maz@kernel.org>
 Cc:     kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org,
         Linux ARM <linux-arm-kernel@lists.infradead.org>,
-        Schspa Shi <schspa@gmail.com>, kernel-team@android.com,
-        Oliver Upton <oliver.upton@linux.dev>
+        James Morse <james.morse@arm.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        Alexandru Elisei <alexandru.elisei@arm.com>,
+        Oliver Upton <oliver.upton@linux.dev>,
+        Schspa Shi <schspa@gmail.com>, kernel-team@android.com
 Content-Type: text/plain; charset="UTF-8"
 X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
@@ -70,77 +72,14 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Jul 14, 2022 at 12:01 AM Marc Zyngier <maz@kernel.org> wrote:
+On Thu, Jul 14, 2022 at 8:20 AM Marc Zyngier <maz@kernel.org> wrote:
 >
-> On Thu, 14 Jul 2022 07:37:25 +0100,
-> Reiji Watanabe <reijiw@google.com> wrote:
-> >
-> > Hi Marc,
-> >
-> > On Wed, Jul 6, 2022 at 10:05 AM Marc Zyngier <maz@kernel.org> wrote:
-> > >
-> > > We carry a legacy interface to set the base addresses for GICv2.
-> > > As this is currently plumbed into the same handling code as
-> > > the modern interface, it limits the evolution we can make there.
-> > >
-> > > Add a helper dedicated to this handling, with a view of maybe
-> > > removing this in the future.
-> > >
-> > > Signed-off-by: Marc Zyngier <maz@kernel.org>
-> > > ---
-> > >  arch/arm64/kvm/arm.c                  | 11 ++-------
-> > >  arch/arm64/kvm/vgic/vgic-kvm-device.c | 32 +++++++++++++++++++++++++++
-> > >  include/kvm/arm_vgic.h                |  1 +
-> > >  3 files changed, 35 insertions(+), 9 deletions(-)
-> > >
-> > > diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
-> > > index 83a7f61354d3..bf39570c0aef 100644
-> > > --- a/arch/arm64/kvm/arm.c
-> > > +++ b/arch/arm64/kvm/arm.c
-> > > @@ -1414,18 +1414,11 @@ void kvm_arch_flush_remote_tlbs_memslot(struct kvm *kvm,
-> > >  static int kvm_vm_ioctl_set_device_addr(struct kvm *kvm,
-> > >                                         struct kvm_arm_device_addr *dev_addr)
-> > >  {
-> > > -       unsigned long dev_id, type;
-> > > -
-> > > -       dev_id = (dev_addr->id & KVM_ARM_DEVICE_ID_MASK) >>
-> > > -               KVM_ARM_DEVICE_ID_SHIFT;
-> > > -       type = (dev_addr->id & KVM_ARM_DEVICE_TYPE_MASK) >>
-> > > -               KVM_ARM_DEVICE_TYPE_SHIFT;
-> > > -
-> > > -       switch (dev_id) {
-> > > +       switch (FIELD_GET(KVM_ARM_DEVICE_ID_MASK, dev_addr->id)) {
-> > >         case KVM_ARM_DEVICE_VGIC_V2:
-> > >                 if (!vgic_present)
-> > >                         return -ENXIO;
-> > > -               return kvm_vgic_addr(kvm, type, &dev_addr->addr, true);
-> > > +               return kvm_set_legacy_vgic_v2_addr(kvm, dev_addr);
-> > >         default:
-> > >                 return -ENODEV;
-> > >         }
-> > > diff --git a/arch/arm64/kvm/vgic/vgic-kvm-device.c b/arch/arm64/kvm/vgic/vgic-kvm-device.c
-> > > index fbbd0338c782..0dfd277b9058 100644
-> > > --- a/arch/arm64/kvm/vgic/vgic-kvm-device.c
-> > > +++ b/arch/arm64/kvm/vgic/vgic-kvm-device.c
-> > > @@ -41,6 +41,38 @@ static int vgic_check_type(struct kvm *kvm, int type_needed)
-> > >                 return 0;
-> > >  }
-> > >
-> > > +int kvm_set_legacy_vgic_v2_addr(struct kvm *kvm, struct kvm_arm_device_addr *dev_addr)
-> > > +{
-> > > +       struct vgic_dist *vgic = &kvm->arch.vgic;
-> > > +       int r;
-> > > +
-> > > +       mutex_lock(&kvm->lock);
-> > > +       switch (FIELD_GET(KVM_ARM_DEVICE_ID_MASK, dev_addr->id)) {
-> >
-> > Shouldn't this be KVM_ARM_DEVICE_TYPE_MASK (not KVM_ARM_DEVICE_ID_MASK) ?
+> index_to_param() already checks that we use 64bit accesses for all
+> registers accessed from userspace.
 >
-> Damn, you just ruined my attempt at deprecating this API ;-).
+> However, we have extra checks in other places, which is pretty
+> confusing. Get rid on these checks.
+>
+> Signed-off-by: Marc Zyngier <maz@kernel.org>
 
-Oops, I should have pretended not to notice:)
-
-> More seriously, thanks for catching this one!
-
-Thank you for cleaning up the code so much!
-Reiji
+Reviewed-by: Reiji Watanabe <reijiw@google.com>
