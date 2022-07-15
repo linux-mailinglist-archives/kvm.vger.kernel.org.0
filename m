@@ -2,155 +2,143 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 0A68C57635B
-	for <lists+kvm@lfdr.de>; Fri, 15 Jul 2022 16:05:12 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 589145763AC
+	for <lists+kvm@lfdr.de>; Fri, 15 Jul 2022 16:32:43 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234957AbiGOOES (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 15 Jul 2022 10:04:18 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34606 "EHLO
+        id S229915AbiGOOck (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 15 Jul 2022 10:32:40 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54450 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235384AbiGOOED (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 15 Jul 2022 10:04:03 -0400
-Received: from mail.skyhub.de (mail.skyhub.de [5.9.137.197])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4AB3A1085;
-        Fri, 15 Jul 2022 07:03:58 -0700 (PDT)
-Received: from zn.tnic (p200300ea972976d6329c23fffea6a903.dip0.t-ipconnect.de [IPv6:2003:ea:9729:76d6:329c:23ff:fea6:a903])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by mail.skyhub.de (SuperMail on ZX Spectrum 128k) with ESMTPSA id 4D6FE1EC0230;
-        Fri, 15 Jul 2022 16:03:53 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alien8.de; s=dkim;
-        t=1657893833;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:in-reply-to:in-reply-to:  references:references;
-        bh=QbGEmJveh3meLgmCPkkX0DKI0iC+qcLBcQMOHTKMAeA=;
-        b=LB2MDoPtY6niEMtL5F7KecDtH4G0UZgkeTflXgMMlmXzw5ldpKCVemI9gqTPo5AbSxg4EW
-        neTaQrJ9rtBNWQfLpqiya0QbagUNun22n4H4xbVnGw/H+WnaqfWZRgp/+bLcfLXcAu155u
-        ALgPcfTW5UMjfnkyTyX7SUoHin+yrs0=
-Date:   Fri, 15 Jul 2022 16:03:47 +0200
-From:   Borislav Petkov <bp@alien8.de>
-To:     Linus Torvalds <torvalds@linux-foundation.org>
-Cc:     Guenter Roeck <linux@roeck-us.net>,
-        Peter Zijlstra <peterz@infradead.org>,
-        Thadeu Lima de Souza Cascardo <cascardo@canonical.com>,
-        Naresh Kamboju <naresh.kamboju@linaro.org>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        kvm list <kvm@vger.kernel.org>,
-        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-        stable <stable@vger.kernel.org>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        Shuah Khan <shuah@kernel.org>, patches@kernelci.org,
-        lkft-triage@lists.linaro.org, Pavel Machek <pavel@denx.de>,
-        Jon Hunter <jonathanh@nvidia.com>,
-        Florian Fainelli <f.fainelli@gmail.com>,
-        Sudip Mukherjee <sudipm.mukherjee@gmail.com>,
-        Slade Watkins <slade@sladewatkins.com>,
-        Sean Christopherson <seanjc@google.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>,
-        Dave Hansen <dave.hansen@linux.intel.com>,
-        X86 ML <x86@kernel.org>, "H. Peter Anvin" <hpa@zytor.com>,
-        Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>,
-        Anders Roxell <anders.roxell@linaro.org>
-Subject: Re: [PATCH 5.15 00/78] 5.15.55-rc1 review
-Message-ID: <YtFzw2+wi9GA5qy8@zn.tnic>
-References: <20220712183238.844813653@linuxfoundation.org>
- <CA+G9fYtntg7=zWSs-dm+n_AUr_u0eBOU0zrwWqMeXZ+SF6_bLw@mail.gmail.com>
- <eb63e4ce-843f-c840-060e-6e15defd3c4d@roeck-us.net>
- <CAHk-=wj5cOA+fbGeV15kvwe6YGT54Wsk8F2UGoekVQLTPJz_pw@mail.gmail.com>
- <CAHk-=wgq1soM4gudypWLVQdYuvJbXn38LtvJMtnLZX+RTypqLg@mail.gmail.com>
- <Ys/bYJ2bLVfNBjFI@nazgul.tnic>
- <CAHk-=wjdafFUFwwQNvNQY_D32CBXnp6_V=DL2FpbbdstVxafow@mail.gmail.com>
- <YtBLe5AziniDm/Wt@nazgul.tnic>
- <CAHk-=wghZB60WCh5M_Y0n1qGYbg-1fvWFnU-bV-4j1bQM1qE5A@mail.gmail.com>
+        with ESMTP id S229436AbiGOOcj (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 15 Jul 2022 10:32:39 -0400
+Received: from mail-pj1-x102b.google.com (mail-pj1-x102b.google.com [IPv6:2607:f8b0:4864:20::102b])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3FEC657E0F
+        for <kvm@vger.kernel.org>; Fri, 15 Jul 2022 07:32:38 -0700 (PDT)
+Received: by mail-pj1-x102b.google.com with SMTP id p9so5800780pjd.3
+        for <kvm@vger.kernel.org>; Fri, 15 Jul 2022 07:32:38 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=KGDc8EbuqC0PvAxCnIwTKvxHYhgAZfQOE+/RAi143ug=;
+        b=JCgSYiRX6HA4YO0cyySvx4Bzs0RhBJGyDuDQdzypDWRq6F+EUrMezPWwe6pBZ73dAd
+         RIil1PTT1JVXwkO/GPq8J7pKkkIlUqXw66FyY+PFbO2HMF6uHZW1wMwMhjtAB6PhjkEv
+         0qii89D5ckU+mD87QNqOlWnP6SLyUNb9gs8XVHiMXJpuul1mKMa/inhbicja9fNM8h6Q
+         0oHBLCdQVMZrvJnVVDP9dE9xdiO6LgxvXAG67eued3ZtvkhbkAJyKCyXO7K2BPkIc6x3
+         23HcMu1gMWtTgfRsduOFKcOmxZTgjRlkd9Qrid0PSb5xRXusMzxkNShxTgSyBr3vrndt
+         wluQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=KGDc8EbuqC0PvAxCnIwTKvxHYhgAZfQOE+/RAi143ug=;
+        b=ebWNGHBE6IQaQ61SXqx92lQpoSgfZOTZf1H+72aC/Y9+ABptOSXntnIxzBtAHXBNJL
+         gcFqZDAjjI74PB3osRFqlnPkE1Nt5lK8UiwmZ0Sdx34YaY5DQUWFASK+k1MCueht/bDc
+         8W21X2VQNtzgSCBYKdNWKjfdkx45WJdryCnfaHBE332s8RPH7QWG4WeSoOT5az6wdbLz
+         6ygwicAKLuVLJTVpNvC13e30+Rcx6QqBA0dEJDXChBH+JNicLUmnLUawQTEy8K9cLnNl
+         M01nzDyPjHn0bQE2QA6Ei/LdwmByCUQqLAxhwSIBg9NEQFeilfYQnnE3mzRgPTTaf9Cr
+         Cb+g==
+X-Gm-Message-State: AJIora9OH7IUp3fv75Ln+xBr1CfCnzopi0kXplu1lmz8YQp7/nJ1KKmz
+        Q73X4kDhFqPgWFxQLz/8GqnlRg==
+X-Google-Smtp-Source: AGRyM1vrP4fMl5xqO1RnpN7iB0+xQmieg3i1s2EH5bpDyK5MEzUlgFWBRCAR7K8wHJxGL+selF7gqA==
+X-Received: by 2002:a17:90b:2242:b0:1f0:6d85:e196 with SMTP id hk2-20020a17090b224200b001f06d85e196mr16405063pjb.3.1657895557596;
+        Fri, 15 Jul 2022 07:32:37 -0700 (PDT)
+Received: from google.com (123.65.230.35.bc.googleusercontent.com. [35.230.65.123])
+        by smtp.gmail.com with ESMTPSA id x62-20020a628641000000b0052842527052sm3844497pfd.189.2022.07.15.07.32.37
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 15 Jul 2022 07:32:37 -0700 (PDT)
+Date:   Fri, 15 Jul 2022 14:32:33 +0000
+From:   Sean Christopherson <seanjc@google.com>
+To:     Gavin Shan <gshan@redhat.com>
+Cc:     Paolo Bonzini <pbonzini@redhat.com>, kvmarm@lists.cs.columbia.edu,
+        kvm@vger.kernel.org, linux-kselftest@vger.kernel.org,
+        linux-kernel@vger.kernel.org, mathieu.desnoyers@efficios.com,
+        shuah@kernel.org, maz@kernel.org, oliver.upton@linux.dev,
+        shan.gavin@gmail.com
+Subject: Re: [PATCH] KVM: selftests: Double check on the current CPU in
+ rseq_test
+Message-ID: <YtF6gVYgMhoiD0Pe@google.com>
+References: <20220714080642.3376618-1-gshan@redhat.com>
+ <cd5d029c-b396-45ef-917b-92e054659623@redhat.com>
+ <YtA3s0VRj3x7vO7B@google.com>
+ <be806f9c-861a-8da8-d42e-1d4271c3a326@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <CAHk-=wghZB60WCh5M_Y0n1qGYbg-1fvWFnU-bV-4j1bQM1qE5A@mail.gmail.com>
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,SPF_HELO_NONE,SPF_PASS
-        autolearn=ham autolearn_force=no version=3.4.6
+In-Reply-To: <be806f9c-861a-8da8-d42e-1d4271c3a326@redhat.com>
+X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
+        USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Jul 14, 2022 at 01:39:25PM -0700, Linus Torvalds wrote:
-> On Thu, Jul 14, 2022 at 10:02 AM Borislav Petkov <bp@alien8.de> wrote:
-> >
-> > On Thu, Jul 14, 2022 at 09:51:40AM -0700, Linus Torvalds wrote:
-> > > Oh, absolutely. Doing an -rc7 is normal.
-> >
-> > Good. I'm gathering all the fallout fixes and will send them to you on
-> > Sunday, if nothing unexpected happens.
+On Fri, Jul 15, 2022, Gavin Shan wrote:
+> Hi Paolo and Sean,
 > 
-> Btw, I assume that includes the clang fix for the
-> x86_spec_ctrl_current section attribute.
-
-Yap. Here's the current lineup:
-
-https://git.kernel.org/pub/scm/linux/kernel/git/tip/tip.git/log/?h=x86/urgent
-
-> That's kind of personally embarrassing that it slipped through: I do
-> all my normal test builds that I actually *boot* with clang.
+> On 7/15/22 1:35 AM, Sean Christopherson wrote:
+> > On Thu, Jul 14, 2022, Paolo Bonzini wrote:
+> Well, I don't think migration_worker() does correct thing, if I'm understanding
+> correctly. The intention seems to force migration on 'main' thread by 'migration'
+> thread?  If that is the case, I don't think the following function call has correct
+> parameters.
 > 
-> But since I kept all of the embargoed stuff outside my normal trees,
-> it also meant that the test builds I did didn't have my "this is my
-> clang tree" stuff in it.
+>     r = sched_setaffinity(0, sizeof(allowed_mask), &allowed_mask);
 > 
-> And so I - like apparently everybody else - only did those builds with gcc.
+>     it should be something like:
 > 
-> And gcc for some reason doesn't care about this whole "you redeclared
-> that variable with a different attribute" thing.
-
-... so why does clang care? Or, why doesn't gcc care?
-
-I guess I need to talk to gcc folks again.
-
-> In the 'x86_spec_ctrl_current' case, that nonsensical code _worked_
-> (with gcc), because despite the declaration being for a regular
-> variable, the actual definition was in the proper segment.
-
-I'm guessing this is the reason why gcc doesn't fail - it probably looks
-at the declaration but doesn't care too much about it. And it is the
-definition that matters.
-
-While clang goes, uh, ah, declaration and definition mismatch, I better
-warn.
-
-> But that 'myvariable' thing above does end up being another example of
-> how we are clearly missing some type checkng in this area.
+>     r = sched_setaffinity(getpid(), sizeof(allowed_mask), &allowed_mask);
 > 
-> I'm not sure if there's any way to get that section mismatch at
-> compile-time at all.
+> If we're using sched_setaffinity(0, ...) in the 'migration' thread, the CPU
+> affinity of 'main' thread won't be affected. It means 'main' thread can be
+> migrated from one CPU to another at any time, even in the following point:
+> 
+>     int main(...)
+>     {
+>           :
+>           /*
+>            * migration can happen immediately after sched_getcpu(). If
+>            * CPU affinity of 'main' thread is sticky to one particular
+>            * CPU, which 'migration' thread supposes to do, then there
+>            * should have no migration.
+>            */
+>           cpu = sched_getcpu();
+>           rseq_cpu = READ_ONCE(__rseq.cpu_id);
+>           :
+>     }
+> 
+> So I think the correct fix is to have sched_setaffinity(getpid(), ...) ?
+> Please refer to the manpage.
+> 
+>    https://man7.org/linux/man-pages/man2/sched_setaffinity.2.html
+>    'If pid is zero, then the calling thread is used'
 
-Well, apparently, clang can:
+Oof, and more explicitly the rest of that sentence clarifies that the result of
+getpid() will target the main thread (I assume "main" means thread group leader).
 
-arch/x86/kernel/cpu/bugs.c:58:21: error: section attribute is specified on redeclared variable [-Werror,-Wsection]
+   Specifying pid as 0 will set the attribute for the calling thread, and passing
+   the value returned from a call to getpid(2) will set the attribute for the main
+   thread of the thread group.
 
-so there's a -Wsection warning which gcc could implement too.
+I'm guessing my test worked (in that it reproduced the bug) by virtue of the
+scheduler trying to colocate all threads in the process.
 
-> For the static declarations, we could just make DECLARE_PER_CPU() add
-> some prefix/postfix to the name (and obviously then do it at use time
-> too).
->
-> We have that '__pcpu_scope_##name' thing to make sure of globally
-> unique naming due to the whole weak type thing. I wonder if we could
-> do something similar to verify that "yes, this has been declared as a
-> percpu variable" at use time?
+In my defense, the die.net copy of the manpages quite clearly uses "process"[1],
+but that was fixed in the manpages in 2013[2]!?!!?  So I guess the takeaway is
+to use only the official manpages.
 
-But how?
+Anyways, for the code, my preference would be to snapshot gettid() in main() before
+spawning the migration worker.  Same result, but I would rather the test explicitly
+target the thread doing rseq instead of relying on (a) getpid() targeting only the
+main thread and (b) the main thread always being the rseq thread.  E.g. if for some
+reason a future patch moves the rseq code to its own worker thread, then getpid()
+would be incorrect.
 
-We need to save the info how a var has been declared and then use that
-info at access time.
+Thanks for figuring this out!
 
-Yeah, lemme bother compiler guys a bit...
-
--- 
-Regards/Gruss,
-    Boris.
-
-https://people.kernel.org/tglx/notes-about-netiquette
+[1] https://linux.die.net/man/2/sched_setaffinity
+[2] 6a7fcf3cc ("sched_setaffinity.2: Clarify that these system calls affect a per-thread attribute")
