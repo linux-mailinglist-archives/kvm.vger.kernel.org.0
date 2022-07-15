@@ -2,70 +2,66 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 589145763AC
-	for <lists+kvm@lfdr.de>; Fri, 15 Jul 2022 16:32:43 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 036D95763D3
+	for <lists+kvm@lfdr.de>; Fri, 15 Jul 2022 16:47:47 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229915AbiGOOck (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 15 Jul 2022 10:32:40 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54450 "EHLO
+        id S232923AbiGOOrn (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 15 Jul 2022 10:47:43 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35562 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229436AbiGOOcj (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 15 Jul 2022 10:32:39 -0400
-Received: from mail-pj1-x102b.google.com (mail-pj1-x102b.google.com [IPv6:2607:f8b0:4864:20::102b])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3FEC657E0F
-        for <kvm@vger.kernel.org>; Fri, 15 Jul 2022 07:32:38 -0700 (PDT)
-Received: by mail-pj1-x102b.google.com with SMTP id p9so5800780pjd.3
-        for <kvm@vger.kernel.org>; Fri, 15 Jul 2022 07:32:38 -0700 (PDT)
+        with ESMTP id S230359AbiGOOrm (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 15 Jul 2022 10:47:42 -0400
+Received: from mail-pj1-x1032.google.com (mail-pj1-x1032.google.com [IPv6:2607:f8b0:4864:20::1032])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7223576943
+        for <kvm@vger.kernel.org>; Fri, 15 Jul 2022 07:47:41 -0700 (PDT)
+Received: by mail-pj1-x1032.google.com with SMTP id v4-20020a17090abb8400b001ef966652a3so11723947pjr.4
+        for <kvm@vger.kernel.org>; Fri, 15 Jul 2022 07:47:41 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
         h=date:from:to:cc:subject:message-id:references:mime-version
          :content-disposition:in-reply-to;
-        bh=KGDc8EbuqC0PvAxCnIwTKvxHYhgAZfQOE+/RAi143ug=;
-        b=JCgSYiRX6HA4YO0cyySvx4Bzs0RhBJGyDuDQdzypDWRq6F+EUrMezPWwe6pBZ73dAd
-         RIil1PTT1JVXwkO/GPq8J7pKkkIlUqXw66FyY+PFbO2HMF6uHZW1wMwMhjtAB6PhjkEv
-         0qii89D5ckU+mD87QNqOlWnP6SLyUNb9gs8XVHiMXJpuul1mKMa/inhbicja9fNM8h6Q
-         0oHBLCdQVMZrvJnVVDP9dE9xdiO6LgxvXAG67eued3ZtvkhbkAJyKCyXO7K2BPkIc6x3
-         23HcMu1gMWtTgfRsduOFKcOmxZTgjRlkd9Qrid0PSb5xRXusMzxkNShxTgSyBr3vrndt
-         wluQ==
+        bh=3tUNFb/MgVcjx+q+xnHzJmvjWkinIDyAxRghu8rwyXg=;
+        b=Rym6NMECh44r0rwd+1g0imZUyyBEkDdo3kxGbrMPCZFbCbLl/8BZolpTX8W+VAh9J4
+         LD7SKH80SdA/NeNTOJFsfxYM8GTz1SGNA0gP0NIwSRANXAG0FNukKoxH1KK97dQAdNdZ
+         8wD6skWaNDKebwz+6vNNVeNOvyVxqY0MWM2VLATFbOa72eeqbsLdt8PujtPqPaJ0jmHm
+         9Vd+jdFjPnQF0klX7fMRdkrRegi+DQc/Vz8loSDSwCry9LFXOU5I3DsNPpjtNIZJPACo
+         tv6/7lXuWQA3HOUAH5sR1YEVV3j6ZJzbWs2uSZxZWowxWWMiXS/qdJtnKJABP3YCVV4n
+         fVSQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:date:from:to:cc:subject:message-id:references
          :mime-version:content-disposition:in-reply-to;
-        bh=KGDc8EbuqC0PvAxCnIwTKvxHYhgAZfQOE+/RAi143ug=;
-        b=ebWNGHBE6IQaQ61SXqx92lQpoSgfZOTZf1H+72aC/Y9+ABptOSXntnIxzBtAHXBNJL
-         gcFqZDAjjI74PB3osRFqlnPkE1Nt5lK8UiwmZ0Sdx34YaY5DQUWFASK+k1MCueht/bDc
-         8W21X2VQNtzgSCBYKdNWKjfdkx45WJdryCnfaHBE332s8RPH7QWG4WeSoOT5az6wdbLz
-         6ygwicAKLuVLJTVpNvC13e30+Rcx6QqBA0dEJDXChBH+JNicLUmnLUawQTEy8K9cLnNl
-         M01nzDyPjHn0bQE2QA6Ei/LdwmByCUQqLAxhwSIBg9NEQFeilfYQnnE3mzRgPTTaf9Cr
-         Cb+g==
-X-Gm-Message-State: AJIora9OH7IUp3fv75Ln+xBr1CfCnzopi0kXplu1lmz8YQp7/nJ1KKmz
-        Q73X4kDhFqPgWFxQLz/8GqnlRg==
-X-Google-Smtp-Source: AGRyM1vrP4fMl5xqO1RnpN7iB0+xQmieg3i1s2EH5bpDyK5MEzUlgFWBRCAR7K8wHJxGL+selF7gqA==
-X-Received: by 2002:a17:90b:2242:b0:1f0:6d85:e196 with SMTP id hk2-20020a17090b224200b001f06d85e196mr16405063pjb.3.1657895557596;
-        Fri, 15 Jul 2022 07:32:37 -0700 (PDT)
+        bh=3tUNFb/MgVcjx+q+xnHzJmvjWkinIDyAxRghu8rwyXg=;
+        b=I55eGhPUFwhZUSzuCKxNhfhCO1dMkwTFcEcwLmkdpNTiXuZzyDZgJf8JjqWYJF1MyG
+         VJbnlfDdFxI7xzOz5y506wBoFdVTE5xMUXhycd1Ncx2pGKQtMLrpiBBm5LA3Hw8FqHQP
+         kfE3Z5HRZdnR7lzLLh2EmMeZCzr0IjKBHQEfzBNaVTX8+56gMVLy11QydhB7euiQpXcG
+         zccAZLhkJ+kCPxSAnd020QrohtQP635SDRc+SFLH1EuqBFt+1o5GTIfCEdvxrU1SqIlM
+         8HadVGo0eT7w84nKooqRM1fO5U6hmgn8aadAceIKRn3SSissuXcPhdtpIeVUg5cx9x4w
+         zzxw==
+X-Gm-Message-State: AJIora/j8bVDQn03LBF9ODnpdcPWUH0ODziFvzAG2GnznMCYzH9NSzJE
+        jUK72blV9v2Kp8+gNMOs0cMmdw==
+X-Google-Smtp-Source: AGRyM1s+NPdiYftBQZwlpnh1yi1YFLFqWcXd2bsDwLI/KbcXrV5CTmR6Cwvi9UcyTn2+4UBAiJ4TEw==
+X-Received: by 2002:a17:902:b612:b0:16c:7e2d:ff39 with SMTP id b18-20020a170902b61200b0016c7e2dff39mr12737288pls.111.1657896460825;
+        Fri, 15 Jul 2022 07:47:40 -0700 (PDT)
 Received: from google.com (123.65.230.35.bc.googleusercontent.com. [35.230.65.123])
-        by smtp.gmail.com with ESMTPSA id x62-20020a628641000000b0052842527052sm3844497pfd.189.2022.07.15.07.32.37
+        by smtp.gmail.com with ESMTPSA id e2-20020a17090a118200b001ef3f85d1aasm5821172pja.9.2022.07.15.07.47.40
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 15 Jul 2022 07:32:37 -0700 (PDT)
-Date:   Fri, 15 Jul 2022 14:32:33 +0000
+        Fri, 15 Jul 2022 07:47:40 -0700 (PDT)
+Date:   Fri, 15 Jul 2022 14:47:36 +0000
 From:   Sean Christopherson <seanjc@google.com>
-To:     Gavin Shan <gshan@redhat.com>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>, kvmarm@lists.cs.columbia.edu,
-        kvm@vger.kernel.org, linux-kselftest@vger.kernel.org,
-        linux-kernel@vger.kernel.org, mathieu.desnoyers@efficios.com,
-        shuah@kernel.org, maz@kernel.org, oliver.upton@linux.dev,
-        shan.gavin@gmail.com
-Subject: Re: [PATCH] KVM: selftests: Double check on the current CPU in
- rseq_test
-Message-ID: <YtF6gVYgMhoiD0Pe@google.com>
-References: <20220714080642.3376618-1-gshan@redhat.com>
- <cd5d029c-b396-45ef-917b-92e054659623@redhat.com>
- <YtA3s0VRj3x7vO7B@google.com>
- <be806f9c-861a-8da8-d42e-1d4271c3a326@redhat.com>
+To:     Yu Zhang <yu.c.zhang@linux.intel.com>
+Cc:     pbonzini@redhat.com, vkuznets@redhat.com, jmattson@google.com,
+        joro@8bytes.org, wanpengli@tencent.com, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+Subject: Re: [PATCH 1/2] KVM: X86: Initialize 'fault' in
+ kvm_fixup_and_inject_pf_error().
+Message-ID: <YtF+CF2FkS7Ho1d5@google.com>
+References: <20220715114211.53175-1-yu.c.zhang@linux.intel.com>
+ <20220715114211.53175-2-yu.c.zhang@linux.intel.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <be806f9c-861a-8da8-d42e-1d4271c3a326@redhat.com>
+In-Reply-To: <20220715114211.53175-2-yu.c.zhang@linux.intel.com>
 X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
         ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
@@ -77,68 +73,71 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Jul 15, 2022, Gavin Shan wrote:
-> Hi Paolo and Sean,
+On Fri, Jul 15, 2022, Yu Zhang wrote:
+> kvm_fixup_and_inject_pf_error() was introduced to fixup the error code(
+> e.g., to add RSVD flag) and inject the #PF to the guest, when guest
+> MAXPHYADDR is smaller than the host one.
 > 
-> On 7/15/22 1:35 AM, Sean Christopherson wrote:
-> > On Thu, Jul 14, 2022, Paolo Bonzini wrote:
-> Well, I don't think migration_worker() does correct thing, if I'm understanding
-> correctly. The intention seems to force migration on 'main' thread by 'migration'
-> thread?  If that is the case, I don't think the following function call has correct
-> parameters.
+> When it comes to nested, L0 is expected to intercept and fix up the #PF
+> and then inject to L2 directly if
+> - L2.MAXPHYADDR < L0.MAXPHYADDR and
+> - L1 has no intention to intercept L2's #PF (e.g., L2 and L1 have the
+>   same MAXPHYADDR value && L1 is using EPT for L2),
+> instead of constructing a #PF VM Exit to L1. Currently, with PFEC_MASK
+> and PFEC_MATCH both set to 0 in vmcs02, the interception and injection
+> may happen on all L2 #PFs.
 > 
->     r = sched_setaffinity(0, sizeof(allowed_mask), &allowed_mask);
-> 
->     it should be something like:
-> 
->     r = sched_setaffinity(getpid(), sizeof(allowed_mask), &allowed_mask);
-> 
-> If we're using sched_setaffinity(0, ...) in the 'migration' thread, the CPU
-> affinity of 'main' thread won't be affected. It means 'main' thread can be
-> migrated from one CPU to another at any time, even in the following point:
-> 
->     int main(...)
->     {
->           :
->           /*
->            * migration can happen immediately after sched_getcpu(). If
->            * CPU affinity of 'main' thread is sticky to one particular
->            * CPU, which 'migration' thread supposes to do, then there
->            * should have no migration.
->            */
->           cpu = sched_getcpu();
->           rseq_cpu = READ_ONCE(__rseq.cpu_id);
->           :
->     }
-> 
-> So I think the correct fix is to have sched_setaffinity(getpid(), ...) ?
-> Please refer to the manpage.
-> 
->    https://man7.org/linux/man-pages/man2/sched_setaffinity.2.html
->    'If pid is zero, then the calling thread is used'
+> However, failing to initialize 'fault' in kvm_fixup_and_inject_pf_error()
+> may cause the fault.async_page_fault being NOT zeroed, and later the #PF
+> being treated as a nested async page fault, and then being injected to L1.
+> So just fix it by initialize the 'fault' value in the beginning.
 
-Oof, and more explicitly the rest of that sentence clarifies that the result of
-getpid() will target the main thread (I assume "main" means thread group leader).
+Ouch.
 
-   Specifying pid as 0 will set the attribute for the calling thread, and passing
-   the value returned from a call to getpid(2) will set the attribute for the main
-   thread of the thread group.
+> Fixes: 897861479c064 ("KVM: x86: Add helper functions for illegal GPA checking and page fault injection")
+> Bugzilla: https://bugzilla.kernel.org/show_bug.cgi?id=216178
+> Reported-by: Yang Lixiao <lixiao.yang@intel.com>
+> Signed-off-by: Yu Zhang <yu.c.zhang@linux.intel.com>
+> ---
+>  arch/x86/kvm/x86.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+> 
+> diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+> index 031678eff28e..3246b3c9dfb3 100644
+> --- a/arch/x86/kvm/x86.c
+> +++ b/arch/x86/kvm/x86.c
+> @@ -12983,7 +12983,7 @@ EXPORT_SYMBOL_GPL(kvm_spec_ctrl_test_value);
+>  void kvm_fixup_and_inject_pf_error(struct kvm_vcpu *vcpu, gva_t gva, u16 error_code)
+>  {
+>  	struct kvm_mmu *mmu = vcpu->arch.walk_mmu;
+> -	struct x86_exception fault;
+> +	struct x86_exception fault = {0};
+>  	u64 access = error_code &
+>  		(PFERR_WRITE_MASK | PFERR_FETCH_MASK | PFERR_USER_MASK);
 
-I'm guessing my test worked (in that it reproduced the bug) by virtue of the
-scheduler trying to colocate all threads in the process.
+As stupid as it may be to intentionally not fix the uninitialized data in a robust
+way, I'd actually prefer to manually clear fault.async_page_fault instead of
+zero-initializing the struct.  Unlike a similar bug fix in commit 159e037d2e36
+("KVM: x86: Fully initialize 'struct kvm_lapic_irq' in kvm_pv_kick_cpu_op()"),
+this code actually cares about async_page_fault being false as opposed to just
+being _initialized_.
 
-In my defense, the die.net copy of the manpages quite clearly uses "process"[1],
-but that was fixed in the manpages in 2013[2]!?!!?  So I guess the takeaway is
-to use only the official manpages.
+And if another field is added to struct x86_exception in the future, leaving the
+struct uninitialized means that if such a patch were to miss this case, running
+with various sanitizers should in theory be able to detect such a bug.  I suspect
+no one has found this with syzkaller due to the need to opt into running with
+allow_smaller_maxphyaddr=1.
 
-Anyways, for the code, my preference would be to snapshot gettid() in main() before
-spawning the migration worker.  Same result, but I would rather the test explicitly
-target the thread doing rseq instead of relying on (a) getpid() targeting only the
-main thread and (b) the main thread always being the rseq thread.  E.g. if for some
-reason a future patch moves the rseq code to its own worker thread, then getpid()
-would be incorrect.
+diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+index f389691d8c04..aeed737b55c2 100644
+--- a/arch/x86/kvm/x86.c
++++ b/arch/x86/kvm/x86.c
+@@ -12996,6 +12996,7 @@ void kvm_fixup_and_inject_pf_error(struct kvm_vcpu *vcpu, gva_t gva, u16 error_c
+                fault.error_code = error_code;
+                fault.nested_page_fault = false;
+                fault.address = gva;
++               fault.async_page_fault = false;
+        }
+        vcpu->arch.walk_mmu->inject_page_fault(vcpu, &fault);
+ }
 
-Thanks for figuring this out!
-
-[1] https://linux.die.net/man/2/sched_setaffinity
-[2] 6a7fcf3cc ("sched_setaffinity.2: Clarify that these system calls affect a per-thread attribute")
