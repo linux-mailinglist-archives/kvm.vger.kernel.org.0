@@ -2,81 +2,68 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id D10FA575839
-	for <lists+kvm@lfdr.de>; Fri, 15 Jul 2022 02:00:57 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 7CF4557589A
+	for <lists+kvm@lfdr.de>; Fri, 15 Jul 2022 02:22:18 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S241007AbiGOAA4 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 14 Jul 2022 20:00:56 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36284 "EHLO
+        id S232908AbiGOAWR (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 14 Jul 2022 20:22:17 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49930 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S240994AbiGOAAv (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 14 Jul 2022 20:00:51 -0400
-Received: from mail-pg1-x52e.google.com (mail-pg1-x52e.google.com [IPv6:2607:f8b0:4864:20::52e])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5405766B91
-        for <kvm@vger.kernel.org>; Thu, 14 Jul 2022 17:00:50 -0700 (PDT)
-Received: by mail-pg1-x52e.google.com with SMTP id e132so2975967pgc.5
-        for <kvm@vger.kernel.org>; Thu, 14 Jul 2022 17:00:50 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=7kQcbuUpYF4D2BnaWIUhPJeFUYzIn6+Qgr3BLmvM4Yw=;
-        b=Ww/hsP1MY82xo12KIVt4OgyeqvT1sRQBHFWuE8zAZHSRmd/pig+6qvG/tUm+17L6Xq
-         kOpudqH7nzu0nHLkbvZlGTUMLA2dfpMf/iKXHonqjpTdUm9HXYntGUWpOu8S1ep9s0ap
-         SgJ+I0gUVrRwJPfvv7bxqaSEi9tNAL/XHGDxO/qQTrdFxSjqjImw9NH5xNmW4aGQ5KN4
-         shUtsd6TrEC5yZyv0AhxuKD0hzzdGOnXIazAI92IRdOZp2cKSVhiLzBOJxypbeIyUMas
-         i7N1nnnbSLyvJtmpAJc3JagJQN5r8k/QDU2P2OK68VuW84jUNq9O2VpSoSz80c+lutN9
-         RVYA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=7kQcbuUpYF4D2BnaWIUhPJeFUYzIn6+Qgr3BLmvM4Yw=;
-        b=oyVPV33bPX6dMgWJ4TAuRVlERwmQcygJovBwXSy8qlSK4nMeK4APLl3OlmTZWiLeef
-         bDl8GKFbFj6aq1qkAgFfsJ35LmDt5dWpJ++Mqwp+yUs1xuSi+6LpGNSeKkgrRRwANdAn
-         qBYeXquzkz4Ad+aZWlA2FOEeE1/6h/00/c9D/Wqcq3P+3GUePGlad19GoyD+VXAz91r/
-         HZTklY5TfC3qd/e1P0d1E1j3hJL9odVcpSx2qouoGrB8ZFplFBgOL/uRiGWPoOr20hon
-         vxeVV5bDC8bciSzpXpMPo2PecX5Bvgop0jbcTZBWRI/i0Iszk20DXrBr0haLswng34sD
-         m3yg==
-X-Gm-Message-State: AJIora8eLlIFMVLJwXJ31llHMlonLS6s81vB1wS0dcinVMLNU8egPJLB
-        erBmLUPhFgZHRWvWaBITDxbxng==
-X-Google-Smtp-Source: AGRyM1vB1Bx0JIdA2uKlH7N/GZYabyRhn+4zGmjeXbgLfPo6T5PvUMOywAs5A1ZieCWcXkppBuQHvg==
-X-Received: by 2002:a05:6a00:998:b0:52a:db4c:541b with SMTP id u24-20020a056a00099800b0052adb4c541bmr10834227pfg.35.1657843249678;
-        Thu, 14 Jul 2022 17:00:49 -0700 (PDT)
-Received: from google.com (123.65.230.35.bc.googleusercontent.com. [35.230.65.123])
-        by smtp.gmail.com with ESMTPSA id w6-20020a17090a780600b001f09d9b6673sm2029731pjk.7.2022.07.14.17.00.46
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 14 Jul 2022 17:00:47 -0700 (PDT)
-Date:   Fri, 15 Jul 2022 00:00:43 +0000
-From:   Sean Christopherson <seanjc@google.com>
-To:     Jim Mattson <jmattson@google.com>
-Cc:     "Maciej S. Szmigiero" <mail@maciej.szmigiero.name>,
-        Maxim Levitsky <mlevitsk@redhat.com>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Borislav Petkov <bp@alien8.de>,
-        "H. Peter Anvin" <hpa@zytor.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Joerg Roedel <joro@8bytes.org>, Ingo Molnar <mingo@redhat.com>,
-        Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org,
-        linux-kernel@vger.kernel.org, kvm@vger.kernel.org
-Subject: Re: [PATCH] KVM: SVM: fix task switch emulation on INTn instruction.
-Message-ID: <YtCuK36YnKp/sojH@google.com>
-References: <20220714124453.188655-1-mlevitsk@redhat.com>
- <52d44630-21ad-1291-4185-40d5728eaea6@maciej.szmigiero.name>
- <034401953bc935d997c143153938edb1034b52cd.camel@redhat.com>
- <84646f56-dcb0-b0f8-f485-eb0d69a84c9c@maciej.szmigiero.name>
- <YtClmOgBV8j3eDkG@google.com>
- <CALMp9eTZKyFM4oFNJbDDe69xfqtSmj5jZnPbe0aQaxxCvqdFTA@mail.gmail.com>
+        with ESMTP id S232538AbiGOAWQ (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 14 Jul 2022 20:22:16 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id ACFAC655A8
+        for <kvm@vger.kernel.org>; Thu, 14 Jul 2022 17:22:13 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1657844532;
+        h=from:from:reply-to:reply-to:subject:subject:date:date:
+         message-id:message-id:to:to:cc:cc:mime-version:mime-version:
+         content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=JDKBdO2ynojitcW0UwD3EnMXjp2f1L6/iJQpfcNZFPM=;
+        b=V0rsTOYwfC+lrBTcmjq5fWGVd/abXGvATDt3Y+I1GKq3LfFr8ZAe2u9VwoL4uKvROqnLpx
+        009Rxi9OBf6wZXXZlO4EABx7/yu0GOrHDmS05nS6HSeiirht71nhAe0t0jQfjdknmNs3YJ
+        WoqMygVxMqjTDiEB6w3LsIM5LGB/47o=
+Received: from mimecast-mx02.redhat.com (mx3-rdu2.redhat.com
+ [66.187.233.73]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-108-tIbxiXzvM4-kc2o0I5BDCQ-1; Thu, 14 Jul 2022 20:22:08 -0400
+X-MC-Unique: tIbxiXzvM4-kc2o0I5BDCQ-1
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.rdu2.redhat.com [10.11.54.2])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 530FC3C01E15;
+        Fri, 15 Jul 2022 00:22:08 +0000 (UTC)
+Received: from [10.64.54.37] (vpn2-54-37.bne.redhat.com [10.64.54.37])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id 9448D40885A1;
+        Fri, 15 Jul 2022 00:22:03 +0000 (UTC)
+Reply-To: Gavin Shan <gshan@redhat.com>
+Subject: Re: [PATCH] KVM: selftests: Double check on the current CPU in
+ rseq_test
+To:     Sean Christopherson <seanjc@google.com>,
+        Paolo Bonzini <pbonzini@redhat.com>
+Cc:     kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org,
+        linux-kselftest@vger.kernel.org, linux-kernel@vger.kernel.org,
+        mathieu.desnoyers@efficios.com, shuah@kernel.org, maz@kernel.org,
+        oliver.upton@linux.dev, shan.gavin@gmail.com
+References: <20220714080642.3376618-1-gshan@redhat.com>
+ <cd5d029c-b396-45ef-917b-92e054659623@redhat.com>
+ <YtA3s0VRj3x7vO7B@google.com>
+From:   Gavin Shan <gshan@redhat.com>
+Message-ID: <be806f9c-861a-8da8-d42e-1d4271c3a326@redhat.com>
+Date:   Fri, 15 Jul 2022 12:21:42 +1000
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.2.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <CALMp9eTZKyFM4oFNJbDDe69xfqtSmj5jZnPbe0aQaxxCvqdFTA@mail.gmail.com>
-X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-        T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL
+In-Reply-To: <YtA3s0VRj3x7vO7B@google.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.84 on 10.11.54.2
+X-Spam-Status: No, score=-2.7 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
+        RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE
         autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -84,50 +71,211 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Jul 14, 2022, Jim Mattson wrote:
-> On Thu, Jul 14, 2022 at 4:24 PM Sean Christopherson <seanjc@google.com> wrote:
-> >
-> > On Fri, Jul 15, 2022, Maciej S. Szmigiero wrote:
-> > > On 14.07.2022 15:57, Maxim Levitsky wrote:
-> > > > On Thu, 2022-07-14 at 15:50 +0200, Maciej S. Szmigiero wrote:
-> > > > > On 14.07.2022 14:44, Maxim Levitsky wrote:
-> > > > > > Recently KVM's SVM code switched to re-injecting software interrupt events,
-> > > > > > if something prevented their delivery.
-> > > > > >
-> > > > > > Task switch due to task gate in the IDT, however is an exception
-> > > > > > to this rule, because in this case, INTn instruction causes
-> > > > > > a task switch intercept and its emulation completes the INTn
-> > > > > > emulation as well.
-> > > > > >
-> > > > > > Add a missing case to task_switch_interception for that.
-> > > > > >
-> > > > > > This fixes 32 bit kvm unit test taskswitch2.
-> > > > > >
-> > > > > > Fixes: 7e5b5ef8dca322 ("KVM: SVM: Re-inject INTn instead of retrying the insn on "failure"")
-> > > > > >
-> > > > > > Signed-off-by: Maxim Levitsky <mlevitsk@redhat.com>
-> > > > > > ---
-> > > > >
-> > > > > That's a good catch, your patch looks totally sensible to me.
-> > > > > People running Win 3.x or OS/2 on top of KVM will surely be grateful for it :)
-> > > >
-> > > > Yes and also people who run 32 bit kvm unit tests :)
-> > >
-> > > It looks like more people need to do this regularly :)
-> >
-> > I do run KUT on 32-bit KVM, but until I hadn't done so on AMD for a long time and
-> > so didn't realize the taskswitch2 failure was a regression.  My goal/hope is to
-> > we'll get to a state where we're able to run the full gamut of tests before things
-> > hit kvm/queue, but the number of permutations of configs and module params means
-> > that's easier said than done.
-> >
-> > Honestly, it'd be a waste of people's time to expect anyone else beyond us few
-> > (and CI if we can get there) to test 32-bit KVM.  We do want to keep it healthy
-> > for a variety of reasons, but I'm quite convinced that outside of us developers,
-> > there's literally no one running 32-bit KVM.
-> 
-> It shouldn't be necessary to run 32-bit KVM to run 32-bit guests! Or
-> am I not understanding the issue that was fixed here?
+Hi Paolo and Sean,
 
-Ah, no, I'm the one off in the weeds.  I only ever run 32-bit KUT on 32-bit VMs
-because I've been too lazy to "cross"-compile.  Time to remedy that...
+On 7/15/22 1:35 AM, Sean Christopherson wrote:
+> On Thu, Jul 14, 2022, Paolo Bonzini wrote:
+>> On 7/14/22 10:06, Gavin Shan wrote:
+>>> In rseq_test, there are two threads created. Those two threads are
+>>> 'main' and 'migration_thread' separately. We also have the assumption
+>>> that non-migration status on 'migration-worker' thread guarantees the
+>>> same non-migration status on 'main' thread. Unfortunately, the assumption
+>>> isn't true. The 'main' thread can be migrated from one CPU to another
+>>> one between the calls to sched_getcpu() and READ_ONCE(__rseq.cpu_id).
+>>> The following assert is raised eventually because of the mismatched
+>>> CPU numbers.
+>>>
+>>> The issue can be reproduced on arm64 system occasionally.
+>>
+>> Hmm, this does not seem a correct patch - the threads are already
+>> synchronizing using seq_cnt, like this:
+>>
+>> 	migration			main
+>> 	----------------------		--------------------------------
+>> 	seq_cnt = 1
+>> 	smp_wmb()
+>> 					snapshot = 0
+>> 					smp_rmb()
+>> 					cpu = sched_getcpu() reads 23
+>> 	sched_setaffinity()
+>> 					rseq_cpu = __rseq.cpuid reads 35
+>> 					smp_rmb()
+>> 					snapshot != seq_cnt -> retry
+>> 	smp_wmb()
+>> 	seq_cnt = 2
+>>
+>> sched_setaffinity() is guaranteed to block until the task is enqueued on an
+>> allowed CPU.
+> 
+> Yes, and retrying could suppress detection of kernel bugs that this test is intended
+> to catch.
+> 
+
+Well, I don't think migration_worker() does correct thing, if I'm understanding
+correctly. The intention seems to force migration on 'main' thread by 'migration'
+thread?  If that is the case, I don't think the following function call has correct
+parameters.
+
+     r = sched_setaffinity(0, sizeof(allowed_mask), &allowed_mask);
+
+     it should be something like:
+
+     r = sched_setaffinity(getpid(), sizeof(allowed_mask), &allowed_mask);
+
+If we're using sched_setaffinity(0, ...) in the 'migration' thread, the CPU
+affinity of 'main' thread won't be affected. It means 'main' thread can be
+migrated from one CPU to another at any time, even in the following point:
+
+     int main(...)
+     {
+           :
+           /*
+            * migration can happen immediately after sched_getcpu(). If
+            * CPU affinity of 'main' thread is sticky to one particular
+            * CPU, which 'migration' thread supposes to do, then there
+            * should have no migration.
+            */
+           cpu = sched_getcpu();
+           rseq_cpu = READ_ONCE(__rseq.cpu_id);
+           :
+     }
+
+So I think the correct fix is to have sched_setaffinity(getpid(), ...) ?
+Please refer to the manpage.
+
+    https://man7.org/linux/man-pages/man2/sched_setaffinity.2.html
+    'If pid is zero, then the calling thread is used'
+
+>> Can you check that smp_rmb() and smp_wmb() generate correct instructions on
+>> arm64?
+> 
+> That seems like the most likely scenario (or a kernel bug), I distinctly remember
+> the barriers provided by tools/ being rather bizarre.
+> 
+
+I don't see any problems for smp_rmb() and smp_wmb() in my case. They have
+been translated to correct instructions, as expected.
+
+#define smp_mb()        asm volatile("dmb ish" ::: "memory")
+#define smp_wmb()       asm volatile("dmb ishst" ::: "memory")
+#define smp_rmb()       asm volatile("dmb ishld" ::: "memory")
+
+--------------
+
+One more experiment for sched_setaffinity(). I run the following program,
+the CPU affinity of 'main' thread isn't changed, until the correct
+parameter is used, to have sched_setaffinity(getpid(), ...).
+
+sched_setaffinity(0, ...)
+-------------------------
+[root@virtlab-arm01 tmp]# ./a
+thread_func: cpu=0
+main: mask=0x000000ff
+main: mask=0x000000ff
+main: mask=0x000000ff
+main: mask=0x000000ff
+main: mask=0x000000ff
+main: mask=0x000000ff
+main: mask=0x000000ff
+main: mask=0x000000ff
+main: mask=0x000000ff
+thread_func: cpu=1
+main: mask=0x000000ff
+main: mask=0x000000ff
+main: mask=0x000000ff
+main: mask=0x000000ff
+main: mask=0x000000ff
+main: mask=0x000000ff
+main: mask=0x000000ff
+main: mask=0x000000ff
+main: mask=0x000000ff
+main: mask=0x000000ff
+   :
+
+sched_setaffinity(getpid(), ...)
+--------------------------------
+thread_func: cpu=198
+main: mask=0x00000001
+main: mask=0x00000001
+main: mask=0x00000001
+main: mask=0x00000001
+main: mask=0x00000001
+main: mask=0x00000001
+main: mask=0x00000001
+main: mask=0x00000001
+main: mask=0x00000001
+thread_func: cpu=198
+main: mask=0x00000002
+main: mask=0x00000002
+main: mask=0x00000002
+main: mask=0x00000002
+main: mask=0x00000002
+main: mask=0x00000002
+main: mask=0x00000002
+main: mask=0x00000002
+main: mask=0x00000002
+main: mask=0x00000002
+   :
+
+#define _GNU_SOURCE
+#include <stdio.h>
+#include <stdlib.h>
+#include <sys/types.h>
+#include <unistd.h>
+#include <pthread.h>
+#include <sched.h>
+
+#define NR_CPUS	8
+static int thread_exit = 0;
+
+static void *thread_func(void *data)
+{
+	cpu_set_t allowed_mask;
+	int ret, i;
+
+	for (i = 0; i < NR_CPUS; i++) {
+		CPU_ZERO(&allowed_mask);
+		CPU_SET(i, &allowed_mask);
+#if 1
+		sched_setaffinity(0, sizeof(allowed_mask), &allowed_mask);
+#else
+                 sched_setaffinity(getpid(), sizeof(allowed_mask), &allowed_mask);
+#endif
+		fprintf(stdout, "%s: cpu=%d\n", __func__, sched_getcpu());
+
+		sleep(1);
+	}
+
+	thread_exit = 1;
+	return NULL;
+}
+
+int main(int argc, char **argv)
+{
+	pthread_t thread;
+	cpu_set_t allowed_mask;
+	int mask, i, count = 0;
+
+	pthread_create(&thread, NULL, thread_func, NULL);
+
+	while (!thread_exit) {
+		usleep(100000);
+
+		mask = 0;
+		sched_getaffinity(0, sizeof(allowed_mask), &allowed_mask);
+		for (i = 0; i < NR_CPUS; i++) {
+			if (CPU_ISSET(i, &allowed_mask))
+				mask |= (1 << i);
+		}
+
+		fprintf(stdout, "%s: mask=0x%08x\n", __func__, mask);
+	}
+
+	return 0;
+}
+
+
+Thanks,
+Gavin
+
+
