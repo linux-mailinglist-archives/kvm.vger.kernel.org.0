@@ -2,63 +2,69 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 7513F576A6B
-	for <lists+kvm@lfdr.de>; Sat, 16 Jul 2022 01:06:43 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 1E5DC576A89
+	for <lists+kvm@lfdr.de>; Sat, 16 Jul 2022 01:18:23 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231894AbiGOXGh (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 15 Jul 2022 19:06:37 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37356 "EHLO
+        id S231483AbiGOXSM (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 15 Jul 2022 19:18:12 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45116 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231768AbiGOXGf (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 15 Jul 2022 19:06:35 -0400
-Received: from mail-oa1-x33.google.com (mail-oa1-x33.google.com [IPv6:2001:4860:4864:20::33])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0386D8B4A1
-        for <kvm@vger.kernel.org>; Fri, 15 Jul 2022 16:06:35 -0700 (PDT)
-Received: by mail-oa1-x33.google.com with SMTP id 586e51a60fabf-10bffc214ffso9468371fac.1
-        for <kvm@vger.kernel.org>; Fri, 15 Jul 2022 16:06:34 -0700 (PDT)
+        with ESMTP id S231163AbiGOXSI (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 15 Jul 2022 19:18:08 -0400
+Received: from mail-pj1-x1036.google.com (mail-pj1-x1036.google.com [IPv6:2607:f8b0:4864:20::1036])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3176890D91
+        for <kvm@vger.kernel.org>; Fri, 15 Jul 2022 16:18:08 -0700 (PDT)
+Received: by mail-pj1-x1036.google.com with SMTP id z12-20020a17090a7b8c00b001ef84000b8bso12874753pjc.1
+        for <kvm@vger.kernel.org>; Fri, 15 Jul 2022 16:18:08 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=mBpXtEslnV1zurvmWEIDiRzGKqnjEUmVJoFW6W9qWCw=;
-        b=AECQ0eHEqmcRYhw/kZaytfxobirCfOqjKbk7//nSJ87Bw9hMpidynMX+QaIk0VUI5O
-         iHNnNLHUStvEkFZ9O7Jbf/Xqqrvods4PMgTxcqJzPLHWW4BzOKzYuG/+BEgP6V3t9XTB
-         LoGIe6NRjIoYGor1s3QyYmhDXT0nn0nuup5cgmfulhkcsULKU1V22NEYCLNP4wJftyg8
-         pWlmK/tPSHI6BCKkvqrxOmdz4+mffWYtXZ3ZPQQ2cL0gECDioTEYSrFvVu/KUStlW2zR
-         WRI/3qDj/hdlTbRDmWEVxaFWgP1TZfR949+D1CPbIQPAlrR2evnu1Oy9FVERBGc1ePtb
-         icfg==
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=XbW4ugQp+4Ks3aPPXecdjoIRykNNddTdltbpwPKe1dg=;
+        b=AqupWTdfkCcwL2MkYOsMqRrMSV/a7tM0rRAIbHGRtwELMYjOPNPvTxm9ck4bRZ1LJL
+         C+GsN6QPyU9IZu0yfL5Hgm1h0+17s2LZYsOW91bZ6cFdcMh0EGwB9pERCkCjGIgHX/sA
+         75BbexmZoonEtKYsSNhYrh0PfX2kPtAIYusu0mprQ9KgDHOH6ThMFDC7dh/Ta9g3cGv4
+         apb0wR/PWrWT6FsSLLxOb7Cgiqk2/C7Kh/1JjLL8dtlUWesUmYgAYWlNbkKGoi0qk97N
+         jNwyZJjwpHDaYJnzuklojThL047k0a1K2rL3VK54fbnn8WNi0fun1SE3rTUCQe5gRGNH
+         7Eng==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=mBpXtEslnV1zurvmWEIDiRzGKqnjEUmVJoFW6W9qWCw=;
-        b=OAD08Nk4r8fi68sjTyU8jipcywrIFxVcVFTTvGQdQWCLZWAHuWY/5lMp1Wl57cQzc2
-         sWTzHUFvkm4qXUP7nDR/pJcInrqD5wMmPT8AhOWUSFhROw/Ripm4BvA9Tb8MxFXxNFEy
-         VrgGlRzl20bvYTmGPNt/yMQdAcZXA1RUTiZDmvBGaBMfr/2B5Rcr3XCKBWnanH0NN3VG
-         KyGe4v5C1YLZl06ty+0rzWWevgeiuQqR+crOIMLYRuS0dR95SUUPc4FRQ3G2vcogCjpR
-         EMdSuzN+RMmxPqQc/2v4QbgtQkq/EvGV4CXdezPHfGtsJlMZeoZ12Hcr9cALP9xjbBix
-         9Eow==
-X-Gm-Message-State: AJIora+gcSWObzHgJMp+AzvqlSsnEd6HJr05/pkidsyjj3OhlslzxGnd
-        MLyKpIs3mDZrkLFV8ELs1UGn7x43riLR7r+e8MewhOpaaTU=
-X-Google-Smtp-Source: AGRyM1u1OTXm2QGLPrI1m/Pl+zrnOXkxWwMmzH8915eiu6wZd+mbVdweoU84R3ujtobf5TgYhtrJSnbOzEOuYLsKi/U=
-X-Received: by 2002:aca:5e05:0:b0:337:bd43:860b with SMTP id
- s5-20020aca5e05000000b00337bd43860bmr7988724oib.181.1657926394114; Fri, 15
- Jul 2022 16:06:34 -0700 (PDT)
-MIME-Version: 1.0
-References: <20220715230016.3762909-1-seanjc@google.com> <20220715230016.3762909-2-seanjc@google.com>
-In-Reply-To: <20220715230016.3762909-2-seanjc@google.com>
-From:   Jim Mattson <jmattson@google.com>
-Date:   Fri, 15 Jul 2022 16:06:23 -0700
-Message-ID: <CALMp9eQdzZK4ZAyQZXUWff_zuRRdr=ugkujWfFrt9dP8uFcs=Q@mail.gmail.com>
-Subject: Re: [PATCH 1/4] KVM: x86: Reject loading KVM if host.PAT[0] != WB
-To:     Sean Christopherson <seanjc@google.com>
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=XbW4ugQp+4Ks3aPPXecdjoIRykNNddTdltbpwPKe1dg=;
+        b=5VAm7P5IL2O8x4OkimaoAvBwQ3IuttVsKTQwVmcVatjYlf0hj6tzgmPuCj4+Xz3ly7
+         2XIJVdmG/QvC7ip1tH9Ri2rZkLHjCcf8QYeeDQYN3OyAZrbTWZ7jYBtORcj7b+FgSesV
+         oyWAecmrkLtxYUA9EulhrDuebVntIes3/snwJM5+tlYjmqQwv4I2mp66BCb+hVZQU32v
+         /lyHUx+OKMCWGqvN0tiglMpgXIIL5QKwh2fesahe8suHTcE6eqXTfiPCL27LzSnURHBa
+         lP7ErctAYOIrqzeGc9dJqrqP+RgXFc+bc3JS/PSWu7WZuO8a8MLD8j0lcvOz03CTI8CE
+         EjLg==
+X-Gm-Message-State: AJIora+sHMewPjQnB6KNgPFNqdNyEAR6jTnq5V7pJUs89UxdKnPNzjdF
+        V0z3YDyZ/6flqA0taKkBT6mlemAIJE0YQg==
+X-Google-Smtp-Source: AGRyM1tgMaamoYyeQMvHcg5nmNj0M22GhP3i8TJXo4psF2lgAUpv4/BagImN3kbzKBXY+aA3OoWDJA==
+X-Received: by 2002:a17:902:c64b:b0:16b:d51a:dc24 with SMTP id s11-20020a170902c64b00b0016bd51adc24mr15965401pls.48.1657927087608;
+        Fri, 15 Jul 2022 16:18:07 -0700 (PDT)
+Received: from google.com (123.65.230.35.bc.googleusercontent.com. [35.230.65.123])
+        by smtp.gmail.com with ESMTPSA id f13-20020a170902ce8d00b0016c1a1c1405sm4204066plg.222.2022.07.15.16.18.06
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 15 Jul 2022 16:18:06 -0700 (PDT)
+Date:   Fri, 15 Jul 2022 23:18:03 +0000
+From:   Sean Christopherson <seanjc@google.com>
+To:     Jim Mattson <jmattson@google.com>
 Cc:     Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org,
         linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [PATCH 1/4] KVM: x86: Reject loading KVM if host.PAT[0] != WB
+Message-ID: <YtH1q3C4F+LAEDTf@google.com>
+References: <20220715230016.3762909-1-seanjc@google.com>
+ <20220715230016.3762909-2-seanjc@google.com>
+ <CALMp9eQdzZK4ZAyQZXUWff_zuRRdr=ugkujWfFrt9dP8uFcs=Q@mail.gmail.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CALMp9eQdzZK4ZAyQZXUWff_zuRRdr=ugkujWfFrt9dP8uFcs=Q@mail.gmail.com>
 X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
         ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-        USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=ham
+        USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=unavailable
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -66,16 +72,21 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Jul 15, 2022 at 4:02 PM Sean Christopherson <seanjc@google.com> wrote:
->
-> Reject KVM if entry '0' in the host's IA32_PAT MSR is not programmed to
-> writeback (WB) memtype.  KVM subtly relies on IA32_PAT entry '0' to be
-> programmed to WB by leaving the PAT bits in shadow paging and NPT SPTEs
-> as '0'.  If something other than WB is in PAT[0], at _best_ guests will
-> suffer very poor performance, and at worst KVM will crash the system by
-> breaking cache-coherency expecations (e.g. using WC for guest memory).
->
-> Signed-off-by: Sean Christopherson <seanjc@google.com>
-> ---
-What if someone changes the host's PAT to violate this rule *after*
-kvm is loaded?
+On Fri, Jul 15, 2022, Jim Mattson wrote:
+> On Fri, Jul 15, 2022 at 4:02 PM Sean Christopherson <seanjc@google.com> wrote:
+> >
+> > Reject KVM if entry '0' in the host's IA32_PAT MSR is not programmed to
+> > writeback (WB) memtype.  KVM subtly relies on IA32_PAT entry '0' to be
+> > programmed to WB by leaving the PAT bits in shadow paging and NPT SPTEs
+> > as '0'.  If something other than WB is in PAT[0], at _best_ guests will
+> > suffer very poor performance, and at worst KVM will crash the system by
+> > breaking cache-coherency expecations (e.g. using WC for guest memory).
+> >
+> > Signed-off-by: Sean Christopherson <seanjc@google.com>
+> > ---
+> What if someone changes the host's PAT to violate this rule *after*
+> kvm is loaded?
+
+Then KVM (and probably many other things in the kernel) is hosed.  The same argument
+(that KVM isn't paranoid enough) can likely be made for a number of MSRs and critical
+registers.
