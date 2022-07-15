@@ -2,116 +2,145 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id B527A575B1B
-	for <lists+kvm@lfdr.de>; Fri, 15 Jul 2022 07:56:09 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 3F057575BC3
+	for <lists+kvm@lfdr.de>; Fri, 15 Jul 2022 08:46:01 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229770AbiGOF4I (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 15 Jul 2022 01:56:08 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44868 "EHLO
+        id S231806AbiGOGol (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 15 Jul 2022 02:44:41 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54428 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229456AbiGOF4H (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 15 Jul 2022 01:56:07 -0400
-Received: from gandalf.ozlabs.org (mail.ozlabs.org [IPv6:2404:9400:2221:ea00::3])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4C8AF4F668;
-        Thu, 14 Jul 2022 22:56:04 -0700 (PDT)
-Received: from authenticated.ozlabs.org (localhost [127.0.0.1])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange ECDHE (P-256) server-signature RSA-PSS (4096 bits) server-digest SHA256)
-        (No client certificate requested)
-        by mail.ozlabs.org (Postfix) with ESMTPSA id 4LkgZj5yH2z4xZB;
-        Fri, 15 Jul 2022 15:55:57 +1000 (AEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=canb.auug.org.au;
-        s=201702; t=1657864558;
-        bh=lW0fBGZ83Ym1P4dAAfXAwmwE8gdVd0eRG6eRH+Hgpg4=;
-        h=Date:From:To:Cc:Subject:From;
-        b=ZtWXus4PGlp9lO0wWR0wulhGu0SrVDQdt7t9llUIzRN9t68L6HQ9UXjOtWQFGGVd6
-         G1zT2MEHTVUZJjEGBfRF14l93jnuhR5bOy6Aazn36c5m12+4xS7nmrbajP5GEriRfp
-         091kwMHJVg/OW9+QQwCW4pvxaMwIyyNQVQArqvMc6nXCmqua59m9SAlBWjLHvxJfn6
-         kMgIU86NcRkN6Ye0RIPVDK6gZTLMlWnnrYC3KB+DKYFNCBovXJx5Cf5nuR/rm/CIWr
-         CD5rArz+A0uC+vACDYhlXZRTdleL7d7cHV0JSfsNX26E0KkWY/EFp83kCBuB1G3AaL
-         ZUUt4Zv+CBt4A==
-Date:   Fri, 15 Jul 2022 15:55:56 +1000
-From:   Stephen Rothwell <sfr@canb.auug.org.au>
-To:     Paolo Bonzini <pbonzini@redhat.com>
-Cc:     KVM <kvm@vger.kernel.org>, Chenyi Qiang <chenyi.qiang@intel.com>,
-        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-        Linux Next Mailing List <linux-next@vger.kernel.org>,
-        Tao Xu <tao3.xu@intel.com>, Xiaoyao Li <xiaoyao.li@intel.com>
-Subject: linux-next: manual merge of the kvm tree with the kvm-fixes tree
-Message-ID: <20220715155556.77911cfe@canb.auug.org.au>
+        with ESMTP id S230151AbiGOGoj (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 15 Jul 2022 02:44:39 -0400
+Received: from mail-ua1-x934.google.com (mail-ua1-x934.google.com [IPv6:2607:f8b0:4864:20::934])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 63A8621266
+        for <kvm@vger.kernel.org>; Thu, 14 Jul 2022 23:44:38 -0700 (PDT)
+Received: by mail-ua1-x934.google.com with SMTP id r25so1485557uap.7
+        for <kvm@vger.kernel.org>; Thu, 14 Jul 2022 23:44:38 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=p6aDTSAubguJZg+3J+aZpS+pct8nChj++g4A7S8KF7M=;
+        b=Jnbw9hVnECgNwloAV8Mr84FXTmguVIg5NfAo3mkCvlZ4hKp8wmbAxT8ZXMLH50tbHb
+         2AtcqfP7CDR/M2LkGerzE4RjbEo3t0+wZ9znySMf0cboWxAHISnGNymaU4u4n+DgDwhw
+         xYDBbeKC7uGCempsmTNjSBbKGkPxxwW3Lqd2C0PTh/i165tqfnkbP9i7mbujFw+EPnEZ
+         0W1uYTZ92SNd5HFvJYLmeUvWHvtwMq0ad8SjNTIwuNai2ZMDD4PXZt1XZSsnuQ2QBtGi
+         BNiQD6ngvkYHgXMzozebc4+/+kt2uNmiAg7HN/zBnwKI+0QIme1wAPU4861wQ7qFEZXb
+         9YRg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=p6aDTSAubguJZg+3J+aZpS+pct8nChj++g4A7S8KF7M=;
+        b=Y24+qzM7jKHmPNoRxWsxHA3ObQvDaUmRFbOwCOLgA8EnPBTs3SlAwL2sNdeAH6USOa
+         cSzC7mxcW4sYDnUtkLY56CjhqOhFZ5ny4SvCabYtbYjaeAafmwVRHTKptO+FDIYu+PRj
+         0L+s99c+n964FnxKEy9MB5ZOMSPru4lToZmoKMk5Oov33kpXLAFtjP+z+xwuZOwyBcFX
+         4UG721IsRdHNBUQNHuXC2wXuJbWJmWJEDp9Zv1GSJWF+7loUud/yhu8sc4NUH4Igcd3J
+         YDF6Fhl6M1SWRR9XX5jx0OMyugMQUQdZA5CFnwNGBXIHrANp+6WqpGP7rPQDbRlVb6EM
+         IuUQ==
+X-Gm-Message-State: AJIora+frou+1eB+YgBGDnDiPHimmYTm30qk+zZyzYqP/LV8xg9NkvhQ
+        5Sol+vO+LKQ+JjDryBRzZ46DK21k+vXjNPW73mbWGA==
+X-Google-Smtp-Source: AGRyM1uWE0AM135v8bgmHTfGGyyoJpV55Gqxr8UiXmUhCXS1dGfLbxzAYnRhlP4kgcMpR7lq+JXvgxe6eP5xZy9syp8=
+X-Received: by 2002:a05:6130:90:b0:362:891c:edef with SMTP id
+ x16-20020a056130009000b00362891cedefmr5471902uaf.106.1657867477456; Thu, 14
+ Jul 2022 23:44:37 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: multipart/signed; boundary="Sig_/SccVHT+w0Pg2sOJQu1cOCFD";
- protocol="application/pgp-signature"; micalg=pgp-sha256
-X-Spam-Status: No, score=-2.7 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,RCVD_IN_DNSWL_LOW,SPF_HELO_PASS,SPF_PASS,
-        T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
+References: <20220706164304.1582687-1-maz@kernel.org> <20220706164304.1582687-16-maz@kernel.org>
+ <CAAeT=FzgBpwcf7oEGeCLCHO+XadP+i7vyPFWx6VJxmiWC94-7g@mail.gmail.com> <877d4gyy7y.wl-maz@kernel.org>
+In-Reply-To: <877d4gyy7y.wl-maz@kernel.org>
+From:   Reiji Watanabe <reijiw@google.com>
+Date:   Thu, 14 Jul 2022 23:44:21 -0700
+Message-ID: <CAAeT=FwwO5=v3vLJ0qAw3V0NaPEnPeP1VmgLXXBL4jdm80aeew@mail.gmail.com>
+Subject: Re: [PATCH 15/19] KVM: arm64: vgic-v2: Add helper for legacy
+ dist/cpuif base address setting
+To:     Marc Zyngier <maz@kernel.org>
+Cc:     kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org,
+        Linux ARM <linux-arm-kernel@lists.infradead.org>,
+        Schspa Shi <schspa@gmail.com>, kernel-team@android.com,
+        Oliver Upton <oliver.upton@linux.dev>
+Content-Type: text/plain; charset="UTF-8"
+X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
+        T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
---Sig_/SccVHT+w0Pg2sOJQu1cOCFD
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: quoted-printable
+On Thu, Jul 14, 2022 at 12:01 AM Marc Zyngier <maz@kernel.org> wrote:
+>
+> On Thu, 14 Jul 2022 07:37:25 +0100,
+> Reiji Watanabe <reijiw@google.com> wrote:
+> >
+> > Hi Marc,
+> >
+> > On Wed, Jul 6, 2022 at 10:05 AM Marc Zyngier <maz@kernel.org> wrote:
+> > >
+> > > We carry a legacy interface to set the base addresses for GICv2.
+> > > As this is currently plumbed into the same handling code as
+> > > the modern interface, it limits the evolution we can make there.
+> > >
+> > > Add a helper dedicated to this handling, with a view of maybe
+> > > removing this in the future.
+> > >
+> > > Signed-off-by: Marc Zyngier <maz@kernel.org>
+> > > ---
+> > >  arch/arm64/kvm/arm.c                  | 11 ++-------
+> > >  arch/arm64/kvm/vgic/vgic-kvm-device.c | 32 +++++++++++++++++++++++++++
+> > >  include/kvm/arm_vgic.h                |  1 +
+> > >  3 files changed, 35 insertions(+), 9 deletions(-)
+> > >
+> > > diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
+> > > index 83a7f61354d3..bf39570c0aef 100644
+> > > --- a/arch/arm64/kvm/arm.c
+> > > +++ b/arch/arm64/kvm/arm.c
+> > > @@ -1414,18 +1414,11 @@ void kvm_arch_flush_remote_tlbs_memslot(struct kvm *kvm,
+> > >  static int kvm_vm_ioctl_set_device_addr(struct kvm *kvm,
+> > >                                         struct kvm_arm_device_addr *dev_addr)
+> > >  {
+> > > -       unsigned long dev_id, type;
+> > > -
+> > > -       dev_id = (dev_addr->id & KVM_ARM_DEVICE_ID_MASK) >>
+> > > -               KVM_ARM_DEVICE_ID_SHIFT;
+> > > -       type = (dev_addr->id & KVM_ARM_DEVICE_TYPE_MASK) >>
+> > > -               KVM_ARM_DEVICE_TYPE_SHIFT;
+> > > -
+> > > -       switch (dev_id) {
+> > > +       switch (FIELD_GET(KVM_ARM_DEVICE_ID_MASK, dev_addr->id)) {
+> > >         case KVM_ARM_DEVICE_VGIC_V2:
+> > >                 if (!vgic_present)
+> > >                         return -ENXIO;
+> > > -               return kvm_vgic_addr(kvm, type, &dev_addr->addr, true);
+> > > +               return kvm_set_legacy_vgic_v2_addr(kvm, dev_addr);
+> > >         default:
+> > >                 return -ENODEV;
+> > >         }
+> > > diff --git a/arch/arm64/kvm/vgic/vgic-kvm-device.c b/arch/arm64/kvm/vgic/vgic-kvm-device.c
+> > > index fbbd0338c782..0dfd277b9058 100644
+> > > --- a/arch/arm64/kvm/vgic/vgic-kvm-device.c
+> > > +++ b/arch/arm64/kvm/vgic/vgic-kvm-device.c
+> > > @@ -41,6 +41,38 @@ static int vgic_check_type(struct kvm *kvm, int type_needed)
+> > >                 return 0;
+> > >  }
+> > >
+> > > +int kvm_set_legacy_vgic_v2_addr(struct kvm *kvm, struct kvm_arm_device_addr *dev_addr)
+> > > +{
+> > > +       struct vgic_dist *vgic = &kvm->arch.vgic;
+> > > +       int r;
+> > > +
+> > > +       mutex_lock(&kvm->lock);
+> > > +       switch (FIELD_GET(KVM_ARM_DEVICE_ID_MASK, dev_addr->id)) {
+> >
+> > Shouldn't this be KVM_ARM_DEVICE_TYPE_MASK (not KVM_ARM_DEVICE_ID_MASK) ?
+>
+> Damn, you just ruined my attempt at deprecating this API ;-).
 
-Hi all,
+Oops, I should have pretended not to notice:)
 
-Today's linux-next merge of the kvm tree got a conflict in:
+> More seriously, thanks for catching this one!
 
-  arch/x86/kvm/x86.c
-
-between commit:
-
-  1b870fa5573e ("kvm: stats: tell userspace which values are boolean")
-
-from the kvm-fixes tree and commit:
-
-  2f4073e08f4c ("KVM: VMX: Enable Notify VM exit")
-
-from the kvm tree.
-
-I fixed it up (see below) and can carry the fix as necessary. This
-is now fixed as far as linux-next is concerned, but any non trivial
-conflicts should be mentioned to your upstream maintainer when your tree
-is submitted for merging.  You may also want to consider cooperating
-with the maintainer of the conflicting tree to minimise any particularly
-complex conflicts.
-
---=20
-Cheers,
-Stephen Rothwell
-
-diff --cc arch/x86/kvm/x86.c
-index af0c5b5fc28f,031678eff28e..000000000000
---- a/arch/x86/kvm/x86.c
-+++ b/arch/x86/kvm/x86.c
-@@@ -298,7 -286,8 +286,8 @@@ const struct _kvm_stats_desc kvm_vcpu_s
-  	STATS_DESC_COUNTER(VCPU, directed_yield_successful),
-  	STATS_DESC_COUNTER(VCPU, preemption_reported),
-  	STATS_DESC_COUNTER(VCPU, preemption_other),
-- 	STATS_DESC_IBOOLEAN(VCPU, guest_mode)
- -	STATS_DESC_ICOUNTER(VCPU, guest_mode),
-++	STATS_DESC_IBOOLEAN(VCPU, guest_mode),
-+ 	STATS_DESC_COUNTER(VCPU, notify_window_exits),
-  };
- =20
-  const struct kvm_stats_header kvm_vcpu_stats_header =3D {
-
---Sig_/SccVHT+w0Pg2sOJQu1cOCFD
-Content-Type: application/pgp-signature
-Content-Description: OpenPGP digital signature
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEENIC96giZ81tWdLgKAVBC80lX0GwFAmLRAWwACgkQAVBC80lX
-0GyPGwf/REik8Nq1tANNerJH+9c1LLZv+lA/q798tY3m3LoLHh4jRFCa/JLrl3Eg
-E81b7WAmLUKGMCu2IvKpAh4XObKuvpqVNnntkZZAla1KiRx+EA0pzYXc8g9n37O9
-PIesefM1M5Q/got8zwehj2Ol38887njTWhFzWitNC67aCe59XInzKrEGD8I0JxoZ
-8YvjrUmEuE8ssX1BfensqdwsM3UptAhQrxqukPQJWH1/M2CXQlGBJp0qP0+nSp/9
-+miabahe7NXaheBLhb2IKEDkRtM1RBeyGaOHL4z6j0wKNxzPkP/lFnJhQ6dNfaUb
-RSGRNj5PonFhQCI/bMnX0SFdlwKktA==
-=p/EE
------END PGP SIGNATURE-----
-
---Sig_/SccVHT+w0Pg2sOJQu1cOCFD--
+Thank you for cleaning up the code so much!
+Reiji
