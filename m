@@ -2,87 +2,128 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id C51AA575F21
-	for <lists+kvm@lfdr.de>; Fri, 15 Jul 2022 12:08:51 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id B937857609C
+	for <lists+kvm@lfdr.de>; Fri, 15 Jul 2022 13:35:31 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234434AbiGOKIs (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 15 Jul 2022 06:08:48 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43760 "EHLO
+        id S232515AbiGOLfa (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 15 Jul 2022 07:35:30 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58370 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233854AbiGOKIS (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 15 Jul 2022 06:08:18 -0400
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9673887C18
-        for <kvm@vger.kernel.org>; Fri, 15 Jul 2022 03:06:52 -0700 (PDT)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id 2DC80621FD
-        for <kvm@vger.kernel.org>; Fri, 15 Jul 2022 10:06:52 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8A744C34115;
-        Fri, 15 Jul 2022 10:06:51 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1657879611;
-        bh=N6XR6hU9xbp0IA+LXBFd/F2FgKNUufttOOOMm1SU3Q4=;
-        h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=UoNAH789eMR64DTe+ttG2yQlzTFq3gbMozTd8BkU/iLEoU6DysqkPwzEji9ast5bQ
-         +EyNVkNAQuH5VsDSqSgPb66le8PeGAF7gW+OGytvi/C2qevoTGwAOO8zId7FzVCWEB
-         QeFDU68BBgp+QuL/LJ+pBbdJrMoNXTmatnigdGgxZY1ExEJveZMdAEOgaMyGKoa4GL
-         rrDj5GLL1bzu8BD7+m+AqcRK37dZwP/pATBmRYEWo2NY77fr7UtiZZOzGmVkmvHsS4
-         KuTDioF+oeRADMGFOt+qRl+Pqoa/mF1YMH7zZuCBVUgHoKHDWpXOAnZdq7NGoyUFH0
-         QBelhk+NsCh9w==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
-        by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-        (Exim 4.95)
-        (envelope-from <maz@kernel.org>)
-        id 1oCIDh-007edL-Bz;
-        Fri, 15 Jul 2022 11:06:49 +0100
-From:   Marc Zyngier <maz@kernel.org>
-To:     Marc Zyngier <maz@kernel.org>, kvmarm@lists.cs.columbia.edu,
-        linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org
-Cc:     James Morse <james.morse@arm.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
-        Oliver Upton <oliver.upton@linux.dev>,
-        Alexandru Elisei <alexandru.elisei@arm.com>,
-        Ricardo Koller <ricarkol@google.com>
-Subject: Re: [PATCH] KVM: arm64: selftests: Add support for GICv2 on v3
-Date:   Fri, 15 Jul 2022 11:06:46 +0100
-Message-Id: <165787958336.3532416.361922683569453134.b4-ty@kernel.org>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <20220714154108.3531213-1-maz@kernel.org>
-References: <20220714154108.3531213-1-maz@kernel.org>
+        with ESMTP id S229978AbiGOLf2 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 15 Jul 2022 07:35:28 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 564074D831
+        for <kvm@vger.kernel.org>; Fri, 15 Jul 2022 04:35:23 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1657884922;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=LqiZ2BH3t6nZQUEw5FLpGzjxGjfx9YKB6EQJtDup9/U=;
+        b=DAQl6yno/T/MhUpjZS0lgx7oLqWn594QyCAEVAELAj9rBc16TkOuOgEzGJ50WzAzLY7iHi
+        te7Bm0umtGWtG0R5G7QWL+sVqszrHgWQAOLJ47D2c0JNt08kBTf/Mfp9nWg06WHcSckUTJ
+        XBiDzuGpxxBOWGotqZZ+7yoT5M8ezuo=
+Received: from mail-ej1-f69.google.com (mail-ej1-f69.google.com
+ [209.85.218.69]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-599-fjGi2yaOMWCDbNu0lXpHsA-1; Fri, 15 Jul 2022 07:35:21 -0400
+X-MC-Unique: fjGi2yaOMWCDbNu0lXpHsA-1
+Received: by mail-ej1-f69.google.com with SMTP id sb15-20020a1709076d8f00b0072b692d938cso1441914ejc.10
+        for <kvm@vger.kernel.org>; Fri, 15 Jul 2022 04:35:21 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:message-id:date:mime-version:user-agent
+         :content-language:to:cc:references:from:subject:in-reply-to
+         :content-transfer-encoding;
+        bh=LqiZ2BH3t6nZQUEw5FLpGzjxGjfx9YKB6EQJtDup9/U=;
+        b=v0gONshXkJ4cp+Uzq48VGg7gftRFrnIbtiOHK4ZgHsYeHT0Ee/JRcjpw/wIKcOja50
+         Zt4g2JqZD+k9obaTzhWD+GPSrdkZ3ZOoNI+OVrRCH2ef4iFH78MFMmEgdLVR1Mn9KSNS
+         2mAHw3Wx9LqTE2IfGxuLNd3iqrPnlxhTZ5/BrvLGrjfoKlAqrWT/QZuFIPtrhbvgJnkR
+         O6kVlf2zGIAy68Pg/AJAJOSbQ1k3yZgNXpMQ3Mx95F+sxZ6GPd1nT9B+te9KDaMIq1oe
+         RCYp4l5zs+dT3JER5zxfOspstltZc+eLZi7ZJw+w0VaUGAyyy95Uoea3b4TfNsgh1y3o
+         Iy7Q==
+X-Gm-Message-State: AJIora/3qBN6gprvnZhjz2ZyJWCx+6UvQ9D2Q65TAU5bLJ7vfA2R7fcx
+        EZQREYZ+jvwbUogxMCB2bTjq6xc2p/LRYjlORA8MmY7krchWg0/XbrazuuqJkK56xxACyQgKMno
+        QxtqBFyX/MZQp
+X-Received: by 2002:a17:906:106:b0:722:d84c:6df0 with SMTP id 6-20020a170906010600b00722d84c6df0mr13298267eje.203.1657884919862;
+        Fri, 15 Jul 2022 04:35:19 -0700 (PDT)
+X-Google-Smtp-Source: AGRyM1tKNjtas+bHjgEhFzyt+2Qnh9h2GuUxR+sU4F7JpDtHGRCeQrtjcgsEPD04deI4nscwAsU8fQ==
+X-Received: by 2002:a17:906:106:b0:722:d84c:6df0 with SMTP id 6-20020a170906010600b00722d84c6df0mr13298252eje.203.1657884919540;
+        Fri, 15 Jul 2022 04:35:19 -0700 (PDT)
+Received: from ?IPV6:2001:b07:6468:f312:9af8:e5f5:7516:fa89? ([2001:b07:6468:f312:9af8:e5f5:7516:fa89])
+        by smtp.googlemail.com with ESMTPSA id 10-20020a170906318a00b0072aac739089sm1942032ejy.98.2022.07.15.04.35.17
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 15 Jul 2022 04:35:18 -0700 (PDT)
+Message-ID: <7b3ccb3e-174b-6f31-d875-452082262906@redhat.com>
+Date:   Fri, 15 Jul 2022 13:35:16 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 8bit
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: maz@kernel.org, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org, james.morse@arm.com, suzuki.poulose@arm.com, oliver.upton@linux.dev, alexandru.elisei@arm.com, ricarkol@google.com
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
-X-Spam-Status: No, score=-7.7 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_HI,
-        SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.10.0
+Content-Language: en-US
+To:     Linus Torvalds <torvalds@linux-foundation.org>,
+        Peter Zijlstra <peterz@infradead.org>
+Cc:     Boris Petkov <bp@alien8.de>, Guenter Roeck <linux@roeck-us.net>,
+        Thadeu Lima de Souza Cascardo <cascardo@canonical.com>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        Naresh Kamboju <naresh.kamboju@linaro.org>,
+        Florian Fainelli <f.fainelli@gmail.com>,
+        kvm list <kvm@vger.kernel.org>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        Dave Hansen <dave.hansen@linux.intel.com>,
+        stable <stable@vger.kernel.org>,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+        Pavel Machek <pavel@denx.de>,
+        Jon Hunter <jonathanh@nvidia.com>,
+        Sudip Mukherjee <sudipm.mukherjee@gmail.com>,
+        Slade Watkins <slade@sladewatkins.com>, patches@kernelci.org,
+        Sean Christopherson <seanjc@google.com>,
+        Shuah Khan <shuah@kernel.org>, Ingo Molnar <mingo@redhat.com>,
+        Thomas Gleixner <tglx@linutronix.de>, X86 ML <x86@kernel.org>,
+        lkft-triage@lists.linaro.org,
+        =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>,
+        "H. Peter Anvin" <hpa@zytor.com>,
+        Anders Roxell <anders.roxell@linaro.org>
+References: <20220712183238.844813653@linuxfoundation.org>
+ <CA+G9fYtntg7=zWSs-dm+n_AUr_u0eBOU0zrwWqMeXZ+SF6_bLw@mail.gmail.com>
+ <eb63e4ce-843f-c840-060e-6e15defd3c4d@roeck-us.net>
+ <CAHk-=wj5cOA+fbGeV15kvwe6YGT54Wsk8F2UGoekVQLTPJz_pw@mail.gmail.com>
+ <CAHk-=wgq1soM4gudypWLVQdYuvJbXn38LtvJMtnLZX+RTypqLg@mail.gmail.com>
+ <Ys/bYJ2bLVfNBjFI@nazgul.tnic>
+ <6b4337f4-d1de-7ba3-14e8-3ad0f9b18788@redhat.com>
+ <8BEC3365-FC09-46C5-8211-518657C0308E@alien8.de>
+ <CAHk-=wj4vtoWZPMXJU-B9qW1zLHsoA1Qb2P0NW=UFhZmrCrf9Q@mail.gmail.com>
+ <YtBQutgSh2j3mFNB@worktop.programming.kicks-ass.net>
+ <CAHk-=wjAouqJQ=C4XZVUmWEV9kerNzbOkK9OeErpHshNkcR=gQ@mail.gmail.com>
+ <CAHk-=whYia1fnjJFiJ59xZv4ROqqTfG4crQNWxb71JYJf5B-Lg@mail.gmail.com>
+From:   Paolo Bonzini <pbonzini@redhat.com>
+Subject: Re: [PATCH 5.15 00/78] 5.15.55-rc1 review
+In-Reply-To: <CAHk-=whYia1fnjJFiJ59xZv4ROqqTfG4crQNWxb71JYJf5B-Lg@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Spam-Status: No, score=-3.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
+        RCVD_IN_DNSWL_LOW,SPF_HELO_NONE,SPF_NONE autolearn=unavailable
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, 14 Jul 2022 16:41:08 +0100, Marc Zyngier wrote:
-> The current vgic_init test wrongly assumes that the host cannot
-> multiple versions of the GIC architecture, while v2 emulation
-> on v3 has almost always been supported (it was supported before
-> the standalone v3 emulation).
+On 7/14/22 20:16, Linus Torvalds wrote:
+> Oh, btw, how bad would it be to just do
 > 
-> Tweak the test to support multiple GIC incarnations.
+>      #define FASTOP_SIZE 16
+>      static_assert(FASTOP_SIZE >= FASTOP_LENGTH)
 
-Applied to next, thanks!
+Yeah, for 32 I might have some (probably irrational) qualms, but 16 is 
+not worth the trouble.
 
-[1/1] KVM: arm64: selftests: Add support for GICv2 on v3
-      commit: 6a4f7fcd750497cb2fa870f799e8b23270bec6e3
+Given 3 bytes for ENDBR, 5 for the return thunk and 1 for the straight 
+line speculation INT3, there are 7 bytes left and only 4 are currently 
+used (for instructions encoded as "66 0f xx xx").  So FASTOP_SIZE at 
+SETCC_ALIGN can indeed be 16 unconditionally.
 
-Cheers,
-
-	M.
--- 
-Marc Zyngier <maz@kernel.org>
+Paolo
 
