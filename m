@@ -2,70 +2,66 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 036D95763D3
-	for <lists+kvm@lfdr.de>; Fri, 15 Jul 2022 16:47:47 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 8D07B57640A
+	for <lists+kvm@lfdr.de>; Fri, 15 Jul 2022 17:04:59 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232923AbiGOOrn (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 15 Jul 2022 10:47:43 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35562 "EHLO
+        id S232477AbiGOPE5 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 15 Jul 2022 11:04:57 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46040 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230359AbiGOOrm (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 15 Jul 2022 10:47:42 -0400
-Received: from mail-pj1-x1032.google.com (mail-pj1-x1032.google.com [IPv6:2607:f8b0:4864:20::1032])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7223576943
-        for <kvm@vger.kernel.org>; Fri, 15 Jul 2022 07:47:41 -0700 (PDT)
-Received: by mail-pj1-x1032.google.com with SMTP id v4-20020a17090abb8400b001ef966652a3so11723947pjr.4
-        for <kvm@vger.kernel.org>; Fri, 15 Jul 2022 07:47:41 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=3tUNFb/MgVcjx+q+xnHzJmvjWkinIDyAxRghu8rwyXg=;
-        b=Rym6NMECh44r0rwd+1g0imZUyyBEkDdo3kxGbrMPCZFbCbLl/8BZolpTX8W+VAh9J4
-         LD7SKH80SdA/NeNTOJFsfxYM8GTz1SGNA0gP0NIwSRANXAG0FNukKoxH1KK97dQAdNdZ
-         8wD6skWaNDKebwz+6vNNVeNOvyVxqY0MWM2VLATFbOa72eeqbsLdt8PujtPqPaJ0jmHm
-         9Vd+jdFjPnQF0klX7fMRdkrRegi+DQc/Vz8loSDSwCry9LFXOU5I3DsNPpjtNIZJPACo
-         tv6/7lXuWQA3HOUAH5sR1YEVV3j6ZJzbWs2uSZxZWowxWWMiXS/qdJtnKJABP3YCVV4n
-         fVSQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=3tUNFb/MgVcjx+q+xnHzJmvjWkinIDyAxRghu8rwyXg=;
-        b=I55eGhPUFwhZUSzuCKxNhfhCO1dMkwTFcEcwLmkdpNTiXuZzyDZgJf8JjqWYJF1MyG
-         VJbnlfDdFxI7xzOz5y506wBoFdVTE5xMUXhycd1Ncx2pGKQtMLrpiBBm5LA3Hw8FqHQP
-         kfE3Z5HRZdnR7lzLLh2EmMeZCzr0IjKBHQEfzBNaVTX8+56gMVLy11QydhB7euiQpXcG
-         zccAZLhkJ+kCPxSAnd020QrohtQP635SDRc+SFLH1EuqBFt+1o5GTIfCEdvxrU1SqIlM
-         8HadVGo0eT7w84nKooqRM1fO5U6hmgn8aadAceIKRn3SSissuXcPhdtpIeVUg5cx9x4w
-         zzxw==
-X-Gm-Message-State: AJIora/j8bVDQn03LBF9ODnpdcPWUH0ODziFvzAG2GnznMCYzH9NSzJE
-        jUK72blV9v2Kp8+gNMOs0cMmdw==
-X-Google-Smtp-Source: AGRyM1s+NPdiYftBQZwlpnh1yi1YFLFqWcXd2bsDwLI/KbcXrV5CTmR6Cwvi9UcyTn2+4UBAiJ4TEw==
-X-Received: by 2002:a17:902:b612:b0:16c:7e2d:ff39 with SMTP id b18-20020a170902b61200b0016c7e2dff39mr12737288pls.111.1657896460825;
-        Fri, 15 Jul 2022 07:47:40 -0700 (PDT)
-Received: from google.com (123.65.230.35.bc.googleusercontent.com. [35.230.65.123])
-        by smtp.gmail.com with ESMTPSA id e2-20020a17090a118200b001ef3f85d1aasm5821172pja.9.2022.07.15.07.47.40
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 15 Jul 2022 07:47:40 -0700 (PDT)
-Date:   Fri, 15 Jul 2022 14:47:36 +0000
-From:   Sean Christopherson <seanjc@google.com>
-To:     Yu Zhang <yu.c.zhang@linux.intel.com>
-Cc:     pbonzini@redhat.com, vkuznets@redhat.com, jmattson@google.com,
-        joro@8bytes.org, wanpengli@tencent.com, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-Subject: Re: [PATCH 1/2] KVM: X86: Initialize 'fault' in
- kvm_fixup_and_inject_pf_error().
-Message-ID: <YtF+CF2FkS7Ho1d5@google.com>
-References: <20220715114211.53175-1-yu.c.zhang@linux.intel.com>
- <20220715114211.53175-2-yu.c.zhang@linux.intel.com>
+        with ESMTP id S232296AbiGOPEx (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 15 Jul 2022 11:04:53 -0400
+Received: from mga17.intel.com (mga17.intel.com [192.55.52.151])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 43AC522289;
+        Fri, 15 Jul 2022 08:04:51 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1657897491; x=1689433491;
+  h=message-id:date:mime-version:subject:to:cc:references:
+   from:in-reply-to:content-transfer-encoding;
+  bh=7CJJdeLyKxz97YNZKtxxG3SsfUPcSChfHIJSt0wgaIA=;
+  b=nrbM7SI+LcecaoyYS1N2u3S7tlNUkQ/sbAIebJhU+wj+TedOWH/07IHh
+   yZ3vFYETuvW/QnV0tu7rG0brMgSbBxdVOlyyEulh8d69ebxBavvhMsnhh
+   i4eWc8CVUj/TkDILuSL7NBGkfAKSVce1G4LD58kEeXNq7vYVGorev+tap
+   34o1jIvd6faLLQ/A5Z9tJbyVn6Zocfg0/D1LlKzOUePFe1XRg8tM5HVSC
+   tNCpcuhVygg78bbCs6OIyAaFiTMEKjt03uedVeZgycjVOn+CKfDEAvA/b
+   M57fJMtMjlIiQgphsYcb6CC2RW2jlhxNY5pJcCngqMpJPDj2ol5sRXDz7
+   w==;
+X-IronPort-AV: E=McAfee;i="6400,9594,10408"; a="266227244"
+X-IronPort-AV: E=Sophos;i="5.92,274,1650956400"; 
+   d="scan'208";a="266227244"
+Received: from orsmga008.jf.intel.com ([10.7.209.65])
+  by fmsmga107.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 15 Jul 2022 08:04:50 -0700
+X-IronPort-AV: E=Sophos;i="5.92,274,1650956400"; 
+   d="scan'208";a="623884439"
+Received: from yangweij-mobl.ccr.corp.intel.com (HELO [10.249.173.193]) ([10.249.173.193])
+  by orsmga008-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 15 Jul 2022 08:04:47 -0700
+Message-ID: <950988cd-708c-af25-9d0e-47062aded504@intel.com>
+Date:   Fri, 15 Jul 2022 23:04:37 +0800
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20220715114211.53175-2-yu.c.zhang@linux.intel.com>
-X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-        USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=ham
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:91.0) Gecko/20100101
+ Thunderbird/91.11.0
+Subject: Re: [PATCH 00/19] Refresh queued CET virtualization series
+Content-Language: en-US
+To:     Sean Christopherson <seanjc@google.com>
+Cc:     Paolo Bonzini <pbonzini@redhat.com>,
+        Peter Zijlstra <peterz@infradead.org>, x86@kernel.org,
+        kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+        rick.p.edgecombe@intel.com
+References: <20220616084643.19564-1-weijiang.yang@intel.com>
+ <YqsB9upUystxvl+d@hirez.programming.kicks-ass.net>
+ <62d4f7f0-e7b2-83ad-a2c7-a90153129da2@redhat.com>
+ <Yqs7qjjbqxpw62B/@hirez.programming.kicks-ass.net>
+ <8a38488d-fb6e-72f9-3529-b098a97d8c97@redhat.com>
+ <2855f8a9-1f77-0265-f02c-b7d584bd8990@intel.com>
+ <YtBwRIiZi262hHiE@google.com>
+From:   "Yang, Weijiang" <weijiang.yang@intel.com>
+In-Reply-To: <YtBwRIiZi262hHiE@google.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Spam-Status: No, score=-5.0 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
+        RCVD_IN_DNSWL_MED,SPF_HELO_NONE,SPF_NONE autolearn=ham
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -73,71 +69,69 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Jul 15, 2022, Yu Zhang wrote:
-> kvm_fixup_and_inject_pf_error() was introduced to fixup the error code(
-> e.g., to add RSVD flag) and inject the #PF to the guest, when guest
-> MAXPHYADDR is smaller than the host one.
-> 
-> When it comes to nested, L0 is expected to intercept and fix up the #PF
-> and then inject to L2 directly if
-> - L2.MAXPHYADDR < L0.MAXPHYADDR and
-> - L1 has no intention to intercept L2's #PF (e.g., L2 and L1 have the
->   same MAXPHYADDR value && L1 is using EPT for L2),
-> instead of constructing a #PF VM Exit to L1. Currently, with PFEC_MASK
-> and PFEC_MATCH both set to 0 in vmcs02, the interception and injection
-> may happen on all L2 #PFs.
-> 
-> However, failing to initialize 'fault' in kvm_fixup_and_inject_pf_error()
-> may cause the fault.async_page_fault being NOT zeroed, and later the #PF
-> being treated as a nested async page fault, and then being injected to L1.
-> So just fix it by initialize the 'fault' value in the beginning.
 
-Ouch.
+On 7/15/2022 3:36 AM, Sean Christopherson wrote:
+> On Sat, Jun 18, 2022, Yang, Weijiang wrote:
+>> On 6/16/2022 11:28 PM, Paolo Bonzini wrote:
+>>> If you build with !X86_KERNEL_IBT, KVM can still rely on the FPU state
+>>> for U_CET state, and S_CET is saved/restored via the VMCS independent of
+>>> X86_KERNEL_IBT.
+>> A fundamental question is, should KVM always honor host CET enablement
+>> before expose the feature to guest? i.e., check X86_KERNEL_IBT and
+>> X86_SHADOW_STACK.
+> If there is a legitimate use case to NOT require host enablement and it's 100%
+> safe to do so (within requiring hacks to the core kernel), then there's no hard
+> requirement that says KVM can't virtualize a feature that's not used by the host.
 
-> Fixes: 897861479c064 ("KVM: x86: Add helper functions for illegal GPA checking and page fault injection")
-> Bugzilla: https://bugzilla.kernel.org/show_bug.cgi?id=216178
-> Reported-by: Yang Lixiao <lixiao.yang@intel.com>
-> Signed-off-by: Yu Zhang <yu.c.zhang@linux.intel.com>
-> ---
->  arch/x86/kvm/x86.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
-> 
-> diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-> index 031678eff28e..3246b3c9dfb3 100644
-> --- a/arch/x86/kvm/x86.c
-> +++ b/arch/x86/kvm/x86.c
-> @@ -12983,7 +12983,7 @@ EXPORT_SYMBOL_GPL(kvm_spec_ctrl_test_value);
->  void kvm_fixup_and_inject_pf_error(struct kvm_vcpu *vcpu, gva_t gva, u16 error_code)
->  {
->  	struct kvm_mmu *mmu = vcpu->arch.walk_mmu;
-> -	struct x86_exception fault;
-> +	struct x86_exception fault = {0};
->  	u64 access = error_code &
->  		(PFERR_WRITE_MASK | PFERR_FETCH_MASK | PFERR_USER_MASK);
+Yeah, CET definitely can be virtualized without considering host usages, 
+but to make things
 
-As stupid as it may be to intentionally not fix the uninitialized data in a robust
-way, I'd actually prefer to manually clear fault.async_page_fault instead of
-zero-initializing the struct.  Unlike a similar bug fix in commit 159e037d2e36
-("KVM: x86: Fully initialize 'struct kvm_lapic_irq' in kvm_pv_kick_cpu_op()"),
-this code actually cares about async_page_fault being false as opposed to just
-being _initialized_.
+easier, still back on some kind of host side support, e.g., xsaves.
 
-And if another field is added to struct x86_exception in the future, leaving the
-struct uninitialized means that if such a patch were to miss this case, running
-with various sanitizers should in theory be able to detect such a bug.  I suspect
-no one has found this with syzkaller due to the need to opt into running with
-allow_smaller_maxphyaddr=1.
+>
+> It's definitely uncommon; unless I'm forgetting features, LA57 is the only feature
+> that KVM fully virtualizes (as opposed to emulates in software) without requiring
+> host enablement.  Ah, and good ol' MPX, which is probably the best prior are since
+> it shares the same XSAVE+VMCS for user+supervisor state management.  So more than
+> one, but still not very many.
 
-diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-index f389691d8c04..aeed737b55c2 100644
---- a/arch/x86/kvm/x86.c
-+++ b/arch/x86/kvm/x86.c
-@@ -12996,6 +12996,7 @@ void kvm_fixup_and_inject_pf_error(struct kvm_vcpu *vcpu, gva_t gva, u16 error_c
-                fault.error_code = error_code;
-                fault.nested_page_fault = false;
-                fault.address = gva;
-+               fault.async_page_fault = false;
-        }
-        vcpu->arch.walk_mmu->inject_page_fault(vcpu, &fault);
- }
+Speaking of MPX, is it really active in recent kernel? I can find little 
+piece of code at native side,
+
+instead, more code in KVM.
+
+>
+> But, requiring host "support" is the de facto standard largely because features
+> tend to fall into one of three categories:
+>
+>    1. The feature is always available, i.e. doesn't have a software enable/disable
+>       flag.
+>
+>    2. The feature isn't explicitly disabled in cpufeatures / x86_capability even
+>       if it's not used by the host.  E.g. MONITOR/MWAIT comes to mind where the
+>       host can be configured to not use MWAIT for idle, but it's still reported
+>       as supported (and for that case, KVM does have to explicitly guard against
+>       X86_BUG_MONITOR).
+>
+>    3. Require some amount of host support, e.g. exposing XSAVE without the kernel
+>       knowing how to save/restore all that state wouldn't end well.
+
+CET may fall into one of the three or combination of them :-), depending 
+on the complexity
+
+of the implementation.
+
+>
+> In other words, virtualizing a feature if it's disabled in the host is allowed,
+> but it's rare because there just aren't many features where doing so is possible
+> _and_ necessary.
+
+I'm thinking of tweaking the patches to construct a safe yet flexible 
+solution based on
+
+a bunch of MSRs/CPUIDs/VMCS fields/XSAVES elements + a few host side 
+constraints.
+
+Thanks for the enlightenment!
+
 
