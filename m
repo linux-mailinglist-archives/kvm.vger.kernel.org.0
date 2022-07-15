@@ -2,58 +2,58 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id BF212576A0A
-	for <lists+kvm@lfdr.de>; Sat, 16 Jul 2022 00:43:05 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id DC746576A12
+	for <lists+kvm@lfdr.de>; Sat, 16 Jul 2022 00:43:34 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232445AbiGOWnC (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 15 Jul 2022 18:43:02 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44476 "EHLO
+        id S230179AbiGOWnF (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 15 Jul 2022 18:43:05 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44504 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231814AbiGOWmj (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 15 Jul 2022 18:42:39 -0400
+        with ESMTP id S229803AbiGOWmq (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 15 Jul 2022 18:42:46 -0400
 Received: from mail-pl1-x64a.google.com (mail-pl1-x64a.google.com [IPv6:2607:f8b0:4864:20::64a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0CC7182F9B
-        for <kvm@vger.kernel.org>; Fri, 15 Jul 2022 15:42:39 -0700 (PDT)
-Received: by mail-pl1-x64a.google.com with SMTP id d10-20020a170902ceca00b0016bea2dc145so2715371plg.7
-        for <kvm@vger.kernel.org>; Fri, 15 Jul 2022 15:42:39 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 53E9C33E0F
+        for <kvm@vger.kernel.org>; Fri, 15 Jul 2022 15:42:41 -0700 (PDT)
+Received: by mail-pl1-x64a.google.com with SMTP id f7-20020a170902ce8700b0016cb1f2298fso2744026plg.18
+        for <kvm@vger.kernel.org>; Fri, 15 Jul 2022 15:42:41 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
         h=reply-to:date:in-reply-to:message-id:mime-version:references
          :subject:from:to:cc;
-        bh=YUNiTgLPlTD8QV7YwB9Lsk9uX244WLJ/qPBCKSza37Q=;
-        b=IEIzxaU10/GgaiEDgvEaEQUdhsFDRh726RllkQBTvaIzeUYiYjOq9O/4cKSO3yn1av
-         fjwH3yERNl2ZmXcYEB3qpBbLg/4GYMzC+lEQ8X4D0FxzjlRyExjLfSrJh18dIHgs9KQ9
-         +IZCQyxjPSJWnHpauWOjHmGeLLQYHXmmm2hnJfEP9L0J3qyq1i92wVYnfgaYwt1PODDB
-         dtONou66ojHYah8BSF1Dk+tphN285ve7P7oKJEIpR0mBL4SkFy7ibQhNIeMAuVJz2v+g
-         0USILFSaWh46CBozYPJQz+HteVHmIU5KXBf/foany0yNV2QvMdDpW3nEySBhFbDCpqfE
-         eWMw==
+        bh=nKZwU46tdd0WaDHu+Sg6LY1gpa1IBSzjRW6H5zeHce8=;
+        b=bSXNdd3WOjzzjC176GBV0psJgli8IOnDsDSF2Ez847DKaoyUXd85e8lrBf4zqRtV6z
+         67psHhfOruNhY60EkxhLGSh7tX/CNDye7qz+c3c9n742Jb4XS+KiT+yZv2SjvASRtBm7
+         iGBoLHF+lJuT8pVwcfLh1VVAkQhGIvC2hOJTXFaSGLLpOJxvEHzCWb11apE7DnEj2hrc
+         fODXS9LcfjYHUM/m6+dDAfueMRO2RA7VJSBQPmIrRHJAwkACw7gONdYFVdry9N82OkSX
+         q+oBObB0R5w9WX4WsAGFkr8cSFa2jQTK2g+EbwP5dGo02RATkZK6eOXrHB2/SkmAclkz
+         gPSA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:reply-to:date:in-reply-to:message-id
          :mime-version:references:subject:from:to:cc;
-        bh=YUNiTgLPlTD8QV7YwB9Lsk9uX244WLJ/qPBCKSza37Q=;
-        b=XD5XoJV0ZS/JmSSAUOExlbhjJ3Bv4I6y3YQFmwsdaO+ClQFm3eA7iayoVnQ2Thwxtx
-         juapXyHRk1Xyv+lfdOGEDcXC9v9Se7g45eVR6G0P9u2BQzM/XLTxwag7Uozn77BWMuMc
-         3uiklB4gAbLxoYGxImLjOs0LtBJo/I+gwU0nDviONRupzdIZLW6zjqIkSVEg9X9FZ6N8
-         5SCh9melp3Dh2MVMfMesecuKOU5BfrJIB8of0GlrHlc5jGtwHbKAneqxDFccPuE+/RZM
-         W5wGFnSvTEXU2RvRVXRBRCOMrYyj9QKrOrIsEbzezpcpIW2rOvleWYV8lYE1ve/8MIvW
-         YL1A==
-X-Gm-Message-State: AJIora/lL0+rVW0qpoqxqFUhcEhJrDoA8zsqXNTbGPf95QBo/G9bpgBF
-        93g79VJL6EpGT1wD5KdYfWzzJ+O2dlg=
-X-Google-Smtp-Source: AGRyM1sXZxYSvsaFGZilN07gFLC+EzEuB3h5XG2oq27eh58j9hdmAtoxmikPALQXg9NtxhdEJXKodqTUEHo=
+        bh=nKZwU46tdd0WaDHu+Sg6LY1gpa1IBSzjRW6H5zeHce8=;
+        b=YuOsjnhN3RUh+F7Gp2CaI0kw/LHAKillD+DF0D8l9qspw/mFSfMNG+pk+M69ZjILKX
+         3FVxyNSobvthfA8NNe8f7wP2/xFuwLMHjiRW9oO7Mq3wbq5wcB0EdVw3mD3N4Wugz8bW
+         HeOgNSUkt8jThydBXrsdCJEirGZrXJxIqYjpDUCSDJlgaJqXjqcH8B6fMabg+f+EpsLN
+         GHLkHaNQQBnBU0TFZdg0TWG/067Giqb8/Ix7pV5BayOvsLB/xWbB1mDdMe221gkmo09G
+         ZRDahv3mxswt0vC1FpE7fKFnMO+qnSF/YL6KEqRJAZ+6KUH6qhQsrxRe+IpIoA5krVid
+         8qGg==
+X-Gm-Message-State: AJIora+LP/LD+EUEgrIUIMMPcWu48hlKWHrSfU83dVL9p2LDU9B7olMM
+        C15oLeKr3cXWdXlXkH+NIpyqZsuBP5A=
+X-Google-Smtp-Source: AGRyM1ujBRNucPizZy2wMsMB7RSXuyXOVOMKIo4vbG8VnH3PpfY+Ru5iTJWa89ooGQKngLh4mbMUKXpoB90=
 X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a17:902:b785:b0:16b:d978:3899 with SMTP id
- e5-20020a170902b78500b0016bd9783899mr15693788pls.109.1657924958641; Fri, 15
- Jul 2022 15:42:38 -0700 (PDT)
+ (user=seanjc job=sendgmr) by 2002:a17:90a:b00b:b0:1f1:6023:dacd with SMTP id
+ x11-20020a17090ab00b00b001f16023dacdmr2731540pjq.184.1657924960839; Fri, 15
+ Jul 2022 15:42:40 -0700 (PDT)
 Reply-To: Sean Christopherson <seanjc@google.com>
-Date:   Fri, 15 Jul 2022 22:42:23 +0000
+Date:   Fri, 15 Jul 2022 22:42:24 +0000
 In-Reply-To: <20220715224226.3749507-1-seanjc@google.com>
-Message-Id: <20220715224226.3749507-5-seanjc@google.com>
+Message-Id: <20220715224226.3749507-6-seanjc@google.com>
 Mime-Version: 1.0
 References: <20220715224226.3749507-1-seanjc@google.com>
 X-Mailer: git-send-email 2.37.0.170.g444d1eabd0-goog
-Subject: [PATCH v2 4/7] KVM: x86/mmu: Rename __kvm_zap_rmaps() to align with
- other nomenclature
+Subject: [PATCH v2 5/7] KVM: x86/mmu: Rename rmap zap helpers to eliminate
+ "unmap" wrapper
 From:   Sean Christopherson <seanjc@google.com>
 To:     Sean Christopherson <seanjc@google.com>,
         Paolo Bonzini <pbonzini@redhat.com>
@@ -61,7 +61,7 @@ Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
 X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL autolearn=ham
+        SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL autolearn=unavailable
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -69,45 +69,64 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Rename __kvm_zap_rmaps() to kvm_rmap_zap_gfn_range() to avoid future
-confusion with a soon-to-be-introduced __kvm_zap_rmap().  Using a plural
-"rmaps" is somewhat ambiguous without additional context, as it's not
-obvious whether it's referring to multiple rmap lists, versus multiple
-rmap entries within a single list.
-
-Use kvm_rmap_zap_gfn_range() to align with the pattern established by
-kvm_rmap_zap_collapsible_sptes(), without losing the information that it
-zaps only rmap-based MMUs, i.e. don't rename it to __kvm_zap_gfn_range().
+Rename kvm_unmap_rmap() and kvm_zap_rmap() to kvm_zap_rmap() and
+__kvm_zap_rmap() respectively to show that what was the "unmap" helper is
+just a wrapper for the "zap" helper, i.e. that they do the exact same
+thing, one just exists to deal with its caller passing in more params.
 
 No functional change intended.
 
 Signed-off-by: Sean Christopherson <seanjc@google.com>
 ---
- arch/x86/kvm/mmu/mmu.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+ arch/x86/kvm/mmu/mmu.c | 16 ++++++++--------
+ 1 file changed, 8 insertions(+), 8 deletions(-)
 
 diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
-index fec999d2fc13..61c32d8d1f6d 100644
+index 61c32d8d1f6d..00be88e0a5f7 100644
 --- a/arch/x86/kvm/mmu/mmu.c
 +++ b/arch/x86/kvm/mmu/mmu.c
-@@ -5982,7 +5982,7 @@ void kvm_mmu_uninit_vm(struct kvm *kvm)
- 	mmu_free_vm_memory_caches(kvm);
+@@ -1383,17 +1383,17 @@ static bool kvm_vcpu_write_protect_gfn(struct kvm_vcpu *vcpu, u64 gfn)
+ 	return kvm_mmu_slot_gfn_write_protect(vcpu->kvm, slot, gfn, PG_LEVEL_4K);
  }
  
--static bool __kvm_zap_rmaps(struct kvm *kvm, gfn_t gfn_start, gfn_t gfn_end)
-+static bool kvm_rmap_zap_gfn_range(struct kvm *kvm, gfn_t gfn_start, gfn_t gfn_end)
+-static bool kvm_zap_rmap(struct kvm *kvm, struct kvm_rmap_head *rmap_head,
+-			 const struct kvm_memory_slot *slot)
++static bool __kvm_zap_rmap(struct kvm *kvm, struct kvm_rmap_head *rmap_head,
++			   const struct kvm_memory_slot *slot)
  {
- 	const struct kvm_memory_slot *memslot;
- 	struct kvm_memslots *slots;
-@@ -6029,7 +6029,7 @@ void kvm_zap_gfn_range(struct kvm *kvm, gfn_t gfn_start, gfn_t gfn_end)
+ 	return pte_list_destroy(kvm, rmap_head);
+ }
  
- 	kvm_inc_notifier_count(kvm, gfn_start, gfn_end);
+-static bool kvm_unmap_rmap(struct kvm *kvm, struct kvm_rmap_head *rmap_head,
+-			   struct kvm_memory_slot *slot, gfn_t gfn, int level,
+-			   pte_t unused)
++static bool kvm_zap_rmap(struct kvm *kvm, struct kvm_rmap_head *rmap_head,
++			 struct kvm_memory_slot *slot, gfn_t gfn, int level,
++			 pte_t unused)
+ {
+-	return kvm_zap_rmap(kvm, rmap_head, slot);
++	return __kvm_zap_rmap(kvm, rmap_head, slot);
+ }
  
--	flush = __kvm_zap_rmaps(kvm, gfn_start, gfn_end);
-+	flush = kvm_rmap_zap_gfn_range(kvm, gfn_start, gfn_end);
+ static bool kvm_set_pte_rmap(struct kvm *kvm, struct kvm_rmap_head *rmap_head,
+@@ -1529,7 +1529,7 @@ bool kvm_unmap_gfn_range(struct kvm *kvm, struct kvm_gfn_range *range)
+ 	bool flush = false;
  
- 	if (is_tdp_mmu_enabled(kvm)) {
- 		for (i = 0; i < KVM_ADDRESS_SPACE_NUM; i++)
+ 	if (kvm_memslots_have_rmaps(kvm))
+-		flush = kvm_handle_gfn_range(kvm, range, kvm_unmap_rmap);
++		flush = kvm_handle_gfn_range(kvm, range, kvm_zap_rmap);
+ 
+ 	if (is_tdp_mmu_enabled(kvm))
+ 		flush = kvm_tdp_mmu_unmap_gfn_range(kvm, range, flush);
+@@ -6004,7 +6004,7 @@ static bool kvm_rmap_zap_gfn_range(struct kvm *kvm, gfn_t gfn_start, gfn_t gfn_e
+ 			if (WARN_ON_ONCE(start >= end))
+ 				continue;
+ 
+-			flush = slot_handle_level_range(kvm, memslot, kvm_zap_rmap,
++			flush = slot_handle_level_range(kvm, memslot, __kvm_zap_rmap,
+ 							PG_LEVEL_4K, KVM_MAX_HUGEPAGE_LEVEL,
+ 							start, end - 1, true, flush);
+ 		}
 -- 
 2.37.0.170.g444d1eabd0-goog
 
