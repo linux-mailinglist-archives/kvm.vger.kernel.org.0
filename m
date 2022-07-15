@@ -2,147 +2,119 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 202CA5760B5
-	for <lists+kvm@lfdr.de>; Fri, 15 Jul 2022 13:43:33 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id DA98F5760DC
+	for <lists+kvm@lfdr.de>; Fri, 15 Jul 2022 13:49:42 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234392AbiGOLnb (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 15 Jul 2022 07:43:31 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36242 "EHLO
+        id S234730AbiGOLtl (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 15 Jul 2022 07:49:41 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43878 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231931AbiGOLn3 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 15 Jul 2022 07:43:29 -0400
+        with ESMTP id S234640AbiGOLti (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 15 Jul 2022 07:49:38 -0400
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 082FE88CC8
-        for <kvm@vger.kernel.org>; Fri, 15 Jul 2022 04:43:27 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id D5A302FFFA
+        for <kvm@vger.kernel.org>; Fri, 15 Jul 2022 04:49:37 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1657885407;
+        s=mimecast20190719; t=1657885776;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=ki/rg86NxH+wVXrdnmin0JzoM5KA471l52TevDjA+74=;
-        b=gmGJ3Y5ATUZPwfEq9QrYgbiAF/M6in7TeIHKm9Om3MRSuWfrX3+LQdvpthKf0/X1juxIZ0
-        niWb/cXMBmUAY+7kPtieUFUhGVfRWB6L23kM1vyDEiHEeSTqKlp99p7ZmyqQzCQoLOolP/
-        BvrN/qBCCXXqnrsrmQ5xYtVWRpECbhc=
-Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
- [209.85.128.70]) by relay.mimecast.com with ESMTP with STARTTLS
+         content-transfer-encoding:content-transfer-encoding;
+        bh=ie8S/4kslSZgdmx6wrSNJRQWWqTbqopyobh+d0XIkq8=;
+        b=V0qN73P6ixf8wljF0wrZgdwkyHmrnUpcfn0ADBgT5DtSqeinYmXloMUGdjKSxkfUjEwk83
+        Yo/XzLnJtcqzysIrNolwvB8Ag3hXMRTybiVz7WqmdkbVGY5kRKLi5S+a40o+i6/uL9wXMy
+        0OIZOqhBgYoxEf2ABZxyV3ffr30VJUY=
+Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
+ [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-52-FOEZjTu1NbKFgWHLLAMSXQ-1; Fri, 15 Jul 2022 07:43:26 -0400
-X-MC-Unique: FOEZjTu1NbKFgWHLLAMSXQ-1
-Received: by mail-wm1-f70.google.com with SMTP id n18-20020a05600c501200b003a050cc39a0so1877176wmr.7
-        for <kvm@vger.kernel.org>; Fri, 15 Jul 2022 04:43:25 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:from:to:cc:subject:in-reply-to:references:date
-         :message-id:mime-version;
-        bh=ki/rg86NxH+wVXrdnmin0JzoM5KA471l52TevDjA+74=;
-        b=dVWloW+88ePigYtYE9SSxXxY1pdbG3cStEwAAac+wn3qkZnqiAMkI7XmFKN7AUVrlm
-         IrabbI5SPF1+G5m1Ywug87AdJGpvEHA+thXDPNhsmIwnr2crGl7rPemWlVNhh7ZtXlP0
-         IqrFK+XuU3wA/dE8X52zDbykupJY33oyXWCJKQWSCnspNAeO8qil+LFkHZt+f0qhwFIX
-         kiTYPEW3gWmW7qP9jhlYjjkdudKnYCYbGgJP7Vf85uPp2+FoBZanjg3WQquqSFLjJYV7
-         5AfJUNtnAUDDoJjFrKIewvNLC915sCrcZw9/II392kta89+SEH6nL4R3ANBBom1oiwhJ
-         As/A==
-X-Gm-Message-State: AJIora+igV2txymc4w2vxE+dJLmyEsyGglAVRhEWrNHdpDOjNWbFGG6h
-        DTrScxPaLfHp2sXTNGyfZWuYb11CNKKtPKhRo520JTrM/hq+DsJj1QefOIMiCERM+th9hJqy75V
-        VozWbxRt7lGwD
-X-Received: by 2002:a05:600c:4e90:b0:3a0:57d6:4458 with SMTP id f16-20020a05600c4e9000b003a057d64458mr13918813wmq.198.1657885404934;
-        Fri, 15 Jul 2022 04:43:24 -0700 (PDT)
-X-Google-Smtp-Source: AGRyM1voIa5Xp8Y0zIi2+lyef5dLJtzpVn4q2JN57Y+LEI7F2eUcC5n0x/9efIPGFXDC6NoCXzKKcA==
-X-Received: by 2002:a05:600c:4e90:b0:3a0:57d6:4458 with SMTP id f16-20020a05600c4e9000b003a057d64458mr13918780wmq.198.1657885404641;
-        Fri, 15 Jul 2022 04:43:24 -0700 (PDT)
-Received: from fedora (nat-2.ign.cz. [91.219.240.2])
-        by smtp.gmail.com with ESMTPSA id m24-20020a056000181800b0021d68e1fd42sm3655846wrh.89.2022.07.15.04.43.23
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 15 Jul 2022 04:43:23 -0700 (PDT)
-From:   Vitaly Kuznetsov <vkuznets@redhat.com>
-To:     Sean Christopherson <seanjc@google.com>,
-        "Durrant, Paul" <pdurrant@amazon.co.uk>
-Cc:     "x86@kernel.org" <x86@kernel.org>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        David Woodhouse <dwmw2@infradead.org>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        Dave Hansen <dave.hansen@linux.intel.com>,
-        "H. Peter Anvin" <hpa@zytor.com>
-Subject: Re: [PATCH v5] KVM: x86/xen: Update Xen CPUID Leaf 4 (tsc info)
- sub-leaves, if present
-In-Reply-To: <Ys2E2ckrk0JtDl52@google.com>
-References: <20220629130514.15780-1-pdurrant@amazon.com>
- <YsynoyUb4zrMBhRU@google.com>
- <369c3e9e02f947e2a2b0c093cbddc99c@EX13D32EUC003.ant.amazon.com>
- <Ys2E2ckrk0JtDl52@google.com>
-Date:   Fri, 15 Jul 2022 13:43:22 +0200
-Message-ID: <87ilnymwit.fsf@redhat.com>
+ us-mta-644-seCiYla0MFacY20sMg_2JA-1; Fri, 15 Jul 2022 07:49:27 -0400
+X-MC-Unique: seCiYla0MFacY20sMg_2JA-1
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.rdu2.redhat.com [10.11.54.7])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 67777801590;
+        Fri, 15 Jul 2022 11:49:27 +0000 (UTC)
+Received: from virtlab701.virt.lab.eng.bos.redhat.com (virtlab701.virt.lab.eng.bos.redhat.com [10.19.152.228])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 397E5140EBE3;
+        Fri, 15 Jul 2022 11:49:27 +0000 (UTC)
+From:   Paolo Bonzini <pbonzini@redhat.com>
+To:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org
+Cc:     x86@kernel.org, peterz@infradead.org, bp@suse.de,
+        Linus Torvalds <torvalds@linux-foundation.org>
+Subject: [PATCH] KVM: emulate: do not adjust size of fastop and setcc subroutines
+Date:   Fri, 15 Jul 2022 07:49:27 -0400
+Message-Id: <20220715114927.1460356-1-pbonzini@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain
+Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 2.85 on 10.11.54.7
 X-Spam-Status: No, score=-2.7 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        SPF_HELO_NONE,SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
+        SPF_HELO_NONE,SPF_NONE autolearn=unavailable autolearn_force=no
+        version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Sean Christopherson <seanjc@google.com> writes:
+Instead of doing complicated calculations to find the size of the subroutines
+(which are even more complicated because they need to be stringified into
+an asm statement), just hardcode to 16.
 
-> On Tue, Jul 12, 2022, Durrant, Paul wrote:
->> > > @@ -1855,3 +1858,51 @@ void kvm_xen_destroy_vm(struct kvm *kvm)
->> > >       if (kvm->arch.xen_hvm_config.msr)
->> > >               static_branch_slow_dec_deferred(&kvm_xen_enabled);
->> > >  }
->> > > +
->> > > +void kvm_xen_after_set_cpuid(struct kvm_vcpu *vcpu)
->> > > +{
->> > > +     u32 base = 0;
->> > > +     u32 limit;
->> > > +     u32 function;
->> > > +
->> > > +     vcpu->arch.xen.cpuid_tsc_info = 0;
->> > > +
->> > > +     for_each_possible_hypervisor_cpuid_base(function) {
->> > > +             struct kvm_cpuid_entry2 *entry = kvm_find_cpuid_entry(vcpu, function, 0);
->> > > +
->> > > +             if (entry &&
->> > > +                 entry->ebx == XEN_CPUID_SIGNATURE_EBX &&
->> > > +                 entry->ecx == XEN_CPUID_SIGNATURE_ECX &&
->> > > +                 entry->edx == XEN_CPUID_SIGNATURE_EDX) {
->> > > +                     base = function;
->> > > +                     limit = entry->eax;
->> > > +                     break;
->> > > +             }
->> > > +     }
->> > > +     if (!base)
->> > > +             return;
->> > 
->> > Rather than open code a variant of kvm_update_kvm_cpuid_base(), that helper can
->> > be tweaked to take a signature.  Along with a patch to provide a #define for Xen's
->> > signature as a string, this entire function becomes a one-liner.
->> > 
->> 
->> Sure, but as said above, we could make capturing the limit part of the
->> general function too. It could even be extended to capture the Hyper-V
->> base/limit too.  As for defining the sig as a string... I guess it would be
->> neater to use the values from the Xen header, but it'll probably make the
->> code more ugly so a secondary definition is reasonable.
->
-> The base needs to be captured separately for KVM and Xen because KVM (and presumably
-> Xen itself since Xen also allows a variable base) supports advertising multiple
-> hypervisors to the guest.  I don't know if there are any guests that will concurrently
-> utilize multiple hypervisor's paravirt features, so maybe we could squeak by, but
-> saving 4 bytes isn't worth the risk.
->
-> AFAIK, Hyper-V doesn't allow for a variable base, and so doesn't utilize the
-> for_each_possible... macro.
+It is less dense for a few combinations of IBT/SLS/retbleed, but it has
+the advantage of being really simple.
 
-FWIW, this matches my understanding too: Windows guests don't seem to
-check anything besides 0x40000001 and give up if Hyper-V's id is not
-there.
+Suggested-by: Linus Torvalds <torvalds@linux-foundation.org>
+Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+---
+ arch/x86/kvm/emulate.c | 17 +++++++----------
+ 1 file changed, 7 insertions(+), 10 deletions(-)
 
+diff --git a/arch/x86/kvm/emulate.c b/arch/x86/kvm/emulate.c
+index 0a15b0fec6d9..f8382abe22ff 100644
+--- a/arch/x86/kvm/emulate.c
++++ b/arch/x86/kvm/emulate.c
+@@ -189,13 +189,6 @@
+ #define X8(x...) X4(x), X4(x)
+ #define X16(x...) X8(x), X8(x)
+ 
+-#define NR_FASTOP	(ilog2(sizeof(ulong)) + 1)
+-#define RET_LENGTH	(1 + (4 * IS_ENABLED(CONFIG_RETHUNK)) + \
+-			 IS_ENABLED(CONFIG_SLS))
+-#define FASTOP_LENGTH	(ENDBR_INSN_SIZE + 7 + RET_LENGTH)
+-#define FASTOP_SIZE	(8 << ((FASTOP_LENGTH > 8) & 1) << ((FASTOP_LENGTH > 16) & 1))
+-static_assert(FASTOP_LENGTH <= FASTOP_SIZE);
+-
+ struct opcode {
+ 	u64 flags;
+ 	u8 intercept;
+@@ -310,9 +303,15 @@ static void invalidate_registers(struct x86_emulate_ctxt *ctxt)
+  * Moreover, they are all exactly FASTOP_SIZE bytes long, so functions for
+  * different operand sizes can be reached by calculation, rather than a jump
+  * table (which would be bigger than the code).
++ *
++ * The 16 byte alignment, considering 5 bytes for the RET thunk, 3 for ENDBR
++ * and 1 for the straight line speculation INT3, leaves 7 bytes for the
++ * body of the function.  Currently none is larger than 4.
+  */
+ static int fastop(struct x86_emulate_ctxt *ctxt, fastop_t fop);
+ 
++#define FASTOP_SIZE	16
++
+ #define __FOP_FUNC(name) \
+ 	".align " __stringify(FASTOP_SIZE) " \n\t" \
+ 	".type " name ", @function \n\t" \
+@@ -446,9 +445,7 @@ static int fastop(struct x86_emulate_ctxt *ctxt, fastop_t fop);
+  * RET | JMP __x86_return_thunk	[1,5 bytes; CONFIG_RETHUNK]
+  * INT3				[1 byte; CONFIG_SLS]
+  */
+-#define SETCC_LENGTH	(ENDBR_INSN_SIZE + 3 + RET_LENGTH)
+-#define SETCC_ALIGN	(4 << ((SETCC_LENGTH > 4) & 1) << ((SETCC_LENGTH > 8) & 1))
+-static_assert(SETCC_LENGTH <= SETCC_ALIGN);
++#define SETCC_ALIGN	16
+ 
+ #define FOP_SETCC(op) \
+ 	".align " __stringify(SETCC_ALIGN) " \n\t" \
 -- 
-Vitaly
+2.31.1
 
