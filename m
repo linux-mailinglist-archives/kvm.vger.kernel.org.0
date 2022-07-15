@@ -2,57 +2,54 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 8FF3A576A11
-	for <lists+kvm@lfdr.de>; Sat, 16 Jul 2022 00:43:34 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id BB5E4576A44
+	for <lists+kvm@lfdr.de>; Sat, 16 Jul 2022 01:00:26 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232517AbiGOWn0 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 15 Jul 2022 18:43:26 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45240 "EHLO
+        id S230026AbiGOXAX (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 15 Jul 2022 19:00:23 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59628 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231735AbiGOWm6 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 15 Jul 2022 18:42:58 -0400
-Received: from mail-pl1-x64a.google.com (mail-pl1-x64a.google.com [IPv6:2607:f8b0:4864:20::64a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D87458C145
-        for <kvm@vger.kernel.org>; Fri, 15 Jul 2022 15:42:44 -0700 (PDT)
-Received: by mail-pl1-x64a.google.com with SMTP id c15-20020a170902d48f00b0016c01db365cso2765899plg.20
-        for <kvm@vger.kernel.org>; Fri, 15 Jul 2022 15:42:44 -0700 (PDT)
+        with ESMTP id S229513AbiGOXAV (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 15 Jul 2022 19:00:21 -0400
+Received: from mail-pj1-x1049.google.com (mail-pj1-x1049.google.com [IPv6:2607:f8b0:4864:20::1049])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3F07F3C144
+        for <kvm@vger.kernel.org>; Fri, 15 Jul 2022 16:00:20 -0700 (PDT)
+Received: by mail-pj1-x1049.google.com with SMTP id o21-20020a17090a9f9500b001f0574225faso5892576pjp.6
+        for <kvm@vger.kernel.org>; Fri, 15 Jul 2022 16:00:20 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
-        h=reply-to:date:in-reply-to:message-id:mime-version:references
-         :subject:from:to:cc;
-        bh=12pAoMG7eqUpSjBxIvOnNJnEwyKK8LrfDPX8olcQNKs=;
-        b=byCtTANhDQqGzobjfvR7dIeBxKJXRj9f4WjvncLqxasPzh2o5H8X/IPljjW2Ey8jZy
-         +eoPB5V0ZDvJ2dBhL4uTf24x6vfC/c7050s049hXISAkUbvVlOHOgAtQG4gFO+RYQpML
-         l0SOhdeMpJGIMNTvySvhtTbMntz1feob2FN52Sn692iRK2j0W/JLUSk39CaeZbeZFeKt
-         Lyc7ehni3ryxB2Hw0pza6UgYFMnk5vTK0M6Py5MSbrDHE7rGSAUbfHU4QbZFfa12x2Md
-         I3kklLPd4TMwvnUAo2nkOS55mDilXcguEdQuaWsJkq57fqiu0vot30r9djl+Tt0rewAh
-         X9fQ==
+        h=reply-to:date:message-id:mime-version:subject:from:to:cc;
+        bh=6Y/afV6LO1OFaPYNu+1/fuV9HTTuiaJGLoIh2l0gw2o=;
+        b=Gi1oX+4dZf54md8glp3WgVFNNmYbUShLb5ozePI+yZQSVbLMKvBtFJb8E7WELN2sEm
+         CdbJbJX3+KlmNTtc1IOuGsReDJQ/gXB0ynCguYRf2SXIiSxTuh+zWN0q9XlGc02pYdRj
+         lCnDSihZCe9hIZVXzYHXqr++48PGmy6z4DxFRrEXiv+QuSX5W8thycI6FcnvSeMqGFEo
+         TONyxKFwCZSobkIkV4i8yvtWr9d3qF00Ks7N9ayTzQyberqxscjkjiWKpVaQYg8mMlFy
+         /6Ol0tRgVuSTLwBRULyv969DELQjiSADfWF/nmI3lsEmCViPRrzNtAltIrs6cmHsWgPq
+         MDqQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:reply-to:date:in-reply-to:message-id
-         :mime-version:references:subject:from:to:cc;
-        bh=12pAoMG7eqUpSjBxIvOnNJnEwyKK8LrfDPX8olcQNKs=;
-        b=VW+6YW5sZDMXU8aS5jVelHjnhF0GRi6d/QlgTy9sd9WNr0TFWcL06Zf8SgA8uAklo6
-         lJnxyZb4MZFOiOwJyO2oycsjG/0ETXxWqNL9l1aPSOyFFeNAPMYffXcwJeL0NyO30OZu
-         Gw0jknKbrRNfPRzo01oi0XLvdqKedFGVE+tsF6EeqWaNDZbYoN7UtyHt3zd6tDYGt/xr
-         gTLQVm8ZxEUvcvhqS3RaVTRHu6q6Oo/8eOs+E6ARlonZq/woyellgW/+NnXcbU2nSpC4
-         M+BZ5A9aRvHzZVn+cIur7cmeIHFU2xZAFfaIPU4XD6naFyMB6X2YADZJ+z6niydMEzzH
-         S7pg==
-X-Gm-Message-State: AJIora8q1m3mZLRhFsYa08wYQ06/LRKmwdZtHEAOg3CGmECH5Oen9R/N
-        maN4Qh4rx547CeRb+OeiOL4gsAi8ZIw=
-X-Google-Smtp-Source: AGRyM1uNRYq10LMeXTESy4mNUWMPIr8lGyZaxJ19QKoiM47J1hE2CGcDTLs2w0Eod1PKupNoYlp2xhx/KPE=
+        h=x-gm-message-state:reply-to:date:message-id:mime-version:subject
+         :from:to:cc;
+        bh=6Y/afV6LO1OFaPYNu+1/fuV9HTTuiaJGLoIh2l0gw2o=;
+        b=5X35rnuuwqvN68UIngHabl35OR3eE9tyEwoMFmEsDD8Mk26h7BSdqVJNylcjHHxsDR
+         Vfyc/FQwe1j/eQzvKl0i+HXYbJf6ZaAz8Rf6GisFojj19pGufh9nM9YSBJjwwrnuaey3
+         4nibzN1/Cc5pNUC49CtChz1luezNAWPzI2PrGBOS4rX3UTa/yeSCCqlAao3zy+QKcIir
+         YxaLYukb5putlrM//t7vyP/nWNfFuWZ4JqLzV8U/jzpih/BVP9TZUXScl34ZLGkDUmmH
+         pdQsARY8LpJ+DbNjcuBOuLXBFXf8QQtbpWbxXOod4kl9Ip+EmJBfJBrFM73Qw3Jas8qC
+         1nPg==
+X-Gm-Message-State: AJIora+xBkKRb1loMMLeCv83H/joYoMZxN4pA+G0AVG97yG0YoPLNFo4
+        ceVeNxjnXXuF7pDcXDPUZwGpdIpiQ/g=
+X-Google-Smtp-Source: AGRyM1s3vRplP0W43wMYpeeKQzDJJzvyo8RRNGjV0S5pJm1tXkCrBdtsKd9bop0kleExU2DjPuMD6W/cn10=
 X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a17:903:11d0:b0:16b:80cf:5d9 with SMTP id
- q16-20020a17090311d000b0016b80cf05d9mr16043328plh.91.1657924964208; Fri, 15
- Jul 2022 15:42:44 -0700 (PDT)
+ (user=seanjc job=sendgmr) by 2002:a17:90a:249:b0:1e0:a8a3:3c6c with SMTP id
+ t9-20020a17090a024900b001e0a8a33c6cmr912755pje.0.1657926019471; Fri, 15 Jul
+ 2022 16:00:19 -0700 (PDT)
 Reply-To: Sean Christopherson <seanjc@google.com>
-Date:   Fri, 15 Jul 2022 22:42:26 +0000
-In-Reply-To: <20220715224226.3749507-1-seanjc@google.com>
-Message-Id: <20220715224226.3749507-8-seanjc@google.com>
+Date:   Fri, 15 Jul 2022 23:00:12 +0000
+Message-Id: <20220715230016.3762909-1-seanjc@google.com>
 Mime-Version: 1.0
-References: <20220715224226.3749507-1-seanjc@google.com>
 X-Mailer: git-send-email 2.37.0.170.g444d1eabd0-goog
-Subject: [PATCH v2 7/7] KVM: x86/mmu: Remove underscores from __pte_list_remove()
+Subject: [PATCH 0/4] KVM: x86/mmu: Memtype related cleanups
 From:   Sean Christopherson <seanjc@google.com>
 To:     Sean Christopherson <seanjc@google.com>,
         Paolo Bonzini <pbonzini@redhat.com>
@@ -68,57 +65,47 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Remove the underscores from __pte_list_remove(), the function formerly
-known as pte_list_remove() is now named kvm_zap_one_rmap_spte() to show
-that it zaps rmaps/PTEs, i.e. doesn't just remove an entry from a list.
+Minor cleanups for KVM's handling of the memtype that's shoved into SPTEs.
 
-No functional change intended.
+Patch 1 enforces that entry '0' of the host's IA32_PAT is configured for WB
+memtype.  KVM subtle relies on this behavior (silently shoves '0' into the
+SPTE PAT field).  Check this at KVM load time so that if that doesn't hold
+true, KVM will refuse to load instead of running the guest with weird and
+potentially dangerous memtypes.
 
-Signed-off-by: Sean Christopherson <seanjc@google.com>
----
- arch/x86/kvm/mmu/mmu.c | 8 ++++----
- 1 file changed, 4 insertions(+), 4 deletions(-)
+Patch 2 is a pure code cleanup (ordered after patch 1 in case someone wants
+to backport the PAT check).
 
-diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
-index 282e7e2ab446..5957c3e66b77 100644
---- a/arch/x86/kvm/mmu/mmu.c
-+++ b/arch/x86/kvm/mmu/mmu.c
-@@ -921,7 +921,7 @@ pte_list_desc_remove_entry(struct kvm_rmap_head *rmap_head,
- 	mmu_free_pte_list_desc(desc);
- }
- 
--static void __pte_list_remove(u64 *spte, struct kvm_rmap_head *rmap_head)
-+static void pte_list_remove(u64 *spte, struct kvm_rmap_head *rmap_head)
- {
- 	struct pte_list_desc *desc;
- 	struct pte_list_desc *prev_desc;
-@@ -961,7 +961,7 @@ static void kvm_zap_one_rmap_spte(struct kvm *kvm,
- 				  struct kvm_rmap_head *rmap_head, u64 *sptep)
- {
- 	mmu_spte_clear_track_bits(kvm, sptep);
--	__pte_list_remove(sptep, rmap_head);
-+	pte_list_remove(sptep, rmap_head);
- }
- 
- /* Return true if at least one SPTE was zapped, false otherwise */
-@@ -1051,7 +1051,7 @@ static void rmap_remove(struct kvm *kvm, u64 *spte)
- 	slot = __gfn_to_memslot(slots, gfn);
- 	rmap_head = gfn_to_rmap(gfn, sp->role.level, slot);
- 
--	__pte_list_remove(spte, rmap_head);
-+	pte_list_remove(spte, rmap_head);
- }
- 
- /*
-@@ -1693,7 +1693,7 @@ static void mmu_page_add_parent_pte(struct kvm_mmu_memory_cache *cache,
- static void mmu_page_remove_parent_pte(struct kvm_mmu_page *sp,
- 				       u64 *parent_pte)
- {
--	__pte_list_remove(parent_pte, &sp->parent_ptes);
-+	pte_list_remove(parent_pte, &sp->parent_ptes);
- }
- 
- static void drop_parent_pte(struct kvm_mmu_page *sp,
+Patch 3 add a mask to track whether or not KVM may use a non-zero memtype
+value in SPTEs.  Essentially, it's a "is EPT enabled" flag without being an
+explicit "is EPT enabled" flag.  This avoid some minor work when not using
+EPT, e.g. technically KVM could drop the RET0 implemention that's used for
+SVM's get_mt_mask(), but IMO that's an unnecessary risk.
+
+Patch 4 modifies the TDP page fault path to restrict the mapping level
+based on guest MTRRs if and only if KVM might actually consume them.  The
+guest MTRRs are purely software constructs (not directly consumed by
+hardware), and KVM only honors them when EPT is enabled (host MTRRs are
+overridden by EPT) and the guest has non-coherent DMA.  I doubt this will
+move the needed on whether or not KVM can create huge pages, but it does
+save having to do MTRR lookups on every page fault for guests without
+a non-coherent DMA device attached.
+
+Sean Christopherson (4):
+  KVM: x86: Reject loading KVM if host.PAT[0] != WB
+  KVM: x86: Drop unnecessary goto+label in kvm_arch_init()
+  KVM: x86/mmu: Add shadow mask for effective host MTRR memtype
+  KVM: x86/mmu: Restrict mapping level based on guest MTRR iff they're
+    used
+
+ arch/x86/kvm/mmu/mmu.c  | 26 +++++++++++++++++++-------
+ arch/x86/kvm/mmu/spte.c | 21 ++++++++++++++++++---
+ arch/x86/kvm/mmu/spte.h |  1 +
+ arch/x86/kvm/x86.c      | 33 ++++++++++++++++++++-------------
+ 4 files changed, 58 insertions(+), 23 deletions(-)
+
+
+base-commit: 8031d87aa9953ddeb047a5356ebd0b240c30f233
 -- 
 2.37.0.170.g444d1eabd0-goog
 
