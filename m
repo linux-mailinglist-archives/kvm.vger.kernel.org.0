@@ -2,162 +2,96 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id C74EF576534
-	for <lists+kvm@lfdr.de>; Fri, 15 Jul 2022 18:24:06 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id DB7CB576553
+	for <lists+kvm@lfdr.de>; Fri, 15 Jul 2022 18:31:54 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232753AbiGOQYF (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 15 Jul 2022 12:24:05 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47696 "EHLO
+        id S233019AbiGOQbu (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 15 Jul 2022 12:31:50 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52492 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232537AbiGOQYA (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 15 Jul 2022 12:24:00 -0400
-Received: from mail-pg1-x529.google.com (mail-pg1-x529.google.com [IPv6:2607:f8b0:4864:20::529])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A4C6518E2A
-        for <kvm@vger.kernel.org>; Fri, 15 Jul 2022 09:23:59 -0700 (PDT)
-Received: by mail-pg1-x529.google.com with SMTP id f65so4810054pgc.12
-        for <kvm@vger.kernel.org>; Fri, 15 Jul 2022 09:23:59 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=AkNS9VjkDM9iJkZW9AUNvrRa0KBpcWyilEmv6y4S+sM=;
-        b=nflMI1NG4jg1HLe/9WW9EHQgZFxk/7qxAorz2aRcjEcFfyi/tt1GwW/3LYWzWkBYCB
-         0MN4PScK2mLGO53rxwmmz7UqqYz4qykuWr8sh970X3LT1ymnSdDXWKPbPpli2XeWx2XM
-         jMhzEoZ/JgKfV0f0NREDvy9wlGWizesrdHO7PC/o8NRC459aI52XCkZIcafBCNyDF3Af
-         p0QG0UKpPkyClrAmByFKWQ0w/mHOEO81WCH58jJhAJY4v65XsvItydOm4G7RxFiznRyo
-         EOLMWXyavtcxEBh22tLeBtNltreGGtC5LsMjd5h346uoh83btr1iD78Bed0uyxQsS2qY
-         9RMg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=AkNS9VjkDM9iJkZW9AUNvrRa0KBpcWyilEmv6y4S+sM=;
-        b=NfoVLpQpBREvmhWmNi9Vif08DtUVZdOci/D5n2Eb4QR52Ocq06EZHs5xxChzIvKnK0
-         KlycTSpEZyHyxU8ybM1mtMqZGu/AJHTn0neNJfJ4RFYpwiXUqO3wvPYhrxD40br+EO77
-         /IbGbor+HmGnKgWOH0J2GFf9s2LJN3RB6es4+KM8PWmVCOrnvvwXOZVO1QoXqfA6SKB8
-         j6MFU5kPLIfC9bM6WhVV/HlAixGbagdD61u8HZVvxYBAE0Jd7kpz7h9spn2pY0Yo9bsg
-         uyTH/1zZQEunb0XGmPJCmUABV4hckSlgjvivDvIDldXzhoSKPBtotfk7l8Lypp9vfVCW
-         XgZg==
-X-Gm-Message-State: AJIora+9Mq389fgnAFNq15z+h+nXWGP4x639yP2yA3T+vGJ2DDR/ngnE
-        obbwiwDxHS7nE06S7G/oGdDVWA==
-X-Google-Smtp-Source: AGRyM1twyk6TGTeksIzZSBwTGlFxy3DNWQYRQFoB/GgvqMbLoh1eqvpBPiL7F72F4TrdaOdNmJ72+g==
-X-Received: by 2002:a63:db41:0:b0:40d:e79f:8334 with SMTP id x1-20020a63db41000000b0040de79f8334mr12614942pgi.565.1657902239042;
-        Fri, 15 Jul 2022 09:23:59 -0700 (PDT)
-Received: from google.com (123.65.230.35.bc.googleusercontent.com. [35.230.65.123])
-        by smtp.gmail.com with ESMTPSA id e15-20020a056a0000cf00b005255489187fsm4037087pfj.135.2022.07.15.09.23.58
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 15 Jul 2022 09:23:58 -0700 (PDT)
-Date:   Fri, 15 Jul 2022 16:23:54 +0000
-From:   Sean Christopherson <seanjc@google.com>
-To:     Peter Xu <peterx@redhat.com>
-Cc:     Shivam Kumar <shivam.kumar1@nutanix.com>,
-        Marc Zyngier <maz@kernel.org>, pbonzini@redhat.com,
-        james.morse@arm.com, borntraeger@linux.ibm.com, david@redhat.com,
-        kvm@vger.kernel.org, Shaju Abraham <shaju.abraham@nutanix.com>,
-        Manish Mishra <manish.mishra@nutanix.com>,
-        Anurag Madnawat <anurag.madnawat@nutanix.com>
-Subject: Re: [PATCH v4 1/4] KVM: Implement dirty quota-based throttling of
- vcpus
-Message-ID: <YtGUmsavkoTBjQTU@google.com>
-References: <bf24e007-23fd-2582-ec0c-5e79ab0c7d56@nutanix.com>
- <878rqomnfr.wl-maz@kernel.org>
- <Yo+gTbo5uqqAMjjX@google.com>
- <877d68mfqv.wl-maz@kernel.org>
- <Yo+82LjHSOdyxKzT@google.com>
- <b75013cb-0d40-569a-8a31-8ebb7cf6c541@nutanix.com>
- <2e5198b3-54ea-010e-c418-f98054befe1b@nutanix.com>
- <YtBanRozLuP9qoWs@xz-m1.local>
- <YtCBBI+rU+UQNm4p@google.com>
- <YtCWW2OfbI4+r1L3@xz-m1.local>
+        with ESMTP id S232754AbiGOQbt (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 15 Jul 2022 12:31:49 -0400
+Received: from smtp-out2.suse.de (smtp-out2.suse.de [IPv6:2001:67c:2178:6::1d])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8828FD13C;
+        Fri, 15 Jul 2022 09:31:48 -0700 (PDT)
+Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
+        (No client certificate requested)
+        by smtp-out2.suse.de (Postfix) with ESMTPS id 401732005B;
+        Fri, 15 Jul 2022 16:31:47 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+        t=1657902707; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=lrF0UTA3Ef9yvnb0oLwXwzJSpicZgGURdMHOPVAzQqM=;
+        b=MyheM1jZdB7zhyU4p8/tTnFyNL8zYY2lMmrYuo/EbDaOYhAAHPSAnMK3uHFod2pl+e3A2d
+        R0Igb+uEChD41vbKud4NI2wnXfDj9tTssn9T3xnFHUXFN8Z/vuxRgDMvEGDjqkir2LYQhE
+        JCWVqDRkRSc3tzk+p2we2TAOYT5uXVc=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+        s=susede2_ed25519; t=1657902707;
+        h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=lrF0UTA3Ef9yvnb0oLwXwzJSpicZgGURdMHOPVAzQqM=;
+        b=Q0BWzNw5P/FusF5cWz01gg3OZNhsK5V8CDirztkQZkkgCjwn4EXf9OviQqKV7O3h6aj5u4
+        8kOC6KPMEPN5NoAA==
+Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
+        (No client certificate requested)
+        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id 3373513754;
+        Fri, 15 Jul 2022 16:31:47 +0000 (UTC)
+Received: from dovecot-director2.suse.de ([192.168.254.65])
+        by imap2.suse-dmz.suse.de with ESMTPSA
+        id NFKHDHOW0WJVcgAAMHmgww
+        (envelope-from <bp@suse.de>); Fri, 15 Jul 2022 16:31:47 +0000
+Date:   Fri, 15 Jul 2022 18:31:43 +0200
+From:   Borislav Petkov <bp@suse.de>
+To:     Paolo Bonzini <pbonzini@redhat.com>
+Cc:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org, x86@kernel.org,
+        peterz@infradead.org,
+        Linus Torvalds <torvalds@linux-foundation.org>
+Subject: Re: [PATCH] KVM: emulate: do not adjust size of fastop and setcc
+ subroutines
+Message-ID: <YtGWb3vTITBS9Wj2@zn.tnic>
+References: <20220715114927.1460356-1-pbonzini@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <YtCWW2OfbI4+r1L3@xz-m1.local>
-X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-        USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=ham
-        autolearn_force=no version=3.4.6
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <20220715114927.1460356-1-pbonzini@redhat.com>
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,SPF_HELO_NONE,SPF_PASS
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Jul 14, 2022, Peter Xu wrote:
-> On Thu, Jul 14, 2022 at 08:48:04PM +0000, Sean Christopherson wrote:
-> > On Thu, Jul 14, 2022, Peter Xu wrote:
-> > > Hi, Shivam,
-> > > 
-> > > On Tue, Jul 05, 2022 at 12:51:01PM +0530, Shivam Kumar wrote:
-> > > > Hi, here's a summary of what needs to be changed and what should be kept as
-> > > > it is (purely my opinion based on the discussions we have had so far):
-> > > > 
-> > > > i) Moving the dirty quota check to mark_page_dirty_in_slot. Use kvm requests
-> > > > in dirty quota check. I hope that the ceiling-based approach, with proper
-> > > > documentation and an ioctl exposed for resetting 'dirty_quota' and
-> > > > 'pages_dirtied', is good enough. Please post your suggestions if you think
-> > > > otherwise.
-> > > 
-> > > An ioctl just for this could be an overkill to me.
-> > >
-> > > Currently you exposes only "quota" to kvm_run, then when vmexit you have
-> > > exit fields contain both "quota" and "count".  I always think it's a bit
-> > > redundant.
-> > > 
-> > > What I'm thinking is:
-> > > 
-> > >   (1) Expose both "quota" and "count" in kvm_run, then:
-> > > 
-> > >       "quota" should only be written by userspace and read by kernel.
-> > >       "count" should only be written by kernel and read by the userspace. [*]
-> > > 
-> > >       [*] One special case is when the userspace found that there's risk of
-> > >       quota & count overflow, then the userspace:
-> > > 
-> > >         - Kick the vcpu out (so the kernel won't write to "count" anymore)
-> > >         - Update both "quota" and "count" to safe values
-> > >         - Resume the KVM_RUN
-> > > 
-> > >   (2) When quota reached, we don't need to copy quota/count in vmexit
-> > >       fields, since the userspace can read the realtime values in kvm_run.
-> > > 
-> > > Would this work?
-> > 
-> > Technically, yes, practically speaking, no.  If KVM doesn't provide the quota
-> > that _KVM_ saw at the time of exit, then there's no sane way to audit KVM exits
-> > due to KVM_EXIT_DIRTY_QUOTA_EXHAUSTED.  Providing the quota ensure userspace sees
-> > sane, coherent data if there's a race between KVM checking the quota and userspace
-> > updating the quota.  If KVM doesn't provide the quota, then userspace can see an
-> > exit with "count < quota".
+On Fri, Jul 15, 2022 at 07:49:27AM -0400, Paolo Bonzini wrote:
+> Instead of doing complicated calculations to find the size of the subroutines
+> (which are even more complicated because they need to be stringified into
+> an asm statement), just hardcode to 16.
 > 
-> This is rare false positive which should be acceptable in this case (the
-> same as vmexit with count==quota but we just planned to boost the quota),
-> IMHO it's better than always kicking the vcpu, since the overhead for such
-> false is only a vmexit but nothing else.
-
-Oh, we're in complete agreement on that front.  I'm only objecting to forcing
-userspace to read the realtime quota+count.  I want KVM to provide a snapshot of
-the quota+count so that if there's a KVM bug, e.g. KVM spuriously exits, then
-there is zero ambiguity as the quota+count in the kvm_run exit field will hold
-invalid/garbage data.  Without a snapshot, if there were a bug where KVM spuriously
-exited, root causing or even detecting the bug would be difficult if userspace is
-dynamically updating the quota as changing the quota would have destroyed the
-evidence of KVM's bug.
-
-It's unlikely we'll eever have such a bug, but filling the exits fields is cheap, and
-because it's a union, the "redundant" fields don't consume extra space in kvm_run.
-
-And the reasoning behind not having kvm_run.dirty_count is that it's fully
-redundant if KVM provides a stat, and IMO such a stat will be quite helpful for
-things beyond dirty quotas, e.g. being able to see which vCPUs are dirtying memory
-from the command line for debug purposes.
-
-> > Even if userspace is ok with such races, it will be extremely difficult to detect
-> > KVM issues if we mess something up because such behavior would have to be allowed
-> > by KVM's ABI.
+> It is less dense for a few combinations of IBT/SLS/retbleed, but it has
+> the advantage of being really simple.
 > 
-> Could you elaborate?  We have quite a few places sharing these between
-> user/kernel on kvm_run, no?
+> Suggested-by: Linus Torvalds <torvalds@linux-foundation.org>
+> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+> ---
+>  arch/x86/kvm/emulate.c | 17 +++++++----------
+>  1 file changed, 7 insertions(+), 10 deletions(-)
 
-I think I answered this above, let me know if I didn't.
+Acked-by: Borislav Petkov <bp@suse.de>
+
+-- 
+Regards/Gruss,
+    Boris.
+
+SUSE Software Solutions Germany GmbH
+GF: Ivo Totev, Andrew Myers, Andrew McDonald, Martje Boudien Moerman
+(HRB 36809, AG Nürnberg)
