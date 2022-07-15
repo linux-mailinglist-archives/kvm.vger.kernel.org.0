@@ -2,57 +2,58 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 2BFAE576A09
-	for <lists+kvm@lfdr.de>; Sat, 16 Jul 2022 00:42:52 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id E58E8576A0D
+	for <lists+kvm@lfdr.de>; Sat, 16 Jul 2022 00:43:06 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232552AbiGOWmt (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 15 Jul 2022 18:42:49 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44462 "EHLO
+        id S232229AbiGOWnA (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 15 Jul 2022 18:43:00 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44514 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232040AbiGOWme (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 15 Jul 2022 18:42:34 -0400
-Received: from mail-pj1-x104a.google.com (mail-pj1-x104a.google.com [IPv6:2607:f8b0:4864:20::104a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5E94F33E27
-        for <kvm@vger.kernel.org>; Fri, 15 Jul 2022 15:42:34 -0700 (PDT)
-Received: by mail-pj1-x104a.google.com with SMTP id a2-20020a17090a740200b001efaae60a57so3583780pjg.8
-        for <kvm@vger.kernel.org>; Fri, 15 Jul 2022 15:42:34 -0700 (PDT)
+        with ESMTP id S232433AbiGOWmg (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 15 Jul 2022 18:42:36 -0400
+Received: from mail-pg1-x54a.google.com (mail-pg1-x54a.google.com [IPv6:2607:f8b0:4864:20::54a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 98F336B27C
+        for <kvm@vger.kernel.org>; Fri, 15 Jul 2022 15:42:35 -0700 (PDT)
+Received: by mail-pg1-x54a.google.com with SMTP id bd7-20020a656e07000000b00412a946da8eso3360694pgb.20
+        for <kvm@vger.kernel.org>; Fri, 15 Jul 2022 15:42:35 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
         h=reply-to:date:in-reply-to:message-id:mime-version:references
          :subject:from:to:cc;
-        bh=2EOUrVvpusq8aFHkobTg35RLb5YlrRiK5e+AovV9uRY=;
-        b=DBMG2tVVToR634Cbm4cNiOI6RU44rkVrgJxbcFv0PwLbVI1V3+1tGvicUjzL5Zi/eS
-         2nXnHlOlqe0d89jIh/5QfTzmrqtZvNGk27YJ/rAalpWjPbPrdO2ZsIUqeLnSJ+A5wMHw
-         Cw5bBWdEhgL0EiDyUjdi1BDU8IsaYuHRLM5PUn0KCuibnE822twZo7rkattUNb2f1C6P
-         1EDOT2L31E98uxBAOZOWYhM2i5KHz1uzHI/wrmf54s98ypmO01s8N1uyczz3r+qlivgk
-         yeOdbay6Fcv38i7DVmsB01j1KPF3OvwE6KVy/4NHWdfjs0kScJI+DMl0wOTR+7rH6xYe
-         xeTA==
+        bh=eh6gEobhpZaKYXrjfikJhjM6emGdwYRyv0yMcaabdXk=;
+        b=VVl6sBHcJOK0bxT4HPjPt9Fzvlg3wie0LNiV4G0kvkIPZOTaIETRDVeyAe2IPDX0Vd
+         BnahEnI6fMgarfoLuCFCSoCX/iFnmJUIXNf+AbpUmfwscwSlxjeLwqGPslVZS4ynCAsq
+         Yq8LiqHE9vM56bv3w6uDUpjwkp6gnAu9P391AEBQlBFKUG/FfQaNyQUCf7eOYklFM8XR
+         QFW/It/Uz8OIAo1qo73Q9TZDBxhoYGFIYWJRc8tUAAbOMCcSK2n2sOeCx86AvB0U1Oc4
+         cpd+o58XOS1NctN04kjcVrJa9Vm2TL14TBLK4/4Ywj60nHfDieJeZxW3Ij21Ri/Z3zaT
+         xknQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:reply-to:date:in-reply-to:message-id
          :mime-version:references:subject:from:to:cc;
-        bh=2EOUrVvpusq8aFHkobTg35RLb5YlrRiK5e+AovV9uRY=;
-        b=KC2UZ/00H8w7+SuJc7L0hSWzfxUbBlfBzy6I8jH8KwaY5wKK+NfgrBUCzjik1Qe6r1
-         vDNFcGWbF1buRNrLhMbeQx0ha4BTpwpnTllYdw89nddd7rbLUcUTJX0kqWtKzQIG66wl
-         NCCPqOMT8fOEXLKRb3EYenL+Zn599YG6JzNZ+ur6Aug4Mt2SjiE0sxJsObwM8cL9WDud
-         3uoHMScq0nVBrPd5GLKDAIAviEJlMnmOuiUaWvOOBHZ5YyjzeQ66MEiXSHTtNUrIi+yt
-         sqGRnJlM43skTveibHOyBQQdrmYt6l0sjh7P5YkHW+7TRLXjHazkAGcjYsijASMCG1NQ
-         s3oQ==
-X-Gm-Message-State: AJIora+s0kDBMHmHBDNUiZ8as7FkDEwyPyvbicnCUB5nIvRzYAEbfy60
-        aE2/eVI8RPfM7kv5Ae5Djos71ugAm2A=
-X-Google-Smtp-Source: AGRyM1ul1DgpT0D5GgbHAeklVzBIohIF0xi85u1+B9OZlhGe27Pg6wzpDLguO/kSiMYVx7aaNQ5sM8aYzd0=
+        bh=eh6gEobhpZaKYXrjfikJhjM6emGdwYRyv0yMcaabdXk=;
+        b=rcPnulYA0uHWU8kYRYYlnUNplMqxtYvzMkwGB6MoUn1H9OsPGNaKyPVglXy4r45mWb
+         VO9t53E1Lf5v4JZ7z7N6uNcfLKcbB5Edc61I/t6Ec23ubaRgTrjHEBrtrpAZnjim0qzI
+         8aRTHkSttAGg5yJm0Qaz9qRZIq5Cdk7Vx3GnvhpJ1YyyGoXDoxkGC/EJRdtqGB+jn40N
+         07UgBAmxhB2c/sa5nYSqUJOrxsg9uVSGTWZJnLscRZAC80elqVFHRYdvJFLEsdnZOZ2T
+         eXH3eScXfqFNK6UnXDYam6UZJnuMMKcLImk5yRd8ZX/T2IReTLZny51R5+AAkmzqagfX
+         Gn9w==
+X-Gm-Message-State: AJIora/IOcQu9HnfZJAaF3+B7xxBbuInx+HqJsz6eKakROzeg8LSmoRN
+        h8ZCc52rOfEQLJ6uiP+PeP4t1Kz+po4=
+X-Google-Smtp-Source: AGRyM1vPilzsnOrSR/Ai7hTylYkvyZsOTRfZHuyNqUSHCZBND2m33KaqZyWmiKiB/PkhSYotZnjls9A1szk=
 X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a17:90a:249:b0:1e0:a8a3:3c6c with SMTP id
- t9-20020a17090a024900b001e0a8a33c6cmr912649pje.0.1657924953367; Fri, 15 Jul
- 2022 15:42:33 -0700 (PDT)
+ (user=seanjc job=sendgmr) by 2002:a05:6a00:1385:b0:52b:bb4:e012 with SMTP id
+ t5-20020a056a00138500b0052b0bb4e012mr15751881pfg.8.1657924955143; Fri, 15 Jul
+ 2022 15:42:35 -0700 (PDT)
 Reply-To: Sean Christopherson <seanjc@google.com>
-Date:   Fri, 15 Jul 2022 22:42:20 +0000
+Date:   Fri, 15 Jul 2022 22:42:21 +0000
 In-Reply-To: <20220715224226.3749507-1-seanjc@google.com>
-Message-Id: <20220715224226.3749507-2-seanjc@google.com>
+Message-Id: <20220715224226.3749507-3-seanjc@google.com>
 Mime-Version: 1.0
 References: <20220715224226.3749507-1-seanjc@google.com>
 X-Mailer: git-send-email 2.37.0.170.g444d1eabd0-goog
-Subject: [PATCH v2 1/7] KVM: x86/mmu: Return a u64 (the old SPTE) from mmu_spte_clear_track_bits()
+Subject: [PATCH v2 2/7] KVM: x86/mmu: Directly "destroy" PTE list when
+ recycling rmaps
 From:   Sean Christopherson <seanjc@google.com>
 To:     Sean Christopherson <seanjc@google.com>,
         Paolo Bonzini <pbonzini@redhat.com>
@@ -60,7 +61,7 @@ Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
 X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL autolearn=ham
+        SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL autolearn=unavailable
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -68,12 +69,13 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Return a u64, not an int, from mmu_spte_clear_track_bits().  The return
-value is the old SPTE value, which is very much a 64-bit value.  The sole
-caller that consumes the return value, drop_spte(), already uses a u64.
-The only reason that truncating the SPTE value is not problematic is
-because drop_spte() only queries the shadow-present bit, which is in the
-lower 32 bits.
+Use pte_list_destroy() directly when recycling rmaps instead of bouncing
+through kvm_unmap_rmapp() and kvm_zap_rmapp().  Calling kvm_unmap_rmapp()
+is unnecessary and odd as it requires passing dummy parameters; passing
+NULL for @slot when __rmap_add() already has a valid slot is especially
+weird and confusing.
+
+No functional change intended.
 
 Signed-off-by: Sean Christopherson <seanjc@google.com>
 ---
@@ -81,18 +83,18 @@ Signed-off-by: Sean Christopherson <seanjc@google.com>
  1 file changed, 1 insertion(+), 1 deletion(-)
 
 diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
-index 52664c3caaab..b2379ede2ed6 100644
+index b2379ede2ed6..92fcffec0227 100644
 --- a/arch/x86/kvm/mmu/mmu.c
 +++ b/arch/x86/kvm/mmu/mmu.c
-@@ -529,7 +529,7 @@ static bool mmu_spte_update(u64 *sptep, u64 new_spte)
-  * state bits, it is used to clear the last level sptep.
-  * Returns the old PTE.
-  */
--static int mmu_spte_clear_track_bits(struct kvm *kvm, u64 *sptep)
-+static u64 mmu_spte_clear_track_bits(struct kvm *kvm, u64 *sptep)
- {
- 	kvm_pfn_t pfn;
- 	u64 old_spte = *sptep;
+@@ -1596,7 +1596,7 @@ static void __rmap_add(struct kvm *kvm,
+ 	rmap_count = pte_list_add(cache, spte, rmap_head);
+ 
+ 	if (rmap_count > RMAP_RECYCLE_THRESHOLD) {
+-		kvm_unmap_rmapp(kvm, rmap_head, NULL, gfn, sp->role.level, __pte(0));
++		pte_list_destroy(kvm, rmap_head);
+ 		kvm_flush_remote_tlbs_with_address(
+ 				kvm, sp->gfn, KVM_PAGES_PER_HPAGE(sp->role.level));
+ 	}
 -- 
 2.37.0.170.g444d1eabd0-goog
 
