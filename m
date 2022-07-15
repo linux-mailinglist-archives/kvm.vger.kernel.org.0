@@ -2,58 +2,58 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 0AC85576850
-	for <lists+kvm@lfdr.de>; Fri, 15 Jul 2022 22:42:43 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 37AE157685A
+	for <lists+kvm@lfdr.de>; Fri, 15 Jul 2022 22:43:28 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230199AbiGOUmi (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 15 Jul 2022 16:42:38 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57844 "EHLO
+        id S230475AbiGOUmn (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 15 Jul 2022 16:42:43 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57942 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230010AbiGOUmh (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 15 Jul 2022 16:42:37 -0400
-Received: from mail-pj1-x1049.google.com (mail-pj1-x1049.google.com [IPv6:2607:f8b0:4864:20::1049])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6176363922
-        for <kvm@vger.kernel.org>; Fri, 15 Jul 2022 13:42:36 -0700 (PDT)
-Received: by mail-pj1-x1049.google.com with SMTP id v19-20020a17090abb9300b001ef7bbd5a28so5795550pjr.0
-        for <kvm@vger.kernel.org>; Fri, 15 Jul 2022 13:42:36 -0700 (PDT)
+        with ESMTP id S230332AbiGOUmj (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 15 Jul 2022 16:42:39 -0400
+Received: from mail-yb1-xb49.google.com (mail-yb1-xb49.google.com [IPv6:2607:f8b0:4864:20::b49])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 52F5787373
+        for <kvm@vger.kernel.org>; Fri, 15 Jul 2022 13:42:38 -0700 (PDT)
+Received: by mail-yb1-xb49.google.com with SMTP id n192-20020a2540c9000000b0066fca45513eso4470474yba.0
+        for <kvm@vger.kernel.org>; Fri, 15 Jul 2022 13:42:38 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
         h=reply-to:date:in-reply-to:message-id:mime-version:references
          :subject:from:to:cc;
-        bh=wPnZg/weEXDMrhZ6n4kyBPhV/0y1/e3H5B3IYu4XWF8=;
-        b=kL+/QFKDFfHHa2pgMd2n57g67SH56QIHlNyzEEpgivSulybkQnQEJVhZms0TIltHzX
-         YanVPCAW9kq18DZ033z657a3P1S/+yTRqtyWbMUWNHBSrqC8bOaZudpmpMIAiU5eeKxN
-         EK73geAcL9a8nvZbF+DvOhzOZpnZIZCge+IlpMpwETikBih5dS15EjEFJRAouIC0kpXr
-         Hrn0oOTVuh50pyxn+VfCGUtyKrZAD/LFojoheRITBQLjZBtvqnWoyer8mEDjoEFibQp2
-         tje+D3oyJOPTgJ+FIrbV5VVA4ldayawW9NxUR9/y1S0fmSnbOMGcA4lgaI24qQTqSvUZ
-         fgWg==
+        bh=EPwdfsc9LMe3xaxT7rQ2AwZ4mWZYsqTIzZwyJm21GaY=;
+        b=hTQIEhNtwLcDTjuYElsz5q0eL249pESLhJ8EP2qPrdhFWAWD6W4lbyapYiA0Fp+y2h
+         PqHx4qe9jc0K0fC8jJRNl2z5NXcy+FXNQFYnGbYMLcDt0P1UYL/OTXvp66EWn2xIAgvk
+         J9ST5jj1zPPqHCAyn35zODw0XqDdQeHBiOcHWQuW3fr9YMXrhR1BBMv6PXgoUE6n0Umu
+         3X2MJwOc/DTaDbDpKm8WAMZXAeO8bVxa1PsPMxu9Ftd42dqJRNaCyslc7WQYq83VDDU+
+         jFlMt6ixZtv82rPGvEISQwQkIKT5n4+34EKeVGT2x+HR1ADC7t5zzQc5BhNSE4Kcf40V
+         qk1g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:reply-to:date:in-reply-to:message-id
          :mime-version:references:subject:from:to:cc;
-        bh=wPnZg/weEXDMrhZ6n4kyBPhV/0y1/e3H5B3IYu4XWF8=;
-        b=YwDXErkB5odkKRAgm5G9zrFEJSCWnTI4QxOX8dHgeD8FAgCRCpS+7yX71HiZBbQY45
-         zWJRS4+jaM8JnyeK+njrTKF9iUVhWGJzHKMYocOj2s8Ns1XleFcESE2syQByRr1gBO38
-         cz1HsoyCqczm4j4zsED1I/r8A2JSRhpYxdoSF3dWWEQowMLMBUC2VeTETM+1nsi5qbqC
-         Djfi+1Vxu5us10sEFqM2LqGZ95hkltjBH2Eugm5G9VTFqirep0PIPeFw7z2FlIYW+ZY3
-         87PcJxfNxzgcenjt1J/cFitelqsWXhn58WhLezZGdun44UqTCnlrnVSb1Un5UfmoCbWu
-         +0Sw==
-X-Gm-Message-State: AJIora9So1NNs6rKNYrExTTZGxFfnAky1/KFprZUVelquATaNh/st+hr
-        iLOaBsbZcY8SMP8iF3+tgiNz6fj/6eE=
-X-Google-Smtp-Source: AGRyM1tOruFNn3/TWHRtsDXTOSPK6qWy/lHTC7NRHc9MhPhSrIFA8RJpO4OPdt5NP7OIhlA25Esj07e+g7Q=
+        bh=EPwdfsc9LMe3xaxT7rQ2AwZ4mWZYsqTIzZwyJm21GaY=;
+        b=hl4eljLR4uWLCgz+KInVXApav0lIO+3q75ctrRvAv0GHHizBereYX5Zta9nSViPpXq
+         /hxGnRcG+VjURk8rF26UMXZ9p3Zap6TQpQH5S+L7MZeQwcTVFG5Uomj2NvkpQb4xe34t
+         82mqxYw0FKuCHPGfHhAKMUsI18+BQ/Df9DuQB+Hn8GFTaJOrhvEu9EWkbT7uww3Jcfum
+         mL0NRq8oX2n/L71RimUWc7pV1ANOnJCwXbo40boApbRDM7iTT1dkegL4FgLLdSP6EWYq
+         TIDy64Ztrl4MWeT2lWTFBJxIQ5bLN9IFZp336zzpKSyDQrFnTo6RWpjYSWlLuxb7f9/V
+         zb/Q==
+X-Gm-Message-State: AJIora+s4dkxSxwin+kg54MVMdjlMnVeeSJI+vWQ+doZNL7XRvnhWxJi
+        kTDhhlLljF7r8uV8JFvZMy9gGbCVFp8=
+X-Google-Smtp-Source: AGRyM1u6UpHh1N6KxJP2MAnf+tpvcvYp7Qkv9jqJ8abXF3dxaUvhIvXuqu2cY9+l6GUJZ+BhsNo+O9zcFNA=
 X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a17:902:eb8c:b0:16b:f104:71bc with SMTP id
- q12-20020a170902eb8c00b0016bf10471bcmr15317039plg.30.1657917755968; Fri, 15
- Jul 2022 13:42:35 -0700 (PDT)
+ (user=seanjc job=sendgmr) by 2002:a25:ca88:0:b0:66f:f681:4c3a with SMTP id
+ a130-20020a25ca88000000b0066ff6814c3amr3426982ybg.582.1657917757506; Fri, 15
+ Jul 2022 13:42:37 -0700 (PDT)
 Reply-To: Sean Christopherson <seanjc@google.com>
-Date:   Fri, 15 Jul 2022 20:42:03 +0000
+Date:   Fri, 15 Jul 2022 20:42:04 +0000
 In-Reply-To: <20220715204226.3655170-1-seanjc@google.com>
-Message-Id: <20220715204226.3655170-2-seanjc@google.com>
+Message-Id: <20220715204226.3655170-3-seanjc@google.com>
 Mime-Version: 1.0
 References: <20220715204226.3655170-1-seanjc@google.com>
 X-Mailer: git-send-email 2.37.0.170.g444d1eabd0-goog
-Subject: [PATCH v2 01/24] KVM: nVMX: Unconditionally purge queued/injected
- events on nested "exit"
+Subject: [PATCH v2 02/24] KVM: VMX: Drop bits 31:16 when shoving exception
+ error code into VMCS
 From:   Sean Christopherson <seanjc@google.com>
 To:     Sean Christopherson <seanjc@google.com>,
         Paolo Bonzini <pbonzini@redhat.com>
@@ -65,7 +65,7 @@ Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
 Content-Type: text/plain; charset="UTF-8"
 X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL autolearn=ham
+        SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL autolearn=unavailable
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -73,68 +73,66 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Drop pending exceptions and events queued for re-injection when leaving
-nested guest mode, even if the "exit" is due to VM-Fail, SMI, or forced
-by host userspace.  Failure to purge events could result in an event
-belonging to L2 being injected into L1.
+Deliberately truncate the exception error code when shoving it into the
+VMCS (VM-Entry field for vmcs01 and vmcs02, VM-Exit field for vmcs12).
+Intel CPUs are incapable of handling 32-bit error codes and will never
+generate an error code with bits 31:16, but userspace can provide an
+arbitrary error code via KVM_SET_VCPU_EVENTS.  Failure to drop the bits
+on exception injection results in failed VM-Entry, as VMX disallows
+setting bits 31:16.  Setting the bits on VM-Exit would at best confuse
+L1, and at worse induce a nested VM-Entry failure, e.g. if L1 decided to
+reinject the exception back into L2.
 
-This _should_ never happen for VM-Fail as all events should be blocked by
-nested_run_pending, but it's possible if KVM, not the L1 hypervisor, is
-the source of VM-Fail when running vmcs02.
-
-SMI is a nop (barring unknown bugs) as recognition of SMI and thus entry
-to SMM is blocked by pending exceptions and re-injected events.
-
-Forced exit is definitely buggy, but has likely gone unnoticed because
-userspace probably follows the forced exit with KVM_SET_VCPU_EVENTS (or
-some other ioctl() that purges the queue).
-
-Fixes: 4f350c6dbcb9 ("kvm: nVMX: Handle deferred early VMLAUNCH/VMRESUME failure properly")
 Cc: stable@vger.kernel.org
 Signed-off-by: Sean Christopherson <seanjc@google.com>
 Reviewed-by: Jim Mattson <jmattson@google.com>
-Reviewed-by: Maxim Levitsky <mlevitsk@redhat.com>
 ---
- arch/x86/kvm/vmx/nested.c | 19 +++++++++++--------
- 1 file changed, 11 insertions(+), 8 deletions(-)
+ arch/x86/kvm/vmx/nested.c |  9 ++++++++-
+ arch/x86/kvm/vmx/vmx.c    | 11 ++++++++++-
+ 2 files changed, 18 insertions(+), 2 deletions(-)
 
 diff --git a/arch/x86/kvm/vmx/nested.c b/arch/x86/kvm/vmx/nested.c
-index bfa366938c49..8c2c81406248 100644
+index 8c2c81406248..05c34a72c266 100644
 --- a/arch/x86/kvm/vmx/nested.c
 +++ b/arch/x86/kvm/vmx/nested.c
-@@ -4250,14 +4250,6 @@ static void prepare_vmcs12(struct kvm_vcpu *vcpu, struct vmcs12 *vmcs12,
- 			nested_vmx_abort(vcpu,
- 					 VMX_ABORT_SAVE_GUEST_MSR_FAIL);
- 	}
--
--	/*
--	 * Drop what we picked up for L2 via vmx_complete_interrupts. It is
--	 * preserved above and would only end up incorrectly in L1.
--	 */
--	vcpu->arch.nmi_injected = false;
--	kvm_clear_exception_queue(vcpu);
--	kvm_clear_interrupt_queue(vcpu);
- }
+@@ -3822,7 +3822,14 @@ static void nested_vmx_inject_exception_vmexit(struct kvm_vcpu *vcpu,
+ 	u32 intr_info = nr | INTR_INFO_VALID_MASK;
  
- /*
-@@ -4596,6 +4588,17 @@ void nested_vmx_vmexit(struct kvm_vcpu *vcpu, u32 vm_exit_reason,
- 		WARN_ON_ONCE(nested_early_check);
+ 	if (vcpu->arch.exception.has_error_code) {
+-		vmcs12->vm_exit_intr_error_code = vcpu->arch.exception.error_code;
++		/*
++		 * Intel CPUs will never generate an error code with bits 31:16
++		 * set, and more importantly VMX disallows setting bits 31:16
++		 * in the injected error code for VM-Entry.  Drop the bits to
++		 * mimic hardware and avoid inducing failure on nested VM-Entry
++		 * if L1 chooses to inject the exception back to L2.
++		 */
++		vmcs12->vm_exit_intr_error_code = (u16)vcpu->arch.exception.error_code;
+ 		intr_info |= INTR_INFO_DELIVER_CODE_MASK;
  	}
  
-+	/*
-+	 * Drop events/exceptions that were queued for re-injection to L2
-+	 * (picked up via vmx_complete_interrupts()), as well as exceptions
-+	 * that were pending for L2.  Note, this must NOT be hoisted above
-+	 * prepare_vmcs12(), events/exceptions queued for re-injection need to
-+	 * be captured in vmcs12 (see vmcs12_save_pending_event()).
-+	 */
-+	vcpu->arch.nmi_injected = false;
-+	kvm_clear_exception_queue(vcpu);
-+	kvm_clear_interrupt_queue(vcpu);
-+
- 	vmx_switch_vmcs(vcpu, &vmx->vmcs01);
+diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
+index b0cc911a8f6f..d2b3d30d6afb 100644
+--- a/arch/x86/kvm/vmx/vmx.c
++++ b/arch/x86/kvm/vmx/vmx.c
+@@ -1621,7 +1621,16 @@ static void vmx_queue_exception(struct kvm_vcpu *vcpu)
+ 	kvm_deliver_exception_payload(vcpu);
  
- 	/* Update any VMCS fields that might have changed while L2 ran */
+ 	if (has_error_code) {
+-		vmcs_write32(VM_ENTRY_EXCEPTION_ERROR_CODE, error_code);
++		/*
++		 * Despite the error code being architecturally defined as 32
++		 * bits, and the VMCS field being 32 bits, Intel CPUs and thus
++		 * VMX don't actually supporting setting bits 31:16.  Hardware
++		 * will (should) never provide a bogus error code, but KVM's
++		 * ABI lets userspace shove in arbitrary 32-bit values.  Drop
++		 * the upper bits to avoid VM-Fail, losing information that
++		 * does't really exist is preferable to killing the VM.
++		 */
++		vmcs_write32(VM_ENTRY_EXCEPTION_ERROR_CODE, (u16)error_code);
+ 		intr_info |= INTR_INFO_DELIVER_CODE_MASK;
+ 	}
+ 
 -- 
 2.37.0.170.g444d1eabd0-goog
 
