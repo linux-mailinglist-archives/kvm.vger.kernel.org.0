@@ -2,280 +2,116 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 7CF4557589A
-	for <lists+kvm@lfdr.de>; Fri, 15 Jul 2022 02:22:18 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id B527A575B1B
+	for <lists+kvm@lfdr.de>; Fri, 15 Jul 2022 07:56:09 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232908AbiGOAWR (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 14 Jul 2022 20:22:17 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49930 "EHLO
+        id S229770AbiGOF4I (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 15 Jul 2022 01:56:08 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44868 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232538AbiGOAWQ (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 14 Jul 2022 20:22:16 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id ACFAC655A8
-        for <kvm@vger.kernel.org>; Thu, 14 Jul 2022 17:22:13 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1657844532;
-        h=from:from:reply-to:reply-to:subject:subject:date:date:
-         message-id:message-id:to:to:cc:cc:mime-version:mime-version:
-         content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=JDKBdO2ynojitcW0UwD3EnMXjp2f1L6/iJQpfcNZFPM=;
-        b=V0rsTOYwfC+lrBTcmjq5fWGVd/abXGvATDt3Y+I1GKq3LfFr8ZAe2u9VwoL4uKvROqnLpx
-        009Rxi9OBf6wZXXZlO4EABx7/yu0GOrHDmS05nS6HSeiirht71nhAe0t0jQfjdknmNs3YJ
-        WoqMygVxMqjTDiEB6w3LsIM5LGB/47o=
-Received: from mimecast-mx02.redhat.com (mx3-rdu2.redhat.com
- [66.187.233.73]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-108-tIbxiXzvM4-kc2o0I5BDCQ-1; Thu, 14 Jul 2022 20:22:08 -0400
-X-MC-Unique: tIbxiXzvM4-kc2o0I5BDCQ-1
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.rdu2.redhat.com [10.11.54.2])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        with ESMTP id S229456AbiGOF4H (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 15 Jul 2022 01:56:07 -0400
+Received: from gandalf.ozlabs.org (mail.ozlabs.org [IPv6:2404:9400:2221:ea00::3])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4C8AF4F668;
+        Thu, 14 Jul 2022 22:56:04 -0700 (PDT)
+Received: from authenticated.ozlabs.org (localhost [127.0.0.1])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange ECDHE (P-256) server-signature RSA-PSS (4096 bits) server-digest SHA256)
         (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 530FC3C01E15;
-        Fri, 15 Jul 2022 00:22:08 +0000 (UTC)
-Received: from [10.64.54.37] (vpn2-54-37.bne.redhat.com [10.64.54.37])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id 9448D40885A1;
-        Fri, 15 Jul 2022 00:22:03 +0000 (UTC)
-Reply-To: Gavin Shan <gshan@redhat.com>
-Subject: Re: [PATCH] KVM: selftests: Double check on the current CPU in
- rseq_test
-To:     Sean Christopherson <seanjc@google.com>,
-        Paolo Bonzini <pbonzini@redhat.com>
-Cc:     kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org,
-        linux-kselftest@vger.kernel.org, linux-kernel@vger.kernel.org,
-        mathieu.desnoyers@efficios.com, shuah@kernel.org, maz@kernel.org,
-        oliver.upton@linux.dev, shan.gavin@gmail.com
-References: <20220714080642.3376618-1-gshan@redhat.com>
- <cd5d029c-b396-45ef-917b-92e054659623@redhat.com>
- <YtA3s0VRj3x7vO7B@google.com>
-From:   Gavin Shan <gshan@redhat.com>
-Message-ID: <be806f9c-861a-8da8-d42e-1d4271c3a326@redhat.com>
-Date:   Fri, 15 Jul 2022 12:21:42 +1000
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.2.0
+        by mail.ozlabs.org (Postfix) with ESMTPSA id 4LkgZj5yH2z4xZB;
+        Fri, 15 Jul 2022 15:55:57 +1000 (AEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=canb.auug.org.au;
+        s=201702; t=1657864558;
+        bh=lW0fBGZ83Ym1P4dAAfXAwmwE8gdVd0eRG6eRH+Hgpg4=;
+        h=Date:From:To:Cc:Subject:From;
+        b=ZtWXus4PGlp9lO0wWR0wulhGu0SrVDQdt7t9llUIzRN9t68L6HQ9UXjOtWQFGGVd6
+         G1zT2MEHTVUZJjEGBfRF14l93jnuhR5bOy6Aazn36c5m12+4xS7nmrbajP5GEriRfp
+         091kwMHJVg/OW9+QQwCW4pvxaMwIyyNQVQArqvMc6nXCmqua59m9SAlBWjLHvxJfn6
+         kMgIU86NcRkN6Ye0RIPVDK6gZTLMlWnnrYC3KB+DKYFNCBovXJx5Cf5nuR/rm/CIWr
+         CD5rArz+A0uC+vACDYhlXZRTdleL7d7cHV0JSfsNX26E0KkWY/EFp83kCBuB1G3AaL
+         ZUUt4Zv+CBt4A==
+Date:   Fri, 15 Jul 2022 15:55:56 +1000
+From:   Stephen Rothwell <sfr@canb.auug.org.au>
+To:     Paolo Bonzini <pbonzini@redhat.com>
+Cc:     KVM <kvm@vger.kernel.org>, Chenyi Qiang <chenyi.qiang@intel.com>,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+        Linux Next Mailing List <linux-next@vger.kernel.org>,
+        Tao Xu <tao3.xu@intel.com>, Xiaoyao Li <xiaoyao.li@intel.com>
+Subject: linux-next: manual merge of the kvm tree with the kvm-fixes tree
+Message-ID: <20220715155556.77911cfe@canb.auug.org.au>
 MIME-Version: 1.0
-In-Reply-To: <YtA3s0VRj3x7vO7B@google.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.84 on 10.11.54.2
-X-Spam-Status: No, score=-2.7 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
-        RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE
-        autolearn=ham autolearn_force=no version=3.4.6
+Content-Type: multipart/signed; boundary="Sig_/SccVHT+w0Pg2sOJQu1cOCFD";
+ protocol="application/pgp-signature"; micalg=pgp-sha256
+X-Spam-Status: No, score=-2.7 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,RCVD_IN_DNSWL_LOW,SPF_HELO_PASS,SPF_PASS,
+        T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi Paolo and Sean,
+--Sig_/SccVHT+w0Pg2sOJQu1cOCFD
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: quoted-printable
 
-On 7/15/22 1:35 AM, Sean Christopherson wrote:
-> On Thu, Jul 14, 2022, Paolo Bonzini wrote:
->> On 7/14/22 10:06, Gavin Shan wrote:
->>> In rseq_test, there are two threads created. Those two threads are
->>> 'main' and 'migration_thread' separately. We also have the assumption
->>> that non-migration status on 'migration-worker' thread guarantees the
->>> same non-migration status on 'main' thread. Unfortunately, the assumption
->>> isn't true. The 'main' thread can be migrated from one CPU to another
->>> one between the calls to sched_getcpu() and READ_ONCE(__rseq.cpu_id).
->>> The following assert is raised eventually because of the mismatched
->>> CPU numbers.
->>>
->>> The issue can be reproduced on arm64 system occasionally.
->>
->> Hmm, this does not seem a correct patch - the threads are already
->> synchronizing using seq_cnt, like this:
->>
->> 	migration			main
->> 	----------------------		--------------------------------
->> 	seq_cnt = 1
->> 	smp_wmb()
->> 					snapshot = 0
->> 					smp_rmb()
->> 					cpu = sched_getcpu() reads 23
->> 	sched_setaffinity()
->> 					rseq_cpu = __rseq.cpuid reads 35
->> 					smp_rmb()
->> 					snapshot != seq_cnt -> retry
->> 	smp_wmb()
->> 	seq_cnt = 2
->>
->> sched_setaffinity() is guaranteed to block until the task is enqueued on an
->> allowed CPU.
-> 
-> Yes, and retrying could suppress detection of kernel bugs that this test is intended
-> to catch.
-> 
+Hi all,
 
-Well, I don't think migration_worker() does correct thing, if I'm understanding
-correctly. The intention seems to force migration on 'main' thread by 'migration'
-thread?  If that is the case, I don't think the following function call has correct
-parameters.
+Today's linux-next merge of the kvm tree got a conflict in:
 
-     r = sched_setaffinity(0, sizeof(allowed_mask), &allowed_mask);
+  arch/x86/kvm/x86.c
 
-     it should be something like:
+between commit:
 
-     r = sched_setaffinity(getpid(), sizeof(allowed_mask), &allowed_mask);
+  1b870fa5573e ("kvm: stats: tell userspace which values are boolean")
 
-If we're using sched_setaffinity(0, ...) in the 'migration' thread, the CPU
-affinity of 'main' thread won't be affected. It means 'main' thread can be
-migrated from one CPU to another at any time, even in the following point:
+from the kvm-fixes tree and commit:
 
-     int main(...)
-     {
-           :
-           /*
-            * migration can happen immediately after sched_getcpu(). If
-            * CPU affinity of 'main' thread is sticky to one particular
-            * CPU, which 'migration' thread supposes to do, then there
-            * should have no migration.
-            */
-           cpu = sched_getcpu();
-           rseq_cpu = READ_ONCE(__rseq.cpu_id);
-           :
-     }
+  2f4073e08f4c ("KVM: VMX: Enable Notify VM exit")
 
-So I think the correct fix is to have sched_setaffinity(getpid(), ...) ?
-Please refer to the manpage.
+from the kvm tree.
 
-    https://man7.org/linux/man-pages/man2/sched_setaffinity.2.html
-    'If pid is zero, then the calling thread is used'
+I fixed it up (see below) and can carry the fix as necessary. This
+is now fixed as far as linux-next is concerned, but any non trivial
+conflicts should be mentioned to your upstream maintainer when your tree
+is submitted for merging.  You may also want to consider cooperating
+with the maintainer of the conflicting tree to minimise any particularly
+complex conflicts.
 
->> Can you check that smp_rmb() and smp_wmb() generate correct instructions on
->> arm64?
-> 
-> That seems like the most likely scenario (or a kernel bug), I distinctly remember
-> the barriers provided by tools/ being rather bizarre.
-> 
+--=20
+Cheers,
+Stephen Rothwell
 
-I don't see any problems for smp_rmb() and smp_wmb() in my case. They have
-been translated to correct instructions, as expected.
+diff --cc arch/x86/kvm/x86.c
+index af0c5b5fc28f,031678eff28e..000000000000
+--- a/arch/x86/kvm/x86.c
++++ b/arch/x86/kvm/x86.c
+@@@ -298,7 -286,8 +286,8 @@@ const struct _kvm_stats_desc kvm_vcpu_s
+  	STATS_DESC_COUNTER(VCPU, directed_yield_successful),
+  	STATS_DESC_COUNTER(VCPU, preemption_reported),
+  	STATS_DESC_COUNTER(VCPU, preemption_other),
+- 	STATS_DESC_IBOOLEAN(VCPU, guest_mode)
+ -	STATS_DESC_ICOUNTER(VCPU, guest_mode),
+++	STATS_DESC_IBOOLEAN(VCPU, guest_mode),
++ 	STATS_DESC_COUNTER(VCPU, notify_window_exits),
+  };
+ =20
+  const struct kvm_stats_header kvm_vcpu_stats_header =3D {
 
-#define smp_mb()        asm volatile("dmb ish" ::: "memory")
-#define smp_wmb()       asm volatile("dmb ishst" ::: "memory")
-#define smp_rmb()       asm volatile("dmb ishld" ::: "memory")
+--Sig_/SccVHT+w0Pg2sOJQu1cOCFD
+Content-Type: application/pgp-signature
+Content-Description: OpenPGP digital signature
 
---------------
+-----BEGIN PGP SIGNATURE-----
 
-One more experiment for sched_setaffinity(). I run the following program,
-the CPU affinity of 'main' thread isn't changed, until the correct
-parameter is used, to have sched_setaffinity(getpid(), ...).
+iQEzBAEBCAAdFiEENIC96giZ81tWdLgKAVBC80lX0GwFAmLRAWwACgkQAVBC80lX
+0GyPGwf/REik8Nq1tANNerJH+9c1LLZv+lA/q798tY3m3LoLHh4jRFCa/JLrl3Eg
+E81b7WAmLUKGMCu2IvKpAh4XObKuvpqVNnntkZZAla1KiRx+EA0pzYXc8g9n37O9
+PIesefM1M5Q/got8zwehj2Ol38887njTWhFzWitNC67aCe59XInzKrEGD8I0JxoZ
+8YvjrUmEuE8ssX1BfensqdwsM3UptAhQrxqukPQJWH1/M2CXQlGBJp0qP0+nSp/9
++miabahe7NXaheBLhb2IKEDkRtM1RBeyGaOHL4z6j0wKNxzPkP/lFnJhQ6dNfaUb
+RSGRNj5PonFhQCI/bMnX0SFdlwKktA==
+=p/EE
+-----END PGP SIGNATURE-----
 
-sched_setaffinity(0, ...)
--------------------------
-[root@virtlab-arm01 tmp]# ./a
-thread_func: cpu=0
-main: mask=0x000000ff
-main: mask=0x000000ff
-main: mask=0x000000ff
-main: mask=0x000000ff
-main: mask=0x000000ff
-main: mask=0x000000ff
-main: mask=0x000000ff
-main: mask=0x000000ff
-main: mask=0x000000ff
-thread_func: cpu=1
-main: mask=0x000000ff
-main: mask=0x000000ff
-main: mask=0x000000ff
-main: mask=0x000000ff
-main: mask=0x000000ff
-main: mask=0x000000ff
-main: mask=0x000000ff
-main: mask=0x000000ff
-main: mask=0x000000ff
-main: mask=0x000000ff
-   :
-
-sched_setaffinity(getpid(), ...)
---------------------------------
-thread_func: cpu=198
-main: mask=0x00000001
-main: mask=0x00000001
-main: mask=0x00000001
-main: mask=0x00000001
-main: mask=0x00000001
-main: mask=0x00000001
-main: mask=0x00000001
-main: mask=0x00000001
-main: mask=0x00000001
-thread_func: cpu=198
-main: mask=0x00000002
-main: mask=0x00000002
-main: mask=0x00000002
-main: mask=0x00000002
-main: mask=0x00000002
-main: mask=0x00000002
-main: mask=0x00000002
-main: mask=0x00000002
-main: mask=0x00000002
-main: mask=0x00000002
-   :
-
-#define _GNU_SOURCE
-#include <stdio.h>
-#include <stdlib.h>
-#include <sys/types.h>
-#include <unistd.h>
-#include <pthread.h>
-#include <sched.h>
-
-#define NR_CPUS	8
-static int thread_exit = 0;
-
-static void *thread_func(void *data)
-{
-	cpu_set_t allowed_mask;
-	int ret, i;
-
-	for (i = 0; i < NR_CPUS; i++) {
-		CPU_ZERO(&allowed_mask);
-		CPU_SET(i, &allowed_mask);
-#if 1
-		sched_setaffinity(0, sizeof(allowed_mask), &allowed_mask);
-#else
-                 sched_setaffinity(getpid(), sizeof(allowed_mask), &allowed_mask);
-#endif
-		fprintf(stdout, "%s: cpu=%d\n", __func__, sched_getcpu());
-
-		sleep(1);
-	}
-
-	thread_exit = 1;
-	return NULL;
-}
-
-int main(int argc, char **argv)
-{
-	pthread_t thread;
-	cpu_set_t allowed_mask;
-	int mask, i, count = 0;
-
-	pthread_create(&thread, NULL, thread_func, NULL);
-
-	while (!thread_exit) {
-		usleep(100000);
-
-		mask = 0;
-		sched_getaffinity(0, sizeof(allowed_mask), &allowed_mask);
-		for (i = 0; i < NR_CPUS; i++) {
-			if (CPU_ISSET(i, &allowed_mask))
-				mask |= (1 << i);
-		}
-
-		fprintf(stdout, "%s: mask=0x%08x\n", __func__, mask);
-	}
-
-	return 0;
-}
-
-
-Thanks,
-Gavin
-
-
+--Sig_/SccVHT+w0Pg2sOJQu1cOCFD--
