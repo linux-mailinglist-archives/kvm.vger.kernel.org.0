@@ -2,172 +2,335 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id C3E78576A9A
-	for <lists+kvm@lfdr.de>; Sat, 16 Jul 2022 01:23:29 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id C0556576B62
+	for <lists+kvm@lfdr.de>; Sat, 16 Jul 2022 05:01:17 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232539AbiGOXVg (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 15 Jul 2022 19:21:36 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47928 "EHLO
+        id S231357AbiGPDBL (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 15 Jul 2022 23:01:11 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42826 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232191AbiGOXVS (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 15 Jul 2022 19:21:18 -0400
-Received: from mail-pj1-x1049.google.com (mail-pj1-x1049.google.com [IPv6:2607:f8b0:4864:20::1049])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4FB6D92870
-        for <kvm@vger.kernel.org>; Fri, 15 Jul 2022 16:21:17 -0700 (PDT)
-Received: by mail-pj1-x1049.google.com with SMTP id n14-20020a17090a2bce00b001ef85fef37fso3620348pje.7
-        for <kvm@vger.kernel.org>; Fri, 15 Jul 2022 16:21:17 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=reply-to:date:in-reply-to:message-id:mime-version:references
-         :subject:from:to:cc;
-        bh=Gm/0I1+T32HiDACucIVWpxGQ1jktv79snrS7GRo/K1s=;
-        b=AoKRujIk2kfCrBAADBgWJNrhbBLYrqc9+T6UYemN6kjvloos9C1+APFaUJZDghTYoK
-         /gl5cf9LBxTnHKhFZihttuUm2Uw8gxHirDUmfoOBef0mS2z12msrFebej17FU4GFuxYc
-         Jc6FLU3SMuhlLrgd91eBSLAv8SNc2g6ZHtFYmIgR0Zd1z6H+d04deiwFm6sR0O5j1oqP
-         xrkV8tVUqiuGUTu9hZoHGz3v+FjoF16oG3R0to+BKmD7r2pdRWKzqSXZeTFEFBvBLOp7
-         06dK7Fq/kNzH0ebilO4dVQPsqEhGUZtn5dHy5uG3jXdG4uhiRvKzRBePbz3VVABSpJJX
-         XKAw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:reply-to:date:in-reply-to:message-id
-         :mime-version:references:subject:from:to:cc;
-        bh=Gm/0I1+T32HiDACucIVWpxGQ1jktv79snrS7GRo/K1s=;
-        b=KQk+UcK9BL+mEA+w+xcIfQbB57fr7sJ/Eyoi2T3Gdxh7LFszJvHevuaNJAns7wGUiu
-         Jbw877mce19JADwBchZprIvPZ/97mWDaEQOZv5c957jtHJBnqWfDwEIhOprSEVdLGtb4
-         HEIBfTVunkiGO6swQ4v3N6cv6F2ZtZK5f3prGVqqY4sSOeLya1uyZxlZvGh4PHJE2zZs
-         Vt4hTNklGKb3oEMXNLCDDgGQZZ3A1Itr+mIQJdy0DqV/kB29jKA9I8nEwYefjIkTegf+
-         lYu+2TbJHMN/0nqpm2yQfUw1XUOLXnGSJh85DRHpA2xRHvZ1ugP+O4DZ9ANeTLhS8nZH
-         7Deg==
-X-Gm-Message-State: AJIora/m3bVXKNWsa5iNdK/lP4wtB/LGnY8Ik9+5jJwAFTdJ6zgf3f/a
-        kz0SWKpiVT+1trXQJI2Bbz5Iai507pQ=
-X-Google-Smtp-Source: AGRyM1sMGARc3J88SzpEf/kmJghkGEoGICMquk6J2DXH7vDBKPf1zVie0uMCNACtGtbHCAHC2vYQvaygYd0=
-X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a63:cb:0:b0:40c:a2b4:4890 with SMTP id
- 194-20020a6300cb000000b0040ca2b44890mr14137493pga.304.1657927276873; Fri, 15
- Jul 2022 16:21:16 -0700 (PDT)
-Reply-To: Sean Christopherson <seanjc@google.com>
-Date:   Fri, 15 Jul 2022 23:21:07 +0000
-In-Reply-To: <20220715232107.3775620-1-seanjc@google.com>
-Message-Id: <20220715232107.3775620-5-seanjc@google.com>
-Mime-Version: 1.0
-References: <20220715232107.3775620-1-seanjc@google.com>
-X-Mailer: git-send-email 2.37.0.170.g444d1eabd0-goog
-Subject: [PATCH 4/4] KVM: selftests: Add an option to run vCPUs while
- disabling dirty logging
-From:   Sean Christopherson <seanjc@google.com>
-To:     Sean Christopherson <seanjc@google.com>,
-        Paolo Bonzini <pbonzini@redhat.com>
-Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Mingwei Zhang <mizhang@google.com>
-Content-Type: text/plain; charset="UTF-8"
-X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL autolearn=ham
-        autolearn_force=no version=3.4.6
+        with ESMTP id S231244AbiGPDBK (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 15 Jul 2022 23:01:10 -0400
+Received: from mga18.intel.com (mga18.intel.com [134.134.136.126])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 70B7A8E4D1;
+        Fri, 15 Jul 2022 20:01:08 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1657940468; x=1689476468;
+  h=date:from:to:cc:subject:message-id:mime-version:
+   content-transfer-encoding;
+  bh=T/cGF5Nkf4YWawUFDvRxQd3G489QI1/mvWEiFyBeprw=;
+  b=I+1XULW4FZYTwJrrV++psp5JubM3M7n8Mp3fDJQ7Hd1CbYxDVafulCnO
+   yHdpTnjEyYnaSMC8RDA3Qg3UxEb/TuITN2wp2KcTIAS9LvgC2ysKJPQp9
+   evyS1hQS0S6Rs9n73JYdqk37/vbm0zxkR37YK+upP84IeIOyYxrfR8u0i
+   LgXj5gLYs21V+Ho8krVteYyDvq45RiHRifKbrrwy/mXuRk9WvKzAIFc/g
+   PX96akBIAcLeK2YnTXMbTi/HT2XaiDvCYdFS20MwGhZe6l3D+Oh7QW18h
+   bNdFhrpxAWNLqzQ1QJxNKZc+rFBPSS63CKzLaGrIDFf5DkpexvimQWqrN
+   w==;
+X-IronPort-AV: E=McAfee;i="6400,9594,10409"; a="268961733"
+X-IronPort-AV: E=Sophos;i="5.92,275,1650956400"; 
+   d="scan'208";a="268961733"
+Received: from orsmga002.jf.intel.com ([10.7.209.21])
+  by orsmga106.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 15 Jul 2022 20:01:04 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.92,275,1650956400"; 
+   d="scan'208";a="596679266"
+Received: from lkp-server02.sh.intel.com (HELO ff137eb26ff1) ([10.239.97.151])
+  by orsmga002.jf.intel.com with ESMTP; 15 Jul 2022 20:01:00 -0700
+Received: from kbuild by ff137eb26ff1 with local (Exim 4.95)
+        (envelope-from <lkp@intel.com>)
+        id 1oCY35-00014O-2o;
+        Sat, 16 Jul 2022 03:00:55 +0000
+Date:   Sat, 16 Jul 2022 11:00:05 +0800
+From:   kernel test robot <lkp@intel.com>
+To:     Andrew Morton <akpm@linux-foundation.org>
+Cc:     openbmc@lists.ozlabs.org, ntfs3@lists.linux.dev,
+        netdev@vger.kernel.org, linux-wireless@vger.kernel.org,
+        linux-scsi@vger.kernel.org, linux-pci@vger.kernel.org,
+        linux-mediatek@lists.infradead.org, linux-fsdevel@vger.kernel.org,
+        linux-can@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+        kvm@vger.kernel.org, apparmor@lists.ubuntu.com,
+        Linux Memory Management List <linux-mm@kvack.org>
+Subject: [linux-next:master] BUILD REGRESSION
+ 6014cfa5bf32cf8c5c58b3cfd5ee0e1542c8a825
+Message-ID: <62d229b5.vqqoX60YvzB2JbT+%lkp@intel.com>
+User-Agent: Heirloom mailx 12.5 6/20/10
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Transfer-Encoding: 7bit
+X-Spam-Status: No, score=-2.7 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,SPF_HELO_NONE,
+        SPF_NONE,WEIRD_PORT autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Add a command line option to dirty_log_perf_test to run vCPUs for the
-entire duration of disabling dirty logging.  By default, the test stops
-running runs vCPUs before disabling dirty logging, which is faster but
-less interesting as it doesn't stress KVM's handling of contention
-between page faults and the zapping of collapsible SPTEs.  Enabling the
-flag also lets the user verify that KVM is indeed rebuilding zapped SPTEs
-as huge pages by checking KVM's pages_{1g,2m,4k} stats.  Without vCPUs to
-fault in the zapped SPTEs, the stats will show that KVM is zapping pages,
-but they never show whether or not KVM actually allows huge pages to be
-recreated.
+tree/branch: https://git.kernel.org/pub/scm/linux/kernel/git/next/linux-next.git master
+branch HEAD: 6014cfa5bf32cf8c5c58b3cfd5ee0e1542c8a825  Add linux-next specific files for 20220715
 
-Note!  Enabling the flag can _significantly_ increase runtime, especially
-if the thread that's disabling dirty logging doesn't have a dedicated
-pCPU, e.g. if all pCPUs are used to run vCPUs.
+Error/Warning reports:
 
-Signed-off-by: Sean Christopherson <seanjc@google.com>
----
- .../selftests/kvm/dirty_log_perf_test.c       | 30 +++++++++++++++++--
- 1 file changed, 27 insertions(+), 3 deletions(-)
+https://lore.kernel.org/linux-doc/202207021352.PpKTUY8V-lkp@intel.com
+https://lore.kernel.org/linux-doc/202207031437.qIh6LFcx-lkp@intel.com
+https://lore.kernel.org/linux-doc/202207051821.3f0eRIsL-lkp@intel.com
+https://lore.kernel.org/linux-mm/202206292052.LsFui3zO-lkp@intel.com
+https://lore.kernel.org/linux-mm/202207160452.HPLSlqzA-lkp@intel.com
+https://lore.kernel.org/llvm/202207160039.bfW3l3uk-lkp@intel.com
 
-diff --git a/tools/testing/selftests/kvm/dirty_log_perf_test.c b/tools/testing/selftests/kvm/dirty_log_perf_test.c
-index 808a36dbf0c0..f99e39a672d3 100644
---- a/tools/testing/selftests/kvm/dirty_log_perf_test.c
-+++ b/tools/testing/selftests/kvm/dirty_log_perf_test.c
-@@ -59,6 +59,7 @@ static void arch_cleanup_vm(struct kvm_vm *vm)
- 
- static int nr_vcpus = 1;
- static uint64_t guest_percpu_mem_size = DEFAULT_PER_VCPU_MEM_SIZE;
-+static bool run_vcpus_while_disabling_dirty_logging;
- 
- /* Host variables */
- static u64 dirty_log_manual_caps;
-@@ -109,8 +110,13 @@ static void vcpu_worker(struct perf_test_vcpu_args *vcpu_args)
- 				ts_diff.tv_nsec);
- 		}
- 
-+		/*
-+		 * Keep running the guest while dirty logging is being disabled
-+		 * (iteration is negative) so that vCPUs are accessing memory
-+		 * for the entire duration of zapping collapsible SPTEs.
-+		 */
- 		while (current_iteration == READ_ONCE(iteration) &&
--		       !READ_ONCE(host_quit)) {}
-+		       READ_ONCE(iteration) >= 0 && !READ_ONCE(host_quit)) {}
- 	}
- 
- 	avg = timespec_div(total, vcpu_last_completed_iteration[vcpu_idx]);
-@@ -302,6 +308,14 @@ static void run_test(enum vm_guest_mode mode, void *arg)
- 		}
- 	}
- 
-+	/*
-+	 * Run vCPUs while dirty logging is being disabled to stress disabling
-+	 * in terms of both performance and correctness.  Opt-in via command
-+	 * line as this significantly increases time to disable dirty logging.
-+	 */
-+	if (run_vcpus_while_disabling_dirty_logging)
-+		WRITE_ONCE(iteration, -1);
-+
- 	/* Disable dirty logging */
- 	clock_gettime(CLOCK_MONOTONIC, &start);
- 	disable_dirty_logging(vm, p->slots);
-@@ -309,7 +323,11 @@ static void run_test(enum vm_guest_mode mode, void *arg)
- 	pr_info("Disabling dirty logging time: %ld.%.9lds\n",
- 		ts_diff.tv_sec, ts_diff.tv_nsec);
- 
--	/* Tell the vcpu thread to quit */
-+	/*
-+	 * Tell the vCPU threads to quit.  No need to manually check that vCPUs
-+	 * have stopped running after disabling dirty logging, the join will
-+	 * wait for them to exit.
-+	 */
- 	host_quit = true;
- 	perf_test_join_vcpu_threads(nr_vcpus);
- 
-@@ -349,6 +367,9 @@ static void help(char *name)
- 	       "     Warning: a low offset can conflict with the loaded test code.\n");
- 	guest_modes_help();
- 	printf(" -n: Run the vCPUs in nested mode (L2)\n");
-+	printf(" -e: Run vCPUs while dirty logging is being disabled.  This\n"
-+	       "     can significantly increase runtime, especially if there\n"
-+	       "     isn't a dedicated pCPU for the main thread.\n");
- 	printf(" -b: specify the size of the memory region which should be\n"
- 	       "     dirtied by each vCPU. e.g. 10M or 3G.\n"
- 	       "     (default: 1G)\n");
-@@ -385,8 +406,11 @@ int main(int argc, char *argv[])
- 
- 	guest_modes_append_default();
- 
--	while ((opt = getopt(argc, argv, "ghi:p:m:nb:f:v:os:x:")) != -1) {
-+	while ((opt = getopt(argc, argv, "eghi:p:m:nb:f:v:os:x:")) != -1) {
- 		switch (opt) {
-+		case 'e':
-+			/* 'e' is for evil. */
-+			run_vcpus_while_disabling_dirty_logging = true;
- 		case 'g':
- 			dirty_log_manual_caps = 0;
- 			break;
+Error/Warning: (recently discovered and may have been fixed)
+
+Documentation/PCI/endpoint/pci-vntb-function.rst:82: WARNING: Unexpected indentation.
+Documentation/PCI/endpoint/pci-vntb-howto.rst:131: WARNING: Title underline too short.
+Documentation/virt/kvm/api.rst:8265: WARNING: Title underline too short.
+Documentation/virt/kvm/api.rst:8272: WARNING: Unexpected indentation.
+aarch64-linux-ld: Unexpected GOT/PLT entries detected!
+aarch64-linux-ld: Unexpected run-time procedure linkages detected!
+drivers/net/wireless/mac80211_hwsim.c:1431:37: warning: cast to pointer from integer of different size [-Wint-to-pointer-cast]
+drivers/pci/endpoint/functions/pci-epf-vntb.c:1247: undefined reference to `ntb_register_device'
+drivers/pci/endpoint/functions/pci-epf-vntb.c:174: undefined reference to `ntb_link_event'
+drivers/pci/endpoint/functions/pci-epf-vntb.c:262: undefined reference to `ntb_db_event'
+drivers/pci/endpoint/functions/pci-epf-vntb.c:975:5: warning: no previous prototype for 'pci_read' [-Wmissing-prototypes]
+drivers/pci/endpoint/functions/pci-epf-vntb.c:984:5: warning: no previous prototype for 'pci_write' [-Wmissing-prototypes]
+drivers/vfio/vfio_iommu_type1.c:2141:35: warning: cast to smaller integer type 'enum iommu_cap' from 'void *' [-Wvoid-pointer-to-enum-cast]
+fs/nfsd/nfsctl.c:1504:17: error: use of undeclared identifier 'NFS4_CLIENTS_PER_GB'
+security/apparmor/policy_ns.c:83:20: warning: no previous prototype for 'alloc_unconfined' [-Wmissing-prototypes]
+security/apparmor/policy_ns.c:83:20: warning: no previous prototype for function 'alloc_unconfined' [-Wmissing-prototypes]
+
+Unverified Error/Warning (likely false positive, please contact us if interested):
+
+arch/x86/kernel/cpu/rdrand.c:36 x86_init_rdrand() error: uninitialized symbol 'prev'.
+drivers/devfreq/mtk-cci-devfreq.c:135 mtk_ccifreq_target() warn: variable dereferenced before check 'drv' (see line 130)
+drivers/gpio/gpio-xilinx.c:709:1: internal compiler error: in arc_ifcvt, at config/arc/arc.cc:9642
+drivers/gpio/gpiolib-cdev.c:2563:1: internal compiler error: in arc_ifcvt, at config/arc/arc.cc:9642
+drivers/gpio/gpiolib.c:2215:1: internal compiler error: in arc_ifcvt, at config/arc/arc.cc:9642
+drivers/gpu/drm/amd/amdgpu/../display/dc/bios/bios_parser2.c:2994:1: internal compiler error: in arc_ifcvt, at config/arc/arc.cc:9642
+drivers/gpu/drm/drm_mipi_dbi.c:876:1: internal compiler error: in arc_ifcvt, at config/arc/arc.cc:9642
+drivers/hid/hid-input.c:2276:1: internal compiler error: in arc_ifcvt, at config/arc/arc.cc:9642
+drivers/i2c/busses/i2c-designware-master.c:165:1: internal compiler error: in arc_ifcvt, at config/arc/arc.cc:9642
+drivers/i2c/busses/i2c-jz4780.c:359:1: internal compiler error: in arc_ifcvt, at config/arc/arc.cc:9642
+drivers/i2c/busses/i2c-mt65xx.c:927:1: internal compiler error: in arc_ifcvt, at config/arc/arc.cc:9642
+drivers/i2c/busses/i2c-npcm7xx.c:639 npcm_i2c_slave_enable() error: buffer overflow 'npcm_i2caddr' 2 <= 9
+drivers/i2c/busses/i2c-s3c2410.c:746:1: internal compiler error: in arc_ifcvt, at config/arc/arc.cc:9642
+drivers/i2c/busses/i2c-xiic.c:540:1: internal compiler error: in arc_ifcvt, at config/arc/arc.cc:9642
+drivers/iio/industrialio-buffer.c:927:1: internal compiler error: in arc_ifcvt, at config/arc/arc.cc:9642
+drivers/md/dm-mpath.c:1681:1: internal compiler error: in arc_ifcvt, at config/arc/arc.cc:9642
+drivers/media/cec/i2c/ch7322.c:332:1: internal compiler error: in arc_ifcvt, at config/arc/arc.cc:9642
+drivers/mfd/da9062-core.c:323:1: internal compiler error: in arc_ifcvt, at config/arc/arc.cc:9642
+drivers/misc/habanalabs/gaudi2/gaudi2.c:8728:1: internal compiler error: in arc_ifcvt, at config/arc/arc.cc:9642
+drivers/mmc/host/dw_mmc.c:989:1: internal compiler error: in arc_ifcvt, at config/arc/arc.cc:9642
+drivers/net/can/slcan/slcan-core.c:601:14: sparse:    void *
+drivers/net/can/slcan/slcan-core.c:601:14: sparse:    void [noderef] __rcu *
+drivers/net/can/slcan/slcan-core.c:601:14: sparse: sparse: incompatible types in comparison expression (different address spaces):
+drivers/net/phy/phylink.c:887 phylink_change_inband_advert() error: we previously assumed 'pl->pcs' could be null (see line 870)
+drivers/nfc/trf7970a.c:631:1: internal compiler error: in arc_ifcvt, at config/arc/arc.cc:9642
+drivers/pinctrl/core.c:2093:1: internal compiler error: in arc_ifcvt, at config/arc/arc.cc:9642
+drivers/pinctrl/stm32/pinctrl-stm32.c:1627:1: internal compiler error: in arc_ifcvt, at config/arc/arc.cc:9642
+drivers/power/supply/bq24190_charger.c:1944:1: internal compiler error: in arc_ifcvt, at config/arc/arc.cc:9642
+drivers/power/supply/bq24257_charger.c:1078:1: internal compiler error: in arc_ifcvt, at config/arc/arc.cc:9642
+drivers/power/supply/bq25890_charger.c:847:1: internal compiler error: in arc_ifcvt, at config/arc/arc.cc:9642
+drivers/power/supply/bq27xxx_battery.c:1123:1: internal compiler error: in arc_ifcvt, at config/arc/arc.cc:9642
+drivers/power/supply/rt9455_charger.c:1055:1: internal compiler error: in arc_ifcvt, at config/arc/arc.cc:9642
+drivers/power/supply/sbs-battery.c:355:1: internal compiler error: in arc_ifcvt, at config/arc/arc.cc:9642
+drivers/regulator/core.c:5171:1: internal compiler error: in arc_ifcvt, at config/arc/arc.cc:9642
+drivers/regulator/s2mps11.c:1226:1: internal compiler error: in arc_ifcvt, at config/arc/arc.cc:9642
+drivers/regulator/slg51000-regulator.c:436:1: internal compiler error: in arc_ifcvt, at config/arc/arc.cc:9642
+drivers/scsi/qla2xxx/qla_os.c:336:5: sparse: sparse: symbol 'ql2xdelay_before_pci_error_handling' was not declared. Should it be static?
+drivers/target/target_core_device.c:1013:1: internal compiler error: in arc_ifcvt, at config/arc/arc.cc:9642
+drivers/tty/n_gsm.c:1526:1: internal compiler error: in arc_ifcvt, at config/arc/arc.cc:9642
+drivers/usb/gadget/composite.c:1080:1: internal compiler error: in arc_ifcvt, at config/arc/arc.cc:9642
+drivers/video/fbdev/sh_mobile_lcdcfb.c:2505:1: internal compiler error: in arc_ifcvt, at config/arc/arc.cc:9642
+fs/ext4/extents.c:1293:1: internal compiler error: in arc_ifcvt, at config/arc/arc.cc:9642
+fs/kernel_read_file.c:61 kernel_read_file() warn: impossible condition '(i_size > (((~0) >> 1))) => (s64min-s64max > s64max)'
+include/linux/bits.h:9:41: warning: shift by negative count ('-1') [-Wanalyzer-shift-count-negative]
+include/linux/libata.h:2052:1: internal compiler error: in arc_ifcvt, at config/arc/arc.cc:9642
+kernel/params.c:214:1: internal compiler error: in arc_ifcvt, at config/arc/arc.cc:9642
+lib/842/842_decompress.c:210:1: internal compiler error: in arc_ifcvt, at config/arc/arc.cc:9642
+lib/kobject.c:683:1: internal compiler error: in arc_ifcvt, at config/arc/arc.cc:9642
+net/bluetooth/aosp.c:114:1: internal compiler error: in arc_ccfsm_record_condition, at config/arc/arc.cc:5500
+net/bluetooth/hci_request.c:2029:1: internal compiler error: in arc_ccfsm_record_condition, at config/arc/arc.cc:5500
+net/caif/cfctrl.c:583:1: internal compiler error: in arc_ifcvt, at config/arc/arc.cc:9642
+
+Error/Warning ids grouped by kconfigs:
+
+gcc_recent_errors
+|-- alpha-allyesconfig
+|   |-- drivers-pci-endpoint-functions-pci-epf-vntb.c:warning:no-previous-prototype-for-pci_read
+|   |-- drivers-pci-endpoint-functions-pci-epf-vntb.c:warning:no-previous-prototype-for-pci_write
+|   `-- security-apparmor-policy_ns.c:warning:no-previous-prototype-for-alloc_unconfined
+|-- alpha-randconfig-c004-20220716
+|   |-- drivers-pci-endpoint-functions-pci-epf-vntb.c:warning:no-previous-prototype-for-pci_read
+|   `-- drivers-pci-endpoint-functions-pci-epf-vntb.c:warning:no-previous-prototype-for-pci_write
+|-- arc-allyesconfig
+|   |-- drivers-gpu-drm-amd-amdgpu-..-display-dc-bios-bios_parser2.c:internal-compiler-error:in-arc_ifcvt-at-config-arc-arc.cc
+|   |-- drivers-misc-habanalabs-gaudi2-gaudi2.c:internal-compiler-error:in-arc_ifcvt-at-config-arc-arc.cc
+|   |-- drivers-net-wireless-mac80211_hwsim.c:warning:cast-to-pointer-from-integer-of-different-size
+|   |-- drivers-pci-endpoint-functions-pci-epf-vntb.c:warning:no-previous-prototype-for-pci_read
+|   |-- drivers-pci-endpoint-functions-pci-epf-vntb.c:warning:no-previous-prototype-for-pci_write
+|   |-- drivers-target-target_core_device.c:internal-compiler-error:in-arc_ifcvt-at-config-arc-arc.cc
+|   `-- security-apparmor-policy_ns.c:warning:no-previous-prototype-for-alloc_unconfined
+|-- arc-randconfig-m031-20220716
+|   |-- drivers-devfreq-mtk-cci-devfreq.c-mtk_ccifreq_target()-warn:variable-dereferenced-before-check-drv-(see-line-)
+|   `-- drivers-i2c-busses-i2c-npcm7xx.c-npcm_i2c_slave_enable()-error:buffer-overflow-npcm_i2caddr
+|-- arc-randconfig-r013-20220715
+|   |-- drivers-usb-gadget-composite.c:internal-compiler-error:in-arc_ifcvt-at-config-arc-arc.cc
+|   |-- net-bluetooth-aosp.c:internal-compiler-error:in-arc_ccfsm_record_condition-at-config-arc-arc.cc
+|   `-- net-bluetooth-hci_request.c:internal-compiler-error:in-arc_ccfsm_record_condition-at-config-arc-arc.cc
+|-- arc-randconfig-r032-20220715
+|   |-- drivers-gpio-gpio-xilinx.c:internal-compiler-error:in-arc_ifcvt-at-config-arc-arc.cc
+|   |-- drivers-gpio-gpiolib-cdev.c:internal-compiler-error:in-arc_ifcvt-at-config-arc-arc.cc
+|   |-- drivers-gpio-gpiolib.c:internal-compiler-error:in-arc_ifcvt-at-config-arc-arc.cc
+|   |-- drivers-gpu-drm-drm_mipi_dbi.c:internal-compiler-error:in-arc_ifcvt-at-config-arc-arc.cc
+|   |-- drivers-hid-hid-input.c:internal-compiler-error:in-arc_ifcvt-at-config-arc-arc.cc
+|   |-- drivers-i2c-busses-i2c-designware-master.c:internal-compiler-error:in-arc_ifcvt-at-config-arc-arc.cc
+|   |-- drivers-i2c-busses-i2c-jz4780.c:internal-compiler-error:in-arc_ifcvt-at-config-arc-arc.cc
+|   |-- drivers-i2c-busses-i2c-mt65xx.c:internal-compiler-error:in-arc_ifcvt-at-config-arc-arc.cc
+|   |-- drivers-i2c-busses-i2c-s3c2410.c:internal-compiler-error:in-arc_ifcvt-at-config-arc-arc.cc
+|   |-- drivers-i2c-busses-i2c-xiic.c:internal-compiler-error:in-arc_ifcvt-at-config-arc-arc.cc
+|   |-- drivers-iio-industrialio-buffer.c:internal-compiler-error:in-arc_ifcvt-at-config-arc-arc.cc
+|   |-- drivers-md-dm-mpath.c:internal-compiler-error:in-arc_ifcvt-at-config-arc-arc.cc
+|   |-- drivers-media-cec-i2c-ch7322.c:internal-compiler-error:in-arc_ifcvt-at-config-arc-arc.cc
+|   |-- drivers-mfd-da9062-core.c:internal-compiler-error:in-arc_ifcvt-at-config-arc-arc.cc
+|   |-- drivers-mmc-host-dw_mmc.c:internal-compiler-error:in-arc_ifcvt-at-config-arc-arc.cc
+|   |-- drivers-nfc-trf7970a.c:internal-compiler-error:in-arc_ifcvt-at-config-arc-arc.cc
+|   |-- drivers-pinctrl-core.c:internal-compiler-error:in-arc_ifcvt-at-config-arc-arc.cc
+|   |-- drivers-pinctrl-stm32-pinctrl-stm32.c:internal-compiler-error:in-arc_ifcvt-at-config-arc-arc.cc
+|   |-- drivers-power-supply-bq24190_charger.c:internal-compiler-error:in-arc_ifcvt-at-config-arc-arc.cc
+|   |-- drivers-power-supply-bq24257_charger.c:internal-compiler-error:in-arc_ifcvt-at-config-arc-arc.cc
+|   |-- drivers-power-supply-bq25890_charger.c:internal-compiler-error:in-arc_ifcvt-at-config-arc-arc.cc
+|   |-- drivers-power-supply-bq27xxx_battery.c:internal-compiler-error:in-arc_ifcvt-at-config-arc-arc.cc
+|   |-- drivers-power-supply-rt9455_charger.c:internal-compiler-error:in-arc_ifcvt-at-config-arc-arc.cc
+|   |-- drivers-power-supply-sbs-battery.c:internal-compiler-error:in-arc_ifcvt-at-config-arc-arc.cc
+|   |-- drivers-regulator-core.c:internal-compiler-error:in-arc_ifcvt-at-config-arc-arc.cc
+|   |-- drivers-regulator-s2mps11.c:internal-compiler-error:in-arc_ifcvt-at-config-arc-arc.cc
+|   |-- drivers-regulator-slg51000-regulator.c:internal-compiler-error:in-arc_ifcvt-at-config-arc-arc.cc
+clang_recent_errors
+|-- arm-versatile_defconfig
+|   `-- fs-nfsd-nfsctl.c:error:use-of-undeclared-identifier-NFS4_CLIENTS_PER_GB
+|-- i386-randconfig-a015
+|   `-- fs-nfsd-nfsctl.c:error:use-of-undeclared-identifier-NFS4_CLIENTS_PER_GB
+|-- powerpc-mvme5100_defconfig
+|   `-- fs-nfsd-nfsctl.c:error:use-of-undeclared-identifier-NFS4_CLIENTS_PER_GB
+|-- x86_64-randconfig-a001
+|   `-- drivers-vfio-vfio_iommu_type1.c:warning:cast-to-smaller-integer-type-enum-iommu_cap-from-void
+|-- x86_64-randconfig-a005
+|   |-- drivers-vfio-vfio_iommu_type1.c:warning:cast-to-smaller-integer-type-enum-iommu_cap-from-void
+|   `-- security-apparmor-policy_ns.c:warning:no-previous-prototype-for-function-alloc_unconfined
+|-- x86_64-randconfig-a012
+|   `-- drivers-vfio-vfio_iommu_type1.c:warning:cast-to-smaller-integer-type-enum-iommu_cap-from-void
+|-- x86_64-randconfig-a016
+|   `-- security-apparmor-policy_ns.c:warning:no-previous-prototype-for-function-alloc_unconfined
+`-- x86_64-randconfig-k001
+    `-- drivers-vfio-vfio_iommu_type1.c:warning:cast-to-smaller-integer-type-enum-iommu_cap-from-void
+
+elapsed time: 725m
+
+configs tested: 98
+configs skipped: 4
+
+gcc tested configs:
+arm                                 defconfig
+arm                              allyesconfig
+arm64                            allyesconfig
+i386                          randconfig-c001
+sh                        sh7785lcr_defconfig
+powerpc                    sam440ep_defconfig
+arm                           h3600_defconfig
+mips                         cobalt_defconfig
+sparc                             allnoconfig
+arm                     eseries_pxa_defconfig
+xtensa                generic_kc705_defconfig
+arm                           sama5_defconfig
+sh                         ap325rxa_defconfig
+arm                          gemini_defconfig
+m68k                        stmark2_defconfig
+mips                         rt305x_defconfig
+arm                             rpc_defconfig
+powerpc                      pasemi_defconfig
+sh                        sh7763rdp_defconfig
+mips                    maltaup_xpa_defconfig
+xtensa                              defconfig
+sh                           se7721_defconfig
+arm                           viper_defconfig
+sh                        edosk7705_defconfig
+alpha                             allnoconfig
+powerpc                 mpc8540_ads_defconfig
+nios2                         3c120_defconfig
+powerpc                     ep8248e_defconfig
+riscv                               defconfig
+riscv                             allnoconfig
+riscv                    nommu_virt_defconfig
+i386                              debian-10.3
+riscv                    nommu_k210_defconfig
+riscv                          rv32_defconfig
+i386                   debian-10.3-kselftests
+x86_64                        randconfig-c001
+ia64                             allmodconfig
+csky                              allnoconfig
+arc                               allnoconfig
+m68k                             allmodconfig
+arc                              allyesconfig
+alpha                            allyesconfig
+m68k                             allyesconfig
+powerpc                           allnoconfig
+sh                               allmodconfig
+mips                             allyesconfig
+powerpc                          allmodconfig
+i386                                defconfig
+i386                             allyesconfig
+x86_64                        randconfig-a004
+x86_64                        randconfig-a002
+x86_64                        randconfig-a006
+i386                          randconfig-a001
+i386                          randconfig-a003
+i386                          randconfig-a005
+x86_64                        randconfig-a013
+x86_64                        randconfig-a011
+x86_64                        randconfig-a015
+i386                          randconfig-a014
+i386                          randconfig-a012
+i386                          randconfig-a016
+arc                  randconfig-r043-20220715
+um                             i386_defconfig
+um                           x86_64_defconfig
+x86_64                              defconfig
+x86_64                               rhel-8.3
+x86_64                           allyesconfig
+x86_64                          rhel-8.3-func
+x86_64                         rhel-8.3-kunit
+x86_64                    rhel-8.3-kselftests
+x86_64                           rhel-8.3-syz
+
+clang tested configs:
+powerpc                     kmeter1_defconfig
+powerpc                  mpc885_ads_defconfig
+powerpc                    mvme5100_defconfig
+arm                       versatile_defconfig
+arm                              alldefconfig
+powerpc                  mpc866_ads_defconfig
+mips                     cu1830-neo_defconfig
+arm                            dove_defconfig
+arm                   milbeaut_m10v_defconfig
+powerpc                      obs600_defconfig
+x86_64                        randconfig-k001
+x86_64                        randconfig-a005
+x86_64                        randconfig-a001
+x86_64                        randconfig-a003
+i386                          randconfig-a002
+i386                          randconfig-a004
+i386                          randconfig-a006
+x86_64                        randconfig-a016
+x86_64                        randconfig-a012
+x86_64                        randconfig-a014
+i386                          randconfig-a013
+i386                          randconfig-a015
+i386                          randconfig-a011
+hexagon              randconfig-r045-20220715
+hexagon              randconfig-r041-20220715
+s390                 randconfig-r044-20220715
+riscv                randconfig-r042-20220715
+
 -- 
-2.37.0.170.g444d1eabd0-goog
-
+0-DAY CI Kernel Test Service
+https://01.org/lkp
