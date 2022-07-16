@@ -2,335 +2,221 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id C0556576B62
-	for <lists+kvm@lfdr.de>; Sat, 16 Jul 2022 05:01:17 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 93CE4576C1A
+	for <lists+kvm@lfdr.de>; Sat, 16 Jul 2022 07:53:58 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231357AbiGPDBL (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 15 Jul 2022 23:01:11 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42826 "EHLO
+        id S231466AbiGPFx4 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sat, 16 Jul 2022 01:53:56 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34252 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231244AbiGPDBK (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 15 Jul 2022 23:01:10 -0400
-Received: from mga18.intel.com (mga18.intel.com [134.134.136.126])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 70B7A8E4D1;
-        Fri, 15 Jul 2022 20:01:08 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1657940468; x=1689476468;
-  h=date:from:to:cc:subject:message-id:mime-version:
-   content-transfer-encoding;
-  bh=T/cGF5Nkf4YWawUFDvRxQd3G489QI1/mvWEiFyBeprw=;
-  b=I+1XULW4FZYTwJrrV++psp5JubM3M7n8Mp3fDJQ7Hd1CbYxDVafulCnO
-   yHdpTnjEyYnaSMC8RDA3Qg3UxEb/TuITN2wp2KcTIAS9LvgC2ysKJPQp9
-   evyS1hQS0S6Rs9n73JYdqk37/vbm0zxkR37YK+upP84IeIOyYxrfR8u0i
-   LgXj5gLYs21V+Ho8krVteYyDvq45RiHRifKbrrwy/mXuRk9WvKzAIFc/g
-   PX96akBIAcLeK2YnTXMbTi/HT2XaiDvCYdFS20MwGhZe6l3D+Oh7QW18h
-   bNdFhrpxAWNLqzQ1QJxNKZc+rFBPSS63CKzLaGrIDFf5DkpexvimQWqrN
-   w==;
-X-IronPort-AV: E=McAfee;i="6400,9594,10409"; a="268961733"
-X-IronPort-AV: E=Sophos;i="5.92,275,1650956400"; 
-   d="scan'208";a="268961733"
-Received: from orsmga002.jf.intel.com ([10.7.209.21])
-  by orsmga106.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 15 Jul 2022 20:01:04 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.92,275,1650956400"; 
-   d="scan'208";a="596679266"
-Received: from lkp-server02.sh.intel.com (HELO ff137eb26ff1) ([10.239.97.151])
-  by orsmga002.jf.intel.com with ESMTP; 15 Jul 2022 20:01:00 -0700
-Received: from kbuild by ff137eb26ff1 with local (Exim 4.95)
-        (envelope-from <lkp@intel.com>)
-        id 1oCY35-00014O-2o;
-        Sat, 16 Jul 2022 03:00:55 +0000
-Date:   Sat, 16 Jul 2022 11:00:05 +0800
-From:   kernel test robot <lkp@intel.com>
-To:     Andrew Morton <akpm@linux-foundation.org>
-Cc:     openbmc@lists.ozlabs.org, ntfs3@lists.linux.dev,
-        netdev@vger.kernel.org, linux-wireless@vger.kernel.org,
-        linux-scsi@vger.kernel.org, linux-pci@vger.kernel.org,
-        linux-mediatek@lists.infradead.org, linux-fsdevel@vger.kernel.org,
-        linux-can@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
-        kvm@vger.kernel.org, apparmor@lists.ubuntu.com,
-        Linux Memory Management List <linux-mm@kvack.org>
-Subject: [linux-next:master] BUILD REGRESSION
- 6014cfa5bf32cf8c5c58b3cfd5ee0e1542c8a825
-Message-ID: <62d229b5.vqqoX60YvzB2JbT+%lkp@intel.com>
-User-Agent: Heirloom mailx 12.5 6/20/10
+        with ESMTP id S229589AbiGPFxy (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sat, 16 Jul 2022 01:53:54 -0400
+Received: from mail-pl1-x632.google.com (mail-pl1-x632.google.com [IPv6:2607:f8b0:4864:20::632])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8D97665C6
+        for <kvm@vger.kernel.org>; Fri, 15 Jul 2022 22:53:52 -0700 (PDT)
+Received: by mail-pl1-x632.google.com with SMTP id y15so99288plp.10
+        for <kvm@vger.kernel.org>; Fri, 15 Jul 2022 22:53:52 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=k4ReJi3gLhxX1c6bDpJ9BCH4j4KqMwkRvv91qaJAxJY=;
+        b=jDsNDTwTJLpeMwp6Rv+gmgHzKlrJzAOAR1jaFqVkv/rcdSdDiuYxpH8FWU30NJ9/eZ
+         MvZDnQfR641Oppryi7W3Ndrem1mmobAwtU7lPUrjCm0USaB+tjP0+Jmh20WPB4Ej+8UV
+         tUlsHe+GPn1OfGvCJEd5Ci1vxm3kXEqkIlrao7AcPYwjgvsRQ8X02wMmxzEKOXh0p9hs
+         3XlYjpLrN5ObmxalmOJuOsaKCY8kcQnuvJhJ5dSqNKP/FPy31VrkxsxXP1+VGpI8R5Hg
+         0d+IzewWtjNVh4PZjiOd4SEJFQE3PIyt/Ncc6YscFCz7tUzq77cMcUQ61jWXVUrbS4Xf
+         /2xA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=k4ReJi3gLhxX1c6bDpJ9BCH4j4KqMwkRvv91qaJAxJY=;
+        b=Ru2lZNCexKt2zh/TXL+QBygE2MZcYyBGyvpcMgjnhhfbdqXHaXanvNkhZdAxVvqX2M
+         KscNQukWELzI8DDflmuK5GUWB4CknJ0Yaqla0+DSdUWyPd/90UXC5HXdy5roh7W0WSU0
+         EPCqpOu9Q56FY69O/0pCDr6JdHpAzaCLzhXbhfBxuxNXpAsRWGXaG0ZvJsJDbzwreSFg
+         WylbdEUJzIU6qlCFadKi6GzBj8g2rxxmqsa7tlOBZlYwsTII16COIkpXajK4QlHozVZr
+         ixre/9ZEkGuNAhsWtZl3OURZiD3Vck/9hIp5TOGEpL2w1g9SQ6eLUuSFdBgDkYG3LZXT
+         FeZA==
+X-Gm-Message-State: AJIora8ZdtUfFYGXWyUkH+o8vNj23hZgof8lEYiceY/WzwOC3QOVwfiq
+        yMrznRsTnnxA0mtuWPF6Uzal/Q==
+X-Google-Smtp-Source: AGRyM1s8pOZhah+AKb86PkWmI7YeI9laP1eieASnKKPv2eD4EV+em/W618k6pZSnGTD8iqtPlRdJ+Q==
+X-Received: by 2002:a17:902:d50e:b0:16c:1664:81e5 with SMTP id b14-20020a170902d50e00b0016c166481e5mr17437272plg.149.1657950831675;
+        Fri, 15 Jul 2022 22:53:51 -0700 (PDT)
+Received: from google.com (59.39.145.34.bc.googleusercontent.com. [34.145.39.59])
+        by smtp.gmail.com with ESMTPSA id x9-20020a170902a38900b0016c0c82e85csm4587320pla.75.2022.07.15.22.53.50
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 15 Jul 2022 22:53:50 -0700 (PDT)
+Date:   Sat, 16 Jul 2022 05:53:46 +0000
+From:   Mingwei Zhang <mizhang@google.com>
+To:     Sean Christopherson <seanjc@google.com>
+Cc:     Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+Subject: Re: [PATCH 1/4] KVM: x86/mmu: Don't require refcounted "struct page"
+ to create huge SPTEs
+Message-ID: <YtJSalFfPPoQs4Dj@google.com>
+References: <20220715232107.3775620-1-seanjc@google.com>
+ <20220715232107.3775620-2-seanjc@google.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-2.7 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,SPF_HELO_NONE,
-        SPF_NONE,WEIRD_PORT autolearn=ham autolearn_force=no version=3.4.6
+Content-Disposition: inline
+In-Reply-To: <20220715232107.3775620-2-seanjc@google.com>
+X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
+        USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=unavailable
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-tree/branch: https://git.kernel.org/pub/scm/linux/kernel/git/next/linux-next.git master
-branch HEAD: 6014cfa5bf32cf8c5c58b3cfd5ee0e1542c8a825  Add linux-next specific files for 20220715
+On Fri, Jul 15, 2022, Sean Christopherson wrote:
+> Drop the requirement that a pfn be backed by a refcounted, compound or
+> or ZONE_DEVICE, struct page, and instead rely solely on the host page
+> tables to identify huge pages.  The PageCompound() check is a remnant of
+> an old implementation that identified (well, attempt to identify) huge
+> pages without walking the host page tables.  The ZONE_DEVICE check was
+> added as an exception to the PageCompound() requirement.  In other words,
+> neither check is actually a hard requirement, if the primary has a pfn
+> backed with a huge page, then KVM can back the pfn with a huge page
+> regardless of the backing store.
+> 
+> Dropping the @pfn parameter will also allow KVM to query the max host
+> mapping level without having to first get the pfn, which is advantageous
+> for use outside of the page fault path where KVM wants to take action if
+> and only if a page can be mapped huge, i.e. avoids the pfn lookup for
+> gfns that can't be backed with a huge page.
 
-Error/Warning reports:
+Our of curiosity, when host maps huge pages under VMA with VM_PFNMAP,
+they are basically out of the control of MM (I presume). So, when
+drivers of those pages remove them from host page table, do we (KVM) get
+mmu_notifiers?
 
-https://lore.kernel.org/linux-doc/202207021352.PpKTUY8V-lkp@intel.com
-https://lore.kernel.org/linux-doc/202207031437.qIh6LFcx-lkp@intel.com
-https://lore.kernel.org/linux-doc/202207051821.3f0eRIsL-lkp@intel.com
-https://lore.kernel.org/linux-mm/202206292052.LsFui3zO-lkp@intel.com
-https://lore.kernel.org/linux-mm/202207160452.HPLSlqzA-lkp@intel.com
-https://lore.kernel.org/llvm/202207160039.bfW3l3uk-lkp@intel.com
+> 
+> Cc: Mingwei Zhang <mizhang@google.com>
+> Signed-off-by: Sean Christopherson <seanjc@google.com>
 
-Error/Warning: (recently discovered and may have been fixed)
-
-Documentation/PCI/endpoint/pci-vntb-function.rst:82: WARNING: Unexpected indentation.
-Documentation/PCI/endpoint/pci-vntb-howto.rst:131: WARNING: Title underline too short.
-Documentation/virt/kvm/api.rst:8265: WARNING: Title underline too short.
-Documentation/virt/kvm/api.rst:8272: WARNING: Unexpected indentation.
-aarch64-linux-ld: Unexpected GOT/PLT entries detected!
-aarch64-linux-ld: Unexpected run-time procedure linkages detected!
-drivers/net/wireless/mac80211_hwsim.c:1431:37: warning: cast to pointer from integer of different size [-Wint-to-pointer-cast]
-drivers/pci/endpoint/functions/pci-epf-vntb.c:1247: undefined reference to `ntb_register_device'
-drivers/pci/endpoint/functions/pci-epf-vntb.c:174: undefined reference to `ntb_link_event'
-drivers/pci/endpoint/functions/pci-epf-vntb.c:262: undefined reference to `ntb_db_event'
-drivers/pci/endpoint/functions/pci-epf-vntb.c:975:5: warning: no previous prototype for 'pci_read' [-Wmissing-prototypes]
-drivers/pci/endpoint/functions/pci-epf-vntb.c:984:5: warning: no previous prototype for 'pci_write' [-Wmissing-prototypes]
-drivers/vfio/vfio_iommu_type1.c:2141:35: warning: cast to smaller integer type 'enum iommu_cap' from 'void *' [-Wvoid-pointer-to-enum-cast]
-fs/nfsd/nfsctl.c:1504:17: error: use of undeclared identifier 'NFS4_CLIENTS_PER_GB'
-security/apparmor/policy_ns.c:83:20: warning: no previous prototype for 'alloc_unconfined' [-Wmissing-prototypes]
-security/apparmor/policy_ns.c:83:20: warning: no previous prototype for function 'alloc_unconfined' [-Wmissing-prototypes]
-
-Unverified Error/Warning (likely false positive, please contact us if interested):
-
-arch/x86/kernel/cpu/rdrand.c:36 x86_init_rdrand() error: uninitialized symbol 'prev'.
-drivers/devfreq/mtk-cci-devfreq.c:135 mtk_ccifreq_target() warn: variable dereferenced before check 'drv' (see line 130)
-drivers/gpio/gpio-xilinx.c:709:1: internal compiler error: in arc_ifcvt, at config/arc/arc.cc:9642
-drivers/gpio/gpiolib-cdev.c:2563:1: internal compiler error: in arc_ifcvt, at config/arc/arc.cc:9642
-drivers/gpio/gpiolib.c:2215:1: internal compiler error: in arc_ifcvt, at config/arc/arc.cc:9642
-drivers/gpu/drm/amd/amdgpu/../display/dc/bios/bios_parser2.c:2994:1: internal compiler error: in arc_ifcvt, at config/arc/arc.cc:9642
-drivers/gpu/drm/drm_mipi_dbi.c:876:1: internal compiler error: in arc_ifcvt, at config/arc/arc.cc:9642
-drivers/hid/hid-input.c:2276:1: internal compiler error: in arc_ifcvt, at config/arc/arc.cc:9642
-drivers/i2c/busses/i2c-designware-master.c:165:1: internal compiler error: in arc_ifcvt, at config/arc/arc.cc:9642
-drivers/i2c/busses/i2c-jz4780.c:359:1: internal compiler error: in arc_ifcvt, at config/arc/arc.cc:9642
-drivers/i2c/busses/i2c-mt65xx.c:927:1: internal compiler error: in arc_ifcvt, at config/arc/arc.cc:9642
-drivers/i2c/busses/i2c-npcm7xx.c:639 npcm_i2c_slave_enable() error: buffer overflow 'npcm_i2caddr' 2 <= 9
-drivers/i2c/busses/i2c-s3c2410.c:746:1: internal compiler error: in arc_ifcvt, at config/arc/arc.cc:9642
-drivers/i2c/busses/i2c-xiic.c:540:1: internal compiler error: in arc_ifcvt, at config/arc/arc.cc:9642
-drivers/iio/industrialio-buffer.c:927:1: internal compiler error: in arc_ifcvt, at config/arc/arc.cc:9642
-drivers/md/dm-mpath.c:1681:1: internal compiler error: in arc_ifcvt, at config/arc/arc.cc:9642
-drivers/media/cec/i2c/ch7322.c:332:1: internal compiler error: in arc_ifcvt, at config/arc/arc.cc:9642
-drivers/mfd/da9062-core.c:323:1: internal compiler error: in arc_ifcvt, at config/arc/arc.cc:9642
-drivers/misc/habanalabs/gaudi2/gaudi2.c:8728:1: internal compiler error: in arc_ifcvt, at config/arc/arc.cc:9642
-drivers/mmc/host/dw_mmc.c:989:1: internal compiler error: in arc_ifcvt, at config/arc/arc.cc:9642
-drivers/net/can/slcan/slcan-core.c:601:14: sparse:    void *
-drivers/net/can/slcan/slcan-core.c:601:14: sparse:    void [noderef] __rcu *
-drivers/net/can/slcan/slcan-core.c:601:14: sparse: sparse: incompatible types in comparison expression (different address spaces):
-drivers/net/phy/phylink.c:887 phylink_change_inband_advert() error: we previously assumed 'pl->pcs' could be null (see line 870)
-drivers/nfc/trf7970a.c:631:1: internal compiler error: in arc_ifcvt, at config/arc/arc.cc:9642
-drivers/pinctrl/core.c:2093:1: internal compiler error: in arc_ifcvt, at config/arc/arc.cc:9642
-drivers/pinctrl/stm32/pinctrl-stm32.c:1627:1: internal compiler error: in arc_ifcvt, at config/arc/arc.cc:9642
-drivers/power/supply/bq24190_charger.c:1944:1: internal compiler error: in arc_ifcvt, at config/arc/arc.cc:9642
-drivers/power/supply/bq24257_charger.c:1078:1: internal compiler error: in arc_ifcvt, at config/arc/arc.cc:9642
-drivers/power/supply/bq25890_charger.c:847:1: internal compiler error: in arc_ifcvt, at config/arc/arc.cc:9642
-drivers/power/supply/bq27xxx_battery.c:1123:1: internal compiler error: in arc_ifcvt, at config/arc/arc.cc:9642
-drivers/power/supply/rt9455_charger.c:1055:1: internal compiler error: in arc_ifcvt, at config/arc/arc.cc:9642
-drivers/power/supply/sbs-battery.c:355:1: internal compiler error: in arc_ifcvt, at config/arc/arc.cc:9642
-drivers/regulator/core.c:5171:1: internal compiler error: in arc_ifcvt, at config/arc/arc.cc:9642
-drivers/regulator/s2mps11.c:1226:1: internal compiler error: in arc_ifcvt, at config/arc/arc.cc:9642
-drivers/regulator/slg51000-regulator.c:436:1: internal compiler error: in arc_ifcvt, at config/arc/arc.cc:9642
-drivers/scsi/qla2xxx/qla_os.c:336:5: sparse: sparse: symbol 'ql2xdelay_before_pci_error_handling' was not declared. Should it be static?
-drivers/target/target_core_device.c:1013:1: internal compiler error: in arc_ifcvt, at config/arc/arc.cc:9642
-drivers/tty/n_gsm.c:1526:1: internal compiler error: in arc_ifcvt, at config/arc/arc.cc:9642
-drivers/usb/gadget/composite.c:1080:1: internal compiler error: in arc_ifcvt, at config/arc/arc.cc:9642
-drivers/video/fbdev/sh_mobile_lcdcfb.c:2505:1: internal compiler error: in arc_ifcvt, at config/arc/arc.cc:9642
-fs/ext4/extents.c:1293:1: internal compiler error: in arc_ifcvt, at config/arc/arc.cc:9642
-fs/kernel_read_file.c:61 kernel_read_file() warn: impossible condition '(i_size > (((~0) >> 1))) => (s64min-s64max > s64max)'
-include/linux/bits.h:9:41: warning: shift by negative count ('-1') [-Wanalyzer-shift-count-negative]
-include/linux/libata.h:2052:1: internal compiler error: in arc_ifcvt, at config/arc/arc.cc:9642
-kernel/params.c:214:1: internal compiler error: in arc_ifcvt, at config/arc/arc.cc:9642
-lib/842/842_decompress.c:210:1: internal compiler error: in arc_ifcvt, at config/arc/arc.cc:9642
-lib/kobject.c:683:1: internal compiler error: in arc_ifcvt, at config/arc/arc.cc:9642
-net/bluetooth/aosp.c:114:1: internal compiler error: in arc_ccfsm_record_condition, at config/arc/arc.cc:5500
-net/bluetooth/hci_request.c:2029:1: internal compiler error: in arc_ccfsm_record_condition, at config/arc/arc.cc:5500
-net/caif/cfctrl.c:583:1: internal compiler error: in arc_ifcvt, at config/arc/arc.cc:9642
-
-Error/Warning ids grouped by kconfigs:
-
-gcc_recent_errors
-|-- alpha-allyesconfig
-|   |-- drivers-pci-endpoint-functions-pci-epf-vntb.c:warning:no-previous-prototype-for-pci_read
-|   |-- drivers-pci-endpoint-functions-pci-epf-vntb.c:warning:no-previous-prototype-for-pci_write
-|   `-- security-apparmor-policy_ns.c:warning:no-previous-prototype-for-alloc_unconfined
-|-- alpha-randconfig-c004-20220716
-|   |-- drivers-pci-endpoint-functions-pci-epf-vntb.c:warning:no-previous-prototype-for-pci_read
-|   `-- drivers-pci-endpoint-functions-pci-epf-vntb.c:warning:no-previous-prototype-for-pci_write
-|-- arc-allyesconfig
-|   |-- drivers-gpu-drm-amd-amdgpu-..-display-dc-bios-bios_parser2.c:internal-compiler-error:in-arc_ifcvt-at-config-arc-arc.cc
-|   |-- drivers-misc-habanalabs-gaudi2-gaudi2.c:internal-compiler-error:in-arc_ifcvt-at-config-arc-arc.cc
-|   |-- drivers-net-wireless-mac80211_hwsim.c:warning:cast-to-pointer-from-integer-of-different-size
-|   |-- drivers-pci-endpoint-functions-pci-epf-vntb.c:warning:no-previous-prototype-for-pci_read
-|   |-- drivers-pci-endpoint-functions-pci-epf-vntb.c:warning:no-previous-prototype-for-pci_write
-|   |-- drivers-target-target_core_device.c:internal-compiler-error:in-arc_ifcvt-at-config-arc-arc.cc
-|   `-- security-apparmor-policy_ns.c:warning:no-previous-prototype-for-alloc_unconfined
-|-- arc-randconfig-m031-20220716
-|   |-- drivers-devfreq-mtk-cci-devfreq.c-mtk_ccifreq_target()-warn:variable-dereferenced-before-check-drv-(see-line-)
-|   `-- drivers-i2c-busses-i2c-npcm7xx.c-npcm_i2c_slave_enable()-error:buffer-overflow-npcm_i2caddr
-|-- arc-randconfig-r013-20220715
-|   |-- drivers-usb-gadget-composite.c:internal-compiler-error:in-arc_ifcvt-at-config-arc-arc.cc
-|   |-- net-bluetooth-aosp.c:internal-compiler-error:in-arc_ccfsm_record_condition-at-config-arc-arc.cc
-|   `-- net-bluetooth-hci_request.c:internal-compiler-error:in-arc_ccfsm_record_condition-at-config-arc-arc.cc
-|-- arc-randconfig-r032-20220715
-|   |-- drivers-gpio-gpio-xilinx.c:internal-compiler-error:in-arc_ifcvt-at-config-arc-arc.cc
-|   |-- drivers-gpio-gpiolib-cdev.c:internal-compiler-error:in-arc_ifcvt-at-config-arc-arc.cc
-|   |-- drivers-gpio-gpiolib.c:internal-compiler-error:in-arc_ifcvt-at-config-arc-arc.cc
-|   |-- drivers-gpu-drm-drm_mipi_dbi.c:internal-compiler-error:in-arc_ifcvt-at-config-arc-arc.cc
-|   |-- drivers-hid-hid-input.c:internal-compiler-error:in-arc_ifcvt-at-config-arc-arc.cc
-|   |-- drivers-i2c-busses-i2c-designware-master.c:internal-compiler-error:in-arc_ifcvt-at-config-arc-arc.cc
-|   |-- drivers-i2c-busses-i2c-jz4780.c:internal-compiler-error:in-arc_ifcvt-at-config-arc-arc.cc
-|   |-- drivers-i2c-busses-i2c-mt65xx.c:internal-compiler-error:in-arc_ifcvt-at-config-arc-arc.cc
-|   |-- drivers-i2c-busses-i2c-s3c2410.c:internal-compiler-error:in-arc_ifcvt-at-config-arc-arc.cc
-|   |-- drivers-i2c-busses-i2c-xiic.c:internal-compiler-error:in-arc_ifcvt-at-config-arc-arc.cc
-|   |-- drivers-iio-industrialio-buffer.c:internal-compiler-error:in-arc_ifcvt-at-config-arc-arc.cc
-|   |-- drivers-md-dm-mpath.c:internal-compiler-error:in-arc_ifcvt-at-config-arc-arc.cc
-|   |-- drivers-media-cec-i2c-ch7322.c:internal-compiler-error:in-arc_ifcvt-at-config-arc-arc.cc
-|   |-- drivers-mfd-da9062-core.c:internal-compiler-error:in-arc_ifcvt-at-config-arc-arc.cc
-|   |-- drivers-mmc-host-dw_mmc.c:internal-compiler-error:in-arc_ifcvt-at-config-arc-arc.cc
-|   |-- drivers-nfc-trf7970a.c:internal-compiler-error:in-arc_ifcvt-at-config-arc-arc.cc
-|   |-- drivers-pinctrl-core.c:internal-compiler-error:in-arc_ifcvt-at-config-arc-arc.cc
-|   |-- drivers-pinctrl-stm32-pinctrl-stm32.c:internal-compiler-error:in-arc_ifcvt-at-config-arc-arc.cc
-|   |-- drivers-power-supply-bq24190_charger.c:internal-compiler-error:in-arc_ifcvt-at-config-arc-arc.cc
-|   |-- drivers-power-supply-bq24257_charger.c:internal-compiler-error:in-arc_ifcvt-at-config-arc-arc.cc
-|   |-- drivers-power-supply-bq25890_charger.c:internal-compiler-error:in-arc_ifcvt-at-config-arc-arc.cc
-|   |-- drivers-power-supply-bq27xxx_battery.c:internal-compiler-error:in-arc_ifcvt-at-config-arc-arc.cc
-|   |-- drivers-power-supply-rt9455_charger.c:internal-compiler-error:in-arc_ifcvt-at-config-arc-arc.cc
-|   |-- drivers-power-supply-sbs-battery.c:internal-compiler-error:in-arc_ifcvt-at-config-arc-arc.cc
-|   |-- drivers-regulator-core.c:internal-compiler-error:in-arc_ifcvt-at-config-arc-arc.cc
-|   |-- drivers-regulator-s2mps11.c:internal-compiler-error:in-arc_ifcvt-at-config-arc-arc.cc
-|   |-- drivers-regulator-slg51000-regulator.c:internal-compiler-error:in-arc_ifcvt-at-config-arc-arc.cc
-clang_recent_errors
-|-- arm-versatile_defconfig
-|   `-- fs-nfsd-nfsctl.c:error:use-of-undeclared-identifier-NFS4_CLIENTS_PER_GB
-|-- i386-randconfig-a015
-|   `-- fs-nfsd-nfsctl.c:error:use-of-undeclared-identifier-NFS4_CLIENTS_PER_GB
-|-- powerpc-mvme5100_defconfig
-|   `-- fs-nfsd-nfsctl.c:error:use-of-undeclared-identifier-NFS4_CLIENTS_PER_GB
-|-- x86_64-randconfig-a001
-|   `-- drivers-vfio-vfio_iommu_type1.c:warning:cast-to-smaller-integer-type-enum-iommu_cap-from-void
-|-- x86_64-randconfig-a005
-|   |-- drivers-vfio-vfio_iommu_type1.c:warning:cast-to-smaller-integer-type-enum-iommu_cap-from-void
-|   `-- security-apparmor-policy_ns.c:warning:no-previous-prototype-for-function-alloc_unconfined
-|-- x86_64-randconfig-a012
-|   `-- drivers-vfio-vfio_iommu_type1.c:warning:cast-to-smaller-integer-type-enum-iommu_cap-from-void
-|-- x86_64-randconfig-a016
-|   `-- security-apparmor-policy_ns.c:warning:no-previous-prototype-for-function-alloc_unconfined
-`-- x86_64-randconfig-k001
-    `-- drivers-vfio-vfio_iommu_type1.c:warning:cast-to-smaller-integer-type-enum-iommu_cap-from-void
-
-elapsed time: 725m
-
-configs tested: 98
-configs skipped: 4
-
-gcc tested configs:
-arm                                 defconfig
-arm                              allyesconfig
-arm64                            allyesconfig
-i386                          randconfig-c001
-sh                        sh7785lcr_defconfig
-powerpc                    sam440ep_defconfig
-arm                           h3600_defconfig
-mips                         cobalt_defconfig
-sparc                             allnoconfig
-arm                     eseries_pxa_defconfig
-xtensa                generic_kc705_defconfig
-arm                           sama5_defconfig
-sh                         ap325rxa_defconfig
-arm                          gemini_defconfig
-m68k                        stmark2_defconfig
-mips                         rt305x_defconfig
-arm                             rpc_defconfig
-powerpc                      pasemi_defconfig
-sh                        sh7763rdp_defconfig
-mips                    maltaup_xpa_defconfig
-xtensa                              defconfig
-sh                           se7721_defconfig
-arm                           viper_defconfig
-sh                        edosk7705_defconfig
-alpha                             allnoconfig
-powerpc                 mpc8540_ads_defconfig
-nios2                         3c120_defconfig
-powerpc                     ep8248e_defconfig
-riscv                               defconfig
-riscv                             allnoconfig
-riscv                    nommu_virt_defconfig
-i386                              debian-10.3
-riscv                    nommu_k210_defconfig
-riscv                          rv32_defconfig
-i386                   debian-10.3-kselftests
-x86_64                        randconfig-c001
-ia64                             allmodconfig
-csky                              allnoconfig
-arc                               allnoconfig
-m68k                             allmodconfig
-arc                              allyesconfig
-alpha                            allyesconfig
-m68k                             allyesconfig
-powerpc                           allnoconfig
-sh                               allmodconfig
-mips                             allyesconfig
-powerpc                          allmodconfig
-i386                                defconfig
-i386                             allyesconfig
-x86_64                        randconfig-a004
-x86_64                        randconfig-a002
-x86_64                        randconfig-a006
-i386                          randconfig-a001
-i386                          randconfig-a003
-i386                          randconfig-a005
-x86_64                        randconfig-a013
-x86_64                        randconfig-a011
-x86_64                        randconfig-a015
-i386                          randconfig-a014
-i386                          randconfig-a012
-i386                          randconfig-a016
-arc                  randconfig-r043-20220715
-um                             i386_defconfig
-um                           x86_64_defconfig
-x86_64                              defconfig
-x86_64                               rhel-8.3
-x86_64                           allyesconfig
-x86_64                          rhel-8.3-func
-x86_64                         rhel-8.3-kunit
-x86_64                    rhel-8.3-kselftests
-x86_64                           rhel-8.3-syz
-
-clang tested configs:
-powerpc                     kmeter1_defconfig
-powerpc                  mpc885_ads_defconfig
-powerpc                    mvme5100_defconfig
-arm                       versatile_defconfig
-arm                              alldefconfig
-powerpc                  mpc866_ads_defconfig
-mips                     cu1830-neo_defconfig
-arm                            dove_defconfig
-arm                   milbeaut_m10v_defconfig
-powerpc                      obs600_defconfig
-x86_64                        randconfig-k001
-x86_64                        randconfig-a005
-x86_64                        randconfig-a001
-x86_64                        randconfig-a003
-i386                          randconfig-a002
-i386                          randconfig-a004
-i386                          randconfig-a006
-x86_64                        randconfig-a016
-x86_64                        randconfig-a012
-x86_64                        randconfig-a014
-i386                          randconfig-a013
-i386                          randconfig-a015
-i386                          randconfig-a011
-hexagon              randconfig-r045-20220715
-hexagon              randconfig-r041-20220715
-s390                 randconfig-r044-20220715
-riscv                randconfig-r042-20220715
-
--- 
-0-DAY CI Kernel Test Service
-https://01.org/lkp
+Reviewed-by: Mingwei Zhang <mizhang@google.com>
+> ---
+>  arch/x86/kvm/mmu/mmu.c          | 23 +++++------------------
+>  arch/x86/kvm/mmu/mmu_internal.h |  2 +-
+>  arch/x86/kvm/mmu/tdp_mmu.c      |  8 +-------
+>  3 files changed, 7 insertions(+), 26 deletions(-)
+> 
+> diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
+> index 52664c3caaab..bebff1d5acd4 100644
+> --- a/arch/x86/kvm/mmu/mmu.c
+> +++ b/arch/x86/kvm/mmu/mmu.c
+> @@ -2919,11 +2919,10 @@ static void direct_pte_prefetch(struct kvm_vcpu *vcpu, u64 *sptep)
+>  	__direct_pte_prefetch(vcpu, sp, sptep);
+>  }
+>  
+> -static int host_pfn_mapping_level(struct kvm *kvm, gfn_t gfn, kvm_pfn_t pfn,
+> +static int host_pfn_mapping_level(struct kvm *kvm, gfn_t gfn,
+>  				  const struct kvm_memory_slot *slot)
+>  {
+>  	int level = PG_LEVEL_4K;
+> -	struct page *page;
+>  	unsigned long hva;
+>  	unsigned long flags;
+>  	pgd_t pgd;
+> @@ -2931,17 +2930,6 @@ static int host_pfn_mapping_level(struct kvm *kvm, gfn_t gfn, kvm_pfn_t pfn,
+>  	pud_t pud;
+>  	pmd_t pmd;
+>  
+> -	/*
+> -	 * Note, @slot must be non-NULL, i.e. the caller is responsible for
+> -	 * ensuring @pfn isn't garbage and is backed by a memslot.
+> -	 */
+> -	page = kvm_pfn_to_refcounted_page(pfn);
+> -	if (!page)
+> -		return PG_LEVEL_4K;
+> -
+> -	if (!PageCompound(page) && !kvm_is_zone_device_page(page))
+> -		return PG_LEVEL_4K;
+> -
+>  	/*
+>  	 * Note, using the already-retrieved memslot and __gfn_to_hva_memslot()
+>  	 * is not solely for performance, it's also necessary to avoid the
+> @@ -2994,7 +2982,7 @@ static int host_pfn_mapping_level(struct kvm *kvm, gfn_t gfn, kvm_pfn_t pfn,
+>  
+>  int kvm_mmu_max_mapping_level(struct kvm *kvm,
+>  			      const struct kvm_memory_slot *slot, gfn_t gfn,
+> -			      kvm_pfn_t pfn, int max_level)
+> +			      int max_level)
+>  {
+>  	struct kvm_lpage_info *linfo;
+>  	int host_level;
+> @@ -3009,7 +2997,7 @@ int kvm_mmu_max_mapping_level(struct kvm *kvm,
+>  	if (max_level == PG_LEVEL_4K)
+>  		return PG_LEVEL_4K;
+>  
+> -	host_level = host_pfn_mapping_level(kvm, gfn, pfn, slot);
+> +	host_level = host_pfn_mapping_level(kvm, gfn, slot);
+>  	return min(host_level, max_level);
+>  }
+>  
+> @@ -3034,8 +3022,7 @@ void kvm_mmu_hugepage_adjust(struct kvm_vcpu *vcpu, struct kvm_page_fault *fault
+>  	 * level, which will be used to do precise, accurate accounting.
+>  	 */
+>  	fault->req_level = kvm_mmu_max_mapping_level(vcpu->kvm, slot,
+> -						     fault->gfn, fault->pfn,
+> -						     fault->max_level);
+> +						     fault->gfn, fault->max_level);
+>  	if (fault->req_level == PG_LEVEL_4K || fault->huge_page_disallowed)
+>  		return;
+>  
+> @@ -6406,7 +6393,7 @@ static bool kvm_mmu_zap_collapsible_spte(struct kvm *kvm,
+>  		 */
+>  		if (sp->role.direct &&
+>  		    sp->role.level < kvm_mmu_max_mapping_level(kvm, slot, sp->gfn,
+> -							       pfn, PG_LEVEL_NUM)) {
+> +							       PG_LEVEL_NUM)) {
+>  			pte_list_remove(kvm, rmap_head, sptep);
+>  
+>  			if (kvm_available_flush_tlb_with_range())
+> diff --git a/arch/x86/kvm/mmu/mmu_internal.h b/arch/x86/kvm/mmu/mmu_internal.h
+> index ae2d660e2dab..582def531d4d 100644
+> --- a/arch/x86/kvm/mmu/mmu_internal.h
+> +++ b/arch/x86/kvm/mmu/mmu_internal.h
+> @@ -309,7 +309,7 @@ static inline int kvm_mmu_do_page_fault(struct kvm_vcpu *vcpu, gpa_t cr2_or_gpa,
+>  
+>  int kvm_mmu_max_mapping_level(struct kvm *kvm,
+>  			      const struct kvm_memory_slot *slot, gfn_t gfn,
+> -			      kvm_pfn_t pfn, int max_level);
+> +			      int max_level);
+>  void kvm_mmu_hugepage_adjust(struct kvm_vcpu *vcpu, struct kvm_page_fault *fault);
+>  void disallowed_hugepage_adjust(struct kvm_page_fault *fault, u64 spte, int cur_level);
+>  
+> diff --git a/arch/x86/kvm/mmu/tdp_mmu.c b/arch/x86/kvm/mmu/tdp_mmu.c
+> index f3a430d64975..d75d93edc40a 100644
+> --- a/arch/x86/kvm/mmu/tdp_mmu.c
+> +++ b/arch/x86/kvm/mmu/tdp_mmu.c
+> @@ -1733,7 +1733,6 @@ static void zap_collapsible_spte_range(struct kvm *kvm,
+>  	gfn_t end = start + slot->npages;
+>  	struct tdp_iter iter;
+>  	int max_mapping_level;
+> -	kvm_pfn_t pfn;
+>  
+>  	rcu_read_lock();
+>  
+> @@ -1745,13 +1744,8 @@ static void zap_collapsible_spte_range(struct kvm *kvm,
+>  		    !is_last_spte(iter.old_spte, iter.level))
+>  			continue;
+>  
+> -		/*
+> -		 * This is a leaf SPTE. Check if the PFN it maps can
+> -		 * be mapped at a higher level.
+> -		 */
+> -		pfn = spte_to_pfn(iter.old_spte);
+>  		max_mapping_level = kvm_mmu_max_mapping_level(kvm, slot,
+> -				iter.gfn, pfn, PG_LEVEL_NUM);
+> +							      iter.gfn, PG_LEVEL_NUM);
+>  
+>  		WARN_ON(max_mapping_level < iter.level);
+>  
+> -- 
+> 2.37.0.170.g444d1eabd0-goog
+> 
