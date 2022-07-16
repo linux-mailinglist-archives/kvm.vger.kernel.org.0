@@ -2,70 +2,69 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 63C87576E0B
-	for <lists+kvm@lfdr.de>; Sat, 16 Jul 2022 14:46:43 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 80D9D5770E1
+	for <lists+kvm@lfdr.de>; Sat, 16 Jul 2022 20:52:07 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232096AbiGPMqm (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sat, 16 Jul 2022 08:46:42 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46794 "EHLO
+        id S232286AbiGPSwF (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sat, 16 Jul 2022 14:52:05 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55094 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232087AbiGPMqk (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sat, 16 Jul 2022 08:46:40 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 213501FCEC
-        for <kvm@vger.kernel.org>; Sat, 16 Jul 2022 05:46:40 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1657975599;
-        h=from:from:reply-to:reply-to:subject:subject:date:date:
-         message-id:message-id:to:to:cc:cc:mime-version:mime-version:
-         content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=gdJrggoBajMyD7ZX4uOkVmmZPh8On8F/BnqfeaTVrkg=;
-        b=KfHIkeJNqxgPz5Kxo855gv4NEl2jfn/9sfnuaTMMOh/GUpcITQWNzdLuh3ACYpf9BCRHov
-        d1ePNjtcJ+Ge7vn3kcNv7mGj+eMbI+QmGvcg9Ohk9Ysr7JGSMdQ1caGeyWRljpeAvNU1Dn
-        Lp42tvhEbF4AE6vDUZKb9Hy/Uz2GvAI=
-Received: from mimecast-mx02.redhat.com (mx3-rdu2.redhat.com
- [66.187.233.73]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-672-BcYhgWPOPneExPiVfr2R7A-1; Sat, 16 Jul 2022 08:46:33 -0400
-X-MC-Unique: BcYhgWPOPneExPiVfr2R7A-1
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.rdu2.redhat.com [10.11.54.2])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 45A533C01DEC;
-        Sat, 16 Jul 2022 12:46:33 +0000 (UTC)
-Received: from [10.64.54.37] (vpn2-54-37.bne.redhat.com [10.64.54.37])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id 74F3A40E8B04;
-        Sat, 16 Jul 2022 12:46:29 +0000 (UTC)
-Reply-To: Gavin Shan <gshan@redhat.com>
-Subject: Re: [PATCH] KVM: selftests: Double check on the current CPU in
- rseq_test
+        with ESMTP id S230315AbiGPSwE (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sat, 16 Jul 2022 14:52:04 -0400
+Received: from mail-pl1-x62e.google.com (mail-pl1-x62e.google.com [IPv6:2607:f8b0:4864:20::62e])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 98C9820BCB
+        for <kvm@vger.kernel.org>; Sat, 16 Jul 2022 11:52:03 -0700 (PDT)
+Received: by mail-pl1-x62e.google.com with SMTP id q5so5783490plr.11
+        for <kvm@vger.kernel.org>; Sat, 16 Jul 2022 11:52:03 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=/zm5921PIdLyylEWb3UJ2bmy8roH475LevweYH2b69k=;
+        b=Y22f83yk8rH+VEbiyo9v6Q1Wy5rno55x07ohaDQqtddX95MFd6xqeOCzYudMoMzzXo
+         S2SLZtWwQrEMWuq5AiuIaobMGr6LVWq0MwTNEDd8JC+vbZGVx/WINQUXUIVMQ9ujaZK/
+         2xY/PVo2Q/APVp0BpsUAMTeFqH7MqqFf8HUkY1nCGFcCCdbxcZLuVpJLSAu6KGDOXJd3
+         Mgvx1Sr3YdklXapWoowk++OENMPR2XCXLaPOpjFFvnXTngDd/vMDH4f1rF1206IA8A48
+         ZKebQtdOJsXJotApPuPjw4Ai/SFG8+Otf8+tDgLiI4z1hYOzSGH+vXqkNIMWwlpEtRZf
+         xl2w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=/zm5921PIdLyylEWb3UJ2bmy8roH475LevweYH2b69k=;
+        b=ZWLLNIxYKw03UzBnGF6qt7IuITP+MgHTFTiyEfe58Qulk4WmFBAJBEKaQpk2x+8Lxb
+         RQE+6IlXMF6clDyUoIxGIEZI1Ez2xFJtV8KYveyIYgVAMnfRXrpNc0DwUn5CI97Oxwv5
+         6BrViCPLVhE8k6nsWKewdqAqDbDuEtTNhltr97t2cNTOZkA/QTuNL591qbsMCr/t/AwP
+         lFXD9tW50MPRE+MsQMr2rv5znqLOEli91iSxqtDybDGBLQjmqRV3wmcfwb1kIhGhnTvy
+         U4XSzN2Uk700cvhOuyMOQHF+9f/Emzq5jSKrQJybiCa7HOw6QH8Gxe26Upfuqbdu38dF
+         tk5Q==
+X-Gm-Message-State: AJIora9MGEz7xJqOjTTthGtHaFc0HQ5jdjbdWtNgBg0IGSgDPeZLhNb/
+        MVcRZhcCn5/aOejwcjLFxhdimg==
+X-Google-Smtp-Source: AGRyM1t2YcDwu5/4sbq81CNCE8l9/E1XPe/ag7gaSPwza2dhFXd/Dq6+THLo1SLwjOEypCQUotnN5A==
+X-Received: by 2002:a17:902:8602:b0:16c:dfae:9afb with SMTP id f2-20020a170902860200b0016cdfae9afbmr3055479plo.35.1657997522166;
+        Sat, 16 Jul 2022 11:52:02 -0700 (PDT)
+Received: from google.com (59.39.145.34.bc.googleusercontent.com. [34.145.39.59])
+        by smtp.gmail.com with ESMTPSA id x1-20020a17090300c100b0016c4fb6e0b2sm5865429plc.55.2022.07.16.11.52.01
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sat, 16 Jul 2022 11:52:01 -0700 (PDT)
+Date:   Sat, 16 Jul 2022 18:51:58 +0000
+From:   Mingwei Zhang <mizhang@google.com>
 To:     Sean Christopherson <seanjc@google.com>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>, kvmarm@lists.cs.columbia.edu,
-        kvm@vger.kernel.org, linux-kselftest@vger.kernel.org,
-        linux-kernel@vger.kernel.org, mathieu.desnoyers@efficios.com,
-        shuah@kernel.org, maz@kernel.org, oliver.upton@linux.dev,
-        shan.gavin@gmail.com
-References: <20220714080642.3376618-1-gshan@redhat.com>
- <cd5d029c-b396-45ef-917b-92e054659623@redhat.com>
- <YtA3s0VRj3x7vO7B@google.com>
- <be806f9c-861a-8da8-d42e-1d4271c3a326@redhat.com>
- <YtF6gVYgMhoiD0Pe@google.com>
-From:   Gavin Shan <gshan@redhat.com>
-Message-ID: <ae6c6ad2-8211-6227-fa41-505ecc7df673@redhat.com>
-Date:   Sun, 17 Jul 2022 00:46:08 +1000
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.2.0
+Cc:     Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+Subject: Re: [PATCH 2/4] KVM: x86/mmu: Document the "rules" for using
+ host_pfn_mapping_level()
+Message-ID: <YtMIvgfsgIPWMgGM@google.com>
+References: <20220715232107.3775620-1-seanjc@google.com>
+ <20220715232107.3775620-3-seanjc@google.com>
 MIME-Version: 1.0
-In-Reply-To: <YtF6gVYgMhoiD0Pe@google.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.84 on 10.11.54.2
-X-Spam-Status: No, score=-2.7 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
-        RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_NONE autolearn=unavailable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20220715232107.3775620-3-seanjc@google.com>
+X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
+        USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=ham
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -73,81 +72,95 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi Sean,
+On Fri, Jul 15, 2022, Sean Christopherson wrote:
+> Add a comment to document how host_pfn_mapping_level() can be used safely,
+> as the line between safe and dangerous is quite thin.  E.g. if KVM were
+> to ever support in-place promotion to create huge pages, consuming the
+> level is safe if the caller holds mmu_lock and checks that there's an
+> existing _leaf_ SPTE, but unsafe if the caller only checks that there's a
+> non-leaf SPTE.
+> 
+> Opportunistically tweak the existing comments to explicitly document why
+> KVM needs to use READ_ONCE().
+> 
+> No functional change intended.
+> 
+> Signed-off-by: Sean Christopherson <seanjc@google.com>
+> ---
+>  arch/x86/kvm/mmu/mmu.c | 42 +++++++++++++++++++++++++++++++++++-------
+>  1 file changed, 35 insertions(+), 7 deletions(-)
+> 
+> diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
+> index bebff1d5acd4..d5b644f3e003 100644
+> --- a/arch/x86/kvm/mmu/mmu.c
+> +++ b/arch/x86/kvm/mmu/mmu.c
+> @@ -2919,6 +2919,31 @@ static void direct_pte_prefetch(struct kvm_vcpu *vcpu, u64 *sptep)
+>  	__direct_pte_prefetch(vcpu, sp, sptep);
+>  }
+>  
+> +/*
+> + * Lookup the mapping level for @gfn in the current mm.
+> + *
+> + * WARNING!  Use of host_pfn_mapping_level() requires the caller and the end
+> + * consumer to be tied into KVM's handlers for MMU notifier events!
+Since calling this function won't cause kernel crash now, I guess we can
+remove the warning sign here, but keep the remaining statement since it
+is necessary.
+> + *
+> + * There are several ways to safely use this helper:
+> + *
+> + * - Check mmu_notifier_retry_hva() after grabbing the mapping level, before
+> + *   consuming it.  In this case, mmu_lock doesn't need to be held during the
+> + *   lookup, but it does need to be held while checking the MMU notifier.
 
-On 7/16/22 12:32 AM, Sean Christopherson wrote:
-> On Fri, Jul 15, 2022, Gavin Shan wrote:
->> On 7/15/22 1:35 AM, Sean Christopherson wrote:
->>> On Thu, Jul 14, 2022, Paolo Bonzini wrote:
->> Well, I don't think migration_worker() does correct thing, if I'm understanding
->> correctly. The intention seems to force migration on 'main' thread by 'migration'
->> thread?  If that is the case, I don't think the following function call has correct
->> parameters.
->>
->>      r = sched_setaffinity(0, sizeof(allowed_mask), &allowed_mask);
->>
->>      it should be something like:
->>
->>      r = sched_setaffinity(getpid(), sizeof(allowed_mask), &allowed_mask);
->>
->> If we're using sched_setaffinity(0, ...) in the 'migration' thread, the CPU
->> affinity of 'main' thread won't be affected. It means 'main' thread can be
->> migrated from one CPU to another at any time, even in the following point:
->>
->>      int main(...)
->>      {
->>            :
->>            /*
->>             * migration can happen immediately after sched_getcpu(). If
->>             * CPU affinity of 'main' thread is sticky to one particular
->>             * CPU, which 'migration' thread supposes to do, then there
->>             * should have no migration.
->>             */
->>            cpu = sched_getcpu();
->>            rseq_cpu = READ_ONCE(__rseq.cpu_id);
->>            :
->>      }
->>
->> So I think the correct fix is to have sched_setaffinity(getpid(), ...) ?
->> Please refer to the manpage.
->>
->>     https://man7.org/linux/man-pages/man2/sched_setaffinity.2.html
->>     'If pid is zero, then the calling thread is used'
-> 
-> Oof, and more explicitly the rest of that sentence clarifies that the result of
-> getpid() will target the main thread (I assume "main" means thread group leader).
-> 
->     Specifying pid as 0 will set the attribute for the calling thread, and passing
->     the value returned from a call to getpid(2) will set the attribute for the main
->     thread of the thread group.
-> 
-> I'm guessing my test worked (in that it reproduced the bug) by virtue of the
-> scheduler trying to colocate all threads in the process.
-> 
-> In my defense, the die.net copy of the manpages quite clearly uses "process"[1],
-> but that was fixed in the manpages in 2013[2]!?!!?  So I guess the takeaway is
-> to use only the official manpages.
-> 
-> Anyways, for the code, my preference would be to snapshot gettid() in main() before
-> spawning the migration worker.  Same result, but I would rather the test explicitly
-> target the thread doing rseq instead of relying on (a) getpid() targeting only the
-> main thread and (b) the main thread always being the rseq thread.  E.g. if for some
-> reason a future patch moves the rseq code to its own worker thread, then getpid()
-> would be incorrect.
-> 
-> Thanks for figuring this out!
-> 
-> [1] https://linux.die.net/man/2/sched_setaffinity
-> [2] 6a7fcf3cc ("sched_setaffinity.2: Clarify that these system calls affect a per-thread attribute")
-> 
+but it does need to be held while checking the MMU notifier and
+consuming the result.
+> + *
+> + * - Hold mmu_lock AND ensure there is no in-progress MMU notifier invalidation
+> + *   event for the hva.  This can be done by explicit checking the MMU notifier
+> + *   or by ensuring that KVM already has a valid mapping that covers the hva.
 
-Thanks for your confirm. The suggested way, to cache tid of the thread group
-leader in advance, makes sense to me. The code has been modified accordingly
-in below patch, which was just posted. Please help to review when you get a
-chance.
-
-[PATCH v2] KVM: selftests: Fix target thread to be migrated in rseq_test
-
-Thanks,
-Gavin
-
+Yes, more specifically, "mmu notifier sequence counter".
+> + *
+> + * - Do not use the result to install new mappings, e.g. use the host mapping
+> + *   level only to decide whether or not to zap an entry.  In this case, it's
+> + *   not required to hold mmu_lock (though it's highly likely the caller will
+> + *   want to hold mmu_lock anyways, e.g. to modify SPTEs).
+> + *
+> + * Note!  The lookup can still race with modifications to host page tables, but
+> + * the above "rules" ensure KVM will not _consume_ the result of the walk if a
+> + * race with the primary MMU occurs.
+> + */
+>  static int host_pfn_mapping_level(struct kvm *kvm, gfn_t gfn,
+>  				  const struct kvm_memory_slot *slot)
+>  {
+> @@ -2941,16 +2966,19 @@ static int host_pfn_mapping_level(struct kvm *kvm, gfn_t gfn,
+>  	hva = __gfn_to_hva_memslot(slot, gfn);
+>  
+>  	/*
+> -	 * Lookup the mapping level in the current mm.  The information
+> -	 * may become stale soon, but it is safe to use as long as
+> -	 * 1) mmu_notifier_retry was checked after taking mmu_lock, and
+> -	 * 2) mmu_lock is taken now.
+> -	 *
+> -	 * We still need to disable IRQs to prevent concurrent tear down
+> -	 * of page tables.
+> +	 * Disable IRQs to prevent concurrent tear down of host page tables,
+> +	 * e.g. if the primary MMU promotes a P*D to a huge page and then frees
+> +	 * the original page table.
+>  	 */
+>  	local_irq_save(flags);
+>  
+> +	/*
+> +	 * Read each entry once.  As above, a non-leaf entry can be promoted to
+> +	 * a huge page _during_ this walk.  Re-reading the entry could send the
+> +	 * walk into the weeks, e.g. p*d_large() returns false (sees the old
+> +	 * value) and then p*d_offset() walks into the target huge page instead
+> +	 * of the old page table (sees the new value).
+> +	 */
+>  	pgd = READ_ONCE(*pgd_offset(kvm->mm, hva));
+>  	if (pgd_none(pgd))
+>  		goto out;
+> -- 
+> 2.37.0.170.g444d1eabd0-goog
+> 
