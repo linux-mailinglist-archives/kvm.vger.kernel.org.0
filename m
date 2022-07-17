@@ -2,84 +2,87 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id E8DF65771A3
-	for <lists+kvm@lfdr.de>; Sat, 16 Jul 2022 23:48:22 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 34A885772A1
+	for <lists+kvm@lfdr.de>; Sun, 17 Jul 2022 03:03:27 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232273AbiGPVsU (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sat, 16 Jul 2022 17:48:20 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49584 "EHLO
+        id S232151AbiGQBDY (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sat, 16 Jul 2022 21:03:24 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60806 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229941AbiGPVsT (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sat, 16 Jul 2022 17:48:19 -0400
-Received: from out2.migadu.com (out2.migadu.com [IPv6:2001:41d0:2:aacc::])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 851AD18E13;
-        Sat, 16 Jul 2022 14:48:18 -0700 (PDT)
-MIME-Version: 1.0
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-        t=1658008095;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=x3HXgQUrco41LDbc708fhSxzFK309rLRf0po+Yszzrw=;
-        b=eCdBgF63tI6bMObcpQ2Y+ue1cynT4Jr8YlUT8CmT88+KL0ZW5coTxvgDrWRKX0eWg+R9XG
-        pAOeZUmflMafSfx6A4PQQXlBtoyV3SsnNpBSBlNL+gWLnU3/za90g0hILCXV5Yc4rzKB6w
-        8Z2sLk2hjVwpKt6sYGVst9+JhM6176I=
-Date:   Sat, 16 Jul 2022 21:48:13 +0000
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From:   oliver.upton@linux.dev
-Message-ID: <385aa28ad559874da8429c40a68570df@linux.dev>
-Subject: Re: [PATCH v2] KVM: selftests: Fix target thread to be migrated
- in rseq_test
-To:     "Gavin Shan" <gshan@redhat.com>, kvmarm@lists.cs.columbia.edu
-Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
-        linux-kselftest@vger.kernel.org, seanjc@google.com,
-        pbonzini@redhat.com, maz@kernel.org, shuah@kernel.org,
-        shan.gavin@gmail.com
-In-Reply-To: <20220716144537.3436743-1-gshan@redhat.com>
-References: <20220716144537.3436743-1-gshan@redhat.com>
-X-Migadu-Flow: FLOW_OUT
-X-Migadu-Auth-User: linux.dev
-X-Spam-Status: No, score=-2.8 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,SPF_HELO_PASS,
-        SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
+        with ESMTP id S229505AbiGQBDY (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sat, 16 Jul 2022 21:03:24 -0400
+Received: from ams.source.kernel.org (ams.source.kernel.org [IPv6:2604:1380:4601:e00::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 315B01A81D;
+        Sat, 16 Jul 2022 18:03:23 -0700 (PDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by ams.source.kernel.org (Postfix) with ESMTPS id B07D1B80AE1;
+        Sun, 17 Jul 2022 01:03:21 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id EC3D9C34114;
+        Sun, 17 Jul 2022 01:03:19 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linux-foundation.org;
+        s=korg; t=1658019800;
+        bh=6lc/voAQIIG/VXdHbLyxYL355ctKMSS9UlOTlBJJc5M=;
+        h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+        b=Sw9ul5PuP/4fE7uKc3VlIVRaBEoakbFDaYCGWJHTFjycO+AgF6qNbNi5u2iBJeXDp
+         sYnWDsGhwiTkyThp5t5aQ0C/lMHv6VuJ0Z6rME8aCGUX4MXpTjLcr+Kletb3vec3he
+         80zU0cipj0Hxdfz/9huBPSv3Dls8N5M6qQ90iIlY=
+Date:   Sat, 16 Jul 2022 18:03:19 -0700
+From:   Andrew Morton <akpm@linux-foundation.org>
+To:     kernel test robot <lkp@intel.com>
+Cc:     ntfs3@lists.linux.dev, linux-pci@vger.kernel.org,
+        linux-ntfs-dev@lists.sourceforge.net, linux-mm@kvack.org,
+        linux-fsdevel@vger.kernel.org, linux-doc@vger.kernel.org,
+        linux-can@vger.kernel.org, linux-aspeed@lists.ozlabs.org,
+        linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org,
+        dri-devel@lists.freedesktop.org, bpf@vger.kernel.org,
+        Liam Howlett <liam.howlett@oracle.com>
+Subject: Re: [linux-next:master] BUILD REGRESSION
+ 4662b7adea50bb62e993a67f611f3be625d3df0d
+Message-Id: <20220716180319.dcb09d8ce9519368695c1108@linux-foundation.org>
+In-Reply-To: <62cf77c3.3T/sxYUjJq0ImGp4%lkp@intel.com>
+References: <62cf77c3.3T/sxYUjJq0ImGp4%lkp@intel.com>
+X-Mailer: Sylpheed 3.7.0 (GTK+ 2.24.33; x86_64-redhat-linux-gnu)
+Mime-Version: 1.0
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-Spam-Status: No, score=-7.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_DNSWL_HI,
+        SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi Gavin,=0A=0AThanks for cleaning this up.=0A=0AJuly 16, 2022 7:45 AM, "=
-Gavin Shan" <gshan@redhat.com> wrote:=0A> In rseq_test, there are two thr=
-eads, which are thread group leader=0A> and migration worker. The migrati=
-on worker relies on sched_setaffinity()=0A> to force migration on the thr=
-ead group leader.=0A=0AIt may be clearer to describe it as a vCPU thread =
-and a migration worker=0Athread. The meat of this test is to catch a regr=
-ession in KVM.=0A=0A> Unfortunately, we have=0A=0As/we have/the test has =
-the/=0A=0A> wrong parameter (0) passed to sched_getaffinity().=0A=0Awrong=
- PID=0A=0A> It's actually=0A> forcing migration on the migration worker i=
-nstead of the thread group=0A> leader.=0A=0AWhat's missing is _why_ the m=
-igration worker is getting moved around by=0Athe call. Perhaps instead it=
- is better to state what a PID of 0 implies,=0Afor those of us who haven'=
-t read their manpages in a while ;-)=0A=0A> It also means migration can h=
-appen on the thread group leader=0A> at any time, which eventually leads =
-to failure as the following logs=0A> show.=0A> =0A> host# uname -r=0A> 5.=
-19.0-rc6-gavin+=0A> host# # cat /proc/cpuinfo | grep processor | tail -n =
-1=0A> processor : 223=0A> host# pwd=0A> /home/gavin/sandbox/linux.main/to=
-ols/testing/selftests/kvm=0A> host# for i in `seq 1 100`; \=0A> do echo "=
---------> $i"; ./rseq_test; done=0A> --------> 1=0A> --------> 2=0A> ----=
-----> 3=0A> --------> 4=0A> --------> 5=0A> --------> 6=0A> =3D=3D=3D=3D =
-Test Assertion Failure =3D=3D=3D=3D=0A> rseq_test.c:265: rseq_cpu =3D=3D =
-cpu=0A> pid=3D3925 tid=3D3925 errno=3D4 - Interrupted system call=0A> 1 0=
-x0000000000401963: main at rseq_test.c:265 (discriminator 2)=0A> 2 0x0000=
-ffffb044affb: ?? ??:0=0A> 3 0x0000ffffb044b0c7: ?? ??:0=0A> 4 0x000000000=
-0401a6f: _start at ??:?=0A> rseq CPU =3D 4, sched CPU =3D 27=0A> =0A> Thi=
-s fixes the issue by passing correct parameter, tid of the group=0A> thre=
-ad leader, to sched_setaffinity().=0A=0AKernel commit messages should hav=
-e an imperative tone:=0A=0AFix the issue by ...=0A=0A> Fixes: 61e52f1630f=
-5 ("KVM: selftests: Add a test for KVM_RUN+rseq to detect task migration =
-bugs")=0A> Signed-off-by: Gavin Shan <gshan@redhat.com>=0A=0AWith the com=
-ments on the commit message addressed:=0A=0AReviewed-by: Oliver Upton <ol=
-iver.upton@linux.dev>
+On Thu, 14 Jul 2022 09:56:19 +0800 kernel test robot <lkp@intel.com> wrote:
+
+> lib/maple_tree.c:1522:52: warning: Parameter 'gaps' can be declared with const [constParameter]
+> lib/maple_tree.c:1871:21: warning: Array index 'split' is used before limits check. [arrayIndexThenCheck]
+> lib/maple_tree.c:2033:55: warning: Parameter 'mas' can be declared with const [constParameter]
+> lib/maple_tree.c:2426:8: warning: Redundant initialization for 'r_tmp'. The initialized value is overwritten before it is read. [redundantInitialization]
+> lib/maple_tree.c:2427:8: warning: Redundant initialization for 'l_tmp'. The initialized value is overwritten before it is read. [redundantInitialization]
+> lib/maple_tree.c:3160:22: warning: Found suspicious operator ',' [constStatement]
+> lib/maple_tree.c:3208:11: warning: Size of pointer 'pivs' used instead of size of its data. [pointerSize]
+> lib/maple_tree.c:326:2: warning: Assignment of function parameter has no effect outside the function. Did you forget dereferencing it? [uselessAssignmentPtrArg]
+> lib/maple_tree.c:4266:15: warning: The if condition is the same as the previous if condition [duplicateCondition]
+> lib/maple_tree.c:4302:23: warning: Boolean result is used in bitwise operation. Clarify expression with parentheses. [clarifyCondition]
+> lib/maple_tree.c:694:59: warning: Parameter 'pivots' can be declared with const [constParameter]
+> lib/test_printf.c:415:11: warning: Local variable 'addr' shadows outer function [shadowFunction]
+> mm/highmem.c:737:13: warning: Uninitialized variable: pam->page [uninitvar]
+> mm/migrate.c:355:53: warning: Parameter 'mapping' can be declared with const [constParameter]
+> mm/migrate.c:875:7: warning: Redundant initialization for 'rc'. The initialized value is overwritten before it is read. [redundantInitialization]
+> mm/mlock.c:230:20: warning: Using pointer that is a temporary. [danglingTemporaryLifetime]
+> mm/slab.c:1635:24: warning: Uninitialized variables: slab.__page_flags, slab.__unused_1, slab.freelist, slab.units, slab.__unused_2, slab.__page_refcount [uninitvar]
+> mm/slab.c:3289:7: warning: Redundant assignment of 'objp' to itself. [selfAssignment]
+> mm/slab.c:3509:8: warning: Redundant assignment of 'p[i]' to itself. [selfAssignment]
+> mm/slab.c:405:9: warning: Local variable 'slab_size' shadows outer function [shadowFunction]
+> mm/vmstat.c:1409:53: warning: Parameter 'pos' can be declared with const [constParameter]
+> mm/vmstat.c:1650:68: warning: Parameter 'zone' can be declared with const [constParameter]
+> mm/zsmalloc.c:2019:15: warning: Uninitialized variables: zspage.huge, zspage.fullness, zspage.class, zspage.isolated, zspage.magic, zspage.inuse, zspage.freeobj, zspage.first_page, zspage.lock [uninitvar]
+> mm/zsmalloc.c:2060:16: warning: Local variable 'obj_allocated' shadows outer function [shadowFunction]
+
+urgh, thanks, lots of stuff to go through here.
+
+Liam, I suggest we worry about the mapletree things at a later time ;)
