@@ -2,87 +2,178 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 34A885772A1
-	for <lists+kvm@lfdr.de>; Sun, 17 Jul 2022 03:03:27 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 8D7F45772AA
+	for <lists+kvm@lfdr.de>; Sun, 17 Jul 2022 03:12:11 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232151AbiGQBDY (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sat, 16 Jul 2022 21:03:24 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60806 "EHLO
+        id S232488AbiGQBMJ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sat, 16 Jul 2022 21:12:09 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36726 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229505AbiGQBDY (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sat, 16 Jul 2022 21:03:24 -0400
-Received: from ams.source.kernel.org (ams.source.kernel.org [IPv6:2604:1380:4601:e00::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 315B01A81D;
-        Sat, 16 Jul 2022 18:03:23 -0700 (PDT)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        with ESMTP id S229941AbiGQBMI (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sat, 16 Jul 2022 21:12:08 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 619B614D1A
+        for <kvm@vger.kernel.org>; Sat, 16 Jul 2022 18:12:07 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1658020325;
+        h=from:from:reply-to:reply-to:subject:subject:date:date:
+         message-id:message-id:to:to:cc:cc:mime-version:mime-version:
+         content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=Yvkpx482WEOx0k7AE4fGPI+kXMmx+3JjLrAm+UsDHkI=;
+        b=UyNMdZmIeBJwlEvB9xsfolbTRKnzh1vOJjpG+Mr0Pq9bpt6rkv0ZBQV1CC2geXacADGNPA
+        E1u2ELujndkkFsYzcssU9Z1YBrTgCLFUZb8rqcGHPKMw19xbEztn+AqrJmPecnFknHtcoz
+        dYOEQi3r54xnNx4VRMTumCldQLMNBNo=
+Received: from mimecast-mx02.redhat.com (mx3-rdu2.redhat.com
+ [66.187.233.73]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-394-9s9Nyz0tNK2LeBZoTUn9Mw-1; Sat, 16 Jul 2022 21:12:03 -0400
+X-MC-Unique: 9s9Nyz0tNK2LeBZoTUn9Mw-1
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.rdu2.redhat.com [10.11.54.2])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by ams.source.kernel.org (Postfix) with ESMTPS id B07D1B80AE1;
-        Sun, 17 Jul 2022 01:03:21 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id EC3D9C34114;
-        Sun, 17 Jul 2022 01:03:19 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linux-foundation.org;
-        s=korg; t=1658019800;
-        bh=6lc/voAQIIG/VXdHbLyxYL355ctKMSS9UlOTlBJJc5M=;
-        h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-        b=Sw9ul5PuP/4fE7uKc3VlIVRaBEoakbFDaYCGWJHTFjycO+AgF6qNbNi5u2iBJeXDp
-         sYnWDsGhwiTkyThp5t5aQ0C/lMHv6VuJ0Z6rME8aCGUX4MXpTjLcr+Kletb3vec3he
-         80zU0cipj0Hxdfz/9huBPSv3Dls8N5M6qQ90iIlY=
-Date:   Sat, 16 Jul 2022 18:03:19 -0700
-From:   Andrew Morton <akpm@linux-foundation.org>
-To:     kernel test robot <lkp@intel.com>
-Cc:     ntfs3@lists.linux.dev, linux-pci@vger.kernel.org,
-        linux-ntfs-dev@lists.sourceforge.net, linux-mm@kvack.org,
-        linux-fsdevel@vger.kernel.org, linux-doc@vger.kernel.org,
-        linux-can@vger.kernel.org, linux-aspeed@lists.ozlabs.org,
-        linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org,
-        dri-devel@lists.freedesktop.org, bpf@vger.kernel.org,
-        Liam Howlett <liam.howlett@oracle.com>
-Subject: Re: [linux-next:master] BUILD REGRESSION
- 4662b7adea50bb62e993a67f611f3be625d3df0d
-Message-Id: <20220716180319.dcb09d8ce9519368695c1108@linux-foundation.org>
-In-Reply-To: <62cf77c3.3T/sxYUjJq0ImGp4%lkp@intel.com>
-References: <62cf77c3.3T/sxYUjJq0ImGp4%lkp@intel.com>
-X-Mailer: Sylpheed 3.7.0 (GTK+ 2.24.33; x86_64-redhat-linux-gnu)
-Mime-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 521652932498;
+        Sun, 17 Jul 2022 01:12:03 +0000 (UTC)
+Received: from [10.64.54.37] (vpn2-54-37.bne.redhat.com [10.64.54.37])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id F3C4A40E8B04;
+        Sun, 17 Jul 2022 01:11:59 +0000 (UTC)
+Reply-To: Gavin Shan <gshan@redhat.com>
+Subject: Re: [PATCH v2] KVM: selftests: Fix target thread to be migrated in
+ rseq_test
+To:     oliver.upton@linux.dev, kvmarm@lists.cs.columbia.edu
+Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+        linux-kselftest@vger.kernel.org, seanjc@google.com,
+        pbonzini@redhat.com, maz@kernel.org, shuah@kernel.org,
+        shan.gavin@gmail.com
+References: <20220716144537.3436743-1-gshan@redhat.com>
+ <385aa28ad559874da8429c40a68570df@linux.dev>
+From:   Gavin Shan <gshan@redhat.com>
+Message-ID: <4bdaa1cd-39f4-97d7-ba33-ee5cdc7d609e@redhat.com>
+Date:   Sun, 17 Jul 2022 13:11:39 +1000
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.2.0
+MIME-Version: 1.0
+In-Reply-To: <385aa28ad559874da8429c40a68570df@linux.dev>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-7.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_DNSWL_HI,
-        SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
+X-Scanned-By: MIMEDefang 2.84 on 10.11.54.2
+X-Spam-Status: No, score=-2.7 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
+        RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_NONE autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, 14 Jul 2022 09:56:19 +0800 kernel test robot <lkp@intel.com> wrote:
+Hi Oliver,
 
-> lib/maple_tree.c:1522:52: warning: Parameter 'gaps' can be declared with const [constParameter]
-> lib/maple_tree.c:1871:21: warning: Array index 'split' is used before limits check. [arrayIndexThenCheck]
-> lib/maple_tree.c:2033:55: warning: Parameter 'mas' can be declared with const [constParameter]
-> lib/maple_tree.c:2426:8: warning: Redundant initialization for 'r_tmp'. The initialized value is overwritten before it is read. [redundantInitialization]
-> lib/maple_tree.c:2427:8: warning: Redundant initialization for 'l_tmp'. The initialized value is overwritten before it is read. [redundantInitialization]
-> lib/maple_tree.c:3160:22: warning: Found suspicious operator ',' [constStatement]
-> lib/maple_tree.c:3208:11: warning: Size of pointer 'pivs' used instead of size of its data. [pointerSize]
-> lib/maple_tree.c:326:2: warning: Assignment of function parameter has no effect outside the function. Did you forget dereferencing it? [uselessAssignmentPtrArg]
-> lib/maple_tree.c:4266:15: warning: The if condition is the same as the previous if condition [duplicateCondition]
-> lib/maple_tree.c:4302:23: warning: Boolean result is used in bitwise operation. Clarify expression with parentheses. [clarifyCondition]
-> lib/maple_tree.c:694:59: warning: Parameter 'pivots' can be declared with const [constParameter]
-> lib/test_printf.c:415:11: warning: Local variable 'addr' shadows outer function [shadowFunction]
-> mm/highmem.c:737:13: warning: Uninitialized variable: pam->page [uninitvar]
-> mm/migrate.c:355:53: warning: Parameter 'mapping' can be declared with const [constParameter]
-> mm/migrate.c:875:7: warning: Redundant initialization for 'rc'. The initialized value is overwritten before it is read. [redundantInitialization]
-> mm/mlock.c:230:20: warning: Using pointer that is a temporary. [danglingTemporaryLifetime]
-> mm/slab.c:1635:24: warning: Uninitialized variables: slab.__page_flags, slab.__unused_1, slab.freelist, slab.units, slab.__unused_2, slab.__page_refcount [uninitvar]
-> mm/slab.c:3289:7: warning: Redundant assignment of 'objp' to itself. [selfAssignment]
-> mm/slab.c:3509:8: warning: Redundant assignment of 'p[i]' to itself. [selfAssignment]
-> mm/slab.c:405:9: warning: Local variable 'slab_size' shadows outer function [shadowFunction]
-> mm/vmstat.c:1409:53: warning: Parameter 'pos' can be declared with const [constParameter]
-> mm/vmstat.c:1650:68: warning: Parameter 'zone' can be declared with const [constParameter]
-> mm/zsmalloc.c:2019:15: warning: Uninitialized variables: zspage.huge, zspage.fullness, zspage.class, zspage.isolated, zspage.magic, zspage.inuse, zspage.freeobj, zspage.first_page, zspage.lock [uninitvar]
-> mm/zsmalloc.c:2060:16: warning: Local variable 'obj_allocated' shadows outer function [shadowFunction]
+On 7/17/22 7:48 AM, oliver.upton@linux.dev wrote:
+> 
+> Thanks for cleaning this up.
+> 
 
-urgh, thanks, lots of stuff to go through here.
+Thanks for your review.
 
-Liam, I suggest we worry about the mapletree things at a later time ;)
+> July 16, 2022 7:45 AM, "Gavin Shan" <gshan@redhat.com> wrote:
+>> In rseq_test, there are two threads, which are thread group leader
+>> and migration worker. The migration worker relies on sched_setaffinity()
+>> to force migration on the thread group leader.
+> 
+> It may be clearer to describe it as a vCPU thread and a migration worker
+> thread. The meat of this test is to catch a regression in KVM.
+> 
+>> Unfortunately, we have
+> 
+> s/we have/the test has the/
+> 
+>> wrong parameter (0) passed to sched_getaffinity().
+> 
+> wrong PID
+> 
+
+Yep, it's much clearer to describe it as vCPU thread and migration worker.
+
+>> It's actually
+>> forcing migration on the migration worker instead of the thread group
+>> leader.
+> 
+> What's missing is _why_ the migration worker is getting moved around by
+> the call. Perhaps instead it is better to state what a PID of 0 implies,
+> for those of us who haven't read their manpages in a while ;-)
+> 
+
+Yes, it's good idea. I will have something like below in next revision :)
+
+     In rseq_test, there are two threads, which are vCPU thread and migration
+     worker separately. Unfortunately, the test has the wrong PID passed to
+     sched_setaffinity() in the migration worker. It forces migration on the
+     migration worker because zeroed PID represents the calling thread, which
+     is the migration worker itself. It means the vCPU thread is never enforced
+     to migration and it can migrate at any time, which eventually leads to
+     failure as the following logs show.
+         :
+         :
+     Fix the issue by passing correct parameter, TID of the vCPU thread, to
+     sched_setaffinity() in the migration worker.
+
+
+>> It also means migration can happen on the thread group leader
+>> at any time, which eventually leads to failure as the following logs
+>> show.
+>>
+>> host# uname -r
+>> 5.19.0-rc6-gavin+
+>> host# # cat /proc/cpuinfo | grep processor | tail -n 1
+>> processor : 223
+>> host# pwd
+>> /home/gavin/sandbox/linux.main/tools/testing/selftests/kvm
+>> host# for i in `seq 1 100`; \
+>> do echo "--------> $i"; ./rseq_test; done
+>> --------> 1
+>> --------> 2
+>> --------> 3
+>> --------> 4
+>> --------> 5
+>> --------> 6
+>> ==== Test Assertion Failure ====
+>> rseq_test.c:265: rseq_cpu == cpu
+>> pid=3925 tid=3925 errno=4 - Interrupted system call
+>> 1 0x0000000000401963: main at rseq_test.c:265 (discriminator 2)
+>> 2 0x0000ffffb044affb: ?? ??:0
+>> 3 0x0000ffffb044b0c7: ?? ??:0
+>> 4 0x0000000000401a6f: _start at ??:?
+>> rseq CPU = 4, sched CPU = 27
+>>
+>> This fixes the issue by passing correct parameter, tid of the group
+>> thread leader, to sched_setaffinity().
+> 
+> Kernel commit messages should have an imperative tone:
+> 
+> Fix the issue by ...
+> 
+
+Ok. I've been having my style for long time. Actually, the style was
+shared by some one when I worked for IBM long time ago. I will bear
+it in mind to use imperative expression since now on :)
+
+All your comments will be fixed in next revision, but I would delay
+the posting a bit to see Sean or Paolo have more comments. In that
+case, I can fix all of them at once.
+
+>> Fixes: 61e52f1630f5 ("KVM: selftests: Add a test for KVM_RUN+rseq to detect task migration bugs")
+>> Signed-off-by: Gavin Shan <gshan@redhat.com>
+> 
+> With the comments on the commit message addressed:
+> 
+> Reviewed-by: Oliver Upton <oliver.upton@linux.dev>
+> 
+
+Thanks again for your time on this.
+
+Thanks,
+Gavin
+
