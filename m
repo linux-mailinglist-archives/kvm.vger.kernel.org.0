@@ -2,76 +2,71 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 8E693578CC8
-	for <lists+kvm@lfdr.de>; Mon, 18 Jul 2022 23:33:52 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 44A49578D89
+	for <lists+kvm@lfdr.de>; Tue, 19 Jul 2022 00:30:07 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235355AbiGRVdv (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 18 Jul 2022 17:33:51 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54870 "EHLO
+        id S234596AbiGRWaF (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 18 Jul 2022 18:30:05 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37134 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235353AbiGRVdh (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 18 Jul 2022 17:33:37 -0400
+        with ESMTP id S233059AbiGRWaE (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 18 Jul 2022 18:30:04 -0400
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id DECF63245B
-        for <kvm@vger.kernel.org>; Mon, 18 Jul 2022 14:33:36 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 96836286D7
+        for <kvm@vger.kernel.org>; Mon, 18 Jul 2022 15:30:03 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1658180015;
+        s=mimecast20190719; t=1658183402;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=McBcNHr9RW9GxlAu+UJlcdP1dYuV9WY6CAhxiggXqkA=;
-        b=QyxmIgnaYtW7NNZjJpmGg6AGpvA08CBeX0soYaQLMuNL+0DXF/jjtxX+QL7ZMohRFRju10
-        wNCOCisL7Kv5DEum/Fy45BUa1Xe04MjAashG/7m3DnxYCQT0YmM0Vb1bW5Kj2ao3owD8oQ
-        +sIXYnG43Bxaz2ZDrtX8ats1SLq5tmE=
+        bh=xtK+zDK0ly1B+4VR7K7+afdONMMr3N7lkh16MEfdihY=;
+        b=NuGuPKhgCO8JH3Hj0nxah+khB3yagybZeYJM8P10RyXpQwUrYh1WGoWLseTUtodcIMt1ln
+        StbpHedaesKwe19SAq/zmoPpQB3IUaYc+cUG1xi0TCT7ksFs2phouGADAO5m1TcxDfKzF2
+        RGQMpRqykdrlB++GeUeqtZpAgyKewCE=
 Received: from mail-il1-f199.google.com (mail-il1-f199.google.com
  [209.85.166.199]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-552-AIG7na-NMDWbP7J5WKq9Ow-1; Mon, 18 Jul 2022 17:33:34 -0400
-X-MC-Unique: AIG7na-NMDWbP7J5WKq9Ow-1
-Received: by mail-il1-f199.google.com with SMTP id h28-20020a056e021d9c00b002dc15a95f9cso8106534ila.2
-        for <kvm@vger.kernel.org>; Mon, 18 Jul 2022 14:33:34 -0700 (PDT)
+ us-mta-290-tXQz9ehcNJmChVL8H-C2Gg-1; Mon, 18 Jul 2022 18:30:01 -0400
+X-MC-Unique: tXQz9ehcNJmChVL8H-C2Gg-1
+Received: by mail-il1-f199.google.com with SMTP id z2-20020a056e02088200b002dc4022c15fso8378784ils.11
+        for <kvm@vger.kernel.org>; Mon, 18 Jul 2022 15:30:01 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:date:from:to:cc:subject:message-id:in-reply-to
          :references:organization:mime-version:content-transfer-encoding;
-        bh=McBcNHr9RW9GxlAu+UJlcdP1dYuV9WY6CAhxiggXqkA=;
-        b=MNYvajct12Ijc5Dzz3SCVZE2fSkat4t14mrwD8sSjue5djnNztMA7q8iWce1GYW6GY
-         i88G6bisXjSpm8AqZFVU36XK1FaGxxkj+hs3Cjewr7awfXGG5EDMo9sXDiq9l4YXOvOy
-         evUnH080KDASG8GavkJqWrgaZQhbh++WJvj/W0bZ9FUrzSK8iER03doqZLNrUVf/33NS
-         6JQndbeNILhi7yuzAUVx47X3ZI2yS9GnRNYhD2Oqgwpt92WUpLfmiyzi+07V4ORfddDY
-         PhY46Ze3VTVb2FLrgbPMzMYOYnFWFB4bvaHfLKCKjVWHacgNT7Dpmxn/3m2dqjVRMGrc
-         DHlg==
-X-Gm-Message-State: AJIora/DiykdpPRYk4FJqJMKZyrTGn4q31mRmb6/GAFbgyf9NGp24XMa
-        JtexCGuV+bS//BsfPDQ9Tb/hqWmxaz4uB42oetFp/mqgfJ/9aPuM3bcrmh6wGRAMt/n3lwArwX0
-        nV3UWMXefac0m
-X-Received: by 2002:a6b:3e83:0:b0:678:e63b:355d with SMTP id l125-20020a6b3e83000000b00678e63b355dmr13719278ioa.134.1658180014077;
-        Mon, 18 Jul 2022 14:33:34 -0700 (PDT)
-X-Google-Smtp-Source: AGRyM1sDrGa8ze2j/q2lwFrndLWdf63qIpnOAVsNqsBc/gBPGdJhX41ARLJ2Yuy3bl7gy/bKR3KwsA==
-X-Received: by 2002:a6b:3e83:0:b0:678:e63b:355d with SMTP id l125-20020a6b3e83000000b00678e63b355dmr13719265ioa.134.1658180013803;
-        Mon, 18 Jul 2022 14:33:33 -0700 (PDT)
+        bh=xtK+zDK0ly1B+4VR7K7+afdONMMr3N7lkh16MEfdihY=;
+        b=pdsIf2kdNR/XW3AKnexaoKEOB5CbN1iTAhMIkura6+Uc9Ac+qX6QVMztnOgDdq33MD
+         /10K8+CpTmHAmr88S1/BfI8LC8og23usZ5eIivkXN4DUYAnLP5+Foki+1WPpJpeUtP/O
+         rNEtRbryYGKv5Tg3vEExaSxhoRsz09OQyqF0krvHYFPmGSqrg1W1q3I5h7Gqh7HPDvil
+         uhZ1DuYTzktZdee4K6pmOLf+G8yKMr0sOlSLOimQ7rIl8EQhV0s/JIUbUbtJI359fW2G
+         +Je0lwqJ3M1xpmzhpK+Ve7sXYnO2QzE6sOJgwk1qwD7UPyGtr6k+eSJm6BjtqHmP4D/B
+         jQGA==
+X-Gm-Message-State: AJIora8Ehfk36GXa+Pp3+8/eXk5SaRiQ/NJfflNtx9uxYtW7gaUAyh+M
+        jexc6mwu15+Xhm7THwDCVr6sjwKAoSWTX743ZTEfIHXWXA6Pjach8/NTNhUXHSRKxx5MgmrPcyw
+        dkiInQUZS67Jz
+X-Received: by 2002:a05:6e02:148c:b0:2dc:386c:9a1a with SMTP id n12-20020a056e02148c00b002dc386c9a1amr14866330ilk.188.1658183400594;
+        Mon, 18 Jul 2022 15:30:00 -0700 (PDT)
+X-Google-Smtp-Source: AGRyM1tAXqEcJK0pIkcIl+HlvZE/NM1Hw/04cn2Y4kQD0d6n104uGJ2KDqJv/Jab6Sp3lvrytW0Z8Q==
+X-Received: by 2002:a05:6e02:148c:b0:2dc:386c:9a1a with SMTP id n12-20020a056e02148c00b002dc386c9a1amr14866315ilk.188.1658183400341;
+        Mon, 18 Jul 2022 15:30:00 -0700 (PDT)
 Received: from redhat.com ([38.15.36.239])
-        by smtp.gmail.com with ESMTPSA id d190-20020a6bb4c7000000b0066961821575sm6386751iof.34.2022.07.18.14.33.33
+        by smtp.gmail.com with ESMTPSA id n2-20020a056e0208e200b002dcdbb4f7b7sm2752335ilt.24.2022.07.18.15.29.59
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 18 Jul 2022 14:33:33 -0700 (PDT)
-Date:   Mon, 18 Jul 2022 15:33:31 -0600
+        Mon, 18 Jul 2022 15:29:59 -0700 (PDT)
+Date:   Mon, 18 Jul 2022 16:29:57 -0600
 From:   Alex Williamson <alex.williamson@redhat.com>
-To:     Christoph Hellwig <hch@lst.de>
-Cc:     Kirti Wankhede <kwankhede@nvidia.com>,
-        Tony Krowiak <akrowiak@linux.ibm.com>,
-        Halil Pasic <pasic@linux.ibm.com>,
-        Jason Herne <jjherne@linux.ibm.com>,
-        Eric Farman <farman@linux.ibm.com>,
-        Matthew Rosato <mjrosato@linux.ibm.com>,
-        Zhenyu Wang <zhenyuw@linux.intel.com>,
-        Zhi Wang <zhi.a.wang@intel.com>,
-        Jason Gunthorpe <jgg@nvidia.com>, kvm@vger.kernel.org,
-        linux-s390@vger.kernel.org, intel-gvt-dev@lists.freedesktop.org
-Subject: Re: simplify the mdev interface v6
-Message-ID: <20220718153331.18a52e31.alex.williamson@redhat.com>
-In-Reply-To: <20220718054348.GA22345@lst.de>
-References: <20220709045450.609884-1-hch@lst.de>
-        <20220718054348.GA22345@lst.de>
+To:     Yishai Hadas <yishaih@nvidia.com>
+Cc:     <jgg@nvidia.com>, <saeedm@nvidia.com>, <kvm@vger.kernel.org>,
+        <netdev@vger.kernel.org>, <kuba@kernel.org>,
+        <kevin.tian@intel.com>, <joao.m.martins@oracle.com>,
+        <leonro@nvidia.com>, <maorg@nvidia.com>, <cohuck@redhat.com>,
+        Kirti Wankhede <kwankhede@nvidia.com>
+Subject: Re: [PATCH V2 vfio 03/11] vfio: Introduce DMA logging uAPIs
+Message-ID: <20220718162957.45ac2a0b.alex.williamson@redhat.com>
+In-Reply-To: <20220714081251.240584-4-yishaih@nvidia.com>
+References: <20220714081251.240584-1-yishaih@nvidia.com>
+        <20220714081251.240584-4-yishaih@nvidia.com>
 Organization: Red Hat
 MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
@@ -85,78 +80,141 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, 18 Jul 2022 07:43:48 +0200
-Christoph Hellwig <hch@lst.de> wrote:
+On Thu, 14 Jul 2022 11:12:43 +0300
+Yishai Hadas <yishaih@nvidia.com> wrote:
 
-> Alex, does this series look good to you now?
+> DMA logging allows a device to internally record what DMAs the device is
+> initiating and report them back to userspace. It is part of the VFIO
+> migration infrastructure that allows implementing dirty page tracking
+> during the pre copy phase of live migration. Only DMA WRITEs are logged,
+> and this API is not connected to VFIO_DEVICE_FEATURE_MIG_DEVICE_STATE.
+> 
+> This patch introduces the DMA logging involved uAPIs.
+> 
+> It uses the FEATURE ioctl with its GET/SET/PROBE options as of below.
+> 
+> It exposes a PROBE option to detect if the device supports DMA logging.
+> It exposes a SET option to start device DMA logging in given IOVAs
+> ranges.
+> It exposes a SET option to stop device DMA logging that was previously
+> started.
+> It exposes a GET option to read back and clear the device DMA log.
+> 
+> Extra details exist as part of vfio.h per a specific option.
 
-It does.  I was hoping we'd get a more complete set acks from the mdev
-driver owners, but I'll grab this within the next day or two with
-whatever additional reviews come in by then.  Thanks,
+
+Kevin, Kirti, others, any comments on this uAPI proposal?  Are there
+potentially other devices that might make use of this or is everyone
+else waiting for IOMMU based dirty tracking?
+
+ 
+> Signed-off-by: Yishai Hadas <yishaih@nvidia.com>
+> Signed-off-by: Jason Gunthorpe <jgg@nvidia.com>
+> ---
+>  include/uapi/linux/vfio.h | 79 +++++++++++++++++++++++++++++++++++++++
+>  1 file changed, 79 insertions(+)
+> 
+> diff --git a/include/uapi/linux/vfio.h b/include/uapi/linux/vfio.h
+> index 733a1cddde30..81475c3e7c92 100644
+> --- a/include/uapi/linux/vfio.h
+> +++ b/include/uapi/linux/vfio.h
+> @@ -986,6 +986,85 @@ enum vfio_device_mig_state {
+>  	VFIO_DEVICE_STATE_RUNNING_P2P = 5,
+>  };
+>  
+> +/*
+> + * Upon VFIO_DEVICE_FEATURE_SET start device DMA logging.
+> + * VFIO_DEVICE_FEATURE_PROBE can be used to detect if the device supports
+> + * DMA logging.
+> + *
+> + * DMA logging allows a device to internally record what DMAs the device is
+> + * initiating and report them back to userspace. It is part of the VFIO
+> + * migration infrastructure that allows implementing dirty page tracking
+> + * during the pre copy phase of live migration. Only DMA WRITEs are logged,
+> + * and this API is not connected to VFIO_DEVICE_FEATURE_MIG_DEVICE_STATE.
+> + *
+> + * When DMA logging is started a range of IOVAs to monitor is provided and the
+> + * device can optimize its logging to cover only the IOVA range given. Each
+> + * DMA that the device initiates inside the range will be logged by the device
+> + * for later retrieval.
+> + *
+> + * page_size is an input that hints what tracking granularity the device
+> + * should try to achieve. If the device cannot do the hinted page size then it
+> + * should pick the next closest page size it supports. On output the device
+> + * will return the page size it selected.
+> + *
+> + * ranges is a pointer to an array of
+> + * struct vfio_device_feature_dma_logging_range.
+> + */
+> +struct vfio_device_feature_dma_logging_control {
+> +	__aligned_u64 page_size;
+> +	__u32 num_ranges;
+> +	__u32 __reserved;
+> +	__aligned_u64 ranges;
+> +};
+> +
+> +struct vfio_device_feature_dma_logging_range {
+> +	__aligned_u64 iova;
+> +	__aligned_u64 length;
+> +};
+> +
+> +#define VFIO_DEVICE_FEATURE_DMA_LOGGING_START 3
+> +
+> +/*
+> + * Upon VFIO_DEVICE_FEATURE_SET stop device DMA logging that was started
+> + * by VFIO_DEVICE_FEATURE_DMA_LOGGING_START
+> + */
+> +#define VFIO_DEVICE_FEATURE_DMA_LOGGING_STOP 4
+> +
+> +/*
+> + * Upon VFIO_DEVICE_FEATURE_GET read back and clear the device DMA log
+> + *
+> + * Query the device's DMA log for written pages within the given IOVA range.
+> + * During querying the log is cleared for the IOVA range.
+> + *
+> + * bitmap is a pointer to an array of u64s that will hold the output bitmap
+> + * with 1 bit reporting a page_size unit of IOVA. The mapping of IOVA to bits
+> + * is given by:
+> + *  bitmap[(addr - iova)/page_size] & (1ULL << (addr % 64))
+> + *
+> + * The input page_size can be any power of two value and does not have to
+> + * match the value given to VFIO_DEVICE_FEATURE_DMA_LOGGING_START. The driver
+> + * will format its internal logging to match the reporting page size, possibly
+> + * by replicating bits if the internal page size is lower than requested.
+> + *
+> + * Bits will be updated in bitmap using atomic or to allow userspace to
+> + * combine bitmaps from multiple trackers together. Therefore userspace must
+> + * zero the bitmap before doing any reports.
+
+Somewhat confusing, perhaps "between report sets"?
+
+> + *
+> + * If any error is returned userspace should assume that the dirty log is
+> + * corrupted and restart.
+
+Restart what?  The user can't just zero the bitmap and retry, dirty
+information at the device has been lost.  Are we suggesting they stop
+DMA logging and restart it, which sounds a lot like failing a migration
+and starting over.  Or could the user gratuitously mark the bitmap
+fully dirty and a subsequent logging report iteration might work?
+Thanks,
 
 Alex
 
-> On Sat, Jul 09, 2022 at 06:54:36AM +0200, Christoph Hellwig wrote:
-> > Hi all,
-> > 
-> > this series signigicantly simplies the mdev driver interface by following
-> > the patterns for device model interaction used elsewhere in the kernel.
-> > 
-> > Changes since v5:
-> >  - rebased to the latest vfio/next branch
-> >  - drop the last patch again
-> >  - make sure show_available_instances works properly for the internallly
-> >    tracked case
-> > 
-> > Changes since v4:
-> >  - move the kobject_put later in mdev_device_release 
-> >  - add a Fixes tag for the first patch
-> >  - add another patch to remove an extra kobject_get/put
-> > 
-> > Changes since v3:
-> >  - make the sysfs_name and pretty_name fields pointers instead of arrays
-> >  - add an i915 cleanup to prepare for the above
-> > 
-> > Changes since v2:
-> >  - rebased to vfio/next
-> >  - fix a pre-existing memory leak in i915 instead of making it worse
-> >  - never manipulate if ->available_instances if drv->get_available is
-> >    provided
-> >  - keep a parent reference for the mdev_type
-> >  - keep a few of the sysfs.c helper function around
-> >  - improve the documentation for the parent device lifetime
-> >  - minor spellig / formatting fixes
-> > 
-> > Changes since v1:
-> >  - embedd the mdev_parent into a different sub-structure in i916
-> >  - remove headers now inclued by mdev.h from individual source files
-> >  - pass an array of mdev_types to mdev_register_parent
-> >  - add additional patches to implement all attributes on the
-> >    mdev_type in the core code
-> > 
-> > Diffstat:
-> >  Documentation/driver-api/vfio-mediated-device.rst |   26 +-
-> >  Documentation/s390/vfio-ap.rst                    |    2 
-> >  Documentation/s390/vfio-ccw.rst                   |    2 
-> >  drivers/gpu/drm/i915/gvt/aperture_gm.c            |   20 +-
-> >  drivers/gpu/drm/i915/gvt/gvt.h                    |   42 ++--
-> >  drivers/gpu/drm/i915/gvt/kvmgt.c                  |  168 ++++-------------
-> >  drivers/gpu/drm/i915/gvt/vgpu.c                   |  210 +++++++---------------
-> >  drivers/s390/cio/cio.h                            |    4 
-> >  drivers/s390/cio/vfio_ccw_drv.c                   |   12 -
-> >  drivers/s390/cio/vfio_ccw_ops.c                   |   51 -----
-> >  drivers/s390/cio/vfio_ccw_private.h               |    2 
-> >  drivers/s390/crypto/vfio_ap_ops.c                 |   68 +------
-> >  drivers/s390/crypto/vfio_ap_private.h             |    6 
-> >  drivers/vfio/mdev/mdev_core.c                     |  190 ++++---------------
-> >  drivers/vfio/mdev/mdev_driver.c                   |    7 
-> >  drivers/vfio/mdev/mdev_private.h                  |   32 ---
-> >  drivers/vfio/mdev/mdev_sysfs.c                    |  189 ++++++++++---------
-> >  include/linux/mdev.h                              |   77 ++++----
-> >  samples/vfio-mdev/mbochs.c                        |  103 +++-------
-> >  samples/vfio-mdev/mdpy.c                          |  115 +++---------
-> >  samples/vfio-mdev/mtty.c                          |   94 +++------
-> >  21 files changed, 463 insertions(+), 957 deletions(-)  
-> ---end quoted text---
-> 
+> + *
+> + * If DMA logging is not enabled, an error will be returned.
+> + *
+> + */
+> +struct vfio_device_feature_dma_logging_report {
+> +	__aligned_u64 iova;
+> +	__aligned_u64 length;
+> +	__aligned_u64 page_size;
+> +	__aligned_u64 bitmap;
+> +};
+> +
+> +#define VFIO_DEVICE_FEATURE_DMA_LOGGING_REPORT 5
+> +
+>  /* -------- API for Type1 VFIO IOMMU -------- */
+>  
+>  /**
 
