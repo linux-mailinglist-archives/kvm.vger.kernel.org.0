@@ -2,112 +2,108 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id E36D9578687
-	for <lists+kvm@lfdr.de>; Mon, 18 Jul 2022 17:41:33 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 6B1825786A9
+	for <lists+kvm@lfdr.de>; Mon, 18 Jul 2022 17:47:46 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233195AbiGRPlA (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 18 Jul 2022 11:41:00 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52212 "EHLO
+        id S233972AbiGRPro (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 18 Jul 2022 11:47:44 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57508 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234440AbiGRPkz (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 18 Jul 2022 11:40:55 -0400
-Received: from mail-pf1-x434.google.com (mail-pf1-x434.google.com [IPv6:2607:f8b0:4864:20::434])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B0511D13B
-        for <kvm@vger.kernel.org>; Mon, 18 Jul 2022 08:40:54 -0700 (PDT)
-Received: by mail-pf1-x434.google.com with SMTP id g126so10982167pfb.3
-        for <kvm@vger.kernel.org>; Mon, 18 Jul 2022 08:40:54 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=2cMWEzH+ndHC8450rlhcgrDegQ6VEB9Envd54B2eHQM=;
-        b=nHIb9ilRkN+ScQRf4KAfdybqCJR4JlX3y4DhOKfTXgzb/3cl0+iJtHr4u/fcrizScf
-         rb037cQsqbF8NwgHWnVOHL/0OtoSytKLszg6ieUHwGu/4UWBZIVnV11UZOpi89IsAF2p
-         SREYybKwuibfl7/azpWvY3586mhEc2Cu9QtELy/t1J4NeB38i3+VQCrzhody3rWbkk/l
-         KRAKXoTvTGCWgdgnNhHeFJCQscPWKuVLDWs+dJSc2oCctw+fgZuOU1Vck21foDcPREfH
-         2P+wXyJMU3pr4tD6yvud7caJCYga/nP6fVtoVdnXACleiXMtaVBv1Zb1kymvyt4QwzXR
-         WxPA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=2cMWEzH+ndHC8450rlhcgrDegQ6VEB9Envd54B2eHQM=;
-        b=AK5rUozSNOyeRBS+FhJXHn1gJE1HcuKP7h+Oglw30iKbYIgfpKdjxWGIa34C0Qx1fJ
-         qCn6pgDZHpozxGfe2zCiWnFAe/7pBNrZLb615l/iSkgy63EdIhmshUn0I4viwZve923s
-         z2S2kiWskrr2DfQL4RBX9Ua3vBocPcS1w93vbbthl6kT7zd2NXTfqxrQg7VEw6ikQDDw
-         9EEYYrOubXUGCV5rLd+hd4Sii7kf9nePct7K6lAezWH55dVyoJ7PKkPIyNYfVrBvf2m6
-         2Cur5ENuBjvKbIHnJlk1ijj8Ivcx+jkZTMbhqwo0l4GQEaAiZd2/Eaq14oTSIv1c5ioF
-         VvHg==
-X-Gm-Message-State: AJIora/N0YeIQsCH69daYtks/hS73+VgdtuPwCcQzCTRPgx0QKEhosmF
-        DPaHsxIYi7g8aerh971xH51hGQ==
-X-Google-Smtp-Source: AGRyM1veve2U62QrxA7Nk2HtioTqWAVXZhSf4GQ9SNLY+wx/A/uu2FyRIVMKkFvnDnsJHnEVLKUy9g==
-X-Received: by 2002:a63:8342:0:b0:415:dde4:f5ec with SMTP id h63-20020a638342000000b00415dde4f5ecmr24201850pge.263.1658158854045;
-        Mon, 18 Jul 2022 08:40:54 -0700 (PDT)
-Received: from google.com (123.65.230.35.bc.googleusercontent.com. [35.230.65.123])
-        by smtp.gmail.com with ESMTPSA id gg15-20020a17090b0a0f00b001ec932d7592sm9525989pjb.9.2022.07.18.08.40.53
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 18 Jul 2022 08:40:53 -0700 (PDT)
-Date:   Mon, 18 Jul 2022 15:40:49 +0000
-From:   Sean Christopherson <seanjc@google.com>
-To:     Maxim Levitsky <mlevitsk@redhat.com>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        with ESMTP id S229639AbiGRPrn (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 18 Jul 2022 11:47:43 -0400
+Received: from vps-vb.mhejs.net (vps-vb.mhejs.net [37.28.154.113])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 58CD32980C;
+        Mon, 18 Jul 2022 08:47:41 -0700 (PDT)
+Received: from MUA
+        by vps-vb.mhejs.net with esmtps  (TLS1.2) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+        (Exim 4.94.2)
+        (envelope-from <mail@maciej.szmigiero.name>)
+        id 1oDSxq-00049n-UZ; Mon, 18 Jul 2022 17:47:18 +0200
+From:   "Maciej S. Szmigiero" <mail@maciej.szmigiero.name>
+To:     Paolo Bonzini <pbonzini@redhat.com>,
+        Sean Christopherson <seanjc@google.com>
+Cc:     Vitaly Kuznetsov <vkuznets@redhat.com>,
         Wanpeng Li <wanpengli@tencent.com>,
         Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org, Oliver Upton <oupton@google.com>,
-        Peter Shier <pshier@google.com>
-Subject: Re: [PATCH v2 12/21] KVM: x86: Make kvm_queued_exception a properly
- named, visible struct
-Message-ID: <YtV/AbG1vyd4Leto@google.com>
-References: <20220614204730.3359543-1-seanjc@google.com>
- <20220614204730.3359543-13-seanjc@google.com>
- <c558310c75367530948b6cccc45cbfe6522cd552.camel@redhat.com>
- <4692a0906554cf6f0473ad138da1b4d739388c89.camel@redhat.com>
+        Joerg Roedel <joro@8bytes.org>,
+        Maxim Levitsky <mlevitsk@redhat.com>, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+Subject: [PATCH] KVM: nSVM: Pull CS.Base from actual VMCB12 for soft int/ex re-injection
+Date:   Mon, 18 Jul 2022 17:47:13 +0200
+Message-Id: <4caa0f67589ae3c22c311ee0e6139496902f2edc.1658159083.git.maciej.szmigiero@oracle.com>
+X-Mailer: git-send-email 2.35.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <4692a0906554cf6f0473ad138da1b4d739388c89.camel@redhat.com>
-X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-        USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=ham
-        autolearn_force=no version=3.4.6
+Content-Transfer-Encoding: 8bit
+X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,SPF_HELO_NONE,
+        SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Jul 18, 2022, Maxim Levitsky wrote:
-> On Mon, 2022-07-18 at 16:07 +0300, Maxim Levitsky wrote:
-> > On Tue, 2022-06-14 at 20:47 +0000, Sean Christopherson wrote:
-> > > Move the definition of "struct kvm_queued_exception" out of kvm_vcpu_arch
-> > > in anticipation of adding a second instance in kvm_vcpu_arch to handle
-> > > exceptions that occur when vectoring an injected exception and are
-> > > morphed to VM-Exit instead of leading to #DF.
-> > > 
-> > > Opportunistically take advantage of the churn to rename "nr" to "vector".
-> > > 
-> > > No functional change intended.
-> > > 
-> > > Signed-off-by: Sean Christopherson <seanjc@google.com>
-> > > ---
-> > > 
-> > ...
-> > 
-> > 
-> > Is this change below intentional? My memory on nested_apf_token is quite rusty, but at least
-> > if possible, I would prefer this to be done in separate patch.
+From: "Maciej S. Szmigiero" <maciej.szmigiero@oracle.com>
 
-Yikes!  It's not intention as of this patch.  It _is_ intentional for the "morph"
-patch, as KVM can simply force "has_payload" in kvm_inject_page_fault() when
-directly queueing the VM-Exit.  I suspect I botched this patch when splitting the
-original changes into separate patches.
+enter_svm_guest_mode() first calls nested_vmcb02_prepare_control() to copy
+control fields from VMCB12 to the current VMCB, then
+nested_vmcb02_prepare_save() to perform a similar copy of the save area.
 
-> Sorry, I replied to the wrong mail, but the newer version also has the same issue.
-> (It should be v3 btw.)
+This means that nested_vmcb02_prepare_control() still runs with the
+previous save area values in the current VMCB so it shouldn't take the L2
+guest CS.Base from this area.
 
-Argh, sorry about the versioning mixup.  I distinctly remember thinking this
-couldn't possibly have been only the second version...  Should have double-checked
-instead of trusting my archive.
+Explicitly pull CS.Base from the actual VMCB12 instead in
+enter_svm_guest_mode().
+
+Granted, having a non-zero CS.Base is a very rare thing (and even
+impossible in 64-bit mode), having it change between nested VMRUNs is
+probably even rarer, but if it happens it would create a really subtle bug
+so it's better to fix it upfront.
+
+Fixes: 6ef88d6e36c2 ("KVM: SVM: Re-inject INT3/INTO instead of retrying the instruction")
+Signed-off-by: Maciej S. Szmigiero <maciej.szmigiero@oracle.com>
+---
+ arch/x86/kvm/svm/nested.c | 9 +++++----
+ 1 file changed, 5 insertions(+), 4 deletions(-)
+
+diff --git a/arch/x86/kvm/svm/nested.c b/arch/x86/kvm/svm/nested.c
+index adf4120b05d90..23252ab821941 100644
+--- a/arch/x86/kvm/svm/nested.c
++++ b/arch/x86/kvm/svm/nested.c
+@@ -639,7 +639,8 @@ static bool is_evtinj_nmi(u32 evtinj)
+ }
+ 
+ static void nested_vmcb02_prepare_control(struct vcpu_svm *svm,
+-					  unsigned long vmcb12_rip)
++					  unsigned long vmcb12_rip,
++					  unsigned long vmcb12_csbase)
+ {
+ 	u32 int_ctl_vmcb01_bits = V_INTR_MASKING_MASK;
+ 	u32 int_ctl_vmcb12_bits = V_TPR_MASK | V_IRQ_INJECTION_BITS_MASK;
+@@ -711,7 +712,7 @@ static void nested_vmcb02_prepare_control(struct vcpu_svm *svm,
+ 	svm->nmi_l1_to_l2 = is_evtinj_nmi(vmcb02->control.event_inj);
+ 	if (is_evtinj_soft(vmcb02->control.event_inj)) {
+ 		svm->soft_int_injected = true;
+-		svm->soft_int_csbase = svm->vmcb->save.cs.base;
++		svm->soft_int_csbase = vmcb12_csbase;
+ 		svm->soft_int_old_rip = vmcb12_rip;
+ 		if (svm->nrips_enabled)
+ 			svm->soft_int_next_rip = svm->nested.ctl.next_rip;
+@@ -800,7 +801,7 @@ int enter_svm_guest_mode(struct kvm_vcpu *vcpu, u64 vmcb12_gpa,
+ 	nested_svm_copy_common_state(svm->vmcb01.ptr, svm->nested.vmcb02.ptr);
+ 
+ 	svm_switch_vmcb(svm, &svm->nested.vmcb02);
+-	nested_vmcb02_prepare_control(svm, vmcb12->save.rip);
++	nested_vmcb02_prepare_control(svm, vmcb12->save.rip, vmcb12->save.cs.base);
+ 	nested_vmcb02_prepare_save(svm, vmcb12);
+ 
+ 	ret = nested_svm_load_cr3(&svm->vcpu, svm->nested.save.cr3,
+@@ -1663,7 +1664,7 @@ static int svm_set_nested_state(struct kvm_vcpu *vcpu,
+ 	nested_copy_vmcb_control_to_cache(svm, ctl);
+ 
+ 	svm_switch_vmcb(svm, &svm->nested.vmcb02);
+-	nested_vmcb02_prepare_control(svm, svm->vmcb->save.rip);
++	nested_vmcb02_prepare_control(svm, svm->vmcb->save.rip, svm->vmcb->save.cs.base);
+ 
+ 	/*
+ 	 * While the nested guest CR3 is already checked and set by
