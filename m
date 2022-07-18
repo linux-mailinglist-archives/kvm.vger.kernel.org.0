@@ -2,41 +2,41 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id A2B525784E8
-	for <lists+kvm@lfdr.de>; Mon, 18 Jul 2022 16:11:49 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 4D6105784ED
+	for <lists+kvm@lfdr.de>; Mon, 18 Jul 2022 16:12:01 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235064AbiGROLo (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 18 Jul 2022 10:11:44 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36838 "EHLO
+        id S235755AbiGROL5 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 18 Jul 2022 10:11:57 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37038 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235728AbiGROLn (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 18 Jul 2022 10:11:43 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 17A872715A
-        for <kvm@vger.kernel.org>; Mon, 18 Jul 2022 07:11:43 -0700 (PDT)
+        with ESMTP id S235750AbiGROL4 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 18 Jul 2022 10:11:56 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 347FB27173
+        for <kvm@vger.kernel.org>; Mon, 18 Jul 2022 07:11:55 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1658153502;
+        s=mimecast20190719; t=1658153514;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=0PgYUbpcI18aPSDLfXO0VvnbczjLoh+Trj4I+dch4ZU=;
-        b=bMV8+qA6UWHEyb2hM9zGi5cM/t9VlnWicVA7nMq9uoMWSa9MqcSeMTSrLMAURfapV744HB
-        yGRVX472PKV415kIi6l7rvg5YImxRaUGqlyhlr54TKK/DHMzc82ALggMe86nLLTLGgfSCR
-        ciqjLaPz3tSUEIV4untO+3xmDt6iVQE=
+        bh=w5ar1xL/lWu4+LzORYC79cebbS3mhMxSowTJXzIDy14=;
+        b=ObEPlGUo3z6gOcAtHmJ/HxF5Wj5bQDOLwVscub1iDBfRRH1+rTY9J+NQKYS5jWMlinfFFN
+        BbYLcwqJDyKkm6K0F31GjcE7eLfveKvlb+mjZxNG+NHWMU0hdqYRE3hi2qmJDt4agyPIbB
+        /I0oPXyKAdHSEZR8fl17+mFZeywsn0M=
 Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
  [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-193-ZvEW642ONcCrVnYdmGuw2Q-1; Mon, 18 Jul 2022 10:11:36 -0400
-X-MC-Unique: ZvEW642ONcCrVnYdmGuw2Q-1
+ us-mta-62-F11jd_UNMn6FzKPX6SELGw-1; Mon, 18 Jul 2022 10:11:42 -0400
+X-MC-Unique: F11jd_UNMn6FzKPX6SELGw-1
 Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.rdu2.redhat.com [10.11.54.4])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 33502101A588;
-        Mon, 18 Jul 2022 14:11:35 +0000 (UTC)
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 3250096AC62;
+        Mon, 18 Jul 2022 14:11:40 +0000 (UTC)
 Received: from amdlaptop.tlv.redhat.com (dhcp-4-238.tlv.redhat.com [10.35.4.238])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 8EB232026D2D;
-        Mon, 18 Jul 2022 14:11:30 +0000 (UTC)
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 7E7D92026D64;
+        Mon, 18 Jul 2022 14:11:35 +0000 (UTC)
 From:   Maxim Levitsky <mlevitsk@redhat.com>
 To:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org
 Cc:     Pawan Gupta <pawan.kumar.gupta@linux.intel.com>,
@@ -65,16 +65,16 @@ Cc:     Pawan Gupta <pawan.kumar.gupta@linux.intel.com>,
         Mark Rutland <mark.rutland@arm.com>,
         linux-perf-users@vger.kernel.org,
         linux-crypto@vger.kernel.org (open list:CRYPTO API)
-Subject: [PATCH v2 1/5] perf/x86/intel/lbr: use setup_clear_cpu_cap instead of clear_cpu_cap
-Date:   Mon, 18 Jul 2022 17:11:19 +0300
-Message-Id: <20220718141123.136106-2-mlevitsk@redhat.com>
+Subject: [PATCH v2 2/5] x86/cpuid: refactor setup_clear_cpu_cap()/clear_cpu_cap()
+Date:   Mon, 18 Jul 2022 17:11:20 +0300
+Message-Id: <20220718141123.136106-3-mlevitsk@redhat.com>
 In-Reply-To: <20220718141123.136106-1-mlevitsk@redhat.com>
 References: <20220718141123.136106-1-mlevitsk@redhat.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-Scanned-By: MIMEDefang 2.78 on 10.11.54.4
-X-Spam-Status: No, score=-3.5 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,
+X-Spam-Status: No, score=-2.8 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
         SPF_HELO_NONE,SPF_NONE autolearn=unavailable autolearn_force=no
         version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
@@ -83,32 +83,67 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-clear_cpu_cap(&boot_cpu_data) is very similar to setup_clear_cpu_cap
-except that the latter also sets a bit in 'cpu_caps_cleared' which
-later clears the same cap in secondary cpus, which is likely
-what is meant here.
+Currently setup_clear_cpu_cap passes NULL 'struct cpuinfo_x86*'
+to clear_cpu_cap to indicate that capability should be cleared from boot_cpu_data.
 
-Fixes: 47125db27e47 ("perf/x86/intel/lbr: Support Architectural LBR")
+Later that is used in clear_feature to do recursive call to
+clear_cpu_cap together with clearing the feature bit from 'cpu_caps_cleared'
 
-Reviewed-by: Kan Liang <kan.liang@linux.intel.com>
+Remove that code and just call the do_clear_cpu_cap on boot_cpu_data directly
+from the setup_clear_cpu_cap.
+
+The only functional change this introduces is that now calling clear_cpu_cap
+explicitly on boot_cpu_data also sets the bits in cpu_caps_cleared,
+which is the only thing that makes sense anyway.
+
+All callers of both functions were checked for this and fixed.
+
 Signed-off-by: Maxim Levitsky <mlevitsk@redhat.com>
 ---
- arch/x86/events/intel/lbr.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ arch/x86/kernel/cpu/cpuid-deps.c | 17 +++++------------
+ 1 file changed, 5 insertions(+), 12 deletions(-)
 
-diff --git a/arch/x86/events/intel/lbr.c b/arch/x86/events/intel/lbr.c
-index 13179f31fe10fa..b08715172309a7 100644
---- a/arch/x86/events/intel/lbr.c
-+++ b/arch/x86/events/intel/lbr.c
-@@ -1860,7 +1860,7 @@ void __init intel_pmu_arch_lbr_init(void)
- 	return;
- 
- clear_arch_lbr:
--	clear_cpu_cap(&boot_cpu_data, X86_FEATURE_ARCH_LBR);
-+	setup_clear_cpu_cap(X86_FEATURE_ARCH_LBR);
+diff --git a/arch/x86/kernel/cpu/cpuid-deps.c b/arch/x86/kernel/cpu/cpuid-deps.c
+index c881bcafba7d70..d6777d07ba3302 100644
+--- a/arch/x86/kernel/cpu/cpuid-deps.c
++++ b/arch/x86/kernel/cpu/cpuid-deps.c
+@@ -88,18 +88,16 @@ static inline void clear_feature(struct cpuinfo_x86 *c, unsigned int feature)
+ 	 * rest of the cpufeature code uses atomics as well, so keep it for
+ 	 * consistency. Cleanup all of it separately.
+ 	 */
+-	if (!c) {
+-		clear_cpu_cap(&boot_cpu_data, feature);
++	clear_bit(feature, (unsigned long *)c->x86_capability);
++
++	if (c == &boot_cpu_data)
+ 		set_bit(feature, (unsigned long *)cpu_caps_cleared);
+-	} else {
+-		clear_bit(feature, (unsigned long *)c->x86_capability);
+-	}
  }
  
- /**
+ /* Take the capabilities and the BUG bits into account */
+ #define MAX_FEATURE_BITS ((NCAPINTS + NBUGINTS) * sizeof(u32) * 8)
+ 
+-static void do_clear_cpu_cap(struct cpuinfo_x86 *c, unsigned int feature)
++void clear_cpu_cap(struct cpuinfo_x86 *c, unsigned int feature)
+ {
+ 	DECLARE_BITMAP(disable, MAX_FEATURE_BITS);
+ 	const struct cpuid_dep *d;
+@@ -129,12 +127,7 @@ static void do_clear_cpu_cap(struct cpuinfo_x86 *c, unsigned int feature)
+ 	} while (changed);
+ }
+ 
+-void clear_cpu_cap(struct cpuinfo_x86 *c, unsigned int feature)
+-{
+-	do_clear_cpu_cap(c, feature);
+-}
+-
+ void setup_clear_cpu_cap(unsigned int feature)
+ {
+-	do_clear_cpu_cap(NULL, feature);
++	clear_cpu_cap(&boot_cpu_data, feature);
+ }
 -- 
 2.34.3
 
