@@ -2,77 +2,160 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 1F4215787A0
-	for <lists+kvm@lfdr.de>; Mon, 18 Jul 2022 18:41:47 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id E5CD85787BD
+	for <lists+kvm@lfdr.de>; Mon, 18 Jul 2022 18:49:26 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234540AbiGRQlp (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 18 Jul 2022 12:41:45 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39038 "EHLO
+        id S233471AbiGRQtZ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 18 Jul 2022 12:49:25 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44972 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233635AbiGRQln (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 18 Jul 2022 12:41:43 -0400
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 7AB98DFB1
-        for <kvm@vger.kernel.org>; Mon, 18 Jul 2022 09:41:42 -0700 (PDT)
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id BB9971042;
-        Mon, 18 Jul 2022 09:41:42 -0700 (PDT)
-Received: from monolith.localdoman (unknown [172.31.20.19])
-        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id D3F443F73D;
-        Mon, 18 Jul 2022 09:41:40 -0700 (PDT)
-Date:   Mon, 18 Jul 2022 17:42:08 +0100
-From:   Alexandru Elisei <alexandru.elisei@arm.com>
-To:     Ricardo Koller <ricarkol@google.com>
-Cc:     kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu, maz@kernel.org,
-        eric.auger@redhat.com, oliver.upton@linux.dev, reijiw@google.com,
-        andrew.jones@linux.dev
-Subject: Re: [kvm-unit-tests PATCH 0/3] arm: pmu: Fixes for bare metal
-Message-ID: <YtWNYGuP/Nu1HwDU@monolith.localdoman>
-References: <20220718154910.3923412-1-ricarkol@google.com>
-MIME-Version: 1.0
+        with ESMTP id S229639AbiGRQtY (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 18 Jul 2022 12:49:24 -0400
+Received: from NAM10-BN7-obe.outbound.protection.outlook.com (mail-bn7nam10on2080.outbound.protection.outlook.com [40.107.92.80])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7F6A8336;
+        Mon, 18 Jul 2022 09:49:23 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=C66J1GqJT0L9CCuszqSdyXhID8Ay+APAGplk0Exqc+15QRtfpJRxDHQybF85wIfgxZy0e59XfapCI3XWzu1UNyguX7vpnLJn26mTqnlUp0sjPTZXRlpajg3vT0ZHbQU7N1xmQ5oOeookLsoySOdmhdzUr6zTvnuO8akEhYfGltnV8Zbisj0yopjYjzymaYFTF206zdbeI/hB1lkOMqJAEaNsz9sJH5qdQX38UF6d2oN6jxFtTlVMUycZkvC2YUr+KJ1mU5+OI8VTnJjplNu48G0BwBIVjIJKArwot6w3gw4mj0zPGf2/T/jeFORTXyC+460eLdnW8I+znW92hLRAYA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=fCQGx+i2YlwnVu/5q34Bx2+nKeo5q84suxQWNuy5Rm4=;
+ b=Ws2QzlWv+JJamcWV0421OnTvkMcgTr5zxp213SVByWSvSKSpE8Hh679YkaA+srjemrsByvZEB+C1CeKzbcXaouq71Ab0LnNmQJy8HSQdsCc8pm0yt/5wBl4ESjRvAaGy6ejv+ugPX3zfnavacSh+5LWCjAdk4D4FbiGfqP/mnLoLC421WZoegXWWfhWjXKtoaptqS4VBkpSxodLh5Ki/Sht7OFK1OW/vdogvgvYp/fMNaVsZwMooO8at2/Ji707iuruc+4fivpxZPw09a4cAH1ppVHvwXJ/8/U03P413uLGul6Sn88RXTdHFrIj5NZiNgUy/9AyV/h7jZgL+Re9WxQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
+ dkim=pass header.d=nvidia.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=fCQGx+i2YlwnVu/5q34Bx2+nKeo5q84suxQWNuy5Rm4=;
+ b=RMA6Hqus7z5VZ4hMm4Z8vL6zoeAK7m66Z0cNtSyegOtFuHJw8hF+CiqGJjf4AXLZJwDFIwzOC21JA6shj8CNyfPTLjstz8uuxYuNT5BvPFf5Ggz07ufBLRjHGcsWgdbtPR7C1SJK/oCQOhIUgzEmt8AsFwZtjY9SfUhvB25smtMhzvt+ps9n03bj92tw6Ai2Fz92T1u/XN+Nfi91dG5TLOzEgp4Ul6Xa9UW5rR41fiZnDXMAiDzzyvEgrkzD+D5cR3GGZFRnx9yFyx2Zp8ND9BtZFioHUMTXSMKWBw5g5zi5FpUwGIkXnFVenyB6Yl3JpvcjB++8ACa34diepTv2PQ==
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=nvidia.com;
+Received: from MN2PR12MB4192.namprd12.prod.outlook.com (2603:10b6:208:1d5::15)
+ by DM6PR12MB3529.namprd12.prod.outlook.com (2603:10b6:5:15d::18) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5438.23; Mon, 18 Jul
+ 2022 16:49:21 +0000
+Received: from MN2PR12MB4192.namprd12.prod.outlook.com
+ ([fe80::ac35:7c4b:3282:abfb]) by MN2PR12MB4192.namprd12.prod.outlook.com
+ ([fe80::ac35:7c4b:3282:abfb%3]) with mapi id 15.20.5438.023; Mon, 18 Jul 2022
+ 16:49:21 +0000
+Date:   Mon, 18 Jul 2022 13:49:20 -0300
+From:   Jason Gunthorpe <jgg@nvidia.com>
+To:     Alexey Kardashevskiy <aik@ozlabs.ru>
+Cc:     linuxppc-dev@lists.ozlabs.org, kvm@vger.kernel.org,
+        kvm-ppc@vger.kernel.org, Deming Wang <wangdeming@inspur.com>,
+        Robin Murphy <robin.murphy@arm.com>,
+        Alex Williamson <alex.williamson@redhat.com>,
+        Daniel Henrique Barboza <danielhb413@gmail.com>,
+        Fabiano Rosas <farosas@linux.ibm.com>,
+        Murilo Opsfelder Araujo <muriloo@linux.ibm.com>,
+        Nicholas Piggin <npiggin@gmail.com>,
+        Michael Ellerman <mpe@ellerman.id.au>
+Subject: Re: [PATCH kernel 1/3] powerpc/iommu: Add "borrowing"
+ iommu_table_group_ops
+Message-ID: <20220718164920.GC4609@nvidia.com>
+References: <20220714081822.3717693-1-aik@ozlabs.ru>
+ <20220714081822.3717693-2-aik@ozlabs.ru>
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20220718154910.3923412-1-ricarkol@google.com>
-X-Spam-Status: No, score=-6.9 required=5.0 tests=BAYES_00,RCVD_IN_DNSWL_HI,
-        SPF_HELO_NONE,SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
+In-Reply-To: <20220714081822.3717693-2-aik@ozlabs.ru>
+X-ClientProxiedBy: BL1PR13CA0158.namprd13.prod.outlook.com
+ (2603:10b6:208:2bd::13) To MN2PR12MB4192.namprd12.prod.outlook.com
+ (2603:10b6:208:1d5::15)
+MIME-Version: 1.0
+X-MS-PublicTrafficType: Email
+X-MS-Office365-Filtering-Correlation-Id: 728e9366-5518-420d-bb41-08da68dd768b
+X-MS-TrafficTypeDiagnostic: DM6PR12MB3529:EE_
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: MeISQJdijtlSeISty9yoorhKS6vyonw0eSEFwiBejZRGwF9wlgIw+OxKRbCSqQcI2HStBVvY49wPsrzKdF7gHCpcbqnFq58kuDe54aO/nH7XaJ3fmApl5iMjodTxkxdhq8lU6EYVBCFlxUN5zSKP3scpeZm1F5/6s17sHNlHsD5fO2fNWLTh8+VD5U851v+nNunw3Te2/nQqbfNkl0crymWLWWVUL1wWaSR4GhWZ1uNig3QLkPZaM0Y1VM612KOM/rZWn4pAMCxydToNXgM32vWCt9ko4ylzmp/nbKPpXfRKeHl6MQ8QmZSIdKlRspGeTysZZxGSN+TSy3zs2Nfce6MxIj39N7IQH4qVDMLq5MbpTqEtnmjsgNql7DxlYLYRgJT0oIUlQbMF8nGKxylcyQlSxVdVcod8uTKzGRZsEjgzGHgLoyhX4S0mjA9LwYVPZuhL+4B1Q7IcdrKEwMXq2h3J+gxrkYQnYMZCwVeb+/T+JQG5nnB6j4Fwa61ecuPreuojJ5j//vkiTu67R+cnB0FoamEUFrpYTFNAvwEmNQ8Opjw41PSK/gXdcYGE2b69GLxL5L7edQ91yiN7MHttZLdg3vPXIz66bV7vf7aOrrv8zaHovrThiL/UsNzZ9nShaiVGd53TMkiqApdRNtISQaiwhyJD1abd/+aoAWd5Pswdcv85TX+VNT4gBBri/+7ZWxwJjwtmo2MYM23UAAtQ8XGcYqC5M7FY41kqCVekOoAG1PvZPVKjdLOzAXDouY7WOSjbQNdG9T27+MWCoU4m/Q==
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:MN2PR12MB4192.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230016)(4636009)(366004)(136003)(396003)(346002)(39860400002)(376002)(2906002)(8936002)(33656002)(316002)(66946007)(66556008)(6916009)(4326008)(54906003)(86362001)(36756003)(6486002)(41300700001)(66476007)(8676002)(478600001)(6506007)(2616005)(83380400001)(26005)(6512007)(5660300002)(1076003)(38100700002)(7416002)(186003);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?2EZ6WkW9C01Zc+7v+jcgwKZBz9coctBwNw3uVQ+HmPzV/azj0cRYKdocN3bY?=
+ =?us-ascii?Q?ZzVXdusoypidqvzRIqCBnJ1xSe+Nf8GMRW2vgchDTbxReR+ejMIXd4/829T0?=
+ =?us-ascii?Q?Y1Hn/2qHJqxk3IXmH7EP5RsDV+7+BCu9fZNdCRMNBFzQXgVqgmFjUawmilH/?=
+ =?us-ascii?Q?wjlI7XjNHpFYKCi4RQNlweWbeeq1RgQB2stateoqMX2ctVtqmlBydu9wkzbA?=
+ =?us-ascii?Q?MQwTuC01id/MdPfIK9LumUIoKs2CPn+4eBHKL3kc3jOUVUcyKJQEz/NrWaaR?=
+ =?us-ascii?Q?lxko609LYiZ6Ngtr/d/qesp7kFy8g/wY5AI8XZbI1yam2z39sMswSAcEO+Kc?=
+ =?us-ascii?Q?YE9mS1zZAHja4KSLJpMNm2lit52jk5gKJo/9AjP/UvnWMSeHIrmeH8XRWltV?=
+ =?us-ascii?Q?Ld5eHRp3+f6d2XtTDwgmAw5jHbMS0e9K0JBPQSkhnRPpm+yK7QMY3rkRTzdC?=
+ =?us-ascii?Q?sEX86hD88ArY4eVVHg+tVKCiU+FsWU519/+noixRWhfIxH8tnRye5Wm+5CFV?=
+ =?us-ascii?Q?jogEWzlol3Fq8f0nWjw71VyULL0YSDeU9KPeG1McsFL4dW+ukLeE0C/tz0EL?=
+ =?us-ascii?Q?Y/J9pLDo5vKtFf1pfo81HjmmS8dSvjQdCNtJMvBDPCIzOzuqWgkYmC10XhYI?=
+ =?us-ascii?Q?2fuz9x86g3Ec1+Ag6DbTTpi3wIIXmu9EDi6k1I/VHofy+3ahGdEJJPi6hEzo?=
+ =?us-ascii?Q?WMBSeS2eN9FTgeNJMOAra412mW411zserfqRGreDTfNwpuUMtehGjudUL+Bn?=
+ =?us-ascii?Q?ZmvgCGStX4iufHrgrYsWkmiU9q9dUGNtqh8qPpt/QnCi1KfI3TIDFveQ0bbw?=
+ =?us-ascii?Q?Mx9ev3uTDpT07G6IylGpEThnIN4Q2HWpkNxScw/A7KxYKqe2Zelhg3VGQrOV?=
+ =?us-ascii?Q?FjXMv2MCA9mJZeA2OQ7ysHTz6QgFZeeDbh14KIYHPBtUarCOk7VtjPfxS90O?=
+ =?us-ascii?Q?LTCigvu9nDGmNY40i7I5ZdSLgmX9JrkP5nv402ejTiRtP+6DlybR65CV4AuV?=
+ =?us-ascii?Q?01HzGJFcQ6+PVnlq9w/5t3gzEz1k1pSbltUVUK2ncK2Mm+u0EzBgRi67arMQ?=
+ =?us-ascii?Q?3eIZt6hm9qkHW1IWnACmew0rBIkXt6oymRnKYRDNkVyD4YF4qFHs6QOskjga?=
+ =?us-ascii?Q?dk8MGIGlz6tPXEdhm1RhGJ0Xiyw0HmDmEkOoHwQfcBDHt4KozavXy2oJfffq?=
+ =?us-ascii?Q?mnA4DWAgR68nPxpveZ1fJFuukg+iiF988/xsDz/GHIzBon40gFKe8gg/8Ffg?=
+ =?us-ascii?Q?3oLAKUrxFdNsSFoGWj1Cq4eh2CHWn3jQ4jp2YoCiY9ebMMV4OPYd0YSA9oi3?=
+ =?us-ascii?Q?uZwoMVNTIlZT8AYkRes64bKerX/zHoDLt2EbpD4cxDw5w3MUgCpLOIXWKVyL?=
+ =?us-ascii?Q?jkRlwnYAM/4GucCCXSaC/HMXXlPwsw8gpjutQUW+i80IKRjLVfmHN/VwqpB9?=
+ =?us-ascii?Q?38RyES59mKQCtRZg7F9r2OmptnpWFLAKErFHr6KVUChDkKfulkr8P/8cHxad?=
+ =?us-ascii?Q?0NNMIpVaulnG7MCowgFk78mQI/3R/r9iKYxCmzqzHOWw8xMPLvqoogRrdCO3?=
+ =?us-ascii?Q?o8ZzzKc1hKD6g8wnF4HU4d5P8Pbj1rj1QmqwBbJN?=
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 728e9366-5518-420d-bb41-08da68dd768b
+X-MS-Exchange-CrossTenant-AuthSource: MN2PR12MB4192.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 18 Jul 2022 16:49:21.3682
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: tjb+2uWzJxdd3KRv4so80rNAdkTOlQnFsTO5D4UtRbtLV3JPa5MXjEvX8DRehpWG
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM6PR12MB3529
+X-Spam-Status: No, score=-1.8 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FORGED_SPF_HELO,
+        RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_NONE
+        autolearn=no autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi,
+On Thu, Jul 14, 2022 at 06:18:20PM +1000, Alexey Kardashevskiy wrote:
+> PPC64 IOMMU API defines iommu_table_group_ops which handles DMA windows
+> for PEs: control the ownership, create/set/unset a table the hardware
+> for dynamic DMA windows (DDW). VFIO uses the API to implement support
+> on POWER.
+> 
+> So far only PowerNV IODA2 (POWER8 and newer machines) implemented this and other cases (POWER7 or nested KVM) did not and instead reused
+> existing iommu_table structs. This means 1) no DDW 2) ownership transfer
+> is done directly in the VFIO SPAPR TCE driver.
+> 
+> Soon POWER is going to get its own iommu_ops and ownership control is
+> going to move there. This implements spapr_tce_table_group_ops which
+> borrows iommu_table tables. The upside is that VFIO needs to know less
+> about POWER.
+> 
+> The new ops returns the existing table from create_table() and
+> only checks if the same window is already set. This is only going to work
+> if the default DMA window starts table_group.tce32_start and as big as
+> pe->table_group.tce32_size (not the case for IODA2+ PowerNV).
+> 
+> This changes iommu_table_group_ops::take_ownership() to return an error
+> if borrowing a table failed.
+> 
+> This should not cause any visible change in behavior for PowerNV.
+> pSeries was not that well tested/supported anyway.
+> 
+> Signed-off-by: Alexey Kardashevskiy <aik@ozlabs.ru>
+> ---
+>  arch/powerpc/include/asm/iommu.h          |  6 +-
+>  arch/powerpc/kernel/iommu.c               | 98 ++++++++++++++++++++++-
+>  arch/powerpc/platforms/powernv/pci-ioda.c |  6 +-
+>  arch/powerpc/platforms/pseries/iommu.c    |  3 +
+>  drivers/vfio/vfio_iommu_spapr_tce.c       | 94 ++++------------------
+>  5 files changed, 121 insertions(+), 86 deletions(-)
 
-I believe you're missing the updated email for the arm maintainer. Added it.
+Reviewed-by: Jason Gunthorpe <jgg@nvidia.com>
 
-Thanks,
-Alex
-
-On Mon, Jul 18, 2022 at 08:49:07AM -0700, Ricardo Koller wrote:
-> There are some tests that fail when running on bare metal (including a
-> passthrough prototype).  There are three issues with the tests.  The
-> first one is that there are some missing isb()'s between enabling event
-> counting and the actual counting. This wasn't an issue on KVM as
-> trapping on registers served as context synchronization events. The
-> second issue is that some tests assume that registers reset to 0.  And
-> finally, the third issue is that overflowing the low counter of a
-> chained event sets the overflow flag in PMVOS and some tests fail by
-> checking for it not being set.
-> 
-> I believe the third fix also requires a KVM change, but would like to
-> double check with others first.  The only reference I could find in the
-> ARM ARM is the AArch64.IncrementEventCounter() pseudocode (DDI 0487H.a,
-> J1.1.1 "aarch64/debug") that unconditionally sets the PMOVS bit on
-> overflow.
-> 
-> Ricardo Koller (3):
->   arm: pmu: Add missing isb()'s after sys register writing
->   arm: pmu: Reset the pmu registers before starting some tests
->   arm: pmu: Remove checks for !overflow in chained counters tests
-> 
->  arm/pmu.c | 34 +++++++++++++++++++++++-----------
->  1 file changed, 23 insertions(+), 11 deletions(-)
-> 
-> -- 
-> 2.37.0.170.g444d1eabd0-goog
-> 
+Jason
