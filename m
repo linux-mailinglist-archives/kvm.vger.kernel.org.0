@@ -2,110 +2,137 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id F235F577A9E
-	for <lists+kvm@lfdr.de>; Mon, 18 Jul 2022 07:48:55 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id EE4D8577BE6
+	for <lists+kvm@lfdr.de>; Mon, 18 Jul 2022 08:52:21 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233176AbiGRFn4 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 18 Jul 2022 01:43:56 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51424 "EHLO
+        id S233184AbiGRGwT (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 18 Jul 2022 02:52:19 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60154 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229585AbiGRFnx (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 18 Jul 2022 01:43:53 -0400
-Received: from verein.lst.de (verein.lst.de [213.95.11.211])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 775301A9;
-        Sun, 17 Jul 2022 22:43:52 -0700 (PDT)
-Received: by verein.lst.de (Postfix, from userid 2407)
-        id A752B68AFE; Mon, 18 Jul 2022 07:43:48 +0200 (CEST)
-Date:   Mon, 18 Jul 2022 07:43:48 +0200
-From:   Christoph Hellwig <hch@lst.de>
-To:     Kirti Wankhede <kwankhede@nvidia.com>,
-        Tony Krowiak <akrowiak@linux.ibm.com>,
-        Halil Pasic <pasic@linux.ibm.com>,
-        Jason Herne <jjherne@linux.ibm.com>,
-        Eric Farman <farman@linux.ibm.com>,
-        Matthew Rosato <mjrosato@linux.ibm.com>,
-        Zhenyu Wang <zhenyuw@linux.intel.com>,
-        Zhi Wang <zhi.a.wang@intel.com>,
-        Alex Williamson <alex.williamson@redhat.com>
-Cc:     Jason Gunthorpe <jgg@nvidia.com>, kvm@vger.kernel.org,
-        linux-s390@vger.kernel.org, intel-gvt-dev@lists.freedesktop.org
-Subject: Re: simplify the mdev interface v6
-Message-ID: <20220718054348.GA22345@lst.de>
-References: <20220709045450.609884-1-hch@lst.de>
+        with ESMTP id S229680AbiGRGwS (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 18 Jul 2022 02:52:18 -0400
+Received: from mga18.intel.com (mga18.intel.com [134.134.136.126])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 90B5AE0C8;
+        Sun, 17 Jul 2022 23:52:17 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1658127137; x=1689663137;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=noTc/cBrpSAUZk+3ypYxCHmUWcNG3pn6t86Bk9BalFc=;
+  b=XgFMIOgZsWkfIenAFgmPHc0lSvEJ47xzlejPo1BOY/5zTRKJhiL7GuGc
+   GoJ03B9mG+0WGvlgWYaDDz+zIzk5pjt4wZn1Co0RIpNmkt9bhoXPn2Giu
+   yzCZk1u3wUOPprzBSIdO4VDfyAWFg3ImusE6IB2GflR74iXvGAbbgegNY
+   yhW5xYabL2dKrrJ6RIOxna2FSNC3qS4VMc62dWVAmOWbHhLUym+DBIpX/
+   yfKmuAnPeeheSGWB/Xcjk0aZFnt/hQqV8uA3FPh34+g8Y8c3Ny56UHcRK
+   bvGgm/ISjhD+gEn2ed2PEoTyT6y7L+pRpJb+vSHHI3kClRt/KiHaUl9Su
+   w==;
+X-IronPort-AV: E=McAfee;i="6400,9594,10411"; a="269172430"
+X-IronPort-AV: E=Sophos;i="5.92,280,1650956400"; 
+   d="scan'208";a="269172430"
+Received: from orsmga008.jf.intel.com ([10.7.209.65])
+  by orsmga106.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 17 Jul 2022 23:52:11 -0700
+X-IronPort-AV: E=Sophos;i="5.92,280,1650956400"; 
+   d="scan'208";a="624603590"
+Received: from yangxuan-mobl.ccr.corp.intel.com (HELO localhost) ([10.249.171.3])
+  by orsmga008-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 17 Jul 2022 23:52:07 -0700
+Date:   Mon, 18 Jul 2022 14:52:05 +0800
+From:   Yu Zhang <yu.c.zhang@linux.intel.com>
+To:     Sean Christopherson <seanjc@google.com>
+Cc:     pbonzini@redhat.com, vkuznets@redhat.com, jmattson@google.com,
+        joro@8bytes.org, wanpengli@tencent.com, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+Subject: Re: [PATCH 1/2] KVM: X86: Initialize 'fault' in
+ kvm_fixup_and_inject_pf_error().
+Message-ID: <20220718065205.j4tsv7tpq4vsmcvp@linux.intel.com>
+References: <20220715114211.53175-1-yu.c.zhang@linux.intel.com>
+ <20220715114211.53175-2-yu.c.zhang@linux.intel.com>
+ <YtF+CF2FkS7Ho1d5@google.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20220709045450.609884-1-hch@lst.de>
-User-Agent: Mutt/1.5.17 (2007-11-01)
-X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,SPF_HELO_NONE,
-        SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
+In-Reply-To: <YtF+CF2FkS7Ho1d5@google.com>
+User-Agent: NeoMutt/20171215
+X-Spam-Status: No, score=-2.6 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_EF,SPF_HELO_NONE,SPF_NONE
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Alex, does this series look good to you now?
+On Fri, Jul 15, 2022 at 02:47:36PM +0000, Sean Christopherson wrote:
+> On Fri, Jul 15, 2022, Yu Zhang wrote:
+> > kvm_fixup_and_inject_pf_error() was introduced to fixup the error code(
+> > e.g., to add RSVD flag) and inject the #PF to the guest, when guest
+> > MAXPHYADDR is smaller than the host one.
+> > 
+> > When it comes to nested, L0 is expected to intercept and fix up the #PF
+> > and then inject to L2 directly if
+> > - L2.MAXPHYADDR < L0.MAXPHYADDR and
+> > - L1 has no intention to intercept L2's #PF (e.g., L2 and L1 have the
+> >   same MAXPHYADDR value && L1 is using EPT for L2),
+> > instead of constructing a #PF VM Exit to L1. Currently, with PFEC_MASK
+> > and PFEC_MATCH both set to 0 in vmcs02, the interception and injection
+> > may happen on all L2 #PFs.
+> > 
+> > However, failing to initialize 'fault' in kvm_fixup_and_inject_pf_error()
+> > may cause the fault.async_page_fault being NOT zeroed, and later the #PF
+> > being treated as a nested async page fault, and then being injected to L1.
+> > So just fix it by initialize the 'fault' value in the beginning.
+> 
+> Ouch.
+> 
+> > Fixes: 897861479c064 ("KVM: x86: Add helper functions for illegal GPA checking and page fault injection")
+> > Bugzilla: https://bugzilla.kernel.org/show_bug.cgi?id=216178
+> > Reported-by: Yang Lixiao <lixiao.yang@intel.com>
+> > Signed-off-by: Yu Zhang <yu.c.zhang@linux.intel.com>
+> > ---
+> >  arch/x86/kvm/x86.c | 2 +-
+> >  1 file changed, 1 insertion(+), 1 deletion(-)
+> > 
+> > diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+> > index 031678eff28e..3246b3c9dfb3 100644
+> > --- a/arch/x86/kvm/x86.c
+> > +++ b/arch/x86/kvm/x86.c
+> > @@ -12983,7 +12983,7 @@ EXPORT_SYMBOL_GPL(kvm_spec_ctrl_test_value);
+> >  void kvm_fixup_and_inject_pf_error(struct kvm_vcpu *vcpu, gva_t gva, u16 error_code)
+> >  {
+> >  	struct kvm_mmu *mmu = vcpu->arch.walk_mmu;
+> > -	struct x86_exception fault;
+> > +	struct x86_exception fault = {0};
+> >  	u64 access = error_code &
+> >  		(PFERR_WRITE_MASK | PFERR_FETCH_MASK | PFERR_USER_MASK);
+> 
+> As stupid as it may be to intentionally not fix the uninitialized data in a robust
+> way, I'd actually prefer to manually clear fault.async_page_fault instead of
+> zero-initializing the struct.  Unlike a similar bug fix in commit 159e037d2e36
+> ("KVM: x86: Fully initialize 'struct kvm_lapic_irq' in kvm_pv_kick_cpu_op()"),
+> this code actually cares about async_page_fault being false as opposed to just
+> being _initialized_.
+> 
+> And if another field is added to struct x86_exception in the future, leaving the
+> struct uninitialized means that if such a patch were to miss this case, running
+> with various sanitizers should in theory be able to detect such a bug.  I suspect
+> no one has found this with syzkaller due to the need to opt into running with
+> allow_smaller_maxphyaddr=1.
+> 
+> diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+> index f389691d8c04..aeed737b55c2 100644
+> --- a/arch/x86/kvm/x86.c
+> +++ b/arch/x86/kvm/x86.c
+> @@ -12996,6 +12996,7 @@ void kvm_fixup_and_inject_pf_error(struct kvm_vcpu *vcpu, gva_t gva, u16 error_c
+>                 fault.error_code = error_code;
+>                 fault.nested_page_fault = false;
+>                 fault.address = gva;
+> +               fault.async_page_fault = false;
+>         }
+>         vcpu->arch.walk_mmu->inject_page_fault(vcpu, &fault);
+>  }
+> 
 
-On Sat, Jul 09, 2022 at 06:54:36AM +0200, Christoph Hellwig wrote:
-> Hi all,
-> 
-> this series signigicantly simplies the mdev driver interface by following
-> the patterns for device model interaction used elsewhere in the kernel.
-> 
-> Changes since v5:
->  - rebased to the latest vfio/next branch
->  - drop the last patch again
->  - make sure show_available_instances works properly for the internallly
->    tracked case
-> 
-> Changes since v4:
->  - move the kobject_put later in mdev_device_release 
->  - add a Fixes tag for the first patch
->  - add another patch to remove an extra kobject_get/put
-> 
-> Changes since v3:
->  - make the sysfs_name and pretty_name fields pointers instead of arrays
->  - add an i915 cleanup to prepare for the above
-> 
-> Changes since v2:
->  - rebased to vfio/next
->  - fix a pre-existing memory leak in i915 instead of making it worse
->  - never manipulate if ->available_instances if drv->get_available is
->    provided
->  - keep a parent reference for the mdev_type
->  - keep a few of the sysfs.c helper function around
->  - improve the documentation for the parent device lifetime
->  - minor spellig / formatting fixes
-> 
-> Changes since v1:
->  - embedd the mdev_parent into a different sub-structure in i916
->  - remove headers now inclued by mdev.h from individual source files
->  - pass an array of mdev_types to mdev_register_parent
->  - add additional patches to implement all attributes on the
->    mdev_type in the core code
-> 
-> Diffstat:
->  Documentation/driver-api/vfio-mediated-device.rst |   26 +-
->  Documentation/s390/vfio-ap.rst                    |    2 
->  Documentation/s390/vfio-ccw.rst                   |    2 
->  drivers/gpu/drm/i915/gvt/aperture_gm.c            |   20 +-
->  drivers/gpu/drm/i915/gvt/gvt.h                    |   42 ++--
->  drivers/gpu/drm/i915/gvt/kvmgt.c                  |  168 ++++-------------
->  drivers/gpu/drm/i915/gvt/vgpu.c                   |  210 +++++++---------------
->  drivers/s390/cio/cio.h                            |    4 
->  drivers/s390/cio/vfio_ccw_drv.c                   |   12 -
->  drivers/s390/cio/vfio_ccw_ops.c                   |   51 -----
->  drivers/s390/cio/vfio_ccw_private.h               |    2 
->  drivers/s390/crypto/vfio_ap_ops.c                 |   68 +------
->  drivers/s390/crypto/vfio_ap_private.h             |    6 
->  drivers/vfio/mdev/mdev_core.c                     |  190 ++++---------------
->  drivers/vfio/mdev/mdev_driver.c                   |    7 
->  drivers/vfio/mdev/mdev_private.h                  |   32 ---
->  drivers/vfio/mdev/mdev_sysfs.c                    |  189 ++++++++++---------
->  include/linux/mdev.h                              |   77 ++++----
->  samples/vfio-mdev/mbochs.c                        |  103 +++-------
->  samples/vfio-mdev/mdpy.c                          |  115 +++---------
->  samples/vfio-mdev/mtty.c                          |   94 +++------
->  21 files changed, 463 insertions(+), 957 deletions(-)
----end quoted text---
+Fair enough. Thanks!
+
+B.R.
+Yu
