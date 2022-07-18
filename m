@@ -2,107 +2,110 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 4F2CB577D90
-	for <lists+kvm@lfdr.de>; Mon, 18 Jul 2022 10:33:46 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id E9822577D45
+	for <lists+kvm@lfdr.de>; Mon, 18 Jul 2022 10:13:58 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233050AbiGRIdo (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 18 Jul 2022 04:33:44 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39800 "EHLO
+        id S233696AbiGRIN4 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 18 Jul 2022 04:13:56 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54956 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229783AbiGRIdn (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 18 Jul 2022 04:33:43 -0400
-Received: from mga05.intel.com (mga05.intel.com [192.55.52.43])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E0FFC19019;
-        Mon, 18 Jul 2022 01:33:42 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1658133222; x=1689669222;
-  h=from:to:cc:subject:date:message-id:mime-version:
-   content-transfer-encoding;
-  bh=79y8dF/1EZHwFPNzMwvoWWdAytAcu/ymcjci+iNiuRw=;
-  b=Ht+CbtZ80w5oKWEcG/cDfn+m8hx2Ex0aq5H0bq0U/jox2IxDtf2vdqF0
-   37mR4Pa5SWVJZvsgKvaAzIzJhNf6FeXVaCsdcJZe48QN5fWuyk0s8gw1L
-   ltQVMqh35Dbh/duJhhGlu4RYLBZ8bZ1vvss6ug/TdArBIzcKWQP+hje8i
-   Tn7ZVmzo3TjXcSUUbJEYGIonIa0WRMc+uhHOMMBferJqy8DD8Py+4lEGz
-   cS5AHcrjbTkDNTaSb00iZyd/beHUuaeSQbJ2RdsH86ol4fc6fFgOdV49T
-   Y3qsg/2fPR6Jodjumb2tThePy7IYzvSniv1zRidfOqdHR3Til6Q+hjrug
-   g==;
-X-IronPort-AV: E=McAfee;i="6400,9594,10411"; a="372474714"
-X-IronPort-AV: E=Sophos;i="5.92,280,1650956400"; 
-   d="scan'208";a="372474714"
-Received: from orsmga007.jf.intel.com ([10.7.209.58])
-  by fmsmga105.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 18 Jul 2022 01:33:42 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.92,280,1650956400"; 
-   d="scan'208";a="594389146"
-Received: from skxmcp01.bj.intel.com ([10.240.193.86])
-  by orsmga007.jf.intel.com with ESMTP; 18 Jul 2022 01:33:40 -0700
-From:   Yu Zhang <yu.c.zhang@linux.intel.com>
-To:     pbonzini@redhat.com, seanjc@google.com, vkuznets@redhat.com,
-        jmattson@google.com, joro@8bytes.org, wanpengli@tencent.com,
-        kvm@vger.kernel.org
-Cc:     linux-kernel@vger.kernel.org
-Subject: [PATCH v2] KVM: X86: Explicitly set the 'fault.async_page_fault' value in kvm_fixup_and_inject_pf_error().
-Date:   Mon, 18 Jul 2022 15:47:56 +0800
-Message-Id: <20220718074756.53788-1-yu.c.zhang@linux.intel.com>
-X-Mailer: git-send-email 2.25.1
+        with ESMTP id S233682AbiGRINw (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 18 Jul 2022 04:13:52 -0400
+Received: from mail.sberdevices.ru (mail.sberdevices.ru [45.89.227.171])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2F928B34;
+        Mon, 18 Jul 2022 01:13:49 -0700 (PDT)
+Received: from s-lin-edge02.sberdevices.ru (localhost [127.0.0.1])
+        by mail.sberdevices.ru (Postfix) with ESMTP id 6E82C5FD02;
+        Mon, 18 Jul 2022 11:13:45 +0300 (MSK)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=sberdevices.ru;
+        s=mail; t=1658132025;
+        bh=K9t73VPQn1H7rzF6FDTeEbbZIPpEhYN+YhYt5OLk0eg=;
+        h=From:To:Subject:Date:Message-ID:Content-Type:MIME-Version;
+        b=PFqZ48CnBylj1z/FTKdJ/Jp6iVsagp8hwbl5Gqslqw+Y+sxJ0WYuDkcdjUzz8wRKs
+         5S5oAXp6iF4uUy9kxoAxe38d16BBNL3ZN8Y4a8fpzt0SI253PGI3IBLPCNFqhsRbcg
+         t/bWorEz+to4y/FX38hDXILrYqRcjdSDJbjBYIsin0AN+3vUAxXwobZFboqSQZuQPG
+         2EH2EjzpCWEcPIk81IGrOSgx0QnaspBWxynKFow6xqppcKL62TzfA9ksMUiEc2yseu
+         0Ypn95pLHMwiQ2/58rdfAPeRtDTJPrZVB21B3rOJ+ULYfHsT2nRcTC4WPGq0hi8QY5
+         AG1zPqDzD7vcQ==
+Received: from S-MS-EXCH02.sberdevices.ru (S-MS-EXCH02.sberdevices.ru [172.16.1.5])
+        by mail.sberdevices.ru (Postfix) with ESMTP;
+        Mon, 18 Jul 2022 11:13:41 +0300 (MSK)
+From:   Arseniy Krasnov <AVKrasnov@sberdevices.ru>
+To:     Stefano Garzarella <sgarzare@redhat.com>,
+        "David S. Miller" <davem@davemloft.net>,
+        Jakub Kicinski <kuba@kernel.org>,
+        Paolo Abeni <pabeni@redhat.com>,
+        Stefan Hajnoczi <stefanha@redhat.com>,
+        "Michael S. Tsirkin" <mst@redhat.com>,
+        Arseniy Krasnov <AVKrasnov@sberdevices.ru>,
+        Krasnov Arseniy <oxffffaa@gmail.com>
+CC:     "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+        "virtualization@lists.linux-foundation.org" 
+        <virtualization@lists.linux-foundation.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        kernel <kernel@sberdevices.ru>
+Subject: [RFC PATCH v1 0/3] virtio/vsock: use SO_RCVLOWAT to set
+ POLLIN/POLLRDNORM
+Thread-Topic: [RFC PATCH v1 0/3] virtio/vsock: use SO_RCVLOWAT to set
+ POLLIN/POLLRDNORM
+Thread-Index: AQHYmn4tqUccpAClwkSIQKaYrjmRMQ==
+Date:   Mon, 18 Jul 2022 08:12:52 +0000
+Message-ID: <c8de13b1-cbd8-e3e0-5728-f3c3648c69f7@sberdevices.ru>
+Accept-Language: en-US, ru-RU
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+x-originating-ip: [172.16.1.12]
+Content-Type: text/plain; charset="utf-8"
+Content-ID: <DC7CDBA78EB51146931911015FE707E9@sberdevices.ru>
+Content-Transfer-Encoding: base64
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-5.0 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,SPF_HELO_NONE,
-        SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
+X-KSMG-Rule-ID: 4
+X-KSMG-Message-Action: clean
+X-KSMG-AntiSpam-Status: not scanned, disabled by settings
+X-KSMG-AntiSpam-Interceptor-Info: not scanned
+X-KSMG-AntiPhishing: not scanned, disabled by settings
+X-KSMG-AntiVirus: Kaspersky Secure Mail Gateway, version 1.1.2.30, bases: 2022/07/18 02:31:00 #19923013
+X-KSMG-AntiVirus-Status: Clean, skipped
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,SPF_HELO_NONE,SPF_PASS
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-kvm_fixup_and_inject_pf_error() was introduced to fixup the error code(
-e.g., to add RSVD flag) and inject the #PF to the guest, when guest
-MAXPHYADDR is smaller than the host one.
-
-When it comes to nested, L0 is expected to intercept and fix up the #PF
-and then inject to L2 directly if
-- L2.MAXPHYADDR < L0.MAXPHYADDR and
-- L1 has no intention to intercept L2's #PF (e.g., L2 and L1 have the
-  same MAXPHYADDR value && L1 is using EPT for L2),
-instead of constructing a #PF VM Exit to L1. Currently, with PFEC_MASK
-and PFEC_MATCH both set to 0 in vmcs02, the interception and injection
-may happen on all L2 #PFs.
-
-However, failing to initialize 'fault' in kvm_fixup_and_inject_pf_error()
-may cause the fault.async_page_fault being NOT zeroed, and later the #PF
-being treated as a nested async page fault, and then being injected to L1.
-Instead of zeroing 'fault' at the beginning of this function, we mannually
-set the value of 'fault.async_page_fault', because false is the value we
-really expect.
-
-Fixes: 897861479c064 ("KVM: x86: Add helper functions for illegal GPA checking and page fault injection")
-Bugzilla: https://bugzilla.kernel.org/show_bug.cgi?id=216178
-Reported-by: Yang Lixiao <lixiao.yang@intel.com>
-Signed-off-by: Yu Zhang <yu.c.zhang@linux.intel.com>
-Signed-off-by: Sean Christopherson <seanjc@google.com>
----
-v2:
-- Set 'fault.async_page_fault' mannually to false, instead of initializing
-the whole structure based on Sean's suggestion.
-- Commit message changes based on the code change.
----
- arch/x86/kvm/x86.c | 1 +
- 1 file changed, 1 insertion(+)
-
-diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-index 031678eff28e..ffd8c96cfaa5 100644
---- a/arch/x86/kvm/x86.c
-+++ b/arch/x86/kvm/x86.c
-@@ -12999,6 +12999,7 @@ void kvm_fixup_and_inject_pf_error(struct kvm_vcpu *vcpu, gva_t gva, u16 error_c
- 		fault.error_code = error_code;
- 		fault.nested_page_fault = false;
- 		fault.address = gva;
-+		fault.async_page_fault = false;
- 	}
- 	vcpu->arch.walk_mmu->inject_page_fault(vcpu, &fault);
- }
--- 
-2.25.1
-
+SGVsbG8sDQoNCmR1cmluZyBteSBleHBlcmltZW50cyB3aXRoIHplcm9jb3B5IHJlY2VpdmUsIGkg
+Zm91bmQsIHRoYXQgaW4gc29tZQ0KY2FzZXMsIHBvbGwoKSBpbXBsZW1lbnRhdGlvbiB2aW9sYXRl
+cyBQT1NJWDogd2hlbiBzb2NrZXQgaGFzIG5vbi0NCmRlZmF1bHQgU09fUkNWTE9XQVQoZS5nLiBu
+b3QgMSksIHBvbGwoKSB3aWxsIGFsd2F5cyBzZXQgUE9MTElOIGFuZA0KUE9MTFJETk9STSBiaXRz
+IGluICdyZXZlbnRzJyBldmVuIG51bWJlciBvZiBieXRlcyBhdmFpbGFibGUgdG8gcmVhZA0Kb24g
+c29ja2V0IGlzIHNtYWxsZXIgdGhhbiBTT19SQ1ZMT1dBVCB2YWx1ZS4gSW4gdGhpcyBjYXNlLHVz
+ZXIgc2Vlcw0KUE9MTElOIGZsYWcgYW5kIHRoZW4gdHJpZXMgdG8gcmVhZCBkYXRhKGZvciBleGFt
+cGxlIHVzaW5nICAncmVhZCgpJw0KY2FsbCksIGJ1dCByZWFkIGNhbGwgd2lsbCBiZSBibG9ja2Vk
+LCBiZWNhdXNlICBTT19SQ1ZMT1dBVCBsb2dpYyBpcw0Kc3VwcG9ydGVkIGluIGRlcXVldWUgbG9v
+cCBpbiBhZl92c29jay5jLiBCdXQgdGhlIHNhbWUgdGltZSwgIFBPU0lYDQpyZXF1aXJlcyB0aGF0
+Og0KDQoiUE9MTElOICAgICBEYXRhIG90aGVyIHRoYW4gaGlnaC1wcmlvcml0eSBkYXRhIG1heSBi
+ZSByZWFkIHdpdGhvdXQNCiAgICAgICAgICAgIGJsb2NraW5nLg0KIFBPTExSRE5PUk0gTm9ybWFs
+IGRhdGEgbWF5IGJlIHJlYWQgd2l0aG91dCBibG9ja2luZy4iDQoNClNlZSBodHRwczovL3d3dy5v
+cGVuLXN0ZC5vcmcvanRjMS9zYzIyL29wZW4vbjQyMTcucGRmLCBwYWdlIDI5My4NCg0KU28sIHdl
+IGhhdmUsIHRoYXQgcG9sbCgpIHN5c2NhbGwgcmV0dXJucyBQT0xMSU4sIGJ1dCByZWFkIGNhbGwg
+d2lsbA0KYmUgYmxvY2tlZC4NCg0KQWxzbyBpbiBtYW4gcGFnZSBzb2NrZXQoNykgaSBmb3VuZCB0
+aGF0Og0KDQoiU2luY2UgTGludXggMi42LjI4LCBzZWxlY3QoMiksIHBvbGwoMiksIGFuZCBlcG9s
+bCg3KSBpbmRpY2F0ZSBhDQpzb2NrZXQgYXMgcmVhZGFibGUgb25seSBpZiBhdCBsZWFzdCBTT19S
+Q1ZMT1dBVCBieXRlcyBhcmUgYXZhaWxhYmxlLiINCg0KSSBjaGVja2VkIFRDUCBjYWxsYmFjayBm
+b3IgcG9sbCgpKG5ldC9pcHY0L3RjcC5jLCB0Y3BfcG9sbCgpKSwgaXQNCnVzZXMgU09fUkNWTE9X
+QVQgdmFsdWUgdG8gc2V0IFBPTExJTiBiaXQsIGFsc28gaSd2ZSB0ZXN0ZWQgVENQIHdpdGgNCnRo
+aXMgY2FzZSBmb3IgVENQIHNvY2tldCwgaXQgd29ya3MgYXMgUE9TSVggcmVxdWlyZWQuDQoNCkkn
+dmUgYWRkZWQgc29tZSBmaXhlcyB0byBhZl92c29jay5jIGFuZCB2aXJ0aW9fdHJhbnNwb3J0X2Nv
+bW1vbi5jLA0KdGVzdCBpcyBhbHNvIGltcGxlbWVudGVkLg0KDQpXaGF0IGRvIFlvdSB0aGluayBn
+dXlzPw0KDQpUaGFuayBZb3UNCg0KQXJzZW5peSBLcmFzbm92KDMpOg0KIHZzb2NrX3Rlc3Q6IFBP
+TExJTiArIFNPX1JDVkxPV0FUIHRlc3QuDQogdmlydGlvL3Zzb2NrOiB1c2UgJ3RhcmdldCcgaW4g
+bm90aWZ5X3BvbGxfaW4gY2FsbGJhY2suDQogdnNvY2s6IHVzZSBza19za3Jjdmxvd2F0IHRvIHNl
+dCBQT0xMSU4sUE9MTFJETk9STSBiaXRzLg0KDQogbmV0L3Ztd192c29jay9hZl92c29jay5jICAg
+ICAgICAgICAgICAgIHwgIDIgKy0NCiBuZXQvdm13X3Zzb2NrL3ZpcnRpb190cmFuc3BvcnRfY29t
+bW9uLmMgfCAgMiArLQ0KIHRvb2xzL3Rlc3RpbmcvdnNvY2svdnNvY2tfdGVzdC5jICAgICAgICB8
+IDkwICsrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKw0KIDMgZmlsZXMgY2hhbmdlZCwg
+OTIgaW5zZXJ0aW9ucygrKSwgMiBkZWxldGlvbnMoLSkNCg0KLS0gDQoyLjI1LjENCg==
