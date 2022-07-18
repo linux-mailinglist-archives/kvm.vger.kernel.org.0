@@ -2,171 +2,202 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id E005D578322
-	for <lists+kvm@lfdr.de>; Mon, 18 Jul 2022 15:06:12 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 0A0E3578318
+	for <lists+kvm@lfdr.de>; Mon, 18 Jul 2022 15:05:08 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235295AbiGRNGL (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 18 Jul 2022 09:06:11 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57652 "EHLO
+        id S235147AbiGRNFG (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 18 Jul 2022 09:05:06 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56068 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235290AbiGRNGF (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 18 Jul 2022 09:06:05 -0400
-Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CABE0252A6;
-        Mon, 18 Jul 2022 06:05:52 -0700 (PDT)
-Received: from pps.filterd (m0098410.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.17.1.5/8.17.1.5) with ESMTP id 26ICt4F9005576;
-        Mon, 18 Jul 2022 13:05:52 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=from : to : cc : subject
- : date : message-id : mime-version : content-transfer-encoding; s=pp1;
- bh=tHtjEA8udhrHVJ+Jm+JMIkgfDrXaVSuhXijJBc7s/kk=;
- b=jBvg4Xipmhf1JoKM6OYI0/mufiBXM/q6Xqz8M1Mg7STiLULpeQ/H3H23NCslGF0vQwo1
- f7bqAks1qrXg5hI5pXjLL6/CGfWVo40Wr9PB1I6JKM7N734VRtZsHMMPbOZCJjOnNzCA
- anMFTeLAlEWmNHG0fjUiM78t47FnuI31Lj4efFk+pFZtFbdxLXNQ73VTHhDxpFFkwh33
- 2MwuVjoOQ6vNpG0KX0H2Y56ovcwFhLJGMjdQGSg2Mie2yWVKo1aYHg6mZBNwaxD4Zz03
- TMl6SGcuCB4rPSoWCbnCJP3cptUmBsUs2nhtWe6phhUgzptdC0ohJE284A8tYlxUX7jp 2Q== 
-Received: from ppma04ams.nl.ibm.com (63.31.33a9.ip4.static.sl-reverse.com [169.51.49.99])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3hd7xr8j3h-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Mon, 18 Jul 2022 13:05:46 +0000
-Received: from pps.filterd (ppma04ams.nl.ibm.com [127.0.0.1])
-        by ppma04ams.nl.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 26ICqYhX027176;
-        Mon, 18 Jul 2022 13:04:38 GMT
-Received: from b06avi18626390.portsmouth.uk.ibm.com (b06avi18626390.portsmouth.uk.ibm.com [9.149.26.192])
-        by ppma04ams.nl.ibm.com with ESMTP id 3hbmy8tkpy-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Mon, 18 Jul 2022 13:04:38 +0000
-Received: from d06av24.portsmouth.uk.ibm.com (d06av24.portsmouth.uk.ibm.com [9.149.105.60])
-        by b06avi18626390.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 26ID2rJe24052180
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Mon, 18 Jul 2022 13:02:53 GMT
-Received: from d06av24.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 23FF242041;
-        Mon, 18 Jul 2022 13:04:35 +0000 (GMT)
-Received: from d06av24.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id DBBFA4203F;
-        Mon, 18 Jul 2022 13:04:34 +0000 (GMT)
-Received: from t35lp63.lnxne.boe (unknown [9.152.108.100])
-        by d06av24.portsmouth.uk.ibm.com (Postfix) with ESMTP;
-        Mon, 18 Jul 2022 13:04:34 +0000 (GMT)
-From:   Nico Boehr <nrb@linux.ibm.com>
-To:     borntraeger@linux.ibm.com, frankja@linux.ibm.com,
-        imbrenda@linux.ibm.com
-Cc:     kvm@vger.kernel.org, linux-s390@vger.kernel.org
-Subject: [PATCH v1] s390/kvm: pv: don't present the ecall interrupt twice
-Date:   Mon, 18 Jul 2022 15:04:34 +0200
-Message-Id: <20220718130434.73302-1-nrb@linux.ibm.com>
-X-Mailer: git-send-email 2.35.3
+        with ESMTP id S235200AbiGRNFF (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 18 Jul 2022 09:05:05 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id DD04111174
+        for <kvm@vger.kernel.org>; Mon, 18 Jul 2022 06:04:52 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1658149491;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=Qtz8QGl64kUBV3EWOme0wtZS/EtSpLd3+LsjwsxBYuo=;
+        b=U8ho8UWR2AKxUpoYhkFxW3bqU9ylwjsQQm1dnoq8FAZZoBn/V3lg9vg03eq6CQ4SvCCKlx
+        Sa8RwWzqJj8j+9zdGGU6IPOErJdWyyb2Ta58qDWbUCIaDiC0qUREzJOv4PqB8qVim7i8qJ
+        UEoUUNwF38UnADY+owjjKZkRR8fVxxQ=
+Received: from mail-qv1-f71.google.com (mail-qv1-f71.google.com
+ [209.85.219.71]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-92-dBEgVeSjON6m9yg_vCiHRg-1; Mon, 18 Jul 2022 09:04:50 -0400
+X-MC-Unique: dBEgVeSjON6m9yg_vCiHRg-1
+Received: by mail-qv1-f71.google.com with SMTP id lp7-20020a056214590700b004733d9feaf6so5435653qvb.0
+        for <kvm@vger.kernel.org>; Mon, 18 Jul 2022 06:04:50 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:message-id:subject:from:to:cc:date:in-reply-to
+         :references:user-agent:mime-version:content-transfer-encoding;
+        bh=Qtz8QGl64kUBV3EWOme0wtZS/EtSpLd3+LsjwsxBYuo=;
+        b=DNQREse6moqGNjUuo/+ZOBpraCxL4J+pA7DzHHuii/GM8CD2aDvPJ1eSnj+Ud5e2fn
+         eUMBpLZ3TiiSwppskMPgYg2/2kGoqdDCU+vVk5qZeVwWUxtQZDi6m6+GFS02DeOBoLyk
+         cPjymCYAmF2bzMvrJW4GE25Xvqcf8LUd8RfBTHMTQsS3v3pvG/Uan7kLd1qaBaTamPgB
+         vyNuIzLprrkNuz7Rnx5MMVhlhITx1w3Q8YCHpFqn9xW8V84x23K8hg7B5e+7ICBIPrFW
+         vjvgGKiJFeAmZ2Ens4Ny83mxay1s4VTuAfQnsnod58WJMx/u+GLa1ECwlYwvI3txTOw/
+         jgMQ==
+X-Gm-Message-State: AJIora/FSGQQd1qk6kqVGBzVTP2sOlyE39MuRIBNi85TFEJvpOHwSFj+
+        XghLUmn3eW/evz+VnMP9ICakD+w+AIiL5tlgaofsLBHJEdre8Vhx9gaNrmaOmkTb95Yniyv2JbR
+        oySpVwt0Yjhw1
+X-Received: by 2002:a05:620a:40c2:b0:6b5:e454:8315 with SMTP id g2-20020a05620a40c200b006b5e4548315mr3701464qko.639.1658149489642;
+        Mon, 18 Jul 2022 06:04:49 -0700 (PDT)
+X-Google-Smtp-Source: AGRyM1sYQIf1anxD1JsBQ3yaIkwNIBz8j7fWmI4CjazBj5gGX196CJAT3Mqn8x73DVq7GPTDBgJ+wA==
+X-Received: by 2002:a05:620a:40c2:b0:6b5:e454:8315 with SMTP id g2-20020a05620a40c200b006b5e4548315mr3701439qko.639.1658149489337;
+        Mon, 18 Jul 2022 06:04:49 -0700 (PDT)
+Received: from [10.35.4.238] (bzq-82-81-161-50.red.bezeqint.net. [82.81.161.50])
+        by smtp.gmail.com with ESMTPSA id i12-20020a37c20c000000b006a6a6f148e6sm11048229qkm.17.2022.07.18.06.04.47
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 18 Jul 2022 06:04:48 -0700 (PDT)
+Message-ID: <a4ac40386f48499f41915db1503650c30161e8be.camel@redhat.com>
+Subject: Re: [PATCH v2 18/24] KVM: nVMX: Document priority of all known
+ events on Intel CPUs
+From:   Maxim Levitsky <mlevitsk@redhat.com>
+To:     Sean Christopherson <seanjc@google.com>,
+        Paolo Bonzini <pbonzini@redhat.com>
+Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Jim Mattson <jmattson@google.com>,
+        Oliver Upton <oupton@google.com>,
+        Peter Shier <pshier@google.com>
+Date:   Mon, 18 Jul 2022 16:04:45 +0300
+In-Reply-To: <20220715204226.3655170-19-seanjc@google.com>
+References: <20220715204226.3655170-1-seanjc@google.com>
+         <20220715204226.3655170-19-seanjc@google.com>
+Content-Type: text/plain; charset="UTF-8"
+User-Agent: Evolution 3.40.4 (3.40.4-5.fc34) 
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-ORIG-GUID: y0YCV19F5tYnkIXM5S3skyQY-Bao3_-L
-X-Proofpoint-GUID: y0YCV19F5tYnkIXM5S3skyQY-Bao3_-L
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.205,Aquarius:18.0.883,Hydra:6.0.517,FMLib:17.11.122.1
- definitions=2022-07-18_12,2022-07-18_01,2022-06-22_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 impostorscore=0 mlxscore=0
- lowpriorityscore=0 malwarescore=0 adultscore=0 spamscore=0
- priorityscore=1501 suspectscore=0 clxscore=1015 mlxlogscore=621
- phishscore=0 bulkscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2206140000 definitions=main-2207180057
-X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_EF,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_PASS
-        autolearn=ham autolearn_force=no version=3.4.6
+X-Spam-Status: No, score=-2.8 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        SPF_HELO_NONE,SPF_NONE autolearn=unavailable autolearn_force=no
+        version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-When the SIGP interpretation facility is present and a VCPU sends an
-ecall to another VCPU in enabled wait, the sending VCPU receives a 56
-intercept (partial execution), so KVM can wake up the receiving CPU.
-Note that the SIGP interpretation facility will take care of the
-interrupt delivery and KVM's only job is to wake the receiving VCPU.
+On Fri, 2022-07-15 at 20:42 +0000, Sean Christopherson wrote:
+> Add a gigantic comment above vmx_check_nested_events() to document the
+> priorities of all known events on Intel CPUs.  Intel's SDM doesn't
+> include VMX-specific events in its "Priority Among Concurrent Events",
+> which makes it painfully difficult to suss out the correct priority
+> between things like Monitor Trap Flag VM-Exits and pending #DBs.
+> 
+> Kudos to Jim Mattson for doing the hard work of collecting and
+> interpreting the priorities from various locations throughtout the SDM
+> (because putting them all in one place in the SDM would be too easy).
+> 
+> Cc: Jim Mattson <jmattson@google.com>
+> Signed-off-by: Sean Christopherson <seanjc@google.com>
+> ---
+>  arch/x86/kvm/vmx/nested.c | 83 +++++++++++++++++++++++++++++++++++++++
+>  1 file changed, 83 insertions(+)
+> 
+> diff --git a/arch/x86/kvm/vmx/nested.c b/arch/x86/kvm/vmx/nested.c
+> index c3fc8b484785..981f98ef96f1 100644
+> --- a/arch/x86/kvm/vmx/nested.c
+> +++ b/arch/x86/kvm/vmx/nested.c
+> @@ -3901,6 +3901,89 @@ static bool nested_vmx_preemption_timer_pending(struct kvm_vcpu *vcpu)
+>                to_vmx(vcpu)->nested.preemption_timer_expired;
+>  }
+>  
+> +/*
+> + * Per the Intel SDM's table "Priority Among Concurrent Events", with minor
+> + * edits to fill in missing examples, e.g. #DB due to split-lock accesses,
+> + * and less minor edits to splice in the priority of VMX Non-Root specific
+> + * events, e.g. MTF and NMI/INTR-window exiting.
+> + *
+> + * 1 Hardware Reset and Machine Checks
+> + *     - RESET
+> + *     - Machine Check
+> + *
+> + * 2 Trap on Task Switch
+> + *     - T flag in TSS is set (on task switch)
+> + *
+> + * 3 External Hardware Interventions
+> + *     - FLUSH
+> + *     - STOPCLK
+> + *     - SMI
+> + *     - INIT
+> + *
+> + * 3.5 Monitor Trap Flag (MTF) VM-exit[1]
+> + *
+> + * 4 Traps on Previous Instruction
+> + *     - Breakpoints
+> + *     - Trap-class Debug Exceptions (#DB due to TF flag set, data/I-O
+> + *       breakpoint, or #DB due to a split-lock access)
+> + *
+> + * 4.3 VMX-preemption timer expired VM-exit
+> + *
+> + * 4.6 NMI-window exiting VM-exit[2]
+> + *
+> + * 5 Nonmaskable Interrupts (NMI)
+> + *
+> + * 5.5 Interrupt-window exiting VM-exit and Virtual-interrupt delivery
+> + *
+> + * 6 Maskable Hardware Interrupts
+> + *
+> + * 7 Code Breakpoint Fault
+> + *
+> + * 8 Faults from Fetching Next Instruction
+> + *     - Code-Segment Limit Violation
+> + *     - Code Page Fault
+> + *     - Control protection exception (missing ENDBRANCH at target of indirect
+> + *                                     call or jump)
+> + *
+> + * 9 Faults from Decoding Next Instruction
+> + *     - Instruction length > 15 bytes
+> + *     - Invalid Opcode
+> + *     - Coprocessor Not Available
+> + *
+> + *10 Faults on Executing Instruction
+> + *     - Overflow
+> + *     - Bound error
+> + *     - Invalid TSS
+> + *     - Segment Not Present
+> + *     - Stack fault
+> + *     - General Protection
+> + *     - Data Page Fault
+> + *     - Alignment Check
+> + *     - x86 FPU Floating-point exception
+> + *     - SIMD floating-point exception
+> + *     - Virtualization exception
+> + *     - Control protection exception
+> + *
+> + * [1] Per the "Monitor Trap Flag" section: System-management interrupts (SMIs),
+> + *     INIT signals, and higher priority events take priority over MTF VM exits.
+> + *     MTF VM exits take priority over debug-trap exceptions and lower priority
+> + *     events.
+> + *
+> + * [2] Debug-trap exceptions and higher priority events take priority over VM exits
+> + *     caused by the VMX-preemption timer.  VM exits caused by the VMX-preemption
+> + *     timer take priority over VM exits caused by the "NMI-window exiting"
+> + *     VM-execution control and lower priority events.
+> + *
+> + * [3] Debug-trap exceptions and higher priority events take priority over VM exits
+> + *     caused by "NMI-window exiting".  VM exits caused by this control take
+> + *     priority over non-maskable interrupts (NMIs) and lower priority events.
+> + *
+> + * [4] Virtual-interrupt delivery has the same priority as that of VM exits due to
+> + *     the 1-setting of the "interrupt-window exiting" VM-execution control.  Thus,
+> + *     non-maskable interrupts (NMIs) and higher priority events take priority over
+> + *     delivery of a virtual interrupt; delivery of a virtual interrupt takes
+> + *     priority over external interrupts and lower priority events.
+> + */
+>  static int vmx_check_nested_events(struct kvm_vcpu *vcpu)
+>  {
+>         struct kvm_lapic *apic = vcpu->arch.apic;
 
-For PV, the sending VCPU will receive a 108 intercept (pv notify) and
-should continue like in the non-PV case, i.e. wake the receiving VCPU.
 
-For PV and non-PV guests the interrupt delivery will occur through the
-SIGP interpretation facility on SIE entry when SIE finds the X bit in
-the status field set.
+Reviewed-by: Maxim Levitsky <mlevitsk@redhat.com>
 
-However, in handle_pv_notification(), there was no special handling for
-SIGP, which leads to interrupt injection being requested by KVM for the
-next SIE entry. This results in the interrupt being delivered twice:
-once by the SIGP interpretation facility and once by KVM through the
-IICTL.
 
-Add the necessary special handling in handle_pv_notification(), similar
-to handle_partial_execution(), which simply wakes the receiving VCPU and
-leave interrupt delivery to the SIGP interpretation facility.
-
-In contrast to external calls, emergency calls are not interpreted but
-also cause a 108 intercept, which is why we still need to call
-handle_instruction() for SIGP orders other than ecall.
-
-Since kvm_s390_handle_sigp_pei() is now called for all SIGP orders which
-cause a 108 intercept - even if they are actually handled by
-handle_instruction() - move the tracepoint in kvm_s390_handle_sigp_pei()
-to avoid possibly confusing trace messages.
-
-Signed-off-by: Nico Boehr <nrb@linux.ibm.com>
-Cc: <stable@vger.kernel.org> # 5.7
-Fixes: da24a0cc58ed ("KVM: s390: protvirt: Instruction emulation")
----
- arch/s390/kvm/intercept.c | 15 +++++++++++++++
- arch/s390/kvm/sigp.c      |  4 ++--
- 2 files changed, 17 insertions(+), 2 deletions(-)
-
-diff --git a/arch/s390/kvm/intercept.c b/arch/s390/kvm/intercept.c
-index 8bd42a20d924..88112065d941 100644
---- a/arch/s390/kvm/intercept.c
-+++ b/arch/s390/kvm/intercept.c
-@@ -528,12 +528,27 @@ static int handle_pv_uvc(struct kvm_vcpu *vcpu)
- 
- static int handle_pv_notification(struct kvm_vcpu *vcpu)
- {
-+	int ret;
-+
- 	if (vcpu->arch.sie_block->ipa == 0xb210)
- 		return handle_pv_spx(vcpu);
- 	if (vcpu->arch.sie_block->ipa == 0xb220)
- 		return handle_pv_sclp(vcpu);
- 	if (vcpu->arch.sie_block->ipa == 0xb9a4)
- 		return handle_pv_uvc(vcpu);
-+	if (vcpu->arch.sie_block->ipa >> 8 == 0xae) {
-+		/*
-+		 * Besides external call, other SIGP orders also cause a
-+		 * 108 (pv notify) intercept. In contrast to external call,
-+		 * these orders need to be emulated and hence the appropriate
-+		 * place to handle them is in handle_instruction().
-+		 * So first try kvm_s390_handle_sigp_pei() and if that isn't
-+		 * successful, go on with handle_instruction().
-+		 */
-+		ret = kvm_s390_handle_sigp_pei(vcpu);
-+		if (!ret)
-+			return ret;
-+	}
- 
- 	return handle_instruction(vcpu);
- }
-diff --git a/arch/s390/kvm/sigp.c b/arch/s390/kvm/sigp.c
-index 8aaee2892ec3..cb747bf6c798 100644
---- a/arch/s390/kvm/sigp.c
-+++ b/arch/s390/kvm/sigp.c
-@@ -480,9 +480,9 @@ int kvm_s390_handle_sigp_pei(struct kvm_vcpu *vcpu)
- 	struct kvm_vcpu *dest_vcpu;
- 	u8 order_code = kvm_s390_get_base_disp_rs(vcpu, NULL);
- 
--	trace_kvm_s390_handle_sigp_pei(vcpu, order_code, cpu_addr);
--
- 	if (order_code == SIGP_EXTERNAL_CALL) {
-+		trace_kvm_s390_handle_sigp_pei(vcpu, order_code, cpu_addr);
-+
- 		dest_vcpu = kvm_get_vcpu_by_id(vcpu->kvm, cpu_addr);
- 		BUG_ON(dest_vcpu == NULL);
- 
--- 
-2.35.3
+Best regards,
+	Maxim Levitsky
 
