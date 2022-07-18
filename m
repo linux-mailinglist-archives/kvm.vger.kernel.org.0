@@ -2,275 +2,145 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 62BDE577E6F
-	for <lists+kvm@lfdr.de>; Mon, 18 Jul 2022 11:14:39 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 20FD3577EC0
+	for <lists+kvm@lfdr.de>; Mon, 18 Jul 2022 11:34:18 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234098AbiGRJOi (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 18 Jul 2022 05:14:38 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44930 "EHLO
+        id S234181AbiGRJeR (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 18 Jul 2022 05:34:17 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57756 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233353AbiGRJOh (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 18 Jul 2022 05:14:37 -0400
-Received: from out30-57.freemail.mail.aliyun.com (out30-57.freemail.mail.aliyun.com [115.124.30.57])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D1B92F5B9;
-        Mon, 18 Jul 2022 02:14:34 -0700 (PDT)
-X-Alimail-AntiSpam: AC=PASS;BC=-1|-1;BR=01201311R811e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=ay29a033018046059;MF=xuanzhuo@linux.alibaba.com;NM=1;PH=DS;RN=36;SR=0;TI=SMTPD_---0VJhAxgV_1658135667;
-Received: from localhost(mailfrom:xuanzhuo@linux.alibaba.com fp:SMTPD_---0VJhAxgV_1658135667)
-          by smtp.aliyun-inc.com;
-          Mon, 18 Jul 2022 17:14:29 +0800
-Message-ID: <1658135504.1522465-2-xuanzhuo@linux.alibaba.com>
-Subject: Re: [PATCH v11 39/40] virtio_net: support tx queue resize
-Date:   Mon, 18 Jul 2022 17:11:44 +0800
-From:   Xuan Zhuo <xuanzhuo@linux.alibaba.com>
-To:     Jason Wang <jasowang@redhat.com>
-Cc:     Richard Weinberger <richard@nod.at>,
-        Anton Ivanov <anton.ivanov@cambridgegreys.com>,
-        Johannes Berg <johannes@sipsolutions.net>,
-        "Michael S. Tsirkin" <mst@redhat.com>,
-        "David S. Miller" <davem@davemloft.net>,
-        Eric Dumazet <edumazet@google.com>,
-        Jakub Kicinski <kuba@kernel.org>,
-        Paolo Abeni <pabeni@redhat.com>,
-        Hans de Goede <hdegoede@redhat.com>,
-        Mark Gross <markgross@kernel.org>,
-        Vadim Pasternak <vadimp@nvidia.com>,
-        Bjorn Andersson <bjorn.andersson@linaro.org>,
-        Mathieu Poirier <mathieu.poirier@linaro.org>,
-        Cornelia Huck <cohuck@redhat.com>,
-        Halil Pasic <pasic@linux.ibm.com>,
-        Eric Farman <farman@linux.ibm.com>,
-        Heiko Carstens <hca@linux.ibm.com>,
-        Vasily Gorbik <gor@linux.ibm.com>,
-        Alexander Gordeev <agordeev@linux.ibm.com>,
-        Christian Borntraeger <borntraeger@linux.ibm.com>,
-        Sven Schnelle <svens@linux.ibm.com>,
-        Alexei Starovoitov <ast@kernel.org>,
-        Daniel Borkmann <daniel@iogearbox.net>,
-        Jesper Dangaard Brouer <hawk@kernel.org>,
-        John Fastabend <john.fastabend@gmail.com>,
-        Vincent Whitchurch <vincent.whitchurch@axis.com>,
-        linux-um@lists.infradead.org, netdev <netdev@vger.kernel.org>,
-        platform-driver-x86@vger.kernel.org,
-        linux-remoteproc@vger.kernel.org, linux-s390@vger.kernel.org,
-        kvm <kvm@vger.kernel.org>,
-        "open list:XDP (eXpress Data Path)" <bpf@vger.kernel.org>,
-        kangjie.xu@linux.alibaba.com,
-        virtualization <virtualization@lists.linux-foundation.org>
-References: <20220629065656.54420-1-xuanzhuo@linux.alibaba.com>
- <20220629065656.54420-40-xuanzhuo@linux.alibaba.com>
- <102d3b83-1ae9-a59a-16ce-251c22b7afb0@redhat.com>
- <1656986432.1164997-2-xuanzhuo@linux.alibaba.com>
- <CACGkMEt8MSS=tcn=Hd6WF9+btT0ccocxEd1ighRgK-V1uiWmCQ@mail.gmail.com>
- <1657873703.9301925-1-xuanzhuo@linux.alibaba.com>
- <CACGkMEvgjX+67NxwrUym7CnbNFU2-=CbAXPN_UmtvDOTS1LrHA@mail.gmail.com>
-In-Reply-To: <CACGkMEvgjX+67NxwrUym7CnbNFU2-=CbAXPN_UmtvDOTS1LrHA@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Spam-Status: No, score=-9.9 required=5.0 tests=BAYES_00,
-        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-        UNPARSEABLE_RELAY,USER_IN_DEF_SPF_WL autolearn=ham autolearn_force=no
-        version=3.4.6
+        with ESMTP id S234044AbiGRJeQ (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 18 Jul 2022 05:34:16 -0400
+Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 53EBB1057C;
+        Mon, 18 Jul 2022 02:34:14 -0700 (PDT)
+Received: from pps.filterd (m0098421.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.17.1.5/8.17.1.5) with ESMTP id 26I9OJwC013534;
+        Mon, 18 Jul 2022 09:34:13 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
+ mime-version : subject : to : cc : references : from : in-reply-to :
+ content-type : content-transfer-encoding; s=pp1;
+ bh=CLtnuMZn0IaIeUfNRVokFsAu9Vmt+6KkmjlqpPstuWE=;
+ b=PgWIVighlvRiymHGqWnzV5Rv+2l2kHDAaNYvDHRaOIcV1SSKTaxzvfQsSZ75zmBaOQHc
+ uIwq+0WZRVyKHdP+VxlL6lo3gRUZXXU/vFshDRcbOIBxFNbtTGC6f5iLiB55dDEpJHSl
+ jT5MQ8HOGGImR6ZxkqT8YcfQlcnyMu/rthXQ2WhH7FQodZH0G9p29v52F6sp1MZlcQnZ
+ IvShXHJyo/T7QwTu+J/6TqJ+AodoAEjfno0mWmBUGVSW9f/GDsx1lNbG2Y8qZEx0J694
+ bizSCsRpRouMidnlQnf0CuWtWZYI3bQ1lSDGCYB4ac43jy3xPNln9TAcZ+DNDBm+aotN 9A== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3hd4uyr810-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Mon, 18 Jul 2022 09:34:13 +0000
+Received: from m0098421.ppops.net (m0098421.ppops.net [127.0.0.1])
+        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 26I9QJOF025620;
+        Mon, 18 Jul 2022 09:34:13 GMT
+Received: from ppma03ams.nl.ibm.com (62.31.33a9.ip4.static.sl-reverse.com [169.51.49.98])
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3hd4uyr804-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Mon, 18 Jul 2022 09:34:12 +0000
+Received: from pps.filterd (ppma03ams.nl.ibm.com [127.0.0.1])
+        by ppma03ams.nl.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 26I9KRsm017554;
+        Mon, 18 Jul 2022 09:34:11 GMT
+Received: from b06cxnps4076.portsmouth.uk.ibm.com (d06relay13.portsmouth.uk.ibm.com [9.149.109.198])
+        by ppma03ams.nl.ibm.com with ESMTP id 3hbmy8tb70-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Mon, 18 Jul 2022 09:34:11 +0000
+Received: from d06av21.portsmouth.uk.ibm.com (d06av21.portsmouth.uk.ibm.com [9.149.105.232])
+        by b06cxnps4076.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 26I9Y8Cm11665912
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Mon, 18 Jul 2022 09:34:09 GMT
+Received: from d06av21.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id D0CCE5204E;
+        Mon, 18 Jul 2022 09:34:08 +0000 (GMT)
+Received: from [9.171.53.146] (unknown [9.171.53.146])
+        by d06av21.portsmouth.uk.ibm.com (Postfix) with ESMTP id 918825204F;
+        Mon, 18 Jul 2022 09:34:08 +0000 (GMT)
+Message-ID: <90e2ebcd-f411-8d44-bf44-5df80fb59b51@linux.ibm.com>
+Date:   Mon, 18 Jul 2022 11:34:08 +0200
+MIME-Version: 1.0
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.10.0
+Subject: Re: [PATCH] kvm: stats: tell userspace which values are boolean
+Content-Language: en-US
+To:     Paolo Bonzini <pbonzini@redhat.com>, linux-kernel@vger.kernel.org,
+        kvm@vger.kernel.org
+Cc:     Amneesh Singh <natto@weirdnatto.in>
+References: <20220714120330.1410308-1-pbonzini@redhat.com>
+From:   Janis Schoetterl-Glausch <scgl@linux.ibm.com>
+In-Reply-To: <20220714120330.1410308-1-pbonzini@redhat.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-ORIG-GUID: ShPBIaQuF6uMl3ehzNI5XhMv0L9pGx99
+X-Proofpoint-GUID: be1TbGoNuk6AVmzsBfJfTR1nMuPj0o6m
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.205,Aquarius:18.0.883,Hydra:6.0.517,FMLib:17.11.122.1
+ definitions=2022-07-18_08,2022-07-15_01,2022-06-22_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 phishscore=0 impostorscore=0
+ malwarescore=0 bulkscore=0 mlxlogscore=999 lowpriorityscore=0 spamscore=0
+ clxscore=1011 adultscore=0 suspectscore=0 priorityscore=1501 mlxscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2206140000
+ definitions=main-2207180038
+X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,
+        SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, 18 Jul 2022 16:57:53 +0800, Jason Wang <jasowang@redhat.com> wrote:
-> On Fri, Jul 15, 2022 at 4:32 PM Xuan Zhuo <xuanzhuo@linux.alibaba.com> wr=
-ote:
-> >
-> > On Fri, 8 Jul 2022 14:23:57 +0800, Jason Wang <jasowang@redhat.com> wro=
-te:
-> > > On Tue, Jul 5, 2022 at 10:01 AM Xuan Zhuo <xuanzhuo@linux.alibaba.com=
-> wrote:
-> > > >
-> > > > On Mon, 4 Jul 2022 11:45:52 +0800, Jason Wang <jasowang@redhat.com>=
- wrote:
-> > > > >
-> > > > > =E5=9C=A8 2022/6/29 14:56, Xuan Zhuo =E5=86=99=E9=81=93:
-> > > > > > This patch implements the resize function of the tx queues.
-> > > > > > Based on this function, it is possible to modify the ring num o=
-f the
-> > > > > > queue.
-> > > > > >
-> > > > > > Signed-off-by: Xuan Zhuo <xuanzhuo@linux.alibaba.com>
-> > > > > > ---
-> > > > > >   drivers/net/virtio_net.c | 48 +++++++++++++++++++++++++++++++=
-+++++++++
-> > > > > >   1 file changed, 48 insertions(+)
-> > > > > >
-> > > > > > diff --git a/drivers/net/virtio_net.c b/drivers/net/virtio_net.c
-> > > > > > index 6ab16fd193e5..fd358462f802 100644
-> > > > > > --- a/drivers/net/virtio_net.c
-> > > > > > +++ b/drivers/net/virtio_net.c
-> > > > > > @@ -135,6 +135,9 @@ struct send_queue {
-> > > > > >     struct virtnet_sq_stats stats;
-> > > > > >
-> > > > > >     struct napi_struct napi;
-> > > > > > +
-> > > > > > +   /* Record whether sq is in reset state. */
-> > > > > > +   bool reset;
-> > > > > >   };
-> > > > > >
-> > > > > >   /* Internal representation of a receive virtqueue */
-> > > > > > @@ -279,6 +282,7 @@ struct padded_vnet_hdr {
-> > > > > >   };
-> > > > > >
-> > > > > >   static void virtnet_rq_free_unused_buf(struct virtqueue *vq, =
-void *buf);
-> > > > > > +static void virtnet_sq_free_unused_buf(struct virtqueue *vq, v=
-oid *buf);
-> > > > > >
-> > > > > >   static bool is_xdp_frame(void *ptr)
-> > > > > >   {
-> > > > > > @@ -1603,6 +1607,11 @@ static void virtnet_poll_cleantx(struct =
-receive_queue *rq)
-> > > > > >             return;
-> > > > > >
-> > > > > >     if (__netif_tx_trylock(txq)) {
-> > > > > > +           if (READ_ONCE(sq->reset)) {
-> > > > > > +                   __netif_tx_unlock(txq);
-> > > > > > +                   return;
-> > > > > > +           }
-> > > > > > +
-> > > > > >             do {
-> > > > > >                     virtqueue_disable_cb(sq->vq);
-> > > > > >                     free_old_xmit_skbs(sq, true);
-> > > > > > @@ -1868,6 +1877,45 @@ static int virtnet_rx_resize(struct virt=
-net_info *vi,
-> > > > > >     return err;
-> > > > > >   }
-> > > > > >
-> > > > > > +static int virtnet_tx_resize(struct virtnet_info *vi,
-> > > > > > +                        struct send_queue *sq, u32 ring_num)
-> > > > > > +{
-> > > > > > +   struct netdev_queue *txq;
-> > > > > > +   int err, qindex;
-> > > > > > +
-> > > > > > +   qindex =3D sq - vi->sq;
-> > > > > > +
-> > > > > > +   virtnet_napi_tx_disable(&sq->napi);
-> > > > > > +
-> > > > > > +   txq =3D netdev_get_tx_queue(vi->dev, qindex);
-> > > > > > +
-> > > > > > +   /* 1. wait all ximt complete
-> > > > > > +    * 2. fix the race of netif_stop_subqueue() vs netif_start_=
-subqueue()
-> > > > > > +    */
-> > > > > > +   __netif_tx_lock_bh(txq);
-> > > > > > +
-> > > > > > +   /* Prevent rx poll from accessing sq. */
-> > > > > > +   WRITE_ONCE(sq->reset, true);
-> > > > >
-> > > > >
-> > > > > Can we simply disable RX NAPI here?
-> > > >
-> > > > Disable rx napi is indeed a simple solution. But I hope that when d=
-ealing with
-> > > > tx, it will not affect rx.
-> > >
-> > > Ok, but I think we've already synchronized with tx lock here, isn't i=
-t?
-> >
-> > Yes, do you have any questions about WRITE_ONCE()? There is a set false=
- operation
-> > later, I did not use lock there, so I used WRITE/READ_ONCE
-> > uniformly.
->
-> I mean, since we've already used tx locks somewhere, we'd better use
-> them here as well at least as a start.
+On 7/14/22 14:03, Paolo Bonzini wrote:
+> Some of the statistics values exported by KVM are always only 0 or 1.
+> It can be useful to export this fact to userspace so that it can track
+> them specially (for example by polling the value every now and then to
+> compute a % of time spent in a specific state).
+> 
+> Therefore, add "boolean value" as a new "unit".  While it is not exactly
+> a unit, it walks and quacks like one.  In particular, using the type
+> would be wrong because boolean values could be instantaneous or peak
+> values (e.g. "is the rmap allocated?") or even two-bucket histograms
+> (e.g. "number of posted vs. non-posted interrupt injections").
+> 
+> Suggested-by: Amneesh Singh <natto@weirdnatto.in>
+> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+> ---
+>  Documentation/virt/kvm/api.rst |  6 ++++++
+>  arch/x86/kvm/x86.c             |  2 +-
+>  include/linux/kvm_host.h       | 11 ++++++++++-
+>  include/uapi/linux/kvm.h       |  1 +
+>  4 files changed, 18 insertions(+), 2 deletions(-)
+> 
+> diff --git a/Documentation/virt/kvm/api.rst b/Documentation/virt/kvm/api.rst
+> index 11e00a46c610..48bf6e49a7de 100644
+> --- a/Documentation/virt/kvm/api.rst
+> +++ b/Documentation/virt/kvm/api.rst
+> @@ -5657,6 +5657,7 @@ by a string of size ``name_size``.
+>  	#define KVM_STATS_UNIT_BYTES		(0x1 << KVM_STATS_UNIT_SHIFT)
+>  	#define KVM_STATS_UNIT_SECONDS		(0x2 << KVM_STATS_UNIT_SHIFT)
+>  	#define KVM_STATS_UNIT_CYCLES		(0x3 << KVM_STATS_UNIT_SHIFT)
+> +	#define KVM_STATS_UNIT_BOOLEAN		(0x4 << KVM_STATS_UNIT_SHIFT)
+>  	#define KVM_STATS_UNIT_MAX		KVM_STATS_UNIT_CYCLES
+> 
+>  	#define KVM_STATS_BASE_SHIFT		8
 
+[...]
 
-OK. next version will fix.
+> diff --git a/include/uapi/linux/kvm.h b/include/uapi/linux/kvm.h
+> index 5088bd9f1922..811897dadcae 100644
+> --- a/include/uapi/linux/kvm.h
+> +++ b/include/uapi/linux/kvm.h
+> @@ -2083,6 +2083,7 @@ struct kvm_stats_header {
+>  #define KVM_STATS_UNIT_BYTES		(0x1 << KVM_STATS_UNIT_SHIFT)
+>  #define KVM_STATS_UNIT_SECONDS		(0x2 << KVM_STATS_UNIT_SHIFT)
+>  #define KVM_STATS_UNIT_CYCLES		(0x3 << KVM_STATS_UNIT_SHIFT)
+> +#define KVM_STATS_UNIT_BOOLEAN		(0x4 << KVM_STATS_UNIT_SHIFT)
+>  #define KVM_STATS_UNIT_MAX		KVM_STATS_UNIT_CYCLES
 
-Thanks.
+Shouldn't KVM_STATS_UNIT_MAX be KVM_STATS_UNIT_BOOLEAN then?
 
-+static int virtnet_tx_resize(struct virtnet_info *vi,
-+			     struct send_queue *sq, u32 ring_num)
-+{
-+	struct netdev_queue *txq;
-+	int err, qindex;
-+
-+	qindex =3D sq - vi->sq;
-+
-+	virtnet_napi_tx_disable(&sq->napi);
-+
-+	txq =3D netdev_get_tx_queue(vi->dev, qindex);
-+
-+	/* 1. wait all ximt complete
-+	 * 2. fix the race of netif_stop_subqueue() vs netif_start_subqueue()
-+	 */
-+	__netif_tx_lock_bh(txq);
-+
-+	sq->reset =3D true;
-+
-+	/* Prevent the upper layer from trying to send packets. */
-+	netif_stop_subqueue(vi->dev, qindex);
-+
-+	__netif_tx_unlock_bh(txq);
-+
-+	err =3D virtqueue_resize(sq->vq, ring_num, virtnet_sq_free_unused_buf);
-+	if (err)
-+		netdev_err(vi->dev, "resize tx fail: tx queue index: %d err: %d\n", qind=
-ex, err);
-+
-+	__netif_tx_lock_bh(txq);
-+	sq->reset =3D false;
-+	netif_tx_wake_queue(txq);
-+	__netif_tx_unlock_bh(txq);
-+
-+	virtnet_napi_tx_enable(vi, sq->vq, &sq->napi);
-+	return err;
-+}
+The selftest has:
+	TEST_ASSERT((pdesc->flags & KVM_STATS_UNIT_MASK)
+                                <= KVM_STATS_UNIT_MAX, "Unknown KVM stats unit");
+> 
+>  #define KVM_STATS_BASE_SHIFT		8
 
-
->
-> Thanks
->
-> >
-> > Thanks.
-> >
-> > >
-> > > Thanks
-> > >
-> > > >
-> > > > Thanks.
-> > > >
-> > > >
-> > > > >
-> > > > > Thanks
-> > > > >
-> > > > >
-> > > > > > +
-> > > > > > +   /* Prevent the upper layer from trying to send packets. */
-> > > > > > +   netif_stop_subqueue(vi->dev, qindex);
-> > > > > > +
-> > > > > > +   __netif_tx_unlock_bh(txq);
-> > > > > > +
-> > > > > > +   err =3D virtqueue_resize(sq->vq, ring_num, virtnet_sq_free_=
-unused_buf);
-> > > > > > +   if (err)
-> > > > > > +           netdev_err(vi->dev, "resize tx fail: tx queue index=
-: %d err: %d\n", qindex, err);
-> > > > > > +
-> > > > > > +   /* Memory barrier before set reset and start subqueue. */
-> > > > > > +   smp_mb();
-> > > > > > +
-> > > > > > +   WRITE_ONCE(sq->reset, false);
-> > > > > > +   netif_tx_wake_queue(txq);
-> > > > > > +
-> > > > > > +   virtnet_napi_tx_enable(vi, sq->vq, &sq->napi);
-> > > > > > +   return err;
-> > > > > > +}
-> > > > > > +
-> > > > > >   /*
-> > > > > >    * Send command via the control virtqueue and check status.  =
-Commands
-> > > > > >    * supported by the hypervisor, as indicated by feature bits,=
- should
-> > > > >
-> > > >
-> > >
-> >
->
