@@ -2,61 +2,61 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 5D56C57831A
-	for <lists+kvm@lfdr.de>; Mon, 18 Jul 2022 15:05:25 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id A601E57831C
+	for <lists+kvm@lfdr.de>; Mon, 18 Jul 2022 15:05:44 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235247AbiGRNFY (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 18 Jul 2022 09:05:24 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56574 "EHLO
+        id S235258AbiGRNFm (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 18 Jul 2022 09:05:42 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56872 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235244AbiGRNFW (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 18 Jul 2022 09:05:22 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id E49712717D
-        for <kvm@vger.kernel.org>; Mon, 18 Jul 2022 06:05:10 -0700 (PDT)
+        with ESMTP id S235264AbiGRNFf (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 18 Jul 2022 09:05:35 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 7E5D426ACB
+        for <kvm@vger.kernel.org>; Mon, 18 Jul 2022 06:05:21 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1658149510;
+        s=mimecast20190719; t=1658149520;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=2fZFmz0sTyerzbll2pA4XeuHkOCraTGUiF885crHKO0=;
-        b=HYASZtjEl3MtG9q35vujeJC0LxES/20VdD9g09j0VusPog3PII6BdITleDvEG+eVD+rf58
-        0ZJPJIjvdkwwtDXWub/MUkJyp9/o/KFlihgCmygchCOcDD09cBjYUdzIKW8ApXM7juSYvV
-        kdi+DZnTiJEJmD1P5xvEozCuwFWs48s=
+        bh=TNn/219w/nxXvIhafPjEI4PpysZRiwXMWVRFnBiLVQo=;
+        b=e5VhSHQiJ1RtCWkdMfmXLO7M44KXVoD0YFycLlSm+UP8rNpdcxIFlwkPDGEFqKEbiKmHYN
+        83SA5Rqt4VL9yyzBYmXnVDeED5gKvshhUdR7Flp/R3SyvXk6Qa4kkeL7jPUNWYewLvyQRI
+        T6a3SHWP4eYdVvOHU08Pa50okEfne8g=
 Received: from mail-qv1-f69.google.com (mail-qv1-f69.google.com
  [209.85.219.69]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-401-5inrhicfN4SHYX63FUVP2w-1; Mon, 18 Jul 2022 09:05:08 -0400
-X-MC-Unique: 5inrhicfN4SHYX63FUVP2w-1
-Received: by mail-qv1-f69.google.com with SMTP id q16-20020a0ce210000000b00472f361d6b1so5490070qvl.21
-        for <kvm@vger.kernel.org>; Mon, 18 Jul 2022 06:05:08 -0700 (PDT)
+ us-mta-196-tKrBi3_zO-SsFOrctR4kew-1; Mon, 18 Jul 2022 09:05:19 -0400
+X-MC-Unique: tKrBi3_zO-SsFOrctR4kew-1
+Received: by mail-qv1-f69.google.com with SMTP id mh1-20020a056214564100b00472fcc5ae9eso5404659qvb.11
+        for <kvm@vger.kernel.org>; Mon, 18 Jul 2022 06:05:19 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:message-id:subject:from:to:cc:date:in-reply-to
          :references:user-agent:mime-version:content-transfer-encoding;
-        bh=2fZFmz0sTyerzbll2pA4XeuHkOCraTGUiF885crHKO0=;
-        b=zw4oDi4QVvSDfZmPc7QtOpp6nSVm/NHsAHSd4WyRkldsG0/Zvz94uVq3H5Jx4DafDh
-         QoLVG8J9SbFhEH/7mElSSbLh3NFZj66cNXmgfCH8ePLgpFDNA6Do8JsXzVtnIxDwtj7R
-         S5lwwZXqH77tHqo6PEx2bVHJRs84gnxco6LORufQGmFwSJglyZt/n/C09slbbNSslsLN
-         C8JAZGw56P9LCdKKUzg6Gx5CsdCkXXZGjh/wqWgTt/gi91OlJhaQXgZIBhtU0BhBzHgw
-         ZxdLv5Hu4T4jGSryndtcghlzv3h0LNE/ChliMPR1zaZxageMLiceGwArXgJVxmD4+99n
-         eIoA==
-X-Gm-Message-State: AJIora/IYZVCfBKMCTwPR9tJe/HTGYx0IiQ8ZOlyx7EFBxyYlDJQ6woz
-        9kR0K24QoVSqb7+bKvs7yEVgwb4pECyAzLQB5mpNp2F0X5URj0XQuEiwXQE6BHWap0A4ilyIdBo
-        +4RAWUU/xoeBo
-X-Received: by 2002:a05:620a:f04:b0:6b5:473d:d47 with SMTP id v4-20020a05620a0f0400b006b5473d0d47mr17450241qkl.577.1658149508003;
-        Mon, 18 Jul 2022 06:05:08 -0700 (PDT)
-X-Google-Smtp-Source: AGRyM1vGGfQZO5VSVCDwuuQ/3oxsmiwRcrMSnZUMGUjT7/yxswU6YZV4dqRJTMFYFU7vctE+P61KFg==
-X-Received: by 2002:a05:620a:f04:b0:6b5:473d:d47 with SMTP id v4-20020a05620a0f0400b006b5473d0d47mr17450201qkl.577.1658149507490;
-        Mon, 18 Jul 2022 06:05:07 -0700 (PDT)
+        bh=TNn/219w/nxXvIhafPjEI4PpysZRiwXMWVRFnBiLVQo=;
+        b=W9EFevdW16ngO7dcA/geK3/YrGzPjXcoRg/IlwE1JtLZas/rGadFhX4Hi9+d+2pvSv
+         glbN4LhcRA3MlOgz7oU9oX2bHwq88d8lNV1PdDMhi1WJPyQt7y2rX5eZStDSHb4f5Pp7
+         +Hq2NwE8+NgKtnoN0fjG7+GLFyMffuDcLgh8gjdyPrBMurrVK977YMmHLz7FvYHcWCau
+         s0F8ZEYGIVAlWtXllp9Dj655ml2DwOS/N7cwBPoJUHlLGQNmd4oUye9A0Ksy8iK+r/xS
+         R6nb4u2w09z8yGb1XwcEEABaIIhXbSM+2AgC7UnwuVFkUMQ1H9lPlnT5Ri1xAvUUHvPT
+         jLxA==
+X-Gm-Message-State: AJIora+XcH5TjRZMMDwfj9jST6cxMQPtWm1xAMQsRGT9miV8EOiAYvP/
+        NHQoIRvXOuhv5EGYDOgxUCrJnCyn5XuZFDTqJbaMF0mUxTjRXYA96X4GgWA3PBJvAGSb1vuIilE
+        sUujtKPOE3mCs
+X-Received: by 2002:a05:620a:d83:b0:6a7:a68c:6118 with SMTP id q3-20020a05620a0d8300b006a7a68c6118mr17493320qkl.337.1658149518784;
+        Mon, 18 Jul 2022 06:05:18 -0700 (PDT)
+X-Google-Smtp-Source: AGRyM1t4AqfUdMQ2En1oft289/J+A0HQz/7crr95hCS3cG1hRbkgp1V5jTc9qwXelJWXoqR8RG90dg==
+X-Received: by 2002:a05:620a:d83:b0:6a7:a68c:6118 with SMTP id q3-20020a05620a0d8300b006a7a68c6118mr17493292qkl.337.1658149518475;
+        Mon, 18 Jul 2022 06:05:18 -0700 (PDT)
 Received: from [10.35.4.238] (bzq-82-81-161-50.red.bezeqint.net. [82.81.161.50])
-        by smtp.gmail.com with ESMTPSA id bp13-20020a05622a1b8d00b0031e9fa40c2esm9425486qtb.27.2022.07.18.06.05.04
+        by smtp.gmail.com with ESMTPSA id r2-20020ac87ee2000000b0031ed590433bsm8051643qtc.78.2022.07.18.06.05.15
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 18 Jul 2022 06:05:06 -0700 (PDT)
-Message-ID: <8d0938d55694e12f19d4ba59749869cc2c1a200d.camel@redhat.com>
-Subject: Re: [PATCH v2 19/24] KVM: x86: Morph pending exceptions to pending
- VM-Exits at queue time
+        Mon, 18 Jul 2022 06:05:17 -0700 (PDT)
+Message-ID: <103afbe8e0d3c560d02fc3454bba3d0d88e9251a.camel@redhat.com>
+Subject: Re: [PATCH v2 21/24] KVM: VMX: Update MTF and ICEBP comments to
+ document KVM's subtle behavior
 From:   Maxim Levitsky <mlevitsk@redhat.com>
 To:     Sean Christopherson <seanjc@google.com>,
         Paolo Bonzini <pbonzini@redhat.com>
@@ -64,17 +64,18 @@ Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
         Jim Mattson <jmattson@google.com>,
         Oliver Upton <oupton@google.com>,
         Peter Shier <pshier@google.com>
-Date:   Mon, 18 Jul 2022 16:05:03 +0300
-In-Reply-To: <20220715204226.3655170-20-seanjc@google.com>
+Date:   Mon, 18 Jul 2022 16:05:14 +0300
+In-Reply-To: <20220715204226.3655170-22-seanjc@google.com>
 References: <20220715204226.3655170-1-seanjc@google.com>
-         <20220715204226.3655170-20-seanjc@google.com>
+         <20220715204226.3655170-22-seanjc@google.com>
 Content-Type: text/plain; charset="UTF-8"
 User-Agent: Evolution 3.40.4 (3.40.4-5.fc34) 
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-3.5 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,
-        SPF_HELO_NONE,SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
+X-Spam-Status: No, score=-2.8 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        SPF_HELO_NONE,SPF_NONE autolearn=unavailable autolearn_force=no
+        version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
@@ -82,736 +83,54 @@ List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
 On Fri, 2022-07-15 at 20:42 +0000, Sean Christopherson wrote:
-> Morph pending exceptions to pending VM-Exits (due to interception) when
-> the exception is queued instead of waiting until nested events are
-> checked at VM-Entry.  This fixes a longstanding bug where KVM fails to
-> handle an exception that occurs during delivery of a previous exception,
-> KVM (L0) and L1 both want to intercept the exception (e.g. #PF for shadow
-> paging), and KVM determines that the exception is in the guest's domain,
-> i.e. queues the new exception for L2.  Deferring the interception check
-> causes KVM to esclate various combinations of injected+pending exceptions
-> to double fault (#DF) without consulting L1's interception desires, and
-> ends up injecting a spurious #DF into L2.
+> Document the oddities of ICEBP interception (trap-like #DB is intercepted
+> as a fault-like exception), and how using VMX's inner "skip" helper
+> deliberately bypasses the pending MTF and single-step #DB logic.
 > 
-> KVM has fudged around the issue for #PF by special casing emulated #PF
-> injection for shadow paging, but the underlying issue is not unique to
-> shadow paging in L0, e.g. if KVM is intercepting #PF because the guest
-> has a smaller maxphyaddr and L1 (but not L0) is using shadow paging.
-> Other exceptions are affected as well, e.g. if KVM is intercepting #GP
-> for one of SVM's workaround or for the VMware backdoor emulation stuff.
-> The other cases have gone unnoticed because the #DF is spurious if and
-> only if L1 resolves the exception, e.g. KVM's goofs go unnoticed if L1
-> would have injected #DF anyways.
+> No functional change intended.
 > 
-> The hack-a-fix has also led to ugly code, e.g. bailing from the emulator
-> if #PF injection forced a nested VM-Exit and the emulator finds itself
-> back in L1.  Allowing for direct-to-VM-Exit queueing also neatly solves
-> the async #PF in L2 mess; no need to set a magic flag and token, simply
-> queue a #PF nested VM-Exit.
-> 
-> Deal with event migration by flagging that a pending exception was queued
-> by userspace and check for interception at the next KVM_RUN, e.g. so that
-> KVM does the right thing regardless of the order in which userspace
-> restores nested state vs. event state.
-> 
-> When "getting" events from userspace, simply drop any pending excpetion
-> that is destined to be intercepted if there is also an injected exception
-> to be migrated.  Ideally, KVM would migrate both events, but that would
-> require new ABI, and practically speaking losing the event is unlikely to
-> be noticed, let alone fatal.  The injected exception is captured, RIP
-> still points at the original faulting instruction, etc...  So either the
-> injection on the target will trigger the same intercepted exception, or
-> the source of the intercepted exception was transient and/or
-> non-deterministic, thus dropping it is ok-ish.
-> 
-> Fixes: a04aead144fd ("KVM: nSVM: fix running nested guests when npt=0")
-> Fixes: feaf0c7dc473 ("KVM: nVMX: Do not generate #DF if #PF happens during exception delivery into L2")
-> Cc: Jim Mattson <jmattson@google.com>
 > Signed-off-by: Sean Christopherson <seanjc@google.com>
 > ---
->  arch/x86/include/asm/kvm_host.h |  12 ++-
->  arch/x86/kvm/svm/nested.c       |  41 +++-----
->  arch/x86/kvm/vmx/nested.c       | 109 ++++++++++------------
->  arch/x86/kvm/vmx/vmx.c          |   6 +-
->  arch/x86/kvm/x86.c              | 159 ++++++++++++++++++++++----------
->  arch/x86/kvm/x86.h              |   7 ++
->  6 files changed, 187 insertions(+), 147 deletions(-)
+>  arch/x86/kvm/vmx/vmx.c | 16 +++++++++++-----
+>  1 file changed, 11 insertions(+), 5 deletions(-)
 > 
-> diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
-> index 0a6a05e25f24..6bcbffb42420 100644
-> --- a/arch/x86/include/asm/kvm_host.h
-> +++ b/arch/x86/include/asm/kvm_host.h
-> @@ -647,7 +647,6 @@ struct kvm_queued_exception {
->         u32 error_code;
->         unsigned long payload;
->         bool has_payload;
-> -       u8 nested_apf;
->  };
->  
->  struct kvm_vcpu_arch {
-> @@ -748,8 +747,12 @@ struct kvm_vcpu_arch {
->  
->         u8 event_exit_inst_len;
->  
-> +       bool exception_from_userspace;
-> +
->         /* Exceptions to be injected to the guest. */
->         struct kvm_queued_exception exception;
-> +       /* Exception VM-Exits to be synthesized to L1. */
-> +       struct kvm_queued_exception exception_vmexit;
->  
->         struct kvm_queued_interrupt {
->                 bool injected;
-> @@ -860,7 +863,6 @@ struct kvm_vcpu_arch {
->                 u32 id;
->                 bool send_user_only;
->                 u32 host_apf_flags;
-> -               unsigned long nested_apf_token;
->                 bool delivery_as_pf_vmexit;
->                 bool pageready_pending;
->         } apf;
-> @@ -1636,9 +1638,9 @@ struct kvm_x86_ops {
->  
->  struct kvm_x86_nested_ops {
->         void (*leave_nested)(struct kvm_vcpu *vcpu);
-> +       bool (*is_exception_vmexit)(struct kvm_vcpu *vcpu, u8 vector,
-> +                                   u32 error_code);
->         int (*check_events)(struct kvm_vcpu *vcpu);
-> -       bool (*handle_page_fault_workaround)(struct kvm_vcpu *vcpu,
-> -                                            struct x86_exception *fault);
->         bool (*hv_timer_pending)(struct kvm_vcpu *vcpu);
->         void (*triple_fault)(struct kvm_vcpu *vcpu);
->         int (*get_state)(struct kvm_vcpu *vcpu,
-> @@ -1865,7 +1867,7 @@ void kvm_queue_exception_p(struct kvm_vcpu *vcpu, unsigned nr, unsigned long pay
->  void kvm_requeue_exception(struct kvm_vcpu *vcpu, unsigned nr);
->  void kvm_requeue_exception_e(struct kvm_vcpu *vcpu, unsigned nr, u32 error_code);
->  void kvm_inject_page_fault(struct kvm_vcpu *vcpu, struct x86_exception *fault);
-> -bool kvm_inject_emulated_page_fault(struct kvm_vcpu *vcpu,
-> +void kvm_inject_emulated_page_fault(struct kvm_vcpu *vcpu,
->                                     struct x86_exception *fault);
->  bool kvm_require_cpl(struct kvm_vcpu *vcpu, int required_cpl);
->  bool kvm_require_dr(struct kvm_vcpu *vcpu, int dr);
-> diff --git a/arch/x86/kvm/svm/nested.c b/arch/x86/kvm/svm/nested.c
-> index f5676c2679d0..0a8ee5f28319 100644
-> --- a/arch/x86/kvm/svm/nested.c
-> +++ b/arch/x86/kvm/svm/nested.c
-> @@ -55,28 +55,6 @@ static void nested_svm_inject_npf_exit(struct kvm_vcpu *vcpu,
->         nested_svm_vmexit(svm);
->  }
->  
-> -static bool nested_svm_handle_page_fault_workaround(struct kvm_vcpu *vcpu,
-> -                                                   struct x86_exception *fault)
-> -{
-> -       struct vcpu_svm *svm = to_svm(vcpu);
-> -       struct vmcb *vmcb = svm->vmcb;
-> -
-> -       WARN_ON(!is_guest_mode(vcpu));
-> -
-> -       if (vmcb12_is_intercept(&svm->nested.ctl,
-> -                               INTERCEPT_EXCEPTION_OFFSET + PF_VECTOR) &&
-> -           !WARN_ON_ONCE(svm->nested.nested_run_pending)) {
-> -               vmcb->control.exit_code = SVM_EXIT_EXCP_BASE + PF_VECTOR;
-> -               vmcb->control.exit_code_hi = 0;
-> -               vmcb->control.exit_info_1 = fault->error_code;
-> -               vmcb->control.exit_info_2 = fault->address;
-> -               nested_svm_vmexit(svm);
-> -               return true;
-> -       }
-> -
-> -       return false;
-> -}
-> -
->  static u64 nested_svm_get_tdp_pdptr(struct kvm_vcpu *vcpu, int index)
->  {
->         struct vcpu_svm *svm = to_svm(vcpu);
-> @@ -1302,16 +1280,17 @@ int nested_svm_check_permissions(struct kvm_vcpu *vcpu)
->         return 0;
->  }
->  
-> -static bool nested_exit_on_exception(struct vcpu_svm *svm)
-> +static bool nested_svm_is_exception_vmexit(struct kvm_vcpu *vcpu, u8 vector,
-> +                                          u32 error_code)
->  {
-> -       unsigned int vector = svm->vcpu.arch.exception.vector;
-> +       struct vcpu_svm *svm = to_svm(vcpu);
->  
->         return (svm->nested.ctl.intercepts[INTERCEPT_EXCEPTION] & BIT(vector));
->  }
->  
->  static void nested_svm_inject_exception_vmexit(struct kvm_vcpu *vcpu)
->  {
-> -       struct kvm_queued_exception *ex = &vcpu->arch.exception;
-> +       struct kvm_queued_exception *ex = &vcpu->arch.exception_vmexit;
->         struct vcpu_svm *svm = to_svm(vcpu);
->         struct vmcb *vmcb = svm->vmcb;
->  
-> @@ -1379,15 +1358,19 @@ static int svm_check_nested_events(struct kvm_vcpu *vcpu)
->                 return 0;
->         }
->  
-> -       if (vcpu->arch.exception.pending) {
-> +       if (vcpu->arch.exception_vmexit.pending) {
->                 if (block_nested_exceptions)
->                          return -EBUSY;
-> -               if (!nested_exit_on_exception(svm))
-> -                       return 0;
->                 nested_svm_inject_exception_vmexit(vcpu);
->                 return 0;
->         }
->  
-> +       if (vcpu->arch.exception.pending) {
-> +               if (block_nested_exceptions)
-> +                       return -EBUSY;
-> +               return 0;
-> +       }
-> +
->         if (vcpu->arch.smi_pending && !svm_smi_blocked(vcpu)) {
->                 if (block_nested_events)
->                         return -EBUSY;
-> @@ -1725,8 +1708,8 @@ static bool svm_get_nested_state_pages(struct kvm_vcpu *vcpu)
->  
->  struct kvm_x86_nested_ops svm_nested_ops = {
->         .leave_nested = svm_leave_nested,
-> +       .is_exception_vmexit = nested_svm_is_exception_vmexit,
->         .check_events = svm_check_nested_events,
-> -       .handle_page_fault_workaround = nested_svm_handle_page_fault_workaround,
->         .triple_fault = nested_svm_triple_fault,
->         .get_nested_state_pages = svm_get_nested_state_pages,
->         .get_state = svm_get_nested_state,
-> diff --git a/arch/x86/kvm/vmx/nested.c b/arch/x86/kvm/vmx/nested.c
-> index 981f98ef96f1..5a6ba62dcd49 100644
-> --- a/arch/x86/kvm/vmx/nested.c
-> +++ b/arch/x86/kvm/vmx/nested.c
-> @@ -439,59 +439,22 @@ static bool nested_vmx_is_page_fault_vmexit(struct vmcs12 *vmcs12,
->         return inequality ^ bit;
->  }
->  
-> -
-> -/*
-> - * KVM wants to inject page-faults which it got to the guest. This function
-> - * checks whether in a nested guest, we need to inject them to L1 or L2.
-> - */
-> -static int nested_vmx_check_exception(struct kvm_vcpu *vcpu, unsigned long *exit_qual)
-> -{
-> -       struct kvm_queued_exception *ex = &vcpu->arch.exception;
-> -       struct vmcs12 *vmcs12 = get_vmcs12(vcpu);
-> -
-> -       if (ex->vector == PF_VECTOR) {
-> -               if (ex->nested_apf) {
-> -                       *exit_qual = vcpu->arch.apf.nested_apf_token;
-> -                       return 1;
-> -               }
-> -               if (nested_vmx_is_page_fault_vmexit(vmcs12, ex->error_code)) {
-> -                       *exit_qual = ex->has_payload ? ex->payload : vcpu->arch.cr2;
-> -                       return 1;
-> -               }
-> -       } else if (vmcs12->exception_bitmap & (1u << ex->vector)) {
-> -               if (ex->vector == DB_VECTOR) {
-> -                       if (ex->has_payload) {
-> -                               *exit_qual = ex->payload;
-> -                       } else {
-> -                               *exit_qual = vcpu->arch.dr6;
-> -                               *exit_qual &= ~DR6_BT;
-> -                               *exit_qual ^= DR6_ACTIVE_LOW;
-> -                       }
-> -               } else
-> -                       *exit_qual = 0;
-> -               return 1;
-> -       }
-> -
-> -       return 0;
-> -}
-> -
-> -static bool nested_vmx_handle_page_fault_workaround(struct kvm_vcpu *vcpu,
-> -                                                   struct x86_exception *fault)
-> +static bool nested_vmx_is_exception_vmexit(struct kvm_vcpu *vcpu, u8 vector,
-> +                                          u32 error_code)
->  {
->         struct vmcs12 *vmcs12 = get_vmcs12(vcpu);
->  
-> -       WARN_ON(!is_guest_mode(vcpu));
-> +       /*
-> +        * Drop bits 31:16 of the error code when performing the #PF mask+match
-> +        * check.  All VMCS fields involved are 32 bits, but Intel CPUs never
-> +        * set bits 31:16 and VMX disallows setting bits 31:16 in the injected
-> +        * error code.  Including the to-be-dropped bits in the check might
-> +        * result in an "impossible" or missed exit from L1's perspective.
-> +        */
-> +       if (vector == PF_VECTOR)
-> +               return nested_vmx_is_page_fault_vmexit(vmcs12, (u16)error_code);
->  
-> -       if (nested_vmx_is_page_fault_vmexit(vmcs12, fault->error_code) &&
-> -           !WARN_ON_ONCE(to_vmx(vcpu)->nested.nested_run_pending)) {
-> -               vmcs12->vm_exit_intr_error_code = fault->error_code;
-> -               nested_vmx_vmexit(vcpu, EXIT_REASON_EXCEPTION_NMI,
-> -                                 PF_VECTOR | INTR_TYPE_HARD_EXCEPTION |
-> -                                 INTR_INFO_DELIVER_CODE_MASK | INTR_INFO_VALID_MASK,
-> -                                 fault->address);
-> -               return true;
-> -       }
-> -       return false;
-> +       return (vmcs12->exception_bitmap & (1u << vector));
->  }
->  
->  static int nested_vmx_check_io_bitmap_controls(struct kvm_vcpu *vcpu,
-> @@ -3812,12 +3775,24 @@ static int vmx_complete_nested_posted_interrupt(struct kvm_vcpu *vcpu)
->         return -ENXIO;
->  }
->  
-> -static void nested_vmx_inject_exception_vmexit(struct kvm_vcpu *vcpu,
-> -                                              unsigned long exit_qual)
-> +static void nested_vmx_inject_exception_vmexit(struct kvm_vcpu *vcpu)
->  {
-> -       struct kvm_queued_exception *ex = &vcpu->arch.exception;
-> +       struct kvm_queued_exception *ex = &vcpu->arch.exception_vmexit;
->         u32 intr_info = ex->vector | INTR_INFO_VALID_MASK;
->         struct vmcs12 *vmcs12 = get_vmcs12(vcpu);
-> +       unsigned long exit_qual;
-> +
-> +       if (ex->has_payload) {
-> +               exit_qual = ex->payload;
-> +       } else if (ex->vector == PF_VECTOR) {
-> +               exit_qual = vcpu->arch.cr2;
-> +       } else if (ex->vector == DB_VECTOR) {
-> +               exit_qual = vcpu->arch.dr6;
-> +               exit_qual &= ~DR6_BT;
-> +               exit_qual ^= DR6_ACTIVE_LOW;
-> +       } else {
-> +               exit_qual = 0;
-> +       }
->  
->         if (ex->has_error_code) {
->                 /*
-> @@ -3988,7 +3963,6 @@ static int vmx_check_nested_events(struct kvm_vcpu *vcpu)
->  {
->         struct kvm_lapic *apic = vcpu->arch.apic;
->         struct vcpu_vmx *vmx = to_vmx(vcpu);
-> -       unsigned long exit_qual;
->         /*
->          * Only a pending nested run blocks a pending exception.  If there is a
->          * previously injected event, the pending exception occurred while said
-> @@ -4042,14 +4016,20 @@ static int vmx_check_nested_events(struct kvm_vcpu *vcpu)
->          * across SMI/RSM as it should; that needs to be addressed in order to
->          * prioritize SMI over MTF and trap-like #DBs.
->          */
-> +       if (vcpu->arch.exception_vmexit.pending &&
-> +           !vmx_is_low_priority_db_trap(&vcpu->arch.exception_vmexit)) {
-> +               if (block_nested_exceptions)
-> +                       return -EBUSY;
-> +
-> +               nested_vmx_inject_exception_vmexit(vcpu);
-> +               return 0;
-> +       }
-> +
->         if (vcpu->arch.exception.pending &&
->             !vmx_is_low_priority_db_trap(&vcpu->arch.exception)) {
->                 if (block_nested_exceptions)
->                         return -EBUSY;
-> -               if (!nested_vmx_check_exception(vcpu, &exit_qual))
-> -                       goto no_vmexit;
-> -               nested_vmx_inject_exception_vmexit(vcpu, exit_qual);
-> -               return 0;
-> +               goto no_vmexit;
->         }
->  
->         if (vmx->nested.mtf_pending) {
-> @@ -4060,13 +4040,18 @@ static int vmx_check_nested_events(struct kvm_vcpu *vcpu)
->                 return 0;
->         }
->  
-> +       if (vcpu->arch.exception_vmexit.pending) {
-> +               if (block_nested_exceptions)
-> +                       return -EBUSY;
-> +
-> +               nested_vmx_inject_exception_vmexit(vcpu);
-> +               return 0;
-> +       }
-> +
->         if (vcpu->arch.exception.pending) {
->                 if (block_nested_exceptions)
->                         return -EBUSY;
-> -               if (!nested_vmx_check_exception(vcpu, &exit_qual))
-> -                       goto no_vmexit;
-> -               nested_vmx_inject_exception_vmexit(vcpu, exit_qual);
-> -               return 0;
-> +               goto no_vmexit;
->         }
->  
->         if (nested_vmx_preemption_timer_pending(vcpu)) {
-> @@ -6952,8 +6937,8 @@ __init int nested_vmx_hardware_setup(int (*exit_handlers[])(struct kvm_vcpu *))
->  
->  struct kvm_x86_nested_ops vmx_nested_ops = {
->         .leave_nested = vmx_leave_nested,
-> +       .is_exception_vmexit = nested_vmx_is_exception_vmexit,
->         .check_events = vmx_check_nested_events,
-> -       .handle_page_fault_workaround = nested_vmx_handle_page_fault_workaround,
->         .hv_timer_pending = nested_vmx_preemption_timer_pending,
->         .triple_fault = nested_vmx_triple_fault,
->         .get_state = vmx_get_nested_state,
 > diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
-> index 7d3abe2a206a..5302b046110f 100644
+> index 5302b046110f..de6fcfa0ef02 100644
 > --- a/arch/x86/kvm/vmx/vmx.c
 > +++ b/arch/x86/kvm/vmx/vmx.c
-> @@ -1585,7 +1585,9 @@ static void vmx_update_emulated_instruction(struct kvm_vcpu *vcpu)
+> @@ -1578,9 +1578,13 @@ static void vmx_update_emulated_instruction(struct kvm_vcpu *vcpu)
+>  
+>         /*
+>          * Per the SDM, MTF takes priority over debug-trap exceptions besides
+> -        * T-bit traps. As instruction emulation is completed (i.e. at the
+> -        * instruction boundary), any #DB exception pending delivery must be a
+> -        * debug-trap. Record the pending MTF state to be delivered in
+> +        * TSS T-bit traps and ICEBP (INT1).  KVM doesn't emulate T-bit traps
+> +        * or ICEBP (in the emulator proper), and skipping of ICEBP after an
+> +        * intercepted #DB deliberately avoids single-step #DB and MTF updates
+> +        * as ICEBP is higher priority than both.  As instruction emulation is
+> +        * completed at this point (i.e. KVM is at the instruction boundary),
+> +        * any #DB exception pending delivery must be a debug-trap of lower
+> +        * priority than MTF.  Record the pending MTF state to be delivered in
+>          * vmx_check_nested_events().
 >          */
 >         if (nested_cpu_has_mtf(vmcs12) &&
->             (!vcpu->arch.exception.pending ||
-> -            vcpu->arch.exception.vector == DB_VECTOR))
-> +            vcpu->arch.exception.vector == DB_VECTOR) &&
-> +           (!vcpu->arch.exception_vmexit.pending ||
-> +            vcpu->arch.exception_vmexit.vector == DB_VECTOR))
->                 vmx->nested.mtf_pending = true;
->         else
->                 vmx->nested.mtf_pending = false;
-> @@ -5637,7 +5639,7 @@ static bool vmx_emulation_required_with_pending_exception(struct kvm_vcpu *vcpu)
->         struct vcpu_vmx *vmx = to_vmx(vcpu);
->  
->         return vmx->emulation_required && !vmx->rmode.vm86_active &&
-> -              (vcpu->arch.exception.pending || vcpu->arch.exception.injected);
-> +              (kvm_is_exception_pending(vcpu) || vcpu->arch.exception.injected);
->  }
->  
->  static int handle_invalid_guest_state(struct kvm_vcpu *vcpu)
-> diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-> index 795c799fc767..9be2fdf834ad 100644
-> --- a/arch/x86/kvm/x86.c
-> +++ b/arch/x86/kvm/x86.c
-> @@ -609,6 +609,21 @@ void kvm_deliver_exception_payload(struct kvm_vcpu *vcpu,
->  }
->  EXPORT_SYMBOL_GPL(kvm_deliver_exception_payload);
->  
-> +static void kvm_queue_exception_vmexit(struct kvm_vcpu *vcpu, unsigned int vector,
-> +                                      bool has_error_code, u32 error_code,
-> +                                      bool has_payload, unsigned long payload)
-> +{
-> +       struct kvm_queued_exception *ex = &vcpu->arch.exception_vmexit;
-> +
-> +       ex->vector = vector;
-> +       ex->injected = false;
-> +       ex->pending = true;
-> +       ex->has_error_code = has_error_code;
-> +       ex->error_code = error_code;
-> +       ex->has_payload = has_payload;
-> +       ex->payload = payload;
-> +}
-> +
->  static void kvm_multiple_exception(struct kvm_vcpu *vcpu,
->                 unsigned nr, bool has_error, u32 error_code,
->                 bool has_payload, unsigned long payload, bool reinject)
-> @@ -618,18 +633,31 @@ static void kvm_multiple_exception(struct kvm_vcpu *vcpu,
->  
->         kvm_make_request(KVM_REQ_EVENT, vcpu);
->  
-> +       /*
-> +        * If the exception is destined for L2 and isn't being reinjected,
-> +        * morph it to a VM-Exit if L1 wants to intercept the exception.  A
-> +        * previously injected exception is not checked because it was checked
-> +        * when it was original queued, and re-checking is incorrect if _L1_
-> +        * injected the exception, in which case it's exempt from interception.
-> +        */
-> +       if (!reinject && is_guest_mode(vcpu) &&
-> +           kvm_x86_ops.nested_ops->is_exception_vmexit(vcpu, nr, error_code)) {
-> +               kvm_queue_exception_vmexit(vcpu, nr, has_error, error_code,
-> +                                          has_payload, payload);
-> +               return;
-> +       }
-> +
->         if (!vcpu->arch.exception.pending && !vcpu->arch.exception.injected) {
->         queue:
->                 if (reinject) {
->                         /*
-> -                        * On vmentry, vcpu->arch.exception.pending is only
-> -                        * true if an event injection was blocked by
-> -                        * nested_run_pending.  In that case, however,
-> -                        * vcpu_enter_guest requests an immediate exit,
-> -                        * and the guest shouldn't proceed far enough to
-> -                        * need reinjection.
-> +                        * On VM-Entry, an exception can be pending if and only
-> +                        * if event injection was blocked by nested_run_pending.
-> +                        * In that case, however, vcpu_enter_guest() requests an
-> +                        * immediate exit, and the guest shouldn't proceed far
-> +                        * enough to need reinjection.
->                          */
-> -                       WARN_ON_ONCE(vcpu->arch.exception.pending);
-> +                       WARN_ON_ONCE(kvm_is_exception_pending(vcpu));
->                         vcpu->arch.exception.injected = true;
->                         if (WARN_ON_ONCE(has_payload)) {
->                                 /*
-> @@ -732,20 +760,22 @@ static int complete_emulated_insn_gp(struct kvm_vcpu *vcpu, int err)
->  void kvm_inject_page_fault(struct kvm_vcpu *vcpu, struct x86_exception *fault)
->  {
->         ++vcpu->stat.pf_guest;
-> -       vcpu->arch.exception.nested_apf =
-> -               is_guest_mode(vcpu) && fault->async_page_fault;
-> -       if (vcpu->arch.exception.nested_apf) {
-> -               vcpu->arch.apf.nested_apf_token = fault->address;
-> -               kvm_queue_exception_e(vcpu, PF_VECTOR, fault->error_code);
-> -       } else {
-> +
-> +       /*
-> +        * Async #PF in L2 is always forwarded to L1 as a VM-Exit regardless of
-> +        * whether or not L1 wants to intercept "regular" #PF.
-> +        */
-> +       if (is_guest_mode(vcpu) && fault->async_page_fault)
-> +               kvm_queue_exception_vmexit(vcpu, PF_VECTOR,
-> +                                          true, fault->error_code,
-> +                                          true, fault->address);
-> +       else
->                 kvm_queue_exception_e_p(vcpu, PF_VECTOR, fault->error_code,
->                                         fault->address);
-> -       }
->  }
->  EXPORT_SYMBOL_GPL(kvm_inject_page_fault);
->  
-> -/* Returns true if the page fault was immediately morphed into a VM-Exit. */
-> -bool kvm_inject_emulated_page_fault(struct kvm_vcpu *vcpu,
-> +void kvm_inject_emulated_page_fault(struct kvm_vcpu *vcpu,
->                                     struct x86_exception *fault)
->  {
->         struct kvm_mmu *fault_mmu;
-> @@ -763,26 +793,7 @@ bool kvm_inject_emulated_page_fault(struct kvm_vcpu *vcpu,
->                 kvm_mmu_invalidate_gva(vcpu, fault_mmu, fault->address,
->                                        fault_mmu->root.hpa);
->  
-> -       /*
-> -        * A workaround for KVM's bad exception handling.  If KVM injected an
-> -        * exception into L2, and L2 encountered a #PF while vectoring the
-> -        * injected exception, manually check to see if L1 wants to intercept
-> -        * #PF, otherwise queuing the #PF will lead to #DF or a lost exception.
-> -        * In all other cases, defer the check to nested_ops->check_events(),
-> -        * which will correctly handle priority (this does not).  Note, other
-> -        * exceptions, e.g. #GP, are theoretically affected, #PF is simply the
-> -        * most problematic, e.g. when L0 and L1 are both intercepting #PF for
-> -        * shadow paging.
-> -        *
-> -        * TODO: Rewrite exception handling to track injected and pending
-> -        *       (VM-Exit) exceptions separately.
-> -        */
-> -       if (unlikely(vcpu->arch.exception.injected && is_guest_mode(vcpu)) &&
-> -           kvm_x86_ops.nested_ops->handle_page_fault_workaround(vcpu, fault))
-> -               return true;
-> -
->         fault_mmu->inject_page_fault(vcpu, fault);
-> -       return false;
->  }
->  EXPORT_SYMBOL_GPL(kvm_inject_emulated_page_fault);
->  
-> @@ -4820,7 +4831,7 @@ static int kvm_vcpu_ready_for_interrupt_injection(struct kvm_vcpu *vcpu)
->         return (kvm_arch_interrupt_allowed(vcpu) &&
->                 kvm_cpu_accept_dm_intr(vcpu) &&
->                 !kvm_event_needs_reinjection(vcpu) &&
-> -               !vcpu->arch.exception.pending);
-> +               !kvm_is_exception_pending(vcpu));
->  }
->  
->  static int kvm_vcpu_ioctl_interrupt(struct kvm_vcpu *vcpu,
-> @@ -4995,13 +5006,27 @@ static int kvm_vcpu_ioctl_x86_set_mce(struct kvm_vcpu *vcpu,
->  static void kvm_vcpu_ioctl_x86_get_vcpu_events(struct kvm_vcpu *vcpu,
->                                                struct kvm_vcpu_events *events)
->  {
-> -       struct kvm_queued_exception *ex = &vcpu->arch.exception;
-> +       struct kvm_queued_exception *ex;
->  
->         process_nmi(vcpu);
->  
->         if (kvm_check_request(KVM_REQ_SMI, vcpu))
->                 process_smi(vcpu);
->  
-> +       /*
-> +        * KVM's ABI only allows for one exception to be migrated.  Luckily,
-> +        * the only time there can be two queued exceptions is if there's a
-> +        * non-exiting _injected_ exception, and a pending exiting exception.
-> +        * In that case, ignore the VM-Exiting exception as it's an extension
-> +        * of the injected exception.
-> +        */
-> +       if (vcpu->arch.exception_vmexit.pending &&
-> +           !vcpu->arch.exception.pending &&
-> +           !vcpu->arch.exception.injected)
-> +               ex = &vcpu->arch.exception_vmexit;
-> +       else
-> +               ex = &vcpu->arch.exception;
-> +
->         /*
->          * In guest mode, payload delivery should be deferred if the exception
->          * will be intercepted by L1, e.g. KVM should not modifying CR2 if L1
-> @@ -5108,6 +5133,19 @@ static int kvm_vcpu_ioctl_x86_set_vcpu_events(struct kvm_vcpu *vcpu,
->                 return -EINVAL;
->  
->         process_nmi(vcpu);
-> +
-> +       /*
-> +        * Flag that userspace is stuffing an exception, the next KVM_RUN will
-> +        * morph the exception to a VM-Exit if appropriate.  Do this only for
-> +        * pending exceptions, already-injected exceptions are not subject to
-> +        * intercpetion.  Note, userspace that conflates pending and injected
-> +        * is hosed, and will incorrectly convert an injected exception into a
-> +        * pending exception, which in turn may cause a spurious VM-Exit.
-> +        */
-> +       vcpu->arch.exception_from_userspace = events->exception.pending;
-> +
-> +       vcpu->arch.exception_vmexit.pending = false;
-> +
->         vcpu->arch.exception.injected = events->exception.injected;
->         vcpu->arch.exception.pending = events->exception.pending;
->         vcpu->arch.exception.vector = events->exception.nr;
-> @@ -8130,18 +8168,17 @@ static void toggle_interruptibility(struct kvm_vcpu *vcpu, u32 mask)
->         }
->  }
->  
-> -static bool inject_emulated_exception(struct kvm_vcpu *vcpu)
-> +static void inject_emulated_exception(struct kvm_vcpu *vcpu)
->  {
->         struct x86_emulate_ctxt *ctxt = vcpu->arch.emulate_ctxt;
-> +
->         if (ctxt->exception.vector == PF_VECTOR)
-> -               return kvm_inject_emulated_page_fault(vcpu, &ctxt->exception);
-> -
-> -       if (ctxt->exception.error_code_valid)
-> +               kvm_inject_emulated_page_fault(vcpu, &ctxt->exception);
-> +       else if (ctxt->exception.error_code_valid)
->                 kvm_queue_exception_e(vcpu, ctxt->exception.vector,
->                                       ctxt->exception.error_code);
->         else
->                 kvm_queue_exception(vcpu, ctxt->exception.vector);
-> -       return false;
->  }
->  
->  static struct x86_emulate_ctxt *alloc_emulate_ctxt(struct kvm_vcpu *vcpu)
-> @@ -8754,8 +8791,7 @@ int x86_emulate_instruction(struct kvm_vcpu *vcpu, gpa_t cr2_or_gpa,
->  
->         if (ctxt->have_exception) {
->                 r = 1;
-> -               if (inject_emulated_exception(vcpu))
-> -                       return r;
-> +               inject_emulated_exception(vcpu);
->         } else if (vcpu->arch.pio.count) {
->                 if (!vcpu->arch.pio.in) {
->                         /* FIXME: return into emulator if single-stepping.  */
-> @@ -9695,7 +9731,7 @@ static int inject_pending_event(struct kvm_vcpu *vcpu, bool *req_immediate_exit)
->          */
->         if (vcpu->arch.exception.injected)
->                 kvm_inject_exception(vcpu);
-> -       else if (vcpu->arch.exception.pending)
-> +       else if (kvm_is_exception_pending(vcpu))
->                 ; /* see above */
->         else if (vcpu->arch.nmi_injected)
->                 static_call(kvm_x86_inject_nmi)(vcpu);
-> @@ -9722,6 +9758,14 @@ static int inject_pending_event(struct kvm_vcpu *vcpu, bool *req_immediate_exit)
->         if (r < 0)
->                 goto out;
->  
-> +       /*
-> +        * A pending exception VM-Exit should either result in nested VM-Exit
-> +        * or force an immediate re-entry and exit to/from L2, and exception
-> +        * VM-Exits cannot be injected (flag should _never_ be set).
-> +        */
-> +       WARN_ON_ONCE(vcpu->arch.exception_vmexit.injected ||
-> +                    vcpu->arch.exception_vmexit.pending);
-> +
->         /*
->          * New events, other than exceptions, cannot be injected if KVM needs
->          * to re-inject a previous event.  See above comments on re-injecting
-> @@ -9821,7 +9865,7 @@ static int inject_pending_event(struct kvm_vcpu *vcpu, bool *req_immediate_exit)
->             kvm_x86_ops.nested_ops->hv_timer_pending(vcpu))
->                 *req_immediate_exit = true;
->  
-> -       WARN_ON(vcpu->arch.exception.pending);
-> +       WARN_ON(kvm_is_exception_pending(vcpu));
->         return 0;
->  
->  out:
-> @@ -10839,6 +10883,7 @@ static void kvm_put_guest_fpu(struct kvm_vcpu *vcpu)
->  
->  int kvm_arch_vcpu_ioctl_run(struct kvm_vcpu *vcpu)
->  {
-> +       struct kvm_queued_exception *ex = &vcpu->arch.exception;
->         struct kvm_run *kvm_run = vcpu->run;
->         int r;
->  
-> @@ -10897,6 +10942,21 @@ int kvm_arch_vcpu_ioctl_run(struct kvm_vcpu *vcpu)
->                 }
->         }
->  
-> +       /*
-> +        * If userspace set a pending exception and L2 is active, convert it to
-> +        * a pending VM-Exit if L1 wants to intercept the exception.
-> +        */
-> +       if (vcpu->arch.exception_from_userspace && is_guest_mode(vcpu) &&
-> +           kvm_x86_ops.nested_ops->is_exception_vmexit(vcpu, ex->vector,
-> +                                                       ex->error_code)) {
-> +               kvm_queue_exception_vmexit(vcpu, ex->vector,
-> +                                          ex->has_error_code, ex->error_code,
-> +                                          ex->has_payload, ex->payload);
-> +               ex->injected = false;
-> +               ex->pending = false;
-> +       }
-> +       vcpu->arch.exception_from_userspace = false;
-> +
->         if (unlikely(vcpu->arch.complete_userspace_io)) {
->                 int (*cui)(struct kvm_vcpu *) = vcpu->arch.complete_userspace_io;
->                 vcpu->arch.complete_userspace_io = NULL;
-> @@ -11003,6 +11063,7 @@ static void __set_regs(struct kvm_vcpu *vcpu, struct kvm_regs *regs)
->         kvm_set_rflags(vcpu, regs->rflags | X86_EFLAGS_FIXED);
->  
->         vcpu->arch.exception.pending = false;
-> +       vcpu->arch.exception_vmexit.pending = false;
->  
->         kvm_make_request(KVM_REQ_EVENT, vcpu);
->  }
-> @@ -11370,7 +11431,7 @@ int kvm_arch_vcpu_ioctl_set_guest_debug(struct kvm_vcpu *vcpu,
->  
->         if (dbg->control & (KVM_GUESTDBG_INJECT_DB | KVM_GUESTDBG_INJECT_BP)) {
->                 r = -EBUSY;
-> -               if (vcpu->arch.exception.pending)
-> +               if (kvm_is_exception_pending(vcpu))
->                         goto out;
->                 if (dbg->control & KVM_GUESTDBG_INJECT_DB)
->                         kvm_queue_exception(vcpu, DB_VECTOR);
-> @@ -12554,7 +12615,7 @@ static inline bool kvm_vcpu_has_events(struct kvm_vcpu *vcpu)
->         if (vcpu->arch.pv.pv_unhalted)
->                 return true;
->  
-> -       if (vcpu->arch.exception.pending)
-> +       if (kvm_is_exception_pending(vcpu))
->                 return true;
->  
->         if (kvm_test_request(KVM_REQ_NMI, vcpu) ||
-> @@ -12809,7 +12870,7 @@ bool kvm_can_do_async_pf(struct kvm_vcpu *vcpu)
->  {
->         if (unlikely(!lapic_in_kernel(vcpu) ||
->                      kvm_event_needs_reinjection(vcpu) ||
-> -                    vcpu->arch.exception.pending))
-> +                    kvm_is_exception_pending(vcpu)))
->                 return false;
->  
->         if (kvm_hlt_in_guest(vcpu->kvm) && !kvm_can_deliver_async_pf(vcpu))
-> diff --git a/arch/x86/kvm/x86.h b/arch/x86/kvm/x86.h
-> index dc2af0146220..eee259e387d3 100644
-> --- a/arch/x86/kvm/x86.h
-> +++ b/arch/x86/kvm/x86.h
-> @@ -82,10 +82,17 @@ static inline unsigned int __shrink_ple_window(unsigned int val,
->  void kvm_service_local_tlb_flush_requests(struct kvm_vcpu *vcpu);
->  int kvm_check_nested_events(struct kvm_vcpu *vcpu);
->  
-> +static inline bool kvm_is_exception_pending(struct kvm_vcpu *vcpu)
-> +{
-> +       return vcpu->arch.exception.pending ||
-> +              vcpu->arch.exception_vmexit.pending;
-> +}
-> +
->  static inline void kvm_clear_exception_queue(struct kvm_vcpu *vcpu)
->  {
->         vcpu->arch.exception.pending = false;
->         vcpu->arch.exception.injected = false;
-> +       vcpu->arch.exception_vmexit.pending = false;
->  }
->  
->  static inline void kvm_queue_interrupt(struct kvm_vcpu *vcpu, u8 vector,
+> @@ -5084,8 +5088,10 @@ static int handle_exception_nmi(struct kvm_vcpu *vcpu)
+>                          * instruction.  ICEBP generates a trap-like #DB, but
+>                          * despite its interception control being tied to #DB,
+>                          * is an instruction intercept, i.e. the VM-Exit occurs
+> -                        * on the ICEBP itself.  Note, skipping ICEBP also
+> -                        * clears STI and MOVSS blocking.
+> +                        * on the ICEBP itself.  Use the inner "skip" helper to
+> +                        * avoid single-step #DB and MTF updates, as ICEBP is
+> +                        * higher priority.  Note, skipping ICEBP still clears
+> +                        * STI and MOVSS blocking.
+>                          *
+>                          * For all other #DBs, set vmcs.PENDING_DBG_EXCEPTIONS.BS
+>                          * if single-step is enabled in RFLAGS and STI or MOVSS
 
 
 Reviewed-by: Maxim Levitsky <mlevitsk@redhat.com>
-
-The patch is large, I could have missed something though.
 
 Best regards,
 	Maxim Levitsky
