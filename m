@@ -2,56 +2,56 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id D5C245779E6
-	for <lists+kvm@lfdr.de>; Mon, 18 Jul 2022 06:23:21 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id C11DE5779E8
+	for <lists+kvm@lfdr.de>; Mon, 18 Jul 2022 06:23:22 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232502AbiGREHV (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 18 Jul 2022 00:07:21 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38436 "EHLO
+        id S232604AbiGREHl (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 18 Jul 2022 00:07:41 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38666 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229824AbiGREHT (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 18 Jul 2022 00:07:19 -0400
-Received: from mail-wr1-x433.google.com (mail-wr1-x433.google.com [IPv6:2a00:1450:4864:20::433])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E189212D0F
-        for <kvm@vger.kernel.org>; Sun, 17 Jul 2022 21:07:18 -0700 (PDT)
-Received: by mail-wr1-x433.google.com with SMTP id bu1so15243504wrb.9
-        for <kvm@vger.kernel.org>; Sun, 17 Jul 2022 21:07:18 -0700 (PDT)
+        with ESMTP id S229681AbiGREHk (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 18 Jul 2022 00:07:40 -0400
+Received: from mail-wr1-x42f.google.com (mail-wr1-x42f.google.com [IPv6:2a00:1450:4864:20::42f])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D85A312D08
+        for <kvm@vger.kernel.org>; Sun, 17 Jul 2022 21:07:38 -0700 (PDT)
+Received: by mail-wr1-x42f.google.com with SMTP id f2so15238998wrr.6
+        for <kvm@vger.kernel.org>; Sun, 17 Jul 2022 21:07:38 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=brainfault-org.20210112.gappssmtp.com; s=20210112;
         h=mime-version:references:in-reply-to:from:date:message-id:subject:to
          :cc;
-        bh=QUmxFHl7udbaeL8gObJYf8R+qnUxXk7ZcjzIWaqyHiU=;
-        b=UnUh04t/rSmvdG08Yrty3ldek6Nnv0PmCHO9xvpdzMcucRZDVLF0YFkwtiucc8S3fX
-         j/B5ft/44yxZfIJFQL6yKpNHrG7qyZ+Gok3CfVxwSw7ylIEw67z9gMmc5MtZNTI7vqdr
-         Rov70ZXEYbCXKG5R1RqddA+np6zzsQsbJXgQQ7IvF3A/PI0BDjV1BHef3Wtl31bZ2sIQ
-         sWw/4fdTZftmbCX2G/yjlOuHKfkM8/Sn+mbXpiCGLyg7gYh4UG5IfB1M2Kf/1jO7Xdx2
-         TRC6b2akSnmDPuZh23RHTJhV/DcO0H+LkFpJIp4QI6NeAVdNd3wK/b8l+5KBsWRtVQ9b
-         W8ag==
+        bh=HHoY7kVryiChr5cJFDSaFpXhijBDuPWIwQr/N0jnjFo=;
+        b=qtaN6WcM7juIy+n1eFrV7mazTFqzvLWTIBqtGrqh9fUUTz89/1F1Ps6gSAq0qbntIl
+         HR0NdANXG7QVJ15000c4yJwY4aEOJeWWaZgTdi7QwfejvWE2/OiZrzlgGWtRU4txCSZ5
+         +cIb1kW9R3JWRvtBRbbJhuIZ5+jcRx60qDrmXwZBVGXOmDt64JGJjoLIrFKkLQhaufuf
+         yvxDoJ12zqmZU6WLqy9mPWj+A4sgGfGfJAbBux6jeGNlG3nHThIq1F+U/DOddBa2ufZN
+         iuV4eWst2h0BrJ4Q0p2YTubNC1EItG7sXU00T78E0eCWCON1qEUL3PqoegYJH+IVy4Ek
+         y3EA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:mime-version:references:in-reply-to:from:date
          :message-id:subject:to:cc;
-        bh=QUmxFHl7udbaeL8gObJYf8R+qnUxXk7ZcjzIWaqyHiU=;
-        b=LXad9LMPzVZT2Eu1BnmaIFaWVFbdjnYhxSSZKuhvxAkA5g+p75vwqbDvV7pS8DlQ8R
-         dGlIpyyXQ2JF6Ijh9MlhEi8UMFykLf/wCXTx8Gt43CA4moQ/AIZ0bZ1qjuC7ARxz5HTx
-         lUPNBkXp/FOztCp8hXZqAY+8JmdyG8yELZT0S9FuObepjzIbNiyhchEnez2JDJuQ//Td
-         PaL78wbXnLU9WDkt5OGImKy+3e9uyWe5e/5UBlQlj0q/Kgg98N9j2u97PTtqMrzD0yGG
-         pGZ+ipVJTJOWhWTulMWc5XS87pfhB7C6PvUndqVsqQ6E8mCQrk1WLHBVuKc/ctegm0m3
-         C78g==
-X-Gm-Message-State: AJIora9BA73Lctif6Ii/GH/nmicjMCKq+JGuGzBMp+XxvnC/YvG1zhtt
-        lGbeFKeMMKpttslST3NqBgFo52JbDuG7McVxI98OUOYXYH2gkg==
-X-Google-Smtp-Source: AGRyM1sgRM5bHN+EZTdAYzsYGyGJ6+Pcr+8r6q8kcbAFBUN7ttVPf5ETNbVQta4uZJMVcFWrjH/y9SjWZJu38BqE6jQ=
-X-Received: by 2002:a5d:53c9:0:b0:21d:62f8:f99f with SMTP id
- a9-20020a5d53c9000000b0021d62f8f99fmr21308980wrw.214.1658117237264; Sun, 17
- Jul 2022 21:07:17 -0700 (PDT)
+        bh=HHoY7kVryiChr5cJFDSaFpXhijBDuPWIwQr/N0jnjFo=;
+        b=7Sc3uPWACSzDLdsOhJj+UcvRfnYZqaJPksQKtnae9mg4XvZ58fRnpnX1f6sgnNKQP+
+         3dMtdPE0Ro1WjIGYIKh0U7LauaZHY18rBNk5mHsM/29alnMJZWMmIfeMr4Kut8QO71Gk
+         z8FrLft5iJgEewoQk+0WpWvC4HSoNmUmgJHNEKaRut6+U8YDukewmAdvxSM09E01W5iv
+         n0iLJaPtaDJ8hcpGQRu7choo2jPL/GtNCS5pTM83RGH5oL1pOaCgv1YlZQcoEhFqMQ4l
+         dWW1FSINS2bcE/x34h0jyzcp+i+DnBwJg069LEGpf+0Y0a343EediJThbK6hExVMVy6r
+         EOMg==
+X-Gm-Message-State: AJIora+E8a5IGlGu+iYEFn36Ai/fDprApzw9iUCZfGGDMXQLF8nC3771
+        8eGx3y4PMU/rmih8qilHgUTNBhh6FnW41759xstCJg==
+X-Google-Smtp-Source: AGRyM1uKbstJceqt8c2FHpo0Az/jpgVPPoiGgGAw/fVKmIhoRiki2Fa/Vb0smtxy8qPA9Z7YWzcYqUAIqOIDXYBQ7io=
+X-Received: by 2002:a5d:64ac:0:b0:21d:7832:ecf9 with SMTP id
+ m12-20020a5d64ac000000b0021d7832ecf9mr20978506wrp.86.1658117257348; Sun, 17
+ Jul 2022 21:07:37 -0700 (PDT)
 MIME-Version: 1.0
 References: <20220707145248.458771-1-apatel@ventanamicro.com>
- <20220707145248.458771-5-apatel@ventanamicro.com> <CAOnJCUKjFMMsrNWR=hzB+qbw4SECWS3+DOJDun90emnM-Vkpiw@mail.gmail.com>
-In-Reply-To: <CAOnJCUKjFMMsrNWR=hzB+qbw4SECWS3+DOJDun90emnM-Vkpiw@mail.gmail.com>
+ <20220707145248.458771-6-apatel@ventanamicro.com> <CAOnJCU+H_inpUj1EuvqEYx41iEguCdcC4B3Lr9TWdo+aFhFNAA@mail.gmail.com>
+In-Reply-To: <CAOnJCU+H_inpUj1EuvqEYx41iEguCdcC4B3Lr9TWdo+aFhFNAA@mail.gmail.com>
 From:   Anup Patel <anup@brainfault.org>
-Date:   Mon, 18 Jul 2022 09:37:05 +0530
-Message-ID: <CAAhSdy2WZ9Gq9n53u+0FY2SAsXrmgDGdsHjbTJDYRNG+yNw3bw@mail.gmail.com>
-Subject: Re: [PATCH 4/5] RISC-V: KVM: Use PAGE_KERNEL_IO in kvm_riscv_gstage_ioremap()
+Date:   Mon, 18 Jul 2022 09:37:25 +0530
+Message-ID: <CAAhSdy2cWnFTRTM3B5e2Ym8=oFiq1ScZwYeDTmWGthU-hZvmWg@mail.gmail.com>
+Subject: Re: [PATCH 5/5] RISC-V: KVM: Add support for Svpbmt inside Guest/VM
 To:     Atish Patra <atishp@atishpatra.org>
 Cc:     Anup Patel <apatel@ventanamicro.com>,
         Paolo Bonzini <pbonzini@redhat.com>,
@@ -73,41 +73,128 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Jul 13, 2022 at 6:53 AM Atish Patra <atishp@atishpatra.org> wrote:
+On Wed, Jul 13, 2022 at 6:54 AM Atish Patra <atishp@atishpatra.org> wrote:
 >
 > On Thu, Jul 7, 2022 at 7:53 AM Anup Patel <apatel@ventanamicro.com> wrote:
 > >
-> > When the host has Svpbmt extension, we should use page based memory
-> > type 2 (i.e. IO) for IO mappings in the G-stage page table.
+> > The Guest/VM can use Svpbmt in VS-stage page tables when allowed by the
+> > Hypervisor using the henvcfg.PBMTE bit.
 > >
-> > To achieve this, we replace use of PAGE_KERNEL with PAGE_KERNEL_IO
-> > in the kvm_riscv_gstage_ioremap().
+> > We add Svpbmt support for the KVM Guest/VM which can be enabled/disabled
+> > by the KVM user-space (QEMU/KVMTOOL) using the ISA extension ONE_REG
+> > interface.
 > >
 > > Signed-off-by: Anup Patel <apatel@ventanamicro.com>
 > > ---
-> >  arch/riscv/kvm/mmu.c | 2 +-
-> >  1 file changed, 1 insertion(+), 1 deletion(-)
+> >  arch/riscv/include/asm/csr.h      | 16 ++++++++++++++++
+> >  arch/riscv/include/uapi/asm/kvm.h |  1 +
+> >  arch/riscv/kvm/vcpu.c             | 16 ++++++++++++++++
+> >  3 files changed, 33 insertions(+)
 > >
-> > diff --git a/arch/riscv/kvm/mmu.c b/arch/riscv/kvm/mmu.c
-> > index f7862ca4c4c6..bc545aef6034 100644
-> > --- a/arch/riscv/kvm/mmu.c
-> > +++ b/arch/riscv/kvm/mmu.c
-> > @@ -361,7 +361,7 @@ int kvm_riscv_gstage_ioremap(struct kvm *kvm, gpa_t gpa,
-> >         pfn = __phys_to_pfn(hpa);
+> > diff --git a/arch/riscv/include/asm/csr.h b/arch/riscv/include/asm/csr.h
+> > index 6d85655e7edf..17516afc389a 100644
+> > --- a/arch/riscv/include/asm/csr.h
+> > +++ b/arch/riscv/include/asm/csr.h
+> > @@ -156,6 +156,18 @@
+> >                                  (_AC(1, UL) << IRQ_S_TIMER) | \
+> >                                  (_AC(1, UL) << IRQ_S_EXT))
 > >
-> >         for (addr = gpa; addr < end; addr += PAGE_SIZE) {
-> > -               pte = pfn_pte(pfn, PAGE_KERNEL);
-> > +               pte = pfn_pte(pfn, PAGE_KERNEL_IO);
+> > +/* xENVCFG flags */
+> > +#define ENVCFG_STCE                    (_AC(1, ULL) << 63)
+> > +#define ENVCFG_PBMTE                   (_AC(1, ULL) << 62)
+> > +#define ENVCFG_CBZE                    (_AC(1, UL) << 7)
+> > +#define ENVCFG_CBCFE                   (_AC(1, UL) << 6)
+> > +#define ENVCFG_CBIE_SHIFT              4
+> > +#define ENVCFG_CBIE                    (_AC(0x3, UL) << ENVCFG_CBIE_SHIFT)
+> > +#define ENVCFG_CBIE_ILL                        _AC(0x0, UL)
+> > +#define ENVCFG_CBIE_FLUSH              _AC(0x1, UL)
+> > +#define ENVCFG_CBIE_INV                        _AC(0x3, UL)
+> > +#define ENVCFG_FIOM                    _AC(0x1, UL)
+> > +
+> >  /* symbolic CSR names: */
+> >  #define CSR_CYCLE              0xc00
+> >  #define CSR_TIME               0xc01
+> > @@ -252,7 +264,9 @@
+> >  #define CSR_HTIMEDELTA         0x605
+> >  #define CSR_HCOUNTEREN         0x606
+> >  #define CSR_HGEIE              0x607
+> > +#define CSR_HENVCFG            0x60a
+> >  #define CSR_HTIMEDELTAH                0x615
+> > +#define CSR_HENVCFGH           0x61a
+> >  #define CSR_HTVAL              0x643
+> >  #define CSR_HIP                        0x644
+> >  #define CSR_HVIP               0x645
+> > @@ -264,6 +278,8 @@
+> >  #define CSR_MISA               0x301
+> >  #define CSR_MIE                        0x304
+> >  #define CSR_MTVEC              0x305
+> > +#define CSR_MENVCFG            0x30a
+> > +#define CSR_MENVCFGH           0x31a
+> >  #define CSR_MSCRATCH           0x340
+> >  #define CSR_MEPC               0x341
+> >  #define CSR_MCAUSE             0x342
+> > diff --git a/arch/riscv/include/uapi/asm/kvm.h b/arch/riscv/include/uapi/asm/kvm.h
+> > index 6119368ba6d5..24b2a6e27698 100644
+> > --- a/arch/riscv/include/uapi/asm/kvm.h
+> > +++ b/arch/riscv/include/uapi/asm/kvm.h
+> > @@ -96,6 +96,7 @@ enum KVM_RISCV_ISA_EXT_ID {
+> >         KVM_RISCV_ISA_EXT_H,
+> >         KVM_RISCV_ISA_EXT_I,
+> >         KVM_RISCV_ISA_EXT_M,
+> > +       KVM_RISCV_ISA_EXT_SVPBMT,
+> >         KVM_RISCV_ISA_EXT_MAX,
+> >  };
 > >
-> >                 if (!writable)
-> >                         pte = pte_wrprotect(pte);
+> > diff --git a/arch/riscv/kvm/vcpu.c b/arch/riscv/kvm/vcpu.c
+> > index 6dd9cf729614..b7a433c54d0f 100644
+> > --- a/arch/riscv/kvm/vcpu.c
+> > +++ b/arch/riscv/kvm/vcpu.c
+> > @@ -51,6 +51,7 @@ static const unsigned long kvm_isa_ext_arr[] = {
+> >         RISCV_ISA_EXT_h,
+> >         RISCV_ISA_EXT_i,
+> >         RISCV_ISA_EXT_m,
+> > +       RISCV_ISA_EXT_SVPBMT,
+> >  };
+> >
+> >  static unsigned long kvm_riscv_vcpu_base2isa_ext(unsigned long base_ext)
+> > @@ -777,6 +778,19 @@ int kvm_arch_vcpu_ioctl_set_guest_debug(struct kvm_vcpu *vcpu,
+> >         return -EINVAL;
+> >  }
+> >
+> > +static void kvm_riscv_vcpu_update_config(const unsigned long *isa)
+> > +{
+> > +       u64 henvcfg = 0;
+> > +
+> > +       if (__riscv_isa_extension_available(isa, RISCV_ISA_EXT_SVPBMT))
+> > +               henvcfg |= ENVCFG_PBMTE;
+> > +
+> > +       csr_write(CSR_HENVCFG, henvcfg);
+> > +#ifdef CONFIG_32BIT
+> > +       csr_write(CSR_HENVCFGH, henvcfg >> 32);
+> > +#endif
+> > +}
+> > +
+> >  void kvm_arch_vcpu_load(struct kvm_vcpu *vcpu, int cpu)
+> >  {
+> >         struct kvm_vcpu_csr *csr = &vcpu->arch.guest_csr;
+> > @@ -791,6 +805,8 @@ void kvm_arch_vcpu_load(struct kvm_vcpu *vcpu, int cpu)
+> >         csr_write(CSR_HVIP, csr->hvip);
+> >         csr_write(CSR_VSATP, csr->vsatp);
+> >
+> > +       kvm_riscv_vcpu_update_config(vcpu->arch.isa);
+> > +
+> >         kvm_riscv_gstage_update_hgatp(vcpu);
+> >
+> >         kvm_riscv_vcpu_timer_restore(vcpu);
 > > --
 > > 2.34.1
 > >
 >
 > LGTM.
 >
+>
 > Reviewed-by: Atish Patra <atishp@rivosinc.com>
+>
 
 Queued this patch for 5.20.
 
