@@ -2,546 +2,217 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 44FED57833C
-	for <lists+kvm@lfdr.de>; Mon, 18 Jul 2022 15:10:28 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id E7D5D5783C8
+	for <lists+kvm@lfdr.de>; Mon, 18 Jul 2022 15:34:55 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235414AbiGRNKZ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 18 Jul 2022 09:10:25 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34614 "EHLO
+        id S233947AbiGRNex (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 18 Jul 2022 09:34:53 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58430 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234290AbiGRNKW (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 18 Jul 2022 09:10:22 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id EB3B8B84
-        for <kvm@vger.kernel.org>; Mon, 18 Jul 2022 06:10:19 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1658149819;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=uODNE+YFTIaPIUn4pAKxdvGDi8LJxAyUV/8dgzl/w2M=;
-        b=MjAfTbbjH+KNt4ck5Rdeuxxykbnf/w7VDn8iSG8CRGXJwIWY7vC2tKuB2GTVaAwkd0LZH7
-        MG+N7PulMF0SaJEZ9I55zMeuTO8lTEYI+ZU0VlT7mOn+r2fvHTyUhgQoExwd9LT8Q2gyd6
-        uYaZiiyaVobasY2GHfGslHzE3bfzs3M=
-Received: from mail-qt1-f199.google.com (mail-qt1-f199.google.com
- [209.85.160.199]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-615--Y2qwdweNyC0C6hbx6phgg-1; Mon, 18 Jul 2022 09:10:18 -0400
-X-MC-Unique: -Y2qwdweNyC0C6hbx6phgg-1
-Received: by mail-qt1-f199.google.com with SMTP id fx12-20020a05622a4acc00b0031e98cb703cso8307871qtb.18
-        for <kvm@vger.kernel.org>; Mon, 18 Jul 2022 06:10:17 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:message-id:subject:from:to:cc:date:in-reply-to
-         :references:user-agent:mime-version:content-transfer-encoding;
-        bh=uODNE+YFTIaPIUn4pAKxdvGDi8LJxAyUV/8dgzl/w2M=;
-        b=BAek57tBlX1QEYK+MrUdcVDqaImIdjoKzW6qlTkLRKew3x8sEt2R9iISzaxtRLJVCW
-         kHM4U1y2YfhUR1H/oAua1XdaAKUDH+8emxyAOHAJA8bTQ6IpSzESiidKztg33O827XZ8
-         z/dPsONq4jhhHQquYQxC3FS198xK1vPNaF0E+L7H4/BuSnvGkMbzbimg4iE/3BrxAO/0
-         zKmmOYSAndCf6TYi46LHfnPvuRvmq1xBRor89NG8nbVlWuQb4GduCWHV85/Ho9BNVq2T
-         /4foOn2c7FvPRXQiA5ffIjsiZ//n9y0ksl7FEiIh4J1xzhqICIUkdeXtcmqWhghy0hLm
-         0Kfw==
-X-Gm-Message-State: AJIora/kRuxkZgDlHS7K0Tlle9d2cF68uxB5Pi+fSjQKzbYZtS6xVCjC
-        5DlAcSao/eL1SDdKIfYqFn/UDWgOjbRkQpWJgL0cCACESCvF1M+wHI6CPT4IKLGujr+WL7eZHap
-        yEG2UnUlnjhZ8
-X-Received: by 2002:a37:bbc5:0:b0:6af:5d81:209 with SMTP id l188-20020a37bbc5000000b006af5d810209mr16927400qkf.721.1658149817225;
-        Mon, 18 Jul 2022 06:10:17 -0700 (PDT)
-X-Google-Smtp-Source: AGRyM1v5dyv7sZRgaw2eWpsozCax2q3trpWlsp5NME2we6G85uVhzFPmHaUiEmHRGKj/nrLUD9UeWw==
-X-Received: by 2002:a37:bbc5:0:b0:6af:5d81:209 with SMTP id l188-20020a37bbc5000000b006af5d810209mr16927372qkf.721.1658149816876;
-        Mon, 18 Jul 2022 06:10:16 -0700 (PDT)
-Received: from [10.35.4.238] (bzq-82-81-161-50.red.bezeqint.net. [82.81.161.50])
-        by smtp.gmail.com with ESMTPSA id k19-20020ac84793000000b0031ece8b6666sm9322165qtq.43.2022.07.18.06.10.14
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 18 Jul 2022 06:10:16 -0700 (PDT)
-Message-ID: <4692a0906554cf6f0473ad138da1b4d739388c89.camel@redhat.com>
-Subject: Re: [PATCH v2 12/21] KVM: x86: Make kvm_queued_exception a properly
- named, visible struct
-From:   Maxim Levitsky <mlevitsk@redhat.com>
-To:     Sean Christopherson <seanjc@google.com>,
-        Paolo Bonzini <pbonzini@redhat.com>
-Cc:     Vitaly Kuznetsov <vkuznets@redhat.com>,
+        with ESMTP id S233900AbiGRNew (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 18 Jul 2022 09:34:52 -0400
+Received: from mga06.intel.com (mga06b.intel.com [134.134.136.31])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8CE5C19C3E;
+        Mon, 18 Jul 2022 06:34:51 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1658151291; x=1689687291;
+  h=date:from:to:cc:subject:message-id:reply-to:references:
+   mime-version:in-reply-to;
+  bh=rHFYZeCUhUEMCyj5v9zq3o/zGTENSXf+B8mm6YmDQ6A=;
+  b=YA9EYCDeqWGfW1UPeaGqPCbNH1VGlfaFYurfw47BjMg/51HVhjZlBkqo
+   3KV7aJ374rocye5HlIm/HEMAaWTi4RSnKoCS2lw1WTMO3EftDEOEUrbTN
+   6jFi3ynXfjcAgvWuWkL1Xq4jsEYK9jjoozTzS4s1ShaseQ3TXehLL3HHV
+   vrEGzA1cQNCj4O36qc0086cNkoXxr4FTbWq/pj9Qv2nK3/outpdbIYPva
+   15l11Eb04u+pZU8eRLlagutnTcKUhN1Ok77sYT2J0nsqM3vhX/5X/5ZU0
+   NMXQjobZssAEmP6p/cnJXNdqprL1e40dS7OMFzxojnVT2s3Tb0kBJ6yWL
+   g==;
+X-IronPort-AV: E=McAfee;i="6400,9594,10411"; a="347907674"
+X-IronPort-AV: E=Sophos;i="5.92,281,1650956400"; 
+   d="scan'208";a="347907674"
+Received: from orsmga008.jf.intel.com ([10.7.209.65])
+  by orsmga104.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 18 Jul 2022 06:34:51 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.92,281,1650956400"; 
+   d="scan'208";a="624730241"
+Received: from chaop.bj.intel.com (HELO localhost) ([10.240.193.75])
+  by orsmga008.jf.intel.com with ESMTP; 18 Jul 2022 06:34:40 -0700
+Date:   Mon, 18 Jul 2022 21:29:50 +0800
+From:   Chao Peng <chao.p.peng@linux.intel.com>
+To:     "Gupta, Pankaj" <pankaj.gupta@amd.com>
+Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+        linux-mm@kvack.org, linux-fsdevel@vger.kernel.org,
+        linux-api@vger.kernel.org, linux-doc@vger.kernel.org,
+        qemu-devel@nongnu.org, linux-kselftest@vger.kernel.org,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Jonathan Corbet <corbet@lwn.net>,
+        Sean Christopherson <seanjc@google.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
         Wanpeng Li <wanpengli@tencent.com>,
         Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org, Oliver Upton <oupton@google.com>,
-        Peter Shier <pshier@google.com>
-Date:   Mon, 18 Jul 2022 16:10:12 +0300
-In-Reply-To: <c558310c75367530948b6cccc45cbfe6522cd552.camel@redhat.com>
-References: <20220614204730.3359543-1-seanjc@google.com>
-         <20220614204730.3359543-13-seanjc@google.com>
-         <c558310c75367530948b6cccc45cbfe6522cd552.camel@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
-User-Agent: Evolution 3.40.4 (3.40.4-5.fc34) 
+        Joerg Roedel <joro@8bytes.org>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+        x86@kernel.org, "H . Peter Anvin" <hpa@zytor.com>,
+        Hugh Dickins <hughd@google.com>,
+        Jeff Layton <jlayton@kernel.org>,
+        "J . Bruce Fields" <bfields@fieldses.org>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        Shuah Khan <shuah@kernel.org>, Mike Rapoport <rppt@kernel.org>,
+        Steven Price <steven.price@arm.com>,
+        "Maciej S . Szmigiero" <mail@maciej.szmigiero.name>,
+        Vlastimil Babka <vbabka@suse.cz>,
+        Vishal Annapurve <vannapurve@google.com>,
+        Yu Zhang <yu.c.zhang@linux.intel.com>,
+        "Kirill A . Shutemov" <kirill.shutemov@linux.intel.com>,
+        luto@kernel.org, jun.nakajima@intel.com, dave.hansen@intel.com,
+        ak@linux.intel.com, david@redhat.com, aarcange@redhat.com,
+        ddutile@redhat.com, dhildenb@redhat.com,
+        Quentin Perret <qperret@google.com>,
+        Michael Roth <michael.roth@amd.com>, mhocko@suse.com,
+        Muchun Song <songmuchun@bytedance.com>
+Subject: Re: [PATCH v7 07/14] KVM: Use gfn instead of hva for
+ mmu_notifier_retry
+Message-ID: <20220718132950.GA38104@chaop.bj.intel.com>
+Reply-To: Chao Peng <chao.p.peng@linux.intel.com>
+References: <20220706082016.2603916-1-chao.p.peng@linux.intel.com>
+ <20220706082016.2603916-8-chao.p.peng@linux.intel.com>
+ <d480a850-601b-cda2-b671-04d839c98429@amd.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-3.5 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,
-        SPF_HELO_NONE,SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <d480a850-601b-cda2-b671-04d839c98429@amd.com>
+X-Spam-Status: No, score=-5.0 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,SPF_HELO_NONE,
+        SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, 2022-07-18 at 16:07 +0300, Maxim Levitsky wrote:
-> On Tue, 2022-06-14 at 20:47 +0000, Sean Christopherson wrote:
-> > Move the definition of "struct kvm_queued_exception" out of kvm_vcpu_arch
-> > in anticipation of adding a second instance in kvm_vcpu_arch to handle
-> > exceptions that occur when vectoring an injected exception and are
-> > morphed to VM-Exit instead of leading to #DF.
+On Fri, Jul 15, 2022 at 01:36:15PM +0200, Gupta, Pankaj wrote:
+> > Currently in mmu_notifier validate path, hva range is recorded and then
+> > checked in the mmu_notifier_retry_hva() from page fault path. However
+> > for the to be introduced private memory, a page fault may not have a hva
+> 
+> As this patch appeared in v7, just wondering did you see an actual bug
+> because of it? And not having corresponding 'hva' occurs only with private
+> memory because its not mapped to host userspace?
+
+The addressed problem is not new in this version, previous versions I
+also had code to handle it (just in different way). But the problem is:
+mmu_notifier/memfile_notifier may be in the progress of invalidating a
+pfn that obtained earlier in the page fault handler, when happens, we
+should retry the fault. In v6 I used global mmu_notifier_retry() for
+memfile_notifier but that can block unrelated mmu_notifer invalidation
+which has hva range specified.
+
+Sean gave a comment at https://lkml.org/lkml/2022/6/17/1001 to separate
+memfile_notifier from mmu_notifier but during the implementation I
+realized we actually can reuse the same code for shared and private
+memory if both using gpa range and that can simplify the code handling
+in kvm_zap_gfn_range and some other code (e.g. we don't need two
+versions for memfile_notifier/mmu_notifier).
+
+Adding gpa range for private memory invalidation also relieves the
+above blocking issue between private memory page fault and mmu_notifier.
+
+Chao
+> 
+> Thanks,
+> Pankaj
+> 
+> > associated, checking gfn(gpa) makes more sense. For existing non private
+> > memory case, gfn is expected to continue to work.
 > > 
-> > Opportunistically take advantage of the churn to rename "nr" to "vector".
+> > The patch also fixes a potential bug in kvm_zap_gfn_range() which has
+> > already been using gfn when calling kvm_inc/dec_notifier_count() in
+> > current code.
 > > 
-> > No functional change intended.
-> > 
-> > Signed-off-by: Sean Christopherson <seanjc@google.com>
+> > Signed-off-by: Chao Peng <chao.p.peng@linux.intel.com>
 > > ---
+> >   arch/x86/kvm/mmu/mmu.c   |  2 +-
+> >   include/linux/kvm_host.h | 18 ++++++++----------
+> >   virt/kvm/kvm_main.c      |  6 +++---
+> >   3 files changed, 12 insertions(+), 14 deletions(-)
 > > 
-> ...
-> 
-> 
-> Is this change below intentional? My memory on nested_apf_token is quite rusty, but at least
-> if possible, I would prefer this to be done in separate patch.
-
-
-Sorry, I replied to the wrong mail, but the newer version also has the same issue.
-(It should be v3 btw.)
-
-Best regards,
-	Maxim Levitsky
-> 
-> 
-> Best regards,
->         Maxim Levitsky
-> 
-> > -               else if (svm->vcpu.arch.exception.has_payload)
-> > -                       vmcb->control.exit_info_2 = svm->vcpu.arch.exception.payload;
-> > +       if (ex->vector == PF_VECTOR) {
-> > +               if (ex->has_payload)
-> > +                       vmcb->control.exit_info_2 = ex->payload;
-> >                 else
-> > -                       vmcb->control.exit_info_2 = svm->vcpu.arch.cr2;
-> > -       } else if (nr == DB_VECTOR) {
-> > +                       vmcb->control.exit_info_2 = vcpu->arch.cr2;
-> > +       } else if (ex->vector == DB_VECTOR) {
-> >                 /* See inject_pending_event.  */
-> > -               kvm_deliver_exception_payload(&svm->vcpu);
-> > -               if (svm->vcpu.arch.dr7 & DR7_GD) {
-> > -                       svm->vcpu.arch.dr7 &= ~DR7_GD;
-> > -                       kvm_update_dr7(&svm->vcpu);
-> > +               kvm_deliver_exception_payload(vcpu, ex);
-> > +
-> > +               if (vcpu->arch.dr7 & DR7_GD) {
-> > +                       vcpu->arch.dr7 &= ~DR7_GD;
-> > +                       kvm_update_dr7(vcpu);
-> >                 }
-> > -       } else
-> > -               WARN_ON(svm->vcpu.arch.exception.has_payload);
-> > +       } else {
-> > +               WARN_ON(ex->has_payload);
-> > +       }
-> >  
-> >         nested_svm_vmexit(svm);
-> >  }
-> > @@ -1372,7 +1373,7 @@ static int svm_check_nested_events(struct kvm_vcpu *vcpu)
-> >                          return -EBUSY;
-> >                 if (!nested_exit_on_exception(svm))
-> >                         return 0;
-> > -               nested_svm_inject_exception_vmexit(svm);
-> > +               nested_svm_inject_exception_vmexit(vcpu);
-> >                 return 0;
-> >         }
-> >  
-> > diff --git a/arch/x86/kvm/svm/svm.c b/arch/x86/kvm/svm/svm.c
-> > index ca39f76ca44b..6b80046a014f 100644
-> > --- a/arch/x86/kvm/svm/svm.c
-> > +++ b/arch/x86/kvm/svm/svm.c
-> > @@ -432,22 +432,20 @@ static int svm_update_soft_interrupt_rip(struct kvm_vcpu *vcpu)
-> >  
-> >  static void svm_inject_exception(struct kvm_vcpu *vcpu)
-> >  {
-> > +       struct kvm_queued_exception *ex = &vcpu->arch.exception;
-> >         struct vcpu_svm *svm = to_svm(vcpu);
-> > -       unsigned nr = vcpu->arch.exception.nr;
-> > -       bool has_error_code = vcpu->arch.exception.has_error_code;
-> > -       u32 error_code = vcpu->arch.exception.error_code;
-> >  
-> > -       kvm_deliver_exception_payload(vcpu);
-> > +       kvm_deliver_exception_payload(vcpu, ex);
-> >  
-> > -       if (kvm_exception_is_soft(nr) &&
-> > +       if (kvm_exception_is_soft(ex->vector) &&
-> >             svm_update_soft_interrupt_rip(vcpu))
-> >                 return;
-> >  
-> > -       svm->vmcb->control.event_inj = nr
-> > +       svm->vmcb->control.event_inj = ex->vector
-> >                 | SVM_EVTINJ_VALID
-> > -               | (has_error_code ? SVM_EVTINJ_VALID_ERR : 0)
-> > +               | (ex->has_error_code ? SVM_EVTINJ_VALID_ERR : 0)
-> >                 | SVM_EVTINJ_TYPE_EXEPT;
-> > -       svm->vmcb->control.event_inj_err = error_code;
-> > +       svm->vmcb->control.event_inj_err = ex->error_code;
-> >  }
-> >  
-> >  static void svm_init_erratum_383(void)
-> > diff --git a/arch/x86/kvm/vmx/nested.c b/arch/x86/kvm/vmx/nested.c
-> > index 7b644513c82b..fafdcbfeca1f 100644
-> > --- a/arch/x86/kvm/vmx/nested.c
-> > +++ b/arch/x86/kvm/vmx/nested.c
-> > @@ -445,29 +445,27 @@ static bool nested_vmx_is_page_fault_vmexit(struct vmcs12 *vmcs12,
-> >   */
-> >  static int nested_vmx_check_exception(struct kvm_vcpu *vcpu, unsigned long *exit_qual)
-> >  {
-> > +       struct kvm_queued_exception *ex = &vcpu->arch.exception;
-> >         struct vmcs12 *vmcs12 = get_vmcs12(vcpu);
-> > -       unsigned int nr = vcpu->arch.exception.nr;
-> > -       bool has_payload = vcpu->arch.exception.has_payload;
-> > -       unsigned long payload = vcpu->arch.exception.payload;
-> >  
-> > -       if (nr == PF_VECTOR) {
-> > -               if (vcpu->arch.exception.nested_apf) {
-> > +       if (ex->vector == PF_VECTOR) {
-> > +               if (ex->nested_apf) {
-> >                         *exit_qual = vcpu->arch.apf.nested_apf_token;
-> >                         return 1;
-> >                 }
-> > -               if (nested_vmx_is_page_fault_vmexit(vmcs12,
-> > -                                                   vcpu->arch.exception.error_code)) {
-> > -                       *exit_qual = has_payload ? payload : vcpu->arch.cr2;
-> > +               if (nested_vmx_is_page_fault_vmexit(vmcs12, ex->error_code)) {
-> > +                       *exit_qual = ex->has_payload ? ex->payload : vcpu->arch.cr2;
-> >                         return 1;
-> >                 }
-> > -       } else if (vmcs12->exception_bitmap & (1u << nr)) {
-> > -               if (nr == DB_VECTOR) {
-> > -                       if (!has_payload) {
-> > -                               payload = vcpu->arch.dr6;
-> > -                               payload &= ~DR6_BT;
-> > -                               payload ^= DR6_ACTIVE_LOW;
-> > +       } else if (vmcs12->exception_bitmap & (1u << ex->vector)) {
-> > +               if (ex->vector == DB_VECTOR) {
-> > +                       if (ex->has_payload) {
-> > +                               *exit_qual = ex->payload;
-> > +                       } else {
-> > +                               *exit_qual = vcpu->arch.dr6;
-> > +                               *exit_qual &= ~DR6_BT;
-> > +                               *exit_qual ^= DR6_ACTIVE_LOW;
-> >                         }
-> > -                       *exit_qual = payload;
-> >                 } else
-> >                         *exit_qual = 0;
-> >                 return 1;
-> > @@ -3724,7 +3722,7 @@ static void vmcs12_save_pending_event(struct kvm_vcpu *vcpu,
-> >              is_double_fault(exit_intr_info))) {
-> >                 vmcs12->idt_vectoring_info_field = 0;
-> >         } else if (vcpu->arch.exception.injected) {
-> > -               nr = vcpu->arch.exception.nr;
-> > +               nr = vcpu->arch.exception.vector;
-> >                 idt_vectoring = nr | VECTORING_INFO_VALID_MASK;
-> >  
-> >                 if (kvm_exception_is_soft(nr)) {
-> > @@ -3828,11 +3826,11 @@ static int vmx_complete_nested_posted_interrupt(struct kvm_vcpu *vcpu)
-> >  static void nested_vmx_inject_exception_vmexit(struct kvm_vcpu *vcpu,
-> >                                                unsigned long exit_qual)
-> >  {
-> > +       struct kvm_queued_exception *ex = &vcpu->arch.exception;
-> > +       u32 intr_info = ex->vector | INTR_INFO_VALID_MASK;
-> >         struct vmcs12 *vmcs12 = get_vmcs12(vcpu);
-> > -       unsigned int nr = vcpu->arch.exception.nr;
-> > -       u32 intr_info = nr | INTR_INFO_VALID_MASK;
-> >  
-> > -       if (vcpu->arch.exception.has_error_code) {
-> > +       if (ex->has_error_code) {
-> >                 /*
-> >                  * Intel CPUs will never generate an error code with bits 31:16
-> >                  * set, and more importantly VMX disallows setting bits 31:16
-> > @@ -3840,11 +3838,11 @@ static void nested_vmx_inject_exception_vmexit(struct kvm_vcpu *vcpu,
-> >                  * mimic hardware and avoid inducing failure on nested VM-Entry
-> >                  * if L1 chooses to inject the exception back to L2.
-> >                  */
-> > -               vmcs12->vm_exit_intr_error_code = (u16)vcpu->arch.exception.error_code;
-> > +               vmcs12->vm_exit_intr_error_code = (u16)ex->error_code;
-> >                 intr_info |= INTR_INFO_DELIVER_CODE_MASK;
-> >         }
-> >  
-> > -       if (kvm_exception_is_soft(nr))
-> > +       if (kvm_exception_is_soft(ex->vector))
-> >                 intr_info |= INTR_TYPE_SOFT_EXCEPTION;
-> >         else
-> >                 intr_info |= INTR_TYPE_HARD_EXCEPTION;
-> > @@ -3875,7 +3873,7 @@ static void nested_vmx_inject_exception_vmexit(struct kvm_vcpu *vcpu,
-> >  static inline unsigned long vmx_get_pending_dbg_trap(struct kvm_vcpu *vcpu)
-> >  {
-> >         if (!vcpu->arch.exception.pending ||
-> > -           vcpu->arch.exception.nr != DB_VECTOR)
-> > +           vcpu->arch.exception.vector != DB_VECTOR)
-> >                 return 0;
-> >  
-> >         /* General Detect #DBs are always fault-like. */
-> > diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
-> > index 26b863c78a9f..7ef5659a1bbd 100644
-> > --- a/arch/x86/kvm/vmx/vmx.c
-> > +++ b/arch/x86/kvm/vmx/vmx.c
-> > @@ -1585,7 +1585,7 @@ static void vmx_update_emulated_instruction(struct kvm_vcpu *vcpu)
-> >          */
-> >         if (nested_cpu_has_mtf(vmcs12) &&
-> >             (!vcpu->arch.exception.pending ||
-> > -            vcpu->arch.exception.nr == DB_VECTOR))
-> > +            vcpu->arch.exception.vector == DB_VECTOR))
-> >                 vmx->nested.mtf_pending = true;
-> >         else
-> >                 vmx->nested.mtf_pending = false;
-> > @@ -1612,15 +1612,13 @@ static void vmx_clear_hlt(struct kvm_vcpu *vcpu)
-> >  
-> >  static void vmx_inject_exception(struct kvm_vcpu *vcpu)
-> >  {
-> > +       struct kvm_queued_exception *ex = &vcpu->arch.exception;
-> > +       u32 intr_info = ex->vector | INTR_INFO_VALID_MASK;
-> >         struct vcpu_vmx *vmx = to_vmx(vcpu);
-> > -       unsigned nr = vcpu->arch.exception.nr;
-> > -       bool has_error_code = vcpu->arch.exception.has_error_code;
-> > -       u32 error_code = vcpu->arch.exception.error_code;
-> > -       u32 intr_info = nr | INTR_INFO_VALID_MASK;
-> >  
-> > -       kvm_deliver_exception_payload(vcpu);
-> > +       kvm_deliver_exception_payload(vcpu, ex);
-> >  
-> > -       if (has_error_code) {
-> > +       if (ex->has_error_code) {
-> >                 /*
-> >                  * Despite the error code being architecturally defined as 32
-> >                  * bits, and the VMCS field being 32 bits, Intel CPUs and thus
-> > @@ -1630,21 +1628,21 @@ static void vmx_inject_exception(struct kvm_vcpu *vcpu)
-> >                  * the upper bits to avoid VM-Fail, losing information that
-> >                  * does't really exist is preferable to killing the VM.
-> >                  */
-> > -               vmcs_write32(VM_ENTRY_EXCEPTION_ERROR_CODE, (u16)error_code);
-> > +               vmcs_write32(VM_ENTRY_EXCEPTION_ERROR_CODE, (u16)ex->error_code);
-> >                 intr_info |= INTR_INFO_DELIVER_CODE_MASK;
-> >         }
-> >  
-> >         if (vmx->rmode.vm86_active) {
-> >                 int inc_eip = 0;
-> > -               if (kvm_exception_is_soft(nr))
-> > +               if (kvm_exception_is_soft(ex->vector))
-> >                         inc_eip = vcpu->arch.event_exit_inst_len;
-> > -               kvm_inject_realmode_interrupt(vcpu, nr, inc_eip);
-> > +               kvm_inject_realmode_interrupt(vcpu, ex->vector, inc_eip);
-> >                 return;
-> >         }
-> >  
-> >         WARN_ON_ONCE(vmx->emulation_required);
-> >  
-> > -       if (kvm_exception_is_soft(nr)) {
-> > +       if (kvm_exception_is_soft(ex->vector)) {
-> >                 vmcs_write32(VM_ENTRY_INSTRUCTION_LEN,
-> >                              vmx->vcpu.arch.event_exit_inst_len);
-> >                 intr_info |= INTR_TYPE_SOFT_EXCEPTION;
-> > diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-> > index b63421d511c5..511c0c8af80e 100644
-> > --- a/arch/x86/kvm/x86.c
-> > +++ b/arch/x86/kvm/x86.c
-> > @@ -557,16 +557,13 @@ static int exception_type(int vector)
-> >         return EXCPT_FAULT;
-> >  }
-> >  
-> > -void kvm_deliver_exception_payload(struct kvm_vcpu *vcpu)
-> > +void kvm_deliver_exception_payload(struct kvm_vcpu *vcpu,
-> > +                                  struct kvm_queued_exception *ex)
-> >  {
-> > -       unsigned nr = vcpu->arch.exception.nr;
-> > -       bool has_payload = vcpu->arch.exception.has_payload;
-> > -       unsigned long payload = vcpu->arch.exception.payload;
-> > -
-> > -       if (!has_payload)
-> > +       if (!ex->has_payload)
-> >                 return;
-> >  
-> > -       switch (nr) {
-> > +       switch (ex->vector) {
-> >         case DB_VECTOR:
-> >                 /*
-> >                  * "Certain debug exceptions may clear bit 0-3.  The
-> > @@ -591,8 +588,8 @@ void kvm_deliver_exception_payload(struct kvm_vcpu *vcpu)
-> >                  * So they need to be flipped for DR6.
-> >                  */
-> >                 vcpu->arch.dr6 |= DR6_ACTIVE_LOW;
-> > -               vcpu->arch.dr6 |= payload;
-> > -               vcpu->arch.dr6 ^= payload & DR6_ACTIVE_LOW;
-> > +               vcpu->arch.dr6 |= ex->payload;
-> > +               vcpu->arch.dr6 ^= ex->payload & DR6_ACTIVE_LOW;
-> >  
-> >                 /*
-> >                  * The #DB payload is defined as compatible with the 'pending
-> > @@ -603,12 +600,12 @@ void kvm_deliver_exception_payload(struct kvm_vcpu *vcpu)
-> >                 vcpu->arch.dr6 &= ~BIT(12);
-> >                 break;
-> >         case PF_VECTOR:
-> > -               vcpu->arch.cr2 = payload;
-> > +               vcpu->arch.cr2 = ex->payload;
-> >                 break;
-> >         }
-> >  
-> > -       vcpu->arch.exception.has_payload = false;
-> > -       vcpu->arch.exception.payload = 0;
-> > +       ex->has_payload = false;
-> > +       ex->payload = 0;
-> >  }
-> >  EXPORT_SYMBOL_GPL(kvm_deliver_exception_payload);
-> >  
-> > @@ -647,17 +644,18 @@ static void kvm_multiple_exception(struct kvm_vcpu *vcpu,
-> >                         vcpu->arch.exception.injected = false;
-> >                 }
-> >                 vcpu->arch.exception.has_error_code = has_error;
-> > -               vcpu->arch.exception.nr = nr;
-> > +               vcpu->arch.exception.vector = nr;
-> >                 vcpu->arch.exception.error_code = error_code;
-> >                 vcpu->arch.exception.has_payload = has_payload;
-> >                 vcpu->arch.exception.payload = payload;
-> >                 if (!is_guest_mode(vcpu))
-> > -                       kvm_deliver_exception_payload(vcpu);
-> > +                       kvm_deliver_exception_payload(vcpu,
-> > +                                                     &vcpu->arch.exception);
-> >                 return;
-> >         }
-> >  
-> >         /* to check exception */
-> > -       prev_nr = vcpu->arch.exception.nr;
-> > +       prev_nr = vcpu->arch.exception.vector;
-> >         if (prev_nr == DF_VECTOR) {
-> >                 /* triple fault -> shutdown */
-> >                 kvm_make_request(KVM_REQ_TRIPLE_FAULT, vcpu);
-> > @@ -675,7 +673,7 @@ static void kvm_multiple_exception(struct kvm_vcpu *vcpu,
-> >                 vcpu->arch.exception.pending = true;
-> >                 vcpu->arch.exception.injected = false;
-> >                 vcpu->arch.exception.has_error_code = true;
-> > -               vcpu->arch.exception.nr = DF_VECTOR;
-> > +               vcpu->arch.exception.vector = DF_VECTOR;
-> >                 vcpu->arch.exception.error_code = 0;
-> >                 vcpu->arch.exception.has_payload = false;
-> >                 vcpu->arch.exception.payload = 0;
-> > @@ -4886,25 +4884,24 @@ static int kvm_vcpu_ioctl_x86_set_mce(struct kvm_vcpu *vcpu,
-> >  static void kvm_vcpu_ioctl_x86_get_vcpu_events(struct kvm_vcpu *vcpu,
-> >                                                struct kvm_vcpu_events *events)
-> >  {
-> > +       struct kvm_queued_exception *ex = &vcpu->arch.exception;
-> > +
-> >         process_nmi(vcpu);
-> >  
-> >         if (kvm_check_request(KVM_REQ_SMI, vcpu))
-> >                 process_smi(vcpu);
-> >  
-> >         /*
-> > -        * In guest mode, payload delivery should be deferred,
-> > -        * so that the L1 hypervisor can intercept #PF before
-> > -        * CR2 is modified (or intercept #DB before DR6 is
-> > -        * modified under nVMX). Unless the per-VM capability,
-> > -        * KVM_CAP_EXCEPTION_PAYLOAD, is set, we may not defer the delivery of
-> > -        * an exception payload and handle after a KVM_GET_VCPU_EVENTS. Since we
-> > -        * opportunistically defer the exception payload, deliver it if the
-> > -        * capability hasn't been requested before processing a
-> > -        * KVM_GET_VCPU_EVENTS.
-> > +        * In guest mode, payload delivery should be deferred if the exception
-> > +        * will be intercepted by L1, e.g. KVM should not modifying CR2 if L1
-> > +        * intercepts #PF, ditto for DR6 and #DBs.  If the per-VM capability,
-> > +        * KVM_CAP_EXCEPTION_PAYLOAD, is not set, userspace may or may not
-> > +        * propagate the payload and so it cannot be safely deferred.  Deliver
-> > +        * the payload if the capability hasn't been requested.
-> >          */
-> >         if (!vcpu->kvm->arch.exception_payload_enabled &&
-> > -           vcpu->arch.exception.pending && vcpu->arch.exception.has_payload)
-> > -               kvm_deliver_exception_payload(vcpu);
-> > +           ex->pending && ex->has_payload)
-> > +               kvm_deliver_exception_payload(vcpu, ex);
-> >  
-> >         /*
-> >          * The API doesn't provide the instruction length for software
-> > @@ -4912,26 +4909,25 @@ static void kvm_vcpu_ioctl_x86_get_vcpu_events(struct kvm_vcpu *vcpu,
-> >          * isn't advanced, we should expect to encounter the exception
-> >          * again.
-> >          */
-> > -       if (kvm_exception_is_soft(vcpu->arch.exception.nr)) {
-> > +       if (kvm_exception_is_soft(ex->vector)) {
-> >                 events->exception.injected = 0;
-> >                 events->exception.pending = 0;
-> >         } else {
-> > -               events->exception.injected = vcpu->arch.exception.injected;
-> > -               events->exception.pending = vcpu->arch.exception.pending;
-> > +               events->exception.injected = ex->injected;
-> > +               events->exception.pending = ex->pending;
-> >                 /*
-> >                  * For ABI compatibility, deliberately conflate
-> >                  * pending and injected exceptions when
-> >                  * KVM_CAP_EXCEPTION_PAYLOAD isn't enabled.
-> >                  */
-> >                 if (!vcpu->kvm->arch.exception_payload_enabled)
-> > -                       events->exception.injected |=
-> > -                               vcpu->arch.exception.pending;
-> > +                       events->exception.injected |= ex->pending;
-> >         }
-> > -       events->exception.nr = vcpu->arch.exception.nr;
-> > -       events->exception.has_error_code = vcpu->arch.exception.has_error_code;
-> > -       events->exception.error_code = vcpu->arch.exception.error_code;
-> > -       events->exception_has_payload = vcpu->arch.exception.has_payload;
-> > -       events->exception_payload = vcpu->arch.exception.payload;
-> > +       events->exception.nr = ex->vector;
-> > +       events->exception.has_error_code = ex->has_error_code;
-> > +       events->exception.error_code = ex->error_code;
-> > +       events->exception_has_payload = ex->has_payload;
-> > +       events->exception_payload = ex->payload;
-> >  
-> >         events->interrupt.injected =
-> >                 vcpu->arch.interrupt.injected && !vcpu->arch.interrupt.soft;
-> > @@ -5003,7 +4999,7 @@ static int kvm_vcpu_ioctl_x86_set_vcpu_events(struct kvm_vcpu *vcpu,
-> >         process_nmi(vcpu);
-> >         vcpu->arch.exception.injected = events->exception.injected;
-> >         vcpu->arch.exception.pending = events->exception.pending;
-> > -       vcpu->arch.exception.nr = events->exception.nr;
-> > +       vcpu->arch.exception.vector = events->exception.nr;
-> >         vcpu->arch.exception.has_error_code = events->exception.has_error_code;
-> >         vcpu->arch.exception.error_code = events->exception.error_code;
-> >         vcpu->arch.exception.has_payload = events->exception_has_payload;
-> > @@ -9497,7 +9493,7 @@ int kvm_check_nested_events(struct kvm_vcpu *vcpu)
-> >  
-> >  static void kvm_inject_exception(struct kvm_vcpu *vcpu)
-> >  {
-> > -       trace_kvm_inj_exception(vcpu->arch.exception.nr,
-> > +       trace_kvm_inj_exception(vcpu->arch.exception.vector,
-> >                                 vcpu->arch.exception.has_error_code,
-> >                                 vcpu->arch.exception.error_code,
-> >                                 vcpu->arch.exception.injected);
-> > @@ -9569,12 +9565,12 @@ static int inject_pending_event(struct kvm_vcpu *vcpu, bool *req_immediate_exit)
-> >                  * describe the behavior of General Detect #DBs, which are
-> >                  * fault-like.  They do _not_ set RF, a la code breakpoints.
-> >                  */
-> > -               if (exception_type(vcpu->arch.exception.nr) == EXCPT_FAULT)
-> > +               if (exception_type(vcpu->arch.exception.vector) == EXCPT_FAULT)
-> >                         __kvm_set_rflags(vcpu, kvm_get_rflags(vcpu) |
-> >                                              X86_EFLAGS_RF);
-> >  
-> > -               if (vcpu->arch.exception.nr == DB_VECTOR) {
-> > -                       kvm_deliver_exception_payload(vcpu);
-> > +               if (vcpu->arch.exception.vector == DB_VECTOR) {
-> > +                       kvm_deliver_exception_payload(vcpu, &vcpu->arch.exception);
-> >                         if (vcpu->arch.dr7 & DR7_GD) {
-> >                                 vcpu->arch.dr7 &= ~DR7_GD;
-> >                                 kvm_update_dr7(vcpu);
-> > diff --git a/arch/x86/kvm/x86.h b/arch/x86/kvm/x86.h
-> > index 501b884b8cc4..dc2af0146220 100644
-> > --- a/arch/x86/kvm/x86.h
-> > +++ b/arch/x86/kvm/x86.h
-> > @@ -286,7 +286,8 @@ int kvm_write_guest_virt_system(struct kvm_vcpu *vcpu,
-> >  
-> >  int handle_ud(struct kvm_vcpu *vcpu);
-> >  
-> > -void kvm_deliver_exception_payload(struct kvm_vcpu *vcpu);
-> > +void kvm_deliver_exception_payload(struct kvm_vcpu *vcpu,
-> > +                                  struct kvm_queued_exception *ex);
-> >  
-> >  void kvm_vcpu_mtrr_init(struct kvm_vcpu *vcpu);
-> >  u8 kvm_mtrr_get_guest_memory_type(struct kvm_vcpu *vcpu, gfn_t gfn);
-> 
-
-
+> > diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
+> > index f7fa4c31b7c5..0d882fad4bc1 100644
+> > --- a/arch/x86/kvm/mmu/mmu.c
+> > +++ b/arch/x86/kvm/mmu/mmu.c
+> > @@ -4182,7 +4182,7 @@ static bool is_page_fault_stale(struct kvm_vcpu *vcpu,
+> >   		return true;
+> >   	return fault->slot &&
+> > -	       mmu_notifier_retry_hva(vcpu->kvm, mmu_seq, fault->hva);
+> > +	       mmu_notifier_retry_gfn(vcpu->kvm, mmu_seq, fault->gfn);
+> >   }
+> >   static int direct_page_fault(struct kvm_vcpu *vcpu, struct kvm_page_fault *fault)
+> > diff --git a/include/linux/kvm_host.h b/include/linux/kvm_host.h
+> > index 0bdb6044e316..e9153b54e2a4 100644
+> > --- a/include/linux/kvm_host.h
+> > +++ b/include/linux/kvm_host.h
+> > @@ -767,8 +767,8 @@ struct kvm {
+> >   	struct mmu_notifier mmu_notifier;
+> >   	unsigned long mmu_notifier_seq;
+> >   	long mmu_notifier_count;
+> > -	unsigned long mmu_notifier_range_start;
+> > -	unsigned long mmu_notifier_range_end;
+> > +	gfn_t mmu_notifier_range_start;
+> > +	gfn_t mmu_notifier_range_end;
+> >   #endif
+> >   	struct list_head devices;
+> >   	u64 manual_dirty_log_protect;
+> > @@ -1362,10 +1362,8 @@ void kvm_mmu_free_memory_cache(struct kvm_mmu_memory_cache *mc);
+> >   void *kvm_mmu_memory_cache_alloc(struct kvm_mmu_memory_cache *mc);
+> >   #endif
+> > -void kvm_inc_notifier_count(struct kvm *kvm, unsigned long start,
+> > -				   unsigned long end);
+> > -void kvm_dec_notifier_count(struct kvm *kvm, unsigned long start,
+> > -				   unsigned long end);
+> > +void kvm_inc_notifier_count(struct kvm *kvm, gfn_t start, gfn_t end);
+> > +void kvm_dec_notifier_count(struct kvm *kvm, gfn_t start, gfn_t end);
+> >   long kvm_arch_dev_ioctl(struct file *filp,
+> >   			unsigned int ioctl, unsigned long arg);
+> > @@ -1923,9 +1921,9 @@ static inline int mmu_notifier_retry(struct kvm *kvm, unsigned long mmu_seq)
+> >   	return 0;
+> >   }
+> > -static inline int mmu_notifier_retry_hva(struct kvm *kvm,
+> > +static inline int mmu_notifier_retry_gfn(struct kvm *kvm,
+> >   					 unsigned long mmu_seq,
+> > -					 unsigned long hva)
+> > +					 gfn_t gfn)
+> >   {
+> >   	lockdep_assert_held(&kvm->mmu_lock);
+> >   	/*
+> > @@ -1935,8 +1933,8 @@ static inline int mmu_notifier_retry_hva(struct kvm *kvm,
+> >   	 * positives, due to shortcuts when handing concurrent invalidations.
+> >   	 */
+> >   	if (unlikely(kvm->mmu_notifier_count) &&
+> > -	    hva >= kvm->mmu_notifier_range_start &&
+> > -	    hva < kvm->mmu_notifier_range_end)
+> > +	    gfn >= kvm->mmu_notifier_range_start &&
+> > +	    gfn < kvm->mmu_notifier_range_end)
+> >   		return 1;
+> >   	if (kvm->mmu_notifier_seq != mmu_seq)
+> >   		return 1;
+> > diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
+> > index da263c370d00..4d7f0e72366f 100644
+> > --- a/virt/kvm/kvm_main.c
+> > +++ b/virt/kvm/kvm_main.c
+> > @@ -536,8 +536,7 @@ static void kvm_mmu_notifier_invalidate_range(struct mmu_notifier *mn,
+> >   typedef bool (*hva_handler_t)(struct kvm *kvm, struct kvm_gfn_range *range);
+> > -typedef void (*on_lock_fn_t)(struct kvm *kvm, unsigned long start,
+> > -			     unsigned long end);
+> > +typedef void (*on_lock_fn_t)(struct kvm *kvm, gfn_t start, gfn_t end);
+> >   typedef void (*on_unlock_fn_t)(struct kvm *kvm);
+> > @@ -624,7 +623,8 @@ static __always_inline int __kvm_handle_hva_range(struct kvm *kvm,
+> >   				locked = true;
+> >   				KVM_MMU_LOCK(kvm);
+> >   				if (!IS_KVM_NULL_FN(range->on_lock))
+> > -					range->on_lock(kvm, range->start, range->end);
+> > +					range->on_lock(kvm, gfn_range.start,
+> > +							    gfn_range.end);
+> >   				if (IS_KVM_NULL_FN(range->handler))
+> >   					break;
+> >   			}
