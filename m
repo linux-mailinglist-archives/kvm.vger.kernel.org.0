@@ -2,106 +2,164 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 2B0585789EB
-	for <lists+kvm@lfdr.de>; Mon, 18 Jul 2022 20:57:33 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 39CBE578C0D
+	for <lists+kvm@lfdr.de>; Mon, 18 Jul 2022 22:49:13 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233736AbiGRS5a (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 18 Jul 2022 14:57:30 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52106 "EHLO
+        id S233332AbiGRUtL (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 18 Jul 2022 16:49:11 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50080 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233788AbiGRS5Y (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 18 Jul 2022 14:57:24 -0400
-Received: from mail-oa1-x32.google.com (mail-oa1-x32.google.com [IPv6:2001:4860:4864:20::32])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 474AD2F3B8
-        for <kvm@vger.kernel.org>; Mon, 18 Jul 2022 11:57:22 -0700 (PDT)
-Received: by mail-oa1-x32.google.com with SMTP id 586e51a60fabf-10c0052da61so26210400fac.12
-        for <kvm@vger.kernel.org>; Mon, 18 Jul 2022 11:57:22 -0700 (PDT)
+        with ESMTP id S233480AbiGRUtE (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 18 Jul 2022 16:49:04 -0400
+Received: from mail-pl1-x635.google.com (mail-pl1-x635.google.com [IPv6:2607:f8b0:4864:20::635])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 108C56400
+        for <kvm@vger.kernel.org>; Mon, 18 Jul 2022 13:49:04 -0700 (PDT)
+Received: by mail-pl1-x635.google.com with SMTP id p8so355717plq.13
+        for <kvm@vger.kernel.org>; Mon, 18 Jul 2022 13:49:04 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=mime-version:reply-to:from:date:message-id:subject:to;
-        bh=h0ZslgqQ94UM3iGDYCZGEx8ZwvbYHY5ZrQARiO/Kpbc=;
-        b=nZ6PZ+UBSZHm6g0nBxoZ3zVhtfI+yGgoyMw4xOJrmwxXMDoOysZZlBXoBWmY1svRLl
-         U7UVqtpIupScRmdZYaUwhpqFr5OruqAhdwNyXDAgjHFZ0Q2y0TPJbg2Y96NqH6p7/Sjt
-         GC/4TGIDop5cxVcNt4/4Yx/xkmvcDVqY14ad2VnxkJvVBOmNAfnq6skkm4sZF8SkPp1m
-         C9akgwH4o3L9YWaqMvP8I6WE+GA1VVLMtztcVSQRm0xXJWUbVA4tKA0VL1J92l4tiGBs
-         BbAx241dmSytvNCA3uDvpgbL5Nldy9s4jRljS2Dn/Ynznu/X8u1lrTYgiGjq0F55dmS9
-         g/Pg==
+        d=google.com; s=20210112;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=Zbzt4chIOAHidm79RNeoJvZKga6Ri3IH/kwQEEuMyhQ=;
+        b=ox+L7vvavOYp4ysTAQIE6ZNLqMWWkVbtwMP1VNfH3juV5EfYZ3YpuVCyI4axobd5eI
+         2RaL+uBtsUPlSjJnh1cpw8gz2z0Qm+NiegNkzBZwuXLUEv+DIhtdmugtgYlEQ3WpnQ71
+         TePdoppcwfTsJPsnkp88/eMaisHj3PYupQ2j7vZN9kA6vsfpH3BeD6pqNfmuljnYfo/Q
+         Jxh6eh04QPrnDP35DacSAXi0oYSvX9J8TOtU+NtGoLa2Mpk6Ygzc4XUwrZucU4Q0j0SQ
+         +WxpiJmMeitNO4mt7MBoPNwEkgAHx9knjOFgMuFce1mZluXqVj5MqbZ1kY/cYij15r8S
+         x3ag==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:reply-to:from:date:message-id
-         :subject:to;
-        bh=h0ZslgqQ94UM3iGDYCZGEx8ZwvbYHY5ZrQARiO/Kpbc=;
-        b=gHuEkE9Xh3iVm86+n0NmPqwcp4L6Bh52QOdviKI+C4ZibVZLHaJERN6u+0XIIafR8A
-         dS7BO91bdqgxYKNJUEEQ1sba+PoBja38iVKTFTwpRh0nfYqidB9M+B5JfaiQuJjbk3pH
-         IfgOPOWBD+HaUI30Mw5I6xDCGokjBssuppnbIflYmwkyZWLNRUYNZd+F+d4+4MqLp9B3
-         yFwiGl6wecn4lWMM2JX08xNWqe8BrdRFO1VLvQ6vX5wbGXgSbkVl/o6mUlJe8WF03DDw
-         zcvUw6yy6TzGqbVnqPbvn47Cw7mzCy3WuqZKOECFvhtnqwvHLSAAoiQoJ+elrlgjanF9
-         zsKg==
-X-Gm-Message-State: AJIora8sRf3ook29ASxj/JhhPht9Lmn0LxvBzWiaq2/0wtZEYk1R20B2
-        U11aJsXfSCtDD6LCp2BsAXxAqXjYsCPiOZL+LYM=
-X-Google-Smtp-Source: AGRyM1uXvTsFjM8LNxJz5uuMX220/eslec/OqAzLUmdh8uwak8Gy3FlUEpu4inIXOAY/88sZbt0riKnPUsMIppzGDvI=
-X-Received: by 2002:a05:6808:1447:b0:339:c893:674c with SMTP id
- x7-20020a056808144700b00339c893674cmr14353983oiv.171.1658170641392; Mon, 18
- Jul 2022 11:57:21 -0700 (PDT)
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=Zbzt4chIOAHidm79RNeoJvZKga6Ri3IH/kwQEEuMyhQ=;
+        b=owvjyc+t0joDK8xbM4HbhIUWlUMBql3W6cMNChcgJnlbyMFYlyK1qzGTKBnyk3LTKH
+         M/iyb2QmXSUjuooIG9nquldsQhsWG+Q2C29JK5pjQA0gOr7jp608DaInrv2AYBZPQIZW
+         jqy7I28/cvwBLWqSE72zgM1GqmuIUQglpyjZwOSTRdbKzp5QYV/nLZwluhY5SeahjhQS
+         i08lU+kSokjI8o5/rOdVUByEazVX6K8gjoDVxw+wwPgwLwNVmau9QuCrXDAupidkLDaj
+         /2hHMgpwRjh8qFGZdjRKzADBpFvazdOjLhkareCrd/crDzkwnJ7PYBQrfZqKWpYwL2Q2
+         TqHw==
+X-Gm-Message-State: AJIora+yjm51wqMhUAsHkQM9HqEO0M+CbTqSOLdhceyZfJ3MFpnt3Q8q
+        McCP0jOiCKlajqs8/vu+qtn7Dw==
+X-Google-Smtp-Source: AGRyM1vgptEceVtByGuNYUrudxA+4UJt+Gr4/h5m/Geot5gc24p2f9PZe/3aC+qtDZ5bkni9hTvQtg==
+X-Received: by 2002:a17:90b:1c0b:b0:1f0:23df:5406 with SMTP id oc11-20020a17090b1c0b00b001f023df5406mr34986891pjb.157.1658177343346;
+        Mon, 18 Jul 2022 13:49:03 -0700 (PDT)
+Received: from google.com (59.39.145.34.bc.googleusercontent.com. [34.145.39.59])
+        by smtp.gmail.com with ESMTPSA id v21-20020a17090ac91500b001f113765d48sm7878522pjt.2.2022.07.18.13.49.00
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 18 Jul 2022 13:49:01 -0700 (PDT)
+Date:   Mon, 18 Jul 2022 20:48:55 +0000
+From:   Mingwei Zhang <mizhang@google.com>
+To:     Sean Christopherson <seanjc@google.com>
+Cc:     Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+Subject: Re: [PATCH 2/4] KVM: x86/mmu: Document the "rules" for using
+ host_pfn_mapping_level()
+Message-ID: <YtXHN9rrj6+SRa1Z@google.com>
+References: <20220715232107.3775620-1-seanjc@google.com>
+ <20220715232107.3775620-3-seanjc@google.com>
+ <YtMIvgfsgIPWMgGM@google.com>
+ <YtWPSILmAp/0m5eC@google.com>
 MIME-Version: 1.0
-Received: by 2002:a05:6850:b093:b0:314:5f48:8afc with HTTP; Mon, 18 Jul 2022
- 11:57:20 -0700 (PDT)
-Reply-To: lilywilliam989@gmail.com
-From:   Lily William <gonwse11@gmail.com>
-Date:   Mon, 18 Jul 2022 10:57:20 -0800
-Message-ID: <CALtkzusVFBg-YR+YvsG4Y8w75j+t8iRx9+7roG4cNRaFUa8ptw@mail.gmail.com>
-Subject: Hi Dear,
-To:     undisclosed-recipients:;
-Content-Type: text/plain; charset="UTF-8"
-X-Spam-Status: Yes, score=5.2 required=5.0 tests=BAYES_50,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_ENVFROM_END_DIGIT,
-        FREEMAIL_FROM,FREEMAIL_REPLYTO,FREEMAIL_REPLYTO_END_DIGIT,
-        RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,UNDISC_FREEM autolearn=no
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <YtWPSILmAp/0m5eC@google.com>
+X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
+        USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=unavailable
         autolearn_force=no version=3.4.6
-X-Spam-Report: * -0.0 RCVD_IN_DNSWL_NONE RBL: Sender listed at
-        *      https://www.dnswl.org/, no trust
-        *      [2001:4860:4864:20:0:0:0:32 listed in]
-        [list.dnswl.org]
-        *  0.8 BAYES_50 BODY: Bayes spam probability is 40 to 60%
-        *      [score: 0.5000]
-        * -0.0 SPF_PASS SPF: sender matches SPF record
-        *  0.2 FREEMAIL_REPLYTO_END_DIGIT Reply-To freemail username ends in
-        *      digit
-        *      [lilywilliam989[at]gmail.com]
-        *  0.2 FREEMAIL_ENVFROM_END_DIGIT Envelope-from freemail username ends
-        *       in digit
-        *      [gonwse11[at]gmail.com]
-        *  0.0 SPF_HELO_NONE SPF: HELO does not publish an SPF Record
-        *  0.0 FREEMAIL_FROM Sender email is commonly abused enduser mail
-        *      provider
-        *      [gonwse11[at]gmail.com]
-        * -0.1 DKIM_VALID_EF Message has a valid DKIM or DK signature from
-        *      envelope-from domain
-        * -0.1 DKIM_VALID_AU Message has a valid DKIM or DK signature from
-        *      author's domain
-        * -0.1 DKIM_VALID Message has at least one valid DKIM or DK signature
-        *  0.1 DKIM_SIGNED Message has a DKIM or DK signature, not necessarily
-        *       valid
-        *  3.1 UNDISC_FREEM Undisclosed recipients + freemail reply-to
-        *  1.0 FREEMAIL_REPLYTO Reply-To/From or Reply-To/body contain
-        *      different freemails
-X-Spam-Level: *****
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi Dear,
+On Mon, Jul 18, 2022, Sean Christopherson wrote:
+> On Sat, Jul 16, 2022, Mingwei Zhang wrote:
+> > On Fri, Jul 15, 2022, Sean Christopherson wrote:
+> > > Add a comment to document how host_pfn_mapping_level() can be used safely,
+> > > as the line between safe and dangerous is quite thin.  E.g. if KVM were
+> > > to ever support in-place promotion to create huge pages, consuming the
+> > > level is safe if the caller holds mmu_lock and checks that there's an
+> > > existing _leaf_ SPTE, but unsafe if the caller only checks that there's a
+> > > non-leaf SPTE.
+> > > 
+> > > Opportunistically tweak the existing comments to explicitly document why
+> > > KVM needs to use READ_ONCE().
+> > > 
+> > > No functional change intended.
+> > > 
+> > > Signed-off-by: Sean Christopherson <seanjc@google.com>
+> > > ---
+> > >  arch/x86/kvm/mmu/mmu.c | 42 +++++++++++++++++++++++++++++++++++-------
+> > >  1 file changed, 35 insertions(+), 7 deletions(-)
+> > > 
+> > > diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
+> > > index bebff1d5acd4..d5b644f3e003 100644
+> > > --- a/arch/x86/kvm/mmu/mmu.c
+> > > +++ b/arch/x86/kvm/mmu/mmu.c
+> > > @@ -2919,6 +2919,31 @@ static void direct_pte_prefetch(struct kvm_vcpu *vcpu, u64 *sptep)
+> > >  	__direct_pte_prefetch(vcpu, sp, sptep);
+> > >  }
+> > >  
+> > > +/*
+> > > + * Lookup the mapping level for @gfn in the current mm.
+> > > + *
+> > > + * WARNING!  Use of host_pfn_mapping_level() requires the caller and the end
+> > > + * consumer to be tied into KVM's handlers for MMU notifier events!
+> > Since calling this function won't cause kernel crash now, I guess we can
+> > remove the warning sign here, but keep the remaining statement since it
+> > is necessary.
+> 
+> Calling this function won't _directly_ crash the kernel, but improper usage can
+> most definitely crash the host kernel, or even worse, silently corrupt host and
+> or guest data.  E.g. if KVM were to race with an mmu_notifier event and incorrectly
+> map a stale huge page into the guest.
+> 
+> So yes, the function itself is robust, but usage is still very subtle and delicate.
 
-My name is Dr Lily William from the United States.I am a French and
-American nationality (dual) living in the U.S and sometimes in France
-for Work Purpose.
+Understood. So we basically create another "gup_fast_only()" within KVM
+and we worry that may confuse other developers so we add the warning
+sign.
+> 
+> > > + *
+> > > + * There are several ways to safely use this helper:
+> > > + *
+> > > + * - Check mmu_notifier_retry_hva() after grabbing the mapping level, before
+> > > + *   consuming it.  In this case, mmu_lock doesn't need to be held during the
+> > > + *   lookup, but it does need to be held while checking the MMU notifier.
+> > 
+> > but it does need to be held while checking the MMU notifier and
+> > consuming the result.
+> 
+> I didn't want to include "consuming the result" because arguably the result is
+> being consumed while running the guest, and obviously KVM doesn't hold mmu_lock
+> while running the guest (though I fully acknowledge the above effectively uses
+> "consume" in the sense of shoving the result into SPTEs).  
+> 
+> > > + *
+> > > + * - Hold mmu_lock AND ensure there is no in-progress MMU notifier invalidation
+> > > + *   event for the hva.  This can be done by explicit checking the MMU notifier
+> 
+> s/explicit/explicitly
+> 
+> > > + *   or by ensuring that KVM already has a valid mapping that covers the hva.
+> > 
+> > Yes, more specifically, "mmu notifier sequence counter".
+> 
+> Heh, depends on what the reader interprets as "sequence counter".  If the reader
+> interprets that as the literal sequence counter, mmu_notifier_seq, then this phrasing
+> is incorrect as mmu_notifier_seq isn't bumped until the invalidation completes,
+> i.e. it guards against _past_ invalidations, not in-progress validations.
+> 
+> My preference is to intentionally not be precise in describing how to check for an
+> in-progress invalidation, e.g. so that this comment doesn't need to be updated if
+> the details change, and to also to try and force developers to do more than copy
+> and paste if they want to use this helper.
 
-I hope you consider my friend request. I will share some of my pics
-and more details about myself when I get your response.
+Hmm, I was going to say that I strongly disagree about the intentional
+unclearness. But then I find that MMU notifier implementation does
+require more than just the counter but also the range, so yeah, talking
+too much may fall into the weeds. But in general, I think mmu notifier
+deserves better documentation in both concept and implementation in KVM.
 
-Thanks
-
-With love
-Lily
