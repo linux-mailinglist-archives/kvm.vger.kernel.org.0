@@ -2,138 +2,151 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id DACF55787C4
-	for <lists+kvm@lfdr.de>; Mon, 18 Jul 2022 18:49:37 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 52CCD5787C8
+	for <lists+kvm@lfdr.de>; Mon, 18 Jul 2022 18:50:31 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233792AbiGRQtg (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 18 Jul 2022 12:49:36 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45092 "EHLO
+        id S233789AbiGRQu0 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 18 Jul 2022 12:50:26 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45776 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233477AbiGRQte (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 18 Jul 2022 12:49:34 -0400
-Received: from NAM10-BN7-obe.outbound.protection.outlook.com (mail-bn7nam10on2040.outbound.protection.outlook.com [40.107.92.40])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id ACE8B336;
-        Mon, 18 Jul 2022 09:49:33 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=KKHimqpwIrccrR+yQuNQJ+4AEdwQf6sx1zlYSp+8ELGteQHZMOTOdbVFvFqnd++8J2WOqhq3wPMf+XQ9Cyhg+CCGu5+yFcBMX1pdDs/4XWrD71GmfJnRY0x901v+Ik3hml1w9gymD5Dl6+g5227HyTz9x1/MmAwT18/3LYMs0q/RL+wxePGyAp3qlCYiQizq/rVQaIhzHryd6dVl7lAZuk5uOOwa8TuWvDO9qpiGuDlpthTIyp+wKAWPBSN2EpV1r1Ja+ikODteaTnvCTQdYlv3HYIMutRiPPR6k7Q7z1atUn5R1+38rzj4yCQWEKbLRQu12OCfB0ElsAWchrMzLJg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=rLvR13GAKH5vTisHpwd4wigQRtDNgsa6+OfKjMKJjys=;
- b=hvcK4nRUlslQpCfN12n5KeHKLoXfBrAtBeBz9VtG4WIj7MSnoYcCmXuwE/BUhRLEXcE/rBjTiA0ufIUKvOrbNWRbkgws4lna3qKSniSSCI/Iebuzi2eck38IjtUBRMMKGyV6UalbeA8cyIPgTCrubNBLM+hkaQdzWPp/AQkjhCe4ZRKyQk64KloUW0ysVk7HVJKEJrV1ajFZ84YruCtTo2gd+pIYbQL0Ws33l7k8mxJwhBR9EapUCiuwLrFOCVsOtw7/jyaM/21JAUycPx8UKYpO+yEQm8Unkk7bfBZmVlfbiXqplqqevCN9laMP09w5z7smKm8QOYoRZUKPSUg7Ew==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
- dkim=pass header.d=nvidia.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=rLvR13GAKH5vTisHpwd4wigQRtDNgsa6+OfKjMKJjys=;
- b=PPlLesbCLCs6dtOotQZY3rvuv28k3Ud5hA62t/RCoPq7i2dnd3xXo7Oy0hPy7nBYjw+puwpwFkXjSJvpciR1FKhrykFziGjsmJztasIsn5h0OmYZSEYZLzXqqDx8BJ5cM0NzxkofIo6e7jui9l9gNXk8WRQETZsk919kwHRkbiDXTZRsQIJ9Pv22+xrtmykvNVPR+FZtce+Xqjx9QgayRZtN17DPBrwhZIwznBuL8uQOAQkcWveLomGQ9s7z7CV8f4sRN9v+fxnsA0Zx6El2+mxm/Mj8c1OFbbyQz6sPi3nNc6FdqHwfOJyUBINrzRp1+Miwl+eQ0vIiRxs/R6jRPA==
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nvidia.com;
-Received: from MN2PR12MB4192.namprd12.prod.outlook.com (2603:10b6:208:1d5::15)
- by DM6PR12MB3529.namprd12.prod.outlook.com (2603:10b6:5:15d::18) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5438.23; Mon, 18 Jul
- 2022 16:49:32 +0000
-Received: from MN2PR12MB4192.namprd12.prod.outlook.com
- ([fe80::ac35:7c4b:3282:abfb]) by MN2PR12MB4192.namprd12.prod.outlook.com
- ([fe80::ac35:7c4b:3282:abfb%3]) with mapi id 15.20.5438.023; Mon, 18 Jul 2022
- 16:49:32 +0000
-Date:   Mon, 18 Jul 2022 13:49:30 -0300
-From:   Jason Gunthorpe <jgg@nvidia.com>
-To:     Alexey Kardashevskiy <aik@ozlabs.ru>
-Cc:     linuxppc-dev@lists.ozlabs.org, kvm@vger.kernel.org,
-        kvm-ppc@vger.kernel.org, Deming Wang <wangdeming@inspur.com>,
-        Robin Murphy <robin.murphy@arm.com>,
-        Alex Williamson <alex.williamson@redhat.com>,
-        Daniel Henrique Barboza <danielhb413@gmail.com>,
-        Fabiano Rosas <farosas@linux.ibm.com>,
-        Murilo Opsfelder Araujo <muriloo@linux.ibm.com>,
-        Nicholas Piggin <npiggin@gmail.com>,
-        Michael Ellerman <mpe@ellerman.id.au>
-Subject: Re: [PATCH kernel 2/3] powerpc/pci_64: Init pcibios subsys a bit
- later
-Message-ID: <20220718164930.GD4609@nvidia.com>
-References: <20220714081822.3717693-1-aik@ozlabs.ru>
- <20220714081822.3717693-3-aik@ozlabs.ru>
+        with ESMTP id S231821AbiGRQuX (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 18 Jul 2022 12:50:23 -0400
+Received: from mail-pl1-x633.google.com (mail-pl1-x633.google.com [IPv6:2607:f8b0:4864:20::633])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 94B16E08E
+        for <kvm@vger.kernel.org>; Mon, 18 Jul 2022 09:50:21 -0700 (PDT)
+Received: by mail-pl1-x633.google.com with SMTP id 5so9539246plk.9
+        for <kvm@vger.kernel.org>; Mon, 18 Jul 2022 09:50:21 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=xbz9zNJ4kudtBf4HleF/yHu6MPshPQFfqoJeR3sCNGk=;
+        b=pIJd3Rwn4OsqgMkQsd/bkmHGfMyZspMyiAOd14uUTppNPZ2se0sG5bX1psOR5cPqnk
+         bxbdl+zj9dDCNCReWjeZ5dReNQ08Gzy4tZwcqezsQOB1ABYcgOo2Xig5BHxO10/xpT/g
+         ovXE+65resESh+wZlHPMAumZ5sCDQia67KIHmp7zX25uRJkk3huy1Wd9Z21YWmG+i2j9
+         lfKAafpGO4z76Djs1J2bsLbFSTihsR11QLFcwdhM1HK8x3ZgcqnZsY1yoT7mpLn6NscT
+         RZyI5K4yjdcnRMzQ3UXh0xSd9t4CT7uvWRGVaf70IoaWdW/zFXhPdWUoUww5unOGVF2a
+         e+ig==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=xbz9zNJ4kudtBf4HleF/yHu6MPshPQFfqoJeR3sCNGk=;
+        b=XoWXRExxhna//8iO8EOslPYxRyi/C6dFhTyZO/W9cWJVyjYRZOeWMo9PaZIaFFB1xj
+         /wGZM4etmpMzD4gx9od4C+IoQkmLR27GS77MEW1gFpj2mC+QHFB2f0kc3HjZKCf0JjId
+         P2XQnlU6vG+ZeI52lHVNqI3GwPydoBEQz2m5oepmGGaaGR0e3Wg3T/jryorE+X2COAJ9
+         utbX98Bexvl638540U8XKyL0mGvlIO1wnhU2PvZd4zlxmzDr6z6KD2T1IPV6vwfmHnBB
+         Nw/Gg2fQsTJDrJn+PWBtVENMX4gne4/KKXnqKFB6WKIHWIfMSiEfpkBMdbMAPCyNPJWx
+         c7mw==
+X-Gm-Message-State: AJIora/DYwuvKmQzSG9nu55a58nxmOFoTCuDhQ/YnV6kBZa8yxo7Nx5X
+        4O37Qlj0mV2QJqI2KGnYZG+DQA==
+X-Google-Smtp-Source: AGRyM1vl7YFDCbAwvvfalJOgfG+z5WlR/ZoOFjk4UTf7LkgcuSQbI2ibhatxCL/NtG24+yabrzs8Kg==
+X-Received: by 2002:a17:902:e746:b0:16c:3ffd:61fb with SMTP id p6-20020a170902e74600b0016c3ffd61fbmr29139404plf.123.1658163020887;
+        Mon, 18 Jul 2022 09:50:20 -0700 (PDT)
+Received: from google.com (123.65.230.35.bc.googleusercontent.com. [35.230.65.123])
+        by smtp.gmail.com with ESMTPSA id k6-20020aa79986000000b00528c22038f5sm9895204pfh.14.2022.07.18.09.50.20
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 18 Jul 2022 09:50:20 -0700 (PDT)
+Date:   Mon, 18 Jul 2022 16:50:16 +0000
+From:   Sean Christopherson <seanjc@google.com>
+To:     Mingwei Zhang <mizhang@google.com>
+Cc:     Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+Subject: Re: [PATCH 2/4] KVM: x86/mmu: Document the "rules" for using
+ host_pfn_mapping_level()
+Message-ID: <YtWPSILmAp/0m5eC@google.com>
+References: <20220715232107.3775620-1-seanjc@google.com>
+ <20220715232107.3775620-3-seanjc@google.com>
+ <YtMIvgfsgIPWMgGM@google.com>
+MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20220714081822.3717693-3-aik@ozlabs.ru>
-X-ClientProxiedBy: BL0PR02CA0034.namprd02.prod.outlook.com
- (2603:10b6:207:3c::47) To MN2PR12MB4192.namprd12.prod.outlook.com
- (2603:10b6:208:1d5::15)
-MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: 21754d54-436f-46b1-c222-08da68dd7cd5
-X-MS-TrafficTypeDiagnostic: DM6PR12MB3529:EE_
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: AXiOvHwNjOqi1aOFo9VyEof1RD369sb8nLHeuu8HnDjeLwZ5ZwY+RFIuieVwUrOuvm0iRp3A9ioALutZTzS7Nl0KFq3IBWwE9Nxgk/9pHa46DxXJYaJ7EgezxzLGgEE97MEuorU6vTcZsbegF1oCESxm53892IfUKmdgDAFQ1me6SO8V3hp7Va5vV9EASav45Wwlc2QbqpK8sUNYe+4/Gt3pcZnJUPi3tef8k3afJF/SgoMXXN8whZAfmPxWmvPH1ORQblVQ17opee6ym/tcVXvfel9+mq3nF1xThCE/Omh+i5dVuEcM/XGoENxrzhnNkDi6fMUEaRsizyOU9mqfJQGm5k4QU4whY/xGhRFXGPdXCSHYH+qexicVcQHaTwzmvEHdHIqGG1YlfeMPR/1bKCJWS1+ziu6IeOEgnDK6+VldxOeZd4xWH+TzKQKPQwd7B9gQEGMGRhQTH31BhLvG+UwiXeKhU9+KYCx7MrAN/Yn8Uhw5ssNRmsZDYcjWQo/4YMpsNakJahmgF/PhH5zo5zLIZVjYqyyWZsDAj2kgukXIw4ct6FafgJiLUriOG36ZuDW0PDic2BSCeB4AH9zbG3BmCt42gfjEL3w8A7zZVll1UIUCG4VmuhQFw3XkHJovQ5tguSu0L9JC2ZWoVz/7vRhoBdFBgjkjCuN6/X2OQpUO/axiGJAaa2O2LpNFuCMPGdgI5BVUYd2qY/56rygDVFD6V5klgKcB5ThHIN0UkvqNx31OJjOIR0CrPkRpGAaa
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:MN2PR12MB4192.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230016)(4636009)(366004)(136003)(396003)(346002)(39860400002)(376002)(2906002)(8936002)(33656002)(316002)(66946007)(66556008)(6916009)(4326008)(54906003)(86362001)(36756003)(6486002)(41300700001)(66476007)(8676002)(478600001)(6506007)(2616005)(83380400001)(26005)(6512007)(5660300002)(4744005)(1076003)(38100700002)(7416002)(186003);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?2zt24alOb+NXsQza8k6i6XPb1oskilxS8P0JMxION1dBBwWoq5M94Op+9+fk?=
- =?us-ascii?Q?hm3YEW0Sj1ha5hBxNFxtG+/e6Eon8OfIje9oeB0A2KKC6HlTIkrRh+ksAF61?=
- =?us-ascii?Q?nbfFmHJ6VO7pcduKeT1bItiheW87Q+pQXGP6j6eHzg8e7e000CQvTtdwF9ve?=
- =?us-ascii?Q?dvQk+hckU9QaPHmqMSGWuLCk/gWdDwLq8BB6H/4d97DF7xfbervRAJvDYi8c?=
- =?us-ascii?Q?1nFmWh2rijuM682LD8AUUB2o4IoB8X8m338B5OiLdZ6IEDFE8QaZMRUwT5me?=
- =?us-ascii?Q?ocZORYd3+6VoZqrFULJX4gzNglUrjlK4thymIBWHq8PY/Tktm3/PbuaLRbPd?=
- =?us-ascii?Q?jQ+F2sPSQLUq5Tn6E7VJrB/TGAOFBGgqy7hpWn+AON4KKgC6K17sUs6LJKIg?=
- =?us-ascii?Q?gc0lwK8J8N3yG6vFHUgzZoi1iDAW7Yhuagyl1rf13Ebxb9KRI4qaAmOpcKFs?=
- =?us-ascii?Q?9ehdDAFocWW6hmSCZ9vZpjzllmJlZWX2tgxlW8Pq1slE0EaojiTZ9wRco8Dx?=
- =?us-ascii?Q?GbetqBPJt/Etd0Adp5HrGKpLPF4PP91WS3lM5LaGAxPpXqmJAj/9bcCXAouy?=
- =?us-ascii?Q?nQBe+meoLy5gCB/dUgbe/s654wzSDzh/6Iv5Ve1X7Gh8zknCZ0odRnCchfBc?=
- =?us-ascii?Q?710ibKqAAeAqWM9nGd/CFeg9k5qmi3oH8ZXN67WyraBgvhqQTI8jfwEbZrjA?=
- =?us-ascii?Q?RLgGV62EnzMgOBNHXDNkTbcfI7Fo/isXP7N62ENt+OW/vCSv0sIvtAgNNI/u?=
- =?us-ascii?Q?PDvdExGBrOmYV7am1F6nXQQcl5MKKL1Um4spZaphS9fjbBSZn14IDYgbUSdQ?=
- =?us-ascii?Q?td3oH3EZ1ndEdgA7UxBe0am74/JuWxq1TlvC85cEXsHtr8W7xe33HSel5HcJ?=
- =?us-ascii?Q?lop9AJ5myhTs/X/9F74U82ugI5SulowabwGhe2k/2l3iG/H5NpUXYQ7c5SVS?=
- =?us-ascii?Q?3XiPSb5JjpEPpJldOqMFKymiZtFlW5ZQw6pdYSKqYPoIMrorB7Us4jTdZ73D?=
- =?us-ascii?Q?itsindavThbCprtsyAQ+z81UaPEeBKM+X5LKTb2b4e1kqXyFZ/cIFjoXx/Rg?=
- =?us-ascii?Q?GFDQQzVwQ4z4aSbKoHMIZ9kahx1Atu9LYz/2QPeBlymuDMfFhyZsyvvIGVg0?=
- =?us-ascii?Q?v0WmiZpXwVhT0x8vPkdnue0pbATWZVHNnz5RFpsrbv7qyp2ptwMkv3baotcR?=
- =?us-ascii?Q?qlyDY5Fsv8T7T0/RG9kXWWPTPDI3x23FvCVV3xMG6ueJhup9c7DmCt8huxOM?=
- =?us-ascii?Q?KZJf0E0zkgJd9CNKZNWKGZLRODrhJkIcrXe+Lc9MLxxVGHc+o0GK5D4L6ZFM?=
- =?us-ascii?Q?gJFdxzyWkArJ/n5ARJ63b9kb19zpDjW+6uM6yVWEX2x+sG+t/kTgWS4czqt/?=
- =?us-ascii?Q?58QOa19/SnRIfshkoMSQVc7g/y1XxLsa/wFq3tG5crBhS5NLkATz9MkePr+h?=
- =?us-ascii?Q?MgiiV0IJYVmEnMmLxkK7XBKnLTPu7RT74SIzkYjY5Dts9sZNkaKJWH5Qm0RD?=
- =?us-ascii?Q?iXpQowmuxu/IoA9h6602L9A/NSxdXtJWlbe6H1f0tfXSLzYWCCe7IthHORUD?=
- =?us-ascii?Q?kXCkNWbu4nSO9snOo99ai0DW2qMDOLZXQrQvluHT?=
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 21754d54-436f-46b1-c222-08da68dd7cd5
-X-MS-Exchange-CrossTenant-AuthSource: MN2PR12MB4192.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 18 Jul 2022 16:49:31.8896
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: o16Q80ZVwCpC312tTXydxNimoPjfmSIURAxq6nOOd6TklZIL9vrBpel9wKL5iTm0
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM6PR12MB3529
-X-Spam-Status: No, score=-1.8 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FORGED_SPF_HELO,
-        RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_NONE
-        autolearn=no autolearn_force=no version=3.4.6
+In-Reply-To: <YtMIvgfsgIPWMgGM@google.com>
+X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
+        USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=unavailable
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Jul 14, 2022 at 06:18:21PM +1000, Alexey Kardashevskiy wrote:
-> The following patches are going to add dependency/use of iommu_ops which
-> is initialized in subsys_initcall as well.
-> 
-> This moves pciobios_init() to the next initcall level.
-> 
-> This should not cause behavioral change.
-> 
-> Signed-off-by: Alexey Kardashevskiy <aik@ozlabs.ru>
-> ---
->  arch/powerpc/kernel/pci_64.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
+On Sat, Jul 16, 2022, Mingwei Zhang wrote:
+> On Fri, Jul 15, 2022, Sean Christopherson wrote:
+> > Add a comment to document how host_pfn_mapping_level() can be used safely,
+> > as the line between safe and dangerous is quite thin.  E.g. if KVM were
+> > to ever support in-place promotion to create huge pages, consuming the
+> > level is safe if the caller holds mmu_lock and checks that there's an
+> > existing _leaf_ SPTE, but unsafe if the caller only checks that there's a
+> > non-leaf SPTE.
+> > 
+> > Opportunistically tweak the existing comments to explicitly document why
+> > KVM needs to use READ_ONCE().
+> > 
+> > No functional change intended.
+> > 
+> > Signed-off-by: Sean Christopherson <seanjc@google.com>
+> > ---
+> >  arch/x86/kvm/mmu/mmu.c | 42 +++++++++++++++++++++++++++++++++++-------
+> >  1 file changed, 35 insertions(+), 7 deletions(-)
+> > 
+> > diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
+> > index bebff1d5acd4..d5b644f3e003 100644
+> > --- a/arch/x86/kvm/mmu/mmu.c
+> > +++ b/arch/x86/kvm/mmu/mmu.c
+> > @@ -2919,6 +2919,31 @@ static void direct_pte_prefetch(struct kvm_vcpu *vcpu, u64 *sptep)
+> >  	__direct_pte_prefetch(vcpu, sp, sptep);
+> >  }
+> >  
+> > +/*
+> > + * Lookup the mapping level for @gfn in the current mm.
+> > + *
+> > + * WARNING!  Use of host_pfn_mapping_level() requires the caller and the end
+> > + * consumer to be tied into KVM's handlers for MMU notifier events!
+> Since calling this function won't cause kernel crash now, I guess we can
+> remove the warning sign here, but keep the remaining statement since it
+> is necessary.
 
-Reviewed-by: Jason Gunthorpe <jgg@nvidia.com>
+Calling this function won't _directly_ crash the kernel, but improper usage can
+most definitely crash the host kernel, or even worse, silently corrupt host and
+or guest data.  E.g. if KVM were to race with an mmu_notifier event and incorrectly
+map a stale huge page into the guest.
 
-Jason
+So yes, the function itself is robust, but usage is still very subtle and delicate.
+
+> > + *
+> > + * There are several ways to safely use this helper:
+> > + *
+> > + * - Check mmu_notifier_retry_hva() after grabbing the mapping level, before
+> > + *   consuming it.  In this case, mmu_lock doesn't need to be held during the
+> > + *   lookup, but it does need to be held while checking the MMU notifier.
+> 
+> but it does need to be held while checking the MMU notifier and
+> consuming the result.
+
+I didn't want to include "consuming the result" because arguably the result is
+being consumed while running the guest, and obviously KVM doesn't hold mmu_lock
+while running the guest (though I fully acknowledge the above effectively uses
+"consume" in the sense of shoving the result into SPTEs).  
+
+> > + *
+> > + * - Hold mmu_lock AND ensure there is no in-progress MMU notifier invalidation
+> > + *   event for the hva.  This can be done by explicit checking the MMU notifier
+
+s/explicit/explicitly
+
+> > + *   or by ensuring that KVM already has a valid mapping that covers the hva.
+> 
+> Yes, more specifically, "mmu notifier sequence counter".
+
+Heh, depends on what the reader interprets as "sequence counter".  If the reader
+interprets that as the literal sequence counter, mmu_notifier_seq, then this phrasing
+is incorrect as mmu_notifier_seq isn't bumped until the invalidation completes,
+i.e. it guards against _past_ invalidations, not in-progress validations.
+
+My preference is to intentionally not be precise in describing how to check for an
+in-progress invalidation, e.g. so that this comment doesn't need to be updated if
+the details change, and to also to try and force developers to do more than copy
+and paste if they want to use this helper.
