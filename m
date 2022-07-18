@@ -2,103 +2,122 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 596075784D1
-	for <lists+kvm@lfdr.de>; Mon, 18 Jul 2022 16:08:04 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id E9A555784E7
+	for <lists+kvm@lfdr.de>; Mon, 18 Jul 2022 16:11:41 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234998AbiGROIC (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 18 Jul 2022 10:08:02 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34236 "EHLO
+        id S235219AbiGROLi (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 18 Jul 2022 10:11:38 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36772 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230107AbiGROIB (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 18 Jul 2022 10:08:01 -0400
-Received: from mx0a-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 41B0A25EBB
-        for <kvm@vger.kernel.org>; Mon, 18 Jul 2022 07:07:59 -0700 (PDT)
-Received: from pps.filterd (m0098420.ppops.net [127.0.0.1])
-        by mx0b-001b2d01.pphosted.com (8.17.1.5/8.17.1.5) with ESMTP id 26IDnkOt014332
-        for <kvm@vger.kernel.org>; Mon, 18 Jul 2022 14:07:58 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=content-type :
- mime-version : content-transfer-encoding : in-reply-to : references : cc :
- subject : to : from : message-id : date; s=pp1;
- bh=tbEjCrP/miHHj5iT1Ds1VUpIhoSD/wUkaV50JvIfeMQ=;
- b=bJCzgxCdFUspmIHgg31jUM/mmCG45w5ijzdPkbFdI8FU21c0B3l8xDFASxkaGg/DTJ3j
- HRw4eWEj5aOBiF8aIKG37qdAcJcooL9Y6pEhSfnLyjiHlWewwL81WzRwZ7mo2BbpXFgk
- u3R+vGP5mFWMxxGdKDLstkntEblQ15yAFqdMOPB+s6q08zTPsVxn9A9QjuDZOtbwDOmX
- Ao05xqIlQJctzu+Qw3+bOZNfnjJP2WAQCsW7GKEbpUYbhNqSuUpujn1gtPyoSu24Uk7k
- oHdM3maKh9iTSwIWBOuUEMXu3UMVqZ5JFXf59WiWH9XaDCZztrjNq/seYasCNVxzuk0i 1w== 
-Received: from ppma06ams.nl.ibm.com (66.31.33a9.ip4.static.sl-reverse.com [169.51.49.102])
-        by mx0b-001b2d01.pphosted.com (PPS) with ESMTPS id 3hd8r5rh31-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT)
-        for <kvm@vger.kernel.org>; Mon, 18 Jul 2022 14:07:58 +0000
-Received: from pps.filterd (ppma06ams.nl.ibm.com [127.0.0.1])
-        by ppma06ams.nl.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 26IE6VIX011502
-        for <kvm@vger.kernel.org>; Mon, 18 Jul 2022 14:07:56 GMT
-Received: from b06cxnps3074.portsmouth.uk.ibm.com (d06relay09.portsmouth.uk.ibm.com [9.149.109.194])
-        by ppma06ams.nl.ibm.com with ESMTP id 3hbmkj2pgt-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT)
-        for <kvm@vger.kernel.org>; Mon, 18 Jul 2022 14:07:56 +0000
-Received: from d06av23.portsmouth.uk.ibm.com (d06av23.portsmouth.uk.ibm.com [9.149.105.59])
-        by b06cxnps3074.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 26IE7r2I7274952
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Mon, 18 Jul 2022 14:07:53 GMT
-Received: from d06av23.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 51274A4053;
-        Mon, 18 Jul 2022 14:07:53 +0000 (GMT)
-Received: from d06av23.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 35ABBA4040;
-        Mon, 18 Jul 2022 14:07:53 +0000 (GMT)
-Received: from li-ca45c2cc-336f-11b2-a85c-c6e71de567f1.ibm.com (unknown [9.171.57.105])
-        by d06av23.portsmouth.uk.ibm.com (Postfix) with ESMTP;
-        Mon, 18 Jul 2022 14:07:53 +0000 (GMT)
+        with ESMTP id S235708AbiGROLh (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 18 Jul 2022 10:11:37 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 744DA275C1
+        for <kvm@vger.kernel.org>; Mon, 18 Jul 2022 07:11:36 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1658153495;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding;
+        bh=Vcb7EQNP7nmt18gfIk7EjblaRPAfBOgB5YIPuamopdk=;
+        b=P6LeF3xy/AR8U+qPK2zn8jA2WE0n/eL430TrlyWfryMyq9BJC5L8fvy9mJYjnikzH8PJma
+        HSX4P+p0fJ4MH6sK4llwSdZc161JFaB9iiPFHom4R5dX1/CPMtJk4heJg0JV+2yNH+P06w
+        SpsfjxTDRVpwO5ZMrRXgIPV5SDyp7kQ=
+Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
+ [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-665-HEpFr7HLMUadJh7iEE8vwg-1; Mon, 18 Jul 2022 10:11:32 -0400
+X-MC-Unique: HEpFr7HLMUadJh7iEE8vwg-1
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.rdu2.redhat.com [10.11.54.4])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 43E78801231;
+        Mon, 18 Jul 2022 14:11:30 +0000 (UTC)
+Received: from amdlaptop.tlv.redhat.com (dhcp-4-238.tlv.redhat.com [10.35.4.238])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id BD78B2026D64;
+        Mon, 18 Jul 2022 14:11:24 +0000 (UTC)
+From:   Maxim Levitsky <mlevitsk@redhat.com>
+To:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org
+Cc:     Pawan Gupta <pawan.kumar.gupta@linux.intel.com>,
+        Ingo Molnar <mingo@redhat.com>,
+        Josh Poimboeuf <jpoimboe@kernel.org>,
+        Namhyung Kim <namhyung@kernel.org>,
+        Tony Luck <tony.luck@intel.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        "H. Peter Anvin" <hpa@zytor.com>,
+        Arnaldo Carvalho de Melo <acme@kernel.org>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Alexander Shishkin <alexander.shishkin@linux.intel.com>,
+        Tim Chen <tim.c.chen@linux.intel.com>,
+        Borislav Petkov <bp@alien8.de>,
+        "David S. Miller" <davem@davemloft.net>,
+        Dave Hansen <dave.hansen@linux.intel.com>,
+        "Chang S. Bae" <chang.seok.bae@intel.com>,
+        Jane Malalane <jane.malalane@citrix.com>,
+        Kees Cook <keescook@chromium.org>,
+        Kan Liang <kan.liang@linux.intel.com>,
+        Peter Zijlstra <peterz@infradead.org>,
+        Maxim Levitsky <mlevitsk@redhat.com>,
+        x86@kernel.org (maintainer:X86 ARCHITECTURE (32-BIT AND 64-BIT)),
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        Jiri Olsa <jolsa@kernel.org>,
+        Mark Rutland <mark.rutland@arm.com>,
+        linux-perf-users@vger.kernel.org,
+        linux-crypto@vger.kernel.org (open list:CRYPTO API)
+Subject: [PATCH v2 0/5] x86: cpuid: improve support for broken CPUID configurations
+Date:   Mon, 18 Jul 2022 17:11:18 +0300
+Message-Id: <20220718141123.136106-1-mlevitsk@redhat.com>
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
-In-Reply-To: <9889f7f6-73ad-32f8-ade8-49886dd148a1@redhat.com>
-References: <20220704121328.721841-1-nrb@linux.ibm.com> <20220704121328.721841-5-nrb@linux.ibm.com> <9889f7f6-73ad-32f8-ade8-49886dd148a1@redhat.com>
-Cc:     frankja@linux.ibm.com, imbrenda@linux.ibm.com
-Subject: Re: [kvm-unit-tests PATCH v2 4/4] s390x: add pgm spec interrupt loop test
-To:     kvm@vger.kernel.org
-From:   Nico Boehr <nrb@linux.ibm.com>
-Message-ID: <165815327297.15145.11439604706465746290@localhost.localdomain>
-User-Agent: alot/0.8.1
-Date:   Mon, 18 Jul 2022 16:07:52 +0200
-X-TM-AS-GCONF: 00
-X-Proofpoint-ORIG-GUID: AGzTpzYJ3E3v2TQ2FisU6N0SNplDmQ25
-X-Proofpoint-GUID: AGzTpzYJ3E3v2TQ2FisU6N0SNplDmQ25
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.205,Aquarius:18.0.883,Hydra:6.0.517,FMLib:17.11.122.1
- definitions=2022-07-18_12,2022-07-18_01,2022-06-22_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 clxscore=1015 spamscore=0
- bulkscore=0 phishscore=0 impostorscore=0 adultscore=0 malwarescore=0
- lowpriorityscore=0 priorityscore=1501 mlxlogscore=574 suspectscore=0
- mlxscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2206140000 definitions=main-2207180058
-X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_EF,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_PASS
-        autolearn=ham autolearn_force=no version=3.4.6
+X-Scanned-By: MIMEDefang 2.78 on 10.11.54.4
+X-Spam-Status: No, score=-3.5 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,
+        SPF_HELO_NONE,SPF_NONE autolearn=unavailable autolearn_force=no
+        version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Quoting Thomas Huth (2022-07-11 14:54:57)
-[...]
-> > diff --git a/s390x/panic-loop-pgm.c b/s390x/panic-loop-pgm.c
-> > new file mode 100644
-> > index 000000000000..68934057a251
-> > --- /dev/null
-> > +++ b/s390x/panic-loop-pgm.c
-[...]
-> > +int main(void)
-> > +{
-> > +     report_prefix_push("panic-loop-pgm");
-> > +
-> > +     if (!host_is_qemu() || host_is_tcg()) {
->=20
-> Is TCG not able to detect the loop? ... if so, we should maybe fix QEMU?
+This patch series aims to harden the cpuid code against the case when=0D
+the hypervisor exposes a broken CPUID configuration to the guest,=0D
+in the form of having a feature disabled but not features that depend on it=
+.=0D
+=0D
+This is the more generic way to fix kernel panic in aes-ni kernel driver,=0D
+which was triggered by CPUID configuration in which AVX is disabled but=0D
+not AVX2.=0D
+=0D
+https://lore.kernel.org/all/20211103145231.GA4485@gondor.apana.org.au/T/=0D
+=0D
+This was tested by booting a guest with AVX disabled and not AVX2,=0D
+and observing that both a warning is now printed in dmesg, and=0D
+that avx2 is gone from /proc/cpuinfo.=0D
+=0D
+V2:=0D
+=0D
+I hopefully addressed all the (very good) review feedback.=0D
+=0D
+Best regards,=0D
+	Maxim Levitsky=0D
+=0D
+Maxim Levitsky (5):=0D
+  perf/x86/intel/lbr: use setup_clear_cpu_cap instead of clear_cpu_cap=0D
+  x86/cpuid: refactor setup_clear_cpu_cap()/clear_cpu_cap()=0D
+  x86/cpuid: move filter_cpuid_features to cpuid-deps.c=0D
+  x86/cpuid: remove 'warn' parameter from filter_cpuid_features=0D
+  x86/cpuid: check for dependencies violations in CPUID and attempt to=0D
+    fix them=0D
+=0D
+ arch/x86/events/intel/lbr.c       |  2 +-=0D
+ arch/x86/include/asm/cpufeature.h |  1 +=0D
+ arch/x86/kernel/cpu/common.c      | 51 +-------------------=0D
+ arch/x86/kernel/cpu/cpuid-deps.c  | 80 +++++++++++++++++++++++++++----=0D
+ 4 files changed, 74 insertions(+), 60 deletions(-)=0D
+=0D
+-- =0D
+2.34.3=0D
+=0D
 
-Sorry, Thomas, I seem to have missed your mail.
-
-Yes, TCG is not able to detect the PGM loop. Should I just go ahead and rem=
-ove the check so we at least know that there is something left to fix?
