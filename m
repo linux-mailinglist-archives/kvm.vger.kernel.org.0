@@ -2,108 +2,94 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 6B1825786A9
-	for <lists+kvm@lfdr.de>; Mon, 18 Jul 2022 17:47:46 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 3396D5786B0
+	for <lists+kvm@lfdr.de>; Mon, 18 Jul 2022 17:49:19 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233972AbiGRPro (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 18 Jul 2022 11:47:44 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57508 "EHLO
+        id S234763AbiGRPtR (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 18 Jul 2022 11:49:17 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58816 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229639AbiGRPrn (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 18 Jul 2022 11:47:43 -0400
-Received: from vps-vb.mhejs.net (vps-vb.mhejs.net [37.28.154.113])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 58CD32980C;
-        Mon, 18 Jul 2022 08:47:41 -0700 (PDT)
-Received: from MUA
-        by vps-vb.mhejs.net with esmtps  (TLS1.2) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-        (Exim 4.94.2)
-        (envelope-from <mail@maciej.szmigiero.name>)
-        id 1oDSxq-00049n-UZ; Mon, 18 Jul 2022 17:47:18 +0200
-From:   "Maciej S. Szmigiero" <mail@maciej.szmigiero.name>
-To:     Paolo Bonzini <pbonzini@redhat.com>,
-        Sean Christopherson <seanjc@google.com>
-Cc:     Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        Maxim Levitsky <mlevitsk@redhat.com>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-Subject: [PATCH] KVM: nSVM: Pull CS.Base from actual VMCB12 for soft int/ex re-injection
-Date:   Mon, 18 Jul 2022 17:47:13 +0200
-Message-Id: <4caa0f67589ae3c22c311ee0e6139496902f2edc.1658159083.git.maciej.szmigiero@oracle.com>
-X-Mailer: git-send-email 2.35.1
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,SPF_HELO_NONE,
-        SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
+        with ESMTP id S229639AbiGRPtP (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 18 Jul 2022 11:49:15 -0400
+Received: from mail-yw1-x114a.google.com (mail-yw1-x114a.google.com [IPv6:2607:f8b0:4864:20::114a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DA480265D
+        for <kvm@vger.kernel.org>; Mon, 18 Jul 2022 08:49:14 -0700 (PDT)
+Received: by mail-yw1-x114a.google.com with SMTP id 00721157ae682-31e0f1fa81fso43915047b3.17
+        for <kvm@vger.kernel.org>; Mon, 18 Jul 2022 08:49:14 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112;
+        h=date:message-id:mime-version:subject:from:to:cc;
+        bh=8hwXAbTV7Qa4wgHWw/mu6mOGF7/qMo3iMN2FISfVMjY=;
+        b=tDbu/3n2A7sX0LInLF6tQ2mZSs3mTOiAz4QgK4s4r7Fc3GLZoH8VInfZWm7NPNXzMA
+         xSYhoBx7dSyl5/U6tDUfmYKVDVfFwZ20vVWr4oSKwrOXnQl0yxnlK5v5ztb+T3uMxBhC
+         HZc+U45bxGDItNRDTapkcybXZxmfFM4Sn8NPuWszObhLyL5qJGKAhfJAJuBYIOboxE/Q
+         /SXu0XpAgSPU1Zi8fjFZ/p3u2/7h09X+G4MJF7+MfGMLvMpEN5O6/Mv/QSDl6vJ6wGl0
+         e4aukyv6SY+6N/qFj8PJiPPmWFIIW6AvnL9e/VANyuaqFAAxYWWvjf+UQ7V1CYQFZuAP
+         5Xbg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:date:message-id:mime-version:subject:from:to:cc;
+        bh=8hwXAbTV7Qa4wgHWw/mu6mOGF7/qMo3iMN2FISfVMjY=;
+        b=5IWGH1bp7BUUqik2L/adTtjpzv9Y1E/OANJE8Qf1Ni0bbiRpzBk0ezkLkIHTkbw1FQ
+         n6aK9ltsaQhdS8eab6XylsAMzv5e2ge6S3DJ+Igw2Jnp7sJI+JijvXl3e9XhiFrpJj8B
+         cY4TsNQ9jWlX01RgSN6VCWfJBdZ1si1hcbUR8S/wNThc0qHlo4gGxVRjG5cBiJPwM+MB
+         u7zu5t0I3slVRTJeS0J0TNT4ZbodaLnwDtR2SOapzp32r+ZigCrGOwfQVgkEmeh5RGT/
+         H1m2HvqeqS8knJ+goFdKDtw9K+8Ac0c5zt1/dYPvEMYz5vGSRmRUwF6pNGtXjqOufqz5
+         yf7g==
+X-Gm-Message-State: AJIora8Wvy/DNFgY3h/tcTOjEEqLnU5EyNfYOhGM0bN9furdGIm3H7q8
+        lmeyGnJj/eGVKawMdX6wkZ4swfeKpu7nHFyFStkGcZM2lsCug7V+56glE/AgWER3ex9Vvqet2Ij
+        XIbMeU6qjdv9+Gnud5kvClv0VwoFK7HgmbnBBryGwzxmihON52PuAlYqoycXXPa8=
+X-Google-Smtp-Source: AGRyM1vYCzHqQ4m9m06B9lipyzRO7s1S5GtcnbcPAzNt/vma4+jdr/NVmOw55dp+b6E8SRtUqkY7rsVys0SByQ==
+X-Received: from ricarkol2.c.googlers.com ([fda3:e722:ac3:cc00:24:72f4:c0a8:62fe])
+ (user=ricarkol job=sendgmr) by 2002:a81:1257:0:b0:31c:97fe:e416 with SMTP id
+ 84-20020a811257000000b0031c97fee416mr31830689yws.34.1658159354110; Mon, 18
+ Jul 2022 08:49:14 -0700 (PDT)
+Date:   Mon, 18 Jul 2022 08:49:07 -0700
+Message-Id: <20220718154910.3923412-1-ricarkol@google.com>
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.37.0.170.g444d1eabd0-goog
+Subject: [kvm-unit-tests PATCH 0/3] arm: pmu: Fixes for bare metal
+From:   Ricardo Koller <ricarkol@google.com>
+To:     kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu,
+        drjones@redhat.com
+Cc:     maz@kernel.org, alexandru.elisei@arm.com, eric.auger@redhat.com,
+        oliver.upton@linux.dev, reijiw@google.com,
+        Ricardo Koller <ricarkol@google.com>
+Content-Type: text/plain; charset="UTF-8"
+X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-From: "Maciej S. Szmigiero" <maciej.szmigiero@oracle.com>
+There are some tests that fail when running on bare metal (including a
+passthrough prototype).  There are three issues with the tests.  The
+first one is that there are some missing isb()'s between enabling event
+counting and the actual counting. This wasn't an issue on KVM as
+trapping on registers served as context synchronization events. The
+second issue is that some tests assume that registers reset to 0.  And
+finally, the third issue is that overflowing the low counter of a
+chained event sets the overflow flag in PMVOS and some tests fail by
+checking for it not being set.
 
-enter_svm_guest_mode() first calls nested_vmcb02_prepare_control() to copy
-control fields from VMCB12 to the current VMCB, then
-nested_vmcb02_prepare_save() to perform a similar copy of the save area.
+I believe the third fix also requires a KVM change, but would like to
+double check with others first.  The only reference I could find in the
+ARM ARM is the AArch64.IncrementEventCounter() pseudocode (DDI 0487H.a,
+J1.1.1 "aarch64/debug") that unconditionally sets the PMOVS bit on
+overflow.
 
-This means that nested_vmcb02_prepare_control() still runs with the
-previous save area values in the current VMCB so it shouldn't take the L2
-guest CS.Base from this area.
+Ricardo Koller (3):
+  arm: pmu: Add missing isb()'s after sys register writing
+  arm: pmu: Reset the pmu registers before starting some tests
+  arm: pmu: Remove checks for !overflow in chained counters tests
 
-Explicitly pull CS.Base from the actual VMCB12 instead in
-enter_svm_guest_mode().
+ arm/pmu.c | 34 +++++++++++++++++++++++-----------
+ 1 file changed, 23 insertions(+), 11 deletions(-)
 
-Granted, having a non-zero CS.Base is a very rare thing (and even
-impossible in 64-bit mode), having it change between nested VMRUNs is
-probably even rarer, but if it happens it would create a really subtle bug
-so it's better to fix it upfront.
+-- 
+2.37.0.170.g444d1eabd0-goog
 
-Fixes: 6ef88d6e36c2 ("KVM: SVM: Re-inject INT3/INTO instead of retrying the instruction")
-Signed-off-by: Maciej S. Szmigiero <maciej.szmigiero@oracle.com>
----
- arch/x86/kvm/svm/nested.c | 9 +++++----
- 1 file changed, 5 insertions(+), 4 deletions(-)
-
-diff --git a/arch/x86/kvm/svm/nested.c b/arch/x86/kvm/svm/nested.c
-index adf4120b05d90..23252ab821941 100644
---- a/arch/x86/kvm/svm/nested.c
-+++ b/arch/x86/kvm/svm/nested.c
-@@ -639,7 +639,8 @@ static bool is_evtinj_nmi(u32 evtinj)
- }
- 
- static void nested_vmcb02_prepare_control(struct vcpu_svm *svm,
--					  unsigned long vmcb12_rip)
-+					  unsigned long vmcb12_rip,
-+					  unsigned long vmcb12_csbase)
- {
- 	u32 int_ctl_vmcb01_bits = V_INTR_MASKING_MASK;
- 	u32 int_ctl_vmcb12_bits = V_TPR_MASK | V_IRQ_INJECTION_BITS_MASK;
-@@ -711,7 +712,7 @@ static void nested_vmcb02_prepare_control(struct vcpu_svm *svm,
- 	svm->nmi_l1_to_l2 = is_evtinj_nmi(vmcb02->control.event_inj);
- 	if (is_evtinj_soft(vmcb02->control.event_inj)) {
- 		svm->soft_int_injected = true;
--		svm->soft_int_csbase = svm->vmcb->save.cs.base;
-+		svm->soft_int_csbase = vmcb12_csbase;
- 		svm->soft_int_old_rip = vmcb12_rip;
- 		if (svm->nrips_enabled)
- 			svm->soft_int_next_rip = svm->nested.ctl.next_rip;
-@@ -800,7 +801,7 @@ int enter_svm_guest_mode(struct kvm_vcpu *vcpu, u64 vmcb12_gpa,
- 	nested_svm_copy_common_state(svm->vmcb01.ptr, svm->nested.vmcb02.ptr);
- 
- 	svm_switch_vmcb(svm, &svm->nested.vmcb02);
--	nested_vmcb02_prepare_control(svm, vmcb12->save.rip);
-+	nested_vmcb02_prepare_control(svm, vmcb12->save.rip, vmcb12->save.cs.base);
- 	nested_vmcb02_prepare_save(svm, vmcb12);
- 
- 	ret = nested_svm_load_cr3(&svm->vcpu, svm->nested.save.cr3,
-@@ -1663,7 +1664,7 @@ static int svm_set_nested_state(struct kvm_vcpu *vcpu,
- 	nested_copy_vmcb_control_to_cache(svm, ctl);
- 
- 	svm_switch_vmcb(svm, &svm->nested.vmcb02);
--	nested_vmcb02_prepare_control(svm, svm->vmcb->save.rip);
-+	nested_vmcb02_prepare_control(svm, svm->vmcb->save.rip, svm->vmcb->save.cs.base);
- 
- 	/*
- 	 * While the nested guest CR3 is already checked and set by
