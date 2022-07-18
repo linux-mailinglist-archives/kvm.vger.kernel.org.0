@@ -2,151 +2,154 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 52CCD5787C8
-	for <lists+kvm@lfdr.de>; Mon, 18 Jul 2022 18:50:31 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id CC719578807
+	for <lists+kvm@lfdr.de>; Mon, 18 Jul 2022 19:05:47 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233789AbiGRQu0 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 18 Jul 2022 12:50:26 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45776 "EHLO
+        id S235687AbiGRRFq (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 18 Jul 2022 13:05:46 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57212 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231821AbiGRQuX (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 18 Jul 2022 12:50:23 -0400
-Received: from mail-pl1-x633.google.com (mail-pl1-x633.google.com [IPv6:2607:f8b0:4864:20::633])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 94B16E08E
-        for <kvm@vger.kernel.org>; Mon, 18 Jul 2022 09:50:21 -0700 (PDT)
-Received: by mail-pl1-x633.google.com with SMTP id 5so9539246plk.9
-        for <kvm@vger.kernel.org>; Mon, 18 Jul 2022 09:50:21 -0700 (PDT)
+        with ESMTP id S235625AbiGRRFp (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 18 Jul 2022 13:05:45 -0400
+Received: from mail-pf1-x432.google.com (mail-pf1-x432.google.com [IPv6:2607:f8b0:4864:20::432])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 30FC62B622
+        for <kvm@vger.kernel.org>; Mon, 18 Jul 2022 10:05:44 -0700 (PDT)
+Received: by mail-pf1-x432.google.com with SMTP id b9so11179385pfp.10
+        for <kvm@vger.kernel.org>; Mon, 18 Jul 2022 10:05:44 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=xbz9zNJ4kudtBf4HleF/yHu6MPshPQFfqoJeR3sCNGk=;
-        b=pIJd3Rwn4OsqgMkQsd/bkmHGfMyZspMyiAOd14uUTppNPZ2se0sG5bX1psOR5cPqnk
-         bxbdl+zj9dDCNCReWjeZ5dReNQ08Gzy4tZwcqezsQOB1ABYcgOo2Xig5BHxO10/xpT/g
-         ovXE+65resESh+wZlHPMAumZ5sCDQia67KIHmp7zX25uRJkk3huy1Wd9Z21YWmG+i2j9
-         lfKAafpGO4z76Djs1J2bsLbFSTihsR11QLFcwdhM1HK8x3ZgcqnZsY1yoT7mpLn6NscT
-         RZyI5K4yjdcnRMzQ3UXh0xSd9t4CT7uvWRGVaf70IoaWdW/zFXhPdWUoUww5unOGVF2a
-         e+ig==
+        d=rivosinc-com.20210112.gappssmtp.com; s=20210112;
+        h=from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=CGesJ3xfjvEZZZT4415xoctAQUbMYAHu9Vlt5BYorCE=;
+        b=5JFtYGglR01I9DhQBYCwoYAMeOZTQ5L8KPmhPGIJtyk5rPeYbL3lmjLJsSbb84p7uH
+         NNS434TKXVpsr10GmlK9T3Z57kMKBnRmYmC3RQ7etjgeeoGxZrfyeK8pexveK+5N1GOx
+         GIe8eJafDVIRnMXuS2j5QcA92rrI0+7uI387VUsYMNRW3zIJedYiPPzwTlk8uH7x0RhM
+         TuDiDsc8jvK3gz191+wq+q6khGXydS2lBedj0NvL1gTMN0vWumOn7hfcv7bAsv7uTHoz
+         AQpvXVxFPnNxDCMIOoNVnf6r+YTqCpUro5bxYrH6KGilcyXIAtvAHifx/QmJpX2/QgKV
+         Id5w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=xbz9zNJ4kudtBf4HleF/yHu6MPshPQFfqoJeR3sCNGk=;
-        b=XoWXRExxhna//8iO8EOslPYxRyi/C6dFhTyZO/W9cWJVyjYRZOeWMo9PaZIaFFB1xj
-         /wGZM4etmpMzD4gx9od4C+IoQkmLR27GS77MEW1gFpj2mC+QHFB2f0kc3HjZKCf0JjId
-         P2XQnlU6vG+ZeI52lHVNqI3GwPydoBEQz2m5oepmGGaaGR0e3Wg3T/jryorE+X2COAJ9
-         utbX98Bexvl638540U8XKyL0mGvlIO1wnhU2PvZd4zlxmzDr6z6KD2T1IPV6vwfmHnBB
-         Nw/Gg2fQsTJDrJn+PWBtVENMX4gne4/KKXnqKFB6WKIHWIfMSiEfpkBMdbMAPCyNPJWx
-         c7mw==
-X-Gm-Message-State: AJIora/DYwuvKmQzSG9nu55a58nxmOFoTCuDhQ/YnV6kBZa8yxo7Nx5X
-        4O37Qlj0mV2QJqI2KGnYZG+DQA==
-X-Google-Smtp-Source: AGRyM1vl7YFDCbAwvvfalJOgfG+z5WlR/ZoOFjk4UTf7LkgcuSQbI2ibhatxCL/NtG24+yabrzs8Kg==
-X-Received: by 2002:a17:902:e746:b0:16c:3ffd:61fb with SMTP id p6-20020a170902e74600b0016c3ffd61fbmr29139404plf.123.1658163020887;
-        Mon, 18 Jul 2022 09:50:20 -0700 (PDT)
-Received: from google.com (123.65.230.35.bc.googleusercontent.com. [35.230.65.123])
-        by smtp.gmail.com with ESMTPSA id k6-20020aa79986000000b00528c22038f5sm9895204pfh.14.2022.07.18.09.50.20
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=CGesJ3xfjvEZZZT4415xoctAQUbMYAHu9Vlt5BYorCE=;
+        b=xREMNDLFz+20UkQMa/i8wikV/bxyKO0EONnMwfDvmGlISmHzVlAlajI5Jzpt0IgEg4
+         jDvO2bvIf4rXzD7xM75x10NptCK4sc/Exciv6Bb4TnDRBk3i8RdXGcwUDBoWN2hpYwRP
+         cmAsRAa2pp/+PyEoxBAh4drat9Qwn0QgEqv2kmwJtfMIiLkvOMmxvE54wkpXpo8M8By/
+         ciblFX/xoiOSY4llbD0MIoIUOgUkV3QOVslTh9h6AmxoIvuJ54pYoO3GJqVBLzdbCDmy
+         uzpn2QHRXzCYhN4vtPHbZ/Ng8jr7WxDuq1csM8g+XmcMnZ7yZnGYWG+6MhpJsTwW66tb
+         qBUA==
+X-Gm-Message-State: AJIora+ITO28GqmxljOFdnNy+U1wNL75Ltq5kwPcscY8rd8mfBOETFAk
+        3+vZnzqnDkLatEIcbX11ww6jQA==
+X-Google-Smtp-Source: AGRyM1sZUAbOKv1l9BvJXO4uJ53bhkJoChfrjodGKmMwMpV0cMcmUqURMqfDyGhsUsFAGT0TeFFbgg==
+X-Received: by 2002:a65:4906:0:b0:40d:dd28:448a with SMTP id p6-20020a654906000000b0040ddd28448amr24126209pgs.567.1658163943502;
+        Mon, 18 Jul 2022 10:05:43 -0700 (PDT)
+Received: from atishp.ba.rivosinc.com ([66.220.2.162])
+        by smtp.gmail.com with ESMTPSA id r10-20020a170902be0a00b0016bc947c5b7sm9733402pls.38.2022.07.18.10.05.41
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 18 Jul 2022 09:50:20 -0700 (PDT)
-Date:   Mon, 18 Jul 2022 16:50:16 +0000
-From:   Sean Christopherson <seanjc@google.com>
-To:     Mingwei Zhang <mizhang@google.com>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-Subject: Re: [PATCH 2/4] KVM: x86/mmu: Document the "rules" for using
- host_pfn_mapping_level()
-Message-ID: <YtWPSILmAp/0m5eC@google.com>
-References: <20220715232107.3775620-1-seanjc@google.com>
- <20220715232107.3775620-3-seanjc@google.com>
- <YtMIvgfsgIPWMgGM@google.com>
+        Mon, 18 Jul 2022 10:05:42 -0700 (PDT)
+From:   Atish Patra <atishp@rivosinc.com>
+To:     linux-kernel@vger.kernel.org
+Cc:     Atish Patra <atishp@rivosinc.com>,
+        Albert Ou <aou@eecs.berkeley.edu>,
+        Anup Patel <anup@brainfault.org>,
+        Atish Patra <atishp@atishpatra.org>,
+        Guo Ren <guoren@kernel.org>, kvm-riscv@lists.infradead.org,
+        kvm@vger.kernel.org, linux-riscv@lists.infradead.org,
+        Mark Rutland <mark.rutland@arm.com>,
+        Palmer Dabbelt <palmer@dabbelt.com>,
+        Paul Walmsley <paul.walmsley@sifive.com>,
+        Will Deacon <will@kernel.org>
+Subject: [RFC  0/9] KVM perf support 
+Date:   Mon, 18 Jul 2022 10:01:56 -0700
+Message-Id: <20220718170205.2972215-1-atishp@rivosinc.com>
+X-Mailer: git-send-email 2.25.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <YtMIvgfsgIPWMgGM@google.com>
-X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-        USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=unavailable
-        autolearn_force=no version=3.4.6
+Content-Transfer-Encoding: 8bit
+X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS
+        autolearn=unavailable autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Sat, Jul 16, 2022, Mingwei Zhang wrote:
-> On Fri, Jul 15, 2022, Sean Christopherson wrote:
-> > Add a comment to document how host_pfn_mapping_level() can be used safely,
-> > as the line between safe and dangerous is quite thin.  E.g. if KVM were
-> > to ever support in-place promotion to create huge pages, consuming the
-> > level is safe if the caller holds mmu_lock and checks that there's an
-> > existing _leaf_ SPTE, but unsafe if the caller only checks that there's a
-> > non-leaf SPTE.
-> > 
-> > Opportunistically tweak the existing comments to explicitly document why
-> > KVM needs to use READ_ONCE().
-> > 
-> > No functional change intended.
-> > 
-> > Signed-off-by: Sean Christopherson <seanjc@google.com>
-> > ---
-> >  arch/x86/kvm/mmu/mmu.c | 42 +++++++++++++++++++++++++++++++++++-------
-> >  1 file changed, 35 insertions(+), 7 deletions(-)
-> > 
-> > diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
-> > index bebff1d5acd4..d5b644f3e003 100644
-> > --- a/arch/x86/kvm/mmu/mmu.c
-> > +++ b/arch/x86/kvm/mmu/mmu.c
-> > @@ -2919,6 +2919,31 @@ static void direct_pte_prefetch(struct kvm_vcpu *vcpu, u64 *sptep)
-> >  	__direct_pte_prefetch(vcpu, sp, sptep);
-> >  }
-> >  
-> > +/*
-> > + * Lookup the mapping level for @gfn in the current mm.
-> > + *
-> > + * WARNING!  Use of host_pfn_mapping_level() requires the caller and the end
-> > + * consumer to be tied into KVM's handlers for MMU notifier events!
-> Since calling this function won't cause kernel crash now, I guess we can
-> remove the warning sign here, but keep the remaining statement since it
-> is necessary.
+This series extends perf support for KVM. The KVM implementation relies
+on the SBI PMU extension and trap n emulation of hpmcounter CSRs.
+The KVM implementation exposes the virtual counters to the guest and internally
+manage the counters using kernel perf counters. 
 
-Calling this function won't _directly_ crash the kernel, but improper usage can
-most definitely crash the host kernel, or even worse, silently corrupt host and
-or guest data.  E.g. if KVM were to race with an mmu_notifier event and incorrectly
-map a stale huge page into the guest.
+This series doesn't support the counter overflow as the Sscofpmf extension
+doesn't allow trap & emulation mechanism of scountovf CSR yet. The required
+changes to allow that are being under discussions. Supporting overflow interrupt
+also requires AIA support which is not frozen either.
 
-So yes, the function itself is robust, but usage is still very subtle and delicate.
+This series can be found at github[1] as well. It depends Anup's CSR emulation
+framework[1] series.
 
-> > + *
-> > + * There are several ways to safely use this helper:
-> > + *
-> > + * - Check mmu_notifier_retry_hva() after grabbing the mapping level, before
-> > + *   consuming it.  In this case, mmu_lock doesn't need to be held during the
-> > + *   lookup, but it does need to be held while checking the MMU notifier.
-> 
-> but it does need to be held while checking the MMU notifier and
-> consuming the result.
+perf stat works in kvm guests with this series. 
 
-I didn't want to include "consuming the result" because arguably the result is
-being consumed while running the guest, and obviously KVM doesn't hold mmu_lock
-while running the guest (though I fully acknowledge the above effectively uses
-"consume" in the sense of shoving the result into SPTEs).  
+Here is example of running perf stat in a guest running in KVM.
+===========================================================================
+/ # /host/apps/perf stat -e instructions -e cycles -e r8000000000000005 \
+> -e r8000000000000006 -e r8000000000000007 -e r8000000000000008 \
+> -e r800000000000000a perf bench sched messaging -g 5 -l 15
+# Running 'sched/messaging' benchmark:
+# 20 sender and receiver processes per group
+# 5 groups == 200 processes run
 
-> > + *
-> > + * - Hold mmu_lock AND ensure there is no in-progress MMU notifier invalidation
-> > + *   event for the hva.  This can be done by explicit checking the MMU notifier
+     Total time: 5.210 [sec] 
 
-s/explicit/explicitly
+ Performance counter stats for 'perf bench sched messaging -g 5 -l 15':
 
-> > + *   or by ensuring that KVM already has a valid mapping that covers the hva.
-> 
-> Yes, more specifically, "mmu notifier sequence counter".
+       37209585734      instructions              #    1.00  insn per cycle
+       37177435570      cycles 
+              2740      r8000000000000005
+              3727      r8000000000000006
+              3655      r8000000000000007
+                10      r8000000000000008
+                 0      r800000000000000a
 
-Heh, depends on what the reader interprets as "sequence counter".  If the reader
-interprets that as the literal sequence counter, mmu_notifier_seq, then this phrasing
-is incorrect as mmu_notifier_seq isn't bumped until the invalidation completes,
-i.e. it guards against _past_ invalidations, not in-progress validations.
+       5.863014800 seconds time elapsed
 
-My preference is to intentionally not be precise in describing how to check for an
-in-progress invalidation, e.g. so that this comment doesn't need to be updated if
-the details change, and to also to try and force developers to do more than copy
-and paste if they want to use this helper.
+       0.569373000 seconds user
+      10.771533000 seconds sys 
+
+[1] https://github.com/atishp04/linux/tree/kvm_perf_rfc
+[2] https://lkml.org/lkml/2022/6/15/389
+
+Atish Patra (9):
+RISC-V: Define a helper function to probe number of hardware counters
+RISC-V: Define a helper function to return counter width
+RISC-V: KVM: Define a probe function for SBI extension data structures
+RISC-V: KVM: Improve privilege mode filtering for perf
+RISC-V: KVM: Add skeleton support for perf
+RISC-V: KVM: Add SBI PMU extension support
+RISC-V: KVM: Implement trap & emulate for hpmcounters
+RISC-V: KVM: Implement perf support
+RISC-V: KVM: Implement firmware events
+
+arch/riscv/include/asm/kvm_host.h     |   3 +
+arch/riscv/include/asm/kvm_vcpu_pmu.h | 102 +++++
+arch/riscv/include/asm/kvm_vcpu_sbi.h |   3 +
+arch/riscv/include/asm/sbi.h          |   2 +-
+arch/riscv/kvm/Makefile               |   1 +
+arch/riscv/kvm/main.c                 |   3 +-
+arch/riscv/kvm/tlb.c                  |   6 +-
+arch/riscv/kvm/vcpu.c                 |   5 +
+arch/riscv/kvm/vcpu_insn.c            |   4 +-
+arch/riscv/kvm/vcpu_pmu.c             | 517 ++++++++++++++++++++++++++
+arch/riscv/kvm/vcpu_sbi.c             |  11 +
+arch/riscv/kvm/vcpu_sbi_base.c        |  13 +-
+arch/riscv/kvm/vcpu_sbi_pmu.c         |  81 ++++
+arch/riscv/kvm/vcpu_sbi_replace.c     |   7 +
+drivers/perf/riscv_pmu_sbi.c          |  75 +++-
+include/linux/perf/riscv_pmu.h        |   7 +
+16 files changed, 823 insertions(+), 17 deletions(-)
+create mode 100644 arch/riscv/include/asm/kvm_vcpu_pmu.h
+create mode 100644 arch/riscv/kvm/vcpu_pmu.c
+create mode 100644 arch/riscv/kvm/vcpu_sbi_pmu.c
+
+--
+2.25.1
+
