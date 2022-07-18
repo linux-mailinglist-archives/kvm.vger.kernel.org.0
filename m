@@ -2,169 +2,110 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id AA977577ECC
-	for <lists+kvm@lfdr.de>; Mon, 18 Jul 2022 11:39:10 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 2F866577EDB
+	for <lists+kvm@lfdr.de>; Mon, 18 Jul 2022 11:43:04 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234040AbiGRJjC (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 18 Jul 2022 05:39:02 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33158 "EHLO
+        id S233921AbiGRJnC (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 18 Jul 2022 05:43:02 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35720 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234187AbiGRJiy (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 18 Jul 2022 05:38:54 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 6AA32CD2
-        for <kvm@vger.kernel.org>; Mon, 18 Jul 2022 02:38:53 -0700 (PDT)
+        with ESMTP id S234195AbiGRJnB (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 18 Jul 2022 05:43:01 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 244EE1AD8E
+        for <kvm@vger.kernel.org>; Mon, 18 Jul 2022 02:43:00 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1658137132;
+        s=mimecast20190719; t=1658137379;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=vesu0j3GgIPn4qpg1moBWzyKr7iHeM8IBkd+1mNy3is=;
-        b=NFxAc7/8/7l+reQtlkhbrp1TmbI29tMWybgwZrElv1h3LifIeELZ9oYg9mu8mWa2aMsDRq
-        EMh0P2+J23FODp36NOM5Fihvx6GlsZjkY6JmhUssqgsC5ABAITDyI1F6QWgW8nFnQImk+/
-        7XLHg1W2LzGoGS5ADmy+U7tH5fckM6I=
-Received: from mail-qv1-f72.google.com (mail-qv1-f72.google.com
- [209.85.219.72]) by relay.mimecast.com with ESMTP with STARTTLS
+        bh=uXsawOufScCM/h/0STmUHv9PQWBiZyHK6GMTOKvjTFs=;
+        b=EWo5fFvSdhcEdOWTlvMQ+lTGgVAD1hR1O8VeDpBuy1GngC+9AYjIEOKK3yjZQJTvKRTdXm
+        LjEz7ByiAL++GPGavzBYwGnEEOdjuYS3OXXcxGwLietedrvDOfYfEK2LQXr7BzeR5ryr8N
+        jFaiV/JmtOX0Mew9HSjLPAY3dMnmrCw=
+Received: from mail-qk1-f197.google.com (mail-qk1-f197.google.com
+ [209.85.222.197]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-479-SYKYS1x6PaCMwV_PuCNHpA-1; Mon, 18 Jul 2022 05:38:51 -0400
-X-MC-Unique: SYKYS1x6PaCMwV_PuCNHpA-1
-Received: by mail-qv1-f72.google.com with SMTP id lp7-20020a056214590700b004733d9feaf6so5161785qvb.0
-        for <kvm@vger.kernel.org>; Mon, 18 Jul 2022 02:38:51 -0700 (PDT)
+ us-mta-322-Z6YqmkyqONOwKmv5kRHsUQ-1; Mon, 18 Jul 2022 05:42:57 -0400
+X-MC-Unique: Z6YqmkyqONOwKmv5kRHsUQ-1
+Received: by mail-qk1-f197.google.com with SMTP id l189-20020a37bbc6000000b006af2596c5e8so9085817qkf.14
+        for <kvm@vger.kernel.org>; Mon, 18 Jul 2022 02:42:57 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:message-id:subject:from:to:cc:date:in-reply-to
          :references:user-agent:mime-version:content-transfer-encoding;
-        bh=vesu0j3GgIPn4qpg1moBWzyKr7iHeM8IBkd+1mNy3is=;
-        b=bi9DBglNa3K3TJaTsG5egHYZs0K+t4gG1TsqujNci1qTNLO+71z/bPbfCUUojOjPHp
-         ZvIVaF0njb2z3lnUO/7IDo65rjH0FxomC5tsGPjiB9KCPQVqCi+aTpRHGOwh2cda6iu6
-         SrQKyWQ7VSQzZgXUQNadsKRXFSVAulUsZn+CEsO3mk+VZ9fqFygrpEmba7Q10GAs3zve
-         BgDQynV0EAYcdd38m4Snncf2jG4IiDnzKdQ6heCQGL7Hd8+g7j6oKl34TApiDeqlEZsp
-         TezSJH+pNbfnP0iHdG6D5CVTzIvv7cqfTwtusuksYCYJCv5fAnf6jvjxseNgoQ9w+U2c
-         ggpw==
-X-Gm-Message-State: AJIora8ezid0E/utN7cjix9XRp1g+H96OvsZt8xwDM1cmaZ/5+ImCADX
-        MEaIoGodbH5eLAMrpDtDv0jrXq7PwzecLjbKSKcfoit5lDRxlH0124KUD9ebCEAO3nBxfc9qhMM
-        sJWM2i2Jj9G2c
-X-Received: by 2002:a05:622a:1ba5:b0:317:c65b:3ad1 with SMTP id bp37-20020a05622a1ba500b00317c65b3ad1mr20254889qtb.117.1658137130670;
-        Mon, 18 Jul 2022 02:38:50 -0700 (PDT)
-X-Google-Smtp-Source: AGRyM1szlag+Xp7/MglHwkYYNaZi7HYohrB3NdOzDA5n47yDL9epjySsY+PhWR7bJWfXCb38wM3Yhw==
-X-Received: by 2002:a05:622a:1ba5:b0:317:c65b:3ad1 with SMTP id bp37-20020a05622a1ba500b00317c65b3ad1mr20254883qtb.117.1658137130479;
-        Mon, 18 Jul 2022 02:38:50 -0700 (PDT)
+        bh=uXsawOufScCM/h/0STmUHv9PQWBiZyHK6GMTOKvjTFs=;
+        b=5SjH2uimv7x0NbPpLZ2C6a4w9Y2yH1eDZTg37EEImg9IhMAzF4iAS5nLeCI87oEY9H
+         qolH7/+zX4z2WHg9Q9C7Gh1PlGPdfxez62GQaliCMDYFVafiJUyrjlpHVu79O2ToQUSq
+         lAjxtRY099GFlrrQzWO/lSheEhOus9w8JZyvC6NAOzKhAcglkjqcfcKEqfkuqqS3W0hn
+         yI62RGH5Vpklg3VRqUfkOSV/2DFQ/23VTAl3GKvAR3aqqwS/VRIvPehq9Aue8H4eIY4n
+         +4ofn6OPESFgYTOxRnzSODmn3bnFlIdhrtl5YewngN+jA52FBsF1Ho5ua84MJh31WOO2
+         jNEw==
+X-Gm-Message-State: AJIora/LVAX9KKoWKRePFZiBlXAS4iNRowabtVWnuiLStsqP25fu+Vjr
+        F77rd0wHodNZ/jnt/yYDvN7G2KS32U7rHhA4rJ+Xm8y11TV/6j+VDLrxVt16RukCELrbA6OaUE3
+        Mh3zmJiTZfCHw
+X-Received: by 2002:a0c:e151:0:b0:472:ed70:5f8 with SMTP id c17-20020a0ce151000000b00472ed7005f8mr19933380qvl.99.1658137377286;
+        Mon, 18 Jul 2022 02:42:57 -0700 (PDT)
+X-Google-Smtp-Source: AGRyM1sxVWRgOCtS+n9Y8O3vdTv9h5Ggs4r1AGyAzDVkKxjpFYANErewut5frVji6Q1WuW63r0aXfA==
+X-Received: by 2002:a0c:e151:0:b0:472:ed70:5f8 with SMTP id c17-20020a0ce151000000b00472ed7005f8mr19933370qvl.99.1658137377073;
+        Mon, 18 Jul 2022 02:42:57 -0700 (PDT)
 Received: from [10.35.4.238] (bzq-82-81-161-50.red.bezeqint.net. [82.81.161.50])
-        by smtp.gmail.com with ESMTPSA id q13-20020a05620a2a4d00b006b5763bffebsm10485498qkp.34.2022.07.18.02.38.48
+        by smtp.gmail.com with ESMTPSA id bt14-20020ac8690e000000b0031ef0081d77sm1837434qtb.79.2022.07.18.02.42.55
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 18 Jul 2022 02:38:49 -0700 (PDT)
-Message-ID: <71585b6bfd584bf01b09d898c5702a8ab54b5308.camel@redhat.com>
-Subject: Re: [PATCH] KVM: SVM: Fix x2APIC MSRs interception
+        Mon, 18 Jul 2022 02:42:56 -0700 (PDT)
+Message-ID: <298d3c2601b13bf45044e92af02a28d5440e944f.camel@redhat.com>
+Subject: Re: [PATCH 1/4] KVM: x86: Reject loading KVM if host.PAT[0] != WB
 From:   Maxim Levitsky <mlevitsk@redhat.com>
-To:     Suravee Suthikulpanit <suravee.suthikulpanit@amd.com>,
-        linux-kernel@vger.kernel.org, kvm@vger.kernel.org
-Cc:     pbonzini@redhat.com, seanjc@google.com, jon.grimm@amd.com
-Date:   Mon, 18 Jul 2022 12:38:47 +0300
-In-Reply-To: <20220718083833.222117-1-suravee.suthikulpanit@amd.com>
-References: <20220718083833.222117-1-suravee.suthikulpanit@amd.com>
+To:     Sean Christopherson <seanjc@google.com>,
+        Jim Mattson <jmattson@google.com>
+Cc:     Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+Date:   Mon, 18 Jul 2022 12:42:52 +0300
+In-Reply-To: <YtH1q3C4F+LAEDTf@google.com>
+References: <20220715230016.3762909-1-seanjc@google.com>
+         <20220715230016.3762909-2-seanjc@google.com>
+         <CALMp9eQdzZK4ZAyQZXUWff_zuRRdr=ugkujWfFrt9dP8uFcs=Q@mail.gmail.com>
+         <YtH1q3C4F+LAEDTf@google.com>
 Content-Type: text/plain; charset="UTF-8"
 User-Agent: Evolution 3.40.4 (3.40.4-5.fc34) 
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-3.5 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,
-        SPF_HELO_NONE,SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
+X-Spam-Status: No, score=-2.8 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        SPF_HELO_NONE,SPF_NONE autolearn=unavailable autolearn_force=no
+        version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, 2022-07-18 at 03:38 -0500, Suravee Suthikulpanit wrote:
-> The index for svm_direct_access_msrs was incorrectly initialized with
-> the APIC MMIO register macros. Fix by introducing a macro for calculating
-> x2APIC MSRs.
+On Fri, 2022-07-15 at 23:18 +0000, Sean Christopherson wrote:
+> On Fri, Jul 15, 2022, Jim Mattson wrote:
+> > On Fri, Jul 15, 2022 at 4:02 PM Sean Christopherson <seanjc@google.com> wrote:
+> > > 
+> > > Reject KVM if entry '0' in the host's IA32_PAT MSR is not programmed to
+> > > writeback (WB) memtype.  KVM subtly relies on IA32_PAT entry '0' to be
+> > > programmed to WB by leaving the PAT bits in shadow paging and NPT SPTEs
+> > > as '0'.  If something other than WB is in PAT[0], at _best_ guests will
+> > > suffer very poor performance, and at worst KVM will crash the system by
+> > > breaking cache-coherency expecations (e.g. using WC for guest memory).
+> > > 
+> > > Signed-off-by: Sean Christopherson <seanjc@google.com>
+> > > ---
+> > What if someone changes the host's PAT to violate this rule *after*
+> > kvm is loaded?
 > 
-> Fixes: 5c127c85472c ("KVM: SVM: Adding support for configuring x2APIC MSRs interception")
-> Cc: Maxim Levitsky <mlevitsk@redhat.com>
-> Signed-off-by: Suravee Suthikulpanit <suravee.suthikulpanit@amd.com>
-> ---
->  arch/x86/kvm/svm/svm.c | 52 ++++++++++++++++++++++--------------------
->  1 file changed, 27 insertions(+), 25 deletions(-)
+> Then KVM (and probably many other things in the kernel) is hosed.  The same argument
+> (that KVM isn't paranoid enough) can likely be made for a number of MSRs and critical
+> registers.
 > 
-> diff --git a/arch/x86/kvm/svm/svm.c b/arch/x86/kvm/svm/svm.c
-> index ba81a7e58f75..aef63aae922d 100644
-> --- a/arch/x86/kvm/svm/svm.c
-> +++ b/arch/x86/kvm/svm/svm.c
-> @@ -74,6 +74,8 @@ static uint64_t osvw_len = 4, osvw_status;
->  
->  static DEFINE_PER_CPU(u64, current_tsc_ratio);
->  
-> +#define X2APIC_MSR(x)  (APIC_BASE_MSR + (x >> 4))
-> +
->  static const struct svm_direct_access_msrs {
->         u32 index;   /* Index of the MSR */
->         bool always; /* True if intercept is initially cleared */
-> @@ -100,31 +102,31 @@ static const struct svm_direct_access_msrs {
->         { .index = MSR_IA32_CR_PAT,                     .always = false },
->         { .index = MSR_AMD64_SEV_ES_GHCB,               .always = true  },
->         { .index = MSR_TSC_AUX,                         .always = false },
-> -       { .index = (APIC_BASE_MSR + APIC_ID),           .always = false },
-> -       { .index = (APIC_BASE_MSR + APIC_LVR),          .always = false },
-> -       { .index = (APIC_BASE_MSR + APIC_TASKPRI),      .always = false },
-> -       { .index = (APIC_BASE_MSR + APIC_ARBPRI),       .always = false },
-> -       { .index = (APIC_BASE_MSR + APIC_PROCPRI),      .always = false },
-> -       { .index = (APIC_BASE_MSR + APIC_EOI),          .always = false },
-> -       { .index = (APIC_BASE_MSR + APIC_RRR),          .always = false },
-> -       { .index = (APIC_BASE_MSR + APIC_LDR),          .always = false },
-> -       { .index = (APIC_BASE_MSR + APIC_DFR),          .always = false },
-> -       { .index = (APIC_BASE_MSR + APIC_SPIV),         .always = false },
-> -       { .index = (APIC_BASE_MSR + APIC_ISR),          .always = false },
-> -       { .index = (APIC_BASE_MSR + APIC_TMR),          .always = false },
-> -       { .index = (APIC_BASE_MSR + APIC_IRR),          .always = false },
-> -       { .index = (APIC_BASE_MSR + APIC_ESR),          .always = false },
-> -       { .index = (APIC_BASE_MSR + APIC_ICR),          .always = false },
-> -       { .index = (APIC_BASE_MSR + APIC_ICR2),         .always = false },
-> -       { .index = (APIC_BASE_MSR + APIC_LVTT),         .always = false },
-> -       { .index = (APIC_BASE_MSR + APIC_LVTTHMR),      .always = false },
-> -       { .index = (APIC_BASE_MSR + APIC_LVTPC),        .always = false },
-> -       { .index = (APIC_BASE_MSR + APIC_LVT0),         .always = false },
-> -       { .index = (APIC_BASE_MSR + APIC_LVT1),         .always = false },
-> -       { .index = (APIC_BASE_MSR + APIC_LVTERR),       .always = false },
-> -       { .index = (APIC_BASE_MSR + APIC_TMICT),        .always = false },
-> -       { .index = (APIC_BASE_MSR + APIC_TMCCT),        .always = false },
-> -       { .index = (APIC_BASE_MSR + APIC_TDCR),         .always = false },
-> +       { .index = X2APIC_MSR(APIC_ID),                 .always = false },
-> +       { .index = X2APIC_MSR(APIC_LVR),                .always = false },
-> +       { .index = X2APIC_MSR(APIC_TASKPRI),            .always = false },
-> +       { .index = X2APIC_MSR(APIC_ARBPRI),             .always = false },
-> +       { .index = X2APIC_MSR(APIC_PROCPRI),            .always = false },
-> +       { .index = X2APIC_MSR(APIC_EOI),                .always = false },
-> +       { .index = X2APIC_MSR(APIC_RRR),                .always = false },
-> +       { .index = X2APIC_MSR(APIC_LDR),                .always = false },
-> +       { .index = X2APIC_MSR(APIC_DFR),                .always = false },
-> +       { .index = X2APIC_MSR(APIC_SPIV),               .always = false },
-> +       { .index = X2APIC_MSR(APIC_ISR),                .always = false },
-> +       { .index = X2APIC_MSR(APIC_TMR),                .always = false },
-> +       { .index = X2APIC_MSR(APIC_IRR),                .always = false },
-> +       { .index = X2APIC_MSR(APIC_ESR),                .always = false },
-> +       { .index = X2APIC_MSR(APIC_ICR),                .always = false },
-> +       { .index = X2APIC_MSR(APIC_ICR2),               .always = false },
-> +       { .index = X2APIC_MSR(APIC_LVTT),               .always = false },
-> +       { .index = X2APIC_MSR(APIC_LVTTHMR),            .always = false },
-> +       { .index = X2APIC_MSR(APIC_LVTPC),              .always = false },
-> +       { .index = X2APIC_MSR(APIC_LVT0),               .always = false },
-> +       { .index = X2APIC_MSR(APIC_LVT1),               .always = false },
-> +       { .index = X2APIC_MSR(APIC_LVTERR),             .always = false },
-> +       { .index = X2APIC_MSR(APIC_TMICT),              .always = false },
-> +       { .index = X2APIC_MSR(APIC_TMCCT),              .always = false },
-> +       { .index = X2APIC_MSR(APIC_TDCR),               .always = false },
->         { .index = MSR_INVALID,                         .always = false },
 
-Ouch.
+I was thinking about the same thing and I also 100% agree with the above.
 
 Reviewed-by: Maxim Levitsky <mlevitsk@redhat.com>
 
 Best regards,
 	Maxim Levitsky
-
->  };
->  
-
 
