@@ -2,143 +2,140 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id EB3E7578D9B
-	for <lists+kvm@lfdr.de>; Tue, 19 Jul 2022 00:37:54 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id A078A578DB1
+	for <lists+kvm@lfdr.de>; Tue, 19 Jul 2022 00:46:47 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235264AbiGRWhu (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 18 Jul 2022 18:37:50 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40978 "EHLO
+        id S235816AbiGRWqm (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 18 Jul 2022 18:46:42 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46732 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230263AbiGRWht (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 18 Jul 2022 18:37:49 -0400
-Received: from mail-yb1-xb31.google.com (mail-yb1-xb31.google.com [IPv6:2607:f8b0:4864:20::b31])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4E3FD27B38
-        for <kvm@vger.kernel.org>; Mon, 18 Jul 2022 15:37:48 -0700 (PDT)
-Received: by mail-yb1-xb31.google.com with SMTP id l11so23468840ybu.13
-        for <kvm@vger.kernel.org>; Mon, 18 Jul 2022 15:37:48 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=1BNdWsaF3uahy5xNZXMoCLMmRQWlXmWwGVzk7t0GH80=;
-        b=joRzGhYq+1nJo3rrtfk3XF7T69GtjNsF0UwsJyiQQMCjUQofTOPho/uMz2rroFejVa
-         xbOSrEbrXEhg728DZ/iz0B0lI80WGdZO0VVivd+aYCllfIGdf/FY3zcxn9lxZb2apsup
-         7tdZD/eJEa5i7cKRhq4iSpBit4SFWuLcX+MOji/pb1rgk1ecGxlH6q1QiAE4D9Ik+sU6
-         EnZvJ1nm73KqCXEz+JNVwFyLJYbyTtR8b0NucNkY1TXXHWJGqqkQOkGYBdePxpzH6+6X
-         eVY5tgoVGslnyQxoabJfzRYpxlBcMglFyNKoX0g0Mzg5k+47JIUqUIYvI/9wjuY7He8H
-         /16Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=1BNdWsaF3uahy5xNZXMoCLMmRQWlXmWwGVzk7t0GH80=;
-        b=nPgNbvYDrjpx2nqryriypbJCryA/YSXygAF5gHwJbOdLJmUwAPFz8we8a1P/zmcDw8
-         D7wvbJkeoqFLnJMrIeCtfsCbMJvcZTNKDPlk5Z5Jg06jnuJZ5993GzCLzY1k+9Ml47gy
-         oZeOhU7J85fj6IAhNW2xnAsLW2KCs3crWh1qIvOQpszqEHNcFI0FX8gtcIKJnDJb+qu0
-         uM3IrHe+Pd0sI8taB6V8SZn9ArtbLcs/PAt/veOeY/4nzZA7Ea5JCeZV6EZqAYrkzs9j
-         e+5LLatoD3LqD4GdNGiGW8qtgF7UI9EVG+4BqbeSIkekkktEv8jOIdWiXiTvmw9AB/Vr
-         EC9Q==
-X-Gm-Message-State: AJIora83QmtUR5HK9ErdOFHREtVVtfvYbP+aB8dcUDdFS4PZGO9iB1Qs
-        +UDtzju3lTfeD+JVUdlWqtWb6aKw+EzvGDVFXAa/Gw==
-X-Google-Smtp-Source: AGRyM1sYwn5En0zgTpktu7I/Hg6nJ8yQa4ZMwZHQNIF/QCoG6aD+McW8mOoEyev33/Zzw4fsuJSlsMK4QvpJiV9of5w=
-X-Received: by 2002:a5b:3ce:0:b0:66f:4692:27a2 with SMTP id
- t14-20020a5b03ce000000b0066f469227a2mr29642799ybp.167.1658183867383; Mon, 18
- Jul 2022 15:37:47 -0700 (PDT)
+        with ESMTP id S232002AbiGRWql (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 18 Jul 2022 18:46:41 -0400
+Received: from NAM10-MW2-obe.outbound.protection.outlook.com (mail-mw2nam10on2085.outbound.protection.outlook.com [40.107.94.85])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6BA7A2494B;
+        Mon, 18 Jul 2022 15:46:40 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=Cc+IDQ8m8ErS+rDrTgjcJMHdDMqKQTC+VbXShvPQHcgtdj1JvlOy0o1GYp/7xagRllPs38xw/5OyRC7c074ES8ShCXhnWmuaQVvdEKz+yOBqEuVtnCY/3Jlzdj+MIIvy/OPfBJX3NWTzchesjYlQ6MapRXunLx1uxGhzdlU2q+szSbZ1nDZBwmpQbvPSDWt0JJD+nMoPrr9g0hKblX8J71zGBUmV6SjvRFIZgmFTi0xVmg175BNGR2bbiBNsS2YAX7Bm/6Hi2T8lxogTFPjZb+33jvvJyG24G8x48IdoR0dI447gsjQNDW2qI0rb3BCacU8jS9xnuzHbIYwj+y+N7g==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=HK4VVtGPcZLDA8LIHCct5IhGMEJJlO1BAYatCYJ9Tbg=;
+ b=c6SwdyoPVhzner0Bbo8nE1b68eLW5DzYXDlBJrfB4yqdS+3yFjf0dsdhnI+bJyFSfadRS/1278l4is781xFvo81iq+CmimuYYXNs2AJHWollc19d1LbYKi+WQMGXY0OR7/bZwAqo4BUFOv8ryrhmpwcCVf+BtkCn8lsSP7lMGu0eCuR3EmU9ZK6Z1bm1Z9hWH9gppnz3iupRL8/O5MLv6od3Grw0kq1cLZwEO+oeWfUmXRH4Zyqvn5HIKU/1VEk/09aXJyIrJuV9i//C2yq0aFJemkThC3/DbkTR60EtgUP9VdC4ZeZgHpONygC4VI01mzLzA9SSmNzgDIj6qFyHXA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
+ dkim=pass header.d=nvidia.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=HK4VVtGPcZLDA8LIHCct5IhGMEJJlO1BAYatCYJ9Tbg=;
+ b=B2epAXtbE/RGTKCEmvmbdxV/YOkH0wM69hQcYqDK0ExhNIp5Pc+unf9cSKY/x0AOpCl3LZlUik3OrxV8+NRRdxX/VaXriUVz8WLI5/B5tFqfnok5TbvrGSuzGBWWdzyioKuFtuZNBxxJaVt4H6TCP9o2C1T8tVdm8yrLhzFRyWVxJA/kcbMpwg5Xm3lxsRqoTOLYifarTrTLBUHwlEnwJXlkwfoJKRD4X8AmV7uLdGgP7bPAmUTNv66mjovJg4ovj/zS35+ovsidJyGsF/Vxo/GWoIQER7aWXtYR/aawQA0ISkdzgGZu67pKZLHyUaFGJmiIuKRvT3E0PSJqru962Q==
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=nvidia.com;
+Received: from MN2PR12MB4192.namprd12.prod.outlook.com (2603:10b6:208:1d5::15)
+ by PH7PR12MB6665.namprd12.prod.outlook.com (2603:10b6:510:1a7::10) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5438.12; Mon, 18 Jul
+ 2022 22:46:37 +0000
+Received: from MN2PR12MB4192.namprd12.prod.outlook.com
+ ([fe80::ac35:7c4b:3282:abfb]) by MN2PR12MB4192.namprd12.prod.outlook.com
+ ([fe80::ac35:7c4b:3282:abfb%3]) with mapi id 15.20.5438.023; Mon, 18 Jul 2022
+ 22:46:37 +0000
+Date:   Mon, 18 Jul 2022 19:46:35 -0300
+From:   Jason Gunthorpe <jgg@nvidia.com>
+To:     Alex Williamson <alex.williamson@redhat.com>
+Cc:     Yishai Hadas <yishaih@nvidia.com>, saeedm@nvidia.com,
+        kvm@vger.kernel.org, netdev@vger.kernel.org, kuba@kernel.org,
+        kevin.tian@intel.com, joao.m.martins@oracle.com, leonro@nvidia.com,
+        maorg@nvidia.com, cohuck@redhat.com
+Subject: Re: [PATCH V2 vfio 05/11] vfio: Add an IOVA bitmap support
+Message-ID: <20220718224635.GF4609@nvidia.com>
+References: <20220714081251.240584-1-yishaih@nvidia.com>
+ <20220714081251.240584-6-yishaih@nvidia.com>
+ <20220718163010.01e11c20.alex.williamson@redhat.com>
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20220718163010.01e11c20.alex.williamson@redhat.com>
+X-ClientProxiedBy: BL0PR1501CA0009.namprd15.prod.outlook.com
+ (2603:10b6:207:17::22) To MN2PR12MB4192.namprd12.prod.outlook.com
+ (2603:10b6:208:1d5::15)
 MIME-Version: 1.0
-References: <cover.1651774250.git.isaku.yamahata@intel.com>
- <98939c0ec83a109c8f49045e82096d6cdd5dafa3.1651774251.git.isaku.yamahata@intel.com>
- <CAAhR5DHPk2no0PVFX6P1NnZdwtVccjmdn4RLg4wKSmfpjD6Qkg@mail.gmail.com> <20220629101356.GA882746@ls.amr.corp.intel.com>
-In-Reply-To: <20220629101356.GA882746@ls.amr.corp.intel.com>
-From:   Sagi Shahar <sagis@google.com>
-Date:   Mon, 18 Jul 2022 15:37:35 -0700
-Message-ID: <CAAhR5DF82HO4yEmOjywXXR-_wcXT7hctib2yfRaS-nb6sGPsLw@mail.gmail.com>
-Subject: Re: [RFC PATCH v6 090/104] KVM: TDX: Handle TDX PV CPUID hypercall
-To:     Isaku Yamahata <isaku.yamahata@gmail.com>
-Cc:     "Yamahata, Isaku" <isaku.yamahata@intel.com>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>,
-        Erdem Aktas <erdemaktas@google.com>,
-        Sean Christopherson <seanjc@google.com>
-Content-Type: text/plain; charset="UTF-8"
-X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-        USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=unavailable
-        autolearn_force=no version=3.4.6
+X-MS-PublicTrafficType: Email
+X-MS-Office365-Filtering-Correlation-Id: b1b8afca-5857-45a1-3e1b-08da690f5f36
+X-MS-TrafficTypeDiagnostic: PH7PR12MB6665:EE_
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: Ek8TnX/hbzhaMjJ9wEEb9Anww3oDtH9B4cMPpQ0FEACDluFwXmHzhvqDKluZclxZDNccpqTVPQkDc3JilyVbxJFbO3k8hcBoSeZLrZrY1VCSXOqMqZuhaPSPoM9ADhOah8NmMqR57HBu52CwkQqxySau0NvkCVlmyjvBY67o2uH43yF1kHXVfF8hJru2S/SQPSHsCkEXn6d/jB1kOX+jqtJz3ihQfZl/Et/z2yRe3q6hUYwJ0x30sEjv/f7UjdffIOx52ZSCrriE1JSzWPp1CEEV1aFI7ydq+HNNLdMx/h6/MEpK0cNJca/iu25DWXU3b47JRrO9eQIipdYOVV78/Q5G63p0V9hFE5jqg3Rt097GiCeKzOgful7fABJ066kza1nGGUxwCRVvqszzHvcCr6lDeX4UXWYmWbOpZBt1c4QKcRY/SL7IFDkrFuNtrAx7whJzc1HBrxrzP0MEbKWgKSO9TIabhBk4G2Q4mdfgEtxjiQMcPqvBnU6qmS7i3FXrodwTf85dJkdx5iW3gn058NzmK13MsslP5yvK06UZ4yFBhqlWUJeAU+pP+6ZGLAr97HpYe6dGTyliM+EHuyYvOjY/v4CUxkWmqAbIU1V4Dz0llw30czWKCKFTU0os98rkpjbpCIaTItBX6Q0J2Z8gL4Q5PgPbx2I766dNfWl+bz/lEQqpn0xMlmj3/wSDEtqlxBOzUVT5a4gh1tt8JNddYNAXkdY6ahpd9ITT95msZHa3XK7PEs9t7l550C/LVFv0
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:MN2PR12MB4192.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230016)(4636009)(39860400002)(346002)(396003)(376002)(366004)(136003)(8936002)(66476007)(4744005)(5660300002)(4326008)(8676002)(66556008)(66946007)(38100700002)(36756003)(33656002)(2906002)(86362001)(6486002)(41300700001)(478600001)(6512007)(6916009)(26005)(316002)(2616005)(1076003)(186003)(6506007);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?9kCc3dpxffXLg5TXXSe9S5W395pukeaWv3mSj1uF0LNXHsto3WafPoghG9m1?=
+ =?us-ascii?Q?OAXZ9WZvap2X5oMOGToqLRqM/rTQ8syJYROXC6X7GW13+kVvy45KJ6t0fPYV?=
+ =?us-ascii?Q?DwzRM6JRudF64+WVzQ6beCxAayqi44JfVStd4PkhydvQTM6U/lFpUlk42SDJ?=
+ =?us-ascii?Q?IF6ttCkQgEHa332YpRh5q6relOBsDLP+sGRhOnQWhZ3Tlxr4FyikWpOEXLPN?=
+ =?us-ascii?Q?ns2rssRLYs8Tl3x07D+bO1cjUNlPcYSvW5StrKG76aCuLgIRlUcHqqAtYoqU?=
+ =?us-ascii?Q?7+OcKJoHB96t5rTI/gyZ25kElL/Wfo7CYMBkY9KutzPDodaGYyRbn/s7e7U2?=
+ =?us-ascii?Q?UbYSDS7LgaY5Q5Ko69Ei3Burw4LC4JaylJWGxrQoA43oAyaVBerZ9BABAeI2?=
+ =?us-ascii?Q?Q6ZnOsS141zIXJWIvEYE1r7Yvmx0aKHs/cJoQKViIRtF5JldVleqNziTktm9?=
+ =?us-ascii?Q?5iW4lMJsI2U99/7m9u+C/J/wlGqpc9At2kFbSOK4VisZjdXxnFp1fuYhmQux?=
+ =?us-ascii?Q?j0KFnQqj/NSjbPlySNmAWWIhBCLXJwRkGsnqKpiGtRVa4TJYrDt8SyEpr15j?=
+ =?us-ascii?Q?v6fdXijcse0EBT3Ubz7IX64R1YSbPFuPuBW6ysmQuVMSSePrqxuLzLSm/iP0?=
+ =?us-ascii?Q?WJ5yKO0uxLENWCrSTgIunYIorPcRvkDTuuoI44zxURXvsWmvi4JByn5RcTAq?=
+ =?us-ascii?Q?f3OA+mCoZIVawbe9zNnQINDyUd5wMDdfJgErZgoM20R/klIG8EbSmJ9x1QYF?=
+ =?us-ascii?Q?KQwTKie2bFUTN+Z14Vj8md0XqZN0c7fXcNCW7Bs540tFDh2p+6JOgcMf/vER?=
+ =?us-ascii?Q?Lr5FPRIe0/KGWGXXQKumsVKPKqTbGOqh3PStFS/ecYkdpMJ4lwK9whUk0DEG?=
+ =?us-ascii?Q?K/f3jfxcnAEXVEAFEC+Br4CfGlTsD0UuP41XuQPWgjw7i+rLKVzeHld3pox4?=
+ =?us-ascii?Q?G1/rlQSG2pvdArHfdhsihCh0Zy2UGRIr+iY5VflgrpMmtIYsyQAbwlG9R3j+?=
+ =?us-ascii?Q?PvsrD70JS87CG91iLgGa0lGtR9k/8TIChgEvQXWEH8hEyP3SycP3C/4Ep8wY?=
+ =?us-ascii?Q?QZzgsnjqgBYHcjkxxn/eNrmN0SuRYIh5ssaRP2SGdMXny86l5ZpmVPfYW84P?=
+ =?us-ascii?Q?yaKoH5VKvJFDrhkcdEcVG+CfeFBwOhfZAenvi6v1SNRHI1Tjswz2gnD/v6zS?=
+ =?us-ascii?Q?W6XuEzdKmdEHNfAYL5hQW/jfPyRgdUVRYUcpHCtOfctWswQ3kFzYMxlzrDPp?=
+ =?us-ascii?Q?bTj4fcG4GPDcXilGLytF2tXtfRmk79Oy/8TAAS8Sz2Waz8nxBt92ceptGRdI?=
+ =?us-ascii?Q?w7nu2w0JwzuFedYodqu8f5MNbaTUhHpkHhIREQMKI2iC2aYWXmfpOjBxhMBX?=
+ =?us-ascii?Q?lfKmZThldi4vnh5noDRwRa5+ryP/Sh79OkSAexra7xonyLoJ0vzRkEBQvIAc?=
+ =?us-ascii?Q?0BaeMvL4dPeIkiuNC2pjcUK6j3IiOX9KfG1jWdZkMYClp8jmAh/M3x/thrQR?=
+ =?us-ascii?Q?+NgLTGjZAi4Qg9/4Trajkt5RpYtv3/QEZ5pvcKgMcfa8a2XXUS9MGwudrQ/9?=
+ =?us-ascii?Q?pRARt7+dULuGVXkgOYSfTY1IBNwO0mPqgiXa+DqU?=
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: b1b8afca-5857-45a1-3e1b-08da690f5f36
+X-MS-Exchange-CrossTenant-AuthSource: MN2PR12MB4192.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 18 Jul 2022 22:46:37.0568
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: q5RprBf1lf2UXJQehOHlLfYJmyg6DqeuEiC2Q4Z73SFEF9OWbzik/vveoo4S3xJk
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH7PR12MB6665
+X-Spam-Status: No, score=-1.8 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FORGED_SPF_HELO,
+        RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_NONE
+        autolearn=no autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Jun 29, 2022 at 3:14 AM Isaku Yamahata <isaku.yamahata@gmail.com> wrote:
->
-> On Tue, Jun 14, 2022 at 11:15:00AM -0700,
-> Sagi Shahar <sagis@google.com> wrote:
->
-> > On Thu, May 5, 2022 at 11:16 AM <isaku.yamahata@intel.com> wrote:
-> > >
-> > > From: Isaku Yamahata <isaku.yamahata@intel.com>
-> > >
-> > > Wire up TDX PV CPUID hypercall to the KVM backend function.
-> > >
-> > > Signed-off-by: Isaku Yamahata <isaku.yamahata@intel.com>
-> > > ---
-> > >  arch/x86/kvm/vmx/tdx.c | 22 ++++++++++++++++++++++
-> > >  1 file changed, 22 insertions(+)
-> > >
-> > > diff --git a/arch/x86/kvm/vmx/tdx.c b/arch/x86/kvm/vmx/tdx.c
-> > > index 9c712f661a7c..c7cdfee397ec 100644
-> > > --- a/arch/x86/kvm/vmx/tdx.c
-> > > +++ b/arch/x86/kvm/vmx/tdx.c
-> > > @@ -946,12 +946,34 @@ static int tdx_emulate_vmcall(struct kvm_vcpu *vcpu)
-> > >         return 1;
-> > >  }
-> > >
-> > > +static int tdx_emulate_cpuid(struct kvm_vcpu *vcpu)
-> > > +{
-> > > +       u32 eax, ebx, ecx, edx;
-> > > +
-> > > +       /* EAX and ECX for cpuid is stored in R12 and R13. */
-> > > +       eax = tdvmcall_a0_read(vcpu);
-> > > +       ecx = tdvmcall_a1_read(vcpu);
-> > > +
-> > > +       kvm_cpuid(vcpu, &eax, &ebx, &ecx, &edx, true);
-> >
-> > According to the GHCI spec section 3.6
-> > (TDG.VP.VMCALL<Instruction.CPUID>) we should return
-> > VMCALL_INVALID_OPERAND if an invalid CPUID is requested.
-> >
-> > kvm_cpuid already returns false in this case so we should use that
-> > return value to set the tdvmcall return code in case of invalid leaf.
->
-> Based on CPUID instruction, cpuid results in #UD when lock prefix is used or
-> earlier CPU that doesn't support cpuid instruction.
-> So I'm not sure what CPUID input result in INVALID_OPERAND error.
-> Does the following make sense for you?
->
-> --- a/arch/x86/kvm/vmx/tdx.c
-> +++ b/arch/x86/kvm/vmx/tdx.c
-> @@ -1347,7 +1347,7 @@ static int tdx_emulate_cpuid(struct kvm_vcpu *vcpu)
->         eax = tdvmcall_a0_read(vcpu);
->         ecx = tdvmcall_a1_read(vcpu);
->
-> -       kvm_cpuid(vcpu, &eax, &ebx, &ecx, &edx, true);
-> +       kvm_cpuid(vcpu, &eax, &ebx, &ecx, &edx, false);
->
->         tdvmcall_a0_write(vcpu, eax);
->         tdvmcall_a1_write(vcpu, ebx);
->
-> thanks,
+On Mon, Jul 18, 2022 at 04:30:10PM -0600, Alex Williamson wrote:
 
-If any CPUID request is considered valid, then perhaps the spec itself
-needs to be updated.
+> > Signed-off-by: Joao Martins <joao.m.martins@oracle.com>
+> > Signed-off-by: Yishai Hadas <yishaih@nvidia.com>
+> > ---
+> >  drivers/vfio/Makefile       |   6 +-
+> >  drivers/vfio/iova_bitmap.c  | 164 ++++++++++++++++++++++++++++++++++++
+> >  include/linux/iova_bitmap.h |  46 ++++++++++
+> 
+> I'm still working my way through the guts of this, but why is it being
+> proposed within the vfio driver when this is not at all vfio specific,
+> proposes it's own separate header, and doesn't conform with any of the
+> namespace conventions of being a sub-component of vfio?  Is this
+> ultimately meant for lib/ or perhaps an extension of iova.c within the
+> iommu subsystem?  Thanks,
 
-Right now it clearly states that TDG.VP.VMCALL_INVALID_OPERAND is
-returned if "Invalid CPUID requested" which I understood as a
-non-existing leaf. But if you say that a non-existing leaf is still a
-valid CPUID request than I'm not sure what "Invalid CPUID requested"
-means in the spec itself.
+I am expecting when iommufd dirty tracking comes we will move this
+file into drivers/iommu/iommufd/ and it will provide it. So it was
+written to make that a simple rename vs changing everything.
 
->
-> --
-> Isaku Yamahata <isaku.yamahata@gmail.com>
+Until we have that, this seems like the best place for it
+
+Jason
