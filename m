@@ -2,112 +2,118 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 15DCA57A5A6
-	for <lists+kvm@lfdr.de>; Tue, 19 Jul 2022 19:44:29 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id AC7F957A5AE
+	for <lists+kvm@lfdr.de>; Tue, 19 Jul 2022 19:46:14 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234465AbiGSRoX (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 19 Jul 2022 13:44:23 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42326 "EHLO
+        id S236432AbiGSRqN (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 19 Jul 2022 13:46:13 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44898 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233929AbiGSRoU (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 19 Jul 2022 13:44:20 -0400
-Received: from mail-wm1-x331.google.com (mail-wm1-x331.google.com [IPv6:2a00:1450:4864:20::331])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 63C605A893
-        for <kvm@vger.kernel.org>; Tue, 19 Jul 2022 10:44:19 -0700 (PDT)
-Received: by mail-wm1-x331.google.com with SMTP id v67-20020a1cac46000000b003a1888b9d36so12484026wme.0
-        for <kvm@vger.kernel.org>; Tue, 19 Jul 2022 10:44:19 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=5IdDA2kur7c9Hb9+rG+ZdCMyG3JxbIJL1PSzFQgUH5o=;
-        b=ZIIuhS4ua1uTO7kwc1l4rxuBA7LXRypBuAlsFPWzhNL9nFofU5DhNkgZNJz6DOKCv2
-         6l3M/kJC4byCfVYv3yK5egHU2DDv4tf8/LVREEDKjH61gLP6wAcTKW+UsP6jG+KgDKG9
-         Ye7cyJk2u8YfQmOAJ4SRqU9lOhepi0VJnqLwx3zwGs+W0h8oSXQeO6012KktbTFd0S5c
-         WiwUH4lasS2Aplz2TS+R33KdVDALvTyz50aWoulKMpAmLRpxbdteFzvbJH+9Ldag2SSP
-         ugiZDkbbA3DYUHyYPCYuo3HhnGdTE6Mc9CwRZLOrsiae9I+ygG5qAcMqljE233yFTXwe
-         jYVA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=5IdDA2kur7c9Hb9+rG+ZdCMyG3JxbIJL1PSzFQgUH5o=;
-        b=5cp+ke65XMI3vxh99lKEVKEnA2D/w0qCxbGLsmrxi3TwSjAEDnvFOr+fvq3Qh4eBSO
-         t1EBMvGihZtGqR9jjwEcYvuj9fyHlUaeMJ1bsaN8dAia0eoF8PlG9bEFyMxKXlNWmrMf
-         n1srguiWkYQLsFuLuTQlHhyD+fK5K3BKn0lMWkyMiMfVGrYL0TTxCuFFedGmimcN3T1+
-         zEsuuJdghfKaXWdgqgYX47L1DghLOR7EbYMe+As3nvVJ40xuFAjEdWXM6HrrYaJQKcIY
-         hQRab4qe6qax06WNf4dr08zDiV6khZs6YkN4+2hAutStnxo+U0GUoaJAqiKCxRuq1UB/
-         90Rw==
-X-Gm-Message-State: AJIora8FCqHWDTAXYDz5zp55Beu37Hg4zn6XDopo+oXCRiO13qthmvvQ
-        LKW6ndl+iEnN8YdNOCPZA0LLYissXw2CEvMY5HMOeA==
-X-Google-Smtp-Source: AGRyM1sFIIq6afZ2uT/z8JrOxJJ4F4jlXibmTDlVkwYmHmy4Zx5TUiRGDshGxvAHKGCwDqY5Ckk1wHAzMzOGjNcbe50=
-X-Received: by 2002:a05:600c:2854:b0:3a3:1551:d7d with SMTP id
- r20-20020a05600c285400b003a315510d7dmr384741wmb.174.1658252657786; Tue, 19
- Jul 2022 10:44:17 -0700 (PDT)
+        with ESMTP id S235972AbiGSRqM (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 19 Jul 2022 13:46:12 -0400
+Received: from mga01.intel.com (mga01.intel.com [192.55.52.88])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 88D25175B0;
+        Tue, 19 Jul 2022 10:46:11 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1658252771; x=1689788771;
+  h=message-id:date:mime-version:subject:to:cc:references:
+   from:in-reply-to:content-transfer-encoding;
+  bh=V10jcj6SoywL+fIcMwLbV2Ry4uZy7FI8pB1QjNM89Sg=;
+  b=HlbnTXK4+S7URe9obWyaah6BwmMQa9iQEsfFFCAQjapeGf6eUi4+5YId
+   xwd2n2pMJQZFjbqiA1Jnd/pIR+/p6tdi3Qxfj85amnGUPKajrBDr1RgNr
+   tu0fNxbQSg0bPKxulPMQOPssQoEbvWh9XcpZuQykFCGUnma5s5SRD3B5W
+   iV7MzeGKdMYGPV0EqnYJsRItedjt8sxhpu20PZ/pf747sVuW2N0OD1jhq
+   qd+qBdqknJJ3QKTKXv0InOm/clSeyFvwz1Ho9RS5yPM/uoT2e8zUhalIm
+   qyrQ7tn+ildqebwLlpfAdhT3MITiw2Ie226XRamn6RT2tQGeX5SPZDE6t
+   w==;
+X-IronPort-AV: E=McAfee;i="6400,9594,10413"; a="312244422"
+X-IronPort-AV: E=Sophos;i="5.92,284,1650956400"; 
+   d="scan'208";a="312244422"
+Received: from fmsmga003.fm.intel.com ([10.253.24.29])
+  by fmsmga101.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 19 Jul 2022 10:46:11 -0700
+X-IronPort-AV: E=Sophos;i="5.92,284,1650956400"; 
+   d="scan'208";a="687197069"
+Received: from twliston-mobl1.amr.corp.intel.com (HELO [10.212.132.190]) ([10.212.132.190])
+  by fmsmga003-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 19 Jul 2022 10:46:09 -0700
+Message-ID: <baaae4b3-7f7d-b193-3546-70170b8b460d@intel.com>
+Date:   Tue, 19 Jul 2022 10:46:09 -0700
 MIME-Version: 1.0
-References: <20220711093218.10967-1-adrian.hunter@intel.com> <20220711093218.10967-10-adrian.hunter@intel.com>
-In-Reply-To: <20220711093218.10967-10-adrian.hunter@intel.com>
-From:   Ian Rogers <irogers@google.com>
-Date:   Tue, 19 Jul 2022 10:44:05 -0700
-Message-ID: <CAP-5=fX4ndBB+0kdW9Bq4b3MDf_appDUj0RiCzbL52k_Agqheg@mail.gmail.com>
-Subject: Re: [PATCH 09/35] perf buildid-cache: Do not require purge files to
- also be in the file system
-To:     Adrian Hunter <adrian.hunter@intel.com>
-Cc:     Arnaldo Carvalho de Melo <acme@kernel.org>,
-        Jiri Olsa <jolsa@redhat.com>,
-        Namhyung Kim <namhyung@kernel.org>,
-        Andi Kleen <ak@linux.intel.com>, linux-kernel@vger.kernel.org,
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.9.1
+Subject: Re: [PATCH v5 02/22] cc_platform: Add new attribute to prevent ACPI
+ CPU hotplug
+Content-Language: en-US
+To:     Kai Huang <kai.huang@intel.com>, linux-kernel@vger.kernel.org,
         kvm@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-        USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=ham
-        autolearn_force=no version=3.4.6
+Cc:     linux-acpi@vger.kernel.org, seanjc@google.com, pbonzini@redhat.com,
+        len.brown@intel.com, tony.luck@intel.com,
+        rafael.j.wysocki@intel.com, reinette.chatre@intel.com,
+        dan.j.williams@intel.com, peterz@infradead.org, ak@linux.intel.com,
+        kirill.shutemov@linux.intel.com,
+        sathyanarayanan.kuppuswamy@linux.intel.com,
+        isaku.yamahata@intel.com, thomas.lendacky@amd.com,
+        Tianyu.Lan@microsoft.com, rdunlap@infradead.org, Jason@zx2c4.com,
+        juri.lelli@redhat.com, mark.rutland@arm.com, frederic@kernel.org,
+        yuehaibing@huawei.com, dongli.zhang@oracle.com
+References: <cover.1655894131.git.kai.huang@intel.com>
+ <f4bff93d83814ea1f54494f51ce3e5d954cf0f5b.1655894131.git.kai.huang@intel.com>
+ <43a67bfe-9707-33e0-2574-1e6eca6aa24b@intel.com>
+ <5ebd7c3cfb3ab9d77a2577c4864befcffe5359d4.camel@intel.com>
+ <173b20166a77012669fdc2c600556fca0623d0b1.camel@intel.com>
+From:   Dave Hansen <dave.hansen@intel.com>
+In-Reply-To: <173b20166a77012669fdc2c600556fca0623d0b1.camel@intel.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+X-Spam-Status: No, score=-7.8 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
+        RCVD_IN_DNSWL_HI,RCVD_IN_MSPIKE_H3,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,
+        SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Jul 11, 2022 at 2:33 AM Adrian Hunter <adrian.hunter@intel.com> wrote:
->
-> realname() returns NULL if the file is not in the file system, but we can
-> still remove it from the build ID cache in that case, so continue and
-> attempt the purge with the name provided.
->
-> Signed-off-by: Adrian Hunter <adrian.hunter@intel.com>
-> ---
->  tools/perf/util/build-id.c | 7 ++-----
->  1 file changed, 2 insertions(+), 5 deletions(-)
->
-> diff --git a/tools/perf/util/build-id.c b/tools/perf/util/build-id.c
-> index 7c9f441936ee..9e176146eb10 100644
-> --- a/tools/perf/util/build-id.c
-> +++ b/tools/perf/util/build-id.c
-> @@ -561,14 +561,11 @@ char *build_id_cache__cachedir(const char *sbuild_id, const char *name,
->         char *realname = (char *)name, *filename;
->         bool slash = is_kallsyms || is_vdso;
->
-> -       if (!slash) {
-> +       if (!slash)
->                 realname = nsinfo__realpath(name, nsi);
-> -               if (!realname)
-> -                       return NULL;
-> -       }
->
->         if (asprintf(&filename, "%s%s%s%s%s", buildid_dir, slash ? "/" : "",
-> -                    is_vdso ? DSO__NAME_VDSO : realname,
-> +                    is_vdso ? DSO__NAME_VDSO : (realname ? realname : name),
+On 7/13/22 04:09, Kai Huang wrote:
+...
+> "TDX doesn’t support adding or removing CPUs from TDX security perimeter. The
+> BIOS should prevent CPUs from being hot-added or hot-removed after platform
+> boots."
 
-nit:  is_vdso ? DSO__NAME_VDSO : (realname ?: name),
+That's a start.  It also probably needs to say that the security
+perimeter includes all logical CPUs, though.
 
-Thanks,
-Ian
+>  static int acpi_map_cpu2node(acpi_handle handle, int cpu, int physid)
+>  {
+> @@ -819,6 +820,12 @@ int acpi_map_cpu(acpi_handle handle, phys_cpuid_t physid,
+> u32 acpi_id,
+>  {
+>         int cpu;
+>  
+> +       if (platform_tdx_enabled()) {
+> +               pr_err("BIOS bug: CPU (physid %u) hot-added on TDX enabled
+> platform. Reject it.\n",
+> +                               physid);
+> +               return -EINVAL;
+> +       }
 
->                      sbuild_id ? "/" : "", sbuild_id ?: "") < 0)
->                 filename = NULL;
->
-> --
-> 2.25.1
->
+Is this the right place?  There are other sanity checks in
+acpi_processor_hotadd_init() and it seems like a better spot.
+
+>         cpu = acpi_register_lapic(physid, acpi_id, ACPI_MADT_ENABLED);
+>         if (cpu < 0) {
+>                 pr_info("Unable to map lapic to logical cpu number\n");
+> @@ -835,6 +842,10 @@ EXPORT_SYMBOL(acpi_map_cpu);
+>  
+>  int acpi_unmap_cpu(int cpu)
+>  {
+> +       if (platform_tdx_enabled())
+> +               pr_err("BIOS bug: CPU %d hot-removed on TDX enabled platform.
+> TDX is broken. Please reboot the machine.\n",
+> +                               cpu);
+> +
+>  #ifdef CONFIG_ACPI_NUMA
+>         set_apicid_to_node(per_cpu(x86_cpu_to_apicid, cpu), NUMA_NO_NODE);
+>  #endif
+
