@@ -2,52 +2,52 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id CAA7D57AA61
-	for <lists+kvm@lfdr.de>; Wed, 20 Jul 2022 01:21:41 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 983BF57AA6B
+	for <lists+kvm@lfdr.de>; Wed, 20 Jul 2022 01:26:14 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235061AbiGSXVk (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 19 Jul 2022 19:21:40 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44254 "EHLO
+        id S237631AbiGSX0N (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 19 Jul 2022 19:26:13 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47678 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233686AbiGSXVj (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 19 Jul 2022 19:21:39 -0400
-Received: from mail-pf1-x42d.google.com (mail-pf1-x42d.google.com [IPv6:2607:f8b0:4864:20::42d])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4CEEA3D5B3
-        for <kvm@vger.kernel.org>; Tue, 19 Jul 2022 16:21:38 -0700 (PDT)
-Received: by mail-pf1-x42d.google.com with SMTP id l124so14983093pfl.8
-        for <kvm@vger.kernel.org>; Tue, 19 Jul 2022 16:21:38 -0700 (PDT)
+        with ESMTP id S231495AbiGSX0M (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 19 Jul 2022 19:26:12 -0400
+Received: from mail-pg1-x532.google.com (mail-pg1-x532.google.com [IPv6:2607:f8b0:4864:20::532])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E2E414C616
+        for <kvm@vger.kernel.org>; Tue, 19 Jul 2022 16:26:11 -0700 (PDT)
+Received: by mail-pg1-x532.google.com with SMTP id s206so14875314pgs.3
+        for <kvm@vger.kernel.org>; Tue, 19 Jul 2022 16:26:11 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
         h=date:from:to:cc:subject:message-id:references:mime-version
          :content-disposition:in-reply-to;
-        bh=v93qZgUDtdRXnHCVUsKcMneA8OJvr6RqrJM3Q32wDgQ=;
-        b=tb5js8lawIeztvJzLz9iz3P+PFAxnz394ahnkedmOlU6D1yIudSmusUnR92MBtF3AB
-         5G44x35fzqxlemVkDBRvgkLEWNorb1/qNb/dXorxTILgIah9EpONxyxcR+f1qS+9aj6J
-         9aarj3+XrjKnwq1leyzxZd4zUV8yluegB93W3DFkz80PvBFo7Sz2O5VW5mWYOmSX5vAQ
-         yKEpUZgf7eHajP3UkmEbRHtU64QebRWUWOL2MrNAMzmEfde2dLDtnKT6sqk7XTgvxc81
-         Nd8bppq47owBZTKCyDOse1V2Yb1upv1xfaZEpP04BwWmNgOKNmOdpzxs5ek+X9N/F8e8
-         hN1Q==
+        bh=PM1UIW/9p/KUWefznS8I/Vq/Z9Bej0JfhvLfrVgUsW8=;
+        b=kDZo7JSCmfah4JxNQpJKDMOKar26uH83fxvBnE7IY4ORxp6fMz6/61Kr7FPDqEozmj
+         sx4iGnYTk8B9T5tAbrEqjS7e3zg/SVABzZBk2gjhJILlwhTZCHtdaEf5YLdNfOxW6nCJ
+         cCByboTNBYvcR4S+UzcIgkZJ7A26oQV5y6ixW2zE48inV1z6r8hZYHiN7qlDUYUWFG1T
+         xycin1HJE6FhlALSuyfUPt5tVvHXhho9N17Hl1bi2ZQARyDpgSk66yiWjNHrhQ0tUgwI
+         laWDfSlBFBduN3e4JjihS6/+wmXthMTTc+tQKPgDfZABWdnWyptqekT37iMs/t7fUvED
+         HNyQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:date:from:to:cc:subject:message-id:references
          :mime-version:content-disposition:in-reply-to;
-        bh=v93qZgUDtdRXnHCVUsKcMneA8OJvr6RqrJM3Q32wDgQ=;
-        b=4b2TJvPUZQgtVWX+FI1cayHkFBpAhYyzBGXNLK0HWEUyO5jpvRGTPYQ3fRkVgkJQZD
-         aqN5uPJQooQ45044rln5iDzkm4+zyFwwTfCHGyLkvVkjoos47IomlL3AoyOhlvbXaNN6
-         nZRuVNb1x+tIWYeU2GF26n7+e2C+5OEr3mg9IiCMquAvS7fyvGHPrA1oROrbP0+pyi6T
-         V3NJnAoLWesNm6fqEfvZQ+JJMMmn/ikef3jyrk47UzZGv1C+dZaXWJy1UyyM9IOzubgO
-         ZJl35gGsYTQFBkrAN5hkGT4CVV3TXswddQ6DK6g+qTIwg7vIrHUfAV+sJpV/DAEYdrbj
-         Vq/w==
-X-Gm-Message-State: AJIora9tvSf42to7YzfiZaRvuoB74DSX+EQENA7PyE0/jtv+xKQMUaWg
-        sscZiEE6mEcaYssJUC/2lJhLew==
-X-Google-Smtp-Source: AGRyM1uaAXlPc2sBh6+WfYJ7/Ev2bkwV4bCZsaitx6DqYTOdrOf4Wu2XjSWCXxrM4yirDFYeR++Jsw==
-X-Received: by 2002:a63:4613:0:b0:40d:91e2:e9bf with SMTP id t19-20020a634613000000b0040d91e2e9bfmr31396205pga.235.1658272897626;
-        Tue, 19 Jul 2022 16:21:37 -0700 (PDT)
+        bh=PM1UIW/9p/KUWefznS8I/Vq/Z9Bej0JfhvLfrVgUsW8=;
+        b=U6MhtfoYiqK07C68Xn5KYaRNdFcSShuDyHgbnVnarcwSrbS2MBBTLnIqoNI3s9FT8b
+         Nlp0rFgnaRsQhfaQhO3w91xFSK2ieluEeys7hmBEJQTxDNy/bRWR8k+UHZ30mlofPVQ/
+         M23oRiOgl+QyZVtUgLxZLaj3irsA6xHwgW8IdTAiuFA2W6VvAa32paMTUl28aVRFMn9b
+         2Ed2omvzy7H9V7yqWcWoI24oOc/lb/AlC+Wv8aSKhWA2SGyWE4vAVI7zWOOU0h+W0tjx
+         OmTgpZ1Gp0eCvSrKGFrjDcdzq8FPmFeU28byxH6DyreSpfVCatXpa2iwvsQUZBCPipG4
+         OiPA==
+X-Gm-Message-State: AJIora8WPZLOC3qUGFlxCBwnajbCQ6j9ev27ybzzgXiFGaZxoLuEiuy4
+        d5fqXBDWt7nls93m2FPQD9eIpoiQ4d/Zlg==
+X-Google-Smtp-Source: AGRyM1ucHijIu37DL/MH9UJmtOsA3/neF6OFfejOM0jONFSxXqH0qt9+o2M9YhwPtQcambswVMkM1w==
+X-Received: by 2002:a05:6a00:15d2:b0:52b:8dc:6cd4 with SMTP id o18-20020a056a0015d200b0052b08dc6cd4mr36444238pfu.68.1658273171197;
+        Tue, 19 Jul 2022 16:26:11 -0700 (PDT)
 Received: from google.com (123.65.230.35.bc.googleusercontent.com. [35.230.65.123])
-        by smtp.gmail.com with ESMTPSA id mi14-20020a17090b4b4e00b001f2184008c7sm9524pjb.53.2022.07.19.16.21.36
+        by smtp.gmail.com with ESMTPSA id a4-20020aa79704000000b00529cbfc8b38sm12085292pfg.191.2022.07.19.16.26.10
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 19 Jul 2022 16:21:37 -0700 (PDT)
-Date:   Tue, 19 Jul 2022 23:21:33 +0000
+        Tue, 19 Jul 2022 16:26:10 -0700 (PDT)
+Date:   Tue, 19 Jul 2022 23:26:07 +0000
 From:   Sean Christopherson <seanjc@google.com>
 To:     Lai Jiangshan <jiangshanlai@gmail.com>
 Cc:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
@@ -56,15 +56,15 @@ Cc:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
         Maxim Levitsky <mlevitsk@redhat.com>,
         David Matlack <dmatlack@google.com>,
         Lai Jiangshan <jiangshan.ljs@antgroup.com>
-Subject: Re: [PATCH V3 09/12] KVM: X86/MMU: Move the verifying of NPT's PDPTE
- in FNAME(fetch)
-Message-ID: <Ytc8fZL2WU4u2x6j@google.com>
+Subject: Re: [PATCH V3 11/12] KVM: X86/MMU: Don't use mmu->pae_root when
+ shadowing PAE NPT in 64-bit host
+Message-ID: <Ytc9j/ayzTfm6Rti@google.com>
 References: <20220521131700.3661-1-jiangshanlai@gmail.com>
- <20220521131700.3661-10-jiangshanlai@gmail.com>
+ <20220521131700.3661-12-jiangshanlai@gmail.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20220521131700.3661-10-jiangshanlai@gmail.com>
+In-Reply-To: <20220521131700.3661-12-jiangshanlai@gmail.com>
 X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
         ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
@@ -79,83 +79,66 @@ X-Mailing-List: kvm@vger.kernel.org
 On Sat, May 21, 2022, Lai Jiangshan wrote:
 > From: Lai Jiangshan <jiangshan.ljs@antgroup.com>
 > 
-> FNAME(page_fault) verifies PDPTE for nested NPT in PAE paging mode
-> because nested_svm_get_tdp_pdptr() reads the guest NPT's PDPTE from
-> memory unconditionally for each call.
-> 
-> The verifying is complicated and it works only when mmu->pae_root
-> is always used when the guest is PAE paging.
+> Allocate the tables when allocating the local shadow page.
 
-Why is this relevant?  It's not _that_ complicated, and even if it were, I don't
-see how calling that out helps the reader understand the motivation for this patch.
+This absolutely needs a much more verbose changelog.
 
-> Move the verifying code in FNAME(fetch) and simplify it since the local
-> shadow page is used and it can be walked in FNAME(fetch) and unlinked
-> from children via drop_spte().
-> 
-> It also allows for mmu->pae_root NOT to be used when it is NOT required
-
-Avoid leading with pronous, "it" is ambiguous, e.g. at first I thought "it' meant
-moving the code, but what "it" really means is using the iterator from the shadow
-page walk instead of hardcoding a pae_root lookup.
-
-And changing from pae_root to it.sptep needs to be explicitly called out.  It's
-a subtle but important detail.  And if you call that out, then it's more obvious
-why this patch is relevant to not having to use pae_root for a 64-bit host with NPT.
-
-> to be put in a 32bit CR3.
-> 
 > Signed-off-by: Lai Jiangshan <jiangshan.ljs@antgroup.com>
 > ---
->  arch/x86/kvm/mmu/paging_tmpl.h | 72 ++++++++++++++++------------------
->  1 file changed, 33 insertions(+), 39 deletions(-)
+>  arch/x86/kvm/mmu/mmu.c | 17 +++++++++--------
+>  1 file changed, 9 insertions(+), 8 deletions(-)
 > 
-> diff --git a/arch/x86/kvm/mmu/paging_tmpl.h b/arch/x86/kvm/mmu/paging_tmpl.h
-> index cd6032e1947c..67c419bce1e5 100644
-> --- a/arch/x86/kvm/mmu/paging_tmpl.h
-> +++ b/arch/x86/kvm/mmu/paging_tmpl.h
-> @@ -659,6 +659,39 @@ static int FNAME(fetch)(struct kvm_vcpu *vcpu, struct kvm_page_fault *fault,
->  		clear_sp_write_flooding_count(it.sptep);
->  		drop_large_spte(vcpu, it.sptep);
->  
-> +		/*
-> +		 * When nested NPT enabled and L1 is PAE paging,
-> +		 * mmu->get_pdptrs() which is nested_svm_get_tdp_pdptr() reads
-> +		 * the guest NPT's PDPTE from memory unconditionally for each
-> +		 * call.
-> +		 *
-> +		 * The guest PAE root page is not write-protected.
-> +		 *
-> +		 * The mmu->get_pdptrs() in FNAME(walk_addr_generic) might get
-> +		 * a value different from previous calls or different from the
-> +		 * return value of mmu->get_pdptrs() in mmu_alloc_shadow_roots().
-> +		 *
-> +		 * It will cause the following code installs the spte in a wrong
-> +		 * sp or links a sp to a wrong parent if the return value of
-> +		 * mmu->get_pdptrs() is not verified unchanged since
-> +		 * FNAME(gpte_changed) can't check this kind of change.
-> +		 *
-> +		 * Verify the return value of mmu->get_pdptrs() (only the gfn
-> +		 * in it needs to be checked) and drop the spte if the gfn isn't
-> +		 * matched.
-> +		 *
-> +		 * Do the verifying unconditionally when the guest is PAE
-> +		 * paging no matter whether it is nested NPT or not to avoid
-> +		 * complicated code.
-> +		 */
-> +		if (vcpu->arch.mmu->cpu_role.base.level == PT32E_ROOT_LEVEL &&
-> +		    it.level == PT32E_ROOT_LEVEL &&
-> +		    is_shadow_present_pte(*it.sptep)) {
-> +			sp = to_shadow_page(*it.sptep & PT64_BASE_ADDR_MASK);
+> diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
+> index 63c2b2c6122c..73e6a8e1e1a9 100644
+> --- a/arch/x86/kvm/mmu/mmu.c
+> +++ b/arch/x86/kvm/mmu/mmu.c
+> @@ -1809,10 +1809,12 @@ static bool using_local_root_page(struct kvm_mmu *mmu)
+>   * 2 or 3 levels of local shadow pages on top of non-local shadow pages.
+>   *
+>   * Local shadow pages are locally allocated.  If the local shadow page's level
+> - * is PT32E_ROOT_LEVEL, it will use the preallocated mmu->pae_root for its
+> - * sp->spt.  Because sp->spt may need to be put in the 32 bits CR3 (even in
+> - * x86_64) or decrypted.  Using the preallocated one to handle these
+> - * requirements makes the allocation simpler.
+> + * is PT32E_ROOT_LEVEL, and it is not shadowing nested NPT for 32-bit L1 in
+> + * 64-bit L0 (or said when the shadow pagetable's level is PT32E_ROOT_LEVEL),
+> + * it will use the preallocated mmu->pae_root for its sp->spt.  Because sp->spt
+> + * need to be put in the 32-bit CR3 (even in 64-bit host) or decrypted.  Using
+> + * the preallocated one to handle these requirements makes the allocation
+> + * simpler.
+>   *
+>   * Local shadow pages are only visible to local VCPU except through
+>   * sp->parent_ptes rmap from their children, so they are not in the
+> @@ -1852,13 +1854,12 @@ kvm_mmu_alloc_local_shadow_page(struct kvm_vcpu *vcpu, union kvm_mmu_page_role r
+>  	sp->gfn = 0;
+>  	sp->role = role;
+>  	/*
+> -	 * Use the preallocated mmu->pae_root when the shadow page's
+> -	 * level is PT32E_ROOT_LEVEL which may need to be put in the 32 bits
+> +	 * Use the preallocated mmu->pae_root when the shadow pagetable's
+> +	 * level is PT32E_ROOT_LEVEL which need to be put in the 32 bits
+>  	 * CR3 (even in x86_64) or decrypted.  The preallocated one is prepared
+>  	 * for the requirements.
+>  	 */
+> -	if (role.level == PT32E_ROOT_LEVEL &&
+> -	    !WARN_ON_ONCE(!vcpu->arch.mmu->pae_root))
 
-For this patch, it's probably worth a
+Why remove this WARN_ON_ONCE()?  And shouldn't this also interact with 
 
-			WARN_ON_ONCE(sp->spt != vcpu->arch.mmu->pae_root);
+   KVM: X86/MMU: Allocate mmu->pae_root for PAE paging on-demand
 
-Mostly so that when the future patch stops using pae_root for 64-bit NPT hosts,
-there's a code change for this particular logic that is very much relevant to
-that change.
+Actually, I think the series is buggy.  That patch, which precedes this one, does
 
-> +			if (gw->table_gfn[it.level - 2] != sp->gfn)
-> +				drop_spte(vcpu->kvm, it.sptep);
-> +		}
+	if (vcpu->arch.mmu->root_role.level != PT32E_ROOT_LEVEL)
+		return 0;
+
+i.e. does NOT allocate pae_root for a 64-bit host, which means that running KVM
+against the on-demand patch would result in the WARN firing and bad things happening.
+
+> +	if (vcpu->arch.mmu->root_role.level == PT32E_ROOT_LEVEL)
+>  		sp->spt = vcpu->arch.mmu->pae_root;
+>  	else
+>  		sp->spt = kvm_mmu_memory_cache_alloc(&vcpu->arch.mmu_shadow_page_cache);
+> -- 
+> 2.19.1.6.gb485710b
+> 
