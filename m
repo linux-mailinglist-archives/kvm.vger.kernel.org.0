@@ -2,52 +2,52 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 5A9CD57A0D4
-	for <lists+kvm@lfdr.de>; Tue, 19 Jul 2022 16:11:28 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 5FBF257A0D9
+	for <lists+kvm@lfdr.de>; Tue, 19 Jul 2022 16:11:58 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S239123AbiGSOL1 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 19 Jul 2022 10:11:27 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44278 "EHLO
+        id S238922AbiGSOL4 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 19 Jul 2022 10:11:56 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53306 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S239050AbiGSOLC (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 19 Jul 2022 10:11:02 -0400
-Received: from mail-wr1-x42f.google.com (mail-wr1-x42f.google.com [IPv6:2a00:1450:4864:20::42f])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BA56B491F3
-        for <kvm@vger.kernel.org>; Tue, 19 Jul 2022 06:30:22 -0700 (PDT)
-Received: by mail-wr1-x42f.google.com with SMTP id j1so17140215wrs.4
-        for <kvm@vger.kernel.org>; Tue, 19 Jul 2022 06:30:22 -0700 (PDT)
+        with ESMTP id S238777AbiGSOLg (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 19 Jul 2022 10:11:36 -0400
+Received: from mail-wr1-x42b.google.com (mail-wr1-x42b.google.com [IPv6:2a00:1450:4864:20::42b])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BAD7A804B4
+        for <kvm@vger.kernel.org>; Tue, 19 Jul 2022 06:32:24 -0700 (PDT)
+Received: by mail-wr1-x42b.google.com with SMTP id r14so21657218wrg.1
+        for <kvm@vger.kernel.org>; Tue, 19 Jul 2022 06:32:24 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
         h=date:from:to:cc:subject:message-id:references:mime-version
          :content-disposition:in-reply-to;
-        bh=aeU9cgOyyIosd32FJcgD+fpFlGUSWOLfdLntVffrwYI=;
-        b=hux2JLvdiv0cwO+vggf9NbJXBqDg2Ko8RqWrIxcttc9Hg0kU7gZtV0HtaGsYzMJN5r
-         2xw+PCxakX3m3q/UPEjcRkRQGRkSeFJ2fEGDqyoqsTV9ixkD9v22Id1hMmzBNtUiDsV3
-         Kop16VLrqGjXK9trmzw+2iuf+R8SFC6k5cm5xvtgAuXyR91yLdQxFt2Hks/xD4SMcbkv
-         RpHxN4o4uYg7HOFYDEMnt50EWgUaPHUff6hQbVOVbFrvUGHzC8sDXcIeXO3S3TfcfB5Z
-         L1h4cAf1nwg7RFdkmLR5r6js+oMs8hZj+72cbkaDTBShuQV8VpQ63RwhZpWHg6bc1V60
-         GlHg==
+        bh=FrozUrwgIOtPZPU7Vt+EwKFtk6342ujDLZysxCGk/2U=;
+        b=S5+hpwih6SZVqj/aZj22GkTtB6kZfbDkhiG9Hf++s/M60OXgNZ/J9S/iUKontqxajh
+         OzXnE52J9XzWdiwGbTqN1ITAQKNwzA4v3az0hShMM6Va2ngQvc5JMkF4xEx34Jek+4hX
+         xqIY6w51YepwMJdLLJUAeAc+jbuEZPdqniB9QcMW0l12HW6bgo5C0nE5rvUq5oSo93eZ
+         MgfZljgodBz8jCjeI/ve6kl4ger6fvg1/P9WWN/hiiTxkThSTx5Uc9CpWqBpwNbmYBkb
+         YMB6utRhH5yLR2qAIvbA/yi19l14EDbTsMIcnboJI/3gyW6RtBzaRL/gtAshqmzTkcXa
+         2b3A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:date:from:to:cc:subject:message-id:references
          :mime-version:content-disposition:in-reply-to;
-        bh=aeU9cgOyyIosd32FJcgD+fpFlGUSWOLfdLntVffrwYI=;
-        b=LqOvA85BR0KR89bs++rY5bu4+xyWwr5XKyGpGlIPFjJdTRysW4IHw4gNNsad85Lfmm
-         OqPFyK29/r7v3v0IN9LpDS0kV3UU87Fex2rR5bw+wf/ertj07NOsIDHJ7EEuQWEt0hAO
-         R6vfL3RyM7yqYYpfF+9l40+6mnLNDDSJgHNnm5ehFFcxK6V+RnxahxWNr9cWeUqWFVwO
-         ZN+dGQaRMDSjX6yTTHYCij7sTxKooopq7BlOqzEy2IIMv8RZmiRr3qpHhpJbGngJfkgH
-         r0hnIubCtvnaRjX26zXWkOHrIhhqS3uedHvLW0KMv9NornmuOfh+bmqlEhWynDNcL7t7
-         v0PA==
-X-Gm-Message-State: AJIora8d++GhYVr6qTcQEXOQv0wqqet48lYgj+mHo6JUPoMr8EYNtY5o
-        cs6PkcAvjGOOYxeeHuPaSFKAqg==
-X-Google-Smtp-Source: AGRyM1vzvLKgd/6l5pxRFRCv0etdl5tPYv3bpkSlMQO5Lp/Wf3UVXLnmW9wvqkKhdX+dMbee37E47A==
-X-Received: by 2002:a05:6000:1541:b0:21d:b298:96be with SMTP id 1-20020a056000154100b0021db29896bemr26549092wry.206.1658237421084;
-        Tue, 19 Jul 2022 06:30:21 -0700 (PDT)
+        bh=FrozUrwgIOtPZPU7Vt+EwKFtk6342ujDLZysxCGk/2U=;
+        b=TN/R5tuaXO1dFmvVceYL59N+znPki66XOS6gVBFVezPMNMbDqi1nzOA4KM9N7Jjwm6
+         UzSUXXc59gbDUPpW2RU0DVn8nV2ef2LVexTECYAvjZFTh194ZoXngvuU/SfCR3AdSsmh
+         eWGd2BweDCNjeppg0hBCnLWq9iNxl5OWbRsNXs55VuEIzfWamzIhnyuZBJgt3aRtKYfU
+         iJ/5k1qf6K2EW/ei5QlAVfeFYKqvJkkkEHPK3L2h3cx8YngAGo2K2oVFvEoO6gLiSEjP
+         UIcgErZPLEiBEpJNTZawZcOcjoPY0N0DwUwGMrA6YrjIPIkI0CEOSLVkL5/IpsLLOX8U
+         FAsg==
+X-Gm-Message-State: AJIora94lm4VItA/0Q0a2wJjAwdFhshJv0doVnIxgr6J1bVI0fPvbbLi
+        YJuSMoC4okbd3N98wke5vBi39Q==
+X-Google-Smtp-Source: AGRyM1tBOCHh1mly6SNagRp9Dh5EU1Ka18SIzDcfqYtAbUecvNXPxURgsOuO1nVIX4WV8COO/Prb7A==
+X-Received: by 2002:a05:6000:1081:b0:21d:6b27:b12d with SMTP id y1-20020a056000108100b0021d6b27b12dmr25759245wrw.504.1658237543035;
+        Tue, 19 Jul 2022 06:32:23 -0700 (PDT)
 Received: from google.com (109.36.187.35.bc.googleusercontent.com. [35.187.36.109])
-        by smtp.gmail.com with ESMTPSA id b14-20020a5d40ce000000b0021a56cda047sm13475885wrq.60.2022.07.19.06.30.20
+        by smtp.gmail.com with ESMTPSA id i4-20020a05600c354400b003a2c7bf0497sm17206016wmq.16.2022.07.19.06.32.22
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 19 Jul 2022 06:30:20 -0700 (PDT)
-Date:   Tue, 19 Jul 2022 14:30:16 +0100
+        Tue, 19 Jul 2022 06:32:22 -0700 (PDT)
+Date:   Tue, 19 Jul 2022 14:32:18 +0100
 From:   Vincent Donnefort <vdonnefort@google.com>
 To:     Will Deacon <will@kernel.org>
 Cc:     kvmarm@lists.cs.columbia.edu, Ard Biesheuvel <ardb@kernel.org>,
@@ -65,15 +65,15 @@ Cc:     kvmarm@lists.cs.columbia.edu, Ard Biesheuvel <ardb@kernel.org>,
         Oliver Upton <oliver.upton@linux.dev>,
         Marc Zyngier <maz@kernel.org>, kernel-team@android.com,
         kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org
-Subject: Re: [PATCH v2 14/24] KVM: arm64: Add pcpu fixmap infrastructure at
- EL2
-Message-ID: <Ytax6L2BUt5ON1Dp@google.com>
+Subject: Re: [PATCH v2 18/24] KVM: arm64: Instantiate guest stage-2
+ page-tables at EL2
+Message-ID: <YtayYuo2qBplXcdi@google.com>
 References: <20220630135747.26983-1-will@kernel.org>
- <20220630135747.26983-15-will@kernel.org>
+ <20220630135747.26983-19-will@kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20220630135747.26983-15-will@kernel.org>
+In-Reply-To: <20220630135747.26983-19-will@kernel.org>
 X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
         ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
@@ -85,51 +85,26 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
->  static struct hyp_pool host_s2_pool;
-> diff --git a/arch/arm64/kvm/hyp/nvhe/mm.c b/arch/arm64/kvm/hyp/nvhe/mm.c
-> index d3a3b47181de..17d689483ec4 100644
-> --- a/arch/arm64/kvm/hyp/nvhe/mm.c
-> +++ b/arch/arm64/kvm/hyp/nvhe/mm.c
-> @@ -14,6 +14,7 @@
->  #include <nvhe/early_alloc.h>
->  #include <nvhe/gfp.h>
->  #include <nvhe/memory.h>
-> +#include <nvhe/mem_protect.h>
->  #include <nvhe/mm.h>
->  #include <nvhe/spinlock.h>
->  
-> @@ -24,6 +25,7 @@ struct memblock_region hyp_memory[HYP_MEMBLOCK_REGIONS];
->  unsigned int hyp_memblock_nr;
->  
->  static u64 __io_map_base;
-> +static DEFINE_PER_CPU(void *, hyp_fixmap_base);
->  
->  static int __pkvm_create_mappings(unsigned long start, unsigned long size,
->  				  unsigned long phys, enum kvm_pgtable_prot prot)
-> @@ -212,6 +214,76 @@ int hyp_map_vectors(void)
->  	return 0;
+[...]
+
 >  }
 >  
-> +void *hyp_fixmap_map(phys_addr_t phys)
-> +{
-> +	void *addr = *this_cpu_ptr(&hyp_fixmap_base);
-> +	int ret = kvm_pgtable_hyp_map(&pkvm_pgtable, (u64)addr, PAGE_SIZE,
-> +				      phys, PAGE_HYP);
-> +	return ret ? NULL : addr;
-> +}
+>  void reclaim_guest_pages(struct kvm_shadow_vm *vm)
+>  {
+> -	unsigned long nr_pages;
+> +	unsigned long nr_pages, pfn;
+>  
+>  	nr_pages = kvm_pgtable_stage2_pgd_size(vm->kvm.arch.vtcr) >> PAGE_SHIFT;
+> -	WARN_ON(__pkvm_hyp_donate_host(hyp_virt_to_pfn(vm->pgt.pgd), nr_pages));
+> +	pfn = hyp_virt_to_pfn(vm->pgt.pgd);
 > +
-> +int hyp_fixmap_unmap(void)
-> +{
-> +	void *addr = *this_cpu_ptr(&hyp_fixmap_base);
-> +	int ret = kvm_pgtable_hyp_unmap(&pkvm_pgtable, (u64)addr, PAGE_SIZE);
+> +	guest_lock_component(vm);
+> +	kvm_pgtable_stage2_destroy(&vm->pgt);
+> +	vm->kvm.arch.mmu.pgd_phys = 0ULL;
+> +	guest_unlock_component(vm);
 > +
-> +	return (ret != PAGE_SIZE) ? -EINVAL : 0;
-> +}
-> +
+> +	WARN_ON(__pkvm_hyp_donate_host(pfn, nr_pages));
+>  }
 
-I probably missed something but as the pagetable pages for this mapping are
-pined, it seems impossible (currently) for this call to fail. Maybe a WARN_ON
-would be more appropriate, especially the callers in the subsequent patches do
-not seem to check for this function return value?
-
-[...]
+The pfn introduction being removed in a subsequent patch, this is probably
+unecessary noise.
