@@ -2,121 +2,110 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id BA40657A2B2
-	for <lists+kvm@lfdr.de>; Tue, 19 Jul 2022 17:13:37 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 3EF8E57A2F4
+	for <lists+kvm@lfdr.de>; Tue, 19 Jul 2022 17:27:21 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238141AbiGSPNg (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 19 Jul 2022 11:13:36 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43012 "EHLO
+        id S237486AbiGSP05 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 19 Jul 2022 11:26:57 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57436 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229460AbiGSPNe (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 19 Jul 2022 11:13:34 -0400
-Received: from mail-wm1-x333.google.com (mail-wm1-x333.google.com [IPv6:2a00:1450:4864:20::333])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5CF6454059
-        for <kvm@vger.kernel.org>; Tue, 19 Jul 2022 08:13:33 -0700 (PDT)
-Received: by mail-wm1-x333.google.com with SMTP id ay11-20020a05600c1e0b00b003a3013da120so10197394wmb.5
-        for <kvm@vger.kernel.org>; Tue, 19 Jul 2022 08:13:33 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=7HHHNGlzReGWpd/M8GTS31oYQW+jdBsAvEwbqXn8OjQ=;
-        b=S1Vmx96rAFfuPzXa+NUsz0wgYJDKlsJ3hxZsaT0u9rxWcPHip2TGaynvrPrZGRvd85
-         Ttj0mKr6NNMfzmMRqTKtUS5fKtVFWB6hmwTzQkTG6dQwzl2h+upGnqbnIs1ExrAf2+7+
-         HRITGBYozO3KvagIppG13VfprYeD7o0vGUUN/jp0zsK/7s9qgQgvzVhFS6HqdsSsCSST
-         TQu116z3NAr/SaCQO62/MrUzGmx5K7/86DYAi11YruXs13qQ+ulWPFMHS3qbzdNH9vS0
-         MZ0ezDB+ThQ51G7mxcANuo/WHQ9sUDB7LUIYFX5FHkHFZYfedHblBxw6AtWhgbBMfWUU
-         7XGQ==
+        with ESMTP id S237995AbiGSP0w (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 19 Jul 2022 11:26:52 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id BA2C8481C8
+        for <kvm@vger.kernel.org>; Tue, 19 Jul 2022 08:26:49 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1658244408;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=G7zzeWeOFiX/qPfQUEc/yUHAFf2sghiN9c5AjnoHblQ=;
+        b=iVMiytTyIP/wTT9Jb0TITimeGlntljxz8hduAQHAHXnseuu+x00ZSym3AHL8LJIYAeW8GT
+        OcTtasDACdxflZEEtfzt48XnRE1jJIRJO7AAVM/6DdF5hG/nB28nGRCLvhOX+y9wPcNJr6
+        xrpXI/76wmHZ+J4kvKxLEj1KG5YQRV4=
+Received: from mail-io1-f72.google.com (mail-io1-f72.google.com
+ [209.85.166.72]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-628-fq0ivay3OgGDOpIqvLmESw-1; Tue, 19 Jul 2022 11:26:47 -0400
+X-MC-Unique: fq0ivay3OgGDOpIqvLmESw-1
+Received: by mail-io1-f72.google.com with SMTP id t3-20020a5d81c3000000b0067bcd25f108so6941069iol.4
+        for <kvm@vger.kernel.org>; Tue, 19 Jul 2022 08:26:47 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=7HHHNGlzReGWpd/M8GTS31oYQW+jdBsAvEwbqXn8OjQ=;
-        b=jbJdzlgVIk72pQ1DXubrIn22DvE9TL7EQtcEBLLqxuIV2gOBZRuNqlu/0RB3cxQbTE
-         e851IO63bxu6sCLTVyZ2mXkJYDpsa6fPQI7S+j7QH3BV4N3WvrueTn/M11PKDDtDQMqy
-         gj6HvECIs0Wd59zqedff/btGaLywkW+XT3RrcXhDW3vB40Gr1qhDtiJbxu3S8PsZtoCK
-         yomCW4t7v7JIx6xBT375yQ/tBnQ7kwJJmwbH6BhSbhloDaUDi+fj0OJkMEswvZENO4Qs
-         l4t4r0Oo8AaOiM5hFXKaCZ+8fBoXTDLkEhroC84e67C+jVmZQYHNJB2QyVbN9ChNOKyu
-         oxPA==
-X-Gm-Message-State: AJIora8sd5NvlA8id04yScWM3xZ3bqkHjvegqoxP/vz9ensiLcjMFw8r
-        2AY5olbKRHc4q0P8z2wZ9t6KMKTJqPSIMvGoWuB8efX16to8gA==
-X-Google-Smtp-Source: AGRyM1vJY7xVDoyVyew7rR5ALwnOHq3ZsMbJ6fPNuiVCBFDnClCKeKypl3zILKTzucKv/N9Nnpkb+rijCA1Lit7z9z8=
-X-Received: by 2002:a05:600c:2854:b0:3a3:1551:d7d with SMTP id
- r20-20020a05600c285400b003a315510d7dmr13704233wmb.174.1658243611702; Tue, 19
- Jul 2022 08:13:31 -0700 (PDT)
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:in-reply-to
+         :references:organization:mime-version:content-transfer-encoding;
+        bh=G7zzeWeOFiX/qPfQUEc/yUHAFf2sghiN9c5AjnoHblQ=;
+        b=oLC0phrTILGLKzRZBpSj9DxK9EjxCDKL0BxCNjizqGUs9y6ElxoKZO5gyq8WvA5ixO
+         ZbXhHRgDw82hEqAJWINwYO6krsMUjvV1MGkOEg0qm2i1vBLkOxo5BA2nmwMHlLJ/jE4W
+         X7VSfkj8jcZYPkkEuvuJN/Y7zjh6HndmvDvCEtTc63T+f9yx5avRfUPR9NvQ1X5sKS2L
+         wleUTmRryKFZ03T6pNt5OzclVkVsB9anIOJC0XSBq07P6/grNEIIw1EQT1YlhEg9efKo
+         KjaA7noUL7wqiXbpEnOLY6thhZbhTDZH8PLhqse3oapM3DaEBUjMGh1vsSbHNxuDFupY
+         VJkQ==
+X-Gm-Message-State: AJIora9Zn5T2tHHor9uo2RsKAq3Yv0uBiot5RqFB2qAYpZV4vTUwKsb7
+        vo6UH4Vkeb5Z45RErx+MqXTOAJ8N4cEwNkv5zVpVoqfyvhPNzksYkZ4uoAO30tKocHmEmL7BlgP
+        KkHfExELNNi3a
+X-Received: by 2002:a05:6638:348c:b0:33f:82b2:7441 with SMTP id t12-20020a056638348c00b0033f82b27441mr17856990jal.296.1658244406585;
+        Tue, 19 Jul 2022 08:26:46 -0700 (PDT)
+X-Google-Smtp-Source: AGRyM1sCP7legSjso0LeShf9Ua6sFhO1nc12IEp69v7ovtogZn2d+6QLUaad2RzcOZuMrXJv8UG/8A==
+X-Received: by 2002:a05:6638:348c:b0:33f:82b2:7441 with SMTP id t12-20020a056638348c00b0033f82b27441mr17856977jal.296.1658244406330;
+        Tue, 19 Jul 2022 08:26:46 -0700 (PDT)
+Received: from redhat.com ([38.15.36.239])
+        by smtp.gmail.com with ESMTPSA id t2-20020a92cc42000000b002dcf927087asm1345647ilq.65.2022.07.19.08.26.45
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 19 Jul 2022 08:26:45 -0700 (PDT)
+Date:   Tue, 19 Jul 2022 09:26:44 -0600
+From:   Alex Williamson <alex.williamson@redhat.com>
+To:     Christoph Hellwig <hch@lst.de>
+Cc:     Eric Farman <farman@linux.ibm.com>,
+        Kirti Wankhede <kwankhede@nvidia.com>,
+        Tony Krowiak <akrowiak@linux.ibm.com>,
+        Halil Pasic <pasic@linux.ibm.com>,
+        Jason Herne <jjherne@linux.ibm.com>,
+        Matthew Rosato <mjrosato@linux.ibm.com>,
+        Zhenyu Wang <zhenyuw@linux.intel.com>,
+        Zhi Wang <zhi.a.wang@intel.com>,
+        Jason Gunthorpe <jgg@nvidia.com>, kvm@vger.kernel.org,
+        linux-s390@vger.kernel.org, intel-gvt-dev@lists.freedesktop.org,
+        Vineeth Vijayan <vneethv@linux.ibm.com>
+Subject: Re: simplify the mdev interface v6
+Message-ID: <20220719092644.3db1ceee.alex.williamson@redhat.com>
+In-Reply-To: <20220719144928.GB21431@lst.de>
+References: <20220709045450.609884-1-hch@lst.de>
+        <20220718054348.GA22345@lst.de>
+        <20220718153331.18a52e31.alex.williamson@redhat.com>
+        <1f945ef0eb6c02079700a6785ca3dd9864096b82.camel@linux.ibm.com>
+        <20220719144928.GB21431@lst.de>
+Organization: Red Hat
 MIME-Version: 1.0
-References: <20220711093218.10967-1-adrian.hunter@intel.com>
- <20220711093218.10967-2-adrian.hunter@intel.com> <YtV0vXJLbfTywZ1B@kernel.org>
- <569b5766-eb6f-8811-c5e5-f5a6972a0fd5@intel.com>
-In-Reply-To: <569b5766-eb6f-8811-c5e5-f5a6972a0fd5@intel.com>
-From:   Ian Rogers <irogers@google.com>
-Date:   Tue, 19 Jul 2022 08:13:18 -0700
-Message-ID: <CAP-5=fXF1VRKjjBt+kv7QqQSbLonaZZoo__2qT1MtvHSZueEEw@mail.gmail.com>
-Subject: Re: [PATCH 01/35] perf tools: Fix dso_id inode generation comparison
-To:     Adrian Hunter <adrian.hunter@intel.com>
-Cc:     Arnaldo Carvalho de Melo <acme@kernel.org>,
-        Jiri Olsa <jolsa@redhat.com>,
-        Namhyung Kim <namhyung@kernel.org>,
-        Andi Kleen <ak@linux.intel.com>, linux-kernel@vger.kernel.org,
-        kvm@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-        USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=ham
-        autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-Spam-Status: No, score=-2.8 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        SPF_HELO_NONE,SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Jul 19, 2022 at 3:18 AM Adrian Hunter <adrian.hunter@intel.com> wrote:
->
-> On 18/07/22 17:57, Arnaldo Carvalho de Melo wrote:
-> > Em Mon, Jul 11, 2022 at 12:31:44PM +0300, Adrian Hunter escreveu:
-> >> Synthesized MMAP events have zero ino_generation, so do not compare zero
-> >> values.
-> >>
-> >> Fixes: 0e3149f86b99 ("perf dso: Move dso_id from 'struct map' to 'struct dso'")
-> >> Signed-off-by: Adrian Hunter <adrian.hunter@intel.com>
-> >> ---
-> >>  tools/perf/util/dsos.c | 10 ++++++++--
-> >>  1 file changed, 8 insertions(+), 2 deletions(-)
-> >>
-> >> diff --git a/tools/perf/util/dsos.c b/tools/perf/util/dsos.c
-> >> index b97366f77bbf..839a1f384733 100644
-> >> --- a/tools/perf/util/dsos.c
-> >> +++ b/tools/perf/util/dsos.c
-> >> @@ -23,8 +23,14 @@ static int __dso_id__cmp(struct dso_id *a, struct dso_id *b)
-> >>      if (a->ino > b->ino) return -1;
-> >>      if (a->ino < b->ino) return 1;
-> >>
-> >> -    if (a->ino_generation > b->ino_generation) return -1;
-> >> -    if (a->ino_generation < b->ino_generation) return 1;
-> >> +    /*
-> >> +     * Synthesized MMAP events have zero ino_generation, so do not compare
-> >> +     * zero values.
-> >> +     */
-> >> +    if (a->ino_generation && b->ino_generation) {
-> >> +            if (a->ino_generation > b->ino_generation) return -1;
-> >> +            if (a->ino_generation < b->ino_generation) return 1;
-> >> +    }
-> >
-> > But comparing didn't harm right? when its !0 now we may have three
-> > comparisions instead of 2 :-\
-> >
-> > The comment has some value tho, so I'm merging this :-)
->
-> Thanks. I found it harmful because the mismatch resulted in a new
-> dso that did not have a build ID whereas the original dso did have
-> a build ID.  The build ID was essential because the object was not
-> found otherwise.
+On Tue, 19 Jul 2022 16:49:28 +0200
+Christoph Hellwig <hch@lst.de> wrote:
 
-That's good to know, could we add that also to the comment? Perhaps:
+> On Mon, Jul 18, 2022 at 10:01:40PM -0400, Eric Farman wrote:
+> > I'll get the problem with struct subchannel [1] sorted out in the next
+> > couple of days. This series breaks vfio-ccw in its current form (see
+> > reply to patch 14), but even with that addressed the placement of all
+> > these other mdev structs needs to be handled differently.  
+> 
+> Alex, any preference if I should just fix the number instances checking
+> with either an incremental patch or a resend, or wait for this ccw
+> rework?
 
-Synthesized MMAP events have zero ino_generation, avoid comparing them
-with MMAP events with actual ino_generation.
+Since it's the last patch, let's at least just respin that patch rather
+than break and fix.  I'd like to make sure Eric is ok to shift around
+structures as a follow-up or make a proposal how this series should
+change though.  Thanks,
 
-Thanks,
-Ian
+Alex
+
