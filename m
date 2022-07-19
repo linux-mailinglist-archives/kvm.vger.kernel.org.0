@@ -2,153 +2,80 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id B3E7857A1AA
-	for <lists+kvm@lfdr.de>; Tue, 19 Jul 2022 16:34:22 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 0BAE257A1AB
+	for <lists+kvm@lfdr.de>; Tue, 19 Jul 2022 16:34:23 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237374AbiGSOeF (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 19 Jul 2022 10:34:05 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51458 "EHLO
+        id S239216AbiGSOeH (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 19 Jul 2022 10:34:07 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52230 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S239032AbiGSOdw (ORCPT <rfc822;kvm@vger.kernel.org>);
+        with ESMTP id S236043AbiGSOdw (ORCPT <rfc822;kvm@vger.kernel.org>);
         Tue, 19 Jul 2022 10:33:52 -0400
-Received: from NAM10-DM6-obe.outbound.protection.outlook.com (mail-dm6nam10on2066.outbound.protection.outlook.com [40.107.93.66])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A0D5955BC;
-        Tue, 19 Jul 2022 07:24:12 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=cBTU1uh8BK6k7Le/YIEDtKouj0FJON4dNZNsCHv78alPsAIol75XExohctHcFqb1YdHbYSQCR0UV/8WU3YnaiNaH+BbEnTj4MFaAYyzTfPNHv7lMtv9exr9E4yqcJ3Qx6CPbAAQg6Im1e8P3DPXcz8lyiQMUAcZAs41514RQXIdsmCJUAZZEWp9v6nPjASZ3OMNTA9+bAh0d1I1jH6sPB2pbjtLJx8bZAAJHlhY37Cb96jYzWsVOX2z7/JQjtJ0IQ5KmyjYBz9YJhVGaTK2IrCztYdsjfop5II4ShfObidQDbSfH/7nI6XlFvjdWJwPQGchepO//8NhcI9hi2jLzTw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=6gbRxjyTfsNeCyxbMbIfPF0WYPFQW8U1LaRtDaQvFwY=;
- b=F2HfDKxUkxNelE2pSkYZl5qzjgJSMgduKrl+HmJkGYohBmi7sYv1C55tdhFQGvuEJCZy5wgvG6A2d3uRh3CVrpLGd4aaH40jmQwNNS4d44vi8ujPdcrg/S6hexF+6Mw5alyaVnAvBJ/w0opWmTDKbxifBW6IdOc5JMIDjhFuzlkBjgXkw6gvLzxv+9/pJN3CKzQEtPn//wybSrqRVzQnbTRC9lzclxmWgjqFxAArMOTSdGMmcIV+xI6MY9ewZOxEWverAZFrjf2Sq+OV+q1DLAQqoHkWWGc6IARg1Sy0ZbwyNDliTiVmFa1v9Q4zOtRidqd5YH7Y6b1MA9Z1kXGXwA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
- header.d=amd.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=6gbRxjyTfsNeCyxbMbIfPF0WYPFQW8U1LaRtDaQvFwY=;
- b=ysN1i3C9hz/0qPnMI88vP+EoMA8HqKkwvzTs2xbq5WXkJnvYGgAhcrgs7ciLoZTDslDilAse+XwG52vsBUpesxXpi7oZ7m4cxXemPMMIqM1JQMrhz7/ppY7iqKrlxSfPwxT2McQzYF+YG30uLSPEGQ0sAKn4JVCvGWSazYI+JoI=
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=amd.com;
-Received: from CY4PR1201MB0181.namprd12.prod.outlook.com
- (2603:10b6:910:1f::11) by SJ1PR12MB6241.namprd12.prod.outlook.com
- (2603:10b6:a03:458::15) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5438.23; Tue, 19 Jul
- 2022 14:24:10 +0000
-Received: from CY4PR1201MB0181.namprd12.prod.outlook.com
- ([fe80::1001:3c79:9504:8d6a]) by CY4PR1201MB0181.namprd12.prod.outlook.com
- ([fe80::1001:3c79:9504:8d6a%10]) with mapi id 15.20.5438.023; Tue, 19 Jul
- 2022 14:24:10 +0000
-Message-ID: <36e671d2-6b95-8e4f-c2ac-fee4b2670c6e@amd.com>
-Date:   Tue, 19 Jul 2022 16:23:52 +0200
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:91.0) Gecko/20100101
- Thunderbird/91.10.0
-Subject: Re: [PATCH v7 11/14] KVM: Register/unregister the guest private
- memory regions
-Content-Language: en-US
-To:     Chao Peng <chao.p.peng@linux.intel.com>
-Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
-        linux-mm@kvack.org, linux-fsdevel@vger.kernel.org,
-        linux-api@vger.kernel.org, linux-doc@vger.kernel.org,
-        qemu-devel@nongnu.org, linux-kselftest@vger.kernel.org,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Jonathan Corbet <corbet@lwn.net>,
+Received: from mail-wr1-x430.google.com (mail-wr1-x430.google.com [IPv6:2a00:1450:4864:20::430])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2179E6175
+        for <kvm@vger.kernel.org>; Tue, 19 Jul 2022 07:24:21 -0700 (PDT)
+Received: by mail-wr1-x430.google.com with SMTP id r14so21888786wrg.1
+        for <kvm@vger.kernel.org>; Tue, 19 Jul 2022 07:24:21 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=WNzGE1u5XBqK6Mb53sKBN5FU4Tw9+8CwrSdfuz5XdPs=;
+        b=bfJEy/cnbMf7Dd+3HUkkFGC74hUVFhvhiX6RtKyPK1wNJDjzvZWDt9+QS+wz40FrTN
+         HztEGcPqJAgSYKG5Ud5mP6WUgE5Vsy1Ey8x4vwxGGzkErc+F/f4zZMXKV0W4AoLMIYlK
+         rdK+I8odxO/LtKbwOdwbk6RtcEFXy0MMU564JRUEqezINa/PYfR4wFoBfsx6h291tdla
+         2u52mftckZzlk3NyzHKaePzs+dBYbx4O1KOBoQc6OldLHSFib9f4w0hUX9pjQsZ2PO21
+         3eHZvRyOltIeXzszeKsuuBmjOvDQD9I5sMAE3gYJJv6Epw3/x+G4XvUt9Ds5GsvWij9u
+         3y9g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=WNzGE1u5XBqK6Mb53sKBN5FU4Tw9+8CwrSdfuz5XdPs=;
+        b=7UmOT9yqaVj+/80QJMTNhcd1RGYwldhFoEVkGxrdzcRIsFNotC1A5++e6HEaORJiEj
+         5RK9IDnPtZfUSM9Fsowc9hoJDkU6GkZZbIS7zMFahLk9UUxG7UI1iXuTG4T5h3wNUkHc
+         HgnG9PGDP4kx923+NLh38r8evsOcQI8LvGRqkLwjrd0LNhBz6fYbNOcUGoX47i8gmjD2
+         4qnRmKFqNb9ZfJXH9oUbQOqao/+luOFHKaaVh29MGMIq/VGFCwlgeBAZhAVpmJ4qR2UQ
+         h9+/WMroEA7hcaFpUcusWhiayeXHPkU+0UvdzrdfoF0i2sXit74juNYDUqswS080T6wT
+         nN5w==
+X-Gm-Message-State: AJIora/STk3VXLO/IFo3/WYi9CG1UXgbAShUwLbglN8kEPNb4dzjcWuQ
+        wN6Kw2PUYVjJy4i1/ydxqDgybA==
+X-Google-Smtp-Source: AGRyM1u/zzb8ihXo42fNXAW1OoFznD0EcxAfeIq6ZlSo4Z+it7CYm8RtVz9+EnpyHMxpc1irG479Bw==
+X-Received: by 2002:a5d:6d8f:0:b0:21d:b7d0:a913 with SMTP id l15-20020a5d6d8f000000b0021db7d0a913mr26582401wrs.462.1658240659597;
+        Tue, 19 Jul 2022 07:24:19 -0700 (PDT)
+Received: from google.com (109.36.187.35.bc.googleusercontent.com. [35.187.36.109])
+        by smtp.gmail.com with ESMTPSA id e9-20020a05600c4e4900b0039c811077d3sm19310285wmq.22.2022.07.19.07.24.19
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 19 Jul 2022 07:24:19 -0700 (PDT)
+Date:   Tue, 19 Jul 2022 15:24:15 +0100
+From:   Vincent Donnefort <vdonnefort@google.com>
+To:     Will Deacon <will@kernel.org>
+Cc:     kvmarm@lists.cs.columbia.edu, Ard Biesheuvel <ardb@kernel.org>,
         Sean Christopherson <seanjc@google.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        x86@kernel.org, "H . Peter Anvin" <hpa@zytor.com>,
-        Hugh Dickins <hughd@google.com>,
-        Jeff Layton <jlayton@kernel.org>,
-        "J . Bruce Fields" <bfields@fieldses.org>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        Shuah Khan <shuah@kernel.org>, Mike Rapoport <rppt@kernel.org>,
-        Steven Price <steven.price@arm.com>,
-        "Maciej S . Szmigiero" <mail@maciej.szmigiero.name>,
-        Vlastimil Babka <vbabka@suse.cz>,
-        Vishal Annapurve <vannapurve@google.com>,
-        Yu Zhang <yu.c.zhang@linux.intel.com>,
-        "Kirill A . Shutemov" <kirill.shutemov@linux.intel.com>,
-        luto@kernel.org, jun.nakajima@intel.com, dave.hansen@intel.com,
-        ak@linux.intel.com, david@redhat.com, aarcange@redhat.com,
-        ddutile@redhat.com, dhildenb@redhat.com,
+        Alexandru Elisei <alexandru.elisei@arm.com>,
+        Andy Lutomirski <luto@amacapital.net>,
+        Catalin Marinas <catalin.marinas@arm.com>,
+        James Morse <james.morse@arm.com>,
+        Chao Peng <chao.p.peng@linux.intel.com>,
         Quentin Perret <qperret@google.com>,
-        Michael Roth <michael.roth@amd.com>, mhocko@suse.com,
-        Muchun Song <songmuchun@bytedance.com>
-References: <20220706082016.2603916-1-chao.p.peng@linux.intel.com>
- <20220706082016.2603916-12-chao.p.peng@linux.intel.com>
- <f02baa37-8d34-5d07-a0ae-300ffefc7fee@amd.com>
- <20220719140843.GA84779@chaop.bj.intel.com>
-From:   "Gupta, Pankaj" <pankaj.gupta@amd.com>
-In-Reply-To: <20220719140843.GA84779@chaop.bj.intel.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: FR3P281CA0114.DEUP281.PROD.OUTLOOK.COM
- (2603:10a6:d10:a3::6) To CY4PR1201MB0181.namprd12.prod.outlook.com
- (2603:10b6:910:1f::11)
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        Michael Roth <michael.roth@amd.com>,
+        Mark Rutland <mark.rutland@arm.com>,
+        Fuad Tabba <tabba@google.com>,
+        Oliver Upton <oliver.upton@linux.dev>,
+        Marc Zyngier <maz@kernel.org>, kernel-team@android.com,
+        kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org
+Subject: Re: [PATCH v2 00/24] KVM: arm64: Introduce pKVM shadow state at EL2
+Message-ID: <Yta+jyw9MfYQPC+e@google.com>
+References: <20220630135747.26983-1-will@kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: 04a97040-e76e-4e96-e5f2-08da69925885
-X-MS-TrafficTypeDiagnostic: SJ1PR12MB6241:EE_
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: mAM1X9spBJlKwV2ShK3OwFXQS1y8MnAB0v3g4kFFNZYN5/zVon7TIfy69d42gkz5xxWadsBBV18Bk3jG6EiS0/3Yg5Idya37ACe+ljw020EY4YdJWyIraJ3fkEzALzhJ304wKYC0VIaId1HIiae+w0yQIxkjZUBzh+4ZpwLbl0t2/mpXcfAUtX3brbBJ3ORckVnX5hvbF1aCffSocJFlow66eDySpvYwF0qD0R4cNRxR4/h/42NwvMU0CjRBC1nMwjqLA0o+tf0OmNe1LHE1yRrDJLJmUvaDLczcKqYBN2FPd3fRqAQHOiGImbe5VuV8sQ6vbV46F5LJk2K6nAZIoyiXPHhyKh0mtPBAYodumNEwwmz9REbouYANoedQ/e1vJkheYISXOpqHk2yfrz3ja/4uW3Qpe9kodlK9faabZjJWeNm0g7VXIONnMP8AZP6ztssCH3+I9aOedYIgrzqfQolYgxWdzVE9/+ls6VLdqY26W9n+dWYtaKmdZOLJCwS1jFhDw3kyuk+5JqzTS70f6+eweKZnn7nPl5YJR+3iknhLntVrgXyBRuS7+JkKk+xkl0ttOR5J8qpZenL7sX3s7yH8jl+BSmk/HINgWvBuQMooIB34RFogbPPYoDQyPfxziGh5DCPz3GoX7c0Xr1vyBxHOgqwS0iY1109ziEYiifud3KdKBLq0gGNdKsDnTKUMuUgkS0zzaFOuYDxCI6hTep7Z++JZM/rHqh6OuKitdAoxWo1aakOevlk4aNPg5cUn683wEp1BFdsYk1jHRFr+BDYhyF8wi8gfY9Coxa4go8VHEzoW8SZ+W7k0xcFJDxsp3cToy/U2wo+LXL3HYCoIMA==
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CY4PR1201MB0181.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230016)(4636009)(39860400002)(136003)(376002)(366004)(346002)(396003)(26005)(2906002)(31686004)(6512007)(6666004)(186003)(41300700001)(86362001)(478600001)(6506007)(5660300002)(7416002)(8936002)(7406005)(2616005)(31696002)(6486002)(66946007)(54906003)(6916009)(316002)(38100700002)(4326008)(66476007)(66556008)(36756003)(8676002)(45980500001)(43740500002);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?Tk5kN0ZUTVFxcG5KZUlqcGtRQUJHcmFseGs3Y0hxNml0WlROdHhML2NpalVZ?=
- =?utf-8?B?STYrbUtPUWZSbFpEakFPb3VobWw3WDVMdkdVYjZhc2Y5OUVBZzRsdTVRQzBU?=
- =?utf-8?B?TEFzalBZNU9ZM2JmYTZrRE9pd3o2UStrYk5SRjNHQnpLZXVJaFRQWS9CT3U0?=
- =?utf-8?B?cGlIcjBpYnZudGYwTzJ4U3hEeWt4Q2Q3ei9zVUJtU1dDM3FrQkxGYzRtN05I?=
- =?utf-8?B?QXFjbmQ3a3ArOHlYazN4SFRyQnBjdmU2QWdQYUNsaGlZV1JmT2JHL2FQQXc1?=
- =?utf-8?B?L3JKU2ZUdDBpVDVVY3dGSnRVTWFvSlY0bGVGN2x2TXdqUlBaMTBrQldKODZO?=
- =?utf-8?B?RXdhRXlCOUU5MkhvSjhWbk9QekZhTVYvTnREZUUrNnc0TUMyVTNoOHU3U3ZG?=
- =?utf-8?B?NjNHbE1hQnJRV1BYdis5RTF5U2lwQTg3ZDNDWXl0eUlpRmJnWGwxZWRMU3pi?=
- =?utf-8?B?azhLWXJiUnZIWk9wR2thOXlkMHlWdVI0aWVwUG93YVdoUC9vT1ZCMjQxbVBC?=
- =?utf-8?B?NlBRWXVmR2tDMFJXckhmUXJ6dnJZVXc3dENQVWQyOE9jUUx5MlBadms2ZGFU?=
- =?utf-8?B?NHhoOVBJeHpDencrWFVHLzZNL200VkJ4YlVOM29rc1IrR1dUWGJYSGNhSEV0?=
- =?utf-8?B?YmNKa1FxQU5VRG1ZdnVnUkdoSU5DZGU4aG9FY3BOcEx1ZGdSMDhKRk1RKzIr?=
- =?utf-8?B?a1ZDMTVQT0pJcU9ISGJqOXZXTDZzSTBlUm9KOUV6d2VhQU1MZ3pOeVpaemVJ?=
- =?utf-8?B?cHhDZnM1Z2FoY0ZkUG40NUxUdkNGYU1welBnMHAvMFhHNk9MQmV6a3JveFda?=
- =?utf-8?B?TG96K0cxM3JoSmVUTWJzS2EzU016ZHNFalRwV1pRTVNrRlNTVytGNlVmcTZs?=
- =?utf-8?B?WjRtNm9mSzNsbFA1N1FMK3h3b1lBejM3VUpsMzFnV0svUmZvS2JtR0p0RjFh?=
- =?utf-8?B?dWYvMnhzbVJWc2ZMRDhkNmRZOVlFV2w2Q2Y0WG1pV2k2QnMrMUUvOHYrVzNI?=
- =?utf-8?B?RGtsYlI2SzlQWHRqQ1BzWXBsbFZPNGZ3ejltZkgrNmxJNHcrcUpqSG9yZEov?=
- =?utf-8?B?YkRhMlJFaktsMVFjd0dzZzhQeitGWVR2bU1SUCsvNVVwdFhHckFoaHF6SGxr?=
- =?utf-8?B?Q3laTGFMUng0WWRRN3ZDSVVFbDM4UkF6ODVHVDR1UHFuQVM1T2tFQng5dXp0?=
- =?utf-8?B?L2J1SVpYTmRTRGlabjNkbWtJSWN2TFY0TTY1eURaajVBY2VkQzRPc0I2R3VW?=
- =?utf-8?B?MnZyMkovMUZYak9yRExDL0dFVElDQWE4Z0VhMXBFTmdMZzU1MFphdGp1QkRL?=
- =?utf-8?B?WUpGakhYNURhSWJnL21hbExIalUrRHVndjgzRmRWSk1wQjBqT0U2ZUJJRitP?=
- =?utf-8?B?QmVmV2JQVE1zTWxaUUpiMmFxUVErbkhoTk5pZVN4bVJEK0IySDJYbitMMmpY?=
- =?utf-8?B?WmFrMWZQY1BrNTJsampGZmV5RE9VRVdSbDV0U0t1WitFRHRJa2txUHlhc2pL?=
- =?utf-8?B?cll4NGRDQmdVNHBiTkYzaHp2bjcwcXYrKzVFa0l2b0E4UGxNU0pnSjVoZWpa?=
- =?utf-8?B?d28zUm9UajY0cW5FTExITEJkZUxMSy8vYW9DWFZOMGFyZ1FqdlY0YmtpTkV0?=
- =?utf-8?B?NVNvQXdiWWJzckRTV2ZGbTVPWklvL0h3ZUJVZjJrNnh5eHU1ZnA1NHdlWml3?=
- =?utf-8?B?UzNpZXdabWlpWlI2a0F0TnAvbEVLYm45RmowcjQ5UGhDOFcrMlcwM2k1STVY?=
- =?utf-8?B?TDBvWWJLVW42K0p2Nm9wTms4ZkQ3RTdwelMydEtHVUVKbDBma3ExclNpNStS?=
- =?utf-8?B?RUxZakx4S3F4NU1vc3NxczZxcHBNVjhPMEgwOWxOZVcxczR4ZGQxN3p3Y2ly?=
- =?utf-8?B?MUJZMjBqTjZMVExncldIclJ1V3JVemEyUkpJNzVOMUpiUlpvNXd1OUlPT3Jr?=
- =?utf-8?B?a3A4NGNkUzd6VXlJZjlVM255Yk5qM3JmUUpqU0puVGNvREJnSW1BdHRpRkxv?=
- =?utf-8?B?ZStmZHQrWDRPR1lMRERQU0lTUDg0MmxZYUQ4QW1UK0ZTTk5zcjIvNU85WUww?=
- =?utf-8?B?aUdEaVJ0S0ZZMXJWeHQ2VHRsY3lvU3ZWVTlvSkY3U0d4R0lmYWtDdFhMWjFj?=
- =?utf-8?Q?ZO04vLQ6IOC3nZuURa2s2Npoj?=
-X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 04a97040-e76e-4e96-e5f2-08da69925885
-X-MS-Exchange-CrossTenant-AuthSource: CY4PR1201MB0181.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 19 Jul 2022 14:24:10.0939
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: COYjKWM0CmMZwrGaP/VoN7FkYMKu/zqiLEHbzzhQYkcGfjwvVOJYeB44kjeIFzVbdgzCCqTTNkE4AsW6eNyr1g==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SJ1PR12MB6241
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_DNSWL_NONE,
-        RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_PASS autolearn=ham
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20220630135747.26983-1-will@kernel.org>
+X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
+        USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=ham
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -156,59 +83,43 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-
->>> +bool __weak kvm_arch_private_mem_supported(struct kvm *kvm)
->>> +{
->>> +	return false;
->>> +}
->>
->> Does this function has to be overriden by SEV and TDX to support the private
->> regions?
+On Thu, Jun 30, 2022 at 02:57:23PM +0100, Will Deacon wrote:
+> Hi everyone,
 > 
-> Yes it should be overridden by architectures which want to support it.
-
-o.k
+> This series has been extracted from the pKVM base support series (aka
+> "pKVM mega-patch") previously posted here:
 > 
->>
->>> +
->>>    static int check_memory_region_flags(const struct kvm_user_mem_region *mem)
->>>    {
->>>    	u32 valid_flags = KVM_MEM_LOG_DIRTY_PAGES;
->>> @@ -4689,6 +4729,22 @@ static long kvm_vm_ioctl(struct file *filp,
->>>    		r = kvm_vm_ioctl_set_memory_region(kvm, &mem);
->>>    		break;
->>>    	}
->>> +#ifdef CONFIG_HAVE_KVM_PRIVATE_MEM
->>> +	case KVM_MEMORY_ENCRYPT_REG_REGION:
->>> +	case KVM_MEMORY_ENCRYPT_UNREG_REGION: {
->>> +		struct kvm_enc_region region;
->>> +
->>> +		if (!kvm_arch_private_mem_supported(kvm))
->>> +			goto arch_vm_ioctl;
->>> +
->>> +		r = -EFAULT;
->>> +		if (copy_from_user(&region, argp, sizeof(region)))
->>> +			goto out;
->>> +
->>> +		r = kvm_vm_ioctl_set_encrypted_region(kvm, ioctl, &region);
->>
->> this is to store private region metadata not only the encrypted region?
+>   https://lore.kernel.org/kvmarm/20220519134204.5379-1-will@kernel.org/
 > 
-> Correct.
-
-Sorry for not being clear, was suggesting name change of this function from:
-"kvm_vm_ioctl_set_encrypted_region" to "kvm_vm_ioctl_set_private_region"
-
+> Unlike that more comprehensive series, this one is fairly fundamental
+> and does not introduce any new ABI commitments, leaving questions
+> involving the management of guest private memory and the creation of
+> protected VMs for future work. Instead, this series extends the pKVM EL2
+> code so that it can dynamically instantiate and manage VM shadow
+> structures without the host being able to access them directly. These
+> shadow structures consist of a shadow VM, a set of shadow vCPUs and the
+> stage-2 page-table and the pages used to hold them are returned to the
+> host when the VM is destroyed.
 > 
->>
->> Also, seems same ioctl can be used to put other regions (e.g firmware, later
->> maybe DAX backend etc) into private memory?
+> The last patch is marked as RFC because, although it plumbs in the
+> shadow state, it is woefully inefficient and copies to/from the host
+> state on every vCPU run. Without the last patch, the new structures are
+> unused but we move considerably closer to isolating guests from the
+> host.
 > 
-> Possibly. Depends on what exactly the semantics is. If just want to set
-> those regions as private current code already support that.
+> The series is based on Marc's rework of the flags
+> (kvm-arm64/burn-the-flags).
+> 
+> Feedback welcome.
+> 
+> Cheers,
 
-Agree. Sure!
+Only had few nitpicks
 
+Reviewed-by: Vincent Donnefort <vdonnefort@google.com>
 
-Thanks,
-Pankaj
+Also, I've been using this patchset for quite a while now.
+
+Tested-by: Vincent Donnefort <vdonnefort@google.com>
+
+[...]
