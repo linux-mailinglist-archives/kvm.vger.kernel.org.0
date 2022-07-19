@@ -2,194 +2,218 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id BB61A57AA75
-	for <lists+kvm@lfdr.de>; Wed, 20 Jul 2022 01:28:16 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 7755A57AA8E
+	for <lists+kvm@lfdr.de>; Wed, 20 Jul 2022 01:44:27 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238810AbiGSX2P (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 19 Jul 2022 19:28:15 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49530 "EHLO
+        id S239401AbiGSXo0 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 19 Jul 2022 19:44:26 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58180 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S238173AbiGSX2M (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 19 Jul 2022 19:28:12 -0400
-Received: from mga03.intel.com (mga03.intel.com [134.134.136.65])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7E0CA62A50;
-        Tue, 19 Jul 2022 16:28:11 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1658273291; x=1689809291;
-  h=message-id:subject:from:to:cc:date:in-reply-to:
-   references:content-transfer-encoding:mime-version;
-  bh=T4kVmJLpu7UE0MsPr1RXmKdo4hskRHKOMDrvdsxMDDI=;
-  b=LqWNtAmrvtEZ1mxcuXoYi517jBhmQ1mC5DyM22Duu8Re1FAaaiExqAwx
-   rIHJR1vpMMQjfWbaXyS2JawtRi7Bwr0huOhClD1vIW2d0fBOhfMOFiKQE
-   peMx1Ofhtks/bGimLjk3j2PcHQ8ybO0Hajp5W5AQlbfDqwn/dZvTgQ8TC
-   p1Klhj9FwRJNkWTT4WFna+13AnJ2LH1uuE4ebTxVGMc0XFMPgOg7wik9C
-   FTQzD8vrJk+IonA0AhIXpmKQaJx2AJ/nbX24McKCC1xW/Xb7FmFwfeFpb
-   BaPq8jTLUqJ88wqhYjTjvUGWnJg0H4eY7OYRaakL0NhMCNnERaIwuqeZR
-   Q==;
-X-IronPort-AV: E=McAfee;i="6400,9594,10413"; a="287787413"
-X-IronPort-AV: E=Sophos;i="5.92,285,1650956400"; 
-   d="scan'208";a="287787413"
-Received: from fmsmga004.fm.intel.com ([10.253.24.48])
-  by orsmga103.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 19 Jul 2022 16:28:10 -0700
-X-IronPort-AV: E=Sophos;i="5.92,285,1650956400"; 
-   d="scan'208";a="665640633"
-Received: from ecurtis-mobl.amr.corp.intel.com (HELO khuang2-desk.gar.corp.intel.com) ([10.213.162.137])
-  by fmsmga004-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 19 Jul 2022 16:28:07 -0700
-Message-ID: <e8cd46df9e3ea5c8c97397a2e89057f521e9eb66.camel@intel.com>
-Subject: Re: [PATCH v5 07/22] x86/virt/tdx: Implement SEAMCALL function
-From:   Kai Huang <kai.huang@intel.com>
-To:     Dan Williams <dan.j.williams@intel.com>,
-        Dave Hansen <dave.hansen@intel.com>,
-        linux-kernel@vger.kernel.org, kvm@vger.kernel.org
-Cc:     seanjc@google.com, pbonzini@redhat.com, len.brown@intel.com,
-        tony.luck@intel.com, rafael.j.wysocki@intel.com,
-        reinette.chatre@intel.com, peterz@infradead.org,
-        ak@linux.intel.com, kirill.shutemov@linux.intel.com,
-        sathyanarayanan.kuppuswamy@linux.intel.com,
-        isaku.yamahata@intel.com
-Date:   Wed, 20 Jul 2022 11:28:05 +1200
-In-Reply-To: <62d7085729358_97b64294f2@dwillia2-xfh.jf.intel.com.notmuch>
-References: <cover.1655894131.git.kai.huang@intel.com>
-         <095e6bbc57b4470e1e9a9104059a5238c9775f00.1655894131.git.kai.huang@intel.com>
-         <069a062e-a4a6-09af-7b74-7f4929f2ec0b@intel.com>
-         <5ce7ebfe54160ea35e432bf50207ebed32db31fc.camel@intel.com>
-         <84e93539-a2f9-f68e-416a-ea3d8fc725af@intel.com>
-         <6bef368ccc68676e4acaecc4b6dc52f598ea7f2f.camel@intel.com>
-         <62d7085729358_97b64294f2@dwillia2-xfh.jf.intel.com.notmuch>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-User-Agent: Evolution 3.44.3 (3.44.3-1.fc36) 
+        with ESMTP id S229784AbiGSXoX (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 19 Jul 2022 19:44:23 -0400
+Received: from NAM12-BN8-obe.outbound.protection.outlook.com (mail-bn8nam12on2087.outbound.protection.outlook.com [40.107.237.87])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D95B04F66E;
+        Tue, 19 Jul 2022 16:44:22 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=d7pSYIXOVdwXkxKsU+x5V7cLKnXidegKiKT6pH7B3qZquSV6I3i4f4N8Lz1bHnV+/q0+q2v4q7j2iCvBAYekoPosD1FYFxWljd/DahGTljMSSUGdAJiKp13cLKTYfKmW1dqkTQMczwi+/ELygocH/b/TQZZc3H/OOfS7QEgnYB4CRpwng9e3yOQirwApnwbv5/rmk3gH01N1ziIbj/vBEoe5xi8Wl1zU7EoCq8XSMloPYT6YLUjKXx6Dzh1ISQkVNIhZfGzguOHhBhhbt+Eaz527hDRPv8ZR6ToaTaDVWIMTSyBM3Gfe16t5278+JgJFpPyNBONMbKCCXoVIA0U97Q==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=BXnNys0O1DqtDFw4CkWzjzHLuk+wqaQe4/3Fi/PiGQA=;
+ b=Li0RKi9t1UCD/mMiKSZ6ub/WS9wM4SZAQ/kqorJa96ky9RHZjqXWd4dVPRCn8elMcN4BMIjYiWvXaPm30StPT5DzvXD6qKF3gdu/0Bo+Sv5fApum+dHg1dz1CO5ZWwxKPM7qmd+SdSITBIBitlMjEgsTxvOBpitTK0ouerCz7JQ+oYSt64S+757ZSM37v5PHFfQ0M5lHsdpg/KUh1Ptxs5PDnz6R/zfW1e2lBRhltbARS7mAwkCTyrTXDRchgk6XjqxukWOjAzrBUIKVdR4VLvSHEEkqNbIgVwSU5G5pnEFVxv/NiSNWbN+u+Wmx2GQjOz5IP9qByHZ67qtBEocjFw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
+ dkim=pass header.d=nvidia.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=BXnNys0O1DqtDFw4CkWzjzHLuk+wqaQe4/3Fi/PiGQA=;
+ b=C+WNj5hOKTdvubpvqcKLCSue6GKNNnBBhbFM+WS9LZA2RvUqrXjQ6GPkLJedyHVAQ2yAWDQYIeOKiILONQI1UQB29RVpqeFFGr9W8i8FlFbpiPkbI24Yn/YeFmOFmH/sy31TriC4iqeKb0OpCnBEVqrsxovGw5pvTtWFJAeQLYKa+u3Hgbmukv03j+CJK6qh6pKVTRJxom3atxDkbWhH2ueK/FdBMzJqENWG4KCkiYCdevfrYjDgYdBgIEj4Si93tZnHMjGFp5pRaOAreDFj9dOohPtjjNhIsk9BpuZOhSJGW0icxPBQxmC10ZtTv1OOQjPh0gkj77i8v9CArmbzwg==
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=nvidia.com;
+Received: from MN2PR12MB4192.namprd12.prod.outlook.com (2603:10b6:208:1d5::15)
+ by BN6PR12MB1826.namprd12.prod.outlook.com (2603:10b6:404:106::9) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5438.20; Tue, 19 Jul
+ 2022 23:44:21 +0000
+Received: from MN2PR12MB4192.namprd12.prod.outlook.com
+ ([fe80::ac35:7c4b:3282:abfb]) by MN2PR12MB4192.namprd12.prod.outlook.com
+ ([fe80::ac35:7c4b:3282:abfb%3]) with mapi id 15.20.5438.024; Tue, 19 Jul 2022
+ 23:44:21 +0000
+Date:   Tue, 19 Jul 2022 20:44:19 -0300
+From:   Jason Gunthorpe <jgg@nvidia.com>
+To:     Alex Williamson <alex.williamson@redhat.com>
+Cc:     Alexander Gordeev <agordeev@linux.ibm.com>,
+        David Airlie <airlied@linux.ie>,
+        Christian Borntraeger <borntraeger@linux.ibm.com>,
+        Cornelia Huck <cohuck@redhat.com>,
+        Daniel Vetter <daniel@ffwll.ch>,
+        dri-devel@lists.freedesktop.org,
+        Harald Freudenberger <freude@linux.ibm.com>,
+        Vasily Gorbik <gor@linux.ibm.com>,
+        Heiko Carstens <hca@linux.ibm.com>,
+        intel-gfx@lists.freedesktop.org,
+        intel-gvt-dev@lists.freedesktop.org,
+        Jani Nikula <jani.nikula@linux.intel.com>,
+        Jason Herne <jjherne@linux.ibm.com>,
+        Joonas Lahtinen <joonas.lahtinen@linux.intel.com>,
+        kvm@vger.kernel.org, linux-s390@vger.kernel.org,
+        Matthew Rosato <mjrosato@linux.ibm.com>,
+        Peter Oberparleiter <oberpar@linux.ibm.com>,
+        Halil Pasic <pasic@linux.ibm.com>,
+        Rodrigo Vivi <rodrigo.vivi@intel.com>,
+        Sven Schnelle <svens@linux.ibm.com>,
+        Tvrtko Ursulin <tvrtko.ursulin@linux.intel.com>,
+        Vineeth Vijayan <vneethv@linux.ibm.com>,
+        Zhenyu Wang <zhenyuw@linux.intel.com>,
+        Zhi Wang <zhi.a.wang@intel.com>,
+        Tony Krowiak <akrowiak@linux.ibm.com>,
+        Eric Farman <farman@linux.ibm.com>,
+        Christoph Hellwig <hch@lst.de>,
+        Kevin Tian <kevin.tian@intel.com>
+Subject: Re: [PATCH v3 1/2] vfio: Replace the DMA unmapping notifier with a
+ callback
+Message-ID: <20220719234419.GN4609@nvidia.com>
+References: <0-v3-7593f297c43f+56ce-vfio_unmap_notif_jgg@nvidia.com>
+ <1-v3-7593f297c43f+56ce-vfio_unmap_notif_jgg@nvidia.com>
+ <20220707153716.70f755ab.alex.williamson@redhat.com>
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20220707153716.70f755ab.alex.williamson@redhat.com>
+X-ClientProxiedBy: MN2PR19CA0023.namprd19.prod.outlook.com
+ (2603:10b6:208:178::36) To MN2PR12MB4192.namprd12.prod.outlook.com
+ (2603:10b6:208:1d5::15)
 MIME-Version: 1.0
-X-Spam-Status: No, score=-5.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
-        SPF_HELO_NONE,SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
+X-MS-PublicTrafficType: Email
+X-MS-Office365-Filtering-Correlation-Id: 88512fab-cb7b-4212-2c1d-08da69e09a53
+X-MS-TrafficTypeDiagnostic: BN6PR12MB1826:EE_
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: vk6/QX301/at567oC9cB3L7LQ5l7vO9sw7P2AsVEOE1d3eF11Nzg8ANM3EWg3etR67V9FD2A18JnCy6Pod8D9/cSRG6BSRzfLExJ+S6zaXlSwWG7q+0Nki9cWfEPRLEV75Q8+LVvdekVoMDh98I8TQ2Z5zmzxJ1EOMoy5UBB2Z68JwSks+qdKDjnEBLYcEBoSM1YCU/ii5rdzk0ZNjKMv6PmB+XDE8bsDPbPq0QNp0Dwmr6J3soHuWKFkOJ470u3g/7GCYjCdkM8/Pcb5F4fwu/+v+Pu5/mI5709j3CGfk2IdoFxok9qP9PzY3Zk4f4pHgS5cWoZLCsJIBhFkqCbPI9pJLWaP1z+zbCIS1olnNFGoQwugVUKYchh7zoPS9/1CD+ERSGeklC3wklJV2G/Yb66ukf/qB8MOz0VjS3avGrKX2L0gBaPoSAuYIYGrd45+VaB7MvpV41aHUf8IFebKvZa+F7LnNDSBQT/oDEkZjc51578+AEuASFwA/ZvwM7qAzhBly4l6wQoA0mw9FWaR2WeaItQD33VZwNi5SaW15ujBfONzp81iJIbw0sOpvegYtHko9/HWafrzsn8+c7LlvWW7aFkiTa7VW3VVrLBcZabmakBNgPsKPLS42HHuxchoaN3fCLxomcEn5OTvZCSrVhrMja7XvtmKwOV6/9QOIkm6ILC+tofWvVGlJKSIvDtPXY9jgeCETszyGrlPsAJjOnQaGVOaC5rPSZ5/eLxJKiB+uD+4QVJo8l1TwVq9aHg
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:MN2PR12MB4192.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230016)(4636009)(136003)(39860400002)(376002)(396003)(346002)(366004)(6486002)(478600001)(54906003)(33656002)(36756003)(86362001)(186003)(26005)(6506007)(38100700002)(6512007)(41300700001)(316002)(2616005)(6916009)(1076003)(66556008)(7406005)(5660300002)(66476007)(66946007)(7416002)(8936002)(8676002)(4326008)(83380400001)(2906002);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?4ya5nanjx24DbVYlPZHDEIkFaXmzqJKqsi9nVVhnCRfNptdyXN+M5Q9mCf+O?=
+ =?us-ascii?Q?/qJLBMvN66wKwWvAzjCvdX9OU1nFEWDW0XVja+wOnQ+wg14ccpWjac3wvv6y?=
+ =?us-ascii?Q?R2imo848jusZWlDrSj40fI+QfreUtWS3H0VXU+eW07wfHj2tZhUH54KmiTtt?=
+ =?us-ascii?Q?MRPrNDNt+am8slasV9Zs9+bdl2b/Q2r6S+bWyNMPMtPXNKfKGm7Eux7oZJZv?=
+ =?us-ascii?Q?Tro1b+YiM/ZXAJi0+0ShEh+vZEgfr3VUHSatLXTKMoWTCj4UWpv/6yI0yXZ9?=
+ =?us-ascii?Q?6rxZrVSaP18SV0pOyBu7KgRt8FxIpA3EfwLzPY39pSJzGmx7AmTXDTzWQsm6?=
+ =?us-ascii?Q?AhryHfpmPmz5lg2mM17IUJN8NbB+PD/xsGGKo7e74HUHd2h5FQ6EinwHTw6i?=
+ =?us-ascii?Q?mgxsiQkg6AvXSxG3IIcEGh0w3dhymNeNB6I+nAeVFzDm0BQfq0T9MQtK5wBQ?=
+ =?us-ascii?Q?ZavSHCZ/Je29ebwuPconclZZ1qQn+APgszQC5ARG54ukUAb4OUKEqUzdyI7A?=
+ =?us-ascii?Q?GdEfKkCKB9Pftvjgn9fvEWoFSn1X3s9r9mqXtngSoBThDKhchSBMdXdCoMxW?=
+ =?us-ascii?Q?kvGZuhCjOKAkbE2nxCrjP42JyjWAe5vDob6HxB1TIO7U8lwSr/1O0MzZ/5LE?=
+ =?us-ascii?Q?q4YjKx3Qe2CkTgwpTs+d276OmOG1Yyfz6U1HsDd3UheU7kY0P42u/spyn/Mm?=
+ =?us-ascii?Q?agp3jWAMuL4LNursIxK7tc3aeGlZ6UisAqYma94J1iUmUE2nS5FoK7eAxN6N?=
+ =?us-ascii?Q?2gzZbIHtXGKflDfjPOLmEEc30FMU7rOBGOcKGvLS6ErAuuQvXxR3tgV7VBAg?=
+ =?us-ascii?Q?SaLQ6llwdtZODk+3By+3R4wKn/Zk6iFb2tmvLdSb/W6VNuP6FUu8EqpTncUi?=
+ =?us-ascii?Q?CesmHIG4EBOT9OkjuD4Aut/Sp2V90gf++5pP8SD5UKvkqpFatopqAOXwfHFt?=
+ =?us-ascii?Q?wEiW0jvBMT9CZi7DhCFOg6kua/JIBav5ExSpvJkaavgHQo1IR/Lav0b3qUAW?=
+ =?us-ascii?Q?jSvbkz+CL6WyBeYEleXAN79Ek39qxt++kKBR0rADLST/JTH/FcaQVpnnkjT3?=
+ =?us-ascii?Q?J9DdrXeQN7mbLkoGTxxodbLy8/RBODU9QhjqH1+euOz7b/uEDDCJucSUCxVY?=
+ =?us-ascii?Q?7Seknt13PvbJ7kj1Fmn6E+H1l1KO4gmAd1Xe0XHcWa8JWmDbAtGMp3GE5dRn?=
+ =?us-ascii?Q?nT++DD66PU08XveabrTWY3GC/pTxKnJbEw8ekIETNyTgnzGGoxLbIPEASXLs?=
+ =?us-ascii?Q?ew5KkCK2zV8cPR8MZe57USr+B8/S7yERjTkbzfqrkNw6xWZ9pIrC8fbntiga?=
+ =?us-ascii?Q?LPGXa0MbW9nyzzbDj50PZb/0Z4GrnRBf9yRBJbJRH3omoj58z/kUuR44l9mS?=
+ =?us-ascii?Q?j9OqFwdSH8zVUH2PIj6Rb0piCbphGg7q5LqL0bgpU6yVwcTBwa97du52Qecj?=
+ =?us-ascii?Q?qQqSukCjCvxsY2uPhEwc7+rrq0K8j6q4JXLMuI4sw76V6c8XDHUCaxvynkLz?=
+ =?us-ascii?Q?UzQfwAiFbfKdT9tv459auonpZpnprB89oIKmRAhDBkn58AA/bGYFadtTVa4f?=
+ =?us-ascii?Q?WmZREERcqHOjb0tnpi8cFhSobr3zJCPct37AfxCS?=
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 88512fab-cb7b-4212-2c1d-08da69e09a53
+X-MS-Exchange-CrossTenant-AuthSource: MN2PR12MB4192.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 19 Jul 2022 23:44:21.1110
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: 095s79ywBMGwhsiW1V75hCNhjAhNzvpXW07SrNdfel2ueXd7B4SVPbbi/vGMKc5x
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: BN6PR12MB1826
+X-Spam-Status: No, score=-1.8 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FORGED_SPF_HELO,
+        RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_NONE
+        autolearn=no autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, 2022-07-19 at 12:39 -0700, Dan Williams wrote:
-> Kai Huang wrote:
-> > On Mon, 2022-06-27 at 13:58 -0700, Dave Hansen wrote:
-> > > On 6/26/22 22:23, Kai Huang wrote:
-> > > > On Fri, 2022-06-24 at 11:38 -0700, Dave Hansen wrote:
-> > > > > On 6/22/22 04:16, Kai Huang wrote:
-> > > > > > SEAMCALL instruction causes #GP when SEAMRR isn't enabled, and =
-#UD when
-> > > > > > CPU is not in VMX operation.  The TDX_MODULE_CALL macro doesn't=
- handle
-> > > > > > SEAMCALL exceptions.  Leave to the caller to guarantee those co=
-nditions
-> > > > > > before calling __seamcall().
-> > > > >=20
-> > > > > I was trying to make the argument earlier that you don't need *AN=
-Y*
-> > > > > detection for TDX, other than the ability to make a SEAMCALL.
-> > > > > Basically, patch 01/22 could go away.
-> > > ...
-> > > > > So what does patch 01/22 buy us?  One EXTABLE entry?
-> > > >=20
-> > > > There are below pros if we can detect whether TDX is enabled by BIO=
-S during boot
-> > > > before initializing the TDX Module:
-> > > >=20
-> > > > 1) There are requirements from customers to report whether platform=
- supports TDX
-> > > > and the TDX keyID numbers before initializing the TDX module so the=
- userspace
-> > > > cloud software can use this information to do something.  Sorry I c=
-annot find
-> > > > the lore link now.
-> > >=20
-> > > <sigh>
-> > >=20
-> > > Never listen to customers literally.  It'll just lead you down the wr=
-ong
-> > > path.  They told you, "we need $FOO in dmesg" and you ran with it
-> > > without understanding why.  The fact that you even *need* to find the
-> > > lore link is because you didn't bother to realize what they really ne=
-eded.
-> > >=20
-> > > dmesg is not ABI.  It's for humans.  If you need data out of the kern=
-el,
-> > > do it with a *REAL* ABI.  Not dmesg.
-> >=20
-> > Showing in the dmesg is the first step, but later we have plan to expos=
-e keyID
-> > info via /sysfs.  Of course, it's always arguable customer's such requi=
-rement is
-> > absolutely needed, but to me it's still a good thing to have code to de=
-tect TDX
-> > during boot.  The code isn't complicated as you can see.
-> >=20
-> > >=20
-> > > > 2) As you can see, it can be used to handle ACPI CPU/memory hotplug=
- and driver
-> > > > managed memory hotplug.  Kexec() support patch also can use it.
-> > > >=20
-> > > > Particularly, in concept, ACPI CPU/memory hotplug is only related t=
-o whether TDX
-> > > > is enabled by BIOS, but not whether TDX module is loaded, or the re=
-sult of
-> > > > initializing the TDX module.  So I think we should have some code t=
-o detect TDX
-> > > > during boot.
-> > >=20
-> > > This is *EXACTLY* why our colleagues at Intel needs to tell us about
-> > > what the OS and firmware should do when TDX is in varying states of d=
-ecay.
-> >=20
-> > Yes I am working on it to make it public.
-> >=20
-> > >=20
-> > > Does the mere presence of the TDX module prevent hotplug? =C2=A0
-> > >=20
-> >=20
-> > For ACPI CPU hotplug, yes.  The TDX module even doesn't need to be load=
-ed.=20
-> > Whether SEAMRR is enabled determines.
-> >=20
-> > For ACPI memory hotplug, in practice yes.  For architectural behaviour,=
- I'll
-> > work with others internally to get some public statement.
-> >=20
-> > > Or, if a
-> > > system has the TDX module loaded but no intent to ever use TDX, why
-> > > can't it just use hotplug like a normal system which is not addled wi=
-th
-> > > the TDX albatross around its neck?
-> >=20
-> > I think if a machine has enabled TDX in the BIOS, the user of the machi=
-ne very
-> > likely has intention to actually use TDX.
-> >=20
-> > Yes for driver-managed memory hotplug, it makes sense if user doesn't w=
-ant to
-> > use TDX, it's better to not disable it.  But to me it's also not a disa=
-ster if
-> > we just disable driver-managed memory hotplug if TDX is enabled by BIOS=
-.
->=20
-> No, driver-managed memory hotplug is how Linux handles "dedicated
-> memory" management. The architecture needs to comprehend that end users
-> may want to move address ranges into and out of Linux core-mm management
-> independently of whether those address ranges are also covered by a SEAM
-> range.
+On Thu, Jul 07, 2022 at 03:37:16PM -0600, Alex Williamson wrote:
+> On Mon,  4 Jul 2022 21:59:03 -0300
+> Jason Gunthorpe <jgg@nvidia.com> wrote:
+> > diff --git a/drivers/s390/cio/vfio_ccw_ops.c b/drivers/s390/cio/vfio_ccw_ops.c
+> > index b49e2e9db2dc6f..09e0ce7b72324c 100644
+> > --- a/drivers/s390/cio/vfio_ccw_ops.c
+> > +++ b/drivers/s390/cio/vfio_ccw_ops.c
+> > @@ -44,31 +44,19 @@ static int vfio_ccw_mdev_reset(struct vfio_ccw_private *private)
+> >  	return ret;
+> >  }
+> >  
+> > -static int vfio_ccw_mdev_notifier(struct notifier_block *nb,
+> > -				  unsigned long action,
+> > -				  void *data)
+> > +static void vfio_ccw_dma_unmap(struct vfio_device *vdev, u64 iova, u64 length)
+> >  {
+> >  	struct vfio_ccw_private *private =
+> > -		container_of(nb, struct vfio_ccw_private, nb);
+> > -
+> > -	/*
+> > -	 * Vendor drivers MUST unpin pages in response to an
+> > -	 * invalidation.
+> > -	 */
+> > -	if (action == VFIO_IOMMU_NOTIFY_DMA_UNMAP) {
+> > -		struct vfio_iommu_type1_dma_unmap *unmap = data;
+> > -
+> > -		if (!cp_iova_pinned(&private->cp, unmap->iova))
+> > -			return NOTIFY_OK;
+> > +		container_of(vdev, struct vfio_ccw_private, vdev);
+> >  
+> > -		if (vfio_ccw_mdev_reset(private))
+> > -			return NOTIFY_BAD;
+> > +	/* Drivers MUST unpin pages in response to an invalidation. */
+> > +	if (!cp_iova_pinned(&private->cp, iova))
+> > +		return;
+> >  
+> > -		cp_free(&private->cp);
+> > -		return NOTIFY_OK;
+> > -	}
+> > +	if (vfio_ccw_mdev_reset(private))
+> > +		return;
+> >  
+> > -	return NOTIFY_DONE;
+> > +	cp_free(&private->cp);
+> >  }
+> 
+> 
+> The cp_free() call is gone here with [1], so I think this function now
+> just ends with:
+> 
+> 	...
+> 	vfio_ccw_mdev_reset(private);
+> }
+> 
+> There are also minor contextual differences elsewhere from that series,
+> so a quick respin to record the changes on list would be appreciated.
+> 
+> However the above kind of highlights that NOTIFY_BAD that silently gets
+> dropped here.  I realize we weren't testing the return value of the
+> notifier call chain and really we didn't intend that notifiers could
+> return a failure here, but does this warrant some logging or suggest
+> future work to allow a device to go offline here?  Thanks.
 
-But to avoid GFP_TDX (and ZONE_TDX) staff, we need to guarantee all memory =
-pages
-in page allocator are TDX pages.  To me it's at least quite fair that user =
-needs
-to *choose* to use driver-managed memory hotplug or TDX.
+It looks like no.
 
-If automatically disable driver-managed memory hotplug on a TDX BIOS enable=
-d
-platform isn't desired, how about we introduce a kernel command line (i.e.
-use_tdx=3D{on|off}) to let user to choose?
+If the FSM trapped in a bad state here, such as
+VFIO_CCW_STATE_NOT_OPER, then it means it should have already unpinned
+the pages and this is considered a success for this purpose
 
-If user specifies use_tdx=3Don, then user cannot use driver-managed memory
-hotplug.  if use_tdx=3Doff, then user cannot use TDX even it is enabled by =
-BIOS.
+The return code here exists only to return to userspace so it can
+detect during a VFIO_DEVICE_RESET that the device has crashed
+irrecoverably.
 
+Thus just continuing to silently ignore it seems like the best thing.
+
+Jason
