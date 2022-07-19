@@ -2,156 +2,354 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id B50AE57A178
-	for <lists+kvm@lfdr.de>; Tue, 19 Jul 2022 16:28:13 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id A97BA57A157
+	for <lists+kvm@lfdr.de>; Tue, 19 Jul 2022 16:24:39 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S239027AbiGSO2K (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 19 Jul 2022 10:28:10 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46312 "EHLO
+        id S235219AbiGSOYh (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 19 Jul 2022 10:24:37 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41878 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S237767AbiGSO1o (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 19 Jul 2022 10:27:44 -0400
-Received: from mga11.intel.com (mga11.intel.com [192.55.52.93])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B0B37BDF;
-        Tue, 19 Jul 2022 07:14:07 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1658240047; x=1689776047;
-  h=date:from:to:cc:subject:message-id:reply-to:references:
-   mime-version:in-reply-to;
-  bh=/UxCRrCRwzJ4X66ZQ0IeKBQtuQGxvYag5toGoeMRWuQ=;
-  b=CZYyYygzXCqloUO9aGVdDcJXYjTh9oYBJFxUMSxe3vvRKpU4gOckgOMn
-   JilTFTI6emQSdx8rywraLU90dhr1EOEFNhKfhHa+WsZwIMkLeSH7zbqq8
-   FJouPrO28zJUxeb/SxE4iTLfLasD7me/K4TWdAjq7X4a2dohduIirBRKf
-   WNMDKsJHPtvSN0BsTYzXvXe3ManHlqTz4kQe21r9Bp/HBTiLQpGGnwOKd
-   U3tdxxcsUWbu4QZv9FYTSDAfiMSLeYxqi5lVXlJjruhpOV6n6KK1zvRtZ
-   q9yPYIc6RAqbyfUskmfkyguvP+kJlEdUqp0XNo4+JbI2iX1YsPRQhKoAg
-   A==;
-X-IronPort-AV: E=McAfee;i="6400,9594,10412"; a="284063648"
-X-IronPort-AV: E=Sophos;i="5.92,284,1650956400"; 
-   d="scan'208";a="284063648"
-Received: from fmsmga008.fm.intel.com ([10.253.24.58])
-  by fmsmga102.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 19 Jul 2022 07:13:43 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.92,284,1650956400"; 
-   d="scan'208";a="655776691"
-Received: from chaop.bj.intel.com (HELO localhost) ([10.240.193.75])
-  by fmsmga008.fm.intel.com with ESMTP; 19 Jul 2022 07:13:34 -0700
-Date:   Tue, 19 Jul 2022 22:08:43 +0800
-From:   Chao Peng <chao.p.peng@linux.intel.com>
-To:     "Gupta, Pankaj" <pankaj.gupta@amd.com>
-Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
-        linux-mm@kvack.org, linux-fsdevel@vger.kernel.org,
-        linux-api@vger.kernel.org, linux-doc@vger.kernel.org,
-        qemu-devel@nongnu.org, linux-kselftest@vger.kernel.org,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Jonathan Corbet <corbet@lwn.net>,
-        Sean Christopherson <seanjc@google.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        x86@kernel.org, "H . Peter Anvin" <hpa@zytor.com>,
-        Hugh Dickins <hughd@google.com>,
-        Jeff Layton <jlayton@kernel.org>,
-        "J . Bruce Fields" <bfields@fieldses.org>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        Shuah Khan <shuah@kernel.org>, Mike Rapoport <rppt@kernel.org>,
-        Steven Price <steven.price@arm.com>,
-        "Maciej S . Szmigiero" <mail@maciej.szmigiero.name>,
-        Vlastimil Babka <vbabka@suse.cz>,
-        Vishal Annapurve <vannapurve@google.com>,
-        Yu Zhang <yu.c.zhang@linux.intel.com>,
-        "Kirill A . Shutemov" <kirill.shutemov@linux.intel.com>,
-        luto@kernel.org, jun.nakajima@intel.com, dave.hansen@intel.com,
-        ak@linux.intel.com, david@redhat.com, aarcange@redhat.com,
-        ddutile@redhat.com, dhildenb@redhat.com,
-        Quentin Perret <qperret@google.com>,
-        Michael Roth <michael.roth@amd.com>, mhocko@suse.com,
-        Muchun Song <songmuchun@bytedance.com>
-Subject: Re: [PATCH v7 11/14] KVM: Register/unregister the guest private
- memory regions
-Message-ID: <20220719140843.GA84779@chaop.bj.intel.com>
-Reply-To: Chao Peng <chao.p.peng@linux.intel.com>
-References: <20220706082016.2603916-1-chao.p.peng@linux.intel.com>
- <20220706082016.2603916-12-chao.p.peng@linux.intel.com>
- <f02baa37-8d34-5d07-a0ae-300ffefc7fee@amd.com>
+        with ESMTP id S237749AbiGSOXn (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 19 Jul 2022 10:23:43 -0400
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id BB53511C26
+        for <kvm@vger.kernel.org>; Tue, 19 Jul 2022 07:08:11 -0700 (PDT)
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id E8A032B;
+        Tue, 19 Jul 2022 07:08:11 -0700 (PDT)
+Received: from monolith.localdoman (unknown [172.31.20.19])
+        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 2DE3A3F73D;
+        Tue, 19 Jul 2022 07:08:10 -0700 (PDT)
+Date:   Tue, 19 Jul 2022 15:08:43 +0100
+From:   Alexandru Elisei <alexandru.elisei@arm.com>
+To:     Nikos Nikoleris <nikos.nikoleris@arm.com>
+Cc:     kvm@vger.kernel.org, andrew.jones@linux.dev, drjones@redhat.com,
+        pbonzini@redhat.com, jade.alglave@arm.com, ricarkol@google.com
+Subject: Re: [kvm-unit-tests PATCH v3 19/27] arm/arm64: Add a setup sequence
+ for systems that boot through EFI
+Message-ID: <Yta663UyZcP1j9t1@monolith.localdoman>
+References: <20220630100324.3153655-1-nikos.nikoleris@arm.com>
+ <20220630100324.3153655-20-nikos.nikoleris@arm.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <f02baa37-8d34-5d07-a0ae-300ffefc7fee@amd.com>
-X-Spam-Status: No, score=-7.7 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_EF,RCVD_IN_DNSWL_HI,SPF_HELO_NONE,
-        SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
+In-Reply-To: <20220630100324.3153655-20-nikos.nikoleris@arm.com>
+X-Spam-Status: No, score=-6.9 required=5.0 tests=BAYES_00,RCVD_IN_DNSWL_HI,
+        SPF_HELO_NONE,SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Jul 19, 2022 at 10:00:23AM +0200, Gupta, Pankaj wrote:
+Hi,
 
-...
-
-> > +bool __weak kvm_arch_private_mem_supported(struct kvm *kvm)
-> > +{
-> > +	return false;
-> > +}
+On Thu, Jun 30, 2022 at 11:03:16AM +0100, Nikos Nikoleris wrote:
+> This change implements an alternative setup sequence for the system
+> when we are booting through EFI. The memory map is discovered through
+> EFI boot services and devices through ACPI.
 > 
-> Does this function has to be overriden by SEV and TDX to support the private
-> regions?
-
-Yes it should be overridden by architectures which want to support it.
-
+> This change is based on a change initially proposed by
+> Andrew Jones <drjones@redhat.com>
 > 
-> > +
-> >   static int check_memory_region_flags(const struct kvm_user_mem_region *mem)
-> >   {
-> >   	u32 valid_flags = KVM_MEM_LOG_DIRTY_PAGES;
-> > @@ -4689,6 +4729,22 @@ static long kvm_vm_ioctl(struct file *filp,
-> >   		r = kvm_vm_ioctl_set_memory_region(kvm, &mem);
-> >   		break;
-> >   	}
-> > +#ifdef CONFIG_HAVE_KVM_PRIVATE_MEM
-> > +	case KVM_MEMORY_ENCRYPT_REG_REGION:
-> > +	case KVM_MEMORY_ENCRYPT_UNREG_REGION: {
-> > +		struct kvm_enc_region region;
-> > +
-> > +		if (!kvm_arch_private_mem_supported(kvm))
-> > +			goto arch_vm_ioctl;
-> > +
-> > +		r = -EFAULT;
-> > +		if (copy_from_user(&region, argp, sizeof(region)))
-> > +			goto out;
-> > +
-> > +		r = kvm_vm_ioctl_set_encrypted_region(kvm, ioctl, &region);
+> Signed-off-by: Nikos Nikoleris <nikos.nikoleris@arm.com>
+> ---
+>  lib/linux/efi.h     |   1 +
+>  lib/arm/asm/setup.h |   2 +
+>  lib/arm/setup.c     | 181 +++++++++++++++++++++++++++++++++++++++++++-
+>  arm/cstart.S        |   1 +
+>  arm/cstart64.S      |   1 +
+>  5 files changed, 184 insertions(+), 2 deletions(-)
 > 
-> this is to store private region metadata not only the encrypted region?
+> diff --git a/lib/linux/efi.h b/lib/linux/efi.h
+> index 53748dd..89f9a9e 100644
+> --- a/lib/linux/efi.h
+> +++ b/lib/linux/efi.h
+> @@ -63,6 +63,7 @@ typedef guid_t efi_guid_t;
+>  	(c) & 0xff, ((c) >> 8) & 0xff, d } }
+>  
+>  #define ACPI_TABLE_GUID EFI_GUID(0xeb9d2d30, 0x2d88, 0x11d3, 0x9a, 0x16, 0x00, 0x90, 0x27, 0x3f, 0xc1, 0x4d)
+> +#define ACPI_20_TABLE_GUID EFI_GUID(0x8868e871, 0xe4f1, 0x11d3,  0xbc, 0x22, 0x00, 0x80, 0xc7, 0x3c, 0x88, 0x81)
+>  
+>  #define LOADED_IMAGE_PROTOCOL_GUID EFI_GUID(0x5b1b31a1, 0x9562, 0x11d2,  0x8e, 0x3f, 0x00, 0xa0, 0xc9, 0x69, 0x72, 0x3b)
+>  
+> diff --git a/lib/arm/asm/setup.h b/lib/arm/asm/setup.h
+> index 64cd379..c4cd485 100644
+> --- a/lib/arm/asm/setup.h
+> +++ b/lib/arm/asm/setup.h
+> @@ -6,6 +6,7 @@
+>   * This work is licensed under the terms of the GNU LGPL, version 2.
+>   */
+>  #include <libcflat.h>
+> +#include <efi.h>
+>  #include <asm/page.h>
+>  #include <asm/pgtable-hwdef.h>
+>  
+> @@ -37,5 +38,6 @@ extern unsigned int mem_region_get_flags(phys_addr_t paddr);
+>  #define SMP_CACHE_BYTES		L1_CACHE_BYTES
+>  
+>  void setup(const void *fdt, phys_addr_t freemem_start);
+> +efi_status_t setup_efi(efi_bootinfo_t *efi_bootinfo);
+>  
+>  #endif /* _ASMARM_SETUP_H_ */
+> diff --git a/lib/arm/setup.c b/lib/arm/setup.c
+> index 13513d0..30d04d0 100644
+> --- a/lib/arm/setup.c
+> +++ b/lib/arm/setup.c
+> @@ -34,7 +34,7 @@
+>  #define NR_EXTRA_MEM_REGIONS	16
+>  #define NR_INITIAL_MEM_REGIONS	(MAX_DT_MEM_REGIONS + NR_EXTRA_MEM_REGIONS)
+>  
+> -extern unsigned long _etext;
+> +extern unsigned long _text, _etext, _data, _edata;
+>  
+>  char *initrd;
+>  u32 initrd_size;
+> @@ -44,7 +44,10 @@ int nr_cpus;
+>  
+>  static struct mem_region __initial_mem_regions[NR_INITIAL_MEM_REGIONS + 1];
+>  struct mem_region *mem_regions = __initial_mem_regions;
+> -phys_addr_t __phys_offset, __phys_end;
+> +phys_addr_t __phys_offset = (phys_addr_t)-1, __phys_end = 0;
+> +
+> +extern void exceptions_init(void);
+> +extern void asm_mmu_disable(void);
+>  
+>  int mpidr_to_cpu(uint64_t mpidr)
+>  {
+> @@ -272,3 +275,177 @@ void setup(const void *fdt, phys_addr_t freemem_start)
+>  	if (!(auxinfo.flags & AUXINFO_MMU_OFF))
+>  		setup_vm();
+>  }
+> +
+> +#ifdef CONFIG_EFI
+> +
+> +#include <efi.h>
+> +
+> +static efi_status_t setup_rsdp(efi_bootinfo_t *efi_bootinfo)
+> +{
+> +	efi_status_t status;
+> +	struct rsdp_descriptor *rsdp;
+> +
+> +	/*
+> +	 * RSDP resides in an EFI_ACPI_RECLAIM_MEMORY region, which is not used
+> +	 * by kvm-unit-tests arm64 memory allocator. So it is not necessary to
+> +	 * copy the data structure to another memory region to prevent
+> +	 * unintentional overwrite.
+> +	 */
+> +	status = efi_get_system_config_table(ACPI_20_TABLE_GUID, (void **)&rsdp);
+> +	if (status != EFI_SUCCESS)
+> +		return status;
+> +
+> +	set_efi_rsdp(rsdp);
+> +
+> +	return EFI_SUCCESS;
+> +}
+> +
+> +static efi_status_t efi_mem_init(efi_bootinfo_t *efi_bootinfo)
+> +{
+> +	int i;
+> +	unsigned long free_mem_pages = 0;
+> +	unsigned long free_mem_start = 0;
+> +	struct efi_boot_memmap *map = &(efi_bootinfo->mem_map);
+> +	efi_memory_desc_t *buffer = *map->map;
+> +	efi_memory_desc_t *d = NULL;
+> +	phys_addr_t base, top;
+> +	struct mem_region *r;
+> +	uintptr_t text = (uintptr_t)&_text, etext = __ALIGN((uintptr_t)&_etext, 4096);
+> +	uintptr_t data = (uintptr_t)&_data, edata = __ALIGN((uintptr_t)&_edata, 4096);
+> +
+> +	/*
+> +	 * Record the largest free EFI_CONVENTIONAL_MEMORY region
+> +	 * which will be used to set up the memory allocator, so that
+> +	 * the memory allocator can work in the largest free
+> +	 * continuous memory region.
+> +	 */
+> +	for (i = 0, r = &mem_regions[0]; i < *(map->map_size); i += *(map->desc_size), ++r) {
+> +		d = (efi_memory_desc_t *)(&((u8 *)buffer)[i]);
+> +
+> +		r->start = d->phys_addr;
+> +		r->end = d->phys_addr + d->num_pages * EFI_PAGE_SIZE;
+> +
+> +		switch (d->type) {
+> +		case EFI_RESERVED_TYPE:
+> +		case EFI_LOADER_DATA:
+> +		case EFI_BOOT_SERVICES_CODE:
+> +		case EFI_BOOT_SERVICES_DATA:
+> +		case EFI_RUNTIME_SERVICES_CODE:
+> +		case EFI_RUNTIME_SERVICES_DATA:
+> +		case EFI_UNUSABLE_MEMORY:
+> +		case EFI_ACPI_RECLAIM_MEMORY:
+> +		case EFI_ACPI_MEMORY_NVS:
+> +		case EFI_PAL_CODE:
+> +			r->flags = MR_F_RESERVED;
+> +			break;
+> +		case EFI_MEMORY_MAPPED_IO:
+> +		case EFI_MEMORY_MAPPED_IO_PORT_SPACE:
+> +			r->flags = MR_F_IO;
+> +			break;
+> +		case EFI_LOADER_CODE:
+> +			if (r->start <= text && r->end > text) {
+> +				/* This is the unit test region. Flag the code separately. */
+> +				phys_addr_t tmp = r->end;
+> +
+> +				assert(etext <= data);
+> +				assert(edata <= r->end);
+> +				r->flags = MR_F_CODE;
+> +				r->end = data;
+> +				++r;
+> +				r->start = data;
+> +				r->end = tmp;
+> +			} else {
+> +				r->flags = MR_F_RESERVED;
+> +			}
+> +			break;
+> +		case EFI_CONVENTIONAL_MEMORY:
+> +			if (free_mem_pages < d->num_pages) {
+> +				free_mem_pages = d->num_pages;
+> +				free_mem_start = d->phys_addr;
+> +			}
+> +			break;
+> +		}
+> +
+> +		if (!(r->flags & MR_F_IO)) {
+> +			if (r->start < __phys_offset)
+> +				__phys_offset = r->start;
+> +			if (r->end > __phys_end)
+> +				__phys_end = r->end;
 
-Correct.
+What happens if there are holes between __phys_offset and __phys_end? The
+boot path for KVM makes sure there are no holes. Wouldn't asm_mmu_disable()
+trigger a translation fault if the address is not mapped because it
+corresponds to a hole in the EFI provided memory map?
 
-> 
-> Also, seems same ioctl can be used to put other regions (e.g firmware, later
-> maybe DAX backend etc) into private memory?
+What happens if the region [__phys_offset, __phys_end) contains one of the
+EFI reserved memory types? That's not really something that kvm-unit-tests
+should be poking.
 
-Possibly. Depends on what exactly the semantics is. If just want to set
-those regions as private current code already support that.
+The efi boot code path changes the semantics for __phys_offset and
+__phys_end, and that's a recipe for introducing bugs.
 
-Chao
-> 
-> > +		break;
-> > +	}
-> > +#endif
-> >   	case KVM_GET_DIRTY_LOG: {
-> >   		struct kvm_dirty_log log;
-> > @@ -4842,6 +4898,7 @@ static long kvm_vm_ioctl(struct file *filp,
-> >   		r = kvm_vm_ioctl_get_stats_fd(kvm);
-> >   		break;
-> >   	default:
-> > +arch_vm_ioctl:
-> >   		r = kvm_arch_vm_ioctl(filp, ioctl, arg);
-> >   	}
-> >   out:
+I would suggest changing __phys_offset and __phys_end to represent
+something that applies to both the KVM boot path and the EFI boot path.
+
+One idea that occured to me would be to have separate text, data and
+available memory regions.  Have __phys_offset and __phys_end express the
+start and end of the largest contiguous memory region, and initialize the
+memory allocator from this region. That will also pave the way for handling
+multiple memory regions from the DT.
+
+Or, if you can prove and EFI_LOADER_CODE is always adjacent to
+EFI_CONVENTIONAL_MEMORY, you can have __phys_offset and __phys_end describe
+the region from the start of text to the end of EFI_CONVENTIONAL_MEMORY.
+
+Thoughts? Suggestions?
+
+Thanks,
+Alex
+
+> +		}
+> +	}
+> +	__phys_end &= PHYS_MASK;
+> +	asm_mmu_disable();
+> +
+> +	if (free_mem_pages == 0)
+> +		return EFI_OUT_OF_RESOURCES;
+> +
+> +	assert(sizeof(long) == 8 || free_mem_start < (3ul << 30));
+> +
+> +	phys_alloc_init(free_mem_start, free_mem_pages << EFI_PAGE_SHIFT);
+> +	phys_alloc_set_minimum_alignment(SMP_CACHE_BYTES);
+> +
+> +	phys_alloc_get_unused(&base, &top);
+> +	base = PAGE_ALIGN(base);
+> +	top = top & PAGE_MASK;
+> +	assert(sizeof(long) == 8 || !(base >> 32));
+> +	if (sizeof(long) != 8 && (top >> 32) != 0)
+> +		top = ((uint64_t)1 << 32);
+> +	page_alloc_init_area(0, base >> PAGE_SHIFT, top >> PAGE_SHIFT);
+> +	page_alloc_ops_enable();
+> +
+> +	return EFI_SUCCESS;
+> +}
+> +
+> +efi_status_t setup_efi(efi_bootinfo_t *efi_bootinfo)
+> +{
+> +	efi_status_t status;
+> +
+> +	struct thread_info *ti = current_thread_info();
+> +
+> +	memset(ti, 0, sizeof(*ti));
+> +
+> +	exceptions_init();
+> +
+> +	status = efi_mem_init(efi_bootinfo);
+> +	if (status != EFI_SUCCESS) {
+> +		printf("Failed to initialize memory: ");
+> +		switch (status) {
+> +		case EFI_OUT_OF_RESOURCES:
+> +			printf("No free memory region\n");
+> +			break;
+> +		default:
+> +			printf("Unknown error\n");
+> +			break;
+> +		}
+> +		return status;
+> +	}
+> +
+> +	status = setup_rsdp(efi_bootinfo);
+> +	if (status != EFI_SUCCESS) {
+> +		printf("Cannot find RSDP in EFI system table\n");
+> +		return status;
+> +	}
+> +
+> +	psci_set_conduit();
+> +	cpu_init();
+> +	/* cpu_init must be called before thread_info_init */
+> +	thread_info_init(current_thread_info(), 0);
+> +	/* mem_init must be called before io_init */
+> +	io_init();
+> +
+> +	timer_save_state();
+> +	if (initrd) {
+> +		/* environ is currently the only file in the initrd */
+> +		char *env = malloc(initrd_size);
+> +
+> +		memcpy(env, initrd, initrd_size);
+> +		setup_env(env, initrd_size);
+> +	}
+> +
+> +	if (!(auxinfo.flags & AUXINFO_MMU_OFF))
+> +		setup_vm();
+> +
+> +	return EFI_SUCCESS;
+> +}
+> +
+> +#endif
+> diff --git a/arm/cstart.S b/arm/cstart.S
+> index dc324c5..66a55b9 100644
+> --- a/arm/cstart.S
+> +++ b/arm/cstart.S
+> @@ -256,6 +256,7 @@ asm_mmu_disable:
+>   *
+>   * Input r0 is the stack top, which is the exception stacks base
+>   */
+> +.globl exceptions_init
+>  exceptions_init:
+>  	mrc	p15, 0, r2, c1, c0, 0	@ read SCTLR
+>  	bic	r2, #CR_V		@ SCTLR.V := 0
+> diff --git a/arm/cstart64.S b/arm/cstart64.S
+> index 390feb9..55b41ea 100644
+> --- a/arm/cstart64.S
+> +++ b/arm/cstart64.S
+> @@ -276,6 +276,7 @@ asm_mmu_disable:
+>   * Vectors
+>   */
+>  
+> +.globl exceptions_init
+>  exceptions_init:
+>  	adrp	x4, vector_table
+>  	add	x4, x4, :lo12:vector_table
+> -- 
+> 2.25.1
 > 
