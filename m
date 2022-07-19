@@ -2,97 +2,441 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id CF91C57A6CB
-	for <lists+kvm@lfdr.de>; Tue, 19 Jul 2022 20:55:12 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 7B3B557A6DD
+	for <lists+kvm@lfdr.de>; Tue, 19 Jul 2022 21:02:24 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S239307AbiGSSzK (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 19 Jul 2022 14:55:10 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49700 "EHLO
+        id S235514AbiGSTBx (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 19 Jul 2022 15:01:53 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54212 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230249AbiGSSzH (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 19 Jul 2022 14:55:07 -0400
-Received: from mail-pg1-x536.google.com (mail-pg1-x536.google.com [IPv6:2607:f8b0:4864:20::536])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 09278F7B
-        for <kvm@vger.kernel.org>; Tue, 19 Jul 2022 11:55:06 -0700 (PDT)
-Received: by mail-pg1-x536.google.com with SMTP id r186so14312670pgr.2
-        for <kvm@vger.kernel.org>; Tue, 19 Jul 2022 11:55:06 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=ivVC9EM9jM66mJwYdCa12X2ciIU5HLlT0VikbwcqW18=;
-        b=MnT5x6BW+UKIQ9tTlvQG7AAUoEnxPFr6NnmrcUd/RurtAKZFDIiMg5JUfsF3geEtkf
-         ZrZGcTGi12Q0VNsAJrY+9AnTQZiZJwJ3FvhtI+E7NDJBKG95qboQwkRYn/fYPh05sQb0
-         he9T+4zweUVHob4/7oBcwbOqOdd5JOyMuFsRnle91Go/rjAErLuaVhk45YK1Hlpt/x6u
-         atHackoDC6xIcsPJReC4pjUWkdBX+hE5s/0GiV8ZzL1OlgNu3sEvrmtpaZH3b+DPRJgZ
-         XxBE9rBrogIyvNj/R5TQAAUHa6Yik8hM/f1v0kU2DrBw+rqgyJazV0cgCARTGeIGw9Ol
-         bxQw==
+        with ESMTP id S231207AbiGSTBY (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 19 Jul 2022 15:01:24 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 5FC5151400
+        for <kvm@vger.kernel.org>; Tue, 19 Jul 2022 12:01:23 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1658257282;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=FHBqlovJJzhLFuBTzArJnXn6dBA0JSfBpz8NV3NeaD0=;
+        b=iMx8r2nLHl30fFXQMwZ7oDWwxysa0/mHdc34ZRuOpWhaEfXfQ3luWe2uWpt8yOtaO9DaoS
+        WLVGYaQwjJvYCgqWOOnpX98sTZJNYvRAy5lfG1sN9Z19GizOaomSKO7GWpnnu8kTCP5GFF
+        ynjWixEagw4ZwSyAQkBl36MioNXWQlk=
+Received: from mail-io1-f70.google.com (mail-io1-f70.google.com
+ [209.85.166.70]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-265-KPOW9-8DM-aYTyLFKNp-Iw-1; Tue, 19 Jul 2022 15:01:21 -0400
+X-MC-Unique: KPOW9-8DM-aYTyLFKNp-Iw-1
+Received: by mail-io1-f70.google.com with SMTP id i3-20020a5d8403000000b0067bd73cc9eeso6816473ion.19
+        for <kvm@vger.kernel.org>; Tue, 19 Jul 2022 12:01:20 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=ivVC9EM9jM66mJwYdCa12X2ciIU5HLlT0VikbwcqW18=;
-        b=vKeccXWs4WFsPAs+nvSkwEIWCBqpjzICP6J/sBgVJFDYpvwWB5jLlXDzaKP2KLscZo
-         MKwjXC1oxE/bnbmHuVpPSHkvmA8BBholcizPpfZJs5KnNpv8fv9MQBVVKOy6R3xD6Vc4
-         I+2rDf7AR8Dg816lewFcw6JygmRNSS2OFVRFGHaMhs3tvZA9dFbgbfVaH1RSLJgw0LAq
-         Cqw5prxYPaDRN4/YToUP1sHHZoo4G6ZVgNIRo/n6rQsgXB/18jqx+rprfJdIsZ9BpUr4
-         GZ0Ur/7S3W5JkzR85ien2liE6a+blgJn4aGLRDRe/DhU+sK5mntZaE50Pv+xksRv25q8
-         0idw==
-X-Gm-Message-State: AJIora/XvC/XFuwfLRyuALsNRGSAExy7NktlDr3EN2YPcZqUaRd4beAO
-        /wTSeP8ktbJe5e0/H6NEV6m+5g==
-X-Google-Smtp-Source: AGRyM1uBI1w+9Wit78V4mJ9Xfvp+eS4Z/zhmPnP8YfL9Lneiu0bXaLfHGedZMlFDpPHBVaepTaV92Q==
-X-Received: by 2002:a05:6a00:1daa:b0:52a:c51d:d36a with SMTP id z42-20020a056a001daa00b0052ac51dd36amr34595993pfw.61.1658256904800;
-        Tue, 19 Jul 2022 11:55:04 -0700 (PDT)
-Received: from google.com (123.65.230.35.bc.googleusercontent.com. [35.230.65.123])
-        by smtp.gmail.com with ESMTPSA id m5-20020a170902db0500b0016bebb0cb96sm12179765plx.266.2022.07.19.11.55.04
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:in-reply-to
+         :references:organization:mime-version:content-transfer-encoding;
+        bh=FHBqlovJJzhLFuBTzArJnXn6dBA0JSfBpz8NV3NeaD0=;
+        b=6/fmNqYQpch3SwT0fgIeUFs1VIBMtdKnoaD5OZ9wkwXk9w+fhCAtXwGNrchuDqRyQk
+         IXtZsAYmNk6sASA/GsI6Im0NA4O0gDby9ScgDRI4Tf4dXVkaCaoyU5sIVh7EOtPvPzyO
+         XsUKjZ18tbllPLOHasObfTxYeAFDCH0nt4FVDPCiRIipfzkSetL5l6uX0OoGH2b/YJjb
+         4NtmxgezpvCr/gdm6dCgn8Dabx+zkee+2bCfgC/RlTdPLtFA4n6wjlxJQJmoHECAd0X9
+         VHNWEjN3pMc8rKXQglNtuWLXKR3nZCu80KUjk3Os/H5tC5sXKcjqaPJkCotaSds5hoVn
+         B4CA==
+X-Gm-Message-State: AJIora/ZKZilLE5/QTLvHE11H/wjlMmTuudW9h2g/MawsvR1mQ19nWL1
+        yv2wtu6EmpHYJamFhThqikHA9Gdq9MwGKrV7XKPhV6zBVLf9Liyd5g4Q76/nlx2h+yWl2pfTSHy
+        5JXpbCuc0AQ9Y
+X-Received: by 2002:a05:6e02:1847:b0:2dc:fb83:69ef with SMTP id b7-20020a056e02184700b002dcfb8369efmr3282167ilv.111.1658257277967;
+        Tue, 19 Jul 2022 12:01:17 -0700 (PDT)
+X-Google-Smtp-Source: AGRyM1udhdioez1RtrDhTSfdT15ch4lhYNmu80lG4mE6yiWWNHb0L9anwiCm6LpP9LZO50rce1Zs3w==
+X-Received: by 2002:a05:6e02:1847:b0:2dc:fb83:69ef with SMTP id b7-20020a056e02184700b002dcfb8369efmr3282149ilv.111.1658257277577;
+        Tue, 19 Jul 2022 12:01:17 -0700 (PDT)
+Received: from redhat.com ([38.15.36.239])
+        by smtp.gmail.com with ESMTPSA id j28-20020a056e02219c00b002dd028f5ef5sm669380ila.38.2022.07.19.12.01.16
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 19 Jul 2022 11:55:04 -0700 (PDT)
-Date:   Tue, 19 Jul 2022 18:55:01 +0000
-From:   Sean Christopherson <seanjc@google.com>
-To:     Paolo Bonzini <pbonzini@redhat.com>
-Cc:     Aaron Lewis <aaronlewis@google.com>, kvm@vger.kernel.org,
-        jmattson@google.com
-Subject: Re: [RFC PATCH] KVM: x86: Protect the unused bits in MSR exiting
- flags
-Message-ID: <Ytb+BZReuuD+2rpd@google.com>
-References: <20220714161314.1715227-1-aaronlewis@google.com>
- <8da08a8a-e639-301d-ca98-d85b74c1ad20@redhat.com>
+        Tue, 19 Jul 2022 12:01:17 -0700 (PDT)
+Date:   Tue, 19 Jul 2022 13:01:14 -0600
+From:   Alex Williamson <alex.williamson@redhat.com>
+To:     Yishai Hadas <yishaih@nvidia.com>
+Cc:     <jgg@nvidia.com>, <saeedm@nvidia.com>, <kvm@vger.kernel.org>,
+        <netdev@vger.kernel.org>, <kuba@kernel.org>,
+        <kevin.tian@intel.com>, <joao.m.martins@oracle.com>,
+        <leonro@nvidia.com>, <maorg@nvidia.com>, <cohuck@redhat.com>
+Subject: Re: [PATCH V2 vfio 05/11] vfio: Add an IOVA bitmap support
+Message-ID: <20220719130114.2eecbba1.alex.williamson@redhat.com>
+In-Reply-To: <20220714081251.240584-6-yishaih@nvidia.com>
+References: <20220714081251.240584-1-yishaih@nvidia.com>
+        <20220714081251.240584-6-yishaih@nvidia.com>
+Organization: Red Hat
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <8da08a8a-e639-301d-ca98-d85b74c1ad20@redhat.com>
-X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-        USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=ham
-        autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-Spam-Status: No, score=-3.5 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,
+        SPF_HELO_NONE,SPF_NONE autolearn=unavailable autolearn_force=no
+        version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Jul 19, 2022, Paolo Bonzini wrote:
-> On 7/14/22 18:13, Aaron Lewis wrote:
-> > ---
-> > 
-> > Posting as an RFC to get feedback whether it's too late to protect the
-> > unused flag bits.  My hope is this feature is still new enough, and not
-> > widely used enough, and this change is reasonable enough to be able to be
-> > corrected.  These bits should have been protected from the start, but
-> > unfortunately they were not.
-> > 
-> > Another option would be to correct this by adding a quirk, but fixing
-> > it that has its down sides.   It complicates the code more than it
-> > would otherwise be, and complicates the usage for anyone using any new
-> > features introduce in the future because they would also have to enable
-> > a quirk.  For long term simplicity my hope is to be able to just patch
-> > the original change.
+On Thu, 14 Jul 2022 11:12:45 +0300
+Yishai Hadas <yishaih@nvidia.com> wrote:
+
+> From: Joao Martins <joao.m.martins@oracle.com>
 > 
-> Yes, let's do it this way.
+> The new facility adds a bunch of wrappers that abstract how an IOVA
+> range is represented in a bitmap that is granulated by a given
+> page_size. So it translates all the lifting of dealing with user
+> pointers into its corresponding kernel addresses backing said user
+> memory into doing finally the bitmap ops to change various bits.
+> 
+> The formula for the bitmap is:
+> 
+>    data[(iova / page_size) / 64] & (1ULL << (iova % 64))
+> 
+> Where 64 is the number of bits in a unsigned long (depending on arch)
+> 
+> An example usage of these helpers for a given @iova, @page_size, @length
+> and __user @data:
+> 
+> 	iova_bitmap_init(&iter.dirty, iova, __ffs(page_size));
+> 	ret = iova_bitmap_iter_init(&iter, iova, length, data);
 
-Heh, which way is "this way"?
+Why are these separate functions given this use case?
 
-  (a) Fix KVM_CAP_X86_USER_SPACE_MSR and cross our fingers
-  (b) Add a quirk
-  (c) ???
+> 	if (ret)
+> 		return -ENOMEM;
+> 
+> 	for (; !iova_bitmap_iter_done(&iter);
+> 	     iova_bitmap_iter_advance(&iter)) {
+> 		ret = iova_bitmap_iter_get(&iter);
+> 		if (ret)
+> 			break;
+> 		if (dirty)
+> 			iova_bitmap_set(iova_bitmap_iova(&iter),
+> 					iova_bitmap_iova_length(&iter),
+> 					&iter.dirty);
+> 
+> 		iova_bitmap_iter_put(&iter);
+> 
+> 		if (ret)
+> 			break;
+
+This break is unreachable.
+
+> 	}
+> 
+> 	iova_bitmap_iter_free(&iter);
+> 
+> The facility is intended to be used for user bitmaps representing
+> dirtied IOVAs by IOMMU (via IOMMUFD) and PCI Devices (via vfio-pci).
+> 
+> Signed-off-by: Joao Martins <joao.m.martins@oracle.com>
+> Signed-off-by: Yishai Hadas <yishaih@nvidia.com>
+> ---
+>  drivers/vfio/Makefile       |   6 +-
+>  drivers/vfio/iova_bitmap.c  | 164 ++++++++++++++++++++++++++++++++++++
+>  include/linux/iova_bitmap.h |  46 ++++++++++
+>  3 files changed, 214 insertions(+), 2 deletions(-)
+>  create mode 100644 drivers/vfio/iova_bitmap.c
+>  create mode 100644 include/linux/iova_bitmap.h
+> 
+> diff --git a/drivers/vfio/Makefile b/drivers/vfio/Makefile
+> index 1a32357592e3..1d6cad32d366 100644
+> --- a/drivers/vfio/Makefile
+> +++ b/drivers/vfio/Makefile
+> @@ -1,9 +1,11 @@
+>  # SPDX-License-Identifier: GPL-2.0
+>  vfio_virqfd-y := virqfd.o
+>  
+> -vfio-y += vfio_main.o
+> -
+>  obj-$(CONFIG_VFIO) += vfio.o
+> +
+> +vfio-y := vfio_main.o \
+> +          iova_bitmap.o \
+> +
+>  obj-$(CONFIG_VFIO_VIRQFD) += vfio_virqfd.o
+>  obj-$(CONFIG_VFIO_IOMMU_TYPE1) += vfio_iommu_type1.o
+>  obj-$(CONFIG_VFIO_IOMMU_SPAPR_TCE) += vfio_iommu_spapr_tce.o
+> diff --git a/drivers/vfio/iova_bitmap.c b/drivers/vfio/iova_bitmap.c
+> new file mode 100644
+> index 000000000000..9ad1533a6aec
+> --- /dev/null
+> +++ b/drivers/vfio/iova_bitmap.c
+> @@ -0,0 +1,164 @@
+> +// SPDX-License-Identifier: GPL-2.0
+> +/*
+> + * Copyright (c) 2022, Oracle and/or its affiliates.
+> + * Copyright (c) 2021-2022, NVIDIA CORPORATION & AFFILIATES. All rights reserved
+> + */
+> +
+> +#include <linux/iova_bitmap.h>
+> +
+> +static unsigned long iova_bitmap_iova_to_index(struct iova_bitmap_iter *iter,
+> +					       unsigned long iova_length)
+
+If we have an iova-to-index function, why do we pass it a length?  That
+seems to be conflating the use cases where the caller is trying to
+determine the last index for a range with the actual implementation of
+this helper.
+
+> +{
+> +	unsigned long pgsize = 1 << iter->dirty.pgshift;
+> +
+> +	return DIV_ROUND_UP(iova_length, BITS_PER_TYPE(*iter->data) * pgsize);
+
+ROUND_UP here doesn't make sense to me and is not symmetric with the
+below index-to-iova function.  For example an iova of 0x1000 give me an
+index of 1, but index of 1 gives me an iova of 0x40000.  Does this code
+work??
+
+> +}
+> +
+> +static unsigned long iova_bitmap_index_to_iova(struct iova_bitmap_iter *iter,
+> +					       unsigned long index)
+> +{
+> +	unsigned long pgshift = iter->dirty.pgshift;
+> +
+> +	return (index * sizeof(*iter->data) * BITS_PER_BYTE) << pgshift;
+                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Isn't that BITS_PER_TYPE(*iter->data), just as in the previous function?
+
+> +}
+> +
+> +static unsigned long iova_bitmap_iter_left(struct iova_bitmap_iter *iter)
+
+I think this is trying to find "remaining" whereas "left" can be
+confused with a direction.
+
+> +{
+> +	unsigned long left = iter->count - iter->offset;
+> +
+> +	left = min_t(unsigned long, left,
+> +		     (iter->dirty.npages << PAGE_SHIFT) / sizeof(*iter->data));
+
+Ugh, dirty.npages is zero'd on bitmap init, allocated on get and left
+with stale data on put.  This really needs some documentation/theory of
+operation.
+
+> +
+> +	return left;
+> +}
+> +
+> +/*
+> + * Input argument of number of bits to bitmap_set() is unsigned integer, which
+> + * further casts to signed integer for unaligned multi-bit operation,
+> + * __bitmap_set().
+> + * Then maximum bitmap size supported is 2^31 bits divided by 2^3 bits/byte,
+> + * that is 2^28 (256 MB) which maps to 2^31 * 2^12 = 2^43 (8TB) on 4K page
+> + * system.
+> + */
+
+This is all true and familiar, but what's it doing here?  The type1
+code this comes from uses this to justify some #defines that are used
+to sanitize input.  I see no such enforcement in this code.  The only
+comment in this whole patch and it seems irrelevant.
+
+> +int iova_bitmap_iter_init(struct iova_bitmap_iter *iter,
+> +			  unsigned long iova, unsigned long length,
+> +			  u64 __user *data)
+> +{
+> +	struct iova_bitmap *dirty = &iter->dirty;
+> +
+> +	iter->data = data;
+> +	iter->offset = 0;
+> +	iter->count = iova_bitmap_iova_to_index(iter, length);
+
+If this works, it's because the DIV_ROUND_UP above accounted for what
+should have been and index-to-count fixup here, ie. add one.
+
+> +	iter->iova = iova;
+> +	iter->length = length;
+> +	dirty->pages = (struct page **)__get_free_page(GFP_KERNEL);
+> +
+> +	return !dirty->pages ? -ENOMEM : 0;
+> +}
+> +
+> +void iova_bitmap_iter_free(struct iova_bitmap_iter *iter)
+> +{
+> +	struct iova_bitmap *dirty = &iter->dirty;
+> +
+> +	if (dirty->pages) {
+> +		free_page((unsigned long)dirty->pages);
+> +		dirty->pages = NULL;
+> +	}
+> +}
+> +
+> +bool iova_bitmap_iter_done(struct iova_bitmap_iter *iter)
+> +{
+> +	return iter->offset >= iter->count;
+> +}
+> +
+> +unsigned long iova_bitmap_length(struct iova_bitmap_iter *iter)
+> +{
+> +	unsigned long max_iova = iter->dirty.iova + iter->length;
+> +	unsigned long left = iova_bitmap_iter_left(iter);
+> +	unsigned long iova = iova_bitmap_iova(iter);
+> +
+> +	left = iova_bitmap_index_to_iova(iter, left);
+
+@left is first used for number of indexes and then for an iova range :(
+
+> +	if (iova + left > max_iova)
+> +		left -= ((iova + left) - max_iova);
+> +
+> +	return left;
+> +}
+
+IIUC, this is returning the iova free space in the bitmap, not the
+length of the bitmap??
+
+> +
+> +unsigned long iova_bitmap_iova(struct iova_bitmap_iter *iter)
+> +{
+> +	unsigned long skip = iter->offset;
+> +
+> +	return iter->iova + iova_bitmap_index_to_iova(iter, skip);
+> +}
+
+It would help if this were defined above it's usage above.
+
+> +
+> +void iova_bitmap_iter_advance(struct iova_bitmap_iter *iter)
+> +{
+> +	unsigned long length = iova_bitmap_length(iter);
+> +
+> +	iter->offset += iova_bitmap_iova_to_index(iter, length);
+
+Again, fudging an index count based on bogus index value.
+
+> +}
+> +
+> +void iova_bitmap_iter_put(struct iova_bitmap_iter *iter)
+> +{
+> +	struct iova_bitmap *dirty = &iter->dirty;
+> +
+> +	if (dirty->npages)
+> +		unpin_user_pages(dirty->pages, dirty->npages);
+
+dirty->npages = 0;?
+
+> +}
+> +
+> +int iova_bitmap_iter_get(struct iova_bitmap_iter *iter)
+> +{
+> +	struct iova_bitmap *dirty = &iter->dirty;
+> +	unsigned long npages;
+> +	u64 __user *addr;
+> +	long ret;
+> +
+> +	npages = DIV_ROUND_UP((iter->count - iter->offset) *
+> +			      sizeof(*iter->data), PAGE_SIZE);
+> +	npages = min(npages,  PAGE_SIZE / sizeof(struct page *));
+> +	addr = iter->data + iter->offset;
+> +	ret = pin_user_pages_fast((unsigned long)addr, npages,
+> +				  FOLL_WRITE, dirty->pages);
+> +	if (ret <= 0)
+> +		return ret;
+> +
+> +	dirty->npages = (unsigned long)ret;
+> +	dirty->iova = iova_bitmap_iova(iter);
+> +	dirty->start_offset = offset_in_page(addr);
+> +	return 0;
+> +}
+> +
+> +void iova_bitmap_init(struct iova_bitmap *bitmap,
+> +		      unsigned long base, unsigned long pgshift)
+> +{
+> +	memset(bitmap, 0, sizeof(*bitmap));
+> +	bitmap->iova = base;
+> +	bitmap->pgshift = pgshift;
+> +}
+> +
+> +unsigned int iova_bitmap_set(struct iova_bitmap *dirty,
+> +			     unsigned long iova,
+> +			     unsigned long length)
+> +{
+> +	unsigned long nbits, offset, start_offset, idx, size, *kaddr;
+> +
+> +	nbits = max(1UL, length >> dirty->pgshift);
+> +	offset = (iova - dirty->iova) >> dirty->pgshift;
+> +	idx = offset / (PAGE_SIZE * BITS_PER_BYTE);
+> +	offset = offset % (PAGE_SIZE * BITS_PER_BYTE);
+> +	start_offset = dirty->start_offset;
+> +
+> +	while (nbits > 0) {
+> +		kaddr = kmap_local_page(dirty->pages[idx]) + start_offset;
+> +		size = min(PAGE_SIZE * BITS_PER_BYTE - offset, nbits);
+> +		bitmap_set(kaddr, offset, size);
+> +		kunmap_local(kaddr - start_offset);
+> +		start_offset = offset = 0;
+> +		nbits -= size;
+> +		idx++;
+> +	}
+> +
+> +	return nbits;
+> +}
+> +EXPORT_SYMBOL_GPL(iova_bitmap_set);
+> +
+> diff --git a/include/linux/iova_bitmap.h b/include/linux/iova_bitmap.h
+> new file mode 100644
+> index 000000000000..c474c351634a
+> --- /dev/null
+> +++ b/include/linux/iova_bitmap.h
+> @@ -0,0 +1,46 @@
+> +/* SPDX-License-Identifier: GPL-2.0 */
+> +/*
+> + * Copyright (c) 2022, Oracle and/or its affiliates.
+> + * Copyright (c) 2021-2022, NVIDIA CORPORATION & AFFILIATES. All rights reserved
+> + */
+> +
+> +#ifndef _IOVA_BITMAP_H_
+> +#define _IOVA_BITMAP_H_
+> +
+> +#include <linux/highmem.h>
+> +#include <linux/mm.h>
+> +#include <linux/uio.h>
+> +
+> +struct iova_bitmap {
+> +	unsigned long iova;
+> +	unsigned long pgshift;
+> +	unsigned long start_offset;
+> +	unsigned long npages;
+> +	struct page **pages;
+> +};
+> +
+> +struct iova_bitmap_iter {
+> +	struct iova_bitmap dirty;
+> +	u64 __user *data;
+> +	size_t offset;
+> +	size_t count;
+> +	unsigned long iova;
+> +	unsigned long length;
+> +};
+> +
+> +int iova_bitmap_iter_init(struct iova_bitmap_iter *iter, unsigned long iova,
+> +			  unsigned long length, u64 __user *data);
+> +void iova_bitmap_iter_free(struct iova_bitmap_iter *iter);
+> +bool iova_bitmap_iter_done(struct iova_bitmap_iter *iter);
+> +unsigned long iova_bitmap_length(struct iova_bitmap_iter *iter);
+> +unsigned long iova_bitmap_iova(struct iova_bitmap_iter *iter);
+> +void iova_bitmap_iter_advance(struct iova_bitmap_iter *iter);
+> +int iova_bitmap_iter_get(struct iova_bitmap_iter *iter);
+> +void iova_bitmap_iter_put(struct iova_bitmap_iter *iter);
+> +void iova_bitmap_init(struct iova_bitmap *bitmap,
+> +		      unsigned long base, unsigned long pgshift);
+> +unsigned int iova_bitmap_set(struct iova_bitmap *dirty,
+> +			     unsigned long iova,
+> +			     unsigned long length);
+> +
+> +#endif
+
+No relevant comments, no theory of operation.  I found this really
+difficult to review and the page handling is still not clear to me.
+I'm not willing to take on maintainership of this code under
+drivers/vfio/ as is.  Thanks,
+
+Alex
+
