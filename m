@@ -2,423 +2,238 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id F28E257A734
-	for <lists+kvm@lfdr.de>; Tue, 19 Jul 2022 21:25:32 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 4F85657A751
+	for <lists+kvm@lfdr.de>; Tue, 19 Jul 2022 21:39:26 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238260AbiGSTZa (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 19 Jul 2022 15:25:30 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47790 "EHLO
+        id S235565AbiGSTjU (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 19 Jul 2022 15:39:20 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56616 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235849AbiGSTZ0 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 19 Jul 2022 15:25:26 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id E73C6BCA9
-        for <kvm@vger.kernel.org>; Tue, 19 Jul 2022 12:25:24 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1658258724;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=01nIMAqu9kXKBUZerezX8Ft5zuAeFvv5UsalBlZ7zoI=;
-        b=epoIoIeruDLHAq9r1ACxtv0u7Au+vowtXEjhHzHgqkjxYXvCAhULDVsusOCUmc5Gt/o0/8
-        LCHmwAA5DSg7x8DE+mIu4rmT5KLr94Cv0rQnEP8T1Ec0Z+BS1MAJtiBA4E/L6SZUfDFg97
-        MQrA5xeLiALyZ+EinMLN6Kpt6Vjeky0=
-Received: from mail-il1-f198.google.com (mail-il1-f198.google.com
- [209.85.166.198]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-322-EMbJe0LEP_eHPIcV-q6lNg-1; Tue, 19 Jul 2022 15:25:17 -0400
-X-MC-Unique: EMbJe0LEP_eHPIcV-q6lNg-1
-Received: by mail-il1-f198.google.com with SMTP id d14-20020a056e020c0e00b002dd0a88a280so57280ile.16
-        for <kvm@vger.kernel.org>; Tue, 19 Jul 2022 12:25:17 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:in-reply-to
-         :references:organization:mime-version:content-transfer-encoding;
-        bh=01nIMAqu9kXKBUZerezX8Ft5zuAeFvv5UsalBlZ7zoI=;
-        b=2UnaWbC3+VvWzlIWfw3oian/OhgVUjMblvx1EWapWfylf/IBeV96SMu+vJ6NwM4lUl
-         vehSe/v25Ymf5WI6wxsztwjueXsM8TOIWYbz0FuQqw4I0dpdpS/fIFMfE/TQ7sO5wO9T
-         sVjZCTmyhUjB3iqOv/nw9y7wdQCIT6LiheQwNXFuRQnFb5dhYnzNtBgLR0qO1azjFrL/
-         YO6F+S26xDVOIINwpX1US3/uqO32/U5QR6Wv1faod3/BlK/Xza1GbgxXvvk5TS0lle5I
-         Aic0gtv8vUKLapJSo12deWRKc8/jLeX2BYjEgw3TxwQdJzJRtA+jYnI3wSWdzI3F/zxu
-         ZOPQ==
-X-Gm-Message-State: AJIora/y7NND+XpARelRGCmBLf3Q7aszgFNXnL+nf6DOPjIFEQrVBerT
-        3/MQH82Zcuvy6h6+gBqBCoLltBRzcP4f1zthm4kLEAhVjR4NWbo7tLv4rLHPXo1rQPthHG0X7PV
-        u3+p4rxFd197/
-X-Received: by 2002:a05:6e02:1c88:b0:2dc:d092:9721 with SMTP id w8-20020a056e021c8800b002dcd0929721mr9150724ill.118.1658258716776;
-        Tue, 19 Jul 2022 12:25:16 -0700 (PDT)
-X-Google-Smtp-Source: AGRyM1tZOG+3tB+aCvTVCSR7lYMcpDeYWLonIVl6Pt4opkh9VdDb7o0N1f6aAdQJVuSsAqXhIfjkZw==
-X-Received: by 2002:a05:6e02:1c88:b0:2dc:d092:9721 with SMTP id w8-20020a056e021c8800b002dcd0929721mr9150708ill.118.1658258716470;
-        Tue, 19 Jul 2022 12:25:16 -0700 (PDT)
-Received: from redhat.com ([38.15.36.239])
-        by smtp.gmail.com with ESMTPSA id k21-20020a02a715000000b00333fa7a642asm6997536jam.63.2022.07.19.12.25.15
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 19 Jul 2022 12:25:16 -0700 (PDT)
-Date:   Tue, 19 Jul 2022 13:25:14 -0600
-From:   Alex Williamson <alex.williamson@redhat.com>
-To:     Yishai Hadas <yishaih@nvidia.com>
-Cc:     <jgg@nvidia.com>, <saeedm@nvidia.com>, <kvm@vger.kernel.org>,
-        <netdev@vger.kernel.org>, <kuba@kernel.org>,
-        <kevin.tian@intel.com>, <joao.m.martins@oracle.com>,
-        <leonro@nvidia.com>, <maorg@nvidia.com>, <cohuck@redhat.com>
-Subject: Re: [PATCH V2 vfio 06/11] vfio: Introduce the DMA logging feature
- support
-Message-ID: <20220719132514.7d21dfaf.alex.williamson@redhat.com>
-In-Reply-To: <8242cd07-0b65-e2b8-3797-3fe5623ec65d@nvidia.com>
-References: <20220714081251.240584-1-yishaih@nvidia.com>
-        <20220714081251.240584-7-yishaih@nvidia.com>
-        <20220718163024.143ec05a.alex.williamson@redhat.com>
-        <8242cd07-0b65-e2b8-3797-3fe5623ec65d@nvidia.com>
-Organization: Red Hat
+        with ESMTP id S231495AbiGSTjL (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 19 Jul 2022 15:39:11 -0400
+Received: from mga06.intel.com (mga06b.intel.com [134.134.136.31])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5F68045040;
+        Tue, 19 Jul 2022 12:39:10 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1658259550; x=1689795550;
+  h=date:from:to:cc:subject:message-id:references:
+   content-transfer-encoding:in-reply-to:mime-version;
+  bh=nohxgLSDBgW6fz4v1285lXi8oIxqvKXW6CYfq+7wIiw=;
+  b=figeyOZBmj8cWvHAejHPIPypLw922trjG6nFrOcq1q5aQ4GdYMVjB6FR
+   B54/ytf9qsUw76d/XWiMvfmzIk+TvvoTM5OP7U2t994lGoonDsWsPntyb
+   WxgaPgkOzs1dtCtjUxFzVqMZLNPG/E0UQrihAFZN1lRhOU9DbE4FKYWHZ
+   L6H9HJn0JP2kOVtH/euIpdJV5Dof1le/jChDZvruT2fE277py36oM+LJj
+   dmYfzQ4vVl2JXQGA7wXLTHfNAqVbBVmCPxjZ4+Efs7gC3js0t4KcMKGmS
+   MBpCXjDLIHUPiK5Yg1uU1jUzNKMxj5dsZjgPgtwNIhVM1TkQhPNevtkLc
+   A==;
+X-IronPort-AV: E=McAfee;i="6400,9594,10413"; a="348277233"
+X-IronPort-AV: E=Sophos;i="5.92,285,1650956400"; 
+   d="scan'208";a="348277233"
+Received: from orsmga006.jf.intel.com ([10.7.209.51])
+  by orsmga104.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 19 Jul 2022 12:39:09 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.92,285,1650956400"; 
+   d="scan'208";a="572987522"
+Received: from orsmsx606.amr.corp.intel.com ([10.22.229.19])
+  by orsmga006.jf.intel.com with ESMTP; 19 Jul 2022 12:39:09 -0700
+Received: from orsmsx603.amr.corp.intel.com (10.22.229.16) by
+ ORSMSX606.amr.corp.intel.com (10.22.229.19) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2375.28; Tue, 19 Jul 2022 12:39:09 -0700
+Received: from ORSEDG602.ED.cps.intel.com (10.7.248.7) by
+ orsmsx603.amr.corp.intel.com (10.22.229.16) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2375.28 via Frontend Transport; Tue, 19 Jul 2022 12:39:09 -0700
+Received: from NAM11-BN8-obe.outbound.protection.outlook.com (104.47.58.168)
+ by edgegateway.intel.com (134.134.137.103) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2308.27; Tue, 19 Jul 2022 12:39:09 -0700
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=lWyysbzwKTfZdZ4m4HDLLcij4Sz2Lm4uwgjX9WNQTsY0efvgbuTc2vX6eoH3H71Pm+p/lG4N6eRsY5ozssJ+0ZpaU8T80XBdpDagW3f5sa0ffrY6ldMvTjrsqfnQY54Bydj+aJQw6b30Hpdl5S2Rcvxit41cB2Ozze3UaBc37fkTFxsW40mcWd2tKh+KU00QBxkG2FKeJ/z0xz6jQ9H3MtUbEG5chk5yzKJetpXr7I5XKC/LsyFOTiZ9r5vNmbM+CxP20zwL7GL8+g/z+dzZKlvpw/+krdRHebZoUyQ7W3xNYnaDyYHV7cCkrt6KdSA554FNAcnTtFU206mO1CpGnA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=ET2MYeg16EkfJSWeNBdW7y8qVPPZu0zfzjDm+xx/F0w=;
+ b=cumYlCtH4Alf+thvl+En4okd7lYsZyX2ivhgYaQwPxR/nJZWFGcgiCw9500W3Pu4TCFArkK8f5UvlE9qmdnIQt25u5lqJyrIYr025k50DjDnfRr2KrRSRhHBuIKy1Wexkx6LpdOOZq8Lv+kePPcKTTvotRD0RYPpgi0l5YR4LGP98LZBJ1zG1DYxyu9P5tcEsxCs3+LGYMoAWGrmsO2GjML3s9kWjHPnDi3Mt1wlFIsBu8vgZt6Cok4r972bpPNo/Oct2QwfX7b3c2Hg2XdV0O6GKfoq/13+zKlEcRqp10tswhHabgvTvuC3MQkWqKAKDAIHchuGcgqj0/1cF27OTw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+Received: from MWHPR1101MB2126.namprd11.prod.outlook.com
+ (2603:10b6:301:50::20) by DM6PR11MB2795.namprd11.prod.outlook.com
+ (2603:10b6:5:bf::24) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5438.21; Tue, 19 Jul
+ 2022 19:39:06 +0000
+Received: from MWHPR1101MB2126.namprd11.prod.outlook.com
+ ([fe80::6466:20a6:57b4:1edf]) by MWHPR1101MB2126.namprd11.prod.outlook.com
+ ([fe80::6466:20a6:57b4:1edf%11]) with mapi id 15.20.5438.024; Tue, 19 Jul
+ 2022 19:39:05 +0000
+Date:   Tue, 19 Jul 2022 12:39:03 -0700
+From:   Dan Williams <dan.j.williams@intel.com>
+To:     Kai Huang <kai.huang@intel.com>,
+        Dave Hansen <dave.hansen@intel.com>,
+        <linux-kernel@vger.kernel.org>, <kvm@vger.kernel.org>
+CC:     <seanjc@google.com>, <pbonzini@redhat.com>, <len.brown@intel.com>,
+        <tony.luck@intel.com>, <rafael.j.wysocki@intel.com>,
+        <reinette.chatre@intel.com>, <dan.j.williams@intel.com>,
+        <peterz@infradead.org>, <ak@linux.intel.com>,
+        <kirill.shutemov@linux.intel.com>,
+        <sathyanarayanan.kuppuswamy@linux.intel.com>,
+        <isaku.yamahata@intel.com>
+Subject: Re: [PATCH v5 07/22] x86/virt/tdx: Implement SEAMCALL function
+Message-ID: <62d7085729358_97b64294f2@dwillia2-xfh.jf.intel.com.notmuch>
+References: <cover.1655894131.git.kai.huang@intel.com>
+ <095e6bbc57b4470e1e9a9104059a5238c9775f00.1655894131.git.kai.huang@intel.com>
+ <069a062e-a4a6-09af-7b74-7f4929f2ec0b@intel.com>
+ <5ce7ebfe54160ea35e432bf50207ebed32db31fc.camel@intel.com>
+ <84e93539-a2f9-f68e-416a-ea3d8fc725af@intel.com>
+ <6bef368ccc68676e4acaecc4b6dc52f598ea7f2f.camel@intel.com>
+Content-Type: text/plain; charset="iso-8859-1"
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <6bef368ccc68676e4acaecc4b6dc52f598ea7f2f.camel@intel.com>
+X-ClientProxiedBy: SJ0PR05CA0170.namprd05.prod.outlook.com
+ (2603:10b6:a03:339::25) To MWHPR1101MB2126.namprd11.prod.outlook.com
+ (2603:10b6:301:50::20)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-2.8 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        SPF_HELO_NONE,SPF_NONE autolearn=unavailable autolearn_force=no
-        version=3.4.6
+X-MS-PublicTrafficType: Email
+X-MS-Office365-Filtering-Correlation-Id: 641b549b-2ff9-4655-60f6-08da69be574d
+X-MS-TrafficTypeDiagnostic: DM6PR11MB2795:EE_
+X-LD-Processed: 46c98d88-e344-4ed4-8496-4ed7712e255d,ExtAddr
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: DP9cQExpBQlAeexRUZmeh+1CzH8DcxKMEpaaUPtTJ3khvVYVIhisNViohk1dJy/ouupNe46h4LwEa5Ggg9GA3qajaamY6jpmU/CqzVfWW3ynmnXb9fuSlbH4AlUfpqo1FF4YeAF09Nnx6RMrzM+3xyQgVj4FPvYsieEXAL4NC6PloghnMBQl6sK3j+D2O6SKPeKPEKr2kZ9c0ZaIsjQU5SQzWwJ01ThSNr8ZDoQNvarqIy/4MoTJIW/EuRAM9UwQKmrYCctwYqtzsSOKke0MOfxEtaOR5l/9ZaPJCrnI2FckUylqBEudmOaV+gdsSGJHw2AF201u4XJcrkPC+PNSSVQ4A86hznGec9kgUhPbvTbw4r2VThLbR8HeGXvhWIyBu/VvbpxZTKZqF8gIJMLEGgKuuUoE/IRr/JWA4syzKDXlmRWM/2iq/rzdmTMAxsNkTADvKHBzuq+0c1ngSd9vo275PlyE3FqjxJJZitLtvaVeiv6deYndua0KYQgfLlRAZdSFB9r7wLjL+wuYIKrlxTERAaFpP+PxEekb972Zl3D+68Fnk56Jkk0t3jxHGrmbYydRpRjZVfvOguHKPVxSrLvmacjmIpuooQucLi0IIrNbCmEE3QC3k2BxnQIhXdY6RYCmEECB/Olr8fubC/1FmoOneA3l6WUGhHl3IQFz4912/k45pkxThAzCLvGnP+xxdBx6MB5Y7u2m45v8cIywI6F2yrXGBhPQsf7yIr/AsiAdi7Z7xLO9FD5j7bMFDBI7
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:MWHPR1101MB2126.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230016)(346002)(39860400002)(136003)(366004)(396003)(376002)(8936002)(5660300002)(2906002)(110136005)(8676002)(4326008)(86362001)(316002)(66946007)(66476007)(186003)(478600001)(9686003)(6512007)(6506007)(83380400001)(26005)(6486002)(53546011)(82960400001)(66556008)(38100700002)(41300700001);DIR:OUT;SFP:1102;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?iso-8859-1?Q?4cs0MUYitlAO5kCNOh3UBIBgDdx2mcDXaeYxdFQQtYqHevPnJv9b9vSn3C?=
+ =?iso-8859-1?Q?yzOB438D4Gi77NtPGC1q9BwI/U8L7jgWA3FghBwHE1aRebYJZHHYz6wU8r?=
+ =?iso-8859-1?Q?rJEC/SfpSXHOmG5BRyc48CZTVWa4RfCvovtzBnFCobtBY3ZaoL9AH/09Vs?=
+ =?iso-8859-1?Q?HSOgWKXy4wKHjZB7MaWPICsY01fyPFhcacY5PsOYd8fiDYwK2n5zAAV43E?=
+ =?iso-8859-1?Q?y3y7siL4OSIiPXM5vFzo0mVL+TRsoYaMwwR7kqbEHK6ZuPN3WD0V/ad5oV?=
+ =?iso-8859-1?Q?DiINqZGqWi3PoVOAAf+lVOiIVhwZImgcrtUYNJdHqVsMHMfmvG/BcixU01?=
+ =?iso-8859-1?Q?PDdMAcGaMq6t9FgAj9K/KGyoBHdqXo7xv49SGoht7+c/PWbDkehZ5mEPWu?=
+ =?iso-8859-1?Q?T4H0u4Bs/ilOIf+oaEfRxF/8AWBhyLChKvspyVHucpSGZp1EUJGGheAyGb?=
+ =?iso-8859-1?Q?UZxNgYZ125M50E7o9Gvj8DIt4BGLuryySdelJWFT11kaAKCmWknezENqpl?=
+ =?iso-8859-1?Q?kchezpW/SJSzM9QKR2O/4Oauc15xE8Y4vEZ7uNGnuzwGpp+PpFB2itYU6+?=
+ =?iso-8859-1?Q?RxIHhPyBzN1JX/9j+dED51QMOOlf4Mal3dA1PrKNKRmESOFkIbWULJeGso?=
+ =?iso-8859-1?Q?JsnoR0ipQ2OdFpecZSKoOUSwCaDaWDzTAWEmOkvegMdezBpqvYkO5d9sIU?=
+ =?iso-8859-1?Q?G9l3919Z+h07mNWu0BAj5XFXVEsGg8X+owtD3zn1ftpZdpGV0E44FN4amE?=
+ =?iso-8859-1?Q?Ou4vDSo8Jmyn8cP18pHPMNJreBt/3uW4K+bq0xqIf5oNeVD8RfdeRQt+OF?=
+ =?iso-8859-1?Q?bE8P6WgVrm0vAhcdJjoCXh0jYGziNu0RVq0jSIQDQZZbZkayiF3TYb9tVq?=
+ =?iso-8859-1?Q?wWGoKsa2P6TXCC1l7wEzUr8piKHwj0/DC1FftDaz/ZCPa5xuQri5SK3o7n?=
+ =?iso-8859-1?Q?BgNRAOBY7rWK+bxbKybiV+4FxODlz38XhQi9qsIQHxBZVl1lpJhpOzr6OP?=
+ =?iso-8859-1?Q?pRdkKHuytv3trmGcl2/x48jCwwWhfW0+LzruCodBjGvJGwijW6ePY0bxGr?=
+ =?iso-8859-1?Q?ByohSNn7HDXaCBTvrx7TEdnNKUpzH46RLqbB1nKE4f5BzXr4j5Rnu29jLa?=
+ =?iso-8859-1?Q?mcT5kPIuirixn1B39iHug7yOwwqDv+FmNfwHj3xr0kpwne2aeT9nifjvRU?=
+ =?iso-8859-1?Q?TSMd4xiCMDTNVYHPC8Fihdd2UracuWXZWYdJj9xinIHRZ0tvWLUEqATYIe?=
+ =?iso-8859-1?Q?EVVwcO6S1v5YPOCwi6hlirkz7rq4kK7iJDo+LLP/m6+1KEHeynXE1+QUeF?=
+ =?iso-8859-1?Q?/gN9lrZXnNCE1jvaE7Dt5HmNsm8mlJi0GANvC+yz2bJExIuUyMzATWJq6l?=
+ =?iso-8859-1?Q?+zDqFR2v9pyOxRhUFefoUObRKcVu4+Jlp2j4bCtIRQcxn+QwJ7ECEahjMQ?=
+ =?iso-8859-1?Q?eCxwrqTKhi5LR/cje7cDbh0wdVl2s/Xp1EMUcnH+8hxLJDLVt9mm5ben9p?=
+ =?iso-8859-1?Q?NjCimCq16ceYphrEP71mRRUg7OO9OYMZ8ONRs/gt658cVmioMDxtscBYCa?=
+ =?iso-8859-1?Q?jeA/yRyViKRK8Qd3sVbDkjQsPtiU1CEIZ3hVDuwixss7JyfD8/g4hYT+LH?=
+ =?iso-8859-1?Q?xPtotXFnON6+bTp6LJOtT37iHwyBGsbFjEcDPHsoyyeALcLhCLrwgjhQ?=
+ =?iso-8859-1?Q?=3D=3D?=
+X-MS-Exchange-CrossTenant-Network-Message-Id: 641b549b-2ff9-4655-60f6-08da69be574d
+X-MS-Exchange-CrossTenant-AuthSource: MWHPR1101MB2126.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 19 Jul 2022 19:39:05.7925
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: VrqBe7FwZJ7Lw+vX5WCmdY2WmLWDU/A4pAf/bHQPfJAeid7XYVomm2gbHwPy5SRBNtwT82oR7MURkxmWkSIikDtl1qzsaOgCmlPDCsjKMqk=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM6PR11MB2795
+X-OriginatorOrg: intel.com
+X-Spam-Status: No, score=-5.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
+        SPF_HELO_NONE,SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, 19 Jul 2022 12:19:25 +0300
-Yishai Hadas <yishaih@nvidia.com> wrote:
-
-> On 19/07/2022 1:30, Alex Williamson wrote:
-> > On Thu, 14 Jul 2022 11:12:46 +0300
-> > Yishai Hadas <yishaih@nvidia.com> wrote:
-> >  
-> >> Introduce the DMA logging feature support in the vfio core layer.
-> >>
-> >> It includes the processing of the device start/stop/report DMA logging
-> >> UAPIs and calling the relevant driver 'op' to do the work.
-> >>
-> >> Specifically,
-> >> Upon start, the core translates the given input ranges into an interval
-> >> tree, checks for unexpected overlapping, non aligned ranges and then
-> >> pass the translated input to the driver for start tracking the given
-> >> ranges.
-> >>
-> >> Upon report, the core translates the given input user space bitmap and
-> >> page size into an IOVA kernel bitmap iterator. Then it iterates it and
-> >> call the driver to set the corresponding bits for the dirtied pages in a
-> >> specific IOVA range.
-> >>
-> >> Upon stop, the driver is called to stop the previous started tracking.
-> >>
-> >> The next patches from the series will introduce the mlx5 driver
-> >> implementation for the logging ops.
-> >>
-> >> Signed-off-by: Yishai Hadas <yishaih@nvidia.com>
-> >> ---
-> >>   drivers/vfio/Kconfig             |   1 +
-> >>   drivers/vfio/pci/vfio_pci_core.c |   5 +
-> >>   drivers/vfio/vfio_main.c         | 161 +++++++++++++++++++++++++++++++
-> >>   include/linux/vfio.h             |  21 +++-
-> >>   4 files changed, 186 insertions(+), 2 deletions(-)
-> >>
-> >> diff --git a/drivers/vfio/Kconfig b/drivers/vfio/Kconfig
-> >> index 6130d00252ed..86c381ceb9a1 100644
-> >> --- a/drivers/vfio/Kconfig
-> >> +++ b/drivers/vfio/Kconfig
-> >> @@ -3,6 +3,7 @@ menuconfig VFIO
-> >>   	tristate "VFIO Non-Privileged userspace driver framework"
-> >>   	select IOMMU_API
-> >>   	select VFIO_IOMMU_TYPE1 if MMU && (X86 || S390 || ARM || ARM64)
-> >> +	select INTERVAL_TREE
-> >>   	help
-> >>   	  VFIO provides a framework for secure userspace device drivers.
-> >>   	  See Documentation/driver-api/vfio.rst for more details.
-> >> diff --git a/drivers/vfio/pci/vfio_pci_core.c b/drivers/vfio/pci/vfio_pci_core.c
-> >> index 2efa06b1fafa..b6dabf398251 100644
-> >> --- a/drivers/vfio/pci/vfio_pci_core.c
-> >> +++ b/drivers/vfio/pci/vfio_pci_core.c
-> >> @@ -1862,6 +1862,11 @@ int vfio_pci_core_register_device(struct vfio_pci_core_device *vdev)
-> >>   			return -EINVAL;
-> >>   	}
-> >>   
-> >> +	if (vdev->vdev.log_ops && !(vdev->vdev.log_ops->log_start &&
-> >> +	    vdev->vdev.log_ops->log_stop &&
-> >> +	    vdev->vdev.log_ops->log_read_and_clear))
-> >> +		return -EINVAL;
-> >> +
-> >>   	/*
-> >>   	 * Prevent binding to PFs with VFs enabled, the VFs might be in use
-> >>   	 * by the host or other users.  We cannot capture the VFs if they
-> >> diff --git a/drivers/vfio/vfio_main.c b/drivers/vfio/vfio_main.c
-> >> index bd84ca7c5e35..2414d827e3c8 100644
-> >> --- a/drivers/vfio/vfio_main.c
-> >> +++ b/drivers/vfio/vfio_main.c
-> >> @@ -32,6 +32,8 @@
-> >>   #include <linux/vfio.h>
-> >>   #include <linux/wait.h>
-> >>   #include <linux/sched/signal.h>
-> >> +#include <linux/interval_tree.h>
-> >> +#include <linux/iova_bitmap.h>
-> >>   #include "vfio.h"
-> >>   
-> >>   #define DRIVER_VERSION	"0.3"
-> >> @@ -1603,6 +1605,153 @@ static int vfio_ioctl_device_feature_migration(struct vfio_device *device,
-> >>   	return 0;
-> >>   }
-> >>   
-> >> +#define LOG_MAX_RANGES 1024
-> >> +
-> >> +static int
-> >> +vfio_ioctl_device_feature_logging_start(struct vfio_device *device,
-> >> +					u32 flags, void __user *arg,
-> >> +					size_t argsz)
-> >> +{
-> >> +	size_t minsz =
-> >> +		offsetofend(struct vfio_device_feature_dma_logging_control,
-> >> +			    ranges);
-> >> +	struct vfio_device_feature_dma_logging_range __user *ranges;
-> >> +	struct vfio_device_feature_dma_logging_control control;
-> >> +	struct vfio_device_feature_dma_logging_range range;
-> >> +	struct rb_root_cached root = RB_ROOT_CACHED;
-> >> +	struct interval_tree_node *nodes;
-> >> +	u32 nnodes;
-> >> +	int i, ret;
-> >> +
-> >> +	if (!device->log_ops)
-> >> +		return -ENOTTY;
-> >> +
-> >> +	ret = vfio_check_feature(flags, argsz,
-> >> +				 VFIO_DEVICE_FEATURE_SET,
-> >> +				 sizeof(control));
-> >> +	if (ret != 1)
-> >> +		return ret;
-> >> +
-> >> +	if (copy_from_user(&control, arg, minsz))
-> >> +		return -EFAULT;
-> >> +
-> >> +	nnodes = control.num_ranges;
-> >> +	if (!nnodes || nnodes > LOG_MAX_RANGES)
-> >> +		return -EINVAL;  
-> > The latter looks more like an -E2BIG errno.  
+Kai Huang wrote:
+> On Mon, 2022-06-27 at 13:58 -0700, Dave Hansen wrote:
+> > On 6/26/22 22:23, Kai Huang wrote:
+> > > On Fri, 2022-06-24 at 11:38 -0700, Dave Hansen wrote:
+> > > > On 6/22/22 04:16, Kai Huang wrote:
+> > > > > SEAMCALL instruction causes #GP when SEAMRR isn't enabled, and #UD when
+> > > > > CPU is not in VMX operation.  The TDX_MODULE_CALL macro doesn't handle
+> > > > > SEAMCALL exceptions.  Leave to the caller to guarantee those conditions
+> > > > > before calling __seamcall().
+> > > > 
+> > > > I was trying to make the argument earlier that you don't need *ANY*
+> > > > detection for TDX, other than the ability to make a SEAMCALL.
+> > > > Basically, patch 01/22 could go away.
+> > ...
+> > > > So what does patch 01/22 buy us?  One EXTABLE entry?
+> > > 
+> > > There are below pros if we can detect whether TDX is enabled by BIOS during boot
+> > > before initializing the TDX Module:
+> > > 
+> > > 1) There are requirements from customers to report whether platform supports TDX
+> > > and the TDX keyID numbers before initializing the TDX module so the userspace
+> > > cloud software can use this information to do something.  Sorry I cannot find
+> > > the lore link now.
+> > 
+> > <sigh>
+> > 
+> > Never listen to customers literally.  It'll just lead you down the wrong
+> > path.  They told you, "we need $FOO in dmesg" and you ran with it
+> > without understanding why.  The fact that you even *need* to find the
+> > lore link is because you didn't bother to realize what they really needed.
+> > 
+> > dmesg is not ABI.  It's for humans.  If you need data out of the kernel,
+> > do it with a *REAL* ABI.  Not dmesg.
 > 
-> OK
+> Showing in the dmesg is the first step, but later we have plan to expose keyID
+> info via /sysfs.  Of course, it's always arguable customer's such requirement is
+> absolutely needed, but to me it's still a good thing to have code to detect TDX
+> during boot.  The code isn't complicated as you can see.
 > 
-> > This is a hard coded
-> > limit, but what are the heuristics?  Can a user introspect the limit?
-> > Thanks,
-> >
-> > Alex  
+> > 
+> > > 2) As you can see, it can be used to handle ACPI CPU/memory hotplug and driver
+> > > managed memory hotplug.  Kexec() support patch also can use it.
+> > > 
+> > > Particularly, in concept, ACPI CPU/memory hotplug is only related to whether TDX
+> > > is enabled by BIOS, but not whether TDX module is loaded, or the result of
+> > > initializing the TDX module.  So I think we should have some code to detect TDX
+> > > during boot.
+> > 
+> > This is *EXACTLY* why our colleagues at Intel needs to tell us about
+> > what the OS and firmware should do when TDX is in varying states of decay.
 > 
-> This hard coded value just comes to prevent user space from exploding 
-> kernel memory allocation.
-
-Of course.
-
-> We don't really expect user space to hit this limit, the RAM in QEMU is 
-> divided today to around ~12 ranges as we saw so far in our evaluation.
-
-There can be far more for vIOMMU use cases or non-QEMU drivers.
-
-> We may also expect user space to combine contiguous ranges to a single 
-> range or in the worst case even to combine non contiguous ranges to a 
-> single range.
-
-Why do we expect that from users?
- 
-> We can consider moving this hard-coded value to be part of the UAPI 
-> header, although, not sure that this is really a must.
+> Yes I am working on it to make it public.
 > 
-> What do you think ?
-
-We're looking at a very narrow use case with implicit assumptions about
-the behavior of the user driver.  Some of those assumptions need to be
-exposed via the uAPI so that userspace can make reasonable choices.
-Thanks,
-
-Alex
-
-> >> +
-> >> +	ranges = u64_to_user_ptr(control.ranges);
-> >> +	nodes = kmalloc_array(nnodes, sizeof(struct interval_tree_node),
-> >> +			      GFP_KERNEL);
-> >> +	if (!nodes)
-> >> +		return -ENOMEM;
-> >> +
-> >> +	for (i = 0; i < nnodes; i++) {
-> >> +		if (copy_from_user(&range, &ranges[i], sizeof(range))) {
-> >> +			ret = -EFAULT;
-> >> +			goto end;
-> >> +		}
-> >> +		if (!IS_ALIGNED(range.iova, control.page_size) ||
-> >> +		    !IS_ALIGNED(range.length, control.page_size)) {
-> >> +			ret = -EINVAL;
-> >> +			goto end;
-> >> +		}
-> >> +		nodes[i].start = range.iova;
-> >> +		nodes[i].last = range.iova + range.length - 1;
-> >> +		if (interval_tree_iter_first(&root, nodes[i].start,
-> >> +					     nodes[i].last)) {
-> >> +			/* Range overlapping */
-> >> +			ret = -EINVAL;
-> >> +			goto end;
-> >> +		}
-> >> +		interval_tree_insert(nodes + i, &root);
-> >> +	}
-> >> +
-> >> +	ret = device->log_ops->log_start(device, &root, nnodes,
-> >> +					 &control.page_size);
-> >> +	if (ret)
-> >> +		goto end;
-> >> +
-> >> +	if (copy_to_user(arg, &control, sizeof(control))) {
-> >> +		ret = -EFAULT;
-> >> +		device->log_ops->log_stop(device);
-> >> +	}
-> >> +
-> >> +end:
-> >> +	kfree(nodes);
-> >> +	return ret;
-> >> +}
-> >> +
-> >> +static int
-> >> +vfio_ioctl_device_feature_logging_stop(struct vfio_device *device,
-> >> +				       u32 flags, void __user *arg,
-> >> +				       size_t argsz)
-> >> +{
-> >> +	int ret;
-> >> +
-> >> +	if (!device->log_ops)
-> >> +		return -ENOTTY;
-> >> +
-> >> +	ret = vfio_check_feature(flags, argsz,
-> >> +				 VFIO_DEVICE_FEATURE_SET, 0);
-> >> +	if (ret != 1)
-> >> +		return ret;
-> >> +
-> >> +	return device->log_ops->log_stop(device);
-> >> +}
-> >> +
-> >> +static int
-> >> +vfio_ioctl_device_feature_logging_report(struct vfio_device *device,
-> >> +					 u32 flags, void __user *arg,
-> >> +					 size_t argsz)
-> >> +{
-> >> +	size_t minsz =
-> >> +		offsetofend(struct vfio_device_feature_dma_logging_report,
-> >> +			    bitmap);
-> >> +	struct vfio_device_feature_dma_logging_report report;
-> >> +	struct iova_bitmap_iter iter;
-> >> +	int ret;
-> >> +
-> >> +	if (!device->log_ops)
-> >> +		return -ENOTTY;
-> >> +
-> >> +	ret = vfio_check_feature(flags, argsz,
-> >> +				 VFIO_DEVICE_FEATURE_GET,
-> >> +				 sizeof(report));
-> >> +	if (ret != 1)
-> >> +		return ret;
-> >> +
-> >> +	if (copy_from_user(&report, arg, minsz))
-> >> +		return -EFAULT;
-> >> +
-> >> +	if (report.page_size < PAGE_SIZE)
-> >> +		return -EINVAL;
-> >> +
-> >> +	iova_bitmap_init(&iter.dirty, report.iova, ilog2(report.page_size));
-> >> +	ret = iova_bitmap_iter_init(&iter, report.iova, report.length,
-> >> +				    u64_to_user_ptr(report.bitmap));
-> >> +	if (ret)
-> >> +		return ret;
-> >> +
-> >> +	for (; !iova_bitmap_iter_done(&iter);
-> >> +	     iova_bitmap_iter_advance(&iter)) {
-> >> +		ret = iova_bitmap_iter_get(&iter);
-> >> +		if (ret)
-> >> +			break;
-> >> +
-> >> +		ret = device->log_ops->log_read_and_clear(device,
-> >> +			iova_bitmap_iova(&iter),
-> >> +			iova_bitmap_length(&iter), &iter.dirty);
-> >> +
-> >> +		iova_bitmap_iter_put(&iter);
-> >> +
-> >> +		if (ret)
-> >> +			break;
-> >> +	}
-> >> +
-> >> +	iova_bitmap_iter_free(&iter);
-> >> +	return ret;
-> >> +}
-> >> +
-> >>   static int vfio_ioctl_device_feature(struct vfio_device *device,
-> >>   				     struct vfio_device_feature __user *arg)
-> >>   {
-> >> @@ -1636,6 +1785,18 @@ static int vfio_ioctl_device_feature(struct vfio_device *device,
-> >>   		return vfio_ioctl_device_feature_mig_device_state(
-> >>   			device, feature.flags, arg->data,
-> >>   			feature.argsz - minsz);
-> >> +	case VFIO_DEVICE_FEATURE_DMA_LOGGING_START:
-> >> +		return vfio_ioctl_device_feature_logging_start(
-> >> +			device, feature.flags, arg->data,
-> >> +			feature.argsz - minsz);
-> >> +	case VFIO_DEVICE_FEATURE_DMA_LOGGING_STOP:
-> >> +		return vfio_ioctl_device_feature_logging_stop(
-> >> +			device, feature.flags, arg->data,
-> >> +			feature.argsz - minsz);
-> >> +	case VFIO_DEVICE_FEATURE_DMA_LOGGING_REPORT:
-> >> +		return vfio_ioctl_device_feature_logging_report(
-> >> +			device, feature.flags, arg->data,
-> >> +			feature.argsz - minsz);
-> >>   	default:
-> >>   		if (unlikely(!device->ops->device_feature))
-> >>   			return -EINVAL;
-> >> diff --git a/include/linux/vfio.h b/include/linux/vfio.h
-> >> index 4d26e149db81..feed84d686ec 100644
-> >> --- a/include/linux/vfio.h
-> >> +++ b/include/linux/vfio.h
-> >> @@ -14,6 +14,7 @@
-> >>   #include <linux/workqueue.h>
-> >>   #include <linux/poll.h>
-> >>   #include <uapi/linux/vfio.h>
-> >> +#include <linux/iova_bitmap.h>
-> >>   
-> >>   struct kvm;
-> >>   
-> >> @@ -33,10 +34,11 @@ struct vfio_device {
-> >>   	struct device *dev;
-> >>   	const struct vfio_device_ops *ops;
-> >>   	/*
-> >> -	 * mig_ops is a static property of the vfio_device which must be set
-> >> -	 * prior to registering the vfio_device.
-> >> +	 * mig_ops/log_ops is a static property of the vfio_device which must
-> >> +	 * be set prior to registering the vfio_device.
-> >>   	 */
-> >>   	const struct vfio_migration_ops *mig_ops;
-> >> +	const struct vfio_log_ops *log_ops;
-> >>   	struct vfio_group *group;
-> >>   	struct vfio_device_set *dev_set;
-> >>   	struct list_head dev_set_list;
-> >> @@ -104,6 +106,21 @@ struct vfio_migration_ops {
-> >>   				   enum vfio_device_mig_state *curr_state);
-> >>   };
-> >>   
-> >> +/**
-> >> + * @log_start: Optional callback to ask the device start DMA logging.
-> >> + * @log_stop: Optional callback to ask the device stop DMA logging.
-> >> + * @log_read_and_clear: Optional callback to ask the device read
-> >> + *         and clear the dirty DMAs in some given range.
-> >> + */
-> >> +struct vfio_log_ops {
-> >> +	int (*log_start)(struct vfio_device *device,
-> >> +		struct rb_root_cached *ranges, u32 nnodes, u64 *page_size);
-> >> +	int (*log_stop)(struct vfio_device *device);
-> >> +	int (*log_read_and_clear)(struct vfio_device *device,
-> >> +		unsigned long iova, unsigned long length,
-> >> +		struct iova_bitmap *dirty);
-> >> +};
-> >> +
-> >>   /**
-> >>    * vfio_check_feature - Validate user input for the VFIO_DEVICE_FEATURE ioctl
-> >>    * @flags: Arg from the device_feature op  
+> > 
+> > Does the mere presence of the TDX module prevent hotplug?  
+> > 
 > 
+> For ACPI CPU hotplug, yes.  The TDX module even doesn't need to be loaded. 
+> Whether SEAMRR is enabled determines.
 > 
+> For ACPI memory hotplug, in practice yes.  For architectural behaviour, I'll
+> work with others internally to get some public statement.
+> 
+> > Or, if a
+> > system has the TDX module loaded but no intent to ever use TDX, why
+> > can't it just use hotplug like a normal system which is not addled with
+> > the TDX albatross around its neck?
+> 
+> I think if a machine has enabled TDX in the BIOS, the user of the machine very
+> likely has intention to actually use TDX.
+> 
+> Yes for driver-managed memory hotplug, it makes sense if user doesn't want to
+> use TDX, it's better to not disable it.  But to me it's also not a disaster if
+> we just disable driver-managed memory hotplug if TDX is enabled by BIOS.
 
+No, driver-managed memory hotplug is how Linux handles "dedicated
+memory" management. The architecture needs to comprehend that end users
+may want to move address ranges into and out of Linux core-mm management
+independently of whether those address ranges are also covered by a SEAM
+range.
