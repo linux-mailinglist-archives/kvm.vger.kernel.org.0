@@ -2,64 +2,71 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id B4C03579777
-	for <lists+kvm@lfdr.de>; Tue, 19 Jul 2022 12:18:21 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 9CF105797A4
+	for <lists+kvm@lfdr.de>; Tue, 19 Jul 2022 12:26:22 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234783AbiGSKSS (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 19 Jul 2022 06:18:18 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42712 "EHLO
+        id S237056AbiGSK0S (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 19 Jul 2022 06:26:18 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50368 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230148AbiGSKSR (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 19 Jul 2022 06:18:17 -0400
-Received: from mga03.intel.com (mga03.intel.com [134.134.136.65])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EF5731A3A6;
-        Tue, 19 Jul 2022 03:18:15 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1658225895; x=1689761895;
-  h=message-id:date:mime-version:subject:to:cc:references:
-   from:in-reply-to:content-transfer-encoding;
-  bh=l2szk8FN3725tnHL17BJQNWuj8HvSKSQKxxvRKjThkk=;
-  b=CwWXUsJ/epsjM234b4QQ+TPOuACK++Y+h3yB+IPnXvW1veh2RIeOED1m
-   H8iy5mQMR8IZEdZNF8MHZdpobeAGKHeNnL2Vp0aR5FkLImTIoi7HYyrlC
-   Cm1hk2ar9uj29LNEQaS+U0bX/9VaIKyCeYvLk3trGB3B+b9DFJ20sKq5H
-   EJzxRbb1Fov2Zp2yHRYJtpTFwJZ1OqNsVfUElWR3V+CJgRKdHdjR+ktF4
-   UUP3/k9p2U9ANjxIrp6sX0UkxK8VsKWv527zKP+gIWowxTEvO+P5e++ip
-   gpviXF8o1Sr0SUsnbPFPZCv09ekppKxujV/H6FEe1vEYYXInkk/4LRZB+
-   Q==;
-X-IronPort-AV: E=McAfee;i="6400,9594,10412"; a="287604532"
-X-IronPort-AV: E=Sophos;i="5.92,283,1650956400"; 
-   d="scan'208";a="287604532"
-Received: from orsmga006.jf.intel.com ([10.7.209.51])
-  by orsmga103.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 19 Jul 2022 03:18:15 -0700
-X-IronPort-AV: E=Sophos;i="5.92,283,1650956400"; 
-   d="scan'208";a="572794100"
-Received: from ahunter6-mobl1.ger.corp.intel.com (HELO [10.0.2.15]) ([10.252.41.111])
-  by orsmga006-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 19 Jul 2022 03:18:13 -0700
-Message-ID: <569b5766-eb6f-8811-c5e5-f5a6972a0fd5@intel.com>
-Date:   Tue, 19 Jul 2022 13:18:08 +0300
+        with ESMTP id S236957AbiGSK0R (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 19 Jul 2022 06:26:17 -0400
+Received: from mail-pj1-x102f.google.com (mail-pj1-x102f.google.com [IPv6:2607:f8b0:4864:20::102f])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 67922108D;
+        Tue, 19 Jul 2022 03:26:16 -0700 (PDT)
+Received: by mail-pj1-x102f.google.com with SMTP id cp18-20020a17090afb9200b001ef79e8484aso1038863pjb.1;
+        Tue, 19 Jul 2022 03:26:16 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=3l+HLhYfqzxi/x6gvVnPdxIk/vWRfgyAXjiA7yGImnI=;
+        b=H58CLxA7+K163/ypV4lgNENxU3/Wdneirm87cBrQAlraAaHpLD/nrZu9QXNk+C9ktY
+         al8RQLzfjUS+vrnb7cowPoZ7d5SrlrF3x+2IOKaSH4l7lDx344pAL3ucSAWm85efbkkO
+         THC1BlT+WjExOYWdT0mX2wpEuzl+L31l0grZvw5LIajM6fWckF7w3v/AzFU0f9ZVZTNU
+         he/H02OSstwffv8wYsrCeOzVYFKO05U7ktqv4a0/IiWmSKsU1Nj3j/RDpGcPZOL7CGFG
+         BmepJjIl/Wa9VIjbBeN2AOckdMOMcT93iLlHDMlANoNcccdv6ECbFPZmubnYH7eoIuMf
+         Dk9A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=3l+HLhYfqzxi/x6gvVnPdxIk/vWRfgyAXjiA7yGImnI=;
+        b=OFWhwIUaa77Rj2ijK+flGupTeKexjEDwIilR6Yo1KPb5K2i/1QnLofhOrZdKF6NlOd
+         WJW1fF7rnwSRyXPHE959hCPnMY7kKoGp/JeXJpr6Srnj/eznR1i+wpuBZ8CExrWg+GVe
+         xG39qm+gKqYJoRMrILbvRw8me268YdLiXZsi/LU5m1VmjaqJ0NVmJX8jht40dgEU+EUj
+         7Ik0P1NrmSbOXQ8SIiYybvxpYcSmAn0ILjqzh713mpCZLjfrGTFaRY+nYC17bjzqq15H
+         ZsRmV0bOCJRB4UZwlm1xc2afRZvG06I4TQa1AatAOn7DWHRQSQC7GNLGZ2yeq4tvcWiK
+         KMXQ==
+X-Gm-Message-State: AJIora+fQk2RFz57M6ayppvOuxb+5Z8BTyZ43yAMgDRtvQCwejiKfnka
+        IZBqONBc3iwcwpP6uASQGfU=
+X-Google-Smtp-Source: AGRyM1uufekVGGKrSJ2gaMc67vKamX1QCyzQmaeokurBK0ofYS7Gx/E0Vhca9alDKP7HndcswHPong==
+X-Received: by 2002:a17:903:2ce:b0:16c:f66b:50fa with SMTP id s14-20020a17090302ce00b0016cf66b50famr8019911plk.109.1658226375737;
+        Tue, 19 Jul 2022 03:26:15 -0700 (PDT)
+Received: from localhost (fmdmzpr02-ext.fm.intel.com. [192.55.54.37])
+        by smtp.gmail.com with ESMTPSA id p11-20020a170902e74b00b0016be596c8afsm11192671plf.282.2022.07.19.03.26.14
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 19 Jul 2022 03:26:15 -0700 (PDT)
+Date:   Tue, 19 Jul 2022 03:26:14 -0700
+From:   Isaku Yamahata <isaku.yamahata@gmail.com>
+To:     Kai Huang <kai.huang@intel.com>
+Cc:     isaku.yamahata@intel.com, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org, isaku.yamahata@gmail.com,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Sean Christopherson <sean.j.christopherson@intel.com>
+Subject: Re: [PATCH v7 039/102] KVM: x86/mmu: Allow per-VM override of the
+ TDP max page level
+Message-ID: <20220719102614.GV1379820@ls.amr.corp.intel.com>
+References: <cover.1656366337.git.isaku.yamahata@intel.com>
+ <e686602e7b57ed0c3600c663d03a9bf76190db0c.1656366338.git.isaku.yamahata@intel.com>
+ <8227079db11c0473f1c368b305e40a94a73fc109.camel@intel.com>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Firefox/91.0 Thunderbird/91.11.0
-Subject: Re: [PATCH 01/35] perf tools: Fix dso_id inode generation comparison
-Content-Language: en-US
-To:     Arnaldo Carvalho de Melo <acme@kernel.org>
-Cc:     Jiri Olsa <jolsa@redhat.com>, Namhyung Kim <namhyung@kernel.org>,
-        Ian Rogers <irogers@google.com>,
-        Andi Kleen <ak@linux.intel.com>, linux-kernel@vger.kernel.org,
-        kvm@vger.kernel.org
-References: <20220711093218.10967-1-adrian.hunter@intel.com>
- <20220711093218.10967-2-adrian.hunter@intel.com>
- <YtV0vXJLbfTywZ1B@kernel.org>
-From:   Adrian Hunter <adrian.hunter@intel.com>
-Organization: Intel Finland Oy, Registered Address: PL 281, 00181 Helsinki,
- Business Identity Code: 0357606 - 4, Domiciled in Helsinki
-In-Reply-To: <YtV0vXJLbfTywZ1B@kernel.org>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-5.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
-        RCVD_IN_DNSWL_MED,SPF_HELO_NONE,SPF_NONE autolearn=ham
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <8227079db11c0473f1c368b305e40a94a73fc109.camel@intel.com>
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
+        RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS autolearn=ham
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -67,42 +74,57 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 18/07/22 17:57, Arnaldo Carvalho de Melo wrote:
-> Em Mon, Jul 11, 2022 at 12:31:44PM +0300, Adrian Hunter escreveu:
->> Synthesized MMAP events have zero ino_generation, so do not compare zero
->> values.
->>
->> Fixes: 0e3149f86b99 ("perf dso: Move dso_id from 'struct map' to 'struct dso'")
->> Signed-off-by: Adrian Hunter <adrian.hunter@intel.com>
->> ---
->>  tools/perf/util/dsos.c | 10 ++++++++--
->>  1 file changed, 8 insertions(+), 2 deletions(-)
->>
->> diff --git a/tools/perf/util/dsos.c b/tools/perf/util/dsos.c
->> index b97366f77bbf..839a1f384733 100644
->> --- a/tools/perf/util/dsos.c
->> +++ b/tools/perf/util/dsos.c
->> @@ -23,8 +23,14 @@ static int __dso_id__cmp(struct dso_id *a, struct dso_id *b)
->>  	if (a->ino > b->ino) return -1;
->>  	if (a->ino < b->ino) return 1;
->>  
->> -	if (a->ino_generation > b->ino_generation) return -1;
->> -	if (a->ino_generation < b->ino_generation) return 1;
->> +	/*
->> +	 * Synthesized MMAP events have zero ino_generation, so do not compare
->> +	 * zero values.
->> +	 */
->> +	if (a->ino_generation && b->ino_generation) {
->> +		if (a->ino_generation > b->ino_generation) return -1;
->> +		if (a->ino_generation < b->ino_generation) return 1;
->> +	}
-> 
-> But comparing didn't harm right? when its !0 now we may have three
-> comparisions instead of 2 :-\
-> 
-> The comment has some value tho, so I'm merging this :-)
+On Fri, Jul 01, 2022 at 12:27:24AM +1200,
+Kai Huang <kai.huang@intel.com> wrote:
 
-Thanks. I found it harmful because the mismatch resulted in a new
-dso that did not have a build ID whereas the original dso did have
-a build ID.  The build ID was essential because the object was not
-found otherwise.
+> On Mon, 2022-06-27 at 14:53 -0700, isaku.yamahata@intel.com wrote:
+> > From: Sean Christopherson <sean.j.christopherson@intel.com>
+> > 
+> > TODO: This is a transient workaround patch until the large page support for
+> > TDX is implemented.  Support large page for TDX and remove this patch.
+> 
+> I don't understand.  How does this patch have anything to do with what you are
+> talking about here?
+> 
+> If you want to remove this patch later, then why not just explain the reason to
+> remove when you actually have that patch?
+> 
+> > 
+> > At this point, large page for TDX isn't supported, and need to allow guest
+> > TD to work only with 4K pages.  On the other hand, conventional VMX VMs
+> > should continue to work with large page.  Allow per-VM override of the TDP
+> > max page level.
+> 
+> At which point/previous patch have you made/declared "large page for TDX isn't
+> supported"?
+> 
+> If you want to declare you don't want to support large page for TDX, IMHO just
+> declare it here, for instance:
+> 
+> "For simplicity, only support 4K page for TD guest."
+>   
+> > 
+> > In the existing x86 KVM MMU code, there is already max_level member in
+> > struct kvm_page_fault with KVM_MAX_HUGEPAGE_LEVEL initial value.  The KVM
+> > page fault handler denies page size larger than max_level.
+> > 
+> > Add per-VM member to indicate the allowed maximum page size with
+> > KVM_MAX_HUGEPAGE_LEVEL as default value and initialize max_level in struct
+> > kvm_page_fault with it.  For the guest TD, the set per-VM value for allows
+> > maximum page size to 4K page size.  Then only allowed page size is 4K.  It
+> > means large page is disabled.
+> 
+> To me it's overcomplicated.  You just need simple sentences for such simple
+> infrastructural patch.  For instance:
+> 
+> "TDX requires special handling to support large private page.  For simplicity,
+> only support 4K page for TD guest for now.  Add per-VM maximum page level
+> support to support different maximum page sizes for TD guest and conventional
+> VMX guest."
+> 
+> Just for your reference.
+
+Thanks for the sentences. I'll replace the commit message with yours.
+
+-- 
+Isaku Yamahata <isaku.yamahata@gmail.com>
