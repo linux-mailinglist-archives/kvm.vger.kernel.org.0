@@ -2,140 +2,175 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id A078A578DB1
-	for <lists+kvm@lfdr.de>; Tue, 19 Jul 2022 00:46:47 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id CF025578E5F
+	for <lists+kvm@lfdr.de>; Tue, 19 Jul 2022 01:40:53 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235816AbiGRWqm (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 18 Jul 2022 18:46:42 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46732 "EHLO
+        id S234621AbiGRXkv (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 18 Jul 2022 19:40:51 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51694 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232002AbiGRWql (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 18 Jul 2022 18:46:41 -0400
-Received: from NAM10-MW2-obe.outbound.protection.outlook.com (mail-mw2nam10on2085.outbound.protection.outlook.com [40.107.94.85])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6BA7A2494B;
-        Mon, 18 Jul 2022 15:46:40 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=Cc+IDQ8m8ErS+rDrTgjcJMHdDMqKQTC+VbXShvPQHcgtdj1JvlOy0o1GYp/7xagRllPs38xw/5OyRC7c074ES8ShCXhnWmuaQVvdEKz+yOBqEuVtnCY/3Jlzdj+MIIvy/OPfBJX3NWTzchesjYlQ6MapRXunLx1uxGhzdlU2q+szSbZ1nDZBwmpQbvPSDWt0JJD+nMoPrr9g0hKblX8J71zGBUmV6SjvRFIZgmFTi0xVmg175BNGR2bbiBNsS2YAX7Bm/6Hi2T8lxogTFPjZb+33jvvJyG24G8x48IdoR0dI447gsjQNDW2qI0rb3BCacU8jS9xnuzHbIYwj+y+N7g==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=HK4VVtGPcZLDA8LIHCct5IhGMEJJlO1BAYatCYJ9Tbg=;
- b=c6SwdyoPVhzner0Bbo8nE1b68eLW5DzYXDlBJrfB4yqdS+3yFjf0dsdhnI+bJyFSfadRS/1278l4is781xFvo81iq+CmimuYYXNs2AJHWollc19d1LbYKi+WQMGXY0OR7/bZwAqo4BUFOv8ryrhmpwcCVf+BtkCn8lsSP7lMGu0eCuR3EmU9ZK6Z1bm1Z9hWH9gppnz3iupRL8/O5MLv6od3Grw0kq1cLZwEO+oeWfUmXRH4Zyqvn5HIKU/1VEk/09aXJyIrJuV9i//C2yq0aFJemkThC3/DbkTR60EtgUP9VdC4ZeZgHpONygC4VI01mzLzA9SSmNzgDIj6qFyHXA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
- dkim=pass header.d=nvidia.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=HK4VVtGPcZLDA8LIHCct5IhGMEJJlO1BAYatCYJ9Tbg=;
- b=B2epAXtbE/RGTKCEmvmbdxV/YOkH0wM69hQcYqDK0ExhNIp5Pc+unf9cSKY/x0AOpCl3LZlUik3OrxV8+NRRdxX/VaXriUVz8WLI5/B5tFqfnok5TbvrGSuzGBWWdzyioKuFtuZNBxxJaVt4H6TCP9o2C1T8tVdm8yrLhzFRyWVxJA/kcbMpwg5Xm3lxsRqoTOLYifarTrTLBUHwlEnwJXlkwfoJKRD4X8AmV7uLdGgP7bPAmUTNv66mjovJg4ovj/zS35+ovsidJyGsF/Vxo/GWoIQER7aWXtYR/aawQA0ISkdzgGZu67pKZLHyUaFGJmiIuKRvT3E0PSJqru962Q==
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nvidia.com;
-Received: from MN2PR12MB4192.namprd12.prod.outlook.com (2603:10b6:208:1d5::15)
- by PH7PR12MB6665.namprd12.prod.outlook.com (2603:10b6:510:1a7::10) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5438.12; Mon, 18 Jul
- 2022 22:46:37 +0000
-Received: from MN2PR12MB4192.namprd12.prod.outlook.com
- ([fe80::ac35:7c4b:3282:abfb]) by MN2PR12MB4192.namprd12.prod.outlook.com
- ([fe80::ac35:7c4b:3282:abfb%3]) with mapi id 15.20.5438.023; Mon, 18 Jul 2022
- 22:46:37 +0000
-Date:   Mon, 18 Jul 2022 19:46:35 -0300
-From:   Jason Gunthorpe <jgg@nvidia.com>
-To:     Alex Williamson <alex.williamson@redhat.com>
-Cc:     Yishai Hadas <yishaih@nvidia.com>, saeedm@nvidia.com,
-        kvm@vger.kernel.org, netdev@vger.kernel.org, kuba@kernel.org,
-        kevin.tian@intel.com, joao.m.martins@oracle.com, leonro@nvidia.com,
-        maorg@nvidia.com, cohuck@redhat.com
-Subject: Re: [PATCH V2 vfio 05/11] vfio: Add an IOVA bitmap support
-Message-ID: <20220718224635.GF4609@nvidia.com>
-References: <20220714081251.240584-1-yishaih@nvidia.com>
- <20220714081251.240584-6-yishaih@nvidia.com>
- <20220718163010.01e11c20.alex.williamson@redhat.com>
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20220718163010.01e11c20.alex.williamson@redhat.com>
-X-ClientProxiedBy: BL0PR1501CA0009.namprd15.prod.outlook.com
- (2603:10b6:207:17::22) To MN2PR12MB4192.namprd12.prod.outlook.com
- (2603:10b6:208:1d5::15)
+        with ESMTP id S230081AbiGRXkt (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 18 Jul 2022 19:40:49 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 1786626573
+        for <kvm@vger.kernel.org>; Mon, 18 Jul 2022 16:40:48 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1658187647;
+        h=from:from:reply-to:reply-to:subject:subject:date:date:
+         message-id:message-id:to:to:cc:cc:mime-version:mime-version:
+         content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=3dTnes+KzHJaFJH05bFK49SXDq+onLA3FIpvx1ZPC08=;
+        b=CkFJK7ff39lYpF+ESsHK0fTQRYJNgsYTEknGrgKE5OeFe5Y6E2AcY/2ZI02XJwOmuoimsG
+        3ovl4vplNZJTyG5pe1oQn/N699eVLsjNlrbEUrdXon+8ICIaihUur1RWPQCXBEz5iqafsU
+        TNtc8/waQJDZZVu+XX7Ul0GRAZlCBr8=
+Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
+ [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-265-Oq18XETuPuGoD7EdNskPDQ-1; Mon, 18 Jul 2022 19:40:43 -0400
+X-MC-Unique: Oq18XETuPuGoD7EdNskPDQ-1
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.rdu2.redhat.com [10.11.54.3])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 34759101A54E;
+        Mon, 18 Jul 2022 23:40:43 +0000 (UTC)
+Received: from [10.64.54.37] (vpn2-54-37.bne.redhat.com [10.64.54.37])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id 4916B1121314;
+        Mon, 18 Jul 2022 23:40:38 +0000 (UTC)
+Reply-To: Gavin Shan <gshan@redhat.com>
+Subject: Re: [PATCH v2] KVM: selftests: Fix target thread to be migrated in
+ rseq_test
+From:   Gavin Shan <gshan@redhat.com>
+To:     oliver.upton@linux.dev, kvmarm@lists.cs.columbia.edu
+Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+        linux-kselftest@vger.kernel.org, seanjc@google.com,
+        pbonzini@redhat.com, maz@kernel.org, shuah@kernel.org,
+        shan.gavin@gmail.com
+References: <20220716144537.3436743-1-gshan@redhat.com>
+ <385aa28ad559874da8429c40a68570df@linux.dev>
+ <4bdaa1cd-39f4-97d7-ba33-ee5cdc7d609e@redhat.com>
+Message-ID: <087c2e7e-998a-b807-0b4e-3c42aca1b5f7@redhat.com>
+Date:   Tue, 19 Jul 2022 11:40:18 +1000
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.2.0
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: b1b8afca-5857-45a1-3e1b-08da690f5f36
-X-MS-TrafficTypeDiagnostic: PH7PR12MB6665:EE_
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: Ek8TnX/hbzhaMjJ9wEEb9Anww3oDtH9B4cMPpQ0FEACDluFwXmHzhvqDKluZclxZDNccpqTVPQkDc3JilyVbxJFbO3k8hcBoSeZLrZrY1VCSXOqMqZuhaPSPoM9ADhOah8NmMqR57HBu52CwkQqxySau0NvkCVlmyjvBY67o2uH43yF1kHXVfF8hJru2S/SQPSHsCkEXn6d/jB1kOX+jqtJz3ihQfZl/Et/z2yRe3q6hUYwJ0x30sEjv/f7UjdffIOx52ZSCrriE1JSzWPp1CEEV1aFI7ydq+HNNLdMx/h6/MEpK0cNJca/iu25DWXU3b47JRrO9eQIipdYOVV78/Q5G63p0V9hFE5jqg3Rt097GiCeKzOgful7fABJ066kza1nGGUxwCRVvqszzHvcCr6lDeX4UXWYmWbOpZBt1c4QKcRY/SL7IFDkrFuNtrAx7whJzc1HBrxrzP0MEbKWgKSO9TIabhBk4G2Q4mdfgEtxjiQMcPqvBnU6qmS7i3FXrodwTf85dJkdx5iW3gn058NzmK13MsslP5yvK06UZ4yFBhqlWUJeAU+pP+6ZGLAr97HpYe6dGTyliM+EHuyYvOjY/v4CUxkWmqAbIU1V4Dz0llw30czWKCKFTU0os98rkpjbpCIaTItBX6Q0J2Z8gL4Q5PgPbx2I766dNfWl+bz/lEQqpn0xMlmj3/wSDEtqlxBOzUVT5a4gh1tt8JNddYNAXkdY6ahpd9ITT95msZHa3XK7PEs9t7l550C/LVFv0
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:MN2PR12MB4192.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230016)(4636009)(39860400002)(346002)(396003)(376002)(366004)(136003)(8936002)(66476007)(4744005)(5660300002)(4326008)(8676002)(66556008)(66946007)(38100700002)(36756003)(33656002)(2906002)(86362001)(6486002)(41300700001)(478600001)(6512007)(6916009)(26005)(316002)(2616005)(1076003)(186003)(6506007);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?9kCc3dpxffXLg5TXXSe9S5W395pukeaWv3mSj1uF0LNXHsto3WafPoghG9m1?=
- =?us-ascii?Q?OAXZ9WZvap2X5oMOGToqLRqM/rTQ8syJYROXC6X7GW13+kVvy45KJ6t0fPYV?=
- =?us-ascii?Q?DwzRM6JRudF64+WVzQ6beCxAayqi44JfVStd4PkhydvQTM6U/lFpUlk42SDJ?=
- =?us-ascii?Q?IF6ttCkQgEHa332YpRh5q6relOBsDLP+sGRhOnQWhZ3Tlxr4FyikWpOEXLPN?=
- =?us-ascii?Q?ns2rssRLYs8Tl3x07D+bO1cjUNlPcYSvW5StrKG76aCuLgIRlUcHqqAtYoqU?=
- =?us-ascii?Q?7+OcKJoHB96t5rTI/gyZ25kElL/Wfo7CYMBkY9KutzPDodaGYyRbn/s7e7U2?=
- =?us-ascii?Q?UbYSDS7LgaY5Q5Ko69Ei3Burw4LC4JaylJWGxrQoA43oAyaVBerZ9BABAeI2?=
- =?us-ascii?Q?Q6ZnOsS141zIXJWIvEYE1r7Yvmx0aKHs/cJoQKViIRtF5JldVleqNziTktm9?=
- =?us-ascii?Q?5iW4lMJsI2U99/7m9u+C/J/wlGqpc9At2kFbSOK4VisZjdXxnFp1fuYhmQux?=
- =?us-ascii?Q?j0KFnQqj/NSjbPlySNmAWWIhBCLXJwRkGsnqKpiGtRVa4TJYrDt8SyEpr15j?=
- =?us-ascii?Q?v6fdXijcse0EBT3Ubz7IX64R1YSbPFuPuBW6ysmQuVMSSePrqxuLzLSm/iP0?=
- =?us-ascii?Q?WJ5yKO0uxLENWCrSTgIunYIorPcRvkDTuuoI44zxURXvsWmvi4JByn5RcTAq?=
- =?us-ascii?Q?f3OA+mCoZIVawbe9zNnQINDyUd5wMDdfJgErZgoM20R/klIG8EbSmJ9x1QYF?=
- =?us-ascii?Q?KQwTKie2bFUTN+Z14Vj8md0XqZN0c7fXcNCW7Bs540tFDh2p+6JOgcMf/vER?=
- =?us-ascii?Q?Lr5FPRIe0/KGWGXXQKumsVKPKqTbGOqh3PStFS/ecYkdpMJ4lwK9whUk0DEG?=
- =?us-ascii?Q?K/f3jfxcnAEXVEAFEC+Br4CfGlTsD0UuP41XuQPWgjw7i+rLKVzeHld3pox4?=
- =?us-ascii?Q?G1/rlQSG2pvdArHfdhsihCh0Zy2UGRIr+iY5VflgrpMmtIYsyQAbwlG9R3j+?=
- =?us-ascii?Q?PvsrD70JS87CG91iLgGa0lGtR9k/8TIChgEvQXWEH8hEyP3SycP3C/4Ep8wY?=
- =?us-ascii?Q?QZzgsnjqgBYHcjkxxn/eNrmN0SuRYIh5ssaRP2SGdMXny86l5ZpmVPfYW84P?=
- =?us-ascii?Q?yaKoH5VKvJFDrhkcdEcVG+CfeFBwOhfZAenvi6v1SNRHI1Tjswz2gnD/v6zS?=
- =?us-ascii?Q?W6XuEzdKmdEHNfAYL5hQW/jfPyRgdUVRYUcpHCtOfctWswQ3kFzYMxlzrDPp?=
- =?us-ascii?Q?bTj4fcG4GPDcXilGLytF2tXtfRmk79Oy/8TAAS8Sz2Waz8nxBt92ceptGRdI?=
- =?us-ascii?Q?w7nu2w0JwzuFedYodqu8f5MNbaTUhHpkHhIREQMKI2iC2aYWXmfpOjBxhMBX?=
- =?us-ascii?Q?lfKmZThldi4vnh5noDRwRa5+ryP/Sh79OkSAexra7xonyLoJ0vzRkEBQvIAc?=
- =?us-ascii?Q?0BaeMvL4dPeIkiuNC2pjcUK6j3IiOX9KfG1jWdZkMYClp8jmAh/M3x/thrQR?=
- =?us-ascii?Q?+NgLTGjZAi4Qg9/4Trajkt5RpYtv3/QEZ5pvcKgMcfa8a2XXUS9MGwudrQ/9?=
- =?us-ascii?Q?pRARt7+dULuGVXkgOYSfTY1IBNwO0mPqgiXa+DqU?=
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: b1b8afca-5857-45a1-3e1b-08da690f5f36
-X-MS-Exchange-CrossTenant-AuthSource: MN2PR12MB4192.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 18 Jul 2022 22:46:37.0568
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: q5RprBf1lf2UXJQehOHlLfYJmyg6DqeuEiC2Q4Z73SFEF9OWbzik/vveoo4S3xJk
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH7PR12MB6665
-X-Spam-Status: No, score=-1.8 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FORGED_SPF_HELO,
-        RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_NONE
-        autolearn=no autolearn_force=no version=3.4.6
+In-Reply-To: <4bdaa1cd-39f4-97d7-ba33-ee5cdc7d609e@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 2.78 on 10.11.54.3
+X-Spam-Status: No, score=-3.5 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
+        RCVD_IN_DNSWL_LOW,SPF_HELO_NONE,SPF_NONE autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Jul 18, 2022 at 04:30:10PM -0600, Alex Williamson wrote:
-
-> > Signed-off-by: Joao Martins <joao.m.martins@oracle.com>
-> > Signed-off-by: Yishai Hadas <yishaih@nvidia.com>
-> > ---
-> >  drivers/vfio/Makefile       |   6 +-
-> >  drivers/vfio/iova_bitmap.c  | 164 ++++++++++++++++++++++++++++++++++++
-> >  include/linux/iova_bitmap.h |  46 ++++++++++
+On 7/17/22 1:11 PM, Gavin Shan wrote:
+> On 7/17/22 7:48 AM, oliver.upton@linux.dev wrote:
+>> July 16, 2022 7:45 AM, "Gavin Shan" <gshan@redhat.com> wrote:
+>>> In rseq_test, there are two threads, which are thread group leader
+>>> and migration worker. The migration worker relies on sched_setaffinity()
+>>> to force migration on the thread group leader.
+>>
+>> It may be clearer to describe it as a vCPU thread and a migration worker
+>> thread. The meat of this test is to catch a regression in KVM.
+>>
+>>> Unfortunately, we have
+>>
+>> s/we have/the test has the/
+>>
+>>> wrong parameter (0) passed to sched_getaffinity().
+>>
+>> wrong PID
+>>
 > 
-> I'm still working my way through the guts of this, but why is it being
-> proposed within the vfio driver when this is not at all vfio specific,
-> proposes it's own separate header, and doesn't conform with any of the
-> namespace conventions of being a sub-component of vfio?  Is this
-> ultimately meant for lib/ or perhaps an extension of iova.c within the
-> iommu subsystem?  Thanks,
+> Yep, it's much clearer to describe it as vCPU thread and migration worker.
+> 
+>>> It's actually
+>>> forcing migration on the migration worker instead of the thread group
+>>> leader.
+>>
+>> What's missing is _why_ the migration worker is getting moved around by
+>> the call. Perhaps instead it is better to state what a PID of 0 implies,
+>> for those of us who haven't read their manpages in a while ;-)
+>>
+> 
+> Yes, it's good idea. I will have something like below in next revision :)
+> 
+>      In rseq_test, there are two threads, which are vCPU thread and migration
+>      worker separately. Unfortunately, the test has the wrong PID passed to
+>      sched_setaffinity() in the migration worker. It forces migration on the
+>      migration worker because zeroed PID represents the calling thread, which
+>      is the migration worker itself. It means the vCPU thread is never enforced
+>      to migration and it can migrate at any time, which eventually leads to
+>      failure as the following logs show.
+>          :
+>          :
+>      Fix the issue by passing correct parameter, TID of the vCPU thread, to
+>      sched_setaffinity() in the migration worker.
+> 
+> 
+>>> It also means migration can happen on the thread group leader
+>>> at any time, which eventually leads to failure as the following logs
+>>> show.
+>>>
+>>> host# uname -r
+>>> 5.19.0-rc6-gavin+
+>>> host# # cat /proc/cpuinfo | grep processor | tail -n 1
+>>> processor : 223
+>>> host# pwd
+>>> /home/gavin/sandbox/linux.main/tools/testing/selftests/kvm
+>>> host# for i in `seq 1 100`; \
+>>> do echo "--------> $i"; ./rseq_test; done
+>>> --------> 1
+>>> --------> 2
+>>> --------> 3
+>>> --------> 4
+>>> --------> 5
+>>> --------> 6
+>>> ==== Test Assertion Failure ====
+>>> rseq_test.c:265: rseq_cpu == cpu
+>>> pid=3925 tid=3925 errno=4 - Interrupted system call
+>>> 1 0x0000000000401963: main at rseq_test.c:265 (discriminator 2)
+>>> 2 0x0000ffffb044affb: ?? ??:0
+>>> 3 0x0000ffffb044b0c7: ?? ??:0
+>>> 4 0x0000000000401a6f: _start at ??:?
+>>> rseq CPU = 4, sched CPU = 27
+>>>
+>>> This fixes the issue by passing correct parameter, tid of the group
+>>> thread leader, to sched_setaffinity().
+>>
+>> Kernel commit messages should have an imperative tone:
+>>
+>> Fix the issue by ...
+>>
+> 
+> Ok. I've been having my style for long time. Actually, the style was
+> shared by some one when I worked for IBM long time ago. I will bear
+> it in mind to use imperative expression since now on :)
+> 
+> All your comments will be fixed in next revision, but I would delay
+> the posting a bit to see Sean or Paolo have more comments. In that
+> case, I can fix all of them at once.
+> 
 
-I am expecting when iommufd dirty tracking comes we will move this
-file into drivers/iommu/iommufd/ and it will provide it. So it was
-written to make that a simple rename vs changing everything.
+v3 was just posted.
 
-Until we have that, this seems like the best place for it
+https://lore.kernel.org/kvmarm/20220719013540.3477946-1-gshan@redhat.com/T/#u
 
-Jason
+>>> Fixes: 61e52f1630f5 ("KVM: selftests: Add a test for KVM_RUN+rseq to detect task migration bugs")
+>>> Signed-off-by: Gavin Shan <gshan@redhat.com>
+>>
+>> With the comments on the commit message addressed:
+>>
+>> Reviewed-by: Oliver Upton <oliver.upton@linux.dev>
+>>
+
+Thanks,
+Gavin
+
