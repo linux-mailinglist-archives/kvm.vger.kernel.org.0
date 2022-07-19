@@ -2,55 +2,55 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id BAA6857A463
-	for <lists+kvm@lfdr.de>; Tue, 19 Jul 2022 18:56:09 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 4220557A46C
+	for <lists+kvm@lfdr.de>; Tue, 19 Jul 2022 18:57:04 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235878AbiGSQ4G (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 19 Jul 2022 12:56:06 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49822 "EHLO
+        id S236801AbiGSQ5D (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 19 Jul 2022 12:57:03 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51042 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235080AbiGSQ4F (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 19 Jul 2022 12:56:05 -0400
-Received: from mail-wr1-x42d.google.com (mail-wr1-x42d.google.com [IPv6:2a00:1450:4864:20::42d])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7E0114AD53
-        for <kvm@vger.kernel.org>; Tue, 19 Jul 2022 09:56:02 -0700 (PDT)
-Received: by mail-wr1-x42d.google.com with SMTP id d8so2584298wrp.6
-        for <kvm@vger.kernel.org>; Tue, 19 Jul 2022 09:56:02 -0700 (PDT)
+        with ESMTP id S236120AbiGSQ5A (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 19 Jul 2022 12:57:00 -0400
+Received: from mail-wr1-x432.google.com (mail-wr1-x432.google.com [IPv6:2a00:1450:4864:20::432])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 419604F1BB
+        for <kvm@vger.kernel.org>; Tue, 19 Jul 2022 09:56:59 -0700 (PDT)
+Received: by mail-wr1-x432.google.com with SMTP id h17so22581416wrx.0
+        for <kvm@vger.kernel.org>; Tue, 19 Jul 2022 09:56:59 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
         h=mime-version:references:in-reply-to:from:date:message-id:subject:to
          :cc;
-        bh=gGiA6ckYRiubKjgpRJXUtNtdjW9CpRo2ZKSumqtjes8=;
-        b=c/q9gFkWi8Ec4wGMmFvun9zo+/LIbDeMaMKwcrXbQWo0rQesInT//edyGk5wYGc78D
-         svpmR36zodRYVVyXkCzQBEw0OS2MuwOXvSZXsMvZ2yHfs7WfajS9Q8ztNuiYry8fOc+i
-         BtSTTBp7Dy4zHfT0ODMmWp+jIuY+bmtJBOK4KOeha0KWAZKcPVBNbmqZr0ABqad+Tvrv
-         kzb2W0riTOCx9S5qKVG5cP6IWHbVRlbDboCfDmy0WBf3oiVXtVkwGUc2TMSztA+jlth5
-         ypRACkDQnR+L83TE224+uq75z1ival1O0Sunq3ROeAgFPYI4mf/bjMXKRjkl/+bt7QnC
-         NKtA==
+        bh=HjzI8Y5AFZSjQh4cY4GKqmaCg1K0UQucOPz5+/QiYwM=;
+        b=dokUPJWuCe4HUQ2XEI1u/VZC8wAmp4o+IFhtkaeR4iasVCBEWU08xfzK1uv9p5HlPk
+         nien7tPJ4L39gthmcuC5oQpFnzwWHeDrGHVC0WQre3cPAv+ZY0fmOH9yZfJTdNYuODv1
+         NpL6R8tIlLZ7CY590YIrWi77dKa+Vx0xzaoU4JfYODCon96dB35xbmY5OvRspEaTJVHL
+         4mBJnwyNWpwWzGNYi+/7aYINsCK1S0NDyGAeVjxGn6Jlb51FY0tYwW/Mv7rDb+KQaeNO
+         m8tnKGu2G7qgdXUp7EVOQGZDiiCQJ5uw5tkFQYkGZNaVA5lTsAcnJvRSf2g/OxzmCd+h
+         23oQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:mime-version:references:in-reply-to:from:date
          :message-id:subject:to:cc;
-        bh=gGiA6ckYRiubKjgpRJXUtNtdjW9CpRo2ZKSumqtjes8=;
-        b=zDDpm+dxfqrsQdCW81ZERXLFwMkQbwV5is19I5d3HyPH3b7FsXpGvBT3XK5yidyOiZ
-         6GM/H90lvVMRSqzbJgeG7JD6batIzB4JHeHYJIZ1weSfEeSVWY97cP65zzRT3y/pfIcK
-         hWLuICQnaWCbqujTpYPBK5L0wer0nJxKjEi2Lu5lrxmHfnAOU9HbjAwVg2+qvZ59km6F
-         D17PbihlAIbEDad3f5ajkcDfrXrJpNyav2hHH6P6swJ1RqK8XmiwzpBU9+pglEZOUK51
-         SsYtP1+WQAFbh98wetYCaLYg3jPZS2QOopvbWZ/ojmNUSSBnx/eU+P5i5CGzHSQkfkB3
-         BRUg==
-X-Gm-Message-State: AJIora8Z5dQYaudNGaKSsAsPMEArUOC+lyKCCkesWyWtCQTuRteJ1IVg
-        hE8/KKPDv+xpQ55/1cTx1FOLawRLQTVDY8MQpHg8rA==
-X-Google-Smtp-Source: AGRyM1u+nGoF3aNLBHbjiNHtUbf7L583xpdSE+hNRiQ3pEMVcPk8iojvNZpzMEuEhSVRlqxslbs6wF/2Qwk5ehx9790=
-X-Received: by 2002:a5d:4d8e:0:b0:21d:68d4:56eb with SMTP id
- b14-20020a5d4d8e000000b0021d68d456ebmr26769704wru.40.1658249760787; Tue, 19
- Jul 2022 09:56:00 -0700 (PDT)
+        bh=HjzI8Y5AFZSjQh4cY4GKqmaCg1K0UQucOPz5+/QiYwM=;
+        b=bEo/KZzJdDYGcT3piYWRSrAKpT/AguJMNwV7Rzip5cnMlsFDepmxT2RyA/N2ww0R0u
+         Camudszl1bhwbap9eDra+yFXC/ghMN4c9YnaLQvnD4zAmesRp/OIJ5Xz33P9mhYwRXq8
+         FoEZxlKcZei+/aIAkuTrO6kUtDrQ5X1ixk5J6nk8dpWmq48Jv/NZF/fzNM+IiKPvrtHe
+         HHkMDxmc3mhWzH9OsbGPfz7A0ja8khJnIb+q6iMAlZ2wURK9AHcY2C8cjD2GJ7mUBw3I
+         Oqty5uinJ9IzUhFGPiRjGNkvMJgTZcloAvwTcq+YJdHV5QlUjEZH2xCY6bo8W9mqH9Bh
+         j07g==
+X-Gm-Message-State: AJIora++V2NBq6rp6W9fp7IfmdrS1GETZB5jovlJWYTHmMvnChu4UHKw
+        U2J1H338yw8ixZNT+7SDCK83OpaIgWXQ/Cd1ruHpLw==
+X-Google-Smtp-Source: AGRyM1txVzkio7oKFun4OwE14uQx7ilwn6eAe1/lyvt+pd0N/bzekFoP9cEO6aXKtzhzHB/IAdMFOcmIZVQK6Yj/bbI=
+X-Received: by 2002:a05:6000:8e:b0:21d:7e97:67ed with SMTP id
+ m14-20020a056000008e00b0021d7e9767edmr26650190wrx.343.1658249817686; Tue, 19
+ Jul 2022 09:56:57 -0700 (PDT)
 MIME-Version: 1.0
-References: <20220711093218.10967-1-adrian.hunter@intel.com> <20220711093218.10967-3-adrian.hunter@intel.com>
-In-Reply-To: <20220711093218.10967-3-adrian.hunter@intel.com>
+References: <20220711093218.10967-1-adrian.hunter@intel.com> <20220711093218.10967-4-adrian.hunter@intel.com>
+In-Reply-To: <20220711093218.10967-4-adrian.hunter@intel.com>
 From:   Ian Rogers <irogers@google.com>
-Date:   Tue, 19 Jul 2022 09:55:48 -0700
-Message-ID: <CAP-5=fXVrKir6VfkDOQ+sK-vqs-aCNBCu5uUVNAUPzW=G-z=cg@mail.gmail.com>
-Subject: Re: [PATCH 02/35] perf tools: Export dsos__for_each_with_build_id()
+Date:   Tue, 19 Jul 2022 09:56:45 -0700
+Message-ID: <CAP-5=fUHG=-QdsP5dGxZ444DUfgaYLGhXevQuUH3dmcQnyexYg@mail.gmail.com>
+Subject: Re: [PATCH 03/35] perf ordered_events: Add ordered_events__last_flush_time()
 To:     Adrian Hunter <adrian.hunter@intel.com>
 Cc:     Arnaldo Carvalho de Melo <acme@kernel.org>,
         Jiri Olsa <jolsa@redhat.com>,
@@ -61,7 +61,7 @@ Content-Type: text/plain; charset="UTF-8"
 X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
         ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-        USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=unavailable
+        USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=ham
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -71,7 +71,12 @@ X-Mailing-List: kvm@vger.kernel.org
 
 On Mon, Jul 11, 2022 at 2:32 AM Adrian Hunter <adrian.hunter@intel.com> wrote:
 >
-> Export dsos__for_each_with_build_id() so it can be used elsewhere.
+> Allow callers to get the ordered_events last flush timestamp.
+>
+> This is needed in perf inject to obey finished-round ordering when
+> injecting additional events (e.g. from a guest perf.data file) with
+> timestamps. Any additional events that have timestamps before the last
+> flush time must be injected before the corresponding FINISHED_ROUND event.
 >
 > Signed-off-by: Adrian Hunter <adrian.hunter@intel.com>
 
@@ -81,44 +86,24 @@ Thanks,
 Ian
 
 > ---
->  tools/perf/util/build-id.c | 6 ------
->  tools/perf/util/dso.h      | 6 ++++++
->  2 files changed, 6 insertions(+), 6 deletions(-)
+>  tools/perf/util/ordered-events.h | 6 ++++++
+>  1 file changed, 6 insertions(+)
 >
-> diff --git a/tools/perf/util/build-id.c b/tools/perf/util/build-id.c
-> index 328668f38c69..4c9093b64d1f 100644
-> --- a/tools/perf/util/build-id.c
-> +++ b/tools/perf/util/build-id.c
-> @@ -300,12 +300,6 @@ char *dso__build_id_filename(const struct dso *dso, char *bf, size_t size,
->         return __dso__build_id_filename(dso, bf, size, is_debug, is_kallsyms);
+> diff --git a/tools/perf/util/ordered-events.h b/tools/perf/util/ordered-events.h
+> index 0b05c3c0aeaa..8febbd7c98ca 100644
+> --- a/tools/perf/util/ordered-events.h
+> +++ b/tools/perf/util/ordered-events.h
+> @@ -75,4 +75,10 @@ void ordered_events__set_copy_on_queue(struct ordered_events *oe, bool copy)
+>  {
+>         oe->copy_on_queue = copy;
 >  }
->
-> -#define dsos__for_each_with_build_id(pos, head)        \
-> -       list_for_each_entry(pos, head, node)    \
-> -               if (!pos->has_build_id)         \
-> -                       continue;               \
-> -               else
-> -
->  static int write_buildid(const char *name, size_t name_len, struct build_id *bid,
->                          pid_t pid, u16 misc, struct feat_fd *fd)
->  {
-> diff --git a/tools/perf/util/dso.h b/tools/perf/util/dso.h
-> index 97047a11282b..66981c7a9a18 100644
-> --- a/tools/perf/util/dso.h
-> +++ b/tools/perf/util/dso.h
-> @@ -227,6 +227,12 @@ struct dso {
->  #define dso__for_each_symbol(dso, pos, n)      \
->         symbols__for_each_entry(&(dso)->symbols, pos, n)
->
-> +#define dsos__for_each_with_build_id(pos, head)        \
-> +       list_for_each_entry(pos, head, node)    \
-> +               if (!pos->has_build_id)         \
-> +                       continue;               \
-> +               else
 > +
->  static inline void dso__set_loaded(struct dso *dso)
->  {
->         dso->loaded = true;
+> +static inline u64 ordered_events__last_flush_time(struct ordered_events *oe)
+> +{
+> +       return oe->last_flush;
+> +}
+> +
+>  #endif /* __ORDERED_EVENTS_H */
 > --
 > 2.25.1
 >
