@@ -2,70 +2,77 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 3916F57A600
-	for <lists+kvm@lfdr.de>; Tue, 19 Jul 2022 20:03:30 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 20A0457A60B
+	for <lists+kvm@lfdr.de>; Tue, 19 Jul 2022 20:04:45 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S239752AbiGSSD2 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 19 Jul 2022 14:03:28 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33180 "EHLO
+        id S239802AbiGSSEk (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 19 Jul 2022 14:04:40 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34076 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232315AbiGSSD1 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 19 Jul 2022 14:03:27 -0400
-Received: from mail-pj1-x102c.google.com (mail-pj1-x102c.google.com [IPv6:2607:f8b0:4864:20::102c])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EB02652E40;
-        Tue, 19 Jul 2022 11:03:26 -0700 (PDT)
-Received: by mail-pj1-x102c.google.com with SMTP id a15so15543402pjs.0;
-        Tue, 19 Jul 2022 11:03:26 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=c2Hf5x/4EgdstY9MF0D9wi/WtpWeS2CRpEW46fk8Oag=;
-        b=SgCis5K1045Nou8JEOF4ez6iSkNGXLk2zyxwYhEsoXHVwMnhGoq8CuDdW+RcOd06gq
-         FTgUeRlv+4q45TvOMEsFgsujzJXvJc6HuKtYeh2IbvzpsJc7m1qSkd8XCVyPTCMx/yro
-         ZbHnYIlXg2HoHYJUaitskDWrMAOgdS0wNrjAqexymhj5ySF7VQiiI4OXoJjRtCKNQYGi
-         RYvWa1MikV7wV9ezysWYbWpbCi/u3MPfO7AxQLN1kUbu6c2dVItGyQxJI6pK6jtv755k
-         Ob1grwpJvW1rP/J2ZPAAsc9DzpiO0jZ5lKeqlxkdcbaegZQIC3SG/T/k0BaDUZztG/zH
-         GVBQ==
+        with ESMTP id S239797AbiGSSEf (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 19 Jul 2022 14:04:35 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 4136952E40
+        for <kvm@vger.kernel.org>; Tue, 19 Jul 2022 11:04:34 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1658253873;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=OMC1Nve8Ww8I2o5thOFNVtOQDQm1fu5RR9KZiFlM7/Q=;
+        b=I5dIkXM4UyBk85S6+zHWE0mrscwoET+AltZ67Ue/aAxKPyPmxxj0E7fL0ngsdAymjNdlgi
+        AWZW5BIbX1c6/E5FTnahAr3+WHg7Jii6FudwE48ME44S3loTX+XpekjiDky7q8j7h16V9u
+        arKUbhkO6WC39XnImqBt5H29/6A7lDo=
+Received: from mail-ed1-f72.google.com (mail-ed1-f72.google.com
+ [209.85.208.72]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-392-gT3PZHqRNaWrkN8DrU8D4A-1; Tue, 19 Jul 2022 14:04:32 -0400
+X-MC-Unique: gT3PZHqRNaWrkN8DrU8D4A-1
+Received: by mail-ed1-f72.google.com with SMTP id b7-20020a056402350700b0043baadc4a58so312784edd.2
+        for <kvm@vger.kernel.org>; Tue, 19 Jul 2022 11:04:31 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=c2Hf5x/4EgdstY9MF0D9wi/WtpWeS2CRpEW46fk8Oag=;
-        b=ONpIh55tyGS1RHtCFdynI0v12idTt8AWSGICPL2c+E21I4TNDEdOTZ5i7yeyvMHFLl
-         ++YRvx9KdZtIrS9gy5+zA0YIKi70KD9mcOuRa3V3XyBqIDsNdvtOlNwRWPr+3XajGhu1
-         emm3N6nysB8jFQrZRt2f+r1AZtI6AJQovUuJCcD5xteEeEPPKglp/MfqKRfDo7ab9f5p
-         FwYptnWxXlulknznea2YJOgcLN/cFZfN7oCn2Y12sElpsOm7WxOUW0btTZBqz0nYvhN7
-         AKwvUlB2qWviW8OLxxglfd6EdG5tzUYs0XG01f1YYpfeO+k3M5z5JaA5eTU44V0sf6dx
-         bFYA==
-X-Gm-Message-State: AJIora9cqD05G34VbfSPbFZkoMdngyzKAwW840Zi6UdhBTgnuUbbsakO
-        mbxmvSo9+0k7l9hS/dzpGwc=
-X-Google-Smtp-Source: AGRyM1sghCUk5769Iyutf93F09AydcjiryPepFBTa6iisqzsDJNFLtnGTwK2l7M2bA4L5oD46dw4Fg==
-X-Received: by 2002:a17:903:124e:b0:16b:e975:232f with SMTP id u14-20020a170903124e00b0016be975232fmr33476548plh.165.1658253806215;
-        Tue, 19 Jul 2022 11:03:26 -0700 (PDT)
-Received: from localhost (fmdmzpr02-ext.fm.intel.com. [192.55.54.37])
-        by smtp.gmail.com with ESMTPSA id g15-20020a17090a640f00b001ec92575e83sm11797433pjj.4.2022.07.19.11.03.24
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 19 Jul 2022 11:03:25 -0700 (PDT)
-Date:   Tue, 19 Jul 2022 11:03:23 -0700
-From:   Isaku Yamahata <isaku.yamahata@gmail.com>
-To:     Yuan Yao <yuan.yao@linux.intel.com>
-Cc:     isaku.yamahata@intel.com, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org, isaku.yamahata@gmail.com,
-        Paolo Bonzini <pbonzini@redhat.com>
-Subject: Re: [PATCH v7 049/102] KVM: x86/tdp_mmu: Ignore unsupported mmu
- operation on private GFNs
-Message-ID: <20220719180323.GA1379820@ls.amr.corp.intel.com>
-References: <cover.1656366337.git.isaku.yamahata@intel.com>
- <8d2266b3e10156ec10daa5ba9cd1bd2adce887a7.1656366338.git.isaku.yamahata@intel.com>
- <20220712025806.qqir22wbfpcg3bth@yy-desk-7060>
+        h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
+         :content-language:to:cc:references:from:in-reply-to
+         :content-transfer-encoding;
+        bh=OMC1Nve8Ww8I2o5thOFNVtOQDQm1fu5RR9KZiFlM7/Q=;
+        b=FsEaW7917Ky76cTt9TenKmOzG1DXlKMEWL7/DOTQwSVCr1PLZgKRw6IjrjjSvQvHqw
+         qdX0ypIi6BANrphdCoWTlMc1LOq2Hj8UDOMpNvTEUPBkxiMzLHTpHFFIf1YsrZqm4q3l
+         zZXW7+x21Kj+jK7s1LOrwrfaeDJ/ES/HUzLTmmr+TQ4xK0tIXcRinD/iK93F+JZGbKbO
+         74WoG5J7bKZI9T0QYD96lo947tvK7y2LXU9N3fhW39XNGCqJOHRbQOmCyF3jiVqOsGjh
+         L1KxWDmyOWltbuH1KX6N34TRKRI1vyhWxCfNYpoNS1Wj3S4bzypArptsjGXgmgd+/gN9
+         1weA==
+X-Gm-Message-State: AJIora/p6jH0vQGflrMi6C9bh9DrZscwDpRlOfPuFVIVb5SWuSYQZW1f
+        cVNgjHwLbmnyNXshCFNVzBWC/C+zhp9ITxBzk9ikgLjbuze6ihzh1mssdF1dlGzJE5L6Xqoxdm7
+        9OYAWdb1QrhRP
+X-Received: by 2002:a05:6402:158b:b0:43a:6cae:a029 with SMTP id c11-20020a056402158b00b0043a6caea029mr45930707edv.201.1658253870945;
+        Tue, 19 Jul 2022 11:04:30 -0700 (PDT)
+X-Google-Smtp-Source: AGRyM1sUFo7dnG5EMCTCD88JxrsB40zI8MBMig1ggUUq+7mBvnc+s7IAGolpOf1UgQc8HozmKOgx+A==
+X-Received: by 2002:a05:6402:158b:b0:43a:6cae:a029 with SMTP id c11-20020a056402158b00b0043a6caea029mr45930679edv.201.1658253870704;
+        Tue, 19 Jul 2022 11:04:30 -0700 (PDT)
+Received: from ?IPV6:2001:b07:6468:f312:9af8:e5f5:7516:fa89? ([2001:b07:6468:f312:9af8:e5f5:7516:fa89])
+        by smtp.googlemail.com with ESMTPSA id c7-20020aa7df07000000b0043a7c24a669sm10777699edy.91.2022.07.19.11.04.29
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 19 Jul 2022 11:04:30 -0700 (PDT)
+Message-ID: <8da08a8a-e639-301d-ca98-d85b74c1ad20@redhat.com>
+Date:   Tue, 19 Jul 2022 20:04:28 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20220712025806.qqir22wbfpcg3bth@yy-desk-7060>
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
-        RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS autolearn=ham
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.10.0
+Subject: Re: [RFC PATCH] KVM: x86: Protect the unused bits in MSR exiting
+ flags
+Content-Language: en-US
+To:     Aaron Lewis <aaronlewis@google.com>, kvm@vger.kernel.org
+Cc:     jmattson@google.com, seanjc@google.com
+References: <20220714161314.1715227-1-aaronlewis@google.com>
+From:   Paolo Bonzini <pbonzini@redhat.com>
+In-Reply-To: <20220714161314.1715227-1-aaronlewis@google.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Spam-Status: No, score=-2.8 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
+        RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_NONE autolearn=ham
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -73,120 +80,23 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Jul 12, 2022 at 10:58:06AM +0800,
-Yuan Yao <yuan.yao@linux.intel.com> wrote:
-
-> On Mon, Jun 27, 2022 at 02:53:41PM -0700, isaku.yamahata@intel.com wrote:
-> > From: Isaku Yamahata <isaku.yamahata@intel.com>
-> >
-> > Some KVM MMU operations (dirty page logging, page migration, aging page)
-> > aren't supported for private GFNs (yet) with the first generation of TDX.
-> > Silently return on unsupported TDX KVM MMU operations.
-> >
-> > Signed-off-by: Isaku Yamahata <isaku.yamahata@intel.com>
-> > ---
-> >  arch/x86/kvm/mmu/tdp_mmu.c | 74 +++++++++++++++++++++++++++++++++++---
-> >  arch/x86/kvm/x86.c         |  3 ++
-> >  2 files changed, 72 insertions(+), 5 deletions(-)
-> >
-> > diff --git a/arch/x86/kvm/mmu/tdp_mmu.c b/arch/x86/kvm/mmu/tdp_mmu.c
-> > index 12f75e60a254..fef6246086a8 100644
-> > --- a/arch/x86/kvm/mmu/tdp_mmu.c
-> > +++ b/arch/x86/kvm/mmu/tdp_mmu.c
-> > @@ -387,6 +387,8 @@ static void handle_changed_spte_dirty_log(struct kvm *kvm, int as_id, gfn_t gfn,
-> >
-> >  	if ((!is_writable_pte(old_spte) || pfn_changed) &&
-> >  	    is_writable_pte(new_spte)) {
-> > +		/* For memory slot operations, use GFN without aliasing */
-> > +		gfn = gfn & ~kvm_gfn_shared_mask(kvm);
+On 7/14/22 18:13, Aaron Lewis wrote:
+> ---
 > 
-> This should be part of enabling, please consider to squash it into patch 46.
-
-Yes, merged into it.
-
-
-> >  		slot = __gfn_to_memslot(__kvm_memslots(kvm, as_id), gfn);
-> >  		mark_page_dirty_in_slot(kvm, slot, gfn);
-> >  	}
-> > @@ -1398,7 +1400,8 @@ typedef bool (*tdp_handler_t)(struct kvm *kvm, struct tdp_iter *iter,
-> >
-> >  static __always_inline bool kvm_tdp_mmu_handle_gfn(struct kvm *kvm,
-> >  						   struct kvm_gfn_range *range,
-> > -						   tdp_handler_t handler)
-> > +						   tdp_handler_t handler,
-> > +						   bool only_shared)
-> >  {
-> >  	struct kvm_mmu_page *root;
-> >  	struct tdp_iter iter;
-> > @@ -1409,9 +1412,23 @@ static __always_inline bool kvm_tdp_mmu_handle_gfn(struct kvm *kvm,
-> >  	 * into this helper allow blocking; it'd be dead, wasteful code.
-> >  	 */
-> >  	for_each_tdp_mmu_root(kvm, root, range->slot->as_id) {
-> > +		gfn_t start;
-> > +		gfn_t end;
-> > +
-> > +		if (only_shared && is_private_sp(root))
-> > +			continue;
-> > +
-> >  		rcu_read_lock();
-> >
-> > -		tdp_root_for_each_leaf_pte(iter, root, range->start, range->end)
-> > +		/*
-> > +		 * For TDX shared mapping, set GFN shared bit to the range,
-> > +		 * so the handler() doesn't need to set it, to avoid duplicated
-> > +		 * code in multiple handler()s.
-> > +		 */
-> > +		start = kvm_gfn_for_root(kvm, root, range->start);
-> > +		end = kvm_gfn_for_root(kvm, root, range->end);
-> > +
-> > +		tdp_root_for_each_leaf_pte(iter, root, start, end)
-> >  			ret |= handler(kvm, &iter, range);
-> >
-> >  		rcu_read_unlock();
-> > @@ -1455,7 +1472,12 @@ static bool age_gfn_range(struct kvm *kvm, struct tdp_iter *iter,
-> >
-> >  bool kvm_tdp_mmu_age_gfn_range(struct kvm *kvm, struct kvm_gfn_range *range)
-> >  {
-> > -	return kvm_tdp_mmu_handle_gfn(kvm, range, age_gfn_range);
-> > +	/*
-> > +	 * First TDX generation doesn't support clearing A bit for private
-> > +	 * mapping, since there's no secure EPT API to support it.  However
-> > +	 * it's a legitimate request for TDX guest.
-> > +	 */
-> > +	return kvm_tdp_mmu_handle_gfn(kvm, range, age_gfn_range, true);
-> >  }
-> >
-> >  static bool test_age_gfn(struct kvm *kvm, struct tdp_iter *iter,
-> > @@ -1466,7 +1488,7 @@ static bool test_age_gfn(struct kvm *kvm, struct tdp_iter *iter,
-> >
-> >  bool kvm_tdp_mmu_test_age_gfn(struct kvm *kvm, struct kvm_gfn_range *range)
-> >  {
-> > -	return kvm_tdp_mmu_handle_gfn(kvm, range, test_age_gfn);
-> > +	return kvm_tdp_mmu_handle_gfn(kvm, range, test_age_gfn, false);
+> Posting as an RFC to get feedback whether it's too late to protect the
+> unused flag bits.  My hope is this feature is still new enough, and not
+> widely used enough, and this change is reasonable enough to be able to be
+> corrected.  These bits should have been protected from the start, but
+> unfortunately they were not.
 > 
-> The "false" here means we will do young testing for even private
-> pages, but we don't have actual A bit state in iter->old_spte for
-> them, so may here should be "true" ?
+> Another option would be to correct this by adding a quirk, but fixing
+> it that has its down sides.   It complicates the code more than it
+> would otherwise be, and complicates the usage for anyone using any new
+> features introduce in the future because they would also have to enable
+> a quirk.  For long term simplicity my hope is to be able to just patch
+> the original change.
 
-Yes, nice catch.
+Yes, let's do it this way.
 
+Paolo
 
-> >  }
-> >
-> >  static bool set_spte_gfn(struct kvm *kvm, struct tdp_iter *iter,
-> > @@ -1511,8 +1533,11 @@ bool kvm_tdp_mmu_set_spte_gfn(struct kvm *kvm, struct kvm_gfn_range *range)
-> >  	 * No need to handle the remote TLB flush under RCU protection, the
-> >  	 * target SPTE _must_ be a leaf SPTE, i.e. cannot result in freeing a
-> >  	 * shadow page.  See the WARN on pfn_changed in __handle_changed_spte().
-> > +	 *
-> > +	 * .change_pte() callback should not happen for private page, because
-> > +	 * for now TDX private pages are pinned during VM's life time.
-> >  	 */
-> 
-> Worth to catch this by WARN_ON() ? Depends on you.
-
-It call back can be called for shared pages.  Here there is no easy way which
-GPA (private or shared) caused it.  i.e. no easy condition for WARN_ON().
-
--- 
-Isaku Yamahata <isaku.yamahata@gmail.com>
