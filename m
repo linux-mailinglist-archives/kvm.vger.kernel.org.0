@@ -2,69 +2,68 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id F049A57A298
-	for <lists+kvm@lfdr.de>; Tue, 19 Jul 2022 17:05:26 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id BA40657A2B2
+	for <lists+kvm@lfdr.de>; Tue, 19 Jul 2022 17:13:37 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238065AbiGSPEy (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 19 Jul 2022 11:04:54 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33728 "EHLO
+        id S238141AbiGSPNg (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 19 Jul 2022 11:13:36 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43012 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S238483AbiGSPEZ (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 19 Jul 2022 11:04:25 -0400
-Received: from mail-pj1-x1035.google.com (mail-pj1-x1035.google.com [IPv6:2607:f8b0:4864:20::1035])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0EC6D4D4DA;
-        Tue, 19 Jul 2022 08:04:25 -0700 (PDT)
-Received: by mail-pj1-x1035.google.com with SMTP id b7-20020a17090a12c700b001f20eb82a08so1086934pjg.3;
-        Tue, 19 Jul 2022 08:04:25 -0700 (PDT)
+        with ESMTP id S229460AbiGSPNe (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 19 Jul 2022 11:13:34 -0400
+Received: from mail-wm1-x333.google.com (mail-wm1-x333.google.com [IPv6:2a00:1450:4864:20::333])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5CF6454059
+        for <kvm@vger.kernel.org>; Tue, 19 Jul 2022 08:13:33 -0700 (PDT)
+Received: by mail-wm1-x333.google.com with SMTP id ay11-20020a05600c1e0b00b003a3013da120so10197394wmb.5
+        for <kvm@vger.kernel.org>; Tue, 19 Jul 2022 08:13:33 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=eKcTqsNwSSuOFT+Ql0M87PqnleLM6znmzYu6pJpa+4k=;
-        b=cdqzTRcmZWlHu0awENUx4WVU/0T2KPzbHeiEwex/6WGqXjxor+ok9Oh4LEHMTTHf5X
-         6r1awrZkZ1kuubEtdJBf3eVG5Fin1dGl32sDGHfEGGdrCkdwEs5HJI7X40cGJnyO1tp0
-         VXrEkqNN568KMpWUA0/RRLzW5zXdZw0Ga2GdPXbJql8169LZsihqpCc+/YOw2cW5Rf4T
-         NQfWJByZ0OxlRHMIx5udImECCrIWip0Q4HkaRberO+JILq/B9/2Gvswu1zXBtcrqj9V0
-         4L8Loib19W8P8m2I8lHn2VXRX2jIlcM/mGmWQ0Nq6pCRPUDQa+mPsUA1fh2OZniteCoY
-         Xhww==
+        d=google.com; s=20210112;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=7HHHNGlzReGWpd/M8GTS31oYQW+jdBsAvEwbqXn8OjQ=;
+        b=S1Vmx96rAFfuPzXa+NUsz0wgYJDKlsJ3hxZsaT0u9rxWcPHip2TGaynvrPrZGRvd85
+         Ttj0mKr6NNMfzmMRqTKtUS5fKtVFWB6hmwTzQkTG6dQwzl2h+upGnqbnIs1ExrAf2+7+
+         HRITGBYozO3KvagIppG13VfprYeD7o0vGUUN/jp0zsK/7s9qgQgvzVhFS6HqdsSsCSST
+         TQu116z3NAr/SaCQO62/MrUzGmx5K7/86DYAi11YruXs13qQ+ulWPFMHS3qbzdNH9vS0
+         MZ0ezDB+ThQ51G7mxcANuo/WHQ9sUDB7LUIYFX5FHkHFZYfedHblBxw6AtWhgbBMfWUU
+         7XGQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=eKcTqsNwSSuOFT+Ql0M87PqnleLM6znmzYu6pJpa+4k=;
-        b=isjClFA43pdo2YWvg08Zu8pDYUrE+ZZfEQ/Gf4VvszI4c+MbEd7BPJ7b968D4U9j6p
-         ORa7dd+h6VxVuv3G5cForgPbEM0ScnEWP+GlfevT5Yc2yqfvfPAYeCxSA0EyYdTUNkw1
-         6HFViv1zKOjE1gtnECFaQXKj90fk+mSGuUBfEPkFTwVQuIdWh+L1TucWHnwKZBo/mltX
-         7BkKhCkSKVXLwkHoxsQMLp4nQ/YxFvBfIp4XXxkvaT+4MslCdPCdPb6ArA+0v+ruvO4s
-         tTTuax1uoYth7HYmqjmr+ZzS5fPNvgGqMrnbFM1PYRjVxT44pLAOzR5sIeYdw4YFt+xS
-         CRFw==
-X-Gm-Message-State: AJIora+GMwLmJxr2m3apBmlUz3ZpvsFIFsNcPtIApO7ezlMkpe3qXjv4
-        lbH18JZgsYLWNWETJjSVjJA=
-X-Google-Smtp-Source: AGRyM1sIE9BeEHBGrgdRgrrSUVEulxTzOUymGx3HCMMvuSO9M14eFrp3rV0/MEqRxs6lQy0n541HZg==
-X-Received: by 2002:a17:902:e84e:b0:16b:f773:4692 with SMTP id t14-20020a170902e84e00b0016bf7734692mr33531902plg.19.1658243064426;
-        Tue, 19 Jul 2022 08:04:24 -0700 (PDT)
-Received: from localhost (fmdmzpr02-ext.fm.intel.com. [192.55.54.37])
-        by smtp.gmail.com with ESMTPSA id j20-20020a170902759400b00161ccdc172dsm11726149pll.300.2022.07.19.08.04.23
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 19 Jul 2022 08:04:23 -0700 (PDT)
-Date:   Tue, 19 Jul 2022 08:04:22 -0700
-From:   Isaku Yamahata <isaku.yamahata@gmail.com>
-To:     Sean Christopherson <seanjc@google.com>
-Cc:     isaku.yamahata@intel.com, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org, isaku.yamahata@gmail.com,
-        Paolo Bonzini <pbonzini@redhat.com>
-Subject: Re: [PATCH v7 043/102] KVM: x86/mmu: Focibly use TDP MMU for TDX
-Message-ID: <20220719150422.GY1379820@ls.amr.corp.intel.com>
-References: <cover.1656366337.git.isaku.yamahata@intel.com>
- <c198d2be26aa9a041176826cf86b51a337427783.1656366338.git.isaku.yamahata@intel.com>
- <Ysw6HdGSIECkP5RC@google.com>
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=7HHHNGlzReGWpd/M8GTS31oYQW+jdBsAvEwbqXn8OjQ=;
+        b=jbJdzlgVIk72pQ1DXubrIn22DvE9TL7EQtcEBLLqxuIV2gOBZRuNqlu/0RB3cxQbTE
+         e851IO63bxu6sCLTVyZ2mXkJYDpsa6fPQI7S+j7QH3BV4N3WvrueTn/M11PKDDtDQMqy
+         gj6HvECIs0Wd59zqedff/btGaLywkW+XT3RrcXhDW3vB40Gr1qhDtiJbxu3S8PsZtoCK
+         yomCW4t7v7JIx6xBT375yQ/tBnQ7kwJJmwbH6BhSbhloDaUDi+fj0OJkMEswvZENO4Qs
+         l4t4r0Oo8AaOiM5hFXKaCZ+8fBoXTDLkEhroC84e67C+jVmZQYHNJB2QyVbN9ChNOKyu
+         oxPA==
+X-Gm-Message-State: AJIora8sd5NvlA8id04yScWM3xZ3bqkHjvegqoxP/vz9ensiLcjMFw8r
+        2AY5olbKRHc4q0P8z2wZ9t6KMKTJqPSIMvGoWuB8efX16to8gA==
+X-Google-Smtp-Source: AGRyM1vJY7xVDoyVyew7rR5ALwnOHq3ZsMbJ6fPNuiVCBFDnClCKeKypl3zILKTzucKv/N9Nnpkb+rijCA1Lit7z9z8=
+X-Received: by 2002:a05:600c:2854:b0:3a3:1551:d7d with SMTP id
+ r20-20020a05600c285400b003a315510d7dmr13704233wmb.174.1658243611702; Tue, 19
+ Jul 2022 08:13:31 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <Ysw6HdGSIECkP5RC@google.com>
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
-        RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS autolearn=ham
+References: <20220711093218.10967-1-adrian.hunter@intel.com>
+ <20220711093218.10967-2-adrian.hunter@intel.com> <YtV0vXJLbfTywZ1B@kernel.org>
+ <569b5766-eb6f-8811-c5e5-f5a6972a0fd5@intel.com>
+In-Reply-To: <569b5766-eb6f-8811-c5e5-f5a6972a0fd5@intel.com>
+From:   Ian Rogers <irogers@google.com>
+Date:   Tue, 19 Jul 2022 08:13:18 -0700
+Message-ID: <CAP-5=fXF1VRKjjBt+kv7QqQSbLonaZZoo__2qT1MtvHSZueEEw@mail.gmail.com>
+Subject: Re: [PATCH 01/35] perf tools: Fix dso_id inode generation comparison
+To:     Adrian Hunter <adrian.hunter@intel.com>
+Cc:     Arnaldo Carvalho de Melo <acme@kernel.org>,
+        Jiri Olsa <jolsa@redhat.com>,
+        Namhyung Kim <namhyung@kernel.org>,
+        Andi Kleen <ak@linux.intel.com>, linux-kernel@vger.kernel.org,
+        kvm@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
+        USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=ham
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -72,60 +71,52 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Jul 11, 2022 at 02:56:29PM +0000,
-Sean Christopherson <seanjc@google.com> wrote:
+On Tue, Jul 19, 2022 at 3:18 AM Adrian Hunter <adrian.hunter@intel.com> wrote:
+>
+> On 18/07/22 17:57, Arnaldo Carvalho de Melo wrote:
+> > Em Mon, Jul 11, 2022 at 12:31:44PM +0300, Adrian Hunter escreveu:
+> >> Synthesized MMAP events have zero ino_generation, so do not compare zero
+> >> values.
+> >>
+> >> Fixes: 0e3149f86b99 ("perf dso: Move dso_id from 'struct map' to 'struct dso'")
+> >> Signed-off-by: Adrian Hunter <adrian.hunter@intel.com>
+> >> ---
+> >>  tools/perf/util/dsos.c | 10 ++++++++--
+> >>  1 file changed, 8 insertions(+), 2 deletions(-)
+> >>
+> >> diff --git a/tools/perf/util/dsos.c b/tools/perf/util/dsos.c
+> >> index b97366f77bbf..839a1f384733 100644
+> >> --- a/tools/perf/util/dsos.c
+> >> +++ b/tools/perf/util/dsos.c
+> >> @@ -23,8 +23,14 @@ static int __dso_id__cmp(struct dso_id *a, struct dso_id *b)
+> >>      if (a->ino > b->ino) return -1;
+> >>      if (a->ino < b->ino) return 1;
+> >>
+> >> -    if (a->ino_generation > b->ino_generation) return -1;
+> >> -    if (a->ino_generation < b->ino_generation) return 1;
+> >> +    /*
+> >> +     * Synthesized MMAP events have zero ino_generation, so do not compare
+> >> +     * zero values.
+> >> +     */
+> >> +    if (a->ino_generation && b->ino_generation) {
+> >> +            if (a->ino_generation > b->ino_generation) return -1;
+> >> +            if (a->ino_generation < b->ino_generation) return 1;
+> >> +    }
+> >
+> > But comparing didn't harm right? when its !0 now we may have three
+> > comparisions instead of 2 :-\
+> >
+> > The comment has some value tho, so I'm merging this :-)
+>
+> Thanks. I found it harmful because the mismatch resulted in a new
+> dso that did not have a build ID whereas the original dso did have
+> a build ID.  The build ID was essential because the object was not
+> found otherwise.
 
-> s/Focibly/Forcibly, but that's a moot point because KVM shouldn't override the
-> the module param.  KVM should instead _require_ the TDP MMU to be enabled.  E.g.
-> if userspace disables the TDP MMU to workaround a fatal bug, then forcing the TDP
-> MMU may silently expose KVM to said bug.
-> 
-> And overriding tdp_enabled is just mind-boggling broken, all of the SPTE masks
-> will be wrong.
-> 
-> On Mon, Jun 27, 2022, isaku.yamahata@intel.com wrote:
-> > From: Isaku Yamahata <isaku.yamahata@intel.com>
-> > 
-> > In this patch series, TDX supports only TDP MMU and doesn't support legacy
-> > MMU.  Forcibly use TDP MMU for TDX irrelevant of kernel parameter to
-> > disable TDP MMU.
-> 
-> Do not refer to the "patch series", instead phrase the statement with respect to
-> what KVM support.
-> 
->   Require the TDP MMU for TDX guests, the so called "shadow" MMU does not
->   support mapping guest private memory, i.e. does not support Secure-EPT.
+That's good to know, could we add that also to the comment? Perhaps:
 
-Thanks for rewrite of the commit message.  Now the TDP MMU is default, I'll change
+Synthesized MMAP events have zero ino_generation, avoid comparing them
+with MMAP events with actual ino_generation.
 
-> > Signed-off-by: Isaku Yamahata <isaku.yamahata@intel.com>
-> > ---
-> >  arch/x86/kvm/mmu/tdp_mmu.c | 9 +++++++--
-> >  1 file changed, 7 insertions(+), 2 deletions(-)
-> > 
-> > diff --git a/arch/x86/kvm/mmu/tdp_mmu.c b/arch/x86/kvm/mmu/tdp_mmu.c
-> > index 82f1bfac7ee6..7eb41b176d1e 100644
-> > --- a/arch/x86/kvm/mmu/tdp_mmu.c
-> > +++ b/arch/x86/kvm/mmu/tdp_mmu.c
-> > @@ -18,8 +18,13 @@ int kvm_mmu_init_tdp_mmu(struct kvm *kvm)
-> >  {
-> >  	struct workqueue_struct *wq;
-> >  
-> > -	if (!tdp_enabled || !READ_ONCE(tdp_mmu_enabled))
-> > -		return 0;
-> > +	/*
-> > +	 *  Because TDX supports only TDP MMU, forcibly use TDP MMU in the case
-> > +	 *  of TDX.
-> > +	 */
-> > +	if (kvm->arch.vm_type != KVM_X86_TDX_VM &&
-> > +		(!tdp_enabled || !READ_ONCE(tdp_mmu_enabled)))
-> > +		return false;
-> 
-> Yeah, no.
-> 
-> 	if (!tdp_enabled || !READ_ONCE(tdp_mmu_enabled))
-> 		return kvm->arch.vm_type == KVM_X86_TDX_VM ? -EINVAL : 0;
-
-I'll use -EOPNOTSUPP instead of -EINVAL.
--- 
-Isaku Yamahata <isaku.yamahata@gmail.com>
+Thanks,
+Ian
