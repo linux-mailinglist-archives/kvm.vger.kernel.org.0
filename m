@@ -2,99 +2,78 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 79D7E57905C
-	for <lists+kvm@lfdr.de>; Tue, 19 Jul 2022 04:01:57 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 8AC59579138
+	for <lists+kvm@lfdr.de>; Tue, 19 Jul 2022 05:18:47 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236651AbiGSCBz (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 18 Jul 2022 22:01:55 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38880 "EHLO
+        id S234048AbiGSDSp (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 18 Jul 2022 23:18:45 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56870 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S236333AbiGSCBy (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 18 Jul 2022 22:01:54 -0400
-Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DBE533AB13;
-        Mon, 18 Jul 2022 19:01:52 -0700 (PDT)
-Received: from pps.filterd (m0187473.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.17.1.5/8.17.1.5) with ESMTP id 26J1ftM5020200;
-        Tue, 19 Jul 2022 02:01:46 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : subject :
- from : to : cc : date : in-reply-to : references : content-type :
- content-transfer-encoding : mime-version; s=pp1;
- bh=PPw8mwGhjQL0BJg93dX6d9Kp4ZAOw9NYB4OXGXK112s=;
- b=Tl1t3eBx/+3e/gWAWKsV8k8HP1+jM8dZulxAVGRFuTtwK040kXac+5SK3T5N2iBxcZ/f
- 4jZxEJfRkH5vaAr+RcVcOjyFZy+4QR6iq9DB/tx/SYe7jUbvbgaBTPwhbH8gubQuUxL0
- 80PqIgbmh0E9Q52090aWiNihpvUC8599UR9L12r25PeHvU0FI3OultgUvv0HUHsYUExr
- BwFxJfWSK/uWrSYCfblAaxUUsNYp8OFiDGb530AdmtUoP7E64dcB6G8nlZQiT/Me8e8P
- BUSB3YCJQ5VYrNFagozZDZDCuTTT/GQPMKfFq+vL8H8KDwfMAnfo3SDcp06ayPH8MePi uQ== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3hdk640asq-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 19 Jul 2022 02:01:46 +0000
-Received: from m0187473.ppops.net (m0187473.ppops.net [127.0.0.1])
-        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 26J1ugPW034569;
-        Tue, 19 Jul 2022 02:01:45 GMT
-Received: from ppma05wdc.us.ibm.com (1b.90.2fa9.ip4.static.sl-reverse.com [169.47.144.27])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3hdk640as8-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 19 Jul 2022 02:01:45 +0000
-Received: from pps.filterd (ppma05wdc.us.ibm.com [127.0.0.1])
-        by ppma05wdc.us.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 26J1onIf004560;
-        Tue, 19 Jul 2022 02:01:44 GMT
-Received: from b03cxnp08027.gho.boulder.ibm.com (b03cxnp08027.gho.boulder.ibm.com [9.17.130.19])
-        by ppma05wdc.us.ibm.com with ESMTP id 3hbmy9geeg-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 19 Jul 2022 02:01:44 +0000
-Received: from b03ledav002.gho.boulder.ibm.com (b03ledav002.gho.boulder.ibm.com [9.17.130.233])
-        by b03cxnp08027.gho.boulder.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 26J21hYZ21168774
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Tue, 19 Jul 2022 02:01:43 GMT
-Received: from b03ledav002.gho.boulder.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 34C7B136051;
-        Tue, 19 Jul 2022 02:01:43 +0000 (GMT)
-Received: from b03ledav002.gho.boulder.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id AC214136053;
-        Tue, 19 Jul 2022 02:01:41 +0000 (GMT)
-Received: from farman-thinkpad-t470p (unknown [9.211.146.30])
-        by b03ledav002.gho.boulder.ibm.com (Postfix) with ESMTP;
-        Tue, 19 Jul 2022 02:01:41 +0000 (GMT)
-Message-ID: <1f945ef0eb6c02079700a6785ca3dd9864096b82.camel@linux.ibm.com>
-Subject: Re: simplify the mdev interface v6
-From:   Eric Farman <farman@linux.ibm.com>
-To:     Alex Williamson <alex.williamson@redhat.com>,
-        Christoph Hellwig <hch@lst.de>
-Cc:     Kirti Wankhede <kwankhede@nvidia.com>,
-        Tony Krowiak <akrowiak@linux.ibm.com>,
-        Halil Pasic <pasic@linux.ibm.com>,
-        Jason Herne <jjherne@linux.ibm.com>,
-        Matthew Rosato <mjrosato@linux.ibm.com>,
-        Zhenyu Wang <zhenyuw@linux.intel.com>,
-        Zhi Wang <zhi.a.wang@intel.com>,
-        Jason Gunthorpe <jgg@nvidia.com>, kvm@vger.kernel.org,
-        linux-s390@vger.kernel.org, intel-gvt-dev@lists.freedesktop.org,
-        Vineeth Vijayan <vneethv@linux.ibm.com>
-Date:   Mon, 18 Jul 2022 22:01:40 -0400
-In-Reply-To: <20220718153331.18a52e31.alex.williamson@redhat.com>
-References: <20220709045450.609884-1-hch@lst.de>
-         <20220718054348.GA22345@lst.de>
-         <20220718153331.18a52e31.alex.williamson@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
-X-Mailer: Evolution 3.28.5 (3.28.5-18.el8) 
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: bPzYFyV32OrQ-bvBA1OaEfajS1Z3nqoV
-X-Proofpoint-ORIG-GUID: uE_GeuD9Iu8rY6zWRdsziIVCXWySTCOe
-Content-Transfer-Encoding: 7bit
-X-Proofpoint-UnRewURL: 0 URL was un-rewritten
+        with ESMTP id S233620AbiGSDSo (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 18 Jul 2022 23:18:44 -0400
+Received: from mail-pj1-x102f.google.com (mail-pj1-x102f.google.com [IPv6:2607:f8b0:4864:20::102f])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 915F4B1C9
+        for <kvm@vger.kernel.org>; Mon, 18 Jul 2022 20:18:41 -0700 (PDT)
+Received: by mail-pj1-x102f.google.com with SMTP id q13-20020a17090a304d00b001f1af9a18a2so5949652pjl.5
+        for <kvm@vger.kernel.org>; Mon, 18 Jul 2022 20:18:41 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=ozlabs-ru.20210112.gappssmtp.com; s=20210112;
+        h=message-id:date:mime-version:user-agent:subject:content-language:to
+         :cc:references:from:in-reply-to:content-transfer-encoding;
+        bh=9BVbVFop1MpExz8nPR0yoVMaqYjV+LHpDDLDzkkCU8g=;
+        b=UAhbqadBM/QJIMG5sz78JBdA/BL/wUjyPyE5E85/ipptFRRwSKwtKhN4WIZ5aA2Ywr
+         Fsdc4BIQ8tnRUxaj6wL/poEe7FJc2kAu03DxFcoRvukp3SawnfYxAoTYLdPZzY5/q/6q
+         MsZYckLMnZeLYQ4aZcBgJ7GWZkun52q5tNbmvddUIT2fV33ZnzGTI9DKEGPGJCm1Lo0t
+         0OCbxdIQddJS6n9AkpSb1JhvlmYsndSqj6LTnxwDzrWFE6cl66FjvhJUrW+fpi2vQMgH
+         dFQEkumZhilzMHLGf487TnvS9oBD0TuTqZCip/HXcACrjG0UEAS7ex/8qh5NXiQRWwhV
+         spdw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
+         :content-language:to:cc:references:from:in-reply-to
+         :content-transfer-encoding;
+        bh=9BVbVFop1MpExz8nPR0yoVMaqYjV+LHpDDLDzkkCU8g=;
+        b=Epg1P9DFtLZl7CSd0xT16gK8quzPnoT1UljUJ0I0bYuX06LufJn9vCfG52fJBIyfDi
+         WaTSjiZ8lzpm1S+UFWDe0czCKtplJLOwA0Jg9zXSjjupRfMe0CsrJppa3Tzk2ofxKnFD
+         G/IIYsynIUHcWXruHuI4hvPr+BNmWGkA86TjtioxLhMd8Mz37XijFnFphFQH7NCIy6EN
+         fpRyJ+x1TCBb2iP0f43Muj2D0Q1/ua93U1P/EPtCiALAUTEnhlYRmCmheGLFo2EW10ls
+         R51JOZlH3DrvfTKFtUkmPpOUoN4vbHhJMfdp1mJz6PYA3sfPa/ILeJlTK2HYHsU3Doah
+         eP0w==
+X-Gm-Message-State: AJIora+9uVs1Q7UGnP33ICZ8j6x9YVizy6Mi4ucS2Th0xxEQ4AjwvX/h
+        xFmUrgrUlo5CmDxod0nDtcaKfw==
+X-Google-Smtp-Source: AGRyM1uY9pOIvUU5sZk2tegLaQel9y2LSRoNU/6A4GrRu42DlhuPCUNFDsTN/WPyANdrSXxxWLHOYg==
+X-Received: by 2002:a17:902:cf12:b0:16c:a263:62b8 with SMTP id i18-20020a170902cf1200b0016ca26362b8mr20734673plg.31.1658200721009;
+        Mon, 18 Jul 2022 20:18:41 -0700 (PDT)
+Received: from [192.168.10.153] (203-7-124-83.dyn.iinet.net.au. [203.7.124.83])
+        by smtp.gmail.com with ESMTPSA id h16-20020a170902f55000b0016c740e53bbsm10281804plf.79.2022.07.18.20.18.35
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 18 Jul 2022 20:18:40 -0700 (PDT)
+Message-ID: <00c41fa4-4e64-0a90-b06e-accdc662fa4d@ozlabs.ru>
+Date:   Tue, 19 Jul 2022 13:18:32 +1000
 MIME-Version: 1.0
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.205,Aquarius:18.0.883,Hydra:6.0.517,FMLib:17.11.122.1
- definitions=2022-07-18_22,2022-07-18_01,2022-06-22_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 adultscore=0
- priorityscore=1501 impostorscore=0 malwarescore=0 bulkscore=0
- mlxlogscore=999 spamscore=0 phishscore=0 clxscore=1015 suspectscore=0
- lowpriorityscore=0 mlxscore=0 classifier=spam adjust=0 reason=mlx
- scancount=1 engine=8.12.0-2206140000 definitions=main-2207190006
-X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_EF,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_PASS
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:103.0) Gecko/20100101
+ Thunderbird/103.0
+Subject: Re: [PATCH kernel 3/3] powerpc/iommu: Add iommu_ops to report
+ capabilities and allow blocking domains
+Content-Language: en-US
+To:     Jason Gunthorpe <jgg@nvidia.com>
+Cc:     linuxppc-dev@lists.ozlabs.org, kvm@vger.kernel.org,
+        kvm-ppc@vger.kernel.org, Deming Wang <wangdeming@inspur.com>,
+        Robin Murphy <robin.murphy@arm.com>,
+        Alex Williamson <alex.williamson@redhat.com>,
+        Daniel Henrique Barboza <danielhb413@gmail.com>,
+        Fabiano Rosas <farosas@linux.ibm.com>,
+        Murilo Opsfelder Araujo <muriloo@linux.ibm.com>,
+        Nicholas Piggin <npiggin@gmail.com>,
+        Michael Ellerman <mpe@ellerman.id.au>
+References: <20220714081822.3717693-1-aik@ozlabs.ru>
+ <20220714081822.3717693-4-aik@ozlabs.ru> <20220718180924.GE4609@nvidia.com>
+From:   Alexey Kardashevskiy <aik@ozlabs.ru>
+In-Reply-To: <20220718180924.GE4609@nvidia.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,NICE_REPLY_A,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS
         autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -102,108 +81,187 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, 2022-07-18 at 15:33 -0600, Alex Williamson wrote:
-> On Mon, 18 Jul 2022 07:43:48 +0200
-> Christoph Hellwig <hch@lst.de> wrote:
+
+
+On 19/07/2022 04:09, Jason Gunthorpe wrote:
+> On Thu, Jul 14, 2022 at 06:18:22PM +1000, Alexey Kardashevskiy wrote:
 > 
-> > Alex, does this series look good to you now?
+>> +/*
+>> + * A simple iommu_ops to allow less cruft in generic VFIO code.
+>> + */
+>> +static bool spapr_tce_iommu_capable(enum iommu_cap cap)
+>> +{
+>> +	switch (cap) {
+>> +	case IOMMU_CAP_CACHE_COHERENCY:
 > 
-> It does.  I was hoping we'd get a more complete set acks from the
-> mdev
-> driver owners, but I'll grab this within the next day or two with
-> whatever additional reviews come in by then. 
-
-Apologies, I have been on vacation since this version was posted.
-
-I'll get the problem with struct subchannel [1] sorted out in the next
-couple of days. This series breaks vfio-ccw in its current form (see
-reply to patch 14), but even with that addressed the placement of all
-these other mdev structs needs to be handled differently.
-
-Eric
-
-[1] https://lore.kernel.org/r/20220707134017.GB19060@lst.de/
-
->  Thanks,
+> I would add a remark here that it is because vfio is going to use
+> SPAPR mode but still checks that the iommu driver support coherency -
+> with out that detail it looks very strange to have caps without
+> implementing unmanaged domains
 > 
-> Alex
+>> +static struct iommu_domain *spapr_tce_iommu_domain_alloc(unsigned int type)
+>> +{
+>> +	struct iommu_domain *dom;
+>> +
+>> +	if (type != IOMMU_DOMAIN_BLOCKED)
+>> +		return NULL;
+>> +
+>> +	dom = kzalloc(sizeof(*dom), GFP_KERNEL);
+>> +	if (!dom)
+>> +		return NULL;
+>> +
+>> +	dom->geometry.aperture_start = 0;
+>> +	dom->geometry.aperture_end = ~0ULL;
+>> +	dom->geometry.force_aperture = true;
 > 
-> > On Sat, Jul 09, 2022 at 06:54:36AM +0200, Christoph Hellwig wrote:
-> > > Hi all,
-> > > 
-> > > this series signigicantly simplies the mdev driver interface by
-> > > following
-> > > the patterns for device model interaction used elsewhere in the
-> > > kernel.
-> > > 
-> > > Changes since v5:
-> > >  - rebased to the latest vfio/next branch
-> > >  - drop the last patch again
-> > >  - make sure show_available_instances works properly for the
-> > > internallly
-> > >    tracked case
-> > > 
-> > > Changes since v4:
-> > >  - move the kobject_put later in mdev_device_release 
-> > >  - add a Fixes tag for the first patch
-> > >  - add another patch to remove an extra kobject_get/put
-> > > 
-> > > Changes since v3:
-> > >  - make the sysfs_name and pretty_name fields pointers instead of
-> > > arrays
-> > >  - add an i915 cleanup to prepare for the above
-> > > 
-> > > Changes since v2:
-> > >  - rebased to vfio/next
-> > >  - fix a pre-existing memory leak in i915 instead of making it
-> > > worse
-> > >  - never manipulate if ->available_instances if drv-
-> > > >get_available is
-> > >    provided
-> > >  - keep a parent reference for the mdev_type
-> > >  - keep a few of the sysfs.c helper function around
-> > >  - improve the documentation for the parent device lifetime
-> > >  - minor spellig / formatting fixes
-> > > 
-> > > Changes since v1:
-> > >  - embedd the mdev_parent into a different sub-structure in i916
-> > >  - remove headers now inclued by mdev.h from individual source
-> > > files
-> > >  - pass an array of mdev_types to mdev_register_parent
-> > >  - add additional patches to implement all attributes on the
-> > >    mdev_type in the core code
-> > > 
-> > > Diffstat:
-> > >  Documentation/driver-api/vfio-mediated-device.rst |   26 +-
-> > >  Documentation/s390/vfio-ap.rst                    |    2 
-> > >  Documentation/s390/vfio-ccw.rst                   |    2 
-> > >  drivers/gpu/drm/i915/gvt/aperture_gm.c            |   20 +-
-> > >  drivers/gpu/drm/i915/gvt/gvt.h                    |   42 ++--
-> > >  drivers/gpu/drm/i915/gvt/kvmgt.c                  |  168 ++++---
-> > > ----------
-> > >  drivers/gpu/drm/i915/gvt/vgpu.c                   |  210
-> > > +++++++---------------
-> > >  drivers/s390/cio/cio.h                            |    4 
-> > >  drivers/s390/cio/vfio_ccw_drv.c                   |   12 -
-> > >  drivers/s390/cio/vfio_ccw_ops.c                   |   51 -----
-> > >  drivers/s390/cio/vfio_ccw_private.h               |    2 
-> > >  drivers/s390/crypto/vfio_ap_ops.c                 |   68 +------
-> > >  drivers/s390/crypto/vfio_ap_private.h             |    6 
-> > >  drivers/vfio/mdev/mdev_core.c                     |  190 ++++---
-> > > ------------
-> > >  drivers/vfio/mdev/mdev_driver.c                   |    7 
-> > >  drivers/vfio/mdev/mdev_private.h                  |   32 ---
-> > >  drivers/vfio/mdev/mdev_sysfs.c                    |  189
-> > > ++++++++++---------
-> > >  include/linux/mdev.h                              |   77 ++++---
-> > > -
-> > >  samples/vfio-mdev/mbochs.c                        |  103 +++--
-> > > -----
-> > >  samples/vfio-mdev/mdpy.c                          |  115 +++--
-> > > -------
-> > >  samples/vfio-mdev/mtty.c                          |   94 +++--
-> > > ----
-> > >  21 files changed, 463 insertions(+), 957 deletions(-)  
-> > ---end quoted text---
-> > 
+> A blocked domain doesn't really have an aperture, all DMA is rejected,
+> so I think these can just be deleted and left at zero.
+> 
+> Generally I'm suggesting drivers just use a static singleton instance
+> for the blocked domain instead of the allocation like this, but that
+> is a very minor nit.
+> 
+>> +static struct iommu_device *spapr_tce_iommu_probe_device(struct device *dev)
+>> +{
+>> +	struct pci_dev *pdev;
+>> +	struct pci_controller *hose;
+>> +
+>> +	/* Weirdly iommu_device_register() assigns the same ops to all buses */
+>> +	if (!dev_is_pci(dev))
+>> +		return ERR_PTR(-EPERM);
+> 
+> Less "weirdly", more by design. The iommu driver should check if the
+> given struct device is supported or not, it isn't really a bus
+> specific operation.
+> 
+>> +static struct iommu_group *spapr_tce_iommu_device_group(struct device *dev)
+>> +{
+>> +	struct pci_controller *hose;
+>> +	struct pci_dev *pdev;
+>> +
+>> +	/* Weirdly iommu_device_register() assigns the same ops to all buses */
+>> +	if (!dev_is_pci(dev))
+>> +		return ERR_PTR(-EPERM);
+> 
+> This doesn't need repeating, if probe_device() fails then this will
+> never be called.
+> 
+>> +static int spapr_tce_iommu_attach_dev(struct iommu_domain *dom,
+>> +				      struct device *dev)
+>> +{
+>> +	struct iommu_group *grp = iommu_group_get(dev);
+>> +	struct iommu_table_group *table_group;
+>> +	int ret = -EINVAL;
+>> +
+>> +	if (!grp)
+>> +		return -ENODEV;
+>> +
+>> +	table_group = iommu_group_get_iommudata(grp);
+>> +
+>> +	if (dom->type == IOMMU_DOMAIN_BLOCKED)
+>> +		ret = table_group->ops->take_ownership(table_group);
+> 
+> Ideally there shouldn't be dom->type checks like this.
+> 
+> 
+> The blocking domain should have its own iommu_domain_ops that only
+> process the blocking operation. Ie call this like
+> spapr_tce_iommu_blocking_attach_dev()
+> 
+> Instead of having a "default_domain_ops" leave it NULL and create a
+> spapr_tce_blocking_domain_ops with these two functions and assign it
+> to domain->ops when creating. Then it is really clear these functions
+> are only called for the DOMAIN_BLOCKED type and you don't need to
+> check it.
+> 
+>> +static void spapr_tce_iommu_detach_dev(struct iommu_domain *dom,
+>> +				       struct device *dev)
+>> +{
+>> +	struct iommu_group *grp = iommu_group_get(dev);
+>> +	struct iommu_table_group *table_group;
+>> +
+>> +	table_group = iommu_group_get_iommudata(grp);
+>> +	WARN_ON(dom->type != IOMMU_DOMAIN_BLOCKED);
+>> +	table_group->ops->release_ownership(table_group);
+>> +}
+> 
+> Ditto
+> 
+>> +struct iommu_group *pSeries_pci_device_group(struct pci_controller *hose,
+>> +					     struct pci_dev *pdev)
+>> +{
+>> +	struct device_node *pdn, *dn = pdev->dev.of_node;
+>> +	struct iommu_group *grp;
+>> +	struct pci_dn *pci;
+>> +
+>> +	pdn = pci_dma_find(dn, NULL);
+>> +	if (!pdn || !PCI_DN(pdn))
+>> +		return ERR_PTR(-ENODEV);
+>> +
+>> +	pci = PCI_DN(pdn);
+>> +	if (!pci->table_group)
+>> +		return ERR_PTR(-ENODEV);
+>> +
+>> +	grp = pci->table_group->group;
+>> +	if (!grp)
+>> +		return ERR_PTR(-ENODEV);
+>> +
+>> +	return iommu_group_ref_get(grp);
+> 
+> Not for this series, but this is kind of backwards, the driver
+> specific data (ie the table_group) should be in
+> iommu_group_get_iommudata()...
 
+
+It is there but here we are getting from a device to a group - a device 
+is not added to a group yet when iommu_probe_device() works and tries 
+adding a device via iommu_group_get_for_dev().
+
+
+
+
+>> diff --git a/drivers/vfio/vfio_iommu_spapr_tce.c b/drivers/vfio/vfio_iommu_spapr_tce.c
+>> index 8a65ea61744c..3b53b466e49b 100644
+>> --- a/drivers/vfio/vfio_iommu_spapr_tce.c
+>> +++ b/drivers/vfio/vfio_iommu_spapr_tce.c
+>> @@ -1152,8 +1152,6 @@ static void tce_iommu_release_ownership(struct tce_container *container,
+>>   	for (i = 0; i < IOMMU_TABLE_GROUP_MAX_TABLES; ++i)
+>>   		if (container->tables[i])
+>>   			table_group->ops->unset_window(table_group, i);
+>> -
+>> -	table_group->ops->release_ownership(table_group);
+>>   }
+>>   
+>>   static long tce_iommu_take_ownership(struct tce_container *container,
+>> @@ -1161,10 +1159,6 @@ static long tce_iommu_take_ownership(struct tce_container *container,
+>>   {
+>>   	long i, ret = 0;
+>>   
+>> -	ret = table_group->ops->take_ownership(table_group);
+>> -	if (ret)
+>> -		return ret;
+>> -
+>>   	/* Set all windows to the new group */
+>>   	for (i = 0; i < IOMMU_TABLE_GROUP_MAX_TABLES; ++i) {
+>>   		struct iommu_table *tbl = container->tables[i];
+>> @@ -1183,8 +1177,6 @@ static long tce_iommu_take_ownership(struct tce_container *container,
+>>   	for (i = 0; i < IOMMU_TABLE_GROUP_MAX_TABLES; ++i)
+>>   		table_group->ops->unset_window(table_group, i);
+>>   
+>> -	table_group->ops->release_ownership(table_group);
+>> -
+> 
+> This is great, makes alot of sense.
+> 
+> Anyhow, it all looks fine to me as is even:
+> 
+> Reviewed-by: Jason Gunthorpe <jgg@nvidia.com>
+
+Thanks. I'll try now to find an interested party to test this :)
+
+
+> 
+> Jason
+
+-- 
+Alexey
