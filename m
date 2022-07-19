@@ -2,71 +2,69 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id E904D57A63E
-	for <lists+kvm@lfdr.de>; Tue, 19 Jul 2022 20:13:04 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id CF91C57A6CB
+	for <lists+kvm@lfdr.de>; Tue, 19 Jul 2022 20:55:12 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S239925AbiGSSND (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 19 Jul 2022 14:13:03 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43636 "EHLO
+        id S239307AbiGSSzK (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 19 Jul 2022 14:55:10 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49700 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232034AbiGSSM7 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 19 Jul 2022 14:12:59 -0400
-Received: from mail-pf1-x42c.google.com (mail-pf1-x42c.google.com [IPv6:2607:f8b0:4864:20::42c])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 13E0D545C7;
-        Tue, 19 Jul 2022 11:12:59 -0700 (PDT)
-Received: by mail-pf1-x42c.google.com with SMTP id e16so14295588pfm.11;
-        Tue, 19 Jul 2022 11:12:59 -0700 (PDT)
+        with ESMTP id S230249AbiGSSzH (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 19 Jul 2022 14:55:07 -0400
+Received: from mail-pg1-x536.google.com (mail-pg1-x536.google.com [IPv6:2607:f8b0:4864:20::536])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 09278F7B
+        for <kvm@vger.kernel.org>; Tue, 19 Jul 2022 11:55:06 -0700 (PDT)
+Received: by mail-pg1-x536.google.com with SMTP id r186so14312670pgr.2
+        for <kvm@vger.kernel.org>; Tue, 19 Jul 2022 11:55:06 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
+        d=google.com; s=20210112;
         h=date:from:to:cc:subject:message-id:references:mime-version
          :content-disposition:in-reply-to;
-        bh=lx48cK2mO82aDssLzSprNsDu8ZPznwsFdIksxVa34nI=;
-        b=p9TgEkgHFMpUpt8wgKRPpuHLgFeJrKGezWQlCxEX4DQ61ebKgRddD+aVPtRsontDul
-         ca6oZocVqAoNx70rWVOPSck2idBpruWwjRF9/JkYWKsGBmaMfTEM3C8tRdIK4wqUFqIk
-         xwx/4slk+6G8ioesR/3sUY6aMNII0OK8U20ktYgy4P2zwOQJXhwUPn4bvnxege9pKhCa
-         axHzwWGGfXo6/nTXsj7Scbu9BzLt4/rG8nwQ6z6PFTx7HmmVS+mWLpvD0KQ0jBJFenTD
-         x7+1Kddu5yczhWCu0Oj84gAxY91LaMtowvXKmeSe1bkWmciLyy0NdzEl63mv7nLMf3e9
-         jG1w==
+        bh=ivVC9EM9jM66mJwYdCa12X2ciIU5HLlT0VikbwcqW18=;
+        b=MnT5x6BW+UKIQ9tTlvQG7AAUoEnxPFr6NnmrcUd/RurtAKZFDIiMg5JUfsF3geEtkf
+         ZrZGcTGi12Q0VNsAJrY+9AnTQZiZJwJ3FvhtI+E7NDJBKG95qboQwkRYn/fYPh05sQb0
+         he9T+4zweUVHob4/7oBcwbOqOdd5JOyMuFsRnle91Go/rjAErLuaVhk45YK1Hlpt/x6u
+         atHackoDC6xIcsPJReC4pjUWkdBX+hE5s/0GiV8ZzL1OlgNu3sEvrmtpaZH3b+DPRJgZ
+         XxBE9rBrogIyvNj/R5TQAAUHa6Yik8hM/f1v0kU2DrBw+rqgyJazV0cgCARTGeIGw9Ol
+         bxQw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:date:from:to:cc:subject:message-id:references
          :mime-version:content-disposition:in-reply-to;
-        bh=lx48cK2mO82aDssLzSprNsDu8ZPznwsFdIksxVa34nI=;
-        b=TN+/Q8PGXkIpquw5O6fXtwJ7feybXBR71T7+KVyav8fh6gcAn54q/as9fF2eCe1ffA
-         kfQNJbHREAdEbqRba5rRv5K2hlbnpQeHPq5bKUxL+8jXdr6caFqtVvSlD2eJn+C/6RVx
-         7d3oO3Coq3yc+I6xfEWYHHP23DjEphYoBxiYgVV4+neOc7Mv1JQ24hAQgPJW5rhzJHkw
-         v69Bn/z5I6jPW4FioVO/5uNTK9TDgJoY17prom9VWhLLj6jSKspReeKUKSDa25LLXBE3
-         +n+mjvzGnoALBs7vdCC1Ug92Ia7epXjFHfmOrK0JqB2aYsscvzdcfXDTT4zEsCCDcqtz
-         BnvQ==
-X-Gm-Message-State: AJIora9BMDDesmPPxVEkxiFwePioNnYPXb9pdqSObsypcACjydeeFCFm
-        RHIGxekMuD9KUhaKbwpVlfY=
-X-Google-Smtp-Source: AGRyM1uZKjd3vypiOzvYHAG42NpxKsJpXUN/a41VFp/AwjkZchOlzYyPloGwvMHwk0QLhdR9kxYVyg==
-X-Received: by 2002:a63:5810:0:b0:40d:77fb:1c25 with SMTP id m16-20020a635810000000b0040d77fb1c25mr30287980pgb.570.1658254378556;
-        Tue, 19 Jul 2022 11:12:58 -0700 (PDT)
-Received: from localhost (fmdmzpr02-ext.fm.intel.com. [192.55.54.37])
-        by smtp.gmail.com with ESMTPSA id n12-20020a170902f60c00b0016d0beb6ce0sm1897179plg.246.2022.07.19.11.12.57
+        bh=ivVC9EM9jM66mJwYdCa12X2ciIU5HLlT0VikbwcqW18=;
+        b=vKeccXWs4WFsPAs+nvSkwEIWCBqpjzICP6J/sBgVJFDYpvwWB5jLlXDzaKP2KLscZo
+         MKwjXC1oxE/bnbmHuVpPSHkvmA8BBholcizPpfZJs5KnNpv8fv9MQBVVKOy6R3xD6Vc4
+         I+2rDf7AR8Dg816lewFcw6JygmRNSS2OFVRFGHaMhs3tvZA9dFbgbfVaH1RSLJgw0LAq
+         Cqw5prxYPaDRN4/YToUP1sHHZoo4G6ZVgNIRo/n6rQsgXB/18jqx+rprfJdIsZ9BpUr4
+         GZ0Ur/7S3W5JkzR85ien2liE6a+blgJn4aGLRDRe/DhU+sK5mntZaE50Pv+xksRv25q8
+         0idw==
+X-Gm-Message-State: AJIora/XvC/XFuwfLRyuALsNRGSAExy7NktlDr3EN2YPcZqUaRd4beAO
+        /wTSeP8ktbJe5e0/H6NEV6m+5g==
+X-Google-Smtp-Source: AGRyM1uBI1w+9Wit78V4mJ9Xfvp+eS4Z/zhmPnP8YfL9Lneiu0bXaLfHGedZMlFDpPHBVaepTaV92Q==
+X-Received: by 2002:a05:6a00:1daa:b0:52a:c51d:d36a with SMTP id z42-20020a056a001daa00b0052ac51dd36amr34595993pfw.61.1658256904800;
+        Tue, 19 Jul 2022 11:55:04 -0700 (PDT)
+Received: from google.com (123.65.230.35.bc.googleusercontent.com. [35.230.65.123])
+        by smtp.gmail.com with ESMTPSA id m5-20020a170902db0500b0016bebb0cb96sm12179765plx.266.2022.07.19.11.55.04
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 19 Jul 2022 11:12:58 -0700 (PDT)
-Date:   Tue, 19 Jul 2022 11:12:56 -0700
-From:   Isaku Yamahata <isaku.yamahata@gmail.com>
-To:     Chao Gao <chao.gao@intel.com>
-Cc:     Yuan Yao <yuan.yao@linux.intel.com>, isaku.yamahata@intel.com,
-        kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
-        isaku.yamahata@gmail.com, Paolo Bonzini <pbonzini@redhat.com>
-Subject: Re: [PATCH v7 053/102] KVM: TDX: don't request
- KVM_REQ_APIC_PAGE_RELOAD
-Message-ID: <20220719181256.GB1379820@ls.amr.corp.intel.com>
-References: <cover.1656366337.git.isaku.yamahata@intel.com>
- <bcdcc4175321ff570a198aa55f8ac035de2add1f.1656366338.git.isaku.yamahata@intel.com>
- <20220712034743.glrfvpx54ja6jrzg@yy-desk-7060>
- <20220712061439.GA28707@gao-cwp>
+        Tue, 19 Jul 2022 11:55:04 -0700 (PDT)
+Date:   Tue, 19 Jul 2022 18:55:01 +0000
+From:   Sean Christopherson <seanjc@google.com>
+To:     Paolo Bonzini <pbonzini@redhat.com>
+Cc:     Aaron Lewis <aaronlewis@google.com>, kvm@vger.kernel.org,
+        jmattson@google.com
+Subject: Re: [RFC PATCH] KVM: x86: Protect the unused bits in MSR exiting
+ flags
+Message-ID: <Ytb+BZReuuD+2rpd@google.com>
+References: <20220714161314.1715227-1-aaronlewis@google.com>
+ <8da08a8a-e639-301d-ca98-d85b74c1ad20@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20220712061439.GA28707@gao-cwp>
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
-        RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS autolearn=ham
+In-Reply-To: <8da08a8a-e639-301d-ca98-d85b74c1ad20@redhat.com>
+X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
+        USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=ham
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -74,59 +72,27 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Jul 12, 2022 at 02:14:45PM +0800,
-Chao Gao <chao.gao@intel.com> wrote:
-
-> On Tue, Jul 12, 2022 at 11:47:43AM +0800, Yuan Yao wrote:
-> >On Mon, Jun 27, 2022 at 02:53:45PM -0700, isaku.yamahata@intel.com wrote:
-> >> From: Isaku Yamahata <isaku.yamahata@intel.com>
-> >>
-> >> TDX doesn't need APIC page depending on vapic and its callback is
-> >> WARN_ON_ONCE(is_tdx).  To avoid unnecessary overhead and WARN_ON_ONCE(),
-> >> skip requesting KVM_REQ_APIC_PAGE_RELOAD when TD.
+On Tue, Jul 19, 2022, Paolo Bonzini wrote:
+> On 7/14/22 18:13, Aaron Lewis wrote:
+> > ---
+> > 
+> > Posting as an RFC to get feedback whether it's too late to protect the
+> > unused flag bits.  My hope is this feature is still new enough, and not
+> > widely used enough, and this change is reasonable enough to be able to be
+> > corrected.  These bits should have been protected from the start, but
+> > unfortunately they were not.
+> > 
+> > Another option would be to correct this by adding a quirk, but fixing
+> > it that has its down sides.   It complicates the code more than it
+> > would otherwise be, and complicates the usage for anyone using any new
+> > features introduce in the future because they would also have to enable
+> > a quirk.  For long term simplicity my hope is to be able to just patch
+> > the original change.
 > 
-> !kvm_gfn_shared_mask() doesn't ensure the VM is a TD. Right?
+> Yes, let's do it this way.
 
+Heh, which way is "this way"?
 
-That's right. I changed the check as follows.
-
-commit 6753fc53f3b3fcbbd07ac688578ff5fb7f7f7d96 (HEAD)
-Author: Isaku Yamahata <isaku.yamahata@intel.com>
-Date:   Wed Mar 30 22:32:03 2022 -0700
-
-    KVM: TDX: don't request KVM_REQ_APIC_PAGE_RELOAD
-    
-    TDX doesn't need APIC page depending on vapic and its callback is
-    WARN_ON_ONCE(is_tdx).  To avoid unnecessary overhead and WARN_ON_ONCE(),
-    skip requesting KVM_REQ_APIC_PAGE_RELOAD when TD.
-    
-      WARNING: arch/x86/kvm/vmx/main.c:696 vt_set_apic_access_page_addr+0x3c/0x50 [kvm_intel]
-      RIP: 0010:vt_set_apic_access_page_addr+0x3c/0x50 [kvm_intel]
-      Call Trace:
-       vcpu_enter_guest+0x145d/0x24d0 [kvm]
-       kvm_arch_vcpu_ioctl_run+0x25d/0xcc0 [kvm]
-       kvm_vcpu_ioctl+0x414/0xa30 [kvm]
-       __x64_sys_ioctl+0xc0/0x100
-       do_syscall_64+0x39/0xc0
-       entry_SYSCALL_64_after_hwframe+0x44/0xae
-    
-    Signed-off-by: Isaku Yamahata <isaku.yamahata@intel.com>
-
-diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-index 51ba2d163ec4..bfd7ed6ba385 100644
---- a/arch/x86/kvm/x86.c
-+++ b/arch/x86/kvm/x86.c
-@@ -10045,7 +10045,9 @@ void kvm_arch_mmu_notifier_invalidate_range(struct kvm *kvm,
-         * Update it when it becomes invalid.
-         */
-        apic_address = gfn_to_hva(kvm, APIC_DEFAULT_PHYS_BASE >> PAGE_SHIFT);
--       if (start <= apic_address && apic_address < end)
-+       /* TDX doesn't need APIC page. */
-+       if (kvm->arch.vm_type != KVM_X86_TDX_VM &&
-+           start <= apic_address && apic_address < end)
-                kvm_make_all_cpus_request(kvm, KVM_REQ_APIC_PAGE_RELOAD);
- }
- 
-
--- 
-Isaku Yamahata <isaku.yamahata@gmail.com>
+  (a) Fix KVM_CAP_X86_USER_SPACE_MSR and cross our fingers
+  (b) Add a quirk
+  (c) ???
