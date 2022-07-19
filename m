@@ -2,151 +2,423 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 43F8757A72F
-	for <lists+kvm@lfdr.de>; Tue, 19 Jul 2022 21:23:30 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id F28E257A734
+	for <lists+kvm@lfdr.de>; Tue, 19 Jul 2022 21:25:32 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S239249AbiGSTX2 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 19 Jul 2022 15:23:28 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45496 "EHLO
+        id S238260AbiGSTZa (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 19 Jul 2022 15:25:30 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47790 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S239135AbiGSTX0 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 19 Jul 2022 15:23:26 -0400
-Received: from mail-pg1-x533.google.com (mail-pg1-x533.google.com [IPv6:2607:f8b0:4864:20::533])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9D06354AEF
-        for <kvm@vger.kernel.org>; Tue, 19 Jul 2022 12:23:25 -0700 (PDT)
-Received: by mail-pg1-x533.google.com with SMTP id bh13so14381365pgb.4
-        for <kvm@vger.kernel.org>; Tue, 19 Jul 2022 12:23:25 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=MTnX2TeXpHP7v1pQxn3jS/+EWjEsPRUgfU3phyOX21s=;
-        b=AVYzqlSpLLX+2Dh2JJv/wP4Ov9MEYgY3fi0PRUL7nSg3XVbabk8dvbL2NdBEwLmCyi
-         mlVYk6VbJIjFad4GBo9iwP4A0HvfVJy+x95dh1iz+tr1KLKSOg96SU4e4bBmNOYHQqMn
-         iD7upg/MAIcOg7fRaddKNxPBOYxU60iqvJankRN8WAXhDo3SgHITdGG85DEfJsz81NUo
-         vGPBeDydYt/J1BKbFCc54iJaKo8lCh6oK3XNLNEIR5TetdUnJqH1dyWShevXuDDcenBA
-         zea/ahSlzqaT1zVqmJPBa7WzyDYVBKAS46wqnZRJCeiwN8JqLzc1eQ9KMNKEFDn3WTng
-         xxPg==
+        with ESMTP id S235849AbiGSTZ0 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 19 Jul 2022 15:25:26 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id E73C6BCA9
+        for <kvm@vger.kernel.org>; Tue, 19 Jul 2022 12:25:24 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1658258724;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=01nIMAqu9kXKBUZerezX8Ft5zuAeFvv5UsalBlZ7zoI=;
+        b=epoIoIeruDLHAq9r1ACxtv0u7Au+vowtXEjhHzHgqkjxYXvCAhULDVsusOCUmc5Gt/o0/8
+        LCHmwAA5DSg7x8DE+mIu4rmT5KLr94Cv0rQnEP8T1Ec0Z+BS1MAJtiBA4E/L6SZUfDFg97
+        MQrA5xeLiALyZ+EinMLN6Kpt6Vjeky0=
+Received: from mail-il1-f198.google.com (mail-il1-f198.google.com
+ [209.85.166.198]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-322-EMbJe0LEP_eHPIcV-q6lNg-1; Tue, 19 Jul 2022 15:25:17 -0400
+X-MC-Unique: EMbJe0LEP_eHPIcV-q6lNg-1
+Received: by mail-il1-f198.google.com with SMTP id d14-20020a056e020c0e00b002dd0a88a280so57280ile.16
+        for <kvm@vger.kernel.org>; Tue, 19 Jul 2022 12:25:17 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=MTnX2TeXpHP7v1pQxn3jS/+EWjEsPRUgfU3phyOX21s=;
-        b=2k7fxdtoJqMaAbJfLNK0DaOip7dZSzCHDqou4+6C2RPa32ltUnSGZTV2jZnhR3FyVX
-         bkcueU45mufypz+yZIwjXhdXjwbNtTvVzaGYRwT8VA9+LTrQO2RVqBeqoS4FHvRqyPAI
-         lQshROdPVsinT0qRRdeM1hprokG7gv8UG5BXVX55+LHQyVutmrS7xVpfIN9/ZZrQ0esQ
-         1knGn844nRSR1bFMGFU2VEAx9KLC9wvX8lli6IOPcgDFZ/lsFUoiWNbnRI4mvlzX/6Ik
-         UqirGSlM25O9R8IwcNVmq8fapxjKgG5bF7LbW/vFraJMLcivjSaE+qG0+cvmgxC6ZmMt
-         nPXQ==
-X-Gm-Message-State: AJIora+pTmGLLVOQWQ/sDS4iXPJEP1eKMwj3P2P0Xmi0osN0fYI0b+4x
-        VaixuSG1+RMvuIlyNqxVzRl1dQ==
-X-Google-Smtp-Source: AGRyM1tdTRACG72ok5+gvUICVuap9dPfxWpcLRXvvt7dtpUivNWDJzFklYwXVDWM4t7qR09jo914hw==
-X-Received: by 2002:a05:6a00:1781:b0:528:c839:9886 with SMTP id s1-20020a056a00178100b00528c8399886mr35174494pfg.71.1658258605007;
-        Tue, 19 Jul 2022 12:23:25 -0700 (PDT)
-Received: from google.com (123.65.230.35.bc.googleusercontent.com. [35.230.65.123])
-        by smtp.gmail.com with ESMTPSA id n5-20020a17090a394500b001f1694dafb1sm8292616pjf.44.2022.07.19.12.23.24
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:in-reply-to
+         :references:organization:mime-version:content-transfer-encoding;
+        bh=01nIMAqu9kXKBUZerezX8Ft5zuAeFvv5UsalBlZ7zoI=;
+        b=2UnaWbC3+VvWzlIWfw3oian/OhgVUjMblvx1EWapWfylf/IBeV96SMu+vJ6NwM4lUl
+         vehSe/v25Ymf5WI6wxsztwjueXsM8TOIWYbz0FuQqw4I0dpdpS/fIFMfE/TQ7sO5wO9T
+         sVjZCTmyhUjB3iqOv/nw9y7wdQCIT6LiheQwNXFuRQnFb5dhYnzNtBgLR0qO1azjFrL/
+         YO6F+S26xDVOIINwpX1US3/uqO32/U5QR6Wv1faod3/BlK/Xza1GbgxXvvk5TS0lle5I
+         Aic0gtv8vUKLapJSo12deWRKc8/jLeX2BYjEgw3TxwQdJzJRtA+jYnI3wSWdzI3F/zxu
+         ZOPQ==
+X-Gm-Message-State: AJIora/y7NND+XpARelRGCmBLf3Q7aszgFNXnL+nf6DOPjIFEQrVBerT
+        3/MQH82Zcuvy6h6+gBqBCoLltBRzcP4f1zthm4kLEAhVjR4NWbo7tLv4rLHPXo1rQPthHG0X7PV
+        u3+p4rxFd197/
+X-Received: by 2002:a05:6e02:1c88:b0:2dc:d092:9721 with SMTP id w8-20020a056e021c8800b002dcd0929721mr9150724ill.118.1658258716776;
+        Tue, 19 Jul 2022 12:25:16 -0700 (PDT)
+X-Google-Smtp-Source: AGRyM1tZOG+3tB+aCvTVCSR7lYMcpDeYWLonIVl6Pt4opkh9VdDb7o0N1f6aAdQJVuSsAqXhIfjkZw==
+X-Received: by 2002:a05:6e02:1c88:b0:2dc:d092:9721 with SMTP id w8-20020a056e021c8800b002dcd0929721mr9150708ill.118.1658258716470;
+        Tue, 19 Jul 2022 12:25:16 -0700 (PDT)
+Received: from redhat.com ([38.15.36.239])
+        by smtp.gmail.com with ESMTPSA id k21-20020a02a715000000b00333fa7a642asm6997536jam.63.2022.07.19.12.25.15
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 19 Jul 2022 12:23:24 -0700 (PDT)
-Date:   Tue, 19 Jul 2022 19:23:20 +0000
-From:   Sean Christopherson <seanjc@google.com>
-To:     Sagi Shahar <sagis@google.com>
-Cc:     Isaku Yamahata <isaku.yamahata@gmail.com>,
-        "Yamahata, Isaku" <isaku.yamahata@intel.com>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>,
-        Erdem Aktas <erdemaktas@google.com>
-Subject: Re: [RFC PATCH v6 090/104] KVM: TDX: Handle TDX PV CPUID hypercall
-Message-ID: <YtcEqMtjAHQ61ZR9@google.com>
-References: <cover.1651774250.git.isaku.yamahata@intel.com>
- <98939c0ec83a109c8f49045e82096d6cdd5dafa3.1651774251.git.isaku.yamahata@intel.com>
- <CAAhR5DHPk2no0PVFX6P1NnZdwtVccjmdn4RLg4wKSmfpjD6Qkg@mail.gmail.com>
- <20220629101356.GA882746@ls.amr.corp.intel.com>
- <CAAhR5DF82HO4yEmOjywXXR-_wcXT7hctib2yfRaS-nb6sGPsLw@mail.gmail.com>
+        Tue, 19 Jul 2022 12:25:16 -0700 (PDT)
+Date:   Tue, 19 Jul 2022 13:25:14 -0600
+From:   Alex Williamson <alex.williamson@redhat.com>
+To:     Yishai Hadas <yishaih@nvidia.com>
+Cc:     <jgg@nvidia.com>, <saeedm@nvidia.com>, <kvm@vger.kernel.org>,
+        <netdev@vger.kernel.org>, <kuba@kernel.org>,
+        <kevin.tian@intel.com>, <joao.m.martins@oracle.com>,
+        <leonro@nvidia.com>, <maorg@nvidia.com>, <cohuck@redhat.com>
+Subject: Re: [PATCH V2 vfio 06/11] vfio: Introduce the DMA logging feature
+ support
+Message-ID: <20220719132514.7d21dfaf.alex.williamson@redhat.com>
+In-Reply-To: <8242cd07-0b65-e2b8-3797-3fe5623ec65d@nvidia.com>
+References: <20220714081251.240584-1-yishaih@nvidia.com>
+        <20220714081251.240584-7-yishaih@nvidia.com>
+        <20220718163024.143ec05a.alex.williamson@redhat.com>
+        <8242cd07-0b65-e2b8-3797-3fe5623ec65d@nvidia.com>
+Organization: Red Hat
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <CAAhR5DF82HO4yEmOjywXXR-_wcXT7hctib2yfRaS-nb6sGPsLw@mail.gmail.com>
-X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-        USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=ham
-        autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-Spam-Status: No, score=-2.8 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        SPF_HELO_NONE,SPF_NONE autolearn=unavailable autolearn_force=no
+        version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Jul 18, 2022, Sagi Shahar wrote:
-> On Wed, Jun 29, 2022 at 3:14 AM Isaku Yamahata <isaku.yamahata@gmail.com> wrote:
-> >
-> > On Tue, Jun 14, 2022 at 11:15:00AM -0700,
-> > Sagi Shahar <sagis@google.com> wrote:
-> >
-> > > On Thu, May 5, 2022 at 11:16 AM <isaku.yamahata@intel.com> wrote:
-> > > >
-> > > > From: Isaku Yamahata <isaku.yamahata@intel.com>
-> > > >
-> > > > Wire up TDX PV CPUID hypercall to the KVM backend function.
-> > > >
-> > > > Signed-off-by: Isaku Yamahata <isaku.yamahata@intel.com>
-> > > > ---
-> > > >  arch/x86/kvm/vmx/tdx.c | 22 ++++++++++++++++++++++
-> > > >  1 file changed, 22 insertions(+)
-> > > >
-> > > > diff --git a/arch/x86/kvm/vmx/tdx.c b/arch/x86/kvm/vmx/tdx.c
-> > > > index 9c712f661a7c..c7cdfee397ec 100644
-> > > > --- a/arch/x86/kvm/vmx/tdx.c
-> > > > +++ b/arch/x86/kvm/vmx/tdx.c
-> > > > @@ -946,12 +946,34 @@ static int tdx_emulate_vmcall(struct kvm_vcpu *vcpu)
-> > > >         return 1;
-> > > >  }
-> > > >
-> > > > +static int tdx_emulate_cpuid(struct kvm_vcpu *vcpu)
-> > > > +{
-> > > > +       u32 eax, ebx, ecx, edx;
-> > > > +
-> > > > +       /* EAX and ECX for cpuid is stored in R12 and R13. */
-> > > > +       eax = tdvmcall_a0_read(vcpu);
-> > > > +       ecx = tdvmcall_a1_read(vcpu);
-> > > > +
-> > > > +       kvm_cpuid(vcpu, &eax, &ebx, &ecx, &edx, true);
-> > >
-> > > According to the GHCI spec section 3.6
-> > > (TDG.VP.VMCALL<Instruction.CPUID>) we should return
-> > > VMCALL_INVALID_OPERAND if an invalid CPUID is requested.
-> > >
-> > > kvm_cpuid already returns false in this case so we should use that
-> > > return value to set the tdvmcall return code in case of invalid leaf.
-> >
-> > Based on CPUID instruction, cpuid results in #UD when lock prefix is used or
-> > earlier CPU that doesn't support cpuid instruction.
-> > So I'm not sure what CPUID input result in INVALID_OPERAND error.
-> > Does the following make sense for you?
-> >
-> > --- a/arch/x86/kvm/vmx/tdx.c
-> > +++ b/arch/x86/kvm/vmx/tdx.c
-> > @@ -1347,7 +1347,7 @@ static int tdx_emulate_cpuid(struct kvm_vcpu *vcpu)
-> >         eax = tdvmcall_a0_read(vcpu);
-> >         ecx = tdvmcall_a1_read(vcpu);
-> >
-> > -       kvm_cpuid(vcpu, &eax, &ebx, &ecx, &edx, true);
-> > +       kvm_cpuid(vcpu, &eax, &ebx, &ecx, &edx, false);
+On Tue, 19 Jul 2022 12:19:25 +0300
+Yishai Hadas <yishaih@nvidia.com> wrote:
 
-Barring new verbiage in the GHCI, this change is correct.  CPUID behavior is
-different for AMD vs. Intel, but the behavior is architectural and well-defined
-for each vendor.  KVM handles this by emulating the AMD vs. Intel behavior based
-on the configured vCPU model.
-
-Forcing an exact match would make TDX follow AMD behavior, not Intel behavior.
-
-> >         tdvmcall_a0_write(vcpu, eax);
-> >         tdvmcall_a1_write(vcpu, ebx);
-> >
-> > thanks,
+> On 19/07/2022 1:30, Alex Williamson wrote:
+> > On Thu, 14 Jul 2022 11:12:46 +0300
+> > Yishai Hadas <yishaih@nvidia.com> wrote:
+> >  
+> >> Introduce the DMA logging feature support in the vfio core layer.
+> >>
+> >> It includes the processing of the device start/stop/report DMA logging
+> >> UAPIs and calling the relevant driver 'op' to do the work.
+> >>
+> >> Specifically,
+> >> Upon start, the core translates the given input ranges into an interval
+> >> tree, checks for unexpected overlapping, non aligned ranges and then
+> >> pass the translated input to the driver for start tracking the given
+> >> ranges.
+> >>
+> >> Upon report, the core translates the given input user space bitmap and
+> >> page size into an IOVA kernel bitmap iterator. Then it iterates it and
+> >> call the driver to set the corresponding bits for the dirtied pages in a
+> >> specific IOVA range.
+> >>
+> >> Upon stop, the driver is called to stop the previous started tracking.
+> >>
+> >> The next patches from the series will introduce the mlx5 driver
+> >> implementation for the logging ops.
+> >>
+> >> Signed-off-by: Yishai Hadas <yishaih@nvidia.com>
+> >> ---
+> >>   drivers/vfio/Kconfig             |   1 +
+> >>   drivers/vfio/pci/vfio_pci_core.c |   5 +
+> >>   drivers/vfio/vfio_main.c         | 161 +++++++++++++++++++++++++++++++
+> >>   include/linux/vfio.h             |  21 +++-
+> >>   4 files changed, 186 insertions(+), 2 deletions(-)
+> >>
+> >> diff --git a/drivers/vfio/Kconfig b/drivers/vfio/Kconfig
+> >> index 6130d00252ed..86c381ceb9a1 100644
+> >> --- a/drivers/vfio/Kconfig
+> >> +++ b/drivers/vfio/Kconfig
+> >> @@ -3,6 +3,7 @@ menuconfig VFIO
+> >>   	tristate "VFIO Non-Privileged userspace driver framework"
+> >>   	select IOMMU_API
+> >>   	select VFIO_IOMMU_TYPE1 if MMU && (X86 || S390 || ARM || ARM64)
+> >> +	select INTERVAL_TREE
+> >>   	help
+> >>   	  VFIO provides a framework for secure userspace device drivers.
+> >>   	  See Documentation/driver-api/vfio.rst for more details.
+> >> diff --git a/drivers/vfio/pci/vfio_pci_core.c b/drivers/vfio/pci/vfio_pci_core.c
+> >> index 2efa06b1fafa..b6dabf398251 100644
+> >> --- a/drivers/vfio/pci/vfio_pci_core.c
+> >> +++ b/drivers/vfio/pci/vfio_pci_core.c
+> >> @@ -1862,6 +1862,11 @@ int vfio_pci_core_register_device(struct vfio_pci_core_device *vdev)
+> >>   			return -EINVAL;
+> >>   	}
+> >>   
+> >> +	if (vdev->vdev.log_ops && !(vdev->vdev.log_ops->log_start &&
+> >> +	    vdev->vdev.log_ops->log_stop &&
+> >> +	    vdev->vdev.log_ops->log_read_and_clear))
+> >> +		return -EINVAL;
+> >> +
+> >>   	/*
+> >>   	 * Prevent binding to PFs with VFs enabled, the VFs might be in use
+> >>   	 * by the host or other users.  We cannot capture the VFs if they
+> >> diff --git a/drivers/vfio/vfio_main.c b/drivers/vfio/vfio_main.c
+> >> index bd84ca7c5e35..2414d827e3c8 100644
+> >> --- a/drivers/vfio/vfio_main.c
+> >> +++ b/drivers/vfio/vfio_main.c
+> >> @@ -32,6 +32,8 @@
+> >>   #include <linux/vfio.h>
+> >>   #include <linux/wait.h>
+> >>   #include <linux/sched/signal.h>
+> >> +#include <linux/interval_tree.h>
+> >> +#include <linux/iova_bitmap.h>
+> >>   #include "vfio.h"
+> >>   
+> >>   #define DRIVER_VERSION	"0.3"
+> >> @@ -1603,6 +1605,153 @@ static int vfio_ioctl_device_feature_migration(struct vfio_device *device,
+> >>   	return 0;
+> >>   }
+> >>   
+> >> +#define LOG_MAX_RANGES 1024
+> >> +
+> >> +static int
+> >> +vfio_ioctl_device_feature_logging_start(struct vfio_device *device,
+> >> +					u32 flags, void __user *arg,
+> >> +					size_t argsz)
+> >> +{
+> >> +	size_t minsz =
+> >> +		offsetofend(struct vfio_device_feature_dma_logging_control,
+> >> +			    ranges);
+> >> +	struct vfio_device_feature_dma_logging_range __user *ranges;
+> >> +	struct vfio_device_feature_dma_logging_control control;
+> >> +	struct vfio_device_feature_dma_logging_range range;
+> >> +	struct rb_root_cached root = RB_ROOT_CACHED;
+> >> +	struct interval_tree_node *nodes;
+> >> +	u32 nnodes;
+> >> +	int i, ret;
+> >> +
+> >> +	if (!device->log_ops)
+> >> +		return -ENOTTY;
+> >> +
+> >> +	ret = vfio_check_feature(flags, argsz,
+> >> +				 VFIO_DEVICE_FEATURE_SET,
+> >> +				 sizeof(control));
+> >> +	if (ret != 1)
+> >> +		return ret;
+> >> +
+> >> +	if (copy_from_user(&control, arg, minsz))
+> >> +		return -EFAULT;
+> >> +
+> >> +	nnodes = control.num_ranges;
+> >> +	if (!nnodes || nnodes > LOG_MAX_RANGES)
+> >> +		return -EINVAL;  
+> > The latter looks more like an -E2BIG errno.  
 > 
-> If any CPUID request is considered valid, then perhaps the spec itself
-> needs to be updated.
+> OK
+> 
+> > This is a hard coded
+> > limit, but what are the heuristics?  Can a user introspect the limit?
+> > Thanks,
+> >
+> > Alex  
+> 
+> This hard coded value just comes to prevent user space from exploding 
+> kernel memory allocation.
 
-Agreed.  Documenting that "Invalid CPUID requested" is a legal return value implies
-that TDX is creating a _third_ variant of CPUID behavior.  Dropping the error return
-seems like the simplest approach, unless it was added for a specific reason?
+Of course.
+
+> We don't really expect user space to hit this limit, the RAM in QEMU is 
+> divided today to around ~12 ranges as we saw so far in our evaluation.
+
+There can be far more for vIOMMU use cases or non-QEMU drivers.
+
+> We may also expect user space to combine contiguous ranges to a single 
+> range or in the worst case even to combine non contiguous ranges to a 
+> single range.
+
+Why do we expect that from users?
+ 
+> We can consider moving this hard-coded value to be part of the UAPI 
+> header, although, not sure that this is really a must.
+> 
+> What do you think ?
+
+We're looking at a very narrow use case with implicit assumptions about
+the behavior of the user driver.  Some of those assumptions need to be
+exposed via the uAPI so that userspace can make reasonable choices.
+Thanks,
+
+Alex
+
+> >> +
+> >> +	ranges = u64_to_user_ptr(control.ranges);
+> >> +	nodes = kmalloc_array(nnodes, sizeof(struct interval_tree_node),
+> >> +			      GFP_KERNEL);
+> >> +	if (!nodes)
+> >> +		return -ENOMEM;
+> >> +
+> >> +	for (i = 0; i < nnodes; i++) {
+> >> +		if (copy_from_user(&range, &ranges[i], sizeof(range))) {
+> >> +			ret = -EFAULT;
+> >> +			goto end;
+> >> +		}
+> >> +		if (!IS_ALIGNED(range.iova, control.page_size) ||
+> >> +		    !IS_ALIGNED(range.length, control.page_size)) {
+> >> +			ret = -EINVAL;
+> >> +			goto end;
+> >> +		}
+> >> +		nodes[i].start = range.iova;
+> >> +		nodes[i].last = range.iova + range.length - 1;
+> >> +		if (interval_tree_iter_first(&root, nodes[i].start,
+> >> +					     nodes[i].last)) {
+> >> +			/* Range overlapping */
+> >> +			ret = -EINVAL;
+> >> +			goto end;
+> >> +		}
+> >> +		interval_tree_insert(nodes + i, &root);
+> >> +	}
+> >> +
+> >> +	ret = device->log_ops->log_start(device, &root, nnodes,
+> >> +					 &control.page_size);
+> >> +	if (ret)
+> >> +		goto end;
+> >> +
+> >> +	if (copy_to_user(arg, &control, sizeof(control))) {
+> >> +		ret = -EFAULT;
+> >> +		device->log_ops->log_stop(device);
+> >> +	}
+> >> +
+> >> +end:
+> >> +	kfree(nodes);
+> >> +	return ret;
+> >> +}
+> >> +
+> >> +static int
+> >> +vfio_ioctl_device_feature_logging_stop(struct vfio_device *device,
+> >> +				       u32 flags, void __user *arg,
+> >> +				       size_t argsz)
+> >> +{
+> >> +	int ret;
+> >> +
+> >> +	if (!device->log_ops)
+> >> +		return -ENOTTY;
+> >> +
+> >> +	ret = vfio_check_feature(flags, argsz,
+> >> +				 VFIO_DEVICE_FEATURE_SET, 0);
+> >> +	if (ret != 1)
+> >> +		return ret;
+> >> +
+> >> +	return device->log_ops->log_stop(device);
+> >> +}
+> >> +
+> >> +static int
+> >> +vfio_ioctl_device_feature_logging_report(struct vfio_device *device,
+> >> +					 u32 flags, void __user *arg,
+> >> +					 size_t argsz)
+> >> +{
+> >> +	size_t minsz =
+> >> +		offsetofend(struct vfio_device_feature_dma_logging_report,
+> >> +			    bitmap);
+> >> +	struct vfio_device_feature_dma_logging_report report;
+> >> +	struct iova_bitmap_iter iter;
+> >> +	int ret;
+> >> +
+> >> +	if (!device->log_ops)
+> >> +		return -ENOTTY;
+> >> +
+> >> +	ret = vfio_check_feature(flags, argsz,
+> >> +				 VFIO_DEVICE_FEATURE_GET,
+> >> +				 sizeof(report));
+> >> +	if (ret != 1)
+> >> +		return ret;
+> >> +
+> >> +	if (copy_from_user(&report, arg, minsz))
+> >> +		return -EFAULT;
+> >> +
+> >> +	if (report.page_size < PAGE_SIZE)
+> >> +		return -EINVAL;
+> >> +
+> >> +	iova_bitmap_init(&iter.dirty, report.iova, ilog2(report.page_size));
+> >> +	ret = iova_bitmap_iter_init(&iter, report.iova, report.length,
+> >> +				    u64_to_user_ptr(report.bitmap));
+> >> +	if (ret)
+> >> +		return ret;
+> >> +
+> >> +	for (; !iova_bitmap_iter_done(&iter);
+> >> +	     iova_bitmap_iter_advance(&iter)) {
+> >> +		ret = iova_bitmap_iter_get(&iter);
+> >> +		if (ret)
+> >> +			break;
+> >> +
+> >> +		ret = device->log_ops->log_read_and_clear(device,
+> >> +			iova_bitmap_iova(&iter),
+> >> +			iova_bitmap_length(&iter), &iter.dirty);
+> >> +
+> >> +		iova_bitmap_iter_put(&iter);
+> >> +
+> >> +		if (ret)
+> >> +			break;
+> >> +	}
+> >> +
+> >> +	iova_bitmap_iter_free(&iter);
+> >> +	return ret;
+> >> +}
+> >> +
+> >>   static int vfio_ioctl_device_feature(struct vfio_device *device,
+> >>   				     struct vfio_device_feature __user *arg)
+> >>   {
+> >> @@ -1636,6 +1785,18 @@ static int vfio_ioctl_device_feature(struct vfio_device *device,
+> >>   		return vfio_ioctl_device_feature_mig_device_state(
+> >>   			device, feature.flags, arg->data,
+> >>   			feature.argsz - minsz);
+> >> +	case VFIO_DEVICE_FEATURE_DMA_LOGGING_START:
+> >> +		return vfio_ioctl_device_feature_logging_start(
+> >> +			device, feature.flags, arg->data,
+> >> +			feature.argsz - minsz);
+> >> +	case VFIO_DEVICE_FEATURE_DMA_LOGGING_STOP:
+> >> +		return vfio_ioctl_device_feature_logging_stop(
+> >> +			device, feature.flags, arg->data,
+> >> +			feature.argsz - minsz);
+> >> +	case VFIO_DEVICE_FEATURE_DMA_LOGGING_REPORT:
+> >> +		return vfio_ioctl_device_feature_logging_report(
+> >> +			device, feature.flags, arg->data,
+> >> +			feature.argsz - minsz);
+> >>   	default:
+> >>   		if (unlikely(!device->ops->device_feature))
+> >>   			return -EINVAL;
+> >> diff --git a/include/linux/vfio.h b/include/linux/vfio.h
+> >> index 4d26e149db81..feed84d686ec 100644
+> >> --- a/include/linux/vfio.h
+> >> +++ b/include/linux/vfio.h
+> >> @@ -14,6 +14,7 @@
+> >>   #include <linux/workqueue.h>
+> >>   #include <linux/poll.h>
+> >>   #include <uapi/linux/vfio.h>
+> >> +#include <linux/iova_bitmap.h>
+> >>   
+> >>   struct kvm;
+> >>   
+> >> @@ -33,10 +34,11 @@ struct vfio_device {
+> >>   	struct device *dev;
+> >>   	const struct vfio_device_ops *ops;
+> >>   	/*
+> >> -	 * mig_ops is a static property of the vfio_device which must be set
+> >> -	 * prior to registering the vfio_device.
+> >> +	 * mig_ops/log_ops is a static property of the vfio_device which must
+> >> +	 * be set prior to registering the vfio_device.
+> >>   	 */
+> >>   	const struct vfio_migration_ops *mig_ops;
+> >> +	const struct vfio_log_ops *log_ops;
+> >>   	struct vfio_group *group;
+> >>   	struct vfio_device_set *dev_set;
+> >>   	struct list_head dev_set_list;
+> >> @@ -104,6 +106,21 @@ struct vfio_migration_ops {
+> >>   				   enum vfio_device_mig_state *curr_state);
+> >>   };
+> >>   
+> >> +/**
+> >> + * @log_start: Optional callback to ask the device start DMA logging.
+> >> + * @log_stop: Optional callback to ask the device stop DMA logging.
+> >> + * @log_read_and_clear: Optional callback to ask the device read
+> >> + *         and clear the dirty DMAs in some given range.
+> >> + */
+> >> +struct vfio_log_ops {
+> >> +	int (*log_start)(struct vfio_device *device,
+> >> +		struct rb_root_cached *ranges, u32 nnodes, u64 *page_size);
+> >> +	int (*log_stop)(struct vfio_device *device);
+> >> +	int (*log_read_and_clear)(struct vfio_device *device,
+> >> +		unsigned long iova, unsigned long length,
+> >> +		struct iova_bitmap *dirty);
+> >> +};
+> >> +
+> >>   /**
+> >>    * vfio_check_feature - Validate user input for the VFIO_DEVICE_FEATURE ioctl
+> >>    * @flags: Arg from the device_feature op  
+> 
+> 
+
