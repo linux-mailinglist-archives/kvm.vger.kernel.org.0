@@ -2,52 +2,52 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 53B4A57A999
-	for <lists+kvm@lfdr.de>; Wed, 20 Jul 2022 00:04:00 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 53EC357A9BF
+	for <lists+kvm@lfdr.de>; Wed, 20 Jul 2022 00:21:48 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S240707AbiGSWD6 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 19 Jul 2022 18:03:58 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43234 "EHLO
+        id S239236AbiGSWVq (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 19 Jul 2022 18:21:46 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56058 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231312AbiGSWD5 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 19 Jul 2022 18:03:57 -0400
-Received: from mail-pj1-x1033.google.com (mail-pj1-x1033.google.com [IPv6:2607:f8b0:4864:20::1033])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 024786050C
-        for <kvm@vger.kernel.org>; Tue, 19 Jul 2022 15:03:57 -0700 (PDT)
-Received: by mail-pj1-x1033.google.com with SMTP id s21so15979944pjq.4
-        for <kvm@vger.kernel.org>; Tue, 19 Jul 2022 15:03:56 -0700 (PDT)
+        with ESMTP id S234794AbiGSWVn (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 19 Jul 2022 18:21:43 -0400
+Received: from mail-pf1-x435.google.com (mail-pf1-x435.google.com [IPv6:2607:f8b0:4864:20::435])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B9AFB5727F
+        for <kvm@vger.kernel.org>; Tue, 19 Jul 2022 15:21:42 -0700 (PDT)
+Received: by mail-pf1-x435.google.com with SMTP id l124so14867567pfl.8
+        for <kvm@vger.kernel.org>; Tue, 19 Jul 2022 15:21:42 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
         h=date:from:to:cc:subject:message-id:references:mime-version
          :content-disposition:in-reply-to;
-        bh=eRpbtTCZs+5+sX8LZNM3fMyA3I2miPI5w4wEOaR3Kd8=;
-        b=L0403lYdHQufM2qI/PJ7bMF875ZWcIbp65rgoZ6AMpKb9DrBBg49bzaDu5ytLIBR6k
-         cHR87boOdSCFHXqHuUB3bJ3/m7PmELpKkXaieFF2bfYDWIRfnshHrZtHtelbFxJG2ipx
-         acqsLcDu3PzNyZgPFGEAjSRO7dXCiAJSiucU2ODOr/1Tr1JIkYYK2Fv2bdo0VNTqWLkf
-         27Yod0pT5lTvMEaQ1SGB9pq7eaKnbjBzVayp4h+Mpk0V8S9mnFNArj8aPPKHWF+02ZJW
-         ML2WrV14/VEq64QAFmzb0Th4WQCIGfzCRUnjsH8+En28OeOHzbz3MLwbRFfyVZgsDFOf
-         sB3Q==
+        bh=jwz2xPBcsSUvi6UQz2aVRRre7pThVfHLQu+ABQPNNpM=;
+        b=bvlVC+TDi6T2/b4/pLOrdrFYGLJavot6uN0VC38WaAa3VaW3zaRwWf0gdFGQMpJbak
+         96TWnRjxQnbhbdZlSvBUqo1Byt+wnG1f6xVDoOZ5jTxnFgGC7/goofWz7QxxpE9MrUUu
+         3MAD4vePMasYcKhPf5CPGxQPtS1ADhXACzf7vdnce4deuyM0ovvPojN5om6EIQiwq8FM
+         TR/MkL13E92UYGG6nzxdVQjK7E6SC7efPQhO+iuziOnyMscb7rDTFklxqekPF3oq8pqA
+         TocrVBZ8BAH2zcKnPrAWu4zilccRa0VfLpgkpuu8lVGwSTv7DDaJ+Pli6amJ5E+71iXP
+         N8Tw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:date:from:to:cc:subject:message-id:references
          :mime-version:content-disposition:in-reply-to;
-        bh=eRpbtTCZs+5+sX8LZNM3fMyA3I2miPI5w4wEOaR3Kd8=;
-        b=zSj5ivSq9T297IolXdb0jSBL51ICRKa6a3qkj1EYMFir7YDXaQOBYTlDKjHB0M2+s0
-         5XZHFICqCtjLCr6wXtCaGmiMuwWOVaQx38EwXQKtCQ8zFfLWHYfS4CjNp37qzujY50lb
-         hu8uZfi5SB/h0umiLQhe2lQpOAg1HYIi+9gSEYBbxKAK1uXO0qWzfRtioC3jzmM7MEyy
-         dgK8E0z2mK6qB0zYINyQye7OD2h/kMOM6cRmyBKiqC2rzwwHCsiBgK+PDF1+Egcnu586
-         uAkSKe/W1n4FDrdNKt8WiSnlzAHvh4NiCxVEHBt28XX3Jif2FFFF4QAjODOCfsunEVVH
-         Iyqg==
-X-Gm-Message-State: AJIora9HFwSC3rz2UV9Vc6IIPJt9+TuLe213lxtmSPqSDQFAlMx0h+k5
-        TU91DEQyg06h8rH9r2KqsHrs9A==
-X-Google-Smtp-Source: AGRyM1uWRLpTQswtNfEV1mRoZyGTzfyIBqNcfPo/PX+Gng0urzkvIUjr27tzFPFz+Ervz6Jjs/53rA==
-X-Received: by 2002:a17:902:ce8c:b0:16c:4be6:254d with SMTP id f12-20020a170902ce8c00b0016c4be6254dmr35100092plg.51.1658268236359;
-        Tue, 19 Jul 2022 15:03:56 -0700 (PDT)
+        bh=jwz2xPBcsSUvi6UQz2aVRRre7pThVfHLQu+ABQPNNpM=;
+        b=UvAGFeUzwu29xuA5iedMZISNfjlxStZyU2NV345qEIqX4B6u3m/VzE9E58X0/S6RwV
+         CiTQQulpHXjSchB7Ub4oBSFCVdswTdMPhW9K3CB9U0WfPb0VEOTLoJdO/ko+btTHuA8u
+         +zrMqfxgxcDSJTT5pQbycencmS2OpxF6b8GbTJ625tjYW4hqljDRIvlizrGAJP2PTuSr
+         Z/Aykvapa4tQzIXLA3SH6qyteI7OgwZD+j89M9y6spO1csjF+apRY+DyVrqhz96tnQPb
+         O1LNulG63O94+jzLevoiczTlQmWNNiHNJHerV/nkbIe/6p/2NejHMjMWP/ObAG/s6Vni
+         wtrQ==
+X-Gm-Message-State: AJIora96gPQBX/zRxUy37UmLQ2AvFMzxxwQ6Z+6jQLy1nPDZWikVboln
+        XDdpLyojgsFQ3qgLWg86FvF04Q==
+X-Google-Smtp-Source: AGRyM1s+hXqcq2Xyg6cYhNLKRigngS/2t05qB058vSHVJl/t1uUVlg5ZrhARR2xmzNBdZRH402kWTw==
+X-Received: by 2002:a05:6a00:e8f:b0:528:a1c7:3d00 with SMTP id bo15-20020a056a000e8f00b00528a1c73d00mr34920341pfb.25.1658269302103;
+        Tue, 19 Jul 2022 15:21:42 -0700 (PDT)
 Received: from google.com (123.65.230.35.bc.googleusercontent.com. [35.230.65.123])
-        by smtp.gmail.com with ESMTPSA id s5-20020a63e805000000b0041a411823d4sm2796267pgh.22.2022.07.19.15.03.55
+        by smtp.gmail.com with ESMTPSA id f15-20020aa7968f000000b00528c22fbb45sm12215669pfk.141.2022.07.19.15.21.41
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 19 Jul 2022 15:03:55 -0700 (PDT)
-Date:   Tue, 19 Jul 2022 22:03:51 +0000
+        Tue, 19 Jul 2022 15:21:41 -0700 (PDT)
+Date:   Tue, 19 Jul 2022 22:21:38 +0000
 From:   Sean Christopherson <seanjc@google.com>
 To:     Lai Jiangshan <jiangshanlai@gmail.com>
 Cc:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
@@ -56,18 +56,19 @@ Cc:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
         Maxim Levitsky <mlevitsk@redhat.com>,
         David Matlack <dmatlack@google.com>,
         Lai Jiangshan <jiangshan.ljs@antgroup.com>
-Subject: Re: [PATCH V3 02/12] KVM: X86/MMU: Add using_local_root_page()
-Message-ID: <YtcqR8jDM+NVXgG5@google.com>
+Subject: Re: [PATCH V3 05/12] KVM: X86/MMU: Link PAE root pagetable with its
+ children
+Message-ID: <YtcucpRhgVuucaaP@google.com>
 References: <20220521131700.3661-1-jiangshanlai@gmail.com>
- <20220521131700.3661-3-jiangshanlai@gmail.com>
+ <20220521131700.3661-6-jiangshanlai@gmail.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20220521131700.3661-3-jiangshanlai@gmail.com>
+In-Reply-To: <20220521131700.3661-6-jiangshanlai@gmail.com>
 X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
         ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-        USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=ham
+        USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=unavailable
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -75,63 +76,99 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+The shortlog is very misleading.  This patch doesn't "Link PAE root pagetable with
+its children", it adds support for creating PAE PDPTEs in order to link them into
+shadow pages, but it doesn't do the actual linking.
+
+  KVM: x86/mmu: Add support for linking PAE PDPTE shadow pages
+
 On Sat, May 21, 2022, Lai Jiangshan wrote:
-> +static bool using_local_root_page(struct kvm_mmu *mmu)
+> From: Lai Jiangshan <jiangshan.ljs@antgroup.com>
+> 
+> When local shadow pages are activated, link_shadow_page() might link
+> a local shadow pages which is the PAE root for PAE paging with its
+> children.
+> 
+> Add make_pae_pdpte() to handle it.
+> 
+> The code is not activated since local shadow pages are not activated
+> yet.
 
-Hmm, I agree with David that "local" isn't the most intuitive terminology.  But
-I also do want to avoid private vs. shared to avoid confusion with confidential VMs.
+And though it's redudnant with other context, IMO it's helpful to again reiterate
+why this will be used for per-vCPU (local) shadow pages, i.e. why it's _not_ used
+right now.
 
-Luckily, I don't think we need to come up with new terminology, just be literal
-and call 'em "per-vCPU root pages".  E.g.
+  Add support for installing PDPTEs via link_shadow_page(), PDPTEs have
+  different layouts than every other entry type and so need a dedicated
+  helper to make them.
 
-  static bool kvm_mmu_has_per_vcpu_root_page()
+  This code will become active when a future patch activates per-vCPU
+  shadow pages and stops using so called "special" roots (which are
+  installed at root allocation, not via link_shadow_page()).
 
-That way readers don't have to understand what "local" means, and that also captures
-per-vCPU roots are an exception, i.e. that most roots are NOT per-vCPU.
-
+> Signed-off-by: Lai Jiangshan <jiangshan.ljs@antgroup.com>
+> ---
+>  arch/x86/kvm/mmu/mmu.c  | 6 +++++-
+>  arch/x86/kvm/mmu/spte.c | 7 +++++++
+>  arch/x86/kvm/mmu/spte.h | 1 +
+>  3 files changed, 13 insertions(+), 1 deletion(-)
+> 
+> diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
+> index c941a5931bc3..e1a059dd9621 100644
+> --- a/arch/x86/kvm/mmu/mmu.c
+> +++ b/arch/x86/kvm/mmu/mmu.c
+> @@ -2340,7 +2340,11 @@ static void link_shadow_page(struct kvm_vcpu *vcpu, u64 *sptep,
+>  
+>  	BUILD_BUG_ON(VMX_EPT_WRITABLE_MASK != PT_WRITABLE_MASK);
+>  
+> -	spte = make_nonleaf_spte(sp->spt, sp_ad_disabled(sp));
+> +	if (unlikely(sp->role.level == PT32_ROOT_LEVEL &&
+> +		     vcpu->arch.mmu->root_role.level == PT32E_ROOT_LEVEL))
+> +		spte = make_pae_pdpte(sp->spt);
+> +	else
+> +		spte = make_nonleaf_spte(sp->spt, sp_ad_disabled(sp));
+>  
+>  	mmu_spte_set(sptep, spte);
+>  
+> diff --git a/arch/x86/kvm/mmu/spte.c b/arch/x86/kvm/mmu/spte.c
+> index b5960bbde7f7..5c31fa1d2b61 100644
+> --- a/arch/x86/kvm/mmu/spte.c
+> +++ b/arch/x86/kvm/mmu/spte.c
+> @@ -279,6 +279,13 @@ u64 make_huge_page_split_spte(u64 huge_spte, int huge_level, int index)
+>  	return child_spte;
+>  }
+>  
+> +u64 make_pae_pdpte(u64 *child_pt)
 > +{
-> +	return mmu->root_role.level == PT32E_ROOT_LEVEL ||
-> +	       (!mmu->root_role.direct && mmu->cpu_role.base.level <= PT32E_ROOT_LEVEL);
-> +}
-> +
->  static struct kvm_mmu_page *kvm_mmu_alloc_page(struct kvm_vcpu *vcpu, int direct)
->  {
->  	struct kvm_mmu_page *sp;
-> @@ -4252,10 +4285,11 @@ static bool fast_pgd_switch(struct kvm *kvm, struct kvm_mmu *mmu,
->  {
->  	/*
->  	 * For now, limit the caching to 64-bit hosts+VMs in order to avoid
-> -	 * having to deal with PDPTEs. We may add support for 32-bit hosts/VMs
-> -	 * later if necessary.
-> +	 * having to deal with PDPTEs.  Local roots can not be put into
-> +	 * mmu->prev_roots[] because mmu->pae_root can not be shared for
-> +	 * different roots at the same time.
->  	 */
-> -	if (VALID_PAGE(mmu->root.hpa) && !to_shadow_page(mmu->root.hpa))
-> +	if (unlikely(using_local_root_page(mmu)))
+> +	/* The only ignore bits in PDPTE are 11:9. */
 
-I don't know that I like using the local/per-vCPU helper.  The problem isn't _just_
-that KVM is using a per-vCPU root, KVM is also deliberately punting on dealing with
-PDTPRs.  E.g. the per-vCPU aspect doesn't explain why KVM doesn't allow reusing the
-current root.  I don't like that the using_local_root_page() obfuscates that check.
-
-My preference for this would be to revert back to a streamlined variation of the
-code prior to commit 5499ea73e7db ("KVM: x86/mmu: look for a cached PGD when going
-from 32-bit to 64-bit").
-
-KVM switched to the !to_shadow_page() check to _avoid_ consuming (what is now)
-mmu->root_role because, at the time of the patch, mmu held the _old_ data, which
-was wrong/stale for nested virtualization transitions.
-
-In other words, I would prefer that explicitly do (in a separate patch):
+s/ignore/ignored, though it might be worth calling out that unlike 64-bit paging,
+the upper bits bits are reserved (I always forget this).
 
 	/*
-	 * For now, limit the fast switch to 64-bit VMs in order to avoid having
-	 * to deal with PDPTEs.  32-bit VMs can be supported later if necessary.
+	 * Only PDPTE bits 11:9 are ignored by hardware.  Unlike 64-bit paging,
+	 * bits above the PA bits are reserved.
 	 */
-	if (new_role.level < PT64_ROOT_LEVEL4)
-		kvm_mmu_free_roots(kvm, mmu, KVM_MMU_ROOT_CURRENT);
 
-The "hosts+VMs" can be shortened to just "VMs", because running a 64-bit VM with
-a 32-bit host just doesn't work for a variety of reasons, i.e. doesn't need to be
-called out here.
+> +	BUILD_BUG_ON(!(GENMASK(11,9) & SPTE_MMU_PRESENT_MASK));
+> +	return __pa(child_pt) | PT_PRESENT_MASK | SPTE_MMU_PRESENT_MASK |
+> +		shadow_me_value;
+> +}
+>  
+>  u64 make_nonleaf_spte(u64 *child_pt, bool ad_disabled)
+>  {
+> diff --git a/arch/x86/kvm/mmu/spte.h b/arch/x86/kvm/mmu/spte.h
+> index 0127bb6e3c7d..2408ba1361d5 100644
+> --- a/arch/x86/kvm/mmu/spte.h
+> +++ b/arch/x86/kvm/mmu/spte.h
+> @@ -426,6 +426,7 @@ bool make_spte(struct kvm_vcpu *vcpu, struct kvm_mmu_page *sp,
+>  	       u64 old_spte, bool prefetch, bool can_unsync,
+>  	       bool host_writable, u64 *new_spte);
+>  u64 make_huge_page_split_spte(u64 huge_spte, int huge_level, int index);
+> +u64 make_pae_pdpte(u64 *child_pt);
+>  u64 make_nonleaf_spte(u64 *child_pt, bool ad_disabled);
+>  u64 make_mmio_spte(struct kvm_vcpu *vcpu, u64 gfn, unsigned int access);
+>  u64 mark_spte_for_access_track(u64 spte);
+> -- 
+> 2.19.1.6.gb485710b
+> 
