@@ -2,52 +2,52 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id BFD4457A866
-	for <lists+kvm@lfdr.de>; Tue, 19 Jul 2022 22:40:48 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 8A03057A870
+	for <lists+kvm@lfdr.de>; Tue, 19 Jul 2022 22:45:25 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S240174AbiGSUkr (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 19 Jul 2022 16:40:47 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55574 "EHLO
+        id S240195AbiGSUpX (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 19 Jul 2022 16:45:23 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59156 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S240144AbiGSUkq (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 19 Jul 2022 16:40:46 -0400
-Received: from mail-pj1-x102a.google.com (mail-pj1-x102a.google.com [IPv6:2607:f8b0:4864:20::102a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AB85328E3A
-        for <kvm@vger.kernel.org>; Tue, 19 Jul 2022 13:40:45 -0700 (PDT)
-Received: by mail-pj1-x102a.google.com with SMTP id b10so4924870pjq.5
-        for <kvm@vger.kernel.org>; Tue, 19 Jul 2022 13:40:45 -0700 (PDT)
+        with ESMTP id S230329AbiGSUpW (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 19 Jul 2022 16:45:22 -0400
+Received: from mail-pg1-x535.google.com (mail-pg1-x535.google.com [IPv6:2607:f8b0:4864:20::535])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0E415240AF
+        for <kvm@vger.kernel.org>; Tue, 19 Jul 2022 13:45:22 -0700 (PDT)
+Received: by mail-pg1-x535.google.com with SMTP id g4so14583809pgc.1
+        for <kvm@vger.kernel.org>; Tue, 19 Jul 2022 13:45:22 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
         h=date:from:to:cc:subject:message-id:references:mime-version
          :content-disposition:in-reply-to;
-        bh=Y5fwh5XQ1eQ19E2Z8DxxEP57ot41iP+HZxIKEkeAu7k=;
-        b=Gg1iGwaFzeNXWLYH3o7HDYdbOCx4YcdI19btWPVG9za5H/8vIXfD59H2snLGuj7tBm
-         X8zOltVQGm+kXZztqubzj8hap2L1wiCMWZb8ON1NV34KFIUtowCVaQNU4YjYJmEqoxIc
-         GwluNfF4a73tE0YFGBqyP6CGaP/l8PH30NjqTNTcixgexwrhhC4RYmnUWUvabYZsnimL
-         5nTjBYctDEN1kG7Dk9FF+zi+0g0XgXzqJCYwfXLuktyljPrNOXldpD4XrI7skoZGpbHq
-         WthL/PFwmSwXuilw7qb16uw6vKakYq578EXI4hl36UikZVmL4lrLLSYHntEt0fAoI01A
-         tv/w==
+        bh=D3kFW+CNJeoH4PPSVHWiEcaf2dsQp1lSy6wc4sWrT4w=;
+        b=LCHYCBm3sqQsmDrj2nWpXqZCy7rnU4/qEAqZN/bgGic9l1ZcrPjflPHTiIDdW1BsSK
+         N3GFvDWDcPtAEvwq6gU6bWpfyBH9IkEaUl3mtVF1UgXjsPo2jS9aGSPYTIrGl+WbaBfV
+         9RWt3g9FZH6JtfhdWEVj7fFoWuoK1JaeTLtqHrkLBqFPKfpdIVVSimDPdalbgGlIIps1
+         Lzd4hpez3lwYJUsPf9sag5biXF+5AI3CTCKKRpAgNsmOyMwslWgKkQ5ZkVrHSCjc4xmO
+         GtaAYeQhkRHPQGbp7qy2H7ovZmBYOMNt4btRrObew3+3knP0Q/6OKguu3Kdfx927H/7Q
+         chow==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:date:from:to:cc:subject:message-id:references
          :mime-version:content-disposition:in-reply-to;
-        bh=Y5fwh5XQ1eQ19E2Z8DxxEP57ot41iP+HZxIKEkeAu7k=;
-        b=pvQ7wFtEn9nrvpx7ZBXSmwwSFv5qpyk9xjhUjbi0jVTo3rnae5N5PpNZyEdSNQonwY
-         UFCCWNFZBhkefqXgjE71NcvI1YIyEt3EZTRKUSxHi+A9Jjbi5aLMNQGNfjVp0/xh6iCK
-         /pZD4nGOXoEKXNX4bSx2D4VWxP8cswcTPJFUUXnYTggnyH8Sa/g8LbajS0uVtXDTcsNN
-         JVePpj3bdiHFvrxZwqTxeAuYdf6R4d/C6ECAVe/38LaNQssj8j+H45H8mgKOI0U9ZRYA
-         tl6tDMYBtZRZo/wCIEWAe8zyxwWvbhrFwcpDdWGMYToE/QtEvEUEx8h7qdTrSCYuB4sD
-         BR8w==
-X-Gm-Message-State: AJIora/PxxialhkqWCS0rz+epDoGHXiBNYLe8UA+MvrZj/+2VcU2o271
-        somWzxBBzcuAM9W5/ZUfZP/4+A==
-X-Google-Smtp-Source: AGRyM1vf3dbslbsbY2ic8F1U4mypBluA6i60ryQkUBk7ewKA1RFGBbhLGjzJ59JOrn6udnWcR3irSQ==
-X-Received: by 2002:a17:90a:7409:b0:1ef:8e95:c861 with SMTP id a9-20020a17090a740900b001ef8e95c861mr1323452pjg.115.1658263244890;
-        Tue, 19 Jul 2022 13:40:44 -0700 (PDT)
+        bh=D3kFW+CNJeoH4PPSVHWiEcaf2dsQp1lSy6wc4sWrT4w=;
+        b=ZO9a/JNSGCo1rhFzoX/yR6hhHRGhWf5u/tqviE6ijZ/jpvcwYae7GAi8tbkFtTTTWz
+         5PVK9GlstNRFNMXbQI4oj+M0tOpj3VEI4ARX9P1rUpGDPxRfd5vLW376HTsyRD0CbEgn
+         kHOVhpF+xRRSbEP73KflvoZ8HJ3Wcnb9CEvuMtSScjelAK1P404NBLJkwSPW+Zw9Yzss
+         V9c//TXPyjhRQ5s1NsJPqFPjP35Mf8d3hqfBlfsPs9JwtEvUV0YsNqDAX9RY68d32G7/
+         X30qMNxX6QPZjOwCY0EL3CtUsHNlwosGxA+KqZ0r34Bjc0iYDF4ldlvn3ga+EUXHLfOb
+         NBCw==
+X-Gm-Message-State: AJIora8e/0mP/AQr7rc6+DFOgkYpWeZaidYtdVL7GnIz5atH9aQkv5Rz
+        aAmvcXgFcRT4bC/suj+ApeUUTA==
+X-Google-Smtp-Source: AGRyM1toqV7tYW7I+isgIZihe3Z6Dew+5gnA7WtnWu5nwkdehbcDNkPk35sFv9xxnrPEOuqnM+Q5mg==
+X-Received: by 2002:a05:6a00:998:b0:52a:db4c:541b with SMTP id u24-20020a056a00099800b0052adb4c541bmr35567778pfg.35.1658263521452;
+        Tue, 19 Jul 2022 13:45:21 -0700 (PDT)
 Received: from google.com (123.65.230.35.bc.googleusercontent.com. [35.230.65.123])
-        by smtp.gmail.com with ESMTPSA id u1-20020a634701000000b004168945bdf4sm10156947pga.66.2022.07.19.13.40.44
+        by smtp.gmail.com with ESMTPSA id g12-20020aa79f0c000000b0052531985e3esm11867788pfr.22.2022.07.19.13.45.20
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 19 Jul 2022 13:40:44 -0700 (PDT)
-Date:   Tue, 19 Jul 2022 20:40:40 +0000
+        Tue, 19 Jul 2022 13:45:21 -0700 (PDT)
+Date:   Tue, 19 Jul 2022 20:45:17 +0000
 From:   Sean Christopherson <seanjc@google.com>
 To:     Lai Jiangshan <jiangshanlai@gmail.com>
 Cc:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
@@ -55,15 +55,15 @@ Cc:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
         Vitaly Kuznetsov <vkuznets@redhat.com>,
         Maxim Levitsky <mlevitsk@redhat.com>,
         Lai Jiangshan <jiangshan.ljs@antgroup.com>
-Subject: Re: [PATCH 11/12] KVM: X86/MMU: Remove mmu_pages_first() and
- mmu_pages_next()
-Message-ID: <YtcWyEdSnMN5M9vn@google.com>
+Subject: Re: [PATCH 12/12] KVM: X86/MMU: Rename struct kvm_mmu_pages to
+ struct kvm_mmu_page_vec
+Message-ID: <YtcX3TK14y55FmmZ@google.com>
 References: <20220605064342.309219-1-jiangshanlai@gmail.com>
- <20220605064342.309219-12-jiangshanlai@gmail.com>
+ <20220605064342.309219-13-jiangshanlai@gmail.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20220605064342.309219-12-jiangshanlai@gmail.com>
+In-Reply-To: <20220605064342.309219-13-jiangshanlai@gmail.com>
 X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
         ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
@@ -78,9 +78,13 @@ X-Mailing-List: kvm@vger.kernel.org
 On Sun, Jun 05, 2022, Lai Jiangshan wrote:
 > From: Lai Jiangshan <jiangshan.ljs@antgroup.com>
 > 
-> Use i = 0 andd i++ instead.
+> It is implemented as a vector and variable names for it are pvec.
 
-s/andd/and, but even better would be to write a full changelog.
+Please define "it" in the changelog before referencing "it".  Avoiding dependencies
+on the shortlog is trivial and really does help as it avoids having to jump back
+to see what "it" refers to.
 
-  Drop mmu_pages_{next,first}() and open code their now trivial
-  implementations in for_each_sp(), the sole caller.
+> Rename it to kvm_mmu_page_vec for better describing it.
+> 
+> Signed-off-by: Lai Jiangshan <jiangshan.ljs@antgroup.com>
+> ---
