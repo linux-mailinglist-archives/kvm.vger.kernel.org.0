@@ -2,154 +2,185 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 7BF2757AAB5
-	for <lists+kvm@lfdr.de>; Wed, 20 Jul 2022 01:54:59 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id EA53A57AAC9
+	for <lists+kvm@lfdr.de>; Wed, 20 Jul 2022 02:03:51 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235993AbiGSXy4 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 19 Jul 2022 19:54:56 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39012 "EHLO
+        id S237198AbiGTADS (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 19 Jul 2022 20:03:18 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44016 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229565AbiGSXyz (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 19 Jul 2022 19:54:55 -0400
-Received: from mga09.intel.com (mga09.intel.com [134.134.136.24])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0AC1F32057;
-        Tue, 19 Jul 2022 16:54:55 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1658274895; x=1689810895;
-  h=message-id:subject:from:to:cc:date:in-reply-to:
-   references:content-transfer-encoding:mime-version;
-  bh=aqsfJe34HmS8HnvW2mJHKpwVN/eAmyfAu5CYq9PPFsQ=;
-  b=HvjhOfU9pbWLAYKzJNaUynsl15Al0xAyU95YsRLBD0EmLFOUbaxMvfQz
-   4Adi/dsgfR+/lBqG+nPK6cSKDT2eKrSL64Ne2kyuAb5l6MT2Nzkhczihl
-   CcC0sZtJX66mtKH5NVkmHVOusFEqZKgqFO4jGleQKUWc6bGMhDIOgLqWB
-   Y67BXytBcJKkHe+aC5fuG+vZHjVWcprwjPJWzhxIT/GFIVC9LvSuEKk2/
-   e7zcp63fOuJZi/6ZvQSj06MGJZoEZmlQF4WAJrrJcn+H6qKT4XOycheAp
-   hNGdwqz5pxjJZEzDm4byPSxLz5qBH5wVXSSEFFh2dtwEpHVQQWMN9+SVi
-   A==;
-X-IronPort-AV: E=McAfee;i="6400,9594,10413"; a="287382262"
-X-IronPort-AV: E=Sophos;i="5.92,285,1650956400"; 
-   d="scan'208";a="287382262"
-Received: from fmsmga006.fm.intel.com ([10.253.24.20])
-  by orsmga102.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 19 Jul 2022 16:54:54 -0700
-X-IronPort-AV: E=Sophos;i="5.92,285,1650956400"; 
-   d="scan'208";a="843843471"
-Received: from ecurtis-mobl.amr.corp.intel.com (HELO khuang2-desk.gar.corp.intel.com) ([10.213.162.137])
-  by fmsmga006-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 19 Jul 2022 16:54:49 -0700
-Message-ID: <b14ef9354392474b0988dde063bdb186a48424a8.camel@intel.com>
-Subject: Re: [PATCH v5 02/22] cc_platform: Add new attribute to prevent ACPI
- CPU hotplug
-From:   Kai Huang <kai.huang@intel.com>
-To:     Dave Hansen <dave.hansen@intel.com>, linux-kernel@vger.kernel.org,
-        kvm@vger.kernel.org
-Cc:     linux-acpi@vger.kernel.org, seanjc@google.com, pbonzini@redhat.com,
-        len.brown@intel.com, tony.luck@intel.com,
-        rafael.j.wysocki@intel.com, reinette.chatre@intel.com,
-        dan.j.williams@intel.com, peterz@infradead.org, ak@linux.intel.com,
-        kirill.shutemov@linux.intel.com,
-        sathyanarayanan.kuppuswamy@linux.intel.com,
-        isaku.yamahata@intel.com, thomas.lendacky@amd.com,
-        Tianyu.Lan@microsoft.com, rdunlap@infradead.org, Jason@zx2c4.com,
-        juri.lelli@redhat.com, mark.rutland@arm.com, frederic@kernel.org,
-        yuehaibing@huawei.com, dongli.zhang@oracle.com
-Date:   Wed, 20 Jul 2022 11:54:47 +1200
-In-Reply-To: <baaae4b3-7f7d-b193-3546-70170b8b460d@intel.com>
-References: <cover.1655894131.git.kai.huang@intel.com>
-         <f4bff93d83814ea1f54494f51ce3e5d954cf0f5b.1655894131.git.kai.huang@intel.com>
-         <43a67bfe-9707-33e0-2574-1e6eca6aa24b@intel.com>
-         <5ebd7c3cfb3ab9d77a2577c4864befcffe5359d4.camel@intel.com>
-         <173b20166a77012669fdc2c600556fca0623d0b1.camel@intel.com>
-         <baaae4b3-7f7d-b193-3546-70170b8b460d@intel.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-User-Agent: Evolution 3.44.3 (3.44.3-1.fc36) 
+        with ESMTP id S239226AbiGTAC5 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 19 Jul 2022 20:02:57 -0400
+Received: from NAM12-DM6-obe.outbound.protection.outlook.com (mail-dm6nam12on2044.outbound.protection.outlook.com [40.107.243.44])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 75F554F185;
+        Tue, 19 Jul 2022 17:02:56 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=aY2QarC8UpJVklCKOv6vbs+JIPIXf/1G8Ygsz+45Vl5nNTY06imjIANWQfUPDD+peNtphF1CdUJv2+tk42ZdzxKk0bL0IQNnmhya00xgNPGbbLiNo0yA9RFt+xOfHAynNz+rciymJ3e1ZZpB1euC7NLVeD6U0taxF2/tsdIiDCxbmY1prGYnerzBxTuoOdM0q2aNcDt3Huz024jxynqGY56mCbRQGNVwKxKToIMIQ0YAcDst42vaYqqgJ90IU3IAuKP+GPMIYXDHAUvNPUbQ1QezyoXNQ16+EneW/l0hNclkCM87CUTaF7O702mtJS/MRCdMNxsdJrXyACCUM7yM+g==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=Pdkm+mf/1R8eNRzg3Gsl3scpziWrU6PYN4wWZaHi+AY=;
+ b=bRAdN7RosXgIeUIyljVmktqp/q5S/ApcjP/QiWIv6+Zo0UrJRaKYgc6pTVMxpaif1dXtFCo0g1FQ7w5qnJbmZzhKcUxLximKHR/QO4jJjPE9uiloJxtkt/i9kkeQMr9WodYFv5SRBcGP9PSuABcNY63Kr+Uxgi1nLiqhdzDoPlfS/0HYE6dW6OlcyNrmSqLfZi2HcqCEE+1RLu2xsONhaR58GM5nJAh9PiZstMxzQNzLO0GeHkAqYP7b7DfOCaT6YwVr2UioDhRcD1Wjt65cN/CIlEeMmNdRulI8YV1QJiuVg7P53Q+vfyLAP78cIz+2w1WGvUsQU4YIRwNTiFlwRQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
+ dkim=pass header.d=nvidia.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=Pdkm+mf/1R8eNRzg3Gsl3scpziWrU6PYN4wWZaHi+AY=;
+ b=fqQHLTQKoWCStj62mxbjVgoSX2Q84dsWBRriTkWz5r4G//ZvpXHzsVPu2QQfW+OmDOVPqooMP0WAB03GS9bHWbrXC6vGr4kaQi3GgW5Bq31SpUbKGFiP6orq0V4Itdf/r1D7urtBeSBKY/0mLJzsPFRY+8RAoWrUvI+N3xOVh9sJIFSdXgtqos1uf3GO0os02SjMPeRPTXPesoj7y+6WUK0FQ0tj3aa/RmWz8IFciQVnfjBazG8wOz61tPpLKWDfp2R+yVm0an7QAfoGYd6tkU2WaSQKHdbkAd36NgUZGaGFUvST4EufpJDxwMWQHSS5kDN6JmDNwv5JVa8Zp5zTAA==
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=nvidia.com;
+Received: from MN2PR12MB4192.namprd12.prod.outlook.com (2603:10b6:208:1d5::15)
+ by MN2PR12MB3134.namprd12.prod.outlook.com (2603:10b6:208:c5::15) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5438.15; Wed, 20 Jul
+ 2022 00:02:53 +0000
+Received: from MN2PR12MB4192.namprd12.prod.outlook.com
+ ([fe80::ac35:7c4b:3282:abfb]) by MN2PR12MB4192.namprd12.prod.outlook.com
+ ([fe80::ac35:7c4b:3282:abfb%3]) with mapi id 15.20.5438.024; Wed, 20 Jul 2022
+ 00:02:53 +0000
+From:   Jason Gunthorpe <jgg@nvidia.com>
+To:     Alexander Gordeev <agordeev@linux.ibm.com>,
+        David Airlie <airlied@linux.ie>,
+        Alex Williamson <alex.williamson@redhat.com>,
+        Christian Borntraeger <borntraeger@linux.ibm.com>,
+        Cornelia Huck <cohuck@redhat.com>,
+        Daniel Vetter <daniel@ffwll.ch>,
+        dri-devel@lists.freedesktop.org,
+        Harald Freudenberger <freude@linux.ibm.com>,
+        Vasily Gorbik <gor@linux.ibm.com>,
+        Heiko Carstens <hca@linux.ibm.com>,
+        intel-gfx@lists.freedesktop.org,
+        intel-gvt-dev@lists.freedesktop.org,
+        Jani Nikula <jani.nikula@linux.intel.com>,
+        Jason Herne <jjherne@linux.ibm.com>,
+        Joonas Lahtinen <joonas.lahtinen@linux.intel.com>,
+        kvm@vger.kernel.org, linux-s390@vger.kernel.org,
+        Matthew Rosato <mjrosato@linux.ibm.com>,
+        Peter Oberparleiter <oberpar@linux.ibm.com>,
+        Halil Pasic <pasic@linux.ibm.com>,
+        Rodrigo Vivi <rodrigo.vivi@intel.com>,
+        Sven Schnelle <svens@linux.ibm.com>,
+        Tvrtko Ursulin <tvrtko.ursulin@linux.intel.com>,
+        Vineeth Vijayan <vneethv@linux.ibm.com>,
+        Zhi Wang <zhi.a.wang@intel.com>
+Cc:     Tony Krowiak <akrowiak@linux.ibm.com>,
+        Eric Farman <farman@linux.ibm.com>,
+        Christoph Hellwig <hch@lst.de>,
+        Kevin Tian <kevin.tian@intel.com>,
+        Zhenyu Wang <zhenyuw@linux.intel.com>
+Subject: [PATCH v4 0/2] Remove the VFIO_IOMMU_NOTIFY_DMA_UNMAP notifier
+Date:   Tue, 19 Jul 2022 21:02:47 -0300
+Message-Id: <0-v4-681e038e30fd+78-vfio_unmap_notif_jgg@nvidia.com>
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: MN2PR13CA0008.namprd13.prod.outlook.com
+ (2603:10b6:208:160::21) To MN2PR12MB4192.namprd12.prod.outlook.com
+ (2603:10b6:208:1d5::15)
 MIME-Version: 1.0
-X-Spam-Status: No, score=-5.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
-        RCVD_IN_MSPIKE_H3,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE
-        autolearn=ham autolearn_force=no version=3.4.6
+X-MS-PublicTrafficType: Email
+X-MS-Office365-Filtering-Correlation-Id: c9ce9382-d4d6-48a1-af02-08da69e32fda
+X-MS-TrafficTypeDiagnostic: MN2PR12MB3134:EE_
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: V57e80dR4Yg7EWE2pDYjiedfceaaF7D+Uh2CS5bB/MqZeo8Wo6ESK7z4EYTjIHwg4zM1DKMig4Vj/9mUI4xNGqZWxpqJ1OpRoAmG8osCEWxNep/UEGm19y32AfCvWOtEsGge8UELuDC0LOmtq8P1X7fqQhhTHD9n45WcEts7vSqXcgyPjLnTQzVdvHm5m6Z65UTk9smulUDjmZtJu8xxGP3rGqzb6DE77/egGX2e6gY/F2apPZg7PZLBTpWq+hUR2qKOUg+8WHTGUJ35/3etKy8Pai8SJxNksEhRGft2PC5Nk87GOP/WcGgQejX6vhY4om+PvORoEuQAaHzZTqFNyfX8sGB32vLHsfktBfsFFy18IRs7yJ2/e9ZFhb73VFZnEZrTmOjQqL+EzUudwRnVge455gIQf9ur3CunOGwZ0YUPhSFUG9vM4r+74hr3ep7wqUBPp65+P36IyEY2h80XyB/FJwcC2CrFJmgx6MXe6LhkfZhj5RA/9NV0xvqB6WL0q5G2hfvxPzctceOIJYiKn8sjYfoBUL3z6XlYcXTIYOW0JQlPGYF7bGy5/Qq89Oh07QYj5ESLMDzQQqiEIgruszLjYnvAPBFFqeWwkelJNT80DUpZwbqYBxpO82WLcVnoFRQwdFrPrGgz3XMdeN2cZ9mrBDX0NoD7mivwcKW58zsUaf3oAMen6HnY4ssf2ufRp+VSx4xcxmUsJXRc4ZjwhIHtAUQkg7rNFb2wJWDKi1h45cvVFmM52L9qX4cEtyzxXcNL5Sf1kD4nws4FK6ySEz4vj4iLLsyz9+bqLo3FOEjddAJtxsfLAZpZ/XS+cREm4teXyCkDvjRGDOe366gpkQNCUjBPOtxfU6E020CblBpBOcGknTjNsRjID2DJwz6253Xn95CGe87yp+TSzKYZekJa7wMq/n0hq1y/UgZRjZA=
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:MN2PR12MB4192.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230016)(4636009)(346002)(396003)(39860400002)(136003)(376002)(366004)(36756003)(83380400001)(86362001)(186003)(921005)(38100700002)(8936002)(6486002)(41300700001)(2616005)(26005)(54906003)(2906002)(7406005)(6666004)(4326008)(6506007)(110136005)(478600001)(5660300002)(7416002)(66476007)(8676002)(316002)(966005)(6512007)(66556008)(66946007)(4216001);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?4qYxPsmNiw9UWVUFr3bSdHSXycaGWculQo093nsH2BtNSr1M7aZKpUnx411g?=
+ =?us-ascii?Q?3+KTo3dzXxeAiuquOwHzsNZJlGrNroKwsMRPagWZ2v/aNXqVDxyLv/EbGF4S?=
+ =?us-ascii?Q?jQ4rcpPEGNhs8mFtQbmGETPFlRXIT3pgkzl2661gtDo3BGGPjnJmUHxvXCuw?=
+ =?us-ascii?Q?BNpUOgtOZPkXkUPyElCrgeGgVja+w2o/MZBPzETIjA+bzrzr+dY7SJq11deB?=
+ =?us-ascii?Q?g5ZASI1jBKT+hELMlTMihiqoXgGZ4gIsLUYPdMyE+/FKw9gDINnL1qDGtVY6?=
+ =?us-ascii?Q?Nmxe1ril2lnVRDB4M8WSXQH7qod7YDzzrelatWV06BJ7oHhdFgGHkGSS1+sJ?=
+ =?us-ascii?Q?la+a+Gq/6Ec2HV+zbB/Wq/nkFZXw3iMoAclwsA5Mwjr74r60i/zx9ZPdmqrv?=
+ =?us-ascii?Q?7REqDBoqiVRxUWJUZduo7tVqpEDhJvwSbfE5rJ8HLOWrsyx1BB/rIJ36ieDe?=
+ =?us-ascii?Q?CwPB/h6ZAl8nFwm3G1f50a36L4EfsKluGmFshhTvhGN9GWQFJwS7I/qJe/Fo?=
+ =?us-ascii?Q?HxHicf/aEL1c48closjy4ysIRdL7kW8c1U3yQs0h0WfDIQMQQXEdgZL5hW5O?=
+ =?us-ascii?Q?9gke3ZyHDUB3m6bCXJVzEjLWOZFGWs/HEpZbnErNEaTOy3W+v9c74oduAIuX?=
+ =?us-ascii?Q?jFvDK17mQI4eezqzNd5bwb4HOrmGVyObcM3XfzuEwQNiNP5ri+bIlEw/zJZp?=
+ =?us-ascii?Q?xshtRfmvlCDG7WkW39XZ9hKP8mxTQ9t8Tw0Hs8dorhGvhq648EVfJtvWydJz?=
+ =?us-ascii?Q?1jUQ4tH0Io5QCpEqakf3xelI3MrVcpqs36MhJ3rjITbUEoiqvbsPPZ5erxzA?=
+ =?us-ascii?Q?MJemR1VBEzbxMYwZmxMWDc223ygkTm1JeqNkg5SSCRLTPN/kYT8YX+svwiID?=
+ =?us-ascii?Q?TKotgLo5alTDT79fJJ+pjA0ikq8xq0l7ahaU+i+7ZFSwQBnlyVgltJ4oD2fa?=
+ =?us-ascii?Q?jdTVc3HYeqqvW+nj0C2pUkTwGM/UE2gMqswGJunmE66J5EDC/My8h7isUxYr?=
+ =?us-ascii?Q?8AKdfChf6hYI+SZFzm5160SjZiWQ8vpsux4ugXOM6VKeNHYZR4X3Vjt8YZSD?=
+ =?us-ascii?Q?QnFfheTmXidrE1zOzhFF0J2p0X3REgv5YL+XI1o7/7lmu4nezAAbBR7P0jfl?=
+ =?us-ascii?Q?KjpOmqfdjR441wClZoX0lFBeWPjmY0xfbdU4nQJejtQrxLXBa6avxUidNArH?=
+ =?us-ascii?Q?Hc7iarYhhaycRG3entZFYrkxyCeTGsmZv2S3K7kq9zHVcIB2Ckl+4aNEaRB1?=
+ =?us-ascii?Q?dNAor6q1fPDewaVO5nKU9M5gm84YnV4tZVAD8tyZqfxO4hGFQ7DyWjWnmyLD?=
+ =?us-ascii?Q?7+SKVKsA6wG0ddUxA2Il0HeAR8IverT1jIai1JxGEkaawQHrEmWmZOuRt3bb?=
+ =?us-ascii?Q?9FTRj4Z3AQag46VlHD7SaHO6hm1qd5gfOhi6Vqgj3KCyoz6m4RK7ij1LCnrq?=
+ =?us-ascii?Q?le/PCDY1paurEvG6znydqSqo0LjFXZp1eOU1KP7coppdRRp6j/X4vh5tpREd?=
+ =?us-ascii?Q?4+11v9kgxDQANNHQvV7ce7DDe1mv+jYK3Ie2S0k2bDVlWR4pv6cZAK9PUL2u?=
+ =?us-ascii?Q?gdMkV3tGpndeIbXrQZg4Qqk+jawLPcK/LLKRuapM?=
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: c9ce9382-d4d6-48a1-af02-08da69e32fda
+X-MS-Exchange-CrossTenant-AuthSource: MN2PR12MB4192.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 20 Jul 2022 00:02:50.8949
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: /G5WTjKX1PdXnOs8RBZkg9EmyZg6SAq7pbqqj9pfttaP8QyDkDj/0CDCd8mCpBLh
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: MN2PR12MB3134
+X-Spam-Status: No, score=-1.8 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FORGED_SPF_HELO,
+        RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_NONE
+        autolearn=no autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, 2022-07-19 at 10:46 -0700, Dave Hansen wrote:
-> On 7/13/22 04:09, Kai Huang wrote:
-> ...
-> > "TDX doesn=E2=80=99t support adding or removing CPUs from TDX security =
-perimeter. The
-> > BIOS should prevent CPUs from being hot-added or hot-removed after plat=
-form
-> > boots."
->=20
-> That's a start.  It also probably needs to say that the security
-> perimeter includes all logical CPUs, though.
+This is the last notifier toward the drivers, replace it with a simple op
+callback in the vfio_device_ops.
 
-To me it is kinda implied.  But I have sent email to TDX spec owner to see
-whether we can say it more explicitly.
+v4:
+ - Rebase over the CCW series
+v3: https://lore.kernel.org/r/0-v3-7593f297c43f+56ce-vfio_unmap_notif_jgg@nvidia.com
+ - Remove 'nb' doc string from ccw
+ - Rebase on extern removal patch
+ - Check that register_device/unregister_device are either both defined or
+   not
+ - Remove check of dma_unmap during vfio_register_iommu_driver() as it
+   would break the drivers that don't use pin_pages
+ - Don't change VFIO_IOMMU_NOTIFY_DMA_UNMAP to an enum since we are not
+   keeping it anyhow
+v2: https://lore.kernel.org/r/0-v2-80aa110d03ce+24b-vfio_unmap_notif_jgg@nvidia.com
+ - Declare and initialize variables in intel_vgpu_dma_unmap()
+ - Remove 'vendor' when touching comments
+ - Remove kdoc for vfio dma_unmap notifier
+ - Add WARN_ON to vfio_register_emulated_iommu_dev() since dma_unmap is
+   mandatory
+ - Move dma_unmap call loop to vfio_notify_dma_unmap()
+ - Document why the double mutex is being used and why the mutex lock is
+   dropped when calling dma_unmap
+v1: https://lore.kernel.org/r/0-v1-896844109f36+a-vfio_unmap_notif_jgg@nvidia.com
 
->=20
-> >  static int acpi_map_cpu2node(acpi_handle handle, int cpu, int physid)
-> >  {
-> > @@ -819,6 +820,12 @@ int acpi_map_cpu(acpi_handle handle, phys_cpuid_t =
-physid,
-> > u32 acpi_id,
-> >  {
-> >         int cpu;
-> > =20
-> > +       if (platform_tdx_enabled()) {
-> > +               pr_err("BIOS bug: CPU (physid %u) hot-added on TDX enab=
-led
-> > platform. Reject it.\n",
-> > +                               physid);
-> > +               return -EINVAL;
-> > +       }
->=20
-> Is this the right place?  There are other sanity checks in
-> acpi_processor_hotadd_init() and it seems like a better spot.
+Signed-off-by: Jason Gunthorpe <jgg@nvidia.com>
 
-It has below additional check:
+Jason Gunthorpe (2):
+  vfio: Replace the DMA unmapping notifier with a callback
+  vfio: Replace the iommu notifier with a device list
 
-        if (invalid_phys_cpuid(pr->phys_id))
-                return -ENODEV;
-       =20
-        status =3D acpi_evaluate_integer(pr->handle, "_STA", NULL, &sta);
-        if (ACPI_FAILURE(status) || !(sta & ACPI_STA_DEVICE_PRESENT))
-                return -ENODEV;
-
-
-I don't know exactly when will the first "invalid_phys_cpuid()" case happen=
-, but
-the CPU is enumerated as "present" only after the second check.  I.e. if BI=
-OS is
-buggy and somehow sends a ACPI CPU hot-add event to kernel w/o having the C=
-PU
-being actually hot-added, the kernel just returns -ENODEV here.
-
-So to me, adding to acpi_map_cpu() is more reasonable, because by reaching =
-here,
-it is sure that a real CPU is being hot-added.
+ drivers/gpu/drm/i915/gvt/gvt.h        |   1 -
+ drivers/gpu/drm/i915/gvt/kvmgt.c      |  75 +++++-------------
+ drivers/s390/cio/vfio_ccw_ops.c       |  39 ++--------
+ drivers/s390/cio/vfio_ccw_private.h   |   2 -
+ drivers/s390/crypto/vfio_ap_ops.c     |  53 ++-----------
+ drivers/s390/crypto/vfio_ap_private.h |   3 -
+ drivers/vfio/vfio.c                   | 108 ++++++--------------------
+ drivers/vfio/vfio.h                   |   9 +--
+ drivers/vfio/vfio_iommu_type1.c       | 103 +++++++++++++++---------
+ include/linux/vfio.h                  |  21 +----
+ 10 files changed, 132 insertions(+), 282 deletions(-)
 
 
->=20
-> >         cpu =3D acpi_register_lapic(physid, acpi_id, ACPI_MADT_ENABLED)=
-;
-> >         if (cpu < 0) {
-> >                 pr_info("Unable to map lapic to logical cpu number\n");
-> > @@ -835,6 +842,10 @@ EXPORT_SYMBOL(acpi_map_cpu);
-> > =20
-> >  int acpi_unmap_cpu(int cpu)
-> >  {
-> > +       if (platform_tdx_enabled())
-> > +               pr_err("BIOS bug: CPU %d hot-removed on TDX enabled pla=
-tform.
-> > TDX is broken. Please reboot the machine.\n",
-> > +                               cpu);
-> > +
-> >  #ifdef CONFIG_ACPI_NUMA
-> >         set_apicid_to_node(per_cpu(x86_cpu_to_apicid, cpu), NUMA_NO_NOD=
-E);
-> >  #endif
->=20
+base-commit: 2a8ed7ef00b939fbcc98b948f780bd03bafed227
+-- 
+2.37.1
 
