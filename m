@@ -2,197 +2,218 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id CF19557BE14
-	for <lists+kvm@lfdr.de>; Wed, 20 Jul 2022 20:49:21 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id DEEF357BE22
+	for <lists+kvm@lfdr.de>; Wed, 20 Jul 2022 20:56:05 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229469AbiGTStN (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 20 Jul 2022 14:49:13 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35142 "EHLO
+        id S230320AbiGTSza (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 20 Jul 2022 14:55:30 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39534 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230253AbiGTStL (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 20 Jul 2022 14:49:11 -0400
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0E26E73586
-        for <kvm@vger.kernel.org>; Wed, 20 Jul 2022 11:49:08 -0700 (PDT)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id 4E6FE61983
-        for <kvm@vger.kernel.org>; Wed, 20 Jul 2022 18:49:08 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id DAF93C341C7;
-        Wed, 20 Jul 2022 18:49:03 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1658342947;
-        bh=08+Q+ucM7zcCNE6VbGiO3oIo7eApyt+93Izjlu+1QBs=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=I5gDqg3ywx4qWRFZdqk2of8EjGxUwRP32WqTD3A6zedGZCkRpKUr07J2YyY2VOvtH
-         odIeq+MaBWBPl29VbjTYBkjxxWSkaMAb8dcNRLwRQ+dTnpJQmDHyLkGLAQkjsiOGM7
-         mtZWTAJSwC67EdecVJP1U7BILEn1WqlO9TWMl9kk52Qfn3QIkbe8qXyYTR+/qXdgkJ
-         u0x857jsmj1+Eu+tlUUO3oyqTRWRYrXMKq+l5rVsrUDZCp2biBvFkzXWm/MiUFidl/
-         drl3U8SY0zufJAPUvVbgQluKsTWrDmSFbmNhGSZTP4W4QV0QcJLz8LNCsve0S5mmOM
-         2vgsJ5MzLryYw==
-Date:   Wed, 20 Jul 2022 19:48:59 +0100
-From:   Will Deacon <will@kernel.org>
-To:     Sean Christopherson <seanjc@google.com>
-Cc:     kvmarm@lists.cs.columbia.edu, Ard Biesheuvel <ardb@kernel.org>,
-        Alexandru Elisei <alexandru.elisei@arm.com>,
-        Andy Lutomirski <luto@amacapital.net>,
-        Catalin Marinas <catalin.marinas@arm.com>,
-        James Morse <james.morse@arm.com>,
-        Chao Peng <chao.p.peng@linux.intel.com>,
-        Quentin Perret <qperret@google.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
-        Michael Roth <michael.roth@amd.com>,
-        Mark Rutland <mark.rutland@arm.com>,
-        Fuad Tabba <tabba@google.com>,
-        Oliver Upton <oliver.upton@linux.dev>,
-        Marc Zyngier <maz@kernel.org>, kernel-team@android.com,
-        kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org
-Subject: Re: [PATCH v2 00/24] KVM: arm64: Introduce pKVM shadow state at EL2
-Message-ID: <20220720184859.GD16603@willie-the-truck>
-References: <20220630135747.26983-1-will@kernel.org>
- <YsXfyVp6sg5XRVAp@google.com>
- <20220708162359.GA6286@willie-the-truck>
- <YtbXtI/lEnNL7fHQ@google.com>
+        with ESMTP id S230174AbiGTSzB (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 20 Jul 2022 14:55:01 -0400
+Received: from na01-obe.outbound.protection.outlook.com (mail-cusazon11020015.outbound.protection.outlook.com [52.101.61.15])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DBC3754CB2;
+        Wed, 20 Jul 2022 11:55:00 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=BQuOYyZxKbn+JMG2d61C4MWIKE52Atzx04VwLRQQeE/cUkq3mCoCuQadIGTcZN5x1AAo8TS8ReELRcJlGopAwGugZJKU4iu85fsFbWNu0pSoWZ5KJzIbyWhbVtTXprOgLEanUxlkGfYG8ycSOi4rGxjYavl6OMkiimZ5VGZY6yYjbcMryEGLx4x81J46r+14FfgufryNgPjDX1bb2Up4cHYB4IUrXl3ybd30ngoJZFEsZo02/WbCkhX0quPdr006OXx6DxiuthPAZDunEBBe14OEeRerfYRfz8r5u4k5y9CUIAingSJepVJZ208KxuSywrMhbIVaB19ulAy+SlzExQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=BnlyVMRCgy51CqEhiKonZImE9K5T4Ol9w2OK1izCC9I=;
+ b=HezlnNV//XssnYQhXtwB/QBVga62DbZtKJpO3+Whzj3JYLXnvciU/knhHf4OVK7g0KvR5N7DJXcYlT/jW0vY4BEmZuzbmUJ8JqAaJcScbn1cXY7vBICuxpMMnrPg+MZQQhJJlJ+LB3cFGP6ADiHWiAmolVEmGBLaxhdGkEEKYDX/uVs1b80hvFe+vPKDndTYod7Jpc4MIATMO4YuQeiw5Ww9/Wwwwdmz5jHODaHGprzJwpiZOmQ5xbPYjAs2lktpzkRBF+PsfBpSwqGObLQORd91WLyAxMLzUy+I1kCigo8gQwyUo1oqpUH3/2H+W9Vi+7aXOvGK8XC5LSgCcNqyKA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=microsoft.com; dmarc=pass action=none
+ header.from=microsoft.com; dkim=pass header.d=microsoft.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=BnlyVMRCgy51CqEhiKonZImE9K5T4Ol9w2OK1izCC9I=;
+ b=Rr6PUuNmO244StdBqthvhYKU/oMBjgEkbqMYGxyAWYthHLKXuexg0OkW4HO0fFjNMoVQ7cRMj7R018D0WGbBdaUJerMqB8mh1WQs1qKt6syw6vThm+PuunpKR7toP25aCNWgYcMRnDnYkDBEPqL+mC0YsKuYcncrzdSfC1IYDlU=
+Received: from SN6PR2101MB1327.namprd21.prod.outlook.com
+ (2603:10b6:805:107::9) by SJ0PR21MB1935.namprd21.prod.outlook.com
+ (2603:10b6:a03:295::8) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5482.1; Wed, 20 Jul
+ 2022 18:54:58 +0000
+Received: from SN6PR2101MB1327.namprd21.prod.outlook.com
+ ([fe80::59ea:cdde:5229:d4f0]) by SN6PR2101MB1327.namprd21.prod.outlook.com
+ ([fe80::59ea:cdde:5229:d4f0%7]) with mapi id 15.20.5482.001; Wed, 20 Jul 2022
+ 18:54:58 +0000
+From:   Dexuan Cui <decui@microsoft.com>
+To:     Stefano Garzarella <sgarzare@redhat.com>,
+        Arseniy Krasnov <AVKrasnov@sberdevices.ru>
+CC:     "David S. Miller" <davem@davemloft.net>,
+        "edumazet@google.com" <edumazet@google.com>,
+        Jakub Kicinski <kuba@kernel.org>,
+        Paolo Abeni <pabeni@redhat.com>,
+        Stefan Hajnoczi <stefanha@redhat.com>,
+        "Michael S. Tsirkin" <mst@redhat.com>,
+        Krasnov Arseniy <oxffffaa@gmail.com>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "virtualization@lists.linux-foundation.org" 
+        <virtualization@lists.linux-foundation.org>,
+        "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        kernel <kernel@sberdevices.ru>
+Subject: RE: [RFC PATCH v1 2/3] virtio/vsock: use 'target' in notify_poll_in,
+ callback.
+Thread-Topic: [RFC PATCH v1 2/3] virtio/vsock: use 'target' in notify_poll_in,
+ callback.
+Thread-Index: AQHYnBH4pVNR0eqcD0CILiDoHCrOv62Hk0AQ
+Date:   Wed, 20 Jul 2022 18:54:58 +0000
+Message-ID: <SN6PR2101MB132703A0F4D08DC28D37A17EBF8E9@SN6PR2101MB1327.namprd21.prod.outlook.com>
+References: <c8de13b1-cbd8-e3e0-5728-f3c3648c69f7@sberdevices.ru>
+ <358f8d52-fd88-ad2e-87e2-c64bfa516a58@sberdevices.ru>
+ <20220719124857.akv25sgp6np3pdaw@sgarzare-redhat>
+ <15f38fcf-f1ff-3aad-4c30-4436bb8c4c44@sberdevices.ru>
+ <20220720082307.djbf7qgnlsjmrxcf@sgarzare-redhat>
+In-Reply-To: <20220720082307.djbf7qgnlsjmrxcf@sgarzare-redhat>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+msip_labels: MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_ActionId=f2ea54de-b924-45d0-a337-e99ed0f78dbb;MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_ContentBits=0;MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_Enabled=true;MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_Method=Standard;MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_Name=Internal;MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_SetDate=2022-07-20T18:22:40Z;MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_SiteId=72f988bf-86f1-41af-91ab-2d7cd011db47;
+authentication-results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=microsoft.com;
+x-ms-publictraffictype: Email
+x-ms-office365-filtering-correlation-id: b259af13-25d9-4f57-4282-08da6a8157e6
+x-ms-traffictypediagnostic: SJ0PR21MB1935:EE_
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam: BCL:0;
+x-microsoft-antispam-message-info: EhGJpSOGChZZ4FVFW71l2Pf5weOl+MR14l3O4wIZxrfdmgJj1Cz3mRIz3SUkrJ2Ghtx6wdiJ/FGdA3MRxjGpmI7BdXQyaJd4yij82Tnm5NZl++Qji0B/5N/Ze/mZ8AakLznRD8druQeNQd/hH1fLo/nGiNnBlJwcxzNM1uyDzZ/U4/tuc1HKfl/lYzY6dKBIiMSD5A53Z4PrLubHNczpykofFnmhTOwRNxbZJnVMHJB1AfVp3o0PCqLwyBuxJ5vmQmCcqUlTMrGYkcuuwEqNr9hx5NXc0eTydRZ01MXGhr4e5GaJlKrJwgTa6LrQEAG8wfvY2Q0hpu2Rh2TJNRT5jVa9OAChLwFfAga5xSOHnw1dGgIDid3QMzcAXXcY9af23ma2HvBRzc+rjMP4EW+p0ESsmwLhvVZdrT9CjVXXdZsvQvD5xobkvtaZh9HFvcULFik+gJ9E+JjflGJC7z6iwAJ2jp6RkE8YGkGvE3cLjr841NPW+6qRaAplv4W3F7WJI3pr7Bi97i66QR7OKQqQAJCrhgPuQNb/TfjN4VdWf4yG8yH9DblziJmPWebVDkWcUIUaptASFfMoRAADEl/BE5sAOlcQ7SS9RtoeRuNorR/Q5CMqUmk44rEj20Wb7IVHFTWETqiy7GiOVjC4hJLevksB55oO8LPD/adrm6l6bGLBmf4/GBWF/yL1sls+84wsRJXpqkgxntNm7Frl5q6jLKaVcIq27hQNHNZG7bi49N3a8cKXERNLV/gNS63QNBnrpkYW+6rz8XLJYckk+kmcUeu7YvSjDm3nfWEYikBeBID33twmAMSAJFMEear6wpS6txUBmdsxh+1xQTCTnUrqU0/U9hmRorwVnXwla6tq5NM=
+x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SN6PR2101MB1327.namprd21.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230016)(4636009)(346002)(376002)(366004)(396003)(39860400002)(136003)(451199009)(54906003)(110136005)(9686003)(10290500003)(8676002)(4326008)(41300700001)(71200400001)(26005)(7696005)(6506007)(316002)(186003)(66556008)(66476007)(66446008)(86362001)(64756008)(33656002)(5660300002)(52536014)(7416002)(8936002)(76116006)(66946007)(8990500004)(55016003)(83380400001)(2906002)(122000001)(38100700002)(478600001)(38070700005)(82950400001)(82960400001);DIR:OUT;SFP:1102;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0: =?iso-8859-1?Q?1AMY9U8yv+6gUlZL0vwiauNojPBDH5U7xIGTxl8M5RDtIpq5ezQH1j+D48?=
+ =?iso-8859-1?Q?MqSYyiB2YnTe24o4W1/wippv0WvByDd4Z9/fjbsBQoUQhSwowLxl+pve9J?=
+ =?iso-8859-1?Q?7azeV2735jEyBrj3KIsAr2RcnLiIWG76WOa3aKy6AggzWdR5QTV55B6RST?=
+ =?iso-8859-1?Q?/QODqgbSqbGBSYGve6pvSRuzKYFqBdnC7gFxOuxPPlkFLJ3u21EwzxPzjq?=
+ =?iso-8859-1?Q?pzCMN/NjxRzCk7/1IT4VcRhT00ltshJZnirZCKPMyykdX8NYhzj1cWuo1f?=
+ =?iso-8859-1?Q?8Tdy1TZMg+YK8Qz+Se2CIAD0RDxK+Mm/nrPnmEkSPLjBfP32Ljl3yfTg+t?=
+ =?iso-8859-1?Q?HM6nCK3dBeGMLPAI6XMmIW41AdSw6AM+H3vQ+TG5ghcsKMzze4IL2zy4Yx?=
+ =?iso-8859-1?Q?4is35IpJgfZDM9O/yC0gYYWWHBr6FUxWbOHKePQ1Z83GVoDi5OTOhaPIM2?=
+ =?iso-8859-1?Q?YpldrMHWIuy0DlS2ncHa82M4fVOnu18VKv03jrBzHZFDxajmNihlIZTu2x?=
+ =?iso-8859-1?Q?/ICMfTeY05QI2yHTEUaJ8UHJwy5CeS6I9HMaPU9TBpp7JEroDC4rICIyTD?=
+ =?iso-8859-1?Q?bEbJPBvUQk/vdA9Rtcm8y69A0QkolalrFxFfjvNAXsxkneisc4JoeobT0r?=
+ =?iso-8859-1?Q?pkEvzsImQfKfX5S2z70KX9B/nRurB+2/6hr4f6ooXUEPeQbk4sGcx0UmsO?=
+ =?iso-8859-1?Q?jrJwwTfPRLuLfNOhtXSr+Cl5mdYJpwj3iKqSjNkhdtC50roZFYUEXY9WjI?=
+ =?iso-8859-1?Q?+vrxe5hr09frQO1lOv6xbllU28jrEbevQDnSIuugHyeq9YRZs6WEjXweLc?=
+ =?iso-8859-1?Q?KGjet9OG4b4wJh2e/6dsMvhXEQklYzG9C0wfowhJBb29ngDGqzdvK1WcBI?=
+ =?iso-8859-1?Q?/DVQsdE8ZTj/oQ3qwmSsdBbiRlH44eDhjhno6PrDVQk8PMgfA7z4PyYQbq?=
+ =?iso-8859-1?Q?JOS29wrH/Dmj3kBiOYDEbH6bASlopMuSgfbetxS7eo+chaUTqJ6bOWxKDY?=
+ =?iso-8859-1?Q?sM8GdoKGYEBOLP4jWgYSJZJVTm48Rn1msbwNVCcodIGE3kRkyQYgpIaGYt?=
+ =?iso-8859-1?Q?PJMvFPHZUgmITRBQLv8njsSnZrzyMPf0jkZVu8YD8PbR7Jik9J4GHdNO4J?=
+ =?iso-8859-1?Q?JQkzeJ2+kc2HwkbZGbPjrI9q0EJjlAYXPXkvcZ8JME+kKz0qrZ2ExFryfW?=
+ =?iso-8859-1?Q?hlb3YC0oqjGA7mPiWC4XSMZP1E5ltRp64NB8zyx8gz8qAIVV3fm4p9uqMv?=
+ =?iso-8859-1?Q?tdvIcs4IoRu8yWPs+n9P5+Nun/dJlcjdw4y66wUrJU59bB4GHDNYRFDmFH?=
+ =?iso-8859-1?Q?XVWGVccsDY19SvAS1nG6C47yCADjGiHWlgiVjp2D+qUw2ZY6xMMkwZKbMS?=
+ =?iso-8859-1?Q?p3+4xO4IeaRvAVG+vJZLL+5hR24sejWjh7rCE298dEInN04ZIktf/TJHhK?=
+ =?iso-8859-1?Q?l+bBkuhDfR6X6VtpOuAON0P3Gqmz2ZzyYL/jR3H0DvqQy7IjAAjriKD/iD?=
+ =?iso-8859-1?Q?HklkrZ8/hbYrGWw7bDbA2YvfaEqCK0nsRwY0Y79xekLI7LjgNuf94yHHyG?=
+ =?iso-8859-1?Q?7sNzrHaAqhS9EBd20RlanBmYO2JOxzY5e81J5YUH288hCZUFqiayKxruPH?=
+ =?iso-8859-1?Q?/kGMvlDrkh5HnNQ8vGCxhwsHTapl1ofcDw?=
+Content-Type: text/plain; charset="iso-8859-1"
+Content-Transfer-Encoding: quoted-printable
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <YtbXtI/lEnNL7fHQ@google.com>
-User-Agent: Mutt/1.10.1 (2018-07-13)
-X-Spam-Status: No, score=-7.8 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_HI,
-        SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
+X-OriginatorOrg: microsoft.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: SN6PR2101MB1327.namprd21.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: b259af13-25d9-4f57-4282-08da6a8157e6
+X-MS-Exchange-CrossTenant-originalarrivaltime: 20 Jul 2022 18:54:58.4223
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 72f988bf-86f1-41af-91ab-2d7cd011db47
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: M/5GTsaDcZj2HuMShsi1ClvtHdcZzLNPhq+qY771qlD06zrVC25nqKJONGRMj+h9lWHrXjIPqrl4H+jyNb05pA==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SJ0PR21MB1935
+X-Spam-Status: No, score=-1.8 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FORGED_SPF_HELO,
+        RCVD_IN_DNSWL_NONE,SPF_HELO_PASS,SPF_NONE autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi Sean,
+> From: Stefano Garzarella <sgarzare@redhat.com>
+> Sent: Wednesday, July 20, 2022 1:23 AM
+> ...
+> On Wed, Jul 20, 2022 at 05:38:03AM +0000, Arseniy Krasnov wrote:
+> >On 19.07.2022 15:48, Stefano Garzarella wrote:
+> >> On Mon, Jul 18, 2022 at 08:17:31AM +0000, Arseniy Krasnov wrote:
+> >>> This callback controls setting of POLLIN,POLLRDNORM output bits
+> >>> of poll() syscall,but in some cases,it is incorrectly to set it,
+> >>> when socket has at least 1 bytes of available data. Use 'target'
+> >>> which is already exists and equal to sk_rcvlowat in this case.
+> >>>
+> >>> Signed-off-by: Arseniy Krasnov <AVKrasnov@sberdevices.ru>
+> >>> ---
+> >>> net/vmw_vsock/virtio_transport_common.c | 2 +-
+> >>> 1 file changed, 1 insertion(+), 1 deletion(-)
+> >>>
+> >>> diff --git a/net/vmw_vsock/virtio_transport_common.c
+> b/net/vmw_vsock/virtio_transport_common.c
+> >>> index ec2c2afbf0d0..591908740992 100644
+> >>> --- a/net/vmw_vsock/virtio_transport_common.c
+> >>> +++ b/net/vmw_vsock/virtio_transport_common.c
+> >>> @@ -634,7 +634,7 @@ virtio_transport_notify_poll_in(struct vsock_sock
+> *vsk,
+> >>> =A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 size_t target,
+> >>> =A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 bool *data_ready_now)
+> >>> {
+> >>> -=A0=A0=A0 if (vsock_stream_has_data(vsk))
+> >>> +=A0=A0=A0 if (vsock_stream_has_data(vsk) >=3D target)
+> >>> =A0=A0=A0=A0=A0=A0=A0 *data_ready_now =3D true;
+> >>> =A0=A0=A0=A0else
+> >>> =A0=A0=A0=A0=A0=A0=A0 *data_ready_now =3D false;
+> >>
+> >> Perhaps we can take the opportunity to clean up the code in this way:
+> >>
+> >> =A0=A0=A0=A0*data_ready_now =3D vsock_stream_has_data(vsk) >=3D target=
+;
+> >Ack
+> >>
+> >> Anyway, I think we also need to fix the other transports (vmci and hyp=
+erv),
+> >> what do you think?
+> >For vmci it is look clear to fix it. For hyperv i need to check it more,=
+ because it
+> > already uses some internal target value.
+>=20
+> Yep, I see. Maybe you can pass `target` to hvs_channel_readable() and
+> use it as parameter of HVS_PKT_LEN().
+>=20
+> @Dexuan what do you think?
+>=20
+> Thanks,
+> Stefano
 
-On Tue, Jul 19, 2022 at 04:11:32PM +0000, Sean Christopherson wrote:
-> Apologies for the slow reply.
+Can we return "not supported" to set_rcvlowat for Hyper-V vsock? :-)
 
-No problem; you've provided a tonne of insightful feedback here, so it was
-worth the wait. Thanks!
+For Hyper-V vsock, it's easy to tell if there is at least 1 byte to read:=20
+please refer to hvs_channel_readable(), but it's difficult to figure out
+exactly how many bytes can be read.=20
 
-> On Fri, Jul 08, 2022, Will Deacon wrote:
-> > but I wanted to inherit the broader cc list so you were aware of this
-> > break-away series. Sadly, I don't think beefing up the commit messages would
-> > get us to a point where somebody unfamiliar with the EL2 code already could
-> > give a constructive review, but we can try to expand them a bit if you
-> > genuinely think it would help.
-> 
-> I'm not looking at it just from a review point, but also from a future readers
-> perspective.  E.g. someone that looks at this changelog in isolation is going to
-> have no idea what a "shadow VM" is:
-> 
->   KVM: arm64: Introduce pKVM shadow VM state at EL2
-> 
->   Introduce a table of shadow VM structures at EL2 and provide hypercalls
->   to the host for creating and destroying shadow VMs.
-> 
-> Obviously there will be some context available in surrounding patches, but if you
-> avoid the "shadow" terminology and provide a bit more context, then it yields
-> something like:
-> 
->   KVM: arm64: Add infrastructure to create and track pKVM instances at EL2
-> 
->   Introduce a global table (and lock) to track pKVM instances at EL2, and
->   provide hypercalls that can be used by the untrusted host to create and
->   destroy pKVM VMs.  pKVM VM/vCPU state is directly accessible only by the
->   trusted hypervisor (EL2).  
-> 
->   Each pKVM VM is directly associated with an untrusted host KVM instance,
->   and is referenced by the host using an opaque handle.  Future patches will
->   provide hypercalls to allow the host to initialize/set/get pKVM VM/vCPU
->   state using the opaque handle.
+In hvs_channel_readable(), hv_get_bytes_to_read() returns the total=20
+bytes of 0, 1 or multiple Hyper-V vsock packets: each packet has a
+24-byte header (see HVS_HEADER_LEN), the payload, some padding
+bytes (if the payload length is not a multiple of 8), and 8 trailing
+useless bytes.
 
-Thanks, that's much better. I'll have to summon up the energy to go through
-the others as well...
+It's hard to get the total payload length because there is no API in
+include/linux/hyperv.h, drivers/hv/channel.c and=20
+drivers/hv/ring_buffer.c that allows us to peek at the data in the
+VMBus channel's ringbuffer.=20
 
-> > Perhaps we should s/shadow/hyp/ to make this a little clearer?
-> 
-> Or maybe just "pkvm"?
+We could add such a "peek" API in drivers/hv/channel.c (see the
+non-peek version of the APIs in hvs_stream_dequeue():=20
+hv_pkt_iter_first() and hv_pkt_iter_next()), and examine the whole
+ringbuffe to figure out the exact total payload length, but I feel it may=20
+not be worth the non-trivial complexity just to be POSIX-compliant --
+nobody ever complained about this for the past 5 years :-) So I'm
+wondering if we should allow Hyper-V vsock to not support the=20
+set_rcvlowat op?
 
-I think the "hyp" part is useful to distinguish the pkvm code running at EL2
-from the pkvm code running at EL1. For example, we have a 'pkvm' member in
-'struct kvm_arch' which is used by the _host_ at EL1.
+Thanks,
+-- Dexuan
 
-So I'd say either "pkvm_hyp" or "hyp" instead of "shadow". The latter is
-nice and short...
-
-> I think that's especially viable if you do away with
-> kvm_shadow_vcpu_state.  As of this series at least, kvm_shadow_vcpu_state is
-> completely unnecessary.  kvm_vcpu.kvm can be used to get at the VM, and thus pKVM
-> state via container_of().  Then the host_vcpu can be retrieved by using the
-> vcpu_idx, e.g.
-> 
-> 	struct pkvm_vm *pkvm_vm = to_pkvm_vm(pkvm_vcpu->vm);
-> 	struct kvm_vcpu *host_vcpu;
-> 
-> 	host_vcpu = kvm_get_vcpu(pkvm_vm->host_vm, pkvm_vcpu->vcpu_idx);
-
-Using container_of() here is neat; we can definitely go ahead with that
-change. However, looking at this in more detail with Fuad, removing
-'struct kvm_shadow_vcpu_state' entirely isn't going to work:
-
-> E.g. I believe you can make the code look like this:
-> 
-> struct kvm_arch {
-> 	...
-> 
-> 	/*
-> 	 * For an unstructed host VM, pkvm_handle is used to lookup the
-> 	 * associated pKVM instance.
-> 	 */
-> 	pvk_handle_t pkvm_handle;
-> };
-> 
-> struct pkvm_vm {
-> 	struct kvm kvm;
-> 
-> 	/* Backpointer to the host's (untrusted) KVM instance. */
-> 	struct kvm *host_kvm;
-> 
-> 	size_t donated_memory_size;
-> 
-> 	struct kvm_pgtable pgt;
-> };
-> 
-> static struct kvm *pkvm_get_vm(pkvm_handle_t handle)
-> {
-> 	unsigned int idx = pkvm_handle_to_idx(handle);
-> 
-> 	if (unlikely(idx >= KVM_MAX_PVMS))
-> 		return NULL;
-> 
-> 	return pkvm_vm_table[idx];
-> }
-> 
-> struct kvm_vcpu *pkvm_vcpu_load(pkvm_handle_t handle, unsigned int vcpu_idx)
-> {
-> 	struct kvm_vpcu *pkvm_vcpu = NULL;
-> 	struct kvm *vm;
-> 
-> 	hyp_spin_lock(&pkvm_global_lock);
-> 	vm = pkvm_get_vm(handle);
-> 	if (!vm || atomic_read(&vm->online_vcpus) <= vcpu_idx)
-> 		goto unlock;
-> 
-> 	pkvm_vcpu = kvm_get_vcpu(vm, vcpu_idx);
-
-kvm_get_vcpu() makes use of an xarray to hold the vCPUs pointers and this is
-really something which we cannot support at EL2 where, amongst other things,
-we do not have support for RCU. Consequently, we do need to keep our own
-mapping from the shad^H^H^H^Hhyp vCPU to the host vCPU.
-
-We also end up expanding the 'struct kvm_shadow_vcpu_state' structure later
-to track additional vCPU state in the hypervisor, for example in the
-mega-series:
-
-https://lore.kernel.org/kvmarm/20220519134204.5379-78-will@kernel.org/#Z31arch:arm64:kvm:hyp:include:nvhe:pkvm.h
-
-Cheers,
-
-Will
