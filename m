@@ -2,55 +2,55 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id E8EE457AB07
-	for <lists+kvm@lfdr.de>; Wed, 20 Jul 2022 02:37:57 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 0633A57AB09
+	for <lists+kvm@lfdr.de>; Wed, 20 Jul 2022 02:39:33 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237685AbiGTAhz (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 19 Jul 2022 20:37:55 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36764 "EHLO
+        id S237896AbiGTAj3 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 19 Jul 2022 20:39:29 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37610 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232412AbiGTAhy (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 19 Jul 2022 20:37:54 -0400
-Received: from mail-wr1-x433.google.com (mail-wr1-x433.google.com [IPv6:2a00:1450:4864:20::433])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BB80F4E63B
-        for <kvm@vger.kernel.org>; Tue, 19 Jul 2022 17:37:53 -0700 (PDT)
-Received: by mail-wr1-x433.google.com with SMTP id u5so887169wrm.4
-        for <kvm@vger.kernel.org>; Tue, 19 Jul 2022 17:37:53 -0700 (PDT)
+        with ESMTP id S234312AbiGTAj1 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 19 Jul 2022 20:39:27 -0400
+Received: from mail-wr1-x436.google.com (mail-wr1-x436.google.com [IPv6:2a00:1450:4864:20::436])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 200094F647
+        for <kvm@vger.kernel.org>; Tue, 19 Jul 2022 17:39:26 -0700 (PDT)
+Received: by mail-wr1-x436.google.com with SMTP id u5so890484wrm.4
+        for <kvm@vger.kernel.org>; Tue, 19 Jul 2022 17:39:26 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
         h=mime-version:references:in-reply-to:from:date:message-id:subject:to
          :cc;
-        bh=hgH1tvYEEyqwJwI8paE3cVCRS3k0UqWKM/aSARN/AlY=;
-        b=IHQFVbJ2j/kFQMtawDxdtL48gU6cv5afOPcRO0W2ZDG5pvEKlX77+broRNagpeQ7La
-         tEchT3E2a3zgqhdunNjx6KwUOvtdxW8bl0mjfc6+tOu7AVrxNqxjdEh9NtQhroPxNp3X
-         173CTmYSLmwd7ZQNwaE7taU8Dj+FSIIn3iblCA0qS0tT3j9XER/csO/qwIcwD+YcpLqJ
-         xv/XM84JfIBzAYedh7zwIdilNxafsYZBB+FEJ7+7nuw6BUWTbcfsXjtbzsD8qRpNrOmW
-         ziNSJcC0KK+eZ4UPpHocVz7n+90suqMa6Cbovi1DzSEf26qGg7hz0ELGrC/eLL16/7YQ
-         Xcpw==
+        bh=kCCNsqvKf+swu9cU+kMO+BvpcV+KmN7njx2itJKwxsE=;
+        b=PwGVkB1OBitQ9l/Sccgdw4R8+vOV9bQ8umxDZTG2CKoRm3az63O/5ZgjYFyBeYTxT5
+         6Mqif0eVEUXP/vZFhbcGWOzcaEXgIopjahx1Dw/v2p9KnMefMyGbJzriXWdRxXYvaS4K
+         kH4k/vk2MJWhfAiuWySUG6XMYYGevdT1hMST+0WK8TqJrlUBeUfTylJAknyOp9c2JYwg
+         3HrZP3Vbbl5dppn30nhRFLyblJY3Z6bQXZxiGDMEN2jYH2dG1IBt+RTegprOnlknYnNw
+         bQ0QHzuSs4UMvatGfJuXo9wSt+uTVEvHyj9tUEovRgv/bt6+KRGo/EGzxcTEYovrraPX
+         cNsQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:mime-version:references:in-reply-to:from:date
          :message-id:subject:to:cc;
-        bh=hgH1tvYEEyqwJwI8paE3cVCRS3k0UqWKM/aSARN/AlY=;
-        b=XYhKIFwX51uwDumM0SzsxVzko54+1kHcqJ9blYXP0XSH6yoCDPhBMWc7UYVzHj5+LN
-         7VQQ0i34MU4CmuJ1Zmham4zjn3n0JKxM9JHKxhAIPI1grhdVr2gHD2MXr+9stkV8FpCS
-         6l5jD0a5PkiMZtj14yoe5fQqhLJ8Vbnlto8AW7k0brzucQaoSTkRq3zkteVLejU+O0a5
-         H+AVZ6BH56xP8m06qR3SeI2mCVwkgOgNZrzNa8kfR4oWkPZSeeGHXXUHtIw5DLk3vgop
-         f9yRg+aImIvFVivy5RrP3n8xfkWcupucFnEE0CWRGO5l3/jV+8EJd7rH9gmKEyRdVYmO
-         f/NQ==
-X-Gm-Message-State: AJIora/8Vl2Oa8sxdrVstPwF6egY/qhJzmO1c50CDZu3uIKAOEhvJN+D
-        asnciyoMZ7Kx32OxwhFS1maAPIAVaDlsd9iKIrR1Sw==
-X-Google-Smtp-Source: AGRyM1vBIk0Bn9MU6iede+X74KkkMjq/dsZs7yta7t6pINmUxXjkocvZi/cehVzzSEMz5IxQGmQxmEM1tG8297o+viA=
-X-Received: by 2002:a5d:4d8e:0:b0:21d:68d4:56eb with SMTP id
- b14-20020a5d4d8e000000b0021d68d456ebmr27742751wru.40.1658277472130; Tue, 19
- Jul 2022 17:37:52 -0700 (PDT)
+        bh=kCCNsqvKf+swu9cU+kMO+BvpcV+KmN7njx2itJKwxsE=;
+        b=wXXc5gLcW4/SQplpHqfD+5WCSoQjafHJl94OsgBfhV6B8kMg7oqMoaKdO/HFQxqanK
+         kMcwBHDgnyFu/nVNf35Ekh3wxE748L/jpQV833DO44Fv5C/FtDcMFbVbprMxNDvwKQb0
+         xG1JOwK1nyELTJFAhujZVkVuTe9Da/vKoVGymHrzZATqhXmlyWvyEN2Le82QFk/eeg92
+         76kamTkR9d052mjTRKXXI03L9WE1rLJoSq7UI52i94/00MZhHONyfH4Fa0l09za/wX2A
+         fbiBsWO8r5pFi5dRaqFjJyep/XfPFdrSKSLEP7y7A96m8klLvJZy0FJIbaTYIXfaxL/V
+         7JIA==
+X-Gm-Message-State: AJIora9x0FmitOmwjl5XWlLtKYoCmXrbyaGM+NfO5EQDb1KkT+h8W9Zk
+        ZH68MlGNPNnjqnucbn1d0B+uyFvYxdbwTDP5kIqNYA==
+X-Google-Smtp-Source: AGRyM1vz3786oon6hZyydXOyOq8KcZZutBQMJxbZa+UHCbxAKJUDy4KYnLFkMeYBCBsoj848NvxOtM7G003ZnLeQX9E=
+X-Received: by 2002:a05:6000:1a8e:b0:21d:a7a8:54f4 with SMTP id
+ f14-20020a0560001a8e00b0021da7a854f4mr29347169wry.654.1658277564483; Tue, 19
+ Jul 2022 17:39:24 -0700 (PDT)
 MIME-Version: 1.0
-References: <20220711093218.10967-1-adrian.hunter@intel.com> <20220711093218.10967-15-adrian.hunter@intel.com>
-In-Reply-To: <20220711093218.10967-15-adrian.hunter@intel.com>
+References: <20220711093218.10967-1-adrian.hunter@intel.com> <20220711093218.10967-16-adrian.hunter@intel.com>
+In-Reply-To: <20220711093218.10967-16-adrian.hunter@intel.com>
 From:   Ian Rogers <irogers@google.com>
-Date:   Tue, 19 Jul 2022 17:37:40 -0700
-Message-ID: <CAP-5=fW2UaXJbDB7_YMWCQBEzJLVyBCOCx=tQv-0Ku-iyf-=+A@mail.gmail.com>
-Subject: Re: [PATCH 14/35] perf tools: Use sample->machine_pid to find guest machine
+Date:   Tue, 19 Jul 2022 17:39:12 -0700
+Message-ID: <CAP-5=fVC0Vx+NWLW1NE4PuKLn0XHBG2MZhnTfLPZxhqE1To3jA@mail.gmail.com>
+Subject: Re: [PATCH 15/35] perf script: Add machine_pid and vcpu
 To:     Adrian Hunter <adrian.hunter@intel.com>
 Cc:     Arnaldo Carvalho de Melo <acme@kernel.org>,
         Jiri Olsa <jolsa@redhat.com>,
@@ -71,34 +71,82 @@ X-Mailing-List: kvm@vger.kernel.org
 
 On Mon, Jul 11, 2022 at 2:33 AM Adrian Hunter <adrian.hunter@intel.com> wrote:
 >
-> If machine_pid is set, use it to find the guest machine.
+> Add fields machine_pid and vcpu. These are displayed only if machine_pid is
+> non-zero.
 >
 > Signed-off-by: Adrian Hunter <adrian.hunter@intel.com>
+> ---
+>  tools/perf/Documentation/perf-script.txt |  7 ++++++-
+>  tools/perf/builtin-script.c              | 11 +++++++++++
+>  2 files changed, 17 insertions(+), 1 deletion(-)
+>
+> diff --git a/tools/perf/Documentation/perf-script.txt b/tools/perf/Documentation/perf-script.txt
+> index e250ff5566cf..c09cc44e50ee 100644
+> --- a/tools/perf/Documentation/perf-script.txt
+> +++ b/tools/perf/Documentation/perf-script.txt
+> @@ -133,7 +133,8 @@ OPTIONS
+>          comm, tid, pid, time, cpu, event, trace, ip, sym, dso, addr, symoff,
+>          srcline, period, iregs, uregs, brstack, brstacksym, flags, bpf-output,
+>          brstackinsn, brstackinsnlen, brstackoff, callindent, insn, insnlen, synth,
+> -        phys_addr, metric, misc, srccode, ipc, data_page_size, code_page_size, ins_lat.
+> +        phys_addr, metric, misc, srccode, ipc, data_page_size, code_page_size, ins_lat,
+> +        machine_pid, vcpu.
+>          Field list can be prepended with the type, trace, sw or hw,
+>          to indicate to which event type the field list applies.
+>          e.g., -F sw:comm,tid,time,ip,sym  and -F trace:time,cpu,trace
+> @@ -226,6 +227,10 @@ OPTIONS
+>         The ipc (instructions per cycle) field is synthesized and may have a value when
+>         Instruction Trace decoding.
+>
+> +       The machine_pid and vcpu fields are derived from data resulting from using
+> +       perf insert to insert a perf.data file recorded inside a virtual machine into
 
-Acked-by: Ian Rogers <irogers@google.com>
+Presumably 'perf inject' ?
 
 Thanks,
 Ian
 
-> ---
->  tools/perf/util/session.c | 4 +++-
->  1 file changed, 3 insertions(+), 1 deletion(-)
+> +       a perf.data file recorded on the host at the same time.
+> +
+>         Finally, a user may not set fields to none for all event types.
+>         i.e., -F "" is not allowed.
 >
-> diff --git a/tools/perf/util/session.c b/tools/perf/util/session.c
-> index 91a091c35945..f3e9fa557bc9 100644
-> --- a/tools/perf/util/session.c
-> +++ b/tools/perf/util/session.c
-> @@ -1418,7 +1418,9 @@ static struct machine *machines__find_for_cpumode(struct machines *machines,
->              (sample->cpumode == PERF_RECORD_MISC_GUEST_USER))) {
->                 u32 pid;
+> diff --git a/tools/perf/builtin-script.c b/tools/perf/builtin-script.c
+> index 4b00a50faf00..ac19fee62d8e 100644
+> --- a/tools/perf/builtin-script.c
+> +++ b/tools/perf/builtin-script.c
+> @@ -125,6 +125,8 @@ enum perf_output_field {
+>         PERF_OUTPUT_CODE_PAGE_SIZE  = 1ULL << 34,
+>         PERF_OUTPUT_INS_LAT         = 1ULL << 35,
+>         PERF_OUTPUT_BRSTACKINSNLEN  = 1ULL << 36,
+> +       PERF_OUTPUT_MACHINE_PID     = 1ULL << 37,
+> +       PERF_OUTPUT_VCPU            = 1ULL << 38,
+>  };
 >
-> -               if (event->header.type == PERF_RECORD_MMAP
-> +               if (sample->machine_pid)
-> +                       pid = sample->machine_pid;
-> +               else if (event->header.type == PERF_RECORD_MMAP
->                     || event->header.type == PERF_RECORD_MMAP2)
->                         pid = event->mmap.pid;
->                 else
+>  struct perf_script {
+> @@ -193,6 +195,8 @@ struct output_option {
+>         {.str = "code_page_size", .field = PERF_OUTPUT_CODE_PAGE_SIZE},
+>         {.str = "ins_lat", .field = PERF_OUTPUT_INS_LAT},
+>         {.str = "brstackinsnlen", .field = PERF_OUTPUT_BRSTACKINSNLEN},
+> +       {.str = "machine_pid", .field = PERF_OUTPUT_MACHINE_PID},
+> +       {.str = "vcpu", .field = PERF_OUTPUT_VCPU},
+>  };
+>
+>  enum {
+> @@ -746,6 +750,13 @@ static int perf_sample__fprintf_start(struct perf_script *script,
+>         int printed = 0;
+>         char tstr[128];
+>
+> +       if (PRINT_FIELD(MACHINE_PID) && sample->machine_pid)
+> +               printed += fprintf(fp, "VM:%5d ", sample->machine_pid);
+> +
+> +       /* Print VCPU only for guest events i.e. with machine_pid */
+> +       if (PRINT_FIELD(VCPU) && sample->machine_pid)
+> +               printed += fprintf(fp, "VCPU:%03d ", sample->vcpu);
+> +
+>         if (PRINT_FIELD(COMM)) {
+>                 const char *comm = thread ? thread__comm_str(thread) : ":-1";
+>
 > --
 > 2.25.1
 >
