@@ -2,55 +2,56 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id EEAEB57AB1B
-	for <lists+kvm@lfdr.de>; Wed, 20 Jul 2022 02:46:04 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 3934057AB20
+	for <lists+kvm@lfdr.de>; Wed, 20 Jul 2022 02:49:47 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238691AbiGTAqA (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 19 Jul 2022 20:46:00 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43888 "EHLO
+        id S238820AbiGTAtU (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 19 Jul 2022 20:49:20 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45148 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232281AbiGTAp6 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 19 Jul 2022 20:45:58 -0400
+        with ESMTP id S230190AbiGTAtR (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 19 Jul 2022 20:49:17 -0400
 Received: from mail-wr1-x42a.google.com (mail-wr1-x42a.google.com [IPv6:2a00:1450:4864:20::42a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 60C2411A01
-        for <kvm@vger.kernel.org>; Tue, 19 Jul 2022 17:45:57 -0700 (PDT)
-Received: by mail-wr1-x42a.google.com with SMTP id z13so4380806wro.13
-        for <kvm@vger.kernel.org>; Tue, 19 Jul 2022 17:45:57 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8660A50078
+        for <kvm@vger.kernel.org>; Tue, 19 Jul 2022 17:49:16 -0700 (PDT)
+Received: by mail-wr1-x42a.google.com with SMTP id z13so4387632wro.13
+        for <kvm@vger.kernel.org>; Tue, 19 Jul 2022 17:49:16 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
         h=mime-version:references:in-reply-to:from:date:message-id:subject:to
          :cc;
-        bh=SWZJK2a5FJh+xqduxqkQ1AlPGmtOJw7B0YsiYXOcGsI=;
-        b=cOEZSVjegdW48/U7AZLjKSVgGWSSjYZnjyDVDRodY8XwtrM2QXLzcrOuPuRmPyYNo/
-         F3KRB5LuDcCZrCr+G+Ixeo7CcUcHaoROjCDRDt+HbjiRiJjgg0eAkxaU39GT0vFbv4Uz
-         rkqaHboeVKcnylk0sUDOVF3yRS9YB1vItukhkJAFLhEwvuCoav7jVhqF6IH00wDfnYrF
-         gz56e1UYTawqsAuICghNM/CtfYqWoVl7LW+t8JCFOU3arQHLUUzWeCwOU4BYJOvzqxrI
-         nV8QfIajB5GfSLhQPWdaISdDi8pRoYdKYy5vgGsKPZ+ix3+hoiP5mJykf1aZVNyIVM9F
-         L0Zg==
+        bh=CCHJ8TobgNF0fvOIJkxeBTzsYQrtkNxAc5kDWAR8KfI=;
+        b=SxO1jUvGIpBRy5VdJnJT8+R8tvYeHZtqL9UrjN4GE6cgDwkdyy9FiLJ/jweKfvR86f
+         oNLbVdYrlTK8G1Lw9DMg1SrVgExD9D4qMhlmRPXGwQd3xy24g9N84Ob1cEpZ5Aqr0SD5
+         vxAWeMIKYPi+Jvun68SZE+XtIbq0NYkHHqHS2bdIX8O8Xlz65TLFPcsIaDTbJY3zgOjH
+         PPkpT0caHTMtlAh+GdeVZBvJ9WBMVOTm8oJB4ZIracc3O2ZgNGF8DiF0CDXzEzaxOMGh
+         zXVl/W1kbl3MFaVHsB8dZc11gnCF2VNTRhCenJsqJHvoNC3kESiWNH/S0uywLctBs3En
+         zJJw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:mime-version:references:in-reply-to:from:date
          :message-id:subject:to:cc;
-        bh=SWZJK2a5FJh+xqduxqkQ1AlPGmtOJw7B0YsiYXOcGsI=;
-        b=bHBT8pvBtSq1l2nlJNTMw4YafDRQPmOLp7LWvHVE9EJJny3vlXF15q35YIpK6hslb1
-         bzrfuqoctwKm6OCyNSZ+mcqW2t+1y0gySVCmlyEyQVivcMgRZnd5NSO1UFtqoXWjvsBA
-         ggygOP1B1oItSE9/IowfMyu7ksvey874qEEcVn3a1FfSLRw47L+SPG9lqK2Di1v1yyO3
-         7AiGmfQsw0RkYpBEVl5fOWVemPfk8SH0xSlDWzy6Fbvocb7BICLQR58ZVGhxVbdd/Ymk
-         T2ETaEauH9NH4n4LhaS1XWFdIcK9j+1pPO9PHlA8aQpLBWEW0GxorZr76eYWupLyaCDl
-         X4Cg==
-X-Gm-Message-State: AJIora/qIjncw/pgsKMJQtLAudg/reGQkZdFI4qi/DE1F7WpQb+nRJr7
-        SPvnNgDeuul7NiFGqN+IXJtMdodrWigNzLixANBmdg==
-X-Google-Smtp-Source: AGRyM1siLdcEH5H28bgj9+GPN5eKcSWM+TGOD/Dqvbiymn7mcnaRTyzL/DiTnB9FVhk/GJHB73BOgO2Qy2IISVtTzSQ=
-X-Received: by 2002:a05:6000:1a8e:b0:21d:a7a8:54f4 with SMTP id
- f14-20020a0560001a8e00b0021da7a854f4mr29360494wry.654.1658277955696; Tue, 19
- Jul 2022 17:45:55 -0700 (PDT)
+        bh=CCHJ8TobgNF0fvOIJkxeBTzsYQrtkNxAc5kDWAR8KfI=;
+        b=c1ujhr937xQyUSJTMqhcZXywjlq94paNRFvNQV+iz75l9yGvhXtqrzLBAlhotfnq3p
+         Y4k+C2MkbrEQfTK/VLdyweXpA+dl8VTyCTzzBZ3RMt+vp90vn+Zi+ePv0au/AWkebEJL
+         DUoZBnxgIHgB3tkA1EWymaHjLCpNfudK9+CiP2b7XmDYzK+f6kgKLKAVdz0ihoyx1xi/
+         g6MidMyLaqaopDLpy5/1eSHs3VeAarfEip0oM+icbQBFNsPHhDzoTULfonId5VEUvXJE
+         GCyJfP0iBh4O1TGXpjyZI30oBkmsVPxTkMH6QZ8or3mEEVla6GOvYV8hxhmvOW5pdla1
+         mQhQ==
+X-Gm-Message-State: AJIora8sfvPz4936RoyAly//PWA3DgfCCts0gth1IXDqxO1TqDig2T51
+        GVAG4oQ3CPqmFCJrNVVovGfAG4GYD9sJEpdmSiZcSQ==
+X-Google-Smtp-Source: AGRyM1uvgh7fMymdevr4ko1E6swNPkbI4DxBgqYR2k9LfvWsS0SUhD4eMwTX2+9goi0zly+CcPFfTKxaIS7U+PffeWk=
+X-Received: by 2002:a5d:6a4c:0:b0:21e:46d4:6eec with SMTP id
+ t12-20020a5d6a4c000000b0021e46d46eecmr1642570wrw.375.1658278155003; Tue, 19
+ Jul 2022 17:49:15 -0700 (PDT)
 MIME-Version: 1.0
-References: <20220711093218.10967-1-adrian.hunter@intel.com> <20220711093218.10967-21-adrian.hunter@intel.com>
-In-Reply-To: <20220711093218.10967-21-adrian.hunter@intel.com>
+References: <20220711093218.10967-1-adrian.hunter@intel.com> <20220711093218.10967-22-adrian.hunter@intel.com>
+In-Reply-To: <20220711093218.10967-22-adrian.hunter@intel.com>
 From:   Ian Rogers <irogers@google.com>
-Date:   Tue, 19 Jul 2022 17:45:43 -0700
-Message-ID: <CAP-5=fXya0idvwme2KTzVkFWkANx-n-r03gV-p+JK3KvRYerag@mail.gmail.com>
-Subject: Re: [PATCH 20/35] perf tools: Remove also guest kcore_dir with host kcore_dir
+Date:   Tue, 19 Jul 2022 17:49:03 -0700
+Message-ID: <CAP-5=fUKkR_coQQX-pce41OYCG4BuLxmidduXy53XKX4Jy+67g@mail.gmail.com>
+Subject: Re: [PATCH 21/35] perf tools: Make has_kcore_dir() work also for
+ guest kcore_dir
 To:     Adrian Hunter <adrian.hunter@intel.com>
 Cc:     Arnaldo Carvalho de Melo <acme@kernel.org>,
         Jiri Olsa <jolsa@redhat.com>,
@@ -74,8 +75,8 @@ On Mon, Jul 11, 2022 at 2:33 AM Adrian Hunter <adrian.hunter@intel.com> wrote:
 > Copies of /proc/kallsyms, /proc/modules and an extract of /proc/kcore can
 > be stored in the perf.data output directory under the subdirectory named
 > kcore_dir. Guest machines will have their files also under subdirectories
-> beginning kcore_dir__ followed by the machine pid. Remove these also when
-> removing kcore_dir.
+> beginning kcore_dir__ followed by the machine pid. Make has_kcore_dir()
+> return true also if there is a guest machine kcore_dir.
 >
 > Signed-off-by: Adrian Hunter <adrian.hunter@intel.com>
 
@@ -85,68 +86,52 @@ Thanks,
 Ian
 
 > ---
->  tools/perf/util/util.c | 37 +++++++++++++++++++++++++++++++++++--
->  1 file changed, 35 insertions(+), 2 deletions(-)
+>  tools/perf/util/data.c | 24 +++++++++++++++---------
+>  1 file changed, 15 insertions(+), 9 deletions(-)
 >
-> diff --git a/tools/perf/util/util.c b/tools/perf/util/util.c
-> index eeb83c80f458..9b02edf9311d 100644
-> --- a/tools/perf/util/util.c
-> +++ b/tools/perf/util/util.c
-> @@ -200,7 +200,7 @@ static int rm_rf_depth_pat(const char *path, int depth, const char **pat)
->         return rmdir(path);
->  }
+> diff --git a/tools/perf/util/data.c b/tools/perf/util/data.c
+> index caabeac24c69..9782ccbe595d 100644
+> --- a/tools/perf/util/data.c
+> +++ b/tools/perf/util/data.c
+> @@ -3,6 +3,7 @@
+>  #include <linux/kernel.h>
+>  #include <linux/string.h>
+>  #include <linux/zalloc.h>
+> +#include <linux/err.h>
+>  #include <sys/types.h>
+>  #include <sys/stat.h>
+>  #include <errno.h>
+> @@ -481,16 +482,21 @@ int perf_data__make_kcore_dir(struct perf_data *data, char *buf, size_t buf_sz)
 >
-> -static int rm_rf_kcore_dir(const char *path)
-> +static int rm_rf_a_kcore_dir(const char *path, const char *name)
+>  bool has_kcore_dir(const char *path)
 >  {
->         char kcore_dir_path[PATH_MAX];
->         const char *pat[] = {
-> @@ -210,11 +210,44 @@ static int rm_rf_kcore_dir(const char *path)
->                 NULL,
->         };
->
-> -       snprintf(kcore_dir_path, sizeof(kcore_dir_path), "%s/kcore_dir", path);
-> +       snprintf(kcore_dir_path, sizeof(kcore_dir_path), "%s/%s", path, name);
->
->         return rm_rf_depth_pat(kcore_dir_path, 0, pat);
->  }
->
-> +static bool kcore_dir_filter(const char *name __maybe_unused, struct dirent *d)
-> +{
-> +       const char *pat[] = {
-> +               "kcore_dir",
-> +               "kcore_dir__[1-9]*",
-> +               NULL,
-> +       };
+> -       char *kcore_dir;
+> -       int ret;
+> -
+> -       if (asprintf(&kcore_dir, "%s/kcore_dir", path) < 0)
+> -               return false;
+> -
+> -       ret = access(kcore_dir, F_OK);
+> +       struct dirent *d = ERR_PTR(-EINVAL);
+> +       const char *name = "kcore_dir";
+> +       DIR *dir = opendir(path);
+> +       size_t n = strlen(name);
+> +       bool result = false;
 > +
-> +       return match_pat(d->d_name, pat);
-> +}
-> +
-> +static int rm_rf_kcore_dir(const char *path)
-> +{
-> +       struct strlist *kcore_dirs;
-> +       struct str_node *nd;
-> +       int ret;
-> +
-> +       kcore_dirs = lsdir(path, kcore_dir_filter);
-> +
-> +       if (!kcore_dirs)
-> +               return 0;
-> +
-> +       strlist__for_each_entry(nd, kcore_dirs) {
-> +               ret = rm_rf_a_kcore_dir(path, nd->s);
-> +               if (ret)
-> +                       return ret;
+> +       if (dir) {
+> +               while (d && !result) {
+> +                       d = readdir(dir);
+> +                       result = d ? strncmp(d->d_name, name, n) : false;
+> +               }
+> +               closedir(dir);
 > +       }
-> +
-> +       strlist__delete(kcore_dirs);
-> +
-> +       return 0;
-> +}
-> +
->  int rm_rf_perf_data(const char *path)
->  {
->         const char *pat[] = {
+>
+> -       free(kcore_dir);
+> -       return !ret;
+> +       return result;
+>  }
+>
+>  char *perf_data__kallsyms_name(struct perf_data *data)
 > --
 > 2.25.1
 >
