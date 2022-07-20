@@ -2,168 +2,159 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id F043157BC8E
-	for <lists+kvm@lfdr.de>; Wed, 20 Jul 2022 19:24:54 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 282C457BC9C
+	for <lists+kvm@lfdr.de>; Wed, 20 Jul 2022 19:27:30 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231860AbiGTRYv (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 20 Jul 2022 13:24:51 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50360 "EHLO
+        id S234679AbiGTR1Z (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 20 Jul 2022 13:27:25 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53136 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229661AbiGTRYu (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 20 Jul 2022 13:24:50 -0400
-Received: from mx0a-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 33C3462489
-        for <kvm@vger.kernel.org>; Wed, 20 Jul 2022 10:24:49 -0700 (PDT)
-Received: from pps.filterd (m0098419.ppops.net [127.0.0.1])
-        by mx0b-001b2d01.pphosted.com (8.17.1.5/8.17.1.5) with ESMTP id 26KHDgu4022475;
-        Wed, 20 Jul 2022 17:24:43 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
- mime-version : subject : to : cc : references : from : in-reply-to :
- content-type : content-transfer-encoding; s=pp1;
- bh=GFPuIJ6wjwzVjF+xgJnE1mUjlOx7qoUJqh0Ipd6wiKI=;
- b=qhKuaHMBEvnvqyFVxOSEShZCcpi8RIWTLnObjfGDWikG3NxgFGbNHFB6+IYqezOSMx5r
- NvmVOCEHgBJryn/Hycan85cw1wUQXuq0LcEQUww8mg4CG3jwHSiqNk/xTZhbHHE5txUn
- 1DzF2nNqArG5N6gPkuwufdYeqEEq7pYNBYBKJtpThzpqUBb+9Bee4eu0sqdncwv88UMM
- uyVykpx58IFSsOJQvZ4qc9ksBKcPYlynQHoz+gIPWMUma77qIKtLBYX5XTEikDSTGaCe
- DykPunsEC4/vbR8Cu1nbq9pBjXNVralX1cfG/jtkn5i5YHGQDm7+nF0gYyeR+XDnfIRS dQ== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0b-001b2d01.pphosted.com (PPS) with ESMTPS id 3henwxr9pf-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Wed, 20 Jul 2022 17:24:43 +0000
-Received: from m0098419.ppops.net (m0098419.ppops.net [127.0.0.1])
-        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 26KHE1Gw023680;
-        Wed, 20 Jul 2022 17:24:43 GMT
-Received: from ppma06ams.nl.ibm.com (66.31.33a9.ip4.static.sl-reverse.com [169.51.49.102])
-        by mx0b-001b2d01.pphosted.com (PPS) with ESMTPS id 3henwxr9ny-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Wed, 20 Jul 2022 17:24:42 +0000
-Received: from pps.filterd (ppma06ams.nl.ibm.com [127.0.0.1])
-        by ppma06ams.nl.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 26KHNovd028246;
-        Wed, 20 Jul 2022 17:24:41 GMT
-Received: from b06cxnps3074.portsmouth.uk.ibm.com (d06relay09.portsmouth.uk.ibm.com [9.149.109.194])
-        by ppma06ams.nl.ibm.com with ESMTP id 3hbmkj5w62-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Wed, 20 Jul 2022 17:24:41 +0000
-Received: from d06av25.portsmouth.uk.ibm.com (d06av25.portsmouth.uk.ibm.com [9.149.105.61])
-        by b06cxnps3074.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 26KHObFc19726694
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Wed, 20 Jul 2022 17:24:37 GMT
-Received: from d06av25.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id AF6A111C050;
-        Wed, 20 Jul 2022 17:24:37 +0000 (GMT)
-Received: from d06av25.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 095A611C04A;
-        Wed, 20 Jul 2022 17:24:36 +0000 (GMT)
-Received: from [9.171.85.19] (unknown [9.171.85.19])
-        by d06av25.portsmouth.uk.ibm.com (Postfix) with ESMTP;
-        Wed, 20 Jul 2022 17:24:34 +0000 (GMT)
-Message-ID: <e497396a-eadf-15ae-e11c-d6a2bbbff7c7@linux.ibm.com>
-Date:   Wed, 20 Jul 2022 19:24:34 +0200
+        with ESMTP id S229690AbiGTR1X (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 20 Jul 2022 13:27:23 -0400
+Received: from NAM10-DM6-obe.outbound.protection.outlook.com (mail-dm6nam10on2075.outbound.protection.outlook.com [40.107.93.75])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BA6082DF4;
+        Wed, 20 Jul 2022 10:27:22 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=PUZ6lfOtJKS+yR21Z87jpilGCzB9mGRvWmN89FyZdKyNAigUV7HuM/pywG8xqRyWoEJ4sGqiaDKyvj2FLOYwDLf6LMSMe6en1jYAxZUHDrn4RoYNzhRLeBq9abdNz5um6xomHVKNXDNX47p2V8l3SybBbbJ0ljfRkrRJ3mswj+snQvF4BZ9DISAhDEpUQriytfO+a6sxXz/Xz15wtosLSrYwxMYanY2szJ71+LIJGOMwrQb2WgtwsRsPq7wi1Soy2B8/Ua0pTPmbwvRgcN38UpODexhYAOF1Gfti2ZDZbAQwtSUO0qbI+jRcyuBh6qEZu9mxMcp+x8Tpbkc5OSuJiA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=bzAgrgkznJt1kJ8Sz1TgUxul5AfZdqsxUollvAGga0c=;
+ b=VbRKB4W3xjCVqKZy/PvpL+kCi63yYkcqW5GECmSXXW4+427+p++8o0yCrYI36//DBOozKx4WX95jIT+CHu/noQsiGj556+ee6qxQ3UAtc2u3RQdtHP2fjPydpBe29AzYqCeukA6Zq2Pzz4zGrLyMxBqnJOnWXVXQnApPGEbxjzngidsd3XWlLkfOzj/fpHPuaQtN8Xm2TCpvLS1abytrjW2+y4z9u5uIMEQvQ+/aCGAIV1JhdwZ+B45K+IDU5OAYtdGf67pbs8hjPNO8lrL0Ifvn8QAaHILGCd7lq6qoKipYj+FUpH+4B9HXW6d5tCD6VyoIRbEL7Uinh+uITfLeTg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
+ dkim=pass header.d=nvidia.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=bzAgrgkznJt1kJ8Sz1TgUxul5AfZdqsxUollvAGga0c=;
+ b=Mzk76ed4pVF0YX0CoSZ8J963nRqLrsa2oq2sq/2v23cOCgPe1pv8CDAwPQ3agGhBBaz8tGhIgD3w9Q3seXm+OkWdTQrOUmK9eqhmEdFnnYrltXpJ1D4D1ET6/fdHvuKeC3wUif2EVEHLSogvp0zXIP5yeNeOMKu7FhnkYrq8xQNTSK1XToJj5aftU4V2JsS9ILJ14QOAyaQkY5ZEvle1I74zWQqtZzeAAG3Q2rDvytcDJTyrD2Zm26ZYZNTOlbkTjEEnxQtPHz0qJPThlxeVyievrKRzksFnAF00wIZauDgT41O3A/OSdm5WAUmRkZbSPCcKincP/DZxldwvYB7KcA==
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=nvidia.com;
+Received: from MN2PR12MB4192.namprd12.prod.outlook.com (2603:10b6:208:1d5::15)
+ by DM6PR12MB3257.namprd12.prod.outlook.com (2603:10b6:5:184::10) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5438.22; Wed, 20 Jul
+ 2022 17:27:20 +0000
+Received: from MN2PR12MB4192.namprd12.prod.outlook.com
+ ([fe80::ac35:7c4b:3282:abfb]) by MN2PR12MB4192.namprd12.prod.outlook.com
+ ([fe80::ac35:7c4b:3282:abfb%3]) with mapi id 15.20.5458.018; Wed, 20 Jul 2022
+ 17:27:20 +0000
+Date:   Wed, 20 Jul 2022 14:27:19 -0300
+From:   Jason Gunthorpe <jgg@nvidia.com>
+To:     Alex Williamson <alex.williamson@redhat.com>
+Cc:     Joao Martins <joao.m.martins@oracle.com>,
+        Yishai Hadas <yishaih@nvidia.com>, saeedm@nvidia.com,
+        kvm@vger.kernel.org, netdev@vger.kernel.org, kuba@kernel.org,
+        kevin.tian@intel.com, leonro@nvidia.com, maorg@nvidia.com,
+        cohuck@redhat.com
+Subject: Re: [PATCH V2 vfio 05/11] vfio: Add an IOVA bitmap support
+Message-ID: <20220720172719.GV4609@nvidia.com>
+References: <20220714081251.240584-1-yishaih@nvidia.com>
+ <20220714081251.240584-6-yishaih@nvidia.com>
+ <20220719130114.2eecbba1.alex.williamson@redhat.com>
+ <11865968-4a13-11b0-abfb-267f9adf3a95@oracle.com>
+ <20220720104725.19aadc5d.alex.williamson@redhat.com>
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20220720104725.19aadc5d.alex.williamson@redhat.com>
+X-ClientProxiedBy: MN2PR02CA0002.namprd02.prod.outlook.com
+ (2603:10b6:208:fc::15) To MN2PR12MB4192.namprd12.prod.outlook.com
+ (2603:10b6:208:1d5::15)
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.10.0
-Subject: Re: [PATCH v8 08/12] s390x/cpu_topology: implementing numa for the
- s390x topology
-Content-Language: en-US
-To:     Pierre Morel <pmorel@linux.ibm.com>, qemu-s390x@nongnu.org
-Cc:     qemu-devel@nongnu.org, borntraeger@de.ibm.com, pasic@linux.ibm.com,
-        richard.henderson@linaro.org, david@redhat.com, thuth@redhat.com,
-        cohuck@redhat.com, mst@redhat.com, pbonzini@redhat.com,
-        kvm@vger.kernel.org, ehabkost@redhat.com,
-        marcel.apfelbaum@gmail.com, eblake@redhat.com, armbru@redhat.com,
-        seiden@linux.ibm.com, nrb@linux.ibm.com, frankja@linux.ibm.com
-References: <20220620140352.39398-1-pmorel@linux.ibm.com>
- <20220620140352.39398-9-pmorel@linux.ibm.com>
- <3a821cd1-b8a0-e737-5279-8ef55e58a77f@linux.ibm.com>
- <b1e89718-232c-2b0b-2133-102ab7b4dad4@linux.ibm.com>
- <b30eb75a-5a0b-3428-b812-95a2884914e4@linux.ibm.com>
- <14afa5dc-80de-c5a2-b57d-867c692b29cf@linux.ibm.com>
-From:   Janis Schoetterl-Glausch <scgl@linux.ibm.com>
-In-Reply-To: <14afa5dc-80de-c5a2-b57d-867c692b29cf@linux.ibm.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: lzwOWa2DdlMOoeQzAGc6_LBLZRXBtN6a
-X-Proofpoint-ORIG-GUID: pAISXU3MGE_M-19vlYi_5k2Wz583TRLS
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.205,Aquarius:18.0.883,Hydra:6.0.517,FMLib:17.11.122.1
- definitions=2022-07-20_10,2022-07-20_01,2022-06-22_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501
- spamscore=0 impostorscore=0 mlxlogscore=999 phishscore=0 mlxscore=0
- malwarescore=0 adultscore=0 clxscore=1015 suspectscore=0
- lowpriorityscore=0 bulkscore=0 classifier=spam adjust=0 reason=mlx
- scancount=1 engine=8.12.0-2206140000 definitions=main-2207200070
-X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,
-        SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
+X-MS-PublicTrafficType: Email
+X-MS-Office365-Filtering-Correlation-Id: edb2bafb-bb1b-4cc7-8715-08da6a7519e3
+X-MS-TrafficTypeDiagnostic: DM6PR12MB3257:EE_
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: Qo8OwwrwflLFwFtGZ1gGk2lU+DFdaNkudFvuDNw9kDnzcGJZVddO8CABvo/uEgKxX/ewEBjTBaUqtgPQGWJeca5h5gFSNwUNZ39cYo0voLfGUuD9GtcXzQ6RrtC2/r+/G77vyJRF7MW//iYmr3WeT5OE9Uastnq4auUaVwf1MY95/tAA1W/Nuh+RqcyiIZTmojUkLI5xPn6X0EUqK2WZU2rV0p+Zo2jL5fHDHcx05yuqrumrMZPW4SpHwQP3M2/43emi6x9ocLoZ4Fi0S1HVqdJSpaUfJCsf9zOahO7/zaBauj0HVh55Zy9nE5v+cqCs1VQdYUC3UEUXaefb8Ltgdc15GCmPz7icXiq+VnagnvHObZQrqNmTfmNzJXTElKmRNFuahtNEz9CnT67irR/vS+VAl3LQtqKXF9ppmQ2NzG+ERy39ns4iCQzhybLIh9tZdgluA98C00tlbnpC0iCSX4M0I5bJ6PJ2HRaVh5aRxsOZV8qgQb59dBlcYdmx2EpGWP5FQKMntMKITSL+D1lwAEeRh/eYPMKSirS+FAvVGo2iIIrqWVWKu8m1lk4l7y3SWlVhF6K+vD6NAA/ZR15V8u1vQCnAWnIcHEBc1y6k0HnXprHPRgM4D9/RiQXMsDDFoF6AN+DTtdis2YPNSznfVUjrHOIKee+LiEaw2+F/MabROwkjZrnlHDX460zQyf2PsavGrlvTsqt4vK2fmpp2xxu5lStJN0zaaQKDpDTTQtxNVCfxsctXNV5P0L6tnoyW
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:MN2PR12MB4192.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230016)(4636009)(346002)(136003)(396003)(366004)(39860400002)(376002)(38100700002)(186003)(4326008)(2906002)(8936002)(2616005)(66476007)(33656002)(1076003)(66946007)(36756003)(54906003)(6512007)(41300700001)(86362001)(6486002)(6506007)(5660300002)(478600001)(6916009)(316002)(66556008)(26005)(8676002);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?3yYI+Xi7qZzVCkwF7Ti5P9rELmGBWvF6MTCn45Ylb0p7OX1sjXjVGETqjyqB?=
+ =?us-ascii?Q?KTBewjITJ15naLvy58kWI97a2YGo2pgo1SqVKBFlSgymwhcvpYLzMXWJZCu6?=
+ =?us-ascii?Q?sybfJjGNqgW0ayuU1h4yp9djfyV5jOYuSzvyktCziKlTYLQ7StkXy7cM0sDF?=
+ =?us-ascii?Q?h3N77L6SJZ3kWjP438OH5H8AOBA3wPvc5pRPjSlL17urmVF/CM8FUW65okLp?=
+ =?us-ascii?Q?z8QUKlsdUz1ZFGD4lAW5JIjpZupG+e3La4omnxiIUPDJ5HO4DPDVSDlktcod?=
+ =?us-ascii?Q?9lXtep9BnSFIF3WR8a6emIiqnutSdSCzrbbGh4Nb0OSSN1c7rdg8QPtZI/My?=
+ =?us-ascii?Q?noqYeCCbbiX1mZHWcK1ltd8PBnfpTef27bTer5vum8tT0HMe9zo4b2vvFkNF?=
+ =?us-ascii?Q?cYsaU+KXyWtY3E2jYfC7FmF12GF3vbl2xPgfpGbZX5H6R96fLN6Ukr7LQHWi?=
+ =?us-ascii?Q?NLXJzH2TggTtfMlEAJ86VHdnoJ9GLCvrd1SQTnUsWTG/vkGtVTxxirbekOf+?=
+ =?us-ascii?Q?X+NVBk2GspanHa4Ree/livDXKHiDBAGbGmhM7SkpKeAPApzAn+XL9i4DLKHs?=
+ =?us-ascii?Q?Y6WvYg82+A6prhorP1rIYyYPfpGFyfjdRTzQqcZ+vTDkdEcKKkKDtfFqm6wP?=
+ =?us-ascii?Q?E+fwk5i7of9TR1mUdw1WOFoFtf7myb1Xuuf/TVMqpyTxg/7zXNg9VOxhcqtS?=
+ =?us-ascii?Q?QHlM4CxPdZr+YELanPloDQP9UlP2zeR3IiZBmeS0N79bQrtSWPSPXAFnQPGi?=
+ =?us-ascii?Q?SsrWm/mIzBtoVo8bZlx84WNcDkyVVWlMxA88jm4J/0w2YiTO4cf7ULynpgC2?=
+ =?us-ascii?Q?Ep+DYZp5JqL9BccO/+ojqOs+XZ/4salNgdlZkKwLgNAkljDTKLA/9yPlShpG?=
+ =?us-ascii?Q?ycsFiIRsnD3okfMJ6SRW5PtKoxWebbKKv5fMRJ5YJ3dDL35M6grekvdipvRa?=
+ =?us-ascii?Q?3WQ7PLBw6J6nuNqz0TLLc+G2+2wqPcy0RysojFDacw8HdHbx73UUU0sKcCXn?=
+ =?us-ascii?Q?2Z59FXUohwRz8gd7WI96VxCCz1bJUfHI7e1YPWfd2VkouySMo96DJyRwqIu4?=
+ =?us-ascii?Q?YMAGQb0ZIwc3ul0CeiEMAqSQziFTJwZymQKRUPNxYsayKy8UI8ehfsvX8hXM?=
+ =?us-ascii?Q?EShrGba0FAEPjtEWeQ2sdJi58IURHGojGSEOtv8vI0OFVSEoCyDwEChesY91?=
+ =?us-ascii?Q?IWhyHQBZkQ9wcMGZLFKyOj5khn8veIxFmT1ZhXyYW3TeQQoMNU5TRO0jVs7d?=
+ =?us-ascii?Q?COWVH6BUROpEv3iAvp6jLVdKvoTE/XbCjuzd7lWqztPaNMN+MvXIxRRWS49n?=
+ =?us-ascii?Q?zkmc/P5khdfdExnD/7U8UklwSXkIJmp69Muu0oZT2Ur8Lh3crG4mta+K1Reb?=
+ =?us-ascii?Q?fARmXkMY3onOBMBfmGZcDdIf/ZyPVay7YbZq8+BcUlYKxrtx4hzMzCFDvf+6?=
+ =?us-ascii?Q?D4GJ+TsXAuar56ZaLxXllzJhtuJeUGbNnVMVPoKnh4QzQB+qxl0H/BYxiPYB?=
+ =?us-ascii?Q?ZUkVMEGHaxloynPiQrluFZWAwtKcwT9T4L6dw6UgrzV50La108D7Crtxwu7R?=
+ =?us-ascii?Q?gQ03M2yLBjCDjzLMZgZnZySxcmAiz3cR2Xefwl/9?=
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: edb2bafb-bb1b-4cc7-8715-08da6a7519e3
+X-MS-Exchange-CrossTenant-AuthSource: MN2PR12MB4192.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 20 Jul 2022 17:27:20.5812
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: aIBf4gl5VIhvmjEJ3vYzTVWrMWAg9x6ayr4pLdBZCB9aMDzwEoLcKsK9Zz3O7zTa
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM6PR12MB3257
+X-Spam-Status: No, score=-1.8 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FORGED_SPF_HELO,
+        RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_NONE
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 7/15/22 15:07, Pierre Morel wrote:
-> 
-> 
-> On 7/15/22 11:11, Janis Schoetterl-Glausch wrote:
->> On 7/14/22 22:17, Pierre Morel wrote:
->>>
->>>
->>> On 7/14/22 16:57, Janis Schoetterl-Glausch wrote:
->>>> On 6/20/22 16:03, Pierre Morel wrote:
->>>>> S390x CPU Topology allows a non uniform repartition of the CPU
->>>>> inside the topology containers, sockets, books and drawers.
->>>>>
->>>>> We use numa to place the CPU inside the right topology container
->>>>> and report the non uniform topology to the guest.
->>>>>
->>>>> Note that s390x needs CPU0 to belong to the topology and consequently
->>>>> all topology must include CPU0.
->>>>>
->>>>> We accept a partial QEMU numa definition, in that case undefined CPUs
->>>>> are added to free slots in the topology starting with slot 0 and going
->>>>> up.
->>>>
->>>> I don't understand why doing it this way, via numa, makes sense for us.
->>>> We report the topology to the guest via STSI, which tells the guest
->>>> what the topology "tree" looks like. We don't report any numa distances to the guest.
->>>> The natural way to specify where a cpu is added to the vm, seems to me to be
->>>> by specify the socket, book, ... IDs when doing a device_add or via -device on
->>>> the command line.
->>>>
->>>> [...]
->>>>
->>>
->>> It is a choice to have the core-id to determine were the CPU is situated in the topology.
->>>
->>> But yes we can chose the use drawer-id,book-id,socket-id and use a core-id starting on 0 on each socket.
->>>
->>> It is not done in the current implementation because the core-id implies the socket-id, book-id and drawer-id together with the smp parameters.
->>>
->>>
->> Regardless of whether the core-id or the combination of socket-id, book-id .. is used to specify where a CPU is
->> located, why use the numa framework and not just device_add or -device ?
-> 
-> You are right, at least we should be able to use both.
-> I will work on this.
-> 
->>
->> That feels way more natural since it should already just work if you can do hotplug.
->> At least with core-id and I suspect with a subset of your changes also with socket-id, etc.
-> 
-> yes, it already works with core-id
-> 
->>
->> Whereas numa is an awkward fit since it's for specifying distances between nodes, which we don't do,
->> and you have to use a hack to get it to specify which CPUs to plug (via setting arch_id to -1).
->>
-> 
-> Is it only for this?
-> 
-That's what it looks like to me, but I'm not an expert by any means.
-x86 reports distances and more via ACPI, riscv via device tree and power appears to
-calculate hierarchy values which the linux kernel will turn into distances again.
-That's maybe closest to s390x. However, as far as I can tell all of that is static
-and cannot be reconfigured. If we want to have STSI dynamically reflect the topology
-at some point in the future, we should have a roadmap for how to achieve that.
+On Wed, Jul 20, 2022 at 10:47:25AM -0600, Alex Williamson wrote:
 
+> As I understand it more though, does the API really fit the expected use
+> cases?  As presented here and used in the following patch, we map every
+> section of the user bitmap, present that section to the device driver
+> and ask them to mark dirty bits and atomically clear their internal
+> tracker for that sub-range.  This seems really inefficient.
+
+I think until someone sits down and benchmarks it, it will be hard to
+really tell what is the rigtht trade offs are.
+
+pin_user_pages_fast() is fairly slow, so calling it once per 4k of
+user VA is definately worse than trying to call it once for 2M of user
+VA.
+
+On the other hand very very big guests are possibly likely to have
+64GB regions where there are no dirties.
+
+But, sweeping the 64GB in the first place is possibly going to be
+slow, so saving a little bit of pin_user_pages time may not matter
+much.
+
+On the other hand, cases like vIOMMU will have huge swaths of IOVA
+where there just nothing mapped so perhaps sweeping for the system
+IOMMU will be fast and pin_user_pages overhead will be troublesome.
+
+Still, another view point is that returning a bitmap at all is really,
+ineffecient if we expect high sparsity and we should return dirty pfns
+and a simple put_user may be sufficient. It may make sense to have a
+2nd API that works like this, userspace could call it during stop_copy
+on the assumption of high sparsity.
+
+We just don't have enough ecosystem going right now to sit down and do
+all this benchmarking works, so I was happy with the simplistic
+implementation here, it is only 160 lines, if we toss it later based
+on benchmarks no biggie. The important thing was that that this
+abstraction exist at all and that drivers don't do their own thing.
+
+Jason
