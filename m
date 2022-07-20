@@ -2,107 +2,192 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 9602E57BB17
-	for <lists+kvm@lfdr.de>; Wed, 20 Jul 2022 18:08:35 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 9AAE457BB55
+	for <lists+kvm@lfdr.de>; Wed, 20 Jul 2022 18:21:49 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230477AbiGTQId (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 20 Jul 2022 12:08:33 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40946 "EHLO
+        id S229485AbiGTQVr (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 20 Jul 2022 12:21:47 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52746 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229469AbiGTQIb (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 20 Jul 2022 12:08:31 -0400
-Received: from vps-vb.mhejs.net (vps-vb.mhejs.net [37.28.154.113])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 191F33FA28;
-        Wed, 20 Jul 2022 09:08:26 -0700 (PDT)
-Received: from MUA
-        by vps-vb.mhejs.net with esmtps  (TLS1.2) tls TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256
-        (Exim 4.94.2)
-        (envelope-from <mail@maciej.szmigiero.name>)
-        id 1oECEy-0003q2-KT; Wed, 20 Jul 2022 18:08:00 +0200
-Message-ID: <d311c92a-d753-3584-d662-7d82b2fc1e50@maciej.szmigiero.name>
-Date:   Wed, 20 Jul 2022 18:07:52 +0200
-MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.9.0
-Content-Language: en-US
-To:     Maxim Levitsky <mlevitsk@redhat.com>
-Cc:     Vitaly Kuznetsov <vkuznets@redhat.com>,
+        with ESMTP id S231256AbiGTQVo (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 20 Jul 2022 12:21:44 -0400
+Received: from mail-pf1-x432.google.com (mail-pf1-x432.google.com [IPv6:2607:f8b0:4864:20::432])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7963361727
+        for <kvm@vger.kernel.org>; Wed, 20 Jul 2022 09:21:42 -0700 (PDT)
+Received: by mail-pf1-x432.google.com with SMTP id 17so6569361pfy.0
+        for <kvm@vger.kernel.org>; Wed, 20 Jul 2022 09:21:42 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=f0adogo0zxbyENycGDyitWJjrMgz2USumvEVtMapSaM=;
+        b=spGLDNQ08YQPqH7UmhIpiHe2RaM2zw7ODEii6vmP7whH0yk8NhoS7QYoLrpacwnfbW
+         S3VkQABUgvOUZAhV+aAm4mnqaDYIZ6zOWmQpK2Ozj1qZ4yEP8IO8Ogxh+e38++9rhFjG
+         Gncn3BStXeB7j7O3s/y/CX20mihB4UWNCG15aOuY2njFY086JqM16L+H4BlY/AN8pWe8
+         s9ex7tY8xz16AMATUg5JkSGjI8FqtQ1JH/Ckd2eXT2/cGJ188i8q7NwsSTtTXSvKMUHc
+         Y4He+Vu/AgyMtaInE+pTo4N4Wc2xqCJOuE/medBD2cHSdxBx52LLtQTesVoUiLmIcCvV
+         AYCw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=f0adogo0zxbyENycGDyitWJjrMgz2USumvEVtMapSaM=;
+        b=vr7eT120+ZmrACpkung0eSGhsjTa2PX2V54zPdcr0DtVijOPcR4x0BT7EZ2Ig/2WCV
+         KSNSS4R8JpGtBw6rcRP+tuFSGLw1sm+lGdDT10emShFOU70LvY6HKE+aI83uXkaX287t
+         1FKCt6pBkdL/ryz/Yo43pJS/KHp9GGAxEAEVG7xIO9p7LWhuMWZexVdFSCnUgPoOdI9+
+         FEyBpuAUi2k3qNNLQHl0jxfnv0LgjOJ+YEQQ2iw1HygAucMJJI9N3LkIPrSmHEjg7t2i
+         Wx4w8BPyohJHA23/PAALFfeJnON3xcCmmTPabnuHRVIkSWgL9oBl5DMCzylWl0JVHCHx
+         xTFg==
+X-Gm-Message-State: AJIora/v5rxnv2XnssF8yKJP+bZrxgk8I0FUzaOIgNdpQjgXnhADef5p
+        pM1h5yF5jEUabq/xRSiFrNeqyg==
+X-Google-Smtp-Source: AGRyM1vSVUjKLbGc4Kd7xVml29j/pMq086Pfs5AgzFCjeBxpV+cVQy9BGtwT6tQB+IRvWirFlwJ5Og==
+X-Received: by 2002:a65:6bcc:0:b0:3f6:1815:f541 with SMTP id e12-20020a656bcc000000b003f61815f541mr33324434pgw.183.1658334101831;
+        Wed, 20 Jul 2022 09:21:41 -0700 (PDT)
+Received: from google.com (123.65.230.35.bc.googleusercontent.com. [35.230.65.123])
+        by smtp.gmail.com with ESMTPSA id g5-20020a63dd45000000b0041a4d5e7e5fsm3266314pgj.47.2022.07.20.09.21.40
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 20 Jul 2022 09:21:41 -0700 (PDT)
+Date:   Wed, 20 Jul 2022 16:21:37 +0000
+From:   Sean Christopherson <seanjc@google.com>
+To:     "Gupta, Pankaj" <pankaj.gupta@amd.com>
+Cc:     Chao Peng <chao.p.peng@linux.intel.com>, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org, linux-mm@kvack.org,
+        linux-fsdevel@vger.kernel.org, linux-api@vger.kernel.org,
+        linux-doc@vger.kernel.org, qemu-devel@nongnu.org,
+        linux-kselftest@vger.kernel.org,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Jonathan Corbet <corbet@lwn.net>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
         Wanpeng Li <wanpengli@tencent.com>,
         Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>,
-        Sean Christopherson <seanjc@google.com>
-References: <4caa0f67589ae3c22c311ee0e6139496902f2edc.1658159083.git.maciej.szmigiero@oracle.com>
- <7458497a8694ba0fbabee28eabf557e6e4406fbe.camel@redhat.com>
-From:   "Maciej S. Szmigiero" <mail@maciej.szmigiero.name>
-Subject: Re: [PATCH] KVM: nSVM: Pull CS.Base from actual VMCB12 for soft
- int/ex re-injection
-In-Reply-To: <7458497a8694ba0fbabee28eabf557e6e4406fbe.camel@redhat.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,NICE_REPLY_A,
-        SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
+        Joerg Roedel <joro@8bytes.org>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+        x86@kernel.org, "H . Peter Anvin" <hpa@zytor.com>,
+        Hugh Dickins <hughd@google.com>,
+        Jeff Layton <jlayton@kernel.org>,
+        "J . Bruce Fields" <bfields@fieldses.org>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        Shuah Khan <shuah@kernel.org>, Mike Rapoport <rppt@kernel.org>,
+        Steven Price <steven.price@arm.com>,
+        "Maciej S . Szmigiero" <mail@maciej.szmigiero.name>,
+        Vlastimil Babka <vbabka@suse.cz>,
+        Vishal Annapurve <vannapurve@google.com>,
+        Yu Zhang <yu.c.zhang@linux.intel.com>,
+        "Kirill A . Shutemov" <kirill.shutemov@linux.intel.com>,
+        luto@kernel.org, jun.nakajima@intel.com, dave.hansen@intel.com,
+        ak@linux.intel.com, david@redhat.com, aarcange@redhat.com,
+        ddutile@redhat.com, dhildenb@redhat.com,
+        Quentin Perret <qperret@google.com>,
+        Michael Roth <michael.roth@amd.com>, mhocko@suse.com,
+        Muchun Song <songmuchun@bytedance.com>
+Subject: Re: [PATCH v7 11/14] KVM: Register/unregister the guest private
+ memory regions
+Message-ID: <YtgrkXqP/GIi9ujZ@google.com>
+References: <20220706082016.2603916-1-chao.p.peng@linux.intel.com>
+ <20220706082016.2603916-12-chao.p.peng@linux.intel.com>
+ <f02baa37-8d34-5d07-a0ae-300ffefc7fee@amd.com>
+ <20220719140843.GA84779@chaop.bj.intel.com>
+ <36e671d2-6b95-8e4f-c2ac-fee4b2670c6e@amd.com>
+ <20220720150706.GB124133@chaop.bj.intel.com>
+ <d0fd229d-afa6-c66d-3e55-09ac5877453e@amd.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <d0fd229d-afa6-c66d-3e55-09ac5877453e@amd.com>
+X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
+        USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=unavailable
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 20.07.2022 10:43, Maxim Levitsky wrote:
-> On Mon, 2022-07-18 at 17:47 +0200, Maciej S. Szmigiero wrote:
->> From: "Maciej S. Szmigiero" <maciej.szmigiero@oracle.com>
->>
->> enter_svm_guest_mode() first calls nested_vmcb02_prepare_control() to copy
->> control fields from VMCB12 to the current VMCB, then
->> nested_vmcb02_prepare_save() to perform a similar copy of the save area.
->>
->> This means that nested_vmcb02_prepare_control() still runs with the
->> previous save area values in the current VMCB so it shouldn't take the L2
->> guest CS.Base from this area.
->>
->> Explicitly pull CS.Base from the actual VMCB12 instead in
->> enter_svm_guest_mode().
->>
->> Granted, having a non-zero CS.Base is a very rare thing (and even
->> impossible in 64-bit mode), having it change between nested VMRUNs is
->> probably even rarer, but if it happens it would create a really subtle bug
->> so it's better to fix it upfront.
->>
->> Fixes: 6ef88d6e36c2 ("KVM: SVM: Re-inject INT3/INTO instead of retrying the instruction")
->> Signed-off-by: Maciej S. Szmigiero <maciej.szmigiero@oracle.com>
->> ---
->>   arch/x86/kvm/svm/nested.c | 9 +++++----
->>   1 file changed, 5 insertions(+), 4 deletions(-)
->>
->> diff --git a/arch/x86/kvm/svm/nested.c b/arch/x86/kvm/svm/nested.c
->> index adf4120b05d90..23252ab821941 100644
->> --- a/arch/x86/kvm/svm/nested.c
->> +++ b/arch/x86/kvm/svm/nested.c
->> @@ -639,7 +639,8 @@ static bool is_evtinj_nmi(u32 evtinj)
->>   }
->>   
->>   static void nested_vmcb02_prepare_control(struct vcpu_svm *svm,
->> -                                         unsigned long vmcb12_rip)
->> +                                         unsigned long vmcb12_rip,
->> +                                         unsigned long vmcb12_csbase)
+On Wed, Jul 20, 2022, Gupta, Pankaj wrote:
 > 
-> Honestly I don't like that nested_vmcb02_prepare_control starts to grow its parameter list,
-> because it kind of defeats the purpose of vmcb12 cache we added back then.
+> > > > > > +bool __weak kvm_arch_private_mem_supported(struct kvm *kvm)
+
+Use kvm_arch_has_private_mem(), both because "has" makes it obvious this is checking
+a flag of sorts, and to align with other helpers of this nature (and with
+CONFIG_HAVE_KVM_PRIVATE_MEM).
+
+  $ git grep kvm_arch | grep supported | wc -l
+  0
+  $ git grep kvm_arch | grep has | wc -l
+  26
+
+> > > > > > +#ifdef CONFIG_HAVE_KVM_PRIVATE_MEM
+> > > > > > +	case KVM_MEMORY_ENCRYPT_REG_REGION:
+> > > > > > +	case KVM_MEMORY_ENCRYPT_UNREG_REGION: {
+> > > > > > +		struct kvm_enc_region region;
+> > > > > > +
+> > > > > > +		if (!kvm_arch_private_mem_supported(kvm))
+> > > > > > +			goto arch_vm_ioctl;
+> > > > > > +
+> > > > > > +		r = -EFAULT;
+> > > > > > +		if (copy_from_user(&region, argp, sizeof(region)))
+> > > > > > +			goto out;
+> > > > > > +
+> > > > > > +		r = kvm_vm_ioctl_set_encrypted_region(kvm, ioctl, &region);
+> > > > > 
+> > > > > this is to store private region metadata not only the encrypted region?
+> > > > 
+> > > > Correct.
+> > > 
+> > > Sorry for not being clear, was suggesting name change of this function from:
+> > > "kvm_vm_ioctl_set_encrypted_region" to "kvm_vm_ioctl_set_private_region"
+> > 
+> > Though I don't have strong reason to change it, I'm fine with this and
 > 
-> I think that it is better to add csbase/rip to vmcb_save_area_cached,
-> but I am not 100% sure. What do you think?
-
-This function has only 3 parameters now, so they fit well into registers
-without taking any extra memory (even assuming it won't get inlined).
-
-If in the future more parameters need to be added to this function
-(which may or may not happen) then they all can be moved to, for example,
-vmcb_ctrl_area_cached.
-
-> Best regards,
-> 	Maxim Levitsky
+> Yes, no strong reason, just thought "kvm_vm_ioctl_set_private_region" would
+> depict the actual functionality :)
 > 
-> 
+> > this name matches the above kvm_arch_private_mem_supported perfectly.
+> BTW could not understand this, how "kvm_vm_ioctl_set_encrypted_region"
+> matches "kvm_arch_private_mem_supported"?
 
-Thanks,
-Maciej
+Chao is saying that kvm_vm_ioctl_set_private_region() pairs nicely with
+kvm_arch_private_mem_supported(), not that the "encrypted" variant pairs nicely.
+
+I also like using "private" instead of "encrypted", though we should probably
+find a different verb than "set", because calling "set_private" when making the
+region shared is confusing.  I'm struggling to come up with a good alternative
+though.
+
+kvm_vm_ioctl_set_memory_region() is already taken by KVM_SET_USER_MEMORY_REGION,
+and that also means that anything with "memory_region" in the name is bound to be
+confusing.
+
+Hmm, and if we move away from "encrypted", it probably makes sense to pass in
+addr+size instead of a kvm_enc_region.
+
+Maybe this?
+
+static int kvm_vm_ioctl_set_or_clear_mem_private(struct kvm *kvm, gpa_t gpa,
+					         gpa_t size, bool set_private)
+
+and then:
+
+#ifdef CONFIG_HAVE_KVM_PRIVATE_MEM
+	case KVM_MEMORY_ENCRYPT_REG_REGION:
+	case KVM_MEMORY_ENCRYPT_UNREG_REGION: {
+		bool set = ioctl == KVM_MEMORY_ENCRYPT_REG_REGION;
+		struct kvm_enc_region region;
+
+		if (!kvm_arch_private_mem_supported(kvm))
+			goto arch_vm_ioctl;
+
+		r = -EFAULT;
+		if (copy_from_user(&region, argp, sizeof(region)))
+			goto out;
+
+		r = kvm_vm_ioctl_set_or_clear_mem_private(kvm, region.addr,
+							  region.size, set);
+		break;
+	}
+#endif
+
+I don't love it, so if someone has a better idea...
