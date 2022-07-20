@@ -2,64 +2,61 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 446DC57AB4D
-	for <lists+kvm@lfdr.de>; Wed, 20 Jul 2022 03:07:19 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 87E6057AB51
+	for <lists+kvm@lfdr.de>; Wed, 20 Jul 2022 03:09:47 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S239226AbiGTBHM (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 19 Jul 2022 21:07:12 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57730 "EHLO
+        id S238214AbiGTBJn (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 19 Jul 2022 21:09:43 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58838 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S238171AbiGTBHK (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 19 Jul 2022 21:07:10 -0400
-Received: from mail-wr1-x42a.google.com (mail-wr1-x42a.google.com [IPv6:2a00:1450:4864:20::42a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 186A948C87
-        for <kvm@vger.kernel.org>; Tue, 19 Jul 2022 18:07:09 -0700 (PDT)
-Received: by mail-wr1-x42a.google.com with SMTP id d16so23974816wrv.10
-        for <kvm@vger.kernel.org>; Tue, 19 Jul 2022 18:07:09 -0700 (PDT)
+        with ESMTP id S231440AbiGTBJk (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 19 Jul 2022 21:09:40 -0400
+Received: from mail-wm1-x32c.google.com (mail-wm1-x32c.google.com [IPv6:2a00:1450:4864:20::32c])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CCE754A819
+        for <kvm@vger.kernel.org>; Tue, 19 Jul 2022 18:09:38 -0700 (PDT)
+Received: by mail-wm1-x32c.google.com with SMTP id be14-20020a05600c1e8e00b003a04a458c54so340568wmb.3
+        for <kvm@vger.kernel.org>; Tue, 19 Jul 2022 18:09:38 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
         h=mime-version:references:in-reply-to:from:date:message-id:subject:to
          :cc;
-        bh=RnduJRWap81e4hsQGNaqE2KBoYp4jqdU1O2gWYXksrg=;
-        b=V3L6saNcxDkw3rVUZoKMT+z27A12bbuMUQUtYUo52WpG05ad/Q3Lae9kO9Ssfq5E+o
-         YzXt4abwxGv+dwxD19q182Tuv+jEQ90ytCYm2jfFd5xxWwmkZBRohif67QZtCceM83oi
-         NUU4ZOjD12l69pg3MEeq0C/RyCjh9aJsInnixGl/o8nH/XrKnDYI86aiat2qCbQxSf38
-         THILLSqte2NlbrOatnLA0liVuydqbpDMtkQWGZdtcz8RmPPLV7Aq4cNotneTAkvZev6r
-         y2dWrfTCTjX2uGv83f5rxxPvXeio8xcWjnvuLCng4BNiGhbO0l7uJp80yX01OHGv+h/M
-         nrqw==
+        bh=RBVHVAW43BmInQW8xdWR/v8IxSN7KBGQTfI9TbyJA0U=;
+        b=U1Lw/qiDoDIqyitCRCAlGJ/9641N+Vv9cSAAErraLVH325IfX1NfIerCLnJ5p1KSG2
+         9+8v7A86wA1VWIibPPJSu0GaH8MGvQw+psEcWyyX7b6LjuoKGg23u0+rjPWt/g0zNVWL
+         vwc3NuwEmDFX7NCshT4Pi+okffZT95HjVdDJfGSyd6IQ3D/jln1Ok7KAKICKCc0mIoIL
+         oxUW1WvtypqyX/sr3RU77QQeYZ0UN9RcH6K6B45KO1bj6/rUzQj7ZeSUNwyFxkFo5duU
+         WRVsrKNp5di7h74mJBKhYj7nmTv+joLbP0MJPa3kobt+pHqs9whxO7D30KJG4sZ8aZJw
+         EBJA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:mime-version:references:in-reply-to:from:date
          :message-id:subject:to:cc;
-        bh=RnduJRWap81e4hsQGNaqE2KBoYp4jqdU1O2gWYXksrg=;
-        b=AVARXi/Y4JPVkhqOo3G9P3maFSptJtl4h0KS1uhG3cL6WfkU2LTxfkKUTIJBQ5AamS
-         0i1EFhUy8ya2kFE5sUrFVzo98gSiH/ywd58h/uq//JlZEUN/GGcOVjTOdfHn5zswRyAo
-         VxYGkkHt/flzMIVeYAJ8v9IBdlemI2aKZKkIh+Ja4AT2FKN9nKrJ++GTFjAmuIUqOOHB
-         OQcFAgzEO9mY9D0SBeRgbqZADAha0w5R4cSAHPWb7LjzAnGu1Nd7W1oyB6yovcfRCLpV
-         BmAC3GuujFgR8F7E0Lvp99IAhjnuNmOysfBCOHAdKNlaKY18K074sZJdhMzMsHuFU8ud
-         Ir4A==
-X-Gm-Message-State: AJIora+TiydEYg5CKCDEmfWmnSVvPhtdsoR9396jkYbNWSMqJlHTRB/+
-        65bX1v1WqOFU0fJoUpGbWYUy0RSvnub5dypMaVdduw==
-X-Google-Smtp-Source: AGRyM1tjfS0I06AEG0F/LzOUouITmNkWGASNHqEfxR822WYDad6jgo6sBqyj7LcYSIIG+kLVswqWoffKMtf3O1YoCYM=
-X-Received: by 2002:a05:6000:81d:b0:21d:a495:6e3 with SMTP id
- bt29-20020a056000081d00b0021da49506e3mr28760355wrb.502.1658279227451; Tue, 19
- Jul 2022 18:07:07 -0700 (PDT)
+        bh=RBVHVAW43BmInQW8xdWR/v8IxSN7KBGQTfI9TbyJA0U=;
+        b=HosE0A+STlSBcuUQSY9ZAwdw65roQOunOed9VAValISjuroiIISkqHcUQPDPUjsFcN
+         HPCQpDZ2Ow3dHITJkucSF69azcJC9N/Nbi86vfl8YX/CkCfcg/LoPDjr26LgXvMquPzL
+         D9YVihdSstvWWYNDRSMl8qK2PGMOdEXaW6z6eKujGZGjRL0hGWMii5GqPXoQF7NOyLYJ
+         16cpn0TvWFQ/nw0+xyNSHI75DFY4ha/xOrHA9rDo6cGm+W/GSe82edvjp4PhxPuUkn/B
+         b1IKJ4C0QTCNVsB3RL5f9eOFZ2h3p5LbOMx+AzFqlzhGT+GDu54XumqTqNCTDhZkmDah
+         hSWA==
+X-Gm-Message-State: AJIora/BF2gvZybif5LbFgkPuLsfDjeqIs1igecLmKoGiQprvxqjg01C
+        ws43K6K7yw0+bQ7mKU/BSx10RGUAVP7WwaVWojDunw==
+X-Google-Smtp-Source: AGRyM1txJjTrndM+sbtdvs/TWSbN+GJAz0n1EgDaOdmwLJpHQ2Foo2ces9t0uO7ZnwAko35RvufUgXmNw2ogOqlvC9k=
+X-Received: by 2002:a7b:ce13:0:b0:3a3:102c:23d3 with SMTP id
+ m19-20020a7bce13000000b003a3102c23d3mr1454769wmc.67.1658279377164; Tue, 19
+ Jul 2022 18:09:37 -0700 (PDT)
 MIME-Version: 1.0
-References: <20220708212106.325260-1-pcc@google.com> <877d49p36n.fsf@redhat.com>
-In-Reply-To: <877d49p36n.fsf@redhat.com>
-From:   Peter Collingbourne <pcc@google.com>
-Date:   Tue, 19 Jul 2022 18:06:55 -0700
-Message-ID: <CAMn1gO65DJs8QyMs4YTmq7_b01qjLgBRhM3OLZ7aKaobEGMXDw@mail.gmail.com>
-Subject: Re: [PATCH v2 0/3] KVM: arm64: support MTE in protected VMs
-To:     Cornelia Huck <cohuck@redhat.com>
-Cc:     kvmarm@lists.cs.columbia.edu, Marc Zyngier <maz@kernel.org>,
-        kvm@vger.kernel.org, Andy Lutomirski <luto@amacapital.net>,
-        Linux ARM <linux-arm-kernel@lists.infradead.org>,
-        Michael Roth <michael.roth@amd.com>,
-        Catalin Marinas <catalin.marinas@arm.com>,
-        Chao Peng <chao.p.peng@linux.intel.com>,
-        Will Deacon <will@kernel.org>,
-        Evgenii Stepanov <eugenis@google.com>
+References: <20220711093218.10967-1-adrian.hunter@intel.com> <20220711093218.10967-27-adrian.hunter@intel.com>
+In-Reply-To: <20220711093218.10967-27-adrian.hunter@intel.com>
+From:   Ian Rogers <irogers@google.com>
+Date:   Tue, 19 Jul 2022 18:09:24 -0700
+Message-ID: <CAP-5=fXPCpKqPD3meS2tbWuubs2U1q139J2a=_TTAXrTaWVHZw@mail.gmail.com>
+Subject: Re: [PATCH 26/35] perf tools: Handle injected guest kernel mmap event
+To:     Adrian Hunter <adrian.hunter@intel.com>
+Cc:     Arnaldo Carvalho de Melo <acme@kernel.org>,
+        Jiri Olsa <jolsa@redhat.com>,
+        Namhyung Kim <namhyung@kernel.org>,
+        Andi Kleen <ak@linux.intel.com>, linux-kernel@vger.kernel.org,
+        kvm@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
 X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
@@ -72,57 +69,65 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Jul 19, 2022 at 7:50 AM Cornelia Huck <cohuck@redhat.com> wrote:
+On Mon, Jul 11, 2022 at 2:33 AM Adrian Hunter <adrian.hunter@intel.com> wrote:
 >
-> On Fri, Jul 08 2022, Peter Collingbourne <pcc@google.com> wrote:
+> If a kernel mmap event was recorded inside a guest and injected into a host
+> perf.data file, then it will match a host mmap_name not a guest mmap_name,
+> see machine__set_mmap_name(). So try matching a host mmap_name in that
+> case.
 >
-> > Hi,
-> >
-> > This patch series contains a proposed extension to pKVM that allows MTE
-> > to be exposed to the protected guests. It is based on the base pKVM
-> > series previously sent to the list [1] and later rebased to 5.19-rc3
-> > and uploaded to [2].
-> >
-> > This series takes precautions against host compromise of the guests
-> > via direct access to their tag storage, by preventing the host from
-> > accessing the tag storage via stage 2 page tables. The device tree
-> > must describe the physical memory address of the tag storage, if any,
-> > and the memory nodes must declare that the tag storage location is
-> > described. Otherwise, the MTE feature is disabled in protected guests.
-> >
-> > Now that we can easily do so, we also prevent the host from accessing
-> > any unmapped reserved-memory regions without a driver, as the host
-> > has no business accessing that memory.
-> >
-> > A proposed extension to the devicetree specification is available at
-> > [3], a patched version of QEMU that produces the required device tree
-> > nodes is available at [4] and a patched version of the crosvm hypervisor
-> > that enables MTE is available at [5].
+> Signed-off-by: Adrian Hunter <adrian.hunter@intel.com>
+
+
+Acked-by: Ian Rogers <irogers@google.com>
+
+Thanks,
+Ian
+
+> ---
+>  tools/perf/util/machine.c | 15 ++++++++++++---
+>  1 file changed, 12 insertions(+), 3 deletions(-)
 >
-> I'm unsure how this is supposed to work with QEMU + KVM, as your QEMU
-> patch adds mte-alloc properties to regions that are exposed as a
-> separate address space (which will not work with KVM). Is the magic in
-> that new shared section?
-
-Hi Cornelia,
-
-The intent is that the mte-alloc property may be set on memory whose
-allocation tag storage is not directly accessible via physical memory,
-since in this case there is no need for the hypervisor to do anything
-to protect allocation tag storage before exposing MTE to guests. In
-the case of QEMU + KVM, I would expect the emulated system to not
-expose the allocation tag storage directly, in which case it would be
-able to set mte-alloc on all memory nodes without further action,
-exactly as my patch implements for TCG. With the interface as
-proposed, QEMU would need to reject the mte-shared-alloc option when
-KVM is enabled, as there is currently no mechanism for KVM-accelerated
-virtualized tag storage.
-
-Note that these properties are only relevant for guest kernels running
-under an emulated EL2 in which pKVM could conceivably run, which means
-that the host would need to implement FEAT_NV2. As far as I know there
-is currently no support for NV2 neither in QEMU TCG nor in the Linux
-kernel, and I'm unaware of any available hardware that supports both
-NV2 and MTE, so it'll be a while before any of this becomes relevant.
-
-Peter
+> diff --git a/tools/perf/util/machine.c b/tools/perf/util/machine.c
+> index 27d1a38f44c3..8f657225fb02 100644
+> --- a/tools/perf/util/machine.c
+> +++ b/tools/perf/util/machine.c
+> @@ -1742,6 +1742,7 @@ static int machine__process_kernel_mmap_event(struct machine *machine,
+>         struct map *map;
+>         enum dso_space_type dso_space;
+>         bool is_kernel_mmap;
+> +       const char *mmap_name = machine->mmap_name;
+>
+>         /* If we have maps from kcore then we do not need or want any others */
+>         if (machine__uses_kcore(machine))
+> @@ -1752,8 +1753,16 @@ static int machine__process_kernel_mmap_event(struct machine *machine,
+>         else
+>                 dso_space = DSO_SPACE__KERNEL_GUEST;
+>
+> -       is_kernel_mmap = memcmp(xm->name, machine->mmap_name,
+> -                               strlen(machine->mmap_name) - 1) == 0;
+> +       is_kernel_mmap = memcmp(xm->name, mmap_name, strlen(mmap_name) - 1) == 0;
+> +       if (!is_kernel_mmap && !machine__is_host(machine)) {
+> +               /*
+> +                * If the event was recorded inside the guest and injected into
+> +                * the host perf.data file, then it will match a host mmap_name,
+> +                * so try that - see machine__set_mmap_name().
+> +                */
+> +               mmap_name = "[kernel.kallsyms]";
+> +               is_kernel_mmap = memcmp(xm->name, mmap_name, strlen(mmap_name) - 1) == 0;
+> +       }
+>         if (xm->name[0] == '/' ||
+>             (!is_kernel_mmap && xm->name[0] == '[')) {
+>                 map = machine__addnew_module_map(machine, xm->start,
+> @@ -1767,7 +1776,7 @@ static int machine__process_kernel_mmap_event(struct machine *machine,
+>                         dso__set_build_id(map->dso, bid);
+>
+>         } else if (is_kernel_mmap) {
+> -               const char *symbol_name = (xm->name + strlen(machine->mmap_name));
+> +               const char *symbol_name = xm->name + strlen(mmap_name);
+>                 /*
+>                  * Should be there already, from the build-id table in
+>                  * the header.
+> --
+> 2.25.1
+>
