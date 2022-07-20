@@ -2,136 +2,118 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id CD18D57BEF7
-	for <lists+kvm@lfdr.de>; Wed, 20 Jul 2022 22:08:36 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 098DD57BF27
+	for <lists+kvm@lfdr.de>; Wed, 20 Jul 2022 22:23:57 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229830AbiGTUIf (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 20 Jul 2022 16:08:35 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36444 "EHLO
+        id S230296AbiGTUXz (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 20 Jul 2022 16:23:55 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45914 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229492AbiGTUIe (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 20 Jul 2022 16:08:34 -0400
-Received: from NAM12-DM6-obe.outbound.protection.outlook.com (mail-dm6nam12on2065.outbound.protection.outlook.com [40.107.243.65])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 608AF4F6A6;
-        Wed, 20 Jul 2022 13:08:33 -0700 (PDT)
+        with ESMTP id S229469AbiGTUXy (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 20 Jul 2022 16:23:54 -0400
+Received: from NAM10-MW2-obe.outbound.protection.outlook.com (mail-mw2nam10on2063.outbound.protection.outlook.com [40.107.94.63])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AC3054A820;
+        Wed, 20 Jul 2022 13:23:52 -0700 (PDT)
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=h7Vv1tHoh8XNfOkcW2qPnQ2GhdNEKsYx3Gy6duOarqMG8rE4bksOR27aELOzoKTfWZh16ypW4JnvU2PNbXadN9XarkyvaVvb1OHqmyj5Lwvauh+vPXzZZlld7fHBBOJGNzIXY7704c+GX/V/0utRMPdgWzaUO4eXCJo9xsyad1DkD5oheOZQjFcMNOYbMoe90mBe2RIn+i7iq7xpye64iNWBiaZl2RHB2pSq7zgBbCy5AEE/brmr4EgyBCTD1Crjt5HeAHXSEk3hQoQ9KqB/Pi1xW6hOLdVJbybK8yHnRANomD2uTdx+p7AnlgHpTsQCJEhJewVgcMb/Oyn6zr9yaw==
+ b=VlGpnM0So1sbS9lPWlc8EIgLdZYTQlOtYqcsjXEhAGeQOkwUxhje9afJfkeostneG9hg1fnP0u54h1O2TjhnP+VM7isB724MzqTS11tJea5KHhDSZkTc8sq4WraABc/yAN6HaO3LBO2ghF0t2+mXp+M45RHwJDLyPcvekgG3Q/Avbr1hziDlSfeQaj6pdiGJr4TEWUuHws4uiwKBIpwe5JHAdMEQIhdoICx4owFykmwnThC5erQl2f28czecAo2VndNnLbNup3alR7iShMT8hgFCGce0Ipm4pDwlw4j4LnwJNx6TZAQPzEhrVU7IIj6ln4bS0ppcpDQW6Uc9WUO+3A==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=uFIV/uobVcUsxlqWI/QapcqAfKZu+w2VoltTiRmWEuU=;
- b=b/zNR3VeaxC/rjRF1MXukl3kHZ1v8pua346nG+LKAjqvJ3rxeJuuIh3RvcYdFG9k7tuuZT9k9osrUrWExQtiJTy8L6hIt6gxabXn/hA8W1Y+K5iEJcDpI+3nRaO3rL/vSbsuBWIjPEy3hvd+RNKi0mAsK8XnFpkOU+8CmCCqWzGtqk58s6/12XeRkSr0/Clsres67AydM6b+0WapsD/qTBc+zDgPe0OYKxzR4NltKMm5ktwA/yCvsu2mHEntVcpLkTq2zo8ZAIMJsrMcFIpnYzVUXFcXLrC+V4Z2sPAHKtjLZgdMxEq8E4nxeA4eiFtS6Xu8rN87MPpaYCEFsyhDIw==
+ bh=TWYR5/glfKXFY5yO87u+ZdvkUB6LbJJqwhaS/jE1Hv0=;
+ b=LoNF57rodrso8jyNYVmoafIxETVO14+5ULlcwrpTfz6XrhZYyl+Eual3TNKS19qdZHK98HOVNgZ86OFDE4GrWLntSoOH0FrESn5oQTrH46aEV2xPFfDqXr79txmtgS6ii/iiSNb2M7GWIsnRlpsAh42+mNLVe8UZ9oY0X3piBaTHwOLiL/imstbzr4+7sERrVjtqqkD5lM2rs8BFuzEp3Lgqs8qZnu/p8cc0k0MVsP6BF7kFZX19euFTF8hmYnJAB2rcc+UOwnJUXvjtBKSTJY9QF3MKQ9ROz2JN85ka7j5IcbjZ5R9mimFFRhtV1YqTI75tZAG9/7QBuErsRkcqog==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
  smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
  dkim=pass header.d=nvidia.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
  s=selector2;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=uFIV/uobVcUsxlqWI/QapcqAfKZu+w2VoltTiRmWEuU=;
- b=D8WjuBh6ZGgKl1mZndxxpKc84EJIpcI4CNnoJH47MrzIVXF+85zd5vdBwioiJiZ7VKFK7IS3FmmIX84Pu872+1BW65aFY2tr9tqaWFz7P+AQtCr37wvlp32KX0wD8AHKV0yZpeTM1JVyqL8ipkMXtXajaSU9UMPquIeANRZ5XAN8Cn/FaDAZGIRrI/mCFtWmJayYlwY1ReRym8MkCT5ghiCwC/A90Og35pZV5DMhN/4ouuFXywtJOxW9meykusznPJfqUBjkId/0KkmwRhrfZtNAuNgd6lltpfVPkdvKp06nY+qh53cvNfO34qFu8R9VlypHZo+eR6pZLUJ8RP9OrA==
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nvidia.com;
-Received: from MN2PR12MB4192.namprd12.prod.outlook.com (2603:10b6:208:1d5::15)
- by MN2PR12MB4783.namprd12.prod.outlook.com (2603:10b6:208:3e::10) with
+ bh=TWYR5/glfKXFY5yO87u+ZdvkUB6LbJJqwhaS/jE1Hv0=;
+ b=C7B6Nf1hoV+/fheRAQckj6UdMQMAwJeiBcsyHipDTbis90G/2m1g8WtdQX4wRxpeh2a1HfVN9ZwpShAlHBKuzzh//flUvlpYYL89fvuccuvpLZZjayxDnaQzjvo64mQ55yzZUTUBGB8pFNpSbDOlx1k1czhPJKwbIoLrWpoHou0gOxkTCXw6dC86iPztKQvs6+u9qxQwyEJvRLuMgXQzqNNGP1VGEP10Ec1mZuO9/PIR2MadOcmjsvQhtPhUqkSeoFKSXog562ETZimS+r5Mgo+6e+VsSu8Rd678mtmTYSWs4KrOGBzZhr7V/VXDZcWQCw6XHwtWDrr7P56qOecbTg==
+Received: from DM6PR12MB3500.namprd12.prod.outlook.com (2603:10b6:5:11d::16)
+ by MN0PR12MB6102.namprd12.prod.outlook.com (2603:10b6:208:3ca::8) with
  Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5438.21; Wed, 20 Jul
- 2022 20:08:31 +0000
-Received: from MN2PR12MB4192.namprd12.prod.outlook.com
- ([fe80::ac35:7c4b:3282:abfb]) by MN2PR12MB4192.namprd12.prod.outlook.com
- ([fe80::ac35:7c4b:3282:abfb%3]) with mapi id 15.20.5458.018; Wed, 20 Jul 2022
- 20:08:31 +0000
-Date:   Wed, 20 Jul 2022 17:08:29 -0300
-From:   Jason Gunthorpe <jgg@nvidia.com>
-To:     Alex Williamson <alex.williamson@redhat.com>
-Cc:     Alexander Gordeev <agordeev@linux.ibm.com>,
-        David Airlie <airlied@linux.ie>,
-        Christian Borntraeger <borntraeger@linux.ibm.com>,
-        Cornelia Huck <cohuck@redhat.com>,
-        Daniel Vetter <daniel@ffwll.ch>,
-        dri-devel@lists.freedesktop.org,
-        Harald Freudenberger <freude@linux.ibm.com>,
-        Vasily Gorbik <gor@linux.ibm.com>,
-        Heiko Carstens <hca@linux.ibm.com>,
-        intel-gfx@lists.freedesktop.org,
-        intel-gvt-dev@lists.freedesktop.org,
-        Jani Nikula <jani.nikula@linux.intel.com>,
-        Jason Herne <jjherne@linux.ibm.com>,
-        Joonas Lahtinen <joonas.lahtinen@linux.intel.com>,
-        kvm@vger.kernel.org, linux-s390@vger.kernel.org,
-        Matthew Rosato <mjrosato@linux.ibm.com>,
-        Peter Oberparleiter <oberpar@linux.ibm.com>,
-        Halil Pasic <pasic@linux.ibm.com>,
-        Rodrigo Vivi <rodrigo.vivi@intel.com>,
-        Sven Schnelle <svens@linux.ibm.com>,
-        Tvrtko Ursulin <tvrtko.ursulin@linux.intel.com>,
-        Vineeth Vijayan <vneethv@linux.ibm.com>,
-        Zhi Wang <zhi.a.wang@intel.com>,
-        Tony Krowiak <akrowiak@linux.ibm.com>,
-        Eric Farman <farman@linux.ibm.com>,
-        Christoph Hellwig <hch@lst.de>,
-        Kevin Tian <kevin.tian@intel.com>,
-        Zhenyu Wang <zhenyuw@linux.intel.com>,
-        Nicolin Chen <nicolinc@nvidia.com>
-Subject: Re: [PATCH v4 1/2] vfio: Replace the DMA unmapping notifier with a
- callback
-Message-ID: <20220720200829.GW4609@nvidia.com>
-References: <0-v4-681e038e30fd+78-vfio_unmap_notif_jgg@nvidia.com>
- <1-v4-681e038e30fd+78-vfio_unmap_notif_jgg@nvidia.com>
- <20220720134113.4225f9d6.alex.williamson@redhat.com>
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20220720134113.4225f9d6.alex.williamson@redhat.com>
-X-ClientProxiedBy: BL1PR13CA0265.namprd13.prod.outlook.com
- (2603:10b6:208:2ba::30) To MN2PR12MB4192.namprd12.prod.outlook.com
- (2603:10b6:208:1d5::15)
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5438.23; Wed, 20 Jul
+ 2022 20:23:51 +0000
+Received: from DM6PR12MB3500.namprd12.prod.outlook.com
+ ([fe80::9479:3bdd:517e:1d54]) by DM6PR12MB3500.namprd12.prod.outlook.com
+ ([fe80::9479:3bdd:517e:1d54%5]) with mapi id 15.20.5438.023; Wed, 20 Jul 2022
+ 20:23:51 +0000
+From:   Kechen Lu <kechenl@nvidia.com>
+To:     Sean Christopherson <seanjc@google.com>
+CC:     "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "pbonzini@redhat.com" <pbonzini@redhat.com>,
+        "chao.gao@intel.com" <chao.gao@intel.com>,
+        "vkuznets@redhat.com" <vkuznets@redhat.com>,
+        Somdutta Roy <somduttar@nvidia.com>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
+Subject: RE: [RFC PATCH v4 5/7] KVM: x86: add vCPU scoped toggling for
+ disabled exits
+Thread-Topic: [RFC PATCH v4 5/7] KVM: x86: add vCPU scoped toggling for
+ disabled exits
+Thread-Index: AQHYhdK9C+0dszRonECIz3pzVsNAb62HxQ8AgAADOICAAAplgIAADVMg
+Date:   Wed, 20 Jul 2022 20:23:50 +0000
+Message-ID: <DM6PR12MB3500F50D7004191902CAF8B4CA8E9@DM6PR12MB3500.namprd12.prod.outlook.com>
+References: <20220622004924.155191-1-kechenl@nvidia.com>
+ <20220622004924.155191-6-kechenl@nvidia.com> <YthMZvWpZ+3gNUhM@google.com>
+ <DM6PR12MB35008628D97A59AA302E772FCA8E9@DM6PR12MB3500.namprd12.prod.outlook.com>
+ <YthX0brdWCZVFB3n@google.com>
+In-Reply-To: <YthX0brdWCZVFB3n@google.com>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+authentication-results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=nvidia.com;
+x-ms-publictraffictype: Email
+x-ms-office365-filtering-correlation-id: 4951aa32-5706-4326-e4f7-08da6a8dc25a
+x-ms-traffictypediagnostic: MN0PR12MB6102:EE_
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam: BCL:0;
+x-microsoft-antispam-message-info: a+AP7Qlkc5a/hECpi9sM1RwsEVcGh4dCZczXkL5bRDJC6ttuuBf6C6yNqxkfkh0Nvk/9ZD4v1EAFPeDJSM5NoU818NBUAY3RdI7B2WgC4XMrL4rJdEXrHAJzM7PE9QCxKCebKL1GOeee7xkvb89kFd+Y4rPC4uJm2YY6IiKlCL79NZp5QZfg8YUcf+7XYGnE4Nga73pGuab9+QAzdaUNJa5gytNJkTYPVuaPFP+eOVS3CTGC48JwNvrBTF/QQTf2FYHh7o2Lxjn6PjRcvIo6GaeItBMPznQsQXuAJJM6QRGFRvdxbscWkGrUtjzH5OnComkpZvQdLDTX5yAFw5TDzLB6aepNmcIpviNnjZQ/C9zM8e25HqB+8c+MAVIaxYU7yrxEUk5+I+0bhJjASqXwIamAG6YeDQ8mDvUBo51IWfvinZBFup3mFttpft/TpiYuVY/kf3fRFmEYE/EikgC6bxtuKXI1E4SFJAQHZmnUH39VTOhzH7XWFCdCdC3ujR/aM00MdU6KAZry/6qxpdFtpL+niXRFtCO+Y/Oym76AGO/SO74tBgwdnsDZRXxxrpxT5DpHFjw2y6EyZ4Cp67rb6aPpIVMuJ1w33EcvO0SYLUd2eUKud9jTl6zfvbhqdn0jSfpn5mcq2XSm0n9uLRK9Bj9bax6dAkjoT/SvUmzJLNvh1kyy12Wp9XEy/SMPNld6eu3ygEkkLj084wlvl02iGfpMxD4abGMmF48c0etbBkdQDMqK3qXGk5cph79ZZ+BQWsYi3FPmBAtFbR6w3E6NEP9jCftRvJ7V64KSek/K2HKadnrgSPuqVNo1kxHrrjo4PnMtgxcdOlPEy7JiOEz8qA==
+x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM6PR12MB3500.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230016)(4636009)(366004)(136003)(376002)(346002)(396003)(39860400002)(38100700002)(8676002)(66446008)(122000001)(186003)(33656002)(83380400001)(86362001)(71200400001)(52536014)(2906002)(41300700001)(26005)(7696005)(6916009)(9686003)(53546011)(6506007)(38070700005)(4326008)(76116006)(316002)(8936002)(478600001)(66946007)(54906003)(66476007)(55016003)(66556008)(5660300002)(64756008)(21314003);DIR:OUT;SFP:1101;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0: =?us-ascii?Q?x5v68i/ynoDIGhDGJcwSY8y1LcnhPpXPSA+0i5dVD/DgxJ+zwiHMaLkqCDKb?=
+ =?us-ascii?Q?9rKcuepAvddFvk0DQmGvJaQDzvQMWyIsWOo7n/5dA2g4XAfSqA6xoLwQhwYu?=
+ =?us-ascii?Q?8NTY9Djc3jC0pUX79DcU6l2XdUM6a4uM/Y9k2vTC1Acf2HHxzDqwpc3+MNmK?=
+ =?us-ascii?Q?3ZRDX/uOe9g46chdZfed5uFRNNFVoYsrIwdL0YmNJTLNzt0AI6qLJ4q0MHCJ?=
+ =?us-ascii?Q?MPBr0aTWrh9WD4+Lt3No9+nhwV+5eWP9oVUzcrIZ8bGjFL1NTPbbxuXPtLme?=
+ =?us-ascii?Q?DcAPMte7rkorwEykneNgaIddMpDiARg0KtmgJ3lgnsJVjM/RfKqBWAVZSU9e?=
+ =?us-ascii?Q?rfDmTC/zOuLI+3nLdIT3F9wvHJlj2uYUtUcZpYGPKavz6XAAujTZOIqlTs/L?=
+ =?us-ascii?Q?0n55YN9Na8hCOV70gDr/rLg6ddenU4DkV7NoEk9HCH/+4zjGFj+n07aXgZPe?=
+ =?us-ascii?Q?xvr1L/e2DmVP/Mw4EctpYnp1PY4NYM3ss5clLRGXX203cW/cd2/+TwUn+y7b?=
+ =?us-ascii?Q?PUY5SN+E98WDafle9Z33cb/MOymZYlAJj5amNyofZ9uH/21jwy8mXvCD4RLv?=
+ =?us-ascii?Q?0PSCwgDmCRhhZTX01hpDIEHAe3qYRezRrzrR0mH3nUdKoXHohnD2wsd971Si?=
+ =?us-ascii?Q?yIBgxPVeNc3KrWV1fjJlRHMA6fu+ucC6/hpszxvXRcXT0BKNMWkIvoAogWgJ?=
+ =?us-ascii?Q?nMbtHj6T4T4R+bcUKurr24J8puj0rX3LdH9XFOnqrKBhkCC0Zfh8cqLoGC63?=
+ =?us-ascii?Q?CdjSKqJS+HOcDEV6V4g5HClok9i3f/s7OveRW3wAq6DLNNrDVzmqGGYrIWgX?=
+ =?us-ascii?Q?eHHv1dIawSuxAdebY9C84K4pJ6B3xNbPEYtHaKhXBoU1GUOP2yKXiCnwNjKq?=
+ =?us-ascii?Q?0nJbW3ujA7QCHSVhWm69Mmp5NGGVW7k32F8s2WNx+ZQsiYz/AQfHrpPdtiCq?=
+ =?us-ascii?Q?Opgh8S/zQ44fUU6i0WylXlq3XPAZ2DlUirbx+zXJdpXzNaeXF7Msoc/qnKFb?=
+ =?us-ascii?Q?u9xPOSEG8LUwEC3QO+3EcS96LMNwyxpv3aAg0tI8UUb+dzPCcRwbvOzRzD7Q?=
+ =?us-ascii?Q?Hg6KWPCTVppoHX3rTcFUAsX9kQffqkwP6DN2Q+8baG7AgDq+SGAAW/VeBdPt?=
+ =?us-ascii?Q?dVHQMDe7MqpoNlrirLmHiuKybdJpGiw94H2uNpwtcsP8dA4U9RyWs2ugS30G?=
+ =?us-ascii?Q?Db7II2AhzlkaylYoSFiRVS0Y2JZVUj8DsmnZIxr51nxplWDlV3w8J24fanjb?=
+ =?us-ascii?Q?gRntObgIPv1ckJAasSonKJeO34HzuJnn9uyVWylRNUsQl43rom69sjnoKau0?=
+ =?us-ascii?Q?MYOKH+5Uidt9EdBfGLLLlH+qpNvvaSqy6gIy1ODfAkGFiMmOMBGlerg5ZPtM?=
+ =?us-ascii?Q?wgfna78KY2/qZqA5O+QjcBMn7S2pvs3bT5xdcDZhDrC1hLda/S69YWbPa3Aw?=
+ =?us-ascii?Q?0k9W/pfSMFNbEsKNMHxmi6LJGUdpbQP5BfeK+pz7OSdCTfmlrbIKfW5dwtYb?=
+ =?us-ascii?Q?pRk8CZt3NmTpUUQZptJdZoz7P7HBSnf6MAZWB/kEzLRz2Ub/+ztWpwEiGp3O?=
+ =?us-ascii?Q?g6HNIDGaujYsUTgaBHSgO9V+KDmfdxPZRwtAIHzU?=
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: 63e8c680-5a38-4349-e819-08da6a8b9e08
-X-MS-TrafficTypeDiagnostic: MN2PR12MB4783:EE_
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: vpu+Cv5x5vqm8Yu+AgAkuOYAaP+lqB2Yvn0rnogh/qQ4ARw5NbRoZ60m4/ScyfLz2i02aOgJ/utDeLeK/YCWutct4m/4eVz4F3cCNHw1wEBCuPbpupclDFYHbv1lrDdru+WhuS1caatLg/6TPpzUQyw3WL2tJRgW7msaEwEZcjpnOGa2fJc5afuhjHPir9qXlZMnDdxwDeDCvYUl3rVyrn8hnTEa5xnW8mbDxZHeqnKGb8nUJv3BOE6lP8HgREtw7qPsYsyWn70Oa9tNILgy1crZJfBV+3OcdnF4RIjsjKkIUyKDWsLxSKcaEt6CuwLUgHI7UZvTxLj8HCwya4VgInWYrGUbADDnOchvzX8iRFEs+oZts1uuFzApupnM4IYTycMJUczfhOHVr2WstlECoa/0FJem42Wj+nB4B6lrJDLxiPNN7G0N3xgIxTlj7B24Drb/oVkqzBC0Wu06TtgCvgfAI4dvo8U0UtQFa32c1zsdflQ1/m1a/g4H0xaEtimn8Ttuv21JoOFXNQPMsbcF4PqZpnLbP4WzAa3oROSBEKgJ3rxDj9jVBna2gs2JAPRuvpUIPqFYph7cJNcXJ1fhpHYTQmq+xKA0+qvH/YPTglR1VqOxCNjXUxgPyAI2De+jcYRNnsUcjVLefH4Ov/sWKjFETvb4vRTgXiqB4U3nIXdDnXMaEFR9o7NZ6b4nxi5xlgI8Ku6Beuq6z6sMEtxPJm78Zx7dTjMF9scFlz41yJI=
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:MN2PR12MB4192.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230016)(4636009)(376002)(366004)(346002)(136003)(39860400002)(396003)(5660300002)(8936002)(7416002)(7406005)(33656002)(2906002)(478600001)(26005)(86362001)(6506007)(6512007)(6486002)(8676002)(107886003)(2616005)(1076003)(186003)(38100700002)(83380400001)(41300700001)(66556008)(6916009)(4326008)(54906003)(36756003)(66476007)(316002)(66946007);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?m5O4tfz8WmT8mit0zKYsuq1NArr8EDAaGnEAW75ZquZisT8K52BgYjwek6vo?=
- =?us-ascii?Q?R5vR9Q24ad4Thkc+b644rL1mlymfWiv3uGB/P9i5eddDBS+npuIH0H6K8x0p?=
- =?us-ascii?Q?Y4aBo8MbYxcytmqPkqEGtEqqDXL5li+V1a+xNXPqFgt9yYPE9EoVFYkfYcdj?=
- =?us-ascii?Q?Busv6FT12zAWSMgL3ryrWW6M9jEIp16pac68PJhuIexkTlITruPqzwlihuIG?=
- =?us-ascii?Q?94ifwlZppWwlvqMb77KEh/IoZytAaQJMBPSWSoZW2CwLZzrA2D6w6Ex98H3G?=
- =?us-ascii?Q?/7wb6O8PMcsKmBt3RV2svB6eN16FsMbFg6IHLDHY3Uxpn/m0BvgqHXcBaOB2?=
- =?us-ascii?Q?nlT0A92rijjEEoR81XRIeGSo26IDu4gDzDW7CWMwtiC5NryqFkVK/ea8Vjd7?=
- =?us-ascii?Q?MBvjGk3FELJC85Rh+vs3ccvQyk+olOetUhNnxZYV0qBtcnsn03UfazMt9mmu?=
- =?us-ascii?Q?j8Uye+7HYzwTeSjDZrn4bBN2WK7gVWO8rIfwdxHd5OVbA2i80FRrDUM0XOmF?=
- =?us-ascii?Q?84891zJs5nwVj1DzJno4El/JrluxCFUqHKZ3TiksaU9MSTNNqOkSiLhkv+ZH?=
- =?us-ascii?Q?la4i9P9ZPgIdVWgGBtJHT+pBZU8/JDs1bp+CkMuNSSQMCUyZsj1zS1I4vZYR?=
- =?us-ascii?Q?U6cuxCY+HcepkMMA556rU/3wS2LB7s/Idv0w17V9Cu1K5PectQ1j9ssVwHPj?=
- =?us-ascii?Q?cqamtNPopKkfQMmjY4LMVtd87rFhSB7rIhXIawp8k1H4W97hcIWw8SliWSbG?=
- =?us-ascii?Q?sQ8Nzu/HZfq98lpYV6t+2KfkeCtUhA8Sv4OGxXIvOR1JLpsNDa5QgthXjEMY?=
- =?us-ascii?Q?x95gleeci8S78HIDkmsRIFDbFZJXdKs24MdbwO2cxkWIQI5SNb99UcR4g0Ve?=
- =?us-ascii?Q?hubtUpMQ7+P94boHgJQxjzKeMSQgAD+POkDPWGIMmCJde77gm6l4JyqBnn9o?=
- =?us-ascii?Q?LtOTAkXLNPsQD+OGRiGll4TpFUuqEC1hFZq7wiqwcFtMYXvmE0cnD8yOSUxb?=
- =?us-ascii?Q?BPj4K/dSpEgIEyFnsYq98QddT0km3g0/MVUmzb4MCbs6xaQ5RWCdSZd0vEY3?=
- =?us-ascii?Q?rNWSVZVpt7hF/sfFZuSo8aY9a3/dhjUPYC2xYmS9gXl0mzdr+6n10lWOiLYG?=
- =?us-ascii?Q?kT/bYokelZM51R7VRQWW0sFZdbOCeUx/ONGeDEydMB+eca7mjKecPe8ofeRl?=
- =?us-ascii?Q?CX8J9vqB6xbpvdGKi3qKvOcn40/dnW+s5QQUNcsOXU5rovuq3r2drFFAnk8q?=
- =?us-ascii?Q?DlPrUZSeUPe91O3TY7QZRMOj/bwS4H6cwZbLZ7Y67Co3c2igEOzLCrcNsleA?=
- =?us-ascii?Q?s5L+XrBeNCnNuxaNB0t4uUCAYG1CxrhOPpNq8P1LlVp+yNQPj6od4hrGfKoF?=
- =?us-ascii?Q?3PVtA1BNHa1bAe4FryQK0l6jvF3qP2C1xD2KvaQ5ln5vU9M9kYSMNmtilEgb?=
- =?us-ascii?Q?ojdjr5PUhVJHK6vSxHXD0s/JkesS08/qjryWgk7IHPgkzS2qS4Y55MffYOR3?=
- =?us-ascii?Q?Iw9QlN4XkximTZuTTsS+2ZImVwQNvgXofpzQl+9tjtXMqwBOdgAkoPCyQerq?=
- =?us-ascii?Q?z2s1DjBByfthAT2on6Fm+gqEWIr7FjZyGU2ALPBL?=
 X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 63e8c680-5a38-4349-e819-08da6a8b9e08
-X-MS-Exchange-CrossTenant-AuthSource: MN2PR12MB4192.namprd12.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 20 Jul 2022 20:08:31.2135
+X-MS-Exchange-CrossTenant-AuthSource: DM6PR12MB3500.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 4951aa32-5706-4326-e4f7-08da6a8dc25a
+X-MS-Exchange-CrossTenant-originalarrivaltime: 20 Jul 2022 20:23:50.9860
  (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: e9MiieropZOiHFi/DBbO/QgDICEon2BdheESMjxTfFqHvMd2zqkxDJayXqLFJ76T
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: MN2PR12MB4783
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: xD528RIQ7WSVy5KSKJOouKtQ1UzFVb5dFG0eIIzAvfuc6VPcozrnN+fTApu+wb1EmyOyoPwQ9lBNJnQng7pL0Q==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: MN0PR12MB6102
 X-Spam-Status: No, score=-1.8 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FORGED_SPF_HELO,
         RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_NONE
@@ -142,37 +124,82 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Jul 20, 2022 at 01:41:13PM -0600, Alex Williamson wrote:
- 
-> ie. we don't need the gfn, we only need the iova.
 
-Right, that makes sense
- 
-> However then I start to wonder why we're passing in 1 for the number of
-> pages because this previously notifier, now callback is called for the
-> entire vfio_dma range when we find any pinned pages.  
 
-Well, it is doing this because it only ever pins one page.
+> -----Original Message-----
+> From: Sean Christopherson <seanjc@google.com>
+> Sent: Wednesday, July 20, 2022 12:30 PM
+> To: Kechen Lu <kechenl@nvidia.com>
+> Cc: kvm@vger.kernel.org; pbonzini@redhat.com; chao.gao@intel.com;
+> vkuznets@redhat.com; Somdutta Roy <somduttar@nvidia.com>; linux-
+> kernel@vger.kernel.org
+> Subject: Re: [RFC PATCH v4 5/7] KVM: x86: add vCPU scoped toggling for
+> disabled exits
+>=20
+> External email: Use caution opening links or attachments
+>=20
+>=20
+> On Wed, Jul 20, 2022, Kechen Lu wrote:
+> > > > @@ -6036,14 +6045,17 @@ int kvm_vm_ioctl_enable_cap(struct kvm
+> kvm,
+> > > >                       break;
+> > > >
+> > > >               mutex_lock(&kvm->lock);
+> > > > -             if (kvm->created_vcpus)
+> > > > -                     goto disable_exits_unlock;
+> > > > +             if (kvm->created_vcpus) {
+> > >
+> > > I retract my comment about using a request, I got ahead of myself.
+> > >
+> > > Don't update vCPUs, the whole point of adding the
+> > > !kvm->created_vcpus check was to avoid having to update vCPUs when
+> > > the per-VM behavior changed.
+> > >
+> > > In other words, keep the restriction and drop the request.
+> > >
+> >
+> > I see. If we keep the restriction here and not updating vCPUs when
+> > kvm->created_vcpus is true, the per-VM and per-vCPU assumption would
+> > kvm->be
+> > different here? Not sure if I understand right:
+> > For per-VM, we assume the per-VM cap enabling is only before vcpus
+> creation.
+> > For per-vCPU cap enabling, we are able to toggle the disabled exits run=
+time.
+>=20
+> Yep.  The main reason being that there's no use case for changing per-VM
+> settings after vCPUs are created.  I.e. we could lift the restriction in =
+the future
+> if a use case pops up, but until then, keep things simple.
+>=20
+> > If I understand correctly, this also makes sense though.
+>=20
+> Paging this all back in...
+>=20
+> There are two (sane) options for defining KVM's ABI:
+>=20
+>   1) KVM combines the per-VM and per-vCPU settings
+>   2) The per-vCPU settings override the per-VM settings
+>=20
+> This series implements (2).
+>=20
+> For (1), KVM would need to recheck the per-VM state during the per-vCPU
+> update, e.g. instead of simply modifying the per-vCPU flags, the vCPU-sco=
+ped
+> handler for KVM_CAP_X86_DISABLE_EXITS would need to merge the
+> incoming settings with the existing kvm->arch.xxx_in_guest flags.
+>=20
+> I like (2) because it's simpler to implement and document (merging state =
+is
+> always
+> messy) and is more flexible.  E.g. with (1), the only way to have per-vCP=
+U
+> settings is for userspace to NOT set the per-VM disables and then set
+> disables on a per-vCPU basis.  Whereas with (2), userspace can set (or no=
+t)
+> the per-VM disables and then override as needed.
 
-The drivers are confused about what the contract is. vfio is calling
-the notifier with the entire IOVA range that is being unmapped and the
-drivers are expecting to receive notifications only for the IOVA they
-have actually pinned.
+Gotcha. Makes sense to me. Thanks for the elaboration!
 
-> Should ap and ccw implementations of .dma_unmap just be replaced with a
-> BUG_ON(1)?
-
-The point of these callbacks is to halt concurrent DMA, and ccw does
-that today. It looks like AP is missing a call to ap_aqic(), so it is
-probably double wrong.
-
-What I'd suggest is adding a WARN_ON that the dma->pfn_list is not
-empty and leave these functions alone.
-
-Most likely AP should be fixed to call vfio_ap_irq_disable() and to
-check the q->saved_pfn against the IOVA.
-
-But I'm inclined to leave this as-is for this series given we are at
-rc7.
-
-Jason
+BR,
+Kechen
