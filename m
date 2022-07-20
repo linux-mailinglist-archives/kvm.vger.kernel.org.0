@@ -2,160 +2,229 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 0923E57BF55
-	for <lists+kvm@lfdr.de>; Wed, 20 Jul 2022 22:47:34 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 22C5357BF7B
+	for <lists+kvm@lfdr.de>; Wed, 20 Jul 2022 23:17:13 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229756AbiGTUrc (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 20 Jul 2022 16:47:32 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59242 "EHLO
+        id S230293AbiGTVRL (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 20 Jul 2022 17:17:11 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46016 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229452AbiGTUr3 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 20 Jul 2022 16:47:29 -0400
-Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DDFDD51A30;
-        Wed, 20 Jul 2022 13:47:27 -0700 (PDT)
-Received: from pps.filterd (m0098409.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.17.1.5/8.17.1.5) with ESMTP id 26KKkrD5008773;
-        Wed, 20 Jul 2022 20:47:20 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : subject :
- from : to : cc : date : in-reply-to : references : content-type :
- mime-version : content-transfer-encoding; s=pp1;
- bh=PXCc9V5i424eVXq6XuYSFn2k2F4T0ZQCulJ+y2jDyXw=;
- b=K3MKcKXlHSGKORzu/7GxTBIim80IVq4Mt6fOC4pthwc072WsE5ZmgJvztImrOs30wof8
- yMOV6feNcKzhdv911y+P+fqO63+zfasaUeFYIoCc/mL4aMaGj+MpOcRf73NDTHlvn57D
- OuHHGnVRfqLwF8f0ROvLkpks03jVAbxcHD7AIFrtpFG/3kB+fUvW+XNeWnde449WC+09
- i8x+VX8NOJIa71GcXvpryvEdMP/W+eqKrjJU3jX7BUOJdjGlLkmXk6662PONCPymvdNk
- tTymQqtuCcarTVOdGYMg3yfnltxN7VJzm7ip8xsvJnFuD7O/iry3IAgskV2lOI3c0SWE Cw== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3herp7rn8s-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Wed, 20 Jul 2022 20:47:20 +0000
-Received: from m0098409.ppops.net (m0098409.ppops.net [127.0.0.1])
-        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 26KKkvkF009114;
-        Wed, 20 Jul 2022 20:47:20 GMT
-Received: from ppma02dal.us.ibm.com (a.bd.3ea9.ip4.static.sl-reverse.com [169.62.189.10])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3herp7rn82-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Wed, 20 Jul 2022 20:47:19 +0000
-Received: from pps.filterd (ppma02dal.us.ibm.com [127.0.0.1])
-        by ppma02dal.us.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 26KKLUWD027125;
-        Wed, 20 Jul 2022 20:47:19 GMT
-Received: from b01cxnp22033.gho.pok.ibm.com (b01cxnp22033.gho.pok.ibm.com [9.57.198.23])
-        by ppma02dal.us.ibm.com with ESMTP id 3hbmy9tnm1-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Wed, 20 Jul 2022 20:47:18 +0000
-Received: from b01ledav005.gho.pok.ibm.com (b01ledav005.gho.pok.ibm.com [9.57.199.110])
-        by b01cxnp22033.gho.pok.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 26KKlHnt61735226
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Wed, 20 Jul 2022 20:47:17 GMT
-Received: from b01ledav005.gho.pok.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id A903AAE060;
-        Wed, 20 Jul 2022 20:47:17 +0000 (GMT)
-Received: from b01ledav005.gho.pok.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id F40A1AE05C;
-        Wed, 20 Jul 2022 20:47:14 +0000 (GMT)
-Received: from farman-thinkpad-t470p (unknown [9.211.146.30])
-        by b01ledav005.gho.pok.ibm.com (Postfix) with ESMTP;
-        Wed, 20 Jul 2022 20:47:14 +0000 (GMT)
-Message-ID: <65746aea193d4a814f895eca4b00b72cf29ac8f9.camel@linux.ibm.com>
-Subject: Re: [PATCH 05/14] vfio/mdev: simplify mdev_type handling
-From:   Eric Farman <farman@linux.ibm.com>
-To:     Christoph Hellwig <hch@lst.de>,
-        Kirti Wankhede <kwankhede@nvidia.com>,
-        Tony Krowiak <akrowiak@linux.ibm.com>,
-        Halil Pasic <pasic@linux.ibm.com>,
-        Jason Herne <jjherne@linux.ibm.com>,
-        Matthew Rosato <mjrosato@linux.ibm.com>,
-        Zhenyu Wang <zhenyuw@linux.intel.com>,
-        Zhi Wang <zhi.a.wang@intel.com>,
-        Alex Williamson <alex.williamson@redhat.com>
-Cc:     Jason Gunthorpe <jgg@nvidia.com>, kvm@vger.kernel.org,
-        linux-s390@vger.kernel.org, intel-gvt-dev@lists.freedesktop.org,
-        Kevin Tian <kevin.tian@intel.com>
-Date:   Wed, 20 Jul 2022 16:47:13 -0400
-In-Reply-To: <20220709045450.609884-6-hch@lst.de>
-References: <20220709045450.609884-1-hch@lst.de>
-         <20220709045450.609884-6-hch@lst.de>
-Content-Type: text/plain; charset="UTF-8"
-X-Mailer: Evolution 3.28.5 (3.28.5-18.el8) 
-Mime-Version: 1.0
-Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-ORIG-GUID: LeTFFDCayeIQQckPjK9m0Nz8qL7MjNzM
-X-Proofpoint-GUID: Cu7dwAIP90sG6U9bqXnn85oF_odgVOTP
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.205,Aquarius:18.0.883,Hydra:6.0.517,FMLib:17.11.122.1
- definitions=2022-07-20_12,2022-07-20_01,2022-06-22_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 impostorscore=0 bulkscore=0
- adultscore=0 suspectscore=0 mlxlogscore=999 mlxscore=0 priorityscore=1501
- phishscore=0 malwarescore=0 lowpriorityscore=0 clxscore=1015 spamscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2206140000
- definitions=main-2207200082
-X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_EF,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_PASS
-        autolearn=ham autolearn_force=no version=3.4.6
+        with ESMTP id S229484AbiGTVRK (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 20 Jul 2022 17:17:10 -0400
+Received: from mail-pj1-x102e.google.com (mail-pj1-x102e.google.com [IPv6:2607:f8b0:4864:20::102e])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6905F23152
+        for <kvm@vger.kernel.org>; Wed, 20 Jul 2022 14:17:05 -0700 (PDT)
+Received: by mail-pj1-x102e.google.com with SMTP id b10so7939648pjq.5
+        for <kvm@vger.kernel.org>; Wed, 20 Jul 2022 14:17:05 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=NaR9N4OauE6F0T95oi/viHvYl6qf1E4qOLQi4oxNhhA=;
+        b=mrbEd58TiGtptOCoPLCXhfpXmWL49rNjaSwJG208LF+R4TIixb2rVR7TzJRgou4fHW
+         PipSq09eCo0Mdd49eis1z42PYzkWmgRH5uwqBWxE/6U3O2Cfy1tMn+94neVjuL8CrckM
+         d+I2u9iLudGhmsEsmJ5ChL8udKBuh3TMg1ehs0ukp4KQXyvZ1LeC6yvR9DBMOh9FDtYv
+         u3SwP/6g6zQIulQGL42uGaBJaP/+SEw+/pskUr69kQGUPbKss7VW6jqk7UhsspSMYMJC
+         tHRCErtwKmKL/mlpbOWyDSNTXyILnlM/ZEHypjrEorKszAMp8Y8EspKW5UXDeawAN4RL
+         4r8Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=NaR9N4OauE6F0T95oi/viHvYl6qf1E4qOLQi4oxNhhA=;
+        b=jOlpHAYskUNFqBhwAmbsJ4I0b7kDx33fMAyUspB+qDgeUsqnSqqWxCqUZYuz9xaswG
+         HzkHw52/J2tGSaCB+tdvZ1qqCpin4Mt04JA9jEv96QeU63drPgoVEcK8z+ri5vZwGIi8
+         VvKMmqd7is7J25HQl+v43/UywCXLd1UqmeGNi0BSQmdyYr8Ii38FQyQs8xmxWewkPl6S
+         q1xFoWHwUPan6Us6dE+CYQb6TrO2yK6LlQ5o3QWdfIiU8SC6dlsmcMsePy8P8z3xOKi7
+         SlPvnSg0RGQdhq+Dh3NsNMmGbjcnYqpv1RyInhm4ussr3R/yrhHRfttvi/cxFk9tCBN/
+         8XRg==
+X-Gm-Message-State: AJIora8w/3frWh5pmDtrBfPMSOGPErwxK0UC4lkfeojFmBPYVEKpWfyZ
+        RgOExBqVNd5Bc6117LbyA+AKNg==
+X-Google-Smtp-Source: AGRyM1svtaT0JDNnzpkJnrm0ReeF5LwlQes8hUEBf/V2rbihL8ZE5dTWTWPWSE3br/M9nX23k69eog==
+X-Received: by 2002:a17:902:a3cc:b0:16d:1af4:6359 with SMTP id q12-20020a170902a3cc00b0016d1af46359mr7373088plb.56.1658351824738;
+        Wed, 20 Jul 2022 14:17:04 -0700 (PDT)
+Received: from google.com (123.65.230.35.bc.googleusercontent.com. [35.230.65.123])
+        by smtp.gmail.com with ESMTPSA id o10-20020a634e4a000000b00401a9bc0f33sm12131866pgl.85.2022.07.20.14.17.04
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 20 Jul 2022 14:17:04 -0700 (PDT)
+Date:   Wed, 20 Jul 2022 21:17:00 +0000
+From:   Sean Christopherson <seanjc@google.com>
+To:     Will Deacon <will@kernel.org>
+Cc:     kvmarm@lists.cs.columbia.edu, Ard Biesheuvel <ardb@kernel.org>,
+        Alexandru Elisei <alexandru.elisei@arm.com>,
+        Andy Lutomirski <luto@amacapital.net>,
+        Catalin Marinas <catalin.marinas@arm.com>,
+        James Morse <james.morse@arm.com>,
+        Chao Peng <chao.p.peng@linux.intel.com>,
+        Quentin Perret <qperret@google.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        Michael Roth <michael.roth@amd.com>,
+        Mark Rutland <mark.rutland@arm.com>,
+        Fuad Tabba <tabba@google.com>,
+        Oliver Upton <oliver.upton@linux.dev>,
+        Marc Zyngier <maz@kernel.org>, kernel-team@android.com,
+        kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org
+Subject: Re: [PATCH v2 00/24] KVM: arm64: Introduce pKVM shadow state at EL2
+Message-ID: <YthwzIS18mutjGhN@google.com>
+References: <20220630135747.26983-1-will@kernel.org>
+ <YsXfyVp6sg5XRVAp@google.com>
+ <20220708162359.GA6286@willie-the-truck>
+ <YtbXtI/lEnNL7fHQ@google.com>
+ <20220720184859.GD16603@willie-the-truck>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20220720184859.GD16603@willie-the-truck>
+X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
+        USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Sat, 2022-07-09 at 06:54 +0200, Christoph Hellwig wrote:
-> Instead of abusing struct attribute_group to control initialization
-> of
-> struct mdev_type, just define the actual attributes in the
-> mdev_driver,
-> allocate the mdev_type structures in the caller and pass them to
-> mdev_register_parent.
+On Wed, Jul 20, 2022, Will Deacon wrote:
+> Hi Sean,
 > 
-> This allows the caller to use container_of to get at the containing
-> structure and thus significantly simplify the code.
+> On Tue, Jul 19, 2022 at 04:11:32PM +0000, Sean Christopherson wrote:
+> > Or maybe just "pkvm"?
 > 
-> Signed-off-by: Christoph Hellwig <hch@lst.de>
-> Reviewed-by: Jason Gunthorpe <jgg@nvidia.com>
-> Reviewed-by: Kevin Tian <kevin.tian@intel.com>
-> Reviewed-by: Kirti Wankhede <kwankhede@nvidia.com>
-> ---
+> I think the "hyp" part is useful to distinguish the pkvm code running at EL2
+> from the pkvm code running at EL1. For example, we have a 'pkvm' member in
+> 'struct kvm_arch' which is used by the _host_ at EL1.
 
-...snip...
+Right, my suggestion was to rename that to pkvm_handle to avoid a direct conflict,
+and then that naturally yields the "pkvm_handle => pkvm_vm" association.  Or are
+you expecting to shove more stuff into the that "pkvm" struct?
+ 
+> So I'd say either "pkvm_hyp" or "hyp" instead of "shadow". The latter is
+> nice and short...
 
-> diff --git a/drivers/vfio/mdev/mdev_sysfs.c
-> b/drivers/vfio/mdev/mdev_sysfs.c
-> b/drivers/vfio/mdev/mdev_sysfs.c
-> index b71ffc5594870..80b2d546a3d98 100644
-> --- a/drivers/vfio/mdev/mdev_sysfs.c
-> +++ b/drivers/vfio/mdev/mdev_sysfs.c
-> @@ -90,35 +90,21 @@ static struct kobj_type mdev_type_ktype = {
->  	.release = mdev_type_release,
->  };
->  
-> -static struct mdev_type *add_mdev_supported_type(struct mdev_parent
-> *parent,
-> -						 unsigned int
-> type_group_id)
-> +static int mdev_type_add(struct mdev_parent *parent, struct
-> mdev_type *type)
->  {
-> -	struct mdev_type *type;
-> -	struct attribute_group *group =
-> -		parent->mdev_driver-
-> >supported_type_groups[type_group_id];
->  	int ret;
->  
-> -	if (!group->name) {
-> -		pr_err("%s: Type name empty!\n", __func__);
-> -		return ERR_PTR(-EINVAL);
-> -	}
-> -
-> -	type = kzalloc(sizeof(*type), GFP_KERNEL);
-> -	if (!type)
-> -		return ERR_PTR(-ENOMEM);
-> -
+I 100% agree that differentating between EL1 and EL2 is important for functions,
+structs and global variables, but I would argue it's not so important for fields
+and local variables where the "owning" struct/function provides that context.  But
+that's actually a partial argument for just using "hyp".
 
-Since mdev_type is embedded in the parent and the alloc is removed,
-shouldn't the kfree(type) in mdev_type_release() also be removed? (This
-appears to be at least one of the causes of my system crashes.)
+My concern with just using e.g. "kvm_hyp" is that, because non-pKVM nVHE also has
+the host vs. hyp split, it could lead people to believe that "kvm_hyp" is also
+used for the non-pKVM case.
 
-...snip.
-..
+So, what about a blend?  E.g. "struct pkvm_hyp_vcpu *hyp_vcpu".  That provides
+the context that the struct is specific to the EL2 side of pKVM, most usage is
+nice and short, and the "hyp" prefix avoids the ambiguity that a bare "pkvm" would
+suffer for EL1 vs. EL2.
 
+Doesn't look awful?
+
+static void handle___kvm_vcpu_run(struct kvm_cpu_context *host_ctxt)
+{
+	DECLARE_REG(struct kvm_vcpu *, host_vcpu, host_ctxt, 1);
+	int ret;
+
+	host_vcpu = kern_hyp_va(host_vcpu);
+
+	if (unlikely(is_protected_kvm_enabled())) {
+		struct pkvm_hyp_vcpu *hyp_vcpu;
+		struct kvm *host_kvm;
+
+		host_kvm = kern_hyp_va(host_vcpu->kvm);
+
+		hyp_vcpu = pkvm_load_hyp_vcpu(host_kvm->arch.pkvm.handle,
+					      host_vcpu->vcpu_idx);
+		if (!hyp_vcpu) {
+			ret = -EINVAL;
+			goto out;
+		}
+
+		flush_pkvm_guest_state(hyp_vcpu);
+
+		ret = __kvm_vcpu_run(shadow_vcpu);
+
+		sync_pkvm_guest_state(hyp_vcpu);
+
+		pkvm_put_hyp_vcpu(shadow_state);
+	} else {
+		/* The host is fully trusted, run its vCPU directly. */
+		ret = __kvm_vcpu_run(host_vcpu);
+	}
+
+out:
+	cpu_reg(host_ctxt, 1) =  ret;
+}
+
+	
+ 
+> > I think that's especially viable if you do away with
+> > kvm_shadow_vcpu_state.  As of this series at least, kvm_shadow_vcpu_state is
+> > completely unnecessary.  kvm_vcpu.kvm can be used to get at the VM, and thus pKVM
+> > state via container_of().  Then the host_vcpu can be retrieved by using the
+> > vcpu_idx, e.g.
+> > 
+> > 	struct pkvm_vm *pkvm_vm = to_pkvm_vm(pkvm_vcpu->vm);
+> > 	struct kvm_vcpu *host_vcpu;
+> > 
+> > 	host_vcpu = kvm_get_vcpu(pkvm_vm->host_vm, pkvm_vcpu->vcpu_idx);
+> 
+> Using container_of() here is neat; we can definitely go ahead with that
+> change. However, looking at this in more detail with Fuad, removing
+> 'struct kvm_shadow_vcpu_state' entirely isn't going to work:
+
+> > struct kvm_vcpu *pkvm_vcpu_load(pkvm_handle_t handle, unsigned int vcpu_idx)
+> > {
+> > 	struct kvm_vpcu *pkvm_vcpu = NULL;
+> > 	struct kvm *vm;
+> > 
+> > 	hyp_spin_lock(&pkvm_global_lock);
+> > 	vm = pkvm_get_vm(handle);
+> > 	if (!vm || atomic_read(&vm->online_vcpus) <= vcpu_idx)
+> > 		goto unlock;
+> > 
+> > 	pkvm_vcpu = kvm_get_vcpu(vm, vcpu_idx);
+> 
+> kvm_get_vcpu() makes use of an xarray to hold the vCPUs pointers and this is
+> really something which we cannot support at EL2 where, amongst other things,
+> we do not have support for RCU. Consequently, we do need to keep our own
+> mapping from the shad^H^H^H^Hhyp vCPU to the host vCPU.
+
+Hmm, are there guardrails in place to prevent using "unsafe" fields from "struct kvm"
+and "struct kvm_vcpu" at EL2?  If not, it seems like embedding the common structs
+in the hyp/pkvm-specific structs is going bite us in the rear at some point.
+
+Mostly out of curiosity, I assume the EL2 restriction only applies to nVHE mode?
+
+And waaaay off topic, has anyone explored adding macro magic to generate wrappers
+to (un)marshall registers to parameters/returns for the hyp functions?  E.g. it'd
+be neat if you could make the code look like this without having to add a wrapper
+for every function:
+
+static int handle___kvm_vcpu_run(unsigned long __host_vcpu)
+{
+	struct kvm_vcpu *host_vcpu = kern_hyp_va(__host_vcpu);
+	int ret;
+
+	if (unlikely(is_protected_kvm_enabled())) {
+		struct pkvm_hyp_vcpu *hyp_vcpu;
+		struct kvm *host_kvm;
+
+		host_kvm = kern_hyp_va(host_vcpu->kvm);
+
+		hyp_vcpu = pkvm_load_hyp_vcpu(host_kvm->arch.pkvm.handle,
+					      host_vcpu->vcpu_idx);
+		if (!hyp_vcpu)
+			return -EINVAL;
+
+		flush_hypervisor_state(hyp_vcpu);
+
+		ret = __kvm_vcpu_run(shadow_vcpu);
+
+		sync_hypervisor_state(hyp_vcpu);
+		pkvm_put_hyp_vcpu(shadow_state);
+	} else {
+		/* The host is fully trusted, run its vCPU directly. */
+		ret = __kvm_vcpu_run(host_vcpu);
+	}
+	return ret;
+}
