@@ -2,120 +2,127 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id BF5DA57BD3C
-	for <lists+kvm@lfdr.de>; Wed, 20 Jul 2022 19:53:52 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id F264257BD89
+	for <lists+kvm@lfdr.de>; Wed, 20 Jul 2022 20:15:12 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235734AbiGTRxt (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 20 Jul 2022 13:53:49 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48172 "EHLO
+        id S229843AbiGTSPK (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 20 Jul 2022 14:15:10 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35914 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235359AbiGTRxs (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 20 Jul 2022 13:53:48 -0400
-Received: from mail-pl1-x636.google.com (mail-pl1-x636.google.com [IPv6:2607:f8b0:4864:20::636])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D81A85C9F6
-        for <kvm@vger.kernel.org>; Wed, 20 Jul 2022 10:53:47 -0700 (PDT)
-Received: by mail-pl1-x636.google.com with SMTP id y15so10915244plp.10
-        for <kvm@vger.kernel.org>; Wed, 20 Jul 2022 10:53:47 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=O/Al1R5ZaPxag7zuieAh2Klr5l3IIXmTVtnz4DBe9kE=;
-        b=L5eCiHPic82jvrGy8eviOxLocm+bUhF9zXDvSe3lXquqr5BiyI7gWbliS5TOC0uzTK
-         vpCZR49PHCShxi6qUHYcu76iIqJtC+pOobAqfEKUYeR57fYA+VVz2o22lEXIUNo8VuLc
-         OignMRlx3uxLF1Xzphm/gw+52RX8aa9KgW48tavtReu7JSfk9zR6w+Of0D2wiCzadVNo
-         OsxLuViI5K7FxrofivrD8OOOZ8iycP3vK65xoIj/IMEQb7oy4eXoeRcAS/hRbm+IJGNh
-         mK9g9PeeWD1WcJ97Sk1EH6lGweFo0tKUuawgOQkRPcj1FXpRu8O0YX62iUuIW1w74skl
-         FLaA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=O/Al1R5ZaPxag7zuieAh2Klr5l3IIXmTVtnz4DBe9kE=;
-        b=QZErc7P4iMbkAnFwc4TOs8XFuVAgB4tAfQsAdJQBQCupo4enD3Y4vvDZtwZbd9GSmU
-         6URpzot2mRRhwxJXQgica0Xo/Qzpb2znDqsaYYY6mYcwDBQFC44Ctbagka5/bsmhJPIc
-         8jFwX3xXtEFEXqqssudwQLKppR7oWpf0+Hbl8tFN/MhBBf4Z8+VOabe0gUee0sbXK1pH
-         k1HThKPc/VdhunNsrkq9P9WPfa3krPb+so0yBhc/TGdQrzyzXlsEjUJfGTm0n0ebqITg
-         h/noG5ytCjcuMOoIQobcwHE79c/FUcmZ4k7L440CGSXJ4UfkMXulOWHMyKJtqRKwJqpA
-         AY4Q==
-X-Gm-Message-State: AJIora82JhXWuOs7I4d6e00Qu0UCRDRsR38VPEko3fkzlZW42U9IH46Z
-        m5PsJIFMXbdkQ/yAhXUEdHoaZg==
-X-Google-Smtp-Source: AGRyM1vsyixSW4O3ki2duNTHeATcGTzaR/YXOLSIDbM9C3jky/23fESZc/anbhv3UrAtkeLB9U2tjA==
-X-Received: by 2002:a17:90b:4d0e:b0:1f1:9109:99df with SMTP id mw14-20020a17090b4d0e00b001f1910999dfmr6716536pjb.234.1658339627255;
-        Wed, 20 Jul 2022 10:53:47 -0700 (PDT)
-Received: from google.com (123.65.230.35.bc.googleusercontent.com. [35.230.65.123])
-        by smtp.gmail.com with ESMTPSA id c135-20020a621c8d000000b005290553d343sm13793677pfc.193.2022.07.20.10.53.46
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 20 Jul 2022 10:53:46 -0700 (PDT)
-Date:   Wed, 20 Jul 2022 17:53:42 +0000
-From:   Sean Christopherson <seanjc@google.com>
-To:     Kechen Lu <kechenl@nvidia.com>
-Cc:     kvm@vger.kernel.org, pbonzini@redhat.com, chao.gao@intel.com,
-        vkuznets@redhat.com, somduttar@nvidia.com,
-        linux-kernel@vger.kernel.org
-Subject: Re: [RFC PATCH v4 3/7] KVM: x86: Reject disabling of MWAIT
- interception when not allowed
-Message-ID: <YthBJsKOhgHfVs1u@google.com>
-References: <20220622004924.155191-1-kechenl@nvidia.com>
- <20220622004924.155191-4-kechenl@nvidia.com>
+        with ESMTP id S239895AbiGTSOS (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 20 Jul 2022 14:14:18 -0400
+Received: from ams.source.kernel.org (ams.source.kernel.org [IPv6:2604:1380:4601:e00::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3787D65D4A
+        for <kvm@vger.kernel.org>; Wed, 20 Jul 2022 11:14:17 -0700 (PDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by ams.source.kernel.org (Postfix) with ESMTPS id D3679B821A9
+        for <kvm@vger.kernel.org>; Wed, 20 Jul 2022 18:14:15 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id EC421C3411E;
+        Wed, 20 Jul 2022 18:14:10 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1658340854;
+        bh=Zy3j8P3splX48YJkjCqikBQJuhtL387mwjUOqWwhZyg=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=f1bSc0Yj3ibRsagQc+g6SlYtxYklYtOgYuELU4/xH6eumhIXFB0mvrGzjq7Cq2/rx
+         1L+jEMH8/N2dpUzOYhcT6ku+7sO7tjKA+JPJXSBFXDeSA2yZFC6QwIbS7zo3GYVAli
+         X+jZ3ubhnXd/DVyN5CD4O+BCW+nIOcvoL7qy9OAZFm79QI9eNd6pX1vbdxD2cA/OSD
+         rNMfyoqxx9j+72gIYM95fnrXCTYoTdrlP8UFHxmN70WwsgreKeJW6Ae32G+hX+rraQ
+         hqOBKq+TCkoU+034Kv4E36/ZCl+EgW2RUjseeClMBew0i29/Id0e7HycMOhUA6upY6
+         Q3tXZDv1WY/oA==
+Date:   Wed, 20 Jul 2022 19:14:07 +0100
+From:   Will Deacon <will@kernel.org>
+To:     Oliver Upton <oliver.upton@linux.dev>
+Cc:     kvmarm@lists.cs.columbia.edu, Ard Biesheuvel <ardb@kernel.org>,
+        Sean Christopherson <seanjc@google.com>,
+        Alexandru Elisei <alexandru.elisei@arm.com>,
+        Andy Lutomirski <luto@amacapital.net>,
+        Catalin Marinas <catalin.marinas@arm.com>,
+        James Morse <james.morse@arm.com>,
+        Chao Peng <chao.p.peng@linux.intel.com>,
+        Quentin Perret <qperret@google.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        Michael Roth <michael.roth@amd.com>,
+        Mark Rutland <mark.rutland@arm.com>,
+        Fuad Tabba <tabba@google.com>, Marc Zyngier <maz@kernel.org>,
+        kernel-team@android.com, kvm@vger.kernel.org,
+        linux-arm-kernel@lists.infradead.org
+Subject: Re: [PATCH v2 06/24] KVM: arm64: Unify identifiers used to
+ distinguish host and hypervisor
+Message-ID: <20220720181406.GA16603@willie-the-truck>
+References: <20220630135747.26983-1-will@kernel.org>
+ <20220630135747.26983-7-will@kernel.org>
+ <YtgbCEOMze8N4TPW@google.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20220622004924.155191-4-kechenl@nvidia.com>
-X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-        USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=unavailable
-        autolearn_force=no version=3.4.6
+In-Reply-To: <YtgbCEOMze8N4TPW@google.com>
+User-Agent: Mutt/1.10.1 (2018-07-13)
+X-Spam-Status: No, score=-7.8 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_HI,
+        SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Jun 21, 2022, Kechen Lu wrote:
-> From: Sean Christopherson <seanjc@google.com>
+Hi Oliver,
+
+Thanks for having a look.
+
+On Wed, Jul 20, 2022 at 03:11:04PM +0000, Oliver Upton wrote:
+> On Thu, Jun 30, 2022 at 02:57:29PM +0100, Will Deacon wrote:
+> > The 'pkvm_component_id' enum type provides constants to refer to the
+> > host and the hypervisor, yet this information is duplicated by the
+> > 'pkvm_hyp_id' constant.
+> > 
+> > Remove the definition of 'pkvm_hyp_id' and move the 'pkvm_component_id'
+> > type definition to 'mem_protect.h' so that it can be used outside of
+> > the memory protection code.
+> > 
+> > Signed-off-by: Will Deacon <will@kernel.org>
+> > ---
+> >  arch/arm64/kvm/hyp/include/nvhe/mem_protect.h | 6 +++++-
+> >  arch/arm64/kvm/hyp/nvhe/mem_protect.c         | 8 --------
+> >  arch/arm64/kvm/hyp/nvhe/setup.c               | 2 +-
+> >  3 files changed, 6 insertions(+), 10 deletions(-)
+> > 
+> > diff --git a/arch/arm64/kvm/hyp/include/nvhe/mem_protect.h b/arch/arm64/kvm/hyp/include/nvhe/mem_protect.h
+> > index 80e99836eac7..f5705a1e972f 100644
+> > --- a/arch/arm64/kvm/hyp/include/nvhe/mem_protect.h
+> > +++ b/arch/arm64/kvm/hyp/include/nvhe/mem_protect.h
+> > @@ -51,7 +51,11 @@ struct host_kvm {
+> >  };
+> >  extern struct host_kvm host_kvm;
+> >  
+> > -extern const u8 pkvm_hyp_id;
+> > +/* This corresponds to page-table locking order */
+> > +enum pkvm_component_id {
+> > +	PKVM_ID_HOST,
+> > +	PKVM_ID_HYP,
+> > +};
 > 
-> Reject KVM_CAP_X86_DISABLE_EXITS if userspace attempts to disable MWAIT
-> exits and KVM previously reported (via KVM_CHECK_EXTENSION) that MWAIT is
-> not allowed in guest, e.g. because it's not supported or the CPU doesn't
-> have an aways-running APIC timer.
-> 
-> Fixes: 4d5422cea3b6 ("KVM: X86: Provide a capability to disable MWAIT intercepts")
-> Signed-off-by: Sean Christopherson <seanjc@google.com>
-> Co-developed-by: Kechen Lu <kechenl@nvidia.com>
+> Since we have the concept of PTE ownership in pgtable.c, WDYT about
+> moving the owner ID enumeration there? KVM_MAX_OWNER_ID should be
+> incorporated in the enum too.
 
-Needs your SOB.
+Interesting idea... I think we need the definition in a header file so that
+it can be used by mem_protect.c, so I'm not entirely sure where you'd like
+to see it moved.
 
-> Suggested-by: Chao Gao <chao.gao@intel.com>
+The main worry I have is that if we ever need to distinguish e.g. one guest
+instance from another, which is likely needed for sharing of memory
+between more than just two components, then the pgtable code really cares
+about the number of instances ("which guest is it?") whilst the mem_protect
+cares about the component type ("is it a guest?").
 
-For code review feedback of this nature, adding Suggested-by isn't appropriate.
-Suggested-by is for when the idea of the patch itself was suggested by someone,
-where as Chao's feedback was a purely mechanical change.
+Finally, the pgtable code is also used outside of pKVM so, although the
+concept of ownership doesn't yet apply elsewhere, keeping the concept
+available without dictacting the different types of owners makes sense to
+me.
 
-> ---
->  arch/x86/kvm/x86.c | 20 +++++++++++++-------
->  1 file changed, 13 insertions(+), 7 deletions(-)
-> 
-> diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-> index b419b258ed90..6ec01362a7d8 100644
-> --- a/arch/x86/kvm/x86.c
-> +++ b/arch/x86/kvm/x86.c
-> @@ -4199,6 +4199,16 @@ static inline bool kvm_can_mwait_in_guest(void)
->  		boot_cpu_has(X86_FEATURE_ARAT);
->  }
->  
-> +static u64 kvm_get_allowed_disable_exits(void)
-> +{
-> +	u64 r = KVM_X86_DISABLE_VALID_EXITS;
+Does that make sense?
 
-In v3 I "voted" to keep the switch to KVM_X86_DISABLE_VALID_EXITS in the next
-patch[*], but seeing the result I 100% agree it's better to handle it here since
-the "enable" patch previously used KVM_X86_DISABLE_VALID_EXITS.
-
-[*] https://lore.kernel.org/all/Ytg428sleo7uMRQt@google.com
-
-> +
-> +	if(!kvm_can_mwait_in_guest())
-
-Space after the "if".
+Will
