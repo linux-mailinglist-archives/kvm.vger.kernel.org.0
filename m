@@ -2,99 +2,68 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 6FB2A57C0A4
-	for <lists+kvm@lfdr.de>; Thu, 21 Jul 2022 01:09:12 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 34E5A57C0D5
+	for <lists+kvm@lfdr.de>; Thu, 21 Jul 2022 01:23:58 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231550AbiGTXJI (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 20 Jul 2022 19:09:08 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56994 "EHLO
+        id S231430AbiGTXXy (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 20 Jul 2022 19:23:54 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40926 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231488AbiGTXIv (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 20 Jul 2022 19:08:51 -0400
-Received: from mail-pf1-x435.google.com (mail-pf1-x435.google.com [IPv6:2607:f8b0:4864:20::435])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 97FE973926
-        for <kvm@vger.kernel.org>; Wed, 20 Jul 2022 16:08:22 -0700 (PDT)
-Received: by mail-pf1-x435.google.com with SMTP id 17so161214pfy.0
-        for <kvm@vger.kernel.org>; Wed, 20 Jul 2022 16:08:22 -0700 (PDT)
+        with ESMTP id S231293AbiGTXXw (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 20 Jul 2022 19:23:52 -0400
+Received: from mail-pj1-x102e.google.com (mail-pj1-x102e.google.com [IPv6:2607:f8b0:4864:20::102e])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DF0DF4F6A4
+        for <kvm@vger.kernel.org>; Wed, 20 Jul 2022 16:23:51 -0700 (PDT)
+Received: by mail-pj1-x102e.google.com with SMTP id o5-20020a17090a3d4500b001ef76490983so3689718pjf.2
+        for <kvm@vger.kernel.org>; Wed, 20 Jul 2022 16:23:51 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=Nszl3bsf2mnME2IbrRKNWdpEyNRDpL7edLFc4oh5rQk=;
-        b=FwlOpTY1Xy5ZtTxSMQshR8kwWNBaEnIm9ywPyxdMxe3T/XxFEM/rXOZ8shtzx6jRRS
-         91M8w+897Sjn6+U9yhdoQBbOHvUIZbnudqyVKqIbiFL3KIAItk6n7+SblQBLvdTN309V
-         3g30TPedV8pjIQUF/c55Q9haSHOBERI23VMmBXMMfrJh6ECBxww0/hu+TOsLKCzYQ+gw
-         GdGAnrtzEzMI3WfqML65BzsZafuMe/PQ0gjEW6sraCLwWPSVKqu83KinR/xUkg5DZP6e
-         1lFSj7wj5ru0N/Lu8b5OfGt3wIdl4NxJaMaNB7fu16Hj/vtrqiGttQ3ijzZC5VLTZ10Y
-         P4jA==
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=ZcOsGUTY+jxlUI545yWUbvFPl+aZJvPHoIP7UpfQ5XA=;
+        b=kbxwLO4iCnuAg3bkPewULTWwrUxaNQruWxxzUVMN7RghidtXrqAJFcubbW1830H7dP
+         kKhWkmhwfsOXaBL9kb2mFh60po0CbORHxX304iJnrLaKn/L1GpuBz2fOE+GbrSrdl7Sw
+         Mg5F8GQjfB1+7q8JQyOgonXepQR/4ZWev2FzfzLo9YzriDaiu6cM+u7/EQKOu0JICfmK
+         tgqbZY4JFDvXpl6S7zd7IX88zfA09cjhDIaCubXnm28ccpk5xjfUS6HEp7N3QikDJbWO
+         i9bvBc47Pyboyb16pRSoslW/O0npGPUTGbTkeLcdU+uh/c8j17D1FPVZuOF2cWaAJKJg
+         Aprg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=Nszl3bsf2mnME2IbrRKNWdpEyNRDpL7edLFc4oh5rQk=;
-        b=bBMgC8AVyc0Aw2LKH69lJW1NrGD4L7rddS3NximzvtSm+5bx8Vqzm2wTYg/FX+eOSM
-         b/vk+cLu00Vs4Co3cXNckteS7rqZf+v/lrQuHl/TDs1NFX7nVhvSnYnjYOXqpseJsgtz
-         ZQQnVhVR+gZAdA4cR0wN9KOrHA62oKZ/Fv8SHhjiIctTFlfsZ8w43N714o8yJI3u7TYN
-         gPi9H8oI7k/VvHDcHZd1AS+MEw7xKRaUKV8BxW5/y3dKX8cGULsJ/tImvubOZQ3s9YEX
-         kSydmXGzRx8bwRjiycS0Yz4r7iFvMIG5D0fBaUX5jdgUnbtxfP4dUOnOe+OTlLVvI/60
-         S44w==
-X-Gm-Message-State: AJIora+jGbk+j/3UkBOX2JF8xQldcF6ywz4V0qQJk/TlqK+I1fYK/bUU
-        IyCcIFTVd6DQF72bPPZwuoblFWqN5VSav2qmecvXIg==
-X-Google-Smtp-Source: AGRyM1sVSu2sWaA6KhwjXATdLIcan8zoTwRzYetVEkO/NR0+movB4Kj6gdLqTbANspAPpdn1ss3XaAW1x7VvJRw8slU=
-X-Received: by 2002:a62:1a8b:0:b0:528:d505:1a06 with SMTP id
- a133-20020a621a8b000000b00528d5051a06mr41267868pfa.78.1658358501699; Wed, 20
- Jul 2022 16:08:21 -0700 (PDT)
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=ZcOsGUTY+jxlUI545yWUbvFPl+aZJvPHoIP7UpfQ5XA=;
+        b=CIQFM23UpY+/IP3kUrYh2o1Jmy6E401QoZGmAwl/oyW9p3NGUbBzceqzfI4x5GyjRT
+         Z07K0xQYlVX9KkwoJclEScr85NNdnT5Bgy1Wyhn5umWpm7mVxX9WORE+aPoCZyppfQlh
+         4wOUng9+sUGplFZ/8WXxCOSPQHinTy37AGyUFWFZtCru8Cedjf+nys1xSJTrs02d+ls3
+         NHarBNvhtChJIGR2EOWh0ufDTgcA1VzA+GuJG7h2toLKD7KeJQVIaRgnFhFqXEOtgCL7
+         9l2WQv5t120PLQcMRooZHkv6/66FZj8MHCRejRiaInhfgayLnDWTWlQtK2NPDjI8i0mz
+         g5/A==
+X-Gm-Message-State: AJIora8RYFIXXcAo+4v3sG3KMr3FCruT7eEXFcHVzMBzR3s9+/kFYPQF
+        KYk39nr5n4pdCPvpi9hwhgORHg==
+X-Google-Smtp-Source: AGRyM1tPQ2KmxItkLMO5hY/NRvHFtRky0mpHHGbngBlpyM5YaYheWPFG15VwH5cXN+y0zPHZOVD0qg==
+X-Received: by 2002:a17:902:b191:b0:16c:64ef:ed86 with SMTP id s17-20020a170902b19100b0016c64efed86mr40756681plr.63.1658359431172;
+        Wed, 20 Jul 2022 16:23:51 -0700 (PDT)
+Received: from google.com (123.65.230.35.bc.googleusercontent.com. [35.230.65.123])
+        by smtp.gmail.com with ESMTPSA id z12-20020a63e54c000000b004119deff40dsm48683pgj.23.2022.07.20.16.23.49
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 20 Jul 2022 16:23:50 -0700 (PDT)
+Date:   Wed, 20 Jul 2022 23:23:46 +0000
+From:   Sean Christopherson <seanjc@google.com>
+To:     Aaron Lewis <aaronlewis@google.com>
+Cc:     kvm@vger.kernel.org, pbonzini@redhat.com, jmattson@google.com
+Subject: Re: [RFC PATCH v2 3/3] selftests: kvm/x86: Test the flags in MSR
+ filtering / exiting
+Message-ID: <YtiOgtQy1bjL3VNX@google.com>
+References: <20220719234950.3612318-1-aaronlewis@google.com>
+ <20220719234950.3612318-4-aaronlewis@google.com>
 MIME-Version: 1.0
-References: <20220519153713.819591-1-chao.p.peng@linux.intel.com>
- <20220519153713.819591-7-chao.p.peng@linux.intel.com> <b3ce0855-0e4b-782a-599c-26590df948dd@amd.com>
- <20220624090246.GA2181919@chaop.bj.intel.com> <CAGtprH82H_fjtRbL0KUxOkgOk4pgbaEbAydDYfZ0qxz41JCnAQ@mail.gmail.com>
- <20220630222140.of4md7bufd5jv5bh@amd.com> <4fe3b47d-e94a-890a-5b87-6dfb7763bc7e@intel.com>
- <Ysc9JDcVAnlVrGC8@google.com> <5d0b9341-78b5-0959-2517-0fb1fe83a205@intel.com>
-In-Reply-To: <5d0b9341-78b5-0959-2517-0fb1fe83a205@intel.com>
-From:   Vishal Annapurve <vannapurve@google.com>
-Date:   Wed, 20 Jul 2022 16:08:10 -0700
-Message-ID: <CAGtprH9knCr++C7jgXYCi1zfYcreip1uun-d+eucjEQy9xymNg@mail.gmail.com>
-Subject: Re: [PATCH v6 6/8] KVM: Handle page fault for private memory
-To:     Xiaoyao Li <xiaoyao.li@intel.com>
-Cc:     Sean Christopherson <seanjc@google.com>,
-        Michael Roth <michael.roth@amd.com>,
-        Chao Peng <chao.p.peng@linux.intel.com>,
-        "Nikunj A. Dadhania" <nikunj@amd.com>,
-        kvm list <kvm@vger.kernel.org>,
-        LKML <linux-kernel@vger.kernel.org>, linux-mm@kvack.org,
-        linux-fsdevel@vger.kernel.org, linux-api@vger.kernel.org,
-        linux-doc@vger.kernel.org, qemu-devel@nongnu.org,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Jonathan Corbet <corbet@lwn.net>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        x86 <x86@kernel.org>, "H . Peter Anvin" <hpa@zytor.com>,
-        Hugh Dickins <hughd@google.com>,
-        Jeff Layton <jlayton@kernel.org>,
-        "J . Bruce Fields" <bfields@fieldses.org>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        Mike Rapoport <rppt@kernel.org>,
-        Steven Price <steven.price@arm.com>,
-        "Maciej S . Szmigiero" <mail@maciej.szmigiero.name>,
-        Vlastimil Babka <vbabka@suse.cz>,
-        Yu Zhang <yu.c.zhang@linux.intel.com>,
-        "Kirill A . Shutemov" <kirill.shutemov@linux.intel.com>,
-        Andy Lutomirski <luto@kernel.org>,
-        Jun Nakajima <jun.nakajima@intel.com>,
-        Dave Hansen <dave.hansen@intel.com>,
-        Andi Kleen <ak@linux.intel.com>,
-        David Hildenbrand <david@redhat.com>, aarcange@redhat.com,
-        ddutile@redhat.com, dhildenb@redhat.com,
-        Quentin Perret <qperret@google.com>, mhocko@suse.com
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20220719234950.3612318-4-aaronlewis@google.com>
 X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
         ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-        USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=unavailable
+        USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=ham
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -102,28 +71,105 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-> > Hmm, so a new slot->arch.page_attr array shouldn't be necessary, KVM can instead
-> > update slot->arch.lpage_info on shared<->private conversions.  Detecting whether
-> > a given range is partially mapped could get nasty if KVM defers tracking to the
-> > backing store, but if KVM itself does the tracking as was previously suggested[*],
-> > then updating lpage_info should be relatively straightfoward, e.g. use
-> > xa_for_each_range() to see if a given 2mb/1gb range is completely covered (fully
-> > shared) or not covered at all (fully private).
-> >
-> > [*] https://lore.kernel.org/all/YofeZps9YXgtP3f1@google.com
->
-> Yes, slot->arch.page_attr was introduced to help identify whether a page
-> is completely shared/private at given level. It seems XARRAY can serve
-> the same purpose, though I know nothing about it. Looking forward to
-> seeing the patch of using XARRAY.
->
-> yes, update slot->arch.lpage_info is good to utilize the existing logic
-> and Isaku has applied it to slot->arch.lpage_info for 2MB support patches.
+On Tue, Jul 19, 2022, Aaron Lewis wrote:
+> When using the flags in KVM_X86_SET_MSR_FILTER and
+> KVM_CAP_X86_USER_SPACE_MSR it is expected that an attempt to write to
+> any of the unused bits will fail.  Add testing to walk over every bit
+> in each of the flag fields in MSR filtering / exiting to verify that
+> happens.
+> 
+> Signed-off-by: Aaron Lewis <aaronlewis@google.com>
+> ---
+>  .../kvm/x86_64/userspace_msr_exit_test.c      | 95 +++++++++++++++++++
+>  1 file changed, 95 insertions(+)
+> 
+> diff --git a/tools/testing/selftests/kvm/x86_64/userspace_msr_exit_test.c b/tools/testing/selftests/kvm/x86_64/userspace_msr_exit_test.c
+> index f84dc37426f5..3b4ad16cc982 100644
+> --- a/tools/testing/selftests/kvm/x86_64/userspace_msr_exit_test.c
+> +++ b/tools/testing/selftests/kvm/x86_64/userspace_msr_exit_test.c
+> @@ -734,6 +734,99 @@ static void test_msr_permission_bitmap(void)
+>  	kvm_vm_free(vm);
+>  }
+>  
+> +static void test_results(int rc, const char *scmd, bool expected_success)
 
-Chao, are you planning to implement these changes to ensure proper
-handling of hugepages partially mapped as private/shared in subsequent
-versions of this series?
-Or is this something left to be handled by the architecture specific code?
+Rather than pass in "success expected", pass in the actual value and the valid
+mask.  Then you can spit out the problematic value in the assert and be kind to
+future debuggers.
 
-Regards,
-Vishal
+And similarly, make the __vm_ioctl() call here instead of in the "caller" and name
+this __test_ioctl() (rename as necessary, see below) to show it's relationship with
+the macro.
+
+> +{
+> +	int expected_rc;
+> +
+> +	expected_rc = expected_success ? 0 : -1;
+> +	TEST_ASSERT(rc == expected_rc,
+> +		    "Unexpected result from '%s', rc: %d, expected rc: %d.",
+> +		    scmd, rc, expected_rc);
+> +	TEST_ASSERT(!rc || (rc == -1 && errno == EINVAL),
+> +		    "Failures are expected to have rc == -1 && errno == EINVAL(%d),\n"
+> +		    "  got rc: %d, errno: %d",
+> +		    EINVAL, rc, errno);
+> +}
+> +
+> +#define test_ioctl(vm, cmd, arg, expected_success)	\
+
+As above, just do e.g.
+
+#define test_ioctl(vm, cmd, arg, val, valid_mask)	\
+	__test_ioctl(vm, cmd, arg, #cmd, val, valid_mask)
+
+Though it might be worth using a more verbose name?  E.g. test_msr_filtering_ioctl()?
+Hmm, but I guess KVM_CAP_X86_USER_SPACE_MSR isn't technically filtering.
+test_user_exit_msr_ioctl()?  Not a big deal if that's too wordy.
+
+> +({							\
+> +	int rc = __vm_ioctl(vm, cmd, arg);		\
+> +							\
+> +	test_results(rc, #cmd, expected_success);	\
+> +})
+> +#define FLAG (1ul << i)
+
+No.  :-)
+
+First, silently consuming local variables is Evil with a capital E.
+
+Second, just use BIT() or BIT_ULL().
+
+> +/* Test that attempts to write to the unused bits in a flag fails. */
+> +static void test_flags(void)
+
+For this one, definitely use a more verbose name, even if it seems stupidly
+redundant.  test_user_msr_exit_flags()?
+
+> +{
+> +	struct kvm_vcpu *vcpu;
+> +	struct kvm_vm *vm;
+> +
+> +	vm = vm_create_with_one_vcpu(&vcpu, NULL);
+> +
+> +	/* Test flags for KVM_CAP_X86_USER_SPACE_MSR. */
+> +	run_user_space_msr_flag_test(vm);
+> +
+> +	/* Test flags and range flags for KVM_X86_SET_MSR_FILTER. */
+> +	run_msr_filter_flag_test(vm);
+> +
+> +	kvm_vm_free(vm);
+> +}
+> +
+>  int main(int argc, char *argv[])
+>  {
+>  	/* Tell stdout not to buffer its content */
+> @@ -745,5 +838,7 @@ int main(int argc, char *argv[])
+>  
+>  	test_msr_permission_bitmap();
+>  
+> +	test_flags();
+> +
+>  	return 0;
+>  }
+> -- 
+> 2.37.1.359.gd136c6c3e2-goog
+> 
