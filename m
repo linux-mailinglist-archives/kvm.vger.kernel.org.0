@@ -2,128 +2,180 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id BC17857B0CF
-	for <lists+kvm@lfdr.de>; Wed, 20 Jul 2022 08:08:15 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 129E057B207
+	for <lists+kvm@lfdr.de>; Wed, 20 Jul 2022 09:47:27 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S239130AbiGTGIF (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 20 Jul 2022 02:08:05 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46430 "EHLO
+        id S240175AbiGTHrY (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 20 Jul 2022 03:47:24 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34202 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S237966AbiGTGIE (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 20 Jul 2022 02:08:04 -0400
-Received: from mail.sberdevices.ru (mail.sberdevices.ru [45.89.227.171])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5BAE06872B;
-        Tue, 19 Jul 2022 23:08:02 -0700 (PDT)
-Received: from s-lin-edge02.sberdevices.ru (localhost [127.0.0.1])
-        by mail.sberdevices.ru (Postfix) with ESMTP id 9664B5FD30;
-        Wed, 20 Jul 2022 09:08:00 +0300 (MSK)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=sberdevices.ru;
-        s=mail; t=1658297280;
-        bh=jPmZtSU8mSGJMcL/aUVhmt1r9yC+Cy2vPtW5d7Pmaeo=;
-        h=From:To:Subject:Date:Message-ID:Content-Type:MIME-Version;
-        b=NAIL0hPGnmaH6Z5zRiAaJDKOYlTyS94NhP2JnApnVyBr09iLWdzhorcIUh9PbtPSK
-         8YM572klcFf0LvoM1SKdLeszyIKtKg3tBAzZYGvmYiMeIPvKCAYM0k2In3EqIKNjqM
-         xMF6JLkCyVm1KRPo2Nj593uANC12dYx/Cdy/m5tn00p5JXA8zD0/mSUV1h+jw1oDL3
-         BqsNbIuyYD6fbS2U/ty7d+hJqaA9eYPVqm7sP+yAXO14l7w13Emrl+dcKpbY+FD2tS
-         F2UkfYRs4Y8TP3sBqAvssnOKQ8Gp0/CTPXIxXBwkmhsKwi3D7AiS3zPb52eptyior+
-         FhuF9kKsqJt/Q==
-Received: from S-MS-EXCH01.sberdevices.ru (S-MS-EXCH01.sberdevices.ru [172.16.1.4])
-        by mail.sberdevices.ru (Postfix) with ESMTP;
-        Wed, 20 Jul 2022 09:07:59 +0300 (MSK)
-From:   Arseniy Krasnov <AVKrasnov@sberdevices.ru>
-To:     Stefano Garzarella <sgarzare@redhat.com>,
-        "David S. Miller" <davem@davemloft.net>,
-        Jakub Kicinski <kuba@kernel.org>,
-        Paolo Abeni <pabeni@redhat.com>
-CC:     Stefan Hajnoczi <stefanha@redhat.com>,
-        "Michael S. Tsirkin" <mst@redhat.com>,
-        Krasnov Arseniy <oxffffaa@gmail.com>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
-        "virtualization@lists.linux-foundation.org" 
-        <virtualization@lists.linux-foundation.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        kernel <kernel@sberdevices.ru>
-Subject: Re: [RFC PATCH v1 0/3] virtio/vsock: use SO_RCVLOWAT to set
- POLLIN/POLLRDNORM
-Thread-Topic: [RFC PATCH v1 0/3] virtio/vsock: use SO_RCVLOWAT to set
- POLLIN/POLLRDNORM
-Thread-Index: AQHYmn4tqUccpAClwkSIQKaYrjmRMa2Fd1UAgAEfggA=
-Date:   Wed, 20 Jul 2022 06:07:47 +0000
-Message-ID: <ac05e1ee-23b3-75e0-f9a4-1056a68934d8@sberdevices.ru>
-References: <c8de13b1-cbd8-e3e0-5728-f3c3648c69f7@sberdevices.ru>
- <20220719125856.a6bfwrvy66gxxzqe@sgarzare-redhat>
-In-Reply-To: <20220719125856.a6bfwrvy66gxxzqe@sgarzare-redhat>
-Accept-Language: en-US, ru-RU
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-x-originating-ip: [172.16.1.12]
-Content-Type: text/plain; charset="utf-8"
-Content-ID: <C98D0D7F5C1ABC439235ABF83F2C9D0B@sberdevices.ru>
-Content-Transfer-Encoding: base64
+        with ESMTP id S240138AbiGTHrW (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 20 Jul 2022 03:47:22 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id E783147BB6
+        for <kvm@vger.kernel.org>; Wed, 20 Jul 2022 00:47:20 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1658303240;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=Bu6xCyclso4xdC6iQFdBvv8TaQgKWEAQIznq+dBxwus=;
+        b=aDGcMyPXq3H+Y2b3e/TsRZUns1n88ozkIzzAnDgHAN0NmA/a90ZkCP0AUuOIFJSS+dd690
+        pPAoLvy1V32C0osb/BbLR60xDad6l5+hiUFgs3cZSQD+rgdJsOJpa1pYv7nMUiSFZyl6k2
+        0eAicwGgCc/ajX4PzLB8VuuNuT74/D4=
+Received: from mimecast-mx02.redhat.com (mx3-rdu2.redhat.com
+ [66.187.233.73]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-371-Lsd68fldM6mZTiXLsO4M8g-1; Wed, 20 Jul 2022 03:47:16 -0400
+X-MC-Unique: Lsd68fldM6mZTiXLsO4M8g-1
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.rdu2.redhat.com [10.11.54.2])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 1092D1C08965;
+        Wed, 20 Jul 2022 07:47:15 +0000 (UTC)
+Received: from localhost (unknown [10.39.193.129])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id EB21440C128A;
+        Wed, 20 Jul 2022 07:47:13 +0000 (UTC)
+From:   Cornelia Huck <cohuck@redhat.com>
+To:     Jason Gunthorpe <jgg@nvidia.com>,
+        Alex Williamson <alex.williamson@redhat.com>
+Cc:     Alexander Gordeev <agordeev@linux.ibm.com>,
+        David Airlie <airlied@linux.ie>,
+        Christian Borntraeger <borntraeger@linux.ibm.com>,
+        Daniel Vetter <daniel@ffwll.ch>,
+        dri-devel@lists.freedesktop.org,
+        Harald Freudenberger <freude@linux.ibm.com>,
+        Vasily Gorbik <gor@linux.ibm.com>,
+        Heiko Carstens <hca@linux.ibm.com>,
+        intel-gfx@lists.freedesktop.org,
+        intel-gvt-dev@lists.freedesktop.org,
+        Jani Nikula <jani.nikula@linux.intel.com>,
+        Jason Herne <jjherne@linux.ibm.com>,
+        Joonas Lahtinen <joonas.lahtinen@linux.intel.com>,
+        kvm@vger.kernel.org, linux-s390@vger.kernel.org,
+        Matthew Rosato <mjrosato@linux.ibm.com>,
+        Peter Oberparleiter <oberpar@linux.ibm.com>,
+        Halil Pasic <pasic@linux.ibm.com>,
+        Rodrigo Vivi <rodrigo.vivi@intel.com>,
+        Sven Schnelle <svens@linux.ibm.com>,
+        Tvrtko Ursulin <tvrtko.ursulin@linux.intel.com>,
+        Vineeth Vijayan <vneethv@linux.ibm.com>,
+        Zhenyu Wang <zhenyuw@linux.intel.com>,
+        Zhi Wang <zhi.a.wang@intel.com>,
+        Tony Krowiak <akrowiak@linux.ibm.com>,
+        Eric Farman <farman@linux.ibm.com>,
+        Christoph Hellwig <hch@lst.de>,
+        Kevin Tian <kevin.tian@intel.com>
+Subject: Re: [PATCH v3 1/2] vfio: Replace the DMA unmapping notifier with a
+ callback
+In-Reply-To: <20220719234419.GN4609@nvidia.com>
+Organization: Red Hat GmbH
+References: <0-v3-7593f297c43f+56ce-vfio_unmap_notif_jgg@nvidia.com>
+ <1-v3-7593f297c43f+56ce-vfio_unmap_notif_jgg@nvidia.com>
+ <20220707153716.70f755ab.alex.williamson@redhat.com>
+ <20220719234419.GN4609@nvidia.com>
+User-Agent: Notmuch/0.36 (https://notmuchmail.org)
+Date:   Wed, 20 Jul 2022 09:47:12 +0200
+Message-ID: <874jzcp6nz.fsf@redhat.com>
 MIME-Version: 1.0
-X-KSMG-Rule-ID: 4
-X-KSMG-Message-Action: clean
-X-KSMG-AntiSpam-Status: not scanned, disabled by settings
-X-KSMG-AntiSpam-Interceptor-Info: not scanned
-X-KSMG-AntiPhishing: not scanned, disabled by settings
-X-KSMG-AntiVirus: Kaspersky Secure Mail Gateway, version 1.1.2.30, bases: 2022/07/19 23:44:00 #19926989
-X-KSMG-AntiVirus-Status: Clean, skipped
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,SPF_HELO_NONE,SPF_PASS
-        autolearn=ham autolearn_force=no version=3.4.6
+Content-Type: text/plain
+X-Scanned-By: MIMEDefang 2.84 on 10.11.54.2
+X-Spam-Status: No, score=-3.5 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,
+        SPF_HELO_NONE,SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-T24gMTkuMDcuMjAyMiAxNTo1OCwgU3RlZmFubyBHYXJ6YXJlbGxhIHdyb3RlOg0KPiBPbiBNb24s
-IEp1bCAxOCwgMjAyMiBhdCAwODoxMjo1MkFNICswMDAwLCBBcnNlbml5IEtyYXNub3Ygd3JvdGU6
-DQo+PiBIZWxsbywNCj4+DQo+PiBkdXJpbmcgbXkgZXhwZXJpbWVudHMgd2l0aCB6ZXJvY29weSBy
-ZWNlaXZlLCBpIGZvdW5kLCB0aGF0IGluIHNvbWUNCj4+IGNhc2VzLCBwb2xsKCkgaW1wbGVtZW50
-YXRpb24gdmlvbGF0ZXMgUE9TSVg6IHdoZW4gc29ja2V0IGhhcyBub24tDQo+PiBkZWZhdWx0IFNP
-X1JDVkxPV0FUKGUuZy4gbm90IDEpLCBwb2xsKCkgd2lsbCBhbHdheXMgc2V0IFBPTExJTiBhbmQN
-Cj4+IFBPTExSRE5PUk0gYml0cyBpbiAncmV2ZW50cycgZXZlbiBudW1iZXIgb2YgYnl0ZXMgYXZh
-aWxhYmxlIHRvIHJlYWQNCj4+IG9uIHNvY2tldCBpcyBzbWFsbGVyIHRoYW4gU09fUkNWTE9XQVQg
-dmFsdWUuIEluIHRoaXMgY2FzZSx1c2VyIHNlZXMNCj4+IFBPTExJTiBmbGFnIGFuZCB0aGVuIHRy
-aWVzIHRvIHJlYWQgZGF0YShmb3IgZXhhbXBsZSB1c2luZ8KgICdyZWFkKCknDQo+PiBjYWxsKSwg
-YnV0IHJlYWQgY2FsbCB3aWxsIGJlIGJsb2NrZWQsIGJlY2F1c2XCoCBTT19SQ1ZMT1dBVCBsb2dp
-YyBpcw0KPj4gc3VwcG9ydGVkIGluIGRlcXVldWUgbG9vcCBpbiBhZl92c29jay5jLiBCdXQgdGhl
-IHNhbWUgdGltZSzCoCBQT1NJWA0KPj4gcmVxdWlyZXMgdGhhdDoNCj4+DQo+PiAiUE9MTElOwqDC
-oMKgwqAgRGF0YSBvdGhlciB0aGFuIGhpZ2gtcHJpb3JpdHkgZGF0YSBtYXkgYmUgcmVhZCB3aXRo
-b3V0DQo+PiDCoMKgwqDCoMKgwqDCoMKgwqDCoCBibG9ja2luZy4NCj4+IFBPTExSRE5PUk0gTm9y
-bWFsIGRhdGEgbWF5IGJlIHJlYWQgd2l0aG91dCBibG9ja2luZy4iDQo+Pg0KPj4gU2VlIGh0dHBz
-Oi8vd3d3Lm9wZW4tc3RkLm9yZy9qdGMxL3NjMjIvb3Blbi9uNDIxNy5wZGYsIHBhZ2UgMjkzLg0K
-Pj4NCj4+IFNvLCB3ZSBoYXZlLCB0aGF0IHBvbGwoKSBzeXNjYWxsIHJldHVybnMgUE9MTElOLCBi
-dXQgcmVhZCBjYWxsIHdpbGwNCj4+IGJlIGJsb2NrZWQuDQo+Pg0KPj4gQWxzbyBpbiBtYW4gcGFn
-ZSBzb2NrZXQoNykgaSBmb3VuZCB0aGF0Og0KPj4NCj4+ICJTaW5jZSBMaW51eCAyLjYuMjgsIHNl
-bGVjdCgyKSwgcG9sbCgyKSwgYW5kIGVwb2xsKDcpIGluZGljYXRlIGENCj4+IHNvY2tldCBhcyBy
-ZWFkYWJsZSBvbmx5IGlmIGF0IGxlYXN0IFNPX1JDVkxPV0FUIGJ5dGVzIGFyZSBhdmFpbGFibGUu
-Ig0KPj4NCj4+IEkgY2hlY2tlZCBUQ1AgY2FsbGJhY2sgZm9yIHBvbGwoKShuZXQvaXB2NC90Y3Au
-YywgdGNwX3BvbGwoKSksIGl0DQo+PiB1c2VzIFNPX1JDVkxPV0FUIHZhbHVlIHRvIHNldCBQT0xM
-SU4gYml0LCBhbHNvIGkndmUgdGVzdGVkIFRDUCB3aXRoDQo+PiB0aGlzIGNhc2UgZm9yIFRDUCBz
-b2NrZXQsIGl0IHdvcmtzIGFzIFBPU0lYIHJlcXVpcmVkLg0KPiANCj4gSSB0cmllZCB0byBsb29r
-IGF0IHRoZSBjb2RlIGFuZCBpdCBzZWVtcyB0aGF0IG9ubHkgVENQIGNvbXBsaWVzIHdpdGggaXQg
-b3IgYW0gSSB3cm9uZz8NClllcywgaSBjaGVja2VkIEFGX1VOSVgsIGl0IGFsc28gZG9uJ3QgY2Fy
-ZSBhYm91dCB0aGF0LiBJdCBjYWxscyBza2JfcXVldWVfZW1wdHkoKSB0aGF0IG9mDQpjb3Vyc2Ug
-aWdub3JlcyBTT19SQ1ZMT1dBVC4NCj4gDQo+Pg0KPj4gSSd2ZSBhZGRlZCBzb21lIGZpeGVzIHRv
-IGFmX3Zzb2NrLmMgYW5kIHZpcnRpb190cmFuc3BvcnRfY29tbW9uLmMsDQo+PiB0ZXN0IGlzIGFs
-c28gaW1wbGVtZW50ZWQuDQo+Pg0KPj4gV2hhdCBkbyBZb3UgdGhpbmsgZ3V5cz8NCj4gDQo+IE5p
-Y2UsIHRoYW5rcyBmb3IgZml4aW5nIHRoaXMgYW5kIGZvciB0aGUgdGVzdCENCj4gDQo+IEkgbGVm
-dCBzb21lIGNvbW1lbnRzLCBidXQgSSB0aGluayB0aGUgc2VyaWVzIGlzIGZpbmUgaWYgd2Ugd2ls
-bCBzdXBwb3J0IGl0IGluIGFsbCB0cmFuc3BvcnRzLg0KQWNrDQo+IA0KPiBJJ2QganVzdCBsaWtl
-IHRvIHVuZGVyc3RhbmQgaWYgaXQncyBqdXN0IFRDUCBjb21wbHlpbmcgd2l0aCBpdCBvciBJJ20g
-bWlzc2luZyBzb21lIGNoZWNrIGluY2x1ZGVkIGluIHRoZSBzb2NrZXQgbGF5ZXIgdGhhdCB3ZSBj
-b3VsZCByZXVzZS4NClNlZW1zIHNvY2tfcG9sbCgpIHdoaWNoIGlzIHNvY2tldCBsYXllciBlbnRy
-eSBwb2ludCBmb3IgcG9sbCgpIGRvZXNuJ3QgY29udGFpbiBhbnkgc3VjaCBjaGVja3MNCj4gDQo+
-IEBEYXZpZCwgQEpha3ViLCBAUGFvbG8sIGFueSBhZHZpY2U/DQo+IA0KPiBUaGFua3MsDQo+IFN0
-ZWZhbm8NCj4gDQoNClBTOiBtb3Jlb3ZlciwgaSBmb3VuZCBvbmUgbW9yZSBpbnRlcmVzdGluZyB0
-aGluZyB3aXRoIFRDUCBhbmQgcG9sbDogVENQIHJlY2VpdmUgbG9naWMgd2FrZXMgdXAgcG9sbCB3
-YWl0ZXINCm9ubHkgd2hlbiBudW1iZXIgb2YgYXZhaWxhYmxlIGJ5dGVzID4gU09fUkNWTE9XQVQu
-IEUuZy4gaXQgcHJldmVudHMgInNwdXJpb3VzIiB3YWtlIHVwcywgd2hlbiBwb2xsIHdpbGwgYmUN
-Cndva2VuIHVwIGJlY2F1c2UgbmV3IGRhdGEgYXJyaXZlZCwgYnV0IFBPTExJTiB0byBhbGxvdyB1
-c2VyIGRlcXVldWUgdGhpcyBkYXRhIHdvbid0IGJlIHNldChhcyBhbW91bnQgb2YgZGF0YQ0KaXMg
-dG9vIHNtYWxsKS4NClNlZSB0Y3BfZGF0YV9yZWFkeSgpIGluIG5ldC9pcHY0L3RjcF9pbnB1dC5j
-DQoNClRoYW5rcw0K
+On Tue, Jul 19 2022, Jason Gunthorpe <jgg@nvidia.com> wrote:
+
+> On Thu, Jul 07, 2022 at 03:37:16PM -0600, Alex Williamson wrote:
+>> On Mon,  4 Jul 2022 21:59:03 -0300
+>> Jason Gunthorpe <jgg@nvidia.com> wrote:
+>> > diff --git a/drivers/s390/cio/vfio_ccw_ops.c b/drivers/s390/cio/vfio_ccw_ops.c
+>> > index b49e2e9db2dc6f..09e0ce7b72324c 100644
+>> > --- a/drivers/s390/cio/vfio_ccw_ops.c
+>> > +++ b/drivers/s390/cio/vfio_ccw_ops.c
+>> > @@ -44,31 +44,19 @@ static int vfio_ccw_mdev_reset(struct vfio_ccw_private *private)
+>> >  	return ret;
+>> >  }
+>> >  
+>> > -static int vfio_ccw_mdev_notifier(struct notifier_block *nb,
+>> > -				  unsigned long action,
+>> > -				  void *data)
+>> > +static void vfio_ccw_dma_unmap(struct vfio_device *vdev, u64 iova, u64 length)
+>> >  {
+>> >  	struct vfio_ccw_private *private =
+>> > -		container_of(nb, struct vfio_ccw_private, nb);
+>> > -
+>> > -	/*
+>> > -	 * Vendor drivers MUST unpin pages in response to an
+>> > -	 * invalidation.
+>> > -	 */
+>> > -	if (action == VFIO_IOMMU_NOTIFY_DMA_UNMAP) {
+>> > -		struct vfio_iommu_type1_dma_unmap *unmap = data;
+>> > -
+>> > -		if (!cp_iova_pinned(&private->cp, unmap->iova))
+>> > -			return NOTIFY_OK;
+>> > +		container_of(vdev, struct vfio_ccw_private, vdev);
+>> >  
+>> > -		if (vfio_ccw_mdev_reset(private))
+>> > -			return NOTIFY_BAD;
+>> > +	/* Drivers MUST unpin pages in response to an invalidation. */
+>> > +	if (!cp_iova_pinned(&private->cp, iova))
+>> > +		return;
+>> >  
+>> > -		cp_free(&private->cp);
+>> > -		return NOTIFY_OK;
+>> > -	}
+>> > +	if (vfio_ccw_mdev_reset(private))
+>> > +		return;
+>> >  
+>> > -	return NOTIFY_DONE;
+>> > +	cp_free(&private->cp);
+>> >  }
+>> 
+>> 
+>> The cp_free() call is gone here with [1], so I think this function now
+>> just ends with:
+>> 
+>> 	...
+>> 	vfio_ccw_mdev_reset(private);
+>> }
+>> 
+>> There are also minor contextual differences elsewhere from that series,
+>> so a quick respin to record the changes on list would be appreciated.
+>> 
+>> However the above kind of highlights that NOTIFY_BAD that silently gets
+>> dropped here.  I realize we weren't testing the return value of the
+>> notifier call chain and really we didn't intend that notifiers could
+>> return a failure here, but does this warrant some logging or suggest
+>> future work to allow a device to go offline here?  Thanks.
+>
+> It looks like no.
+>
+> If the FSM trapped in a bad state here, such as
+> VFIO_CCW_STATE_NOT_OPER, then it means it should have already unpinned
+> the pages and this is considered a success for this purpose
+
+A rather pathological case would be a subchannel that cannot be
+quiesced and does not end up being non-operational; in theory, the
+hardware could still try to access the buffers we provided for I/O. I'd
+say that is extremely unlikely, we might log it, but really cannot do
+anything else.
+
+>
+> The return code here exists only to return to userspace so it can
+> detect during a VFIO_DEVICE_RESET that the device has crashed
+> irrecoverably.
+
+Does it imply only that ("it's dead, Jim"), or can it also imply a
+runaway device? Not that userspace can do much in any case.
+
+>
+> Thus just continuing to silently ignore it seems like the best thing.
+>
+> Jason
+
