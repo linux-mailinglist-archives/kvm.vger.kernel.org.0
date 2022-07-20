@@ -2,37 +2,37 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 2916857B3B7
+	by mail.lfdr.de (Postfix) with ESMTP id A34A257B3B8
 	for <lists+kvm@lfdr.de>; Wed, 20 Jul 2022 11:23:34 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237778AbiGTJXa (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 20 Jul 2022 05:23:30 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53060 "EHLO
+        id S236324AbiGTJXb (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 20 Jul 2022 05:23:31 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53070 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230460AbiGTJX2 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 20 Jul 2022 05:23:28 -0400
+        with ESMTP id S232234AbiGTJX3 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 20 Jul 2022 05:23:29 -0400
 Received: from out0.migadu.com (out0.migadu.com [IPv6:2001:41d0:2:267::])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3441D474E2
-        for <kvm@vger.kernel.org>; Wed, 20 Jul 2022 02:23:27 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6C5AC474D3
+        for <kvm@vger.kernel.org>; Wed, 20 Jul 2022 02:23:28 -0700 (PDT)
 X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-        t=1658309005;
+        t=1658309007;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=x9H1B0qp5vV2SXCFJBDuseXpKkjoj0nJpiEMWlXy/Qk=;
-        b=P7Isxxvpi8y4H75QfyaFmD1XqHHtW8I94j4NGpiu0Yh1q3dHxuV0vRu//ER6SzzuMthtkS
-        2aCWimK4FVKWl0aK19Zc8+FIcnP0+8+J4xFoTbJ4ISSGIHMDDjzWUN9BpQDSEuackH6y5W
-        FO3/lnLw9c3VB8Q4k/z8oKLqYJ3ZZtE=
+        bh=yj4cKQUNfFd/J+viYgR9EC3Bhqm/pfiAtMI4M4xe9jA=;
+        b=M/cBuBd3VLXrDJ6EbV4Gd94u+43VDAiF2g/4VsvVpTpSbGkDr4fTZ2eSarBw/jiFaOXBtu
+        l/y/G4R4IPIrlrxv+h0pbOUhjCxRDJ/vVLrfnkIiy5nTom6UmUoe6pC9HApSTqdXsWtMNy
+        qsDlQHmbySnWMIpm9Y2W4O8m9vmSINU=
 From:   Oliver Upton <oliver.upton@linux.dev>
 To:     kvm@vger.kernel.org
 Cc:     Paolo Bonzini <pbonzini@redhat.com>,
         Sean Christopherson <seanjc@google.com>,
         Oliver Upton <oupton@google.com>
-Subject: [PATCH v3 1/6] KVM: Shove vm stats_id init into kvm_create_vm()
-Date:   Wed, 20 Jul 2022 09:22:47 +0000
-Message-Id: <20220720092259.3491733-2-oliver.upton@linux.dev>
+Subject: [PATCH v3 2/6] KVM: Shove vcpu stats_id init into kvm_vcpu_init()
+Date:   Wed, 20 Jul 2022 09:22:48 +0000
+Message-Id: <20220720092259.3491733-3-oliver.upton@linux.dev>
 In-Reply-To: <20220720092259.3491733-1-oliver.upton@linux.dev>
 References: <20220720092259.3491733-1-oliver.upton@linux.dev>
 MIME-Version: 1.0
@@ -50,42 +50,42 @@ X-Mailing-List: kvm@vger.kernel.org
 
 From: Oliver Upton <oupton@google.com>
 
-Initialize stats_id alongside the other struct kvm fields to futureproof
-against possible initialization order mistakes in KVM. While at it, move
-the format string to the first line of the call and fix the indentation
-of the second line.
+Initialize stats_id alongside other kvm_vcpu fields to futureproof
+against possible initialization order mistakes in KVM.
 
 No functional change intended.
 
 Signed-off-by: Oliver Upton <oupton@google.com>
 ---
- virt/kvm/kvm_main.c | 6 +++---
- 1 file changed, 3 insertions(+), 3 deletions(-)
+ virt/kvm/kvm_main.c | 8 ++++----
+ 1 file changed, 4 insertions(+), 4 deletions(-)
 
 diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
-index da263c370d00..cc760ebcd390 100644
+index cc760ebcd390..1f78b7ad5430 100644
 --- a/virt/kvm/kvm_main.c
 +++ b/virt/kvm/kvm_main.c
-@@ -1155,6 +1155,9 @@ static struct kvm *kvm_create_vm(unsigned long type)
- 	 */
- 	kvm->debugfs_dentry = ERR_PTR(-ENOENT);
- 
-+	snprintf(kvm->stats_id, sizeof(kvm->stats_id), "kvm-%d",
-+		 task_pid_nr(current));
+@@ -484,6 +484,10 @@ static void kvm_vcpu_init(struct kvm_vcpu *vcpu, struct kvm *kvm, unsigned id)
+ 	vcpu->ready = false;
+ 	preempt_notifier_init(&vcpu->preempt_notifier, &kvm_preempt_ops);
+ 	vcpu->last_used_slot = NULL;
 +
- 	if (init_srcu_struct(&kvm->srcu))
- 		goto out_err_no_srcu;
- 	if (init_srcu_struct(&kvm->irq_srcu))
-@@ -4902,9 +4905,6 @@ static int kvm_dev_ioctl_create_vm(unsigned long type)
- 	if (r < 0)
- 		goto put_kvm;
++	/* Fill the stats id string for the vcpu */
++	snprintf(vcpu->stats_id, sizeof(vcpu->stats_id), "kvm-%d/vcpu-%d",
++		 task_pid_nr(current), id);
+ }
  
--	snprintf(kvm->stats_id, sizeof(kvm->stats_id),
--			"kvm-%d", task_pid_nr(current));
+ static void kvm_vcpu_destroy(struct kvm_vcpu *vcpu)
+@@ -3919,10 +3923,6 @@ static int kvm_vm_ioctl_create_vcpu(struct kvm *kvm, u32 id)
+ 	if (r)
+ 		goto unlock_vcpu_destroy;
+ 
+-	/* Fill the stats id string for the vcpu */
+-	snprintf(vcpu->stats_id, sizeof(vcpu->stats_id), "kvm-%d/vcpu-%d",
+-		 task_pid_nr(current), id);
 -
- 	file = anon_inode_getfile("kvm-vm", &kvm_vm_fops, kvm, O_RDWR);
- 	if (IS_ERR(file)) {
- 		put_unused_fd(r);
+ 	/* Now it's all set up, let userspace reach it */
+ 	kvm_get_kvm(kvm);
+ 	r = create_vcpu_fd(vcpu);
 -- 
 2.37.0.170.g444d1eabd0-goog
 
