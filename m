@@ -2,133 +2,149 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id CE64057BB58
-	for <lists+kvm@lfdr.de>; Wed, 20 Jul 2022 18:22:20 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id BDBEF57BBA6
+	for <lists+kvm@lfdr.de>; Wed, 20 Jul 2022 18:44:42 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S240860AbiGTQWC (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 20 Jul 2022 12:22:02 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53192 "EHLO
+        id S229552AbiGTQok (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 20 Jul 2022 12:44:40 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42986 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S240332AbiGTQV7 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 20 Jul 2022 12:21:59 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 75B3261B0C
-        for <kvm@vger.kernel.org>; Wed, 20 Jul 2022 09:21:56 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1658334115;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=RNk6IAipo4mh8LBH8MtO8K18i9SdfeqIGL3OSdVhBzg=;
-        b=baJ5f2YOzwaFeqAvuQVYhAM+XQp9IG21OiA7wLswgsgEgySmmtBMoBcrN3cNF9ksYII6zL
-        6IIEkr/p06anJU+I4IxvdQDxZ8RU8IsUg4EKjnz+C5nIOsgYAkl69JxYEUG9jlEcgBVvFo
-        72H2gOUjpHVUyqHT77fetn0tsGTEalQ=
-Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
- [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-120-RHYrurhEO5S1XqoXofI7Cw-1; Wed, 20 Jul 2022 12:21:49 -0400
-X-MC-Unique: RHYrurhEO5S1XqoXofI7Cw-1
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.rdu2.redhat.com [10.11.54.4])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 1877A8037AF;
-        Wed, 20 Jul 2022 16:21:49 +0000 (UTC)
-Received: from localhost (unknown [10.39.193.129])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id B2D4E2026614;
-        Wed, 20 Jul 2022 16:21:48 +0000 (UTC)
-From:   Cornelia Huck <cohuck@redhat.com>
-To:     Peter Collingbourne <pcc@google.com>
-Cc:     kvmarm@lists.cs.columbia.edu, Marc Zyngier <maz@kernel.org>,
-        kvm@vger.kernel.org, Andy Lutomirski <luto@amacapital.net>,
-        Linux ARM <linux-arm-kernel@lists.infradead.org>,
-        Michael Roth <michael.roth@amd.com>,
-        Catalin Marinas <catalin.marinas@arm.com>,
-        Chao Peng <chao.p.peng@linux.intel.com>,
-        Will Deacon <will@kernel.org>,
-        Evgenii Stepanov <eugenis@google.com>
-Subject: Re: [PATCH v2 0/3] KVM: arm64: support MTE in protected VMs
-In-Reply-To: <CAMn1gO65DJs8QyMs4YTmq7_b01qjLgBRhM3OLZ7aKaobEGMXDw@mail.gmail.com>
-Organization: Red Hat GmbH
-References: <20220708212106.325260-1-pcc@google.com>
- <877d49p36n.fsf@redhat.com>
- <CAMn1gO65DJs8QyMs4YTmq7_b01qjLgBRhM3OLZ7aKaobEGMXDw@mail.gmail.com>
-User-Agent: Notmuch/0.36 (https://notmuchmail.org)
-Date:   Wed, 20 Jul 2022 18:21:47 +0200
-Message-ID: <87k087oiuc.fsf@redhat.com>
+        with ESMTP id S232224AbiGTQoj (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 20 Jul 2022 12:44:39 -0400
+Received: from mail-pl1-x62d.google.com (mail-pl1-x62d.google.com [IPv6:2607:f8b0:4864:20::62d])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6B58C66ADF
+        for <kvm@vger.kernel.org>; Wed, 20 Jul 2022 09:44:37 -0700 (PDT)
+Received: by mail-pl1-x62d.google.com with SMTP id d7so3638836plr.9
+        for <kvm@vger.kernel.org>; Wed, 20 Jul 2022 09:44:37 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=NKI6wQLzSjuIgXqGP/STBDd/io3ztt1cS6FImLHwFp4=;
+        b=aYf105zHRqcKnwIvd6ekmpqruUyQToVuka3h99YqNWRmFXkZ7ZVHV8oWNskzAvMx2F
+         hflOC9nxBStxjqtxvcltphe6Q5E58yJ1G2iJfhXNEqLsdIUxBz1Jghs5U/OLu3mGUc1a
+         JRrnyPRUFOER4kSZYOrYSqnkSlzR3XQAIIqK13/lyE2A23HrMPyXlZiOV822mKgY0tgd
+         nTwYcdRpttHY+A4wo2bLHxYVFSJL0sIrCNfPF0RyUS+KwJ64AABEJ8yX01Hb9NjXpaI/
+         s6Pf48SWnWTxK6vMsYlo9rnJGzIsPUCTu5j+IdeVl1yrYnYpbPzLMaw748Y0j9AcRKUU
+         ZGfw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=NKI6wQLzSjuIgXqGP/STBDd/io3ztt1cS6FImLHwFp4=;
+        b=oe+z/kXsirP0i4RKXVzo+EDZv/IQxVZNHQGpjGT+itCryX3JtU102sJfbO2MjWr+AW
+         mVjnydxI/0PRgolH+buWc8zYFqA5yIMTRUIFAjkDeL4dQV4LxTCyJFUy4bQmmxBsUmZr
+         asv+WBsuGCCVpMewzqE8ZgBSGigeftWr9VARbNFTzMFbvvjvMAhpbEHmE+S4P4Y2/Zl9
+         HrFepKF8GzJayyj/wnKfMxWINzzUAa9etJVPcjJkrIbJ90YSMERRyfAZONmGywiI++FP
+         3uXrLPif5DxpUsppOnJeaiddIPNw1z3uEnBTik7s0LDEVF37roECmFv5P1aRG5WPsDU4
+         KkMA==
+X-Gm-Message-State: AJIora+xvFc69TpJZyMcZyykLgML2QPnXeTXTet2puPC9VS1PL2RXqNn
+        CEA2eWqs+YrgFjbDEnisNimKgA==
+X-Google-Smtp-Source: AGRyM1utYrsQFWglg8OIUvJRKtR6LVkU7MbzTy7HM7RFQtBExxPfhBWR/u5swtl61L63cUwi4vupQg==
+X-Received: by 2002:a17:90b:3ec1:b0:1f1:edcf:dd2b with SMTP id rm1-20020a17090b3ec100b001f1edcfdd2bmr6535996pjb.156.1658335476747;
+        Wed, 20 Jul 2022 09:44:36 -0700 (PDT)
+Received: from google.com (123.65.230.35.bc.googleusercontent.com. [35.230.65.123])
+        by smtp.gmail.com with ESMTPSA id k6-20020aa79986000000b00528c22038f5sm14345128pfh.14.2022.07.20.09.44.36
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 20 Jul 2022 09:44:36 -0700 (PDT)
+Date:   Wed, 20 Jul 2022 16:44:32 +0000
+From:   Sean Christopherson <seanjc@google.com>
+To:     Chao Peng <chao.p.peng@linux.intel.com>
+Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+        linux-mm@kvack.org, linux-fsdevel@vger.kernel.org,
+        linux-api@vger.kernel.org, linux-doc@vger.kernel.org,
+        qemu-devel@nongnu.org, linux-kselftest@vger.kernel.org,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Jonathan Corbet <corbet@lwn.net>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+        x86@kernel.org, "H . Peter Anvin" <hpa@zytor.com>,
+        Hugh Dickins <hughd@google.com>,
+        Jeff Layton <jlayton@kernel.org>,
+        "J . Bruce Fields" <bfields@fieldses.org>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        Shuah Khan <shuah@kernel.org>, Mike Rapoport <rppt@kernel.org>,
+        Steven Price <steven.price@arm.com>,
+        "Maciej S . Szmigiero" <mail@maciej.szmigiero.name>,
+        Vlastimil Babka <vbabka@suse.cz>,
+        Vishal Annapurve <vannapurve@google.com>,
+        Yu Zhang <yu.c.zhang@linux.intel.com>,
+        "Kirill A . Shutemov" <kirill.shutemov@linux.intel.com>,
+        luto@kernel.org, jun.nakajima@intel.com, dave.hansen@intel.com,
+        ak@linux.intel.com, david@redhat.com, aarcange@redhat.com,
+        ddutile@redhat.com, dhildenb@redhat.com,
+        Quentin Perret <qperret@google.com>,
+        Michael Roth <michael.roth@amd.com>, mhocko@suse.com,
+        Muchun Song <songmuchun@bytedance.com>
+Subject: Re: [PATCH v7 11/14] KVM: Register/unregister the guest private
+ memory regions
+Message-ID: <Ytgw8HAsKTmZaubv@google.com>
+References: <20220706082016.2603916-1-chao.p.peng@linux.intel.com>
+ <20220706082016.2603916-12-chao.p.peng@linux.intel.com>
 MIME-Version: 1.0
-Content-Type: text/plain
-X-Scanned-By: MIMEDefang 2.78 on 10.11.54.4
-X-Spam-Status: No, score=-2.8 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        SPF_HELO_NONE,SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20220706082016.2603916-12-chao.p.peng@linux.intel.com>
+X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
+        USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=unavailable
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Jul 19 2022, Peter Collingbourne <pcc@google.com> wrote:
+On Wed, Jul 06, 2022, Chao Peng wrote:
+> diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
+> index 230c8ff9659c..bb714c2a4b06 100644
+> --- a/virt/kvm/kvm_main.c
+> +++ b/virt/kvm/kvm_main.c
+> @@ -914,6 +914,35 @@ static int kvm_init_mmu_notifier(struct kvm *kvm)
+>  
+>  #endif /* CONFIG_MMU_NOTIFIER && KVM_ARCH_WANT_MMU_NOTIFIER */
+>  
+> +#ifdef CONFIG_HAVE_KVM_PRIVATE_MEM
+> +#define KVM_MEM_ATTR_PRIVATE	0x0001
+> +static int kvm_vm_ioctl_set_encrypted_region(struct kvm *kvm, unsigned int ioctl,
+> +					     struct kvm_enc_region *region)
+> +{
+> +	unsigned long start, end;
 
-> On Tue, Jul 19, 2022 at 7:50 AM Cornelia Huck <cohuck@redhat.com> wrote:
->>
->> On Fri, Jul 08 2022, Peter Collingbourne <pcc@google.com> wrote:
->>
->> > Hi,
->> >
->> > This patch series contains a proposed extension to pKVM that allows MTE
->> > to be exposed to the protected guests. It is based on the base pKVM
->> > series previously sent to the list [1] and later rebased to 5.19-rc3
->> > and uploaded to [2].
->> >
->> > This series takes precautions against host compromise of the guests
->> > via direct access to their tag storage, by preventing the host from
->> > accessing the tag storage via stage 2 page tables. The device tree
->> > must describe the physical memory address of the tag storage, if any,
->> > and the memory nodes must declare that the tag storage location is
->> > described. Otherwise, the MTE feature is disabled in protected guests.
->> >
->> > Now that we can easily do so, we also prevent the host from accessing
->> > any unmapped reserved-memory regions without a driver, as the host
->> > has no business accessing that memory.
->> >
->> > A proposed extension to the devicetree specification is available at
->> > [3], a patched version of QEMU that produces the required device tree
->> > nodes is available at [4] and a patched version of the crosvm hypervisor
->> > that enables MTE is available at [5].
->>
->> I'm unsure how this is supposed to work with QEMU + KVM, as your QEMU
->> patch adds mte-alloc properties to regions that are exposed as a
->> separate address space (which will not work with KVM). Is the magic in
->> that new shared section?
->
-> Hi Cornelia,
->
-> The intent is that the mte-alloc property may be set on memory whose
-> allocation tag storage is not directly accessible via physical memory,
-> since in this case there is no need for the hypervisor to do anything
-> to protect allocation tag storage before exposing MTE to guests. In
-> the case of QEMU + KVM, I would expect the emulated system to not
-> expose the allocation tag storage directly, in which case it would be
-> able to set mte-alloc on all memory nodes without further action,
-> exactly as my patch implements for TCG. With the interface as
-> proposed, QEMU would need to reject the mte-shared-alloc option when
-> KVM is enabled, as there is currently no mechanism for KVM-accelerated
-> virtualized tag storage.
+As alluded to in a different reply, because this will track GPAs instead of HVAs,
+the type needs to be "gpa_t", not "unsigned long".  Oh, actually, they need to
+be gfn_t, since those are what gets shoved into the xarray.
 
-Ok, that makes sense.
+> +	void *entry;
+> +	int r;
+> +
+> +	if (region->size == 0 || region->addr + region->size < region->addr)
+> +		return -EINVAL;
+> +	if (region->addr & (PAGE_SIZE - 1) || region->size & (PAGE_SIZE - 1))
+> +		return -EINVAL;
+> +
+> +	start = region->addr >> PAGE_SHIFT;
+> +	end = (region->addr + region->size - 1) >> PAGE_SHIFT;
+> +
+> +	entry = ioctl == KVM_MEMORY_ENCRYPT_REG_REGION ?
+> +				xa_mk_value(KVM_MEM_ATTR_PRIVATE) : NULL;
+> +
+> +	r = xa_err(xa_store_range(&kvm->mem_attr_array, start, end,
+> +					entry, GFP_KERNEL_ACCOUNT));
 
->
-> Note that these properties are only relevant for guest kernels running
-> under an emulated EL2 in which pKVM could conceivably run, which means
-> that the host would need to implement FEAT_NV2. As far as I know there
-> is currently no support for NV2 neither in QEMU TCG nor in the Linux
-> kernel, and I'm unaware of any available hardware that supports both
-> NV2 and MTE, so it'll be a while before any of this becomes relevant.
+IIUC, this series treats memory as shared by default.  I think we should invert
+that and have KVM's ABI be that all guest memory as private by default, i.e.
+require the guest to opt into sharing memory instead of opt out of sharing memory.
 
-Nod.
+And then the xarray would track which regions are shared.
 
-I'm mostly interested because I wanted to figure out how this feature
-might interact with enabling MTE for QEMU+KVM. I'll keep it in mind.
-
-Thanks!
-
+Regarding mem_attr_array, it probably makes sense to explicitly include what it's
+tracking in the name, i.e. name it {private,shared}_mem_array depending on whether
+it's used to track private vs. shared memory.  If we ever need to track metadata
+beyond shared/private then we can tweak the name as needed, e.g. if hardware ever
+supports secondary non-ephemeral encryption keys.
