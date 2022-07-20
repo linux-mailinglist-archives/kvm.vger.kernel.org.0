@@ -2,177 +2,128 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 8139557C073
-	for <lists+kvm@lfdr.de>; Thu, 21 Jul 2022 01:05:13 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 6FB2A57C0A4
+	for <lists+kvm@lfdr.de>; Thu, 21 Jul 2022 01:09:12 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231361AbiGTXFG (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 20 Jul 2022 19:05:06 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53778 "EHLO
+        id S231550AbiGTXJI (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 20 Jul 2022 19:09:08 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56994 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231340AbiGTXFE (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 20 Jul 2022 19:05:04 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 455584599F
-        for <kvm@vger.kernel.org>; Wed, 20 Jul 2022 16:05:03 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1658358302;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=zg6tKh24AWnTu20bQJOGXj28spsKAAV7siHCBMGPsbs=;
-        b=V30Ve37xYpdvDbBpkI76x2H5epYbpdi0WGlMECTy3Rnjij0x99vZnHQDBhjIOqwYWJvVpm
-        Ggyje7saAq/BI162l1RQh1F87XpJ1d1xhytBaDIqTqp4YUm8Rryse+cxHZFgNcSaXnLYPb
-        i5nCL5EO8EuqBMiKYipHLcuVnjyBNcY=
-Received: from mail-il1-f197.google.com (mail-il1-f197.google.com
- [209.85.166.197]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-27-ndExvGVwMWO6T1_tiCVeKw-1; Wed, 20 Jul 2022 19:05:00 -0400
-X-MC-Unique: ndExvGVwMWO6T1_tiCVeKw-1
-Received: by mail-il1-f197.google.com with SMTP id l10-20020a056e021aaa00b002dd08016baeso2672863ilv.13
-        for <kvm@vger.kernel.org>; Wed, 20 Jul 2022 16:05:00 -0700 (PDT)
+        with ESMTP id S231488AbiGTXIv (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 20 Jul 2022 19:08:51 -0400
+Received: from mail-pf1-x435.google.com (mail-pf1-x435.google.com [IPv6:2607:f8b0:4864:20::435])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 97FE973926
+        for <kvm@vger.kernel.org>; Wed, 20 Jul 2022 16:08:22 -0700 (PDT)
+Received: by mail-pf1-x435.google.com with SMTP id 17so161214pfy.0
+        for <kvm@vger.kernel.org>; Wed, 20 Jul 2022 16:08:22 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=Nszl3bsf2mnME2IbrRKNWdpEyNRDpL7edLFc4oh5rQk=;
+        b=FwlOpTY1Xy5ZtTxSMQshR8kwWNBaEnIm9ywPyxdMxe3T/XxFEM/rXOZ8shtzx6jRRS
+         91M8w+897Sjn6+U9yhdoQBbOHvUIZbnudqyVKqIbiFL3KIAItk6n7+SblQBLvdTN309V
+         3g30TPedV8pjIQUF/c55Q9haSHOBERI23VMmBXMMfrJh6ECBxww0/hu+TOsLKCzYQ+gw
+         GdGAnrtzEzMI3WfqML65BzsZafuMe/PQ0gjEW6sraCLwWPSVKqu83KinR/xUkg5DZP6e
+         1lFSj7wj5ru0N/Lu8b5OfGt3wIdl4NxJaMaNB7fu16Hj/vtrqiGttQ3ijzZC5VLTZ10Y
+         P4jA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:in-reply-to
-         :references:organization:mime-version:content-transfer-encoding;
-        bh=zg6tKh24AWnTu20bQJOGXj28spsKAAV7siHCBMGPsbs=;
-        b=vgreZGr6+hWtYOzDFmUIrNq9XK6z0Tx73Y0oTidky0lr5xTgUvSq5Rzd2lgjqjg4HC
-         9nVcxEnyW0VJ12IhP+RD4kE8LTBG3+lUSmauVRdtXLMiQlCYD1hPMNwtzlIB9TKdjiLl
-         XLoBe8SN5c5/VKRRCbYspJ95E2Yl4R1x7Zem1besofnsKbwIqgk9fm4iHBxYyrBPKZxi
-         KZIxaI86XclfTl2vWKuB1BLATLArk2cVwIl+5XT5kwaWa5H2g5PUrhPb0jtrcSKhWfNp
-         u0zLD+NPnRnrtRv4GPdEun8NIpG4uLZdyre35EdKXM3zcoAgwJOYNSgHnhnSAkdLm4NB
-         nH5w==
-X-Gm-Message-State: AJIora9BJmUXiRYlOEeZcTDPP/8tnBo2gkgRQCtBCsIKsF5/wJWgL5jB
-        bTkEDa4FcZ1PJ51TWCJMKJEQzqwQ/VRtxvsLJ3hBwVzpekrE1BVfVneWJWU8OLCWsuwoFyNe78g
-        45P+YpqvIbyOf
-X-Received: by 2002:a92:d64d:0:b0:2dc:e337:58ab with SMTP id x13-20020a92d64d000000b002dce33758abmr8883700ilp.85.1658358300017;
-        Wed, 20 Jul 2022 16:05:00 -0700 (PDT)
-X-Google-Smtp-Source: AGRyM1sQXCea5IlpPt4z3PoQC/VJ/h3ZRlmifntgfmb+p+6Hl0NlKR1GQe1eKRx6WPGYdv4/I+TsDA==
-X-Received: by 2002:a92:d64d:0:b0:2dc:e337:58ab with SMTP id x13-20020a92d64d000000b002dce33758abmr8883682ilp.85.1658358299767;
-        Wed, 20 Jul 2022 16:04:59 -0700 (PDT)
-Received: from redhat.com ([38.15.36.239])
-        by smtp.gmail.com with ESMTPSA id n24-20020a056638111800b0034195de93b3sm92309jal.51.2022.07.20.16.04.58
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 20 Jul 2022 16:04:59 -0700 (PDT)
-Date:   Wed, 20 Jul 2022 17:04:57 -0600
-From:   Alex Williamson <alex.williamson@redhat.com>
-To:     Jason Gunthorpe <jgg@nvidia.com>
-Cc:     Alexander Gordeev <agordeev@linux.ibm.com>,
-        David Airlie <airlied@linux.ie>,
-        Christian Borntraeger <borntraeger@linux.ibm.com>,
-        Cornelia Huck <cohuck@redhat.com>,
-        Daniel Vetter <daniel@ffwll.ch>,
-        dri-devel@lists.freedesktop.org,
-        Harald Freudenberger <freude@linux.ibm.com>,
-        Vasily Gorbik <gor@linux.ibm.com>,
-        Heiko Carstens <hca@linux.ibm.com>,
-        intel-gfx@lists.freedesktop.org,
-        intel-gvt-dev@lists.freedesktop.org,
-        Jani Nikula <jani.nikula@linux.intel.com>,
-        Jason Herne <jjherne@linux.ibm.com>,
-        Joonas Lahtinen <joonas.lahtinen@linux.intel.com>,
-        kvm@vger.kernel.org, linux-s390@vger.kernel.org,
-        Matthew Rosato <mjrosato@linux.ibm.com>,
-        Peter Oberparleiter <oberpar@linux.ibm.com>,
-        Halil Pasic <pasic@linux.ibm.com>,
-        Rodrigo Vivi <rodrigo.vivi@intel.com>,
-        Sven Schnelle <svens@linux.ibm.com>,
-        Tvrtko Ursulin <tvrtko.ursulin@linux.intel.com>,
-        Vineeth Vijayan <vneethv@linux.ibm.com>,
-        Zhi Wang <zhi.a.wang@intel.com>,
-        Tony Krowiak <akrowiak@linux.ibm.com>,
-        Eric Farman <farman@linux.ibm.com>,
-        Christoph Hellwig <hch@lst.de>,
-        Kevin Tian <kevin.tian@intel.com>,
-        Zhenyu Wang <zhenyuw@linux.intel.com>,
-        Nicolin Chen <nicolinc@nvidia.com>
-Subject: Re: [PATCH v4 1/2] vfio: Replace the DMA unmapping notifier with a
- callback
-Message-ID: <20220720170457.39cda0d0.alex.williamson@redhat.com>
-In-Reply-To: <20220720200829.GW4609@nvidia.com>
-References: <0-v4-681e038e30fd+78-vfio_unmap_notif_jgg@nvidia.com>
-        <1-v4-681e038e30fd+78-vfio_unmap_notif_jgg@nvidia.com>
-        <20220720134113.4225f9d6.alex.williamson@redhat.com>
-        <20220720200829.GW4609@nvidia.com>
-Organization: Red Hat
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=Nszl3bsf2mnME2IbrRKNWdpEyNRDpL7edLFc4oh5rQk=;
+        b=bBMgC8AVyc0Aw2LKH69lJW1NrGD4L7rddS3NximzvtSm+5bx8Vqzm2wTYg/FX+eOSM
+         b/vk+cLu00Vs4Co3cXNckteS7rqZf+v/lrQuHl/TDs1NFX7nVhvSnYnjYOXqpseJsgtz
+         ZQQnVhVR+gZAdA4cR0wN9KOrHA62oKZ/Fv8SHhjiIctTFlfsZ8w43N714o8yJI3u7TYN
+         gPi9H8oI7k/VvHDcHZd1AS+MEw7xKRaUKV8BxW5/y3dKX8cGULsJ/tImvubOZQ3s9YEX
+         kSydmXGzRx8bwRjiycS0Yz4r7iFvMIG5D0fBaUX5jdgUnbtxfP4dUOnOe+OTlLVvI/60
+         S44w==
+X-Gm-Message-State: AJIora+jGbk+j/3UkBOX2JF8xQldcF6ywz4V0qQJk/TlqK+I1fYK/bUU
+        IyCcIFTVd6DQF72bPPZwuoblFWqN5VSav2qmecvXIg==
+X-Google-Smtp-Source: AGRyM1sVSu2sWaA6KhwjXATdLIcan8zoTwRzYetVEkO/NR0+movB4Kj6gdLqTbANspAPpdn1ss3XaAW1x7VvJRw8slU=
+X-Received: by 2002:a62:1a8b:0:b0:528:d505:1a06 with SMTP id
+ a133-20020a621a8b000000b00528d5051a06mr41267868pfa.78.1658358501699; Wed, 20
+ Jul 2022 16:08:21 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-3.5 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,
-        SPF_HELO_NONE,SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
+References: <20220519153713.819591-1-chao.p.peng@linux.intel.com>
+ <20220519153713.819591-7-chao.p.peng@linux.intel.com> <b3ce0855-0e4b-782a-599c-26590df948dd@amd.com>
+ <20220624090246.GA2181919@chaop.bj.intel.com> <CAGtprH82H_fjtRbL0KUxOkgOk4pgbaEbAydDYfZ0qxz41JCnAQ@mail.gmail.com>
+ <20220630222140.of4md7bufd5jv5bh@amd.com> <4fe3b47d-e94a-890a-5b87-6dfb7763bc7e@intel.com>
+ <Ysc9JDcVAnlVrGC8@google.com> <5d0b9341-78b5-0959-2517-0fb1fe83a205@intel.com>
+In-Reply-To: <5d0b9341-78b5-0959-2517-0fb1fe83a205@intel.com>
+From:   Vishal Annapurve <vannapurve@google.com>
+Date:   Wed, 20 Jul 2022 16:08:10 -0700
+Message-ID: <CAGtprH9knCr++C7jgXYCi1zfYcreip1uun-d+eucjEQy9xymNg@mail.gmail.com>
+Subject: Re: [PATCH v6 6/8] KVM: Handle page fault for private memory
+To:     Xiaoyao Li <xiaoyao.li@intel.com>
+Cc:     Sean Christopherson <seanjc@google.com>,
+        Michael Roth <michael.roth@amd.com>,
+        Chao Peng <chao.p.peng@linux.intel.com>,
+        "Nikunj A. Dadhania" <nikunj@amd.com>,
+        kvm list <kvm@vger.kernel.org>,
+        LKML <linux-kernel@vger.kernel.org>, linux-mm@kvack.org,
+        linux-fsdevel@vger.kernel.org, linux-api@vger.kernel.org,
+        linux-doc@vger.kernel.org, qemu-devel@nongnu.org,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Jonathan Corbet <corbet@lwn.net>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+        x86 <x86@kernel.org>, "H . Peter Anvin" <hpa@zytor.com>,
+        Hugh Dickins <hughd@google.com>,
+        Jeff Layton <jlayton@kernel.org>,
+        "J . Bruce Fields" <bfields@fieldses.org>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        Mike Rapoport <rppt@kernel.org>,
+        Steven Price <steven.price@arm.com>,
+        "Maciej S . Szmigiero" <mail@maciej.szmigiero.name>,
+        Vlastimil Babka <vbabka@suse.cz>,
+        Yu Zhang <yu.c.zhang@linux.intel.com>,
+        "Kirill A . Shutemov" <kirill.shutemov@linux.intel.com>,
+        Andy Lutomirski <luto@kernel.org>,
+        Jun Nakajima <jun.nakajima@intel.com>,
+        Dave Hansen <dave.hansen@intel.com>,
+        Andi Kleen <ak@linux.intel.com>,
+        David Hildenbrand <david@redhat.com>, aarcange@redhat.com,
+        ddutile@redhat.com, dhildenb@redhat.com,
+        Quentin Perret <qperret@google.com>, mhocko@suse.com
+Content-Type: text/plain; charset="UTF-8"
+X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
+        USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=unavailable
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, 20 Jul 2022 17:08:29 -0300
-Jason Gunthorpe <jgg@nvidia.com> wrote:
+> > Hmm, so a new slot->arch.page_attr array shouldn't be necessary, KVM can instead
+> > update slot->arch.lpage_info on shared<->private conversions.  Detecting whether
+> > a given range is partially mapped could get nasty if KVM defers tracking to the
+> > backing store, but if KVM itself does the tracking as was previously suggested[*],
+> > then updating lpage_info should be relatively straightfoward, e.g. use
+> > xa_for_each_range() to see if a given 2mb/1gb range is completely covered (fully
+> > shared) or not covered at all (fully private).
+> >
+> > [*] https://lore.kernel.org/all/YofeZps9YXgtP3f1@google.com
+>
+> Yes, slot->arch.page_attr was introduced to help identify whether a page
+> is completely shared/private at given level. It seems XARRAY can serve
+> the same purpose, though I know nothing about it. Looking forward to
+> seeing the patch of using XARRAY.
+>
+> yes, update slot->arch.lpage_info is good to utilize the existing logic
+> and Isaku has applied it to slot->arch.lpage_info for 2MB support patches.
 
-> On Wed, Jul 20, 2022 at 01:41:13PM -0600, Alex Williamson wrote:
->  
-> > ie. we don't need the gfn, we only need the iova.  
-> 
-> Right, that makes sense
->  
-> > However then I start to wonder why we're passing in 1 for the number of
-> > pages because this previously notifier, now callback is called for the
-> > entire vfio_dma range when we find any pinned pages.    
-> 
-> Well, it is doing this because it only ever pins one page.
+Chao, are you planning to implement these changes to ensure proper
+handling of hugepages partially mapped as private/shared in subsequent
+versions of this series?
+Or is this something left to be handled by the architecture specific code?
 
-Of course that page is not necessarily the page it unpins given the
-contract misunderstanding below.
- 
-> The drivers are confused about what the contract is. vfio is calling
-> the notifier with the entire IOVA range that is being unmapped and the
-> drivers are expecting to receive notifications only for the IOVA they
-> have actually pinned.
-> 
-> > Should ap and ccw implementations of .dma_unmap just be replaced with a
-> > BUG_ON(1)?  
-> 
-> The point of these callbacks is to halt concurrent DMA, and ccw does
-> that today.
-
-ccw essentially only checks whether the starting iova of the unmap is
-currently mapped.  If not it does nothing, if it is it tries to reset
-the device and unpin everything.  Chances are the first iova is not the
-one pinned, so we don't end up removing the pinned page and type1 will
-eventually BUG_ON after a few tries.
-
-> It looks like AP is missing a call to ap_aqic(), so it is
-> probably double wrong.
-
-Thankfully the type1 unpinning path can't be tricked into unpinning
-something that wasn't pinned, so chances are the unpin call does
-nothing, with a small risk that it unpins another driver's pinned page,
-which might not yet have been notified and could still be using the
-page.  In the end, if ap did have a page pinned in the range, we'll hit
-the same BUG_ON as above.
-
-> What I'd suggest is adding a WARN_ON that the dma->pfn_list is not
-> empty and leave these functions alone.
-
-The BUG_ON still exists in type1.
-
-Eric, Matt, Tony, Halil, JasonH, any quick fixes here?  ccw looks like
-it would be pretty straightforward to test against a range rather than
-a single iova.
- 
-> Most likely AP should be fixed to call vfio_ap_irq_disable() and to
-> check the q->saved_pfn against the IOVA.
-
-Right, the q->saved_iova, perhaps calling vfio_ap_irq_disable() on
-finding a matching queue.
-
-> But I'm inclined to leave this as-is for this series given we are at
-> rc7.
-
-On the grounds that it's no worse, maybe, but given the changes
-around this code hopefully we can submit fixes patches to stable if the
-backport isn't obvious and the BUG_ON in type1 is reachable.  Thanks,
-
-Alex
-
+Regards,
+Vishal
