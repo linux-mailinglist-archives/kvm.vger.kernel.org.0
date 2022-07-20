@@ -2,191 +2,103 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id B6B0657B34E
-	for <lists+kvm@lfdr.de>; Wed, 20 Jul 2022 10:57:04 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 0CD8D57B3B5
+	for <lists+kvm@lfdr.de>; Wed, 20 Jul 2022 11:23:31 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229807AbiGTI5D (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 20 Jul 2022 04:57:03 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:32776 "EHLO
+        id S232833AbiGTJX3 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 20 Jul 2022 05:23:29 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53056 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229898AbiGTI5A (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 20 Jul 2022 04:57:00 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id AECE8675A8
-        for <kvm@vger.kernel.org>; Wed, 20 Jul 2022 01:56:59 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1658307418;
+        with ESMTP id S230348AbiGTJX2 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 20 Jul 2022 05:23:28 -0400
+Received: from out0.migadu.com (out0.migadu.com [IPv6:2001:41d0:2:267::])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7F27C474D3
+        for <kvm@vger.kernel.org>; Wed, 20 Jul 2022 02:23:26 -0700 (PDT)
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+        t=1658309004;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=0PlCq6ajL/Z4I1TluumiywIvpa4NQvyOba7zhGyb68U=;
-        b=hYcbF9eC1KySREeAYv5+KwO0yUAtYAtjv/y5p0zVU5DB0QQ5UW017ge+LLdFwYNYbA8+gH
-        qYrsqFc0I9JUfREFncgK5NVk61llq8v8Sso568ZMgiPAdWvm82pBiuqJMPRgx44Ax72l/i
-        Zr2K0AFo4jt/HoSvFhRds2HthTL7hlY=
-Received: from mail-qv1-f71.google.com (mail-qv1-f71.google.com
- [209.85.219.71]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-163-WOc7v-xCNWqGlXUJZC73aQ-1; Wed, 20 Jul 2022 04:56:57 -0400
-X-MC-Unique: WOc7v-xCNWqGlXUJZC73aQ-1
-Received: by mail-qv1-f71.google.com with SMTP id p6-20020a0c8c86000000b004731e63c75bso9075781qvb.10
-        for <kvm@vger.kernel.org>; Wed, 20 Jul 2022 01:56:57 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:content-transfer-encoding
-         :in-reply-to;
-        bh=0PlCq6ajL/Z4I1TluumiywIvpa4NQvyOba7zhGyb68U=;
-        b=5xNLUBu4j2CsvudQpuBFHaZXx2omZkNKOP0evM9h8m7sZTDi/uweVfRKhfgN4hTwpE
-         kVRM6KJQ/oRTwTnIFaK2b9sPWrlPXJIVNC2xIWdfEzL7KWXKh6mtbyOwFwmX+5omHpXF
-         LpPyZDU9Pm8z44zKSinWv4PWmVl5sdFN0g2XPcy9REItzTRi9ChFaRMZFBIYr42vot/n
-         kqMDEgEDiC8zSHLWFWf9LN8FEkHK/p/tmWi+myUcKleSQZseD7TIDgtTavfreg+V6NEg
-         qPLUGxWcvfN2igdhKOQUV1iVH0kPS7zWnC9cBcNceRgNo5gCTvgVDkUKFjFPjixFq8cT
-         LvaQ==
-X-Gm-Message-State: AJIora+kgFZe4LOCwkWyPMYC2uk50FBeWK4/x0X7wQ+NUeth73GZ/BoU
-        VCT4J38lCafUXgXVnix9//eAwxu2LeHUApn7XDK1H5n7XWmcwXYU7BANA/4fCb7mZhoDFn44T0Y
-        wCrx/O/eXQDVJ
-X-Received: by 2002:a0c:8c89:0:b0:470:9ab6:bb27 with SMTP id p9-20020a0c8c89000000b004709ab6bb27mr28764647qvb.118.1658307417211;
-        Wed, 20 Jul 2022 01:56:57 -0700 (PDT)
-X-Google-Smtp-Source: AGRyM1uUEd8wd9tFBWjZIynLvqe+YW58v3ThG/Igh7FbI5iMXJ4uDVuxP2SQYrdm0ppCHCoqmP9x8A==
-X-Received: by 2002:a0c:8c89:0:b0:470:9ab6:bb27 with SMTP id p9-20020a0c8c89000000b004709ab6bb27mr28764632qvb.118.1658307416999;
-        Wed, 20 Jul 2022 01:56:56 -0700 (PDT)
-Received: from sgarzare-redhat (host-79-46-200-178.retail.telecomitalia.it. [79.46.200.178])
-        by smtp.gmail.com with ESMTPSA id bn10-20020a05622a1dca00b0031ece6e0f17sm3229189qtb.71.2022.07.20.01.56.53
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 20 Jul 2022 01:56:56 -0700 (PDT)
-Date:   Wed, 20 Jul 2022 10:56:49 +0200
-From:   Stefano Garzarella <sgarzare@redhat.com>
-To:     Arseniy Krasnov <AVKrasnov@sberdevices.ru>
-Cc:     "David S. Miller" <davem@davemloft.net>,
-        "edumazet@google.com" <edumazet@google.com>,
-        Jakub Kicinski <kuba@kernel.org>,
-        Paolo Abeni <pabeni@redhat.com>,
-        Stefan Hajnoczi <stefanha@redhat.com>,
-        "Michael S. Tsirkin" <mst@redhat.com>,
-        Krasnov Arseniy <oxffffaa@gmail.com>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "virtualization@lists.linux-foundation.org" 
-        <virtualization@lists.linux-foundation.org>,
-        "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        kernel <kernel@sberdevices.ru>
-Subject: Re: [RFC PATCH v1 3/3] vsock_test: POLLIN + SO_RCVLOWAT test.
-Message-ID: <20220720085649.6pqj55hmkxlamxjq@sgarzare-redhat>
-References: <c8de13b1-cbd8-e3e0-5728-f3c3648c69f7@sberdevices.ru>
- <df70a274-4e69-ca1f-acba-126eb517e532@sberdevices.ru>
- <20220719125227.bktosg3yboeaeoo5@sgarzare-redhat>
- <ea414c31-741f-6994-651a-a686cba3d25e@sberdevices.ru>
+         to:to:cc:cc:mime-version:mime-version:
+         content-transfer-encoding:content-transfer-encoding;
+        bh=DXu1ttuM/4nB6h+hG9M8DKITaTQ3r2iVyd84bbxFhoY=;
+        b=CVuZtFXIlocdzLsPkedUaYL2rM8D/PxCoN7bDOBnQxm90DDc8RgieqLE1DOHYk544qtN9O
+        fy2m0NX/6MMarHsRfMcwJjm9aiHlpK03uNqQ3j98iRkfAK2OjCtjtuOn0pkIaT16rRw6Ng
+        Ncz6Oy1Gmf2wSsUBgFXOY+mz8W5E/yc=
+From:   Oliver Upton <oliver.upton@linux.dev>
+To:     kvm@vger.kernel.org
+Cc:     Paolo Bonzini <pbonzini@redhat.com>,
+        Sean Christopherson <seanjc@google.com>,
+        Oliver Upton <oupton@google.com>
+Subject: [PATCH v3 0/6] KVM: Clean up debugfs init/destroy
+Date:   Wed, 20 Jul 2022 09:22:46 +0000
+Message-Id: <20220720092259.3491733-1-oliver.upton@linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1; format=flowed
-Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <ea414c31-741f-6994-651a-a686cba3d25e@sberdevices.ru>
-X-Spam-Status: No, score=-3.5 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,
-        SPF_HELO_NONE,SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
+X-Migadu-Flow: FLOW_OUT
+X-Migadu-Auth-User: linux.dev
+X-Spam-Status: No, score=-2.8 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,SPF_HELO_PASS,
+        SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Jul 20, 2022 at 05:46:01AM +0000, Arseniy Krasnov wrote:
->On 19.07.2022 15:52, Stefano Garzarella wrote:
->> On Mon, Jul 18, 2022 at 08:19:06AM +0000, Arseniy Krasnov wrote:
->>> This adds test to check, that when poll() returns POLLIN and
->>> POLLRDNORM bits, next read call won't block.
->>>
->>> Signed-off-by: Arseniy Krasnov <AVKrasnov@sberdevices.ru>
->>> ---
->>> tools/testing/vsock/vsock_test.c | 90 ++++++++++++++++++++++++++++++++
->>> 1 file changed, 90 insertions(+)
->>>
->>> diff --git a/tools/testing/vsock/vsock_test.c b/tools/testing/vsock/vsock_test.c
->>> index dc577461afc2..8e394443eaf6 100644
->>> --- a/tools/testing/vsock/vsock_test.c
->>> +++ b/tools/testing/vsock/vsock_test.c
->>> @@ -18,6 +18,7 @@
->>> #include <sys/socket.h>
->>> #include <time.h>
->>> #include <sys/mman.h>
->>> +#include <poll.h>
->>>
->>> #include "timeout.h"
->>> #include "control.h"
->>> @@ -596,6 +597,90 @@ static void test_seqpacket_invalid_rec_buffer_server(const struct test_opts *opt
->>>     close(fd);
->>> }
->>>
->>> +static void test_stream_poll_rcvlowat_server(const struct test_opts *opts)
->>> +{
->>> +#define RCVLOWAT_BUF_SIZE 128
->>> +    int fd;
->>> +    int i;
->>> +
->>> +    fd = vsock_stream_accept(VMADDR_CID_ANY, 1234, NULL);
->>> +    if (fd < 0) {
->>> +        perror("accept");
->>> +        exit(EXIT_FAILURE);
->>> +    }
->>> +
->>> +    /* Send 1 byte. */
->>> +    send_byte(fd, 1, 0);
->>> +
->>> +    control_writeln("SRVSENT");
->>> +
->>> +    /* Just empirically delay value. */
->>> +    sleep(4);
->>
->> Why we need this sleep()?
->Purpose of sleep() is to move client in state, when it has 1 byte of rx data
->and poll() won't wake. For example:
->client:                        server:
->waits for "SRVSENT"
->                               send 1 byte
->                               send "SRVSENT"
->poll()
->                               sleep
->...
->poll sleeps
->...
->                               send rest of data
->poll wake up
->
->I think, without sleep there is chance, that client enters poll() when whole
->data from server is already received, thus test will be useless(it just tests
+From: Oliver Upton <oupton@google.com>
 
-Right, I see (maybe add a comment in the test).
+The way that KVM handles debugfs init/destroy is somewhat sloppy. Even
+though debugfs is stood up after kvm_create_vm(), it is torn down from
+kvm_destroy_vm(). There exists a window where we need to tear down a VM
+before debugfs is created, requiring delicate handling.
 
->poll()). May be i can remove "SRVSENT" as sleep is enough.
+This series cleans up the debugfs lifecycle by fully tying it to the
+VM's init/destroy pattern.
 
-I think it's fine.
+First two patches hoist some unrelated stats initialization to a more
+appropriate place for kvm and kvm_vcpu.
 
-An alternative could be to use the `timeout` of poll():
+The next 3 patches are the meat of the series, changing around the
+initialization order to get an FD early and wiring in debugfs
+initialization to kvm_create_vm().
 
-client:                        server:
-waits for "SRVSENT"
-                                send 1 byte
-                                send "SRVSENT"
-poll(, timeout = 1 * 1000)
-                                wait for "CLNSENT"
-poll should return 0
-send "CLNSENT"
+Lastly, patch 6 is essentially a revert of Sean's fix [1] for a NULL deref
+in debugfs, though I stopped short of an outright revert since that one
+went to stable and is still entirely correct.
 
-poll(, timeout = 10 * 1000)
-...
-poll sleeps
-...
-                                send rest of data
-poll wake up
+"Works on my machine", and with luck it will on yours too.
+
+[1] 5c697c367a66 ("KVM: Initialize debugfs_dentry when a VM is created to avoid NULL deref")
+
+v1: http://lore.kernel.org/r/20220415201542.1496582-1-oupton@google.com
+v2: https://lore.kernel.org/kvm/20220518175811.2758661-1-oupton@google.com
+
+v1 -> v2:
+ - Don't conflate debugfs+stats. Initialize stats_id outside of the
+   context of debugfs (Sean)
+ - Pass around the FD as a string to avoid subsequent KVM changes
+   inappropriately using the FD (Sean)
+
+v2 -> v3:
+ - Spare readers from needing to refer to the title of a commit (Sean)
+ - Crack fd stringization and move of kvm_create_vm_debugfs() into two
+   patches (Sean)
+ - Fix a bug that crops up in the middle of the series. Failed to pass
+   the fd through to kvm_create_vm_debugfs()
+
+Oliver Upton (6):
+  KVM: Shove vm stats_id init into kvm_create_vm()
+  KVM: Shove vcpu stats_id init into kvm_vcpu_init()
+  KVM: Get an fd before creating the VM
+  KVM: Pass the name of the VM fd to kvm_create_vm_debugfs()
+  KVM: Actually create debugfs in kvm_create_vm()
+  KVM: Hoist debugfs_dentry init to kvm_create_vm_debugfs() (again)
+
+ virt/kvm/kvm_main.c | 91 +++++++++++++++++++++++++--------------------
+ 1 file changed, 50 insertions(+), 41 deletions(-)
 
 
-I don't have a strong opinion, also your version seems fine, just an 
-alternative ;-)
-
-Maybe in your version you can add a 10 sec timeout to poll, to avoid 
-that the test stuck for some reason (failing if the timeout is reached).
-
-Thanks,
-Stefano
+base-commit: 8031d87aa9953ddeb047a5356ebd0b240c30f233
+-- 
+2.37.0.170.g444d1eabd0-goog
 
