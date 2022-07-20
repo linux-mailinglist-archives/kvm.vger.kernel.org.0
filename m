@@ -2,264 +2,141 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 66C0F57B45C
-	for <lists+kvm@lfdr.de>; Wed, 20 Jul 2022 12:18:22 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id A8EA257B4D8
+	for <lists+kvm@lfdr.de>; Wed, 20 Jul 2022 12:53:38 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231668AbiGTKSU (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 20 Jul 2022 06:18:20 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36776 "EHLO
+        id S240589AbiGTKxg (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 20 Jul 2022 06:53:36 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35882 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229644AbiGTKSS (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 20 Jul 2022 06:18:18 -0400
-Received: from mga11.intel.com (mga11.intel.com [192.55.52.93])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7B1629FD2;
-        Wed, 20 Jul 2022 03:18:17 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1658312297; x=1689848297;
-  h=message-id:subject:from:to:cc:date:in-reply-to:
-   references:content-transfer-encoding:mime-version;
-  bh=zJGqHdShaBf2frYWeGAD4nc3U4rFK1l2uN03UPQgUCE=;
-  b=H6/2PtEmhd0oZmOZ7L8aCpH5M+JVpeMCicV+Pc7AWTEl+PwgdDZaUsOu
-   XDCydLQ2m5pzzBGSn2l2wDlyELqj39ertDDyZfFnOvsv/89QNQkkWSlAn
-   p2PkD8tHlCFviMUBn2o0eAsGN6pME9BrnLAvlPuXrEEazLDYU0F4fU4qs
-   y6fsl+v/jXcm10ZCe/EmHOvXjfI3K6CyA2BCR4o+5v1om5Ti1nM8y4xJa
-   m6dsHwX/eiQz+A58cLusRBtUXmcB6pX4AwPAac5mz78RiLRKkseuveuqv
-   lvBsIcdMaWSo08LpDMWXM3xOrUSMb7SVOxiZHgEKdajtrmHpc7Y8dUywi
-   A==;
-X-IronPort-AV: E=McAfee;i="6400,9594,10413"; a="284297351"
-X-IronPort-AV: E=Sophos;i="5.92,286,1650956400"; 
-   d="scan'208";a="284297351"
-Received: from fmsmga006.fm.intel.com ([10.253.24.20])
-  by fmsmga102.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 20 Jul 2022 03:18:17 -0700
-X-IronPort-AV: E=Sophos;i="5.92,286,1650956400"; 
-   d="scan'208";a="843994786"
-Received: from ecurtis-mobl.amr.corp.intel.com (HELO khuang2-desk.gar.corp.intel.com) ([10.213.162.137])
-  by fmsmga006-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 20 Jul 2022 03:18:14 -0700
-Message-ID: <ea03e55499f556388c0a5f9ed565e72e213c276f.camel@intel.com>
-Subject: Re: [PATCH v5 07/22] x86/virt/tdx: Implement SEAMCALL function
-From:   Kai Huang <kai.huang@intel.com>
-To:     Dave Hansen <dave.hansen@intel.com>, linux-kernel@vger.kernel.org,
-        kvm@vger.kernel.org
-Cc:     seanjc@google.com, pbonzini@redhat.com, len.brown@intel.com,
-        tony.luck@intel.com, rafael.j.wysocki@intel.com,
-        reinette.chatre@intel.com, dan.j.williams@intel.com,
-        peterz@infradead.org, ak@linux.intel.com,
-        kirill.shutemov@linux.intel.com,
-        sathyanarayanan.kuppuswamy@linux.intel.com,
-        isaku.yamahata@intel.com
-Date:   Wed, 20 Jul 2022 22:18:12 +1200
-In-Reply-To: <6bef368ccc68676e4acaecc4b6dc52f598ea7f2f.camel@intel.com>
-References: <cover.1655894131.git.kai.huang@intel.com>
-         <095e6bbc57b4470e1e9a9104059a5238c9775f00.1655894131.git.kai.huang@intel.com>
-         <069a062e-a4a6-09af-7b74-7f4929f2ec0b@intel.com>
-         <5ce7ebfe54160ea35e432bf50207ebed32db31fc.camel@intel.com>
-         <84e93539-a2f9-f68e-416a-ea3d8fc725af@intel.com>
-         <6bef368ccc68676e4acaecc4b6dc52f598ea7f2f.camel@intel.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-User-Agent: Evolution 3.44.3 (3.44.3-1.fc36) 
+        with ESMTP id S232606AbiGTKx0 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 20 Jul 2022 06:53:26 -0400
+Received: from mail.sberdevices.ru (mail.sberdevices.ru [45.89.227.171])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9CCFC7173A;
+        Wed, 20 Jul 2022 03:52:56 -0700 (PDT)
+Received: from s-lin-edge02.sberdevices.ru (localhost [127.0.0.1])
+        by mail.sberdevices.ru (Postfix) with ESMTP id C851A5FD2F;
+        Wed, 20 Jul 2022 13:52:41 +0300 (MSK)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=sberdevices.ru;
+        s=mail; t=1658314361;
+        bh=Reu0fuSf+RtOwElI8k8f5OiCjMhFmisHomzOclTNIRc=;
+        h=From:To:Subject:Date:Message-ID:Content-Type:MIME-Version;
+        b=N3gwopGugWOONNgObmfj2QjNpW+/oJAJV9LTye8vjSxMraUowYebGdh1Wz0wFGbsb
+         33flSeW587hQ/ouMb0rkf2DQQr1OTm0h+Ap+sWSPk4nWxnCrhgsjOKJJzaaBilDU+A
+         RFufZyaWZFg2TeJxa0CY+K9AKGZOaCBnrgSvjazVD3ynqGETzUI2ecOPYSeLhznm1r
+         ZYSx5whjO16VPBcLY448f2qWEW+s4psKD5/OG5NEjFEuDP4ZWINifEjW1OofeyWnzU
+         gBqw4pogXwV366eG/inIA0IrMt5SrJBdeLbyi9aQZ0CCkBauw5dwVEKIzBnG6hQOL/
+         VrISluw0z7WkQ==
+Received: from S-MS-EXCH02.sberdevices.ru (S-MS-EXCH02.sberdevices.ru [172.16.1.5])
+        by mail.sberdevices.ru (Postfix) with ESMTP;
+        Wed, 20 Jul 2022 13:52:37 +0300 (MSK)
+From:   Arseniy Krasnov <AVKrasnov@sberdevices.ru>
+To:     Stefano Garzarella <sgarzare@redhat.com>
+CC:     "David S. Miller" <davem@davemloft.net>,
+        Jakub Kicinski <kuba@kernel.org>,
+        Paolo Abeni <pabeni@redhat.com>,
+        Stefan Hajnoczi <stefanha@redhat.com>,
+        "Michael S. Tsirkin" <mst@redhat.com>,
+        Krasnov Arseniy <oxffffaa@gmail.com>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+        "virtualization@lists.linux-foundation.org" 
+        <virtualization@lists.linux-foundation.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        kernel <kernel@sberdevices.ru>
+Subject: Re: [RFC PATCH v1 0/3] virtio/vsock: use SO_RCVLOWAT to set
+ POLLIN/POLLRDNORM
+Thread-Topic: [RFC PATCH v1 0/3] virtio/vsock: use SO_RCVLOWAT to set
+ POLLIN/POLLRDNORM
+Thread-Index: AQHYmn4tqUccpAClwkSIQKaYrjmRMa2Fd1UAgAEfggCAADh4gIAAFxCA
+Date:   Wed, 20 Jul 2022 10:52:25 +0000
+Message-ID: <3e954621-4496-17be-4b73-d0971372b8c5@sberdevices.ru>
+References: <c8de13b1-cbd8-e3e0-5728-f3c3648c69f7@sberdevices.ru>
+ <20220719125856.a6bfwrvy66gxxzqe@sgarzare-redhat>
+ <ac05e1ee-23b3-75e0-f9a4-1056a68934d8@sberdevices.ru>
+ <20220720093005.2unej4jnnvrn55f2@sgarzare-redhat>
+In-Reply-To: <20220720093005.2unej4jnnvrn55f2@sgarzare-redhat>
+Accept-Language: en-US, ru-RU
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+x-originating-ip: [172.16.1.12]
+Content-Type: text/plain; charset="utf-8"
+Content-ID: <E7D43A9AB1AF3341827A5BC6EA70248A@sberdevices.ru>
+Content-Transfer-Encoding: base64
 MIME-Version: 1.0
-X-Spam-Status: No, score=-7.8 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_HI,
-        SPF_HELO_NONE,SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
+X-KSMG-Rule-ID: 4
+X-KSMG-Message-Action: clean
+X-KSMG-AntiSpam-Status: not scanned, disabled by settings
+X-KSMG-AntiSpam-Interceptor-Info: not scanned
+X-KSMG-AntiPhishing: not scanned, disabled by settings
+X-KSMG-AntiVirus: Kaspersky Secure Mail Gateway, version 1.1.2.30, bases: 2022/07/20 09:26:00 #19927092
+X-KSMG-AntiVirus-Status: Clean, skipped
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,SPF_HELO_NONE,SPF_PASS
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, 2022-06-28 at 10:10 +1200, Kai Huang wrote:
-> On Mon, 2022-06-27 at 13:58 -0700, Dave Hansen wrote:
-> > On 6/26/22 22:23, Kai Huang wrote:
-> > > On Fri, 2022-06-24 at 11:38 -0700, Dave Hansen wrote:
-> > > > On 6/22/22 04:16, Kai Huang wrote:
-> > > > > SEAMCALL instruction causes #GP when SEAMRR isn't enabled, and #U=
-D when
-> > > > > CPU is not in VMX operation.  The TDX_MODULE_CALL macro doesn't h=
-andle
-> > > > > SEAMCALL exceptions.  Leave to the caller to guarantee those cond=
-itions
-> > > > > before calling __seamcall().
-> > > >=20
-> > > > I was trying to make the argument earlier that you don't need *ANY*
-> > > > detection for TDX, other than the ability to make a SEAMCALL.
-> > > > Basically, patch 01/22 could go away.
-> > ...
-> > > > So what does patch 01/22 buy us?  One EXTABLE entry?
-> > >=20
-> > > There are below pros if we can detect whether TDX is enabled by BIOS =
-during boot
-> > > before initializing the TDX Module:
-> > >=20
-> > > 1) There are requirements from customers to report whether platform s=
-upports TDX
-> > > and the TDX keyID numbers before initializing the TDX module so the u=
-serspace
-> > > cloud software can use this information to do something.  Sorry I can=
-not find
-> > > the lore link now.
-> >=20
-> > <sigh>
-> >=20
-> > Never listen to customers literally.  It'll just lead you down the wron=
-g
-> > path.  They told you, "we need $FOO in dmesg" and you ran with it
-> > without understanding why.  The fact that you even *need* to find the
-> > lore link is because you didn't bother to realize what they really need=
-ed.
-> >=20
-> > dmesg is not ABI.  It's for humans.  If you need data out of the kernel=
-,
-> > do it with a *REAL* ABI.  Not dmesg.
->=20
-> Showing in the dmesg is the first step, but later we have plan to expose =
-keyID
-> info via /sysfs.  Of course, it's always arguable customer's such require=
-ment is
-> absolutely needed, but to me it's still a good thing to have code to dete=
-ct TDX
-> during boot.  The code isn't complicated as you can see.
->=20
-> >=20
-> > > 2) As you can see, it can be used to handle ACPI CPU/memory hotplug a=
-nd driver
-> > > managed memory hotplug.  Kexec() support patch also can use it.
-> > >=20
-> > > Particularly, in concept, ACPI CPU/memory hotplug is only related to =
-whether TDX
-> > > is enabled by BIOS, but not whether TDX module is loaded, or the resu=
-lt of
-> > > initializing the TDX module.  So I think we should have some code to =
-detect TDX
-> > > during boot.
-> >=20
-> > This is *EXACTLY* why our colleagues at Intel needs to tell us about
-> > what the OS and firmware should do when TDX is in varying states of dec=
-ay.
->=20
-> Yes I am working on it to make it public.
->=20
-> >=20
-> > Does the mere presence of the TDX module prevent hotplug? =C2=A0
-> >=20
->=20
-> For ACPI CPU hotplug, yes.  The TDX module even doesn't need to be loaded=
-.=20
-> Whether SEAMRR is enabled determines.
->=20
-> For ACPI memory hotplug, in practice yes.  For architectural behaviour, I=
-'ll
-> work with others internally to get some public statement.
->=20
-> > Or, if a
-> > system has the TDX module loaded but no intent to ever use TDX, why
-> > can't it just use hotplug like a normal system which is not addled with
-> > the TDX albatross around its neck?
->=20
-> I think if a machine has enabled TDX in the BIOS, the user of the machine=
- very
-> likely has intention to actually use TDX.
->=20
-> Yes for driver-managed memory hotplug, it makes sense if user doesn't wan=
-t to
-> use TDX, it's better to not disable it.  But to me it's also not a disast=
-er if
-> we just disable driver-managed memory hotplug if TDX is enabled by BIOS.
->=20
-> For ACPI memory hotplug, I think in practice we can treat it as BIOS bug,=
- but
-> I'll get some public statement around this.
->=20
-
-Hi Dave,
-
-Try to close on how to handle memory hotplug.  After discussion, below will=
- be
-architectural behaviour of TDX in terms of ACPI memory hotplug:
-
-1) During platform boot, CMRs must be physically present. MCHECK verifies a=
-ll
-CMRs are physically present and are actually TDX convertible memory.
-2) CMRs are static after platform boots and don't change at runtime. =C2=A0=
-TDX
-architecture doesn't support hot-add or hot-removal of CMR memory.
-3) TDX architecture doesn't forbid non-CMR memory hotplug.
-
-Also, although TDX doesn't trust BIOS in terms of security, a non-buggy BIO=
-S
-should prevent CMR memory from being hot-removed.  If kernel ever receives =
-such
-event, it's a BIOS bug, or even worse, the BIOS is compromised and under at=
-tack.
-
-As a result, the kernel should also never receive event of hot-add CMR memo=
-ry.=20
-It is very much likely TDX is under attack (physical attack) in such case, =
-i.e.
-someone is trying to physically replace any CMR memory.
-
-In terms of how to handle ACPI memory hotplug, my thinking is -- ideally, i=
-f the
-kernel can get the CMRs during kernel boot when detecting whether TDX is en=
-abled
-by BIOS, we can do below:
-
-- For memory hot-removal, if the removed memory falls into any CMR, then ke=
-rnel
-can speak loudly it is a BIOS bug.  But when this happens, the hot-removal =
-has
-been handled by BIOS thus kernel cannot actually prevent, so kernel can eit=
-her
-BUG(), or just print error message.  If the removed memory doesn't fall int=
-o
-CMR, we do nothing.
-
-- For memory hot-add, if the new memory falls into any CMR, then kernel sho=
-uld
-speak loudly it is a BIOS bug, or even say "TDX is under attack" as this is=
- only
-possible when CMR memory has been previously hot-removed.  And kernel shoul=
-d
-reject the new memory for security reason.  If the new memory doesn't fall =
-into
-any CMR, then we (also) just reject the new memory, as we want to guarantee=
- all
-memory in page allocator are TDX pages.  But this is basically due to kerne=
-l
-policy but not due to TDX architecture.
-
-BUT, since as the first step, we cannot get the CMR during kernel boot (as =
-it
-requires additional code to put CPU into VMX operation), I think for now we=
- can
-handle ACPI memory hotplug in below way:
-
-- For memory hot-removal, we do nothing.
-- For memory hot-add, we simply reject the new memory when TDX is enabled b=
-y
-BIOS.  This not only prevents the potential "physical attack of replacing a=
-ny
-CMR memory", but also makes sure no non-CMR memory will be added to page
-allocator during runtime via ACPI memory hot-add.
-
-We can improve this in next stage when we can get CMRs during kernel boot.
-
-For the concern that on a TDX BIOS enabled system, people may not want to u=
-se
-TDX at all but just use it as normal system, as I replied to Dan regarding =
-to
-the driver-managed memory hotplug, we can provide a kernel commandline, i.e=
-.
-use_tdx=3D{on|off}, to allow user to *choose* between TDX and memory hotplu=
-g.=20
-When use_tdx=3Doff, we continue to allow memory hotplug and driver-managed =
-hotplug
-as normal but refuse to initialize TDX module.
-
-Any comments?
-
-
-=20
-
-
+T24gMjAuMDcuMjAyMiAxMjozMCwgU3RlZmFubyBHYXJ6YXJlbGxhIHdyb3RlOg0KPiBPbiBXZWQs
+IEp1bCAyMCwgMjAyMiBhdCAwNjowNzo0N0FNICswMDAwLCBBcnNlbml5IEtyYXNub3Ygd3JvdGU6
+DQo+PiBPbiAxOS4wNy4yMDIyIDE1OjU4LCBTdGVmYW5vIEdhcnphcmVsbGEgd3JvdGU6DQo+Pj4g
+T24gTW9uLCBKdWwgMTgsIDIwMjIgYXQgMDg6MTI6NTJBTSArMDAwMCwgQXJzZW5peSBLcmFzbm92
+IHdyb3RlOg0KPj4+PiBIZWxsbywNCj4+Pj4NCj4+Pj4gZHVyaW5nIG15IGV4cGVyaW1lbnRzIHdp
+dGggemVyb2NvcHkgcmVjZWl2ZSwgaSBmb3VuZCwgdGhhdCBpbiBzb21lDQo+Pj4+IGNhc2VzLCBw
+b2xsKCkgaW1wbGVtZW50YXRpb24gdmlvbGF0ZXMgUE9TSVg6IHdoZW4gc29ja2V0IGhhcyBub24t
+DQo+Pj4+IGRlZmF1bHQgU09fUkNWTE9XQVQoZS5nLiBub3QgMSksIHBvbGwoKSB3aWxsIGFsd2F5
+cyBzZXQgUE9MTElOIGFuZA0KPj4+PiBQT0xMUkROT1JNIGJpdHMgaW4gJ3JldmVudHMnIGV2ZW4g
+bnVtYmVyIG9mIGJ5dGVzIGF2YWlsYWJsZSB0byByZWFkDQo+Pj4+IG9uIHNvY2tldCBpcyBzbWFs
+bGVyIHRoYW4gU09fUkNWTE9XQVQgdmFsdWUuIEluIHRoaXMgY2FzZSx1c2VyIHNlZXMNCj4+Pj4g
+UE9MTElOIGZsYWcgYW5kIHRoZW4gdHJpZXMgdG8gcmVhZCBkYXRhKGZvciBleGFtcGxlIHVzaW5n
+wqAgJ3JlYWQoKScNCj4+Pj4gY2FsbCksIGJ1dCByZWFkIGNhbGwgd2lsbCBiZSBibG9ja2VkLCBi
+ZWNhdXNlwqAgU09fUkNWTE9XQVQgbG9naWMgaXMNCj4+Pj4gc3VwcG9ydGVkIGluIGRlcXVldWUg
+bG9vcCBpbiBhZl92c29jay5jLiBCdXQgdGhlIHNhbWUgdGltZSzCoCBQT1NJWA0KPj4+PiByZXF1
+aXJlcyB0aGF0Og0KPj4+Pg0KPj4+PiAiUE9MTElOwqDCoMKgwqAgRGF0YSBvdGhlciB0aGFuIGhp
+Z2gtcHJpb3JpdHkgZGF0YSBtYXkgYmUgcmVhZCB3aXRob3V0DQo+Pj4+IMKgwqDCoMKgwqDCoMKg
+wqDCoMKgIGJsb2NraW5nLg0KPj4+PiBQT0xMUkROT1JNIE5vcm1hbCBkYXRhIG1heSBiZSByZWFk
+IHdpdGhvdXQgYmxvY2tpbmcuIg0KPj4+Pg0KPj4+PiBTZWUgaHR0cHM6Ly93d3cub3Blbi1zdGQu
+b3JnL2p0YzEvc2MyMi9vcGVuL240MjE3LnBkZiwgcGFnZSAyOTMuDQo+Pj4+DQo+Pj4+IFNvLCB3
+ZSBoYXZlLCB0aGF0IHBvbGwoKSBzeXNjYWxsIHJldHVybnMgUE9MTElOLCBidXQgcmVhZCBjYWxs
+IHdpbGwNCj4+Pj4gYmUgYmxvY2tlZC4NCj4+Pj4NCj4+Pj4gQWxzbyBpbiBtYW4gcGFnZSBzb2Nr
+ZXQoNykgaSBmb3VuZCB0aGF0Og0KPj4+Pg0KPj4+PiAiU2luY2UgTGludXggMi42LjI4LCBzZWxl
+Y3QoMiksIHBvbGwoMiksIGFuZCBlcG9sbCg3KSBpbmRpY2F0ZSBhDQo+Pj4+IHNvY2tldCBhcyBy
+ZWFkYWJsZSBvbmx5IGlmIGF0IGxlYXN0IFNPX1JDVkxPV0FUIGJ5dGVzIGFyZSBhdmFpbGFibGUu
+Ig0KPj4+Pg0KPj4+PiBJIGNoZWNrZWQgVENQIGNhbGxiYWNrIGZvciBwb2xsKCkobmV0L2lwdjQv
+dGNwLmMsIHRjcF9wb2xsKCkpLCBpdA0KPj4+PiB1c2VzIFNPX1JDVkxPV0FUIHZhbHVlIHRvIHNl
+dCBQT0xMSU4gYml0LCBhbHNvIGkndmUgdGVzdGVkIFRDUCB3aXRoDQo+Pj4+IHRoaXMgY2FzZSBm
+b3IgVENQIHNvY2tldCwgaXQgd29ya3MgYXMgUE9TSVggcmVxdWlyZWQuDQo+Pj4NCj4+PiBJIHRy
+aWVkIHRvIGxvb2sgYXQgdGhlIGNvZGUgYW5kIGl0IHNlZW1zIHRoYXQgb25seSBUQ1AgY29tcGxp
+ZXMgd2l0aCBpdCBvciBhbSBJIHdyb25nPw0KPj4gWWVzLCBpIGNoZWNrZWQgQUZfVU5JWCwgaXQg
+YWxzbyBkb24ndCBjYXJlIGFib3V0IHRoYXQuIEl0IGNhbGxzIHNrYl9xdWV1ZV9lbXB0eSgpIHRo
+YXQgb2YNCj4+IGNvdXJzZSBpZ25vcmVzIFNPX1JDVkxPV0FULg0KPj4+DQo+Pj4+DQo+Pj4+IEkn
+dmUgYWRkZWQgc29tZSBmaXhlcyB0byBhZl92c29jay5jIGFuZCB2aXJ0aW9fdHJhbnNwb3J0X2Nv
+bW1vbi5jLA0KPj4+PiB0ZXN0IGlzIGFsc28gaW1wbGVtZW50ZWQuDQo+Pj4+DQo+Pj4+IFdoYXQg
+ZG8gWW91IHRoaW5rIGd1eXM/DQo+Pj4NCj4+PiBOaWNlLCB0aGFua3MgZm9yIGZpeGluZyB0aGlz
+IGFuZCBmb3IgdGhlIHRlc3QhDQo+Pj4NCj4+PiBJIGxlZnQgc29tZSBjb21tZW50cywgYnV0IEkg
+dGhpbmsgdGhlIHNlcmllcyBpcyBmaW5lIGlmIHdlIHdpbGwgc3VwcG9ydCBpdCBpbiBhbGwgdHJh
+bnNwb3J0cy4NCj4+IEFjaw0KPj4+DQo+Pj4gSSdkIGp1c3QgbGlrZSB0byB1bmRlcnN0YW5kIGlm
+IGl0J3MganVzdCBUQ1AgY29tcGx5aW5nIHdpdGggaXQgb3IgSSdtIG1pc3Npbmcgc29tZSBjaGVj
+ayBpbmNsdWRlZCBpbiB0aGUgc29ja2V0IGxheWVyIHRoYXQgd2UgY291bGQgcmV1c2UuDQo+PiBT
+ZWVtcyBzb2NrX3BvbGwoKSB3aGljaCBpcyBzb2NrZXQgbGF5ZXIgZW50cnkgcG9pbnQgZm9yIHBv
+bGwoKSBkb2Vzbid0IGNvbnRhaW4gYW55IHN1Y2ggY2hlY2tzDQo+Pj4NCj4+PiBARGF2aWQsIEBK
+YWt1YiwgQFBhb2xvLCBhbnkgYWR2aWNlPw0KPj4+DQo+Pj4gVGhhbmtzLA0KPj4+IFN0ZWZhbm8N
+Cj4+Pg0KPj4NCj4+IFBTOiBtb3Jlb3ZlciwgaSBmb3VuZCBvbmUgbW9yZSBpbnRlcmVzdGluZyB0
+aGluZyB3aXRoIFRDUCBhbmQgcG9sbDogVENQIHJlY2VpdmUgbG9naWMgd2FrZXMgdXAgcG9sbCB3
+YWl0ZXINCj4+IG9ubHkgd2hlbiBudW1iZXIgb2YgYXZhaWxhYmxlIGJ5dGVzID4gU09fUkNWTE9X
+QVQuIEUuZy4gaXQgcHJldmVudHMgInNwdXJpb3VzIiB3YWtlIHVwcywgd2hlbiBwb2xsIHdpbGwg
+YmUNCj4+IHdva2VuIHVwIGJlY2F1c2UgbmV3IGRhdGEgYXJyaXZlZCwgYnV0IFBPTExJTiB0byBh
+bGxvdyB1c2VyIGRlcXVldWUgdGhpcyBkYXRhIHdvbid0IGJlIHNldChhcyBhbW91bnQgb2YgZGF0
+YQ0KPj4gaXMgdG9vIHNtYWxsKS4NCj4+IFNlZSB0Y3BfZGF0YV9yZWFkeSgpIGluIG5ldC9pcHY0
+L3RjcF9pbnB1dC5jDQo+IA0KPiBEbyB5b3UgbWVhbiB0aGF0IHdlIHNob3VsZCBjYWxsIHNrLT5z
+a19kYXRhX3JlYWR5KHNrKSBjaGVja2luZyBTT19SQ1ZMT1dBVD8NClllcywgbGlrZSB0Y3BfZGF0
+YV9yZWFkKCkuDQo+IA0KPiBJdCBzZWVtcyBmaW5lLCBtYXliZSB3ZSBjYW4gYWRkIHZzb2NrX2Rh
+dGFfcmVhZHkoKSBpbiBhZl92c29jay5jIHRoYXQgdHJhbnNwb3J0cyBzaG91bGQgY2FsbCBpbnN0
+ZWFkIG9mIGNhbGxpbmcgc2stPnNrX2RhdGFfcmVhZHkoc2spIGRpcmVjdGx5Lg0KWWVzLCB0aGlz
+IHdpbGwgYWxzbyB1cGRhdGUgbG9naWMgaW4gdm1jaSBhbmQgaHlwZXJ2IHRyYW5zcG9ydHMNCj4g
+DQo+IFRoZW4gd2UgY2FuIHNvbWV0aGluZyBzaW1pbGFyIHRvIHRjcF9kYXRhX3JlYWR5KCkuDQo+
+IA0KPiBUaGFua3MsDQo+IFN0ZWZhbm8NCj4gDQoNCg==
