@@ -2,55 +2,55 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 1111E57ABEF
-	for <lists+kvm@lfdr.de>; Wed, 20 Jul 2022 03:18:37 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 8BD2057AC1A
+	for <lists+kvm@lfdr.de>; Wed, 20 Jul 2022 03:18:52 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S241276AbiGTBRk (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 19 Jul 2022 21:17:40 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45750 "EHLO
+        id S238691AbiGTBSv (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 19 Jul 2022 21:18:51 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45560 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S241262AbiGTBRR (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 19 Jul 2022 21:17:17 -0400
-Received: from mail-wr1-x431.google.com (mail-wr1-x431.google.com [IPv6:2a00:1450:4864:20::431])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B92F06A9FE
-        for <kvm@vger.kernel.org>; Tue, 19 Jul 2022 18:14:08 -0700 (PDT)
-Received: by mail-wr1-x431.google.com with SMTP id z12so24023915wrq.7
-        for <kvm@vger.kernel.org>; Tue, 19 Jul 2022 18:14:08 -0700 (PDT)
+        with ESMTP id S241205AbiGTBSf (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 19 Jul 2022 21:18:35 -0400
+Received: from mail-wm1-x334.google.com (mail-wm1-x334.google.com [IPv6:2a00:1450:4864:20::334])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 46E1A6C114
+        for <kvm@vger.kernel.org>; Tue, 19 Jul 2022 18:14:54 -0700 (PDT)
+Received: by mail-wm1-x334.google.com with SMTP id h14-20020a1ccc0e000000b0039eff745c53so340837wmb.5
+        for <kvm@vger.kernel.org>; Tue, 19 Jul 2022 18:14:54 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
         h=mime-version:references:in-reply-to:from:date:message-id:subject:to
          :cc;
-        bh=UJBZv4Q6ih78sOcuYMsxNeE+4gVsZnpn/0Sr9oGu6h4=;
-        b=OXZe2KbCnA5IMhDjgQjh5nF9PEttZ41HWw3AZKRtdB19MLjDISfZpFmg3RfSjHTXvc
-         fl6NEVXdHaSRLW6+6TxVbd8k3fvnecxEDkwFwpoR2ZWjlicjVaEZYh4EwbyHRO+Q/CbI
-         D15OE6m2NStHXukDDmLL0zwaNTqyCpnrSKVU7jRYwPIF+jy2QLZ3Hep/l3Tm5imglTwF
-         j5Cll5QnEQv8uRRZGslD/O3j5PT4aReL64TL2CQQndNYfdm/ls51xc86x1LG0jsPpiC5
-         TIqfS4LTU0P9xD1ohPe97mCf+0K7JkW6Da8u6e7EqOURQt1drNN+FE5ahM5fkjF8AA7n
-         sgwQ==
+        bh=YtETk/RtD2vfpKLPOYkK3onAIfmX1vMQdXew1DBAtWE=;
+        b=VjHJMI94hF15HeECAjWZcPQbMufkMPjqLIIExiPZ5qpah+cB3gf29WmBjTPZ/CavYw
+         urwYjQepGXpKdyesjkgxQSDuqk1ZgWyBxBOX+aPSQy+RvlWtOzBb+TY0wa5PE8WRVhbq
+         /NpvkwUGddPCn5BOong0Rby+i06xSMVIaf3Ej+eVZkZ+Vo3mwK64E6pBXbL8PmYq4Zk3
+         Jl/l1KWAL2RH+Gjn8t3xn7Yx2TojfuB9egRAemN79qmmOqeMDrOpGILcKE0Qc93/GwTb
+         NbSCvKmhqUgWoxM1iuUC4TCt6DjW5g04lb+vKSrDCmdZhW/d9MhqTF85O+3HKl5aI5ZG
+         xtFg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:mime-version:references:in-reply-to:from:date
          :message-id:subject:to:cc;
-        bh=UJBZv4Q6ih78sOcuYMsxNeE+4gVsZnpn/0Sr9oGu6h4=;
-        b=ae7vgUnoX6pqo6qmHtVAF+4tMQWLnkqZwbpcK8fLqMmxdRdzPrVHd8oEPqAWX/znNv
-         uFXLZcV4PW4/3yd9v8Zc5hWwI6w2a83jSCh7DldpDUmE2lRKzdu/hFk0aM6PMNcu9/kl
-         vBTFrrJIqqtMDyBZUuUitX4bnbbG52DLj540/M+qNDoxIEi2+rI3Br5U4p9ua0qRQlOz
-         Iz2QZ79e+J2kVEArrgUIFfvccgbPelhpYNUGyRlH61+UV4Ks6x2afT1zbHcuEPsALkXo
-         bNIodaylliaMx/VqTXoeSYm6+aMc4ufScepbfRgNgyXLX5Dk6Qpn7L0a25IZPU+pHiRs
-         9Nrw==
-X-Gm-Message-State: AJIora8ptuIQxrfpLIzAh4wQdh/wmFJXKxxxhAgkum9IK5Rx5WMZHATd
-        9c6x/jvWxdcOB8zhX78jZSIZWz4A8awLLcmRAwS3bA==
-X-Google-Smtp-Source: AGRyM1u/Bwh/R9Ajr9HzYVxMxebtsdWlhxDZxGxv5wVJCM8/ETMrerIKmXFV2uqFy2OW/ykb1SuqwYH92xXYyfip10c=
-X-Received: by 2002:a05:6000:8e:b0:21d:7e97:67ed with SMTP id
- m14-20020a056000008e00b0021d7e9767edmr27695297wrx.343.1658279647101; Tue, 19
- Jul 2022 18:14:07 -0700 (PDT)
+        bh=YtETk/RtD2vfpKLPOYkK3onAIfmX1vMQdXew1DBAtWE=;
+        b=aedQfQsnRzaPX5JFn9Mzj+VGh3FTzyH1rcb/Xa/D5JZUqFMufxeHeCWZNhDTJfPtmf
+         1Oiw/i5Y0VQ/50VESx73gJBXONl5LTfTCT5rGXyieEleMFf1HYbrW9amhTdp/Vv2Mhd1
+         dSsP/pF++HvSHUA7CgRXjGZ2jxY9etz6aXAls2VbOuYJi5Pbt8nVOVIt6SM9bB9ID2jb
+         hf2Fh97rkJ6ewke100pDGXXlu87BMNQPSR6oIlizdQBP48GVgDBjdHqe0scK1/NXDKk0
+         L4KAL5xwIBJkb39yWdDMlYKdaUzygTgTESSq+0YcIEp4R9d2RfdbiP6LVmNCRm8IeOPG
+         POEA==
+X-Gm-Message-State: AJIora8IvmK6EEjWjVdebInD1CH/0a1EfLDjbSzLDBm6O9Gt0OvifpEW
+        YavcXgBCXjzn/8/Y/U3/BovsarO484q7zAfQoLJXUUV674MUnrq+
+X-Google-Smtp-Source: AGRyM1sSipGrC2xG2iqHNRsY+NyReM9AdVDMAmwIm7gnydC6CBKRlCCn5BoAB5dIx7zaUZ5nLyDMnnJBxqYhUViNO2c=
+X-Received: by 2002:a05:600c:2854:b0:3a3:1551:d7d with SMTP id
+ r20-20020a05600c285400b003a315510d7dmr1437492wmb.174.1658279692551; Tue, 19
+ Jul 2022 18:14:52 -0700 (PDT)
 MIME-Version: 1.0
-References: <20220711093218.10967-1-adrian.hunter@intel.com> <20220711093218.10967-31-adrian.hunter@intel.com>
-In-Reply-To: <20220711093218.10967-31-adrian.hunter@intel.com>
+References: <20220711093218.10967-1-adrian.hunter@intel.com> <20220711093218.10967-32-adrian.hunter@intel.com>
+In-Reply-To: <20220711093218.10967-32-adrian.hunter@intel.com>
 From:   Ian Rogers <irogers@google.com>
-Date:   Tue, 19 Jul 2022 18:13:54 -0700
-Message-ID: <CAP-5=fUGVEDKCZxhBRh-o15qEQ1h-nrOfSy=PRsqhKuoib4=0Q@mail.gmail.com>
-Subject: Re: [PATCH 30/35] perf intel-pt: Track guest context switches
+Date:   Tue, 19 Jul 2022 18:14:40 -0700
+Message-ID: <CAP-5=fW0kHPpz5-krEoeRk7QBE7HyerfX-5MrAkukudSTSY52Q@mail.gmail.com>
+Subject: Re: [PATCH 31/35] perf intel-pt: Disable sync switch with guest sideband
 To:     Adrian Hunter <adrian.hunter@intel.com>
 Cc:     Arnaldo Carvalho de Melo <acme@kernel.org>,
         Jiri Olsa <jolsa@redhat.com>,
@@ -61,7 +61,7 @@ Content-Type: text/plain; charset="UTF-8"
 X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
         ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-        USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=unavailable
+        USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=ham
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -71,8 +71,9 @@ X-Mailing-List: kvm@vger.kernel.org
 
 On Mon, Jul 11, 2022 at 2:33 AM Adrian Hunter <adrian.hunter@intel.com> wrote:
 >
-> Use guest context switch events to keep track of which guest thread is
-> running on a particular guest machine and VCPU.
+> The sync_switch facility attempts to better synchronize context switches
+> with the Intel PT trace, however it is not designed for guest machine
+> context switches, so disable it when guest sideband is detected.
 >
 > Signed-off-by: Adrian Hunter <adrian.hunter@intel.com>
 
@@ -82,57 +83,70 @@ Thanks,
 Ian
 
 > ---
->  tools/perf/util/intel-pt.c | 23 +++++++++++++++++++++++
->  1 file changed, 23 insertions(+)
+>  tools/perf/util/intel-pt.c | 29 +++++++++++++++++++++++++++++
+>  1 file changed, 29 insertions(+)
 >
 > diff --git a/tools/perf/util/intel-pt.c b/tools/perf/util/intel-pt.c
-> index a8798b5bb311..98b097fec476 100644
+> index 98b097fec476..dc2af64f9e31 100644
 > --- a/tools/perf/util/intel-pt.c
 > +++ b/tools/perf/util/intel-pt.c
-> @@ -78,6 +78,7 @@ struct intel_pt {
+> @@ -74,6 +74,7 @@ struct intel_pt {
+>         bool data_queued;
+>         bool est_tsc;
+>         bool sync_switch;
+> +       bool sync_switch_not_supported;
+>         bool mispred_all;
 >         bool use_thread_stack;
 >         bool callstack;
->         bool cap_event_trace;
-> +       bool have_guest_sideband;
->         unsigned int br_stack_sz;
->         unsigned int br_stack_sz_plus;
->         int have_sched_switch;
-> @@ -3079,6 +3080,25 @@ static int intel_pt_context_switch_in(struct intel_pt *pt,
->         return machine__set_current_tid(pt->machine, cpu, pid, tid);
+> @@ -2638,6 +2639,9 @@ static void intel_pt_enable_sync_switch(struct intel_pt *pt)
+>  {
+>         unsigned int i;
+>
+> +       if (pt->sync_switch_not_supported)
+> +               return;
+> +
+>         pt->sync_switch = true;
+>
+>         for (i = 0; i < pt->queues.nr_queues; i++) {
+> @@ -2649,6 +2653,23 @@ static void intel_pt_enable_sync_switch(struct intel_pt *pt)
+>         }
 >  }
 >
-> +static int intel_pt_guest_context_switch(struct intel_pt *pt,
-> +                                        union perf_event *event,
-> +                                        struct perf_sample *sample)
+> +static void intel_pt_disable_sync_switch(struct intel_pt *pt)
 > +{
-> +       bool out = event->header.misc & PERF_RECORD_MISC_SWITCH_OUT;
-> +       struct machines *machines = &pt->session->machines;
-> +       struct machine *machine = machines__find(machines, sample->machine_pid);
+> +       unsigned int i;
 > +
-> +       pt->have_guest_sideband = true;
+> +       pt->sync_switch = false;
 > +
-> +       if (out)
-> +               return 0;
+> +       for (i = 0; i < pt->queues.nr_queues; i++) {
+> +               struct auxtrace_queue *queue = &pt->queues.queue_array[i];
+> +               struct intel_pt_queue *ptq = queue->priv;
 > +
-> +       if (!machine)
-> +               return -EINVAL;
-> +
-> +       return machine__set_current_tid(machine, sample->vcpu, sample->pid, sample->tid);
+> +               if (ptq) {
+> +                       ptq->sync_switch = false;
+> +                       intel_pt_next_tid(pt, ptq);
+> +               }
+> +       }
 > +}
 > +
->  static int intel_pt_context_switch(struct intel_pt *pt, union perf_event *event,
->                                    struct perf_sample *sample)
->  {
-> @@ -3086,6 +3106,9 @@ static int intel_pt_context_switch(struct intel_pt *pt, union perf_event *event,
->         pid_t pid, tid;
->         int cpu, ret;
+>  /*
+>   * To filter against time ranges, it is only necessary to look at the next start
+>   * or end time.
+> @@ -3090,6 +3111,14 @@ static int intel_pt_guest_context_switch(struct intel_pt *pt,
 >
-> +       if (perf_event__is_guest(event))
-> +               return intel_pt_guest_context_switch(pt, event, sample);
+>         pt->have_guest_sideband = true;
+>
+> +       /*
+> +        * sync_switch cannot handle guest machines at present, so just disable
+> +        * it.
+> +        */
+> +       pt->sync_switch_not_supported = true;
+> +       if (pt->sync_switch)
+> +               intel_pt_disable_sync_switch(pt);
 > +
->         cpu = sample->cpu;
+>         if (out)
+>                 return 0;
 >
->         if (pt->have_sched_switch == 3) {
 > --
 > 2.25.1
 >
