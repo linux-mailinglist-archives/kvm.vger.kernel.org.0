@@ -2,86 +2,90 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 129E057B207
-	for <lists+kvm@lfdr.de>; Wed, 20 Jul 2022 09:47:27 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 5BB2357B2CF
+	for <lists+kvm@lfdr.de>; Wed, 20 Jul 2022 10:23:22 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S240175AbiGTHrY (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 20 Jul 2022 03:47:24 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34202 "EHLO
+        id S235726AbiGTIXS (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 20 Jul 2022 04:23:18 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36224 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S240138AbiGTHrW (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 20 Jul 2022 03:47:22 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id E783147BB6
-        for <kvm@vger.kernel.org>; Wed, 20 Jul 2022 00:47:20 -0700 (PDT)
+        with ESMTP id S230354AbiGTIXR (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 20 Jul 2022 04:23:17 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 042496BC13
+        for <kvm@vger.kernel.org>; Wed, 20 Jul 2022 01:23:15 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1658303240;
+        s=mimecast20190719; t=1658305394;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=Bu6xCyclso4xdC6iQFdBvv8TaQgKWEAQIznq+dBxwus=;
-        b=aDGcMyPXq3H+Y2b3e/TsRZUns1n88ozkIzzAnDgHAN0NmA/a90ZkCP0AUuOIFJSS+dd690
-        pPAoLvy1V32C0osb/BbLR60xDad6l5+hiUFgs3cZSQD+rgdJsOJpa1pYv7nMUiSFZyl6k2
-        0eAicwGgCc/ajX4PzLB8VuuNuT74/D4=
-Received: from mimecast-mx02.redhat.com (mx3-rdu2.redhat.com
- [66.187.233.73]) by relay.mimecast.com with ESMTP with STARTTLS
+        bh=WqWXkpMYDjGMkR6N048q9/Kkfh0q8LEuKcrhvdxBx9U=;
+        b=Ryddgz21Hjea6a0njB3Qp8QEjnL8IPEMJWDYi4C3SPpe5pEuMuat8JPGDNKj5oeW2LjIVm
+        k8l9e6kgDmeS/kTG6dN4AIY2KPdZLeejOFt/dCEjBbnQTRZwZKaDmKb81FypAumeEYt6o9
+        cc3lmAmaWEKsbgw2SkUzvXIc/ncAC6Y=
+Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
+ [209.85.128.71]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-371-Lsd68fldM6mZTiXLsO4M8g-1; Wed, 20 Jul 2022 03:47:16 -0400
-X-MC-Unique: Lsd68fldM6mZTiXLsO4M8g-1
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.rdu2.redhat.com [10.11.54.2])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 1092D1C08965;
-        Wed, 20 Jul 2022 07:47:15 +0000 (UTC)
-Received: from localhost (unknown [10.39.193.129])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id EB21440C128A;
-        Wed, 20 Jul 2022 07:47:13 +0000 (UTC)
-From:   Cornelia Huck <cohuck@redhat.com>
-To:     Jason Gunthorpe <jgg@nvidia.com>,
-        Alex Williamson <alex.williamson@redhat.com>
-Cc:     Alexander Gordeev <agordeev@linux.ibm.com>,
-        David Airlie <airlied@linux.ie>,
-        Christian Borntraeger <borntraeger@linux.ibm.com>,
-        Daniel Vetter <daniel@ffwll.ch>,
-        dri-devel@lists.freedesktop.org,
-        Harald Freudenberger <freude@linux.ibm.com>,
-        Vasily Gorbik <gor@linux.ibm.com>,
-        Heiko Carstens <hca@linux.ibm.com>,
-        intel-gfx@lists.freedesktop.org,
-        intel-gvt-dev@lists.freedesktop.org,
-        Jani Nikula <jani.nikula@linux.intel.com>,
-        Jason Herne <jjherne@linux.ibm.com>,
-        Joonas Lahtinen <joonas.lahtinen@linux.intel.com>,
-        kvm@vger.kernel.org, linux-s390@vger.kernel.org,
-        Matthew Rosato <mjrosato@linux.ibm.com>,
-        Peter Oberparleiter <oberpar@linux.ibm.com>,
-        Halil Pasic <pasic@linux.ibm.com>,
-        Rodrigo Vivi <rodrigo.vivi@intel.com>,
-        Sven Schnelle <svens@linux.ibm.com>,
-        Tvrtko Ursulin <tvrtko.ursulin@linux.intel.com>,
-        Vineeth Vijayan <vneethv@linux.ibm.com>,
-        Zhenyu Wang <zhenyuw@linux.intel.com>,
-        Zhi Wang <zhi.a.wang@intel.com>,
-        Tony Krowiak <akrowiak@linux.ibm.com>,
-        Eric Farman <farman@linux.ibm.com>,
-        Christoph Hellwig <hch@lst.de>,
-        Kevin Tian <kevin.tian@intel.com>
-Subject: Re: [PATCH v3 1/2] vfio: Replace the DMA unmapping notifier with a
- callback
-In-Reply-To: <20220719234419.GN4609@nvidia.com>
-Organization: Red Hat GmbH
-References: <0-v3-7593f297c43f+56ce-vfio_unmap_notif_jgg@nvidia.com>
- <1-v3-7593f297c43f+56ce-vfio_unmap_notif_jgg@nvidia.com>
- <20220707153716.70f755ab.alex.williamson@redhat.com>
- <20220719234419.GN4609@nvidia.com>
-User-Agent: Notmuch/0.36 (https://notmuchmail.org)
-Date:   Wed, 20 Jul 2022 09:47:12 +0200
-Message-ID: <874jzcp6nz.fsf@redhat.com>
+ us-mta-122-JXzcyXg3NtWT8t87lwmP_w-1; Wed, 20 Jul 2022 04:23:13 -0400
+X-MC-Unique: JXzcyXg3NtWT8t87lwmP_w-1
+Received: by mail-wm1-f71.google.com with SMTP id i133-20020a1c3b8b000000b003a2fe4c345cso909010wma.0
+        for <kvm@vger.kernel.org>; Wed, 20 Jul 2022 01:23:13 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:content-transfer-encoding
+         :in-reply-to;
+        bh=WqWXkpMYDjGMkR6N048q9/Kkfh0q8LEuKcrhvdxBx9U=;
+        b=YXSiGpKKiK8KfNmmM4NNMBsdcvP7jmHtS2wxRSQrcTeJh/XPqJsE/G0LUQyYED96Rt
+         cIkuWVNxi+EzeMvcHl2N0zGCSRgb1lGJ8Ldqa2FEP55eBZjkLMRe3RpQKOZxAJY5iTfa
+         xJL7RsrYykP6WPDHaoN4bNLdQ8XwNpmAzu1L8hlKdPCH0xH4oGkr/BzETwly06qskrI2
+         Z18duP2wktgKl3POW5FrDSc5jxZnikKGFI4xi6JsLN2yQwjluprDvVWDc6A6D9wfr1T6
+         0OhEn8b3VlLVZhlnTsEYn/k40EMIZEM0gfFoKjmo8lSEclVIPOCk1VmvZcsie5mc4kR0
+         2tIQ==
+X-Gm-Message-State: AJIora+GCx0c1678F8IKjpJgFaIsf2ZNih5hoOYo7n61LSyV/f12IFIS
+        j+MNbCD2sylKQfQlynsJTS7D0Yfu/XN/f1yqe8cbF2yxr2J2xHEfGZts0+h57QJvD18fbv7IMul
+        HTbSMkpH9Dw+b
+X-Received: by 2002:a05:600c:3227:b0:3a3:be7:2917 with SMTP id r39-20020a05600c322700b003a30be72917mr2760529wmp.83.1658305392324;
+        Wed, 20 Jul 2022 01:23:12 -0700 (PDT)
+X-Google-Smtp-Source: AGRyM1sk2lxdgaBkVc5Kem0cnAq2mfCBRvNA74098gzKOVACYFwhUlWyh6yfDCAwDcJmLBObthn+bA==
+X-Received: by 2002:a05:600c:3227:b0:3a3:be7:2917 with SMTP id r39-20020a05600c322700b003a30be72917mr2760502wmp.83.1658305392025;
+        Wed, 20 Jul 2022 01:23:12 -0700 (PDT)
+Received: from sgarzare-redhat (host-79-46-200-178.retail.telecomitalia.it. [79.46.200.178])
+        by smtp.gmail.com with ESMTPSA id g8-20020a05600c4ec800b003a317ee3036sm1887541wmq.2.2022.07.20.01.23.10
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 20 Jul 2022 01:23:11 -0700 (PDT)
+Date:   Wed, 20 Jul 2022 10:23:07 +0200
+From:   Stefano Garzarella <sgarzare@redhat.com>
+To:     Arseniy Krasnov <AVKrasnov@sberdevices.ru>,
+        Dexuan Cui <decui@microsoft.com>
+Cc:     "David S. Miller" <davem@davemloft.net>,
+        "edumazet@google.com" <edumazet@google.com>,
+        Jakub Kicinski <kuba@kernel.org>,
+        Paolo Abeni <pabeni@redhat.com>,
+        Stefan Hajnoczi <stefanha@redhat.com>,
+        "Michael S. Tsirkin" <mst@redhat.com>,
+        Krasnov Arseniy <oxffffaa@gmail.com>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "virtualization@lists.linux-foundation.org" 
+        <virtualization@lists.linux-foundation.org>,
+        "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        kernel <kernel@sberdevices.ru>
+Subject: Re: [RFC PATCH v1 2/3] virtio/vsock: use 'target' in notify_poll_in,
+ callback.
+Message-ID: <20220720082307.djbf7qgnlsjmrxcf@sgarzare-redhat>
+References: <c8de13b1-cbd8-e3e0-5728-f3c3648c69f7@sberdevices.ru>
+ <358f8d52-fd88-ad2e-87e2-c64bfa516a58@sberdevices.ru>
+ <20220719124857.akv25sgp6np3pdaw@sgarzare-redhat>
+ <15f38fcf-f1ff-3aad-4c30-4436bb8c4c44@sberdevices.ru>
 MIME-Version: 1.0
-Content-Type: text/plain
-X-Scanned-By: MIMEDefang 2.84 on 10.11.54.2
-X-Spam-Status: No, score=-3.5 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,
+Content-Type: text/plain; charset=iso-8859-1; format=flowed
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <15f38fcf-f1ff-3aad-4c30-4436bb8c4c44@sberdevices.ru>
+X-Spam-Status: No, score=-2.8 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
         SPF_HELO_NONE,SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -89,93 +93,47 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Jul 19 2022, Jason Gunthorpe <jgg@nvidia.com> wrote:
+On Wed, Jul 20, 2022 at 05:38:03AM +0000, Arseniy Krasnov wrote:
+>On 19.07.2022 15:48, Stefano Garzarella wrote:
+>> On Mon, Jul 18, 2022 at 08:17:31AM +0000, Arseniy Krasnov wrote:
+>>> This callback controls setting of POLLIN,POLLRDNORM output bits
+>>> of poll() syscall,but in some cases,it is incorrectly to set it,
+>>> when socket has at least 1 bytes of available data. Use 'target'
+>>> which is already exists and equal to sk_rcvlowat in this case.
+>>>
+>>> Signed-off-by: Arseniy Krasnov <AVKrasnov@sberdevices.ru>
+>>> ---
+>>> net/vmw_vsock/virtio_transport_common.c | 2 +-
+>>> 1 file changed, 1 insertion(+), 1 deletion(-)
+>>>
+>>> diff --git a/net/vmw_vsock/virtio_transport_common.c b/net/vmw_vsock/virtio_transport_common.c
+>>> index ec2c2afbf0d0..591908740992 100644
+>>> --- a/net/vmw_vsock/virtio_transport_common.c
+>>> +++ b/net/vmw_vsock/virtio_transport_common.c
+>>> @@ -634,7 +634,7 @@ virtio_transport_notify_poll_in(struct vsock_sock *vsk,
+>>>                 size_t target,
+>>>                 bool *data_ready_now)
+>>> {
+>>> -    if (vsock_stream_has_data(vsk))
+>>> +    if (vsock_stream_has_data(vsk) >= target)
+>>>         *data_ready_now = true;
+>>>     else
+>>>         *data_ready_now = false;
+>>
+>> Perhaps we can take the opportunity to clean up the code in this way:
+>>
+>>     *data_ready_now = vsock_stream_has_data(vsk) >= target;
+>Ack
+>>
+>> Anyway, I think we also need to fix the other transports (vmci and hyperv), what do you think?
+>For vmci it is look clear to fix it. For hyperv i need to check it more, because it already
+>uses some internal target value.
 
-> On Thu, Jul 07, 2022 at 03:37:16PM -0600, Alex Williamson wrote:
->> On Mon,  4 Jul 2022 21:59:03 -0300
->> Jason Gunthorpe <jgg@nvidia.com> wrote:
->> > diff --git a/drivers/s390/cio/vfio_ccw_ops.c b/drivers/s390/cio/vfio_ccw_ops.c
->> > index b49e2e9db2dc6f..09e0ce7b72324c 100644
->> > --- a/drivers/s390/cio/vfio_ccw_ops.c
->> > +++ b/drivers/s390/cio/vfio_ccw_ops.c
->> > @@ -44,31 +44,19 @@ static int vfio_ccw_mdev_reset(struct vfio_ccw_private *private)
->> >  	return ret;
->> >  }
->> >  
->> > -static int vfio_ccw_mdev_notifier(struct notifier_block *nb,
->> > -				  unsigned long action,
->> > -				  void *data)
->> > +static void vfio_ccw_dma_unmap(struct vfio_device *vdev, u64 iova, u64 length)
->> >  {
->> >  	struct vfio_ccw_private *private =
->> > -		container_of(nb, struct vfio_ccw_private, nb);
->> > -
->> > -	/*
->> > -	 * Vendor drivers MUST unpin pages in response to an
->> > -	 * invalidation.
->> > -	 */
->> > -	if (action == VFIO_IOMMU_NOTIFY_DMA_UNMAP) {
->> > -		struct vfio_iommu_type1_dma_unmap *unmap = data;
->> > -
->> > -		if (!cp_iova_pinned(&private->cp, unmap->iova))
->> > -			return NOTIFY_OK;
->> > +		container_of(vdev, struct vfio_ccw_private, vdev);
->> >  
->> > -		if (vfio_ccw_mdev_reset(private))
->> > -			return NOTIFY_BAD;
->> > +	/* Drivers MUST unpin pages in response to an invalidation. */
->> > +	if (!cp_iova_pinned(&private->cp, iova))
->> > +		return;
->> >  
->> > -		cp_free(&private->cp);
->> > -		return NOTIFY_OK;
->> > -	}
->> > +	if (vfio_ccw_mdev_reset(private))
->> > +		return;
->> >  
->> > -	return NOTIFY_DONE;
->> > +	cp_free(&private->cp);
->> >  }
->> 
->> 
->> The cp_free() call is gone here with [1], so I think this function now
->> just ends with:
->> 
->> 	...
->> 	vfio_ccw_mdev_reset(private);
->> }
->> 
->> There are also minor contextual differences elsewhere from that series,
->> so a quick respin to record the changes on list would be appreciated.
->> 
->> However the above kind of highlights that NOTIFY_BAD that silently gets
->> dropped here.  I realize we weren't testing the return value of the
->> notifier call chain and really we didn't intend that notifiers could
->> return a failure here, but does this warrant some logging or suggest
->> future work to allow a device to go offline here?  Thanks.
->
-> It looks like no.
->
-> If the FSM trapped in a bad state here, such as
-> VFIO_CCW_STATE_NOT_OPER, then it means it should have already unpinned
-> the pages and this is considered a success for this purpose
+Yep, I see. Maybe you can pass `target` to hvs_channel_readable() and 
+use it as parameter of HVS_PKT_LEN().
 
-A rather pathological case would be a subchannel that cannot be
-quiesced and does not end up being non-operational; in theory, the
-hardware could still try to access the buffers we provided for I/O. I'd
-say that is extremely unlikely, we might log it, but really cannot do
-anything else.
+@Dexuan what do you think?
 
->
-> The return code here exists only to return to userspace so it can
-> detect during a VFIO_DEVICE_RESET that the device has crashed
-> irrecoverably.
-
-Does it imply only that ("it's dead, Jim"), or can it also imply a
-runaway device? Not that userspace can do much in any case.
-
->
-> Thus just continuing to silently ignore it seems like the best thing.
->
-> Jason
+Thanks,
+Stefano
 
