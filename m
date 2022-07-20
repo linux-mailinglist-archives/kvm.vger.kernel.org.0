@@ -2,100 +2,118 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 51BE557ABE8
-	for <lists+kvm@lfdr.de>; Wed, 20 Jul 2022 03:18:34 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id B75C957AB89
+	for <lists+kvm@lfdr.de>; Wed, 20 Jul 2022 03:13:21 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S241165AbiGTBQO (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 19 Jul 2022 21:16:14 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33234 "EHLO
+        id S240811AbiGTBMr (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 19 Jul 2022 21:12:47 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33660 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S241116AbiGTBPr (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 19 Jul 2022 21:15:47 -0400
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 657D46A9C4;
-        Tue, 19 Jul 2022 18:13:47 -0700 (PDT)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id 9B2056172E;
-        Wed, 20 Jul 2022 01:13:46 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id B2A31C385A2;
-        Wed, 20 Jul 2022 01:13:44 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1658279626;
-        bh=BFRNXG82zN5fDX4BiXByhaveTpDwgz8NI7Uuk60vbTc=;
-        h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=pg4JukBxTzY7dQg1MOOaRoZTseD4j504durBivbRY9MXqxxxLGZWzEx9qhmtPZhAg
-         Fd7kZ4uhc3l+GYEEffsNUH5J6YyQnTVii6Yu6ZR3Joq5BYZZf3TxV7VW/43l2RijS3
-         iijzQXXZ2c8vNwfy2tx42XQ0u+XdDCU6B5vBwhFFGfbq1TSVb61Run/srzWI9V+Yuo
-         xwhNgNonLqBVXAXF2pk5JQTzVwG9eYWnHK9xC7RAW0r9c/6wZ4l3x4FwNMurpBnOfI
-         8rssmsPUiTgY0XJYof1njWlFy2GnW2KHVPVXE4JJm6doDQ29A8eB9j0NgCN2XCkWhy
-         g4xZTZ7/dJqCQ==
-From:   Sasha Levin <sashal@kernel.org>
-To:     linux-kernel@vger.kernel.org, stable@vger.kernel.org
-Cc:     Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Maxim Levitsky <mlevitsk@redhat.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Sasha Levin <sashal@kernel.org>, seanjc@google.com,
-        tglx@linutronix.de, mingo@redhat.com, bp@alien8.de,
-        dave.hansen@linux.intel.com, x86@kernel.org, kvm@vger.kernel.org
-Subject: [PATCH AUTOSEL 5.18 53/54] KVM: nVMX: Always enable TSC scaling for L2 when it was enabled for L1
-Date:   Tue, 19 Jul 2022 21:10:30 -0400
-Message-Id: <20220720011031.1023305-53-sashal@kernel.org>
-X-Mailer: git-send-email 2.35.1
-In-Reply-To: <20220720011031.1023305-1-sashal@kernel.org>
-References: <20220720011031.1023305-1-sashal@kernel.org>
+        with ESMTP id S240749AbiGTBMX (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 19 Jul 2022 21:12:23 -0400
+Received: from mail-wm1-x32e.google.com (mail-wm1-x32e.google.com [IPv6:2a00:1450:4864:20::32e])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 54F2764E0D
+        for <kvm@vger.kernel.org>; Tue, 19 Jul 2022 18:12:01 -0700 (PDT)
+Received: by mail-wm1-x32e.google.com with SMTP id ay11-20020a05600c1e0b00b003a3013da120so363080wmb.5
+        for <kvm@vger.kernel.org>; Tue, 19 Jul 2022 18:12:01 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=EwSUfPkQVeR7NYyFbUEPjbwfxOPGOsnMvFnmzzVWm6o=;
+        b=h4ETeloH7fEzsDaxeEtLaNiME7Eki7tRET7EZCLK7UzBLTYNLSYhlTtHO6ZXX54qZB
+         V+VQSn3Ze3N0m69Yoef6AzDyaIvqxGobzhyOhIJzJpZQpxaNmqqOgGzB5ZJbL06ppK98
+         SC13T2eXLjk5VCwEf4g+wkasGTtt2/C/hfd9S5sZ/ubeLq+GzlKmY8Dd/Ffn+EgLRykz
+         zP5e+w3YsEnztn6erjcBq0skxh67Z5wKwf+or+2RKr/6yidd6a/Hx/TEJUcKE5ZdpzbW
+         k8V0ZV8weXP7ESvWMMGnsTMaE+kcYVzMV12so0c9QAP6j92x7cPIIzM0i4aHAJ+Kww7k
+         fvww==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=EwSUfPkQVeR7NYyFbUEPjbwfxOPGOsnMvFnmzzVWm6o=;
+        b=uuvcYQp18oClaejVcaoSofLKanAruq3G1sbRy90noBe1XqlK/aeZgmEZwThEwwSFE2
+         vtLG7XdZYXXsLiox7b4EEKFzu2i1ziDLb71megHI1Ty0Km6bIZKbyZ0kp5gCGVMGOovD
+         LqN/nZjI1cp7CwxN+ousFMC/XebGdz65mF8QTAa0FooRKvu1Hnt0F50z4eMdQbboYa2m
+         0FvjBsP2GihwztzcgEFXAG+O0hckbMe8xaCr2H/krP2LkFi7g4j2hazEEpvzkphN7vp8
+         6s/7n6sz4ksSt/swgXUQllZSkvOqan/xADbq4wxs3z2JbgOXiccfbJOIhT2vZqJaAIhr
+         c7jg==
+X-Gm-Message-State: AJIora9ar2KvHOWrMB0aw+gDEOz88SxQt2qVZOxCMttdYcJMh+jggOzt
+        CPDHrlt0g4HVwXus0ly5ACTlYc0NmVCT7ZImjYqoUg==
+X-Google-Smtp-Source: AGRyM1s9XPVY6MfzpZH32z0fEyhH1tdpOtvVVTAtcchSfPEZbHXO0IiLEbmDmgZPUyD9pxe7setPm0Vm7rCc/6ZhyY4=
+X-Received: by 2002:a7b:c8d3:0:b0:3a2:fe0d:ba2e with SMTP id
+ f19-20020a7bc8d3000000b003a2fe0dba2emr1533504wml.115.1658279519587; Tue, 19
+ Jul 2022 18:11:59 -0700 (PDT)
 MIME-Version: 1.0
-X-stable: review
-X-Patchwork-Hint: Ignore
-Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-7.8 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_HI,
-        SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
+References: <20220711093218.10967-1-adrian.hunter@intel.com> <20220711093218.10967-28-adrian.hunter@intel.com>
+In-Reply-To: <20220711093218.10967-28-adrian.hunter@intel.com>
+From:   Ian Rogers <irogers@google.com>
+Date:   Tue, 19 Jul 2022 18:11:47 -0700
+Message-ID: <CAP-5=fXC4SYyV3DJKxy0atW1RRSS8EouD+t=pXuqJPSQ=x_jMA@mail.gmail.com>
+Subject: Re: [PATCH 27/35] perf tools: Add perf_event__is_guest()
+To:     Adrian Hunter <adrian.hunter@intel.com>
+Cc:     Arnaldo Carvalho de Melo <acme@kernel.org>,
+        Jiri Olsa <jolsa@redhat.com>,
+        Namhyung Kim <namhyung@kernel.org>,
+        Andi Kleen <ak@linux.intel.com>, linux-kernel@vger.kernel.org,
+        kvm@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
+        USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=unavailable
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-From: Vitaly Kuznetsov <vkuznets@redhat.com>
+On Mon, Jul 11, 2022 at 2:33 AM Adrian Hunter <adrian.hunter@intel.com> wrote:
+>
+> Add a helper function to determine if an event is a guest event.
+>
+> Signed-off-by: Adrian Hunter <adrian.hunter@intel.com>
+> ---
+>  tools/perf/util/event.h | 21 +++++++++++++++++++++
+>  1 file changed, 21 insertions(+)
+>
+> diff --git a/tools/perf/util/event.h b/tools/perf/util/event.h
+> index a660f304f83c..a7b0931d5137 100644
+> --- a/tools/perf/util/event.h
+> +++ b/tools/perf/util/event.h
 
-[ Upstream commit 99482726452bdf8be9325199022b17fa6d7d58fe ]
+Would this be better under tools/lib/perf ?
 
-Windows 10/11 guests with Hyper-V role (WSL2) enabled are observed to
-hang upon boot or shortly after when a non-default TSC frequency was
-set for L1. The issue is observed on a host where TSC scaling is
-supported. The problem appears to be that Windows doesn't use TSC
-frequency for its guests even when the feature is advertised and KVM
-filters SECONDARY_EXEC_TSC_SCALING out when creating L2 controls from
-L1's. This leads to L2 running with the default frequency (matching
-host's) while L1 is running with an altered one.
+Thanks,
+Ian
 
-Keep SECONDARY_EXEC_TSC_SCALING in secondary exec controls for L2 when
-it was set for L1. TSC_MULTIPLIER is already correctly computed and
-written by prepare_vmcs02().
-
-Signed-off-by: Vitaly Kuznetsov <vkuznets@redhat.com>
-Reviewed-by: Maxim Levitsky <mlevitsk@redhat.com>
-Message-Id: <20220712135009.952805-1-vkuznets@redhat.com>
-Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
-Signed-off-by: Sasha Levin <sashal@kernel.org>
----
- arch/x86/kvm/vmx/nested.c | 1 -
- 1 file changed, 1 deletion(-)
-
-diff --git a/arch/x86/kvm/vmx/nested.c b/arch/x86/kvm/vmx/nested.c
-index 28ccf25c4124..223de8e0dd5f 100644
---- a/arch/x86/kvm/vmx/nested.c
-+++ b/arch/x86/kvm/vmx/nested.c
-@@ -2279,7 +2279,6 @@ static void prepare_vmcs02_early(struct vcpu_vmx *vmx, struct loaded_vmcs *vmcs0
- 				  SECONDARY_EXEC_VIRTUAL_INTR_DELIVERY |
- 				  SECONDARY_EXEC_APIC_REGISTER_VIRT |
- 				  SECONDARY_EXEC_ENABLE_VMFUNC |
--				  SECONDARY_EXEC_TSC_SCALING |
- 				  SECONDARY_EXEC_DESC);
- 
- 		if (nested_cpu_has(vmcs12,
--- 
-2.35.1
-
+> @@ -484,4 +484,25 @@ void arch_perf_synthesize_sample_weight(const struct perf_sample *data, __u64 *a
+>  const char *arch_perf_header_entry(const char *se_header);
+>  int arch_support_sort_key(const char *sort_key);
+>
+> +static inline bool perf_event_header__cpumode_is_guest(u8 cpumode)
+> +{
+> +       return cpumode == PERF_RECORD_MISC_GUEST_KERNEL ||
+> +              cpumode == PERF_RECORD_MISC_GUEST_USER;
+> +}
+> +
+> +static inline bool perf_event_header__misc_is_guest(u16 misc)
+> +{
+> +       return perf_event_header__cpumode_is_guest(misc & PERF_RECORD_MISC_CPUMODE_MASK);
+> +}
+> +
+> +static inline bool perf_event_header__is_guest(const struct perf_event_header *header)
+> +{
+> +       return perf_event_header__misc_is_guest(header->misc);
+> +}
+> +
+> +static inline bool perf_event__is_guest(const union perf_event *event)
+> +{
+> +       return perf_event_header__is_guest(&event->header);
+> +}
+> +
+>  #endif /* __PERF_RECORD_H */
+> --
+> 2.25.1
+>
