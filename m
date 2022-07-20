@@ -2,70 +2,70 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id C5B2957BD2C
-	for <lists+kvm@lfdr.de>; Wed, 20 Jul 2022 19:49:45 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id BF5DA57BD3C
+	for <lists+kvm@lfdr.de>; Wed, 20 Jul 2022 19:53:52 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231805AbiGTRtn (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 20 Jul 2022 13:49:43 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44838 "EHLO
+        id S235734AbiGTRxt (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 20 Jul 2022 13:53:49 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48172 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230444AbiGTRtm (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 20 Jul 2022 13:49:42 -0400
-Received: from mail-pl1-x629.google.com (mail-pl1-x629.google.com [IPv6:2607:f8b0:4864:20::629])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 22B574F64D
-        for <kvm@vger.kernel.org>; Wed, 20 Jul 2022 10:49:42 -0700 (PDT)
-Received: by mail-pl1-x629.google.com with SMTP id f11so15643477plr.4
-        for <kvm@vger.kernel.org>; Wed, 20 Jul 2022 10:49:42 -0700 (PDT)
+        with ESMTP id S235359AbiGTRxs (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 20 Jul 2022 13:53:48 -0400
+Received: from mail-pl1-x636.google.com (mail-pl1-x636.google.com [IPv6:2607:f8b0:4864:20::636])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D81A85C9F6
+        for <kvm@vger.kernel.org>; Wed, 20 Jul 2022 10:53:47 -0700 (PDT)
+Received: by mail-pl1-x636.google.com with SMTP id y15so10915244plp.10
+        for <kvm@vger.kernel.org>; Wed, 20 Jul 2022 10:53:47 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
         h=date:from:to:cc:subject:message-id:references:mime-version
          :content-disposition:in-reply-to;
-        bh=OGZ6EVWX47iCkpURH7H3jNVGerihNoxgBZpPgKoFRr8=;
-        b=O3aL38WUU88GpHHYgqPXQWchcKkMKntZmXceWbN9//3BO/ipwbkli8WNWEDDeohigQ
-         VJFg4kTsW/AeAfksCnc8aoq34ZDnH3IadJsWoJEC2j8nzKStyzCpX5ECTyrzDIemyUAY
-         JP7f+W3dq7f8qdOAAyWdYvVQbmqhyf1F/2Ee8px0W57cUTduj9dU73oOFdTX4w0+tHoT
-         QML868lIp9RUjf/AerCOe4eUiQhay1UNZP6GRKmv8Sjf0MXvi8/hlHWYS+Em+et6OBn7
-         URLUv8UFz3try8UtTUQzYGpjcGO5vMCBXZHAuKzHeRYfCg+IoxFN/iZI4zAU8mV3kIuV
-         Kiiw==
+        bh=O/Al1R5ZaPxag7zuieAh2Klr5l3IIXmTVtnz4DBe9kE=;
+        b=L5eCiHPic82jvrGy8eviOxLocm+bUhF9zXDvSe3lXquqr5BiyI7gWbliS5TOC0uzTK
+         vpCZR49PHCShxi6qUHYcu76iIqJtC+pOobAqfEKUYeR57fYA+VVz2o22lEXIUNo8VuLc
+         OignMRlx3uxLF1Xzphm/gw+52RX8aa9KgW48tavtReu7JSfk9zR6w+Of0D2wiCzadVNo
+         OsxLuViI5K7FxrofivrD8OOOZ8iycP3vK65xoIj/IMEQb7oy4eXoeRcAS/hRbm+IJGNh
+         mK9g9PeeWD1WcJ97Sk1EH6lGweFo0tKUuawgOQkRPcj1FXpRu8O0YX62iUuIW1w74skl
+         FLaA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:date:from:to:cc:subject:message-id:references
          :mime-version:content-disposition:in-reply-to;
-        bh=OGZ6EVWX47iCkpURH7H3jNVGerihNoxgBZpPgKoFRr8=;
-        b=rpHhB3QPZe/RHBJH2pLF1dX3YKNFWmszd8hT5uXLo6Z+zv5XJy4XVBXPZV7vr7B5Bp
-         Bl21JKgm9SuUkpFCTxzbfeo3Kpsho9/q2mSDD5vOycGEpz2Zk5DZnSSn3gvZ9PfHQyVA
-         Jl3OnxZK+O5vu/qOOWiHUFwtp2BaGUu4LnhJvsNpBwYAXz1Fx87uGXiYgJ38QNVi9pgx
-         tZsrfREZV8UmyZCzxVeaTBdww1B/h/36x9pz9FsP96zrOSYV51yxqph2i6Yitn3PDDx+
-         2QMqHHUMoZyURMSxnfBO752OSNRRxVbXkPKgRZl66B6fvYWr3MY6hPZL2RLNIn2JEVc/
-         3BTw==
-X-Gm-Message-State: AJIora/nyPGDo9qclc/FFWVtmm3JeaPm6ZIONtUrRrBqeIv1Q/ittYJL
-        hHJFFD71iuYzEBX/Rs1dCgakUOt+Y6P0Aw==
-X-Google-Smtp-Source: AGRyM1uLpyDev3mfEmiYT/AYGBq/z+bL/mCYCp3mQHbT+sPz+DLYt966JJnwm3sZVaTPWN0xVo+OYw==
-X-Received: by 2002:a17:90a:4b05:b0:1f2:1c2a:6fea with SMTP id g5-20020a17090a4b0500b001f21c2a6feamr5249743pjh.115.1658339381553;
-        Wed, 20 Jul 2022 10:49:41 -0700 (PDT)
+        bh=O/Al1R5ZaPxag7zuieAh2Klr5l3IIXmTVtnz4DBe9kE=;
+        b=QZErc7P4iMbkAnFwc4TOs8XFuVAgB4tAfQsAdJQBQCupo4enD3Y4vvDZtwZbd9GSmU
+         6URpzot2mRRhwxJXQgica0Xo/Qzpb2znDqsaYYY6mYcwDBQFC44Ctbagka5/bsmhJPIc
+         8jFwX3xXtEFEXqqssudwQLKppR7oWpf0+Hbl8tFN/MhBBf4Z8+VOabe0gUee0sbXK1pH
+         k1HThKPc/VdhunNsrkq9P9WPfa3krPb+so0yBhc/TGdQrzyzXlsEjUJfGTm0n0ebqITg
+         h/noG5ytCjcuMOoIQobcwHE79c/FUcmZ4k7L440CGSXJ4UfkMXulOWHMyKJtqRKwJqpA
+         AY4Q==
+X-Gm-Message-State: AJIora82JhXWuOs7I4d6e00Qu0UCRDRsR38VPEko3fkzlZW42U9IH46Z
+        m5PsJIFMXbdkQ/yAhXUEdHoaZg==
+X-Google-Smtp-Source: AGRyM1vsyixSW4O3ki2duNTHeATcGTzaR/YXOLSIDbM9C3jky/23fESZc/anbhv3UrAtkeLB9U2tjA==
+X-Received: by 2002:a17:90b:4d0e:b0:1f1:9109:99df with SMTP id mw14-20020a17090b4d0e00b001f1910999dfmr6716536pjb.234.1658339627255;
+        Wed, 20 Jul 2022 10:53:47 -0700 (PDT)
 Received: from google.com (123.65.230.35.bc.googleusercontent.com. [35.230.65.123])
-        by smtp.gmail.com with ESMTPSA id r2-20020aa79ec2000000b005284e98304csm13694155pfq.205.2022.07.20.10.49.40
+        by smtp.gmail.com with ESMTPSA id c135-20020a621c8d000000b005290553d343sm13793677pfc.193.2022.07.20.10.53.46
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 20 Jul 2022 10:49:40 -0700 (PDT)
-Date:   Wed, 20 Jul 2022 17:49:37 +0000
+        Wed, 20 Jul 2022 10:53:46 -0700 (PDT)
+Date:   Wed, 20 Jul 2022 17:53:42 +0000
 From:   Sean Christopherson <seanjc@google.com>
 To:     Kechen Lu <kechenl@nvidia.com>
-Cc:     kvm@vger.kernel.org, pbonzini@redhat.com, vkuznets@redhat.com,
-        somduttar@nvidia.com, linux-kernel@vger.kernel.org
-Subject: Re: [RFC PATCH v3 1/7] KVM: x86: only allow exits disable before
- vCPUs created
-Message-ID: <YthAMfGD3nHtrOg9@google.com>
-References: <20220615011622.136646-1-kechenl@nvidia.com>
- <20220615011622.136646-2-kechenl@nvidia.com>
- <Ytg3kHHdft8IqIP+@google.com>
+Cc:     kvm@vger.kernel.org, pbonzini@redhat.com, chao.gao@intel.com,
+        vkuznets@redhat.com, somduttar@nvidia.com,
+        linux-kernel@vger.kernel.org
+Subject: Re: [RFC PATCH v4 3/7] KVM: x86: Reject disabling of MWAIT
+ interception when not allowed
+Message-ID: <YthBJsKOhgHfVs1u@google.com>
+References: <20220622004924.155191-1-kechenl@nvidia.com>
+ <20220622004924.155191-4-kechenl@nvidia.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <Ytg3kHHdft8IqIP+@google.com>
+In-Reply-To: <20220622004924.155191-4-kechenl@nvidia.com>
 X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
         ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-        USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=ham
+        USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=unavailable
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -73,18 +73,49 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Jul 20, 2022, Sean Christopherson wrote:
-> On Tue, Jun 14, 2022, Kechen Lu wrote:
-> > From: Sean Christopherson <seanjc@google.com>
-> > 
-> > Since VMX and SVM both would never update the control bits if exits
-> > are disable after vCPUs are created, only allow setting exits
-> > disable flag before vCPU creation.
-> > 
-> > Fixes: 4d5422cea3b6 ("KVM: X86: Provide a capability to disable MWAIT
-> > intercepts")
+On Tue, Jun 21, 2022, Kechen Lu wrote:
+> From: Sean Christopherson <seanjc@google.com>
 > 
-> Don't wrap the Fixes: line (ignore any complaints from checkpatch).
+> Reject KVM_CAP_X86_DISABLE_EXITS if userspace attempts to disable MWAIT
+> exits and KVM previously reported (via KVM_CHECK_EXTENSION) that MWAIT is
+> not allowed in guest, e.g. because it's not supported or the CPU doesn't
+> have an aways-running APIC timer.
+> 
+> Fixes: 4d5422cea3b6 ("KVM: X86: Provide a capability to disable MWAIT intercepts")
+> Signed-off-by: Sean Christopherson <seanjc@google.com>
+> Co-developed-by: Kechen Lu <kechenl@nvidia.com>
 
-Sorry, I didn't see that you had sent v4 already and replied to some v3 patches.
-This one still holds true for v4 (very minor nit though).
+Needs your SOB.
+
+> Suggested-by: Chao Gao <chao.gao@intel.com>
+
+For code review feedback of this nature, adding Suggested-by isn't appropriate.
+Suggested-by is for when the idea of the patch itself was suggested by someone,
+where as Chao's feedback was a purely mechanical change.
+
+> ---
+>  arch/x86/kvm/x86.c | 20 +++++++++++++-------
+>  1 file changed, 13 insertions(+), 7 deletions(-)
+> 
+> diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+> index b419b258ed90..6ec01362a7d8 100644
+> --- a/arch/x86/kvm/x86.c
+> +++ b/arch/x86/kvm/x86.c
+> @@ -4199,6 +4199,16 @@ static inline bool kvm_can_mwait_in_guest(void)
+>  		boot_cpu_has(X86_FEATURE_ARAT);
+>  }
+>  
+> +static u64 kvm_get_allowed_disable_exits(void)
+> +{
+> +	u64 r = KVM_X86_DISABLE_VALID_EXITS;
+
+In v3 I "voted" to keep the switch to KVM_X86_DISABLE_VALID_EXITS in the next
+patch[*], but seeing the result I 100% agree it's better to handle it here since
+the "enable" patch previously used KVM_X86_DISABLE_VALID_EXITS.
+
+[*] https://lore.kernel.org/all/Ytg428sleo7uMRQt@google.com
+
+> +
+> +	if(!kvm_can_mwait_in_guest())
+
+Space after the "if".
