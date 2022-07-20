@@ -2,153 +2,114 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id BF20157AF0B
-	for <lists+kvm@lfdr.de>; Wed, 20 Jul 2022 05:13:25 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 486B857AF66
+	for <lists+kvm@lfdr.de>; Wed, 20 Jul 2022 05:16:20 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S242097AbiGTDJr (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 19 Jul 2022 23:09:47 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36266 "EHLO
+        id S236159AbiGTDPs (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 19 Jul 2022 23:15:48 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48102 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S241939AbiGTDI5 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 19 Jul 2022 23:08:57 -0400
-Received: from out30-130.freemail.mail.aliyun.com (out30-130.freemail.mail.aliyun.com [115.124.30.130])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CC9331145;
-        Tue, 19 Jul 2022 20:06:18 -0700 (PDT)
-X-Alimail-AntiSpam: AC=PASS;BC=-1|-1;BR=01201311R221e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=ay29a033018046049;MF=xuanzhuo@linux.alibaba.com;NM=1;PH=DS;RN=37;SR=0;TI=SMTPD_---0VJux9Mt_1658286371;
-Received: from localhost(mailfrom:xuanzhuo@linux.alibaba.com fp:SMTPD_---0VJux9Mt_1658286371)
-          by smtp.aliyun-inc.com;
-          Wed, 20 Jul 2022 11:06:13 +0800
-From:   Xuan Zhuo <xuanzhuo@linux.alibaba.com>
-To:     virtualization@lists.linux-foundation.org
-Cc:     Richard Weinberger <richard@nod.at>,
-        Anton Ivanov <anton.ivanov@cambridgegreys.com>,
-        Johannes Berg <johannes@sipsolutions.net>,
-        "Michael S. Tsirkin" <mst@redhat.com>,
-        Jason Wang <jasowang@redhat.com>,
-        "David S. Miller" <davem@davemloft.net>,
-        Eric Dumazet <edumazet@google.com>,
-        Jakub Kicinski <kuba@kernel.org>,
-        Paolo Abeni <pabeni@redhat.com>,
-        Hans de Goede <hdegoede@redhat.com>,
-        Mark Gross <markgross@kernel.org>,
-        Vadim Pasternak <vadimp@nvidia.com>,
-        Bjorn Andersson <bjorn.andersson@linaro.org>,
-        Mathieu Poirier <mathieu.poirier@linaro.org>,
-        Cornelia Huck <cohuck@redhat.com>,
-        Halil Pasic <pasic@linux.ibm.com>,
-        Eric Farman <farman@linux.ibm.com>,
-        Heiko Carstens <hca@linux.ibm.com>,
-        Vasily Gorbik <gor@linux.ibm.com>,
-        Alexander Gordeev <agordeev@linux.ibm.com>,
-        Christian Borntraeger <borntraeger@linux.ibm.com>,
-        Sven Schnelle <svens@linux.ibm.com>,
-        Alexei Starovoitov <ast@kernel.org>,
-        Daniel Borkmann <daniel@iogearbox.net>,
-        Jesper Dangaard Brouer <hawk@kernel.org>,
-        John Fastabend <john.fastabend@gmail.com>,
-        Xuan Zhuo <xuanzhuo@linux.alibaba.com>,
-        Vincent Whitchurch <vincent.whitchurch@axis.com>,
-        linux-um@lists.infradead.org, netdev@vger.kernel.org,
-        platform-driver-x86@vger.kernel.org,
-        linux-remoteproc@vger.kernel.org, linux-s390@vger.kernel.org,
-        kvm@vger.kernel.org, bpf@vger.kernel.org,
-        kangjie.xu@linux.alibaba.com
-Subject: [PATCH v12 40/40] virtio_net: support set_ringparam
-Date:   Wed, 20 Jul 2022 11:04:36 +0800
-Message-Id: <20220720030436.79520-41-xuanzhuo@linux.alibaba.com>
-X-Mailer: git-send-email 2.31.0
-In-Reply-To: <20220720030436.79520-1-xuanzhuo@linux.alibaba.com>
-References: <20220720030436.79520-1-xuanzhuo@linux.alibaba.com>
+        with ESMTP id S242648AbiGTDPG (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 19 Jul 2022 23:15:06 -0400
+Received: from mga18.intel.com (mga18.intel.com [134.134.136.126])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id ECBAB323;
+        Tue, 19 Jul 2022 20:12:23 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1658286744; x=1689822744;
+  h=message-id:subject:from:to:cc:date:in-reply-to:
+   references:content-transfer-encoding:mime-version;
+  bh=ySMjzh3NsTJKTRrIejBJDaESWOXt7P0Fuvi7p6w8yJ0=;
+  b=fvqXHNxyKJBi4fyA1OQ2GWC6m4ZXZ4KeGJ+2j2Ad7GL3BGZYcbS8F+8s
+   WO6ECzg4F6u9JuAg03VrxCGy5xURWH/WihjJaYKU/fOW9v9GWGJeqb6IH
+   K5fVu3LwO8i7cwYKG+kL5//z1QidnrRsZc4rJw8xeG0vh9vEe1mFmwbpQ
+   GGWoI07305MfRmR1e5vjE8jF1gI4I5DVxKcUoUko0dZAsxHy0p+sMX4+o
+   zbiDYVUAWoMK8+Koz3w3rRU04BfK7dG6EMqwthyFPlJk+8msDNZbyDALp
+   01oaJZzrlgG0fRbCZi/S01MZrS0aXRUW6ruea8gV4hHWAucaStTP3QzNZ
+   g==;
+X-IronPort-AV: E=McAfee;i="6400,9594,10413"; a="269693302"
+X-IronPort-AV: E=Sophos;i="5.92,285,1650956400"; 
+   d="scan'208";a="269693302"
+Received: from orsmga001.jf.intel.com ([10.7.209.18])
+  by orsmga106.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 19 Jul 2022 20:12:21 -0700
+X-IronPort-AV: E=Sophos;i="5.92,285,1650956400"; 
+   d="scan'208";a="630603712"
+Received: from ecurtis-mobl.amr.corp.intel.com (HELO khuang2-desk.gar.corp.intel.com) ([10.213.162.137])
+  by orsmga001-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 19 Jul 2022 20:12:18 -0700
+Message-ID: <d7f60ee5e2bdd72e8b1fbcabb753170167674eee.camel@intel.com>
+Subject: Re: [PATCH v7 036/102] KVM: x86/mmu: Allow non-zero value for
+ non-present SPTE
+From:   Kai Huang <kai.huang@intel.com>
+To:     Isaku Yamahata <isaku.yamahata@gmail.com>, isaku.yamahata@intel.com
+Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Sean Christopherson <sean.j.christopherson@intel.com>,
+        Yuan Yao <yuan.yao@linux.intel.com>
+Date:   Wed, 20 Jul 2022 15:12:16 +1200
+In-Reply-To: <20220714184111.GT1379820@ls.amr.corp.intel.com>
+References: <cover.1656366337.git.isaku.yamahata@intel.com>
+         <f74b05eca8815744ce1ad672c66033101be7369c.1656366338.git.isaku.yamahata@intel.com>
+         <20220714184111.GT1379820@ls.amr.corp.intel.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+User-Agent: Evolution 3.44.3 (3.44.3-1.fc36) 
 MIME-Version: 1.0
-X-Git-Hash: 366032b2ffac
-Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-9.9 required=5.0 tests=BAYES_00,
-        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-        UNPARSEABLE_RELAY,USER_IN_DEF_SPF_WL autolearn=ham autolearn_force=no
-        version=3.4.6
+X-Spam-Status: No, score=-0.3 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,SORTED_RECIPS,
+        SPF_HELO_NONE,SPF_NONE autolearn=no autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Support set_ringparam based on virtio queue reset.
 
-Users can use ethtool -G eth0 <ring_num> to modify the ring size of
-virtio-net.
+> --- a/arch/x86/kvm/mmu/spte.c
+> +++ b/arch/x86/kvm/mmu/spte.c
+> @@ -36,6 +36,9 @@ u64 __read_mostly shadow_present_mask;
+>  u64 __read_mostly shadow_me_value;
+>  u64 __read_mostly shadow_me_mask;
+>  u64 __read_mostly shadow_acc_track_mask;
+> +#ifdef CONFIG_X86_64
+> +u64 __read_mostly shadow_nonpresent_value;
+> +#endif
 
-Signed-off-by: Xuan Zhuo <xuanzhuo@linux.alibaba.com>
-Acked-by: Jason Wang <jasowang@redhat.com>
----
- drivers/net/virtio_net.c | 48 ++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 48 insertions(+)
+Is this ever used?
 
-diff --git a/drivers/net/virtio_net.c b/drivers/net/virtio_net.c
-index d1e6940b46d8..59fc48c60403 100644
---- a/drivers/net/virtio_net.c
-+++ b/drivers/net/virtio_net.c
-@@ -2329,6 +2329,53 @@ static void virtnet_get_ringparam(struct net_device *dev,
- 	ring->tx_pending = virtqueue_get_vring_size(vi->sq[0].vq);
- }
- 
-+static int virtnet_set_ringparam(struct net_device *dev,
-+				 struct ethtool_ringparam *ring,
-+				 struct kernel_ethtool_ringparam *kernel_ring,
-+				 struct netlink_ext_ack *extack)
-+{
-+	struct virtnet_info *vi = netdev_priv(dev);
-+	u32 rx_pending, tx_pending;
-+	struct receive_queue *rq;
-+	struct send_queue *sq;
-+	int i, err;
-+
-+	if (ring->rx_mini_pending || ring->rx_jumbo_pending)
-+		return -EINVAL;
-+
-+	rx_pending = virtqueue_get_vring_size(vi->rq[0].vq);
-+	tx_pending = virtqueue_get_vring_size(vi->sq[0].vq);
-+
-+	if (ring->rx_pending == rx_pending &&
-+	    ring->tx_pending == tx_pending)
-+		return 0;
-+
-+	if (ring->rx_pending > vi->rq[0].vq->num_max)
-+		return -EINVAL;
-+
-+	if (ring->tx_pending > vi->sq[0].vq->num_max)
-+		return -EINVAL;
-+
-+	for (i = 0; i < vi->max_queue_pairs; i++) {
-+		rq = vi->rq + i;
-+		sq = vi->sq + i;
-+
-+		if (ring->tx_pending != tx_pending) {
-+			err = virtnet_tx_resize(vi, sq, ring->tx_pending);
-+			if (err)
-+				return err;
-+		}
-+
-+		if (ring->rx_pending != rx_pending) {
-+			err = virtnet_rx_resize(vi, rq, ring->rx_pending);
-+			if (err)
-+				return err;
-+		}
-+	}
-+
-+	return 0;
-+}
-+
- static bool virtnet_commit_rss_command(struct virtnet_info *vi)
- {
- 	struct net_device *dev = vi->dev;
-@@ -2816,6 +2863,7 @@ static const struct ethtool_ops virtnet_ethtool_ops = {
- 	.get_drvinfo = virtnet_get_drvinfo,
- 	.get_link = ethtool_op_get_link,
- 	.get_ringparam = virtnet_get_ringparam,
-+	.set_ringparam = virtnet_set_ringparam,
- 	.get_strings = virtnet_get_strings,
- 	.get_sset_count = virtnet_get_sset_count,
- 	.get_ethtool_stats = virtnet_get_ethtool_stats,
--- 
-2.31.0
+> =20
+>  u64 __read_mostly shadow_nonpresent_or_rsvd_mask;
+>  u64 __read_mostly shadow_nonpresent_or_rsvd_lower_gfn_mask;
+> @@ -360,7 +363,7 @@ void kvm_mmu_set_mmio_spte_mask(u64 mmio_value, u64 m=
+mio_mask, u64 access_mask)
+>  	 * not set any RWX bits.
+>  	 */
+>  	if (WARN_ON((mmio_value & mmio_mask) !=3D mmio_value) ||
+> -	    WARN_ON(mmio_value && (REMOVED_SPTE & mmio_mask) =3D=3D mmio_value)=
+)
+> +	    WARN_ON(mmio_value && (__REMOVED_SPTE & mmio_mask) =3D=3D mmio_valu=
+e))
+>  		mmio_value =3D 0;
+
+This chunk doesn't look right, or necessary.  We need mmio_mask/mmio_value =
+which
+causes EPT violation but with "suppress #VE" bit clear. =20
+
+So, actually, we want to make sure SHADOW_NONPRESENT_VALUE is *NOT* in mmio=
+_mask
+and mmio_value.  Using (REMOVED_SPTE & mmio_mask) =3D=3D mmio_value can act=
+ually
+ensure SHADOW_NONPRESENT_VALUE is never set in MMIO spte, correct?  So I th=
+ink
+using REMOVED_SPTE is fine.
+
+Or maybe additionally adding a explicit check is even better:
+
+	if (WARN_ON(mmio_mask & SHADOW_NONPRESENT_VALUE))
+		mmio_value =3D 0;
+
+But this change maybe should be in another patch which deals setting up per=
+-VM
+mmio_mask/mmio_value anyway.  This patch, instead, focuses on allowing non-=
+zero
+value for non-present SPTE.
 
