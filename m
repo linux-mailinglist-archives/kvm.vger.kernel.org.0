@@ -2,315 +2,256 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id B095157BEAA
-	for <lists+kvm@lfdr.de>; Wed, 20 Jul 2022 21:34:35 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id D1E7F57BEB9
+	for <lists+kvm@lfdr.de>; Wed, 20 Jul 2022 21:41:24 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235678AbiGTTed (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 20 Jul 2022 15:34:33 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41554 "EHLO
+        id S234128AbiGTTlX (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 20 Jul 2022 15:41:23 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46606 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230248AbiGTTeb (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 20 Jul 2022 15:34:31 -0400
-Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D24FF5FACE
-        for <kvm@vger.kernel.org>; Wed, 20 Jul 2022 12:34:29 -0700 (PDT)
-Received: from pps.filterd (m0098404.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.17.1.5/8.17.1.5) with ESMTP id 26KJDlip028404;
-        Wed, 20 Jul 2022 19:34:17 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
- mime-version : subject : to : cc : references : from : in-reply-to :
- content-type : content-transfer-encoding; s=pp1;
- bh=lx6L2dzg0qc3FATPU4CKpnSNgkzwFBG97tceDHmmfZQ=;
- b=iLc6khkJyZmJAuFm70qBxpGXXTFspTVI8PO6fRtTLmszXJ9C4Ds0NMB3NLLYO5FpugzS
- JiM9V8Y4DNdZALz08MikroQxvl/IcbKYxSEzZa/26vupmrp+8SWs2cWOYJpNXw4FU5og
- Cr86vvGMA/mWXWJo72p49VaUXpI0N/Gkzno2swY9a+a1/mnS0dFUrx2uNwOtopllADTf
- HbQfyrPIka7wlow4Eufl85uMcKbaSGV4bqr7BbEgQVWyQRT5H1MVbnCk101ty7isDZux
- uIMA+iYxrL75es4Bvtp04DmdQmjQKWCx/JYBmVBDY6a6QtfuTOQJR+EL+1SyFUySY+oP Qw== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3heqp9gk6w-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Wed, 20 Jul 2022 19:34:17 +0000
-Received: from m0098404.ppops.net (m0098404.ppops.net [127.0.0.1])
-        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 26KJFxqK009481;
-        Wed, 20 Jul 2022 19:34:16 GMT
-Received: from ppma03fra.de.ibm.com (6b.4a.5195.ip4.static.sl-reverse.com [149.81.74.107])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3heqp9gk5m-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Wed, 20 Jul 2022 19:34:16 +0000
-Received: from pps.filterd (ppma03fra.de.ibm.com [127.0.0.1])
-        by ppma03fra.de.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 26KJK6I4002938;
-        Wed, 20 Jul 2022 19:34:14 GMT
-Received: from b06cxnps4075.portsmouth.uk.ibm.com (d06relay12.portsmouth.uk.ibm.com [9.149.109.197])
-        by ppma03fra.de.ibm.com with ESMTP id 3hbmy8mj1q-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Wed, 20 Jul 2022 19:34:14 +0000
-Received: from d06av25.portsmouth.uk.ibm.com (d06av25.portsmouth.uk.ibm.com [9.149.105.61])
-        by b06cxnps4075.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 26KJYAng20840796
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Wed, 20 Jul 2022 19:34:10 GMT
-Received: from d06av25.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id ADB7911C04A;
-        Wed, 20 Jul 2022 19:34:10 +0000 (GMT)
-Received: from d06av25.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 4BFCD11C050;
-        Wed, 20 Jul 2022 19:34:05 +0000 (GMT)
-Received: from [9.171.85.19] (unknown [9.171.85.19])
-        by d06av25.portsmouth.uk.ibm.com (Postfix) with ESMTP;
-        Wed, 20 Jul 2022 19:34:05 +0000 (GMT)
-Message-ID: <13764041-7eb5-258f-1eac-f7b6d86597e9@linux.ibm.com>
-Date:   Wed, 20 Jul 2022 21:34:04 +0200
+        with ESMTP id S229570AbiGTTlV (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 20 Jul 2022 15:41:21 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 317FA5143E
+        for <kvm@vger.kernel.org>; Wed, 20 Jul 2022 12:41:21 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1658346080;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=ehh4V90wN0RJR9qCy+oaecsD0c4O/PC+hN+Ir98d0Ho=;
+        b=XlT8hWmKQcazn9UC/cEMWe1bkxLkc2ENuiUDZKlvwOcdevpycZs2FcqeXkmTVrbuKB8ULh
+        BNzog7A21HhqUvl2KOnO2ghNu1Z5NecnIRvCyhgMglf+IHOPs/NpTXf+8HhdJb2qcwujW/
+        S0tM6/XKW7xVoqMNEZyEoE9TLBAq6e0=
+Received: from mail-io1-f72.google.com (mail-io1-f72.google.com
+ [209.85.166.72]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-464-Wg5RUNQeMbu7vmBmk_Z0fg-1; Wed, 20 Jul 2022 15:41:17 -0400
+X-MC-Unique: Wg5RUNQeMbu7vmBmk_Z0fg-1
+Received: by mail-io1-f72.google.com with SMTP id v14-20020a6b5b0e000000b0067bc967a6c0so8610633ioh.5
+        for <kvm@vger.kernel.org>; Wed, 20 Jul 2022 12:41:17 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:in-reply-to
+         :references:organization:mime-version:content-transfer-encoding;
+        bh=ehh4V90wN0RJR9qCy+oaecsD0c4O/PC+hN+Ir98d0Ho=;
+        b=IZHKGrxjrWUxGT8eb8pw50rKWdvJVLzB30vYB3uk7Up0dwXAQM2K3AdF3hPoj7B3ax
+         ApyuMRxAk67s5ojmi6XIlNo9X2YbTzeZ1bpp9NY71vvwLuwKTXR985B/HqC12GGb+eNI
+         02FdHq3hs+l1CGVv61OoHCfQwN62hWsuAejR2kx1R/xYmHd7ogJtiuS9C0WZ3WtcYAYe
+         bXxxKiSw8XUQdTX2fzXB8jN30rkd4/Db6/XpTDwolmGVqVSPYQllGed593T+PWKMe0Ea
+         bW1UfI91PFOLSM8VmZzDyRYp4hIrW3piNCuq4bRGgmL4qGt635dpcFQiszXtM03K34uv
+         3NRw==
+X-Gm-Message-State: AJIora/wCdp8A6AkCl/K9O7Rxz/vRHG/D/aXblBFtPnCPDERhLoamNHb
+        sAysv9PNXc0nNGT8eHeTfRmjzwppYO88cBJZgrY5WnXsSEBIZYehcNoSdPTSc7upoyLWrLG4Aqr
+        0cn25yd4eED8a
+X-Received: by 2002:a05:6e02:1a0c:b0:2dc:8921:a8d9 with SMTP id s12-20020a056e021a0c00b002dc8921a8d9mr20755551ild.145.1658346076492;
+        Wed, 20 Jul 2022 12:41:16 -0700 (PDT)
+X-Google-Smtp-Source: AGRyM1vYxHlGrytgU3tCmIJ+Uhn7Hc+/RyJhZDLkKiiqtiSiv/P5YPbnk+rkd8QUKXd1S1jL+Xv4Pg==
+X-Received: by 2002:a05:6e02:1a0c:b0:2dc:8921:a8d9 with SMTP id s12-20020a056e021a0c00b002dc8921a8d9mr20755544ild.145.1658346076213;
+        Wed, 20 Jul 2022 12:41:16 -0700 (PDT)
+Received: from redhat.com ([38.15.36.239])
+        by smtp.gmail.com with ESMTPSA id g40-20020a022728000000b00339eedc7840sm8267773jaa.94.2022.07.20.12.41.15
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 20 Jul 2022 12:41:15 -0700 (PDT)
+Date:   Wed, 20 Jul 2022 13:41:13 -0600
+From:   Alex Williamson <alex.williamson@redhat.com>
+To:     Jason Gunthorpe <jgg@nvidia.com>
+Cc:     Alexander Gordeev <agordeev@linux.ibm.com>,
+        David Airlie <airlied@linux.ie>,
+        Christian Borntraeger <borntraeger@linux.ibm.com>,
+        Cornelia Huck <cohuck@redhat.com>,
+        Daniel Vetter <daniel@ffwll.ch>,
+        dri-devel@lists.freedesktop.org,
+        Harald Freudenberger <freude@linux.ibm.com>,
+        Vasily Gorbik <gor@linux.ibm.com>,
+        Heiko Carstens <hca@linux.ibm.com>,
+        intel-gfx@lists.freedesktop.org,
+        intel-gvt-dev@lists.freedesktop.org,
+        Jani Nikula <jani.nikula@linux.intel.com>,
+        Jason Herne <jjherne@linux.ibm.com>,
+        Joonas Lahtinen <joonas.lahtinen@linux.intel.com>,
+        kvm@vger.kernel.org, linux-s390@vger.kernel.org,
+        Matthew Rosato <mjrosato@linux.ibm.com>,
+        Peter Oberparleiter <oberpar@linux.ibm.com>,
+        Halil Pasic <pasic@linux.ibm.com>,
+        Rodrigo Vivi <rodrigo.vivi@intel.com>,
+        Sven Schnelle <svens@linux.ibm.com>,
+        Tvrtko Ursulin <tvrtko.ursulin@linux.intel.com>,
+        Vineeth Vijayan <vneethv@linux.ibm.com>,
+        Zhi Wang <zhi.a.wang@intel.com>,
+        Tony Krowiak <akrowiak@linux.ibm.com>,
+        Eric Farman <farman@linux.ibm.com>,
+        Christoph Hellwig <hch@lst.de>,
+        Kevin Tian <kevin.tian@intel.com>,
+        Zhenyu Wang <zhenyuw@linux.intel.com>,
+        Nicolin Chen <nicolinc@nvidia.com>
+Subject: Re: [PATCH v4 1/2] vfio: Replace the DMA unmapping notifier with a
+ callback
+Message-ID: <20220720134113.4225f9d6.alex.williamson@redhat.com>
+In-Reply-To: <1-v4-681e038e30fd+78-vfio_unmap_notif_jgg@nvidia.com>
+References: <0-v4-681e038e30fd+78-vfio_unmap_notif_jgg@nvidia.com>
+        <1-v4-681e038e30fd+78-vfio_unmap_notif_jgg@nvidia.com>
+Organization: Red Hat
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.10.0
-Subject: Re: [PATCH v8 03/12] s390x/cpu_topology: implementating Store
- Topology System Information
-Content-Language: en-US
-To:     Pierre Morel <pmorel@linux.ibm.com>, qemu-s390x@nongnu.org
-Cc:     qemu-devel@nongnu.org, borntraeger@de.ibm.com, pasic@linux.ibm.com,
-        richard.henderson@linaro.org, david@redhat.com, thuth@redhat.com,
-        cohuck@redhat.com, mst@redhat.com, pbonzini@redhat.com,
-        kvm@vger.kernel.org, ehabkost@redhat.com,
-        marcel.apfelbaum@gmail.com, eblake@redhat.com, armbru@redhat.com,
-        seiden@linux.ibm.com, nrb@linux.ibm.com, frankja@linux.ibm.com
-References: <20220620140352.39398-1-pmorel@linux.ibm.com>
- <20220620140352.39398-4-pmorel@linux.ibm.com>
-From:   Janis Schoetterl-Glausch <scgl@linux.ibm.com>
-In-Reply-To: <20220620140352.39398-4-pmorel@linux.ibm.com>
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: LRJMl3iRrkFAHN9VNnNQ6kNMQTY0sq0f
-X-Proofpoint-ORIG-GUID: 4t51Tfuom2tIEbnmlICWm5HWN0uJBxmL
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.205,Aquarius:18.0.883,Hydra:6.0.517,FMLib:17.11.122.1
- definitions=2022-07-20_12,2022-07-20_01,2022-06-22_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 bulkscore=0 mlxlogscore=999
- impostorscore=0 lowpriorityscore=0 adultscore=0 suspectscore=0 spamscore=0
- mlxscore=0 clxscore=1015 malwarescore=0 phishscore=0 priorityscore=1501
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2206140000
- definitions=main-2207200078
-X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,
-        SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
+X-Spam-Status: No, score=-2.8 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        SPF_HELO_NONE,SPF_NONE autolearn=unavailable autolearn_force=no
+        version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 6/20/22 16:03, Pierre Morel wrote:
-> The handling of STSI is enhanced with the interception of the
-> function code 15 for storing CPU topology.
-> 
-> Using the objects built during the plugging of CPU, we build the
-> SYSIB 15_1_x structures.
-> 
-> With this patch the maximum MNEST level is 2, this is also
-> the only level allowed and only SYSIB 15_1_2 will be built.
-> 
-> Signed-off-by: Pierre Morel <pmorel@linux.ibm.com>
-> ---
->  target/s390x/cpu.h          |   2 +
->  target/s390x/cpu_topology.c | 112 ++++++++++++++++++++++++++++++++++++
->  target/s390x/kvm/kvm.c      |   5 ++
->  target/s390x/meson.build    |   1 +
->  4 files changed, 120 insertions(+)
->  create mode 100644 target/s390x/cpu_topology.c
-> 
-> diff --git a/target/s390x/cpu.h b/target/s390x/cpu.h
-> index 216adfde26..9d48087b71 100644
-> --- a/target/s390x/cpu.h
-> +++ b/target/s390x/cpu.h
-> @@ -890,4 +890,6 @@ S390CPU *s390_cpu_addr2state(uint16_t cpu_addr);
+On Tue, 19 Jul 2022 21:02:48 -0300
+Jason Gunthorpe <jgg@nvidia.com> wrote:
+> diff --git a/drivers/s390/crypto/vfio_ap_ops.c b/drivers/s390/crypto/vfio_ap_ops.c
+> index a7d2a95796d360..bb1a1677c5c230 100644
+> --- a/drivers/s390/crypto/vfio_ap_ops.c
+> +++ b/drivers/s390/crypto/vfio_ap_ops.c
+> @@ -1226,34 +1226,14 @@ static int vfio_ap_mdev_set_kvm(struct ap_matrix_mdev *matrix_mdev,
+>  	return 0;
+>  }
 >  
->  #include "exec/cpu-all.h"
+> -/**
+> - * vfio_ap_mdev_iommu_notifier - IOMMU notifier callback
+> - *
+> - * @nb: The notifier block
+> - * @action: Action to be taken
+> - * @data: data associated with the request
+> - *
+> - * For an UNMAP request, unpin the guest IOVA (the NIB guest address we
+> - * pinned before). Other requests are ignored.
+> - *
+> - * Return: for an UNMAP request, NOFITY_OK; otherwise NOTIFY_DONE.
+> - */
+> -static int vfio_ap_mdev_iommu_notifier(struct notifier_block *nb,
+> -				       unsigned long action, void *data)
+> +static void vfio_ap_mdev_dma_unmap(struct vfio_device *vdev, u64 iova,
+> +				   u64 length)
+>  {
+> -	struct ap_matrix_mdev *matrix_mdev;
+> -
+> -	matrix_mdev = container_of(nb, struct ap_matrix_mdev, iommu_notifier);
+> -
+> -	if (action == VFIO_IOMMU_NOTIFY_DMA_UNMAP) {
+> -		struct vfio_iommu_type1_dma_unmap *unmap = data;
+> -		unsigned long g_pfn = unmap->iova >> PAGE_SHIFT;
+> -
+> -		vfio_unpin_pages(&matrix_mdev->vdev, &g_pfn, 1);
+> -		return NOTIFY_OK;
+> -	}
+> +	struct ap_matrix_mdev *matrix_mdev =
+> +		container_of(vdev, struct ap_matrix_mdev, vdev);
+> +	unsigned long g_pfn = iova >> PAGE_SHIFT;
 >  
-> +void insert_stsi_15_1_x(S390CPU *cpu, int sel2, __u64 addr, uint8_t ar);
-> +
->  #endif
-> diff --git a/target/s390x/cpu_topology.c b/target/s390x/cpu_topology.c
-> new file mode 100644
-> index 0000000000..9f656d7e51
-> --- /dev/null
-> +++ b/target/s390x/cpu_topology.c
-> @@ -0,0 +1,112 @@
-> +/*
-> + * QEMU S390x CPU Topology
-> + *
-> + * Copyright IBM Corp. 2022
-> + * Author(s): Pierre Morel <pmorel@linux.ibm.com>
-> + *
-> + * This work is licensed under the terms of the GNU GPL, version 2 or (at
-> + * your option) any later version. See the COPYING file in the top-level
-> + * directory.
-> + */
-> +
-> +#include "qemu/osdep.h"
-> +#include "cpu.h"
-> +#include "hw/s390x/pv.h"
-> +#include "hw/sysbus.h"
-> +#include "hw/s390x/cpu-topology.h"
-> +
-> +static int stsi_15_container(void *p, int nl, int id)
-> +{
-> +    SysIBTl_container *tle = (SysIBTl_container *)p;
-> +
-> +    tle->nl = nl;
-> +    tle->id = id;
-> +
-> +    return sizeof(*tle);
-> +}
-> +
-> +static int stsi_15_cpus(void *p, S390TopologyCores *cd)
-> +{
-> +    SysIBTl_cpu *tle = (SysIBTl_cpu *)p;
-> +
-> +    tle->nl = 0;
-> +    tle->dedicated = cd->dedicated;
-> +    tle->polarity = cd->polarity;
-> +    tle->type = cd->cputype;
-> +    tle->origin = be16_to_cpu(cd->origin);
-> +    tle->mask = be64_to_cpu(cd->mask);
-> +
-> +    return sizeof(*tle);
-> +}
-> +
-> +static int set_socket(const MachineState *ms, void *p,
-> +                      S390TopologySocket *socket)
-> +{
-> +    BusChild *kid;
-> +    int l, len = 0;
-> +
-> +    len += stsi_15_container(p, 1, socket->socket_id);
-> +    p += len;
-> +
+> -	return NOTIFY_DONE;
+> +	vfio_unpin_pages(&matrix_mdev->vdev, &g_pfn, 1);
+>  }
+>  
+>  /**
 
-You could put a comment here, TODO: different cpu types, polarizations not supported,
-or similar, since those require a specific order.
+
+I tried to apply this on top of Nicolin's series which results in a
+conflict that can be resolved as below:
+
+diff --git a/drivers/s390/crypto/vfio_ap_ops.c b/drivers/s390/crypto/vfio_ap_ops.c
+index e8856a7e151c..d7c38c82f694 100644
+--- a/drivers/s390/crypto/vfio_ap_ops.c
++++ b/drivers/s390/crypto/vfio_ap_ops.c
+@@ -1219,33 +1219,13 @@ static int vfio_ap_mdev_set_kvm(struct ap_matrix_mdev *matrix_mdev,
+ 	return 0;
+ }
  
-> +    QTAILQ_FOREACH_REVERSE(kid, &socket->bus->children, sibling) {
+-/**
+- * vfio_ap_mdev_iommu_notifier - IOMMU notifier callback
+- *
+- * @nb: The notifier block
+- * @action: Action to be taken
+- * @data: data associated with the request
+- *
+- * For an UNMAP request, unpin the guest IOVA (the NIB guest address we
+- * pinned before). Other requests are ignored.
+- *
+- * Return: for an UNMAP request, NOFITY_OK; otherwise NOTIFY_DONE.
+- */
+-static int vfio_ap_mdev_iommu_notifier(struct notifier_block *nb,
+-				       unsigned long action, void *data)
++static void vfio_ap_mdev_dma_unmap(struct vfio_device *vdev, u64 iova,
++				   u64 length)
+ {
+-	struct ap_matrix_mdev *matrix_mdev;
+-
+-	matrix_mdev = container_of(nb, struct ap_matrix_mdev, iommu_notifier);
+-
+-	if (action == VFIO_IOMMU_NOTIFY_DMA_UNMAP) {
+-		struct vfio_iommu_type1_dma_unmap *unmap = data;
+-
+-		vfio_unpin_pages(&matrix_mdev->vdev, unmap->iova, 1);
+-		return NOTIFY_OK;
+-	}
++	struct ap_matrix_mdev *matrix_mdev =
++		container_of(vdev, struct ap_matrix_mdev, vdev);
+ 
+-	return NOTIFY_DONE;
++	vfio_unpin_pages(&matrix_mdev->vdev, iova, 1);
+ }
+ 
+ /**
 
-Is there no synchronization/RCU read section necessary to guard against a concurrent hotplug?
-Since the children are ordered by creation, not core_id, the order of the entries is incorrect.
-Ditto for the other equivalent loops.
+ie. we don't need the gfn, we only need the iova.
 
-> +        l = stsi_15_cpus(p, S390_TOPOLOGY_CORES(kid->child));
-> +        p += l;
-> +        len += l;
-> +    }
-> +    return len;
-> +}
-> +
-> +static void setup_stsi(const MachineState *ms, void *p, int level)
+However then I start to wonder why we're passing in 1 for the number of
+pages because this previously notifier, now callback is called for the
+entire vfio_dma range when we find any pinned pages.  It makes no sense for
+a driver to assume that the first iova is pinned and is the only pinned
+page.
 
-I don't love the name of this function, it's not very descriptive. fill_sysib_15_1_x ?
-Why don't you pass a SysIB_151x* instead of a void*?
+ccw has the same issue:
 
-> +{
-> +    S390TopologyBook *book;
-> +    SysIB_151x *sysib;
-> +    BusChild *kid;
-> +    int len, l;
-> +
-> +    sysib = (SysIB_151x *)p;
-> +    sysib->mnest = level;
-> +    sysib->mag[TOPOLOGY_NR_MAG2] = ms->smp.sockets;
-> +    sysib->mag[TOPOLOGY_NR_MAG1] = ms->smp.cores * ms->smp.threads;
+static void vfio_ccw_dma_unmap(struct vfio_device *vdev, u64 iova, u64 length)
+{
+        struct vfio_ccw_private *private =
+                container_of(vdev, struct vfio_ccw_private, vdev);
 
-If I understood STSI right, it doesn't care about threads, so there should not be a multiplication here.
-> +
-> +    book = s390_get_topology();
-> +    len = sizeof(SysIB_151x);
-> +    p += len;
-> +
-> +    QTAILQ_FOREACH_REVERSE(kid, &book->bus->children, sibling) {
-> +        l = set_socket(ms, p, S390_TOPOLOGY_SOCKET(kid->child));
-> +        p += l;
+        /* Drivers MUST unpin pages in response to an invalidation. */
+        if (!cp_iova_pinned(&private->cp, iova))
+                return;
 
-I'm uncomfortable with advancing the pointer without a check if the page is being overflowed.
-With lots of cpus in lots of sockets and a deep hierarchy the topology list can get quite long.
+        vfio_ccw_mdev_reset(private);
+}
 
-> +        len += l;> +    }
-> +
-> +    sysib->length = be16_to_cpu(len);
-> +}
-> +
-> +void insert_stsi_15_1_x(S390CPU *cpu, int sel2, __u64 addr, uint8_t ar)
-> +{
-> +    const MachineState *machine = MACHINE(qdev_get_machine());
-> +    void *p;
-> +    int ret;
-> +
-> +    /*
-> +     * Until the SCLP STSI Facility reporting the MNEST value is used,
-> +     * a sel2 value of 2 is the only value allowed in STSI 15.1.x.
-> +     */
+Entirely ignoring the length arg.
 
-Do you actually implement the SCLP functionality in this series? You're changing
-this check in subsequent patches, but I only see the definition of a new constant,
-not that you're presenting it to the guest.
+It seems only GVT-g has this correct to actually look through the
+extent of the range being unmapped:
 
-> +    if (sel2 != 2) {
-> +        setcc(cpu, 3);
-> +        return;
-> +    }
-> +
-> +    p = g_malloc0(TARGET_PAGE_SIZE);
+static void intel_vgpu_dma_unmap(struct vfio_device *vfio_dev, u64 iova,
+                                 u64 length)
+{
+        struct intel_vgpu *vgpu = vfio_dev_to_vgpu(vfio_dev);
+        struct gvt_dma *entry;
+        u64 iov_pfn = iova >> PAGE_SHIFT;
+        u64 end_iov_pfn = iov_pfn + length / PAGE_SIZE;
 
-Any reason not to stack allocate the sysib?
-> +
-> +    setup_stsi(machine, p, 2);
-> +
-> +    if (s390_is_pv()) {
-> +        ret = s390_cpu_pv_mem_write(cpu, 0, p, TARGET_PAGE_SIZE);
-> +    } else {
-> +        ret = s390_cpu_virt_mem_write(cpu, addr, ar, p, TARGET_PAGE_SIZE);
-> +    }
+        mutex_lock(&vgpu->cache_lock);
+        for (; iov_pfn < end_iov_pfn; iov_pfn++) {
+                entry = __gvt_cache_find_gfn(vgpu, iov_pfn);
+                if (!entry)
+                        continue;
 
-Since we're allowed to not store the reserved space after the sysib, it seems more natural
-to do so. I don't know if it makes any difference performance wise, but it doesn't harm.
-> +
-> +    setcc(cpu, ret ? 3 : 0);
+                gvt_dma_unmap_page(vgpu, entry->gfn, entry->dma_addr,
+                                   entry->size);
+                __gvt_cache_remove_entry(vgpu, entry);
+        }
+        mutex_unlock(&vgpu->cache_lock);
+}
 
-Shouldn't this result in an exception instead? Not sure if you should call
-s390_cpu_virt_mem_handle_exc thereafter.
+Should ap and ccw implementations of .dma_unmap just be replaced with a
+BUG_ON(1)?  Thanks,
 
-> +    g_free(p);
-> +}
-> +
-> diff --git a/target/s390x/kvm/kvm.c b/target/s390x/kvm/kvm.c
-> index 7bd8db0e7b..563bf5ac60 100644
-> --- a/target/s390x/kvm/kvm.c
-> +++ b/target/s390x/kvm/kvm.c
-> @@ -51,6 +51,7 @@
->  #include "hw/s390x/s390-virtio-ccw.h"
->  #include "hw/s390x/s390-virtio-hcall.h"
->  #include "hw/s390x/pv.h"
-> +#include "hw/s390x/cpu-topology.h"
->  
->  #ifndef DEBUG_KVM
->  #define DEBUG_KVM  0
-> @@ -1918,6 +1919,10 @@ static int handle_stsi(S390CPU *cpu)
->          /* Only sysib 3.2.2 needs post-handling for now. */
->          insert_stsi_3_2_2(cpu, run->s390_stsi.addr, run->s390_stsi.ar);
->          return 0;
-> +    case 15:
-> +        insert_stsi_15_1_x(cpu, run->s390_stsi.sel2, run->s390_stsi.addr,
-> +                           run->s390_stsi.ar);
-> +        return 0;
->      default:
->          return 0;
->      }
-> diff --git a/target/s390x/meson.build b/target/s390x/meson.build
-> index 84c1402a6a..890ccfa789 100644
-> --- a/target/s390x/meson.build
-> +++ b/target/s390x/meson.build
-> @@ -29,6 +29,7 @@ s390x_softmmu_ss.add(files(
->    'sigp.c',
->    'cpu-sysemu.c',
->    'cpu_models_sysemu.c',
-> +  'cpu_topology.c',
->  ))
->  
->  s390x_user_ss = ss.source_set()
+Alex
 
