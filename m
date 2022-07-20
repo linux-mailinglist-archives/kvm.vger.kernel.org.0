@@ -2,90 +2,104 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id C125A57B3BF
-	for <lists+kvm@lfdr.de>; Wed, 20 Jul 2022 11:23:55 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 2891457B3C8
+	for <lists+kvm@lfdr.de>; Wed, 20 Jul 2022 11:25:54 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238301AbiGTJXl (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 20 Jul 2022 05:23:41 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53248 "EHLO
+        id S238470AbiGTJZw (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 20 Jul 2022 05:25:52 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56690 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S238244AbiGTJXh (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 20 Jul 2022 05:23:37 -0400
-Received: from out0.migadu.com (out0.migadu.com [IPv6:2001:41d0:2:267::])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F13A347BA1
-        for <kvm@vger.kernel.org>; Wed, 20 Jul 2022 02:23:36 -0700 (PDT)
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-        t=1658309015;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=yj4cKQUNfFd/J+viYgR9EC3Bhqm/pfiAtMI4M4xe9jA=;
-        b=GgL9aJ4DKPT2CMXYi3eGQuBFBsBSyKZ3mhWMaaCDrnc4nlgLuYq+S4NrshTb+MctWp9GhN
-        xkirQJPSzwmGh6EJx5wFi0m4rJHgtKtXcUPn1IsbJ4bn4iJrCMeTUKwT9xnR8oHgzarN31
-        hA56AmORJrmDSiyRshFhWOnDF+AdesI=
-From:   Oliver Upton <oliver.upton@linux.dev>
-To:     kvm@vger.kernel.org
-Cc:     Paolo Bonzini <pbonzini@redhat.com>,
-        Sean Christopherson <seanjc@google.com>,
-        Oliver Upton <oupton@google.com>
-Subject: [PATCH v3 2/6] KVM: Shove vcpu stats_id init into kvm_vcpu_init()
-Date:   Wed, 20 Jul 2022 09:22:55 +0000
-Message-Id: <20220720092259.3491733-10-oliver.upton@linux.dev>
-In-Reply-To: <20220720092259.3491733-1-oliver.upton@linux.dev>
-References: <20220720092259.3491733-1-oliver.upton@linux.dev>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Migadu-Flow: FLOW_OUT
-X-Migadu-Auth-User: linux.dev
-X-Spam-Status: No, score=-2.8 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,SPF_HELO_PASS,
-        SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
+        with ESMTP id S229449AbiGTJZu (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 20 Jul 2022 05:25:50 -0400
+Received: from ams.source.kernel.org (ams.source.kernel.org [145.40.68.75])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6A67B45F50
+        for <kvm@vger.kernel.org>; Wed, 20 Jul 2022 02:25:48 -0700 (PDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by ams.source.kernel.org (Postfix) with ESMTPS id 78F6AB81EC0
+        for <kvm@vger.kernel.org>; Wed, 20 Jul 2022 09:25:47 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3C47EC3411E;
+        Wed, 20 Jul 2022 09:25:46 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1658309146;
+        bh=aRfV00jPYBkhj3AAFRLIgZ2Svrr0Xhq4W7IMudBuVXI=;
+        h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+        b=EQ8tbim40ZtsikX4yucRuTf9Zuqpv2mUalzppCtwxbUZbSBJJBHDIWNdPdjr9LySO
+         Kx9PanK++xw9j6M8SmbhGsSMezJSuKuAMexZCuLo7qFOCiYFmFKHwlsHo1Elkbufx0
+         NC4DDMIk/ANuwYKpF7bvGVgIBYvD4faWDHEkpMW3M2EQB/NSpmBO6LaUYutw2SJeQR
+         B6zMeJcNfBIpEYZatgXO+T3ssfzewuvLOimPMIon/RtoyJJoLbSt5p3zzw9RUrjm4+
+         nFmCNd6zcJ56dCIUygnfDHTWqgXWoQ4eWq3S+CJwx+cMM9qm6hbEnrkoNbPujTWCyJ
+         8YU6ocWeRB+EA==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=why.misterjones.org)
+        by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+        (Exim 4.95)
+        (envelope-from <maz@kernel.org>)
+        id 1oE5xf-008juE-Q3;
+        Wed, 20 Jul 2022 10:25:44 +0100
+Date:   Wed, 20 Jul 2022 10:25:43 +0100
+Message-ID: <87a694yw2w.wl-maz@kernel.org>
+From:   Marc Zyngier <maz@kernel.org>
+To:     Sean Christopherson <seanjc@google.com>
+Cc:     Will Deacon <will@kernel.org>, kvmarm@lists.cs.columbia.edu,
+        Ard Biesheuvel <ardb@kernel.org>,
+        Alexandru Elisei <alexandru.elisei@arm.com>,
+        Andy Lutomirski <luto@amacapital.net>,
+        Catalin Marinas <catalin.marinas@arm.com>,
+        James Morse <james.morse@arm.com>,
+        Chao Peng <chao.p.peng@linux.intel.com>,
+        Quentin Perret <qperret@google.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        Michael Roth <michael.roth@amd.com>,
+        Mark Rutland <mark.rutland@arm.com>,
+        Fuad Tabba <tabba@google.com>,
+        Oliver Upton <oliver.upton@linux.dev>, kernel-team@android.com,
+        kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org
+Subject: Re: [PATCH v2 00/24] KVM: arm64: Introduce pKVM shadow state at EL2
+In-Reply-To: <YtbXtI/lEnNL7fHQ@google.com>
+References: <20220630135747.26983-1-will@kernel.org>
+        <YsXfyVp6sg5XRVAp@google.com>
+        <20220708162359.GA6286@willie-the-truck>
+        <YtbXtI/lEnNL7fHQ@google.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/27.1
+ (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: seanjc@google.com, will@kernel.org, kvmarm@lists.cs.columbia.edu, ardb@kernel.org, alexandru.elisei@arm.com, luto@amacapital.net, catalin.marinas@arm.com, james.morse@arm.com, chao.p.peng@linux.intel.com, qperret@google.com, suzuki.poulose@arm.com, michael.roth@amd.com, mark.rutland@arm.com, tabba@google.com, oliver.upton@linux.dev, kernel-team@android.com, kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+X-Spam-Status: No, score=-7.8 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_HI,
+        SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-From: Oliver Upton <oupton@google.com>
+On Tue, 19 Jul 2022 17:11:32 +0100,
+Sean Christopherson <seanjc@google.com> wrote:
 
-Initialize stats_id alongside other kvm_vcpu fields to futureproof
-against possible initialization order mistakes in KVM.
+> Honestly, I think pKVM is simply being too cute in picking names.
 
-No functional change intended.
+I don't know what you mean by "cute" here, but I assume this is not
+exactly a flattering qualifier.
 
-Signed-off-by: Oliver Upton <oupton@google.com>
----
- virt/kvm/kvm_main.c | 8 ++++----
- 1 file changed, 4 insertions(+), 4 deletions(-)
+> And not just for "shadow", e.g. IMO the flush/sync terminology in
+> patch 24 is also unnecessarily cute.  Instead of coming up with
+> clever names, just be explicit in what the code is doing.
+> E.g. something like:
+> 
+>   flush_shadow_state() => sync_host_to_pkvm_vcpu()
+>   sync_shadow_state()  => sync_pkvm_to_host_vcpu()
 
-diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
-index cc760ebcd390..1f78b7ad5430 100644
---- a/virt/kvm/kvm_main.c
-+++ b/virt/kvm/kvm_main.c
-@@ -484,6 +484,10 @@ static void kvm_vcpu_init(struct kvm_vcpu *vcpu, struct kvm *kvm, unsigned id)
- 	vcpu->ready = false;
- 	preempt_notifier_init(&vcpu->preempt_notifier, &kvm_preempt_ops);
- 	vcpu->last_used_slot = NULL;
-+
-+	/* Fill the stats id string for the vcpu */
-+	snprintf(vcpu->stats_id, sizeof(vcpu->stats_id), "kvm-%d/vcpu-%d",
-+		 task_pid_nr(current), id);
- }
- 
- static void kvm_vcpu_destroy(struct kvm_vcpu *vcpu)
-@@ -3919,10 +3923,6 @@ static int kvm_vm_ioctl_create_vcpu(struct kvm *kvm, u32 id)
- 	if (r)
- 		goto unlock_vcpu_destroy;
- 
--	/* Fill the stats id string for the vcpu */
--	snprintf(vcpu->stats_id, sizeof(vcpu->stats_id), "kvm-%d/vcpu-%d",
--		 task_pid_nr(current), id);
--
- 	/* Now it's all set up, let userspace reach it */
- 	kvm_get_kvm(kvm);
- 	r = create_vcpu_fd(vcpu);
+As much as I like bikesheding, this isn't going to happen. We have had
+the sync/flush duality since day one, we have a lot of code based
+around this naming, and departing from it seems counter productive.
+
+	M.
+
 -- 
-2.37.0.170.g444d1eabd0-goog
-
+Without deviation from the norm, progress is not possible.
