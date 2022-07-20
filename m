@@ -2,47 +2,46 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 8293F57AB66
-	for <lists+kvm@lfdr.de>; Wed, 20 Jul 2022 03:11:52 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 1299F57ABB0
+	for <lists+kvm@lfdr.de>; Wed, 20 Jul 2022 03:15:18 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S239689AbiGTBLe (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 19 Jul 2022 21:11:34 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33216 "EHLO
+        id S240075AbiGTBNh (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 19 Jul 2022 21:13:37 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33222 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S240619AbiGTBLT (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 19 Jul 2022 21:11:19 -0400
-Received: from ams.source.kernel.org (ams.source.kernel.org [IPv6:2604:1380:4601:e00::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6870265591;
-        Tue, 19 Jul 2022 18:11:09 -0700 (PDT)
+        with ESMTP id S240771AbiGTBNL (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 19 Jul 2022 21:13:11 -0400
+Received: from ams.source.kernel.org (ams.source.kernel.org [145.40.68.75])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 01CDD66B9F;
+        Tue, 19 Jul 2022 18:12:25 -0700 (PDT)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by ams.source.kernel.org (Postfix) with ESMTPS id A2B08B81DEA;
-        Wed, 20 Jul 2022 01:11:07 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 11BCCC385A5;
-        Wed, 20 Jul 2022 01:11:04 +0000 (UTC)
+        by ams.source.kernel.org (Postfix) with ESMTPS id B27FCB81DE8;
+        Wed, 20 Jul 2022 01:12:23 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0D73BC341CE;
+        Wed, 20 Jul 2022 01:12:20 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1658279466;
-        bh=99oYuSj1M8WEb4HdX2609nGaiPr3UQnE0ldIVJt3eB0=;
+        s=k20201202; t=1658279542;
+        bh=wuSGpDUo/9f9sjPcaCG+Z+ueiLLYwAIpjnKkdH1iGys=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=LdXEci4SiePms7IHOojt0stIe4faGHOrVQwDFSOI2amsxlOtvqCNtcVNc3CBsVZWW
-         5qrd30NerpTeh0617iDQVH4Pj8cOmZfW71VVzNSh/b8ZwPgoxumFmE3Ux8z5yd752+
-         sZfZEP3prnhEiiH8mPIeIi2NGO786zWiz1NoiTJDa8XHERg2E+Uwo6I7hY8oKamGXy
-         ZRNGxC8QyEb8N009jBy+PuCxk+4UcEvNrLHGZyHo7mqP/4XYDtutjUh7IlVEmL88Dy
-         VwTO5rgyUK5e+bXHQyptuL0YJvdJ9dWlpj/WLtqWoiVKgY/Ka3MEOFh4IFvMVbzxGa
-         MsaIf2eVa07gQ==
+        b=pgJosKZH+kszX3O/z123xb4Hm05hAcfV81bfmr/xsSZlfuAscOgtWup0tN9m8jI2u
+         dYxiAUHMkChC7SCnTYREHCRHguz9S6RIN0FqYCO6ajl+YJUE5UbUgAucaltxsRGVl+
+         ZG6IHR4Jd3ihtpzeAvu/sDwoKK5sjuD5vrfSoLkt3nuKPHHnBDkwLz8tprnLtiXVRh
+         8CdF9c2NbMHHQsAUaZ+JfD9wSr6I7CbjHvYc69HpJ9Svw3DVR10UjkEI6sjoL0n4JG
+         nV4k6oiZUS4auNPfvhtNmT8EO2DoVjBFfq1wRCyKFsGRMIleC/muFpu3Uc48585y5N
+         dgImxK35Cglnw==
 From:   Sasha Levin <sashal@kernel.org>
 To:     linux-kernel@vger.kernel.org, stable@vger.kernel.org
-Cc:     Peter Zijlstra <peterz@infradead.org>,
-        Borislav Petkov <bp@suse.de>,
-        Josh Poimboeuf <jpoimboe@kernel.org>,
-        Sasha Levin <sashal@kernel.org>, seanjc@google.com,
-        pbonzini@redhat.com, tglx@linutronix.de, mingo@redhat.com,
-        bp@alien8.de, dave.hansen@linux.intel.com, x86@kernel.org,
-        kvm@vger.kernel.org
-Subject: [PATCH AUTOSEL 5.18 09/54] x86/kvm: Fix SETcc emulation for return thunks
-Date:   Tue, 19 Jul 2022 21:09:46 -0400
-Message-Id: <20220720011031.1023305-9-sashal@kernel.org>
+Cc:     Josh Poimboeuf <jpoimboe@kernel.org>,
+        Peter Zijlstra <peterz@infradead.org>,
+        Borislav Petkov <bp@suse.de>, Sasha Levin <sashal@kernel.org>,
+        seanjc@google.com, pbonzini@redhat.com, tglx@linutronix.de,
+        mingo@redhat.com, bp@alien8.de, dave.hansen@linux.intel.com,
+        x86@kernel.org, kvm@vger.kernel.org
+Subject: [PATCH AUTOSEL 5.18 25/54] KVM: VMX: Flatten __vmx_vcpu_run()
+Date:   Tue, 19 Jul 2022 21:10:02 -0400
+Message-Id: <20220720011031.1023305-25-sashal@kernel.org>
 X-Mailer: git-send-email 2.35.1
 In-Reply-To: <20220720011031.1023305-1-sashal@kernel.org>
 References: <20220720011031.1023305-1-sashal@kernel.org>
@@ -59,95 +58,198 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-From: Peter Zijlstra <peterz@infradead.org>
+From: Josh Poimboeuf <jpoimboe@kernel.org>
 
-[ Upstream commit af2e140f34208a5dfb6b7a8ad2d56bda88f0524d ]
+[ Upstream commit 8bd200d23ec42d66ccd517a72dd0b9cc6132d2fd ]
 
-Prepare the SETcc fastop stuff for when RET can be larger still.
+Move the vmx_vm{enter,exit}() functionality into __vmx_vcpu_run().  This
+will make it easier to do the spec_ctrl handling before the first RET.
 
-The tricky bit here is that the expressions should not only be
-constant C expressions, but also absolute GAS expressions. This means
-no ?: and 'true' is ~0.
-
-Also ensure em_setcc() has the same alignment as the actual FOP_SETCC()
-ops, this ensures there cannot be an alignment hole between em_setcc()
-and the first op.
-
-Additionally, add a .skip directive to the FOP_SETCC() macro to fill
-any remaining space with INT3 traps; however the primary purpose of
-this directive is to generate AS warnings when the remaining space
-goes negative. Which is a very good indication the alignment magic
-went side-ways.
-
+Signed-off-by: Josh Poimboeuf <jpoimboe@kernel.org>
 Signed-off-by: Peter Zijlstra (Intel) <peterz@infradead.org>
-Signed-off-by: Borislav Petkov <bp@suse.de>
-Reviewed-by: Josh Poimboeuf <jpoimboe@kernel.org>
 Signed-off-by: Borislav Petkov <bp@suse.de>
 Signed-off-by: Sasha Levin <sashal@kernel.org>
 ---
- arch/x86/kvm/emulate.c | 28 +++++++++++++++-------------
- 1 file changed, 15 insertions(+), 13 deletions(-)
+ arch/x86/kvm/vmx/vmenter.S | 119 ++++++++++++++-----------------------
+ 1 file changed, 46 insertions(+), 73 deletions(-)
 
-diff --git a/arch/x86/kvm/emulate.c b/arch/x86/kvm/emulate.c
-index 89b11e7dca8a..b01437015f99 100644
---- a/arch/x86/kvm/emulate.c
-+++ b/arch/x86/kvm/emulate.c
-@@ -325,13 +325,15 @@ static int fastop(struct x86_emulate_ctxt *ctxt, fastop_t fop);
- #define FOP_RET(name) \
- 	__FOP_RET(#name)
+diff --git a/arch/x86/kvm/vmx/vmenter.S b/arch/x86/kvm/vmx/vmenter.S
+index 435c187927c4..c83163fb2e9c 100644
+--- a/arch/x86/kvm/vmx/vmenter.S
++++ b/arch/x86/kvm/vmx/vmenter.S
+@@ -30,68 +30,6 @@
  
--#define FOP_START(op) \
-+#define __FOP_START(op, align) \
- 	extern void em_##op(struct fastop *fake); \
- 	asm(".pushsection .text, \"ax\" \n\t" \
- 	    ".global em_" #op " \n\t" \
--	    ".align " __stringify(FASTOP_SIZE) " \n\t" \
-+	    ".align " __stringify(align) " \n\t" \
- 	    "em_" #op ":\n\t"
+ .section .noinstr.text, "ax"
  
-+#define FOP_START(op) __FOP_START(op, FASTOP_SIZE)
-+
- #define FOP_END \
- 	    ".popsection")
- 
-@@ -435,16 +437,15 @@ static int fastop(struct x86_emulate_ctxt *ctxt, fastop_t fop);
- /*
-  * Depending on .config the SETcc functions look like:
-  *
-- * ENDBR       [4 bytes; CONFIG_X86_KERNEL_IBT]
-- * SETcc %al   [3 bytes]
-- * RET         [1 byte]
-- * INT3        [1 byte; CONFIG_SLS]
+-/**
+- * vmx_vmenter - VM-Enter the current loaded VMCS
 - *
-- * Which gives possible sizes 4, 5, 8 or 9.  When rounded up to the
-- * next power-of-two alignment they become 4, 8 or 16 resp.
-+ * ENDBR			[4 bytes; CONFIG_X86_KERNEL_IBT]
-+ * SETcc %al			[3 bytes]
-+ * RET | JMP __x86_return_thunk	[1,5 bytes; CONFIG_RETPOLINE]
-+ * INT3				[1 byte; CONFIG_SLS]
-  */
--#define SETCC_LENGTH	(ENDBR_INSN_SIZE + 4 + IS_ENABLED(CONFIG_SLS))
--#define SETCC_ALIGN	(4 << IS_ENABLED(CONFIG_SLS) << HAS_KERNEL_IBT)
-+#define RET_LENGTH	(1 + (4 * IS_ENABLED(CONFIG_RETPOLINE)) + \
-+			 IS_ENABLED(CONFIG_SLS))
-+#define SETCC_LENGTH	(ENDBR_INSN_SIZE + 3 + RET_LENGTH)
-+#define SETCC_ALIGN	(4 << ((SETCC_LENGTH > 4) & 1) << ((SETCC_LENGTH > 8) & 1))
- static_assert(SETCC_LENGTH <= SETCC_ALIGN);
+- * %RFLAGS.ZF:	!VMCS.LAUNCHED, i.e. controls VMLAUNCH vs. VMRESUME
+- *
+- * Returns:
+- *	%RFLAGS.CF is set on VM-Fail Invalid
+- *	%RFLAGS.ZF is set on VM-Fail Valid
+- *	%RFLAGS.{CF,ZF} are cleared on VM-Success, i.e. VM-Exit
+- *
+- * Note that VMRESUME/VMLAUNCH fall-through and return directly if
+- * they VM-Fail, whereas a successful VM-Enter + VM-Exit will jump
+- * to vmx_vmexit.
+- */
+-SYM_FUNC_START_LOCAL(vmx_vmenter)
+-	/* EFLAGS.ZF is set if VMCS.LAUNCHED == 0 */
+-	je 2f
+-
+-1:	vmresume
+-	RET
+-
+-2:	vmlaunch
+-	RET
+-
+-3:	cmpb $0, kvm_rebooting
+-	je 4f
+-	RET
+-4:	ud2
+-
+-	_ASM_EXTABLE(1b, 3b)
+-	_ASM_EXTABLE(2b, 3b)
+-
+-SYM_FUNC_END(vmx_vmenter)
+-
+-/**
+- * vmx_vmexit - Handle a VMX VM-Exit
+- *
+- * Returns:
+- *	%RFLAGS.{CF,ZF} are cleared on VM-Success, i.e. VM-Exit
+- *
+- * This is vmx_vmenter's partner in crime.  On a VM-Exit, control will jump
+- * here after hardware loads the host's state, i.e. this is the destination
+- * referred to by VMCS.HOST_RIP.
+- */
+-SYM_FUNC_START(vmx_vmexit)
+-#ifdef CONFIG_RETPOLINE
+-	ALTERNATIVE "jmp .Lvmexit_skip_rsb", "", X86_FEATURE_RETPOLINE
+-	/* Preserve guest's RAX, it's used to stuff the RSB. */
+-	push %_ASM_AX
+-
+-	/* IMPORTANT: Stuff the RSB immediately after VM-Exit, before RET! */
+-	FILL_RETURN_BUFFER %_ASM_AX, RSB_CLEAR_LOOPS, X86_FEATURE_RETPOLINE
+-
+-	/* Clear RFLAGS.CF and RFLAGS.ZF to preserve VM-Exit, i.e. !VM-Fail. */
+-	or $1, %_ASM_AX
+-
+-	pop %_ASM_AX
+-.Lvmexit_skip_rsb:
+-#endif
+-	RET
+-SYM_FUNC_END(vmx_vmexit)
+-
+ /**
+  * __vmx_vcpu_run - Run a vCPU via a transition to VMX guest mode
+  * @vmx:	struct vcpu_vmx * (forwarded to vmx_update_host_rsp)
+@@ -124,8 +62,7 @@ SYM_FUNC_START(__vmx_vcpu_run)
+ 	/* Copy @launched to BL, _ASM_ARG3 is volatile. */
+ 	mov %_ASM_ARG3B, %bl
  
- #define FOP_SETCC(op) \
-@@ -453,9 +454,10 @@ static_assert(SETCC_LENGTH <= SETCC_ALIGN);
- 	#op ": \n\t" \
- 	ASM_ENDBR \
- 	#op " %al \n\t" \
--	__FOP_RET(#op)
-+	__FOP_RET(#op) \
-+	".skip " __stringify(SETCC_ALIGN) " - (.-" #op "), 0xcc \n\t"
+-	/* Adjust RSP to account for the CALL to vmx_vmenter(). */
+-	lea -WORD_SIZE(%_ASM_SP), %_ASM_ARG2
++	lea (%_ASM_SP), %_ASM_ARG2
+ 	call vmx_update_host_rsp
  
--FOP_START(setcc)
-+__FOP_START(setcc, SETCC_ALIGN)
- FOP_SETCC(seto)
- FOP_SETCC(setno)
- FOP_SETCC(setc)
+ 	/* Load @regs to RAX. */
+@@ -154,11 +91,37 @@ SYM_FUNC_START(__vmx_vcpu_run)
+ 	/* Load guest RAX.  This kills the @regs pointer! */
+ 	mov VCPU_RAX(%_ASM_AX), %_ASM_AX
+ 
+-	/* Enter guest mode */
+-	call vmx_vmenter
++	/* Check EFLAGS.ZF from 'testb' above */
++	je .Lvmlaunch
++
++	/*
++	 * After a successful VMRESUME/VMLAUNCH, control flow "magically"
++	 * resumes below at 'vmx_vmexit' due to the VMCS HOST_RIP setting.
++	 * So this isn't a typical function and objtool needs to be told to
++	 * save the unwind state here and restore it below.
++	 */
++	UNWIND_HINT_SAVE
++
++/*
++ * If VMRESUME/VMLAUNCH and corresponding vmexit succeed, execution resumes at
++ * the 'vmx_vmexit' label below.
++ */
++.Lvmresume:
++	vmresume
++	jmp .Lvmfail
++
++.Lvmlaunch:
++	vmlaunch
++	jmp .Lvmfail
++
++	_ASM_EXTABLE(.Lvmresume, .Lfixup)
++	_ASM_EXTABLE(.Lvmlaunch, .Lfixup)
+ 
+-	/* Jump on VM-Fail. */
+-	jbe 2f
++SYM_INNER_LABEL(vmx_vmexit, SYM_L_GLOBAL)
++
++	/* Restore unwind state from before the VMRESUME/VMLAUNCH. */
++	UNWIND_HINT_RESTORE
++	ENDBR
+ 
+ 	/* Temporarily save guest's RAX. */
+ 	push %_ASM_AX
+@@ -185,9 +148,13 @@ SYM_FUNC_START(__vmx_vcpu_run)
+ 	mov %r15, VCPU_R15(%_ASM_AX)
+ #endif
+ 
++	/* IMPORTANT: RSB must be stuffed before the first return. */
++	FILL_RETURN_BUFFER %_ASM_BX, RSB_CLEAR_LOOPS, X86_FEATURE_RETPOLINE
++
+ 	/* Clear RAX to indicate VM-Exit (as opposed to VM-Fail). */
+ 	xor %eax, %eax
+ 
++.Lclear_regs:
+ 	/*
+ 	 * Clear all general purpose registers except RSP and RAX to prevent
+ 	 * speculative use of the guest's values, even those that are reloaded
+@@ -197,7 +164,7 @@ SYM_FUNC_START(__vmx_vcpu_run)
+ 	 * free.  RSP and RAX are exempt as RSP is restored by hardware during
+ 	 * VM-Exit and RAX is explicitly loaded with 0 or 1 to return VM-Fail.
+ 	 */
+-1:	xor %ecx, %ecx
++	xor %ecx, %ecx
+ 	xor %edx, %edx
+ 	xor %ebx, %ebx
+ 	xor %ebp, %ebp
+@@ -216,8 +183,8 @@ SYM_FUNC_START(__vmx_vcpu_run)
+ 
+ 	/* "POP" @regs. */
+ 	add $WORD_SIZE, %_ASM_SP
+-	pop %_ASM_BX
+ 
++	pop %_ASM_BX
+ #ifdef CONFIG_X86_64
+ 	pop %r12
+ 	pop %r13
+@@ -230,9 +197,15 @@ SYM_FUNC_START(__vmx_vcpu_run)
+ 	pop %_ASM_BP
+ 	RET
+ 
+-	/* VM-Fail.  Out-of-line to avoid a taken Jcc after VM-Exit. */
+-2:	mov $1, %eax
+-	jmp 1b
++.Lfixup:
++	cmpb $0, kvm_rebooting
++	jne .Lvmfail
++	ud2
++.Lvmfail:
++	/* VM-Fail: set return value to 1 */
++	mov $1, %eax
++	jmp .Lclear_regs
++
+ SYM_FUNC_END(__vmx_vcpu_run)
+ 
+ 
 -- 
 2.35.1
 
