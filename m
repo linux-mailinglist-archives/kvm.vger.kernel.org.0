@@ -2,60 +2,60 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id C7A9457BDEB
-	for <lists+kvm@lfdr.de>; Wed, 20 Jul 2022 20:37:56 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 7F06657BE11
+	for <lists+kvm@lfdr.de>; Wed, 20 Jul 2022 20:49:12 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229626AbiGTShy (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 20 Jul 2022 14:37:54 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54556 "EHLO
+        id S230225AbiGTStL (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 20 Jul 2022 14:49:11 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56278 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229790AbiGTShw (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 20 Jul 2022 14:37:52 -0400
-Received: from NAM04-DM6-obe.outbound.protection.outlook.com (mail-dm6nam04on2068.outbound.protection.outlook.com [40.107.102.68])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8577072ECE;
-        Wed, 20 Jul 2022 11:37:50 -0700 (PDT)
+        with ESMTP id S230213AbiGTSi7 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 20 Jul 2022 14:38:59 -0400
+Received: from NAM04-DM6-obe.outbound.protection.outlook.com (mail-dm6nam04on2079.outbound.protection.outlook.com [40.107.102.79])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 102577391D;
+        Wed, 20 Jul 2022 11:38:48 -0700 (PDT)
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=jRu2wCOadK2qnpeO87Wpes15xcqNnzD7fv8tWQRChkZp5GuBoY2eT8kk2g9F0irvufUITgnZiHLjdsVq3G+2S1d4wMYgLE6UB9pxVSUff2txu/giFdsEhylHiLugWbwUCGMeZCV9Vo0JDkPamhdxCsM6xWp1/IxQZnMaeoBFrd+aPgDUcGjKOqndHhzdWRPid7YqQBTcV1+9C0PKChImI2ffWFdMXjWvZkg2kR0igu09TtNE/newm4F7lPORkZkEPSKt9LtfQA/AHLmSwli7Xt/H7Y3n0MwmiIpvOL3xpxADRi6IzKXXPqcYiNl/c+Kk29rSXBUfzmyIm+CTlBR0yg==
+ b=aLEKU9OMxZUlZfpaEHBCKnkJzFlMRPGERPGoIHc8hMoQD9dQMsIiUUzCw5sCei+1+V6Hf47D6yX+qUZd3HeNXwtGLINZBHzE8F95SLObTUJn02o/4G9J1RQYj6S2Gr5ns+HV8AwgJzTap8NoBPmwD0UgqT+DPloAED3W9MrRkpwIbtupUffeP5DCwThLttr8B6Jie4OagKcwNFWRKqSKs9tPm5dutgwa+WuEQ8hpYQBga7aIUseXdECi8k/QtoEtzUSMsP+RWJgsjqpej7/9ukm8VOywPdoHH1FEKOgkzt95688AzHLkMMefEs/E9vKH8cfZdgzRdBlVGrglLvg9WA==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=kKrhFJW5u3N+jbmuZuAjel1hzViDvbmyweUId4fxPbc=;
- b=bgbEu3J3RPrCkAPvR6gGpjKAHOhpTKqeVd6N7Qa01RrLi/ipS8i9GS6HCiUv0ylplspJe+7e4KD/k6n5PUNdwQ2WJM6CRsb3vKOcqQ9Q+yz88xZKeIEXWawbfS8pd0BTbGVZLNPz/vPBV/hMT/zLwOmvaVMp75YjJ6CTKaFB4EdZNHzzRBFFuo0HXQxKGBJgubnvGlSSok31Nfy4x2V4hoU4jTAsqEfY3w/5ZoYiynF5Pz7T6L3Ggi+D4jj5eMQ1z6Cb99K0KXm6jS0AmmguCNpl06YZZy/5aAVMBJk95zBScDgMtpINE3sZAdtsGSQr43weo/R7SUd4zoA9daMnMQ==
+ bh=wq+T35A5U2OJWEAhIlCZp0xVArV18RIBgkQksENlbaA=;
+ b=ffpVGZv03fZTqZCrbG74g2/g/yOLWLmmMg4MP84NNd15SRgyXszLrOwnb/ipBkNjKzs4wHB+B3skkDaUTUJn3/Chq2nBuS0PopRbs/ecEAJyuzSj3Fx+COREp88en2h6nmYZAFIiaWIB4GX6g87Dj47OGgDGVkIhY18VVGxKYlLlXQX8VYAGCkSPAo7BeMg2OBnV6770NA1FhtVzQ3kTqv6ddTcI7TRHz6k5ZjnnGwCL8HW04jDQOiO8l1MWlm6REkRtG9s/qEvl4LPQ3bcB6DcbTALIkQ+4lnVktDC1bHPHB7ZhTit2LNmFrgAdBFsQG7+kxCJcZ4fi0YsMRHmIUQ==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
  smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
  dkim=pass header.d=nvidia.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
  s=selector2;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=kKrhFJW5u3N+jbmuZuAjel1hzViDvbmyweUId4fxPbc=;
- b=Vh+M6wCaIz03rsaupnloIK08CEnzTS6owJYNcWAqMEWoGJRjvRDuVDvrKL1Gqi3My6etRGdw9WPruYCEIioJg+3+4zOU641dPaR8NbdcRNX7VxaU22vqhLv+QqQsRd1+DgRgU8SSaRgXhZ1E6fLkbOmkB9clEfETU6wvTkZ54xRfo1AoxTcckBcTkw3HEOhy21FjeApA7T50LrNoFqdcBFdrh4UKDF6oBlhKpnBNN3j2x5VZlMy4/3uMmlxUDHjS1k8wCyA/R3nhqTbZ6tXuvVHSNEKVCv875n7tdUWA/dQsXB5VTjMbUl4axTPXOVVztKyCaViZTTmLHPGf67ITqw==
+ bh=wq+T35A5U2OJWEAhIlCZp0xVArV18RIBgkQksENlbaA=;
+ b=qP00+7GRxthoQBfQj0kow8l0YfYHYfPB9RS5K9M57hYQGi4oFYaE4khuYiwFEYkp4ku8oKhCUIU59Zu4MdWvaUyzCeaD3bV9eR2q8547t2DNUrYmfDSnS1ffRUFh5bf/Cun3sO1lK0g/sKFY2fjBKOVjzXRcOzXx+UujGKKrs0QCsoa7blOXyKTOGp0rmtqdRREhi98493Do6T6Lj8kZ83lBCkVKFdiBe7NoOt5mUuUK/WfOwyT9RK00m1t2iLf2gbrLfKzSz+12/joc8UNidrZeftkKKCXFaCPlg5hHukLK5bol3YRkH/imeY/a4FwFl2jQfol4h5bNYuIaif2a8Q==
 Received: from DM6PR12MB3500.namprd12.prod.outlook.com (2603:10b6:5:11d::16)
  by MN2PR12MB4566.namprd12.prod.outlook.com (2603:10b6:208:26a::19) with
  Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5438.14; Wed, 20 Jul
- 2022 18:37:46 +0000
+ 2022 18:38:46 +0000
 Received: from DM6PR12MB3500.namprd12.prod.outlook.com
  ([fe80::9479:3bdd:517e:1d54]) by DM6PR12MB3500.namprd12.prod.outlook.com
  ([fe80::9479:3bdd:517e:1d54%5]) with mapi id 15.20.5438.023; Wed, 20 Jul 2022
- 18:37:46 +0000
+ 18:38:46 +0000
 From:   Kechen Lu <kechenl@nvidia.com>
 To:     Sean Christopherson <seanjc@google.com>
 CC:     "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
         "pbonzini@redhat.com" <pbonzini@redhat.com>,
-        "chao.gao@intel.com" <chao.gao@intel.com>,
         "vkuznets@redhat.com" <vkuznets@redhat.com>,
         Somdutta Roy <somduttar@nvidia.com>,
         "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
-Subject: RE: [RFC PATCH v4 3/7] KVM: x86: Reject disabling of MWAIT
- interception when not allowed
-Thread-Topic: [RFC PATCH v4 3/7] KVM: x86: Reject disabling of MWAIT
- interception when not allowed
-Thread-Index: AQHYhdK25QGQTvu5mEmoX9lZZPTRaK2Ht6YAgAALZPA=
-Date:   Wed, 20 Jul 2022 18:37:46 +0000
-Message-ID: <DM6PR12MB3500B287FDB67273470985EECA8E9@DM6PR12MB3500.namprd12.prod.outlook.com>
-References: <20220622004924.155191-1-kechenl@nvidia.com>
- <20220622004924.155191-4-kechenl@nvidia.com> <YthBJsKOhgHfVs1u@google.com>
-In-Reply-To: <YthBJsKOhgHfVs1u@google.com>
+Subject: RE: [RFC PATCH v3 1/7] KVM: x86: only allow exits disable before
+ vCPUs created
+Thread-Topic: [RFC PATCH v3 1/7] KVM: x86: only allow exits disable before
+ vCPUs created
+Thread-Index: AQHYgFWpO+aVuW3IJk6V/XCp8vu9Y62HtzMAgAAKSYCAAA2QUA==
+Date:   Wed, 20 Jul 2022 18:38:46 +0000
+Message-ID: <DM6PR12MB3500110A9D2AEA90E93EC6FCCA8E9@DM6PR12MB3500.namprd12.prod.outlook.com>
+References: <20220615011622.136646-1-kechenl@nvidia.com>
+ <20220615011622.136646-2-kechenl@nvidia.com> <Ytg3kHHdft8IqIP+@google.com>
+ <YthAMfGD3nHtrOg9@google.com>
+In-Reply-To: <YthAMfGD3nHtrOg9@google.com>
 Accept-Language: en-US
 Content-Language: en-US
 X-MS-Has-Attach: 
@@ -63,54 +63,54 @@ X-MS-TNEF-Correlator:
 authentication-results: dkim=none (message not signed)
  header.d=none;dmarc=none action=none header.from=nvidia.com;
 x-ms-publictraffictype: Email
-x-ms-office365-filtering-correlation-id: e3558ad7-cb51-47f3-ab51-08da6a7ef0cf
+x-ms-office365-filtering-correlation-id: f3259d03-1c3b-4211-3367-08da6a7f149e
 x-ms-traffictypediagnostic: MN2PR12MB4566:EE_
 x-ms-exchange-senderadcheck: 1
 x-ms-exchange-antispam-relay: 0
 x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info: A6bUgUxMszN/iGpMGwm8oK0ttgmGjBpS2t1bB5k9NVcSXca/0BhhcDzkQnC6IBcC+2QGUh57e0LKvsqjLBwVW3WEy8BGbaWwiAJ7F6yvQpl37LsGkZhYOHyOEbp8hFdr3ZVRDcCjpkA3StNt7sRs09lgrkGiTVRCFIq3pLwoZVfiDitfBCtlKXgBW0sAice99VEZ0PFm6Oi0vY7Eb0CTWv3cTZxIkRgKEBqhI72kbOP+9XZIJ1fkn15wAbSCJrBSByw09QT5keZA4hAz1fCWW3eE45U3ppO4ZHPE7bWYDQIfrdXJ4dNtppcIm6Z2YcEXf3BXlv7T3Ho5yDuZmtz9nnR4vPYLMKtBa25bZhJyKb9bdZXS4gjk12SCyJajHjLMLjbCFQpcC7ip2tl/iCeuxELOuIEVEI094jqN5Gb1VusdaBJOfcPiVfHmjNQ/P2CdQhxPCCiAIdtyKr3q5GESQlRjx/QlLneL/BJoasYcJUshtDT/o9U40NWt3Kayby2EKiM1c58sBX7iC9JPgU4EXXz+DDL3O8SuMKLLlZUVfinkhf+BGSRwNbU1J5RmZ0f6lRXLnJByiKuE5Qt+JKInVTfQ7PPiLG2G6139AFDhIywXn1GeazfCheyfRA/4mdGDwug5ysKHHLsaxT916WkS1iMIM+oOgQcD5tgdYX6WAQxzI/TtfezCqYTu+jNGWFKB1NEZun/5aQpR13aueM9QUFqj87XSCK9c/jEKhf8MGkUiifn2I1K9VselF50zB6VHNuSE2cEy5RooHfzX0h69YfJbbBDm0nh71yStaZ+ayCjv1Z2uxCQqJqoSCAnkgSTpOYwYRoWdMqFUkLRfTwNwuz2an670ifmcZ+YE0tB0AMbpft7xyaXtJa3YzO0y5nHkR8oJFhDGHeVZwUCzw8EqsA==
-x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM6PR12MB3500.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230016)(4636009)(136003)(366004)(376002)(39860400002)(396003)(346002)(186003)(122000001)(83380400001)(66946007)(55016003)(38100700002)(38070700005)(76116006)(8936002)(478600001)(64756008)(9686003)(71200400001)(966005)(8676002)(316002)(4326008)(53546011)(6916009)(86362001)(2906002)(66556008)(54906003)(26005)(66476007)(7696005)(33656002)(5660300002)(66446008)(52536014)(6506007)(41300700001);DIR:OUT;SFP:1101;
+x-microsoft-antispam-message-info: OzNcWgWySsjURD7WzlvZRmrLC9i6Funv2U31aA/QIWOekzHUXvnDiVWrta3es+r2918XWHov2DSaMhNBRF6JXRhmKbjdN+6d0EA5+ATvejBjyZ0kzE6AyAENfF6yTHZSz/vCM4bIzADWparxPJc37YWqSm6E+nRydxj8CfRbG+TfB5z5w0lz9UiYvzu03IEuYxo1cksuhGZ4CI2jO/lPZUabUB+FpXxw21HagRjozS+jrNYKxxDRVOvQSnK2Yu8OSRCfDDE/9aARYrJeuLN7LCTDp6NmTn68fLnX5kb/6kcLWbaiMR44PCRfmyzZYRFN6WHACO1qToUgHqpfY41LyrrnaSjFUNVEZaiAW6vApuKgn3Q+Lkmv22EKXXKrVtCJuRHWvvaA+0GlDu+dckGv+np1hZzbic3ixBB1YFgBlK2ZEvTLcNHMbiZdi74sJ7sULdgrGDmuZFkFCuoEdx4EBCvBPvGdoOap1pz/FnuVQjr7xduk94t+748VwgX6gkjIGs95ExGUoL4QgtMS3Lx28U0KkM1ag2FRQa3KjpZOI0Z2I+4wH4kn/dxd8pcEVBchy26bTou75QuOkZxLe92i8QrB7mYO8FkTqTmFhzjesIzfUYpHhxhC021djZUTLKhB72OtA4L9GAISGNRhILyFmnAjIhdG/LOMOD3l2xC2mJlYXhOeaRWiT7i0mSRbR5Q2Sl0CF5jzhFEbrIAog9x+0Eb7uUPs7E+WX1Ri19Ea+xHrVKYHPjzOA6fWDXer/Puag11Ui5mbCVnXgpmw93ZYjxp3A7jOQgGSwiuNbI3KSr8+kO2lhNUfwBIVATT2zDnY
+x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM6PR12MB3500.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230016)(4636009)(136003)(366004)(376002)(39860400002)(396003)(346002)(186003)(122000001)(83380400001)(66946007)(55016003)(38100700002)(38070700005)(76116006)(8936002)(478600001)(64756008)(9686003)(71200400001)(8676002)(316002)(4326008)(53546011)(6916009)(86362001)(2906002)(66556008)(54906003)(26005)(66476007)(7696005)(33656002)(5660300002)(66446008)(52536014)(6506007)(41300700001);DIR:OUT;SFP:1101;
 x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0: =?us-ascii?Q?Yeom2rggzQ98l3emYY4ZSLwYPsiX5EOnrcspUB4x5MUpieEkMC583FvYjn25?=
- =?us-ascii?Q?CmnbsZN9nzU/8tovQEyFB4ZXwB3eWhHerTndErqHJwAZAXBXTXOJoecf0oYt?=
- =?us-ascii?Q?n4pnSLJD7vHNdAghV3/fLbNrZfHNtDhsR2PncKuhLc3Yelh+fSGsTr/jEuGD?=
- =?us-ascii?Q?HC/miErygOaAsLXzKrvzdbkareHW8NnxksZFrF3zH53RBE3WlIqwGRDAGwmK?=
- =?us-ascii?Q?wY9Us29OYciewQneDtEDsqR/gqbxGlpenp7i8mwK2vkwEdNfJnCtn6/B9D5R?=
- =?us-ascii?Q?GsXHJXRdBz0DXTjvx2IuM9Y/9lERAZZ2PD37G9Av7EUgYzRvO0Ciwu+A2Wex?=
- =?us-ascii?Q?1gPB/2tHcwVhxGAgFxvCo1Dud1uCyLa5CIQ8TKWdPtabww31WVHyJ9pNVaEc?=
- =?us-ascii?Q?ZP5hosC9NKfmqPWYS7w+1WH2fz+SjTOvUOSAbK+x447C6cwSu2w8Tz3A/Fs1?=
- =?us-ascii?Q?AiKTRnDOCVedhrO1iLJOVc201NBCPAn8JrZX+SpBIWQyfiywAqduCThzwLLr?=
- =?us-ascii?Q?jjKPUQENWN8Umr4mLHtE4qQvVsMHRKcwN3PDjqi4nNokticI4jfPzCpaWRve?=
- =?us-ascii?Q?emPmHXFcVv0sXVGQ5xDrSkJ+TZgIfDa14lnSV8MnMAljeztAElhU1TOAMgJU?=
- =?us-ascii?Q?3Y50nyj15VR3GzjyvabDA+r/z1Jmysx7Np7DgRoxCkRH5gIYk7cUEOKk9sgT?=
- =?us-ascii?Q?3W7jDvMty1QmxJvmn9VE/oTcSUxt1lpiETv78A6F3w6HodVzRHSIJa1TbkPk?=
- =?us-ascii?Q?aYE0l07rF+iWZYYrFDMrzYhpPWEZ4X/lEhwElhfbaSrb3t0n9A+oYShzE/ln?=
- =?us-ascii?Q?PC3FzFajMhTxYQEd6GI6uj9AVS2BXWLhj3EtvTZD0xa9HOkRHhxS/n/xfZoR?=
- =?us-ascii?Q?0zp0/FNTZQpEGwFOVTTCYu43h0Wdy188rKlOhqphDFsA1GPrwDJWVnke9AG8?=
- =?us-ascii?Q?DWxD/NHS5BgtqypvQh5ucqakqRPFrhywOa9CsUZW5Xd+nDZSN2EqkxSQ1nHR?=
- =?us-ascii?Q?i+tFGakzCDOxxVqrVkLF1DX8j0ywgE0E4JoXOGWaMFiIQhcHfHKWY1KWIXB8?=
- =?us-ascii?Q?qlksUoy/Bk05xfq9JJJzMHDOwpOk0fcJD0mD5vjN43KEtvgg6olxEUn836Fz?=
- =?us-ascii?Q?J0+RtUaMJPdE5ro0Ucp/pSSeB7rper1MD+qphbS2bagoGUHfIXJMfRA4hbQ1?=
- =?us-ascii?Q?ztrFtuV8xPAYVaPWIpz7pjZEL3Zrp+DhRilZ4tfZC2NXtxF2aUWhUK28wUc+?=
- =?us-ascii?Q?AR0A0sRt3OkcjUIn0FGznUDJJhUmlt6snp9AAQQfuNahN7jfiK5/PtlMySKD?=
- =?us-ascii?Q?q+PNWWtXDCl8dUzDnWxGU3pxRhS/Stt2gT+Zrs+zOGtAYDcaXYSgbN8g0NMl?=
- =?us-ascii?Q?Td+MHf6+JaUL56kZTVtrWd9r/LhXYULaa86o+HgzbaYqgS2gLK3t/77Az3fs?=
- =?us-ascii?Q?PqTmroGTof96qn4pB/0Eod2jZCIxl7sOwGd8O3ZmtJQ/ElTYpzZMaxNuTh2V?=
- =?us-ascii?Q?kUzC9TCykgBDKUv6Fz02G9KELlNO7+Yzz9oaYNLsHYsKboPP1cEY4oEhSBTY?=
- =?us-ascii?Q?mboUiqJ7Z672rmf9YpKWiTm7aL1MuzfIxBCRtH1N?=
+x-ms-exchange-antispam-messagedata-0: =?us-ascii?Q?fzqQRRSudmkONxKZM+1kb8WasoHSMem1GY2OCWFf2l9+qR3xgUw1dkFpuWke?=
+ =?us-ascii?Q?YPsrsheOHdgJjoYEt3Uq/Ef6Ptx5jqEfpgrDShnz9ZJPhrVJjKjI5P9VyWnY?=
+ =?us-ascii?Q?Hz5V3b+f2gx+l5zIU2GqjHONdgUyMhsdTOlPRP76mqzyphQmEG4eGrsZaRR3?=
+ =?us-ascii?Q?TEfYZwGLAU570R8jnszdD8K3UNSO2fiaOkxNVmc00reEu2gefi/5r2gfBc8e?=
+ =?us-ascii?Q?HVgAAJhGHAyG3AYtHXCgBJaccDh5Scg5VLyuhTnq9u7kGGp8adjNy0rZ6fBl?=
+ =?us-ascii?Q?WR+jydKdO+A9P3jIFSSRl/0nFpqPDHf72fzj+0QQqM38TnwlHnZAwYG6i74R?=
+ =?us-ascii?Q?Q04KtWtLYOc65E9RwshX14uKGUgRkMulISFDaXXiyKxWoONVayTxIcV97GbT?=
+ =?us-ascii?Q?qF82VuKn8g0B7gxbgUAFszMnkxv6rhiS4yOKmm+vabViO7Rw1jfRME5e3v6O?=
+ =?us-ascii?Q?bHOpHreWpAP3eSiu4wd/Q3hFcO+DMwyB5JWh6XB47hegaxJKb/mRKj6xwz4g?=
+ =?us-ascii?Q?boH8coU9cKkbTw+ekkMehXZHE61y53beBXOaXHpOfhjDHTi4XtROs7bYDJVd?=
+ =?us-ascii?Q?zCcAO+BTrmJXSNGLLQgUwk13oAJrn6rPX6tNc0y2tTIWAb41g18g5OwT3Cq3?=
+ =?us-ascii?Q?q20xOB+/DsPBuXM5AZPyRakvqUwkcwxzCh+0xSm6+urdjDbFyj98lr0Kwr9Q?=
+ =?us-ascii?Q?5kzN8ZCu13gHrJ8SXd9/xA8iapntqDp5XxPPLPhazK/VmvhjoOGpmjmUviQL?=
+ =?us-ascii?Q?7prgkPvKCqPphUMRFW4Rb/3Q2HuALOqcKoCPmsPyaPYtkovt1Zx62wKMIPiK?=
+ =?us-ascii?Q?rPutsi5Qml5ZrKuz31Rh6pQSIyQi/pgZOmeJ94GPLnzWvn4tY8ph6RDO9Wie?=
+ =?us-ascii?Q?SQeOToYGWyht9MGjXLqvkS+ONgkiz/1XsFV1wP6Wq57YqEZB8zgJ7FgWleK5?=
+ =?us-ascii?Q?FDb7b7D5ut1UoqOADvKnLXOk57zzuNUt5XeLGWRKdoWO1vqsyW8uQnXuoAqP?=
+ =?us-ascii?Q?RSAF/Yq7XSz04OoJo0LU2nMUKXA83vHKbP+W1U44CwwyLorB+UD5r1edUw2i?=
+ =?us-ascii?Q?eVAn1ZSzP1Mm1CNl47E8SgBMIIoh2ujDNdflCu4p9BbBnIelYyduMnBpN1Cb?=
+ =?us-ascii?Q?NSCjlfoai4YO1UvTs3n4MfHzCMTW3xrNeQEYPcuwc3Na59x/Od3vTXivBD4V?=
+ =?us-ascii?Q?4fyYNWOmL7+783dtT8VRipiPsk0WV9BU7oYq7Z3acEHzbsScIopOpe36E8ss?=
+ =?us-ascii?Q?PhUCBUuLSPnG+437Vj7rlz0sfAYVeXg18U4X+hIMOcJby7egtbGIl+xLUlPr?=
+ =?us-ascii?Q?Y/GTE23VhGWjw3cRaMgKrcJqMTLswecamNYdqPQnexw2EERzq31PoKFaP4/S?=
+ =?us-ascii?Q?lwljetR3MYFPUfyHMARWZ27Bc8Y7if4JE8Or4hw/LPQVIv5uvOd6mBP7svRP?=
+ =?us-ascii?Q?HK2lU41xVtff9u9VsrmUywPKbhbjJihQ6SVLKO2hx4MtNaxCS6/JANTqZgiW?=
+ =?us-ascii?Q?PSP8XZaZf9ZNCRwdRrftmZIznLd/SDcKE7Fblay5BJMLPm284GOgQxSrnmU2?=
+ =?us-ascii?Q?hUTrCap73IL1drrUOzO/2Ug7xLRIA7LfYmWZVu9V?=
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: quoted-printable
 MIME-Version: 1.0
 X-OriginatorOrg: Nvidia.com
 X-MS-Exchange-CrossTenant-AuthAs: Internal
 X-MS-Exchange-CrossTenant-AuthSource: DM6PR12MB3500.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: e3558ad7-cb51-47f3-ab51-08da6a7ef0cf
-X-MS-Exchange-CrossTenant-originalarrivaltime: 20 Jul 2022 18:37:46.4599
+X-MS-Exchange-CrossTenant-Network-Message-Id: f3259d03-1c3b-4211-3367-08da6a7f149e
+X-MS-Exchange-CrossTenant-originalarrivaltime: 20 Jul 2022 18:38:46.5493
  (UTC)
 X-MS-Exchange-CrossTenant-fromentityheader: Hosted
 X-MS-Exchange-CrossTenant-id: 43083d15-7273-40c1-b7db-39efd9ccc17a
 X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: iki0J6DZ4ZfSZvGDWyJxFhPtCViOTNYtMs6+mIuY/ddBsSgx5YVjxNJvVg9DW2+S6IGQWxhhim4FifOOTKWtVQ==
+X-MS-Exchange-CrossTenant-userprincipalname: 9iDJevM4wlEzcyICNSNlcaxjaFuWWxIIXqVx+DmSxscrfKqFBJGxJ7yEglePw8Nmcq/VY2n4EF0iFNKJO9nS7A==
 X-MS-Exchange-Transport-CrossTenantHeadersStamped: MN2PR12MB4566
 X-Spam-Status: No, score=-1.8 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FORGED_SPF_HELO,
@@ -126,75 +126,32 @@ X-Mailing-List: kvm@vger.kernel.org
 
 > -----Original Message-----
 > From: Sean Christopherson <seanjc@google.com>
-> Sent: Wednesday, July 20, 2022 10:54 AM
+> Sent: Wednesday, July 20, 2022 10:50 AM
 > To: Kechen Lu <kechenl@nvidia.com>
-> Cc: kvm@vger.kernel.org; pbonzini@redhat.com; chao.gao@intel.com;
-> vkuznets@redhat.com; Somdutta Roy <somduttar@nvidia.com>; linux-
-> kernel@vger.kernel.org
-> Subject: Re: [RFC PATCH v4 3/7] KVM: x86: Reject disabling of MWAIT
-> interception when not allowed
+> Cc: kvm@vger.kernel.org; pbonzini@redhat.com; vkuznets@redhat.com;
+> Somdutta Roy <somduttar@nvidia.com>; linux-kernel@vger.kernel.org
+> Subject: Re: [RFC PATCH v3 1/7] KVM: x86: only allow exits disable before
+> vCPUs created
 >=20
 > External email: Use caution opening links or attachments
 >=20
 >=20
-> On Tue, Jun 21, 2022, Kechen Lu wrote:
-> > From: Sean Christopherson <seanjc@google.com>
+> On Wed, Jul 20, 2022, Sean Christopherson wrote:
+> > On Tue, Jun 14, 2022, Kechen Lu wrote:
+> > > From: Sean Christopherson <seanjc@google.com>
+> > >
+> > > Since VMX and SVM both would never update the control bits if exits
+> > > are disable after vCPUs are created, only allow setting exits
+> > > disable flag before vCPU creation.
+> > >
+> > > Fixes: 4d5422cea3b6 ("KVM: X86: Provide a capability to disable
+> > > MWAIT
+> > > intercepts")
 > >
-> > Reject KVM_CAP_X86_DISABLE_EXITS if userspace attempts to disable
-> > MWAIT exits and KVM previously reported (via KVM_CHECK_EXTENSION)
-> that
-> > MWAIT is not allowed in guest, e.g. because it's not supported or the
-> > CPU doesn't have an aways-running APIC timer.
-> >
-> > Fixes: 4d5422cea3b6 ("KVM: X86: Provide a capability to disable MWAIT
-> > intercepts")
-> > Signed-off-by: Sean Christopherson <seanjc@google.com>
-> > Co-developed-by: Kechen Lu <kechenl@nvidia.com>
+> > Don't wrap the Fixes: line (ignore any complaints from checkpatch).
 >=20
-> Needs your SOB.
->
-=20
-Ack!
+> Sorry, I didn't see that you had sent v4 already and replied to some v3
+> patches.
+> This one still holds true for v4 (very minor nit though).
 
-> > Suggested-by: Chao Gao <chao.gao@intel.com>
->=20
-> For code review feedback of this nature, adding Suggested-by isn't
-> appropriate.
-> Suggested-by is for when the idea of the patch itself was suggested by
-> someone, where as Chao's feedback was a purely mechanical change.
->=20
-
-Sure I see.
-
-> > ---
-> >  arch/x86/kvm/x86.c | 20 +++++++++++++-------
-> >  1 file changed, 13 insertions(+), 7 deletions(-)
-> >
-> > diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c index
-> > b419b258ed90..6ec01362a7d8 100644
-> > --- a/arch/x86/kvm/x86.c
-> > +++ b/arch/x86/kvm/x86.c
-> > @@ -4199,6 +4199,16 @@ static inline bool
-> kvm_can_mwait_in_guest(void)
-> >               boot_cpu_has(X86_FEATURE_ARAT);  }
-> >
-> > +static u64 kvm_get_allowed_disable_exits(void)
-> > +{
-> > +     u64 r =3D KVM_X86_DISABLE_VALID_EXITS;
->=20
-> In v3 I "voted" to keep the switch to KVM_X86_DISABLE_VALID_EXITS in the
-> next patch[*], but seeing the result I 100% agree it's better to handle i=
-t here
-> since the "enable" patch previously used KVM_X86_DISABLE_VALID_EXITS.
->=20
-
-Yes, I agree, handling here makes sense.
-
-> [*] https://lore.kernel.org/all/Ytg428sleo7uMRQt@google.com
->=20
-> > +
-> > +     if(!kvm_can_mwait_in_guest())
->=20
-> Space after the "if".
-
-Ack!
+Sure:)
