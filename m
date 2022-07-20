@@ -2,45 +2,47 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 274A057AB68
-	for <lists+kvm@lfdr.de>; Wed, 20 Jul 2022 03:11:53 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 8293F57AB66
+	for <lists+kvm@lfdr.de>; Wed, 20 Jul 2022 03:11:52 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238757AbiGTBKp (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 19 Jul 2022 21:10:45 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60656 "EHLO
+        id S239689AbiGTBLe (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 19 Jul 2022 21:11:34 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33216 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S238064AbiGTBKj (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 19 Jul 2022 21:10:39 -0400
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9209B481FC;
-        Tue, 19 Jul 2022 18:10:38 -0700 (PDT)
+        with ESMTP id S240619AbiGTBLT (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 19 Jul 2022 21:11:19 -0400
+Received: from ams.source.kernel.org (ams.source.kernel.org [IPv6:2604:1380:4601:e00::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6870265591;
+        Tue, 19 Jul 2022 18:11:09 -0700 (PDT)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id 2E8A26172D;
-        Wed, 20 Jul 2022 01:10:38 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 51BB5C341C6;
-        Wed, 20 Jul 2022 01:10:36 +0000 (UTC)
+        by ams.source.kernel.org (Postfix) with ESMTPS id A2B08B81DEA;
+        Wed, 20 Jul 2022 01:11:07 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 11BCCC385A5;
+        Wed, 20 Jul 2022 01:11:04 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1658279437;
-        bh=iyRLA+DAXkZaeBukF5eaYWdqM/9ijPvnUbZY7Ny8mCM=;
+        s=k20201202; t=1658279466;
+        bh=99oYuSj1M8WEb4HdX2609nGaiPr3UQnE0ldIVJt3eB0=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=JuaJ8rbajPkNRNY/bF7RSgTUv6C1uQ694uxLtSE6flA5HgMA4fuugVczdivyffcVI
-         CMq2sqDbXF6D7UvpZxRVp6SGP/MVLEYMXfC+nK+VU1sbjvRYr+8uE0Gkq4WPeYcRhM
-         s/Stb0FhssDPpZ0xnYMJ7sX/Rk44U/SXPYZoBxo5nhSRm6X2dCn5zJRCl8W8yZaRCm
-         P2kj9yCE1PgqW+k/Q38YM63iz1mvGVfdMmA37597QoK6m4jZ6E3ifpyZYtDK9upvTB
-         lYlPEi8WAU6x+dNir7tsEgSchc5AZENU9FOtNuEtaiRHZJBhlMpHyEoKQtzSUzjrfa
-         AwCHLK8FAKiKQ==
+        b=LdXEci4SiePms7IHOojt0stIe4faGHOrVQwDFSOI2amsxlOtvqCNtcVNc3CBsVZWW
+         5qrd30NerpTeh0617iDQVH4Pj8cOmZfW71VVzNSh/b8ZwPgoxumFmE3Ux8z5yd752+
+         sZfZEP3prnhEiiH8mPIeIi2NGO786zWiz1NoiTJDa8XHERg2E+Uwo6I7hY8oKamGXy
+         ZRNGxC8QyEb8N009jBy+PuCxk+4UcEvNrLHGZyHo7mqP/4XYDtutjUh7IlVEmL88Dy
+         VwTO5rgyUK5e+bXHQyptuL0YJvdJ9dWlpj/WLtqWoiVKgY/Ka3MEOFh4IFvMVbzxGa
+         MsaIf2eVa07gQ==
 From:   Sasha Levin <sashal@kernel.org>
 To:     linux-kernel@vger.kernel.org, stable@vger.kernel.org
 Cc:     Peter Zijlstra <peterz@infradead.org>,
-        Borislav Petkov <bp@suse.de>, Sasha Levin <sashal@kernel.org>,
-        seanjc@google.com, pbonzini@redhat.com, tglx@linutronix.de,
-        mingo@redhat.com, bp@alien8.de, dave.hansen@linux.intel.com,
-        x86@kernel.org, kvm@vger.kernel.org
-Subject: [PATCH AUTOSEL 5.18 03/54] x86/kvm/vmx: Make noinstr clean
-Date:   Tue, 19 Jul 2022 21:09:40 -0400
-Message-Id: <20220720011031.1023305-3-sashal@kernel.org>
+        Borislav Petkov <bp@suse.de>,
+        Josh Poimboeuf <jpoimboe@kernel.org>,
+        Sasha Levin <sashal@kernel.org>, seanjc@google.com,
+        pbonzini@redhat.com, tglx@linutronix.de, mingo@redhat.com,
+        bp@alien8.de, dave.hansen@linux.intel.com, x86@kernel.org,
+        kvm@vger.kernel.org
+Subject: [PATCH AUTOSEL 5.18 09/54] x86/kvm: Fix SETcc emulation for return thunks
+Date:   Tue, 19 Jul 2022 21:09:46 -0400
+Message-Id: <20220720011031.1023305-9-sashal@kernel.org>
 X-Mailer: git-send-email 2.35.1
 In-Reply-To: <20220720011031.1023305-1-sashal@kernel.org>
 References: <20220720011031.1023305-1-sashal@kernel.org>
@@ -59,78 +61,93 @@ X-Mailing-List: kvm@vger.kernel.org
 
 From: Peter Zijlstra <peterz@infradead.org>
 
-[ Upstream commit 742ab6df974ae8384a2dd213db1a3a06cf6d8936 ]
+[ Upstream commit af2e140f34208a5dfb6b7a8ad2d56bda88f0524d ]
 
-The recent mmio_stale_data fixes broke the noinstr constraints:
+Prepare the SETcc fastop stuff for when RET can be larger still.
 
-  vmlinux.o: warning: objtool: vmx_vcpu_enter_exit+0x15b: call to wrmsrl.constprop.0() leaves .noinstr.text section
-  vmlinux.o: warning: objtool: vmx_vcpu_enter_exit+0x1bf: call to kvm_arch_has_assigned_device() leaves .noinstr.text section
+The tricky bit here is that the expressions should not only be
+constant C expressions, but also absolute GAS expressions. This means
+no ?: and 'true' is ~0.
 
-make it all happy again.
+Also ensure em_setcc() has the same alignment as the actual FOP_SETCC()
+ops, this ensures there cannot be an alignment hole between em_setcc()
+and the first op.
+
+Additionally, add a .skip directive to the FOP_SETCC() macro to fill
+any remaining space with INT3 traps; however the primary purpose of
+this directive is to generate AS warnings when the remaining space
+goes negative. Which is a very good indication the alignment magic
+went side-ways.
 
 Signed-off-by: Peter Zijlstra (Intel) <peterz@infradead.org>
 Signed-off-by: Borislav Petkov <bp@suse.de>
+Reviewed-by: Josh Poimboeuf <jpoimboe@kernel.org>
+Signed-off-by: Borislav Petkov <bp@suse.de>
 Signed-off-by: Sasha Levin <sashal@kernel.org>
 ---
- arch/x86/kvm/vmx/vmx.c   | 6 +++---
- arch/x86/kvm/x86.c       | 4 ++--
- include/linux/kvm_host.h | 2 +-
- 3 files changed, 6 insertions(+), 6 deletions(-)
+ arch/x86/kvm/emulate.c | 28 +++++++++++++++-------------
+ 1 file changed, 15 insertions(+), 13 deletions(-)
 
-diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
-index 9646ae886b4b..da103938e62e 100644
---- a/arch/x86/kvm/vmx/vmx.c
-+++ b/arch/x86/kvm/vmx/vmx.c
-@@ -383,9 +383,9 @@ static __always_inline void vmx_disable_fb_clear(struct vcpu_vmx *vmx)
- 	if (!vmx->disable_fb_clear)
- 		return;
+diff --git a/arch/x86/kvm/emulate.c b/arch/x86/kvm/emulate.c
+index 89b11e7dca8a..b01437015f99 100644
+--- a/arch/x86/kvm/emulate.c
++++ b/arch/x86/kvm/emulate.c
+@@ -325,13 +325,15 @@ static int fastop(struct x86_emulate_ctxt *ctxt, fastop_t fop);
+ #define FOP_RET(name) \
+ 	__FOP_RET(#name)
  
--	rdmsrl(MSR_IA32_MCU_OPT_CTRL, msr);
-+	msr = __rdmsr(MSR_IA32_MCU_OPT_CTRL);
- 	msr |= FB_CLEAR_DIS;
--	wrmsrl(MSR_IA32_MCU_OPT_CTRL, msr);
-+	native_wrmsrl(MSR_IA32_MCU_OPT_CTRL, msr);
- 	/* Cache the MSR value to avoid reading it later */
- 	vmx->msr_ia32_mcu_opt_ctrl = msr;
- }
-@@ -396,7 +396,7 @@ static __always_inline void vmx_enable_fb_clear(struct vcpu_vmx *vmx)
- 		return;
+-#define FOP_START(op) \
++#define __FOP_START(op, align) \
+ 	extern void em_##op(struct fastop *fake); \
+ 	asm(".pushsection .text, \"ax\" \n\t" \
+ 	    ".global em_" #op " \n\t" \
+-	    ".align " __stringify(FASTOP_SIZE) " \n\t" \
++	    ".align " __stringify(align) " \n\t" \
+ 	    "em_" #op ":\n\t"
  
- 	vmx->msr_ia32_mcu_opt_ctrl &= ~FB_CLEAR_DIS;
--	wrmsrl(MSR_IA32_MCU_OPT_CTRL, vmx->msr_ia32_mcu_opt_ctrl);
-+	native_wrmsrl(MSR_IA32_MCU_OPT_CTRL, vmx->msr_ia32_mcu_opt_ctrl);
- }
++#define FOP_START(op) __FOP_START(op, FASTOP_SIZE)
++
+ #define FOP_END \
+ 	    ".popsection")
  
- static void vmx_update_fb_clear_dis(struct kvm_vcpu *vcpu, struct vcpu_vmx *vmx)
-diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-index 558d1f2ab5b4..9caa902f0de1 100644
---- a/arch/x86/kvm/x86.c
-+++ b/arch/x86/kvm/x86.c
-@@ -12531,9 +12531,9 @@ void kvm_arch_end_assignment(struct kvm *kvm)
- }
- EXPORT_SYMBOL_GPL(kvm_arch_end_assignment);
+@@ -435,16 +437,15 @@ static int fastop(struct x86_emulate_ctxt *ctxt, fastop_t fop);
+ /*
+  * Depending on .config the SETcc functions look like:
+  *
+- * ENDBR       [4 bytes; CONFIG_X86_KERNEL_IBT]
+- * SETcc %al   [3 bytes]
+- * RET         [1 byte]
+- * INT3        [1 byte; CONFIG_SLS]
+- *
+- * Which gives possible sizes 4, 5, 8 or 9.  When rounded up to the
+- * next power-of-two alignment they become 4, 8 or 16 resp.
++ * ENDBR			[4 bytes; CONFIG_X86_KERNEL_IBT]
++ * SETcc %al			[3 bytes]
++ * RET | JMP __x86_return_thunk	[1,5 bytes; CONFIG_RETPOLINE]
++ * INT3				[1 byte; CONFIG_SLS]
+  */
+-#define SETCC_LENGTH	(ENDBR_INSN_SIZE + 4 + IS_ENABLED(CONFIG_SLS))
+-#define SETCC_ALIGN	(4 << IS_ENABLED(CONFIG_SLS) << HAS_KERNEL_IBT)
++#define RET_LENGTH	(1 + (4 * IS_ENABLED(CONFIG_RETPOLINE)) + \
++			 IS_ENABLED(CONFIG_SLS))
++#define SETCC_LENGTH	(ENDBR_INSN_SIZE + 3 + RET_LENGTH)
++#define SETCC_ALIGN	(4 << ((SETCC_LENGTH > 4) & 1) << ((SETCC_LENGTH > 8) & 1))
+ static_assert(SETCC_LENGTH <= SETCC_ALIGN);
  
--bool kvm_arch_has_assigned_device(struct kvm *kvm)
-+bool noinstr kvm_arch_has_assigned_device(struct kvm *kvm)
- {
--	return atomic_read(&kvm->arch.assigned_device_count);
-+	return arch_atomic_read(&kvm->arch.assigned_device_count);
- }
- EXPORT_SYMBOL_GPL(kvm_arch_has_assigned_device);
+ #define FOP_SETCC(op) \
+@@ -453,9 +454,10 @@ static_assert(SETCC_LENGTH <= SETCC_ALIGN);
+ 	#op ": \n\t" \
+ 	ASM_ENDBR \
+ 	#op " %al \n\t" \
+-	__FOP_RET(#op)
++	__FOP_RET(#op) \
++	".skip " __stringify(SETCC_ALIGN) " - (.-" #op "), 0xcc \n\t"
  
-diff --git a/include/linux/kvm_host.h b/include/linux/kvm_host.h
-index 34eed5f85ed6..88d94cf515e1 100644
---- a/include/linux/kvm_host.h
-+++ b/include/linux/kvm_host.h
-@@ -1511,7 +1511,7 @@ static inline void kvm_arch_end_assignment(struct kvm *kvm)
- {
- }
- 
--static inline bool kvm_arch_has_assigned_device(struct kvm *kvm)
-+static __always_inline bool kvm_arch_has_assigned_device(struct kvm *kvm)
- {
- 	return false;
- }
+-FOP_START(setcc)
++__FOP_START(setcc, SETCC_ALIGN)
+ FOP_SETCC(seto)
+ FOP_SETCC(setno)
+ FOP_SETCC(setc)
 -- 
 2.35.1
 
