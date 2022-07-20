@@ -2,176 +2,145 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 600B857B8AC
-	for <lists+kvm@lfdr.de>; Wed, 20 Jul 2022 16:42:32 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 8CC8A57B8FD
+	for <lists+kvm@lfdr.de>; Wed, 20 Jul 2022 16:56:42 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232568AbiGTOma (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 20 Jul 2022 10:42:30 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48666 "EHLO
+        id S241048AbiGTO4k (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 20 Jul 2022 10:56:40 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34726 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229830AbiGTOm3 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 20 Jul 2022 10:42:29 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 6E35A4D805
-        for <kvm@vger.kernel.org>; Wed, 20 Jul 2022 07:42:28 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1658328147;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=cvhT3S9WVM0zbX99AylzeVt8EncWc0nM5sQ4BeMLhBk=;
-        b=UzvpBvIv0zEd7m4CXN88yg4EWop+mXthhR84RibTwejlWl0LCUUUgaCYDDXiYSU+S/peyT
-        tkLhMKPfXnrCwV2tX95MP7yx8D45MZgZtvpmgxqdDAuTsVLNfUJtrhPJ4wBFaT1HQrmpcS
-        GxaaeJUq56j+WbLtKLs8gZ7We3XVMWs=
-Received: from mail-qv1-f69.google.com (mail-qv1-f69.google.com
- [209.85.219.69]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-187-zf-iVOCRMIuacE0VB_BnMg-1; Wed, 20 Jul 2022 10:42:26 -0400
-X-MC-Unique: zf-iVOCRMIuacE0VB_BnMg-1
-Received: by mail-qv1-f69.google.com with SMTP id u15-20020a0ced2f000000b004732a5e7a99so9525315qvq.5
-        for <kvm@vger.kernel.org>; Wed, 20 Jul 2022 07:42:26 -0700 (PDT)
+        with ESMTP id S233329AbiGTO4i (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 20 Jul 2022 10:56:38 -0400
+Received: from mail-wr1-x431.google.com (mail-wr1-x431.google.com [IPv6:2a00:1450:4864:20::431])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F38A53247D
+        for <kvm@vger.kernel.org>; Wed, 20 Jul 2022 07:56:37 -0700 (PDT)
+Received: by mail-wr1-x431.google.com with SMTP id a5so26463846wrx.12
+        for <kvm@vger.kernel.org>; Wed, 20 Jul 2022 07:56:37 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=gFaFfhQuDdNcq9NTKFOPtpu0tCvR0SyPhCdMyJvFbcc=;
+        b=nmKLfLBL22w5ZwGCQtct0mhoMXTDxZXZWSX9+sHqBplsXjlyfl6ACww3TO2BllA0Kq
+         StLiUpr7nvRvw3R1HuCYAAUAqSFRqolsSeGfBWL0hqhUUI8Bf7Z+9rob1e5fZKvVo8Jy
+         Jp/gqprpSzF8/7pI3A14yhjq5J2PatkBxEPWW4ZQnp/yqfBaVbGVRNngj9tnZXnYfecm
+         nfKUaS9CDCtTi92sOcyFnrU0vgiXjUGg9iG13aBJBfzo27YuR3I/x7seUdRMgiwgqLb5
+         ZDSxsjhW82utJhB0QpLUlvxQZxVKDPvO8RQSRW+Ypj5RgpcmsZE1YgrWrVWt5+Fq7fQh
+         N9lg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:message-id:subject:from:to:cc:date:in-reply-to
-         :references:user-agent:mime-version:content-transfer-encoding;
-        bh=cvhT3S9WVM0zbX99AylzeVt8EncWc0nM5sQ4BeMLhBk=;
-        b=QrwZ2D+9np+if+omUJtLIJFKO0gEBphmru4hpHtLBcG3CtnFdE9KWl5XrGE4gPePTf
-         DVHxB39UZj2oHDfgDJOoFbz//7r4hi0HRrSzbWrSYQVEEyvqzBRRKMo9tQsoRu/KewdD
-         aI+klxtDZq6pVm0JXAQfHle46kXRBxrTrtczzJ2Sxb2QdxPQHaCxXk4crgSqTrGfzPDp
-         OQ3rQrsMbMgl3TLWssPGA+zbJAtGtthjgSWxNd5ci4aCbRmwclmodfyU6rL5Fj99whpA
-         uR5gxR5WIRbpdHBJBkmRxz5w1EIpkjtTLEKDuR/ZYW2Hv9jwm2ww/nFN4wRNgEnzen+q
-         vDtg==
-X-Gm-Message-State: AJIora9UXTGpl5VSpjw8ahJKDq1t2uvz4IdzNzdqEIk0iU121Zys8b5N
-        OOzAV5/ifOcipjO1p4u32JHkg0DTNjxr7WGjFBBJsZdVMtBqfBUAXbk6kmC8m93jQMvJEtFGElw
-        gx628K2YrB+yo
-X-Received: by 2002:a05:622a:1a14:b0:31e:e89f:4dda with SMTP id f20-20020a05622a1a1400b0031ee89f4ddamr15317180qtb.622.1658328145879;
-        Wed, 20 Jul 2022 07:42:25 -0700 (PDT)
-X-Google-Smtp-Source: AGRyM1tGn9yFp45TY6RYzVBxsl9nb/67MqV9TQtVWfuHzl2vf0hFiw4YH/r3ee/crX2uGuJr5QQhHQ==
-X-Received: by 2002:a05:622a:1a14:b0:31e:e89f:4dda with SMTP id f20-20020a05622a1a1400b0031ee89f4ddamr15317158qtb.622.1658328145616;
-        Wed, 20 Jul 2022 07:42:25 -0700 (PDT)
-Received: from [10.35.4.238] (bzq-82-81-161-50.red.bezeqint.net. [82.81.161.50])
-        by smtp.gmail.com with ESMTPSA id y206-20020a3764d7000000b006b5652edb93sm16190459qkb.48.2022.07.20.07.42.20
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 20 Jul 2022 07:42:24 -0700 (PDT)
-Message-ID: <c22a18631c2067871b9ed8a9246ad58fa1ab8947.camel@redhat.com>
-Subject: Re: [RFC PATCH v3 04/19] KVM: x86: mmu: allow to enable write
- tracking externally
-From:   Maxim Levitsky <mlevitsk@redhat.com>
-To:     Sean Christopherson <seanjc@google.com>
-Cc:     kvm@vger.kernel.org, Wanpeng Li <wanpengli@tencent.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Jani Nikula <jani.nikula@linux.intel.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Tvrtko Ursulin <tvrtko.ursulin@linux.intel.com>,
-        Rodrigo Vivi <rodrigo.vivi@intel.com>,
-        Zhenyu Wang <zhenyuw@linux.intel.com>,
-        Joonas Lahtinen <joonas.lahtinen@linux.intel.com>,
-        Tom Lendacky <thomas.lendacky@amd.com>,
-        Ingo Molnar <mingo@redhat.com>,
-        David Airlie <airlied@linux.ie>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org,
-        intel-gfx@lists.freedesktop.org, Daniel Vetter <daniel@ffwll.ch>,
-        Borislav Petkov <bp@alien8.de>, Joerg Roedel <joro@8bytes.org>,
-        linux-kernel@vger.kernel.org, Jim Mattson <jmattson@google.com>,
-        Zhi Wang <zhi.a.wang@intel.com>,
-        Brijesh Singh <brijesh.singh@amd.com>,
-        "H. Peter Anvin" <hpa@zytor.com>,
-        intel-gvt-dev@lists.freedesktop.org,
-        dri-devel@lists.freedesktop.org
-Date:   Wed, 20 Jul 2022 17:42:17 +0300
-In-Reply-To: <5ed0d0e5a88bbee2f95d794dbbeb1ad16789f319.camel@redhat.com>
-References: <20220427200314.276673-1-mlevitsk@redhat.com>
-         <20220427200314.276673-5-mlevitsk@redhat.com> <YoZyWOh4NPA0uN5J@google.com>
-         <5ed0d0e5a88bbee2f95d794dbbeb1ad16789f319.camel@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
-User-Agent: Evolution 3.40.4 (3.40.4-5.fc34) 
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=gFaFfhQuDdNcq9NTKFOPtpu0tCvR0SyPhCdMyJvFbcc=;
+        b=wZiAXeKIy1dbGhvFogp4Zr9fQBrVYXj16C2DQzUUxn5b9P+4bFHKqviyXFXt5FmPJV
+         GCsKvqbXhjJaMZhcmFdL19Y/XxiQ+6z8fvLVyzgvbNUXJOfMkClLBHao8Gq7Q2sTXGgW
+         7S0zKpF/+s9f7pkr6ZHWsR4zm6ax1oycyeMpuVuZKoFJP+Jl8m3A3bLndACvL9dlqpf+
+         XTSOgJgNOn7mA/+SPQBuucubU/2rGZBbOMdlEIILbmttIfTC8kaURU/hdfXurqGKnr5C
+         Kvebasn9/dCHBDFNzos2bnVe5TJvfVqwFve1TyXIvx89gOw8BP7QG2SYI6g2CFd5Y0df
+         zI/w==
+X-Gm-Message-State: AJIora9OVIC0S9pFLjPE8Zzgg2CpWKcEAwxJpvEhCnTiXWkMTXBtytGM
+        jXn5gwogfpd5dlvwbVlCyv7c4zTRnJaTMvq262M0sQ==
+X-Google-Smtp-Source: AGRyM1uGkHMIXlmRm01LO91SN8vvZWqAyDmmWFlXa49gZuK26ZIu98kBLGxblEKerbDtJRU3COg7jgz9/2va9pvgGdI=
+X-Received: by 2002:a5d:4d8e:0:b0:21d:68d4:56eb with SMTP id
+ b14-20020a5d4d8e000000b0021d68d456ebmr29981723wru.40.1658328996384; Wed, 20
+ Jul 2022 07:56:36 -0700 (PDT)
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-3.5 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,
-        SPF_HELO_NONE,SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
+References: <20220711093218.10967-1-adrian.hunter@intel.com>
+ <20220711093218.10967-28-adrian.hunter@intel.com> <CAP-5=fXC4SYyV3DJKxy0atW1RRSS8EouD+t=pXuqJPSQ=x_jMA@mail.gmail.com>
+ <YtgL0M/jHSC9/BBG@kernel.org>
+In-Reply-To: <YtgL0M/jHSC9/BBG@kernel.org>
+From:   Ian Rogers <irogers@google.com>
+Date:   Wed, 20 Jul 2022 07:56:24 -0700
+Message-ID: <CAP-5=fVUHdDZi_EHCe2Ko-7FZjbdaoNvA-u-CrZE4Vs6O=fNAw@mail.gmail.com>
+Subject: Re: [PATCH 27/35] perf tools: Add perf_event__is_guest()
+To:     Arnaldo Carvalho de Melo <acme@kernel.org>
+Cc:     Adrian Hunter <adrian.hunter@intel.com>,
+        Jiri Olsa <jolsa@redhat.com>,
+        Namhyung Kim <namhyung@kernel.org>,
+        Andi Kleen <ak@linux.intel.com>, linux-kernel@vger.kernel.org,
+        kvm@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
+        USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=unavailable
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Sun, 2022-05-22 at 13:22 +0300, Maxim Levitsky wrote:
-> On Thu, 2022-05-19 at 16:37 +0000, Sean Christopherson wrote:
-> > On Wed, Apr 27, 2022, Maxim Levitsky wrote:
-> > > @@ -5753,6 +5752,10 @@ int kvm_mmu_init_vm(struct kvm *kvm)
-> > >         node->track_write = kvm_mmu_pte_write;
-> > >         node->track_flush_slot = kvm_mmu_invalidate_zap_pages_in_memslot;
-> > >         kvm_page_track_register_notifier(kvm, node);
-> > 
-> > Can you add a patch to move this call to kvm_page_track_register_notifier() into
-> > mmu_enable_write_tracking(), and simultaneously add a WARN in the register path
-> > that page tracking is enabled?
-> > 
-> > Oh, actually, a better idea. Add an inner __kvm_page_track_register_notifier()
-> > that is not exported and thus used only by KVM, invoke mmu_enable_write_tracking()
-> > from the exported kvm_page_track_register_notifier(), and then do the above.
-> > That will require modifying KVMGT and KVM in a single patch, but that's ok.
-> > 
-> > That will avoid any possibility of an external user failing to enabling tracking
-> > before registering its notifier, and also avoids bikeshedding over what to do with
-> > the one-line wrapper to enable tracking.
-> > 
-> 
-> This is a good idea as well, especially looking at kvmgt and seeing that
-> it registers the page track notifier, when the vGPU is opened.
-> 
-> I'll do this in the next series.
-> 
-> Thanks for the review!
+On Wed, Jul 20, 2022 at 7:06 AM Arnaldo Carvalho de Melo
+<acme@kernel.org> wrote:
+>
+> Em Tue, Jul 19, 2022 at 06:11:47PM -0700, Ian Rogers escreveu:
+> > On Mon, Jul 11, 2022 at 2:33 AM Adrian Hunter <adrian.hunter@intel.com> wrote:
+> > >
+> > > Add a helper function to determine if an event is a guest event.
+> > >
+> > > Signed-off-by: Adrian Hunter <adrian.hunter@intel.com>
+> > > ---
+> > >  tools/perf/util/event.h | 21 +++++++++++++++++++++
+> > >  1 file changed, 21 insertions(+)
+> > >
+> > > diff --git a/tools/perf/util/event.h b/tools/perf/util/event.h
+> > > index a660f304f83c..a7b0931d5137 100644
+> > > --- a/tools/perf/util/event.h
+> > > +++ b/tools/perf/util/event.h
+> >
+> > Would this be better under tools/lib/perf ?
+>
+> In general I think we should move things to libperf when a user requests
+> it, i.e. it'll be needed in a tool that uses libperf.
 
-After putting some thought into this, I am not 100% sure anymore I want to do it this way.
- 
-Let me explain the current state of things:
+The perf_event_header is defined in libperf. If we're worried about
+exposing the API, we could keep it in the internal include files. To
+explain my thinking, if something like cpumap or perf_event_header
+live in libperf, then it makes sense to me that the structs, accessors
+and the like also live there. Having the code standing in both perf
+and libperf is a transitory state we should be working to remove.
 
-For mmu: 
-- write tracking notifier is registered on VM initialization (that is pretty much always),
-and if it is called because write tracking was enabled due to some other reason
-(currently only KVMGT), it checks the number of shadow mmu pages and if zero, bails out.
- 
-- write tracking enabled when shadow root is allocated.
- 
-This can be kept as is by using the __kvm_page_track_register_notifier as you suggested.
- 
-For KVMGT:
-- both write tracking and notifier are enabled when an vgpu mdev device is first opened.
-That 'works' only because KVMGT doesn't allow to assign more that one mdev to same VM,
-thus a per VM notifier and the write tracking for that VM are enabled at the same time
- 
- 
-Now for nested AVIC, this is what I would like to do:
- 
-- just like mmu, I prefer to register the write tracking notifier, when the VM is created.
-- just like mmu, write tracking should only be enabled when nested AVIC is actually used
-  first time, so that write tracking is not always enabled when you just boot a VM with nested avic supported,
-  since the VM might not use nested at all.
- 
-Thus I either need to use the __kvm_page_track_register_notifier too for AVIC (and thus need to export it)
-or I need to have a boolean (nested_avic_was_used_once) and register the write tracking
-notifier only when false and do it not on VM creation but on first attempt to use nested AVIC.
- 
-Do you think this is worth it? I mean there is some value of registering the notifier only when needed
-(this way it is not called for nothing) but it does complicate things a bit.
- 
-I can also stash this boolean (like 'bool registered;') into the 'struct kvm_page_track_notifier_node', 
-and thus allow the kvm_page_track_register_notifier to be called more that once - 
-then I can also get rid of __kvm_page_track_register_notifier. 
+I don't see this as a big deal, so don't mind the code not being in libperf :-)
 
-What do you think about this?
- 
-Best regards,
-	Maxim Levitsky
+Thanks,
+Ian
 
-
-> 
-> Best regards,
->         Maxim Levitsky
-
-
+> - Arnaldo
+>
+> > Thanks,
+> > Ian
+> >
+> > > @@ -484,4 +484,25 @@ void arch_perf_synthesize_sample_weight(const struct perf_sample *data, __u64 *a
+> > >  const char *arch_perf_header_entry(const char *se_header);
+> > >  int arch_support_sort_key(const char *sort_key);
+> > >
+> > > +static inline bool perf_event_header__cpumode_is_guest(u8 cpumode)
+> > > +{
+> > > +       return cpumode == PERF_RECORD_MISC_GUEST_KERNEL ||
+> > > +              cpumode == PERF_RECORD_MISC_GUEST_USER;
+> > > +}
+> > > +
+> > > +static inline bool perf_event_header__misc_is_guest(u16 misc)
+> > > +{
+> > > +       return perf_event_header__cpumode_is_guest(misc & PERF_RECORD_MISC_CPUMODE_MASK);
+> > > +}
+> > > +
+> > > +static inline bool perf_event_header__is_guest(const struct perf_event_header *header)
+> > > +{
+> > > +       return perf_event_header__misc_is_guest(header->misc);
+> > > +}
+> > > +
+> > > +static inline bool perf_event__is_guest(const union perf_event *event)
+> > > +{
+> > > +       return perf_event_header__is_guest(&event->header);
+> > > +}
+> > > +
+> > >  #endif /* __PERF_RECORD_H */
+> > > --
+> > > 2.25.1
+> > >
+>
+> --
+>
+> - Arnaldo
