@@ -2,70 +2,72 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 9F1AB57BF8A
-	for <lists+kvm@lfdr.de>; Wed, 20 Jul 2022 23:26:19 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id AABBA57BFA9
+	for <lists+kvm@lfdr.de>; Wed, 20 Jul 2022 23:34:24 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229761AbiGTV0R (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 20 Jul 2022 17:26:17 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52444 "EHLO
+        id S230520AbiGTVeT (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 20 Jul 2022 17:34:19 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57234 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229549AbiGTV0P (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 20 Jul 2022 17:26:15 -0400
-Received: from mail-pf1-x432.google.com (mail-pf1-x432.google.com [IPv6:2607:f8b0:4864:20::432])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 488B922B36
-        for <kvm@vger.kernel.org>; Wed, 20 Jul 2022 14:26:14 -0700 (PDT)
-Received: by mail-pf1-x432.google.com with SMTP id 17so7250094pfy.0
-        for <kvm@vger.kernel.org>; Wed, 20 Jul 2022 14:26:14 -0700 (PDT)
+        with ESMTP id S230473AbiGTVeQ (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 20 Jul 2022 17:34:16 -0400
+Received: from mail-pj1-x1030.google.com (mail-pj1-x1030.google.com [IPv6:2607:f8b0:4864:20::1030])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E41AF61B3B
+        for <kvm@vger.kernel.org>; Wed, 20 Jul 2022 14:34:14 -0700 (PDT)
+Received: by mail-pj1-x1030.google.com with SMTP id gq7so2751065pjb.1
+        for <kvm@vger.kernel.org>; Wed, 20 Jul 2022 14:34:14 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
         h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=HCY796BMJ2oxk4qGgRmjBRC8Xu8JftRftOsx1tYR+B0=;
-        b=XDvCGfbA1C8gkVaIGW/X8rxKS3oy3mMldq/gc3wMQyZyXK+URjRMofgHodqHsrdr9C
-         tCe/niRyj2oX4geF4nHQjazu2BPPuOU1PcFfbRLJ2410NGhDchKOX1CYPKh/QeuIl7CO
-         vZcke62x4v9g1UDW8BOmQz6Zu/uq2MorjqLfU85HP4NBiVnNbA4LWM3k2xht1HTaXzcr
-         AEkOkwqz6i7qqLSPcDF5Z6V4mPIR2k8my4SuxHFRjof88vOan0rS25HMVbwM+exgs5E9
-         J0Dl5fN7n38nfxUHgSLwA/ZWenlHg+6+PFgs30H48MLSskG66egw7dR+CQ6hF9D2adyh
-         RDCQ==
+         :content-disposition:content-transfer-encoding:in-reply-to;
+        bh=1zPvOAfNQSKYRymm+iaox5ob/omLNCeEyMBAD2pYWSM=;
+        b=pnrNrarI97nFqDUBSLy8dacdW2PdHQo4VN3LHAYfHJRkO7veBaIQV1oXbkiQDgU5L8
+         jOlrBSmzg2EiIBTXZEGliLbzlMeaVv+5wvj3bX+uJ84DvL9NZrC1fHXfxnzKgTHWJ/zD
+         DQuIIiEpiSemJ9USa5UEKmZzi65rop/ZduyQf2tv7UDSgwe3HbwkWhLo0nLI4F6DUk2Q
+         csQdHcG8Sr5ga7DcgoSOmD3ln/lVAY2prGrH9ciqBlHbYuyBKIgDkyfblKR7Loj4ZKhY
+         0G0eTkhkmPyl7PmuwQm9u0pjp7sxd7RqTsU73kqty2uV269PiWCygQCE3mzvgTQFfF3x
+         LMHw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=HCY796BMJ2oxk4qGgRmjBRC8Xu8JftRftOsx1tYR+B0=;
-        b=sHxlrK2CRKpCapzKhCOHuBhj4jqzc5MIyAg13dHpz9tpzNS+5eW8d3GMWlT2iXJSq/
-         RkrVJ1g4DTN6iX1ZDEbF1mExRb3gdnuYmVu6yUaHWdQJCVc6+QTUG8b6YXisjJ/XhkiG
-         TNEGxUV3C+kRqxm9rZmuTzV9aMzQGaVcOStnsrMXlCZU0YHXl76ZEczQ9FYWtvtqAMGB
-         hyShxeSqHZNiv1yteviZeggqynuWbZnppfpAqMK5JMpFRx2FE1/AwyjpR+M4Rf5VFSfD
-         SA0PnWbY5Zg3QDTI8SGVukGCFArQFE2H4+rR5SK+6IHSSyWL2L/1Ej5qTS7QZxIkhsv/
-         XA4g==
-X-Gm-Message-State: AJIora/9a/XvG/0aUc+LHVqNbN8lIo3V7nV4dP4H0yrJTtI3Xdzhg/Rx
-        hS2EcPUsRvaMpqr/0ZUEW26MYg==
-X-Google-Smtp-Source: AGRyM1u2Toix/4MkWUmJIpxn45NOXxn1ehVFBWt9jErGZXNwxhmyu+pJbUt1b9EMJDEd/3TGpw9dwQ==
-X-Received: by 2002:a05:6a02:30d:b0:412:9de2:eb48 with SMTP id bn13-20020a056a02030d00b004129de2eb48mr34567838pgb.47.1658352373632;
-        Wed, 20 Jul 2022 14:26:13 -0700 (PDT)
-Received: from google.com (150.12.83.34.bc.googleusercontent.com. [34.83.12.150])
-        by smtp.gmail.com with ESMTPSA id x15-20020a170902ec8f00b0016b8746132esm30750plg.105.2022.07.20.14.26.12
+         :mime-version:content-disposition:content-transfer-encoding
+         :in-reply-to;
+        bh=1zPvOAfNQSKYRymm+iaox5ob/omLNCeEyMBAD2pYWSM=;
+        b=Gpsx6oOd3wCIoIIeMCZLrI8pOMQPVPBh4Q/hNpal6h69l7lECJ7eDC6M9yzlp3gwem
+         drLEA9GcKZBJ/BTRcBVZR7hn/DfvC5p6noVi/mL+Ivg8oOsyhpJl8Hy7kbn7O+4ffu9c
+         TQQ4M/2e1Ej0+iHGFBU/WpFz0+4XEg6cI2ERUHgJxWBejoL803KhNfq6TX8sjopeqwB+
+         7uFYE2aZlyEacLYiAcOkyYAOCIENOTkqOssSpQpAqXdE38HnR9+ga3saNUVRNesDbUek
+         iJMpqJkDuzBaV5yMJ2yX9I+WRyJf2hw3L/OYk4YrSHnGzL8zGQmRNj2UpU6G+//DMgRt
+         xpKw==
+X-Gm-Message-State: AJIora+oCf6fIOVBBPARMPz76O5gHu0zdiBd3GzV30vdS/FIgmDLPUyd
+        s7XUt8pzZqZll+I4XxZSNPlv8Q==
+X-Google-Smtp-Source: AGRyM1vAdYfw9RIxDHrYdR6qtPxUT9OHkYPEAy5IdYgfrX7zq3OBl0MJqfUaJ/gA3DXc5mEUZoUFfg==
+X-Received: by 2002:a17:902:9692:b0:16c:4f81:b7 with SMTP id n18-20020a170902969200b0016c4f8100b7mr40889241plp.92.1658352854058;
+        Wed, 20 Jul 2022 14:34:14 -0700 (PDT)
+Received: from google.com (123.65.230.35.bc.googleusercontent.com. [35.230.65.123])
+        by smtp.gmail.com with ESMTPSA id r18-20020a170902be1200b0016784c93f23sm24799pls.197.2022.07.20.14.34.13
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 20 Jul 2022 14:26:12 -0700 (PDT)
-Date:   Wed, 20 Jul 2022 14:26:09 -0700
-From:   Ricardo Koller <ricarkol@google.com>
-To:     Marc Zyngier <maz@kernel.org>
-Cc:     kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu,
-        drjones@redhat.com, alexandru.elisei@arm.com,
-        eric.auger@redhat.com, oliver.upton@linux.dev, reijiw@google.com
-Subject: Re: [kvm-unit-tests PATCH 3/3] arm: pmu: Remove checks for !overflow
- in chained counters tests
-Message-ID: <Ythy8XXN2rFytXdr@google.com>
-References: <20220718154910.3923412-1-ricarkol@google.com>
- <20220718154910.3923412-4-ricarkol@google.com>
- <87edyhz68i.wl-maz@kernel.org>
- <Yte/YXWYSikyQcqh@google.com>
- <875yjsyv67.wl-maz@kernel.org>
- <Ythw1UT1wFHbY/jN@google.com>
+        Wed, 20 Jul 2022 14:34:13 -0700 (PDT)
+Date:   Wed, 20 Jul 2022 21:34:10 +0000
+From:   Sean Christopherson <seanjc@google.com>
+To:     "Maciej S. Szmigiero" <mail@maciej.szmigiero.name>
+Cc:     Maxim Levitsky <mlevitsk@redhat.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>
+Subject: Re: [PATCH] KVM: nSVM: Pull CS.Base from actual VMCB12 for soft
+ int/ex re-injection
+Message-ID: <Yth00gK0DWjukLgq@google.com>
+References: <4caa0f67589ae3c22c311ee0e6139496902f2edc.1658159083.git.maciej.szmigiero@oracle.com>
+ <7458497a8694ba0fbabee28eabf557e6e4406fbe.camel@redhat.com>
+ <d311c92a-d753-3584-d662-7d82b2fc1e50@maciej.szmigiero.name>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=iso-8859-1
 Content-Disposition: inline
-In-Reply-To: <Ythw1UT1wFHbY/jN@google.com>
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <d311c92a-d753-3584-d662-7d82b2fc1e50@maciej.szmigiero.name>
 X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
         ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
@@ -77,70 +79,42 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Jul 20, 2022 at 02:17:09PM -0700, Ricardo Koller wrote:
-> On Wed, Jul 20, 2022 at 10:45:20AM +0100, Marc Zyngier wrote:
-> > On Wed, 20 Jul 2022 09:40:01 +0100,
-> > Ricardo Koller <ricarkol@google.com> wrote:
+On Wed, Jul 20, 2022, Maciej S. Szmigiero wrote:
+> On 20.07.2022 10:43, Maxim Levitsky wrote:
+> > On Mon, 2022-07-18 at 17:47 +0200, Maciej S. Szmigiero wrote:
+> > > Fixes: 6ef88d6e36c2 ("KVM: SVM: Re-inject INT3/INTO instead of retrying the instruction")
+> > > Signed-off-by: Maciej S. Szmigiero <maciej.szmigiero@oracle.com>
+> > > ---
+> > >   arch/x86/kvm/svm/nested.c | 9 +++++----
+> > >   1 file changed, 5 insertions(+), 4 deletions(-)
 > > > 
-> > > On Tue, Jul 19, 2022 at 12:34:05PM +0100, Marc Zyngier wrote:
-> > > > On Mon, 18 Jul 2022 16:49:10 +0100,
-> > > > Ricardo Koller <ricarkol@google.com> wrote:
-> > > > > 
-> > > > > A chained event overflowing on the low counter can set the overflow flag
-> > > > > in PMOVS.  KVM does not set it, but real HW and the fast-model seem to.
-> > > > > Moreover, the AArch64.IncrementEventCounter() pseudocode in the ARM ARM
-> > > > > (DDI 0487H.a, J1.1.1 "aarch64/debug") also sets the PMOVS bit on
-> > > > > overflow.
-> > > > 
-> > > > Isn't this indicative of a bug in the KVM emulation? To be honest, the
-> > > > pseudocode looks odd. It says:
-> > > > 
-> > > > <quote>
-> > > > 	if old_value<64:ovflw> != new_value<64:ovflw> then
-> > > > 	    PMOVSSET_EL0<idx> = '1';
-> > > > 	    PMOVSCLR_EL0<idx> = '1';
-> > > > </quote>
-> > > > 
-> > > > which I find remarkably ambiguous. Is this setting and clearing the
-> > > > overflow bit? Or setting it in the single register that backs the two
-> > > > accessors in whatever way it can?
-> > > > 
-> > > > If it is the second interpretation that is correct, then KVM
-> > > > definitely needs fixing
-> > > 
-> > > I think it's the second, as those two "= '1'" apply to the non-chained
-> > > counters case as well, which should definitely set the bit in PMOVSSET.
-> > > 
-> > > > (though this looks pretty involved for
-> > > > anything that isn't a SWINC event).
-> > > 
-> > > Ah, I see, there's a pretty convenient kvm_pmu_software_increment() for
-> > > SWINC, but a non-SWINC event is implemented as a single 64-bit perf
-> > > event.
+> > > diff --git a/arch/x86/kvm/svm/nested.c b/arch/x86/kvm/svm/nested.c
+> > > index adf4120b05d90..23252ab821941 100644
+> > > --- a/arch/x86/kvm/svm/nested.c
+> > > +++ b/arch/x86/kvm/svm/nested.c
+> > > @@ -639,7 +639,8 @@ static bool is_evtinj_nmi(u32 evtinj)
+> > >   }
+> > >   static void nested_vmcb02_prepare_control(struct vcpu_svm *svm,
+> > > -                                         unsigned long vmcb12_rip)
+> > > +                                         unsigned long vmcb12_rip,
+> > > +                                         unsigned long vmcb12_csbase)
 > > 
-> > Indeed. Which means we need to de-optimise chained counters to being
-> > 32bit events, which is pretty annoying (for rapidly firing events, the
-> > interrupt rate is going to be significantly higher).
+> > Honestly I don't like that nested_vmcb02_prepare_control starts to grow its parameter list,
+> > because it kind of defeats the purpose of vmcb12 cache we added back then.
 > > 
-> > I guess we should also investigate the support for FEAT_PMUv3p5 and
-> > native 64bit counters. Someone is bound to build it at some point.
+> > I think that it is better to add csbase/rip to vmcb_save_area_cached,
+> > but I am not 100% sure. What do you think?
 > 
-> The kernel perf event is implementing 64-bit counters using chained
-> counters. I assume this is already firing an interrupt for the low
-> counter overflow; we might need to just hook into that, investigating...
+> This function has only 3 parameters now, so they fit well into registers
+> without taking any extra memory (even assuming it won't get inlined).
 > 
+> If in the future more parameters need to be added to this function
+> (which may or may not happen) then they all can be moved to, for example,
+> vmcb_ctrl_area_cached.
 
-Additionally, given that the kernel is already emulating 64-bit
-counters, can KVM just expose FEAT_PMUv3p5? Assuming all the other new
-features can be emulated.
+I don't think Maxim is concerned about the size, rather that we have a dedicated
+struct for snapshotting select save state and aren't using it.
 
-Thanks,
-Ricardo
-
-> > 
-> > Thanks,
-> > 
-> > 	M.
-> > 
-> > -- 
-> > Without deviation from the norm, progress is not possible.
+IIRC, I deliberately avoided using the "cache" because the main/original purpose
+of the cache is to avoid TOCTOU issues.  And because RIP and CS.base aren't checked,
+there's no need to throw them in the cache.
