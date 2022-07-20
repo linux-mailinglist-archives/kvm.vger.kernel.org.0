@@ -2,167 +2,102 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 9043357B3DE
-	for <lists+kvm@lfdr.de>; Wed, 20 Jul 2022 11:31:14 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id AC2E457B3E9
+	for <lists+kvm@lfdr.de>; Wed, 20 Jul 2022 11:31:55 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231202AbiGTJaa (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 20 Jul 2022 05:30:30 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59528 "EHLO
+        id S236955AbiGTJbd (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 20 Jul 2022 05:31:33 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:32866 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S236865AbiGTJa0 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 20 Jul 2022 05:30:26 -0400
+        with ESMTP id S232734AbiGTJbZ (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 20 Jul 2022 05:31:25 -0400
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 32D9A12D0F
-        for <kvm@vger.kernel.org>; Wed, 20 Jul 2022 02:30:24 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 4D08F5A2CD
+        for <kvm@vger.kernel.org>; Wed, 20 Jul 2022 02:31:24 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1658309423;
+        s=mimecast20190719; t=1658309483;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=GDJ3pDuliBBFCjPRQRCyBqUtEOUMI1zRI5vOv79h/yg=;
-        b=fpRFxwO6qrnnwzv+0lZ8VZhSlN/hNAMHPO/gEmiFUFJWwZOGPhwYVWbbJmtJ2RpRlSB0j6
-        QdUJW/5rHTVkBXb60MoheyGtyfYcJy43pAuChYlhvCVFqDEYZb50yl4gaOLeiuZTVBbdzS
-        Qdg7mrG8TfXvKwdnB8GQqsj87zUa0Z0=
-Received: from mail-qt1-f199.google.com (mail-qt1-f199.google.com
- [209.85.160.199]) by relay.mimecast.com with ESMTP with STARTTLS
+        bh=44BQ4IyJ/Aqy9TbnKir1Ev2RlYMwItwK5RDWRIabjHU=;
+        b=Lj5JZJJPTzesnNIVc0mmcstB0PTGXmMM9dSlX+ds8xWPpN+EuDYkqkeSoS2XCBRMdxRufa
+        MLvc9HGiFuC1QX+cl/IYGl3ohRUB7jHy0yGw2DnwprIjTfojiEG5p69QlI1NJ3NtLvjFMx
+        HXIKomTaz+jdFU0BPSaoTnEwWRAIl28=
+Received: from mail-qv1-f72.google.com (mail-qv1-f72.google.com
+ [209.85.219.72]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-630-SJUmewQcOUqa9ku5jlYQ4Q-1; Wed, 20 Jul 2022 05:30:13 -0400
-X-MC-Unique: SJUmewQcOUqa9ku5jlYQ4Q-1
-Received: by mail-qt1-f199.google.com with SMTP id u12-20020a05622a17cc00b0031ede432916so8949567qtk.1
-        for <kvm@vger.kernel.org>; Wed, 20 Jul 2022 02:30:13 -0700 (PDT)
+ us-mta-166-EgiD7QujOaO0L_2n90omTQ-1; Wed, 20 Jul 2022 05:31:22 -0400
+X-MC-Unique: EgiD7QujOaO0L_2n90omTQ-1
+Received: by mail-qv1-f72.google.com with SMTP id ns1-20020a056214380100b00474050cf13aso609267qvb.18
+        for <kvm@vger.kernel.org>; Wed, 20 Jul 2022 02:31:21 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:content-transfer-encoding
-         :in-reply-to;
-        bh=GDJ3pDuliBBFCjPRQRCyBqUtEOUMI1zRI5vOv79h/yg=;
-        b=oNVQJKwI3rq3+gk9WqDFzmcCk62rVRAPvfP2Xh56UXqKSnJY9jT41TQuwsYbCA2Ruo
-         Y5jHgy0Or0yLrFRjwTo8f1kX+e9JPPK+VZpfaS3WEsmAgYz4qg9Tj3oihIfRs9LdYh4X
-         IaP+eYmdfhNlH0uf4EgGVZGtMIhEFZ+9/4y3DG9dbWZgOdKXKEw2XRno3cOqn0kGLVSP
-         chTw/c6oUiEPSCk0mlSwWn2OrklF5Wc6PCCCH3FPo+dVCGTnOppwPmXfLcMUPIAUlxx1
-         +aVdCaPnQDdDCdMykN7G4u7d1QdRsBtT1VIO9A3emfvbhXGgJD6YKp3FVlBbGKc6vjkO
-         YOmA==
-X-Gm-Message-State: AJIora9vTaErmQFUBjN326ejxo7p5u3lhi6hY8X3pSReBK7/jI9ogDtF
-        O8YQkgEXRhefUyACP0E6V+IKFSfALJzQ/nPeKRW4U/ei2tIqBgORNoqE+jc13RSLyb/ola7OW2l
-        IlluG/ecJDZds
-X-Received: by 2002:ac8:59c7:0:b0:31e:ede9:971b with SMTP id f7-20020ac859c7000000b0031eede9971bmr10707670qtf.208.1658309413092;
-        Wed, 20 Jul 2022 02:30:13 -0700 (PDT)
-X-Google-Smtp-Source: AGRyM1s6mJMvfgOsm/KeVUVbnelP8FW2qMJbR3hxdq7pZeKI4iupDApN2I1fzLeoIKhfg5s7AfAEcg==
-X-Received: by 2002:ac8:59c7:0:b0:31e:ede9:971b with SMTP id f7-20020ac859c7000000b0031eede9971bmr10707652qtf.208.1658309412863;
-        Wed, 20 Jul 2022 02:30:12 -0700 (PDT)
-Received: from sgarzare-redhat (host-79-46-200-178.retail.telecomitalia.it. [79.46.200.178])
-        by smtp.gmail.com with ESMTPSA id u12-20020a05620a0c4c00b006a6ebde4799sm17257649qki.90.2022.07.20.02.30.10
+        h=x-gm-message-state:message-id:subject:from:to:cc:date:in-reply-to
+         :references:user-agent:mime-version:content-transfer-encoding;
+        bh=44BQ4IyJ/Aqy9TbnKir1Ev2RlYMwItwK5RDWRIabjHU=;
+        b=2i6wVFXNwoGnS5ihSPatRS7zS5DLNn/u/5dEsVChSvJg337BosZVS/tkywEhbfdoUY
+         1IxbVijx8QSwsx3N5QjyJGd8BEwXpxRptXIfOsVDUsjlUtKdGFOUndBU+rB/kQj1AC5A
+         eMimjG46nHFR//o/pvMVCOMBMv7vV/A8A5a7HmQtY3aGIQ3pbC1SyQy5Iim25nAQ9FW2
+         ktwyf22HJ+bpRE9ep+7OaNH8T1clL2ZnujaJ41p/J569vsNBTERXv0e0s0Fdy8ozDvkr
+         c8+Xa2svAUYZ8Rm8f1xlidnpTwsEVVxxH00ib6EtCsU9eJmxjOPiHIFvh7xQqjyZyYF5
+         2k8A==
+X-Gm-Message-State: AJIora/8WIOSgeEKBQyGs4SgrFk5Kpjsm1eH2D1MTt10RXrK6r7ana/S
+        menVXNjiRQeCV8HjHxUFdmns0sjqB+FoeTfR/c9ShpxR3MYk6Q09sRITzGC5+pQ57mvs+/07so4
+        oJquJTnOuIvah
+X-Received: by 2002:a05:6214:27ef:b0:473:2465:c2 with SMTP id jt15-20020a05621427ef00b00473246500c2mr28478303qvb.37.1658309480788;
+        Wed, 20 Jul 2022 02:31:20 -0700 (PDT)
+X-Google-Smtp-Source: AGRyM1v+B8X8QMtX2b/xtGFp+p1pM8hxjKbQxqsLoXR3e6M832KQzwNkM1/GT7Kxw2CYXadCDt72CA==
+X-Received: by 2002:a05:6214:27ef:b0:473:2465:c2 with SMTP id jt15-20020a05621427ef00b00473246500c2mr28478298qvb.37.1658309480604;
+        Wed, 20 Jul 2022 02:31:20 -0700 (PDT)
+Received: from [10.35.4.238] (bzq-82-81-161-50.red.bezeqint.net. [82.81.161.50])
+        by smtp.gmail.com with ESMTPSA id bl13-20020a05620a1a8d00b006b5f8f32a8fsm4887461qkb.114.2022.07.20.02.31.18
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 20 Jul 2022 02:30:12 -0700 (PDT)
-Date:   Wed, 20 Jul 2022 11:30:05 +0200
-From:   Stefano Garzarella <sgarzare@redhat.com>
-To:     Arseniy Krasnov <AVKrasnov@sberdevices.ru>
-Cc:     "David S. Miller" <davem@davemloft.net>,
-        Jakub Kicinski <kuba@kernel.org>,
-        Paolo Abeni <pabeni@redhat.com>,
-        Stefan Hajnoczi <stefanha@redhat.com>,
-        "Michael S. Tsirkin" <mst@redhat.com>,
-        Krasnov Arseniy <oxffffaa@gmail.com>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
-        "virtualization@lists.linux-foundation.org" 
-        <virtualization@lists.linux-foundation.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        kernel <kernel@sberdevices.ru>
-Subject: Re: [RFC PATCH v1 0/3] virtio/vsock: use SO_RCVLOWAT to set
- POLLIN/POLLRDNORM
-Message-ID: <20220720093005.2unej4jnnvrn55f2@sgarzare-redhat>
-References: <c8de13b1-cbd8-e3e0-5728-f3c3648c69f7@sberdevices.ru>
- <20220719125856.a6bfwrvy66gxxzqe@sgarzare-redhat>
- <ac05e1ee-23b3-75e0-f9a4-1056a68934d8@sberdevices.ru>
+        Wed, 20 Jul 2022 02:31:19 -0700 (PDT)
+Message-ID: <63508f39e42738d145b3534e6768a9a09c9ca37e.camel@redhat.com>
+Subject: Re: [PATCH 0/2] KVM: x86: never write to memory from
+ kvm_vcpu_check_block
+From:   Maxim Levitsky <mlevitsk@redhat.com>
+To:     Paolo Bonzini <pbonzini@redhat.com>, linux-kernel@vger.kernel.org,
+        kvm@vger.kernel.org
+Cc:     seanjc@google.com
+Date:   Wed, 20 Jul 2022 12:31:17 +0300
+In-Reply-To: <20220427173758.517087-1-pbonzini@redhat.com>
+References: <20220427173758.517087-1-pbonzini@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
+User-Agent: Evolution 3.40.4 (3.40.4-5.fc34) 
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1; format=flowed
-Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <ac05e1ee-23b3-75e0-f9a4-1056a68934d8@sberdevices.ru>
 X-Spam-Status: No, score=-2.8 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        SPF_HELO_NONE,SPF_NONE autolearn=unavailable autolearn_force=no
-        version=3.4.6
+        SPF_HELO_NONE,SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Jul 20, 2022 at 06:07:47AM +0000, Arseniy Krasnov wrote:
->On 19.07.2022 15:58, Stefano Garzarella wrote:
->> On Mon, Jul 18, 2022 at 08:12:52AM +0000, Arseniy Krasnov wrote:
->>> Hello,
->>>
->>> during my experiments with zerocopy receive, i found, that in some
->>> cases, poll() implementation violates POSIX: when socket has non-
->>> default SO_RCVLOWAT(e.g. not 1), poll() will always set POLLIN and
->>> POLLRDNORM bits in 'revents' even number of bytes available to read
->>> on socket is smaller than SO_RCVLOWAT value. In this case,user sees
->>> POLLIN flag and then tries to read data(for example using  'read()'
->>> call), but read call will be blocked, because  SO_RCVLOWAT logic is
->>> supported in dequeue loop in af_vsock.c. But the same time,  POSIX
->>> requires that:
->>>
->>> "POLLIN     Data other than high-priority data may be read without
->>>            blocking.
->>> POLLRDNORM Normal data may be read without blocking."
->>>
->>> See https://www.open-std.org/jtc1/sc22/open/n4217.pdf, page 293.
->>>
->>> So, we have, that poll() syscall returns POLLIN, but read call will
->>> be blocked.
->>>
->>> Also in man page socket(7) i found that:
->>>
->>> "Since Linux 2.6.28, select(2), poll(2), and epoll(7) indicate a
->>> socket as readable only if at least SO_RCVLOWAT bytes are available."
->>>
->>> I checked TCP callback for poll()(net/ipv4/tcp.c, tcp_poll()), it
->>> uses SO_RCVLOWAT value to set POLLIN bit, also i've tested TCP with
->>> this case for TCP socket, it works as POSIX required.
->>
->> I tried to look at the code and it seems that only TCP complies with it or am I wrong?
->Yes, i checked AF_UNIX, it also don't care about that. It calls skb_queue_empty() that of
->course ignores SO_RCVLOWAT.
->>
->>>
->>> I've added some fixes to af_vsock.c and virtio_transport_common.c,
->>> test is also implemented.
->>>
->>> What do You think guys?
->>
->> Nice, thanks for fixing this and for the test!
->>
->> I left some comments, but I think the series is fine if we will support it in all transports.
->Ack
->>
->> I'd just like to understand if it's just TCP complying with it or I'm missing some check included in the socket layer that we could reuse.
->Seems sock_poll() which is socket layer entry point for poll() doesn't contain any such checks
->>
->> @David, @Jakub, @Paolo, any advice?
->>
->> Thanks,
->> Stefano
->>
->
->PS: moreover, i found one more interesting thing with TCP and poll: TCP receive logic wakes up poll waiter
->only when number of available bytes > SO_RCVLOWAT. E.g. it prevents "spurious" wake ups, when poll will be
->woken up because new data arrived, but POLLIN to allow user dequeue this data won't be set(as amount of data
->is too small).
->See tcp_data_ready() in net/ipv4/tcp_input.c
+On Wed, 2022-04-27 at 13:37 -0400, Paolo Bonzini wrote:
+> Maxim reported the following backtrace:
+> 
+> [ 1355.807187]Â  kvm_vcpu_map+0x159/0x190 [kvm]
+> [ 1355.807628]Â  nested_svm_vmexit+0x4c/0x7f0 [kvm_amd]
+> [ 1355.808036]Â  ? kvm_vcpu_block+0x54/0xa0 [kvm]
+> [ 1355.808450]Â  svm_check_nested_events+0x97/0x390 [kvm_amd]
+> [ 1355.808920]Â  kvm_check_nested_events+0x1c/0x40 [kvm] 
+> [ 1355.809396]Â  kvm_arch_vcpu_runnable+0x4e/0x190 [kvm]
+> [ 1355.809892]Â  kvm_vcpu_check_block+0x4f/0x100 [kvm]
+> [ 1355.811259]Â  kvm_vcpu_block+0x6b/0xa0 [kvm] 
+> 
+> due to kmap being called in non-sleepable (!TASK_RUNNING) context.
+> Fix it by extending kvm_x86_ops->nested_ops.hv_timer_pending and
+> getting rid of one annoying instance of kvm_check_nested_events.
+> 
+> Paolo
+> 
 
-Do you mean that we should call sk->sk_data_ready(sk) checking 
-SO_RCVLOWAT?
+Any update on this patch series? Pinging so it is not forgotten.
 
-It seems fine, maybe we can add vsock_data_ready() in af_vsock.c that 
-transports should call instead of calling sk->sk_data_ready(sk) 
-directly.
-
-Then we can something similar to tcp_data_ready().
-
-Thanks,
-Stefano
+Best regards,
+	Maxim Levitsky
 
