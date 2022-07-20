@@ -2,48 +2,82 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 7EFBE57BFE4
-	for <lists+kvm@lfdr.de>; Thu, 21 Jul 2022 00:06:04 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id E2D1A57BFFB
+	for <lists+kvm@lfdr.de>; Thu, 21 Jul 2022 00:19:54 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230008AbiGTWGC (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 20 Jul 2022 18:06:02 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46976 "EHLO
+        id S230316AbiGTWTx (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 20 Jul 2022 18:19:53 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53970 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229496AbiGTWGB (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 20 Jul 2022 18:06:01 -0400
-Received: from gandalf.ozlabs.org (gandalf.ozlabs.org [150.107.74.76])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9E4963AE42;
-        Wed, 20 Jul 2022 15:05:58 -0700 (PDT)
-Received: from authenticated.ozlabs.org (localhost [127.0.0.1])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange ECDHE (P-256) server-signature RSA-PSS (4096 bits) server-digest SHA256)
-        (No client certificate requested)
-        by mail.ozlabs.org (Postfix) with ESMTPSA id 4Lp8sc4fkDz4xCy;
-        Thu, 21 Jul 2022 08:05:56 +1000 (AEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=canb.auug.org.au;
-        s=201702; t=1658354756;
-        bh=vPttMMWc9zt/4UolFz2K4BGs30yfO2taUQuvNVWruNA=;
-        h=Date:From:To:Cc:Subject:From;
-        b=LMktGf0Pq4PSTwSj8k/uLW2YsSjjfPPqe7rDn6ysJie9ZNqvp6G4MrCsIIMkFy6XK
-         yrl+7PEpi5WuPOrbuMcFjaiFMxaXPma5SIT4RCpks2RzLz7LraqKxzLyuPSfvyHp1N
-         ry9hDrqI2Gj2PizEilgZl+f8gFo04bWy/qTlkk+kUoOXZED7HhQKIKEKNn35zy35Bf
-         xXQYLdUGR4WY7914iH836/3CqS3UXwXFnEWpvc3q0QqNj4Wdp4+VDzIVB3vfHA3SLv
-         mCQIHGhMv7UbSh39V6f+zS7Gjp/4klKyfCoW1sdkqs8s59X6Gn3He7MRjMdVsdVHx3
-         CWCAJRjHMxHCA==
-Date:   Thu, 21 Jul 2022 08:05:33 +1000
-From:   Stephen Rothwell <sfr@canb.auug.org.au>
-To:     Paolo Bonzini <pbonzini@redhat.com>
-Cc:     KVM <kvm@vger.kernel.org>, Colton Lewis <coltonlewis@google.com>,
-        Sean Christopherson <seanjc@google.com>,
-        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-        Linux Next Mailing List <linux-next@vger.kernel.org>
-Subject: linux-next: Fixes tag needs some work in the kvm tree
-Message-ID: <20220721080533.7d71118f@canb.auug.org.au>
+        with ESMTP id S229595AbiGTWTw (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 20 Jul 2022 18:19:52 -0400
+Received: from mail-pf1-x42a.google.com (mail-pf1-x42a.google.com [IPv6:2607:f8b0:4864:20::42a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9830251411
+        for <kvm@vger.kernel.org>; Wed, 20 Jul 2022 15:19:51 -0700 (PDT)
+Received: by mail-pf1-x42a.google.com with SMTP id 70so31767pfx.1
+        for <kvm@vger.kernel.org>; Wed, 20 Jul 2022 15:19:51 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=1ZxyLZ0QxKzQzDRLPibOfpzfI1ZlC+suEMS1udnprk8=;
+        b=BY/258fxiwyb/hCVHWHpPTg2PYUCxJ45zmq8SCD/Y3AhUT46OCJHN/mT+DkG6m01tj
+         34tjvpxtQjJJp/JFHKQY8uM+YMOKSAgtweSqgR1sT4lHyz509usVCuGJYF0Na0765S4d
+         BgZl5NIzuMzo9j0NoUtH8rtyelIa+Ep/60SGw1GjT7p9JV+ktxNRjuKhGGGv206krOXd
+         SvrsO817DqmrqicsJwekKrCioa11PfTSt9GsDvufT2kgDyC/RVmOoRom+p8DGA/hxa3X
+         r3IbOaL3JvDnauAPBfOKpDFHWclcNl6sDgJRUPrRPw5kfWo2SQnZ+AppGwSB6SEmFVlO
+         FpXg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=1ZxyLZ0QxKzQzDRLPibOfpzfI1ZlC+suEMS1udnprk8=;
+        b=TfYgMvXszD9Af7+kdKu5yTZVCQ0Nc0tR1shq8No8apfFVq2urHwE70LeSAlx/dHFA/
+         14muSZBpx4pXUnnVe2Pfe9L4p0FCkzts+7VPb1xzh3R+SGZZViCXw0TmPlmgxgTcsQrP
+         /oZjFl6F7XYzbgZBiQ25bb7JhgGSqehla+S6cGo/jLd/VyXoeQ34f0hbWQXnyhWgNNX1
+         MbXgZPtfEv2t2I34rncaeuRwOXaTaqQmIQ3V+UKJVjZrguyVbsKKeZmeAMntUes0Y6lO
+         QWtkSzrOxvG1ZM0HpfBoEjC9zfMRqwTJrQLHHrj+V9ozAx2wYhWw/rRAHMmy6osfSAu8
+         k9bw==
+X-Gm-Message-State: AJIora+rvuwEiBrXvjuZmTTGPOSnYVv+cZ6AOm9U0Opky2XutHovhrCi
+        RFbEVefCiO9j51aOzAQELflRXg==
+X-Google-Smtp-Source: AGRyM1sQTtoUHcxxTGn5INxwcSsDTwXdrs+zrCZ2Hxmv+xffsTeoooZDt9v2hmn+vUWnpM4KG/y4hg==
+X-Received: by 2002:a63:1848:0:b0:416:1821:aa0b with SMTP id 8-20020a631848000000b004161821aa0bmr35801786pgy.394.1658355590980;
+        Wed, 20 Jul 2022 15:19:50 -0700 (PDT)
+Received: from google.com (123.65.230.35.bc.googleusercontent.com. [35.230.65.123])
+        by smtp.gmail.com with ESMTPSA id z28-20020aa7949c000000b0052516db7123sm141228pfk.35.2022.07.20.15.19.50
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 20 Jul 2022 15:19:50 -0700 (PDT)
+Date:   Wed, 20 Jul 2022 22:19:46 +0000
+From:   Sean Christopherson <seanjc@google.com>
+To:     Vishal Annapurve <vannapurve@google.com>
+Cc:     x86@kernel.org, kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+        linux-kselftest@vger.kernel.org, pbonzini@redhat.com,
+        vkuznets@redhat.com, wanpengli@tencent.com, jmattson@google.com,
+        joro@8bytes.org, tglx@linutronix.de, mingo@redhat.com,
+        bp@alien8.de, dave.hansen@linux.intel.com, hpa@zytor.com,
+        shauh@kernel.org, yang.zhong@intel.com, drjones@redhat.com,
+        ricarkol@google.com, aaronlewis@google.com, wei.w.wang@intel.com,
+        kirill.shutemov@linux.intel.com, corbet@lwn.net, hughd@google.com,
+        jlayton@kernel.org, bfields@fieldses.org,
+        akpm@linux-foundation.org, chao.p.peng@linux.intel.com,
+        yu.c.zhang@linux.intel.com, jun.nakajima@intel.com,
+        dave.hansen@intel.com, michael.roth@amd.com, qperret@google.com,
+        steven.price@arm.com, ak@linux.intel.com, david@redhat.com,
+        luto@kernel.org, vbabka@suse.cz, marcorr@google.com,
+        erdemaktas@google.com, pgonda@google.com, nikunj@amd.com,
+        diviness@google.com
+Subject: Re: [RFC V2 PATCH 0/8] selftests: KVM: selftests for fd-based
+ approach of supporting private memory
+Message-ID: <Yth/gpebtWkTu4bC@google.com>
+References: <20220511000811.384766-1-vannapurve@google.com>
 MIME-Version: 1.0
-Content-Type: multipart/signed; boundary="Sig_/0n3Xc2=LMdbu=kEa=+SsFNA";
- protocol="application/pgp-signature"; micalg=pgp-sha256
-X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,SPF_HELO_PASS,SPF_PASS autolearn=ham
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20220511000811.384766-1-vannapurve@google.com>
+X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
+        USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=ham
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -51,50 +85,39 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
---Sig_/0n3Xc2=LMdbu=kEa=+SsFNA
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: quoted-printable
+On Wed, May 11, 2022, Vishal Annapurve wrote:
+>  tools/testing/selftests/kvm/priv_memfd_test.c | 1359 +++++++++++++++++
 
-Hi all,
+Please don't create a megatest.  We have megatests for nVMX and nSVM in KVM-Unit-Test
+and IMO they are a mistake.  E.g. to run a single test instead of the entire suite,
+the KUT tests provide a funky wildcard/filter syntax.  But the names of the tests
+aren't discoverable, so inevitably I have to look at the source code to figure out
+the exact name of the test I want to run.  And don't get me started on sub-tests
+within sub-tests...
 
-In commit
+AFAICT, what you've proposed here doesn't provide any such filter mechanism.  And
+I would rather we NOT start adding those to selftests, because we'd effectively be
+reinventing the wheel _and_ dealing with strings in C is a pain.  Writing a script
+to find and run all tests is trivial, e.g. grep the .gitignore to find tests for
+the target arch.  Or when the system under test is different than the build system,
+copy the binaries to a dedicated directory and run every binary in that directory.
 
-  594a1c271c15 ("KVM: selftests: Fix filename reporting in guest asserts")
+Discovering and running a single test is similarly trivial.  For KUT, it's less
+trivial because running a test involves invoking a VMM command line, and some of
+the tests need specific command line parameters.  But for selftests, except for the
+NX huge page test, they're all standalone and don't need additional setup.
 
-Fixes tag
+And unlike KUT's nVMX and nSVM tests, which involve running hundreds of little
+sub-tests with only minor differences in setup, these tests are largely independent,
+i.e. you're not really getting much code reuse.
 
-  Fixes: 4e18bccc2e5544f0be28fc1c4e6be47a469d6c60
+And if you split the tests up, then all of the inter-test namespacing goes away,
+e.g. there is zero chance I will ever remember what "PSPAHCT" stands for.
 
-has these problem(s):
++#define PSPAHCT_GUEST_STARTED                          0ULL
++#define PSPAHCT_GUEST_PRIVATE_MEM_UPDATED              1ULL
++#define PSPAHCT_GUEST_SHARED_MEM_UPDATED               2ULL
++#define PSPAHCT_GUEST_PRIVATE_MEM_UPDATED2             3ULL
 
-  - missing subject
-
-Please just use
-
-  git log -1 --format=3D'Fixes: %h ("%s")' <commit>
-
-So
-
-Fixes: 4e18bccc2e55 ("kvm: selftest: unify the guest port macros")
-
---=20
-Cheers,
-Stephen Rothwell
-
---Sig_/0n3Xc2=LMdbu=kEa=+SsFNA
-Content-Type: application/pgp-signature
-Content-Description: OpenPGP digital signature
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEENIC96giZ81tWdLgKAVBC80lX0GwFAmLYfC4ACgkQAVBC80lX
-0Gzdtgf7Bzce09XsU0k00K8INDOuIC7bNo1V1hKhcQUjhO/u0P5i5aKJFdIPcyh5
-qjP7Q6uLne8iKerxJbKVrCdVBkVu98Goxhz7JDKAgtVIMnQ9WuMndX2QrsIV0ItL
-APdcqEK/pD8RDiPn+MhcZwHSgOuvib7JD2Yj/0hnYpViEJnUB01UPR6herFOkUBt
-5plJVroVUADNmPhfV6kR3c2RZnVa0rT02FUlezuQndCaLOV04lviqd8Q1roWecf1
-Z/dHQZY8mqWN+s+mjep3eEgigVX3tBJZRSVT+RNqxnNOVGEc5/4sSIc6vBpRU3p5
-MTzIONDtQDoi12T3Qa2d835q6RSYaQ==
-=07cg
------END PGP SIGNATURE-----
-
---Sig_/0n3Xc2=LMdbu=kEa=+SsFNA--
+If you find yourself doing a lot of copy+paste, then we should enhance the APIs
+provided by the core infrastructure.
