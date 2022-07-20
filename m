@@ -2,74 +2,48 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id C182457BFD4
-	for <lists+kvm@lfdr.de>; Wed, 20 Jul 2022 23:54:22 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 7EFBE57BFE4
+	for <lists+kvm@lfdr.de>; Thu, 21 Jul 2022 00:06:04 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230346AbiGTVyV (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 20 Jul 2022 17:54:21 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40580 "EHLO
+        id S230008AbiGTWGC (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 20 Jul 2022 18:06:02 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46976 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230198AbiGTVyU (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 20 Jul 2022 17:54:20 -0400
-Received: from mail-pj1-x102e.google.com (mail-pj1-x102e.google.com [IPv6:2607:f8b0:4864:20::102e])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A6F1D4B0D1
-        for <kvm@vger.kernel.org>; Wed, 20 Jul 2022 14:54:19 -0700 (PDT)
-Received: by mail-pj1-x102e.google.com with SMTP id bk6-20020a17090b080600b001f2138a2a7bso3073825pjb.1
-        for <kvm@vger.kernel.org>; Wed, 20 Jul 2022 14:54:19 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=jK6tZAVLlpKQaYUdrFhp6jMza1P7Y68lK+h4BL/v32U=;
-        b=bb98mV59J227Gzh/7pVgul7s8I0m8osIYW3lUlal2sBMW6xjav+1p6xkJtJazn3Mok
-         J//BBdPQpXecD7+EhWvOvCltmXpnI/a/ICbDRKTuq61zuiZvri80vPGiEUUmaJqFF3Mi
-         Zi2WDSRXPk/Soa8PjpvEWT8m2FCXt05Ib1eBWCA8ivsbdCpnTy4ghKR1pDhsVln29nQk
-         tcO+yHWxsR5A34ZKgL0lPbUsfqQU08E1MULduTTsedAm7FJMOeoGj53+SQafmoeDD3r9
-         rrcdvQzIls9I15ogFqdOjwcAwOHhfa9z1J/ncy147O1ttAStxNqJUzKgiwV3icnRz0mX
-         A7WQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=jK6tZAVLlpKQaYUdrFhp6jMza1P7Y68lK+h4BL/v32U=;
-        b=J+xVXWVq230PfvgT0Y3WeWBN1kSJ7JMR7HvtpkLeex7C0VIrYisttmjqqtC9ILUUyn
-         YYmVwbCJphHCs6RGHKgaZXgZiTOUxGOReZKCUxaSp5Ba1p69HLLJd3I9Jvxs7cRYYYJh
-         HyGHhFStvDZ+i7EGiaWCNE3FM02Ml2QrElEAb5Uti29njQDJaG1Lc8iRzc77QSE6j9SC
-         pWnyVXZ+LCyQNKEzMGE19GpWOIkVCdaDnUPcwzr/HhIP4xqa7hkkzV1LwLKh4naKeLI3
-         rZ+kqnlj/LFdDVwHJBB0ouT+GkLoUqRePKMyUChcsDepKISd+YEIDQ4BXcbgVZt8f8xi
-         58xA==
-X-Gm-Message-State: AJIora/Odrd7vbWVGRo7Jg6HrpUHtvl8kaKXJ/KQJ4BMPuphql406491
-        elE759XP6IBR92faiHu2jsJajw==
-X-Google-Smtp-Source: AGRyM1vStDlNny4fDdiDFJ8dmGdUdCUD+1Ycb4i6vQYzM6OiOymkMtuHm6tYxo3g2qaD1skEB041+Q==
-X-Received: by 2002:a17:902:e886:b0:16b:faee:ccfc with SMTP id w6-20020a170902e88600b0016bfaeeccfcmr41017840plg.114.1658354059054;
-        Wed, 20 Jul 2022 14:54:19 -0700 (PDT)
-Received: from google.com (123.65.230.35.bc.googleusercontent.com. [35.230.65.123])
-        by smtp.gmail.com with ESMTPSA id u22-20020a17090adb5600b001f1a8c24b5esm2167407pjx.6.2022.07.20.14.54.18
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 20 Jul 2022 14:54:18 -0700 (PDT)
-Date:   Wed, 20 Jul 2022 21:54:14 +0000
-From:   Sean Christopherson <seanjc@google.com>
-To:     Santosh Shukla <santosh.shukla@amd.com>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        Maxim Levitsky <mlevitsk@redhat.com>,
-        Tom Lendacky <thomas.lendacky@amd.com>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-Subject: Re: [PATCHv2 4/7] KVM: SVM: Report NMI not allowed when Guest busy
- handling VNMI
-Message-ID: <Yth5hl+RlTaa5ybj@google.com>
-References: <20220709134230.2397-1-santosh.shukla@amd.com>
- <20220709134230.2397-5-santosh.shukla@amd.com>
+        with ESMTP id S229496AbiGTWGB (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 20 Jul 2022 18:06:01 -0400
+Received: from gandalf.ozlabs.org (gandalf.ozlabs.org [150.107.74.76])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9E4963AE42;
+        Wed, 20 Jul 2022 15:05:58 -0700 (PDT)
+Received: from authenticated.ozlabs.org (localhost [127.0.0.1])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange ECDHE (P-256) server-signature RSA-PSS (4096 bits) server-digest SHA256)
+        (No client certificate requested)
+        by mail.ozlabs.org (Postfix) with ESMTPSA id 4Lp8sc4fkDz4xCy;
+        Thu, 21 Jul 2022 08:05:56 +1000 (AEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=canb.auug.org.au;
+        s=201702; t=1658354756;
+        bh=vPttMMWc9zt/4UolFz2K4BGs30yfO2taUQuvNVWruNA=;
+        h=Date:From:To:Cc:Subject:From;
+        b=LMktGf0Pq4PSTwSj8k/uLW2YsSjjfPPqe7rDn6ysJie9ZNqvp6G4MrCsIIMkFy6XK
+         yrl+7PEpi5WuPOrbuMcFjaiFMxaXPma5SIT4RCpks2RzLz7LraqKxzLyuPSfvyHp1N
+         ry9hDrqI2Gj2PizEilgZl+f8gFo04bWy/qTlkk+kUoOXZED7HhQKIKEKNn35zy35Bf
+         xXQYLdUGR4WY7914iH836/3CqS3UXwXFnEWpvc3q0QqNj4Wdp4+VDzIVB3vfHA3SLv
+         mCQIHGhMv7UbSh39V6f+zS7Gjp/4klKyfCoW1sdkqs8s59X6Gn3He7MRjMdVsdVHx3
+         CWCAJRjHMxHCA==
+Date:   Thu, 21 Jul 2022 08:05:33 +1000
+From:   Stephen Rothwell <sfr@canb.auug.org.au>
+To:     Paolo Bonzini <pbonzini@redhat.com>
+Cc:     KVM <kvm@vger.kernel.org>, Colton Lewis <coltonlewis@google.com>,
+        Sean Christopherson <seanjc@google.com>,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+        Linux Next Mailing List <linux-next@vger.kernel.org>
+Subject: linux-next: Fixes tag needs some work in the kvm tree
+Message-ID: <20220721080533.7d71118f@canb.auug.org.au>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20220709134230.2397-5-santosh.shukla@amd.com>
-X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-        USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=ham
+Content-Type: multipart/signed; boundary="Sig_/0n3Xc2=LMdbu=kEa=+SsFNA";
+ protocol="application/pgp-signature"; micalg=pgp-sha256
+X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,SPF_HELO_PASS,SPF_PASS autolearn=ham
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -77,58 +51,50 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Sat, Jul 09, 2022, Santosh Shukla wrote:
-> In the VNMI case, Report NMI is not allowed when the processor set the
-> V_NMI_MASK to 1 which means the Guest is busy handling VNMI.
-> 
-> Signed-off-by: Santosh Shukla <santosh.shukla@amd.com>
-> ---
-> v2:
-> - Moved vnmi check after is_guest_mode() in func _nmi_blocked().
-> - Removed is_vnmi_mask_set check from _enable_nmi_window().
-> as it was a redundent check.
-> 
->  arch/x86/kvm/svm/svm.c | 6 ++++++
->  1 file changed, 6 insertions(+)
-> 
-> diff --git a/arch/x86/kvm/svm/svm.c b/arch/x86/kvm/svm/svm.c
-> index 3574e804d757..44c1f2317b45 100644
-> --- a/arch/x86/kvm/svm/svm.c
-> +++ b/arch/x86/kvm/svm/svm.c
-> @@ -3480,6 +3480,9 @@ bool svm_nmi_blocked(struct kvm_vcpu *vcpu)
->  	if (is_guest_mode(vcpu) && nested_exit_on_nmi(svm))
->  		return false;
->  
-> +	if (is_vnmi_enabled(svm) && is_vnmi_mask_set(svm))
-> +		return true;
-> +
->  	ret = (vmcb->control.int_state & SVM_INTERRUPT_SHADOW_MASK) ||
->  	      (vcpu->arch.hflags & HF_NMI_MASK);
->  
-> @@ -3609,6 +3612,9 @@ static void svm_enable_nmi_window(struct kvm_vcpu *vcpu)
->  {
->  	struct vcpu_svm *svm = to_svm(vcpu);
->  
-> +	if (is_vnmi_enabled(svm))
-> +		return;
+--Sig_/0n3Xc2=LMdbu=kEa=+SsFNA
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: quoted-printable
 
-Ugh, is there really no way to trigger an exit when NMIs become unmasked?  Because
-if there isn't, this is broken for KVM.
+Hi all,
 
-On bare metal, if two NMIs arrive "simultaneously", so long as NMIs aren't blocked,
-the first NMI will be delivered and the second will be pended, i.e. software will
-see both NMIs.  And if that doesn't hold true, the window for a true collision is
-really, really tiny.
+In commit
 
-But in KVM, because a vCPU may not be run a long duration, that window becomes
-very large.  To not drop NMIs and more faithfully emulate hardware, KVM allows two
-NMIs to be _pending_.  And when that happens, KVM needs to trigger an exit when
-NMIs become unmasked _after_ the first NMI is injected.
+  594a1c271c15 ("KVM: selftests: Fix filename reporting in guest asserts")
 
-> +
->  	if ((vcpu->arch.hflags & (HF_NMI_MASK | HF_IRET_MASK)) == HF_NMI_MASK)
->  		return; /* IRET will cause a vm exit */
->  
-> -- 
-> 2.25.1
-> 
+Fixes tag
+
+  Fixes: 4e18bccc2e5544f0be28fc1c4e6be47a469d6c60
+
+has these problem(s):
+
+  - missing subject
+
+Please just use
+
+  git log -1 --format=3D'Fixes: %h ("%s")' <commit>
+
+So
+
+Fixes: 4e18bccc2e55 ("kvm: selftest: unify the guest port macros")
+
+--=20
+Cheers,
+Stephen Rothwell
+
+--Sig_/0n3Xc2=LMdbu=kEa=+SsFNA
+Content-Type: application/pgp-signature
+Content-Description: OpenPGP digital signature
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEENIC96giZ81tWdLgKAVBC80lX0GwFAmLYfC4ACgkQAVBC80lX
+0Gzdtgf7Bzce09XsU0k00K8INDOuIC7bNo1V1hKhcQUjhO/u0P5i5aKJFdIPcyh5
+qjP7Q6uLne8iKerxJbKVrCdVBkVu98Goxhz7JDKAgtVIMnQ9WuMndX2QrsIV0ItL
+APdcqEK/pD8RDiPn+MhcZwHSgOuvib7JD2Yj/0hnYpViEJnUB01UPR6herFOkUBt
+5plJVroVUADNmPhfV6kR3c2RZnVa0rT02FUlezuQndCaLOV04lviqd8Q1roWecf1
+Z/dHQZY8mqWN+s+mjep3eEgigVX3tBJZRSVT+RNqxnNOVGEc5/4sSIc6vBpRU3p5
+MTzIONDtQDoi12T3Qa2d835q6RSYaQ==
+=07cg
+-----END PGP SIGNATURE-----
+
+--Sig_/0n3Xc2=LMdbu=kEa=+SsFNA--
