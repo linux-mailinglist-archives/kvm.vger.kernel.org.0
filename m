@@ -2,96 +2,150 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id BE6E257CC3E
-	for <lists+kvm@lfdr.de>; Thu, 21 Jul 2022 15:44:02 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 3D41357CC75
+	for <lists+kvm@lfdr.de>; Thu, 21 Jul 2022 15:46:39 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230014AbiGUNnX (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 21 Jul 2022 09:43:23 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49076 "EHLO
+        id S230256AbiGUNqi (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 21 Jul 2022 09:46:38 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48754 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229838AbiGUNmz (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 21 Jul 2022 09:42:55 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 4F302823A4
-        for <kvm@vger.kernel.org>; Thu, 21 Jul 2022 06:42:53 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1658410972;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=eB2t6MCwiJG1ExNDB+Ljjom6WV2GQK9LC4WD3rPXQFM=;
-        b=AbG0no7aimDpwFzVwvVXDWtWvspzvAoR6e3WPJKEIM/fa6A7M4nOp9UkGI7JDk6rgmvDf1
-        4jPtG4szPgz3gIDlcKDjQ7DX8qMq/3x1Fi0VPGsBxE/uehKFez7BGdvmU64klJCkS6jZzS
-        V9p6iNjuIa6onXlIQmDlMlwzvgO7OCQ=
-Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
- [209.85.128.72]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-499-HbFgVMrFOv2Gf1Hm30gHwQ-1; Thu, 21 Jul 2022 09:42:48 -0400
-X-MC-Unique: HbFgVMrFOv2Gf1Hm30gHwQ-1
-Received: by mail-wm1-f72.google.com with SMTP id r127-20020a1c4485000000b003a2fdeea756so2834956wma.2
-        for <kvm@vger.kernel.org>; Thu, 21 Jul 2022 06:42:48 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
-         :content-language:to:cc:references:from:in-reply-to
-         :content-transfer-encoding;
-        bh=eB2t6MCwiJG1ExNDB+Ljjom6WV2GQK9LC4WD3rPXQFM=;
-        b=MMntmG9otY22584E1WO8Ygot95P9OLZfRsSZc5On5MII8NVS3ISQ9OOB5Qx7zFUNsr
-         DkmMChRUULsatf7iumyRpSOWFHPA/gKRGzwX/lhNDZw2UnSgqHBz6DU/klrMXZxRdeZo
-         9opyikdsNsPHzPivzcyQIJbIgN/qOox+XNkzUC9QH4QJeHQdLob3C68xHndZPKlnTV+2
-         J5+Nz2ZTiPYK95gbcHBrdPheb5Zh2a1jwVMAvFtKlNOAzYueMUDeXTshHq9CVcio40v9
-         a/pUj35Uf7s0xLapD+U1jHbpmMug2men8K76Ik80sM5XAxdx2CYIzGz7W3BAZFUvMBqL
-         UN1A==
-X-Gm-Message-State: AJIora9eop5aCFAG2Je+IkkOyr0IhO9UGwdM4vJR1nDkKpjyBTvv/DYu
-        TZxIXTmidOBqfvDvY2YxrKhfRqFyjs92Ra0pYwIZztDyu8Dm8DnbbnAXDBkcy3mPwiU55fjpbae
-        FKsaFU0BChSnx
-X-Received: by 2002:a7b:c314:0:b0:3a0:5750:1b4a with SMTP id k20-20020a7bc314000000b003a057501b4amr8321579wmj.20.1658410967532;
-        Thu, 21 Jul 2022 06:42:47 -0700 (PDT)
-X-Google-Smtp-Source: AGRyM1ug2ArlCJqt7J1dKmM5rfPnxaF/fjypmxrD5aWpELpC2SRJSk58l4vg/VOciBPY0TDmY3lVgw==
-X-Received: by 2002:a7b:c314:0:b0:3a0:5750:1b4a with SMTP id k20-20020a7bc314000000b003a057501b4amr8321560wmj.20.1658410967327;
-        Thu, 21 Jul 2022 06:42:47 -0700 (PDT)
-Received: from [192.168.0.5] (ip-109-43-179-217.web.vodafone.de. [109.43.179.217])
-        by smtp.gmail.com with ESMTPSA id o9-20020a05600c058900b0039c54bb28f2sm1893473wmd.36.2022.07.21.06.42.46
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 21 Jul 2022 06:42:46 -0700 (PDT)
-Message-ID: <163212be-f3b2-ca68-d28b-df4cf4039bc3@redhat.com>
-Date:   Thu, 21 Jul 2022 15:42:46 +0200
-MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.10.0
-Subject: Re: [PATCH v2 2/2] s390x: intercept: make sure all output lines are
- unique
-Content-Language: en-US
-To:     Claudio Imbrenda <imbrenda@linux.ibm.com>, kvm@vger.kernel.org,
-        linux-s390@vger.kernel.org, qemu-s390x@nongnu.org
-Cc:     frankja@linux.ibm.com
-References: <20220721133002.142897-1-imbrenda@linux.ibm.com>
- <20220721133002.142897-3-imbrenda@linux.ibm.com>
-From:   Thomas Huth <thuth@redhat.com>
-In-Reply-To: <20220721133002.142897-3-imbrenda@linux.ibm.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-3.5 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
-        RCVD_IN_DNSWL_LOW,SPF_HELO_NONE,SPF_NONE autolearn=ham
-        autolearn_force=no version=3.4.6
+        with ESMTP id S230248AbiGUNqZ (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 21 Jul 2022 09:46:25 -0400
+Received: from ams.source.kernel.org (ams.source.kernel.org [145.40.68.75])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C87DE87C0C
+        for <kvm@vger.kernel.org>; Thu, 21 Jul 2022 06:44:00 -0700 (PDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by ams.source.kernel.org (Postfix) with ESMTPS id EE5D2B82505
+        for <kvm@vger.kernel.org>; Thu, 21 Jul 2022 13:43:55 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5973DC341C0;
+        Thu, 21 Jul 2022 13:43:54 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1658411034;
+        bh=zolXVvw7AUB3a/fOSg4H/0PyzLm5+4/cEagmQ13GdgA=;
+        h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+        b=cGRU+epYiW7RdR6QwlcTzBtkykN4sgAhn64EEUAdCOqTGgwKDjg9lHHe832aJ6KWz
+         AAIuRuQbeBnBJNS+LjZZujK4d8a7ugArxNDt5DE8YSFBRu+AjoYMXudjgEHrUQIbzI
+         AT7CNfCV5Mw25LADXP/YjXxaFT9kdicGIif8FCM3KFVdUULfUKjhRdUuLBAa1oOMAr
+         z3fh823CsmnSebIZN3Q21GttKZJQr+nArKoTgagZNF4Tc/JOmIVHC8SFZH5IvsUsJJ
+         J9d2Fd8+ou7sUi8DpI4u3VJ3okfcHWiApWQ7ry0Kp/8FEdYcog5XpEXL3NmmdZTCkb
+         N6IgxdBSAXDAg==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=why.misterjones.org)
+        by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+        (Exim 4.95)
+        (envelope-from <maz@kernel.org>)
+        id 1oEWT0-0095gK-GZ;
+        Thu, 21 Jul 2022 14:43:51 +0100
+Date:   Thu, 21 Jul 2022 14:43:50 +0100
+Message-ID: <871quezill.wl-maz@kernel.org>
+From:   Marc Zyngier <maz@kernel.org>
+To:     Ricardo Koller <ricarkol@google.com>
+Cc:     kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu,
+        drjones@redhat.com, alexandru.elisei@arm.com,
+        eric.auger@redhat.com, oliver.upton@linux.dev, reijiw@google.com
+Subject: Re: [kvm-unit-tests PATCH 3/3] arm: pmu: Remove checks for !overflow in chained counters tests
+In-Reply-To: <Ythy8XXN2rFytXdr@google.com>
+References: <20220718154910.3923412-1-ricarkol@google.com>
+        <20220718154910.3923412-4-ricarkol@google.com>
+        <87edyhz68i.wl-maz@kernel.org>
+        <Yte/YXWYSikyQcqh@google.com>
+        <875yjsyv67.wl-maz@kernel.org>
+        <Ythw1UT1wFHbY/jN@google.com>
+        <Ythy8XXN2rFytXdr@google.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/27.1
+ (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: ricarkol@google.com, kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu, drjones@redhat.com, alexandru.elisei@arm.com, eric.auger@redhat.com, oliver.upton@linux.dev, reijiw@google.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+X-Spam-Status: No, score=-7.8 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_HI,
+        SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 21/07/2022 15.30, Claudio Imbrenda wrote:
-> The intercept test has the same output line twice for two different
-> testcases.
+On Wed, 20 Jul 2022 22:26:09 +0100,
+Ricardo Koller <ricarkol@google.com> wrote:
 > 
-> Fix this by adding report_prefix_push() as appropriate.
-> 
-> Signed-off-by: Claudio Imbrenda <imbrenda@linux.ibm.com>
-> ---
->   s390x/intercept.c | 6 ++++++
->   1 file changed, 6 insertions(+)
+> On Wed, Jul 20, 2022 at 02:17:09PM -0700, Ricardo Koller wrote:
+> > On Wed, Jul 20, 2022 at 10:45:20AM +0100, Marc Zyngier wrote:
+> > > On Wed, 20 Jul 2022 09:40:01 +0100,
+> > > Ricardo Koller <ricarkol@google.com> wrote:
+> > > > 
+> > > > On Tue, Jul 19, 2022 at 12:34:05PM +0100, Marc Zyngier wrote:
+> > > > > On Mon, 18 Jul 2022 16:49:10 +0100,
+> > > > > Ricardo Koller <ricarkol@google.com> wrote:
+> > > > > > 
+> > > > > > A chained event overflowing on the low counter can set the overflow flag
+> > > > > > in PMOVS.  KVM does not set it, but real HW and the fast-model seem to.
+> > > > > > Moreover, the AArch64.IncrementEventCounter() pseudocode in the ARM ARM
+> > > > > > (DDI 0487H.a, J1.1.1 "aarch64/debug") also sets the PMOVS bit on
+> > > > > > overflow.
+> > > > > 
+> > > > > Isn't this indicative of a bug in the KVM emulation? To be honest, the
+> > > > > pseudocode looks odd. It says:
+> > > > > 
+> > > > > <quote>
+> > > > > 	if old_value<64:ovflw> != new_value<64:ovflw> then
+> > > > > 	    PMOVSSET_EL0<idx> = '1';
+> > > > > 	    PMOVSCLR_EL0<idx> = '1';
+> > > > > </quote>
+> > > > > 
+> > > > > which I find remarkably ambiguous. Is this setting and clearing the
+> > > > > overflow bit? Or setting it in the single register that backs the two
+> > > > > accessors in whatever way it can?
+> > > > > 
+> > > > > If it is the second interpretation that is correct, then KVM
+> > > > > definitely needs fixing
+> > > > 
+> > > > I think it's the second, as those two "= '1'" apply to the non-chained
+> > > > counters case as well, which should definitely set the bit in PMOVSSET.
+> > > > 
+> > > > > (though this looks pretty involved for
+> > > > > anything that isn't a SWINC event).
+> > > > 
+> > > > Ah, I see, there's a pretty convenient kvm_pmu_software_increment() for
+> > > > SWINC, but a non-SWINC event is implemented as a single 64-bit perf
+> > > > event.
+> > > 
+> > > Indeed. Which means we need to de-optimise chained counters to being
+> > > 32bit events, which is pretty annoying (for rapidly firing events, the
+> > > interrupt rate is going to be significantly higher).
+> > > 
+> > > I guess we should also investigate the support for FEAT_PMUv3p5 and
+> > > native 64bit counters. Someone is bound to build it at some point.
+> > 
+> > The kernel perf event is implementing 64-bit counters using chained
+> > counters. I assume this is already firing an interrupt for the low
+> > counter overflow; we might need to just hook into that, investigating...
 
-Reviewed-by: Thomas Huth <thuth@redhat.com>
+We probably only enable the overflow interrupt on the odd counter, and
+not the even one (which is why you request chained counters the first
+place).
 
+And perf wouldn't call us back anyway, as we described the counter as
+64bit.
+
+> Additionally, given that the kernel is already emulating 64-bit
+> counters, can KVM just expose FEAT_PMUv3p5? Assuming all the other new
+> features can be emulated.
+
+This is what I suggested above. Although it can only happen on a
+system that already supports FEAT_PMU3p4, as PMMIR_EL1 is not defined
+before that (and FEAT_PMU3p5 implies 3p4).
+
+It also remains that we need to *properly* emulate chained counters,
+which means not handling them as 64bit counters in perf, but as a
+32bit counter and a carry (exactly like the pseudocode does).
+
+	M.
+
+-- 
+Without deviation from the norm, progress is not possible.
