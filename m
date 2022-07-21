@@ -2,60 +2,60 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id A4C1B57C91A
-	for <lists+kvm@lfdr.de>; Thu, 21 Jul 2022 12:36:24 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 482F657C91C
+	for <lists+kvm@lfdr.de>; Thu, 21 Jul 2022 12:36:25 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233284AbiGUKgF (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 21 Jul 2022 06:36:05 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33856 "EHLO
+        id S233303AbiGUKgK (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 21 Jul 2022 06:36:10 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33888 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233277AbiGUKgD (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 21 Jul 2022 06:36:03 -0400
-Received: from mail-pl1-x62b.google.com (mail-pl1-x62b.google.com [IPv6:2607:f8b0:4864:20::62b])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 633812D1CE;
-        Thu, 21 Jul 2022 03:36:02 -0700 (PDT)
-Received: by mail-pl1-x62b.google.com with SMTP id y24so1411798plh.7;
-        Thu, 21 Jul 2022 03:36:02 -0700 (PDT)
+        with ESMTP id S233280AbiGUKgF (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 21 Jul 2022 06:36:05 -0400
+Received: from mail-pf1-x435.google.com (mail-pf1-x435.google.com [IPv6:2607:f8b0:4864:20::435])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 193CE10F7;
+        Thu, 21 Jul 2022 03:36:04 -0700 (PDT)
+Received: by mail-pf1-x435.google.com with SMTP id 70so1393814pfx.1;
+        Thu, 21 Jul 2022 03:36:04 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
         h=from:to:cc:subject:date:message-id:in-reply-to:references
          :mime-version:content-transfer-encoding;
-        bh=gDRQtRi/q/kMC+1Mbr451BbZ8n+5KHSY3o4YQBH6BZ4=;
-        b=RZiQ4nF0eC6iDy4YnxcewVc4TO8dRSPbHqdWpQBYl/gJmswoium8hRY/32dzFjpr/F
-         wwG+73HueMEig0tn4e4/RFEU9tK81/iMMVNbJ+um0DliNmkhdN8xzJPf0WQypRkhLvYX
-         ZNEiqcBhpdyUi5t+E1r7sder7W+4SQgcCjayfmAgElNOtrpzOvvmoF3ACMRFFEeQDD7d
-         IArAUR27ntGU9UtFA8UAvb4kzz+FcxavU5p6BsM7p2lNRb9lqeRJMZkpWImAH0MsyxlT
-         sZuVqDnx66NQiOv9ZGfvNNJIcD9OlSBF9dj3s90fbRTM9drfN0o9j+t6adUi4Rs1FA1N
-         WbIA==
+        bh=eFWQxgmoOmb0OXJQ/pZFCZuTJ4aZfLkbiYFQ43Ipza4=;
+        b=phLpZKgJUCca2MNXFSj7jUoVdqQrWwulesLvEoe7ojliOoavpkNnI5EvlaZKu2XHi8
+         w7JTFKlHfgQox1tmYzRK4fS6CBH3hqfOBnmx/u7I4DktajZoL560ap1IswAp/LHURXUj
+         b6U1SCCPI2HKOg81+ziNbd+IopWjvTCZZLfGMtcNh164odPg18iK0bbZwW0a94vylAwH
+         NYCehxkioPtYKeBTnO5P+ppYWrN6LQ8R+pTC31J2m4kIE9sBAqmHjFSSyGS659VDPAVv
+         1DWJzeWI0Ry3MG6mK63JppRubrFZ0/CD/i1yYL+sjWS67RzlX3ikvVl1ploXIqEW/D3o
+         jDrA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
          :references:mime-version:content-transfer-encoding;
-        bh=gDRQtRi/q/kMC+1Mbr451BbZ8n+5KHSY3o4YQBH6BZ4=;
-        b=b7xk/aigyCANhqs8vz7wQHple/o23bC5PDRRv1K52MqC1nIZIBhGfSIgYQQmhRXuF1
-         f/lJrW85YfT8SphLMNaFEcipuqFgte8DK00G42xzP7J4So0KTPM0W873d1ClFBNlQz7E
-         mSgba7d3aJdngujOpngay4Wi3HN+aoD1OQS5CYbhdIuLe2N+x2JJQJ6zjyJG8ses6aAv
-         QPXcF+NNqxovGENAp9Q76LmpFVxMTWs/QjUZ1W6Mg6LN+X6ic7b+jYIZZHEdYY53NAJh
-         5r3oKM25BRGeRhEJQf3kiJPMOutfFD0ApYtBODLfcOD+ChhM5hGiV4PfqfEB5QrUSrJ7
-         3IyQ==
-X-Gm-Message-State: AJIora/HimFkQ/hY69G15GAFs3i3Hki/LqEPHWlwb9mG7mNwLM6hoT4Q
-        vIqguzEZorMqoVL3+2ZxSEwQn5+QzkENaQ==
-X-Google-Smtp-Source: AGRyM1uEQlbFVsHB+3J2X/Jj7VjG+qIEVzZxyu7U+D4MzljkwEKH501d7gRSg3NjBl4RzRpI2F99pg==
-X-Received: by 2002:a17:902:e742:b0:16c:44b7:c8b6 with SMTP id p2-20020a170902e74200b0016c44b7c8b6mr42947535plf.140.1658399761871;
-        Thu, 21 Jul 2022 03:36:01 -0700 (PDT)
+        bh=eFWQxgmoOmb0OXJQ/pZFCZuTJ4aZfLkbiYFQ43Ipza4=;
+        b=GiNgHy5O/1syaZzlKmSjwNKFnpU2GBu/8LCyUX69EIbd61wkSdr6IFCl1Jl7M6r67K
+         XS5u3omEOS7w7iH/5s7FdtjJsEOSYBpeXTpUmxRfwBwmZ8rACtmsVOTRdseAAebnOLko
+         ff7FUgtjEG1k0jhMgzSYC5H/Ayo/ANp6FDIweOKWA3M82fQPINZfTkom4y/IV+3rX8B5
+         wz/qM6qcp814It8nHDMt1qSgSMpIc2SKRMTsdmHaLtKVWMwAn/3Dn8TXYAlZxEwvSAvC
+         G68OiMT08u+BQs3gEgxWQhAMxRSK3PFlED+Z7mWvQml1lcqs3yos2ytMhB5Rxb5jKKmu
+         D0kQ==
+X-Gm-Message-State: AJIora8/IPuUjXubFvV7z6sr88bSDpAhvTVBA8GfRvYQMB5lI1JiUixK
+        /RBe+b51EFVSmKng731+Zow=
+X-Google-Smtp-Source: AGRyM1v9f/CPoSpHsCfRwb3fbhYN2WhLVkyAvAo38NyFTK8Ye5td8wRcdZNqi+b7pMLQuo2rYYHa5Q==
+X-Received: by 2002:a63:1648:0:b0:41a:49f9:77ae with SMTP id 8-20020a631648000000b0041a49f977aemr11979681pgw.377.1658399763573;
+        Thu, 21 Jul 2022 03:36:03 -0700 (PDT)
 Received: from localhost.localdomain ([103.7.29.32])
-        by smtp.gmail.com with ESMTPSA id q12-20020a65494c000000b00419aa0d9a2esm1161887pgs.28.2022.07.21.03.36.00
+        by smtp.gmail.com with ESMTPSA id q12-20020a65494c000000b00419aa0d9a2esm1161887pgs.28.2022.07.21.03.36.02
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 21 Jul 2022 03:36:01 -0700 (PDT)
+        Thu, 21 Jul 2022 03:36:03 -0700 (PDT)
 From:   Like Xu <like.xu.linux@gmail.com>
 X-Google-Original-From: Like Xu <likexu@tencent.com>
 To:     Paolo Bonzini <pbonzini@redhat.com>,
         Sean Christopherson <seanjc@google.com>
 Cc:     Jim Mattson <jmattson@google.com>, linux-kernel@vger.kernel.org,
         kvm@vger.kernel.org
-Subject: [PATCH v2 2/7] perf/x86/core: Completely disable guest PEBS via guest's global_ctrl
-Date:   Thu, 21 Jul 2022 18:35:43 +0800
-Message-Id: <20220721103549.49543-3-likexu@tencent.com>
+Subject: [PATCH v2 3/7] KVM: x86/pmu: Avoid setting BIT_ULL(-1) to pmu->host_cross_mapped_mask
+Date:   Thu, 21 Jul 2022 18:35:44 +0800
+Message-Id: <20220721103549.49543-4-likexu@tencent.com>
 X-Mailer: git-send-email 2.37.1
 In-Reply-To: <20220721103549.49543-1-likexu@tencent.com>
 References: <20220721103549.49543-1-likexu@tencent.com>
@@ -73,40 +73,48 @@ X-Mailing-List: kvm@vger.kernel.org
 
 From: Like Xu <likexu@tencent.com>
 
-When a guest PEBS counter is cross-mapped by a host counter, software
-will remove the corresponding bit in the arr[global_ctrl].guest and
-expect hardware to perform a change of state "from enable to disable"
-via the msr_slot[] switch during the vmx transaction.
-
-The real world is that if user adjust the counter overflow value small
-enough, it still opens a tiny race window for the previously PEBS-enabled
-counter to write cross-mapped PEBS records into the guest's PEBS buffer,
-when arr[global_ctrl].guest has been prioritised (switch_msr_special stuff)
-to switch into the enabled state, while the arr[pebs_enable].guest has not.
-
-Close this window by clearing invalid bits in the arr[global_ctrl].guest.
+In the extreme case of host counters multiplexing and contention, the
+perf_event requested by the guest's pebs counter is not allocated to any
+actual physical counter, in which case hw.idx is bookkept as -1,
+resulting in an out-of-bounds access to host_cross_mapped_mask.
 
 Fixes: 854250329c02 ("KVM: x86/pmu: Disable guest PEBS temporarily in two rare situations")
 Signed-off-by: Like Xu <likexu@tencent.com>
 ---
- arch/x86/events/intel/core.c | 3 ++-
- 1 file changed, 2 insertions(+), 1 deletion(-)
+ arch/x86/kvm/vmx/pmu_intel.c | 12 ++++++------
+ 1 file changed, 6 insertions(+), 6 deletions(-)
 
-diff --git a/arch/x86/events/intel/core.c b/arch/x86/events/intel/core.c
-index e46fd496187b..495ac447bb3a 100644
---- a/arch/x86/events/intel/core.c
-+++ b/arch/x86/events/intel/core.c
-@@ -4052,8 +4052,9 @@ static struct perf_guest_switch_msr *intel_guest_get_msrs(int *nr, void *data)
- 		/* Disable guest PEBS if host PEBS is enabled. */
- 		arr[pebs_enable].guest = 0;
- 	} else {
--		/* Disable guest PEBS for cross-mapped PEBS counters. */
-+		/* Disable guest PEBS thoroughly for cross-mapped PEBS counters. */
- 		arr[pebs_enable].guest &= ~kvm_pmu->host_cross_mapped_mask;
-+		arr[global_ctrl].guest &= ~kvm_pmu->host_cross_mapped_mask;
- 		/* Set hw GLOBAL_CTRL bits for PEBS counter when it runs for guest */
- 		arr[global_ctrl].guest |= arr[pebs_enable].guest;
+diff --git a/arch/x86/kvm/vmx/pmu_intel.c b/arch/x86/kvm/vmx/pmu_intel.c
+index 4bc098fbec31..22793348aa14 100644
+--- a/arch/x86/kvm/vmx/pmu_intel.c
++++ b/arch/x86/kvm/vmx/pmu_intel.c
+@@ -783,20 +783,20 @@ static void intel_pmu_cleanup(struct kvm_vcpu *vcpu)
+ void intel_pmu_cross_mapped_check(struct kvm_pmu *pmu)
+ {
+ 	struct kvm_pmc *pmc = NULL;
+-	int bit;
++	int bit, hw_idx;
+ 
+ 	for_each_set_bit(bit, (unsigned long *)&pmu->global_ctrl,
+ 			 X86_PMC_IDX_MAX) {
+ 		pmc = intel_pmc_idx_to_pmc(pmu, bit);
+ 
+ 		if (!pmc || !pmc_speculative_in_use(pmc) ||
+-		    !intel_pmc_is_enabled(pmc))
++		    !intel_pmc_is_enabled(pmc) || !pmc->perf_event)
+ 			continue;
+ 
+-		if (pmc->perf_event && pmc->idx != pmc->perf_event->hw.idx) {
+-			pmu->host_cross_mapped_mask |=
+-				BIT_ULL(pmc->perf_event->hw.idx);
+-		}
++		hw_idx = pmc->perf_event->hw.idx;
++		/* make it a little less dependent on perf's exact behavior */
++		if (hw_idx != pmc->idx && hw_idx > -1)
++			pmu->host_cross_mapped_mask |= BIT_ULL(hw_idx);
  	}
+ }
+ 
 -- 
 2.37.1
 
