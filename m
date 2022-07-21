@@ -2,144 +2,144 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 1728C57CDE6
-	for <lists+kvm@lfdr.de>; Thu, 21 Jul 2022 16:42:15 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 6D11657CE57
+	for <lists+kvm@lfdr.de>; Thu, 21 Jul 2022 16:57:29 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229550AbiGUOmN (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 21 Jul 2022 10:42:13 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56206 "EHLO
+        id S232478AbiGUO5X (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 21 Jul 2022 10:57:23 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44076 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229456AbiGUOmN (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 21 Jul 2022 10:42:13 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 408927C19C
-        for <kvm@vger.kernel.org>; Thu, 21 Jul 2022 07:42:12 -0700 (PDT)
+        with ESMTP id S232431AbiGUO5O (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 21 Jul 2022 10:57:14 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 91BAB85D6C
+        for <kvm@vger.kernel.org>; Thu, 21 Jul 2022 07:57:12 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1658414531;
+        s=mimecast20190719; t=1658415431;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=ETGjmT2JL2PraKGO03bftrjJZ3DkGyZ8T/dEPja2F48=;
-        b=BlHnIf1crdO/AB1oNF9Ycvk/kLCpKOfOlJrSkVEH1a0jDuy+hXlIND6FzZrdUGvJRk2c/R
-        cTgrthmRDKvGhGFkNYwXm9BK51Ra0hyDGeYnoF5pT0O/ajKjOzMG8LCh3VG298lWFX4+d2
-        hoyEEvFkUf5kf7y2gE3upziYoVSmU/k=
-Received: from mail-ed1-f70.google.com (mail-ed1-f70.google.com
- [209.85.208.70]) by relay.mimecast.com with ESMTP with STARTTLS
+        bh=FtBAxFvMFDzgwHndzmBu4PFBZ+QVw2pSEVvuBlD9/k8=;
+        b=CNG4N6JPfhODqD6QhAPiHGAR9pxu29YwO382m3PpgWiOXcdLMDn/byAoP1cqHa8j7P5RNM
+        c6ZbM6ILtH3xKU5W8sjReh7uuDp+pWaggLWj4gcbDJJEC8VUTaHx1/q6e73Tt3Im47aEk1
+        4rU45LPlM63XHQV9Aefjwq7E9lP54Vs=
+Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
+ [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-364-wzYUva3nOQ-Ny-N72KFnJw-1; Thu, 21 Jul 2022 10:42:07 -0400
-X-MC-Unique: wzYUva3nOQ-Ny-N72KFnJw-1
-Received: by mail-ed1-f70.google.com with SMTP id w15-20020a056402268f00b0043ac600a6bcso1244706edd.6
-        for <kvm@vger.kernel.org>; Thu, 21 Jul 2022 07:42:07 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
-         :content-language:to:cc:references:from:in-reply-to
-         :content-transfer-encoding;
-        bh=ETGjmT2JL2PraKGO03bftrjJZ3DkGyZ8T/dEPja2F48=;
-        b=nI0GXPSA8WPXQ3NZ3LyLpsxi1ryeae4EhFaeJuIMOMJOEKU5rj5L4QAvrwfTmeUeoK
-         3Ee5ruFUXUia96whhSQspuPCVMi2UZcIMPdHorNJMLfImxktFpfjn4xIMW6Fm/7INmdE
-         qlu4sB05QMkHI0NMwICILhnEcgDW1I4fCMJJE0t51wkkNfRteXY/+4isqcpQWU6uTUQP
-         6KBAX1e8Q3UCTKx8vU6RwPUE1amcZwsBHdOZaCRvrlYCoNGu/AfpIb1EYvp3BXSdPFNQ
-         ZF9GOKkOEqK+4sShyy9S5qg1gLwC7CQgdhaXSCoi5ZsMS0zs7uoDXW4cAr6eFgz1pHlW
-         wXuQ==
-X-Gm-Message-State: AJIora9qqDY5EwSS9aSEshVAXlYP41DmtkAo3+nCqPs9scqVr4g/zh+O
-        4R6NU5lLFdKVWpIC3gd9cmdOBNeWox4zF59rA8um+sWwmwayWmYgYm2uCxPLe0dEsEjRtDMNTEE
-        uJjJWqlwL2Yu2
-X-Received: by 2002:a17:906:6a0f:b0:72b:64ce:289d with SMTP id qw15-20020a1709066a0f00b0072b64ce289dmr39234757ejc.663.1658414526798;
-        Thu, 21 Jul 2022 07:42:06 -0700 (PDT)
-X-Google-Smtp-Source: AGRyM1vy8QuPW9zECMk5hGE/N69CO/x9Ew68dW+DY+f39ELjiTgulwvNhQSDonPFVwB0MghB2/ceIg==
-X-Received: by 2002:a17:906:6a0f:b0:72b:64ce:289d with SMTP id qw15-20020a1709066a0f00b0072b64ce289dmr39234717ejc.663.1658414526276;
-        Thu, 21 Jul 2022 07:42:06 -0700 (PDT)
-Received: from ?IPV6:2001:b07:6468:f312:9af8:e5f5:7516:fa89? ([2001:b07:6468:f312:9af8:e5f5:7516:fa89])
-        by smtp.googlemail.com with ESMTPSA id t8-20020aa7db08000000b0043bba84ded6sm1086730eds.92.2022.07.21.07.42.05
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 21 Jul 2022 07:42:05 -0700 (PDT)
-Message-ID: <be68776d-a690-2d53-10dd-c922673cde11@redhat.com>
-Date:   Thu, 21 Jul 2022 16:42:05 +0200
+ us-mta-59-Gn6dFRFKMj6x1PROaP9Jag-1; Thu, 21 Jul 2022 10:57:08 -0400
+X-MC-Unique: Gn6dFRFKMj6x1PROaP9Jag-1
+Received: from smtp.corp.redhat.com (int-mx09.intmail.prod.int.rdu2.redhat.com [10.11.54.9])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 83FD31019C96;
+        Thu, 21 Jul 2022 14:57:07 +0000 (UTC)
+Received: from starship (unknown [10.40.192.46])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 3B445492CA5;
+        Thu, 21 Jul 2022 14:57:03 +0000 (UTC)
+Message-ID: <c37645cbba5a381ce409dcdb5b9d9bed02b90dd3.camel@redhat.com>
+Subject: Re: [PATCH v2 05/11] KVM: x86: emulator: update the emulation mode
+ after CR0 write
+From:   Maxim Levitsky <mlevitsk@redhat.com>
+To:     Sean Christopherson <seanjc@google.com>
+Cc:     kvm@vger.kernel.org, x86@kernel.org,
+        Kees Cook <keescook@chromium.org>,
+        Dave Hansen <dave.hansen@linux.intel.com>,
+        linux-kernel@vger.kernel.org, "H. Peter Anvin" <hpa@zytor.com>,
+        Borislav Petkov <bp@alien8.de>, Joerg Roedel <joro@8bytes.org>,
+        Ingo Molnar <mingo@redhat.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>
+Date:   Thu, 21 Jul 2022 17:57:02 +0300
+In-Reply-To: <YtlefGulMwp/WwKv@google.com>
+References: <20220621150902.46126-1-mlevitsk@redhat.com>
+         <20220621150902.46126-6-mlevitsk@redhat.com> <YtiUq7jm2Z1NTRv3@google.com>
+         <532c71cbca049004bd6860508fdc056ae118ab1f.camel@redhat.com>
+         <YtlefGulMwp/WwKv@google.com>
+Content-Type: text/plain; charset="UTF-8"
+User-Agent: Evolution 3.36.5 (3.36.5-2.fc32) 
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.10.0
-Subject: Re: [kvm-unit-tests GIT PULL 00/12] s390x: improve error reporting,
- more storage key tests
-Content-Language: en-US
-To:     Claudio Imbrenda <imbrenda@linux.ibm.com>
-Cc:     kvm@vger.kernel.org, thuth@redhat.com, frankja@linux.ibm.com
-References: <20220721140701.146135-1-imbrenda@linux.ibm.com>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-In-Reply-To: <20220721140701.146135-1-imbrenda@linux.ibm.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-2.8 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
-        RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_NONE autolearn=ham
-        autolearn_force=no version=3.4.6
+X-Scanned-By: MIMEDefang 2.85 on 10.11.54.9
+X-Spam-Status: No, score=-3.5 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,
+        SPF_HELO_NONE,SPF_NONE autolearn=unavailable autolearn_force=no
+        version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 7/21/22 16:06, Claudio Imbrenda wrote:
-> Hi Paolo,
+On Thu, 2022-07-21 at 14:11 +0000, Sean Christopherson wrote:
+> On Thu, Jul 21, 2022, Maxim Levitsky wrote:
+> > On Wed, 2022-07-20 at 23:50 +0000, Sean Christopherson wrote:
+> > > On Tue, Jun 21, 2022, Maxim Levitsky wrote:
+> > > > CR0.PE toggles real/protected mode, thus its update
+> > > > should update the emulation mode.
+> > > > 
+> > > > This is likely a benign bug because there is no writeback
+> > > > of state, other than the RIP increment, and when toggling
+> > > > CR0.PE, the CPU has to execute code from a very low memory address.
+> > > > 
+> > > > Signed-off-by: Maxim Levitsky <mlevitsk@redhat.com>
+> > > > ---
+> > > >  arch/x86/kvm/emulate.c | 13 ++++++++++++-
+> > > >  1 file changed, 12 insertions(+), 1 deletion(-)
+> > > > 
+> > > > diff --git a/arch/x86/kvm/emulate.c b/arch/x86/kvm/emulate.c
+> > > > index 6f4632babc4cd8..002687d17f9364 100644
+> > > > --- a/arch/x86/kvm/emulate.c
+> > > > +++ b/arch/x86/kvm/emulate.c
+> > > > @@ -3659,11 +3659,22 @@ static int em_movbe(struct x86_emulate_ctxt *ctxt)
+> > > >  
+> > > >  static int em_cr_write(struct x86_emulate_ctxt *ctxt)
+> > > >  {
+> > > > -	if (ctxt->ops->set_cr(ctxt, ctxt->modrm_reg, ctxt->src.val))
+> > > > +	int cr_num = ctxt->modrm_reg;
+> > > > +	int r;
+> > > > +
+> > > > +	if (ctxt->ops->set_cr(ctxt, cr_num, ctxt->src.val))
+> > > >  		return emulate_gp(ctxt, 0);
+> > > >  
+> > > >  	/* Disable writeback. */
+> > > >  	ctxt->dst.type = OP_NONE;
+> > > > +
+> > > > +	if (cr_num == 0) {
+> > > > +		/* CR0 write might have updated CR0.PE */
+> > > 
+> > > Or toggled CR0.PG.  
+> > 
+> > I thought about it but paging actually does not affect the CPU mode.
 > 
-> please merge the following changes:
-> * new testcases to test storage keys functionality
-> * improved parsing of interrupt parameters
-> * readability improvements
-> * CI fix to overcome a qemu bug exposed by the new tests
-> * better error reporting for SMP tests
-> 
-> MERGE:
-> https://gitlab.com/kvm-unit-tests/kvm-unit-tests/-/merge_requests/34
-> 
-> PIPELINE:
-> https://gitlab.com/imbrenda/kvm-unit-tests/-/pipelines/593541216
-> 
-> PULL:
-> https://gitlab.com/imbrenda/kvm-unit-tests.git s390x-next-2022-07
-> 
-> 
-> Claudio Imbrenda (5):
->    lib: s390x: add functions to set and clear PSW bits
->    s390x: skey.c: rework the interrupt handler
->    lib: s390x: better smp interrupt checks
->    s390x: intercept: fence one test when using TCG
->    s390x: intercept: make sure all output lines are unique
-> 
-> Janis Schoetterl-Glausch (7):
->    s390x: Fix sclp facility bit numbers
->    s390x: lib: SOP facility query function
->    s390x: Rework TEID decoding and usage
->    s390x: Test TEID values in storage key test
->    s390x: Test effect of storage keys on some more instructions
->    s390x: Test effect of storage keys on diag 308
->    s390x/intercept: Test invalid prefix argument to SET PREFIX
-> 
->   lib/s390x/asm/arch_def.h  |  75 ++++++-
->   lib/s390x/asm/facility.h  |  21 ++
->   lib/s390x/asm/interrupt.h |  65 ++++--
->   lib/s390x/asm/pgtable.h   |   2 -
->   lib/s390x/fault.h         |  30 +--
->   lib/s390x/sclp.h          |  18 +-
->   lib/s390x/smp.h           |   8 +-
->   lib/s390x/fault.c         |  58 ++++--
->   lib/s390x/interrupt.c     |  79 ++++++--
->   lib/s390x/mmu.c           |  14 +-
->   lib/s390x/sclp.c          |   9 +-
->   lib/s390x/smp.c           |  11 +
->   s390x/diag288.c           |   6 +-
->   s390x/edat.c              |  25 ++-
->   s390x/intercept.c         |  27 +++
->   s390x/selftest.c          |   4 +-
->   s390x/skey.c              | 408 ++++++++++++++++++++++++++++++++++++--
->   s390x/skrf.c              |  14 +-
->   s390x/smp.c               |  18 +-
->   s390x/unittests.cfg       |   1 +
->   20 files changed, 712 insertions(+), 181 deletions(-)
-> 
+> Toggling CR0.PG when EFER.LME=1 (and CR4.PAE=1) switches the CPU in and out of
+> long mode.  That's why I mentioned the EFER.LMA thing below.  It's also notable
+> in that the only reason we don't have to handle CR4 here is because clearing
+> CR4.PAE while long is active causes a #GP.  
 
-Merged, thanks!
+I had a distinct feeling that this is related to LMA/LME which I always learn and then forget
+Now I do, and I wrote a short summary for myself to refresh my memory when I forget about this again :-)
 
-Paolo
+I'll update the comment again in v3.
+
+Thanks a lot,
+	Best regards,
+		Maxim Levitsky
+
+>  
+> > E.g if you are in protected mode, instructions execute the same regardless
+> > if you have paging or not.
+> > 
+> > (There are probably some exceptions but you understand what I mean).
+> > 
+> > Best regards,
+> > 	Maxim Levitsky
+> > 
+> > > It's probably also worth noting that ->set_cr() handles side
+> > > effects to other registers, e.g. the lack of an EFER.LMA update makes this look
+> > > suspicious at first glance.
+
 
