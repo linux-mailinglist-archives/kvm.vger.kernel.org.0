@@ -2,148 +2,165 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id B9EEC57C9CF
-	for <lists+kvm@lfdr.de>; Thu, 21 Jul 2022 13:37:27 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id DF85757C9F0
+	for <lists+kvm@lfdr.de>; Thu, 21 Jul 2022 13:50:47 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233202AbiGULh0 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 21 Jul 2022 07:37:26 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50048 "EHLO
+        id S233251AbiGULuo (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 21 Jul 2022 07:50:44 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59044 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232881AbiGULhX (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 21 Jul 2022 07:37:23 -0400
-Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 73CA452459
-        for <kvm@vger.kernel.org>; Thu, 21 Jul 2022 04:37:22 -0700 (PDT)
-Received: from pps.filterd (m0098409.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.17.1.5/8.17.1.5) with ESMTP id 26LBFRYD029655;
-        Thu, 21 Jul 2022 11:37:07 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
- mime-version : subject : to : cc : references : from : in-reply-to :
- content-type : content-transfer-encoding; s=pp1;
- bh=jG4UrI7tJxrYRS1TiGzcdECRfBA3oj3rSHWMn7wkNeM=;
- b=jEAYVu7M2n5G58V4cdq6rttjOxpam28VkhW0pJ9IyVHI3AiaPBupeKULfwZgJpCK+AvK
- 0fNqsrfbvWz9qaHVcNHpVg5d9Znh69W5xJf+hf7a73Y5iN+PM/f3uOq4oCnnj8PP9eVK
- fc4Gqo+WSmuBp+Yi1gan+jTY95xPlC3Wj5ihZkjl99jHbm0B+BEsAwghwMbt7deGeWrp
- R4wU6LidjQQIb/TGkFpxxdKxk3U/V0tFZtjmN8Kf2sqK5rO4p7YDMUlV1ZrRHhqwaJGB
- DB8dLcj2arq53Db699wup+eVjpkLHMQoprY2fOfpWrPcavS6U8MWatXTBFVua81FPxlN Yw== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3hf5ru0fcy-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 21 Jul 2022 11:37:07 +0000
-Received: from m0098409.ppops.net (m0098409.ppops.net [127.0.0.1])
-        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 26LBJDac011467;
-        Thu, 21 Jul 2022 11:37:06 GMT
-Received: from ppma03ams.nl.ibm.com (62.31.33a9.ip4.static.sl-reverse.com [169.51.49.98])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3hf5ru0fc9-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 21 Jul 2022 11:37:06 +0000
-Received: from pps.filterd (ppma03ams.nl.ibm.com [127.0.0.1])
-        by ppma03ams.nl.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 26LBYmHW029689;
-        Thu, 21 Jul 2022 11:37:04 GMT
-Received: from b06avi18878370.portsmouth.uk.ibm.com (b06avi18878370.portsmouth.uk.ibm.com [9.149.26.194])
-        by ppma03ams.nl.ibm.com with ESMTP id 3hbmy8xun7-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 21 Jul 2022 11:37:04 +0000
-Received: from b06wcsmtp001.portsmouth.uk.ibm.com (b06wcsmtp001.portsmouth.uk.ibm.com [9.149.105.160])
-        by b06avi18878370.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 26LBbDYj30015846
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Thu, 21 Jul 2022 11:37:13 GMT
-Received: from b06wcsmtp001.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id F2D5EA405B;
-        Thu, 21 Jul 2022 11:37:00 +0000 (GMT)
-Received: from b06wcsmtp001.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id AD1DEA4054;
-        Thu, 21 Jul 2022 11:36:59 +0000 (GMT)
-Received: from [9.171.89.164] (unknown [9.171.89.164])
-        by b06wcsmtp001.portsmouth.uk.ibm.com (Postfix) with ESMTP;
-        Thu, 21 Jul 2022 11:36:59 +0000 (GMT)
-Message-ID: <2c0b3926-482a-9c3f-1937-1be672ba7aeb@linux.ibm.com>
-Date:   Thu, 21 Jul 2022 13:41:47 +0200
+        with ESMTP id S230230AbiGULum (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 21 Jul 2022 07:50:42 -0400
+Received: from NAM11-CO1-obe.outbound.protection.outlook.com (mail-co1nam11on2044.outbound.protection.outlook.com [40.107.220.44])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0B46A2A400;
+        Thu, 21 Jul 2022 04:50:42 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=E4lnkksOxRFVaMJNrICoQkb3cqCfjrMTHkcTQmfm797h90SzUkdA/w887X2JRrV/IrEdHp8Rd8kpL6mvEudXf3QyWZUCqYgC0gaB0aU0ODkDwvGgLyVAFsS0YXRfo9U1+0/Qwh6OyfqqWFP8N4ukqkiwiI1vLmaV03GWynaWTc3ksWC6NmkbZ6LWvsKEq5A1JEPmT+Xj+bV3/idLmfjKw6XJR4+2Xfht9mPoxLWbra7jsGvOLKuhby2MZsxRe+lPlq1p2DDk0EMXZeqwwcqKluPz6qr+whIqq4CkG29cXGoCmTU97WWDwcGH/tGEqjZftod55MqjTR4CaCkZxIA3Uw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=6TzOuzfsfDz8jvQl74Es/QYDD6mbPQ51m4iN7k0p1lI=;
+ b=hkkpKcAGOewgZp4DMAiaiFSycXYAZZ1z7qAYF/xKeL1lZk0/tZsGh/YQyvdU5u08F+c7c/OamwhK7T9SxrO2zganZLlwNYcOHAt7/lNPa7inQJW2o/xFmv1j8xVEDIm2OAsIrGslxE18XVAB5YvBzsN4Re9AiQkKoe7F/d5aInNZ5DammEQMA9/JlNR2KyFvWkC3ZMzNb8v4xUpGnTWuSzRhJUvfSQqq7EUVs4WbHdpEMyR6XSSWRUS+dp7Rx21G2iW5zrSQuUx2bku+/rZTYnMEgC2MDG/lb7zIpqyKnsJmuW4CLozIoNfmrxW+sgD1+861/riGImQtrPjs4nTeUg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
+ dkim=pass header.d=nvidia.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=6TzOuzfsfDz8jvQl74Es/QYDD6mbPQ51m4iN7k0p1lI=;
+ b=Zop68F7zAB5v0af/8MqvQG6gK38zHi1Dius/gpAIINFRfoFAlfMA3ZVWoaWB6qSPZs1JrU2HkGfoOGscXVWbfOEySVZv1D3XH2Ajx4LDKtzKomvR3LUlhCbv9/F+soT8VCeTCnDgOJPSxhPb7VJB7W0ZR5n3/QyHuBnERbjVg5nA+P/7TZxed9iALmG+kZCmSgOgQgLbCYVwERdLb47jxfkXRqSgxwC4Yd0mBp3zj0dTeAepAh9pFaAtPodfl0JIcDob+XDFbMtoMdkU/435eskYaxH7JvfaEHzIERK0rI6Pd/+1qSCqjcs03b5tK50AlaKp5qTWyBpEcFk+ww7aGQ==
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=nvidia.com;
+Received: from MN2PR12MB4192.namprd12.prod.outlook.com (2603:10b6:208:1d5::15)
+ by CH0PR12MB5187.namprd12.prod.outlook.com (2603:10b6:610:ba::5) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5458.18; Thu, 21 Jul
+ 2022 11:50:39 +0000
+Received: from MN2PR12MB4192.namprd12.prod.outlook.com
+ ([fe80::ac35:7c4b:3282:abfb]) by MN2PR12MB4192.namprd12.prod.outlook.com
+ ([fe80::ac35:7c4b:3282:abfb%3]) with mapi id 15.20.5458.018; Thu, 21 Jul 2022
+ 11:50:39 +0000
+Date:   Thu, 21 Jul 2022 08:50:38 -0300
+From:   Jason Gunthorpe <jgg@nvidia.com>
+To:     "Tian, Kevin" <kevin.tian@intel.com>
+Cc:     Alex Williamson <alex.williamson@redhat.com>,
+        Yishai Hadas <yishaih@nvidia.com>,
+        "saeedm@nvidia.com" <saeedm@nvidia.com>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+        "kuba@kernel.org" <kuba@kernel.org>,
+        "Martins, Joao" <joao.m.martins@oracle.com>,
+        "leonro@nvidia.com" <leonro@nvidia.com>,
+        "maorg@nvidia.com" <maorg@nvidia.com>,
+        "cohuck@redhat.com" <cohuck@redhat.com>
+Subject: Re: [PATCH V2 vfio 06/11] vfio: Introduce the DMA logging feature
+ support
+Message-ID: <20220721115038.GX4609@nvidia.com>
+References: <20220714081251.240584-1-yishaih@nvidia.com>
+ <20220714081251.240584-7-yishaih@nvidia.com>
+ <20220718163024.143ec05a.alex.williamson@redhat.com>
+ <8242cd07-0b65-e2b8-3797-3fe5623ec65d@nvidia.com>
+ <20220719132514.7d21dfaf.alex.williamson@redhat.com>
+ <20220719200825.GK4609@nvidia.com>
+ <BN9PR11MB527610E578F01DC631F626A88C919@BN9PR11MB5276.namprd11.prod.outlook.com>
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <BN9PR11MB527610E578F01DC631F626A88C919@BN9PR11MB5276.namprd11.prod.outlook.com>
+X-ClientProxiedBy: BL1PR13CA0198.namprd13.prod.outlook.com
+ (2603:10b6:208:2be::23) To MN2PR12MB4192.namprd12.prod.outlook.com
+ (2603:10b6:208:1d5::15)
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.3.0
-Subject: Re: [PATCH v8 08/12] s390x/cpu_topology: implementing numa for the
- s390x topology
-Content-Language: en-US
-To:     Janis Schoetterl-Glausch <scgl@linux.ibm.com>,
-        qemu-s390x@nongnu.org
-Cc:     qemu-devel@nongnu.org, borntraeger@de.ibm.com, pasic@linux.ibm.com,
-        richard.henderson@linaro.org, david@redhat.com, thuth@redhat.com,
-        cohuck@redhat.com, mst@redhat.com, pbonzini@redhat.com,
-        kvm@vger.kernel.org, ehabkost@redhat.com,
-        marcel.apfelbaum@gmail.com, eblake@redhat.com, armbru@redhat.com,
-        seiden@linux.ibm.com, nrb@linux.ibm.com, frankja@linux.ibm.com
-References: <20220620140352.39398-1-pmorel@linux.ibm.com>
- <20220620140352.39398-9-pmorel@linux.ibm.com>
- <3a821cd1-b8a0-e737-5279-8ef55e58a77f@linux.ibm.com>
- <b1e89718-232c-2b0b-2133-102ab7b4dad4@linux.ibm.com>
- <b30eb75a-5a0b-3428-b812-95a2884914e4@linux.ibm.com>
- <14afa5dc-80de-c5a2-b57d-867c692b29cf@linux.ibm.com>
- <e497396a-eadf-15ae-e11c-d6a2bbbff7c7@linux.ibm.com>
- <3b2f62a7-b526-adfd-e791-f2bc2cae3ccf@linux.ibm.com>
- <4d0d25e9-fedf-728c-12e9-70e4dc04d6b7@linux.ibm.com>
-From:   Pierre Morel <pmorel@linux.ibm.com>
-In-Reply-To: <4d0d25e9-fedf-728c-12e9-70e4dc04d6b7@linux.ibm.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-ORIG-GUID: KkAy_KrZRIrsAu4fh4feqta8Io22-Ygt
-X-Proofpoint-GUID: ciCFhT6-OlcRrRo8X9bZQsSKr2fMwGsH
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.205,Aquarius:18.0.883,Hydra:6.0.517,FMLib:17.11.122.1
- definitions=2022-07-21_16,2022-07-20_01,2022-06-22_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 bulkscore=0 malwarescore=0
- phishscore=0 mlxscore=0 spamscore=0 adultscore=0 suspectscore=0
- mlxlogscore=999 priorityscore=1501 impostorscore=0 clxscore=1015
- lowpriorityscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2206140000 definitions=main-2207210046
-X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,
-        SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
+X-MS-PublicTrafficType: Email
+X-MS-Office365-Filtering-Correlation-Id: a02b6f0d-e2f5-41a3-1ac8-08da6b0f3b45
+X-MS-TrafficTypeDiagnostic: CH0PR12MB5187:EE_
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: 9zHi9uwqoYrfSwPUYdX6xSxnhQgE4JRsMUscApvwLu4RpiaW2F1RYaUrMfYIYV5rR2JlcGGcD9sllHkaBzVhZ2CsBYgUec1T35NhTeB9xfxO2ksENeiqDDAZDHhCZEv5Et7MtsPlpkA90nsk/E9UnzNcJDqzM3a1NtZcOuy4RU1HyvJrpi7h7WnV58XwqpUrNvFR0T3XwCLbt1RvMDaY/5ytPAFoOTHi5QCC85FlDJzLGJhWrqFA/UyhUFjHBRZEY9e7v1vC76MV2pJJDGcEsgvI20OlbT9o9REGZpqjE2YMgcX8+n3Ltp7TA2ela8DKUOyb/M/6BnkDFyEVaH5WnbJ2TebFfTNcAGIlzOio8eMd+mGzrqkM6KvFYmdZtBNtSY+nzCU72Dfeyp1oXbOd0bV4lbhY9egKrsYPOwTeyUZsZF/P7sxhsUqdjMFgmNY0NoHpXovB7aJSkO5JetuyK9gEBJ8v2Vmw5rUcfZmj3LiJe3k6AXKXbS36FAhJH4qIRrfBQXzt9yrMSpEy1UM2Ed60+ZV9T52oS+PnKEUyIQiDkV39TuJbRZl+XYRrzqcT5VMiBGhnUl8HswcYH0c3Crbv96eC7bmj4ET8iBxrnX5spKIIFc5KlzAHP7/iX8SlguQHWcq05VyRv++G1oqkPgEmcQmFi5B+MaxiFYyXZoytQqG2D987HtFb8f75DwnnnbVPoB4Y3w6XVaiepagkRsFXJ8efARgFgm/dkXNCxNc=
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:MN2PR12MB4192.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230016)(4636009)(396003)(346002)(136003)(376002)(366004)(39860400002)(54906003)(6862004)(36756003)(4326008)(8676002)(66946007)(66476007)(83380400001)(478600001)(86362001)(8936002)(66556008)(5660300002)(33656002)(26005)(6512007)(41300700001)(38100700002)(186003)(6506007)(316002)(6486002)(2906002)(1076003)(2616005);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?ze+6V9SibxH/ZawesA8spifOmyaHjGKgz5USGVgVUN8VgOxLIof5pE8fzuaJ?=
+ =?us-ascii?Q?/AiARFBx+1yPOazYU5Phvw9Oea/of+vARap83mUZT50d7wrE3HqFWq3Z7PXl?=
+ =?us-ascii?Q?g6mntXe/uBs0pYzhVDwpz7fIpDL1xaXXibmcVvGctg/WnSYnMVL4kvOZ+qZH?=
+ =?us-ascii?Q?tYW3tZcwQpq5PJSXa6HRzuNvMsCWxIyoY2NckL7Z1AwqLB6Wxj5Bl2diY8SO?=
+ =?us-ascii?Q?z5yl2FXq+S+XJaYOaY3qKGduoL2C0LLCTPyban4HNHd9Ufxm1QTZY8X1gS8N?=
+ =?us-ascii?Q?dS/m7vmpCHELsOY05ANAzkEb4LARXD/WT5uuuOThnZmBBEMgi3ZjZ/CVxM4H?=
+ =?us-ascii?Q?rKEbbNWBjReqowCjYrYjOjffro3FkXSYzGLgPgclaLkl/Fp/CfOQF7Ru2Vfc?=
+ =?us-ascii?Q?K8+tfQw664nXNF/jtbkTrEcmB6Bj+CD5oZKoB/nGsn+pE2kBX9qGqNo1Q7L7?=
+ =?us-ascii?Q?v+mjuJRoXzH8cvVUWnpfVA8NPXVvchy67kqX3kEX194U/MYNlc4IviNQ47tv?=
+ =?us-ascii?Q?DYzKHSUTn1SVNGW0jXrythO5YcB5QcZOKA9IGhxg1kN1xYD3keZYKUfugiFL?=
+ =?us-ascii?Q?85lbrqxMl8MPA/J4e7lH9tiqyzXJPw1A5964eue2prnOKl9KRL9Gy4pq8iGO?=
+ =?us-ascii?Q?8gtdHNJS6NbAxAJ1rygWAbTY8tK6yx/56xqtf71SiVRWqnlysL5eMm79J33w?=
+ =?us-ascii?Q?XeWCnSXSATvxucPtO+CrVlDKIiEy5nN1PVL7qi5Irt+rdkPnTB+FZc6pXorX?=
+ =?us-ascii?Q?8elvillMC6ygGypAljiS0ktdEwEZXY4NP8mCw010nldlGHHVkvNgltO1weii?=
+ =?us-ascii?Q?3vNpGx7a/VgM+jdMQ7q/kFivdmwRC7GK38Nc/ppWUc2uJYLHs5niscKtX+DP?=
+ =?us-ascii?Q?RqhNrW+M0tgyBbqta8pgWJIyONCgFATbgJ6WNSCNbOFiDvsFzIiYolT3rgn/?=
+ =?us-ascii?Q?EPUyI/qVso33bzYo8x8lXZKNIMOiRJuVaJSvEmH5VK5qE7nd+C7aVLH8c0qx?=
+ =?us-ascii?Q?cSG94vhtJmHKjn7m5Krdl7y3RxLCTsHdOEsZgtAEM38GPlfC8ITUQf2gnqhZ?=
+ =?us-ascii?Q?2jNJ0Mc19ntpaxhK3fi0WUVtFuqgGRjBrzuvLVACwbgFS4dQQSfN6M3EY3EU?=
+ =?us-ascii?Q?RmcIJeDpenrp6mESZ9JHYKM/wpYUOi1n8/5mef0xxfiHuu9gE7DGi7Zb8tjG?=
+ =?us-ascii?Q?XrVc1Fy6sYjlkI2hWZHQrZOVuvhhmpE+gAUQRa3pP8Kod9pmkbWNrMgixxG8?=
+ =?us-ascii?Q?U+s1wqc9Kkf0eCeeRTE/wgf09KvIw2BQw26E4eCsbn6jNEnwi/MZq+lPBfJ9?=
+ =?us-ascii?Q?OoHDocxxbiq8nTXlLem73ySgCOZbdIdTuC5D0jreRTyKThrtdzpsh9z5tY9E?=
+ =?us-ascii?Q?p79JJv3k20zKi4rnUB3+TKEztgC3UZ/8TZhImhJoiNPESAFpsYuN0kFj3aFY?=
+ =?us-ascii?Q?xShLTDv7GEurahOHJ3dIMqSFxIR2ohc02Z12zpRkVQf+HisqExpNbg6vD//y?=
+ =?us-ascii?Q?6Etm/G5flASHEGf3JmY9A1zh0BIYTTOn4yHaS1E9UfQ7dYWIeqMJhG6wNbux?=
+ =?us-ascii?Q?xLp6Okjrdom4PcL1KxdXXZt0bE9Oz25pVhModa6W?=
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: a02b6f0d-e2f5-41a3-1ac8-08da6b0f3b45
+X-MS-Exchange-CrossTenant-AuthSource: MN2PR12MB4192.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 21 Jul 2022 11:50:39.0662
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: i4CebTF2DbrA0UWurloSYX2TbIXGdDl+wK0N8XNvwoMqFv013gZn/b5ZxaoFeEX1
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: CH0PR12MB5187
+X-Spam-Status: No, score=-1.8 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FORGED_SPF_HELO,
+        RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_NONE
+        autolearn=no autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-
-
-On 7/21/22 10:16, Janis Schoetterl-Glausch wrote:
-> On 7/21/22 09:58, Pierre Morel wrote:
->>
->>
-
-...snip...
-
->>
->> You are right, numa is redundant for us as we specify the topology using the core-id.
->> The roadmap I would like to discuss is using a new:
->>
->> (qemu) cpu_move src dst
->>
->> where src is the current core-id and dst is the destination core-id.
->>
->> I am aware that there are deep implication on current cpu code but I do not think it is not possible.
->> If it is unpossible then we would need a new argument to the device_add for cpu to define the "effective_core_id"
->> But we will still need the new hmp command to update the topology.
->>
-> I don't think core-id is the right one, that's the guest visible CPU address, isn't it?
-
-Yes, the topology is the one seen by the guest.
-
-> Although it seems badly named then, since multiple threads are part of the same core (ok, we don't support threads).
-
-I guess that threads will always move with the core or... we do not 
-support threads.
-
-> Instead socket-id, book-id could be changed dynamically instead of being computed from the core-id.
+On Thu, Jul 21, 2022 at 08:54:39AM +0000, Tian, Kevin wrote:
+> > From: Jason Gunthorpe <jgg@nvidia.com>
+> > Sent: Wednesday, July 20, 2022 4:08 AM
+> > 
+> > On Tue, Jul 19, 2022 at 01:25:14PM -0600, Alex Williamson wrote:
+> > 
+> > > > We don't really expect user space to hit this limit, the RAM in QEMU is
+> > > > divided today to around ~12 ranges as we saw so far in our evaluation.
+> > >
+> > > There can be far more for vIOMMU use cases or non-QEMU drivers.
+> > 
+> > Not really, it isn't dynamic so vIOMMU has to decide what it wants to
+> > track up front. It would never make sense to track based on what is
+> > currently mapped. So it will be some small list, probably a big linear
+> > chunk of the IOVA space.
 > 
+> How would vIOMMU make such decision when the address space 
+> is managed by the guest? it is dynamic and could be sparse. I'm
+> curious about any example a vIOMMU can use to generate such small
+> list. Would it be a single range based on aperture reported from the
+> kernel?
 
-What becomes of the core-id ?
+Yes. qemu has to select a static aperture at start.
 
+ The entire aperture is best, if that fails
 
+ A smaller aperture and hope the guest doesn't use the whole space, if
+ that fails,
 
+ The entire guest physical map and hope the guest is in PT mode
 
--- 
-Pierre Morel
-IBM Lab Boeblingen
+All of these options are small lists.
+
+Any vIOMMU maps that are created outside of what was asked to be
+tracked have to be made permanently dirty by qemu.
+
+Jason 
