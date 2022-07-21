@@ -2,281 +2,143 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 52E8E57D129
-	for <lists+kvm@lfdr.de>; Thu, 21 Jul 2022 18:14:39 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 01BC257D14C
+	for <lists+kvm@lfdr.de>; Thu, 21 Jul 2022 18:18:41 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233870AbiGUQOg (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 21 Jul 2022 12:14:36 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42956 "EHLO
+        id S233957AbiGUQSa (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 21 Jul 2022 12:18:30 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42456 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233499AbiGUQOS (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 21 Jul 2022 12:14:18 -0400
-Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B3D8689662;
-        Thu, 21 Jul 2022 09:14:06 -0700 (PDT)
-Received: from pps.filterd (m0098421.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.17.1.5/8.17.1.5) with ESMTP id 26LFs0mg006175;
-        Thu, 21 Jul 2022 16:13:36 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=from : to : cc : subject
- : date : message-id : in-reply-to : references : content-transfer-encoding
- : mime-version; s=pp1; bh=L5+lu9PnLTS52Xj3+U2iqNoRACm4yer8cO647T8wkuY=;
- b=WVGnuCkCzic8wNH4F6YT4XkqOxmDA7dFGyK1kWVvf6eZzOnGOSsuRQrfwJ2QrjfN3/eW
- 05+fWmo9YbaNZa4Kr5qdbuivIkmLg9YVLKuWpegcnIZWQvWy71Hz4dtE/bHFTNzbnlFw
- mkyn12GolA2yhJUoQfNLPz+YASN2Hf/gHsiKtWXLCZEUg0oBZjrP1EaeWZlzPwI54k44
- dB6J4PH2qK2zAMgn0ChpSm53EYdfNK+OA2wqS61UweU1ondpGCIQ55oxb84LkMyfFKKZ
- p2Tffv8yWISm3+azvlavDQyKJahb06Mh/I1w78Jhfx6qJjiCBey4oJGxJthyxJ44fKZX ng== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3hf9um8fkw-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 21 Jul 2022 16:13:35 +0000
-Received: from m0098421.ppops.net (m0098421.ppops.net [127.0.0.1])
-        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 26LFuB2P017603;
-        Thu, 21 Jul 2022 16:13:35 GMT
-Received: from ppma04ams.nl.ibm.com (63.31.33a9.ip4.static.sl-reverse.com [169.51.49.99])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3hf9um8fjq-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 21 Jul 2022 16:13:35 +0000
-Received: from pps.filterd (ppma04ams.nl.ibm.com [127.0.0.1])
-        by ppma04ams.nl.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 26LGDB8v004192;
-        Thu, 21 Jul 2022 16:13:33 GMT
-Received: from b06cxnps4076.portsmouth.uk.ibm.com (d06relay13.portsmouth.uk.ibm.com [9.149.109.198])
-        by ppma04ams.nl.ibm.com with ESMTP id 3hbmy8y54b-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 21 Jul 2022 16:13:33 +0000
-Received: from b06wcsmtp001.portsmouth.uk.ibm.com (b06wcsmtp001.portsmouth.uk.ibm.com [9.149.105.160])
-        by b06cxnps4076.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 26LGDUIr15401408
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Thu, 21 Jul 2022 16:13:30 GMT
-Received: from b06wcsmtp001.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 27C25A4054;
-        Thu, 21 Jul 2022 16:13:30 +0000 (GMT)
-Received: from b06wcsmtp001.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 92D20A405B;
-        Thu, 21 Jul 2022 16:13:29 +0000 (GMT)
-Received: from p-imbrenda.ibmuc.com (unknown [9.145.4.232])
-        by b06wcsmtp001.portsmouth.uk.ibm.com (Postfix) with ESMTP;
-        Thu, 21 Jul 2022 16:13:29 +0000 (GMT)
-From:   Claudio Imbrenda <imbrenda@linux.ibm.com>
-To:     pbonzini@redhat.com
-Cc:     kvm@vger.kernel.org, linux-s390@vger.kernel.org,
-        frankja@linux.ibm.com, borntraeger@linux.ibm.com,
-        hca@linux.ibm.com, gor@linux.ibm.com, agordeev@linux.ibm.com,
-        thuth@redhat.com, david@redhat.com,
-        Pierre Morel <pmorel@linux.ibm.com>,
-        Janis Schoetterl-Glausch <scgl@linux.ibm.com>
-Subject: [GIT PULL 42/42] KVM: s390: resetting the Topology-Change-Report
-Date:   Thu, 21 Jul 2022 18:13:02 +0200
-Message-Id: <20220721161302.156182-43-imbrenda@linux.ibm.com>
-X-Mailer: git-send-email 2.36.1
-In-Reply-To: <20220721161302.156182-1-imbrenda@linux.ibm.com>
-References: <20220721161302.156182-1-imbrenda@linux.ibm.com>
-X-TM-AS-GCONF: 00
-X-Proofpoint-ORIG-GUID: gOVAdRUJfBYCFNlXMiTBT0Z5DV_E2Ou3
-X-Proofpoint-GUID: zBJGP0isZRDgODCsa0NGQSyRgiYp6Q-I
-Content-Transfer-Encoding: 8bit
-X-Proofpoint-UnRewURL: 0 URL was un-rewritten
+        with ESMTP id S233965AbiGUQRq (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 21 Jul 2022 12:17:46 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id C0CFA52E4E
+        for <kvm@vger.kernel.org>; Thu, 21 Jul 2022 09:17:21 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1658420240;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=iVqv0DH0Rdu3Hx2gmqiPwyuJENuZAXX6QoeoOvG6sKo=;
+        b=WUtq0fPdHt0ecQIF2RWwnhxySVXjeARyRQysrWBDnsi9uA93xaLy/g34JvKH0sk3Yyii2O
+        59dhQWeK75NpZi6q4oPfi2z7uXi4w+2kGmIha9EXYZlUDNnJ5BPqMXDXS/LUUwfCnUg1Vy
+        4z+1wa6hVsCcA4p4ipfbF6Zi5Ha6uJo=
+Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
+ [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-9-UsMk2uezMCyR3rV2bxDVBw-1; Thu, 21 Jul 2022 12:17:17 -0400
+X-MC-Unique: UsMk2uezMCyR3rV2bxDVBw-1
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.rdu2.redhat.com [10.11.54.5])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id B66BD858EFE;
+        Thu, 21 Jul 2022 16:17:16 +0000 (UTC)
+Received: from starship (unknown [10.40.192.46])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 49590909FF;
+        Thu, 21 Jul 2022 16:17:14 +0000 (UTC)
+Message-ID: <23f156d46033a6434591186b0a7bcce3d8a138d1.camel@redhat.com>
+Subject: Re: [PATCHv2 4/7] KVM: SVM: Report NMI not allowed when Guest busy
+ handling VNMI
+From:   Maxim Levitsky <mlevitsk@redhat.com>
+To:     Sean Christopherson <seanjc@google.com>
+Cc:     Santosh Shukla <santosh.shukla@amd.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>,
+        Tom Lendacky <thomas.lendacky@amd.com>, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+Date:   Thu, 21 Jul 2022 19:17:13 +0300
+In-Reply-To: <Ytl6GLui7UQFi3FO@google.com>
+References: <20220709134230.2397-1-santosh.shukla@amd.com>
+         <20220709134230.2397-5-santosh.shukla@amd.com>
+         <Yth5hl+RlTaa5ybj@google.com>
+         <c5acc3ac2aec4b98f9211ca3f4100c358bf2f460.camel@redhat.com>
+         <Ytlpxa2ULiIQFOnj@google.com>
+         <413f59cd3c0a80c5b71a0cd033fdaad082c5a0e7.camel@redhat.com>
+         <Ytl6GLui7UQFi3FO@google.com>
+Content-Type: text/plain; charset="UTF-8"
+User-Agent: Evolution 3.36.5 (3.36.5-2.fc32) 
 MIME-Version: 1.0
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.205,Aquarius:18.0.883,Hydra:6.0.517,FMLib:17.11.122.1
- definitions=2022-07-21_22,2022-07-20_01,2022-06-22_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 impostorscore=0
- suspectscore=0 priorityscore=1501 spamscore=0 mlxscore=0 bulkscore=0
- lowpriorityscore=0 adultscore=0 phishscore=0 mlxlogscore=999 clxscore=1015
- malwarescore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2206140000 definitions=main-2207210061
-X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_EF,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_PASS
-        autolearn=ham autolearn_force=no version=3.4.6
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.79 on 10.11.54.5
+X-Spam-Status: No, score=-3.5 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,
+        SPF_HELO_NONE,SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-From: Pierre Morel <pmorel@linux.ibm.com>
+On Thu, 2022-07-21 at 16:08 +0000, Sean Christopherson wrote:
+> On Thu, Jul 21, 2022, Maxim Levitsky wrote:
+> > On Thu, 2022-07-21 at 14:59 +0000, Sean Christopherson wrote:
+> > > Yep.  Dropping an NMI in the last case is ok, AFAIK no CPU will pend multiple NMIs
+> > > while another is in-flight.  But triggering an immediate exit in svm_nmi_allowed()
+> > > will hang the vCPU as the second pending NMI will never go away since the vCPU
+> > 
+> > The idea is to trigger the immediate exit only when a NMI was just injected (V_NMI_PENDING=1)
+> > but not masked (that is currently in service, that is V_NMI_MASK=0).
+> 
+> I assume you mean "and an NMI is currently NOT in service"?
 
-During a subsystem reset the Topology-Change-Report is cleared.
+Yes
+> 
+> Anyways, we're on the same page, trigger an exit if and only if there's an NMI pending
+> and the vCPU isn't already handling a vNMI.  We may need to explicitly drop one of
+> the pending NMIs in that case though, otherwise the NMI that _KVM_ holds pending could
+> get "injected" well after NMIs are unmasked, which could suprise the guest.  E.g.
+> guest IRETs from the second (of three) NMIs, KVM doesn't "inject" that third NMI
+> until the next VM-Exit, which could be a long time in the future.
+> 
+> > In case both bits are set, the NMI is dropped, that is no immediate exit is requested.
+> > 
+> > In this case, next VM entry should have no reason to not inject the NMI and then VM exit
+> > on the interrupt we raised, so there should not be a problem with forward progress.
+> > 
+> > There is an issue still, the NMI could also be masked if we are in SMM (I suggested
+> > setting the V_NMI_MASK manually in this case), thus in this case we won't have more
+> > that one pending NMI, but I guess this is not that big problem.
+> > 
+> > We can btw also in this case "open" the NMI window by waiting for RSM intercept.
+> > (that is just not inject the NMI, and on RSM inject it, I think that KVM already does this)
+> > 
+> > I think it should overal work, but no doubt I do expect issues and corner cases,
+> > 
+> > 
+> > > won't make forward progress to unmask NMIs.  This can also happen if there are
+> > > two pending NMIs and GIF=0, i.e. any time there are multiple pending NMIs and NMIs
+> > > are blocked.
+> > 
+> > GIF=0 can be dealt with though, if GIF is 0 when 2nd pending NMI arrives, we can
+> > delay its injection to the moment the STGI is executed and intercept STGI.
+> > 
+> > We I think already do something like that as well.
+> 
+> Yep, you're right, svm_enable_nmi_window() sets INTERCEPT_STGI if VGIF is enabled
+> and GIF=0 (and STGI exits unconditional if VGIF=0?
 
-Let's give userland the possibility to clear the MTCR in the case
-of a subsystem reset.
+Its not unconditional but KVM has to set the intercept, otherwise the guest
+will control the host's GIF.
 
-To migrate the MTCR, we give userland the possibility to
-query the MTCR state.
+Best regards,
+	Maxim Levitsky
 
-We indicate KVM support for the CPU topology facility with a new
-KVM capability: KVM_CAP_S390_CPU_TOPOLOGY.
 
-Signed-off-by: Pierre Morel <pmorel@linux.ibm.com>
-Reviewed-by: Janis Schoetterl-Glausch <scgl@linux.ibm.com>
-Reviewed-by: Janosch Frank <frankja@linux.ibm.com>
-Message-Id: <20220714194334.127812-1-pmorel@linux.ibm.com>
-Link: https://lore.kernel.org/all/20220714194334.127812-1-pmorel@linux.ibm.com/
-[frankja@linux.ibm.com: Simple conflict resolution in Documentation/virt/kvm/api.rst]
-Signed-off-by: Janosch Frank <frankja@linux.ibm.com>
----
- Documentation/virt/kvm/api.rst   | 25 ++++++++++++++++
- arch/s390/include/uapi/asm/kvm.h |  1 +
- arch/s390/kvm/kvm-s390.c         | 51 ++++++++++++++++++++++++++++++++
- include/uapi/linux/kvm.h         |  1 +
- 4 files changed, 78 insertions(+)
+> ).
+> 
+> So we have a poor man's NMI-window exiting.
 
-diff --git a/Documentation/virt/kvm/api.rst b/Documentation/virt/kvm/api.rst
-index 5be5cc59869d..3c4551a2f6d0 100644
---- a/Documentation/virt/kvm/api.rst
-+++ b/Documentation/virt/kvm/api.rst
-@@ -8269,6 +8269,31 @@ The capability has no effect if the nx_huge_pages module parameter is not set.
- 
- This capability may only be set before any vCPUs are created.
- 
-+8.39 KVM_CAP_S390_CPU_TOPOLOGY
-+------------------------------
-+
-+:Capability: KVM_CAP_S390_CPU_TOPOLOGY
-+:Architectures: s390
-+:Type: vm
-+
-+This capability indicates that KVM will provide the S390 CPU Topology
-+facility which consist of the interpretation of the PTF instruction for
-+the function code 2 along with interception and forwarding of both the
-+PTF instruction with function codes 0 or 1 and the STSI(15,1,x)
-+instruction to the userland hypervisor.
-+
-+The stfle facility 11, CPU Topology facility, should not be indicated
-+to the guest without this capability.
-+
-+When this capability is present, KVM provides a new attribute group
-+on vm fd, KVM_S390_VM_CPU_TOPOLOGY.
-+This new attribute allows to get, set or clear the Modified Change
-+Topology Report (MTCR) bit of the SCA through the kvm_device_attr
-+structure.
-+
-+When getting the Modified Change Topology Report value, the attr->addr
-+must point to a byte where the value will be stored or retrieved from.
-+
- 9. Known KVM API problems
- =========================
- 
-diff --git a/arch/s390/include/uapi/asm/kvm.h b/arch/s390/include/uapi/asm/kvm.h
-index 7a6b14874d65..a73cf01a1606 100644
---- a/arch/s390/include/uapi/asm/kvm.h
-+++ b/arch/s390/include/uapi/asm/kvm.h
-@@ -74,6 +74,7 @@ struct kvm_s390_io_adapter_req {
- #define KVM_S390_VM_CRYPTO		2
- #define KVM_S390_VM_CPU_MODEL		3
- #define KVM_S390_VM_MIGRATION		4
-+#define KVM_S390_VM_CPU_TOPOLOGY	5
- 
- /* kvm attributes for mem_ctrl */
- #define KVM_S390_VM_MEM_ENABLE_CMMA	0
-diff --git a/arch/s390/kvm/kvm-s390.c b/arch/s390/kvm/kvm-s390.c
-index 5d18b66a08c9..edfd4bbd0cba 100644
---- a/arch/s390/kvm/kvm-s390.c
-+++ b/arch/s390/kvm/kvm-s390.c
-@@ -642,6 +642,9 @@ int kvm_vm_ioctl_check_extension(struct kvm *kvm, long ext)
- 	case KVM_CAP_S390_ZPCI_OP:
- 		r = kvm_s390_pci_interp_allowed();
- 		break;
-+	case KVM_CAP_S390_CPU_TOPOLOGY:
-+		r = test_facility(11);
-+		break;
- 	default:
- 		r = 0;
- 	}
-@@ -853,6 +856,20 @@ int kvm_vm_ioctl_enable_cap(struct kvm *kvm, struct kvm_enable_cap *cap)
- 		icpt_operexc_on_all_vcpus(kvm);
- 		r = 0;
- 		break;
-+	case KVM_CAP_S390_CPU_TOPOLOGY:
-+		r = -EINVAL;
-+		mutex_lock(&kvm->lock);
-+		if (kvm->created_vcpus) {
-+			r = -EBUSY;
-+		} else if (test_facility(11)) {
-+			set_kvm_facility(kvm->arch.model.fac_mask, 11);
-+			set_kvm_facility(kvm->arch.model.fac_list, 11);
-+			r = 0;
-+		}
-+		mutex_unlock(&kvm->lock);
-+		VM_EVENT(kvm, 3, "ENABLE: CAP_S390_CPU_TOPOLOGY %s",
-+			 r ? "(not available)" : "(success)");
-+		break;
- 	default:
- 		r = -EINVAL;
- 		break;
-@@ -1789,6 +1806,31 @@ static void kvm_s390_update_topology_change_report(struct kvm *kvm, bool val)
- 	read_unlock(&kvm->arch.sca_lock);
- }
- 
-+static int kvm_s390_set_topo_change_indication(struct kvm *kvm,
-+					       struct kvm_device_attr *attr)
-+{
-+	if (!test_kvm_facility(kvm, 11))
-+		return -ENXIO;
-+
-+	kvm_s390_update_topology_change_report(kvm, !!attr->attr);
-+	return 0;
-+}
-+
-+static int kvm_s390_get_topo_change_indication(struct kvm *kvm,
-+					       struct kvm_device_attr *attr)
-+{
-+	u8 topo;
-+
-+	if (!test_kvm_facility(kvm, 11))
-+		return -ENXIO;
-+
-+	read_lock(&kvm->arch.sca_lock);
-+	topo = ((struct bsca_block *)kvm->arch.sca)->utility.mtcr;
-+	read_unlock(&kvm->arch.sca_lock);
-+
-+	return put_user(topo, (u8 __user *)attr->addr);
-+}
-+
- static int kvm_s390_vm_set_attr(struct kvm *kvm, struct kvm_device_attr *attr)
- {
- 	int ret;
-@@ -1809,6 +1851,9 @@ static int kvm_s390_vm_set_attr(struct kvm *kvm, struct kvm_device_attr *attr)
- 	case KVM_S390_VM_MIGRATION:
- 		ret = kvm_s390_vm_set_migration(kvm, attr);
- 		break;
-+	case KVM_S390_VM_CPU_TOPOLOGY:
-+		ret = kvm_s390_set_topo_change_indication(kvm, attr);
-+		break;
- 	default:
- 		ret = -ENXIO;
- 		break;
-@@ -1834,6 +1879,9 @@ static int kvm_s390_vm_get_attr(struct kvm *kvm, struct kvm_device_attr *attr)
- 	case KVM_S390_VM_MIGRATION:
- 		ret = kvm_s390_vm_get_migration(kvm, attr);
- 		break;
-+	case KVM_S390_VM_CPU_TOPOLOGY:
-+		ret = kvm_s390_get_topo_change_indication(kvm, attr);
-+		break;
- 	default:
- 		ret = -ENXIO;
- 		break;
-@@ -1907,6 +1955,9 @@ static int kvm_s390_vm_has_attr(struct kvm *kvm, struct kvm_device_attr *attr)
- 	case KVM_S390_VM_MIGRATION:
- 		ret = 0;
- 		break;
-+	case KVM_S390_VM_CPU_TOPOLOGY:
-+		ret = test_kvm_facility(kvm, 11) ? 0 : -ENXIO;
-+		break;
- 	default:
- 		ret = -ENXIO;
- 		break;
-diff --git a/include/uapi/linux/kvm.h b/include/uapi/linux/kvm.h
-index 20817dd7f2f1..7e06194129e3 100644
---- a/include/uapi/linux/kvm.h
-+++ b/include/uapi/linux/kvm.h
-@@ -1168,6 +1168,7 @@ struct kvm_ppc_resize_hpt {
- #define KVM_CAP_X86_NOTIFY_VMEXIT 219
- #define KVM_CAP_VM_DISABLE_NX_HUGE_PAGES 220
- #define KVM_CAP_S390_ZPCI_OP 221
-+#define KVM_CAP_S390_CPU_TOPOLOGY 222
- 
- #ifdef KVM_CAP_IRQ_ROUTING
- 
--- 
-2.36.1
+Yep, we also intercept IRET for the same purpose, and RSM interception
+is also a place the NMI are evaluated.
+
+We only single step over the IRET, because NMIs are unmasked _after_ the IRET
+retires.
+
+Best regards,
+	Maxim Levitsky
+> 
+
 
