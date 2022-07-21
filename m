@@ -2,296 +2,143 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id EE1E857CA2D
-	for <lists+kvm@lfdr.de>; Thu, 21 Jul 2022 14:01:51 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 9DBA057CA39
+	for <lists+kvm@lfdr.de>; Thu, 21 Jul 2022 14:05:25 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230230AbiGUMBu (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 21 Jul 2022 08:01:50 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44198 "EHLO
+        id S233453AbiGUMFY (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 21 Jul 2022 08:05:24 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46404 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233433AbiGUMBn (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 21 Jul 2022 08:01:43 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id C909285D64
-        for <kvm@vger.kernel.org>; Thu, 21 Jul 2022 05:01:40 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1658404899;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=q4UwWjQjkx59dvCWwir5dfdbwg9UBNJTDHiU7QC81b8=;
-        b=R00/vbtFVRidkz7Ic8sSOLHKsKK4PkZ3ufDlRXFDIx8QkrMvYkQOvelTvcsf8hXRB5epiI
-        bDC+LhDXlRGxInvVo0j1XVun6wuYhSjUHKXq1KohqhLZcFugGAK8Pt9gEQ4383TysbHC+7
-        65dfw5o9HNPJdt5Kahkn4yKfrSsAJbI=
-Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
- [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-142-dO54k74_OWqTM_bDnusd4A-1; Thu, 21 Jul 2022 08:01:28 -0400
-X-MC-Unique: dO54k74_OWqTM_bDnusd4A-1
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.rdu2.redhat.com [10.11.54.8])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id CDCD085A586;
-        Thu, 21 Jul 2022 12:01:27 +0000 (UTC)
-Received: from starship (unknown [10.40.192.46])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 8696BC2811A;
-        Thu, 21 Jul 2022 12:01:25 +0000 (UTC)
-Message-ID: <d5df7e9e18528de56c41c24958901ace1e2d0aca.camel@redhat.com>
-Subject: Re: [PATCHv2 3/7] KVM: SVM: Add VNMI support in get/set_nmi_mask
-From:   Maxim Levitsky <mlevitsk@redhat.com>
-To:     "Shukla, Santosh" <santosh.shukla@amd.com>,
-        Paolo Bonzini <pbonzini@redhat.com>
-Cc:     Sean Christopherson <seanjc@google.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        Tom Lendacky <thomas.lendacky@amd.com>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-Date:   Thu, 21 Jul 2022 15:01:24 +0300
-In-Reply-To: <6a1e7ce4-81af-ffb9-d193-a98375b632fd@amd.com>
-References: <20220709134230.2397-1-santosh.shukla@amd.com>
-         <20220709134230.2397-4-santosh.shukla@amd.com>
-         <641b171f53cb6a1e596e9591065a694fd2a59b69.camel@redhat.com>
-         <6a1e7ce4-81af-ffb9-d193-a98375b632fd@amd.com>
-Content-Type: text/plain; charset="UTF-8"
-User-Agent: Evolution 3.36.5 (3.36.5-2.fc32) 
+        with ESMTP id S233440AbiGUMFW (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 21 Jul 2022 08:05:22 -0400
+Received: from NAM12-MW2-obe.outbound.protection.outlook.com (mail-mw2nam12on2087.outbound.protection.outlook.com [40.107.244.87])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 69DDBBC80;
+        Thu, 21 Jul 2022 05:05:21 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=l6auCYbu4+0MxyK6skxJ6EPk/ApM9kxGBdtLrShrCbZ8xCop0t+8waeU1YUC+6tL9ghsdXlBpG61lAG00b3MO0P0ZnokEM6IkSNtHeycUIB22NwAXdEH5MUmgQorOqYrbqAwcICvlPIOf/JuKDEzwOZB2PWkI86cRk+3w2IxzoxhWigURTkWaEFVcQHqjTxjM9thYoCHY9HmGev96JlWpsxg0kdkSgghhB/AkT34podru2vSWh81sNZzfxYrjOA1edcJ33AVxi4i8KStrwwqrakAgTnpg1beh9PLoFYyGpHc5HqiD3YbjKaXOk6SmlQofmSe+c3dfUH0HSvWny92wg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=Q4wj5QxOqnya3nq5I26NiK+pwMToGk/vd1XWyAQP6qU=;
+ b=lAltYJqnIt68+GKY+b4nl68h2o3O9k7Kb6otmN78XansYkq3feaY+Lto0FwaNzfsTwYf3ArUZG6jXuvTmAdHSjumBHA0e6NFGgLzcZou+XEqPL1vN/Rl+LBeBQ49ZV1hzv1u+RdLgQtN6TsEX1zRvsJXJ4rATR/yJRlbNAWGn5iuyG2/CLVTjBeePo/Jo6GUaO+g48IKsxH79kxvpPBFwKJvJAoSobQvc+Fu75rR8jn5lFZPgyzt8IruCvysQAIy451e4BODLv7wNbS2rY76IvoJsF5HVH50OxdbKZVQsZMtfX4iyk9Z/8VENbp9glU84Jvv6hEckwdTJCAVv4ONvw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
+ dkim=pass header.d=nvidia.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=Q4wj5QxOqnya3nq5I26NiK+pwMToGk/vd1XWyAQP6qU=;
+ b=XOjHZLSY2SjVeCbeutQn5OP33f93uyYreTdDs1/9BfFV/FM9uC2GHlPgiqUzHIOaLZMhFMzco8Ysu0mrfvojyXgtEobqP3h1AOj9LZFtnBKhZj3K94zOwz96XspclcgqVKC82UgI5+lTTLh6vxzCaFn8/9ZH5bCU8GXWMJuWqD9l8mnkEEZNX2BBmXSR3EmptMJr2oUJ5ae03cfMWDvzEUj1XIKB3O0fBgrpS4dF+5W6JhkvDAjfPQAE52LAUHFXYlfjWXQCE+9jPDWra26TeZ1EfIkiM+MZhBcsRLDaqjcP3GhDsOz5Wl26wZPux02kFZ1En1gTYzJw+BAkkqcFNA==
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=nvidia.com;
+Received: from MN2PR12MB4192.namprd12.prod.outlook.com (2603:10b6:208:1d5::15)
+ by SN6PR12MB2816.namprd12.prod.outlook.com (2603:10b6:805:75::16) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5438.17; Thu, 21 Jul
+ 2022 12:05:19 +0000
+Received: from MN2PR12MB4192.namprd12.prod.outlook.com
+ ([fe80::ac35:7c4b:3282:abfb]) by MN2PR12MB4192.namprd12.prod.outlook.com
+ ([fe80::ac35:7c4b:3282:abfb%3]) with mapi id 15.20.5458.018; Thu, 21 Jul 2022
+ 12:05:19 +0000
+Date:   Thu, 21 Jul 2022 09:05:18 -0300
+From:   Jason Gunthorpe <jgg@nvidia.com>
+To:     "Tian, Kevin" <kevin.tian@intel.com>
+Cc:     Yishai Hadas <yishaih@nvidia.com>,
+        "alex.williamson@redhat.com" <alex.williamson@redhat.com>,
+        "saeedm@nvidia.com" <saeedm@nvidia.com>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+        "kuba@kernel.org" <kuba@kernel.org>,
+        "Martins, Joao" <joao.m.martins@oracle.com>,
+        "leonro@nvidia.com" <leonro@nvidia.com>,
+        "maorg@nvidia.com" <maorg@nvidia.com>,
+        "cohuck@redhat.com" <cohuck@redhat.com>
+Subject: Re: [PATCH V2 vfio 03/11] vfio: Introduce DMA logging uAPIs
+Message-ID: <20220721120518.GZ4609@nvidia.com>
+References: <20220714081251.240584-1-yishaih@nvidia.com>
+ <20220714081251.240584-4-yishaih@nvidia.com>
+ <BN9PR11MB5276B26F76F409BE27E593758C919@BN9PR11MB5276.namprd11.prod.outlook.com>
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <BN9PR11MB5276B26F76F409BE27E593758C919@BN9PR11MB5276.namprd11.prod.outlook.com>
+X-ClientProxiedBy: BL1P222CA0026.NAMP222.PROD.OUTLOOK.COM
+ (2603:10b6:208:2c7::31) To MN2PR12MB4192.namprd12.prod.outlook.com
+ (2603:10b6:208:1d5::15)
 MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.85 on 10.11.54.8
-X-Spam-Status: No, score=-2.8 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        SPF_HELO_NONE,SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
+X-MS-PublicTrafficType: Email
+X-MS-Office365-Filtering-Correlation-Id: dcddf148-e9bf-4826-7ed2-08da6b114839
+X-MS-TrafficTypeDiagnostic: SN6PR12MB2816:EE_
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: OLBbbPE2EHiMRsr4/iLgIbIJCFUDCRnd/eykvwIvHzEyna7lnnTqtUn+E2O04GRU+o2qyDxEfh4uXNZ1wGoY161BywtRys6c5S2peIPA1oa5gCyau5qM4uxH7q8VkzdcyO4XWvsmFiuyEAL6DGiFeh6q7+ZE08Cp8n3Ccawg6cXm7ewAYyloqQuzxWJbY3ucLyAPCvqL05UKgRniZnTdV0W+ITVs3z1+1qyOanNCBM76vd6SXooG2UqvV5hcZVTn6/a8XLPMklCiJ7YXLlQAr/EnGs2ElfskWHoFoSSAAcVRJEA9x2KidhKTFMx/KvGd8KStL+aUOOcYnrgH+Lz5MZp7ukjsGbJRGIQvaGXMZ1lG2uPDYKVJFbSsrmDeVFcez1qEKr8VonJ5c0lQ2Qqm21BMYEMiUA6Ytd4275epCsBwA47/Roksn3w14pbZ4FhsbH3NV0nv6tBEvFA+FBh7iaFI5ffbKstuEahQ1DJeywDkpiAQojWDJcL12GqD8xwjtXcWHNp7eGoNphDH8WNiewn3+N5QKJj1DucQ6wiAVUvLnHbtJdfK+QS+SNED+21NtQGvcvCIdLWV8VJ7Xr7/Xp107vFD/k9qpsr4Vn42gOSgjWb2x5BBQY+TVy/Y1YMcFair+oqpi0/vMPxJPctijMSPAwSVy2zrnRQfXM/0b6HXAsXVnCvdap4tBrYzLUyVHpq+o+cw/h44Kz778ljyZFSjm0YOFUbLWIhDAy7ObFiP3K0CdrKvLxdPNNlKCXkG
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:MN2PR12MB4192.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230016)(4636009)(366004)(136003)(376002)(396003)(39860400002)(346002)(38100700002)(4744005)(316002)(66556008)(6512007)(8936002)(6862004)(5660300002)(2906002)(33656002)(54906003)(8676002)(4326008)(36756003)(41300700001)(6506007)(478600001)(86362001)(26005)(6486002)(66476007)(1076003)(66946007)(83380400001)(2616005)(186003);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?IJzW+WCXqOgJmSeL72Sf0A+N2Xl9yybGuFCc1KNjz7+ghY7QogunRHz9Su2u?=
+ =?us-ascii?Q?qlR2kpYpWf4ECrgUqpbuern0xjvj1Z94iA70E96+v2s402PiKd/JgMfXm1wg?=
+ =?us-ascii?Q?NT4XKBeBrsARRBpU0lP4/HxnoDKhGQjOeYBLz5ZJy9PZGwwDvhCCSwi7Mt2S?=
+ =?us-ascii?Q?dwAcjr/QrJSWi4Fio4or0PVISEXcUIvKFOi/KSaYqcX/FJySL9iL0Vcw5btR?=
+ =?us-ascii?Q?Y8HKng3XMjkCo5D867HUvtZ/iOFAxORfBu1thmhBHlh8NgZh4XpAz0btAOeI?=
+ =?us-ascii?Q?ilZ3PSxV57hhJfUjttTPaclPtqTG4MSymbicVGP4FbqwcCOs5SrKqlRzg98/?=
+ =?us-ascii?Q?Ap0YaJZ8tIoEpGTduboAB0ZwDWxYCOcpe4GuUjvtNl2U4RZCJ2N3oIhihoeJ?=
+ =?us-ascii?Q?WABCqie/PkpNp9vXsVj6kDwKs0bfL9ov/Ei5DDxkq2b79yPQgzVw8xYRG8sj?=
+ =?us-ascii?Q?6kes4jykzmDuIqZHUCVMSATCrF6kDLNVARe56WEWnWzGwjvbYeAwSH+31qvM?=
+ =?us-ascii?Q?/WXlFQe2S26Ru3fCFZPpHW992ESuTkVexXyg6cHBzXVYsn5m/rMLVrF4eM35?=
+ =?us-ascii?Q?2VJz/CNQ4zM5pme6AeK8ya0XwldGyARAWN1+h9ntajPWCddqOrf1YbGmkHrJ?=
+ =?us-ascii?Q?CrMj0/L2+XyMsg1W5oezihZxZeWSOKKY0vp94WEk8F7c4nz+AwybLh2t+0B2?=
+ =?us-ascii?Q?t+VndsOfRuQZwoFlvQp8iDh3C6fjY0zLrJGSkFFujZIp0Vxi1uBj1vRzrT+e?=
+ =?us-ascii?Q?Z/8EQBvL5No0UuBDiR599pqFln1HRl36CZUMDeuHcgYYRG3QvjHuK8/KT9qY?=
+ =?us-ascii?Q?RtybFaufAFU1Ud4G30mcD+y0tlQWfeky/K6tCIkfDZhFPG5z06DUXFs33JPr?=
+ =?us-ascii?Q?sC6GypnJzk2RSGqz41jZoP8b665gH0nkWLoGYuxGWYxvxgTLcKLH1T+C4aNf?=
+ =?us-ascii?Q?q02zRpoQVlPwa7Kv+LIMOd2FKMFcmgvcZiaRRpwvC/7dzYhF8reyf/17q3Ai?=
+ =?us-ascii?Q?NWwTqN0xburtLbtMJ/p8DwQm7FyN65o5fV7UyJQT8pRlCuCm11bgwaVqqSGs?=
+ =?us-ascii?Q?i1obut7jQQZSPPok1Rh8N/4GnWVCNeD+MSnSi/ga7/71x24qjPkqSB0h81kW?=
+ =?us-ascii?Q?Bo6Bk7N6kt7Tv8xrePR2x4VnK6DujuBQYr7Eta87cih+pEcd7hE8rJZvYlGL?=
+ =?us-ascii?Q?fr8kSLepicuZtDXo2h76fXRvCcJqwmQ8Ackgsh/puQLGneaymBP4+YADReGj?=
+ =?us-ascii?Q?l7rQwUduTOH5RxVBXlKfjnmqs7Ge/wdVq5ILIXLUHEPWaoTAX593PIaU0/cE?=
+ =?us-ascii?Q?mMPD3b4GJ05aKoTtWpobvY6oN7+8sFOL7w9OwP448wYFlRiG49tn74PnOjhQ?=
+ =?us-ascii?Q?+8GVRd2UEsJfUdgkgffEIFb22QJfFRUmfdSEjy28z69wF7xiKauqZtwX882U?=
+ =?us-ascii?Q?Phlc1EUuE5cy0tM8HqAtqy8zOf/z8wdhQiOIi5cg861kBWy0nSKq6/5jNHAe?=
+ =?us-ascii?Q?uFIPDmY/KoQudSMkelpwChYuUnF1yPSp6tqFpGiVeHkoi4yM7G7m878NJo5j?=
+ =?us-ascii?Q?HENz9978+YrT3y0jUE18n3T/R2Xe+n8FCX3mKqHC?=
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: dcddf148-e9bf-4826-7ed2-08da6b114839
+X-MS-Exchange-CrossTenant-AuthSource: MN2PR12MB4192.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 21 Jul 2022 12:05:19.7783
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: 8N5IBnb5ECso1PoMO/BO4vE0KhuZBm7nQ83GNJFTTzGWuMvpwWl14pPjQWZn0GqR
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SN6PR12MB2816
+X-Spam-Status: No, score=-1.8 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FORGED_SPF_HELO,
+        RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_NONE
+        autolearn=no autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, 2022-07-21 at 15:04 +0530, Shukla, Santosh wrote:
+On Thu, Jul 21, 2022 at 08:45:10AM +0000, Tian, Kevin wrote:
+
+> > + * will format its internal logging to match the reporting page size, possibly
+> > + * by replicating bits if the internal page size is lower than requested.
 > 
-> On 7/10/2022 9:45 PM, Maxim Levitsky wrote:
-> > On Sat, 2022-07-09 at 19:12 +0530, Santosh Shukla wrote:
-> > > VMCB intr_ctrl bit12 (V_NMI_MASK) is set by the processor when handling
-> > > NMI in guest and is cleared after the NMI is handled. Treat V_NMI_MASK as
-> > > read-only in the hypervisor and do not populate set accessors.
-> > > 
-> > > Adding API(get_vnmi_vmcb) in order to return the correct vmcb for L1 or
-> > > L2.
-> > > 
-> > > Signed-off-by: Santosh Shukla <santosh.shukla@amd.com>
-> > > ---
-> > > v2:
-> > > - Added get_vnmi_vmcb API to return vmcb for l1 and l2.
-> > > - Use get_vnmi_vmcb to get correct vmcb in func -
-> > >   is_vnmi_enabled/_mask_set()
-> > > - removed vnmi check from is_vnmi_enabled() func.
-> > > 
-> > >  arch/x86/kvm/svm/svm.c | 12 ++++++++++--
-> > >  arch/x86/kvm/svm/svm.h | 32 ++++++++++++++++++++++++++++++++
-> > >  2 files changed, 42 insertions(+), 2 deletions(-)
-> > > 
-> > > diff --git a/arch/x86/kvm/svm/svm.c b/arch/x86/kvm/svm/svm.c
-> > > index baaf35be36e5..3574e804d757 100644
-> > > --- a/arch/x86/kvm/svm/svm.c
-> > > +++ b/arch/x86/kvm/svm/svm.c
-> > > @@ -198,7 +198,7 @@ module_param(dump_invalid_vmcb, bool, 0644);
-> > >  bool intercept_smi = true;
-> > >  module_param(intercept_smi, bool, 0444);
-> > >  
-> > > -static bool vnmi;
-> > > +bool vnmi = true;
-> > >  module_param(vnmi, bool, 0444);
-> > >  
-> > >  static bool svm_gp_erratum_intercept = true;
-> > > @@ -3503,13 +3503,21 @@ static int svm_nmi_allowed(struct kvm_vcpu *vcpu, bool for_injection)
-> > >  
-> > >  static bool svm_get_nmi_mask(struct kvm_vcpu *vcpu)
-> > >  {
-> > > -	return !!(vcpu->arch.hflags & HF_NMI_MASK);
-> > > +	struct vcpu_svm *svm = to_svm(vcpu);
-> > > +
-> > > +	if (is_vnmi_enabled(svm))
-> > > +		return is_vnmi_mask_set(svm);
-> > > +	else
-> > > +		return !!(vcpu->arch.hflags & HF_NMI_MASK);
-> > >  }
-> > >  
-> > >  static void svm_set_nmi_mask(struct kvm_vcpu *vcpu, bool masked)
-> > >  {
-> > >  	struct vcpu_svm *svm = to_svm(vcpu);
-> > >  
-> > > +	if (is_vnmi_enabled(svm))
-> > > +		return;
-> > > +
-> > >  	if (masked) {
-> > >  		vcpu->arch.hflags |= HF_NMI_MASK;
-> > >  		if (!sev_es_guest(vcpu->kvm))
-> > > diff --git a/arch/x86/kvm/svm/svm.h b/arch/x86/kvm/svm/svm.h
-> > > index 9223ac100ef5..f36e30df6202 100644
-> > > --- a/arch/x86/kvm/svm/svm.h
-> > > +++ b/arch/x86/kvm/svm/svm.h
-> > > @@ -35,6 +35,7 @@ extern u32 msrpm_offsets[MSRPM_OFFSETS] __read_mostly;
-> > >  extern bool npt_enabled;
-> > >  extern int vgif;
-> > >  extern bool intercept_smi;
-> > > +extern bool vnmi;
-> > >  
-> > >  /*
-> > >   * Clean bits in VMCB.
-> > > @@ -509,6 +510,37 @@ static inline bool nested_npt_enabled(struct vcpu_svm *svm)
-> > >  	return svm->nested.ctl.nested_ctl & SVM_NESTED_CTL_NP_ENABLE;
-> > >  }
-> > >  
-> > > +static inline struct vmcb *get_vnmi_vmcb(struct vcpu_svm *svm)
-> > > +{
-> > > +	if (!vnmi)
-> > > +		return NULL;
-> > > +
-> > > +	if (is_guest_mode(&svm->vcpu))
-> > > +		return svm->nested.vmcb02.ptr;
-> > > +	else
-> > > +		return svm->vmcb01.ptr;
-> > > +}
-> > 
-> > This is better but still not enough to support nesting:
-> > 
-> > 
-> > Let me explain the cases that we need to cover:
-> > 
-> > 
-> > 1. non nested case, vmcb01 has all the VNMI settings,
-> > and I think it should work, but need to review the patches again.
-> > 
-> > 
-> > 
-> > 2. L1 uses vNMI, L2 doesn't use vNMI (nested_vnmi_enabled() == false).
-> > 
-> >   In this case, vNMI settings just need to be copied from vmcb01 to vmcb02
-> >   and vise versa during nested entry and exit.
-> > 
-> > 
-> >   This means that nested_vmcb02_prepare_control in this case should copy
-> >   all 3 bits from vmcb01 to vmcb02, and vise versa nested_svm_vmexit
-> >   should copy them back.
-> > 
-> >   Currently I see no indication of this being done in this patch series.
-> > 
-> 
-> Yes, Thanks for pointing out, in v3 series.
-> 
-> >   vmcb02 should indeed be used to read vnmi bits (like done above).
-> > 
-> > 
-> > 3. L1 uses vNMI, L2 uses vNMI:
-> > 
-> >   - First of all in this case all 3 vNMI bits should be copied from vmcb12
-> >     to vmcb02 on nested entry and back on nested VM exit.
-> > 
-> >     I *think* this is done correctly in the patch 6, but I need to check again.
-> > 
-> >  
-> >   - Second issue, depends on vNMI spec which we still don't have, and it
-> >     relates to the fact on what to do if NMIs are not intercepted by
-> >     the (nested) hypervisor, and L0 wants to inject an NMI
-> > 
-> >     (from L1 point of view it means that a 'real' NMI is about to be
-> >     received while L2 is running).
-> > 
-> > 
-> >     - If VNMI is not allowed to be enabled when NMIs are not intercepted,
-> >       (vast majority of nested hypervisors will want to intercept real NMIs)
-> >       then everything is fine -
-> > 
-> >       this means that if nested vNMI is enabled, then L1 will have
-> >       to intercept 'real' NMIs, and thus L0 would be able to always
-> >       inject 'real' NMIs while L2 is running by doing a VM exit to L1 without
-> >       touching any vNMI state.
-> > 
-> Yes. Enabling NMI virtualization requires the NMI intercept bit to be set.
+> what's the purpose of this? I didn't quite get why an user would want to
+> start tracking in one page size and then read back the dirty bitmap in
+> another page size...
 
-Those are very good news. 
+There may be multiple kernel trackers that are working with different
+underlying block sizes, so the concept is userspace decides what block
+size it wants to work in and the kernel side transparently adapts. The
+math is simple so putting it in the kernel is convenient.
 
-What would happen though if the guest doesn't intercept NMI,
-and still tries to enable vNMI? 
+Effectively the general vision is that qemu would allocate one
+reporting buffer and then invoke these IOCTLs in parallel on all the
+trackers then process the single bitmap. Forcing qemu to allocate
+bitmaps per tracker page size is just inefficient.
 
-Failed VM entry or vNMI ignored?
-
-This matters for nested because nested must work the same as real hardware.
-
-In either of the cases some code is needed to emulate this correctly in the nested
-virtualization code in KVM, but the patches have none.
-
-Best regards,
-	Maxim Levitsky
-
-
-> 
-> >     - If the vNMI spec states that if vNMI is enabled, real NMIs
-> >       are not intercepted and a real NMI is arriving, then the CPU
-> >       will use vNMI state to handle it (that is it will set the 'pending'
-> >       bit, then check if 'masked' bit is set, and if not, move pending to masked
-> >       and deliver NMI to L2, in this case, it is indeed right to use vmcb02
-> >       and keep on using VNMI for NMIs that are directed to L1,
-> >       but I highly doubt that this is the case.
-> > 
-> > 
-> No.
-> 
-> >     - Most likely case - vNMI is allowed without NMI intercept,
-> >       and real NMI does't consult the vNMI bits, but rather uses 'hosts'
-> >       NMI masking. IRET doesn't affect host's NMI' masking as well.
-> > 
-> > 
-> 
-> No.
-> 
-> Thanks,
-> Santosh
->  
-> >       In this case, when L0 wants to inject NMI to a nested guest
-> >       that has vNMI enabled, and doesn't intercept NMIs, it
-> >       has to:
-> > 
-> >       - still consult the vNMI pending/masked bits of *vmcb01*,
-> >         to know if it can inject a NMI
-> > 
-> >       - if it can inject it, it should update *manually* the pending/masked bits
-> >         of vmcb01 as well, so that L1's vNMI the state remains consistent.
-> > 
-> >       - inject the NMI to L2, in the old fashioned way with EVENTINJ,
-> > 	or open NMI window by intercepting IRET if NMI is masked.
-> > 
-> > 
-> > Best regards,
-> > 	Maxim Levitsky
-> > 
-> > 
-> > 
-> > 
-> > > +
-> > > +static inline bool is_vnmi_enabled(struct vcpu_svm *svm)
-> > > +{
-> > > +	struct vmcb *vmcb = get_vnmi_vmcb(svm);
-> > > +
-> > > +	if (vmcb)
-> > > +		return !!(vmcb->control.int_ctl & V_NMI_ENABLE);
-> > > +	else
-> > > +		return false;
-> > > +}
-> > > +
-> > > +static inline bool is_vnmi_mask_set(struct vcpu_svm *svm)
-> > > +{
-> > > +	struct vmcb *vmcb = get_vnmi_vmcb(svm);
-> > > +
-> > > +	if (vmcb)
-> > > +		return !!(vmcb->control.int_ctl & V_NMI_MASK);
-> > > +	else
-> > > +		return false;
-> > > +}
-> > > +
-> > >  /* svm.c */
-> > >  #define MSR_INVALID				0xffffffffU
-> > >  
-
-
+Jason
