@@ -2,143 +2,138 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 01BC257D14C
-	for <lists+kvm@lfdr.de>; Thu, 21 Jul 2022 18:18:41 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 9F5E657D161
+	for <lists+kvm@lfdr.de>; Thu, 21 Jul 2022 18:21:39 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233957AbiGUQSa (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 21 Jul 2022 12:18:30 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42456 "EHLO
+        id S229481AbiGUQVg (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 21 Jul 2022 12:21:36 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55456 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233965AbiGUQRq (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 21 Jul 2022 12:17:46 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id C0CFA52E4E
-        for <kvm@vger.kernel.org>; Thu, 21 Jul 2022 09:17:21 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1658420240;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=iVqv0DH0Rdu3Hx2gmqiPwyuJENuZAXX6QoeoOvG6sKo=;
-        b=WUtq0fPdHt0ecQIF2RWwnhxySVXjeARyRQysrWBDnsi9uA93xaLy/g34JvKH0sk3Yyii2O
-        59dhQWeK75NpZi6q4oPfi2z7uXi4w+2kGmIha9EXYZlUDNnJ5BPqMXDXS/LUUwfCnUg1Vy
-        4z+1wa6hVsCcA4p4ipfbF6Zi5Ha6uJo=
-Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
- [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-9-UsMk2uezMCyR3rV2bxDVBw-1; Thu, 21 Jul 2022 12:17:17 -0400
-X-MC-Unique: UsMk2uezMCyR3rV2bxDVBw-1
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.rdu2.redhat.com [10.11.54.5])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id B66BD858EFE;
-        Thu, 21 Jul 2022 16:17:16 +0000 (UTC)
-Received: from starship (unknown [10.40.192.46])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 49590909FF;
-        Thu, 21 Jul 2022 16:17:14 +0000 (UTC)
-Message-ID: <23f156d46033a6434591186b0a7bcce3d8a138d1.camel@redhat.com>
-Subject: Re: [PATCHv2 4/7] KVM: SVM: Report NMI not allowed when Guest busy
- handling VNMI
-From:   Maxim Levitsky <mlevitsk@redhat.com>
-To:     Sean Christopherson <seanjc@google.com>
-Cc:     Santosh Shukla <santosh.shukla@amd.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        Tom Lendacky <thomas.lendacky@amd.com>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-Date:   Thu, 21 Jul 2022 19:17:13 +0300
-In-Reply-To: <Ytl6GLui7UQFi3FO@google.com>
-References: <20220709134230.2397-1-santosh.shukla@amd.com>
-         <20220709134230.2397-5-santosh.shukla@amd.com>
-         <Yth5hl+RlTaa5ybj@google.com>
-         <c5acc3ac2aec4b98f9211ca3f4100c358bf2f460.camel@redhat.com>
-         <Ytlpxa2ULiIQFOnj@google.com>
-         <413f59cd3c0a80c5b71a0cd033fdaad082c5a0e7.camel@redhat.com>
-         <Ytl6GLui7UQFi3FO@google.com>
-Content-Type: text/plain; charset="UTF-8"
-User-Agent: Evolution 3.36.5 (3.36.5-2.fc32) 
+        with ESMTP id S232996AbiGUQVf (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 21 Jul 2022 12:21:35 -0400
+Received: from mail-pl1-x634.google.com (mail-pl1-x634.google.com [IPv6:2607:f8b0:4864:20::634])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 875C918399
+        for <kvm@vger.kernel.org>; Thu, 21 Jul 2022 09:21:34 -0700 (PDT)
+Received: by mail-pl1-x634.google.com with SMTP id f11so2285891plr.4
+        for <kvm@vger.kernel.org>; Thu, 21 Jul 2022 09:21:34 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:content-transfer-encoding:in-reply-to;
+        bh=B5QADwm1IjojmIP5KhzAK+RFSkf1XxJ83WA0F0bHtjo=;
+        b=iUUJ1Ha+14FXUJoXmObbgUmonhYR0mB4408FF/ScjresrnZaUIpq/j+K6Dzthg1ADe
+         sKV0urwdg9XHOPe4H7iBH5oKYSPPiYLv5TfaJv6BPM+8YrQrWVzp/2wuMtBFiDXIIAtQ
+         hC0665IlnL2ixOxsIsVzxJDTXoKZ2pFbMnWzChQCWTP1nIh3jO3ma6n28ek5Zp+FGOYQ
+         IRD0p0cYR0tVxO9xgQu52295cbkmsFDs+6j9v9gEfVAM8OxtKqF4cTsDUPE2ZZ7+nA+r
+         GA2LgVy+5QsITEoFqs7lfZhcWUMchdRKAX8RBshFLTZVTAOcUdUrSayIsx2QCroB1TV6
+         odhw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:content-transfer-encoding
+         :in-reply-to;
+        bh=B5QADwm1IjojmIP5KhzAK+RFSkf1XxJ83WA0F0bHtjo=;
+        b=BlziTsYZ1F2JkPT7JzpR8auCFGslgnIXS9DVp0YrOL/NreEVSz/n1KOo9GdbJUdAXx
+         egyWofoZUWDeg8HyQtsZGVuMGu+agaUxJx1eW6wOwr1y/XaUJmiFyTZ/IgxgLnZNuMdJ
+         75LUrucgFdbec6R58Zv5I8nxzv80nvYizHnsMknfLO9KP/mmpQ2nTgxesK1+TgYIslB8
+         QB8JceDnNh4GUI+KRE5RXsHJIsHFN5GcYBsh1oRXObvQdRk2Ast54QpxhXlesVKnqPQJ
+         q5yt3r3JSa7yu+/ZJ4rBiwPRYozkKC4q1AwuDc6CGgfbPyn2MsuWPYUjZKoewpsYAoUJ
+         m4WA==
+X-Gm-Message-State: AJIora9WOFsW+RJGRQxnV/oifx+KA3a9hfFCB2z6LLiN6dXAc/LO2Vjb
+        DF8pMiBrDl0kGG3DDcY7Ip5BGQ==
+X-Google-Smtp-Source: AGRyM1uYJw8SiSBykSPdKMWwYiMI8y6/BXPB2OVNz12c04yXYZIYgKUchjjDsX68QiSfG0eluJFd2A==
+X-Received: by 2002:a17:902:e74d:b0:16d:1e82:c8e6 with SMTP id p13-20020a170902e74d00b0016d1e82c8e6mr9653520plf.17.1658420493795;
+        Thu, 21 Jul 2022 09:21:33 -0700 (PDT)
+Received: from google.com (123.65.230.35.bc.googleusercontent.com. [35.230.65.123])
+        by smtp.gmail.com with ESMTPSA id a12-20020aa795ac000000b0051be16492basm1987812pfk.195.2022.07.21.09.21.32
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 21 Jul 2022 09:21:33 -0700 (PDT)
+Date:   Thu, 21 Jul 2022 16:21:29 +0000
+From:   Sean Christopherson <seanjc@google.com>
+To:     Aaron Lewis <aaronlewis@google.com>
+Cc:     kvm@vger.kernel.org, pbonzini@redhat.com, jmattson@google.com
+Subject: Re: [RFC PATCH v2 3/3] selftests: kvm/x86: Test the flags in MSR
+ filtering / exiting
+Message-ID: <Ytl9CaEZUKMug5oD@google.com>
+References: <20220719234950.3612318-1-aaronlewis@google.com>
+ <20220719234950.3612318-4-aaronlewis@google.com>
+ <YtiOgtQy1bjL3VNX@google.com>
+ <CAAAPnDEKS5hrunMg8Q5Gvt=bU81zZD6fMWsfqRJu029JXpvv1w@mail.gmail.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.11.54.5
-X-Spam-Status: No, score=-3.5 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,
-        SPF_HELO_NONE,SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <CAAAPnDEKS5hrunMg8Q5Gvt=bU81zZD6fMWsfqRJu029JXpvv1w@mail.gmail.com>
+X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
+        USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, 2022-07-21 at 16:08 +0000, Sean Christopherson wrote:
-> On Thu, Jul 21, 2022, Maxim Levitsky wrote:
-> > On Thu, 2022-07-21 at 14:59 +0000, Sean Christopherson wrote:
-> > > Yep.  Dropping an NMI in the last case is ok, AFAIK no CPU will pend multiple NMIs
-> > > while another is in-flight.  But triggering an immediate exit in svm_nmi_allowed()
-> > > will hang the vCPU as the second pending NMI will never go away since the vCPU
-> > 
-> > The idea is to trigger the immediate exit only when a NMI was just injected (V_NMI_PENDING=1)
-> > but not masked (that is currently in service, that is V_NMI_MASK=0).
+On Thu, Jul 21, 2022, Aaron Lewis wrote:
+> > > --- a/tools/testing/selftests/kvm/x86_64/userspace_msr_exit_test.c
+> > > +++ b/tools/testing/selftests/kvm/x86_64/userspace_msr_exit_test.c
+> > > @@ -734,6 +734,99 @@ static void test_msr_permission_bitmap(void)
+> > >       kvm_vm_free(vm);
+> > >  }
+> > >
+> > > +static void test_results(int rc, const char *scmd, bool expected_success)
+> >
+> > Rather than pass in "success expected", pass in the actual value and the valid
+> > mask.  Then you can spit out the problematic value in the assert and be kind to
+> > future debuggers.
+> >
+> > And similarly, make the __vm_ioctl() call here instead of in the "caller" and name
+> > this __test_ioctl() (rename as necessary, see below) to show it's relationship with
+> > the macro.
 > 
-> I assume you mean "and an NMI is currently NOT in service"?
-
-Yes
+> The other comments look good.  I'll update.
 > 
-> Anyways, we're on the same page, trigger an exit if and only if there's an NMI pending
-> and the vCPU isn't already handling a vNMI.  We may need to explicitly drop one of
-> the pending NMIs in that case though, otherwise the NMI that _KVM_ holds pending could
-> get "injected" well after NMIs are unmasked, which could suprise the guest.  E.g.
-> guest IRETs from the second (of three) NMIs, KVM doesn't "inject" that third NMI
-> until the next VM-Exit, which could be a long time in the future.
+> This one is a bit tricky though.  I did originally have __vm_ioctl()
+> in test_results() (or whatever name it will end up with), but the
+> static assert in kvm_do_ioctl() gave me problems.  Unless I make
+> test_results() a macro, I have to force cmd to a uint64_t or something
+> other than a literal, then I get this:
 > 
-> > In case both bits are set, the NMI is dropped, that is no immediate exit is requested.
-> > 
-> > In this case, next VM entry should have no reason to not inject the NMI and then VM exit
-> > on the interrupt we raised, so there should not be a problem with forward progress.
-> > 
-> > There is an issue still, the NMI could also be masked if we are in SMM (I suggested
-> > setting the V_NMI_MASK manually in this case), thus in this case we won't have more
-> > that one pending NMI, but I guess this is not that big problem.
-> > 
-> > We can btw also in this case "open" the NMI window by waiting for RSM intercept.
-> > (that is just not inject the NMI, and on RSM inject it, I think that KVM already does this)
-> > 
-> > I think it should overal work, but no doubt I do expect issues and corner cases,
-> > 
-> > 
-> > > won't make forward progress to unmask NMIs.  This can also happen if there are
-> > > two pending NMIs and GIF=0, i.e. any time there are multiple pending NMIs and NMIs
-> > > are blocked.
-> > 
-> > GIF=0 can be dealt with though, if GIF is 0 when 2nd pending NMI arrives, we can
-> > delay its injection to the moment the STGI is executed and intercept STGI.
-> > 
-> > We I think already do something like that as well.
+> include/kvm_util_base.h:190:39: error: expression in static assertion
+> is not constant
+> 190 |         static_assert(!_IOC_SIZE(cmd) || sizeof(*arg) ==
+> _IOC_SIZE(cmd), "");   \
+>        |                                       ^
+> include/kvm_util_base.h:213:9: note: in expansion of macro ‘kvm_do_ioctl’
+> 213 |         kvm_do_ioctl((vm)->fd, cmd, arg);                       \
 > 
-> Yep, you're right, svm_enable_nmi_window() sets INTERCEPT_STGI if VGIF is enabled
-> and GIF=0 (and STGI exits unconditional if VGIF=0?
-
-Its not unconditional but KVM has to set the intercept, otherwise the guest
-will control the host's GIF.
-
-Best regards,
-	Maxim Levitsky
-
-
-> ).
+> That's not the only problem.  In order to pass 'arg' in I would have
+> to pass it as a void *, making sizeof(*arg) wrong.
 > 
-> So we have a poor man's NMI-window exiting.
-
-Yep, we also intercept IRET for the same purpose, and RSM interception
-is also a place the NMI are evaluated.
-
-We only single step over the IRET, because NMIs are unmasked _after_ the IRET
-retires.
-
-Best regards,
-	Maxim Levitsky
+> Being that the ioctl call was the first thing I did in that function I
+> opted to make it a part of test_ioctl() rather than making
+> test_results() a macro.
 > 
+> If only C had templates :)
+
+Eh, what C++ can do with templates, C can usually do with macros :-)
+
+Sans backslashes, I think this can simply be:
+
+#define test_user_exit_msr_ioctl(vm, cmd, arg, val, valid_mask)
+({
+	int r = __vm_ioctl(vm, cmd, arg);
+
+	if (val & valid_mask)
+		TEST_ASSERT(!r, KVM_IOCTL_ERROR(cmd, r));
+	else
+		TEST_ASSERT(r == -1 && errno == EINVAL,
+			    "Wanted EINVAL with val = 0x%llx, got  rc: %i errno: %i (%s)",
+			    val, r, errno,  strerror(errno))
+})
 
 
+It doesn't print "val" when success is expected, but I'm ok with that.  Though I
+suspect that adding a common macro to print additional info on an unexpected
+ioctl() result would be useful for other tests.
