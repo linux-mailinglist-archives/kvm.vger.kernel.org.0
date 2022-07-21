@@ -2,112 +2,183 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 32EB757CEDA
-	for <lists+kvm@lfdr.de>; Thu, 21 Jul 2022 17:26:07 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 36A5557CEFB
+	for <lists+kvm@lfdr.de>; Thu, 21 Jul 2022 17:32:10 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231182AbiGUP0F (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 21 Jul 2022 11:26:05 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39786 "EHLO
+        id S229681AbiGUPcI (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 21 Jul 2022 11:32:08 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45792 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229717AbiGUP0D (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 21 Jul 2022 11:26:03 -0400
-Received: from mail-pl1-x62c.google.com (mail-pl1-x62c.google.com [IPv6:2607:f8b0:4864:20::62c])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1115124099
-        for <kvm@vger.kernel.org>; Thu, 21 Jul 2022 08:26:02 -0700 (PDT)
-Received: by mail-pl1-x62c.google.com with SMTP id z3so2157402plb.1
-        for <kvm@vger.kernel.org>; Thu, 21 Jul 2022 08:26:02 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=2uLd/RvlCglp7VMJKG7TRwZBoXRuAQZML6wCn6y9QPE=;
-        b=U8YeA1C1xSmyf9+g6oR8D+gFOIU4wx6tbOqYi/lXgRktJn50dwvUYwjs0cAk4xYSRZ
-         NdVOITGtBt1888pnTJF12EhfFQp1ZjMYxPtt2twRkUFC5rAwA58kPIJeQ+XWL7tAEKLv
-         PHhv4UmiLlB2FD5ZZwJ87M+5IJ2jbF6D9yGS94EUIXg8+3+enWUWO58q+DA4ghVcBfOf
-         OXYwfAaGtYbxz316MH3az8hvm+PgGNDH4LueZl+QJPAnZy0hrPWIYLVHo1UCrES6RVqB
-         zP4RHCzc9gDewTG9NDS3IDGMN2jzDS63hbyUZsWGGW4vnuNXk0JbbXHxQeNFRWhTBvo/
-         e97Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=2uLd/RvlCglp7VMJKG7TRwZBoXRuAQZML6wCn6y9QPE=;
-        b=8QC1wkBeaH2eSgOoElqfoblZ98zzcfmlOqb34KMAWH7U4iNDFZRNdFAa8xhbFgUvRP
-         1RE3XS/VkV+4vR3dzQXuvLlbdqcBazLyvAkepF33XeOcGMgtQT8a5UZZMFcvkMwwMQ1o
-         XQH5mlsDZBeFL9OBQWzdALPn0jZPh7ECSDTTJdDwsfGk5H/6j26vI6KlrzqZWVvTlFDV
-         5gODFH1QauYAn9TlLZJliiEU3GV8gogqLXsjCFVbZPZriwfJC/g0xBzo0fZAqzU2jSXD
-         mDDCmtKRbJ+CDx9WuCJwEgbTDvlmcMiyF8YgiiZuXCkKBnlG4jaYjkd6OfOtlqPc0Ix4
-         oPqA==
-X-Gm-Message-State: AJIora9OZcv9CGBvhWLN8uRWGFbiJNPm1syig/fFe+dtTjTFOxwOzApm
-        W4Qnw/EZAivB9oyjj2AuuAcmfw==
-X-Google-Smtp-Source: AGRyM1s4jbrd+HHmsGjYZRgS2raRakVuaIBd48F8IPCNE2NUCnQugca4NB0SWzvboULXHumLt45VtQ==
-X-Received: by 2002:a17:90a:8914:b0:1dc:20c0:40f4 with SMTP id u20-20020a17090a891400b001dc20c040f4mr11806859pjn.11.1658417161366;
-        Thu, 21 Jul 2022 08:26:01 -0700 (PDT)
-Received: from google.com (123.65.230.35.bc.googleusercontent.com. [35.230.65.123])
-        by smtp.gmail.com with ESMTPSA id q14-20020a170902a3ce00b001618b70dcc9sm1832358plb.101.2022.07.21.08.26.00
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 21 Jul 2022 08:26:00 -0700 (PDT)
-Date:   Thu, 21 Jul 2022 15:25:57 +0000
-From:   Sean Christopherson <seanjc@google.com>
-To:     Lai Jiangshan <jiangshanlai@gmail.com>
-Cc:     LKML <linux-kernel@vger.kernel.org>,
-        "open list:KERNEL VIRTUAL MACHINE FOR MIPS (KVM/mips)" 
-        <kvm@vger.kernel.org>, Paolo Bonzini <pbonzini@redhat.com>,
+        with ESMTP id S229446AbiGUPcH (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 21 Jul 2022 11:32:07 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 5AF0A13F79
+        for <kvm@vger.kernel.org>; Thu, 21 Jul 2022 08:32:03 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1658417522;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=GgKT1VkFHod0SXS+lxkOUzuqRT5Wgmq8Kpjbic6X/pE=;
+        b=E8w/MoVMSXnzFV76GOj3ayzUMsPzdPB+NPz7a4q94ck7GvJSlwws2u51fh1IQJTFGiGyqb
+        /V/tulmMsJSUi0P6qtcXAF30pWHkVBZp7mcoZ083J/AswGUC9y0IIcosoSLh2CAy7F6/c0
+        SqgxJ150Jg++5i/61MtqOg0fayZ6GtE=
+Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
+ [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-55-Bc2sPCtJPYWTiDUoRGONtw-1; Thu, 21 Jul 2022 11:32:01 -0400
+X-MC-Unique: Bc2sPCtJPYWTiDUoRGONtw-1
+Received: from smtp.corp.redhat.com (int-mx10.intmail.prod.int.rdu2.redhat.com [10.11.54.10])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 6F5038037AC;
+        Thu, 21 Jul 2022 15:32:00 +0000 (UTC)
+Received: from starship (unknown [10.40.192.46])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 2A9CD492C3B;
+        Thu, 21 Jul 2022 15:31:57 +0000 (UTC)
+Message-ID: <413f59cd3c0a80c5b71a0cd033fdaad082c5a0e7.camel@redhat.com>
+Subject: Re: [PATCHv2 4/7] KVM: SVM: Report NMI not allowed when Guest busy
+ handling VNMI
+From:   Maxim Levitsky <mlevitsk@redhat.com>
+To:     Sean Christopherson <seanjc@google.com>
+Cc:     Santosh Shukla <santosh.shukla@amd.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
         Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Maxim Levitsky <mlevitsk@redhat.com>,
-        Lai Jiangshan <jiangshan.ljs@antgroup.com>
-Subject: Re: [PATCH 07/12] KVM: X86/MMU: Remove the useless struct
- mmu_page_path
-Message-ID: <YtlwBcvU5ro11wuy@google.com>
-References: <20220605064342.309219-1-jiangshanlai@gmail.com>
- <20220605064342.309219-8-jiangshanlai@gmail.com>
- <YtcQ1GuTAttXaUk+@google.com>
- <CAJhGHyB=-bGrguLKtTh+EAr5zr--H97HUgR3WP=JTovQLkoevQ@mail.gmail.com>
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>,
+        Tom Lendacky <thomas.lendacky@amd.com>, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+Date:   Thu, 21 Jul 2022 18:31:56 +0300
+In-Reply-To: <Ytlpxa2ULiIQFOnj@google.com>
+References: <20220709134230.2397-1-santosh.shukla@amd.com>
+         <20220709134230.2397-5-santosh.shukla@amd.com>
+         <Yth5hl+RlTaa5ybj@google.com>
+         <c5acc3ac2aec4b98f9211ca3f4100c358bf2f460.camel@redhat.com>
+         <Ytlpxa2ULiIQFOnj@google.com>
+Content-Type: text/plain; charset="UTF-8"
+User-Agent: Evolution 3.36.5 (3.36.5-2.fc32) 
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <CAJhGHyB=-bGrguLKtTh+EAr5zr--H97HUgR3WP=JTovQLkoevQ@mail.gmail.com>
-X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-        USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=ham
-        autolearn_force=no version=3.4.6
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.85 on 10.11.54.10
+X-Spam-Status: No, score=-3.5 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,
+        SPF_HELO_NONE,SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Jul 21, 2022, Lai Jiangshan wrote:
-> On Wed, Jul 20, 2022 at 4:15 AM Sean Christopherson <seanjc@google.com> wrote:
-> >
-> > Nit, s/useless/now-unused, or "no longer used".  I associate "useless" in shortlogs
-> > as "this <xyz> is pointless and always has been pointless", whereas "now-unused"
-> > is likely to be interpreted as "remove <xyz> as it's no longer used after recent
-> > changes".
-> >
-> > Alternatively, can this patch be squashed with the patch that removes
-> > mmu_pages_clear_parents()?  Yeah, it'll be a (much?) larger patch, but leaving
-> > dead code behind is arguably worse.
+On Thu, 2022-07-21 at 14:59 +0000, Sean Christopherson wrote:
+> On Thu, Jul 21, 2022, Maxim Levitsky wrote:
+> > On Wed, 2022-07-20 at 21:54 +0000, Sean Christopherson wrote:
+> > > On Sat, Jul 09, 2022, Santosh Shukla wrote:
+> > > > @@ -3609,6 +3612,9 @@ static void svm_enable_nmi_window(struct kvm_vcpu *vcpu)
+> > > >  {
+> > > >  	struct vcpu_svm *svm = to_svm(vcpu);
+> > > >  
+> > > > +	if (is_vnmi_enabled(svm))
+> > > > +		return;
+> > > 
+> > > Ugh, is there really no way to trigger an exit when NMIs become unmasked?  Because
+> > > if there isn't, this is broken for KVM.
+> > > 
+> > > On bare metal, if two NMIs arrive "simultaneously", so long as NMIs aren't blocked,
+> > > the first NMI will be delivered and the second will be pended, i.e. software will
+> > > see both NMIs.  And if that doesn't hold true, the window for a true collision is
+> > > really, really tiny.
+> > > 
+> > > But in KVM, because a vCPU may not be run a long duration, that window becomes
+> > > very large.  To not drop NMIs and more faithfully emulate hardware, KVM allows two
+> > > NMIs to be _pending_.  And when that happens, KVM needs to trigger an exit when
+> > > NMIs become unmasked _after_ the first NMI is injected.
+> > 
+> > This is how I see this:
+> > 
+> > - When a NMI arrives and neither NMI is injected (V_NMI_PENDING) nor in service (V_NMI_MASK)
+> >   then all it is needed to inject the NMI will be to set the V_NMI_PENDING bit and do VM entry.
+> > 
+> > - If V_NMI_PENDING is set but not V_NMI_MASK, and another NMI arrives we can make the
+> >   svm_nmi_allowed return -EBUSY which will cause immediate VM exit,
+> > 
+> >   and if hopefully vNMI takes priority over the fake interrupt we raise, it will be injected,
 > 
-> Defined by the C-language and the machine, struct mmu_page_path is used
-> in for_each_sp() and the data is set and updated every iteration.
+> Nit (for other readers following along), it's not a fake interrupt,I would describe
+> it as spurious or ignored.  It's very much a real IRQ, which matters because it
+> factors into event priority.
+
+Yep, 100% agree.
+
+
 > 
-> It is not really dead code.
+> >   and upon immediate VM exit we can inject another NMI by setting the V_NMI_PENDING again,
+> >   and later when the guest is done with first NMI, it will take the second.
+> 
+> Yeaaaah.  This depends heavily on the vNMI being prioritized over the IRQ.
+> 
+> >   Of course if we get a nested exception, then it will be fun....
+> > 
+> >   (the patches don't do it (causing immediate VM exit), 
+> >   but I think we should make the svm_nmi_allowed, check for the case for 
+> >   V_NMI_PENDING && !V_NMI_MASK and make it return -EBUSY).
+> 
+> Yep, though I think there's a wrinkle (see below).
+> 
+> > - If both V_NMI_PENDING and V_NMI_MASK are set, then I guess we lose an NMI.
+> >  (It means that the guest is handling an NMI, there is a pending NMI, and now
+> >  another NMI arrived)
+> > 
+> >  Sean, this is the problem you mention, right?
+> 
+> Yep.  Dropping an NMI in the last case is ok, AFAIK no CPU will pend multiple NMIs
+> while another is in-flight.  But triggering an immediate exit in svm_nmi_allowed()
+> will hang the vCPU as the second pending NMI will never go away since the vCPU
 
-I'm not talking about just "struct mmu_page_path", but also the pointless updates
-in for_each_sp().  And I think even if we're being super pedantic, it _is_ dead
-code because C99 allows the compiler to drop code that the compiler can prove has
-no side effects.  I learned this the hard way by discovering that an asm() blob
-with an output constraint will be elided if the output isn't consumed and the asm()
-blob isn't tagged volatile.
+The idea is to trigger the immediate exit only when a NMI was just injected (V_NMI_PENDING=1)
+but not masked (that is currently in service, that is V_NMI_MASK=0).
 
-  In the abstract machine, all expressions are evaluated as specified by the
-  semantics. An actual implementation need not evaluate part of an expression if
-  it can deduce that its value is not used and that no needed side effects are
-  produced (including any caused by calling a function or accessing a volatile object)
+In case both bits are set, the NMI is dropped, that is no immediate exit is requested.
 
-I don't see any advantage to separating this from mmu_pages_clear_parents().  It
-doesn't make the code any easier to review.  I'd argue it does the opposite because
-it makes it harder to see that mmu_pages_clear_parents() was the only user, i.e.
-squashing this would provide further justification for dropping mmu_pages_clear_parents().
+In this case, next VM entry should have no reason to not inject the NMI and then VM exit
+on the interrupt we raised, so there should not be a problem with forward progress.
+
+There is an issue still, the NMI could also be masked if we are in SMM (I suggested
+setting the V_NMI_MASK manually in this case), thus in this case we won't have more
+that one pending NMI, but I guess this is not that big problem.
+
+We can btw also in this case "open" the NMI window by waiting for RSM intercept.
+(that is just not inject the NMI, and on RSM inject it, I think that KVM already does this)
+
+I think it should overal work, but no doubt I do expect issues and corner cases,
+
+
+> won't make forward progress to unmask NMIs.  This can also happen if there are
+> two pending NMIs and GIF=0, i.e. any time there are multiple pending NMIs and NMIs
+> are blocked.
+
+GIF=0 can be dealt with though, if GIF is 0 when 2nd pending NMI arrives, we can
+delay its injection to the moment the STGI is executed and intercept STGI.
+
+We I think already do something like that as well.
+
+> 
+> One other question: what happens if software atomically sets V_NMI_PENDING while
+> the VMCB is in use?  I assume bad things?  I.e. I assume KVM can't "post" NMIs :-)
+
+I can't answer that but I bet that this bit is only checked on VM entry.
+
+
+Another question about the spec (sorry if I already asked this):
+
+if vGIF is used, and the guest does CLGI, does the CPU set the V_NMI_MASK,
+itself, or the CPU considers both the V_GIF and the V_NMI_MASK in the int_ctl,
+as a condition of delivering the NMI? I think that the later should be true,
+and thus V_NMI_MASK is more like V_NMI_IN_SERVICE.
+
+Best regards,
+	Maxim Levitsky
+
+> 
+
+
