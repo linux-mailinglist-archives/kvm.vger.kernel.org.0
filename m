@@ -2,193 +2,187 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 1471357D1C5
-	for <lists+kvm@lfdr.de>; Thu, 21 Jul 2022 18:42:21 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 6AB4357D2DA
+	for <lists+kvm@lfdr.de>; Thu, 21 Jul 2022 19:59:01 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231603AbiGUQmH (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 21 Jul 2022 12:42:07 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46614 "EHLO
+        id S229668AbiGUR7A (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 21 Jul 2022 13:59:00 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49308 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231146AbiGUQmF (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 21 Jul 2022 12:42:05 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 89D6971BC1
-        for <kvm@vger.kernel.org>; Thu, 21 Jul 2022 09:42:04 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1658421723;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=lpgjxHYzUdT13dg92JGLQAgwmOcrc+nlknH/en5JH44=;
-        b=RI2+3b9D3uHFwxoJ7qtwOrVY8ZtBrMNDfujWVCjTtfGR4gVTTLf6HIzm2suXrfUIdw19KB
-        hB4DSwItppZUmgX6oaQorCSTw4UmRUZanWgPpiekxJU/r6GnwXASViKdUJECQ9yXERdTxi
-        bkB5uwrlnw6yqjV2L8cmtV0Bear4/cs=
-Received: from mail-il1-f197.google.com (mail-il1-f197.google.com
- [209.85.166.197]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-524-QPSyB_1BPHm67kSYWjTA2w-1; Thu, 21 Jul 2022 12:42:02 -0400
-X-MC-Unique: QPSyB_1BPHm67kSYWjTA2w-1
-Received: by mail-il1-f197.google.com with SMTP id l10-20020a056e021aaa00b002dd08016baeso1215472ilv.13
-        for <kvm@vger.kernel.org>; Thu, 21 Jul 2022 09:42:01 -0700 (PDT)
+        with ESMTP id S232057AbiGUR66 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 21 Jul 2022 13:58:58 -0400
+Received: from mail-pj1-x1031.google.com (mail-pj1-x1031.google.com [IPv6:2607:f8b0:4864:20::1031])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 36D368811A
+        for <kvm@vger.kernel.org>; Thu, 21 Jul 2022 10:58:56 -0700 (PDT)
+Received: by mail-pj1-x1031.google.com with SMTP id q41-20020a17090a1b2c00b001f2043c727aso2113745pjq.1
+        for <kvm@vger.kernel.org>; Thu, 21 Jul 2022 10:58:56 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=wvI0q5HAql8tMPxcnKbiOi/9NxgmmSwnzAAkVZd1GZE=;
+        b=QeJXriKT9c5kzVC7WwOIhi80ckWM6ug8VcaWprkpELe4t4pSILpTjfg8m+cMtOrWBe
+         jmelByXoDseFjzPN05HlM35WJraOgVD8XBmkQsrB5vGpNrj70IhxBhsBNPglHsEpzekf
+         1kG3W212r4FUnxp6h1itgEO/FJ4Uuo3CeYYXkoiOWqCRXrzKR28+BcJbG5kguyytRjkg
+         rjsFU2rMHcaFZYM7jRBwDx3y4TNjRz8cS5RWMgjh+1ofnV6wnx05hcN9heFlTTNfsAVq
+         qUjZMJxGLa9mHYyEFjkrcwiRRdLtgvROz3H/Z1mIRgvYivxLAzSanUXyi85+4NTaGuJS
+         Ssew==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:in-reply-to
-         :references:organization:mime-version:content-transfer-encoding;
-        bh=lpgjxHYzUdT13dg92JGLQAgwmOcrc+nlknH/en5JH44=;
-        b=KMuFW2gYlMEKLCrs7dxGtk6628nuKA0eZmCgx+xWLmxdSsqWJvQyTgbvsDIwH/7kKV
-         QbScjjrHWIQ5eajoNdEzIWUgNwP804SkG+/Hfaq90fcR17UgUo2tp9EKss/gDBb0Jxqy
-         cQT0zVSdtaxOqaei9nr8SZQAqJdtWQ/Fp7o8Qh2XHPuOdYRuHem5TQC2nCAI0VzjNGHg
-         vK9tNH8SJQ0XkdNIJGjyzH6sbgdCRiBn1QMsLTSWXejziyP/hlGpxCY8x/JX4OKmYgfc
-         jTNGA7wa+PuNeCK9suo7DVfGdvx6UjKkv2Lz4dduz5nxJlefMJZZYRZxiyYN1FTLe003
-         zEvw==
-X-Gm-Message-State: AJIora/bVMYMqdQZqv1InOt+a7VPGaDaVv8oCtF25bFDw9uUQySzjBFA
-        Eo/FWDdEE2fAAcLgf7NqaiOCyVuzVuOAcUG3ZvpjbStnqpGWdeA6AjFTnuPatYeCDaFY4bh1UCy
-        xc4N3iy6qGKG2
-X-Received: by 2002:a02:9995:0:b0:33f:1def:a856 with SMTP id a21-20020a029995000000b0033f1defa856mr24004775jal.140.1658421721176;
-        Thu, 21 Jul 2022 09:42:01 -0700 (PDT)
-X-Google-Smtp-Source: AGRyM1uDra+sBjomhufuKVE3FoD1JmBYjfrwTVbG3vPUfrMl7qSHvCezbvx0MjlGPc8ncq7OqQjIFA==
-X-Received: by 2002:a02:9995:0:b0:33f:1def:a856 with SMTP id a21-20020a029995000000b0033f1defa856mr24004742jal.140.1658421720864;
-        Thu, 21 Jul 2022 09:42:00 -0700 (PDT)
-Received: from redhat.com ([38.15.36.239])
-        by smtp.gmail.com with ESMTPSA id d184-20020a0262c1000000b0033f0c9f4fbesm978665jac.135.2022.07.21.09.41.59
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=wvI0q5HAql8tMPxcnKbiOi/9NxgmmSwnzAAkVZd1GZE=;
+        b=nuXBpIVhexbU7prY3i9XcyIwUkoHatof2R6zYWWiVKETsopk9X8E8ufUeMUrPG4V3U
+         y/OsUm/XPynswlNIDrXpu7WTpDLYb88iY+V/cOqSGhsiAAXOvhws4onvOSXX1rPlwEAM
+         1oR9yEJ+bwJ/XMaI1oCJwCoK6TdXQoAoOEmB/DWZIS3B+cebI/02LpC+IuM15BcCXG0I
+         J7ICAKcArrFzTzleIPXoe0beQktQdMC247GMt9xrTFjQeMJtVrI81zJj3Cr3HGUu3670
+         zl0xTBcPKA2foudVt093zrxRxmkXYg2GKvq3jTrk466lBDFmpHqZkU/2xhEsVZP2M2Wd
+         H8Zg==
+X-Gm-Message-State: AJIora9+cnzsZZdncT8jnaXIVVXHDSYYHfEjwFNN6pBShqXuO5IrS+pS
+        93lpp0Buv9HhW5Nq6SsTK65clQ==
+X-Google-Smtp-Source: AGRyM1sy1sNPIZTfbcs9D/R5onBZFJSx4EAG07fQgd3u5pHjtvT3tSBi6UiM7uRquYtBlR+3qYzZvg==
+X-Received: by 2002:a17:90b:3d84:b0:1ef:9049:9f43 with SMTP id pq4-20020a17090b3d8400b001ef90499f43mr12682443pjb.45.1658426335405;
+        Thu, 21 Jul 2022 10:58:55 -0700 (PDT)
+Received: from google.com (123.65.230.35.bc.googleusercontent.com. [35.230.65.123])
+        by smtp.gmail.com with ESMTPSA id f4-20020a170902684400b0016c1cdd2de3sm1956763pln.281.2022.07.21.10.58.54
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 21 Jul 2022 09:42:00 -0700 (PDT)
-Date:   Thu, 21 Jul 2022 10:41:58 -0600
-From:   Alex Williamson <alex.williamson@redhat.com>
-To:     Eric Farman <farman@linux.ibm.com>
-Cc:     Jason Gunthorpe <jgg@nvidia.com>,
-        Alexander Gordeev <agordeev@linux.ibm.com>,
-        David Airlie <airlied@linux.ie>,
-        Christian Borntraeger <borntraeger@linux.ibm.com>,
-        Cornelia Huck <cohuck@redhat.com>,
-        Daniel Vetter <daniel@ffwll.ch>,
-        dri-devel@lists.freedesktop.org,
-        Harald Freudenberger <freude@linux.ibm.com>,
-        Vasily Gorbik <gor@linux.ibm.com>,
-        Heiko Carstens <hca@linux.ibm.com>,
-        intel-gfx@lists.freedesktop.org,
-        intel-gvt-dev@lists.freedesktop.org,
-        Jani Nikula <jani.nikula@linux.intel.com>,
-        Jason Herne <jjherne@linux.ibm.com>,
-        Joonas Lahtinen <joonas.lahtinen@linux.intel.com>,
-        kvm@vger.kernel.org, linux-s390@vger.kernel.org,
-        Matthew Rosato <mjrosato@linux.ibm.com>,
-        Peter Oberparleiter <oberpar@linux.ibm.com>,
-        Halil Pasic <pasic@linux.ibm.com>,
-        Rodrigo Vivi <rodrigo.vivi@intel.com>,
-        Sven Schnelle <svens@linux.ibm.com>,
-        Tvrtko Ursulin <tvrtko.ursulin@linux.intel.com>,
-        Vineeth Vijayan <vneethv@linux.ibm.com>,
-        Zhi Wang <zhi.a.wang@intel.com>,
-        Tony Krowiak <akrowiak@linux.ibm.com>,
-        Christoph Hellwig <hch@lst.de>,
-        Kevin Tian <kevin.tian@intel.com>,
-        Zhenyu Wang <zhenyuw@linux.intel.com>,
-        Nicolin Chen <nicolinc@nvidia.com>
-Subject: Re: [PATCH v4 1/2] vfio: Replace the DMA unmapping notifier with a
- callback
-Message-ID: <20220721104158.225a3562.alex.williamson@redhat.com>
-In-Reply-To: <d4b7abce8ef8646819d32fef57ea51e38cd53f1b.camel@linux.ibm.com>
-References: <0-v4-681e038e30fd+78-vfio_unmap_notif_jgg@nvidia.com>
-        <1-v4-681e038e30fd+78-vfio_unmap_notif_jgg@nvidia.com>
-        <20220720134113.4225f9d6.alex.williamson@redhat.com>
-        <20220720200829.GW4609@nvidia.com>
-        <20220720170457.39cda0d0.alex.williamson@redhat.com>
-        <d4b7abce8ef8646819d32fef57ea51e38cd53f1b.camel@linux.ibm.com>
-Organization: Red Hat
+        Thu, 21 Jul 2022 10:58:54 -0700 (PDT)
+Date:   Thu, 21 Jul 2022 17:58:50 +0000
+From:   Sean Christopherson <seanjc@google.com>
+To:     Chao Peng <chao.p.peng@linux.intel.com>
+Cc:     Wei Wang <wei.w.wang@linux.intel.com>,
+        "Gupta, Pankaj" <pankaj.gupta@amd.com>, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org, linux-mm@kvack.org,
+        linux-fsdevel@vger.kernel.org, linux-api@vger.kernel.org,
+        linux-doc@vger.kernel.org, qemu-devel@nongnu.org,
+        linux-kselftest@vger.kernel.org,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Jonathan Corbet <corbet@lwn.net>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+        x86@kernel.org, "H . Peter Anvin" <hpa@zytor.com>,
+        Hugh Dickins <hughd@google.com>,
+        Jeff Layton <jlayton@kernel.org>,
+        "J . Bruce Fields" <bfields@fieldses.org>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        Shuah Khan <shuah@kernel.org>, Mike Rapoport <rppt@kernel.org>,
+        Steven Price <steven.price@arm.com>,
+        "Maciej S . Szmigiero" <mail@maciej.szmigiero.name>,
+        Vlastimil Babka <vbabka@suse.cz>,
+        Vishal Annapurve <vannapurve@google.com>,
+        Yu Zhang <yu.c.zhang@linux.intel.com>,
+        "Kirill A . Shutemov" <kirill.shutemov@linux.intel.com>,
+        luto@kernel.org, jun.nakajima@intel.com, dave.hansen@intel.com,
+        ak@linux.intel.com, david@redhat.com, aarcange@redhat.com,
+        ddutile@redhat.com, dhildenb@redhat.com,
+        Quentin Perret <qperret@google.com>,
+        Michael Roth <michael.roth@amd.com>, mhocko@suse.com,
+        Muchun Song <songmuchun@bytedance.com>
+Subject: Re: [PATCH v7 11/14] KVM: Register/unregister the guest private
+ memory regions
+Message-ID: <YtmT2irvgInX1kPp@google.com>
+References: <20220706082016.2603916-1-chao.p.peng@linux.intel.com>
+ <20220706082016.2603916-12-chao.p.peng@linux.intel.com>
+ <f02baa37-8d34-5d07-a0ae-300ffefc7fee@amd.com>
+ <20220719140843.GA84779@chaop.bj.intel.com>
+ <36e671d2-6b95-8e4f-c2ac-fee4b2670c6e@amd.com>
+ <20220720150706.GB124133@chaop.bj.intel.com>
+ <d0fd229d-afa6-c66d-3e55-09ac5877453e@amd.com>
+ <YtgrkXqP/GIi9ujZ@google.com>
+ <45ae9f57-d595-f202-abb5-26a03a2ca131@linux.intel.com>
+ <20220721092906.GA153288@chaop.bj.intel.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-2.8 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        SPF_HELO_NONE,SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20220721092906.GA153288@chaop.bj.intel.com>
+X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
+        USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=unavailable
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, 21 Jul 2022 12:01:47 -0400
-Eric Farman <farman@linux.ibm.com> wrote:
-
-> On Wed, 2022-07-20 at 17:04 -0600, Alex Williamson wrote:
-> > On Wed, 20 Jul 2022 17:08:29 -0300
-> > Jason Gunthorpe <jgg@nvidia.com> wrote:
-> >   
-> > > On Wed, Jul 20, 2022 at 01:41:13PM -0600, Alex Williamson wrote:
-> > >    
-> > > > ie. we don't need the gfn, we only need the iova.    
-> > > 
-> > > Right, that makes sense
-> > >    
-> > > > However then I start to wonder why we're passing in 1 for the
-> > > > number of
-> > > > pages because this previously notifier, now callback is called
-> > > > for the
-> > > > entire vfio_dma range when we find any pinned pages.      
-> > > 
-> > > Well, it is doing this because it only ever pins one page.  
+On Thu, Jul 21, 2022, Chao Peng wrote:
+> On Thu, Jul 21, 2022 at 03:34:59PM +0800, Wei Wang wrote:
 > > 
-> > Of course that page is not necessarily the page it unpins given the
-> > contract misunderstanding below.
-> >    
-> > > The drivers are confused about what the contract is. vfio is
-> > > calling
-> > > the notifier with the entire IOVA range that is being unmapped and
-> > > the
-> > > drivers are expecting to receive notifications only for the IOVA
-> > > they
-> > > have actually pinned.
-> > >   
-> > > > Should ap and ccw implementations of .dma_unmap just be replaced
-> > > > with a
-> > > > BUG_ON(1)?    
-> > > 
-> > > The point of these callbacks is to halt concurrent DMA, and ccw
-> > > does
-> > > that today.  
 > > 
-> > ccw essentially only checks whether the starting iova of the unmap is
-> > currently mapped.  If not it does nothing, if it is it tries to reset
-> > the device and unpin everything.  Chances are the first iova is not
-> > the
-> > one pinned, so we don't end up removing the pinned page and type1
-> > will
-> > eventually BUG_ON after a few tries.
-> >   
-> > > It looks like AP is missing a call to ap_aqic(), so it is
-> > > probably double wrong.  
+> > On 7/21/22 00:21, Sean Christopherson wrote:
+> > Maybe you could tag it with cgs for all the confidential guest support
+> > related stuff: e.g. kvm_vm_ioctl_set_cgs_mem()
 > > 
-> > Thankfully the type1 unpinning path can't be tricked into unpinning
-> > something that wasn't pinned, so chances are the unpin call does
-> > nothing, with a small risk that it unpins another driver's pinned
-> > page,
-> > which might not yet have been notified and could still be using the
-> > page.  In the end, if ap did have a page pinned in the range, we'll
-> > hit
-> > the same BUG_ON as above.
-> >   
-> > > What I'd suggest is adding a WARN_ON that the dma->pfn_list is not
-> > > empty and leave these functions alone.  
-> > 
-> > The BUG_ON still exists in type1.
-> > 
-> > Eric, Matt, Tony, Halil, JasonH, any quick fixes here?  ccw looks
-> > like
-> > it would be pretty straightforward to test against a range rather
-> > than
-> > a single iova.  
+> > bool is_private = ioctl == KVM_MEMORY_ENCRYPT_REG_REGION;
+> > ...
+> > kvm_vm_ioctl_set_cgs_mem(, is_private)
 > 
-> Agreed, ccw looks pretty easy. Should I send something to go before
-> this series to make stable easier? (It's a trivial change in either
-> direction, so either is fine to me.)
+> If we plan to widely use such abbr. through KVM (e.g. it's well known),
+> I'm fine.
 
-It looks like we're expecting an rc8 for this development cycle, so the
-merge window will be pushed out a week (which works better for some
-upcoming PTO on my end), but if it's trivial either way let's plan for
-the fix to follow Nicolin's and Jason's series and we can always post a
-backport to the stable list if there's any trouble.  Thanks,
+I'd prefer to stay away from "confidential guest", and away from any VM-scoped
+name for that matter.  User-unmappable memmory has use cases beyond hiding guest
+state from the host, e.g. userspace could use inaccessible/unmappable memory to
+harden itself against unintentional access to guest memory.
 
-Alex
+> I actually use mem_attr in patch: https://lkml.org/lkml/2022/7/20/610
+> But I also don't quite like it, it's so generic and sounds say nothing.
+> 
+> But I do want a name can cover future usages other than just 
+> private/shared (pKVM for example may have a third state).
 
+I don't think there can be a third top-level state.  Memory is either private to
+the guest or it's not.  There can be sub-states, e.g. memory could be selectively
+shared or encrypted with a different key, in which case we'd need metadata to
+track that state.
+
+Though that begs the question of whether or not private_fd is the correct
+terminology.  E.g. if guest memory is backed by a memfd that can't be mapped by
+userspace (currently F_SEAL_INACCESSIBLE), but something else in the kernel plugs
+that memory into a device or another VM, then arguably that memory is shared,
+especially the multi-VM scenario.
+
+For TDX and SNP "private vs. shared" is likely the correct terminology given the
+current specs, but for generic KVM it's probably better to align with whatever
+terminology is used for memfd.  "inaccessible_fd" and "user_inaccessible_fd" are
+a bit odd since the fd itself is accesible.
+
+What about "user_unmappable"?  E.g.
+
+  F_SEAL_USER_UNMAPPABLE, MFD_USER_UNMAPPABLE, KVM_HAS_USER_UNMAPPABLE_MEMORY,
+  MEMFILE_F_USER_INACCESSIBLE, user_unmappable_fd, etc...
+
+that gives us flexibility to map the memory from within the kernel, e.g. into
+other VMs or devices.
+
+Hmm, and then keep your original "mem_attr_array" name?  And probably 
+
+ int kvm_vm_ioctl_set_mem_attr(struct kvm *kvm, gpa_t gpa, gpa_t size,
+ 			       bool is_user_mappable)
+
+Then the x86/mmu code for TDX/SNP private faults could be:
+
+	is_private = !kvm_is_gpa_user_mappable();
+
+	if (fault->is_private != is_private) {
+
+or if we want to avoid mixing up "user_mappable" and "user_unmappable":
+
+	is_private = kvm_is_gpa_user_unmappable();
+
+	if (fault->is_private != is_private) {
+
+though a helper that returns a negative (not mappable) feels kludgy.  And I like
+kvm_is_gpa_user_mappable() because then when there's not "special" memory, it
+defaults to true, which is more intuitive IMO.
+
+And then if the future needs more precision, e.g. user-unmappable memory isn't
+necessarily guest-exclusive, the uAPI names still work even though KVM internals
+will need to be reworked, but that's unavoidable.  E.g. piggybacking
+KVM_MEMORY_ENCRYPT_(UN)REG_REGION doesn't allow for further differentiation,
+so we'd need to _extend_ the uAPI, but the _existing_ uAPI would still be sane.
