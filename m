@@ -2,65 +2,109 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id B662257C23D
-	for <lists+kvm@lfdr.de>; Thu, 21 Jul 2022 04:28:35 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id BBF7B57C2D0
+	for <lists+kvm@lfdr.de>; Thu, 21 Jul 2022 05:36:48 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230135AbiGUC2e (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 20 Jul 2022 22:28:34 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41734 "EHLO
+        id S230152AbiGUDgq (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 20 Jul 2022 23:36:46 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55456 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229576AbiGUC2d (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 20 Jul 2022 22:28:33 -0400
-Received: from mail-wm1-x32c.google.com (mail-wm1-x32c.google.com [IPv6:2a00:1450:4864:20::32c])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 42ED67748D
-        for <kvm@vger.kernel.org>; Wed, 20 Jul 2022 19:28:32 -0700 (PDT)
-Received: by mail-wm1-x32c.google.com with SMTP id b21-20020a05600c4e1500b003a32bc8612fso77696wmq.3
-        for <kvm@vger.kernel.org>; Wed, 20 Jul 2022 19:28:32 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc:content-transfer-encoding;
-        bh=19tjAXZdXv68l+YAa0ZBgRNpk344mTsjynA3NFgFKCA=;
-        b=TKoFdcXDZLfDMneVBORAok2+vyXEb+qu9uNr5uMmuS01DbWsKwgeyA5InrxDT+Es39
-         TS8SFJzYuqq7kQmqOkdrDt+aUiY/OKqSQPVfMrWqor0zv9GM56GPwglzZyTYQXSukIPv
-         2NvA7OMMiEXh2jy/w7M82TX0PZ2pDJi0pkI1uD6f5c2HLXEFYZMDa0rSkGdZ7L22EJb7
-         28lVqyBW0oiH3lmKnBpbNzqK/vtstvIbN/XlQ+RtjPiJx1DMcrZiQM32/y7X7S/H9r2f
-         6r7OuMf/nTGPozqlF1is0Xgl7v6P3eYROxJjcHuoK0nBdJBp3FuH63B+TptQHyDobQdJ
-         hDBw==
+        with ESMTP id S230332AbiGUDgm (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 20 Jul 2022 23:36:42 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 982D57822D
+        for <kvm@vger.kernel.org>; Wed, 20 Jul 2022 20:36:38 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1658374597;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=XZs2MTtPJCgrF13MTLP6HwaK4P20s9o4BWWN0llGmLc=;
+        b=cCOXgnOO8xmvw+LZvOOhfD76/BS0ADF+QjtgZYBEk8Eyh6cDt/NnNyz2jv4kZCu3pnbKpT
+        eXKngVDK+Gj0hgYTtJiNCyFxq6oOqR7tNJFB+8FB5fAxvuvdtBwPi2q0BEhCjNZtlGNMG5
+        R+X9K2RsWhf5vPk7ynjvP82NHxs4RvY=
+Received: from mail-pg1-f197.google.com (mail-pg1-f197.google.com
+ [209.85.215.197]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-573-gKR3If_3NLq3OaJpGDpJzQ-1; Wed, 20 Jul 2022 23:36:36 -0400
+X-MC-Unique: gKR3If_3NLq3OaJpGDpJzQ-1
+Received: by mail-pg1-f197.google.com with SMTP id u11-20020a654c0b000000b00415ed4acf16so271735pgq.22
+        for <kvm@vger.kernel.org>; Wed, 20 Jul 2022 20:36:36 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc:content-transfer-encoding;
-        bh=19tjAXZdXv68l+YAa0ZBgRNpk344mTsjynA3NFgFKCA=;
-        b=feFq1NDZzpdnSGzwm+Ce4Dte32iIzFkZH9hFYWE/jMu8lo3wXLC1DDkxxHuVfNfse4
-         FySMYBGHDQOQw2xleE9EGvCqnJWFLD+wPgv9Sn3KY40eSaWUcANmDvqCmf+IkO1toPWU
-         cP3kZMT2KL3EY8DMc569cHn861jBb1GgdNyW9/owGpjzBOVIrm/ZdMfLTUKlLCW3mrD+
-         GJrg9C2QmnMBtmv/Dmkei5jalsHElLz0phUiy1xxB9klaocBIJUa8UCU5oOxMxvop5en
-         9T8ythDrMaDp80UF4rfCe6kIrjl06Rpsn/fm8TKtQJpnOMTpAcR1BrhoMLaRLIVnJ18a
-         ndOQ==
-X-Gm-Message-State: AJIora/ep7i6swP5Iho3kNidpG/bp3SwXnan/ZorIUR/Zs2x7qVDYGrT
-        0Al7tyZrKnFJPWwIsvbZouIu3gW1r7xR6Y3RldJRlw==
-X-Google-Smtp-Source: AGRyM1vE7AdNjWBIwuiujlKAqemHdV3gh9ZupYfREkyvjWQZ7lbVC7ZR8mv0zwVT+luSSVfqjBmsotZvsGZFZpciAQU=
-X-Received: by 2002:a05:600c:1e0f:b0:3a3:191c:a3c8 with SMTP id
- ay15-20020a05600c1e0f00b003a3191ca3c8mr6353368wmb.151.1658370510638; Wed, 20
- Jul 2022 19:28:30 -0700 (PDT)
+        h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
+         :content-language:to:cc:references:from:in-reply-to
+         :content-transfer-encoding;
+        bh=XZs2MTtPJCgrF13MTLP6HwaK4P20s9o4BWWN0llGmLc=;
+        b=psR9z+wjlGhUl1AWxeqMvUZyIYyK4Lq8P2cacm7xO2DEN7oPC0dCssyzxITKCNrEN5
+         IvUB2EG6qNfl5vS+BBvP5pnVfU1V88KlMr7fNQsTYj7DQBHuv2KXBKzgKr33FKohSzvd
+         JWtWGsMQN3CzDkyrUKW1qQL7WtSWSu/I8MrsxsFkgyimcXphSlmYhEQvqHyN0jc7axlK
+         oK0uDblvxyqXfcfqK8j/vCfmTQMX365PSiSDLHFYYCCyieK1Qsrds2+DckpgmFQVX399
+         1TMyaJH6O1U8ejrwkJkeqUCAEzLMG4cGfAPYo3ZDKlddpo9mtbI/j7opL69ohd6qc3B5
+         GM/g==
+X-Gm-Message-State: AJIora/bSnFuGaGEg/gM5ogOJqTrCw8rHvD2WE3Th5Set2r8gLzpjthv
+        uUtpF32cR4BlQu4tU0AwyBbjLae962xk+vi+OjqVFPzgPYbzD+UNRwODE/OncfPz1bZgpi7B40a
+        s56CMgFn3gyJe
+X-Received: by 2002:a17:903:230c:b0:16c:4c65:18be with SMTP id d12-20020a170903230c00b0016c4c6518bemr41221925plh.138.1658374595109;
+        Wed, 20 Jul 2022 20:36:35 -0700 (PDT)
+X-Google-Smtp-Source: AGRyM1tr2BE9d26jAFZ7UzmaXmDCEYEs27OTIGhFU26HuMl2rkNob1MeYihMEZsIvqYHGU+JOzJneA==
+X-Received: by 2002:a17:903:230c:b0:16c:4c65:18be with SMTP id d12-20020a170903230c00b0016c4c6518bemr41221903plh.138.1658374594755;
+        Wed, 20 Jul 2022 20:36:34 -0700 (PDT)
+Received: from [10.72.12.47] ([209.132.188.80])
+        by smtp.gmail.com with ESMTPSA id x22-20020aa79416000000b005289fad1bbesm424278pfo.94.2022.07.20.20.36.24
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 20 Jul 2022 20:36:34 -0700 (PDT)
+Message-ID: <ba2ae3e4-a950-6b7f-8748-c45a685bb6b0@redhat.com>
+Date:   Thu, 21 Jul 2022 11:36:19 +0800
 MIME-Version: 1.0
-References: <20220719234950.3612318-1-aaronlewis@google.com>
- <20220719234950.3612318-4-aaronlewis@google.com> <YtiOgtQy1bjL3VNX@google.com>
-In-Reply-To: <YtiOgtQy1bjL3VNX@google.com>
-From:   Aaron Lewis <aaronlewis@google.com>
-Date:   Thu, 21 Jul 2022 02:28:18 +0000
-Message-ID: <CAAAPnDEKS5hrunMg8Q5Gvt=bU81zZD6fMWsfqRJu029JXpvv1w@mail.gmail.com>
-Subject: Re: [RFC PATCH v2 3/3] selftests: kvm/x86: Test the flags in MSR
- filtering / exiting
-To:     Sean Christopherson <seanjc@google.com>
-Cc:     kvm@vger.kernel.org, pbonzini@redhat.com, jmattson@google.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-        USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=ham
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:91.0)
+ Gecko/20100101 Thunderbird/91.11.0
+Subject: Re: [PATCH v12 01/40] virtio: record the maximum queue num supported
+ by the device.
+Content-Language: en-US
+To:     Xuan Zhuo <xuanzhuo@linux.alibaba.com>,
+        virtualization@lists.linux-foundation.org
+Cc:     Richard Weinberger <richard@nod.at>,
+        Anton Ivanov <anton.ivanov@cambridgegreys.com>,
+        Johannes Berg <johannes@sipsolutions.net>,
+        "Michael S. Tsirkin" <mst@redhat.com>,
+        "David S. Miller" <davem@davemloft.net>,
+        Eric Dumazet <edumazet@google.com>,
+        Jakub Kicinski <kuba@kernel.org>,
+        Paolo Abeni <pabeni@redhat.com>,
+        Hans de Goede <hdegoede@redhat.com>,
+        Mark Gross <markgross@kernel.org>,
+        Vadim Pasternak <vadimp@nvidia.com>,
+        Bjorn Andersson <bjorn.andersson@linaro.org>,
+        Mathieu Poirier <mathieu.poirier@linaro.org>,
+        Cornelia Huck <cohuck@redhat.com>,
+        Halil Pasic <pasic@linux.ibm.com>,
+        Eric Farman <farman@linux.ibm.com>,
+        Heiko Carstens <hca@linux.ibm.com>,
+        Vasily Gorbik <gor@linux.ibm.com>,
+        Alexander Gordeev <agordeev@linux.ibm.com>,
+        Christian Borntraeger <borntraeger@linux.ibm.com>,
+        Sven Schnelle <svens@linux.ibm.com>,
+        Alexei Starovoitov <ast@kernel.org>,
+        Daniel Borkmann <daniel@iogearbox.net>,
+        Jesper Dangaard Brouer <hawk@kernel.org>,
+        John Fastabend <john.fastabend@gmail.com>,
+        Vincent Whitchurch <vincent.whitchurch@axis.com>,
+        linux-um@lists.infradead.org, netdev@vger.kernel.org,
+        platform-driver-x86@vger.kernel.org,
+        linux-remoteproc@vger.kernel.org, linux-s390@vger.kernel.org,
+        kvm@vger.kernel.org, bpf@vger.kernel.org,
+        kangjie.xu@linux.alibaba.com
+References: <20220720030436.79520-1-xuanzhuo@linux.alibaba.com>
+ <20220720030436.79520-2-xuanzhuo@linux.alibaba.com>
+From:   Jason Wang <jasowang@redhat.com>
+In-Reply-To: <20220720030436.79520-2-xuanzhuo@linux.alibaba.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-Spam-Status: No, score=-3.5 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
+        RCVD_IN_DNSWL_LOW,SPF_HELO_NONE,SPF_NONE autolearn=ham
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -68,68 +112,153 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-> > --- a/tools/testing/selftests/kvm/x86_64/userspace_msr_exit_test.c
-> > +++ b/tools/testing/selftests/kvm/x86_64/userspace_msr_exit_test.c
-> > @@ -734,6 +734,99 @@ static void test_msr_permission_bitmap(void)
-> >       kvm_vm_free(vm);
-> >  }
-> >
-> > +static void test_results(int rc, const char *scmd, bool expected_succe=
-ss)
+
+在 2022/7/20 11:03, Xuan Zhuo 写道:
+> virtio-net can display the maximum (supported by hardware) ring size in
+> ethtool -g eth0.
 >
-> Rather than pass in "success expected", pass in the actual value and the =
-valid
-> mask.  Then you can spit out the problematic value in the assert and be k=
-ind to
-> future debuggers.
+> When the subsequent patch implements vring reset, it can judge whether
+> the ring size passed by the driver is legal based on this.
 >
-> And similarly, make the __vm_ioctl() call here instead of in the "caller"=
- and name
-> this __test_ioctl() (rename as necessary, see below) to show it's relatio=
-nship with
-> the macro.
+> Signed-off-by: Xuan Zhuo <xuanzhuo@linux.alibaba.com>
 
-The other comments look good.  I'll update.
+Acked-by: Jason Wang <jasowang@redhat.com>
 
-This one is a bit tricky though.  I did originally have __vm_ioctl()
-in test_results() (or whatever name it will end up with), but the
-static assert in kvm_do_ioctl() gave me problems.  Unless I make
-test_results() a macro, I have to force cmd to a uint64_t or something
-other than a literal, then I get this:
 
-include/kvm_util_base.h:190:39: error: expression in static assertion
-is not constant
-190 |         static_assert(!_IOC_SIZE(cmd) || sizeof(*arg) =3D=3D
-_IOC_SIZE(cmd), "");   \
-       |                                       ^
-include/kvm_util_base.h:213:9: note: in expansion of macro =E2=80=98kvm_do_=
-ioctl=E2=80=99
-213 |         kvm_do_ioctl((vm)->fd, cmd, arg);                       \
-
-That's not the only problem.  In order to pass 'arg' in I would have
-to pass it as a void *, making sizeof(*arg) wrong.
-
-Being that the ioctl call was the first thing I did in that function I
-opted to make it a part of test_ioctl() rather than making
-test_results() a macro.
-
-If only C had templates :)
-
+> ---
+>   arch/um/drivers/virtio_uml.c             | 1 +
+>   drivers/platform/mellanox/mlxbf-tmfifo.c | 2 ++
+>   drivers/remoteproc/remoteproc_virtio.c   | 2 ++
+>   drivers/s390/virtio/virtio_ccw.c         | 3 +++
+>   drivers/virtio/virtio_mmio.c             | 2 ++
+>   drivers/virtio/virtio_pci_legacy.c       | 2 ++
+>   drivers/virtio/virtio_pci_modern.c       | 2 ++
+>   drivers/virtio/virtio_vdpa.c             | 2 ++
+>   include/linux/virtio.h                   | 2 ++
+>   9 files changed, 18 insertions(+)
 >
-> > +{
-> > +     int expected_rc;
-> > +
-> > +     expected_rc =3D expected_success ? 0 : -1;
-> > +     TEST_ASSERT(rc =3D=3D expected_rc,
-> > +                 "Unexpected result from '%s', rc: %d, expected rc: %d=
-.",
-> > +                 scmd, rc, expected_rc);
-> > +     TEST_ASSERT(!rc || (rc =3D=3D -1 && errno =3D=3D EINVAL),
-> > +                 "Failures are expected to have rc =3D=3D -1 && errno =
-=3D=3D EINVAL(%d),\n"
-> > +                 "  got rc: %d, errno: %d",
-> > +                 EINVAL, rc, errno);
-> > +}
-> > +
-> > +#define test_ioctl(vm, cmd, arg, expected_success)   \
->
+> diff --git a/arch/um/drivers/virtio_uml.c b/arch/um/drivers/virtio_uml.c
+> index 82ff3785bf69..e719af8bdf56 100644
+> --- a/arch/um/drivers/virtio_uml.c
+> +++ b/arch/um/drivers/virtio_uml.c
+> @@ -958,6 +958,7 @@ static struct virtqueue *vu_setup_vq(struct virtio_device *vdev,
+>   		goto error_create;
+>   	}
+>   	vq->priv = info;
+> +	vq->num_max = num;
+>   	num = virtqueue_get_vring_size(vq);
+>   
+>   	if (vu_dev->protocol_features &
+> diff --git a/drivers/platform/mellanox/mlxbf-tmfifo.c b/drivers/platform/mellanox/mlxbf-tmfifo.c
+> index 38800e86ed8a..1ae3c56b66b0 100644
+> --- a/drivers/platform/mellanox/mlxbf-tmfifo.c
+> +++ b/drivers/platform/mellanox/mlxbf-tmfifo.c
+> @@ -959,6 +959,8 @@ static int mlxbf_tmfifo_virtio_find_vqs(struct virtio_device *vdev,
+>   			goto error;
+>   		}
+>   
+> +		vq->num_max = vring->num;
+> +
+>   		vqs[i] = vq;
+>   		vring->vq = vq;
+>   		vq->priv = vring;
+> diff --git a/drivers/remoteproc/remoteproc_virtio.c b/drivers/remoteproc/remoteproc_virtio.c
+> index d43d74733f0a..0f7706e23eb9 100644
+> --- a/drivers/remoteproc/remoteproc_virtio.c
+> +++ b/drivers/remoteproc/remoteproc_virtio.c
+> @@ -125,6 +125,8 @@ static struct virtqueue *rp_find_vq(struct virtio_device *vdev,
+>   		return ERR_PTR(-ENOMEM);
+>   	}
+>   
+> +	vq->num_max = num;
+> +
+>   	rvring->vq = vq;
+>   	vq->priv = rvring;
+>   
+> diff --git a/drivers/s390/virtio/virtio_ccw.c b/drivers/s390/virtio/virtio_ccw.c
+> index 161d3b141f0d..6b86d0280d6b 100644
+> --- a/drivers/s390/virtio/virtio_ccw.c
+> +++ b/drivers/s390/virtio/virtio_ccw.c
+> @@ -530,6 +530,9 @@ static struct virtqueue *virtio_ccw_setup_vq(struct virtio_device *vdev,
+>   		err = -ENOMEM;
+>   		goto out_err;
+>   	}
+> +
+> +	vq->num_max = info->num;
+> +
+>   	/* it may have been reduced */
+>   	info->num = virtqueue_get_vring_size(vq);
+>   
+> diff --git a/drivers/virtio/virtio_mmio.c b/drivers/virtio/virtio_mmio.c
+> index 083ff1eb743d..a20d5a6b5819 100644
+> --- a/drivers/virtio/virtio_mmio.c
+> +++ b/drivers/virtio/virtio_mmio.c
+> @@ -403,6 +403,8 @@ static struct virtqueue *vm_setup_vq(struct virtio_device *vdev, unsigned int in
+>   		goto error_new_virtqueue;
+>   	}
+>   
+> +	vq->num_max = num;
+> +
+>   	/* Activate the queue */
+>   	writel(virtqueue_get_vring_size(vq), vm_dev->base + VIRTIO_MMIO_QUEUE_NUM);
+>   	if (vm_dev->version == 1) {
+> diff --git a/drivers/virtio/virtio_pci_legacy.c b/drivers/virtio/virtio_pci_legacy.c
+> index a5e5721145c7..2257f1b3d8ae 100644
+> --- a/drivers/virtio/virtio_pci_legacy.c
+> +++ b/drivers/virtio/virtio_pci_legacy.c
+> @@ -135,6 +135,8 @@ static struct virtqueue *setup_vq(struct virtio_pci_device *vp_dev,
+>   	if (!vq)
+>   		return ERR_PTR(-ENOMEM);
+>   
+> +	vq->num_max = num;
+> +
+>   	q_pfn = virtqueue_get_desc_addr(vq) >> VIRTIO_PCI_QUEUE_ADDR_SHIFT;
+>   	if (q_pfn >> 32) {
+>   		dev_err(&vp_dev->pci_dev->dev,
+> diff --git a/drivers/virtio/virtio_pci_modern.c b/drivers/virtio/virtio_pci_modern.c
+> index 623906b4996c..e7e0b8c850f6 100644
+> --- a/drivers/virtio/virtio_pci_modern.c
+> +++ b/drivers/virtio/virtio_pci_modern.c
+> @@ -218,6 +218,8 @@ static struct virtqueue *setup_vq(struct virtio_pci_device *vp_dev,
+>   	if (!vq)
+>   		return ERR_PTR(-ENOMEM);
+>   
+> +	vq->num_max = num;
+> +
+>   	/* activate the queue */
+>   	vp_modern_set_queue_size(mdev, index, virtqueue_get_vring_size(vq));
+>   	vp_modern_queue_address(mdev, index, virtqueue_get_desc_addr(vq),
+> diff --git a/drivers/virtio/virtio_vdpa.c b/drivers/virtio/virtio_vdpa.c
+> index c40f7deb6b5a..9670cc79371d 100644
+> --- a/drivers/virtio/virtio_vdpa.c
+> +++ b/drivers/virtio/virtio_vdpa.c
+> @@ -183,6 +183,8 @@ virtio_vdpa_setup_vq(struct virtio_device *vdev, unsigned int index,
+>   		goto error_new_virtqueue;
+>   	}
+>   
+> +	vq->num_max = max_num;
+> +
+>   	/* Setup virtqueue callback */
+>   	cb.callback = callback ? virtio_vdpa_virtqueue_cb : NULL;
+>   	cb.private = info;
+> diff --git a/include/linux/virtio.h b/include/linux/virtio.h
+> index d8fdf170637c..129bde7521e3 100644
+> --- a/include/linux/virtio.h
+> +++ b/include/linux/virtio.h
+> @@ -19,6 +19,7 @@
+>    * @priv: a pointer for the virtqueue implementation to use.
+>    * @index: the zero-based ordinal number for this queue.
+>    * @num_free: number of elements we expect to be able to fit.
+> + * @num_max: the maximum number of elements supported by the device.
+>    *
+>    * A note on @num_free: with indirect buffers, each buffer needs one
+>    * element in the queue, otherwise a buffer will need one element per
+> @@ -31,6 +32,7 @@ struct virtqueue {
+>   	struct virtio_device *vdev;
+>   	unsigned int index;
+>   	unsigned int num_free;
+> +	unsigned int num_max;
+>   	void *priv;
+>   };
+>   
+
