@@ -2,335 +2,136 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id C529057C148
-	for <lists+kvm@lfdr.de>; Thu, 21 Jul 2022 02:03:36 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id B90CD57C151
+	for <lists+kvm@lfdr.de>; Thu, 21 Jul 2022 02:06:36 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231818AbiGUADe (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 20 Jul 2022 20:03:34 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40180 "EHLO
+        id S232052AbiGUAGV (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 20 Jul 2022 20:06:21 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43320 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231867AbiGUAD3 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 20 Jul 2022 20:03:29 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 3BF79747B4
-        for <kvm@vger.kernel.org>; Wed, 20 Jul 2022 17:03:28 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1658361807;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=vEKhqgRr9e+FdFBlcgIQBne//MdIQ/2rpsCkqOHqxu0=;
-        b=hdAv2Nh17lpT5EQ2hwK6Xy+3/l7ORwdLBze9txK7NdtZZZCPlfUypls0ws2KXQ+lQ8KfGq
-        CZMbuk8yv1TeazgC1zfESCf3ypk2+TbX4JKSDYidZ+xscDGbQfw6fvn0YER8DcP+Ic567K
-        cGMKy0A+xBMrBJo8pP3r8GaXMEeMWLc=
-Received: from mail-qk1-f199.google.com (mail-qk1-f199.google.com
- [209.85.222.199]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-554-OKflfEbAO2uWCHgefk5rDQ-1; Wed, 20 Jul 2022 20:03:26 -0400
-X-MC-Unique: OKflfEbAO2uWCHgefk5rDQ-1
-Received: by mail-qk1-f199.google.com with SMTP id bi37-20020a05620a31a500b006b5ef0afedaso201275qkb.22
-        for <kvm@vger.kernel.org>; Wed, 20 Jul 2022 17:03:26 -0700 (PDT)
+        with ESMTP id S232024AbiGUAGS (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 20 Jul 2022 20:06:18 -0400
+Received: from mail-pj1-x102c.google.com (mail-pj1-x102c.google.com [IPv6:2607:f8b0:4864:20::102c])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 03CE130F42
+        for <kvm@vger.kernel.org>; Wed, 20 Jul 2022 17:06:18 -0700 (PDT)
+Received: by mail-pj1-x102c.google.com with SMTP id q41-20020a17090a1b2c00b001f2043c727aso3767362pjq.1
+        for <kvm@vger.kernel.org>; Wed, 20 Jul 2022 17:06:17 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=Zl8f6HPV5Rh1bVpXZpG/PEaQanwB5mTX2EqFow7ycko=;
+        b=Xx7vzVCyr7mRNu58QYoYyo86qSl8a+kuEDUBCY48OhL3YMALD4/CAq8hvTzABMUoTd
+         uLKYr3y4hrF00Y2NyJzRGrJaK38Q2z+sC2ERNsYkS1c9dsBOVNA9jXjyq0QxR8taQyeD
+         Gd6zwv6JAFcwxovkErY66KP7MJdOHq2cqNWX7qtLy8V/KvN7PjxI8ahnilmA5QpG46lB
+         J3ZTJeb/LfJju34WO9NAzVCgwoUyOs6BO5kCCLohNr7x+pvUX3j1uNyezyyCqD4ZS68N
+         YmYocE3jf8eaDS8U/L3ZCYZEznzJZrlG9D1avRqB6bOMqeB6B3aU1+4ML0Re5B4+JqOJ
+         MLBQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
-         :references:mime-version:content-transfer-encoding;
-        bh=vEKhqgRr9e+FdFBlcgIQBne//MdIQ/2rpsCkqOHqxu0=;
-        b=Jkv7iYbPZZOP8tSzFGL2HJ0oOtsuARk/Ct/SMX1lUGw7nVC8p+y89Vpead00tYt4D7
-         IWLkZon8oWXoZUMGPv2/Dgyxe/VZGlZAKTpH2KEspMHHqLpeUfldiAxIYO3Yk73NJP+r
-         oYSvj4ygv9Q3TYqTQiWrF4pVKNC0HzZEPCu5PqCviCzEPuZVMveDVZH3546uOD6o4jgv
-         sc75oLusdOTQEZktXqBhge1IsjcN4e09cbdLS9E2BBZ6GT/wxtMh4Jbl8rfe83/C6cou
-         9RH90qmJSnOJA3EobhLk5LmUmM6MImMzcgiaMPqnys5qfo5GXFF/SGC7nmKg5vUo6rW7
-         ohWg==
-X-Gm-Message-State: AJIora+vPptX2Lyndc3yxhCb6OkpiZlOvoRKvvsTbWyIsWH5/91guWja
-        wNLTlu4wo7N3WgrHYWMZrzG6eQhZND5REplyvV94e1D4ZsfrW2NbNE+YW1wURnIaQ0bgoMYW2r/
-        cHimdyG36KRAk
-X-Received: by 2002:a05:620a:410c:b0:6b2:82d8:dcae with SMTP id j12-20020a05620a410c00b006b282d8dcaemr26219833qko.259.1658361804830;
-        Wed, 20 Jul 2022 17:03:24 -0700 (PDT)
-X-Google-Smtp-Source: AGRyM1tKKR7T4A+w03q2sFw9EEHlT0lO0nSE92BRB0WQDe4C2KneGlhmAUXd/ls2kVGBH4CAIrGMMw==
-X-Received: by 2002:a05:620a:410c:b0:6b2:82d8:dcae with SMTP id j12-20020a05620a410c00b006b282d8dcaemr26219802qko.259.1658361804490;
-        Wed, 20 Jul 2022 17:03:24 -0700 (PDT)
-Received: from localhost.localdomain (bras-base-aurron9127w-grc-37-74-12-30-48.dsl.bell.ca. [74.12.30.48])
-        by smtp.gmail.com with ESMTPSA id g4-20020ac87f44000000b0031eb3af3ffesm418640qtk.52.2022.07.20.17.03.23
-        (version=TLS1_3 cipher=TLS_CHACHA20_POLY1305_SHA256 bits=256/256);
-        Wed, 20 Jul 2022 17:03:23 -0700 (PDT)
-From:   Peter Xu <peterx@redhat.com>
-To:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org
-Cc:     David Hildenbrand <david@redhat.com>,
-        "Dr . David Alan Gilbert" <dgilbert@redhat.com>, peterx@redhat.com,
-        John Hubbard <jhubbard@nvidia.com>,
-        Sean Christopherson <seanjc@google.com>,
-        Linux MM Mailing List <linux-mm@kvack.org>,
-        Andrew Morton <akpm@linux-foundation.org>,
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=Zl8f6HPV5Rh1bVpXZpG/PEaQanwB5mTX2EqFow7ycko=;
+        b=Romc2xe3ciS1tm5Krsopqy3yKerNHjS5jpf1a6cdQ+e4KuFVHRe+4b/WXEchRo01XI
+         CPn797RFI4VXNRba5Nj4UILmRSZAv1WWgeJJYb8o2m8fDmbrMIDSF/QeL8lhhVeFEcTR
+         Mf/mI0E9vf8tYI4xgnPET6OVbgMyPCbJSIoU5UpF9GI3QllsWm34znBRNy8iyff4KCXJ
+         DlNvQ/M6q1pMQXkgGkIgGfQvHJMGIMJ8VC6zUIv12PaIx7FHK/DesK3R3O30bcAEwDwh
+         4RUvT1qSSovsNCGhiWoKl1IA0HvhgBnl1OPZUNsbPBzj2IWDThnsRMiPWy/8sU5fbW2J
+         /C3Q==
+X-Gm-Message-State: AJIora9dZRRzVEi7PpAa5kCyvjvTv2fECDf67lJvdazCno280aKeVta/
+        qw0DaW9Ebcba7zh6vORRnVB/AQ==
+X-Google-Smtp-Source: AGRyM1u0qqrMwXFL3ruItNWgLDmjtV7VS1B/ZOauP14OjkD++cleqCJs9fxb05Cy971+zEUN/4hCZw==
+X-Received: by 2002:a17:90b:1d01:b0:1f2:104:6424 with SMTP id on1-20020a17090b1d0100b001f201046424mr7992254pjb.101.1658361977426;
+        Wed, 20 Jul 2022 17:06:17 -0700 (PDT)
+Received: from google.com (123.65.230.35.bc.googleusercontent.com. [35.230.65.123])
+        by smtp.gmail.com with ESMTPSA id i66-20020a626d45000000b00525373aac7csm221278pfc.26.2022.07.20.17.06.16
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 20 Jul 2022 17:06:16 -0700 (PDT)
+Date:   Thu, 21 Jul 2022 00:06:13 +0000
+From:   Sean Christopherson <seanjc@google.com>
+To:     Maxim Levitsky <mlevitsk@redhat.com>
+Cc:     kvm@vger.kernel.org, x86@kernel.org,
+        Kees Cook <keescook@chromium.org>,
+        Dave Hansen <dave.hansen@linux.intel.com>,
+        linux-kernel@vger.kernel.org, "H. Peter Anvin" <hpa@zytor.com>,
+        Borislav Petkov <bp@alien8.de>, Joerg Roedel <joro@8bytes.org>,
+        Ingo Molnar <mingo@redhat.com>,
         Paolo Bonzini <pbonzini@redhat.com>,
-        Andrea Arcangeli <aarcange@redhat.com>
-Subject: [PATCH v2 3/3] kvm/x86: Allow to respond to generic signals during slow page faults
-Date:   Wed, 20 Jul 2022 20:03:18 -0400
-Message-Id: <20220721000318.93522-4-peterx@redhat.com>
-X-Mailer: git-send-email 2.32.0
-In-Reply-To: <20220721000318.93522-1-peterx@redhat.com>
-References: <20220721000318.93522-1-peterx@redhat.com>
+        Thomas Gleixner <tglx@linutronix.de>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>
+Subject: Re: [PATCH v2 06/11] KVM: x86: emulator/smm: number of GPRs in the
+ SMRAM image depends on the image format
+Message-ID: <YtiYdTWQ7Vy+IHLO@google.com>
+References: <20220621150902.46126-1-mlevitsk@redhat.com>
+ <20220621150902.46126-7-mlevitsk@redhat.com>
 MIME-Version: 1.0
-Content-type: text/plain
-Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-2.8 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        SPF_HELO_NONE,SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20220621150902.46126-7-mlevitsk@redhat.com>
+X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
+        USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-All the facilities should be ready for this, what we need to do is to add a
-new "interruptible" flag showing that we're willing to be interrupted by
-common signals during the __gfn_to_pfn_memslot() request, and wire it up
-with a FOLL_INTERRUPTIBLE flag that we've just introduced.
+On Tue, Jun 21, 2022, Maxim Levitsky wrote:
+> On 64 bit host, if the guest doesn't have X86_FEATURE_LM, we would
 
-Note that only x86 slow page fault routine will set this to true.  The new
-flag is by default false in non-x86 arch or on other gup paths even for
-x86.  It can actually be used elsewhere too but not yet covered.
+s/we would/KVM will
 
-When we see the PFN fetching was interrupted, do early exit to userspace
-with an KVM_EXIT_INTR exit reason.
+> access 16 gprs to 32-bit smram image, causing out-ouf-bound ram
+> access.
+> 
+> On 32 bit host, the rsm_load_state_64/enter_smm_save_state_64
+> is compiled out, thus access overflow can't happen.
+> 
+> Fixes: b443183a25ab61 ("KVM: x86: Reduce the number of emulator GPRs to '8' for 32-bit KVM")
 
-Signed-off-by: Peter Xu <peterx@redhat.com>
----
- arch/arm64/kvm/mmu.c                   |  2 +-
- arch/powerpc/kvm/book3s_64_mmu_hv.c    |  2 +-
- arch/powerpc/kvm/book3s_64_mmu_radix.c |  2 +-
- arch/x86/kvm/mmu/mmu.c                 | 16 ++++++++++++--
- include/linux/kvm_host.h               |  4 ++--
- virt/kvm/kvm_main.c                    | 30 ++++++++++++++++----------
- virt/kvm/kvm_mm.h                      |  4 ++--
- virt/kvm/pfncache.c                    |  2 +-
- 8 files changed, 41 insertions(+), 21 deletions(-)
+Argh, I forgot that this one of the like five places KVM actually respects the
+long mode flag.  Even worse, I fixed basically the same thing a while back,
+commit b68f3cc7d978 ("KVM: x86: Always use 32-bit SMRAM save state for 32-bit kernels").
 
-diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
-index f5651a05b6a8..93f6b9bf1af1 100644
---- a/arch/arm64/kvm/mmu.c
-+++ b/arch/arm64/kvm/mmu.c
-@@ -1204,7 +1204,7 @@ static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
- 	 */
- 	smp_rmb();
- 
--	pfn = __gfn_to_pfn_memslot(memslot, gfn, false, NULL,
-+	pfn = __gfn_to_pfn_memslot(memslot, gfn, false, false, NULL,
- 				   write_fault, &writable, NULL);
- 	if (pfn == KVM_PFN_ERR_HWPOISON) {
- 		kvm_send_hwpoison_signal(hva, vma_shift);
-diff --git a/arch/powerpc/kvm/book3s_64_mmu_hv.c b/arch/powerpc/kvm/book3s_64_mmu_hv.c
-index 514fd45c1994..7aed5ef6588e 100644
---- a/arch/powerpc/kvm/book3s_64_mmu_hv.c
-+++ b/arch/powerpc/kvm/book3s_64_mmu_hv.c
-@@ -598,7 +598,7 @@ int kvmppc_book3s_hv_page_fault(struct kvm_vcpu *vcpu,
- 		write_ok = true;
- 	} else {
- 		/* Call KVM generic code to do the slow-path check */
--		pfn = __gfn_to_pfn_memslot(memslot, gfn, false, NULL,
-+		pfn = __gfn_to_pfn_memslot(memslot, gfn, false, false, NULL,
- 					   writing, &write_ok, NULL);
- 		if (is_error_noslot_pfn(pfn))
- 			return -EFAULT;
-diff --git a/arch/powerpc/kvm/book3s_64_mmu_radix.c b/arch/powerpc/kvm/book3s_64_mmu_radix.c
-index 42851c32ff3b..9991f9d9ee59 100644
---- a/arch/powerpc/kvm/book3s_64_mmu_radix.c
-+++ b/arch/powerpc/kvm/book3s_64_mmu_radix.c
-@@ -845,7 +845,7 @@ int kvmppc_book3s_instantiate_page(struct kvm_vcpu *vcpu,
- 		unsigned long pfn;
- 
- 		/* Call KVM generic code to do the slow-path check */
--		pfn = __gfn_to_pfn_memslot(memslot, gfn, false, NULL,
-+		pfn = __gfn_to_pfn_memslot(memslot, gfn, false, false, NULL,
- 					   writing, upgrade_p, NULL);
- 		if (is_error_noslot_pfn(pfn))
- 			return -EFAULT;
-diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
-index 17252f39bd7c..aeafe0e9cfbf 100644
---- a/arch/x86/kvm/mmu/mmu.c
-+++ b/arch/x86/kvm/mmu/mmu.c
-@@ -3012,6 +3012,13 @@ static int kvm_handle_bad_page(struct kvm_vcpu *vcpu, gfn_t gfn, kvm_pfn_t pfn)
- static int handle_abnormal_pfn(struct kvm_vcpu *vcpu, struct kvm_page_fault *fault,
- 			       unsigned int access)
- {
-+	/* NOTE: not all error pfn is fatal; handle sigpending pfn first */
-+	if (unlikely(is_sigpending_pfn(fault->pfn))) {
-+		vcpu->run->exit_reason = KVM_EXIT_INTR;
-+		++vcpu->stat.signal_exits;
-+		return -EINTR;
-+	}
-+
- 	/* The pfn is invalid, report the error! */
- 	if (unlikely(is_error_pfn(fault->pfn)))
- 		return kvm_handle_bad_page(vcpu, fault->gfn, fault->pfn);
-@@ -3999,7 +4006,7 @@ static int kvm_faultin_pfn(struct kvm_vcpu *vcpu, struct kvm_page_fault *fault)
- 	}
- 
- 	async = false;
--	fault->pfn = __gfn_to_pfn_memslot(slot, fault->gfn, false, &async,
-+	fault->pfn = __gfn_to_pfn_memslot(slot, fault->gfn, false, false, &async,
- 					  fault->write, &fault->map_writable,
- 					  &fault->hva);
- 	if (!async)
-@@ -4016,7 +4023,12 @@ static int kvm_faultin_pfn(struct kvm_vcpu *vcpu, struct kvm_page_fault *fault)
- 		}
- 	}
- 
--	fault->pfn = __gfn_to_pfn_memslot(slot, fault->gfn, false, NULL,
-+	/*
-+	 * Allow gup to bail on pending non-fatal signals when it's also allowed
-+	 * to wait for IO.  Note, gup always bails if it is unable to quickly
-+	 * get a page and a fatal signal, i.e. SIGKILL, is pending.
-+	 */
-+	fault->pfn = __gfn_to_pfn_memslot(slot, fault->gfn, false, true, NULL,
- 					  fault->write, &fault->map_writable,
- 					  &fault->hva);
- 	return RET_PF_CONTINUE;
-diff --git a/include/linux/kvm_host.h b/include/linux/kvm_host.h
-index 06a5b17d3679..5bae753ebe48 100644
---- a/include/linux/kvm_host.h
-+++ b/include/linux/kvm_host.h
-@@ -1158,8 +1158,8 @@ kvm_pfn_t gfn_to_pfn_prot(struct kvm *kvm, gfn_t gfn, bool write_fault,
- kvm_pfn_t gfn_to_pfn_memslot(const struct kvm_memory_slot *slot, gfn_t gfn);
- kvm_pfn_t gfn_to_pfn_memslot_atomic(const struct kvm_memory_slot *slot, gfn_t gfn);
- kvm_pfn_t __gfn_to_pfn_memslot(const struct kvm_memory_slot *slot, gfn_t gfn,
--			       bool atomic, bool *async, bool write_fault,
--			       bool *writable, hva_t *hva);
-+			       bool atomic, bool interruptible, bool *async,
-+			       bool write_fault, bool *writable, hva_t *hva);
- 
- void kvm_release_pfn_clean(kvm_pfn_t pfn);
- void kvm_release_pfn_dirty(kvm_pfn_t pfn);
-diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
-index a49df8988cd6..25deacc705b8 100644
---- a/virt/kvm/kvm_main.c
-+++ b/virt/kvm/kvm_main.c
-@@ -2445,7 +2445,7 @@ static bool hva_to_pfn_fast(unsigned long addr, bool write_fault,
-  * 1 indicates success, -errno is returned if error is detected.
-  */
- static int hva_to_pfn_slow(unsigned long addr, bool *async, bool write_fault,
--			   bool *writable, kvm_pfn_t *pfn)
-+			   bool interruptible, bool *writable, kvm_pfn_t *pfn)
- {
- 	unsigned int flags = FOLL_HWPOISON;
- 	struct page *page;
-@@ -2460,6 +2460,8 @@ static int hva_to_pfn_slow(unsigned long addr, bool *async, bool write_fault,
- 		flags |= FOLL_WRITE;
- 	if (async)
- 		flags |= FOLL_NOWAIT;
-+	if (interruptible)
-+		flags |= FOLL_INTERRUPTIBLE;
- 
- 	npages = get_user_pages_unlocked(addr, 1, &page, flags);
- 	if (npages != 1)
-@@ -2566,6 +2568,7 @@ static int hva_to_pfn_remapped(struct vm_area_struct *vma,
-  * Pin guest page in memory and return its pfn.
-  * @addr: host virtual address which maps memory to the guest
-  * @atomic: whether this function can sleep
-+ * @interruptible: whether the process can be interrupted by non-fatal signals
-  * @async: whether this function need to wait IO complete if the
-  *         host page is not in the memory
-  * @write_fault: whether we should get a writable host page
-@@ -2576,8 +2579,8 @@ static int hva_to_pfn_remapped(struct vm_area_struct *vma,
-  * 2): @write_fault = false && @writable, @writable will tell the caller
-  *     whether the mapping is writable.
-  */
--kvm_pfn_t hva_to_pfn(unsigned long addr, bool atomic, bool *async,
--		     bool write_fault, bool *writable)
-+kvm_pfn_t hva_to_pfn(unsigned long addr, bool atomic, bool interruptible,
-+		     bool *async, bool write_fault, bool *writable)
- {
- 	struct vm_area_struct *vma;
- 	kvm_pfn_t pfn = 0;
-@@ -2592,9 +2595,12 @@ kvm_pfn_t hva_to_pfn(unsigned long addr, bool atomic, bool *async,
- 	if (atomic)
- 		return KVM_PFN_ERR_FAULT;
- 
--	npages = hva_to_pfn_slow(addr, async, write_fault, writable, &pfn);
-+	npages = hva_to_pfn_slow(addr, async, write_fault, interruptible,
-+				 writable, &pfn);
- 	if (npages == 1)
- 		return pfn;
-+	if (npages == -EINTR)
-+		return KVM_PFN_ERR_SIGPENDING;
- 
- 	mmap_read_lock(current->mm);
- 	if (npages == -EHWPOISON ||
-@@ -2625,8 +2631,8 @@ kvm_pfn_t hva_to_pfn(unsigned long addr, bool atomic, bool *async,
- }
- 
- kvm_pfn_t __gfn_to_pfn_memslot(const struct kvm_memory_slot *slot, gfn_t gfn,
--			       bool atomic, bool *async, bool write_fault,
--			       bool *writable, hva_t *hva)
-+			       bool atomic, bool interruptible, bool *async,
-+			       bool write_fault, bool *writable, hva_t *hva)
- {
- 	unsigned long addr = __gfn_to_hva_many(slot, gfn, NULL, write_fault);
- 
-@@ -2651,7 +2657,7 @@ kvm_pfn_t __gfn_to_pfn_memslot(const struct kvm_memory_slot *slot, gfn_t gfn,
- 		writable = NULL;
- 	}
- 
--	return hva_to_pfn(addr, atomic, async, write_fault,
-+	return hva_to_pfn(addr, atomic, interruptible, async, write_fault,
- 			  writable);
- }
- EXPORT_SYMBOL_GPL(__gfn_to_pfn_memslot);
-@@ -2659,20 +2665,22 @@ EXPORT_SYMBOL_GPL(__gfn_to_pfn_memslot);
- kvm_pfn_t gfn_to_pfn_prot(struct kvm *kvm, gfn_t gfn, bool write_fault,
- 		      bool *writable)
- {
--	return __gfn_to_pfn_memslot(gfn_to_memslot(kvm, gfn), gfn, false, NULL,
--				    write_fault, writable, NULL);
-+	return __gfn_to_pfn_memslot(gfn_to_memslot(kvm, gfn), gfn, false,
-+				    false, NULL, write_fault, writable, NULL);
- }
- EXPORT_SYMBOL_GPL(gfn_to_pfn_prot);
- 
- kvm_pfn_t gfn_to_pfn_memslot(const struct kvm_memory_slot *slot, gfn_t gfn)
- {
--	return __gfn_to_pfn_memslot(slot, gfn, false, NULL, true, NULL, NULL);
-+	return __gfn_to_pfn_memslot(slot, gfn, false, false, NULL, true,
-+				    NULL, NULL);
- }
- EXPORT_SYMBOL_GPL(gfn_to_pfn_memslot);
- 
- kvm_pfn_t gfn_to_pfn_memslot_atomic(const struct kvm_memory_slot *slot, gfn_t gfn)
- {
--	return __gfn_to_pfn_memslot(slot, gfn, true, NULL, true, NULL, NULL);
-+	return __gfn_to_pfn_memslot(slot, gfn, true, false, NULL, true,
-+				    NULL, NULL);
- }
- EXPORT_SYMBOL_GPL(gfn_to_pfn_memslot_atomic);
- 
-diff --git a/virt/kvm/kvm_mm.h b/virt/kvm/kvm_mm.h
-index 41da467d99c9..a1ab15006af3 100644
---- a/virt/kvm/kvm_mm.h
-+++ b/virt/kvm/kvm_mm.h
-@@ -24,8 +24,8 @@
- #define KVM_MMU_READ_UNLOCK(kvm)	spin_unlock(&(kvm)->mmu_lock)
- #endif /* KVM_HAVE_MMU_RWLOCK */
- 
--kvm_pfn_t hva_to_pfn(unsigned long addr, bool atomic, bool *async,
--		     bool write_fault, bool *writable);
-+kvm_pfn_t hva_to_pfn(unsigned long addr, bool atomic, bool interruptible,
-+		     bool *async, bool write_fault, bool *writable);
- 
- #ifdef CONFIG_HAVE_KVM_PFNCACHE
- void gfn_to_pfn_cache_invalidate_start(struct kvm *kvm,
-diff --git a/virt/kvm/pfncache.c b/virt/kvm/pfncache.c
-index dd84676615f1..294808e77f44 100644
---- a/virt/kvm/pfncache.c
-+++ b/virt/kvm/pfncache.c
-@@ -123,7 +123,7 @@ static kvm_pfn_t hva_to_pfn_retry(struct kvm *kvm, unsigned long uhva)
- 		smp_rmb();
- 
- 		/* We always request a writeable mapping */
--		new_pfn = hva_to_pfn(uhva, false, NULL, true, NULL);
-+		new_pfn = hva_to_pfn(uhva, false, false, NULL, true, NULL);
- 		if (is_error_noslot_pfn(new_pfn))
- 			break;
- 
--- 
-2.32.0
+We should really harden put_smstate() and GET_SMSTATE()...
 
+> Signed-off-by: Maxim Levitsky <mlevitsk@redhat.com>
+> ---
+
+Nits aside,
+
+Reviewed-by: Sean Christopherson <seanjc@google.com>
+
+>  arch/x86/kvm/emulate.c | 4 ++--
+>  1 file changed, 2 insertions(+), 2 deletions(-)
+> 
+> diff --git a/arch/x86/kvm/emulate.c b/arch/x86/kvm/emulate.c
+> index 002687d17f9364..ce186aebca8e83 100644
+> --- a/arch/x86/kvm/emulate.c
+> +++ b/arch/x86/kvm/emulate.c
+> @@ -2469,7 +2469,7 @@ static int rsm_load_state_32(struct x86_emulate_ctxt *ctxt,
+>  	ctxt->eflags =             GET_SMSTATE(u32, smstate, 0x7ff4) | X86_EFLAGS_FIXED;
+>  	ctxt->_eip =               GET_SMSTATE(u32, smstate, 0x7ff0);
+>  
+> -	for (i = 0; i < NR_EMULATOR_GPRS; i++)
+> +	for (i = 0; i < 8; i++)
+>  		*reg_write(ctxt, i) = GET_SMSTATE(u32, smstate, 0x7fd0 + i * 4);
+>  
+>  	val = GET_SMSTATE(u32, smstate, 0x7fcc);
+> @@ -2526,7 +2526,7 @@ static int rsm_load_state_64(struct x86_emulate_ctxt *ctxt,
+>  	u16 selector;
+>  	int i, r;
+>  
+> -	for (i = 0; i < NR_EMULATOR_GPRS; i++)
+> +	for (i = 0; i < 16; i++)
+>  		*reg_write(ctxt, i) = GET_SMSTATE(u64, smstate, 0x7ff8 - i * 8);
+>  
+>  	ctxt->_eip   = GET_SMSTATE(u64, smstate, 0x7f78);
+> -- 
+> 2.26.3
+> 
