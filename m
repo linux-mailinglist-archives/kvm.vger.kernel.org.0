@@ -2,108 +2,131 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 9253157C797
-	for <lists+kvm@lfdr.de>; Thu, 21 Jul 2022 11:30:38 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 9441C57C7A5
+	for <lists+kvm@lfdr.de>; Thu, 21 Jul 2022 11:31:29 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232035AbiGUJag (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 21 Jul 2022 05:30:36 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60656 "EHLO
+        id S231874AbiGUJb0 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 21 Jul 2022 05:31:26 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33310 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230148AbiGUJae (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 21 Jul 2022 05:30:34 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 81F847AB1D
-        for <kvm@vger.kernel.org>; Thu, 21 Jul 2022 02:30:33 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1658395832;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=cE2msxk6QPw86zAV3haYmpL0Ot9f5ZCy5ykRLxOKnec=;
-        b=GlQjpbr7E+McOWJVbcQk3HbL++9lYEsdLLPe232nBwS20VCQ8UVr88APvkNZShIZ2bdUE3
-        gwnC908AMcEdw/MeRywV3jTADaCBKeqhXJ9mcvuMUNuUdt9yKjl5IBljgOubmAlnwIL4cO
-        8mNKyrrEmOeFGML90r5dJy1vHkuBN6E=
-Received: from mail-pg1-f197.google.com (mail-pg1-f197.google.com
- [209.85.215.197]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-313-x5-Px0FxMamJNEumURE2ww-1; Thu, 21 Jul 2022 05:30:31 -0400
-X-MC-Unique: x5-Px0FxMamJNEumURE2ww-1
-Received: by mail-pg1-f197.google.com with SMTP id f128-20020a636a86000000b0041a4b07b039so676591pgc.5
-        for <kvm@vger.kernel.org>; Thu, 21 Jul 2022 02:30:31 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
-         :content-language:to:cc:references:from:in-reply-to
-         :content-transfer-encoding;
-        bh=cE2msxk6QPw86zAV3haYmpL0Ot9f5ZCy5ykRLxOKnec=;
-        b=HWzDj0/E0FRK/brzbSnxB1c+miX+NtmFxz1mJuLj5/sXfcFkq4JlcE9vWR8JdE3HOq
-         ll24MkeUyT0nGj8D8YDKBz96ZgSQttp27x2MLAWtUu75Nwd9GMTZc22EQhat/jdwPLPL
-         1u4BLbTOIr4DwFuOqvYwcMgrGV7xcer2/aC71R522jiWPJcyKw8NaH5wY8JKfR9s8XTA
-         xZrcp9CTFSu46uNMxmD8/oPQrQotmbrVMkwAewXikpkPg4WofZxYw5BMUBC4EfgNEhGh
-         50TfVlKTc2w4eHloH5NS4EO0yTxNsu6eyx+l05n6gTCSQpZg7J9JXqCwSEijkLhp/tth
-         eHVA==
-X-Gm-Message-State: AJIora/Es5P093AoKSWWLVgpKYUUZxJyjUfVEJf2lZmQtvQF+4VWg5cj
-        chphVnz0153lHdgFSYumXx9h+EduAxzC1J+cCEZQgC7CXtVEme6ERwsppobl3U4Zhv89d3eGLN9
-        BD669Ai4nGQr0
-X-Received: by 2002:a05:6a00:1308:b0:528:2ed8:7e3d with SMTP id j8-20020a056a00130800b005282ed87e3dmr44101329pfu.82.1658395830220;
-        Thu, 21 Jul 2022 02:30:30 -0700 (PDT)
-X-Google-Smtp-Source: AGRyM1sZJ2tQPOK504th0WDmmE1eCdXGAgBe+DPqkW4Ch1xqd/jvYFMXQX10YnFglctjFz+BMq1srg==
-X-Received: by 2002:a05:6a00:1308:b0:528:2ed8:7e3d with SMTP id j8-20020a056a00130800b005282ed87e3dmr44101301pfu.82.1658395829765;
-        Thu, 21 Jul 2022 02:30:29 -0700 (PDT)
-Received: from [10.72.12.47] ([209.132.188.80])
-        by smtp.gmail.com with ESMTPSA id b14-20020a17090a6ace00b001f061359023sm988456pjm.21.2022.07.21.02.30.19
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 21 Jul 2022 02:30:29 -0700 (PDT)
-Message-ID: <cbc59d60-f3b3-465d-185b-5b83f893be63@redhat.com>
-Date:   Thu, 21 Jul 2022 17:30:18 +0800
-MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:91.0)
- Gecko/20100101 Thunderbird/91.11.0
-Subject: Re: [PATCH v12 39/40] virtio_net: support tx queue resize
+        with ESMTP id S232465AbiGUJbY (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 21 Jul 2022 05:31:24 -0400
+Received: from NAM12-BN8-obe.outbound.protection.outlook.com (mail-bn8nam12on2056.outbound.protection.outlook.com [40.107.237.56])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6EE9B80528;
+        Thu, 21 Jul 2022 02:31:16 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=htV6wCz6vPOf8iCED7frvmZouJPJHysvxuUJwYCheufvK3J2pFfhzVYt5fjWAtjhlMrD92Sg9Mqt3r6BBxrSAnzKBMiX+jLdkpvfoZ0jxwAMGTIW+E3xX1OjsnCBvWBltpXJsQNfFxpDL1PwzRBYTg2CY7CVe4iVQe0wco6BeNzrXF+WJwBcifwRqTqu5V86NlucFCER9uCCi8SyQgmNiY7EHk2dBFkCv94gnOJPPBkTt6w/6xZC7wAyhTQ5PsPNqitqskoi6EtfXZGkGxP6rY6h13ept2tcfZNl3/I31vclFiOL/sUGD1DVn+V95kGN6KUny+4ppfEQoF51wObmBg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=6Om0zh3sbvaSs9ipSD23tpEal96/8+GfFwQih/65FMY=;
+ b=dhgNzDBveL9HRjxgh5isiYQ0fXHidYd3Okuq7G/cfbwwHxV7oWz1oBAGGj+b8+p0vbZo/VlXCy4ak3xBHiKGWjiLiNXI4vuncdLHYL0iQsiHKEsBSHi0WveEHyb/DMEH0EdXEmOBZw90cicF2S5sizCevZjmTYR1ff7dpwDERM7Z0HqNH0Sa+XSgJ1Divf02DjMu8lwiPwz+EouZ0xOGMRICCsVyfb3NskYoqPKazZ5eumlJXB5eSpE+7dih2XG71f0L1kdRnr5rUT/Fez0eyH77o7k63I58l8QWP6N8VoO+dHk03Fv43zhayN/2dOgRUIUUZHDFTtX2cI6rkTgxKw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
+ header.d=amd.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=6Om0zh3sbvaSs9ipSD23tpEal96/8+GfFwQih/65FMY=;
+ b=R1UZE4P8FMleUblKpHqideav+ASjPvJv0UPCf1OjWsjnW2aI24p3ba2AuMgQ0Y7mtJuU3AAe56eWXnDITbWdyNlMJotBCy64SIjLPCJ2idi7sFR7KBIPLhhnSKMJ4/Gnx4LNRlvkOaS71v3m3sr0ugsHE/Bdd6odrpYDe9AdhZo=
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=amd.com;
+Received: from CY5PR12MB6323.namprd12.prod.outlook.com (2603:10b6:930:20::11)
+ by DM8PR12MB5461.namprd12.prod.outlook.com (2603:10b6:8:3a::19) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5458.19; Thu, 21 Jul
+ 2022 09:31:14 +0000
+Received: from CY5PR12MB6323.namprd12.prod.outlook.com
+ ([fe80::1901:1d1e:a186:b37a]) by CY5PR12MB6323.namprd12.prod.outlook.com
+ ([fe80::1901:1d1e:a186:b37a%8]) with mapi id 15.20.5458.019; Thu, 21 Jul 2022
+ 09:31:14 +0000
+Message-ID: <ca108529-9252-5f1d-cbd1-51a43b476ce9@amd.com>
+Date:   Thu, 21 Jul 2022 15:01:01 +0530
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:91.0) Gecko/20100101
+ Thunderbird/91.9.1
+Subject: Re: [PATCH 4/7] KVM: SVM: Report NMI not allowed when Guest busy
+ handling VNMI
 Content-Language: en-US
-To:     Xuan Zhuo <xuanzhuo@linux.alibaba.com>,
-        virtualization@lists.linux-foundation.org
-Cc:     Richard Weinberger <richard@nod.at>,
-        Anton Ivanov <anton.ivanov@cambridgegreys.com>,
-        Johannes Berg <johannes@sipsolutions.net>,
-        "Michael S. Tsirkin" <mst@redhat.com>,
-        "David S. Miller" <davem@davemloft.net>,
-        Eric Dumazet <edumazet@google.com>,
-        Jakub Kicinski <kuba@kernel.org>,
-        Paolo Abeni <pabeni@redhat.com>,
-        Hans de Goede <hdegoede@redhat.com>,
-        Mark Gross <markgross@kernel.org>,
-        Vadim Pasternak <vadimp@nvidia.com>,
-        Bjorn Andersson <bjorn.andersson@linaro.org>,
-        Mathieu Poirier <mathieu.poirier@linaro.org>,
-        Cornelia Huck <cohuck@redhat.com>,
-        Halil Pasic <pasic@linux.ibm.com>,
-        Eric Farman <farman@linux.ibm.com>,
-        Heiko Carstens <hca@linux.ibm.com>,
-        Vasily Gorbik <gor@linux.ibm.com>,
-        Alexander Gordeev <agordeev@linux.ibm.com>,
-        Christian Borntraeger <borntraeger@linux.ibm.com>,
-        Sven Schnelle <svens@linux.ibm.com>,
-        Alexei Starovoitov <ast@kernel.org>,
-        Daniel Borkmann <daniel@iogearbox.net>,
-        Jesper Dangaard Brouer <hawk@kernel.org>,
-        John Fastabend <john.fastabend@gmail.com>,
-        Vincent Whitchurch <vincent.whitchurch@axis.com>,
-        linux-um@lists.infradead.org, netdev@vger.kernel.org,
-        platform-driver-x86@vger.kernel.org,
-        linux-remoteproc@vger.kernel.org, linux-s390@vger.kernel.org,
-        kvm@vger.kernel.org, bpf@vger.kernel.org,
-        kangjie.xu@linux.alibaba.com
-References: <20220720030436.79520-1-xuanzhuo@linux.alibaba.com>
- <20220720030436.79520-40-xuanzhuo@linux.alibaba.com>
-From:   Jason Wang <jasowang@redhat.com>
-In-Reply-To: <20220720030436.79520-40-xuanzhuo@linux.alibaba.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-3.5 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
-        RCVD_IN_DNSWL_LOW,SPF_HELO_NONE,SPF_NONE autolearn=ham
+To:     Maxim Levitsky <mlevitsk@redhat.com>,
+        Paolo Bonzini <pbonzini@redhat.com>
+Cc:     Sean Christopherson <seanjc@google.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>,
+        Tom Lendacky <thomas.lendacky@amd.com>, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+References: <20220602142620.3196-1-santosh.shukla@amd.com>
+ <20220602142620.3196-5-santosh.shukla@amd.com>
+ <da6e0e9375d1286d3d9d4b6ab669d234850261eb.camel@redhat.com>
+ <45e9ccafcdb48c7521b697b41e849dab98a7a76c.camel@redhat.com>
+ <ac67da62-a0c0-27a4-df81-90734382ffdf@amd.com>
+ <76e007d7fc7af0629279f2563f8d0c48274bc774.camel@redhat.com>
+From:   "Shukla, Santosh" <santosh.shukla@amd.com>
+In-Reply-To: <76e007d7fc7af0629279f2563f8d0c48274bc774.camel@redhat.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: PN3PR01CA0092.INDPRD01.PROD.OUTLOOK.COM
+ (2603:1096:c01:9b::10) To CY5PR12MB6323.namprd12.prod.outlook.com
+ (2603:10b6:930:20::11)
+MIME-Version: 1.0
+X-MS-PublicTrafficType: Email
+X-MS-Office365-Filtering-Correlation-Id: e51e4cd3-d8a4-4b30-6145-08da6afbc165
+X-MS-TrafficTypeDiagnostic: DM8PR12MB5461:EE_
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: ENUcOYtdWtE8n6HuQWfrPPTbRE3Okn0RIlHomtdyWMkHo+mzbvJ9qNF+2qP2LBzLIv4rBLJsRsHOPgz5HLBaq7HJu8RxHeaS0XFZR3Y1L1XNU+YLT8fVQf+ITPot0QuRvziAMOYxtxBAyjFd0Ny8trL89BB8hNXjdpV3GnWPTW3uT1CIWP8OoeD2BFi8CtTOPomE8t4MCRBtaiBgL9nmBpEYClUrm/CpKaQOdTVULG4WEHG8lgP0ouz6UzLqJ11qbLcRmaHKrqzmoSvIM13Vd127WsJgBa2l2Mn4doYwUHE8DNrUkwkvz5hCWkffx7OvRQ0T3wMs7YOrsMKd3AHZGUjSxFa7yVazRnzJJm8qLWBtOKiwz8KuCWiLfi9MS88yyd0gtDkGtFHB9/vp0/u+xNPSAxbeRTJx6NnE91shSkDiUzSkw/d8AGukJO1GH4Q4fOo6lI1RyujlkH6bH5pght8TYoGRRhSYQBP9BYUcJaL/3cajh40huVqFYajAXeL337CK8tMq5S6fCtPFEK7xWakQrEET668Nb4mM+u7FUzOI2MQe1ST52l7Nvp0HIrWPtzsRYFShD7404v4ng3dndjpv59mQdVIv1vcH/gEx5p3cpIoOXkIbMu2+aGku4aLR2VcwvLs/JHQZrqSLtiarGi5jzvwMzOHUEXoWOaFof4sJcYq3V/iN20ODe8s20oUXK/ZUWKUHr+GBEEGNcyfJJS2PXlALtnSztzrCZqsW2zzsruoTn/sx7K0p7GkIBJNSqHyAsf7c7yNSAbfLXbnSrWQYJdQEkvEvfkhKtBNvBtqoF+SMd/SPujXCyrrGrGCCi/rWZBgjsgxtI0G+9qaZPQ==
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CY5PR12MB6323.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230016)(4636009)(366004)(346002)(376002)(136003)(396003)(39860400002)(8936002)(5660300002)(4326008)(66946007)(66476007)(66556008)(8676002)(54906003)(2906002)(83380400001)(31696002)(86362001)(36756003)(38100700002)(6512007)(110136005)(26005)(316002)(53546011)(6486002)(6666004)(2616005)(478600001)(41300700001)(6506007)(186003)(31686004)(43740500002)(45980500001);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?M1NSUDlCV0trSWovd1h2WEhjTXBjcTZDZHR6OFpxU1JLanFaSFdmRGdka1VP?=
+ =?utf-8?B?V2NtS1dSY2J6YW9OYnZDdFhlb1NCQXdIZ0ZLdnVKOWUzRlFXaWhHTlV4RHBu?=
+ =?utf-8?B?dy9ZUmgyalVROElHY3ppNk9YVXNxSC9vQUhtdGdPcXVWYTNnY08vWDFmRkd5?=
+ =?utf-8?B?Y0ZrQjlpeGxiRVhRNFhGREQwZmRsTkthVFE5UDg2Yy9uc0F3eFRzeUlOajRx?=
+ =?utf-8?B?aENPeXJ6VE9HTkFycmVkZDlkVzZBS3dBRWpyd2VCY3Bhd0dBNFVlQW8wM1Bx?=
+ =?utf-8?B?Ulh2UVJvZjd1MnQydFdYSnNrWC9hL0Zhb2M1Smc2Y0M3MENqTGwwWFk3QmQ1?=
+ =?utf-8?B?a1pUQVZCcHZnNEZzNDJqOTlCQkU3VWY1NmxmTDkrcENHMzlwMG9IMkRVaXVl?=
+ =?utf-8?B?a3dmNTRMQ2NmVmRrWW9SZFVjTGpZbkd2WmZVV0V3T000NVI0aUs0c2IyQnh4?=
+ =?utf-8?B?UFRNbU1FOEc5d0FBSVNjV1p1OHNZblBqQitTWTFkT0doWlZHdmdsc2hJa3ZK?=
+ =?utf-8?B?MndhQm95UWVpUm5aMXp1VlA4aW42QmI0QmU5Mlo3Q0w4eGdzd3Byb2RzMUxq?=
+ =?utf-8?B?M2JUaktEV0RONFBDcE9Xb1V3WXhBOHE5elpsZlZBUnEyTDlJVjhqRlh1Wk15?=
+ =?utf-8?B?bE10eHlpVytUdTJQdVNHamhuc1ZXemN5dTVEOXNESk5QVldyMkZMcWkwbHFj?=
+ =?utf-8?B?NzNJT0xrQncwNVF0VE1Jc0FqT0F2R3dLSmMrTXdVOG9TbXU2bmU1OXpkV0Va?=
+ =?utf-8?B?VEY4WXNnWXZMRDA3WHNRamkvaW5ldll3UXNJOUFZTERONnYwMU1vazI1cnBz?=
+ =?utf-8?B?L2lFRlJBcUVpbDJPaGtERlBSSk1HN1c0cE9hSlFlRm9jTFZnNkw3ZUhMTGJy?=
+ =?utf-8?B?L3FJNUlINDR6WDBzUTU0dlVjWW0xVlBHTUprUTl4dmc5OGhxMHdlSFg2c0Iv?=
+ =?utf-8?B?WUhNSjJkMTd6QkhXWUVCdVZ6U0w1Wm9GY0FZbHpadmJIM2xvellOY1p0VzNL?=
+ =?utf-8?B?SUxFYkVpOW96WHlmaC9YRERidUlJSWpwQXdOek5rQmcxTTNMTmFxSlVvUjVQ?=
+ =?utf-8?B?MVRCMDNvaFdxdS94K21kVHZ6Z1VJOUt1UjIvTmZxc2hjb21uZk5PdHdNb0Nj?=
+ =?utf-8?B?NzVLSDl3eEI0MHBPang5QW03MFVuS00vZ210VnhOVTZJVzN3alFieXBFSVVF?=
+ =?utf-8?B?T1VkZHUralpmVm00SmdwcksxUHZHeWRBbXhIM3hPeFIxaFl1ZjQ0MU12NjBW?=
+ =?utf-8?B?STd1SGJGT0Q3NWw0QnovUGRGQzRUUU94M0ZGRFcwV0EwcUU4T3ZhalZMOWpI?=
+ =?utf-8?B?aFphVlJnSUM1RnVsK1dUeGNKUjFTZ1VoQmpRRkhWcXpBK0o2dUtwLzV5QkEr?=
+ =?utf-8?B?aVlJMGFld09VUkJaMDNHSVV5c2RqL1VKU1RZcDNsRUg5cCtMczQ5Wll3VTRG?=
+ =?utf-8?B?NEhjOE55T3ptVWZpdHMwd2FpaHQySXY2QjgxdWJKUzBubCtHTjRPRjU2WmpI?=
+ =?utf-8?B?NUd0YUJEd1VjckRHM2lWTjJRRHVJWllkTHFJQkdSTXhnSFBRdXBOaTE5OXpM?=
+ =?utf-8?B?d1VNZ0lkODRKVVRpbFRrQUsxb3FDRi9TbjJvZUdOVzRNNDJ4Rk9iaW9VUEFw?=
+ =?utf-8?B?RlBxOW12c3hxLzFoTTZkZ1doSFVia3ZncFZ6aVl0VjlQN2NmUUhmcktRdnVm?=
+ =?utf-8?B?WlYyWDREbHh6Nk5OSlBPNGdBSk40K3U3eTZqNk1xa1hkaVpObXVPZTlwa25I?=
+ =?utf-8?B?MjhLNU9ObWZ6Um1CakF3THF1WUVwSmxySU9sQXRwSTNOS3hBVy9pbEh3aXRZ?=
+ =?utf-8?B?TElDQmloSW1SWXR0ZnRUTXE4QUpzT3pVcVBjOW4ybFMxUXNHa2pQREIyVVpM?=
+ =?utf-8?B?QVJCSHdmM2NmVHhXZ1pRZmFnUktkUjdVRDhpdGZXM2cwY1NkZUQrV2h4SFlC?=
+ =?utf-8?B?cmNESzVUVmJOSVlEdDRvcWxKMzhLOTBsb2R3M3ZtMm5sVTJrUGdXQjh5SkJw?=
+ =?utf-8?B?SG5lTW4wZ1JWWUlkZmJ2ek04Q3ZkalNHN0YzcGRDU3ZXRjZYblN6ZkRZZmZp?=
+ =?utf-8?B?eUFJSFRlbUtTT0VyZmpqRU5sYUU3V3cvVHgwUGszczVmWVdtcVZaeWQ4eDE1?=
+ =?utf-8?Q?hhl8kLXrPD95b4OIq3XA4mfm6?=
+X-OriginatorOrg: amd.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: e51e4cd3-d8a4-4b30-6145-08da6afbc165
+X-MS-Exchange-CrossTenant-AuthSource: CY5PR12MB6323.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 21 Jul 2022 09:31:14.3609
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: 51JWGOEfmosut1MCV1woLDVgdwgkfaJfZeBzR23qdvACoAYnD6dvbzSxM/jIOIOsFs18peK0xz4UehnMKqvZfg==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM8PR12MB5461
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_DNSWL_NONE,
+        RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_PASS autolearn=ham
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -112,98 +135,90 @@ List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
 
-在 2022/7/20 11:04, Xuan Zhuo 写道:
-> This patch implements the resize function of the tx queues.
-> Based on this function, it is possible to modify the ring num of the
-> queue.
->
-> Signed-off-by: Xuan Zhuo <xuanzhuo@linux.alibaba.com>
 
+On 7/10/2022 9:38 PM, Maxim Levitsky wrote:
+> On Fri, 2022-06-17 at 20:29 +0530, Shukla, Santosh wrote:
+>>
+>> On 6/7/2022 6:42 PM, Maxim Levitsky wrote:
+>>> On Tue, 2022-06-07 at 16:10 +0300, Maxim Levitsky wrote:
+>>>> On Thu, 2022-06-02 at 19:56 +0530, Santosh Shukla wrote:
+>>>>> In the VNMI case, Report NMI is not allowed when the processor set the
+>>>>> V_NMI_MASK to 1 which means the Guest is busy handling VNMI.
+>>>>>
+>>>>> Signed-off-by: Santosh Shukla <santosh.shukla@amd.com>
+>>>>> ---
+>>>>>  arch/x86/kvm/svm/svm.c | 6 ++++++
+>>>>>  1 file changed, 6 insertions(+)
+>>>>>
+>>>>> diff --git a/arch/x86/kvm/svm/svm.c b/arch/x86/kvm/svm/svm.c
+>>>>> index d67a54517d95..a405e414cae4 100644
+>>>>> --- a/arch/x86/kvm/svm/svm.c
+>>>>> +++ b/arch/x86/kvm/svm/svm.c
+>>>>> @@ -3483,6 +3483,9 @@ bool svm_nmi_blocked(struct kvm_vcpu *vcpu)
+>>>>>         struct vmcb *vmcb = svm->vmcb;
+>>>>>         bool ret;
+>>>>>  
+>>>>> +       if (is_vnmi_enabled(vmcb) && is_vnmi_mask_set(vmcb))
+>>>>> +               return true;
+>>>>
+>>>> How does this interact with GIF? if the guest does clgi, will the
+>>>> CPU update the V_NMI_MASK on its own If vGIF is enabled?
+>>>>
+>> Yes.
+>>
+>>>> What happens if vGIF is disabled and vNMI is enabled? KVM then intercepts
+>>>> the stgi/clgi, and it should then update the V_NMI_MASK?
+>>>>
+>> No.
+>>
+>> For both case - HW takes the V_NMI event at the boundary of VMRUN instruction.
+> 
+> How that is possible? if vGIF is disabled in L1, then L1 can't execute STGI/CLGI - 
+> that means that the CPU can't update the V_NMI, as it never sees the STGI/CLGI
+> beeing executed.
+> 
 
-Acked-by: Jason Wang <jasowang@redhat.com>
+If vGIF is disabled then HW will take the vnmi event at the boundary of vmrun instruction.
 
+Thanks,
+Santosh
 
-> ---
->   drivers/net/virtio_net.c | 47 ++++++++++++++++++++++++++++++++++++++++
->   1 file changed, 47 insertions(+)
->
-> diff --git a/drivers/net/virtio_net.c b/drivers/net/virtio_net.c
-> index 1115a8b59a08..d1e6940b46d8 100644
-> --- a/drivers/net/virtio_net.c
-> +++ b/drivers/net/virtio_net.c
-> @@ -135,6 +135,9 @@ struct send_queue {
->   	struct virtnet_sq_stats stats;
->   
->   	struct napi_struct napi;
-> +
-> +	/* Record whether sq is in reset state. */
-> +	bool reset;
->   };
->   
->   /* Internal representation of a receive virtqueue */
-> @@ -279,6 +282,7 @@ struct padded_vnet_hdr {
->   };
->   
->   static void virtnet_rq_free_unused_buf(struct virtqueue *vq, void *buf);
-> +static void virtnet_sq_free_unused_buf(struct virtqueue *vq, void *buf);
->   
->   static bool is_xdp_frame(void *ptr)
->   {
-> @@ -1603,6 +1607,11 @@ static void virtnet_poll_cleantx(struct receive_queue *rq)
->   		return;
->   
->   	if (__netif_tx_trylock(txq)) {
-> +		if (sq->reset) {
-> +			__netif_tx_unlock(txq);
-> +			return;
-> +		}
-> +
->   		do {
->   			virtqueue_disable_cb(sq->vq);
->   			free_old_xmit_skbs(sq, true);
-> @@ -1868,6 +1877,44 @@ static int virtnet_rx_resize(struct virtnet_info *vi,
->   	return err;
->   }
->   
-> +static int virtnet_tx_resize(struct virtnet_info *vi,
-> +			     struct send_queue *sq, u32 ring_num)
-> +{
-> +	struct netdev_queue *txq;
-> +	int err, qindex;
-> +
-> +	qindex = sq - vi->sq;
-> +
-> +	virtnet_napi_tx_disable(&sq->napi);
-> +
-> +	txq = netdev_get_tx_queue(vi->dev, qindex);
-> +
-> +	/* 1. wait all ximt complete
-> +	 * 2. fix the race of netif_stop_subqueue() vs netif_start_subqueue()
-> +	 */
-> +	__netif_tx_lock_bh(txq);
-> +
-> +	/* Prevent rx poll from accessing sq. */
-> +	sq->reset = true;
-> +
-> +	/* Prevent the upper layer from trying to send packets. */
-> +	netif_stop_subqueue(vi->dev, qindex);
-> +
-> +	__netif_tx_unlock_bh(txq);
-> +
-> +	err = virtqueue_resize(sq->vq, ring_num, virtnet_sq_free_unused_buf);
-> +	if (err)
-> +		netdev_err(vi->dev, "resize tx fail: tx queue index: %d err: %d\n", qindex, err);
-> +
-> +	__netif_tx_lock_bh(txq);
-> +	sq->reset = false;
-> +	netif_tx_wake_queue(txq);
-> +	__netif_tx_unlock_bh(txq);
-> +
-> +	virtnet_napi_tx_enable(vi, sq->vq, &sq->napi);
-> +	return err;
-> +}
-> +
->   /*
->    * Send command via the control virtqueue and check status.  Commands
->    * supported by the hypervisor, as indicated by feature bits, should
-
+> Best regards,
+> 	Maxim Levitsky
+> 
+>>
+>>>>
+>>>>
+>>>>> +
+>>>>>         if (!gif_set(svm))
+>>>>>                 return true;
+>>>>>  
+>>>>> @@ -3618,6 +3621,9 @@ static void svm_enable_nmi_window(struct kvm_vcpu *vcpu)
+>>>>>  {
+>>>>>         struct vcpu_svm *svm = to_svm(vcpu);
+>>>>>  
+>>>>> +       if (is_vnmi_enabled(svm->vmcb) && is_vnmi_mask_set(svm->vmcb))
+>>>>> +               return;
+>>>>
+>>>> This might have hidden assumption that we will only enable NMI window when vNMI is masked.
+>>>
+>>> Also what if vNMI is already pending?
+>>>
+>> If V_NMI_MASK set, that means V_NMI is pending, if so then inject another V_NMI in next VMRUN.
+>>
+>> Thanks,
+>> Santosh
+>>
+>>> Best regards,
+>>> 	Maxim Levitsky
+>>>>
+>>>>
+>>>>> +
+>>>>>         if ((vcpu->arch.hflags & (HF_NMI_MASK | HF_IRET_MASK)) == HF_NMI_MASK)
+>>>>>                 return; /* IRET will cause a vm exit */
+>>>>>  
+>>>>
+>>>> Best regards,
+>>>>         Maxim Levitsky
+> 
+> 
