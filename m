@@ -2,85 +2,97 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 5606757CA7F
-	for <lists+kvm@lfdr.de>; Thu, 21 Jul 2022 14:15:57 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 3AC3E57CA90
+	for <lists+kvm@lfdr.de>; Thu, 21 Jul 2022 14:20:33 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232158AbiGUMP4 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 21 Jul 2022 08:15:56 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56802 "EHLO
+        id S233023AbiGUMUc (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 21 Jul 2022 08:20:32 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59954 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229497AbiGUMPz (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 21 Jul 2022 08:15:55 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 725507FE53
-        for <kvm@vger.kernel.org>; Thu, 21 Jul 2022 05:15:54 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1658405753;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=MlNc9n1fWwFyGkTTnJTXKq0eSOBEo14Xu9eIJGaW+eE=;
-        b=ce1tZ+/1sAchlWibaAPM+X+BTG3iUBfU1oH27UIEiCA1oQKxTsRiKkZF5qW7wOFI+x9kd6
-        5MWYRMKrBkkPxvrJrnPy2CVNBayBwMS3vBrkOPkkxtYi50nXDP7XENzARZmBQ7kp30RRXu
-        oDCZzbZBmTsTg0iong6qDAlpaO0tob0=
-Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
- [209.85.128.71]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-121-fxtHcbCMN2qV3_JiagUuZQ-1; Thu, 21 Jul 2022 08:15:52 -0400
-X-MC-Unique: fxtHcbCMN2qV3_JiagUuZQ-1
-Received: by mail-wm1-f71.google.com with SMTP id h65-20020a1c2144000000b003a30cae106cso2718746wmh.8
-        for <kvm@vger.kernel.org>; Thu, 21 Jul 2022 05:15:52 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
-         :content-language:to:cc:references:from:in-reply-to
-         :content-transfer-encoding;
-        bh=MlNc9n1fWwFyGkTTnJTXKq0eSOBEo14Xu9eIJGaW+eE=;
-        b=cT7r5A3ZszdpiBeXMT09QeTsyKLdxAuqkymlDqvjgZfbkLC6eHYTDS8pezYL2hLpQL
-         eVjUjQoNvcdncTxcqgWauQt5d7frK2wHk9Cxquivoxk3UiTMA4qFO/kfGLEGJpzwCP4F
-         n1vI3GwF0Z0/t3Havqnpd7TPr2gp+arWwNuTKHeN8zz/uPu2NwGCI7RPBGEovGYL8q3O
-         tQVCddMQfOp/yGiMRJPNHA6ZoRXgtlRHrDoEgYvylTHowkXXXjCbzl0f06Gm/CqZBgK+
-         tqidLcETqD/4fV/FQN1m/JzBammR/4ScmLyeq6Vlci3ROEkGG1u9zpIL6xq9TltRjors
-         xg3A==
-X-Gm-Message-State: AJIora+aNy8FjAfk3txOCbIN/zsHcoWaQMJwEtDxt0djM9/bZpo5Ga6H
-        7D7yux+gxabsn38PM4A34TauE1c/8oz30DzvAK3MKkwwA0bHBQiXWAHqwd5RNKE0L4T5yD2OwAJ
-        rdjXspcFbMf0y
-X-Received: by 2002:adf:fb86:0:b0:21e:3cc8:a917 with SMTP id a6-20020adffb86000000b0021e3cc8a917mr10084337wrr.538.1658405751256;
-        Thu, 21 Jul 2022 05:15:51 -0700 (PDT)
-X-Google-Smtp-Source: AGRyM1uEfV+Y4MmsVwCxdufVaD98uQsWP39lN2lswSNi4VCBH6RHHbzQn31qR8ld5PovVsrM4d86oQ==
-X-Received: by 2002:adf:fb86:0:b0:21e:3cc8:a917 with SMTP id a6-20020adffb86000000b0021e3cc8a917mr10084320wrr.538.1658405751047;
-        Thu, 21 Jul 2022 05:15:51 -0700 (PDT)
-Received: from [192.168.0.5] (ip-109-43-179-217.web.vodafone.de. [109.43.179.217])
-        by smtp.gmail.com with ESMTPSA id y11-20020a5d4acb000000b0021e57963c4asm1020715wrs.77.2022.07.21.05.15.50
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 21 Jul 2022 05:15:50 -0700 (PDT)
-Message-ID: <e43f4951-049b-7ec9-aefa-2f3731bd74da@redhat.com>
-Date:   Thu, 21 Jul 2022 14:15:49 +0200
+        with ESMTP id S229497AbiGUMUa (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 21 Jul 2022 08:20:30 -0400
+Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2DBD2E0FD;
+        Thu, 21 Jul 2022 05:20:30 -0700 (PDT)
+Received: from pps.filterd (m0098399.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.17.1.5/8.17.1.5) with ESMTP id 26LBtvEu003353;
+        Thu, 21 Jul 2022 12:20:23 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
+ mime-version : subject : to : cc : references : from : in-reply-to :
+ content-type : content-transfer-encoding; s=pp1;
+ bh=79cTzjUU8arfxdY9zxEsif8YuGILU6MGWmZtB7deu5A=;
+ b=P8YsQRsci8SxKxc/bnbKNlCFvmeOTAUC0xQAjLf3LGalK3Hmo3d/+8CiwSs5ztUdCs8r
+ 4qb+GLfSYC/wCLSskyd9hdYas9O09CXCoFyjuOVJSBb6sOhcMN1Ih0p2buJUgDwVIFT8
+ QE7Ro8/LLz8F26YYfU+ZfbHo2B1OI+FCxWlMpbB+dRtJitmB9exRwHUineSjZB6CAec9
+ n74sn3uS8doS8lcvihGqjMNjad4TCu738U17ixrFVEGcDmUOpItvU9khPLHcVwF/tJCo
+ y6+w9bmOUqqmIGtEJrqnEVZ0er7o9ImLcbPwaXHV2JxYBvqj1NodEIyv/gju1S6edVEE BA== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3hf6bs0usf-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Thu, 21 Jul 2022 12:20:22 +0000
+Received: from m0098399.ppops.net (m0098399.ppops.net [127.0.0.1])
+        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 26LBv9VJ010395;
+        Thu, 21 Jul 2022 12:20:22 GMT
+Received: from ppma03fra.de.ibm.com (6b.4a.5195.ip4.static.sl-reverse.com [149.81.74.107])
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3hf6bs0ur7-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Thu, 21 Jul 2022 12:20:22 +0000
+Received: from pps.filterd (ppma03fra.de.ibm.com [127.0.0.1])
+        by ppma03fra.de.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 26LC5WNN026459;
+        Thu, 21 Jul 2022 12:20:19 GMT
+Received: from b06cxnps4076.portsmouth.uk.ibm.com (d06relay13.portsmouth.uk.ibm.com [9.149.109.198])
+        by ppma03fra.de.ibm.com with ESMTP id 3hbmy8n8vn-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Thu, 21 Jul 2022 12:20:19 +0000
+Received: from b06wcsmtp001.portsmouth.uk.ibm.com (b06wcsmtp001.portsmouth.uk.ibm.com [9.149.105.160])
+        by b06cxnps4076.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 26LCKH3Q24314180
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Thu, 21 Jul 2022 12:20:17 GMT
+Received: from b06wcsmtp001.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 26B98A405C;
+        Thu, 21 Jul 2022 12:20:17 +0000 (GMT)
+Received: from b06wcsmtp001.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id DD314A4054;
+        Thu, 21 Jul 2022 12:20:16 +0000 (GMT)
+Received: from [9.145.177.237] (unknown [9.145.177.237])
+        by b06wcsmtp001.portsmouth.uk.ibm.com (Postfix) with ESMTP;
+        Thu, 21 Jul 2022 12:20:16 +0000 (GMT)
+Message-ID: <88ec8a24-69ac-d57f-797e-31af250dcd17@linux.ibm.com>
+Date:   Thu, 21 Jul 2022 14:20:16 +0200
 MIME-Version: 1.0
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.10.0
+ Thunderbird/91.9.0
 Subject: Re: [PATCH] s390x: intercept: fence one test when using TCG
 Content-Language: en-US
 To:     Claudio Imbrenda <imbrenda@linux.ibm.com>, kvm@vger.kernel.org,
         linux-s390@vger.kernel.org, qemu-s390x@nongnu.org
-Cc:     frankja@linux.ibm.com
+Cc:     thuth@redhat.com
 References: <20220721105641.131710-1-imbrenda@linux.ibm.com>
-From:   Thomas Huth <thuth@redhat.com>
+From:   Janosch Frank <frankja@linux.ibm.com>
 In-Reply-To: <20220721105641.131710-1-imbrenda@linux.ibm.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-3.5 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
-        RCVD_IN_DNSWL_LOW,SPF_HELO_NONE,SPF_NONE autolearn=ham
-        autolearn_force=no version=3.4.6
+Content-Transfer-Encoding: 7bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: Ruy9XTj7T_jzTcvJXa0xN1_rbGM2NTDI
+X-Proofpoint-ORIG-GUID: VwfvUTsB7jaMA73jA3Xfmetv7r9s5wsj
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.205,Aquarius:18.0.883,Hydra:6.0.517,FMLib:17.11.122.1
+ definitions=2022-07-21_16,2022-07-20_01,2022-06-22_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 bulkscore=0 clxscore=1015
+ mlxlogscore=999 mlxscore=0 lowpriorityscore=0 suspectscore=0
+ impostorscore=0 spamscore=0 adultscore=0 priorityscore=1501 malwarescore=0
+ phishscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2206140000 definitions=main-2207210048
+X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,
+        SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 21/07/2022 12.56, Claudio Imbrenda wrote:
+On 7/21/22 12:56, Claudio Imbrenda wrote:
 > Qemu commit f8333de2793 ("target/s390x/tcg: SPX: check validity of new prefix")
 > fixes a TCG bug discovered with a new testcase in the intercept test.
 > 
@@ -115,11 +127,14 @@ On 21/07/2022 12.56, Claudio Imbrenda wrote:
 > -	if (get_ram_size() - new_prefix < 2 * PAGE_SIZE) {
 > +	if (!host_is_tcg() && (get_ram_size() - new_prefix < 2 * PAGE_SIZE)) {
 
-Could you please add a comment à la
+I'm ok with this if we also do a report_skip() that states that we skip 
+because of a QEMU bug which will lead to a SIGABORT.
 
-  /* TODO: Remove host_is_tcg() once CIs are using QEMU >= 7.1 */
+I don't see an easy way to fence this more precisely. We could pass the 
+QEMU version and check it but there are also backports to consider. So 
+it's not a one size fits all solution...
 
-?
-
-  Thomas
+>   		expect_pgm_int();
+>   		asm volatile("spx	%0 " : : "Q"(new_prefix));
+>   		check_pgm_int_code(PGM_INT_CODE_ADDRESSING);
 
