@@ -2,107 +2,68 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 6AB4357D2DA
-	for <lists+kvm@lfdr.de>; Thu, 21 Jul 2022 19:59:01 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 467D657D2F7
+	for <lists+kvm@lfdr.de>; Thu, 21 Jul 2022 20:04:45 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229668AbiGUR7A (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 21 Jul 2022 13:59:00 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49308 "EHLO
+        id S232014AbiGUSEl (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 21 Jul 2022 14:04:41 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55176 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232057AbiGUR66 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 21 Jul 2022 13:58:58 -0400
-Received: from mail-pj1-x1031.google.com (mail-pj1-x1031.google.com [IPv6:2607:f8b0:4864:20::1031])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 36D368811A
-        for <kvm@vger.kernel.org>; Thu, 21 Jul 2022 10:58:56 -0700 (PDT)
-Received: by mail-pj1-x1031.google.com with SMTP id q41-20020a17090a1b2c00b001f2043c727aso2113745pjq.1
-        for <kvm@vger.kernel.org>; Thu, 21 Jul 2022 10:58:56 -0700 (PDT)
+        with ESMTP id S229461AbiGUSEk (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 21 Jul 2022 14:04:40 -0400
+Received: from mail-pj1-x102b.google.com (mail-pj1-x102b.google.com [IPv6:2607:f8b0:4864:20::102b])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DACB08C582
+        for <kvm@vger.kernel.org>; Thu, 21 Jul 2022 11:04:38 -0700 (PDT)
+Received: by mail-pj1-x102b.google.com with SMTP id pc13so2288969pjb.4
+        for <kvm@vger.kernel.org>; Thu, 21 Jul 2022 11:04:38 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
         h=date:from:to:cc:subject:message-id:references:mime-version
          :content-disposition:in-reply-to;
-        bh=wvI0q5HAql8tMPxcnKbiOi/9NxgmmSwnzAAkVZd1GZE=;
-        b=QeJXriKT9c5kzVC7WwOIhi80ckWM6ug8VcaWprkpELe4t4pSILpTjfg8m+cMtOrWBe
-         jmelByXoDseFjzPN05HlM35WJraOgVD8XBmkQsrB5vGpNrj70IhxBhsBNPglHsEpzekf
-         1kG3W212r4FUnxp6h1itgEO/FJ4Uuo3CeYYXkoiOWqCRXrzKR28+BcJbG5kguyytRjkg
-         rjsFU2rMHcaFZYM7jRBwDx3y4TNjRz8cS5RWMgjh+1ofnV6wnx05hcN9heFlTTNfsAVq
-         qUjZMJxGLa9mHYyEFjkrcwiRRdLtgvROz3H/Z1mIRgvYivxLAzSanUXyi85+4NTaGuJS
-         Ssew==
+        bh=OgAJmm3Ep3wxfkpYOEOF9qseQqCbaLzwzuf8n7Ni2cs=;
+        b=AK/Pd6lyH9yHIX8/NUcSoSfTOtHuGyf+OWPFuY5DS9DSBaqSy/C0mAp2D4VgZhq2R/
+         rlBXVwa29pVgFypSS7/R4ATWc1h1ifXlst8WWedvjd3iqhRLz5JwxJfY0jfzRZ2vrLwv
+         mHJww7kvjEILQ9nNENDZgMs5ubgh0dVtTU9TxyBMIvGrBWRgOC6b7MzFveISIVjBSKwL
+         fBQ5MoxmzPkJEoQ8fHYu1F547N2Hc1aW5UZZ+G0UGAYI3Ot7qfgsaQT+dNYiVG59D6TX
+         jWktjJiOzhZGNhE3nJiML5iE27oVsgSFS4ku2lgrSlax8wAD3AMHZ4SK0zA0IJvtPXKT
+         SIHQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:date:from:to:cc:subject:message-id:references
          :mime-version:content-disposition:in-reply-to;
-        bh=wvI0q5HAql8tMPxcnKbiOi/9NxgmmSwnzAAkVZd1GZE=;
-        b=nuXBpIVhexbU7prY3i9XcyIwUkoHatof2R6zYWWiVKETsopk9X8E8ufUeMUrPG4V3U
-         y/OsUm/XPynswlNIDrXpu7WTpDLYb88iY+V/cOqSGhsiAAXOvhws4onvOSXX1rPlwEAM
-         1oR9yEJ+bwJ/XMaI1oCJwCoK6TdXQoAoOEmB/DWZIS3B+cebI/02LpC+IuM15BcCXG0I
-         J7ICAKcArrFzTzleIPXoe0beQktQdMC247GMt9xrTFjQeMJtVrI81zJj3Cr3HGUu3670
-         zl0xTBcPKA2foudVt093zrxRxmkXYg2GKvq3jTrk466lBDFmpHqZkU/2xhEsVZP2M2Wd
-         H8Zg==
-X-Gm-Message-State: AJIora9+cnzsZZdncT8jnaXIVVXHDSYYHfEjwFNN6pBShqXuO5IrS+pS
-        93lpp0Buv9HhW5Nq6SsTK65clQ==
-X-Google-Smtp-Source: AGRyM1sy1sNPIZTfbcs9D/R5onBZFJSx4EAG07fQgd3u5pHjtvT3tSBi6UiM7uRquYtBlR+3qYzZvg==
-X-Received: by 2002:a17:90b:3d84:b0:1ef:9049:9f43 with SMTP id pq4-20020a17090b3d8400b001ef90499f43mr12682443pjb.45.1658426335405;
-        Thu, 21 Jul 2022 10:58:55 -0700 (PDT)
+        bh=OgAJmm3Ep3wxfkpYOEOF9qseQqCbaLzwzuf8n7Ni2cs=;
+        b=Ik5bhzrFYCRerwvX+Tn3bb84XzPr84PfLQWSAkHHTLCdmc5ypq+N9M3s/ujm3Cg/GG
+         rInuJBg6OihnaiEGeTmauNjZ+LPn0uwndXFSZih5SZdqey25fRW5ENjxYQpBOj/PHYce
+         H6ITAO91HKj8UsM39myFCnR07FBCDnpa9YcUa+H+0uqwA9jiVo1CQBlZFbGu26yCtoEo
+         vcp7a37t3wbypT1fZhsbiikVyMLEP+tEBmtKuKm3jjtCwoNSlqClJ3egDQuHw0jRel5g
+         qpDoR17Ska5ZcEyYxXVkVAwS5xtxp+1JQE2Sg/+UPORvKC4BQXcS58MzYCAY8MmzBVs/
+         Y5ZQ==
+X-Gm-Message-State: AJIora8lTEIOpS8+rAR/l16gw6RaWG/4JvV+Q7rS5P6bF0kPk/zs+vKH
+        7Hse5WfiVUjNooMXuJ6OM+7GaQiTUrSr6A==
+X-Google-Smtp-Source: AGRyM1tDWHIKIPtKPtUT1K/IJOLBSjoS46MKh129dDYvNzYv2SFNmGZyZjc1LVKrRi4QPZ4Js2TtiQ==
+X-Received: by 2002:a17:902:f54e:b0:16c:5119:d4a8 with SMTP id h14-20020a170902f54e00b0016c5119d4a8mr43406849plf.22.1658426678106;
+        Thu, 21 Jul 2022 11:04:38 -0700 (PDT)
 Received: from google.com (123.65.230.35.bc.googleusercontent.com. [35.230.65.123])
-        by smtp.gmail.com with ESMTPSA id f4-20020a170902684400b0016c1cdd2de3sm1956763pln.281.2022.07.21.10.58.54
+        by smtp.gmail.com with ESMTPSA id y16-20020a17090322d000b0016c4fb6e0b2sm2077898plg.55.2022.07.21.11.04.37
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 21 Jul 2022 10:58:54 -0700 (PDT)
-Date:   Thu, 21 Jul 2022 17:58:50 +0000
+        Thu, 21 Jul 2022 11:04:37 -0700 (PDT)
+Date:   Thu, 21 Jul 2022 18:04:34 +0000
 From:   Sean Christopherson <seanjc@google.com>
-To:     Chao Peng <chao.p.peng@linux.intel.com>
-Cc:     Wei Wang <wei.w.wang@linux.intel.com>,
-        "Gupta, Pankaj" <pankaj.gupta@amd.com>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org, linux-mm@kvack.org,
-        linux-fsdevel@vger.kernel.org, linux-api@vger.kernel.org,
-        linux-doc@vger.kernel.org, qemu-devel@nongnu.org,
-        linux-kselftest@vger.kernel.org,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Jonathan Corbet <corbet@lwn.net>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        x86@kernel.org, "H . Peter Anvin" <hpa@zytor.com>,
-        Hugh Dickins <hughd@google.com>,
-        Jeff Layton <jlayton@kernel.org>,
-        "J . Bruce Fields" <bfields@fieldses.org>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        Shuah Khan <shuah@kernel.org>, Mike Rapoport <rppt@kernel.org>,
-        Steven Price <steven.price@arm.com>,
-        "Maciej S . Szmigiero" <mail@maciej.szmigiero.name>,
-        Vlastimil Babka <vbabka@suse.cz>,
-        Vishal Annapurve <vannapurve@google.com>,
-        Yu Zhang <yu.c.zhang@linux.intel.com>,
-        "Kirill A . Shutemov" <kirill.shutemov@linux.intel.com>,
-        luto@kernel.org, jun.nakajima@intel.com, dave.hansen@intel.com,
-        ak@linux.intel.com, david@redhat.com, aarcange@redhat.com,
-        ddutile@redhat.com, dhildenb@redhat.com,
-        Quentin Perret <qperret@google.com>,
-        Michael Roth <michael.roth@amd.com>, mhocko@suse.com,
-        Muchun Song <songmuchun@bytedance.com>
-Subject: Re: [PATCH v7 11/14] KVM: Register/unregister the guest private
- memory regions
-Message-ID: <YtmT2irvgInX1kPp@google.com>
-References: <20220706082016.2603916-1-chao.p.peng@linux.intel.com>
- <20220706082016.2603916-12-chao.p.peng@linux.intel.com>
- <f02baa37-8d34-5d07-a0ae-300ffefc7fee@amd.com>
- <20220719140843.GA84779@chaop.bj.intel.com>
- <36e671d2-6b95-8e4f-c2ac-fee4b2670c6e@amd.com>
- <20220720150706.GB124133@chaop.bj.intel.com>
- <d0fd229d-afa6-c66d-3e55-09ac5877453e@amd.com>
- <YtgrkXqP/GIi9ujZ@google.com>
- <45ae9f57-d595-f202-abb5-26a03a2ca131@linux.intel.com>
- <20220721092906.GA153288@chaop.bj.intel.com>
+To:     Manali Shukla <manali.shukla@amd.com>
+Cc:     pbonzini@redhat.com, kvm@vger.kernel.org
+Subject: Re: [kvm-unit-tests PATCH v5 1/8] x86: nSVM: Move common
+ functionality of the main() to helper run_svm_tests
+Message-ID: <YtmVMmp1aK+lEY6b@google.com>
+References: <20220628113853.392569-1-manali.shukla@amd.com>
+ <20220628113853.392569-2-manali.shukla@amd.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20220721092906.GA153288@chaop.bj.intel.com>
+In-Reply-To: <20220628113853.392569-2-manali.shukla@amd.com>
 X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
         ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-        USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=unavailable
+        USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=ham
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -110,79 +71,75 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Jul 21, 2022, Chao Peng wrote:
-> On Thu, Jul 21, 2022 at 03:34:59PM +0800, Wei Wang wrote:
-> > 
-> > 
-> > On 7/21/22 00:21, Sean Christopherson wrote:
-> > Maybe you could tag it with cgs for all the confidential guest support
-> > related stuff: e.g. kvm_vm_ioctl_set_cgs_mem()
-> > 
-> > bool is_private = ioctl == KVM_MEMORY_ENCRYPT_REG_REGION;
-> > ...
-> > kvm_vm_ioctl_set_cgs_mem(, is_private)
+On Tue, Jun 28, 2022, Manali Shukla wrote:
+> Move common functionalities of main() to run_svm_tests(), so that
+> nNPT tests can be moved to their own file to make other test cases run
+> without nNPT test cases fiddling with page table midway.
 > 
-> If we plan to widely use such abbr. through KVM (e.g. it's well known),
-> I'm fine.
-
-I'd prefer to stay away from "confidential guest", and away from any VM-scoped
-name for that matter.  User-unmappable memmory has use cases beyond hiding guest
-state from the host, e.g. userspace could use inaccessible/unmappable memory to
-harden itself against unintentional access to guest memory.
-
-> I actually use mem_attr in patch: https://lkml.org/lkml/2022/7/20/610
-> But I also don't quite like it, it's so generic and sounds say nothing.
+> The quick and dirty approach would be to turn the current main()
+> into a small helper, minus its call to __setup_vm() and call the
+> helper function run_svm_tests() from main() function.
 > 
-> But I do want a name can cover future usages other than just 
-> private/shared (pKVM for example may have a third state).
+> No functional change intended.
+> 
+> Suggested-by: Sean Christopherson <seanjc@google.com>
+> Signed-off-by: Manali Shukla <manali.shukla@amd.com>
+> ---
+>  x86/svm.c | 14 +++++++++-----
+>  x86/svm.h |  1 +
+>  2 files changed, 10 insertions(+), 5 deletions(-)
+> 
+> diff --git a/x86/svm.c b/x86/svm.c
+> index 93794fd..36ba05e 100644
+> --- a/x86/svm.c
+> +++ b/x86/svm.c
+> @@ -397,17 +397,13 @@ test_wanted(const char *name, char *filters[], int filter_count)
+>          }
+>  }
+>  
+> -int main(int ac, char **av)
+> +int run_svm_tests(int ac, char **av)
+>  {
+> -	/* Omit PT_USER_MASK to allow tested host.CR4.SMEP=1. */
+> -	pteval_t opt_mask = 0;
+>  	int i = 0;
+>  
+>  	ac--;
+>  	av++;
+>  
+> -	__setup_vm(&opt_mask);
+> -
+>  	if (!this_cpu_has(X86_FEATURE_SVM)) {
+>  		printf("SVM not available\n");
+>  		return report_summary();
+> @@ -444,3 +440,11 @@ int main(int ac, char **av)
+>  
+>  	return report_summary();
+>  }
+> +
+> +int main(int ac, char **av)
+> +{
+> +    pteval_t opt_mask = 0;
+> +
+> +    __setup_vm(&opt_mask);
+> +    return run_svm_tests(ac, av);
 
-I don't think there can be a third top-level state.  Memory is either private to
-the guest or it's not.  There can be sub-states, e.g. memory could be selectively
-shared or encrypted with a different key, in which case we'd need metadata to
-track that state.
+Indentation is wrong.  Yeah, the rest of the file has issues and this gets
+cleaned up in future patches, but that's no excuse for introducing _new_ badness.
 
-Though that begs the question of whether or not private_fd is the correct
-terminology.  E.g. if guest memory is backed by a memfd that can't be mapped by
-userspace (currently F_SEAL_INACCESSIBLE), but something else in the kernel plugs
-that memory into a device or another VM, then arguably that memory is shared,
-especially the multi-VM scenario.
-
-For TDX and SNP "private vs. shared" is likely the correct terminology given the
-current specs, but for generic KVM it's probably better to align with whatever
-terminology is used for memfd.  "inaccessible_fd" and "user_inaccessible_fd" are
-a bit odd since the fd itself is accesible.
-
-What about "user_unmappable"?  E.g.
-
-  F_SEAL_USER_UNMAPPABLE, MFD_USER_UNMAPPABLE, KVM_HAS_USER_UNMAPPABLE_MEMORY,
-  MEMFILE_F_USER_INACCESSIBLE, user_unmappable_fd, etc...
-
-that gives us flexibility to map the memory from within the kernel, e.g. into
-other VMs or devices.
-
-Hmm, and then keep your original "mem_attr_array" name?  And probably 
-
- int kvm_vm_ioctl_set_mem_attr(struct kvm *kvm, gpa_t gpa, gpa_t size,
- 			       bool is_user_mappable)
-
-Then the x86/mmu code for TDX/SNP private faults could be:
-
-	is_private = !kvm_is_gpa_user_mappable();
-
-	if (fault->is_private != is_private) {
-
-or if we want to avoid mixing up "user_mappable" and "user_unmappable":
-
-	is_private = kvm_is_gpa_user_unmappable();
-
-	if (fault->is_private != is_private) {
-
-though a helper that returns a negative (not mappable) feels kludgy.  And I like
-kvm_is_gpa_user_mappable() because then when there's not "special" memory, it
-defaults to true, which is more intuitive IMO.
-
-And then if the future needs more precision, e.g. user-unmappable memory isn't
-necessarily guest-exclusive, the uAPI names still work even though KVM internals
-will need to be reworked, but that's unavoidable.  E.g. piggybacking
-KVM_MEMORY_ENCRYPT_(UN)REG_REGION doesn't allow for further differentiation,
-so we'd need to _extend_ the uAPI, but the _existing_ uAPI would still be sane.
+> +}
+> diff --git a/x86/svm.h b/x86/svm.h
+> index e93822b..123e64f 100644
+> --- a/x86/svm.h
+> +++ b/x86/svm.h
+> @@ -403,6 +403,7 @@ struct regs {
+>  
+>  typedef void (*test_guest_func)(struct svm_test *);
+>  
+> +int run_svm_tests(int ac, char **av);
+>  u64 *npt_get_pte(u64 address);
+>  u64 *npt_get_pde(u64 address);
+>  u64 *npt_get_pdpe(void);
+> -- 
+> 2.30.2
+> 
