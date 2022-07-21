@@ -2,149 +2,388 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 0F6B357C407
-	for <lists+kvm@lfdr.de>; Thu, 21 Jul 2022 08:02:49 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 91BFA57C4EF
+	for <lists+kvm@lfdr.de>; Thu, 21 Jul 2022 09:06:28 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231661AbiGUGCr (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 21 Jul 2022 02:02:47 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52924 "EHLO
+        id S230238AbiGUHG1 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 21 Jul 2022 03:06:27 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53000 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229925AbiGUGCp (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 21 Jul 2022 02:02:45 -0400
-Received: from mail.sberdevices.ru (mail.sberdevices.ru [45.89.227.171])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8DFCD1D319;
-        Wed, 20 Jul 2022 23:02:43 -0700 (PDT)
-Received: from s-lin-edge02.sberdevices.ru (localhost [127.0.0.1])
-        by mail.sberdevices.ru (Postfix) with ESMTP id 1B2605FD31;
-        Thu, 21 Jul 2022 09:02:41 +0300 (MSK)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=sberdevices.ru;
-        s=mail; t=1658383361;
-        bh=LqYtRAFoz0ma2I9ckyn+2XhKXUFisTnrYlNzjAg7q9w=;
-        h=From:To:Subject:Date:Message-ID:Content-Type:MIME-Version;
-        b=c8ZLFxGmHWJMGlq8X4iaj7vfnaYlNSSmD8axx3vJaufz9L+sbBVCoZAX2vzwnxN9y
-         biH7BJrhNwGAydfFNYyKBwrjIDubT8TtlsyN1XmRg5vF8FlnLNA1Je7kw94hChFNLE
-         JK4WDyH7Z7wGobQVssxsmD1mfgaB2fhgYzuO3c82psf7uBDmMJa3Agrj+JRk6sIXer
-         Xk2Nf3Nui3hpQ17PxLIziODCotnuMc3HgK+8X1/y5TEKRBLzBFPqJFvgaX3W26UdHU
-         sJrFpAlH6pAFb5KiC5IKZsEyb8WuGXqMdoGVL/nnL5F9Y54DaXeQRoU2Ihee3uiJGn
-         x0Yhrr3ts9C7w==
-Received: from S-MS-EXCH01.sberdevices.ru (S-MS-EXCH01.sberdevices.ru [172.16.1.4])
-        by mail.sberdevices.ru (Postfix) with ESMTP;
-        Thu, 21 Jul 2022 09:02:36 +0300 (MSK)
-From:   Arseniy Krasnov <AVKrasnov@sberdevices.ru>
-To:     Dexuan Cui <decui@microsoft.com>,
-        Stefano Garzarella <sgarzare@redhat.com>
-CC:     "David S. Miller" <davem@davemloft.net>,
-        "edumazet@google.com" <edumazet@google.com>,
-        Jakub Kicinski <kuba@kernel.org>,
-        Paolo Abeni <pabeni@redhat.com>,
-        Stefan Hajnoczi <stefanha@redhat.com>,
-        "Michael S. Tsirkin" <mst@redhat.com>,
-        Krasnov Arseniy <oxffffaa@gmail.com>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "virtualization@lists.linux-foundation.org" 
-        <virtualization@lists.linux-foundation.org>,
-        "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        kernel <kernel@sberdevices.ru>
-Subject: Re: [RFC PATCH v1 2/3] virtio/vsock: use 'target' in notify_poll_in,
- callback.
-Thread-Topic: [RFC PATCH v1 2/3] virtio/vsock: use 'target' in notify_poll_in,
- callback.
-Thread-Index: AQHYmn7T+PqKYxwQ8USiiecixCHJYa2FdImAgAEZ/YCAAC4SgIAAsIoAgAC6iAA=
-Date:   Thu, 21 Jul 2022 06:02:17 +0000
-Message-ID: <420cde93-bc9d-925b-e68e-fdf04326f031@sberdevices.ru>
-References: <c8de13b1-cbd8-e3e0-5728-f3c3648c69f7@sberdevices.ru>
- <358f8d52-fd88-ad2e-87e2-c64bfa516a58@sberdevices.ru>
- <20220719124857.akv25sgp6np3pdaw@sgarzare-redhat>
- <15f38fcf-f1ff-3aad-4c30-4436bb8c4c44@sberdevices.ru>
- <20220720082307.djbf7qgnlsjmrxcf@sgarzare-redhat>
- <SN6PR2101MB132703A0F4D08DC28D37A17EBF8E9@SN6PR2101MB1327.namprd21.prod.outlook.com>
-In-Reply-To: <SN6PR2101MB132703A0F4D08DC28D37A17EBF8E9@SN6PR2101MB1327.namprd21.prod.outlook.com>
-Accept-Language: en-US, ru-RU
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-x-originating-ip: [172.16.1.12]
-Content-Type: text/plain; charset="utf-8"
-Content-ID: <281EBE318E5239428D1B59BB68E59335@sberdevices.ru>
-Content-Transfer-Encoding: base64
+        with ESMTP id S229648AbiGUHG0 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 21 Jul 2022 03:06:26 -0400
+Received: from mail-yb1-xb2e.google.com (mail-yb1-xb2e.google.com [IPv6:2607:f8b0:4864:20::b2e])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0090C79695
+        for <kvm@vger.kernel.org>; Thu, 21 Jul 2022 00:06:24 -0700 (PDT)
+Received: by mail-yb1-xb2e.google.com with SMTP id k85so1317990ybk.7
+        for <kvm@vger.kernel.org>; Thu, 21 Jul 2022 00:06:24 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=atishpatra.org; s=google;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=LpwVsautRFlDJDA1sbNhSwQKO+NgjypEdty8BUqzXpg=;
+        b=VmBfYifBV1ljfmac3r8D0dIReL9DzQ35/6kgP/s+u12mzY159hJpPDgY02sx3F1Kzy
+         plAtnqrd9EZdt4t+2y2hjDCpYKZHmiRJosf/mLx3/5LZFegcV0y6VArqYpUPLFsP5pE7
+         IGJNq3qkoNiFtlBA+QjB82WGfdccUYDy1rsmQ=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=LpwVsautRFlDJDA1sbNhSwQKO+NgjypEdty8BUqzXpg=;
+        b=xejJBcjX3SvnrRnMaeNmg3MqMtSGLtFGEnsMyOEMa5HWKIQSfRxhVZUD8tKFzJYstk
+         oUm8C+39aZHKg1mWbTP39sbLJjQHG3Nm8P5k6pg8Y3WBfHGnrxct90cbM26tmDPAPgYs
+         OlZSK4yAgBsyHcuHm+aKi0gVDdJpa55tY3I4TUHJEVjguUuKtLSpCVbYx0MkOOWVgj32
+         NnRoA9OFd5jOJ0850lAKgEjbwd//2ybYG1SUXWLOi+Y+EddKjyczNWN2XgmlkcAn4MFa
+         M748VIF+osF8l3I55488BnVzImzwL8UZEC92UC7pNfQkpwztfKURP9rsydqoCuD31D8K
+         gkjQ==
+X-Gm-Message-State: AJIora8oClpAt7NmumR9M9EKwBN0jYI3ECP3PXA6quhG86xVLX/HqUyh
+        FzpN6fa/GCKnZkST4YlULSSnmmw+Z+2a038LRNuo
+X-Google-Smtp-Source: AGRyM1uo7Hxvn1TxM85yEqyVC1cUuwKWVnZ5dghq2ZtcLgmtZsc5994BJDhdFvxdpmHxzx2Lc6FjHkATcn0+tkV1dTk=
+X-Received: by 2002:a25:25d7:0:b0:66e:ce4d:da48 with SMTP id
+ l206-20020a2525d7000000b0066ece4dda48mr39146020ybl.301.1658387184065; Thu, 21
+ Jul 2022 00:06:24 -0700 (PDT)
 MIME-Version: 1.0
-X-KSMG-Rule-ID: 4
-X-KSMG-Message-Action: clean
-X-KSMG-AntiSpam-Status: not scanned, disabled by settings
-X-KSMG-AntiSpam-Interceptor-Info: not scanned
-X-KSMG-AntiPhishing: not scanned, disabled by settings
-X-KSMG-AntiVirus: Kaspersky Secure Mail Gateway, version 1.1.2.30, bases: 2022/07/20 23:43:00 #19928907
-X-KSMG-AntiVirus-Status: Clean, skipped
+References: <20220720192342.3428144-1-atishp@rivosinc.com> <20220720192342.3428144-5-atishp@rivosinc.com>
+ <CAAhSdy1b0pAhex6V-T5AhLmvo5-F1B4fOTpphJ-0A3+si-Q2OA@mail.gmail.com>
+In-Reply-To: <CAAhSdy1b0pAhex6V-T5AhLmvo5-F1B4fOTpphJ-0A3+si-Q2OA@mail.gmail.com>
+From:   Atish Patra <atishp@atishpatra.org>
+Date:   Thu, 21 Jul 2022 00:06:13 -0700
+Message-ID: <CAOnJCUL0yOzKxi7BOrBp4Fax3TNT+j8LfZejHr0BC7=kP6vV6w@mail.gmail.com>
+Subject: Re: [PATCH v5 4/4] RISC-V: KVM: Support sstc extension
+To:     Anup Patel <anup@brainfault.org>
+Cc:     Atish Patra <atishp@rivosinc.com>,
+        "linux-kernel@vger.kernel.org List" <linux-kernel@vger.kernel.org>,
+        Albert Ou <aou@eecs.berkeley.edu>,
+        Daniel Lezcano <daniel.lezcano@linaro.org>,
+        Guo Ren <guoren@kernel.org>, Heiko Stuebner <heiko@sntech.de>,
+        "open list:KERNEL VIRTUAL MACHINE FOR RISC-V (KVM/riscv)" 
+        <kvm-riscv@lists.infradead.org>, KVM General <kvm@vger.kernel.org>,
+        linux-riscv <linux-riscv@lists.infradead.org>,
+        Liu Shaohua <liush@allwinnertech.com>,
+        Niklas Cassel <niklas.cassel@wdc.com>,
+        Palmer Dabbelt <palmer@dabbelt.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Paul Walmsley <paul.walmsley@sifive.com>,
+        Philipp Tomsich <philipp.tomsich@vrull.eu>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Tsukasa OI <research_trasio@irq.a4lg.com>,
+        Wei Fu <wefu@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
 X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,SPF_HELO_NONE,SPF_PASS
-        autolearn=ham autolearn_force=no version=3.4.6
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-T24gMjAuMDcuMjAyMiAyMTo1NCwgRGV4dWFuIEN1aSB3cm90ZToNCj4+IEZyb206IFN0ZWZhbm8g
-R2FyemFyZWxsYSA8c2dhcnphcmVAcmVkaGF0LmNvbT4NCj4+IFNlbnQ6IFdlZG5lc2RheSwgSnVs
-eSAyMCwgMjAyMiAxOjIzIEFNDQo+PiAuLi4NCj4+IE9uIFdlZCwgSnVsIDIwLCAyMDIyIGF0IDA1
-OjM4OjAzQU0gKzAwMDAsIEFyc2VuaXkgS3Jhc25vdiB3cm90ZToNCj4+PiBPbiAxOS4wNy4yMDIy
-IDE1OjQ4LCBTdGVmYW5vIEdhcnphcmVsbGEgd3JvdGU6DQo+Pj4+IE9uIE1vbiwgSnVsIDE4LCAy
-MDIyIGF0IDA4OjE3OjMxQU0gKzAwMDAsIEFyc2VuaXkgS3Jhc25vdiB3cm90ZToNCj4+Pj4+IFRo
-aXMgY2FsbGJhY2sgY29udHJvbHMgc2V0dGluZyBvZiBQT0xMSU4sUE9MTFJETk9STSBvdXRwdXQg
-Yml0cw0KPj4+Pj4gb2YgcG9sbCgpIHN5c2NhbGwsYnV0IGluIHNvbWUgY2FzZXMsaXQgaXMgaW5j
-b3JyZWN0bHkgdG8gc2V0IGl0LA0KPj4+Pj4gd2hlbiBzb2NrZXQgaGFzIGF0IGxlYXN0IDEgYnl0
-ZXMgb2YgYXZhaWxhYmxlIGRhdGEuIFVzZSAndGFyZ2V0Jw0KPj4+Pj4gd2hpY2ggaXMgYWxyZWFk
-eSBleGlzdHMgYW5kIGVxdWFsIHRvIHNrX3Jjdmxvd2F0IGluIHRoaXMgY2FzZS4NCj4+Pj4+DQo+
-Pj4+PiBTaWduZWQtb2ZmLWJ5OiBBcnNlbml5IEtyYXNub3YgPEFWS3Jhc25vdkBzYmVyZGV2aWNl
-cy5ydT4NCj4+Pj4+IC0tLQ0KPj4+Pj4gbmV0L3Ztd192c29jay92aXJ0aW9fdHJhbnNwb3J0X2Nv
-bW1vbi5jIHwgMiArLQ0KPj4+Pj4gMSBmaWxlIGNoYW5nZWQsIDEgaW5zZXJ0aW9uKCspLCAxIGRl
-bGV0aW9uKC0pDQo+Pj4+Pg0KPj4+Pj4gZGlmZiAtLWdpdCBhL25ldC92bXdfdnNvY2svdmlydGlv
-X3RyYW5zcG9ydF9jb21tb24uYw0KPj4gYi9uZXQvdm13X3Zzb2NrL3ZpcnRpb190cmFuc3BvcnRf
-Y29tbW9uLmMNCj4+Pj4+IGluZGV4IGVjMmMyYWZiZjBkMC4uNTkxOTA4NzQwOTkyIDEwMDY0NA0K
-Pj4+Pj4gLS0tIGEvbmV0L3Ztd192c29jay92aXJ0aW9fdHJhbnNwb3J0X2NvbW1vbi5jDQo+Pj4+
-PiArKysgYi9uZXQvdm13X3Zzb2NrL3ZpcnRpb190cmFuc3BvcnRfY29tbW9uLmMNCj4+Pj4+IEBA
-IC02MzQsNyArNjM0LDcgQEAgdmlydGlvX3RyYW5zcG9ydF9ub3RpZnlfcG9sbF9pbihzdHJ1Y3Qg
-dnNvY2tfc29jaw0KPj4gKnZzaywNCj4+Pj4+IMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDC
-oCBzaXplX3QgdGFyZ2V0LA0KPj4+Pj4gwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgIGJv
-b2wgKmRhdGFfcmVhZHlfbm93KQ0KPj4+Pj4gew0KPj4+Pj4gLcKgwqDCoCBpZiAodnNvY2tfc3Ry
-ZWFtX2hhc19kYXRhKHZzaykpDQo+Pj4+PiArwqDCoMKgIGlmICh2c29ja19zdHJlYW1faGFzX2Rh
-dGEodnNrKSA+PSB0YXJnZXQpDQo+Pj4+PiDCoMKgwqDCoMKgwqDCoCAqZGF0YV9yZWFkeV9ub3cg
-PSB0cnVlOw0KPj4+Pj4gwqDCoMKgwqBlbHNlDQo+Pj4+PiDCoMKgwqDCoMKgwqDCoCAqZGF0YV9y
-ZWFkeV9ub3cgPSBmYWxzZTsNCj4+Pj4NCj4+Pj4gUGVyaGFwcyB3ZSBjYW4gdGFrZSB0aGUgb3Bw
-b3J0dW5pdHkgdG8gY2xlYW4gdXAgdGhlIGNvZGUgaW4gdGhpcyB3YXk6DQo+Pj4+DQo+Pj4+IMKg
-wqDCoMKgKmRhdGFfcmVhZHlfbm93ID0gdnNvY2tfc3RyZWFtX2hhc19kYXRhKHZzaykgPj0gdGFy
-Z2V0Ow0KPj4+IEFjaw0KPj4+Pg0KPj4+PiBBbnl3YXksIEkgdGhpbmsgd2UgYWxzbyBuZWVkIHRv
-IGZpeCB0aGUgb3RoZXIgdHJhbnNwb3J0cyAodm1jaSBhbmQgaHlwZXJ2KSwNCj4+Pj4gd2hhdCBk
-byB5b3UgdGhpbms/DQo+Pj4gRm9yIHZtY2kgaXQgaXMgbG9vayBjbGVhciB0byBmaXggaXQuIEZv
-ciBoeXBlcnYgaSBuZWVkIHRvIGNoZWNrIGl0IG1vcmUsIGJlY2F1c2UgaXQNCj4+PiBhbHJlYWR5
-IHVzZXMgc29tZSBpbnRlcm5hbCB0YXJnZXQgdmFsdWUuDQo+Pg0KPj4gWWVwLCBJIHNlZS4gTWF5
-YmUgeW91IGNhbiBwYXNzIGB0YXJnZXRgIHRvIGh2c19jaGFubmVsX3JlYWRhYmxlKCkgYW5kDQo+
-PiB1c2UgaXQgYXMgcGFyYW1ldGVyIG9mIEhWU19QS1RfTEVOKCkuDQo+Pg0KPj4gQERleHVhbiB3
-aGF0IGRvIHlvdSB0aGluaz8NCj4+DQo+PiBUaGFua3MsDQo+PiBTdGVmYW5vDQo+IA0KPiBDYW4g
-d2UgcmV0dXJuICJub3Qgc3VwcG9ydGVkIiB0byBzZXRfcmN2bG93YXQgZm9yIEh5cGVyLVYgdnNv
-Y2s/IDotKQ0KPiANCj4gRm9yIEh5cGVyLVYgdnNvY2ssIGl0J3MgZWFzeSB0byB0ZWxsIGlmIHRo
-ZXJlIGlzIGF0IGxlYXN0IDEgYnl0ZSB0byByZWFkOiANCj4gcGxlYXNlIHJlZmVyIHRvIGh2c19j
-aGFubmVsX3JlYWRhYmxlKCksIGJ1dCBpdCdzIGRpZmZpY3VsdCB0byBmaWd1cmUgb3V0DQo+IGV4
-YWN0bHkgaG93IG1hbnkgYnl0ZXMgY2FuIGJlIHJlYWQuIA0KPiANCj4gSW4gaHZzX2NoYW5uZWxf
-cmVhZGFibGUoKSwgaHZfZ2V0X2J5dGVzX3RvX3JlYWQoKSByZXR1cm5zIHRoZSB0b3RhbCANCj4g
-Ynl0ZXMgb2YgMCwgMSBvciBtdWx0aXBsZSBIeXBlci1WIHZzb2NrIHBhY2tldHM6IGVhY2ggcGFj
-a2V0IGhhcyBhDQo+IDI0LWJ5dGUgaGVhZGVyIChzZWUgSFZTX0hFQURFUl9MRU4pLCB0aGUgcGF5
-bG9hZCwgc29tZSBwYWRkaW5nDQo+IGJ5dGVzIChpZiB0aGUgcGF5bG9hZCBsZW5ndGggaXMgbm90
-IGEgbXVsdGlwbGUgb2YgOCksIGFuZCA4IHRyYWlsaW5nDQo+IHVzZWxlc3MgYnl0ZXMuDQo+IA0K
-PiBJdCdzIGhhcmQgdG8gZ2V0IHRoZSB0b3RhbCBwYXlsb2FkIGxlbmd0aCBiZWNhdXNlIHRoZXJl
-IGlzIG5vIEFQSSBpbg0KPiBpbmNsdWRlL2xpbnV4L2h5cGVydi5oLCBkcml2ZXJzL2h2L2NoYW5u
-ZWwuYyBhbmQgDQo+IGRyaXZlcnMvaHYvcmluZ19idWZmZXIuYyB0aGF0IGFsbG93cyB1cyB0byBw
-ZWVrIGF0IHRoZSBkYXRhIGluIHRoZQ0KPiBWTUJ1cyBjaGFubmVsJ3MgcmluZ2J1ZmZlci4gDQo+
-IA0KPiBXZSBjb3VsZCBhZGQgc3VjaCBhICJwZWVrIiBBUEkgaW4gZHJpdmVycy9odi9jaGFubmVs
-LmMgKHNlZSB0aGUNCj4gbm9uLXBlZWsgdmVyc2lvbiBvZiB0aGUgQVBJcyBpbiBodnNfc3RyZWFt
-X2RlcXVldWUoKTogDQo+IGh2X3BrdF9pdGVyX2ZpcnN0KCkgYW5kIGh2X3BrdF9pdGVyX25leHQo
-KSksIGFuZCBleGFtaW5lIHRoZSB3aG9sZQ0KPiByaW5nYnVmZmUgdG8gZmlndXJlIG91dCB0aGUg
-ZXhhY3QgdG90YWwgcGF5bG9hZCBsZW5ndGgsIGJ1dCBJIGZlZWwgaXQgbWF5IA0KPiBub3QgYmUg
-d29ydGggdGhlIG5vbi10cml2aWFsIGNvbXBsZXhpdHkganVzdCB0byBiZSBQT1NJWC1jb21wbGlh
-bnQgLS0NCj4gbm9ib2R5IGV2ZXIgY29tcGxhaW5lZCBhYm91dCB0aGlzIGZvciB0aGUgcGFzdCA1
-IHllYXJzIDotKSBTbyBJJ20NCj4gd29uZGVyaW5nIGlmIHdlIHNob3VsZCBhbGxvdyBIeXBlci1W
-IHZzb2NrIHRvIG5vdCBzdXBwb3J0IHRoZSANCj4gc2V0X3Jjdmxvd2F0IG9wPw0KSSBzZWUsIGkg
-Y2FuIHByZXBhcmUgcGF0Y2ggZm9yIHRoaXMgaW4gdGhpcyBwYXRjaHNldCBpbiB2Mi4gQ2FsbCB0
-byBzZXQgU09fUkNWTE9XQVQgZm9yIEh5cGVyLVYNCnRyYW5zcG9ydCB3aWxsIHJldHVybiBFT1BO
-T1RTVVBQLg0KDQpUaGFuayBZb3UNCj4gDQo+IFRoYW5rcywNCj4gLS0gRGV4dWFuDQo+IA0KDQo=
+On Wed, Jul 20, 2022 at 9:33 PM Anup Patel <anup@brainfault.org> wrote:
+>
+> On Thu, Jul 21, 2022 at 12:53 AM Atish Patra <atishp@rivosinc.com> wrote:
+> >
+> > Sstc extension allows the guest to program the vstimecmp CSR directly
+> > instead of making an SBI call to the hypervisor to program the next
+> > event. The timer interrupt is also directly injected to the guest by
+> > the hardware in this case. To maintain backward compatibility, the
+> > hypervisors also update the vstimecmp in an SBI set_time call if
+> > the hardware supports it. Thus, the older kernels in guest also
+> > take advantage of the sstc extension.
+> >
+> > Reviewed-by: Anup Patel <anup@brainfault.org>
+> > Signed-off-by: Atish Patra <atishp@rivosinc.com>
+> > ---
+> >  arch/riscv/include/asm/kvm_vcpu_timer.h |   7 ++
+> >  arch/riscv/include/uapi/asm/kvm.h       |   1 +
+> >  arch/riscv/kvm/vcpu.c                   |   7 +-
+> >  arch/riscv/kvm/vcpu_timer.c             | 144 +++++++++++++++++++++++-
+> >  4 files changed, 152 insertions(+), 7 deletions(-)
+> >
+> > diff --git a/arch/riscv/include/asm/kvm_vcpu_timer.h b/arch/riscv/include/asm/kvm_vcpu_timer.h
+> > index 50138e2eb91b..0d8fdb8ec63a 100644
+> > --- a/arch/riscv/include/asm/kvm_vcpu_timer.h
+> > +++ b/arch/riscv/include/asm/kvm_vcpu_timer.h
+> > @@ -28,6 +28,11 @@ struct kvm_vcpu_timer {
+> >         u64 next_cycles;
+> >         /* Underlying hrtimer instance */
+> >         struct hrtimer hrt;
+> > +
+> > +       /* Flag to check if sstc is enabled or not */
+> > +       bool sstc_enabled;
+> > +       /* A function pointer to switch between stimecmp or hrtimer at runtime */
+> > +       int (*timer_next_event)(struct kvm_vcpu *vcpu, u64 ncycles);
+> >  };
+> >
+> >  int kvm_riscv_vcpu_timer_next_event(struct kvm_vcpu *vcpu, u64 ncycles);
+> > @@ -40,5 +45,7 @@ int kvm_riscv_vcpu_timer_deinit(struct kvm_vcpu *vcpu);
+> >  int kvm_riscv_vcpu_timer_reset(struct kvm_vcpu *vcpu);
+> >  void kvm_riscv_vcpu_timer_restore(struct kvm_vcpu *vcpu);
+> >  void kvm_riscv_guest_timer_init(struct kvm *kvm);
+> > +void kvm_riscv_vcpu_timer_save(struct kvm_vcpu *vcpu);
+> > +bool kvm_riscv_vcpu_timer_pending(struct kvm_vcpu *vcpu);
+> >
+> >  #endif
+> > diff --git a/arch/riscv/include/uapi/asm/kvm.h b/arch/riscv/include/uapi/asm/kvm.h
+> > index 24b2a6e27698..9ac3dbaf0b0f 100644
+> > --- a/arch/riscv/include/uapi/asm/kvm.h
+> > +++ b/arch/riscv/include/uapi/asm/kvm.h
+> > @@ -96,6 +96,7 @@ enum KVM_RISCV_ISA_EXT_ID {
+> >         KVM_RISCV_ISA_EXT_H,
+> >         KVM_RISCV_ISA_EXT_I,
+> >         KVM_RISCV_ISA_EXT_M,
+> > +       KVM_RISCV_ISA_EXT_SSTC,
+>
+> Please don't add a new ISA ext register in-between to maintain
+> UAPI compatibility.
+>
+
+Sure. As SVPBMT was not merged yet, I thought it would be good to keep
+them in canonical order.
+I will move it as per your suggestion it in the next version.
+
+> >         KVM_RISCV_ISA_EXT_SVPBMT,
+> >         KVM_RISCV_ISA_EXT_MAX,
+> >  };
+> > diff --git a/arch/riscv/kvm/vcpu.c b/arch/riscv/kvm/vcpu.c
+> > index 5d271b597613..9ee6ad376eb2 100644
+> > --- a/arch/riscv/kvm/vcpu.c
+> > +++ b/arch/riscv/kvm/vcpu.c
+> > @@ -51,6 +51,7 @@ static const unsigned long kvm_isa_ext_arr[] = {
+> >         RISCV_ISA_EXT_h,
+> >         RISCV_ISA_EXT_i,
+> >         RISCV_ISA_EXT_m,
+> > +       RISCV_ISA_EXT_SSTC,
+>
+> Move this at the end of array as-per above.
+>
+> >         RISCV_ISA_EXT_SVPBMT,
+> >  };
+> >
+> > @@ -203,7 +204,7 @@ void kvm_arch_vcpu_destroy(struct kvm_vcpu *vcpu)
+> >
+> >  int kvm_cpu_has_pending_timer(struct kvm_vcpu *vcpu)
+> >  {
+> > -       return kvm_riscv_vcpu_has_interrupts(vcpu, 1UL << IRQ_VS_TIMER);
+> > +       return kvm_riscv_vcpu_timer_pending(vcpu);
+> >  }
+> >
+> >  void kvm_arch_vcpu_blocking(struct kvm_vcpu *vcpu)
+> > @@ -785,6 +786,8 @@ static void kvm_riscv_vcpu_update_config(const unsigned long *isa)
+> >         if (__riscv_isa_extension_available(isa, RISCV_ISA_EXT_SVPBMT))
+> >                 henvcfg |= ENVCFG_PBMTE;
+> >
+> > +       if (__riscv_isa_extension_available(isa, RISCV_ISA_EXT_SSTC))
+> > +               henvcfg |= ENVCFG_STCE;
+> >         csr_write(CSR_HENVCFG, henvcfg);
+> >  #ifdef CONFIG_32BIT
+> >         csr_write(CSR_HENVCFGH, henvcfg >> 32);
+> > @@ -828,6 +831,8 @@ void kvm_arch_vcpu_put(struct kvm_vcpu *vcpu)
+> >                                      vcpu->arch.isa);
+> >         kvm_riscv_vcpu_host_fp_restore(&vcpu->arch.host_context);
+> >
+> > +       kvm_riscv_vcpu_timer_save(vcpu);
+> > +
+> >         csr->vsstatus = csr_read(CSR_VSSTATUS);
+> >         csr->vsie = csr_read(CSR_VSIE);
+> >         csr->vstvec = csr_read(CSR_VSTVEC);
+> > diff --git a/arch/riscv/kvm/vcpu_timer.c b/arch/riscv/kvm/vcpu_timer.c
+> > index 595043857049..16f50c46ba39 100644
+> > --- a/arch/riscv/kvm/vcpu_timer.c
+> > +++ b/arch/riscv/kvm/vcpu_timer.c
+> > @@ -69,7 +69,18 @@ static int kvm_riscv_vcpu_timer_cancel(struct kvm_vcpu_timer *t)
+> >         return 0;
+> >  }
+> >
+> > -int kvm_riscv_vcpu_timer_next_event(struct kvm_vcpu *vcpu, u64 ncycles)
+> > +static int kvm_riscv_vcpu_update_vstimecmp(struct kvm_vcpu *vcpu, u64 ncycles)
+> > +{
+> > +#if defined(CONFIG_32BIT)
+> > +               csr_write(CSR_VSTIMECMP, ncycles & 0xFFFFFFFF);
+> > +               csr_write(CSR_VSTIMECMPH, ncycles >> 32);
+> > +#else
+> > +               csr_write(CSR_VSTIMECMP, ncycles);
+> > +#endif
+> > +               return 0;
+> > +}
+> > +
+> > +static int kvm_riscv_vcpu_update_hrtimer(struct kvm_vcpu *vcpu, u64 ncycles)
+> >  {
+> >         struct kvm_vcpu_timer *t = &vcpu->arch.timer;
+> >         struct kvm_guest_timer *gt = &vcpu->kvm->arch.timer;
+> > @@ -88,6 +99,65 @@ int kvm_riscv_vcpu_timer_next_event(struct kvm_vcpu *vcpu, u64 ncycles)
+> >         return 0;
+> >  }
+> >
+> > +int kvm_riscv_vcpu_timer_next_event(struct kvm_vcpu *vcpu, u64 ncycles)
+> > +{
+> > +       struct kvm_vcpu_timer *t = &vcpu->arch.timer;
+> > +
+> > +       return t->timer_next_event(vcpu, ncycles);
+> > +}
+> > +
+> > +static enum hrtimer_restart kvm_riscv_vcpu_vstimer_expired(struct hrtimer *h)
+> > +{
+> > +       u64 delta_ns;
+> > +       struct kvm_vcpu_timer *t = container_of(h, struct kvm_vcpu_timer, hrt);
+> > +       struct kvm_vcpu *vcpu = container_of(t, struct kvm_vcpu, arch.timer);
+> > +       struct kvm_guest_timer *gt = &vcpu->kvm->arch.timer;
+> > +
+> > +       if (kvm_riscv_current_cycles(gt) < t->next_cycles) {
+> > +               delta_ns = kvm_riscv_delta_cycles2ns(t->next_cycles, gt, t);
+> > +               hrtimer_forward_now(&t->hrt, ktime_set(0, delta_ns));
+> > +               return HRTIMER_RESTART;
+> > +       }
+> > +
+> > +       t->next_set = false;
+> > +       kvm_vcpu_kick(vcpu);
+> > +
+> > +       return HRTIMER_NORESTART;
+> > +}
+> > +
+> > +bool kvm_riscv_vcpu_timer_pending(struct kvm_vcpu *vcpu)
+> > +{
+> > +       struct kvm_vcpu_timer *t = &vcpu->arch.timer;
+> > +       struct kvm_guest_timer *gt = &vcpu->kvm->arch.timer;
+> > +
+> > +       if (!kvm_riscv_delta_cycles2ns(t->next_cycles, gt, t) ||
+> > +           kvm_riscv_vcpu_has_interrupts(vcpu, 1UL << IRQ_VS_TIMER))
+> > +               return true;
+> > +       else
+> > +               return false;
+> > +}
+> > +
+> > +static void kvm_riscv_vcpu_timer_blocking(struct kvm_vcpu *vcpu)
+> > +{
+> > +       struct kvm_vcpu_timer *t = &vcpu->arch.timer;
+> > +       struct kvm_guest_timer *gt = &vcpu->kvm->arch.timer;
+> > +       u64 delta_ns;
+> > +
+> > +       if (!t->init_done)
+> > +               return;
+> > +
+> > +       delta_ns = kvm_riscv_delta_cycles2ns(t->next_cycles, gt, t);
+> > +       if (delta_ns) {
+> > +               hrtimer_start(&t->hrt, ktime_set(0, delta_ns), HRTIMER_MODE_REL);
+> > +               t->next_set = true;
+> > +       }
+> > +}
+> > +
+> > +static void kvm_riscv_vcpu_timer_unblocking(struct kvm_vcpu *vcpu)
+> > +{
+> > +       kvm_riscv_vcpu_timer_cancel(&vcpu->arch.timer);
+> > +}
+> > +
+> >  int kvm_riscv_vcpu_get_reg_timer(struct kvm_vcpu *vcpu,
+> >                                  const struct kvm_one_reg *reg)
+> >  {
+> > @@ -180,10 +250,20 @@ int kvm_riscv_vcpu_timer_init(struct kvm_vcpu *vcpu)
+> >                 return -EINVAL;
+> >
+> >         hrtimer_init(&t->hrt, CLOCK_MONOTONIC, HRTIMER_MODE_REL);
+> > -       t->hrt.function = kvm_riscv_vcpu_hrtimer_expired;
+> >         t->init_done = true;
+> >         t->next_set = false;
+> >
+> > +       /* Enable sstc for every vcpu if available in hardware */
+> > +       if (riscv_isa_extension_available(NULL, SSTC)) {
+> > +               t->sstc_enabled = true;
+> > +               t->hrt.function = kvm_riscv_vcpu_vstimer_expired;
+> > +               t->timer_next_event = kvm_riscv_vcpu_update_vstimecmp;
+> > +       } else {
+> > +               t->sstc_enabled = false;
+> > +               t->hrt.function = kvm_riscv_vcpu_hrtimer_expired;
+> > +               t->timer_next_event = kvm_riscv_vcpu_update_hrtimer;
+> > +       }
+> > +
+> >         return 0;
+> >  }
+> >
+> > @@ -199,21 +279,73 @@ int kvm_riscv_vcpu_timer_deinit(struct kvm_vcpu *vcpu)
+> >
+> >  int kvm_riscv_vcpu_timer_reset(struct kvm_vcpu *vcpu)
+> >  {
+> > +       struct kvm_vcpu_timer *t = &vcpu->arch.timer;
+> > +
+> > +       t->next_cycles = -1ULL;
+> >         return kvm_riscv_vcpu_timer_cancel(&vcpu->arch.timer);
+> >  }
+> >
+> > -void kvm_riscv_vcpu_timer_restore(struct kvm_vcpu *vcpu)
+> > +static void kvm_riscv_vcpu_update_timedelta(struct kvm_vcpu *vcpu)
+> >  {
+> >         struct kvm_guest_timer *gt = &vcpu->kvm->arch.timer;
+> >
+> > -#ifdef CONFIG_64BIT
+> > -       csr_write(CSR_HTIMEDELTA, gt->time_delta);
+> > -#else
+> > +#if defined(CONFIG_32BIT)
+> >         csr_write(CSR_HTIMEDELTA, (u32)(gt->time_delta));
+> >         csr_write(CSR_HTIMEDELTAH, (u32)(gt->time_delta >> 32));
+> > +#else
+> > +       csr_write(CSR_HTIMEDELTA, gt->time_delta);
+> >  #endif
+> >  }
+> >
+> > +void kvm_riscv_vcpu_timer_restore(struct kvm_vcpu *vcpu)
+> > +{
+> > +       struct kvm_vcpu_csr *csr;
+> > +       struct kvm_vcpu_timer *t = &vcpu->arch.timer;
+> > +
+> > +       kvm_riscv_vcpu_update_timedelta(vcpu);
+> > +
+> > +       if (!t->sstc_enabled)
+> > +               return;
+> > +
+> > +       csr = &vcpu->arch.guest_csr;
+> > +#if defined(CONFIG_32BIT)
+> > +       csr_write(CSR_VSTIMECMP, (u32)t->next_cycles);
+> > +       csr_write(CSR_VSTIMECMPH, (u32)(t->next_cycles >> 32));
+> > +#else
+> > +       csr_write(CSR_VSTIMECMP, t->next_cycles);
+> > +#endif
+> > +
+> > +       /* timer should be enabled for the remaining operations */
+> > +       if (unlikely(!t->init_done))
+> > +               return;
+> > +
+> > +       kvm_riscv_vcpu_timer_unblocking(vcpu);
+> > +}
+> > +
+> > +void kvm_riscv_vcpu_timer_save(struct kvm_vcpu *vcpu)
+> > +{
+> > +       struct kvm_vcpu_csr *csr;
+> > +       struct kvm_vcpu_timer *t = &vcpu->arch.timer;
+> > +
+> > +       if (!t->sstc_enabled)
+> > +               return;
+> > +
+> > +       csr = &vcpu->arch.guest_csr;
+> > +       t = &vcpu->arch.timer;
+> > +#if defined(CONFIG_32BIT)
+> > +       t->next_cycles = csr_read(CSR_VSTIMECMP);
+> > +       t->next_cycles |= (u64)csr_read(CSR_VSTIMECMPH) << 32;
+> > +#else
+> > +       t->next_cycles = csr_read(CSR_VSTIMECMP);
+> > +#endif
+> > +       /* timer should be enabled for the remaining operations */
+> > +       if (unlikely(!t->init_done))
+> > +               return;
+> > +
+> > +       if (kvm_vcpu_is_blocking(vcpu))
+> > +               kvm_riscv_vcpu_timer_blocking(vcpu);
+> > +}
+> > +
+> >  void kvm_riscv_guest_timer_init(struct kvm *kvm)
+> >  {
+> >         struct kvm_guest_timer *gt = &kvm->arch.timer;
+> > --
+> > 2.25.1
+> >
+>
+> Regards,
+> Anup
+
+
+
+-- 
+Regards,
+Atish
