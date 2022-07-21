@@ -2,60 +2,60 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 76DD557C917
+	by mail.lfdr.de (Postfix) with ESMTP id C305B57C918
 	for <lists+kvm@lfdr.de>; Thu, 21 Jul 2022 12:36:23 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233287AbiGUKgR (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 21 Jul 2022 06:36:17 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33988 "EHLO
+        id S232488AbiGUKgS (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 21 Jul 2022 06:36:18 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33992 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233296AbiGUKgJ (ORCPT <rfc822;kvm@vger.kernel.org>);
+        with ESMTP id S233297AbiGUKgJ (ORCPT <rfc822;kvm@vger.kernel.org>);
         Thu, 21 Jul 2022 06:36:09 -0400
-Received: from mail-pf1-x432.google.com (mail-pf1-x432.google.com [IPv6:2607:f8b0:4864:20::432])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DC18867155;
-        Thu, 21 Jul 2022 03:36:05 -0700 (PDT)
-Received: by mail-pf1-x432.google.com with SMTP id b133so1376772pfb.6;
-        Thu, 21 Jul 2022 03:36:05 -0700 (PDT)
+Received: from mail-pg1-x52f.google.com (mail-pg1-x52f.google.com [IPv6:2607:f8b0:4864:20::52f])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CE4936A9D3;
+        Thu, 21 Jul 2022 03:36:07 -0700 (PDT)
+Received: by mail-pg1-x52f.google.com with SMTP id s206so1294050pgs.3;
+        Thu, 21 Jul 2022 03:36:07 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
         h=from:to:cc:subject:date:message-id:in-reply-to:references
          :mime-version:content-transfer-encoding;
-        bh=5Ym1FB+/JJQNox/gaxXHdeqZtRcvY1gpDzJL3fRppc8=;
-        b=QBkmWhfEU8U0o5GNBUv8rEQRlOYAJQ+vTkBO40BEjnLDJlROYBfKQJ2fzGQBlj8a8w
-         a06a3ov8Maworp4uiXMcyEcfWOGJM6uGOQ+HoJEiEluHOkxBml3JgLCC5wWzuQ7CDbyp
-         biT/kMvdUywg98YTHoetMxYer+lkN7YX8ZJG+7zmesfqFILkOXYs/V2weUwDSJJoW0Yb
-         3sXZu2Ry6NSB0FnrrAYkZBi5O0rjmhU1JRY/qvu5g//Z9twsgOBkFVb1JTUZLmX+Isoi
-         Gfej0IrjXTIOEFUso7pI8mk380IS+rWpbP4ymtY2AiWZV8MdKaFt74ICHnWsu98hEvDN
-         O5ew==
+        bh=rk4YQEFZ9q3XkvsAPJzCLl3rTK6rSHOeH4GBUtkHDEc=;
+        b=mj4kSgA8HGlu9Nw+Ii1qbzC6c5a71cbDpWq+8HbTfKQMJt6q53h7dzGfExghUxqZ0L
+         VNjYxMAhM8QpDjpLuGA0Sjjio/1ip231Ov2k9hJMOsV59GtiWlvwna5GMLwR1Dl5hc0Z
+         srdJJTXsyMe3EofYXsCSMS4lLKxNNg1SBlpvSL5V5jyknYGxa9M/HpExC4Ai0FMTqor8
+         vom/aUynFWpt0ZUGeIK0yIf8BAy+6tZjWHWTsTIBomiCkIzMqPub8ePIcomAySKwED66
+         VD/3yZ7un4bl5ZnDjmRbzYTAioo5Rf/uw66GHpNN4a1JtFsZ2DylxTwZwWqQDbXOajCp
+         mclA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
          :references:mime-version:content-transfer-encoding;
-        bh=5Ym1FB+/JJQNox/gaxXHdeqZtRcvY1gpDzJL3fRppc8=;
-        b=I+iIGGk6z5HDWRUhDQsOZlb3B9SmaeNpHLaeiuYUIqgthuiEChz7+CDqZO8A+cExJw
-         x28c5NYZUC2V46P7ZSYXG3UYoVTA9hHMY3jHJaKbHNw9zWF2JVbDNAJpA0tzagPkZzPL
-         5CsBxUXpmRuFYh0TtcwDfsTO1Aa9pBxfViJTmlPefEvZaKuOTSSiqTVZizCHdZblIP6K
-         KULBOC+W2IN9fId4nH61Et29kilD2gb/FmNCXB8nfC9ao5g7Zt1R9iA5azPuIE2T47Im
-         WKhXBBtu7zx6Qi30CL0OOSx9ythqwmhoPBFCBFhe3O2gd46DWfhBaKc3n9zw5pVms85K
-         q5Qg==
-X-Gm-Message-State: AJIora9UCg557qseC+ykrhXBwmTuB/Cr0A1r9nxEEVxghcgpqcCPhJb6
-        lyjPYA1MB0fwYfcGV65QRRA=
-X-Google-Smtp-Source: AGRyM1vB9s6zBC9K5Is/MIZjEzvQtPMT3Wb6hEsyvFEVyXHFhrnT+i4vcHnFWgMOj4wj1uZ18D1/IA==
-X-Received: by 2002:a62:5bc5:0:b0:528:c346:9632 with SMTP id p188-20020a625bc5000000b00528c3469632mr43099409pfb.48.1658399765341;
-        Thu, 21 Jul 2022 03:36:05 -0700 (PDT)
+        bh=rk4YQEFZ9q3XkvsAPJzCLl3rTK6rSHOeH4GBUtkHDEc=;
+        b=WjTJTNjLnp7LRjWeunY4WnxR34qsvz1x/9mjilr4m5/ElF/X0OZeya/IrlpPjwBFiD
+         griIcUQ3eqEzIMm7T1yHyiESZrNhlEXPuV6JDFWUfJ/EzGC5U1FnAi2FX0bD5ez5mAj+
+         sytRlY+3/EHxp6U/7Mf7RbxJSfSAxL2POlhV3dDPTyCPAbvd8kw4ACAWQj1l33V+qE5c
+         7ZlWharKQrylOHwQWKCs46CHIx0doHHmM4EflQDU3RnLCAtlsuYaUydZIWvQ7gxEc/03
+         eRz8gqHDa3ym5PrqMGWnLZOYeynSKAKThAS4iP/jerNvTj4sp9wE+0bVwMm7yl/4LA1M
+         osrg==
+X-Gm-Message-State: AJIora9pLmgHBnBE5t6d0B+ppbDdLO7yJ7KcN5C161GBXJBHyjQg0aqm
+        dskgeuRLdt77WMwKHUUAN6s=
+X-Google-Smtp-Source: AGRyM1txJN0FEip0oGXy99I4KACumLEOC/+1s1HhOdVlBU3UjbAWgK+YkWGXz4gokpajNc1K6s7Ipw==
+X-Received: by 2002:a62:4e04:0:b0:52b:30f5:59b8 with SMTP id c4-20020a624e04000000b0052b30f559b8mr34941989pfb.37.1658399767349;
+        Thu, 21 Jul 2022 03:36:07 -0700 (PDT)
 Received: from localhost.localdomain ([103.7.29.32])
-        by smtp.gmail.com with ESMTPSA id q12-20020a65494c000000b00419aa0d9a2esm1161887pgs.28.2022.07.21.03.36.03
+        by smtp.gmail.com with ESMTPSA id q12-20020a65494c000000b00419aa0d9a2esm1161887pgs.28.2022.07.21.03.36.05
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 21 Jul 2022 03:36:05 -0700 (PDT)
+        Thu, 21 Jul 2022 03:36:07 -0700 (PDT)
 From:   Like Xu <like.xu.linux@gmail.com>
 X-Google-Original-From: Like Xu <likexu@tencent.com>
 To:     Paolo Bonzini <pbonzini@redhat.com>,
         Sean Christopherson <seanjc@google.com>
 Cc:     Jim Mattson <jmattson@google.com>, linux-kernel@vger.kernel.org,
         kvm@vger.kernel.org
-Subject: [PATCH v2 4/7] KVM: x86/pmu: Don't generate PEBS records for emulated instructions
-Date:   Thu, 21 Jul 2022 18:35:45 +0800
-Message-Id: <20220721103549.49543-5-likexu@tencent.com>
+Subject: [PATCH v2 5/7] KVM: x86/pmu: Avoid using PEBS perf_events for normal counters
+Date:   Thu, 21 Jul 2022 18:35:46 +0800
+Message-Id: <20220721103549.49543-6-likexu@tencent.com>
 X-Mailer: git-send-email 2.37.1
 In-Reply-To: <20220721103549.49543-1-likexu@tencent.com>
 References: <20220721103549.49543-1-likexu@tencent.com>
@@ -73,54 +73,96 @@ X-Mailing-List: kvm@vger.kernel.org
 
 From: Like Xu <likexu@tencent.com>
 
-KVM will accumulate an enabled counter for at least INSTRUCTIONS or
-BRANCH_INSTRUCTION hw event from any KVM emulated instructions,
-generating emulated overflow interrupt on counter overflow, which
-in theory should also happen when the PEBS counter overflows but
-it currently lacks this part of the underlying support (e.g. through
-software injection of records in the irq context or a lazy approach).
+The check logic in the pmc_resume_counter() to determine whether
+a perf_event is reusable is partial and flawed, especially when it
+comes to a pseudocode sequence (not correct but clearly valid) like:
 
-In this case, KVM skips the injection of this BUFFER_OVF PMI (effectively
-dropping one PEBS record) and let the overflow counter move on. The loss
-of a single sample does not introduce a loss of accuracy, but is easily
-noticeable for certain specific instructions.
+  - enabling a counter and its PEBS bit
+  - enable global_ctrl
+  - run workload
+  - disable only the PEBS bit, leaving the global_ctrl bit enabled
 
-This issue is expected to be addressed along with the issue
-of PEBS cross-mapped counters with a slow-path proposal.
+In this corner case, a perf_event created for PEBS can be reused by
+a normal counter before it has been released and recreated, and when this
+normal counter overflows, it triggers a PEBS interrupt (precise_ip != 0).
+
+To address this issue, the reuse check has been revamped and KVM will
+go back to do reprogram_counter() when any bit of guest PEBS_ENABLE
+msr has changed, which is similar to what global_ctrl_changed() does.
 
 Fixes: 79f3e3b58386 ("KVM: x86/pmu: Reprogram PEBS event to emulate guest PEBS counter")
 Signed-off-by: Like Xu <likexu@tencent.com>
 ---
- arch/x86/kvm/pmu.c | 16 +++++++++++++---
- 1 file changed, 13 insertions(+), 3 deletions(-)
+ arch/x86/kvm/pmu.c           |  4 ++--
+ arch/x86/kvm/vmx/pmu_intel.c | 14 +++++++-------
+ 2 files changed, 9 insertions(+), 9 deletions(-)
 
 diff --git a/arch/x86/kvm/pmu.c b/arch/x86/kvm/pmu.c
-index 02f9e4f245bd..390d697efde1 100644
+index 390d697efde1..d9b9a0f0db17 100644
 --- a/arch/x86/kvm/pmu.c
 +++ b/arch/x86/kvm/pmu.c
-@@ -106,9 +106,19 @@ static inline void __kvm_perf_overflow(struct kvm_pmc *pmc, bool in_pmi)
- 		return;
+@@ -237,8 +237,8 @@ static bool pmc_resume_counter(struct kvm_pmc *pmc)
+ 			      get_sample_period(pmc, pmc->counter)))
+ 		return false;
  
- 	if (pmc->perf_event && pmc->perf_event->attr.precise_ip) {
--		/* Indicate PEBS overflow PMI to guest. */
--		skip_pmi = __test_and_set_bit(GLOBAL_STATUS_BUFFER_OVF_BIT,
--					      (unsigned long *)&pmu->global_status);
-+		if (!in_pmi) {
-+			/*
-+			 * TODO: KVM is currently _choosing_ to not generate records
-+			 * for emulated instructions, avoiding BUFFER_OVF PMI when
-+			 * there are no records. Strictly speaking, it should be done
-+			 * as well in the right context to improve sampling accuracy.
-+			 */
-+			skip_pmi = true;
-+		} else {
-+			/* Indicate PEBS overflow PMI to guest. */
-+			skip_pmi = __test_and_set_bit(GLOBAL_STATUS_BUFFER_OVF_BIT,
-+						      (unsigned long *)&pmu->global_status);
-+		}
- 	} else {
- 		__set_bit(pmc->idx, (unsigned long *)&pmu->global_status);
+-	if (!test_bit(pmc->idx, (unsigned long *)&pmc_to_pmu(pmc)->pebs_enable) &&
+-	    pmc->perf_event->attr.precise_ip)
++	if (test_bit(pmc->idx, (unsigned long *)&pmc_to_pmu(pmc)->pebs_enable) !=
++	    (!!pmc->perf_event->attr.precise_ip))
+ 		return false;
+ 
+ 	/* reuse perf_event to serve as pmc_reprogram_counter() does*/
+diff --git a/arch/x86/kvm/vmx/pmu_intel.c b/arch/x86/kvm/vmx/pmu_intel.c
+index 22793348aa14..97236b6cbe04 100644
+--- a/arch/x86/kvm/vmx/pmu_intel.c
++++ b/arch/x86/kvm/vmx/pmu_intel.c
+@@ -68,15 +68,11 @@ static struct kvm_pmc *intel_pmc_idx_to_pmc(struct kvm_pmu *pmu, int pmc_idx)
  	}
+ }
+ 
+-/* function is called when global control register has been updated. */
+-static void global_ctrl_changed(struct kvm_pmu *pmu, u64 data)
++static void reprogram_counters(struct kvm_pmu *pmu, u64 diff)
+ {
+ 	int bit;
+-	u64 diff = pmu->global_ctrl ^ data;
+ 	struct kvm_pmc *pmc;
+ 
+-	pmu->global_ctrl = data;
+-
+ 	for_each_set_bit(bit, (unsigned long *)&diff, X86_PMC_IDX_MAX) {
+ 		pmc = intel_pmc_idx_to_pmc(pmu, bit);
+ 		if (pmc)
+@@ -404,7 +400,7 @@ static int intel_pmu_set_msr(struct kvm_vcpu *vcpu, struct msr_data *msr_info)
+ 	struct kvm_pmc *pmc;
+ 	u32 msr = msr_info->index;
+ 	u64 data = msr_info->data;
+-	u64 reserved_bits;
++	u64 reserved_bits, diff;
+ 
+ 	switch (msr) {
+ 	case MSR_CORE_PERF_FIXED_CTR_CTRL:
+@@ -425,7 +421,9 @@ static int intel_pmu_set_msr(struct kvm_vcpu *vcpu, struct msr_data *msr_info)
+ 		if (pmu->global_ctrl == data)
+ 			return 0;
+ 		if (kvm_valid_perf_global_ctrl(pmu, data)) {
+-			global_ctrl_changed(pmu, data);
++			diff = pmu->global_ctrl ^ data;
++			pmu->global_ctrl = data;
++			reprogram_counters(pmu, diff);
+ 			return 0;
+ 		}
+ 		break;
+@@ -440,7 +438,9 @@ static int intel_pmu_set_msr(struct kvm_vcpu *vcpu, struct msr_data *msr_info)
+ 		if (pmu->pebs_enable == data)
+ 			return 0;
+ 		if (!(data & pmu->pebs_enable_mask)) {
++			diff = pmu->pebs_enable ^ data;
+ 			pmu->pebs_enable = data;
++			reprogram_counters(pmu, diff);
+ 			return 0;
+ 		}
+ 		break;
 -- 
 2.37.1
 
