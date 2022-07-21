@@ -2,333 +2,127 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 2EA6E57D175
-	for <lists+kvm@lfdr.de>; Thu, 21 Jul 2022 18:27:05 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 3016A57D1A0
+	for <lists+kvm@lfdr.de>; Thu, 21 Jul 2022 18:36:30 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232154AbiGUQ1D (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 21 Jul 2022 12:27:03 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60666 "EHLO
+        id S229616AbiGUQg2 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 21 Jul 2022 12:36:28 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42344 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229576AbiGUQ1B (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 21 Jul 2022 12:27:01 -0400
-Received: from mail-pl1-x62e.google.com (mail-pl1-x62e.google.com [IPv6:2607:f8b0:4864:20::62e])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 595598875B
-        for <kvm@vger.kernel.org>; Thu, 21 Jul 2022 09:27:00 -0700 (PDT)
-Received: by mail-pl1-x62e.google.com with SMTP id f11so2299341plr.4
-        for <kvm@vger.kernel.org>; Thu, 21 Jul 2022 09:27:00 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=ycEo8rq5UtZnwC6hQzTjMDJ45cvRJruq/s+I5GijYek=;
-        b=j0qCNnv3YhAAKWjdYM5hb/iiBS30UPtTpaKzK/5qfPWowKMKN4d51LIGszGBELf1T+
-         S78AwILwSJ9DGmtRJg3Fo0Q3HhOGWjRSvwiNv73dTHvika9+p/eTIaWfdsYziUnAWJMl
-         croBjvv43nQChvWY1XFao+twS9ZtdTCzWyv4a83Dp/exb9x/Bqyl0JeB/q0Yp1juZCBq
-         lddLvZs2GQ9c7JFK33gblg5uN7yYRMG84FEVG7/JzluBpwMPzV0FGwgJJWjkVhTPA0Ow
-         zEF/51QmZNBUPsRkKSJysVjXePa9LJJ1MHTqquG6SRF9tIRxP10I8y62z9DSKEUGlj4v
-         laZQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=ycEo8rq5UtZnwC6hQzTjMDJ45cvRJruq/s+I5GijYek=;
-        b=QJBQY4bnxrBxnFFRrZBbS/WhHS+wSrkPYODBTz7T/cf5f9Q93vZPs67UT8J2WhSHhw
-         32N9BCATQfb/ATXe6F563UBukPgBnX/f78uhlSMMrYgiZhDSvF6NX9zKyVAL71jZMhht
-         PtmikRMwl5c2V8P/j+YtuGkMWoY+B1JsbTL1gVcWIAmxrazKFtG1HNgRrsf6DPxxBMA8
-         e9DEir65A+F8Qf+XWYUhbgxpWLgLT5e8sc7/GnB5Q+Mgh0KQMaayRAUnP0nyAeu9QWI+
-         N5w4lDzvofnvTyMaQQ+S1387lJxv7e6nLXLHBCf4nrSl5Rdvt8o9I8Sh28IS00cYPSQz
-         OR6g==
-X-Gm-Message-State: AJIora8drzEURSe1ynjYLgJF52WTBbF/nDZacZ7b4MQD0db5QaQ6ywyT
-        rzHgNAvUgxJ0pWyZyG6fNsJgyQ==
-X-Google-Smtp-Source: AGRyM1sBSifkUkW8ZgrEcen6BJPb/an/LJjySGt8ij20fV7nzG2bKuCb7RU2JZuXyxjk+6YJLjKcIw==
-X-Received: by 2002:a17:90b:3e8a:b0:1f0:4157:daf8 with SMTP id rj10-20020a17090b3e8a00b001f04157daf8mr12089359pjb.222.1658420819607;
-        Thu, 21 Jul 2022 09:26:59 -0700 (PDT)
-Received: from google.com (123.65.230.35.bc.googleusercontent.com. [35.230.65.123])
-        by smtp.gmail.com with ESMTPSA id s32-20020a17090a2f2300b001efc839ac97sm3900801pjd.3.2022.07.21.09.26.57
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 21 Jul 2022 09:26:57 -0700 (PDT)
-Date:   Thu, 21 Jul 2022 16:26:54 +0000
-From:   Sean Christopherson <seanjc@google.com>
-To:     Lai Jiangshan <jiangshanlai@gmail.com>
-Cc:     LKML <linux-kernel@vger.kernel.org>,
-        "open list:KERNEL VIRTUAL MACHINE FOR MIPS (KVM/mips)" 
-        <kvm@vger.kernel.org>, Paolo Bonzini <pbonzini@redhat.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Maxim Levitsky <mlevitsk@redhat.com>,
-        Lai Jiangshan <jiangshan.ljs@antgroup.com>
-Subject: Re: [PATCH 05/12] KVM: X86/MMU: Clear unsync bit directly in
- __mmu_unsync_walk()
-Message-ID: <Ytl+Tn8YBQR3KQFM@google.com>
-References: <20220605064342.309219-1-jiangshanlai@gmail.com>
- <20220605064342.309219-6-jiangshanlai@gmail.com>
- <YtcLiNskPb8z/2Qc@google.com>
- <CAJhGHyAoM+6cOh7XQUvavgJcUts53FW6BnjM_wqMD6fkoYoB3w@mail.gmail.com>
+        with ESMTP id S229558AbiGUQg1 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 21 Jul 2022 12:36:27 -0400
+Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A9AB51D0EF
+        for <kvm@vger.kernel.org>; Thu, 21 Jul 2022 09:36:24 -0700 (PDT)
+Received: from pps.filterd (m0187473.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.17.1.5/8.17.1.5) with ESMTP id 26LGaIAZ012659
+        for <kvm@vger.kernel.org>; Thu, 21 Jul 2022 16:36:24 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=date : from : to : cc :
+ subject : message-id : in-reply-to : references : mime-version :
+ content-type : content-transfer-encoding; s=pp1;
+ bh=tkS+Gp01EK5cn/tLmSkkf/7iv0WHkElr+pYFrapBi6c=;
+ b=hswZyKwPHQmfP2LiJo95qfD5dfVTyqvbnwV1LiJUJU4495td/kjS3IuEETkmK3Ovu7OP
+ Mkj3QJLv+CCg+5YCaIeEdHVH8A00dPc7BIzfEvs18cF/NJSl0SbgtwExxB0VuI6YjOGe
+ wNXhPFlA9mDKSaWgTpbwMgL4CLlN5x7bwgp/shTclHKPVxShxrwaFpI8i/Fi9n/SAPbL
+ +UJfu570PdqacPuElPtoQ42wnJJn+OrS1ODEZ6SjtHBPnXg38rfxTT4pqI/Q6UiBp3dW
+ mfUL9Xr5y/BraboIkQ4jAH4Cz0orRJF9vGfJR/+E4/kkhbIkETskvFs8/y9Qy0vHkIPr Bw== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3hf9s4sc83-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT)
+        for <kvm@vger.kernel.org>; Thu, 21 Jul 2022 16:36:24 +0000
+Received: from m0187473.ppops.net (m0187473.ppops.net [127.0.0.1])
+        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 26LGIpGW018800
+        for <kvm@vger.kernel.org>; Thu, 21 Jul 2022 16:36:23 GMT
+Received: from ppma05fra.de.ibm.com (6c.4a.5195.ip4.static.sl-reverse.com [149.81.74.108])
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3hf9s4sbup-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Thu, 21 Jul 2022 16:36:23 +0000
+Received: from pps.filterd (ppma05fra.de.ibm.com [127.0.0.1])
+        by ppma05fra.de.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 26LGMxLF008677;
+        Thu, 21 Jul 2022 16:32:59 GMT
+Received: from b06cxnps3075.portsmouth.uk.ibm.com (d06relay10.portsmouth.uk.ibm.com [9.149.109.195])
+        by ppma05fra.de.ibm.com with ESMTP id 3hbmy8wf4t-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Thu, 21 Jul 2022 16:32:59 +0000
+Received: from d06av22.portsmouth.uk.ibm.com (d06av22.portsmouth.uk.ibm.com [9.149.105.58])
+        by b06cxnps3075.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 26LGWunf24642038
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Thu, 21 Jul 2022 16:32:56 GMT
+Received: from d06av22.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 1802B4C04A;
+        Thu, 21 Jul 2022 16:32:56 +0000 (GMT)
+Received: from d06av22.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id CE34E4C044;
+        Thu, 21 Jul 2022 16:32:55 +0000 (GMT)
+Received: from p-imbrenda (unknown [9.145.4.232])
+        by d06av22.portsmouth.uk.ibm.com (Postfix) with ESMTP;
+        Thu, 21 Jul 2022 16:32:55 +0000 (GMT)
+Date:   Thu, 21 Jul 2022 18:30:29 +0200
+From:   Claudio Imbrenda <imbrenda@linux.ibm.com>
+To:     Nico Boehr <nrb@linux.ibm.com>
+Cc:     kvm@vger.kernel.org, frankja@linux.ibm.com, thuth@redhat.com
+Subject: Re: [kvm-unit-tests PATCH v1 1/2] s390x: factor out common args for
+ genprotimg
+Message-ID: <20220721183029.15f7ac2b@p-imbrenda>
+In-Reply-To: <20220721132647.552298-2-nrb@linux.ibm.com>
+References: <20220721132647.552298-1-nrb@linux.ibm.com>
+        <20220721132647.552298-2-nrb@linux.ibm.com>
+Organization: IBM
+X-Mailer: Claws Mail 4.1.0 (GTK 3.24.34; x86_64-redhat-linux-gnu)
 MIME-Version: 1.0
-Content-Type: multipart/mixed; boundary="JZkyYl2Tfi/vytoa"
-Content-Disposition: inline
-In-Reply-To: <CAJhGHyAoM+6cOh7XQUvavgJcUts53FW6BnjM_wqMD6fkoYoB3w@mail.gmail.com>
-X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-        USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=unavailable
-        autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-ORIG-GUID: kwubjQ6De0P2ALo3VlEkXIQdNDXMOmd4
+X-Proofpoint-GUID: T7RaVpkaXOBNTOsDq_N_cKX5BHEJFogb
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.205,Aquarius:18.0.883,Hydra:6.0.517,FMLib:17.11.122.1
+ definitions=2022-07-21_23,2022-07-20_01,2022-06-22_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 adultscore=0 mlxlogscore=999
+ malwarescore=0 clxscore=1015 impostorscore=0 phishscore=0 suspectscore=0
+ bulkscore=0 spamscore=0 lowpriorityscore=0 priorityscore=1501 mlxscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2206140000
+ definitions=main-2207210066
+X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_EF,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_PASS
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+On Thu, 21 Jul 2022 15:26:46 +0200
+Nico Boehr <nrb@linux.ibm.com> wrote:
 
---JZkyYl2Tfi/vytoa
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-
-On Thu, Jul 21, 2022, Lai Jiangshan wrote:
-> On Wed, Jul 20, 2022 at 3:52 AM Sean Christopherson <seanjc@google.com> wrote:
+> Upcoming changes will add more arguments to genprotimg. To avoid
+> duplicating this logic, move the arguments to genprotimg to a variable.
 > 
-> > > ---
-> > >  arch/x86/kvm/mmu/mmu.c | 22 +++++++++++++---------
-> > >  1 file changed, 13 insertions(+), 9 deletions(-)
-> > >
-> > > diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
-> > > index f35fd5c59c38..2446ede0b7b9 100644
-> > > --- a/arch/x86/kvm/mmu/mmu.c
-> > > +++ b/arch/x86/kvm/mmu/mmu.c
-> > > @@ -1794,19 +1794,23 @@ static int __mmu_unsync_walk(struct kvm_mmu_page *sp,
-> > >                               return -ENOSPC;
-> > >
-> > >                       ret = __mmu_unsync_walk(child, pvec);
-> > > -                     if (!ret) {
-> > > -                             clear_unsync_child_bit(sp, i);
-> > > -                             continue;
-> > > -                     } else if (ret > 0) {
-> > > -                             nr_unsync_leaf += ret;
-> > > -                     } else
-> > > +                     if (ret < 0)
-> > >                               return ret;
-> > > -             } else if (child->unsync) {
-> > > +                     nr_unsync_leaf += ret;
-> > > +             }
-> > > +
-> > > +             /*
-> > > +              * Clear unsync bit for @child directly if @child is fully
-> > > +              * walked and all the unsync shadow pages descended from
-> > > +              * @child (including itself) are added into @pvec, the caller
-> > > +              * must sync or zap all the unsync shadow pages in @pvec.
-> > > +              */
-> > > +             clear_unsync_child_bit(sp, i);
-> > > +             if (child->unsync) {
-> > >                       nr_unsync_leaf++;
-> > >                       if (mmu_pages_add(pvec, child, i))
-> >
-> > This ordering is wrong, no?  If the child itself is unsync and can't be added to
-> > @pvec, i.e. fails here, then clearing its bit in unsync_child_bitmap is wrong.
+> Signed-off-by: Nico Boehr <nrb@linux.ibm.com>
+
+Reviewed-by: Claudio Imbrenda <imbrenda@linux.ibm.com>
+
+> ---
+>  s390x/Makefile | 5 +++--
+>  1 file changed, 3 insertions(+), 2 deletions(-)
 > 
-> mmu_pages_add() can always successfully add the page to @pvec and
-> the caller needs to guarantee there is enough room to do so.
-> 
-> When it returns true, it means it will fail if you keep adding pages.
+> diff --git a/s390x/Makefile b/s390x/Makefile
+> index efd5e0c13102..34de233d09b8 100644
+> --- a/s390x/Makefile
+> +++ b/s390x/Makefile
+> @@ -165,11 +165,12 @@ $(SNIPPET_DIR)/c/%.hdr: $(SNIPPET_DIR)/c/%.gbin $(HOST_KEY_DOCUMENT)
+>  %.bin: %.elf
+>  	$(OBJCOPY) -O binary  $< $@
+>  
+> +genprotimg_args = --host-key-document $(HOST_KEY_DOCUMENT) --no-verify
+>  %selftest.pv.bin: %selftest.bin $(HOST_KEY_DOCUMENT) $(patsubst %.pv.bin,%.parmfile,$@)
+> -	$(GENPROTIMG) --host-key-document $(HOST_KEY_DOCUMENT) --parmfile $(patsubst %.pv.bin,%.parmfile,$@) --no-verify --image $< -o $@
+> +	$(GENPROTIMG) $(genprotimg_args) --parmfile $(patsubst %.pv.bin,%.parmfile,$@) --image $< -o $@
+>  
+>  %.pv.bin: %.bin $(HOST_KEY_DOCUMENT)
+> -	$(GENPROTIMG) --host-key-document $(HOST_KEY_DOCUMENT) --no-verify --image $< -o $@
+> +	$(GENPROTIMG) $(genprotimg_args) --image $< -o $@
+>  
+>  $(snippet_asmlib): $$(patsubst %.o,%.S,$$@) $(asm-offsets)
+>  	$(CC) $(CFLAGS) -c -nostdlib -o $@ $<
 
-Oof, that's downright evil.  As prep work, can you fold in the attached patches
-earlier in this series?  Then this patch can yield:
-
-	for_each_set_bit(i, sp->unsync_child_bitmap, 512) {
-		struct kvm_mmu_page *child;
-		u64 ent = sp->spt[i];
-
-		if (!is_shadow_present_pte(ent) || is_large_pte(ent))
-			goto clear_unsync_child;
-
-		child = to_shadow_page(ent & SPTE_BASE_ADDR_MASK);
-		if (!child->unsync && !child->unsync_children)
-			goto clear_unsync_child;
-
-		if (mmu_is_page_vec_full(pvec))
-			return -ENOSPC;
-
-		mmu_pages_add(pvec, child, i);
-
-		if (child->unsync_children) {
-			ret = __mmu_unsync_walk(child, pvec);
-			if (!ret)
-				goto clear_unsync_child;
-			else if (ret > 0)
-				nr_unsync_leaf += ret;
-			else
-				return ret;
-		} else {
-			nr_unsync_leaf++;
-		}
-
-clear_unsync_child:
-                /*
-                 * Clear the unsync info, the child is either already sync
-                 * (bitmap is stale) or is guaranteed to be zapped/synced by
-                 * the caller before mmu_lock is released.  Note, the caller is
-                 * required to zap/sync all entries in @pvec even if an error
-                 * is returned!
-                 */
-                clear_unsync_child_bit(sp, i);
-        }
-
---JZkyYl2Tfi/vytoa
-Content-Type: text/x-diff; charset=us-ascii
-Content-Disposition: attachment;
-	filename="0001-KVM-x86-mmu-Separate-page-vec-is-full-from-adding-a-.patch"
-
-From f2968d1afb08708c8292808b88aa915ec714e154 Mon Sep 17 00:00:00 2001
-From: Sean Christopherson <seanjc@google.com>
-Date: Thu, 21 Jul 2022 08:38:35 -0700
-Subject: [PATCH 1/2] KVM: x86/mmu: Separate "page vec is full" from adding a
- page to the array
-
-Move the check for a full "page vector" out of mmu_pages_add(), returning
-true/false (effectively) looks a _lot_ like returning success/fail, which
-is very misleading and will even be more misleading when a future patch
-clears the unsync child bit upon a page being added to the vector (as
-opposed to clearing the bit when the vector is processed by the caller).
-
-Checking that the vector is full when adding a previous page is also
-sub-optimal, e.g. KVM unnecessarily returns an error if the vector is
-full but there are no more unsync pages to process.  Separating the check
-from the "add" will allow fixing this quirk in a future patch.
-
-No functional change intended.
-
-Signed-off-by: Sean Christopherson <seanjc@google.com>
----
- arch/x86/kvm/mmu/mmu.c | 24 +++++++++++++++++-------
- 1 file changed, 17 insertions(+), 7 deletions(-)
-
-diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
-index 52664c3caaab..ac60a52044ef 100644
---- a/arch/x86/kvm/mmu/mmu.c
-+++ b/arch/x86/kvm/mmu/mmu.c
-@@ -1741,20 +1741,26 @@ struct kvm_mmu_pages {
- 	unsigned int nr;
- };
- 
--static int mmu_pages_add(struct kvm_mmu_pages *pvec, struct kvm_mmu_page *sp,
-+static bool mmu_is_page_vec_full(struct kvm_mmu_pages *pvec)
-+{
-+	return (pvec->nr == KVM_PAGE_ARRAY_NR);
-+}
-+
-+static void mmu_pages_add(struct kvm_mmu_pages *pvec, struct kvm_mmu_page *sp,
- 			 int idx)
- {
- 	int i;
- 
--	if (sp->unsync)
--		for (i=0; i < pvec->nr; i++)
-+	if (sp->unsync) {
-+		for (i = 0; i < pvec->nr; i++) {
- 			if (pvec->page[i].sp == sp)
--				return 0;
-+				return;
-+		}
-+	}
- 
- 	pvec->page[pvec->nr].sp = sp;
- 	pvec->page[pvec->nr].idx = idx;
- 	pvec->nr++;
--	return (pvec->nr == KVM_PAGE_ARRAY_NR);
- }
- 
- static inline void clear_unsync_child_bit(struct kvm_mmu_page *sp, int idx)
-@@ -1781,7 +1787,9 @@ static int __mmu_unsync_walk(struct kvm_mmu_page *sp,
- 		child = to_shadow_page(ent & SPTE_BASE_ADDR_MASK);
- 
- 		if (child->unsync_children) {
--			if (mmu_pages_add(pvec, child, i))
-+			mmu_pages_add(pvec, child, i);
-+
-+			if (mmu_is_page_vec_full(pvec))
- 				return -ENOSPC;
- 
- 			ret = __mmu_unsync_walk(child, pvec);
-@@ -1794,7 +1802,9 @@ static int __mmu_unsync_walk(struct kvm_mmu_page *sp,
- 				return ret;
- 		} else if (child->unsync) {
- 			nr_unsync_leaf++;
--			if (mmu_pages_add(pvec, child, i))
-+			mmu_pages_add(pvec, child, i);
-+
-+			if (mmu_is_page_vec_full(pvec))
- 				return -ENOSPC;
- 		} else
- 			clear_unsync_child_bit(sp, i);
--- 
-2.37.1.359.gd136c6c3e2-goog
-
-
---JZkyYl2Tfi/vytoa
-Content-Type: text/x-diff; charset=us-ascii
-Content-Disposition: attachment;
-	filename="0002-KVM-x86-mmu-Check-for-full-page-vector-_before_-addi.patch"
-
-From c8b0d983791ef783165bbf2230ebc41145bf052e Mon Sep 17 00:00:00 2001
-From: Sean Christopherson <seanjc@google.com>
-Date: Thu, 21 Jul 2022 08:49:37 -0700
-Subject: [PATCH 2/2] KVM: x86/mmu: Check for full page vector _before_ adding
- a new page
-
-Check for a full page vector before adding to the vector instead of after
-adding to the vector array, i.e. bail if and only if the vector is full
-_and_ a new page needs to be added.  Previously, KVM would still bail if
-the vector was full but there were no more unsync pages to process.
-
-Signed-off-by: Sean Christopherson <seanjc@google.com>
----
- arch/x86/kvm/mmu/mmu.c | 23 +++++++++++------------
- 1 file changed, 11 insertions(+), 12 deletions(-)
-
-diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
-index ac60a52044ef..aca9a8e6c626 100644
---- a/arch/x86/kvm/mmu/mmu.c
-+++ b/arch/x86/kvm/mmu/mmu.c
-@@ -1785,13 +1785,17 @@ static int __mmu_unsync_walk(struct kvm_mmu_page *sp,
- 		}
- 
- 		child = to_shadow_page(ent & SPTE_BASE_ADDR_MASK);
-+		if (!child->unsync && !child->unsync_children) {
-+			clear_unsync_child_bit(sp, i);
-+			continue;
-+		}
-+
-+		if (mmu_is_page_vec_full(pvec))
-+			return -ENOSPC;
-+
-+		mmu_pages_add(pvec, child, i);
- 
- 		if (child->unsync_children) {
--			mmu_pages_add(pvec, child, i);
--
--			if (mmu_is_page_vec_full(pvec))
--				return -ENOSPC;
--
- 			ret = __mmu_unsync_walk(child, pvec);
- 			if (!ret) {
- 				clear_unsync_child_bit(sp, i);
-@@ -1800,14 +1804,9 @@ static int __mmu_unsync_walk(struct kvm_mmu_page *sp,
- 				nr_unsync_leaf += ret;
- 			} else
- 				return ret;
--		} else if (child->unsync) {
-+		} else {
- 			nr_unsync_leaf++;
--			mmu_pages_add(pvec, child, i);
--
--			if (mmu_is_page_vec_full(pvec))
--				return -ENOSPC;
--		} else
--			clear_unsync_child_bit(sp, i);
-+		}
- 	}
- 
- 	return nr_unsync_leaf;
--- 
-2.37.1.359.gd136c6c3e2-goog
-
-
---JZkyYl2Tfi/vytoa--
