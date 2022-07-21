@@ -2,73 +2,65 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 13B9D57C232
-	for <lists+kvm@lfdr.de>; Thu, 21 Jul 2022 04:22:35 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id B662257C23D
+	for <lists+kvm@lfdr.de>; Thu, 21 Jul 2022 04:28:35 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229949AbiGUCWc (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 20 Jul 2022 22:22:32 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38266 "EHLO
+        id S230135AbiGUC2e (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 20 Jul 2022 22:28:34 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41734 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229515AbiGUCWb (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 20 Jul 2022 22:22:31 -0400
-Received: from mail-pg1-x532.google.com (mail-pg1-x532.google.com [IPv6:2607:f8b0:4864:20::532])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C91CB753B0;
-        Wed, 20 Jul 2022 19:22:30 -0700 (PDT)
-Received: by mail-pg1-x532.google.com with SMTP id r186so372616pgr.2;
-        Wed, 20 Jul 2022 19:22:30 -0700 (PDT)
+        with ESMTP id S229576AbiGUC2d (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 20 Jul 2022 22:28:33 -0400
+Received: from mail-wm1-x32c.google.com (mail-wm1-x32c.google.com [IPv6:2a00:1450:4864:20::32c])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 42ED67748D
+        for <kvm@vger.kernel.org>; Wed, 20 Jul 2022 19:28:32 -0700 (PDT)
+Received: by mail-wm1-x32c.google.com with SMTP id b21-20020a05600c4e1500b003a32bc8612fso77696wmq.3
+        for <kvm@vger.kernel.org>; Wed, 20 Jul 2022 19:28:32 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=message-id:date:mime-version:user-agent:subject:content-language:to
-         :cc:references:from:in-reply-to:content-transfer-encoding;
-        bh=4nLuxiwxNWSo6nYVmF5yVIePyzyJgZedSv2mAEqQoU0=;
-        b=XGsC8Qj+Vasfdh4AYTuUjqAVu0i6Jw68beIIBCjNEfp1WOKPdNq1d+/xhAlrH67CEe
-         uVvdOA88CnT13lTjaam+E7Qaaihs7SPqvmIPNaKSwmg10or8K5cLli2F6pKTSpihbb1E
-         8T4l9lg50W8vKFVJL5Fk035sf8wuWMJD9/enKMmvO5c+zmc39Lcy8Uc9r0qEigJeLpU1
-         uxK8q7lwH4a0lYy1rkO5xyRO7dbGHcMmY6uB0UEQOiubv1R9EZ6LrkUPgjjhizZ/yjHr
-         +CbCvW3MQiETTPiDP3EzG7w1lucyBTBH+rc5GHqIEDZCLa5srQFBnU1nw0shsc1B6bF3
-         xOgQ==
+        d=google.com; s=20210112;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc:content-transfer-encoding;
+        bh=19tjAXZdXv68l+YAa0ZBgRNpk344mTsjynA3NFgFKCA=;
+        b=TKoFdcXDZLfDMneVBORAok2+vyXEb+qu9uNr5uMmuS01DbWsKwgeyA5InrxDT+Es39
+         TS8SFJzYuqq7kQmqOkdrDt+aUiY/OKqSQPVfMrWqor0zv9GM56GPwglzZyTYQXSukIPv
+         2NvA7OMMiEXh2jy/w7M82TX0PZ2pDJi0pkI1uD6f5c2HLXEFYZMDa0rSkGdZ7L22EJb7
+         28lVqyBW0oiH3lmKnBpbNzqK/vtstvIbN/XlQ+RtjPiJx1DMcrZiQM32/y7X7S/H9r2f
+         6r7OuMf/nTGPozqlF1is0Xgl7v6P3eYROxJjcHuoK0nBdJBp3FuH63B+TptQHyDobQdJ
+         hDBw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
-         :content-language:to:cc:references:from:in-reply-to
-         :content-transfer-encoding;
-        bh=4nLuxiwxNWSo6nYVmF5yVIePyzyJgZedSv2mAEqQoU0=;
-        b=rnwlHG/N2fZpGejsjFYHCetRm+MFgMQ4F2ZTR918O9gUqrekMB11t8pVqurj1/cyYR
-         imzwOBcmR4GvPn54g4lgYNmb4LOGHuF181/6xc4PGFih/SB22KspfM/+7xDLlwx3x6Ns
-         Ukd/VqIQGP1rKpnZTyuqDMCnID786t+/sIwmUGgaGKV+3MsAtChVrlv7IDr2asdKs82N
-         z1OkXEZGK8ObNkyZPvrUcVoyZgpBadJKw9AN/ezOwUrWjJ9aRgp+ySBLK1UMv7PSklCx
-         tbE+N8e+PIcNmPbS02WfMO/yJErW8ROIRsaj9OJWVlGTYIPz8+rujnPaLX6rkvfiNah0
-         ON8w==
-X-Gm-Message-State: AJIora+0u5/W/TwewumlcPvDInszzf9wwWGj1qB5Y/a7UhN5XYqvmdpb
-        hdrzw9go33ZFZ8RnCef8sBBtTz+NzKX/ww==
-X-Google-Smtp-Source: AGRyM1tTvNe9tf8JnJSMKZmwPrM8GisIkMzBuVY5qL4Ry1vpfCNZfvak0SQ1NTvQf2a78QRXRNV69g==
-X-Received: by 2002:a63:1e49:0:b0:3fd:cf48:3694 with SMTP id p9-20020a631e49000000b003fdcf483694mr37308384pgm.275.1658370149785;
-        Wed, 20 Jul 2022 19:22:29 -0700 (PDT)
-Received: from [192.168.255.10] ([103.7.29.32])
-        by smtp.gmail.com with ESMTPSA id q2-20020a170902f34200b0015e8d4eb27esm247824ple.200.2022.07.20.19.22.22
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 20 Jul 2022 19:22:29 -0700 (PDT)
-Message-ID: <aacf1eb4-26f6-4c62-9c4a-d8249a986c8c@gmail.com>
-Date:   Thu, 21 Jul 2022 10:22:14 +0800
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc:content-transfer-encoding;
+        bh=19tjAXZdXv68l+YAa0ZBgRNpk344mTsjynA3NFgFKCA=;
+        b=feFq1NDZzpdnSGzwm+Ce4Dte32iIzFkZH9hFYWE/jMu8lo3wXLC1DDkxxHuVfNfse4
+         FySMYBGHDQOQw2xleE9EGvCqnJWFLD+wPgv9Sn3KY40eSaWUcANmDvqCmf+IkO1toPWU
+         cP3kZMT2KL3EY8DMc569cHn861jBb1GgdNyW9/owGpjzBOVIrm/ZdMfLTUKlLCW3mrD+
+         GJrg9C2QmnMBtmv/Dmkei5jalsHElLz0phUiy1xxB9klaocBIJUa8UCU5oOxMxvop5en
+         9T8ythDrMaDp80UF4rfCe6kIrjl06Rpsn/fm8TKtQJpnOMTpAcR1BrhoMLaRLIVnJ18a
+         ndOQ==
+X-Gm-Message-State: AJIora/ep7i6swP5Iho3kNidpG/bp3SwXnan/ZorIUR/Zs2x7qVDYGrT
+        0Al7tyZrKnFJPWwIsvbZouIu3gW1r7xR6Y3RldJRlw==
+X-Google-Smtp-Source: AGRyM1vE7AdNjWBIwuiujlKAqemHdV3gh9ZupYfREkyvjWQZ7lbVC7ZR8mv0zwVT+luSSVfqjBmsotZvsGZFZpciAQU=
+X-Received: by 2002:a05:600c:1e0f:b0:3a3:191c:a3c8 with SMTP id
+ ay15-20020a05600c1e0f00b003a3191ca3c8mr6353368wmb.151.1658370510638; Wed, 20
+ Jul 2022 19:28:30 -0700 (PDT)
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:91.0)
- Gecko/20100101 Thunderbird/91.11.0
-Subject: Re: [PATCH 4/7] KVM: x86/pmu: Not to generate PEBS records for
- emulated instructions
-Content-Language: en-US
+References: <20220719234950.3612318-1-aaronlewis@google.com>
+ <20220719234950.3612318-4-aaronlewis@google.com> <YtiOgtQy1bjL3VNX@google.com>
+In-Reply-To: <YtiOgtQy1bjL3VNX@google.com>
+From:   Aaron Lewis <aaronlewis@google.com>
+Date:   Thu, 21 Jul 2022 02:28:18 +0000
+Message-ID: <CAAAPnDEKS5hrunMg8Q5Gvt=bU81zZD6fMWsfqRJu029JXpvv1w@mail.gmail.com>
+Subject: Re: [RFC PATCH v2 3/3] selftests: kvm/x86: Test the flags in MSR
+ filtering / exiting
 To:     Sean Christopherson <seanjc@google.com>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>,
-        Jim Mattson <jmattson@google.com>,
-        linux-kernel@vger.kernel.org, kvm@vger.kernel.org
-References: <20220713122507.29236-1-likexu@tencent.com>
- <20220713122507.29236-5-likexu@tencent.com> <YtijFDufUBR7buyv@google.com>
-From:   Like Xu <like.xu.linux@gmail.com>
-In-Reply-To: <YtijFDufUBR7buyv@google.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,NICE_REPLY_A,
-        RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS autolearn=ham
+Cc:     kvm@vger.kernel.org, pbonzini@redhat.com, jmattson@google.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
+        USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=ham
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -76,87 +68,68 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 21/7/2022 8:51 am, Sean Christopherson wrote:
-> "Don't" instead of "Not to".  Not is an adverb, not a verb itself.
-> 
-> On Wed, Jul 13, 2022, Like Xu wrote:
->> From: Like Xu <likexu@tencent.com>
->>
->> The KVM accumulate an enabeld counter for at least INSTRUCTIONS or
-> 
-> Probably just "KVM" instead of "the KVM"?
-> 
-> s/enabeld/enabled
+> > --- a/tools/testing/selftests/kvm/x86_64/userspace_msr_exit_test.c
+> > +++ b/tools/testing/selftests/kvm/x86_64/userspace_msr_exit_test.c
+> > @@ -734,6 +734,99 @@ static void test_msr_permission_bitmap(void)
+> >       kvm_vm_free(vm);
+> >  }
+> >
+> > +static void test_results(int rc, const char *scmd, bool expected_succe=
+ss)
+>
+> Rather than pass in "success expected", pass in the actual value and the =
+valid
+> mask.  Then you can spit out the problematic value in the assert and be k=
+ind to
+> future debuggers.
+>
+> And similarly, make the __vm_ioctl() call here instead of in the "caller"=
+ and name
+> this __test_ioctl() (rename as necessary, see below) to show it's relatio=
+nship with
+> the macro.
 
-Applied, thanks.
+The other comments look good.  I'll update.
 
-> 
->> BRANCH_INSTRUCTION hw event from any KVM emulated instructions,
->> generating emulated overflow interrupt on counter overflow, which
->> in theory should also happen when the PEBS counter overflows but
->> it currently lacks this part of the underlying support (e.g. through
->> software injection of records in the irq context or a lazy approach).
->>
->> In this case, KVM skips the injection of this BUFFER_OVF PMI (effectively
->> dropping one PEBS record) and let the overflow counter move on. The loss
->> of a single sample does not introduce a loss of accuracy, but is easily
->> noticeable for certain specific instructions.
->>
->> This issue is expected to be addressed along with the issue
->> of PEBS cross-mapped counters with a slow-path proposal.
->>
->> Fixes: 79f3e3b58386 ("KVM: x86/pmu: Reprogram PEBS event to emulate guest PEBS counter")
->> Signed-off-by: Like Xu <likexu@tencent.com>
->> ---
->>   arch/x86/kvm/pmu.c | 11 ++++++++---
->>   1 file changed, 8 insertions(+), 3 deletions(-)
->>
->> diff --git a/arch/x86/kvm/pmu.c b/arch/x86/kvm/pmu.c
->> index 02f9e4f245bd..08ee0fed63d5 100644
->> --- a/arch/x86/kvm/pmu.c
->> +++ b/arch/x86/kvm/pmu.c
->> @@ -106,9 +106,14 @@ static inline void __kvm_perf_overflow(struct kvm_pmc *pmc, bool in_pmi)
->>   		return;
->>   
->>   	if (pmc->perf_event && pmc->perf_event->attr.precise_ip) {
->> -		/* Indicate PEBS overflow PMI to guest. */
->> -		skip_pmi = __test_and_set_bit(GLOBAL_STATUS_BUFFER_OVF_BIT,
->> -					      (unsigned long *)&pmu->global_status);
->> +		if (!in_pmi) {
->> +			/* The emulated instructions does not generate PEBS records. */
-> 
-> This needs a better comment.  IIUC, it's not that they don't generate records,
-> it's that KVM is _choosing_ to not generate records to hack around a different
-> bug(s).  If that's true a TODO or FIXME would also be nice.
+This one is a bit tricky though.  I did originally have __vm_ioctl()
+in test_results() (or whatever name it will end up with), but the
+static assert in kvm_do_ioctl() gave me problems.  Unless I make
+test_results() a macro, I have to force cmd to a uint64_t or something
+other than a literal, then I get this:
 
-Indeed, to understand more of the context, this part will look like this:
+include/kvm_util_base.h:190:39: error: expression in static assertion
+is not constant
+190 |         static_assert(!_IOC_SIZE(cmd) || sizeof(*arg) =3D=3D
+_IOC_SIZE(cmd), "");   \
+       |                                       ^
+include/kvm_util_base.h:213:9: note: in expansion of macro =E2=80=98kvm_do_=
+ioctl=E2=80=99
+213 |         kvm_do_ioctl((vm)->fd, cmd, arg);                       \
 
-		if (!in_pmi) {
-			/*
-			* TODO: KVM is currently _choosing_ to not generate records
-			* for emulated instructions, avoiding BUFFER_OVF PMI when
-			* there are no records. Strictly speaking, it should be done
-			* as well in the right context to improve sampling accuracy.
-			*/
-			skip_pmi = true;
-		} else {
-			/* Indicate PEBS overflow PMI to guest. */
-			skip_pmi = __test_and_set_bit(GLOBAL_STATUS_BUFFER_OVF_BIT,
-						      (unsigned long *)&pmu->global_status);
-		}
+That's not the only problem.  In order to pass 'arg' in I would have
+to pass it as a void *, making sizeof(*arg) wrong.
 
-, what do you think ?
+Being that the ioctl call was the first thing I did in that function I
+opted to make it a part of test_ioctl() rather than making
+test_results() a macro.
 
-> 
->> +			skip_pmi = true;
->> +		} else {
->> +			/* Indicate PEBS overflow PMI to guest. */
->> +			skip_pmi = __test_and_set_bit(GLOBAL_STATUS_BUFFER_OVF_BIT,
->> +						      (unsigned long *)&pmu->global_status);
->> +		}
->>   	} else {
->>   		__set_bit(pmc->idx, (unsigned long *)&pmu->global_status);
->>   	}
->> -- 
->> 2.37.0
->>
+If only C had templates :)
+
+>
+> > +{
+> > +     int expected_rc;
+> > +
+> > +     expected_rc =3D expected_success ? 0 : -1;
+> > +     TEST_ASSERT(rc =3D=3D expected_rc,
+> > +                 "Unexpected result from '%s', rc: %d, expected rc: %d=
+.",
+> > +                 scmd, rc, expected_rc);
+> > +     TEST_ASSERT(!rc || (rc =3D=3D -1 && errno =3D=3D EINVAL),
+> > +                 "Failures are expected to have rc =3D=3D -1 && errno =
+=3D=3D EINVAL(%d),\n"
+> > +                 "  got rc: %d, errno: %d",
+> > +                 EINVAL, rc, errno);
+> > +}
+> > +
+> > +#define test_ioctl(vm, cmd, arg, expected_success)   \
+>
