@@ -2,72 +2,82 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 9F5E657D161
-	for <lists+kvm@lfdr.de>; Thu, 21 Jul 2022 18:21:39 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 5957357D173
+	for <lists+kvm@lfdr.de>; Thu, 21 Jul 2022 18:25:53 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229481AbiGUQVg (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 21 Jul 2022 12:21:36 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55456 "EHLO
+        id S231948AbiGUQZv (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 21 Jul 2022 12:25:51 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59784 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232996AbiGUQVf (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 21 Jul 2022 12:21:35 -0400
-Received: from mail-pl1-x634.google.com (mail-pl1-x634.google.com [IPv6:2607:f8b0:4864:20::634])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 875C918399
-        for <kvm@vger.kernel.org>; Thu, 21 Jul 2022 09:21:34 -0700 (PDT)
-Received: by mail-pl1-x634.google.com with SMTP id f11so2285891plr.4
-        for <kvm@vger.kernel.org>; Thu, 21 Jul 2022 09:21:34 -0700 (PDT)
+        with ESMTP id S230043AbiGUQZu (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 21 Jul 2022 12:25:50 -0400
+Received: from mail-pg1-x533.google.com (mail-pg1-x533.google.com [IPv6:2607:f8b0:4864:20::533])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F3C9584EEC
+        for <kvm@vger.kernel.org>; Thu, 21 Jul 2022 09:25:45 -0700 (PDT)
+Received: by mail-pg1-x533.google.com with SMTP id e132so2111573pgc.5
+        for <kvm@vger.kernel.org>; Thu, 21 Jul 2022 09:25:45 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
         h=date:from:to:cc:subject:message-id:references:mime-version
          :content-disposition:content-transfer-encoding:in-reply-to;
-        bh=B5QADwm1IjojmIP5KhzAK+RFSkf1XxJ83WA0F0bHtjo=;
-        b=iUUJ1Ha+14FXUJoXmObbgUmonhYR0mB4408FF/ScjresrnZaUIpq/j+K6Dzthg1ADe
-         sKV0urwdg9XHOPe4H7iBH5oKYSPPiYLv5TfaJv6BPM+8YrQrWVzp/2wuMtBFiDXIIAtQ
-         hC0665IlnL2ixOxsIsVzxJDTXoKZ2pFbMnWzChQCWTP1nIh3jO3ma6n28ek5Zp+FGOYQ
-         IRD0p0cYR0tVxO9xgQu52295cbkmsFDs+6j9v9gEfVAM8OxtKqF4cTsDUPE2ZZ7+nA+r
-         GA2LgVy+5QsITEoFqs7lfZhcWUMchdRKAX8RBshFLTZVTAOcUdUrSayIsx2QCroB1TV6
-         odhw==
+        bh=5OeVO50J7VroLT736lBfkoQjjuYlp1AvuRN18nKvUnM=;
+        b=YMkM6vDLPLjmGcZQHgSmri+i2/nAPH+/qCTfgudw2H+zVQTjyTbi07IY4iX3Jp5NLk
+         OsvNgm0HxSQ0nRBBzaMovnt/g/rt+hqEaEoYl4unXO5xMrENsjB7ovNTLyuwr/EQhO5Q
+         Bng5DtDV1UUvxGtSghiWDgwWQdE0iq6DPKdQxiss1L6qI58lbXmEZc1/cN9/fkCn+WAE
+         uX8edVy7nXpmcxOpMQ0Gt0pbMvlclinuPpLfVZRrf83tDmq45etKijsNaRhegnVWwt5R
+         VJeWouHPEUlRz/f9rHFLue7LrGb7t67Ah1qTrZZp3MMPdCDo4l9oi0ogfYfsNiIGDfxk
+         6Oag==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:date:from:to:cc:subject:message-id:references
          :mime-version:content-disposition:content-transfer-encoding
          :in-reply-to;
-        bh=B5QADwm1IjojmIP5KhzAK+RFSkf1XxJ83WA0F0bHtjo=;
-        b=BlziTsYZ1F2JkPT7JzpR8auCFGslgnIXS9DVp0YrOL/NreEVSz/n1KOo9GdbJUdAXx
-         egyWofoZUWDeg8HyQtsZGVuMGu+agaUxJx1eW6wOwr1y/XaUJmiFyTZ/IgxgLnZNuMdJ
-         75LUrucgFdbec6R58Zv5I8nxzv80nvYizHnsMknfLO9KP/mmpQ2nTgxesK1+TgYIslB8
-         QB8JceDnNh4GUI+KRE5RXsHJIsHFN5GcYBsh1oRXObvQdRk2Ast54QpxhXlesVKnqPQJ
-         q5yt3r3JSa7yu+/ZJ4rBiwPRYozkKC4q1AwuDc6CGgfbPyn2MsuWPYUjZKoewpsYAoUJ
-         m4WA==
-X-Gm-Message-State: AJIora9WOFsW+RJGRQxnV/oifx+KA3a9hfFCB2z6LLiN6dXAc/LO2Vjb
-        DF8pMiBrDl0kGG3DDcY7Ip5BGQ==
-X-Google-Smtp-Source: AGRyM1uYJw8SiSBykSPdKMWwYiMI8y6/BXPB2OVNz12c04yXYZIYgKUchjjDsX68QiSfG0eluJFd2A==
-X-Received: by 2002:a17:902:e74d:b0:16d:1e82:c8e6 with SMTP id p13-20020a170902e74d00b0016d1e82c8e6mr9653520plf.17.1658420493795;
-        Thu, 21 Jul 2022 09:21:33 -0700 (PDT)
+        bh=5OeVO50J7VroLT736lBfkoQjjuYlp1AvuRN18nKvUnM=;
+        b=aMDHZYL2MpOVpD3iYtFF0gziJ+lWSX0V976AlQ5OBMM9aj73j6qzhE4ZjCuElQNJ+x
+         zVLPEctVS5TMWd2TPMHVc5AOwsZxF4wz67BI2VvNw9B4VtVrKbqX9TUIzU73MLMTGrKL
+         39gYGnL2pTyOP7V500aw024rppgSmuvn1A2VYcNP3tQ5McZ8euDJdu/MimKnq4iazDD+
+         lwxOJ0bgCenQT4Kxz9zQCzsdocVu4jSth5zfqiKh1sSKrLuIXziHPBhigoLhMDC7kox5
+         A1T9etN5vvpgGOOKEbcvZhY17J4Yt2wU8n4QO/6JLbEiweu/kxsNYhPxIAHUq1ZvMLG6
+         v+UQ==
+X-Gm-Message-State: AJIora8nCjoFjfC7f8TtFvX5LWUUfl0evGSeUaLvPRzpfP25caVwA5Kd
+        T4VnPP+w0q5dRWCOrpilIOOeAg==
+X-Google-Smtp-Source: AGRyM1ssGZStH5RKI0f7tLkGUTHVJhb80FN2mRQMENDsdJFujfu+pZ3MuEs/4tNXiZ1Rt1cUk09uYg==
+X-Received: by 2002:a63:4a12:0:b0:419:9ede:b7a0 with SMTP id x18-20020a634a12000000b004199edeb7a0mr36227511pga.167.1658420745211;
+        Thu, 21 Jul 2022 09:25:45 -0700 (PDT)
 Received: from google.com (123.65.230.35.bc.googleusercontent.com. [35.230.65.123])
-        by smtp.gmail.com with ESMTPSA id a12-20020aa795ac000000b0051be16492basm1987812pfk.195.2022.07.21.09.21.32
+        by smtp.gmail.com with ESMTPSA id i8-20020a170902c94800b0016d2dc52eb1sm1987771pla.18.2022.07.21.09.25.44
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 21 Jul 2022 09:21:33 -0700 (PDT)
-Date:   Thu, 21 Jul 2022 16:21:29 +0000
+        Thu, 21 Jul 2022 09:25:44 -0700 (PDT)
+Date:   Thu, 21 Jul 2022 16:25:40 +0000
 From:   Sean Christopherson <seanjc@google.com>
-To:     Aaron Lewis <aaronlewis@google.com>
-Cc:     kvm@vger.kernel.org, pbonzini@redhat.com, jmattson@google.com
-Subject: Re: [RFC PATCH v2 3/3] selftests: kvm/x86: Test the flags in MSR
- filtering / exiting
-Message-ID: <Ytl9CaEZUKMug5oD@google.com>
-References: <20220719234950.3612318-1-aaronlewis@google.com>
- <20220719234950.3612318-4-aaronlewis@google.com>
- <YtiOgtQy1bjL3VNX@google.com>
- <CAAAPnDEKS5hrunMg8Q5Gvt=bU81zZD6fMWsfqRJu029JXpvv1w@mail.gmail.com>
+To:     Maxim Levitsky <mlevitsk@redhat.com>
+Cc:     Santosh Shukla <santosh.shukla@amd.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>,
+        Tom Lendacky <thomas.lendacky@amd.com>, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+Subject: Re: [PATCHv2 4/7] KVM: SVM: Report NMI not allowed when Guest busy
+ handling VNMI
+Message-ID: <Ytl+BGei3zUlHY6l@google.com>
+References: <20220709134230.2397-1-santosh.shukla@amd.com>
+ <20220709134230.2397-5-santosh.shukla@amd.com>
+ <Yth5hl+RlTaa5ybj@google.com>
+ <c5acc3ac2aec4b98f9211ca3f4100c358bf2f460.camel@redhat.com>
+ <Ytlpxa2ULiIQFOnj@google.com>
+ <413f59cd3c0a80c5b71a0cd033fdaad082c5a0e7.camel@redhat.com>
+ <Ytl6GLui7UQFi3FO@google.com>
+ <23f156d46033a6434591186b0a7bcce3d8a138d1.camel@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <CAAAPnDEKS5hrunMg8Q5Gvt=bU81zZD6fMWsfqRJu029JXpvv1w@mail.gmail.com>
+In-Reply-To: <23f156d46033a6434591186b0a7bcce3d8a138d1.camel@redhat.com>
 X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
         ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-        USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=ham
+        USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=unavailable
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -75,65 +85,23 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Jul 21, 2022, Aaron Lewis wrote:
-> > > --- a/tools/testing/selftests/kvm/x86_64/userspace_msr_exit_test.c
-> > > +++ b/tools/testing/selftests/kvm/x86_64/userspace_msr_exit_test.c
-> > > @@ -734,6 +734,99 @@ static void test_msr_permission_bitmap(void)
-> > >       kvm_vm_free(vm);
-> > >  }
-> > >
-> > > +static void test_results(int rc, const char *scmd, bool expected_success)
-> >
-> > Rather than pass in "success expected", pass in the actual value and the valid
-> > mask.  Then you can spit out the problematic value in the assert and be kind to
-> > future debuggers.
-> >
-> > And similarly, make the __vm_ioctl() call here instead of in the "caller" and name
-> > this __test_ioctl() (rename as necessary, see below) to show it's relationship with
-> > the macro.
+On Thu, Jul 21, 2022, Maxim Levitsky wrote:
+> On Thu, 2022-07-21 at 16:08 +0000, Sean Christopherson wrote:
+> > So we have a poor man's NMI-window exiting.
 > 
-> The other comments look good.  I'll update.
+> Yep, we also intercept IRET for the same purpose, and RSM interception
+> is also a place the NMI are evaluated.
 > 
-> This one is a bit tricky though.  I did originally have __vm_ioctl()
-> in test_results() (or whatever name it will end up with), but the
-> static assert in kvm_do_ioctl() gave me problems.  Unless I make
-> test_results() a macro, I have to force cmd to a uint64_t or something
-> other than a literal, then I get this:
-> 
-> include/kvm_util_base.h:190:39: error: expression in static assertion
-> is not constant
-> 190 |         static_assert(!_IOC_SIZE(cmd) || sizeof(*arg) ==
-> _IOC_SIZE(cmd), "");   \
->        |                                       ^
-> include/kvm_util_base.h:213:9: note: in expansion of macro ‘kvm_do_ioctl’
-> 213 |         kvm_do_ioctl((vm)->fd, cmd, arg);                       \
-> 
-> That's not the only problem.  In order to pass 'arg' in I would have
-> to pass it as a void *, making sizeof(*arg) wrong.
-> 
-> Being that the ioctl call was the first thing I did in that function I
-> opted to make it a part of test_ioctl() rather than making
-> test_results() a macro.
-> 
-> If only C had templates :)
+> We only single step over the IRET, because NMIs are unmasked _after_ the IRET
+> retires.
 
-Eh, what C++ can do with templates, C can usually do with macros :-)
+Heh, check out this blurb from Intel's SDM:
 
-Sans backslashes, I think this can simply be:
+  An execution of the IRET instruction unblocks NMIs even if the instruction
+  causes a fault. For example, if the IRET instruction executes with EFLAGS.VM = 1
+  and IOPL of less than 3, a general-protection exception is generated (see
+  Section 20.2.7, “Sensitive Instructions”). In such a case, NMIs are unmasked
+  before the exception handler is invoked.
 
-#define test_user_exit_msr_ioctl(vm, cmd, arg, val, valid_mask)
-({
-	int r = __vm_ioctl(vm, cmd, arg);
-
-	if (val & valid_mask)
-		TEST_ASSERT(!r, KVM_IOCTL_ERROR(cmd, r));
-	else
-		TEST_ASSERT(r == -1 && errno == EINVAL,
-			    "Wanted EINVAL with val = 0x%llx, got  rc: %i errno: %i (%s)",
-			    val, r, errno,  strerror(errno))
-})
-
-
-It doesn't print "val" when success is expected, but I'm ok with that.  Though I
-suspect that adding a common macro to print additional info on an unexpected
-ioctl() result would be useful for other tests.
+Not that I want to try and handle that in KVM if AMD follows suit, I simply find
+it amusing how messy this all is.  A true NMI-window exit would have been nice...
