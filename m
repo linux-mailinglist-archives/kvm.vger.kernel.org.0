@@ -2,176 +2,209 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 6A7DC57C78D
-	for <lists+kvm@lfdr.de>; Thu, 21 Jul 2022 11:26:26 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 5487657C7BC
+	for <lists+kvm@lfdr.de>; Thu, 21 Jul 2022 11:34:30 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232695AbiGUJ0Y (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 21 Jul 2022 05:26:24 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57900 "EHLO
+        id S232566AbiGUJe1 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 21 Jul 2022 05:34:27 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36290 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230170AbiGUJ0X (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 21 Jul 2022 05:26:23 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 7561A7756F
-        for <kvm@vger.kernel.org>; Thu, 21 Jul 2022 02:26:21 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1658395580;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=pxqVBZnZmkgOHYwiYGXPDu4uhyKliCc2cAcObS0C01w=;
-        b=bb7fqamyHS9GFmq8uDAqWQwb3iJWNvxV9yoq01Smrxkx/x6QUiQDKZ7fHM9p+QCb82ouby
-        9KFPRl6THFvmGU9gCQ2KedVChMpYy2Nu4mIVAfHqY9nBG1GCKzmM7QJ0CYeqFF12jIs6xj
-        efsJ5tdAHnrnH7/6H1vKQ1QijtDM84k=
-Received: from mail-pj1-f70.google.com (mail-pj1-f70.google.com
- [209.85.216.70]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-479-R-7rvV4AMrWE7rbcope9GA-1; Thu, 21 Jul 2022 05:26:19 -0400
-X-MC-Unique: R-7rvV4AMrWE7rbcope9GA-1
-Received: by mail-pj1-f70.google.com with SMTP id c12-20020a17090a8d0c00b001f20d603777so2571122pjo.4
-        for <kvm@vger.kernel.org>; Thu, 21 Jul 2022 02:26:19 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
-         :content-language:to:cc:references:from:in-reply-to
-         :content-transfer-encoding;
-        bh=pxqVBZnZmkgOHYwiYGXPDu4uhyKliCc2cAcObS0C01w=;
-        b=Xz1VCxzmNWkTTyGKjBZ0lMxw5kLwgsuKK/y7yaRcDL3reC0SfvEbs/tdVF/2dXcGoM
-         4TjktgZEC266RWG2d6Yyq/24Jj+SwPNeUUDz/zvLfjVTcXu0SmLaYe8jBfeNBAJFoShj
-         xSUq+7NAKlGhTrmTOsaKj59ShRbd1NO7SAWvMjZ1mh0LOt8PGuVeyuoG6sDv7e5K7zRb
-         7qmFMZi6qPxcaHCAK1wgiWEPxWLx/X7z8HXcF4YmVdLexl4M9Eln5PPwFL5GBZwiMKcg
-         ZceF+nPCSRXD0kkOCqfFOl3f0Ar3Ethi1+IrOHI2cZqyx4tYYTZA9gXm+wob/kXQV1oj
-         FrDQ==
-X-Gm-Message-State: AJIora/03wQGjPeKmREIRFPyTgnEYnj5IlT13bm+gKgZefEGQ0fD5Rly
-        XILJsCt0N+wi8emllYD1gL+MRidnChDYn5sw63FHtUU3achgtn8KsRMBsb9Ldz2lwEoCItPlql7
-        viisZklnT48Hm
-X-Received: by 2002:a17:90a:f481:b0:1f2:43c:a61 with SMTP id bx1-20020a17090af48100b001f2043c0a61mr10625075pjb.134.1658395578170;
-        Thu, 21 Jul 2022 02:26:18 -0700 (PDT)
-X-Google-Smtp-Source: AGRyM1sVEm7Oz/22bKmKW2lh3GmJtdU5mssFIrGu+0Tisk4DP+fMNvbSDHGVBHUYgonKpLqTeG+uag==
-X-Received: by 2002:a17:90a:f481:b0:1f2:43c:a61 with SMTP id bx1-20020a17090af48100b001f2043c0a61mr10625043pjb.134.1658395577872;
-        Thu, 21 Jul 2022 02:26:17 -0700 (PDT)
-Received: from [10.72.12.47] ([209.132.188.80])
-        by smtp.gmail.com with ESMTPSA id l28-20020a635b5c000000b0041a411823d4sm1036080pgm.22.2022.07.21.02.26.04
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 21 Jul 2022 02:26:17 -0700 (PDT)
-Message-ID: <726a5056-789a-b445-a2c6-879008ad270a@redhat.com>
-Date:   Thu, 21 Jul 2022 17:25:59 +0800
+        with ESMTP id S229663AbiGUJeZ (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 21 Jul 2022 05:34:25 -0400
+Received: from mga07.intel.com (mga07.intel.com [134.134.136.100])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 897D48053F;
+        Thu, 21 Jul 2022 02:34:24 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1658396064; x=1689932064;
+  h=date:from:to:cc:subject:message-id:reply-to:references:
+   mime-version:in-reply-to;
+  bh=wCb9PX4Sp0/BeSAl8rvIo3FQtV/S7LHLo0bGkTMYvrA=;
+  b=TztBwVMhKq369DA2k08ewtfAXu9LZpAjXKVivbEJIVR6GjjdyXJ4DKx2
+   L/bM0MgvQmYONtr8u3N504B/v+KOZDhtOx5aQJSH6xKe5f+e9d+yvIP4f
+   cwF84aN6RNa7V0Fq+KMd9H+4yFmFH8eWEg4oYnr6MWsctfEWUrWw8OSJB
+   +DBGymO1Im9DlG9PUUMSWmTWLPHppbN7T86A1DwLB7/kAhRgcvvM1AAzQ
+   KY5eeys0UEejnRrnlebBNbUB4PcefCXj0Nmqo+QQzUK/Uhs6XJLSss/0T
+   4psZu8l/Rts/oKACBA/aElGcQOCzQ1EyZ55yeHRnP/TQDJbsLExiTTadI
+   w==;
+X-IronPort-AV: E=McAfee;i="6400,9594,10414"; a="350988486"
+X-IronPort-AV: E=Sophos;i="5.92,289,1650956400"; 
+   d="scan'208";a="350988486"
+Received: from fmsmga008.fm.intel.com ([10.253.24.58])
+  by orsmga105.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 21 Jul 2022 02:34:06 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.92,289,1650956400"; 
+   d="scan'208";a="656666919"
+Received: from chaop.bj.intel.com (HELO localhost) ([10.240.193.75])
+  by fmsmga008.fm.intel.com with ESMTP; 21 Jul 2022 02:33:56 -0700
+Date:   Thu, 21 Jul 2022 17:29:06 +0800
+From:   Chao Peng <chao.p.peng@linux.intel.com>
+To:     Wei Wang <wei.w.wang@linux.intel.com>
+Cc:     Sean Christopherson <seanjc@google.com>,
+        "Gupta, Pankaj" <pankaj.gupta@amd.com>, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org, linux-mm@kvack.org,
+        linux-fsdevel@vger.kernel.org, linux-api@vger.kernel.org,
+        linux-doc@vger.kernel.org, qemu-devel@nongnu.org,
+        linux-kselftest@vger.kernel.org,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Jonathan Corbet <corbet@lwn.net>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+        x86@kernel.org, "H . Peter Anvin" <hpa@zytor.com>,
+        Hugh Dickins <hughd@google.com>,
+        Jeff Layton <jlayton@kernel.org>,
+        "J . Bruce Fields" <bfields@fieldses.org>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        Shuah Khan <shuah@kernel.org>, Mike Rapoport <rppt@kernel.org>,
+        Steven Price <steven.price@arm.com>,
+        "Maciej S . Szmigiero" <mail@maciej.szmigiero.name>,
+        Vlastimil Babka <vbabka@suse.cz>,
+        Vishal Annapurve <vannapurve@google.com>,
+        Yu Zhang <yu.c.zhang@linux.intel.com>,
+        "Kirill A . Shutemov" <kirill.shutemov@linux.intel.com>,
+        luto@kernel.org, jun.nakajima@intel.com, dave.hansen@intel.com,
+        ak@linux.intel.com, david@redhat.com, aarcange@redhat.com,
+        ddutile@redhat.com, dhildenb@redhat.com,
+        Quentin Perret <qperret@google.com>,
+        Michael Roth <michael.roth@amd.com>, mhocko@suse.com,
+        Muchun Song <songmuchun@bytedance.com>
+Subject: Re: [PATCH v7 11/14] KVM: Register/unregister the guest private
+ memory regions
+Message-ID: <20220721092906.GA153288@chaop.bj.intel.com>
+Reply-To: Chao Peng <chao.p.peng@linux.intel.com>
+References: <20220706082016.2603916-1-chao.p.peng@linux.intel.com>
+ <20220706082016.2603916-12-chao.p.peng@linux.intel.com>
+ <f02baa37-8d34-5d07-a0ae-300ffefc7fee@amd.com>
+ <20220719140843.GA84779@chaop.bj.intel.com>
+ <36e671d2-6b95-8e4f-c2ac-fee4b2670c6e@amd.com>
+ <20220720150706.GB124133@chaop.bj.intel.com>
+ <d0fd229d-afa6-c66d-3e55-09ac5877453e@amd.com>
+ <YtgrkXqP/GIi9ujZ@google.com>
+ <45ae9f57-d595-f202-abb5-26a03a2ca131@linux.intel.com>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:91.0)
- Gecko/20100101 Thunderbird/91.11.0
-Subject: Re: [PATCH v12 38/40] virtio_net: support rx queue resize
-Content-Language: en-US
-To:     Xuan Zhuo <xuanzhuo@linux.alibaba.com>,
-        virtualization@lists.linux-foundation.org
-Cc:     Richard Weinberger <richard@nod.at>,
-        Anton Ivanov <anton.ivanov@cambridgegreys.com>,
-        Johannes Berg <johannes@sipsolutions.net>,
-        "Michael S. Tsirkin" <mst@redhat.com>,
-        "David S. Miller" <davem@davemloft.net>,
-        Eric Dumazet <edumazet@google.com>,
-        Jakub Kicinski <kuba@kernel.org>,
-        Paolo Abeni <pabeni@redhat.com>,
-        Hans de Goede <hdegoede@redhat.com>,
-        Mark Gross <markgross@kernel.org>,
-        Vadim Pasternak <vadimp@nvidia.com>,
-        Bjorn Andersson <bjorn.andersson@linaro.org>,
-        Mathieu Poirier <mathieu.poirier@linaro.org>,
-        Cornelia Huck <cohuck@redhat.com>,
-        Halil Pasic <pasic@linux.ibm.com>,
-        Eric Farman <farman@linux.ibm.com>,
-        Heiko Carstens <hca@linux.ibm.com>,
-        Vasily Gorbik <gor@linux.ibm.com>,
-        Alexander Gordeev <agordeev@linux.ibm.com>,
-        Christian Borntraeger <borntraeger@linux.ibm.com>,
-        Sven Schnelle <svens@linux.ibm.com>,
-        Alexei Starovoitov <ast@kernel.org>,
-        Daniel Borkmann <daniel@iogearbox.net>,
-        Jesper Dangaard Brouer <hawk@kernel.org>,
-        John Fastabend <john.fastabend@gmail.com>,
-        Vincent Whitchurch <vincent.whitchurch@axis.com>,
-        linux-um@lists.infradead.org, netdev@vger.kernel.org,
-        platform-driver-x86@vger.kernel.org,
-        linux-remoteproc@vger.kernel.org, linux-s390@vger.kernel.org,
-        kvm@vger.kernel.org, bpf@vger.kernel.org,
-        kangjie.xu@linux.alibaba.com
-References: <20220720030436.79520-1-xuanzhuo@linux.alibaba.com>
- <20220720030436.79520-39-xuanzhuo@linux.alibaba.com>
-From:   Jason Wang <jasowang@redhat.com>
-In-Reply-To: <20220720030436.79520-39-xuanzhuo@linux.alibaba.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-3.5 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
-        RCVD_IN_DNSWL_LOW,SPF_HELO_NONE,SPF_NONE autolearn=unavailable
-        autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <45ae9f57-d595-f202-abb5-26a03a2ca131@linux.intel.com>
+X-Spam-Status: No, score=-5.0 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,SPF_HELO_NONE,
+        SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+On Thu, Jul 21, 2022 at 03:34:59PM +0800, Wei Wang wrote:
+> 
+> 
+> On 7/21/22 00:21, Sean Christopherson wrote:
+> > On Wed, Jul 20, 2022, Gupta, Pankaj wrote:
+> > > > > > > > +bool __weak kvm_arch_private_mem_supported(struct kvm *kvm)
+> > Use kvm_arch_has_private_mem(), both because "has" makes it obvious this is checking
+> > a flag of sorts, and to align with other helpers of this nature (and with
+> > CONFIG_HAVE_KVM_PRIVATE_MEM).
+> > 
+> >    $ git grep kvm_arch | grep supported | wc -l
+> >    0
+> >    $ git grep kvm_arch | grep has | wc -l
+> >    26
 
-在 2022/7/20 11:04, Xuan Zhuo 写道:
-> This patch implements the resize function of the rx queues.
-> Based on this function, it is possible to modify the ring num of the
-> queue.
->
-> Signed-off-by: Xuan Zhuo <xuanzhuo@linux.alibaba.com>
-> ---
->   drivers/net/virtio_net.c | 22 ++++++++++++++++++++++
->   1 file changed, 22 insertions(+)
->
-> diff --git a/drivers/net/virtio_net.c b/drivers/net/virtio_net.c
-> index fe4dc43c05a1..1115a8b59a08 100644
-> --- a/drivers/net/virtio_net.c
-> +++ b/drivers/net/virtio_net.c
-> @@ -278,6 +278,8 @@ struct padded_vnet_hdr {
->   	char padding[12];
->   };
->   
-> +static void virtnet_rq_free_unused_buf(struct virtqueue *vq, void *buf);
-> +
->   static bool is_xdp_frame(void *ptr)
->   {
->   	return (unsigned long)ptr & VIRTIO_XDP_FLAG;
-> @@ -1846,6 +1848,26 @@ static netdev_tx_t start_xmit(struct sk_buff *skb, struct net_device *dev)
->   	return NETDEV_TX_OK;
->   }
->   
-> +static int virtnet_rx_resize(struct virtnet_info *vi,
-> +			     struct receive_queue *rq, u32 ring_num)
-> +{
-> +	int err, qindex;
-> +
-> +	qindex = rq - vi->rq;
-> +
-> +	napi_disable(&rq->napi);
+Make sense. kvm_arch_has_private_mem it actually better.
 
+> > 
+> > > > > > > > +#ifdef CONFIG_HAVE_KVM_PRIVATE_MEM
+> > > > > > > > +	case KVM_MEMORY_ENCRYPT_REG_REGION:
+> > > > > > > > +	case KVM_MEMORY_ENCRYPT_UNREG_REGION: {
+> > > > > > > > +		struct kvm_enc_region region;
+> > > > > > > > +
+> > > > > > > > +		if (!kvm_arch_private_mem_supported(kvm))
+> > > > > > > > +			goto arch_vm_ioctl;
+> > > > > > > > +
+> > > > > > > > +		r = -EFAULT;
+> > > > > > > > +		if (copy_from_user(&region, argp, sizeof(region)))
+> > > > > > > > +			goto out;
+> > > > > > > > +
+> > > > > > > > +		r = kvm_vm_ioctl_set_encrypted_region(kvm, ioctl, &region);
+> > > > > > > this is to store private region metadata not only the encrypted region?
+> > > > > > Correct.
+> > > > > Sorry for not being clear, was suggesting name change of this function from:
+> > > > > "kvm_vm_ioctl_set_encrypted_region" to "kvm_vm_ioctl_set_private_region"
+> > > > Though I don't have strong reason to change it, I'm fine with this and
+> > > Yes, no strong reason, just thought "kvm_vm_ioctl_set_private_region" would
+> > > depict the actual functionality :)
+> > > 
+> > > > this name matches the above kvm_arch_private_mem_supported perfectly.
+> > > BTW could not understand this, how "kvm_vm_ioctl_set_encrypted_region"
+> > > matches "kvm_arch_private_mem_supported"?
+> > Chao is saying that kvm_vm_ioctl_set_private_region() pairs nicely with
+> > kvm_arch_private_mem_supported(), not that the "encrypted" variant pairs nicely.
+> > 
+> > I also like using "private" instead of "encrypted", though we should probably
+> > find a different verb than "set", because calling "set_private" when making the
+> > region shared is confusing.  I'm struggling to come up with a good alternative
+> > though.
+> > 
+> > kvm_vm_ioctl_set_memory_region() is already taken by KVM_SET_USER_MEMORY_REGION,
+> > and that also means that anything with "memory_region" in the name is bound to be
+> > confusing.
+> > 
+> > Hmm, and if we move away from "encrypted", it probably makes sense to pass in
+> > addr+size instead of a kvm_enc_region.
 
-We need to disable refill work as well. So this series might need 
-rebasing on top of
+This makes sense.
 
-https://lore.kernel.org/netdev/20220704074859.16912-1-jasowang@redhat.com/
+> > 
+> > Maybe this?
+> > 
+> > static int kvm_vm_ioctl_set_or_clear_mem_private(struct kvm *kvm, gpa_t gpa,
+> > 					         gpa_t size, bool set_private)
 
-I will send a new version (probably tomorrow).
+Currently this should work.
 
-Thanks
+> > 
+> > and then:
+> > 
+> > #ifdef CONFIG_HAVE_KVM_PRIVATE_MEM
+> > 	case KVM_MEMORY_ENCRYPT_REG_REGION:
+> > 	case KVM_MEMORY_ENCRYPT_UNREG_REGION: {
+> > 		bool set = ioctl == KVM_MEMORY_ENCRYPT_REG_REGION;
+> > 		struct kvm_enc_region region;
+> > 
+> > 		if (!kvm_arch_private_mem_supported(kvm))
+> > 			goto arch_vm_ioctl;
+> > 
+> > 		r = -EFAULT;
+> > 		if (copy_from_user(&region, argp, sizeof(region)))
+> > 			goto out;
+> > 
+> > 		r = kvm_vm_ioctl_set_or_clear_mem_private(kvm, region.addr,
+> > 							  region.size, set);
+> > 		break;
+> > 	}
+> > #endif
+> > 
+> > I don't love it, so if someone has a better idea...
+> > 
+> Maybe you could tag it with cgs for all the confidential guest support
+> related stuff:
+> e.g. kvm_vm_ioctl_set_cgs_mem()
+> 
+> bool is_private = ioctl == KVM_MEMORY_ENCRYPT_REG_REGION;
+> ...
+> kvm_vm_ioctl_set_cgs_mem(, is_private)
 
+If we plan to widely use such abbr. through KVM (e.g. it's well known),
+I'm fine.
 
-> +
-> +	err = virtqueue_resize(rq->vq, ring_num, virtnet_rq_free_unused_buf);
-> +	if (err)
-> +		netdev_err(vi->dev, "resize rx fail: rx queue index: %d err: %d\n", qindex, err);
-> +
-> +	if (!try_fill_recv(vi, rq, GFP_KERNEL))
-> +		schedule_delayed_work(&vi->refill, 0);
-> +
-> +	virtnet_napi_enable(rq->vq, &rq->napi);
-> +	return err;
-> +}
-> +
->   /*
->    * Send command via the control virtqueue and check status.  Commands
->    * supported by the hypervisor, as indicated by feature bits, should
+I actually use mem_attr in patch: https://lkml.org/lkml/2022/7/20/610
+But I also don't quite like it, it's so generic and sounds say nothing.
 
+But I do want a name can cover future usages other than just 
+private/shared (pKVM for example may have a third state).
+
+Thanks,
+Chao
