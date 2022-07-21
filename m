@@ -2,101 +2,105 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 1872257D5C1
-	for <lists+kvm@lfdr.de>; Thu, 21 Jul 2022 23:16:23 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id ADCEB57D5CE
+	for <lists+kvm@lfdr.de>; Thu, 21 Jul 2022 23:19:16 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233773AbiGUVQV (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 21 Jul 2022 17:16:21 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36536 "EHLO
+        id S233845AbiGUVTO (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 21 Jul 2022 17:19:14 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39158 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233749AbiGUVQR (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 21 Jul 2022 17:16:17 -0400
+        with ESMTP id S233732AbiGUVTM (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 21 Jul 2022 17:19:12 -0400
 Received: from mail-pg1-x52d.google.com (mail-pg1-x52d.google.com [IPv6:2607:f8b0:4864:20::52d])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2C8505C347
-        for <kvm@vger.kernel.org>; Thu, 21 Jul 2022 14:16:15 -0700 (PDT)
-Received: by mail-pg1-x52d.google.com with SMTP id 6so2751326pgb.13
-        for <kvm@vger.kernel.org>; Thu, 21 Jul 2022 14:16:15 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D323D91CF1
+        for <kvm@vger.kernel.org>; Thu, 21 Jul 2022 14:19:10 -0700 (PDT)
+Received: by mail-pg1-x52d.google.com with SMTP id 72so2834297pge.0
+        for <kvm@vger.kernel.org>; Thu, 21 Jul 2022 14:19:10 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
         h=date:from:to:cc:subject:message-id:references:mime-version
          :content-disposition:in-reply-to;
-        bh=11OqmbhSRizQ74Ch/j9J4lE0a0EnvcFlYhbfmnjs8Cg=;
-        b=RenZ/SKdXZfOHNevGxkMopwKMPWrfJxiCyc9BeId33rQlF1/1vzAERKsROGsgu73PO
-         3Vh+kBwRBR34zv6Cs7ZDNkRpWgwILWeqJwmR13cSjtmU0unAVdR41Nf/NH0jfEogkr2r
-         JHF9df+/fhRXMvvJnH3igBuCM+wK+xZhIdC/GSM24+Vcw7Gc90w73jNaPXTXhKdfuYLT
-         Dku2YQ2CN5mLe0SZz1eF0QJrwRspDs0R8NQZXQX7+lxV0WzhKtPvY+5ITZxdh5gN/3r+
-         nMFKRwOUV1v2Cq34kX1X0GD8LegMqzy3ApouqelaYdqEVdaSzVtSegGXRc/6GHjh0zKx
-         /wJg==
+        bh=ScpzxJyKmeludExQxXIszukI2lfSKDVjTGaUtRwviD0=;
+        b=fYYV0vbwKMgnf6isTcV+vMM02uE3HouFd898nbPDmChcgRckNqpK/32TxwPnHN227J
+         ++L0os8W6x9ium+SRGtN1Ky0yP28Yuv/qHye6YY85twUgSpz5cL4iafN1yWBzT5mF5jT
+         zfZ0audvBpI4c00xFJNjzqhLBl3DeJoNNfW967aC5PgjacYCopiCYm4yTM/A0/u+cirV
+         MUabNXNe86MjLj4FukHS14w3Pyv+H9Fs6bPQsVG7BpQl5iGi6UTeRa3otGxN0BH1ah9v
+         19fMAXWCGwObG/1U0EneiYQ/0oaLDLnpN90yC2Rxw6G7kn46NiP6IFXR/iv11/pJMTkK
+         uw5A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:date:from:to:cc:subject:message-id:references
          :mime-version:content-disposition:in-reply-to;
-        bh=11OqmbhSRizQ74Ch/j9J4lE0a0EnvcFlYhbfmnjs8Cg=;
-        b=u1j0fs0qVVLHuinf+GdcfGRyVIpVf20WzxfEKb891tCnQYtPgJEemwNhVFya9VkDEK
-         tRzbsqG+CwENvxFZUGtgUBnj986fsJoevLgVjFHys+grENQNKBofsrzFIiAvZLQRoa8N
-         jIgsfglDqDzVlP/lscEg0J+CeTJoV1+Ik6zeR7Xd8Cp7lqGbj4pMU1HN74XqKlAwe0em
-         nn8nm+HTAYFF2nxv9Eg042ES88+b26aRyFJ4V8dlOzPYAxytUGdt4WB6yMFqyvsZH8um
-         pfPO5yxG97jcLeJ7D9JAdUQP1qB/PxrogA1OVL1hlK09WBB1Jbi02povIHJoccISO7Dk
-         7zRg==
-X-Gm-Message-State: AJIora8WFp3JqBoYiXMQWKj88ptD1ZFzO6LdyAsjLGLSsUk9Kgpz3rtz
-        4zLyj8tn4owebBR7GJIOwjR70u9JuZ6YZg==
-X-Google-Smtp-Source: AGRyM1tYVnSFtctc/PTPJVmFsiWSfHQt3N50JGg4333C9oMWtUgpVYWuQQYd9+YZX+C2GpeXrgjMVA==
-X-Received: by 2002:a65:6151:0:b0:412:e419:d651 with SMTP id o17-20020a656151000000b00412e419d651mr289868pgv.378.1658438174487;
-        Thu, 21 Jul 2022 14:16:14 -0700 (PDT)
+        bh=ScpzxJyKmeludExQxXIszukI2lfSKDVjTGaUtRwviD0=;
+        b=UeoynEcKf6hWkfuSpaxy0ny0yBDEo51RdF0HGxipU3H4bBDuG41d8JzpEyUsiZwEAc
+         d2XEgRwtVYQGR4XuAWwfMaE0jHRW1RaQAG2suqCtnMy+D8t3kPqLpg0XfNIPnbrb7lXx
+         4ZCNLLABcfKxufLDjwvuYbjjE6UXdEOuw57CARHuQ5Eo8FBMxi+bA26qlnT0sg+6TEkB
+         z0xorbXQU7XTgUIMpG7KFp1Nad8+ta7eNcHSRSny352AAzI67ws4mhElic6ynIVKzUiy
+         BdLVSwvehrtoPQiOrZ/vzqDZRnFDFkRAPuLX4NBSrL5R3ZRwqdFewdAoKIOyTtjwVYCi
+         qwHA==
+X-Gm-Message-State: AJIora9rgdsZDRC0AZBiZ5ow+QihqDVKyybCKyEF0bRyyntNjIqvtMIh
+        Z9LrOom70mOF8nWKCffjscw8kg==
+X-Google-Smtp-Source: AGRyM1tRhRp+6mg/TcG9DeP0WjeN5fNx2D34QSPiNsnaUnKIDpEjYXyyrYr8GL+NFtkg+bEZ2FCYeg==
+X-Received: by 2002:a65:6d19:0:b0:41a:625e:7d7a with SMTP id bf25-20020a656d19000000b0041a625e7d7amr275152pgb.506.1658438350139;
+        Thu, 21 Jul 2022 14:19:10 -0700 (PDT)
 Received: from google.com (123.65.230.35.bc.googleusercontent.com. [35.230.65.123])
-        by smtp.gmail.com with ESMTPSA id h6-20020a056a00000600b00528c6c7bf37sm2213407pfk.129.2022.07.21.14.16.13
+        by smtp.gmail.com with ESMTPSA id i67-20020a62c146000000b005289fbef7c4sm2243655pfg.140.2022.07.21.14.19.09
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 21 Jul 2022 14:16:13 -0700 (PDT)
-Date:   Thu, 21 Jul 2022 21:16:10 +0000
+        Thu, 21 Jul 2022 14:19:09 -0700 (PDT)
+Date:   Thu, 21 Jul 2022 21:19:06 +0000
 From:   Sean Christopherson <seanjc@google.com>
-To:     Vishal Annapurve <vannapurve@google.com>
-Cc:     x86 <x86@kernel.org>, kvm list <kvm@vger.kernel.org>,
-        LKML <linux-kernel@vger.kernel.org>,
-        linux-kselftest@vger.kernel.org,
+To:     "Gupta, Pankaj" <pankaj.gupta@amd.com>
+Cc:     Chao Peng <chao.p.peng@linux.intel.com>,
+        Quentin Perret <qperret@google.com>,
+        Michael Roth <michael.roth@amd.com>,
+        Andy Lutomirski <luto@kernel.org>,
+        Steven Price <steven.price@arm.com>,
+        kvm list <kvm@vger.kernel.org>,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+        linux-mm@kvack.org, linux-fsdevel@vger.kernel.org,
+        Linux API <linux-api@vger.kernel.org>, qemu-devel@nongnu.org,
         Paolo Bonzini <pbonzini@redhat.com>,
+        Jonathan Corbet <corbet@lwn.net>,
         Vitaly Kuznetsov <vkuznets@redhat.com>,
         Wanpeng Li <wanpengli@tencent.com>,
         Jim Mattson <jmattson@google.com>,
         Joerg Roedel <joro@8bytes.org>,
         Thomas Gleixner <tglx@linutronix.de>,
         Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        dave.hansen@linux.intel.com, "H . Peter Anvin" <hpa@zytor.com>,
-        shauh@kernel.org, yang.zhong@intel.com, drjones@redhat.com,
-        Ricardo Koller <ricarkol@google.com>,
-        Aaron Lewis <aaronlewis@google.com>, wei.w.wang@intel.com,
-        "Kirill A . Shutemov" <kirill.shutemov@linux.intel.com>,
-        Jonathan Corbet <corbet@lwn.net>,
-        Hugh Dickins <hughd@google.com>,
+        the arch/x86 maintainers <x86@kernel.org>,
+        "H. Peter Anvin" <hpa@zytor.com>, Hugh Dickins <hughd@google.com>,
         Jeff Layton <jlayton@kernel.org>,
         "J . Bruce Fields" <bfields@fieldses.org>,
         Andrew Morton <akpm@linux-foundation.org>,
-        Chao Peng <chao.p.peng@linux.intel.com>,
+        Mike Rapoport <rppt@kernel.org>,
+        "Maciej S . Szmigiero" <mail@maciej.szmigiero.name>,
+        Vlastimil Babka <vbabka@suse.cz>,
+        Vishal Annapurve <vannapurve@google.com>,
         Yu Zhang <yu.c.zhang@linux.intel.com>,
-        Jun Nakajima <jun.nakajima@intel.com>,
+        "Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>,
+        "Nakajima, Jun" <jun.nakajima@intel.com>,
         Dave Hansen <dave.hansen@intel.com>,
-        Michael Roth <michael.roth@amd.com>,
-        Quentin Perret <qperret@google.com>,
-        Steven Price <steven.price@arm.com>,
         Andi Kleen <ak@linux.intel.com>,
         David Hildenbrand <david@redhat.com>,
-        Andy Lutomirski <luto@kernel.org>,
-        Vlastimil Babka <vbabka@suse.cz>,
-        Marc Orr <marcorr@google.com>,
-        Erdem Aktas <erdemaktas@google.com>,
-        Peter Gonda <pgonda@google.com>,
-        "Nikunj A. Dadhania" <nikunj@amd.com>,
-        Austin Diviness <diviness@google.com>
-Subject: Re: [RFC V2 PATCH 2/8] selftests: kvm: Add a basic selftest to test
- private memory
-Message-ID: <YtnCGktd8S7gtAQJ@google.com>
-References: <20220511000811.384766-1-vannapurve@google.com>
- <20220511000811.384766-3-vannapurve@google.com>
- <YtiJx11AZHslcGnN@google.com>
- <CAGtprH9BQkcJcpp=uEJJLwM-Z=cW9rsJ7iVKbjv_gisVj8EWGQ@mail.gmail.com>
+        Marc Zyngier <maz@kernel.org>, Will Deacon <will@kernel.org>,
+        nikunj@amd.com, ashish.kalra@amd.com
+Subject: Re: [PATCH v5 00/13] KVM: mm: fd-based approach for supporting KVM
+ guest private memory
+Message-ID: <YtnCyqbI26QfRuOP@google.com>
+References: <83fd55f8-cd42-4588-9bf6-199cbce70f33@www.fastmail.com>
+ <YksIQYdG41v3KWkr@google.com>
+ <Ykslo2eo2eRXrpFR@google.com>
+ <eefc3c74-acca-419c-8947-726ce2458446@www.fastmail.com>
+ <Ykwbqv90C7+8K+Ao@google.com>
+ <YkyEaYiL0BrDYcZv@google.com>
+ <20220422105612.GB61987@chaop.bj.intel.com>
+ <20220509223056.pyazfxjwjvipmytb@amd.com>
+ <YnmjvX9ow4elYsY8@google.com>
+ <c3ca63d6-db27-d783-40ca-486b3fbbced7@amd.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <CAGtprH9BQkcJcpp=uEJJLwM-Z=cW9rsJ7iVKbjv_gisVj8EWGQ@mail.gmail.com>
+In-Reply-To: <c3ca63d6-db27-d783-40ca-486b3fbbced7@amd.com>
 X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
         ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
@@ -108,34 +112,34 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Jul 21, 2022, Vishal Annapurve wrote:
-> On Wed, Jul 20, 2022 at 4:03 PM Sean Christopherson <seanjc@google.com> wrote:
-> > ...
-> > > + * which doesn't handle global offset table updates. Calling standard libc
-> > > + * functions would normally result in referring to the global offset table.
-> > > + * Adding O1 here seems to prohibit compiler from replacing the memory
-> > > + * operations with standard libc functions such as memset.
-> > > + */
-> >
-> > Eww.  We should either fix kvm_vm_elf_load() or override the problematic libc
-> > variants.  Playing games with per-function attributes is not maintainable.
-> >
+On Thu, Jul 21, 2022, Gupta, Pankaj wrote:
 > 
-> I will try to spend more time on how kvm_vm_elf_load can be modified
-> to handle GOT fixups in different scenarios including
-> statically/dynamically linked sefltest binaries as I currently recall
-> limited information here.
+> Hi Sean, Chao,
 > 
-> But modifying kvm_vm_elf_load to fixup GOT entries will be
-> insufficient as guest VM code (possibly whole selftest binary) will
-> need to be compiled with flags that allow memset/memcpy
-> implementations to work with specific guest VM configurations e.g. AVX
-> extension. Same concern is outlined in
-> https://elixir.bootlin.com/linux/latest/source/tools/testing/selftests/kvm/lib/x86_64/svm.c#L64.
+> While attempting to solve the pre-boot guest payload/firmware population
+> into private memory for SEV SNP, retrieved this thread. Have question below:
 > 
-> Would it be ok to maintain selftest binary compilation flags based on
-> guest VM configurations?
+> > > > Requirements & Gaps
+> > > > -------------------------------------
+> > > >    - Confidential computing(CC): TDX/SEV/CCA
+> > > >      * Need support both explicit/implicit conversions.
+> > > >      * Need support only destructive conversion at runtime.
+> > > >      * The current patch should just work, but prefer to have pre-boot guest
+> > > >        payload/firmware population into private memory for performance.
+> > > 
+> > > Not just performance in the case of SEV, it's needed there because firmware
+> > > only supports in-place encryption of guest memory, there's no mechanism to
+> > > provide a separate buffer to load into guest memory at pre-boot time. I
+> > > think you're aware of this but wanted to point that out just in case.
+> > 
+> > I view it as a performance problem because nothing stops KVM from copying from
+> > userspace into the private fd during the SEV ioctl().  What's missing is the
+> > ability for userspace to directly initialze the private fd, which may or may not
+> > avoid an extra memcpy() depending on how clever userspace is.
+> Can you please elaborate more what you see as a performance problem? And
+> possible ways to solve it?
 
-No, we should instead define/implement versions of memset/memcpy that are
-guaranteed to be guest-friendly, either explicitly by selftests are implicitly
-by compiler builtins, e.g. see arch/x86/boot/string.h.
+Oh, I'm not saying there actually _is_ a performance problem.  What I'm saying is
+that in-place encryption is not a functional requirement, which means it's purely
+an optimization, and thus we should other bother supporting in-place encryption
+_if_ it would solve a performane bottleneck.
