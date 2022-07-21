@@ -2,78 +2,71 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 5957357D173
-	for <lists+kvm@lfdr.de>; Thu, 21 Jul 2022 18:25:53 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 2EA6E57D175
+	for <lists+kvm@lfdr.de>; Thu, 21 Jul 2022 18:27:05 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231948AbiGUQZv (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 21 Jul 2022 12:25:51 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59784 "EHLO
+        id S232154AbiGUQ1D (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 21 Jul 2022 12:27:03 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60666 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230043AbiGUQZu (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 21 Jul 2022 12:25:50 -0400
-Received: from mail-pg1-x533.google.com (mail-pg1-x533.google.com [IPv6:2607:f8b0:4864:20::533])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F3C9584EEC
-        for <kvm@vger.kernel.org>; Thu, 21 Jul 2022 09:25:45 -0700 (PDT)
-Received: by mail-pg1-x533.google.com with SMTP id e132so2111573pgc.5
-        for <kvm@vger.kernel.org>; Thu, 21 Jul 2022 09:25:45 -0700 (PDT)
+        with ESMTP id S229576AbiGUQ1B (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 21 Jul 2022 12:27:01 -0400
+Received: from mail-pl1-x62e.google.com (mail-pl1-x62e.google.com [IPv6:2607:f8b0:4864:20::62e])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 595598875B
+        for <kvm@vger.kernel.org>; Thu, 21 Jul 2022 09:27:00 -0700 (PDT)
+Received: by mail-pl1-x62e.google.com with SMTP id f11so2299341plr.4
+        for <kvm@vger.kernel.org>; Thu, 21 Jul 2022 09:27:00 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
         h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:content-transfer-encoding:in-reply-to;
-        bh=5OeVO50J7VroLT736lBfkoQjjuYlp1AvuRN18nKvUnM=;
-        b=YMkM6vDLPLjmGcZQHgSmri+i2/nAPH+/qCTfgudw2H+zVQTjyTbi07IY4iX3Jp5NLk
-         OsvNgm0HxSQ0nRBBzaMovnt/g/rt+hqEaEoYl4unXO5xMrENsjB7ovNTLyuwr/EQhO5Q
-         Bng5DtDV1UUvxGtSghiWDgwWQdE0iq6DPKdQxiss1L6qI58lbXmEZc1/cN9/fkCn+WAE
-         uX8edVy7nXpmcxOpMQ0Gt0pbMvlclinuPpLfVZRrf83tDmq45etKijsNaRhegnVWwt5R
-         VJeWouHPEUlRz/f9rHFLue7LrGb7t67Ah1qTrZZp3MMPdCDo4l9oi0ogfYfsNiIGDfxk
-         6Oag==
+         :content-disposition:in-reply-to;
+        bh=ycEo8rq5UtZnwC6hQzTjMDJ45cvRJruq/s+I5GijYek=;
+        b=j0qCNnv3YhAAKWjdYM5hb/iiBS30UPtTpaKzK/5qfPWowKMKN4d51LIGszGBELf1T+
+         S78AwILwSJ9DGmtRJg3Fo0Q3HhOGWjRSvwiNv73dTHvika9+p/eTIaWfdsYziUnAWJMl
+         croBjvv43nQChvWY1XFao+twS9ZtdTCzWyv4a83Dp/exb9x/Bqyl0JeB/q0Yp1juZCBq
+         lddLvZs2GQ9c7JFK33gblg5uN7yYRMG84FEVG7/JzluBpwMPzV0FGwgJJWjkVhTPA0Ow
+         zEF/51QmZNBUPsRkKSJysVjXePa9LJJ1MHTqquG6SRF9tIRxP10I8y62z9DSKEUGlj4v
+         laZQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:content-transfer-encoding
-         :in-reply-to;
-        bh=5OeVO50J7VroLT736lBfkoQjjuYlp1AvuRN18nKvUnM=;
-        b=aMDHZYL2MpOVpD3iYtFF0gziJ+lWSX0V976AlQ5OBMM9aj73j6qzhE4ZjCuElQNJ+x
-         zVLPEctVS5TMWd2TPMHVc5AOwsZxF4wz67BI2VvNw9B4VtVrKbqX9TUIzU73MLMTGrKL
-         39gYGnL2pTyOP7V500aw024rppgSmuvn1A2VYcNP3tQ5McZ8euDJdu/MimKnq4iazDD+
-         lwxOJ0bgCenQT4Kxz9zQCzsdocVu4jSth5zfqiKh1sSKrLuIXziHPBhigoLhMDC7kox5
-         A1T9etN5vvpgGOOKEbcvZhY17J4Yt2wU8n4QO/6JLbEiweu/kxsNYhPxIAHUq1ZvMLG6
-         v+UQ==
-X-Gm-Message-State: AJIora8nCjoFjfC7f8TtFvX5LWUUfl0evGSeUaLvPRzpfP25caVwA5Kd
-        T4VnPP+w0q5dRWCOrpilIOOeAg==
-X-Google-Smtp-Source: AGRyM1ssGZStH5RKI0f7tLkGUTHVJhb80FN2mRQMENDsdJFujfu+pZ3MuEs/4tNXiZ1Rt1cUk09uYg==
-X-Received: by 2002:a63:4a12:0:b0:419:9ede:b7a0 with SMTP id x18-20020a634a12000000b004199edeb7a0mr36227511pga.167.1658420745211;
-        Thu, 21 Jul 2022 09:25:45 -0700 (PDT)
+         :mime-version:content-disposition:in-reply-to;
+        bh=ycEo8rq5UtZnwC6hQzTjMDJ45cvRJruq/s+I5GijYek=;
+        b=QJBQY4bnxrBxnFFRrZBbS/WhHS+wSrkPYODBTz7T/cf5f9Q93vZPs67UT8J2WhSHhw
+         32N9BCATQfb/ATXe6F563UBukPgBnX/f78uhlSMMrYgiZhDSvF6NX9zKyVAL71jZMhht
+         PtmikRMwl5c2V8P/j+YtuGkMWoY+B1JsbTL1gVcWIAmxrazKFtG1HNgRrsf6DPxxBMA8
+         e9DEir65A+F8Qf+XWYUhbgxpWLgLT5e8sc7/GnB5Q+Mgh0KQMaayRAUnP0nyAeu9QWI+
+         N5w4lDzvofnvTyMaQQ+S1387lJxv7e6nLXLHBCf4nrSl5Rdvt8o9I8Sh28IS00cYPSQz
+         OR6g==
+X-Gm-Message-State: AJIora8drzEURSe1ynjYLgJF52WTBbF/nDZacZ7b4MQD0db5QaQ6ywyT
+        rzHgNAvUgxJ0pWyZyG6fNsJgyQ==
+X-Google-Smtp-Source: AGRyM1sBSifkUkW8ZgrEcen6BJPb/an/LJjySGt8ij20fV7nzG2bKuCb7RU2JZuXyxjk+6YJLjKcIw==
+X-Received: by 2002:a17:90b:3e8a:b0:1f0:4157:daf8 with SMTP id rj10-20020a17090b3e8a00b001f04157daf8mr12089359pjb.222.1658420819607;
+        Thu, 21 Jul 2022 09:26:59 -0700 (PDT)
 Received: from google.com (123.65.230.35.bc.googleusercontent.com. [35.230.65.123])
-        by smtp.gmail.com with ESMTPSA id i8-20020a170902c94800b0016d2dc52eb1sm1987771pla.18.2022.07.21.09.25.44
+        by smtp.gmail.com with ESMTPSA id s32-20020a17090a2f2300b001efc839ac97sm3900801pjd.3.2022.07.21.09.26.57
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 21 Jul 2022 09:25:44 -0700 (PDT)
-Date:   Thu, 21 Jul 2022 16:25:40 +0000
+        Thu, 21 Jul 2022 09:26:57 -0700 (PDT)
+Date:   Thu, 21 Jul 2022 16:26:54 +0000
 From:   Sean Christopherson <seanjc@google.com>
-To:     Maxim Levitsky <mlevitsk@redhat.com>
-Cc:     Santosh Shukla <santosh.shukla@amd.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
+To:     Lai Jiangshan <jiangshanlai@gmail.com>
+Cc:     LKML <linux-kernel@vger.kernel.org>,
+        "open list:KERNEL VIRTUAL MACHINE FOR MIPS (KVM/mips)" 
+        <kvm@vger.kernel.org>, Paolo Bonzini <pbonzini@redhat.com>,
         Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        Tom Lendacky <thomas.lendacky@amd.com>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-Subject: Re: [PATCHv2 4/7] KVM: SVM: Report NMI not allowed when Guest busy
- handling VNMI
-Message-ID: <Ytl+BGei3zUlHY6l@google.com>
-References: <20220709134230.2397-1-santosh.shukla@amd.com>
- <20220709134230.2397-5-santosh.shukla@amd.com>
- <Yth5hl+RlTaa5ybj@google.com>
- <c5acc3ac2aec4b98f9211ca3f4100c358bf2f460.camel@redhat.com>
- <Ytlpxa2ULiIQFOnj@google.com>
- <413f59cd3c0a80c5b71a0cd033fdaad082c5a0e7.camel@redhat.com>
- <Ytl6GLui7UQFi3FO@google.com>
- <23f156d46033a6434591186b0a7bcce3d8a138d1.camel@redhat.com>
+        Maxim Levitsky <mlevitsk@redhat.com>,
+        Lai Jiangshan <jiangshan.ljs@antgroup.com>
+Subject: Re: [PATCH 05/12] KVM: X86/MMU: Clear unsync bit directly in
+ __mmu_unsync_walk()
+Message-ID: <Ytl+Tn8YBQR3KQFM@google.com>
+References: <20220605064342.309219-1-jiangshanlai@gmail.com>
+ <20220605064342.309219-6-jiangshanlai@gmail.com>
+ <YtcLiNskPb8z/2Qc@google.com>
+ <CAJhGHyAoM+6cOh7XQUvavgJcUts53FW6BnjM_wqMD6fkoYoB3w@mail.gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: multipart/mixed; boundary="JZkyYl2Tfi/vytoa"
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <23f156d46033a6434591186b0a7bcce3d8a138d1.camel@redhat.com>
+In-Reply-To: <CAJhGHyAoM+6cOh7XQUvavgJcUts53FW6BnjM_wqMD6fkoYoB3w@mail.gmail.com>
 X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
         ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
@@ -85,23 +78,257 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Jul 21, 2022, Maxim Levitsky wrote:
-> On Thu, 2022-07-21 at 16:08 +0000, Sean Christopherson wrote:
-> > So we have a poor man's NMI-window exiting.
+
+--JZkyYl2Tfi/vytoa
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+
+On Thu, Jul 21, 2022, Lai Jiangshan wrote:
+> On Wed, Jul 20, 2022 at 3:52 AM Sean Christopherson <seanjc@google.com> wrote:
 > 
-> Yep, we also intercept IRET for the same purpose, and RSM interception
-> is also a place the NMI are evaluated.
+> > > ---
+> > >  arch/x86/kvm/mmu/mmu.c | 22 +++++++++++++---------
+> > >  1 file changed, 13 insertions(+), 9 deletions(-)
+> > >
+> > > diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
+> > > index f35fd5c59c38..2446ede0b7b9 100644
+> > > --- a/arch/x86/kvm/mmu/mmu.c
+> > > +++ b/arch/x86/kvm/mmu/mmu.c
+> > > @@ -1794,19 +1794,23 @@ static int __mmu_unsync_walk(struct kvm_mmu_page *sp,
+> > >                               return -ENOSPC;
+> > >
+> > >                       ret = __mmu_unsync_walk(child, pvec);
+> > > -                     if (!ret) {
+> > > -                             clear_unsync_child_bit(sp, i);
+> > > -                             continue;
+> > > -                     } else if (ret > 0) {
+> > > -                             nr_unsync_leaf += ret;
+> > > -                     } else
+> > > +                     if (ret < 0)
+> > >                               return ret;
+> > > -             } else if (child->unsync) {
+> > > +                     nr_unsync_leaf += ret;
+> > > +             }
+> > > +
+> > > +             /*
+> > > +              * Clear unsync bit for @child directly if @child is fully
+> > > +              * walked and all the unsync shadow pages descended from
+> > > +              * @child (including itself) are added into @pvec, the caller
+> > > +              * must sync or zap all the unsync shadow pages in @pvec.
+> > > +              */
+> > > +             clear_unsync_child_bit(sp, i);
+> > > +             if (child->unsync) {
+> > >                       nr_unsync_leaf++;
+> > >                       if (mmu_pages_add(pvec, child, i))
+> >
+> > This ordering is wrong, no?  If the child itself is unsync and can't be added to
+> > @pvec, i.e. fails here, then clearing its bit in unsync_child_bitmap is wrong.
 > 
-> We only single step over the IRET, because NMIs are unmasked _after_ the IRET
-> retires.
+> mmu_pages_add() can always successfully add the page to @pvec and
+> the caller needs to guarantee there is enough room to do so.
+> 
+> When it returns true, it means it will fail if you keep adding pages.
 
-Heh, check out this blurb from Intel's SDM:
+Oof, that's downright evil.  As prep work, can you fold in the attached patches
+earlier in this series?  Then this patch can yield:
 
-  An execution of the IRET instruction unblocks NMIs even if the instruction
-  causes a fault. For example, if the IRET instruction executes with EFLAGS.VM = 1
-  and IOPL of less than 3, a general-protection exception is generated (see
-  Section 20.2.7, “Sensitive Instructions”). In such a case, NMIs are unmasked
-  before the exception handler is invoked.
+	for_each_set_bit(i, sp->unsync_child_bitmap, 512) {
+		struct kvm_mmu_page *child;
+		u64 ent = sp->spt[i];
 
-Not that I want to try and handle that in KVM if AMD follows suit, I simply find
-it amusing how messy this all is.  A true NMI-window exit would have been nice...
+		if (!is_shadow_present_pte(ent) || is_large_pte(ent))
+			goto clear_unsync_child;
+
+		child = to_shadow_page(ent & SPTE_BASE_ADDR_MASK);
+		if (!child->unsync && !child->unsync_children)
+			goto clear_unsync_child;
+
+		if (mmu_is_page_vec_full(pvec))
+			return -ENOSPC;
+
+		mmu_pages_add(pvec, child, i);
+
+		if (child->unsync_children) {
+			ret = __mmu_unsync_walk(child, pvec);
+			if (!ret)
+				goto clear_unsync_child;
+			else if (ret > 0)
+				nr_unsync_leaf += ret;
+			else
+				return ret;
+		} else {
+			nr_unsync_leaf++;
+		}
+
+clear_unsync_child:
+                /*
+                 * Clear the unsync info, the child is either already sync
+                 * (bitmap is stale) or is guaranteed to be zapped/synced by
+                 * the caller before mmu_lock is released.  Note, the caller is
+                 * required to zap/sync all entries in @pvec even if an error
+                 * is returned!
+                 */
+                clear_unsync_child_bit(sp, i);
+        }
+
+--JZkyYl2Tfi/vytoa
+Content-Type: text/x-diff; charset=us-ascii
+Content-Disposition: attachment;
+	filename="0001-KVM-x86-mmu-Separate-page-vec-is-full-from-adding-a-.patch"
+
+From f2968d1afb08708c8292808b88aa915ec714e154 Mon Sep 17 00:00:00 2001
+From: Sean Christopherson <seanjc@google.com>
+Date: Thu, 21 Jul 2022 08:38:35 -0700
+Subject: [PATCH 1/2] KVM: x86/mmu: Separate "page vec is full" from adding a
+ page to the array
+
+Move the check for a full "page vector" out of mmu_pages_add(), returning
+true/false (effectively) looks a _lot_ like returning success/fail, which
+is very misleading and will even be more misleading when a future patch
+clears the unsync child bit upon a page being added to the vector (as
+opposed to clearing the bit when the vector is processed by the caller).
+
+Checking that the vector is full when adding a previous page is also
+sub-optimal, e.g. KVM unnecessarily returns an error if the vector is
+full but there are no more unsync pages to process.  Separating the check
+from the "add" will allow fixing this quirk in a future patch.
+
+No functional change intended.
+
+Signed-off-by: Sean Christopherson <seanjc@google.com>
+---
+ arch/x86/kvm/mmu/mmu.c | 24 +++++++++++++++++-------
+ 1 file changed, 17 insertions(+), 7 deletions(-)
+
+diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
+index 52664c3caaab..ac60a52044ef 100644
+--- a/arch/x86/kvm/mmu/mmu.c
++++ b/arch/x86/kvm/mmu/mmu.c
+@@ -1741,20 +1741,26 @@ struct kvm_mmu_pages {
+ 	unsigned int nr;
+ };
+ 
+-static int mmu_pages_add(struct kvm_mmu_pages *pvec, struct kvm_mmu_page *sp,
++static bool mmu_is_page_vec_full(struct kvm_mmu_pages *pvec)
++{
++	return (pvec->nr == KVM_PAGE_ARRAY_NR);
++}
++
++static void mmu_pages_add(struct kvm_mmu_pages *pvec, struct kvm_mmu_page *sp,
+ 			 int idx)
+ {
+ 	int i;
+ 
+-	if (sp->unsync)
+-		for (i=0; i < pvec->nr; i++)
++	if (sp->unsync) {
++		for (i = 0; i < pvec->nr; i++) {
+ 			if (pvec->page[i].sp == sp)
+-				return 0;
++				return;
++		}
++	}
+ 
+ 	pvec->page[pvec->nr].sp = sp;
+ 	pvec->page[pvec->nr].idx = idx;
+ 	pvec->nr++;
+-	return (pvec->nr == KVM_PAGE_ARRAY_NR);
+ }
+ 
+ static inline void clear_unsync_child_bit(struct kvm_mmu_page *sp, int idx)
+@@ -1781,7 +1787,9 @@ static int __mmu_unsync_walk(struct kvm_mmu_page *sp,
+ 		child = to_shadow_page(ent & SPTE_BASE_ADDR_MASK);
+ 
+ 		if (child->unsync_children) {
+-			if (mmu_pages_add(pvec, child, i))
++			mmu_pages_add(pvec, child, i);
++
++			if (mmu_is_page_vec_full(pvec))
+ 				return -ENOSPC;
+ 
+ 			ret = __mmu_unsync_walk(child, pvec);
+@@ -1794,7 +1802,9 @@ static int __mmu_unsync_walk(struct kvm_mmu_page *sp,
+ 				return ret;
+ 		} else if (child->unsync) {
+ 			nr_unsync_leaf++;
+-			if (mmu_pages_add(pvec, child, i))
++			mmu_pages_add(pvec, child, i);
++
++			if (mmu_is_page_vec_full(pvec))
+ 				return -ENOSPC;
+ 		} else
+ 			clear_unsync_child_bit(sp, i);
+-- 
+2.37.1.359.gd136c6c3e2-goog
+
+
+--JZkyYl2Tfi/vytoa
+Content-Type: text/x-diff; charset=us-ascii
+Content-Disposition: attachment;
+	filename="0002-KVM-x86-mmu-Check-for-full-page-vector-_before_-addi.patch"
+
+From c8b0d983791ef783165bbf2230ebc41145bf052e Mon Sep 17 00:00:00 2001
+From: Sean Christopherson <seanjc@google.com>
+Date: Thu, 21 Jul 2022 08:49:37 -0700
+Subject: [PATCH 2/2] KVM: x86/mmu: Check for full page vector _before_ adding
+ a new page
+
+Check for a full page vector before adding to the vector instead of after
+adding to the vector array, i.e. bail if and only if the vector is full
+_and_ a new page needs to be added.  Previously, KVM would still bail if
+the vector was full but there were no more unsync pages to process.
+
+Signed-off-by: Sean Christopherson <seanjc@google.com>
+---
+ arch/x86/kvm/mmu/mmu.c | 23 +++++++++++------------
+ 1 file changed, 11 insertions(+), 12 deletions(-)
+
+diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
+index ac60a52044ef..aca9a8e6c626 100644
+--- a/arch/x86/kvm/mmu/mmu.c
++++ b/arch/x86/kvm/mmu/mmu.c
+@@ -1785,13 +1785,17 @@ static int __mmu_unsync_walk(struct kvm_mmu_page *sp,
+ 		}
+ 
+ 		child = to_shadow_page(ent & SPTE_BASE_ADDR_MASK);
++		if (!child->unsync && !child->unsync_children) {
++			clear_unsync_child_bit(sp, i);
++			continue;
++		}
++
++		if (mmu_is_page_vec_full(pvec))
++			return -ENOSPC;
++
++		mmu_pages_add(pvec, child, i);
+ 
+ 		if (child->unsync_children) {
+-			mmu_pages_add(pvec, child, i);
+-
+-			if (mmu_is_page_vec_full(pvec))
+-				return -ENOSPC;
+-
+ 			ret = __mmu_unsync_walk(child, pvec);
+ 			if (!ret) {
+ 				clear_unsync_child_bit(sp, i);
+@@ -1800,14 +1804,9 @@ static int __mmu_unsync_walk(struct kvm_mmu_page *sp,
+ 				nr_unsync_leaf += ret;
+ 			} else
+ 				return ret;
+-		} else if (child->unsync) {
++		} else {
+ 			nr_unsync_leaf++;
+-			mmu_pages_add(pvec, child, i);
+-
+-			if (mmu_is_page_vec_full(pvec))
+-				return -ENOSPC;
+-		} else
+-			clear_unsync_child_bit(sp, i);
++		}
+ 	}
+ 
+ 	return nr_unsync_leaf;
+-- 
+2.37.1.359.gd136c6c3e2-goog
+
+
+--JZkyYl2Tfi/vytoa--
