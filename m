@@ -2,85 +2,85 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id D79DB57D0FD
-	for <lists+kvm@lfdr.de>; Thu, 21 Jul 2022 18:13:45 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id E509457D109
+	for <lists+kvm@lfdr.de>; Thu, 21 Jul 2022 18:13:57 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233543AbiGUQNo (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 21 Jul 2022 12:13:44 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41872 "EHLO
+        id S233564AbiGUQN4 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 21 Jul 2022 12:13:56 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42456 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232547AbiGUQN1 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 21 Jul 2022 12:13:27 -0400
-Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6534287F41;
-        Thu, 21 Jul 2022 09:13:24 -0700 (PDT)
-Received: from pps.filterd (m0098410.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.17.1.5/8.17.1.5) with ESMTP id 26LG7B89006290;
+        with ESMTP id S233280AbiGUQNk (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 21 Jul 2022 12:13:40 -0400
+Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 43D2688E21;
+        Thu, 21 Jul 2022 09:13:29 -0700 (PDT)
+Received: from pps.filterd (m0098417.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.17.1.5/8.17.1.5) with ESMTP id 26LFiHrN010834;
         Thu, 21 Jul 2022 16:13:23 GMT
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=from : to : cc : subject
  : date : message-id : in-reply-to : references : content-transfer-encoding
- : mime-version; s=pp1; bh=f01TCrzIahs7uzXJOy8c954+RziyBnwt4QO4IC9vc24=;
- b=Qmw7tDG1wionQtwaTzeS/+yUbRSO1fmRU81EhsoEwQJPBsXj2vbbXKsO+kST68qX9kQP
- WGkSoHGseGLHEEBXYhc2j9YY0AxE6VxPSzHttMkKd+gZHkhrISrSd7lTCUG6GcZM02r9
- aIUIa59Ve2AvSx0oIT2PpJgspANHs3o6IsWA0oiwu92ZgdJ0L6d+TssXhohrMk9Ym7Oe
- liksKOQsO59u/pSjvtNFtxm1wfQ2CTPPPxMueoXISw2IkZbwjc6x1YxkTiOzpzSujIP5
- EXHcDbuVvgv7R9FZNuwA7SLUU+VUDiPfewW2cImO+u5H4glK5nY2qzeVOSM7SoJcBGQQ /g== 
+ : mime-version; s=pp1; bh=BrZR/6+FwIeEt60RPyHBAipK0gVgNwVg80JZNVTOQPA=;
+ b=ImhP9lp+fNgr4I1506YrbHzagvnRQgrlL5pN+QNt8AvQxrIKLLX3u3NoJGpgog85qA60
+ KIZgtQie5qS0ckElh3mlqAzoXgfB7O5AO3iAayI0PPBDuYowjfTkHrlf7HBrznYEnAIC
+ qZE90ThwYUESGni25DmxocyLkyEJ1714T/IaAouJDzfvka+JZT/NXhGnDdB0F7j5ktsJ
+ zk+0fgVsg4a4PwQ5xtQrzURgfaT3gUfZpD5aKPkyfn/pyQxRheqtjZl45QNeH/VG+6wz
+ uhtQ4kUbU+xYZxiGFmqGQBjEOHCgh1E3zVPg5eNm44oBrGGbVO74laqW0r1QlYK7zlez eA== 
 Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3hf90nt1uu-1
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3hf9pu0v1c-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
         Thu, 21 Jul 2022 16:13:23 +0000
-Received: from m0098410.ppops.net (m0098410.ppops.net [127.0.0.1])
-        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 26LG9Hbb014975;
+Received: from m0098417.ppops.net (m0098417.ppops.net [127.0.0.1])
+        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 26LFrobl024219;
         Thu, 21 Jul 2022 16:13:23 GMT
-Received: from ppma05fra.de.ibm.com (6c.4a.5195.ip4.static.sl-reverse.com [149.81.74.108])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3hf90nt1tm-1
+Received: from ppma06ams.nl.ibm.com (66.31.33a9.ip4.static.sl-reverse.com [169.51.49.102])
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3hf9pu0uyy-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
         Thu, 21 Jul 2022 16:13:23 +0000
-Received: from pps.filterd (ppma05fra.de.ibm.com [127.0.0.1])
-        by ppma05fra.de.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 26LG87NW029865;
-        Thu, 21 Jul 2022 16:13:20 GMT
-Received: from b06avi18878370.portsmouth.uk.ibm.com (b06avi18878370.portsmouth.uk.ibm.com [9.149.26.194])
-        by ppma05fra.de.ibm.com with ESMTP id 3hbmy8werj-1
+Received: from pps.filterd (ppma06ams.nl.ibm.com [127.0.0.1])
+        by ppma06ams.nl.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 26LG6iX7029928;
+        Thu, 21 Jul 2022 16:13:21 GMT
+Received: from b06avi18626390.portsmouth.uk.ibm.com (b06avi18626390.portsmouth.uk.ibm.com [9.149.26.192])
+        by ppma06ams.nl.ibm.com with ESMTP id 3hbmkj769e-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
         Thu, 21 Jul 2022 16:13:20 +0000
 Received: from b06wcsmtp001.portsmouth.uk.ibm.com (b06wcsmtp001.portsmouth.uk.ibm.com [9.149.105.160])
-        by b06avi18878370.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 26LGDTux22675834
+        by b06avi18626390.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 26LGBTul22938104
         (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Thu, 21 Jul 2022 16:13:29 GMT
+        Thu, 21 Jul 2022 16:11:29 GMT
 Received: from b06wcsmtp001.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 5D895A405C;
+        by IMSVA (Postfix) with ESMTP id 02401A405B;
+        Thu, 21 Jul 2022 16:13:18 +0000 (GMT)
+Received: from b06wcsmtp001.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 721DEA4054;
         Thu, 21 Jul 2022 16:13:17 +0000 (GMT)
-Received: from b06wcsmtp001.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id C9EA7A4054;
-        Thu, 21 Jul 2022 16:13:16 +0000 (GMT)
 Received: from p-imbrenda.ibmuc.com (unknown [9.145.4.232])
         by b06wcsmtp001.portsmouth.uk.ibm.com (Postfix) with ESMTP;
-        Thu, 21 Jul 2022 16:13:16 +0000 (GMT)
+        Thu, 21 Jul 2022 16:13:17 +0000 (GMT)
 From:   Claudio Imbrenda <imbrenda@linux.ibm.com>
 To:     pbonzini@redhat.com
 Cc:     kvm@vger.kernel.org, linux-s390@vger.kernel.org,
         frankja@linux.ibm.com, borntraeger@linux.ibm.com,
         hca@linux.ibm.com, gor@linux.ibm.com, agordeev@linux.ibm.com,
         thuth@redhat.com, david@redhat.com,
-        Matthew Rosato <mjrosato@linux.ibm.com>
-Subject: [GIT PULL 21/42] MAINTAINERS: additional files related kvm s390 pci passthrough
-Date:   Thu, 21 Jul 2022 18:12:41 +0200
-Message-Id: <20220721161302.156182-22-imbrenda@linux.ibm.com>
+        Jiang Jian <jiangjian@cdjrlc.com>
+Subject: [GIT PULL 22/42] KVM: s390: drop unexpected word 'and' in the comments
+Date:   Thu, 21 Jul 2022 18:12:42 +0200
+Message-Id: <20220721161302.156182-23-imbrenda@linux.ibm.com>
 X-Mailer: git-send-email 2.36.1
 In-Reply-To: <20220721161302.156182-1-imbrenda@linux.ibm.com>
 References: <20220721161302.156182-1-imbrenda@linux.ibm.com>
 X-TM-AS-GCONF: 00
-X-Proofpoint-ORIG-GUID: g-rAQQPyQojMBvq1PXFujeCmTJwaN1C3
-X-Proofpoint-GUID: IIIfiD0IxKm6_t01SNF5caf8aJ4yn5_G
+X-Proofpoint-ORIG-GUID: 4m6_zvBAF2rMFWkQ1byRodyYZBAvtMtl
+X-Proofpoint-GUID: N87K7jmK_maersNhxdJdxptynsnTO31e
 Content-Transfer-Encoding: 8bit
 X-Proofpoint-UnRewURL: 0 URL was un-rewritten
 MIME-Version: 1.0
 X-Proofpoint-Virus-Version: vendor=baseguard
  engine=ICAP:2.0.205,Aquarius:18.0.883,Hydra:6.0.517,FMLib:17.11.122.1
  definitions=2022-07-21_22,2022-07-20_01,2022-06-22_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 bulkscore=0 phishscore=0
- lowpriorityscore=0 adultscore=0 mlxlogscore=999 spamscore=0 malwarescore=0
- impostorscore=0 mlxscore=0 suspectscore=0 priorityscore=1501 clxscore=1015
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 clxscore=1011 mlxscore=0
+ adultscore=0 malwarescore=0 priorityscore=1501 suspectscore=0 phishscore=0
+ mlxlogscore=705 impostorscore=0 spamscore=0 bulkscore=0 lowpriorityscore=0
  classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2206140000
  definitions=main-2207210064
 X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
@@ -92,31 +92,39 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-From: Matthew Rosato <mjrosato@linux.ibm.com>
+From: Jiang Jian <jiangjian@cdjrlc.com>
 
-Add entries from the s390 kvm subdirectory related to pci passthrough.
+there is an unexpected word 'and' in the comments that need to be dropped
 
-Acked-by: Christian Borntraeger <borntraeger@linux.ibm.com>
-Signed-off-by: Matthew Rosato <mjrosato@linux.ibm.com>
-Reviewed-by: Thomas Huth <thuth@redhat.com>
-Link: https://lore.kernel.org/r/20220606203325.110625-22-mjrosato@linux.ibm.com
-Signed-off-by: Christian Borntraeger <borntraeger@linux.ibm.com>
+file: arch/s390/kvm/interrupt.c
+line: 705
+
+* Subsystem damage are the only two and and are indicated by
+
+changed to:
+
+* Subsystem damage are the only two and are indicated by
+
+Signed-off-by: Jiang Jian <jiangjian@cdjrlc.com>
+Link: https://lore.kernel.org/lkml/20220622140720.7617-1-jiangjian@cdjrlc.com/
+Signed-off-by: Janosch Frank <frankja@linux.ibm.com>
 ---
- MAINTAINERS | 1 +
- 1 file changed, 1 insertion(+)
+ arch/s390/kvm/interrupt.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/MAINTAINERS b/MAINTAINERS
-index a6d3bd9d2a8d..3dd8657f5482 100644
---- a/MAINTAINERS
-+++ b/MAINTAINERS
-@@ -17454,6 +17454,7 @@ M:	Eric Farman <farman@linux.ibm.com>
- L:	linux-s390@vger.kernel.org
- L:	kvm@vger.kernel.org
- S:	Supported
-+F:	arch/s390/kvm/pci*
- F:	drivers/vfio/pci/vfio_pci_zdev.c
- F:	include/uapi/linux/vfio_zdev.h
- 
+diff --git a/arch/s390/kvm/interrupt.c b/arch/s390/kvm/interrupt.c
+index d8e1fce78b7c..b9c944b262c7 100644
+--- a/arch/s390/kvm/interrupt.c
++++ b/arch/s390/kvm/interrupt.c
+@@ -704,7 +704,7 @@ static int __must_check __deliver_machine_check(struct kvm_vcpu *vcpu)
+ 	/*
+ 	 * We indicate floating repressible conditions along with
+ 	 * other pending conditions. Channel Report Pending and Channel
+-	 * Subsystem damage are the only two and and are indicated by
++	 * Subsystem damage are the only two and are indicated by
+ 	 * bits in mcic and masked in cr14.
+ 	 */
+ 	if (test_and_clear_bit(IRQ_PEND_MCHK_REP, &fi->pending_irqs)) {
 -- 
 2.36.1
 
