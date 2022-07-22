@@ -2,142 +2,124 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id CB98B57E327
-	for <lists+kvm@lfdr.de>; Fri, 22 Jul 2022 16:41:27 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 03FB857E3C2
+	for <lists+kvm@lfdr.de>; Fri, 22 Jul 2022 17:28:03 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234834AbiGVOl0 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 22 Jul 2022 10:41:26 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38240 "EHLO
+        id S235189AbiGVP2A (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 22 Jul 2022 11:28:00 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44762 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232365AbiGVOlZ (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 22 Jul 2022 10:41:25 -0400
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id C2C73313A5
-        for <kvm@vger.kernel.org>; Fri, 22 Jul 2022 07:41:22 -0700 (PDT)
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id E6EC01063;
-        Fri, 22 Jul 2022 07:41:22 -0700 (PDT)
-Received: from monolith.localdoman (unknown [172.31.20.19])
-        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 4776F3F70D;
-        Fri, 22 Jul 2022 07:41:21 -0700 (PDT)
-Date:   Fri, 22 Jul 2022 15:41:51 +0100
-From:   Alexandru Elisei <alexandru.elisei@arm.com>
-To:     Nikos Nikoleris <nikos.nikoleris@arm.com>
-Cc:     kvm@vger.kernel.org, andrew.jones@linux.dev, pbonzini@redhat.com,
-        jade.alglave@arm.com, ricarkol@google.com
-Subject: Re: [kvm-unit-tests PATCH v3 00/27] EFI and ACPI support for arm64
-Message-ID: <Ytq3Lxwa4fKG63GM@monolith.localdoman>
-References: <20220630100324.3153655-1-nikos.nikoleris@arm.com>
- <YtbNin3VTyIT/yYF@monolith.localdoman>
- <86e94983-0c69-88c8-f37f-c772ab6a4847@arm.com>
+        with ESMTP id S234947AbiGVP1u (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 22 Jul 2022 11:27:50 -0400
+Received: from mail-pl1-x62a.google.com (mail-pl1-x62a.google.com [IPv6:2607:f8b0:4864:20::62a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 47A739FE06
+        for <kvm@vger.kernel.org>; Fri, 22 Jul 2022 08:27:49 -0700 (PDT)
+Received: by mail-pl1-x62a.google.com with SMTP id y24so4836759plh.7
+        for <kvm@vger.kernel.org>; Fri, 22 Jul 2022 08:27:49 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=GvsJKETzIYJsxczzHJyFdH4tuugoZF3X8uPibH3AGEA=;
+        b=pBOTejsyvveMutjphsKDBUaGpuKUFc4XMUEms1oWqHa/5DDWVtDdI4Jt3EjD+xFc/z
+         lefXIIdQA+Cngt0ViiJMfjCrvLVsnHzHqwRDK2Iwp+F/DsQ7MV+jwSdKctK/UVf4qygv
+         H9DjCQdrZRApSni5sXt+xLaXiYG25Zfxijifhk0hE+ht3f4BmGce4uebq6+qdbRkvXF4
+         Di9jXoMG8Zd0HM8eZm7sI0+Zx4+CSp5xbwACis0wAgafasGHiEUIBoWctM1PTgtwwZiy
+         KdYKILzZzLb0WE5xs8kDpDEFKexdDtkVlk0ggkCo0iTkHZ7bBwehl1veNh7SQPQf2vU5
+         bXkg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=GvsJKETzIYJsxczzHJyFdH4tuugoZF3X8uPibH3AGEA=;
+        b=faXQw2vqMkHiYlpjizAV9nBlyUyRn7sCAEnYwhj28w71QqkxzOak5+bWC7y9iU29I1
+         OpOWXoOvMN+qqmcJmpHgcG9TubErB0guI3DcmR/r9n7EJPoBJKPKYyEixaCPGcM9ua57
+         zYgaEFxhOyK0t/3PcLKSZAirRcKPlsOlRqRvcyi9mavirBzpl0ySKjaxjIDqxZDFTl3k
+         cwxdDBzI3qB5z6oVQmxquK8+iifnqcMFGLyYAvA3nsNBMVn72vE9IxPfzcMI7bbOvxQw
+         A3PTTv9WM409KQnYI8f9be4bI1eUyclBCByhghyphyMOXIynOPvtKyT+gpUPcnm05Zwc
+         QiAQ==
+X-Gm-Message-State: AJIora+bPaAbxXVP81wjJhqgfnb0F0CwEHCuEpBLqDC44wv19+YSWHvr
+        WhSZFUT581K492PToQN7blNuuA==
+X-Google-Smtp-Source: AGRyM1vGuWvC3KxSmAdtBwft7NJW+zK/QU+mBC8yea/Nf0X4k4yfoT+8Hs83yK4wxBTWv1gSlNXYZA==
+X-Received: by 2002:a17:903:1208:b0:16b:81f6:e992 with SMTP id l8-20020a170903120800b0016b81f6e992mr420562plh.55.1658503668507;
+        Fri, 22 Jul 2022 08:27:48 -0700 (PDT)
+Received: from google.com (123.65.230.35.bc.googleusercontent.com. [35.230.65.123])
+        by smtp.gmail.com with ESMTPSA id m1-20020a170902db0100b0016d295888e3sm3958168plx.241.2022.07.22.08.27.47
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 22 Jul 2022 08:27:48 -0700 (PDT)
+Date:   Fri, 22 Jul 2022 15:27:44 +0000
+From:   Sean Christopherson <seanjc@google.com>
+To:     Paolo Bonzini <pbonzini@redhat.com>
+Cc:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        oliver.upton@linux.dev
+Subject: Re: [PATCH] Revert "KVM: nVMX: Do not expose MPX VMX controls when
+ guest MPX disabled"
+Message-ID: <YtrB8JEuc1Il1EOO@google.com>
+References: <20220722104329.3265411-1-pbonzini@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <86e94983-0c69-88c8-f37f-c772ab6a4847@arm.com>
-X-Spam-Status: No, score=-6.9 required=5.0 tests=BAYES_00,RCVD_IN_DNSWL_HI,
-        SPF_HELO_NONE,SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
+In-Reply-To: <20220722104329.3265411-1-pbonzini@redhat.com>
+X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
+        USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi Nikos,
-
-On Fri, Jul 22, 2022 at 11:57:09AM +0100, Nikos Nikoleris wrote:
-> Hi Alex,
+On Fri, Jul 22, 2022, Paolo Bonzini wrote:
+> Since commit 5f76f6f5ff96 ("KVM: nVMX: Do not expose MPX VMX controls
+> when guest MPX disabled"), KVM has taken ownership of the "load
+> IA32_BNDCFGS" and "clear IA32_BNDCFGS" VMX entry/exit controls,
+> trying to set these bits in the IA32_VMX_TRUE_{ENTRY,EXIT}_CTLS
+> MSRs if the guest's CPUID supports MPX, and clear otherwise.
 > 
-> On 19/07/2022 16:28, Alexandru Elisei wrote:
-> > Hi,
-> > 
-> > I've been trying to test the seris and I've come across some issues.
-[..]
-> > 
-> > The second error I'm encountering is when I try the selftest-setup test:
-> > 
-> > [..]
-> > ProtectUefiImageCommon - 0x4D046040
-> >    - 0x000000004BEC4000 - 0x000000000001F600
-> > SetUefiImageMemoryAttributes - 0x000000004BEC4000 - 0x0000000000001000 (0x0000000000004008)
-> > SetUefiImageMemoryAttributes - 0x000000004BEC5000 - 0x0000000000010000 (0x0000000000020008)
-> > SetUefiImageMemoryAttributes - 0x000000004BED5000 - 0x000000000000F000 (0x0000000000004008)
-> > InstallProtocolInterface: 752F3136-4E16-4FDC-A22A-E5F46812F4CA 4F8014E8
-> > SetUefiImageMemoryAttributes - 0x000000004F640000 - 0x0000000000040000 (0x0000000000000008)
-> > SetUefiImageMemoryAttributes - 0x000000004C2D0000 - 0x0000000000040000 (0x0000000000000008)
-> > SetUefiImageMemoryAttributes - 0x000000004C280000 - 0x0000000000040000 (0x0000000000000008)
-> > SetUefiImageMemoryAttributes - 0x000000004C230000 - 0x0000000000040000 (0x0000000000000008)
-> > SetUefiImageMemoryAttributes - 0x000000004C140000 - 0x0000000000040000 (0x0000000000000008)
-> > SetUefiImageMemoryAttributes - 0x000000004F600000 - 0x0000000000030000 (0x0000000000000008)
-> > SetUefiImageMemoryAttributes - 0x000000004C040000 - 0x0000000000030000 (0x0000000000000008)
-> > SetUefiImageMemoryAttributes - 0x000000004BFC0000 - 0x0000000000030000 (0x0000000000000008)
-> > Load address: 4bec4000
-> > PC: 4beca400 PC offset: 6400
-> > Unhandled exception ec=0x25 (DABT_EL1)
-> > Vector: 4 (el1h_sync)
-> > ESR_EL1:         96000000, ec=0x25 (DABT_EL1)
-> > FAR_EL1: 0000fffffffff0f8 (valid)
-> > Exception frame registers:
-> > pc : [<000000004beca400>] lr : [<000000004beca42c>] pstate: 400002c5
-> > sp : 000000004f7ffe40
-> > x29: 000000004f7ffff0 x28: 0000000000000000
-> > x27: 000000004d046040 x26: 0000000000000000
-> > x25: 0000000000000703 x24: 0000000000000050
-> > x23: 0000000009011000 x22: 0000000000000000
-> > x21: 000000000000001f x20: 0000fffffffff000
-> > x19: 0000000043f92000 x18: 0000000000000000
-> > x17: 00000000ffffa6ab x16: 000000004f513ebc
-> > x15: 0000000000000002 x14: 000000004bed5000
-> > x13: 000000004bee4000 x12: 000000004bed4000
-> > x11: 000000004bec4000 x10: 000000004c03febc
-> > x9 : 000000004bee2938 x8 : 0000000000000000
-> > x7 : 0000000000000000 x6 : 000000004bee2900
-> > x5 : 000000004bee2908 x4 : 0000000048000000
-> > x3 : 0000000048000000 x2 : 000000004bee2928
-> > x1 : 0000000000000003 x0 : ffffffffffffffff
-> > 
-> > 
-> > EXIT: STATUS=127
-> > 
-> > The preceding lines were omitted for brevity, the entire log can be found
-> > at [1] (expires in 6 months).
-> > 
-> > Command used to launch the test:
-> > 
-> > $ QEMU=/path/to/qemu/build/qemu-system-aarch64 EFI_UEFI=/path/to/QEMU_EFI.fd taskset -c 4-5 arm/efi/run arm/selftest.efi -smp 2 -m 256 -append "setup smp=2 mem=256"
-> > 
-> > qemu has been built from source, tag v7.0.0, configured with:
-> > 
-> > $ ./configure --target-list=aarch64-softmmu --disable-vnc --disable-gtk --disable-bpf
-> > 
-> > EDK2 image has been built from commit e1eef3a8b01a ("NetworkPkg: Add Wi-Fi
-> > Wpa3 support in WifiConnectManager"):
-> > 
-> > $ build -a AARCH64 -t GCC5 -p ArmVirtPkg/ArmVirtQemu.dsc -b DEBUG
-> > 
-> > I tried to disassemble selftest.efi: $ objdump -d selftest.efi, but there
-> > were no debug symbols in the output and it was impossible to figure what is
-> > going on.
-> > 
-> > [1] https://pastebin.com/0mcap1BU
+> The intent of the patch was to apply it to L0 in order to work around
+> L1 kernels that lack the fix in commit 691bd4340bef ("kvm: vmx: allow
+> host to access guest MSR_IA32_BNDCFGS", 2017-07-04): by hiding the
+> control bits from L0, L1 hides BNDCFGS from KVM_GET_MSR_INDEX_LIST,
+> and the L1 bug is neutralized even in the lack of commit 691bd4340bef.
 > 
-> I haven't been to able to reproduce this. I've build from source qemu and
-> EDK2 from source (the revisions you provided) and I've used gcc-10 to
-> compile KUT but selftest-smp passes.
-
-That's weird, I've compiled kvm-unit-tests with gcc 10.3.0 [1] and I'm still
-seeing the error (tried it on my x86 machine), for both selftest-setup
-selftest-smp.
-
-Did you compile qemu and edk2 with gcc 10.3.0? Or did you use some other
-compiler?
-
-[1] https://developer.arm.com/-/media/Files/downloads/gnu-a/10.3-2021.07/binrel/gcc-arm-10.3-2021.07-x86_64-aarch64-none-linux-gnu.tar.xz
-
-Thanks,
-Alex
-
+> This was perhaps a sensible kludge at the time, but a horrible
+> idea in the long term and in fact it has not been extended to
+> other CPUID bits like these:
 > 
-> Thanks,
+>   X86_FEATURE_LM => VM_EXIT_HOST_ADDR_SPACE_SIZE, VM_ENTRY_IA32E_MODE,
+>                     VMX_MISC_SAVE_EFER_LMA
 > 
-> Nikos
+>   X86_FEATURE_TSC => CPU_BASED_RDTSC_EXITING, CPU_BASED_USE_TSC_OFFSETTING,
+>                      SECONDARY_EXEC_TSC_SCALING
 > 
+>   X86_FEATURE_INVPCID_SINGLE => SECONDARY_EXEC_ENABLE_INVPCID
+> 
+>   X86_FEATURE_MWAIT => CPU_BASED_MONITOR_EXITING, CPU_BASED_MWAIT_EXITING
+> 
+>   X86_FEATURE_INTEL_PT => SECONDARY_EXEC_PT_CONCEAL_VMX, SECONDARY_EXEC_PT_USE_GPA,
+>                           VM_EXIT_CLEAR_IA32_RTIT_CTL, VM_ENTRY_LOAD_IA32_RTIT_CTL
+> 
+>   X86_FEATURE_XSAVES => SECONDARY_EXEC_XSAVES
+> 
+> These days it's sort of common knowledge that any MSR in
+> KVM_GET_MSR_INDEX_LIST must allow *at least* setting it with KVM_SET_MSR
+> to a default value, so it is unlikely that something like commit
+> 5f76f6f5ff96 will be needed again.  So revert it, at the potential cost
+> of breaking L1s with a 6 year old kernel.  
+
+I would further qualify this with "breaking L1s with an _unpatched_ 6 year old
+kernel".  That fix was tagged for stable and made it way to at least the 4.9 and
+4.4 LTS releases.
+
+> While in principle the L0 owner doesn't control what runs on L1, such an old
+> hypervisor would probably have many other bugs.
+
+And patching KVM to workaround L1 Linux bugs never ends well, e.g. see also the
+hypercall patching snafu.
+
+> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+> ---
+
+Reviewed-by: Sean Christopherson <seanjc@google.com>
