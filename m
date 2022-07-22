@@ -2,265 +2,129 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 4492357D91F
-	for <lists+kvm@lfdr.de>; Fri, 22 Jul 2022 05:58:06 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id B5EFE57D9E7
+	for <lists+kvm@lfdr.de>; Fri, 22 Jul 2022 08:00:56 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233608AbiGVD6A (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 21 Jul 2022 23:58:00 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35506 "EHLO
+        id S229519AbiGVGAz (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 22 Jul 2022 02:00:55 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46812 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229692AbiGVD54 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 21 Jul 2022 23:57:56 -0400
-Received: from out30-133.freemail.mail.aliyun.com (out30-133.freemail.mail.aliyun.com [115.124.30.133])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 136CD6C105;
-        Thu, 21 Jul 2022 20:57:52 -0700 (PDT)
-X-Alimail-AntiSpam: AC=PASS;BC=-1|-1;BR=01201311R121e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=e01e04400;MF=xuanzhuo@linux.alibaba.com;NM=1;PH=DS;RN=36;SR=0;TI=SMTPD_---0VK3SFm4_1658462266;
-Received: from localhost(mailfrom:xuanzhuo@linux.alibaba.com fp:SMTPD_---0VK3SFm4_1658462266)
-          by smtp.aliyun-inc.com;
-          Fri, 22 Jul 2022 11:57:47 +0800
-Message-ID: <1658461678.632858-2-xuanzhuo@linux.alibaba.com>
-Subject: Re: [PATCH v12 08/40] virtio_ring: split: extract the logic of alloc queue
-Date:   Fri, 22 Jul 2022 11:47:58 +0800
-From:   Xuan Zhuo <xuanzhuo@linux.alibaba.com>
-To:     Jason Wang <jasowang@redhat.com>
-Cc:     Richard Weinberger <richard@nod.at>,
-        Anton Ivanov <anton.ivanov@cambridgegreys.com>,
-        Johannes Berg <johannes@sipsolutions.net>,
-        "Michael S. Tsirkin" <mst@redhat.com>,
-        "David S. Miller" <davem@davemloft.net>,
-        Eric Dumazet <edumazet@google.com>,
-        Jakub Kicinski <kuba@kernel.org>,
-        Paolo Abeni <pabeni@redhat.com>,
-        Hans de Goede <hdegoede@redhat.com>,
-        Mark Gross <markgross@kernel.org>,
-        Vadim Pasternak <vadimp@nvidia.com>,
-        Bjorn Andersson <bjorn.andersson@linaro.org>,
-        Mathieu Poirier <mathieu.poirier@linaro.org>,
-        Cornelia Huck <cohuck@redhat.com>,
-        Halil Pasic <pasic@linux.ibm.com>,
-        Eric Farman <farman@linux.ibm.com>,
-        Heiko Carstens <hca@linux.ibm.com>,
-        Vasily Gorbik <gor@linux.ibm.com>,
-        Alexander Gordeev <agordeev@linux.ibm.com>,
-        Christian Borntraeger <borntraeger@linux.ibm.com>,
-        Sven Schnelle <svens@linux.ibm.com>,
-        Alexei Starovoitov <ast@kernel.org>,
-        Daniel Borkmann <daniel@iogearbox.net>,
-        Jesper Dangaard Brouer <hawk@kernel.org>,
-        John Fastabend <john.fastabend@gmail.com>,
-        Vincent Whitchurch <vincent.whitchurch@axis.com>,
-        linux-um@lists.infradead.org, netdev@vger.kernel.org,
-        platform-driver-x86@vger.kernel.org,
-        linux-remoteproc@vger.kernel.org, linux-s390@vger.kernel.org,
-        kvm@vger.kernel.org, bpf@vger.kernel.org,
-        kangjie.xu@linux.alibaba.com,
-        virtualization@lists.linux-foundation.org
-References: <20220720030436.79520-1-xuanzhuo@linux.alibaba.com>
- <20220720030436.79520-9-xuanzhuo@linux.alibaba.com>
- <0b3c985d-d479-a554-4fe2-bfe94fc74070@redhat.com>
-In-Reply-To: <0b3c985d-d479-a554-4fe2-bfe94fc74070@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Spam-Status: No, score=-9.9 required=5.0 tests=BAYES_00,
-        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-        UNPARSEABLE_RELAY,USER_IN_DEF_SPF_WL autolearn=ham autolearn_force=no
-        version=3.4.6
+        with ESMTP id S231913AbiGVGAw (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 22 Jul 2022 02:00:52 -0400
+Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A871440BEA
+        for <kvm@vger.kernel.org>; Thu, 21 Jul 2022 23:00:51 -0700 (PDT)
+Received: from pps.filterd (m0098417.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.17.1.5/8.17.1.5) with ESMTP id 26M5mpHZ002213
+        for <kvm@vger.kernel.org>; Fri, 22 Jul 2022 06:00:51 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=from : to : cc : subject
+ : date : message-id : mime-version : content-transfer-encoding; s=pp1;
+ bh=ssOHIs8kE1BTtjg+B/BudwerE3GAQSPiUiZnx3QjyPo=;
+ b=jdfsUQ3rqdcUhi6cMk5AIisq3t9Ai229mBQoN3RCaLzqffHTKyjIFi54rqjMMJTQ9ZOf
+ bmbXte0uS/G+aRDPKSe73UE+LawJ3Bkb81gfvNXVYYFmVe97l3VGJ5kcO8hbSwvesfD9
+ FYyI+dNdeABFQN4kAgPI6Z+TWpN/P/h95UJZKs/1iknzr2WCrAXYf7L/O5CKE/ykYAMy
+ cQeIjHGJJ9GyAu3PuLeB2VcJTr/DvL1LyojQXMxJ6L08h0V2S8cx/RXT+X7dkYoaqIr+
+ p8PjW1x9IrCCy5/E/gmZCRoNmNaXmIAp9xTMfysmbdk7Ikk0cMFGjPcldmnQmJS+jjl3 6w== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3hfp2y87ns-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT)
+        for <kvm@vger.kernel.org>; Fri, 22 Jul 2022 06:00:50 +0000
+Received: from m0098417.ppops.net (m0098417.ppops.net [127.0.0.1])
+        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 26M5nZYm003144
+        for <kvm@vger.kernel.org>; Fri, 22 Jul 2022 06:00:50 GMT
+Received: from ppma06ams.nl.ibm.com (66.31.33a9.ip4.static.sl-reverse.com [169.51.49.102])
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3hfp2y87m8-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Fri, 22 Jul 2022 06:00:50 +0000
+Received: from pps.filterd (ppma06ams.nl.ibm.com [127.0.0.1])
+        by ppma06ams.nl.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 26M5p9vc018217;
+        Fri, 22 Jul 2022 06:00:47 GMT
+Received: from b06cxnps4075.portsmouth.uk.ibm.com (d06relay12.portsmouth.uk.ibm.com [9.149.109.197])
+        by ppma06ams.nl.ibm.com with ESMTP id 3hbmkj7v4t-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Fri, 22 Jul 2022 06:00:47 +0000
+Received: from d06av21.portsmouth.uk.ibm.com (d06av21.portsmouth.uk.ibm.com [9.149.105.232])
+        by b06cxnps4075.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 26M60ihX19464548
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Fri, 22 Jul 2022 06:00:44 GMT
+Received: from d06av21.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 4052652051;
+        Fri, 22 Jul 2022 06:00:44 +0000 (GMT)
+Received: from a46lp57.lnxne.boe (unknown [9.152.108.100])
+        by d06av21.portsmouth.uk.ibm.com (Postfix) with ESMTP id 0CB925204E;
+        Fri, 22 Jul 2022 06:00:44 +0000 (GMT)
+From:   Nico Boehr <nrb@linux.ibm.com>
+To:     kvm@vger.kernel.org
+Cc:     frankja@linux.ibm.com, imbrenda@linux.ibm.com, thuth@redhat.com
+Subject: [kvm-unit-tests PATCH v3 0/4] Add panic test support
+Date:   Fri, 22 Jul 2022 08:00:39 +0200
+Message-Id: <20220722060043.733796-1-nrb@linux.ibm.com>
+X-Mailer: git-send-email 2.36.1
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-ORIG-GUID: LvDqxAwuTWc-MsIdVCfVadtRuem8BgDh
+X-Proofpoint-GUID: weKoO-STI6Nl2NeL7b5tLLntiPWHj5Ve
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.205,Aquarius:18.0.883,Hydra:6.0.517,FMLib:17.11.122.1
+ definitions=2022-07-21_28,2022-07-21_02,2022-06-22_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 adultscore=0 malwarescore=0
+ clxscore=1015 spamscore=0 phishscore=0 lowpriorityscore=0 impostorscore=0
+ priorityscore=1501 mlxscore=0 suspectscore=0 mlxlogscore=796 bulkscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2206140000
+ definitions=main-2207220021
+X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_EF,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_PASS
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, 21 Jul 2022 17:13:49 +0800, Jason Wang <jasowang@redhat.com> wrote:
->
-> =E5=9C=A8 2022/7/20 11:04, Xuan Zhuo =E5=86=99=E9=81=93:
-> > Separate the logic of split to create vring queue.
-> >
-> > This feature is required for subsequent virtuqueue reset vring.
-> >
-> > Signed-off-by: Xuan Zhuo <xuanzhuo@linux.alibaba.com>
-> > ---
-> >   drivers/virtio/virtio_ring.c | 68 ++++++++++++++++++++++--------------
-> >   1 file changed, 42 insertions(+), 26 deletions(-)
-> >
-> > diff --git a/drivers/virtio/virtio_ring.c b/drivers/virtio/virtio_ring.c
-> > index c94c5461e702..c7971438bb2c 100644
-> > --- a/drivers/virtio/virtio_ring.c
-> > +++ b/drivers/virtio/virtio_ring.c
-> > @@ -950,28 +950,19 @@ static void vring_free_split(struct vring_virtque=
-ue_split *vring_split,
-> >   	kfree(vring_split->desc_extra);
-> >   }
-> >
-> > -static struct virtqueue *vring_create_virtqueue_split(
-> > -	unsigned int index,
-> > -	unsigned int num,
-> > -	unsigned int vring_align,
-> > -	struct virtio_device *vdev,
-> > -	bool weak_barriers,
-> > -	bool may_reduce_num,
-> > -	bool context,
-> > -	bool (*notify)(struct virtqueue *),
-> > -	void (*callback)(struct virtqueue *),
-> > -	const char *name)
-> > +static int vring_alloc_queue_split(struct vring_virtqueue_split *vring=
-_split,
-> > +				   struct virtio_device *vdev,
-> > +				   u32 num,
-> > +				   unsigned int vring_align,
-> > +				   bool may_reduce_num)
-> >   {
-> > -	struct virtqueue *vq;
-> >   	void *queue =3D NULL;
-> >   	dma_addr_t dma_addr;
-> > -	size_t queue_size_in_bytes;
-> > -	struct vring vring;
-> >
-> >   	/* We assume num is a power of 2. */
-> >   	if (num & (num - 1)) {
-> >   		dev_warn(&vdev->dev, "Bad virtqueue length %u\n", num);
-> > -		return NULL;
-> > +		return -EINVAL;
-> >   	}
-> >
-> >   	/* TODO: allocate each queue chunk individually */
-> > @@ -982,11 +973,11 @@ static struct virtqueue *vring_create_virtqueue_s=
-plit(
-> >   		if (queue)
-> >   			break;
-> >   		if (!may_reduce_num)
-> > -			return NULL;
-> > +			return -ENOMEM;
-> >   	}
-> >
-> >   	if (!num)
-> > -		return NULL;
-> > +		return -ENOMEM;
-> >
-> >   	if (!queue) {
-> >   		/* Try to get a single page. You are my only hope! */
-> > @@ -994,21 +985,46 @@ static struct virtqueue *vring_create_virtqueue_s=
-plit(
-> >   					  &dma_addr, GFP_KERNEL|__GFP_ZERO);
-> >   	}
-> >   	if (!queue)
-> > -		return NULL;
-> > +		return -ENOMEM;
-> > +
-> > +	vring_init(&vring_split->vring, num, queue, vring_align);
-> >
-> > -	queue_size_in_bytes =3D vring_size(num, vring_align);
-> > -	vring_init(&vring, num, queue, vring_align);
-> > +	vring_split->queue_dma_addr =3D dma_addr;
-> > +	vring_split->queue_size_in_bytes =3D vring_size(num, vring_align);
-> > +
-> > +	return 0;
-> > +}
-> > +
-> > +static struct virtqueue *vring_create_virtqueue_split(
-> > +	unsigned int index,
-> > +	unsigned int num,
-> > +	unsigned int vring_align,
-> > +	struct virtio_device *vdev,
-> > +	bool weak_barriers,
-> > +	bool may_reduce_num,
-> > +	bool context,
-> > +	bool (*notify)(struct virtqueue *),
-> > +	void (*callback)(struct virtqueue *),
-> > +	const char *name)
-> > +{
-> > +	struct vring_virtqueue_split vring_split =3D {};
-> > +	struct virtqueue *vq;
-> > +	int err;
-> > +
-> > +	err =3D vring_alloc_queue_split(&vring_split, vdev, num, vring_align,
-> > +				      may_reduce_num);
-> > +	if (err)
-> > +		return NULL;
-> >
-> > -	vq =3D __vring_new_virtqueue(index, vring, vdev, weak_barriers, conte=
-xt,
-> > -				   notify, callback, name);
-> > +	vq =3D __vring_new_virtqueue(index, vring_split.vring, vdev, weak_bar=
-riers,
-> > +				   context, notify, callback, name);
-> >   	if (!vq) {
-> > -		vring_free_queue(vdev, queue_size_in_bytes, queue,
-> > -				 dma_addr);
-> > +		vring_free_split(&vring_split, vdev);
-> >   		return NULL;
-> >   	}
-> >
-> > -	to_vvq(vq)->split.queue_dma_addr =3D dma_addr;
-> > -	to_vvq(vq)->split.queue_size_in_bytes =3D queue_size_in_bytes;
-> > +	to_vvq(vq)->split.queue_dma_addr =3D vring_split.queue_dma_addr;
-> > +	to_vvq(vq)->split.queue_size_in_bytes =3D vring_split.queue_size_in_b=
-ytes;
->
->
-> This still seems a little bit redundant since the current logic is a
-> little bit complicated since the vq->split is not initialized in a
-> single place.
->
-> I wonder if it's better to:
->
-> vring_alloc_queue_split()
-> vring_alloc_desc_extra() (reorder to make patch 9 come first)
->
-> then we can simply assign vring_split to vq->split in
-> __vring_new_virtqueue() since it has:
->
->  =C2=A0=C2=A0=C2=A0 vq->split.queue_dma_addr =3D 0;
->  =C2=A0=C2=A0 =C2=A0vq->split.queue_size_in_bytes =3D 0;
->
->  =C2=A0=C2=A0=C2=A0 vq->split.vring =3D vring;
->  =C2=A0=C2=A0=C2=A0 vq->split.avail_flags_shadow =3D 0;
->  =C2=A0=C2=A0=C2=A0 vq->split.avail_idx_shadow =3D 0;
->
-> This seems to simplify the logic and task of e.g
-> virtqueue_vring_attach_split() to a simple:
->
-> vq->split=3D vring_split;
+v2->v3:
+---
+* rename TIMING_S390_SHIFT_US->S390_CLOCK_SHIFT_US (thanks Claudio)
+* rename cpu_timer_set -> cpu_timer_set_ms (thanks Claudio)
 
-This does look simpler. The reason for not doing this is that the argument
-accepted by __vring_new_virtqueue() is "struct vring", and
-__vring_new_virtqueue() is an export symbol.
+v1->v2:
+---
+* fix spelling mistakes/long lines (thanks Thomas)
+* quoting improvments (thanks Thomas)
+* smaller timeout for tests (thanks Thomas and Janis)
+* move function and defines for cpu timer to time.h (thanks Janosch)
+* fence tests for non-QEMU/KVM (thanks Janosch)
 
-I took a look, and the only external direct call to __vring_new_virtqueue is
-here.
+QEMU suports a guest state "guest-panicked" which indicates something in
+the guest went wrong, for example on s390x, when an external interrupt
+loop was triggered.
 
-	tools/virtio/virtio_test.c
-	static void vq_reset(struct vq_info *info, int num, struct virtio_device *=
-vdev)
-	{
-		if (info->vq)
-			vring_del_virtqueue(info->vq);
+Since the guest does not continue to run when it is in the
+guest-panicked state, it is currently impossible to write panicking
+tests in kvm-unit-tests. Support from the runtime is needed to check
+that the guest enters the guest-panicked state.
 
-		memset(info->ring, 0, vring_size(num, 4096));
-		vring_init(&info->vring, num, info->ring, 4096);
-		info->vq =3D __vring_new_virtqueue(info->idx, info->vring, vdev, true,
-						 false, vq_notify, vq_callback, "test");
-		assert(info->vq);
-		info->vq->priv =3D info;
-	}
+This series adds the required support to the runtime together with two
+tests for s390x which cause guest panics.
 
-I think this could be replaced with vring_new_virtqueue() so that we don't =
-need
-to make __vring_new_virtqueue as an export function so we can make some
-modifications to it.
+Nico Boehr (4):
+  runtime: add support for panic tests
+  lib: s390x: add CPU timer functions to time.h
+  s390x: add extint loop test
+  s390x: add pgm spec interrupt loop test
 
-nit: vring_alloc_desc_extra() should not have to be extract from
-__vring_new_virtqueue() .
+ lib/s390x/asm/time.h      | 17 ++++++++++-
+ s390x/Makefile            |  2 ++
+ s390x/panic-loop-extint.c | 60 +++++++++++++++++++++++++++++++++++++++
+ s390x/panic-loop-pgm.c    | 53 ++++++++++++++++++++++++++++++++++
+ s390x/run                 |  2 +-
+ s390x/unittests.cfg       | 12 ++++++++
+ scripts/arch-run.bash     | 49 ++++++++++++++++++++++++++++++++
+ scripts/runtime.bash      |  3 ++
+ 8 files changed, 196 insertions(+), 2 deletions(-)
+ create mode 100644 s390x/panic-loop-extint.c
+ create mode 100644 s390x/panic-loop-pgm.c
 
-Thanks.
+-- 
+2.36.1
 
->
-> And if this makes sense, we can do something similar to packed ring.
->
-> Thanks
->
->
-> >   	to_vvq(vq)->we_own_ring =3D true;
-> >
-> >   	return vq;
->
