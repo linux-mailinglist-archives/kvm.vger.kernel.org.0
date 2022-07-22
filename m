@@ -2,111 +2,110 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 1489257E785
-	for <lists+kvm@lfdr.de>; Fri, 22 Jul 2022 21:38:18 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id D04D157E843
+	for <lists+kvm@lfdr.de>; Fri, 22 Jul 2022 22:23:14 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236496AbiGVTiQ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 22 Jul 2022 15:38:16 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39482 "EHLO
+        id S236341AbiGVUXN (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 22 Jul 2022 16:23:13 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49628 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229986AbiGVTiO (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 22 Jul 2022 15:38:14 -0400
-Received: from mail.skyhub.de (mail.skyhub.de [5.9.137.197])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 26E9B52889;
-        Fri, 22 Jul 2022 12:38:14 -0700 (PDT)
-Received: from zn.tnic (p200300ea97297665329c23fffea6a903.dip0.t-ipconnect.de [IPv6:2003:ea:9729:7665:329c:23ff:fea6:a903])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by mail.skyhub.de (SuperMail on ZX Spectrum 128k) with ESMTPSA id A74851EC0666;
-        Fri, 22 Jul 2022 21:38:08 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alien8.de; s=dkim;
-        t=1658518688;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:in-reply-to:in-reply-to:  references:references;
-        bh=oqMlhQ+9AS8F60PcU1q78Rrrk17ahXV0byauFO5z1UU=;
-        b=pfCUktwvWkG8U+aXBptEc75Naz9avVy8tj8mgVyoRbOzAP4tbeOUfcsyB1cEHRJQiRYHNN
-        OszJAzeSOi6AAD3WDUvaBlLpfBrkiXm9Br3wdsTCPfwl/qdjJMF6lwdg4DjjaBwlGllUqz
-        9n5XyBv4JtYXEaGzrdzUq78AGYDJkNM=
-Date:   Fri, 22 Jul 2022 21:38:04 +0200
-From:   Borislav Petkov <bp@alien8.de>
-To:     Sean Christopherson <seanjc@google.com>
-Cc:     "Kalra, Ashish" <Ashish.Kalra@amd.com>,
-        Dave Hansen <dave.hansen@intel.com>,
-        "x86@kernel.org" <x86@kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "linux-coco@lists.linux.dev" <linux-coco@lists.linux.dev>,
-        "linux-mm@kvack.org" <linux-mm@kvack.org>,
-        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
-        "tglx@linutronix.de" <tglx@linutronix.de>,
-        "mingo@redhat.com" <mingo@redhat.com>,
-        "jroedel@suse.de" <jroedel@suse.de>,
-        "Lendacky, Thomas" <Thomas.Lendacky@amd.com>,
-        "hpa@zytor.com" <hpa@zytor.com>,
-        "ardb@kernel.org" <ardb@kernel.org>,
-        "pbonzini@redhat.com" <pbonzini@redhat.com>,
-        "vkuznets@redhat.com" <vkuznets@redhat.com>,
-        "jmattson@google.com" <jmattson@google.com>,
-        "luto@kernel.org" <luto@kernel.org>,
-        "dave.hansen@linux.intel.com" <dave.hansen@linux.intel.com>,
-        "slp@redhat.com" <slp@redhat.com>,
-        "pgonda@google.com" <pgonda@google.com>,
-        "peterz@infradead.org" <peterz@infradead.org>,
-        "srinivas.pandruvada@linux.intel.com" 
-        <srinivas.pandruvada@linux.intel.com>,
-        "rientjes@google.com" <rientjes@google.com>,
-        "dovmurik@linux.ibm.com" <dovmurik@linux.ibm.com>,
-        "tobin@ibm.com" <tobin@ibm.com>,
-        "Roth, Michael" <Michael.Roth@amd.com>,
-        "vbabka@suse.cz" <vbabka@suse.cz>,
-        "kirill@shutemov.name" <kirill@shutemov.name>,
-        "ak@linux.intel.com" <ak@linux.intel.com>,
-        "tony.luck@intel.com" <tony.luck@intel.com>,
-        "marcorr@google.com" <marcorr@google.com>,
-        "sathyanarayanan.kuppuswamy@linux.intel.com" 
-        <sathyanarayanan.kuppuswamy@linux.intel.com>,
-        "alpergun@google.com" <alpergun@google.com>,
-        "dgilbert@redhat.com" <dgilbert@redhat.com>,
-        "jarkko@kernel.org" <jarkko@kernel.org>
-Subject: Re: [PATCH Part2 v6 05/49] x86/sev: Add RMP entry lookup helpers
-Message-ID: <Ytr8nCL6pa2Q1kWy@zn.tnic>
-References: <BYAPR12MB27595CF4328B15F0F9573D188EB29@BYAPR12MB2759.namprd12.prod.outlook.com>
- <99d72d58-a9bb-d75c-93af-79d497dfe176@intel.com>
- <BYAPR12MB275984F14B1E103935A103D98EB29@BYAPR12MB2759.namprd12.prod.outlook.com>
- <5db37cc2-4fb1-7a73-c39a-3531260414d0@intel.com>
- <BYAPR12MB2759AA368C8B6A5F1C31642F8EB29@BYAPR12MB2759.namprd12.prod.outlook.com>
- <YrTq3WfOeA6ehsk6@google.com>
- <SN6PR12MB276743CBEAD5AFE9033AFE558EB59@SN6PR12MB2767.namprd12.prod.outlook.com>
- <YtqLhHughuh3KDzH@zn.tnic>
- <Ytr0t119QrZ8PUBB@google.com>
- <Ytr5ndnlOQvqWdPP@zn.tnic>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <Ytr5ndnlOQvqWdPP@zn.tnic>
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,SPF_HELO_NONE,SPF_PASS
-        autolearn=ham autolearn_force=no version=3.4.6
+        with ESMTP id S233195AbiGVUXM (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 22 Jul 2022 16:23:12 -0400
+Received: from mail-yb1-xb4a.google.com (mail-yb1-xb4a.google.com [IPv6:2607:f8b0:4864:20::b4a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5481FAF870
+        for <kvm@vger.kernel.org>; Fri, 22 Jul 2022 13:23:10 -0700 (PDT)
+Received: by mail-yb1-xb4a.google.com with SMTP id v1-20020a259d81000000b0066ec7dff8feso4394350ybp.18
+        for <kvm@vger.kernel.org>; Fri, 22 Jul 2022 13:23:10 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112;
+        h=date:message-id:mime-version:subject:from:to:cc;
+        bh=3DKrfoh61Dqk6Sa/nAKARj+FQDg0i5e4KBmQvEvcS2s=;
+        b=j0/4QiM2sGxSn//FUxRPUuhp++Ne+jXeznezeNxC2YIXonamyN3Wv9QQfO6wGmabZy
+         CkUcvXobHBYBvgfvBloT29Ah14Yads9R/V5KHZqJObNImKuVWRSBoZHxGLk3bi8NUVJK
+         sTgPCBVdz+X+uMZuaLrYE7bj7QeQCn3HFI2p2INBX3kok+DAbErkDHPb2mTOMb3n1TcR
+         4/exj5aARp/ILpXpVcV+8mfmwKmgNoryT6ksBrJHJj8KBq1lO3Nk0MXvUJN/CzUu6OCe
+         qaCkR26ZDW6wE6+pAgGTAh9uShGM55nqxYwLLaci4hLSVpEw9rTKBI73gKbvmU5rTAc8
+         8Guw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:date:message-id:mime-version:subject:from:to:cc;
+        bh=3DKrfoh61Dqk6Sa/nAKARj+FQDg0i5e4KBmQvEvcS2s=;
+        b=xMHE57rOg/N1LtGBHT3oxl5V9EzdoON15oPHsuAWOuYwrQvz4BLmjd9yzNpoQXva+E
+         Xli7Rp64UMkF6SSBcmFH9Q9t00i3QUAEk+huhR8ek+FKyutc0HgpOlvqL1PxOOT5uoMN
+         xILmPC0X2gRWQ04cPo+y9Y1tWfmCAaeFLSi/Hxtu5EibeviVPNUTsTJ6G0+0UUawL0ZA
+         2odkoVkRyrbH2AbNMd3Y/hxm0UgpCcWCRPypBtCNF6jFCKZUa51DDr7n+dgbcg4EpSI5
+         l8QDtNVH6F966+rmqrkIlCGHWCKWQqAvHdr3Gr78b1jYmD1QZ9QTDXI6xYY/X3BxrHAY
+         U0yg==
+X-Gm-Message-State: AJIora9swbJjTOI1S5nlbVwK0gNX1xkuNgr1kkwUtuVJhPtGvl/AbS3P
+        J67Uxh2NxlxcI2OLGQHzGcG+bsAfk9lqDBmmcjkPL6CmAUkumwjL0uQfNtPR8fgY7cC9B7Gy7X/
+        5bJ+z3vWA00EwvDzd4+pJsUSEj8beK69QYn0PTVctTNUg9X3KeT4X2F1hpcljjBr4JOc6
+X-Google-Smtp-Source: AGRyM1uNzE+SHMa2FmYt1lsh0VTiAdvlqVzeqcA1kudP6HfJekAEsfTbVlCNF8GF5QmYN4dd2gdeSlZNiWwjn0H7
+X-Received: from aaronlewis.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:2675])
+ (user=aaronlewis job=sendgmr) by 2002:a81:1545:0:b0:31e:73f6:13f4 with SMTP
+ id 66-20020a811545000000b0031e73f613f4mr1399348ywv.127.1658521389552; Fri, 22
+ Jul 2022 13:23:09 -0700 (PDT)
+Date:   Fri, 22 Jul 2022 20:22:59 +0000
+Message-Id: <20220722202303.391709-1-aaronlewis@google.com>
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.37.1.359.gd136c6c3e2-goog
+Subject: [RFC PATCH v3 0/4] MSR filtering / exiting flag cleanup
+From:   Aaron Lewis <aaronlewis@google.com>
+To:     kvm@vger.kernel.org
+Cc:     pbonzini@redhat.com, jmattson@google.com, seanjc@google.com,
+        Aaron Lewis <aaronlewis@google.com>
+Content-Type: text/plain; charset="UTF-8"
+X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Btw,
+Posting as an RFC to get feedback whether it's too late to protect the
+unused flag bits.  My hope is this feature is still new enough, and not
+widely used enough, and this change is reasonable enough to be able to be
+corrected.  These bits should have been protected from the start, but
+unfortunately they were not.
 
-what could work is to spec only a *version* field somewhere in the HW or
-FW which says which version the RMP header has.
+Other approaches to fixing this could be to fix it with a quirk, or the
+tried and true KVM method of adding a "2" (e.g. KVM_CAP_X86_USER_SPACE_MSR2).
+Both approaches, however, complicate the code more than it would otherwise
+be if the original feature could be patched.
 
-Then, OS would check that field and if it doesn't support that certain
-version, it'll bail.
+For long term simplicity my hope is to be able to just patch
+the original change.
 
-I'd need to talk to folks first, though, what the whole story is behind
-not spec-ing the RMP format...
+Note: Patch 1/4 does not change the ABI and patch 3/4 does not contain
+functional changes, so they are not labeled as RFCs.
+
+v2 -> v3
+ - Added patch 1/4 to prevent the kernel from using the flag
+   KVM_MSR_FILTER_DEFAULT_ALLOW.
+ - Cleaned up the selftest code based on feedback.
+
+v1 -> v2
+ - Added valid masks KVM_MSR_FILTER_VALID_MASK and
+   KVM_MSR_EXIT_REASON_VALID_MASK.
+ - Added patch 2/3 to add valid mask KVM_MSR_FILTER_RANGE_VALID_MASK, and
+   use it.
+ - Added testing to demonstrate flag protection when calling the ioctl for
+   KVM_X86_SET_MSR_FILTER or KVM_CAP_X86_USER_SPACE_MSR.
+
+Aaron Lewis (4):
+  KVM: x86: Do not allow use of the MSR filter allow flag in the kernel
+  KVM: x86: Protect the unused bits in the MSR filtering / exiting flags
+  KVM: x86: Add a VALID_MASK for the flags in kvm_msr_filter_range
+  selftests: kvm/x86: Test the flags in MSR filtering / exiting
+
+ arch/x86/include/uapi/asm/kvm.h               |  5 ++
+ arch/x86/kvm/x86.c                            |  8 +-
+ include/uapi/linux/kvm.h                      |  3 +
+ .../kvm/x86_64/userspace_msr_exit_test.c      | 85 +++++++++++++++++++
+ 4 files changed, 100 insertions(+), 1 deletion(-)
 
 -- 
-Regards/Gruss,
-    Boris.
+2.37.1.359.gd136c6c3e2-goog
 
-https://people.kernel.org/tglx/notes-about-netiquette
