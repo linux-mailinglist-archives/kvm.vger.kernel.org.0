@@ -2,100 +2,94 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id E12E757E574
-	for <lists+kvm@lfdr.de>; Fri, 22 Jul 2022 19:24:25 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 97F6F57E5AB
+	for <lists+kvm@lfdr.de>; Fri, 22 Jul 2022 19:34:13 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233965AbiGVRYL (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 22 Jul 2022 13:24:11 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45672 "EHLO
+        id S236001AbiGVReL (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 22 Jul 2022 13:34:11 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54494 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235739AbiGVRYB (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 22 Jul 2022 13:24:01 -0400
-Received: from mail-pg1-x52e.google.com (mail-pg1-x52e.google.com [IPv6:2607:f8b0:4864:20::52e])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7271A7B7A2
-        for <kvm@vger.kernel.org>; Fri, 22 Jul 2022 10:23:54 -0700 (PDT)
-Received: by mail-pg1-x52e.google.com with SMTP id 12so4716382pga.1
-        for <kvm@vger.kernel.org>; Fri, 22 Jul 2022 10:23:54 -0700 (PDT)
+        with ESMTP id S235065AbiGVReK (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 22 Jul 2022 13:34:10 -0400
+Received: from mail-ed1-x52f.google.com (mail-ed1-x52f.google.com [IPv6:2a00:1450:4864:20::52f])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 75A108CEB2;
+        Fri, 22 Jul 2022 10:34:09 -0700 (PDT)
+Received: by mail-ed1-x52f.google.com with SMTP id t3so6715747edd.0;
+        Fri, 22 Jul 2022 10:34:09 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=nP/kZp+cfU+PzA9FUjazEG7/eYrubq8X263Q4O4hdGA=;
-        b=d1uA3R0qq8joJKG5RNV6d/UBGTRfMTvqMP6O7YtvO5p85K2pjIsoI4Zz1VKX4Ak519
-         QCGffbe+j3tWqxDWOvpLMu6q3LIkT//K257CkgOccMcDegdi2E2JgmBBLLeybYGxUOd3
-         59LGK7aCNaC7hB8xqLJsH6bqn4KBqOQ+N46BE+0VMs5tIk6a3jn8dDwV4w/RWViGhKjc
-         1+xVI6W1F8J0r9ipDTvNx/Z0w0jfVhmz2HTltC8T4nG1tr/9diqHK/IbyuF1I1gwZtJv
-         T8XC8FvWkYORTqGvmx92kSnLMH2fbZ3BvsynLr5cr4bHmX0Q78OP/aD75I+2QOxYDhMR
-         OK+Q==
+        d=gmail.com; s=20210112;
+        h=sender:message-id:date:mime-version:user-agent:subject
+         :content-language:to:cc:references:from:in-reply-to
+         :content-transfer-encoding;
+        bh=G8wV1o9o6SN/p0PWSM9C28UoTIzC1ku8DpyZxiwFv3E=;
+        b=X1aBufQJAIrSZNSx8ZHnnf+MXDY0THmUHcFObNk2PcKLW1PP13HzP1mxHbhBd6SJJW
+         nHx/qsfrIbMODP1dr2PIjaFbCL7F7jg08WqhzblKtiqSYvM5AcMypYvowfdxenvOJRtS
+         5RPnB1wgCoW2PSr7mJvUQSE2URnPC7fiE2/0kXQkJnc/AEbP/jNMfx9cpaxz07mYJhbU
+         72szGkVHcZebY3DK1UrICbm2MqBi3TZqo4RDtKD2Ja4t7+sc3NnNRyGzPNqTlFK9e4VG
+         uMgJkLhsQqofYFjbsIGGNE6vc05wvFwh/C9D8gwC5na5ySDxU8J/kODmmEZyVv8TtlPq
+         GKqw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=nP/kZp+cfU+PzA9FUjazEG7/eYrubq8X263Q4O4hdGA=;
-        b=KZZcywPutstOrpfzNxTjeAisoN3jlz3DMzW7o7D6bG8acxK7wjLwcq2vDEHXNmnM3Q
-         3N+yzAtCgVjxYMsFUn7un+wwKbjOENQSJb9Cskh1ZYbl1q/CrQUXQ012HKtLTTrk2mwD
-         wL/b803eQApiJPppUFucqECY26NLUk+cv5103Z1cwFnHhxN2+urcnE6g+ZEoUQICE3VR
-         JKiclpfSxoesfoIuZvmKBv9VFoO2Xq7m0S5lS4Q4n7x3ImpTKlxDy3aPdpYvEXLmLCcx
-         9sBJ+k0p/AOxswWiM4NOIV9WCbJbYJqsS8vtCeuVdDdmhX9hWS/nxsnVvZZI7yknqVRr
-         dvsw==
-X-Gm-Message-State: AJIora/p3ZttQH8UeRIbbdLta4qa3vJ6SIjRTXVRHkvhBzbgIUdCRsCv
-        TyC6BI9EX1d6V7JSejAezLbAOg==
-X-Google-Smtp-Source: AGRyM1uj5dABQna8UMODRfNQ6r1Z8LffiMru2fxqxcgGmeM9Ao43oJ9OhYnmZuxsnSMMweKJJVpbAw==
-X-Received: by 2002:a63:fc14:0:b0:419:d6c0:c79e with SMTP id j20-20020a63fc14000000b00419d6c0c79emr659961pgi.493.1658510633709;
-        Fri, 22 Jul 2022 10:23:53 -0700 (PDT)
-Received: from google.com (123.65.230.35.bc.googleusercontent.com. [35.230.65.123])
-        by smtp.gmail.com with ESMTPSA id p27-20020a63951b000000b003fbfe88be17sm3770452pgd.24.2022.07.22.10.23.52
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 22 Jul 2022 10:23:53 -0700 (PDT)
-Date:   Fri, 22 Jul 2022 17:23:49 +0000
-From:   Sean Christopherson <seanjc@google.com>
-To:     Paolo Bonzini <pbonzini@redhat.com>
-Cc:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-        oliver.upton@linux.dev
+        h=x-gm-message-state:sender:message-id:date:mime-version:user-agent
+         :subject:content-language:to:cc:references:from:in-reply-to
+         :content-transfer-encoding;
+        bh=G8wV1o9o6SN/p0PWSM9C28UoTIzC1ku8DpyZxiwFv3E=;
+        b=14BwcQooIM7bwqofvmfNcmsHEBXY2Y8M7WdFOngER/96bHBIHR8aM07hQq2LyMkQZ6
+         h97ZDL93Lmstefk4O5X4bOvZm3qg6sPgcSTkKv/QzC7RGTRqXUOTCvUAcHrDpuoibHr4
+         PPILV+iZbQxd4KtG4xnAoZsmuh1Mn4N745owvQMY3mLBDzzbSomEEW/Kr3CMq3xK8NE+
+         0ic54tORjIJDpatgBUHeySA+ZZ8OiDzFUzl7ujwdNlOh1XdbP8eE2cykfMKHrr3p6NYW
+         mSEHIsxa72z+T7XPZlpEzImTtixu0MvHtRfXmAOBs4IPF0CU9se2xug1ocgBAiFKUA4e
+         0h3g==
+X-Gm-Message-State: AJIora9B3dS0bhKh7mZAi/1pk7sxqTbU9gnxVsqnf6IY+eFYe8jQMcM4
+        tcmnF13v/u70DGf0frD4dAY=
+X-Google-Smtp-Source: AGRyM1vb2Aa2MfX5JDtVJrsdGpFw+uv9M6/mUx8CIXnfLz7uKg9KNU2nM8HATusYDlxB76zAPjRa5w==
+X-Received: by 2002:a05:6402:529a:b0:43b:b8e4:fca5 with SMTP id en26-20020a056402529a00b0043bb8e4fca5mr978244edb.344.1658511247874;
+        Fri, 22 Jul 2022 10:34:07 -0700 (PDT)
+Received: from ?IPV6:2001:b07:6468:f312:9af8:e5f5:7516:fa89? ([2001:b07:6468:f312:9af8:e5f5:7516:fa89])
+        by smtp.googlemail.com with ESMTPSA id j16-20020a50ed10000000b0043ab36d6019sm2842711eds.9.2022.07.22.10.34.07
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 22 Jul 2022 10:34:07 -0700 (PDT)
+Sender: Paolo Bonzini <paolo.bonzini@gmail.com>
+Message-ID: <860ea999-76c3-9ffe-054c-2f88bb914a56@redhat.com>
+Date:   Fri, 22 Jul 2022 19:34:06 +0200
+MIME-Version: 1.0
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.10.0
 Subject: Re: [PATCH] Revert "KVM: nVMX: Do not expose MPX VMX controls when
  guest MPX disabled"
-Message-ID: <YtrdJWmk/2RkcQi7@google.com>
+Content-Language: en-US
+To:     Sean Christopherson <seanjc@google.com>
+Cc:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        oliver.upton@linux.dev
 References: <20220722104329.3265411-1-pbonzini@redhat.com>
  <YtrB8JEuc1Il1EOO@google.com>
  <0f8dde12-576b-1579-38c9-496306aeeb81@redhat.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <0f8dde12-576b-1579-38c9-496306aeeb81@redhat.com>
-X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-        USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=unavailable
-        autolearn_force=no version=3.4.6
+ <YtrdJWmk/2RkcQi7@google.com>
+From:   Paolo Bonzini <pbonzini@redhat.com>
+In-Reply-To: <YtrdJWmk/2RkcQi7@google.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Spam-Status: No, score=-1.5 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_EF,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+        HEADER_FROM_DIFFERENT_DOMAINS,NICE_REPLY_A,RCVD_IN_DNSWL_NONE,
+        SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Jul 22, 2022, Paolo Bonzini wrote:
-> On 7/22/22 17:27, Sean Christopherson wrote:
-> > > So revert it, at the potential cost
-> > > of breaking L1s with a 6 year old kernel.
-> > I would further qualify this with "breaking L1s with an_unpatched_  6 year old
-> > kernel".  That fix was tagged for stable and made it way to at least the 4.9 and
-> > 4.4 LTS releases.
-> > 
+On 7/22/22 19:23, Sean Christopherson wrote:
+> Can you drop the PERF_GLOBAL_CTRL revert?  I figured out how to achieve what you
+> intended, but in a more robust (and IMO more logical) manner.
 > 
-> Well, there _are_ people that use very old kernels and keep them up-to-date
-> with fixes for only critical CVEs (for example by, ehm, paying my employer
-> to do so).
+> If you don't drop it before I concoct the series, I'll just include a throwaway
+> patch to revert it.
 
-Heh, I'm sure that's a winning strategy.
+I didn't drop it in the end (pushed before reading this), but it's 
+intended to be temporary and I'll of course drop it if your series 
+supersedes it instead of building upon it.
 
-> But still it's way way unlikely for them to be used as L1 in a nested setup,
-> whether on their own hardware or in the cloud.
->
-> I pushed everything to kvm/queue, but depending on what you post it may be
-> deferred to 5.21.
+You don't need to include the revert but you can also do that if you prefer.
 
-Can you drop the PERF_GLOBAL_CTRL revert?  I figured out how to achieve what you
-intended, but in a more robust (and IMO more logical) manner.
-
-If you don't drop it before I concoct the series, I'll just include a throwaway
-patch to revert it.
+Paolo
