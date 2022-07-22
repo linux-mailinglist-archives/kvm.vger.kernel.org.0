@@ -2,78 +2,74 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 8773E57E4D4
-	for <lists+kvm@lfdr.de>; Fri, 22 Jul 2022 18:51:30 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 3577157E4F5
+	for <lists+kvm@lfdr.de>; Fri, 22 Jul 2022 19:05:16 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235939AbiGVQvJ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 22 Jul 2022 12:51:09 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47900 "EHLO
+        id S234251AbiGVRFO (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 22 Jul 2022 13:05:14 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57466 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235959AbiGVQvB (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 22 Jul 2022 12:51:01 -0400
-Received: from mail-pj1-x1033.google.com (mail-pj1-x1033.google.com [IPv6:2607:f8b0:4864:20::1033])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 86F2D6454
-        for <kvm@vger.kernel.org>; Fri, 22 Jul 2022 09:51:00 -0700 (PDT)
-Received: by mail-pj1-x1033.google.com with SMTP id b10so4854302pjq.5
-        for <kvm@vger.kernel.org>; Fri, 22 Jul 2022 09:51:00 -0700 (PDT)
+        with ESMTP id S233662AbiGVRFM (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 22 Jul 2022 13:05:12 -0400
+Received: from mail-pj1-x1034.google.com (mail-pj1-x1034.google.com [IPv6:2607:f8b0:4864:20::1034])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E85DD7650
+        for <kvm@vger.kernel.org>; Fri, 22 Jul 2022 10:05:11 -0700 (PDT)
+Received: by mail-pj1-x1034.google.com with SMTP id x24-20020a17090ab01800b001f21556cf48so8682173pjq.4
+        for <kvm@vger.kernel.org>; Fri, 22 Jul 2022 10:05:11 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=rivosinc-com.20210112.gappssmtp.com; s=20210112;
-        h=from:to:cc:subject:date:message-id:in-reply-to:references
-         :mime-version:content-transfer-encoding;
-        bh=KXvEKspdEkxNZ7tN6bENVdCw8YU5lf4YyaP929zXWIY=;
-        b=7p+lThfs8k+oMeRhSJ4+Sa0GbYsf5NGzgVNLIZsOK/i7bYyR9ikCF+F4K2laR6bTve
-         6F2xKPhOVzVlntVsPYc1gdJ2wtZzASEPN4YRBYwW2gSZ+jP+i31xDUywHBLquGkotWp1
-         9eC11EYlLNS2YYteaIEbi0Q0sdeseQNurVzM7efF5pLBCGBzPP4ZU2aH23vi4raqmKv3
-         RWcDot9rNBkQwxfarCY6J9JMfjUXnXV9LpwB7QNZjtfBLdFyppIzuxUTWRG7E5vGEYCe
-         KkS3CaND5njvc/9QX5tYNJwuYu6py/U1L7f4O6IhAtsivG1ChTMKyANICi3Hff5mA7gx
-         DcyA==
+        d=google.com; s=20210112;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=EIQBR56/tJcNBR6OGH/TjjSrDbmF7UtKhywW9Hj0CUY=;
+        b=ll/TN7RHrz3zet8Hb5kr/a0vsvXTl01rS1ijTZRx2gc/6AX7XZlUe25dJ6dyifZAkn
+         Vf+suc2mp2Mo7OU49OfAsxW+vzt+VLB/Lhh9jZPHlIOKu6rw5SPMA7lwqcPFOSix23E3
+         xidaleqnYRsuyCOp0BBfofLrx0Wp2Js/csk6eMH+TEQ6i1btJRgPyQnM/sYt9CtFFiX0
+         9evjlfYud7iuG5e94WVg8HHecjPuvNJTUmjMIxGyFSb6Inhmlbfw5D9ZoAvyRw8qTdiN
+         yv0FzfY0EXkrrnsH4/IYTex0Y7BMikYCyw6oHvxJX4k1BdSI043dkl2mssfj9SP1XxAZ
+         TP/g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
-         :references:mime-version:content-transfer-encoding;
-        bh=KXvEKspdEkxNZ7tN6bENVdCw8YU5lf4YyaP929zXWIY=;
-        b=rYcyj9RwWjRaLg85I6PlimmOFzcQPEam619q7XHBfh4HjS4n26xWJYggVUO4qF6VU6
-         MVYyBLheWJGwf+6aMMqygM0fNPNDbFACzBAVmgodTxGF5hni+cIu5TE+fzc/5+cpQzlA
-         Hu7TspkggiSQ4iJyEcst50M3tyxgoGgG+7IalM6WqE4euGW9m+iNMFWunCCywTc0U/SY
-         vId6I5Cj81zhEymbQYoU7lzHkeAha0zoytympqFx67He2sNbtN3aYkcJphGMah5YMnhi
-         nJefub+gNfqpTnkIZT0SmwCXq4FLTC1lM6HFwvRkly5fAL4fLQlms/8sScyOO524VNjJ
-         btwg==
-X-Gm-Message-State: AJIora8uMaRaAW/RJLSwkq7TD24P6Px3cefJSTy3n2fOtPSCsza33BEw
-        X8VbzpR/RMn5yFxbGKIy7vZVhw==
-X-Google-Smtp-Source: AGRyM1tUVg7Oh9vy5jlPMjPGaMSlVSCY+jB3RipEuR8oPEj5J52fy13dYqMdBlfpR+3cY+bINis72g==
-X-Received: by 2002:a17:90b:390a:b0:1f0:6a1a:9654 with SMTP id ob10-20020a17090b390a00b001f06a1a9654mr564533pjb.90.1658508659995;
-        Fri, 22 Jul 2022 09:50:59 -0700 (PDT)
-Received: from atishp.ba.rivosinc.com ([66.220.2.162])
-        by smtp.gmail.com with ESMTPSA id s7-20020a170902ea0700b0016a3f9e4865sm4028476plg.148.2022.07.22.09.50.58
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=EIQBR56/tJcNBR6OGH/TjjSrDbmF7UtKhywW9Hj0CUY=;
+        b=0zgRZ+AO672icIisJNfLYbK8kV/ZFUsj0YzAT0rles/1rBrfyF8oRa/ySpcXVP1Mfl
+         YFb00dlgn9A35JMJh2oJWyrQQ75go0puGurHd9n17x5Iqmin8B4RmCxgYdvxaisFhUlC
+         krbjiL3EE1lriTRs+IcTpPQ+pUb0eNj0PC6nTnsnrlM8vA3p3CMiIS4S7QYThUlg3u0p
+         SNUNGrqxd1SdqiQq3zqPs8K4CUToRUB9UcmmSek9TS4SJRo/91pKuqeB2sIlmvqPky7Y
+         FcRPcB/exta0lGt8mYb52gdok1ZsW44D0OJLToDrGCH86haxCxH/W78nzDcWLzrzeelF
+         NdWw==
+X-Gm-Message-State: AJIora8L4JciaLVHHU+Fwx8Bu81YzWVl1FThODlGUzeihZuTa4ktaq29
+        96ltrfoKsTPdNvUS8t3mTitY3g==
+X-Google-Smtp-Source: AGRyM1vFlk9DkZd9UBK770fSURYjd+N7HQh0/nEt16WDmaIMu9aOsXfJxkshzokJ7v3u6ERX5w/m5A==
+X-Received: by 2002:a17:902:da85:b0:16c:bf2e:fac7 with SMTP id j5-20020a170902da8500b0016cbf2efac7mr784455plx.166.1658509510994;
+        Fri, 22 Jul 2022 10:05:10 -0700 (PDT)
+Received: from google.com ([2620:15c:2ce:200:2571:bd04:907d:d32f])
+        by smtp.gmail.com with ESMTPSA id f26-20020a631f1a000000b00415320bc31dsm3632484pgf.32.2022.07.22.10.05.09
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 22 Jul 2022 09:50:59 -0700 (PDT)
-From:   Atish Patra <atishp@rivosinc.com>
-To:     linux-kernel@vger.kernel.org
-Cc:     Atish Patra <atishp@rivosinc.com>,
-        Anup Patel <anup@brainfault.org>,
-        Albert Ou <aou@eecs.berkeley.edu>,
-        Atish Patra <atishp@atishpatra.org>,
-        Daniel Lezcano <daniel.lezcano@linaro.org>,
-        Guo Ren <guoren@kernel.org>, Heiko Stuebner <heiko@sntech.de>,
-        kvm-riscv@lists.infradead.org, kvm@vger.kernel.org,
-        linux-riscv@lists.infradead.org,
-        Palmer Dabbelt <palmer@dabbelt.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Paul Walmsley <paul.walmsley@sifive.com>,
-        Rob Herring <robh@kernel.org>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Tsukasa OI <research_trasio@irq.a4lg.com>,
-        Wei Fu <wefu@redhat.com>
-Subject: [PATCH v7 4/4] RISC-V: KVM: Support sstc extension
-Date:   Fri, 22 Jul 2022 09:50:47 -0700
-Message-Id: <20220722165047.519994-5-atishp@rivosinc.com>
-X-Mailer: git-send-email 2.25.1
-In-Reply-To: <20220722165047.519994-1-atishp@rivosinc.com>
-References: <20220722165047.519994-1-atishp@rivosinc.com>
+        Fri, 22 Jul 2022 10:05:10 -0700 (PDT)
+Date:   Fri, 22 Jul 2022 10:04:59 -0700
+From:   Peter Collingbourne <pcc@google.com>
+To:     Marc Zyngier <maz@kernel.org>
+Cc:     linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
+        Cornelia Huck <cohuck@redhat.com>,
+        Catalin Marinas <catalin.marinas@arm.com>,
+        Will Deacon <will@kernel.org>,
+        Evgenii Stepanov <eugenis@google.com>, kvm@vger.kernel.org,
+        Steven Price <steven.price@arm.com>,
+        Vincenzo Frascino <vincenzo.frascino@arm.com>
+Subject: Re: [PATCH v2 3/7] mm: Add PG_arch_3 page flag
+Message-ID: <YtrYu54WBHJa4YMP@google.com>
+References: <20220722015034.809663-1-pcc@google.com>
+ <20220722015034.809663-4-pcc@google.com>
+ <87leslxmf1.wl-maz@kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS autolearn=ham
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <87leslxmf1.wl-maz@kernel.org>
+X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
+        USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=ham
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -81,296 +77,86 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Sstc extension allows the guest to program the vstimecmp CSR directly
-instead of making an SBI call to the hypervisor to program the next
-event. The timer interrupt is also directly injected to the guest by
-the hardware in this case. To maintain backward compatibility, the
-hypervisors also update the vstimecmp in an SBI set_time call if
-the hardware supports it. Thus, the older kernels in guest also
-take advantage of the sstc extension.
+On Fri, Jul 22, 2022 at 03:16:34PM +0100, Marc Zyngier wrote:
+> On Fri, 22 Jul 2022 02:50:29 +0100,
+> Peter Collingbourne <pcc@google.com> wrote:
+> > 
+> > As with PG_arch_2, this flag is only allowed on 64-bit architectures due
+> > to the shortage of bits available. It will be used by the arm64 MTE code
+> > in subsequent patches.
+> > 
+> > Signed-off-by: Peter Collingbourne <pcc@google.com>
+> > Cc: Will Deacon <will@kernel.org>
+> > Cc: Marc Zyngier <maz@kernel.org>
+> > Cc: Steven Price <steven.price@arm.com>
+> > [catalin.marinas@arm.com: added flag preserving in __split_huge_page_tail()]
+> > Signed-off-by: Catalin Marinas <catalin.marinas@arm.com>
+> > ---
+> >  fs/proc/page.c                 | 1 +
+> >  include/linux/page-flags.h     | 1 +
+> >  include/trace/events/mmflags.h | 7 ++++---
+> >  mm/huge_memory.c               | 1 +
+> >  4 files changed, 7 insertions(+), 3 deletions(-)
+> > 
+> > diff --git a/fs/proc/page.c b/fs/proc/page.c
+> > index a2873a617ae8..438b8aa7249d 100644
+> > --- a/fs/proc/page.c
+> > +++ b/fs/proc/page.c
+> > @@ -220,6 +220,7 @@ u64 stable_page_flags(struct page *page)
+> >  	u |= kpf_copy_bit(k, KPF_ARCH,		PG_arch_1);
+> >  #ifdef CONFIG_64BIT
+> >  	u |= kpf_copy_bit(k, KPF_ARCH_2,	PG_arch_2);
+> > +	u |= kpf_copy_bit(k, KPF_ARCH_2,	PG_arch_3);
+> 
+> Are PG_arch_2 and PG_arch_3 supposed to share the same user bit in
+> /proc/kpageflags? This seems odd.
 
-Reviewed-by: Anup Patel <anup@brainfault.org>
-Signed-off-by: Atish Patra <atishp@rivosinc.com>
----
- arch/riscv/include/asm/kvm_vcpu_timer.h |   7 ++
- arch/riscv/include/uapi/asm/kvm.h       |   1 +
- arch/riscv/kvm/vcpu.c                   |   8 +-
- arch/riscv/kvm/vcpu_timer.c             | 144 +++++++++++++++++++++++-
- 4 files changed, 153 insertions(+), 7 deletions(-)
+No, that was an oversight, thanks for the catch. I will fix it up like
+so in v3.
 
-diff --git a/arch/riscv/include/asm/kvm_vcpu_timer.h b/arch/riscv/include/asm/kvm_vcpu_timer.h
-index 50138e2eb91b..0d8fdb8ec63a 100644
---- a/arch/riscv/include/asm/kvm_vcpu_timer.h
-+++ b/arch/riscv/include/asm/kvm_vcpu_timer.h
-@@ -28,6 +28,11 @@ struct kvm_vcpu_timer {
- 	u64 next_cycles;
- 	/* Underlying hrtimer instance */
- 	struct hrtimer hrt;
-+
-+	/* Flag to check if sstc is enabled or not */
-+	bool sstc_enabled;
-+	/* A function pointer to switch between stimecmp or hrtimer at runtime */
-+	int (*timer_next_event)(struct kvm_vcpu *vcpu, u64 ncycles);
- };
- 
- int kvm_riscv_vcpu_timer_next_event(struct kvm_vcpu *vcpu, u64 ncycles);
-@@ -40,5 +45,7 @@ int kvm_riscv_vcpu_timer_deinit(struct kvm_vcpu *vcpu);
- int kvm_riscv_vcpu_timer_reset(struct kvm_vcpu *vcpu);
- void kvm_riscv_vcpu_timer_restore(struct kvm_vcpu *vcpu);
- void kvm_riscv_guest_timer_init(struct kvm *kvm);
-+void kvm_riscv_vcpu_timer_save(struct kvm_vcpu *vcpu);
-+bool kvm_riscv_vcpu_timer_pending(struct kvm_vcpu *vcpu);
- 
+Peter
+
+diff --git a/fs/proc/page.c b/fs/proc/page.c
+index 438b8aa7249d..0129aa3cfb7a 100644
+--- a/fs/proc/page.c
++++ b/fs/proc/page.c
+@@ -220,7 +220,7 @@ u64 stable_page_flags(struct page *page)
+ 	u |= kpf_copy_bit(k, KPF_ARCH,		PG_arch_1);
+ #ifdef CONFIG_64BIT
+ 	u |= kpf_copy_bit(k, KPF_ARCH_2,	PG_arch_2);
+-	u |= kpf_copy_bit(k, KPF_ARCH_2,	PG_arch_3);
++	u |= kpf_copy_bit(k, KPF_ARCH_3,	PG_arch_3);
  #endif
-diff --git a/arch/riscv/include/uapi/asm/kvm.h b/arch/riscv/include/uapi/asm/kvm.h
-index 24b2a6e27698..7351417afd62 100644
---- a/arch/riscv/include/uapi/asm/kvm.h
-+++ b/arch/riscv/include/uapi/asm/kvm.h
-@@ -97,6 +97,7 @@ enum KVM_RISCV_ISA_EXT_ID {
- 	KVM_RISCV_ISA_EXT_I,
- 	KVM_RISCV_ISA_EXT_M,
- 	KVM_RISCV_ISA_EXT_SVPBMT,
-+	KVM_RISCV_ISA_EXT_SSTC,
- 	KVM_RISCV_ISA_EXT_MAX,
- };
  
-diff --git a/arch/riscv/kvm/vcpu.c b/arch/riscv/kvm/vcpu.c
-index 5d271b597613..d0f08d5b4282 100644
---- a/arch/riscv/kvm/vcpu.c
-+++ b/arch/riscv/kvm/vcpu.c
-@@ -52,6 +52,7 @@ static const unsigned long kvm_isa_ext_arr[] = {
- 	RISCV_ISA_EXT_i,
- 	RISCV_ISA_EXT_m,
- 	RISCV_ISA_EXT_SVPBMT,
-+	RISCV_ISA_EXT_SSTC,
- };
+ 	return u;
+diff --git a/include/linux/kernel-page-flags.h b/include/linux/kernel-page-flags.h
+index eee1877a354e..859f4b0c1b2b 100644
+--- a/include/linux/kernel-page-flags.h
++++ b/include/linux/kernel-page-flags.h
+@@ -18,5 +18,6 @@
+ #define KPF_UNCACHED		39
+ #define KPF_SOFTDIRTY		40
+ #define KPF_ARCH_2		41
++#define KPF_ARCH_3		42
  
- static unsigned long kvm_riscv_vcpu_base2isa_ext(unsigned long base_ext)
-@@ -85,6 +86,7 @@ static bool kvm_riscv_vcpu_isa_disable_allowed(unsigned long ext)
- 	case KVM_RISCV_ISA_EXT_C:
- 	case KVM_RISCV_ISA_EXT_I:
- 	case KVM_RISCV_ISA_EXT_M:
-+	case KVM_RISCV_ISA_EXT_SSTC:
- 		return false;
- 	default:
- 		break;
-@@ -203,7 +205,7 @@ void kvm_arch_vcpu_destroy(struct kvm_vcpu *vcpu)
+ #endif /* LINUX_KERNEL_PAGE_FLAGS_H */
+diff --git a/tools/vm/page-types.c b/tools/vm/page-types.c
+index 381dcc00cb62..364373f5bba0 100644
+--- a/tools/vm/page-types.c
++++ b/tools/vm/page-types.c
+@@ -79,6 +79,7 @@
+ #define KPF_UNCACHED		39
+ #define KPF_SOFTDIRTY		40
+ #define KPF_ARCH_2		41
++#define KPF_ARCH_3		42
  
- int kvm_cpu_has_pending_timer(struct kvm_vcpu *vcpu)
- {
--	return kvm_riscv_vcpu_has_interrupts(vcpu, 1UL << IRQ_VS_TIMER);
-+	return kvm_riscv_vcpu_timer_pending(vcpu);
- }
+ /* [47-] take some arbitrary free slots for expanding overloaded flags
+  * not part of kernel API
+@@ -138,6 +139,7 @@ static const char * const page_flag_names[] = {
+ 	[KPF_UNCACHED]		= "c:uncached",
+ 	[KPF_SOFTDIRTY]		= "f:softdirty",
+ 	[KPF_ARCH_2]		= "H:arch_2",
++	[KPF_ARCH_3]		= "H:arch_3",
  
- void kvm_arch_vcpu_blocking(struct kvm_vcpu *vcpu)
-@@ -785,6 +787,8 @@ static void kvm_riscv_vcpu_update_config(const unsigned long *isa)
- 	if (__riscv_isa_extension_available(isa, RISCV_ISA_EXT_SVPBMT))
- 		henvcfg |= ENVCFG_PBMTE;
- 
-+	if (__riscv_isa_extension_available(isa, RISCV_ISA_EXT_SSTC))
-+		henvcfg |= ENVCFG_STCE;
- 	csr_write(CSR_HENVCFG, henvcfg);
- #ifdef CONFIG_32BIT
- 	csr_write(CSR_HENVCFGH, henvcfg >> 32);
-@@ -828,6 +832,8 @@ void kvm_arch_vcpu_put(struct kvm_vcpu *vcpu)
- 				     vcpu->arch.isa);
- 	kvm_riscv_vcpu_host_fp_restore(&vcpu->arch.host_context);
- 
-+	kvm_riscv_vcpu_timer_save(vcpu);
-+
- 	csr->vsstatus = csr_read(CSR_VSSTATUS);
- 	csr->vsie = csr_read(CSR_VSIE);
- 	csr->vstvec = csr_read(CSR_VSTVEC);
-diff --git a/arch/riscv/kvm/vcpu_timer.c b/arch/riscv/kvm/vcpu_timer.c
-index 595043857049..16f50c46ba39 100644
---- a/arch/riscv/kvm/vcpu_timer.c
-+++ b/arch/riscv/kvm/vcpu_timer.c
-@@ -69,7 +69,18 @@ static int kvm_riscv_vcpu_timer_cancel(struct kvm_vcpu_timer *t)
- 	return 0;
- }
- 
--int kvm_riscv_vcpu_timer_next_event(struct kvm_vcpu *vcpu, u64 ncycles)
-+static int kvm_riscv_vcpu_update_vstimecmp(struct kvm_vcpu *vcpu, u64 ncycles)
-+{
-+#if defined(CONFIG_32BIT)
-+		csr_write(CSR_VSTIMECMP, ncycles & 0xFFFFFFFF);
-+		csr_write(CSR_VSTIMECMPH, ncycles >> 32);
-+#else
-+		csr_write(CSR_VSTIMECMP, ncycles);
-+#endif
-+		return 0;
-+}
-+
-+static int kvm_riscv_vcpu_update_hrtimer(struct kvm_vcpu *vcpu, u64 ncycles)
- {
- 	struct kvm_vcpu_timer *t = &vcpu->arch.timer;
- 	struct kvm_guest_timer *gt = &vcpu->kvm->arch.timer;
-@@ -88,6 +99,65 @@ int kvm_riscv_vcpu_timer_next_event(struct kvm_vcpu *vcpu, u64 ncycles)
- 	return 0;
- }
- 
-+int kvm_riscv_vcpu_timer_next_event(struct kvm_vcpu *vcpu, u64 ncycles)
-+{
-+	struct kvm_vcpu_timer *t = &vcpu->arch.timer;
-+
-+	return t->timer_next_event(vcpu, ncycles);
-+}
-+
-+static enum hrtimer_restart kvm_riscv_vcpu_vstimer_expired(struct hrtimer *h)
-+{
-+	u64 delta_ns;
-+	struct kvm_vcpu_timer *t = container_of(h, struct kvm_vcpu_timer, hrt);
-+	struct kvm_vcpu *vcpu = container_of(t, struct kvm_vcpu, arch.timer);
-+	struct kvm_guest_timer *gt = &vcpu->kvm->arch.timer;
-+
-+	if (kvm_riscv_current_cycles(gt) < t->next_cycles) {
-+		delta_ns = kvm_riscv_delta_cycles2ns(t->next_cycles, gt, t);
-+		hrtimer_forward_now(&t->hrt, ktime_set(0, delta_ns));
-+		return HRTIMER_RESTART;
-+	}
-+
-+	t->next_set = false;
-+	kvm_vcpu_kick(vcpu);
-+
-+	return HRTIMER_NORESTART;
-+}
-+
-+bool kvm_riscv_vcpu_timer_pending(struct kvm_vcpu *vcpu)
-+{
-+	struct kvm_vcpu_timer *t = &vcpu->arch.timer;
-+	struct kvm_guest_timer *gt = &vcpu->kvm->arch.timer;
-+
-+	if (!kvm_riscv_delta_cycles2ns(t->next_cycles, gt, t) ||
-+	    kvm_riscv_vcpu_has_interrupts(vcpu, 1UL << IRQ_VS_TIMER))
-+		return true;
-+	else
-+		return false;
-+}
-+
-+static void kvm_riscv_vcpu_timer_blocking(struct kvm_vcpu *vcpu)
-+{
-+	struct kvm_vcpu_timer *t = &vcpu->arch.timer;
-+	struct kvm_guest_timer *gt = &vcpu->kvm->arch.timer;
-+	u64 delta_ns;
-+
-+	if (!t->init_done)
-+		return;
-+
-+	delta_ns = kvm_riscv_delta_cycles2ns(t->next_cycles, gt, t);
-+	if (delta_ns) {
-+		hrtimer_start(&t->hrt, ktime_set(0, delta_ns), HRTIMER_MODE_REL);
-+		t->next_set = true;
-+	}
-+}
-+
-+static void kvm_riscv_vcpu_timer_unblocking(struct kvm_vcpu *vcpu)
-+{
-+	kvm_riscv_vcpu_timer_cancel(&vcpu->arch.timer);
-+}
-+
- int kvm_riscv_vcpu_get_reg_timer(struct kvm_vcpu *vcpu,
- 				 const struct kvm_one_reg *reg)
- {
-@@ -180,10 +250,20 @@ int kvm_riscv_vcpu_timer_init(struct kvm_vcpu *vcpu)
- 		return -EINVAL;
- 
- 	hrtimer_init(&t->hrt, CLOCK_MONOTONIC, HRTIMER_MODE_REL);
--	t->hrt.function = kvm_riscv_vcpu_hrtimer_expired;
- 	t->init_done = true;
- 	t->next_set = false;
- 
-+	/* Enable sstc for every vcpu if available in hardware */
-+	if (riscv_isa_extension_available(NULL, SSTC)) {
-+		t->sstc_enabled = true;
-+		t->hrt.function = kvm_riscv_vcpu_vstimer_expired;
-+		t->timer_next_event = kvm_riscv_vcpu_update_vstimecmp;
-+	} else {
-+		t->sstc_enabled = false;
-+		t->hrt.function = kvm_riscv_vcpu_hrtimer_expired;
-+		t->timer_next_event = kvm_riscv_vcpu_update_hrtimer;
-+	}
-+
- 	return 0;
- }
- 
-@@ -199,21 +279,73 @@ int kvm_riscv_vcpu_timer_deinit(struct kvm_vcpu *vcpu)
- 
- int kvm_riscv_vcpu_timer_reset(struct kvm_vcpu *vcpu)
- {
-+	struct kvm_vcpu_timer *t = &vcpu->arch.timer;
-+
-+	t->next_cycles = -1ULL;
- 	return kvm_riscv_vcpu_timer_cancel(&vcpu->arch.timer);
- }
- 
--void kvm_riscv_vcpu_timer_restore(struct kvm_vcpu *vcpu)
-+static void kvm_riscv_vcpu_update_timedelta(struct kvm_vcpu *vcpu)
- {
- 	struct kvm_guest_timer *gt = &vcpu->kvm->arch.timer;
- 
--#ifdef CONFIG_64BIT
--	csr_write(CSR_HTIMEDELTA, gt->time_delta);
--#else
-+#if defined(CONFIG_32BIT)
- 	csr_write(CSR_HTIMEDELTA, (u32)(gt->time_delta));
- 	csr_write(CSR_HTIMEDELTAH, (u32)(gt->time_delta >> 32));
-+#else
-+	csr_write(CSR_HTIMEDELTA, gt->time_delta);
- #endif
- }
- 
-+void kvm_riscv_vcpu_timer_restore(struct kvm_vcpu *vcpu)
-+{
-+	struct kvm_vcpu_csr *csr;
-+	struct kvm_vcpu_timer *t = &vcpu->arch.timer;
-+
-+	kvm_riscv_vcpu_update_timedelta(vcpu);
-+
-+	if (!t->sstc_enabled)
-+		return;
-+
-+	csr = &vcpu->arch.guest_csr;
-+#if defined(CONFIG_32BIT)
-+	csr_write(CSR_VSTIMECMP, (u32)t->next_cycles);
-+	csr_write(CSR_VSTIMECMPH, (u32)(t->next_cycles >> 32));
-+#else
-+	csr_write(CSR_VSTIMECMP, t->next_cycles);
-+#endif
-+
-+	/* timer should be enabled for the remaining operations */
-+	if (unlikely(!t->init_done))
-+		return;
-+
-+	kvm_riscv_vcpu_timer_unblocking(vcpu);
-+}
-+
-+void kvm_riscv_vcpu_timer_save(struct kvm_vcpu *vcpu)
-+{
-+	struct kvm_vcpu_csr *csr;
-+	struct kvm_vcpu_timer *t = &vcpu->arch.timer;
-+
-+	if (!t->sstc_enabled)
-+		return;
-+
-+	csr = &vcpu->arch.guest_csr;
-+	t = &vcpu->arch.timer;
-+#if defined(CONFIG_32BIT)
-+	t->next_cycles = csr_read(CSR_VSTIMECMP);
-+	t->next_cycles |= (u64)csr_read(CSR_VSTIMECMPH) << 32;
-+#else
-+	t->next_cycles = csr_read(CSR_VSTIMECMP);
-+#endif
-+	/* timer should be enabled for the remaining operations */
-+	if (unlikely(!t->init_done))
-+		return;
-+
-+	if (kvm_vcpu_is_blocking(vcpu))
-+		kvm_riscv_vcpu_timer_blocking(vcpu);
-+}
-+
- void kvm_riscv_guest_timer_init(struct kvm *kvm)
- {
- 	struct kvm_guest_timer *gt = &kvm->arch.timer;
--- 
-2.25.1
-
+ 	[KPF_ANON_EXCLUSIVE]	= "d:anon_exclusive",
+ 	[KPF_READAHEAD]		= "I:readahead",
