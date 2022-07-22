@@ -2,201 +2,173 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id A837F57E056
-	for <lists+kvm@lfdr.de>; Fri, 22 Jul 2022 12:57:21 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 02CD157E0A8
+	for <lists+kvm@lfdr.de>; Fri, 22 Jul 2022 13:08:41 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235041AbiGVK5R (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 22 Jul 2022 06:57:17 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34764 "EHLO
+        id S234097AbiGVLIi (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 22 Jul 2022 07:08:38 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45276 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229762AbiGVK5Q (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 22 Jul 2022 06:57:16 -0400
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 00FF2BA25D
-        for <kvm@vger.kernel.org>; Fri, 22 Jul 2022 03:57:14 -0700 (PDT)
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 4E9EF1063;
-        Fri, 22 Jul 2022 03:57:15 -0700 (PDT)
-Received: from [10.57.42.35] (unknown [10.57.42.35])
-        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id B84063F70D;
-        Fri, 22 Jul 2022 03:57:12 -0700 (PDT)
-Message-ID: <86e94983-0c69-88c8-f37f-c772ab6a4847@arm.com>
-Date:   Fri, 22 Jul 2022 11:57:09 +0100
+        with ESMTP id S233363AbiGVLIf (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 22 Jul 2022 07:08:35 -0400
+Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 466D0BDA05
+        for <kvm@vger.kernel.org>; Fri, 22 Jul 2022 04:08:34 -0700 (PDT)
+Received: from pps.filterd (m0098404.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.17.1.5/8.17.1.5) with ESMTP id 26M9i0ms018158
+        for <kvm@vger.kernel.org>; Fri, 22 Jul 2022 11:08:34 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=content-type :
+ mime-version : content-transfer-encoding : in-reply-to : references : cc :
+ subject : from : to : message-id : date; s=pp1;
+ bh=gnJrKYpRWoECkZfpMxQNq7BAHGUHoAot6mmNZndFSdk=;
+ b=bk/C8WTT2ioJVHIkyAEEebyytln/kqpJX5vF06NWHvCsO6+VmTQTyowPncf7Kkf/6jrh
+ Lc37nW9ehofXFDRQEjT4qGoiVxXsTLHj9jUEs51JmlN2X1qd23nW1N/VcTViqX2IkVWX
+ beHx8TkU8lutHuUi0j6PwYpy+qreW+OooIoV8ztqXj1Th1O1J95HI/oJdp7U8YfzFoKE
+ ju0rvFNSbo4kYObazqFU5ubqXaAmR1Cgh7Jec/0BaW8eXrTS4Pj/vZVv6MNu9TDNQjnO
+ l1mAJ2g5ins8hHCUntmG1FAvkYXNRxiAfNF/faBxyUvUaJljwEPXWX+Fh7HncnwJy8b/ jw== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3hfsh7abdu-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT)
+        for <kvm@vger.kernel.org>; Fri, 22 Jul 2022 11:08:33 +0000
+Received: from m0098404.ppops.net (m0098404.ppops.net [127.0.0.1])
+        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 26M9kXXa000754
+        for <kvm@vger.kernel.org>; Fri, 22 Jul 2022 11:08:33 GMT
+Received: from ppma06fra.de.ibm.com (48.49.7a9f.ip4.static.sl-reverse.com [159.122.73.72])
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3hfsh7abcp-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Fri, 22 Jul 2022 11:08:33 +0000
+Received: from pps.filterd (ppma06fra.de.ibm.com [127.0.0.1])
+        by ppma06fra.de.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 26MB8BgR024222;
+        Fri, 22 Jul 2022 11:08:30 GMT
+Received: from b06avi18878370.portsmouth.uk.ibm.com (b06avi18878370.portsmouth.uk.ibm.com [9.149.26.194])
+        by ppma06fra.de.ibm.com with ESMTP id 3hbmkht91q-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Fri, 22 Jul 2022 11:08:30 +0000
+Received: from d06av26.portsmouth.uk.ibm.com (d06av26.portsmouth.uk.ibm.com [9.149.105.62])
+        by b06avi18878370.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 26MB8duS31261016
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Fri, 22 Jul 2022 11:08:40 GMT
+Received: from d06av26.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 3921FAE04D;
+        Fri, 22 Jul 2022 11:08:27 +0000 (GMT)
+Received: from d06av26.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 17405AE057;
+        Fri, 22 Jul 2022 11:08:27 +0000 (GMT)
+Received: from li-ca45c2cc-336f-11b2-a85c-c6e71de567f1.ibm.com (unknown [9.171.80.183])
+        by d06av26.portsmouth.uk.ibm.com (Postfix) with ESMTP;
+        Fri, 22 Jul 2022 11:08:27 +0000 (GMT)
+Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:91.0)
- Gecko/20100101 Thunderbird/91.11.0
-Subject: Re: [kvm-unit-tests PATCH v3 00/27] EFI and ACPI support for arm64
-Content-Language: en-GB
-To:     Alexandru Elisei <alexandru.elisei@arm.com>
-Cc:     kvm@vger.kernel.org, andrew.jones@linux.dev, pbonzini@redhat.com,
-        jade.alglave@arm.com, ricarkol@google.com
-References: <20220630100324.3153655-1-nikos.nikoleris@arm.com>
- <YtbNin3VTyIT/yYF@monolith.localdoman>
-From:   Nikos Nikoleris <nikos.nikoleris@arm.com>
-In-Reply-To: <YtbNin3VTyIT/yYF@monolith.localdoman>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-6.9 required=5.0 tests=BAYES_00,NICE_REPLY_A,
-        RCVD_IN_DNSWL_HI,SPF_HELO_NONE,SPF_NONE autolearn=ham
-        autolearn_force=no version=3.4.6
+Content-Transfer-Encoding: quoted-printable
+In-Reply-To: <facc8a71-954a-4b4d-5d63-d07b69125a80@linux.ibm.com>
+References: <20220722072004.800792-1-nrb@linux.ibm.com> <20220722072004.800792-4-nrb@linux.ibm.com> <facc8a71-954a-4b4d-5d63-d07b69125a80@linux.ibm.com>
+Cc:     imbrenda@linux.ibm.com, thuth@redhat.com
+Subject: Re: [kvm-unit-tests PATCH v2 3/3] s390x: smp: add tests for calls in wait state
+From:   Nico Boehr <nrb@linux.ibm.com>
+To:     kvm@vger.kernel.org
+Message-ID: <165848810687.161082.2344144216592218763@localhost.localdomain>
+User-Agent: alot/0.8.1
+Date:   Fri, 22 Jul 2022 13:08:26 +0200
+X-TM-AS-GCONF: 00
+X-Proofpoint-ORIG-GUID: N4U4xasVoFXdNI0VACQYelN_yDAF10-3
+X-Proofpoint-GUID: ET6aHIYemN0vO-2R9BziILpEl2B2aa-W
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.205,Aquarius:18.0.883,Hydra:6.0.517,FMLib:17.11.122.1
+ definitions=2022-07-22_02,2022-07-21_02,2022-06-22_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 clxscore=1015 suspectscore=0
+ phishscore=0 priorityscore=1501 impostorscore=0 mlxscore=0 adultscore=0
+ lowpriorityscore=0 spamscore=0 bulkscore=0 mlxlogscore=999 malwarescore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2206140000
+ definitions=main-2207220046
+X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_EF,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_PASS
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi Alex,
+Quoting Janosch Frank (2022-07-22 10:30:46)
+> On 7/22/22 09:20, Nico Boehr wrote:
+> > Under PV, SIGP ecall requires some special handling by the hypervisor
+> > when the receiving CPU is in enabled wait. Hence, we should have
+> > coverage for the various SIGP call orders when the receiving CPU is in
+> > enabled wait.
+>=20
+> When the SIGP interpretation facility is in use a SIGP external call to=20
+> a waiting CPU will result in an exit of the calling cpu. For non-pv=20
+> guests it's a code 56 (partial execution) exit otherwise its a code 108=20
+> (secure instruction notification) exit. Those exits are handled=20
+> differently from a normal SIGP instruction intercept that happens=20
+> without interpretation and hence need to be tested.
 
-On 19/07/2022 16:28, Alexandru Elisei wrote:
-> Hi,
-> 
-> I've been trying to test the seris and I've come across some issues.
-> 
-> I've been using the target-efi-upstream-v3-rebased branch.
-> 
-> When compiling, I encounter this error:
-> 
-> gcc -mstrict-align  -mno-outline-atomics -std=gnu99 -ffreestanding -O2 -I /path/to/kvm-unit-tests/lib -I /path/to/kvm-unit-tests/lib/libfdt -I lib -g -MMD -MF lib/arm/.timer.d -fno-strict-aliasing -fno-common -Wall -Wwrite-strings -Wempty-body -Wuninitialized -Wignored-qualifiers -Wno-missing-braces -Werror  -fomit-frame-pointer  -fno-stack-protector    -Wno-frame-address   -fno-pic  -no-pie  -Wclobbered  -Wunused-but-set-parameter  -Wmissing-parameter-type  -Wold-style-declaration -Woverride-init -Wmissing-prototypes -Wstrict-prototypes   -c -o lib/arm/timer.o lib/arm/timer.c
-> lib/arm/gic.c: In function ‘gic_init_acpi’:
-> lib/arm/gic.c:241:21: error: the comparison will always evaluate as ‘true’ for the address of ‘redist_base’ will never be NULL [-Werror=address]
->    241 |                 if (!gicv3_data.redist_base)
->        |                     ^
-> In file included from /path/to//kvm-unit-tests/lib/asm/gic-v3.h:1,
->                   from /path/to//kvm-unit-tests/lib/asm/../../arm/asm/gic.h:43,
->                   from /path/to//kvm-unit-tests/lib/asm/gic.h:1,
->                   from lib/arm/gic.c:8:
-> /path/to//kvm-unit-tests/lib/asm/../../arm/asm/gic-v3.h:82:15: note: ‘redist_base’ declared here
->     82 |         void *redist_base[NR_CPUS];
->        |               ^~~~~~~~~~~
-> 
-> This happens with --enable-efi both set and unset (the above snippet is
-> from when I didn't specify --enable-efi).
-> 
-> For reference:
-> 
-> $ gcc --version
-> gcc (GCC) 12.1.0
-> Copyright (C) 2022 Free Software Foundation, Inc.
-> This is free software; see the source for copying conditions.  There is NO
-> warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
-> 
-> I managed to fix the compilation error by commenting out the
-> gicv3_acpi_parse_madt_gicc call:
-> 
-> diff --git a/lib/arm/gic.c b/lib/arm/gic.c
-> index 69521c3fde4f..66066ca84a96 100644
-> --- a/lib/arm/gic.c
-> +++ b/lib/arm/gic.c
-> @@ -179,6 +179,7 @@ static int gicv2_acpi_parse_madt_dist(struct acpi_subtable_header *header)
->          return 0;
->   }
-> 
-> +/*
->   static int gicv3_acpi_parse_madt_gicc(struct acpi_subtable_header *header)
->   {
->          struct acpi_madt_generic_interrupt *gicc = (void *)header;
-> @@ -195,6 +196,7 @@ static int gicv3_acpi_parse_madt_gicc(struct acpi_subtable_header *header)
-> 
->          return 0;
->   }
-> +*/
-> 
->   static int gicv3_acpi_parse_madt_dist(struct acpi_subtable_header *header)
->   {
-> @@ -238,9 +240,11 @@ static int gic_init_acpi(void)
->                                        gicv3_acpi_parse_madt_dist);
->                  acpi_table_parse_madt(ACPI_MADT_TYPE_GENERIC_REDISTRIBUTOR,
->                                        gicv3_acpi_parse_madt_redist);
-> +               /*
->                  if (!gicv3_data.redist_base)
->                          acpi_table_parse_madt(ACPI_MADT_TYPE_GENERIC_REDISTRIBUTOR,
->                                                gicv3_acpi_parse_madt_gicc);
-> +                                             */
->                  acpi_table_parse_madt(ACPI_MADT_TYPE_GENERIC_TRANSLATOR,
->                                        gicv3_acpi_parse_madt_its);
-> 
-> I don't think this is the right fix, but I made the changes to get
-> kvm-unit-test to build.
-> 
+Changed.
 
-Thanks, that's obviously a bug. I have a fix and I will include it in 
-the next revision. This branch: 
-https://github.com/relokin/kvm-unit-tests/tree/target-efi-upstream-v4 
-contains fixes for the feedback I received and I've been able to address 
-so far.
+> >=20
+> > The ecall test currently fails under PV due to a KVM bug under
+> > investigation.
+>=20
+> That shouldn't be true anymore
 
-> The second error I'm encountering is when I try the selftest-setup test:
-> 
-> [..]
-> ProtectUefiImageCommon - 0x4D046040
->    - 0x000000004BEC4000 - 0x000000000001F600
-> SetUefiImageMemoryAttributes - 0x000000004BEC4000 - 0x0000000000001000 (0x0000000000004008)
-> SetUefiImageMemoryAttributes - 0x000000004BEC5000 - 0x0000000000010000 (0x0000000000020008)
-> SetUefiImageMemoryAttributes - 0x000000004BED5000 - 0x000000000000F000 (0x0000000000004008)
-> InstallProtocolInterface: 752F3136-4E16-4FDC-A22A-E5F46812F4CA 4F8014E8
-> SetUefiImageMemoryAttributes - 0x000000004F640000 - 0x0000000000040000 (0x0000000000000008)
-> SetUefiImageMemoryAttributes - 0x000000004C2D0000 - 0x0000000000040000 (0x0000000000000008)
-> SetUefiImageMemoryAttributes - 0x000000004C280000 - 0x0000000000040000 (0x0000000000000008)
-> SetUefiImageMemoryAttributes - 0x000000004C230000 - 0x0000000000040000 (0x0000000000000008)
-> SetUefiImageMemoryAttributes - 0x000000004C140000 - 0x0000000000040000 (0x0000000000000008)
-> SetUefiImageMemoryAttributes - 0x000000004F600000 - 0x0000000000030000 (0x0000000000000008)
-> SetUefiImageMemoryAttributes - 0x000000004C040000 - 0x0000000000030000 (0x0000000000000008)
-> SetUefiImageMemoryAttributes - 0x000000004BFC0000 - 0x0000000000030000 (0x0000000000000008)
-> Load address: 4bec4000
-> PC: 4beca400 PC offset: 6400
-> Unhandled exception ec=0x25 (DABT_EL1)
-> Vector: 4 (el1h_sync)
-> ESR_EL1:         96000000, ec=0x25 (DABT_EL1)
-> FAR_EL1: 0000fffffffff0f8 (valid)
-> Exception frame registers:
-> pc : [<000000004beca400>] lr : [<000000004beca42c>] pstate: 400002c5
-> sp : 000000004f7ffe40
-> x29: 000000004f7ffff0 x28: 0000000000000000
-> x27: 000000004d046040 x26: 0000000000000000
-> x25: 0000000000000703 x24: 0000000000000050
-> x23: 0000000009011000 x22: 0000000000000000
-> x21: 000000000000001f x20: 0000fffffffff000
-> x19: 0000000043f92000 x18: 0000000000000000
-> x17: 00000000ffffa6ab x16: 000000004f513ebc
-> x15: 0000000000000002 x14: 000000004bed5000
-> x13: 000000004bee4000 x12: 000000004bed4000
-> x11: 000000004bec4000 x10: 000000004c03febc
-> x9 : 000000004bee2938 x8 : 0000000000000000
-> x7 : 0000000000000000 x6 : 000000004bee2900
-> x5 : 000000004bee2908 x4 : 0000000048000000
-> x3 : 0000000048000000 x2 : 000000004bee2928
-> x1 : 0000000000000003 x0 : ffffffffffffffff
-> 
-> 
-> EXIT: STATUS=127
-> 
-> The preceding lines were omitted for brevity, the entire log can be found
-> at [1] (expires in 6 months).
-> 
-> Command used to launch the test:
-> 
-> $ QEMU=/path/to/qemu/build/qemu-system-aarch64 EFI_UEFI=/path/to/QEMU_EFI.fd taskset -c 4-5 arm/efi/run arm/selftest.efi -smp 2 -m 256 -append "setup smp=2 mem=256"
-> 
-> qemu has been built from source, tag v7.0.0, configured with:
-> 
-> $ ./configure --target-list=aarch64-softmmu --disable-vnc --disable-gtk --disable-bpf
-> 
-> EDK2 image has been built from commit e1eef3a8b01a ("NetworkPkg: Add Wi-Fi
-> Wpa3 support in WifiConnectManager"):
-> 
-> $ build -a AARCH64 -t GCC5 -p ArmVirtPkg/ArmVirtQemu.dsc -b DEBUG
-> 
-> I tried to disassemble selftest.efi: $ objdump -d selftest.efi, but there
-> were no debug symbols in the output and it was impossible to figure what is
-> going on.
-> 
-> [1] https://pastebin.com/0mcap1BU
+Yeah, it's not yet in mainline, but is soon gonna be. I will remove this.
 
-I haven't been to able to reproduce this. I've build from source qemu 
-and EDK2 from source (the revisions you provided) and I've used gcc-10 
-to compile KUT but selftest-smp passes.
+> >=20
+> > Signed-off-by: Nico Boehr <nrb@linux.ibm.com>
+> > ---
+> >   s390x/smp.c | 75 +++++++++++++++++++++++++++++++++++++++++++++++++++++
+> >   1 file changed, 75 insertions(+)
+> >=20
+> > diff --git a/s390x/smp.c b/s390x/smp.c
+> > index 683b0e618a48..eed7aa3564de 100644
+> > --- a/s390x/smp.c
+> > +++ b/s390x/smp.c
+> > @@ -347,6 +347,80 @@ static void test_calls(void)
+> >       }
+> >   }
+> >  =20
+> > +static void call_in_wait_ext_int_fixup(struct stack_frame_int *stack)
+> > +{
+> > +     /* leave wait after returning */
+>=20
+> Clear wait bit so we don't immediately wait again after the fixup
 
-Thanks,
+Changed.
 
-Nikos
+>=20
+> > +     lowcore.ext_old_psw.mask &=3D ~PSW_MASK_WAIT;
+> > +
+> > +     stack->crs[0] &=3D ~current_sigp_call_case->cr0_bit;
+>=20
+> You need a mask but have a bit, no?
+>=20
+> ~BIT(current_sigp_call_case->cr0_bit)
 
+Oopsie, thanks, good find.
+
+This reminds me the ctl_clear_bit() I added in call_in_wait_received() is c=
+ompletely useless, since I handle it here. So, I will remove it there as we=
+ll.
+
+[...]
+> > +static void test_calls_in_wait(void)
+> > +{
+> > +     int i;
+> > +     struct psw psw;
+> > +
+> > +     report_prefix_push("psw wait");
+> > +     for (i =3D 0; i < ARRAY_SIZE(cases_sigp_call); i++) {
+> > +             current_sigp_call_case =3D &cases_sigp_call[i];
+> > +
+> > +             report_prefix_push(current_sigp_call_case->name);
+> > +             if (!current_sigp_call_case->supports_pv && uv_os_is_gues=
+t()) {
+> > +                     report_skip("Not supported under PV");
+> > +                     report_prefix_pop();
+> > +                     continue;
+> > +             }
+> > +
+> /* Let the secondary CPU setup the external mask and the external=20
+> interrupt cleanup function */
+
+Changed.
