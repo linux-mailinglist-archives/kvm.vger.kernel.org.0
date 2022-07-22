@@ -2,106 +2,135 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 2A80B57D80D
-	for <lists+kvm@lfdr.de>; Fri, 22 Jul 2022 03:41:13 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 3848957D81B
+	for <lists+kvm@lfdr.de>; Fri, 22 Jul 2022 03:51:00 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232009AbiGVBlD (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 21 Jul 2022 21:41:03 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34764 "EHLO
+        id S233367AbiGVBu5 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 21 Jul 2022 21:50:57 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40800 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229441AbiGVBk7 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 21 Jul 2022 21:40:59 -0400
-Received: from mail-pj1-x102d.google.com (mail-pj1-x102d.google.com [IPv6:2607:f8b0:4864:20::102d])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9918E11153;
-        Thu, 21 Jul 2022 18:40:58 -0700 (PDT)
-Received: by mail-pj1-x102d.google.com with SMTP id f3-20020a17090ac28300b001f22d62bfbcso2535976pjt.0;
-        Thu, 21 Jul 2022 18:40:58 -0700 (PDT)
+        with ESMTP id S229508AbiGVBu4 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 21 Jul 2022 21:50:56 -0400
+Received: from mail-yb1-xb4a.google.com (mail-yb1-xb4a.google.com [IPv6:2607:f8b0:4864:20::b4a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3D1EF18E17
+        for <kvm@vger.kernel.org>; Thu, 21 Jul 2022 18:50:55 -0700 (PDT)
+Received: by mail-yb1-xb4a.google.com with SMTP id r64-20020a254443000000b006707b7c2baeso2601126yba.16
+        for <kvm@vger.kernel.org>; Thu, 21 Jul 2022 18:50:55 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=message-id:date:mime-version:user-agent:subject:content-language:to
-         :cc:references:from:in-reply-to:content-transfer-encoding;
-        bh=wQ4PwxJdfeRuNFlBgfKXQzk/YsoiF4IpRVdTPSkrj58=;
-        b=hq4fXVwKlhrxu5/HkzmMTJXI58duVtf5bcwzWDTb+EtRHfvCIAr1DVRQgfUnlAcV05
-         RI+gw00avBdTD5q1pS8nF1EhK8X+KWIizO5aAgKpCu0VdStgIj556c3G0cd19iCFdFeb
-         JcUd3UOQbRQeuDe+7DduZqongYVr6JmfA5oK1LKlmBweXYHGH81iOG/HzIXkMHROh4VX
-         X8RHYTZgL3ISwOpXG7C9xrHrViEL/bNuOb4dQTZLj5AccQrg9AWwDMWys1q5b8/9raS4
-         4zeiok5CSjOQug+vIsMLy7El5CoV20N2jgbvOqybBL9fQNW66gcx1wNIyqVrJ83/KpIL
-         zRUA==
+        d=google.com; s=20210112;
+        h=date:message-id:mime-version:subject:from:to:cc;
+        bh=Rhs+4jBfg1QM5n7eWG2/LdEIc5IyIGfWAsCL7NyPRwQ=;
+        b=EPu9cfSmX3DAmdVD3SXg5Chipd7twxc2aYzKZWGdt9qqZYcXxOhVbYsm2Q4w3Keblq
+         iOOY371rfBqvXTY6NybNQWreMp53L+rUZ1LTcNZne4JJDGcvaPks3Ru8OFBCCz30Qmwx
+         4WD270XRYhRv/GvT+dVV1awsfHaNxwtD37r68MFhp9ELCmrImgLiyWRhaKkWDXkBoZnH
+         s78qnShu3Azqth50MftuCULbQDS0/sGtGm8g1LRAArzgephpOZ9rxfyCLFfTxD4ZvsHo
+         W0x7N5i+Yoy5MqKgYCuj6TnY2HyvX9xkkG6z1rNzJUm68C/cjwlYxsZY/ACE2sHzBlDO
+         jhcQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
-         :content-language:to:cc:references:from:in-reply-to
-         :content-transfer-encoding;
-        bh=wQ4PwxJdfeRuNFlBgfKXQzk/YsoiF4IpRVdTPSkrj58=;
-        b=XwEDPRCEUU8tGZLKWgIU+FmwjNveAW2LaTUGPLafaLXv12J+q7UXQ78KouRylDWiGT
-         0945s4PuNoOLNc8ZzW8nz+LZKKq5+qyeBnmqzU9KF2g3jUsJs5myUgSqrKpQbDYfQh/e
-         hRLGAsNC+MYKFxUcApJ3Y9zgbQMLoVIu6CdLsf2Qg03oVu6rYxQSR8tzmSSae6aoCflK
-         rIIvlgUUglYTPABvud8/JPNaAgac+8M+DVjq4N5papEozKbisEbxk+xiU26v/qFfpQVs
-         fENeZm/7FxN/uledd45GwbUWEJolIh/hvXdNcn+JwxFxUbHLrEfkeXatxADyL704hLOF
-         FBaA==
-X-Gm-Message-State: AJIora9z+UTSQV1Rx1vW78TdzjgUccXqQIGOU+WwyL110OjmkXBCU61n
-        lkGpSrgGyT1zZ8N85c4DvXc=
-X-Google-Smtp-Source: AGRyM1ttGkNHj4rBoCrfvrWDPH8ttiNUx2pwkiSRVGCKVMLCgCOu/R4Bw2sjCT07NlZoEM0kf3MkOw==
-X-Received: by 2002:a17:90b:3a88:b0:1f2:199d:2ceb with SMTP id om8-20020a17090b3a8800b001f2199d2cebmr1351864pjb.196.1658454057976;
-        Thu, 21 Jul 2022 18:40:57 -0700 (PDT)
-Received: from [192.168.43.80] (subs32-116-206-28-36.three.co.id. [116.206.28.36])
-        by smtp.gmail.com with ESMTPSA id x27-20020aa7941b000000b005251f4596f0sm2434829pfo.107.2022.07.21.18.40.52
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 21 Jul 2022 18:40:57 -0700 (PDT)
-Message-ID: <f918aa10-2d75-815f-d75a-52ef3ffa7776@gmail.com>
-Date:   Fri, 22 Jul 2022 08:40:50 +0700
-MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.11.0
-Subject: Re: [GIT PULL 25/42] Documentation: kvm: extend KVM_S390_ZPCI_OP
- subheading underline
-Content-Language: en-US
-To:     Claudio Imbrenda <imbrenda@linux.ibm.com>, pbonzini@redhat.com
-Cc:     kvm@vger.kernel.org, linux-s390@vger.kernel.org,
-        frankja@linux.ibm.com, borntraeger@linux.ibm.com,
-        hca@linux.ibm.com, gor@linux.ibm.com, agordeev@linux.ibm.com,
-        thuth@redhat.com, david@redhat.com,
-        Stephen Rothwell <sfr@canb.auug.org.au>,
-        Jonathan Corbet <corbet@lwn.net>,
-        Pierre Morel <pmorel@linux.ibm.com>,
-        Matthew Rosato <mjrosato@linux.ibm.com>,
-        Christian Borntraeger <borntraeger@de.ibm.com>,
-        linux-kernel@vger.kernel.org
-References: <20220721161302.156182-1-imbrenda@linux.ibm.com>
- <20220721161302.156182-26-imbrenda@linux.ibm.com>
-From:   Bagas Sanjaya <bagasdotme@gmail.com>
-In-Reply-To: <20220721161302.156182-26-imbrenda@linux.ibm.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-0.6 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,NICE_REPLY_A,
-        RCVD_IN_DNSWL_NONE,RCVD_IN_SORBS_WEB,SPF_HELO_NONE,SPF_PASS
-        autolearn=no autolearn_force=no version=3.4.6
+        h=x-gm-message-state:date:message-id:mime-version:subject:from:to:cc;
+        bh=Rhs+4jBfg1QM5n7eWG2/LdEIc5IyIGfWAsCL7NyPRwQ=;
+        b=TdB5vLDLVHpxyayVfoBpVY13OEc7sNCob+ReHadxXAZ8U/HftOOFT2LRpXz3RzJYjx
+         XA3l3AnHUnH3X+ASs9PUUJT93ecZUi4f0RlmuWA0tcNngM/WKRC/cHAvZvbaLPbmrj8R
+         5uf/sKS1JiDdYyn1WTjiNDQUWc07JPELb4O50zM7fR4RQ1Sjq6K9+QheMkONA4L/H7w0
+         tN3tuFXNcy9ehXtyoDUFH3Avm/4JVtm2rgsT8isfwQipfT6QmQoPZgFbyftPXHbG89as
+         641ZCniGmgLjrT0ppW6MaPsjMFFgCQSHzU6YGCm8vNoQ56UWl0YkEZU6GikCaIBFQ7Nj
+         +2bw==
+X-Gm-Message-State: AJIora+mlnxtOyoCkHjP+u3fgcin9BkOcLPRD0u4LibMKduFbClCg04T
+        gwUcoYFK/z5gcGGh6+LOj4rpQeA=
+X-Google-Smtp-Source: AGRyM1s/pmWLb7/RVeSHgBd1PqQYRVoHVPsujzJ6L2UtPXkGfO1tJ3J+fcjlJoTgQYjpaF7llAnRI+U=
+X-Received: from pcc-desktop.svl.corp.google.com ([2620:15c:2ce:200:7ed4:5864:d5e1:ffe1])
+ (user=pcc job=sendgmr) by 2002:a5b:890:0:b0:670:8312:a52f with SMTP id
+ e16-20020a5b0890000000b006708312a52fmr1197181ybq.139.1658454654329; Thu, 21
+ Jul 2022 18:50:54 -0700 (PDT)
+Date:   Thu, 21 Jul 2022 18:50:26 -0700
+Message-Id: <20220722015034.809663-1-pcc@google.com>
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.37.1.359.gd136c6c3e2-goog
+Subject: [PATCH v2 0/7] KVM: arm64: permit MAP_SHARED mappings with MTE enabled
+From:   Peter Collingbourne <pcc@google.com>
+To:     linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu
+Cc:     Peter Collingbourne <pcc@google.com>,
+        Cornelia Huck <cohuck@redhat.com>,
+        Catalin Marinas <catalin.marinas@arm.com>,
+        Will Deacon <will@kernel.org>, Marc Zyngier <maz@kernel.org>,
+        Evgenii Stepanov <eugenis@google.com>, kvm@vger.kernel.org,
+        Steven Price <steven.price@arm.com>,
+        Vincenzo Frascino <vincenzo.frascino@arm.com>
+Content-Type: text/plain; charset="UTF-8"
+X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 7/21/22 23:12, Claudio Imbrenda wrote:
-> From: Bagas Sanjaya <bagasdotme@gmail.com>
-> 
-> Stephen Rothwell reported the htmldocs warning:
-> 
-> Documentation/virt/kvm/api.rst:5959: WARNING: Title underline too short.
-> 
-> 4.137 KVM_S390_ZPCI_OP
-> --------------------
-> 
-> The warning is due to subheading underline on KVM_S390_ZPCI_OP section is
-> short of 2 dashes.
-> 
-> Extend the underline to fix the warning.
-> 
+Hi,
 
-Thanks for picking this up!
+This patch series allows VMMs to use shared mappings in MTE enabled
+guests. The first four patches are based on the series that Catalin sent
+out, whose cover letter [1] I quote from below:
 
-Acked-by: Bagas Sanjaya <bagasdotme@gmail.com>
+> This series aims to fix the races between initialising the tags on a
+> page and setting the PG_mte_tagged flag. Currently the flag is set
+> either before or after that tag initialisation and this can lead to CoW
+> copying stale tags. The first patch moves the flag setting after the
+> tags have been initialised, solving the CoW issue. However, concurrent
+> mprotect() on a shared mapping may (very rarely) lead to valid tags
+> being zeroed.
+>
+> The second skips the sanitise_mte_tags() call in kvm_set_spte_gfn(),
+> deferring it to user_mem_abort(). The outcome is that no
+> sanitise_mte_tags() can be simplified to skip the pfn_to_online_page()
+> check and only rely on VM_MTE_ALLOWED vma flag that can be checked in
+> user_mem_abort().
+>
+> The third and fourth patches use PG_arch_3 as a lock for page tagging,
+> based on Peter Collingbourne's idea of a two-bit lock.
+>
+> I think the first patch can be queued but the rest needs some in depth
+> review and test. With this series (if correct) we could allos MAP_SHARED
+> on KVM guest memory but this is to be discussed separately as there are
+> some KVM ABI implications.
+
+I rebased Catalin's series onto -next, addressed the issues that I
+identified in the review and added the proposed userspace enablement
+patches after the series.
+
+[1] https://lore.kernel.org/all/20220705142619.4135905-1-catalin.marinas@arm.com/
+
+Catalin Marinas (3):
+  arm64: mte: Fix/clarify the PG_mte_tagged semantics
+  KVM: arm64: Simplify the sanitise_mte_tags() logic
+  arm64: mte: Lock a page for MTE tag initialisation
+
+Peter Collingbourne (4):
+  mm: Add PG_arch_3 page flag
+  KVM: arm64: unify the tests for VMAs in memslots when MTE is enabled
+  KVM: arm64: permit all VM_MTE_ALLOWED mappings with MTE enabled
+  Documentation: document the ABI changes for KVM_CAP_ARM_MTE
+
+ Documentation/virt/kvm/api.rst   |  5 +--
+ arch/arm64/include/asm/mte.h     | 62 ++++++++++++++++++++++++++++++++
+ arch/arm64/include/asm/pgtable.h |  3 +-
+ arch/arm64/kernel/cpufeature.c   |  4 ++-
+ arch/arm64/kernel/elfcore.c      |  2 +-
+ arch/arm64/kernel/hibernate.c    |  2 +-
+ arch/arm64/kernel/mte.c          | 17 +++++----
+ arch/arm64/kvm/guest.c           | 18 ++++++----
+ arch/arm64/kvm/mmu.c             | 55 ++++++++++++----------------
+ arch/arm64/mm/copypage.c         |  6 ++--
+ arch/arm64/mm/fault.c            |  4 ++-
+ arch/arm64/mm/mteswap.c          |  5 ++-
+ fs/proc/page.c                   |  1 +
+ include/linux/page-flags.h       |  1 +
+ include/trace/events/mmflags.h   |  7 ++--
+ mm/huge_memory.c                 |  1 +
+ 16 files changed, 134 insertions(+), 59 deletions(-)
 
 -- 
-An old man doll... just what I always wanted! - Clara
+2.37.1.359.gd136c6c3e2-goog
+
