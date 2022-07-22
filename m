@@ -2,72 +2,72 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 831EB57EA68
-	for <lists+kvm@lfdr.de>; Sat, 23 Jul 2022 01:48:50 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 8753A57EA6B
+	for <lists+kvm@lfdr.de>; Sat, 23 Jul 2022 01:50:01 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236399AbiGVXst (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 22 Jul 2022 19:48:49 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50946 "EHLO
+        id S236452AbiGVXuA (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 22 Jul 2022 19:50:00 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51650 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234919AbiGVXsr (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 22 Jul 2022 19:48:47 -0400
-Received: from mail-yw1-x1149.google.com (mail-yw1-x1149.google.com [IPv6:2607:f8b0:4864:20::1149])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E6F65C06C2
-        for <kvm@vger.kernel.org>; Fri, 22 Jul 2022 16:48:46 -0700 (PDT)
-Received: by mail-yw1-x1149.google.com with SMTP id 00721157ae682-31e65a848daso50605917b3.20
-        for <kvm@vger.kernel.org>; Fri, 22 Jul 2022 16:48:46 -0700 (PDT)
+        with ESMTP id S234919AbiGVXt5 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 22 Jul 2022 19:49:57 -0400
+Received: from mail-pl1-x62f.google.com (mail-pl1-x62f.google.com [IPv6:2607:f8b0:4864:20::62f])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1FEB3C06CD
+        for <kvm@vger.kernel.org>; Fri, 22 Jul 2022 16:49:57 -0700 (PDT)
+Received: by mail-pl1-x62f.google.com with SMTP id d7so5762845plr.9
+        for <kvm@vger.kernel.org>; Fri, 22 Jul 2022 16:49:57 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
-        h=date:in-reply-to:message-id:mime-version:references:subject:from:to
-         :cc;
-        bh=C5vxcKBsXfUKk2MUSnDuijEsY5Uu1XCESOEGFEpHan4=;
-        b=Utdu1V3aRcGKKdAJiX1P6WXcvxoJLpXF8LbdwZgQ2R2R8j/6WsY8HUYm06OrvZY4B9
-         VZDgDdFPliKb2A21kfpagaDCr3hSzuk07GJTzX4xKoYTukGX7X6x+v/OKdMt08DlJQuL
-         cip9S4pmjPz13jQlWcDoQqd98cR7AgfDgYdBZO0qwLNfICob/mXUBOmSEaeKyxCwPhg3
-         Xh7PlWjmdmj8mxZ2E/AZ7Ud1E6YVP1qJ16h2kryDbkLHW+FlihzkrITlgMCXm7fJxHp+
-         pKUyuBIrrv/yMsooOhKXxACpWSPyQ7idgj+jQ0J1T2hWTjCh750l11CsZ1SGFvf+QVPO
-         JZCA==
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=Js8QiHziuijv16DRJ7w1nD2pqN06FjnDg+o72AhTw7U=;
+        b=Z/PsvRcva+XJA2wurOimE48Wl7e0nVz5oMMjsc8l4n3+ulY8DO4ktwqBb//eRIfF5p
+         wQqrhbO6J2Qc7WZk+LIo5dK5m99ez4e7sLE3n2pVauMy2SuNNou919nStktsCtyCkoCd
+         HtY8eVBtpm1nOxyCgD0RfxZS8vwznn8pBmAAwYhB6vCaPjrSrgncRD7JtN14Zp/AMvOv
+         J3Os05/WX9QbK37nsiBYaOpZ+/XkxsPmNUFQOVbEgvOFkUcsZDK67fR12wuN9/gIpmGI
+         7ybvtBBcCziahUaQh6zkWkSzveq5typOBWsZbCLaRLT7MuZE3mQJLPtSMO8V539Lw3dt
+         tnVA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:in-reply-to:message-id:mime-version
-         :references:subject:from:to:cc;
-        bh=C5vxcKBsXfUKk2MUSnDuijEsY5Uu1XCESOEGFEpHan4=;
-        b=wdvQv5ZX50AmAp2NDr/+7ZV4p0q/3njEEtbNeLeNRffme/fJsnrViYMUD1sZHXji2s
-         giOVQ1H/WBQGfGMte5XPXjdggovIomYbDUkyWCpplDv7Mor7kpO96IrHn3QapvQbGoJZ
-         Ngfp2LtRv4VDE/yFhYmjNYpMi+PadIfTHSJqPwjpavIDIxIApin8yvXNkiREyd3LQSKD
-         GdF7GXpceS1h96UGHqr0KlBC9A+xno6jWsijDPqEubNiArUSfjsqIWiSWuyaa1uX6VXp
-         pbumMrF9oPh6L3ocQx6MF2KF3MgfjU3nW9mVuph38x7PJ4rgAcgwfwgOUiQpyLwpKlg4
-         OPvw==
-X-Gm-Message-State: AJIora8lVz70jvVve996l07BAcxzN2gCFWfo3QI/10sZSdi75iAed0cH
-        zvGSixwS/udCxNtDK2/ScaNeX/wlXvC7kw==
-X-Google-Smtp-Source: AGRyM1tn9WYAdHKqq6lfJAZm8nBg32Zv2QGSkMx1BhgjaHTdJKmr0cWym95nsT9ukBiTU4ZQC0T077veefdMvQ==
-X-Received: from dmatlack-n2d-128.c.googlers.com ([fda3:e722:ac3:cc00:20:ed76:c0a8:1309])
- (user=dmatlack job=sendgmr) by 2002:a0d:c603:0:b0:31e:7d54:17fd with SMTP id
- i3-20020a0dc603000000b0031e7d5417fdmr1922347ywd.421.1658533726164; Fri, 22
- Jul 2022 16:48:46 -0700 (PDT)
-Date:   Fri, 22 Jul 2022 23:48:38 +0000
-In-Reply-To: <20220722234838.2160385-1-dmatlack@google.com>
-Message-Id: <20220722234838.2160385-3-dmatlack@google.com>
-Mime-Version: 1.0
-References: <20220722234838.2160385-1-dmatlack@google.com>
-X-Mailer: git-send-email 2.37.1.359.gd136c6c3e2-goog
-Subject: [PATCH 2/2] KVM: selftests: Fix ambiguous mov in KVM_ASM_SAFE()
-From:   David Matlack <dmatlack@google.com>
-To:     Paolo Bonzini <pbonzini@redhat.com>
-Cc:     Nathan Chancellor <nathan@kernel.org>,
-        Nick Desaulniers <ndesaulniers@google.com>,
-        Tom Rix <trix@redhat.com>,
-        Sean Christopherson <seanjc@google.com>,
-        Peter Xu <peterx@redhat.com>,
-        David Matlack <dmatlack@google.com>,
-        Jim Mattson <jmattson@google.com>,
-        Oliver Upton <oupton@google.com>,
-        "open list:CLANG/LLVM BUILD SUPPORT" <llvm@lists.linux.dev>,
-        kvm@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL autolearn=ham
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=Js8QiHziuijv16DRJ7w1nD2pqN06FjnDg+o72AhTw7U=;
+        b=j+p0nAelc+w+NiK9OKYOUZIIACswb/K3L1DbjTv11nav/h+ZugxE1I0jShQDbF4Hfc
+         r6JSfo8QMFyOcapcr/29R2H5JKMhscLgKa1BB98yKCpmoifDoEW7+/66BK9xCKoMMWIf
+         dI67EFOI4EUCRMwoFjHFjGzSKo3UoLfifYTzdpUtuHhZ193tDgZUFNra4LhQGmUxkNg0
+         REvABWU8h2HEhlPnw0dxFF8eiTW689WNnY7HoYFxsKGXPYM+y1OOoq8BftydGDz4237P
+         /ZED+pGD2mTzxcuF1WYxJoQSNnpjhOx21njE/ERzEJC3XwwQihWax7jEciJ3U1ua4NrO
+         R4AA==
+X-Gm-Message-State: AJIora/oXbeh2SRiDmi4KVak0xTnn8DT2hu69e+9hijmZ15C8QiNR8+3
+        gwfSoZwqUxqa0CHgWdD3H0Ebkg==
+X-Google-Smtp-Source: AGRyM1tmKNy7nzqxvFM1gB8002n04gH5GT6VKAbb/8qhEYzXEK0Ko8Vq8df5/cSbVs8wpSINzu/8FA==
+X-Received: by 2002:a17:90b:3b51:b0:1f0:5ebc:ac9 with SMTP id ot17-20020a17090b3b5100b001f05ebc0ac9mr2108057pjb.229.1658533796497;
+        Fri, 22 Jul 2022 16:49:56 -0700 (PDT)
+Received: from google.com (123.65.230.35.bc.googleusercontent.com. [35.230.65.123])
+        by smtp.gmail.com with ESMTPSA id b4-20020a62cf04000000b0052ab92772a0sm4618191pfg.98.2022.07.22.16.49.55
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 22 Jul 2022 16:49:56 -0700 (PDT)
+Date:   Fri, 22 Jul 2022 23:49:52 +0000
+From:   Sean Christopherson <seanjc@google.com>
+To:     kernel test robot <lkp@intel.com>
+Cc:     kbuild-all@lists.01.org, kvm@vger.kernel.org,
+        Robert Hu <robert.hu@intel.com>,
+        Farrah Chen <farrah.chen@intel.com>,
+        Danmei Wei <danmei.wei@intel.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Mingwei Zhang <mizhang@google.com>
+Subject: Re: [kvm:queue 23/35] arch/x86/kvm/mmu/mmu.c:6391:19: warning:
+ variable 'pfn' set but not used
+Message-ID: <Yts3oLhqJ2SNGurV@google.com>
+References: <202207230706.VfX9Ycxh-lkp@intel.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <202207230706.VfX9Ycxh-lkp@intel.com>
+X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
+        USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=ham
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -75,55 +75,49 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Change the mov in KVM_ASM_SAFE() that zeroes @vector to a movb to
-make it unambiguous.
+On Sat, Jul 23, 2022, kernel test robot wrote:
+> tree:   https://git.kernel.org/pub/scm/virt/kvm/kvm.git queue
+> head:   1a4d88a361af4f2e91861d632c6a1fe87a9665c2
+> commit: fe631a46409403616aa0c28c2c16cae7f7c92b1e [23/35] KVM: x86/mmu: Don't require refcounted "struct page" to create huge SPTEs
+> config: x86_64-randconfig-a015 (https://download.01.org/0day-ci/archive/20220723/202207230706.VfX9Ycxh-lkp@intel.com/config)
+> compiler: gcc-11 (Debian 11.3.0-3) 11.3.0
+> reproduce (this is a W=1 build):
+>         # https://git.kernel.org/pub/scm/virt/kvm/kvm.git/commit/?id=fe631a46409403616aa0c28c2c16cae7f7c92b1e
+>         git remote add kvm https://git.kernel.org/pub/scm/virt/kvm/kvm.git
+>         git fetch --no-tags kvm queue
+>         git checkout fe631a46409403616aa0c28c2c16cae7f7c92b1e
+>         # save the config file
+>         mkdir build_dir && cp config build_dir/.config
+>         make W=1 O=build_dir ARCH=x86_64 SHELL=/bin/bash arch/x86/kvm/
+> 
+> If you fix the issue, kindly add following tag where applicable
+> Reported-by: kernel test robot <lkp@intel.com>
+> 
+> All warnings (new ones prefixed by >>):
+> 
+>    arch/x86/kvm/mmu/mmu.c: In function 'kvm_mmu_zap_collapsible_spte':
+> >> arch/x86/kvm/mmu/mmu.c:6391:19: warning: variable 'pfn' set but not used [-Wunused-but-set-variable]
+>     6391 |         kvm_pfn_t pfn;
+>          |                   ^~~
+> 
+> 
+> vim +/pfn +6391 arch/x86/kvm/mmu/mmu.c
+> 
+> a3fe5dbda0a4bb arch/x86/kvm/mmu/mmu.c David Matlack       2022-01-19  6383  
+> 3ea3b7fa9af067 arch/x86/kvm/mmu.c     Wanpeng Li          2015-04-03  6384  static bool kvm_mmu_zap_collapsible_spte(struct kvm *kvm,
+> 0a234f5dd06582 arch/x86/kvm/mmu/mmu.c Sean Christopherson 2021-02-12  6385  					 struct kvm_rmap_head *rmap_head,
+> 269e9552d20817 arch/x86/kvm/mmu/mmu.c Hamza Mahfooz       2021-07-12  6386  					 const struct kvm_memory_slot *slot)
+> 3ea3b7fa9af067 arch/x86/kvm/mmu.c     Wanpeng Li          2015-04-03  6387  {
+> 3ea3b7fa9af067 arch/x86/kvm/mmu.c     Wanpeng Li          2015-04-03  6388  	u64 *sptep;
+> 3ea3b7fa9af067 arch/x86/kvm/mmu.c     Wanpeng Li          2015-04-03  6389  	struct rmap_iterator iter;
+> 3ea3b7fa9af067 arch/x86/kvm/mmu.c     Wanpeng Li          2015-04-03  6390  	int need_tlb_flush = 0;
+> ba049e93aef7e8 arch/x86/kvm/mmu.c     Dan Williams        2016-01-15 @6391  	kvm_pfn_t pfn;
+> 3ea3b7fa9af067 arch/x86/kvm/mmu.c     Wanpeng Li          2015-04-03  6392  	struct kvm_mmu_page *sp;
+> 3ea3b7fa9af067 arch/x86/kvm/mmu.c     Wanpeng Li          2015-04-03  6393  
+> 0d5367900a319a arch/x86/kvm/mmu.c     Xiao Guangrong      2015-05-13  6394  restart:
+> 018aabb56d6109 arch/x86/kvm/mmu.c     Takuya Yoshikawa    2015-11-20  6395  	for_each_rmap_spte(rmap_head, &iter, sptep) {
+> 573546820b792e arch/x86/kvm/mmu/mmu.c Sean Christopherson 2020-06-22  6396  		sp = sptep_to_sp(sptep);
+> 3ea3b7fa9af067 arch/x86/kvm/mmu.c     Wanpeng Li          2015-04-03  6397  		pfn = spte_to_pfn(*sptep);
 
-This fixes a build failure with Clang since, unlike the GNU assembler,
-the LLVM integrated assembler rejects ambiguous X86 instructions that
-don't have suffixes:
-
-  In file included from x86_64/hyperv_features.c:13:
-  include/x86_64/processor.h:825:9: error: ambiguous instructions require an explicit suffix (could be 'movb', 'movw', 'movl', or 'movq')
-          return kvm_asm_safe("wrmsr", "a"(val & -1u), "d"(val >> 32), "c"(msr));
-                 ^
-  include/x86_64/processor.h:802:15: note: expanded from macro 'kvm_asm_safe'
-          asm volatile(KVM_ASM_SAFE(insn)                 \
-                       ^
-  include/x86_64/processor.h:788:16: note: expanded from macro 'KVM_ASM_SAFE'
-          "1: " insn "\n\t"                                       \
-                        ^
-  <inline asm>:5:2: note: instantiated into assembly here
-          mov $0, 15(%rsp)
-          ^
-
-It seems like this change could introduce undesirable behavior in the
-future, e.g. if someone used a type larger than a u8 for @vector, since
-KVM_ASM_SAFE() will only zero the bottom byte. I tried changing the type
-of @vector to an int to see what would happen. GCC failed to compile due
-to a size mismatch between `movb` and `%eax`. Clang succeeded in
-compiling, but the generated code looked correct, so perhaps it will not
-be an issue. That being said it seems like there could be a better
-solution to this issue that does not assume @vector is a u8.
-
-Fixes: 3b23054cd3f5 ("KVM: selftests: Add x86-64 support for exception fixup")
-Signed-off-by: David Matlack <dmatlack@google.com>
----
- tools/testing/selftests/kvm/include/x86_64/processor.h | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
-
-diff --git a/tools/testing/selftests/kvm/include/x86_64/processor.h b/tools/testing/selftests/kvm/include/x86_64/processor.h
-index 51c6661aca77..0cbc71b7af50 100644
---- a/tools/testing/selftests/kvm/include/x86_64/processor.h
-+++ b/tools/testing/selftests/kvm/include/x86_64/processor.h
-@@ -786,7 +786,7 @@ void vm_install_exception_handler(struct kvm_vm *vm, int vector,
- 	"lea 1f(%%rip), %%r10\n\t"				\
- 	"lea 2f(%%rip), %%r11\n\t"				\
- 	"1: " insn "\n\t"					\
--	"mov $0, %[vector]\n\t"					\
-+	"movb $0, %[vector]\n\t"				\
- 	"jmp 3f\n\t"						\
- 	"2:\n\t"						\
- 	"mov  %%r9b, %[vector]\n\t"				\
--- 
-2.37.1.359.gd136c6c3e2-goog
-
+Dagnabbit, I caught the TDP MMU case where "pfn" was completely unused, but not
+this one.  I'll send a fixup/follow-up.
