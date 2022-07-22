@@ -2,161 +2,96 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 3577157E4F5
-	for <lists+kvm@lfdr.de>; Fri, 22 Jul 2022 19:05:16 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 0C91257E53C
+	for <lists+kvm@lfdr.de>; Fri, 22 Jul 2022 19:18:31 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234251AbiGVRFO (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 22 Jul 2022 13:05:14 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57466 "EHLO
+        id S236017AbiGVRS3 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 22 Jul 2022 13:18:29 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40098 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233662AbiGVRFM (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 22 Jul 2022 13:05:12 -0400
-Received: from mail-pj1-x1034.google.com (mail-pj1-x1034.google.com [IPv6:2607:f8b0:4864:20::1034])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E85DD7650
-        for <kvm@vger.kernel.org>; Fri, 22 Jul 2022 10:05:11 -0700 (PDT)
-Received: by mail-pj1-x1034.google.com with SMTP id x24-20020a17090ab01800b001f21556cf48so8682173pjq.4
-        for <kvm@vger.kernel.org>; Fri, 22 Jul 2022 10:05:11 -0700 (PDT)
+        with ESMTP id S235631AbiGVRS1 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 22 Jul 2022 13:18:27 -0400
+Received: from mail-ed1-x52c.google.com (mail-ed1-x52c.google.com [IPv6:2a00:1450:4864:20::52c])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B56F61CFDD;
+        Fri, 22 Jul 2022 10:18:25 -0700 (PDT)
+Received: by mail-ed1-x52c.google.com with SMTP id y4so6635725edc.4;
+        Fri, 22 Jul 2022 10:18:25 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=EIQBR56/tJcNBR6OGH/TjjSrDbmF7UtKhywW9Hj0CUY=;
-        b=ll/TN7RHrz3zet8Hb5kr/a0vsvXTl01rS1ijTZRx2gc/6AX7XZlUe25dJ6dyifZAkn
-         Vf+suc2mp2Mo7OU49OfAsxW+vzt+VLB/Lhh9jZPHlIOKu6rw5SPMA7lwqcPFOSix23E3
-         xidaleqnYRsuyCOp0BBfofLrx0Wp2Js/csk6eMH+TEQ6i1btJRgPyQnM/sYt9CtFFiX0
-         9evjlfYud7iuG5e94WVg8HHecjPuvNJTUmjMIxGyFSb6Inhmlbfw5D9ZoAvyRw8qTdiN
-         yv0FzfY0EXkrrnsH4/IYTex0Y7BMikYCyw6oHvxJX4k1BdSI043dkl2mssfj9SP1XxAZ
-         TP/g==
+        d=gmail.com; s=20210112;
+        h=sender:message-id:date:mime-version:user-agent:subject
+         :content-language:to:cc:references:from:in-reply-to
+         :content-transfer-encoding;
+        bh=foxH3rHhRPgtf4syZS9ZyQqEcF6wD+SNSuScXFbUvG0=;
+        b=QxBPhnrSOWqnIJd43lGO0/gWcM8avq0E8xAoznnlwOdLvCCXkZD8K3UwrpYbHEVdUX
+         jQfJKUrV05E+0+2xarcUGpaO2se43L/3/xYdUsvvu95Z6WBiGEG3WwAJw6Ku2vjWcyx/
+         MjYKk1Tf2JMx90waYb5Z0hMmSziBGDdTtuc0XO1dryK6bdlslawz/xmt/KDPYb14xhOY
+         dace6GBzHw5oWcl/KeC2E1Z66phUK/HMP+95GDCXiKxEjcF7RQdXRyENVqO+9UkvLzf5
+         OAAjRH2IVOJhjuOS3aYG/K/ooNRat0oK4gJ46U+LyZlhRF62NlQN3gnSiCRekDoXo8L2
+         24eQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=EIQBR56/tJcNBR6OGH/TjjSrDbmF7UtKhywW9Hj0CUY=;
-        b=0zgRZ+AO672icIisJNfLYbK8kV/ZFUsj0YzAT0rles/1rBrfyF8oRa/ySpcXVP1Mfl
-         YFb00dlgn9A35JMJh2oJWyrQQ75go0puGurHd9n17x5Iqmin8B4RmCxgYdvxaisFhUlC
-         krbjiL3EE1lriTRs+IcTpPQ+pUb0eNj0PC6nTnsnrlM8vA3p3CMiIS4S7QYThUlg3u0p
-         SNUNGrqxd1SdqiQq3zqPs8K4CUToRUB9UcmmSek9TS4SJRo/91pKuqeB2sIlmvqPky7Y
-         FcRPcB/exta0lGt8mYb52gdok1ZsW44D0OJLToDrGCH86haxCxH/W78nzDcWLzrzeelF
-         NdWw==
-X-Gm-Message-State: AJIora8L4JciaLVHHU+Fwx8Bu81YzWVl1FThODlGUzeihZuTa4ktaq29
-        96ltrfoKsTPdNvUS8t3mTitY3g==
-X-Google-Smtp-Source: AGRyM1vFlk9DkZd9UBK770fSURYjd+N7HQh0/nEt16WDmaIMu9aOsXfJxkshzokJ7v3u6ERX5w/m5A==
-X-Received: by 2002:a17:902:da85:b0:16c:bf2e:fac7 with SMTP id j5-20020a170902da8500b0016cbf2efac7mr784455plx.166.1658509510994;
-        Fri, 22 Jul 2022 10:05:10 -0700 (PDT)
-Received: from google.com ([2620:15c:2ce:200:2571:bd04:907d:d32f])
-        by smtp.gmail.com with ESMTPSA id f26-20020a631f1a000000b00415320bc31dsm3632484pgf.32.2022.07.22.10.05.09
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 22 Jul 2022 10:05:10 -0700 (PDT)
-Date:   Fri, 22 Jul 2022 10:04:59 -0700
-From:   Peter Collingbourne <pcc@google.com>
-To:     Marc Zyngier <maz@kernel.org>
-Cc:     linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
-        Cornelia Huck <cohuck@redhat.com>,
-        Catalin Marinas <catalin.marinas@arm.com>,
-        Will Deacon <will@kernel.org>,
-        Evgenii Stepanov <eugenis@google.com>, kvm@vger.kernel.org,
-        Steven Price <steven.price@arm.com>,
-        Vincenzo Frascino <vincenzo.frascino@arm.com>
-Subject: Re: [PATCH v2 3/7] mm: Add PG_arch_3 page flag
-Message-ID: <YtrYu54WBHJa4YMP@google.com>
-References: <20220722015034.809663-1-pcc@google.com>
- <20220722015034.809663-4-pcc@google.com>
- <87leslxmf1.wl-maz@kernel.org>
+        h=x-gm-message-state:sender:message-id:date:mime-version:user-agent
+         :subject:content-language:to:cc:references:from:in-reply-to
+         :content-transfer-encoding;
+        bh=foxH3rHhRPgtf4syZS9ZyQqEcF6wD+SNSuScXFbUvG0=;
+        b=TAby+sEBzZM+InBpWjHkyCfDsuIq1HIPcnShnngIZ1Rdw2E8AzK4yR9LaXuS9w93rv
+         G2BB4Bc575P38VH0Y/L4pyCO1A5HNiVDfq56NoVNP85BDx4sFXGDUV0GuoRCAcfN0uAA
+         qd0fjJG2HHcyPSc+5nxRNVZFcxbM5TX/UuKghgHuij2axNqnIE/146EaJz+dwujHW1RU
+         YAGo5RKnkwCcYYCuG9p5loeyfojM/N6GXbFCsM1vy0vCFgDE8vBNPhrkT1XvwVi+7SW1
+         KmeYVkwJTeNmswVXfP5BueJrUJqTPKdMdCIrV+xDpXKuqi7p7KTzUOVi4+28cWTxBsc2
+         xqAg==
+X-Gm-Message-State: AJIora/4Zhf+wMYxtFE4XsJUhnxz8UI8VJQPMg3NIgPk/hyOxbF4sb77
+        zVEZEdBcteyCkq7OeZcEpOsHW7yrDF9rYQ==
+X-Google-Smtp-Source: AGRyM1v14b6KQLZqGhKGEQKVL1vQWfB+6T5FoNKkvPj0AwUq2PkMI5vnQlIBGGBE1Z0ffuH51zMsWQ==
+X-Received: by 2002:a05:6402:5167:b0:43b:b6fe:f4d6 with SMTP id d7-20020a056402516700b0043bb6fef4d6mr894486ede.316.1658510304046;
+        Fri, 22 Jul 2022 10:18:24 -0700 (PDT)
+Received: from ?IPV6:2001:b07:6468:f312:9af8:e5f5:7516:fa89? ([2001:b07:6468:f312:9af8:e5f5:7516:fa89])
+        by smtp.googlemail.com with ESMTPSA id w7-20020aa7dcc7000000b0043a83f77b59sm2823150edu.48.2022.07.22.10.18.22
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 22 Jul 2022 10:18:23 -0700 (PDT)
+Sender: Paolo Bonzini <paolo.bonzini@gmail.com>
+Message-ID: <0f8dde12-576b-1579-38c9-496306aeeb81@redhat.com>
+Date:   Fri, 22 Jul 2022 19:18:22 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <87leslxmf1.wl-maz@kernel.org>
-X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-        USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=ham
-        autolearn_force=no version=3.4.6
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.10.0
+Subject: Re: [PATCH] Revert "KVM: nVMX: Do not expose MPX VMX controls when
+ guest MPX disabled"
+Content-Language: en-US
+To:     Sean Christopherson <seanjc@google.com>
+Cc:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        oliver.upton@linux.dev
+References: <20220722104329.3265411-1-pbonzini@redhat.com>
+ <YtrB8JEuc1Il1EOO@google.com>
+From:   Paolo Bonzini <pbonzini@redhat.com>
+In-Reply-To: <YtrB8JEuc1Il1EOO@google.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Spam-Status: No, score=-1.5 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_EF,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+        HEADER_FROM_DIFFERENT_DOMAINS,NICE_REPLY_A,RCVD_IN_DNSWL_NONE,
+        SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Jul 22, 2022 at 03:16:34PM +0100, Marc Zyngier wrote:
-> On Fri, 22 Jul 2022 02:50:29 +0100,
-> Peter Collingbourne <pcc@google.com> wrote:
-> > 
-> > As with PG_arch_2, this flag is only allowed on 64-bit architectures due
-> > to the shortage of bits available. It will be used by the arm64 MTE code
-> > in subsequent patches.
-> > 
-> > Signed-off-by: Peter Collingbourne <pcc@google.com>
-> > Cc: Will Deacon <will@kernel.org>
-> > Cc: Marc Zyngier <maz@kernel.org>
-> > Cc: Steven Price <steven.price@arm.com>
-> > [catalin.marinas@arm.com: added flag preserving in __split_huge_page_tail()]
-> > Signed-off-by: Catalin Marinas <catalin.marinas@arm.com>
-> > ---
-> >  fs/proc/page.c                 | 1 +
-> >  include/linux/page-flags.h     | 1 +
-> >  include/trace/events/mmflags.h | 7 ++++---
-> >  mm/huge_memory.c               | 1 +
-> >  4 files changed, 7 insertions(+), 3 deletions(-)
-> > 
-> > diff --git a/fs/proc/page.c b/fs/proc/page.c
-> > index a2873a617ae8..438b8aa7249d 100644
-> > --- a/fs/proc/page.c
-> > +++ b/fs/proc/page.c
-> > @@ -220,6 +220,7 @@ u64 stable_page_flags(struct page *page)
-> >  	u |= kpf_copy_bit(k, KPF_ARCH,		PG_arch_1);
-> >  #ifdef CONFIG_64BIT
-> >  	u |= kpf_copy_bit(k, KPF_ARCH_2,	PG_arch_2);
-> > +	u |= kpf_copy_bit(k, KPF_ARCH_2,	PG_arch_3);
+On 7/22/22 17:27, Sean Christopherson wrote:
+>> So revert it, at the potential cost
+>> of breaking L1s with a 6 year old kernel.
+> I would further qualify this with "breaking L1s with an_unpatched_  6 year old
+> kernel".  That fix was tagged for stable and made it way to at least the 4.9 and
+> 4.4 LTS releases.
 > 
-> Are PG_arch_2 and PG_arch_3 supposed to share the same user bit in
-> /proc/kpageflags? This seems odd.
 
-No, that was an oversight, thanks for the catch. I will fix it up like
-so in v3.
+Well, there _are_ people that use very old kernels and keep them 
+up-to-date with fixes for only critical CVEs (for example by, ehm, 
+paying my employer to do so).  But still it's way way unlikely for them 
+to be used as L1 in a nested setup, whether on their own hardware or in 
+the cloud.
 
-Peter
+I pushed everything to kvm/queue, but depending on what you post it may 
+be deferred to 5.21.
 
-diff --git a/fs/proc/page.c b/fs/proc/page.c
-index 438b8aa7249d..0129aa3cfb7a 100644
---- a/fs/proc/page.c
-+++ b/fs/proc/page.c
-@@ -220,7 +220,7 @@ u64 stable_page_flags(struct page *page)
- 	u |= kpf_copy_bit(k, KPF_ARCH,		PG_arch_1);
- #ifdef CONFIG_64BIT
- 	u |= kpf_copy_bit(k, KPF_ARCH_2,	PG_arch_2);
--	u |= kpf_copy_bit(k, KPF_ARCH_2,	PG_arch_3);
-+	u |= kpf_copy_bit(k, KPF_ARCH_3,	PG_arch_3);
- #endif
- 
- 	return u;
-diff --git a/include/linux/kernel-page-flags.h b/include/linux/kernel-page-flags.h
-index eee1877a354e..859f4b0c1b2b 100644
---- a/include/linux/kernel-page-flags.h
-+++ b/include/linux/kernel-page-flags.h
-@@ -18,5 +18,6 @@
- #define KPF_UNCACHED		39
- #define KPF_SOFTDIRTY		40
- #define KPF_ARCH_2		41
-+#define KPF_ARCH_3		42
- 
- #endif /* LINUX_KERNEL_PAGE_FLAGS_H */
-diff --git a/tools/vm/page-types.c b/tools/vm/page-types.c
-index 381dcc00cb62..364373f5bba0 100644
---- a/tools/vm/page-types.c
-+++ b/tools/vm/page-types.c
-@@ -79,6 +79,7 @@
- #define KPF_UNCACHED		39
- #define KPF_SOFTDIRTY		40
- #define KPF_ARCH_2		41
-+#define KPF_ARCH_3		42
- 
- /* [47-] take some arbitrary free slots for expanding overloaded flags
-  * not part of kernel API
-@@ -138,6 +139,7 @@ static const char * const page_flag_names[] = {
- 	[KPF_UNCACHED]		= "c:uncached",
- 	[KPF_SOFTDIRTY]		= "f:softdirty",
- 	[KPF_ARCH_2]		= "H:arch_2",
-+	[KPF_ARCH_3]		= "H:arch_3",
- 
- 	[KPF_ANON_EXCLUSIVE]	= "d:anon_exclusive",
- 	[KPF_READAHEAD]		= "I:readahead",
+Paolo
