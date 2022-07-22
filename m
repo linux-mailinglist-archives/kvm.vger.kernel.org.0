@@ -2,61 +2,61 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 02E9457DA9F
-	for <lists+kvm@lfdr.de>; Fri, 22 Jul 2022 09:08:16 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 6019057DAC4
+	for <lists+kvm@lfdr.de>; Fri, 22 Jul 2022 09:14:36 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234319AbiGVHIB (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 22 Jul 2022 03:08:01 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33146 "EHLO
+        id S234364AbiGVHN2 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 22 Jul 2022 03:13:28 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36534 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234227AbiGVHH6 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 22 Jul 2022 03:07:58 -0400
+        with ESMTP id S231585AbiGVHN1 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 22 Jul 2022 03:13:27 -0400
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 14DC98E6FF
-        for <kvm@vger.kernel.org>; Fri, 22 Jul 2022 00:07:56 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id D48858E6D9
+        for <kvm@vger.kernel.org>; Fri, 22 Jul 2022 00:13:26 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1658473676;
+        s=mimecast20190719; t=1658474005;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          in-reply-to:in-reply-to:references:references;
-        bh=GzF+ETyrmoD747FNPp3QPTAixHepqvjTlPacCwfRImE=;
-        b=eHkyNN3kKWfK2vn4ZEo2RbC3p+/nKmZ/AGrFXU6mJA3k4L3flQqpPTzlEOCBVCzryUcd2X
-        u+X8egnLpsSwy1Yi99XDGrLmrEXQ7gCpoJlxEIgg7HLSKNBHZm2kJ+AQj6FZef9JmNYnCk
-        LlDxl6hbJWUzQDjgWEKUSheySeffWl0=
-Received: from mail-qk1-f197.google.com (mail-qk1-f197.google.com
- [209.85.222.197]) by relay.mimecast.com with ESMTP with STARTTLS
+        bh=Wsed93BuNRJkapkugRn/nwfX0SXje/qBsJN6NO73XG0=;
+        b=X/ImYPqPy/txfCCPHa6W4jadNo+S1NuOHVTtFaPYXw810zBQr96xj+poRQEgqVnclkvxhG
+        smH/UvFDbpAUMbYTVM6IhUckgpzHYvdc5M7WENDLovd4105AZTWkLnZjppdp3y13gJJ3dq
+        UZWCsrxU9QW8yGiEBhnJ1JQDTDVYIwk=
+Received: from mail-qv1-f72.google.com (mail-qv1-f72.google.com
+ [209.85.219.72]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-663-S9ztAXmUNY6rkqJoU_G-Fw-1; Fri, 22 Jul 2022 03:07:54 -0400
-X-MC-Unique: S9ztAXmUNY6rkqJoU_G-Fw-1
-Received: by mail-qk1-f197.google.com with SMTP id w22-20020a05620a425600b006b5f48556cbso3116338qko.17
-        for <kvm@vger.kernel.org>; Fri, 22 Jul 2022 00:07:53 -0700 (PDT)
+ us-mta-557-Euz-AMPtPAOsfAnjjU8A2g-1; Fri, 22 Jul 2022 03:13:24 -0400
+X-MC-Unique: Euz-AMPtPAOsfAnjjU8A2g-1
+Received: by mail-qv1-f72.google.com with SMTP id u14-20020a0ced2e000000b004741065d449so2279158qvq.11
+        for <kvm@vger.kernel.org>; Fri, 22 Jul 2022 00:13:24 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:mime-version:references:in-reply-to:from:date
          :message-id:subject:to:cc;
-        bh=GzF+ETyrmoD747FNPp3QPTAixHepqvjTlPacCwfRImE=;
-        b=XaWLs00vWYlPf/lWl+vCiDqJHhsIL28nKJiDjw9uod6XxkjAnTyHXo9qQP0IzVJnSQ
-         jHkpm4lPOYFKrryo7nxe/+1fyyC+5dd0DOSGtTuklr1BWXZTnku/gZF5KOdYTAh1fGCJ
-         0Nkn73qMCtXQOpgoihrIhRQuIf59X5u+tzWRwBjXc2XlBKtGxVkuaqR91+7aXL0ief4t
-         aGOhvmzjdegYCGQ64A2i6PXXI0iIQxHg1QITpkk7i+RJFgPcX47J/BCHZKkIHHDbF7At
-         l7UQ1c1qZ7gtCgSkKTxE3eBe+L6HblgcyDd3sv2kgn901yQ/SwhDzqvClHgdDrrdDiLK
-         lVQQ==
-X-Gm-Message-State: AJIora/b1kljAF+eKaZ+uRhIRCRrIAb0MmuKTGFzzqV7Fma3CwVS+gsw
-        g/lYIC2+PC2MOKQy7EdWr1iJS/uldoY/sHpS+RmALDdyzrBWbngiRymQIOZbRBq50MzpuFpW7iH
-        UFklu632XBjayN8HqcEWtN5V7bmyk
-X-Received: by 2002:a05:620a:1456:b0:6b5:dbd5:3c50 with SMTP id i22-20020a05620a145600b006b5dbd53c50mr1461416qkl.193.1658473673326;
-        Fri, 22 Jul 2022 00:07:53 -0700 (PDT)
-X-Google-Smtp-Source: AGRyM1tQ0kj38FLk62rI6HiTNXcfww0XVcykkgM94yuuMiYSYCs5w7Fk992trjfXKTwluazLnKzTUeAHv/rR/019B4w=
-X-Received: by 2002:a05:620a:1456:b0:6b5:dbd5:3c50 with SMTP id
- i22-20020a05620a145600b006b5dbd53c50mr1461407qkl.193.1658473673036; Fri, 22
- Jul 2022 00:07:53 -0700 (PDT)
+        bh=Wsed93BuNRJkapkugRn/nwfX0SXje/qBsJN6NO73XG0=;
+        b=WxscaRVB7BL2/QVsjZNe2RqZyn+kmIqJ5PxOPuu0myVvRa2V8p12S47ewe1NInFajq
+         uSS8HJ1Y2ySAGe3fCaDNla81rmj7jg4ajcIzZI0AfuXl/aXtREg55xvYhdtJyFbX7eJ5
+         TKwkeZya51IxmbBDuBgF6uPB7GUDFsp/h+77QUMYiaDJbFFOY3Pi9msVo1d08JC4a22k
+         tnUbm8odQh7o1YJhs5ysCMHlXxs1oGr0OTI5dkoPLQAyMzknlPGMcBfBPgRLBRX7+vlp
+         7dZ3EVAhUdnem8P0aQn1jl3Y+bYpM0/Wu3Be1K2xZs0j6gYykQUDCuz/eqrDpaSo6EpR
+         jFgw==
+X-Gm-Message-State: AJIora+aSIn/FG3rBKZbMjEEsGuU+N5I24qSWfQ3P/Ps7TTsN6sgtssF
+        NmjlBInqpEqDA/hLcfAsNLvzH8rtYya5oe+kjzw4GkXPpTgHS7YGACsfSX/f2pFD9UUpKAg62K5
+        fO6da9egRySAsCyKmh9NJXzm+/3CO
+X-Received: by 2002:a0c:be91:0:b0:474:1d6:b1a4 with SMTP id n17-20020a0cbe91000000b0047401d6b1a4mr1734954qvi.108.1658474003804;
+        Fri, 22 Jul 2022 00:13:23 -0700 (PDT)
+X-Google-Smtp-Source: AGRyM1tEcyOOrz8ulXALLU3lOqBWBPAhsUJqLPMU34S78oArx1JQGAQejfV6MMkgWmFYInqi0IgRkgNkqkYPfZYae8I=
+X-Received: by 2002:a0c:be91:0:b0:474:1d6:b1a4 with SMTP id
+ n17-20020a0cbe91000000b0047401d6b1a4mr1734938qvi.108.1658474003579; Fri, 22
+ Jul 2022 00:13:23 -0700 (PDT)
 MIME-Version: 1.0
-References: <20220721084341.24183-1-qtxuning1999@sjtu.edu.cn> <20220721084341.24183-2-qtxuning1999@sjtu.edu.cn>
-In-Reply-To: <20220721084341.24183-2-qtxuning1999@sjtu.edu.cn>
+References: <20220721084341.24183-1-qtxuning1999@sjtu.edu.cn> <20220721084341.24183-4-qtxuning1999@sjtu.edu.cn>
+In-Reply-To: <20220721084341.24183-4-qtxuning1999@sjtu.edu.cn>
 From:   Eugenio Perez Martin <eperezma@redhat.com>
-Date:   Fri, 22 Jul 2022 09:07:17 +0200
-Message-ID: <CAJaqyWcP3CQoqN=oQ2c3d9UbGPgSS+j18CA5NO5JGAW64Z+H-Q@mail.gmail.com>
-Subject: Re: [RFC 1/5] vhost: reorder used descriptors in a batch
+Date:   Fri, 22 Jul 2022 09:12:47 +0200
+Message-ID: <CAJaqyWfgUqdP6mkOUdouvQSst=qc7MOTaigC-EiTg9-gojHqzg@mail.gmail.com>
+Subject: Re: [RFC 3/5] vhost_test: batch used buffer
 To:     Guo Zhi <qtxuning1999@sjtu.edu.cn>
 Cc:     Jason Wang <jasowang@redhat.com>,
         Stefano Garzarella <sgarzare@redhat.com>,
@@ -68,8 +68,7 @@ Cc:     Jason Wang <jasowang@redhat.com>,
 Content-Type: text/plain; charset="UTF-8"
 X-Spam-Status: No, score=-3.5 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,
-        SPF_HELO_NONE,SPF_NONE autolearn=unavailable autolearn_force=no
-        version=3.4.6
+        SPF_HELO_NONE,SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
@@ -78,174 +77,61 @@ X-Mailing-List: kvm@vger.kernel.org
 
 On Thu, Jul 21, 2022 at 10:44 AM Guo Zhi <qtxuning1999@sjtu.edu.cn> wrote:
 >
-> Device may not use descriptors in order, for example, NIC and SCSI may
-> not call __vhost_add_used_n with buffers in order.  It's the task of
-> __vhost_add_used_n to order them.  This commit reorder the buffers using
-> vq->heads, only the batch is begin from the expected start point and is
-> continuous can the batch be exposed to driver.  And only writing out a
-> single used ring for a batch of descriptors, according to VIRTIO 1.1
-> spec.
+> Only add to used ring when a batch a buffer have all been used.  And if
+> in order feature negotiated, add randomness to the used buffer's order,
+> test the ability of vhost to reorder batched buffer.
 >
 > Signed-off-by: Guo Zhi <qtxuning1999@sjtu.edu.cn>
 > ---
->  drivers/vhost/vhost.c | 44 +++++++++++++++++++++++++++++++++++++++++--
->  drivers/vhost/vhost.h |  3 +++
->  2 files changed, 45 insertions(+), 2 deletions(-)
+>  drivers/vhost/test.c | 15 ++++++++++++++-
+>  1 file changed, 14 insertions(+), 1 deletion(-)
 >
-> diff --git a/drivers/vhost/vhost.c b/drivers/vhost/vhost.c
-> index 40097826c..e2e77e29f 100644
-> --- a/drivers/vhost/vhost.c
-> +++ b/drivers/vhost/vhost.c
-> @@ -317,6 +317,7 @@ static void vhost_vq_reset(struct vhost_dev *dev,
->         vq->used_flags = 0;
->         vq->log_used = false;
->         vq->log_addr = -1ull;
-> +       vq->next_used_head_idx = 0;
->         vq->private_data = NULL;
->         vq->acked_features = 0;
->         vq->acked_backend_features = 0;
-> @@ -398,6 +399,8 @@ static long vhost_dev_alloc_iovecs(struct vhost_dev *dev)
->                                           GFP_KERNEL);
->                 if (!vq->indirect || !vq->log || !vq->heads)
->                         goto err_nomem;
-> +
-> +               memset(vq->heads, 0, sizeof(*vq->heads) * dev->iov_limit);
->         }
->         return 0;
->
-> @@ -2374,12 +2377,49 @@ static int __vhost_add_used_n(struct vhost_virtqueue *vq,
->                             unsigned count)
+> diff --git a/drivers/vhost/test.c b/drivers/vhost/test.c
+> index bc8e7fb1e..1c9c40c11 100644
+> --- a/drivers/vhost/test.c
+> +++ b/drivers/vhost/test.c
+> @@ -43,6 +43,9 @@ struct vhost_test {
+>  static void handle_vq(struct vhost_test *n)
 >  {
->         vring_used_elem_t __user *used;
-> +       struct vring_desc desc;
->         u16 old, new;
->         int start;
-> +       int begin, end, i;
-> +       int copy_n = count;
-> +
-> +       if (vhost_has_feature(vq, VIRTIO_F_IN_ORDER)) {
-> +               /* calculate descriptor chain length for each used buffer */
-> +               for (i = 0; i < count; i++) {
-> +                       begin = heads[i].id;
-> +                       end = begin;
-> +                       vq->heads[begin].len = 0;
-> +                       do {
-> +                               vq->heads[begin].len += 1;
-> +                               if (unlikely(vhost_get_desc(vq, &desc, end))) {
-> +                                       vq_err(vq, "Failed to get descriptor: idx %d addr %p\n",
-> +                                              end, vq->desc + end);
-> +                                       return -EFAULT;
-> +                               }
-> +                       } while ((end = next_desc(vq, &desc)) != -1);
-> +               }
-> +
-> +               count = 0;
-> +               /* sort and batch continuous used ring entry */
-> +               while (vq->heads[vq->next_used_head_idx].len != 0) {
-> +                       count++;
-> +                       i = vq->next_used_head_idx;
-> +                       vq->next_used_head_idx = (vq->next_used_head_idx +
-> +                                                 vq->heads[vq->next_used_head_idx].len)
-> +                                                 % vq->num;
-> +                       vq->heads[i].len = 0;
-> +               }
+>         struct vhost_virtqueue *vq = &n->vqs[VHOST_TEST_VQ];
+> +       struct vring_used_elem *heads = kmalloc(sizeof(*heads)
+> +                       * vq->num, GFP_KERNEL);
+> +       int batch_idx = 0;
+>         unsigned out, in;
+>         int head;
+>         size_t len, total_len = 0;
+> @@ -84,11 +87,21 @@ static void handle_vq(struct vhost_test *n)
+>                         vq_err(vq, "Unexpected 0 len for TX\n");
+>                         break;
+>                 }
+> -               vhost_add_used_and_signal(&n->dev, vq, head, 0);
+> +               heads[batch_idx].id = cpu_to_vhost32(vq, head);
+> +               heads[batch_idx++].len = cpu_to_vhost32(vq, len);
+>                 total_len += len;
+>                 if (unlikely(vhost_exceeds_weight(vq, 0, total_len)))
+>                         break;
+>         }
+> +       if (batch_idx) {
+> +               if (vhost_has_feature(vq, VIRTIO_F_IN_ORDER) && batch_idx >= 2) {
 
-You're iterating vq->heads with two different indexes here.
+Maybe to add a module parameter to test this? Instead of trusting in
+feature negotiation, "unorder_used=1" or something like that.
 
-The first loop is working with indexes [0, count), which is fine if
-heads is a "cache" and everything can be overwritten (as it used to be
-before this patch).
-
-The other loop trusts in vq->next_used_head_idx, which is saved between calls.
-
-So both uses are going to conflict with each other.
-
-A proposal for checking this is to push the data in the chains
-incrementally at the virtio_test driver, and check that they are
-returned properly. Like, the first buffer in the chain has the value
-of N, the second one N+1, and so on.
-
-Let's split saving chains in its own patch.
-
-
-> +               /* only write out a single used ring entry with the id corresponding
-> +                * to the head entry of the descriptor chain describing the last buffer
-> +                * in the batch.
-> +                */
-
-Let's delay the batching for now, we can add it as an optimization on
-top in the case of devices.
-
-My proposal is to define a new struct vring_used_elem_inorder:
-
-struct vring_used_elem_inorder {
-    uint16_t written'
-    uint16_t num;
-}
-
-And create a per vq array of them, with vq->num size. Let's call it
-used_inorder for example.
-
-Everytime the device uses a buffer chain of N buffers, written L and
-first descriptor id D, it stores vq->used_inorder[D] = { .written = L,
-.num = N }. .num == 0 means the buffer is not available.
-
-After storing that information, you have your next_used_head_idx. You
-can check if vq->used_inorder[next_used_head_idx] is used (.num != 0).
-In case is not, there is no need to perform any actions for now.
-
-In case it is, you iterate vq->used_inorder. First you write as used
-next_used_head_idx. After that, next_used_head_idx increments by .num,
-and we need to clean .num. If vq->used_inorder[vq->next_used_head_idx]
-is used too, repeat.
-
-I think we could even squash vq->heads and vq->used_inorder with some
-tricks, because a chain's length would always be bigger or equal than
-used descriptor one, but to store in a different array would be more
-clear.
-
-> +               heads[0].id = i;
-> +               copy_n = 1;
-
-The device must not write anything to the used ring if the next
-descriptor has not been used. I'm failing to trace how this works when
-the second half of the batch in vhost/test.c is used here.
+vhost.c:vhost_add_used_and_signal_n should support receiving buffers
+in order or out of order whether F_IN_ORDER is negotiated or not.
 
 Thanks!
 
-
+> +                       vhost_add_used_and_signal_n(&n->dev, vq, &heads[batch_idx / 2],
+> +                                                   batch_idx - batch_idx / 2);
+> +                       vhost_add_used_and_signal_n(&n->dev, vq, heads, batch_idx / 2);
+> +               } else {
+> +                       vhost_add_used_and_signal_n(&n->dev, vq, heads, batch_idx);
+> +               }
 > +       }
 >
->         start = vq->last_used_idx & (vq->num - 1);
->         used = vq->used->ring + start;
-> -       if (vhost_put_used(vq, heads, start, count)) {
-> +       if (vhost_put_used(vq, heads, start, copy_n)) {
->                 vq_err(vq, "Failed to write used");
->                 return -EFAULT;
->         }
-> @@ -2410,7 +2450,7 @@ int vhost_add_used_n(struct vhost_virtqueue *vq, struct vring_used_elem *heads,
->
->         start = vq->last_used_idx & (vq->num - 1);
->         n = vq->num - start;
-> -       if (n < count) {
-> +       if (n < count && !vhost_has_feature(vq, VIRTIO_F_IN_ORDER)) {
->                 r = __vhost_add_used_n(vq, heads, n);
->                 if (r < 0)
->                         return r;
-> diff --git a/drivers/vhost/vhost.h b/drivers/vhost/vhost.h
-> index d9109107a..7b2c0fbb5 100644
-> --- a/drivers/vhost/vhost.h
-> +++ b/drivers/vhost/vhost.h
-> @@ -107,6 +107,9 @@ struct vhost_virtqueue {
->         bool log_used;
->         u64 log_addr;
->
-> +       /* Sort heads in order */
-> +       u16 next_used_head_idx;
-> +
->         struct iovec iov[UIO_MAXIOV];
->         struct iovec iotlb_iov[64];
->         struct iovec *indirect;
+>         mutex_unlock(&vq->mutex);
+>  }
 > --
 > 2.17.1
 >
