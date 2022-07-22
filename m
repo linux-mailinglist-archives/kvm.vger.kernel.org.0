@@ -2,86 +2,91 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 02CD157E0A8
-	for <lists+kvm@lfdr.de>; Fri, 22 Jul 2022 13:08:41 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 67D9457E0DF
+	for <lists+kvm@lfdr.de>; Fri, 22 Jul 2022 13:35:50 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234097AbiGVLIi (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 22 Jul 2022 07:08:38 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45276 "EHLO
+        id S234368AbiGVLfs (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 22 Jul 2022 07:35:48 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36920 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233363AbiGVLIf (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 22 Jul 2022 07:08:35 -0400
-Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 466D0BDA05
-        for <kvm@vger.kernel.org>; Fri, 22 Jul 2022 04:08:34 -0700 (PDT)
-Received: from pps.filterd (m0098404.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.17.1.5/8.17.1.5) with ESMTP id 26M9i0ms018158
-        for <kvm@vger.kernel.org>; Fri, 22 Jul 2022 11:08:34 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=content-type :
- mime-version : content-transfer-encoding : in-reply-to : references : cc :
- subject : from : to : message-id : date; s=pp1;
- bh=gnJrKYpRWoECkZfpMxQNq7BAHGUHoAot6mmNZndFSdk=;
- b=bk/C8WTT2ioJVHIkyAEEebyytln/kqpJX5vF06NWHvCsO6+VmTQTyowPncf7Kkf/6jrh
- Lc37nW9ehofXFDRQEjT4qGoiVxXsTLHj9jUEs51JmlN2X1qd23nW1N/VcTViqX2IkVWX
- beHx8TkU8lutHuUi0j6PwYpy+qreW+OooIoV8ztqXj1Th1O1J95HI/oJdp7U8YfzFoKE
- ju0rvFNSbo4kYObazqFU5ubqXaAmR1Cgh7Jec/0BaW8eXrTS4Pj/vZVv6MNu9TDNQjnO
- l1mAJ2g5ins8hHCUntmG1FAvkYXNRxiAfNF/faBxyUvUaJljwEPXWX+Fh7HncnwJy8b/ jw== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3hfsh7abdu-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT)
-        for <kvm@vger.kernel.org>; Fri, 22 Jul 2022 11:08:33 +0000
-Received: from m0098404.ppops.net (m0098404.ppops.net [127.0.0.1])
-        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 26M9kXXa000754
-        for <kvm@vger.kernel.org>; Fri, 22 Jul 2022 11:08:33 GMT
-Received: from ppma06fra.de.ibm.com (48.49.7a9f.ip4.static.sl-reverse.com [159.122.73.72])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3hfsh7abcp-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Fri, 22 Jul 2022 11:08:33 +0000
-Received: from pps.filterd (ppma06fra.de.ibm.com [127.0.0.1])
-        by ppma06fra.de.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 26MB8BgR024222;
-        Fri, 22 Jul 2022 11:08:30 GMT
-Received: from b06avi18878370.portsmouth.uk.ibm.com (b06avi18878370.portsmouth.uk.ibm.com [9.149.26.194])
-        by ppma06fra.de.ibm.com with ESMTP id 3hbmkht91q-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Fri, 22 Jul 2022 11:08:30 +0000
-Received: from d06av26.portsmouth.uk.ibm.com (d06av26.portsmouth.uk.ibm.com [9.149.105.62])
-        by b06avi18878370.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 26MB8duS31261016
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Fri, 22 Jul 2022 11:08:40 GMT
-Received: from d06av26.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 3921FAE04D;
-        Fri, 22 Jul 2022 11:08:27 +0000 (GMT)
-Received: from d06av26.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 17405AE057;
-        Fri, 22 Jul 2022 11:08:27 +0000 (GMT)
-Received: from li-ca45c2cc-336f-11b2-a85c-c6e71de567f1.ibm.com (unknown [9.171.80.183])
-        by d06av26.portsmouth.uk.ibm.com (Postfix) with ESMTP;
-        Fri, 22 Jul 2022 11:08:27 +0000 (GMT)
-Content-Type: text/plain; charset="utf-8"
+        with ESMTP id S230134AbiGVLfq (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 22 Jul 2022 07:35:46 -0400
+Received: from mail.skyhub.de (mail.skyhub.de [5.9.137.197])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E8CA7AF868;
+        Fri, 22 Jul 2022 04:35:43 -0700 (PDT)
+Received: from zn.tnic (p200300ea97297665329c23fffea6a903.dip0.t-ipconnect.de [IPv6:2003:ea:9729:7665:329c:23ff:fea6:a903])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by mail.skyhub.de (SuperMail on ZX Spectrum 128k) with ESMTPSA id E5EF91EC04E4;
+        Fri, 22 Jul 2022 13:35:37 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alien8.de; s=dkim;
+        t=1658489738;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:in-reply-to:in-reply-to:  references:references;
+        bh=iA4hF9kkPlWcq5B8sNQx2XUmWFJBZdfDGxazbgtSxSs=;
+        b=Gfc3qmAZEapfyhMcE8YqM23jtcCxb3f562sZrP/kg89pc7XVy8A0voe5xVEINVUjkO8ZaW
+        m4rhZaFIc53CaGiUZGsfxI0n7W63uo5tIJG6Ml78lhKPPuk10M76vzqvHbod4qaMEiPiSw
+        UGND80nYqOiUPTj4DE81rtyPQKffhqE=
+Date:   Fri, 22 Jul 2022 13:35:32 +0200
+From:   Borislav Petkov <bp@alien8.de>
+To:     "Kalra, Ashish" <Ashish.Kalra@amd.com>
+Cc:     Sean Christopherson <seanjc@google.com>,
+        Dave Hansen <dave.hansen@intel.com>,
+        "x86@kernel.org" <x86@kernel.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "linux-coco@lists.linux.dev" <linux-coco@lists.linux.dev>,
+        "linux-mm@kvack.org" <linux-mm@kvack.org>,
+        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
+        "tglx@linutronix.de" <tglx@linutronix.de>,
+        "mingo@redhat.com" <mingo@redhat.com>,
+        "jroedel@suse.de" <jroedel@suse.de>,
+        "Lendacky, Thomas" <Thomas.Lendacky@amd.com>,
+        "hpa@zytor.com" <hpa@zytor.com>,
+        "ardb@kernel.org" <ardb@kernel.org>,
+        "pbonzini@redhat.com" <pbonzini@redhat.com>,
+        "vkuznets@redhat.com" <vkuznets@redhat.com>,
+        "jmattson@google.com" <jmattson@google.com>,
+        "luto@kernel.org" <luto@kernel.org>,
+        "dave.hansen@linux.intel.com" <dave.hansen@linux.intel.com>,
+        "slp@redhat.com" <slp@redhat.com>,
+        "pgonda@google.com" <pgonda@google.com>,
+        "peterz@infradead.org" <peterz@infradead.org>,
+        "srinivas.pandruvada@linux.intel.com" 
+        <srinivas.pandruvada@linux.intel.com>,
+        "rientjes@google.com" <rientjes@google.com>,
+        "dovmurik@linux.ibm.com" <dovmurik@linux.ibm.com>,
+        "tobin@ibm.com" <tobin@ibm.com>,
+        "Roth, Michael" <Michael.Roth@amd.com>,
+        "vbabka@suse.cz" <vbabka@suse.cz>,
+        "kirill@shutemov.name" <kirill@shutemov.name>,
+        "ak@linux.intel.com" <ak@linux.intel.com>,
+        "tony.luck@intel.com" <tony.luck@intel.com>,
+        "marcorr@google.com" <marcorr@google.com>,
+        "sathyanarayanan.kuppuswamy@linux.intel.com" 
+        <sathyanarayanan.kuppuswamy@linux.intel.com>,
+        "alpergun@google.com" <alpergun@google.com>,
+        "dgilbert@redhat.com" <dgilbert@redhat.com>,
+        "jarkko@kernel.org" <jarkko@kernel.org>
+Subject: Re: [PATCH Part2 v6 05/49] x86/sev: Add RMP entry lookup helpers
+Message-ID: <YtqLhHughuh3KDzH@zn.tnic>
+References: <25be3068-be13-a451-86d4-ff4cc12ddb23@intel.com>
+ <BYAPR12MB27599BCEA9F692E173911C3B8EB29@BYAPR12MB2759.namprd12.prod.outlook.com>
+ <681e4e45-eff1-600c-9b81-1fa9bdf24232@intel.com>
+ <BYAPR12MB27595CF4328B15F0F9573D188EB29@BYAPR12MB2759.namprd12.prod.outlook.com>
+ <99d72d58-a9bb-d75c-93af-79d497dfe176@intel.com>
+ <BYAPR12MB275984F14B1E103935A103D98EB29@BYAPR12MB2759.namprd12.prod.outlook.com>
+ <5db37cc2-4fb1-7a73-c39a-3531260414d0@intel.com>
+ <BYAPR12MB2759AA368C8B6A5F1C31642F8EB29@BYAPR12MB2759.namprd12.prod.outlook.com>
+ <YrTq3WfOeA6ehsk6@google.com>
+ <SN6PR12MB276743CBEAD5AFE9033AFE558EB59@SN6PR12MB2767.namprd12.prod.outlook.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
-In-Reply-To: <facc8a71-954a-4b4d-5d63-d07b69125a80@linux.ibm.com>
-References: <20220722072004.800792-1-nrb@linux.ibm.com> <20220722072004.800792-4-nrb@linux.ibm.com> <facc8a71-954a-4b4d-5d63-d07b69125a80@linux.ibm.com>
-Cc:     imbrenda@linux.ibm.com, thuth@redhat.com
-Subject: Re: [kvm-unit-tests PATCH v2 3/3] s390x: smp: add tests for calls in wait state
-From:   Nico Boehr <nrb@linux.ibm.com>
-To:     kvm@vger.kernel.org
-Message-ID: <165848810687.161082.2344144216592218763@localhost.localdomain>
-User-Agent: alot/0.8.1
-Date:   Fri, 22 Jul 2022 13:08:26 +0200
-X-TM-AS-GCONF: 00
-X-Proofpoint-ORIG-GUID: N4U4xasVoFXdNI0VACQYelN_yDAF10-3
-X-Proofpoint-GUID: ET6aHIYemN0vO-2R9BziILpEl2B2aa-W
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.205,Aquarius:18.0.883,Hydra:6.0.517,FMLib:17.11.122.1
- definitions=2022-07-22_02,2022-07-21_02,2022-06-22_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 clxscore=1015 suspectscore=0
- phishscore=0 priorityscore=1501 impostorscore=0 mlxscore=0 adultscore=0
- lowpriorityscore=0 spamscore=0 bulkscore=0 mlxlogscore=999 malwarescore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2206140000
- definitions=main-2207220046
-X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_EF,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_PASS
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <SN6PR12MB276743CBEAD5AFE9033AFE558EB59@SN6PR12MB2767.namprd12.prod.outlook.com>
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,SPF_HELO_NONE,SPF_PASS
         autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -89,86 +94,30 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Quoting Janosch Frank (2022-07-22 10:30:46)
-> On 7/22/22 09:20, Nico Boehr wrote:
-> > Under PV, SIGP ecall requires some special handling by the hypervisor
-> > when the receiving CPU is in enabled wait. Hence, we should have
-> > coverage for the various SIGP call orders when the receiving CPU is in
-> > enabled wait.
->=20
-> When the SIGP interpretation facility is in use a SIGP external call to=20
-> a waiting CPU will result in an exit of the calling cpu. For non-pv=20
-> guests it's a code 56 (partial execution) exit otherwise its a code 108=20
-> (secure instruction notification) exit. Those exits are handled=20
-> differently from a normal SIGP instruction intercept that happens=20
-> without interpretation and hence need to be tested.
+On Thu, Jun 23, 2022 at 10:43:40PM +0000, Kalra, Ashish wrote:
+> Yes, that's a nice way to hide it from the rest of the kernel which
+> does not require access to this structure anyway, in essence, it
+> becomes a private structure.
 
-Changed.
+So this whole discussion whether there should be a model check or not
+in case a new RMP format gets added in the future is moot - when a new
+model format comes along, *then* the distinction should be done and
+added in code - not earlier.
 
-> >=20
-> > The ecall test currently fails under PV due to a KVM bug under
-> > investigation.
->=20
-> That shouldn't be true anymore
+This is nothing else but normal CPU enablement work - it should be done
+when it is really needed.
 
-Yeah, it's not yet in mainline, but is soon gonna be. I will remove this.
+Because the opposite can happen: you can add a model check which
+excludes future model X, future model X comes along but does *not*
+change the RMP format and then you're going to have to relax that model
+check again to fix SNP on the new model X.
 
-> >=20
-> > Signed-off-by: Nico Boehr <nrb@linux.ibm.com>
-> > ---
-> >   s390x/smp.c | 75 +++++++++++++++++++++++++++++++++++++++++++++++++++++
-> >   1 file changed, 75 insertions(+)
-> >=20
-> > diff --git a/s390x/smp.c b/s390x/smp.c
-> > index 683b0e618a48..eed7aa3564de 100644
-> > --- a/s390x/smp.c
-> > +++ b/s390x/smp.c
-> > @@ -347,6 +347,80 @@ static void test_calls(void)
-> >       }
-> >   }
-> >  =20
-> > +static void call_in_wait_ext_int_fixup(struct stack_frame_int *stack)
-> > +{
-> > +     /* leave wait after returning */
->=20
-> Clear wait bit so we don't immediately wait again after the fixup
+So pls add the model checks only when really needed.
 
-Changed.
+Thx.
 
->=20
-> > +     lowcore.ext_old_psw.mask &=3D ~PSW_MASK_WAIT;
-> > +
-> > +     stack->crs[0] &=3D ~current_sigp_call_case->cr0_bit;
->=20
-> You need a mask but have a bit, no?
->=20
-> ~BIT(current_sigp_call_case->cr0_bit)
+-- 
+Regards/Gruss,
+    Boris.
 
-Oopsie, thanks, good find.
-
-This reminds me the ctl_clear_bit() I added in call_in_wait_received() is c=
-ompletely useless, since I handle it here. So, I will remove it there as we=
-ll.
-
-[...]
-> > +static void test_calls_in_wait(void)
-> > +{
-> > +     int i;
-> > +     struct psw psw;
-> > +
-> > +     report_prefix_push("psw wait");
-> > +     for (i =3D 0; i < ARRAY_SIZE(cases_sigp_call); i++) {
-> > +             current_sigp_call_case =3D &cases_sigp_call[i];
-> > +
-> > +             report_prefix_push(current_sigp_call_case->name);
-> > +             if (!current_sigp_call_case->supports_pv && uv_os_is_gues=
-t()) {
-> > +                     report_skip("Not supported under PV");
-> > +                     report_prefix_pop();
-> > +                     continue;
-> > +             }
-> > +
-> /* Let the secondary CPU setup the external mask and the external=20
-> interrupt cleanup function */
-
-Changed.
+https://people.kernel.org/tglx/notes-about-netiquette
