@@ -2,119 +2,99 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id DDCD257E9A1
-	for <lists+kvm@lfdr.de>; Sat, 23 Jul 2022 00:26:01 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id C4DD857E9F4
+	for <lists+kvm@lfdr.de>; Sat, 23 Jul 2022 00:44:18 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236550AbiGVWZ4 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 22 Jul 2022 18:25:56 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48442 "EHLO
+        id S236941AbiGVWoQ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 22 Jul 2022 18:44:16 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38766 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234255AbiGVWZz (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 22 Jul 2022 18:25:55 -0400
-Received: from mail.skyhub.de (mail.skyhub.de [IPv6:2a01:4f8:190:11c2::b:1457])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5C5148965A;
-        Fri, 22 Jul 2022 15:25:53 -0700 (PDT)
-Received: from zn.tnic (p200300ea97297621329c23fffea6a903.dip0.t-ipconnect.de [IPv6:2003:ea:9729:7621:329c:23ff:fea6:a903])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by mail.skyhub.de (SuperMail on ZX Spectrum 128k) with ESMTPSA id DFCE81EC02E4;
-        Sat, 23 Jul 2022 00:25:46 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alien8.de; s=dkim;
-        t=1658528746;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:in-reply-to:in-reply-to:  references:references;
-        bh=emiawl0ZNbUbhwPd8wD23nmKvXFNPldjeUy0zLg0tu8=;
-        b=eNQANAVlpHoclXI7HJ9Le6r1ZbS/iErXCHKwynRvmd73vdwfp6eQVw1ymNnEsRmPAaXC4w
-        Ebxz9VE60nC3MAtQQzpMQMj0daKH8XQ/n7m6f6fADdwGeLsIYGC2St44DA/pIqrE+sewKM
-        48fmPx4N0N76V4OTDJSFL8YTsgIDDfo=
-Date:   Sat, 23 Jul 2022 00:25:41 +0200
-From:   Borislav Petkov <bp@alien8.de>
-To:     Sean Christopherson <seanjc@google.com>
-Cc:     "Kalra, Ashish" <Ashish.Kalra@amd.com>,
-        Dave Hansen <dave.hansen@intel.com>,
-        "x86@kernel.org" <x86@kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "linux-coco@lists.linux.dev" <linux-coco@lists.linux.dev>,
-        "linux-mm@kvack.org" <linux-mm@kvack.org>,
-        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
-        "tglx@linutronix.de" <tglx@linutronix.de>,
-        "mingo@redhat.com" <mingo@redhat.com>,
-        "jroedel@suse.de" <jroedel@suse.de>,
-        "Lendacky, Thomas" <Thomas.Lendacky@amd.com>,
-        "hpa@zytor.com" <hpa@zytor.com>,
-        "ardb@kernel.org" <ardb@kernel.org>,
-        "pbonzini@redhat.com" <pbonzini@redhat.com>,
-        "vkuznets@redhat.com" <vkuznets@redhat.com>,
-        "jmattson@google.com" <jmattson@google.com>,
-        "luto@kernel.org" <luto@kernel.org>,
-        "dave.hansen@linux.intel.com" <dave.hansen@linux.intel.com>,
-        "slp@redhat.com" <slp@redhat.com>,
-        "pgonda@google.com" <pgonda@google.com>,
-        "peterz@infradead.org" <peterz@infradead.org>,
-        "srinivas.pandruvada@linux.intel.com" 
-        <srinivas.pandruvada@linux.intel.com>,
-        "rientjes@google.com" <rientjes@google.com>,
-        "dovmurik@linux.ibm.com" <dovmurik@linux.ibm.com>,
-        "tobin@ibm.com" <tobin@ibm.com>,
-        "Roth, Michael" <Michael.Roth@amd.com>,
-        "vbabka@suse.cz" <vbabka@suse.cz>,
-        "kirill@shutemov.name" <kirill@shutemov.name>,
-        "ak@linux.intel.com" <ak@linux.intel.com>,
-        "tony.luck@intel.com" <tony.luck@intel.com>,
-        "marcorr@google.com" <marcorr@google.com>,
-        "sathyanarayanan.kuppuswamy@linux.intel.com" 
-        <sathyanarayanan.kuppuswamy@linux.intel.com>,
-        "alpergun@google.com" <alpergun@google.com>,
-        "dgilbert@redhat.com" <dgilbert@redhat.com>,
-        "jarkko@kernel.org" <jarkko@kernel.org>
-Subject: Re: [PATCH Part2 v6 05/49] x86/sev: Add RMP entry lookup helpers
-Message-ID: <Ytsj5Wi0clIR6p9l@zn.tnic>
-References: <99d72d58-a9bb-d75c-93af-79d497dfe176@intel.com>
- <BYAPR12MB275984F14B1E103935A103D98EB29@BYAPR12MB2759.namprd12.prod.outlook.com>
- <5db37cc2-4fb1-7a73-c39a-3531260414d0@intel.com>
- <BYAPR12MB2759AA368C8B6A5F1C31642F8EB29@BYAPR12MB2759.namprd12.prod.outlook.com>
- <YrTq3WfOeA6ehsk6@google.com>
- <SN6PR12MB276743CBEAD5AFE9033AFE558EB59@SN6PR12MB2767.namprd12.prod.outlook.com>
- <YtqLhHughuh3KDzH@zn.tnic>
- <Ytr0t119QrZ8PUBB@google.com>
- <Ytr5ndnlOQvqWdPP@zn.tnic>
- <Ytshp+D+IT8eaevH@google.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <Ytshp+D+IT8eaevH@google.com>
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,SPF_HELO_NONE,SPF_PASS
-        autolearn=ham autolearn_force=no version=3.4.6
+        with ESMTP id S236920AbiGVWoP (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 22 Jul 2022 18:44:15 -0400
+Received: from mail-yw1-x1149.google.com (mail-yw1-x1149.google.com [IPv6:2607:f8b0:4864:20::1149])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 62099BB5
+        for <kvm@vger.kernel.org>; Fri, 22 Jul 2022 15:44:13 -0700 (PDT)
+Received: by mail-yw1-x1149.google.com with SMTP id 00721157ae682-31ea3f0e357so20463787b3.16
+        for <kvm@vger.kernel.org>; Fri, 22 Jul 2022 15:44:13 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112;
+        h=reply-to:date:message-id:mime-version:subject:from:to:cc;
+        bh=j8oRiyx9dXqV7vPKYboluXt1U7dVeZU4Z3i7e3MK2Qw=;
+        b=qbTvZCxh50eBdy6iEkrMwum5y36MtOX6vakynZX0gRRTQmJHuMYRyKPuoBBvttjeAr
+         R8oM5sSRd2QMVj1mujp1n6poemzmhqFWldIBO+oxhWI3lr2fHLxU0l9OwTz2eLbtAc9Q
+         aLemE5fS0+iyNo8j00F4F6v2CN+XXvQwwk9eIB1nu5IkAVM2ITMVLqHXaI172doHI42u
+         quOIFaJg7K7iHqNO9sREC/ksrAcsWE98619qW6zYZrdL+F2hGt+WYNiavR3/VMmGoCnR
+         +w8p0jXUePe6P7DGUvWYg4mGVY9vxQDoPt6amKVAEQRdrwtBMo9doQQNDxO8F80LCbkw
+         7FFw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:reply-to:date:message-id:mime-version:subject
+         :from:to:cc;
+        bh=j8oRiyx9dXqV7vPKYboluXt1U7dVeZU4Z3i7e3MK2Qw=;
+        b=x/hlI/VHGsdUHbqip2cpfvnaHtN71LI+vNkUFYnlpJ/4kxjnNjNe/O7USImkXt4ktK
+         /dJKM96ZK/b5eTfYix3ROWNmEYVpJqFNADDi8v6s/R6xoeBajLlfHFo6ur4FtA6MU33m
+         nAvG4cTvZsSdUxJdVNoYb2uJGkyO4ND0bJsdaty21k71LoEMVSzXsCwDvF1LvJE6hJku
+         Q8iwqqksMbdyE5ET7CMEF4dykxfHQsD8EoL2Wn2PtwCeP7QdhLqE5KCKh3YJBQJg8QBH
+         UWSYviwzdrN1IGAdV/xREj0OLKpFehEb6mNK0e7/PfX7lE6/dCFRYBy+qU+J7bFst2RQ
+         F1SA==
+X-Gm-Message-State: AJIora8fIcqpdXH6e6NC6zZ6Ehkp7PdnZIv+Ev5jhbaV0DHoCCMjACn8
+        HGbHzZyE5s4qdKLXwECYVLu9DH97KBw=
+X-Google-Smtp-Source: AGRyM1v8iz/eHevRQ9dlbWckZAJONNTGRk/tyTPHxUfg114rq00aDrMVnAe88/HNVtcM1Fme6/GFvB9oUBM=
+X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
+ (user=seanjc job=sendgmr) by 2002:a05:690c:102:b0:2ef:48d8:24c3 with SMTP id
+ bd2-20020a05690c010200b002ef48d824c3mr1831929ywb.153.1658529852712; Fri, 22
+ Jul 2022 15:44:12 -0700 (PDT)
+Reply-To: Sean Christopherson <seanjc@google.com>
+Date:   Fri, 22 Jul 2022 22:44:04 +0000
+Message-Id: <20220722224409.1336532-1-seanjc@google.com>
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.37.1.359.gd136c6c3e2-goog
+Subject: [PATCH 0/5] KVM: VMX: PERF_GLOBAL_CTRL fixes
+From:   Sean Christopherson <seanjc@google.com>
+To:     Sean Christopherson <seanjc@google.com>,
+        Paolo Bonzini <pbonzini@redhat.com>
+Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Jul 22, 2022 at 10:16:07PM +0000, Sean Christopherson wrote:
-> Yar, just wanted to be make sure we're all on the same page, I wasn't entirely
-> sure what was get nacked :-)
+This is intended as a replacement for commit 00590a384408 ("Revert "KVM:
+nVMX: Expose load IA32_PERF_GLOBAL_CTRL VM-{Entry,Exit} control"").
 
-Not nacked - we're all just talking here. :-)
+The basic idea is the same, except instead of skipping the load if
+the desired value is the same, skip the load if the MSR doesn't exist.
+AFAICT, that plugs all holes where a mischievious usersepace can get
+KVM to WARN.
 
-> Heh, you're definitely more optimistic than me.  I can just see something truly
-> ridiculous happening like moving the page size bit and then getting weird behavior
-> only when KVM happens to need the page size for some edge case.
-> 
-> Anyways, it's not a sticking point, and I certainly am not volunteering to
-> maintain the FMS list...
+I dropped the CR4 changes for now.  I'd still prefer to give userspace
+control, but AFAIK it doesn't cause problems, yet...
 
-Yeah, no need for it to be a sticking point because a pretty reliable
-birdie just told me that we're worrying for nothing and it all will
-solve itself.
+Paolo Bonzini (1):
+  Revert "KVM: nVMX: Expose load IA32_PERF_GLOBAL_CTRL VM-{Entry,Exit}
+    control"
 
-:-)
+Sean Christopherson (4):
+  Revert "Revert "KVM: nVMX: Expose load IA32_PERF_GLOBAL_CTRL
+    VM-{Entry,Exit} control""
+  KVM: VMX: Mark all PERF_GLOBAL_(OVF)_CTRL bits reserved if there's no
+    vPMU
+  KVM: VMX: Add helper to check if the guest PMU has PERF_GLOBAL_CTRL
+  KVM: nVMX: Attempt to load PERF_GLOBAL_CTRL on nVMX xfer iff it exists
 
+ arch/x86/kvm/vmx/nested.c    |  6 +++---
+ arch/x86/kvm/vmx/pmu_intel.c |  6 ++++--
+ arch/x86/kvm/vmx/vmx.h       | 12 ++++++++++++
+ 3 files changed, 19 insertions(+), 5 deletions(-)
+
+
+base-commit: 1a4d88a361af4f2e91861d632c6a1fe87a9665c2
 -- 
-Regards/Gruss,
-    Boris.
+2.37.1.359.gd136c6c3e2-goog
 
-https://people.kernel.org/tglx/notes-about-netiquette
