@@ -2,335 +2,108 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 8BC8457E27F
-	for <lists+kvm@lfdr.de>; Fri, 22 Jul 2022 15:43:55 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 99D0457E2E7
+	for <lists+kvm@lfdr.de>; Fri, 22 Jul 2022 16:16:42 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235271AbiGVNnx (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 22 Jul 2022 09:43:53 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53338 "EHLO
+        id S235229AbiGVOQk (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 22 Jul 2022 10:16:40 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49162 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235242AbiGVNnu (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 22 Jul 2022 09:43:50 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 6C1A47859F
-        for <kvm@vger.kernel.org>; Fri, 22 Jul 2022 06:43:48 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1658497427;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=+d1YaUOb2Xz5MsGpJ1hi2AuJIoactnpJkhrLVcKrmxI=;
-        b=SRbDsj/dq85gmjlBpNSaULfjw6XBjznJYElKZFwV2b48Dd49ig486YVSogCsbtfV6aWao8
-        RYFmxbcsOhXubJim5c6r0hlaZ2In4OFy03bRdkRDeO1NZGhPHI6b1nQ3unGSSzlIVN7Lzc
-        Dy2pCZi0qU6sjNMSGSNjyHLJTLWKDas=
-Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
- [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-611-58qf-zb0PUS0dvNuFaXKfw-1; Fri, 22 Jul 2022 09:43:44 -0400
-X-MC-Unique: 58qf-zb0PUS0dvNuFaXKfw-1
-Received: from smtp.corp.redhat.com (int-mx10.intmail.prod.int.rdu2.redhat.com [10.11.54.10])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        with ESMTP id S233115AbiGVOQj (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 22 Jul 2022 10:16:39 -0400
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AF4F5A026A
+        for <kvm@vger.kernel.org>; Fri, 22 Jul 2022 07:16:38 -0700 (PDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 9E1F8185A7B2;
-        Fri, 22 Jul 2022 13:43:43 +0000 (UTC)
-Received: from eperezma.remote.csb (unknown [10.39.194.161])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id CB83A401E92;
-        Fri, 22 Jul 2022 13:43:40 +0000 (UTC)
-From:   =?UTF-8?q?Eugenio=20P=C3=A9rez?= <eperezma@redhat.com>
-To:     qemu-devel@nongnu.org
-Cc:     Jason Wang <jasowang@redhat.com>,
-        Harpreet Singh Anand <hanand@xilinx.com>,
-        Cindy Lu <lulu@redhat.com>, Cornelia Huck <cohuck@redhat.com>,
-        kvm@vger.kernel.org, Parav Pandit <parav@mellanox.com>,
-        Stefan Hajnoczi <stefanha@redhat.com>,
-        "Gonglei (Arei)" <arei.gonglei@huawei.com>,
-        "Michael S. Tsirkin" <mst@redhat.com>,
-        Zhu Lingshan <lingshan.zhu@intel.com>,
-        Liuxiangdong <liuxiangdong5@huawei.com>,
-        Gautam Dawar <gdawar@xilinx.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Stefano Garzarella <sgarzare@redhat.com>,
-        Eli Cohen <eli@mellanox.com>,
-        Laurent Vivier <lvivier@redhat.com>
-Subject: [PATCH v2 7/7] vdpa: Always start CVQ in SVQ mode
-Date:   Fri, 22 Jul 2022 15:43:18 +0200
-Message-Id: <20220722134318.3430667-8-eperezma@redhat.com>
-In-Reply-To: <20220722134318.3430667-1-eperezma@redhat.com>
-References: <20220722134318.3430667-1-eperezma@redhat.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 2.85 on 10.11.54.10
-X-Spam-Status: No, score=-3.5 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,
-        SPF_HELO_NONE,SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
+        by dfw.source.kernel.org (Postfix) with ESMTPS id 3D6F962096
+        for <kvm@vger.kernel.org>; Fri, 22 Jul 2022 14:16:38 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8B7B1C341C6;
+        Fri, 22 Jul 2022 14:16:37 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1658499397;
+        bh=qPci77WK/98/z0Cyg/1FZengXU7A1Tr9GDGL2oMHA0M=;
+        h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+        b=VQuQTeCEljHzEjJXz4qGxwKYrcgTdErLguIV6/4HKkpKoeCVIjSS0uv4pb2wvi1IK
+         bHat0KgKoTn8ZmQA0QM7Xtc58ZnG+QHHbVxlaalI324Z8MM58OSogUO9xixlT/pYqY
+         WTUY5o2m2IWAhK7ubI5zNin0z5/lmMlSXnCPIR4ekta45lejAK3soV79PlOezX3wxa
+         w8hcjECHGr2MIJJom2Jlg7tTyRVHYA3ub9R2auvu0D38tWkp22THyNfc/R1OtypSkJ
+         wxf2gaxDERD9CxJkocrr0j6/U3YJmhiwDH+AVIkutn7mSUfh3VITPIpoxvL3+D7+28
+         LLc/b2d+pdf/w==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=why.misterjones.org)
+        by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+        (Exim 4.95)
+        (envelope-from <maz@kernel.org>)
+        id 1oEtSF-009MCL-0a;
+        Fri, 22 Jul 2022 15:16:35 +0100
+Date:   Fri, 22 Jul 2022 15:16:34 +0100
+Message-ID: <87leslxmf1.wl-maz@kernel.org>
+From:   Marc Zyngier <maz@kernel.org>
+To:     Peter Collingbourne <pcc@google.com>
+Cc:     linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
+        Cornelia Huck <cohuck@redhat.com>,
+        Catalin Marinas <catalin.marinas@arm.com>,
+        Will Deacon <will@kernel.org>,
+        Evgenii Stepanov <eugenis@google.com>, kvm@vger.kernel.org,
+        Steven Price <steven.price@arm.com>,
+        Vincenzo Frascino <vincenzo.frascino@arm.com>
+Subject: Re: [PATCH v2 3/7] mm: Add PG_arch_3 page flag
+In-Reply-To: <20220722015034.809663-4-pcc@google.com>
+References: <20220722015034.809663-1-pcc@google.com>
+        <20220722015034.809663-4-pcc@google.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/27.1
+ (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: pcc@google.com, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, cohuck@redhat.com, catalin.marinas@arm.com, will@kernel.org, eugenis@google.com, kvm@vger.kernel.org, steven.price@arm.com, vincenzo.frascino@arm.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+X-Spam-Status: No, score=-7.8 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_HI,
+        SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Isolate control virtqueue in its own group, allowing to intercept control
-commands but letting dataplane run totally passthrough to the guest.
+On Fri, 22 Jul 2022 02:50:29 +0100,
+Peter Collingbourne <pcc@google.com> wrote:
+> 
+> As with PG_arch_2, this flag is only allowed on 64-bit architectures due
+> to the shortage of bits available. It will be used by the arm64 MTE code
+> in subsequent patches.
+> 
+> Signed-off-by: Peter Collingbourne <pcc@google.com>
+> Cc: Will Deacon <will@kernel.org>
+> Cc: Marc Zyngier <maz@kernel.org>
+> Cc: Steven Price <steven.price@arm.com>
+> [catalin.marinas@arm.com: added flag preserving in __split_huge_page_tail()]
+> Signed-off-by: Catalin Marinas <catalin.marinas@arm.com>
+> ---
+>  fs/proc/page.c                 | 1 +
+>  include/linux/page-flags.h     | 1 +
+>  include/trace/events/mmflags.h | 7 ++++---
+>  mm/huge_memory.c               | 1 +
+>  4 files changed, 7 insertions(+), 3 deletions(-)
+> 
+> diff --git a/fs/proc/page.c b/fs/proc/page.c
+> index a2873a617ae8..438b8aa7249d 100644
+> --- a/fs/proc/page.c
+> +++ b/fs/proc/page.c
+> @@ -220,6 +220,7 @@ u64 stable_page_flags(struct page *page)
+>  	u |= kpf_copy_bit(k, KPF_ARCH,		PG_arch_1);
+>  #ifdef CONFIG_64BIT
+>  	u |= kpf_copy_bit(k, KPF_ARCH_2,	PG_arch_2);
+> +	u |= kpf_copy_bit(k, KPF_ARCH_2,	PG_arch_3);
 
-Signed-off-by: Eugenio Pérez <eperezma@redhat.com>
----
- hw/virtio/vhost-vdpa.c |   3 +-
- net/vhost-vdpa.c       | 158 +++++++++++++++++++++++++++++++++++++++--
- 2 files changed, 156 insertions(+), 5 deletions(-)
+Are PG_arch_2 and PG_arch_3 supposed to share the same user bit in
+/proc/kpageflags? This seems odd.
 
-diff --git a/hw/virtio/vhost-vdpa.c b/hw/virtio/vhost-vdpa.c
-index 79623badf2..fe1c85b086 100644
---- a/hw/virtio/vhost-vdpa.c
-+++ b/hw/virtio/vhost-vdpa.c
-@@ -668,7 +668,8 @@ static int vhost_vdpa_set_backend_cap(struct vhost_dev *dev)
- {
-     uint64_t features;
-     uint64_t f = 0x1ULL << VHOST_BACKEND_F_IOTLB_MSG_V2 |
--        0x1ULL << VHOST_BACKEND_F_IOTLB_BATCH;
-+        0x1ULL << VHOST_BACKEND_F_IOTLB_BATCH |
-+        0x1ULL << VHOST_BACKEND_F_IOTLB_ASID;
-     int r;
- 
-     if (vhost_vdpa_call(dev, VHOST_GET_BACKEND_FEATURES, &features)) {
-diff --git a/net/vhost-vdpa.c b/net/vhost-vdpa.c
-index 6c1c64f9b1..f5075ef487 100644
---- a/net/vhost-vdpa.c
-+++ b/net/vhost-vdpa.c
-@@ -37,6 +37,9 @@ typedef struct VhostVDPAState {
-     /* Control commands shadow buffers */
-     void *cvq_cmd_out_buffer, *cvq_cmd_in_buffer;
- 
-+    /* Number of address spaces supported by the device */
-+    unsigned address_space_num;
-+
-     /* The device always have SVQ enabled */
-     bool always_svq;
-     bool started;
-@@ -100,6 +103,8 @@ static const uint64_t vdpa_svq_device_features =
-     BIT_ULL(VIRTIO_NET_F_RSC_EXT) |
-     BIT_ULL(VIRTIO_NET_F_STANDBY);
- 
-+#define VHOST_VDPA_NET_CVQ_ASID 1
-+
- VHostNetState *vhost_vdpa_get_vhost_net(NetClientState *nc)
- {
-     VhostVDPAState *s = DO_UPCAST(VhostVDPAState, nc, nc);
-@@ -214,6 +219,109 @@ static ssize_t vhost_vdpa_receive(NetClientState *nc, const uint8_t *buf,
-     return 0;
- }
- 
-+static int vhost_vdpa_get_vring_group(int device_fd,
-+                                      struct vhost_vring_state *state)
-+{
-+    int r = ioctl(device_fd, VHOST_VDPA_GET_VRING_GROUP, state);
-+    return r < 0 ? -errno : 0;
-+}
-+
-+/**
-+ * Check if all the virtqueues of the virtio device are in a different vq than
-+ * the last vq. VQ group of last group passed in cvq_group.
-+ */
-+static bool vhost_vdpa_cvq_group_is_independent(struct vhost_vdpa *v,
-+                                            struct vhost_vring_state cvq_group)
-+{
-+    struct vhost_dev *dev = v->dev;
-+    int ret;
-+
-+    for (int i = 0; i < (dev->vq_index_end - 1); ++i) {
-+        struct vhost_vring_state vq_group = {
-+            .index = i,
-+        };
-+
-+        ret = vhost_vdpa_get_vring_group(v->device_fd, &vq_group);
-+        if (unlikely(ret)) {
-+            goto call_err;
-+        }
-+        if (unlikely(vq_group.num == cvq_group.num)) {
-+            error_report("CVQ %u group is the same as VQ %u one (%u)",
-+                         cvq_group.index, vq_group.index, cvq_group.num);
-+            return false;
-+        }
-+    }
-+
-+    return true;
-+
-+call_err:
-+    error_report("Can't read vq group, errno=%d (%s)", -ret, g_strerror(-ret));
-+    return false;
-+}
-+
-+static int vhost_vdpa_set_address_space_id(struct vhost_vdpa *v,
-+                                           unsigned vq_group,
-+                                           unsigned asid_num)
-+{
-+    struct vhost_vring_state asid = {
-+        .index = vq_group,
-+        .num = asid_num,
-+    };
-+    int ret;
-+
-+    ret = ioctl(v->device_fd, VHOST_VDPA_SET_GROUP_ASID, &asid);
-+    if (unlikely(ret < 0)) {
-+        error_report("Can't set vq group %u asid %u, errno=%d (%s)",
-+            asid.index, asid.num, errno, g_strerror(errno));
-+    }
-+    return ret;
-+}
-+
-+static void vhost_vdpa_net_prepare(NetClientState *nc)
-+{
-+    VhostVDPAState *s = DO_UPCAST(VhostVDPAState, nc, nc);
-+    struct vhost_vdpa *v = &s->vhost_vdpa;
-+    struct vhost_dev *dev = v->dev;
-+    struct vhost_vring_state cvq_group = {
-+        .index = v->dev->vq_index_end - 1,
-+    };
-+    int r;
-+
-+    assert(nc->info->type == NET_CLIENT_DRIVER_VHOST_VDPA);
-+
-+    if (dev->nvqs != 1 || dev->vq_index + dev->nvqs != dev->vq_index_end) {
-+        /* Only interested in CVQ */
-+        return;
-+    }
-+
-+    if (s->always_svq) {
-+        /* SVQ is already enabled */
-+        return;
-+    }
-+
-+    if (s->address_space_num < 2) {
-+        v->shadow_vqs_enabled = false;
-+        return;
-+    }
-+
-+    r = vhost_vdpa_get_vring_group(v->device_fd, &cvq_group);
-+    if (unlikely(r)) {
-+        error_report("Can't read cvq group, errno=%d (%s)", r, g_strerror(-r));
-+        v->shadow_vqs_enabled = false;
-+        return;
-+    }
-+
-+    if (!vhost_vdpa_cvq_group_is_independent(v, cvq_group)) {
-+        v->shadow_vqs_enabled = false;
-+        return;
-+    }
-+
-+    r = vhost_vdpa_set_address_space_id(v, cvq_group.num,
-+                                        VHOST_VDPA_NET_CVQ_ASID);
-+    v->shadow_vqs_enabled = r == 0;
-+    s->vhost_vdpa.address_space_id = r == 0 ? 1 : 0;
-+}
-+
- static void vhost_vdpa_cvq_unmap_buf(struct vhost_vdpa *v, void *addr)
- {
-     VhostIOVATree *tree = v->iova_tree;
-@@ -432,6 +540,7 @@ static NetClientInfo net_vhost_vdpa_info = {
-         .type = NET_CLIENT_DRIVER_VHOST_VDPA,
-         .size = sizeof(VhostVDPAState),
-         .receive = vhost_vdpa_receive,
-+        .prepare = vhost_vdpa_net_prepare,
-         .start = vhost_vdpa_net_start,
-         .cleanup = vhost_vdpa_cleanup,
-         .has_vnet_hdr = vhost_vdpa_has_vnet_hdr,
-@@ -542,12 +651,40 @@ static const VhostShadowVirtqueueOps vhost_vdpa_net_svq_ops = {
-     .avail_handler = vhost_vdpa_net_handle_ctrl_avail,
- };
- 
-+static bool vhost_vdpa_get_as_num(int vdpa_device_fd, unsigned *num_as,
-+                                  Error **errp)
-+{
-+    uint64_t features;
-+    int r;
-+
-+    r = ioctl(vdpa_device_fd, VHOST_GET_BACKEND_FEATURES, &features);
-+    if (unlikely(r < 0)) {
-+        error_setg_errno(errp, errno, "Cannot get backend features");
-+        return r;
-+    }
-+
-+    if (!(features & BIT_ULL(VHOST_BACKEND_F_IOTLB_ASID))) {
-+        *num_as = 1;
-+        return 0;
-+    }
-+
-+    r = ioctl(vdpa_device_fd, VHOST_VDPA_GET_AS_NUM, num_as);
-+    if (unlikely(r < 0)) {
-+        error_setg_errno(errp, errno,
-+                         "Cannot retrieve number of supported ASs");
-+        return r;
-+    }
-+
-+    return 0;
-+}
-+
- static NetClientState *net_vhost_vdpa_init(NetClientState *peer,
-                                            const char *device,
-                                            const char *name,
-                                            int vdpa_device_fd,
-                                            int queue_pair_index,
-                                            int nvqs,
-+                                           unsigned nas,
-                                            bool is_datapath,
-                                            bool svq,
-                                            VhostIOVATree *iova_tree)
-@@ -566,6 +703,7 @@ static NetClientState *net_vhost_vdpa_init(NetClientState *peer,
-     snprintf(nc->info_str, sizeof(nc->info_str), TYPE_VHOST_VDPA);
-     s = DO_UPCAST(VhostVDPAState, nc, nc);
- 
-+    s->address_space_num = nas;
-     s->vhost_vdpa.device_fd = vdpa_device_fd;
-     s->vhost_vdpa.index = queue_pair_index;
-     s->always_svq = svq;
-@@ -651,6 +789,8 @@ int net_init_vhost_vdpa(const Netdev *netdev, const char *name,
-     g_autoptr(VhostIOVATree) iova_tree = NULL;
-     NetClientState *nc;
-     int queue_pairs, r, i, has_cvq = 0;
-+    unsigned num_as = 1;
-+    bool svq_cvq;
- 
-     assert(netdev->type == NET_CLIENT_DRIVER_VHOST_VDPA);
-     opts = &netdev->u.vhost_vdpa;
-@@ -676,7 +816,17 @@ int net_init_vhost_vdpa(const Netdev *netdev, const char *name,
-         return queue_pairs;
-     }
- 
--    if (opts->x_svq) {
-+    svq_cvq = opts->x_svq;
-+    if (has_cvq && !opts->x_svq) {
-+        r = vhost_vdpa_get_as_num(vdpa_device_fd, &num_as, errp);
-+        if (unlikely(r < 0)) {
-+            return r;
-+        }
-+
-+        svq_cvq = num_as > 1;
-+    }
-+
-+    if (opts->x_svq || svq_cvq) {
-         struct vhost_vdpa_iova_range iova_range;
- 
-         uint64_t invalid_dev_features =
-@@ -699,15 +849,15 @@ int net_init_vhost_vdpa(const Netdev *netdev, const char *name,
- 
-     for (i = 0; i < queue_pairs; i++) {
-         ncs[i] = net_vhost_vdpa_init(peer, TYPE_VHOST_VDPA, name,
--                                     vdpa_device_fd, i, 2, true, opts->x_svq,
--                                     iova_tree);
-+                                     vdpa_device_fd, i, 2, num_as, true,
-+                                     opts->x_svq, iova_tree);
-         if (!ncs[i])
-             goto err;
-     }
- 
-     if (has_cvq) {
-         nc = net_vhost_vdpa_init(peer, TYPE_VHOST_VDPA, name,
--                                 vdpa_device_fd, i, 1, false,
-+                                 vdpa_device_fd, i, 1, num_as, false,
-                                  opts->x_svq, iova_tree);
-         if (!nc)
-             goto err;
+	M.
+
 -- 
-2.31.1
-
+Without deviation from the norm, progress is not possible.
