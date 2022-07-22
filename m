@@ -2,120 +2,161 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 1C5BE57DB43
-	for <lists+kvm@lfdr.de>; Fri, 22 Jul 2022 09:31:17 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 5CA9157DBA9
+	for <lists+kvm@lfdr.de>; Fri, 22 Jul 2022 10:01:00 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232555AbiGVHbM (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 22 Jul 2022 03:31:12 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56492 "EHLO
+        id S234279AbiGVIA4 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 22 Jul 2022 04:00:56 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52214 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229519AbiGVHbK (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 22 Jul 2022 03:31:10 -0400
-Received: from mx0a-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 12CCA1409B
-        for <kvm@vger.kernel.org>; Fri, 22 Jul 2022 00:31:10 -0700 (PDT)
-Received: from pps.filterd (m0098419.ppops.net [127.0.0.1])
-        by mx0b-001b2d01.pphosted.com (8.17.1.5/8.17.1.5) with ESMTP id 26M7L9pl020298
-        for <kvm@vger.kernel.org>; Fri, 22 Jul 2022 07:31:09 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=content-type :
- mime-version : content-transfer-encoding : in-reply-to : references : cc :
- subject : from : to : message-id : date; s=pp1;
- bh=isaWe7EyBap/hjV0/A4YOvO6hu3ai4zULqcGFlRGoYo=;
- b=P56ULh808yRrGQ/bSD2GbQyanHV6SF7dyTGctHj/fIL6l4zHMve2RWEgyX0V84udIhSa
- VKVMhpJUEoQ4oLCOB4GJ4IEWwyDrhWeoPYAgvafhZ0m1Qz2nRSeaFGJqMUs8ZLJYKEGC
- UbQqmZ0o8b1e/k2cfigYFRCcjshAjFNClJI7QeOHHNemjxlgHe1r0/zYyMfXwfu7/u0I
- iNWRvKm+Io3YhwBdqPSV72iHi6VdIhI8gBdYYkWyLFa8qxBn76G1k+fymBSz4z7xlBea
- x9k1VneqRkG/G/lcELUnm8w1dRtKyafhJpO34qiQfc5ousIs1ocHXLbJtbwezcHdnuXw ug== 
+        with ESMTP id S231807AbiGVIAv (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 22 Jul 2022 04:00:51 -0400
+Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DA3D1550F4
+        for <kvm@vger.kernel.org>; Fri, 22 Jul 2022 01:00:49 -0700 (PDT)
+Received: from pps.filterd (m0098417.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.17.1.5/8.17.1.5) with ESMTP id 26M7VLV1015746
+        for <kvm@vger.kernel.org>; Fri, 22 Jul 2022 08:00:49 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
+ mime-version : subject : to : cc : references : from : in-reply-to :
+ content-type : content-transfer-encoding; s=pp1;
+ bh=wLAP8+UosC3bipynSKDEDCjV5dRGVMNcc9xz9vyJXIk=;
+ b=f/KFiEoEUxPsoD7TmMPf6iEa8kdYLVK2KZFEyKu8gShxudJi2F82IQ0YBT8LOH2oabUz
+ 88Xxx15SFjFxUwrl4/WOJHjZQo/ZAq50cPKyLCQ7HT9yLnlPwLVYoK5kvHSPPNPBHZA4
+ rik76W8t9LNOprUFMLRdB3+i/MPp/6MnABD2dG1VQIWDIBPKYT/ZC7EQborRvrtWPzuh
+ TSc0GtK/zIzDS2r4JJm/7Zr4e7hJUlua4n2M0EXOxfkr79mB4S8kauLuqWToZYTW0+5+
+ paWMkweozJeLaC0b8MDir2Bgv/8LljdKYme1vxzl24C2Hgk4bqW2IF9HQSN4MAG9DzcP Lw== 
 Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0b-001b2d01.pphosted.com (PPS) with ESMTPS id 3hfqe8g7d6-1
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3hfqk1gn76-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT)
-        for <kvm@vger.kernel.org>; Fri, 22 Jul 2022 07:31:09 +0000
-Received: from m0098419.ppops.net (m0098419.ppops.net [127.0.0.1])
-        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 26M7LTEW020892
-        for <kvm@vger.kernel.org>; Fri, 22 Jul 2022 07:31:08 GMT
-Received: from ppma01fra.de.ibm.com (46.49.7a9f.ip4.static.sl-reverse.com [159.122.73.70])
-        by mx0b-001b2d01.pphosted.com (PPS) with ESMTPS id 3hfqe8g7cj-1
+        for <kvm@vger.kernel.org>; Fri, 22 Jul 2022 08:00:48 +0000
+Received: from m0098417.ppops.net (m0098417.ppops.net [127.0.0.1])
+        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 26M7ZC2F031091
+        for <kvm@vger.kernel.org>; Fri, 22 Jul 2022 08:00:48 GMT
+Received: from ppma03ams.nl.ibm.com (62.31.33a9.ip4.static.sl-reverse.com [169.51.49.98])
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3hfqk1gn60-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Fri, 22 Jul 2022 07:31:08 +0000
-Received: from pps.filterd (ppma01fra.de.ibm.com [127.0.0.1])
-        by ppma01fra.de.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 26M7LLQO003849;
-        Fri, 22 Jul 2022 07:31:06 GMT
-Received: from b06cxnps3075.portsmouth.uk.ibm.com (d06relay10.portsmouth.uk.ibm.com [9.149.109.195])
-        by ppma01fra.de.ibm.com with ESMTP id 3hbmy901mx-1
+        Fri, 22 Jul 2022 08:00:48 +0000
+Received: from pps.filterd (ppma03ams.nl.ibm.com [127.0.0.1])
+        by ppma03ams.nl.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 26M7oqHm003586;
+        Fri, 22 Jul 2022 08:00:46 GMT
+Received: from b06avi18626390.portsmouth.uk.ibm.com (b06avi18626390.portsmouth.uk.ibm.com [9.149.26.192])
+        by ppma03ams.nl.ibm.com with ESMTP id 3hbmy8yydm-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Fri, 22 Jul 2022 07:31:06 +0000
-Received: from d06av25.portsmouth.uk.ibm.com (d06av25.portsmouth.uk.ibm.com [9.149.105.61])
-        by b06cxnps3075.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 26M7V3xU24052202
+        Fri, 22 Jul 2022 08:00:46 +0000
+Received: from b06wcsmtp001.portsmouth.uk.ibm.com (b06wcsmtp001.portsmouth.uk.ibm.com [9.149.105.160])
+        by b06avi18626390.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 26M7wrjG21561768
         (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Fri, 22 Jul 2022 07:31:03 GMT
-Received: from d06av25.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 1168911C050;
-        Fri, 22 Jul 2022 07:31:03 +0000 (GMT)
-Received: from d06av25.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id E3C7C11C04C;
-        Fri, 22 Jul 2022 07:31:02 +0000 (GMT)
-Received: from li-ca45c2cc-336f-11b2-a85c-c6e71de567f1.ibm.com (unknown [9.171.78.214])
-        by d06av25.portsmouth.uk.ibm.com (Postfix) with ESMTP;
-        Fri, 22 Jul 2022 07:31:02 +0000 (GMT)
-Content-Type: text/plain; charset="utf-8"
+        Fri, 22 Jul 2022 07:58:53 GMT
+Received: from b06wcsmtp001.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 3BFFDA405B;
+        Fri, 22 Jul 2022 08:00:43 +0000 (GMT)
+Received: from b06wcsmtp001.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id EEFBEA4054;
+        Fri, 22 Jul 2022 08:00:42 +0000 (GMT)
+Received: from [9.145.175.204] (unknown [9.145.175.204])
+        by b06wcsmtp001.portsmouth.uk.ibm.com (Postfix) with ESMTP;
+        Fri, 22 Jul 2022 08:00:42 +0000 (GMT)
+Message-ID: <b620492e-6e02-8946-40cd-d92769f209c8@linux.ibm.com>
+Date:   Fri, 22 Jul 2022 10:00:42 +0200
 MIME-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
-In-Reply-To: <20220721183245.36b9d126@p-imbrenda>
-References: <20220721132647.552298-1-nrb@linux.ibm.com> <20220721132647.552298-3-nrb@linux.ibm.com> <20220721183245.36b9d126@p-imbrenda>
-Cc:     kvm@vger.kernel.org, frankja@linux.ibm.com, thuth@redhat.com
-Subject: Re: [kvm-unit-tests PATCH v1 2/2] s390x: create persistent comm-key
-From:   Nico Boehr <nrb@linux.ibm.com>
-To:     Claudio Imbrenda <imbrenda@linux.ibm.com>
-Message-ID: <165847506260.161082.3109099161458300124@localhost.localdomain>
-User-Agent: alot/0.8.1
-Date:   Fri, 22 Jul 2022 09:31:02 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.9.0
+Subject: Re: [kvm-unit-tests PATCH v2 1/3] s390x: smp: move sigp calls with
+ invalid cpu address to array
+Content-Language: en-US
+To:     Nico Boehr <nrb@linux.ibm.com>, kvm@vger.kernel.org
+Cc:     imbrenda@linux.ibm.com, thuth@redhat.com
+References: <20220722072004.800792-1-nrb@linux.ibm.com>
+ <20220722072004.800792-2-nrb@linux.ibm.com>
+From:   Janosch Frank <frankja@linux.ibm.com>
+In-Reply-To: <20220722072004.800792-2-nrb@linux.ibm.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 X-TM-AS-GCONF: 00
-X-Proofpoint-ORIG-GUID: 1oCsKI5Nnuy51BU-oO_SdGx8ERt7tsZ0
-X-Proofpoint-GUID: 8of_JHP_o3BRcJeXK6THoWdlTSNHblGk
+X-Proofpoint-ORIG-GUID: OtqMI-Wott2rSQEqbq6RTmX1-0BQ6pkk
+X-Proofpoint-GUID: LscMNW-SzoWA3PuUCoNfn8fWMwJJJmJo
 X-Proofpoint-Virus-Version: vendor=baseguard
  engine=ICAP:2.0.205,Aquarius:18.0.883,Hydra:6.0.517,FMLib:17.11.122.1
  definitions=2022-07-21_28,2022-07-21_02,2022-06-22_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxscore=0 bulkscore=0
- mlxlogscore=999 spamscore=0 impostorscore=0 malwarescore=0
- lowpriorityscore=0 clxscore=1015 priorityscore=1501 suspectscore=0
- adultscore=0 phishscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2206140000 definitions=main-2207220029
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 phishscore=0 mlxlogscore=999
+ clxscore=1015 bulkscore=0 priorityscore=1501 impostorscore=0 mlxscore=0
+ adultscore=0 malwarescore=0 spamscore=0 lowpriorityscore=0 suspectscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2206140000
+ definitions=main-2207220031
 X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_EF,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_PASS
-        autolearn=ham autolearn_force=no version=3.4.6
+        DKIM_VALID,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,
+        SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Quoting Claudio Imbrenda (2022-07-21 18:32:45)
-> On Thu, 21 Jul 2022 15:26:47 +0200
-> Nico Boehr <nrb@linux.ibm.com> wrote:
->=20
-> > To decrypt the dump of a PV guest, the comm-key (CCK) is required. Until
-> > now, no comm-key was provided to genprotimg, therefore decrypting the
-> > dump of a kvm-unit-test under PV was not possible.
-> >=20
-> > This patch makes sure that we create a random CCK if there's no
-> > $(TEST_DIR)/comm.key file.
-> >=20
-> > Also allow dumping of PV tests by passing the appropriate PCF to
-> > genprotimg (bit 34). --x-pcf is used to be compatible with older
-> > genprotimg versions, which don't support --enable-dump. 0xe0 is the
-> > default PCF value and only bit 34 is added.
-> >=20
-> > Unfortunately, recent versions of genprotimg removed the --x-comm-key
-> > argument which was used by older versions to specify the CCK. To support
-> > these versions, we need to parse the genprotimg help output and decide
-> > which argument to use.
->=20
-> I wonder if we can simply support only the newest version?
-> would make the code cleaner, and updating genprotimg is not too
-> complicated
+On 7/22/22 09:20, Nico Boehr wrote:
+> We have the nice array to test SIGP calls with invalid CPU addresses.
+> Move the SIGP cases there to eliminate some of the duplicated code in
+> test_emcall and test_cond_emcall.
+> 
+> Since adding coverage for invalid CPU addresses in the ecall case is now
+> trivial, do that as well.
+> 
+> Signed-off-by: Nico Boehr <nrb@linux.ibm.com>
 
-I would be annoyed by having to compile s390-tools every time I want to run=
- PV tests on older distros.
+Reviewed-by: Janosch Frank <frankja@linux.ibm.com>
 
-If we want to avoid the --help parsing stuff, we could add a configure opti=
-on to disable PV dump support. Not sure if it's a good idea.
+> ---
+>   s390x/smp.c | 18 +++---------------
+>   1 file changed, 3 insertions(+), 15 deletions(-)
+> 
+> diff --git a/s390x/smp.c b/s390x/smp.c
+> index 0df4751f9cee..34ae91c3fe12 100644
+> --- a/s390x/smp.c
+> +++ b/s390x/smp.c
+> @@ -30,6 +30,9 @@ static const struct sigp_invalid_cases cases_invalid_cpu_addr[] = {
+>   	{ SIGP_STOP,                  "stop with invalid CPU address" },
+>   	{ SIGP_START,                 "start with invalid CPU address" },
+>   	{ SIGP_CPU_RESET,             "reset with invalid CPU address" },
+> +	{ SIGP_COND_EMERGENCY_SIGNAL, "conditional emcall with invalid CPU address" },
+> +	{ SIGP_EMERGENCY_SIGNAL,      "emcall with invalid CPU address" },
+> +	{ SIGP_EXTERNAL_CALL,         "ecall with invalid CPU address" },
+>   	{ INVALID_ORDER_CODE,         "invalid order code and CPU address" },
+>   	{ SIGP_SENSE,                 "sense with invalid CPU address" },
+>   	{ SIGP_STOP_AND_STORE_STATUS, "stop and store status with invalid CPU address" },
+> @@ -329,7 +332,6 @@ static void emcall(void)
+>   static void test_emcall(void)
+>   {
+>   	struct psw psw;
+> -	int cc;
+>   	psw.mask = extract_psw_mask();
+>   	psw.addr = (unsigned long)emcall;
+>   
+> @@ -343,13 +345,6 @@ static void test_emcall(void)
+>   	wait_for_flag();
+>   	smp_cpu_stop(1);
+>   
+> -	report_prefix_push("invalid CPU address");
+> -
+> -	cc = sigp(INVALID_CPU_ADDRESS, SIGP_EMERGENCY_SIGNAL, 0, NULL);
+> -	report(cc == 3, "CC = 3");
+> -
+> -	report_prefix_pop();
+> -
+>   	report_prefix_pop();
+>   }
+>   
+> @@ -368,13 +363,6 @@ static void test_cond_emcall(void)
+>   		goto out;
+>   	}
+>   
+> -	report_prefix_push("invalid CPU address");
+> -
+> -	cc = sigp(INVALID_CPU_ADDRESS, SIGP_COND_EMERGENCY_SIGNAL, 0, NULL);
+> -	report(cc == 3, "CC = 3");
+> -
+> -	report_prefix_pop();
+> -
+>   	report_prefix_push("success");
+>   	set_flag(0);
+>   
+
