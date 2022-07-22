@@ -2,150 +2,157 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id BAF1C57E166
-	for <lists+kvm@lfdr.de>; Fri, 22 Jul 2022 14:28:36 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 127CB57E1CE
+	for <lists+kvm@lfdr.de>; Fri, 22 Jul 2022 15:00:25 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231733AbiGVM2e (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 22 Jul 2022 08:28:34 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48778 "EHLO
+        id S233126AbiGVNAW (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 22 Jul 2022 09:00:22 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46384 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229704AbiGVM2d (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 22 Jul 2022 08:28:33 -0400
-Received: from proxmox-new.maurer-it.com (proxmox-new.maurer-it.com [94.136.29.106])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D898C4BD17
-        for <kvm@vger.kernel.org>; Fri, 22 Jul 2022 05:28:30 -0700 (PDT)
-Received: from proxmox-new.maurer-it.com (localhost.localdomain [127.0.0.1])
-        by proxmox-new.maurer-it.com (Proxmox) with ESMTP id 542BF424F9;
-        Fri, 22 Jul 2022 14:28:29 +0200 (CEST)
-Message-ID: <e4c49e1d-4c37-981f-0611-afc754d52202@proxmox.com>
-Date:   Fri, 22 Jul 2022 14:28:27 +0200
-MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.11.0
-Subject: Re: Guest reboot issues since QEMU 6.0 and Linux 5.11
+        with ESMTP id S229593AbiGVNAV (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 22 Jul 2022 09:00:21 -0400
+Received: from NAM10-BN7-obe.outbound.protection.outlook.com (mail-bn7nam10on2057.outbound.protection.outlook.com [40.107.92.57])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7380E2B263
+        for <kvm@vger.kernel.org>; Fri, 22 Jul 2022 06:00:20 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=KlVMwU7WSUCGmCmNbAUZTO12wrLJQWzSOOcNUS//mpgi9dhhec5lu1Z3BAQPUEza1A8nRNakgv00IMhEjc3FC/SI37wCVY2h6B/uFGi0wEznKqSXVYmgIBo8Sx86DAlwGCqX+8SgyVIO2wlZH3VclXYYO0jXLaw/2coa0Qrs9hFC870QZcRzc0doHyoz/XY9MyboLxidASE6l6okwymorXrLsX+JlciSrEkGobLY4Eoq5NVebtkwbTkcjssCjCrLOkch6/9JUuymCf6Iq/gTXSB7SrIsdM1gi1o5/sd5nKfsiCnrBUrQwHEf9CBno4GKM/c49huJpw+s6whVYrQffw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=szI8v3Wo7MAN0zjXUCJllfgHPBNdJwMRtQ1yJfQgLfI=;
+ b=Wtab5mCshcQnXWMES2At5J64uG9Rw8fPXQBODUxQVjuE7yEvkCSjiyJuCQVYZGh+KgZsT3VCg9Mm1PRqcHcZhW+KBmRrsViyc01ocbcgGgMV/V4Za9EcJ78Fli+KZNPq8Vdc1kN22Cj/qXXISSsJIR7AUA0nVCLVY0lPyi2vSApigHKgJ9wFoRoBlnkCArvrf20ELfmXcqfHl3E7J03A++O5W71UqgU4UoNd1k+sCOOZ571CKrVQsR3kk3V0D/lmWdHbdLiic9KRcOYNJDRHnCC/I+ei0mtxKqvH64G4rPi5uLzOAwemcnKz0hkPjPwRpIQVUnR/qjUMEqj7s4RJtw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
+ header.d=amd.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=szI8v3Wo7MAN0zjXUCJllfgHPBNdJwMRtQ1yJfQgLfI=;
+ b=eNya3VwQCGMdadNRsWECEcDGtw6hq7ZcQbaMui5xCKLXM6Hrg2qe3px0xYWL1yx5tjpTRV4giyEE5Nihe8/27b1WUzxFL9xXN7XLs5MxfR6pP9iSgm2OwiUnb2DcdbDQ6umiyTyQW5CcIicofeYv8tahRfl7hGJvtJE4SSpmp+A=
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=amd.com;
+Received: from DS7PR12MB6214.namprd12.prod.outlook.com (2603:10b6:8:96::13) by
+ BN6PR12MB1923.namprd12.prod.outlook.com (2603:10b6:404:107::21) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5438.21; Fri, 22 Jul
+ 2022 13:00:18 +0000
+Received: from DS7PR12MB6214.namprd12.prod.outlook.com
+ ([fe80::8c4a:a8c9:c7d3:479]) by DS7PR12MB6214.namprd12.prod.outlook.com
+ ([fe80::8c4a:a8c9:c7d3:479%5]) with mapi id 15.20.5458.019; Fri, 22 Jul 2022
+ 13:00:18 +0000
+Message-ID: <0f0b6fa6-0e74-9078-94d5-229ca34e9560@amd.com>
+Date:   Fri, 22 Jul 2022 18:30:08 +0530
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
+ Thunderbird/102.0.2
+Subject: Re: [kvm-unit-tests PATCH v5 0/8] Move npt test cases and NPT code
+ improvements
+To:     Sean Christopherson <seanjc@google.com>,
+        Manali Shukla <manali.shukla@amd.com>
+Cc:     pbonzini@redhat.com, kvm@vger.kernel.org
+References: <20220628113853.392569-1-manali.shukla@amd.com>
+ <Ytml0zc1cJh5tRG9@google.com>
 Content-Language: en-US
-To:     Maxim Levitsky <mlevitsk@redhat.com>, kvm@vger.kernel.org,
-        qemu-devel@nongnu.org
-Cc:     Thomas Lamprecht <t.lamprecht@proxmox.com>,
-        Mira Limbeck <m.limbeck@proxmox.com>
-References: <eb0e0c7e-5b6f-a573-43f6-bd58be243d6b@proxmox.com>
- <8ac992205e740722160f770821a49278bfa12b0a.camel@redhat.com>
-From:   Fiona Ebner <f.ebner@proxmox.com>
-In-Reply-To: <8ac992205e740722160f770821a49278bfa12b0a.camel@redhat.com>
+From:   "Shukla, Manali" <mashukla@amd.com>
+In-Reply-To: <Ytml0zc1cJh5tRG9@google.com>
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,NICE_REPLY_A,
-        SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
+X-ClientProxiedBy: PN3PR01CA0140.INDPRD01.PROD.OUTLOOK.COM
+ (2603:1096:c01:bf::12) To DS7PR12MB6214.namprd12.prod.outlook.com
+ (2603:10b6:8:96::13)
+MIME-Version: 1.0
+X-MS-PublicTrafficType: Email
+X-MS-Office365-Filtering-Correlation-Id: 4c63d8a5-5787-4f73-1bd1-08da6be22072
+X-MS-TrafficTypeDiagnostic: BN6PR12MB1923:EE_
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: e5TTVaRenQOFdNac+PI0bAgrXXvT5TqBRHcFWxnNlGvMUTSrTQR5ebljsAIUPkYbOhru7vbh7lMxu7XLYqCOBQX0ttrmOte7oHoG2CFBmWCzjBo9mTesCaKZPEMGAoWYnFenPAlxX/69EKGie6JDKmX755bqYvlxAGOas5x9ibaJdbstHYTMynADbPjM3PpkeZWINJgICRuH6ksjDYRQMD2h+nr9N8HyrrPfZCqKSGQVP3bsWoAfl0GHj35xarCRxUjvKMrqRTgcxNBRztPehMFYrsXfL6Ju9RUCj0HknJ6Dtogv8Z88FpQIQQAxG6ogNT0TyuZS/9qlOTXnOffWqSzai+HSaNFjnkStwLkMBNtfB1+kBeOgAL6iaJvU+UXSxpHeRNIF8btTAKS6aez9RChuAiKwimFf0WErsvjkAWFOLsuzU4U5wj/sJZh6IUVbJqUAKy0iN2FpfNDBsyV7jMM0kxGzNU7VL4sPJIquQ4Sj8h08t6mFa8bvN/cd3vm66FMl/hwOQEyixTb5wleJxJ14dBqrBjmY0vpRIapwnvaQsEzXuNYSBmh1NKMaXr4lSKNhGlv+x1i2xLujMQFX6MUO9ZA7OpDhNBh9LfNs6IrEc2QA/hGoOrmcY8dld95OePLEVpqh9J746LS9rr13d2Z/J1G1w+FkqIM05qsUXj5BAX3NHzWk+BSgBywBmGDeH5l2mf+FRMcmAsiyV8w5MBTgirJUMMldXUCw48tKzJBFtHH9Z/j9rcVdTam09P+R9M2hm8iVtc2m/N0KAObovb7OIl1xmYtX4+qfLCzawm20ouqOHlI3TF/NFU6O8yLT9e26bcIdsWWvvZ2jiBBFCA==
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DS7PR12MB6214.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230016)(4636009)(396003)(366004)(346002)(136003)(376002)(39860400002)(6666004)(2616005)(110136005)(5660300002)(8936002)(31686004)(36756003)(478600001)(31696002)(2906002)(8676002)(83380400001)(4326008)(186003)(316002)(6636002)(38100700002)(6486002)(26005)(6512007)(66476007)(66946007)(66556008)(41300700001)(6506007)(53546011)(45980500001)(43740500002);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?N2NyclFSdy9pYWQ3ZjJLZWJvem5EbEZabmhlQ1hOVXVsRE5xUHpkRlNDMkRC?=
+ =?utf-8?B?QjlSS29ONUNnSTYzZEJBQ1ZBQ3JtU21JaG5LeEtWOEhDVjRHSkNaZUNrU096?=
+ =?utf-8?B?dlJTRW4yWG9XQnFzYnhKRzFuWEg4bjdRYUMzUDYyMVR4N0lMMSswcWhjMkNy?=
+ =?utf-8?B?T1Q1S2RvSUVzYWVtQmx6K2QyTi9KZEhYQkxKV3psek1CUERWNnVKV3BKeFNo?=
+ =?utf-8?B?amZFSjdramVzQ1BlOVdqZHJaT052WFo5ZzhpTW9rUEowM1hBRE13alY0QW9z?=
+ =?utf-8?B?ZDNnMlk1cDVBcER2eEpQRnBDRnNPQmpwd1VsWUNUQUdaOWlmM3pEcWtDNEE2?=
+ =?utf-8?B?Q3VXbjhURlVRejh1Q25kZFFhK3hFeFhFZ01ERkJNUXpUQ3hENDdhTkdPQlUy?=
+ =?utf-8?B?ZnBwQVhsTUdKeUV5ajB3MElQV3J0b2lWV3BGUSt3eTJxWldrOXFtNjNONkZ0?=
+ =?utf-8?B?bm1wWGNDcllZNENTNzI1d21hS2ZxdzBrN0RRSDVJU1B4QXlPUCtaWFpKRVRH?=
+ =?utf-8?B?K3I3c3BtTFVNT3JmZFQ2TDFoUjJHWHovZWwwU3RLc1NKbThkY1hCdzZOcHNP?=
+ =?utf-8?B?RmJrLzZsV3dGREJiSDdJZHkwS0NqbU5tdmVCS2NpbXFrdG1sVUJaSEZqRFNy?=
+ =?utf-8?B?UDBwVUpMaFcwQkI3aU1kc0NrMk9XSmMxTUhoUytmbEhQcmd1VVNZMTlFdklP?=
+ =?utf-8?B?SXRjdS8wbEFHODQzeGllSjAzWmlwMlR1WlFBcUVZb1YzRUJlL0RkZmlhbWxj?=
+ =?utf-8?B?WVVyU3JwNm43bU9MMzQ3TktUVUZSYllkaHlDbVM4Zng5bi9OZUUyRHdnak1Q?=
+ =?utf-8?B?UGdLWVpDK0hFeFdreVdyWjJPS1FmWHJkLzJQSTZEb3hKWUo0NXRNZk95aFBL?=
+ =?utf-8?B?Sy9sdTJxQ2dzNzhVaTZRTllGYXQ0dWY2bTlSdHJ6cjdBUk9ZeEVqbHVOVnAx?=
+ =?utf-8?B?Q1B4ZnNzT3lUUHczUi9EWXJObG53bDdEcFp3a3d3ajAzSms2ejNBK28rK1I5?=
+ =?utf-8?B?MWF0anRXeXY3UEhBVTZNQWZ5Y1MyQkhxU0lIMjJhVWtPbS96N3hLVWJrNzNC?=
+ =?utf-8?B?NVErWjBuZ0xNbDMvMjVwZFVSL0h0Qkd6Qkd1bDc4TFBjb3hVZ1QxSStVNHV3?=
+ =?utf-8?B?Z0E5bnk1RkVwdDNPMlMvRytaMWN0VzVkREVUbUhLVy8vSXJhYUQ2Snl4WTJI?=
+ =?utf-8?B?ODM2TFlibGQxWmV0Z1IyUUtDVkFITk1XUUhGUjNuM2MvblphalVqV0kycDUy?=
+ =?utf-8?B?LzZvNWtlL05iZzJpUFlSWGJzT1JDTDhDb29lQ2h4SlBrVDExTjQweEJMRWZD?=
+ =?utf-8?B?VlpDZWZlSloyNFpSNnZCTVh4ZXMwLzUvNlFWckhSbTYydUlPTkNhaStWM2pT?=
+ =?utf-8?B?SlFXV0QvS1pOWUNZYzl3cENaa2VERURVK2E0WWlSSnRhSnhYRE54R2NNZ2pG?=
+ =?utf-8?B?Vjc3TDc0d2haR0VKc3E3K1d6Vk9TVzJoU1pqTEdPcU9mRFFiNFhncCtQalpU?=
+ =?utf-8?B?RytOY052L0l4YVFZakRFWDRwVUpxWUVzU3YxaTJMQW9ZdjJCUlUwdzlEM2FR?=
+ =?utf-8?B?ZE1DeWh2UUd0WGtYdG01NlhkNU5wb2tjUUpudnZEKzFPMFE0WW9XaVRlQklr?=
+ =?utf-8?B?b0hVTE5ZNy80ZEV3OFBHUXVKY1RLRnhYaFVxNVhHZWVaVnVwZjhjNVdJNmtj?=
+ =?utf-8?B?NjF5MWdGK1hsN01RTE5na2dRR2pmUjJGSkJ0K1Y1ZE5SNVBHaW5lZnJkTU8z?=
+ =?utf-8?B?UDcwMHVlNTlueGFTWmowZjVIcmFKekl3cThuWlNwSEdYR242b1lrNVZvTUR3?=
+ =?utf-8?B?RFMwVWhWVXpFNU5KejArQVVsMDVnbzhFeGJSSkdUeG1DNFVkeEJtOXhKL0F3?=
+ =?utf-8?B?ZDFWT092YkNPc2lNQjVrcUdVVWhLblNEenAwZ3dWZ2lMdHl1dStpYzFrRmc3?=
+ =?utf-8?B?VkRCNC9ZM1lkOFh5a0xqZFhwUU5sTWYrdHJuQzNXcjZXbFpkcCtuVUpEZDFN?=
+ =?utf-8?B?R0d1Nktxd3lqR2h4ZGNyVGhsWDQyK1lZZEdaYzRYQ2V1UUdFSiszYjZwVHc4?=
+ =?utf-8?B?a0loVHhzQmtTdlZBSXFGZ2srNys5QVR4U0pXampkNVEwZUgxTjZxWWVzUjRW?=
+ =?utf-8?Q?w56YFBt5lFPiElQVW61nAI8UF?=
+X-OriginatorOrg: amd.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 4c63d8a5-5787-4f73-1bd1-08da6be22072
+X-MS-Exchange-CrossTenant-AuthSource: DS7PR12MB6214.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 22 Jul 2022 13:00:18.1069
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: +sixX5yipqk9yG8ouv3aC8Wq3jPATuxtN+tw3JmJfvTOOG9T/yPg4dP24HIC/IkS5Yjr2rntdotdbKtrxVBKIg==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: BN6PR12MB1923
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_DNSWL_NONE,
+        RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_PASS autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Am 21.07.22 um 17:51 schrieb Maxim Levitsky:
-> On Thu, 2022-07-21 at 14:49 +0200, Fabian Ebner wrote:
->> Hi,
->> since about half a year ago, we're getting user reports about guest
->> reboot issues with KVM/QEMU[0].
+
+
+On 7/22/2022 12:45 AM, Sean Christopherson wrote:
+> On Tue, Jun 28, 2022, Manali Shukla wrote:
+>> If __setup_vm() is changed to setup_vm(), KUT will build tests with PT_USER_MASK
+>> set on all PTEs. It is a better idea to move nNPT tests to their own file so
+>> that tests don't need to fiddle with page tables midway.
 >>
->> The most common scenario is a Windows Server VM (2012R2/2016/2019,
->> UEFI/OVMF and SeaBIOS) getting stuck during the screen with the Windows
->> logo and the spinning circles after a reboot was triggered from within
->> the guest. Quitting the kvm process and booting with a fresh instance
->> works. The issue seems to become more likely, the longer the kvm
->> instance runs.
+>> The quick approach to do this would be to turn the current main into a small
+>> helper, without calling __setup_vm() from helper.
 >>
->> We did not get such reports while we were providing Linux 5.4 and QEMU
->> 5.2.0, but we do with Linux 5.11/5.13/5.15 and QEMU 6.x.
+>> setup_mmu_range() function in vm.c was modified to allocate new user pages to
+>> implement nested page table.
 >>
->> I'm just wondering if anybody has seen this issue before or might have a
->> hunch what it's about? Any tips on what to look out for when debugging
->> are also greatly appreciated!
+>> Current implementation of nested page table does the page table build up
+>> statically with 2048 PTEs and one pml4 entry. With newly implemented routine,
+>> nested page table can be implemented dynamically based on the RAM size of VM
+>> which enables us to have separate memory ranges to test various npt test cases.
 >>
->> We do have debug access to a user's test VM and the VM state was saved
->> before a problematic reboot, but I can't modify the host system there.
->> AFAICT QEMU just executes guest code as usual, but I'm really not sure
->> what to look out for.
->>
->> That VM has CPU type host, and a colleague did have a similar enough CPU
->> to load the VM state, but for him, the reboot went through normally. On
->> the user's system, it triggers consistently after loading the VM state
->> and rebooting.
->>
->> So unfortunately, we didn't manage to reproduce the issue locally yet.
->> With two other images provided by users, we ran into a boot loop, where
->> QEMU resets the CPUs and does a few KVM_RUNs before the exit reason is
->> KVM_EXIT_SHUTDOWN (which to my understanding indicates a triple fa
->> ult)
->> and then it repeats. It's not clear if the issues are related.
+>> Based on this implementation, minimal changes were required to be done in
+>> below mentioned existing APIs:
+>> npt_get_pde(), npt_get_pte(), npt_get_pdpe().
 > 
-> 
-> Does the guest have HyperV enabled in it (that is nested virtualization?)
-> 
+> I have a variety of nits and minor complaints, but no need to send another version,
+> I'll fix things up as I go.  I'm going to send Paolo a pull request for KUT, there's
+> a big pile of outstanding changes that have been languishing.
 
-For all three machines described above
-Get-WindowsOptionalFeature -Online -FeatureName Microsoft-Hyper-V
-indicates that HyperV is disabled.
+Sure Sean,
+Thank you for the review.
 
-> Intel or AMD?
-> 
-
-We do have reports for both Intel and AMD.
-
-> Does the VM uses secure boot / SMM?
-> 
-
-The customer VM which can reliably trigger the issue after loading the
-state and rebooting uses SeaBIOS. For the other two VMs,
-Confirm-SecureBootUEFI
-returns "False".
-
-SMM might be a lead! We did disable SMM in the past, because apparently
-there were problems with it (didn't dig out which, was before I worked
-here), and the timing of enabling it and the reports coming in would
-match. I guess (some) guest OSes don't expect it to be suddenly turned on?
-
-However, there is a report of a user with two clusters with QEMU 5.2,
-one with kernel 5.4 without the issue and one with kernel 5.11 with the
-issue (Windows VM with spinning circles). So that's confusing :/
-
-
-We do use some additional options if the OS type is "Windows" in our
-high-level configuration, including hyperV enlightenments:
-
-> -cpu 'host,hv_ipi,hv_relaxed,hv_reset,hv_runtime,hv_spinlocks=0x1fff,hv_stimer,hv_synic,hv_time,hv_vapic,hv_vpindex,+kvm_pv_eoi,+kvm_pv_unhalt'
-> -no-hpet
-> -rtc 'driftfix=slew,base=localtime'
-> -global 'kvm-pit.lost_tick_policy=discard'
-
-But one user reported running into the issue even with OS type "other",
-i.e. when the above options are not present and CPU flags should be just
-'+kvm_pv_eoi,+kvm_pv_unhalt'. There are also reports with CPU type
-different from 'host', also with 'kvm64' (where we automatically set the
-flags +lahf_lm,+sep).
-
-
-Thank you and Best Regards,
-Fiona
-
-P.S. Please don't mind the (from your perspective sudden) name change.
-I'm still the same person and don't intend to change it again :)
-
-> Best regards,
-> 	Maxim Levitsky
-> 
->>
->> There are also a few reports about non-Windows VMs, mostly Ubuntu 20.04
->> with UEFI/OVMF, but again, it's not clear if the issues are related.
->>
->> [0]: https://forum.proxmox.com/threads/100744/
->> (the forum thread is a bit chaotic unfortunately).
->>
->> Best Regards,
->> Fabi
->>
->>
-> 
-> 
-> 
-
+-Manali
