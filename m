@@ -2,57 +2,58 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id E023357E846
-	for <lists+kvm@lfdr.de>; Fri, 22 Jul 2022 22:23:23 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id DC40657E847
+	for <lists+kvm@lfdr.de>; Fri, 22 Jul 2022 22:23:25 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236835AbiGVUXW (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 22 Jul 2022 16:23:22 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49888 "EHLO
+        id S233167AbiGVUXY (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 22 Jul 2022 16:23:24 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49902 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233167AbiGVUXV (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 22 Jul 2022 16:23:21 -0400
-Received: from mail-pj1-x1049.google.com (mail-pj1-x1049.google.com [IPv6:2607:f8b0:4864:20::1049])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2091FAF943
-        for <kvm@vger.kernel.org>; Fri, 22 Jul 2022 13:23:18 -0700 (PDT)
-Received: by mail-pj1-x1049.google.com with SMTP id b10-20020a17090a6e0a00b001f221432098so2614317pjk.0
-        for <kvm@vger.kernel.org>; Fri, 22 Jul 2022 13:23:18 -0700 (PDT)
+        with ESMTP id S236537AbiGVUXW (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 22 Jul 2022 16:23:22 -0400
+Received: from mail-yb1-xb4a.google.com (mail-yb1-xb4a.google.com [IPv6:2607:f8b0:4864:20::b4a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7C192AF86D
+        for <kvm@vger.kernel.org>; Fri, 22 Jul 2022 13:23:21 -0700 (PDT)
+Received: by mail-yb1-xb4a.google.com with SMTP id u6-20020a25b7c6000000b00670862c5b16so4413069ybj.12
+        for <kvm@vger.kernel.org>; Fri, 22 Jul 2022 13:23:21 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
         h=date:in-reply-to:message-id:mime-version:references:subject:from:to
          :cc;
-        bh=NINnO0u+rS1nQj0nYR1Q0tDMfqB2BixwK3awIOe4L84=;
-        b=jhB4fK1qnN2kN7C1Uz7Qljzpv/g1v4QhesHdUWd2nLP/FK6P9Z4qNM/1jNFUStcPL1
-         WAx8FMgyVFIs0zs99WPt28HT+YnU6/KGiOE6S73aNC7I7iqvtrmWmMEXmk9kHMEghZ4y
-         K/J8KrkDVDNcowsJ3VL2Pfv8/PHeml6e1j+vyfr3+0Yuu2nsr0IsdR+Cqi8GK1tu2P/d
-         h6Pq4Kvsg2lenb0qwx11oKAWtFkSjndnJ+CZRwIHnokRLUUg2Y5jLGW7VXnT9n239UbG
-         Aluz2KQv0yTvLy6QVhz992M0TQI3d+8L+J8fWJUXDU4aSvkpfX/BdZ0+kmEWadklGBKw
-         LIIQ==
+        bh=LotgCwTPE7W0Iog/EgRAiJU4OXX1J8eWyfbtht/7qSU=;
+        b=pWifpqbzWfnhr9vzlztD0iRmDjf6xepYMBaIFE0nit1Ymw1wxwYv/D1ioJTYBh/wMi
+         EgKS5fvdEHwXXyTKdlf+/9SALX4Cjx3SYF8dVY3W4BkReDfH3KIdM8HYNK19ww7dB2Uw
+         ELbwge9idiwSAXUkCOf9THUMfMhBW/ZEApOvrY32miNxE3x7TEzmDJ7hTPVtGIzUJIh3
+         DWO/2xg79daZjtJLYPCcWfE5vE7wJshQ2s/mz0ybyMXsGHDBWai1PqTNnx2hDyJz7dQY
+         Xgap+sYlAEGl1zVFf3J7vpO3mm5zKg7sPqw4yl4vrUFdGKtkwNKJRCRU+ijMnqHrOBEz
+         fXug==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:date:in-reply-to:message-id:mime-version
          :references:subject:from:to:cc;
-        bh=NINnO0u+rS1nQj0nYR1Q0tDMfqB2BixwK3awIOe4L84=;
-        b=OY+4+/r0YreqlVX5GHRIpL9ZshtinkJsv4rf4xsqsSWrAKAr2T5oLf/FTr0LZwX/+0
-         j1shK29IUAZaebLMBHmebI9Z6VdhIydG7xiRgEsj8XJA1QMNjIGRRnLtjPdM1QYC4NQK
-         gUD5oBEUTYoF3SEZROJekYPj2EfbIstwMb5LpaE0yUc0Ugy5gmsBkg1EXo2xj6r/b0e7
-         0Nk0rMFaxjo0VUUTrbDm8faaqgoCrOf9E05kxuAykmlmirXAq3oS/3Yn2zv0TyRB/QhC
-         y6FgKzkR9r5pf24O/JHT1HR0RB87OmQv72KR5nmYemeNV8ZK7jnvF1jj8li/Cd0yzmJc
-         fgUg==
-X-Gm-Message-State: AJIora/0fQNBiut+RC4Ql6wuePERybj/VCryaTzcE7K9D/IPyEJK09C1
-        qeugxzkInyEcsV5t5bkcvRQLG9z3w05WQpZ1Ouf9BnQxIIisJUL9PjYlz7psS4ZutlpYnXkIlcJ
-        rS01JuFjna4yGgtG2FKMfatMohq8uNOTH6c1i8QwPCY4Hre5/f4+aScbaM+1CxeTg62b1
-X-Google-Smtp-Source: AGRyM1s4ND3jUItqv+7xvgSl5rR1i8VY6viX/x2zkOqnM2sdls84/Oz5D7C3bGY/Lz24ry9KAyFCFGtG0ZkIto82
+        bh=LotgCwTPE7W0Iog/EgRAiJU4OXX1J8eWyfbtht/7qSU=;
+        b=55pm7VDzNbsWiT8P6wRM/+k8zElnkmjUKSGdnzCp3C//nlXwtwLiWPp4lL6Q3hmbGJ
+         XVroAfU5DLHUJZJVQqzJ4vMYxAlbY4c+pvd8O1oTPX9VvIgRahwBbKcAh3w1JTfVXOuJ
+         UTMODb+oVLWhnNufietLQ7glMZq+devJDfRhfNdIQit6N87xw0oqnuUCqHivqgFKgra9
+         O8SFJdBPEzwnO7Dq+M5Or8nE749woXogueJ0AQZrYs9Wvlw/rBLsWBV/xWQ5O+409B8u
+         ELtdFcF8rq2afvuHptTSvkhX9tMIDj1D826beA5S52nfjmZmeKHsLX/1U7noLsUE7h5B
+         iK1Q==
+X-Gm-Message-State: AJIora+Pi1Pm0kRkApE5jMrUU+mmaKNtxFC7nZEYt1uTGbjaPIKSvOpl
+        ynTu5Rk79JL1c7IBuDro1HjijjMnXDaWxuJGgektHZQ5qTYxpTgDd/dTs4HWXii1nx0wX4Ce24L
+        rni0l4b1Bo932gVO98q9MfvZQRIJPzlM/UdRBSHcf6yfU7bstUx13BD4th+PifFm8hJfB
+X-Google-Smtp-Source: AGRyM1vR5+e5DhehxYSXChpczI8kiGskrMMXGcpU5ly/rWU1pcg0RVvZwkimu0MGnsjAy5IL1DhYotoORiTyMhU2
 X-Received: from aaronlewis.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:2675])
- (user=aaronlewis job=sendgmr) by 2002:a17:902:cf0c:b0:16c:8a4e:746b with SMTP
- id i12-20020a170902cf0c00b0016c8a4e746bmr1226090plg.37.1658521397505; Fri, 22
- Jul 2022 13:23:17 -0700 (PDT)
-Date:   Fri, 22 Jul 2022 20:23:02 +0000
+ (user=aaronlewis job=sendgmr) by 2002:a81:36c3:0:b0:31e:6899:dd7b with SMTP
+ id d186-20020a8136c3000000b0031e6899dd7bmr1387271ywa.205.1658521399937; Fri,
+ 22 Jul 2022 13:23:19 -0700 (PDT)
+Date:   Fri, 22 Jul 2022 20:23:03 +0000
 In-Reply-To: <20220722202303.391709-1-aaronlewis@google.com>
-Message-Id: <20220722202303.391709-4-aaronlewis@google.com>
+Message-Id: <20220722202303.391709-5-aaronlewis@google.com>
 Mime-Version: 1.0
 References: <20220722202303.391709-1-aaronlewis@google.com>
 X-Mailer: git-send-email 2.37.1.359.gd136c6c3e2-goog
-Subject: [PATCH v3 3/4] KVM: x86: Add a VALID_MASK for the flags in kvm_msr_filter_range
+Subject: [RFC PATCH v3 4/4] selftests: kvm/x86: Test the flags in MSR
+ filtering / exiting
 From:   Aaron Lewis <aaronlewis@google.com>
 To:     kvm@vger.kernel.org
 Cc:     pbonzini@redhat.com, jmattson@google.com, seanjc@google.com,
@@ -68,44 +69,119 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Add the mask KVM_MSR_FILTER_RANGE_VALID_MASK for the flags in the
-struct kvm_msr_filter_range.  This simplifies checks that validate
-these flags, and makes it easier to introduce new flags in the future.
-
-No functional change intended.
+When using the flags in KVM_X86_SET_MSR_FILTER and
+KVM_CAP_X86_USER_SPACE_MSR it is expected that an attempt to write to
+any of the unused bits will fail.  Add testing to walk over every bit
+in each of the flag fields in MSR filtering / exiting to verify that
+happens.
 
 Signed-off-by: Aaron Lewis <aaronlewis@google.com>
 ---
- arch/x86/include/uapi/asm/kvm.h | 2 ++
- arch/x86/kvm/x86.c              | 2 +-
- 2 files changed, 3 insertions(+), 1 deletion(-)
+ .../kvm/x86_64/userspace_msr_exit_test.c      | 85 +++++++++++++++++++
+ 1 file changed, 85 insertions(+)
 
-diff --git a/arch/x86/include/uapi/asm/kvm.h b/arch/x86/include/uapi/asm/kvm.h
-index 404b031f78ae..fcf300158c9a 100644
---- a/arch/x86/include/uapi/asm/kvm.h
-+++ b/arch/x86/include/uapi/asm/kvm.h
-@@ -214,6 +214,8 @@ struct kvm_msr_list {
- struct kvm_msr_filter_range {
- #define KVM_MSR_FILTER_READ  (1 << 0)
- #define KVM_MSR_FILTER_WRITE (1 << 1)
-+#define KVM_MSR_FILTER_RANGE_VALID_MASK (KVM_MSR_FILTER_READ | \
-+					 KVM_MSR_FILTER_WRITE)
- 	__u32 flags;
- 	__u32 nmsrs; /* number of msrs in bitmap */
- 	__u32 base;  /* MSR index the bitmap starts at */
-diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-index adaec8d07a25..6c1a531e3b88 100644
---- a/arch/x86/kvm/x86.c
-+++ b/arch/x86/kvm/x86.c
-@@ -6349,7 +6349,7 @@ static int kvm_add_msr_filter(struct kvm_x86_msr_filter *msr_filter,
- 	if (!user_range->nmsrs)
- 		return 0;
+diff --git a/tools/testing/selftests/kvm/x86_64/userspace_msr_exit_test.c b/tools/testing/selftests/kvm/x86_64/userspace_msr_exit_test.c
+index f84dc37426f5..0173bd41b577 100644
+--- a/tools/testing/selftests/kvm/x86_64/userspace_msr_exit_test.c
++++ b/tools/testing/selftests/kvm/x86_64/userspace_msr_exit_test.c
+@@ -734,6 +734,89 @@ static void test_msr_permission_bitmap(void)
+ 	kvm_vm_free(vm);
+ }
  
--	if (user_range->flags & ~(KVM_MSR_FILTER_READ | KVM_MSR_FILTER_WRITE))
-+	if (user_range->flags & ~KVM_MSR_FILTER_RANGE_VALID_MASK)
- 		return -EINVAL;
++#define test_user_exit_msr_ioctl(vm, cmd, arg, flag, valid_mask)	\
++({									\
++	int r = __vm_ioctl(vm, cmd, arg);				\
++									\
++	if (flag & valid_mask)						\
++		TEST_ASSERT(!r, __KVM_IOCTL_ERROR(#cmd, r));		\
++	else								\
++		TEST_ASSERT(r == -1 && errno == EINVAL,			\
++			    "Wanted EINVAL for %s with flag = 0x%llx, got  rc: %i errno: %i (%s)", \
++			    #cmd, flag, r, errno,  strerror(errno));	\
++})
++
++static void run_user_space_msr_flag_test(struct kvm_vm *vm)
++{
++	struct kvm_enable_cap cap = { .cap = KVM_CAP_X86_USER_SPACE_MSR };
++	int nflags = sizeof(cap.args[0]) * BITS_PER_BYTE;
++	int rc;
++	int i;
++
++	rc = kvm_check_cap(KVM_CAP_X86_USER_SPACE_MSR);
++	TEST_ASSERT(rc, "KVM_CAP_X86_USER_SPACE_MSR is available");
++
++	for (i = 0; i < nflags; i++) {
++		cap.args[0] = BIT_ULL(i);
++		test_user_exit_msr_ioctl(vm, KVM_ENABLE_CAP, &cap,
++			   BIT_ULL(i), KVM_MSR_EXIT_REASON_VALID_MASK);
++	}
++}
++
++static void run_msr_filter_flag_test(struct kvm_vm *vm)
++{
++	u64 deny_bits = 0;
++	struct kvm_msr_filter filter = {
++		.flags = KVM_MSR_FILTER_DEFAULT_ALLOW,
++		.ranges = {
++			{
++				.flags = KVM_MSR_FILTER_READ,
++				.nmsrs = 1,
++				.base = 0,
++				.bitmap = (uint8_t *)&deny_bits,
++			},
++		},
++	};
++	int nflags;
++	int rc;
++	int i;
++
++	rc = kvm_check_cap(KVM_CAP_X86_MSR_FILTER);
++	TEST_ASSERT(rc, "KVM_CAP_X86_MSR_FILTER is available");
++
++	nflags = sizeof(filter.flags) * BITS_PER_BYTE;
++	for (i = 0; i < nflags; i++) {
++		filter.flags = BIT_ULL(i);
++		test_user_exit_msr_ioctl(vm, KVM_X86_SET_MSR_FILTER, &filter,
++			   BIT_ULL(i), KVM_MSR_FILTER_VALID_MASK);
++	}
++
++	filter.flags = KVM_MSR_FILTER_DEFAULT_ALLOW;
++	nflags = sizeof(filter.ranges[0].flags) * BITS_PER_BYTE;
++	for (i = 0; i < nflags; i++) {
++		filter.ranges[0].flags = BIT_ULL(i);
++		test_user_exit_msr_ioctl(vm, KVM_X86_SET_MSR_FILTER, &filter,
++			   BIT_ULL(i), KVM_MSR_FILTER_RANGE_VALID_MASK);
++	}
++}
++
++/* Test that attempts to write to the unused bits in a flag fails. */
++static void test_user_exit_msr_flags(void)
++{
++	struct kvm_vcpu *vcpu;
++	struct kvm_vm *vm;
++
++	vm = vm_create_with_one_vcpu(&vcpu, NULL);
++
++	/* Test flags for KVM_CAP_X86_USER_SPACE_MSR. */
++	run_user_space_msr_flag_test(vm);
++
++	/* Test flags and range flags for KVM_X86_SET_MSR_FILTER. */
++	run_msr_filter_flag_test(vm);
++
++	kvm_vm_free(vm);
++}
++
+ int main(int argc, char *argv[])
+ {
+ 	/* Tell stdout not to buffer its content */
+@@ -745,5 +828,7 @@ int main(int argc, char *argv[])
  
- 	if (!user_range->flags)
+ 	test_msr_permission_bitmap();
+ 
++	test_user_exit_msr_flags();
++
+ 	return 0;
+ }
 -- 
 2.37.1.359.gd136c6c3e2-goog
 
