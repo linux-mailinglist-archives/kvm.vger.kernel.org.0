@@ -2,107 +2,88 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 2368D57EA0F
-	for <lists+kvm@lfdr.de>; Sat, 23 Jul 2022 00:50:42 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 9C9C457EA1B
+	for <lists+kvm@lfdr.de>; Sat, 23 Jul 2022 01:02:21 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236451AbiGVWuk (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 22 Jul 2022 18:50:40 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45748 "EHLO
+        id S231777AbiGVXCF (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 22 Jul 2022 19:02:05 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51750 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230072AbiGVWui (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 22 Jul 2022 18:50:38 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 9090F2253C
-        for <kvm@vger.kernel.org>; Fri, 22 Jul 2022 15:50:36 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1658530235;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=5G+9XofFYtjcjc9nMklfj+U+SYfTvHOn025PmT4w4OA=;
-        b=gIC0KkPnEczr7Ug7ADupegVWAGTB2FklPDAq3hxZ/LmmuOp10qxOpWYsFBWibdQ7IsitxY
-        Gpuedcw8vUEBdZagNpEHjjsq5RoKaqX+Fwwf2iUCi1AjbtfxCrdZP8NJxkMRYnEP71wF0m
-        1UxqmcF7Bog0SVU/qvKHYavAMjzoxno=
-Received: from mail-il1-f197.google.com (mail-il1-f197.google.com
- [209.85.166.197]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-269-luGZIMGqOVyYoyQOwJ6qXQ-1; Fri, 22 Jul 2022 18:50:34 -0400
-X-MC-Unique: luGZIMGqOVyYoyQOwJ6qXQ-1
-Received: by mail-il1-f197.google.com with SMTP id b15-20020a92c56f000000b002dd2870c587so406824ilj.20
-        for <kvm@vger.kernel.org>; Fri, 22 Jul 2022 15:50:34 -0700 (PDT)
+        with ESMTP id S229572AbiGVXCD (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 22 Jul 2022 19:02:03 -0400
+Received: from mail-pl1-x649.google.com (mail-pl1-x649.google.com [IPv6:2607:f8b0:4864:20::649])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1407248C82
+        for <kvm@vger.kernel.org>; Fri, 22 Jul 2022 16:02:03 -0700 (PDT)
+Received: by mail-pl1-x649.google.com with SMTP id e11-20020a17090301cb00b0016c3375abd3so3301605plh.3
+        for <kvm@vger.kernel.org>; Fri, 22 Jul 2022 16:02:03 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112;
+        h=cc:to:from:subject:mime-version:message-id:date:from:to:cc;
+        bh=QcbuP/zxcogacMUrRB+WPN1LLTGM9pzC81o0jrcvja8=;
+        b=SX3ud7yQzu2OSxHI+nd3/fylZ/k4Dzth0Cj+Lfjr76wSSbJu8D6kSlySCaSvGcjlfH
+         gROYkquPtfSizAfn5ua61L+TM4XRvwngltTXQ7BFMKWUL6cBvkLrUXxyq5cO4t0zN4tS
+         HDcSbFWuwVGOWKBYTZzXaAY5uTrMiOm+o3lGR3vgXgpRyxAVB3IAVgh9aQfyl59JbH9P
+         ViA9Ftu1wMgBLaJ7qaBkALaU6noAjAFK/9ro5Iwzj9l/vWXCMp9s4PyhTLGqkTMsjN7C
+         ggyA9+e2yq+E+2nlOIBHFR1GnuERvUjUo/YWTWfjOQN58vpRCoX0brIj66qJbcVjZmcf
+         3DcA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:in-reply-to
-         :references:organization:mime-version:content-transfer-encoding;
-        bh=5G+9XofFYtjcjc9nMklfj+U+SYfTvHOn025PmT4w4OA=;
-        b=3Pav6ecuMaJYKz/YtvU36KCflfcU6gD6rhLuSNqi8gdsSCCuqRZLYoUgGLqnlWiqYn
-         xwEEr86Focn/6FVJpkwVrSR3nDWKpPZ+aQv4TfYQ6QISnpD4QF6WAyU7eFxz+ppFQ0oL
-         PngbFTUwM40ei7bgFGSKHFYfCiHu7IpiZFmGh6lSj9Pr37Ymz4Df1ZEidVZKpCbp2Pf5
-         ZMpwKlkztMXhVzHGN7FCs67OF6lm9GncyKIWnkzDcznV/slNYs07nfc1bX8yh8OE9Yc3
-         TpndXoYwEMWryqLNVrnRE69Ibl7Sq/zXMZx35dWXhJ7TA5sjcsfFof5AitjI1OsA5apF
-         r7ew==
-X-Gm-Message-State: AJIora9fODjsIh+G56WMe+qEGSG0kSsXhTH2X9VUiln1xFGd0JCJhm7Z
-        zu1yyB6Q3vNmze7apVp0vI4kLCJgzuz0wS/8txGawp5rZvfZKJHD9kzQAJn2Uechg06/RKFwHZI
-        tpX+I7ySrGJhb
-X-Received: by 2002:a6b:146:0:b0:67b:c614:d6bd with SMTP id 67-20020a6b0146000000b0067bc614d6bdmr676746iob.76.1658530233793;
-        Fri, 22 Jul 2022 15:50:33 -0700 (PDT)
-X-Google-Smtp-Source: AGRyM1sHnPDxfnE1FYRt+HswBN5/Vx6Bm07TqPL4q4XagHh2Kh1ra94En6q+UnhzhVSmG3FYDySiCg==
-X-Received: by 2002:a6b:146:0:b0:67b:c614:d6bd with SMTP id 67-20020a6b0146000000b0067bc614d6bdmr676743iob.76.1658530233576;
-        Fri, 22 Jul 2022 15:50:33 -0700 (PDT)
-Received: from redhat.com ([38.15.36.239])
-        by smtp.gmail.com with ESMTPSA id f16-20020a022410000000b0033e72ec9d93sm2527322jaa.145.2022.07.22.15.50.32
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 22 Jul 2022 15:50:32 -0700 (PDT)
-Date:   Fri, 22 Jul 2022 16:50:27 -0600
-From:   Alex Williamson <alex.williamson@redhat.com>
-To:     Alexey Kardashevskiy <aik@ozlabs.ru>
-Cc:     kvm@vger.kernel.org, kvm-ppc@vger.kernel.org
-Subject: Re: [PATCH kernel] vfio/spapr_tce: Fix the comment
-Message-ID: <20220722165027.13dc2045.alex.williamson@redhat.com>
-In-Reply-To: <20220714080912.3713509-1-aik@ozlabs.ru>
-References: <20220714080912.3713509-1-aik@ozlabs.ru>
-Organization: Red Hat
-MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-3.5 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,
-        SPF_HELO_NONE,SPF_NONE autolearn=unavailable autolearn_force=no
-        version=3.4.6
+        h=cc:to:from:subject:mime-version:message-id:date:x-gm-message-state
+         :from:to:cc;
+        bh=QcbuP/zxcogacMUrRB+WPN1LLTGM9pzC81o0jrcvja8=;
+        b=vho4xZFgXuU1eRSfzMDVMjhTch3J1ywkRlmKerfW9AOiBHeeJJ796Fb5FiCVzp4S/q
+         zvm/HeTaE/KKwsYxvzhAPAHvz04Yok6t8fG5LnQ4nuyMI0dFvmg47xM5iOWquVCj4YSy
+         jHq3X2NaW9QzMNAFxEQPxcHUgsr5SS20QF3xES+kKOV9/6iFoa6TpmV34Op0uadX06yj
+         lriUliXzyoOo8OC/yhaXWu9OWRkNQyENXYIsVuoJOKIAbqL3zo4y66k+0KUBSyL4Cooe
+         V0o8Yy6YMiJbd4jE009mcIgApfdi7f6CXYNJ7x0ix1qmqk36OAgu5HNTiTBi+Ern9SCW
+         StKg==
+X-Gm-Message-State: AJIora9KPRCVs02uITh5fYpGPafssDv7PZpQPHDAm2JCJbNJCLRtyqxe
+        ibWuMzIf9PYW2/c/wULgu1Fg8AgJOu7xgWel8QLmRylmj24F4vbNmmku4XC1yUs99DBx5mhLPEA
+        DBqjJXnm1svpdZZR/wlPfmYj7lh0/xzEJp2rPA6Nwq4DS2J4CKkK0KWW0+r7I1C8=
+X-Google-Smtp-Source: AGRyM1vN9a3iSyZgrhJEDupPZj+y40XaynuHLrdJc4tOKfjiZkLhGPy7QJmFPuwostPIv4SaxUhlriN0IMAMhg==
+X-Received: from loggerhead.c.googlers.com ([fda3:e722:ac3:cc00:24:72f4:c0a8:29a])
+ (user=jmattson job=sendgmr) by 2002:a05:6a00:1c5c:b0:505:7469:134a with SMTP
+ id s28-20020a056a001c5c00b005057469134amr2174133pfw.16.1658530922508; Fri, 22
+ Jul 2022 16:02:02 -0700 (PDT)
+Date:   Fri, 22 Jul 2022 16:01:57 -0700
+Message-Id: <20220722230157.2429624-1-jmattson@google.com>
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.37.1.359.gd136c6c3e2-goog
+Subject: [kvm-unit-tests PATCH] x86: kvmclock: Fix a non-prototype function declaration
+From:   Jim Mattson <jmattson@google.com>
+To:     kvm@vger.kernel.org, pbonzini@redhat.com
+Cc:     Jim Mattson <jmattson@google.com>
+Content-Type: text/plain; charset="UTF-8"
+X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, 14 Jul 2022 18:09:12 +1000
-Alexey Kardashevskiy <aik@ozlabs.ru> wrote:
+Avoid a -Wstrict-prototypes clang warning.
 
-> Grepping for "iommu_ops" finds this spot and gives wrong impression
-> that iommu_ops is used in here, fix the comment.
-> 
-> Signed-off-by: Alexey Kardashevskiy <aik@ozlabs.ru>
-> ---
->  drivers/vfio/vfio_iommu_spapr_tce.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
-> 
-> diff --git a/drivers/vfio/vfio_iommu_spapr_tce.c b/drivers/vfio/vfio_iommu_spapr_tce.c
-> index 708a95e61831..cd7b9c136889 100644
-> --- a/drivers/vfio/vfio_iommu_spapr_tce.c
-> +++ b/drivers/vfio/vfio_iommu_spapr_tce.c
-> @@ -1266,7 +1266,7 @@ static int tce_iommu_attach_group(void *iommu_data,
->  		goto unlock_exit;
->  	}
->  
-> -	/* Check if new group has the same iommu_ops (i.e. compatible) */
-> +	/* Check if new group has the same iommu_table_group_ops (i.e. compatible) */
->  	list_for_each_entry(tcegrp, &container->group_list, next) {
->  		struct iommu_table_group *table_group_tmp;
->  
+Signed-off-by: Jim Mattson <jmattson@google.com>
+---
+ x86/kvmclock.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-Applied to vfio next branch for v5.20 with a conversion to a multi-line
-comment to avoid the long line.  Thanks,
-
-Alex
+diff --git a/x86/kvmclock.c b/x86/kvmclock.c
+index f190048c9bde..f9f21032fea9 100644
+--- a/x86/kvmclock.c
++++ b/x86/kvmclock.c
+@@ -222,7 +222,7 @@ static cycle_t pvclock_clocksource_read(struct pvclock_vcpu_time_info *src)
+ 	return ret;
+ }
+ 
+-cycle_t kvm_clock_read()
++cycle_t kvm_clock_read(void)
+ {
+         struct pvclock_vcpu_time_info *src;
+         cycle_t ret;
+-- 
+2.37.1.359.gd136c6c3e2-goog
 
