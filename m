@@ -2,62 +2,69 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 7588657EA92
-	for <lists+kvm@lfdr.de>; Sat, 23 Jul 2022 02:18:12 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 67F5B57EAAC
+	for <lists+kvm@lfdr.de>; Sat, 23 Jul 2022 02:38:42 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229572AbiGWASK (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 22 Jul 2022 20:18:10 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38520 "EHLO
+        id S235033AbiGWAik (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 22 Jul 2022 20:38:40 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50054 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229587AbiGWASJ (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 22 Jul 2022 20:18:09 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id C9A9C77A75
-        for <kvm@vger.kernel.org>; Fri, 22 Jul 2022 17:18:06 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1658535485;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=iEphr6ZIYFwSwZ4pYciMnV/Wf4dcsbYqo+HwMi5Di7E=;
-        b=BMkb+MowpcA9AWBflrm3MortzhGqbtxIi9MmHxXMSCiP4Bks5nBKs8E/UY31xj0kemj3na
-        fCwXABq4qIEWmPx12R1YyhqJJTlfioEit+ehzB9vgZ9nu+jbeoT7zPlXB+pHVSg32m/BeL
-        LswSvtbZs2QTAWY0LOoGm2AOnIBmcYQ=
-Received: from mail-il1-f198.google.com (mail-il1-f198.google.com
- [209.85.166.198]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-562-k3vlw_GnPFuthNfnRoX_ww-1; Fri, 22 Jul 2022 20:18:04 -0400
-X-MC-Unique: k3vlw_GnPFuthNfnRoX_ww-1
-Received: by mail-il1-f198.google.com with SMTP id d12-20020a056e02214c00b002dd143bee38so3490970ilv.7
-        for <kvm@vger.kernel.org>; Fri, 22 Jul 2022 17:18:04 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:in-reply-to
-         :references:organization:mime-version:content-transfer-encoding;
-        bh=iEphr6ZIYFwSwZ4pYciMnV/Wf4dcsbYqo+HwMi5Di7E=;
-        b=jWvVmRPGqO6B7c9trEYOI3RfD/DVWtGhvcMGJ+aR/y9l9dYZQP1t2xZVIRCfY601es
-         FfDzTzAkZK4KNnu7SIz9QyqHjEKXHpbFhFCYVh+LRYh9qQYPBTObCEf4Dq09IIjCHzGU
-         YsVS+mcx3brMg+UWnQNoNOMExPyi+aeQ+DwXOSe8iR+EK53VXfcy1NgDkVTGikplWqVd
-         P1saiQK2g+OYtWSCCmW0oXv5VtUvFPTLEEZ8OuirxivEytHPj4rzZDepxnWk33Tx01Eq
-         z26awqEuhuu0eOzPxNa70e9NZI/OzcOxLoN9/qC9IiBmAjt9IxeiGPDQgx+n5CNi10Y1
-         6vCw==
-X-Gm-Message-State: AJIora/f6QrsbKbcDpNmed7NWNprdhoAYVYjUUyLU/7qPEZJuX7mcYRZ
-        TQl6/2rs20xdf6x9UPXnuso7i+XMRxNx8HfFNKE/NhtR54BH8H6BG4/XqzSlstntaJQCeyfhGLt
-        aWRnrBBK8WwX0
-X-Received: by 2002:a05:6638:160c:b0:33f:54c7:ee69 with SMTP id x12-20020a056638160c00b0033f54c7ee69mr1050253jas.65.1658535483694;
-        Fri, 22 Jul 2022 17:18:03 -0700 (PDT)
-X-Google-Smtp-Source: AGRyM1vh5y3jozCZ7iRDuGEDUiaJjAA10VNoYNXKY4pR3tY8wyP5ioYAHZdpqHyeNFeMGRhrxZbgZA==
-X-Received: by 2002:a05:6638:160c:b0:33f:54c7:ee69 with SMTP id x12-20020a056638160c00b0033f54c7ee69mr1050243jas.65.1658535483492;
-        Fri, 22 Jul 2022 17:18:03 -0700 (PDT)
-Received: from redhat.com ([38.15.36.239])
-        by smtp.gmail.com with ESMTPSA id n4-20020a056602340400b00674f9fb1531sm2752495ioz.30.2022.07.22.17.18.02
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 22 Jul 2022 17:18:03 -0700 (PDT)
-Date:   Fri, 22 Jul 2022 18:18:00 -0600
-From:   Alex Williamson <alex.williamson@redhat.com>
-To:     Nicolin Chen <nicolinc@nvidia.com>
-Cc:     <kwankhede@nvidia.com>, <corbet@lwn.net>, <hca@linux.ibm.com>,
+        with ESMTP id S229572AbiGWAii (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 22 Jul 2022 20:38:38 -0400
+Received: from NAM10-BN7-obe.outbound.protection.outlook.com (mail-bn7nam10on2060.outbound.protection.outlook.com [40.107.92.60])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6C0F6101EB;
+        Fri, 22 Jul 2022 17:38:37 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=T77h3mgM7qskhXsE1IGaFkTpf2yCL82KCGy1kFevV6N6NE4OVuDOAbOOOrwGswkeIUtmWas2aAblV3Ms1voDGwP94lBedQPzYJ59D/nQOn7H3oj3LOnJkWN1Utvv3CZz4MNPYBCDtp5bvlLmVvwruMYrn031cP1Agt5+LJG8cF+8iCxRzC25gKtXlteIjxw/tOrdutt62qaTk1aaaIIxBfLR2YxA8vtM9iWNhim+TsPIzPm46z+aE6Zvg54IdPkDQgkAjRWwbDi3mw/6SmtP3yHXjUidFuzGMGAf1qQQLmOJnO6ZiW/OKOn2tzhaDgvEQZBKFXvSGuJfFqVNcvbduA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=H5G2/e7OUebQ2iW3eCdEqxc2JXPmrtXwDmC0CS2aSTo=;
+ b=PJBryC9yW+0jkFtoiIIdE+xTCELkYa84krmUDDnqVtgApxdDIHV50PG2UgEBDI2ESOk8ftu854njLe++PP/Nlh52HAFFmh5UDgdmcH75QRRF8kca4K5s60fiMdVvUT3PuVWNLwPCeklF91zOUzlpxO348I4obsOgcCs0ZqrL9GP+ygNU6X4L4yVY6ar3nKlgUuVJm5K56Lh6t5NnZg21Mcs51QWaRcY1dlADoB4/ZXW7sDDcp28CqxDNqRGhE0Yyjgq8i91H85i8lrhA0KLxicGPb8sQNvynUgwxYnRudJkjrW76YQCsO4QZt0yyxDdMmxp1sdonQeGTHGOGLrDmPw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
+ 12.22.5.236) smtp.rcpttodomain=linux.ibm.com smtp.mailfrom=nvidia.com;
+ dmarc=pass (p=reject sp=reject pct=100) action=none header.from=nvidia.com;
+ dkim=none (message not signed); arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=H5G2/e7OUebQ2iW3eCdEqxc2JXPmrtXwDmC0CS2aSTo=;
+ b=iavIAWZ+nbsuReXfI7Ausac/BbypJP1s2zL3eVhKPVr62f4lpC4NCUqoKbLhYLIh/0EUTGvIbFmktJip1GPBWc5VdklLj6+MPICotY+ZHz3aVXYALjbk2+VME3Gwyi6A3HR6Nb76aSx0djYiZbuyhlS8CnvxAfOno1Wda6Do3xtY7po3HU85dI+M5D6JcJ959fr/tK5DqEaYvc1x099PyZSZS0uX+1yErCt9/ipf6kyVYLMDVbix2hsaElV0ZyrZL9K/Z8YlXCZnjZro47vlMYH/C1sHKdsmk5UaLBQHvlcTRWwXn8mKFbC9t2m0nPKjeH/kJRsWQRSMHUiF88OEBg==
+Received: from MW4PR04CA0312.namprd04.prod.outlook.com (2603:10b6:303:82::17)
+ by MN2PR12MB4568.namprd12.prod.outlook.com (2603:10b6:208:260::12) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5458.19; Sat, 23 Jul
+ 2022 00:38:35 +0000
+Received: from CO1NAM11FT005.eop-nam11.prod.protection.outlook.com
+ (2603:10b6:303:82:cafe::aa) by MW4PR04CA0312.outlook.office365.com
+ (2603:10b6:303:82::17) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5438.24 via Frontend
+ Transport; Sat, 23 Jul 2022 00:38:35 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 12.22.5.236)
+ smtp.mailfrom=nvidia.com; dkim=none (message not signed)
+ header.d=none;dmarc=pass action=none header.from=nvidia.com;
+Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
+ 12.22.5.236 as permitted sender) receiver=protection.outlook.com;
+ client-ip=12.22.5.236; helo=mail.nvidia.com; pr=C
+Received: from mail.nvidia.com (12.22.5.236) by
+ CO1NAM11FT005.mail.protection.outlook.com (10.13.174.147) with Microsoft SMTP
+ Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384) id
+ 15.20.5458.17 via Frontend Transport; Sat, 23 Jul 2022 00:38:35 +0000
+Received: from rnnvmail204.nvidia.com (10.129.68.6) by DRHQMAIL109.nvidia.com
+ (10.27.9.19) with Microsoft SMTP Server (TLS) id 15.0.1497.32; Sat, 23 Jul
+ 2022 00:38:28 +0000
+Received: from rnnvmail204.nvidia.com (10.129.68.6) by rnnvmail204.nvidia.com
+ (10.129.68.6) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.986.26; Fri, 22 Jul
+ 2022 17:38:28 -0700
+Received: from Asurada-Nvidia (10.127.8.10) by mail.nvidia.com (10.129.68.6)
+ with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.986.26 via Frontend
+ Transport; Fri, 22 Jul 2022 17:38:26 -0700
+Date:   Fri, 22 Jul 2022 17:38:25 -0700
+From:   Nicolin Chen <nicolinc@nvidia.com>
+To:     Alex Williamson <alex.williamson@redhat.com>
+CC:     <kwankhede@nvidia.com>, <corbet@lwn.net>, <hca@linux.ibm.com>,
         <gor@linux.ibm.com>, <agordeev@linux.ibm.com>,
         <borntraeger@linux.ibm.com>, <svens@linux.ibm.com>,
         <zhenyuw@linux.intel.com>, <zhi.a.wang@intel.com>,
@@ -76,57 +83,98 @@ Cc:     <kwankhede@nvidia.com>, <corbet@lwn.net>, <hca@linux.ibm.com>,
         <intel-gfx@lists.freedesktop.org>,
         <dri-devel@lists.freedesktop.org>, <terrence.xu@intel.com>
 Subject: Re: [PATCH v3 00/10] Update vfio_pin/unpin_pages API
-Message-ID: <20220722181800.56093444.alex.williamson@redhat.com>
-In-Reply-To: <Ytsu07eGHS9B7HY8@Asurada-Nvidia>
+Message-ID: <YttDAfDEnrlhcZix@Asurada-Nvidia>
 References: <20220708224427.1245-1-nicolinc@nvidia.com>
-        <20220722161129.21059262.alex.williamson@redhat.com>
-        <Ytsu07eGHS9B7HY8@Asurada-Nvidia>
-Organization: Red Hat
+ <20220722161129.21059262.alex.williamson@redhat.com>
+ <Ytsu07eGHS9B7HY8@Asurada-Nvidia>
+ <20220722181800.56093444.alex.williamson@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-2.8 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        SPF_HELO_NONE,SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset="us-ascii"
+Content-Disposition: inline
+In-Reply-To: <20220722181800.56093444.alex.williamson@redhat.com>
+X-EOPAttributedMessage: 0
+X-MS-PublicTrafficType: Email
+X-MS-Office365-Filtering-Correlation-Id: 59d4fa1d-b3de-4137-8319-08da6c43ad60
+X-MS-TrafficTypeDiagnostic: MN2PR12MB4568:EE_
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: eLCed88kFBpqeTpBUauo2tXFFMmUhWa0fkXZTc/S5fkgsV+/1G5Bj6To9vlCVPfRmu8L5Qr8vRNEwMAgb1mrjZ9myDGYCtWoGa7qzvEFuYaVht0l/sCBcsjtcuJKoEjMkJwd18JC80Mnfh8A10eUCHQQgxAZLGr2EpTwh1XTYNnfFAbWVp/K/Ct4owtHX6555V0oZ9uacshrPc42g7+Zy+ZN/0CEzMXmwiz6aukpDmWkhByYEAOliX8RkocP8fvtynu6L3GrOU9JkW5+QswCPTn1aboz9t9yeeuVeWP8LRkm1xUdQ8nAYkDMmVwsTIzSL07LZl63Gdrrwha294fxBe5S4D5/2oWUF4Sr0KxnVvNlGyQ2L+bE+9BYGJQIPW2FUv8eLQ4llu4H0+5WJOtoP5eKZuTpumZNzXUzYDB/4+VDW90EINlne33xBYQYUan8VwBc1YjShImIW7gpEPSxvAnV4wXHWgVEXSNge9o7gBZnMkwKh7ROBX4+ClQGvDZP+GLSBUzNRmrfgj8P+XsXDACIzJGgUHxUSAldZvF6l4VudIbjwruwvUzuGPUgUZ2W3DNsYWlZnMAJwFlfRVnbfeW4aA64Kc47995YhhIHOEN7KYg0PcQWwUnnIEnDUeoXNLQ9tHaFhf+f+lLjnwOIozBxC73ZAlvj9hwvQlsAL9KDa1wTsGB+DlKgd/Oxm5msvhVlc5zqUBtD3eaTEYSFHFi8xku7JRbWKW8oSnJ36hyCuRyZItgMg/05vz71rLLMU6grtv559Y7x9xsbpLYV8yXg9RD16IcoYhUFy0+/e3GEALlaH5I2QZUd7WWz4/Q9hRvWjnK9L27XTZ7A6YgWDg==
+X-Forefront-Antispam-Report: CIP:12.22.5.236;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:InfoNoRecords;CAT:NONE;SFS:(13230016)(4636009)(136003)(346002)(376002)(39860400002)(396003)(46966006)(36840700001)(40470700004)(478600001)(356005)(86362001)(81166007)(82740400003)(9686003)(316002)(426003)(6916009)(186003)(41300700001)(336012)(54906003)(47076005)(83380400001)(8936002)(82310400005)(55016003)(40480700001)(26005)(33716001)(5660300002)(7406005)(7416002)(70586007)(8676002)(4326008)(70206006)(2906002)(36860700001)(40460700003)(36900700001);DIR:OUT;SFP:1101;
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 23 Jul 2022 00:38:35.2801
+ (UTC)
+X-MS-Exchange-CrossTenant-Network-Message-Id: 59d4fa1d-b3de-4137-8319-08da6c43ad60
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[12.22.5.236];Helo=[mail.nvidia.com]
+X-MS-Exchange-CrossTenant-AuthSource: CO1NAM11FT005.eop-nam11.prod.protection.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Anonymous
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: MN2PR12MB4568
+X-Spam-Status: No, score=-1.8 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FORGED_SPF_HELO,
+        RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_NONE
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, 22 Jul 2022 16:12:19 -0700
-Nicolin Chen <nicolinc@nvidia.com> wrote:
+On Fri, Jul 22, 2022 at 06:18:00PM -0600, Alex Williamson wrote:
+> External email: Use caution opening links or attachments
+> 
+> 
+> On Fri, 22 Jul 2022 16:12:19 -0700
+> Nicolin Chen <nicolinc@nvidia.com> wrote:
+> 
+> > On Fri, Jul 22, 2022 at 04:11:29PM -0600, Alex Williamson wrote:
+> >
+> > > GVT-g explodes for me with this series on my Broadwell test system,
+> > > continuously spewing the following:
+> >
+> > Thank you for running additional tests.
+> >
+> > > [   47.348778] WARNING: CPU: 3 PID: 501 at drivers/vfio/vfio_iommu_type1.c:978 vfio_iommu_type1_unpin_pages+0x7b/0x100 [vfio_iommu_type1]
+> >
+> > > Line 978 is the WARN_ON(i != npage) line.  For the cases where we don't
+> > > find a matching vfio_dma, I'm seeing addresses that look maybe like
+> > > we're shifting  a value that's already an iova by PAGE_SHIFT somewhere.
+> >
+> > Hmm..I don't understand the PAGE_SHIFT part. Do you mind clarifying?
+> 
+> The iova was a very large address for a 4GB VM with a lot of zeros on
+> the low order bits, ex. 0x162459000000.  Thanks,
 
-> On Fri, Jul 22, 2022 at 04:11:29PM -0600, Alex Williamson wrote:
-> 
-> > GVT-g explodes for me with this series on my Broadwell test system,
-> > continuously spewing the following:  
-> 
-> Thank you for running additional tests.
-> 
-> > [   47.348778] WARNING: CPU: 3 PID: 501 at drivers/vfio/vfio_iommu_type1.c:978 vfio_iommu_type1_unpin_pages+0x7b/0x100 [vfio_iommu_type1]  
->  
-> > Line 978 is the WARN_ON(i != npage) line.  For the cases where we don't
-> > find a matching vfio_dma, I'm seeing addresses that look maybe like
-> > we're shifting  a value that's already an iova by PAGE_SHIFT somewhere.  
-> 
-> Hmm..I don't understand the PAGE_SHIFT part. Do you mind clarifying?
+Ah! Thanks for the hint. The following commit did a double shifting:
+   "vfio: Pass in starting IOVA to vfio_pin/unpin_pages AP"
 
-The iova was a very large address for a 4GB VM with a lot of zeros on
-the low order bits, ex. 0x162459000000.  Thanks,
+And the following change should fix:
+-------------------
+diff --git a/drivers/gpu/drm/i915/gvt/kvmgt.c b/drivers/gpu/drm/i915/gvt/kvmgt.c
+index 481dd2aeb40e..4790c7f35b88 100644
+--- a/drivers/gpu/drm/i915/gvt/kvmgt.c
++++ b/drivers/gpu/drm/i915/gvt/kvmgt.c
+@@ -293,7 +293,7 @@ static int gvt_dma_map_page(struct intel_vgpu *vgpu, unsigned long gfn,
+        if (dma_mapping_error(dev, *dma_addr)) {
+                gvt_vgpu_err("DMA mapping failed for pfn 0x%lx, ret %d\n",
+                             page_to_pfn(page), ret);
+-               gvt_unpin_guest_page(vgpu, gfn << PAGE_SHIFT, size);
++               gvt_unpin_guest_page(vgpu, gfn, size);
+                return -ENOMEM;
+        }
 
-Alex
- 
-> And GVT code initiated an unpin request from gvt_unpin_guest_pag()
-> that is currently unpinning one page at a time on a contiguous IOVA
-> range, prior to this series. After this series, it leaves the per-
-> page routine to the internal loop of vfio_iommu_type1_unpin_pages(),
-> which is supposed to do the same.
-> 
-> So, either resulted from the npage input being wrong or some other
-> factor weighed in that invoked a vfio_remove_dma on those iovas?
-> 
-> Thanks
-> Nic
-> 
+@@ -306,7 +306,7 @@ static void gvt_dma_unmap_page(struct intel_vgpu *vgpu, unsigned long gfn,
+        struct device *dev = vgpu->gvt->gt->i915->drm.dev;
 
+        dma_unmap_page(dev, dma_addr, size, DMA_BIDIRECTIONAL);
+-       gvt_unpin_guest_page(vgpu, gfn << PAGE_SHIFT, size);
++       gvt_unpin_guest_page(vgpu, gfn, size);
+ }
+
+ static struct gvt_dma *__gvt_cache_find_dma_addr(struct intel_vgpu *vgpu,
+-------------------
+
+
+So, I think that I should send a v4, given that the patches aren't
+officially applied?
