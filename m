@@ -2,179 +2,166 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 67F5B57EAAC
-	for <lists+kvm@lfdr.de>; Sat, 23 Jul 2022 02:38:42 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 7774657EAB6
+	for <lists+kvm@lfdr.de>; Sat, 23 Jul 2022 02:51:46 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235033AbiGWAik (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 22 Jul 2022 20:38:40 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50054 "EHLO
+        id S235202AbiGWAvp (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 22 Jul 2022 20:51:45 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57180 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229572AbiGWAii (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 22 Jul 2022 20:38:38 -0400
-Received: from NAM10-BN7-obe.outbound.protection.outlook.com (mail-bn7nam10on2060.outbound.protection.outlook.com [40.107.92.60])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6C0F6101EB;
-        Fri, 22 Jul 2022 17:38:37 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=T77h3mgM7qskhXsE1IGaFkTpf2yCL82KCGy1kFevV6N6NE4OVuDOAbOOOrwGswkeIUtmWas2aAblV3Ms1voDGwP94lBedQPzYJ59D/nQOn7H3oj3LOnJkWN1Utvv3CZz4MNPYBCDtp5bvlLmVvwruMYrn031cP1Agt5+LJG8cF+8iCxRzC25gKtXlteIjxw/tOrdutt62qaTk1aaaIIxBfLR2YxA8vtM9iWNhim+TsPIzPm46z+aE6Zvg54IdPkDQgkAjRWwbDi3mw/6SmtP3yHXjUidFuzGMGAf1qQQLmOJnO6ZiW/OKOn2tzhaDgvEQZBKFXvSGuJfFqVNcvbduA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=H5G2/e7OUebQ2iW3eCdEqxc2JXPmrtXwDmC0CS2aSTo=;
- b=PJBryC9yW+0jkFtoiIIdE+xTCELkYa84krmUDDnqVtgApxdDIHV50PG2UgEBDI2ESOk8ftu854njLe++PP/Nlh52HAFFmh5UDgdmcH75QRRF8kca4K5s60fiMdVvUT3PuVWNLwPCeklF91zOUzlpxO348I4obsOgcCs0ZqrL9GP+ygNU6X4L4yVY6ar3nKlgUuVJm5K56Lh6t5NnZg21Mcs51QWaRcY1dlADoB4/ZXW7sDDcp28CqxDNqRGhE0Yyjgq8i91H85i8lrhA0KLxicGPb8sQNvynUgwxYnRudJkjrW76YQCsO4QZt0yyxDdMmxp1sdonQeGTHGOGLrDmPw==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
- 12.22.5.236) smtp.rcpttodomain=linux.ibm.com smtp.mailfrom=nvidia.com;
- dmarc=pass (p=reject sp=reject pct=100) action=none header.from=nvidia.com;
- dkim=none (message not signed); arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=H5G2/e7OUebQ2iW3eCdEqxc2JXPmrtXwDmC0CS2aSTo=;
- b=iavIAWZ+nbsuReXfI7Ausac/BbypJP1s2zL3eVhKPVr62f4lpC4NCUqoKbLhYLIh/0EUTGvIbFmktJip1GPBWc5VdklLj6+MPICotY+ZHz3aVXYALjbk2+VME3Gwyi6A3HR6Nb76aSx0djYiZbuyhlS8CnvxAfOno1Wda6Do3xtY7po3HU85dI+M5D6JcJ959fr/tK5DqEaYvc1x099PyZSZS0uX+1yErCt9/ipf6kyVYLMDVbix2hsaElV0ZyrZL9K/Z8YlXCZnjZro47vlMYH/C1sHKdsmk5UaLBQHvlcTRWwXn8mKFbC9t2m0nPKjeH/kJRsWQRSMHUiF88OEBg==
-Received: from MW4PR04CA0312.namprd04.prod.outlook.com (2603:10b6:303:82::17)
- by MN2PR12MB4568.namprd12.prod.outlook.com (2603:10b6:208:260::12) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5458.19; Sat, 23 Jul
- 2022 00:38:35 +0000
-Received: from CO1NAM11FT005.eop-nam11.prod.protection.outlook.com
- (2603:10b6:303:82:cafe::aa) by MW4PR04CA0312.outlook.office365.com
- (2603:10b6:303:82::17) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5438.24 via Frontend
- Transport; Sat, 23 Jul 2022 00:38:35 +0000
-X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 12.22.5.236)
- smtp.mailfrom=nvidia.com; dkim=none (message not signed)
- header.d=none;dmarc=pass action=none header.from=nvidia.com;
-Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
- 12.22.5.236 as permitted sender) receiver=protection.outlook.com;
- client-ip=12.22.5.236; helo=mail.nvidia.com; pr=C
-Received: from mail.nvidia.com (12.22.5.236) by
- CO1NAM11FT005.mail.protection.outlook.com (10.13.174.147) with Microsoft SMTP
- Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384) id
- 15.20.5458.17 via Frontend Transport; Sat, 23 Jul 2022 00:38:35 +0000
-Received: from rnnvmail204.nvidia.com (10.129.68.6) by DRHQMAIL109.nvidia.com
- (10.27.9.19) with Microsoft SMTP Server (TLS) id 15.0.1497.32; Sat, 23 Jul
- 2022 00:38:28 +0000
-Received: from rnnvmail204.nvidia.com (10.129.68.6) by rnnvmail204.nvidia.com
- (10.129.68.6) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.986.26; Fri, 22 Jul
- 2022 17:38:28 -0700
-Received: from Asurada-Nvidia (10.127.8.10) by mail.nvidia.com (10.129.68.6)
- with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.986.26 via Frontend
- Transport; Fri, 22 Jul 2022 17:38:26 -0700
-Date:   Fri, 22 Jul 2022 17:38:25 -0700
-From:   Nicolin Chen <nicolinc@nvidia.com>
-To:     Alex Williamson <alex.williamson@redhat.com>
-CC:     <kwankhede@nvidia.com>, <corbet@lwn.net>, <hca@linux.ibm.com>,
-        <gor@linux.ibm.com>, <agordeev@linux.ibm.com>,
-        <borntraeger@linux.ibm.com>, <svens@linux.ibm.com>,
-        <zhenyuw@linux.intel.com>, <zhi.a.wang@intel.com>,
-        <jani.nikula@linux.intel.com>, <joonas.lahtinen@linux.intel.com>,
-        <rodrigo.vivi@intel.com>, <tvrtko.ursulin@linux.intel.com>,
-        <airlied@linux.ie>, <daniel@ffwll.ch>, <farman@linux.ibm.com>,
-        <mjrosato@linux.ibm.com>, <pasic@linux.ibm.com>,
-        <vneethv@linux.ibm.com>, <oberpar@linux.ibm.com>,
-        <freude@linux.ibm.com>, <akrowiak@linux.ibm.com>,
-        <jjherne@linux.ibm.com>, <cohuck@redhat.com>, <jgg@nvidia.com>,
-        <kevin.tian@intel.com>, <hch@infradead.org>,
-        <jchrist@linux.ibm.com>, <kvm@vger.kernel.org>,
-        <linux-doc@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
-        <linux-s390@vger.kernel.org>,
-        <intel-gvt-dev@lists.freedesktop.org>,
-        <intel-gfx@lists.freedesktop.org>,
-        <dri-devel@lists.freedesktop.org>, <terrence.xu@intel.com>
-Subject: Re: [PATCH v3 00/10] Update vfio_pin/unpin_pages API
-Message-ID: <YttDAfDEnrlhcZix@Asurada-Nvidia>
-References: <20220708224427.1245-1-nicolinc@nvidia.com>
- <20220722161129.21059262.alex.williamson@redhat.com>
- <Ytsu07eGHS9B7HY8@Asurada-Nvidia>
- <20220722181800.56093444.alex.williamson@redhat.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Disposition: inline
-In-Reply-To: <20220722181800.56093444.alex.williamson@redhat.com>
-X-EOPAttributedMessage: 0
-X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: 59d4fa1d-b3de-4137-8319-08da6c43ad60
-X-MS-TrafficTypeDiagnostic: MN2PR12MB4568:EE_
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: eLCed88kFBpqeTpBUauo2tXFFMmUhWa0fkXZTc/S5fkgsV+/1G5Bj6To9vlCVPfRmu8L5Qr8vRNEwMAgb1mrjZ9myDGYCtWoGa7qzvEFuYaVht0l/sCBcsjtcuJKoEjMkJwd18JC80Mnfh8A10eUCHQQgxAZLGr2EpTwh1XTYNnfFAbWVp/K/Ct4owtHX6555V0oZ9uacshrPc42g7+Zy+ZN/0CEzMXmwiz6aukpDmWkhByYEAOliX8RkocP8fvtynu6L3GrOU9JkW5+QswCPTn1aboz9t9yeeuVeWP8LRkm1xUdQ8nAYkDMmVwsTIzSL07LZl63Gdrrwha294fxBe5S4D5/2oWUF4Sr0KxnVvNlGyQ2L+bE+9BYGJQIPW2FUv8eLQ4llu4H0+5WJOtoP5eKZuTpumZNzXUzYDB/4+VDW90EINlne33xBYQYUan8VwBc1YjShImIW7gpEPSxvAnV4wXHWgVEXSNge9o7gBZnMkwKh7ROBX4+ClQGvDZP+GLSBUzNRmrfgj8P+XsXDACIzJGgUHxUSAldZvF6l4VudIbjwruwvUzuGPUgUZ2W3DNsYWlZnMAJwFlfRVnbfeW4aA64Kc47995YhhIHOEN7KYg0PcQWwUnnIEnDUeoXNLQ9tHaFhf+f+lLjnwOIozBxC73ZAlvj9hwvQlsAL9KDa1wTsGB+DlKgd/Oxm5msvhVlc5zqUBtD3eaTEYSFHFi8xku7JRbWKW8oSnJ36hyCuRyZItgMg/05vz71rLLMU6grtv559Y7x9xsbpLYV8yXg9RD16IcoYhUFy0+/e3GEALlaH5I2QZUd7WWz4/Q9hRvWjnK9L27XTZ7A6YgWDg==
-X-Forefront-Antispam-Report: CIP:12.22.5.236;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:InfoNoRecords;CAT:NONE;SFS:(13230016)(4636009)(136003)(346002)(376002)(39860400002)(396003)(46966006)(36840700001)(40470700004)(478600001)(356005)(86362001)(81166007)(82740400003)(9686003)(316002)(426003)(6916009)(186003)(41300700001)(336012)(54906003)(47076005)(83380400001)(8936002)(82310400005)(55016003)(40480700001)(26005)(33716001)(5660300002)(7406005)(7416002)(70586007)(8676002)(4326008)(70206006)(2906002)(36860700001)(40460700003)(36900700001);DIR:OUT;SFP:1101;
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 23 Jul 2022 00:38:35.2801
- (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: 59d4fa1d-b3de-4137-8319-08da6c43ad60
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[12.22.5.236];Helo=[mail.nvidia.com]
-X-MS-Exchange-CrossTenant-AuthSource: CO1NAM11FT005.eop-nam11.prod.protection.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Anonymous
-X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: MN2PR12MB4568
-X-Spam-Status: No, score=-1.8 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FORGED_SPF_HELO,
-        RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_NONE
-        autolearn=ham autolearn_force=no version=3.4.6
+        with ESMTP id S230215AbiGWAvo (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 22 Jul 2022 20:51:44 -0400
+Received: from mail-pl1-x64a.google.com (mail-pl1-x64a.google.com [IPv6:2607:f8b0:4864:20::64a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 41907101F3
+        for <kvm@vger.kernel.org>; Fri, 22 Jul 2022 17:51:43 -0700 (PDT)
+Received: by mail-pl1-x64a.google.com with SMTP id d10-20020a170902ceca00b0016bea2dc145so3410557plg.7
+        for <kvm@vger.kernel.org>; Fri, 22 Jul 2022 17:51:43 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112;
+        h=reply-to:date:message-id:mime-version:subject:from:to:cc;
+        bh=ys0GEGydU2uam+ngTo0juEJ4Yk0g/q5LIx8twKFbkvo=;
+        b=eoJyzr4WnjHgJiPyv/j3LYAggu5KZ6mgGOSC+8DjGmkVg0ZQkSGqMkngQAsl8GQHTr
+         Qh63sE0ukJVkRBYSl1oDORksOiGHnIi5eQENeRmJinEEuLjBaEI6r9dEA/EKh7Yc1H+K
+         xhWMHn0IWuzmRzpqZycznbL9BKA5rUA6vdplBVkslg0hQg4V3FAd1Wv9vxSstOCwGA3i
+         Cj1F1sHHFfRW5gvCdjiVCBA9Cn9SbjZX83685VAfn5cl1C6akRPsXB89IaxNM3wm5KZd
+         g2IOqE4EblmvV+cFSC62c5SEdZDVsDLWRhwaQlAcpdtZxqfXm9b/efZ1I07zg85s3Yy2
+         b53Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:reply-to:date:message-id:mime-version:subject
+         :from:to:cc;
+        bh=ys0GEGydU2uam+ngTo0juEJ4Yk0g/q5LIx8twKFbkvo=;
+        b=POvj3CH7A/8yz00/N4KfWpVyqPUEONcP1ir05+PmgV/H/hQJ2z5/+Dqs9GgqwoKdeM
+         7rBf5RtLF+CgDB/IZIjy2iUnKNW+gWuynZYSqdCEBCjQtwmpMHSMBBDEAh0jjp80EwFt
+         6vST+iXSVMczFzNxrspra+l6SYGM+Ny2oQGsKbgHfo5CJwEYmiKvhDrYZmhVtz3qjRFH
+         9pbx7zxak6cd/HREjKGd7UQMq7ykOUaytNXIlDnvy7rXms3R2BBp1QcHYkkZQ958n/gk
+         5a/LE/teIajbZ8AF37FWneM9C47P//rZ9VJ7+ncPENnVFm3BHSIOYl45BSWhn3UdAh9/
+         +yaw==
+X-Gm-Message-State: AJIora+UsmBAshFpTgrIuocCoURutjnj5oT3SD9qQAEkBdLjLpbrexkV
+        fEFuC6V6IhpKU0hcHwUrXLG3uw8IAQ4=
+X-Google-Smtp-Source: AGRyM1sNSto+k2nljue71DnqV97d9qArsGrPWIPo3Wa8vvX1skLmXUMNbkt7w98ictKfa8YZGCclE5ggSYg=
+X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
+ (user=seanjc job=sendgmr) by 2002:a17:90a:249:b0:1e0:a8a3:3c6c with SMTP id
+ t9-20020a17090a024900b001e0a8a33c6cmr1127906pje.0.1658537502542; Fri, 22 Jul
+ 2022 17:51:42 -0700 (PDT)
+Reply-To: Sean Christopherson <seanjc@google.com>
+Date:   Sat, 23 Jul 2022 00:51:13 +0000
+Message-Id: <20220723005137.1649592-1-seanjc@google.com>
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.37.1.359.gd136c6c3e2-goog
+Subject: [PATCH v4 00/24] KVM: x86: Event/exception fixes and cleanups
+From:   Sean Christopherson <seanjc@google.com>
+To:     Sean Christopherson <seanjc@google.com>,
+        Paolo Bonzini <pbonzini@redhat.com>
+Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Jim Mattson <jmattson@google.com>,
+        Maxim Levitsky <mlevitsk@redhat.com>,
+        Oliver Upton <oupton@google.com>,
+        Peter Shier <pshier@google.com>
+Content-Type: text/plain; charset="UTF-8"
+X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Jul 22, 2022 at 06:18:00PM -0600, Alex Williamson wrote:
-> External email: Use caution opening links or attachments
-> 
-> 
-> On Fri, 22 Jul 2022 16:12:19 -0700
-> Nicolin Chen <nicolinc@nvidia.com> wrote:
-> 
-> > On Fri, Jul 22, 2022 at 04:11:29PM -0600, Alex Williamson wrote:
-> >
-> > > GVT-g explodes for me with this series on my Broadwell test system,
-> > > continuously spewing the following:
-> >
-> > Thank you for running additional tests.
-> >
-> > > [   47.348778] WARNING: CPU: 3 PID: 501 at drivers/vfio/vfio_iommu_type1.c:978 vfio_iommu_type1_unpin_pages+0x7b/0x100 [vfio_iommu_type1]
-> >
-> > > Line 978 is the WARN_ON(i != npage) line.  For the cases where we don't
-> > > find a matching vfio_dma, I'm seeing addresses that look maybe like
-> > > we're shifting  a value that's already an iova by PAGE_SHIFT somewhere.
-> >
-> > Hmm..I don't understand the PAGE_SHIFT part. Do you mind clarifying?
-> 
-> The iova was a very large address for a 4GB VM with a lot of zeros on
-> the low order bits, ex. 0x162459000000.  Thanks,
+The main goal of this series is to fix KVM's longstanding bug of not
+honoring L1's exception intercepts wants when handling an exception that
+occurs during delivery of a different exception.  E.g. if L0 and L1 are
+using shadow paging, and L2 hits a #PF, and then hits another #PF while
+vectoring the first #PF due to _L1_ not having a shadow page for the IDT,
+KVM needs to check L1's intercepts before morphing the #PF => #PF => #DF
+so that the #PF is routed to L1, not injected into L2 as a #DF.
 
-Ah! Thanks for the hint. The following commit did a double shifting:
-   "vfio: Pass in starting IOVA to vfio_pin/unpin_pages AP"
+nVMX has hacked around the bug for years by overriding the #PF injector
+for shadow paging to go straight to VM-Exit, and nSVM has started doing
+the same.  The hacks mostly work, but they're incomplete, confusing, and
+lead to other hacky code, e.g. bailing from the emulator because #PF
+injection forced a VM-Exit and suddenly KVM is back in L1.
 
-And the following change should fix:
--------------------
-diff --git a/drivers/gpu/drm/i915/gvt/kvmgt.c b/drivers/gpu/drm/i915/gvt/kvmgt.c
-index 481dd2aeb40e..4790c7f35b88 100644
---- a/drivers/gpu/drm/i915/gvt/kvmgt.c
-+++ b/drivers/gpu/drm/i915/gvt/kvmgt.c
-@@ -293,7 +293,7 @@ static int gvt_dma_map_page(struct intel_vgpu *vgpu, unsigned long gfn,
-        if (dma_mapping_error(dev, *dma_addr)) {
-                gvt_vgpu_err("DMA mapping failed for pfn 0x%lx, ret %d\n",
-                             page_to_pfn(page), ret);
--               gvt_unpin_guest_page(vgpu, gfn << PAGE_SHIFT, size);
-+               gvt_unpin_guest_page(vgpu, gfn, size);
-                return -ENOMEM;
-        }
+v4:
+ - Collect reviews. [Maxim]
+ - Fix a bug where an intermediate patch dropped the async #PF token
+   and used a stale payload. [Maxim]
+ - Tweak comments to call out that AMD CPUs generate error codes with
+   bits 31:16 != 0. [Maxim]
 
-@@ -306,7 +306,7 @@ static void gvt_dma_unmap_page(struct intel_vgpu *vgpu, unsigned long gfn,
-        struct device *dev = vgpu->gvt->gt->i915->drm.dev;
+v3:
+ - https://lore.kernel.org/all/20220715204226.3655170-1-seanjc@google.com
+ - Collect reviews. [Maxim, Jim]
+ - Split a few patches into more consumable chunks. [Maxim]
+ - Document that KVM doesn't correctly handle SMI+MTF (or SMI priority). [Maxim]
+ - Add comment to document the instruction boundary (event window) aspect
+   of block_nested_events. [Maxim]
+ - Add a patch to rename inject_pending_events() and add a comment to
+   document KVM's not-quite-architecturally-correct handing of instruction
+   boundaries and asynchronous events. [Maxim]
 
-        dma_unmap_page(dev, dma_addr, size, DMA_BIDIRECTIONAL);
--       gvt_unpin_guest_page(vgpu, gfn << PAGE_SHIFT, size);
-+       gvt_unpin_guest_page(vgpu, gfn, size);
- }
+v2:
+  - https://lore.kernel.org/all/20220614204730.3359543-1-seanjc@google.com
+  - Rebased to kvm/queue (commit 8baacf67c76c) + selftests CPUID
+    overhaul.
+    https://lore.kernel.org/all/20220614200707.3315957-1-seanjc@google.com
+  - Treat KVM_REQ_TRIPLE_FAULT as a pending exception.
 
- static struct gvt_dma *__gvt_cache_find_dma_addr(struct intel_vgpu *vgpu,
--------------------
+v1: https://lore.kernel.org/all/20220614204730.3359543-1-seanjc@google.com
+
+Sean Christopherson (24):
+  KVM: nVMX: Unconditionally purge queued/injected events on nested
+    "exit"
+  KVM: VMX: Drop bits 31:16 when shoving exception error code into VMCS
+  KVM: x86: Don't check for code breakpoints when emulating on exception
+  KVM: nVMX: Treat General Detect #DB (DR7.GD=1) as fault-like
+  KVM: nVMX: Prioritize TSS T-flag #DBs over Monitor Trap Flag
+  KVM: x86: Treat #DBs from the emulator as fault-like (code and
+    DR7.GD=1)
+  KVM: x86: Use DR7_GD macro instead of open coding check in emulator
+  KVM: nVMX: Ignore SIPI that arrives in L2 when vCPU is not in WFS
+  KVM: nVMX: Unconditionally clear mtf_pending on nested VM-Exit
+  KVM: VMX: Inject #PF on ENCLS as "emulated" #PF
+  KVM: x86: Rename kvm_x86_ops.queue_exception to inject_exception
+  KVM: x86: Make kvm_queued_exception a properly named, visible struct
+  KVM: x86: Formalize blocking of nested pending exceptions
+  KVM: x86: Use kvm_queue_exception_e() to queue #DF
+  KVM: x86: Hoist nested event checks above event injection logic
+  KVM: x86: Evaluate ability to inject SMI/NMI/IRQ after potential
+    VM-Exit
+  KVM: nVMX: Add a helper to identify low-priority #DB traps
+  KVM: nVMX: Document priority of all known events on Intel CPUs
+  KVM: x86: Morph pending exceptions to pending VM-Exits at queue time
+  KVM: x86: Treat pending TRIPLE_FAULT requests as pending exceptions
+  KVM: VMX: Update MTF and ICEBP comments to document KVM's subtle
+    behavior
+  KVM: x86: Rename inject_pending_events() to
+    kvm_check_and_inject_events()
+  KVM: selftests: Use uapi header to get VMX and SVM exit reasons/codes
+  KVM: selftests: Add an x86-only test to verify nested exception
+    queueing
+
+ arch/x86/include/asm/kvm-x86-ops.h            |   2 +-
+ arch/x86/include/asm/kvm_host.h               |  35 +-
+ arch/x86/kvm/emulate.c                        |   3 +-
+ arch/x86/kvm/svm/nested.c                     | 110 ++---
+ arch/x86/kvm/svm/svm.c                        |  20 +-
+ arch/x86/kvm/vmx/nested.c                     | 331 ++++++++-----
+ arch/x86/kvm/vmx/sgx.c                        |   2 +-
+ arch/x86/kvm/vmx/vmx.c                        |  54 ++-
+ arch/x86/kvm/x86.c                            | 450 ++++++++++++------
+ arch/x86/kvm/x86.h                            |  11 +-
+ tools/testing/selftests/kvm/.gitignore        |   1 +
+ tools/testing/selftests/kvm/Makefile          |   1 +
+ .../selftests/kvm/include/x86_64/svm_util.h   |   7 +-
+ .../selftests/kvm/include/x86_64/vmx.h        |  51 +-
+ .../kvm/x86_64/nested_exceptions_test.c       | 295 ++++++++++++
+ 15 files changed, 953 insertions(+), 420 deletions(-)
+ create mode 100644 tools/testing/selftests/kvm/x86_64/nested_exceptions_test.c
 
 
-So, I think that I should send a v4, given that the patches aren't
-officially applied?
+base-commit: 1a4d88a361af4f2e91861d632c6a1fe87a9665c2
+-- 
+2.37.1.359.gd136c6c3e2-goog
+
