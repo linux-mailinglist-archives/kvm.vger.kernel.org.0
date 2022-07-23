@@ -2,92 +2,72 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id DC8BD57EBA2
-	for <lists+kvm@lfdr.de>; Sat, 23 Jul 2022 05:09:33 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id CFB8157EC1E
+	for <lists+kvm@lfdr.de>; Sat, 23 Jul 2022 06:47:25 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233041AbiGWDJa (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 22 Jul 2022 23:09:30 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59288 "EHLO
+        id S236851AbiGWErX (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sat, 23 Jul 2022 00:47:23 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53536 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229469AbiGWDJ2 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 22 Jul 2022 23:09:28 -0400
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CC03278598;
-        Fri, 22 Jul 2022 20:09:27 -0700 (PDT)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id 6EEA762308;
-        Sat, 23 Jul 2022 03:09:27 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id DD8C9C341C6;
-        Sat, 23 Jul 2022 03:09:24 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1658545766;
-        bh=yfeKrSA/SfbRW4ZHy2JK6fnHYLeUM29oPE55X5506UQ=;
-        h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-        b=Oxm6j4n4k6TEwVlK1dp/rDs53BLhwoauQbLGK35rc3QJ+wKey0b7sGTpikHW4XCvY
-         1JQNGkU2/ealbT+TOlf5zdl65Ecd0y/txIIQwq85gdvSTrBRDN00VMmMFOzHLaK8co
-         Tm3Ejfx8av5weVgr8UFTcaBA8CZcFNbCF4xWNajYI9OCEWgsi3etdizaEN291jOYya
-         EWgKUJ6hjldQNmY7xRMSkvHOK0oqmPh1bMP39edxeiCh9w3Extm3R/FoZu5F+ZGeWS
-         zPTL4jl/DeG2NZSThdoMW+a3xiq0qebMTY8jfhn4XDCwuNqYBjJqN6Y4E1vBNieytj
-         F3xnrGkgASOBQ==
-Message-ID: <2171cf37-ea82-25c5-ad85-a80519525045@kernel.org>
-Date:   Fri, 22 Jul 2022 20:09:23 -0700
+        with ESMTP id S229450AbiGWErW (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sat, 23 Jul 2022 00:47:22 -0400
+Received: from mail-wm1-x334.google.com (mail-wm1-x334.google.com [IPv6:2a00:1450:4864:20::334])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7585431200
+        for <kvm@vger.kernel.org>; Fri, 22 Jul 2022 21:47:20 -0700 (PDT)
+Received: by mail-wm1-x334.google.com with SMTP id b6so3802979wmq.5
+        for <kvm@vger.kernel.org>; Fri, 22 Jul 2022 21:47:20 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=brainfault-org.20210112.gappssmtp.com; s=20210112;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=ClkRR6M+900US0KQHHRgn2sKqC8Wt2qOmc26396rdLw=;
+        b=sCzL+HDv0axLrw3jxXM06IvPYPBB/FqyaN5CzcyIs518O6+S5/Hq6HW0Vtm8IrrN9a
+         JlEoRO3fzJcqMiA5rECLNcZUTyfzZnduc6XmJoxXEIJ4Fa/i/mBRTN4a226oLGfZOy1T
+         ZrOZBGtNb7jDv4c4cLT3HU2K5LAR+2K5qxKy6mRUcO2lMTPYGngWJngUi1s/49AZATMi
+         vHTWJRjvVmdXTABGUuRMNhvtBEEH/zpdBUjLdv/kWoG/AC6eD7wkYIXXobgqA2vPgvCH
+         dCy+zmkL6e/pgjUzPS+fawOaB4WCErjeADN8Gx2KtQfWmuQ65cHlJvW6YycGCCVgB0Pd
+         VwEw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=ClkRR6M+900US0KQHHRgn2sKqC8Wt2qOmc26396rdLw=;
+        b=vb7riR+Za/ITu9o3/pvgWyoNQb65itE7EXQ/isIzXHXuXf4vn1QosjHDmLDfuO5MA7
+         CEosjMqpgoFpmecay3OgOsyBt3wvnuVG4LWj41cBRR9ZR3VQ2+u7cnjI1juJbHuPEjom
+         FdgE9Fxh/4lNtusMIPX6WU8Q2AnMzSjCOKfMVl5baX6muDptYzA+lFmipgaWMnsHUSQj
+         0TYX38AFraamkcci0ru8x3sV8GjzVCagqs1ZPhneBoMuZ2wQMOs6nExJ4LMdSytD1dXj
+         Pq17lOn1sDBIPGsuanrwEgxpjIOSwt4CYBLYo1TjkNhQWUIfTm2VyIAepSSL0p8Prcum
+         Xrzg==
+X-Gm-Message-State: AJIora/3Exchrobqoo/1FihHZH0k9hXsdg9AzGOv+PXVIkgwJ7eTImzW
+        hj7xy73ApNMlHNPWW/wka/tDEQJEM7vvR0nqxic8aQ==
+X-Google-Smtp-Source: AGRyM1vdTDHnXx6/iSL72TAIkM2o5HPzQQpmceFlCysZbho0p1KKEyC2jfWh5dOmd2LLx/uobVYvmK1JdDJJLKgFhWQ=
+X-Received: by 2002:a05:600c:3caa:b0:394:8fb8:716 with SMTP id
+ bg42-20020a05600c3caa00b003948fb80716mr14237697wmb.105.1658551638574; Fri, 22
+ Jul 2022 21:47:18 -0700 (PDT)
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.9.0
-Subject: Re: [PATCH v5 00/13] KVM: mm: fd-based approach for supporting KVM
- guest private memory
-Content-Language: en-US
-To:     Sean Christopherson <seanjc@google.com>,
-        "Gupta, Pankaj" <pankaj.gupta@amd.com>
-Cc:     Chao Peng <chao.p.peng@linux.intel.com>,
-        Quentin Perret <qperret@google.com>,
-        Michael Roth <michael.roth@amd.com>,
-        Steven Price <steven.price@arm.com>,
-        kvm list <kvm@vger.kernel.org>,
-        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-        linux-mm@kvack.org, linux-fsdevel@vger.kernel.org,
-        Linux API <linux-api@vger.kernel.org>, qemu-devel@nongnu.org,
+References: <20220722165047.519994-1-atishp@rivosinc.com>
+In-Reply-To: <20220722165047.519994-1-atishp@rivosinc.com>
+From:   Anup Patel <anup@brainfault.org>
+Date:   Sat, 23 Jul 2022 10:17:06 +0530
+Message-ID: <CAAhSdy2UDwZYK+EaKHPXLxyKUMv-OX02EdaBDBgjNF0jdDJ7xQ@mail.gmail.com>
+Subject: Re: [PATCH v7 0/4] Add Sstc extension support
+To:     Atish Patra <atishp@rivosinc.com>
+Cc:     linux-kernel@vger.kernel.org, Albert Ou <aou@eecs.berkeley.edu>,
+        Atish Patra <atishp@atishpatra.org>,
+        Daniel Lezcano <daniel.lezcano@linaro.org>,
+        Guo Ren <guoren@kernel.org>, Heiko Stuebner <heiko@sntech.de>,
+        kvm-riscv@lists.infradead.org, kvm@vger.kernel.org,
+        linux-riscv@lists.infradead.org,
+        Palmer Dabbelt <palmer@dabbelt.com>,
         Paolo Bonzini <pbonzini@redhat.com>,
-        Jonathan Corbet <corbet@lwn.net>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>,
+        Paul Walmsley <paul.walmsley@sifive.com>,
+        Rob Herring <robh@kernel.org>,
         Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        the arch/x86 maintainers <x86@kernel.org>,
-        "H. Peter Anvin" <hpa@zytor.com>, Hugh Dickins <hughd@google.com>,
-        Jeff Layton <jlayton@kernel.org>,
-        "J . Bruce Fields" <bfields@fieldses.org>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        Mike Rapoport <rppt@kernel.org>,
-        "Maciej S . Szmigiero" <mail@maciej.szmigiero.name>,
-        Vlastimil Babka <vbabka@suse.cz>,
-        Vishal Annapurve <vannapurve@google.com>,
-        Yu Zhang <yu.c.zhang@linux.intel.com>,
-        "Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>,
-        "Nakajima, Jun" <jun.nakajima@intel.com>,
-        Dave Hansen <dave.hansen@intel.com>,
-        Andi Kleen <ak@linux.intel.com>,
-        David Hildenbrand <david@redhat.com>,
-        Marc Zyngier <maz@kernel.org>, Will Deacon <will@kernel.org>,
-        nikunj@amd.com, ashish.kalra@amd.com
-References: <83fd55f8-cd42-4588-9bf6-199cbce70f33@www.fastmail.com>
- <YksIQYdG41v3KWkr@google.com> <Ykslo2eo2eRXrpFR@google.com>
- <eefc3c74-acca-419c-8947-726ce2458446@www.fastmail.com>
- <Ykwbqv90C7+8K+Ao@google.com> <YkyEaYiL0BrDYcZv@google.com>
- <20220422105612.GB61987@chaop.bj.intel.com>
- <20220509223056.pyazfxjwjvipmytb@amd.com> <YnmjvX9ow4elYsY8@google.com>
- <c3ca63d6-db27-d783-40ca-486b3fbbced7@amd.com> <YtnCyqbI26QfRuOP@google.com>
-From:   Andy Lutomirski <luto@kernel.org>
-In-Reply-To: <YtnCyqbI26QfRuOP@google.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-7.8 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
-        RCVD_IN_DNSWL_HI,SPF_HELO_NONE,SPF_PASS autolearn=ham
+        Tsukasa OI <research_trasio@irq.a4lg.com>,
+        Wei Fu <wefu@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
+X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_NONE autolearn=ham
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -95,35 +75,104 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 7/21/22 14:19, Sean Christopherson wrote:
-> On Thu, Jul 21, 2022, Gupta, Pankaj wrote:
->>
+Hi Palmer,
 
->>> I view it as a performance problem because nothing stops KVM from copying from
->>> userspace into the private fd during the SEV ioctl().  What's missing is the
->>> ability for userspace to directly initialze the private fd, which may or may not
->>> avoid an extra memcpy() depending on how clever userspace is.
->> Can you please elaborate more what you see as a performance problem? And
->> possible ways to solve it?
-> 
-> Oh, I'm not saying there actually _is_ a performance problem.  What I'm saying is
-> that in-place encryption is not a functional requirement, which means it's purely
-> an optimization, and thus we should other bother supporting in-place encryption
-> _if_ it would solve a performane bottleneck.
+On Fri, Jul 22, 2022 at 10:20 PM Atish Patra <atishp@rivosinc.com> wrote:
+>
+> This series implements Sstc extension support which was ratified recently.
+> Before the Sstc extension, an SBI call is necessary to generate timer
+> interrupts as only M-mode have access to the timecompare registers. Thus,
+> there is significant latency to generate timer interrupts at kernel.
+> For virtualized enviornments, its even worse as the KVM handles the SBI call
+> and uses a software timer to emulate the timecomapre register.
+>
+> Sstc extension solves both these problems by defining a stimecmp/vstimecmp
+> at supervisor (host/guest) level. It allows kernel to program a timer and
+> recieve interrupt without supervisor execution enviornment (M-mode/HS mode)
+> intervention.
+>
+> KVM directly updates the vstimecmp as well if the guest kernel invokes the SBI
+> call instead of updating stimecmp directly. This is required because KVM will
+> enable sstc extension if the hardware supports it unless the VMM explicitly
+> disables it for that guest. The hardware is expected to compare the
+> vstimecmp at every cycle if sstc is enabled and any stale value in vstimecmp
+> will lead to spurious timer interrupts. This also helps maintaining the
+> backward compatibility with older kernels.
+>
+> Similary, the M-mode firmware(OpenSBI) uses stimecmp for older kernel
+> without sstc support as STIP bit in mip is read only for hardware with sstc.
+>
+> The PATCH 1 & 2 enables the basic infrastructure around Sstc extension while
+> PATCH 3 lets kernel use the Sstc extension if it is available in hardware.
+> PATCH 4 implements the Sstc extension in KVM.
+>
+> This series has been tested on Qemu(RV32 & RV64) with additional patches in
+> Qemu[2]. This series can also be found at [3].
+>
+> Changes from v6->v7:
+> 1. Fixed a compilation error reported by 0-day bot.
+>
+> Changes from v5->v6:
+> 1. Moved SSTC extension enum below SVPBMT.
+>
+> Changes from v4->v5:
+> 1. Added RB tag.
+> 2. Changed the pr-format.
+> 3. Rebased on 5.19-rc7 and kvm-queue.
+> 4. Moved the henvcfg modification from hardware enable to vcpu_load.
+>
+> Changes from v3->v4:
+> 1. Rebased on 5.18-rc6
+> 2. Unified vstimemp & next_cycles.
+> 3. Addressed comments in PATCH 3 & 4.
+>
+> Changes from v2->v3:
+> 1. Dropped unrelated KVM fixes from this series.
+> 2. Rebased on 5.18-rc3.
+>
+> Changes from v1->v2:
+> 1. Separate the static key from kvm usage
+> 2. Makde the sstc specific static key local to the driver/clocksource
+> 3. Moved the vstimecmp update code to the vcpu_timer
+> 4. Used function pointers instead of static key to invoke vstimecmp vs
+>    hrtimer at the run time. This will help in future for migration of vms
+>    from/to sstc enabled hardware to non-sstc enabled hardware.
+> 5. Unified the vstimer & timer to 1 timer as only one of them will be used
+>    at runtime.
+>
+> [1] https://drive.google.com/file/d/1m84Re2yK8m_vbW7TspvevCDR82MOBaSX/view
+> [2] https://github.com/atishp04/qemu/tree/sstc_v6
+> [3] https://github.com/atishp04/linux/tree/sstc_v7
+>
+> Atish Patra (4):
+> RISC-V: Add SSTC extension CSR details
+> RISC-V: Enable sstc extension parsing from DT
+> RISC-V: Prefer sstc extension if available
+> RISC-V: KVM: Support sstc extension
 
-Even if we end up having a performance problem, I think we need to 
-understand the workloads that we want to optimize before getting too 
-excited about designing a speedup.
+The PATCH4 is dependent on the KVM patches in queue for 5.20.
 
-In particular, there's (depending on the specific technology, perhaps, 
-and also architecture) a possible tradeoff between trying to reduce 
-copying and trying to reduce unmapping and the associated flushes.  If a 
-user program maps an fd, populates it, and then converts it in place 
-into private memory (especially if it doesn't do it in a single shot), 
-then that memory needs to get unmapped both from the user mm and 
-probably from the kernel direct map.  On the flip side, it's possible to 
-imagine an ioctl that does copy-and-add-to-private-fd that uses a 
-private mm and doesn't need any TLB IPIs.
+I suggest you take PATCH1, PATCH2 and PATCH3. I will send
+PATCH4 in second batch/PR for 5.20 assuming you will send the
+first three patches in your first PR for 5.20
 
-All of this is to say that trying to optimize right now seems quite 
-premature to me.
+Does this sound okay to you ?
+
+Regards,
+Anup
+
+>
+> arch/riscv/include/asm/csr.h            |   5 +
+> arch/riscv/include/asm/hwcap.h          |   1 +
+> arch/riscv/include/asm/kvm_vcpu_timer.h |   7 ++
+> arch/riscv/include/uapi/asm/kvm.h       |   1 +
+> arch/riscv/kernel/cpu.c                 |   1 +
+> arch/riscv/kernel/cpufeature.c          |   1 +
+> arch/riscv/kvm/vcpu.c                   |   8 +-
+> arch/riscv/kvm/vcpu_timer.c             | 144 +++++++++++++++++++++++-
+> drivers/clocksource/timer-riscv.c       |  25 +++-
+> 9 files changed, 185 insertions(+), 8 deletions(-)
+>
+> --
+> 2.25.1
+>
