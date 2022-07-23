@@ -2,68 +2,65 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id BC25357EB02
-	for <lists+kvm@lfdr.de>; Sat, 23 Jul 2022 03:14:54 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 90A0457EB08
+	for <lists+kvm@lfdr.de>; Sat, 23 Jul 2022 03:23:39 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234190AbiGWBOx (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 22 Jul 2022 21:14:53 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50290 "EHLO
+        id S234587AbiGWBXd (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 22 Jul 2022 21:23:33 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54768 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231160AbiGWBOw (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 22 Jul 2022 21:14:52 -0400
-Received: from mail-pj1-x1035.google.com (mail-pj1-x1035.google.com [IPv6:2607:f8b0:4864:20::1035])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 510C78AB3C
-        for <kvm@vger.kernel.org>; Fri, 22 Jul 2022 18:14:51 -0700 (PDT)
-Received: by mail-pj1-x1035.google.com with SMTP id gq7so5689666pjb.1
-        for <kvm@vger.kernel.org>; Fri, 22 Jul 2022 18:14:51 -0700 (PDT)
+        with ESMTP id S229825AbiGWBXc (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 22 Jul 2022 21:23:32 -0400
+Received: from mail-yb1-xb4a.google.com (mail-yb1-xb4a.google.com [IPv6:2607:f8b0:4864:20::b4a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3165567CB7
+        for <kvm@vger.kernel.org>; Fri, 22 Jul 2022 18:23:31 -0700 (PDT)
+Received: by mail-yb1-xb4a.google.com with SMTP id y4-20020a25b9c4000000b0066e573fb0fcso4897746ybj.21
+        for <kvm@vger.kernel.org>; Fri, 22 Jul 2022 18:23:31 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=mlhuJjsagpUtxAvday6D2ZpIOCEYXdAj2hQUheI+5sE=;
-        b=oBpAgdi1U4gV+6QmYklwJBD5Y+RvGZkwdNbv9T7ie/YkMoWrcaJIN1JrIP3WQQwGvN
-         8PKzrb5seQIn/dr8BJPrnWg6rtulowOeqMZspDGYd7wZcCsyoVhp2SXqCDDn9H1M+/Gz
-         RysbsMT2tsO6qLRN/qjq4qHWlALjguSRT4mU/iwRSsFKWg++c7KsXgWtso2g1wflFt8c
-         JheHxsoXiCv92eJkxbI+Ek4NTy1Q0cqVH3WtJL8205BXxHkA0ZM2282eH9pWVPq08AaH
-         sskBda21dVnh4QxVeWkDt4yxUinjmCP7+f7GbpUCuYbPrVPsvoaO+Q1S+pxz06QmYxIC
-         u7eg==
+        h=reply-to:date:message-id:mime-version:subject:from:to:cc;
+        bh=/gYd/fZvacXV103c8Lv/rGV7oRgkLYVyY8qKay9SInY=;
+        b=cV861rw7TopdwNZfjzFLsWvW1zofCcUZDGXRFCfdk/hnh/KEKQARihawDtz0JOa5R5
+         +ChtrCDJJ7VytXjFDlIJ+My/SgqZYEw9LUXTHIg1pmDaXKAd0IGNocf/w5XUclYDrP5T
+         pOUOvCSFrxYCD/vOnfzTJspdfHHho4BOrcxcWxm+INEfHiqiYCUNiL3DvcpuAeSw1H8j
+         YzdhfxTqCT6fwvAvekTu5aAyWwxApEk6jyiKKAN6V4dii8hY6eygJlpQuY94Zqkphsym
+         jxl4fs4F2/l40rmjHe98W1D9d+wKK20FFFLdL5WWx61V/3HGS3Ch99KtgzW8+qg2u/pw
+         RCog==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=mlhuJjsagpUtxAvday6D2ZpIOCEYXdAj2hQUheI+5sE=;
-        b=Q1DD4jjL3rO9naiJzZEGVU+jBEd3z3UWSIpvIBkkKIJZiLBjVThbD1DXmk7BcYW1RV
-         ecQwSlnX40S+4OuWdBswuOqbIcJaMuv92iPa1q6kmKxvqhY5SRd5+ljtJn6q6BnGlZQN
-         NdjecoSuR+86SQfZ8sM2wf5RIXSBJ2muiIGXx3FDy3Io88Yc/OJ0GEleGy5dxMLHUxH+
-         wC97a4artT5SsKo9IQf4NzvOgfH+fBBbem4XdWWw5fJ4Txmyfsm62Xkaz7wEh9DJg5Ed
-         oHdDnaXrkuPzizKRCHFQe4uGrQ8V9A1uXly1W/Bb9E4I5IJuxmt6ONGuaLA6eaCdCORX
-         zp7A==
-X-Gm-Message-State: AJIora+oF/3BEvk6QdJazpYcKwuO+eOVUhMiWoKEK9IDNGReDXBvheE4
-        /qCkwPlREbR3k5IiepE+Sb8WWQ==
-X-Google-Smtp-Source: AGRyM1vydYxRZ4i8BecNEhnMklgRKF6JCGsAtC9dc7lPgALEPKB+OxynXk32WAO6N4fZX8yNSwUzyA==
-X-Received: by 2002:a17:90a:8c88:b0:1f2:12b0:ae9e with SMTP id b8-20020a17090a8c8800b001f212b0ae9emr20513747pjo.42.1658538890580;
-        Fri, 22 Jul 2022 18:14:50 -0700 (PDT)
-Received: from google.com (123.65.230.35.bc.googleusercontent.com. [35.230.65.123])
-        by smtp.gmail.com with ESMTPSA id h5-20020a654045000000b00413d592af6asm4058346pgp.50.2022.07.22.18.14.50
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 22 Jul 2022 18:14:50 -0700 (PDT)
-Date:   Sat, 23 Jul 2022 01:14:46 +0000
+        h=x-gm-message-state:reply-to:date:message-id:mime-version:subject
+         :from:to:cc;
+        bh=/gYd/fZvacXV103c8Lv/rGV7oRgkLYVyY8qKay9SInY=;
+        b=xG9MBYC7mLxfQglv3SyS/PZ9IeTkSbFXwXzNQI9rd1cXhcGr7tswaBeKK0ldOLfSrL
+         fCLAjni7a9cgXErZqjsPCKb90uitUfTMDlCHT8h03v26zhJOkQgvUl16AAPXIqUWVGf0
+         o2FvkDnVzndMR9PXws+yqKOaNi01SDes2aGXjrXREYTUbwUdIqj8JFHIqOhxTCVQwVsl
+         POH2OM691SrRhgKnCqiYkjBYoPUayDWRg9hOfJ/TirmZjX+AVqhqu8IrD9g5UMF6gN7G
+         cXN4toZsAXD7T3rCpfuKUlK/JtPREXVb8FUTy+PNyzibgJGlqWPVpyjMNmhmpOw8Yar6
+         w8+w==
+X-Gm-Message-State: AJIora9a2H/r5ZINilPreLkof2XXJCKSmLCLs5GymQwwEJEY5hDLAZtE
+        uiQSf+NsyYo7+SkKkWCzx9rBFzlrVUo=
+X-Google-Smtp-Source: AGRyM1sx0VIq9j0LtHvFZvxQ31X4Dbrctolz4QwoeZHvPWPrKKa8y/ba1dnHkCstwXZzXSHJ4dTclNaXz+k=
+X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
+ (user=seanjc job=sendgmr) by 2002:a81:190f:0:b0:31e:66e3:79e0 with SMTP id
+ 15-20020a81190f000000b0031e66e379e0mr2128354ywz.331.1658539410510; Fri, 22
+ Jul 2022 18:23:30 -0700 (PDT)
+Reply-To: Sean Christopherson <seanjc@google.com>
+Date:   Sat, 23 Jul 2022 01:23:19 +0000
+Message-Id: <20220723012325.1715714-1-seanjc@google.com>
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.37.1.359.gd136c6c3e2-goog
+Subject: [PATCH v2 0/6] KVM: x86: Apply NX mitigation more precisely
 From:   Sean Christopherson <seanjc@google.com>
-To:     Paolo Bonzini <pbonzini@redhat.com>
-Cc:     kvm@vger.kernel.org, Yang Weijiang <weijiang.yang@intel.com>,
-        Manali Shukla <manali.shukla@amd.com>,
-        Jim Mattson <jmattson@google.com>
-Subject: Re: [kvm-unit-tests GIT PULL] x86: Fixes, cleanups, and new sub-tests
-Message-ID: <YttLhpaAwft0PnbI@google.com>
-References: <YtnBbb1pleBpIl2J@google.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <YtnBbb1pleBpIl2J@google.com>
-X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-        USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=ham
+To:     Sean Christopherson <seanjc@google.com>,
+        Paolo Bonzini <pbonzini@redhat.com>
+Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Yosry Ahmed <yosryahmed@google.com>,
+        Mingwei Zhang <mizhang@google.com>,
+        Ben Gardon <bgardon@google.com>
+Content-Type: text/plain; charset="UTF-8"
+X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL autolearn=unavailable
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -71,17 +68,43 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Jul 21, 2022, Sean Christopherson wrote:
-> Please pull/merge a pile of x86 cleanups and fixes, most of which have been
-> waiting for review/merge for quite some time.  The only non-trivial changes that
-> haven't been posted are the massaged version of the PMU cleanup patches.
-> 
-> Note, the very last commit will fail spectacularly on kvm/queue due to a KVM
-> bug: https://lore.kernel.org/all/20220607213604.3346000-4-seanjc@google.com.
-> 
-> Other than that, tested on Intel and AMD, both 64-bit and 32-bit.
+Patch 6 from Mingwei is the end goal of the series.  KVM incorrectly
+assumes that the NX huge page mitigation is the only scenario where KVM
+will create a non-leaf page instead of a huge page.   Precisely track
+(via kvm_mmu_page) if a non-huge page is being forced and use that info
+to avoid unnecessarily forcing smaller page sizes in
+disallowed_hugepage_adjust().
 
-Argh, don't pull this.
+v2: Rebase, tweak a changelog accordingly.
 
-Commit b89a09f ("x86: Provide a common 64-bit AP entrypoint for EFI and non-EFI")
-broke the SVM tests on Rome.  I'll look into it next week and spin a new version.
+v1: https://lore.kernel.org/all/20220409003847.819686-1-seanjc@google.com
+
+Mingwei Zhang (1):
+  KVM: x86/mmu: explicitly check nx_hugepage in
+    disallowed_hugepage_adjust()
+
+Sean Christopherson (5):
+  KVM: x86/mmu: Tag disallowed NX huge pages even if they're not tracked
+  KVM: x86/mmu: Properly account NX huge page workaround for nonpaging
+    MMUs
+  KVM: x86/mmu: Set disallowed_nx_huge_page in TDP MMU before setting
+    SPTE
+  KVM: x86/mmu: Track the number of TDP MMU pages, but not the actual
+    pages
+  KVM: x86/mmu: Add helper to convert SPTE value to its shadow page
+
+ arch/x86/include/asm/kvm_host.h |  17 ++---
+ arch/x86/kvm/mmu/mmu.c          | 107 ++++++++++++++++++++++----------
+ arch/x86/kvm/mmu/mmu_internal.h |  41 +++++++-----
+ arch/x86/kvm/mmu/paging_tmpl.h  |   6 +-
+ arch/x86/kvm/mmu/spte.c         |  11 ++++
+ arch/x86/kvm/mmu/spte.h         |  17 +++++
+ arch/x86/kvm/mmu/tdp_mmu.c      |  49 +++++++++------
+ arch/x86/kvm/mmu/tdp_mmu.h      |   2 +
+ 8 files changed, 167 insertions(+), 83 deletions(-)
+
+
+base-commit: 1a4d88a361af4f2e91861d632c6a1fe87a9665c2
+-- 
+2.37.1.359.gd136c6c3e2-goog
+
