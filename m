@@ -2,482 +2,219 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id B9DD75800F4
-	for <lists+kvm@lfdr.de>; Mon, 25 Jul 2022 16:48:39 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 77F265800FD
+	for <lists+kvm@lfdr.de>; Mon, 25 Jul 2022 16:50:03 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235637AbiGYOsh (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 25 Jul 2022 10:48:37 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41632 "EHLO
+        id S235733AbiGYOuB (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 25 Jul 2022 10:50:01 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42722 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234814AbiGYOse (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 25 Jul 2022 10:48:34 -0400
-Received: from NAM02-DM3-obe.outbound.protection.outlook.com (mail-dm3nam02on2059.outbound.protection.outlook.com [40.107.95.59])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 51B71140AE;
-        Mon, 25 Jul 2022 07:48:33 -0700 (PDT)
+        with ESMTP id S233550AbiGYOuA (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 25 Jul 2022 10:50:00 -0400
+Received: from NAM11-CO1-obe.outbound.protection.outlook.com (mail-co1nam11on2067.outbound.protection.outlook.com [40.107.220.67])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 424911835E;
+        Mon, 25 Jul 2022 07:49:59 -0700 (PDT)
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=mEj1Hg3Px082M40nZhU4ZysSxjlByIX50nNQSCff6El/iWiZYN9MJ3oyZIM706ELcHLN461j0J1SKntXNN4RDsbZez1my3JMG4OoGW/KayJh3mBu0DZ+WTukIFNKTZ1/HHwO1eiqy+vitkWVaA+f7OTIh2QalCicHZtqUszqwSpcHQKrBvXMd8nUG7Pwe4DQnfUylrmUmh4WzoI1J8PaHlNudun1l7tnjmNSUB8xlFXcGGaPB813cUjAs/MKUajz1e8Mx1cdXDWjfVPZhVHCSFd0VmkVbb7g5Y1XDR1lnJzi12WezEj2fLbPJIarvLUu/b+vG6cLJWk53sSO4au9dQ==
+ b=TTQF4r42Z5Gl2Tm6NREYf3c9wVWCbrTreQIize0P5j/euOjZXwIFk/U00ly6EDX1gy9Cev+raJpTg5mVxAOQ3p/3KOVBbHdb46SMIfyKybiX42QZT5IZpKkIuvGOZwFKB5S4vP9irKT23D6YkmtjqlpXAYApvEODkYMKB/s3lUQD3H6LCwTkXJgwMx12hQTcZHg4sp6beuXzNrJiV9ElFI/tXsTXXyKCIHgUeFtal6kTURafz71mkWkjPzMQoVk44kpHNjMRnTMm/3u/EzSK8nbRtlYIusV3INYgCIszuahBLZtZ021APDCEmFgkRrxq6xVa8PxbAE4oA8a0RD9vtA==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=PGR148m2EvsKyuGU3f6+GKq/+Kw+7RILhdvmNfrN3LA=;
- b=RNj75ac+vqXKCyFXDLF+DISB25Nt8to4Ny4BPRnFXHg2zgQiAAYKpqY+OrgGPjxoxv7iP5A1EwS0nsasA/zeLvrLXtFOkNsF8t48PDg7XoQ7euCmdJWMmnRZKQPdPZh1sFDTT+TSi4TgFW5/jZeP1nn4kKqd5/wwtpxSZmyJDIp/e+ZXxEpJc18F0soefX0brnY6aDrc9V5FoN78eKF+Sj21CRRBIDz52s6pRnkizj05qodlZX2Vmygq4cfhl+lshOHN1mDOzUVe5TD1GZTdssgA0eks6umo125VYdh5q/F7qzkIG0l73pqQA8lWt01OcnAY1J+0wjf30UEcKCPiWg==
+ bh=qGgh7cGiUxo8piOwCZODYaqKZivAZm519AjxtozZYr0=;
+ b=KhlA1dGLsXZ3h0bT/ABfUGNbRkJ8n5ymL3ufQvcAoUO20b/0+gnrlJ2WWZ/niGAqFpRbkVSg3HdFKTFJmsrvVQkeBF1rND3ZzUVDuINs3t3ei9otTU1ELByxE2Hx8lKYC+a61zyTtTOHDryrz9MneyICmnN73N1OAiLv73/ez+La3mDyLvrhT53Cy7dUTo5Sh4bGR4/0z3TxQPi5fznKgtzbC2YpHllRdLeSHtw78nuopCmYqxPwFgMzUOHGoPwoQYNwT1ml5dxvOpf/kjME+mLYDYy94v823dJYyCulFH+WIaX6sa46gqdmgpyhzDzHFHkuBSRSV1YHJEfRqgXyuw==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
- dkim=pass header.d=nvidia.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
+ smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
+ header.d=amd.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=PGR148m2EvsKyuGU3f6+GKq/+Kw+7RILhdvmNfrN3LA=;
- b=gFrfJgMPJoHCpCG6MU/NXvLiaoDI0UffNuUbV8BMh2/yq1Xdo6EmV2XHoPDsUsMeFgTUCT+1t2MyqSjV3HRTt8gJ4aPWXU0+BPmo38AcZ4ULkvk3IjsA8yq46L6puHAwlDQavQ/CkZIq74xHFLmCJ2sTfs8WGehUjpdIfh8AqKtnh87F/525DbvsurjTfCx+pSgiJ/m74KtbNjwCCNnwoJkFajxqnWgnTHsrUV6sy+BmgGAuefPjsXQsm7HY1AHqiJq15Am8xRpyqFPKABaziEN7RkjZUPH5ibieaZG4ysYwDQjbo3Alyj8gDD0stLWciXqva7W2mDC82JFNtM0ySw==
+ bh=qGgh7cGiUxo8piOwCZODYaqKZivAZm519AjxtozZYr0=;
+ b=RywHUoyM03elksTiq1SJyTSPY4w6SmtqDdcfPAQs1DL/Qgnw9Ui0M6osGKI4YTbC64LLGA83q8wSrkeFWnPqW+he6j9+Ezbw/nb1bTDxWEM3v8Thp+EIbc/fORR511kQlbnNw9fBdid+868bwWnjODyB1yKHLWnibPEuPXsN388=
 Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nvidia.com;
-Received: from BL1PR12MB5304.namprd12.prod.outlook.com (2603:10b6:208:314::13)
- by MWHPR1201MB0094.namprd12.prod.outlook.com (2603:10b6:301:5a::21) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5458.19; Mon, 25 Jul
- 2022 14:48:30 +0000
-Received: from BL1PR12MB5304.namprd12.prod.outlook.com
- ([fe80::784c:3561:5f6a:10ed]) by BL1PR12MB5304.namprd12.prod.outlook.com
- ([fe80::784c:3561:5f6a:10ed%8]) with mapi id 15.20.5458.024; Mon, 25 Jul 2022
- 14:48:30 +0000
-Message-ID: <e6bd500e-f250-982f-cda6-2ec8ccb6d592@nvidia.com>
-Date:   Mon, 25 Jul 2022 20:18:17 +0530
+ header.d=none;dmarc=none action=none header.from=amd.com;
+Received: from CY4PR1201MB0181.namprd12.prod.outlook.com
+ (2603:10b6:910:1f::11) by DM6PR12MB3706.namprd12.prod.outlook.com
+ (2603:10b6:5:1cc::27) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5458.18; Mon, 25 Jul
+ 2022 14:49:56 +0000
+Received: from CY4PR1201MB0181.namprd12.prod.outlook.com
+ ([fe80::1001:3c79:9504:8d6a]) by CY4PR1201MB0181.namprd12.prod.outlook.com
+ ([fe80::1001:3c79:9504:8d6a%10]) with mapi id 15.20.5458.024; Mon, 25 Jul
+ 2022 14:49:56 +0000
+Message-ID: <c193585a-ec32-7ed5-6418-162959e9e449@amd.com>
+Date:   Mon, 25 Jul 2022 16:49:52 +0200
 User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:91.0) Gecko/20100101
- Thunderbird/91.11.0
-Subject: Re: [PATCH v5 4/5] vfio/pci: Implement
- VFIO_DEVICE_FEATURE_LOW_POWER_ENTRY/EXIT
+ Thunderbird/91.10.0
+From:   "Gupta, Pankaj" <pankaj.gupta@amd.com>
+Subject: Re: [PATCH v7 01/14] mm: Add F_SEAL_AUTO_ALLOCATE seal to memfd
+To:     Chao Peng <chao.p.peng@linux.intel.com>
+Cc:     David Hildenbrand <david@redhat.com>, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org, linux-mm@kvack.org,
+        linux-fsdevel@vger.kernel.org, linux-api@vger.kernel.org,
+        linux-doc@vger.kernel.org, qemu-devel@nongnu.org,
+        linux-kselftest@vger.kernel.org,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Jonathan Corbet <corbet@lwn.net>,
+        Sean Christopherson <seanjc@google.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+        x86@kernel.org, "H . Peter Anvin" <hpa@zytor.com>,
+        Hugh Dickins <hughd@google.com>,
+        Jeff Layton <jlayton@kernel.org>,
+        "J . Bruce Fields" <bfields@fieldses.org>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        Shuah Khan <shuah@kernel.org>, Mike Rapoport <rppt@kernel.org>,
+        Steven Price <steven.price@arm.com>,
+        "Maciej S . Szmigiero" <mail@maciej.szmigiero.name>,
+        Vlastimil Babka <vbabka@suse.cz>,
+        Vishal Annapurve <vannapurve@google.com>,
+        Yu Zhang <yu.c.zhang@linux.intel.com>,
+        "Kirill A . Shutemov" <kirill.shutemov@linux.intel.com>,
+        luto@kernel.org, jun.nakajima@intel.com, dave.hansen@intel.com,
+        ak@linux.intel.com, aarcange@redhat.com, ddutile@redhat.com,
+        dhildenb@redhat.com, Quentin Perret <qperret@google.com>,
+        Michael Roth <michael.roth@amd.com>, mhocko@suse.com,
+        Muchun Song <songmuchun@bytedance.com>
+References: <20220706082016.2603916-1-chao.p.peng@linux.intel.com>
+ <20220706082016.2603916-2-chao.p.peng@linux.intel.com>
+ <f39c4f63-a511-4beb-b3a4-66589ddb5475@redhat.com>
+ <c59fca89-cd0c-1724-210e-d9b01b375103@amd.com>
+ <20220725135416.GD304216@chaop.bj.intel.com>
 Content-Language: en-US
-To:     Alex Williamson <alex.williamson@redhat.com>
-Cc:     Cornelia Huck <cohuck@redhat.com>,
-        Yishai Hadas <yishaih@nvidia.com>,
-        Jason Gunthorpe <jgg@nvidia.com>,
-        Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>,
-        Kevin Tian <kevin.tian@intel.com>,
-        "Rafael J . Wysocki" <rafael@kernel.org>,
-        Max Gurtovoy <mgurtovoy@nvidia.com>,
-        Bjorn Helgaas <bhelgaas@google.com>,
-        linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-        linux-pm@vger.kernel.org, linux-pci@vger.kernel.org
-References: <20220719121523.21396-1-abhsahu@nvidia.com>
- <20220719121523.21396-5-abhsahu@nvidia.com>
- <20220721163455.5ba133ef.alex.williamson@redhat.com>
-X-Nvconfidentiality: public
-From:   Abhishek Sahu <abhsahu@nvidia.com>
-In-Reply-To: <20220721163455.5ba133ef.alex.williamson@redhat.com>
-Content-Type: text/plain; charset=UTF-8
+In-Reply-To: <20220725135416.GD304216@chaop.bj.intel.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: MAXPR0101CA0059.INDPRD01.PROD.OUTLOOK.COM
- (2603:1096:a00:e::21) To BL1PR12MB5304.namprd12.prod.outlook.com
- (2603:10b6:208:314::13)
+X-ClientProxiedBy: FR3P281CA0052.DEUP281.PROD.OUTLOOK.COM
+ (2603:10a6:d10:4a::23) To CY4PR1201MB0181.namprd12.prod.outlook.com
+ (2603:10b6:910:1f::11)
 MIME-Version: 1.0
 X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: 4a09f2ad-a6fd-47e4-14b8-08da6e4cbd3d
-X-MS-TrafficTypeDiagnostic: MWHPR1201MB0094:EE_
+X-MS-Office365-Filtering-Correlation-Id: 66a760a8-4a1d-4fba-18c5-08da6e4cf08f
+X-MS-TrafficTypeDiagnostic: DM6PR12MB3706:EE_
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: +PKAgowhPlUAR5snoTvro1YGQ0xc/4GArJs8kkncqKum3BjhAomfgkkfg2Pxni6/meHZHVCMbMZFUXJSbpXcnAEA8IIFsjEsMfPVijrnGK950HyIyAYqoOf/C3Uj3J+LRHKWvB+ffyPLka8HQxSwzN+GFX9w74vIWrPUqA7F1x40X10ePJ5txqP1adCLQPAtVJ1GzZtFakbZChySpJ6670pHVbIrFce2w6R4B3ZN1CQ4AvvOOoYfRoMKPWe06y7wMtt6KZf42RYc0jyKwM9GJwsjdppYYfe7qv6sqn3csf2tzVLVwoTeIjl/P8Xpndbm8vWhs0sjpNunTID8l0yjqB3mlzlpGWpo4X8q5iqX2/tjINg9eXEPrtf5ukYOGASfzKF32329xJGewyhbT5G6wgqitHV94M2ryPYxRZXo8gZwjVfJEdgEl3Q5xaadXz+CX6H6Ua5W+jfzNmNygBjKJZbrD+jg5d6hBQ8YbuBb/GZd/sg0OvVvR+CcZBfUu6e6MTj3+lvV+p6FsYRsilmOZMyZSmlfeihXsl9QlXmZmnKlQLXQ+z/xqpPdynqk4ODM9Be3V7ycj7PsOOiOlSI6W45rHg3iV3sNDXc24c672oJb8FDqY4g+Ugn8EG04UjhJkFKwE5a7Ijcy0RggQ4SyZ+INg60H7Lm5CY/aWUxjTq7GFFsFYne/dyDBhoKlmunIA9yS3EcmKCqg7k2deaE34xav18amHTs8T+JpUGVM5F+rU4gRvJ6FMqgMuPun4zWGJKJe90OPEOuwhSKDnH+OBAIrkVxPGtJKbx/HEXln41V7SbqoI5U1exZWz11miCuKJG+WciRuEWyi5ZCfcr8Dzw==
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BL1PR12MB5304.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230016)(4636009)(396003)(39860400002)(346002)(376002)(136003)(366004)(6916009)(54906003)(478600001)(6486002)(6666004)(2906002)(316002)(41300700001)(5660300002)(30864003)(8676002)(66946007)(4326008)(66476007)(7416002)(66556008)(8936002)(86362001)(83380400001)(31696002)(55236004)(6512007)(2616005)(36756003)(186003)(31686004)(38100700002)(26005)(53546011)(6506007)(45980500001)(43740500002);DIR:OUT;SFP:1101;
+X-Microsoft-Antispam-Message-Info: SZ71P4njeNOwMuQCK8udkzGnrs4jK47l58HrMXEpYzhXUspWepzhixYjo5b8lzPAPcB7sH1e07qgvpxLHa3gfYDDkMjygBWTLk8/L+3gTpBEYoIh32zTIt5em/UcggX3AyQi7ND14femlQwFFm7ETrwKVhLfTCHlTfz4YArgHIHOxvPsI1xkU6W76RqCzIANZySgEqTSGNLgdM0ehNayYs+oZ6abCbmjxmb/MRCAt97c0aeP2qqCgXkBa8dc2oB5hZhk0i3jOCzTJMbGhax9TlEZWIx+0OL6oVIqEAxum+WQwMPRLORdD3HNjMmjT1HAWhs9hwp1PE8FRQPB6whknokkvQ7+/9ez/uG29aJDJro3IZllpw5StUPiGbycQR2iyc4EjqzfiJw9stT6XheqZFn/15aqWBCxLLPHPgCQb5+4n4D5SYkbTgBP8ydBReVPzG5X9G5Qi3apbtHGsTUrgXn5wDX1urG15sknifMcnCX4HzmgrU1Bcb2xlpju5ZnR/YNMqIXasqt/ngPGkH9Y7er6z0fWRR/Mu1LJiQwl8xfuVj0PhV96I4fCWlsCyRcp7RlPA0jJyuU1Jm40XGpgvvld3G1qavSrXhv6HxJ5Rc2XDkFZf/zvLGaZKfJWXtwaLjtWhqV0GU8J4L/pzGmtL2nOQc6a1BEtRvMNlHNpSW294+IzQe2hrENColocSG0PhizJyi37FT+RkhbJzdPqUmHC8uB85Q6+ubHkS1LJOeR27Cy5xLauX7Z8FlkrhY2SFdVnFAp5zpuXcXWl6WbGkrTt8/RmCbJwGM81d53dcjxpCmaJFkhpTZ8IATFh3mVZz+ZY+VjjQz8LNXwkAQfqOwnRNT0SfBeYuHokekiO1Co=
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CY4PR1201MB0181.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230016)(4636009)(376002)(346002)(396003)(39860400002)(136003)(366004)(7406005)(966005)(478600001)(316002)(7416002)(6486002)(8936002)(5660300002)(66476007)(66556008)(66946007)(8676002)(6506007)(4326008)(6512007)(26005)(6666004)(86362001)(2906002)(36756003)(6916009)(31696002)(54906003)(38100700002)(41300700001)(2616005)(186003)(83380400001)(31686004)(43740500002)(45980500001);DIR:OUT;SFP:1101;
 X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?VldqUitKWFZUWVd2L3F0aUFPc2U4Ny9WVVlTeGdJeVpsdXU5RGU1NkZ0RHB6?=
- =?utf-8?B?dUxyZVBVK3NpZHNQZFR2dHcxS0V1VjE3TnhsT20vOVd4V3pHYmZoQ0d1dHEx?=
- =?utf-8?B?eS80c1VCN3lrL05JQjFJb0EwdVJxcC9oUnE1RHYwaXdmMVJFK2lYOU05d0RT?=
- =?utf-8?B?azRoNUFNekxRdzltallnbXV4RlFOTFJ6d0U5V3lrVkduVEJEdnAwWGxOb2xx?=
- =?utf-8?B?Sm9hWFNyT0tmeTV1eUEyb2NJV1JPRUpaWnFONHdoQWtXU2RHUXJScHlSRzE4?=
- =?utf-8?B?ZmdCVzBNYnQ0QkRXWXUxb0tMRUs0UjlPc21uOHdzRUhqZCtDMGwvY2ttNzVi?=
- =?utf-8?B?RW1vd29JbWs3aWkxWWQ1ZjMyTFhNcTdPUzNFUExJL1p2YWpyYzJTSUQyb2pT?=
- =?utf-8?B?OHNEZTc0ekdDakcvZHNoblJTV2g2eTJxRGFMeWRtSVVLWGw5ZzhGRWpsckkx?=
- =?utf-8?B?NTdQaGxYUGtZL2xZRzFQOFl0Yms5ZlFLWGxjbm12b0kraUdkSG1xaWxBWDJu?=
- =?utf-8?B?ck1xQlBHbW1SN0U0azNuQTdkSEswQmladmdrL3duNEEzcUZ1bGthN1VyQlBF?=
- =?utf-8?B?Y2x3Q3VObk5jRE5rN3pETXhUdHRvbWxaTjdsQWhkL0dTcjJna0N6L2xYcSs5?=
- =?utf-8?B?bkJEc2JpYVhKYm5NWks5VVNnR0lqS3dIai9udkFIdUt2ZlJoc3lEQUVId05l?=
- =?utf-8?B?NXBVdWxBZ3pqeklxZGRHYzQxbFp5Y21UZVBtdVhEUXFMc3dVQnk3N1AvUURx?=
- =?utf-8?B?NCtqRUwzcVpJa01abHgzS3hnOFlBRzhvUzlCM3VSZE9GeUhmQ1JEdG1nMWdo?=
- =?utf-8?B?VGRvU01mTlNsZVRpWUJJUUhlYnIvdUhMUGtxTzZsa3hPT2xoWDljaDNpRXpI?=
- =?utf-8?B?Q1dOL1FZK3dJeC92QUVPdVRNYnF0aHk0UGpCcFQvL0FycytkZTh2KzhGamcx?=
- =?utf-8?B?ZVlIK2h5UHJCRDU2S0lXQTZmajlHb25kUUV1RU1zczNNT1p5bjNVSk0vbFhP?=
- =?utf-8?B?YjdiVFZzNTQxREU3bW5ISlRWbXUzcHdxMGo5cHQzWkI2SWdBWVFQT3JxcDFY?=
- =?utf-8?B?OThwbmx6Z0NMenhyK1JyaXVUNFNLaDJ4bWxaeVdNZmZaeGw3SWFFdWhHaXJS?=
- =?utf-8?B?dXBJZkRDUHF1TnFPOFVnM2w5N2orTnhIc1hiVzI3RERDUGRiMnUreGN1a2Jm?=
- =?utf-8?B?ZC84QllIai8rL0psbzYzWTBtMXNNNm03L2h4YllTbFhZNW0vL1RTMmljTCts?=
- =?utf-8?B?ejlNRjZRRjBiZVNZRGYwV3hZdmxSdXlNOU5aLzlsM01xcmczOTdmeTZlREM5?=
- =?utf-8?B?QTJEU0EwOGxLcEUzYk14RUZuMlRHd3locFlFU1B0Q05tM3QydXhOdmhEdy9r?=
- =?utf-8?B?V1BMU2p6WVVMR2dJN0pLeW44anZzVzVoZHd0d3FYOWV5eG9DTFNIcWFQdCtW?=
- =?utf-8?B?S1RtM2xlY3ByTHpKWmw4UCtrNWxTUWFyY3U4TE9aRVFqQTJSamIrYWpISUVS?=
- =?utf-8?B?aCtXRWhtVUVGZnp4ald5VHR2TkZucElFbjh6VElvaUFMZmFRREVWdUtYZ0xr?=
- =?utf-8?B?Ui9xaG53MklEb2pFTmp1ejNKTXZ6MU1WOHd2aEova1o3K3AzcDMrNDRzZm43?=
- =?utf-8?B?Q0NlczNzenFVVjFGMW00NjdPaDI1VzIxS1U1WVB6RVRtYUl5czJ2U2szZEVs?=
- =?utf-8?B?NWlaVCsyVDM3OVp5dUlIazAzVTExWWlCdWI2RXVJK25qTURFckdHY1dUdnFH?=
- =?utf-8?B?cDlaL3BpRmpyMVVpR0wrd0t4K3VqU0NzVUJUQjUyWVVxK1Q5NVlLQU45Tk1q?=
- =?utf-8?B?Z3IrdjJoZTVrb1FvcFdjZG5HQzZLQ2c1MC9aczhBN1Y0bHNjcEw2aTZxcTc4?=
- =?utf-8?B?cUt5SmN3SXM2NkpuTEdkMlRhQmxQQlpCNkMySVZaRkhjNzE2NXV4WktLenFL?=
- =?utf-8?B?ZGQrT3ZBaHFscnJOSFA4R05sZklUU1VtSGtMeUFKMlhKZ25SOWJpU2IwTkJx?=
- =?utf-8?B?dW5vUkpFWCtRbVNMcElBbzRVbUJzendSSldzTjhadWJ5WXJZUVlmbXN0ZHBi?=
- =?utf-8?B?TWtBNHdiMFZhVDhtN045QTc1SGRyNDNJMk43K2ZyMnlTaUpUamlSRXFzdWN3?=
- =?utf-8?Q?TumMNObruSd3bzeZiyCYMREJD?=
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 4a09f2ad-a6fd-47e4-14b8-08da6e4cbd3d
-X-MS-Exchange-CrossTenant-AuthSource: BL1PR12MB5304.namprd12.prod.outlook.com
+X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?djR0bXRNRFFnaytkZGpOcnN3emxLRy9Xam5CU1MwalJ3ZC9ubEtxRVZDRVRM?=
+ =?utf-8?B?a1grQmVwWWtXb1JmeWM3OTVYYnhaaEJkU3RlS0pGMDdXYWZHVzBKOHhzQU5z?=
+ =?utf-8?B?V3hTdk9RMEhMa0xpVVhieUc5dVBlaDFVUGxoNWtvRFI4cHE1VDlnaVJWYTJO?=
+ =?utf-8?B?TjUySVBGR0grMkNKUmVadTl3eEdXMmgxMFVLZFFiZFhsZ0ozWndleWhQQmhB?=
+ =?utf-8?B?alZYSGhpTDJMVzZVaGRGMnlHZkJSM2Jqd3phSEIwM0ZXYnhBYnR3WURDUG9r?=
+ =?utf-8?B?czdsNjh6YjJMcFduMkJGTDNScUdlZ29jdUZkV1ZEUVdEcjRId1gyZEZ2ZEV3?=
+ =?utf-8?B?OVh4ZkJQRDRYK2x4Y1VWV3ZpcWhZSzVPaXpNRDBFUkRkNmhkeTJZNk95V3pt?=
+ =?utf-8?B?V2lTYkRuVHlmNHV0SWlucFdBWW04RFFXd2c5TXh3TVlIR3dKWk1nWmRBTzNp?=
+ =?utf-8?B?L2RuM1FRRWwxckFwMVRTanNVVGJTTWZvVnJrcHJ1N1BzSk50cC8wekhmM3BU?=
+ =?utf-8?B?ZGt3aW1LWnBLMVRTWXZUR1plaFhWSEw0YkxjNUQvS0FGYlRxclNmSmZENGts?=
+ =?utf-8?B?SmttcE9CNjA3VlViYjlPZ2tzM2FaSTBNWGVQSk1VYmRIbzhnWktMdkw4bzhu?=
+ =?utf-8?B?VFBvK3FiVU8vZ0Z6aFVFaGFaWVdScmowQXNENmtpWHplaEthQjh6d1FJemEv?=
+ =?utf-8?B?RkZSZXZDL05qNncxVVF2R3dJTG55USt2NERQblZLazZ5QndFQlZaMnRqNFhR?=
+ =?utf-8?B?MEd1WkR1YUhxMCtJS2hkNUF5a3dZWVhudkRuZ3pjemhyd2pkSmpFQTBxVFdB?=
+ =?utf-8?B?MEErbXEvOEppc3ZZNEFsSUExWkZDa3FLV25Zd1BFWlRwNjVnRzBKWXQ0SHo1?=
+ =?utf-8?B?YSt2TDBoY1F4MWt3eHFpTzBRNmdmczVXWW5xYmRxZjVGR3NuSGovOFNka0F4?=
+ =?utf-8?B?WW9xRFhZd1o1VndEZlF2Y09QLzhGc201U2FQMUszVHMxcUdGS0hkalN2YmhE?=
+ =?utf-8?B?SWJGcm02aFV1MmRlKzVqRGRmWmRjU3hKOUM1WGtXM2FrZUthSVAwdk9GNmp5?=
+ =?utf-8?B?cnUzZHBDdnUvdVVSQWNBVGt2RnZsRGhkYTFkRXdmbWYzdnQwRnhSYmwzUEtx?=
+ =?utf-8?B?NTNZdU9GanFrTS9Dd2ljbkkxcmlzN1d2bEFBTUlFR0M5M1VJNGFIYWxoMGlN?=
+ =?utf-8?B?cEsvcEVQZjhqblovWEYxcnRvMXJTVXdyVUJLYjI1Y0tlYk0wRHRiaFEveXlu?=
+ =?utf-8?B?UDZ1a3RwNURuTlBDbllRQ055ZEp4NU5qODQwSDZsa0ZOKzVwb0ZkL2tmWUxI?=
+ =?utf-8?B?TkRkR2trUzFVZnJPTHZPWVZlcUkvaGEwYVlheWtPdCtrSGNVQVNHb1ZneXNr?=
+ =?utf-8?B?d0FjYXl1MXpzdnBBcExjaUdmWHpTTWhYU3BDN1pCb2I1bWtYZi9oVWthTExI?=
+ =?utf-8?B?aGxMdU1sWCs5ZWtyeXNIRldjVjcxeVkzZEdoZVdsbm16V2ZjMWtRNXB0a2F5?=
+ =?utf-8?B?Nm5wa2Y5dnA5M3NqZXlQS2UzTjZBZm0zUkI4TXFFQjlhcDBnSjJxNHF0emov?=
+ =?utf-8?B?QWR0emtVOTYrOUNUcVlWbzcvVkJOYUJaMjZTWDRqTjBDeEJYMGczdGNQYmRk?=
+ =?utf-8?B?TldlbTduVW9vTzIvN2krK3hVU3dNOVkrTjN1VjNFUkhZQzBCVmJ4MVZMY2wz?=
+ =?utf-8?B?RTJ3SnNQemoxS0ZaMlJqWjBzWVFRYWdxZXVHaXEyVXNEamQvdkVMTEpmc0Jw?=
+ =?utf-8?B?TVFQU1FoczBtYkRGSGdvWEpsRUZ2cDV5dTNwMlh2U0ZWa1lpOTJSOWE4YjRS?=
+ =?utf-8?B?aVR4STI2OFdIWlRtNnJlMWRPWFdscmtWejRoTDA5VHdYbzhQNEkrOUNqRFQ1?=
+ =?utf-8?B?SlY2UXQ0d2VkNWpQcGpWZWZGVVlHZ294M3dyakR1aG9BeklIUjFhNmJrUCt0?=
+ =?utf-8?B?TEtCS2d2VVBFaFpHMXA3MTV4NFU4WEF1aGgzT0VPaDBCL0kwYkZRZUR2ZFBv?=
+ =?utf-8?B?dXpmRWVXSFVyNFhDTUNQZW91SlRNaDIvUTBHVTFLSGprQzFTcFVQci9BWTMw?=
+ =?utf-8?B?WDFuS1lQSzgxMG9GRGRPRWpPbG0zeFBjMTlwbTBMZlZYa3lOTk5yUGtoeitq?=
+ =?utf-8?Q?rLxJ/tjtpzzzPm6nO3C47tiBj?=
+X-OriginatorOrg: amd.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 66a760a8-4a1d-4fba-18c5-08da6e4cf08f
+X-MS-Exchange-CrossTenant-AuthSource: CY4PR1201MB0181.namprd12.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 25 Jul 2022 14:48:30.1250
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 25 Jul 2022 14:49:56.1950
  (UTC)
 X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
 X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: Ma4yl++ytzcE0YfIKpv4xmWKozi2t1R5HoIJBP6qKR5kvJWSs4gdo8MViEZEN+ztnRLKhIKFIGJIAnCbNefS6w==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: MWHPR1201MB0094
-X-Spam-Status: No, score=-1.7 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FORGED_SPF_HELO,
-        NICE_REPLY_A,RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,
-        SPF_NONE autolearn=no autolearn_force=no version=3.4.6
+X-MS-Exchange-CrossTenant-UserPrincipalName: 5uVwNMu6qP6o72b4bf3u4HzMIDGL7TYa8SDu9w6RPOAfY22q6RG+HuVa4T0orWjWK5nu9IZmh+lZkb3/XdmOxA==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM6PR12MB3706
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_DNSWL_NONE,
+        RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_PASS autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 7/22/2022 4:04 AM, Alex Williamson wrote:
-> On Tue, 19 Jul 2022 17:45:22 +0530
-> Abhishek Sahu <abhsahu@nvidia.com> wrote:
-> 
->> Currently, if the runtime power management is enabled for vfio-pci
->> based devices in the guest OS, then the guest OS will do the register
->> write for PCI_PM_CTRL register. This write request will be handled in
->> vfio_pm_config_write() where it will do the actual register write of
->> PCI_PM_CTRL register. With this, the maximum D3hot state can be
->> achieved for low power. If we can use the runtime PM framework, then
->> we can achieve the D3cold state (on the supported systems) which will
->> help in saving maximum power.
->>
->> 1. D3cold state can't be achieved by writing PCI standard
->>    PM config registers. This patch implements the following
->>    newly added low power related device features:
->>     - VFIO_DEVICE_FEATURE_LOW_POWER_ENTRY
->>     - VFIO_DEVICE_FEATURE_LOW_POWER_EXIT
->>
->>    The VFIO_DEVICE_FEATURE_LOW_POWER_ENTRY will move the device into
->>    the low power state, and the VFIO_DEVICE_FEATURE_LOW_POWER_EXIT
->>    will move the device out of the low power state.
-> 
-> Isn't this really:
-> 
-> 	The VFIO_DEVICE_FEATURE_LOW_POWER_ENTRY feature will allow the
-> 	device to make use of low power platform states on the host
-> 	while the VFIO_DEVICE_FEATURE_LOW_POWER_EXIT will prevent
-> 	further use of those power states.
-> 
-> ie. we can't make the device move to low power and every ioctl/access
-> will make it exit, it's more about allowing/preventing use of those
-> platform provided low power states.
-> 
 
- Thanks Alex.
- Yes. I will update this.
+>>>> Normally, a write to unallocated space of a file or the hole of a sparse
+>>>> file automatically causes space allocation, for memfd, this equals to
+>>>> memory allocation. This new seal prevents such automatically allocating,
+>>>> either this is from a direct write() or a write on the previously
+>>>> mmap-ed area. The seal does not prevent fallocate() so an explicit
+>>>> fallocate() can still cause allocating and can be used to reserve
+>>>> memory.
+>>>>
+>>>> This is used to prevent unintentional allocation from userspace on a
+>>>> stray or careless write and any intentional allocation should use an
+>>>> explicit fallocate(). One of the main usecases is to avoid memory double
+>>>> allocation for confidential computing usage where we use two memfds to
+>>>> back guest memory and at a single point only one memfd is alive and we
+>>>> want to prevent memory allocation for the other memfd which may have
+>>>> been mmap-ed previously. More discussion can be found at:
+>>>>
+>>>>     https://lkml.org/lkml/2022/6/14/1255
+>>>>
+>>>> Suggested-by: Sean Christopherson <seanjc@google.com>
+>>>> Signed-off-by: Chao Peng <chao.p.peng@linux.intel.com>
+>>>> ---
+>>>>    include/uapi/linux/fcntl.h |  1 +
+>>>>    mm/memfd.c                 |  3 ++-
+>>>>    mm/shmem.c                 | 16 ++++++++++++++--
+>>>>    3 files changed, 17 insertions(+), 3 deletions(-)
+>>>>
+>>>> diff --git a/include/uapi/linux/fcntl.h b/include/uapi/linux/fcntl.h
+>>>> index 2f86b2ad6d7e..98bdabc8e309 100644
+>>>> --- a/include/uapi/linux/fcntl.h
+>>>> +++ b/include/uapi/linux/fcntl.h
+>>>> @@ -43,6 +43,7 @@
+>>>>    #define F_SEAL_GROW	0x0004	/* prevent file from growing */
+>>>>    #define F_SEAL_WRITE	0x0008	/* prevent writes */
+>>>>    #define F_SEAL_FUTURE_WRITE	0x0010  /* prevent future writes while mapped */
+>>>> +#define F_SEAL_AUTO_ALLOCATE	0x0020  /* prevent allocation for writes */
+>>>
+>>> Why only "on writes" and not "on reads". IIRC, shmem doesn't support the
+>>> shared zeropage, so you'll simply allocate a new page via read() or on
+>>> read faults.
+>>>
+>>>
+>>> Also, I *think* you can place pages via userfaultfd into shmem. Not sure
+>>> if that would count "auto alloc", but it would certainly bypass fallocate().
+>>
+>> I was also thinking this at the same time, but for different reason:
+>>
+>> "Want to populate private preboot memory with firmware payload", so was
+>> thinking userfaulftd could be an option as direct writes are restricted?
+> 
+> If that can be a side effect, I definitely glad to see it, though I'm
+> still not clear how userfaultfd can be particularly helpful for that.
 
->>
->> 2. The vfio-pci driver uses runtime PM framework for low power entry and
->>    exit. On the platforms where D3cold state is supported, the runtime
->>    PM framework will put the device into D3cold otherwise, D3hot or some
->>    other power state will be used. If the user has explicitly disabled
->>    runtime PM for the device, then the device will be in the power state
->>    configured by the guest OS through PCI_PM_CTRL.
-> 
-> This is talking about disabling runtime PM support for a device on the
-> host precluding this interface from allowing the device to enter
-> platform defined low power states, right?
-> 
- 
- Yes. It is on the host side.
- I will update this to include the host term to make this clear.
- Also, there are more cases where device won't go into runtime
- suspended state which you mentioned in the first patch (the dependent
- devices preventing the runtime suspend or user keeps the device busy).
- I will add that as well. In all these cases, the device will be in
- active state.
+Was thinking if we can use userfaultfd to monitor the pagefault on 
+virtual firmware memory range and use to populate the private memory.
 
->> 3. The hypervisors can implement virtual ACPI methods. For example,
->>    in guest linux OS if PCI device ACPI node has _PR3 and _PR0 power
->>    resources with _ON/_OFF method, then guest linux OS invokes
->>    the _OFF method during D3cold transition and then _ON during D0
->>    transition. The hypervisor can tap these virtual ACPI calls and then
->>    call the low power device feature IOCTL.
->>
->> 4. The 'pm_runtime_engaged' flag tracks the entry and exit to
->>    runtime PM. This flag is protected with 'memory_lock' semaphore.
->>
->> 5. All the config and other region access are wrapped under
->>    pm_runtime_resume_and_get() and pm_runtime_put(). So, if any
->>    device access happens while the device is in the runtime suspended
->>    state, then the device will be resumed first before access. Once the
->>    access has been finished, then the device will again go into the
->>    runtime suspended state.
->>
->> 6. The memory region access through mmap will not be allowed in the low
->>    power state. Since __vfio_pci_memory_enabled() is a common function,
->>    so check for 'pm_runtime_engaged' has been added explicitly in
->>    vfio_pci_mmap_fault() to block only mmap'ed access.
->>
->> Signed-off-by: Abhishek Sahu <abhsahu@nvidia.com>
->> ---
->>  drivers/vfio/pci/vfio_pci_core.c | 151 +++++++++++++++++++++++++++++--
->>  include/linux/vfio_pci_core.h    |   1 +
->>  2 files changed, 144 insertions(+), 8 deletions(-)
->>
->> diff --git a/drivers/vfio/pci/vfio_pci_core.c b/drivers/vfio/pci/vfio_pci_core.c
->> index 9517645acfa6..726a6f282496 100644
->> --- a/drivers/vfio/pci/vfio_pci_core.c
->> +++ b/drivers/vfio/pci/vfio_pci_core.c
->> @@ -259,11 +259,98 @@ int vfio_pci_set_power_state(struct vfio_pci_core_device *vdev, pci_power_t stat
->>  	return ret;
->>  }
->>  
->> +static int vfio_pci_runtime_pm_entry(struct vfio_pci_core_device *vdev)
->> +{
->> +	/*
->> +	 * The vdev power related flags are protected with 'memory_lock'
->> +	 * semaphore.
->> +	 */
->> +	vfio_pci_zap_and_down_write_memory_lock(vdev);
->> +	if (vdev->pm_runtime_engaged) {
->> +		up_write(&vdev->memory_lock);
->> +		return -EINVAL;
->> +	}
-> 
-> Awkward that we zap memory for the error path here, but optimizing
-> performance for a user that can't remember they've already activated
-> low power for a device doesn't seem like a priority ;)
-> 
->> +
->> +	vdev->pm_runtime_engaged = true;
->> +	pm_runtime_put_noidle(&vdev->pdev->dev);
->> +	up_write(&vdev->memory_lock);
->> +
->> +	return 0;
->> +}
->> +
->> +static int vfio_pci_core_pm_entry(struct vfio_device *device, u32 flags,
->> +				  void __user *arg, size_t argsz)
->> +{
->> +	struct vfio_pci_core_device *vdev =
->> +		container_of(device, struct vfio_pci_core_device, vdev);
->> +	int ret;
->> +
->> +	ret = vfio_check_feature(flags, argsz, VFIO_DEVICE_FEATURE_SET, 0);
->> +	if (ret != 1)
->> +		return ret;
->> +
->> +	/*
->> +	 * Inside vfio_pci_runtime_pm_entry(), only the runtime PM usage count
->> +	 * will be decremented. The pm_runtime_put() will be invoked again
->> +	 * while returning from the ioctl and then the device can go into
->> +	 * runtime suspended state.
->> +	 */
->> +	return vfio_pci_runtime_pm_entry(vdev);
->> +}
->> +
->> +static void vfio_pci_runtime_pm_exit(struct vfio_pci_core_device *vdev)
->> +{
->> +	/*
->> +	 * The vdev power related flags are protected with 'memory_lock'
->> +	 * semaphore.
->> +	 */
->> +	down_write(&vdev->memory_lock);
->> +	if (vdev->pm_runtime_engaged) {
->> +		vdev->pm_runtime_engaged = false;
->> +		pm_runtime_get_noresume(&vdev->pdev->dev);
->> +	}
->> +
->> +	up_write(&vdev->memory_lock);
->> +}
->> +
->> +static int vfio_pci_core_pm_exit(struct vfio_device *device, u32 flags,
->> +				 void __user *arg, size_t argsz)
->> +{
->> +	struct vfio_pci_core_device *vdev =
->> +		container_of(device, struct vfio_pci_core_device, vdev);
->> +	int ret;
->> +
->> +	ret = vfio_check_feature(flags, argsz, VFIO_DEVICE_FEATURE_SET, 0);
->> +	if (ret != 1)
->> +		return ret;
->> +
->> +	/*
->> +	 * The device should already be resumed by the vfio core layer.
->> +	 * vfio_pci_runtime_pm_exit() will internally increment the usage
->> +	 * count corresponding to pm_runtime_put() called during low power
->> +	 * feature entry.
->> +	 */
->> +	vfio_pci_runtime_pm_exit(vdev);
->> +	return 0;
->> +}
->> +
->>  #ifdef CONFIG_PM
->>  static int vfio_pci_core_runtime_suspend(struct device *dev)
->>  {
->>  	struct vfio_pci_core_device *vdev = dev_get_drvdata(dev);
->>  
->> +	down_write(&vdev->memory_lock);
->> +	/*
->> +	 * The user can move the device into D3hot state before invoking
->> +	 * power management IOCTL. Move the device into D0 state here and then
->> +	 * the pci-driver core runtime PM suspend function will move the device
->> +	 * into the low power state. Also, for the devices which have
->> +	 * NoSoftRst-, it will help in restoring the original state
->> +	 * (saved locally in 'vdev->pm_save').
->> +	 */
->> +	vfio_pci_set_power_state(vdev, PCI_D0);
->> +	up_write(&vdev->memory_lock);
->> +
->>  	/*
->>  	 * If INTx is enabled, then mask INTx before going into the runtime
->>  	 * suspended state and unmask the same in the runtime resume.
->> @@ -393,6 +480,18 @@ void vfio_pci_core_disable(struct vfio_pci_core_device *vdev)
->>  
->>  	/*
->>  	 * This function can be invoked while the power state is non-D0.
->> +	 * This non-D0 power state can be with or without runtime PM.
->> +	 * vfio_pci_runtime_pm_exit() will internally increment the usage
->> +	 * count corresponding to pm_runtime_put() called during low power
->> +	 * feature entry and then pm_runtime_resume() will wake up the device,
->> +	 * if the device has already gone into the suspended state. Otherwise,
->> +	 * the vfio_pci_set_power_state() will change the device power state
->> +	 * to D0.
->> +	 */
->> +	vfio_pci_runtime_pm_exit(vdev);
->> +	pm_runtime_resume(&pdev->dev);
->> +
->> +	/*
->>  	 * This function calls __pci_reset_function_locked() which internally
->>  	 * can use pci_pm_reset() for the function reset. pci_pm_reset() will
->>  	 * fail if the power state is non-D0. Also, for the devices which
->> @@ -1224,6 +1323,10 @@ int vfio_pci_core_ioctl_feature(struct vfio_device *device, u32 flags,
->>  	switch (flags & VFIO_DEVICE_FEATURE_MASK) {
->>  	case VFIO_DEVICE_FEATURE_PCI_VF_TOKEN:
->>  		return vfio_pci_core_feature_token(device, flags, arg, argsz);
->> +	case VFIO_DEVICE_FEATURE_LOW_POWER_ENTRY:
->> +		return vfio_pci_core_pm_entry(device, flags, arg, argsz);
->> +	case VFIO_DEVICE_FEATURE_LOW_POWER_EXIT:
->> +		return vfio_pci_core_pm_exit(device, flags, arg, argsz);
->>  	default:
->>  		return -ENOTTY;
->>  	}
->> @@ -1234,31 +1337,47 @@ static ssize_t vfio_pci_rw(struct vfio_pci_core_device *vdev, char __user *buf,
->>  			   size_t count, loff_t *ppos, bool iswrite)
->>  {
->>  	unsigned int index = VFIO_PCI_OFFSET_TO_INDEX(*ppos);
->> +	int ret;
->>  
->>  	if (index >= VFIO_PCI_NUM_REGIONS + vdev->num_regions)
->>  		return -EINVAL;
->>  
->> +	ret = pm_runtime_resume_and_get(&vdev->pdev->dev);
->> +	if (ret < 0) {
-> 
-> if (ret) {
-> 
-> Thanks,
-> Alex
-> 
- 
- I will fix this.
- 
- Thanks,
- Abhishek
+Not sure if it is a side effect. Was just theoretically thinking (for 
+now kept the idea aside as these enhancements can be worked later).
 
->> +		pci_info_ratelimited(vdev->pdev, "runtime resume failed %d\n",
->> +				     ret);
->> +		return -EIO;
->> +	}
->> +
->>  	switch (index) {
->>  	case VFIO_PCI_CONFIG_REGION_INDEX:
->> -		return vfio_pci_config_rw(vdev, buf, count, ppos, iswrite);
->> +		ret = vfio_pci_config_rw(vdev, buf, count, ppos, iswrite);
->> +		break;
->>  
->>  	case VFIO_PCI_ROM_REGION_INDEX:
->>  		if (iswrite)
->> -			return -EINVAL;
->> -		return vfio_pci_bar_rw(vdev, buf, count, ppos, false);
->> +			ret = -EINVAL;
->> +		else
->> +			ret = vfio_pci_bar_rw(vdev, buf, count, ppos, false);
->> +		break;
->>  
->>  	case VFIO_PCI_BAR0_REGION_INDEX ... VFIO_PCI_BAR5_REGION_INDEX:
->> -		return vfio_pci_bar_rw(vdev, buf, count, ppos, iswrite);
->> +		ret = vfio_pci_bar_rw(vdev, buf, count, ppos, iswrite);
->> +		break;
->>  
->>  	case VFIO_PCI_VGA_REGION_INDEX:
->> -		return vfio_pci_vga_rw(vdev, buf, count, ppos, iswrite);
->> +		ret = vfio_pci_vga_rw(vdev, buf, count, ppos, iswrite);
->> +		break;
->> +
->>  	default:
->>  		index -= VFIO_PCI_NUM_REGIONS;
->> -		return vdev->region[index].ops->rw(vdev, buf,
->> +		ret = vdev->region[index].ops->rw(vdev, buf,
->>  						   count, ppos, iswrite);
->> +		break;
->>  	}
->>  
->> -	return -EINVAL;
->> +	pm_runtime_put(&vdev->pdev->dev);
->> +	return ret;
->>  }
->>  
->>  ssize_t vfio_pci_core_read(struct vfio_device *core_vdev, char __user *buf,
->> @@ -1453,7 +1572,11 @@ static vm_fault_t vfio_pci_mmap_fault(struct vm_fault *vmf)
->>  	mutex_lock(&vdev->vma_lock);
->>  	down_read(&vdev->memory_lock);
->>  
->> -	if (!__vfio_pci_memory_enabled(vdev)) {
->> +	/*
->> +	 * Memory region cannot be accessed if the low power feature is engaged
->> +	 * or memory access is disabled.
->> +	 */
->> +	if (vdev->pm_runtime_engaged || !__vfio_pci_memory_enabled(vdev)) {
->>  		ret = VM_FAULT_SIGBUS;
->>  		goto up_out;
->>  	}
->> @@ -2164,6 +2287,15 @@ static int vfio_pci_dev_set_hot_reset(struct vfio_device_set *dev_set,
->>  		goto err_unlock;
->>  	}
->>  
->> +	/*
->> +	 * Some of the devices in the dev_set can be in the runtime suspended
->> +	 * state. Increment the usage count for all the devices in the dev_set
->> +	 * before reset and decrement the same after reset.
->> +	 */
->> +	ret = vfio_pci_dev_set_pm_runtime_get(dev_set);
->> +	if (ret)
->> +		goto err_unlock;
->> +
->>  	list_for_each_entry(cur_vma, &dev_set->device_list, vdev.dev_set_list) {
->>  		/*
->>  		 * Test whether all the affected devices are contained by the
->> @@ -2219,6 +2351,9 @@ static int vfio_pci_dev_set_hot_reset(struct vfio_device_set *dev_set,
->>  		else
->>  			mutex_unlock(&cur->vma_lock);
->>  	}
->> +
->> +	list_for_each_entry(cur, &dev_set->device_list, vdev.dev_set_list)
->> +		pm_runtime_put(&cur->pdev->dev);
->>  err_unlock:
->>  	mutex_unlock(&dev_set->lock);
->>  	return ret;
->> diff --git a/include/linux/vfio_pci_core.h b/include/linux/vfio_pci_core.h
->> index e96cc3081236..7ec81271bd05 100644
->> --- a/include/linux/vfio_pci_core.h
->> +++ b/include/linux/vfio_pci_core.h
->> @@ -125,6 +125,7 @@ struct vfio_pci_core_device {
->>  	bool			nointx;
->>  	bool			needs_pm_restore;
->>  	bool			pm_intx_masked;
->> +	bool			pm_runtime_engaged;
->>  	struct pci_saved_state	*pci_saved_state;
->>  	struct pci_saved_state	*pm_save;
->>  	int			ioeventfds_nr;
-> 
+Thanks,
+Pankaj
 
