@@ -2,88 +2,87 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id AB07B57FFBC
-	for <lists+kvm@lfdr.de>; Mon, 25 Jul 2022 15:24:47 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 18FF358001E
+	for <lists+kvm@lfdr.de>; Mon, 25 Jul 2022 15:47:17 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235437AbiGYNYo (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 25 Jul 2022 09:24:44 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48054 "EHLO
+        id S235020AbiGYNrP (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 25 Jul 2022 09:47:15 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33364 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232494AbiGYNYn (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 25 Jul 2022 09:24:43 -0400
-Received: from mail.skyhub.de (mail.skyhub.de [5.9.137.197])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 359A813CCE;
-        Mon, 25 Jul 2022 06:24:42 -0700 (PDT)
-Received: from zn.tnic (p200300ea972976f8329c23fffea6a903.dip0.t-ipconnect.de [IPv6:2003:ea:9729:76f8:329c:23ff:fea6:a903])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by mail.skyhub.de (SuperMail on ZX Spectrum 128k) with ESMTPSA id B0B301EC067C;
-        Mon, 25 Jul 2022 15:24:36 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alien8.de; s=dkim;
-        t=1658755476;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:in-reply-to:in-reply-to:  references:references;
-        bh=6AT8Zd6HwL3AiZs+hVZ03j4gMl4EdeI7g5LHD0WVY6c=;
-        b=reBNqb8TBfK88JijG2GZF3ExFDhuXvx6UCJ+L4ncIaQQMbNHAnw46ziQDqR027wg/Pf545
-        gHmETb4hT1AQSnH+5tSTjZoNfWdm1nfBkVX2XX488+Z84i2aM4CdrsUtaA7n4u1Rx/f9vc
-        KB+srz/jIG2tKwpZor+3FWqijTbmBTc=
-Date:   Mon, 25 Jul 2022 15:24:31 +0200
-From:   Borislav Petkov <bp@alien8.de>
-To:     "Kalra, Ashish" <Ashish.Kalra@amd.com>
-Cc:     "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
-        "x86@kernel.org" <x86@kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "linux-coco@lists.linux.dev" <linux-coco@lists.linux.dev>,
-        "linux-mm@kvack.org" <linux-mm@kvack.org>,
-        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
-        "tglx@linutronix.de" <tglx@linutronix.de>,
-        "mingo@redhat.com" <mingo@redhat.com>,
-        "jroedel@suse.de" <jroedel@suse.de>,
-        "Lendacky, Thomas" <Thomas.Lendacky@amd.com>,
-        "hpa@zytor.com" <hpa@zytor.com>,
-        "ardb@kernel.org" <ardb@kernel.org>,
-        "pbonzini@redhat.com" <pbonzini@redhat.com>,
-        "seanjc@google.com" <seanjc@google.com>,
-        "vkuznets@redhat.com" <vkuznets@redhat.com>,
-        "jmattson@google.com" <jmattson@google.com>,
-        "luto@kernel.org" <luto@kernel.org>,
-        "dave.hansen@linux.intel.com" <dave.hansen@linux.intel.com>,
-        "slp@redhat.com" <slp@redhat.com>,
-        "pgonda@google.com" <pgonda@google.com>,
-        "peterz@infradead.org" <peterz@infradead.org>,
-        "srinivas.pandruvada@linux.intel.com" 
-        <srinivas.pandruvada@linux.intel.com>,
-        "rientjes@google.com" <rientjes@google.com>,
-        "dovmurik@linux.ibm.com" <dovmurik@linux.ibm.com>,
-        "tobin@ibm.com" <tobin@ibm.com>,
-        "Roth, Michael" <Michael.Roth@amd.com>,
-        "vbabka@suse.cz" <vbabka@suse.cz>,
-        "kirill@shutemov.name" <kirill@shutemov.name>,
-        "ak@linux.intel.com" <ak@linux.intel.com>,
-        "tony.luck@intel.com" <tony.luck@intel.com>,
-        "marcorr@google.com" <marcorr@google.com>,
-        "sathyanarayanan.kuppuswamy@linux.intel.com" 
-        <sathyanarayanan.kuppuswamy@linux.intel.com>,
-        "alpergun@google.com" <alpergun@google.com>,
-        "jarkko@kernel.org" <jarkko@kernel.org>
-Subject: Re: [PATCH Part2 v6 06/49] x86/sev: Add helper functions for
- RMPUPDATE and PSMASH instruction
-Message-ID: <Yt6ZjzCSqPv6BKfH@zn.tnic>
-References: <cover.1655761627.git.ashish.kalra@amd.com>
- <e4643e9d37fcb025d0aec9080feefaae5e9245d5.1655761627.git.ashish.kalra@amd.com>
- <YrH0ca3Sam7Ru11c@work-vm>
- <SN6PR12MB2767FBF0848B906B9F0284D28EB39@SN6PR12MB2767.namprd12.prod.outlook.com>
- <BYAPR12MB2759910E715C69D1027CCE678EB29@BYAPR12MB2759.namprd12.prod.outlook.com>
- <Yrrc/6x70wa14c5t@work-vm>
- <SN6PR12MB27677062FBBF9D62C7BF41D88EB89@SN6PR12MB2767.namprd12.prod.outlook.com>
+        with ESMTP id S234519AbiGYNrM (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 25 Jul 2022 09:47:12 -0400
+Received: from mga02.intel.com (mga02.intel.com [134.134.136.20])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B84E2F5B2;
+        Mon, 25 Jul 2022 06:47:11 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1658756831; x=1690292831;
+  h=date:from:to:cc:subject:message-id:reply-to:references:
+   mime-version:in-reply-to;
+  bh=Bdlz/iQMAncTEc31gSNH4MyviKpdF4xPNxVdJTjrNtE=;
+  b=jyN/Qt8oZ61OMT0b0U0mnnEakPBTAWBW9ROL5Qj4YTDFH9l2EgzmUoMx
+   mGz71MPcXmWxojD/4KFgXIHqNaHAGQQIW853CVEODOPb5H4XpIZEHdmky
+   IgwzodsJs56ayZ2MsLBwA7+sMyJOUqdbBuvL/Qw6w93f9xf8BsRljj6VO
+   ZIbAOn/trWBfhFNNEtOx+fbL3VOy575YHIrxesI8VaSfjssT2VgMO1Ly7
+   ga6j91+pIudRPtfWG/fduvEjc+h2qsKf623E6LemlrK6s5g0QbAQoaE05
+   pczw7liTC4e5nXyS9lKvncmenfCWYrZjd3gYDKkjH3rySv97QF4hxR4Vd
+   g==;
+X-IronPort-AV: E=McAfee;i="6400,9594,10418"; a="274565644"
+X-IronPort-AV: E=Sophos;i="5.93,193,1654585200"; 
+   d="scan'208";a="274565644"
+Received: from orsmga008.jf.intel.com ([10.7.209.65])
+  by orsmga101.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 25 Jul 2022 06:47:11 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.93,193,1654585200"; 
+   d="scan'208";a="627457285"
+Received: from chaop.bj.intel.com (HELO localhost) ([10.240.193.75])
+  by orsmga008.jf.intel.com with ESMTP; 25 Jul 2022 06:47:01 -0700
+Date:   Mon, 25 Jul 2022 21:42:12 +0800
+From:   Chao Peng <chao.p.peng@linux.intel.com>
+To:     David Hildenbrand <david@redhat.com>
+Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+        linux-mm@kvack.org, linux-fsdevel@vger.kernel.org,
+        linux-api@vger.kernel.org, linux-doc@vger.kernel.org,
+        qemu-devel@nongnu.org, linux-kselftest@vger.kernel.org,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Jonathan Corbet <corbet@lwn.net>,
+        Sean Christopherson <seanjc@google.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+        x86@kernel.org, "H . Peter Anvin" <hpa@zytor.com>,
+        Hugh Dickins <hughd@google.com>,
+        Jeff Layton <jlayton@kernel.org>,
+        "J . Bruce Fields" <bfields@fieldses.org>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        Shuah Khan <shuah@kernel.org>, Mike Rapoport <rppt@kernel.org>,
+        Steven Price <steven.price@arm.com>,
+        "Maciej S . Szmigiero" <mail@maciej.szmigiero.name>,
+        Vlastimil Babka <vbabka@suse.cz>,
+        Vishal Annapurve <vannapurve@google.com>,
+        Yu Zhang <yu.c.zhang@linux.intel.com>,
+        "Kirill A . Shutemov" <kirill.shutemov@linux.intel.com>,
+        luto@kernel.org, jun.nakajima@intel.com, dave.hansen@intel.com,
+        ak@linux.intel.com, aarcange@redhat.com, ddutile@redhat.com,
+        dhildenb@redhat.com, Quentin Perret <qperret@google.com>,
+        Michael Roth <michael.roth@amd.com>, mhocko@suse.com,
+        Muchun Song <songmuchun@bytedance.com>
+Subject: Re: [PATCH v7 01/14] mm: Add F_SEAL_AUTO_ALLOCATE seal to memfd
+Message-ID: <20220725134212.GB304216@chaop.bj.intel.com>
+Reply-To: Chao Peng <chao.p.peng@linux.intel.com>
+References: <20220706082016.2603916-1-chao.p.peng@linux.intel.com>
+ <20220706082016.2603916-2-chao.p.peng@linux.intel.com>
+ <f39c4f63-a511-4beb-b3a4-66589ddb5475@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <SN6PR12MB27677062FBBF9D62C7BF41D88EB89@SN6PR12MB2767.namprd12.prod.outlook.com>
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,SPF_HELO_NONE,SPF_PASS
+In-Reply-To: <f39c4f63-a511-4beb-b3a4-66589ddb5475@redhat.com>
+X-Spam-Status: No, score=-4.9 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
+        RCVD_IN_MSPIKE_H3,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE
         autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -91,22 +90,64 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Jun 28, 2022 at 05:57:41PM +0000, Kalra, Ashish wrote:
-> Yes, I will be adding a check for CPU family/model as following :
+On Thu, Jul 21, 2022 at 11:44:11AM +0200, David Hildenbrand wrote:
+> On 06.07.22 10:20, Chao Peng wrote:
+> > Normally, a write to unallocated space of a file or the hole of a sparse
+> > file automatically causes space allocation, for memfd, this equals to
+> > memory allocation. This new seal prevents such automatically allocating,
+> > either this is from a direct write() or a write on the previously
+> > mmap-ed area. The seal does not prevent fallocate() so an explicit
+> > fallocate() can still cause allocating and can be used to reserve
+> > memory.
+> > 
+> > This is used to prevent unintentional allocation from userspace on a
+> > stray or careless write and any intentional allocation should use an
+> > explicit fallocate(). One of the main usecases is to avoid memory double
+> > allocation for confidential computing usage where we use two memfds to
+> > back guest memory and at a single point only one memfd is alive and we
+> > want to prevent memory allocation for the other memfd which may have
+> > been mmap-ed previously. More discussion can be found at:
+> > 
+> >   https://lkml.org/lkml/2022/6/14/1255
+> > 
+> > Suggested-by: Sean Christopherson <seanjc@google.com>
+> > Signed-off-by: Chao Peng <chao.p.peng@linux.intel.com>
+> > ---
+> >  include/uapi/linux/fcntl.h |  1 +
+> >  mm/memfd.c                 |  3 ++-
+> >  mm/shmem.c                 | 16 ++++++++++++++--
+> >  3 files changed, 17 insertions(+), 3 deletions(-)
+> > 
+> > diff --git a/include/uapi/linux/fcntl.h b/include/uapi/linux/fcntl.h
+> > index 2f86b2ad6d7e..98bdabc8e309 100644
+> > --- a/include/uapi/linux/fcntl.h
+> > +++ b/include/uapi/linux/fcntl.h
+> > @@ -43,6 +43,7 @@
+> >  #define F_SEAL_GROW	0x0004	/* prevent file from growing */
+> >  #define F_SEAL_WRITE	0x0008	/* prevent writes */
+> >  #define F_SEAL_FUTURE_WRITE	0x0010  /* prevent future writes while mapped */
+> > +#define F_SEAL_AUTO_ALLOCATE	0x0020  /* prevent allocation for writes */
+> 
+> Why only "on writes" and not "on reads". IIRC, shmem doesn't support the
+> shared zeropage, so you'll simply allocate a new page via read() or on
+> read faults.
 
-Why if the PPR is already kinda spelling the already architectural
-pieces of the RMP entry?
+Right, it also prevents read faults.
 
-"In order to assist software" it says.
+> 
+> 
+> Also, I *think* you can place pages via userfaultfd into shmem. Not sure
+> if that would count "auto alloc", but it would certainly bypass fallocate().
 
-So you call the specified ones by their name and the rest is __rsvd.
+Userfaultfd sounds interesting, will further investigate it. But a rough
+look sounds it only faults to usrspace for write/read fault, not
+write()? Also sounds it operates on vma and userfaultfd_register() takes
+mmap_lock which is what we want to avoid for frequent
+register/unregister during private/shared memory conversion.
 
-No need for model checks at all.
-
-Right?
-
--- 
-Regards/Gruss,
-    Boris.
-
-https://people.kernel.org/tglx/notes-about-netiquette
+Chao
+> 
+> -- 
+> Thanks,
+> 
+> David / dhildenb
