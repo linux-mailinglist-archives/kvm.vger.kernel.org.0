@@ -2,93 +2,64 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 07BC7580273
-	for <lists+kvm@lfdr.de>; Mon, 25 Jul 2022 18:08:33 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id CB42E5802C9
+	for <lists+kvm@lfdr.de>; Mon, 25 Jul 2022 18:35:51 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234778AbiGYQIb (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 25 Jul 2022 12:08:31 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45652 "EHLO
+        id S236232AbiGYQfq (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 25 Jul 2022 12:35:46 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33722 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233511AbiGYQI3 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 25 Jul 2022 12:08:29 -0400
-Received: from mail-pj1-x1032.google.com (mail-pj1-x1032.google.com [IPv6:2607:f8b0:4864:20::1032])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8715C13DC4
-        for <kvm@vger.kernel.org>; Mon, 25 Jul 2022 09:08:27 -0700 (PDT)
-Received: by mail-pj1-x1032.google.com with SMTP id z1-20020a17090a170100b001f2e643b299so204349pjd.3
-        for <kvm@vger.kernel.org>; Mon, 25 Jul 2022 09:08:27 -0700 (PDT)
+        with ESMTP id S236153AbiGYQfn (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 25 Jul 2022 12:35:43 -0400
+Received: from mail-yw1-x114a.google.com (mail-yw1-x114a.google.com [IPv6:2607:f8b0:4864:20::114a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DEB7F1147D
+        for <kvm@vger.kernel.org>; Mon, 25 Jul 2022 09:35:42 -0700 (PDT)
+Received: by mail-yw1-x114a.google.com with SMTP id 00721157ae682-31f3959ba41so6993667b3.2
+        for <kvm@vger.kernel.org>; Mon, 25 Jul 2022 09:35:42 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:content-transfer-encoding:in-reply-to;
-        bh=FjmoqdU5kj6rAICx3+QzM5MmmkfRNlf/iMQ4fGtplDA=;
-        b=qPSXGfwvhrycsBQOp8iY52tnh1KgXSyBQB+dY2Cc2tVNhSXPKkg6St7J8kQhqlxsEa
-         03/RDkLPFIsTansQAXIAeanSealDnebMm5Rkdeor7AxexibjsXRGN73FxGe+80khHHPT
-         v8xnWy3f4sCauZhKga5d0yRHZMfto0sAsNxbMkAfxHPvxIQ0QMx7qXI5Yd72cemfFpCD
-         ub1xtP7DT0g4876OlkgQbiBkH+IA9KU4VYPyvaX+x4qSh+CKsdH1qu+6TICYYOcHbB97
-         U52lm5UEl9xUZTAXBGfNfpUs+Njp6xwD/4d+nSIA1+bpzWLsFtNt7MCE6xDG67zmiVWT
-         cQ2g==
+        h=date:message-id:mime-version:subject:from:to:cc;
+        bh=ksBrfdewc8P33kwHHKDSCCyl/DzIxhpSYohpoXierk4=;
+        b=ZC1bR9phtbNXEPryoyk1EkQ3bf9BMsQO/E+fcO1TftMoR8B9g+cZFlznv24JmUu/C0
+         2y0no+lbmVHb1kL1iY+mLTD+6eDi5s8t2Qro/wEBaVO9dvTy35UPq8ZQfoXE7y1OiyMz
+         ElkbIl+D9Gdi9ReweT1OfnYE2BM68YmsukmjxX5sBLktmJI1UEtjWUsPXD2NA5eZKO/J
+         sJyPWT3/77dViRM3fm3av+ixpyBw1UHxEhJYozpl8wLF2tb3WiQ6gC3v4KqjE0BvONEz
+         exf9/ZBw2xwpYuywDwYAArj24YLkpcbBBz3D0wbxJ8MfWTx2aVHib8oYf1GnWRiScMO4
+         BSTw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:content-transfer-encoding
-         :in-reply-to;
-        bh=FjmoqdU5kj6rAICx3+QzM5MmmkfRNlf/iMQ4fGtplDA=;
-        b=hZsX42Pk+1+hGEiyVczv53zh9P7bB6eHhNQPokOMXdAo0eEKeFFKvsAJNgcH1MalSe
-         by9Qf3YWsoVCaR6Kjxf1IvVbtkwOkhjXpfKeQEsQ2mrsVkx9Cr8aagFU9fCqvF8i6xNs
-         nsIuJ3oJGmP7tgCbEjnu/IHaxRvJ8iQ18R2XAMri4zp3OoSch+u5w/8gDeQ5mYBtBprz
-         59X2GkYzV2dSE2KEfaS+UyJ8h9Cr07Ayjeja8PQBng4vvPOGwUiXhsKKGwFMpOxTbzQy
-         4RI/JacVac/XubZqG1mSdcuVyUPJ6byJRm6oVvu6h/WIec9/fFsgxNe0pqws2rrGeAAy
-         /5DQ==
-X-Gm-Message-State: AJIora+76AJeAkU4JDIQB2X161iNEb+ThtD554ivBoQsmGUjlj7mD0jO
-        cj3dCI5drigtXAR8JtQeh74IdQ==
-X-Google-Smtp-Source: AGRyM1unzHQqb8zVBUKEs6rrq19O/McmbA2bTcyfP51716abdNtaluRuKhI7j88I4xjSdpuIYIqcpg==
-X-Received: by 2002:a17:90b:4a12:b0:1ef:a8bb:b475 with SMTP id kk18-20020a17090b4a1200b001efa8bbb475mr15047889pjb.124.1658765306524;
-        Mon, 25 Jul 2022 09:08:26 -0700 (PDT)
-Received: from google.com (123.65.230.35.bc.googleusercontent.com. [35.230.65.123])
-        by smtp.gmail.com with ESMTPSA id e7-20020a17090301c700b0016bf2dc1724sm9463154plh.247.2022.07.25.09.08.25
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 25 Jul 2022 09:08:25 -0700 (PDT)
-Date:   Mon, 25 Jul 2022 16:08:21 +0000
-From:   Sean Christopherson <seanjc@google.com>
-To:     Maxim Levitsky <mlevitsk@redhat.com>
-Cc:     kvm@vger.kernel.org, Wanpeng Li <wanpengli@tencent.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Jani Nikula <jani.nikula@linux.intel.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Tvrtko Ursulin <tvrtko.ursulin@linux.intel.com>,
-        Rodrigo Vivi <rodrigo.vivi@intel.com>,
-        Zhenyu Wang <zhenyuw@linux.intel.com>,
-        Joonas Lahtinen <joonas.lahtinen@linux.intel.com>,
-        Tom Lendacky <thomas.lendacky@amd.com>,
-        Ingo Molnar <mingo@redhat.com>,
-        David Airlie <airlied@linux.ie>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org,
-        intel-gfx@lists.freedesktop.org, Daniel Vetter <daniel@ffwll.ch>,
-        Borislav Petkov <bp@alien8.de>, Joerg Roedel <joro@8bytes.org>,
-        linux-kernel@vger.kernel.org, Jim Mattson <jmattson@google.com>,
-        Zhi Wang <zhi.a.wang@intel.com>,
-        Brijesh Singh <brijesh.singh@amd.com>,
-        "H. Peter Anvin" <hpa@zytor.com>,
-        intel-gvt-dev@lists.freedesktop.org,
-        dri-devel@lists.freedesktop.org
-Subject: Re: [RFC PATCH v3 04/19] KVM: x86: mmu: allow to enable write
- tracking externally
-Message-ID: <Yt6/9V0S9of7dueW@google.com>
-References: <20220427200314.276673-1-mlevitsk@redhat.com>
- <20220427200314.276673-5-mlevitsk@redhat.com>
- <YoZyWOh4NPA0uN5J@google.com>
- <5ed0d0e5a88bbee2f95d794dbbeb1ad16789f319.camel@redhat.com>
- <c22a18631c2067871b9ed8a9246ad58fa1ab8947.camel@redhat.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <c22a18631c2067871b9ed8a9246ad58fa1ab8947.camel@redhat.com>
-X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-        USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=ham
+        h=x-gm-message-state:date:message-id:mime-version:subject:from:to:cc;
+        bh=ksBrfdewc8P33kwHHKDSCCyl/DzIxhpSYohpoXierk4=;
+        b=nIDcTm/ERZhNF91PEwxSFmGQKZuVkOAolVKpk1yXkX5m+JiD3xosNTBVcAPDvDcU3y
+         1B/YtfuDdMEpbDWrVDSbK8yPVm7LurdVOCgIZr1VyYYMm2e7w4dmxLVpgWEVuNONc6fS
+         v9PglIr0XWGOd8tTcsi3i6vI8IysezKfA+/iH8qs7zsOmGqHd7F8ihEVg9saAzEKN+cx
+         AgEDhSk/0MeztSQWDbg3mrgvAyW2Jy80as8dYkwUBKvzomfVle3XB12pV0nplkGYGeQZ
+         eVPrl8e+g8rqePq8z6HfgDEhIDIC9po29kXnFQnS2TaOW9vpfS9X4D2SOiqgqAqBruya
+         DMRA==
+X-Gm-Message-State: AJIora/owkLRyfGltJjJFE/BIkbpPoVHqNfxdGDz4uDWk6tDUBx7M2JO
+        sw4ZZ8UicmNRJboLfQsrTXAYQrK40pIJPg==
+X-Google-Smtp-Source: AGRyM1sL1gyUN1UQbPSWdnzvDxlCAaonA7uF+FZyLewz7h5gcYIDjw5CZ+u9/w6tNgEX+bi1MQDnhbUysd55Vw==
+X-Received: from dmatlack-n2d-128.c.googlers.com ([fda3:e722:ac3:cc00:20:ed76:c0a8:1309])
+ (user=dmatlack job=sendgmr) by 2002:a81:6e56:0:b0:31e:8e41:7357 with SMTP id
+ j83-20020a816e56000000b0031e8e417357mr10634393ywc.434.1658766942228; Mon, 25
+ Jul 2022 09:35:42 -0700 (PDT)
+Date:   Mon, 25 Jul 2022 16:35:37 +0000
+Message-Id: <20220725163539.3145690-1-dmatlack@google.com>
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.37.1.359.gd136c6c3e2-goog
+Subject: [RFC PATCH 0/2] KVM: selftests: Rename perf_test_util to memstress
+From:   David Matlack <dmatlack@google.com>
+To:     Paolo Bonzini <pbonzini@redhat.com>
+Cc:     kvm@vger.kernel.org, Sean Christopherson <seanjc@google.com>,
+        Ben Gardon <bgardon@google.com>,
+        Colton Lewis <coltonlewis@google.com>,
+        Ricardo Koller <ricarkol@google.com>,
+        Andrew Jones <andrew.jones@linux.dev>,
+        David Matlack <dmatlack@google.com>
+Content-Type: text/plain; charset="UTF-8"
+X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL autolearn=ham
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -96,45 +67,60 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Jul 20, 2022, Maxim Levitsky wrote:
-> On Sun, 2022-05-22 at 13:22 +0300, Maxim Levitsky wrote:
-> > On Thu, 2022-05-19 at 16:37 +0000, Sean Christopherson wrote:
-> > > On Wed, Apr 27, 2022, Maxim Levitsky wrote:
-> > > > @@ -5753,6 +5752,10 @@ int kvm_mmu_init_vm(struct kvm *kvm)
-> Now for nested AVIC, this is what I would like to do:
->  
-> - just like mmu, I prefer to register the write tracking notifier, when the
->   VM is created.
->
-> - just like mmu, write tracking should only be enabled when nested AVIC is
->   actually used first time, so that write tracking is not always enabled when
->   you just boot a VM with nested avic supported, since the VM might not use
->   nested at all.
->  
-> Thus I either need to use the __kvm_page_track_register_notifier too for AVIC
-> (and thus need to export it) or I need to have a boolean
-> (nested_avic_was_used_once) and register the write tracking notifier only
-> when false and do it not on VM creation but on first attempt to use nested
-> AVIC.
->  
-> Do you think this is worth it? I mean there is some value of registering the
-> notifier only when needed (this way it is not called for nothing) but it does
-> complicate things a bit.
+This series renames the perf_test_util to memstress. patch 1 renames the files
+perf_test_util.[ch] to memstress.[ch], and patch 2 replaces the perf_test_
+prefix on symbols with memstress_.
 
-Compared to everything else that you're doing in the nested AVIC code, refcounting
-the shared kvm_page_track_notifier_node object is a trivial amount of complexity.
+The reason for this rename, as with any rename, is to improve readability.
+perf_test_util is too generic and does not describe at all what the library
+does, other than being used for perf tests.
 
-And on that topic, do you have performance numbers to justify using a single
-shared node?  E.g. if every table instance has its own notifier, then no additional
-refcounting is needed.  It's not obvious that a shared node will provide better
-performance, e.g. if there are only a handful of AVIC tables being shadowed, then
-a linear walk of all nodes is likely fast enough, and doesn't bring the risk of
-a write potentially being stalled due to having to acquire a VM-scoped mutex.
+I considered a lot of different names (naming is hard) and eventually settled
+on memstress for a few reasons:
 
-> I can also stash this boolean (like 'bool registered;') into the 'struct
-> kvm_page_track_notifier_node',  and thus allow the
-> kvm_page_track_register_notifier to be called more that once -  then I can
-> also get rid of __kvm_page_track_register_notifier. 
+ - "memstress" better describes the functionality proveded by this library,
+   which is to run a VM that reads/writes to memory from all vCPUs in parallel
+   (i.e. stressing VM memory).
 
-No, allowing redundant registration without proper refcounting leads to pain,
-e.g. X registers, Y registers, X unregisters, kaboom.
+ - "memstress" contains the same number of characters as "perf_test", making
+   it a drop in replacement in symbols wihout changing line lengths.
+
+ - The lack of underscore between "mem" and "stress" makes it clear "memstress"
+   is a noun, avoiding confusion in function names.
+
+Looking to the future, I think "memstress" will remain a good name. Specifically
+there are some in-flight improvements that will make this library even more of
+a "memory stress tester":
+
+ - A proposed series by yours truly [1] extends memstress/perf_test_util to
+   support execute from memory, in addition to reading/writing.
+
+ - Colton Lewis within Google is looking into adding support for more complex
+   memory access patterns.
+
+[1] https://lore.kernel.org/kvm/20220401233737.3021889-2-dmatlack@google.com/
+
+David Matlack (2):
+  KVM: selftests: Rename perf_test_util.[ch] to memstress.[ch]
+  KVM: selftests: Rename perf_test symbols to memstress
+
+ tools/testing/selftests/kvm/Makefile          |  4 +-
+ .../selftests/kvm/access_tracking_perf_test.c | 20 +++----
+ .../selftests/kvm/demand_paging_test.c        | 20 +++----
+ .../selftests/kvm/dirty_log_perf_test.c       | 22 ++++----
+ .../include/{perf_test_util.h => memstress.h} | 34 ++++++------
+ .../kvm/lib/{perf_test_util.c => memstress.c} | 54 +++++++++----------
+ .../x86_64/{perf_test_util.c => memstress.c}  | 36 ++++++-------
+ .../kvm/memslot_modification_stress_test.c    | 16 +++---
+ 8 files changed, 103 insertions(+), 103 deletions(-)
+ rename tools/testing/selftests/kvm/include/{perf_test_util.h => memstress.h} (50%)
+ rename tools/testing/selftests/kvm/lib/{perf_test_util.c => memstress.c} (83%)
+ rename tools/testing/selftests/kvm/lib/x86_64/{perf_test_util.c => memstress.c} (68%)
+
+
+base-commit: 1a4d88a361af4f2e91861d632c6a1fe87a9665c2
+prerequisite-patch-id: 8c230105c8a2f1245dedb5b386327d98865d0bb2
+prerequisite-patch-id: 9b4329037e2e880db19f3221e47d956b78acadc8
+-- 
+2.37.1.359.gd136c6c3e2-goog
+
