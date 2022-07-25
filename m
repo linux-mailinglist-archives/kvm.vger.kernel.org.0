@@ -2,160 +2,91 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id BE4B457FC38
-	for <lists+kvm@lfdr.de>; Mon, 25 Jul 2022 11:19:17 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 9594857FC8B
+	for <lists+kvm@lfdr.de>; Mon, 25 Jul 2022 11:36:44 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234491AbiGYJTQ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 25 Jul 2022 05:19:16 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57706 "EHLO
+        id S233923AbiGYJgn (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 25 Jul 2022 05:36:43 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42108 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234514AbiGYJTL (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 25 Jul 2022 05:19:11 -0400
-Received: from NAM11-CO1-obe.outbound.protection.outlook.com (mail-co1nam11on2062.outbound.protection.outlook.com [40.107.220.62])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D4B0415A04;
-        Mon, 25 Jul 2022 02:19:09 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=WrzFT5MtCs2Btrdz0IkZRQzNnDlmXCtQL32KPXjhRvJxVFrnRbuUM9pn9jfA2J6Orf5U4WlWM3eayabxsnHDEgLqGMnykPklgRktvaz61DR7HZ6MmY5hpm57X1DtjyPbDujbD2WKltyrlYdPnkrxnLxpn+m4xs5FInHS7QcHoEqX3MRzJuZG/g/a6bhPES9j15iG9B5valLF2bqFb8sL7H6/k62/EgXqEdT7J7PjdmlHNRZYg4r5h5wwX4n4ixVEEuSeyN/NrtewRZgxl7KoyL1DBrOB4+emfmxKOBWelJ6ySMliyj098dXfQgVWbbzlmpksp7/+jwviq9+Z6J5TeQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=f9gJz52bityA0G4eTEvfuw1EK4wdHbEs3XJxz071Qyc=;
- b=MPLdT8Xzz4+wMsAyK1E3RqK83Tbr0/8Y0BljTnr9WPWRbY1x6XI9EgNP1R7SEUu9rsRdaWTxIPZY1vPdTwooIxgsmrFk3ZH7k8iqKVHJ8uEfTBGpNEesX36fBJAlcPxWWYe5eIM73YBK0fJQkb3m3kVR6wgxFL7sKReQlN3QLyaBg2iw6F2tSTefDtOU2KrhjqPg75h3AXavIUTl/o/FshLDMIlNILSg/d3ZTRyVeowMeviFIKUKKfR8L6Amd6ZL7SyMW6t4MoeanTHEw6kyMFcV1HZV4XKKiE+XXyKybqkg+HRXtP0ouP7mqdqk98i3tY8LiC8J2g3Gdqr+lNm5NA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
- header.d=amd.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=f9gJz52bityA0G4eTEvfuw1EK4wdHbEs3XJxz071Qyc=;
- b=ivEYi1NKyxXbcSIPS5dLH/QOgXrK1TRmNxdRjlqcoH4P9eqA10vqfU4Q4eCcVZ4UGsOM3Ukp6zn1ttsMAElq22WZTq7U3gKtO+lJZLU2SA+2eXQaZJjibcjTHXfWUW94zgOZb8DlAtRWdLT8QR7kCJUs13eq8FzjnJQz8qvGmxQ=
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=amd.com;
-Received: from CY4PR1201MB0181.namprd12.prod.outlook.com
- (2603:10b6:910:1f::11) by BY5PR12MB4917.namprd12.prod.outlook.com
- (2603:10b6:a03:1d1::8) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5458.19; Mon, 25 Jul
- 2022 09:19:06 +0000
-Received: from CY4PR1201MB0181.namprd12.prod.outlook.com
- ([fe80::1001:3c79:9504:8d6a]) by CY4PR1201MB0181.namprd12.prod.outlook.com
- ([fe80::1001:3c79:9504:8d6a%10]) with mapi id 15.20.5458.024; Mon, 25 Jul
- 2022 09:19:05 +0000
-Message-ID: <17ce3189-5e88-3c9b-605d-e259dcedece3@amd.com>
-Date:   Mon, 25 Jul 2022 11:19:02 +0200
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:91.0) Gecko/20100101
- Thunderbird/91.10.0
-Subject: Re: [PATCH v5 00/13] KVM: mm: fd-based approach for supporting KVM
- guest private memory
+        with ESMTP id S233167AbiGYJgm (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 25 Jul 2022 05:36:42 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 511DAA18D
+        for <kvm@vger.kernel.org>; Mon, 25 Jul 2022 02:36:41 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1658741800;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=AOYFRhGkb10OAe8LzC2iXHQJ5iqncr95aKZsdocQoTE=;
+        b=F7KMhgLO9ZUn/ehncm8tO6pkH0inKJh8ia7xXQOeiylyCH+kWnwPIUlFXwfsnpTmKM7HaX
+        P4ojBo11kzARMyUC51Q2odNMLzVdL60ZHBfSkcNgJvxFERI97MnORBgC07Emnc26S5uquE
+        caIqXgevsezTaFT+Df/Euec4sPCrvjw=
+Received: from mail-pf1-f199.google.com (mail-pf1-f199.google.com
+ [209.85.210.199]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-553-w5duZuEwMymEFCvPAB3wDw-1; Mon, 25 Jul 2022 05:36:38 -0400
+X-MC-Unique: w5duZuEwMymEFCvPAB3wDw-1
+Received: by mail-pf1-f199.google.com with SMTP id r7-20020aa79627000000b00528beaf82c3so3572759pfg.8
+        for <kvm@vger.kernel.org>; Mon, 25 Jul 2022 02:36:38 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
+         :content-language:to:cc:references:from:in-reply-to
+         :content-transfer-encoding;
+        bh=AOYFRhGkb10OAe8LzC2iXHQJ5iqncr95aKZsdocQoTE=;
+        b=dpgp57kvAgwnJCxIIrHBjjrFw/CPsmfZMKBcZMjMoLKjyokK+Mzrzxd2rELnB+nUns
+         JCkIDKZt1yS+JDvnolbmFX1suekZ7iVzaDnwHWef0t1dAnmZD2bkpjJjCkehaeFPpyfN
+         286d3uJspmJNs2ZNG6NpYwubr9iY2/sEmN+3+2Z1XRpVS4bbzeN768RZ7sXOabzp0jjh
+         HmvDmHLFt2m/alzpBXDvoFMG8szLPoLmk34Ul2ZfhmpJ62iA3Vsv/v8HODqdN7rowZ1I
+         piYJ/ns77s407yvrt8dXF5h3RHw9w43tX+GPxge7C5B06TIQg7ZypHvRi/7e2UccKBlY
+         oaoA==
+X-Gm-Message-State: AJIora+91ZpJSXbJngbayrVFXim6RKyaWZJE5mWujQvXXjlUioRZBUEu
+        juCkxBMIOllfheyJ4PbkZQ/3wj5SnSTk+oy/cW1ZHbEB+HvNPLOgqhzo4MM1aiheeHBTtpdy/LP
+        ek6GGR412OW37
+X-Received: by 2002:a62:3884:0:b0:52b:ead1:7bc8 with SMTP id f126-20020a623884000000b0052bead17bc8mr9166316pfa.78.1658741797525;
+        Mon, 25 Jul 2022 02:36:37 -0700 (PDT)
+X-Google-Smtp-Source: AGRyM1uAJPwLww74z3mRYesDxBU6PPDsp78NaoLITE97YOswfQ8HkwxKokcN0osi5NGWFDnkVbKTzg==
+X-Received: by 2002:a62:3884:0:b0:52b:ead1:7bc8 with SMTP id f126-20020a623884000000b0052bead17bc8mr9166277pfa.78.1658741797065;
+        Mon, 25 Jul 2022 02:36:37 -0700 (PDT)
+Received: from [10.72.13.203] ([209.132.188.80])
+        by smtp.gmail.com with ESMTPSA id s6-20020a170902a50600b0016a0ac06424sm8739568plq.51.2022.07.25.02.36.31
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 25 Jul 2022 02:36:36 -0700 (PDT)
+Message-ID: <22b35cff-bcd5-78b8-cab4-43d2e65dccbe@redhat.com>
+Date:   Mon, 25 Jul 2022 17:36:28 +0800
+MIME-Version: 1.0
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:91.0)
+ Gecko/20100101 Thunderbird/91.11.0
+Subject: Re: [PATCH v2 4/7] vdpa: Add asid parameter to
+ vhost_vdpa_dma_map/unmap
 Content-Language: en-US
-To:     Andy Lutomirski <luto@kernel.org>,
-        Sean Christopherson <seanjc@google.com>
-Cc:     Chao Peng <chao.p.peng@linux.intel.com>,
-        Quentin Perret <qperret@google.com>,
-        Michael Roth <michael.roth@amd.com>,
-        Steven Price <steven.price@arm.com>,
-        kvm list <kvm@vger.kernel.org>,
-        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-        linux-mm@kvack.org, linux-fsdevel@vger.kernel.org,
-        Linux API <linux-api@vger.kernel.org>, qemu-devel@nongnu.org,
+To:     =?UTF-8?Q?Eugenio_P=c3=a9rez?= <eperezma@redhat.com>,
+        qemu-devel@nongnu.org
+Cc:     Harpreet Singh Anand <hanand@xilinx.com>,
+        Cindy Lu <lulu@redhat.com>, Cornelia Huck <cohuck@redhat.com>,
+        kvm@vger.kernel.org, Parav Pandit <parav@mellanox.com>,
+        Stefan Hajnoczi <stefanha@redhat.com>,
+        "Gonglei (Arei)" <arei.gonglei@huawei.com>,
+        "Michael S. Tsirkin" <mst@redhat.com>,
+        Zhu Lingshan <lingshan.zhu@intel.com>,
+        Liuxiangdong <liuxiangdong5@huawei.com>,
+        Gautam Dawar <gdawar@xilinx.com>,
         Paolo Bonzini <pbonzini@redhat.com>,
-        Jonathan Corbet <corbet@lwn.net>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        the arch/x86 maintainers <x86@kernel.org>,
-        "H. Peter Anvin" <hpa@zytor.com>, Hugh Dickins <hughd@google.com>,
-        Jeff Layton <jlayton@kernel.org>,
-        "J . Bruce Fields" <bfields@fieldses.org>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        Mike Rapoport <rppt@kernel.org>,
-        "Maciej S . Szmigiero" <mail@maciej.szmigiero.name>,
-        Vlastimil Babka <vbabka@suse.cz>,
-        Vishal Annapurve <vannapurve@google.com>,
-        Yu Zhang <yu.c.zhang@linux.intel.com>,
-        "Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>,
-        "Nakajima, Jun" <jun.nakajima@intel.com>,
-        Dave Hansen <dave.hansen@intel.com>,
-        Andi Kleen <ak@linux.intel.com>,
-        David Hildenbrand <david@redhat.com>,
-        Marc Zyngier <maz@kernel.org>, Will Deacon <will@kernel.org>,
-        nikunj@amd.com, ashish.kalra@amd.com
-References: <83fd55f8-cd42-4588-9bf6-199cbce70f33@www.fastmail.com>
- <YksIQYdG41v3KWkr@google.com> <Ykslo2eo2eRXrpFR@google.com>
- <eefc3c74-acca-419c-8947-726ce2458446@www.fastmail.com>
- <Ykwbqv90C7+8K+Ao@google.com> <YkyEaYiL0BrDYcZv@google.com>
- <20220422105612.GB61987@chaop.bj.intel.com>
- <20220509223056.pyazfxjwjvipmytb@amd.com> <YnmjvX9ow4elYsY8@google.com>
- <c3ca63d6-db27-d783-40ca-486b3fbbced7@amd.com> <YtnCyqbI26QfRuOP@google.com>
- <2171cf37-ea82-25c5-ad85-a80519525045@kernel.org>
-From:   "Gupta, Pankaj" <pankaj.gupta@amd.com>
-In-Reply-To: <2171cf37-ea82-25c5-ad85-a80519525045@kernel.org>
+        Stefano Garzarella <sgarzare@redhat.com>,
+        Eli Cohen <eli@mellanox.com>,
+        Laurent Vivier <lvivier@redhat.com>
+References: <20220722134318.3430667-1-eperezma@redhat.com>
+ <20220722134318.3430667-5-eperezma@redhat.com>
+From:   Jason Wang <jasowang@redhat.com>
+In-Reply-To: <20220722134318.3430667-5-eperezma@redhat.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
-X-ClientProxiedBy: AM5PR1001CA0070.EURPRD10.PROD.OUTLOOK.COM
- (2603:10a6:206:15::47) To CY4PR1201MB0181.namprd12.prod.outlook.com
- (2603:10b6:910:1f::11)
-MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: 0fe40321-a29d-4fb4-40ac-08da6e1eb82b
-X-MS-TrafficTypeDiagnostic: BY5PR12MB4917:EE_
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: ZSz2FxlVn7MaI5zGpyMLVRnxvM5rzwItupVpbKwUttGhbMZx6lCuOOLqSp3BL6MRxkNxJUZAdJNFWd4+zFkgmmIM71urdKNuIK1wEfvhNuUW/qTxPqVo6gGb+nUt4DoI3ge2xfKCpYgnJM9THIc5KeCN+sdRVwDSzc7aYkX4sxKPlCzTV6YSVkE4trUSwU1cAoJWnWUVqYW4l2ivp+cCaWZECDkmD72RlNC4BWugA9vl4cRz7NUtAuWiUi8E28pc6rIL1P+/K827e/4ywKPVaGmuoJbMlooGjvqSVIGEDqe51+/zQjpMT8lj635CWSs7bZ1PBBcStp1r4JkiU6+Z79txe0/z4ZVRAOKeEo5Oy5Wg/raE+SFXMwHrhEWowE4arrCXG3J8D+dAhqc+lUBqmWVry06DPN78ygfXFT4N8hFHKfXiSXBLQF7B8wKt1BqXSVz8PdDTjKyxJQnxpijkQtBZXwNswRNQDsPauwMRnR2VG95c9y1uspyOhyITNhrLnbBAtoMaZ6v+YvoQJfogehgu7VvV4BC88eyn24XyhTRTYisYo2iADsEDwPwYhbOdnM3BSJsjJtvGcK2eZoy6IoHauB3mbWSZH6h2DocoTsffyPMfcIC6eICHGNDBQgpEUXp5ntKSw1f+mAC6dbGUcFxuHYgMbjiS9svuGfv9hzsBZibosAe6XzGWLfJH+C1dDJjPSUq1ugPb2tT0+bycIjLrvs4aABoqZXzOk4HqMvOV02dpg/UuHVS+bjHW2czNNAGxt9y+ovLZHoPtyCGT405vI+5lQOuCNHfMFd0Q7T99tYkyOui9uNHChC6XOgS1CuBf7dxCVz7jW7BeaZ4PGw==
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CY4PR1201MB0181.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230016)(4636009)(39860400002)(136003)(346002)(396003)(366004)(376002)(31686004)(36756003)(83380400001)(8936002)(86362001)(31696002)(6512007)(38100700002)(2616005)(6506007)(186003)(478600001)(316002)(41300700001)(6666004)(110136005)(54906003)(6486002)(7406005)(5660300002)(7416002)(8676002)(66946007)(26005)(66476007)(66556008)(4326008)(2906002)(43740500002)(45980500001);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?YUVVSWxzUUxzTzlLWDBycWtGZXkzZkt5U09FOXB4OTdxbVRpUWs0dmFRT0cy?=
- =?utf-8?B?Z21GSFhGdm84WFNkOXNCMzFuNVNnZllWTGtmMnZ0ZkJwUHZRcVBGajEraVpK?=
- =?utf-8?B?dTlFSjFGNkNjQ0svSm1UWUszbkY3T3lXNnFpbk9HdlVHRnpoM3N0NjhmNWNK?=
- =?utf-8?B?Y2xDYTFLcTI2Z1hqV0lDME5IL1g4SDkxb3U1UkpXSE1wOC92VjRLem1hLzkw?=
- =?utf-8?B?Sm85UkZ3eUg3NlBIbjhSdzNtMHo4ZGlpZEsxYnJvbXg5Zmo0TUJHTzVlNEVF?=
- =?utf-8?B?aE5ieEl0RUFSUnJHMXdZclU5Wjc0RTlLWjVjTDRCVDVYMFExaFFQRHlPY3Rj?=
- =?utf-8?B?THBkdkFKMS9iaUVmOUNWN1A1SEtBaXJiNXRqOFh4MS9acWJPYmVhd00vMklo?=
- =?utf-8?B?S0ZEK1dFNTAyazNZQlpiYVhRK1ppWkcxWktKb3JBWktxTGozMjNGcWZFbGFH?=
- =?utf-8?B?MjBVSG9pYzk1SlJZbElwVkswQUYwSkdmRTVaRStPa0J0endFdjdkOHFGTEJL?=
- =?utf-8?B?cXFwemNCeDkvdHU3Nm42ZzFlTFEySUpGa1lReDJwZ0VVRGZITEUxMzdGSXVR?=
- =?utf-8?B?T3RvbjVLN1RXZnZBV3dkR3RXSlBhQ1F3Q0VnYmt2WGppdCtqdUVFQUhTN29s?=
- =?utf-8?B?azhYY1h0WmVueENKZlJCNDQ2d21TNU1yVWMzRWQrZW0wL0ptSXE2ZitlNW5t?=
- =?utf-8?B?RXpaSUlJSiswWndXSTlRcUpsVjcxeDM4eGZKb05OV1hzeVZWSm1uNi9DT0lz?=
- =?utf-8?B?ZUhlYW5qcmxodVMxcHlkZldDeU1mWWJrTGNsSXFOd0ZRdkRTUGxIQU12Rlpy?=
- =?utf-8?B?TGhlekxEQVV1aFc3dEplYWVZNzBYZm1HdnNzN3phQVhYMENUMmxnMUlrTnNB?=
- =?utf-8?B?VDVqS2V5L0FzVnI0V1JwRWZ0cUlyaUczMGdoRk9vTnpjQ0VCK0FCbHo1cVlR?=
- =?utf-8?B?dGNoTGxWeVlZMXJ5dVIzMUtaY2o4MnB0OWhyUUc0NkJGL1lMck0yU0k1d0Ru?=
- =?utf-8?B?UXBsNUllSGcxQ3V3L2NKRS94djkzQUQzYlhPd0FkS3o1cGxuRktLU2svSkVU?=
- =?utf-8?B?NHZ1eUtWL2RGeGhtSGF6d1lTank1bkIxTjFvU1RwZEtFOTNvUVJxeWpFUHlv?=
- =?utf-8?B?NzhWeHRwZHh1ZHBmY2x2eUxZb09hVmZyWU1vQUp3Q0pWOUxscFNwdndiZ2Y2?=
- =?utf-8?B?S05SK1RwT0xRM1VhOU8ydEhLenFtZHFwM2hlb0o3NDJ0NGJiM2JENlV5bmwy?=
- =?utf-8?B?RjVzUTdzR2hKNmN0Zlk0WUxhRFZoZG5rekxmZWlUVnV1NmJFblI5V2xWWVdL?=
- =?utf-8?B?TFNEcjdCcUtJK2pRYnlhVnNhaTFaQnNsd2FzWFdTekRwL2JUWmczVUJXU0tk?=
- =?utf-8?B?RUk3RGdJcFlja3dicGxydmJvYmdMekdtTEhsTDBrU2k5MDJCRUFNOWpHbFJp?=
- =?utf-8?B?YWt1OTNUZWRTQUdGaWtPemtqS2o0TTlIVzlOMEtmN3Q4eWxUQ2QwaFY1RW5u?=
- =?utf-8?B?aDA5SmdNazRyd1ZlazdqNEJTd1p3UnJGWlRrbm9LZVpiRU9YUzBvbHQ3TjlF?=
- =?utf-8?B?K1hEdGVMRU9sS3d2NDAxUmFXdnFoK2RydmtQZ2F2dnc1UkgvRHYya0czN3Jl?=
- =?utf-8?B?OU1hNVdMR2Q2WHNwVEJraW9tYzFGUHlXSVRKMHlpWEx0dWdkeHVyWGNYcjh2?=
- =?utf-8?B?cVE3YThLSlZCaFB0SjJWSUtqU1hFbi9LYTBuWlpkZDJhUFlCN2pCQkdmbENk?=
- =?utf-8?B?Y1JXNFE2ZVo3YldGL2RTcHp6UTlGN0JVYlNRaytNMHdENTBqbDY3N3ZrajhE?=
- =?utf-8?B?aUJoS0p5NFdERTFvdHFzdVNENUMzTEFUOFQ0SXpCUDVaQXgvbUIvOFNEWm50?=
- =?utf-8?B?ditvNnZTcVMydzFqRGdhdGp3WFdlcWFXRU54eFV0aDJDUjVlSDZFNjNHN096?=
- =?utf-8?B?RUtMQU5wSlBGams5ZWdCVFV3cWV6UFd3UDNISVViR2xFYjB2dithVEdmVzJG?=
- =?utf-8?B?TWZGb01SalFPcjRuOFBGQzE1bnkxWFBaQVZIbGhLYTRaWUJoZEhROFA0cnZM?=
- =?utf-8?B?YkdOQlhYdW92SklTSUhXYnRvUG4wd1poUGZiZ2lWVEZzZlJvek1yTFBWOHZx?=
- =?utf-8?Q?MxFDuwSJaqD8Ijo94HQzPfzVL?=
-X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 0fe40321-a29d-4fb4-40ac-08da6e1eb82b
-X-MS-Exchange-CrossTenant-AuthSource: CY4PR1201MB0181.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 25 Jul 2022 09:19:04.7700
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: Eu57ewKcRDTfEijcv744kG5B0ZilckD434KHF/4Fm5vDPDwGoq31MQ8Qr+k2by0ldLNCm51PMOzvD7avPO8zZg==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: BY5PR12MB4917
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_DNSWL_NONE,
-        RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_PASS autolearn=ham
+X-Spam-Status: No, score=-3.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
+        RCVD_IN_DNSWL_LOW,SPF_HELO_NONE,SPF_NONE autolearn=ham
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -164,45 +95,195 @@ List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
 
->>>> I view it as a performance problem because nothing stops KVM from 
->>>> copying from
->>>> userspace into the private fd during the SEV ioctl().  What's 
->>>> missing is the
->>>> ability for userspace to directly initialze the private fd, which 
->>>> may or may not
->>>> avoid an extra memcpy() depending on how clever userspace is.
->>> Can you please elaborate more what you see as a performance problem? And
->>> possible ways to solve it?
->>
->> Oh, I'm not saying there actually _is_ a performance problem.  What 
->> I'm saying is
->> that in-place encryption is not a functional requirement, which means 
->> it's purely
->> an optimization, and thus we should other bother supporting in-place 
->> encryption
->> _if_ it would solve a performane bottleneck.
-> 
-> Even if we end up having a performance problem, I think we need to 
-> understand the workloads that we want to optimize before getting too 
-> excited about designing a speedup.
-> 
-> In particular, there's (depending on the specific technology, perhaps, 
-> and also architecture) a possible tradeoff between trying to reduce 
-> copying and trying to reduce unmapping and the associated flushes.  If a 
-> user program maps an fd, populates it, and then converts it in place 
-> into private memory (especially if it doesn't do it in a single shot), 
-> then that memory needs to get unmapped both from the user mm and 
-> probably from the kernel direct map.  On the flip side, it's possible to 
-> imagine an ioctl that does copy-and-add-to-private-fd that uses a 
-> private mm and doesn't need any TLB IPIs.
-> 
-> All of this is to say that trying to optimize right now seems quite 
-> premature to me.
+在 2022/7/22 21:43, Eugenio Pérez 写道:
+> So the caller can choose which ASID is destined.
+>
+> No need to update the batch functions as they will always be called from
+> memory listener updates at the moment. Memory listener updates will
+> always update ASID 0, as it's the passthrough ASID.
+>
+> All vhost devices's ASID are 0 at this moment.
+>
+> Signed-off-by: Eugenio Pérez <eperezma@redhat.com>
+> ---
+>   include/hw/virtio/vhost-vdpa.h |  8 +++++---
+>   hw/virtio/vhost-vdpa.c         | 26 ++++++++++++++++----------
+>   net/vhost-vdpa.c               |  6 +++---
+>   hw/virtio/trace-events         |  4 ++--
+>   4 files changed, 26 insertions(+), 18 deletions(-)
+>
+> diff --git a/include/hw/virtio/vhost-vdpa.h b/include/hw/virtio/vhost-vdpa.h
+> index 1111d85643..6560bb9d78 100644
+> --- a/include/hw/virtio/vhost-vdpa.h
+> +++ b/include/hw/virtio/vhost-vdpa.h
+> @@ -29,6 +29,7 @@ typedef struct vhost_vdpa {
+>       int index;
+>       uint32_t msg_type;
+>       bool iotlb_batch_begin_sent;
+> +    uint32_t address_space_id;
+>       MemoryListener listener;
+>       struct vhost_vdpa_iova_range iova_range;
+>       uint64_t acked_features;
+> @@ -42,8 +43,9 @@ typedef struct vhost_vdpa {
+>       VhostVDPAHostNotifier notifier[VIRTIO_QUEUE_MAX];
+>   } VhostVDPA;
+>   
+> -int vhost_vdpa_dma_map(struct vhost_vdpa *v, hwaddr iova, hwaddr size,
+> -                       void *vaddr, bool readonly);
+> -int vhost_vdpa_dma_unmap(struct vhost_vdpa *v, hwaddr iova, hwaddr size);
+> +int vhost_vdpa_dma_map(struct vhost_vdpa *v, uint32_t asid, hwaddr iova,
+> +                       hwaddr size, void *vaddr, bool readonly);
+> +int vhost_vdpa_dma_unmap(struct vhost_vdpa *v, uint32_t asid, hwaddr iova,
+> +                         hwaddr size);
+>   
+>   #endif
+> diff --git a/hw/virtio/vhost-vdpa.c b/hw/virtio/vhost-vdpa.c
+> index e1ed56b26d..79623badf2 100644
+> --- a/hw/virtio/vhost-vdpa.c
+> +++ b/hw/virtio/vhost-vdpa.c
+> @@ -72,22 +72,24 @@ static bool vhost_vdpa_listener_skipped_section(MemoryRegionSection *section,
+>       return false;
+>   }
+>   
+> -int vhost_vdpa_dma_map(struct vhost_vdpa *v, hwaddr iova, hwaddr size,
+> -                       void *vaddr, bool readonly)
+> +int vhost_vdpa_dma_map(struct vhost_vdpa *v, uint32_t asid, hwaddr iova,
+> +                       hwaddr size, void *vaddr, bool readonly)
+>   {
+>       struct vhost_msg_v2 msg = {};
+>       int fd = v->device_fd;
+>       int ret = 0;
+>   
+>       msg.type = v->msg_type;
+> +    msg.asid = asid;
+>       msg.iotlb.iova = iova;
+>       msg.iotlb.size = size;
+>       msg.iotlb.uaddr = (uint64_t)(uintptr_t)vaddr;
+>       msg.iotlb.perm = readonly ? VHOST_ACCESS_RO : VHOST_ACCESS_RW;
+>       msg.iotlb.type = VHOST_IOTLB_UPDATE;
+>   
+> -   trace_vhost_vdpa_dma_map(v, fd, msg.type, msg.iotlb.iova, msg.iotlb.size,
+> -                            msg.iotlb.uaddr, msg.iotlb.perm, msg.iotlb.type);
+> +    trace_vhost_vdpa_dma_map(v, fd, msg.type, msg.asid, msg.iotlb.iova,
+> +                             msg.iotlb.size, msg.iotlb.uaddr, msg.iotlb.perm,
+> +                             msg.iotlb.type);
+>   
+>       if (write(fd, &msg, sizeof(msg)) != sizeof(msg)) {
+>           error_report("failed to write, fd=%d, errno=%d (%s)",
+> @@ -98,18 +100,20 @@ int vhost_vdpa_dma_map(struct vhost_vdpa *v, hwaddr iova, hwaddr size,
+>       return ret;
+>   }
+>   
+> -int vhost_vdpa_dma_unmap(struct vhost_vdpa *v, hwaddr iova, hwaddr size)
+> +int vhost_vdpa_dma_unmap(struct vhost_vdpa *v, uint32_t asid, hwaddr iova,
+> +                         hwaddr size)
+>   {
+>       struct vhost_msg_v2 msg = {};
+>       int fd = v->device_fd;
+>       int ret = 0;
+>   
+>       msg.type = v->msg_type;
+> +    msg.asid = asid;
+>       msg.iotlb.iova = iova;
+>       msg.iotlb.size = size;
+>       msg.iotlb.type = VHOST_IOTLB_INVALIDATE;
+>   
+> -    trace_vhost_vdpa_dma_unmap(v, fd, msg.type, msg.iotlb.iova,
+> +    trace_vhost_vdpa_dma_unmap(v, fd, msg.type, msg.asid, msg.iotlb.iova,
+>                                  msg.iotlb.size, msg.iotlb.type);
+>   
+>       if (write(fd, &msg, sizeof(msg)) != sizeof(msg)) {
+> @@ -228,7 +232,7 @@ static void vhost_vdpa_listener_region_add(MemoryListener *listener,
+>       }
+>   
+>       vhost_vdpa_iotlb_batch_begin_once(v);
+> -    ret = vhost_vdpa_dma_map(v, iova, int128_get64(llsize),
+> +    ret = vhost_vdpa_dma_map(v, 0, iova, int128_get64(llsize),
+>                                vaddr, section->readonly);
+>       if (ret) {
+>           error_report("vhost vdpa map fail!");
+> @@ -293,7 +297,7 @@ static void vhost_vdpa_listener_region_del(MemoryListener *listener,
+>           vhost_iova_tree_remove(v->iova_tree, result);
+>       }
+>       vhost_vdpa_iotlb_batch_begin_once(v);
+> -    ret = vhost_vdpa_dma_unmap(v, iova, int128_get64(llsize));
+> +    ret = vhost_vdpa_dma_unmap(v, 0, iova, int128_get64(llsize));
+>       if (ret) {
+>           error_report("vhost_vdpa dma unmap error!");
+>       }
+> @@ -884,7 +888,7 @@ static bool vhost_vdpa_svq_unmap_ring(struct vhost_vdpa *v,
+>       }
+>   
+>       size = ROUND_UP(result->size, qemu_real_host_page_size());
+> -    r = vhost_vdpa_dma_unmap(v, result->iova, size);
+> +    r = vhost_vdpa_dma_unmap(v, v->address_space_id, result->iova, size);
+>       return r == 0;
+>   }
+>   
+> @@ -926,7 +930,8 @@ static bool vhost_vdpa_svq_map_ring(struct vhost_vdpa *v, DMAMap *needle,
+>           return false;
+>       }
+>   
+> -    r = vhost_vdpa_dma_map(v, needle->iova, needle->size + 1,
+> +    r = vhost_vdpa_dma_map(v, v->address_space_id, needle->iova,
+> +                           needle->size + 1,
+>                              (void *)(uintptr_t)needle->translated_addr,
+>                              needle->perm == IOMMU_RO);
+>       if (unlikely(r != 0)) {
+> @@ -1092,6 +1097,7 @@ static int vhost_vdpa_dev_start(struct vhost_dev *dev, bool started)
+>   
+>       if (started) {
+>           vhost_vdpa_host_notifiers_init(dev);
+> +
 
-Agree to it. Thank you for explaining!
 
-Thanks,
-Pankaj
+Unnecessary changes.
+
+Other looks good.
+
+Thanks
 
 
+>           ok = vhost_vdpa_svqs_start(dev);
+>           if (unlikely(!ok)) {
+>               return -1;
+> diff --git a/net/vhost-vdpa.c b/net/vhost-vdpa.c
+> index 75143ded8b..8203200c2a 100644
+> --- a/net/vhost-vdpa.c
+> +++ b/net/vhost-vdpa.c
+> @@ -229,7 +229,7 @@ static void vhost_vdpa_cvq_unmap_buf(struct vhost_vdpa *v, void *addr)
+>           return;
+>       }
+>   
+> -    r = vhost_vdpa_dma_unmap(v, map->iova, map->size + 1);
+> +    r = vhost_vdpa_dma_unmap(v, v->address_space_id, map->iova, map->size + 1);
+>       if (unlikely(r != 0)) {
+>           error_report("Device cannot unmap: %s(%d)", g_strerror(r), r);
+>       }
+> @@ -278,8 +278,8 @@ static bool vhost_vdpa_cvq_map_buf(struct vhost_vdpa *v,
+>           return false;
+>       }
+>   
+> -    r = vhost_vdpa_dma_map(v, map.iova, vhost_vdpa_net_cvq_cmd_page_len(), buf,
+> -                           !write);
+> +    r = vhost_vdpa_dma_map(v, v->address_space_id, map.iova,
+> +                           vhost_vdpa_net_cvq_cmd_page_len(), buf, !write);
+>       if (unlikely(r < 0)) {
+>           goto dma_map_err;
+>       }
+> diff --git a/hw/virtio/trace-events b/hw/virtio/trace-events
+> index 20af2e7ebd..36e5ae75f6 100644
+> --- a/hw/virtio/trace-events
+> +++ b/hw/virtio/trace-events
+> @@ -26,8 +26,8 @@ vhost_user_write(uint32_t req, uint32_t flags) "req:%d flags:0x%"PRIx32""
+>   vhost_user_create_notifier(int idx, void *n) "idx:%d n:%p"
+>   
+>   # vhost-vdpa.c
+> -vhost_vdpa_dma_map(void *vdpa, int fd, uint32_t msg_type, uint64_t iova, uint64_t size, uint64_t uaddr, uint8_t perm, uint8_t type) "vdpa:%p fd: %d msg_type: %"PRIu32" iova: 0x%"PRIx64" size: 0x%"PRIx64" uaddr: 0x%"PRIx64" perm: 0x%"PRIx8" type: %"PRIu8
+> -vhost_vdpa_dma_unmap(void *vdpa, int fd, uint32_t msg_type, uint64_t iova, uint64_t size, uint8_t type) "vdpa:%p fd: %d msg_type: %"PRIu32" iova: 0x%"PRIx64" size: 0x%"PRIx64" type: %"PRIu8
+> +vhost_vdpa_dma_map(void *vdpa, int fd, uint32_t msg_type, uint32_t asid, uint64_t iova, uint64_t size, uint64_t uaddr, uint8_t perm, uint8_t type) "vdpa:%p fd: %d msg_type: %"PRIu32" asid: %"PRIu32" iova: 0x%"PRIx64" size: 0x%"PRIx64" uaddr: 0x%"PRIx64" perm: 0x%"PRIx8" type: %"PRIu8
+> +vhost_vdpa_dma_unmap(void *vdpa, int fd, uint32_t msg_type, uint32_t asid, uint64_t iova, uint64_t size, uint8_t type) "vdpa:%p fd: %d msg_type: %"PRIu32" asid: %"PRIu32" iova: 0x%"PRIx64" size: 0x%"PRIx64" type: %"PRIu8
+>   vhost_vdpa_listener_begin_batch(void *v, int fd, uint32_t msg_type, uint8_t type)  "vdpa:%p fd: %d msg_type: %"PRIu32" type: %"PRIu8
+>   vhost_vdpa_listener_commit(void *v, int fd, uint32_t msg_type, uint8_t type)  "vdpa:%p fd: %d msg_type: %"PRIu32" type: %"PRIu8
+>   vhost_vdpa_listener_region_add(void *vdpa, uint64_t iova, uint64_t llend, void *vaddr, bool readonly) "vdpa: %p iova 0x%"PRIx64" llend 0x%"PRIx64" vaddr: %p read-only: %d"
 
