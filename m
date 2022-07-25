@@ -2,197 +2,139 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 3769D58024A
-	for <lists+kvm@lfdr.de>; Mon, 25 Jul 2022 17:54:35 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 07BC7580273
+	for <lists+kvm@lfdr.de>; Mon, 25 Jul 2022 18:08:33 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235804AbiGYPyb (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 25 Jul 2022 11:54:31 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36960 "EHLO
+        id S234778AbiGYQIb (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 25 Jul 2022 12:08:31 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45652 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235775AbiGYPy2 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 25 Jul 2022 11:54:28 -0400
-Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D537112740
-        for <kvm@vger.kernel.org>; Mon, 25 Jul 2022 08:54:27 -0700 (PDT)
-Received: from pps.filterd (m0098421.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.17.1.5/8.17.1.5) with ESMTP id 26PFkltm013296
-        for <kvm@vger.kernel.org>; Mon, 25 Jul 2022 15:54:27 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=from : to : cc : subject
- : date : message-id : in-reply-to : references : mime-version :
- content-transfer-encoding; s=pp1;
- bh=GfJFCxMYKXtYWuuwJIfYZ9Iy6tHMydG8ae2oT96zmj4=;
- b=ZDXMqc++9YN2omfUIOD//mc9/kmu2OnrmJiKn01SZ1UnYV+mwrO5hrFa0TXq7vU4tv0n
- qcATwN5COj8ABToMmwh/KXFMtnCpfo6WxSpkJEF+8t00pG33k7VgAITehPymqC31vDwj
- NmcIJqvxKdyY0saNI8QWVqMd/9iOYvMsEamuT26uNE/uwAvDwrS0Iy3gUHGJd2YzMUax
- yTvtz1F7XeUFawxMHd3oV5zPJRLLlOr4LAnOrnJ6yaa/aHcTR6rMIvKQgiirH93vroTE
- ZYGUtaoqsnuuwWdR0l4pJ7vCRy4Y9G5+SAKKj2cH6zTIxW/HZB4FFm7yqY1U2TRR2oXt Pg== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3hhx49g7vr-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT)
-        for <kvm@vger.kernel.org>; Mon, 25 Jul 2022 15:54:26 +0000
-Received: from m0098421.ppops.net (m0098421.ppops.net [127.0.0.1])
-        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 26PFsQBn016775
-        for <kvm@vger.kernel.org>; Mon, 25 Jul 2022 15:54:26 GMT
-Received: from ppma05fra.de.ibm.com (6c.4a.5195.ip4.static.sl-reverse.com [149.81.74.108])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3hhx49g7uv-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Mon, 25 Jul 2022 15:54:26 +0000
-Received: from pps.filterd (ppma05fra.de.ibm.com [127.0.0.1])
-        by ppma05fra.de.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 26PFqe5H015823;
-        Mon, 25 Jul 2022 15:54:24 GMT
-Received: from b06cxnps4074.portsmouth.uk.ibm.com (d06relay11.portsmouth.uk.ibm.com [9.149.109.196])
-        by ppma05fra.de.ibm.com with ESMTP id 3hg94ea06a-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Mon, 25 Jul 2022 15:54:24 +0000
-Received: from d06av21.portsmouth.uk.ibm.com (d06av21.portsmouth.uk.ibm.com [9.149.105.232])
-        by b06cxnps4074.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 26PFsL0j23069020
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Mon, 25 Jul 2022 15:54:21 GMT
-Received: from d06av21.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 5459D5204E;
-        Mon, 25 Jul 2022 15:54:21 +0000 (GMT)
-Received: from a46lp57.lnxne.boe (unknown [9.152.108.100])
-        by d06av21.portsmouth.uk.ibm.com (Postfix) with ESMTP id 2280A5204F;
-        Mon, 25 Jul 2022 15:54:21 +0000 (GMT)
-From:   Nico Boehr <nrb@linux.ibm.com>
-To:     kvm@vger.kernel.org
-Cc:     frankja@linux.ibm.com, imbrenda@linux.ibm.com, thuth@redhat.com
-Subject: [kvm-unit-tests PATCH v3 3/3] s390x: smp: add tests for calls in wait state
-Date:   Mon, 25 Jul 2022 17:54:20 +0200
-Message-Id: <20220725155420.2009109-4-nrb@linux.ibm.com>
-X-Mailer: git-send-email 2.36.1
-In-Reply-To: <20220725155420.2009109-1-nrb@linux.ibm.com>
-References: <20220725155420.2009109-1-nrb@linux.ibm.com>
+        with ESMTP id S233511AbiGYQI3 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 25 Jul 2022 12:08:29 -0400
+Received: from mail-pj1-x1032.google.com (mail-pj1-x1032.google.com [IPv6:2607:f8b0:4864:20::1032])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8715C13DC4
+        for <kvm@vger.kernel.org>; Mon, 25 Jul 2022 09:08:27 -0700 (PDT)
+Received: by mail-pj1-x1032.google.com with SMTP id z1-20020a17090a170100b001f2e643b299so204349pjd.3
+        for <kvm@vger.kernel.org>; Mon, 25 Jul 2022 09:08:27 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:content-transfer-encoding:in-reply-to;
+        bh=FjmoqdU5kj6rAICx3+QzM5MmmkfRNlf/iMQ4fGtplDA=;
+        b=qPSXGfwvhrycsBQOp8iY52tnh1KgXSyBQB+dY2Cc2tVNhSXPKkg6St7J8kQhqlxsEa
+         03/RDkLPFIsTansQAXIAeanSealDnebMm5Rkdeor7AxexibjsXRGN73FxGe+80khHHPT
+         v8xnWy3f4sCauZhKga5d0yRHZMfto0sAsNxbMkAfxHPvxIQ0QMx7qXI5Yd72cemfFpCD
+         ub1xtP7DT0g4876OlkgQbiBkH+IA9KU4VYPyvaX+x4qSh+CKsdH1qu+6TICYYOcHbB97
+         U52lm5UEl9xUZTAXBGfNfpUs+Njp6xwD/4d+nSIA1+bpzWLsFtNt7MCE6xDG67zmiVWT
+         cQ2g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:content-transfer-encoding
+         :in-reply-to;
+        bh=FjmoqdU5kj6rAICx3+QzM5MmmkfRNlf/iMQ4fGtplDA=;
+        b=hZsX42Pk+1+hGEiyVczv53zh9P7bB6eHhNQPokOMXdAo0eEKeFFKvsAJNgcH1MalSe
+         by9Qf3YWsoVCaR6Kjxf1IvVbtkwOkhjXpfKeQEsQ2mrsVkx9Cr8aagFU9fCqvF8i6xNs
+         nsIuJ3oJGmP7tgCbEjnu/IHaxRvJ8iQ18R2XAMri4zp3OoSch+u5w/8gDeQ5mYBtBprz
+         59X2GkYzV2dSE2KEfaS+UyJ8h9Cr07Ayjeja8PQBng4vvPOGwUiXhsKKGwFMpOxTbzQy
+         4RI/JacVac/XubZqG1mSdcuVyUPJ6byJRm6oVvu6h/WIec9/fFsgxNe0pqws2rrGeAAy
+         /5DQ==
+X-Gm-Message-State: AJIora+76AJeAkU4JDIQB2X161iNEb+ThtD554ivBoQsmGUjlj7mD0jO
+        cj3dCI5drigtXAR8JtQeh74IdQ==
+X-Google-Smtp-Source: AGRyM1unzHQqb8zVBUKEs6rrq19O/McmbA2bTcyfP51716abdNtaluRuKhI7j88I4xjSdpuIYIqcpg==
+X-Received: by 2002:a17:90b:4a12:b0:1ef:a8bb:b475 with SMTP id kk18-20020a17090b4a1200b001efa8bbb475mr15047889pjb.124.1658765306524;
+        Mon, 25 Jul 2022 09:08:26 -0700 (PDT)
+Received: from google.com (123.65.230.35.bc.googleusercontent.com. [35.230.65.123])
+        by smtp.gmail.com with ESMTPSA id e7-20020a17090301c700b0016bf2dc1724sm9463154plh.247.2022.07.25.09.08.25
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 25 Jul 2022 09:08:25 -0700 (PDT)
+Date:   Mon, 25 Jul 2022 16:08:21 +0000
+From:   Sean Christopherson <seanjc@google.com>
+To:     Maxim Levitsky <mlevitsk@redhat.com>
+Cc:     kvm@vger.kernel.org, Wanpeng Li <wanpengli@tencent.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Jani Nikula <jani.nikula@linux.intel.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Tvrtko Ursulin <tvrtko.ursulin@linux.intel.com>,
+        Rodrigo Vivi <rodrigo.vivi@intel.com>,
+        Zhenyu Wang <zhenyuw@linux.intel.com>,
+        Joonas Lahtinen <joonas.lahtinen@linux.intel.com>,
+        Tom Lendacky <thomas.lendacky@amd.com>,
+        Ingo Molnar <mingo@redhat.com>,
+        David Airlie <airlied@linux.ie>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org,
+        intel-gfx@lists.freedesktop.org, Daniel Vetter <daniel@ffwll.ch>,
+        Borislav Petkov <bp@alien8.de>, Joerg Roedel <joro@8bytes.org>,
+        linux-kernel@vger.kernel.org, Jim Mattson <jmattson@google.com>,
+        Zhi Wang <zhi.a.wang@intel.com>,
+        Brijesh Singh <brijesh.singh@amd.com>,
+        "H. Peter Anvin" <hpa@zytor.com>,
+        intel-gvt-dev@lists.freedesktop.org,
+        dri-devel@lists.freedesktop.org
+Subject: Re: [RFC PATCH v3 04/19] KVM: x86: mmu: allow to enable write
+ tracking externally
+Message-ID: <Yt6/9V0S9of7dueW@google.com>
+References: <20220427200314.276673-1-mlevitsk@redhat.com>
+ <20220427200314.276673-5-mlevitsk@redhat.com>
+ <YoZyWOh4NPA0uN5J@google.com>
+ <5ed0d0e5a88bbee2f95d794dbbeb1ad16789f319.camel@redhat.com>
+ <c22a18631c2067871b9ed8a9246ad58fa1ab8947.camel@redhat.com>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-ORIG-GUID: J9ggzL6y-ke0UD214PnYZgHMtiBN-MCn
-X-Proofpoint-GUID: RDRmyue9oKOWi8LdNLWpowv5kHWa9mSK
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.205,Aquarius:18.0.883,Hydra:6.0.517,FMLib:17.11.122.1
- definitions=2022-07-25_10,2022-07-25_02,2022-06-22_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501
- malwarescore=0 adultscore=0 mlxscore=0 clxscore=1015 impostorscore=0
- lowpriorityscore=0 phishscore=0 bulkscore=0 mlxlogscore=835 spamscore=0
- suspectscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2206140000 definitions=main-2207250063
-X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_EF,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_PASS
-        autolearn=ham autolearn_force=no version=3.4.6
+In-Reply-To: <c22a18631c2067871b9ed8a9246ad58fa1ab8947.camel@redhat.com>
+X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
+        USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-When the SIGP interpretation facility is in use a SIGP external call to
-a waiting CPU will result in an exit of the calling cpu. For non-pv
-guests it's a code 56 (partial execution) exit otherwise its a code 108
-(secure instruction notification) exit. Those exits are handled
-differently from a normal SIGP instruction intercept that happens
-without interpretation and hence need to be tested.
+On Wed, Jul 20, 2022, Maxim Levitsky wrote:
+> On Sun, 2022-05-22 at 13:22 +0300, Maxim Levitsky wrote:
+> > On Thu, 2022-05-19 at 16:37 +0000, Sean Christopherson wrote:
+> > > On Wed, Apr 27, 2022, Maxim Levitsky wrote:
+> > > > @@ -5753,6 +5752,10 @@ int kvm_mmu_init_vm(struct kvm *kvm)
+> Now for nested AVIC, this is what I would like to do:
+>  
+> - just like mmu, I prefer to register the write tracking notifier, when the
+>   VM is created.
+>
+> - just like mmu, write tracking should only be enabled when nested AVIC is
+>   actually used first time, so that write tracking is not always enabled when
+>   you just boot a VM with nested avic supported, since the VM might not use
+>   nested at all.
+>  
+> Thus I either need to use the __kvm_page_track_register_notifier too for AVIC
+> (and thus need to export it) or I need to have a boolean
+> (nested_avic_was_used_once) and register the write tracking notifier only
+> when false and do it not on VM creation but on first attempt to use nested
+> AVIC.
+>  
+> Do you think this is worth it? I mean there is some value of registering the
+> notifier only when needed (this way it is not called for nothing) but it does
+> complicate things a bit.
 
-Signed-off-by: Nico Boehr <nrb@linux.ibm.com>
----
- s390x/smp.c | 78 +++++++++++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 78 insertions(+)
+Compared to everything else that you're doing in the nested AVIC code, refcounting
+the shared kvm_page_track_notifier_node object is a trivial amount of complexity.
 
-diff --git a/s390x/smp.c b/s390x/smp.c
-index 12c40cadaed2..d59ca38e7a37 100644
---- a/s390x/smp.c
-+++ b/s390x/smp.c
-@@ -356,6 +356,83 @@ static void test_calls(void)
- 	}
- }
- 
-+static void call_in_wait_ext_int_fixup(struct stack_frame_int *stack)
-+{
-+	/* Clear wait bit so we don't immediately wait again after the fixup */
-+	lowcore.ext_old_psw.mask &= ~PSW_MASK_WAIT;
-+
-+	stack->crs[0] &= ~BIT(current_sigp_call_case->cr0_bit);
-+}
-+
-+static void call_in_wait_setup(void)
-+{
-+	expect_ext_int();
-+	ctl_set_bit(0, current_sigp_call_case->cr0_bit);
-+	register_ext_cleanup_func(call_in_wait_ext_int_fixup);
-+
-+	set_flag(1);
-+}
-+
-+static void call_in_wait_received(void)
-+{
-+	report(lowcore.ext_int_code == current_sigp_call_case->ext_int_expected_type, "received");
-+	register_ext_cleanup_func(NULL);
-+
-+	set_flag(1);
-+}
-+
-+static void test_calls_in_wait(void)
-+{
-+	int i;
-+	struct psw psw;
-+
-+	report_prefix_push("psw wait");
-+	for (i = 0; i < ARRAY_SIZE(cases_sigp_call); i++) {
-+		current_sigp_call_case = &cases_sigp_call[i];
-+
-+		report_prefix_push(current_sigp_call_case->name);
-+		if (!current_sigp_call_case->supports_pv && uv_os_is_guest()) {
-+			report_skip("Not supported under PV");
-+			report_prefix_pop();
-+			continue;
-+		}
-+
-+		/* Let the secondary CPU setup the external mask and the external interrupt cleanup function */
-+		set_flag(0);
-+		psw.mask = extract_psw_mask();
-+		psw.addr = (unsigned long)call_in_wait_setup;
-+		smp_cpu_start(1, psw);
-+
-+		/* Wait until the receiver has finished setup */
-+		wait_for_flag();
-+		set_flag(0);
-+
-+		/*
-+		 * To avoid races, we need to know that the secondary CPU has entered wait,
-+		 * but the architecture provides no way to check whether the secondary CPU
-+		 * is in wait.
-+		 *
-+		 * But since a waiting CPU is considered operating, simply stop the CPU, set
-+		 * up the restart new PSW mask in wait, send the restart interrupt and then
-+		 * wait until the CPU becomes operating (done by smp_cpu_start).
-+		 */
-+		smp_cpu_stop(1);
-+		expect_ext_int();
-+		psw.mask = extract_psw_mask() | PSW_MASK_EXT | PSW_MASK_WAIT;
-+		psw.addr = (unsigned long)call_in_wait_received;
-+		smp_cpu_start(1, psw);
-+
-+		smp_sigp(1, current_sigp_call_case->call, 0, NULL);
-+
-+		/* Wait until the receiver has handled the call */
-+		wait_for_flag();
-+		smp_cpu_stop(1);
-+
-+		report_prefix_pop();
-+	}
-+	report_prefix_pop();
-+}
-+
- static void test_sense_running(void)
- {
- 	report_prefix_push("sense_running");
-@@ -474,6 +551,7 @@ int main(void)
- 	test_store_status();
- 	test_set_prefix();
- 	test_calls();
-+	test_calls_in_wait();
- 	test_sense_running();
- 	test_reset();
- 	test_reset_initial();
--- 
-2.36.1
+And on that topic, do you have performance numbers to justify using a single
+shared node?  E.g. if every table instance has its own notifier, then no additional
+refcounting is needed.  It's not obvious that a shared node will provide better
+performance, e.g. if there are only a handful of AVIC tables being shadowed, then
+a linear walk of all nodes is likely fast enough, and doesn't bring the risk of
+a write potentially being stalled due to having to acquire a VM-scoped mutex.
 
+> I can also stash this boolean (like 'bool registered;') into the 'struct
+> kvm_page_track_notifier_node',  and thus allow the
+> kvm_page_track_register_notifier to be called more that once -  then I can
+> also get rid of __kvm_page_track_register_notifier. 
+
+No, allowing redundant registration without proper refcounting leads to pain,
+e.g. X registers, Y registers, X unregisters, kaboom.
