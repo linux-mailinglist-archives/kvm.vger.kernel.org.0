@@ -2,67 +2,68 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 73C79580831
-	for <lists+kvm@lfdr.de>; Tue, 26 Jul 2022 01:28:17 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 9763D580847
+	for <lists+kvm@lfdr.de>; Tue, 26 Jul 2022 01:33:23 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236826AbiGYX2P (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 25 Jul 2022 19:28:15 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53646 "EHLO
+        id S237265AbiGYXdV (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 25 Jul 2022 19:33:21 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57918 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231424AbiGYX2N (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 25 Jul 2022 19:28:13 -0400
-Received: from mail-pg1-x532.google.com (mail-pg1-x532.google.com [IPv6:2607:f8b0:4864:20::532])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E6F7C2657B
-        for <kvm@vger.kernel.org>; Mon, 25 Jul 2022 16:28:11 -0700 (PDT)
-Received: by mail-pg1-x532.google.com with SMTP id s206so11696528pgs.3
-        for <kvm@vger.kernel.org>; Mon, 25 Jul 2022 16:28:11 -0700 (PDT)
+        with ESMTP id S237421AbiGYXdS (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 25 Jul 2022 19:33:18 -0400
+Received: from mail-pg1-x52b.google.com (mail-pg1-x52b.google.com [IPv6:2607:f8b0:4864:20::52b])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7876126AF2
+        for <kvm@vger.kernel.org>; Mon, 25 Jul 2022 16:33:17 -0700 (PDT)
+Received: by mail-pg1-x52b.google.com with SMTP id q22so6539208pgt.9
+        for <kvm@vger.kernel.org>; Mon, 25 Jul 2022 16:33:17 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
         h=date:from:to:cc:subject:message-id:references:mime-version
          :content-disposition:in-reply-to;
-        bh=7wi8bg/Mx00eJP/7DMQWdUzovW7ROgUSLVQ3KoCFZm4=;
-        b=UVsf1+wMyBp60ANtjUt1J5fZ6B3ElwNqFoI/cgtNjF7hWuIlgK2XLGHWcL64SsuJzG
-         irJXvkDmvEDZN29vOjDrOwEuSidNqcCXkCMz+jGzHJVx0ZhJcvK5Is3urL6dL8BEy9Tx
-         Gdns9uPmDPtK64XjWsd8z/uBqqGU1A2dE4KxBDq6YzdhLKAPtE8Vle91IUHZBuHMDFnA
-         8mQU6E3pzALA8GlQyYiWBEQ1VRAG6kslkBoTYuEktMW/r0q3B/l2po3Fb+bO6K7SWmv9
-         +qqwjBdkB/V5kayThphX8iVJVm3bpUbyo/PsFAmnOy1olrPL0HJGulnS86rP0YIJkuic
-         3ZWQ==
+        bh=ZQyRxqGM1W/LS0ssRps7WJXXzo4kRUKS7bNZtUe51CI=;
+        b=nD1BmdVcHA3I/t+9230v3W5nFsOePTrhYHGv1QgVncGS6DjjdzdUlg0mB28F2w17he
+         wLIwFt2t1dozuJkNbrYtPWRQKfBx2GA6EQRPMLVO5IBGIyYkvHpjqIa6DwjXaLl15cks
+         o1vVz7YidMp46YVb/IJoMUHFevN7f18woJ3vqb1msw37nMZ1WMQDEUfiCZekJKT2B3g+
+         /V4sFLBnFXPB7bJpDxO1U8rWzwNquDh13PZXl2rPZVcUBUgi5Vp7svlCGze6dANvD2Ow
+         eZI6QTIWPbeTOhqOGkng55MBfyQiuvBtWJwJA4h6yEK8FAfmGad8EtpVPzP9xiMtjFmc
+         JcSQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:date:from:to:cc:subject:message-id:references
          :mime-version:content-disposition:in-reply-to;
-        bh=7wi8bg/Mx00eJP/7DMQWdUzovW7ROgUSLVQ3KoCFZm4=;
-        b=07vw4xnF2sd2Bl88M6rcPkwm4Hdt94MyQ708U7XswuxvnHzebJLwhh7FJBArxE8j1r
-         zbaOpBdb/zjz6+UcuJtGgG+Ywxcl9y3LUuRc4ck7omY6BcH+xCP+VOYcQunRIKmcw1b+
-         PZeiztS8URf3CtiiNtHnff9PTpVhly9npJLzD5pqCMWE7w08xHBqkPUlaWouelTKlTQR
-         GRnfOYVJgv7szTGBBheaBAqf3Lgy3+2+wEK4ehW3anX8NLWxwzyvxn1kcOPMwlZh4NQW
-         mmf5UrH4bGoc9hoeaDmD3m8HkNDopu4qAZk2rdkocfyqQFFIirCN9rAH1A/4bq2cH6WJ
-         m91A==
-X-Gm-Message-State: AJIora/uYMCGx+/nONpBfTHAhRVP/CodleO/VQ0VNu4WoCqLVNjsflfI
-        q8H8YtpcGRvL2ne3vRjrJrh5uFsoPv0JfQ==
-X-Google-Smtp-Source: AGRyM1uAJt/bbD/gUxdlkUSc8KuXjNiL1jGe++3RkRQXHto/BwsierZwh3fpTMAhcSd5jCJJ0aKEEg==
-X-Received: by 2002:a65:524a:0:b0:41a:996c:a2c6 with SMTP id q10-20020a65524a000000b0041a996ca2c6mr12687936pgp.528.1658791691219;
-        Mon, 25 Jul 2022 16:28:11 -0700 (PDT)
-Received: from google.com (223.103.125.34.bc.googleusercontent.com. [34.125.103.223])
-        by smtp.gmail.com with ESMTPSA id n11-20020a170902d2cb00b0016bdf2220desm9835181plc.263.2022.07.25.16.28.09
+        bh=ZQyRxqGM1W/LS0ssRps7WJXXzo4kRUKS7bNZtUe51CI=;
+        b=Jk+nMWeCMJTUNe9JKXDfafizLSqPJeK3++zmS6+c7jZUlGmwCniUABgJYOZMlpm9m+
+         XF9W+zeT4xKbZ3NB0gD7HdwuNu/VjRsGQF9J6AmfBadcDxW6eKzGMhr0CgPgVtnQAc+G
+         mZ9qRzNcpMTj7cbLN0nYiqcxmhGjEF9vUhXX1dFpWCOCdCerNDTDrVwm+4PEr3Lc32pM
+         bb6V0viFigqzha/DsLrlfQhsob7BkQWWUslUYpDp6bX2gpTxzPjWsMXg56CORRSAEFDl
+         tCaB4gSEFzl+WFQ1cZmJWZ4zW77I/ebVXsvFwd4aKD5k0+0fYEehtyfEAGK5Dwiysb0a
+         jKMQ==
+X-Gm-Message-State: AJIora/oFh1oDrtZ4hOweSqhqp9+vpnaE5u6Sc5oAFMIH3rvC9giKbPD
+        8R8AkCEiaomhpyL6r4mx35WIGg==
+X-Google-Smtp-Source: AGRyM1sMXhCPTxflahi4xB99ucQ9r1TYGMPJzX8LIjoubSDlVEHm0UejmNXeAe5WrFC09nN3obvhWQ==
+X-Received: by 2002:a05:6a00:134e:b0:52a:d5b4:19bb with SMTP id k14-20020a056a00134e00b0052ad5b419bbmr14826941pfu.45.1658791996740;
+        Mon, 25 Jul 2022 16:33:16 -0700 (PDT)
+Received: from google.com (7.104.168.34.bc.googleusercontent.com. [34.168.104.7])
+        by smtp.gmail.com with ESMTPSA id a8-20020a17090a6d8800b001f24c08c3fesm7573683pjk.1.2022.07.25.16.33.16
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 25 Jul 2022 16:28:10 -0700 (PDT)
-Date:   Mon, 25 Jul 2022 16:28:05 -0700
-From:   David Matlack <dmatlack@google.com>
-To:     Sean Christopherson <seanjc@google.com>
+        Mon, 25 Jul 2022 16:33:16 -0700 (PDT)
+Date:   Mon, 25 Jul 2022 23:33:12 +0000
+From:   Sean Christopherson <seanjc@google.com>
+To:     David Matlack <dmatlack@google.com>
 Cc:     Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org,
         linux-kernel@vger.kernel.org, Yosry Ahmed <yosryahmed@google.com>,
         Mingwei Zhang <mizhang@google.com>,
         Ben Gardon <bgardon@google.com>
-Subject: Re: [PATCH v2 6/6] KVM: x86/mmu: explicitly check nx_hugepage in
- disallowed_hugepage_adjust()
-Message-ID: <Yt8nBa00jQyoqFsQ@google.com>
+Subject: Re: [PATCH v2 5/6] KVM: x86/mmu: Add helper to convert SPTE value to
+ its shadow page
+Message-ID: <Yt8oOHvNO2nnBQwM@google.com>
 References: <20220723012325.1715714-1-seanjc@google.com>
- <20220723012325.1715714-7-seanjc@google.com>
+ <20220723012325.1715714-6-seanjc@google.com>
+ <Yt8mCI7MFhZbT+5R@google.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20220723012325.1715714-7-seanjc@google.com>
+In-Reply-To: <Yt8mCI7MFhZbT+5R@google.com>
 X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
         ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
@@ -74,84 +75,46 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Sat, Jul 23, 2022 at 01:23:25AM +0000, Sean Christopherson wrote:
-> From: Mingwei Zhang <mizhang@google.com>
+On Mon, Jul 25, 2022, David Matlack wrote:
+> On Sat, Jul 23, 2022 at 01:23:24AM +0000, Sean Christopherson wrote:
+> > Add a helper to convert a SPTE to its shadow page to deduplicate a
+> > variety of flows and hopefully avoid future bugs, e.g. if KVM attempts to
+> > get the shadow page for a SPTE without dropping high bits.
+> > 
+> > Opportunistically add a comment in mmu_free_root_page() documenting why
+> > it treats the root HPA as a SPTE.
+> > 
+> > No functional change intended.
+> > 
+> > Signed-off-by: Sean Christopherson <seanjc@google.com>
+> > ---
+> [...]
+> > --- a/arch/x86/kvm/mmu/spte.h
+> > +++ b/arch/x86/kvm/mmu/spte.h
+> > @@ -207,6 +207,23 @@ static inline int spte_index(u64 *sptep)
+> >   */
+> >  extern u64 __read_mostly shadow_nonpresent_or_rsvd_lower_gfn_mask;
+> >  
+> > +static inline struct kvm_mmu_page *to_shadow_page(hpa_t shadow_page)
+> > +{
+> > +	struct page *page = pfn_to_page((shadow_page) >> PAGE_SHIFT);
+> > +
+> > +	return (struct kvm_mmu_page *)page_private(page);
+> > +}
+> > +
+> > +static inline struct kvm_mmu_page *spte_to_sp(u64 spte)
+> > +{
+> > +	return to_shadow_page(spte & SPTE_BASE_ADDR_MASK);
+> > +}
 > 
-> Explicitly check if a NX huge page is disallowed when determining if a page
-> fault needs to be forced to use a smaller sized page. KVM incorrectly
-> assumes that the NX huge page mitigation is the only scenario where KVM
-> will create a shadow page instead of a huge page. Any scenario that causes
-> KVM to zap leaf SPTEs may result in having a SP that can be made huge
-> without violating the NX huge page mitigation. E.g. disabling of dirty
-> logging, zapping from mmu_notifier due to page migration, guest MTRR
-> changes that affect the viability of a huge page, etc...
-> 
-> Fixes: b8e8c8303ff2 ("kvm: mmu: ITLB_MULTIHIT mitigation")
-> 
-> Reviewed-by: Ben Gardon <bgardon@google.com>
-> Signed-off-by: Mingwei Zhang <mizhang@google.com>
-> [sean: add barrier comments, use spte_to_sp()]
-> Signed-off-by: Sean Christopherson <seanjc@google.com>
+> spte_to_sp() and sptep_to_sp() are a bit hard to differentiate visually.
 
-Reviewed-by: David Matlack <dmatlack@google.com>
+Yeah, I balked a bit when making the change, but couldn't come up with a better
+alternative.
 
-> ---
->  arch/x86/kvm/mmu/mmu.c     | 17 +++++++++++++++--
->  arch/x86/kvm/mmu/tdp_mmu.c |  6 ++++++
->  2 files changed, 21 insertions(+), 2 deletions(-)
-> 
-> diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
-> index ed3cfb31853b..97980528bf4a 100644
-> --- a/arch/x86/kvm/mmu/mmu.c
-> +++ b/arch/x86/kvm/mmu/mmu.c
-> @@ -3092,6 +3092,19 @@ void disallowed_hugepage_adjust(struct kvm_page_fault *fault, u64 spte, int cur_
->  	    cur_level == fault->goal_level &&
->  	    is_shadow_present_pte(spte) &&
->  	    !is_large_pte(spte)) {
-> +		u64 page_mask;
-> +
-> +		/*
-> +		 * Ensure nx_huge_page_disallowed is read after checking for a
-> +		 * present shadow page.  A different vCPU may be concurrently
-> +		 * installing the shadow page if mmu_lock is held for read.
-> +		 * Pairs with the smp_wmb() in kvm_tdp_mmu_map().
-> +		 */
-> +		smp_rmb();
-> +
-> +		if (!spte_to_sp(spte)->nx_huge_page_disallowed)
-> +			return;
-> +
->  		/*
->  		 * A small SPTE exists for this pfn, but FNAME(fetch)
->  		 * and __direct_map would like to create a large PTE
-> @@ -3099,8 +3112,8 @@ void disallowed_hugepage_adjust(struct kvm_page_fault *fault, u64 spte, int cur_
->  		 * patching back for them into pfn the next 9 bits of
->  		 * the address.
->  		 */
-> -		u64 page_mask = KVM_PAGES_PER_HPAGE(cur_level) -
-> -				KVM_PAGES_PER_HPAGE(cur_level - 1);
-> +		page_mask = KVM_PAGES_PER_HPAGE(cur_level) -
-> +			    KVM_PAGES_PER_HPAGE(cur_level - 1);
->  		fault->pfn |= fault->gfn & page_mask;
->  		fault->goal_level--;
->  	}
-> diff --git a/arch/x86/kvm/mmu/tdp_mmu.c b/arch/x86/kvm/mmu/tdp_mmu.c
-> index fea22dc481a0..313092d4931a 100644
-> --- a/arch/x86/kvm/mmu/tdp_mmu.c
-> +++ b/arch/x86/kvm/mmu/tdp_mmu.c
-> @@ -1194,6 +1194,12 @@ int kvm_tdp_mmu_map(struct kvm_vcpu *vcpu, struct kvm_page_fault *fault)
->  			tdp_mmu_init_child_sp(sp, &iter);
->  
->  			sp->nx_huge_page_disallowed = fault->huge_page_disallowed;
-> +			/*
-> +			 * Ensure nx_huge_page_disallowed is visible before the
-> +			 * SP is marked present, as mmu_lock is held for read.
-> +			 * Pairs with the smp_rmb() in disallowed_hugepage_adjust().
-> +			 */
-> +			smp_wmb();
->  
->  			if (tdp_mmu_link_sp(kvm, &iter, sp, true)) {
->  				tdp_mmu_free_sp(sp);
-> -- 
-> 2.37.1.359.gd136c6c3e2-goog
-> 
+> Maybe spte_to_child_sp() or to_child_sp()?
+
+I like to_child_sp().  Apparently I have a mental block when it comes to parent
+vs. child pages and never realized that sptep_to_sp() gets the "parent" but
+spte_to_sp() gets the "child".  That indeed makes spte_to_sp() a bad name.
+
