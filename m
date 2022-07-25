@@ -2,96 +2,175 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 8D4D45805BF
-	for <lists+kvm@lfdr.de>; Mon, 25 Jul 2022 22:35:22 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 6A28C580647
+	for <lists+kvm@lfdr.de>; Mon, 25 Jul 2022 23:18:19 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236973AbiGYUfV (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 25 Jul 2022 16:35:21 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40770 "EHLO
+        id S236666AbiGYVSR (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 25 Jul 2022 17:18:17 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39222 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S237244AbiGYUfO (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 25 Jul 2022 16:35:14 -0400
-Received: from mail-pj1-x102f.google.com (mail-pj1-x102f.google.com [IPv6:2607:f8b0:4864:20::102f])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6F026115F
-        for <kvm@vger.kernel.org>; Mon, 25 Jul 2022 13:35:11 -0700 (PDT)
-Received: by mail-pj1-x102f.google.com with SMTP id e1so980355pjl.1
-        for <kvm@vger.kernel.org>; Mon, 25 Jul 2022 13:35:11 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=oSbs4bLiLFRoDiEdwoSde6H1Z0IYhG08lZUF8/TBVx0=;
-        b=Bh6KsA4MANApkZQcCv5PI1jyKjSXTtpArjwUaDuXE8570p2KFUo8i2Os/izOz4cswS
-         owObzscuCn4t65SH5K/XHfdrs2fxRAN6sp8N2bcmo38wlZqlAFHciRzZwoPIweFyCc6H
-         Hx00piazZJiv7qZxYuMm3JkHsYYiNKEMHTFTJwfm/Z6ZtmPNX6h3NIqTDNytIrTnz7Ey
-         qLAd0cY/7GTpi72ej7NVrjS5f17Jo8OaDczpzfUTu/ux7gGhp4qpXJ51EH5+rhgNQFbd
-         olhzCt9JeZMlskjQ5mn94oR3/GCZg3VpYoAYLdD2LxjQ+y7fTI4fN5WDjn1/vDiUGWTR
-         VQSw==
+        with ESMTP id S236539AbiGYVSQ (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 25 Jul 2022 17:18:16 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 0DF3F237D4
+        for <kvm@vger.kernel.org>; Mon, 25 Jul 2022 14:18:15 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1658783895;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=2NWyiHW5I2/geA1CEWbRzyNY6UqPET26DY1+YZLfRCI=;
+        b=GFnRcScho2HqGfIsavFTZpFg0SDeQ48BZHbI+nax0W9xPrTO+LtIrO3CU0U7LZUpUrUd32
+        7/8HW+DaPKq5I17evhEng1uDUPag6vadt/RDS+gOBtoQSoRr8ECr0iCwlTWknnx8GB0MaY
+        bDOqI+NUl60ku5hTpQ0hZMHjs/qgy0c=
+Received: from mail-il1-f197.google.com (mail-il1-f197.google.com
+ [209.85.166.197]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-122-Qx8l389sM6OWiyUq0BOdAw-1; Mon, 25 Jul 2022 17:17:59 -0400
+X-MC-Unique: Qx8l389sM6OWiyUq0BOdAw-1
+Received: by mail-il1-f197.google.com with SMTP id h7-20020a92c267000000b002dd80cf0989so702597ild.5
+        for <kvm@vger.kernel.org>; Mon, 25 Jul 2022 14:17:59 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=oSbs4bLiLFRoDiEdwoSde6H1Z0IYhG08lZUF8/TBVx0=;
-        b=ow80l2kaF2qAaWK+WKvVV2+y62aMi2fFd5DU1yDzQJHuEkfr8V1l/QlyFdWlsngjXA
-         zfsEt9Tui1JpNRhkpXHJiVFtuN2zYb27p8AbVe4zYTtj6RgH9wrMgURAvQSKcy+PN43y
-         1G+wybkMP2fXy7g6XWV88cKQ2LmW+xzX9NV/0sr0Y0rbIZpsCRemsLKbhvSPc4bv7b42
-         1l7FH+a90Fcj9dUx5PKN78nVQL/PoKVoh6ZhymnpasmVCE71moJ+wpmQ7Zj9HgUrNWUq
-         RU8XBpdHhSQiMc/gIBqV0Lm/dHw7Mjs7h67DVj6xNae6z3GEtIEll+NZIqLyl4J0vQ92
-         ETJQ==
-X-Gm-Message-State: AJIora9BSHNHuPiPzV3ILQUJIXB+qX41oddxbNu0pyMojW+P9c+AaZ+p
-        d1/BACA6ItbsZEFKMf0/B3XcQw==
-X-Google-Smtp-Source: AGRyM1s8L2Ck3bOdVVoh7FfCYNRThxdqd2Hc4lDp/jMpGPaf0gU0UePxPeNU6oSikTi74r98Mfo75Q==
-X-Received: by 2002:a17:902:cf09:b0:16d:69ad:e496 with SMTP id i9-20020a170902cf0900b0016d69ade496mr8650520plg.6.1658781310824;
-        Mon, 25 Jul 2022 13:35:10 -0700 (PDT)
-Received: from google.com (7.104.168.34.bc.googleusercontent.com. [34.168.104.7])
-        by smtp.gmail.com with ESMTPSA id r12-20020a17090a4dcc00b001ef81574355sm11375507pjl.12.2022.07.25.13.35.10
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:in-reply-to
+         :references:organization:mime-version:content-transfer-encoding;
+        bh=2NWyiHW5I2/geA1CEWbRzyNY6UqPET26DY1+YZLfRCI=;
+        b=bjXDeLZ7s35RW+eJSEiIDnkhDEsLI6svke35x8JXhExZwgE98LSOTsnBYwQb2tKCKa
+         WbyCMu4XH/pJoYJiAoJdCr15a3YJeNY29EFMLDAIiyMN9bGjMBRn/9gnnoR22TuhlLoy
+         RBRFc7ehybWmAZeylIUIBEk4JaR4UE0FCc1kN8LnyHE+V9ylQWjqpLqL209QPwm3qVbQ
+         nrMVh3tvzZ5Q710JvKlou3i36QJ6Vy19RuDd71zxxHEdItu7i92xfKgZGUDcsHlkgz0C
+         9TAkg/c4fpXv3eto6IK7R7zGP4sJATdrQI3rzmqJ8DzJ+D+MTz5qrG2yMR/SIOdVW0in
+         uJ/w==
+X-Gm-Message-State: AJIora/LskPbWl4K8Ex+f1ydzFAfSpjpw02feuyZOxA1TyOkP9AIHp6i
+        EV5/v2t3FbP7dTMGcndS4cDEP/SPLNKpSDSgFP1s7CFdc+DA1AXRPX2T2HZ6KPa8sFJRF7bnAIZ
+        Rog3wKTt77TZ4
+X-Received: by 2002:a05:6e02:148c:b0:2dc:38ae:5c6a with SMTP id n12-20020a056e02148c00b002dc38ae5c6amr5550201ilk.115.1658783878650;
+        Mon, 25 Jul 2022 14:17:58 -0700 (PDT)
+X-Google-Smtp-Source: AGRyM1uXwuWmhW15O2ymdEn2whv1cs+NjXgAHFLetXDjRt4kzq/rgyjNkTHVfDxBgkGk5gC+VO8tdQ==
+X-Received: by 2002:a05:6e02:148c:b0:2dc:38ae:5c6a with SMTP id n12-20020a056e02148c00b002dc38ae5c6amr5550196ilk.115.1658783878367;
+        Mon, 25 Jul 2022 14:17:58 -0700 (PDT)
+Received: from redhat.com ([38.15.36.239])
+        by smtp.gmail.com with ESMTPSA id h76-20020a6bb74f000000b0067baeb55e65sm6614546iof.38.2022.07.25.14.17.57
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 25 Jul 2022 13:35:10 -0700 (PDT)
-Date:   Mon, 25 Jul 2022 20:35:06 +0000
-From:   Sean Christopherson <seanjc@google.com>
-To:     Paolo Bonzini <pbonzini@redhat.com>
-Cc:     kvm@vger.kernel.org, Yang Weijiang <weijiang.yang@intel.com>,
-        Manali Shukla <manali.shukla@amd.com>,
-        Jim Mattson <jmattson@google.com>
-Subject: Re: [kvm-unit-tests GIT PULL] x86: Fixes, cleanups, and new sub-tests
-Message-ID: <Yt7+epRAIL7EK2jj@google.com>
-References: <YtnBbb1pleBpIl2J@google.com>
- <YttLhpaAwft0PnbI@google.com>
- <Yt7LJZpmF3ddJJnk@google.com>
+        Mon, 25 Jul 2022 14:17:58 -0700 (PDT)
+Date:   Mon, 25 Jul 2022 15:17:55 -0600
+From:   Alex Williamson <alex.williamson@redhat.com>
+To:     Nicolin Chen <nicolinc@nvidia.com>
+Cc:     <kwankhede@nvidia.com>, <corbet@lwn.net>, <hca@linux.ibm.com>,
+        <gor@linux.ibm.com>, <agordeev@linux.ibm.com>,
+        <borntraeger@linux.ibm.com>, <svens@linux.ibm.com>,
+        <zhenyuw@linux.intel.com>, <zhi.a.wang@intel.com>,
+        <jani.nikula@linux.intel.com>, <joonas.lahtinen@linux.intel.com>,
+        <rodrigo.vivi@intel.com>, <tvrtko.ursulin@linux.intel.com>,
+        <airlied@linux.ie>, <daniel@ffwll.ch>, <farman@linux.ibm.com>,
+        <mjrosato@linux.ibm.com>, <pasic@linux.ibm.com>,
+        <vneethv@linux.ibm.com>, <oberpar@linux.ibm.com>,
+        <freude@linux.ibm.com>, <akrowiak@linux.ibm.com>,
+        <jjherne@linux.ibm.com>, <cohuck@redhat.com>, <jgg@nvidia.com>,
+        <kevin.tian@intel.com>, <hch@infradead.org>,
+        <jchrist@linux.ibm.com>, <kvm@vger.kernel.org>,
+        <linux-doc@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+        <linux-s390@vger.kernel.org>,
+        <intel-gvt-dev@lists.freedesktop.org>,
+        <intel-gfx@lists.freedesktop.org>,
+        <dri-devel@lists.freedesktop.org>, <terrence.xu@intel.com>
+Subject: Re: [PATCH v4 00/10] cover-letter: Update vfio_pin/unpin_pages API
+Message-ID: <20220725151755.12d53f2e.alex.williamson@redhat.com>
+In-Reply-To: <20220723020256.30081-1-nicolinc@nvidia.com>
+References: <20220723020256.30081-1-nicolinc@nvidia.com>
+Organization: Red Hat
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <Yt7LJZpmF3ddJJnk@google.com>
-X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-        USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=ham
-        autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-Spam-Status: No, score=-2.7 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        SPF_HELO_NONE,SPF_NONE autolearn=unavailable autolearn_force=no
+        version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Jul 25, 2022, Sean Christopherson wrote:
-> On Sat, Jul 23, 2022, Sean Christopherson wrote:
-> > On Thu, Jul 21, 2022, Sean Christopherson wrote:
-> > > Please pull/merge a pile of x86 cleanups and fixes, most of which have been
-> > > waiting for review/merge for quite some time.  The only non-trivial changes that
-> > > haven't been posted are the massaged version of the PMU cleanup patches.
-> > > 
-> > > Note, the very last commit will fail spectacularly on kvm/queue due to a KVM
-> > > bug: https://lore.kernel.org/all/20220607213604.3346000-4-seanjc@google.com.
-> > > 
-> > > Other than that, tested on Intel and AMD, both 64-bit and 32-bit.
-> > 
-> > Argh, don't pull this.
-> > 
-> > Commit b89a09f ("x86: Provide a common 64-bit AP entrypoint for EFI and non-EFI")
-> > broke the SVM tests on Rome.  I'll look into it next week and spin a new version.
-> 
-> The APIC needs to be "reset" to put it back into xAPIC, otherwise pre_boot_apic_id()
-> will return garbage when `svm_init_startup_test` is run and x2APIC is supported.
+On Fri, 22 Jul 2022 19:02:46 -0700
+Nicolin Chen <nicolinc@nvidia.com> wrote:
 
-And of course that breaks EFI.  Posted a small series to play nice with x2APIC and
-provide a segue into the UEFI changes.
+> This is a preparatory series for IOMMUFD v2 patches. It prepares for
+> replacing vfio_iommu_type1 implementations of vfio_pin/unpin_pages()
+> with IOMMUFD version.
+> 
+> There's a gap between these two versions: the vfio_iommu_type1 version
+> inputs a non-contiguous PFN list and outputs another PFN list for the
+> pinned physical page list, while the IOMMUFD version only supports a
+> contiguous address input by accepting the starting IO virtual address
+> of a set of pages to pin and by outputting to a physical page list.
+> 
+> The nature of existing callers mostly aligns with the IOMMUFD version,
+> except s390's vfio_ccw_cp code where some additional change is needed
+> along with this series. Overall, updating to "iova" and "phys_page"
+> does improve the caller side to some extent.
+> 
+> Also fix a misuse of physical address and virtual address in the s390's
+> crypto code. And update the input naming at the adjacent vfio_dma_rw().
+> 
+> This is on github:
+> https://github.com/nicolinc/iommufd/commits/vfio_pin_pages-v4
+> 
+> Terrence has tested this series on i915; Eric has tested on s390.
+> 
+> Thanks!
+> 
+> Changelog
+> v4:
+>  * Dropped double-shifting at two gvt_unpin_guest_page calls, fixing
+>    a bug that's discovered by Alex
+>  * Added Reviewed-by from Anthony Krowiak
+>  * Rebased on top of linux-vfio's next
+> v3: https://lore.kernel.org/kvm/20220708224427.1245-1-nicolinc@nvidia.com/
+>  * Added a patch to replace roundup with DIV_ROUND_UP in i915 gvt
+>  * Dropped the "driver->ops->unpin_pages" and NULL checks in PATCH-1
+>  * Changed to use WARN_ON and separate into lines in PATCH-1
+>  * Replaced "guest" words with "user" and fix typo in PATCH-5
+>  * Updated commit log of PATCH-1, PATCH-6, and PATCH-10
+>  * Added Reviewed/Acked-by from Christoph, Jason, Kirti, Kevin and Eric
+>  * Added Tested-by from Terrence (i915) and Eric (s390)
+> v2: https://lore.kernel.org/kvm/20220706062759.24946-1-nicolinc@nvidia.com/
+>  * Added a patch to make vfio_unpin_pages return void
+>  * Added two patches to remove PFN list from two s390 callers
+>  * Renamed "phys_page" parameter to "pages" for vfio_pin_pages
+>  * Updated commit log of kmap_local_page() patch
+>  * Added Harald's "Reviewed-by" to pa_ind patch
+>  * Rebased on top of Alex's extern removal path
+> v1: https://lore.kernel.org/kvm/20220616235212.15185-1-nicolinc@nvidia.com/
+> 
+> Nicolin Chen (10):
+>   vfio: Make vfio_unpin_pages() return void
+>   drm/i915/gvt: Replace roundup with DIV_ROUND_UP
+>   vfio/ap: Pass in physical address of ind to ap_aqic()
+>   vfio/ccw: Only pass in contiguous pages
+>   vfio: Pass in starting IOVA to vfio_pin/unpin_pages API
+>   vfio/ap: Change saved_pfn to saved_iova
+>   vfio/ccw: Change pa_pfn list to pa_iova list
+>   vfio: Rename user_iova of vfio_dma_rw()
+>   vfio/ccw: Add kmap_local_page() for memcpy
+>   vfio: Replace phys_pfn with pages for vfio_pin_pages()
+> 
+>  .../driver-api/vfio-mediated-device.rst       |   6 +-
+>  arch/s390/include/asm/ap.h                    |   6 +-
+>  drivers/gpu/drm/i915/gvt/kvmgt.c              |  45 ++--
+>  drivers/s390/cio/vfio_ccw_cp.c                | 195 +++++++++++-------
+>  drivers/s390/crypto/ap_queue.c                |   2 +-
+>  drivers/s390/crypto/vfio_ap_ops.c             |  54 +++--
+>  drivers/s390/crypto/vfio_ap_private.h         |   4 +-
+>  drivers/vfio/vfio.c                           |  54 ++---
+>  drivers/vfio/vfio.h                           |   8 +-
+>  drivers/vfio/vfio_iommu_type1.c               |  45 ++--
+>  include/linux/vfio.h                          |   9 +-
+>  11 files changed, 213 insertions(+), 215 deletions(-)
+> 
+
+Applied to vfio next branch for v5.20.  Thanks,
+
+Alex
+
