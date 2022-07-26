@@ -2,121 +2,156 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id AA31E580ADB
-	for <lists+kvm@lfdr.de>; Tue, 26 Jul 2022 07:37:35 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 5FB36580AE2
+	for <lists+kvm@lfdr.de>; Tue, 26 Jul 2022 07:49:52 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237609AbiGZFhZ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 26 Jul 2022 01:37:25 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40850 "EHLO
+        id S231941AbiGZFtt (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 26 Jul 2022 01:49:49 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45716 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S237602AbiGZFhY (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 26 Jul 2022 01:37:24 -0400
-Received: from mail-pj1-x1031.google.com (mail-pj1-x1031.google.com [IPv6:2607:f8b0:4864:20::1031])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D545E27CDE
-        for <kvm@vger.kernel.org>; Mon, 25 Jul 2022 22:37:23 -0700 (PDT)
-Received: by mail-pj1-x1031.google.com with SMTP id jw17so57804pjb.0
-        for <kvm@vger.kernel.org>; Mon, 25 Jul 2022 22:37:23 -0700 (PDT)
+        with ESMTP id S229952AbiGZFts (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 26 Jul 2022 01:49:48 -0400
+Received: from mail-yw1-x1129.google.com (mail-yw1-x1129.google.com [IPv6:2607:f8b0:4864:20::1129])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C4C081FCFB
+        for <kvm@vger.kernel.org>; Mon, 25 Jul 2022 22:49:45 -0700 (PDT)
+Received: by mail-yw1-x1129.google.com with SMTP id 00721157ae682-31d85f82f0bso131324277b3.7
+        for <kvm@vger.kernel.org>; Mon, 25 Jul 2022 22:49:45 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=cSJ2gSZEB95hQy+fBPJ2b6XGNWJqJmog2/ljhs0mKjk=;
-        b=Tni2yj0/pL2Jpa8ecAowM1kwFjFqP1gjp4Pwvvksw8y6+kamiIiCbiK8LMkZy7tv3l
-         eCz53si26zG3SIFgWxMoLX1OWgY3g92VLYPoz06MadIQFIM6U+QGv2n925Diti5NOn7K
-         2gDDCp419O+bMCh6SplghILz6okQcoBGnApd5QXxL62BmRimZ6mhqUcCfvzH4JT1aIVA
-         IwmvKKLyIWfgqMJ3J3AeWRyYKJhqTuC8Y2/5XY+EdgTeDMUsxO0cQudUwkWSzQvmtNBW
-         j2SBzu5/z4zrjac5sUzfrrQQYuFyyjYJrQeB4k0ZcZIGAH3NRoPQRyCh/VBwTHrX4fv+
-         U3Ng==
+        d=atishpatra.org; s=google;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=wC2AgKCkoa/FuALgKTQYRYYG1SVq93t6JSMuNrwiiVQ=;
+        b=F4isfSDJdigZd5IbUyJaKZkLsqKJ0djQ5AJsNPp5sk3hO0Srpfu02Gd+HPjkgrz5wo
+         O+PaCOQyaFPTLB4WTUB8yVUUezS7JlUl8/ZSoHLcV6jckZwGIHBJ1tZepFRTGIu7NQS5
+         H6jeRvyaDzVzWFxtir2ln7IMoyaT6NHB+P+ew=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=cSJ2gSZEB95hQy+fBPJ2b6XGNWJqJmog2/ljhs0mKjk=;
-        b=kqtAkOKrHRerr8ETMXAxXUkSAxOB9OcgtCXKkzviH2rnammly2RYQif90JPLkl3YgG
-         o0ArOdNH9wESfV+Lf7no3B+Ob2476aQHucSKH5df+t4EG7iiiIMBSJRWguVDOxnfEtOF
-         lfyXf63yNW+BMnB/DzGO5QZ208kaHsKg1Eq+3XmHOQ5QEXAmUtZom4nYAc7UlSA4aq2Y
-         8+8BuDj5fa/d9nV+3d974Ao1G9s3K/w+EFFcewuKN0XSdEIW/a3vR6hxEtGb0eFAHN1v
-         +QpfxKIOsC0z6gdjqr7q5Kr2Du4vpbTjWocKkwAb2LyV4qgwSLlmx2AClJ0UzZFIQz9v
-         p8Nw==
-X-Gm-Message-State: AJIora8+YfHRDlEw0Tlhmt3qBYQRNqN8jtv21OCOr70FyUjGQQ7UC2Jc
-        fsfbRhcaPVxGBePE4qTI0TdwFhu20pUVMQ==
-X-Google-Smtp-Source: AGRyM1tW8LiEDIBONgwUmkjln3quZm/8MKljtCsacOKwijdmvK0Yjxw2u6ulUGjMINFD4v5vRms0Og==
-X-Received: by 2002:a17:902:d64a:b0:16c:2755:428d with SMTP id y10-20020a170902d64a00b0016c2755428dmr15805492plh.79.1658813843096;
-        Mon, 25 Jul 2022 22:37:23 -0700 (PDT)
-Received: from google.com (59.39.145.34.bc.googleusercontent.com. [34.145.39.59])
-        by smtp.gmail.com with ESMTPSA id h13-20020a170902680d00b00168c52319c3sm10429459plk.149.2022.07.25.22.37.22
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 25 Jul 2022 22:37:22 -0700 (PDT)
-Date:   Tue, 26 Jul 2022 05:37:18 +0000
-From:   Mingwei Zhang <mizhang@google.com>
-To:     Sean Christopherson <seanjc@google.com>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org, Yosry Ahmed <yosryahmed@google.com>,
-        Ben Gardon <bgardon@google.com>
-Subject: Re: [PATCH v2 0/6] KVM: x86: Apply NX mitigation more precisely
-Message-ID: <Yt99jpf5l/cInivs@google.com>
-References: <20220723012325.1715714-1-seanjc@google.com>
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=wC2AgKCkoa/FuALgKTQYRYYG1SVq93t6JSMuNrwiiVQ=;
+        b=YK/T+L4achpV52rF+ne1u7MBSXT0EDKdVSEJMlTxUHVMjL5Lm9vJK9Nkeo+hizuPMH
+         rB9K4a5F5RyIyKBx1ig3VzP6wsXtgehRTOYwA5RSdtFubLBQPUPfhIEm2MPJ41Yq3XcE
+         Q+QOvzj1GRekofb0gj/pXxiLJXfexbQDVz1irjlqV7svCVmgyQXs3ux/55EWhZlzoeDJ
+         GqYCDnzDTwQJ0nVzNV3hDvx0EEzVw9jVdgsPwLmN4Y1dJr+cgboypZ5NGMPNebqt7lHn
+         jE/GnAqncxmrOlG6XjZ04KEnBHN+q2RJLXjKvp2guhs+mxhoaKDFH13Q7h/Pcs6Zwmxk
+         hkpQ==
+X-Gm-Message-State: AJIora8Dr7TXEMio8ZCEnq6S2eLKRk29Pd4XDW9QJfAXwf0mZbQuEen/
+        jkfB7tNp56/3V+U6X+FnGEyBAp0YMoek5/a04fKK
+X-Google-Smtp-Source: AGRyM1ui8146ZmRckyLg9qtt9W1JTT+gVnn4Uua002pEWROvnIjWvUOUDn+8rcpNk56CG05r6u+sWklRBNPaopmmcSU=
+X-Received: by 2002:a81:7589:0:b0:31e:620b:e75 with SMTP id
+ q131-20020a817589000000b0031e620b0e75mr12770978ywc.482.1658814584983; Mon, 25
+ Jul 2022 22:49:44 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20220723012325.1715714-1-seanjc@google.com>
-X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-        USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=ham
-        autolearn_force=no version=3.4.6
+References: <20220722165047.519994-1-atishp@rivosinc.com> <20220722165047.519994-4-atishp@rivosinc.com>
+In-Reply-To: <20220722165047.519994-4-atishp@rivosinc.com>
+From:   Atish Patra <atishp@atishpatra.org>
+Date:   Mon, 25 Jul 2022 22:49:34 -0700
+Message-ID: <CAOnJCUK1JppQkZ+bv7mNpCm95i3gGZ5wHaRc2wiBGyp3zj2Dhw@mail.gmail.com>
+Subject: Re: [PATCH v7 3/4] RISC-V: Prefer sstc extension if available
+To:     Atish Patra <atishp@rivosinc.com>, Stephen Boyd <sboyd@kernel.org>,
+        Palmer Dabbelt <palmer@dabbelt.com>
+Cc:     "linux-kernel@vger.kernel.org List" <linux-kernel@vger.kernel.org>,
+        Anup Patel <anup@brainfault.org>,
+        Albert Ou <aou@eecs.berkeley.edu>,
+        Daniel Lezcano <daniel.lezcano@linaro.org>,
+        Guo Ren <guoren@kernel.org>, Heiko Stuebner <heiko@sntech.de>,
+        "open list:KERNEL VIRTUAL MACHINE FOR RISC-V (KVM/riscv)" 
+        <kvm-riscv@lists.infradead.org>, KVM General <kvm@vger.kernel.org>,
+        linux-riscv <linux-riscv@lists.infradead.org>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Paul Walmsley <paul.walmsley@sifive.com>,
+        Rob Herring <robh@kernel.org>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Tsukasa OI <research_trasio@irq.a4lg.com>,
+        Wei Fu <wefu@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Sat, Jul 23, 2022, Sean Christopherson wrote:
-> Patch 6 from Mingwei is the end goal of the series.  KVM incorrectly
-> assumes that the NX huge page mitigation is the only scenario where KVM
-> will create a non-leaf page instead of a huge page.   Precisely track
-> (via kvm_mmu_page) if a non-huge page is being forced and use that info
-> to avoid unnecessarily forcing smaller page sizes in
-> disallowed_hugepage_adjust().
-> 
-> v2: Rebase, tweak a changelog accordingly.
+On Fri, Jul 22, 2022 at 9:50 AM Atish Patra <atishp@rivosinc.com> wrote:
+>
+> RISC-V ISA has sstc extension which allows updating the next clock event
+> via a CSR (stimecmp) instead of an SBI call. This should happen dynamically
+> if sstc extension is available. Otherwise, it will fallback to SBI call
+> to maintain backward compatibility.
+>
+> Reviewed-by: Anup Patel <anup@brainfault.org>
+> Signed-off-by: Atish Patra <atishp@rivosinc.com>
+> ---
+>  drivers/clocksource/timer-riscv.c | 25 ++++++++++++++++++++++++-
+>  1 file changed, 24 insertions(+), 1 deletion(-)
+>
+> diff --git a/drivers/clocksource/timer-riscv.c b/drivers/clocksource/timer-riscv.c
+> index 593d5a957b69..05f6cf067289 100644
+> --- a/drivers/clocksource/timer-riscv.c
+> +++ b/drivers/clocksource/timer-riscv.c
+> @@ -7,6 +7,9 @@
+>   * either be read from the "time" and "timeh" CSRs, and can use the SBI to
+>   * setup events, or directly accessed using MMIO registers.
+>   */
+> +
+> +#define pr_fmt(fmt) "riscv-timer: " fmt
+> +
+>  #include <linux/clocksource.h>
+>  #include <linux/clockchips.h>
+>  #include <linux/cpu.h>
+> @@ -20,14 +23,28 @@
+>  #include <linux/of_irq.h>
+>  #include <clocksource/timer-riscv.h>
+>  #include <asm/smp.h>
+> +#include <asm/hwcap.h>
+>  #include <asm/sbi.h>
+>  #include <asm/timex.h>
+>
+> +static DEFINE_STATIC_KEY_FALSE(riscv_sstc_available);
+> +
+>  static int riscv_clock_next_event(unsigned long delta,
+>                 struct clock_event_device *ce)
+>  {
+> +       u64 next_tval = get_cycles64() + delta;
+> +
+>         csr_set(CSR_IE, IE_TIE);
+> -       sbi_set_timer(get_cycles64() + delta);
+> +       if (static_branch_likely(&riscv_sstc_available)) {
+> +#if defined(CONFIG_32BIT)
+> +               csr_write(CSR_STIMECMP, next_tval & 0xFFFFFFFF);
+> +               csr_write(CSR_STIMECMPH, next_tval >> 32);
+> +#else
+> +               csr_write(CSR_STIMECMP, next_tval);
+> +#endif
+> +       } else
+> +               sbi_set_timer(next_tval);
+> +
+>         return 0;
+>  }
+>
+> @@ -165,6 +182,12 @@ static int __init riscv_timer_init_dt(struct device_node *n)
+>         if (error)
+>                 pr_err("cpu hp setup state failed for RISCV timer [%d]\n",
+>                        error);
+> +
+> +       if (riscv_isa_extension_available(NULL, SSTC)) {
+> +               pr_info("Timer interrupt in S-mode is available via sstc extension\n");
+> +               static_branch_enable(&riscv_sstc_available);
+> +       }
+> +
+>         return error;
+>  }
+>
+> --
+> 2.25.1
+>
 
-hmm, I applied this patch set (v2) on top of kvm/queue (HEAD:
-1a4d88a361af) and it seems kvm-unit-tests/vmx failed on both ept=1 and
-ept=0. And it did not work on our internel kernel either (kernel
-crashed).
+Hi Stephen,
+Can you please review this whenever you get a chance ? We probably
+need an ACK at least :)
 
-Maybe there is still minor issues?
-
-> 
-> v1: https://lore.kernel.org/all/20220409003847.819686-1-seanjc@google.com
-> 
-> Mingwei Zhang (1):
->   KVM: x86/mmu: explicitly check nx_hugepage in
->     disallowed_hugepage_adjust()
-> 
-> Sean Christopherson (5):
->   KVM: x86/mmu: Tag disallowed NX huge pages even if they're not tracked
->   KVM: x86/mmu: Properly account NX huge page workaround for nonpaging
->     MMUs
->   KVM: x86/mmu: Set disallowed_nx_huge_page in TDP MMU before setting
->     SPTE
->   KVM: x86/mmu: Track the number of TDP MMU pages, but not the actual
->     pages
->   KVM: x86/mmu: Add helper to convert SPTE value to its shadow page
-> 
->  arch/x86/include/asm/kvm_host.h |  17 ++---
->  arch/x86/kvm/mmu/mmu.c          | 107 ++++++++++++++++++++++----------
->  arch/x86/kvm/mmu/mmu_internal.h |  41 +++++++-----
->  arch/x86/kvm/mmu/paging_tmpl.h  |   6 +-
->  arch/x86/kvm/mmu/spte.c         |  11 ++++
->  arch/x86/kvm/mmu/spte.h         |  17 +++++
->  arch/x86/kvm/mmu/tdp_mmu.c      |  49 +++++++++------
->  arch/x86/kvm/mmu/tdp_mmu.h      |   2 +
->  8 files changed, 167 insertions(+), 83 deletions(-)
-> 
-> 
-> base-commit: 1a4d88a361af4f2e91861d632c6a1fe87a9665c2
-> -- 
-> 2.37.1.359.gd136c6c3e2-goog
-> 
+-- 
+Regards,
+Atish
