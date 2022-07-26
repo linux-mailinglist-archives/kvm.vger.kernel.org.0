@@ -2,296 +2,103 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 55922580F17
-	for <lists+kvm@lfdr.de>; Tue, 26 Jul 2022 10:33:54 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 35DAA580F2E
+	for <lists+kvm@lfdr.de>; Tue, 26 Jul 2022 10:37:43 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238363AbiGZIdo (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 26 Jul 2022 04:33:44 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49220 "EHLO
+        id S238582AbiGZIhl (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 26 Jul 2022 04:37:41 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53356 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231345AbiGZIdk (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 26 Jul 2022 04:33:40 -0400
-Received: from mail-yw1-x1132.google.com (mail-yw1-x1132.google.com [IPv6:2607:f8b0:4864:20::1132])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4DE7D2F3A8
-        for <kvm@vger.kernel.org>; Tue, 26 Jul 2022 01:33:39 -0700 (PDT)
-Received: by mail-yw1-x1132.google.com with SMTP id 00721157ae682-31bf3656517so134581677b3.12
-        for <kvm@vger.kernel.org>; Tue, 26 Jul 2022 01:33:39 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc:content-transfer-encoding;
-        bh=2Zj6IDscOqGpySURIv3/6OT9Yjl3MfpVD47TFHbtsSY=;
-        b=Cq3woY32gfETWotKVJ0jVvPaZnuXlO78yPMcYGL8XNfszfNG7vyRsamBeGl50H7/DM
-         J4k0t8KmRkm3KkP1t1wOHez6f3tCNBb5ZYCEXlAegZfUA1u1uQ2N4SyDIsmwBF6HImaV
-         A7ct2UFqNDuN9o8jqRbLaVguw6IYnuM4PnMqtw756iGGGcOXvtYVuMCLiPtkWFXIR4QD
-         i/9LXg2E5q5LxtRVbWiRFKxQBEWsHFGOIs0KmhqhLaPeYWCS/OBQdZA/foxm0yZypBzP
-         AUjJqyGrt6YMi7GLRGTUEaTJF7FrAPzyZL37KFUUJjNFMtJ00jt0BgkhbdosUZK2Kvaw
-         QH+A==
+        with ESMTP id S238581AbiGZIhi (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 26 Jul 2022 04:37:38 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 752A42F385
+        for <kvm@vger.kernel.org>; Tue, 26 Jul 2022 01:37:35 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1658824654;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding;
+        bh=FurqgRX31jVoiI2p8b4EmkiKFjf4ER8n82Uh1xsPhDo=;
+        b=FO/HsPnOD49r3BGkh7C6cO1+YnKvoRVsebIA2PHu+YjAp5YiqIRIxc1ykUJw5gkYJiWpYF
+        z/VHY/sb6vZWhKhY6EyMesLl4Q7H0CabPIg81y3r/e8t/8Z51Mdm65p6LQIED82foViyV+
+        6UYJAb9Mxj1VQWfaqmdKEPnt3ZVgUng=
+Received: from mail-ed1-f69.google.com (mail-ed1-f69.google.com
+ [209.85.208.69]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-660-Hb-0WJ5KObuWfRQFLZWawQ-1; Tue, 26 Jul 2022 04:37:28 -0400
+X-MC-Unique: Hb-0WJ5KObuWfRQFLZWawQ-1
+Received: by mail-ed1-f69.google.com with SMTP id w15-20020a056402268f00b0043be4012ea9so4222247edd.4
+        for <kvm@vger.kernel.org>; Tue, 26 Jul 2022 01:37:28 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc:content-transfer-encoding;
-        bh=2Zj6IDscOqGpySURIv3/6OT9Yjl3MfpVD47TFHbtsSY=;
-        b=ya91uj7CF7X0ciADGENBj27l6hdQSbjQiF7UkE/v8HrJwbWnEsPVsou3W+UCFeDhXz
-         md2w7WrfiYvx8mXUHlqxPDdg6OyF6XmYq3GsnTXmsZIPUwgb7nFHsl22JXElIxOdDiBr
-         P+gVbRvHr1A1CjaMupLzFwnBO9Q44fEY7QCeRNHCqVK0IcjCa9SQUUqWpg4ZJt3lAyqU
-         7WqfiUknDqrSMh7xzYOD3ldzefts5/mikX4MTUacPLWGNFV4+krgaWIXUXLh+08Fldch
-         IyA6LHZ91nC+pWeW/xXU8xgO6kfqSfKsE1XRw8vGXG/uugDIaEN+AffjlRUXUg1+U+P2
-         5K3w==
-X-Gm-Message-State: AJIora/asBgjQX3gsnxNjHHn4q7Ctvsuv4ShBSsxHurkf+DRvaiqNCgi
-        3d9tNZ9CcrxqY782yOl1yP/Xg1gOsET1epyB7ylnxQ==
-X-Google-Smtp-Source: AGRyM1ua9TSRpV0zIZSYIP6XnTuBYQmdJo06utwGMAgbUoepW/SG6vP4DyIAXqYyoa7tAeOpas2aiWwwh7IAFnd+Z+I=
-X-Received: by 2002:a81:74d:0:b0:31e:c419:fc75 with SMTP id
- 74-20020a81074d000000b0031ec419fc75mr13398395ywh.364.1658824418308; Tue, 26
- Jul 2022 01:33:38 -0700 (PDT)
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=FurqgRX31jVoiI2p8b4EmkiKFjf4ER8n82Uh1xsPhDo=;
+        b=n1in8w5ktN8mK8RM5uiYuCoG9Ma78k6ywhgY2opzFlq92ualU+cQnuFzNEydz2Jape
+         FCjYVLnCZwlQUOW6ioH6FWyktB3BMBWVeVwgMpXrXPQBvetiIG+nX1VlLHEOBC+c9Siy
+         1NwOEihhkVuqkiY0Gs2xM65nAlxLOIYr07Soa1EBi9jCqs+eVxbg+X/ghRX/R2sJBJ0v
+         5E52XQiSt7DwTLMQ4Bvnz/vuulzOj7y+xrTKJPZym3a2J0t2Wu3XE/OOPGTeLBY3Pquo
+         AVorpyy/JSGm/vstpBYQM+OG5iDijfPwY56DbdVcDLjocAkLg97y8zvtQjSZIZn2prMA
+         4V4w==
+X-Gm-Message-State: AJIora+Tv5JqIX+sq3pNBwqEPhlYt1Jpy7EM9lz1CDHj8Q41qyv0sw4d
+        9IgTatRhtj8kc85GkKDgqQI16aMxgXyhAHxB4rBqgLUZ2QMc+WWk53OowEFIlk4X809sHeP1xqp
+        mX8yhfLfgct+7oNKo5kf1sRjrxuwPWD+Zf9/xVEYMqyMEEIMfQTDAdeTzvEHNPlF4
+X-Received: by 2002:a17:907:a0c6:b0:72e:ee9a:cf89 with SMTP id hw6-20020a170907a0c600b0072eee9acf89mr12746852ejc.43.1658824647103;
+        Tue, 26 Jul 2022 01:37:27 -0700 (PDT)
+X-Google-Smtp-Source: AGRyM1voOl14uHYpAP9YZBy7kzR5G5Pwt847cwy0JMatd4ESzo/kvdtPiu6BB7oU7d3lUAQCtWy9mA==
+X-Received: by 2002:a17:907:a0c6:b0:72e:ee9a:cf89 with SMTP id hw6-20020a170907a0c600b0072eee9acf89mr12746819ejc.43.1658824646540;
+        Tue, 26 Jul 2022 01:37:26 -0700 (PDT)
+Received: from goa-sendmail ([93.56.169.184])
+        by smtp.gmail.com with ESMTPSA id j9-20020a17090623e900b006fed93bf71fsm6241504ejg.18.2022.07.26.01.37.25
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 26 Jul 2022 01:37:26 -0700 (PDT)
+From:   Paolo Bonzini <pbonzini@redhat.com>
+To:     kvm@vger.kernel.org
+Cc:     thuth@redhat.com, imbrenda@linux.ibm.com
+Subject: [PATCH kvm-unit-tests] s390x: fix build with clang
+Date:   Tue, 26 Jul 2022 10:37:25 +0200
+Message-Id: <20220726083725.32454-1-pbonzini@redhat.com>
+X-Mailer: git-send-email 2.36.1
 MIME-Version: 1.0
-References: <20220722230241.1944655-1-avagin@google.com> <Yts1tUfPxdPH5XGs@google.com>
-In-Reply-To: <Yts1tUfPxdPH5XGs@google.com>
-From:   Andrei Vagin <avagin@google.com>
-Date:   Tue, 26 Jul 2022 01:33:27 -0700
-Message-ID: <CAEWA0a4hrRb5HYLqa1Q47=guY6TLsWSJ_zxNjOXXV2jCjUekUA@mail.gmail.com>
-Subject: Re: [PATCH 0/5] KVM/x86: add a new hypercall to execute host system
-To:     Sean Christopherson <seanjc@google.com>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>, linux-kernel@vger.kernel.org,
-        kvm@vger.kernel.org, Wanpeng Li <wanpengli@tencent.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Jianfeng Tan <henry.tjf@antfin.com>,
-        Adin Scannell <ascannell@google.com>,
-        Konstantin Bogomolov <bogomolov@google.com>,
-        Etienne Perot <eperot@google.com>,
-        Andy Lutomirski <luto@kernel.org>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org,
-        "H. Peter Anvin" <hpa@zytor.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-        USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=ham
-        autolearn_force=no version=3.4.6
+Content-Type: text/plain
+Content-Transfer-Encoding: 8bit
+X-Spam-Status: No, score=-2.7 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        SPF_HELO_NONE,SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Jul 22, 2022 at 4:41 PM Sean Christopherson <seanjc@google.com> wro=
-te:
->
-> +x86 maintainers, patch 1 most definitely needs acceptance from folks bey=
-ond KVM.
->
-> On Fri, Jul 22, 2022, Andrei Vagin wrote:
-> > Another option is the KVM platform. In this case, the Sentry (gVisor
-> > kernel) can run in a guest ring0 and create/manage multiple address
-> > spaces. Its performance is much better than the ptrace one, but it is
-> > still not great compared with the native performance. This change
-> > optimizes the most critical part, which is the syscall overhead.
->
-> What exactly is the source of the syscall overhead,
+Reported by Travis CI:
 
-Here are perf traces for two cases: when "guest" syscalls are executed via
-hypercalls and when syscalls are executed by the user-space VMM:
-https://gist.github.com/avagin/f50a6d569440c9ae382281448c187f4e
+/home/travis/build/kvm-unit-tests/kvm-unit-tests/lib/s390x/fault.c:43:56: error: static_assert with no message is a C++17 extension [-Werror,-Wc++17-extensions]
+                _Static_assert(ARRAY_SIZE(prot_str) == PROT_NUM_CODES);
+                                                                     ^
+                                                                     , ""
+1 error generated.
+make: *** [<builtin>: lib/s390x/fault.o] Error 1
 
-And here are two tests that I use to collect these traces:
-https://github.com/avagin/linux-task-diag/commit/4e19c7007bec6a15645025c337=
-f2e85689b81f99
+Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+---
+ lib/s390x/fault.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-If we compare these traces, we can find that in the second case, we spend e=
-xtra
-time in vmx_prepare_switch_to_guest, fpu_swap_kvm_fpstate, vcpu_put,
-syscall_exit_to_user_mode.
+diff --git a/lib/s390x/fault.c b/lib/s390x/fault.c
+index 1cd6e26..a882d5d 100644
+--- a/lib/s390x/fault.c
++++ b/lib/s390x/fault.c
+@@ -40,7 +40,7 @@ static void print_decode_pgm_prot(union teid teid)
+ 			"LAP",
+ 			"IEP",
+ 		};
+-		_Static_assert(ARRAY_SIZE(prot_str) == PROT_NUM_CODES);
++		_Static_assert(ARRAY_SIZE(prot_str) == PROT_NUM_CODES, "ESOP2 prot codes");
+ 		int prot_code = teid_esop2_prot_code(teid);
+ 
+ 		printf("Type: %s\n", prot_str[prot_code]);
+-- 
+2.36.1
 
-> and what alternatives have been explored?  Making arbitrary syscalls from
-> within KVM is mildly terrifying.
-
-"mildly terrifying" is a good sentence in this case:). If I were in your pl=
-ace,
-I would think about it similarly.
-
-I understand these concerns about calling syscalls from the KVM code, and t=
-his
-is why I hide this feature under a separate capability that can be enabled
-explicitly.
-
-We can think about restricting the list of system calls that this hypercall=
- can
-execute. In the user-space changes for gVisor, we have a list of system cal=
-ls
-that are not executed via this hypercall. For example, sigprocmask is never
-executed by this hypercall, because the kvm vcpu has its signal mask.  Anot=
-her
-example is the ioctl syscall, because it can be one of kvm ioctl-s.
-
-As for alternatives, we explored different ways:
-
-=3D=3D Host Ring3/Guest ring0 mixed mode =3D=3D
-
-This is how the gVisor KVM platform works right now. We don=E2=80=99t have =
-a separate
-hypervisor, and the Sentry does its functions. The Sentry creates a KVM vir=
-tual
-machine instance, sets it up, and handles VMEXITs. As a result, the Sentry =
-runs
-in the host ring3 and the guest ring0 and can transparently switch between
-these two contexts.
-
-When the Sentry starts, it creates a new kernel VM instance and maps its me=
-mory
-to the guest physical. Then it makes a set of page tables for the Sentry th=
-at
-mirrors the host virtual address space. When host and guest address spaces =
-are
-identical, the Sentry can switch between these two contexts.
-
-The bluepill function switches the Sentry into guest ring0. It calls a
-privileged instruction (CLI) that is a no-op in the guest (by design, since=
- we
-ensure interrupts are disabled for guest ring 0 execution) and triggers a
-signal on the host. The signal is handled by the bluepillHandler that takes=
- a
-virtual CPU and executes it with the current thread state grabbed from a si=
-gnal
-frame.
-
-As for regular VMs, user processes have their own address spaces (page tabl=
-es)
-and run in guest ring3. So when the Sentry is going to execute a user proce=
-ss,
-it needs to be sure that it is running inside a VM, and it is the exact poi=
-nt
-when it calls bluepill(). Then it executes a user process with its page tab=
-les
-before it triggers an exception or a system call. All such events are trapp=
-ed
-and handled in the Sentry.
-
-The Sentry is a normal Linux process that can trigger a fault and execute
-system calls. To handle these events, the Sentry returns to the host mode. =
-If
-ring0 sysenter or exception entry point detects an event from the Sentry, t=
-hey
-save the current thread state on a per-CPU structure and trigger VMEXIT. Th=
-is
-returns us into bluepillHandler, where we set the thread state on a signal
-frame and exit from the signal handler, so the Sentry resumes from the poin=
-t
-where it has been in the VM.
-
-In this scheme, the sentry syscall time is 3600ns. This is for the case whe=
-n a
-system call is called from gr0.
-
-The benefit of this way is that only a first system call triggers vmexit an=
-d
-all subsequent syscalls are executed on the host natively.
-
-But it has downsides:
-* Each sentry system call trigger the full exit to hr3.
-* Each vmenter/vmexit requires to trigger a signal but it is expensive.
-* It doesn't allow to support Confidential Computing (SEV-ES/SGX). The Sent=
-ry
-  has to be fully enclosed in a VM to be able to support these technologies=
-.
-
-=3D=3D Execute system calls from a user-space VMM =3D=3D
-
-In this case, the Sentry is always running in VM, and a syscall handler in =
-GR0
-triggers vmexit to transfer control to VMM (user process that is running in
-hr3), VMM executes a required system call, and transfers control back to th=
-e
-Sentry. We can say that it implements the suggested hypercall in the
-user-space.
-
-The sentry syscall time is 2100ns in this case.
-
-The new hypercall does the same but without switching to the host ring 3. I=
-t
-reduces the sentry syscall time to 1000ns.
-
-
-=3D=3D A new BPF hook to handle vmexit-s  =3D=3D
-
-https://github.com/avagin/linux-task-diag/commits/kvm-bpf
-
-This way allows us to reach the same performance numbers, but it gives less
-control over who and how use this functionality. Second, it requires adding=
- a
-few questionable BPF helpers like calling syscall from BPF hooks.
-
-=3D=3D Non-KVM platforms =3D=3D
-
-We are experimenting with non-KVM platforms. We have the ptrace platform, b=
-ut it
-is almost for experiments due to the slowness of the ptrace interface.
-
-Another idea was to add the process_vm_exec system call:
-https://lwn.net/Articles/852662/
-
-This system call can significantly increase performance compared with the
-ptrace platform, but it is still slower than the KVM platform in its curren=
-t
-form (without the new hypercall). But this is true only if we run the KVM
-platform on a bare-metal. In the case of nested-virtualization, the KVM
-platform becomes much slower, which is expected.
-
-We have another idea to use the seccomp notify to trap system calls, but it
-requires some kernel change to reach a reasonable performance. I am working=
- on
-these changes and will present them soon.
-
-I want to emphasize that non-KVM platforms don't allow us to implement the
-confidential concept in gVisor, but this is one of our main goals concernin=
-g
-the KVM platform.
-
-All previous numbers have been getting from the same host (Xeon(R) Gold 626=
-8CL,
-5.19-rc5).
-
->
-> > The idea of using vmcall to execute system calls isn=E2=80=99t new. Two=
- large users
-> > of gVisor (Google and AntFinacial) have out-of-tree code to implement s=
-uch
-> > hypercalls.
-> >
-> > In the Google kernel, we have a kvm-like subsystem designed especially
-> > for gVisor. This change is the first step of integrating it into the KV=
-M
-> > code base and making it available to all Linux users.
->
-> Can you please lay out the complete set of changes that you will be propo=
-sing?
-> Doesn't have to be gory details, but at a minimum there needs to be a hig=
-h level
-> description that very clearly defines the scope of what changes you want =
-to make
-> and what the end result will look like.
->
-> It's practically impossible to review this series without first understan=
-ding the
-> bigger picture, e.g. if KVM_HC_HOST_SYSCALL is ultimately useless without=
- the other
-> bits you plan to upstream, then merging it without a high level of confid=
-ence that
-> the other bits are acceptable is a bad idea since it commits KVM to suppo=
-rting
-> unused ABI.
-
-I was not precise in my description. This is the only change that we
-need right now.
-The gVisor KVM platform is the real thing that exists today and works
-on the upstream kernels:
-https://cs.opensource.google/gvisor/gvisor/+/master:pkg/sentry/platform/kvm=
-/
-
-This hypercall improves its performance and makes it comparable with
-the google-internal platform.
-
-Thanks,
-Andrei
