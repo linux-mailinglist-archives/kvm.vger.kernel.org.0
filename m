@@ -2,66 +2,62 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 744F5581845
-	for <lists+kvm@lfdr.de>; Tue, 26 Jul 2022 19:22:07 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 3DA5D581849
+	for <lists+kvm@lfdr.de>; Tue, 26 Jul 2022 19:23:11 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S239232AbiGZRWF (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 26 Jul 2022 13:22:05 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49998 "EHLO
+        id S239069AbiGZRXJ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 26 Jul 2022 13:23:09 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50604 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230415AbiGZRWE (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 26 Jul 2022 13:22:04 -0400
-Received: from mail-pj1-x1035.google.com (mail-pj1-x1035.google.com [IPv6:2607:f8b0:4864:20::1035])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 644122A431
-        for <kvm@vger.kernel.org>; Tue, 26 Jul 2022 10:22:02 -0700 (PDT)
-Received: by mail-pj1-x1035.google.com with SMTP id t2-20020a17090a4e4200b001f21572f3a4so13919042pjl.0
-        for <kvm@vger.kernel.org>; Tue, 26 Jul 2022 10:22:02 -0700 (PDT)
+        with ESMTP id S229958AbiGZRXI (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 26 Jul 2022 13:23:08 -0400
+Received: from mail-pj1-x1029.google.com (mail-pj1-x1029.google.com [IPv6:2607:f8b0:4864:20::1029])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8C4F36417
+        for <kvm@vger.kernel.org>; Tue, 26 Jul 2022 10:23:06 -0700 (PDT)
+Received: by mail-pj1-x1029.google.com with SMTP id e8-20020a17090a280800b001f2fef7886eso1284118pjd.3
+        for <kvm@vger.kernel.org>; Tue, 26 Jul 2022 10:23:06 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
         h=date:from:to:cc:subject:message-id:references:mime-version
          :content-disposition:in-reply-to;
-        bh=rLvA0pJXBiu18VTDgjU1t8kkKR29S/VzdiVvj2UzZFM=;
-        b=jFXTcJ8C49mjOOMW4x8gf6boC++CpAnxMwyECAGtyHLMUgDwF4jUZKj2feMmpWr2RQ
-         5S+OitMnj981OR3Cmek5EtM4THd7vgOp8qVOKO55OovuXxPwPozoJSZ72nnrr0+Cb5R+
-         pAYcaFwUQ9F8SwX9FuHkzmmDuNE42PIBvEMr1eRauwDpvFtF5nQ6hvhVgPwgH1oFKOO6
-         lQ6iuA8oz53gJRjhWIcju6rC7M41JuVIXxDLbmGGpkIm/m3TmG/7GwX9+1Ggdgep1NMM
-         4iH8Uy3kGgsUcb1lB0b7qlEJBN0QXhd/8f/bi0FpGOQV1frzVIJ/gQNWAJTBRcvFGF/6
-         4U/Q==
+        bh=/OqsrOTLkjBEAzj6fLwmJRc6IwqAp6rTf1R7SLIbSnU=;
+        b=l8iR+uVRAduws3yNPBEf68/c/vhKz4rJNv49xy6Dy4m0feP4lErlpKDOtYdAGAPtKR
+         k6He26FbkWRHb3gguWww4e4LuxxJRnPTyo6kjQRcODdfu7FLzW4AjKnHD3JAyzV6+CUf
+         uUqOO49Le6CfnChp6T5SSsLjB6c7IbTUu4Rq6NBRsBm+mEk6yGcQiNUnWRwBwNY0Ok/p
+         UWsmhYY9T+zC181SlIu2UnANgpK5VMIB7Bn9T3zemVF0dPNZlmck/AG//DaUu7NSfaHo
+         sBJhTOvlVurYN47pQ+m9QMyHT6BepnMPxFf16gxK9YpRlaZw9TUWFd7RCLE9/Q8CGrxD
+         PvNg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:date:from:to:cc:subject:message-id:references
          :mime-version:content-disposition:in-reply-to;
-        bh=rLvA0pJXBiu18VTDgjU1t8kkKR29S/VzdiVvj2UzZFM=;
-        b=Xl3ZKlwaKTnWSnex+VVNosiBiNwPoqpv8PL7VyZAIkGyvw6yLiOnJdRj6m5Pv6iQ2E
-         qmnzrHqPxWur+VABxUqFVnQG7/1vdOi5bYglrRXv2Dgn+ovJlkwHIzmv/ONeee3Jzfio
-         STIJuvqO8km10/3HJmM8B27BAkwb/sndgAi4xWSaKcOkNScjTWRL01pVIl2KG3WMQ+b0
-         dIhJ/WYu9SiFM3BBj3Qt5nqU1knpZMYmzcqRLnYLJ6pDQrZD6rsh455yYKiSoN39mUXb
-         67dh2/qyttHxVYoAlREXo1INlhXlaxV6l18ou+X+Yfw8WQB6lodj2SEdKYEQbJBSFqdN
-         +bnQ==
-X-Gm-Message-State: AJIora9BxH0i8zOJBfulp4jVXsOQ3YTZbsS/DSAOoaolu+q2DoLje6CD
-        FyFXeT7fYqm0641dGBjxvjXPpA==
-X-Google-Smtp-Source: AGRyM1ufRd77+MR/uG2mVZwFTX1nowcW2gPfloHLGArvoudkVeqsPyiR3QmMVkGzPtjWBA6CEB3+oQ==
-X-Received: by 2002:a17:90a:4b45:b0:1f2:4c2d:ac7e with SMTP id o5-20020a17090a4b4500b001f24c2dac7emr227241pjl.69.1658856121695;
-        Tue, 26 Jul 2022 10:22:01 -0700 (PDT)
+        bh=/OqsrOTLkjBEAzj6fLwmJRc6IwqAp6rTf1R7SLIbSnU=;
+        b=6036npH2pPReU04E3dgDjlFz6p1enlZVLa2LjapX4/o2VzxVaBoY2oLbXeRyvHPohm
+         afrdQKCNDMP7p4vAt5Di4+0n6v2MQZtkoQxvLpSIB/o4rP1VZDGNABnIjXRNiD1Jrkjr
+         evtQbOLBZm/gMEa0pD3aiZXTAO/hWgSLja8SQLZUf5EMCNnknOu+js+jwDTL2APo83Pw
+         Jmx8OPD5vc93dGjcPt9sgqTXmLB3GSn86APp1FxR/PzP3UYGxCAhcLSNphSO6aqzwMb+
+         +qyUuHPIcQlZT96hZ8KoX+1M5uJ4jY1gEAMsYtWkiO97+zQEibMwlTk2rTdrH9xhydOL
+         lheA==
+X-Gm-Message-State: AJIora/OYUE++t2jgwzoT/nC9b3aHUJwLVdUyXvAT99WVyskn4iCAX5F
+        /c1cs4VqXX/5WXHTZsSfEp7R3Op4tyaszw==
+X-Google-Smtp-Source: AGRyM1ts6YyomE64mggXIWfJWK1IM9LvgPN9dL5mdu4hjSW8MD3oTHZ1RDqiNWgf14OMcBcHcN/09Q==
+X-Received: by 2002:a17:902:ced2:b0:16c:ff1b:a6d0 with SMTP id d18-20020a170902ced200b0016cff1ba6d0mr17143923plg.154.1658856185993;
+        Tue, 26 Jul 2022 10:23:05 -0700 (PDT)
 Received: from google.com (7.104.168.34.bc.googleusercontent.com. [34.168.104.7])
-        by smtp.gmail.com with ESMTPSA id j4-20020a170903028400b0016d692ff95esm5893092plr.133.2022.07.26.10.22.01
+        by smtp.gmail.com with ESMTPSA id q12-20020a170902e30c00b0016bdb5a3e37sm11641257plc.250.2022.07.26.10.23.05
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 26 Jul 2022 10:22:01 -0700 (PDT)
-Date:   Tue, 26 Jul 2022 17:21:57 +0000
+        Tue, 26 Jul 2022 10:23:05 -0700 (PDT)
+Date:   Tue, 26 Jul 2022 17:23:01 +0000
 From:   Sean Christopherson <seanjc@google.com>
-To:     Mingwei Zhang <mizhang@google.com>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org, Yosry Ahmed <yosryahmed@google.com>,
-        Ben Gardon <bgardon@google.com>
-Subject: Re: [PATCH v2 0/6] KVM: x86: Apply NX mitigation more precisely
-Message-ID: <YuAitajfWA40qQI8@google.com>
-References: <20220723012325.1715714-1-seanjc@google.com>
- <Yt99jpf5l/cInivs@google.com>
- <YuAZDbg9Dzw0LKkp@google.com>
+To:     Paolo Bonzini <pbonzini@redhat.com>
+Cc:     kvm@vger.kernel.org
+Subject: Re: [PATCH kvm-unit-tests] x86: fix clang warning
+Message-ID: <YuAi9dpL58+dOAgQ@google.com>
+References: <20220726150331.91457-1-pbonzini@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <YuAZDbg9Dzw0LKkp@google.com>
+In-Reply-To: <20220726150331.91457-1-pbonzini@redhat.com>
 X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
         ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
@@ -73,29 +69,10 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Jul 26, 2022, Sean Christopherson wrote:
-> On Tue, Jul 26, 2022, Mingwei Zhang wrote:
-> > On Sat, Jul 23, 2022, Sean Christopherson wrote:
-> > > Patch 6 from Mingwei is the end goal of the series.  KVM incorrectly
-> > > assumes that the NX huge page mitigation is the only scenario where KVM
-> > > will create a non-leaf page instead of a huge page.   Precisely track
-> > > (via kvm_mmu_page) if a non-huge page is being forced and use that info
-> > > to avoid unnecessarily forcing smaller page sizes in
-> > > disallowed_hugepage_adjust().
-> > > 
-> > > v2: Rebase, tweak a changelog accordingly.
-> > 
-> > hmm, I applied this patch set (v2) on top of kvm/queue (HEAD:
-> > 1a4d88a361af) and it seems kvm-unit-tests/vmx failed on both ept=1 and
-> > ept=0. And it did not work on our internel kernel either (kernel
-> > crashed).
-> > 
-> > Maybe there is still minor issues?
-> 
-> Heh, or not so minor issues.  I'll see what I broke.  I have a bad feeling that
-> it's the EPT tests; IIRC I only ran VMX on a platform with MAXPHYADDR < 40.
+On Tue, Jul 26, 2022, Paolo Bonzini wrote:
+> x86/vmx.c:1502:69: error: use of logical
+> ---
 
-Hrm, not seeing failures (beyond the VMX_VMCS_ENUM.MAX_INDEX failure because I'm
-running an older QEMU).
+Sorry :-(
 
-I'll follow up off-list to figure out what's going on.
+Reviewed-by: Sean Christopherson <seanjc@google.com>
