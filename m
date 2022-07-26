@@ -2,174 +2,154 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id D52345815F6
-	for <lists+kvm@lfdr.de>; Tue, 26 Jul 2022 17:06:14 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 4EFFC581620
+	for <lists+kvm@lfdr.de>; Tue, 26 Jul 2022 17:10:50 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S239158AbiGZPGK (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 26 Jul 2022 11:06:10 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39552 "EHLO
+        id S230424AbiGZPKq (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 26 Jul 2022 11:10:46 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44576 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234121AbiGZPGJ (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 26 Jul 2022 11:06:09 -0400
-Received: from EUR05-AM6-obe.outbound.protection.outlook.com (mail-am6eur05on2133.outbound.protection.outlook.com [40.107.22.133])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A47A82BE2
-        for <kvm@vger.kernel.org>; Tue, 26 Jul 2022 08:06:08 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=REU4cE861VmUKL13QwY8AMQxXxyUY5SqUPNoVfho5dws6EyqipihF3gLjldwd7352e66vojhQ24CZ4oDmib4XM5oTrrM2AZO+vsZ/m7b/lfNaJPcZnzqS4TNRfH679HibP5bjJD66xA1tTlRyqdmwzR/Galkll9WNPNoTaT6+Fic31eNABFBqJgadC4kb8cmE9VSr3ozMjYdYX0KI2OuOAFmKNAozX02sXbGTbR7qYjatl0sxaqEs/U3RW7SZiPF7AQ8Q3ydIiTZ1WDwmmT6R2qVZzqB8ICN8ETLNH1/8PY5xF92+3P1tt3Xbv3KXJiGG7pyJ6NDnSxR7Evyi7YoPg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=8iUFKjpQMt1qzvlvR7Qmcc+dwM+QaBqyqsfYUP6XGjA=;
- b=irh3V0AY5Z2nXPYYnbL7YNKN5Sh7hDRXHXjfOhJqsYLDNS3t9/1nD5SEHjnaRrlf+OQIzbbgUTgdJouzWP0/YzsV5geNA6AFivt04yIJXyVnAzQIEj++M03+8OL3wlXa15PpHxY5e2vD0xyNmo5OJsIkejPaSz1CaFLeWiFQf04lPk6DwfMQPk5f+Uqe06DIcoLZcl97GlqNcwUURvE6ANbek8EUH+xxIi+ObKlL3OTGDO+KCFeeO+AY2Np66tsm+jY+Ecp4qXKsOUdxJhkn1k0RmZyTBV5sblZbVWMumVzem458mkhW5x+PULPpESx5xNPWg3GwbFwXlCuKjFqf5g==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=virtuozzo.com; dmarc=pass action=none
- header.from=virtuozzo.com; dkim=pass header.d=virtuozzo.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=virtuozzo.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=8iUFKjpQMt1qzvlvR7Qmcc+dwM+QaBqyqsfYUP6XGjA=;
- b=dLEgAIgTY6M6MZ/vZzvmixso5Rnx0Y0jYdO0NMrI3d0BwFqK2/pWS62mxMuK95pXftJMdhDZiLf6J1KG/7WapuIfSpV/McijEIYZBVCrzsNrlmfC9u3Nc3vexMhsQFyT5TYPtRNLRk7jE+9HbqyWUYfS1AavKqmEVAW+4imrwkM9k2HRBILkMLCFggbXz/GhsLDFIf5N6A48Q3bKzQJsL3ts+RsR9tJAccgNI+aNDNY1MmivxOf7IZYO+pCHzN4tY62+ASRjSHX2TMBykP23195db4XuZD5EuDPSoJgwyTEwg4X0dzjecfz8Ap7CIoS5bWFujDejWjVceWwXvCOLJg==
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=virtuozzo.com;
-Received: from PAXPR08MB6956.eurprd08.prod.outlook.com (2603:10a6:102:1db::9)
- by DB9PR08MB7129.eurprd08.prod.outlook.com (2603:10a6:10:2c7::8) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5458.19; Tue, 26 Jul
- 2022 15:06:04 +0000
-Received: from PAXPR08MB6956.eurprd08.prod.outlook.com
- ([fe80::813d:902d:17e5:499d]) by PAXPR08MB6956.eurprd08.prod.outlook.com
- ([fe80::813d:902d:17e5:499d%3]) with mapi id 15.20.5458.025; Tue, 26 Jul 2022
- 15:06:04 +0000
-Message-ID: <1cc04c01-ab10-8fa7-e2c2-3a835cb0de10@virtuozzo.com>
-Date:   Tue, 26 Jul 2022 17:06:02 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.11.0
-Subject: Re: [RFC PATCH 1/1] drivers/vhost: vhost-blk accelerator for
- virtio-blk guests
-Content-Language: en-US
-To:     "Michael S. Tsirkin" <mst@redhat.com>,
-        Andrey Zhadchenko <andrey.zhadchenko@virtuozzo.com>
-Cc:     virtualization@lists.linux-foundation.org, kvm@vger.kernel.org,
-        jasowang@redhat.com, asias@redhat.com
-References: <20220725202753.298725-1-andrey.zhadchenko@virtuozzo.com>
- <20220725202753.298725-2-andrey.zhadchenko@virtuozzo.com>
- <20220726104354-mutt-send-email-mst@kernel.org>
-From:   "Denis V. Lunev" <den@virtuozzo.com>
-In-Reply-To: <20220726104354-mutt-send-email-mst@kernel.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: VI1P194CA0052.EURP194.PROD.OUTLOOK.COM
- (2603:10a6:803:3c::41) To PAXPR08MB6956.eurprd08.prod.outlook.com
- (2603:10a6:102:1db::9)
+        with ESMTP id S229804AbiGZPKk (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 26 Jul 2022 11:10:40 -0400
+Received: from mail-pl1-x631.google.com (mail-pl1-x631.google.com [IPv6:2607:f8b0:4864:20::631])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6688B656B
+        for <kvm@vger.kernel.org>; Tue, 26 Jul 2022 08:10:39 -0700 (PDT)
+Received: by mail-pl1-x631.google.com with SMTP id d3so5716898pls.4
+        for <kvm@vger.kernel.org>; Tue, 26 Jul 2022 08:10:39 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=nEq1IaNhdkodBDzozbLgFdlJtMKKyeEDpgF5SJMm+Y8=;
+        b=OWEnJwcMRH6J/QXCuwh5ay2U50ZpDhtt9UbnMucbCaA8Hn/Gf1tn7OIPJZvJJlYZph
+         LW8ZsOCCLqtJX6LzYMwSle6gPv8wQUpMXg/MKvdNr6Jw/YVHewJywz77TGt6RYKsrv7s
+         SaYVVhrt32cGZ4Vqk4SVa2I7QE52NbeI2bAhNurJ2VvJc9eEaSBJ74CCOhEq5pj6Lfjc
+         GH7pedy/4PRnTzw3rnxOmJYwi3M2qip3MhP3oY2TjKi1A/z/1XkDjDb80k1rsXKkYTKQ
+         1rS339PAXGkNqzjwoqOFEuEedlCoeFDrxQRsqQt1kR5gbNkNRVUSH9SwC4ovtagB6bu7
+         dNxA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=nEq1IaNhdkodBDzozbLgFdlJtMKKyeEDpgF5SJMm+Y8=;
+        b=I04VQpIFyXYc+v6ezmOPiEoEsYF/8NZlt3zAnSYNmGSKwlwZ/fsutSDygyaYDR7gDM
+         Zugtxo7mGbA3iTHVYTK3iGnOYq+Klc88Hle5oSztyqaMYQjU0Bi/RS23joj+tksxAlA+
+         5ja86yrrshKi86ne/iwH37ZGKt8nTfQk3OmHVk4R288eg1iCiqAWQdErWcUoysVyMVpj
+         2XgyU/HgAbb3N/3cdV7dzozvVlrVAztMibOUtlhkYUZMJQxXGBX7tx/bWAr03frUTK4f
+         7r6VsXzm+exbAhJyZ/dKx7U4HRfpTiup+RgR1SjuraJCwPLp9m+Q2Uaj1Dhc276xNoPT
+         2NRA==
+X-Gm-Message-State: AJIora8l5vmy13bSXmf4gKPUbXtsHGV1enXpeZ9Deu98Cu9TlVIUYETe
+        LHpM8aIFUubDywVbmpNrSe0M7w==
+X-Google-Smtp-Source: AGRyM1tbthc+9spb5S+wWJFbOwwDqsIQ0p+TbIcXSswRVvW+f3FRIUOzzHyQP2Y909DPGDD80G8XRA==
+X-Received: by 2002:a17:902:d2d1:b0:16c:223e:a3db with SMTP id n17-20020a170902d2d100b0016c223ea3dbmr17861909plc.37.1658848238620;
+        Tue, 26 Jul 2022 08:10:38 -0700 (PDT)
+Received: from google.com (7.104.168.34.bc.googleusercontent.com. [34.168.104.7])
+        by smtp.gmail.com with ESMTPSA id j1-20020a654d41000000b003fadd680908sm10389894pgt.83.2022.07.26.08.10.37
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 26 Jul 2022 08:10:37 -0700 (PDT)
+Date:   Tue, 26 Jul 2022 15:10:34 +0000
+From:   Sean Christopherson <seanjc@google.com>
+To:     Andrei Vagin <avagin@google.com>
+Cc:     Paolo Bonzini <pbonzini@redhat.com>, linux-kernel@vger.kernel.org,
+        kvm@vger.kernel.org, Wanpeng Li <wanpengli@tencent.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Jianfeng Tan <henry.tjf@antfin.com>,
+        Adin Scannell <ascannell@google.com>,
+        Konstantin Bogomolov <bogomolov@google.com>,
+        Etienne Perot <eperot@google.com>,
+        Andy Lutomirski <luto@kernel.org>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+        Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org,
+        "H. Peter Anvin" <hpa@zytor.com>
+Subject: Re: [PATCH 0/5] KVM/x86: add a new hypercall to execute host system
+Message-ID: <YuAD6qY+F2nuGm62@google.com>
+References: <20220722230241.1944655-1-avagin@google.com>
+ <Yts1tUfPxdPH5XGs@google.com>
+ <CAEWA0a4hrRb5HYLqa1Q47=guY6TLsWSJ_zxNjOXXV2jCjUekUA@mail.gmail.com>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: 64063b9b-11b8-4bbb-e185-08da6f185beb
-X-MS-TrafficTypeDiagnostic: DB9PR08MB7129:EE_
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: MPptsXcdDW9VPVzyhdKRgePdJNbADPE6DXfTEigqtN/KTUvK/K9cVJbZ0U4lx7o6JOWb2Cmcmqn8QpO8U4kL5ykCKzd5djSjp6gSBHyUqLHpA4aY/G7xwgpX3B59ux7RuW/i6phU3yMw0WspezqZ1xI8rz4a2KNMijk5lEM1ZNzyFpdfFrwcGXwSmEyiXpafqpKGZBXKk0b8JbLQgc3SuEE5TERCj7G5FYG8+Ar/+wyZlJlPMQqMt/TuUCwgRNGKzvRWkLBvYLPX+E5fFPVIottKN9EIkQgXpMOG7fNIwoIDokJ6FveUGpQHlTWaU4iV7GcqAufLYWc3PMV31FqxgxuylVj3v0TPVwiHVgpunRAnO+D/pjaOpkiIrw+wHw+yUhugZ9o9GOMO4IcGbqJeQY83VHj/fzJ7/W4HxX3bgtolJbyB2v6YHU051f+m85lhxi+stJozgNubXrDQOEGl+m8u9cEliRbfOwPDCvjAKQ/+WoeoOkLFQb7EPqpM68DiVVxv5v+18JonA/AWmxKkvQ5Rzb81s4BeDyHY/kOvnfgF37S0gOe1/ElGZW4zymewKYsZ0sYhj+6RCRpvK8HOPehzANHAGrBvUY/JaCZXPqwAQgRJ6tOQ+1vIyG3h5lq44mgK1rtg6k4A7xtKh1YL9mDrMqWBnk/Um2lunrcIt5jyff+DDtyt8GY113U/v5FsOPon4BLSP7B87t2aNHIyHA11DTY4ItUPNtEaN1AaHbsmB1nuRWs+0jbwKg5Jvr90SpA4IEcF5q/Rx5q1e8NELqmOWMaEcAurVKwbTmGB9D7iw3EGUKFtvg8uGLJ+TawqKN/d8yiHl6iIpNRk1YeLtaXuTwInkHfHisx6c2LdHOZtw+VIN76q4Fnxt6ZH6NKS
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PAXPR08MB6956.eurprd08.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230016)(4636009)(346002)(396003)(376002)(366004)(39850400004)(136003)(4326008)(8676002)(6506007)(66556008)(66476007)(66946007)(2906002)(31696002)(5660300002)(41300700001)(86362001)(8936002)(478600001)(52116002)(26005)(6486002)(53546011)(6512007)(2616005)(83380400001)(31686004)(316002)(36756003)(110136005)(186003)(6636002)(38100700002)(38350700002)(43740500002)(45980500001);DIR:OUT;SFP:1102;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?V1F6OGVEZnN4NW50SkozaFJTU09UNEZ6UWJYM3M0Ry9pbWhBRVR1akJMby94?=
- =?utf-8?B?bXhNdUVkK3c4dVdYcXkwajhUSFZLWEQwTCs4R0t6VzFxN2pzZ2oyV2tVWncx?=
- =?utf-8?B?ZUpNQXEzM1l3T1RVc1BhM0xsZXJBTEJObStybDVaMEdzdS95bFUzcVZ2Sm1n?=
- =?utf-8?B?ZnJuZGdqSUN5Qmw1RWYzQi85Z1djSk5hQUpFNDdudjZiYmxPYTVTalQ0V2d6?=
- =?utf-8?B?YUM2bDlSczZyeVZBYkZFWEhUN0ZCNm5mVXVKeGtMbzFxM3djcmtiOUU0S2Jn?=
- =?utf-8?B?QmwzOVRwSWJDSlJRbFpkait1bkNLMCt6dWcxNFhTRXZPNG01dmFDcm9aRzU2?=
- =?utf-8?B?Q1Q1RTVtbzlOODhmdlRHM2JWeTk1aTlMZS92L2xWQWx1a04vTjdxTVN5WmVV?=
- =?utf-8?B?cWw1T05TQ1dyU3hwdXhNMlJsc25IZ1lSL2VKWHlnaGQrSFhlTGE4RkVXU1RB?=
- =?utf-8?B?QzdFVkh0WDYreXMvUVdXMWxpU1RLQXFvdHBlU2hTM2hua0lEdmJrR1BsaE9l?=
- =?utf-8?B?R1NITXpwOTM0ZE03NU1pb1dkcmV0WkpzQWxIZFJ1ei83Qzd0RmtGR2o3THgy?=
- =?utf-8?B?NDZuaVdxSjVLa3FJMGNERmMyeUpaTzM1OWowS2dhRmVrak42bmovL2FqNHhT?=
- =?utf-8?B?RzVYYXlsRCtDOWZjMzZKbDdIdmFaYzRGaG9OZzg1QU1FalhjUmQ0QXZqaTl0?=
- =?utf-8?B?Rnc0RVBKVkNwS2YwSEtmOUxFcmVzWTBxNThCNkZZRzUvZS9kamhldzZSVHBS?=
- =?utf-8?B?TVI4VlQ2M3ppKzBINmR2eExVbzNmWTRyT3B1UDJCUnZaM25pRnZUSGJzcjVh?=
- =?utf-8?B?bm1HQkdxWitvV1M2dTRUcjBVNzR3WXYrZ2NLRktZMHY1NEhlQ3gxdW1sZ1RB?=
- =?utf-8?B?UHV4SWNFcDJ0VEFVRmsyR0s2WFJLeVpaeEV0VmwxWlc1aHJrSURJdG9qSjBq?=
- =?utf-8?B?OHFlWVNUdkhTTkJjQzJyNHZpbGhybmZoOU5IQUJjZ2tGV0dqQVdVemtEeVIx?=
- =?utf-8?B?R2RKeEZVNGpKRTM5eWpWWnIwM29CYUxmYVlPcE4wc2k5RWZMMjlmNUZnUXMw?=
- =?utf-8?B?REdOODZNSWJ1SGo2K2ZEWmkrbDVzdkdPNDV1YzNzd05mbldxUnNyMjBkV3pY?=
- =?utf-8?B?L0dwZTVCeGNESVd3amJOZEEyOC8yY2FMYVF0Q2k1YlRyTnlHUW42amlsL0pS?=
- =?utf-8?B?NGorczRHTEtIOGgzellpVzJxbEVPVlZyamR1VTVzeEVDVnB2TlFmQWVhVndP?=
- =?utf-8?B?MUVsMVdVZXlzQVVxR3hYclFHV1JqeTJSTjRkWTNJcjl0c0lrMHhpY0xFWmVG?=
- =?utf-8?B?c2xnZUlPZnpvRFRtaUhVZkhxNGRnc0dvZmN4VEtNeDZQcTl6ZmdXVytlL25t?=
- =?utf-8?B?Ti9JMGEvWDRNa3ZSeWNEamYrQjRUdVRXQmF1cFAxZCs4dExIQ2NPbmQ3K1ZW?=
- =?utf-8?B?WnhWanI0T2ZWR1FNSDBRcTRwWXZmSGtyd2loOWJzblhzZzJyb0NKYlc2RFJO?=
- =?utf-8?B?aEVZRm1KdDBTSzhrZzNTS2NLcktPL1B5MDl6eDIvVkpDSGdESm92WEhvU1Bi?=
- =?utf-8?B?QTZwc1h1NkU2ZW9tWnM5bWk1NEhsYmVLYVlsaUQxcGJGNlhHRXExNDJKeDBs?=
- =?utf-8?B?c3VYUnFBdkxQcU56TGY3RDgveXZOclBOSlJGdXR0enNyUjZ2M0FJa1JPNno0?=
- =?utf-8?B?MUh4alpuWHJTSVRLR21RY0NMLzdYRk1MMkZlMzNydk12TFJONWRmcFI5S3ZG?=
- =?utf-8?B?V1czK0Rjc0dxaElyK0FtalpmQWFINXlmTENrNUMyTEh5ajl0Nk9WQ3VSdjJ0?=
- =?utf-8?B?QThQZVJMOUNVRkNuaFFlWFZwb3dkNUFsTzM5Qy82aXYxQTQzUVViSDRvVk80?=
- =?utf-8?B?d1hvNndwa3pMRnRtbisrMzRMV1ZCcFlTYkVwL2taa1AyMENNcEJ6VU9USHVM?=
- =?utf-8?B?M2JoUUlTeWw5blVudC9JL3hIN3Z4Uk5VaTJ0d1Z4NkxKdW84MTFKbC9PZnZB?=
- =?utf-8?B?SFZQUEFCNC9Da1VUem5hT0dkZzhjNG81TU90djl6dTVtdFFKb0dHS2lybjU3?=
- =?utf-8?B?OUQvNWU5ajJJRmIydHN2UVg4eHpONUN1bnQ2RXUyd1pOSW8vWElWbUthMVJ0?=
- =?utf-8?Q?oE7TzxjAsqMvamXlDzDtLtb95?=
-X-OriginatorOrg: virtuozzo.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 64063b9b-11b8-4bbb-e185-08da6f185beb
-X-MS-Exchange-CrossTenant-AuthSource: PAXPR08MB6956.eurprd08.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 26 Jul 2022 15:06:04.0304
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 0bc7f26d-0264-416e-a6fc-8352af79c58f
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: p8bLGoamKfaF3diZDAAo1IJmbA75XnvzQhtDPwLfLmFTuPdaA4+ujs1LFxFcUB3sdzaq5poKbarGAbmFB+HTsw==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DB9PR08MB7129
-X-Spam-Status: No, score=-1.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FORGED_SPF_HELO,NICE_REPLY_A,
-        RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_NONE
-        autolearn=no autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CAEWA0a4hrRb5HYLqa1Q47=guY6TLsWSJ_zxNjOXXV2jCjUekUA@mail.gmail.com>
+X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
+        USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 26.07.2022 16:45, Michael S. Tsirkin wrote:
-> On Mon, Jul 25, 2022 at 11:27:53PM +0300, Andrey Zhadchenko wrote:
->> Although QEMU virtio is quite fast, there is still some room for
->> improvements. Disk latency can be reduced if we handle virito-blk requests
->> in host kernel istead of passing them to QEMU. The patch adds vhost-blk
->> kernel module to do so.
->>
->> Some test setups:
->> fio --direct=1 --rw=randread  --bs=4k  --ioengine=libaio --iodepth=128
->> QEMU drive options: cache=none
->> filesystem: xfs
->>
->> SSD:
->>                 | randread, IOPS  | randwrite, IOPS |
->> Host           |      95.8k      |      85.3k      |
->> QEMU virtio    |      57.5k      |      79.4k      |
->> QEMU vhost-blk |      95.6k      |      84.3k      |
->>
->> RAMDISK (vq == vcpu):
->>                   | randread, IOPS | randwrite, IOPS |
->> virtio, 1vcpu    |      123k      |      129k       |
->> virtio, 2vcpu    |      253k (??) |      250k (??)  |
->> virtio, 4vcpu    |      158k      |      154k       |
->> vhost-blk, 1vcpu |      110k      |      113k       |
->> vhost-blk, 2vcpu |      247k      |      252k       |
->> vhost-blk, 4vcpu |      576k      |      567k       |
->>
->> Signed-off-by: Andrey Zhadchenko <andrey.zhadchenko@virtuozzo.com>
->
-> Sounds good to me. What this depends on is whether some userspace
-> will actually use it. In the past QEMU rejected support for vhost-blk,
-> if this time it fares better then I won't have a problem merging
-> the kernel bits.
+On Tue, Jul 26, 2022, Andrei Vagin wrote:
+> On Fri, Jul 22, 2022 at 4:41 PM Sean Christopherson <seanjc@google.com> wrote:
+> >
+> > +x86 maintainers, patch 1 most definitely needs acceptance from folks beyond KVM.
+> >
+> > On Fri, Jul 22, 2022, Andrei Vagin wrote:
+> > > Another option is the KVM platform. In this case, the Sentry (gVisor
+> > > kernel) can run in a guest ring0 and create/manage multiple address
+> > > spaces. Its performance is much better than the ptrace one, but it is
+> > > still not great compared with the native performance. This change
+> > > optimizes the most critical part, which is the syscall overhead.
+> >
+> > What exactly is the source of the syscall overhead,
+> 
+> Here are perf traces for two cases: when "guest" syscalls are executed via
+> hypercalls and when syscalls are executed by the user-space VMM:
+> https://gist.github.com/avagin/f50a6d569440c9ae382281448c187f4e
+> 
+> And here are two tests that I use to collect these traces:
+> https://github.com/avagin/linux-task-diag/commit/4e19c7007bec6a15645025c337f2e85689b81f99
+> 
+> If we compare these traces, we can find that in the second case, we spend extra
+> time in vmx_prepare_switch_to_guest, fpu_swap_kvm_fpstate, vcpu_put,
+> syscall_exit_to_user_mode.
 
-In general, we are going to use this in production for our
-next generation product and thus we would be very glad
-to see both parts, i.e. in-kernel and in-QEMU to be merged
-to reduce our support costs.
+So of those, I think the only path a robust implementation can actually avoid,
+without significantly whittling down the allowed set of syscalls, is
+syscall_exit_to_user_mode().
 
-I think that numbers are talking on themselves and this
-would be quite beneficial for all parties especially keeping
-in mind that QCOW2 is also now supported for this kind
-of IO engine.
+The bulk of vcpu_put() is vmx_prepare_switch_to_host(), and KVM needs to run
+through that before calling out of KVM.  E.g. prctrl(ARCH_GET_GS) will read the
+wrong GS.base if MSR_KERNEL_GS_BASE isn't restored.  And that necessitates
+calling vmx_prepare_switch_to_guest() when resuming the vCPU.
 
-Den
+FPU state, i.e. fpu_swap_kvm_fpstate() is likely a similar story, there's bound
+to be a syscall that accesses user FPU state and will do the wrong thing if guest
+state is loaded.
+
+For gVisor, that's all presumably a non-issue because it uses a small set of
+syscalls (or has guest==host state?), but for a common KVM feature it's problematic.
+
+> > and what alternatives have been explored?  Making arbitrary syscalls from
+> > within KVM is mildly terrifying.
+> 
+> "mildly terrifying" is a good sentence in this case:). If I were in your place,
+> I would think about it similarly.
+> 
+> I understand these concerns about calling syscalls from the KVM code, and this
+> is why I hide this feature under a separate capability that can be enabled
+> explicitly.
+> 
+> We can think about restricting the list of system calls that this hypercall can
+> execute. In the user-space changes for gVisor, we have a list of system calls
+> that are not executed via this hypercall.
+
+Can you provide that list?
+
+> But it has downsides:
+> * Each sentry system call trigger the full exit to hr3.
+> * Each vmenter/vmexit requires to trigger a signal but it is expensive.
+
+Can you explain this one?  I didn't quite follow what this is referring to.
+
+> * It doesn't allow to support Confidential Computing (SEV-ES/SGX). The Sentry
+>   has to be fully enclosed in a VM to be able to support these technologies.
+
+Speaking of SGX, this reminds me a lot of Graphene, SCONEs, etc..., which IIRC
+tackled the "syscalls are crazy expensive" problem by using a message queue and
+a dedicated task outside of the enclave to handle syscalls.  Would something like
+that work, or is having to burn a pCPU (or more) to handle syscalls in the host a
+non-starter?
