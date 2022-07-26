@@ -2,105 +2,122 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id AAB6A581875
-	for <lists+kvm@lfdr.de>; Tue, 26 Jul 2022 19:38:04 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id B4A0E5818C2
+	for <lists+kvm@lfdr.de>; Tue, 26 Jul 2022 19:45:15 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S239158AbiGZRiD (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 26 Jul 2022 13:38:03 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60926 "EHLO
+        id S239438AbiGZRpO (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 26 Jul 2022 13:45:14 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39782 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S239452AbiGZRiC (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 26 Jul 2022 13:38:02 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id B2C1A2E9DB
-        for <kvm@vger.kernel.org>; Tue, 26 Jul 2022 10:38:01 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1658857080;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding;
-        bh=sWzm0DLPHs5F5TGWF/3So4rl+1KlzHURmpCX78JE+vw=;
-        b=hU/50N1XnEaQKUkgMo/jNW6PX1lCu4gd/vq4bb2A9e0ZeBTV0K0stWSlU5DPQonPqgMNMv
-        CWy8C6rDNB75TCYnqg6O4BmJm/dCbkPINT+US7rtaHjwLkQfjd/ld2/o//lbggamqol5fh
-        1wrnS4bWHWV9+mzloCygi4HT78tL1S4=
-Received: from mail-ed1-f72.google.com (mail-ed1-f72.google.com
- [209.85.208.72]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-117-TcJyorDpPsGQiMn6cCQ7mQ-1; Tue, 26 Jul 2022 13:37:59 -0400
-X-MC-Unique: TcJyorDpPsGQiMn6cCQ7mQ-1
-Received: by mail-ed1-f72.google.com with SMTP id z1-20020a05640235c100b0043bca7d9b3eso8241464edc.5
-        for <kvm@vger.kernel.org>; Tue, 26 Jul 2022 10:37:59 -0700 (PDT)
+        with ESMTP id S239404AbiGZRpL (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 26 Jul 2022 13:45:11 -0400
+Received: from mail-pj1-x1036.google.com (mail-pj1-x1036.google.com [IPv6:2607:f8b0:4864:20::1036])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 48941299
+        for <kvm@vger.kernel.org>; Tue, 26 Jul 2022 10:45:08 -0700 (PDT)
+Received: by mail-pj1-x1036.google.com with SMTP id e8-20020a17090a280800b001f2fef7886eso1342367pjd.3
+        for <kvm@vger.kernel.org>; Tue, 26 Jul 2022 10:45:08 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=e6Mz+oRz8N/ZMfMKQJLfeo18Qs4Bfu/y+IOLPo/Xolc=;
+        b=Sl6Wz5Mc19zPbPzX/YifPRbqb/o8hj/Al005SjMzeeTFP0a6/21SHGsr9R2vtSSUqA
+         Xl7DLGoVFKbgm3AZfLAOWUt6SkdbPMwCH2gWwrgBlhON4oQair/2reaTw/OJIuWupUdu
+         ruFPRQ+mml66GMl7w4VOPpF+WF6JUT05A28HzTYodYUZj6qehwD+2o7ZlHPNoIh2Rbu/
+         dBiFU5mB0eesLVZchDOIWBxXfqv4MDiIEvNirt5KVKEvbFXZYnLZasCyz+VkQqZgv0vS
+         QTq2MNa+xn34sVEUr9MO/bP0PI7rWevwu3RJri9U/DnsGSnB6eB0c29FxCx+IeDtZkzN
+         25Rg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=sWzm0DLPHs5F5TGWF/3So4rl+1KlzHURmpCX78JE+vw=;
-        b=sJYxLm5KoSZ3taMa8WZVliitreoNeJ19vldYU0QM90SUTNGiyAks9hqGu8Yf2Bf7Ij
-         XDdqnNT/oPj9Ex4PDov8G1QB7rO7M7ng3K6sH0QnCao2bEAKO8kjt3JM1Ds3c2l/UlLa
-         0uLcpg1RkyUt1Pshm0Dm+oIhInsJsJW/1vHg90R9xKCnB88zmhWfsEmdYwSghcnFxg+z
-         QEmR0cQayBIgpc0G3NW85aYlhMHX2oNURhT11wkkFCrDaL4aHqptt+878a5709SvM9Ni
-         VaBu3b1404iUEr39yeSs5vfF8bGsK+BIHnkIJZBIVa1VJTcUJSp4jz+beuI/SNaJMeyP
-         qQ8A==
-X-Gm-Message-State: AJIora+kqcOIp/zpU1mnlVI83C56tBihmcv2CW/gEdmb8dehQWF5Rfs+
-        v2AVBHv8Ve0EIYm8OgVwTw3HTuvQZWUgB7P6/VYkEEF1LjBqeIdPMfST1pNUc+McxQXi2j/NjkD
-        NDR8f9xQTFsMyWoPw35boeFCFLi8C1ZJIbZCFttZIged49+cC298hIOf/SWKO+VpY
-X-Received: by 2002:a17:907:2cc8:b0:72b:7c72:e6a4 with SMTP id hg8-20020a1709072cc800b0072b7c72e6a4mr14698957ejc.160.1658857078136;
-        Tue, 26 Jul 2022 10:37:58 -0700 (PDT)
-X-Google-Smtp-Source: AGRyM1suTrWcv9oArOwoRu3MYbuqnq4SFJi8PvqlwPJWMcAiwgtuMET+B0PGDo1j0ILsT33xJB6jtw==
-X-Received: by 2002:a17:907:2cc8:b0:72b:7c72:e6a4 with SMTP id hg8-20020a1709072cc800b0072b7c72e6a4mr14698939ejc.160.1658857077813;
-        Tue, 26 Jul 2022 10:37:57 -0700 (PDT)
-Received: from goa-sendmail ([2001:b07:6468:f312:9af8:e5f5:7516:fa89])
-        by smtp.gmail.com with ESMTPSA id a17-20020a50ff11000000b00435a62d35b5sm8750423edu.45.2022.07.26.10.37.57
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=e6Mz+oRz8N/ZMfMKQJLfeo18Qs4Bfu/y+IOLPo/Xolc=;
+        b=nj0BiBbow1rt2/ydsRZd61A7EeqDPlJ9UxnSoxVvz5QYs2nkuiy9fiB7UeumFsUbgA
+         2Ud3ju867qcQJ5CuaQKxNaefwZVedXg15TmnlmBYxKjlhBe/8ntJWTmPBib2zSbgdBup
+         TfH/aUphP0n7dzzP7ZuCR9k71g+VLo4QScX23GrzI78te2ju87UyhmvfT/xH0O2mFhJr
+         KoNB1uX2WBQOA8w45EqQg85YSSUqehHUvg6n9LoI76LT9e8r1CFRmVSV7qgTlTiUbnXp
+         o8ctTK6cBjR6lUtNiCxkeBIyFnLT0pt7ZkWv75hvpVD+09BHjHGvY1KJoPSM95ZPirpI
+         f6kw==
+X-Gm-Message-State: AJIora8RZ3DmyEXL5xU2RI7fVZA8+GP6A8uApX96ckukph5wcJuoBAaZ
+        QSHA7KhO1syLb/mrD56DnBAU6A==
+X-Google-Smtp-Source: AGRyM1spXBSxypx2RydnwucYrC82/NnBmQLJRjMaunGalWfd0VV3Ww2fh7tE8iXt8LtgcUFHGMFdUw==
+X-Received: by 2002:a17:90a:1485:b0:1ec:788e:a053 with SMTP id k5-20020a17090a148500b001ec788ea053mr334517pja.16.1658857507723;
+        Tue, 26 Jul 2022 10:45:07 -0700 (PDT)
+Received: from google.com (7.104.168.34.bc.googleusercontent.com. [34.168.104.7])
+        by smtp.gmail.com with ESMTPSA id u5-20020a627905000000b005259578e8fcsm12004983pfc.181.2022.07.26.10.45.07
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 26 Jul 2022 10:37:57 -0700 (PDT)
-From:   Paolo Bonzini <pbonzini@redhat.com>
-To:     kvm@vger.kernel.org
-Cc:     seanjc@google.com
-Subject: [PATCH kvm-unit-tests] x86: smp: fix 32-bit build
-Date:   Tue, 26 Jul 2022 19:37:56 +0200
-Message-Id: <20220726173756.108816-1-pbonzini@redhat.com>
-X-Mailer: git-send-email 2.36.1
+        Tue, 26 Jul 2022 10:45:07 -0700 (PDT)
+Date:   Tue, 26 Jul 2022 17:45:03 +0000
+From:   Sean Christopherson <seanjc@google.com>
+To:     David Matlack <dmatlack@google.com>
+Cc:     Paolo Bonzini <pbonzini@redhat.com>,
+        kvm list <kvm@vger.kernel.org>,
+        Ben Gardon <bgardon@google.com>,
+        Colton Lewis <coltonlewis@google.com>,
+        Ricardo Koller <ricarkol@google.com>,
+        Andrew Jones <andrew.jones@linux.dev>
+Subject: Re: [RFC PATCH 0/2] KVM: selftests: Rename perf_test_util to
+ memstress
+Message-ID: <YuAoH9NZHbKzC6Az@google.com>
+References: <20220725163539.3145690-1-dmatlack@google.com>
+ <Yt8c6gklsMy2eM5f@google.com>
+ <CALzav=e6ZODi1Cpv5Ej9uWWC_zF1eMMJqbXYHhi+fgenfgsfow@mail.gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain
-Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-3.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,
-        SPF_HELO_NONE,SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CALzav=e6ZODi1Cpv5Ej9uWWC_zF1eMMJqbXYHhi+fgenfgsfow@mail.gmail.com>
+X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
+        USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On macOS the 32-bit build gives the following warning:
+On Tue, Jul 26, 2022, David Matlack wrote:
+> On Mon, Jul 25, 2022 at 3:45 PM Sean Christopherson <seanjc@google.com> wrote:
+> >
+> > On Mon, Jul 25, 2022, David Matlack wrote:
+> > > This series renames the perf_test_util to memstress. patch 1 renames the files
+> > > perf_test_util.[ch] to memstress.[ch], and patch 2 replaces the perf_test_
+> > > prefix on symbols with memstress_.
+> > >
+> > > The reason for this rename, as with any rename, is to improve readability.
+> > > perf_test_util is too generic and does not describe at all what the library
+> > > does, other than being used for perf tests.
+> > >
+> > > I considered a lot of different names (naming is hard) and eventually settled
+> > > on memstress for a few reasons:
+> > >
+> > >  - "memstress" better describes the functionality proveded by this library,
+> > >    which is to run a VM that reads/writes to memory from all vCPUs in parallel
+> > >    (i.e. stressing VM memory).
+> >
+> > Hmm, but the purpose of the library isn't to stress VM memory so much as it is to
+> > stress KVM's MMU. And typically "stress" tests just hammer a resource to try and
+> > make it fail, whereas measuring performance is one of the main
+> >
+> > In other words, IMO it would be nice to keep "perf" in there somehwere.
+> 
+> The reasons I leaned toward "stress" rather than "perf" is that this
+> library itself does not measure performance (it's just a workload) and
+> it's not always used for performance tests (e.g.
+> memslot_modification_stress_test.c).
 
-lib/x86/smp.c:89:29: error: format '%d' expects argument of type 'int', but argument 2 has type 'uint32_t' {aka 'long unsigned int'} [-Werror=format=]
-   89 |         printf("setup: CPU %d online\n", apic_id());
-      |                            ~^            ~~~~~~~~~
-      |                             |            |
-      |                             int          uint32_t {aka long unsigned int}
-      |                            %ld
+Yeah, I don't disagree on any point, it's purely that memstress makes me think of
+memtest (the pre-boot test that blasts memory with patterns to detect bad DRAM).
 
-Fix by using the inttypes.h printf formats.
+> > Maybe mmu_perf or something along those lines?
+> 
+> How about "memperf"? "mmu_perf" makes me think it'd be explicitly
+> measuring the performance of MMU operations.
 
-Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
----
- lib/x86/smp.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+Let's go with your original "memstress".  I like how it looks in code, and once I
+get past the initial "memtest" association, it's a good fit.
 
-diff --git a/lib/x86/smp.c b/lib/x86/smp.c
-index feaab7a..b9b91c7 100644
---- a/lib/x86/smp.c
-+++ b/lib/x86/smp.c
-@@ -86,7 +86,7 @@ void ap_online(void)
- {
- 	irq_enable();
- 
--	printf("setup: CPU %d online\n", apic_id());
-+	printf("setup: CPU %" PRId32 " online\n", apic_id());
- 	atomic_inc(&cpu_online_count);
- 
- 	/* Only the BSP runs the test's main(), APs are given work via IPIs. */
--- 
-2.36.1
+> Another contender was "memstorm", but I thought it might be too cute.
 
+Heh.  mem_minions?  Then we can have "mm_args" and really confuse everyone.
