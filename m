@@ -2,123 +2,166 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id D4424582CE4
-	for <lists+kvm@lfdr.de>; Wed, 27 Jul 2022 18:51:56 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id A9153582F5A
+	for <lists+kvm@lfdr.de>; Wed, 27 Jul 2022 19:25:31 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S240762AbiG0Qvf (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 27 Jul 2022 12:51:35 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56192 "EHLO
+        id S242061AbiG0RYB (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 27 Jul 2022 13:24:01 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44520 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S240649AbiG0QvC (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 27 Jul 2022 12:51:02 -0400
-Received: from mail-lj1-x230.google.com (mail-lj1-x230.google.com [IPv6:2a00:1450:4864:20::230])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8095E61DA4
-        for <kvm@vger.kernel.org>; Wed, 27 Jul 2022 09:33:20 -0700 (PDT)
-Received: by mail-lj1-x230.google.com with SMTP id q7so4973200ljp.13
-        for <kvm@vger.kernel.org>; Wed, 27 Jul 2022 09:33:20 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=hzahODgMNuon2IeUr2EuuHPWt8+D9EzcvbJbwRZcpkA=;
-        b=q37f8MYDml0WJQ6tALjGlG5Vm7UhkOtu+hluMsitRxWmOAPmVBZWNmPWNbjHKSc1N9
-         QGY6rimQfE6pvxDGfLLTJtOLancrwW4USdDDzbqGrxGxoJBos/6bKm2yrdmFi6rpMHb8
-         JSSk01V4sXf1ecwSzunHRWz+9wQkpvuLuzE2z+T1GGoDaJPCDx3DA6L7qxDhrV3XXjcO
-         nzjlX+BpVDXctxfyqiIOZu57hV6UNdMJgKgMlcKeS/bo03JKmsks6tn9htHJk9XlMXWW
-         zNBpRKP8AVoaaaRaBqsXUg08ZVrekrYI5Fhq0tJqY8Cbtes3dNJxM+xPEYI7d7APDGsl
-         y8tQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=hzahODgMNuon2IeUr2EuuHPWt8+D9EzcvbJbwRZcpkA=;
-        b=vwlQJWex5y26Mivg8gTENU1P7/Cml/fI3rDr1AfrLO+x6+SMsOkbHvgB4R8u9qTOFm
-         3lZZC3L01SsaaVB1Kz9MwocXQ2yUah6tLa0atVU2aMDnT/vV2K5tdn1XcT55aBP46v8P
-         8vnhErPCSG4pnLXnftJP3MC7POiPSAy+bNkto8gS2nCe0CJisHT7zHjSQ/7J6HeZngSD
-         ojjgO2uEo3ZswJg33k9A5+nlwj8AZLt/UqBl2R6uAjfG8H/XscWLlGo+9dj4OGwHZug5
-         UNSboHy1bw0a9RwZOsAEVWt7WXrrtspYA3UCLZ/biKCfNLzPIluy6tGOvxlwFRQxs7bD
-         FB+Q==
-X-Gm-Message-State: AJIora+76ChIjjJ5sXWC93pOP48JgYeclXFsXujbYMvQdS+8pjaW13sJ
-        MKsZGTf0NlIMwMHXNPHXuqIno9fs9NMtQfvA9YUsBw==
-X-Google-Smtp-Source: AGRyM1u+ugCfHWSJfs+Xcjaw0Npmkbnj0H+gh0RdJaFTfS9O/IUFRBKCCuHQG2kHb0WKS/09gAr8JI7by1jmQn8McKM=
-X-Received: by 2002:a2e:a914:0:b0:25d:f74a:54c0 with SMTP id
- j20-20020a2ea914000000b0025df74a54c0mr8116851ljq.290.1658939598105; Wed, 27
- Jul 2022 09:33:18 -0700 (PDT)
-MIME-Version: 1.0
-References: <CAPm50aKursUrDpgqLt7RT-VoSfBJswsnR2w1sVAt5mburmdd8g@mail.gmail.com>
-In-Reply-To: <CAPm50aKursUrDpgqLt7RT-VoSfBJswsnR2w1sVAt5mburmdd8g@mail.gmail.com>
-From:   David Matlack <dmatlack@google.com>
-Date:   Wed, 27 Jul 2022 09:32:51 -0700
-Message-ID: <CALzav=eccuGWGpBs=tp5RO_wJqQecGRwDAPi+tyPkMcYrbrPoA@mail.gmail.com>
-Subject: Re: [PATCH] kvm: mmu: fix typos in struct kvm_arch
-To:     Hao Peng <flyingpenghao@gmail.com>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>,
-        kvm list <kvm@vger.kernel.org>,
-        LKML <linux-kernel@vger.kernel.org>,
-        Sean Christopherson <seanjc@google.com>
+        with ESMTP id S241959AbiG0RXZ (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 27 Jul 2022 13:23:25 -0400
+Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 88ED27AC04;
+        Wed, 27 Jul 2022 09:45:49 -0700 (PDT)
+Received: from pps.filterd (m0187473.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.17.1.5/8.17.1.5) with ESMTP id 26RGITtG007902;
+        Wed, 27 Jul 2022 16:45:42 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : subject :
+ from : to : cc : date : in-reply-to : references : content-type :
+ content-transfer-encoding : mime-version; s=pp1;
+ bh=5PcERGFTTciFJd0v0+nxjz2F0QqyHBO5FhRMqSoh0v8=;
+ b=I9jV7GbEzPJZ0IA5CUGCXltUND7KnPsyQnOuVnZj6jvDPtg1Qv9TEicXL4B2g4P33zVE
+ F78QEMCZJrVAyNixGsJjjddDVIDuI/+1uLhhma7OhVJqrehkV5R/cpFBsxp9J4cxauct
+ bkRbWW6iDJK+7r0da0vV00w0rLyGTufwjfXHEuetAyJCdeOVCMkJJkmvU8FVByU1mJ8v
+ NbXfbZib8aGV8ndnaRDa8MMU4qJFqzYKcYzbViLg6k0ofQ6y2CvmvauTnTv0DZzaHtfu
+ PPTfTtb8dxP9VGuNWt2a9drfe42J5pO2NOKfoaUKvekaRUKlpdGryDXINUDPnreXpeMk yg== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3hk8rtrxgc-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Wed, 27 Jul 2022 16:45:42 +0000
+Received: from m0187473.ppops.net (m0187473.ppops.net [127.0.0.1])
+        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 26RGJ2Ov010725;
+        Wed, 27 Jul 2022 16:45:41 GMT
+Received: from ppma01dal.us.ibm.com (83.d6.3fa9.ip4.static.sl-reverse.com [169.63.214.131])
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3hk8rtrxf6-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Wed, 27 Jul 2022 16:45:41 +0000
+Received: from pps.filterd (ppma01dal.us.ibm.com [127.0.0.1])
+        by ppma01dal.us.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 26RGZAEE021857;
+        Wed, 27 Jul 2022 16:45:39 GMT
+Received: from b01cxnp23034.gho.pok.ibm.com (b01cxnp23034.gho.pok.ibm.com [9.57.198.29])
+        by ppma01dal.us.ibm.com with ESMTP id 3hg98s8s4w-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Wed, 27 Jul 2022 16:45:39 +0000
+Received: from b01ledav003.gho.pok.ibm.com (b01ledav003.gho.pok.ibm.com [9.57.199.108])
+        by b01cxnp23034.gho.pok.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 26RGjcDF63439246
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Wed, 27 Jul 2022 16:45:38 GMT
+Received: from b01ledav003.gho.pok.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id B586DB205F;
+        Wed, 27 Jul 2022 16:45:38 +0000 (GMT)
+Received: from b01ledav003.gho.pok.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 0DF18B206A;
+        Wed, 27 Jul 2022 16:45:37 +0000 (GMT)
+Received: from farman-thinkpad-t470p (unknown [9.211.142.12])
+        by b01ledav003.gho.pok.ibm.com (Postfix) with ESMTP;
+        Wed, 27 Jul 2022 16:45:36 +0000 (GMT)
+Message-ID: <82a08af9dd2d83537d20e26416bf99148fdd94f9.camel@linux.ibm.com>
+Subject: Re: [PATCH 1/2] vfio/ccw: Add length to DMA_UNMAP checks
+From:   Eric Farman <farman@linux.ibm.com>
+To:     Matthew Rosato <mjrosato@linux.ibm.com>,
+        Alex Williamson <alex.williamson@redhat.com>,
+        Jason Gunthorpe <jgg@nvidia.com>
+Cc:     Cornelia Huck <cohuck@redhat.com>,
+        Halil Pasic <pasic@linux.ibm.com>,
+        Christian Borntraeger <borntraeger@linux.ibm.com>,
+        Nicolin Chen <nicolinc@nvidia.com>, linux-s390@vger.kernel.org,
+        kvm@vger.kernel.org
+Date:   Wed, 27 Jul 2022 12:45:36 -0400
+In-Reply-To: <74db2158-a334-abb7-d93e-158b97305a57@linux.ibm.com>
+References: <20220726150123.2567761-1-farman@linux.ibm.com>
+         <20220726150123.2567761-2-farman@linux.ibm.com>
+         <74db2158-a334-abb7-d93e-158b97305a57@linux.ibm.com>
 Content-Type: text/plain; charset="UTF-8"
-X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-        USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=unavailable
-        autolearn_force=no version=3.4.6
+X-Mailer: Evolution 3.28.5 (3.28.5-18.el8) 
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: zp1jFKw_2W8gCYDKe3aokXws9E_7uR3i
+X-Proofpoint-ORIG-GUID: MzQ-WIpq8GZemCPhWjPSataonhVJFLmw
+Content-Transfer-Encoding: 7bit
+X-Proofpoint-UnRewURL: 0 URL was un-rewritten
+MIME-Version: 1.0
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.205,Aquarius:18.0.883,Hydra:6.0.517,FMLib:17.11.122.1
+ definitions=2022-07-27_06,2022-07-27_01,2022-06-22_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 malwarescore=0 spamscore=0
+ mlxscore=0 phishscore=0 adultscore=0 impostorscore=0 bulkscore=0
+ suspectscore=0 priorityscore=1501 mlxlogscore=999 clxscore=1015
+ lowpriorityscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2206140000 definitions=main-2207270069
+X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_EF,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_PASS
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Jul 27, 2022 at 3:58 AM Hao Peng <flyingpenghao@gmail.com> wrote:
->
-> From: Peng Hao <flyingpeng@tencent.com>
->
-> No 'kvmp_mmu_pages', it should be 'kvm_mmu_page'. And
-> struct kvm_mmu_pages and struct kvm_mmu_page are different structures,
-> here should be kvm_mmu_page.
-> kvm_mmu_pages is defined in arch/x86/kvm/mmu/mmu.c.
->
-> Signed-off-by: Peng Hao <flyingpeng@tencent.com>
-> ---
->  arch/x86/include/asm/kvm_host.h | 8 ++++----
->  1 file changed, 4 insertions(+), 4 deletions(-)
->
-> diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
-> index e8281d64a431..205a9f374e14 100644
-> --- a/arch/x86/include/asm/kvm_host.h
-> +++ b/arch/x86/include/asm/kvm_host.h
-> @@ -1272,8 +1272,8 @@ struct kvm_arch {
->         bool tdp_mmu_enabled;
->
->         /*
-> -        * List of struct kvm_mmu_pages being used as roots.
-> -        * All struct kvm_mmu_pages in the list should have
-> +        * List of struct kvm_mmu_page being used as roots.
+On Tue, 2022-07-26 at 12:12 -0400, Matthew Rosato wrote:
+> On 7/26/22 11:01 AM, Eric Farman wrote:
+> > As pointed out with the simplification of the
+> > VFIO_IOMMU_NOTIFY_DMA_UNMAP notifier [1], the length
+> > parameter was never used to check against the pinned
+> > pages.
+> > 
+> > Let's correct that, and see if a page is within the
+> > affected range instead of simply the first page of
+> > the range.
+> > 
+> > [1] 
+> > https://lore.kernel.org/kvm/20220720170457.39cda0d0.alex.williamson@redhat.com/
+> > 
+> > Signed-off-by: Eric Farman <farman@linux.ibm.com>
+> > ---
+> >   drivers/s390/cio/vfio_ccw_cp.c  | 11 +++++++----
+> >   drivers/s390/cio/vfio_ccw_cp.h  |  2 +-
+> >   drivers/s390/cio/vfio_ccw_ops.c |  2 +-
+> >   3 files changed, 9 insertions(+), 6 deletions(-)
+> > 
+> > diff --git a/drivers/s390/cio/vfio_ccw_cp.c
+> > b/drivers/s390/cio/vfio_ccw_cp.c
+> > index 8963f452f963..f15b5114abd1 100644
+> > --- a/drivers/s390/cio/vfio_ccw_cp.c
+> > +++ b/drivers/s390/cio/vfio_ccw_cp.c
+> > @@ -170,12 +170,14 @@ static void page_array_unpin_free(struct
+> > page_array *pa, struct vfio_device *vde
+> >   	kfree(pa->pa_iova);
+> >   }
+> >   
+> > -static bool page_array_iova_pinned(struct page_array *pa, unsigned
+> > long iova)
+> > +static bool page_array_iova_pinned(struct page_array *pa, unsigned
+> > long iova,
+> > +				   unsigned long length)
+> >   {
+> >   	int i;
+> >   
+> >   	for (i = 0; i < pa->pa_nr; i++)
+> > -		if (pa->pa_iova[i] == iova)
+> > +		if (pa->pa_iova[i] >= iova &&
+> > +		    pa->pa_iova[i] <= iova + length)
+> 
+> For the sake of completeness, I think you want to be checking to
+> make 
+> sure the end of the page is also within the range, not just the
+> start?
+> 
+> if (pa->pa_iova[i] >= iova &&
+>      pa->pa_iova[i] + PAGE_SIZE <= iova + length)
 
-I agree that "struct <name>s" is a bad/misleading way to make a struct
-plural in comments. The way I prefer to do it is "<name> structs".
-That avoids changing the <name> and still makes it clear it's plural.
-So in this case the comment would be:
+Well +PAGE_SIZE would iterate to the next page, so that would be
+captured on the next iteration of the for(i) loop if the pages were
+contiguous (or not applicable, if the pages weren't).
 
-/*
- * List of kvm_mmu_page structs being used as roots.
- * All kvm_mmu_page structs in the list should have
- * tdp_mmu_page set.
- */
+But, since the comment is really about the end of the page (0xfff), I
+guess I'm not understanding what that gets us so perhaps you could help
+elaborate your question? From my chair, since the pa_iova argument
+passed to vfio_pin_pages() pins the whole page, checking the start
+address versus the end (or anywhere in between) should still capture
+its interaction with an affected range. That is to say, we don't care
+about the -whole- page being within the unmap range, but -any- part of
+it.
 
-> +        * All struct kvm_mmu_page in the list should have
->          * tdp_mmu_page set.
->          *
->          * For reads, this list is protected by:
-> @@ -1292,8 +1292,8 @@ struct kvm_arch {
->         struct list_head tdp_mmu_roots;
->
->         /*
-> -        * List of struct kvmp_mmu_pages not being used as roots.
-> -        * All struct kvm_mmu_pages in the list should have
-> +        * List of struct kvm_mmu_page not being used as roots.
-> +        * All struct kvm_mmu_page in the list should have
->          * tdp_mmu_page set and a tdp_mmu_root_count of 0.
->          */
->         struct list_head tdp_mmu_pages;
-> --
-> 2.27.0
+
+
