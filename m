@@ -2,72 +2,73 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id CE712581CD0
-	for <lists+kvm@lfdr.de>; Wed, 27 Jul 2022 02:45:14 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id C1014581CDC
+	for <lists+kvm@lfdr.de>; Wed, 27 Jul 2022 02:50:58 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S240101AbiG0Ao5 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 26 Jul 2022 20:44:57 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47998 "EHLO
+        id S239709AbiG0Aut (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 26 Jul 2022 20:50:49 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51324 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S240111AbiG0Aoy (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 26 Jul 2022 20:44:54 -0400
-Received: from mail-pj1-x1034.google.com (mail-pj1-x1034.google.com [IPv6:2607:f8b0:4864:20::1034])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0618E3AE55;
-        Tue, 26 Jul 2022 17:44:51 -0700 (PDT)
-Received: by mail-pj1-x1034.google.com with SMTP id f11-20020a17090a4a8b00b001f2f7e32d03so2039086pjh.0;
-        Tue, 26 Jul 2022 17:44:51 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=GN/As28NJTkt9K3MCXqEyETDJB3ZuY0ItHR0XOMDO20=;
-        b=eOVxX9scVmYCLsfd/EiwtUY7Pkh1pNA1M71bz18pHn7CC0EUA9SWx6ahknb9fYP7sO
-         9Z0a8WQrH+3Z6B17rqEwSJpF3u2OyazBRxsjy0MctCVTgJbiGNJ/+RFcQNoXStrNm3M9
-         iVOBChBS+ERR/yJOIUkKSvj6tvSe7F5FofEWxriVwbJcb85Z7acXFi7941ek6c0oeXyz
-         q+5WI7HFaYTjrMueA9eyYkTB6dpFkunDo3Y0tE+zIHw3OpvGj0w1fFpxI2+/lt/8bhnU
-         +WWpaKwG2l23r9FxduEWyRmmCCkrx7vDtFpX4gxEDsQ8uJLE50MOl04Y6z+WP22iIEJS
-         UmRA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=GN/As28NJTkt9K3MCXqEyETDJB3ZuY0ItHR0XOMDO20=;
-        b=Ed3iAc5zYogG76dYfqnC2kTa5qgu8Q6mXSOXMmXAL9cKHQPp15VSMp/ClJbSEUoQG9
-         FWjW4AhyNoHReMXuhvriWD43FYKUnnLX3b80mgwF65PXYodjvpWRWcAOKq2pbZRG5UHB
-         6kbM1xNbVw5NnMxhhr3lW70mzOTeEURJbi4Gen8NJ259+H1nMS1/Nks6cuJ058L3spgi
-         mUj7SNxdt3+ZGFlBAvLxPMeSxURA5XScTwpO9iXRcLnWMycuKiyIGYPh7JHbGShXnmXf
-         fQPJbnWW32lBtSa0ZRNrN43fnmrgql+upjV1s1dcctcilpdnnCnimWSAoVIuPwLwJQeB
-         K/1w==
-X-Gm-Message-State: AJIora8CKkAaKxoFlb43I4qB9I3IwmzlJKSwtNliR7K7l0l5wh7pCtBK
-        rul9cFWfsx2SuD2cKSgHAV8=
-X-Google-Smtp-Source: AGRyM1tXAM3DDr7ZMwMAG5o1Ob+aZOo9Fc+MNvZKUwnqpx9bYCmDWnK6oOGA67J9k7U2sLwgEYyrJQ==
-X-Received: by 2002:a17:902:7612:b0:16d:2dbe:26f2 with SMTP id k18-20020a170902761200b0016d2dbe26f2mr19645136pll.94.1658882690413;
-        Tue, 26 Jul 2022 17:44:50 -0700 (PDT)
-Received: from localhost ([192.55.54.49])
-        by smtp.gmail.com with ESMTPSA id b1-20020a621b01000000b005258df7615bsm12305050pfb.0.2022.07.26.17.44.49
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 26 Jul 2022 17:44:49 -0700 (PDT)
-Date:   Tue, 26 Jul 2022 17:44:48 -0700
-From:   Isaku Yamahata <isaku.yamahata@gmail.com>
-To:     Kai Huang <kai.huang@intel.com>
-Cc:     Isaku Yamahata <isaku.yamahata@gmail.com>,
-        isaku.yamahata@intel.com, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>
-Subject: Re: [PATCH v7 008/102] KVM: x86: Refactor KVM VMX module init/exit
- functions
-Message-ID: <20220727004448.GH1379820@ls.amr.corp.intel.com>
-References: <cover.1656366337.git.isaku.yamahata@intel.com>
- <b8761fc945630d6f264ff22a388d286394a2904f.1656366338.git.isaku.yamahata@intel.com>
- <46acf87f3980a6f709e191cfc10ff4be78e23553.camel@intel.com>
- <20220712003811.GB1379820@ls.amr.corp.intel.com>
- <20f87d1f04f71bd2be63519ebf2a2447c07f7e7a.camel@intel.com>
+        with ESMTP id S232932AbiG0Aus (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 26 Jul 2022 20:50:48 -0400
+Received: from mga11.intel.com (mga11.intel.com [192.55.52.93])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7CC6828E1B;
+        Tue, 26 Jul 2022 17:50:47 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1658883047; x=1690419047;
+  h=message-id:date:mime-version:subject:to:cc:references:
+   from:in-reply-to:content-transfer-encoding;
+  bh=FTrR6qP1iHKDHwfnfSs2iYxLlfhKdoQ6vYNhBp0Kwd8=;
+  b=JdW6RVzESlckP3SIR9c/h8dWwXvOXmmt4v5a5kuDFD3JiOp3h2BkfkbS
+   UNDprkWBZdcaUHqjQ0kXyN5fuyWnpdQ1511ti9GuH/x7ze4qwPzB74lZ3
+   vCM7jlVMFne5hDWo08G9brtcEmRXUFa9W3cFgaXeXKBtx98TV1FbwIydd
+   ChfQ962I9GmWnsNgXLLDs1KZMoYU60BoxecPVvadtHUIh1cbcQLDhFngL
+   pmUjs5jFOgNTtKl/7dMuNMGYKYSsG/h9WjuPBUhLZWLJf47dyQeOv6iyZ
+   JeRizk2MRUqdSGlkD2ohn6+0yvtJ8NVAZwa3hvWGmQ+ASF3aXs7Qgqn03
+   Q==;
+X-IronPort-AV: E=McAfee;i="6400,9594,10420"; a="285659188"
+X-IronPort-AV: E=Sophos;i="5.93,194,1654585200"; 
+   d="scan'208";a="285659188"
+Received: from orsmga006.jf.intel.com ([10.7.209.51])
+  by fmsmga102.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 26 Jul 2022 17:50:44 -0700
+X-IronPort-AV: E=Sophos;i="5.93,194,1654585200"; 
+   d="scan'208";a="575747522"
+Received: from cpmcinty-mobl1.ger.corp.intel.com (HELO [10.209.58.71]) ([10.209.58.71])
+  by orsmga006-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 26 Jul 2022 17:50:44 -0700
+Message-ID: <81b70f92-d869-f56d-a152-11aff4e1d785@intel.com>
+Date:   Tue, 26 Jul 2022 17:50:43 -0700
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20f87d1f04f71bd2be63519ebf2a2447c07f7e7a.camel@intel.com>
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
-        RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS autolearn=ham
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.11.0
+Subject: Re: [PATCH v5 07/22] x86/virt/tdx: Implement SEAMCALL function
+Content-Language: en-US
+To:     Kai Huang <kai.huang@intel.com>, linux-kernel@vger.kernel.org,
+        kvm@vger.kernel.org
+Cc:     seanjc@google.com, pbonzini@redhat.com, len.brown@intel.com,
+        tony.luck@intel.com, rafael.j.wysocki@intel.com,
+        reinette.chatre@intel.com, dan.j.williams@intel.com,
+        peterz@infradead.org, ak@linux.intel.com,
+        kirill.shutemov@linux.intel.com,
+        sathyanarayanan.kuppuswamy@linux.intel.com,
+        isaku.yamahata@intel.com
+References: <cover.1655894131.git.kai.huang@intel.com>
+ <095e6bbc57b4470e1e9a9104059a5238c9775f00.1655894131.git.kai.huang@intel.com>
+ <069a062e-a4a6-09af-7b74-7f4929f2ec0b@intel.com>
+ <5ce7ebfe54160ea35e432bf50207ebed32db31fc.camel@intel.com>
+ <84e93539-a2f9-f68e-416a-ea3d8fc725af@intel.com>
+ <6bef368ccc68676e4acaecc4b6dc52f598ea7f2f.camel@intel.com>
+ <ea03e55499f556388c0a5f9ed565e72e213c276f.camel@intel.com>
+ <978c3d37-97c9-79b9-426a-2c27db34c38a@intel.com>
+ <0b20f1878d31658a9e3cd3edaf3826fe8731346e.camel@intel.com>
+ <11b7e8668fde31ead768075e51f9667276ddc78a.camel@intel.com>
+From:   Dave Hansen <dave.hansen@intel.com>
+In-Reply-To: <11b7e8668fde31ead768075e51f9667276ddc78a.camel@intel.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-Spam-Status: No, score=-7.7 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
+        RCVD_IN_DNSWL_HI,SPF_HELO_NONE,SPF_NONE autolearn=ham
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -75,65 +76,29 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Jul 12, 2022 at 01:30:34PM +1200,
-Kai Huang <kai.huang@intel.com> wrote:
-
-> On Mon, 2022-07-11 at 17:38 -0700, Isaku Yamahata wrote:
-> > On Tue, Jun 28, 2022 at 03:53:31PM +1200,
-> > Kai Huang <kai.huang@intel.com> wrote:
-> > 
-> > > On Mon, 2022-06-27 at 14:53 -0700, isaku.yamahata@intel.com wrote:
-> > > > From: Isaku Yamahata <isaku.yamahata@intel.com>
-> > > > 
-> > > > Currently, KVM VMX module initialization/exit functions are a single
-> > > > function each.  Refactor KVM VMX module initialization functions into KVM
-> > > > common part and VMX part so that TDX specific part can be added cleanly.
-> > > > Opportunistically refactor module exit function as well.
-> > > > 
-> > > > The current module initialization flow is, 1.) calculate the sizes of VMX
-> > > > kvm structure and VMX vcpu structure, 2.) hyper-v specific initialization
-> > > > 3.) report those sizes to the KVM common layer and KVM common
-> > > > initialization, and 4.) VMX specific system-wide initialization.
-> > > > 
-> > > > Refactor the KVM VMX module initialization function into functions with a
-> > > > wrapper function to separate VMX logic in vmx.c from a file, main.c, common
-> > > > among VMX and TDX.  We have a wrapper function, "vt_init() {vmx kvm/vcpu
-> > > > size calculation; hv_vp_assist_page_init(); kvm_init(); vmx_init(); }" in
-> > > > main.c, and hv_vp_assist_page_init() and vmx_init() in vmx.c.
-> > > > hv_vp_assist_page_init() initializes hyper-v specific assist pages,
-> > > > kvm_init() does system-wide initialization of the KVM common layer, and
-> > > > vmx_init() does system-wide VMX initialization.
-> > > > 
-> > > > The KVM architecture common layer allocates struct kvm with reported size
-> > > > for architecture-specific code.  The KVM VMX module defines its structure
-> > > > as struct vmx_kvm { struct kvm; VMX specific members;} and uses it as
-> > > > struct vmx kvm.  Similar for vcpu structure. TDX KVM patches will define
-> > > > TDX specific kvm and vcpu structures, add tdx_pre_kvm_init() to report the
-> > > > sizes of them to the KVM common layer.
-> > > > 
-> > > > The current module exit function is also a single function, a combination
-> > > > of VMX specific logic and common KVM logic.  Refactor it into VMX specific
-> > > > logic and KVM common logic.  This is just refactoring to keep the VMX
-> > > > specific logic in vmx.c from main.c.
-> > > 
-> > > This patch, coupled with the patch:
-> > > 
-> > > 	KVM: VMX: Move out vmx_x86_ops to 'main.c' to wrap VMX and TDX
-> > > 
-> > > Basically provides an infrastructure to support both VMX and TDX.  Why we cannot
-> > > merge them into one patch?  What's the benefit of splitting them?
-> > > 
-> > > At least, why the two patches cannot be put together closely?
-> > 
-> > It is trivial for the change of "KVM: VMX: Move out vmx_x86_ops to 'main.c' to
-> > wrap VMX and TDX" to introduce no functional change.  But it's not trivial
-> > for this patch to introduce no functional change.
+On 7/26/22 17:34, Kai Huang wrote:
+>> This doesn't seem right to me.  *If* we get a known-bogus
+>> hot-remove event, we need to reject it.  Remember, removal is a
+>> two-step process.
+> If so, we need to reject the (CMR) memory offline.  Or we just BUG()
+> in the ACPI memory removal  callback?
 > 
-> This doesn't sound right.  If I understand correctly, this patch supposedly
-> shouldn't bring any functional change, right?  Could you explain what functional
-> change does this patch bring?
+> But either way this will requires us to get the CMRs during kernel boot.
 
-This patch doesn't bring functional change.  This patch changes orders of
-some function calls.  It doesn't matter actually.  But I think it's non-trivial.
--- 
-Isaku Yamahata <isaku.yamahata@gmail.com>
+I don't get the link there between CMRs at boot and handling hotplug.
+
+We don't need to go to extreme measures just to get a message out of the
+kernel that the BIOS is bad.  If we don't have the data to do it
+already, then I don't really see the nee to warn about it.
+
+Think of a system that has TDX enabled in the BIOS, but is running an
+old kernel.  It will have *ZERO* idea that hotplug doesn't work.  It'll
+run blissfully along.  I don't see any reason that a kernel with TDX
+support, but where TDX is disabled should actively go out and try to be
+better than those old pre-TDX kernels.
+
+Further, there's nothing to stop non-CMR memory from being added to a
+system with TDX enabled in the BIOS but where the kernel is not using
+it.  If we actively go out and keep good old DRAM from being added, then
+we unnecessarily addle those systems.
+
