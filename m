@@ -2,55 +2,60 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 71B85582394
-	for <lists+kvm@lfdr.de>; Wed, 27 Jul 2022 11:59:18 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 27AF1582424
+	for <lists+kvm@lfdr.de>; Wed, 27 Jul 2022 12:23:01 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231297AbiG0J7P (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 27 Jul 2022 05:59:15 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37396 "EHLO
+        id S229763AbiG0KW5 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 27 Jul 2022 06:22:57 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57356 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230478AbiG0J7M (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 27 Jul 2022 05:59:12 -0400
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 22619402D8
-        for <kvm@vger.kernel.org>; Wed, 27 Jul 2022 02:59:11 -0700 (PDT)
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 6C197D6E;
-        Wed, 27 Jul 2022 02:59:11 -0700 (PDT)
-Received: from monolith.localdoman (unknown [172.31.20.19])
-        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id E39FB3F70D;
-        Wed, 27 Jul 2022 02:59:07 -0700 (PDT)
-Date:   Wed, 27 Jul 2022 10:59:44 +0100
-From:   Alexandru Elisei <alexandru.elisei@arm.com>
-To:     "Huang, Shaoqin" <shaoqin.huang@intel.com>
-Cc:     Will Deacon <will@kernel.org>, kvmarm@lists.cs.columbia.edu,
-        Ard Biesheuvel <ardb@kernel.org>,
-        Sean Christopherson <seanjc@google.com>,
-        Andy Lutomirski <luto@amacapital.net>,
-        Catalin Marinas <catalin.marinas@arm.com>,
-        James Morse <james.morse@arm.com>,
-        Chao Peng <chao.p.peng@linux.intel.com>,
-        Quentin Perret <qperret@google.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
-        Michael Roth <michael.roth@amd.com>,
-        Mark Rutland <mark.rutland@arm.com>,
-        Fuad Tabba <tabba@google.com>,
-        Oliver Upton <oupton@google.com>,
-        Marc Zyngier <maz@kernel.org>, kernel-team@android.com,
-        kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org
-Subject: Re: [PATCH 33/89] KVM: arm64: Handle guest stage-2 page-tables
- entirely at EL2
-Message-ID: <YuEMkKY2RU/2KiZW@monolith.localdoman>
-References: <20220519134204.5379-1-will@kernel.org>
- <20220519134204.5379-34-will@kernel.org>
- <Yoe70WC0wJg0Vcon@monolith.localdoman>
- <20220531164550.GA25631@willie-the-truck>
- <bf7dffb8-55d2-22cb-2944-b90e6117e810@intel.com>
+        with ESMTP id S229489AbiG0KWy (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 27 Jul 2022 06:22:54 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 9497C37FAE
+        for <kvm@vger.kernel.org>; Wed, 27 Jul 2022 03:22:53 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1658917372;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=xJ74GF4mlhYqy+2/HrHGfYCLzmw6cTg2nUt/Z8f593o=;
+        b=bz1/j+Q5PmFByM/1xX4D1jc7ujcc1YS3TYXWOYlWJmOTVyhBkJqx01AoGU+ORgLAlvpECT
+        /f4jZ1IgeLmw5r+rNw1+RHvjdhhB5HDc9HCjLnLdpopAsG4gy6F3YBDHPIrAVlCNUdleWQ
+        rApi70pTC1KsxVqYnd8TYQsDWbXag+0=
+Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
+ [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-152-jLVwplDrOyiBnwEvMA7seg-1; Wed, 27 Jul 2022 06:22:51 -0400
+X-MC-Unique: jLVwplDrOyiBnwEvMA7seg-1
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.rdu2.redhat.com [10.11.54.3])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id F0A71801585;
+        Wed, 27 Jul 2022 10:22:50 +0000 (UTC)
+Received: from starship (unknown [10.40.192.46])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 2F22A1121314;
+        Wed, 27 Jul 2022 10:22:48 +0000 (UTC)
+Message-ID: <20dcddad9f6c8384c49f9d8ec95a826df35fc92d.camel@redhat.com>
+Subject: Re: [PATCH] KVM: x86: enable TDP MMU by default
+From:   Maxim Levitsky <mlevitsk@redhat.com>
+To:     Paolo Bonzini <pbonzini@redhat.com>,
+        Stoiko Ivanov <s.ivanov@proxmox.com>
+Cc:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        bgardon@google.com, Jim Mattson <jmattson@google.com>
+Date:   Wed, 27 Jul 2022 13:22:48 +0300
+In-Reply-To: <ffc99463-6a61-8694-6a4e-3162580f94ee@redhat.com>
+References: <20210726163106.1433600-1-pbonzini@redhat.com>
+         <20220726165748.76db5284@rosa.proxmox.com>
+         <ffc99463-6a61-8694-6a4e-3162580f94ee@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
+User-Agent: Evolution 3.36.5 (3.36.5-2.fc32) 
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <bf7dffb8-55d2-22cb-2944-b90e6117e810@intel.com>
-X-Spam-Status: No, score=-6.9 required=5.0 tests=BAYES_00,RCVD_IN_DNSWL_HI,
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.78 on 10.11.54.3
+X-Spam-Status: No, score=-2.7 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
         SPF_HELO_NONE,SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -58,114 +63,54 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi,
-
-On Wed, Jun 08, 2022 at 09:16:56AM +0800, Huang, Shaoqin wrote:
+On Tue, 2022-07-26 at 17:43 +0200, Paolo Bonzini wrote:
+> On 7/26/22 16:57, Stoiko Ivanov wrote:
+> > Hi,
+> > 
+> > Proxmox[0] recently switched to the 5.15 kernel series (based on the one
+> > for Ubuntu 22.04), which includes this commit.
+> > While it's working well on most installations, we have a few users who
+> > reported that some of their guests shutdown with
+> > `KVM: entry failed, hardware error 0x80000021` being logged under certain
+> > conditions and environments[1]:
+> > * The issue is not deterministically reproducible, and only happens
+> >    eventually with certain loads (e.g. we have only one system in our
+> >    office which exhibits the issue - and this only by repeatedly installing
+> >    Windows 2k22 ~ one out of 10 installs will cause the guest-crash)
+> > * While most reports are referring to (newer) Windows guests, some users
+> >    run into the issue with Linux VMs as well
+> > * The affected systems are from a quite wide range - our affected machine
+> >    is an old IvyBridge Xeon with outdated BIOS (an equivalent system with
+> >    the latest available BIOS is not affected), but we have
+> >    reports of all kind of Intel CPUs (up to an i5-12400). It seems AMD CPUs
+> >    are not affected.
+> > 
+> > Disabling tdp_mmu seems to mitigate the issue, but I still thought you
+> > might want to know that in some cases tdp_mmu causes problems, or that you
+> > even might have an idea of how to fix the issue without explicitly
+> > disabling tdp_mmu?
 > 
-> On 6/1/2022 12:45 AM, Will Deacon wrote:
-> > On Fri, May 20, 2022 at 05:03:29PM +0100, Alexandru Elisei wrote:
-> > > On Thu, May 19, 2022 at 02:41:08PM +0100, Will Deacon wrote:
-> > > > Now that EL2 is able to manage guest stage-2 page-tables, avoid
-> > > > allocating a separate MMU structure in the host and instead introduce a
-> > > > new fault handler which responds to guest stage-2 faults by sharing
-> > > > GUP-pinned pages with the guest via a hypercall. These pages are
-> > > > recovered (and unpinned) on guest teardown via the page reclaim
-> > > > hypercall.
-> > > > 
-> > > > Signed-off-by: Will Deacon <will@kernel.org>
-> > > > ---
-> > > [..]
-> > > > +static int pkvm_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
-> > > > +			  unsigned long hva)
-> > > > +{
-> > > > +	struct kvm_hyp_memcache *hyp_memcache = &vcpu->arch.pkvm_memcache;
-> > > > +	struct mm_struct *mm = current->mm;
-> > > > +	unsigned int flags = FOLL_HWPOISON | FOLL_LONGTERM | FOLL_WRITE;
-> > > > +	struct kvm_pinned_page *ppage;
-> > > > +	struct kvm *kvm = vcpu->kvm;
-> > > > +	struct page *page;
-> > > > +	u64 pfn;
-> > > > +	int ret;
-> > > > +
-> > > > +	ret = topup_hyp_memcache(hyp_memcache, kvm_mmu_cache_min_pages(kvm));
-> > > > +	if (ret)
-> > > > +		return -ENOMEM;
-> > > > +
-> > > > +	ppage = kmalloc(sizeof(*ppage), GFP_KERNEL_ACCOUNT);
-> > > > +	if (!ppage)
-> > > > +		return -ENOMEM;
-> > > > +
-> > > > +	ret = account_locked_vm(mm, 1, true);
-> > > > +	if (ret)
-> > > > +		goto free_ppage;
-> > > > +
-> > > > +	mmap_read_lock(mm);
-> > > > +	ret = pin_user_pages(hva, 1, flags, &page, NULL);
-> > > 
-> > > When I implemented memory pinning via GUP for the KVM SPE series, I
-> > > discovered that the pages were regularly unmapped at stage 2 because of
-> > > automatic numa balancing, as change_prot_numa() ends up calling
-> > > mmu_notifier_invalidate_range_start().
-> > > 
-> > > I was curious how you managed to avoid that, I don't know my way around
-> > > pKVM and can't seem to find where that's implemented.
-> > 
-> > With this series, we don't take any notice of the MMU notifiers at EL2
-> > so the stage-2 remains intact. The GUP pin will prevent the page from
-> > being migrated as the rmap walker won't be able to drop the mapcount.
-> > 
-> > It's functional, but we'd definitely like to do better in the long term.
-> > The fd-based approach that I mentioned in the cover letter gets us some of
-> > the way there for protected guests ("private memory"), but non-protected
-> > guests running under pKVM are proving to be pretty challenging (we need to
-> > deal with things like sharing the zero page...).
-> > 
-> > Will
+> If you don't need secure boot, you can try disabling SMM.  It should not 
+> be related to TDP MMU, but the logs (thanks!) point at an SMM entry (RIP 
+> = 0x8000, CS base=0x7ffc2000).
+
+No doubt about it. It is the issue.
+
 > 
-> My understanding is that with the pin_user_pages, the page that used by
-> guests (both protected and non-protected) will stay for a long time, and the
-> page will not be swapped or migrated. So no need to care about the MMU
-> notifiers. Is it right?
+> This is likely to be fixed by 
+> https://lore.kernel.org/kvm/20220621150902.46126-1-mlevitsk@redhat.com/.
 
-There are two things here.
 
-First, pinning a page means making the data persistent in memory. From
-Documentation/core-api/pin_user_pages.rst:
+Speaking of my patch series, anything I should do to move that thing forward?
 
-"FOLL_PIN is a *replacement* for FOLL_GET, and is for short term pins on
-pages whose data *will* get accessed. As such, FOLL_PIN is a "more severe"
-form of pinning. And finally, FOLL_LONGTERM is an even more restrictive
-case that has FOLL_PIN as a prerequisite: this is for pages that will be
-pinned longterm, and whose data will be accessed."
+My approach to preserve the interrupt shadow in SMRAM doesn't seem to be accepted,
+so what you think I should do?
 
-It does not mean that the translation table entry for the page is not
-modified for as long as the pin exists. In the example I gave, automatic
-NUMA balancing changes the protection of translation table entries to
-PAGE_NONE, which will invoke the MMU notifers to unmap the corresponding
-stage 2 entries, regardless of the fact that the pinned pages will not get
-migrated the next time they are accessed.
+Best regards,
+	Maxim Levitsky
 
-There are other mechanisms in the kernel that do that, for example
-split_huge_pmd(), which must always succeed, even if the THP is pinned (it
-transfers the refcounts among the pages): "Note that split_huge_pmd()
-doesn't have any limitations on refcounting: pmd can be split at any point
-and never fails" (Documentation/vm/transhuge.rst, also see
-__split_huge_pmd() from mm/huge_memory.c).
+> 
+> Paolo
+> 
 
-KSM also does that: it invokes the invalidate_range_start MMU notifier
-before backing out of the merge because of the refcount (see mm/ksm.c::
-try_to_merge_one_page -> write_protect_page).
 
-This brings me to my second point: one might rightfully ask themselves (I
-did!), why not invoke the MMU notifiers *after* checking that the page is
-not pinned? It turns out that that is not reliable, because the refcount is
-increased by GUP with the page lock held (which is a spinlock), but by
-their design the invalidate_range_start MMU notifiers must be called from
-interruptible + preemptible context. The only way to avoid races would be
-to call the MMU notifier while holding the page table lock, which is
-impossible.
-
-Hope my explanation has been adequate.
-
-Thanks,
-Alex
