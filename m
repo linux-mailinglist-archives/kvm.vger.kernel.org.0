@@ -2,54 +2,57 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 338575835AF
-	for <lists+kvm@lfdr.de>; Thu, 28 Jul 2022 01:37:08 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id F02A85835AB
+	for <lists+kvm@lfdr.de>; Thu, 28 Jul 2022 01:37:06 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232989AbiG0Xef (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 27 Jul 2022 19:34:35 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54904 "EHLO
+        id S233194AbiG0Xeg (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 27 Jul 2022 19:34:36 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54920 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230392AbiG0Xed (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 27 Jul 2022 19:34:33 -0400
-Received: from mail-yb1-xb49.google.com (mail-yb1-xb49.google.com [IPv6:2607:f8b0:4864:20::b49])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id ECF3F558D1
-        for <kvm@vger.kernel.org>; Wed, 27 Jul 2022 16:34:32 -0700 (PDT)
-Received: by mail-yb1-xb49.google.com with SMTP id j11-20020a05690212cb00b006454988d225so345597ybu.10
-        for <kvm@vger.kernel.org>; Wed, 27 Jul 2022 16:34:32 -0700 (PDT)
+        with ESMTP id S232834AbiG0Xee (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 27 Jul 2022 19:34:34 -0400
+Received: from mail-pl1-x64a.google.com (mail-pl1-x64a.google.com [IPv6:2607:f8b0:4864:20::64a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E821356B99
+        for <kvm@vger.kernel.org>; Wed, 27 Jul 2022 16:34:33 -0700 (PDT)
+Received: by mail-pl1-x64a.google.com with SMTP id i9-20020a170902cf0900b0016d1e277547so211348plg.0
+        for <kvm@vger.kernel.org>; Wed, 27 Jul 2022 16:34:33 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
-        h=reply-to:date:message-id:mime-version:subject:from:to:cc;
-        bh=L3m2JC5GapMYqTiLfpgpy+Syxp+egGM8zqBmpln74FQ=;
-        b=QvTYidN+KmLvcyrB45xodWUwi/AdeLijHMBx02iEklp/7wl57m7u637uhOrULFDewY
-         TqAKGaiQ7JdJhAgxOWdP05ycp1WblrYbO0SCtaXgJg8L0lR2xMIw+Oe8OzAv+uEDD2l9
-         6fnOpN1vv4D2yUKVaT2JHZCS2EgkHP4db9EM4l7ip3q37wL7F5uWFshBXczDGRMuJUox
-         1SWxuGx+0993mtZ+Goym38hbqGpcArVYyE9t6b8l8IbutN+O5/7yXiMnDR/M7FhIVISX
-         d/9g9w1XuC97w6ae9THw15cTzlH/zf/Ipxh6j8XnRZkXRmCG0oeyVTrqdwPkKIPMu/34
-         kGtQ==
+        h=reply-to:date:in-reply-to:message-id:mime-version:references
+         :subject:from:to:cc;
+        bh=tcg4fyWcMhApmssB1rrZxLEKjBF7sSie1JOHuz2QyKw=;
+        b=Y22uyc7My63H8qiFF1kgEwUBLMnNiTDQAspI9xMCMaI8CL4pMsFZwEy5qqqu/OAbjk
+         dCkhYEVY81t7juGyB3KIxXTQ16K2PW8Lbb0TiJluF1RHfns+Gpb4V79FfA53W3Jo94he
+         OhcXVYyDhnTAEAhhX4NcAbrMDp1GYhjOIRVOBGVk99IfkIzYylefYMyoW1sFSV14LpXR
+         /loGYZXkjgZj34YAUF1U+FsjpNVxIp22oA9ihhclEeuBB1IqhuA/NrFqXW3aYoCx0I57
+         74hrMCbtPcUJHybQ8N6HeVjtcLXTs1aNHY455CaZL+xFrrAx8aGJU+hv7v53sWhV6ZIR
+         zeaw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:reply-to:date:message-id:mime-version:subject
-         :from:to:cc;
-        bh=L3m2JC5GapMYqTiLfpgpy+Syxp+egGM8zqBmpln74FQ=;
-        b=kjioTEwoeLFMCABspfU0vqmzpssKoDGj2o7dzQV5zmUmN5cXsEfa+C1KiADi4CDSbr
-         7hQa0mEtwFvd+4JL+xFpe7uv0RQOy9CCr3qTVgIoFFKvUuRDVnJoSrj9C1zaDuTNq6ky
-         oAmC6nYsJjBIv12xNC4KElB7OlqBHvigt6c3CdcqZk28ucziRN1TT2x2mdUcO6vuMv8c
-         OcBf2ptJNJvPqgx+i1NjznjdttkoBp4+RNDwvBmcgL/+MvDJc42KJlPZx9sNzRtcygFg
-         Oxp2yw4dTD5T/28RorwbrN7YohKLFHQLjNc8djuZku7ATN3w3BfYd9AjdauoJkHKkG+1
-         ++bQ==
-X-Gm-Message-State: AJIora8NY/6vWndgMnsdhhD7pj/POTPCl+ZUbBjYUkicyOtHlvKCOT0k
-        +2jDiamfSjmsvY0OUbFJqgYZHSUdhng=
-X-Google-Smtp-Source: AGRyM1sca9IphNd8CVhj6GCoCv/IHqCsRy7Rx96SSaFVhtFNf05rx3qu5MLsio63ysQSa/8xeUoPppboX9I=
+        h=x-gm-message-state:reply-to:date:in-reply-to:message-id
+         :mime-version:references:subject:from:to:cc;
+        bh=tcg4fyWcMhApmssB1rrZxLEKjBF7sSie1JOHuz2QyKw=;
+        b=UCNpgIUK5LQzzzkhZGeL6dOXQIiOg+YMkSGItD7KlFAN0Q3ePDjq0cBomY7UKXNHX/
+         LOjSerx7P1vFNXYxp/vI5PqgfuJe8H9h+zA5kB/fCwPzifVl0G1xqxfErWzPgtJc89fb
+         lNwhCQZ0SYldWjEjKaTBHXkVMtskPR1EVHKSsAweYWbBW3OxJc8hKtvlIixArbhKbZ0Y
+         aBh5eA0WqynY220QzYshbuLS8Wp5EdTHwX3R23S1B+Sx22Aiweel8QFi/LEvIlojjcrm
+         5d0c3/cb7aKdgc8B07Mhh4dz5v3asWK35yBqB0euN++eosLdNRIg8vf6fIo1KdaQ7jIj
+         g+Fg==
+X-Gm-Message-State: AJIora/vJAEILpaZPxsR2zfdKmCOGpJ8sujc+7zO8w1t4wVIlrFEYJzi
+        em6plCn0Rqd830WFwgQCzIo4aD80E3k=
+X-Google-Smtp-Source: AGRyM1v9kW5QkJ7txPbJ2wbBnmnKx7n0zh8SlRr9e8pUg1+T0qGL/PY7sqMWVgiX+DZcxx9VtWqNPiGmxJI=
 X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a81:1c45:0:b0:31f:539b:91db with SMTP id
- c66-20020a811c45000000b0031f539b91dbmr7764607ywc.435.1658964872253; Wed, 27
- Jul 2022 16:34:32 -0700 (PDT)
+ (user=seanjc job=sendgmr) by 2002:aa7:9e9b:0:b0:528:2948:e974 with SMTP id
+ p27-20020aa79e9b000000b005282948e974mr24092040pfq.79.1658964873498; Wed, 27
+ Jul 2022 16:34:33 -0700 (PDT)
 Reply-To: Sean Christopherson <seanjc@google.com>
-Date:   Wed, 27 Jul 2022 23:34:21 +0000
-Message-Id: <20220727233424.2968356-1-seanjc@google.com>
+Date:   Wed, 27 Jul 2022 23:34:22 +0000
+In-Reply-To: <20220727233424.2968356-1-seanjc@google.com>
+Message-Id: <20220727233424.2968356-2-seanjc@google.com>
 Mime-Version: 1.0
+References: <20220727233424.2968356-1-seanjc@google.com>
 X-Mailer: git-send-email 2.37.1.359.gd136c6c3e2-goog
-Subject: [PATCH 0/3] KVM: x86: Intel PERF_CAPABILITIES fix and cleanups
+Subject: [PATCH 1/3] KVM: x86: Refresh PMU after writes to MSR_IA32_PERF_CAPABILITIES
 From:   Sean Christopherson <seanjc@google.com>
 To:     Sean Christopherson <seanjc@google.com>,
         Paolo Bonzini <pbonzini@redhat.com>
@@ -58,7 +61,7 @@ Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
 Content-Type: text/plain; charset="UTF-8"
 X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL autolearn=ham
+        SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL autolearn=unavailable
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -66,26 +69,36 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Fix a bug where KVM doesn't refresh the vPMU after userspace writes
-PERF_CAPABILITIES, and then leverage that fix to avoiding checking
-guest_cpuid_has(X86_FEATURE_PDCM) during VM-Enter, which is slow enough
-that it shows up in perf traces[*].
+Refresh the PMU if userspace modifies MSR_IA32_PERF_CAPABILITIES.  KVM
+consumes the vCPU's PERF_CAPABILITIES when enumerating PEBS support, but
+relies on CPUID updates to refresh the PMU.  I.e. KVM will do the wrong
+thing if userspace stuffs PERF_CAPABILITIES _after_ setting guest CPUID.
 
-[*] https://gist.github.com/avagin/f50a6d569440c9ae382281448c187f4e
+Opportunistically fix a curly-brace indentation.
 
-Sean Christopherson (3):
-  KVM: x86: Refresh PMU after writes to MSR_IA32_PERF_CAPABILITIES
-  KVM: VMX: Use proper type-safe functions for vCPU => LBRs helpers
-  KVM: VMX: Adjust number of LBR records for PERF_CAPABILITIES at
-    refresh
+Fixes: c59a1f106f5c ("KVM: x86/pmu: Add IA32_PEBS_ENABLE MSR emulation for extended PEBS")
+Cc: Like Xu <like.xu.linux@gmail.com>
+Signed-off-by: Sean Christopherson <seanjc@google.com>
+---
+ arch/x86/kvm/x86.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
- arch/x86/kvm/vmx/pmu_intel.c | 12 +++---------
- arch/x86/kvm/vmx/vmx.h       | 29 ++++++++++++++++++++---------
- arch/x86/kvm/x86.c           |  4 ++--
- 3 files changed, 25 insertions(+), 20 deletions(-)
-
-
-base-commit: 1a4d88a361af4f2e91861d632c6a1fe87a9665c2
+diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+index 5366f884e9a7..362c538285db 100644
+--- a/arch/x86/kvm/x86.c
++++ b/arch/x86/kvm/x86.c
+@@ -3543,9 +3543,9 @@ int kvm_set_msr_common(struct kvm_vcpu *vcpu, struct msr_data *msr_info)
+ 			return 1;
+ 
+ 		vcpu->arch.perf_capabilities = data;
+-
++		kvm_pmu_refresh(vcpu);
+ 		return 0;
+-		}
++	}
+ 	case MSR_EFER:
+ 		return set_efer(vcpu, msr_info);
+ 	case MSR_K7_HWCR:
 -- 
 2.37.1.359.gd136c6c3e2-goog
 
