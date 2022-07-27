@@ -2,189 +2,557 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id E11225826C7
-	for <lists+kvm@lfdr.de>; Wed, 27 Jul 2022 14:37:25 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 845C75826EB
+	for <lists+kvm@lfdr.de>; Wed, 27 Jul 2022 14:46:51 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233268AbiG0MhX (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 27 Jul 2022 08:37:23 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51308 "EHLO
+        id S232297AbiG0Mqu (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 27 Jul 2022 08:46:50 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58394 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233228AbiG0MhU (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 27 Jul 2022 08:37:20 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 546173337F
-        for <kvm@vger.kernel.org>; Wed, 27 Jul 2022 05:37:19 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1658925438;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=4LWH5gfewkP2m9y0QehAONnCxfwoC2hdUW6P/cyixj4=;
-        b=MpFDnMIn5YsixoYMfxydyZGmBOrW4acAfgOaEv/w7cUB4HilrTkHDxInljKQG+KzbfnDg1
-        mcPVOi91/ny6hRF/ehyVt/wbI2zy9Mdhx4jptMbCscUIrUgw60D4w3wmjWqtTaVee1vrNL
-        qqeV07Zg2Prh3xrEROr6oXTEjaAq/ME=
-Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
- [209.85.221.72]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-272-5QlQUmqwPviEjJ3ciqw-Hw-1; Wed, 27 Jul 2022 08:37:17 -0400
-X-MC-Unique: 5QlQUmqwPviEjJ3ciqw-Hw-1
-Received: by mail-wr1-f72.google.com with SMTP id n7-20020adfc607000000b0021a37d8f93aso2827136wrg.21
-        for <kvm@vger.kernel.org>; Wed, 27 Jul 2022 05:37:17 -0700 (PDT)
+        with ESMTP id S231877AbiG0Mqt (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 27 Jul 2022 08:46:49 -0400
+Received: from mail-pj1-x1031.google.com (mail-pj1-x1031.google.com [IPv6:2607:f8b0:4864:20::1031])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 009401CB26
+        for <kvm@vger.kernel.org>; Wed, 27 Jul 2022 05:46:47 -0700 (PDT)
+Received: by mail-pj1-x1031.google.com with SMTP id d65-20020a17090a6f4700b001f303a97b14so2023723pjk.1
+        for <kvm@vger.kernel.org>; Wed, 27 Jul 2022 05:46:47 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=from:to:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=MKGtbnavMu2cAFwizKi7KuJH3vDK8oJgQIAfik26hIw=;
+        b=bvxu6YJc93KX8ZnG5lZq1aIpqBNCC2QvCkn4DKVAGoT0NYGGiUCSPbqs7ANlRb1m/2
+         gSwD5vUHqQRY2enc5UI1w+YaUFMnHWhRchIbVuOev/MROUcCitK6zyCu5G3QEsyH0/Fm
+         ZnWeNsm741dTroAzFqMuLlci8roPzo0ZdtCWNbaZlAXgGDyu5vBKggek50lriEiwxlr0
+         l9xqwkHVBREjjH2ZyR7nwPV0dldKM2DiNZlc4qNyBfVHR9uaS7hQha5HCyov9RopGOUq
+         hPMmZerNAD4Bq37Zz8zp+fcnHmdqJIcgbRSJuV7MbLo6u69ZGeJ8WbUay+c9qMSqjmjx
+         XBHA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:content-transfer-encoding
-         :in-reply-to;
-        bh=4LWH5gfewkP2m9y0QehAONnCxfwoC2hdUW6P/cyixj4=;
-        b=FcGVtn9JfeDqhrY+NmOLcpkaXOhmOJe1SYY4SFCRHdRq5YZgINf7a+2/chYthh69ZF
-         KRoy+WM9+AjDYJwVb66w57XNW7exz7c9zsTeRSkoTInk/8nV34ggiDpIQNLCb5htxS9c
-         TZ03h6m9+7PclP6749ULY4HVVQyVmU0T2oojMxaiYze7bU1JJUgUWx6jyY5C4zeh975/
-         H7cOqH8tR1HTg4JimQZi80nRosIiXMu/XxmR6YXyoN7z97ctU64hgJNmZhpfN0HO4a3Q
-         PlbMdcZy2AUUtDcOPEOc6DtEhN/bUhz10goU6UKqi2ovXwuB1U0Eakl4lzGix3Sibv9Z
-         lkAA==
-X-Gm-Message-State: AJIora8yD3ju8MJ8p+IM04D+rvPG01SICE6NeOWjQTkuf+pAG1R6rZMy
-        47Tf9jBy39oVNTB0iR72m5tCLi8zWRMBZbGnF3k05UIshOlkw+2pA+1WQzKNxSlinKpQsVwUOyR
-        kKmLZKppPldvS
-X-Received: by 2002:adf:d1e8:0:b0:21d:ac9c:983d with SMTP id g8-20020adfd1e8000000b0021dac9c983dmr13770290wrd.629.1658925436051;
-        Wed, 27 Jul 2022 05:37:16 -0700 (PDT)
-X-Google-Smtp-Source: AGRyM1vJrWqBiaq6uBMB03xiUMkRFhOPCI0fFvUqiEuTuZWyTbuHIhoAAyTdDFMM07jJhUESZdjGNg==
-X-Received: by 2002:adf:d1e8:0:b0:21d:ac9c:983d with SMTP id g8-20020adfd1e8000000b0021dac9c983dmr13770264wrd.629.1658925435819;
-        Wed, 27 Jul 2022 05:37:15 -0700 (PDT)
-Received: from sgarzare-redhat (host-79-46-200-178.retail.telecomitalia.it. [79.46.200.178])
-        by smtp.gmail.com with ESMTPSA id u9-20020adff889000000b0020fcaba73bcsm16755266wrp.104.2022.07.27.05.37.13
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 27 Jul 2022 05:37:15 -0700 (PDT)
-Date:   Wed, 27 Jul 2022 14:37:10 +0200
-From:   Stefano Garzarella <sgarzare@redhat.com>
-To:     Arseniy Krasnov <AVKrasnov@sberdevices.ru>,
-        Bryan Tan <bryantan@vmware.com>,
-        Vishnu Dasa <vdasa@vmware.com>,
-        VMware PV-Drivers Reviewers <pv-drivers@vmware.com>
-Cc:     "David S. Miller" <davem@davemloft.net>,
-        "edumazet@google.com" <edumazet@google.com>,
-        Jakub Kicinski <kuba@kernel.org>,
-        Paolo Abeni <pabeni@redhat.com>,
-        Stefan Hajnoczi <stefanha@redhat.com>,
-        "Michael S. Tsirkin" <mst@redhat.com>,
-        "kys@microsoft.com" <kys@microsoft.com>,
-        "haiyangz@microsoft.com" <haiyangz@microsoft.com>,
-        "sthemmin@microsoft.com" <sthemmin@microsoft.com>,
-        "wei.liu@kernel.org" <wei.liu@kernel.org>,
-        Dexuan Cui <decui@microsoft.com>,
-        Krasnov Arseniy <oxffffaa@gmail.com>,
-        "virtualization@lists.linux-foundation.org" 
-        <virtualization@lists.linux-foundation.org>,
-        "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "linux-hyperv@vger.kernel.org" <linux-hyperv@vger.kernel.org>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        kernel <kernel@sberdevices.ru>
-Subject: Re: [RFC PATCH v2 0/9] vsock: updates for SO_RCVLOWAT handling
-Message-ID: <20220727123710.pwzy6ag3gavotxda@sgarzare-redhat>
-References: <19e25833-5f5c-f9b9-ac0f-1945ea17638d@sberdevices.ru>
+        h=x-gm-message-state:from:to:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=MKGtbnavMu2cAFwizKi7KuJH3vDK8oJgQIAfik26hIw=;
+        b=ph/3tqERvrLhzTPt99+92LfS1gA0uUTy1CB7PGbfYPME6TFkdetFtq+c212a6Gn/Mg
+         E/oVmQ12B7nHvOLjbUZGSGHfqnTiMclrWYzjvNLkcS0AtSVyzQdHNXPjAT+7F19OlZ5m
+         /tworuXTOWIKNsjaU8oXLh6Tike53jafGcxvFonGNPd4hcLDEZvUAokFRUtopdLFonoh
+         ENmuFX9x8XUWvfNWSOvHYkQ1jfQBc4f/ArSPGQ0E9XRX5QzYfUqZlD3F9+IsQWYH7o+h
+         iXyyvXXn1uOIgvBkASYz/omX14uaHkEmDDE2lnft9q1cb6FJwjwaQUu3ygZVUEgLo5nU
+         yAtQ==
+X-Gm-Message-State: AJIora/jk4fQrO7kEQcWZ8Xk+qcpwHea2aVsvn9I4l2tqLNUS3seuTw4
+        FbJuKPDx9lCpUxXVId4yZto=
+X-Google-Smtp-Source: AGRyM1umvJG2UdVLvUb9ZHVm3jNx1vXJDSlebZ0I7jVEc8Bvy0GWLFof9OqNbs8cZek/GxP/V+/H0Q==
+X-Received: by 2002:a17:902:ce05:b0:16b:e725:6f6c with SMTP id k5-20020a170902ce0500b0016be7256f6cmr21222326plg.110.1658926007429;
+        Wed, 27 Jul 2022 05:46:47 -0700 (PDT)
+Received: from localhost.localdomain ([47.246.98.184])
+        by smtp.gmail.com with ESMTPSA id d5-20020a170903230500b0016c3b0042d0sm13763924plh.14.2022.07.27.05.46.45
+        (version=TLS1_3 cipher=TLS_CHACHA20_POLY1305_SHA256 bits=256/256);
+        Wed, 27 Jul 2022 05:46:46 -0700 (PDT)
+From:   SU Hang <darcysail@gmail.com>
+X-Google-Original-From: SU Hang <darcy.sh@antgroup.com>
+To:     darcy.sh@antgroup.com, babu.moger@amd.com, manali.shukla@amd.com,
+        mlevitsk@redhat.com, wei.huang2@amd.com, kvm@vger.kernel.org,
+        pbonzini@redhat.com
+Subject: [kvm-unit-tests PATCH v2] x86: amd: pmu: test performance counter on AMD
+Date:   Wed, 27 Jul 2022 20:46:32 +0800
+Message-Id: <20220727124632.44253-1-darcy.sh@antgroup.com>
+X-Mailer: git-send-email 2.32.1 (Apple Git-133)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1; format=flowed
-Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <19e25833-5f5c-f9b9-ac0f-1945ea17638d@sberdevices.ru>
-X-Spam-Status: No, score=-2.7 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        SPF_HELO_NONE,SPF_NONE autolearn=unavailable autolearn_force=no
-        version=3.4.6
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
+        RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi Arseniy,
+This test adds performance counter test for AMD CPU, it tests old
+performance legacy 4 counters [1] since Family 6(that is AMD K7 CPU),
+and new 6 counters [2] since Family 21 (15H).
 
-On Mon, Jul 25, 2022 at 07:54:05AM +0000, Arseniy Krasnov wrote:
->Hello,
->
->This patchset includes some updates for SO_RCVLOWAT:
->
->1) af_vsock:
->   During my experiments with zerocopy receive, i found, that in some
->   cases, poll() implementation violates POSIX: when socket has non-
->   default SO_RCVLOWAT(e.g. not 1), poll() will always set POLLIN and
->   POLLRDNORM bits in 'revents' even number of bytes available to read
->   on socket is smaller than SO_RCVLOWAT value. In this case,user sees
->   POLLIN flag and then tries to read data(for example using  'read()'
->   call), but read call will be blocked, because  SO_RCVLOWAT logic is
->   supported in dequeue loop in af_vsock.c. But the same time,  POSIX
->   requires that:
->
->   "POLLIN     Data other than high-priority data may be read without
->               blocking.
->    POLLRDNORM Normal data may be read without blocking."
->
->   See https://www.open-std.org/jtc1/sc22/open/n4217.pdf, page 293.
->
->   So, we have, that poll() syscall returns POLLIN, but read call will
->   be blocked.
->
->   Also in man page socket(7) i found that:
->
->   "Since Linux 2.6.28, select(2), poll(2), and epoll(7) indicate a
->   socket as readable only if at least SO_RCVLOWAT bytes are available."
->
->   I checked TCP callback for poll()(net/ipv4/tcp.c, tcp_poll()), it
->   uses SO_RCVLOWAT value to set POLLIN bit, also i've tested TCP with
->   this case for TCP socket, it works as POSIX required.
->
->   I've added some fixes to af_vsock.c and virtio_transport_common.c,
->   test is also implemented.
->
->2) virtio/vsock:
->   It adds some optimization to wake ups, when new data arrived. Now,
->   SO_RCVLOWAT is considered before wake up sleepers who wait new data.
->   There is no sense, to kick waiter, when number of available bytes
->   in socket's queue < SO_RCVLOWAT, because if we wake up reader in
->   this case, it will wait for SO_RCVLOWAT data anyway during dequeue,
->   or in poll() case, POLLIN/POLLRDNORM bits won't be set, so such
->   exit from poll() will be "spurious". This logic is also used in TCP
->   sockets.
+And because AMD doesn't have some MSRs(e.g. MSR_CORE_PERF_GLOBAL_STATUS)
+and fixed counters as Intel, simply disable corresponding statements
+or cases.
 
-Nice, it looks good!
+Another thing worth mentioning is, AMD perf counter doesn't support
+select 'reference cycle', disable it too.
 
->
->3) vmci/vsock:
->   Same as 2), but i'm not sure about this changes. Will be very good,
->   to get comments from someone who knows this code.
+> refs[1]: MSRC001_000[4...7] [Performance Event Counter [3:0]] (Core::X86::Msr::PERF_LEGACY_CTR)
+> refs[2]: MSRC001_020[1...B] [Performance Event Counter [5:0]] (Core::X86::Msr::PERF_CTR)
 
-I CCed VMCI maintainers to the patch and also to this cover, maybe 
-better to keep them in the loop for next versions.
+Signed-off-by: SU Hang <darcy.sh@antgroup.com>
+---
+ lib/x86/msr.h |  23 +++++
+ x86/pmu.c     | 251 ++++++++++++++++++++++++++++++++++++++++----------
+ 2 files changed, 223 insertions(+), 51 deletions(-)
 
-(Jorgen's and Rajesh's emails bounced back, so I'm CCing here only 
-Bryan, Vishnu, and pv-drivers@vmware.com)
-
->
->4) Hyper-V:
->   As Dexuan Cui mentioned, for Hyper-V transport it is difficult to
->   support SO_RCVLOWAT, so he suggested to disable this feature for
->   Hyper-V.
-
-I left a couple of comments in some patches, but it seems to me to be in 
-a good state :-)
-
-I would just suggest a bit of a re-organization of the series (the 
-patches are fine, just the order):
-   - introduce vsock_set_rcvlowat()
-   - disabling it for hv_sock
-   - use 'target' in virtio transports
-   - use 'target' in vmci transports
-   - use sock_rcvlowat in vsock_poll()
-     I think is better to pass sock_rcvlowat() as 'target' when the
-     transports are already able to use it
-   - add vsock_data_ready()
-   - use vsock_data_ready() in virtio transports
-   - use vsock_data_ready() in vmci transports
-   - tests
-
-What do you think?
-
-Thanks,
-Stefano
+diff --git a/lib/x86/msr.h b/lib/x86/msr.h
+index fa1c0c8..a8aa907 100644
+--- a/lib/x86/msr.h
++++ b/lib/x86/msr.h
+@@ -129,6 +129,29 @@
+ #define MSR_AMD64_IBSDCPHYSAD		0xc0011039
+ #define MSR_AMD64_IBSCTL		0xc001103a
+ 
++/* Fam 15h MSRs */
++#define MSR_F15H_PERF_CTL		0xc0010200
++#define MSR_F15H_PERF_CTL0		MSR_F15H_PERF_CTL
++#define MSR_F15H_PERF_CTL1		(MSR_F15H_PERF_CTL + 2)
++#define MSR_F15H_PERF_CTL2		(MSR_F15H_PERF_CTL + 4)
++#define MSR_F15H_PERF_CTL3		(MSR_F15H_PERF_CTL + 6)
++#define MSR_F15H_PERF_CTL4		(MSR_F15H_PERF_CTL + 8)
++#define MSR_F15H_PERF_CTL5		(MSR_F15H_PERF_CTL + 10)
++
++#define MSR_F15H_PERF_CTR		0xc0010201
++#define MSR_F15H_PERF_CTR0		MSR_F15H_PERF_CTR
++#define MSR_F15H_PERF_CTR1		(MSR_F15H_PERF_CTR + 2)
++#define MSR_F15H_PERF_CTR2		(MSR_F15H_PERF_CTR + 4)
++#define MSR_F15H_PERF_CTR3		(MSR_F15H_PERF_CTR + 6)
++#define MSR_F15H_PERF_CTR4		(MSR_F15H_PERF_CTR + 8)
++#define MSR_F15H_PERF_CTR5		(MSR_F15H_PERF_CTR + 10)
++
++#define MSR_F15H_NB_PERF_CTL		0xc0010240
++#define MSR_F15H_NB_PERF_CTR		0xc0010241
++#define MSR_F15H_PTSC			0xc0010280
++#define MSR_F15H_IC_CFG			0xc0011021
++#define MSR_F15H_EX_CFG			0xc001102c
++
+ /* Fam 10h MSRs */
+ #define MSR_FAM10H_MMIO_CONF_BASE	0xc0010058
+ #define FAM10H_MMIO_CONF_ENABLE		(1<<0)
+diff --git a/x86/pmu.c b/x86/pmu.c
+index a46bdbf..77332b6 100644
+--- a/x86/pmu.c
++++ b/x86/pmu.c
+@@ -83,7 +83,9 @@ struct pmu_event {
+ 	uint32_t unit_sel;
+ 	int min;
+ 	int max;
+-} gp_events[] = {
++} * gp_events;
++
++struct pmu_event intel_gp_event[] = {
+ 	{"core cycles", 0x003c, 1*N, 50*N},
+ 	{"instructions", 0x00c0, 10*N, 10.2*N},
+ 	{"ref cycles", 0x013c, 1*N, 30*N},
+@@ -91,16 +93,26 @@ struct pmu_event {
+ 	{"llc misses", 0x412e, 1, 1*N},
+ 	{"branches", 0x00c4, 1*N, 1.1*N},
+ 	{"branch misses", 0x00c5, 0, 0.1*N},
+-}, fixed_events[] = {
++};
++struct pmu_event amd_gp_event[] = {
++	{ "core cycles", 0x0076, 1 * N, 50 * N },
++	{ "instructions", 0x00c0, 10 * N, 10.9 * N },
++	{ "llc references", 0x028f, 1, 5 * N },
++	{ "branches", 0x00c2, 1 * N, 1.1 * N },
++	{ "branch misses", 0x00c3, 0, 0.1 * N },
++};
++struct pmu_event fixed_events[] = {
+ 	{"fixed 1", MSR_CORE_PERF_FIXED_CTR0, 10*N, 10.2*N},
+ 	{"fixed 2", MSR_CORE_PERF_FIXED_CTR0 + 1, 1*N, 30*N},
+ 	{"fixed 3", MSR_CORE_PERF_FIXED_CTR0 + 2, 0.1*N, 30*N}
+ };
+ 
+ #define PMU_CAP_FW_WRITES	(1ULL << 13)
+-static u64 gp_counter_base = MSR_IA32_PERFCTR0;
++static u64 gp_counter_base;
+ 
+ static int num_counters;
++static int num_gp_event;
++static bool is_intel_chip;
+ 
+ char *buf;
+ 
+@@ -134,6 +146,9 @@ static bool check_irq(void)
+ 
+ static bool is_gp(pmu_counter_t *evt)
+ {
++	/* MSR_F15H_PERF_CTR == 0xc0010201
++	 * MSR_K7_PERFCTR0   == 0xc0010004
++	 * both happened to greater than MSR_IA32_PMC0. */
+ 	return evt->ctr < MSR_CORE_PERF_FIXED_CTR0 ||
+ 		evt->ctr >= MSR_IA32_PMC0;
+ }
+@@ -149,7 +164,8 @@ static struct pmu_event* get_counter_event(pmu_counter_t *cnt)
+ 	if (is_gp(cnt)) {
+ 		int i;
+ 
+-		for (i = 0; i < sizeof(gp_events)/sizeof(gp_events[0]); i++)
++		for (i = 0; i < num_gp_event; i++)
++
+ 			if (gp_events[i].unit_sel == (cnt->config & 0xffff))
+ 				return &gp_events[i];
+ 	} else
+@@ -161,6 +177,8 @@ static struct pmu_event* get_counter_event(pmu_counter_t *cnt)
+ static void global_enable(pmu_counter_t *cnt)
+ {
+ 	cnt->idx = event_to_global_idx(cnt);
++	if (!is_intel_chip)
++		return;
+ 
+ 	wrmsr(MSR_CORE_PERF_GLOBAL_CTRL, rdmsr(MSR_CORE_PERF_GLOBAL_CTRL) |
+ 			(1ull << cnt->idx));
+@@ -168,6 +186,8 @@ static void global_enable(pmu_counter_t *cnt)
+ 
+ static void global_disable(pmu_counter_t *cnt)
+ {
++	if (!is_intel_chip)
++		return;
+ 	wrmsr(MSR_CORE_PERF_GLOBAL_CTRL, rdmsr(MSR_CORE_PERF_GLOBAL_CTRL) &
+ 			~(1ull << cnt->idx));
+ }
+@@ -176,14 +196,19 @@ static void global_disable(pmu_counter_t *cnt)
+ static void start_event(pmu_counter_t *evt)
+ {
+     wrmsr(evt->ctr, evt->count);
+-    if (is_gp(evt))
+-	    wrmsr(MSR_P6_EVNTSEL0 + event_to_global_idx(evt),
+-			    evt->config | EVNTSEL_EN);
+-    else {
++	if (is_gp(evt)) {
++		uint64_t sel;
++		if (is_intel_chip)
++			sel = MSR_P6_EVNTSEL0;
++		else if (gp_counter_base == MSR_F15H_PERF_CTR)
++			sel = MSR_F15H_PERF_CTL;
++		else
++			sel = MSR_K7_EVNTSEL0;
++		wrmsr(sel + event_to_global_idx(evt), evt->config | EVNTSEL_EN);
++	} else {
+ 	    uint32_t ctrl = rdmsr(MSR_CORE_PERF_FIXED_CTR_CTRL);
+ 	    int shift = (evt->ctr - MSR_CORE_PERF_FIXED_CTR0) * 4;
+ 	    uint32_t usrospmi = 0;
+-
+ 	    if (evt->config & EVNTSEL_OS)
+ 		    usrospmi |= (1 << 0);
+ 	    if (evt->config & EVNTSEL_USR)
+@@ -200,10 +225,16 @@ static void start_event(pmu_counter_t *evt)
+ static void stop_event(pmu_counter_t *evt)
+ {
+ 	global_disable(evt);
+-	if (is_gp(evt))
+-		wrmsr(MSR_P6_EVNTSEL0 + event_to_global_idx(evt),
+-				evt->config & ~EVNTSEL_EN);
+-	else {
++	if (is_gp(evt)) {
++		uint64_t sel;
++		if (is_intel_chip)
++			sel = MSR_P6_EVNTSEL0;
++		else if (gp_counter_base == MSR_F15H_PERF_CTR)
++			sel = MSR_F15H_PERF_CTL;
++		else
++			sel = MSR_K7_EVNTSEL0;
++		wrmsr(sel + event_to_global_idx(evt), evt->config & ~EVNTSEL_EN);
++	} else {
+ 		uint32_t ctrl = rdmsr(MSR_CORE_PERF_FIXED_CTR_CTRL);
+ 		int shift = (evt->ctr - MSR_CORE_PERF_FIXED_CTR0) * 4;
+ 		wrmsr(MSR_CORE_PERF_FIXED_CTR_CTRL, ctrl & ~(0xf << shift));
+@@ -241,10 +272,16 @@ static void check_gp_counter(struct pmu_event *evt)
+ 	};
+ 	int i;
+ 
+-	for (i = 0; i < num_counters; i++, cnt.ctr++) {
++	for (i = 0; i < num_counters; i++) {
+ 		cnt.count = 0;
+ 		measure(&cnt, 1);
+ 		report(verify_event(cnt.count, evt), "%s-%d", evt->name, i);
++		if (gp_counter_base == MSR_F15H_PERF_CTR)
++			/* The counter MSRs are interleaved with the event select MSRs,
++			 * since Family 15H. */
++			cnt.ctr += 2;
++		else
++			cnt.ctr++;
+ 	}
+ }
+ 
+@@ -252,7 +289,7 @@ static void check_gp_counters(void)
+ {
+ 	int i;
+ 
+-	for (i = 0; i < sizeof(gp_events)/sizeof(gp_events[0]); i++)
++	for (i = 0; i < num_gp_event; i++)
+ 		if (!(ebx.full & (1 << i)))
+ 			check_gp_counter(&gp_events[i]);
+ 		else
+@@ -288,7 +325,12 @@ static void check_counters_many(void)
+ 		cnt[n].count = 0;
+ 		cnt[n].ctr = gp_counter_base + n;
+ 		cnt[n].config = EVNTSEL_OS | EVNTSEL_USR |
+-			gp_events[i % ARRAY_SIZE(gp_events)].unit_sel;
++				gp_events[i % num_gp_event].unit_sel;
++
++		if (gp_counter_base == MSR_F15H_PERF_CTR)
++			/* The counter MSRs are interleaved with the event select MSRs,
++			 * since Family 15H. */
++			cnt[i].ctr += n;
+ 		n++;
+ 	}
+ 	for (i = 0; i < edx.split.num_counters_fixed; i++) {
+@@ -311,6 +353,7 @@ static void check_counter_overflow(void)
+ {
+ 	uint64_t count;
+ 	int i;
++	int loop_times;
+ 	pmu_counter_t cnt = {
+ 		.ctr = gp_counter_base,
+ 		.config = EVNTSEL_OS | EVNTSEL_USR | gp_events[1].unit_sel /* instructions */,
+@@ -319,18 +362,34 @@ static void check_counter_overflow(void)
+ 	measure(&cnt, 1);
+ 	count = cnt.count;
+ 
+-	/* clear status before test */
+-	wrmsr(MSR_CORE_PERF_GLOBAL_OVF_CTRL, rdmsr(MSR_CORE_PERF_GLOBAL_STATUS));
++	if (is_intel_chip)
++		/* clear status before test */
++		wrmsr(MSR_CORE_PERF_GLOBAL_OVF_CTRL,
++		      rdmsr(MSR_CORE_PERF_GLOBAL_STATUS));
+ 
+ 	report_prefix_push("overflow");
+ 
+-	for (i = 0; i < num_counters + 1; i++, cnt.ctr++) {
++	if (is_intel_chip)
++		loop_times = num_counters + 1;
++	else
++		/* AMD CPU doesn't have fixed counters. */
++		loop_times = num_counters;
++	for (i = 0; i < loop_times; i++) {
+ 		uint64_t status;
+ 		int idx;
+ 
+-		cnt.count = 1 - count;
+-		if (gp_counter_base == MSR_IA32_PMC0)
++		if (is_intel_chip) {
++			cnt.count = 1 - count;
++			if (gp_counter_base == MSR_IA32_PMC0)
++				cnt.count &= (1ull << eax.split.bit_width) - 1;
++		} else {
++			/* KVM fails to accurate count on AMD CPU,
++			 * due to instructions in hypervisor when set
++			 * AMD64_EVENTSEL_GUESTONLY bit?
++			 */
++			cnt.count = 1 - count * 0.5;
+ 			cnt.count &= (1ull << eax.split.bit_width) - 1;
++		}
+ 
+ 		if (i == num_counters) {
+ 			cnt.ctr = fixed_events[0].unit_sel;
+@@ -343,13 +402,21 @@ static void check_counter_overflow(void)
+ 			cnt.config &= ~EVNTSEL_INT;
+ 		idx = event_to_global_idx(&cnt);
+ 		measure(&cnt, 1);
+-		report(cnt.count == 1, "cntr-%d", i);
+-		status = rdmsr(MSR_CORE_PERF_GLOBAL_STATUS);
+-		report(status & (1ull << idx), "status-%d", i);
+-		wrmsr(MSR_CORE_PERF_GLOBAL_OVF_CTRL, status);
+-		status = rdmsr(MSR_CORE_PERF_GLOBAL_STATUS);
+-		report(!(status & (1ull << idx)), "status clear-%d", i);
++		if (is_intel_chip) {
++			report(cnt.count == 1, "cntr-%d", i);
++			status = rdmsr(MSR_CORE_PERF_GLOBAL_STATUS);
++			report(status & (1ull << idx), "status-%d", i);
++			wrmsr(MSR_CORE_PERF_GLOBAL_OVF_CTRL, status);
++			status = rdmsr(MSR_CORE_PERF_GLOBAL_STATUS);
++			report(!(status & (1ull << idx)), "status clear-%d", i);
++		}
+ 		report(check_irq() == (i % 2), "irq-%d", i);
++		if (gp_counter_base == MSR_F15H_PERF_CTR)
++			/* The counter MSRs are interleaved with the event select MSRs,
++			 * since Family 15H. */
++			cnt.ctr += 2;
++		else
++			cnt.ctr++;
+ 	}
+ 
+ 	report_prefix_pop();
+@@ -381,9 +448,13 @@ static void do_rdpmc_fast(void *ptr)
+ 
+ static void check_rdpmc(void)
+ {
+-	uint64_t val = 0xff0123456789ull;
+ 	bool exc;
+ 	int i;
++	uint64_t val;
++	if (is_intel_chip)
++		val = 0xff0123456789ull;
++	else
++		val = 0xffff0123456789ull;
+ 
+ 	report_prefix_push("rdpmc");
+ 
+@@ -406,7 +477,10 @@ static void check_rdpmc(void)
+ 		/* Mask according to the number of supported bits */
+ 		x &= (1ull << eax.split.bit_width) - 1;
+ 
+-		wrmsr(gp_counter_base + i, val);
++		if (gp_counter_base == MSR_F15H_PERF_CTR)
++			wrmsr(gp_counter_base + i * 2, val);
++		else
++			wrmsr(gp_counter_base + i, val);
+ 		report(rdpmc(i) == x, "cntr-%d", i);
+ 
+ 		exc = test_for_exception(GP_VECTOR, do_rdpmc_fast, &cnt);
+@@ -453,9 +527,10 @@ static void check_running_counter_wrmsr(void)
+ 	stop_event(&evt);
+ 	report(evt.count < gp_events[1].min, "cntr");
+ 
+-	/* clear status before overflow test */
+-	wrmsr(MSR_CORE_PERF_GLOBAL_OVF_CTRL,
+-	      rdmsr(MSR_CORE_PERF_GLOBAL_STATUS));
++	if (is_intel_chip)
++		/* clear status before overflow test */
++		wrmsr(MSR_CORE_PERF_GLOBAL_OVF_CTRL,
++		      rdmsr(MSR_CORE_PERF_GLOBAL_STATUS));
+ 
+ 	evt.count = 0;
+ 	start_event(&evt);
+@@ -468,8 +543,10 @@ static void check_running_counter_wrmsr(void)
+ 
+ 	loop();
+ 	stop_event(&evt);
+-	status = rdmsr(MSR_CORE_PERF_GLOBAL_STATUS);
+-	report(status & 1, "status");
++	if (is_intel_chip) {
++		status = rdmsr(MSR_CORE_PERF_GLOBAL_STATUS);
++		report(status & 1, "status");
++	}
+ 
+ 	report_prefix_pop();
+ }
+@@ -605,6 +682,45 @@ static void  check_gp_counters_write_width(void)
+ 	}
+ }
+ 
++static void check_amd_gp_counters_write_width(void)
++{
++	u64 val_64 = 0xffffff0123456789ull;
++	u64 val_32 = val_64 & ((1ull << 32) - 1);
++	u64 val_max_width = val_64 & ((1ull << eax.split.bit_width) - 1);
++	int i;
++
++	/* There are 4 legacy counters, and 6 core PerfMon counters,
++	 * select the less one. */
++	int legacy_num_counter = 4;
++	for (i = 0; i < legacy_num_counter; i++) {
++		wrmsr(MSR_K7_PERFCTR0 + i, val_32);
++		assert(rdmsr(MSR_K7_PERFCTR0 + i) == val_32);
++		assert(rdmsr(MSR_F15H_PERF_CTR + 2 * i) == val_32);
++
++		wrmsr(MSR_K7_PERFCTR0 + i, val_max_width);
++		assert(rdmsr(MSR_K7_PERFCTR0 + i) == val_max_width);
++		assert(rdmsr(MSR_F15H_PERF_CTR + 2 * i) == val_max_width);
++
++		wrmsr(MSR_K7_PERFCTR0 + i, val_64);
++		assert(rdmsr(MSR_K7_PERFCTR0 + i) == val_max_width);
++		assert(rdmsr(MSR_F15H_PERF_CTR + 2 * i) == val_max_width);
++	}
++
++	for (i = 0; i < legacy_num_counter; i++) {
++		wrmsr(MSR_F15H_PERF_CTR + 2 * i, val_32);
++		assert(rdmsr(MSR_K7_PERFCTR0 + i) == val_32);
++		assert(rdmsr(MSR_F15H_PERF_CTR + 2 * i) == val_32);
++
++		wrmsr(MSR_F15H_PERF_CTR + 2 * i, val_max_width);
++		assert(rdmsr(MSR_K7_PERFCTR0 + i) == val_max_width);
++		assert(rdmsr(MSR_F15H_PERF_CTR + 2 * i) == val_max_width);
++
++		wrmsr(MSR_F15H_PERF_CTR + 2 * i, val_64);
++		assert(rdmsr(MSR_K7_PERFCTR0 + i) == val_max_width);
++		assert(rdmsr(MSR_F15H_PERF_CTR + 2 * i) == val_max_width);
++	}
++}
++
+ /*
+  * Per the SDM, reference cycles are currently implemented using the
+  * core crystal clock, TSC, or bus clock. Calibrate to the TSC
+@@ -655,27 +771,47 @@ static void set_ref_cycle_expectations(void)
+ 
+ int main(int ac, char **av)
+ {
+-	struct cpuid id = cpuid(10);
+-
+-	setup_vm();
+-	handle_irq(PC_VECTOR, cnt_overflow);
+-	buf = malloc(N*64);
++	struct cpuid id;
++	is_intel_chip = is_intel();
++	if (is_intel_chip) {
++		id = cpuid(10);
++		eax.full = id.a;
++		ebx.full = id.b;
++		edx.full = id.d;
++		gp_counter_base = MSR_IA32_PERFCTR0;
++		gp_events = (struct pmu_event *)&intel_gp_event;
++		num_gp_event = ARRAY_SIZE(intel_gp_event);
++		if (!eax.split.version_id) {
++			printf("No pmu is detected!\n");
++			return report_summary();
++		}
+ 
+-	eax.full = id.a;
+-	ebx.full = id.b;
+-	edx.full = id.d;
++		if (eax.split.version_id == 1) {
++			printf("PMU version 1 is not supported\n");
++			return report_summary();
++		}
++	} else {
++		gp_counter_base = MSR_K7_PERFCTR0;
++		gp_events = (struct pmu_event *)&amd_gp_event;
++		num_gp_event = ARRAY_SIZE(amd_gp_event);
++		id = cpuid(1);
++		/* Performance-monitoring supported from K7 and later. */
++		if (((id.a & 0xf00) >> 8) < 6) {
++			printf("No pmu is detected!\n");
++			return report_summary();
++		}
+ 
+-	if (!eax.split.version_id) {
+-		printf("No pmu is detected!\n");
+-		return report_summary();
++		edx.split.num_counters_fixed = 0;
++		eax.split.num_counters = 4;
++		eax.split.bit_width = 48;
+ 	}
+ 
+-	if (eax.split.version_id == 1) {
+-		printf("PMU version 1 is not supported\n");
+-		return report_summary();
+-	}
++	setup_vm();
++	handle_irq(PC_VECTOR, cnt_overflow);
++	buf = malloc(N * 64);
+ 
+-	set_ref_cycle_expectations();
++	if (is_intel_chip)
++		set_ref_cycle_expectations();
+ 
+ 	printf("PMU version:         %d\n", eax.split.version_id);
+ 	printf("GP counters:         %d\n", eax.split.num_counters);
+@@ -693,7 +829,20 @@ int main(int ac, char **av)
+ 	} else {
+ 		check_counters();
+ 
+-		if (rdmsr(MSR_IA32_PERF_CAPABILITIES) & PMU_CAP_FW_WRITES) {
++		if (!is_intel_chip) {
++			id = raw_cpuid(0x80000001, 0);
++			if (id.c & (1 << 23)) {
++				/* support core perfmon */
++				gp_counter_base = MSR_F15H_PERF_CTR;
++				eax.split.num_counters = 6;
++				num_counters = eax.split.num_counters;
++				report_prefix_push("core perf");
++				check_counters();
++				check_amd_gp_counters_write_width();
++			}
++		}
++
++		if (is_intel_chip && rdmsr(MSR_IA32_PERF_CAPABILITIES) & PMU_CAP_FW_WRITES) {
+ 			gp_counter_base = MSR_IA32_PMC0;
+ 			report_prefix_push("full-width writes");
+ 			check_counters();
+-- 
+2.32.1 (Apple Git-133)
 
