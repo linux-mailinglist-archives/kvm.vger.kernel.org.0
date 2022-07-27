@@ -2,123 +2,99 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 40C515826ED
-	for <lists+kvm@lfdr.de>; Wed, 27 Jul 2022 14:47:18 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 307E75827B8
+	for <lists+kvm@lfdr.de>; Wed, 27 Jul 2022 15:31:33 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232606AbiG0MrR (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 27 Jul 2022 08:47:17 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58688 "EHLO
+        id S233788AbiG0Nbb (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 27 Jul 2022 09:31:31 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40320 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231135AbiG0MrP (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 27 Jul 2022 08:47:15 -0400
-Received: from mga17.intel.com (mga17.intel.com [192.55.52.151])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 289D21CB26;
-        Wed, 27 Jul 2022 05:47:15 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1658926035; x=1690462035;
-  h=message-id:subject:from:to:cc:date:in-reply-to:
-   references:content-transfer-encoding:mime-version;
-  bh=6yfECxzeuBHnNk9O6XrYbgAxEG+46JckcwYj/fktdKI=;
-  b=DXQw4sWGgCEanyfopO5HHcky6z1S3G91t8OxqJ+XBZDUUWdTnUK3eN+m
-   3gYYxtHgxbmtIdfECcQjkRKf4CQ8zYosTHivGFaAESxZPTl+nMeFPoi2O
-   aRJ887nyc/M5J31nnsF7RVzsUOHjXHrMH4DGF8OzB0qpNrj0UZPXOmYzs
-   OxnOYiYqnKNYN+oRFknW0CFcaoGTOLuRtUbaMESLa56EniEcyLmrJO9sT
-   +cW74NTr4ZlExSGIqPNroMJhtcH/X6iUrdIZVfqdC/I1FJwPUQKSMcfGS
-   vm0BQAAN6OUjkRnCdvNZxAf54mc6sGXpDcl3wOgypicAXa1+SmzaJqF/C
-   Q==;
-X-IronPort-AV: E=McAfee;i="6400,9594,10420"; a="268606391"
-X-IronPort-AV: E=Sophos;i="5.93,195,1654585200"; 
-   d="scan'208";a="268606391"
-Received: from fmsmga007.fm.intel.com ([10.253.24.52])
-  by fmsmga107.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 27 Jul 2022 05:47:01 -0700
-X-IronPort-AV: E=Sophos;i="5.93,195,1654585200"; 
-   d="scan'208";a="604137145"
-Received: from jlseahol-mobl3.amr.corp.intel.com (HELO khuang2-desk.gar.corp.intel.com) ([10.212.1.35])
-  by fmsmga007-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 27 Jul 2022 05:46:58 -0700
-Message-ID: <59a2748ed446f3e8a00834982b54848937a97379.camel@intel.com>
-Subject: Re: [PATCH v5 07/22] x86/virt/tdx: Implement SEAMCALL function
-From:   Kai Huang <kai.huang@intel.com>
-To:     Dave Hansen <dave.hansen@intel.com>, linux-kernel@vger.kernel.org,
-        kvm@vger.kernel.org
-Cc:     seanjc@google.com, pbonzini@redhat.com, len.brown@intel.com,
-        tony.luck@intel.com, rafael.j.wysocki@intel.com,
-        reinette.chatre@intel.com, dan.j.williams@intel.com,
-        peterz@infradead.org, ak@linux.intel.com,
-        kirill.shutemov@linux.intel.com,
-        sathyanarayanan.kuppuswamy@linux.intel.com,
-        isaku.yamahata@intel.com
-Date:   Thu, 28 Jul 2022 00:46:56 +1200
-In-Reply-To: <81b70f92-d869-f56d-a152-11aff4e1d785@intel.com>
-References: <cover.1655894131.git.kai.huang@intel.com>
-         <095e6bbc57b4470e1e9a9104059a5238c9775f00.1655894131.git.kai.huang@intel.com>
-         <069a062e-a4a6-09af-7b74-7f4929f2ec0b@intel.com>
-         <5ce7ebfe54160ea35e432bf50207ebed32db31fc.camel@intel.com>
-         <84e93539-a2f9-f68e-416a-ea3d8fc725af@intel.com>
-         <6bef368ccc68676e4acaecc4b6dc52f598ea7f2f.camel@intel.com>
-         <ea03e55499f556388c0a5f9ed565e72e213c276f.camel@intel.com>
-         <978c3d37-97c9-79b9-426a-2c27db34c38a@intel.com>
-         <0b20f1878d31658a9e3cd3edaf3826fe8731346e.camel@intel.com>
-         <11b7e8668fde31ead768075e51f9667276ddc78a.camel@intel.com>
-         <81b70f92-d869-f56d-a152-11aff4e1d785@intel.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-User-Agent: Evolution 3.44.3 (3.44.3-1.fc36) 
+        with ESMTP id S232246AbiG0Nb3 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 27 Jul 2022 09:31:29 -0400
+Received: from proxmox-new.maurer-it.com (proxmox-new.maurer-it.com [94.136.29.106])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C050EE23;
+        Wed, 27 Jul 2022 06:31:27 -0700 (PDT)
+Received: from proxmox-new.maurer-it.com (localhost.localdomain [127.0.0.1])
+        by proxmox-new.maurer-it.com (Proxmox) with ESMTP id 26CEA43AFC;
+        Wed, 27 Jul 2022 15:31:26 +0200 (CEST)
+Date:   Wed, 27 Jul 2022 15:31:24 +0200
+From:   Stoiko Ivanov <s.ivanov@proxmox.com>
+To:     Maxim Levitsky <mlevitsk@redhat.com>
+Cc:     Paolo Bonzini <pbonzini@redhat.com>, linux-kernel@vger.kernel.org,
+        kvm@vger.kernel.org, bgardon@google.com,
+        Jim Mattson <jmattson@google.com>, t.lamprecht@proxmox.com
+Subject: Re: [PATCH] KVM: x86: enable TDP MMU by default
+Message-ID: <20220727153124.1afdad67@rosa.proxmox.com>
+In-Reply-To: <20dcddad9f6c8384c49f9d8ec95a826df35fc92d.camel@redhat.com>
+References: <20210726163106.1433600-1-pbonzini@redhat.com>
+        <20220726165748.76db5284@rosa.proxmox.com>
+        <ffc99463-6a61-8694-6a4e-3162580f94ee@redhat.com>
+        <20dcddad9f6c8384c49f9d8ec95a826df35fc92d.camel@redhat.com>
+X-Mailer: Claws Mail 3.17.8 (GTK+ 2.24.33; x86_64-pc-linux-gnu)
 MIME-Version: 1.0
-X-Spam-Status: No, score=-5.0 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
-        SPF_HELO_NONE,SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,SPF_HELO_NONE,
+        SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, 2022-07-26 at 17:50 -0700, Dave Hansen wrote:
-> On 7/26/22 17:34, Kai Huang wrote:
-> > > This doesn't seem right to me.  *If* we get a known-bogus
-> > > hot-remove event, we need to reject it.  Remember, removal is a
-> > > two-step process.
-> > If so, we need to reject the (CMR) memory offline.  Or we just BUG()
-> > in the ACPI memory removal  callback?
-> >=20
-> > But either way this will requires us to get the CMRs during kernel boot=
-.
->=20
-> I don't get the link there between CMRs at boot and handling hotplug.
->=20
-> We don't need to go to extreme measures just to get a message out of the
-> kernel that the BIOS is bad.  If we don't have the data to do it
-> already, then I don't really see the nee to warn about it.
->=20
-> Think of a system that has TDX enabled in the BIOS, but is running an
-> old kernel.  It will have *ZERO* idea that hotplug doesn't work.  It'll
-> run blissfully along.  I don't see any reason that a kernel with TDX
-> support, but where TDX is disabled should actively go out and try to be
-> better than those old pre-TDX kernels.
+On Wed, 27 Jul 2022 13:22:48 +0300
+Maxim Levitsky <mlevitsk@redhat.com> wrote:
 
-Agreed, assuming "where TDX is disabled" you mean TDX isn't usable (i.e. wh=
-en
-TDX module isn't loaded, or won't be initialized at all).
+> On Tue, 2022-07-26 at 17:43 +0200, Paolo Bonzini wrote:
+> > On 7/26/22 16:57, Stoiko Ivanov wrote:  
+> > > Hi,
+> > > 
+> > > Proxmox[0] recently switched to the 5.15 kernel series (based on the one
+> > > for Ubuntu 22.04), which includes this commit.
+> > > While it's working well on most installations, we have a few users who
+> > > reported that some of their guests shutdown with
+> > > `KVM: entry failed, hardware error 0x80000021` being logged under certain
+> > > conditions and environments[1]:
+> > > * The issue is not deterministically reproducible, and only happens
+> > >    eventually with certain loads (e.g. we have only one system in our
+> > >    office which exhibits the issue - and this only by repeatedly installing
+> > >    Windows 2k22 ~ one out of 10 installs will cause the guest-crash)
+> > > * While most reports are referring to (newer) Windows guests, some users
+> > >    run into the issue with Linux VMs as well
+> > > * The affected systems are from a quite wide range - our affected machine
+> > >    is an old IvyBridge Xeon with outdated BIOS (an equivalent system with
+> > >    the latest available BIOS is not affected), but we have
+> > >    reports of all kind of Intel CPUs (up to an i5-12400). It seems AMD CPUs
+> > >    are not affected.
+> > > 
+> > > Disabling tdp_mmu seems to mitigate the issue, but I still thought you
+> > > might want to know that in some cases tdp_mmu causes problems, or that you
+> > > even might have an idea of how to fix the issue without explicitly
+> > > disabling tdp_mmu?  
+> > 
+> > If you don't need secure boot, you can try disabling SMM.  It should not 
+> > be related to TDP MMU, but the logs (thanks!) point at an SMM entry (RIP 
+> > = 0x8000, CS base=0x7ffc2000).  
+> 
+> No doubt about it. It is the issue.
+> 
+> > 
+> > This is likely to be fixed by 
+> > https://lore.kernel.org/kvm/20220621150902.46126-1-mlevitsk@redhat.com/.
+Thanks to both of you for the quick feedback and the patches!
 
->=20
-> Further, there's nothing to stop non-CMR memory from being added to a
-> system with TDX enabled in the BIOS but where the kernel is not using
-> it.  If we actively go out and keep good old DRAM from being added, then
-> we unnecessarily addle those systems.
->=20
+We ran our reproducer with the patch-series above applied on top of
+5.19-rc8 from
+git://git.launchpad.net/~ubuntu-kernel/ubuntu/+source/linux/+git/kinetic
+* without the patches the issue occurred within 20 minutes,
+* with the patches applied issues did not occur for 3 hours (it usually
+  does within 1-2 hours at most)
 
-OK.
+so fwiw it seems to fix the issue on our setup.
+we'll do some more internal tests and would then make this available
+(backported to our 5.15 kernel) to our users, who are affected by this.
 
-Then for memory hot-add, perhaps we can just go with the "winner-take-all"
-approach you mentioned before?
-
-For memory hot-removal, as I replied previously, looks the kernel cannot re=
-ject
-the removal if it allows memory offline.  Any suggestion on this?
-
---=20
-Thanks,
--Kai
+Kind regards,
+stoiko
 
 
