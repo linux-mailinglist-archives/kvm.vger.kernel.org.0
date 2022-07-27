@@ -2,102 +2,105 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 004CF5824FC
-	for <lists+kvm@lfdr.de>; Wed, 27 Jul 2022 12:58:25 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 0359D582633
+	for <lists+kvm@lfdr.de>; Wed, 27 Jul 2022 14:14:57 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231707AbiG0K6X (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 27 Jul 2022 06:58:23 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55258 "EHLO
+        id S232399AbiG0MOz (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 27 Jul 2022 08:14:55 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58404 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230521AbiG0K6V (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 27 Jul 2022 06:58:21 -0400
-Received: from mail-yw1-x1132.google.com (mail-yw1-x1132.google.com [IPv6:2607:f8b0:4864:20::1132])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7A42048E81;
-        Wed, 27 Jul 2022 03:58:19 -0700 (PDT)
-Received: by mail-yw1-x1132.google.com with SMTP id 00721157ae682-31f445bd486so52428177b3.13;
-        Wed, 27 Jul 2022 03:58:19 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=mime-version:from:date:message-id:subject:to:cc;
-        bh=+nM0z4zkbNurHCJ2O2FDuPzoZOWUDunYm+zsnrOGmOE=;
-        b=NvHxgA64TcVZWVj0Zkp373TEvfX6smG1F5OWG4WUxxCekfTLQ04NEvTwW8P24I453J
-         QtvqVi/T9qSQB7cong2b02CEE00lObQU5/mAF/utGBDNKuQeqgHdDIbAvcjC1S7XOLHM
-         5Xxyk+noB1q0hzEcyF4ulpmplBnloYaJiIhDk7K5EL9NY+/5/NZYSuxfttyMJjfRRnoS
-         ogMWCgfP+9mtKLlF//nlKyHpDEbRFFRsA8c2YPVvZ+Tf39pRiDJtQpA/baXGS1LnOlS1
-         XXtT25jPfiYI0fU5xAm4WwH1sUYMXetN8uqaYHosmsNGmrgkfi+/5Gdc8VKmMlHjiIOo
-         eBxA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:from:date:message-id:subject:to:cc;
-        bh=+nM0z4zkbNurHCJ2O2FDuPzoZOWUDunYm+zsnrOGmOE=;
-        b=ZWjkhr3Oo5tBLz+LicJsZSyiP4y0iQ7tijqK3noIb4znRCwzG/j3tlXZBQR3xNPJGx
-         pMcQRa3VQRvVEo368BYahp390mxBbLLFlV+xSqcKLSpZyk020iuDlA9SNNdr2NEqH+sg
-         emVeiB32/LK2VS0RPQ+7/8PntkB73J0N6rJ2gjq9XFneyVxGNG0yxf7YJoI15c5Tj45p
-         H0MSW7HMUqjwlVkznQYWjbQxlgqW/Cx65ZGwHG0I+O3NxcGGcpRJNB4cqENImuPuJbZG
-         zdNEGwL9qdRSvdqBIVfvTmhOdnViYGd6UpNdHhlHoOzbKLEJ0ggxaE625gVhNSM4bm3b
-         f2Lw==
-X-Gm-Message-State: AJIora9AlkCDo8r+pZw+Yc0grGtyqoAkFtRYJoW0Ff+lgPdwTZbFjI2S
-        3EIaNXEbUFdjxZ0ijN1cEfKxcdKs3ck3URmCEHA=
-X-Google-Smtp-Source: AGRyM1vSTOkM799B3+gTj3tXbYxz9DCPkHcK7bX/iUgAJ9R8CP3G8uzIC8Ihwikmuhuxsn2nmP9hJd55onmZnRuxJL8=
-X-Received: by 2002:a81:1b97:0:b0:2db:640f:49d8 with SMTP id
- b145-20020a811b97000000b002db640f49d8mr18215415ywb.326.1658919498562; Wed, 27
- Jul 2022 03:58:18 -0700 (PDT)
+        with ESMTP id S229489AbiG0MOx (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 27 Jul 2022 08:14:53 -0400
+Received: from out0-134.mail.aliyun.com (out0-134.mail.aliyun.com [140.205.0.134])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DC84248C91
+        for <kvm@vger.kernel.org>; Wed, 27 Jul 2022 05:14:48 -0700 (PDT)
+X-Alimail-AntiSpam: AC=PASS;BC=-1|-1;BR=01201311R651e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=ay29a033018047194;MF=houwenlong.hwl@antgroup.com;NM=1;PH=DS;RN=2;SR=0;TI=SMTPD_---.Of0ejI-_1658924085;
+Received: from localhost(mailfrom:houwenlong.hwl@antgroup.com fp:SMTPD_---.Of0ejI-_1658924085)
+          by smtp.aliyun-inc.com;
+          Wed, 27 Jul 2022 20:14:45 +0800
+Date:   Wed, 27 Jul 2022 20:14:45 +0800
+From:   "Hou Wenlong" <houwenlong.hwl@antgroup.com>
+To:     David Matlack <dmatlack@google.com>
+Cc:     kvm@vger.kernel.org
+Subject: Re: [PATCH 0/5] Fix wrong gfn range of tlb flushing with range
+Message-ID: <20220727121445.GA62296@k08j02272.eu95sqa>
+References: <cover.1656039275.git.houwenlong.hwl@antgroup.com>
+ <YuBxyPl9W9mWaBRS@google.com>
 MIME-Version: 1.0
-From:   Hao Peng <flyingpenghao@gmail.com>
-Date:   Wed, 27 Jul 2022 18:58:07 +0800
-Message-ID: <CAPm50aKursUrDpgqLt7RT-VoSfBJswsnR2w1sVAt5mburmdd8g@mail.gmail.com>
-Subject: [PATCH] kvm: mmu: fix typos in struct kvm_arch
-To:     pbonzini@redhat.com
-Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Sean Christopherson <seanjc@google.com>
-Content-Type: text/plain; charset="UTF-8"
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
-        RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS autolearn=ham
-        autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <YuBxyPl9W9mWaBRS@google.com>
+User-Agent: Mutt/1.5.21 (2010-09-15)
+X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,SPF_HELO_NONE,
+        SPF_PASS,UNPARSEABLE_RELAY autolearn=ham autolearn_force=no
+        version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-From: Peng Hao <flyingpeng@tencent.com>
+On Wed, Jul 27, 2022 at 06:59:20AM +0800, David Matlack wrote:
+> On Fri, Jun 24, 2022 at 11:36:56AM +0800, Hou Wenlong wrote:
+> > Commit c3134ce240eed
+> > ("KVM: Replace old tlb flush function with new one to flush a specified range.")
+> > replaces old tlb flush function with kvm_flush_remote_tlbs_with_address()
+> > to do tlb flushing. However, the gfn range of tlb flushing is wrong in
+> > some cases. E.g., when a spte is dropped, the start gfn of tlb flushing
+> > should be the gfn of spte not the base gfn of SP which contains the spte.
+> > So this patchset would fix them and do some cleanups.
+> 
+> One thing that would help prevent future buggy use of
+> kvm_flush_remote_tlbs_with_address(), and clean up this series, would be to
+> introduce some helper functions for common operations. In fact, even if
+> there is only one caller, I still think it would be useful to have helper
+> functions because it makes it clear the author's intent.
+> 
+> For example, I think the following helpers would be useful in this series:
+> 
+> /* Flush the given page (huge or not) of guest memory. */
+> static void kvm_flush_remote_tlbs_gfn(struct kvm *kvm, gfn_t gfn, int level)
+> {
+>         u64 pages = KVM_PAGES_PER_HPAGE(level);
+> 
+>         kvm_flush_remote_tlbs_with_address(kvm, gfn, pages);
+> }
+> 
+> /* Flush the range of guest memory mapped by the given SPTE. */
+> static void kvm_flush_remote_tlbs_sptep(struct kvm *kvm, u64 *sptep)
+> {
+>         struct kvm_mmu_page *sp = sptep_to_sp(sptep);
+>         gfn_t gfn = kvm_mmu_page_get_gfn(sp, spte_index(sptep));
+> 
+>         kvm_flush_remote_tlbs_gfn(kvm, gfn, sp->role.level);
+> }
+> 
+> /* Flush all memory mapped by the given direct SP. */
+> static void kvm_flush_remote_tlbs_direct_sp(struct kvm *kvm, struct kvm_mmu_page *sp)
+> {
+>         WARN_ON_ONCE(!sp->role.direct);
+>         kvm_flush_remote_tlbs_gfn(kvm, sp->gfn, sp->role.level + 1);
+> }
+>
+Thanks for your good suggestions, I'll add those helpers in the next version.
 
-No 'kvmp_mmu_pages', it should be 'kvm_mmu_page'. And
-struct kvm_mmu_pages and struct kvm_mmu_page are different structures,
-here should be kvm_mmu_page.
-kvm_mmu_pages is defined in arch/x86/kvm/mmu/mmu.c.
-
-Signed-off-by: Peng Hao <flyingpeng@tencent.com>
----
- arch/x86/include/asm/kvm_host.h | 8 ++++----
- 1 file changed, 4 insertions(+), 4 deletions(-)
-
-diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
-index e8281d64a431..205a9f374e14 100644
---- a/arch/x86/include/asm/kvm_host.h
-+++ b/arch/x86/include/asm/kvm_host.h
-@@ -1272,8 +1272,8 @@ struct kvm_arch {
-        bool tdp_mmu_enabled;
-
-        /*
--        * List of struct kvm_mmu_pages being used as roots.
--        * All struct kvm_mmu_pages in the list should have
-+        * List of struct kvm_mmu_page being used as roots.
-+        * All struct kvm_mmu_page in the list should have
-         * tdp_mmu_page set.
-         *
-         * For reads, this list is protected by:
-@@ -1292,8 +1292,8 @@ struct kvm_arch {
-        struct list_head tdp_mmu_roots;
-
-        /*
--        * List of struct kvmp_mmu_pages not being used as roots.
--        * All struct kvm_mmu_pages in the list should have
-+        * List of struct kvm_mmu_page not being used as roots.
-+        * All struct kvm_mmu_page in the list should have
-         * tdp_mmu_page set and a tdp_mmu_root_count of 0.
-         */
-        struct list_head tdp_mmu_pages;
---
-2.27.0
+> > 
+> > Hou Wenlong (5):
+> >   KVM: x86/mmu: Fix wrong gfn range of tlb flushing in
+> >     validate_direct_spte()
+> >   KVM: x86/mmu: Fix wrong gfn range of tlb flushing in
+> >     kvm_set_pte_rmapp()
+> >   KVM: x86/mmu: Reduce gfn range of tlb flushing in
+> >     tdp_mmu_map_handle_target_level()
+> >   KVM: x86/mmu: Fix wrong start gfn of tlb flushing with range
+> >   KVM: x86/mmu: Use 1 as the size of gfn range for tlb flushing in
+> >     FNAME(invlpg)()
+> > 
+> >  arch/x86/kvm/mmu/mmu.c         | 15 +++++++++------
+> >  arch/x86/kvm/mmu/paging_tmpl.h |  2 +-
+> >  arch/x86/kvm/mmu/tdp_mmu.c     |  4 ++--
+> >  3 files changed, 12 insertions(+), 9 deletions(-)
+> > 
+> > --
+> > 2.31.1
+> > 
