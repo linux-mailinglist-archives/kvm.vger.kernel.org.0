@@ -2,69 +2,70 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id A7D0B58350B
-	for <lists+kvm@lfdr.de>; Thu, 28 Jul 2022 00:05:05 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id B7CC458355C
+	for <lists+kvm@lfdr.de>; Thu, 28 Jul 2022 00:42:19 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233686AbiG0WFC (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 27 Jul 2022 18:05:02 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47362 "EHLO
+        id S235229AbiG0WmR (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 27 Jul 2022 18:42:17 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51208 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229628AbiG0WFA (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 27 Jul 2022 18:05:00 -0400
-Received: from mail-pg1-x530.google.com (mail-pg1-x530.google.com [IPv6:2607:f8b0:4864:20::530])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B639F4F65B;
-        Wed, 27 Jul 2022 15:04:59 -0700 (PDT)
-Received: by mail-pg1-x530.google.com with SMTP id r186so24280pgr.2;
-        Wed, 27 Jul 2022 15:04:59 -0700 (PDT)
+        with ESMTP id S229830AbiG0WmQ (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 27 Jul 2022 18:42:16 -0400
+Received: from mail-pf1-x42f.google.com (mail-pf1-x42f.google.com [IPv6:2607:f8b0:4864:20::42f])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 45EB35C9C6
+        for <kvm@vger.kernel.org>; Wed, 27 Jul 2022 15:42:15 -0700 (PDT)
+Received: by mail-pf1-x42f.google.com with SMTP id o12so378005pfp.5
+        for <kvm@vger.kernel.org>; Wed, 27 Jul 2022 15:42:15 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
+        d=google.com; s=20210112;
         h=date:from:to:cc:subject:message-id:references:mime-version
          :content-disposition:in-reply-to;
-        bh=OiEj/R0C3vTV+d3PwcjLmHykKOPJgu0AEZlp4Qdcy4Q=;
-        b=cvo9jO6J0wLArB5Xs4cPzAPCM3Gb7qtmxxTetz5HeMRuG+XF/1dxo9Jay/0EkQPaD3
-         G9IwPi0kv0CYiyH2BvjwnOTEaaRS/8mtdXwIB+9A43ywLyhAz0QnxDV6jJ48qYnQmAXW
-         MZX+0ex9e74H+4mqNsFUcdd7IhcOfvQXrcUXMC52JCVIS7U+4P18jizf+igy49AYked2
-         lMHAeYgGF4F9B3SvplxYyIbB1UQUHNxgS2YWLhJZodV1aHSdrCWi5f7VktXOJ3YUFf1A
-         MQHsd1JpQrH9fkgLaGXQd9nmo77rxiCAsSRIR2hFoGCBBWc/w1dQNeGs3lIehvvjL9Q6
-         xaGw==
+        bh=NYAvAw9cVOoPnQbWeVJn8GPEaPKmeSC20kSm+BsfcGc=;
+        b=nAM5FKKiZyv18t23cbcc4URV/I6nC6QJ7PQksL4sN5wARqcMZ8yIgI0922LrZ1IMP8
+         QAARCHSnjO/CJzU42f0C4FqBaFKGhVUc4uMtzWtaX8tvzYyiucy5TCUKsXxqCJ+ftWgm
+         9V5kfMvXh670C9rVeodUxpSd1QLiiHvgz4eodX769O9aBtda39o8He4YF20lmFauLTnW
+         Z/cGo4E7fjVZKVlildsJoj1WlzAfEKsfj1SLNQWX5MBIOar9yfqrmFElVCkq9jLh3AxL
+         89p2GRyTJT6VjSa8QuPCLEFF9Is3sIO1SRC3SrC97M2mUqqRVO5cOk/TM3/EGaR3zUyM
+         8lbQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:date:from:to:cc:subject:message-id:references
          :mime-version:content-disposition:in-reply-to;
-        bh=OiEj/R0C3vTV+d3PwcjLmHykKOPJgu0AEZlp4Qdcy4Q=;
-        b=msUhMGQjl+KNpXxli8rkT+0YroO/3KLv8ay/zuBVTgN+n46kgJckxRb9quf7MsXPyl
-         2H3tGhXtBsXh8s1QFfOFHR0Pz/Ah05CuTbOYboTJUNE7ncIg/dyBbYxetVs294b/vT2F
-         oHJuB/iOp8SdqLJTXMu5dkNS1ZDyRfXo9q1sOF8rcuSA6Ow6GquFqnGlzIbarSGHVZdA
-         1iPH8sSgkupbr3pL1aCAqyQY4VC8KAl+yw4vK16MhKI+FHu/0Ofe3/sZK7rJsB8wpsgx
-         jPJ5tQj3dNqax1lgnFugKFDqYYetjeGG+7hAt/NjqwR5FC2Jpt5zadtoobkSAM3pDzWn
-         cwtg==
-X-Gm-Message-State: AJIora8A9ZUVSJMfnuh5/vtUnjojvvlzTpYuyXZ6AojJ5e7/PSfiHV9O
-        zSHjiGQGeJJkoAZYRYdJ/gcoW62e/g/gdA==
-X-Google-Smtp-Source: AGRyM1uC00vgkFudu0aCP4qQC+TZ3+sx/1U5xCnb4EWVxe7VQAm9clQyAE/Z+Ak0/6t30Vp2jUURGw==
-X-Received: by 2002:a63:4613:0:b0:40d:91e2:e9bf with SMTP id t19-20020a634613000000b0040d91e2e9bfmr20789285pga.235.1658959498812;
-        Wed, 27 Jul 2022 15:04:58 -0700 (PDT)
-Received: from localhost ([192.55.54.49])
-        by smtp.gmail.com with ESMTPSA id i2-20020a170902c94200b0016d773aae60sm5904135pla.19.2022.07.27.15.04.57
+        bh=NYAvAw9cVOoPnQbWeVJn8GPEaPKmeSC20kSm+BsfcGc=;
+        b=tP2S7rrCAIwNNILssY/UMfjaeDuyDtTYkCih+8uzBw0WDFLzrPH4nl2N5NFjBL5+xj
+         1cqiwfbYFR0g5VKx712JK6fTPFueG84SbGPm83SrfTEtdlP8HzP+BZ9ZjtM3uehMI/h9
+         B4DuAEGw1KUwpAnx21BPBWf1Lic5CMR7KXNsf+6A+tLyGGGaELP3TIj/zgMYjzQ6jiK9
+         pzrCuzeGpZCbOAUOm+UYwbmUZHVY7e8v/wGv+ZHIiSaq6sq/YOb6Sg4o5+GnS2kQw6xb
+         va9aOiQeXuqcaLMAbDiMNDopFn/hJw1uvRVw404DazUl4kzOz/1zhmRPZLYjs0o+uA1l
+         vGCQ==
+X-Gm-Message-State: AJIora8AYDIuIFKRmWCpPCmfWjayqGi8dT/kMtfKB8WuOfeLL8tV8pCM
+        IhlEJf9VL1j3MrSF3TAL6G8f6w==
+X-Google-Smtp-Source: AGRyM1vTFkf4+0TEEy64B/IkyBMp9gDI09JYWDcoFl7iFoQjdbrkCfM8e4ZDDVK2Uv5MNT+o4rXewg==
+X-Received: by 2002:a63:e80e:0:b0:419:d02c:fc8b with SMTP id s14-20020a63e80e000000b00419d02cfc8bmr20255708pgh.385.1658961734594;
+        Wed, 27 Jul 2022 15:42:14 -0700 (PDT)
+Received: from google.com (7.104.168.34.bc.googleusercontent.com. [34.168.104.7])
+        by smtp.gmail.com with ESMTPSA id i14-20020a17090332ce00b0016a33177d3csm14503714plr.160.2022.07.27.15.42.13
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 27 Jul 2022 15:04:57 -0700 (PDT)
-Date:   Wed, 27 Jul 2022 15:04:56 -0700
-From:   Isaku Yamahata <isaku.yamahata@gmail.com>
-To:     isaku.yamahata@intel.com
-Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
-        isaku.yamahata@gmail.com, Paolo Bonzini <pbonzini@redhat.com>,
-        Sean Christopherson <seanjc@google.com>
-Subject: Re: [PATCH v7 003/102] KVM: Refactor CPU compatibility check on
- module initialiization
-Message-ID: <20220727220456.GA3669189@ls.amr.corp.intel.com>
-References: <cover.1656366337.git.isaku.yamahata@intel.com>
- <e1f72040effd7b4ed31f9941e009f959d6345129.1656366338.git.isaku.yamahata@intel.com>
+        Wed, 27 Jul 2022 15:42:13 -0700 (PDT)
+Date:   Wed, 27 Jul 2022 22:42:10 +0000
+From:   Sean Christopherson <seanjc@google.com>
+To:     Like Xu <like.xu.linux@gmail.com>
+Cc:     Paolo Bonzini <pbonzini@redhat.com>,
+        Jim Mattson <jmattson@google.com>,
+        linux-kernel@vger.kernel.org, kvm@vger.kernel.org
+Subject: Re: [kvm-unit-tests PATCH] x86: Add tests for Guest Processor Event
+ Based Sampling (PEBS)
+Message-ID: <YuG/QtIM/fvhLI/u@google.com>
+References: <20220721103549.49543-1-likexu@tencent.com>
+ <20220721103549.49543-9-likexu@tencent.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <e1f72040effd7b4ed31f9941e009f959d6345129.1656366338.git.isaku.yamahata@intel.com>
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
-        RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS autolearn=ham
+In-Reply-To: <20220721103549.49543-9-likexu@tencent.com>
+X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
+        USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=unavailable
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -72,258 +73,88 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Here is the updated version.
+On Thu, Jul 21, 2022, Like Xu wrote:
+> +union perf_capabilities {
+> +	struct {
+> +		u64	lbr_format:6;
+> +		u64	pebs_trap:1;
+> +		u64	pebs_arch_reg:1;
+> +		u64	pebs_format:4;
+> +		u64	smm_freeze:1;
+> +		/*
+> +		 * PMU supports separate counter range for writing
+> +		 * values > 32bit.
+> +		 */
+> +		u64	full_width_write:1;
+> +		u64 pebs_baseline:1;
+> +		u64	perf_metrics:1;
+> +		u64	pebs_output_pt_available:1;
+> +		u64	anythread_deprecated:1;
+> +	};
+> +	u64	capabilities;
+> +};
+> +
+> +union cpuid10_eax {
+> +        struct {
+> +                unsigned int version_id:8;
+> +                unsigned int num_counters:8;
+> +                unsigned int bit_width:8;
+> +                unsigned int mask_length:8;
+> +        } split;
+> +        unsigned int full;
+> +} pmu_eax;
+> +
+> +union cpuid10_edx {
+> +        struct {
+> +                unsigned int num_counters_fixed:5;
+> +                unsigned int bit_width_fixed:8;
+> +                unsigned int reserved:19;
+> +        } split;
+> +        unsigned int full;
+> +} pmu_edx;
 
-commit 7d042749b631f668ed9e99044228f16c212161bc
-Author: Isaku Yamahata <isaku.yamahata@intel.com>
-Date:   Fri Apr 22 16:56:51 2022 -0700
+The generic unions are hopefully unnecessary now that helpers are provided by
+lib/x86/processor.h, e.g. for pmu_version().
 
-    KVM: Refactor CPU compatibility check on module initialization
-    
-    TDX module requires its initialization.  It requires VMX to be enabled.
-    Although there are several options of when to initialize it, the choice is
-    the initialization time of the KVM kernel module.  There is no usable
-    arch-specific hook for the TDX module to utilize during the KVM kernel module
-    initialization.  The code doesn't enable/disable hardware (VMX in TDX case)
-    during the kernel module initialization.  Add a hook for enabling hardware,
-    arch-specific initialization, and disabling hardware during KVM kernel
-    module initialization to make a room for TDX module initialization.  The
-    current KVM enables hardware when the first VM is created and disables
-    hardware when the last VM is destroyed.  When no VM is running, hardware is
-    disabled.  To follow these semantics, the kernel module initialization needs
-    to disable hardware. Opportunistically refactor the code to enable/disable
-    hardware.
-    
-    Add hadware_enable_all() and hardware_disable_all() to kvm_init() and
-    introduce a new arch-specific callback function,
-    kvm_arch_post_hardware_enable_setup, for arch to do arch-specific
-    initialization that requires hardware_enable_all().  Opportunistically,
-    move kvm_arch_check_processor_compat() to to hardware_enabled_nolock().
-    TDX module initialization code will go into
-    kvm_arch_post_hardware_enable_setup().
-    
-    This patch reorders some function calls as below from (*) (**) (A) and (B)
-    to (A) (B) and (*).  Here (A) and (B) depends on (*), but not (**).  By
-    code inspection, only mips and VMX has the code of (*).  No other
-    arch has empty (*).  So refactor mips and VMX and eliminate the
-    necessity hook for (*) instead of adding an unused hook.
-    
-    Before this patch:
-    - Arch module initialization
-      - kvm_init()
-        - kvm_arch_init()
-        - kvm_arch_check_processor_compat() on each CPUs
-      - post-arch-specific initialization -- (*): (A) and (B) depends on this
-      - post-arch-specific initialization -- (**): no dependency to (A) and (B)
-    
-    - When creating/deleting the first/last VM
-       - kvm_arch_hardware_enable() on each CPUs -- (A)
-       - kvm_arch_hardware_disable() on each CPUs -- (B)
-    
-    After this patch:
-    - Arch module initialization
-      - kvm_init()
-        - kvm_arch_init()
-        - arch-specific initialization -- (*)
-        - kvm_arch_check_processor_compat() on each CPUs
-        - kvm_arch_hardware_enable() on each CPUs -- (A)
-        - kvm_arch_hardware_disable() on each CPUs -- (B)
-      - post-arch-specific initialization  -- (**)
-    
-    - When creating/deleting the first/last VM (no logic change)
-       - kvm_arch_hardware_enable() on each CPUs -- (A)
-       - kvm_arch_hardware_disable() on each CPUs -- (B)
-    
-    Code inspection result:
-    As long as I inspected, I found only mips and VMX have non-empty (*) or
-    non-empty (A) or (B).
-    x86: tested on a real machine
-    mips: compile test only
-    powerpc, s390, arm, riscv: code inspection only
-    
-    - arch/mips/kvm/mips.c
-      module init function, kvm_mips_init(), does some initialization after
-      kvm_init().  Compile test only.
-    
-    - arch/x86/kvm/x86.c
-      - uses vm_list which is statically initialized.
-      - static_call(kvm_x86_hardware_enable)();
-        - SVM: (*) and (**) are empty.
-        - VMX: initialize percpu variable loaded_vmcss_on_cpu that VMXON uses.
-    
-    - arch/powerpc/kvm/powerpc.c
-      kvm_arch_hardware_enable/disable() are nop
-    
-    - arch/s390/kvm/kvm-s390.c
-      kvm_arch_hardware_enable/disable() are nop
-    
-    - arch/arm64/kvm/arm.c
-      module init function, arm_init(), calls only kvm_init().
-      (*) and (**) are empty
-    
-    - arch/riscv/kvm/main.c
-      module init function, riscv_kvm_init(), calls only kvm_init().
-      (*) and (**) are empty
-    
-    Co-developed-by: Sean Christopherson <seanjc@google.com>
-    Signed-off-by: Sean Christopherson <seanjc@google.com>
-    Signed-off-by: Isaku Yamahata <isaku.yamahata@intel.com>
+I would prefer to have similar helpers instead of "union perf_capabilities",
+but it's not a sticking point if helpers a signifiantly more painful to use.
 
-diff --git a/arch/mips/kvm/mips.c b/arch/mips/kvm/mips.c
-index 092d09fb6a7e..fd7339cff57c 100644
---- a/arch/mips/kvm/mips.c
-+++ b/arch/mips/kvm/mips.c
-@@ -1642,12 +1642,11 @@ static int __init kvm_mips_init(void)
- 		return -EOPNOTSUPP;
- 	}
- 
-+	/*
-+	 * kvm_init() calls kvm_arch_hardware_enable/disable().  The early
-+	 * initialization is needed before calling kvm_init().
-+	 */
- 	ret = kvm_mips_entry_setup();
--	if (ret)
--		return ret;
--
--	ret = kvm_init(NULL, sizeof(struct kvm_vcpu), 0, THIS_MODULE);
--
- 	if (ret)
- 		return ret;
- 
-@@ -1656,6 +1655,13 @@ static int __init kvm_mips_init(void)
- 
- 	register_die_notifier(&kvm_mips_csr_die_notifier);
- 
-+	ret = kvm_init(NULL, sizeof(struct kvm_vcpu), 0, THIS_MODULE);
-+
-+	if (ret) {
-+		unregister_die_notifier(&kvm_mips_csr_die_notifier);
-+		return ret;
-+	}
-+
- 	return 0;
- }
- 
-diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
-index 111e0c42479a..5c59b4ea6524 100644
---- a/arch/x86/kvm/vmx/vmx.c
-+++ b/arch/x86/kvm/vmx/vmx.c
-@@ -8442,6 +8442,23 @@ static void vmx_exit(void)
- }
- module_exit(vmx_exit);
- 
-+/*
-+ * Early initialization before kvm_init() so that vmx_hardware_enable/disable()
-+ * can work.
-+ */
-+static void __init vmx_init_early(void)
-+{
-+	int cpu;
-+
-+	/*
-+	 * vmx_hardware_disable() accesses loaded_vmcss_on_cpu list.
-+	 * Initialize the variable before kvm_init() that calls
-+	 * vmx_hardware_enable/disable().
-+	 */
-+	for_each_possible_cpu(cpu)
-+		INIT_LIST_HEAD(&per_cpu(loaded_vmcss_on_cpu, cpu));
-+}
-+
- static int __init vmx_init(void)
- {
- 	int r, cpu;
-@@ -8479,6 +8496,7 @@ static int __init vmx_init(void)
- 	}
- #endif
- 
-+	vmx_init_early();
- 	r = kvm_init(&vmx_init_ops, sizeof(struct vcpu_vmx),
- 		     __alignof__(struct vcpu_vmx), THIS_MODULE);
- 	if (r)
-@@ -8499,11 +8517,8 @@ static int __init vmx_init(void)
- 
- 	vmx_setup_fb_clear_ctrl();
- 
--	for_each_possible_cpu(cpu) {
--		INIT_LIST_HEAD(&per_cpu(loaded_vmcss_on_cpu, cpu));
--
-+	for_each_possible_cpu(cpu)
- 		pi_init_cpu(cpu);
--	}
- 
- #ifdef CONFIG_KEXEC_CORE
- 	rcu_assign_pointer(crash_vmclear_loaded_vmcss,
-diff --git a/include/linux/kvm_host.h b/include/linux/kvm_host.h
-index d4f130a9f5c8..79a4988fd51f 100644
---- a/include/linux/kvm_host.h
-+++ b/include/linux/kvm_host.h
-@@ -1441,6 +1441,7 @@ void kvm_arch_create_vcpu_debugfs(struct kvm_vcpu *vcpu, struct dentry *debugfs_
- int kvm_arch_hardware_enable(void);
- void kvm_arch_hardware_disable(void);
- int kvm_arch_hardware_setup(void *opaque);
-+int kvm_arch_post_hardware_enable_setup(void *opaque);
- void kvm_arch_hardware_unsetup(void);
- int kvm_arch_check_processor_compat(void);
- int kvm_arch_vcpu_runnable(struct kvm_vcpu *vcpu);
-diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
-index a5bada53f1fe..51b8ac5faca5 100644
---- a/virt/kvm/kvm_main.c
-+++ b/virt/kvm/kvm_main.c
-@@ -4899,8 +4899,13 @@ static void hardware_enable_nolock(void *junk)
- 
- 	cpumask_set_cpu(cpu, cpus_hardware_enabled);
- 
-+	r = kvm_arch_check_processor_compat();
-+	if (r)
-+		goto out;
-+
- 	r = kvm_arch_hardware_enable();
- 
-+out:
- 	if (r) {
- 		cpumask_clear_cpu(cpu, cpus_hardware_enabled);
- 		atomic_inc(&hardware_enable_failed);
-@@ -5697,9 +5702,9 @@ void kvm_unregister_perf_callbacks(void)
- }
- #endif
- 
--static void check_processor_compat(void *rtn)
-+__weak int kvm_arch_post_hardware_enable_setup(void *opaque)
- {
--	*(int *)rtn = kvm_arch_check_processor_compat();
-+	return 0;
- }
- 
- int kvm_init(void *opaque, unsigned vcpu_size, unsigned vcpu_align,
-@@ -5732,11 +5737,23 @@ int kvm_init(void *opaque, unsigned vcpu_size, unsigned vcpu_align,
- 	if (r < 0)
- 		goto out_free_1;
- 
--	for_each_online_cpu(cpu) {
--		smp_call_function_single(cpu, check_processor_compat, &r, 1);
--		if (r < 0)
--			goto out_free_2;
--	}
-+	/* hardware_enable_nolock() checks CPU compatibility on each CPUs. */
-+	r = hardware_enable_all();
-+	if (r)
-+		goto out_free_2;
-+	/*
-+	 * Arch specific initialization that requires to enable virtualization
-+	 * feature.  e.g. TDX module initialization requires VMXON on all
-+	 * present CPUs.
-+	 */
-+	kvm_arch_post_hardware_enable_setup(opaque);
-+	/*
-+	 * Make hardware disabled after the KVM module initialization.  KVM
-+	 * enables hardware when the first KVM VM is created and disables
-+	 * hardware when the last KVM VM is destroyed.  When no KVM VM is
-+	 * running, hardware is disabled.  Keep that semantics.
-+	 */
-+	hardware_disable_all();
- 
- 	r = cpuhp_setup_state_nocalls(CPUHP_AP_KVM_STARTING, "kvm/cpu:starting",
- 				      kvm_starting_cpu, kvm_dying_cpu);
+> +	if (!is_intel() || (pmu_eax.split.version_id < 2) ||
+> +	    !(perf.capabilities & PERF_CAP_PEBS_FORMAT) ||
+> +	    (rdmsr(MSR_IA32_MISC_ENABLE) & MSR_IA32_MISC_ENABLE_PEBS_UNAVAIL)) {
 
--- 
-Isaku Yamahata <isaku.yamahata@gmail.com>
+Split these up, it's really, really annoying to have to guess which one of the
+four checks failed.
+
+> +		report_skip("This platform doesn't support guest PEBS.");
+> +		return 0;
+
+This needs be be "return report_summary()", otherwise the test says pass when it
+didn't do anyting:
+
+ TESTNAME=pmu_pebs TIMEOUT=90s ACCEL=kvm ./x86/run x86/pmu_pebs.flat -smp 1 -cpu host,migratable=no
+ PASS pmu_pebs 
+
+wait a second...
+
+  SKIP: This platform doesn't support guest PEBS.
+
+E.g. (though if KUT can provide more information on why PERF_CAP_PEBS_FORMAT
+may not be advertised, e.g. requires ICX+?, that would be nice to have)
+
+        if (!is_intel()) {
+                report_skip("PEBS is only supported on Intel CPUs");
+                return report_summary();
+        }
+        if (pmu_version() < 2) {
+                report_skip("Architectural PMU not available");
+                return report_summary();
+        }
+        if (!(perf.capabilities & PERF_CAP_PEBS_FORMAT)) {
+                report_skip("PEBS not enumerated in PERF_CAPABILITIES");
+                return report_summary();
+        }
+        if (rdmsr(MSR_IA32_MISC_ENABLE) & MSR_IA32_MISC_ENABLE_PEBS_UNAVAIL) {
+                report_skip("PEBS unavailable according to MISC_ENABLE");
+                return report_summary();
+        }
