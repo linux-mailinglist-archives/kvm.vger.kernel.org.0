@@ -2,72 +2,73 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 3EB11581CE8
-	for <lists+kvm@lfdr.de>; Wed, 27 Jul 2022 03:04:02 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 30429581D9F
+	for <lists+kvm@lfdr.de>; Wed, 27 Jul 2022 04:29:12 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S240104AbiG0BD7 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 26 Jul 2022 21:03:59 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57110 "EHLO
+        id S239972AbiG0C3I (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 26 Jul 2022 22:29:08 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47370 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233248AbiG0BD5 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 26 Jul 2022 21:03:57 -0400
-Received: from mail-yb1-xb2a.google.com (mail-yb1-xb2a.google.com [IPv6:2607:f8b0:4864:20::b2a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 015DE31919
-        for <kvm@vger.kernel.org>; Tue, 26 Jul 2022 18:03:57 -0700 (PDT)
-Received: by mail-yb1-xb2a.google.com with SMTP id n8so8477836yba.2
-        for <kvm@vger.kernel.org>; Tue, 26 Jul 2022 18:03:56 -0700 (PDT)
+        with ESMTP id S233554AbiG0C3H (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 26 Jul 2022 22:29:07 -0400
+Received: from mail-pg1-x52a.google.com (mail-pg1-x52a.google.com [IPv6:2607:f8b0:4864:20::52a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 41E1B3C8DC
+        for <kvm@vger.kernel.org>; Tue, 26 Jul 2022 19:29:07 -0700 (PDT)
+Received: by mail-pg1-x52a.google.com with SMTP id bh13so14753197pgb.4
+        for <kvm@vger.kernel.org>; Tue, 26 Jul 2022 19:29:07 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=F1CB8uxEEeVmjEqML3wHULJiqkA1BC56ArX1DExl2h0=;
-        b=BowbdoekaMtWgeqq6JQeYxKcmHK+fziGoVioqo96wYk6ogTiHULPf4SFWGSe7wcDHQ
-         5B5YGzp/Hoi+EAxUMDZy9RVS8WYYSDvYTBeg+z1mT8LQWxhYNPs8qO1pO4az8spk0vK/
-         MWD4BMay3csEszpYfEbpFda2WQfCZBau7qu7Km+U2EtFCucH8A4tXLbmnaDV58OeBZ9L
-         aGHCRzJ+ZbIEw3Tgt1ofq3ES8n7CYx9kuT/tSozsqeohGOgctAr88tg7WLpiH14C2DIu
-         /EE219agvhkYpwOtk78869F1P6IfDBx0NKG1Lpmbn8VrTU064hZpqHqCHBAYbEId67Tm
-         JiYg==
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=Xt1DjmVl4U5N3l5qtCeMuaUsGLKcjntACgSyyEM4lUc=;
+        b=szuOoqkw2ViLkaHOXdhTRcJsv330QS30uwrWThy/QvFSt6dMjYUW1Kb8xRHB3hHPZS
+         jdH5iGcFHQbPtves5M/Viy5DL2k8GvQcSKXD6fCWbuzjobMEzkAwoIR1WbkuIbvsADBD
+         UFRiX1ADtYD2qF0FsUZDzDHekJrgTd6TxftAtoyHi6rTHfhHOMx3UpuRMsrzUBVTmUOk
+         MKKsll0lqKC1Rb7z7XK/zSVY2xjpYzCkYbCa+QBeiEs5kd1+qEdwuf76+9vk5pdxHbhx
+         XTsatamtSYbiDrgrdTKVYkGkmzlIqafnE3iXC9mxzBA7XRvtNYmKoi1YOo+0TyJ75I6B
+         ABBg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=F1CB8uxEEeVmjEqML3wHULJiqkA1BC56ArX1DExl2h0=;
-        b=JdiCyZmgshyKXa07gmmYXUtlLQXQ7836ehyEHWcCLR7/2GagCxvfDcoqa7DZ9fUsz1
-         n8M6++5xYAJ2SbYmsIJbwPh6u/8DH3iB6UjVThT1X/12HsO46rkOooMmvYA5jjnfH4ER
-         6ZF+pPnDjR0u2mwvtJhM8PblUvL0v+krIC5xykLV0PVmb+KB32J6w1i7NdO+jANwo1ST
-         i4EiTGBExyH7+NKXzcQqA6g+l8iyzX5NqOKJMCGKlARZmNk9F6eXdl44ppt204skYBYo
-         nc/BOqHJvdu6lbKKqf1TRA5CncGjj4S3632X91H1OCaJePkGgsM/DLZxtdxltBB8hRrJ
-         S0jQ==
-X-Gm-Message-State: AJIora8cHTCwPzd7jlTDpEO2cufU81mi2rQJnnBnW5Pa/7U3SmWZQbkJ
-        Y8jlJ5m3ZgNRZWiXgvmtls8MBKYpesiwa0L9go2Hog==
-X-Google-Smtp-Source: AGRyM1vGwdn/xjVFlR+Q0hjliaGUjO9ApRQRkLN4eTOeu46rx7zNMkYHZz68lQZc/kvDEyyVp6TNc5FmkdLhujzyhNk=
-X-Received: by 2002:a25:b9d1:0:b0:671:49f9:4e01 with SMTP id
- y17-20020a25b9d1000000b0067149f94e01mr8795250ybj.398.1658883835983; Tue, 26
- Jul 2022 18:03:55 -0700 (PDT)
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=Xt1DjmVl4U5N3l5qtCeMuaUsGLKcjntACgSyyEM4lUc=;
+        b=d2fO3VJZUeqcL79jik388oCQVsBgOX+kJp2pwzcS1wGPtHitaRTObkulZxN/P9sBqJ
+         olCvJmEGR5xzT/a63UTi0rZhBndRrQLfMfrnp7vzf1XH049LhIEtG7xAraK2+euqthMQ
+         nH6/V0EjQPEfEI0AX1PaeQgmNe68uBGHZUkmReU9ydqhqEJU16s5q+rUEDD9hhaPrwTw
+         HYUeEL3W3WZdkZTD6er7zErk43cPapZEUMeaJKhQaEVNVqKZ1M2CqwzlcYA6MXHOtlhH
+         tLauF7wC+acpbQpKAOHgzXANgakYJqVg6VCVQbFlODVZQPZws9+ou3E/nW17Wk/TcBjv
+         6lPw==
+X-Gm-Message-State: AJIora/Hr7ixUPR7F2guhMBe8yOmX9N/l9UIiM8q09g4N3wmRdVco0Dv
+        F6pUNQHxfez9W5iACRRhh+6Sfw==
+X-Google-Smtp-Source: AGRyM1uX1ZM5ywBj8WbRVbH9b+XKaR87Z46iycdDdF6uQ9blbrk80iU3FnQ/eDW4XGZGRdcazp1H1A==
+X-Received: by 2002:a65:580e:0:b0:41a:4c10:817f with SMTP id g14-20020a65580e000000b0041a4c10817fmr17433895pgr.93.1658888946533;
+        Tue, 26 Jul 2022 19:29:06 -0700 (PDT)
+Received: from google.com (220.181.82.34.bc.googleusercontent.com. [34.82.181.220])
+        by smtp.gmail.com with ESMTPSA id j6-20020a170902da8600b0016d763967f8sm5617010plx.107.2022.07.26.19.29.05
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 26 Jul 2022 19:29:05 -0700 (PDT)
+Date:   Tue, 26 Jul 2022 19:29:01 -0700
+From:   Ricardo Koller <ricarkol@google.com>
+To:     Marc Zyngier <maz@kernel.org>
+Cc:     Andrew Jones <andrew.jones@linux.dev>, kvm@vger.kernel.org,
+        kvmarm@lists.cs.columbia.edu
+Subject: Re: [kvm-unit-tests PATCH 3/3] arm: pmu: Remove checks for !overflow
+ in chained counters tests
+Message-ID: <YuCi7ew10HfnSFmc@google.com>
+References: <20220718154910.3923412-4-ricarkol@google.com>
+ <87edyhz68i.wl-maz@kernel.org>
+ <Yte/YXWYSikyQcqh@google.com>
+ <875yjsyv67.wl-maz@kernel.org>
+ <Ythw1UT1wFHbY/jN@google.com>
+ <Ythy8XXN2rFytXdr@google.com>
+ <871quezill.wl-maz@kernel.org>
+ <YtscUOUGKra3LpsK@google.com>
+ <20220723075955.ipoekdpzkqticadt@kamzik>
+ <875yjmdf23.wl-maz@kernel.org>
 MIME-Version: 1.0
-References: <20220722230241.1944655-1-avagin@google.com> <Yts1tUfPxdPH5XGs@google.com>
- <CAEWA0a4hrRb5HYLqa1Q47=guY6TLsWSJ_zxNjOXXV2jCjUekUA@mail.gmail.com>
- <YuAD6qY+F2nuGm62@google.com> <875yjjttiz.ffs@tglx>
-In-Reply-To: <875yjjttiz.ffs@tglx>
-From:   Andrei Vagin <avagin@google.com>
-Date:   Tue, 26 Jul 2022 18:03:44 -0700
-Message-ID: <CAEWA0a6hteJsvkd7Fe06P93O0GcE=4izSvJEj3RGpYPta9=s1w@mail.gmail.com>
-Subject: Re: [PATCH 0/5] KVM/x86: add a new hypercall to execute host system
-To:     Thomas Gleixner <tglx@linutronix.de>
-Cc:     Sean Christopherson <seanjc@google.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Jianfeng Tan <henry.tjf@antfin.com>,
-        Adin Scannell <ascannell@google.com>,
-        Konstantin Bogomolov <bogomolov@google.com>,
-        Etienne Perot <eperot@google.com>,
-        Andy Lutomirski <luto@kernel.org>,
-        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org,
-        "H. Peter Anvin" <hpa@zytor.com>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <875yjmdf23.wl-maz@kernel.org>
 X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
         ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
@@ -79,38 +80,35 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Jul 26, 2022 at 3:10 PM Thomas Gleixner <tglx@linutronix.de> wrote:
->
-> On Tue, Jul 26 2022 at 15:10, Sean Christopherson wrote:
-> > On Tue, Jul 26, 2022, Andrei Vagin wrote:
-> >> * It doesn't allow to support Confidential Computing (SEV-ES/SGX). The Sentry
-> >>   has to be fully enclosed in a VM to be able to support these technologies.
-> >
-> > Speaking of SGX, this reminds me a lot of Graphene, SCONEs, etc..., which IIRC
-> > tackled the "syscalls are crazy expensive" problem by using a message queue and
-> > a dedicated task outside of the enclave to handle syscalls.  Would something like
-> > that work, or is having to burn a pCPU (or more) to handle syscalls in the host a
-> > non-starter?
->
-> Let's put VMs aside for a moment. The problem you are trying to solve is
-> ptrace overhead because that requires context switching, right?
+On Sun, Jul 24, 2022 at 10:40:20AM +0100, Marc Zyngier wrote:
+> On Sat, 23 Jul 2022 08:59:55 +0100,
+> Andrew Jones <andrew.jones@linux.dev> wrote:
+> > 
+> > On Fri, Jul 22, 2022 at 02:53:20PM -0700, Ricardo Koller wrote:
+> > > 
+> > > Which brings me to what to do with this test. Should it be fixed for
+> > > bare-metal by ignoring the PMOVSSET check? or should it actually check
+> > > for PMOVSSET=1 and fail on KVM until KVM gets fixed?
+> > >
+> > 
+> > Hi Ricardo,
+> > 
+> > Please write the test per the spec. Failures pointed out in kvm-unit-tests
+> > are great, when the tests are written correctly, since it means it's
+> > doing its job :-)
+> 
+> Agreed. This is a bug, and bugs are to be fixed. The fact that it will
+> flare up and annoy people is a good incentive to fix the kernel!
+> 
 
-Yes, you are right.
+Sounds good, thank you both. Will send V2 with the proper behavior then.
 
->
-> Did you ever try to solve this with SYSCALL_USER_DISPATCH? That requires
-> signals, which are not cheap either, but we certainly could come up with
-> a lightweight signal implementation for that particular use case.
+Thanks,
+Ricardo
 
-We thought about this interface and how it could be used for gVisor needs. I
-think the main question is how to manage guest address spaces.  gVisor can run
-multiple processes in one sandbox. Each process must have its address space
-isolated from other address spaces. The gVisor kernel (Sentry) has to run in a
-separate address space that guest processes don't have access to, but the
-Sentry has to be able to access all other address spaces.
-
->
 > Thanks,
->
->         tglx
->
+> 
+> 	M.
+> 
+> -- 
+> Without deviation from the norm, progress is not possible.
