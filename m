@@ -2,557 +2,123 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 845C75826EB
-	for <lists+kvm@lfdr.de>; Wed, 27 Jul 2022 14:46:51 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 40C515826ED
+	for <lists+kvm@lfdr.de>; Wed, 27 Jul 2022 14:47:18 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232297AbiG0Mqu (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 27 Jul 2022 08:46:50 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58394 "EHLO
+        id S232606AbiG0MrR (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 27 Jul 2022 08:47:17 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58688 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231877AbiG0Mqt (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 27 Jul 2022 08:46:49 -0400
-Received: from mail-pj1-x1031.google.com (mail-pj1-x1031.google.com [IPv6:2607:f8b0:4864:20::1031])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 009401CB26
-        for <kvm@vger.kernel.org>; Wed, 27 Jul 2022 05:46:47 -0700 (PDT)
-Received: by mail-pj1-x1031.google.com with SMTP id d65-20020a17090a6f4700b001f303a97b14so2023723pjk.1
-        for <kvm@vger.kernel.org>; Wed, 27 Jul 2022 05:46:47 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=from:to:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=MKGtbnavMu2cAFwizKi7KuJH3vDK8oJgQIAfik26hIw=;
-        b=bvxu6YJc93KX8ZnG5lZq1aIpqBNCC2QvCkn4DKVAGoT0NYGGiUCSPbqs7ANlRb1m/2
-         gSwD5vUHqQRY2enc5UI1w+YaUFMnHWhRchIbVuOev/MROUcCitK6zyCu5G3QEsyH0/Fm
-         ZnWeNsm741dTroAzFqMuLlci8roPzo0ZdtCWNbaZlAXgGDyu5vBKggek50lriEiwxlr0
-         l9xqwkHVBREjjH2ZyR7nwPV0dldKM2DiNZlc4qNyBfVHR9uaS7hQha5HCyov9RopGOUq
-         hPMmZerNAD4Bq37Zz8zp+fcnHmdqJIcgbRSJuV7MbLo6u69ZGeJ8WbUay+c9qMSqjmjx
-         XBHA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:from:to:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=MKGtbnavMu2cAFwizKi7KuJH3vDK8oJgQIAfik26hIw=;
-        b=ph/3tqERvrLhzTPt99+92LfS1gA0uUTy1CB7PGbfYPME6TFkdetFtq+c212a6Gn/Mg
-         E/oVmQ12B7nHvOLjbUZGSGHfqnTiMclrWYzjvNLkcS0AtSVyzQdHNXPjAT+7F19OlZ5m
-         /tworuXTOWIKNsjaU8oXLh6Tike53jafGcxvFonGNPd4hcLDEZvUAokFRUtopdLFonoh
-         ENmuFX9x8XUWvfNWSOvHYkQ1jfQBc4f/ArSPGQ0E9XRX5QzYfUqZlD3F9+IsQWYH7o+h
-         iXyyvXXn1uOIgvBkASYz/omX14uaHkEmDDE2lnft9q1cb6FJwjwaQUu3ygZVUEgLo5nU
-         yAtQ==
-X-Gm-Message-State: AJIora/jk4fQrO7kEQcWZ8Xk+qcpwHea2aVsvn9I4l2tqLNUS3seuTw4
-        FbJuKPDx9lCpUxXVId4yZto=
-X-Google-Smtp-Source: AGRyM1umvJG2UdVLvUb9ZHVm3jNx1vXJDSlebZ0I7jVEc8Bvy0GWLFof9OqNbs8cZek/GxP/V+/H0Q==
-X-Received: by 2002:a17:902:ce05:b0:16b:e725:6f6c with SMTP id k5-20020a170902ce0500b0016be7256f6cmr21222326plg.110.1658926007429;
-        Wed, 27 Jul 2022 05:46:47 -0700 (PDT)
-Received: from localhost.localdomain ([47.246.98.184])
-        by smtp.gmail.com with ESMTPSA id d5-20020a170903230500b0016c3b0042d0sm13763924plh.14.2022.07.27.05.46.45
-        (version=TLS1_3 cipher=TLS_CHACHA20_POLY1305_SHA256 bits=256/256);
-        Wed, 27 Jul 2022 05:46:46 -0700 (PDT)
-From:   SU Hang <darcysail@gmail.com>
-X-Google-Original-From: SU Hang <darcy.sh@antgroup.com>
-To:     darcy.sh@antgroup.com, babu.moger@amd.com, manali.shukla@amd.com,
-        mlevitsk@redhat.com, wei.huang2@amd.com, kvm@vger.kernel.org,
-        pbonzini@redhat.com
-Subject: [kvm-unit-tests PATCH v2] x86: amd: pmu: test performance counter on AMD
-Date:   Wed, 27 Jul 2022 20:46:32 +0800
-Message-Id: <20220727124632.44253-1-darcy.sh@antgroup.com>
-X-Mailer: git-send-email 2.32.1 (Apple Git-133)
+        with ESMTP id S231135AbiG0MrP (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 27 Jul 2022 08:47:15 -0400
+Received: from mga17.intel.com (mga17.intel.com [192.55.52.151])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 289D21CB26;
+        Wed, 27 Jul 2022 05:47:15 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1658926035; x=1690462035;
+  h=message-id:subject:from:to:cc:date:in-reply-to:
+   references:content-transfer-encoding:mime-version;
+  bh=6yfECxzeuBHnNk9O6XrYbgAxEG+46JckcwYj/fktdKI=;
+  b=DXQw4sWGgCEanyfopO5HHcky6z1S3G91t8OxqJ+XBZDUUWdTnUK3eN+m
+   3gYYxtHgxbmtIdfECcQjkRKf4CQ8zYosTHivGFaAESxZPTl+nMeFPoi2O
+   aRJ887nyc/M5J31nnsF7RVzsUOHjXHrMH4DGF8OzB0qpNrj0UZPXOmYzs
+   OxnOYiYqnKNYN+oRFknW0CFcaoGTOLuRtUbaMESLa56EniEcyLmrJO9sT
+   +cW74NTr4ZlExSGIqPNroMJhtcH/X6iUrdIZVfqdC/I1FJwPUQKSMcfGS
+   vm0BQAAN6OUjkRnCdvNZxAf54mc6sGXpDcl3wOgypicAXa1+SmzaJqF/C
+   Q==;
+X-IronPort-AV: E=McAfee;i="6400,9594,10420"; a="268606391"
+X-IronPort-AV: E=Sophos;i="5.93,195,1654585200"; 
+   d="scan'208";a="268606391"
+Received: from fmsmga007.fm.intel.com ([10.253.24.52])
+  by fmsmga107.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 27 Jul 2022 05:47:01 -0700
+X-IronPort-AV: E=Sophos;i="5.93,195,1654585200"; 
+   d="scan'208";a="604137145"
+Received: from jlseahol-mobl3.amr.corp.intel.com (HELO khuang2-desk.gar.corp.intel.com) ([10.212.1.35])
+  by fmsmga007-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 27 Jul 2022 05:46:58 -0700
+Message-ID: <59a2748ed446f3e8a00834982b54848937a97379.camel@intel.com>
+Subject: Re: [PATCH v5 07/22] x86/virt/tdx: Implement SEAMCALL function
+From:   Kai Huang <kai.huang@intel.com>
+To:     Dave Hansen <dave.hansen@intel.com>, linux-kernel@vger.kernel.org,
+        kvm@vger.kernel.org
+Cc:     seanjc@google.com, pbonzini@redhat.com, len.brown@intel.com,
+        tony.luck@intel.com, rafael.j.wysocki@intel.com,
+        reinette.chatre@intel.com, dan.j.williams@intel.com,
+        peterz@infradead.org, ak@linux.intel.com,
+        kirill.shutemov@linux.intel.com,
+        sathyanarayanan.kuppuswamy@linux.intel.com,
+        isaku.yamahata@intel.com
+Date:   Thu, 28 Jul 2022 00:46:56 +1200
+In-Reply-To: <81b70f92-d869-f56d-a152-11aff4e1d785@intel.com>
+References: <cover.1655894131.git.kai.huang@intel.com>
+         <095e6bbc57b4470e1e9a9104059a5238c9775f00.1655894131.git.kai.huang@intel.com>
+         <069a062e-a4a6-09af-7b74-7f4929f2ec0b@intel.com>
+         <5ce7ebfe54160ea35e432bf50207ebed32db31fc.camel@intel.com>
+         <84e93539-a2f9-f68e-416a-ea3d8fc725af@intel.com>
+         <6bef368ccc68676e4acaecc4b6dc52f598ea7f2f.camel@intel.com>
+         <ea03e55499f556388c0a5f9ed565e72e213c276f.camel@intel.com>
+         <978c3d37-97c9-79b9-426a-2c27db34c38a@intel.com>
+         <0b20f1878d31658a9e3cd3edaf3826fe8731346e.camel@intel.com>
+         <11b7e8668fde31ead768075e51f9667276ddc78a.camel@intel.com>
+         <81b70f92-d869-f56d-a152-11aff4e1d785@intel.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+User-Agent: Evolution 3.44.3 (3.44.3-1.fc36) 
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
-        RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS autolearn=ham
-        autolearn_force=no version=3.4.6
+X-Spam-Status: No, score=-5.0 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
+        SPF_HELO_NONE,SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-This test adds performance counter test for AMD CPU, it tests old
-performance legacy 4 counters [1] since Family 6(that is AMD K7 CPU),
-and new 6 counters [2] since Family 21 (15H).
+On Tue, 2022-07-26 at 17:50 -0700, Dave Hansen wrote:
+> On 7/26/22 17:34, Kai Huang wrote:
+> > > This doesn't seem right to me.  *If* we get a known-bogus
+> > > hot-remove event, we need to reject it.  Remember, removal is a
+> > > two-step process.
+> > If so, we need to reject the (CMR) memory offline.  Or we just BUG()
+> > in the ACPI memory removal  callback?
+> >=20
+> > But either way this will requires us to get the CMRs during kernel boot=
+.
+>=20
+> I don't get the link there between CMRs at boot and handling hotplug.
+>=20
+> We don't need to go to extreme measures just to get a message out of the
+> kernel that the BIOS is bad.  If we don't have the data to do it
+> already, then I don't really see the nee to warn about it.
+>=20
+> Think of a system that has TDX enabled in the BIOS, but is running an
+> old kernel.  It will have *ZERO* idea that hotplug doesn't work.  It'll
+> run blissfully along.  I don't see any reason that a kernel with TDX
+> support, but where TDX is disabled should actively go out and try to be
+> better than those old pre-TDX kernels.
 
-And because AMD doesn't have some MSRs(e.g. MSR_CORE_PERF_GLOBAL_STATUS)
-and fixed counters as Intel, simply disable corresponding statements
-or cases.
+Agreed, assuming "where TDX is disabled" you mean TDX isn't usable (i.e. wh=
+en
+TDX module isn't loaded, or won't be initialized at all).
 
-Another thing worth mentioning is, AMD perf counter doesn't support
-select 'reference cycle', disable it too.
+>=20
+> Further, there's nothing to stop non-CMR memory from being added to a
+> system with TDX enabled in the BIOS but where the kernel is not using
+> it.  If we actively go out and keep good old DRAM from being added, then
+> we unnecessarily addle those systems.
+>=20
 
-> refs[1]: MSRC001_000[4...7] [Performance Event Counter [3:0]] (Core::X86::Msr::PERF_LEGACY_CTR)
-> refs[2]: MSRC001_020[1...B] [Performance Event Counter [5:0]] (Core::X86::Msr::PERF_CTR)
+OK.
 
-Signed-off-by: SU Hang <darcy.sh@antgroup.com>
----
- lib/x86/msr.h |  23 +++++
- x86/pmu.c     | 251 ++++++++++++++++++++++++++++++++++++++++----------
- 2 files changed, 223 insertions(+), 51 deletions(-)
+Then for memory hot-add, perhaps we can just go with the "winner-take-all"
+approach you mentioned before?
 
-diff --git a/lib/x86/msr.h b/lib/x86/msr.h
-index fa1c0c8..a8aa907 100644
---- a/lib/x86/msr.h
-+++ b/lib/x86/msr.h
-@@ -129,6 +129,29 @@
- #define MSR_AMD64_IBSDCPHYSAD		0xc0011039
- #define MSR_AMD64_IBSCTL		0xc001103a
- 
-+/* Fam 15h MSRs */
-+#define MSR_F15H_PERF_CTL		0xc0010200
-+#define MSR_F15H_PERF_CTL0		MSR_F15H_PERF_CTL
-+#define MSR_F15H_PERF_CTL1		(MSR_F15H_PERF_CTL + 2)
-+#define MSR_F15H_PERF_CTL2		(MSR_F15H_PERF_CTL + 4)
-+#define MSR_F15H_PERF_CTL3		(MSR_F15H_PERF_CTL + 6)
-+#define MSR_F15H_PERF_CTL4		(MSR_F15H_PERF_CTL + 8)
-+#define MSR_F15H_PERF_CTL5		(MSR_F15H_PERF_CTL + 10)
-+
-+#define MSR_F15H_PERF_CTR		0xc0010201
-+#define MSR_F15H_PERF_CTR0		MSR_F15H_PERF_CTR
-+#define MSR_F15H_PERF_CTR1		(MSR_F15H_PERF_CTR + 2)
-+#define MSR_F15H_PERF_CTR2		(MSR_F15H_PERF_CTR + 4)
-+#define MSR_F15H_PERF_CTR3		(MSR_F15H_PERF_CTR + 6)
-+#define MSR_F15H_PERF_CTR4		(MSR_F15H_PERF_CTR + 8)
-+#define MSR_F15H_PERF_CTR5		(MSR_F15H_PERF_CTR + 10)
-+
-+#define MSR_F15H_NB_PERF_CTL		0xc0010240
-+#define MSR_F15H_NB_PERF_CTR		0xc0010241
-+#define MSR_F15H_PTSC			0xc0010280
-+#define MSR_F15H_IC_CFG			0xc0011021
-+#define MSR_F15H_EX_CFG			0xc001102c
-+
- /* Fam 10h MSRs */
- #define MSR_FAM10H_MMIO_CONF_BASE	0xc0010058
- #define FAM10H_MMIO_CONF_ENABLE		(1<<0)
-diff --git a/x86/pmu.c b/x86/pmu.c
-index a46bdbf..77332b6 100644
---- a/x86/pmu.c
-+++ b/x86/pmu.c
-@@ -83,7 +83,9 @@ struct pmu_event {
- 	uint32_t unit_sel;
- 	int min;
- 	int max;
--} gp_events[] = {
-+} * gp_events;
-+
-+struct pmu_event intel_gp_event[] = {
- 	{"core cycles", 0x003c, 1*N, 50*N},
- 	{"instructions", 0x00c0, 10*N, 10.2*N},
- 	{"ref cycles", 0x013c, 1*N, 30*N},
-@@ -91,16 +93,26 @@ struct pmu_event {
- 	{"llc misses", 0x412e, 1, 1*N},
- 	{"branches", 0x00c4, 1*N, 1.1*N},
- 	{"branch misses", 0x00c5, 0, 0.1*N},
--}, fixed_events[] = {
-+};
-+struct pmu_event amd_gp_event[] = {
-+	{ "core cycles", 0x0076, 1 * N, 50 * N },
-+	{ "instructions", 0x00c0, 10 * N, 10.9 * N },
-+	{ "llc references", 0x028f, 1, 5 * N },
-+	{ "branches", 0x00c2, 1 * N, 1.1 * N },
-+	{ "branch misses", 0x00c3, 0, 0.1 * N },
-+};
-+struct pmu_event fixed_events[] = {
- 	{"fixed 1", MSR_CORE_PERF_FIXED_CTR0, 10*N, 10.2*N},
- 	{"fixed 2", MSR_CORE_PERF_FIXED_CTR0 + 1, 1*N, 30*N},
- 	{"fixed 3", MSR_CORE_PERF_FIXED_CTR0 + 2, 0.1*N, 30*N}
- };
- 
- #define PMU_CAP_FW_WRITES	(1ULL << 13)
--static u64 gp_counter_base = MSR_IA32_PERFCTR0;
-+static u64 gp_counter_base;
- 
- static int num_counters;
-+static int num_gp_event;
-+static bool is_intel_chip;
- 
- char *buf;
- 
-@@ -134,6 +146,9 @@ static bool check_irq(void)
- 
- static bool is_gp(pmu_counter_t *evt)
- {
-+	/* MSR_F15H_PERF_CTR == 0xc0010201
-+	 * MSR_K7_PERFCTR0   == 0xc0010004
-+	 * both happened to greater than MSR_IA32_PMC0. */
- 	return evt->ctr < MSR_CORE_PERF_FIXED_CTR0 ||
- 		evt->ctr >= MSR_IA32_PMC0;
- }
-@@ -149,7 +164,8 @@ static struct pmu_event* get_counter_event(pmu_counter_t *cnt)
- 	if (is_gp(cnt)) {
- 		int i;
- 
--		for (i = 0; i < sizeof(gp_events)/sizeof(gp_events[0]); i++)
-+		for (i = 0; i < num_gp_event; i++)
-+
- 			if (gp_events[i].unit_sel == (cnt->config & 0xffff))
- 				return &gp_events[i];
- 	} else
-@@ -161,6 +177,8 @@ static struct pmu_event* get_counter_event(pmu_counter_t *cnt)
- static void global_enable(pmu_counter_t *cnt)
- {
- 	cnt->idx = event_to_global_idx(cnt);
-+	if (!is_intel_chip)
-+		return;
- 
- 	wrmsr(MSR_CORE_PERF_GLOBAL_CTRL, rdmsr(MSR_CORE_PERF_GLOBAL_CTRL) |
- 			(1ull << cnt->idx));
-@@ -168,6 +186,8 @@ static void global_enable(pmu_counter_t *cnt)
- 
- static void global_disable(pmu_counter_t *cnt)
- {
-+	if (!is_intel_chip)
-+		return;
- 	wrmsr(MSR_CORE_PERF_GLOBAL_CTRL, rdmsr(MSR_CORE_PERF_GLOBAL_CTRL) &
- 			~(1ull << cnt->idx));
- }
-@@ -176,14 +196,19 @@ static void global_disable(pmu_counter_t *cnt)
- static void start_event(pmu_counter_t *evt)
- {
-     wrmsr(evt->ctr, evt->count);
--    if (is_gp(evt))
--	    wrmsr(MSR_P6_EVNTSEL0 + event_to_global_idx(evt),
--			    evt->config | EVNTSEL_EN);
--    else {
-+	if (is_gp(evt)) {
-+		uint64_t sel;
-+		if (is_intel_chip)
-+			sel = MSR_P6_EVNTSEL0;
-+		else if (gp_counter_base == MSR_F15H_PERF_CTR)
-+			sel = MSR_F15H_PERF_CTL;
-+		else
-+			sel = MSR_K7_EVNTSEL0;
-+		wrmsr(sel + event_to_global_idx(evt), evt->config | EVNTSEL_EN);
-+	} else {
- 	    uint32_t ctrl = rdmsr(MSR_CORE_PERF_FIXED_CTR_CTRL);
- 	    int shift = (evt->ctr - MSR_CORE_PERF_FIXED_CTR0) * 4;
- 	    uint32_t usrospmi = 0;
--
- 	    if (evt->config & EVNTSEL_OS)
- 		    usrospmi |= (1 << 0);
- 	    if (evt->config & EVNTSEL_USR)
-@@ -200,10 +225,16 @@ static void start_event(pmu_counter_t *evt)
- static void stop_event(pmu_counter_t *evt)
- {
- 	global_disable(evt);
--	if (is_gp(evt))
--		wrmsr(MSR_P6_EVNTSEL0 + event_to_global_idx(evt),
--				evt->config & ~EVNTSEL_EN);
--	else {
-+	if (is_gp(evt)) {
-+		uint64_t sel;
-+		if (is_intel_chip)
-+			sel = MSR_P6_EVNTSEL0;
-+		else if (gp_counter_base == MSR_F15H_PERF_CTR)
-+			sel = MSR_F15H_PERF_CTL;
-+		else
-+			sel = MSR_K7_EVNTSEL0;
-+		wrmsr(sel + event_to_global_idx(evt), evt->config & ~EVNTSEL_EN);
-+	} else {
- 		uint32_t ctrl = rdmsr(MSR_CORE_PERF_FIXED_CTR_CTRL);
- 		int shift = (evt->ctr - MSR_CORE_PERF_FIXED_CTR0) * 4;
- 		wrmsr(MSR_CORE_PERF_FIXED_CTR_CTRL, ctrl & ~(0xf << shift));
-@@ -241,10 +272,16 @@ static void check_gp_counter(struct pmu_event *evt)
- 	};
- 	int i;
- 
--	for (i = 0; i < num_counters; i++, cnt.ctr++) {
-+	for (i = 0; i < num_counters; i++) {
- 		cnt.count = 0;
- 		measure(&cnt, 1);
- 		report(verify_event(cnt.count, evt), "%s-%d", evt->name, i);
-+		if (gp_counter_base == MSR_F15H_PERF_CTR)
-+			/* The counter MSRs are interleaved with the event select MSRs,
-+			 * since Family 15H. */
-+			cnt.ctr += 2;
-+		else
-+			cnt.ctr++;
- 	}
- }
- 
-@@ -252,7 +289,7 @@ static void check_gp_counters(void)
- {
- 	int i;
- 
--	for (i = 0; i < sizeof(gp_events)/sizeof(gp_events[0]); i++)
-+	for (i = 0; i < num_gp_event; i++)
- 		if (!(ebx.full & (1 << i)))
- 			check_gp_counter(&gp_events[i]);
- 		else
-@@ -288,7 +325,12 @@ static void check_counters_many(void)
- 		cnt[n].count = 0;
- 		cnt[n].ctr = gp_counter_base + n;
- 		cnt[n].config = EVNTSEL_OS | EVNTSEL_USR |
--			gp_events[i % ARRAY_SIZE(gp_events)].unit_sel;
-+				gp_events[i % num_gp_event].unit_sel;
-+
-+		if (gp_counter_base == MSR_F15H_PERF_CTR)
-+			/* The counter MSRs are interleaved with the event select MSRs,
-+			 * since Family 15H. */
-+			cnt[i].ctr += n;
- 		n++;
- 	}
- 	for (i = 0; i < edx.split.num_counters_fixed; i++) {
-@@ -311,6 +353,7 @@ static void check_counter_overflow(void)
- {
- 	uint64_t count;
- 	int i;
-+	int loop_times;
- 	pmu_counter_t cnt = {
- 		.ctr = gp_counter_base,
- 		.config = EVNTSEL_OS | EVNTSEL_USR | gp_events[1].unit_sel /* instructions */,
-@@ -319,18 +362,34 @@ static void check_counter_overflow(void)
- 	measure(&cnt, 1);
- 	count = cnt.count;
- 
--	/* clear status before test */
--	wrmsr(MSR_CORE_PERF_GLOBAL_OVF_CTRL, rdmsr(MSR_CORE_PERF_GLOBAL_STATUS));
-+	if (is_intel_chip)
-+		/* clear status before test */
-+		wrmsr(MSR_CORE_PERF_GLOBAL_OVF_CTRL,
-+		      rdmsr(MSR_CORE_PERF_GLOBAL_STATUS));
- 
- 	report_prefix_push("overflow");
- 
--	for (i = 0; i < num_counters + 1; i++, cnt.ctr++) {
-+	if (is_intel_chip)
-+		loop_times = num_counters + 1;
-+	else
-+		/* AMD CPU doesn't have fixed counters. */
-+		loop_times = num_counters;
-+	for (i = 0; i < loop_times; i++) {
- 		uint64_t status;
- 		int idx;
- 
--		cnt.count = 1 - count;
--		if (gp_counter_base == MSR_IA32_PMC0)
-+		if (is_intel_chip) {
-+			cnt.count = 1 - count;
-+			if (gp_counter_base == MSR_IA32_PMC0)
-+				cnt.count &= (1ull << eax.split.bit_width) - 1;
-+		} else {
-+			/* KVM fails to accurate count on AMD CPU,
-+			 * due to instructions in hypervisor when set
-+			 * AMD64_EVENTSEL_GUESTONLY bit?
-+			 */
-+			cnt.count = 1 - count * 0.5;
- 			cnt.count &= (1ull << eax.split.bit_width) - 1;
-+		}
- 
- 		if (i == num_counters) {
- 			cnt.ctr = fixed_events[0].unit_sel;
-@@ -343,13 +402,21 @@ static void check_counter_overflow(void)
- 			cnt.config &= ~EVNTSEL_INT;
- 		idx = event_to_global_idx(&cnt);
- 		measure(&cnt, 1);
--		report(cnt.count == 1, "cntr-%d", i);
--		status = rdmsr(MSR_CORE_PERF_GLOBAL_STATUS);
--		report(status & (1ull << idx), "status-%d", i);
--		wrmsr(MSR_CORE_PERF_GLOBAL_OVF_CTRL, status);
--		status = rdmsr(MSR_CORE_PERF_GLOBAL_STATUS);
--		report(!(status & (1ull << idx)), "status clear-%d", i);
-+		if (is_intel_chip) {
-+			report(cnt.count == 1, "cntr-%d", i);
-+			status = rdmsr(MSR_CORE_PERF_GLOBAL_STATUS);
-+			report(status & (1ull << idx), "status-%d", i);
-+			wrmsr(MSR_CORE_PERF_GLOBAL_OVF_CTRL, status);
-+			status = rdmsr(MSR_CORE_PERF_GLOBAL_STATUS);
-+			report(!(status & (1ull << idx)), "status clear-%d", i);
-+		}
- 		report(check_irq() == (i % 2), "irq-%d", i);
-+		if (gp_counter_base == MSR_F15H_PERF_CTR)
-+			/* The counter MSRs are interleaved with the event select MSRs,
-+			 * since Family 15H. */
-+			cnt.ctr += 2;
-+		else
-+			cnt.ctr++;
- 	}
- 
- 	report_prefix_pop();
-@@ -381,9 +448,13 @@ static void do_rdpmc_fast(void *ptr)
- 
- static void check_rdpmc(void)
- {
--	uint64_t val = 0xff0123456789ull;
- 	bool exc;
- 	int i;
-+	uint64_t val;
-+	if (is_intel_chip)
-+		val = 0xff0123456789ull;
-+	else
-+		val = 0xffff0123456789ull;
- 
- 	report_prefix_push("rdpmc");
- 
-@@ -406,7 +477,10 @@ static void check_rdpmc(void)
- 		/* Mask according to the number of supported bits */
- 		x &= (1ull << eax.split.bit_width) - 1;
- 
--		wrmsr(gp_counter_base + i, val);
-+		if (gp_counter_base == MSR_F15H_PERF_CTR)
-+			wrmsr(gp_counter_base + i * 2, val);
-+		else
-+			wrmsr(gp_counter_base + i, val);
- 		report(rdpmc(i) == x, "cntr-%d", i);
- 
- 		exc = test_for_exception(GP_VECTOR, do_rdpmc_fast, &cnt);
-@@ -453,9 +527,10 @@ static void check_running_counter_wrmsr(void)
- 	stop_event(&evt);
- 	report(evt.count < gp_events[1].min, "cntr");
- 
--	/* clear status before overflow test */
--	wrmsr(MSR_CORE_PERF_GLOBAL_OVF_CTRL,
--	      rdmsr(MSR_CORE_PERF_GLOBAL_STATUS));
-+	if (is_intel_chip)
-+		/* clear status before overflow test */
-+		wrmsr(MSR_CORE_PERF_GLOBAL_OVF_CTRL,
-+		      rdmsr(MSR_CORE_PERF_GLOBAL_STATUS));
- 
- 	evt.count = 0;
- 	start_event(&evt);
-@@ -468,8 +543,10 @@ static void check_running_counter_wrmsr(void)
- 
- 	loop();
- 	stop_event(&evt);
--	status = rdmsr(MSR_CORE_PERF_GLOBAL_STATUS);
--	report(status & 1, "status");
-+	if (is_intel_chip) {
-+		status = rdmsr(MSR_CORE_PERF_GLOBAL_STATUS);
-+		report(status & 1, "status");
-+	}
- 
- 	report_prefix_pop();
- }
-@@ -605,6 +682,45 @@ static void  check_gp_counters_write_width(void)
- 	}
- }
- 
-+static void check_amd_gp_counters_write_width(void)
-+{
-+	u64 val_64 = 0xffffff0123456789ull;
-+	u64 val_32 = val_64 & ((1ull << 32) - 1);
-+	u64 val_max_width = val_64 & ((1ull << eax.split.bit_width) - 1);
-+	int i;
-+
-+	/* There are 4 legacy counters, and 6 core PerfMon counters,
-+	 * select the less one. */
-+	int legacy_num_counter = 4;
-+	for (i = 0; i < legacy_num_counter; i++) {
-+		wrmsr(MSR_K7_PERFCTR0 + i, val_32);
-+		assert(rdmsr(MSR_K7_PERFCTR0 + i) == val_32);
-+		assert(rdmsr(MSR_F15H_PERF_CTR + 2 * i) == val_32);
-+
-+		wrmsr(MSR_K7_PERFCTR0 + i, val_max_width);
-+		assert(rdmsr(MSR_K7_PERFCTR0 + i) == val_max_width);
-+		assert(rdmsr(MSR_F15H_PERF_CTR + 2 * i) == val_max_width);
-+
-+		wrmsr(MSR_K7_PERFCTR0 + i, val_64);
-+		assert(rdmsr(MSR_K7_PERFCTR0 + i) == val_max_width);
-+		assert(rdmsr(MSR_F15H_PERF_CTR + 2 * i) == val_max_width);
-+	}
-+
-+	for (i = 0; i < legacy_num_counter; i++) {
-+		wrmsr(MSR_F15H_PERF_CTR + 2 * i, val_32);
-+		assert(rdmsr(MSR_K7_PERFCTR0 + i) == val_32);
-+		assert(rdmsr(MSR_F15H_PERF_CTR + 2 * i) == val_32);
-+
-+		wrmsr(MSR_F15H_PERF_CTR + 2 * i, val_max_width);
-+		assert(rdmsr(MSR_K7_PERFCTR0 + i) == val_max_width);
-+		assert(rdmsr(MSR_F15H_PERF_CTR + 2 * i) == val_max_width);
-+
-+		wrmsr(MSR_F15H_PERF_CTR + 2 * i, val_64);
-+		assert(rdmsr(MSR_K7_PERFCTR0 + i) == val_max_width);
-+		assert(rdmsr(MSR_F15H_PERF_CTR + 2 * i) == val_max_width);
-+	}
-+}
-+
- /*
-  * Per the SDM, reference cycles are currently implemented using the
-  * core crystal clock, TSC, or bus clock. Calibrate to the TSC
-@@ -655,27 +771,47 @@ static void set_ref_cycle_expectations(void)
- 
- int main(int ac, char **av)
- {
--	struct cpuid id = cpuid(10);
--
--	setup_vm();
--	handle_irq(PC_VECTOR, cnt_overflow);
--	buf = malloc(N*64);
-+	struct cpuid id;
-+	is_intel_chip = is_intel();
-+	if (is_intel_chip) {
-+		id = cpuid(10);
-+		eax.full = id.a;
-+		ebx.full = id.b;
-+		edx.full = id.d;
-+		gp_counter_base = MSR_IA32_PERFCTR0;
-+		gp_events = (struct pmu_event *)&intel_gp_event;
-+		num_gp_event = ARRAY_SIZE(intel_gp_event);
-+		if (!eax.split.version_id) {
-+			printf("No pmu is detected!\n");
-+			return report_summary();
-+		}
- 
--	eax.full = id.a;
--	ebx.full = id.b;
--	edx.full = id.d;
-+		if (eax.split.version_id == 1) {
-+			printf("PMU version 1 is not supported\n");
-+			return report_summary();
-+		}
-+	} else {
-+		gp_counter_base = MSR_K7_PERFCTR0;
-+		gp_events = (struct pmu_event *)&amd_gp_event;
-+		num_gp_event = ARRAY_SIZE(amd_gp_event);
-+		id = cpuid(1);
-+		/* Performance-monitoring supported from K7 and later. */
-+		if (((id.a & 0xf00) >> 8) < 6) {
-+			printf("No pmu is detected!\n");
-+			return report_summary();
-+		}
- 
--	if (!eax.split.version_id) {
--		printf("No pmu is detected!\n");
--		return report_summary();
-+		edx.split.num_counters_fixed = 0;
-+		eax.split.num_counters = 4;
-+		eax.split.bit_width = 48;
- 	}
- 
--	if (eax.split.version_id == 1) {
--		printf("PMU version 1 is not supported\n");
--		return report_summary();
--	}
-+	setup_vm();
-+	handle_irq(PC_VECTOR, cnt_overflow);
-+	buf = malloc(N * 64);
- 
--	set_ref_cycle_expectations();
-+	if (is_intel_chip)
-+		set_ref_cycle_expectations();
- 
- 	printf("PMU version:         %d\n", eax.split.version_id);
- 	printf("GP counters:         %d\n", eax.split.num_counters);
-@@ -693,7 +829,20 @@ int main(int ac, char **av)
- 	} else {
- 		check_counters();
- 
--		if (rdmsr(MSR_IA32_PERF_CAPABILITIES) & PMU_CAP_FW_WRITES) {
-+		if (!is_intel_chip) {
-+			id = raw_cpuid(0x80000001, 0);
-+			if (id.c & (1 << 23)) {
-+				/* support core perfmon */
-+				gp_counter_base = MSR_F15H_PERF_CTR;
-+				eax.split.num_counters = 6;
-+				num_counters = eax.split.num_counters;
-+				report_prefix_push("core perf");
-+				check_counters();
-+				check_amd_gp_counters_write_width();
-+			}
-+		}
-+
-+		if (is_intel_chip && rdmsr(MSR_IA32_PERF_CAPABILITIES) & PMU_CAP_FW_WRITES) {
- 			gp_counter_base = MSR_IA32_PMC0;
- 			report_prefix_push("full-width writes");
- 			check_counters();
--- 
-2.32.1 (Apple Git-133)
+For memory hot-removal, as I replied previously, looks the kernel cannot re=
+ject
+the removal if it allows memory offline.  Any suggestion on this?
+
+--=20
+Thanks,
+-Kai
+
 
