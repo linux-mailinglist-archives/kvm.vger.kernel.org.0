@@ -2,141 +2,195 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 5460958205A
-	for <lists+kvm@lfdr.de>; Wed, 27 Jul 2022 08:46:01 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 97BA5582138
+	for <lists+kvm@lfdr.de>; Wed, 27 Jul 2022 09:36:58 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230103AbiG0Goq (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 27 Jul 2022 02:44:46 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53146 "EHLO
+        id S230371AbiG0Hg4 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 27 Jul 2022 03:36:56 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39964 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230032AbiG0Gog (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 27 Jul 2022 02:44:36 -0400
-Received: from mail-yw1-x1131.google.com (mail-yw1-x1131.google.com [IPv6:2607:f8b0:4864:20::1131])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 37CDB3B94A
-        for <kvm@vger.kernel.org>; Tue, 26 Jul 2022 23:44:35 -0700 (PDT)
-Received: by mail-yw1-x1131.google.com with SMTP id 00721157ae682-31bf3656517so165076677b3.12
-        for <kvm@vger.kernel.org>; Tue, 26 Jul 2022 23:44:35 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=dIk2fwAV08ErsFGBkLnOZZhNa5yhNMvY3ac+VYQOigs=;
-        b=FbQa9CWLgVzM61MSmBPyFGX9XBA0kbtIVSTlHrDxqFV7j9+nBUaDPM+IUXwo/wIUxG
-         KPPngDX3kSul/rXj7jFnIoNpmzw1YsziS5UghXNzbGSQCw2GmedjHkmtFF9d+Vi5gbUu
-         Fb6kAFhm8lDtast5qrj+uxouUqkz48c+lZ+lloD4rE3qxbkZ6O7MmYuNxYH6nu+lYkaZ
-         ZqBk3LD/TBSJ3QBsNMJz74WoUcVEXc38KSO2H+/KkazhvWng04YhOfKpn6ja192YM6n6
-         2nUSpoi059q0aWddmCnes3XpDmvC2G8NmEb6zgHCbUHo7SianEodgTrBRyS6lxyIEY8B
-         Nr7A==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=dIk2fwAV08ErsFGBkLnOZZhNa5yhNMvY3ac+VYQOigs=;
-        b=dNFfYmxjr6Qme6kZlxJ/P1l7zcFjJvk2DVWirg7zxSeuZOskIilboAqOufwuYOqelm
-         BfL9looiYTzzGh8gaWvYglx6dTJDTrnIO75x4BQCxPbjCqNxHNdMm/abC5yoJ36axluE
-         /gp5BpLgGGz6qdBAMde+Zth0OFZ8kFvoB6ZSggcL41t9cuKVybp/GLvpcEceMYJfuhns
-         neuAyiI0QIO8KSsNdeCC5DaRinarOfQDbW9oTTDo8yJclf25qu63PE3eYRGSed8l71nc
-         XBZrdDr21xiQiDBJLiR7TsPfDKSQZwYkcJtn0dAAXwmIMRq9GqHzQHDHEH103TW51dHB
-         M5tQ==
-X-Gm-Message-State: AJIora9tRIv9ed+C8utQJC095QMdBBZzIoyxk7ksmt4Y0ukJDD14da6r
-        9uHqlOBNwC0jFAYKtQnY45KIEGRhsS4Mwqynn4iPrA==
-X-Google-Smtp-Source: AGRyM1tipEd88RLhbMI7x25eWr2jW13u3yKwL9gRJHxWq0wXbqhO5fcpzdUM6gejuzUvo5aZ0pG/tzyitGNCKLOTCM8=
-X-Received: by 2002:a0d:c587:0:b0:31e:8bab:394d with SMTP id
- h129-20020a0dc587000000b0031e8bab394dmr18163248ywd.107.1658904274278; Tue, 26
- Jul 2022 23:44:34 -0700 (PDT)
-MIME-Version: 1.0
-References: <20220722230241.1944655-1-avagin@google.com> <Yts1tUfPxdPH5XGs@google.com>
- <CAEWA0a4hrRb5HYLqa1Q47=guY6TLsWSJ_zxNjOXXV2jCjUekUA@mail.gmail.com> <69b45487-ce0e-d643-6c48-03c5943ce2e6@redhat.com>
-In-Reply-To: <69b45487-ce0e-d643-6c48-03c5943ce2e6@redhat.com>
-From:   Andrei Vagin <avagin@google.com>
-Date:   Tue, 26 Jul 2022 23:44:23 -0700
-Message-ID: <CAEWA0a4G2VzDA0C5ujXQpeyxT98Sg1tmeaLBX7VX3g16WrwjjQ@mail.gmail.com>
-Subject: Re: [PATCH 0/5] KVM/x86: add a new hypercall to execute host system
-To:     Paolo Bonzini <pbonzini@redhat.com>
-Cc:     Sean Christopherson <seanjc@google.com>,
-        linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Jianfeng Tan <henry.tjf@antfin.com>,
-        Adin Scannell <ascannell@google.com>,
-        Konstantin Bogomolov <bogomolov@google.com>,
-        Etienne Perot <eperot@google.com>,
-        Andy Lutomirski <luto@kernel.org>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org,
-        "H. Peter Anvin" <hpa@zytor.com>
+        with ESMTP id S229680AbiG0Hgy (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 27 Jul 2022 03:36:54 -0400
+Received: from out30-133.freemail.mail.aliyun.com (out30-133.freemail.mail.aliyun.com [115.124.30.133])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 454B82A94C;
+        Wed, 27 Jul 2022 00:36:50 -0700 (PDT)
+X-Alimail-AntiSpam: AC=PASS;BC=-1|-1;BR=01201311R251e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=ay29a033018046059;MF=xuanzhuo@linux.alibaba.com;NM=1;PH=DS;RN=36;SR=0;TI=SMTPD_---0VKZmDNB_1658907402;
+Received: from localhost(mailfrom:xuanzhuo@linux.alibaba.com fp:SMTPD_---0VKZmDNB_1658907402)
+          by smtp.aliyun-inc.com;
+          Wed, 27 Jul 2022 15:36:43 +0800
+Message-ID: <1658907340.34387-1-xuanzhuo@linux.alibaba.com>
+Subject: Re: [PATCH v13 07/42] virtio_ring: split: stop __vring_new_virtqueue as export symbol
+Date:   Wed, 27 Jul 2022 15:35:40 +0800
+From:   Xuan Zhuo <xuanzhuo@linux.alibaba.com>
+To:     Jason Wang <jasowang@redhat.com>
+Cc:     Richard Weinberger <richard@nod.at>,
+        Anton Ivanov <anton.ivanov@cambridgegreys.com>,
+        Johannes Berg <johannes@sipsolutions.net>,
+        "Michael S. Tsirkin" <mst@redhat.com>,
+        "David S. Miller" <davem@davemloft.net>,
+        Eric Dumazet <edumazet@google.com>,
+        Jakub Kicinski <kuba@kernel.org>,
+        Paolo Abeni <pabeni@redhat.com>,
+        Hans de Goede <hdegoede@redhat.com>,
+        Mark Gross <markgross@kernel.org>,
+        Vadim Pasternak <vadimp@nvidia.com>,
+        Bjorn Andersson <bjorn.andersson@linaro.org>,
+        Mathieu Poirier <mathieu.poirier@linaro.org>,
+        Cornelia Huck <cohuck@redhat.com>,
+        Halil Pasic <pasic@linux.ibm.com>,
+        Eric Farman <farman@linux.ibm.com>,
+        Heiko Carstens <hca@linux.ibm.com>,
+        Vasily Gorbik <gor@linux.ibm.com>,
+        Alexander Gordeev <agordeev@linux.ibm.com>,
+        Christian Borntraeger <borntraeger@linux.ibm.com>,
+        Sven Schnelle <svens@linux.ibm.com>,
+        Alexei Starovoitov <ast@kernel.org>,
+        Daniel Borkmann <daniel@iogearbox.net>,
+        Jesper Dangaard Brouer <hawk@kernel.org>,
+        John Fastabend <john.fastabend@gmail.com>,
+        Vincent Whitchurch <vincent.whitchurch@axis.com>,
+        linux-um@lists.infradead.org, netdev@vger.kernel.org,
+        platform-driver-x86@vger.kernel.org,
+        linux-remoteproc@vger.kernel.org, linux-s390@vger.kernel.org,
+        kvm@vger.kernel.org, bpf@vger.kernel.org,
+        kangjie.xu@linux.alibaba.com,
+        virtualization@lists.linux-foundation.org
+References: <20220726072225.19884-1-xuanzhuo@linux.alibaba.com>
+ <20220726072225.19884-8-xuanzhuo@linux.alibaba.com>
+ <a5449e49-ba38-9760-ac07-cfad048bc602@redhat.com>
+In-Reply-To: <a5449e49-ba38-9760-ac07-cfad048bc602@redhat.com>
 Content-Type: text/plain; charset="UTF-8"
-X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+Content-Transfer-Encoding: quoted-printable
+X-Spam-Status: No, score=-9.9 required=5.0 tests=BAYES_00,
         ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-        USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=unavailable
-        autolearn_force=no version=3.4.6
+        UNPARSEABLE_RELAY,USER_IN_DEF_SPF_WL autolearn=ham autolearn_force=no
+        version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Jul 26, 2022 at 3:27 AM Paolo Bonzini <pbonzini@redhat.com> wrote:
+On Wed, 27 Jul 2022 10:58:05 +0800, Jason Wang <jasowang@redhat.com> wrote:
 >
-> On 7/26/22 10:33, Andrei Vagin wrote:
-...
-> > == Execute system calls from a user-space VMM ==
+> =E5=9C=A8 2022/7/26 15:21, Xuan Zhuo =E5=86=99=E9=81=93:
+> > There is currently only one place to reference __vring_new_virtqueue()
+> > directly from the outside of virtio core. And here vring_new_virtqueue()
+> > can be used instead.
 > >
-> > In this case, the Sentry is always running in VM, and a syscall handler in GR0
-> > triggers vmexit to transfer control to VMM (user process that is running in
-> > hr3), VMM executes a required system call, and transfers control back to the
-> > Sentry. We can say that it implements the suggested hypercall in the
-> > user-space.
+> > Subsequent patches will modify __vring_new_virtqueue, so stop it as an
+> > export symbol for now.
 > >
-> > The sentry syscall time is 2100ns in this case.
+> > Signed-off-by: Xuan Zhuo <xuanzhuo@linux.alibaba.com>
+> > ---
+> >   drivers/virtio/virtio_ring.c | 25 ++++++++++++++++---------
+> >   include/linux/virtio_ring.h  | 10 ----------
+> >   tools/virtio/virtio_test.c   |  4 ++--
+> >   3 files changed, 18 insertions(+), 21 deletions(-)
 > >
-> > The new hypercall does the same but without switching to the host ring 3. It
-> > reduces the sentry syscall time to 1000ns.
+> > diff --git a/drivers/virtio/virtio_ring.c b/drivers/virtio/virtio_ring.c
+> > index 0ad35eca0d39..4e54ed7ee7fb 100644
+> > --- a/drivers/virtio/virtio_ring.c
+> > +++ b/drivers/virtio/virtio_ring.c
+> > @@ -204,6 +204,14 @@ struct vring_virtqueue {
+> >   #endif
+> >   };
+> >
+> > +static struct virtqueue *__vring_new_virtqueue(unsigned int index,
+> > +					       struct vring vring,
+> > +					       struct virtio_device *vdev,
+> > +					       bool weak_barriers,
+> > +					       bool context,
+> > +					       bool (*notify)(struct virtqueue *),
+> > +					       void (*callback)(struct virtqueue *),
+> > +					       const char *name);
+> >
+> >   /*
+> >    * Helpers.
+> > @@ -2197,14 +2205,14 @@ irqreturn_t vring_interrupt(int irq, void *_vq)
+> >   EXPORT_SYMBOL_GPL(vring_interrupt);
+> >
+> >   /* Only available for split ring */
+> > -struct virtqueue *__vring_new_virtqueue(unsigned int index,
+> > -					struct vring vring,
+> > -					struct virtio_device *vdev,
+> > -					bool weak_barriers,
+> > -					bool context,
+> > -					bool (*notify)(struct virtqueue *),
+> > -					void (*callback)(struct virtqueue *),
+> > -					const char *name)
+> > +static struct virtqueue *__vring_new_virtqueue(unsigned int index,
+> > +					       struct vring vring,
+> > +					       struct virtio_device *vdev,
+> > +					       bool weak_barriers,
+> > +					       bool context,
+> > +					       bool (*notify)(struct virtqueue *),
+> > +					       void (*callback)(struct virtqueue *),
+> > +					       const char *name)
+> >   {
+> >   	struct vring_virtqueue *vq;
+> >
+> > @@ -2272,7 +2280,6 @@ struct virtqueue *__vring_new_virtqueue(unsigned =
+int index,
+> >   	kfree(vq);
+> >   	return NULL;
+> >   }
+> > -EXPORT_SYMBOL_GPL(__vring_new_virtqueue);
+> >
+> >   struct virtqueue *vring_create_virtqueue(
+> >   	unsigned int index,
+> > diff --git a/include/linux/virtio_ring.h b/include/linux/virtio_ring.h
+> > index b485b13fa50b..8b8af1a38991 100644
+> > --- a/include/linux/virtio_ring.h
+> > +++ b/include/linux/virtio_ring.h
+> > @@ -76,16 +76,6 @@ struct virtqueue *vring_create_virtqueue(unsigned in=
+t index,
+> >   					 void (*callback)(struct virtqueue *vq),
+> >   					 const char *name);
+> >
+> > -/* Creates a virtqueue with a custom layout. */
+> > -struct virtqueue *__vring_new_virtqueue(unsigned int index,
+> > -					struct vring vring,
+> > -					struct virtio_device *vdev,
+> > -					bool weak_barriers,
+> > -					bool ctx,
+> > -					bool (*notify)(struct virtqueue *),
+> > -					void (*callback)(struct virtqueue *),
+> > -					const char *name);
+> > -
+> >   /*
+> >    * Creates a virtqueue with a standard layout but a caller-allocated
+> >    * ring.
+> > diff --git a/tools/virtio/virtio_test.c b/tools/virtio/virtio_test.c
+> > index 23f142af544a..86a410ddcedd 100644
+> > --- a/tools/virtio/virtio_test.c
+> > +++ b/tools/virtio/virtio_test.c
+> > @@ -102,8 +102,8 @@ static void vq_reset(struct vq_info *info, int num,=
+ struct virtio_device *vdev)
+> >
+> >   	memset(info->ring, 0, vring_size(num, 4096));
+> >   	vring_init(&info->vring, num, info->ring, 4096);
 >
-> Yeah, ~3000 clock cycles is what I would expect.
 >
-> What does it translate to in terms of benchmarks?  For example a simple
-> netperf/UDP_RR benchmark.
+> Let's remove the duplicated vring_init() here.
+>
+> With this removed:
 
-* netperf in gVisor with the syscall fast path:
-$  ./runsc --platform kvm --network host --rootless do netperf -H ::1
--p 12865 -t UDP_RR
-MIGRATED UDP REQUEST/RESPONSE TEST from ::0 (::) port 0 AF_INET6 to
-::1 (::1) port 0 AF_INET6 : interval : first burst 0
-Local /Remote
-Socket Size   Request  Resp.   Elapsed  Trans.
-Send   Recv   Size     Size    Time     Rate
-bytes  Bytes  bytes    bytes   secs.    per sec
+The reason I didn't delete this vring_init() is because info->vring is used
+elsewhere. So it can't be deleted directly.
 
-212992 212992 1        1       10.00    95965.18
-212992 212992
+Thanks.
 
-* netperf in gVisor without syscall fast path:
-$  ./runsc.orig --platform kvm --network host --rootless do netperf -H
-::1 -p 12865 -t UDP_RR
-MIGRATED UDP REQUEST/RESPONSE TEST from ::0 (::) port 0 AF_INET6 to
-::1 (::1) port 0 AF_INET6 : interval : first burst 0
-Local /Remote
-Socket Size   Request  Resp.   Elapsed  Trans.
-Send   Recv   Size     Size    Time     Rate
-bytes  Bytes  bytes    bytes   secs.    per sec
-
-212992 212992 1        1       10.00    58709.17
-212992 212992
-
-* netperf executed on the host without gVisor
-$ netperf -H ::1 -p 12865 -t UDP_RR
-MIGRATED UDP REQUEST/RESPONSE TEST from ::0 (::) port 0 AF_INET6 to
-::1 (::1) port 0 AF_INET6 : interval : first burst 0
-Local /Remote
-Socket Size   Request  Resp.   Elapsed  Trans.
-Send   Recv   Size     Size    Time     Rate
-bytes  Bytes  bytes    bytes   secs.    per sec
-
-212992 212992 1        1       10.00    146460.80
-212992 212992
-
-Thanks,
-Andrei
+>
+> Acked-by: Jason Wang <jasowang@redhat.com>
+>
+>
+> > -	info->vq =3D __vring_new_virtqueue(info->idx, info->vring, vdev, true,
+> > -					 false, vq_notify, vq_callback, "test");
+> > +	info->vq =3D vring_new_virtqueue(info->idx, num, 4096, vdev, true, fa=
+lse,
+> > +				       info->ring, vq_notify, vq_callback, "test");
+> >   	assert(info->vq);
+> >   	info->vq->priv =3D info;
+> >   }
+>
