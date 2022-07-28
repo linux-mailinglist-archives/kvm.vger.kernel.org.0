@@ -2,79 +2,72 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 8E7F0584851
-	for <lists+kvm@lfdr.de>; Fri, 29 Jul 2022 00:35:17 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 39A8D584869
+	for <lists+kvm@lfdr.de>; Fri, 29 Jul 2022 00:50:01 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232781AbiG1WfQ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 28 Jul 2022 18:35:16 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43524 "EHLO
+        id S232163AbiG1Wty (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 28 Jul 2022 18:49:54 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52972 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229813AbiG1WfO (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 28 Jul 2022 18:35:14 -0400
-Received: from mail-pl1-x633.google.com (mail-pl1-x633.google.com [IPv6:2607:f8b0:4864:20::633])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 37DEB6275
-        for <kvm@vger.kernel.org>; Thu, 28 Jul 2022 15:35:13 -0700 (PDT)
-Received: by mail-pl1-x633.google.com with SMTP id z19so3022808plb.1
-        for <kvm@vger.kernel.org>; Thu, 28 Jul 2022 15:35:13 -0700 (PDT)
+        with ESMTP id S229614AbiG1Wtx (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 28 Jul 2022 18:49:53 -0400
+Received: from mail-io1-xd2a.google.com (mail-io1-xd2a.google.com [IPv6:2607:f8b0:4864:20::d2a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E6EB751421
+        for <kvm@vger.kernel.org>; Thu, 28 Jul 2022 15:49:51 -0700 (PDT)
+Received: by mail-io1-xd2a.google.com with SMTP id y197so2471391iof.12
+        for <kvm@vger.kernel.org>; Thu, 28 Jul 2022 15:49:51 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
+        d=csp-edu.20210112.gappssmtp.com; s=20210112;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:from:to:cc;
-        bh=QH1SswHogd2HYdm+DJGhURoSojlk/dCm4tDDpy+Plzc=;
-        b=DWgbT7/SYnRGYxKp/73nM2bQFceSlVA3zb3AvExKGWdz6XwR3KqCuJ6tMopoNSTwhZ
-         eRIWaAsjGsBzKoJLpgSXn/X1Rb5rYTvp96m87FPAX8pjQAaL0bAJ1a2qS2/XEY9sAUAG
-         wlSocwL9FFsjh5l3rUCCSMbBEYKVHLaf7bLu91sxJBWbWynNrrpotygzZHJtHcGGTG5x
-         REfu8SuEJ6iTKYLpB7DhRVq8pvy4lLMWQ8xsS196GMWGPWpwxR03Y8QbGeIuGrHFcSxE
-         m8rLptXZeTOF/Y/UgNB1TgAHFr7LVURTKoVoEVeyvaCbVO37TsavGwXUMnetdD9CtNtp
-         wD1A==
+        bh=zp3s0H17eNS8RLeZJwuDNDBm2rORUB76Sr+0ULT5CUY=;
+        b=6PGeof5tavB8xZZTMvnmR1G9QRO/mLfOjc0reQCxtLSivzfi9q8iDpINmOG3CqIk1J
+         V/4tvnXKugAAt21XfV/Z2uiIxw+8hXzLA2dsAv/uoXinTF4o8Nqwz1gfVxY8qwjGwY/g
+         ufPTjRpLHsKTfLpawEKVoX2rNyPWNAmDWeHmOBct8AVx0zYE3CiPQ8jV0V4RIpUngPKE
+         1fnLh+jaLYGb+QbWJx0XiPPLS/1W7idEyupyUBwnk3IYA1WWk6ObCbHxbzGlYOeQ7hMS
+         srTT0S2fMC/rzOYu2eNTUrB+cZyNdLRlHtwIcSDAz3Wu+lGFtnno1DSP3IU7TtdWciEa
+         si1w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:x-gm-message-state:from:to:cc;
-        bh=QH1SswHogd2HYdm+DJGhURoSojlk/dCm4tDDpy+Plzc=;
-        b=XBvZTRvs29Vp0NUxY6nWFBJahF29T8jFV2zfHjXyNAtRYZACUVwwU01JztbiR1OMb2
-         pgbGEsME5WNr609cjwe88lfwkljm/INB0dkg3A4quA2t8eNeOHuHmDuuZoiyqnLRuVre
-         RZsy6Ykz99kkKAZGCe75/9YRO1Mvs9dSbDQOfIVUcZbjVA9UN05shK3AnnOFwgePd4jH
-         QsfiHBPjmnBVxu1jAxHlZGC+/pktUyuTaE/If6bx0WK7HNf4kpFqtKmawVRCfsgOAF3k
-         wefOMzcXFV4TfZ1YLh2wEdR0Gqog8FS10U6mGBTJfA44FUcQ3MrMTSLD5u7gcV13TRk5
-         0OZw==
-X-Gm-Message-State: ACgBeo1lQlxme/kUsaDnuJ6gJvrpMBBnU3/0D7DR/FTZFmhLQ4KUQOO2
-        3wlw7ng79BeWl9Oh4JhnL5FUFw==
-X-Google-Smtp-Source: AA6agR6XAn25lwoKn04LJu4ycH59kHbRg8DdCtEwqTycQaCiFYXeFkDEbZF8JhKF9qSbtzmZIYGbKA==
-X-Received: by 2002:a17:902:d4c6:b0:16d:2f7f:9a71 with SMTP id o6-20020a170902d4c600b0016d2f7f9a71mr974863plg.36.1659047712638;
-        Thu, 28 Jul 2022 15:35:12 -0700 (PDT)
-Received: from google.com (7.104.168.34.bc.googleusercontent.com. [34.168.104.7])
-        by smtp.gmail.com with ESMTPSA id ix2-20020a170902f80200b0016c5306917fsm1883805plb.53.2022.07.28.15.35.11
+        bh=zp3s0H17eNS8RLeZJwuDNDBm2rORUB76Sr+0ULT5CUY=;
+        b=431i8yhsB58sTIyWwP4era7kmlzGrVrP25RblufNu2h8JqtxH0ByhKb7lTxuTpJA7p
+         If2SQLG4YI7Xom+lYecJE3Ngr08VSe42kzaXf7cSx8FY88ef6C501lYRANnf2ntyUlnH
+         1CxqcJhiw0M+saOoYP89WkQM34TuAAZC9F34N+D+q+j664StzyEZMOUBp49D5jkbNnYV
+         J6rFtjpdErrCCMHPR66PsO6F0OVN8VDb32lgJ8A7+WZJXijZrAVDM9W5JeiZbDfaekcM
+         yIdLXP+ADvzDqdVc9OFQGHitMY5BSlzrqXCGDGTMds7nBGCRtaZ7fTOQoKPUJIhtWEQC
+         rJpA==
+X-Gm-Message-State: AJIora+iDf9mAP/5/T05VET7vEx3zYssMN9KsMbgi1mpr5ph1pj36wNz
+        Qlc17bZMAeShd0c/VXmYfHupAA==
+X-Google-Smtp-Source: AGRyM1uqTbWLghcYSIroC35qIH2sScjpChjXWce93/xlSm9BiJZwYwxOvdmB3S0gh0B1moTqmpnYeQ==
+X-Received: by 2002:a05:6638:270d:b0:33f:3f96:468c with SMTP id m13-20020a056638270d00b0033f3f96468cmr394388jav.272.1659048591254;
+        Thu, 28 Jul 2022 15:49:51 -0700 (PDT)
+Received: from kernel-dev-1 (75-168-113-69.mpls.qwest.net. [75.168.113.69])
+        by smtp.gmail.com with ESMTPSA id w11-20020a056602034b00b0067bd23bb692sm853686iou.27.2022.07.28.15.49.50
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 28 Jul 2022 15:35:11 -0700 (PDT)
-Date:   Thu, 28 Jul 2022 22:35:08 +0000
-From:   Sean Christopherson <seanjc@google.com>
-To:     Paolo Bonzini <pbonzini@redhat.com>
-Cc:     Vitaly Kuznetsov <vkuznets@redhat.com>, kvm@vger.kernel.org,
-        Anirudh Rayabharam <anrayabh@linux.microsoft.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Maxim Levitsky <mlevitsk@redhat.com>,
-        linux-hyperv@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v4 09/25] KVM: VMX: nVMX: Support TSC scaling and
- PERF_GLOBAL_CTRL with enlightened VMCS
-Message-ID: <YuMPHCanuPtYEN4j@google.com>
-References: <20220714091327.1085353-1-vkuznets@redhat.com>
- <20220714091327.1085353-10-vkuznets@redhat.com>
- <YtnMIkFI469Ub9vB@google.com>
- <48de7ea7-fc1a-6a83-3d6f-e04d26ea2f05@redhat.com>
- <Yt7ehL0HfR3b97FQ@google.com>
- <870d507d-a516-5601-4d21-2bfd571cf008@redhat.com>
- <YuMKBzeB2cE/NZ2K@google.com>
- <62ac29cb-3270-a810-bad1-3692da448016@redhat.com>
+        Thu, 28 Jul 2022 15:49:50 -0700 (PDT)
+Date:   Thu, 28 Jul 2022 17:49:49 -0500
+From:   Coleman Dietsch <dietschc@csp.edu>
+To:     Sean Christopherson <seanjc@google.com>
+Cc:     kvm@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+        Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org,
+        "H . Peter Anvin" <hpa@zytor.com>, linux-kernel@vger.kernel.org,
+        skhan@linuxfoundation.org, Pavel Skripkin <paskripkin@gmail.com>,
+        linux-kernel-mentees@lists.linuxfoundation.org,
+        syzbot+e54f930ed78eb0f85281@syzkaller.appspotmail.com
+Subject: Re: [PATCH] KVM: x86/xen: Fix bug in kvm_xen_vcpu_set_attr()
+Message-ID: <YuMSjQ3Y2ADA40KV@kernel-dev-1>
+References: <20220728194736.383727-1-dietschc@csp.edu>
+ <YuL0auT3lFhfQHeY@google.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <62ac29cb-3270-a810-bad1-3692da448016@redhat.com>
-X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-        USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=unavailable
+In-Reply-To: <YuL0auT3lFhfQHeY@google.com>
+X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS autolearn=ham
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -82,21 +75,131 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Jul 29, 2022, Paolo Bonzini wrote:
-> On 7/29/22 00:13, Sean Christopherson wrote:
-> > The only flaw in this is if KVM gets handed a CPUID model that enumerates support
-> > for 2025 (or whenever the next update comes) but not 2022.  Hmm, though if Microsoft
-> > defines each new "version" as a full superset, then even that theoretical bug goes
-> > away.  I'm happy to be optimistic for once and give this a shot.  I definitely like
-> > that it makes it easier to see the deltas between versions.
+On Thu, Jul 28, 2022 at 08:41:14PM +0000, Sean Christopherson wrote:
+> Be more specific in the shortlog.  "Fix a bug in XYZ" doesn't provide any info
+> about the bug itself, and can even become frustratingly stale if XYZ is renamed.
+> I believe we should end up with two patches (see below), e.g.
 > 
-> Okay, I have queued the series but I still haven't gone through all the
-> comments.  So this will _not_ be in the 5.21 pull request.
+>   KVM: x86/xen: Initialize Xen timer only once (when it's NOT running)
+> 
+> and
+>   
+>   KVM: x86/xen: Stop Xen timer before changing the IRQ vector
+> 
 
-I assume you meant 5.20?
+Got it, I will work on splitting the v2 into a patch set as you suggested
+(with better names of course).
 
-> The first patch also needs a bit more thought to figure out the impact on
-> userspace and whether we can consider syndbg niche enough to not care.
+> Note, I'm assuming timer_virq is a vector of some form, I haven't actually looked
+> that far into the code.
 > 
-> Paolo
+> On Thu, Jul 28, 2022, Coleman Dietsch wrote:
+> > This crash appears to be happening when vcpu->arch.xen.timer is already set
 > 
+> Instead of saying "This crash", provide the actual splat (sanitized to make it
+> more readable).  That way readers, reviewers, and archaeologists don't need to
+> open up a hyperlink to get details on what broken.
+> 
+> > and kvm_xen_init_timer(vcpu) is called.
+> 
+> Wrap changelogs at ~75 chars.
+> 
+> > During testing with the syzbot reproducer code it seemed apparent that the
+> > else if statement in the KVM_XEN_VCPU_ATTR_TYPE_TIMER switch case was not
+> > being reached, which is where the kvm_xen_stop_timer(vcpu) call is located.
+> 
+> Neither the shortlog nor the changelog actually says anything about what is actually
+> being changed.
+> 
+
+I will make sure to address all these issues in the v2 patch set.
+
+> > Link: https://syzkaller.appspot.com/bug?id=8234a9dfd3aafbf092cc5a7cd9842e3ebc45fc42
+> > Reported-and-tested-by: syzbot+e54f930ed78eb0f85281@syzkaller.appspotmail.com
+> > Signed-off-by: Coleman Dietsch <dietschc@csp.edu>
+> > ---
+> >  arch/x86/kvm/xen.c | 9 ++++++---
+> >  1 file changed, 6 insertions(+), 3 deletions(-)
+> > 
+> > diff --git a/arch/x86/kvm/xen.c b/arch/x86/kvm/xen.c
+> > index 610beba35907..4b4b985813c5 100644
+> > --- a/arch/x86/kvm/xen.c
+> > +++ b/arch/x86/kvm/xen.c
+> > @@ -707,6 +707,12 @@ int kvm_xen_vcpu_set_attr(struct kvm_vcpu *vcpu, struct kvm_xen_vcpu_attr *data)
+> >  		break;
+> >  
+> >  	case KVM_XEN_VCPU_ATTR_TYPE_TIMER:
+> > +		/* Stop current timer if it is enabled */
+> > +		if (kvm_xen_timer_enabled(vcpu)) {
+> > +			kvm_xen_stop_timer(vcpu);
+> > +			vcpu->arch.xen.timer_virq = 0;
+> > +		}
+> > +
+> >  		if (data->u.timer.port) {
+> >  			if (data->u.timer.priority != KVM_IRQ_ROUTING_XEN_EVTCHN_PRIO_2LEVEL) {
+> >  				r = -EINVAL;
+> 
+> I'm not entirely sure this is correct.  Probably doesn't matter, but there's a
+> subtle ABI change here in that invoking the ioctl with a "bad" priority will
+> cancel any existing timer.
+> 
+
+I will try to get some clarification before I send in the next patch.
+
+> And there appear to be two separate bugs: initializing the hrtimer while it's
+> running, and not canceling a running timer before changing timer_virq.
+> 
+
+This does seem to be the case so I will be splitting v2 into a patch
+set.
+
+> Calling kvm_xen_init_timer() on "every" KVM_XEN_VCPU_ATTR_TYPE_TIMER is odd and
+> unnecessary, it only needs to be called once during vCPU setup.  If Xen doesn't
+> have such a hook, then a !ULL check can be done on vcpu->arch.xen.timer.function
+> to initialize the timer on-demand.
+> 
+
+Yes I also thought that was a bit odd that kvm_xen_init_timer() is called on "every" KVM_XEN_VCPU_ATTR_TYPE_TIMER 
+
+> With that out of the way, the code can be streamlined a bit, e.g. something like
+> this?
+> 
+> 	case KVM_XEN_VCPU_ATTR_TYPE_TIMER:
+> 		if (data->u.timer.port &&
+> 		    data->u.timer.priority != KVM_IRQ_ROUTING_XEN_EVTCHN_PRIO_2LEVEL) {
+> 			r = -EINVAL;
+> 			break;
+> 		}
+> 
+> 		if (!vcpu->arch.xen.timer.function)
+> 			kvm_xen_init_timer(vcpu);
+> 
+> 		/* Stop the timer (if it's running) before changing the vector. */
+> 		kvm_xen_stop_timer(vcpu);
+> 		vcpu->arch.xen.timer_virq = data->u.timer.port;
+> 
+> 		if (data->u.timer.port && data->u.timer.expires_ns)
+> 			kvm_xen_start_timer(vcpu, data->u.timer.expires_ns,
+> 					    data->u.timer.expires_ns -
+> 					    get_kvmclock_ns(vcpu->kvm));
+> 		r = 0;
+> 		break;
+> 
+
+I agree this code could use some cleanup, I'll see what I can do.
+
+> > @@ -720,9 +726,6 @@ int kvm_xen_vcpu_set_attr(struct kvm_vcpu *vcpu, struct kvm_xen_vcpu_attr *data)
+> >  				kvm_xen_start_timer(vcpu, data->u.timer.expires_ns,
+> >  						    data->u.timer.expires_ns -
+> >  						    get_kvmclock_ns(vcpu->kvm));
+> > -		} else if (kvm_xen_timer_enabled(vcpu)) {
+> > -			kvm_xen_stop_timer(vcpu);
+> > -			vcpu->arch.xen.timer_virq = 0;
+> >  		}
+> >  
+> >  		r = 0;
+> > -- 
+> > 2.34.1
+> > 
+
+Thank you for the feedback Sean, it has been most helpful!
