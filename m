@@ -2,66 +2,66 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 57F1E58430D
-	for <lists+kvm@lfdr.de>; Thu, 28 Jul 2022 17:27:15 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 4A777584366
+	for <lists+kvm@lfdr.de>; Thu, 28 Jul 2022 17:43:17 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231676AbiG1P1N (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 28 Jul 2022 11:27:13 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41918 "EHLO
+        id S230127AbiG1PnP (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 28 Jul 2022 11:43:15 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55326 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230245AbiG1P1L (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 28 Jul 2022 11:27:11 -0400
-Received: from mail-pj1-x102c.google.com (mail-pj1-x102c.google.com [IPv6:2607:f8b0:4864:20::102c])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9247454CAE
-        for <kvm@vger.kernel.org>; Thu, 28 Jul 2022 08:27:10 -0700 (PDT)
-Received: by mail-pj1-x102c.google.com with SMTP id v16-20020a17090abb9000b001f25244c65dso5629212pjr.2
-        for <kvm@vger.kernel.org>; Thu, 28 Jul 2022 08:27:10 -0700 (PDT)
+        with ESMTP id S229532AbiG1PnN (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 28 Jul 2022 11:43:13 -0400
+Received: from mail-pl1-x633.google.com (mail-pl1-x633.google.com [IPv6:2607:f8b0:4864:20::633])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CA22568DF0
+        for <kvm@vger.kernel.org>; Thu, 28 Jul 2022 08:43:12 -0700 (PDT)
+Received: by mail-pl1-x633.google.com with SMTP id o3so2127336ple.5
+        for <kvm@vger.kernel.org>; Thu, 28 Jul 2022 08:43:12 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
         h=date:from:to:cc:subject:message-id:references:mime-version
          :content-disposition:in-reply-to;
-        bh=csSpCZse6HkYpD0alLhYtbnpKIryDbXXSRH4Zixe2I0=;
-        b=DkCdzxLK5NMyhbrRcX2IZyC+qb3fASA7xm+FklYTyIR9i/BtuJCrGtnZ+AdUf0X0wm
-         hGWnJ2oNm7620mgjU+M3EsIbnX9EOpgInxnyAH4HoQucT4UJh+HDjoWAUyeJ+WsbPayP
-         jWsjtVh/hMHN7ORsq0XS+MXrT4EbO9ByEAyycoW2W6ogA76kfiecl+tobRog/ZwdtR2/
-         ZUKCtjOm4My2QJZRlWG8SmorApa8fR3ZFp9TTfOaJgn7R78s1zs/vAHZzkhtK8vr7Q5g
-         b15cKKmG3mRaTCY3npAWbsJ0rBfv8LLQAzK9L8QPC/UxuKQr6Xu/7Ssu/zmG2oXqHLEn
-         WVyg==
+        bh=OvVirUwva7iitmCWZI9gOg8g2CWki9PsaWOed+nTpOU=;
+        b=AiRFPHaA7gZOYNc69ZY96d8VhlOkMnaDNRHXUPXYvDABBFKi+J5uw7z/ofo7pXx+kZ
+         OLkNhH6Kgd3V69r4I7YmRLT/Tjia4T46btmtB1dIkIw28Vis+01PIRvIPlJitO/FwFw/
+         1U1P8H0p3NMJKHx+U00LYiF/H6ovjadOyBh9jbw5EV0yzAp2mhazixc661ahs+T9PIG2
+         PLxkwjYXNKIM7s/70lnmsJ6WXvH8uJuhEARVWaFT4vFEvklLelKE8IPxtg2ZlI3gWFrm
+         WLZJK2MpAbAObHMb4Zc+gAO/fwqAEfWJaGvKTCbie4uhrbeJl0J8pMdvZBKF8ZOaLOct
+         J5WA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:date:from:to:cc:subject:message-id:references
          :mime-version:content-disposition:in-reply-to;
-        bh=csSpCZse6HkYpD0alLhYtbnpKIryDbXXSRH4Zixe2I0=;
-        b=KJyxBLcbUHjLpMLUwKl6Dnyi+ObbetwjxsO4RopoTOqSCCqCIG/GpuZFUA/L8AJJBt
-         M7tZyUzBqShM3ZBH7NWXfefzSrm6YW/cmRL70dsjtD6U+F1IH87asue2s1ULhGlGH2io
-         VvQauLadu699AFCwlzqdz8akbCaHwE1riCtfulByPm98mwAd3UfpOfZbiZXAXlIH0CeA
-         sSKO1BvhlbDi8ay++Dpvj63DnK26AfVTbBTGHYBbw2Hh+QA+m9EGnjTwzrk1gUHn5b03
-         HpCW5N0xF3NvYia5K6e6OLAappP00mfI5tkyTsrL+5W29gGBLCaMsfIzNFHkF/qZ2PIK
-         8Ntg==
-X-Gm-Message-State: AJIora88iRbiOFd9NZVLx/vBwMbnfKgj072uVsOcZzZdLq+0h0iXeuXY
-        XcWDIwOxjh6l3gxS8zSxwwamjw==
-X-Google-Smtp-Source: AGRyM1sSrhEeTcGBug/hRwN/UzMJ5vxfJ6sRHheRoPfJs89jT56gNZ6MA6i+bGEizG7IcFl0eZ8aig==
-X-Received: by 2002:a17:902:ea07:b0:16c:1efb:916e with SMTP id s7-20020a170902ea0700b0016c1efb916emr26478459plg.25.1659022029899;
-        Thu, 28 Jul 2022 08:27:09 -0700 (PDT)
+        bh=OvVirUwva7iitmCWZI9gOg8g2CWki9PsaWOed+nTpOU=;
+        b=dgg0QqRZ1jp37aFTi48w7djQNiRS3yJfiZbyRnzrs4uJcn4xzObBviLiMM2U7l1GYC
+         QSFa+FTJJM0TSILPy6fZnC074NcDIcdUWvJC2sdgNNhkW2zCTJ7Fh4PsUiH+ettBjjXV
+         8rw/Wofp4oKtj9KPj690MZZ+81cLLY0YaHZtOcwE7Fs67Qvltd8Tf9TprfBdCzIHxBwT
+         p53gTWNosfafONt92hRfjbVhZqrQew7Q2ZdbTxyzkhW3pCbFy7A37qQvReskm6b8VIgZ
+         3Cg/hmXwWfXKG1+BxPl1ffWmv+5aBfPfbBbIrCyMuvaknIX4OXkyKKBtKXnAAeLblbwO
+         rFFg==
+X-Gm-Message-State: AJIora99o/epizJWUt4hlH3Av4OCidz8Mdqu2dyvhsYXl8IBE6FNR5sZ
+        +BXdIGMWmRbCh+QIN9M/4lqkag==
+X-Google-Smtp-Source: AGRyM1sH1quS5prsBUI9o3IRDsm8cA8ZRJf5b7TYuFSboXNv9OrkXcNXF6d6uc0XJRCyRVNDWZAZfg==
+X-Received: by 2002:a17:902:d483:b0:16d:6d17:1695 with SMTP id c3-20020a170902d48300b0016d6d171695mr20600840plg.73.1659022992223;
+        Thu, 28 Jul 2022 08:43:12 -0700 (PDT)
 Received: from google.com (7.104.168.34.bc.googleusercontent.com. [34.168.104.7])
-        by smtp.gmail.com with ESMTPSA id h14-20020a056a00000e00b005255263a864sm881752pfk.169.2022.07.28.08.27.08
+        by smtp.gmail.com with ESMTPSA id q17-20020aa78431000000b0052badc0f3d7sm947704pfn.50.2022.07.28.08.43.11
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 28 Jul 2022 08:27:09 -0700 (PDT)
-Date:   Thu, 28 Jul 2022 15:27:05 +0000
+        Thu, 28 Jul 2022 08:43:11 -0700 (PDT)
+Date:   Thu, 28 Jul 2022 15:43:07 +0000
 From:   Sean Christopherson <seanjc@google.com>
-To:     Like Xu <like.xu.linux@gmail.com>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-Subject: Re: [PATCH 1/3] KVM: x86: Refresh PMU after writes to
- MSR_IA32_PERF_CAPABILITIES
-Message-ID: <YuKqyTvbVx2UyP2w@google.com>
-References: <20220727233424.2968356-1-seanjc@google.com>
- <20220727233424.2968356-2-seanjc@google.com>
- <271bddfa-9e48-d5f6-6147-af346d7946bf@gmail.com>
+To:     Michael Roth <michael.roth@amd.com>
+Cc:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        Tom Lendacky <thomas.lendacky@amd.com>
+Subject: Re: Possible 5.19 regression for systems with 52-bit physical
+ address support
+Message-ID: <YuKuiyFFFY3QbZ3z@google.com>
+References: <20220728134430.ulykdplp6fxgkyiw@amd.com>
+ <20220728135320.6u7rmejkuqhy4mhr@amd.com>
+ <YuKjsuyM7+Gbr2nw@google.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <271bddfa-9e48-d5f6-6147-af346d7946bf@gmail.com>
+In-Reply-To: <YuKjsuyM7+Gbr2nw@google.com>
 X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
         ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
@@ -73,56 +73,43 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Jul 28, 2022, Like Xu wrote:
-> On 28/7/2022 7:34 am, Sean Christopherson wrote:
-> > Refresh the PMU if userspace modifies MSR_IA32_PERF_CAPABILITIES.  KVM
-> > consumes the vCPU's PERF_CAPABILITIES when enumerating PEBS support, but
-> > relies on CPUID updates to refresh the PMU.  I.e. KVM will do the wrong
-> > thing if userspace stuffs PERF_CAPABILITIES _after_ setting guest CPUID.
+On Thu, Jul 28, 2022, Sean Christopherson wrote:
+> On Thu, Jul 28, 2022, Michael Roth wrote:
+> > On Thu, Jul 28, 2022 at 08:44:30AM -0500, Michael Roth wrote:
+> Different approach.  To fix the bug with enable_mmio_caching not being set back to
+> true when a vendor-specific mask allows caching, I believe the below will do the
+> trick.
+
+...
+ 
+> diff --git a/arch/x86/kvm/mmu/spte.c b/arch/x86/kvm/mmu/spte.c
+> index 7314d27d57a4..a57add994b8d 100644
+> --- a/arch/x86/kvm/mmu/spte.c
+> +++ b/arch/x86/kvm/mmu/spte.c
+> @@ -19,8 +19,9 @@
+>  #include <asm/memtype.h>
+>  #include <asm/vmx.h>
 > 
-> Unwise userspace should reap its consequences if it does not break KVM or host.
-
-I don't think this is a case of userspace being weird or unwise.  IMO, setting
-CPUID before MSRs is perfectly logical and intuitive.
-
-> When a guest feature can be defined/controlled by multiple KVM APIs entries,
-> (such as SET_CPUID2, msr_feature, KVM_CAP, module_para), should KVM
-> define the priority of these APIs (e.g. whether they can override each other) ?
-
-KVM does have "rules" in the sense that it has an established ABI for things
-like KVM_CAP and module params, though documentation may be lacking in some cases.
-The CPUID and MSR ioctls don't have a prescribe ordering though.
-
-> Removing this ambiguity ensures consistency in the architecture and behavior
-> of all KVM features.
-
-Agreed, but the CPUID and MSR ioctls (among many others) have existed for quite
-some time.  KVM likely can't retroactively force a specific order without breaking
-one userspace or another.
-
-> Any further performance optimizations can be based on these finalized values
-> as you do.
+> -bool __read_mostly enable_mmio_caching = true;
+> -module_param_named(mmio_caching, enable_mmio_caching, bool, 0444);
+> +bool __read_mostly enable_mmio_caching;
+> +static bool __read_mostly __enable_mmio_caching = true;
+> +module_param_named(mmio_caching, __enable_mmio_caching, bool, 0444);
 > 
-> > 
-> > Opportunistically fix a curly-brace indentation.
-> > 
-> > Fixes: c59a1f106f5c ("KVM: x86/pmu: Add IA32_PEBS_ENABLE MSR emulation for extended PEBS")
-> > Cc: Like Xu <like.xu.linux@gmail.com>
-> > Signed-off-by: Sean Christopherson <seanjc@google.com>
-> > ---
-> >   arch/x86/kvm/x86.c | 4 ++--
-> >   1 file changed, 2 insertions(+), 2 deletions(-)
-> > 
-> > diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-> > index 5366f884e9a7..362c538285db 100644
-> > --- a/arch/x86/kvm/x86.c
-> > +++ b/arch/x86/kvm/x86.c
-> > @@ -3543,9 +3543,9 @@ int kvm_set_msr_common(struct kvm_vcpu *vcpu, struct msr_data *msr_info)
-> >   			return 1;
-> >   		vcpu->arch.perf_capabilities = data;
-> > -
-> > +		kvm_pmu_refresh(vcpu);
+>  u64 __read_mostly shadow_host_writable_mask;
+>  u64 __read_mostly shadow_mmu_writable_mask;
+> @@ -340,6 +341,8 @@ void kvm_mmu_set_mmio_spte_mask(u64 mmio_value, u64 mmio_mask, u64 access_mask)
+>         BUG_ON((u64)(unsigned)access_mask != access_mask);
+>         WARN_ON(mmio_value & shadow_nonpresent_or_rsvd_lower_gfn_mask);
 > 
-> I had proposed this diff but was met with silence.
+> +       enable_mmio_caching = __enable_mmio_caching;
 
-My apologies, I either missed it or didn't connect the dots.
+This isn't ideal as the value used by KVM won't be reflected in the module param.
+The basic approach is sound, but KVM should snapshot the original value of the module
+param and "reset" to that.
+
+> +
+>         if (!enable_mmio_caching)
+>                 mmio_value = 0;
+> 
+> 
