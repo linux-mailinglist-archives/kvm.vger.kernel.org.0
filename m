@@ -2,72 +2,74 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id BFFC75835B6
-	for <lists+kvm@lfdr.de>; Thu, 28 Jul 2022 01:40:10 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 3278B5835DA
+	for <lists+kvm@lfdr.de>; Thu, 28 Jul 2022 02:02:35 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233061AbiG0XkA (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 27 Jul 2022 19:40:00 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59902 "EHLO
+        id S234392AbiG1ACe (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 27 Jul 2022 20:02:34 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47448 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231322AbiG0Xj6 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 27 Jul 2022 19:39:58 -0400
-Received: from mail-pf1-x432.google.com (mail-pf1-x432.google.com [IPv6:2607:f8b0:4864:20::432])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D63FF3AE78;
-        Wed, 27 Jul 2022 16:39:57 -0700 (PDT)
-Received: by mail-pf1-x432.google.com with SMTP id c139so487652pfc.2;
-        Wed, 27 Jul 2022 16:39:57 -0700 (PDT)
+        with ESMTP id S234300AbiG1ACc (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 27 Jul 2022 20:02:32 -0400
+Received: from mail-lf1-x12f.google.com (mail-lf1-x12f.google.com [IPv6:2a00:1450:4864:20::12f])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9237E49B5E
+        for <kvm@vger.kernel.org>; Wed, 27 Jul 2022 17:02:31 -0700 (PDT)
+Received: by mail-lf1-x12f.google.com with SMTP id bf9so522649lfb.13
+        for <kvm@vger.kernel.org>; Wed, 27 Jul 2022 17:02:31 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=p442nXLXAOZRcv+94Q684jDX8TVbbWTp/gcLJwOXX+A=;
-        b=jPBI0Ycntp69I51ne0TN1jsgVup7yxCEsc5QGJLiJRsrtOHyPBVQgsEjEM6eG6084F
-         nsURI8JfizNvVXUVj2kYFThtseLegKEJ9dI5T/xnPma+YdwrlfhCx4fhXWBT8dAW8/nn
-         7Q0jqblHvkPj9WJx6NHL8rlGxeBgfjgM3eqRF5NT2zF4kzOiMY1uyqj728/Hoiw6WPGD
-         PC47gukhNIRXPdmQlAjvw+JaIZZEgdd7SpODeWGNgbbUBUSjSFi7lhp1JKeTkRh/V02K
-         r50ncEsIV3KBqMXcxSKKiUpYOmCqgB998c4k1NP5gze6CaUx2MKAuxt700tGxokhI6vq
-         md7A==
+        d=profian-com.20210112.gappssmtp.com; s=20210112;
+        h=from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=mBsuLV2Kcuz0I195V1tt9wJXgZd8wQhbwFhjdKnnIJE=;
+        b=l3MGDDEdS9t9yQxk624TuJG1yi8Q65z7u1Kbu1NGAGE5iTZqEyvSpMIssIgZqFbcog
+         tgnqIdBLB5ZyY01UAVkhNmm08bUwvtYktXorCFReTU6g1W3UEQ71DFIvS1QxHdwBYaBe
+         l1dkPVjdWppEix7iwqiFhqXCBId631FcZLwaU+RdLbVqguhF2XtJkWgCGKKKWQ7+EOi3
+         YVyXFf9I+QMPBz/N/FzKGSfpAidyW1O2O2Q9dqX9sywEb0g7SbOSdNzAhzbhRSLirQ9R
+         f06nl3wGAqpcepN/PuNK/WvfOceNFDYHD+Bzpj+S7lEbu5x1YuTZzkIvVBFEO41MccVj
+         J/Qw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=p442nXLXAOZRcv+94Q684jDX8TVbbWTp/gcLJwOXX+A=;
-        b=DT7Okq+4V3hsdVbWhfXVbm4FaJD8fsvxWJcCK80IqCo5yFtxDEkzzMWMyciTS0ePGQ
-         t1ytIablyX2ZSv9rkGgZjQy2yvBPuVyJit1aPdXxwX5jUGrhmZ5zqk3emO+1iEN9iW2F
-         u0KdrytwQCNdG/CNVbgigB9+0ObHTMW9MXzzs1L99jjWbQHr+68OcTItt3k8pgikvsMn
-         VcHp2ZqxzshRwoi4MXTlLdIWtCJW1gnc6PUr1iJwJyn3t2ZliTDhLueFo7iJIG7/GdrA
-         3XCcTIb64Ldi987cLGQcR84fpG66QQhYHniNMTJsjloguVxYD7D0sQ/Ac822XGRC+hMB
-         oxbA==
-X-Gm-Message-State: AJIora/h6s5AFc+uc9Wz4QmoSkEsHMSnfeaBfccM59TcrggtA/g/IVzQ
-        RNj/76eZ59XrkZ9FTQ3EUc4=
-X-Google-Smtp-Source: AGRyM1sVjvFFZjDF/xCwbBFsQzYhoF10W2YAiWw4h2MfxldU/DH7d4JnPU15WFGIyRb3a7iCJ7aYWg==
-X-Received: by 2002:a63:112:0:b0:419:e88d:7a2a with SMTP id 18-20020a630112000000b00419e88d7a2amr21227973pgb.410.1658965197220;
-        Wed, 27 Jul 2022 16:39:57 -0700 (PDT)
-Received: from localhost ([192.55.54.49])
-        by smtp.gmail.com with ESMTPSA id p7-20020a170902ebc700b0016d1f6d1b99sm14206091plg.49.2022.07.27.16.39.56
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=mBsuLV2Kcuz0I195V1tt9wJXgZd8wQhbwFhjdKnnIJE=;
+        b=gzWiyLvxNXMduCuQtkcReA3osB96srcz3geXmpHDlUL8WzD8EHCis+mgfZU+YG8IIM
+         1V0h8+FL/kzeDMhIgioBh7jI1CnJpAf/ykq34LDFH3PQlDzJudzmG7sikKAJZ3M6FGjQ
+         mNaPiprReW/dKSHoYiYJ8nLOSUp+X+FeT1lyLqkeCBQejdPFJVgK4Z8+k+B81enK3ANA
+         GBGYTw9xSsckhM3/OE9kZ/mEnvCTlcM1yCuMJ6fFt3OXxcvSwIfWZ6HMI/apR0Cd5aE7
+         4xodVrKk/r1NAxdE6mFwgrEw0OQYbxjzOJMcP6V/kg+CFUFDatutYwZejFlpvNAVVQ3P
+         f9+Q==
+X-Gm-Message-State: AJIora+bao5519lTrQGxQqc9HFzc6g2yryZqP/zr91eqnmJe+67qof1M
+        FVOSxFi2bpHVUIzxSwCWtCz36A==
+X-Google-Smtp-Source: AGRyM1uJOZj/Ud8yjL00jfvfNrl8tmJjn2jtL+kO+cqfm7FOI+GilysBPfZMbkNBrIU8/Qy5rZM+9g==
+X-Received: by 2002:a05:6512:1694:b0:48a:9d45:763f with SMTP id bu20-20020a056512169400b0048a9d45763fmr4368355lfb.662.1658966549714;
+        Wed, 27 Jul 2022 17:02:29 -0700 (PDT)
+Received: from localhost (91-154-92-55.elisa-laajakaista.fi. [91.154.92.55])
+        by smtp.gmail.com with ESMTPSA id q27-20020ac2515b000000b0048a897adbc9sm2096529lfd.211.2022.07.27.17.02.28
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 27 Jul 2022 16:39:56 -0700 (PDT)
-Date:   Wed, 27 Jul 2022 16:39:55 -0700
-From:   Isaku Yamahata <isaku.yamahata@gmail.com>
-To:     Kai Huang <kai.huang@intel.com>
-Cc:     Isaku Yamahata <isaku.yamahata@gmail.com>,
-        isaku.yamahata@intel.com, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>
-Subject: Re: [PATCH v7 041/102] KVM: VMX: Introduce test mode related to EPT
- violation VE
-Message-ID: <20220727233955.GC3669189@ls.amr.corp.intel.com>
-References: <cover.1656366337.git.isaku.yamahata@intel.com>
- <cadf3221e3f7b911c810f15cfe300dd5337a966d.1656366338.git.isaku.yamahata@intel.com>
- <52915310c9118a124da2380daf3d753a818de05e.camel@intel.com>
- <20220719144936.GX1379820@ls.amr.corp.intel.com>
- <9945dbf586d8738b7cf0af53bfb760da9eb9e882.camel@intel.com>
+        Wed, 27 Jul 2022 17:02:29 -0700 (PDT)
+From:   Jarkko Sakkinen <jarkko@profian.com>
+To:     Paolo Bonzini <pbonzini@redhat.com>
+Cc:     Jarkko Sakkinen <jarkko@profian.com>, stable@vger.kernel.org,
+        Jarkko Sakkinen <jarkko@kernel.org>,
+        Sean Christopherson <seanjc@google.com>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+        Dave Hansen <dave.hansen@linux.intel.com>,
+        x86@kernel.org (maintainer:X86 ARCHITECTURE (32-BIT AND 64-BIT)),
+        "H. Peter Anvin" <hpa@zytor.com>,
+        Brijesh Singh <brijesh.singh@amd.com>,
+        Isaku Yamahata <isaku.yamahata@intel.com>,
+        kvm@vger.kernel.org (open list:KERNEL VIRTUAL MACHINE FOR X86 (KVM/x86)),
+        linux-kernel@vger.kernel.org (open list:X86 ARCHITECTURE (32-BIT AND
+        64-BIT))
+Subject: [PATCH] KVM: x86/mmu: Fix incorrect use of CONFIG_RETPOLINE
+Date:   Thu, 28 Jul 2022 03:02:21 +0300
+Message-Id: <20220728000221.19088-1-jarkko@profian.com>
+X-Mailer: git-send-email 2.37.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <9945dbf586d8738b7cf0af53bfb760da9eb9e882.camel@intel.com>
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
-        RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS autolearn=ham
+Content-Transfer-Encoding: 8bit
+X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS autolearn=ham
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -75,38 +77,53 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Jul 20, 2022 at 05:13:08PM +1200,
-Kai Huang <kai.huang@intel.com> wrote:
+Use "#ifdef" instead of "#if", as it is possible to select KVM
+without enabling RETPOLINE.
 
-> On Tue, 2022-07-19 at 07:49 -0700, Isaku Yamahata wrote:
-> > On Fri, Jul 08, 2022 at 02:23:43PM +1200,
-> > Kai Huang <kai.huang@intel.com> wrote:
-> > 
-> > > On Mon, 2022-06-27 at 14:53 -0700, isaku.yamahata@intel.com wrote:
-> > > > From: Isaku Yamahata <isaku.yamahata@intel.com>
-> > > > 
-> > > > To support TDX, KVM is enhanced to operate with #VE.  For TDX, KVM programs
-> > > > to inject #VE conditionally and set #VE suppress bit in EPT entry.  For VMX
-> > > > case, #VE isn't used.  If #VE happens for VMX, it's a bug.  To be
-> > > > defensive (test that VMX case isn't broken), introduce option
-> > > > ept_violation_ve_test and when it's set, set error.
-> > > 
-> > > I don't see why we need this patch.  It may be helpful during your test, but why
-> > > do we need this patch for formal submission?
-> > > 
-> > > And for a normal guest, what prevents one vcpu from sending #VE IPI to another
-> > > vcpu?
-> > 
-> > Paolo suggested it as follows.  Maybe it should be kernel config.
-> > (I forgot to add suggested-by. I'll add it)
-> > 
-> > https://lore.kernel.org/lkml/84d56339-4a8a-6ddb-17cb-12074588ba9c@redhat.com/
-> > 
-> > > 
-> 
-> OK.  But can we assume a normal guest won't sending #VE IPI?
+Adding the following list of flags on top of tinyconfig is an
+example of a failing config file:
 
-Theoretically nothing prevents that.  I wouldn't way "normal".
-Anyway this is off by default.
+CONFIG_64BIT=y
+CONFIG_PCI=y
+CONFIG_ACPI=y
+CONFIG_VIRTUALIZATION=y
+CONFIG_HIGH_RES_TIMERS=y
+CONFIG_CRYPTO=y
+CONFIG_DMADEVICES=y
+CONFIG_X86_MCE=y
+CONFIG_RETPOLINE=y
+CONFIG_MEMORY_FAILURE=y
+CONFIG_KVM=y
+CONFIG_KVM_AMD=y
+CONFIG_CRYPTO_DEV_CCP=y
+CONFIG_CRYPTO_DEV_CCP_DD=y
+CONFIG_CRYPTO_DEV_SP_CCP=y
+CONFIG_CRYPTO_DEV_SP_PSP=y
+CONFIG_KVM_AMD_SEV=y
+CONFIG_AMD_MEM_ENCRYPT=y
+CONFIG_AMD_MEM_ENCRYPT_ACTIVE_BY_DEFAULT=n
+
+Cc: stable@vger.kernel.org # 5.19
+Cc: Jarkko Sakkinen <jarkko@kernel.org>
+Fixes: d1f5c8366288 ("KVM: x86/mmu: Introduce kvm_mmu_map_tdp_page() for use by TDX and SNP")
+Signed-off-by: Jarkko Sakkinen <jarkko@profian.com>
+---
+ arch/x86/kvm/mmu/mmu.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
+index 0b99ee4ea184..e08c7e85bbb9 100644
+--- a/arch/x86/kvm/mmu/mmu.c
++++ b/arch/x86/kvm/mmu/mmu.c
+@@ -4213,7 +4213,7 @@ kvm_pfn_t kvm_mmu_map_tdp_page(struct kvm_vcpu *vcpu, gpa_t gpa,
+ 		 * direct_page_fault() when appropriate.
+ 		 */
+ 		//r = direct_page_fault(vcpu, &fault);
+-#if CONFIG_RETPOLINE
++#ifdef CONFIG_RETPOLINE
+ 		if (fault.is_tdp)
+ 			r = kvm_tdp_page_fault(vcpu, &fault);
+ #else
 -- 
-Isaku Yamahata <isaku.yamahata@gmail.com>
+2.36.1
+
