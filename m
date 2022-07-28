@@ -2,177 +2,289 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 902AB5839BF
-	for <lists+kvm@lfdr.de>; Thu, 28 Jul 2022 09:46:22 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id CFD8E583A2F
+	for <lists+kvm@lfdr.de>; Thu, 28 Jul 2022 10:18:25 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234735AbiG1HqU (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 28 Jul 2022 03:46:20 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38868 "EHLO
+        id S235098AbiG1ISW (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 28 Jul 2022 04:18:22 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34578 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234631AbiG1HqS (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 28 Jul 2022 03:46:18 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id E025054644
-        for <kvm@vger.kernel.org>; Thu, 28 Jul 2022 00:46:16 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1658994376;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=JxD0SjhCn3MzLYFy6Mt2UGeOLFZapeIwuPiohQNsjYI=;
-        b=ZcuRNIejqYlRacGe8ZGcb1nurgmIHQ//qZp0KBKDJio2VIZD86Zd0UcEhU5oQFELU6c/GC
-        8Mm7sdrZ0RCjoNR3XQwSFsz0Xbp0kO57c3H4QHDctdvH7zUxcuk4u0uQ483EaQnU8KxHm6
-        JXijoK4GZChpfqzzb9UOuHaBw42nmbc=
-Received: from mimecast-mx02.redhat.com (mx3-rdu2.redhat.com
- [66.187.233.73]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-223-tU15Gl_zNy21qkwgOyDVpQ-1; Thu, 28 Jul 2022 03:46:11 -0400
-X-MC-Unique: tU15Gl_zNy21qkwgOyDVpQ-1
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.rdu2.redhat.com [10.11.54.8])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 44F361C05ABC;
-        Thu, 28 Jul 2022 07:46:10 +0000 (UTC)
-Received: from starship (unknown [10.40.192.46])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 6D7C5C27D95;
-        Thu, 28 Jul 2022 07:46:02 +0000 (UTC)
-Message-ID: <7c4cf32dca42ab84bdb427a9e4862dbf5509f961.camel@redhat.com>
-Subject: Re: [RFC PATCH v3 04/19] KVM: x86: mmu: allow to enable write
- tracking externally
-From:   Maxim Levitsky <mlevitsk@redhat.com>
-To:     Sean Christopherson <seanjc@google.com>
-Cc:     kvm@vger.kernel.org, Wanpeng Li <wanpengli@tencent.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Jani Nikula <jani.nikula@linux.intel.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Tvrtko Ursulin <tvrtko.ursulin@linux.intel.com>,
-        Rodrigo Vivi <rodrigo.vivi@intel.com>,
-        Zhenyu Wang <zhenyuw@linux.intel.com>,
-        Joonas Lahtinen <joonas.lahtinen@linux.intel.com>,
-        Tom Lendacky <thomas.lendacky@amd.com>,
-        Ingo Molnar <mingo@redhat.com>,
-        David Airlie <airlied@linux.ie>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org,
-        intel-gfx@lists.freedesktop.org, Daniel Vetter <daniel@ffwll.ch>,
-        Borislav Petkov <bp@alien8.de>, Joerg Roedel <joro@8bytes.org>,
-        linux-kernel@vger.kernel.org, Jim Mattson <jmattson@google.com>,
-        Zhi Wang <zhi.a.wang@intel.com>,
-        Brijesh Singh <brijesh.singh@amd.com>,
-        "H. Peter Anvin" <hpa@zytor.com>,
-        intel-gvt-dev@lists.freedesktop.org,
-        dri-devel@lists.freedesktop.org
-Date:   Thu, 28 Jul 2022 10:46:01 +0300
-In-Reply-To: <Yt6/9V0S9of7dueW@google.com>
-References: <20220427200314.276673-1-mlevitsk@redhat.com>
-         <20220427200314.276673-5-mlevitsk@redhat.com> <YoZyWOh4NPA0uN5J@google.com>
-         <5ed0d0e5a88bbee2f95d794dbbeb1ad16789f319.camel@redhat.com>
-         <c22a18631c2067871b9ed8a9246ad58fa1ab8947.camel@redhat.com>
-         <Yt6/9V0S9of7dueW@google.com>
+        with ESMTP id S234999AbiG1IST (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 28 Jul 2022 04:18:19 -0400
+Received: from out30-42.freemail.mail.aliyun.com (out30-42.freemail.mail.aliyun.com [115.124.30.42])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0C9D55A2DE;
+        Thu, 28 Jul 2022 01:18:15 -0700 (PDT)
+X-Alimail-AntiSpam: AC=PASS;BC=-1|-1;BR=01201311R721e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=ay29a033018045168;MF=xuanzhuo@linux.alibaba.com;NM=1;PH=DS;RN=36;SR=0;TI=SMTPD_---0VKefuGf_1658996289;
+Received: from localhost(mailfrom:xuanzhuo@linux.alibaba.com fp:SMTPD_---0VKefuGf_1658996289)
+          by smtp.aliyun-inc.com;
+          Thu, 28 Jul 2022 16:18:10 +0800
+Message-ID: <1658995783.1026692-1-xuanzhuo@linux.alibaba.com>
+Subject: Re: [PATCH v13 16/42] virtio_ring: split: introduce virtqueue_resize_split()
+Date:   Thu, 28 Jul 2022 16:09:43 +0800
+From:   Xuan Zhuo <xuanzhuo@linux.alibaba.com>
+To:     Jason Wang <jasowang@redhat.com>
+Cc:     Richard Weinberger <richard@nod.at>,
+        Anton Ivanov <anton.ivanov@cambridgegreys.com>,
+        Johannes Berg <johannes@sipsolutions.net>,
+        "Michael S. Tsirkin" <mst@redhat.com>,
+        "David S. Miller" <davem@davemloft.net>,
+        Eric Dumazet <edumazet@google.com>,
+        Jakub Kicinski <kuba@kernel.org>,
+        Paolo Abeni <pabeni@redhat.com>,
+        Hans de Goede <hdegoede@redhat.com>,
+        Mark Gross <markgross@kernel.org>,
+        Vadim Pasternak <vadimp@nvidia.com>,
+        Bjorn Andersson <bjorn.andersson@linaro.org>,
+        Mathieu Poirier <mathieu.poirier@linaro.org>,
+        Cornelia Huck <cohuck@redhat.com>,
+        Halil Pasic <pasic@linux.ibm.com>,
+        Eric Farman <farman@linux.ibm.com>,
+        Heiko Carstens <hca@linux.ibm.com>,
+        Vasily Gorbik <gor@linux.ibm.com>,
+        Alexander Gordeev <agordeev@linux.ibm.com>,
+        Christian Borntraeger <borntraeger@linux.ibm.com>,
+        Sven Schnelle <svens@linux.ibm.com>,
+        Alexei Starovoitov <ast@kernel.org>,
+        Daniel Borkmann <daniel@iogearbox.net>,
+        Jesper Dangaard Brouer <hawk@kernel.org>,
+        John Fastabend <john.fastabend@gmail.com>,
+        Vincent Whitchurch <vincent.whitchurch@axis.com>,
+        linux-um@lists.infradead.org, netdev <netdev@vger.kernel.org>,
+        platform-driver-x86@vger.kernel.org,
+        linux-remoteproc@vger.kernel.org, linux-s390@vger.kernel.org,
+        kvm <kvm@vger.kernel.org>,
+        "open list:XDP (eXpress Data Path)" <bpf@vger.kernel.org>,
+        Kangjie Xu <kangjie.xu@linux.alibaba.com>,
+        virtualization <virtualization@lists.linux-foundation.org>
+References: <20220726072225.19884-1-xuanzhuo@linux.alibaba.com>
+ <20220726072225.19884-17-xuanzhuo@linux.alibaba.com>
+ <15aa26f2-f8af-5dbd-f2b2-9270ad873412@redhat.com>
+ <1658907413.1860468-2-xuanzhuo@linux.alibaba.com>
+ <CACGkMEvxsOfiiaWWAR8P68GY1yfwgTvaAbHk1JF7pTw-o2k25w@mail.gmail.com>
+ <1658992162.584327-1-xuanzhuo@linux.alibaba.com>
+ <CACGkMEv-KYieHKXY_Qn0nfcnLMOSF=TowF5PwLKOxESL3KQ40Q@mail.gmail.com>
+In-Reply-To: <CACGkMEv-KYieHKXY_Qn0nfcnLMOSF=TowF5PwLKOxESL3KQ40Q@mail.gmail.com>
 Content-Type: text/plain; charset="UTF-8"
-User-Agent: Evolution 3.36.5 (3.36.5-2.fc32) 
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.85 on 10.11.54.8
-X-Spam-Status: No, score=-3.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,
-        SPF_HELO_NONE,SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
+Content-Transfer-Encoding: quoted-printable
+X-Spam-Status: No, score=-9.9 required=5.0 tests=BAYES_00,
+        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
+        UNPARSEABLE_RELAY,USER_IN_DEF_SPF_WL autolearn=ham autolearn_force=no
+        version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, 2022-07-25 at 16:08 +0000, Sean Christopherson wrote:
-> On Wed, Jul 20, 2022, Maxim Levitsky wrote:
-> > On Sun, 2022-05-22 at 13:22 +0300, Maxim Levitsky wrote:
-> > > On Thu, 2022-05-19 at 16:37 +0000, Sean Christopherson wrote:
-> > > > On Wed, Apr 27, 2022, Maxim Levitsky wrote:
-> > > > > @@ -5753,6 +5752,10 @@ int kvm_mmu_init_vm(struct kvm *kvm)
-> > Now for nested AVIC, this is what I would like to do:
-> >  
-> > - just like mmu, I prefer to register the write tracking notifier, when the
-> >   VM is created.
-> > 
-> > - just like mmu, write tracking should only be enabled when nested AVIC is
-> >   actually used first time, so that write tracking is not always enabled when
-> >   you just boot a VM with nested avic supported, since the VM might not use
-> >   nested at all.
-> >  
-> > Thus I either need to use the __kvm_page_track_register_notifier too for AVIC
-> > (and thus need to export it) or I need to have a boolean
-> > (nested_avic_was_used_once) and register the write tracking notifier only
-> > when false and do it not on VM creation but on first attempt to use nested
-> > AVIC.
-> >  
-> > Do you think this is worth it? I mean there is some value of registering the
-> > notifier only when needed (this way it is not called for nothing) but it does
-> > complicate things a bit.
-> 
-> Compared to everything else that you're doing in the nested AVIC code, refcounting
-> the shared kvm_page_track_notifier_node object is a trivial amount of complexity.
-Makes sense.
+On Thu, 28 Jul 2022 15:42:50 +0800, Jason Wang <jasowang@redhat.com> wrote:
+> On Thu, Jul 28, 2022 at 3:24 PM Xuan Zhuo <xuanzhuo@linux.alibaba.com> wr=
+ote:
+> >
+> > On Thu, 28 Jul 2022 10:38:51 +0800, Jason Wang <jasowang@redhat.com> wr=
+ote:
+> > > On Wed, Jul 27, 2022 at 3:44 PM Xuan Zhuo <xuanzhuo@linux.alibaba.com=
+> wrote:
+> > > >
+> > > > On Wed, 27 Jul 2022 11:12:19 +0800, Jason Wang <jasowang@redhat.com=
+> wrote:
+> > > > >
+> > > > > =E5=9C=A8 2022/7/26 15:21, Xuan Zhuo =E5=86=99=E9=81=93:
+> > > > > > virtio ring split supports resize.
+> > > > > >
+> > > > > > Only after the new vring is successfully allocated based on the=
+ new num,
+> > > > > > we will release the old vring. In any case, an error is returne=
+d,
+> > > > > > indicating that the vring still points to the old vring.
+> > > > > >
+> > > > > > In the case of an error, re-initialize(virtqueue_reinit_split()=
+) the
+> > > > > > virtqueue to ensure that the vring can be used.
+> > > > > >
+> > > > > > Signed-off-by: Xuan Zhuo <xuanzhuo@linux.alibaba.com>
+> > > > > > Acked-by: Jason Wang <jasowang@redhat.com>
+> > > > > > ---
+> > > > > >   drivers/virtio/virtio_ring.c | 34 +++++++++++++++++++++++++++=
++++++++
+> > > > > >   1 file changed, 34 insertions(+)
+> > > > > >
+> > > > > > diff --git a/drivers/virtio/virtio_ring.c b/drivers/virtio/virt=
+io_ring.c
+> > > > > > index b6fda91c8059..58355e1ac7d7 100644
+> > > > > > --- a/drivers/virtio/virtio_ring.c
+> > > > > > +++ b/drivers/virtio/virtio_ring.c
+> > > > > > @@ -220,6 +220,7 @@ static struct virtqueue *__vring_new_virtqu=
+eue(unsigned int index,
+> > > > > >                                            void (*callback)(str=
+uct virtqueue *),
+> > > > > >                                            const char *name);
+> > > > > >   static struct vring_desc_extra *vring_alloc_desc_extra(unsign=
+ed int num);
+> > > > > > +static void vring_free(struct virtqueue *_vq);
+> > > > > >
+> > > > > >   /*
+> > > > > >    * Helpers.
+> > > > > > @@ -1117,6 +1118,39 @@ static struct virtqueue *vring_create_vi=
+rtqueue_split(
+> > > > > >     return vq;
+> > > > > >   }
+> > > > > >
+> > > > > > +static int virtqueue_resize_split(struct virtqueue *_vq, u32 n=
+um)
+> > > > > > +{
+> > > > > > +   struct vring_virtqueue_split vring_split =3D {};
+> > > > > > +   struct vring_virtqueue *vq =3D to_vvq(_vq);
+> > > > > > +   struct virtio_device *vdev =3D _vq->vdev;
+> > > > > > +   int err;
+> > > > > > +
+> > > > > > +   err =3D vring_alloc_queue_split(&vring_split, vdev, num,
+> > > > > > +                                 vq->split.vring_align,
+> > > > > > +                                 vq->split.may_reduce_num);
+> > > > > > +   if (err)
+> > > > > > +           goto err;
+> > > > >
+> > > > >
+> > > > > I think we don't need to do anything here?
+> > > >
+> > > > Am I missing something?
+> > >
+> > > I meant it looks to me most of the virtqueue_reinit() is unnecessary.
+> > > We probably only need to reinit avail/used idx there.
+> >
+> >
+> > In this function, we can indeed remove some code.
+> >
+> > >       static void virtqueue_reinit_split(struct vring_virtqueue *vq)
+> > >       {
+> > >               int size, i;
+> > >
+> > >               memset(vq->split.vring.desc, 0, vq->split.queue_size_in=
+_bytes);
+> > >
+> > >               size =3D sizeof(struct vring_desc_state_split) * vq->sp=
+lit.vring.num;
+> > >               memset(vq->split.desc_state, 0, size);
+> > >
+> > >               size =3D sizeof(struct vring_desc_extra) * vq->split.vr=
+ing.num;
+> > >               memset(vq->split.desc_extra, 0, size);
+> >
+> > These memsets can be removed, and theoretically it will not cause any
+> > exceptions.
+>
+> Yes, otherwise we have bugs in detach_buf().
+>
+> >
+> > >
+> > >
+> > >
+> > >               for (i =3D 0; i < vq->split.vring.num - 1; i++)
+> > >                       vq->split.desc_extra[i].next =3D i + 1;
+> >
+> > This can also be removed, but we need to record free_head that will bee=
+n update
+> > inside virtqueue_init().
+>
+> We can simply keep free_head unchanged? Otherwise it's a bug somewhere I =
+guess.
+>
+>
+> >
+> > >
+> > >               virtqueue_init(vq, vq->split.vring.num);
+> >
+> > There are some operations in this, which can also be skipped, such as s=
+etting
+> > use_dma_api. But I think calling this function directly will be more co=
+nvenient
+> > for maintenance.
+>
+> I don't see anything that is necessary here.
 
-> 
-> And on that topic, do you have performance numbers to justify using a single
-> shared node?  E.g. if every table instance has its own notifier, then no additional
-> refcounting is needed. 
+These three are currently inside virtqueue_init()
 
-The thing is that KVM goes over the list of notifiers and calls them for every write from the emulator
-in fact even just for mmio write, and when you enable write tracking on a page,
-you just write protect the page and add a mark in the page track array, which is roughly 
+vq->last_used_idx =3D 0;
+vq->event_triggered =3D false;
+vq->num_added =3D 0;
 
-'don't install spte, don't install mmio spte, but just emulate the page fault if it hits this page'
-
-So adding more than a bare minimum to this list, seems just a bit wrong.
+Thanks.
 
 
->  It's not obvious that a shared node will provide better
-> performance, e.g. if there are only a handful of AVIC tables being shadowed, then
-> a linear walk of all nodes is likely fast enough, and doesn't bring the risk of
-> a write potentially being stalled due to having to acquire a VM-scoped mutex.
-
-The thing is that if I register multiple notifiers, they all will be called anyway,
-but yes I can use container_of, and discover which table the notifier belongs to,
-instead of having a hash table where I lookup the GFN of the fault.
-
-The above means practically that all the shadow physid tables will be in a linear
-list of notifiers, so I could indeed avoid per vm mutex on the write tracking,
-however for simplicity I probably will still need it because I do modify the page,
-and having per physid table mutex complicates things.
-
-Currently in my code the locking is very simple and somewhat dumb, but the performance
-is very good because the code isn't executed often, most of the time the AVIC hardware
-works alone without any VM exits.
-
-Once the code is accepted upstream, it's one of the things that can be improved.
-
-
-Note though that I still need a hash table and a mutex because on each VM entry,
-the guest can use a different physid table, so I need to lookup it, and create it,
-if not found, which would require read/write of the hash table and thus a mutex.
-
-
-
-> 
-> > I can also stash this boolean (like 'bool registered;') into the 'struct
-> > kvm_page_track_notifier_node',  and thus allow the
-> > kvm_page_track_register_notifier to be called more that once -  then I can
-> > also get rid of __kvm_page_track_register_notifier. 
-> 
-> No, allowing redundant registration without proper refcounting leads to pain,
-> e.g. X registers, Y registers, X unregisters, kaboom.
-> 
-
-True, but then what about adding a refcount to 'struct kvm_page_track_notifier_node'
-instead of a boolean, and allowing redundant registration? 
-Probably not worth it, in which case I am OK to add a refcount to my avic code.
-
-Or maybe just scrap the whole thing and just leave registration and activation of the
-write tracking as two separate things? Honestly now that looks like the most clean
-solution.
-
-Best regards,
-	Maxim Levitsky
-
+>
+> >
+> >
+> > >               virtqueue_vring_init_split(&vq->split, vq);
+> >
+> > virtqueue_vring_init_split() is necessary.
+>
+> Right.
+>
+> >
+> > >       }
+> >
+> > Another method, we can take out all the variables to be reinitialized
+> > separately, and repackage them into a new function. I don=E2=80=99t thi=
+nk it=E2=80=99s worth
+> > it, because this path will only be reached if the memory allocation fai=
+ls, which
+> > is a rare occurrence. In this case, doing so will increase the cost of
+> > maintenance. If you think so also, I will remove the above memset in th=
+e next
+> > version.
+>
+> I agree.
+>
+> Thanks
+>
+> >
+> > Thanks.
+> >
+> >
+> > >
+> > > Thanks
+> > >
+> > > >
+> > > > >
+> > > > >
+> > > > > > +
+> > > > > > +   err =3D vring_alloc_state_extra_split(&vring_split);
+> > > > > > +   if (err) {
+> > > > > > +           vring_free_split(&vring_split, vdev);
+> > > > > > +           goto err;
+> > > > >
+> > > > >
+> > > > > I suggest to move vring_free_split() into a dedicated error label.
+> > > >
+> > > > Will change.
+> > > >
+> > > > Thanks.
+> > > >
+> > > >
+> > > > >
+> > > > > Thanks
+> > > > >
+> > > > >
+> > > > > > +   }
+> > > > > > +
+> > > > > > +   vring_free(&vq->vq);
+> > > > > > +
+> > > > > > +   virtqueue_vring_init_split(&vring_split, vq);
+> > > > > > +
+> > > > > > +   virtqueue_init(vq, vring_split.vring.num);
+> > > > > > +   virtqueue_vring_attach_split(vq, &vring_split);
+> > > > > > +
+> > > > > > +   return 0;
+> > > > > > +
+> > > > > > +err:
+> > > > > > +   virtqueue_reinit_split(vq);
+> > > > > > +   return -ENOMEM;
+> > > > > > +}
+> > > > > > +
+> > > > > >
+> > > > > >   /*
+> > > > > >    * Packed ring specific functions - *_packed().
+> > > > >
+> > > >
+> > >
+> >
+>
