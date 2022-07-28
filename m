@@ -2,109 +2,101 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 5185E584421
-	for <lists+kvm@lfdr.de>; Thu, 28 Jul 2022 18:27:20 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id D1B8A58456A
+	for <lists+kvm@lfdr.de>; Thu, 28 Jul 2022 20:08:33 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231522AbiG1Q1S (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 28 Jul 2022 12:27:18 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41118 "EHLO
+        id S231194AbiG1SGi (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 28 Jul 2022 14:06:38 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41282 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229540AbiG1Q1Q (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 28 Jul 2022 12:27:16 -0400
-Received: from mail-ed1-x52f.google.com (mail-ed1-x52f.google.com [IPv6:2a00:1450:4864:20::52f])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 02FB4422C9;
-        Thu, 28 Jul 2022 09:27:16 -0700 (PDT)
-Received: by mail-ed1-x52f.google.com with SMTP id m8so2819444edd.9;
-        Thu, 28 Jul 2022 09:27:15 -0700 (PDT)
+        with ESMTP id S229754AbiG1SGh (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 28 Jul 2022 14:06:37 -0400
+Received: from mail-pj1-x1032.google.com (mail-pj1-x1032.google.com [IPv6:2607:f8b0:4864:20::1032])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3EAD452E65
+        for <kvm@vger.kernel.org>; Thu, 28 Jul 2022 11:06:37 -0700 (PDT)
+Received: by mail-pj1-x1032.google.com with SMTP id b10so2511736pjq.5
+        for <kvm@vger.kernel.org>; Thu, 28 Jul 2022 11:06:37 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=sender:message-id:date:mime-version:user-agent:subject
-         :content-language:to:cc:references:from:in-reply-to
-         :content-transfer-encoding;
-        bh=YOEJPh6TjX4+rdwbsuFqKjnIwbvJGoiCO+qrSCNH7/c=;
-        b=EmAN8zUTC/RcMAMhlOeO6A1XGZj6g3APe8FINVKGhWUVR2UjsUgk+548tNO3o60HW9
-         oLE9YJpSdqzyViCfi7lAhnlYnv2h/ntyVexwtW3J76EvQOTUIRvkuiaqZGYXCl0yXn+Z
-         UQNIrxXSFw2u2wq2DEqn1MtD4IepoMbP5F0z6dPMV+XCkAgqth+eEtC4zKLosEWlVkwG
-         sPklG+ya6uCzEoYfPYhD0eWPu1SSqTRLB8Gu3RkMEyxAdR/8t5vVAiKz1M+ak9wwJ2zl
-         HtgDu4na5FodmymQpEEAOi/aJbixFwukmidVqr8TBbB5JymtFBohwx/Ejlhak9cm++Ik
-         ERKg==
+        d=google.com; s=20210112;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc;
+        bh=QmamTPJn34eKWOCAe6RkQXqcNYOAiS0ZT4CRPFO2XpU=;
+        b=PE4+QVfC/OzOHLmqIQGNYjXtmPqO6O5/rEOtyMWuF/0sbAXwtFKVrvWWXf2s2X+Qzt
+         6qlqJLpsHo8lDAxOMdZYx7s2o6Q2LgJe3aZ5GSQPk+x2gtOTUQHuCkPtddCoNLCC54nR
+         rw/QR1Q8LPYHHvLKZNkbsmYLvdgxXeTWAjnvyac8JtqEhtb/wbg52kuyXGeJjkwQ4fUx
+         vf8kjIBnSypJUmampQKez8NNaQm3OmIcNsg4HvNs999ZRH/dRmZD3mdJ3KMD4Mtx3mNJ
+         j8gUbLlXnYiHBNFQ8N/d1g3+l485O+B3ybDaw1+wx0mPjXSkSdSL1aOmI69se5eLIr7c
+         bKXQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:sender:message-id:date:mime-version:user-agent
-         :subject:content-language:to:cc:references:from:in-reply-to
-         :content-transfer-encoding;
-        bh=YOEJPh6TjX4+rdwbsuFqKjnIwbvJGoiCO+qrSCNH7/c=;
-        b=RPCcwOvOLFMsY1zzk7mSK5sB9tWgyNxtLM6X4oBKo00fuFnapIULf5yaT+5VE4n4ND
-         iK9fAY4D09pLNaJkIzKp2vgICdwLmrFSzXDNz59wvA5CDmpNGvtcSh9IDXRLTqD4OqHE
-         jg1Z6aJrL/unZUCQIjtu9/KlfYAXEa9KVRoT5w4ekfdLp/95faEzDEIoqUyDlG3p9N4x
-         YobPeVXb/P1X+NyWIP8iurK8/lc+U169SYF141duFRwg2fUrlLpCX647uYiXaYD1TEvm
-         iIhEP/Qjpa1Q9IB5igyClPlIPel/4m4M1QxtP2LzlaugucQOoST3mcKdeG5bdFTfAFaa
-         ONjw==
-X-Gm-Message-State: AJIora9Yhzv1ZfrCHfx2zwbKPYh5k3xLC8H1F9Ak96EwZY9jmTuMnPMi
-        cWDuMCDLl4J670HFRl/ZCspSeC7Lm+7plw==
-X-Google-Smtp-Source: AGRyM1vFtPGWmN+sAVtBi/AwjeTOY50tUUaNB9efIW6I2I9HPw/gBRpK66cqbLv/POjcciE30ByREg==
-X-Received: by 2002:a05:6402:388b:b0:42b:5f20:c616 with SMTP id fd11-20020a056402388b00b0042b5f20c616mr27667421edb.50.1659025634492;
-        Thu, 28 Jul 2022 09:27:14 -0700 (PDT)
-Received: from ?IPV6:2001:b07:6468:f312:9af8:e5f5:7516:fa89? ([2001:b07:6468:f312:9af8:e5f5:7516:fa89])
-        by smtp.googlemail.com with ESMTPSA id p6-20020a170906b20600b0072b1cc543fasm574793ejz.130.2022.07.28.09.27.13
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 28 Jul 2022 09:27:13 -0700 (PDT)
-Sender: Paolo Bonzini <paolo.bonzini@gmail.com>
-Message-ID: <58bc1828-57ef-8b08-b12f-679ab2a9f9c9@redhat.com>
-Date:   Thu, 28 Jul 2022 18:27:12 +0200
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc;
+        bh=QmamTPJn34eKWOCAe6RkQXqcNYOAiS0ZT4CRPFO2XpU=;
+        b=ZnUjMiz26hl+Hufeo9vWsdV3nOstDzwQtZs9flPgkw+6Ih6lVKi9KNsTlxFKZqzaqT
+         x/GZfuKGM/U7GcBTLOEpo4/3Cqs1M3BP8Fn1H7XfzV6sPzLz+oE8zeGCnnWOvihwAqJ7
+         3nFGIrSoVbPonqlRURUkFuzqoou6MbK+h6Vkv0A/Ab05Ul9uWX7NRRvEE6x7tFxzknxD
+         ynfndXp1kSDHoPiV7AQ8PThFW3KXDVNzleldCrJ3MAXhn65w1jWS/0uA10iqWh4N9sKn
+         +dYsfYzQJ6yLR447TWydQTTE9pbdNnAiGehBM/6A6y8CVYj0mumk27XP+pcOmqXpFtN5
+         +yAg==
+X-Gm-Message-State: ACgBeo36woYms91cgrj1r56V93bu3RjfaswQRLicmxBhlsf4LSq08XMH
+        aSDr9pzLrj7b1UO0E2KQMwnwAg==
+X-Google-Smtp-Source: AA6agR4XtUr/AoEJ1jnjG0r4xDPHWcY/X53JHyx0yk2bKcIR40Lwmd8emH5wPPk6kJQk1KXgqU34cg==
+X-Received: by 2002:a17:903:2308:b0:16c:58a3:638e with SMTP id d8-20020a170903230800b0016c58a3638emr150079plh.100.1659031596580;
+        Thu, 28 Jul 2022 11:06:36 -0700 (PDT)
+Received: from google.com (7.104.168.34.bc.googleusercontent.com. [34.168.104.7])
+        by smtp.gmail.com with ESMTPSA id w71-20020a62824a000000b005252defb016sm1058929pfd.122.2022.07.28.11.06.35
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 28 Jul 2022 11:06:35 -0700 (PDT)
+Date:   Thu, 28 Jul 2022 18:06:31 +0000
+From:   Sean Christopherson <seanjc@google.com>
+To:     Michael Roth <michael.roth@amd.com>
+Cc:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        Tom Lendacky <thomas.lendacky@amd.com>
+Subject: Re: Possible 5.19 regression for systems with 52-bit physical
+ address support
+Message-ID: <YuLQJ53QGDzHqFGc@google.com>
+References: <20220728134430.ulykdplp6fxgkyiw@amd.com>
+ <20220728135320.6u7rmejkuqhy4mhr@amd.com>
+ <YuKjsuyM7+Gbr2nw@google.com>
+ <20220728160613.uwewpxdqdygmqlqh@amd.com>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.11.0
-Subject: Re: [PATCH v4 15/25] KVM: VMX: Extend VMX controls macro shenanigans
-Content-Language: en-US
-To:     Sean Christopherson <seanjc@google.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>
-Cc:     kvm@vger.kernel.org,
-        Anirudh Rayabharam <anrayabh@linux.microsoft.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Maxim Levitsky <mlevitsk@redhat.com>,
-        linux-hyperv@vger.kernel.org, linux-kernel@vger.kernel.org
-References: <20220714091327.1085353-1-vkuznets@redhat.com>
- <20220714091327.1085353-16-vkuznets@redhat.com> <YtrtdylmyolAHToz@google.com>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-In-Reply-To: <YtrtdylmyolAHToz@google.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-1.5 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_EF,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-        HEADER_FROM_DIFFERENT_DOMAINS,NICE_REPLY_A,RCVD_IN_DNSWL_NONE,
-        SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20220728160613.uwewpxdqdygmqlqh@amd.com>
+X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
+        USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 7/22/22 20:33, Sean Christopherson wrote:
-> ERROR: modpost: "__compiletime_assert_533" [arch/x86/kvm/kvm-intel.ko] undefined!
-> ERROR: modpost: "__compiletime_assert_531" [arch/x86/kvm/kvm-intel.ko] undefined!
-> ERROR: modpost: "__compiletime_assert_532" [arch/x86/kvm/kvm-intel.ko] undefined!
-> ERROR: modpost: "__compiletime_assert_530" [arch/x86/kvm/kvm-intel.ko] undefined!
-> make[2]: *** [scripts/Makefile.modpost:128: modules-only.symvers] Error 1
-> make[1]: *** [Makefile:1753: modules] Error 2
-> make[1]: *** Waiting for unfinished jobs....
+On Thu, Jul 28, 2022, Michael Roth wrote:
+> On Thu, Jul 28, 2022 at 02:56:50PM +0000, Sean Christopherson wrote:
+> > On Thu, Jul 28, 2022, Michael Roth wrote:
+> > Speaking of which, what prevents hardware (firmware?) from configuring the C-bit
+> > position to be bit 51 and thus preventing KVM from generating the reserved #NPF?
+> 
+> I'm not sure if there's a way to change this: the related PPR documents
+> the CPUID 0x8000001F as read-only along with the expected value, but
+> it's not documented as 'fixed' so maybe there is some way.
+> 
+> However in this case, just like with Milan the C-bit position actually
+> already is 51, but since for guests we rely on the value from
+> boot_cpu_data.x86_phys_bits, which is less than 51, any bits in-between
+> can be used to generate the RSVD bit in the exit field.
 
-I think it comes from
+Ya, I forgot to include the "and MAXPHYADDR >= 50" clause. 
 
-static void add_atomic_switch_msr_special(struct vcpu_vmx *vmx,
-                 unsigned long entry, unsigned long exit,
-                 unsigned long guest_val_vmcs, unsigned long host_val_vmcs,
-                 u64 guest_val, u64 host_val)
-{
-         vmcs_write64(guest_val_vmcs, guest_val);
-         if (host_val_vmcs != HOST_IA32_EFER)
-                 vmcs_write64(host_val_vmcs, host_val);
-         vm_entry_controls_setbit(vmx, entry);
-         vm_exit_controls_setbit(vmx, exit);
-}
+> So more problematic would be if boot_cpu_data.x86_phys_bits could be set
+> to 51+, in which case we would silently break SEV-ES/SNP in a similar
+> manner. That should probably just print an error and disable SEV-ES,
+> similar to what should be done if mmio_caching is disabled in KVM
+> module.
 
-
-and it can be fixed just with __always_inline.
-
-Paolo
+This is the scenario I'm curious about.  It's mostly a future problem, so I guess
+I'm just wondering if there's a plan for making things work if/when this collision
+occurs.
