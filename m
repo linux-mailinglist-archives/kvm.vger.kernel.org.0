@@ -2,71 +2,82 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 5AAC958396F
-	for <lists+kvm@lfdr.de>; Thu, 28 Jul 2022 09:24:57 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 4808C583988
+	for <lists+kvm@lfdr.de>; Thu, 28 Jul 2022 09:30:58 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234306AbiG1HYy (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 28 Jul 2022 03:24:54 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49674 "EHLO
+        id S233314AbiG1Hax (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 28 Jul 2022 03:30:53 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54462 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231701AbiG1HYx (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 28 Jul 2022 03:24:53 -0400
-Received: from out30-42.freemail.mail.aliyun.com (out30-42.freemail.mail.aliyun.com [115.124.30.42])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 91CCF5B7AD;
-        Thu, 28 Jul 2022 00:24:49 -0700 (PDT)
-X-Alimail-AntiSpam: AC=PASS;BC=-1|-1;BR=01201311R111e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=ay29a033018046056;MF=xuanzhuo@linux.alibaba.com;NM=1;PH=DS;RN=36;SR=0;TI=SMTPD_---0VKeO8TX_1658993082;
-Received: from localhost(mailfrom:xuanzhuo@linux.alibaba.com fp:SMTPD_---0VKeO8TX_1658993082)
-          by smtp.aliyun-inc.com;
-          Thu, 28 Jul 2022 15:24:44 +0800
-Message-ID: <1658992162.584327-1-xuanzhuo@linux.alibaba.com>
-Subject: Re: [PATCH v13 16/42] virtio_ring: split: introduce virtqueue_resize_split()
-Date:   Thu, 28 Jul 2022 15:09:22 +0800
-From:   Xuan Zhuo <xuanzhuo@linux.alibaba.com>
-To:     Jason Wang <jasowang@redhat.com>
-Cc:     Richard Weinberger <richard@nod.at>,
-        Anton Ivanov <anton.ivanov@cambridgegreys.com>,
-        Johannes Berg <johannes@sipsolutions.net>,
-        "Michael S. Tsirkin" <mst@redhat.com>,
+        with ESMTP id S233308AbiG1Hat (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 28 Jul 2022 03:30:49 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 126C75140F
+        for <kvm@vger.kernel.org>; Thu, 28 Jul 2022 00:30:48 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1658993448;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=Ux6VwMtMxHO2mepOlWLk/n9XMR06YLsuanCnSO2VUjI=;
+        b=EWH0svMqrd1xmc8XfKXT2oLjHJfGoWEKiWiJQQyiRb/6TCBBQv4Qh7bfdsBIbdYr+gZUUR
+        WACwjhGvFe0sVuwHAZV8FH5WgmXuKo39QI6Hrm0Ho/M9e9gikU0FUgw8TMHMVATazGJJB3
+        khkW06sdV0TqnzIeuROCAOyS5mLIheg=
+Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
+ [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-204-fvFAbU1_PgCryZqHIMMp5w-1; Thu, 28 Jul 2022 03:30:42 -0400
+X-MC-Unique: fvFAbU1_PgCryZqHIMMp5w-1
+Received: from smtp.corp.redhat.com (int-mx09.intmail.prod.int.rdu2.redhat.com [10.11.54.9])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id CC6E2185A79C;
+        Thu, 28 Jul 2022 07:30:41 +0000 (UTC)
+Received: from starship (unknown [10.40.192.46])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 332ED492C3B;
+        Thu, 28 Jul 2022 07:30:34 +0000 (UTC)
+Message-ID: <fad05f161cc6425d8c36fb6322de2bbaa683dcb3.camel@redhat.com>
+Subject: Re: [PATCH v2 0/5] x86: cpuid: improve support for broken CPUID
+ configurations
+From:   Maxim Levitsky <mlevitsk@redhat.com>
+To:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org
+Cc:     Pawan Gupta <pawan.kumar.gupta@linux.intel.com>,
+        Ingo Molnar <mingo@redhat.com>,
+        Josh Poimboeuf <jpoimboe@kernel.org>,
+        Namhyung Kim <namhyung@kernel.org>,
+        Tony Luck <tony.luck@intel.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        "H. Peter Anvin" <hpa@zytor.com>,
+        Arnaldo Carvalho de Melo <acme@kernel.org>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Alexander Shishkin <alexander.shishkin@linux.intel.com>,
+        Tim Chen <tim.c.chen@linux.intel.com>,
+        Borislav Petkov <bp@alien8.de>,
         "David S. Miller" <davem@davemloft.net>,
-        Eric Dumazet <edumazet@google.com>,
-        Jakub Kicinski <kuba@kernel.org>,
-        Paolo Abeni <pabeni@redhat.com>,
-        Hans de Goede <hdegoede@redhat.com>,
-        Mark Gross <markgross@kernel.org>,
-        Vadim Pasternak <vadimp@nvidia.com>,
-        Bjorn Andersson <bjorn.andersson@linaro.org>,
-        Mathieu Poirier <mathieu.poirier@linaro.org>,
-        Cornelia Huck <cohuck@redhat.com>,
-        Halil Pasic <pasic@linux.ibm.com>,
-        Eric Farman <farman@linux.ibm.com>,
-        Heiko Carstens <hca@linux.ibm.com>,
-        Vasily Gorbik <gor@linux.ibm.com>,
-        Alexander Gordeev <agordeev@linux.ibm.com>,
-        Christian Borntraeger <borntraeger@linux.ibm.com>,
-        Sven Schnelle <svens@linux.ibm.com>,
-        Alexei Starovoitov <ast@kernel.org>,
-        Daniel Borkmann <daniel@iogearbox.net>,
-        Jesper Dangaard Brouer <hawk@kernel.org>,
-        John Fastabend <john.fastabend@gmail.com>,
-        Vincent Whitchurch <vincent.whitchurch@axis.com>,
-        linux-um@lists.infradead.org, netdev <netdev@vger.kernel.org>,
-        platform-driver-x86@vger.kernel.org,
-        linux-remoteproc@vger.kernel.org, linux-s390@vger.kernel.org,
-        kvm <kvm@vger.kernel.org>,
-        "open list:XDP (eXpress Data Path)" <bpf@vger.kernel.org>,
-        Kangjie Xu <kangjie.xu@linux.alibaba.com>,
-        virtualization <virtualization@lists.linux-foundation.org>
-References: <20220726072225.19884-1-xuanzhuo@linux.alibaba.com>
- <20220726072225.19884-17-xuanzhuo@linux.alibaba.com>
- <15aa26f2-f8af-5dbd-f2b2-9270ad873412@redhat.com>
- <1658907413.1860468-2-xuanzhuo@linux.alibaba.com>
- <CACGkMEvxsOfiiaWWAR8P68GY1yfwgTvaAbHk1JF7pTw-o2k25w@mail.gmail.com>
-In-Reply-To: <CACGkMEvxsOfiiaWWAR8P68GY1yfwgTvaAbHk1JF7pTw-o2k25w@mail.gmail.com>
+        Dave Hansen <dave.hansen@linux.intel.com>,
+        "Chang S. Bae" <chang.seok.bae@intel.com>,
+        Jane Malalane <jane.malalane@citrix.com>,
+        Kees Cook <keescook@chromium.org>,
+        Kan Liang <kan.liang@linux.intel.com>,
+        Peter Zijlstra <peterz@infradead.org>,
+        "maintainer:X86 ARCHITECTURE (32-BIT AND 64-BIT)" <x86@kernel.org>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        Jiri Olsa <jolsa@kernel.org>,
+        Mark Rutland <mark.rutland@arm.com>,
+        linux-perf-users@vger.kernel.org,
+        "open list:CRYPTO API" <linux-crypto@vger.kernel.org>
+Date:   Thu, 28 Jul 2022 10:30:33 +0300
+In-Reply-To: <20220718141123.136106-1-mlevitsk@redhat.com>
+References: <20220718141123.136106-1-mlevitsk@redhat.com>
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Spam-Status: No, score=-9.9 required=5.0 tests=BAYES_00,
-        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-        UNPARSEABLE_RELAY,USER_IN_DEF_SPF_WL autolearn=ham autolearn_force=no
+User-Agent: Evolution 3.36.5 (3.36.5-2.fc32) 
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.85 on 10.11.54.9
+X-Spam-Status: No, score=-2.7 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        SPF_HELO_NONE,SPF_NONE autolearn=unavailable autolearn_force=no
         version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -74,173 +85,48 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, 28 Jul 2022 10:38:51 +0800, Jason Wang <jasowang@redhat.com> wrote:
-> On Wed, Jul 27, 2022 at 3:44 PM Xuan Zhuo <xuanzhuo@linux.alibaba.com> wr=
-ote:
-> >
-> > On Wed, 27 Jul 2022 11:12:19 +0800, Jason Wang <jasowang@redhat.com> wr=
-ote:
-> > >
-> > > =E5=9C=A8 2022/7/26 15:21, Xuan Zhuo =E5=86=99=E9=81=93:
-> > > > virtio ring split supports resize.
-> > > >
-> > > > Only after the new vring is successfully allocated based on the new=
- num,
-> > > > we will release the old vring. In any case, an error is returned,
-> > > > indicating that the vring still points to the old vring.
-> > > >
-> > > > In the case of an error, re-initialize(virtqueue_reinit_split()) the
-> > > > virtqueue to ensure that the vring can be used.
-> > > >
-> > > > Signed-off-by: Xuan Zhuo <xuanzhuo@linux.alibaba.com>
-> > > > Acked-by: Jason Wang <jasowang@redhat.com>
-> > > > ---
-> > > >   drivers/virtio/virtio_ring.c | 34 +++++++++++++++++++++++++++++++=
-+++
-> > > >   1 file changed, 34 insertions(+)
-> > > >
-> > > > diff --git a/drivers/virtio/virtio_ring.c b/drivers/virtio/virtio_r=
-ing.c
-> > > > index b6fda91c8059..58355e1ac7d7 100644
-> > > > --- a/drivers/virtio/virtio_ring.c
-> > > > +++ b/drivers/virtio/virtio_ring.c
-> > > > @@ -220,6 +220,7 @@ static struct virtqueue *__vring_new_virtqueue(=
-unsigned int index,
-> > > >                                            void (*callback)(struct =
-virtqueue *),
-> > > >                                            const char *name);
-> > > >   static struct vring_desc_extra *vring_alloc_desc_extra(unsigned i=
-nt num);
-> > > > +static void vring_free(struct virtqueue *_vq);
-> > > >
-> > > >   /*
-> > > >    * Helpers.
-> > > > @@ -1117,6 +1118,39 @@ static struct virtqueue *vring_create_virtqu=
-eue_split(
-> > > >     return vq;
-> > > >   }
-> > > >
-> > > > +static int virtqueue_resize_split(struct virtqueue *_vq, u32 num)
-> > > > +{
-> > > > +   struct vring_virtqueue_split vring_split =3D {};
-> > > > +   struct vring_virtqueue *vq =3D to_vvq(_vq);
-> > > > +   struct virtio_device *vdev =3D _vq->vdev;
-> > > > +   int err;
-> > > > +
-> > > > +   err =3D vring_alloc_queue_split(&vring_split, vdev, num,
-> > > > +                                 vq->split.vring_align,
-> > > > +                                 vq->split.may_reduce_num);
-> > > > +   if (err)
-> > > > +           goto err;
-> > >
-> > >
-> > > I think we don't need to do anything here?
-> >
-> > Am I missing something?
->
-> I meant it looks to me most of the virtqueue_reinit() is unnecessary.
-> We probably only need to reinit avail/used idx there.
+On Mon, 2022-07-18 at 17:11 +0300, Maxim Levitsky wrote:
+> This patch series aims to harden the cpuid code against the case when
+> the hypervisor exposes a broken CPUID configuration to the guest,
+> in the form of having a feature disabled but not features that depend on it.
+> 
+> This is the more generic way to fix kernel panic in aes-ni kernel driver,
+> which was triggered by CPUID configuration in which AVX is disabled but
+> not AVX2.
+> 
+> https://lore.kernel.org/all/20211103145231.GA4485@gondor.apana.org.au/T/
+> 
+> This was tested by booting a guest with AVX disabled and not AVX2,
+> and observing that both a warning is now printed in dmesg, and
+> that avx2 is gone from /proc/cpuinfo.
+> 
+> V2:
+> 
+> I hopefully addressed all the (very good) review feedback.
+> 
+> Best regards,
+> 	Maxim Levitsky
+> 
+> Maxim Levitsky (5):
+>   perf/x86/intel/lbr: use setup_clear_cpu_cap instead of clear_cpu_cap
+>   x86/cpuid: refactor setup_clear_cpu_cap()/clear_cpu_cap()
+>   x86/cpuid: move filter_cpuid_features to cpuid-deps.c
+>   x86/cpuid: remove 'warn' parameter from filter_cpuid_features
+>   x86/cpuid: check for dependencies violations in CPUID and attempt to
+>     fix them
+> 
+>  arch/x86/events/intel/lbr.c       |  2 +-
+>  arch/x86/include/asm/cpufeature.h |  1 +
+>  arch/x86/kernel/cpu/common.c      | 51 +-------------------
+>  arch/x86/kernel/cpu/cpuid-deps.c  | 80 +++++++++++++++++++++++++++----
+>  4 files changed, 74 insertions(+), 60 deletions(-)
+> 
+> -- 
+> 2.34.3
+> 
+> 
+A very kind ping on these patches.
 
+Best regards,
+	Maxim Levitsky
 
-In this function, we can indeed remove some code.
-
->	static void virtqueue_reinit_split(struct vring_virtqueue *vq)
->	{
->		int size, i;
->
->		memset(vq->split.vring.desc, 0, vq->split.queue_size_in_bytes);
->
->		size =3D sizeof(struct vring_desc_state_split) * vq->split.vring.num;
->		memset(vq->split.desc_state, 0, size);
->
->		size =3D sizeof(struct vring_desc_extra) * vq->split.vring.num;
->		memset(vq->split.desc_extra, 0, size);
-
-These memsets can be removed, and theoretically it will not cause any
-exceptions.
-
->
->
->
->		for (i =3D 0; i < vq->split.vring.num - 1; i++)
->			vq->split.desc_extra[i].next =3D i + 1;
-
-This can also be removed, but we need to record free_head that will been up=
-date
-inside virtqueue_init().
-
->
->		virtqueue_init(vq, vq->split.vring.num);
-
-There are some operations in this, which can also be skipped, such as setti=
-ng
-use_dma_api. But I think calling this function directly will be more conven=
-ient
-for maintenance.
-
-
->		virtqueue_vring_init_split(&vq->split, vq);
-
-virtqueue_vring_init_split() is necessary.
-
->	}
-
-Another method, we can take out all the variables to be reinitialized
-separately, and repackage them into a new function. I don=E2=80=99t think i=
-t=E2=80=99s worth
-it, because this path will only be reached if the memory allocation fails, =
-which
-is a rare occurrence. In this case, doing so will increase the cost of
-maintenance. If you think so also, I will remove the above memset in the ne=
-xt
-version.
-
-Thanks.
-
-
->
-> Thanks
->
-> >
-> > >
-> > >
-> > > > +
-> > > > +   err =3D vring_alloc_state_extra_split(&vring_split);
-> > > > +   if (err) {
-> > > > +           vring_free_split(&vring_split, vdev);
-> > > > +           goto err;
-> > >
-> > >
-> > > I suggest to move vring_free_split() into a dedicated error label.
-> >
-> > Will change.
-> >
-> > Thanks.
-> >
-> >
-> > >
-> > > Thanks
-> > >
-> > >
-> > > > +   }
-> > > > +
-> > > > +   vring_free(&vq->vq);
-> > > > +
-> > > > +   virtqueue_vring_init_split(&vring_split, vq);
-> > > > +
-> > > > +   virtqueue_init(vq, vring_split.vring.num);
-> > > > +   virtqueue_vring_attach_split(vq, &vring_split);
-> > > > +
-> > > > +   return 0;
-> > > > +
-> > > > +err:
-> > > > +   virtqueue_reinit_split(vq);
-> > > > +   return -ENOMEM;
-> > > > +}
-> > > > +
-> > > >
-> > > >   /*
-> > > >    * Packed ring specific functions - *_packed().
-> > >
-> >
->
