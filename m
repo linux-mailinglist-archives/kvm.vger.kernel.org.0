@@ -2,289 +2,93 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 4AAE65843C1
-	for <lists+kvm@lfdr.de>; Thu, 28 Jul 2022 18:01:19 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 946F958439C
+	for <lists+kvm@lfdr.de>; Thu, 28 Jul 2022 17:53:20 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229865AbiG1QBR (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 28 Jul 2022 12:01:17 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44998 "EHLO
+        id S232113AbiG1PxR (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 28 Jul 2022 11:53:17 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37164 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229618AbiG1QBQ (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 28 Jul 2022 12:01:16 -0400
-Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7D9DC69F28
-        for <kvm@vger.kernel.org>; Thu, 28 Jul 2022 09:01:15 -0700 (PDT)
-Received: from pps.filterd (m0098417.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.17.1.5/8.17.1.5) with ESMTP id 26SFhiJo004420
-        for <kvm@vger.kernel.org>; Thu, 28 Jul 2022 16:01:14 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=date : from : to : cc :
- subject : message-id : in-reply-to : references : mime-version :
- content-type : content-transfer-encoding; s=pp1;
- bh=r74d/mfhiCbTW7+QyulGRccG+9TqELuWv6Ks2FRC724=;
- b=evlDydNltmZx8DGf2QnIEWGmWVhtqD4EaYYcF8vNEeVWug8du99lD9+fbEPnJWPyhq9I
- eJf5Omkn5AlA3US/03k6LJW0R7Ul9MNEj8claow6HlZYOSCu+6UehSuQIuVkS8awJHoS
- 6+SEKS3q5zskx416ANes5BI2GWGg+agNHMvwXWCgj1nnLHbv0vTR/nULeTR+3tbDI1Gx
- lpLWKPOjbjPwhCVbgwwwp8+qUr/Jn0+eQbg8SnpCFr88PkP0S9bK+gQLqLTuXK1f/ip8
- VBjj9QTRnXwHl/e5791MsZ5INha8E4OqQ3HiQjMxkF0/jC7NbfO1QTXm5HTSBG5/L8h8 4A== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3hkwbh8jqv-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT)
-        for <kvm@vger.kernel.org>; Thu, 28 Jul 2022 16:01:14 +0000
-Received: from m0098417.ppops.net (m0098417.ppops.net [127.0.0.1])
-        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 26SFhtkT004613
-        for <kvm@vger.kernel.org>; Thu, 28 Jul 2022 16:01:13 GMT
-Received: from ppma04fra.de.ibm.com (6a.4a.5195.ip4.static.sl-reverse.com [149.81.74.106])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3hkwbh8jpe-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 28 Jul 2022 16:01:13 +0000
-Received: from pps.filterd (ppma04fra.de.ibm.com [127.0.0.1])
-        by ppma04fra.de.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 26SFpEh2021698;
-        Thu, 28 Jul 2022 16:01:11 GMT
-Received: from b06avi18878370.portsmouth.uk.ibm.com (b06avi18878370.portsmouth.uk.ibm.com [9.149.26.194])
-        by ppma04fra.de.ibm.com with ESMTP id 3hg945mxxb-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 28 Jul 2022 16:01:11 +0000
-Received: from d06av26.portsmouth.uk.ibm.com (d06av26.portsmouth.uk.ibm.com [9.149.105.62])
-        by b06avi18878370.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 26SG1MKl31326696
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Thu, 28 Jul 2022 16:01:22 GMT
-Received: from d06av26.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 66EA7AE051;
-        Thu, 28 Jul 2022 16:01:08 +0000 (GMT)
-Received: from d06av26.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 1D477AE045;
-        Thu, 28 Jul 2022 16:01:08 +0000 (GMT)
-Received: from p-imbrenda (unknown [9.145.0.43])
-        by d06av26.portsmouth.uk.ibm.com (Postfix) with ESMTP;
-        Thu, 28 Jul 2022 16:01:08 +0000 (GMT)
-Date:   Thu, 28 Jul 2022 17:47:35 +0200
-From:   Claudio Imbrenda <imbrenda@linux.ibm.com>
-To:     Nico Boehr <nrb@linux.ibm.com>
-Cc:     kvm@vger.kernel.org, frankja@linux.ibm.com, thuth@redhat.com
-Subject: Re: [kvm-unit-tests PATCH v3 2/3] s390x: smp: use an array for sigp
- calls
-Message-ID: <20220728174735.49f5322c@p-imbrenda>
-In-Reply-To: <20220725155420.2009109-3-nrb@linux.ibm.com>
-References: <20220725155420.2009109-1-nrb@linux.ibm.com>
-        <20220725155420.2009109-3-nrb@linux.ibm.com>
-Organization: IBM
-X-Mailer: Claws Mail 4.1.0 (GTK 3.24.34; x86_64-redhat-linux-gnu)
+        with ESMTP id S232060AbiG1PxQ (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 28 Jul 2022 11:53:16 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 9FCF26BC2B
+        for <kvm@vger.kernel.org>; Thu, 28 Jul 2022 08:53:15 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1659023594;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=cyh9GNwkSeiWX8VVWJet6cmrStrv1Y1BhHYKMAKCy08=;
+        b=CR7W8yzle9Zr6nPa3nWK0fbYLGoAXfhatxVa3PcQEOnfHlNL3N53sWk0hiH4MWKad2nh/E
+        59aZW5AU9W/hgptHHpgeQw4+ldnMUlsMdGVabDM7mZ3/SxURgQ2T3beFYGdHEKh15RzRVf
+        tcMTGMmYbZItnL/Ao9Gtk3TtkXVvOrw=
+Received: from mail-ed1-f71.google.com (mail-ed1-f71.google.com
+ [209.85.208.71]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-196-kPr6J1zROJ6UJi44u3yC_A-1; Thu, 28 Jul 2022 11:53:13 -0400
+X-MC-Unique: kPr6J1zROJ6UJi44u3yC_A-1
+Received: by mail-ed1-f71.google.com with SMTP id c9-20020a05640227c900b0043ad14b1fa0so1371242ede.1
+        for <kvm@vger.kernel.org>; Thu, 28 Jul 2022 08:53:12 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
+         :references:mime-version:content-transfer-encoding;
+        bh=cyh9GNwkSeiWX8VVWJet6cmrStrv1Y1BhHYKMAKCy08=;
+        b=snR4/fkKyS4g3QwtPAUuEDCCon54MAgd97rG0MeRnFb1lhMMQklRuaV6CibAywHOoL
+         FmV44GqTGAcY1W2oeTiYp8foIp84Q8LF2QtBtyuNLVbrUGsgocZ/PUzrzdHOjGYfnfsh
+         vkREVpscK4q86T2hJ97qYvrdCAUJo1p/2FOaeswjShybXAGUfh8pzRRqPjiT8qFB111e
+         8e86sMgr1A4xDmCV7UY+mxcpXbVfi0fBn4h8yGyGvkpT7zWRrmJs6UKdtSyKH5syDVmE
+         LkQ5w7j4U0rbgtUV30v9vJoNFRuNfKsiIIB69YB+apdpnVXk1QDLoCi8tD3C/MuwrrFR
+         93BA==
+X-Gm-Message-State: AJIora+orWW3rwPkC/YuCs0Y/V2yh0JR8lt56weqBYgKyluzK7P/rr1n
+        S+hcbHnx2UHm6Mky2QQf39FWnJbhupQLdpA/mWdFJo2bE6rCFwqWl4DG8coyoClfaZyTpKYXWxo
+        8ImzKsWMztfbr
+X-Received: by 2002:a05:6402:11c9:b0:43b:b905:cb88 with SMTP id j9-20020a05640211c900b0043bb905cb88mr28005170edw.102.1659023591977;
+        Thu, 28 Jul 2022 08:53:11 -0700 (PDT)
+X-Google-Smtp-Source: AGRyM1uQ0WGkcljQ8+LQm9jJHKMMx05xV2P+kXpPzT5FmSEfnOq9qHwys5h+KfxqBoBs5xEkKeffGQ==
+X-Received: by 2002:a05:6402:11c9:b0:43b:b905:cb88 with SMTP id j9-20020a05640211c900b0043bb905cb88mr28005135edw.102.1659023591576;
+        Thu, 28 Jul 2022 08:53:11 -0700 (PDT)
+Received: from goa-sendmail ([93.56.169.184])
+        by smtp.gmail.com with ESMTPSA id a12-20020a170906368c00b0072af890f52dsm548037ejc.88.2022.07.28.08.53.10
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 28 Jul 2022 08:53:10 -0700 (PDT)
+From:   Paolo Bonzini <pbonzini@redhat.com>
+To:     Jarkko Sakkinen <jarkko@profian.com>
+Cc:     stable@vger.kernel.org, Jarkko Sakkinen <jarkko@kernel.org>,
+        Sean Christopherson <seanjc@google.com>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+        Dave Hansen <dave.hansen@linux.intel.com>,
+        "maintainer : X86 ARCHITECTURE 32-BIT AND 64-BIT" <x86@kernel.org>,
+        "H . Peter Anvin" <hpa@zytor.com>,
+        Brijesh Singh <brijesh.singh@amd.com>,
+        Isaku Yamahata <isaku.yamahata@intel.com>,
+        "open list : KERNEL VIRTUAL MACHINE FOR X86 KVM/x86" 
+        <kvm@vger.kernel.org>,
+        "open list : X86 ARCHITECTURE 32-BIT AND 64-BIT" 
+        <linux-kernel@vger.kernel.org>
+Subject: Re: [PATCH] KVM: x86/mmu: Fix incorrect use of CONFIG_RETPOLINE
+Date:   Thu, 28 Jul 2022 17:53:07 +0200
+Message-Id: <20220728155307.277425-1-pbonzini@redhat.com>
+X-Mailer: git-send-email 2.36.1
+In-Reply-To: <20220728000221.19088-1-jarkko@profian.com>
+References: 
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: zPPTSkPqa5TIpHjItAQaaOuZvrKncjoD
-X-Proofpoint-ORIG-GUID: _iClGu4YZxauodir7Leo9TUbh0JZLtbw
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.205,Aquarius:18.0.883,Hydra:6.0.517,FMLib:17.11.122.1
- definitions=2022-07-28_06,2022-07-28_02,2022-06-22_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 clxscore=1015
- lowpriorityscore=0 priorityscore=1501 malwarescore=0 mlxscore=0
- spamscore=0 impostorscore=0 adultscore=0 phishscore=0 suspectscore=0
- mlxlogscore=999 bulkscore=0 classifier=spam adjust=0 reason=mlx
- scancount=1 engine=8.12.0-2206140000 definitions=main-2207280070
-X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_EF,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_PASS
-        autolearn=ham autolearn_force=no version=3.4.6
+Content-Transfer-Encoding: 8bit
+X-Spam-Status: No, score=-2.6 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        SPF_HELO_NONE,SPF_NONE autolearn=unavailable autolearn_force=no
+        version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, 25 Jul 2022 17:54:19 +0200
-Nico Boehr <nrb@linux.ibm.com> wrote:
+Queued, thanks.
 
-> Tests for the SIGP calls are quite similar, so we have a lot of code
-> duplication right now. Since upcoming changes will add more cases,
-> refactor the code to iterate over an array, similarily as we already do
-> for test_invalid().
-> 
-> The receiving CPU is disabled for IO interrupts. This makes sure the
-> conditional emergency signal is accepted and doesn't hurt the other
-> orders.
-> 
-> Signed-off-by: Nico Boehr <nrb@linux.ibm.com>
-> Reviewed-by: Janosch Frank <frankja@linux.ibm.com>
-> ---
->  s390x/smp.c | 124 ++++++++++++++++++++--------------------------------
->  1 file changed, 48 insertions(+), 76 deletions(-)
-> 
-> diff --git a/s390x/smp.c b/s390x/smp.c
-> index 34ae91c3fe12..12c40cadaed2 100644
-> --- a/s390x/smp.c
-> +++ b/s390x/smp.c
-> @@ -43,6 +43,20 @@ static const struct sigp_invalid_cases cases_valid_cpu_addr[] = {
->  
->  static uint32_t cpu1_prefix;
->  
-> +struct sigp_call_cases {
-> +	char name[20];
-> +	int call;
-> +	uint16_t ext_int_expected_type;
-> +	uint32_t cr0_bit;
+Paolo
 
-does it need to be 32 bits? the range of valid values is 0 ~ 63
-bonus, if you use an uint8_t, the whole struct will shrink by 8 bytes
-
-with that fixed:
-
-Reviewed-by: Claudio Imbrenda <imbrenda@linux.ibm.com>
-
-(unless there is a good enough reason to use uint32_t)
-
-> +	bool supports_pv;
-> +};
-> +static const struct sigp_call_cases cases_sigp_call[] = {
-> +	{ "emcall",      SIGP_EMERGENCY_SIGNAL,      0x1201, CTL0_EMERGENCY_SIGNAL, true },
-> +	{ "cond emcall", SIGP_COND_EMERGENCY_SIGNAL, 0x1201, CTL0_EMERGENCY_SIGNAL, false },
-> +	{ "ecall",       SIGP_EXTERNAL_CALL,         0x1202, CTL0_EXTERNAL_CALL,    true },
-> +};
-> +static const struct sigp_call_cases *current_sigp_call_case;
-> +
->  static void test_invalid(void)
->  {
->  	const struct sigp_invalid_cases *c;
-> @@ -289,97 +303,57 @@ static void test_set_prefix(void)
->  
->  }
->  
-> -static void ecall(void)
-> +static void call_received(void)
->  {
->  	expect_ext_int();
-> -	ctl_set_bit(0, CTL0_EXTERNAL_CALL);
-> -	psw_mask_set_bits(PSW_MASK_EXT);
-> -	set_flag(1);
-> -	while (lowcore.ext_int_code != 0x1202) { mb(); }
-> -	report_pass("received");
-> -	set_flag(1);
-> -}
-> +	ctl_set_bit(0, current_sigp_call_case->cr0_bit);
-> +	/* make sure conditional emergency is accepted by disabling IO interrupts */
-> +	psw_mask_clear_and_set_bits(PSW_MASK_IO, PSW_MASK_EXT);
->  
-> -static void test_ecall(void)
-> -{
-> -	struct psw psw;
-> -	psw.mask = extract_psw_mask();
-> -	psw.addr = (unsigned long)ecall;
-> +	/* Indicate that we're ready to receive the call */
-> +	set_flag(1);
->  
-> -	report_prefix_push("ecall");
-> -	set_flag(0);
-> +	while (lowcore.ext_int_code != current_sigp_call_case->ext_int_expected_type)
-> +		mb();
-> +	report_pass("received");
->  
-> -	smp_cpu_start(1, psw);
-> -	wait_for_flag();
-> -	set_flag(0);
-> -	smp_sigp(1, SIGP_EXTERNAL_CALL, 0, NULL);
-> -	wait_for_flag();
-> -	smp_cpu_stop(1);
-> -	report_prefix_pop();
-> -}
-> +	ctl_clear_bit(0, current_sigp_call_case->cr0_bit);
->  
-> -static void emcall(void)
-> -{
-> -	expect_ext_int();
-> -	ctl_set_bit(0, CTL0_EMERGENCY_SIGNAL);
-> -	psw_mask_set_bits(PSW_MASK_EXT);
-> -	set_flag(1);
-> -	while (lowcore.ext_int_code != 0x1201) { mb(); }
-> -	report_pass("received");
-> +	/* Indicate that we're done */
->  	set_flag(1);
->  }
->  
-> -static void test_emcall(void)
-> +static void test_calls(void)
->  {
-> +	int i;
->  	struct psw psw;
-> -	psw.mask = extract_psw_mask();
-> -	psw.addr = (unsigned long)emcall;
->  
-> -	report_prefix_push("emcall");
-> -	set_flag(0);
-> +	for (i = 0; i < ARRAY_SIZE(cases_sigp_call); i++) {
-> +		current_sigp_call_case = &cases_sigp_call[i];
->  
-> -	smp_cpu_start(1, psw);
-> -	wait_for_flag();
-> -	set_flag(0);
-> -	smp_sigp(1, SIGP_EMERGENCY_SIGNAL, 0, NULL);
-> -	wait_for_flag();
-> -	smp_cpu_stop(1);
-> +		report_prefix_push(current_sigp_call_case->name);
-> +		if (!current_sigp_call_case->supports_pv && uv_os_is_guest()) {
-> +			report_skip("Not supported under PV");
-> +			report_prefix_pop();
-> +			continue;
-> +		}
->  
-> -	report_prefix_pop();
-> -}
-> +		set_flag(0);
-> +		psw.mask = extract_psw_mask();
-> +		psw.addr = (unsigned long)call_received;
-> +		smp_cpu_start(1, psw);
->  
-> -static void test_cond_emcall(void)
-> -{
-> -	uint32_t status = 0;
-> -	struct psw psw;
-> -	int cc;
-> -	psw.mask = extract_psw_mask() & ~PSW_MASK_IO;
-> -	psw.addr = (unsigned long)emcall;
-> +		/* Wait until the receiver has finished setup */
-> +		wait_for_flag();
-> +		set_flag(0);
->  
-> -	report_prefix_push("conditional emergency call");
-> +		smp_sigp(1, current_sigp_call_case->call, 0, NULL);
->  
-> -	if (uv_os_is_guest()) {
-> -		report_skip("unsupported under PV");
-> -		goto out;
-> +		/* Wait until the receiver has handled the call */
-> +		wait_for_flag();
-> +		smp_cpu_stop(1);
-> +		report_prefix_pop();
->  	}
-> -
-> -	report_prefix_push("success");
-> -	set_flag(0);
-> -
-> -	smp_cpu_start(1, psw);
-> -	wait_for_flag();
-> -	set_flag(0);
-> -	cc = smp_sigp(1, SIGP_COND_EMERGENCY_SIGNAL, 0, &status);
-> -	report(!cc, "CC = 0");
-> -
-> -	wait_for_flag();
-> -	smp_cpu_stop(1);
-> -
-> -	report_prefix_pop();
-> -
-> -out:
-> -	report_prefix_pop();
-> -
->  }
->  
->  static void test_sense_running(void)
-> @@ -499,9 +473,7 @@ int main(void)
->  	test_stop_store_status();
->  	test_store_status();
->  	test_set_prefix();
-> -	test_ecall();
-> -	test_emcall();
-> -	test_cond_emcall();
-> +	test_calls();
->  	test_sense_running();
->  	test_reset();
->  	test_reset_initial();
 
