@@ -2,131 +2,148 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 4B8E05846C0
-	for <lists+kvm@lfdr.de>; Thu, 28 Jul 2022 22:06:46 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 74FDC5846ED
+	for <lists+kvm@lfdr.de>; Thu, 28 Jul 2022 22:20:22 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230115AbiG1UED (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 28 Jul 2022 16:04:03 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44682 "EHLO
+        id S231383AbiG1UMK (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 28 Jul 2022 16:12:10 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50832 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229456AbiG1UEC (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 28 Jul 2022 16:04:02 -0400
-Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E7BEB201AA;
-        Thu, 28 Jul 2022 13:04:01 -0700 (PDT)
-Received: from pps.filterd (m0098404.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.17.1.5/8.17.1.5) with ESMTP id 26SJwgNX006896;
-        Thu, 28 Jul 2022 20:03:59 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
- mime-version : subject : to : cc : references : from : in-reply-to :
- content-type : content-transfer-encoding; s=pp1;
- bh=yyklyrdqOPSjZe81xSQb/DEOuuyi8oCpC0xlgk/+Xhs=;
- b=HyOtktsARwI5jtMTc1JCn3Af2egcrukUgcFmo45apAjbtfpr9qlo8YMc+uk0ElPGOwqX
- lFfLz5VoBMDBZS+Jq2ztZ0b9+gJA3Cv/K7hkBcStnwYGmXo51uBDHKNjtzW3TAwYMlrK
- 0U8mB68RtAhBJRsIOyzj4HCdfmAxBzKXKxD7z1hTE+2V9RkIgRnAQ5ekKIpfFHwKJjc4
- c/NFBbHtwKD6qnYE0QPjDre31iGXUtVhenxQt2MtkyWB7tYan8BQ4TABnZaBkveHj/Ah
- VyKxe7ZBRsq2soMDzhG+jWvMMu/M1iruRqmowN09eNL4xk2OzkbPG6+oD5sOYshUmFi1 CA== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3hm13b05s1-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 28 Jul 2022 20:03:59 +0000
-Received: from m0098404.ppops.net (m0098404.ppops.net [127.0.0.1])
-        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 26SJxmBP013841;
-        Thu, 28 Jul 2022 20:03:58 GMT
-Received: from ppma02wdc.us.ibm.com (aa.5b.37a9.ip4.static.sl-reverse.com [169.55.91.170])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3hm13b05qj-2
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 28 Jul 2022 20:03:58 +0000
-Received: from pps.filterd (ppma02wdc.us.ibm.com [127.0.0.1])
-        by ppma02wdc.us.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 26SJa82j002524;
-        Thu, 28 Jul 2022 19:38:08 GMT
-Received: from b01cxnp22036.gho.pok.ibm.com (b01cxnp22036.gho.pok.ibm.com [9.57.198.26])
-        by ppma02wdc.us.ibm.com with ESMTP id 3hg97usedm-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 28 Jul 2022 19:38:08 +0000
-Received: from b01ledav001.gho.pok.ibm.com (b01ledav001.gho.pok.ibm.com [9.57.199.106])
-        by b01cxnp22036.gho.pok.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 26SJc8S119203066
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Thu, 28 Jul 2022 19:38:08 GMT
-Received: from b01ledav001.gho.pok.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 07F8E28059;
-        Thu, 28 Jul 2022 19:38:08 +0000 (GMT)
-Received: from b01ledav001.gho.pok.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 87C3E2805A;
-        Thu, 28 Jul 2022 19:38:05 +0000 (GMT)
-Received: from [9.211.95.8] (unknown [9.211.95.8])
-        by b01ledav001.gho.pok.ibm.com (Postfix) with ESMTP;
-        Thu, 28 Jul 2022 19:38:05 +0000 (GMT)
-Message-ID: <327f4a7c-bc44-6fb9-9d03-6b164ff76a4f@linux.ibm.com>
-Date:   Thu, 28 Jul 2022 15:38:04 -0400
+        with ESMTP id S230242AbiG1UMG (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 28 Jul 2022 16:12:06 -0400
+Received: from mail-pf1-x42d.google.com (mail-pf1-x42d.google.com [IPv6:2607:f8b0:4864:20::42d])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8E6C474E22
+        for <kvm@vger.kernel.org>; Thu, 28 Jul 2022 13:12:05 -0700 (PDT)
+Received: by mail-pf1-x42d.google.com with SMTP id w205so2826630pfc.8
+        for <kvm@vger.kernel.org>; Thu, 28 Jul 2022 13:12:05 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc;
+        bh=EplIlrIeqL3qzFgDUGxCxRqOfq3c4zp3SLt5PE7mwGU=;
+        b=W1MroCyit8k2GJt5siN1t1/3CC0b3RU0K4uhewMrN4VENd5nCC/xUkSSW/labnEngm
+         EbpKboOZXG/G30FXhtu8p7X3zS3WEl6xSOO3rqi+/Abt5c/YVgow09Q85Xn7up7TwlyK
+         dUCeZCwZKFnCb8d95f97S99XoOSqMUvxu5xebBv29M+++v2YlNFp4WWACtcDoEP5Mik0
+         0JUf9sXG7v7Q8p1dlPRRsreuYMKiCPCJ0ARFjIU85WPUeAZPV5tbynXC1q2J9kwyP2gw
+         Yrl0oadQB6gF1iKWkvzuUkTrBejb6f0KyRML3Cm7Ye55dCra8csNTlX25/WV1/9AAswE
+         Y+sA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc;
+        bh=EplIlrIeqL3qzFgDUGxCxRqOfq3c4zp3SLt5PE7mwGU=;
+        b=2ChyC33HAjE+tkkZKyJevfFRKV8F0nQYsrnFlvtUDOCUuwaaiqsAefh2O95Ff3eWor
+         /qeJsZBgNQt99BgxyY6CkZrF7jcNXgsJPgHaHqf2pr/4m9Q4+hIGz8ZhTpC0kfdJb8gn
+         yho2hmD1uHHb+T1XxzyVXkmuKypA/PuEJLCOHL1xIWBZ2vnCwFUTPicCV100bi+eh8k4
+         o74YN6db8WdMGHCQEVl0y81DmXwCs35QGCWQGluzUqqYiyDjbpXCY2HjdxHyNslae50t
+         lNWizT9pVgMsFgb+VxCV+c2lfOrRGtfkgBtB+4T5wTWzJqsaiQ4wtjHTthDESrvagu/H
+         INCA==
+X-Gm-Message-State: AJIora/aCwmVAShjbWdQo337Md6fMsDDTMjC8oIVTJbWeY0xVJ3hHitz
+        dG8jNqfdOGDWpItalXcmZmbPWm9fiHhz/Q==
+X-Google-Smtp-Source: AGRyM1swxpHg/ylzgZI9N9Nyjv0QqP/u1muA/l/hbanPTx+q8x8AesqG46mq+DEpIp9m4pEpUedsIg==
+X-Received: by 2002:a05:6a00:1c54:b0:52b:a70e:8207 with SMTP id s20-20020a056a001c5400b0052ba70e8207mr227874pfw.48.1659039124699;
+        Thu, 28 Jul 2022 13:12:04 -0700 (PDT)
+Received: from google.com (7.104.168.34.bc.googleusercontent.com. [34.168.104.7])
+        by smtp.gmail.com with ESMTPSA id rv2-20020a17090b2c0200b001f280153b4dsm4296251pjb.47.2022.07.28.13.12.03
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 28 Jul 2022 13:12:03 -0700 (PDT)
+Date:   Thu, 28 Jul 2022 20:11:59 +0000
+From:   Sean Christopherson <seanjc@google.com>
+To:     Kai Huang <kai.huang@intel.com>
+Cc:     Isaku Yamahata <isaku.yamahata@gmail.com>,
+        isaku.yamahata@intel.com, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>
+Subject: Re: [PATCH v7 041/102] KVM: VMX: Introduce test mode related to EPT
+ violation VE
+Message-ID: <YuLtj4/pgUZBc6f9@google.com>
+References: <cover.1656366337.git.isaku.yamahata@intel.com>
+ <cadf3221e3f7b911c810f15cfe300dd5337a966d.1656366338.git.isaku.yamahata@intel.com>
+ <52915310c9118a124da2380daf3d753a818de05e.camel@intel.com>
+ <20220719144936.GX1379820@ls.amr.corp.intel.com>
+ <9945dbf586d8738b7cf0af53bfb760da9eb9e882.camel@intel.com>
+ <20220727233955.GC3669189@ls.amr.corp.intel.com>
+ <af9e3b06ba9e16df4bfd768dfdd78f2e0277cbe5.camel@intel.com>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.11.0
-Subject: Re: [PATCH v2 3/3] vfio/ccw: Check return code from subchannel
- quiesce
-Content-Language: en-US
-To:     Eric Farman <farman@linux.ibm.com>,
-        Alex Williamson <alex.williamson@redhat.com>
-Cc:     Jason Gunthorpe <jgg@nvidia.com>,
-        Cornelia Huck <cohuck@redhat.com>,
-        Halil Pasic <pasic@linux.ibm.com>,
-        Christian Borntraeger <borntraeger@linux.ibm.com>,
-        Nicolin Chen <nicolinc@nvidia.com>, linux-s390@vger.kernel.org,
-        kvm@vger.kernel.org
-References: <20220728160550.2119289-1-farman@linux.ibm.com>
- <20220728160550.2119289-4-farman@linux.ibm.com>
-From:   Matthew Rosato <mjrosato@linux.ibm.com>
-In-Reply-To: <20220728160550.2119289-4-farman@linux.ibm.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: UF9VcT7-6Caq1OKWpIzhel_ntkgXQ41t
-X-Proofpoint-ORIG-GUID: 0cCi7k5JVln-e2SHxOtDtxxja_UGJrrd
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.205,Aquarius:18.0.883,Hydra:6.0.517,FMLib:17.11.122.1
- definitions=2022-07-28_06,2022-07-28_02,2022-06-22_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxlogscore=999
- lowpriorityscore=0 malwarescore=0 phishscore=0 spamscore=0 impostorscore=0
- mlxscore=0 bulkscore=0 adultscore=0 clxscore=1015 suspectscore=0
- priorityscore=1501 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2206140000 definitions=main-2207280090
-X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,
-        SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <af9e3b06ba9e16df4bfd768dfdd78f2e0277cbe5.camel@intel.com>
+X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
+        USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=unavailable
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 7/28/22 12:05 PM, Eric Farman wrote:
-> If a subchannel is busy when a close is performed, the subchannel
-> needs to be quiesced and left nice and tidy, so nothing unexpected
-> (like a solicited interrupt) shows up while in the closed state.
-> Unfortunately, the return code from this call isn't checked,
-> so any busy subchannel is treated as a failing one.
+On Thu, Jul 28, 2022, Kai Huang wrote:
+> On Wed, 2022-07-27 at 16:39 -0700, Isaku Yamahata wrote:
+> > On Wed, Jul 20, 2022 at 05:13:08PM +1200,
+> > Kai Huang <kai.huang@intel.com> wrote:
+> > 
+> > > On Tue, 2022-07-19 at 07:49 -0700, Isaku Yamahata wrote:
+> > > > On Fri, Jul 08, 2022 at 02:23:43PM +1200,
+> > > > Kai Huang <kai.huang@intel.com> wrote:
+> > > > 
+> > > > > On Mon, 2022-06-27 at 14:53 -0700, isaku.yamahata@intel.com wrote:
+> > > > > > From: Isaku Yamahata <isaku.yamahata@intel.com>
+> > > > > > 
+> > > > > > To support TDX, KVM is enhanced to operate with #VE.  For TDX, KVM programs
+> > > > > > to inject #VE conditionally and set #VE suppress bit in EPT entry.  For VMX
+> > > > > > case, #VE isn't used.  If #VE happens for VMX, it's a bug.  To be
+> > > > > > defensive (test that VMX case isn't broken), introduce option
+> > > > > > ept_violation_ve_test and when it's set, set error.
+> > > > > 
+> > > > > I don't see why we need this patch.  It may be helpful during your test, but why
+> > > > > do we need this patch for formal submission?
+> > > > > 
+> > > > > And for a normal guest, what prevents one vcpu from sending #VE IPI to another
+> > > > > vcpu?
+> > > > 
+> > > > Paolo suggested it as follows.  Maybe it should be kernel config.
+> > > > (I forgot to add suggested-by. I'll add it)
+> > > > 
+> > > > https://lore.kernel.org/lkml/84d56339-4a8a-6ddb-17cb-12074588ba9c@redhat.com/
+> > > > 
+> > > > > 
+> > > 
+> > > OK.  But can we assume a normal guest won't sending #VE IPI?
+> > 
+> > Theoretically nothing prevents that.  I wouldn't way "normal".
+> > Anyway this is off by default.
 > 
-> Fix that, so that the close on a busy subchannel happens normally.
+> I don't think whether it is on or off by default matters.
+
+It matters in the sense that the module param is intended purely for testing, i.e.
+there's zero reason to ever enable it in production.  That changes what is and
+wasn't isn't a reasonable response to an unexpected #VE.
+
+> If it can happen legitimately in the guest, it doesn't look right to print
+> out something like below:
 > 
-> Signed-off-by: Eric Farman <farman@linux.ibm.com>
+> 	pr_err("VMEXIT due to unexpected #VE.\n");
 
-Reviewed-by: Matthew Rosato <mjrosato@linux.ibm.com>
+Agreed.  In this particular case I think the right approach is to treat an
+unexpected #VE as a fatal KVM bug.  Yes, disabling EPT violation #VEs would likely
+allow the guest to live, but as above the module param should never be enabled in
+production.  And if we get a #VE with the module param disabled, then KVM is truly
+in the weeds and killing the VM is the safe option.
 
-> ---
->   drivers/s390/cio/vfio_ccw_fsm.c | 2 +-
->   1 file changed, 1 insertion(+), 1 deletion(-)
-> 
-> diff --git a/drivers/s390/cio/vfio_ccw_fsm.c b/drivers/s390/cio/vfio_ccw_fsm.c
-> index 4b8b623df24f..a59c758869f8 100644
-> --- a/drivers/s390/cio/vfio_ccw_fsm.c
-> +++ b/drivers/s390/cio/vfio_ccw_fsm.c
-> @@ -407,7 +407,7 @@ static void fsm_close(struct vfio_ccw_private *private,
->   
->   	ret = cio_disable_subchannel(sch);
->   	if (ret == -EBUSY)
-> -		vfio_ccw_sch_quiesce(sch);
-> +		ret = vfio_ccw_sch_quiesce(sch);
->   	if (ret)
->   		goto err_unlock;
->   
+E.g. something like
 
+diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
+index 4fd25e1d6ec9..54b9cb56f6e2 100644
+--- a/arch/x86/kvm/vmx/vmx.c
++++ b/arch/x86/kvm/vmx/vmx.c
+@@ -5010,6 +5010,9 @@ static int handle_exception_nmi(struct kvm_vcpu *vcpu)
+        if (is_invalid_opcode(intr_info))
+                return handle_ud(vcpu);
+
++       if (KVM_BUG_ON(is_ve_fault(intr_info), vcpu->kvm))
++               return -EIO;
++
+        error_code = 0;
+        if (intr_info & INTR_INFO_DELIVER_CODE_MASK)
+                error_code = vmcs_read32(VM_EXIT_INTR_ERROR_CODE);
