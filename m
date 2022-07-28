@@ -2,127 +2,122 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 58AD5584751
-	for <lists+kvm@lfdr.de>; Thu, 28 Jul 2022 22:57:23 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 2E0CC5847A6
+	for <lists+kvm@lfdr.de>; Thu, 28 Jul 2022 23:21:05 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232974AbiG1U5W (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 28 Jul 2022 16:57:22 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55458 "EHLO
+        id S232968AbiG1VUz (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 28 Jul 2022 17:20:55 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46240 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232818AbiG1U5O (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 28 Jul 2022 16:57:14 -0400
-Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 82CA97756F;
-        Thu, 28 Jul 2022 13:57:13 -0700 (PDT)
-Received: from pps.filterd (m0098399.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.17.1.5/8.17.1.5) with ESMTP id 26SKqbjj006040;
-        Thu, 28 Jul 2022 20:57:11 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=from : to : cc : subject
- : date : message-id : in-reply-to : references : mime-version :
- content-transfer-encoding; s=pp1;
- bh=Q49pvwiDXgpTDTiMjf8wWGVUqEkfx7B/uYUDJknVWnc=;
- b=Hv1/PHN8nvclFg3nZSgj8er32hlZIiPqpRK7HBDxdAwhW1TTLHv+mt0IFdfZ2tv5w594
- q2LEuVjdROHRr1sQLarOAJXTSJWzaQizfVF8i6621Nt6rOalh8NkE/uIPQdkWxhNADXw
- SzEqldlIzH/doCaDUTG3p4CU0ikJMJiczOUFvJ4x6GWPg065ZZH35pLhkFOH4om/Cb25
- KeGxsr7Z20y6t+GkJpluL+vu+fLx/Jchqh0f3akIMbETn0a1sd5WIiGzTj3MM1nhXNa0
- SB6LYNvpP/EgOLHlvT3UL6pUk7Z3a2RvgzB8aHJnHm+wIno2h8XrszO0YMe6gUGwHiqD Jg== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3hm1vm824u-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 28 Jul 2022 20:57:11 +0000
-Received: from m0098399.ppops.net (m0098399.ppops.net [127.0.0.1])
-        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 26SKsQin016132;
-        Thu, 28 Jul 2022 20:57:10 GMT
-Received: from ppma05fra.de.ibm.com (6c.4a.5195.ip4.static.sl-reverse.com [149.81.74.108])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3hm1vm823v-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 28 Jul 2022 20:57:10 +0000
-Received: from pps.filterd (ppma05fra.de.ibm.com [127.0.0.1])
-        by ppma05fra.de.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 26SKp8Fr011884;
-        Thu, 28 Jul 2022 20:57:08 GMT
-Received: from b06cxnps3075.portsmouth.uk.ibm.com (d06relay10.portsmouth.uk.ibm.com [9.149.109.195])
-        by ppma05fra.de.ibm.com with ESMTP id 3hg94ed4uw-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 28 Jul 2022 20:57:08 +0000
-Received: from d06av24.portsmouth.uk.ibm.com (mk.ibm.com [9.149.105.60])
-        by b06cxnps3075.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 26SKv43E20906368
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Thu, 28 Jul 2022 20:57:04 GMT
-Received: from d06av24.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 9B61642045;
-        Thu, 28 Jul 2022 20:57:04 +0000 (GMT)
-Received: from d06av24.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 899FA4203F;
-        Thu, 28 Jul 2022 20:57:04 +0000 (GMT)
-Received: from tuxmaker.boeblingen.de.ibm.com (unknown [9.152.85.9])
-        by d06av24.portsmouth.uk.ibm.com (Postfix) with ESMTP;
-        Thu, 28 Jul 2022 20:57:04 +0000 (GMT)
-Received: by tuxmaker.boeblingen.de.ibm.com (Postfix, from userid 4958)
-        id 0ED02E098F; Thu, 28 Jul 2022 22:49:16 +0200 (CEST)
-From:   Eric Farman <farman@linux.ibm.com>
-To:     Matthew Rosato <mjrosato@linux.ibm.com>,
-        Alex Williamson <alex.williamson@redhat.com>
-Cc:     Jason Gunthorpe <jgg@nvidia.com>,
-        Cornelia Huck <cohuck@redhat.com>,
-        Halil Pasic <pasic@linux.ibm.com>,
-        Christian Borntraeger <borntraeger@linux.ibm.com>,
-        Nicolin Chen <nicolinc@nvidia.com>, linux-s390@vger.kernel.org,
-        kvm@vger.kernel.org, Eric Farman <farman@linux.ibm.com>
-Subject: [PATCH v3 3/3] vfio/ccw: Check return code from subchannel quiesce
-Date:   Thu, 28 Jul 2022 22:49:14 +0200
-Message-Id: <20220728204914.2420989-4-farman@linux.ibm.com>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <20220728204914.2420989-1-farman@linux.ibm.com>
-References: <20220728204914.2420989-1-farman@linux.ibm.com>
+        with ESMTP id S233318AbiG1VUy (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 28 Jul 2022 17:20:54 -0400
+Received: from mail-pj1-x102c.google.com (mail-pj1-x102c.google.com [IPv6:2607:f8b0:4864:20::102c])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2FC316F7C0
+        for <kvm@vger.kernel.org>; Thu, 28 Jul 2022 14:20:53 -0700 (PDT)
+Received: by mail-pj1-x102c.google.com with SMTP id w17-20020a17090a8a1100b001f326c73df6so1732865pjn.3
+        for <kvm@vger.kernel.org>; Thu, 28 Jul 2022 14:20:53 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc;
+        bh=uuN6oV2GDxVgrMrqBmdFNwnkVyBPZkA4XskmYFR538M=;
+        b=KNMypVL63c6J1kGWCcU1z+6rnrd5vdPhCfv4kiN5RGx4ubCIjZ1GxW9mJkr4vEl3QE
+         wb/fYespIwj5zRps11p0Ql+jbfsowwu8z5M7IluoPiOKLwqgk+jrpiA/DvampHtFZTnC
+         Stypnoqag7pqxhfKtMHzdTzNIFpiBSAIX96frENV7ZEEv2Vq12BnPw234C8qkHtW9Iry
+         RXI1cviow6I4m9m6rdLPd034RnzOTwmO+8dX763q9XksNQLmkJTbEqLZkrhUXmTdDsMN
+         xdrHBxJXoBaDwlZhZUz1Lelh+TB9pISZj+DFDwANAGNL7fROgtHM1IbUhI3vnqM19nyA
+         X+4Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc;
+        bh=uuN6oV2GDxVgrMrqBmdFNwnkVyBPZkA4XskmYFR538M=;
+        b=d2TRdzD4ELFgG4jlk6p1HyAirmyGMilhpOCOcUKxH/ntHMnduNPM0M7/cdIwa7OEfz
+         ESxcD0QXQK9A60eYUeoVU2lO0PC+y4DYd70lsqNfmcgfAF275FPEcdpTpcmhxEPrWab3
+         W2D053q+rJo6UoGiS4hOpsy0SLLuonf1vpghzqpfnZh4dwQN4dcvxz2JWFCI2U9zANFi
+         XLKlWqLIrQFflfk9A20OvCyDsWlObITgTWRf9QqekeByzR/EGjo+Lp8S9nHcMhyLHGgl
+         LovHuCItkFzXhO7LHUEf1qodJ5lVwuNBasLUFVzJzeV2Y39yUvxcVjQ5x5hf0f2FV2nD
+         lA+A==
+X-Gm-Message-State: ACgBeo2uKzukyWTgC+zrzv/MKkWQg241jv70CFH2VYHjtDGCqKytNw6v
+        hHKae4dxg9lLj/kSCKICm9sKSA==
+X-Google-Smtp-Source: AA6agR5tmWMEJ2tsryUZTuqYhWdo/6KZgZs5pr3I1SGn4yIBa/QGPUT2iCS4TUg40upw5pijthGhiA==
+X-Received: by 2002:a17:90a:6fe1:b0:1f3:19f7:2e2d with SMTP id e88-20020a17090a6fe100b001f319f72e2dmr675184pjk.28.1659043252422;
+        Thu, 28 Jul 2022 14:20:52 -0700 (PDT)
+Received: from google.com (7.104.168.34.bc.googleusercontent.com. [34.168.104.7])
+        by smtp.gmail.com with ESMTPSA id i5-20020a17090332c500b0016a091eb88esm1812015plr.126.2022.07.28.14.20.51
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 28 Jul 2022 14:20:51 -0700 (PDT)
+Date:   Thu, 28 Jul 2022 21:20:48 +0000
+From:   Sean Christopherson <seanjc@google.com>
+To:     Paolo Bonzini <pbonzini@redhat.com>
+Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Yosry Ahmed <yosryahmed@google.com>,
+        Mingwei Zhang <mizhang@google.com>,
+        Ben Gardon <bgardon@google.com>
+Subject: Re: [PATCH v2 0/6] KVM: x86: Apply NX mitigation more precisely
+Message-ID: <YuL9sB8ux88TJ9o0@google.com>
+References: <20220723012325.1715714-1-seanjc@google.com>
+ <08c9e2ed-29a2-14ea-c872-1a353a70d3e5@redhat.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: vZLvIXTDWhEEBmKUbwULLz5ZstYYnU3u
-X-Proofpoint-ORIG-GUID: XOxeq4WSRJD4xaEniFqSduV4cAb28FeP
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.205,Aquarius:18.0.883,Hydra:6.0.517,FMLib:17.11.122.1
- definitions=2022-07-28_06,2022-07-28_02,2022-06-22_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 clxscore=1015 phishscore=0
- adultscore=0 lowpriorityscore=0 mlxlogscore=999 spamscore=0
- impostorscore=0 bulkscore=0 malwarescore=0 priorityscore=1501 mlxscore=0
- suspectscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2206140000 definitions=main-2207280093
-X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_EF,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_PASS
-        autolearn=ham autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <08c9e2ed-29a2-14ea-c872-1a353a70d3e5@redhat.com>
+X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
+        USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-If a subchannel is busy when a close is performed, the subchannel
-needs to be quiesced and left nice and tidy, so nothing unexpected
-(like a solicited interrupt) shows up while in the closed state.
-Unfortunately, the return code from this call isn't checked,
-so any busy subchannel is treated as a failing one.
+On Thu, Jul 28, 2022, Paolo Bonzini wrote:
+> On 7/23/22 03:23, Sean Christopherson wrote:
+> > Patch 6 from Mingwei is the end goal of the series.  KVM incorrectly
+> > assumes that the NX huge page mitigation is the only scenario where KVM
+> > will create a non-leaf page instead of a huge page.   Precisely track
+> > (via kvm_mmu_page) if a non-huge page is being forced and use that info
+> > to avoid unnecessarily forcing smaller page sizes in
+> > disallowed_hugepage_adjust().
+> > 
+> > v2: Rebase, tweak a changelog accordingly.
+> > 
+> > v1:https://lore.kernel.org/all/20220409003847.819686-1-seanjc@google.com
+> > 
+> > Mingwei Zhang (1):
+> >    KVM: x86/mmu: explicitly check nx_hugepage in
+> >      disallowed_hugepage_adjust()
+> > 
+> > Sean Christopherson (5):
+> >    KVM: x86/mmu: Tag disallowed NX huge pages even if they're not tracked
+> >    KVM: x86/mmu: Properly account NX huge page workaround for nonpaging
+> >      MMUs
+> >    KVM: x86/mmu: Set disallowed_nx_huge_page in TDP MMU before setting
+> >      SPTE
+> >    KVM: x86/mmu: Track the number of TDP MMU pages, but not the actual
+> >      pages
+> >    KVM: x86/mmu: Add helper to convert SPTE value to its shadow page
+> 
+> Some of the benefits are cool, such as not having to track the pages for the
+> TDP MMU, and patch 2 is a borderline bugfix, but there's quite a lot of new
+> non-obvious complexity here.
 
-Fix that, so that the close on a busy subchannel happens normally.
+100% agree on the complexity.
 
-Signed-off-by: Eric Farman <farman@linux.ibm.com>
-Reviewed-by: Matthew Rosato <mjrosato@linux.ibm.com>
----
- drivers/s390/cio/vfio_ccw_fsm.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+> So the obligatory question is: is it worth a hundred lines of new code?
 
-diff --git a/drivers/s390/cio/vfio_ccw_fsm.c b/drivers/s390/cio/vfio_ccw_fsm.c
-index 4b8b623df24f..a59c758869f8 100644
---- a/drivers/s390/cio/vfio_ccw_fsm.c
-+++ b/drivers/s390/cio/vfio_ccw_fsm.c
-@@ -407,7 +407,7 @@ static void fsm_close(struct vfio_ccw_private *private,
- 
- 	ret = cio_disable_subchannel(sch);
- 	if (ret == -EBUSY)
--		vfio_ccw_sch_quiesce(sch);
-+		ret = vfio_ccw_sch_quiesce(sch);
- 	if (ret)
- 		goto err_unlock;
- 
--- 
-2.34.1
+Assuming I understanding the bug Mingwei's patch fixes, yes.  Though after
+re-reading that changelog, it should more explicitly call out the scenario we
+actually care about.
 
+Anyways, the bug we really care about is that by not precisely checking if a
+huge page is disallowed, KVM would refuse to create huge page after disabling
+dirty logging, which is a very noticeable performance issue for large VMs if
+a migration is canceled.  That particular bug has since been unintentionally
+fixed in the TDP MMU by zapping the non-leaf SPTE, but there are other paths
+that could similarly be affected, e.g. I believe zapping leaf SPTEs in response
+to a host page migration (mmu_notifier invalidation) to create a huge page would
+yield a similar result; KVM would see the shadow-present non-leaf SPTE and assume
+a huge page is disallowed.
