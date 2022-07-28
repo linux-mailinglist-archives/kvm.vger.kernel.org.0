@@ -2,123 +2,148 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 024915847F9
-	for <lists+kvm@lfdr.de>; Fri, 29 Jul 2022 00:11:12 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 37A7758480D
+	for <lists+kvm@lfdr.de>; Fri, 29 Jul 2022 00:13:37 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231736AbiG1WLJ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 28 Jul 2022 18:11:09 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50070 "EHLO
+        id S231761AbiG1WNf (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 28 Jul 2022 18:13:35 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52344 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230357AbiG1WLH (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 28 Jul 2022 18:11:07 -0400
-Received: from mail-wm1-x32d.google.com (mail-wm1-x32d.google.com [IPv6:2a00:1450:4864:20::32d])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 29DB5FD05;
-        Thu, 28 Jul 2022 15:11:05 -0700 (PDT)
-Received: by mail-wm1-x32d.google.com with SMTP id r1-20020a05600c35c100b003a326685e7cso3698080wmq.1;
-        Thu, 28 Jul 2022 15:11:05 -0700 (PDT)
+        with ESMTP id S229740AbiG1WNe (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 28 Jul 2022 18:13:34 -0400
+Received: from mail-pl1-x62a.google.com (mail-pl1-x62a.google.com [IPv6:2607:f8b0:4864:20::62a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D4197785B8
+        for <kvm@vger.kernel.org>; Thu, 28 Jul 2022 15:13:32 -0700 (PDT)
+Received: by mail-pl1-x62a.google.com with SMTP id x7so2960206pll.7
+        for <kvm@vger.kernel.org>; Thu, 28 Jul 2022 15:13:32 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=sender:message-id:date:mime-version:user-agent:subject
-         :content-language:to:cc:references:from:in-reply-to
-         :content-transfer-encoding;
-        bh=q2/z+7O4E17iIS07AIkl4QnBTdGWTDMPIVTs4ITLA3c=;
-        b=UdAYIgX3QnJ+zCPpv5ngrq1lAvvosnMRgn5q9rc47OC/o8am/v/DwLn8s+AAaq7jkY
-         dks9vXZ9WLVFKbXopbNuDy2zZlqMAIWgsmBWJdBYlmZeLkDJYS+bgf2LPF1x2T7wbYj7
-         vs6n0smR5/rGJfzQuyaC9A2iBSB9P8w6Z14oOK7BzwB7k49wY3CL/Nvd2KOdpCMZb0ZX
-         /XUozKLgyIJMuHLrMzjJHfEsTlI4VbbgdFOmK0cpOKJamYPKcmzTEO9JfdTFY3L4V+gv
-         CfKh/fJLrTlC0i8S3dLp+DmISvPIGYcnaSLP1yz6oWzWGcdXa/t5YEXnuGswE0uM+gQH
-         dr6A==
+        d=google.com; s=20210112;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc;
+        bh=l+5rBl2AK20PKGSH65YU4OKpcYRMAbAXO924wPV6Eik=;
+        b=G8r95Q5hVuJdINZ5QqtY3e6DleLLl6mJ8NIAFZtg9iYDfXUfTrEfqm91RDT9EPqoXH
+         v/h2kLU9U4IM03G3Y3Syt3PeuvRfeMeHuytOAsJFNn4HkAS0CWdFNUNxpK9Xqm1z69Yz
+         ofZSMnadJWIBesKXLIWCCNeW5w5zzy2Lgrph55zYPmUWos4Sx638KPd/A2K+CbOKnexw
+         FJMZw6w3cOeJydQGZ89N8ZOyWsVESGDUsZSKlzzPSoRmAH3b5eDw0j/SASSXovoly4EG
+         pgoJKE3WAWl6SLP4OioP1JsCteYpM+rVXi/iwQyxpJuYAWSRfKaqTbRU2udnrO2F6eKS
+         42ug==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:sender:message-id:date:mime-version:user-agent
-         :subject:content-language:to:cc:references:from:in-reply-to
-         :content-transfer-encoding;
-        bh=q2/z+7O4E17iIS07AIkl4QnBTdGWTDMPIVTs4ITLA3c=;
-        b=qzI+kLyh3iA5sjmg5Tcq8Yx3WXTzMBbeli58L2wr/DN9hRbiQllIzYWEFWxr5BEzGO
-         0Kyn5CbKOL3IaRwvAspDKWyfFMwLTfr2NovIfyEI8uVadm/KS2JsxhesxyLMmqQxOOyF
-         NoXiRmMU95EaJcv+zxNN6dMmgF9uCGriEZpj5vWsJZgo8vawgcIxinCy8jEbcdnLbMaT
-         ZceLbvCzMJjPccLl+ZFJagYgmNGZBX4VuYGfKVceJ2tBUK5iQGUi5n1J004ZC/p3eVOn
-         bJWLca4ERlvVbByo34Qpp2eQabZBLBGGQiJrQdPfb6QiG17mPZVmgwPAuV7WSyZUKVfH
-         a0IA==
-X-Gm-Message-State: AJIora/O5QkLE8ZIf9GY2fK9WcfCwEi/DoOCfjUebBszfjbLWSBFkUM1
-        t+bFSpQOrMoEsmGGTChZXOs=
-X-Google-Smtp-Source: AGRyM1uT4dr9G2iKVcNG5Z7Zve1cM+mhX0bkVdF4U2dM1BceH9FJUEGUOew6sFEQcNvfp0+0gQgfXA==
-X-Received: by 2002:a1c:a444:0:b0:3a3:53e6:fd3d with SMTP id n65-20020a1ca444000000b003a353e6fd3dmr811870wme.173.1659046263431;
-        Thu, 28 Jul 2022 15:11:03 -0700 (PDT)
-Received: from ?IPV6:2001:b07:6468:f312:9af8:e5f5:7516:fa89? ([2001:b07:6468:f312:9af8:e5f5:7516:fa89])
-        by smtp.googlemail.com with ESMTPSA id v21-20020a7bcb55000000b003a3270735besm2364725wmj.28.2022.07.28.15.11.02
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 28 Jul 2022 15:11:02 -0700 (PDT)
-Sender: Paolo Bonzini <paolo.bonzini@gmail.com>
-Message-ID: <16036872-43d6-fdef-b262-1423fd6207bc@redhat.com>
-Date:   Fri, 29 Jul 2022 00:11:00 +0200
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc;
+        bh=l+5rBl2AK20PKGSH65YU4OKpcYRMAbAXO924wPV6Eik=;
+        b=0Die/0qJyZi725EnOwfAjF5AWvn+GZYc9OyKk+RxB6eL2S9PkSDvtjNz/71+3PsSug
+         XrCrugYQN6sd3BhKmx70vua56czhNwKztTS/p4vYiod4vP0PyEOJsfI2lZO6Boag4EKT
+         rBrkp4j3lcf2oLBTCxlA8QF8OzM3nuYvxJvdcSNaY3dxCG/7PsoZgyxwMfzmFaKJ1rtS
+         aAVwh3Inv3Yz6FXevsiiGm1Z6fSy/rLpKoOu4/Gng9e3TkVr0At5/JH6bwyYGLE8NeT2
+         /PWAovjsrv/hcLzig+Q0hShbJ1/+XyyQ8Qxl7thuzFaZd08lOs3j/ohRi7/zBCvtPgJu
+         ASxQ==
+X-Gm-Message-State: ACgBeo3SWU6OdxlZcCo2JMOJk3/IgRCFy+zow1y18Xokp6s4iUKtphDa
+        WoCEGJDCtE/r8H9dDmZVCSJhKw==
+X-Google-Smtp-Source: AA6agR6+VxdW2AncFaQzR2JNzm9++SeJViANFTSi6sftkYixtXxow5mvN8+au9fN/WbG/faRu1Swfg==
+X-Received: by 2002:a17:902:cf06:b0:16b:cc33:5bce with SMTP id i6-20020a170902cf0600b0016bcc335bcemr864483plg.152.1659046412192;
+        Thu, 28 Jul 2022 15:13:32 -0700 (PDT)
+Received: from google.com (7.104.168.34.bc.googleusercontent.com. [34.168.104.7])
+        by smtp.gmail.com with ESMTPSA id 13-20020a170902c24d00b0016db7f49cc2sm1826843plg.115.2022.07.28.15.13.31
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 28 Jul 2022 15:13:31 -0700 (PDT)
+Date:   Thu, 28 Jul 2022 22:13:27 +0000
+From:   Sean Christopherson <seanjc@google.com>
+To:     Paolo Bonzini <pbonzini@redhat.com>
+Cc:     Vitaly Kuznetsov <vkuznets@redhat.com>, kvm@vger.kernel.org,
+        Anirudh Rayabharam <anrayabh@linux.microsoft.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Maxim Levitsky <mlevitsk@redhat.com>,
+        linux-hyperv@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v4 09/25] KVM: VMX: nVMX: Support TSC scaling and
+ PERF_GLOBAL_CTRL with enlightened VMCS
+Message-ID: <YuMKBzeB2cE/NZ2K@google.com>
+References: <20220714091327.1085353-1-vkuznets@redhat.com>
+ <20220714091327.1085353-10-vkuznets@redhat.com>
+ <YtnMIkFI469Ub9vB@google.com>
+ <48de7ea7-fc1a-6a83-3d6f-e04d26ea2f05@redhat.com>
+ <Yt7ehL0HfR3b97FQ@google.com>
+ <870d507d-a516-5601-4d21-2bfd571cf008@redhat.com>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.11.0
-Subject: Re: [PATCH v2 1/6] KVM: x86/mmu: Tag disallowed NX huge pages even if
- they're not tracked
-Content-Language: en-US
-To:     Sean Christopherson <seanjc@google.com>
-Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Yosry Ahmed <yosryahmed@google.com>,
-        Mingwei Zhang <mizhang@google.com>,
-        Ben Gardon <bgardon@google.com>
-References: <20220723012325.1715714-1-seanjc@google.com>
- <20220723012325.1715714-2-seanjc@google.com>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-In-Reply-To: <20220723012325.1715714-2-seanjc@google.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-1.5 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_EF,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-        HEADER_FROM_DIFFERENT_DOMAINS,NICE_REPLY_A,RCVD_IN_DNSWL_NONE,
-        SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <870d507d-a516-5601-4d21-2bfd571cf008@redhat.com>
+X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
+        USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=unavailable
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 7/23/22 03:23, Sean Christopherson wrote:
-> Tag shadow pages that cannot be replaced with an NX huge page even if
-> zapping the page would not allow KVM to create a huge page, e.g. because
-> something else prevents creating a huge page.  This will allow a future
-> patch to more precisely apply the mitigation by checking if an existing
-> shadow page can be replaced by a NX huge page.  Currently, KVM assumes
-> that any existing shadow page encountered cannot be replaced by a NX huge
-> page (if the mitigation is enabled), which prevents KVM from replacing
-> no-longer-necessary shadow pages with huge pages, e.g. after disabling
-> dirty logging, zapping from the mmu_notifier due to page migration,
-> etc...
+On Thu, Jul 28, 2022, Paolo Bonzini wrote:
+> On 7/25/22 20:18, Sean Christopherson wrote:
+> > > I kind of like the idea of having a two-dimensional array based on the enums
+> > > instead of switch statements, so for now I'll keep Vitaly's enums.
+> > I don't have a strong opinion on using a 2d array, but unless I'm missing something,
+> > that's nowhere to be found in this patch.  IMO, having the enums without them
+> > providing any unique value is silly and obfuscates the code.
 > 
-> Failure to tag shadow pages appropriately could theoretically lead to
-> false negatives, e.g. if a fetch fault requests a small page and thus
-> isn't tracked, and a read/write fault later requests a huge page, KVM
-> will not reject the huge page as it should.
+> Yeah, like this:
 > 
-> To avoid yet another flag, initialize the list_head and use list_empty()
-> to determine whether or not a page is on the list of NX huge pages that
-> should be recovered.
-> 
-> Opportunstically rename most of the variables/functions involved to
-> provide consistency, e.g. lpage vs huge page and NX huge vs huge NX, and
-> clarity, e.g. to make it obvious the flag applies only to the NX huge
-> page mitigation, not to any condition that prevents creating a huge page.
+> diff --git a/arch/x86/kvm/vmx/evmcs.c b/arch/x86/kvm/vmx/evmcs.c
+> index d8da4026c93d..8055128d8638 100644
+> --- a/arch/x86/kvm/vmx/evmcs.c
+> +++ b/arch/x86/kvm/vmx/evmcs.c
+> @@ -342,9 +342,10 @@ uint16_t nested_get_evmcs_version(struct kvm_vcpu *vcpu)
+>  	return 0;
+>  }
+> -enum evmcs_v1_revision {
+> +enum evmcs_revision {
+>  	EVMCSv1_2016,
+>  	EVMCSv1_2022,
+> +	EVMCS_REVISION_MAX,
+>  };
+>  enum evmcs_unsupported_ctrl_type {
+> @@ -353,13 +354,37 @@ enum evmcs_unsupported_ctrl_type {
+>  	EVMCS_2NDEXEC,
+>  	EVMCS_PINCTRL,
+>  	EVMCS_VMFUNC,
+> +	EVMCS_CTRL_MAX,
+> +};
+> +
+> +static u32 evmcs_unsupported_ctls[EVMCS_CTRL_MAX][EVMCS_REVISION_MAX] = {
 
-Please do this in a separate patch, since this one is already complex 
-enough.
+Can this be const?
 
->   	 * The following two entries are used to key the shadow page in the
-> @@ -100,7 +106,14 @@ struct kvm_mmu_page {
->   		};
->   	};
->   
-> -	struct list_head lpage_disallowed_link;
-> +	/*
-> +	 * Use to track shadow pages that, if zapped, would allow KVM to create
+> +	[EVMCS_EXIT_CTLS] = {
+> +		[EVMCSv1_2016] = EVMCS1_UNSUPPORTED_VMEXIT_CTRL | VM_EXIT_LOAD_IA32_PERF_GLOBAL_CTRL,
+> +		[EVMCSv1_2022] = EVMCS1_UNSUPPORTED_VMEXIT_CTRL,
+> +	},
+> +	[EVMCS_ENTRY_CTLS] = {
+> +		[EVMCSv1_2016] = EVMCS1_UNSUPPORTED_VMENTRY_CTRL | VM_ENTRY_LOAD_IA32_PERF_GLOBAL_CTRL,
+> +		[EVMCSv1_2022] =  EVMCS1_UNSUPPORTED_VMENTRY_CTRL,
+> +	},
+> +	[EVMCS_2NDEXEC] = {
+> +		[EVMCSv1_2016] = EVMCS1_UNSUPPORTED_2NDEXEC | SECONDARY_EXEC_TSC_SCALING,
+> +		[EVMCSv1_2022] = EVMCS1_UNSUPPORTED_2NDEXEC,
+> +	},
+> +	[EVMCS_PINCTRL] = {
+> +		[EVMCSv1_2016] = EVMCS1_UNSUPPORTED_PINCTRL,
+> +		[EVMCSv1_2022] = EVMCS1_UNSUPPORTED_PINCTRL,
+> +	},
+> +	[EVMCS_VMFUNC] = {
+> +		[EVMCSv1_2016] = EVMCS1_UNSUPPORTED_VMFUNC,
+> +		[EVMCSv1_2022] = EVMCS1_UNSUPPORTED_VMFUNC,
+> +	},
+>  };
 
-s/Use/Used/
+...
 
-Thanks,
+> +	return evmcs_unsupported_ctls[ctrl_type][evmcs_rev];
+>  }
 
-Paolo
+The only flaw in this is if KVM gets handed a CPUID model that enumerates support
+for 2025 (or whenever the next update comes) but not 2022.  Hmm, though if Microsoft
+defines each new "version" as a full superset, then even that theoretical bug goes
+away.  I'm happy to be optimistic for once and give this a shot.  I definitely like
+that it makes it easier to see the deltas between versions.
