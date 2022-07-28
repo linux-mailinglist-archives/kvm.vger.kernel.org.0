@@ -2,95 +2,69 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 37899584067
-	for <lists+kvm@lfdr.de>; Thu, 28 Jul 2022 15:53:53 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 534C7584269
+	for <lists+kvm@lfdr.de>; Thu, 28 Jul 2022 16:58:15 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229576AbiG1Nxt (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 28 Jul 2022 09:53:49 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56974 "EHLO
+        id S229513AbiG1O6M (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 28 Jul 2022 10:58:12 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34862 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229511AbiG1Nxs (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 28 Jul 2022 09:53:48 -0400
-Received: from NAM04-BN8-obe.outbound.protection.outlook.com (mail-bn8nam04on2055.outbound.protection.outlook.com [40.107.100.55])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 12498EE30;
-        Thu, 28 Jul 2022 06:53:47 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=D7JgjdVOw0OWKJmtw2NRoFQ22Zr0iV9VuyeSQTKxvknPIZ5T7COL+goBBLc6R98Y9wDo07EaQvNZDwZCy/wagwSuSHqXV6js6NLC2rUhN7qE2X/HmeC/1F1ekRZGh2sovzbXLdF+wcCbZiP0cCTAqzMcFAdN4An3EgPm746HQHKvb2Io4cdjpsOGdatxgcEkAa06iRUiFBwECR0Nux2UqjQ8YQ26ggjRGMTqDQYyyJEj2OArOPc6MufHpvy7Ulat9/Q3QdKvY5VUbw9aPiRdHdY0v3YCty+Sum6N+dIpOjQ/ExpQvHmG9My2cirS6AwjNz9VfDoG+K0VdNLzDTYM6w==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=aNcjT+sdwxV/ilXTDZdvi6SPlBzo6OrdI/fMZlBbE28=;
- b=Mf9Yspu+bCvAV+CSBIejY8/JRGlMclphYGm8IYNL3uFalXIqnU4Ra/SXytpK5n7F2rHtaaM0sCkIW7coIcJxmi2T758ozklPUv1DgFkw4lAQZHYUdKO0cIhd08gMJNGdOj3+ZLoBu/WqS/vPZFhv30U5CRYTrVtLKYTxa9qRD7wcJCpMcKVn0fJjotIAgR2Suy1hZkonUgsf/WlgEabdyX7i7FehwKNDxZgp3hrHxrZctPhOK/I7ePPJTvaj3j83Eb4vCuh2d4Id5FT3FRKaRyM0vscvaMns2yy74OeRgaJHWg+AHHAsteQoQKhXBYZ9AF0A1MRPF1prNRBEJF2tbQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
- 165.204.84.17) smtp.rcpttodomain=google.com smtp.mailfrom=amd.com; dmarc=pass
- (p=quarantine sp=quarantine pct=100) action=none header.from=amd.com;
- dkim=none (message not signed); arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=aNcjT+sdwxV/ilXTDZdvi6SPlBzo6OrdI/fMZlBbE28=;
- b=444LLUamiV0NWED3OcexfoEoc4TMJO1kV9tiB0ZUNv5i+a4aOMkAZTrYDsdMenPiOsPUuDYMQK6gDFxi1lDYpQ9UxJnk4nVsAUu+Zqxb0tXXzS2mmDvP8u/4xLs3pCUZbr5aTYL6NBY+rJ4GFqQLPhjWYqcCmcSEnXs5Cll9bSc=
-Received: from BN9PR03CA0871.namprd03.prod.outlook.com (2603:10b6:408:13c::6)
- by MWHPR1201MB2542.namprd12.prod.outlook.com (2603:10b6:300:e8::20) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5458.19; Thu, 28 Jul
- 2022 13:53:43 +0000
-Received: from BN8NAM11FT052.eop-nam11.prod.protection.outlook.com
- (2603:10b6:408:13c:cafe::4d) by BN9PR03CA0871.outlook.office365.com
- (2603:10b6:408:13c::6) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5458.24 via Frontend
- Transport; Thu, 28 Jul 2022 13:53:43 +0000
-X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 165.204.84.17)
- smtp.mailfrom=amd.com; dkim=none (message not signed)
- header.d=none;dmarc=pass action=none header.from=amd.com;
-Received-SPF: Pass (protection.outlook.com: domain of amd.com designates
- 165.204.84.17 as permitted sender) receiver=protection.outlook.com;
- client-ip=165.204.84.17; helo=SATLEXMB04.amd.com; pr=C
-Received: from SATLEXMB04.amd.com (165.204.84.17) by
- BN8NAM11FT052.mail.protection.outlook.com (10.13.177.210) with Microsoft SMTP
- Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.20.5482.10 via Frontend Transport; Thu, 28 Jul 2022 13:53:43 +0000
-Received: from localhost (10.180.168.240) by SATLEXMB04.amd.com
- (10.181.40.145) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2375.28; Thu, 28 Jul
- 2022 08:53:41 -0500
-Date:   Thu, 28 Jul 2022 08:53:20 -0500
-From:   Michael Roth <michael.roth@amd.com>
-To:     <seanjc@google.com>
-CC:     <linux-kernel@vger.kernel.org>, <kvm@vger.kernel.org>,
+        with ESMTP id S230130AbiG1O5o (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 28 Jul 2022 10:57:44 -0400
+Received: from mail-pl1-x629.google.com (mail-pl1-x629.google.com [IPv6:2607:f8b0:4864:20::629])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A26C96AA0F
+        for <kvm@vger.kernel.org>; Thu, 28 Jul 2022 07:56:55 -0700 (PDT)
+Received: by mail-pl1-x629.google.com with SMTP id z19so2031363plb.1
+        for <kvm@vger.kernel.org>; Thu, 28 Jul 2022 07:56:55 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=IE9HJ/QB34gIaoVfeAMT+Lysq4a4pjkYfZrZPAIzbsM=;
+        b=RXTHZFRSPzp68kD724m5hsf+h9LtUEHJnmncEI+XoFM3zKXOvGbuUcMNHL7XGgFBAc
+         iiIYHrNSQAOXKsuaxXf6NQ295QaBAwFreKJlS/XP8KudogteskdpNKxm3cSavhkIe6ja
+         fymhfAygy+H7mP4QKCHAI0TXGkfJcxKeSsM/2srtvZHtBU52GVLEciyL/1cnLLLa/guD
+         vM4SQQsM89mlD/gf0Rw4UGb4b1TypUkRGfCm16zj0mgmcFOrozxTtVDXLltzwtwdv0YD
+         1j6gK3vJUkoI8EgGPoCV7ENnokfEIOPU/UQkVEHNBbUBciaFb0SSkhgQERl3LHuNNmAN
+         5yew==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=IE9HJ/QB34gIaoVfeAMT+Lysq4a4pjkYfZrZPAIzbsM=;
+        b=NJkEkecmOQ2SDEO2SgdigAuZgCA+llExNST11rKgK0rZdIJr3XxyagadaAwe35GPhR
+         1TGqU4n1xTRe1rulI9ljWqH9Jg4zBSOVo4B/6p5521h/ogD8r/Sg5/FwFyIPe9QfpJgw
+         9vU1ynEJyy1VFoZ8IRconemtXF9KgQPY4ZGUx4D3GjWBK9YLFz1AXn3/Q+T4Ms4eKF3a
+         6CZy+ZDTUEJH1ty+UBKmD1F0zrWGrGzYS/RgJmmbLXzyG3/dZh2F7qZWs5UleBqIFPts
+         t/f91jYuttoadbVOf+NyHgpaXIk7tkDyi09ibfXF4ogHD4D2nhnfD/wKTNC4YnqYpRVq
+         faqw==
+X-Gm-Message-State: AJIora913sOhJ1ukitv9ohbY3TBNT/tltpgvNJOnLXwJj7D62snsRNrH
+        3MPu+0pGMpHAIipupTELSTtvgA==
+X-Google-Smtp-Source: AGRyM1uTsDdDBG61hWpxX10KUtjI5qqB2K1VibyIddhNEL7eC66FtNpaFPjMeUkIbxIvplNZrvb1aQ==
+X-Received: by 2002:a17:90b:1c0b:b0:1f0:23df:5406 with SMTP id oc11-20020a17090b1c0b00b001f023df5406mr10853910pjb.157.1659020214919;
+        Thu, 28 Jul 2022 07:56:54 -0700 (PDT)
+Received: from google.com (7.104.168.34.bc.googleusercontent.com. [34.168.104.7])
+        by smtp.gmail.com with ESMTPSA id q12-20020a170902a3cc00b0016397da033csm1437740plb.62.2022.07.28.07.56.54
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 28 Jul 2022 07:56:54 -0700 (PDT)
+Date:   Thu, 28 Jul 2022 14:56:50 +0000
+From:   Sean Christopherson <seanjc@google.com>
+To:     Michael Roth <michael.roth@amd.com>
+Cc:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
         Tom Lendacky <thomas.lendacky@amd.com>
 Subject: Re: Possible 5.19 regression for systems with 52-bit physical
  address support
-Message-ID: <20220728135320.6u7rmejkuqhy4mhr@amd.com>
+Message-ID: <YuKjsuyM7+Gbr2nw@google.com>
 References: <20220728134430.ulykdplp6fxgkyiw@amd.com>
+ <20220728135320.6u7rmejkuqhy4mhr@amd.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20220728134430.ulykdplp6fxgkyiw@amd.com>
-X-Originating-IP: [10.180.168.240]
-X-ClientProxiedBy: SATLEXMB04.amd.com (10.181.40.145) To SATLEXMB04.amd.com
- (10.181.40.145)
-X-EOPAttributedMessage: 0
-X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: 7a4137aa-123e-45cd-7cd9-08da70a095cd
-X-MS-TrafficTypeDiagnostic: MWHPR1201MB2542:EE_
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: Bzx2dgg90GLHPDuDzAze1S3M+E+PF64SNmBgV03HgKRLKom1pg6V8M2tGL9XKXLMG3Vf430dD68HiGtUHetsawNR6HdN8BLWOQT6Q/AsCvDdb5wNtmSquRzpF9aRu7UCcVg0umDeDLHsg5hCPgMck+gga0NCmzTdBORlay8HXGiTnn/kL0blvNc8ngOdgleDp2o93oODK4GMc4kGGdnnmVJOIJ9laF10LpFvsPZ5kE5egmB/y8SaLSzPXtuTJUvxTB9W/S7aLTjlwmXRawDSCEmLxD11JSsxcRGsNWSfoOb6d3rBM5t9RRRuuwpKBFKsoX79pK2pKZ0HeVtp6hFCuavYc2/4BDAucjX/L7Zmn/iZSp4nPe00OnhrY0zqDMApEAQbv20e5IDYuHpk2CFwK8/Af/VySYxLNV78rdlLfEQbe1xwuwc8JlAw0tttMGi2mNUDmzcpElhli/LaSTE4RzpnBJZj4dOFspDlLmwD6m/X8t8jHhMOfS7ubuKq18m7SolLu73tpYMH6/pwtjq3yO8+82eIqmRQNFQGuk26SIB/IaZI8nlIBTPhGWwde69gbyu8XqVfGZc87I0DSIeWS7SXs93D6yFRQtBH5vIf8UBWomzerryHEvT5KNEWunu/hmFF1iYkGpezBjlyPeqHBhwcWksmjtlfs2rhS8GDlJkZZ45ObKDKdm81Jwbc7X3ySfSey84L4gk/5joR2H9MplT1gtJIX8xbO7lEXr5CmLCdgSespL4EmateKYTPchfGiyFQa9Z1M5u4c3aqVnHGt+DlWSFP9CZ/2VOZ/XroRv983bbOXSzFRRLCoSu7SALpTvb1B1X4xZdycD1kfB+n6J8VWugMe2DqT3X96DuIZxH9EK39X09eNV+1VN74Y209
-X-Forefront-Antispam-Report: CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:SATLEXMB04.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230016)(4636009)(346002)(136003)(376002)(39860400002)(396003)(46966006)(36840700001)(40470700004)(478600001)(8676002)(70206006)(336012)(4326008)(40480700001)(426003)(8936002)(966005)(83380400001)(40460700003)(26005)(5660300002)(70586007)(82740400003)(186003)(82310400005)(16526019)(356005)(6666004)(86362001)(6916009)(81166007)(2616005)(2906002)(47076005)(54906003)(36860700001)(36756003)(316002)(41300700001)(1076003)(44832011)(36900700001);DIR:OUT;SFP:1101;
-X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 28 Jul 2022 13:53:43.6071
- (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: 7a4137aa-123e-45cd-7cd9-08da70a095cd
-X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=3dd8961f-e488-4e60-8e11-a82d994e183d;Ip=[165.204.84.17];Helo=[SATLEXMB04.amd.com]
-X-MS-Exchange-CrossTenant-AuthSource: BN8NAM11FT052.eop-nam11.prod.protection.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Anonymous
-X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: MWHPR1201MB2542
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_PASS autolearn=ham
+In-Reply-To: <20220728135320.6u7rmejkuqhy4mhr@amd.com>
+X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
+        USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=unavailable
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -98,38 +72,84 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Jul 28, 2022 at 08:44:30AM -0500, Michael Roth wrote:
-> Hi Sean,
+On Thu, Jul 28, 2022, Michael Roth wrote:
+> On Thu, Jul 28, 2022 at 08:44:30AM -0500, Michael Roth wrote:
+> > Hi Sean,
+> > 
+> > With this patch applied, AMD processors that support 52-bit physical
 > 
-> With this patch applied, AMD processors that support 52-bit physical
+> Sorry, threading got messed up. This is in reference to:
+> 
+> https://lore.kernel.org/lkml/20220420002747.3287931-1-seanjc@google.com/#r
+> 
+> commit 8b9e74bfbf8c7020498a9ea600bd4c0f1915134d
+> Author: Sean Christopherson <seanjc@google.com>
+> Date:   Wed Apr 20 00:27:47 2022 +0000
+> 
+>     KVM: x86/mmu: Use enable_mmio_caching to track if MMIO caching is enabled
 
-Sorry, threading got messed up. This is in reference to:
+Oh crud.  I suspect I also broke EPT with MAXPHYADDR=52; the initial
+kvm_mmu_reset_all_pte_masks() will clear the flag, and it won't get set back to
+true even though EPT can generate a reserved bit fault.
 
-https://lore.kernel.org/lkml/20220420002747.3287931-1-seanjc@google.com/#r
+> > address will result in MMIO caching being disabled. This ends up
+> > breaking SEV-ES and SNP, since they rely on the MMIO reserved bit to
+> > generate the appropriate NAE MMIO exit event.
+> >
+> > This failure can also be reproduced on Milan by disabling mmio_caching
+> > via KVM module parameter.
 
-commit 8b9e74bfbf8c7020498a9ea600bd4c0f1915134d
-Author: Sean Christopherson <seanjc@google.com>
-Date:   Wed Apr 20 00:27:47 2022 +0000
+Hrm, this is a separate bug of sorts.  SEV-ES (and later) needs to have an explicit
+check the MMIO caching is enabled, e.g. my bug aside, if KVM can't use MMIO caching
+due to the location of the C-bit, then SEV-ES must be disabled.
 
-    KVM: x86/mmu: Use enable_mmio_caching to track if MMIO caching is enabled
+Speaking of which, what prevents hardware (firmware?) from configuring the C-bit
+position to be bit 51 and thus preventing KVM from generating the reserved #NPF?
 
-> address will result in MMIO caching being disabled. This ends up
-> breaking SEV-ES and SNP, since they rely on the MMIO reserved bit to
-> generate the appropriate NAE MMIO exit event.
-> 
-> This failure can also be reproduced on Milan by disabling mmio_caching
-> via KVM module parameter.
-> 
-> In the case of AMD, guests use a separate physical address range that
-> and so there are still reserved bits available to make use of the MMIO
-> caching. This adjustment happens in svm_adjust_mmio_mask(), but since
-> mmio_caching_enabled flag is 0, any attempts to update masks get
-> ignored by kvm_mmu_set_mmio_spte_mask().
-> 
-> Would adding 'force' parameter to kvm_mmu_set_mmio_spte_mask() that
-> svm_adjust_mmio_mask() can set to ignore enable_mmio_caching be
-> reasonable fix, or should we take a different approach?
-> 
-> Thanks!
-> 
-> -Mike
+> > In the case of AMD, guests use a separate physical address range that
+> > and so there are still reserved bits available to make use of the MMIO
+> > caching. This adjustment happens in svm_adjust_mmio_mask(), but since
+> > mmio_caching_enabled flag is 0, any attempts to update masks get
+> > ignored by kvm_mmu_set_mmio_spte_mask().
+> > 
+> > Would adding 'force' parameter to kvm_mmu_set_mmio_spte_mask() that
+> > svm_adjust_mmio_mask() can set to ignore enable_mmio_caching be
+> > reasonable fix, or should we take a different approach?
+
+Different approach.  To fix the bug with enable_mmio_caching not being set back to
+true when a vendor-specific mask allows caching, I believe the below will do the
+trick.
+
+The SEV-ES dependency is easy to solve, but will require a few patches in order
+to get the necessary ordering; svm_adjust_mmio_mask() is currently called _after_
+SEV-ES is configured.
+
+I'll test (as much as I can, I don't think we have platforms with MAXPHYADDR=52)
+and get a series sent out later today.
+
+diff --git a/arch/x86/kvm/mmu/spte.c b/arch/x86/kvm/mmu/spte.c
+index 7314d27d57a4..a57add994b8d 100644
+--- a/arch/x86/kvm/mmu/spte.c
++++ b/arch/x86/kvm/mmu/spte.c
+@@ -19,8 +19,9 @@
+ #include <asm/memtype.h>
+ #include <asm/vmx.h>
+
+-bool __read_mostly enable_mmio_caching = true;
+-module_param_named(mmio_caching, enable_mmio_caching, bool, 0444);
++bool __read_mostly enable_mmio_caching;
++static bool __read_mostly __enable_mmio_caching = true;
++module_param_named(mmio_caching, __enable_mmio_caching, bool, 0444);
+
+ u64 __read_mostly shadow_host_writable_mask;
+ u64 __read_mostly shadow_mmu_writable_mask;
+@@ -340,6 +341,8 @@ void kvm_mmu_set_mmio_spte_mask(u64 mmio_value, u64 mmio_mask, u64 access_mask)
+        BUG_ON((u64)(unsigned)access_mask != access_mask);
+        WARN_ON(mmio_value & shadow_nonpresent_or_rsvd_lower_gfn_mask);
+
++       enable_mmio_caching = __enable_mmio_caching;
++
+        if (!enable_mmio_caching)
+                mmio_value = 0;
+
+
