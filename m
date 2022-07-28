@@ -2,348 +2,139 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id BCB50583D5D
-	for <lists+kvm@lfdr.de>; Thu, 28 Jul 2022 13:27:52 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id ACC10583BDE
+	for <lists+kvm@lfdr.de>; Thu, 28 Jul 2022 12:14:04 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235377AbiG1L1v (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 28 Jul 2022 07:27:51 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58192 "EHLO
+        id S234950AbiG1KOD (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 28 Jul 2022 06:14:03 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44408 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235485AbiG1L1p (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 28 Jul 2022 07:27:45 -0400
-Received: from out30-43.freemail.mail.aliyun.com (out30-43.freemail.mail.aliyun.com [115.124.30.43])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1B9DF294;
-        Thu, 28 Jul 2022 04:27:42 -0700 (PDT)
-X-Alimail-AntiSpam: AC=PASS;BC=-1|-1;BR=01201311R201e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=ay29a033018045176;MF=xuanzhuo@linux.alibaba.com;NM=1;PH=DS;RN=36;SR=0;TI=SMTPD_---0VKfSKFm_1659007656;
-Received: from localhost(mailfrom:xuanzhuo@linux.alibaba.com fp:SMTPD_---0VKfSKFm_1659007656)
-          by smtp.aliyun-inc.com;
-          Thu, 28 Jul 2022 19:27:37 +0800
-Message-ID: <1659001321.5738833-2-xuanzhuo@linux.alibaba.com>
-Subject: Re: [PATCH v13 16/42] virtio_ring: split: introduce virtqueue_resize_split()
-Date:   Thu, 28 Jul 2022 17:42:01 +0800
-From:   Xuan Zhuo <xuanzhuo@linux.alibaba.com>
-To:     Jason Wang <jasowang@redhat.com>
-Cc:     Richard Weinberger <richard@nod.at>,
-        Anton Ivanov <anton.ivanov@cambridgegreys.com>,
-        Johannes Berg <johannes@sipsolutions.net>,
-        "Michael S. Tsirkin" <mst@redhat.com>,
-        "David S. Miller" <davem@davemloft.net>,
-        Eric Dumazet <edumazet@google.com>,
-        Jakub Kicinski <kuba@kernel.org>,
-        Paolo Abeni <pabeni@redhat.com>,
-        Hans de Goede <hdegoede@redhat.com>,
-        Mark Gross <markgross@kernel.org>,
-        Vadim Pasternak <vadimp@nvidia.com>,
-        Bjorn Andersson <bjorn.andersson@linaro.org>,
-        Mathieu Poirier <mathieu.poirier@linaro.org>,
-        Cornelia Huck <cohuck@redhat.com>,
-        Halil Pasic <pasic@linux.ibm.com>,
-        Eric Farman <farman@linux.ibm.com>,
-        Heiko Carstens <hca@linux.ibm.com>,
-        Vasily Gorbik <gor@linux.ibm.com>,
-        Alexander Gordeev <agordeev@linux.ibm.com>,
-        Christian Borntraeger <borntraeger@linux.ibm.com>,
-        Sven Schnelle <svens@linux.ibm.com>,
-        Alexei Starovoitov <ast@kernel.org>,
-        Daniel Borkmann <daniel@iogearbox.net>,
-        Jesper Dangaard Brouer <hawk@kernel.org>,
-        John Fastabend <john.fastabend@gmail.com>,
-        Vincent Whitchurch <vincent.whitchurch@axis.com>,
-        linux-um@lists.infradead.org, netdev <netdev@vger.kernel.org>,
-        platform-driver-x86@vger.kernel.org,
-        linux-remoteproc@vger.kernel.org, linux-s390@vger.kernel.org,
-        kvm <kvm@vger.kernel.org>,
-        "open list:XDP (eXpress Data Path)" <bpf@vger.kernel.org>,
-        Kangjie Xu <kangjie.xu@linux.alibaba.com>,
-        virtualization <virtualization@lists.linux-foundation.org>
-References: <20220726072225.19884-1-xuanzhuo@linux.alibaba.com>
- <20220726072225.19884-17-xuanzhuo@linux.alibaba.com>
- <15aa26f2-f8af-5dbd-f2b2-9270ad873412@redhat.com>
- <1658907413.1860468-2-xuanzhuo@linux.alibaba.com>
- <CACGkMEvxsOfiiaWWAR8P68GY1yfwgTvaAbHk1JF7pTw-o2k25w@mail.gmail.com>
- <1658992162.584327-1-xuanzhuo@linux.alibaba.com>
- <CACGkMEv-KYieHKXY_Qn0nfcnLMOSF=TowF5PwLKOxESL3KQ40Q@mail.gmail.com>
- <1658995783.1026692-1-xuanzhuo@linux.alibaba.com>
- <CACGkMEv6Ptn4zj_F-ww3Nay-VPmCNrXLaf5U98PvupAvo44FpA@mail.gmail.com>
-In-Reply-To: <CACGkMEv6Ptn4zj_F-ww3Nay-VPmCNrXLaf5U98PvupAvo44FpA@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
+        with ESMTP id S235672AbiG1KOA (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 28 Jul 2022 06:14:00 -0400
+Received: from mail-wm1-x330.google.com (mail-wm1-x330.google.com [IPv6:2a00:1450:4864:20::330])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1C5DB65545
+        for <kvm@vger.kernel.org>; Thu, 28 Jul 2022 03:13:59 -0700 (PDT)
+Received: by mail-wm1-x330.google.com with SMTP id v5so716563wmj.0
+        for <kvm@vger.kernel.org>; Thu, 28 Jul 2022 03:13:59 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=daynix-com.20210112.gappssmtp.com; s=20210112;
+        h=to:references:message-id:content-transfer-encoding:cc:date
+         :in-reply-to:from:subject:mime-version:from:to:cc;
+        bh=OwtQ01iyvWW02aEqU8I1cLzmE86cVtLSJOim+G3EiMo=;
+        b=nC6N1+FIfZ8qW8P0WLRt9JA3s69lzCNOcSga+7s0vxdLP3XjZhzqaIkwkP5P1tgdci
+         GR29rDWmzdTuVrv+SOFKki7grcLPwYUiqICTNkz5XhDaGc4HlU/7v/OjyUWcuiqFLq5w
+         XxlGRm45fSYhULfaBFChgd0iPEaaWaecoYNrA1cFSRmVPSds/r64v9iD0YBl+QaoJDmb
+         DDT76x+FsCCNvJoWCquIF8cbzw2e7TqhQbbyL6e1OOVJJx1N3F1SLvDT+LLLDn/gXuhc
+         sLzhGwsywrEMLyiwnEFIBOkxkyeil52HKUcWSpIYYBKOX6evRjV1ebxhgp/HO558pWb5
+         /7DQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=to:references:message-id:content-transfer-encoding:cc:date
+         :in-reply-to:from:subject:mime-version:x-gm-message-state:from:to:cc;
+        bh=OwtQ01iyvWW02aEqU8I1cLzmE86cVtLSJOim+G3EiMo=;
+        b=IKChNY+UXbkh0fmA3Jza/vTuOM3LS53nP2g3ykOmJE8wvYqhHnP2H1QIWZ/UcLDi9s
+         irSS3xbiWl6+uJH0uMzTF19jS4NxA8vmKQz9crx1gBHy8aKSOtN2xSu86KOPeFc4sfTP
+         pMYh6Jtn8vitrjdDlGcvifzNMbhR4i0ITL2Wqwh789HI2Ho7caEI55DG53LGFcmiNiO5
+         w1lyKC604vDf8+97/3wjwhNLzlH52J2wgwBuRfb0/bRi9+JynctEVvgfL6L9J6AWlk+3
+         QzMKR/9pSHm2JC9VXkmVGU/72GcxNn5gPWHQSdlOyfSqp0wsOODOAWiuthkCESXyGn+1
+         whhA==
+X-Gm-Message-State: AJIora/lErsA8rqrCZsmfH/8s8LOXenVUOtc7+iLk2UogW2se0tErjp/
+        RHs044mmAXO1XrX6kEKJlrdFuQ==
+X-Google-Smtp-Source: AGRyM1vHfpjCseABSE4t/EiEtNmp3FM9HuOorpTvtmL0uvz/Z+yWRkdPxuVojee2GnZDIh6FNDVYjw==
+X-Received: by 2002:a05:600c:3b9e:b0:3a2:feb5:2b43 with SMTP id n30-20020a05600c3b9e00b003a2feb52b43mr6073835wms.26.1659003237562;
+        Thu, 28 Jul 2022 03:13:57 -0700 (PDT)
+Received: from smtpclient.apple (bzq-84-110-34-91.static-ip.bezeqint.net. [84.110.34.91])
+        by smtp.gmail.com with ESMTPSA id r21-20020a05600c35d500b003a17ab4e7c8sm5441937wmq.39.2022.07.28.03.13.56
+        (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
+        Thu, 28 Jul 2022 03:13:56 -0700 (PDT)
+Content-Type: text/plain;
+        charset=utf-8
+Mime-Version: 1.0 (Mac OS X Mail 14.0 \(3654.120.0.1.13\))
+Subject: Re: Guest reboot issues since QEMU 6.0 and Linux 5.11
+From:   Yan Vugenfirer <yan@daynix.com>
+In-Reply-To: <eb0e0c7e-5b6f-a573-43f6-bd58be243d6b@proxmox.com>
+Date:   Thu, 28 Jul 2022 13:13:54 +0300
+Cc:     kvm@vger.kernel.org, QEMU Developers <qemu-devel@nongnu.org>,
+        Thomas Lamprecht <t.lamprecht@proxmox.com>,
+        Mira Limbeck <m.limbeck@proxmox.com>
 Content-Transfer-Encoding: quoted-printable
-X-Spam-Status: No, score=-9.9 required=5.0 tests=BAYES_00,
-        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,
-        SPF_HELO_NONE,SPF_PASS,UNPARSEABLE_RELAY,USER_IN_DEF_SPF_WL
-        autolearn=ham autolearn_force=no version=3.4.6
+Message-Id: <1675C8E3-D071-4F5A-814B-A06C281CC930@daynix.com>
+References: <eb0e0c7e-5b6f-a573-43f6-bd58be243d6b@proxmox.com>
+To:     Fabian Ebner <f.ebner@proxmox.com>
+X-Mailer: Apple Mail (2.3654.120.0.1.13)
+X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_NONE autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, 28 Jul 2022 17:04:36 +0800, Jason Wang <jasowang@redhat.com> wrote:
-> On Thu, Jul 28, 2022 at 4:18 PM Xuan Zhuo <xuanzhuo@linux.alibaba.com> wr=
-ote:
-> >
-> > On Thu, 28 Jul 2022 15:42:50 +0800, Jason Wang <jasowang@redhat.com> wr=
-ote:
-> > > On Thu, Jul 28, 2022 at 3:24 PM Xuan Zhuo <xuanzhuo@linux.alibaba.com=
-> wrote:
-> > > >
-> > > > On Thu, 28 Jul 2022 10:38:51 +0800, Jason Wang <jasowang@redhat.com=
-> wrote:
-> > > > > On Wed, Jul 27, 2022 at 3:44 PM Xuan Zhuo <xuanzhuo@linux.alibaba=
-.com> wrote:
-> > > > > >
-> > > > > > On Wed, 27 Jul 2022 11:12:19 +0800, Jason Wang <jasowang@redhat=
-.com> wrote:
-> > > > > > >
-> > > > > > > =E5=9C=A8 2022/7/26 15:21, Xuan Zhuo =E5=86=99=E9=81=93:
-> > > > > > > > virtio ring split supports resize.
-> > > > > > > >
-> > > > > > > > Only after the new vring is successfully allocated based on=
- the new num,
-> > > > > > > > we will release the old vring. In any case, an error is ret=
-urned,
-> > > > > > > > indicating that the vring still points to the old vring.
-> > > > > > > >
-> > > > > > > > In the case of an error, re-initialize(virtqueue_reinit_spl=
-it()) the
-> > > > > > > > virtqueue to ensure that the vring can be used.
-> > > > > > > >
-> > > > > > > > Signed-off-by: Xuan Zhuo <xuanzhuo@linux.alibaba.com>
-> > > > > > > > Acked-by: Jason Wang <jasowang@redhat.com>
-> > > > > > > > ---
-> > > > > > > >   drivers/virtio/virtio_ring.c | 34 +++++++++++++++++++++++=
-+++++++++++
-> > > > > > > >   1 file changed, 34 insertions(+)
-> > > > > > > >
-> > > > > > > > diff --git a/drivers/virtio/virtio_ring.c b/drivers/virtio/=
-virtio_ring.c
-> > > > > > > > index b6fda91c8059..58355e1ac7d7 100644
-> > > > > > > > --- a/drivers/virtio/virtio_ring.c
-> > > > > > > > +++ b/drivers/virtio/virtio_ring.c
-> > > > > > > > @@ -220,6 +220,7 @@ static struct virtqueue *__vring_new_vi=
-rtqueue(unsigned int index,
-> > > > > > > >                                            void (*callback)=
-(struct virtqueue *),
-> > > > > > > >                                            const char *name=
-);
-> > > > > > > >   static struct vring_desc_extra *vring_alloc_desc_extra(un=
-signed int num);
-> > > > > > > > +static void vring_free(struct virtqueue *_vq);
-> > > > > > > >
-> > > > > > > >   /*
-> > > > > > > >    * Helpers.
-> > > > > > > > @@ -1117,6 +1118,39 @@ static struct virtqueue *vring_creat=
-e_virtqueue_split(
-> > > > > > > >     return vq;
-> > > > > > > >   }
-> > > > > > > >
-> > > > > > > > +static int virtqueue_resize_split(struct virtqueue *_vq, u=
-32 num)
-> > > > > > > > +{
-> > > > > > > > +   struct vring_virtqueue_split vring_split =3D {};
-> > > > > > > > +   struct vring_virtqueue *vq =3D to_vvq(_vq);
-> > > > > > > > +   struct virtio_device *vdev =3D _vq->vdev;
-> > > > > > > > +   int err;
-> > > > > > > > +
-> > > > > > > > +   err =3D vring_alloc_queue_split(&vring_split, vdev, num,
-> > > > > > > > +                                 vq->split.vring_align,
-> > > > > > > > +                                 vq->split.may_reduce_num);
-> > > > > > > > +   if (err)
-> > > > > > > > +           goto err;
-> > > > > > >
-> > > > > > >
-> > > > > > > I think we don't need to do anything here?
-> > > > > >
-> > > > > > Am I missing something?
-> > > > >
-> > > > > I meant it looks to me most of the virtqueue_reinit() is unnecess=
-ary.
-> > > > > We probably only need to reinit avail/used idx there.
-> > > >
-> > > >
-> > > > In this function, we can indeed remove some code.
-> > > >
-> > > > >       static void virtqueue_reinit_split(struct vring_virtqueue *=
-vq)
-> > > > >       {
-> > > > >               int size, i;
-> > > > >
-> > > > >               memset(vq->split.vring.desc, 0, vq->split.queue_siz=
-e_in_bytes);
-> > > > >
-> > > > >               size =3D sizeof(struct vring_desc_state_split) * vq=
-->split.vring.num;
-> > > > >               memset(vq->split.desc_state, 0, size);
-> > > > >
-> > > > >               size =3D sizeof(struct vring_desc_extra) * vq->spli=
-t.vring.num;
-> > > > >               memset(vq->split.desc_extra, 0, size);
-> > > >
-> > > > These memsets can be removed, and theoretically it will not cause a=
-ny
-> > > > exceptions.
-> > >
-> > > Yes, otherwise we have bugs in detach_buf().
-> > >
-> > > >
-> > > > >
-> > > > >
-> > > > >
-> > > > >               for (i =3D 0; i < vq->split.vring.num - 1; i++)
-> > > > >                       vq->split.desc_extra[i].next =3D i + 1;
-> > > >
-> > > > This can also be removed, but we need to record free_head that will=
- been update
-> > > > inside virtqueue_init().
-> > >
-> > > We can simply keep free_head unchanged? Otherwise it's a bug somewher=
-e I guess.
-> > >
-> > >
-> > > >
-> > > > >
-> > > > >               virtqueue_init(vq, vq->split.vring.num);
-> > > >
-> > > > There are some operations in this, which can also be skipped, such =
-as setting
-> > > > use_dma_api. But I think calling this function directly will be mor=
-e convenient
-> > > > for maintenance.
-> > >
-> > > I don't see anything that is necessary here.
-> >
-> > These three are currently inside virtqueue_init()
-> >
-> > vq->last_used_idx =3D 0;
-> > vq->event_triggered =3D false;
-> > vq->num_added =3D 0;
->
-> Right. Let's keep it there.
->
-> (Though it's kind of strange that the last_used_idx is not initialized
-> at the same place with avail_idx/flags_shadow, we can optimize it on
-> top).
+Hi Fabian,
 
-I put free_head =3D 0 in the attach function, it is only necessary to set
-free_head =3D 0 when a new state/extra is attached.
-
-In this way, when we call virtqueue_init(), we don't have to worry about
-free_head being modified.
-
-Rethinking this problem, I think virtqueue_init() can be rewritten and some
-variables that will not change are removed from it. (use_dma_api, event,
-weak_barriers)
-
-+static void virtqueue_init(struct vring_virtqueue *vq, u32 num)
-+{
-+       vq->vq.num_free =3D num;
-+
-+       if (vq->packed_ring)
-+               vq->last_used_idx =3D 0 | (1 << VRING_PACKED_EVENT_F_WRAP_C=
-TR);
-+       else
-+               vq->last_used_idx =3D 0;
-+
-+       vq->event_triggered =3D false;
-+       vq->num_added =3D 0;
-+
-+#ifdef DEBUG
-+       vq->in_use =3D false;
-+       vq->last_add_time_valid =3D false;
-+#endif
-+}
-+
-
-Thanks.
+Can you save the dump file with QEMU monitor using dump-guest-memory or =
+with virsh dump?
+Then you can use elf2dmp (compiled with QEMU and is found in =
+=E2=80=9Ccontrib=E2=80=9D folder) to covert the dump file to WinDbg =
+format and examine the stack.=20
 
 
->
-> Thanks
->
-> >
-> > Thanks.
-> >
-> >
-> > >
-> > > >
-> > > >
-> > > > >               virtqueue_vring_init_split(&vq->split, vq);
-> > > >
-> > > > virtqueue_vring_init_split() is necessary.
-> > >
-> > > Right.
-> > >
-> > > >
-> > > > >       }
-> > > >
-> > > > Another method, we can take out all the variables to be reinitializ=
-ed
-> > > > separately, and repackage them into a new function. I don=E2=80=99t=
- think it=E2=80=99s worth
-> > > > it, because this path will only be reached if the memory allocation=
- fails, which
-> > > > is a rare occurrence. In this case, doing so will increase the cost=
- of
-> > > > maintenance. If you think so also, I will remove the above memset i=
-n the next
-> > > > version.
-> > >
-> > > I agree.
-> > >
-> > > Thanks
-> > >
-> > > >
-> > > > Thanks.
-> > > >
-> > > >
-> > > > >
-> > > > > Thanks
-> > > > >
-> > > > > >
-> > > > > > >
-> > > > > > >
-> > > > > > > > +
-> > > > > > > > +   err =3D vring_alloc_state_extra_split(&vring_split);
-> > > > > > > > +   if (err) {
-> > > > > > > > +           vring_free_split(&vring_split, vdev);
-> > > > > > > > +           goto err;
-> > > > > > >
-> > > > > > >
-> > > > > > > I suggest to move vring_free_split() into a dedicated error l=
-abel.
-> > > > > >
-> > > > > > Will change.
-> > > > > >
-> > > > > > Thanks.
-> > > > > >
-> > > > > >
-> > > > > > >
-> > > > > > > Thanks
-> > > > > > >
-> > > > > > >
-> > > > > > > > +   }
-> > > > > > > > +
-> > > > > > > > +   vring_free(&vq->vq);
-> > > > > > > > +
-> > > > > > > > +   virtqueue_vring_init_split(&vring_split, vq);
-> > > > > > > > +
-> > > > > > > > +   virtqueue_init(vq, vring_split.vring.num);
-> > > > > > > > +   virtqueue_vring_attach_split(vq, &vring_split);
-> > > > > > > > +
-> > > > > > > > +   return 0;
-> > > > > > > > +
-> > > > > > > > +err:
-> > > > > > > > +   virtqueue_reinit_split(vq);
-> > > > > > > > +   return -ENOMEM;
-> > > > > > > > +}
-> > > > > > > > +
-> > > > > > > >
-> > > > > > > >   /*
-> > > > > > > >    * Packed ring specific functions - *_packed().
-> > > > > > >
-> > > > > >
-> > > > >
-> > > >
-> > >
-> >
->
+Best regards,
+Yan.
+
+
+> On 21 Jul 2022, at 3:49 PM, Fabian Ebner <f.ebner@proxmox.com> wrote:
+>=20
+> Hi,
+> since about half a year ago, we're getting user reports about guest
+> reboot issues with KVM/QEMU[0].
+>=20
+> The most common scenario is a Windows Server VM (2012R2/2016/2019,
+> UEFI/OVMF and SeaBIOS) getting stuck during the screen with the =
+Windows
+> logo and the spinning circles after a reboot was triggered from within
+> the guest. Quitting the kvm process and booting with a fresh instance
+> works. The issue seems to become more likely, the longer the kvm
+> instance runs.
+>=20
+> We did not get such reports while we were providing Linux 5.4 and QEMU
+> 5.2.0, but we do with Linux 5.11/5.13/5.15 and QEMU 6.x.
+>=20
+> I'm just wondering if anybody has seen this issue before or might have =
+a
+> hunch what it's about? Any tips on what to look out for when debugging
+> are also greatly appreciated!
+>=20
+> We do have debug access to a user's test VM and the VM state was saved
+> before a problematic reboot, but I can't modify the host system there.
+> AFAICT QEMU just executes guest code as usual, but I'm really not sure
+> what to look out for.
+>=20
+> That VM has CPU type host, and a colleague did have a similar enough =
+CPU
+> to load the VM state, but for him, the reboot went through normally. =
+On
+> the user's system, it triggers consistently after loading the VM state
+> and rebooting.
+>=20
+> So unfortunately, we didn't manage to reproduce the issue locally yet.
+> With two other images provided by users, we ran into a boot loop, =
+where
+> QEMU resets the CPUs and does a few KVM_RUNs before the exit reason is
+> KVM_EXIT_SHUTDOWN (which to my understanding indicates a triple fault)
+> and then it repeats. It's not clear if the issues are related.
+>=20
+> There are also a few reports about non-Windows VMs, mostly Ubuntu =
+20.04
+> with UEFI/OVMF, but again, it's not clear if the issues are related.
+>=20
+> [0]: https://forum.proxmox.com/threads/100744/
+> (the forum thread is a bit chaotic unfortunately).
+>=20
+> Best Regards,
+> Fabi
+>=20
+>=20
+>=20
+
