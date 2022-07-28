@@ -2,114 +2,289 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 4A777584366
-	for <lists+kvm@lfdr.de>; Thu, 28 Jul 2022 17:43:17 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 4AAE65843C1
+	for <lists+kvm@lfdr.de>; Thu, 28 Jul 2022 18:01:19 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230127AbiG1PnP (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 28 Jul 2022 11:43:15 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55326 "EHLO
+        id S229865AbiG1QBR (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 28 Jul 2022 12:01:17 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44998 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229532AbiG1PnN (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 28 Jul 2022 11:43:13 -0400
-Received: from mail-pl1-x633.google.com (mail-pl1-x633.google.com [IPv6:2607:f8b0:4864:20::633])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CA22568DF0
-        for <kvm@vger.kernel.org>; Thu, 28 Jul 2022 08:43:12 -0700 (PDT)
-Received: by mail-pl1-x633.google.com with SMTP id o3so2127336ple.5
-        for <kvm@vger.kernel.org>; Thu, 28 Jul 2022 08:43:12 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=OvVirUwva7iitmCWZI9gOg8g2CWki9PsaWOed+nTpOU=;
-        b=AiRFPHaA7gZOYNc69ZY96d8VhlOkMnaDNRHXUPXYvDABBFKi+J5uw7z/ofo7pXx+kZ
-         OLkNhH6Kgd3V69r4I7YmRLT/Tjia4T46btmtB1dIkIw28Vis+01PIRvIPlJitO/FwFw/
-         1U1P8H0p3NMJKHx+U00LYiF/H6ovjadOyBh9jbw5EV0yzAp2mhazixc661ahs+T9PIG2
-         PLxkwjYXNKIM7s/70lnmsJ6WXvH8uJuhEARVWaFT4vFEvklLelKE8IPxtg2ZlI3gWFrm
-         WLZJK2MpAbAObHMb4Zc+gAO/fwqAEfWJaGvKTCbie4uhrbeJl0J8pMdvZBKF8ZOaLOct
-         J5WA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=OvVirUwva7iitmCWZI9gOg8g2CWki9PsaWOed+nTpOU=;
-        b=dgg0QqRZ1jp37aFTi48w7djQNiRS3yJfiZbyRnzrs4uJcn4xzObBviLiMM2U7l1GYC
-         QSFa+FTJJM0TSILPy6fZnC074NcDIcdUWvJC2sdgNNhkW2zCTJ7Fh4PsUiH+ettBjjXV
-         8rw/Wofp4oKtj9KPj690MZZ+81cLLY0YaHZtOcwE7Fs67Qvltd8Tf9TprfBdCzIHxBwT
-         p53gTWNosfafONt92hRfjbVhZqrQew7Q2ZdbTxyzkhW3pCbFy7A37qQvReskm6b8VIgZ
-         3Cg/hmXwWfXKG1+BxPl1ffWmv+5aBfPfbBbIrCyMuvaknIX4OXkyKKBtKXnAAeLblbwO
-         rFFg==
-X-Gm-Message-State: AJIora99o/epizJWUt4hlH3Av4OCidz8Mdqu2dyvhsYXl8IBE6FNR5sZ
-        +BXdIGMWmRbCh+QIN9M/4lqkag==
-X-Google-Smtp-Source: AGRyM1sH1quS5prsBUI9o3IRDsm8cA8ZRJf5b7TYuFSboXNv9OrkXcNXF6d6uc0XJRCyRVNDWZAZfg==
-X-Received: by 2002:a17:902:d483:b0:16d:6d17:1695 with SMTP id c3-20020a170902d48300b0016d6d171695mr20600840plg.73.1659022992223;
-        Thu, 28 Jul 2022 08:43:12 -0700 (PDT)
-Received: from google.com (7.104.168.34.bc.googleusercontent.com. [34.168.104.7])
-        by smtp.gmail.com with ESMTPSA id q17-20020aa78431000000b0052badc0f3d7sm947704pfn.50.2022.07.28.08.43.11
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 28 Jul 2022 08:43:11 -0700 (PDT)
-Date:   Thu, 28 Jul 2022 15:43:07 +0000
-From:   Sean Christopherson <seanjc@google.com>
-To:     Michael Roth <michael.roth@amd.com>
-Cc:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-        Tom Lendacky <thomas.lendacky@amd.com>
-Subject: Re: Possible 5.19 regression for systems with 52-bit physical
- address support
-Message-ID: <YuKuiyFFFY3QbZ3z@google.com>
-References: <20220728134430.ulykdplp6fxgkyiw@amd.com>
- <20220728135320.6u7rmejkuqhy4mhr@amd.com>
- <YuKjsuyM7+Gbr2nw@google.com>
+        with ESMTP id S229618AbiG1QBQ (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 28 Jul 2022 12:01:16 -0400
+Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7D9DC69F28
+        for <kvm@vger.kernel.org>; Thu, 28 Jul 2022 09:01:15 -0700 (PDT)
+Received: from pps.filterd (m0098417.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.17.1.5/8.17.1.5) with ESMTP id 26SFhiJo004420
+        for <kvm@vger.kernel.org>; Thu, 28 Jul 2022 16:01:14 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=date : from : to : cc :
+ subject : message-id : in-reply-to : references : mime-version :
+ content-type : content-transfer-encoding; s=pp1;
+ bh=r74d/mfhiCbTW7+QyulGRccG+9TqELuWv6Ks2FRC724=;
+ b=evlDydNltmZx8DGf2QnIEWGmWVhtqD4EaYYcF8vNEeVWug8du99lD9+fbEPnJWPyhq9I
+ eJf5Omkn5AlA3US/03k6LJW0R7Ul9MNEj8claow6HlZYOSCu+6UehSuQIuVkS8awJHoS
+ 6+SEKS3q5zskx416ANes5BI2GWGg+agNHMvwXWCgj1nnLHbv0vTR/nULeTR+3tbDI1Gx
+ lpLWKPOjbjPwhCVbgwwwp8+qUr/Jn0+eQbg8SnpCFr88PkP0S9bK+gQLqLTuXK1f/ip8
+ VBjj9QTRnXwHl/e5791MsZ5INha8E4OqQ3HiQjMxkF0/jC7NbfO1QTXm5HTSBG5/L8h8 4A== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3hkwbh8jqv-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT)
+        for <kvm@vger.kernel.org>; Thu, 28 Jul 2022 16:01:14 +0000
+Received: from m0098417.ppops.net (m0098417.ppops.net [127.0.0.1])
+        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 26SFhtkT004613
+        for <kvm@vger.kernel.org>; Thu, 28 Jul 2022 16:01:13 GMT
+Received: from ppma04fra.de.ibm.com (6a.4a.5195.ip4.static.sl-reverse.com [149.81.74.106])
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3hkwbh8jpe-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Thu, 28 Jul 2022 16:01:13 +0000
+Received: from pps.filterd (ppma04fra.de.ibm.com [127.0.0.1])
+        by ppma04fra.de.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 26SFpEh2021698;
+        Thu, 28 Jul 2022 16:01:11 GMT
+Received: from b06avi18878370.portsmouth.uk.ibm.com (b06avi18878370.portsmouth.uk.ibm.com [9.149.26.194])
+        by ppma04fra.de.ibm.com with ESMTP id 3hg945mxxb-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Thu, 28 Jul 2022 16:01:11 +0000
+Received: from d06av26.portsmouth.uk.ibm.com (d06av26.portsmouth.uk.ibm.com [9.149.105.62])
+        by b06avi18878370.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 26SG1MKl31326696
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Thu, 28 Jul 2022 16:01:22 GMT
+Received: from d06av26.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 66EA7AE051;
+        Thu, 28 Jul 2022 16:01:08 +0000 (GMT)
+Received: from d06av26.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 1D477AE045;
+        Thu, 28 Jul 2022 16:01:08 +0000 (GMT)
+Received: from p-imbrenda (unknown [9.145.0.43])
+        by d06av26.portsmouth.uk.ibm.com (Postfix) with ESMTP;
+        Thu, 28 Jul 2022 16:01:08 +0000 (GMT)
+Date:   Thu, 28 Jul 2022 17:47:35 +0200
+From:   Claudio Imbrenda <imbrenda@linux.ibm.com>
+To:     Nico Boehr <nrb@linux.ibm.com>
+Cc:     kvm@vger.kernel.org, frankja@linux.ibm.com, thuth@redhat.com
+Subject: Re: [kvm-unit-tests PATCH v3 2/3] s390x: smp: use an array for sigp
+ calls
+Message-ID: <20220728174735.49f5322c@p-imbrenda>
+In-Reply-To: <20220725155420.2009109-3-nrb@linux.ibm.com>
+References: <20220725155420.2009109-1-nrb@linux.ibm.com>
+        <20220725155420.2009109-3-nrb@linux.ibm.com>
+Organization: IBM
+X-Mailer: Claws Mail 4.1.0 (GTK 3.24.34; x86_64-redhat-linux-gnu)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <YuKjsuyM7+Gbr2nw@google.com>
-X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-        USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=ham
-        autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: zPPTSkPqa5TIpHjItAQaaOuZvrKncjoD
+X-Proofpoint-ORIG-GUID: _iClGu4YZxauodir7Leo9TUbh0JZLtbw
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.205,Aquarius:18.0.883,Hydra:6.0.517,FMLib:17.11.122.1
+ definitions=2022-07-28_06,2022-07-28_02,2022-06-22_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 clxscore=1015
+ lowpriorityscore=0 priorityscore=1501 malwarescore=0 mlxscore=0
+ spamscore=0 impostorscore=0 adultscore=0 phishscore=0 suspectscore=0
+ mlxlogscore=999 bulkscore=0 classifier=spam adjust=0 reason=mlx
+ scancount=1 engine=8.12.0-2206140000 definitions=main-2207280070
+X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_EF,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_PASS
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Jul 28, 2022, Sean Christopherson wrote:
-> On Thu, Jul 28, 2022, Michael Roth wrote:
-> > On Thu, Jul 28, 2022 at 08:44:30AM -0500, Michael Roth wrote:
-> Different approach.  To fix the bug with enable_mmio_caching not being set back to
-> true when a vendor-specific mask allows caching, I believe the below will do the
-> trick.
+On Mon, 25 Jul 2022 17:54:19 +0200
+Nico Boehr <nrb@linux.ibm.com> wrote:
 
-...
- 
-> diff --git a/arch/x86/kvm/mmu/spte.c b/arch/x86/kvm/mmu/spte.c
-> index 7314d27d57a4..a57add994b8d 100644
-> --- a/arch/x86/kvm/mmu/spte.c
-> +++ b/arch/x86/kvm/mmu/spte.c
-> @@ -19,8 +19,9 @@
->  #include <asm/memtype.h>
->  #include <asm/vmx.h>
+> Tests for the SIGP calls are quite similar, so we have a lot of code
+> duplication right now. Since upcoming changes will add more cases,
+> refactor the code to iterate over an array, similarily as we already do
+> for test_invalid().
 > 
-> -bool __read_mostly enable_mmio_caching = true;
-> -module_param_named(mmio_caching, enable_mmio_caching, bool, 0444);
-> +bool __read_mostly enable_mmio_caching;
-> +static bool __read_mostly __enable_mmio_caching = true;
-> +module_param_named(mmio_caching, __enable_mmio_caching, bool, 0444);
+> The receiving CPU is disabled for IO interrupts. This makes sure the
+> conditional emergency signal is accepted and doesn't hurt the other
+> orders.
 > 
->  u64 __read_mostly shadow_host_writable_mask;
->  u64 __read_mostly shadow_mmu_writable_mask;
-> @@ -340,6 +341,8 @@ void kvm_mmu_set_mmio_spte_mask(u64 mmio_value, u64 mmio_mask, u64 access_mask)
->         BUG_ON((u64)(unsigned)access_mask != access_mask);
->         WARN_ON(mmio_value & shadow_nonpresent_or_rsvd_lower_gfn_mask);
+> Signed-off-by: Nico Boehr <nrb@linux.ibm.com>
+> Reviewed-by: Janosch Frank <frankja@linux.ibm.com>
+> ---
+>  s390x/smp.c | 124 ++++++++++++++++++++--------------------------------
+>  1 file changed, 48 insertions(+), 76 deletions(-)
 > 
-> +       enable_mmio_caching = __enable_mmio_caching;
+> diff --git a/s390x/smp.c b/s390x/smp.c
+> index 34ae91c3fe12..12c40cadaed2 100644
+> --- a/s390x/smp.c
+> +++ b/s390x/smp.c
+> @@ -43,6 +43,20 @@ static const struct sigp_invalid_cases cases_valid_cpu_addr[] = {
+>  
+>  static uint32_t cpu1_prefix;
+>  
+> +struct sigp_call_cases {
+> +	char name[20];
+> +	int call;
+> +	uint16_t ext_int_expected_type;
+> +	uint32_t cr0_bit;
 
-This isn't ideal as the value used by KVM won't be reflected in the module param.
-The basic approach is sound, but KVM should snapshot the original value of the module
-param and "reset" to that.
+does it need to be 32 bits? the range of valid values is 0 ~ 63
+bonus, if you use an uint8_t, the whole struct will shrink by 8 bytes
 
+with that fixed:
+
+Reviewed-by: Claudio Imbrenda <imbrenda@linux.ibm.com>
+
+(unless there is a good enough reason to use uint32_t)
+
+> +	bool supports_pv;
+> +};
+> +static const struct sigp_call_cases cases_sigp_call[] = {
+> +	{ "emcall",      SIGP_EMERGENCY_SIGNAL,      0x1201, CTL0_EMERGENCY_SIGNAL, true },
+> +	{ "cond emcall", SIGP_COND_EMERGENCY_SIGNAL, 0x1201, CTL0_EMERGENCY_SIGNAL, false },
+> +	{ "ecall",       SIGP_EXTERNAL_CALL,         0x1202, CTL0_EXTERNAL_CALL,    true },
+> +};
+> +static const struct sigp_call_cases *current_sigp_call_case;
 > +
->         if (!enable_mmio_caching)
->                 mmio_value = 0;
-> 
-> 
+>  static void test_invalid(void)
+>  {
+>  	const struct sigp_invalid_cases *c;
+> @@ -289,97 +303,57 @@ static void test_set_prefix(void)
+>  
+>  }
+>  
+> -static void ecall(void)
+> +static void call_received(void)
+>  {
+>  	expect_ext_int();
+> -	ctl_set_bit(0, CTL0_EXTERNAL_CALL);
+> -	psw_mask_set_bits(PSW_MASK_EXT);
+> -	set_flag(1);
+> -	while (lowcore.ext_int_code != 0x1202) { mb(); }
+> -	report_pass("received");
+> -	set_flag(1);
+> -}
+> +	ctl_set_bit(0, current_sigp_call_case->cr0_bit);
+> +	/* make sure conditional emergency is accepted by disabling IO interrupts */
+> +	psw_mask_clear_and_set_bits(PSW_MASK_IO, PSW_MASK_EXT);
+>  
+> -static void test_ecall(void)
+> -{
+> -	struct psw psw;
+> -	psw.mask = extract_psw_mask();
+> -	psw.addr = (unsigned long)ecall;
+> +	/* Indicate that we're ready to receive the call */
+> +	set_flag(1);
+>  
+> -	report_prefix_push("ecall");
+> -	set_flag(0);
+> +	while (lowcore.ext_int_code != current_sigp_call_case->ext_int_expected_type)
+> +		mb();
+> +	report_pass("received");
+>  
+> -	smp_cpu_start(1, psw);
+> -	wait_for_flag();
+> -	set_flag(0);
+> -	smp_sigp(1, SIGP_EXTERNAL_CALL, 0, NULL);
+> -	wait_for_flag();
+> -	smp_cpu_stop(1);
+> -	report_prefix_pop();
+> -}
+> +	ctl_clear_bit(0, current_sigp_call_case->cr0_bit);
+>  
+> -static void emcall(void)
+> -{
+> -	expect_ext_int();
+> -	ctl_set_bit(0, CTL0_EMERGENCY_SIGNAL);
+> -	psw_mask_set_bits(PSW_MASK_EXT);
+> -	set_flag(1);
+> -	while (lowcore.ext_int_code != 0x1201) { mb(); }
+> -	report_pass("received");
+> +	/* Indicate that we're done */
+>  	set_flag(1);
+>  }
+>  
+> -static void test_emcall(void)
+> +static void test_calls(void)
+>  {
+> +	int i;
+>  	struct psw psw;
+> -	psw.mask = extract_psw_mask();
+> -	psw.addr = (unsigned long)emcall;
+>  
+> -	report_prefix_push("emcall");
+> -	set_flag(0);
+> +	for (i = 0; i < ARRAY_SIZE(cases_sigp_call); i++) {
+> +		current_sigp_call_case = &cases_sigp_call[i];
+>  
+> -	smp_cpu_start(1, psw);
+> -	wait_for_flag();
+> -	set_flag(0);
+> -	smp_sigp(1, SIGP_EMERGENCY_SIGNAL, 0, NULL);
+> -	wait_for_flag();
+> -	smp_cpu_stop(1);
+> +		report_prefix_push(current_sigp_call_case->name);
+> +		if (!current_sigp_call_case->supports_pv && uv_os_is_guest()) {
+> +			report_skip("Not supported under PV");
+> +			report_prefix_pop();
+> +			continue;
+> +		}
+>  
+> -	report_prefix_pop();
+> -}
+> +		set_flag(0);
+> +		psw.mask = extract_psw_mask();
+> +		psw.addr = (unsigned long)call_received;
+> +		smp_cpu_start(1, psw);
+>  
+> -static void test_cond_emcall(void)
+> -{
+> -	uint32_t status = 0;
+> -	struct psw psw;
+> -	int cc;
+> -	psw.mask = extract_psw_mask() & ~PSW_MASK_IO;
+> -	psw.addr = (unsigned long)emcall;
+> +		/* Wait until the receiver has finished setup */
+> +		wait_for_flag();
+> +		set_flag(0);
+>  
+> -	report_prefix_push("conditional emergency call");
+> +		smp_sigp(1, current_sigp_call_case->call, 0, NULL);
+>  
+> -	if (uv_os_is_guest()) {
+> -		report_skip("unsupported under PV");
+> -		goto out;
+> +		/* Wait until the receiver has handled the call */
+> +		wait_for_flag();
+> +		smp_cpu_stop(1);
+> +		report_prefix_pop();
+>  	}
+> -
+> -	report_prefix_push("success");
+> -	set_flag(0);
+> -
+> -	smp_cpu_start(1, psw);
+> -	wait_for_flag();
+> -	set_flag(0);
+> -	cc = smp_sigp(1, SIGP_COND_EMERGENCY_SIGNAL, 0, &status);
+> -	report(!cc, "CC = 0");
+> -
+> -	wait_for_flag();
+> -	smp_cpu_stop(1);
+> -
+> -	report_prefix_pop();
+> -
+> -out:
+> -	report_prefix_pop();
+> -
+>  }
+>  
+>  static void test_sense_running(void)
+> @@ -499,9 +473,7 @@ int main(void)
+>  	test_stop_store_status();
+>  	test_store_status();
+>  	test_set_prefix();
+> -	test_ecall();
+> -	test_emcall();
+> -	test_cond_emcall();
+> +	test_calls();
+>  	test_sense_running();
+>  	test_reset();
+>  	test_reset_initial();
+
