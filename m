@@ -2,125 +2,121 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id C62BB583F98
-	for <lists+kvm@lfdr.de>; Thu, 28 Jul 2022 15:06:48 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 0C393584042
+	for <lists+kvm@lfdr.de>; Thu, 28 Jul 2022 15:46:08 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S239019AbiG1NGr (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 28 Jul 2022 09:06:47 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45840 "EHLO
+        id S229869AbiG1NqG (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 28 Jul 2022 09:46:06 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51490 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S238732AbiG1NGq (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 28 Jul 2022 09:06:46 -0400
-Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 74A25CD6
-        for <kvm@vger.kernel.org>; Thu, 28 Jul 2022 06:06:45 -0700 (PDT)
-Received: from pps.filterd (m0098417.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.17.1.5/8.17.1.5) with ESMTP id 26SCpgsN022721
-        for <kvm@vger.kernel.org>; Thu, 28 Jul 2022 13:06:44 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=date : from : to : cc :
- subject : message-id : in-reply-to : references : mime-version :
- content-type : content-transfer-encoding; s=pp1;
- bh=6sfgsorhL6xF7d2lDyaG1bwB+sGYe85RN4RDroOOREg=;
- b=ZU+l6fixpR9xhlTH6lT8AeIbzpr+vfvwa2oYpsgfLip3aDmwyO1UVxQ39q1olofOMcX+
- kkxUaQ2MfJYJLVhGJNGpVarUnn4IT+Dz7VZIJfw2qCsiKdDF1m9PDPj/Fim4jDNkHy0A
- MeTod3Qx5jHT3ie5UpIvubmZgFQTx7OT2ZmBI8RkNOhydI4r2dxiLmKn8zQJDWrA2zaj
- ssLflrzT8wn0NNK1qTMM25Fo4sJlP8I0GgyffPY3IxOQ5TuI/rgJNBR9HmrIp5D1uZZE
- P2CHeEPZGIjNw1/v+TACu2XdRy7yfq2iWczjM2JDd1HYtQ6CoLPBwygjWJKOkimxv+iT 1A== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3hktu6rm1m-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT)
-        for <kvm@vger.kernel.org>; Thu, 28 Jul 2022 13:06:44 +0000
-Received: from m0098417.ppops.net (m0098417.ppops.net [127.0.0.1])
-        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 26SCve2O025149
-        for <kvm@vger.kernel.org>; Thu, 28 Jul 2022 13:06:44 GMT
-Received: from ppma03ams.nl.ibm.com (62.31.33a9.ip4.static.sl-reverse.com [169.51.49.98])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3hktu6rkyy-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 28 Jul 2022 13:06:44 +0000
-Received: from pps.filterd (ppma03ams.nl.ibm.com [127.0.0.1])
-        by ppma03ams.nl.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 26SD5J9J006879;
-        Thu, 28 Jul 2022 13:06:42 GMT
-Received: from b06avi18626390.portsmouth.uk.ibm.com (b06avi18626390.portsmouth.uk.ibm.com [9.149.26.192])
-        by ppma03ams.nl.ibm.com with ESMTP id 3hh6eun2qu-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 28 Jul 2022 13:06:42 +0000
-Received: from d06av25.portsmouth.uk.ibm.com (d06av25.portsmouth.uk.ibm.com [9.149.105.61])
-        by b06avi18626390.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 26SD4boZ32244112
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Thu, 28 Jul 2022 13:04:37 GMT
-Received: from d06av25.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 1415D11C050;
-        Thu, 28 Jul 2022 13:06:40 +0000 (GMT)
-Received: from d06av25.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id C876711C04A;
-        Thu, 28 Jul 2022 13:06:39 +0000 (GMT)
-Received: from p-imbrenda (unknown [9.145.0.43])
-        by d06av25.portsmouth.uk.ibm.com (Postfix) with ESMTP;
-        Thu, 28 Jul 2022 13:06:39 +0000 (GMT)
-Date:   Thu, 28 Jul 2022 15:06:38 +0200
-From:   Claudio Imbrenda <imbrenda@linux.ibm.com>
-To:     Paolo Bonzini <pbonzini@redhat.com>
-Cc:     kvm@vger.kernel.org, thuth@redhat.com
-Subject: Re: [PATCH kvm-unit-tests] s390x: fix build with clang
-Message-ID: <20220728150638.41b8f5f0@p-imbrenda>
-In-Reply-To: <20220726083725.32454-1-pbonzini@redhat.com>
-References: <20220726083725.32454-1-pbonzini@redhat.com>
-Organization: IBM
-X-Mailer: Claws Mail 4.1.0 (GTK 3.24.34; x86_64-redhat-linux-gnu)
+        with ESMTP id S230326AbiG1Npr (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 28 Jul 2022 09:45:47 -0400
+Received: from NAM12-DM6-obe.outbound.protection.outlook.com (mail-dm6nam12on2043.outbound.protection.outlook.com [40.107.243.43])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9341661D82;
+        Thu, 28 Jul 2022 06:45:46 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=bMVeZIi7IIwT+TQu9ZjFNc5KoaNsIZneVFiXyxSrZKLyk9Y8Ne3kiByOeV7x7XMdVkd8KRGaf/FG4+azW3HEdr9vKcqmzndIZpy5jIaH4+7PE8LkIc/6pnKdYzba68Q9OgTHs+Zlrif28t5PmHMOTwkk+eAMp3BTbsLgiAaxAl3Pa0TcwdcDwS9Hd7kx0ZeHbAF5blyEHZkbr8DVkLA++rOSrUclTkOpBfLz6RXVqjM2J5ehiVEQ/pcC6XbhLzLvyHjUYCzSkInNVovW+jKupBhD8PWeCveePuZZ9b8xOkBqtaamnMt31oelVNY9rSSCVst9O4coYCrITw/Stcx9xA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=sCYmpIlNiV51gzZNOnmcf/o3xy/Uy06xSdY4vy71K9s=;
+ b=kHer0QyGpWuZZrzekgq0I1NqYb6xMpS4R7ggeYjsmUtFmy0D3HuaT4NM9EVGlxscxrNGvvjGWbPIan7M1HO9hmSwuGv64gqpYS3AiYYGzGBGg17A0uUMJkJvK9Zx5pCBvaWiH9rDR0WCs56vsmnrmgfITuMfUVFF+9BqWPfjBvMzc4v5r69QWol8gQzlm9GeNUg1joezVzG2o/2662SRAP8wK/RrHZOHLieZDmhASTbltPo8f7DP9PsELhmYGU79KCMAtmC4/im8Vq5F55X1ox7OF+3jqR379OMFzntT4NCA1WpUPqV8cvlE9JyOn1urTbEOKjvXT8M4y2vssIgTDw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
+ 165.204.84.17) smtp.rcpttodomain=google.com smtp.mailfrom=amd.com; dmarc=pass
+ (p=quarantine sp=quarantine pct=100) action=none header.from=amd.com;
+ dkim=none (message not signed); arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=sCYmpIlNiV51gzZNOnmcf/o3xy/Uy06xSdY4vy71K9s=;
+ b=wG32dGZrkbm7fpN0/U6M6f/WjI+ohvfTHzoLbqGdXHmTpBrw7+j1BBD4DSflvlk8wcBEEhLwZftKG3r+op/71RN4ZzQBRImhgNAMFsazHQmb/40oGCaHhLtnYNsIw72A8a8hRFyOsFb514yaDvmXIirVHD3RhMReKisJ5MxcNIk=
+Received: from DS7PR03CA0208.namprd03.prod.outlook.com (2603:10b6:5:3b6::33)
+ by SN7PR12MB7021.namprd12.prod.outlook.com (2603:10b6:806:262::16) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5482.6; Thu, 28 Jul
+ 2022 13:45:45 +0000
+Received: from DM6NAM11FT052.eop-nam11.prod.protection.outlook.com
+ (2603:10b6:5:3b6:cafe::df) by DS7PR03CA0208.outlook.office365.com
+ (2603:10b6:5:3b6::33) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5482.10 via Frontend
+ Transport; Thu, 28 Jul 2022 13:45:44 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 165.204.84.17)
+ smtp.mailfrom=amd.com; dkim=none (message not signed)
+ header.d=none;dmarc=pass action=none header.from=amd.com;
+Received-SPF: Pass (protection.outlook.com: domain of amd.com designates
+ 165.204.84.17 as permitted sender) receiver=protection.outlook.com;
+ client-ip=165.204.84.17; helo=SATLEXMB04.amd.com; pr=C
+Received: from SATLEXMB04.amd.com (165.204.84.17) by
+ DM6NAM11FT052.mail.protection.outlook.com (10.13.172.111) with Microsoft SMTP
+ Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.20.5482.10 via Frontend Transport; Thu, 28 Jul 2022 13:45:44 +0000
+Received: from localhost (10.180.168.240) by SATLEXMB04.amd.com
+ (10.181.40.145) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2375.28; Thu, 28 Jul
+ 2022 08:45:43 -0500
+Date:   Thu, 28 Jul 2022 08:44:30 -0500
+From:   Michael Roth <michael.roth@amd.com>
+To:     <seanjc@google.com>
+CC:     <linux-kernel@vger.kernel.org>, <kvm@vger.kernel.org>,
+        Tom Lendacky <thomas.lendacky@amd.com>
+Subject: re: Possible 5.19 regression for systems with 52-bit physical
+ address support
+Message-ID: <20220728134430.ulykdplp6fxgkyiw@amd.com>
+In-Reply-To: 20220420002747.3287931-1-seanjc@google.com
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: e_1zLJDUgLES3oc2zlMXoSToVgsXt3AG
-X-Proofpoint-ORIG-GUID: 4DPpESyWjHmqtXvtqpU3Mts9xp1B7--5
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.205,Aquarius:18.0.883,Hydra:6.0.517,FMLib:17.11.122.1
- definitions=2022-07-28_05,2022-07-28_02,2022-06-22_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501
- impostorscore=0 spamscore=0 phishscore=0 mlxlogscore=999 adultscore=0
- mlxscore=0 lowpriorityscore=0 clxscore=1015 suspectscore=0 bulkscore=0
- malwarescore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2206140000 definitions=main-2207280057
-X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_EF,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_PASS
-        autolearn=ham autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset="us-ascii"
+Content-Disposition: inline
+X-Originating-IP: [10.180.168.240]
+X-ClientProxiedBy: SATLEXMB03.amd.com (10.181.40.144) To SATLEXMB04.amd.com
+ (10.181.40.145)
+X-EOPAttributedMessage: 0
+X-MS-PublicTrafficType: Email
+X-MS-Office365-Filtering-Correlation-Id: 21c41e81-08aa-49f8-a564-08da709f785e
+X-MS-TrafficTypeDiagnostic: SN7PR12MB7021:EE_
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: AptLxT/0AVBMxcQwalw2vEsT0oxr8he/vsUjPWJFvMSiJt8ymyiNZcmrd3R3vb/OqXfQ/J7Re+i9KafVYJcfuoELOEK0LKasGTFE5N6UQnfb56JDSqGuUcXZGtTh5eOTosq6rrWHhZ/1tw+lp5Qrn+480++v98ocN9IOT6N2ovxgGNZ9CrSXxNocvCDy28GMtvgnLnlJq+55T6OpPtOsRaxQPMD9LB1AywhV+UfNklLIWxEyfuAyEh9CgQgvHWsb4kUW0rgNpcz8RdeSd3umo/SMehWiVTXyp0Stkr8qhnHvApaQ9TMuSJ49FF63VOFh13PQlPGIGh+5qYU4AsyVMCR08GYSIP1pWFRWxlt+d40nMvfIzbC7wVYkHIodV7+mV3CKdiIKVhyExQHlt4a09ZtUi0jWquxwOCQ/SR75787t/W9vv+PAYadKushupUXJmOQratENf/y3CVLa4S0D/euPPA9ojOo0afZRukbHxkTpGB/T7aGt7ZHAnPpYFb7DJyaAVKzLWFO3U4ihYrxSLAwt6M4s5UIxC0HLJTDxaVdd2QFSPRSQOA39NeUdrm70POpFVX/Kdy9brHpEzb8uhTGRQPiYnqqnaW7w0mHfk7UiWTrFJgvTrksqFkzcKxTcpWE6DVWz3G4p7tQmcD3tM76CpkcTj2paLtexoJ4veske98zJ0prCYMm172o7B1jJKh0Yw83yH3lbhIJ8YJe9ip5QiesoeEYwmkjpddLCUsJfd3fxZvJGD5dSbZTVWtQ6VPsjD9cqAlK+nOKtgtbMYrIbVytDXHLBTRuvbIwP2j6T2yb84BjldjB1VzseYv83h1FzIeiQfp5yAbf9/xkwLg==
+X-Forefront-Antispam-Report: CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:SATLEXMB04.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230016)(4636009)(346002)(39860400002)(136003)(376002)(396003)(46966006)(36840700001)(40470700004)(2616005)(44832011)(86362001)(54906003)(4744005)(8936002)(8676002)(6916009)(4326008)(316002)(41300700001)(16526019)(186003)(36756003)(6666004)(70586007)(5660300002)(70206006)(336012)(426003)(81166007)(47076005)(356005)(1076003)(2906002)(83380400001)(40460700003)(82310400005)(26005)(82740400003)(478600001)(36860700001)(40480700001)(36900700001);DIR:OUT;SFP:1101;
+X-OriginatorOrg: amd.com
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 28 Jul 2022 13:45:44.6988
+ (UTC)
+X-MS-Exchange-CrossTenant-Network-Message-Id: 21c41e81-08aa-49f8-a564-08da709f785e
+X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=3dd8961f-e488-4e60-8e11-a82d994e183d;Ip=[165.204.84.17];Helo=[SATLEXMB04.amd.com]
+X-MS-Exchange-CrossTenant-AuthSource: DM6NAM11FT052.eop-nam11.prod.protection.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Anonymous
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SN7PR12MB7021
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_PASS autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, 26 Jul 2022 10:37:25 +0200
-Paolo Bonzini <pbonzini@redhat.com> wrote:
+Hi Sean,
 
-> Reported by Travis CI:
-> 
-> /home/travis/build/kvm-unit-tests/kvm-unit-tests/lib/s390x/fault.c:43:56: error: static_assert with no message is a C++17 extension [-Werror,-Wc++17-extensions]
->                 _Static_assert(ARRAY_SIZE(prot_str) == PROT_NUM_CODES);
->                                                                      ^
->                                                                      , ""
-> 1 error generated.
-> make: *** [<builtin>: lib/s390x/fault.o] Error 1
-> 
-> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+With this patch applied, AMD processors that support 52-bit physical
+address will result in MMIO caching being disabled. This ends up
+breaking SEV-ES and SNP, since they rely on the MMIO reserved bit to
+generate the appropriate NAE MMIO exit event.
 
-Reviewed-by: Claudio Imbrenda <imbrenda@linux.ibm.com>
+This failure can also be reproduced on Milan by disabling mmio_caching
+via KVM module parameter.
 
-> ---
->  lib/s390x/fault.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
-> 
-> diff --git a/lib/s390x/fault.c b/lib/s390x/fault.c
-> index 1cd6e26..a882d5d 100644
-> --- a/lib/s390x/fault.c
-> +++ b/lib/s390x/fault.c
-> @@ -40,7 +40,7 @@ static void print_decode_pgm_prot(union teid teid)
->  			"LAP",
->  			"IEP",
->  		};
-> -		_Static_assert(ARRAY_SIZE(prot_str) == PROT_NUM_CODES);
-> +		_Static_assert(ARRAY_SIZE(prot_str) == PROT_NUM_CODES, "ESOP2 prot codes");
->  		int prot_code = teid_esop2_prot_code(teid);
->  
->  		printf("Type: %s\n", prot_str[prot_code]);
+In the case of AMD, guests use a separate physical address range that
+and so there are still reserved bits available to make use of the MMIO
+caching. This adjustment happens in svm_adjust_mmio_mask(), but since
+mmio_caching_enabled flag is 0, any attempts to update masks get
+ignored by kvm_mmu_set_mmio_spte_mask().
 
+Would adding 'force' parameter to kvm_mmu_set_mmio_spte_mask() that
+svm_adjust_mmio_mask() can set to ignore enable_mmio_caching be
+reasonable fix, or should we take a different approach?
+
+Thanks!
+
+-Mike
