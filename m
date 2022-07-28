@@ -2,122 +2,125 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 3D9C7583E3B
-	for <lists+kvm@lfdr.de>; Thu, 28 Jul 2022 14:03:08 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id C62BB583F98
+	for <lists+kvm@lfdr.de>; Thu, 28 Jul 2022 15:06:48 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237566AbiG1MDF (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 28 Jul 2022 08:03:05 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39978 "EHLO
+        id S239019AbiG1NGr (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 28 Jul 2022 09:06:47 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45840 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235664AbiG1MDE (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 28 Jul 2022 08:03:04 -0400
-Received: from mail-pf1-x432.google.com (mail-pf1-x432.google.com [IPv6:2607:f8b0:4864:20::432])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8998C67151;
-        Thu, 28 Jul 2022 05:03:03 -0700 (PDT)
-Received: by mail-pf1-x432.google.com with SMTP id c3so1725019pfb.13;
-        Thu, 28 Jul 2022 05:03:03 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=message-id:date:mime-version:user-agent:subject:content-language:to
-         :cc:references:from:in-reply-to:content-transfer-encoding;
-        bh=6nvKbT9kndzSOUcfK+zc9MvubXEZk6miyWHNHn+5OxY=;
-        b=f1YeSeTjLcomvltM6VYE8CROdkCKG4NTbFMbj45rMThgoM6sGFv8czsgRRZfgd1WKt
-         f/08GfGCfpugkNkzhZUBer6T79p1kpE4c4DXPGSZNsCf2T0QJ2VCkuWLqJo0ziYiPCDz
-         GvwVufYfxqJRU595/YjWWArmjF9unlseUWacHYEBZmo13XHJxCJ6tuyGAbG65R+7HwNr
-         uo2WTpmy2euBKPbcYPy28keUFAt/3oP9OJ1JFjEoaHfZYfyWUBB8/FpBtlv3XNF1hiO5
-         3uFGN7/p7PfTIf+xlNLn/R9PWIus6jG9WetHyv8CdccXU0FfYs4GlnzKyd9hXY1rfNE5
-         AbFg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
-         :content-language:to:cc:references:from:in-reply-to
-         :content-transfer-encoding;
-        bh=6nvKbT9kndzSOUcfK+zc9MvubXEZk6miyWHNHn+5OxY=;
-        b=C0+fM6FK8o5hemvJkcpS2lrO5toy6iD96j0HqQ8WkWxPt9uURaZ3e1FTOnTQNUZHiW
-         AHThJpUB+bnrRlCP3cYGy2ZyIhk74ycZt8UwNZruQwi0a21vhPa2R/q0paSQDHyCQvf2
-         +sy/AMU/XMT6GXozQNcha5PeVFBWkH9QTIrVxsYQlMe3amfMQTeix4gtPOlmF0qbOmtn
-         DsBCz05bCQhNnUF1ltKZlWfuMgmI11N2kv2qVr37/n6W4kkLupxsPqJPb5pZDc3nOU9U
-         PpSLjqIGPb38DNtl/ODGv+aIN+b/Wan37CvU6X7INknrn5HIXPJh05l6QEhmlJKLvq+i
-         C/aA==
-X-Gm-Message-State: AJIora+brUw6vrhrPJaqsfjwnUsWGbrqp1qUPWUq72jJvJS21GEY5AOl
-        qmWX6IvQugzoLdizGHPqvdbjK0Ghn5oOlw==
-X-Google-Smtp-Source: AGRyM1ufvExeCGCzYxqGycF0uLOFYtynrFUL0MSe6SOxjvtAeuwZiJkNue2cpzf3SNcK4og20Lnzyg==
-X-Received: by 2002:a65:6494:0:b0:419:9527:2a69 with SMTP id e20-20020a656494000000b0041995272a69mr22789010pgv.80.1659009782991;
-        Thu, 28 Jul 2022 05:03:02 -0700 (PDT)
-Received: from [192.168.255.10] ([103.7.29.32])
-        by smtp.gmail.com with ESMTPSA id q12-20020a170902a3cc00b0016397da033csm1108413plb.62.2022.07.28.05.03.00
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 28 Jul 2022 05:03:02 -0700 (PDT)
-Message-ID: <271bddfa-9e48-d5f6-6147-af346d7946bf@gmail.com>
-Date:   Thu, 28 Jul 2022 20:02:53 +0800
+        with ESMTP id S238732AbiG1NGq (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 28 Jul 2022 09:06:46 -0400
+Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 74A25CD6
+        for <kvm@vger.kernel.org>; Thu, 28 Jul 2022 06:06:45 -0700 (PDT)
+Received: from pps.filterd (m0098417.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.17.1.5/8.17.1.5) with ESMTP id 26SCpgsN022721
+        for <kvm@vger.kernel.org>; Thu, 28 Jul 2022 13:06:44 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=date : from : to : cc :
+ subject : message-id : in-reply-to : references : mime-version :
+ content-type : content-transfer-encoding; s=pp1;
+ bh=6sfgsorhL6xF7d2lDyaG1bwB+sGYe85RN4RDroOOREg=;
+ b=ZU+l6fixpR9xhlTH6lT8AeIbzpr+vfvwa2oYpsgfLip3aDmwyO1UVxQ39q1olofOMcX+
+ kkxUaQ2MfJYJLVhGJNGpVarUnn4IT+Dz7VZIJfw2qCsiKdDF1m9PDPj/Fim4jDNkHy0A
+ MeTod3Qx5jHT3ie5UpIvubmZgFQTx7OT2ZmBI8RkNOhydI4r2dxiLmKn8zQJDWrA2zaj
+ ssLflrzT8wn0NNK1qTMM25Fo4sJlP8I0GgyffPY3IxOQ5TuI/rgJNBR9HmrIp5D1uZZE
+ P2CHeEPZGIjNw1/v+TACu2XdRy7yfq2iWczjM2JDd1HYtQ6CoLPBwygjWJKOkimxv+iT 1A== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3hktu6rm1m-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT)
+        for <kvm@vger.kernel.org>; Thu, 28 Jul 2022 13:06:44 +0000
+Received: from m0098417.ppops.net (m0098417.ppops.net [127.0.0.1])
+        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 26SCve2O025149
+        for <kvm@vger.kernel.org>; Thu, 28 Jul 2022 13:06:44 GMT
+Received: from ppma03ams.nl.ibm.com (62.31.33a9.ip4.static.sl-reverse.com [169.51.49.98])
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3hktu6rkyy-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Thu, 28 Jul 2022 13:06:44 +0000
+Received: from pps.filterd (ppma03ams.nl.ibm.com [127.0.0.1])
+        by ppma03ams.nl.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 26SD5J9J006879;
+        Thu, 28 Jul 2022 13:06:42 GMT
+Received: from b06avi18626390.portsmouth.uk.ibm.com (b06avi18626390.portsmouth.uk.ibm.com [9.149.26.192])
+        by ppma03ams.nl.ibm.com with ESMTP id 3hh6eun2qu-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Thu, 28 Jul 2022 13:06:42 +0000
+Received: from d06av25.portsmouth.uk.ibm.com (d06av25.portsmouth.uk.ibm.com [9.149.105.61])
+        by b06avi18626390.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 26SD4boZ32244112
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Thu, 28 Jul 2022 13:04:37 GMT
+Received: from d06av25.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 1415D11C050;
+        Thu, 28 Jul 2022 13:06:40 +0000 (GMT)
+Received: from d06av25.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id C876711C04A;
+        Thu, 28 Jul 2022 13:06:39 +0000 (GMT)
+Received: from p-imbrenda (unknown [9.145.0.43])
+        by d06av25.portsmouth.uk.ibm.com (Postfix) with ESMTP;
+        Thu, 28 Jul 2022 13:06:39 +0000 (GMT)
+Date:   Thu, 28 Jul 2022 15:06:38 +0200
+From:   Claudio Imbrenda <imbrenda@linux.ibm.com>
+To:     Paolo Bonzini <pbonzini@redhat.com>
+Cc:     kvm@vger.kernel.org, thuth@redhat.com
+Subject: Re: [PATCH kvm-unit-tests] s390x: fix build with clang
+Message-ID: <20220728150638.41b8f5f0@p-imbrenda>
+In-Reply-To: <20220726083725.32454-1-pbonzini@redhat.com>
+References: <20220726083725.32454-1-pbonzini@redhat.com>
+Organization: IBM
+X-Mailer: Claws Mail 4.1.0 (GTK 3.24.34; x86_64-redhat-linux-gnu)
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:91.0)
- Gecko/20100101 Thunderbird/91.11.0
-Subject: Re: [PATCH 1/3] KVM: x86: Refresh PMU after writes to
- MSR_IA32_PERF_CAPABILITIES
-Content-Language: en-US
-To:     Sean Christopherson <seanjc@google.com>,
-        Paolo Bonzini <pbonzini@redhat.com>
-Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org
-References: <20220727233424.2968356-1-seanjc@google.com>
- <20220727233424.2968356-2-seanjc@google.com>
-From:   Like Xu <like.xu.linux@gmail.com>
-In-Reply-To: <20220727233424.2968356-2-seanjc@google.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,NICE_REPLY_A,
-        RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS autolearn=ham
-        autolearn_force=no version=3.4.6
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: e_1zLJDUgLES3oc2zlMXoSToVgsXt3AG
+X-Proofpoint-ORIG-GUID: 4DPpESyWjHmqtXvtqpU3Mts9xp1B7--5
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.205,Aquarius:18.0.883,Hydra:6.0.517,FMLib:17.11.122.1
+ definitions=2022-07-28_05,2022-07-28_02,2022-06-22_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501
+ impostorscore=0 spamscore=0 phishscore=0 mlxlogscore=999 adultscore=0
+ mlxscore=0 lowpriorityscore=0 clxscore=1015 suspectscore=0 bulkscore=0
+ malwarescore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2206140000 definitions=main-2207280057
+X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_EF,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_PASS
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 28/7/2022 7:34 am, Sean Christopherson wrote:
-> Refresh the PMU if userspace modifies MSR_IA32_PERF_CAPABILITIES.  KVM
-> consumes the vCPU's PERF_CAPABILITIES when enumerating PEBS support, but
-> relies on CPUID updates to refresh the PMU.  I.e. KVM will do the wrong
-> thing if userspace stuffs PERF_CAPABILITIES _after_ setting guest CPUID.
+On Tue, 26 Jul 2022 10:37:25 +0200
+Paolo Bonzini <pbonzini@redhat.com> wrote:
 
-Unwise userspace should reap its consequences if it does not break KVM or host.
-
-When a guest feature can be defined/controlled by multiple KVM APIs entries,
-(such as SET_CPUID2, msr_feature, KVM_CAP, module_para), should KVM
-define the priority of these APIs (e.g. whether they can override each other) ?
-
-Removing this ambiguity ensures consistency in the architecture and behavior of 
-all KVM features.
-Any further performance optimizations can be based on these finalized values as 
-you do.
-
+> Reported by Travis CI:
 > 
-> Opportunistically fix a curly-brace indentation.
+> /home/travis/build/kvm-unit-tests/kvm-unit-tests/lib/s390x/fault.c:43:56: error: static_assert with no message is a C++17 extension [-Werror,-Wc++17-extensions]
+>                 _Static_assert(ARRAY_SIZE(prot_str) == PROT_NUM_CODES);
+>                                                                      ^
+>                                                                      , ""
+> 1 error generated.
+> make: *** [<builtin>: lib/s390x/fault.o] Error 1
 > 
-> Fixes: c59a1f106f5c ("KVM: x86/pmu: Add IA32_PEBS_ENABLE MSR emulation for extended PEBS")
-> Cc: Like Xu <like.xu.linux@gmail.com>
-> Signed-off-by: Sean Christopherson <seanjc@google.com>
+> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+
+Reviewed-by: Claudio Imbrenda <imbrenda@linux.ibm.com>
+
 > ---
->   arch/x86/kvm/x86.c | 4 ++--
->   1 file changed, 2 insertions(+), 2 deletions(-)
+>  lib/s390x/fault.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
 > 
-> diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-> index 5366f884e9a7..362c538285db 100644
-> --- a/arch/x86/kvm/x86.c
-> +++ b/arch/x86/kvm/x86.c
-> @@ -3543,9 +3543,9 @@ int kvm_set_msr_common(struct kvm_vcpu *vcpu, struct msr_data *msr_info)
->   			return 1;
->   
->   		vcpu->arch.perf_capabilities = data;
-> -
-> +		kvm_pmu_refresh(vcpu);
+> diff --git a/lib/s390x/fault.c b/lib/s390x/fault.c
+> index 1cd6e26..a882d5d 100644
+> --- a/lib/s390x/fault.c
+> +++ b/lib/s390x/fault.c
+> @@ -40,7 +40,7 @@ static void print_decode_pgm_prot(union teid teid)
+>  			"LAP",
+>  			"IEP",
+>  		};
+> -		_Static_assert(ARRAY_SIZE(prot_str) == PROT_NUM_CODES);
+> +		_Static_assert(ARRAY_SIZE(prot_str) == PROT_NUM_CODES, "ESOP2 prot codes");
+>  		int prot_code = teid_esop2_prot_code(teid);
+>  
+>  		printf("Type: %s\n", prot_str[prot_code]);
 
-I had proposed this diff but was met with silence.
-
->   		return 0;
-> -		}
-> +	}
->   	case MSR_EFER:
->   		return set_efer(vcpu, msr_info);
->   	case MSR_K7_HWCR:
