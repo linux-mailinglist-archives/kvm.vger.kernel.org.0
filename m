@@ -2,74 +2,113 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 4E16D584CC3
-	for <lists+kvm@lfdr.de>; Fri, 29 Jul 2022 09:41:13 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 63CA1584D58
+	for <lists+kvm@lfdr.de>; Fri, 29 Jul 2022 10:28:22 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234896AbiG2HlK (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 29 Jul 2022 03:41:10 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51752 "EHLO
+        id S234644AbiG2I2T (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 29 Jul 2022 04:28:19 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35194 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234154AbiG2HlJ (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 29 Jul 2022 03:41:09 -0400
-Received: from ams.source.kernel.org (ams.source.kernel.org [IPv6:2604:1380:4601:e00::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BC65A30F45;
-        Fri, 29 Jul 2022 00:41:07 -0700 (PDT)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by ams.source.kernel.org (Postfix) with ESMTPS id 747BFB826FC;
-        Fri, 29 Jul 2022 07:41:06 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7B969C433C1;
-        Fri, 29 Jul 2022 07:41:04 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
-        s=korg; t=1659080465;
-        bh=FGL1aL6A/RUi4MWxUt1uEuHn+zfgp4GeIxmcVsCw1F4=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=fJ7gKeTugfJH/h3B7n7K/CEU0tl9h/jM/Ej149hPw1vYLEJ0ZjlSpxZIwDEE6e1aa
-         sG1QMS3ATbpyFb/mhLL2L2JIBqBDPAV2d18egaraTDGb31CqxjIvIXkuECBjX9KY+L
-         kOUEipqVnksAgmpdlpxnEwJA++KoIihZ2z6a2dcs=
-Date:   Fri, 29 Jul 2022 09:41:02 +0200
-From:   Greg KH <gregkh@linuxfoundation.org>
-To:     Coleman Dietsch <dietschc@csp.edu>
-Cc:     kvm@vger.kernel.org, x86@kernel.org,
-        Sean Christopherson <seanjc@google.com>,
-        Dave Hansen <dave.hansen@linux.intel.com>,
-        linux-kernel@vger.kernel.org,
-        syzbot+e54f930ed78eb0f85281@syzkaller.appspotmail.com,
-        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        "H . Peter Anvin" <hpa@zytor.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Pavel Skripkin <paskripkin@gmail.com>,
-        linux-kernel-mentees@lists.linuxfoundation.org
-Subject: Re: [PATCH] KVM: x86/xen: Fix bug in kvm_xen_vcpu_set_attr()
-Message-ID: <YuOPDpy+RqD09n3j@kroah.com>
-References: <20220728194736.383727-1-dietschc@csp.edu>
+        with ESMTP id S235462AbiG2I2F (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 29 Jul 2022 04:28:05 -0400
+Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7265583202
+        for <kvm@vger.kernel.org>; Fri, 29 Jul 2022 01:27:17 -0700 (PDT)
+Received: from pps.filterd (m0098404.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.17.1.5/8.17.1.5) with ESMTP id 26T8Gi86029372
+        for <kvm@vger.kernel.org>; Fri, 29 Jul 2022 08:27:17 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=from : to : cc : subject
+ : date : message-id : mime-version : content-transfer-encoding; s=pp1;
+ bh=WS2M5BDmB4yB4xxJdTHP2A7E5DOfgj1M3zzj06/3HKs=;
+ b=UzR0KtRVPOmPrAAqe09NNLIc0BIpcNNFmJm5EbJSFK/qmV23JP/u/6wUTpZfZ7+yRGow
+ zFxli3t6NcV+307ur/5HpW9oi5PIkgI6qmTkwQ07EcrvP/Tf66Xk5PEWOJSb+xZHRToo
+ W9D76uXpx1mpg6XIBNB2XZl9aw05lOLyPMvdIg94cOjicf9JZOCZJbuJKL0jMwyAirH5
+ 0z/K15DI3BS5aqP5TJi8YkP+LnlgFROmsNCaObDZLeajqcBCmMuhcUF3O3tBlFFMRRz2
+ 7SBliV/2lyqwM/1r7SVfsXZv6FeyQaRzp1v61EFZswqUDdZKeD0beCGwgZ/rzt83OTbV cA== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3hmbw9g82s-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT)
+        for <kvm@vger.kernel.org>; Fri, 29 Jul 2022 08:27:16 +0000
+Received: from m0098404.ppops.net (m0098404.ppops.net [127.0.0.1])
+        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 26T8HwNU003676
+        for <kvm@vger.kernel.org>; Fri, 29 Jul 2022 08:27:16 GMT
+Received: from ppma06ams.nl.ibm.com (66.31.33a9.ip4.static.sl-reverse.com [169.51.49.102])
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3hmbw9g81q-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Fri, 29 Jul 2022 08:27:16 +0000
+Received: from pps.filterd (ppma06ams.nl.ibm.com [127.0.0.1])
+        by ppma06ams.nl.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 26T8LE3G009709;
+        Fri, 29 Jul 2022 08:27:14 GMT
+Received: from b06cxnps3075.portsmouth.uk.ibm.com (d06relay10.portsmouth.uk.ibm.com [9.149.109.195])
+        by ppma06ams.nl.ibm.com with ESMTP id 3hg97tfaxh-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Fri, 29 Jul 2022 08:27:14 +0000
+Received: from d06av21.portsmouth.uk.ibm.com (d06av21.portsmouth.uk.ibm.com [9.149.105.232])
+        by b06cxnps3075.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 26T8RBaS32178512
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Fri, 29 Jul 2022 08:27:11 GMT
+Received: from d06av21.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id EFCB052051;
+        Fri, 29 Jul 2022 08:27:10 +0000 (GMT)
+Received: from linux6.. (unknown [9.114.12.104])
+        by d06av21.portsmouth.uk.ibm.com (Postfix) with ESMTP id 429665204E;
+        Fri, 29 Jul 2022 08:27:10 +0000 (GMT)
+From:   Janosch Frank <frankja@linux.ibm.com>
+To:     kvm@vger.kernel.org
+Cc:     imbrenda@linux.ibm.com, seiden@linux.ibm.com, nrb@linux.ibm.com,
+        scgl@linux.ibm.com, thuth@redhat.com
+Subject: [kvm-unit-tests PATCH 0/6] s390x: PV fixups
+Date:   Fri, 29 Jul 2022 08:26:27 +0000
+Message-Id: <20220729082633.277240-1-frankja@linux.ibm.com>
+X-Mailer: git-send-email 2.34.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20220728194736.383727-1-dietschc@csp.edu>
-X-Spam-Status: No, score=-7.6 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_HI,
-        SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
+Content-Transfer-Encoding: 8bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: 1LsMsHfE4jTFT1GQTrL4gDhYZDLiga27
+X-Proofpoint-ORIG-GUID: Pk4-vqu2fDZXXuN8aDFY9zWTldwdIUmd
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.205,Aquarius:18.0.883,Hydra:6.0.517,FMLib:17.11.122.1
+ definitions=2022-07-28_06,2022-07-28_02,2022-06-22_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 lowpriorityscore=0 mlxscore=0
+ mlxlogscore=815 priorityscore=1501 phishscore=0 clxscore=1015 spamscore=0
+ bulkscore=0 impostorscore=0 suspectscore=0 malwarescore=0 adultscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2206140000
+ definitions=main-2207290032
+X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_EF,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_PASS
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Jul 28, 2022 at 02:47:37PM -0500, Coleman Dietsch wrote:
-> This crash appears to be happening when vcpu->arch.xen.timer is already set and kvm_xen_init_timer(vcpu) is called.
+A small set of patches that clean up the PV snippet handling.
 
-What does "this crash" refer to ?
+Janosch Frank (6):
+  s390x: snippets: asm: Add a macro to write an exception PSW
+  s390x: MAKEFILE: Use $< instead of pathsubst
+  s390x: Add a linker script to assembly snippets
+  lib: s390x: sie: Improve validity handling and make it vm specific
+  lib: s390x: Use a new asce for each PV guest
+  lib: s390x: sie: Properly populate SCA
 
-> 
-> During testing with the syzbot reproducer code it seemed apparent that the else if statement in the KVM_XEN_VCPU_ATTR_TYPE_TIMER switch case was not being reached, which is where the kvm_xen_stop_timer(vcpu) call is located.
+ lib/s390x/asm-offsets.c                  |  2 ++
+ lib/s390x/sie.c                          | 36 +++++++++++++-------
+ lib/s390x/sie.h                          | 43 ++++++++++++++++++++++--
+ lib/s390x/snippet.h                      |  3 +-
+ lib/s390x/uv.c                           | 35 +++++++++++++++++--
+ lib/s390x/uv.h                           |  5 ++-
+ s390x/Makefile                           | 18 +++++++---
+ s390x/cpu.S                              |  6 ++++
+ s390x/mvpg-sie.c                         |  2 +-
+ s390x/pv-diags.c                         |  6 ++--
+ s390x/snippets/asm/macros.S              | 28 +++++++++++++++
+ s390x/snippets/asm/snippet-pv-diag-288.S |  4 +--
+ s390x/snippets/asm/snippet-pv-diag-500.S |  6 ++--
+ 13 files changed, 157 insertions(+), 37 deletions(-)
+ create mode 100644 s390x/snippets/asm/macros.S
 
-Please properly wrap your kernel changelog at 72 columns.
+-- 
+2.34.1
 
-Didn't checkpatch.pl complain about this?
-
-thanks,
-
-greg k-h
