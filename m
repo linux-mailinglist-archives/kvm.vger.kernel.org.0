@@ -2,211 +2,172 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 682AC585326
-	for <lists+kvm@lfdr.de>; Fri, 29 Jul 2022 18:01:53 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id ACBB458532D
+	for <lists+kvm@lfdr.de>; Fri, 29 Jul 2022 18:08:34 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236282AbiG2QBu (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 29 Jul 2022 12:01:50 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59864 "EHLO
+        id S236905AbiG2QIc (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 29 Jul 2022 12:08:32 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35066 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230040AbiG2QBt (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 29 Jul 2022 12:01:49 -0400
-Received: from vps-vb.mhejs.net (vps-vb.mhejs.net [37.28.154.113])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 50F206FA1D
-        for <kvm@vger.kernel.org>; Fri, 29 Jul 2022 09:01:47 -0700 (PDT)
-Received: from MUA
-        by vps-vb.mhejs.net with esmtps  (TLS1.2) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-        (Exim 4.94.2)
-        (envelope-from <mail@maciej.szmigiero.name>)
-        id 1oHSQe-0001k4-76; Fri, 29 Jul 2022 18:01:32 +0200
-From:   "Maciej S. Szmigiero" <mail@maciej.szmigiero.name>
-To:     Paolo Bonzini <pbonzini@redhat.com>,
-        Richard Henderson <richard.henderson@linaro.org>,
-        Eduardo Habkost <eduardo@habkost.net>
-Cc:     Marcelo Tosatti <mtosatti@redhat.com>,
-        "Michael S . Tsirkin" <mst@redhat.com>,
-        Marcel Apfelbaum <marcel.apfelbaum@gmail.com>,
-        kvm@vger.kernel.org, qemu-devel@nongnu.org
-Subject: [PATCH] hyperv: fix SynIC SINT assertion failure on guest reset
-Date:   Fri, 29 Jul 2022 18:01:26 +0200
-Message-Id: <e132e1fbf2bcc3f6f4ba339a5b36d938aca083fa.1659110405.git.maciej.szmigiero@oracle.com>
-X-Mailer: git-send-email 2.35.1
+        with ESMTP id S229818AbiG2QIb (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 29 Jul 2022 12:08:31 -0400
+Received: from mail-pl1-x62f.google.com (mail-pl1-x62f.google.com [IPv6:2607:f8b0:4864:20::62f])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 416C788762
+        for <kvm@vger.kernel.org>; Fri, 29 Jul 2022 09:08:30 -0700 (PDT)
+Received: by mail-pl1-x62f.google.com with SMTP id x7so4995172pll.7
+        for <kvm@vger.kernel.org>; Fri, 29 Jul 2022 09:08:30 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc;
+        bh=RYcpsjxUNAdkgvJjXQiMdiYuQAEk/gdttUVtKFBEw8A=;
+        b=AjKL6PeRqhXDIEOnN9L9Wd0ZFCa25E/pyJmXJGzXI0EfRnj4fw59ouUPcSKuQYlzyF
+         WvLcMVXcBPLzEU6WNKNhrGIjCoW1eO0FJJ7f9AG4xL9G1mFBAhimzIwMMHurKp8W+9G8
+         j2kmV8Akh2pkqJmzPoNyJlJbW5zbtvKuelo9Lg3M/8GAZeMKP+MAfR5aBJ/eWb5Vmdle
+         iYPiTiIBpLPbtHZV9MQKJh1dOQ2ttYyTZWAP2LuNEtsfdiQJN2ZzWR8IW0R7UtETmWpA
+         E/TAMjLZxWO7BG5uWwxkkrcufuoRHgYslEOTdzl6MiR2sb2b40Vz5cs9SOWhcCLCo+5V
+         BiWA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc;
+        bh=RYcpsjxUNAdkgvJjXQiMdiYuQAEk/gdttUVtKFBEw8A=;
+        b=PM16fhWCrL+RJuaLibihMCiU6Ie+SrqjYLjS2VUHYg/7RutBEacbxqpvZItKPkaiOu
+         So2Y9jYoWqITcj+QgKvXcBfUxTxb63C7O6TTW1S3Pt/TxGhrrXUH1BQ2CdFSZkg7MNbz
+         5XPgmR4KtwiLKt4HZTVI9TaLsZ9lHwZ8EAMiSbduTf4HrnK3UmaknVVzVhcsTpkRCo/S
+         9jP1Xhjyy/fDJjwtng9FWDigl/GB3yZQdJUCm0dUTcJUCrfKwzY7hGcgP+uLlayqXpZL
+         OlqO9ITHjYjfAhls5EFcQOIjSv7O1TdOxaMbx2EgJ99tLaKJ1lLA7Qr5EZ9WmOqhG4x8
+         qMhA==
+X-Gm-Message-State: ACgBeo14jpdcSQvf83wqSKROn+Pijm7LcSg2Ww6OTzQFymo6/iaZoYHD
+        2CM5suLnhBMQU2Al9gQnA2vjwQ==
+X-Google-Smtp-Source: AA6agR61xDITDWyHhmJ/PgNsKxGvpkXB+wIdNYNMpSXXqsxuypo6qbXBT4gtZgofOJj6mB0LmCVlrw==
+X-Received: by 2002:a17:902:c950:b0:16d:4035:3bb9 with SMTP id i16-20020a170902c95000b0016d40353bb9mr4691728pla.55.1659110909604;
+        Fri, 29 Jul 2022 09:08:29 -0700 (PDT)
+Received: from google.com (7.104.168.34.bc.googleusercontent.com. [34.168.104.7])
+        by smtp.gmail.com with ESMTPSA id f12-20020a170902684c00b0016dcc381bbasm2618348pln.144.2022.07.29.09.08.28
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 29 Jul 2022 09:08:29 -0700 (PDT)
+Date:   Fri, 29 Jul 2022 16:08:24 +0000
+From:   Sean Christopherson <seanjc@google.com>
+To:     Like Xu <like.xu.linux@gmail.com>
+Cc:     Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+Subject: Re: [PATCH 2/3] KVM: VMX: Use proper type-safe functions for vCPU =>
+ LBRs helpers
+Message-ID: <YuQF+BBWA1SkXjT/@google.com>
+References: <20220727233424.2968356-1-seanjc@google.com>
+ <20220727233424.2968356-3-seanjc@google.com>
+ <5f93760c-cb93-2c58-11d7-f9ddef7f640c@gmail.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,SPF_HELO_NONE,
-        SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <5f93760c-cb93-2c58-11d7-f9ddef7f640c@gmail.com>
+X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
+        USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-From: "Maciej S. Szmigiero" <maciej.szmigiero@oracle.com>
+On Fri, Jul 29, 2022, Like Xu wrote:
+> On 28/7/2022 7:34 am, Sean Christopherson wrote:
+> > Turn vcpu_to_lbr_desc() and vcpu_to_lbr_records() into functions in order
+> > to provide type safety, to document exactly what they return, and to
+> 
+> Considering the prevalence of similar practices, perhaps we (at least me)
+> need doc more benefits of "type safety" or the risks of not doing so.
 
-Resetting a guest that has Hyper-V VMBus support enabled triggers a QEMU
-assertion failure:
-hw/hyperv/hyperv.c:131: synic_reset: Assertion `QLIST_EMPTY(&synic->sint_routes)' failed.
+There already is documentation, see "#ifdef and preprocessor use in general" in
+Documentation/process/4.Coding.rst:
 
-This happens both on normal guest reboot or when using "system_reset" HMP
-command.
+  C preprocessor macros present a number of hazards, including possible
+  multiple evaluation of expressions with side effects and no type safety.
+  If you are tempted to define a macro, consider creating an inline function
+  instead.  The code which results will be the same, but inline functions are
+  easier to read, do not evaluate their arguments multiple times, and allow
+  the compiler to perform type checking on the arguments and return value.
 
-The failing assertion was introduced by commit 64ddecc88bcf ("hyperv: SControl is optional to enable SynIc")
-to catch dangling SINT routes on SynIC reset.
+To elaborate on type safety, or lack thereof, let's pretend that struct kvm_vcpu's
+"mutex" was actually named "lock", i.e. that both struct kvm_vcpu and struct kvm had:
 
-The root cause of this problem is that the SynIC itself is reset before
-devices using SINT routes have chance to clean up these routes.
+	struct mutex lock;
 
-Since there seems to be no existing mechanism to force reset callbacks (or
-methods) to be executed in specific order let's use a similar method that
-is already used to reset another interrupt controller (APIC) after devices
-have been reset - by invoking the SynIC reset from the machine reset
-handler via a new "after_reset" X86 CPU method.
+And for whatever reason, we wanted to add helpers to lock/unlock.  If the helpers
+were implemented via macros, e.g.
 
-Fixes: 64ddecc88bcf ("hyperv: SControl is optional to enable SynIc") # exposed the bug
-Signed-off-by: Maciej S. Szmigiero <maciej.szmigiero@oracle.com>
----
- hw/i386/pc.c               |  6 ++++++
- target/i386/cpu-qom.h      |  2 ++
- target/i386/cpu.c          | 10 ++++++++++
- target/i386/kvm/hyperv.c   |  4 ++++
- target/i386/kvm/kvm.c      | 20 +++++++++++++++-----
- target/i386/kvm/kvm_i386.h |  1 +
- 6 files changed, 38 insertions(+), 5 deletions(-)
+  	#define kvm_lock_vm(kvm) mutex_lock(&(kvm)->lock)
 
-diff --git a/hw/i386/pc.c b/hw/i386/pc.c
-index 7280c02ce3..6a76d320f6 100644
---- a/hw/i386/pc.c
-+++ b/hw/i386/pc.c
-@@ -1847,6 +1847,7 @@ static void pc_machine_reset(MachineState *machine)
- {
-     CPUState *cs;
-     X86CPU *cpu;
-+    const X86CPUClass *cpuc;
- 
-     qemu_devices_reset();
- 
-@@ -1855,6 +1856,11 @@ static void pc_machine_reset(MachineState *machine)
-      */
-     CPU_FOREACH(cs) {
-         cpu = X86_CPU(cs);
-+        cpuc = X86_CPU_GET_CLASS(cpu);
-+
-+        if (cpuc->after_reset) {
-+            cpuc->after_reset(cpu);
-+        }
- 
-         if (cpu->apic_state) {
-             device_legacy_reset(cpu->apic_state);
-diff --git a/target/i386/cpu-qom.h b/target/i386/cpu-qom.h
-index c557a522e1..339d23006a 100644
---- a/target/i386/cpu-qom.h
-+++ b/target/i386/cpu-qom.h
-@@ -43,6 +43,7 @@ typedef struct X86CPUModel X86CPUModel;
-  * @static_model: See CpuDefinitionInfo::static
-  * @parent_realize: The parent class' realize handler.
-  * @parent_reset: The parent class' reset handler.
-+ * @after_reset: Reset handler to be called only after all other devices have been reset.
-  *
-  * An x86 CPU model or family.
-  */
-@@ -68,6 +69,7 @@ struct X86CPUClass {
-     DeviceRealize parent_realize;
-     DeviceUnrealize parent_unrealize;
-     DeviceReset parent_reset;
-+    void (*after_reset)(X86CPU *cpu);
- };
- 
- 
-diff --git a/target/i386/cpu.c b/target/i386/cpu.c
-index 6a57ef13af..a7b5945efd 100644
---- a/target/i386/cpu.c
-+++ b/target/i386/cpu.c
-@@ -6029,6 +6029,15 @@ static void x86_cpu_reset(DeviceState *dev)
- #endif
- }
- 
-+static void x86_cpu_after_reset(X86CPU *cpu)
-+{
-+#ifndef CONFIG_USER_ONLY
-+    if (kvm_enabled()) {
-+        kvm_arch_after_reset_vcpu(cpu);
-+    }
-+#endif
-+}
-+
- static void mce_init(X86CPU *cpu)
- {
-     CPUX86State *cenv = &cpu->env;
-@@ -7094,6 +7103,7 @@ static void x86_cpu_common_class_init(ObjectClass *oc, void *data)
-     device_class_set_props(dc, x86_cpu_properties);
- 
-     device_class_set_parent_reset(dc, x86_cpu_reset, &xcc->parent_reset);
-+    xcc->after_reset = x86_cpu_after_reset;
-     cc->reset_dump_flags = CPU_DUMP_FPU | CPU_DUMP_CCOP;
- 
-     cc->class_by_name = x86_cpu_class_by_name;
-diff --git a/target/i386/kvm/hyperv.c b/target/i386/kvm/hyperv.c
-index 9026ef3a81..e3ac978648 100644
---- a/target/i386/kvm/hyperv.c
-+++ b/target/i386/kvm/hyperv.c
-@@ -23,6 +23,10 @@ int hyperv_x86_synic_add(X86CPU *cpu)
-     return 0;
- }
- 
-+/*
-+ * All devices possibly using SynIC have to be reset before calling this to let
-+ * them remove their SINT routes first.
-+ */
- void hyperv_x86_synic_reset(X86CPU *cpu)
- {
-     hyperv_synic_reset(CPU(cpu));
-diff --git a/target/i386/kvm/kvm.c b/target/i386/kvm/kvm.c
-index f148a6d52f..00736abeea 100644
---- a/target/i386/kvm/kvm.c
-+++ b/target/i386/kvm/kvm.c
-@@ -2188,18 +2188,28 @@ void kvm_arch_reset_vcpu(X86CPU *cpu)
-         env->mp_state = KVM_MP_STATE_RUNNABLE;
-     }
- 
-+    /* enabled by default */
-+    env->poll_control_msr = 1;
-+
-+    sev_es_set_reset_vector(CPU(cpu));
-+}
-+
-+void kvm_arch_after_reset_vcpu(X86CPU *cpu)
-+{
-+    CPUX86State *env = &cpu->env;
-+    int i;
-+
-+    /*
-+     * Reset SynIC after all other devices have been reset to let them remove
-+     * their SINT routes first.
-+     */
-     if (hyperv_feat_enabled(cpu, HYPERV_FEAT_SYNIC)) {
--        int i;
-         for (i = 0; i < ARRAY_SIZE(env->msr_hv_synic_sint); i++) {
-             env->msr_hv_synic_sint[i] = HV_SINT_MASKED;
-         }
- 
-         hyperv_x86_synic_reset(cpu);
-     }
--    /* enabled by default */
--    env->poll_control_msr = 1;
--
--    sev_es_set_reset_vector(CPU(cpu));
- }
- 
- void kvm_arch_do_init_vcpu(X86CPU *cpu)
-diff --git a/target/i386/kvm/kvm_i386.h b/target/i386/kvm/kvm_i386.h
-index 4124912c20..096a5dd781 100644
---- a/target/i386/kvm/kvm_i386.h
-+++ b/target/i386/kvm/kvm_i386.h
-@@ -38,6 +38,7 @@ bool kvm_has_adjust_clock_stable(void);
- bool kvm_has_exception_payload(void);
- void kvm_synchronize_all_tsc(void);
- void kvm_arch_reset_vcpu(X86CPU *cs);
-+void kvm_arch_after_reset_vcpu(X86CPU *cpu);
- void kvm_arch_do_init_vcpu(X86CPU *cs);
- 
- void kvm_put_apicbase(X86CPU *cpu, uint64_t value);
+then this ends up being 100% legal code from the compilers perspective
+
+	kvm_lock_vm(vcpu);
+
+i.e. it will compile cleanly and only cause problems at run time because the
+preprocesor expands that to:
+
+	mutex_lock(&vcpu->lock);
+
+A function on the other hand provides type safety because even though both kvm.lock
+and kvm_vcpu.lock exist, the compiler will yell due to attempting to pass a
+"struct kvm_vcpu *" into a function that takes a "struct kvm *kvm".
+
+	static inline void kvm_lock_vm(struct kvm *kvm)
+	{
+		mutex_lock(&kvm->lock);
+	}
+
+There are instances where a macro is used because it's deemed to be the lesser
+evil.  E.g. KVM x86 does
+
+  #define kvm_arch_vcpu_memslots_id(vcpu) ((vcpu)->arch.hflags & HF_SMM_MASK ? 1 : 0)
+
+to allow inlining without creating a circular dependency.  include/linux/kvm_host.h
+uses kvm_arch_vcpu_memslots_id() and so it needs to be fully defined by
+arch/x86/include/asm/kvm_host.h.  But because linux/kvm_host.h includes asm/kvm_host.h,
+asm/kvm_host.h can't deference @vcpu due to "struct kvm_vcpu" not yet being defined.
+
+The macro trick works for this case because the preprocessor doesn't compile or check
+anything, it just expands the macro in its user.  I.e. the derefence of @vcpu occurs
+in kvm_vcpu_memslots() from the compilers perspective, and at that point "struct kvm_vcpu"
+is fully defined and everyone is happy.
+
+There's still some amount of risk in misuing kvm_arch_vcpu_memslots_id(), but in
+this case we've decided that the benefits of inlining outweigh the risk of misuse.
+
+> > allow consuming the helpers in vmx.h.  Move the definitions as necessary
+> > (the macros "reference" to_vmx() before its definition).
+> > 
+> > No functional change intended.
+> > 
+> > Signed-off-by: Sean Christopherson <seanjc@google.com>
+> > ---
+> >   arch/x86/kvm/vmx/vmx.h | 26 +++++++++++++++++---------
+> >   1 file changed, 17 insertions(+), 9 deletions(-)
+> > 
+> > diff --git a/arch/x86/kvm/vmx/vmx.h b/arch/x86/kvm/vmx/vmx.h
+> > index 286c88e285ea..690421b7d26c 100644
+> > --- a/arch/x86/kvm/vmx/vmx.h
+> > +++ b/arch/x86/kvm/vmx/vmx.h
+> > @@ -6,6 +6,7 @@
+> >   #include <asm/kvm.h>
+> >   #include <asm/intel_pt.h>
+> > +#include <asm/perf_event.h>
+> >   #include "capabilities.h"
+> >   #include "kvm_cache_regs.h"
+> > @@ -91,15 +92,6 @@ union vmx_exit_reason {
+> >   	u32 full;
+> >   };
+> > -#define vcpu_to_lbr_desc(vcpu) (&to_vmx(vcpu)->lbr_desc)
+> > -#define vcpu_to_lbr_records(vcpu) (&to_vmx(vcpu)->lbr_desc.records)
+> 
+> More targets can be found in the arch/x86/kvm/pmu.h:
+> 
+> #define vcpu_to_pmu(vcpu) (&(vcpu)->arch.pmu)
+> #define pmu_to_vcpu(pmu)  (container_of((pmu), struct kvm_vcpu, arch.pmu))
+> #define pmc_to_pmu(pmc)   (&(pmc)->vcpu->arch.pmu)
+
+We should definitely convert those, assuming it's not too painful and not
+completely impossible due to circular dependencies.
