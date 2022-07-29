@@ -2,71 +2,73 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 5375C5854F4
-	for <lists+kvm@lfdr.de>; Fri, 29 Jul 2022 20:15:26 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 5FCC15854FD
+	for <lists+kvm@lfdr.de>; Fri, 29 Jul 2022 20:28:10 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238347AbiG2SPZ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 29 Jul 2022 14:15:25 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49730 "EHLO
+        id S237315AbiG2S2I (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 29 Jul 2022 14:28:08 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57452 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S237601AbiG2SPX (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 29 Jul 2022 14:15:23 -0400
-Received: from mail-pf1-x431.google.com (mail-pf1-x431.google.com [IPv6:2607:f8b0:4864:20::431])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6FCE91AF13
-        for <kvm@vger.kernel.org>; Fri, 29 Jul 2022 11:15:21 -0700 (PDT)
-Received: by mail-pf1-x431.google.com with SMTP id g12so5306361pfb.3
-        for <kvm@vger.kernel.org>; Fri, 29 Jul 2022 11:15:21 -0700 (PDT)
+        with ESMTP id S231359AbiG2S2G (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 29 Jul 2022 14:28:06 -0400
+Received: from mail-pg1-x52a.google.com (mail-pg1-x52a.google.com [IPv6:2607:f8b0:4864:20::52a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7662E6BD66
+        for <kvm@vger.kernel.org>; Fri, 29 Jul 2022 11:28:05 -0700 (PDT)
+Received: by mail-pg1-x52a.google.com with SMTP id bf13so4609608pgb.11
+        for <kvm@vger.kernel.org>; Fri, 29 Jul 2022 11:28:05 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc;
-        bh=Obk/pcqF68Ks7EntsqYVj2QhxCZophsW8ZmQm6Eytd0=;
-        b=sdNmm3lLFIdBbY9ez5s+LiPHA0B79x8tQ1YJzPIc62ADvFEVyR6qw9k2bOtcfRWF/1
-         QVKJrGQFjgxWtK4j9SVMWTC2uu7nEKyh5pxHBwgLIR1eNfHQ7hRGGiByQ70p6TWHI78q
-         +xAaZPpgMHO0AeTlIJzRI00J4P/Nd24j8doXNytxXZXuPv8I9CjMq1tDu42BMi7Qiw3h
-         G/dWVytyQYCgnE7SuD+OUsUtZ951KJf3smo8WTiuTY6vNJ9vp6Qx6WOmFMPlgAWHm9P6
-         AHZyVKiPkewv86zzPZc4Uq+BEdRLvKI2eb+4Ygk81F4u/w24SmLfxsOqIzEaQR8aMRo/
-         V5ZA==
+        h=message-id:date:mime-version:user-agent:subject:content-language:to
+         :cc:references:from:in-reply-to:content-transfer-encoding;
+        bh=0EZkxS7nvpWAzwN5vYWDWRFT8Tn5/5KW+sdHzKZHyh8=;
+        b=QnLrxGTVsSg281e0ZalQoV1m2Kd3owXkKvNwd4ZdKsD10Zyo/QAHY3l/oZLtYLwRph
+         MdMG14kIxL1EqKpEAvkY4R3ybibPxKT/bzarO8tNG2uFmAXs4jj7B86dtpu3O2GcMhU1
+         xdBXEBD4q+rY4FWkx8kvj9/+PADqAEYrDwXoU8lcCpf16Ht+MaY1bcR/Uxs6ahpNNImv
+         PbIw2jxvL8JiP4kUYGjGsNYP2L4F8VYto22PxZm5McN+GDhfqztgiZb90oEsGtuZ6DU/
+         iPcF1SMG+41FhDVV+JJnr/EamDwicom5b8fj6O36dRSXQzRrrbKDTY9wJr6ihQ/vCA/q
+         9Ibw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc;
-        bh=Obk/pcqF68Ks7EntsqYVj2QhxCZophsW8ZmQm6Eytd0=;
-        b=tq10OBVLCVd+KcAOmkh/gh0/Idf4O4H1RigIgXTuNuRx1C4HHi2X1d4yvgt+mZNPoK
-         R670BL+EvHRTGGmwTCtYJRJpsH8ZfvhF5Ef7Oo+Xx8yBpf9XcYswFsq7lk1aqgM0LEE9
-         lE7G7wVsXv+a2adx2lZlvkYvaYohmhe7ge4OnGObJsOsoYEOSGnGbKb/q+ClRsuOq9AN
-         x1my4yQUnPJkwC5TOmprl+GGnUGA4q2moUeWpWOvM18Pj3YevhZjvKUtZzSTAAFTmO5e
-         J76NZdj7AtwjJmqIA4X5zmhibfkeTdrPu8eK31DFfWid5bSkzy6F1M5MAZSYUfzNbzMg
-         8AAA==
-X-Gm-Message-State: AJIora+v0j5upump/nCX5w41e9g60XdT1+0DfGEKBPTvrmMPeNzEi57J
-        U9QIFsBTXX330jeGxkXH8g3glg==
-X-Google-Smtp-Source: AGRyM1svUsmBEpgf5T4GJq5zfLGGMtiYdIybjaQglORa4rlytr4GMQJOh2HBpI9hYelo6x2YrG5qWw==
-X-Received: by 2002:a63:f011:0:b0:41a:6262:bfcd with SMTP id k17-20020a63f011000000b0041a6262bfcdmr3842848pgh.40.1659118520814;
-        Fri, 29 Jul 2022 11:15:20 -0700 (PDT)
-Received: from google.com (7.104.168.34.bc.googleusercontent.com. [34.168.104.7])
-        by smtp.gmail.com with ESMTPSA id x11-20020a1709028ecb00b0016c38eb1f3asm3861796plo.214.2022.07.29.11.15.20
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 29 Jul 2022 11:15:20 -0700 (PDT)
-Date:   Fri, 29 Jul 2022 18:15:16 +0000
-From:   Sean Christopherson <seanjc@google.com>
-To:     Kai Huang <kai.huang@intel.com>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org, Michael Roth <michael.roth@amd.com>,
-        Tom Lendacky <thomas.lendacky@amd.com>
-Subject: Re: [PATCH 3/4] KVM: SVM: Adjust MMIO masks (for caching) before
- doing SEV(-ES) setup
-Message-ID: <YuQjtLK1uk3/bhK/@google.com>
-References: <20220728221759.3492539-1-seanjc@google.com>
- <20220728221759.3492539-4-seanjc@google.com>
- <9bdfbad2dc9f193fb57f7ee113db7f1c2b96973c.camel@intel.com>
+        h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
+         :content-language:to:cc:references:from:in-reply-to
+         :content-transfer-encoding;
+        bh=0EZkxS7nvpWAzwN5vYWDWRFT8Tn5/5KW+sdHzKZHyh8=;
+        b=HvKjZrYwVcCn7n4qOcJiKEAtMWLydBLU6Pt7UO62uLY7bxWyovxX9gMOMGvGvL+RBZ
+         n9KnOpXTc4Jgh7mUJ5CVZmmRaFcIwyAkmuASQ2b4OU0WaBHQxCkcDEAuhxKWZLVc3Vto
+         8OpjP22y+jbhJkx1nKnVkTSEH/VBQvLsGwl04yf5sHbTyh0QztLeDtPlR8aaqUkLmfoB
+         qjmYDo6F0ulMi79RG9vZ7NNPNqh6Km8Z2NMJeKLEgRkZ6NRByjhB4VykWkusIeVGOjc8
+         3FiX6jcf1W8UgsK0HOqtPOrFskQX6uFo777qvfOYVmK5mp+ATuEZCcdAlbpofQOWwHXm
+         C1Mg==
+X-Gm-Message-State: ACgBeo0Zenu5DhFyblGTdAALX9Mvlop6nUj7Ja4Gog6rTzypk63Ktx82
+        PEvrF+gHN4/SFN2ZUYnfTd4w+Q==
+X-Google-Smtp-Source: AA6agR7SG375KRcIPpsw/6KkL8V4kUwH59K0Apo3F4YyqYnSlvDxuTMw7uCuMvryeq/kN0O0hQKlNg==
+X-Received: by 2002:a63:3545:0:b0:41b:b5e3:550b with SMTP id c66-20020a633545000000b0041bb5e3550bmr683385pga.551.1659119284721;
+        Fri, 29 Jul 2022 11:28:04 -0700 (PDT)
+Received: from ?IPV6:2600:1700:38d4:55df:70e9:57a7:80c3:84be? ([2600:1700:38d4:55df:70e9:57a7:80c3:84be])
+        by smtp.gmail.com with ESMTPSA id c7-20020a170903234700b0016c28a68ad0sm111060plh.253.2022.07.29.11.28.03
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 29 Jul 2022 11:28:04 -0700 (PDT)
+Message-ID: <3ba4d61c-f01c-e740-1045-994788da66b1@google.com>
+Date:   Fri, 29 Jul 2022 11:28:02 -0700
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <9bdfbad2dc9f193fb57f7ee113db7f1c2b96973c.camel@intel.com>
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.11.0
+Subject: Re: [PATCH] kvm: x86: Do proper cleanup if kvm_x86_ops->vm_init()
+ fails
+Content-Language: en-US
+To:     Sean Christopherson <seanjc@google.com>
+Cc:     kvm@vger.kernel.org, pbonzini@redhat.com, dmatlack@google.com,
+        jmattson@google.com
+References: <20220729031108.3929138-1-junaids@google.com>
+ <YuPwhWi1xWgAwmK4@google.com>
+From:   Junaid Shahid <junaids@google.com>
+In-Reply-To: <YuPwhWi1xWgAwmK4@google.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-        USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=unavailable
+        ENV_AND_HDR_SPF_MATCH,NICE_REPLY_A,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,
+        SPF_PASS,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=ham
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -74,47 +76,47 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Jul 29, 2022, Kai Huang wrote:
-> On Thu, 2022-07-28 at 22:17 +0000, Sean Christopherson wrote:
-> > Adjust KVM's MMIO masks to account for the C-bit location prior to doing
-> > SEV(-ES) setup.  A future patch will consume enable_mmio caching during
-> > SEV setup as SEV-ES _requires_ MMIO caching, i.e. KVM needs to disallow
-> > SEV-ES if MMIO caching is disabled.
-> > 
-> > Cc: stable@vger.kernel.org
-> > Signed-off-by: Sean Christopherson <seanjc@google.com>
-> > ---
-> >  arch/x86/kvm/svm/svm.c | 9 ++++++---
-> >  1 file changed, 6 insertions(+), 3 deletions(-)
-> > 
-> > diff --git a/arch/x86/kvm/svm/svm.c b/arch/x86/kvm/svm/svm.c
-> > index aef63aae922d..62e89db83bc1 100644
-> > --- a/arch/x86/kvm/svm/svm.c
-> > +++ b/arch/x86/kvm/svm/svm.c
-> > @@ -5034,13 +5034,16 @@ static __init int svm_hardware_setup(void)
-> >  	/* Setup shadow_me_value and shadow_me_mask */
-> >  	kvm_mmu_set_me_spte_mask(sme_me_mask, sme_me_mask);
-> >  
-> > -	/* Note, SEV setup consumes npt_enabled. */
-> > +	svm_adjust_mmio_mask();
-> > +
-> > +	/*
-> > +	 * Note, SEV setup consumes npt_enabled and enable_mmio_caching (which
-> > +	 * may be modified by svm_adjust_mmio_mask()).
-> > +	 */
-> >  	sev_hardware_setup();
+On 7/29/22 07:36, Sean Christopherson wrote:
+> On Thu, Jul 28, 2022, Junaid Shahid wrote:
+>> If vm_init() fails [which can happen, for instance, if a memory
+>> allocation fails during avic_vm_init()], we need to cleanup some
+>> state in order to avoid resource leaks.
+>>
+>> Signed-off-by: Junaid Shahid <junaids@google.com>
+>> ---
+>>   arch/x86/kvm/x86.c | 8 +++++++-
+>>   1 file changed, 7 insertions(+), 1 deletion(-)
+>>
+>> diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+>> index f389691d8c04..ef5fd2f05c79 100644
+>> --- a/arch/x86/kvm/x86.c
+>> +++ b/arch/x86/kvm/x86.c
+>> @@ -12064,8 +12064,14 @@ int kvm_arch_init_vm(struct kvm *kvm, unsigned long type)
+>>   	kvm_hv_init_vm(kvm);
+>>   	kvm_xen_init_vm(kvm);
+>>   
+>> -	return static_call(kvm_x86_vm_init)(kvm);
+>> +	ret = static_call(kvm_x86_vm_init)(kvm);
+>> +	if (ret)
+>> +		goto out_uninit_mmu;
+>>   
+>> +	return 0;
+>> +
+>> +out_uninit_mmu:
+>> +	kvm_mmu_uninit_vm(kvm);
 > 
-> If I am not seeing mistakenly, the code in latest queue branch doesn't consume
-> enable_mmio_caching.  It is only added in your later patch.
+> Hrm, this works for now (I think), but I really don't like that kvm_apicv_init(),
+> kvm_hv_init_vm(), and kvm_xen_init_vm() all do something without that something
+> being unwound on failure.  E.g. both Hyper-V and Xen have a paired "destroy"
+> function, it just so happens that their destroy paths are guaranteed nops in this
+> case.
 > 
-> So perhaps adjust the comment or merge patches together?
+> AFAICT, there are no dependencies on doing vendor init at the end, so what if we
+> hoist it up so that all paths that can fail are at the top?
+> 
 
-Oooh, I see what you're saying.  I split the patches so that if this movement turns
-out to break something then bisection will point directly here, but that's a pretty
-weak argument since both patches are tiny.  And taking patch 4 without patch 3,
-e.g. in the unlikely event this movement needs to be reverted, is probably worse
-than not having patch 4 at all, i.e. having somewhat obvious breakage is better.
+Ack. I'll move the vendor init call up. I think I'll skip breaking out a 
+separate kvm_x86_op for apicv_init() for now.
 
-So yeah, I'll squash this with patch 4.
-
-Thanks!
+Thanks,
+Junaid
