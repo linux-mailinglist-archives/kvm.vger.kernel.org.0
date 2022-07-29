@@ -2,80 +2,80 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 57779584D5B
-	for <lists+kvm@lfdr.de>; Fri, 29 Jul 2022 10:28:29 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 2C4B7584D5D
+	for <lists+kvm@lfdr.de>; Fri, 29 Jul 2022 10:28:30 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234899AbiG2I2X (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 29 Jul 2022 04:28:23 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35398 "EHLO
+        id S234931AbiG2I2Y (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 29 Jul 2022 04:28:24 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35296 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235641AbiG2I2F (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 29 Jul 2022 04:28:05 -0400
+        with ESMTP id S235645AbiG2I2G (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 29 Jul 2022 04:28:06 -0400
 Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EF88983207
-        for <kvm@vger.kernel.org>; Fri, 29 Jul 2022 01:27:19 -0700 (PDT)
-Received: from pps.filterd (m0098421.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.17.1.5/8.17.1.5) with ESMTP id 26T7wGr3008229
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8F01B83208
+        for <kvm@vger.kernel.org>; Fri, 29 Jul 2022 01:27:20 -0700 (PDT)
+Received: from pps.filterd (m0098417.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.17.1.5/8.17.1.5) with ESMTP id 26T8HqWK011242
         for <kvm@vger.kernel.org>; Fri, 29 Jul 2022 08:27:19 GMT
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=from : to : cc : subject
  : date : message-id : in-reply-to : references : mime-version :
  content-transfer-encoding; s=pp1;
- bh=bgHgBKEafCyes+QJEZ9bCyDYIyr/PrwJMl8m8E4GSTo=;
- b=oDiPk4KQOzBS874AXmAGra/Iisio/TLbp9nKPf6hj5x5x1msnDe93XDN/USsFqkpgvHR
- mwMIHdmU7T7OsDlUzzgpR7LLsHY4uI2gbKC6l1c7wHqC2ffOgxlb5xSw/3HDtQw0FoH1
- hta8nJHBKQjIufi2WSMh/FlkrZCLpVH0ts8dfbVxEgMGMncfuOV7lmjGl9lSdGppDlrI
- SskbX76yNBqPkJd/IsE2a+RPheDtb/T/SRSObp3FsqXQXVqhrCUSUg1pZRnD8OP/ZgTf
- KW5g0D/7s5Omd4Sj2C2PUn0hbmoqBzFNIh+EPaXTdHf6WNtHFyHZb9I6b0kgzAlzkUKk aA== 
+ bh=daynlHv7VtDmf5b4t+9WYbcemt/15Ad5fG6YSWIoXVs=;
+ b=DD3gDm0ucB4rQAp/GDvUIiwiQUIHMi172QBx4uLkVZVK+TOT4GCLMRrisJiecUpnmJGn
+ oZI9+g/VW6M06BU8i4crxKqMnKiIy8NDcGSEV7jMTCPJ3MLU5zf4+O29zpW9pw7eG1cV
+ jztHsmzIImUf65nCj033dCJN8A81rgltZ1rwCn25h3w7KTtFJPmyfk2Nfi7h7NGyVRdy
+ a5eNbwNdFjzv9pAJAO54onN8cZvxZwghztA3swtn8Gl33XKW4ivVkGHaorG7dd4FFWgx
+ aPt4yIOMYqfC+XAeV/TT/DCa8cAUSPEZoJZkeTBdq/NJ/wvHe1KS8g3ZMB1XNXYyM7a0 +A== 
 Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3hmbmmrvr5-1
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3hmbwu86ug-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT)
-        for <kvm@vger.kernel.org>; Fri, 29 Jul 2022 08:27:18 +0000
-Received: from m0098421.ppops.net (m0098421.ppops.net [127.0.0.1])
-        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 26T7wKLI008305
-        for <kvm@vger.kernel.org>; Fri, 29 Jul 2022 08:27:18 GMT
-Received: from ppma03fra.de.ibm.com (6b.4a.5195.ip4.static.sl-reverse.com [149.81.74.107])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3hmbmmrvqh-1
+        for <kvm@vger.kernel.org>; Fri, 29 Jul 2022 08:27:19 +0000
+Received: from m0098417.ppops.net (m0098417.ppops.net [127.0.0.1])
+        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 26T8JmI1016247
+        for <kvm@vger.kernel.org>; Fri, 29 Jul 2022 08:27:19 GMT
+Received: from ppma04ams.nl.ibm.com (63.31.33a9.ip4.static.sl-reverse.com [169.51.49.99])
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3hmbwu86ty-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Fri, 29 Jul 2022 08:27:18 +0000
-Received: from pps.filterd (ppma03fra.de.ibm.com [127.0.0.1])
-        by ppma03fra.de.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 26T8K6bO021088;
-        Fri, 29 Jul 2022 08:27:16 GMT
-Received: from b06cxnps4075.portsmouth.uk.ibm.com (d06relay12.portsmouth.uk.ibm.com [9.149.109.197])
-        by ppma03fra.de.ibm.com with ESMTP id 3hg95ydj0t-1
+        Fri, 29 Jul 2022 08:27:19 +0000
+Received: from pps.filterd (ppma04ams.nl.ibm.com [127.0.0.1])
+        by ppma04ams.nl.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 26T8LRcN005009;
+        Fri, 29 Jul 2022 08:27:17 GMT
+Received: from b06cxnps4076.portsmouth.uk.ibm.com (d06relay13.portsmouth.uk.ibm.com [9.149.109.198])
+        by ppma04ams.nl.ibm.com with ESMTP id 3hg96wqbwn-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Fri, 29 Jul 2022 08:27:16 +0000
+        Fri, 29 Jul 2022 08:27:17 +0000
 Received: from d06av21.portsmouth.uk.ibm.com (d06av21.portsmouth.uk.ibm.com [9.149.105.232])
-        by b06cxnps4075.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 26T8RDO529688210
+        by b06cxnps4076.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 26T8REVf15794454
         (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Fri, 29 Jul 2022 08:27:13 GMT
+        Fri, 29 Jul 2022 08:27:14 GMT
 Received: from d06av21.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 599D05204F;
-        Fri, 29 Jul 2022 08:27:13 +0000 (GMT)
+        by IMSVA (Postfix) with ESMTP id 23B675204F;
+        Fri, 29 Jul 2022 08:27:14 +0000 (GMT)
 Received: from linux6.. (unknown [9.114.12.104])
-        by d06av21.portsmouth.uk.ibm.com (Postfix) with ESMTP id AAC2A5204E;
-        Fri, 29 Jul 2022 08:27:12 +0000 (GMT)
+        by d06av21.portsmouth.uk.ibm.com (Postfix) with ESMTP id 7535B5204E;
+        Fri, 29 Jul 2022 08:27:13 +0000 (GMT)
 From:   Janosch Frank <frankja@linux.ibm.com>
 To:     kvm@vger.kernel.org
 Cc:     imbrenda@linux.ibm.com, seiden@linux.ibm.com, nrb@linux.ibm.com,
         scgl@linux.ibm.com, thuth@redhat.com
-Subject: [kvm-unit-tests PATCH 3/6] s390x: Add a linker script to assembly snippets
-Date:   Fri, 29 Jul 2022 08:26:30 +0000
-Message-Id: <20220729082633.277240-4-frankja@linux.ibm.com>
+Subject: [kvm-unit-tests PATCH 4/6] lib: s390x: sie: Improve validity handling and make it vm specific
+Date:   Fri, 29 Jul 2022 08:26:31 +0000
+Message-Id: <20220729082633.277240-5-frankja@linux.ibm.com>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20220729082633.277240-1-frankja@linux.ibm.com>
 References: <20220729082633.277240-1-frankja@linux.ibm.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-TM-AS-GCONF: 00
-X-Proofpoint-ORIG-GUID: -mDego_LWHrx7Yz_inxyxxMSStP7roaH
-X-Proofpoint-GUID: oUq5i9m5caOyWZAkqx-_iVkG-KP1PcMw
+X-Proofpoint-ORIG-GUID: HGrBPgh11lZWsMp4AMKa38WJsvBfgJVv
+X-Proofpoint-GUID: kthanfUJ-g47ylCoGopdQai8M64Akl0L
 X-Proofpoint-Virus-Version: vendor=baseguard
  engine=ICAP:2.0.205,Aquarius:18.0.883,Hydra:6.0.517,FMLib:17.11.122.1
  definitions=2022-07-28_06,2022-07-28_02,2022-06-22_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 clxscore=1015 impostorscore=0
- phishscore=0 malwarescore=0 bulkscore=0 mlxlogscore=999 mlxscore=0
- adultscore=0 suspectscore=0 priorityscore=1501 spamscore=0
- lowpriorityscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxlogscore=561 mlxscore=0
+ impostorscore=0 lowpriorityscore=0 bulkscore=0 suspectscore=0
+ malwarescore=0 spamscore=0 priorityscore=1501 adultscore=0 phishscore=0
+ clxscore=1015 classifier=spam adjust=0 reason=mlx scancount=1
  engine=8.12.0-2206140000 definitions=main-2207290032
 X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
         DKIM_VALID,DKIM_VALID_EF,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_PASS
@@ -86,122 +86,88 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-A linker script has a few benefits:
-- We can easily define a lowcore and load the snippet from 0x0 instead
-of 0x4000 which makes asm snippets behave like c snippets
-- We can easily define an invalid PGM new PSW to ensure an exit on a
-guest PGM
-
-As we gain another step and file extension by linking, a comment
-explains which file extensions are generated and why.
+The current library doesn't support running multiple vms at once as it
+stores the validity once and not per vm. Let's move the validity
+handling into the vm and introduce a new function to retrieve the vir.
 
 Signed-off-by: Janosch Frank <frankja@linux.ibm.com>
 ---
- lib/s390x/snippet.h |  3 +--
- s390x/Makefile      | 16 +++++++++++++---
- s390x/mvpg-sie.c    |  2 +-
- s390x/pv-diags.c    |  6 +++---
- 4 files changed, 18 insertions(+), 9 deletions(-)
+ lib/s390x/sie.c | 26 +++++++++++++-------------
+ lib/s390x/sie.h |  6 ++++--
+ 2 files changed, 17 insertions(+), 15 deletions(-)
 
-diff --git a/lib/s390x/snippet.h b/lib/s390x/snippet.h
-index b17b2a4c..57045994 100644
---- a/lib/s390x/snippet.h
-+++ b/lib/s390x/snippet.h
-@@ -32,8 +32,7 @@
+diff --git a/lib/s390x/sie.c b/lib/s390x/sie.c
+index 00aff713..c3a53ad6 100644
+--- a/lib/s390x/sie.c
++++ b/lib/s390x/sie.c
+@@ -15,19 +15,21 @@
+ #include <libcflat.h>
+ #include <alloc_page.h>
  
- #define SNIPPET_PV_TWEAK0	0x42UL
- #define SNIPPET_PV_TWEAK1	0UL
--#define SNIPPET_OFF_C		0
--#define SNIPPET_OFF_ASM		0x4000
-+#define SNIPPET_UNPACK_OFF	0
+-static bool validity_expected;
+-static uint16_t vir;		/* Validity interception reason */
+-
+-void sie_expect_validity(void)
++void sie_expect_validity(struct vm *vm)
+ {
+-	validity_expected = true;
+-	vir = 0;
++	vm->validity_expected = true;
+ }
  
- 
- /*
-diff --git a/s390x/Makefile b/s390x/Makefile
-index ee34a1d7..9a0b48e2 100644
---- a/s390x/Makefile
-+++ b/s390x/Makefile
-@@ -122,6 +122,13 @@ else
- snippet-hdr-obj =
- endif
- 
-+# Each snippet will generate the following files (in order): \
-+  *.o is a snippet that has been compiled \
-+  *.ol is a snippet that has been linked \
-+  *.gbin is a snippet that has been converted to binary \
-+  *.gobj is the final format after converting the binary into a elf file again, \
-+  it will be linked into the tests
+-void sie_check_validity(uint16_t vir_exp)
++uint16_t sie_get_validity(struct vm *vm)
+ {
++	return vm->sblk->ipb >> 16;
++}
 +
- # the asm/c snippets %.o have additional generated files as dependencies
- $(SNIPPET_DIR)/asm/%.o: $(SNIPPET_DIR)/asm/%.S $(asm-offsets)
- 	$(CC) $(CFLAGS) -c -nostdlib -o $@ $<
-@@ -129,8 +136,11 @@ $(SNIPPET_DIR)/asm/%.o: $(SNIPPET_DIR)/asm/%.S $(asm-offsets)
- $(SNIPPET_DIR)/c/%.o: $(SNIPPET_DIR)/c/%.c $(asm-offsets)
- 	$(CC) $(CFLAGS) -c -nostdlib -o $@ $<
- 
--$(SNIPPET_DIR)/asm/%.gbin: $(SNIPPET_DIR)/asm/%.o
--	$(OBJCOPY) -O binary -j ".rodata" -j ".text" -j ".data" -j ".bss" --set-section-flags .bss=alloc,load,contents $(patsubst %.gbin,%.o,$@) $@
-+$(SNIPPET_DIR)/asm/%.ol: $(SNIPPET_DIR)/asm/%.o
-+	$(CC) $(LDFLAGS) -o $@ -T $(SRCDIR)/s390x/snippets/asm/flat.lds $<
++void sie_check_validity(struct vm *vm, uint16_t vir_exp)
++{
++	uint16_t vir = sie_get_validity(vm);
 +
-+$(SNIPPET_DIR)/asm/%.gbin: $(SNIPPET_DIR)/asm/%.ol
-+	$(OBJCOPY) -O binary -j ".rodata" -j ".lowcore" -j ".text" -j ".data" -j ".bss" --set-section-flags .bss=alloc,load,contents $< $@
- 	truncate -s '%4096' $@
+ 	report(vir_exp == vir, "VALIDITY: %x", vir);
+-	vir = 0;
+ }
  
- $(SNIPPET_DIR)/c/%.gbin: $(SNIPPET_DIR)/c/%.o $(snippet_lib) $(FLATLIBS)
-@@ -139,7 +149,7 @@ $(SNIPPET_DIR)/c/%.gbin: $(SNIPPET_DIR)/c/%.o $(snippet_lib) $(FLATLIBS)
- 	truncate -s '%4096' $@
+ void sie_handle_validity(struct vm *vm)
+@@ -35,11 +37,9 @@ void sie_handle_validity(struct vm *vm)
+ 	if (vm->sblk->icptcode != ICPT_VALIDITY)
+ 		return;
  
- $(SNIPPET_DIR)/asm/%.hdr: $(SNIPPET_DIR)/asm/%.gbin $(HOST_KEY_DOCUMENT)
--	$(GEN_SE_HEADER) -k $(HOST_KEY_DOCUMENT) -c $<,0x4000,0x00000000000000420000000000000000 --psw-addr 0x4000 -o $@
-+	$(GEN_SE_HEADER) -k $(HOST_KEY_DOCUMENT) -c $<,0x0,0x00000000000000420000000000000000 --psw-addr 0x4000 -o $@
+-	vir = vm->sblk->ipb >> 16;
+-
+-	if (!validity_expected)
+-		report_abort("VALIDITY: %x", vir);
+-	validity_expected = false;
++	if (!vm->validity_expected)
++		report_abort("VALIDITY: %x", sie_get_validity(vm));
++	vm->validity_expected = false;
+ }
  
- $(SNIPPET_DIR)/c/%.hdr: $(SNIPPET_DIR)/c/%.gbin $(HOST_KEY_DOCUMENT)
- 	$(GEN_SE_HEADER) -k $(HOST_KEY_DOCUMENT) -c $<,0x0,0x00000000000000420000000000000000 --psw-addr 0x4000 -o $@
-diff --git a/s390x/mvpg-sie.c b/s390x/mvpg-sie.c
-index 46a2edb6..99f4859b 100644
---- a/s390x/mvpg-sie.c
-+++ b/s390x/mvpg-sie.c
-@@ -87,7 +87,7 @@ static void setup_guest(void)
+ void sie(struct vm *vm)
+diff --git a/lib/s390x/sie.h b/lib/s390x/sie.h
+index de91ea5a..320c4218 100644
+--- a/lib/s390x/sie.h
++++ b/lib/s390x/sie.h
+@@ -233,14 +233,16 @@ struct vm {
+ 	struct vm_uv uv;			/* PV UV information */
+ 	/* Ptr to first guest page */
+ 	uint8_t *guest_mem;
++	bool validity_expected;
+ };
  
- 	snippet_setup_guest(&vm, false);
- 	snippet_init(&vm, SNIPPET_NAME_START(c, mvpg_snippet),
--		     SNIPPET_LEN(c, mvpg_snippet), SNIPPET_OFF_C);
-+		     SNIPPET_LEN(c, mvpg_snippet), SNIPPET_UNPACK_OFF);
- 
- 	/* Enable MVPG interpretation as we want to test KVM and not ourselves */
- 	vm.sblk->eca = ECA_MVPGI;
-diff --git a/s390x/pv-diags.c b/s390x/pv-diags.c
-index 9ced68c7..5165937a 100644
---- a/s390x/pv-diags.c
-+++ b/s390x/pv-diags.c
-@@ -28,7 +28,7 @@ static void test_diag_500(void)
- 
- 	snippet_pv_init(&vm, SNIPPET_NAME_START(asm, snippet_pv_diag_500),
- 			SNIPPET_HDR_START(asm, snippet_pv_diag_500),
--			size_gbin, size_hdr, SNIPPET_OFF_ASM);
-+			size_gbin, size_hdr, SNIPPET_UNPACK_OFF);
- 
- 	sie(&vm);
- 	report(vm.sblk->icptcode == ICPT_PV_INSTR && vm.sblk->ipa == 0x8302 &&
-@@ -83,7 +83,7 @@ static void test_diag_288(void)
- 
- 	snippet_pv_init(&vm, SNIPPET_NAME_START(asm, snippet_pv_diag_288),
- 			SNIPPET_HDR_START(asm, snippet_pv_diag_288),
--			size_gbin, size_hdr, SNIPPET_OFF_ASM);
-+			size_gbin, size_hdr, SNIPPET_UNPACK_OFF);
- 
- 	sie(&vm);
- 	report(vm.sblk->icptcode == ICPT_PV_INSTR && vm.sblk->ipa == 0x8302 &&
-@@ -124,7 +124,7 @@ static void test_diag_yield(void)
- 
- 	snippet_pv_init(&vm, SNIPPET_NAME_START(asm, snippet_pv_diag_yield),
- 			SNIPPET_HDR_START(asm, snippet_pv_diag_yield),
--			size_gbin, size_hdr, SNIPPET_OFF_ASM);
-+			size_gbin, size_hdr, SNIPPET_UNPACK_OFF);
- 
- 	/* 0x44 */
- 	report_prefix_push("0x44");
+ extern void sie_entry(void);
+ extern void sie_exit(void);
+ extern void sie64a(struct kvm_s390_sie_block *sblk, struct vm_save_area *save_area);
+ void sie(struct vm *vm);
+-void sie_expect_validity(void);
+-void sie_check_validity(uint16_t vir_exp);
++void sie_expect_validity(struct vm *vm);
++uint16_t sie_get_validity(struct vm *vm);
++void sie_check_validity(struct vm *vm, uint16_t vir_exp);
+ void sie_handle_validity(struct vm *vm);
+ void sie_guest_sca_create(struct vm *vm);
+ void sie_guest_create(struct vm *vm, uint64_t guest_mem, uint64_t guest_mem_len);
 -- 
 2.34.1
 
