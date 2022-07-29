@@ -2,298 +2,156 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 5E8665851DD
-	for <lists+kvm@lfdr.de>; Fri, 29 Jul 2022 16:56:33 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 210E4585154
+	for <lists+kvm@lfdr.de>; Fri, 29 Jul 2022 16:11:57 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237266AbiG2O4b (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 29 Jul 2022 10:56:31 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57688 "EHLO
+        id S236914AbiG2OLy (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 29 Jul 2022 10:11:54 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51710 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S237253AbiG2O43 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 29 Jul 2022 10:56:29 -0400
-Received: from mailtransmit05.runbox.com (mailtransmit05.runbox.com [IPv6:2a0c:5a00:149::26])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B42DD2B199
-        for <kvm@vger.kernel.org>; Fri, 29 Jul 2022 07:56:18 -0700 (PDT)
-Received: from mailtransmit03.runbox ([10.9.9.163] helo=aibo.runbox.com)
-        by mailtransmit05.runbox.com with esmtps  (TLS1.2) tls TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256
-        (Exim 4.93)
-        (envelope-from <mhal@rbox.co>)
-        id 1oHQNm-0045mw-V3; Fri, 29 Jul 2022 15:50:26 +0200
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=rbox.co;
-        s=selector1; h=Content-Transfer-Encoding:MIME-Version:References:In-Reply-To:
-        Message-Id:Date:Subject:Cc:To:From;
-        bh=hMw5w0EPif8FZOb6nZWrBE2MciY2imMiWQdD6+Ag/JU=; b=Pk3UDt93B+3EWuyx34lGybLHZX
-        90bqJRslq8t+o2E8O1LOtgnO+lCOl3oqsYPrNnMVbDbHr6npwd8WeVxAKV4NfGAIKyU3gDgZwgoRq
-        D5dErLiCgEQHEjfRVHU7IXjpjbGaQKEYhhqlUa0bL/EP6+KFdKba1ZEt87LnQHTUgovplYJFYYVr7
-        BFDt+DPulBtEyeWUv2ONkCFDTO3Sullmyu8CP5QLhpdeM8fOqFsXqDCWLbCgmTUWWeWZJrzZKmCsw
-        RIteNZa2WnqmYukJ9etkjsjMdq4sUf+b9E0pDbSHhTEjJIBkk4u3kmlEViSbXbbu2JTGV0ZFlqWmQ
-        LN0oDk+g==;
-Received: from [10.9.9.72] (helo=submission01.runbox)
-        by mailtransmit03.runbox with esmtp (Exim 4.86_2)
-        (envelope-from <mhal@rbox.co>)
-        id 1oHQNm-0006Ir-Gj; Fri, 29 Jul 2022 15:50:26 +0200
-Received: by submission01.runbox with esmtpsa  [Authenticated ID (604044)]  (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
-        (Exim 4.90_1)
-        id 1oHQNV-0001bD-K1; Fri, 29 Jul 2022 15:50:09 +0200
-From:   Michal Luczaj <mhal@rbox.co>
-To:     kvm@vger.kernel.org
-Cc:     linux-kselftest@vger.kernel.org, seanjc@google.com,
-        pbonzini@redhat.com, shuah@kernel.org, Michal Luczaj <mhal@rbox.co>
-Subject: [PATCH 2/2] KVM: selftests: x86: Test illegal LEA handling
-Date:   Fri, 29 Jul 2022 15:48:03 +0200
-Message-Id: <20220729134801.1120-2-mhal@rbox.co>
-X-Mailer: git-send-email 2.32.0
-In-Reply-To: <20220729134801.1120-1-mhal@rbox.co>
-References: <20220729134801.1120-1-mhal@rbox.co>
+        with ESMTP id S230318AbiG2OLw (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 29 Jul 2022 10:11:52 -0400
+Received: from NAM04-BN8-obe.outbound.protection.outlook.com (mail-bn8nam04on2047.outbound.protection.outlook.com [40.107.100.47])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C4D38422EB;
+        Fri, 29 Jul 2022 07:11:51 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=h7Ld+7Bj+XcY7Bvx4UwiPkv21sny1vAotbHd9Qrq3uwFLTgeW9DNzNUOvOg5UcQ6Cja39qLTstNzt41u+0aE27mu+iWWjDMBw4zta8ARcLn6qIfz3Q0wGbs3hPtM78DDc2mgjcKk2BzJxKT03NA8kbmKdgW3JeuukwP/7algJsCsGw/8PJcu+oAmh4aSkjysML9A33VaxzQkg90w8dMtiwgwfJxB885sKn+DUr0KIXXFVcfyIi6u5q0qm4P1oDTe70LKZjFdBdEGtssrvx2Q9i7SHyJtW77zQXXpyh0qPKD3wxWGQA4fjVE4aOnOSdbOcwvFZqIXI+5iUcfbQ7xgMw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=/trnf414VIOJEPFey+vlqR1KXVJij0e5nbogN3OsT3c=;
+ b=bMXZKyNEoXCifjwt6Fkm64oFWrM1ITCKfav74gGhhx4aKaCI4ffZfIPnH4QUB4KZXMyYmWu2++He78RtXZ+bOFq9tcdRoeH0h7WBJy8Gt52JLOdfEc4Sc4V++t+6OZqdl9+G6CsXT/86biiAhkJ1cmY0/FdN0muOBR0LMqi7uhGzUHsIOjoEWwL+JuRK1Y5Gzxlvnqk837ahvPBDqbLub0pfO2q2lzAxx+svYSMq/lq+FARke1b8jb88eg+DQ+DKhYjphcPU1z/lDHGXzIseKTLiXmiNRAQUwj5wulvZLIaWbQ+sN+dMWDXlmguGuHWvdzhsDE27mdv+WfKBTqxcCw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
+ dkim=pass header.d=nvidia.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=/trnf414VIOJEPFey+vlqR1KXVJij0e5nbogN3OsT3c=;
+ b=UZvn30oNC8g2TYDVkVv+RGeIds2qWk/DtF7l48hXckI4kvYtSvgXx7q51qQQjpouawYO/K+xr5SYdd3iI0l7V+5q/4XB0CthIU3KwJxn2z7piXCbHUP5e/OeEYDoHeEvXKReSeyIgCAuoKw7tw5RnRrfLan7xvjfxKYmXGBZUNdHEVJ6JIz0C1oRvFdkZLHv8pZ4FX4hCAKfud2z+Xg0pzslJfmMZQNiLyK5XBvBktfzH8YNF6QfzulePyCfMqXonvH+x2FO1xtvZsl/Xytyev5MxkPg799zwsw7bZ2viQGUVLAQX1uWAvVpxJ2r/p0UjOt1uQ7R2dYhyeFNyo0l3w==
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=nvidia.com;
+Received: from MN2PR12MB4192.namprd12.prod.outlook.com (2603:10b6:208:1d5::15)
+ by DM4PR12MB5199.namprd12.prod.outlook.com (2603:10b6:5:396::14) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5482.11; Fri, 29 Jul
+ 2022 14:11:47 +0000
+Received: from MN2PR12MB4192.namprd12.prod.outlook.com
+ ([fe80::4cce:310f:93:5d58]) by MN2PR12MB4192.namprd12.prod.outlook.com
+ ([fe80::4cce:310f:93:5d58%8]) with mapi id 15.20.5482.006; Fri, 29 Jul 2022
+ 14:11:47 +0000
+Date:   Fri, 29 Jul 2022 11:11:46 -0300
+From:   Jason Gunthorpe <jgg@nvidia.com>
+To:     "Tian, Kevin" <kevin.tian@intel.com>
+Cc:     Alex Williamson <alex.williamson@redhat.com>,
+        Yishai Hadas <yishaih@nvidia.com>,
+        "saeedm@nvidia.com" <saeedm@nvidia.com>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+        "kuba@kernel.org" <kuba@kernel.org>,
+        "Martins, Joao" <joao.m.martins@oracle.com>,
+        "leonro@nvidia.com" <leonro@nvidia.com>,
+        "maorg@nvidia.com" <maorg@nvidia.com>,
+        "cohuck@redhat.com" <cohuck@redhat.com>
+Subject: Re: [PATCH V2 vfio 03/11] vfio: Introduce DMA logging uAPIs
+Message-ID: <YuPqokHRZrA6mlRU@nvidia.com>
+References: <20220714081251.240584-4-yishaih@nvidia.com>
+ <BN9PR11MB5276B26F76F409BE27E593758C919@BN9PR11MB5276.namprd11.prod.outlook.com>
+ <56bd06d3-944c-18da-86ed-ae14ce5940b7@nvidia.com>
+ <BN9PR11MB5276BEDFBBD53A44C1525A118C959@BN9PR11MB5276.namprd11.prod.outlook.com>
+ <eab568ea-f39e-5399-6af6-0518832dfc91@nvidia.com>
+ <20220726080320.798129d5.alex.williamson@redhat.com>
+ <20220726150452.GE4438@nvidia.com>
+ <BN9PR11MB52766B673C70439A78E16B518C969@BN9PR11MB5276.namprd11.prod.outlook.com>
+ <YuJ7vpwCPqg2l8Nq@nvidia.com>
+ <BN9PR11MB52763DDCBAB61A47693B83B38C999@BN9PR11MB5276.namprd11.prod.outlook.com>
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <BN9PR11MB52763DDCBAB61A47693B83B38C999@BN9PR11MB5276.namprd11.prod.outlook.com>
+X-ClientProxiedBy: BL1PR13CA0335.namprd13.prod.outlook.com
+ (2603:10b6:208:2c6::10) To MN2PR12MB4192.namprd12.prod.outlook.com
+ (2603:10b6:208:1d5::15)
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-2.8 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,RCVD_IN_DNSWL_LOW,
-        SPF_HELO_NONE,SPF_PASS autolearn=unavailable autolearn_force=no
-        version=3.4.6
+X-MS-PublicTrafficType: Email
+X-MS-Office365-Filtering-Correlation-Id: 102ae539-15e0-4178-ad62-08da716c45d9
+X-MS-TrafficTypeDiagnostic: DM4PR12MB5199:EE_
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: KOzkWbvas18g7zq5Jal/yDDK3lCkw1ndf45SZELIwZaDJC6Sqi2RVGM12gbhHMcrnI4tLLF+Xo0nZJzD+8B7My+pOgU2qOGTj2YZuuoHz0hon4PMdUOVuowLlACIgPJjgWbZoXJxTmLAEHRZXVLAlNQxayWCslZa2UkQIs38PER5AmCAjYnlsB1zxBWzutXBB0TFmKuRhkPhe6yZDt/LetYi/SHGembduJuO9zxbeBpngSJ0SGbNc0J/K4RLfUy8c8hgKqf4jRF7FxyArmWjWSRalLWiqLIgSPO87ZuCmpn0hYIS/mCT4yfvCLMnAz0qQ/mGVpHWp12oXFXPfMf+FazIuI0TxxNSDZZq9A6Z3FiQJYGC2yaGylqkRsbxfEcsx9KIRt4mIUynqtMW2xoSB4IlKA5WQFvDq8HAnAMhE1aObcySJoQoa7269zCuyOB/wjNMFjFlEhJKoSYhJ54+dhDNcX6Fr7nC3Js+90s42OVthC+6D7g8TLfN4zvkXEwdXNZ8zZWrHvTrnUbsc9Av8fWfY3Ud5A+5yYk/aa43fTUv5ggtm2lU9SWQvHWau5ODUFVRPXb9+Y0xuXzjpEhvPWpfyKtNPVJg4mysPAPQBRI6OMt8e6xa0sUNKQ8lK8/fAy/np9pEdRmls6ImB+KleE+NI/BFvfGmAyI1Z9TplHuSxPmN8LkZiN3fXpNLcoHFZOH/a0yn6PbaPNR2c2msIl3IMpyBA9E2UFT3KMOWyONbihTWFIqKAZpaP14SR18I
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:MN2PR12MB4192.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230016)(4636009)(366004)(39860400002)(396003)(136003)(376002)(346002)(86362001)(38100700002)(478600001)(8676002)(4326008)(66556008)(8936002)(6862004)(66476007)(5660300002)(6486002)(316002)(54906003)(66946007)(186003)(83380400001)(2616005)(41300700001)(2906002)(26005)(6512007)(6506007)(36756003);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?E2IW7ZGfWs1ZUXsay20J9Ft2pgEM7eymLwq/KtylgbZ8fSoIWCJq/DbLpDUi?=
+ =?us-ascii?Q?ySmUNPh6Xg0Fx0aHB9mC9nphYiry3zQHX7n0e5vptk8S++6HaYAKcecKn+27?=
+ =?us-ascii?Q?PkxaWXCHGGoRGpH6WSWbbC6jqjJx87hBDz2tkEu0U0+Ki7AyosQ9WHRVNwQM?=
+ =?us-ascii?Q?HSaJfDjrXoXiYzykAP3jriKSbHg+yin3wrxGXLGyGxD5JG0G9yZF7SkUm7TT?=
+ =?us-ascii?Q?1IJEIL3aGdHSMtMoq7tzy6p5uIjRDGVHizYpI8d8MEdPcVx+tmceHtWiSbbE?=
+ =?us-ascii?Q?b8x+jjsBbAewarujvtXdBjHfXu+NxQiAtOcAEmn2oCUvu0bEsj5qG4MwQCsf?=
+ =?us-ascii?Q?I756SAx2Yj/4X8T8KfZMwKOINEXO2nWWFNo7QwLz/BJ8Is88lX3rzVwLf6f+?=
+ =?us-ascii?Q?/lxY9QwbSjfurUHn6oUWDs4BvHvzTrOElVVZ/ySs/MUGmLMGy/mxAIIJVX8Y?=
+ =?us-ascii?Q?yRm7MBWjkFCtdJQd8TJO1i+AnYosIcNWxRA7X8dvXFpWYfwPj5K20AYUclNN?=
+ =?us-ascii?Q?hgkBL24r5Rbga3Qyfow6tZjB+SzXyp8W61YsJ1N8keXTVdINnXPDhklB6GLJ?=
+ =?us-ascii?Q?4d0Ua7OHBVMZTs4J/uzun2/gGA9UQ7kYAQLVrfWY2IO3kHZqz9FmDhp5tnwz?=
+ =?us-ascii?Q?vwcfjnPRiSoOB1In/4LRJEevz4RdEwaVBAMwz4ln5AmDPzapqJrU+7FLPfy1?=
+ =?us-ascii?Q?DZxX8UwE/potjbmSYvpiE1FmLfrDk8MzR34PHgYOn+wI+UanIR7m6lhAZ2VT?=
+ =?us-ascii?Q?IDw1+jU3MBCCaxpieSZKqn79HxChNKpIgYa0e9hC6VFGRtxQUicx2XNPN/BC?=
+ =?us-ascii?Q?lyiZOCmGh5wPKnK4fJBKaJiVTzPkO/1KN3RUmNVYkOnjdgjGU0O7NpXMCjLa?=
+ =?us-ascii?Q?8E2HUw+0U/zPOWzexGErTEHwcKHBY2L+AZxjncoT0GQptDxlkuC5UfwC7cP3?=
+ =?us-ascii?Q?13QczhLmbpfiBB6LO7ZpzW+D8Sb1bRFS2JxQna6/gEZ81PC2Cg4N82KxoZUe?=
+ =?us-ascii?Q?YAuxLBxzHv7p2Wdrm/l+HgHMhbQSa27jjHKyiYh0eHx7Eg3Vv+peeNX8X9qL?=
+ =?us-ascii?Q?fgIHhNvbm1Du71jyvBPGicHKAmlLVXlWJyWOH3SQGGJw8ivcuUGos3FjzNzh?=
+ =?us-ascii?Q?/j8H6lOIoZ+gheAaZXeEvSxu6snuDJcy/qeo2wntCx5ur90I5rIFPAzXRtve?=
+ =?us-ascii?Q?fHsrOfbNcYfwIT+EhjjaiLb6K4pjHgqnYz0V6nqvcyIw7uIbs0Kkw/hdfyft?=
+ =?us-ascii?Q?0JA0aefuRSb45HACdZjD7tcp/VVHt2KQh9j13iT/DIFw+s8yu7fUq3CVcRbT?=
+ =?us-ascii?Q?RJCdunFGY1UWYMr5rJL1JyeBa6Y/SnRDAEsvSvbghOpgE22F+kh/wa8nbMcq?=
+ =?us-ascii?Q?YhvAvcbu8+0bZkw5HDy0Gi+Oth4bznFNT9NRXv+PYngZ//HritWsnwJnKyu1?=
+ =?us-ascii?Q?sZxJv75z7QkYzwhctHM9SQCtoarJMyw6glgRpNSaH02vP3g2zsPIt/Vt6NU/?=
+ =?us-ascii?Q?oahKHXItGOcxt2jU8UnbLTVBFU0UOP5hSWl925aTYm+nqmSOrH5lrMSyFdG9?=
+ =?us-ascii?Q?lQSkmLS2LJ0/ep16pb1gT1/TGfIEeB2lBBFh7erm?=
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 102ae539-15e0-4178-ad62-08da716c45d9
+X-MS-Exchange-CrossTenant-AuthSource: MN2PR12MB4192.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 29 Jul 2022 14:11:46.9900
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: QpcJK3lt5j+iY4nSv0OIYoSoK6t2l6KC+n+cDz5DTfXZhlV0utFQR4MJTb1z4BHa
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM4PR12MB5199
+X-Spam-Status: No, score=-1.7 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FORGED_SPF_HELO,
+        RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_NONE
+        autolearn=no autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Check if the emulator reveals host's kernel memory address.
+On Fri, Jul 29, 2022 at 03:01:51AM +0000, Tian, Kevin wrote:
+> > From: Jason Gunthorpe <jgg@nvidia.com>
+> > Sent: Thursday, July 28, 2022 8:06 PM
+> > 
+> > On Thu, Jul 28, 2022 at 04:05:04AM +0000, Tian, Kevin wrote:
+> > 
+> > > > I think this is not correct, just because we made it discoverable does
+> > > > not absolve the kernel of compatibility. If we change the limit, eg to
+> > > > 1, and a real userspace stops working then we still broke userspace.
+> > >
+> > > iiuc Alex's suggestion doesn't conflict with the 'try and fail' model.
+> > > By using the reserved field of vfio_device_feature_dma_logging_control
+> > > to return the limit of the specified page_size from a given tracker,
+> > > the user can quickly retry and adapt to that limit if workable.
+> > 
+> > Again, no it can't. The marshalling limit is not the device limit and
+> > it will still potentially fail. Userspace does not gain much
+> > additional API certainty by knowing this internal limit.
+> 
+> Why cannot the tracker return device limit here?
 
-Signed-off-by: Michal Luczaj <mhal@rbox.co>
----
-Although checkpatch complains about the use of `extern`, I am sending this
-as it is. Let me know if you need it in some better form.
+Because it is "complicated". mlx5 doesn't really have a limit in
+simple terms of the number of ranges - it has other limits based on
+total span and page size.
 
-[unpatched]$ ./tools/testing/selftests/kvm/x86_64/emulator_illegal_lea
-==== Test Assertion Failure ====
-  x86_64/emulator_illegal_lea.c:129: uc->args[0] == 0
-  pid=957 tid=957 errno=4 - Interrupted system call
-     1	: check_state at emulator_illegal_lea.c:129
-     2	: main at emulator_illegal_lea.c:169 (discriminator 1)
-     3	: ?? ??:0
-     4	: ?? ??:0
-     5	: _start at ??:?
-  Host's address leaked: 0xffff88811a5d3620 (2)
-
-[patched]$ ./tools/testing/selftests/kvm/x86_64/emulator_illegal_lea
-[patched]$
-
- tools/testing/selftests/kvm/.gitignore        |   1 +
- tools/testing/selftests/kvm/Makefile          |   1 +
- .../kvm/x86_64/emulator_illegal_lea.c         | 180 ++++++++++++++++++
- 3 files changed, 182 insertions(+)
- create mode 100644 tools/testing/selftests/kvm/x86_64/emulator_illegal_lea.c
-
-diff --git a/tools/testing/selftests/kvm/.gitignore b/tools/testing/selftests/kvm/.gitignore
-index 4509a3a7eeae..8977458080b9 100644
---- a/tools/testing/selftests/kvm/.gitignore
-+++ b/tools/testing/selftests/kvm/.gitignore
-@@ -17,6 +17,7 @@
- /x86_64/debug_regs
- /x86_64/evmcs_test
- /x86_64/emulator_error_test
-+/x86_64/emulator_illegal_lea
- /x86_64/fix_hypercall_test
- /x86_64/get_msr_index_features
- /x86_64/kvm_clock_test
-diff --git a/tools/testing/selftests/kvm/Makefile b/tools/testing/selftests/kvm/Makefile
-index 22423c871ed6..453cd34e1fde 100644
---- a/tools/testing/selftests/kvm/Makefile
-+++ b/tools/testing/selftests/kvm/Makefile
-@@ -75,6 +75,7 @@ TEST_GEN_PROGS_x86_64 += x86_64/cr4_cpuid_sync_test
- TEST_GEN_PROGS_x86_64 += x86_64/get_msr_index_features
- TEST_GEN_PROGS_x86_64 += x86_64/evmcs_test
- TEST_GEN_PROGS_x86_64 += x86_64/emulator_error_test
-+TEST_GEN_PROGS_x86_64 += x86_64/emulator_illegal_lea
- TEST_GEN_PROGS_x86_64 += x86_64/fix_hypercall_test
- TEST_GEN_PROGS_x86_64 += x86_64/hyperv_clock
- TEST_GEN_PROGS_x86_64 += x86_64/hyperv_cpuid
-diff --git a/tools/testing/selftests/kvm/x86_64/emulator_illegal_lea.c b/tools/testing/selftests/kvm/x86_64/emulator_illegal_lea.c
-new file mode 100644
-index 000000000000..5f0704e04fac
---- /dev/null
-+++ b/tools/testing/selftests/kvm/x86_64/emulator_illegal_lea.c
-@@ -0,0 +1,180 @@
-+// SPDX-License-Identifier: GPL-2.0-only
-+/*
-+ * Test for handling of illegal (ModRM mod = 3) LEA.
-+ *
-+ * To trigger the emulator and feed it with LEA, we VM-exit on IO (with a
-+ * single OUTS), then race decoder's instruction fetch - hoping to replace the
-+ * initial IO op with an illegal LEA.
-+ */
-+
-+#include "test_util.h"
-+#include "kvm_util.h"
-+#include "processor.h"
-+
-+#include <string.h>
-+#include <pthread.h>
-+#include <sys/mman.h>
-+
-+/* defined in tools/testing/selftests/kvm/lib/x86_64/ucall.c */
-+#define UCALL_PIO_PORT ((uint16_t)0x1000)
-+
-+#define VCPU_ID 0
-+#define NOT_UCALL_PORT ((uint16_t)~UCALL_PIO_PORT)
-+#define MAX_ATTEMPTS 0x10000
-+#define MAYBE_KERNEL(addr) ((int64_t)(addr) < 0)
-+
-+extern uint32_t race_op;
-+
-+static void guest_ud_handler(struct ex_regs *regs)
-+{
-+	GUEST_ASSERT(regs->rip == (uint64_t)&race_op);
-+	regs->rip += 4;
-+}
-+
-+__aligned(0x1000) __attribute__((naked)) static void guest_code(void)
-+{
-+	uint32_t n = 1;
-+	void *readable;
-+	uint64_t rax;
-+
-+	do {
-+		rax = 0;
-+		readable = &guest_code;
-+		/*
-+		 * This is where
-+		 *   3e 3e 3e 6f    outsl (%rsi), %dx
-+		 * will be turned into
-+		 *   3e 48 8d c0    lea rax (!), rax
-+		 * Both instructions padded to 32 bits with DS prefixes.
-+		 */
-+		asm volatile(".align 8\n\t"
-+			     "race_op:\n\t"
-+			     "ds\n\t"
-+			     "ds\n\t"
-+			     "ds\n\t"
-+			     "outsl (%[readable]), %[port]\n\t"
-+			     ".fill 8, 1, 0x90"
-+			     : [rax] "=a" (rax)
-+			     : [readable] "S" (readable),
-+			       [port] "d" (NOT_UCALL_PORT));
-+	} while (!MAYBE_KERNEL(rax) && n++ < MAX_ATTEMPTS);
-+
-+	ucall(UCALL_DONE, 2, rax, n);
-+}
-+
-+__attribute__((naked)) static void asm_lea(void)
-+{
-+	asm volatile("ds\n\t"
-+		     "lea (%rax), %rax");
-+}
-+
-+__attribute__((naked)) static void asm_outs(void)
-+{
-+	asm volatile("ds\n\t"
-+		     "ds\n\t"
-+		     "ds\n\t"
-+		     "outsl (%rsi), %dx");
-+}
-+
-+void *racer(void *arg)
-+{
-+	uint32_t *ptr = arg;
-+	uint32_t lea, outs;
-+
-+	memcpy(&lea, &asm_lea, sizeof(lea));
-+	/* set modrm mod = 3 */
-+	lea |= 0xc0000000;
-+
-+	memcpy(&outs, &asm_outs, sizeof(outs));
-+
-+	while (true) {
-+		*ptr = outs;
-+		sched_yield();
-+		*ptr = lea;
-+		sched_yield();
-+		pthread_testcancel();
-+	};
-+}
-+
-+int check_exit_reason(struct kvm_run *run)
-+{
-+	switch (run->exit_reason) {
-+	case KVM_EXIT_IO:
-+		/* race lost: OUTS was executed; ignore and retry */
-+		TEST_ASSERT(run->io.port == NOT_UCALL_PORT,
-+			    "Unexpected IO port: %u",
-+			    run->io.port);
-+		return 1;
-+	case KVM_EXIT_INTERNAL_ERROR:
-+		/* emulator hit bad LEA and bailed out; well done */
-+		ASSERT_EQ(*(uint32_t *)&run->emulation_failure.insn_bytes,
-+			  *(uint32_t *)&asm_lea | 0xc0000000);
-+		TEST_ASSERT(run->internal.suberror == KVM_INTERNAL_ERROR_EMULATION,
-+			    "Unexpected suberror: %u",
-+			    run->internal.suberror);
-+		return 0;
-+	default:
-+		TEST_FAIL("Unexpected VM exit: %s",
-+			  exit_reason_str(run->exit_reason));
-+	}
-+
-+	__builtin_unreachable();
-+}
-+
-+int check_state(struct kvm_run *run, struct ucall *uc)
-+{
-+	switch (uc->cmd) {
-+	case UCALL_NONE:
-+		return check_exit_reason(run);
-+	case UCALL_DONE:
-+		TEST_ASSERT(uc->args[0] == 0,
-+			    "Host's address leaked: %#lx (%lu)",
-+			    uc->args[0], uc->args[1]);
-+		return 0;
-+	case UCALL_ABORT:
-+		TEST_FAIL("UCALL_ABORT: %s, line %ld\n",
-+			  (char *)uc->args[0], uc->args[1]);
-+	case UCALL_UNHANDLED:
-+		TEST_FAIL("UCALL_UNHANDLED: #%ld\n", uc->args[0]);
-+	default:
-+		TEST_FAIL("Unexpected ucall");
-+	}
-+
-+	__builtin_unreachable();
-+}
-+
-+int main(int argc, char *argv[])
-+{
-+	struct kvm_run *run;
-+	struct kvm_vm *vm;
-+	pthread_t thread;
-+	struct ucall uc;
-+	int ret;
-+
-+	ret = mprotect(&guest_code, 0x1000, PROT_READ | PROT_WRITE | PROT_EXEC);
-+	TEST_ASSERT(ret == 0, "mprotect() failed: %s", strerror(errno));
-+
-+	vm = vm_create_default(VCPU_ID, 0, (void *)guest_code);
-+	run = vcpu_state(vm, VCPU_ID);
-+
-+	vm_init_descriptor_tables(vm);
-+	vcpu_init_descriptor_tables(vm, VCPU_ID);
-+	vm_install_exception_handler(vm, UD_VECTOR, guest_ud_handler);
-+
-+	ret = pthread_create(&thread, 0, racer, addr_gva2hva(vm, (vm_vaddr_t)&race_op));
-+	TEST_ASSERT(ret == 0, "pthread_create() failed: %s", strerror(ret));
-+
-+	do {
-+		vcpu_run(vm, VCPU_ID);
-+		get_ucall(vm, VCPU_ID, &uc);
-+	} while (check_state(run, &uc));
-+
-+	ret = pthread_cancel(thread);
-+	TEST_ASSERT(ret == 0, "pthread_cancel() failed: %s", strerror(ret));
-+
-+	ret = pthread_join(thread, 0);
-+	TEST_ASSERT(ret == 0, "pthread_join() failed: %s", strerror(ret));
-+
-+	kvm_vm_free(vm);
-+	return 0;
-+}
--- 
-2.32.0
-
+Jason
