@@ -2,105 +2,158 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 84BE1585182
-	for <lists+kvm@lfdr.de>; Fri, 29 Jul 2022 16:25:29 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id B5D985851A7
+	for <lists+kvm@lfdr.de>; Fri, 29 Jul 2022 16:37:01 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237021AbiG2OZ0 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 29 Jul 2022 10:25:26 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34130 "EHLO
+        id S237134AbiG2OhA (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 29 Jul 2022 10:37:00 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43114 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S236998AbiG2OZY (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 29 Jul 2022 10:25:24 -0400
-Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B4ACE1D32F
-        for <kvm@vger.kernel.org>; Fri, 29 Jul 2022 07:25:23 -0700 (PDT)
-Received: from pps.filterd (m0098409.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.17.1.5/8.17.1.5) with ESMTP id 26TECuJb023691
-        for <kvm@vger.kernel.org>; Fri, 29 Jul 2022 14:25:23 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
- mime-version : subject : to : cc : references : from : in-reply-to :
- content-type : content-transfer-encoding; s=pp1;
- bh=40kK2zv5CRUA+zK3Z+xyR3zv0QiUl7hpA/fVj6LVvIA=;
- b=sEfC/nerYd9EGwO4g4qKYabOhDtOnfyMZmTmu962KUo0Yxid4Zz8OcaAvgugklOQc8lx
- ebcWx3JUv1nju6q201f0vveQKsi+/nJjo9aOTnepSVr4cb8i8qXBo2IFUwAXevIRJFXz
- v3yQ6pTuAg23eNts3AVLXW9qY9bRmloL6kbHNB7rXiacY+9XogsLMAakYrvf5zWNy+l5
- sysPKrJ8fL58cNP1AjLpijEend5r+r2GbEU55WulfJwFgRAv3TnFZ+OKoC/uVqfJyhUR
- jgtKAkt7Tqc0/9WgisXSt4f8E7yCddfSRP984rkFrqp70vG5fpykSpw9LlGelQmvsBFZ +g== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3hmh410cva-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT)
-        for <kvm@vger.kernel.org>; Fri, 29 Jul 2022 14:25:23 +0000
-Received: from m0098409.ppops.net (m0098409.ppops.net [127.0.0.1])
-        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 26TEEN00028442
-        for <kvm@vger.kernel.org>; Fri, 29 Jul 2022 14:25:22 GMT
-Received: from ppma02fra.de.ibm.com (47.49.7a9f.ip4.static.sl-reverse.com [159.122.73.71])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3hmh410cud-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Fri, 29 Jul 2022 14:25:22 +0000
-Received: from pps.filterd (ppma02fra.de.ibm.com [127.0.0.1])
-        by ppma02fra.de.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 26TE5fdM024834;
-        Fri, 29 Jul 2022 14:25:20 GMT
-Received: from b06avi18878370.portsmouth.uk.ibm.com (b06avi18878370.portsmouth.uk.ibm.com [9.149.26.194])
-        by ppma02fra.de.ibm.com with ESMTP id 3hg946frg5-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Fri, 29 Jul 2022 14:25:19 +0000
-Received: from b06wcsmtp001.portsmouth.uk.ibm.com (b06wcsmtp001.portsmouth.uk.ibm.com [9.149.105.160])
-        by b06avi18878370.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 26TEPV5528180972
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Fri, 29 Jul 2022 14:25:31 GMT
-Received: from b06wcsmtp001.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id D0EF5A405F;
-        Fri, 29 Jul 2022 14:25:16 +0000 (GMT)
-Received: from b06wcsmtp001.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 8DD0FA405B;
-        Fri, 29 Jul 2022 14:25:16 +0000 (GMT)
-Received: from [9.145.174.114] (unknown [9.145.174.114])
-        by b06wcsmtp001.portsmouth.uk.ibm.com (Postfix) with ESMTP;
-        Fri, 29 Jul 2022 14:25:16 +0000 (GMT)
-Message-ID: <cc5dc084-f064-39f1-3813-cfa725d8f0d1@linux.ibm.com>
-Date:   Fri, 29 Jul 2022 16:25:16 +0200
+        with ESMTP id S236547AbiG2Og6 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 29 Jul 2022 10:36:58 -0400
+Received: from mail-pl1-x62b.google.com (mail-pl1-x62b.google.com [IPv6:2607:f8b0:4864:20::62b])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 56DF96170E
+        for <kvm@vger.kernel.org>; Fri, 29 Jul 2022 07:36:58 -0700 (PDT)
+Received: by mail-pl1-x62b.google.com with SMTP id b22so4767385plz.9
+        for <kvm@vger.kernel.org>; Fri, 29 Jul 2022 07:36:58 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc;
+        bh=UJxEn4xcgj+ln1eSjZjkxrNWHJwcAg9c38FMYxFrEw4=;
+        b=Llt63vfhKnScgYaIaDCdE5iR4zO0UBwA/DKPfMke+neC1JBL32YFpgFFV6xl2YIt6D
+         fcm6DBwAKxLX6EHNmh78ZMFx80I4GGfFe6JJfDxhfXVO1c6tddbnv/YXhxcpuIX8/0D4
+         4/bcakY3kMtTIC/8ODy7RFKEIVohnCm6z365lHubhmi8qtrmfvqhHcM7diC782mNi+1R
+         gqQ9f7XWkn4RtPUTmWQ7/S+cqhpANz+vlws6uZvuZuv++UlGNRji5n8r13chEsgBU+uW
+         MGyZFis7lIMbVuQEusYNn/C2MSgNClRD3tZfS/vGTndVQqch3mYm9u/a8sPDAWoXIb5R
+         OzCw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc;
+        bh=UJxEn4xcgj+ln1eSjZjkxrNWHJwcAg9c38FMYxFrEw4=;
+        b=yHB8cfZyImLi1t8qrAVpFMRgsxjy+4Ue01M6MtDQgZj6meQ8mwo0Dy690/xon6Qe9D
+         eVhzLkbIrQy6FBacTkEq6ZJ3Br4nAcFJbifNUisWZu7xOXluPnPBZEI3L5LiiVad0Xi3
+         xDNvZWbghN/A+zrKRV0da+PLIOOvztaonMK25XncwvHmC1aZi8FyfzMO4KDY8jVIcVND
+         vJEyRQBwQF6d3fgp9LSYH3BFvkETcqOnaTEPatTFlm22RdX1swx9gapjb/pY4wwp5Kng
+         Wtcao6xJrNOWbHXNEHiBxuzdgB3ge/o4m+gnD69FUHnXXiQnUvK3gYKdALjf44CtByL7
+         tIWw==
+X-Gm-Message-State: ACgBeo3zRHp33ciYaCL91X4r7j7/PM2z0Txcbs7IxYyDrkINwNSNSY8K
+        Ha5NUuRBcSfRKjIK5CoFszn7tg==
+X-Google-Smtp-Source: AA6agR7gPHWxKhEhDN6n0RS6tuTj1B2aPWI4qV0F7CLKQBg9Ed4eMDHx1ydx99D+k633KKy23icx0A==
+X-Received: by 2002:a17:902:f80f:b0:16d:c4af:88aa with SMTP id ix15-20020a170902f80f00b0016dc4af88aamr4254559plb.6.1659105417682;
+        Fri, 29 Jul 2022 07:36:57 -0700 (PDT)
+Received: from google.com (7.104.168.34.bc.googleusercontent.com. [34.168.104.7])
+        by smtp.gmail.com with ESMTPSA id g18-20020a170902869200b0016cdbb22c28sm3700309plo.0.2022.07.29.07.36.56
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 29 Jul 2022 07:36:57 -0700 (PDT)
+Date:   Fri, 29 Jul 2022 14:36:53 +0000
+From:   Sean Christopherson <seanjc@google.com>
+To:     Junaid Shahid <junaids@google.com>
+Cc:     kvm@vger.kernel.org, pbonzini@redhat.com, dmatlack@google.com,
+        jmattson@google.com
+Subject: Re: [PATCH] kvm: x86: Do proper cleanup if kvm_x86_ops->vm_init()
+ fails
+Message-ID: <YuPwhWi1xWgAwmK4@google.com>
+References: <20220729031108.3929138-1-junaids@google.com>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.8.0
-Subject: Re: [kvm-unit-tests PATCH 4/6] lib: s390x: sie: Improve validity
- handling and make it vm specific
-Content-Language: en-US
-To:     Janosch Frank <frankja@linux.ibm.com>, kvm@vger.kernel.org
-Cc:     imbrenda@linux.ibm.com, nrb@linux.ibm.com, scgl@linux.ibm.com,
-        thuth@redhat.com
-References: <20220729082633.277240-1-frankja@linux.ibm.com>
- <20220729082633.277240-5-frankja@linux.ibm.com>
-From:   Steffen Eiden <seiden@linux.ibm.com>
-Organization: IBM
-In-Reply-To: <20220729082633.277240-5-frankja@linux.ibm.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-ORIG-GUID: kzACFrW97F3237fPIZqap7dDH0ppICNN
-X-Proofpoint-GUID: t1FLEnsCe2zl9vyXu08gOuPNg9kYpwrE
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.205,Aquarius:18.0.883,Hydra:6.0.517,FMLib:17.11.122.1
- definitions=2022-07-29_16,2022-07-28_02,2022-06-22_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 suspectscore=0 clxscore=1015
- mlxscore=0 impostorscore=0 bulkscore=0 spamscore=0 malwarescore=0
- priorityscore=1501 adultscore=0 lowpriorityscore=0 mlxlogscore=780
- phishscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2206140000 definitions=main-2207290061
-X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,
-        SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20220729031108.3929138-1-junaids@google.com>
+X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
+        USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-
-
-On 7/29/22 10:26, Janosch Frank wrote:
-> The current library doesn't support running multiple vms at once as it
-> stores the validity once and not per vm. Let's move the validity
-> handling into the vm and introduce a new function to retrieve the vir.
+On Thu, Jul 28, 2022, Junaid Shahid wrote:
+> If vm_init() fails [which can happen, for instance, if a memory
+> allocation fails during avic_vm_init()], we need to cleanup some
+> state in order to avoid resource leaks.
 > 
-> Signed-off-by: Janosch Frank <frankja@linux.ibm.com>
-Reviewed-by: Steffen Eiden <seiden@linux.ibm.com>
+> Signed-off-by: Junaid Shahid <junaids@google.com>
+> ---
+>  arch/x86/kvm/x86.c | 8 +++++++-
+>  1 file changed, 7 insertions(+), 1 deletion(-)
+> 
+> diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+> index f389691d8c04..ef5fd2f05c79 100644
+> --- a/arch/x86/kvm/x86.c
+> +++ b/arch/x86/kvm/x86.c
+> @@ -12064,8 +12064,14 @@ int kvm_arch_init_vm(struct kvm *kvm, unsigned long type)
+>  	kvm_hv_init_vm(kvm);
+>  	kvm_xen_init_vm(kvm);
+>  
+> -	return static_call(kvm_x86_vm_init)(kvm);
+> +	ret = static_call(kvm_x86_vm_init)(kvm);
+> +	if (ret)
+> +		goto out_uninit_mmu;
+>  
+> +	return 0;
+> +
+> +out_uninit_mmu:
+> +	kvm_mmu_uninit_vm(kvm);
+
+Hrm, this works for now (I think), but I really don't like that kvm_apicv_init(),
+kvm_hv_init_vm(), and kvm_xen_init_vm() all do something without that something
+being unwound on failure.  E.g. both Hyper-V and Xen have a paired "destroy"
+function, it just so happens that their destroy paths are guaranteed nops in this
+case.
+
+AFAICT, there are no dependencies on doing vendor init at the end, so what if we
+hoist it up so that all paths that can fail are at the top?
+
+diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+index 5366f884e9a7..7e749be356b2 100644
+--- a/arch/x86/kvm/x86.c
++++ b/arch/x86/kvm/x86.c
+@@ -12042,6 +12042,10 @@ int kvm_arch_init_vm(struct kvm *kvm, unsigned long type)
+        if (ret)
+                goto out_page_track;
+ 
++       ret = static_call(kvm_x86_vm_init)(kvm);
++       if (ret)
++               goto out_uninit_mmu;
++
+        INIT_HLIST_HEAD(&kvm->arch.mask_notifier_list);
+        INIT_LIST_HEAD(&kvm->arch.assigned_dev_head);
+        atomic_set(&kvm->arch.noncoherent_dma_count, 0);
+@@ -12077,8 +12081,10 @@ int kvm_arch_init_vm(struct kvm *kvm, unsigned long type)
+        kvm_hv_init_vm(kvm);
+        kvm_xen_init_vm(kvm);
+ 
+-       return static_call(kvm_x86_vm_init)(kvm);
++       return 0;
+ 
++out_uninit_mmu:
++       kvm_mmu_uninit_vm(kvm);
+ out_page_track:
+        kvm_page_track_cleanup(kvm);
+ out:
+
+
+Calling kvm_apicv_init() after avic_vm_init() is somewhat odd.  If we really want
+to avoid that, we could add a dedicated kvm_x86_ops to initialize APICv and then
+make kvm_x86_ops.vm_init() a void return e.g.
+
+static int kvm_apicv_init(struct kvm *kvm)
+{
+	unsigned long *inhibits = &kvm->arch.apicv_inhibit_reasons;
+
+	init_rwsem(&kvm->arch.apicv_update_lock);
+
+	set_or_clear_apicv_inhibit(inhibits, APICV_INHIBIT_REASON_ABSENT, true);
+
+	if (!enable_apicv) {
+		set_or_clear_apicv_inhibit(inhibits,
+					   APICV_INHIBIT_REASON_DISABLE, true);
+		return 0;
+	}
+
+	return static_call(kvm_x86_apicv_init(kvm));
+}
