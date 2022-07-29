@@ -2,185 +2,297 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id D36D3584C6F
-	for <lists+kvm@lfdr.de>; Fri, 29 Jul 2022 09:14:14 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 77088584CA5
+	for <lists+kvm@lfdr.de>; Fri, 29 Jul 2022 09:32:27 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234462AbiG2HOM (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 29 Jul 2022 03:14:12 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58444 "EHLO
+        id S234476AbiG2HcX (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 29 Jul 2022 03:32:23 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44182 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234292AbiG2HOL (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 29 Jul 2022 03:14:11 -0400
-Received: from mga01.intel.com (mga01.intel.com [192.55.52.88])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 555D552446
-        for <kvm@vger.kernel.org>; Fri, 29 Jul 2022 00:14:10 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1659078850; x=1690614850;
-  h=message-id:date:mime-version:subject:to:cc:references:
-   from:in-reply-to:content-transfer-encoding;
-  bh=XQxjxHX2C+sC18rbptR/ov9GQsB4VVhSQEUddJTFw1M=;
-  b=KkY9rJJiCVS2YxTVvZiGlSXOYkO9yQO5rnF00ByW3fa1tXr2J31J1rko
-   RzPUogm56DHaIFcL9RKClV+Dy68AA7sBkdVVBzDn+WubdaPe/ip5Qz57Y
-   jO2u+vsgscDRyCEIlVN7gEEAnpZDRj/bKZPCYh6Br2nka/0y43/aijDdx
-   o3fdcCtQ1rqn+6RvOAhxISM87dwwhK4UYzNE8lhHX4NHoKFlMsJ22/7sd
-   3Wlv6q1c98DZe+KYr7GPq6vS2enmIi72gr2l9F7z4QIOekPrFiDyLkxz2
-   FC7txtC+5PZbS+uqJbHmmJhxTm/oc8QLYagJpFnBLEFUZmdphqw5BeWjj
-   Q==;
-X-IronPort-AV: E=McAfee;i="6400,9594,10422"; a="314509722"
-X-IronPort-AV: E=Sophos;i="5.93,200,1654585200"; 
-   d="scan'208";a="314509722"
-Received: from fmsmga008.fm.intel.com ([10.253.24.58])
-  by fmsmga101.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 29 Jul 2022 00:14:09 -0700
-X-IronPort-AV: E=Sophos;i="5.93,200,1654585200"; 
-   d="scan'208";a="660125746"
-Received: from xiaoyaol-hp-g830.ccr.corp.intel.com (HELO [10.249.175.53]) ([10.249.175.53])
-  by fmsmga008-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 29 Jul 2022 00:14:05 -0700
-Message-ID: <ad425c66-ce61-3e21-307e-55fc7131d954@intel.com>
-Date:   Fri, 29 Jul 2022 15:14:02 +0800
+        with ESMTP id S234371AbiG2HcW (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 29 Jul 2022 03:32:22 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 535EC7C1B4
+        for <kvm@vger.kernel.org>; Fri, 29 Jul 2022 00:32:21 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1659079940;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=S2q2utn2CzeOeojEKg/tCXnqvan/YkCeq0ehI4nAHW8=;
+        b=Ix79ElaHHTmzpLH5aTqa9St7W+1g47xRjpTeRDz//JUcpEwNhJndb4mHlLLs9E0HvzO3Cy
+        ubdzc/fZFOU+PBApV+b+E4RDOKD82JOqWr7L9gUKGq+xeVEEYt54ll28XhmXt+29hZB9Ct
+        2y0LsEfbSq+wxaMGgmDYivnf023h6kE=
+Received: from mail-lj1-f197.google.com (mail-lj1-f197.google.com
+ [209.85.208.197]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-272-GV1eUwYjND22hR8LAtWFPw-1; Fri, 29 Jul 2022 03:32:16 -0400
+X-MC-Unique: GV1eUwYjND22hR8LAtWFPw-1
+Received: by mail-lj1-f197.google.com with SMTP id k2-20020a2ea282000000b0025dea602f7cso740330lja.0
+        for <kvm@vger.kernel.org>; Fri, 29 Jul 2022 00:32:15 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc:content-transfer-encoding;
+        bh=S2q2utn2CzeOeojEKg/tCXnqvan/YkCeq0ehI4nAHW8=;
+        b=k09NYyllBet6d/Q9V2mBWWI/b/3dLcp6PFc/wrMR/8SBuBEc2jJUOlseiWJNmyBtLI
+         xk+SytQRKm7cvzmR+/NLYril3RJ4UrHSaoh6B2ktOvNLY6stkEC0mfpaTHsJ8QAD98bD
+         mOcdrX+ss+77H9KiRd+DwN/pKcG3fH/X36FLY1PnVo3oDQ7AoHrz6o4v9Pa/SU6hVaRA
+         p7i2yKosC/gxWDcgAAN2UwFBDpUEJPGQW1KUzz7pMs60cAbtjWfDjZDcsaOERfxMQt/D
+         zyl3zEAGDI9D33sz8lKiWR3oHuNhDzQhEmojWd496Ic81kSe2YkKYFc/f2BhPYpQHSwl
+         V4Bg==
+X-Gm-Message-State: AJIora9VU6BVM71na+JTtplC+FD+mZ0wfrakmRJ8IsG6lk4j+An7p5ZB
+        6ZcaayrXVg8DjAn9sZ/rDu6o59ajaAiredvd0HgnNGsL9BI23j93pDfrfy9Xx/MpBNC9rtC1lLP
+        +wkRAS/0X5pSPhnJEzTHKT2D7J4dq
+X-Received: by 2002:a19:9145:0:b0:48a:7ee4:5eac with SMTP id y5-20020a199145000000b0048a7ee45eacmr849962lfj.641.1659079934548;
+        Fri, 29 Jul 2022 00:32:14 -0700 (PDT)
+X-Google-Smtp-Source: AA6agR724Z9TIFD4TBShsFS+WI+wVQDzXpDufX5nXFkZ8Tvp62c/qrPU4I1gK/YFs9x7sodZ+Vk2IgowAFkA5+mh0bs=
+X-Received: by 2002:a19:9145:0:b0:48a:7ee4:5eac with SMTP id
+ y5-20020a199145000000b0048a7ee45eacmr849942lfj.641.1659079934017; Fri, 29 Jul
+ 2022 00:32:14 -0700 (PDT)
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:91.0) Gecko/20100101
- Firefox/91.0 Thunderbird/91.11.0
-Subject: Re: [RFC PATCH v4 18/36] i386/tdx: Skip BIOS shadowing setup
-Content-Language: en-US
-To:     Gerd Hoffmann <kraxel@redhat.com>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>,
-        Isaku Yamahata <isaku.yamahata@gmail.com>,
-        isaku.yamahata@intel.com,
-        =?UTF-8?Q?Daniel_P=2e_Berrang=c3=a9?= <berrange@redhat.com>,
-        =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>,
-        Richard Henderson <richard.henderson@linaro.org>,
-        "Michael S . Tsirkin" <mst@redhat.com>,
-        Marcel Apfelbaum <marcel.apfelbaum@gmail.com>,
-        Cornelia Huck <cohuck@redhat.com>,
-        Marcelo Tosatti <mtosatti@redhat.com>,
-        Laszlo Ersek <lersek@redhat.com>,
-        Eric Blake <eblake@redhat.com>,
-        Connor Kuehl <ckuehl@redhat.com>, erdemaktas@google.com,
-        kvm@vger.kernel.org, qemu-devel@nongnu.org, seanjc@google.com
-References: <20220512031803.3315890-1-xiaoyao.li@intel.com>
- <20220512031803.3315890-19-xiaoyao.li@intel.com>
- <20220524070804.tcrsg7cwlnbkzhjz@sirius.home.kraxel.org>
- <b294af31-fe92-f251-5d3e-0e439a59ee1e@intel.com>
- <20220530114904.242xqql3xfugy2a7@sirius.home.kraxel.org>
-From:   Xiaoyao Li <xiaoyao.li@intel.com>
-In-Reply-To: <20220530114904.242xqql3xfugy2a7@sirius.home.kraxel.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-5.6 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,HK_RANDOM_ENVFROM,
-        HK_RANDOM_FROM,NICE_REPLY_A,RCVD_IN_DNSWL_HI,RCVD_IN_MSPIKE_H3,
-        RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE autolearn=ham
-        autolearn_force=no version=3.4.6
+References: <20220721084341.24183-1-qtxuning1999@sjtu.edu.cn>
+ <20220721084341.24183-2-qtxuning1999@sjtu.edu.cn> <16a232ad-e0a1-fd4c-ae3e-27db168daacb@redhat.com>
+ <2a8838c4-2e6f-6de7-dcdc-572699ff3dc9@sjtu.edu.cn>
+In-Reply-To: <2a8838c4-2e6f-6de7-dcdc-572699ff3dc9@sjtu.edu.cn>
+From:   Jason Wang <jasowang@redhat.com>
+Date:   Fri, 29 Jul 2022 15:32:02 +0800
+Message-ID: <CACGkMEuwgZRt=J_2i-XugMZtcG-xZ7ZF1RpTjmErT5+RCcZ1OQ@mail.gmail.com>
+Subject: Re: [RFC 1/5] vhost: reorder used descriptors in a batch
+To:     Guo Zhi <qtxuning1999@sjtu.edu.cn>
+Cc:     eperezma <eperezma@redhat.com>,
+        Stefano Garzarella <sgarzare@redhat.com>, mst <mst@redhat.com>,
+        netdev <netdev@vger.kernel.org>,
+        linux-kernel <linux-kernel@vger.kernel.org>,
+        kvm <kvm@vger.kernel.org>,
+        virtualization <virtualization@lists.linux-foundation.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Spam-Status: No, score=-2.6 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        SPF_HELO_NONE,SPF_NONE autolearn=unavailable autolearn_force=no
+        version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 5/30/2022 7:49 PM, Gerd Hoffmann wrote:
-> On Thu, May 26, 2022 at 10:48:56AM +0800, Xiaoyao Li wrote:
->> On 5/24/2022 3:08 PM, Gerd Hoffmann wrote:
->>> On Thu, May 12, 2022 at 11:17:45AM +0800, Xiaoyao Li wrote:
->>>> TDX guest cannot go to real mode, so just skip the setup of isa-bios.
->>>
->>> Does isa-bios setup cause any actual problems?
->>> (same question for patch #19).
->>
->> It causes mem_region split and mem_slot deletion on KVM.
->>
->> TDVF marks pages starting from 0x800000 as TEMP_MEM and TD_HOB, which are
->> TD's private memory and are TDH_MEM_PAGE_ADD'ed to TD via
->> KVM_TDX_INIT_MEM_REGION
->>
->> However, if isa-bios and pc.rom are not skipped, the memory_region
->> initialization of them is after KVM_TDX_INIT_MEM_REGION in
->> tdx_machine_done_notify(). (I didn't figure out why this order though)
->>
->> And the it causes memory region split that splits
->> 	[0, ram_below_4g)
->> to
->> 	[0, 0xc0 000),
->> 	[0xc0 000, 0xe0 000),
->> 	[0xe0 000, 0x100 000),
->> 	[0x100 000, ram_below_4g)
->>
->> which causes mem_slot deletion on KVM. On KVM side, we lose the page content
->> when mem_slot deletion.  Thus, the we lose the content of TD HOB.
-> 
-> Hmm, removing and re-creating memory slots shouldn't cause page content
-> go away.   I'm wondering what the *real* problem is?  Maybe you loose
-> tdx-specific state, i.e. this removes TDH_MEM_PAGE_ADD changes?
-> 
->> Yes, the better solution seems to be ensure KVM_TDX_INIT_MEM_REGION is
->> called after all the mem region is settled down.
-> 
-> Yes, especially if tdx can't tolerate memory slots coming and going.
+On Thu, Jul 28, 2022 at 4:26 PM Guo Zhi <qtxuning1999@sjtu.edu.cn> wrote:
+>
+> On 2022/7/26 15:36, Jason Wang wrote:
+>
+>
+> =E5=9C=A8 2022/7/21 16:43, Guo Zhi =E5=86=99=E9=81=93:
+>
+> Device may not use descriptors in order, for example, NIC and SCSI may
+> not call __vhost_add_used_n with buffers in order.  It's the task of
+> __vhost_add_used_n to order them.
+>
+>
+>
+> I'm not sure this is ture. Having ooo descriptors is probably by design t=
+o have better performance.
+>
+> This might be obvious for device that may have elevator or QOS stuffs.
+>
+> I suspect the right thing to do here is, for the device that can't perfor=
+m better in the case of IN_ORDER, let's simply not offer IN_ORDER (zerocopy=
+ or scsi). And for the device we know it can perform better, non-zercopy et=
+hernet device we can do that.
+>
+>
+>   This commit reorder the buffers using
+> vq->heads, only the batch is begin from the expected start point and is
+> continuous can the batch be exposed to driver.  And only writing out a
+> single used ring for a batch of descriptors, according to VIRTIO 1.1
+> spec.
+>
+>
+>
+> So this sounds more like a "workaround" of the device that can't consume =
+buffer in order, I suspect it can help in performance.
+>
+> More below.
+>
+>
+>
+> Signed-off-by: Guo Zhi <qtxuning1999@sjtu.edu.cn>
+> ---
+>   drivers/vhost/vhost.c | 44 +++++++++++++++++++++++++++++++++++++++++--
+>   drivers/vhost/vhost.h |  3 +++
+>   2 files changed, 45 insertions(+), 2 deletions(-)
+>
+> diff --git a/drivers/vhost/vhost.c b/drivers/vhost/vhost.c
+> index 40097826c..e2e77e29f 100644
+> --- a/drivers/vhost/vhost.c
+> +++ b/drivers/vhost/vhost.c
+> @@ -317,6 +317,7 @@ static void vhost_vq_reset(struct vhost_dev *dev,
+>       vq->used_flags =3D 0;
+>       vq->log_used =3D false;
+>       vq->log_addr =3D -1ull;
+> +    vq->next_used_head_idx =3D 0;
+>       vq->private_data =3D NULL;
+>       vq->acked_features =3D 0;
+>       vq->acked_backend_features =3D 0;
+> @@ -398,6 +399,8 @@ static long vhost_dev_alloc_iovecs(struct vhost_dev *=
+dev)
+>                         GFP_KERNEL);
+>           if (!vq->indirect || !vq->log || !vq->heads)
+>               goto err_nomem;
+> +
+> +        memset(vq->heads, 0, sizeof(*vq->heads) * dev->iov_limit);
+>       }
+>       return 0;
+>   @@ -2374,12 +2377,49 @@ static int __vhost_add_used_n(struct vhost_virt=
+queue *vq,
+>                   unsigned count)
+>   {
+>       vring_used_elem_t __user *used;
+> +    struct vring_desc desc;
+>       u16 old, new;
+>       int start;
+> +    int begin, end, i;
+> +    int copy_n =3D count;
+> +
+> +    if (vhost_has_feature(vq, VIRTIO_F_IN_ORDER)) {
+>
+>
+>
+> How do you guarantee that ids of heads are contiguous?
+>
+> There is no need to be contiguous for ids of heads.
+>
+> For example, I have three buffer { .id =3D 0, 15}, {.id =3D 20, 30} {.id =
+=3D 15, 20} for vhost_add_used_n. Then I will let the vq->heads[0].len=3D15=
+. vq->heads[15].len=3D5, vq->heads[20].len=3D10 as reorder. Once I found th=
+ere is no hold in the batched descriptors. I will expose them to driver.
 
-Actually, only the private memory that is assumed as already-accepted 
-via SEAMALL(TDH.MEM.PAGE.ADD) in the point of view of TDVF cannot 
-tolerate being removed. TDVF assumes those memory has initialized 
-content and can be accessed directly. In other words, QEMU needs to 
-always calls SEAMALL(TDH.MEM.PAGE.ADD) to "add" those memory before TDVF 
-runs.
+So spec said:
 
->> But I haven't figured out the reason why the isa-bios and pc.rom
->> initialization happens after machine_init_done_notifier
-> 
-> Probably happens when a flatview is created from the address space.
-> 
-> Maybe that is delayed somehow for machine creation, so all the address
-> space updates caused by device creation don't lead to lots of flatviews
-> being created and thrown away.
+"If VIRTIO_F_IN_ORDER has been negotiated, driver uses descriptors in
+ring order: starting from offset 0 in the table, and wrapping around
+at the end of the table."
 
-sorry for the late response.
+And
 
-I did some tracing for this, and the result differs for q35 machine type 
-and pc machine type.
+"VIRTIO_F_IN_ORDER(35)This feature indicates that all buffers are used
+by the device in the same order in which they have been made
+available."
 
-- For q35, the memslot update for isa-bios/pc.rom happens when 
-mc->reset() that is triggered via
+This means your example is not an IN_ORDER device.
 
-   qdev_machine_creation_done()
-     -> qemu_system_reset(SHUTDOWN_CASE_NONE);
+The driver should submit buffers (assuming each buffer have one
+descriptor) in order {id =3D 0, 15}, {id =3D 1, 30} and {id =3D 2, 20}.
 
-It's surely later than TDX's machine_init_done_notify callback which 
-initializes the part of private memory via KVM_TDX_INIT_MEM_REGION
+And even if it is submitted in order, we can not use a batch because:
 
-- For pc machine type, the memslot update happens in i440fx_init(), 
-which is earlier than TDX's machine_init_done_notify callback
+"The skipped buffers (for which no used ring entry was written) are
+assumed to have been used (read or written) by the device completely."
 
-I haven't fully understand in what condition will QEMU carry out the 
-memslot update yet. I will keep learning and try to come up a solution 
-to ensure TDX's machine_init_done_notify callback executed after all the 
-memslot settle down.
+This means for TX we are probably ok, but for rx, unless we know the
+buffers were written completely, we can't write them in a batch.
 
->> on the other hand, to keep isa-bios and pc.rom, we need additional work to
->> copy the content from the end_of_4G to end_of_1M.
-> 
-> There is no need for copying, end_of_1M is a alias memory region for
-> end_of_4G, so the backing storage is the same.
+I'd suggest to do cross testing for this series:
 
-It is a reason that current alias approach cannot work for TDX. Because 
-in TDX a private page can be only mapped to one gpa. So for simplicity, 
-I will just skip isa-bios shadowing for TDX instead of implementing a 
-non-alias + memcpy approach.
+1) testing vhost IN_ORDER support with DPDK virtio PMD
+2) testing virtio IN_ORDER with DPDK vhost-user via testpmd
 
-For pc.rom in next patch, I don't have strong reason to skip it. But I 
-will keep it in next version to make whole TDX patches work for q35 
-machine type until I think up a good solution to ensure the memslot 
-update happens before TDX's machine_init_done_notify callback.
+Thanks
 
->> I'm not sure if isa-bios and pc.rom are needed from people on TD guest, so I
->> just skip them for simplicity,
-> 
-> Given that TDX guests start in 32bit mode not in real mode everything
-> should work fine without isa-bios.
-> 
-> I'd prefer to avoid creating a special case for tdx though.  Should make
-> long-term maintenance a bit easier when this is not needed.
-> 
-> take care,
->    Gerd
-> 
+
+>
+>
+> +        /* calculate descriptor chain length for each used buffer */
+>
+>
+>
+> I'm a little bit confused about this comment, we have heads[i].len for th=
+is?
+>
+> Maybe I should not use vq->heads, some misleading.
+>
+>
+> +        for (i =3D 0; i < count; i++) {
+> +            begin =3D heads[i].id;
+> +            end =3D begin;
+> +            vq->heads[begin].len =3D 0;
+>
+>
+>
+> Does this work for e.g RX virtqueue?
+>
+>
+> +            do {
+> +                vq->heads[begin].len +=3D 1;
+> +                if (unlikely(vhost_get_desc(vq, &desc, end))) {
+>
+>
+>
+> Let's try hard to avoid more userspace copy here, it's the source of perf=
+ormance regression.
+>
+> Thanks
+>
+>
+> +                    vq_err(vq, "Failed to get descriptor: idx %d addr %p=
+\n",
+> +                           end, vq->desc + end);
+> +                    return -EFAULT;
+> +                }
+> +            } while ((end =3D next_desc(vq, &desc)) !=3D -1);
+> +        }
+> +
+> +        count =3D 0;
+> +        /* sort and batch continuous used ring entry */
+> +        while (vq->heads[vq->next_used_head_idx].len !=3D 0) {
+> +            count++;
+> +            i =3D vq->next_used_head_idx;
+> +            vq->next_used_head_idx =3D (vq->next_used_head_idx +
+> +                          vq->heads[vq->next_used_head_idx].len)
+> +                          % vq->num;
+> +            vq->heads[i].len =3D 0;
+> +        }
+> +        /* only write out a single used ring entry with the id correspon=
+ding
+> +         * to the head entry of the descriptor chain describing the last=
+ buffer
+> +         * in the batch.
+> +         */
+> +        heads[0].id =3D i;
+> +        copy_n =3D 1;
+> +    }
+>         start =3D vq->last_used_idx & (vq->num - 1);
+>       used =3D vq->used->ring + start;
+> -    if (vhost_put_used(vq, heads, start, count)) {
+> +    if (vhost_put_used(vq, heads, start, copy_n)) {
+>           vq_err(vq, "Failed to write used");
+>           return -EFAULT;
+>       }
+> @@ -2410,7 +2450,7 @@ int vhost_add_used_n(struct vhost_virtqueue *vq, st=
+ruct vring_used_elem *heads,
+>         start =3D vq->last_used_idx & (vq->num - 1);
+>       n =3D vq->num - start;
+> -    if (n < count) {
+> +    if (n < count && !vhost_has_feature(vq, VIRTIO_F_IN_ORDER)) {
+>           r =3D __vhost_add_used_n(vq, heads, n);
+>           if (r < 0)
+>               return r;
+> diff --git a/drivers/vhost/vhost.h b/drivers/vhost/vhost.h
+> index d9109107a..7b2c0fbb5 100644
+> --- a/drivers/vhost/vhost.h
+> +++ b/drivers/vhost/vhost.h
+> @@ -107,6 +107,9 @@ struct vhost_virtqueue {
+>       bool log_used;
+>       u64 log_addr;
+>   +    /* Sort heads in order */
+> +    u16 next_used_head_idx;
+> +
+>       struct iovec iov[UIO_MAXIOV];
+>       struct iovec iotlb_iov[64];
+>       struct iovec *indirect;
+>
+>
+>
 
