@@ -2,140 +2,196 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id C7E8E585591
-	for <lists+kvm@lfdr.de>; Fri, 29 Jul 2022 21:28:33 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id DF7985855BD
+	for <lists+kvm@lfdr.de>; Fri, 29 Jul 2022 21:51:50 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238184AbiG2T2V (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 29 Jul 2022 15:28:21 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43732 "EHLO
+        id S238475AbiG2Tvj (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 29 Jul 2022 15:51:39 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34338 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229549AbiG2T2U (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 29 Jul 2022 15:28:20 -0400
-Received: from out1.migadu.com (out1.migadu.com [IPv6:2001:41d0:2:863f::])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1BA705C362
-        for <kvm@vger.kernel.org>; Fri, 29 Jul 2022 12:28:18 -0700 (PDT)
-Date:   Fri, 29 Jul 2022 19:28:10 +0000
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-        t=1659122895;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=hGAAQQims/x+aVkjeXh2pO3zuX49eGIs7h2PdGd4m9k=;
-        b=rQXuzbUlhy1H2pl2MLh/fFzXumhLDJ1JmxPLp9XsRjxgk5EM2up8wOI94Wy6GEXKWBDCOu
-        uqX9RQF/oULzk6hI2zFHjlgwyY+Yl6wrh35P6gVDjBNPYihBnycuHu99Gdw2aX1LmHSHiE
-        Q6O8rTbFdMTQpb4uya6GSPgXVbjxsEA=
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From:   Oliver Upton <oliver.upton@linux.dev>
-To:     Will Deacon <will@kernel.org>
-Cc:     kvmarm@lists.cs.columbia.edu, Ard Biesheuvel <ardb@kernel.org>,
-        Sean Christopherson <seanjc@google.com>,
-        Alexandru Elisei <alexandru.elisei@arm.com>,
-        Andy Lutomirski <luto@amacapital.net>,
-        Catalin Marinas <catalin.marinas@arm.com>,
-        James Morse <james.morse@arm.com>,
-        Chao Peng <chao.p.peng@linux.intel.com>,
+        with ESMTP id S230518AbiG2Tvh (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 29 Jul 2022 15:51:37 -0400
+Received: from mail-pj1-x102c.google.com (mail-pj1-x102c.google.com [IPv6:2607:f8b0:4864:20::102c])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3353A79684
+        for <kvm@vger.kernel.org>; Fri, 29 Jul 2022 12:51:35 -0700 (PDT)
+Received: by mail-pj1-x102c.google.com with SMTP id w63-20020a17090a6bc500b001f3160a6011so7464562pjj.5
+        for <kvm@vger.kernel.org>; Fri, 29 Jul 2022 12:51:34 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc;
+        bh=Dstciygn1YsoqcejBVc0D+MFf2Th1tfQSWlbVTNdSdk=;
+        b=OrhOLugCM8Cj6h/411/1G13LNCne89tLk5CN5RFMmNJSVoJNIumYmTLvlzznytVtNN
+         +65DB/Lckye6fIPxvoZypOO8+mrNMPNNKas4vW7cgtVmxrweDNwCISCeiu0QCKuS2RZ6
+         ttaT5y9tC05NWhrlcjtdCsb6bWH7km4UaVw4OedOk2ltG35dSvYrKBj7OmyLILdt3Upf
+         Iy9drzJziV1Aq+PbxPImfRw3PlkeRVsHRBoYCrTRvuKjXPhLz/a00+HdWIEf7gUQxdPD
+         LSVaC821KNqpxBCP0G4SRoMSzSCEBj/43FxcrRa86Ms3qiqAbpkt93nq+xufg884dyHM
+         3E1g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc;
+        bh=Dstciygn1YsoqcejBVc0D+MFf2Th1tfQSWlbVTNdSdk=;
+        b=pBdwvno3DcHNDnvPi0Gm9An7uFUuLs+XPPKsT8k1CPK8wh5veG9yOy6gk0BZuD47Iz
+         +xSlap0ekA7X5/bhuqm3d6VrjvbPqvRj5HcFEt0FNf6Wd9is6IN+jNIHDJWJ/ukY1vuk
+         7evZCOzis7SOflii6PhXmGFtURMlOTa6iqPCd5H450e98FwW7m87wneL0c1cUomYJ53R
+         CsGYjA0hMKxFSBXcgd5TVz7mxJCYygPr4mb1fpkdFDsz/uNonltUDhN9LXUUv3PRaBJr
+         6TUeTkJt2ZXHs89mn8caWIHj2iwaDbWzl0S1GEscJIV4fTzuurPHPp3WHWWFl//txE3g
+         oBMg==
+X-Gm-Message-State: ACgBeo3PCoprz5DmBTGT2wVIF9V0BK8M7nvCqNPSGlY/6PUcqLE6xLr3
+        P967Bd4q/n4OfLXyg7dSzJAm4Q==
+X-Google-Smtp-Source: AA6agR63sDQRf5W5vFXYY3BbXk7I5lysrOCYAyeVjEMh41/Jj9OO8QiEjQjnyE/PUlhIQQOKevQ85Q==
+X-Received: by 2002:a17:902:7e47:b0:16c:7115:84d6 with SMTP id a7-20020a1709027e4700b0016c711584d6mr5524717pln.93.1659124294027;
+        Fri, 29 Jul 2022 12:51:34 -0700 (PDT)
+Received: from google.com (7.104.168.34.bc.googleusercontent.com. [34.168.104.7])
+        by smtp.gmail.com with ESMTPSA id u5-20020a170902714500b0016c574aa0fdsm4057346plm.76.2022.07.29.12.51.33
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 29 Jul 2022 12:51:33 -0700 (PDT)
+Date:   Fri, 29 Jul 2022 19:51:29 +0000
+From:   Sean Christopherson <seanjc@google.com>
+To:     Chao Peng <chao.p.peng@linux.intel.com>
+Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+        linux-mm@kvack.org, linux-fsdevel@vger.kernel.org,
+        linux-api@vger.kernel.org, linux-doc@vger.kernel.org,
+        qemu-devel@nongnu.org, linux-kselftest@vger.kernel.org,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Jonathan Corbet <corbet@lwn.net>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+        x86@kernel.org, "H . Peter Anvin" <hpa@zytor.com>,
+        Hugh Dickins <hughd@google.com>,
+        Jeff Layton <jlayton@kernel.org>,
+        "J . Bruce Fields" <bfields@fieldses.org>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        Shuah Khan <shuah@kernel.org>, Mike Rapoport <rppt@kernel.org>,
+        Steven Price <steven.price@arm.com>,
+        "Maciej S . Szmigiero" <mail@maciej.szmigiero.name>,
+        Vlastimil Babka <vbabka@suse.cz>,
+        Vishal Annapurve <vannapurve@google.com>,
+        Yu Zhang <yu.c.zhang@linux.intel.com>,
+        "Kirill A . Shutemov" <kirill.shutemov@linux.intel.com>,
+        luto@kernel.org, jun.nakajima@intel.com, dave.hansen@intel.com,
+        ak@linux.intel.com, david@redhat.com, aarcange@redhat.com,
+        ddutile@redhat.com, dhildenb@redhat.com,
         Quentin Perret <qperret@google.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
-        Michael Roth <michael.roth@amd.com>,
-        Mark Rutland <mark.rutland@arm.com>,
-        Fuad Tabba <tabba@google.com>, Marc Zyngier <maz@kernel.org>,
-        kernel-team@android.com, kvm@vger.kernel.org,
-        linux-arm-kernel@lists.infradead.org
-Subject: Re: [PATCH v2 06/24] KVM: arm64: Unify identifiers used to
- distinguish host and hypervisor
-Message-ID: <YuQ0ypCVgfMjJOew@google.com>
-References: <20220630135747.26983-1-will@kernel.org>
- <20220630135747.26983-7-will@kernel.org>
- <YtgbCEOMze8N4TPW@google.com>
- <20220720181406.GA16603@willie-the-truck>
+        Michael Roth <michael.roth@amd.com>, mhocko@suse.com,
+        Muchun Song <songmuchun@bytedance.com>
+Subject: Re: [PATCH v7 09/14] KVM: Extend the memslot to support fd-based
+ private memory
+Message-ID: <YuQ6QWcdZLdStkWl@google.com>
+References: <20220706082016.2603916-1-chao.p.peng@linux.intel.com>
+ <20220706082016.2603916-10-chao.p.peng@linux.intel.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20220720181406.GA16603@willie-the-truck>
-X-Migadu-Flow: FLOW_OUT
-X-Migadu-Auth-User: linux.dev
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        SPF_HELO_PASS,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
+In-Reply-To: <20220706082016.2603916-10-chao.p.peng@linux.intel.com>
+X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
+        USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=unavailable
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi Will,
+On Wed, Jul 06, 2022, Chao Peng wrote:
+> @@ -1332,9 +1332,18 @@ yet and must be cleared on entry.
+>  	__u64 userspace_addr; /* start of the userspace allocated memory */
+>    };
+>  
+> +  struct kvm_userspace_memory_region_ext {
+> +	struct kvm_userspace_memory_region region;
+> +	__u64 private_offset;
+> +	__u32 private_fd;
+> +	__u32 pad1;
+> +	__u64 pad2[14];
+> +};
+> +
+>    /* for kvm_memory_region::flags */
+>    #define KVM_MEM_LOG_DIRTY_PAGES	(1UL << 0)
+>    #define KVM_MEM_READONLY	(1UL << 1)
+> +  #define KVM_MEM_PRIVATE		(1UL << 2)
 
-Sorry, I didn't see your reply til now.
+Very belatedly following up on prior feedback...
 
-On Wed, Jul 20, 2022 at 07:14:07PM +0100, Will Deacon wrote:
-> Hi Oliver,
-> 
-> Thanks for having a look.
-> 
-> On Wed, Jul 20, 2022 at 03:11:04PM +0000, Oliver Upton wrote:
-> > On Thu, Jun 30, 2022 at 02:57:29PM +0100, Will Deacon wrote:
-> > > The 'pkvm_component_id' enum type provides constants to refer to the
-> > > host and the hypervisor, yet this information is duplicated by the
-> > > 'pkvm_hyp_id' constant.
-> > > 
-> > > Remove the definition of 'pkvm_hyp_id' and move the 'pkvm_component_id'
-> > > type definition to 'mem_protect.h' so that it can be used outside of
-> > > the memory protection code.
-> > > 
-> > > Signed-off-by: Will Deacon <will@kernel.org>
-> > > ---
-> > >  arch/arm64/kvm/hyp/include/nvhe/mem_protect.h | 6 +++++-
-> > >  arch/arm64/kvm/hyp/nvhe/mem_protect.c         | 8 --------
-> > >  arch/arm64/kvm/hyp/nvhe/setup.c               | 2 +-
-> > >  3 files changed, 6 insertions(+), 10 deletions(-)
-> > > 
-> > > diff --git a/arch/arm64/kvm/hyp/include/nvhe/mem_protect.h b/arch/arm64/kvm/hyp/include/nvhe/mem_protect.h
-> > > index 80e99836eac7..f5705a1e972f 100644
-> > > --- a/arch/arm64/kvm/hyp/include/nvhe/mem_protect.h
-> > > +++ b/arch/arm64/kvm/hyp/include/nvhe/mem_protect.h
-> > > @@ -51,7 +51,11 @@ struct host_kvm {
-> > >  };
-> > >  extern struct host_kvm host_kvm;
-> > >  
-> > > -extern const u8 pkvm_hyp_id;
-> > > +/* This corresponds to page-table locking order */
-> > > +enum pkvm_component_id {
-> > > +	PKVM_ID_HOST,
-> > > +	PKVM_ID_HYP,
-> > > +};
-> > 
-> > Since we have the concept of PTE ownership in pgtable.c, WDYT about
-> > moving the owner ID enumeration there? KVM_MAX_OWNER_ID should be
-> > incorporated in the enum too.
-> 
-> Interesting idea... I think we need the definition in a header file so that
-> it can be used by mem_protect.c, so I'm not entirely sure where you'd like
-> to see it moved.
-> 
-> The main worry I have is that if we ever need to distinguish e.g. one guest
-> instance from another, which is likely needed for sharing of memory
-> between more than just two components, then the pgtable code really cares
-> about the number of instances ("which guest is it?") whilst the mem_protect
-> cares about the component type ("is it a guest?").
-> 
-> Finally, the pgtable code is also used outside of pKVM so, although the
-> concept of ownership doesn't yet apply elsewhere, keeping the concept
-> available without dictacting the different types of owners makes sense to
-> me.
+  | I think a flag is still needed, the problem is private_fd can be safely
+  | accessed only when this flag is set, e.g. without this flag, we can't
+  | copy_from_user these new fields since they don't exist for previous
+  | kvm_userspace_memory_region callers.
 
-Sorry, it was a silly suggestion to wedge the enum there. I don't think
-it matters too much where it winds up, but something like:
+I forgot about that aspect of things.  We don't technically need a dedicated
+PRIVATE flag to handle that, but it does seem to be the least awful soltuion.
+We could either add a generic KVM_MEM_EXTENDED_REGION or an entirely new
+ioctl(), e.g. KVM_SET_USER_MEMORY_REGION2, but in both approaches there's a decent
+chance that we'll end up needed individual "this field is valid" flags anways.
 
-  enum kvm_pgtable_owner_id {
-  	OWNER_ID_PKVM_HOST,
-	OWNER_ID_PKVM_HYP,
-	NR_PGTABLE_OWNER_IDS,
-  }
+E.g. if KVM requires pad1 and pad2 to be zero to carve out future extensions,
+then we're right back here if some future extension needs to treat '0' as a legal
+input.
 
-And put it somewhere that both pgtable.c and mem_protect.c can get at
-it. That way bound checks (like in kvm_pgtable_stage2_set_owner())
-organically work as new IDs are added.
+TL;DR: adding KVM_MEM_PRIVATE still seems like the best approach.
 
---
-Thanks,
-Oliver
+> @@ -4631,14 +4658,35 @@ static long kvm_vm_ioctl(struct file *filp,
+>  		break;
+>  	}
+>  	case KVM_SET_USER_MEMORY_REGION: {
+> -		struct kvm_userspace_memory_region kvm_userspace_mem;
+> +		struct kvm_user_mem_region mem;
+> +		unsigned long size;
+> +		u32 flags;
+> +
+> +		kvm_sanity_check_user_mem_region_alias();
+> +
+> +		memset(&mem, 0, sizeof(mem));
+>  
+>  		r = -EFAULT;
+> -		if (copy_from_user(&kvm_userspace_mem, argp,
+> -						sizeof(kvm_userspace_mem)))
+> +
+> +		if (get_user(flags,
+> +			(u32 __user *)(argp + offsetof(typeof(mem), flags))))
+> +			goto out;
+
+
+Indentation is funky.  It's hard to massage this into something short and
+readable  What about capturing the offset separately?  E.g.
+
+                struct kvm_user_mem_region mem;
+                unsigned int flags_offset = offsetof(typeof(mem), flags));
+                unsigned long size;
+                u32 flags;
+
+                kvm_sanity_check_user_mem_region_alias();
+
+		memset(&mem, 0, sizeof(mem));
+
+                r = -EFAULT;
+                if (get_user(flags, (u32 __user *)(argp + flags_offset)))
+                        goto out;
+
+But this can actually be punted until KVM_MEM_PRIVATE is fully supported.  As of
+this patch, KVM doesn't read the extended size, so I believe the diff for this
+patch can simply be:
+
+diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
+index da263c370d00..5194beb7b52f 100644
+--- a/virt/kvm/kvm_main.c
++++ b/virt/kvm/kvm_main.c
+@@ -4640,6 +4640,10 @@ static long kvm_vm_ioctl(struct file *filp,
+                                                sizeof(kvm_userspace_mem)))
+                        goto out;
+
++               r = -EINVAL;
++               if (mem.flags & KVM_MEM_PRIVATE)
++                       goto out;
++
+                r = kvm_vm_ioctl_set_memory_region(kvm, &kvm_userspace_mem);
+                break;
+        }
+
