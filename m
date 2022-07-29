@@ -2,255 +2,218 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 07BD8584D94
-	for <lists+kvm@lfdr.de>; Fri, 29 Jul 2022 10:43:23 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 1F216584D9E
+	for <lists+kvm@lfdr.de>; Fri, 29 Jul 2022 10:45:58 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235004AbiG2InV (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 29 Jul 2022 04:43:21 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51004 "EHLO
+        id S229784AbiG2Ip4 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 29 Jul 2022 04:45:56 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53886 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234853AbiG2InS (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 29 Jul 2022 04:43:18 -0400
-Received: from ams.source.kernel.org (ams.source.kernel.org [IPv6:2604:1380:4601:e00::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4FB63B4BE
-        for <kvm@vger.kernel.org>; Fri, 29 Jul 2022 01:43:16 -0700 (PDT)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by ams.source.kernel.org (Postfix) with ESMTPS id D2E55B826F0
-        for <kvm@vger.kernel.org>; Fri, 29 Jul 2022 08:43:14 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 68ED6C433C1;
-        Fri, 29 Jul 2022 08:43:13 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1659084193;
-        bh=jPbZkgYa9GkfB5ysi5xuqeGsMQ+Nwk3bXeJINmKXVbo=;
-        h=From:To:Cc:Subject:Date:From;
-        b=gdbFf70kwmxvgW/y1pRVmGXUStAjirfsr27k/irKK9kn6YqUvY5rRh9ys82+w5mIe
-         sqGK6d188hAH75Iprr77vyP8O6Io3IsZb7srnzTiF80T3UL1CrIZLUL3Pi7JJggH/h
-         LBVFOguIDvnbHmHoyCwHu7tOg3fZe6Q5fWcRxTmTT1vQU9dLYFIj8tDbA6kCIL+Bfk
-         HW723Hd9d+Mh/LhaqNWLxcCyBAwl4ep7RSDEgC11q+HBMi9OePS8Om+A4Nm9xHRsbS
-         tKaCzjBfPiH03GlbtfRLieocJCipYYUHoNyvWMBNAons9ZiWofYcr341apwcEDwzZQ
-         3Np9N82ZbI/0g==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=why.lan)
-        by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-        (Exim 4.95)
-        (envelope-from <maz@kernel.org>)
-        id 1oHLaQ-00Aq9G-Ul;
-        Fri, 29 Jul 2022 09:43:11 +0100
-From:   Marc Zyngier <maz@kernel.org>
-To:     Paolo Bonzini <pbonzini@redhat.com>
-Cc:     Andrey Konovalov <andreyknvl@google.com>,
-        Fuad Tabba <tabba@google.com>,
-        Kalesh Singh <kaleshsingh@google.com>,
-        "Madhavan T . Venkataraman" <madvenka@linux.microsoft.com>,
-        Mark Brown <broonie@kernel.org>,
-        Mark Rutland <mark.rutland@arm.com>,
-        Masahiro Yamada <masahiroy@kernel.org>,
-        Oliver Upton <oliver.upton@linux.dev>,
-        Quentin Perret <qperret@google.com>,
-        Reiji Watanabe <reijiw@google.com>,
-        Ricardo Koller <ricarkol@google.com>,
-        Will Deacon <will@kernel.org>,
-        James Morse <james.morse@arm.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
-        Alexandru Elisei <alexandru.elisei@arm.com>,
-        linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org,
-        kvmarm@lists.cs.columbia.edu, kernel-team@android.com
-Subject: [GIT PULL] KVM/arm64 updates for 5.20
-Date:   Fri, 29 Jul 2022 09:43:08 +0100
-Message-Id: <20220729084308.1881661-1-maz@kernel.org>
-X-Mailer: git-send-email 2.34.1
+        with ESMTP id S230317AbiG2Ipw (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 29 Jul 2022 04:45:52 -0400
+Received: from mail-pf1-x431.google.com (mail-pf1-x431.google.com [IPv6:2607:f8b0:4864:20::431])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8DB94491D8;
+        Fri, 29 Jul 2022 01:45:51 -0700 (PDT)
+Received: by mail-pf1-x431.google.com with SMTP id b133so4068278pfb.6;
+        Fri, 29 Jul 2022 01:45:51 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=sender:from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=3W7hNFmAJEfXBo7DpbR7xQUy/ygc6BlRe7J3ZXgX4QI=;
+        b=dQ+W+ksU7zadADK/7nZApQgG6i/N0vxl6+ss4UhEd0mmiBety/RiYD4ooYxZki6WTH
+         2yXAO/lJ53RY3/DCRlGkPo9rIl+rjt52iGpRf/VywKr5jHzW1PXQst1+5WPYsz4Fmi/m
+         Hl22mON2zMOPH3h9sqw4MNpMesyMFvkrRrfOSmg4juYYqCTXlMhn+zgJXu6T1dQfyP/v
+         Y15CTJZnuonWA2r+dYCJV7MF/dUtcvl04HNEK10ensrHTUgzPHuNhF6pKTohsn7kt9Qf
+         7Cw43E4+01H6SyCeh9GNMnoA6PRsliOEzwwhKpgZ+Lo70LwN4zh7a+Ws9dbHA2XCf1rC
+         NBig==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:sender:from:to:cc:subject:date:message-id
+         :mime-version:content-transfer-encoding;
+        bh=3W7hNFmAJEfXBo7DpbR7xQUy/ygc6BlRe7J3ZXgX4QI=;
+        b=wXiDvhnzx8nikFyd/jlZvWi49UzTq/9nEmUEYfMmRFCN0+HbmOuBDf9ceSA7xXLa9h
+         htz5FhPWOzuC0FKmVcMWsM9fcDAHk7i6uK792Dvl68SHn+1gLNd2DnROFBHudUzkqRUz
+         XZpcZDIVISz4TfkRERJPbRhq3Z+usNPwDXT3aYjx49ko+pgh1Zp48/NNwp6fVcLh8K0L
+         mz6VQhVEVbUJH7rLUjcz6CliJ9JFaUJOMYenFySQlLW65H8F8i5JK2sf0LKX34DRMLkk
+         BUXGEgWfpWz08ea6w/A7T2pyglZxzNA940OPiyjnI//z+TqYU0PSRrN2D/X8ADT3Wz5W
+         ViGg==
+X-Gm-Message-State: AJIora/ZLk6uEp2yLhkYNNENCM+k+HvRXGX7jFYneJYZrLCVXdG5UxqV
+        dLLZhbr9W60diGMgzQTuTEahpnEvfH0bZA==
+X-Google-Smtp-Source: AGRyM1tlKis80ji4ijnWxaVFpz18EUUYJEthu+66QnUQ2I3TAcw2BwX7CuweFy0WxMP394RUW5iEdw==
+X-Received: by 2002:a65:6bd6:0:b0:39d:4f85:9ecf with SMTP id e22-20020a656bd6000000b0039d4f859ecfmr2180776pgw.336.1659084350338;
+        Fri, 29 Jul 2022 01:45:50 -0700 (PDT)
+Received: from localhost.localdomain (124x33x176x97.ap124.ftth.ucom.ne.jp. [124.33.176.97])
+        by smtp.gmail.com with ESMTPSA id y11-20020aa793cb000000b0052c89540659sm2208145pff.189.2022.07.29.01.45.47
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 29 Jul 2022 01:45:49 -0700 (PDT)
+Sender: Vincent Mailhol <vincent.mailhol@gmail.com>
+From:   Vincent Mailhol <mailhol.vincent@wanadoo.fr>
+To:     kvm@vger.kernel.org, Sean Christopherson <seanjc@google.com>,
+        Paolo Bonzini <pbonzini@redhat.com>
+Cc:     Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+        Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org,
+        "H . Peter Anvin" <hpa@zytor.com>, linux-kernel@vger.kernel.org,
+        Vincent Mailhol <mailhol.vincent@wanadoo.fr>
+Subject: [PATCH] KVM: x86: do not shadow apic global definition
+Date:   Fri, 29 Jul 2022 17:45:33 +0900
+Message-Id: <20220729084533.54500-1-mailhol.vincent@wanadoo.fr>
+X-Mailer: git-send-email 2.35.1
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: pbonzini@redhat.com, andreyknvl@google.com, tabba@google.com, kaleshsingh@google.com, madvenka@linux.microsoft.com, broonie@kernel.org, mark.rutland@arm.com, masahiroy@kernel.org, oliver.upton@linux.dev, qperret@google.com, reijiw@google.com, ricarkol@google.com, will@kernel.org, james.morse@arm.com, suzuki.poulose@arm.com, alexandru.elisei@arm.com, linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu, kernel-team@android.com
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
-X-Spam-Status: No, score=-7.7 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_HI,
-        SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
+X-Spam-Status: No, score=-1.5 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_EF,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+        HEADER_FROM_DIFFERENT_DOMAINS,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,
+        SPF_PASS autolearn=no autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Paolo,
+arch/x86/include/asm/apic.h declares a global variable named `apic'.
 
-Here's the bulk of the KVM/arm64 updates for 5.20. Major feature is
-the new unwinder for the nVHE modes. The rest is mostly rewriting some
-unloved aspects of the arm64 port (sysregs, flags). Further details in
-the tag description.
+Many function arguments from arch/x86/kvm/lapic.h also uses the same
+name and thus shadow the global declaration. For each case of
+shadowing, rename the function argument from `apic' to `lapic'.
 
-Note that this PR contains a shared branch with the arm64 tree
-containing some of the stacktrace updates. There is also a minor
-conflict with your tree in one of the selftests, already resolved in
--next.
+This patch silences below -Wshadow warnings:
 
-Please pull,
+| In file included from arch/x86/kernel/../kvm/vmx/capabilities.h:7,
+|                  from arch/x86/kernel/../kvm/vmx/vmx.h:10:
+| arch/x86/kernel/../kvm/vmx/../lapic.h: In function 'kvm_lapic_set_irr':
+| arch/x86/kernel/../kvm/vmx/../lapic.h:143:65: warning: declaration of 'apic' shadows a global declaration [-Wshadow]
+|   143 | static inline void kvm_lapic_set_irr(int vec, struct kvm_lapic *apic)
+|       |                                               ~~~~~~~~~~~~~~~~~~^~~~
+| In file included from ./arch/x86/include/asm/kvm_host.h:29,
+|                  from ./include/linux/kvm_host.h:45:
+| ./arch/x86/include/asm/apic.h:357:21: note: shadowed declaration is here
+|   357 | extern struct apic *apic;
+|       |                     ^~~~
+| arch/x86/kernel/../kvm/vmx/../lapic.h: In function 'kvm_lapic_get_reg':
+| arch/x86/kernel/../kvm/vmx/../lapic.h:158:55: warning: declaration of 'apic' shadows a global declaration [-Wshadow]
+|   158 | static inline u32 kvm_lapic_get_reg(struct kvm_lapic *apic, int reg_off)
+|       |                                     ~~~~~~~~~~~~~~~~~~^~~~
+| ./arch/x86/include/asm/apic.h:357:21: note: shadowed declaration is here
+|   357 | extern struct apic *apic;
+|       |                     ^~~~
+| arch/x86/kernel/../kvm/vmx/../lapic.h: In function 'kvm_apic_hw_enabled':
+| arch/x86/kernel/../kvm/vmx/../lapic.h:174:57: warning: declaration of 'apic' shadows a global declaration [-Wshadow]
+|   174 | static inline int kvm_apic_hw_enabled(struct kvm_lapic *apic)
+|       |                                       ~~~~~~~~~~~~~~~~~~^~~~
+| ./arch/x86/include/asm/apic.h:357:21: note: shadowed declaration is here
+|   357 | extern struct apic *apic;
+|       |                     ^~~~
+| arch/x86/kernel/../kvm/vmx/../lapic.h: In function 'kvm_apic_sw_enabled':
+| arch/x86/kernel/../kvm/vmx/../lapic.h:183:58: warning: declaration of 'apic' shadows a global declaration [-Wshadow]
+|   183 | static inline bool kvm_apic_sw_enabled(struct kvm_lapic *apic)
+|       |                                        ~~~~~~~~~~~~~~~~~~^~~~
+| ./arch/x86/include/asm/apic.h:357:21: note: shadowed declaration is here
+|   357 | extern struct apic *apic;
+|       |                     ^~~~
+| arch/x86/kernel/../kvm/vmx/../lapic.h: In function 'apic_x2apic_mode':
+| arch/x86/kernel/../kvm/vmx/../lapic.h:200:54: warning: declaration of 'apic' shadows a global declaration [-Wshadow]
+|   200 | static inline int apic_x2apic_mode(struct kvm_lapic *apic)
+|       |                                    ~~~~~~~~~~~~~~~~~~^~~~
+| ./arch/x86/include/asm/apic.h:357:21: note: shadowed declaration is here
+|   357 | extern struct apic *apic;
+|       |                     ^~~~
+| arch/x86/kernel/../kvm/vmx/../lapic.h: In function 'kvm_xapic_id':
+| arch/x86/kernel/../kvm/vmx/../lapic.h:249:49: warning: declaration of 'apic' shadows a global declaration [-Wshadow]
+|   249 | static inline u8 kvm_xapic_id(struct kvm_lapic *apic)
+|       |                               ~~~~~~~~~~~~~~~~~~^~~~
+| ./arch/x86/include/asm/apic.h:357:21: note: shadowed declaration is here
+|   357 | extern struct apic *apic;
+|       |                     ^~~~
 
-	M.
+Signed-off-by: Vincent Mailhol <mailhol.vincent@wanadoo.fr>
+---
+ arch/x86/kvm/lapic.h | 26 +++++++++++++-------------
+ 1 file changed, 13 insertions(+), 13 deletions(-)
 
-The following changes since commit a111daf0c53ae91e71fd2bfe7497862d14132e3e:
+diff --git a/arch/x86/kvm/lapic.h b/arch/x86/kvm/lapic.h
+index 117a46df5cc1..55abd5e22462 100644
+--- a/arch/x86/kvm/lapic.h
++++ b/arch/x86/kvm/lapic.h
+@@ -156,14 +156,14 @@ static inline void kvm_lapic_set_vector(int vec, void *bitmap)
+ 	set_bit(VEC_POS(vec), (bitmap) + REG_POS(vec));
+ }
+ 
+-static inline void kvm_lapic_set_irr(int vec, struct kvm_lapic *apic)
++static inline void kvm_lapic_set_irr(int vec, struct kvm_lapic *lapic)
+ {
+-	kvm_lapic_set_vector(vec, apic->regs + APIC_IRR);
++	kvm_lapic_set_vector(vec, lapic->regs + APIC_IRR);
+ 	/*
+ 	 * irr_pending must be true if any interrupt is pending; set it after
+ 	 * APIC_IRR to avoid race with apic_clear_irr
+ 	 */
+-	apic->irr_pending = true;
++	lapic->irr_pending = true;
+ }
+ 
+ static inline u32 __kvm_lapic_get_reg(char *regs, int reg_off)
+@@ -171,9 +171,9 @@ static inline u32 __kvm_lapic_get_reg(char *regs, int reg_off)
+ 	return *((u32 *) (regs + reg_off));
+ }
+ 
+-static inline u32 kvm_lapic_get_reg(struct kvm_lapic *apic, int reg_off)
++static inline u32 kvm_lapic_get_reg(struct kvm_lapic *lapic, int reg_off)
+ {
+-	return __kvm_lapic_get_reg(apic->regs, reg_off);
++	return __kvm_lapic_get_reg(lapic->regs, reg_off);
+ }
+ 
+ DECLARE_STATIC_KEY_FALSE(kvm_has_noapic_vcpu);
+@@ -187,19 +187,19 @@ static inline bool lapic_in_kernel(struct kvm_vcpu *vcpu)
+ 
+ extern struct static_key_false_deferred apic_hw_disabled;
+ 
+-static inline int kvm_apic_hw_enabled(struct kvm_lapic *apic)
++static inline int kvm_apic_hw_enabled(struct kvm_lapic *lapic)
+ {
+ 	if (static_branch_unlikely(&apic_hw_disabled.key))
+-		return apic->vcpu->arch.apic_base & MSR_IA32_APICBASE_ENABLE;
++		return lapic->vcpu->arch.apic_base & MSR_IA32_APICBASE_ENABLE;
+ 	return MSR_IA32_APICBASE_ENABLE;
+ }
+ 
+ extern struct static_key_false_deferred apic_sw_disabled;
+ 
+-static inline bool kvm_apic_sw_enabled(struct kvm_lapic *apic)
++static inline bool kvm_apic_sw_enabled(struct kvm_lapic *lapic)
+ {
+ 	if (static_branch_unlikely(&apic_sw_disabled.key))
+-		return apic->sw_enabled;
++		return lapic->sw_enabled;
+ 	return true;
+ }
+ 
+@@ -213,9 +213,9 @@ static inline int kvm_lapic_enabled(struct kvm_vcpu *vcpu)
+ 	return kvm_apic_present(vcpu) && kvm_apic_sw_enabled(vcpu->arch.apic);
+ }
+ 
+-static inline int apic_x2apic_mode(struct kvm_lapic *apic)
++static inline int apic_x2apic_mode(struct kvm_lapic *lapic)
+ {
+-	return apic->vcpu->arch.apic_base & X2APIC_ENABLE;
++	return lapic->vcpu->arch.apic_base & X2APIC_ENABLE;
+ }
+ 
+ static inline bool kvm_vcpu_apicv_active(struct kvm_vcpu *vcpu)
+@@ -262,9 +262,9 @@ static inline enum lapic_mode kvm_apic_mode(u64 apic_base)
+ 	return apic_base & (MSR_IA32_APICBASE_ENABLE | X2APIC_ENABLE);
+ }
+ 
+-static inline u8 kvm_xapic_id(struct kvm_lapic *apic)
++static inline u8 kvm_xapic_id(struct kvm_lapic *lapic)
+ {
+-	return kvm_lapic_get_reg(apic, APIC_ID) >> 24;
++	return kvm_lapic_get_reg(lapic, APIC_ID) >> 24;
+ }
+ 
+ #endif
+-- 
+2.35.1
 
-  Linux 5.19-rc3 (2022-06-19 15:06:47 -0500)
-
-are available in the Git repository at:
-
-  git://git.kernel.org/pub/scm/linux/kernel/git/kvmarm/kvmarm.git tags/kvmarm-5.20
-
-for you to fetch changes up to 0982c8d859f8f7022b9fd44d421c7ec721bb41f9:
-
-  Merge branch kvm-arm64/nvhe-stacktrace into kvmarm-master/next (2022-07-27 18:33:27 +0100)
-
-----------------------------------------------------------------
-KVM/arm64 updates for 5.20:
-
-- Unwinder implementations for both nVHE modes (classic and
-  protected), complete with an overflow stack
-
-- Rework of the sysreg access from userspace, with a complete
-  rewrite of the vgic-v3 view to allign with the rest of the
-  infrastructure
-
-- Disagregation of the vcpu flags in separate sets to better track
-  their use model.
-
-- A fix for the GICv2-on-v3 selftest
-
-- A small set of cosmetic fixes
-
-----------------------------------------------------------------
-Andrey Konovalov (2):
-      arm64: kasan: do not instrument stacktrace.c
-      arm64: stacktrace: use non-atomic __set_bit
-
-Kalesh Singh (18):
-      KVM: arm64: Fix hypervisor address symbolization
-      arm64: stacktrace: Add shared header for common stack unwinding code
-      arm64: stacktrace: Factor out on_accessible_stack_common()
-      arm64: stacktrace: Factor out unwind_next_common()
-      arm64: stacktrace: Handle frame pointer from different address spaces
-      arm64: stacktrace: Factor out common unwind()
-      arm64: stacktrace: Add description of stacktrace/common.h
-      KVM: arm64: On stack overflow switch to hyp overflow_stack
-      KVM: arm64: Stub implementation of non-protected nVHE HYP stack unwinder
-      KVM: arm64: Prepare non-protected nVHE hypervisor stacktrace
-      KVM: arm64: Implement non-protected nVHE hyp stack unwinder
-      KVM: arm64: Introduce hyp_dump_backtrace()
-      KVM: arm64: Add PROTECTED_NVHE_STACKTRACE Kconfig
-      KVM: arm64: Allocate shared pKVM hyp stacktrace buffers
-      KVM: arm64: Stub implementation of pKVM HYP stack unwinder
-      KVM: arm64: Save protected-nVHE (pKVM) hyp stacktrace
-      KVM: arm64: Implement protected nVHE hyp stack unwinder
-      KVM: arm64: Introduce pkvm_dump_backtrace()
-
-Madhavan T. Venkataraman (2):
-      arm64: Split unwind_init()
-      arm64: Copy the task argument to unwind_state
-
-Marc Zyngier (47):
-      KVM: arm64: Drop FP_FOREIGN_STATE from the hypervisor code
-      KVM: arm64: Move FP state ownership from flag to a tristate
-      KVM: arm64: Add helpers to manipulate vcpu flags among a set
-      KVM: arm64: Add three sets of flags to the vcpu state
-      KVM: arm64: Move vcpu configuration flags into their own set
-      KVM: arm64: Move vcpu PC/Exception flags to the input flag set
-      KVM: arm64: Move vcpu debug/SPE/TRBE flags to the input flag set
-      KVM: arm64: Move vcpu SVE/SME flags to the state flag set
-      KVM: arm64: Move vcpu ON_UNSUPPORTED_CPU flag to the state flag set
-      KVM: arm64: Move vcpu WFIT flag to the state flag set
-      KVM: arm64: Kill unused vcpu flags field
-      KVM: arm64: Convert vcpu sysregs_loaded_on_cpu to a state flag
-      KVM: arm64: Warn when PENDING_EXCEPTION and INCREMENT_PC are set together
-      KVM: arm64: Add build-time sanity checks for flags
-      KVM: arm64: Reduce the size of the vcpu flag members
-      KVM: arm64: Document why pause cannot be turned into a flag
-      KVM: arm64: Move the handling of !FP outside of the fast path
-      Merge branch kvm-arm64/burn-the-flags into kvmarm-master/next
-      KVM: arm64: selftests: Add support for GICv2 on v3
-      Merge branch kvm-arm64/misc-5.20 into kvmarm-master/next
-      KVM: arm64: Add get_reg_by_id() as a sys_reg_desc retrieving helper
-      KVM: arm64: Reorder handling of invariant sysregs from userspace
-      KVM: arm64: Introduce generic get_user/set_user helpers for system registers
-      KVM: arm64: Rely on index_to_param() for size checks on userspace access
-      KVM: arm64: Consolidate sysreg userspace accesses
-      KVM: arm64: Get rid of reg_from/to_user()
-      KVM: arm64: vgic-v3: Simplify vgic_v3_has_cpu_sysregs_attr()
-      KVM: arm64: vgic-v3: Push user access into vgic_v3_cpu_sysregs_uaccess()
-      KVM: arm64: vgic-v3: Make the userspace accessors use sysreg API
-      KVM: arm64: vgic-v3: Convert userspace accessors over to FIELD_GET/FIELD_PREP
-      KVM: arm64: vgic-v3: Use u32 to manage the line level from userspace
-      KVM: arm64: vgic-v3: Consolidate userspace access for MMIO registers
-      KVM: arm64: vgic-v2: Consolidate userspace access for MMIO registers
-      KVM: arm64: vgic: Use {get,put}_user() instead of copy_{from.to}_user
-      KVM: arm64: vgic-v2: Add helper for legacy dist/cpuif base address setting
-      KVM: arm64: vgic: Consolidate userspace access for base address setting
-      KVM: arm64: vgic: Tidy-up calls to vgic_{get,set}_common_attr()
-      KVM: arm64: Get rid of find_reg_by_id()
-      KVM: arm64: Descope kvm_arm_sys_reg_{get,set}_reg()
-      KVM: arm64: Get rid or outdated comments
-      Merge branch kvm-arm64/sysreg-cleanup-5.20 into kvmarm-master/next
-      KVM: arm64: Move PROTECTED_NVHE_STACKTRACE around
-      KVM: arm64: Move nVHE stacktrace unwinding into its own compilation unit
-      KVM: arm64: Make unwind()/on_accessible_stack() per-unwinder functions
-      KVM: arm64: Move nVHE-only helpers into kvm/stacktrace.c
-      arm64: Update 'unwinder howto'
-      Merge branch kvm-arm64/nvhe-stacktrace into kvmarm-master/next
-
-Masahiro Yamada (2):
-      KVM: arm64: nvhe: Rename confusing obj-y
-      KVM: arm64: nvhe: Add intermediates to 'targets' instead of extra-y
-
-Oliver Upton (1):
-      KVM: arm64: Don't open code ARRAY_SIZE()
-
-Quentin Perret (1):
-      KVM: arm64: Don't return from void function
-
- arch/arm64/include/asm/kvm_asm.h                |  16 +
- arch/arm64/include/asm/kvm_emulate.h            |  11 +-
- arch/arm64/include/asm/kvm_host.h               | 205 ++++++++---
- arch/arm64/include/asm/memory.h                 |   8 +
- arch/arm64/include/asm/stacktrace.h             |  62 +---
- arch/arm64/include/asm/stacktrace/common.h      | 199 ++++++++++
- arch/arm64/include/asm/stacktrace/nvhe.h        |  55 +++
- arch/arm64/kernel/Makefile                      |   5 +
- arch/arm64/kernel/stacktrace.c                  | 184 +++++-----
- arch/arm64/kvm/Kconfig                          |  13 +
- arch/arm64/kvm/Makefile                         |   2 +-
- arch/arm64/kvm/arch_timer.c                     |   2 +-
- arch/arm64/kvm/arm.c                            |  25 +-
- arch/arm64/kvm/debug.c                          |  25 +-
- arch/arm64/kvm/fpsimd.c                         |  39 +-
- arch/arm64/kvm/handle_exit.c                    |  10 +-
- arch/arm64/kvm/hyp/exception.c                  |  23 +-
- arch/arm64/kvm/hyp/include/hyp/debug-sr.h       |   6 +-
- arch/arm64/kvm/hyp/include/hyp/switch.h         |  24 +-
- arch/arm64/kvm/hyp/include/hyp/sysreg-sr.h      |   4 +-
- arch/arm64/kvm/hyp/nvhe/Makefile                |  14 +-
- arch/arm64/kvm/hyp/nvhe/debug-sr.c              |   8 +-
- arch/arm64/kvm/hyp/nvhe/host.S                  |   9 +-
- arch/arm64/kvm/hyp/nvhe/stacktrace.c            | 160 ++++++++
- arch/arm64/kvm/hyp/nvhe/switch.c                |  14 +-
- arch/arm64/kvm/hyp/nvhe/sys_regs.c              |   4 +-
- arch/arm64/kvm/hyp/vhe/switch.c                 |   6 +-
- arch/arm64/kvm/hyp/vhe/sysreg-sr.c              |   4 +-
- arch/arm64/kvm/inject_fault.c                   |  17 +-
- arch/arm64/kvm/reset.c                          |   6 +-
- arch/arm64/kvm/stacktrace.c                     | 218 +++++++++++
- arch/arm64/kvm/sys_regs.c                       | 294 ++++++---------
- arch/arm64/kvm/sys_regs.h                       |  18 +-
- arch/arm64/kvm/vgic-sys-reg-v3.c                | 462 ++++++++++++++----------
- arch/arm64/kvm/vgic/vgic-kvm-device.c           | 342 ++++++++----------
- arch/arm64/kvm/vgic/vgic-mmio-v3.c              |  10 +-
- arch/arm64/kvm/vgic/vgic-mmio.c                 |   6 +-
- arch/arm64/kvm/vgic/vgic-mmio.h                 |   4 +-
- arch/arm64/kvm/vgic/vgic.h                      |   9 +-
- include/kvm/arm_vgic.h                          |   2 +-
- tools/testing/selftests/kvm/aarch64/vgic_init.c |  13 +-
- 41 files changed, 1588 insertions(+), 950 deletions(-)
- create mode 100644 arch/arm64/include/asm/stacktrace/common.h
- create mode 100644 arch/arm64/include/asm/stacktrace/nvhe.h
- create mode 100644 arch/arm64/kvm/hyp/nvhe/stacktrace.c
- create mode 100644 arch/arm64/kvm/stacktrace.c
