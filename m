@@ -2,60 +2,75 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 7B5FD5856EB
-	for <lists+kvm@lfdr.de>; Sat, 30 Jul 2022 00:43:38 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 25E29585755
+	for <lists+kvm@lfdr.de>; Sat, 30 Jul 2022 01:29:16 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S239054AbiG2Wnh (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 29 Jul 2022 18:43:37 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37558 "EHLO
+        id S232018AbiG2X3M (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 29 Jul 2022 19:29:12 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38174 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229683AbiG2Wnf (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 29 Jul 2022 18:43:35 -0400
-Received: from mail-yb1-xb4a.google.com (mail-yb1-xb4a.google.com [IPv6:2607:f8b0:4864:20::b4a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 822918C5A1
-        for <kvm@vger.kernel.org>; Fri, 29 Jul 2022 15:43:34 -0700 (PDT)
-Received: by mail-yb1-xb4a.google.com with SMTP id m123-20020a253f81000000b0066ff6484995so4812827yba.22
-        for <kvm@vger.kernel.org>; Fri, 29 Jul 2022 15:43:34 -0700 (PDT)
+        with ESMTP id S231235AbiG2X3J (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 29 Jul 2022 19:29:09 -0400
+Received: from mail-io1-xd34.google.com (mail-io1-xd34.google.com [IPv6:2607:f8b0:4864:20::d34])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 96167E0E8
+        for <kvm@vger.kernel.org>; Fri, 29 Jul 2022 16:29:08 -0700 (PDT)
+Received: by mail-io1-xd34.google.com with SMTP id e69so4693867iof.5
+        for <kvm@vger.kernel.org>; Fri, 29 Jul 2022 16:29:08 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=date:message-id:mime-version:subject:from:to:cc;
-        bh=OeZZWvdh82N6iL4lq+61htCI+mNsngRP+8WrJM8iYKA=;
-        b=ghgA8pxOghYMZvBzAKNHKfpBY4akXFzFR5QlBQu0h9LhKDiY6OIFHE0Yv3cVVk5PL+
-         BPqvIEeIsgZhmgHEdXvIAA84nIX1mSjtTKygIO6EaUEzXMr5nHvu/e7llCTV60EMJ2ix
-         2sUmSH0y4GJAvhlm1CGaPey4SqVUOH/OjG7+xknJpYP8/gFRJoMm2h6mRDX+8YqJzFOS
-         T4toJPZl9EM/0+Dlrzppy7Y89WhhqftkrJa1m+jrN7NwfD+qMAZV9P6UuX6p9zT30jna
-         vQlF7ienYdfFMiPkiyMyMoq81v7blPIFSVfbD1LJZEtUb/xvv6j7Xvv7gKpxr6/USNla
-         yXFw==
+        d=csp-edu.20210112.gappssmtp.com; s=20210112;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc;
+        bh=qWNh7vOk9tCkYV94WwXKMJ4uEd3sFIr85O9CxOfUKiQ=;
+        b=wQRaueezeuI5pT4oYhFHZhZMItthSUgguL7GFYaB68jVps//cv0JYxK90b/gVoI05n
+         h8dk3+3t6WieMLwz6z1FkKimPbVmxBxmwHfZ2H2GauMe/JDVDscps2uZS6q2n5ehoxyw
+         K54ymHUibx6A+RwjmsE+sATpqcBcstkpP+aMgjfMXtSD1T7G06Bm/3FjtmkNfhzv8Yxq
+         zj3bPFJ9BbBbJ5lQtFHs3M4iw3Y8yxFUXHwDZvz4iUR1t+dFmIS535MsNySc4XOqDTJN
+         AzfiIGVwL8pvMskr8ehS/xgY2ZzFjfGB0VG+4x4NwHQxpcKiTtHsv6uQyoYdrTZlQsBx
+         13sA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:message-id:mime-version:subject:from:to:cc;
-        bh=OeZZWvdh82N6iL4lq+61htCI+mNsngRP+8WrJM8iYKA=;
-        b=k/nkl+A53gbfO2SLZnZJWd10/yYI2lIECYi3lk93ELB9zipvNcMWQbOA20Ete922Gk
-         Jh9QCpP6e4Y3UH/30moJCZtKWWyPwg9TbXlhL1R4BRLzdZoMe9sLO4fKBybYjtPcHMAO
-         M2SN8AiAUZA9DwD1YVRw0nPqHVosA9hwfqoz3GvrGt1UuWASJTXYuzj7CaS3UiSZ+Q2w
-         0ih4P2u55Bl6InFqDRMu8UtDbf7RUk0LzGImbPsCJpPtcnefwNs8QuJEcsQo66slORyR
-         KHaxc8YQZBKnpWF4Ug3ShpIuj04rTsk/rBskuPoJKiRx3RhVWeSdYQWZNkmljG+JErrg
-         4H1g==
-X-Gm-Message-State: ACgBeo32qsrd6WYVYPdfZUlGsrHYolNcQAje9b2h6ubw4ekFZ7Mn4K+o
-        Vc5cT491wvBGbsb0N6AB/eTX0hEWV08Te2avArJA73PqKBj7/FQx+ME/gYLeUU/gGN3yLP2Z6wo
-        CFzX2Ax2Da74pJyYh3kJi5cVQFJ7a1zB3EibRf3RjJec+8P4tqFp/ux0XNNL0
-X-Google-Smtp-Source: AA6agR5Dvj+M0eXvxsog++oluj+Q1gQm5EvLJ32ev8pf6Gm0gYLhLCJXSyGt9tsZtIKsKyTUrD+NQXrQT27j
-X-Received: from js-desktop.svl.corp.google.com ([2620:15c:2d4:203:ae07:7e0e:8132:a470])
- (user=junaids job=sendgmr) by 2002:a25:80d3:0:b0:66f:5da5:204f with SMTP id
- c19-20020a2580d3000000b0066f5da5204fmr4353399ybm.30.1659134613718; Fri, 29
- Jul 2022 15:43:33 -0700 (PDT)
-Date:   Fri, 29 Jul 2022 15:43:29 -0700
-Message-Id: <20220729224329.323378-1-junaids@google.com>
-Mime-Version: 1.0
-X-Mailer: git-send-email 2.37.1.455.g008518b4e5-goog
-Subject: [PATCH v2] kvm: x86: Do proper cleanup if kvm_x86_ops->vm_init() fails
-From:   Junaid Shahid <junaids@google.com>
-To:     kvm@vger.kernel.org, pbonzini@redhat.com
-Cc:     seanjc@google.com, dmatlack@google.com, jmattson@google.com
-Content-Type: text/plain; charset="UTF-8"
-X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL autolearn=ham
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc;
+        bh=qWNh7vOk9tCkYV94WwXKMJ4uEd3sFIr85O9CxOfUKiQ=;
+        b=BCx46wadmi637S/9GY6qzErEHx2+/Vx35Q7sbhuaCb/FCmYr0Zj2yVG3y9YG+lkfBX
+         pUWe4HC+XjVbpeeC4bU5gwMB2f7TDQa1wEMXdWxVduoywPL81vXigEO3IHsBQ6nthOJp
+         SPpBmppIXVrNQu139odzrlQQ63xNY95pyzbBUQSG+qiW0BKhjs3+5Z8mDHw6932WGvVr
+         e3xpl5zmQ9rRTnJ+IYYNtvxramoaq/gn84yU7HyZGKn1glZ+nKBgsyM4HFAS3cQM/Yl4
+         eXhmMdmXBZFZLQlIwVGuZkm2/2eKWqhFUQcQizkCV0/UimYr8XMmix5vRdUke/j4sySX
+         yQBA==
+X-Gm-Message-State: AJIora+qPZZ9aiATfts9rp8JAeri/Z8ZIBYFFvSwYbDXAovlg4PrlYhN
+        Uyt2RnPPc64C9PyXgGegHRTV+w==
+X-Google-Smtp-Source: AGRyM1uRQjDAUWSoc11u2QbNyEFqJJaHT/kHhRAen2+cI88tCY46m5+6iYzrx08XaKia2PfQSYlqDA==
+X-Received: by 2002:a05:6638:12d4:b0:33f:aaab:8d84 with SMTP id v20-20020a05663812d400b0033faaab8d84mr2274213jas.67.1659137348018;
+        Fri, 29 Jul 2022 16:29:08 -0700 (PDT)
+Received: from kernel-dev-1 (75-168-113-69.mpls.qwest.net. [75.168.113.69])
+        by smtp.gmail.com with ESMTPSA id y14-20020a5e870e000000b0067bd7f5f964sm2244967ioj.7.2022.07.29.16.29.07
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 29 Jul 2022 16:29:07 -0700 (PDT)
+Date:   Fri, 29 Jul 2022 18:29:07 -0500
+From:   Coleman Dietsch <dietschc@csp.edu>
+To:     Greg KH <gregkh@linuxfoundation.org>
+Cc:     kvm@vger.kernel.org, x86@kernel.org,
+        Sean Christopherson <seanjc@google.com>,
+        Dave Hansen <dave.hansen@linux.intel.com>,
+        linux-kernel@vger.kernel.org,
+        syzbot+e54f930ed78eb0f85281@syzkaller.appspotmail.com,
+        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+        "H . Peter Anvin" <hpa@zytor.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Pavel Skripkin <paskripkin@gmail.com>,
+        linux-kernel-mentees@lists.linuxfoundation.org
+Subject: Re: [PATCH] KVM: x86/xen: Fix bug in kvm_xen_vcpu_set_attr()
+Message-ID: <YuRtQ/GHc3poAmHG@kernel-dev-1>
+References: <20220728194736.383727-1-dietschc@csp.edu>
+ <YuOPDpy+RqD09n3j@kroah.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <YuOPDpy+RqD09n3j@kroah.com>
+X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS autolearn=ham
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -63,47 +78,26 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-If vm_init() fails [which can happen, for instance, if a memory
-allocation fails during avic_vm_init()], we need to cleanup some
-state in order to avoid resource leaks.
+On Fri, Jul 29, 2022 at 09:41:02AM +0200, Greg KH wrote:
+> On Thu, Jul 28, 2022 at 02:47:37PM -0500, Coleman Dietsch wrote:
+> > This crash appears to be happening when vcpu->arch.xen.timer is already set and kvm_xen_init_timer(vcpu) is called.
+> 
+> What does "this crash" refer to ?
+> 
+> > 
+> > During testing with the syzbot reproducer code it seemed apparent that the else if statement in the KVM_XEN_VCPU_ATTR_TYPE_TIMER switch case was not being reached, which is where the kvm_xen_stop_timer(vcpu) call is located.
+> 
+> Please properly wrap your kernel changelog at 72 columns.
+> 
+> Didn't checkpatch.pl complain about this?
+> 
 
-Signed-off-by: Junaid Shahid <junaids@google.com>
----
-v2:
-- Moved the vm_init() call earlier in kvm_arch_init_vm()
+I believe I made the mistake of editing the patch file directly so it was
+on me for forgetting to run checkpatch.pl manually.
 
- arch/x86/kvm/x86.c | 8 +++++++-
- 1 file changed, 7 insertions(+), 1 deletion(-)
+> thanks,
+> 
+> greg k-h
 
-diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-index f389691d8c04..547e55d6b662 100644
---- a/arch/x86/kvm/x86.c
-+++ b/arch/x86/kvm/x86.c
-@@ -12029,6 +12029,10 @@ int kvm_arch_init_vm(struct kvm *kvm, unsigned long type)
- 	if (ret)
- 		goto out_page_track;
- 
-+	ret = static_call(kvm_x86_vm_init)(kvm);
-+	if (ret)
-+		goto out_uninit_mmu;
-+
- 	INIT_HLIST_HEAD(&kvm->arch.mask_notifier_list);
- 	INIT_LIST_HEAD(&kvm->arch.assigned_dev_head);
- 	atomic_set(&kvm->arch.noncoherent_dma_count, 0);
-@@ -12064,8 +12068,10 @@ int kvm_arch_init_vm(struct kvm *kvm, unsigned long type)
- 	kvm_hv_init_vm(kvm);
- 	kvm_xen_init_vm(kvm);
- 
--	return static_call(kvm_x86_vm_init)(kvm);
-+	return 0;
- 
-+out_uninit_mmu:
-+	kvm_mmu_uninit_vm(kvm);
- out_page_track:
- 	kvm_page_track_cleanup(kvm);
- out:
-
-base-commit: a4850b5590d01bf3fb19fda3fc5d433f7382a974
--- 
-2.37.1.455.g008518b4e5-goog
-
+Thanks for the feedback Greg, I believe I have (at least these) issues
+resolved in the next version of the patch.
