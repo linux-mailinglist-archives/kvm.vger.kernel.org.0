@@ -2,73 +2,61 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 959E6585008
-	for <lists+kvm@lfdr.de>; Fri, 29 Jul 2022 14:22:07 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id A413758501A
+	for <lists+kvm@lfdr.de>; Fri, 29 Jul 2022 14:32:37 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235619AbiG2MWD (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 29 Jul 2022 08:22:03 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52872 "EHLO
+        id S234008AbiG2Mcg (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 29 Jul 2022 08:32:36 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60594 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229603AbiG2MWB (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 29 Jul 2022 08:22:01 -0400
-Received: from mail-lf1-x12e.google.com (mail-lf1-x12e.google.com [IPv6:2a00:1450:4864:20::12e])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 317216171F
-        for <kvm@vger.kernel.org>; Fri, 29 Jul 2022 05:22:00 -0700 (PDT)
-Received: by mail-lf1-x12e.google.com with SMTP id u3so4302933lfl.3
-        for <kvm@vger.kernel.org>; Fri, 29 Jul 2022 05:22:00 -0700 (PDT)
+        with ESMTP id S232085AbiG2Mce (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 29 Jul 2022 08:32:34 -0400
+Received: from mail-yb1-xb31.google.com (mail-yb1-xb31.google.com [IPv6:2607:f8b0:4864:20::b31])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7629A7FE77
+        for <kvm@vger.kernel.org>; Fri, 29 Jul 2022 05:32:33 -0700 (PDT)
+Received: by mail-yb1-xb31.google.com with SMTP id o15so7900479yba.10
+        for <kvm@vger.kernel.org>; Fri, 29 Jul 2022 05:32:33 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=profian-com.20210112.gappssmtp.com; s=20210112;
-        h=from:to:cc:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=OnpMDbAGT3435SYeG/PuiMkkIvduYtBcbEfOdwrgav0=;
-        b=KPuPNa0tPqTmVunPM8do8wBS8wNRtGFF8MmJefwl4f13rJKccVZHIkyAQjs65+AUSI
-         JDdo6dbVEhU9w+traz0cPNSgP7UtRsiMVdSrVFQLphmuLKTfsBKVKodV/UhcC+ufjw5F
-         qN1hrT7ndhFppAxdURuR8iKPtKuC7UlUK36CK4Kz2NSz7NA1DyM3eQExEV/43seeRBtf
-         1l7sV/H32jJXW/qIMIQSyUFnm9RyeSX8XmVN+gwVavul8DG59RusrxUPsuMMftbcLaaF
-         UaEGdXQFgi2RUbtG66q1o/3FxUA+jiMHzYd9eMoTqP8OlvcIGVKkH8DcxAQd7uSU1yb/
-         o1lw==
+        d=brainfault-org.20210112.gappssmtp.com; s=20210112;
+        h=mime-version:from:date:message-id:subject:to:cc;
+        bh=NgyXkRFKm1mWhtYAsy1KT6+Z/leQljWMD9vh/ZwdATE=;
+        b=lVxWNeiNNhf5exql1Zx56C+uKo33x2mOny1EHptn9GK7V/cpoe63ZN1t5R56FkojAx
+         Xv2HWPYCxf6WLzAcSRgKGgw7Agdmx0wKA7HzqByzcArH5r1mRKMla5wl23fWrKeuoAkE
+         WFch4kUomrXvGHu24wne/FjmtUnMKWWAg9v7Pud0WHzzS/QFnh6td36U+kkgJ1PSJOUS
+         KSiFfjQN6xYZpi7QP21vLEsLfH2xRNx+pCoE0Yl73v4nM3GYCnArbA74bUHrqivuurkz
+         vt5Ts5LpL4gErRKgUaAMlglc8CCrnpBiz7IZTRyUjwNlNtlSvXOd9SlLgxvsxk/Xdvtv
+         B/Jw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=OnpMDbAGT3435SYeG/PuiMkkIvduYtBcbEfOdwrgav0=;
-        b=5a39kWFyZzmlSm0PXOSBpBst7gqkuSrTgEB5sTarLqVP8LeA25UxY8QVnsth7FGSWW
-         VKKqm6/zsNDzyRF+PzXl5c10z/l2kV3TiXZ+6MUIAbAQXqxozAf6nfZIW8a+qXWwA5EO
-         5mSaoG3sN8LnIAXLTRLumjgC8/242q7H7IzyTRCiIAGZwdoZvLg0kTICOMBd2RihpTZv
-         6QheQH3eJ93uLSz8kXlvZh2JFi4TqAZ9n8Q8B90PFQ0B2A541cSOPd8rI9/QygN7FEe6
-         dWhZtDUsUBNKDBS78FreEp1j3lZlvzBPDwydqn60++hBVnka2jYyZ6fEcYv5kQlb7hvI
-         8drA==
-X-Gm-Message-State: AJIora9EZd75pxw88OCnHiiSYjPzbaw15GduM4si/ltgfCo+xdeVqLkL
-        zOBay+iHBvjDSsjIl9hqpMIJUA==
-X-Google-Smtp-Source: AGRyM1tyP9orVFNQ9fmvaHaNYa9Y6U90Ur/dnqX1+fl4Omo5jXLdi9XiVLpuregqAemcxeF2RKiqGg==
-X-Received: by 2002:ac2:4ec7:0:b0:48a:c05b:d408 with SMTP id p7-20020ac24ec7000000b0048ac05bd408mr1105880lfr.588.1659097318515;
-        Fri, 29 Jul 2022 05:21:58 -0700 (PDT)
-Received: from localhost (91-154-92-55.elisa-laajakaista.fi. [91.154.92.55])
-        by smtp.gmail.com with ESMTPSA id r22-20020ac25f96000000b0048a74608f16sm635414lfe.308.2022.07.29.05.21.57
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 29 Jul 2022 05:21:57 -0700 (PDT)
-From:   Jarkko Sakkinen <jarkko@profian.com>
-To:     Paolo Bonzini <pbonzini@redhat.com>
-Cc:     Jarkko Sakkinen <jarkko@profian.com>,
-        Jarkko Sakkinen <jarkko@kernel.org>,
-        Harald Hoyer <harald@profian.com>,
-        Sean Christopherson <seanjc@google.com>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        Dave Hansen <dave.hansen@linux.intel.com>,
-        x86@kernel.org (maintainer:X86 ARCHITECTURE (32-BIT AND 64-BIT)),
-        "H. Peter Anvin" <hpa@zytor.com>,
-        kvm@vger.kernel.org (open list:KERNEL VIRTUAL MACHINE FOR X86 (KVM/x86)),
-        linux-kernel@vger.kernel.org (open list:X86 ARCHITECTURE (32-BIT AND
-        64-BIT))
-Subject: [PATCH v2] KVM: SVM: Dump Virtual Machine Save Area (VMSA) to klog
-Date:   Fri, 29 Jul 2022 15:21:50 +0300
-Message-Id: <20220729122150.601-1-jarkko@profian.com>
-X-Mailer: git-send-email 2.37.1
+        h=x-gm-message-state:mime-version:from:date:message-id:subject:to:cc;
+        bh=NgyXkRFKm1mWhtYAsy1KT6+Z/leQljWMD9vh/ZwdATE=;
+        b=SKvER1gQDQWd/AbgZs/rfw5zKdTbefwwENBjh2nL/5iDqWKkd+EcWHUG1t2TC6Y974
+         yWK+JuOk0oAjNQw6hVty2foFACtzkyJeQ7z47Gd0CQQQ7QP7M073aa3HYwT5oHIDTy72
+         IRA8mBEJ5RSLDstMQKL2IPVh40sJdOEyLuODDtl8TgdcwLsu+JiigDPczHg0bG4alAdL
+         4WO54fcu2C3BqtPDUes5E7z8JyesxMGdgxaBOvzw3bWQ9edqRW5Y99rilkRea7zOUj88
+         xt2Qv7MP4tPyu8fBrJhvfxiLJxhCiFgMV4sDRWFTL1LP331AdUa9qElEv7Bd7J8z3ewR
+         OO5w==
+X-Gm-Message-State: ACgBeo1JLmiOk9KNl4g+CM0Qy2GCMl1HNILX7OJN1qTGajWvKJqSXi5E
+        kkF1M03eu1Iy1WhSWQShNb6+ZvUn6b/ND3kTQPT/Aw==
+X-Google-Smtp-Source: AA6agR5PBgzCERmTltJ0yu6/L1mipdnkKNUMB8kysnrz+Fh5bxYh/fYtfbYWKZ1au9+Nu6zm4te49cyZpxjApNx1TKg=
+X-Received: by 2002:a25:640a:0:b0:671:3386:f860 with SMTP id
+ y10-20020a25640a000000b006713386f860mr2272340ybb.423.1659097952476; Fri, 29
+ Jul 2022 05:32:32 -0700 (PDT)
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+From:   Anup Patel <anup@brainfault.org>
+Date:   Fri, 29 Jul 2022 18:01:27 +0530
+Message-ID: <CAAhSdy2iH-WpitweQ_nCYm6p0S5S_fmQ3x37FdAe7tEmu_np0A@mail.gmail.com>
+Subject: [GIT PULL] KVM/riscv changes for 5.20
+To:     Paolo Bonzini <pbonzini@redhat.com>
+Cc:     Palmer Dabbelt <palmer@dabbelt.com>,
+        Atish Patra <atishp@atishpatra.org>,
+        KVM General <kvm@vger.kernel.org>,
+        "open list:KERNEL VIRTUAL MACHINE FOR RISC-V (KVM/riscv)" 
+        <kvm-riscv@lists.infradead.org>,
+        linux-riscv <linux-riscv@lists.infradead.org>
+Content-Type: text/plain; charset="UTF-8"
 X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS autolearn=ham
+        DKIM_VALID,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_NONE autolearn=ham
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -76,34 +64,81 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-As Virtual Machine Save Area (VMSA) is essential in troubleshooting
-attestation, dump it to the klog with the KERN_DEBUG level of priority.
+Hi Paolo,
 
-Cc: Jarkko Sakkinen <jarkko@kernel.org>
-Suggested-by: Harald Hoyer <harald@profian.com>
-Signed-off-by: Jarkko Sakkinen <jarkko@profian.com>
----
- arch/x86/kvm/svm/sev.c | 4 ++++
- 1 file changed, 4 insertions(+)
+We have following KVM RISC-V changes for 5.20:
+1) Track ISA extensions used by Guest using bitmap
+2) Added system instruction emulation framework
+3) Added CSR emulation framework
+4) Added gfp_custom flag in struct kvm_mmu_memory_cache
+5) Added G-stage ioremap() and iounmap() functions
+6) Added support for Svpbmt inside Guest
 
-diff --git a/arch/x86/kvm/svm/sev.c b/arch/x86/kvm/svm/sev.c
-index 0c240ed04f96..c91a905436d5 100644
---- a/arch/x86/kvm/svm/sev.c
-+++ b/arch/x86/kvm/svm/sev.c
-@@ -603,6 +603,10 @@ static int sev_es_sync_vmsa(struct vcpu_svm *svm)
- 	save->xss  = svm->vcpu.arch.ia32_xss;
- 	save->dr6  = svm->vcpu.arch.dr6;
- 
-+	if (printk_ratelimit()) {
-+		print_hex_dump(KERN_DEBUG, "VMSA", DUMP_PREFIX_NONE, 16, 1, save, sizeof(*save), false);
-+	}
-+
- 	return 0;
- }
- 
--- 
-v2:
-- Use KERN_DEBUG for print_hex_dump()
-- Check for ratelimit.
-2.37.1
+Please pull.
 
+Regards,
+Anup
+
+The following changes since commit e0dccc3b76fb35bb257b4118367a883073d7390e:
+
+  Linux 5.19-rc8 (2022-07-24 13:26:27 -0700)
+
+are available in the Git repository at:
+
+  https://github.com/kvm-riscv/linux.git tags/kvm-riscv-5.20-1
+
+for you to fetch changes up to 6bb2e00ea304ffc0446f345c46fe22713ce43cbf:
+
+  RISC-V: KVM: Add support for Svpbmt inside Guest/VM (2022-07-29
+17:15:18 +0530)
+
+----------------------------------------------------------------
+KVM/riscv changes for 5.20
+
+- Track ISA extensions used by Guest using bitmap
+- Added system instruction emulation framework
+- Added CSR emulation framework
+- Added gfp_custom flag in struct kvm_mmu_memory_cache
+- Added G-stage ioremap() and iounmap() functions
+- Added support for Svpbmt inside Guest
+
+----------------------------------------------------------------
+Anup Patel (7):
+      RISC-V: KVM: Factor-out instruction emulation into separate sources
+      RISC-V: KVM: Add extensible system instruction emulation framework
+      RISC-V: KVM: Add extensible CSR emulation framework
+      KVM: Add gfp_custom flag in struct kvm_mmu_memory_cache
+      RISC-V: KVM: Add G-stage ioremap() and iounmap() functions
+      RISC-V: KVM: Use PAGE_KERNEL_IO in kvm_riscv_gstage_ioremap()
+      RISC-V: KVM: Add support for Svpbmt inside Guest/VM
+
+Atish Patra (1):
+      RISC-V: KVM: Improve ISA extension by using a bitmap
+
+Nikolay Borisov (2):
+      RISC-V: KVM: Make kvm_riscv_guest_timer_init a void function
+      RISC-V: KVM: move preempt_disable() call in kvm_arch_vcpu_ioctl_run
+
+Zhang Jiaming (1):
+      RISC-V: KVM: Fix variable spelling mistake
+
+ arch/riscv/include/asm/csr.h            |  16 +
+ arch/riscv/include/asm/kvm_host.h       |  24 +-
+ arch/riscv/include/asm/kvm_vcpu_fp.h    |   8 +-
+ arch/riscv/include/asm/kvm_vcpu_insn.h  |  48 ++
+ arch/riscv/include/asm/kvm_vcpu_timer.h |   2 +-
+ arch/riscv/include/uapi/asm/kvm.h       |   1 +
+ arch/riscv/kvm/Makefile                 |   1 +
+ arch/riscv/kvm/mmu.c                    |  28 +-
+ arch/riscv/kvm/vcpu.c                   | 203 ++++++---
+ arch/riscv/kvm/vcpu_exit.c              | 496 +--------------------
+ arch/riscv/kvm/vcpu_fp.c                |  27 +-
+ arch/riscv/kvm/vcpu_insn.c              | 752 ++++++++++++++++++++++++++++++++
+ arch/riscv/kvm/vcpu_timer.c             |   4 +-
+ arch/riscv/kvm/vm.c                     |   4 +-
+ include/linux/kvm_types.h               |   1 +
+ include/uapi/linux/kvm.h                |   8 +
+ virt/kvm/kvm_main.c                     |   4 +-
+ 17 files changed, 1028 insertions(+), 599 deletions(-)
+ create mode 100644 arch/riscv/include/asm/kvm_vcpu_insn.h
+ create mode 100644 arch/riscv/kvm/vcpu_insn.c
