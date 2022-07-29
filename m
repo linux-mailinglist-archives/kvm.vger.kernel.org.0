@@ -2,120 +2,140 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 40B2458510E
-	for <lists+kvm@lfdr.de>; Fri, 29 Jul 2022 15:46:29 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 084D9585120
+	for <lists+kvm@lfdr.de>; Fri, 29 Jul 2022 15:51:48 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236526AbiG2Nq1 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 29 Jul 2022 09:46:27 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60990 "EHLO
+        id S236205AbiG2Nvq (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 29 Jul 2022 09:51:46 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36928 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233738AbiG2NqZ (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 29 Jul 2022 09:46:25 -0400
-Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 77BDE237C9
-        for <kvm@vger.kernel.org>; Fri, 29 Jul 2022 06:46:24 -0700 (PDT)
-Received: from pps.filterd (m0127361.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.17.1.5/8.17.1.5) with ESMTP id 26TDX86r036097
-        for <kvm@vger.kernel.org>; Fri, 29 Jul 2022 13:46:23 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
- mime-version : subject : to : cc : references : from : in-reply-to :
- content-type : content-transfer-encoding; s=pp1;
- bh=Izr/7dwJbsddu1CJJDsXBg/LeRsWurJORLdJHFfkAgU=;
- b=HKyq0EbbyeE+w5stuqElHwJpl0LCpMmx6s27eiUxUNm6cs4J0PCfIxvbj14kOZLTQauI
- n0IMZ9sUeBkuu+esKGc6vn7jEgfa6elSNxR8TDwjlBpIcncJu6UBXebVdOU1QV8BUT8I
- C48aSHg8pg1nBo3oDjmFB+hTOddaEe4IEH21GDaiVaP/VNkzh0nyeQMUQfoD6NcZoLHT
- K4vXWAuMv2gbKzujQHb3mdvX+4TBHAmCAVGyS5aBAv0bbTyACCTEiElNDRazPQ8GXjEH
- cfxmoYyyCF0fLdAvCeX6HhpxkF52eSeZnLfZ1nJYtX3fJ5LLg2u8hpvkKnjq4AQGoP8e Rg== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3hmghkrk09-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT)
-        for <kvm@vger.kernel.org>; Fri, 29 Jul 2022 13:46:23 +0000
-Received: from m0127361.ppops.net (m0127361.ppops.net [127.0.0.1])
-        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 26TDXI8f036402
-        for <kvm@vger.kernel.org>; Fri, 29 Jul 2022 13:46:22 GMT
-Received: from ppma04ams.nl.ibm.com (63.31.33a9.ip4.static.sl-reverse.com [169.51.49.99])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3hmghkrjyk-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Fri, 29 Jul 2022 13:46:22 +0000
-Received: from pps.filterd (ppma04ams.nl.ibm.com [127.0.0.1])
-        by ppma04ams.nl.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 26TDZUdV026924;
-        Fri, 29 Jul 2022 13:46:21 GMT
-Received: from b06cxnps4076.portsmouth.uk.ibm.com (d06relay13.portsmouth.uk.ibm.com [9.149.109.198])
-        by ppma04ams.nl.ibm.com with ESMTP id 3hg96wqpty-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Fri, 29 Jul 2022 13:46:21 +0000
-Received: from b06wcsmtp001.portsmouth.uk.ibm.com (b06wcsmtp001.portsmouth.uk.ibm.com [9.149.105.160])
-        by b06cxnps4076.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 26TDkHn232178548
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Fri, 29 Jul 2022 13:46:17 GMT
-Received: from b06wcsmtp001.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 6EB45A405F;
-        Fri, 29 Jul 2022 13:46:17 +0000 (GMT)
-Received: from b06wcsmtp001.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 2F98DA405B;
-        Fri, 29 Jul 2022 13:46:17 +0000 (GMT)
-Received: from [9.145.174.114] (unknown [9.145.174.114])
-        by b06wcsmtp001.portsmouth.uk.ibm.com (Postfix) with ESMTP;
-        Fri, 29 Jul 2022 13:46:17 +0000 (GMT)
-Message-ID: <feafe1bc-8703-359e-9a5b-f4693b7650e1@linux.ibm.com>
-Date:   Fri, 29 Jul 2022 15:46:16 +0200
+        with ESMTP id S236910AbiG2NvY (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 29 Jul 2022 09:51:24 -0400
+Received: from mail-pf1-x42a.google.com (mail-pf1-x42a.google.com [IPv6:2607:f8b0:4864:20::42a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E905A72ECB
+        for <kvm@vger.kernel.org>; Fri, 29 Jul 2022 06:51:17 -0700 (PDT)
+Received: by mail-pf1-x42a.google.com with SMTP id y9so4666147pff.12
+        for <kvm@vger.kernel.org>; Fri, 29 Jul 2022 06:51:17 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc;
+        bh=f8C06rWDnabiVcFlgJ+UgwkudoctnDN6mfhX9wOsdF4=;
+        b=o7qom6zQ0W8otqq7nXz0A4nViHUnNZbupgjcb281+K4RRXVe6OGv1IH4j/TOIuwILq
+         g129ESd4HAONEy2mhnARHmHXW8gDI+KJ8FBQpQ9k5q0Y1BIJrJX52czJTfbG9oLtIFiK
+         oAgDy5H4SriAcMiHGKiC069nAqxG/Gg0UP/7Bi+a6Eb/NOoFv1IJb83i3ebTXlaYgo/m
+         tYZjPKEon4vBEeJWRunRWPaOAl1isLGnWKJ42+966fpgJppHp8jmmywydJy0Hz9jW2D0
+         NShmnF0nVKvDXRe4OzrzgVO6y+mySZ90vvKcSla6wj4tf5AGzxeuw4X3ysuix+oGc7Tv
+         wlAw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc;
+        bh=f8C06rWDnabiVcFlgJ+UgwkudoctnDN6mfhX9wOsdF4=;
+        b=qKlUZq6fT24PgaX32bRuLkon6SsnKnwHVniJZrBjOUoxYLdHfk7sq4aeXiv2qRLzgX
+         xQMNvr6DUol/XSYDElZ+NsrX+Dt/HUr+YlxSvUEp4U8STOf26vl+o5E9lGJGEP1i9CeM
+         JTJUHeziacZ/lj7W+ExRc3aHqDDQqqawiHEDEEJm3aOFXjjnIa1e20yS2JiCM7rcuqPn
+         CAt7zf3VjtMuKicxGi2EvsiJJ5tIxRjywMNnjzkURxLZrg2EMyXGx1KInWq4O650o9lh
+         WCaS/tCi1WnPo8K7u0oN7c4RuBaiVSRK1wzD+wgw6WwLTli2P9wwUJqgiLbwvfGoWpBO
+         6OLA==
+X-Gm-Message-State: AJIora/KPAB3vkW2KbJ3Tm7ehelkbsRO3/Gy7CkVBMOCpltZabZVjqIp
+        8vRmHqBPpPPIuTRmy/setGekPw==
+X-Google-Smtp-Source: AGRyM1ugu0ZMAIN/uxPPceRZ9TJVJVgURFyIuWCGDMfS+TSwBEqBgq6vtS6SB72Bn/UXbF/ZBzpl/g==
+X-Received: by 2002:a63:8049:0:b0:414:e8aa:b6bd with SMTP id j70-20020a638049000000b00414e8aab6bdmr3155757pgd.10.1659102677195;
+        Fri, 29 Jul 2022 06:51:17 -0700 (PDT)
+Received: from google.com (7.104.168.34.bc.googleusercontent.com. [34.168.104.7])
+        by smtp.gmail.com with ESMTPSA id pt1-20020a17090b3d0100b001ef3cec7f47sm127468pjb.52.2022.07.29.06.51.16
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 29 Jul 2022 06:51:16 -0700 (PDT)
+Date:   Fri, 29 Jul 2022 13:51:12 +0000
+From:   Sean Christopherson <seanjc@google.com>
+To:     Like Xu <like.xu.linux@gmail.com>
+Cc:     Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+Subject: Re: [PATCH 1/3] KVM: x86: Refresh PMU after writes to
+ MSR_IA32_PERF_CAPABILITIES
+Message-ID: <YuPl0KqHPagKKAgo@google.com>
+References: <20220727233424.2968356-1-seanjc@google.com>
+ <20220727233424.2968356-2-seanjc@google.com>
+ <271bddfa-9e48-d5f6-6147-af346d7946bf@gmail.com>
+ <YuKqyTvbVx2UyP2w@google.com>
+ <5090d500-1549-79ba-53a9-4929114eb569@gmail.com>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.8.0
-Subject: Re: [kvm-unit-tests PATCH 2/6] s390x: MAKEFILE: Use $< instead of
- pathsubst
-Content-Language: en-US
-To:     Janosch Frank <frankja@linux.ibm.com>, kvm@vger.kernel.org
-Cc:     imbrenda@linux.ibm.com, nrb@linux.ibm.com, scgl@linux.ibm.com,
-        thuth@redhat.com
-References: <20220729082633.277240-1-frankja@linux.ibm.com>
- <20220729082633.277240-3-frankja@linux.ibm.com>
-From:   Steffen Eiden <seiden@linux.ibm.com>
-Organization: IBM
-In-Reply-To: <20220729082633.277240-3-frankja@linux.ibm.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-ORIG-GUID: u7Iyx48UU_xqBa7BbzqKPbW-c05tCahY
-X-Proofpoint-GUID: BGQEuHlAnI3fO6yGhuunxq7Z9PF4REAS
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.205,Aquarius:18.0.883,Hydra:6.0.517,FMLib:17.11.122.1
- definitions=2022-07-29_15,2022-07-28_02,2022-06-22_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 malwarescore=0 bulkscore=0
- adultscore=0 impostorscore=0 mlxscore=0 phishscore=0 mlxlogscore=999
- priorityscore=1501 spamscore=0 suspectscore=0 clxscore=1015
- lowpriorityscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2206140000 definitions=main-2207290061
-X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,
-        SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <5090d500-1549-79ba-53a9-4929114eb569@gmail.com>
+X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
+        USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=unavailable
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+On Fri, Jul 29, 2022, Like Xu wrote:
+> On 28/7/2022 11:27 pm, Sean Christopherson wrote:
+> > On Thu, Jul 28, 2022, Like Xu wrote:
+> > > On 28/7/2022 7:34 am, Sean Christopherson wrote:
+> > > > Refresh the PMU if userspace modifies MSR_IA32_PERF_CAPABILITIES.  KVM
+> > > > consumes the vCPU's PERF_CAPABILITIES when enumerating PEBS support, but
+> > > > relies on CPUID updates to refresh the PMU.  I.e. KVM will do the wrong
+> > > > thing if userspace stuffs PERF_CAPABILITIES _after_ setting guest CPUID.
+> > > 
+> > > Unwise userspace should reap its consequences if it does not break KVM or host.
+> > 
+> > I don't think this is a case of userspace being weird or unwise.  IMO, setting
+> > CPUID before MSRs is perfectly logical and intuitive.
+> 
+> The concern is whether to allow changing the semantically featured MSR value
+> (as an alternative to CPUID or KVM_CAP.) from user space after the guest CPUID
+> is finalized or the guest has run for a while.
+
+Hrm, I forgot about that problem.
+
+> > KVM does have "rules" in the sense that it has an established ABI for things
+> > like KVM_CAP and module params, though documentation may be lacking in some cases.
+> > The CPUID and MSR ioctls don't have a prescribe ordering though.
+> 
+> Should we continue with this inter-dependence (as a silent feature) ?
+> The patch implies that it should be left as it is in order not to break any
+> user space.
+> 
+> How we break out of this rut ?
+
+The correct fix in KVM is to reject writes to feature MSRs after KVM_RUN.  KVM
+already does this for CPUID.   I'm pretty sure KVM needs to allow writes with the
+same value to support QEMU's hotplug behavior, but that's easy enough to handle
+(in theory).  There are few enough feature MSRs that I think we can get away with
+a linear walk, e.g.
+
+diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+index 5366f884e9a7..fffc57dea304 100644
+--- a/arch/x86/kvm/x86.c
++++ b/arch/x86/kvm/x86.c
+@@ -2150,6 +2150,22 @@ static int do_get_msr(struct kvm_vcpu *vcpu, unsigned index, u64 *data)
+
+ static int do_set_msr(struct kvm_vcpu *vcpu, unsigned index, u64 *data)
+ {
++       u64 current_val;
++       int i;
++
++       if (vcpu->arch.last_vmentry_cpu != -1 && index != MSR_IA32_UCODE_REV) {
++               for (i = 0; i < num_msr_based_features; i++) {
++                       if (index != msr_based_features[i])
++                               continue;
++
++                       if (do_get_msr(vcpu, index, &current_val) ||
++                           *data != current_val)
++                               return -EINVAL;
++
++                       return 0;
++               }
++       }
++
+        return kvm_set_msr_ignored_check(vcpu, index, *data, true);
+ }
 
 
-On 7/29/22 10:26, Janosch Frank wrote:
-> No need to mangle strings if we already have the value at hand.
-> 
-> Signed-off-by: Janosch Frank <frankja@linux.ibm.com>
-Reviewed-by: Steffen Eiden <seiden@linux.ibm.com>
-> ---
->   s390x/Makefile | 2 +-
->   1 file changed, 1 insertion(+), 1 deletion(-)
-> 
-> diff --git a/s390x/Makefile b/s390x/Makefile
-> index efd5e0c1..ee34a1d7 100644
-> --- a/s390x/Makefile
-> +++ b/s390x/Makefile
-> @@ -134,7 +134,7 @@ $(SNIPPET_DIR)/asm/%.gbin: $(SNIPPET_DIR)/asm/%.o
->   	truncate -s '%4096' $@
->   
->   $(SNIPPET_DIR)/c/%.gbin: $(SNIPPET_DIR)/c/%.o $(snippet_lib) $(FLATLIBS)
-> -	$(CC) $(LDFLAGS) -o $@ -T $(SRCDIR)/s390x/snippets/c/flat.lds $(patsubst %.gbin,%.o,$@) $(snippet_lib) $(FLATLIBS)
-> +	$(CC) $(LDFLAGS) -o $@ -T $(SRCDIR)/s390x/snippets/c/flat.lds $< $(snippet_lib) $(FLATLIBS)
->   	$(OBJCOPY) -O binary -j ".rodata" -j ".lowcore" -j ".text" -j ".data" -j ".bss" --set-section-flags .bss=alloc,load,contents $@ $@
->   	truncate -s '%4096' $@
->   
