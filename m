@@ -2,41 +2,41 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 10B60585040
+	by mail.lfdr.de (Postfix) with ESMTP id 92E23585041
 	for <lists+kvm@lfdr.de>; Fri, 29 Jul 2022 15:02:10 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236131AbiG2NBl (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 29 Jul 2022 09:01:41 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50356 "EHLO
+        id S236144AbiG2NBw (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 29 Jul 2022 09:01:52 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50428 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233298AbiG2NBk (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 29 Jul 2022 09:01:40 -0400
+        with ESMTP id S233298AbiG2NBu (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 29 Jul 2022 09:01:50 -0400
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 1A84C41D35
-        for <kvm@vger.kernel.org>; Fri, 29 Jul 2022 06:01:39 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 494E841989
+        for <kvm@vger.kernel.org>; Fri, 29 Jul 2022 06:01:49 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1659099698;
+        s=mimecast20190719; t=1659099708;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=hlYPqOwXF8kEqxkm8xop27cvQNh7ZouuY1kfQAMVKXY=;
-        b=fbLYysWkdIRF61kN8MsYtbjhg1NwUY3OrhpblMBMTLQJrMoCb/FzKe4a4PXJhn4USx3Mxb
-        qH+u5p9z2J/00uOAY0Qs4qpvWtqvnlD/sa4zKOXBTr92OahB+uK+sdyUkJvri0ZZ942RPQ
-        WoH13tzet0FmEbvaYJVZc6HQZC/9jgU=
-Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
- [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
+        bh=RjJRL9ZMD4Gcb7S3Fim3915yhE1CVy3SoJuD57X/KbM=;
+        b=G1bl5ER9i1SudObpyXhMbCQhqYIi3bAz7d7CW0a2lKBf+413tKsbAc4vikOEe1jU6JShYe
+        CMqGmTl2QwqQBs/HU8J8db8sNwGZA2+ikStX0rglu/BRFzahE4ASr4G1MNXE8xJ+lnrFCQ
+        C5USG23HzzYpHTvQM2PJAKhv4XnPChI=
+Received: from mimecast-mx02.redhat.com (mx3-rdu2.redhat.com
+ [66.187.233.73]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-533-NYTDOgrTNfuIYcfbwtKTrA-1; Fri, 29 Jul 2022 09:01:34 -0400
-X-MC-Unique: NYTDOgrTNfuIYcfbwtKTrA-1
+ us-mta-389-hzhfTPsBNCGLwu_2weGmYQ-1; Fri, 29 Jul 2022 09:01:45 -0400
+X-MC-Unique: hzhfTPsBNCGLwu_2weGmYQ-1
 Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.rdu2.redhat.com [10.11.54.4])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 45970811E76;
-        Fri, 29 Jul 2022 13:01:33 +0000 (UTC)
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id C30073804523;
+        Fri, 29 Jul 2022 13:01:43 +0000 (UTC)
 Received: from localhost.localdomain (unknown [10.39.192.53])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 232482026D64;
-        Fri, 29 Jul 2022 13:01:22 +0000 (UTC)
+        by smtp.corp.redhat.com (Postfix) with ESMTP id A4DF62026D64;
+        Fri, 29 Jul 2022 13:01:33 +0000 (UTC)
 From:   Alberto Faria <afaria@redhat.com>
 To:     qemu-devel@nongnu.org
 Cc:     =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>,
@@ -86,9 +86,9 @@ Cc:     =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>,
         John Snow <jsnow@redhat.com>,
         Markus Armbruster <armbru@redhat.com>,
         Alberto Faria <afaria@redhat.com>
-Subject: [RFC v2 03/10] static-analyzer: Support adding tests to checks
-Date:   Fri, 29 Jul 2022 14:00:32 +0100
-Message-Id: <20220729130040.1428779-4-afaria@redhat.com>
+Subject: [RFC v2 04/10] static-analyzer: Avoid reanalyzing unmodified translation units
+Date:   Fri, 29 Jul 2022 14:00:33 +0100
+Message-Id: <20220729130040.1428779-5-afaria@redhat.com>
 In-Reply-To: <20220729130040.1428779-1-afaria@redhat.com>
 References: <20220729130040.1428779-1-afaria@redhat.com>
 MIME-Version: 1.0
@@ -103,436 +103,398 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Introduce an add_check_tests() method to add output-comparison tests to
-checks, and add some tests to the "return-value-never-used" check.
+For each translation unit, run each check only if any of the translation
+unit's files has been modified since the last time the check ran and
+passed without reporting problems.
 
 Signed-off-by: Alberto Faria <afaria@redhat.com>
 ---
- static-analyzer.py                         | 133 ++++++++++++++++++++-
- static_analyzer/__init__.py                |  39 +++++-
- static_analyzer/return_value_never_used.py | 103 ++++++++++++++++
- 3 files changed, 267 insertions(+), 8 deletions(-)
+ static-analyzer.py | 240 ++++++++++++++++++++++++++++++++++++++++-----
+ 1 file changed, 217 insertions(+), 23 deletions(-)
 
 diff --git a/static-analyzer.py b/static-analyzer.py
-index 3ade422dbf..16e331000d 100755
+index 16e331000d..140760a93e 100755
 --- a/static-analyzer.py
 +++ b/static-analyzer.py
-@@ -11,17 +11,26 @@
- import subprocess
- import sys
- import re
--from argparse import ArgumentParser, Namespace, RawDescriptionHelpFormatter
-+from argparse import (
-+    Action,
-+    ArgumentParser,
-+    Namespace,
-+    RawDescriptionHelpFormatter,
-+)
- from multiprocessing import Pool
- from pathlib import Path
-+from tempfile import TemporaryDirectory
- import textwrap
- import time
-+from traceback import print_exc
+@@ -25,6 +25,8 @@
+ from traceback import print_exc
  from typing import (
-+    Callable,
+     Callable,
++    Dict,
++    FrozenSet,
      Iterable,
      Iterator,
      List,
-     Mapping,
+@@ -32,6 +34,7 @@
      NoReturn,
-+    Optional,
+     Optional,
      Sequence,
++    Tuple,
      Union,
  )
-@@ -37,7 +46,7 @@
- def parse_args() -> Namespace:
  
-     available_checks = "\n".join(
--        f"  {name}   {' '.join((CHECKS[name].__doc__ or '').split())}"
-+        f"  {name}   {' '.join((CHECKS[name].checker.__doc__ or '').split())}"
-         for name in sorted(CHECKS)
+@@ -61,9 +64,19 @@ def parse_args() -> Namespace:
+             build configuration. Note that a single .c file may give rise to
+             several translation units.
+ 
++            For each translation unit, each check is run only if any its files
++            has been modified since the last time the check ran and passed
++            without reporting problems.
++
+             You should build QEMU before running this, since some translation
+             units depend on files that are generated during the build. If you
+             don't, you'll get errors, but should never get false negatives.
++            Also, translation units that haven't been built will always be
++            reanalyzed, even they haven't been modified, because we cant't know
++            what their dependencies are until they are built. (TODO: This is
++            rather annoying since `make all` does not actually build every
++            translation unit. Should this script trigger an actual full build
++            somehow as a first step?)
+             """
+         ),
+         epilog=textwrap.dedent(
+@@ -111,6 +124,16 @@ def parse_args() -> Namespace:
+         ),
      )
  
-@@ -134,14 +143,37 @@ def parse_args() -> Namespace:
-         help="Do everything except actually running the checks.",
-     )
- 
-+    dev_options.add_argument(
-+        "--test",
-+        action=TestAction,
-+        nargs=0,
-+        help="Run tests for all checks and exit.",
++    parser.add_argument(
++        "-f",
++        "--force",
++        action="store_true",
++        help=(
++            "Analyze translation units even if they haven't been modified since"
++            " the last analysis."
++        ),
 +    )
 +
-     # parse arguments
+     parser.add_argument(
+         "-j",
+         "--jobs",
+@@ -220,12 +243,17 @@ def test() -> int:
  
--    args = parser.parse_args()
-+    try:
-+        args = parser.parse_args()
-+    except TestSentinelError:
-+        # --test was specified
-+        if len(sys.argv) > 2:
-+            parser.error("--test must be given alone")
-+        return Namespace(test=True)
-+
-     args.check_names = sorted(set(args.check_names or CHECKS))
- 
-     return args
- 
- 
-+class TestAction(Action):
-+    def __call__(self, parser, namespace, values, option_string=None):
-+        raise TestSentinelError
-+
-+
-+class TestSentinelError(Exception):
-+    pass
-+
-+
- # ---------------------------------------------------------------------------- #
- # Main
- 
-@@ -150,7 +182,11 @@ def main() -> int:
- 
-     args = parse_args()
- 
--    if args.profile:
-+    if args.test:
-+
-+        return test()
-+
-+    elif args.profile:
- 
-         import cProfile
-         import pstats
-@@ -170,6 +206,18 @@ def main() -> int:
-         return analyze(args)
- 
- 
-+def test() -> int:
-+
-+    for (check_name, check) in CHECKS.items():
-+        for group in check.test_groups:
-+            for input in group.inputs:
-+                run_test(
-+                    check_name, group.location, input, group.expected_output
-+                )
-+
-+    return 0
-+
-+
  def analyze(args: Namespace) -> int:
  
-     tr_units = get_translation_units(args)
-@@ -247,6 +295,7 @@ class TranslationUnit:
+-    tr_units = get_translation_units(args)
++    analysis_timestamp = time.time()
++
++    # load log and get translation units
++
++    log = AnalysisLog.load(args.build_dir)
++    (tr_units, num_up_to_date_tr_units) = get_translation_units(args, log)
+ 
+     # analyze translation units
+ 
+     start_time = time.monotonic()
+-    results: List[bool] = []
++    results: List[AnalysisResults] = []
+ 
+     if len(tr_units) == 1:
+         progress_suffix = " of 1 translation unit...\033[0m\r"
+@@ -237,7 +265,7 @@ def print_progress() -> None:
+ 
+     print_progress()
+ 
+-    def collect_results(results_iter: Iterable[bool]) -> None:
++    def collect_results(results_iter: Iterable[AnalysisResults]) -> None:
+         if sys.stdout.isatty():
+             for r in results_iter:
+                 results.append(r)
+@@ -246,27 +274,41 @@ def collect_results(results_iter: Iterable[bool]) -> None:
+             for r in results_iter:
+                 results.append(r)
+ 
+-    if tr_units:
++    try:
+ 
+-        if args.threads == 1:
++        if tr_units:
+ 
+-            collect_results(map(analyze_translation_unit, tr_units))
++            if args.threads == 1:
+ 
+-        else:
++                collect_results(map(analyze_translation_unit, tr_units))
+ 
+-            # Mimic Python's default pool.map() chunk size, but limit it to
+-            # 5 to avoid very big chunks when analyzing thousands of
+-            # translation units.
+-            chunk_size = min(5, -(-len(tr_units) // (args.threads * 4)))
++            else:
+ 
+-            with Pool(processes=args.threads) as pool:
+-                collect_results(
+-                    pool.imap_unordered(
+-                        analyze_translation_unit, tr_units, chunk_size
++                # Mimic Python's default pool.map() chunk size, but limit it to
++                # 5 to avoid very big chunks when analyzing thousands of
++                # translation units.
++                chunk_size = min(5, -(-len(tr_units) // (args.threads * 4)))
++
++                with Pool(processes=args.threads) as pool:
++                    collect_results(
++                        pool.imap_unordered(
++                            analyze_translation_unit, tr_units, chunk_size
++                        )
+                     )
+-                )
+ 
+-    end_time = time.monotonic()
++        end_time = time.monotonic()
++
++    finally:
++
++        # update analysis timestamps for passed checks for each translation unit
++        # (even if the static analyzer failed or was interrupted)
++
++        for r in results:
++            log.set_last_analysis_time(
++                r.tr_unit_object_file, r.passed_check_names, analysis_timestamp
++            )
++
++        log.save()
+ 
+     # print summary
+ 
+@@ -275,13 +317,18 @@ def collect_results(results_iter: Iterable[bool]) -> None:
+     else:
+         message = f"Analyzed {len(tr_units)} translation units"
+ 
++    if num_up_to_date_tr_units == 1:
++        message += " (1 other was up-to-date)"
++    elif num_up_to_date_tr_units > 1:
++        message += f" ({num_up_to_date_tr_units} other were up-to-date)"
++
+     message += f" in {end_time - start_time:.1f} seconds."
+ 
+     print(f"\033[0;34m{message}\033[0m")
+ 
+     # exit
+ 
+-    return 0 if all(results) else 3
++    return 0 if all(not r.problems_found for r in results) else 3
+ 
+ 
+ # ---------------------------------------------------------------------------- #
+@@ -293,13 +340,17 @@ class TranslationUnit:
+     absolute_path: str
+     build_working_dir: str
      build_command: str
++    object_file: str
      system_include_paths: Sequence[str]
      check_names: Sequence[str]
-+    custom_printer: Optional[Callable[[str], None]]
+     custom_printer: Optional[Callable[[str], None]]
  
  
- def get_translation_units(args: Namespace) -> Sequence["TranslationUnit"]:
-@@ -264,6 +313,7 @@ def get_translation_units(args: Namespace) -> Sequence["TranslationUnit"]:
+-def get_translation_units(args: Namespace) -> Sequence["TranslationUnit"]:
+-    """Return a list of translation units to be analyzed."""
++def get_translation_units(
++    args: Namespace, log: "AnalysisLog"
++) -> Tuple[Sequence["TranslationUnit"], int]:
++    """Return a list of translation units to be analyzed, and the number of
++    translation units that were skipped because all checks are up to date."""
+ 
+     system_include_paths = get_clang_system_include_paths()
+     compile_commands = load_compilation_database(args.build_dir)
+@@ -311,6 +362,7 @@ def get_translation_units(args: Namespace) -> Sequence["TranslationUnit"]:
+             absolute_path=str(Path(cmd["directory"], cmd["file"]).resolve()),
+             build_working_dir=cmd["directory"],
              build_command=cmd["command"],
++            object_file=cmd["output"],
              system_include_paths=system_include_paths,
              check_names=args.check_names,
-+            custom_printer=None,
-         )
-         for cmd in compile_commands
-     )
-@@ -380,7 +430,7 @@ def analyze_translation_unit(tr_unit: TranslationUnit) -> bool:
+             custom_printer=None,
+@@ -365,17 +417,25 @@ def get_translation_units(args: Namespace) -> Sequence["TranslationUnit"]:
+     # ensure that at least one translation unit is selected
  
-     try:
-         for name in tr_unit.check_names:
--            CHECKS[name](check_context)
-+            CHECKS[name].checker(check_context)
-     except Exception as e:
-         raise RuntimeError(f"Error analyzing {check_context._rel_path}") from e
+     tr_unit_list = list(tr_units)
++    num_selected_tr_units = len(tr_unit_list)
  
-@@ -428,7 +478,9 @@ def get_check_context(tr_unit: TranslationUnit) -> CheckContext:
-         except clang.cindex.TranslationUnitLoadError as e:
-             raise RuntimeError(f"Failed to load {rel_path}") from e
+     if not tr_unit_list:
+         fatal("No translation units to analyze")
  
--    if sys.stdout.isatty():
-+    if tr_unit.custom_printer is not None:
-+        printer = tr_unit.custom_printer
-+    elif sys.stdout.isatty():
-         # add padding to fully overwrite progress message
-         printer = lambda s: print(s.ljust(50))
-     else:
-@@ -457,6 +509,75 @@ def get_check_context(tr_unit: TranslationUnit) -> CheckContext:
-     return check_context
++    # skip translation units that don't need reanalyzing
++
++    if not args.force:
++        log.drop_up_to_date_checks(tr_unit_list)
++
++    num_up_to_date_tr_units = num_selected_tr_units - len(tr_unit_list)
++
+     # disable all checks if --skip-checks was given
+ 
+     if args.skip_checks:
+         for context in tr_unit_list:
+             context.check_names = []
+ 
+-    return tr_unit_list
++    return (tr_unit_list, num_up_to_date_tr_units)
+ 
+ 
+ def get_clang_system_include_paths() -> Sequence[str]:
+@@ -420,21 +480,154 @@ def load_compilation_database(build_dir: Path) -> Sequence[Mapping[str, str]]:
+         fatal(f"{path} does not exist")
  
  
 +# ---------------------------------------------------------------------------- #
-+# Tests
-+
-+
-+def run_test(
-+    check_name: str, location: str, input: str, expected_output: str
-+) -> None:
-+
-+    with TemporaryDirectory() as temp_dir:
-+
-+        os.chdir(temp_dir)
-+
-+        input_path = Path(temp_dir) / "file.c"
-+        input_path.write_text(input)
-+
-+        actual_output_list = []
-+
-+        tu_context = TranslationUnit(
-+            absolute_path=str(input_path),
-+            build_working_dir=str(input_path.parent),
-+            build_command=f"cc {shlex.quote(str(input_path))}",
-+            system_include_paths=[],
-+            check_names=[check_name],
-+            custom_printer=lambda s: actual_output_list.append(s + "\n"),
-+        )
-+
-+        check_context = get_check_context(tu_context)
-+
-+        # analyze translation unit
-+
-+        try:
-+
-+            for name in tu_context.check_names:
-+                CHECKS[name].checker(check_context)
-+
-+        except Exception:
-+
-+            print(
-+                f"\033[0;31mTest defined at {location} raised an"
-+                f" exception.\033[0m"
-+            )
-+            print(f"\033[0;31mInput:\033[0m")
-+            print(input, end="")
-+            print(f"\033[0;31mExpected output:\033[0m")
-+            print(expected_output, end="")
-+            print(f"\033[0;31mException:\033[0m")
-+            print_exc(file=sys.stdout)
-+            print(f"\033[0;31mAST:\033[0m")
-+            check_context.print_tree(check_context.translation_unit.cursor)
-+
-+            sys.exit(1)
-+
-+        actual_output = "".join(actual_output_list)
-+
-+        if actual_output != expected_output:
-+
-+            print(f"\033[0;33mTest defined at {location} failed.\033[0m")
-+            print(f"\033[0;33mInput:\033[0m")
-+            print(input, end="")
-+            print(f"\033[0;33mExpected output:\033[0m")
-+            print(expected_output, end="")
-+            print(f"\033[0;33mActual output:\033[0m")
-+            print(actual_output, end="")
-+            print(f"\033[0;33mAST:\033[0m")
-+            check_context.print_tree(check_context.translation_unit.cursor)
-+
-+            sys.exit(3)
-+
-+
- # ---------------------------------------------------------------------------- #
- # Utilities
- 
-diff --git a/static_analyzer/__init__.py b/static_analyzer/__init__.py
-index e6ca48d714..36028724b1 100644
---- a/static_analyzer/__init__.py
-+++ b/static_analyzer/__init__.py
-@@ -3,16 +3,20 @@
- from ctypes import CFUNCTYPE, c_int, py_object
- from dataclasses import dataclass
- from enum import Enum
-+import inspect
- import os
- import os.path
- from pathlib import Path
- from importlib import import_module
-+import textwrap
- from typing import (
-     Any,
-     Callable,
-     Dict,
-+    Iterable,
-     List,
-     Optional,
-+    Sequence,
-     Union,
- )
- 
-@@ -218,18 +222,49 @@ def print_tree(
- 
- Checker = Callable[[CheckContext], None]
- 
--CHECKS: Dict[str, Checker] = {}
-+
-+class CheckTestGroup:
-+
-+    inputs: Sequence[str]
-+    expected_output: str
-+
-+    location: str
-+
-+    def __init__(self, inputs: Iterable[str], expected_output: str) -> None:
-+        def reformat_string(s: str) -> str:
-+            return "".join(
-+                line + "\n" for line in textwrap.dedent(s).strip().splitlines()
-+            )
-+
-+        self.inputs = [reformat_string(input) for input in inputs]
-+        self.expected_output = reformat_string(expected_output)
-+
-+        caller = inspect.stack()[1]
-+        self.location = f"{os.path.relpath(caller.filename)}:{caller.lineno}"
++# Analysis log
 +
 +
 +@dataclass
-+class Check:
-+    checker: Checker
-+    test_groups: List[CheckTestGroup]
++class AnalysisLog:
 +
++    build_dir: Path
++    deps_by_object_file: Mapping[str, FrozenSet[str]]
++    last_analysis: Dict[str, Dict[str, float]]
 +
-+CHECKS: Dict[str, Check] = {}
- 
- 
- def check(name: str) -> Callable[[Checker], Checker]:
-     def decorator(checker: Checker) -> Checker:
-         assert name not in CHECKS
--        CHECKS[name] = checker
-+        CHECKS[name] = Check(checker=checker, test_groups=[])
-         return checker
- 
-     return decorator
- 
- 
-+def add_check_tests(check_name: str, *groups: CheckTestGroup) -> None:
-+    CHECKS[check_name].test_groups.extend(groups)
++    @classmethod
++    def load(cls, build_dir: Path) -> "AnalysisLog":
++
++        # get dependencies
++
++        result = subprocess.run(
++            ["ninja", "-C", str(build_dir), "-t", "deps"],
++            stdin=subprocess.DEVNULL,
++            stdout=subprocess.PIPE,
++            stderr=subprocess.DEVNULL,
++            universal_newlines=True,  # decode output using default encoding
++            check=True,
++        )
++
++        deps: Dict[str, FrozenSet[str]] = {}
++
++        for group in result.stdout.split("\n\n"):
++            if group:
++                [first_line, *other_lines] = group.splitlines()
++                target = first_line[: first_line.index(":")]
++                deps[target] = frozenset(dep[4:] for dep in other_lines)
++
++        # load log
++
++        try:
++            with (build_dir / "static-analyzer-log.json").open("r") as f:
++                last_analysis: Dict[str, Dict[str, float]] = json.load(f)
++        except FileNotFoundError:
++            last_analysis = {}
++
++        return AnalysisLog(
++            build_dir=build_dir,
++            deps_by_object_file=deps,
++            last_analysis=last_analysis,
++        )
++
++    def drop_up_to_date_checks(self, tr_units: List[TranslationUnit]) -> None:
++        """For each translation unit, removes checks from
++        `TranslationUnit.check_names` that are are up-to-date.
++
++        If a `TranslationUnit` ends up with no checks, it is removed from the
++        list.
++        """
++
++        # deps are output relative to build dir
++        with cwd(self.build_dir):
++
++            def f(tr_unit: TranslationUnit) -> bool:
++                tr_unit.check_names = self._outdated_checks(
++                    tr_unit.object_file, tr_unit.check_names
++                )
++                return bool(tr_unit.check_names)
++
++            tr_units[:] = list(filter(f, tr_units))
++
++    def _outdated_checks(
++        self,
++        tr_unit_object_file: str,
++        candidate_check_names: Sequence[str],
++    ) -> Sequence[str]:
++        """Working directory must be `self.build_dir`."""
++
++        deps = self.deps_by_object_file.get(tr_unit_object_file)
++
++        if deps is None:
++            # This happens when the translation unit hasn't been built. In this
++            # case, we cannot know what its dependencies are, and thus whether
++            # they have been modified, so we must play safe and run all checks.
++            return candidate_check_names
++
++        latest_dep_mtime = max(map(os.path.getmtime, deps), default=0.0)
++
++        d = self.last_analysis.get(tr_unit_object_file, {})
++
++        return [
++            check
++            for check in candidate_check_names
++            if latest_dep_mtime >= d.get(check, 0.0)
++        ]
++
++    def set_last_analysis_time(
++        self,
++        tr_unit_object_file: str,
++        check_names: Iterable[str],
++        time: float,
++    ) -> None:
++
++        d = self.last_analysis.setdefault(tr_unit_object_file, {})
++
++        for check_name in check_names:
++            d[check_name] = time
++
++    def save(self) -> None:
++
++        with (self.build_dir / "static-analyzer-log.json").open("w") as f:
++            json.dump(self.last_analysis, f, indent=2)
 +
 +
  # ---------------------------------------------------------------------------- #
- # Import all checks
- 
-diff --git a/static_analyzer/return_value_never_used.py b/static_analyzer/return_value_never_used.py
-index 05c06cd4c2..de1a6542d1 100644
---- a/static_analyzer/return_value_never_used.py
-+++ b/static_analyzer/return_value_never_used.py
-@@ -11,7 +11,9 @@
- 
- from static_analyzer import (
-     CheckContext,
-+    CheckTestGroup,
-     VisitorResult,
-+    add_check_tests,
-     check,
-     might_have_attribute,
-     visit,
-@@ -115,3 +117,104 @@ def get_parent_if_unexposed_expr(node: Cursor) -> Cursor:
+ # Analysis
  
  
- # ---------------------------------------------------------------------------- #
+-def analyze_translation_unit(tr_unit: TranslationUnit) -> bool:
++@dataclass
++class AnalysisResults:
++    tr_unit_object_file: str
++    passed_check_names: Sequence[str]
++    problems_found: bool
 +
-+add_check_tests(
-+    "return-value-never-used",
-+    CheckTestGroup(
-+        inputs=[
-+            R"""
-+                static void f(void) { }
-+                """,
-+            R"""
-+                static __attribute__((unused)) int f(void) { }
-+                """,
-+            R"""
-+                #define ATTR __attribute__((unused))
-+                static __attribute__((unused)) int f(void) { }
-+                """,
-+            R"""
-+                #define FUNC static __attribute__((unused)) int f(void) { }
-+                FUNC
-+                """,
-+            R"""
-+                static __attribute__((unused, constructor)) int f(void) { }
-+                """,
-+            R"""
-+                static __attribute__((constructor, unused)) int f(void) { }
-+                """,
-+            R"""
-+                static int f(void) { return 42; }
-+                static void g(void) {
-+                    int x = f();
-+                }
-+                """,
-+            R"""
-+                static int f(void) { return 42; }
-+                static void g(void) {
-+                    for (0; f(); 0) { }
-+                }
-+                """,
-+            R"""
-+                static int f(void) { return 42; }
-+                static void g(void) {
-+                    for (f(); ; ) { }
-+                }
-+                """,
-+            R"""
-+                static int f(void) { return 42; }
-+                static void g(void) {
-+                    for ( ; f(); ) { }
-+                }
-+                """,
-+            R"""
-+                static int f(void) { return 42; }
-+                static void g(void) {
-+                    for ( ; ; f()) { }
-+                }
-+                """,
-+            R"""
-+                static int f(void) { return 42; }
-+                static void g(void) {
-+                    int (*ptr)(void) = 0;
-+                    __atomic_store_n(&ptr, f, __ATOMIC_RELAXED);
-+                }
-+                """,
-+        ],
-+        expected_output=R"""
-+            """,
-+    ),
-+    CheckTestGroup(
-+        inputs=[
-+            R"""
-+                static int f(void) { return 42; }
-+                """,
-+            R"""
-+                static int f(void) { return 42; }
-+                static void g(void) {
-+                    f();
-+                }
-+                """,
-+            R"""
-+                static int f(void) { return 42; }
-+                static void g(void) {
-+                    for (f(); 0; f()) { }
-+                }
-+                """,
-+        ],
-+        expected_output=R"""
-+            file.c:1:12: f() return value is never used
-+            """,
-+    ),
-+    CheckTestGroup(
-+        inputs=[
-+            R"""
-+                static __attribute__((constructor)) int f(void) { }
-+                """,
-+        ],
-+        expected_output=R"""
-+            file.c:1:41: f() return value is never used
-+            """,
-+    ),
-+)
 +
-+# ---------------------------------------------------------------------------- #
++def analyze_translation_unit(tr_unit: TranslationUnit) -> AnalysisResults:
+ 
+     check_context = get_check_context(tr_unit)
+ 
++    had_diagnostics = check_context._problems_found
++    problems_found = check_context._problems_found
++    passed_check_names: List[str] = []
++
+     try:
++
+         for name in tr_unit.check_names:
++
++            check_context._problems_found = False
+             CHECKS[name].checker(check_context)
++
++            if not had_diagnostics and not check_context._problems_found:
++                passed_check_names.append(name)
++            else:
++                problems_found = True
++
+     except Exception as e:
+         raise RuntimeError(f"Error analyzing {check_context._rel_path}") from e
+ 
+-    return not check_context._problems_found
++    return AnalysisResults(
++        tr_unit_object_file=tr_unit.object_file,
++        passed_check_names=passed_check_names,
++        problems_found=problems_found,
++    )
+ 
+ 
+ def get_check_context(tr_unit: TranslationUnit) -> CheckContext:
+@@ -530,6 +723,7 @@ def run_test(
+             absolute_path=str(input_path),
+             build_working_dir=str(input_path.parent),
+             build_command=f"cc {shlex.quote(str(input_path))}",
++            object_file="file.o",
+             system_include_paths=[],
+             check_names=[check_name],
+             custom_printer=lambda s: actual_output_list.append(s + "\n"),
 -- 
 2.37.1
 
