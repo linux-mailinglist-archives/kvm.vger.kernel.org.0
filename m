@@ -2,68 +2,76 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id B5D985851A7
-	for <lists+kvm@lfdr.de>; Fri, 29 Jul 2022 16:37:01 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id BA0C95851B8
+	for <lists+kvm@lfdr.de>; Fri, 29 Jul 2022 16:41:30 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237134AbiG2OhA (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 29 Jul 2022 10:37:00 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43114 "EHLO
+        id S236852AbiG2Ol2 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 29 Jul 2022 10:41:28 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47216 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S236547AbiG2Og6 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 29 Jul 2022 10:36:58 -0400
-Received: from mail-pl1-x62b.google.com (mail-pl1-x62b.google.com [IPv6:2607:f8b0:4864:20::62b])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 56DF96170E
-        for <kvm@vger.kernel.org>; Fri, 29 Jul 2022 07:36:58 -0700 (PDT)
-Received: by mail-pl1-x62b.google.com with SMTP id b22so4767385plz.9
-        for <kvm@vger.kernel.org>; Fri, 29 Jul 2022 07:36:58 -0700 (PDT)
+        with ESMTP id S235375AbiG2Ol0 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 29 Jul 2022 10:41:26 -0400
+Received: from mail-pl1-x636.google.com (mail-pl1-x636.google.com [IPv6:2607:f8b0:4864:20::636])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 98F5FD69
+        for <kvm@vger.kernel.org>; Fri, 29 Jul 2022 07:41:25 -0700 (PDT)
+Received: by mail-pl1-x636.google.com with SMTP id v18so4773614plo.8
+        for <kvm@vger.kernel.org>; Fri, 29 Jul 2022 07:41:25 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:from:to:cc;
-        bh=UJxEn4xcgj+ln1eSjZjkxrNWHJwcAg9c38FMYxFrEw4=;
-        b=Llt63vfhKnScgYaIaDCdE5iR4zO0UBwA/DKPfMke+neC1JBL32YFpgFFV6xl2YIt6D
-         fcm6DBwAKxLX6EHNmh78ZMFx80I4GGfFe6JJfDxhfXVO1c6tddbnv/YXhxcpuIX8/0D4
-         4/bcakY3kMtTIC/8ODy7RFKEIVohnCm6z365lHubhmi8qtrmfvqhHcM7diC782mNi+1R
-         gqQ9f7XWkn4RtPUTmWQ7/S+cqhpANz+vlws6uZvuZuv++UlGNRji5n8r13chEsgBU+uW
-         MGyZFis7lIMbVuQEusYNn/C2MSgNClRD3tZfS/vGTndVQqch3mYm9u/a8sPDAWoXIb5R
-         OzCw==
+        bh=l6vl6ca73afFDe1dwkZCvYaT2HbaszVLHWeIgM0p68Q=;
+        b=DGnbOED8lHCv9LKFZzoznPEAMqQykB8lamD3rHMLRweCz609+UyPI8tVXZ17ZvA3B6
+         9YfSbQWrwRCcUCgg0uxXYFkBZLyEPIkzBJo5xl7S0ir2fu37zg+sqUndtw9Ba8FKYJm/
+         bT1xp4d/7ffTswlbmEw6zuOCGf5JVzlF11J+k6Fw0CrqMuu6aHVrqxmZu/yZBQ8VFkE1
+         9k3yKvif/D7bohRnpGFp8GQ9+lVa/kbi1D+eFKHzJ8ObBJ437+RXe5a+b4lYdgOKJNP1
+         h6ABub5bOJUu9ke5+xL4zkjlJoSvEBSOaCJ3f2w6fhNWgBve5NFeAaxN6Pasf/Iuxk0U
+         5+YA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:x-gm-message-state:from:to:cc;
-        bh=UJxEn4xcgj+ln1eSjZjkxrNWHJwcAg9c38FMYxFrEw4=;
-        b=yHB8cfZyImLi1t8qrAVpFMRgsxjy+4Ue01M6MtDQgZj6meQ8mwo0Dy690/xon6Qe9D
-         eVhzLkbIrQy6FBacTkEq6ZJ3Br4nAcFJbifNUisWZu7xOXluPnPBZEI3L5LiiVad0Xi3
-         xDNvZWbghN/A+zrKRV0da+PLIOOvztaonMK25XncwvHmC1aZi8FyfzMO4KDY8jVIcVND
-         vJEyRQBwQF6d3fgp9LSYH3BFvkETcqOnaTEPatTFlm22RdX1swx9gapjb/pY4wwp5Kng
-         Wtcao6xJrNOWbHXNEHiBxuzdgB3ge/o4m+gnD69FUHnXXiQnUvK3gYKdALjf44CtByL7
-         tIWw==
-X-Gm-Message-State: ACgBeo3zRHp33ciYaCL91X4r7j7/PM2z0Txcbs7IxYyDrkINwNSNSY8K
-        Ha5NUuRBcSfRKjIK5CoFszn7tg==
-X-Google-Smtp-Source: AA6agR7gPHWxKhEhDN6n0RS6tuTj1B2aPWI4qV0F7CLKQBg9Ed4eMDHx1ydx99D+k633KKy23icx0A==
-X-Received: by 2002:a17:902:f80f:b0:16d:c4af:88aa with SMTP id ix15-20020a170902f80f00b0016dc4af88aamr4254559plb.6.1659105417682;
-        Fri, 29 Jul 2022 07:36:57 -0700 (PDT)
+        bh=l6vl6ca73afFDe1dwkZCvYaT2HbaszVLHWeIgM0p68Q=;
+        b=yR1FjD/WlgZlA16YKnpFpPJjbBvgDQM/pmHvf5dDyvR1EJNNlCH52DZfFv+au2OMHu
+         E1EmUDdre8VKJJFJRRTe5Dhf/oKWWX7ie/7+Vrln370maBr/HoZAkEizDaA318JqIXXv
+         usn/DAbRohuOUj84+zW0vQUd4m6Kzed4L+ho9MfF9HyhFM/8OIN+x5C48s4R7Sy3WANp
+         ZRfLzNitEy9JfVxgbDUT2hrvjguZ5bdQ5jnQhWvgECeub181SBoq8tWpjRDIkuWaFh2H
+         Ux+8sHXhcqsdgD7bofjMOAa4GRv6swswYnoNJnHEGlQwFl+7sqhGe2RZycLqTnbtTccX
+         jWig==
+X-Gm-Message-State: ACgBeo3xjIQEhWca/1wEgHb4/4qE1u0qT6+dMfbzF7fNAE7l1ziFlpgM
+        74M02jRIZvBsDYNX4VSDpdBo7w==
+X-Google-Smtp-Source: AA6agR4X7fAFXTDw6OjZ5xRKI0Lw6Or/jMev9hgZVz//3MiEjIpKJ8O97KNwiTbXNAAu8OJZrokubQ==
+X-Received: by 2002:a17:90b:1d8f:b0:1f0:270a:b556 with SMTP id pf15-20020a17090b1d8f00b001f0270ab556mr4557647pjb.192.1659105684880;
+        Fri, 29 Jul 2022 07:41:24 -0700 (PDT)
 Received: from google.com (7.104.168.34.bc.googleusercontent.com. [34.168.104.7])
-        by smtp.gmail.com with ESMTPSA id g18-20020a170902869200b0016cdbb22c28sm3700309plo.0.2022.07.29.07.36.56
+        by smtp.gmail.com with ESMTPSA id l1-20020a170902ec0100b0016d338160d6sm3651019pld.155.2022.07.29.07.41.24
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 29 Jul 2022 07:36:57 -0700 (PDT)
-Date:   Fri, 29 Jul 2022 14:36:53 +0000
+        Fri, 29 Jul 2022 07:41:24 -0700 (PDT)
+Date:   Fri, 29 Jul 2022 14:41:20 +0000
 From:   Sean Christopherson <seanjc@google.com>
-To:     Junaid Shahid <junaids@google.com>
-Cc:     kvm@vger.kernel.org, pbonzini@redhat.com, dmatlack@google.com,
-        jmattson@google.com
-Subject: Re: [PATCH] kvm: x86: Do proper cleanup if kvm_x86_ops->vm_init()
- fails
-Message-ID: <YuPwhWi1xWgAwmK4@google.com>
-References: <20220729031108.3929138-1-junaids@google.com>
+To:     "Shukla, Santosh" <santosh.shukla@amd.com>
+Cc:     Paolo Bonzini <pbonzini@redhat.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>,
+        Maxim Levitsky <mlevitsk@redhat.com>,
+        Tom Lendacky <thomas.lendacky@amd.com>, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+Subject: Re: [PATCHv2 4/7] KVM: SVM: Report NMI not allowed when Guest busy
+ handling VNMI
+Message-ID: <YuPxkMW2aZxrw57n@google.com>
+References: <20220709134230.2397-1-santosh.shukla@amd.com>
+ <20220709134230.2397-5-santosh.shukla@amd.com>
+ <Yth5hl+RlTaa5ybj@google.com>
+ <20c2142a-ec88-02cf-01f2-cf7f8dfcef77@amd.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20220729031108.3929138-1-junaids@google.com>
+In-Reply-To: <20c2142a-ec88-02cf-01f2-cf7f8dfcef77@amd.com>
 X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
         ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-        USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=ham
+        USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=unavailable
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -71,89 +79,56 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Jul 28, 2022, Junaid Shahid wrote:
-> If vm_init() fails [which can happen, for instance, if a memory
-> allocation fails during avic_vm_init()], we need to cleanup some
-> state in order to avoid resource leaks.
+On Fri, Jul 29, 2022, Shukla, Santosh wrote:
+> Hello Sean,
 > 
-> Signed-off-by: Junaid Shahid <junaids@google.com>
-> ---
->  arch/x86/kvm/x86.c | 8 +++++++-
->  1 file changed, 7 insertions(+), 1 deletion(-)
+> On 7/21/2022 3:24 AM, Sean Christopherson wrote:
+> > On Sat, Jul 09, 2022, Santosh Shukla wrote:
+
+...
+
+> >> @@ -3609,6 +3612,9 @@ static void svm_enable_nmi_window(struct kvm_vcpu *vcpu)
+> >>  {
+> >>  	struct vcpu_svm *svm = to_svm(vcpu);
+> >>  
+> >> +	if (is_vnmi_enabled(svm))
+> >> +		return;
+> > 
+> > Ugh, is there really no way to trigger an exit when NMIs become unmasked?  Because
+> > if there isn't, this is broken for KVM.
+> > 
 > 
-> diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-> index f389691d8c04..ef5fd2f05c79 100644
-> --- a/arch/x86/kvm/x86.c
-> +++ b/arch/x86/kvm/x86.c
-> @@ -12064,8 +12064,14 @@ int kvm_arch_init_vm(struct kvm *kvm, unsigned long type)
->  	kvm_hv_init_vm(kvm);
->  	kvm_xen_init_vm(kvm);
->  
-> -	return static_call(kvm_x86_vm_init)(kvm);
-> +	ret = static_call(kvm_x86_vm_init)(kvm);
-> +	if (ret)
-> +		goto out_uninit_mmu;
->  
-> +	return 0;
-> +
-> +out_uninit_mmu:
-> +	kvm_mmu_uninit_vm(kvm);
+> Yes. there is.
+> 
+> NMI_INTERCEPT will trigger VMEXIT when second NMI arrives while guest is busy handling first NMI.
 
-Hrm, this works for now (I think), but I really don't like that kvm_apicv_init(),
-kvm_hv_init_vm(), and kvm_xen_init_vm() all do something without that something
-being unwound on failure.  E.g. both Hyper-V and Xen have a paired "destroy"
-function, it just so happens that their destroy paths are guaranteed nops in this
-case.
+But NMI_INTERCEPT only applies to "real" NMIs.  The scenario laid out below is where
+KVM wants to inject a virtual NMI without an associated hardware/real NMI, e.g. if
+multiple vCPUs send NMI IPIs to the target.
 
-AFAICT, there are no dependencies on doing vendor init at the end, so what if we
-hoist it up so that all paths that can fail are at the top?
-
-diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-index 5366f884e9a7..7e749be356b2 100644
---- a/arch/x86/kvm/x86.c
-+++ b/arch/x86/kvm/x86.c
-@@ -12042,6 +12042,10 @@ int kvm_arch_init_vm(struct kvm *kvm, unsigned long type)
-        if (ret)
-                goto out_page_track;
- 
-+       ret = static_call(kvm_x86_vm_init)(kvm);
-+       if (ret)
-+               goto out_uninit_mmu;
-+
-        INIT_HLIST_HEAD(&kvm->arch.mask_notifier_list);
-        INIT_LIST_HEAD(&kvm->arch.assigned_dev_head);
-        atomic_set(&kvm->arch.noncoherent_dma_count, 0);
-@@ -12077,8 +12081,10 @@ int kvm_arch_init_vm(struct kvm *kvm, unsigned long type)
-        kvm_hv_init_vm(kvm);
-        kvm_xen_init_vm(kvm);
- 
--       return static_call(kvm_x86_vm_init)(kvm);
-+       return 0;
- 
-+out_uninit_mmu:
-+       kvm_mmu_uninit_vm(kvm);
- out_page_track:
-        kvm_page_track_cleanup(kvm);
- out:
-
-
-Calling kvm_apicv_init() after avic_vm_init() is somewhat odd.  If we really want
-to avoid that, we could add a dedicated kvm_x86_ops to initialize APICv and then
-make kvm_x86_ops.vm_init() a void return e.g.
-
-static int kvm_apicv_init(struct kvm *kvm)
-{
-	unsigned long *inhibits = &kvm->arch.apicv_inhibit_reasons;
-
-	init_rwsem(&kvm->arch.apicv_update_lock);
-
-	set_or_clear_apicv_inhibit(inhibits, APICV_INHIBIT_REASON_ABSENT, true);
-
-	if (!enable_apicv) {
-		set_or_clear_apicv_inhibit(inhibits,
-					   APICV_INHIBIT_REASON_DISABLE, true);
-		return 0;
-	}
-
-	return static_call(kvm_x86_apicv_init(kvm));
-}
+> And in that scenario, Guest will exit with V_NMI_MASK set to 1, KVM can inject pending(Second)
+> NMI(V_NMI=1). Guest will resume handling the first NMI, then HW will
+> clear the V_NMI_MASK and later HW will take the pending V_NMI in side the guest. 
+> 
+> I'll handle above case in v3.
+> 
+> Thanks,
+> Santosh
+> 
+> > On bare metal, if two NMIs arrive "simultaneously", so long as NMIs aren't blocked,
+> > the first NMI will be delivered and the second will be pended, i.e. software will
+> > see both NMIs.  And if that doesn't hold true, the window for a true collision is
+> > really, really tiny.
+> > 
+> > But in KVM, because a vCPU may not be run a long duration, that window becomes
+> > very large.  To not drop NMIs and more faithfully emulate hardware, KVM allows two
+> > NMIs to be _pending_.  And when that happens, KVM needs to trigger an exit when
+> > NMIs become unmasked _after_ the first NMI is injected.
+> > 
+> >> +
+> >>  	if ((vcpu->arch.hflags & (HF_NMI_MASK | HF_IRET_MASK)) == HF_NMI_MASK)
+> >>  		return; /* IRET will cause a vm exit */
+> >>  
+> >> -- 
+> >> 2.25.1
+> >>
