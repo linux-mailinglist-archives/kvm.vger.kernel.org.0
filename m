@@ -2,190 +2,155 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id D08CF58494E
-	for <lists+kvm@lfdr.de>; Fri, 29 Jul 2022 03:23:11 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 17930584944
+	for <lists+kvm@lfdr.de>; Fri, 29 Jul 2022 03:12:43 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233436AbiG2BW4 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 28 Jul 2022 21:22:56 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59410 "EHLO
+        id S233310AbiG2BMl (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 28 Jul 2022 21:12:41 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54026 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229535AbiG2BWy (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 28 Jul 2022 21:22:54 -0400
-Received: from mga11.intel.com (mga11.intel.com [192.55.52.93])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EE7AD17A99;
-        Thu, 28 Jul 2022 18:22:53 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1659057773; x=1690593773;
-  h=date:from:to:cc:subject:message-id:reply-to:references:
-   in-reply-to:mime-version;
-  bh=Xyb12e2ceTTrVFL2DSyXoREVy7jl9ntXHyTdW8Aax2g=;
-  b=N7nItGS0axWYAGHhqBMXcbwVHvx+4ZPiILo1vuK/QqRlszQEREJYkbt+
-   6zKbcFa2T+IworKE39V3oxXizKwwTJMX+kzA0ArtSFv8KW3NjR6DAUjLR
-   IRHcNcQv35TxUUNt6Ogf1Nj640Nw0dI6lyk64oqIcWdWoxEmXjsaHVGlE
-   RSiDvp/D/ibRAL6W4DjtLZJbgOrHJAQ1cmEA9N2uxMjqX+EULcZP9n4pZ
-   TEl2Q1HEd9vtirEq5DE+nVSkMmD6YAiU37A9UiKNG3iXsEVnGyYleLRb7
-   liWqw9OXKmjneu2O03mh5cERG1HaEwSPWyLhyFCNiyAqiI/nOGf7tykpq
-   g==;
-X-IronPort-AV: E=McAfee;i="6400,9594,10422"; a="286213300"
-X-IronPort-AV: E=Sophos;i="5.93,199,1654585200"; 
-   d="scan'208";a="286213300"
-Received: from fmsmga005.fm.intel.com ([10.253.24.32])
-  by fmsmga102.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 28 Jul 2022 18:22:53 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.93,199,1654585200"; 
-   d="scan'208";a="928555307"
-Received: from orsmsx604.amr.corp.intel.com ([10.22.229.17])
-  by fmsmga005.fm.intel.com with ESMTP; 28 Jul 2022 18:22:53 -0700
-Received: from orsmsx603.amr.corp.intel.com (10.22.229.16) by
- ORSMSX604.amr.corp.intel.com (10.22.229.17) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2375.28; Thu, 28 Jul 2022 18:22:53 -0700
-Received: from ORSEDG601.ED.cps.intel.com (10.7.248.6) by
- orsmsx603.amr.corp.intel.com (10.22.229.16) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2375.28 via Frontend Transport; Thu, 28 Jul 2022 18:22:53 -0700
-Received: from NAM10-MW2-obe.outbound.protection.outlook.com (104.47.55.101)
- by edgegateway.intel.com (134.134.137.102) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2375.28; Thu, 28 Jul 2022 18:22:52 -0700
+        with ESMTP id S229535AbiG2BMk (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 28 Jul 2022 21:12:40 -0400
+Received: from NAM12-DM6-obe.outbound.protection.outlook.com (mail-dm6nam12on2089.outbound.protection.outlook.com [40.107.243.89])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B4CFC17064;
+        Thu, 28 Jul 2022 18:12:38 -0700 (PDT)
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=DLE5dCaeWeFGVUGngXUdXBFQvOz1NPzzZiGwWo+xIj8XylrcAwTYgeo6Sd7wcAiEr4wnoZ5iyed4r0IZW3XqEZFzaEcmS0q5fYif+wlMvY73+1cJaiJjYrcR3inX2Sta5BAFXp/Ot0jxMnLXytI/zWXlKs2ehKFXCEdlAPe2BMgXSUIFipyJjC/qbw5QnrsmheUuftfixbYn92U0g2UwMixs0WxSVvrmP9NYCs6/3mR/FLJJGwVbd0D1uxAIjYQ578yK+UM9a/+6bsSqE4l5CZ9YM3r4KmIxvnfHZt5yDI1AYR0seNlVUHfpiuHSAbCTA3iQAa1FPr5LqyFBg7z9Dw==
+ b=MsuRUypriGbhY8eFfCyx/zMPErRkVQji5x6v9u5COv7RXdnpCjffdnf4rqDelnTDSVbCbN5ipSXmMDJtty8spS+Vydw92FbppcP+RNr9YRLeveDCFSumndxbKWdrKpIDefeWodwr+duNL1CukLmfB+XBPV01qLopUmfpv3hQ6KlKR9xGi4XCa7thqlDQCS2NT/7tElf+Ln1hHsnRTndfcNYeRyp9/eekULCFFArPDEM9olslqftrQZeelakUvP4r6qmLKunHabf5dtJfCHExfupVJaAiw5szQ8YyBfn+vNc0L087uNTHRyo43bUyyIvZ2oaqYIbOKPmrDuliYCj9dQ==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=H1oVDr9RuDDxCIVNl1o4E5c5uVp9+cr4jI21/ZoOw/w=;
- b=SL6H3O6Mbwj+gRGZ0zqqeTjjYyLXd3POyWvDLFoPR3VV5K/Myds35ogqO79yxJGTGy75sfDNasAhqmqepdBMUV+Ow50r7qXCPhYTGPrumhQYsDr2EtHrVrTMXKt7ptVkv6aVuT0jGWzKBJ2RnGavPo5PV89ivWIpf1jz55TGn4iV391QvIa3Brm7HedjmOu4rYwCxnMHNxP/FKj9t/mP+Hv42qL7XdP13lGKE6UY2zwh6xqXzhKrweJ3GCFxrcnCSbSR+epWw2FeDcWCd36Jj8F8C5MfNuVoRLSRw8gH/XvnClLxtINJN9738kWhk+2p7ozTJDSCJyQhLEGMxeeuog==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=intel.com;
-Received: from DS7PR11MB5966.namprd11.prod.outlook.com (2603:10b6:8:71::6) by
- BL0PR11MB3521.namprd11.prod.outlook.com (2603:10b6:208:7b::32) with Microsoft
+ bh=ozwOIchTLTJBxc1bbIfDkOrwJ07Hj7JmmoLGUiA8n1M=;
+ b=L22MZGn/6GFa527qakAwPvAGV72fUAmLlpAin72n80YLj+KO5vzGLlxaw9PRBw8J50KQakBSb0j/ZfDY2Gs5mkq/VLTGafeA5m4gmVuoX9e9kTsxvNXun6A0iLbrVQjlquKfcW+a3xa808VjDiNElqiYZPRQ8f7wuUc7fL6CObu4o5uhE2HWJon92hgoQcmn8/wxA8cVxRvk6UidIGTUpL43xmF3z1T92Ig3zhvdRGe011Z0ZDyz0onTweTqokfQzshcZHvFyC6BU2xAVhZi1Z4q6C9j0Q2w2o7DcqgbzYcPlSUgtZN5mA5EKFI8Ln2SN0//Uo5tzUqd2Cg+sUh5Wg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
+ 165.204.84.17) smtp.rcpttodomain=google.com smtp.mailfrom=amd.com; dmarc=pass
+ (p=quarantine sp=quarantine pct=100) action=none header.from=amd.com;
+ dkim=none (message not signed); arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=ozwOIchTLTJBxc1bbIfDkOrwJ07Hj7JmmoLGUiA8n1M=;
+ b=xvy05IxzWVMcmZja/hGzvW80hlJIQvFunsw1EnTn+Uty2Gl74NhQGjhrjCOPSQip4yQZUKIPMSWMSiwZVzyXkZyTlVItxCwZSJCm/4oetef4YXFVKQvDY3RqEtBG7nWG3EuCEh5Hda1e8XiTZt82PgL0gcpLMSmfGzmD9kyvaSY=
+Received: from DS7PR05CA0078.namprd05.prod.outlook.com (2603:10b6:8:57::24) by
+ DM5PR12MB1675.namprd12.prod.outlook.com (2603:10b6:4:5::21) with Microsoft
  SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.5458.20; Fri, 29 Jul 2022 01:22:51 +0000
-Received: from DS7PR11MB5966.namprd11.prod.outlook.com
- ([fe80::74e8:3af5:24cb:4545]) by DS7PR11MB5966.namprd11.prod.outlook.com
- ([fe80::74e8:3af5:24cb:4545%7]) with mapi id 15.20.5482.006; Fri, 29 Jul 2022
- 01:22:51 +0000
-Date:   Fri, 29 Jul 2022 09:02:51 +0800
-From:   Yan Zhao <yan.y.zhao@intel.com>
+ 15.20.5458.19; Fri, 29 Jul 2022 01:12:36 +0000
+Received: from DM6NAM11FT041.eop-nam11.prod.protection.outlook.com
+ (2603:10b6:8:57:cafe::f9) by DS7PR05CA0078.outlook.office365.com
+ (2603:10b6:8:57::24) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5504.4 via Frontend
+ Transport; Fri, 29 Jul 2022 01:12:36 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 165.204.84.17)
+ smtp.mailfrom=amd.com; dkim=none (message not signed)
+ header.d=none;dmarc=pass action=none header.from=amd.com;
+Received-SPF: Pass (protection.outlook.com: domain of amd.com designates
+ 165.204.84.17 as permitted sender) receiver=protection.outlook.com;
+ client-ip=165.204.84.17; helo=SATLEXMB04.amd.com; pr=C
+Received: from SATLEXMB04.amd.com (165.204.84.17) by
+ DM6NAM11FT041.mail.protection.outlook.com (10.13.172.98) with Microsoft SMTP
+ Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.20.5482.10 via Frontend Transport; Fri, 29 Jul 2022 01:12:36 +0000
+Received: from localhost (10.180.168.240) by SATLEXMB04.amd.com
+ (10.181.40.145) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2375.28; Thu, 28 Jul
+ 2022 20:12:20 -0500
+Date:   Thu, 28 Jul 2022 20:09:24 -0500
+From:   Michael Roth <michael.roth@amd.com>
 To:     Sean Christopherson <seanjc@google.com>
 CC:     Paolo Bonzini <pbonzini@redhat.com>, <kvm@vger.kernel.org>,
         <linux-kernel@vger.kernel.org>,
-        Yosry Ahmed <yosryahmed@google.com>,
-        "Mingwei Zhang" <mizhang@google.com>,
-        Ben Gardon <bgardon@google.com>
-Subject: Re: [PATCH v2 4/6] KVM: x86/mmu: Track the number of TDP MMU pages,
- but not the actual pages
-Message-ID: <YuMxuxgFpQdpmBBN@yzhao56-desk.sh.intel.com>
-Reply-To: Yan Zhao <yan.y.zhao@intel.com>
-References: <20220723012325.1715714-1-seanjc@google.com>
- <20220723012325.1715714-5-seanjc@google.com>
- <YuCl48wyA1XkqMan@yzhao56-desk.sh.intel.com>
- <YuGMQ/JJjuWxaUSu@google.com>
+        Tom Lendacky <thomas.lendacky@amd.com>
+Subject: Re: [PATCH 0/4] KVM: x86/mmu: MMIO caching bug fixes
+Message-ID: <20220729010924.zatnwgprojuqspna@amd.com>
+References: <20220728221759.3492539-1-seanjc@google.com>
+MIME-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Disposition: inline
-In-Reply-To: <YuGMQ/JJjuWxaUSu@google.com>
-X-ClientProxiedBy: SG2PR06CA0184.apcprd06.prod.outlook.com (2603:1096:4:1::16)
- To DS7PR11MB5966.namprd11.prod.outlook.com (2603:10b6:8:71::6)
-MIME-Version: 1.0
+In-Reply-To: <20220728221759.3492539-1-seanjc@google.com>
+X-Originating-IP: [10.180.168.240]
+X-ClientProxiedBy: SATLEXMB04.amd.com (10.181.40.145) To SATLEXMB04.amd.com
+ (10.181.40.145)
+X-EOPAttributedMessage: 0
 X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: 6e867979-9387-4b08-24e8-08da7100da80
-X-MS-TrafficTypeDiagnostic: BL0PR11MB3521:EE_
-X-LD-Processed: 46c98d88-e344-4ed4-8496-4ed7712e255d,ExtAddr
+X-MS-Office365-Filtering-Correlation-Id: 7f342b6d-6e6b-4d73-6f7a-08da70ff6c79
+X-MS-TrafficTypeDiagnostic: DM5PR12MB1675:EE_
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: IDuL6ieJEVfv4feQ4tefBL5LYRbNNpM74vDvxwAOh8lguZxbb5H0BCh9soVer+L49Bzsv1wG4zktD9Gp5oPxATkr3b++q8TkwFRZIdMFoi71BIetBBH7BcQixAF+Lzwzs+V9fBwFsbVuUgJlHdcMjSf+hc/jqCT4UkBGahvVZxhX/DzBE+b0c8RMjy1x0OX2hXBSxMGbwMHrdaOobnpklVUc/L4g/8KCJoKebyT7ABPKggUsq0+XIWXXxHMeFzV4ekVGCG5a6z+5Dd8URF/Zed2eD4Y++C45kCdLU6gCrbjDKxu+EvIFwT/r761MJUT+J5a6tt4DDrS43X48xBX+FmVvdB8CdMPQXKsM2VM8HSmsoftyxL6Hw+Uo1BZCMzH5anOFfxWMCpIIgIywuS9uHvvqIO49YAcW7x+Xozmya6p/rkWWaDhQfjYGJGcZLe+I5maWNqnOTIFpG9e4vt1n/130i4a/7zG3UE9RTPayfI3Jkn0T6e0ymdDx5lkWOYdIOoPzYHjJtyqcqINaI3NMPVdmOh/topBGb9ZkVCsrbEDWb4KuymYGU4xd8sttb04sepZv+MXBz6NvH5R3cu0AQtBw2spo+iIDv95kibOd2MepqzsesilHnLZeOLnRFJqWKCoK5kghII0a1fGIq/ndLVuV0WMZaoH6YK3yof2mRvgxO5cnmx2OoCfHFCE4ewmyHCcaUW5bdXYjng7XFGhpHa3gni1uf4LI7Uq2H+xQNKE=
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DS7PR11MB5966.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230016)(136003)(366004)(346002)(396003)(39860400002)(376002)(5660300002)(6512007)(82960400001)(38100700002)(41300700001)(186003)(83380400001)(86362001)(66946007)(54906003)(4326008)(66476007)(6916009)(8936002)(6486002)(6506007)(3450700001)(2906002)(8676002)(66556008)(26005)(478600001)(316002);DIR:OUT;SFP:1102;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?x5x8s4qBWEH+zcQO+K1Vjwz/hW9ettyKUxBg7qP1Jhi+OjEyGjpkTLZZFa3F?=
- =?us-ascii?Q?u/tUECVWXb2IXd4dT+4qY1pRN18/ejkVrOEjkeIj8ktRwPTohvGpzHvWU/x4?=
- =?us-ascii?Q?0DF12sgWBo0q6i5DwopJaeANQuiuHzWSToJveeroabTwY2Q+4TzMCIVXXSqx?=
- =?us-ascii?Q?C1TDOEWIbNbZLJGY7Cepi/rr8wblNG5fL9ym8ly9luhaQhZhEgkd359NeHQ7?=
- =?us-ascii?Q?dhw61vBTnOhQ4CtLlOwkOURCdG6ORnpV/4zNre2ySCcGqm5kQHCkaNRVfaqQ?=
- =?us-ascii?Q?ZJBSdrV6HJFL7G3IuTuei1AgeAnk8429+oK0/+gaGe+Tx89rZ8jCE8+ml6Ht?=
- =?us-ascii?Q?MWef3azb5iR6epn3lsmHtolC9qYO3fXY40xeFNtGRAo9aLxAWr4MaVQ197lm?=
- =?us-ascii?Q?/DLhyTHN2qoikHMQbmqKCMtsSrORjC5N+Oz8tShyfLUbMc0WVqE+hIpOeFCk?=
- =?us-ascii?Q?rxaxkQP3sIvv2Biy3Nh4NgF46BHQsjV8TpEdn/HKqUP/pXDPMbnJBiCbBWKZ?=
- =?us-ascii?Q?tr8EuFbRQe+I1Wp7xxoZcI6NxlQR0JIEWRGmUps8XP4lRZpT70/ictmcXWq8?=
- =?us-ascii?Q?ZuazsrgrHGLTHHbJkVlyQPcsOaqdvfiGWTZ5+ySuC8YFo2vkNsfH3T9nfs/q?=
- =?us-ascii?Q?rKJTvkoDbSO0HjqtzMTZR7iFpFzOWDTlifI1OcyaeTSev3xQADN1jpuP7xJ8?=
- =?us-ascii?Q?PHNzmj/3TvFd3eJzxQvaiU/KfCgpwr8uBwpPyXOD+nGL/qbrIXR8ogEgKVJQ?=
- =?us-ascii?Q?l0KeewaU5vQCMKAUpkek0yhejCWwa58sJl079FHzysMraluprz2nsQsVe92V?=
- =?us-ascii?Q?GcFqJQI5nn+XaqG0fmoC93pUgzbKMOkOIWZvKWYqGw0uC1IVWBy+GpJ4vYNg?=
- =?us-ascii?Q?kQ0KNFDCITcWXGx1WbQqfm87uBrmD9z7iXfTkOeQzCtGr+apOliEez9ul5Ge?=
- =?us-ascii?Q?jfg+PaK4j2IvoXFTX1TdkvCn7aW2PfL5Fg+8VuM9YzZpenSarqpsa1DSlWsr?=
- =?us-ascii?Q?b1KH02UehTi4XP6yq0TUc3rNtoMgYEDoeYnVimpaqJpKqVZuZCiKKkraI36e?=
- =?us-ascii?Q?kYIJtuIsVZAMfMV1uC7MzL/oE5AmtxvS6063riZ7qKrhqmmtC9UNraWNtyWK?=
- =?us-ascii?Q?S2Pmeb9kz/JK4NqJcauUDJPegbzhiAW/1W2ix5FB/1CyUcOh4yjwZxlMPsEZ?=
- =?us-ascii?Q?ubN5nmKlbvyaiV4ibMRy10nVaQuxZFWhsJXAZ/8pXEvS6YeMj25gtLMvfN28?=
- =?us-ascii?Q?WikQuKzoXKCl+b7YdmH+MH899axsXl2C+0SzkPun6Z/x3WL9D7DI+3X8Hnbf?=
- =?us-ascii?Q?nY3p8SHoS5a8AbNqVdDrDU551Q4OkBzzLIeljCycWlZwk5hx4qTIzXX238Gq?=
- =?us-ascii?Q?LpxyS2motjYXL4shz/tl2upPJpLe3xTXOmAklgLrE3aQSRrNrdY0lfDUwEPo?=
- =?us-ascii?Q?MF3FaGkeUw8Pk8uF/bidTCODj47S4pHN9sVJnYNShRjNJNqwASBNgOJqs980?=
- =?us-ascii?Q?Sj8QQmiaOYzfw9G1AaCFU/lt/qBmQQygbLqFIE2+uSpUwcapWqbZg8sq39lL?=
- =?us-ascii?Q?P/GvBrvRAjGPwWC+j7IgQNmXZFxsMGLeRn77VB4D?=
-X-MS-Exchange-CrossTenant-Network-Message-Id: 6e867979-9387-4b08-24e8-08da7100da80
-X-MS-Exchange-CrossTenant-AuthSource: DS7PR11MB5966.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 29 Jul 2022 01:22:50.8928
+X-Microsoft-Antispam-Message-Info: WC5J3SyqeFtY3ZCYVJM6C499fSmOz6VH/c9kSEofrSDyP5XjbzSS0yEit2NxoCYtd+Iaxhpj1iK+sSeBsmMETk4OTcr2E5A7iqAk+zHDr5pSnh2pxTQhS6gVt/cQC6yHTLDRvILubpbIBddjubXaCZmbaWyN12EhCKxUq1SoGV+T+/UHFEKLdzf1EX7tJnREwlAvfAi4FPWP8gfWH9qtFuZLa7zdMfbGhep8QsMJv++Ch+CilmQQ7XdCrhcWmJZwAGlMtdaM1iLQHapUElg+9ERP/zo0xIXAd6ICKcyJgFdQjemi6PZskBqRYVaiB173eXwVcrR2hdUaWjObCDm892vWaW+Kfs43KSU2RTTWKso35jUuRKrgh3VlOhYL8OLV129ifKUgdusm2/jzNuFFYYyMtv6DlRF5SK1Fka5ydYWgwzg1zpgofY+30Rre04l7cmFR81epCk2YQmq1mTzpVMguvCcIf0yZap0O4fagClkAiqXRqsACJmWu+key9XynNeBSTjQVn5jNNZ46qrnNYIpGhftiT+LUIrRg7oCFL1kX+fgE1XRz6AT7vSROLyyXamYOZVIG+XFf8Pt15/zgZ2Ix5LjXWXoz8mLnfqhwoSynbo16GijN3TNNBo/VfofMeIBd+Ju4Ag7MkQT2+sdbK5GFhIcxESAANlSnTXVVt4QCGTAeLYfE0cFr79LAywh9g+pEePNMa7YQTffpkJETEX3KqyedVWQ7XqlK2TxLfWsWdq+R93LXkb5F871UnYLNrpsVH+I75XDKxLppHAxRVpOcdqNbq2PRwLR9QOothU60Vi0Pm50o8cfrMTfzW0XIepscZRQuTKHrsvjnhliX+A==
+X-Forefront-Antispam-Report: CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:SATLEXMB04.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230016)(4636009)(39860400002)(396003)(346002)(376002)(136003)(40470700004)(36840700001)(46966006)(36860700001)(83380400001)(54906003)(3716004)(356005)(16526019)(336012)(70586007)(2906002)(426003)(81166007)(186003)(2616005)(70206006)(47076005)(36756003)(5660300002)(82310400005)(8936002)(82740400003)(4326008)(41300700001)(478600001)(44832011)(40460700003)(8676002)(316002)(40480700001)(86362001)(26005)(1076003)(6916009)(36900700001);DIR:OUT;SFP:1101;
+X-OriginatorOrg: amd.com
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 29 Jul 2022 01:12:36.4121
  (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: IYn+NAr0F8E3dZfbpOnxkFrN/4mcFGE0Doz//htt9/ETdc4/0+Tpjs9NNulIK+Bzd1Gsnb/vcPqoTOTd6jAGhg==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: BL0PR11MB3521
-X-OriginatorOrg: intel.com
-X-Spam-Status: No, score=-7.6 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_HI,
-        SPF_HELO_NONE,SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
+X-MS-Exchange-CrossTenant-Network-Message-Id: 7f342b6d-6e6b-4d73-6f7a-08da70ff6c79
+X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=3dd8961f-e488-4e60-8e11-a82d994e183d;Ip=[165.204.84.17];Helo=[SATLEXMB04.amd.com]
+X-MS-Exchange-CrossTenant-AuthSource: DM6NAM11FT041.eop-nam11.prod.protection.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Anonymous
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM5PR12MB1675
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_PASS autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Jul 27, 2022 at 07:04:35PM +0000, Sean Christopherson wrote:
-> On Wed, Jul 27, 2022, Yan Zhao wrote:
-> > On Sat, Jul 23, 2022 at 01:23:23AM +0000, Sean Christopherson wrote:
-> > 
-> > <snip>
-> > 
-> > > @@ -386,16 +385,18 @@ static void handle_changed_spte_dirty_log(struct kvm *kvm, int as_id, gfn_t gfn,
-> > >  static void tdp_mmu_unlink_sp(struct kvm *kvm, struct kvm_mmu_page *sp,
-> > >  			      bool shared)
-> > >  {
-> > > +	atomic64_dec(&kvm->arch.tdp_mmu_pages);
-> > > +
-> > > +	if (!sp->nx_huge_page_disallowed)
-> > > +		return;
-> > > +
-> > Does this read of sp->nx_huge_page_disallowed also need to be protected by
-> > tdp_mmu_pages_lock in shared path?
+On Thu, Jul 28, 2022 at 10:17:55PM +0000, Sean Christopherson wrote:
+> Fix two bugs I introduced when adding the enable_mmio_caching module param.
 > 
+> Bug #1 is that KVM unintentionally makes disabling caching due to a config
+> incompatibility "sticky", e.g. disabling caching because there are no
+> reserved PA bits prevents KVM from enabling when "switching" to an EPT
+> config (doesn't rely on PA bits) or when SVM adjusts the MMIO masks to
+> account for C-bit shenanigans (even if MAXPHYADDR=52 and C-bit=51, there
+> can be reserved PA bits due to the "real" MAXPHYADDR being reduced).
 > 
-> No, because only one CPU can call tdp_mmu_unlink_sp() for a shadow page.  E.g. in
-> a shared walk, the SPTE is zapped atomically and only the CPU that "wins" gets to
-> unlink the s[.  The extra lock is needed to prevent list corruption, but the
-> sp itself is thread safe.
+> Bug #2 is that KVM doesn't explicitly check that MMIO caching is enabled
+> when doing SEV-ES setup.  Prior to the module param, MMIO caching was
+> guaranteed when SEV-ES could be enabled as SEV-ES-capable CPUs effectively
+> guarantee there will be at least one reserved PA bit (see above).  With
+> the module param, userspace can explicitly disable MMIO caching, thus
+> silently breaking SEV-ES.
 > 
-> FWIW, even if that guarantee didn't hold, checking the flag outside of tdp_mmu_pages_lock
-> is safe because false positives are ok.  untrack_possible_nx_huge_page() checks that
-> the shadow page is actually on the list, i.e. it's a nop if a different task unlinks
-> the page first.
-> 
-> False negatives need to be avoided, but nx_huge_page_disallowed is cleared only
-> when untrack_possible_nx_huge_page() is guaranteed to be called, i.e. true false
-> negatives can't occur.
-> 
-> Hmm, but I think there's a missing smp_rmb(), which is needed to ensure
-> nx_huge_page_disallowed is read after observing the shadow-present SPTE (that's
-> being unlinked).  I'll add that in the next version.
+> I believe I tested all combinations of things getting disabled and enabled
+> by hacking kvm_mmu_reset_all_pte_masks() to disable MMIO caching on a much
+> lower MAXPHYADDR, e.g. 43 instead of 52.  That said, definitely wait for a
+> thumbs up from the AMD folks before queueing.
 
-It makes sense. Thanks for such detailed explanation!
+I tested the below systems/configurations and everything looks good
+to me.  Thanks for the quick fix!
 
-Thanks
-Yan
+  AMD Milan, MAXPHYADDR = 48 bits, kvm.mmio_caching=on (on by default)
+  normal: pass
+  SEV:    pass
+  SEV-ES: pass
+  
+  AMD Milan, MAXPHYADDR = 48 bits, kvm.mmio_caching=off
+  normal: pass
+  SEV:    pass
+  SEV-ES: fail (as expected, since kvm_amd.sev_es gets forced to off)
+  
+  AMD unreleased, MAXPHYADDR = 52 bits, kvm.mmio_caching=on (on by default)
+  normal: pass
+  SEV:    pass
+  SEV-ES: pass
+  
+  AMD unreleased, MAXPHYADDR = 52 bits, kvm.mmio_caching=off
+  normal: pass
+  SEV:    pass
+  SEV-ES: fail (as expected, since kvm_amd.sev_es gets forced to off)
+
+> 
+> Sean Christopherson (4):
+>   KVM: x86: Tag kvm_mmu_x86_module_init() with __init
+>   KVM: x86/mmu: Fully re-evaluate MMIO caching when SPTE masks change
+>   KVM: SVM: Adjust MMIO masks (for caching) before doing SEV(-ES) setup
+>   KVM: SVM: Disable SEV-ES support if MMIO caching is disable
+
+Series:
+
+Tested-by: Michael Roth <michael.roth@amd.com>
+
+-Mike
