@@ -2,133 +2,211 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id DA979585254
-	for <lists+kvm@lfdr.de>; Fri, 29 Jul 2022 17:22:06 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 682AC585326
+	for <lists+kvm@lfdr.de>; Fri, 29 Jul 2022 18:01:53 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237594AbiG2PWD (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 29 Jul 2022 11:22:03 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49304 "EHLO
+        id S236282AbiG2QBu (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 29 Jul 2022 12:01:50 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59864 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S237350AbiG2PVq (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 29 Jul 2022 11:21:46 -0400
-Received: from mail-pj1-x1035.google.com (mail-pj1-x1035.google.com [IPv6:2607:f8b0:4864:20::1035])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BA58483229
-        for <kvm@vger.kernel.org>; Fri, 29 Jul 2022 08:21:18 -0700 (PDT)
-Received: by mail-pj1-x1035.google.com with SMTP id d65-20020a17090a6f4700b001f303a97b14so5581902pjk.1
-        for <kvm@vger.kernel.org>; Fri, 29 Jul 2022 08:21:18 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date:from:to
-         :cc;
-        bh=1ZDw/3z/X+yx550UAQFNka6PWkeDe5NYwe15kEz7pHU=;
-        b=S+gy6IATbpJggKXSY94td4m53HXiZ93LJGa015Sm+3LWLcwnar5FJjly6k+l6xCw3r
-         mpAtrAsj50f2W5wiMzdu7cvxa8bYnCIbuSTYxt5bBeU5iEJEWpy6pMdHFuqN1EmDpH6x
-         St4aQXo8iVHekOOol7nnXEftYbdcyCqs0S0uv3EBNMkFiULBJTYjIlfpNKuQtqwJStww
-         SXGfrd/XRebdR/HpE/QudgSe/l1NjiSuBFvetuHCDoWz/Fs8dmtghb4wyoBFGPdrLsox
-         Lk296FG2V/jnYxdVvW9+NcgxxmmxWC5PUTRE7clcq9qE85hJQdYU7NSW1eYeYqVswuhM
-         Y6bg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date
-         :x-gm-message-state:from:to:cc;
-        bh=1ZDw/3z/X+yx550UAQFNka6PWkeDe5NYwe15kEz7pHU=;
-        b=OoyCWySvwcMxeNBAA2CNmh8qU6vuD3Hpp6lixm63h9Uw1YwWR7X4Z3Tau40lhn+u0x
-         s5SVyAaTDpQpdeuB9QsEsfUfYyudtCtsInRhZNkBqikrTClh1wTGoPq6evxbCjrqnbFl
-         2REln8J8Ro6XVre8bRiMtjTFFOHLdstMkpmRCvXpZZqv22l52c/HeZ2bTrcNSvq75gsK
-         7M1FZ75BhI5S+opHIrN/a50dDnbGqx0Lzq/5ihTJL6lwXkd+owsr3Jl8hGn6KPsnVHdS
-         HL7j3TF//cZVGxe8EjfJTdiUOWJ0Kss07ywCAQYlb94moiuC2++jpforrakFHbBIC9Rz
-         QhKw==
-X-Gm-Message-State: ACgBeo1TQ27yffN4Jim1L1uqStgivZqSs9C9nPgewdtbIiDqywlQ1/9u
-        En/TFXZjVvtIi5HLtxKr2ELWIg==
-X-Google-Smtp-Source: AA6agR7NYs2c/zcNB15D0jIe7jgy3CA9rztzeX745HupFnJf/9qKLBj2eCo5rDYiX+iAeJhRNlSu7g==
-X-Received: by 2002:a17:90b:4a92:b0:1f2:a67b:296d with SMTP id lp18-20020a17090b4a9200b001f2a67b296dmr5383203pjb.149.1659108077936;
-        Fri, 29 Jul 2022 08:21:17 -0700 (PDT)
-Received: from google.com (7.104.168.34.bc.googleusercontent.com. [34.168.104.7])
-        by smtp.gmail.com with ESMTPSA id o11-20020a170902d4cb00b0016a058b7547sm3773294plg.294.2022.07.29.08.21.17
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 29 Jul 2022 08:21:17 -0700 (PDT)
-Date:   Fri, 29 Jul 2022 15:21:13 +0000
-From:   Sean Christopherson <seanjc@google.com>
-To:     Kai Huang <kai.huang@intel.com>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org, Michael Roth <michael.roth@amd.com>,
-        Tom Lendacky <thomas.lendacky@amd.com>
-Subject: Re: [PATCH 4/4] KVM: SVM: Disable SEV-ES support if MMIO caching is
- disable
-Message-ID: <YuP66QVxyeT4wd5H@google.com>
-References: <20220728221759.3492539-1-seanjc@google.com>
- <20220728221759.3492539-5-seanjc@google.com>
- <d09972481dede743dd0a77409cd8ecaecdbf86b3.camel@intel.com>
+        with ESMTP id S230040AbiG2QBt (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 29 Jul 2022 12:01:49 -0400
+Received: from vps-vb.mhejs.net (vps-vb.mhejs.net [37.28.154.113])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 50F206FA1D
+        for <kvm@vger.kernel.org>; Fri, 29 Jul 2022 09:01:47 -0700 (PDT)
+Received: from MUA
+        by vps-vb.mhejs.net with esmtps  (TLS1.2) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+        (Exim 4.94.2)
+        (envelope-from <mail@maciej.szmigiero.name>)
+        id 1oHSQe-0001k4-76; Fri, 29 Jul 2022 18:01:32 +0200
+From:   "Maciej S. Szmigiero" <mail@maciej.szmigiero.name>
+To:     Paolo Bonzini <pbonzini@redhat.com>,
+        Richard Henderson <richard.henderson@linaro.org>,
+        Eduardo Habkost <eduardo@habkost.net>
+Cc:     Marcelo Tosatti <mtosatti@redhat.com>,
+        "Michael S . Tsirkin" <mst@redhat.com>,
+        Marcel Apfelbaum <marcel.apfelbaum@gmail.com>,
+        kvm@vger.kernel.org, qemu-devel@nongnu.org
+Subject: [PATCH] hyperv: fix SynIC SINT assertion failure on guest reset
+Date:   Fri, 29 Jul 2022 18:01:26 +0200
+Message-Id: <e132e1fbf2bcc3f6f4ba339a5b36d938aca083fa.1659110405.git.maciej.szmigiero@oracle.com>
+X-Mailer: git-send-email 2.35.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <d09972481dede743dd0a77409cd8ecaecdbf86b3.camel@intel.com>
-X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-        USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=ham
-        autolearn_force=no version=3.4.6
+X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,SPF_HELO_NONE,
+        SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Jul 29, 2022, Kai Huang wrote:
-> On Thu, 2022-07-28 at 22:17 +0000, Sean Christopherson wrote:
-> > Disable SEV-ES if MMIO caching is disabled as SEV-ES relies on MMIO SPTEs
-> > generating #NPF(RSVD), which are reflected by the CPU into the guest as
-> > a #VC.  With SEV-ES, the untrusted host, a.k.a. KVM, doesn't have access
-> > to the guest instruction stream or register state and so can't directly
-> > emulate in response to a #NPF on an emulated MMIO GPA.  Disabling MMIO
-> > caching means guest accesses to emulated MMIO ranges cause #NPF(!PRESENT),
-> > and those flavors of #NPF cause automatic VM-Exits, not #VC.
-> > 
-> > Fixes: b09763da4dd8 ("KVM: x86/mmu: Add module param to disable MMIO caching (for testing)")
-> > Reported-by: Michael Roth <michael.roth@amd.com>
-> > Cc: Tom Lendacky <thomas.lendacky@amd.com>
-> > Cc: stable@vger.kernel.org
-> > Signed-off-by: Sean Christopherson <seanjc@google.com>
-> > ---
+From: "Maciej S. Szmigiero" <maciej.szmigiero@oracle.com>
 
-...
+Resetting a guest that has Hyper-V VMBus support enabled triggers a QEMU
+assertion failure:
+hw/hyperv/hyperv.c:131: synic_reset: Assertion `QLIST_EMPTY(&synic->sint_routes)' failed.
 
-> > +	/*
-> > +	 * SEV-ES requires MMIO caching as KVM doesn't have access to the guest
-> > +	 * instruction stream, i.e. can't emulate in response to a #NPF and
-> > +	 * instead relies on #NPF(RSVD) being reflected into the guest as #VC
-> > +	 * (the guest can then do a #VMGEXIT to request MMIO emulation).
-> > +	 */
-> > +	if (!enable_mmio_caching)
-> > +		goto out;
-> > +
-> > 
-> 
-> I am not familiar with SEV, but looks it is similar to TDX -- they both causes
-> #VE to guest instead of faulting into KVM.  And they both require explicit call
-> from guest to do MMIO.
-> 
-> In this case, does existing MMIO caching logic still apply to them?
+This happens both on normal guest reboot or when using "system_reset" HMP
+command.
 
-Yes, because TDX/SEV-ES+ need to generate #VE/#VC on emulated MMIO so that legacy
-(or intentionally unenlightened) software in the guest doesn't simply hang/die on
-memory accesses to emulated MMIO (as opposed to direct TDVMCALL/#VMGEXIT).
+The failing assertion was introduced by commit 64ddecc88bcf ("hyperv: SControl is optional to enable SynIc")
+to catch dangling SINT routes on SynIC reset.
 
-> Should we still treat SEV and TDX's MMIO handling as MMIO caching being
-> enabled?  Or perhaps another variable?
+The root cause of this problem is that the SynIC itself is reset before
+devices using SINT routes have chance to clean up these routes.
 
-I don't think a separate variable is necesary.  At its core, KVM is still caching
-MMIO GPAs via magic SPTE values.  The fact that it's required for functionality
-doesn't make the name wrong.
+Since there seems to be no existing mechanism to force reset callbacks (or
+methods) to be executed in specific order let's use a similar method that
+is already used to reset another interrupt controller (APIC) after devices
+have been reset - by invoking the SynIC reset from the machine reset
+handler via a new "after_reset" X86 CPU method.
 
-SEV-ES+ in particular doesn't have a strong guarantee that inducing #VC via #NPF(RSVD)
-is always possible.  Theoretically, an SEV-ES+ capable CPU could ship with an effective
-MAXPHYADDR=51 (after reducing the raw MAXPHYADDR) and C-bit=51, in which case there are
-no resered PA bits and thus no reserved PTE bits at all.  That's obviously unlikely to
-happen, but if it does come up, then disabling SEV-ES+ due to MMIO caching not being
-possible is the desired behavior, e.g. either the CPU configuration is bad or KVM is
-lacking support for a newfangled way to support emulated MMIO (in a future theoretical
-SEV-* product).
+Fixes: 64ddecc88bcf ("hyperv: SControl is optional to enable SynIc") # exposed the bug
+Signed-off-by: Maciej S. Szmigiero <maciej.szmigiero@oracle.com>
+---
+ hw/i386/pc.c               |  6 ++++++
+ target/i386/cpu-qom.h      |  2 ++
+ target/i386/cpu.c          | 10 ++++++++++
+ target/i386/kvm/hyperv.c   |  4 ++++
+ target/i386/kvm/kvm.c      | 20 +++++++++++++++-----
+ target/i386/kvm/kvm_i386.h |  1 +
+ 6 files changed, 38 insertions(+), 5 deletions(-)
+
+diff --git a/hw/i386/pc.c b/hw/i386/pc.c
+index 7280c02ce3..6a76d320f6 100644
+--- a/hw/i386/pc.c
++++ b/hw/i386/pc.c
+@@ -1847,6 +1847,7 @@ static void pc_machine_reset(MachineState *machine)
+ {
+     CPUState *cs;
+     X86CPU *cpu;
++    const X86CPUClass *cpuc;
+ 
+     qemu_devices_reset();
+ 
+@@ -1855,6 +1856,11 @@ static void pc_machine_reset(MachineState *machine)
+      */
+     CPU_FOREACH(cs) {
+         cpu = X86_CPU(cs);
++        cpuc = X86_CPU_GET_CLASS(cpu);
++
++        if (cpuc->after_reset) {
++            cpuc->after_reset(cpu);
++        }
+ 
+         if (cpu->apic_state) {
+             device_legacy_reset(cpu->apic_state);
+diff --git a/target/i386/cpu-qom.h b/target/i386/cpu-qom.h
+index c557a522e1..339d23006a 100644
+--- a/target/i386/cpu-qom.h
++++ b/target/i386/cpu-qom.h
+@@ -43,6 +43,7 @@ typedef struct X86CPUModel X86CPUModel;
+  * @static_model: See CpuDefinitionInfo::static
+  * @parent_realize: The parent class' realize handler.
+  * @parent_reset: The parent class' reset handler.
++ * @after_reset: Reset handler to be called only after all other devices have been reset.
+  *
+  * An x86 CPU model or family.
+  */
+@@ -68,6 +69,7 @@ struct X86CPUClass {
+     DeviceRealize parent_realize;
+     DeviceUnrealize parent_unrealize;
+     DeviceReset parent_reset;
++    void (*after_reset)(X86CPU *cpu);
+ };
+ 
+ 
+diff --git a/target/i386/cpu.c b/target/i386/cpu.c
+index 6a57ef13af..a7b5945efd 100644
+--- a/target/i386/cpu.c
++++ b/target/i386/cpu.c
+@@ -6029,6 +6029,15 @@ static void x86_cpu_reset(DeviceState *dev)
+ #endif
+ }
+ 
++static void x86_cpu_after_reset(X86CPU *cpu)
++{
++#ifndef CONFIG_USER_ONLY
++    if (kvm_enabled()) {
++        kvm_arch_after_reset_vcpu(cpu);
++    }
++#endif
++}
++
+ static void mce_init(X86CPU *cpu)
+ {
+     CPUX86State *cenv = &cpu->env;
+@@ -7094,6 +7103,7 @@ static void x86_cpu_common_class_init(ObjectClass *oc, void *data)
+     device_class_set_props(dc, x86_cpu_properties);
+ 
+     device_class_set_parent_reset(dc, x86_cpu_reset, &xcc->parent_reset);
++    xcc->after_reset = x86_cpu_after_reset;
+     cc->reset_dump_flags = CPU_DUMP_FPU | CPU_DUMP_CCOP;
+ 
+     cc->class_by_name = x86_cpu_class_by_name;
+diff --git a/target/i386/kvm/hyperv.c b/target/i386/kvm/hyperv.c
+index 9026ef3a81..e3ac978648 100644
+--- a/target/i386/kvm/hyperv.c
++++ b/target/i386/kvm/hyperv.c
+@@ -23,6 +23,10 @@ int hyperv_x86_synic_add(X86CPU *cpu)
+     return 0;
+ }
+ 
++/*
++ * All devices possibly using SynIC have to be reset before calling this to let
++ * them remove their SINT routes first.
++ */
+ void hyperv_x86_synic_reset(X86CPU *cpu)
+ {
+     hyperv_synic_reset(CPU(cpu));
+diff --git a/target/i386/kvm/kvm.c b/target/i386/kvm/kvm.c
+index f148a6d52f..00736abeea 100644
+--- a/target/i386/kvm/kvm.c
++++ b/target/i386/kvm/kvm.c
+@@ -2188,18 +2188,28 @@ void kvm_arch_reset_vcpu(X86CPU *cpu)
+         env->mp_state = KVM_MP_STATE_RUNNABLE;
+     }
+ 
++    /* enabled by default */
++    env->poll_control_msr = 1;
++
++    sev_es_set_reset_vector(CPU(cpu));
++}
++
++void kvm_arch_after_reset_vcpu(X86CPU *cpu)
++{
++    CPUX86State *env = &cpu->env;
++    int i;
++
++    /*
++     * Reset SynIC after all other devices have been reset to let them remove
++     * their SINT routes first.
++     */
+     if (hyperv_feat_enabled(cpu, HYPERV_FEAT_SYNIC)) {
+-        int i;
+         for (i = 0; i < ARRAY_SIZE(env->msr_hv_synic_sint); i++) {
+             env->msr_hv_synic_sint[i] = HV_SINT_MASKED;
+         }
+ 
+         hyperv_x86_synic_reset(cpu);
+     }
+-    /* enabled by default */
+-    env->poll_control_msr = 1;
+-
+-    sev_es_set_reset_vector(CPU(cpu));
+ }
+ 
+ void kvm_arch_do_init_vcpu(X86CPU *cpu)
+diff --git a/target/i386/kvm/kvm_i386.h b/target/i386/kvm/kvm_i386.h
+index 4124912c20..096a5dd781 100644
+--- a/target/i386/kvm/kvm_i386.h
++++ b/target/i386/kvm/kvm_i386.h
+@@ -38,6 +38,7 @@ bool kvm_has_adjust_clock_stable(void);
+ bool kvm_has_exception_payload(void);
+ void kvm_synchronize_all_tsc(void);
+ void kvm_arch_reset_vcpu(X86CPU *cs);
++void kvm_arch_after_reset_vcpu(X86CPU *cpu);
+ void kvm_arch_do_init_vcpu(X86CPU *cs);
+ 
+ void kvm_put_apicbase(X86CPU *cpu, uint64_t value);
