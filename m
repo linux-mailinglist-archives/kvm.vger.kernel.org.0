@@ -2,205 +2,220 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 74798585A63
-	for <lists+kvm@lfdr.de>; Sat, 30 Jul 2022 14:22:07 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 19625585A79
+	for <lists+kvm@lfdr.de>; Sat, 30 Jul 2022 14:47:22 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234149AbiG3MUJ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sat, 30 Jul 2022 08:20:09 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43112 "EHLO
+        id S233087AbiG3MrU (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sat, 30 Jul 2022 08:47:20 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57340 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230135AbiG3MUI (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sat, 30 Jul 2022 08:20:08 -0400
-Received: from mga17.intel.com (mga17.intel.com [192.55.52.151])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DBB52A19B
-        for <kvm@vger.kernel.org>; Sat, 30 Jul 2022 05:20:06 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1659183606; x=1690719606;
-  h=date:from:to:cc:subject:message-id:mime-version;
-  bh=pCLGv3g2wk0CNIr1FfigMKEt3WZnTGnj6YVJwIPCAmo=;
-  b=UPb2YjzXUyviY4LgD4GJj4gUGZbToUHQHW4h3LZgi6Y9pdBORoX74aLq
-   AEzPxiyiDxrPiDt2f0NPT94FvlzRp5sxmufYe4b2a1iZ4MB1Ljz84zBPW
-   z6x7jJpawtN9SUU8v/7hA78OOqAyXB2wvmxTHJMczDqHMpq5cbB4V4pXc
-   9WbTKuUbQNYlbD+OMi6UHJnmWq8souUlIPOZ3WZ+r4po4Ek7ClEZnBrYg
-   m6OVJA4X9/ENK5tUwaiHT9Ee1amSFU5CW+qwLPv+Baq/ONPahgs+yi7Jy
-   f+AymWXSeUIpc9Kojfv0hoeRUx+ecYn1psTXG/OMAcF2nf4E9NoZLvLMc
-   A==;
-X-IronPort-AV: E=McAfee;i="6400,9594,10423"; a="269296677"
-X-IronPort-AV: E=Sophos;i="5.93,204,1654585200"; 
-   d="scan'208";a="269296677"
-Received: from fmsmga001.fm.intel.com ([10.253.24.23])
-  by fmsmga107.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 30 Jul 2022 05:20:06 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.93,204,1654585200"; 
-   d="scan'208";a="743798736"
-Received: from lkp-server01.sh.intel.com (HELO e0eace57cfef) ([10.239.97.150])
-  by fmsmga001.fm.intel.com with ESMTP; 30 Jul 2022 05:20:04 -0700
-Received: from kbuild by e0eace57cfef with local (Exim 4.96)
-        (envelope-from <lkp@intel.com>)
-        id 1oHlRr-000CoZ-3B;
-        Sat, 30 Jul 2022 12:20:03 +0000
-Date:   Sat, 30 Jul 2022 20:19:40 +0800
-From:   kernel test robot <lkp@intel.com>
-To:     Paolo Bonzini <pbonzini@redhat.com>
-Cc:     llvm@lists.linux.dev, kbuild-all@lists.01.org, kvm@vger.kernel.org,
-        Robert Hu <robert.hu@intel.com>,
-        Farrah Chen <farrah.chen@intel.com>,
-        Danmei Wei <danmei.wei@intel.com>
-Subject: [kvm:queue 2/3] arch/riscv/kvm/mmu.c:355:61: error: expected '}'
-Message-ID: <202207302002.opeObPd2-lkp@intel.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-X-Spam-Status: No, score=-5.0 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
-        SPF_HELO_NONE,SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
+        with ESMTP id S230135AbiG3MrT (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sat, 30 Jul 2022 08:47:19 -0400
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 692631C10D
+        for <kvm@vger.kernel.org>; Sat, 30 Jul 2022 05:47:18 -0700 (PDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id D563360C91
+        for <kvm@vger.kernel.org>; Sat, 30 Jul 2022 12:47:17 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 182F5C433C1;
+        Sat, 30 Jul 2022 12:47:17 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1659185237;
+        bh=kZTc5twSzrccS0agfAec2OpOomKSTPQRxT/mVPO60wA=;
+        h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+        b=Kb43IOBhoKvOWa9jWpAyIecz1GLZIl5jXa9pJ40ioImlCZEA2sEoWbS7y4u6Kd+wA
+         2Ydz1ytvau8wqxktgkb4mWYHD5Mre9NeUUvC2C1H4z42sQGPXxH/d/1qDsN4Bh6viZ
+         9u5eJSo8AAk8zW/UFlgLQVFHTH5EkXmmyRQSIdSz4DukE4mSQfjVocyAqxn7FFjZLI
+         wN/C3f2MfdRmKGfv9XSH5a7EHRIDDC/5VYaxfxkGxFbs4ICJw84297biVElhKSNr/H
+         NTEuKPNHXwmPG6lrSv7Xf89O4vSMSexyirnN5jlJJWviLywbqJgD2pWNe/hxlTt4p1
+         uE3GkhBd1M4gw==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=why.misterjones.org)
+        by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+        (Exim 4.95)
+        (envelope-from <maz@kernel.org>)
+        id 1oHlsA-00B2Nm-FG;
+        Sat, 30 Jul 2022 13:47:14 +0100
+Date:   Sat, 30 Jul 2022 13:47:14 +0100
+Message-ID: <87sfmiwywd.wl-maz@kernel.org>
+From:   Marc Zyngier <maz@kernel.org>
+To:     Ricardo Koller <ricarkol@google.com>
+Cc:     kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu,
+        drjones@redhat.com, alexandru.elisei@arm.com,
+        eric.auger@redhat.com, oliver.upton@linux.dev, reijiw@google.com
+Subject: Re: [kvm-unit-tests PATCH 3/3] arm: pmu: Remove checks for !overflow in chained counters tests
+In-Reply-To: <20220718154910.3923412-4-ricarkol@google.com>
+References: <20220718154910.3923412-1-ricarkol@google.com>
+        <20220718154910.3923412-4-ricarkol@google.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/27.1
+ (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: ricarkol@google.com, kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu, drjones@redhat.com, alexandru.elisei@arm.com, eric.auger@redhat.com, oliver.upton@linux.dev, reijiw@google.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+X-Spam-Status: No, score=-7.7 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_HI,
+        SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-tree:   https://git.kernel.org/pub/scm/virt/kvm/kvm.git queue
-head:   93472b79715378a2386598d6632c654a2223267b
-commit: 24688433d2ef9b65af51aa065f649b5f891f6961 [2/3] Merge remote-tracking branch 'kvm/next' into kvm-next-5.20
-config: riscv-randconfig-r012-20220729 (https://download.01.org/0day-ci/archive/20220730/202207302002.opeObPd2-lkp@intel.com/config)
-compiler: clang version 16.0.0 (https://github.com/llvm/llvm-project 52cd00cabf479aa7eb6dbb063b7ba41ea57bce9e)
-reproduce (this is a W=1 build):
-        wget https://raw.githubusercontent.com/intel/lkp-tests/master/sbin/make.cross -O ~/bin/make.cross
-        chmod +x ~/bin/make.cross
-        # install riscv cross compiling tool for clang build
-        # apt-get install binutils-riscv64-linux-gnu
-        # https://git.kernel.org/pub/scm/virt/kvm/kvm.git/commit/?id=24688433d2ef9b65af51aa065f649b5f891f6961
-        git remote add kvm https://git.kernel.org/pub/scm/virt/kvm/kvm.git
-        git fetch --no-tags kvm queue
-        git checkout 24688433d2ef9b65af51aa065f649b5f891f6961
-        # save the config file
-        mkdir build_dir && cp config build_dir/.config
-        COMPILER_INSTALL_PATH=$HOME/0day COMPILER=clang make.cross W=1 O=build_dir ARCH=riscv SHELL=/bin/bash arch/riscv/kvm/
+Hi Ricardo,
 
-If you fix the issue, kindly add following tag where applicable
-Reported-by: kernel test robot <lkp@intel.com>
+On Mon, 18 Jul 2022 16:49:10 +0100,
+Ricardo Koller <ricarkol@google.com> wrote:
+> 
+> A chained event overflowing on the low counter can set the overflow flag
+> in PMOVS.  KVM does not set it, but real HW and the fast-model seem to.
+> Moreover, the AArch64.IncrementEventCounter() pseudocode in the ARM ARM
+> (DDI 0487H.a, J1.1.1 "aarch64/debug") also sets the PMOVS bit on
+> overflow.
+> 
+> The pmu chain tests fail on bare metal when checking the overflow flag
+> of the low counter _not_ being set on overflow.  Fix by removing the
+> checks.
+> 
+> Signed-off-by: Ricardo Koller <ricarkol@google.com>
+> ---
+>  arm/pmu.c | 21 ++++++++++-----------
+>  1 file changed, 10 insertions(+), 11 deletions(-)
+> 
+> diff --git a/arm/pmu.c b/arm/pmu.c
+> index a7899c3c..4f2c5096 100644
+> --- a/arm/pmu.c
+> +++ b/arm/pmu.c
+> @@ -581,7 +581,6 @@ static void test_chained_counters(void)
+>  	precise_instrs_loop(22, pmu.pmcr_ro | PMU_PMCR_E);
+>  
+>  	report(read_regn_el0(pmevcntr, 1) == 1, "CHAIN counter #1 incremented");
+> -	report(!read_sysreg(pmovsclr_el0), "no overflow recorded for chained incr #1");
+>  
+>  	/* test 64b overflow */
+>  
+> @@ -593,7 +592,7 @@ static void test_chained_counters(void)
+>  	precise_instrs_loop(22, pmu.pmcr_ro | PMU_PMCR_E);
+>  	report_info("overflow reg = 0x%lx", read_sysreg(pmovsclr_el0));
+>  	report(read_regn_el0(pmevcntr, 1) == 2, "CHAIN counter #1 set to 2");
+> -	report(!read_sysreg(pmovsclr_el0), "no overflow recorded for chained incr #2");
+> +	report((read_sysreg(pmovsclr_el0) & 0x2) == 0, "no overflow recorded for chained incr #2");
+>  
+>  	write_regn_el0(pmevcntr, 0, PRE_OVERFLOW);
+>  	write_regn_el0(pmevcntr, 1, ALL_SET);
+> @@ -601,7 +600,7 @@ static void test_chained_counters(void)
+>  	precise_instrs_loop(22, pmu.pmcr_ro | PMU_PMCR_E);
+>  	report_info("overflow reg = 0x%lx", read_sysreg(pmovsclr_el0));
+>  	report(!read_regn_el0(pmevcntr, 1), "CHAIN counter #1 wrapped");
+> -	report(read_sysreg(pmovsclr_el0) == 0x2, "overflow on chain counter");
+> +	report(read_sysreg(pmovsclr_el0) & 0x2, "overflow on chain counter");
+>  }
+>  
+>  static void test_chained_sw_incr(void)
+> @@ -626,10 +625,10 @@ static void test_chained_sw_incr(void)
+>  	for (i = 0; i < 100; i++)
+>  		write_sysreg(0x1, pmswinc_el0);
+>  
+> -	report(!read_sysreg(pmovsclr_el0) && (read_regn_el0(pmevcntr, 1) == 1),
+> -		"no overflow and chain counter incremented after 100 SW_INCR/CHAIN");
+> +	report(read_regn_el0(pmevcntr, 1) == 1,
+> +			"no chain counter incremented after 100 SW_INCR/CHAIN");
+>  	report_info("overflow=0x%lx, #0=%ld #1=%ld", read_sysreg(pmovsclr_el0),
+> -		    read_regn_el0(pmevcntr, 0), read_regn_el0(pmevcntr, 1));
+> +			read_regn_el0(pmevcntr, 0), read_regn_el0(pmevcntr, 1));
+>  
+>  	/* 64b SW_INCR and overflow on CHAIN counter*/
+>  	pmu_reset();
+> @@ -644,7 +643,7 @@ static void test_chained_sw_incr(void)
+>  	for (i = 0; i < 100; i++)
+>  		write_sysreg(0x1, pmswinc_el0);
+>  
+> -	report((read_sysreg(pmovsclr_el0) == 0x2) &&
+> +	report((read_sysreg(pmovsclr_el0) & 0x2) &&
+>  		(read_regn_el0(pmevcntr, 1) == 0) &&
+>  		(read_regn_el0(pmevcntr, 0) == 84),
+>  		"overflow on chain counter and expected values after 100 SW_INCR/CHAIN");
+> @@ -727,8 +726,8 @@ static void test_chain_promotion(void)
+>  	report_info("MEM_ACCESS counter #0 has value 0x%lx",
+>  		    read_regn_el0(pmevcntr, 0));
+>  
+> -	report((read_regn_el0(pmevcntr, 1) == 1) && !read_sysreg(pmovsclr_el0),
+> -		"CHAIN counter enabled: CHAIN counter was incremented and no overflow");
+> +	report((read_regn_el0(pmevcntr, 1) == 1),
+> +		"CHAIN counter enabled: CHAIN counter was incremented");
+>  
+>  	report_info("CHAIN counter #1 = 0x%lx, overflow=0x%lx",
+>  		read_regn_el0(pmevcntr, 1), read_sysreg(pmovsclr_el0));
+> @@ -755,8 +754,8 @@ static void test_chain_promotion(void)
+>  	report_info("MEM_ACCESS counter #0 has value 0x%lx",
+>  		    read_regn_el0(pmevcntr, 0));
+>  
+> -	report((read_regn_el0(pmevcntr, 1) == 1) && !read_sysreg(pmovsclr_el0),
+> -		"32b->64b: CHAIN counter incremented and no overflow");
+> +	report((read_regn_el0(pmevcntr, 1) == 1),
+> +		"32b->64b: CHAIN counter incremented");
+>  
+>  	report_info("CHAIN counter #1 = 0x%lx, overflow=0x%lx",
+>  		read_regn_el0(pmevcntr, 1), read_sysreg(pmovsclr_el0));
 
-All errors (new ones prefixed by >>):
+I'm looking at fixing KVM to match this (see the binch of hacks at
+[1]), and still getting a couple of failures in the PMU overflow tests
+despite my best effort to fix the code:
 
->> arch/riscv/kvm/mmu.c:355:61: error: expected '}'
-                   .gfp_custom = (in_atomic) ? GFP_ATOMIC | __GFP_ACCOUNT : 0;
-                                                                             ^
-   arch/riscv/kvm/mmu.c:354:39: note: to match this '{'
-           struct kvm_mmu_memory_cache pcache = {
-                                                ^
->> arch/riscv/kvm/mmu.c:356:3: error: expected expression
-                   .gfp_zero = __GFP_ZERO;
-                   ^
->> arch/riscv/kvm/mmu.c:359:2: error: type specifier missing, defaults to 'int'; ISO C99 and later do not support implicit int [-Wimplicit-int]
-           end = (gpa + size + PAGE_SIZE - 1) & PAGE_MASK;
-           ^
-           int
->> arch/riscv/kvm/mmu.c:359:9: error: use of undeclared identifier 'gpa'
-           end = (gpa + size + PAGE_SIZE - 1) & PAGE_MASK;
-                  ^
->> arch/riscv/kvm/mmu.c:359:15: error: use of undeclared identifier 'size'
-           end = (gpa + size + PAGE_SIZE - 1) & PAGE_MASK;
-                        ^
-   arch/riscv/kvm/mmu.c:360:2: error: type specifier missing, defaults to 'int'; ISO C99 and later do not support implicit int [-Wimplicit-int]
-           pfn = __phys_to_pfn(hpa);
-           ^
-           int
->> arch/riscv/kvm/mmu.c:360:22: error: use of undeclared identifier 'hpa'
-           pfn = __phys_to_pfn(hpa);
-                               ^
->> arch/riscv/kvm/mmu.c:362:2: error: expected identifier or '('
-           for (addr = gpa; addr < end; addr += PAGE_SIZE) {
-           ^
-   arch/riscv/kvm/mmu.c:381:1: error: type specifier missing, defaults to 'int'; ISO C99 and later do not support implicit int [-Wimplicit-int]
-   out:
-   ^
-   int
->> arch/riscv/kvm/mmu.c:381:4: error: expected ';' after top level declarator
-   out:
-      ^
-      ;
->> arch/riscv/kvm/mmu.c:382:28: error: expected parameter declarator
-           kvm_mmu_free_memory_cache(&pcache);
-                                     ^
->> arch/riscv/kvm/mmu.c:382:28: error: expected ')'
-   arch/riscv/kvm/mmu.c:382:27: note: to match this '('
-           kvm_mmu_free_memory_cache(&pcache);
-                                    ^
-   arch/riscv/kvm/mmu.c:382:2: error: type specifier missing, defaults to 'int'; ISO C99 and later do not support implicit int [-Wimplicit-int]
-           kvm_mmu_free_memory_cache(&pcache);
-           ^
-           int
->> arch/riscv/kvm/mmu.c:382:27: error: a function declaration without a prototype is deprecated in all versions of C [-Werror,-Wstrict-prototypes]
-           kvm_mmu_free_memory_cache(&pcache);
-                                    ^
-                                            void
->> arch/riscv/kvm/mmu.c:382:2: error: a function declaration without a prototype is deprecated in all versions of C and is treated as a zero-parameter prototype in C2x, conflicting with a previous declaration [-Werror,-Wdeprecated-non-prototype]
-           kvm_mmu_free_memory_cache(&pcache);
-           ^
-   include/linux/kvm_host.h:1356:6: note: conflicting prototype is here
-   void kvm_mmu_free_memory_cache(struct kvm_mmu_memory_cache *mc);
-        ^
->> arch/riscv/kvm/mmu.c:382:2: error: conflicting types for 'kvm_mmu_free_memory_cache'
-           kvm_mmu_free_memory_cache(&pcache);
-           ^
-   include/linux/kvm_host.h:1356:6: note: previous declaration is here
-   void kvm_mmu_free_memory_cache(struct kvm_mmu_memory_cache *mc);
-        ^
-   arch/riscv/kvm/mmu.c:383:2: error: expected identifier or '('
-           return ret;
-           ^
->> arch/riscv/kvm/mmu.c:384:1: error: extraneous closing brace ('}')
-   }
-   ^
-   18 errors generated.
+$ ./arm-run  arm/pmu.flat --append pmu-overflow-interrupt
+/usr/bin/qemu-system-aarch64 -nodefaults -machine virt,gic-version=host -accel kvm -cpu host -device virtio-serial-device -device virtconsole,chardev=ctd -chardev testdev,id=ctd -device pci-testdev -display none -serial stdio -kernel arm/pmu.flat --append pmu-overflow-interrupt # -initrd /tmp/tmp.RQ6FmkvXay
+INFO: PMU version: 0x1
+INFO: PMU implementer/ID code: 0x41("A")/0x3
+INFO: Implements 6 event counters
+PASS: pmu: pmu-overflow-interrupt: no overflow interrupt after preset
+PASS: pmu: pmu-overflow-interrupt: no overflow interrupt after counting
+INFO: pmu: pmu-overflow-interrupt: overflow=0x0
+PASS: pmu: pmu-overflow-interrupt: overflow interrupts expected on #0 and #1
+FAIL: pmu: pmu-overflow-interrupt: no overflow interrupt expected on 32b boundary
+FAIL: pmu: pmu-overflow-interrupt: expect overflow interrupt on odd counter
+SUMMARY: 5 tests, 2 unexpected failures
 
+Looking at the kut code, I'm wondering whether you're still missing a
+couple of extra fixes such as:
 
-vim +355 arch/riscv/kvm/mmu.c
+diff --git a/arm/pmu.c b/arm/pmu.c
+index 4f2c5096..e0b9f71a 100644
+--- a/arm/pmu.c
++++ b/arm/pmu.c
+@@ -861,8 +861,8 @@ static void test_overflow_interrupt(void)
+ 	write_regn_el0(pmevcntr, 0, PRE_OVERFLOW);
+ 	isb();
+ 	mem_access_loop(addr, 200, pmu.pmcr_ro | PMU_PMCR_E);
+-	report(expect_interrupts(0),
+-		"no overflow interrupt expected on 32b boundary");
++	report(expect_interrupts(1),
++		"expect overflow interrupt on 32b counter");
+ 
+ 	/* overflow on odd counter */
+ 	pmu_reset_stats();
+@@ -870,8 +870,8 @@ static void test_overflow_interrupt(void)
+ 	write_regn_el0(pmevcntr, 1, ALL_SET);
+ 	isb();
+ 	mem_access_loop(addr, 400, pmu.pmcr_ro | PMU_PMCR_E);
+-	report(expect_interrupts(0x2),
+-		"expect overflow interrupt on odd counter");
++	report(expect_interrupts(0x3),
++		"expect overflow interrupt on even+odd counters");
+ }
+ #endif
+ 
+With that, all PMU tests pass. Am I missing something? Did you notice
+these failing on HW?
 
-   345	
-   346	int kvm_riscv_gstage_ioremap(struct kvm *kvm, gpa_t gpa,
-   347				     phys_addr_t hpa, unsigned long size,
-   348				     bool writable, bool in_atomic)
-   349	{
-   350		pte_t pte;
-   351		int ret = 0;
-   352		unsigned long pfn;
-   353		phys_addr_t addr, end;
-   354		struct kvm_mmu_memory_cache pcache = {
- > 355			.gfp_custom = (in_atomic) ? GFP_ATOMIC | __GFP_ACCOUNT : 0;
- > 356			.gfp_zero = __GFP_ZERO;
-   357		};
-   358	
- > 359		end = (gpa + size + PAGE_SIZE - 1) & PAGE_MASK;
- > 360		pfn = __phys_to_pfn(hpa);
-   361	
- > 362		for (addr = gpa; addr < end; addr += PAGE_SIZE) {
-   363			pte = pfn_pte(pfn, PAGE_KERNEL_IO);
-   364	
-   365			if (!writable)
-   366				pte = pte_wrprotect(pte);
-   367	
-   368			ret = kvm_mmu_topup_memory_cache(&pcache, gstage_pgd_levels);
-   369			if (ret)
-   370				goto out;
-   371	
-   372			spin_lock(&kvm->mmu_lock);
-   373			ret = gstage_set_pte(kvm, 0, &pcache, addr, &pte);
-   374			spin_unlock(&kvm->mmu_lock);
-   375			if (ret)
-   376				goto out;
-   377	
-   378			pfn++;
-   379		}
-   380	
- > 381	out:
- > 382		kvm_mmu_free_memory_cache(&pcache);
-   383		return ret;
- > 384	}
-   385	
+Thanks,
+
+	M.
+
+[1] https://git.kernel.org/pub/scm/linux/kernel/git/maz/arm-platforms.git/log/?h=kvm-arm64/pmu-chained
 
 -- 
-0-DAY CI Kernel Test Service
-https://01.org/lkp
+Without deviation from the norm, progress is not possible.
