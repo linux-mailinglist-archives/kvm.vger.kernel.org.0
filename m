@@ -2,94 +2,205 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 7F926585869
-	for <lists+kvm@lfdr.de>; Sat, 30 Jul 2022 06:16:12 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 74798585A63
+	for <lists+kvm@lfdr.de>; Sat, 30 Jul 2022 14:22:07 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232930AbiG3EQH (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sat, 30 Jul 2022 00:16:07 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57750 "EHLO
+        id S234149AbiG3MUJ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sat, 30 Jul 2022 08:20:09 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43112 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229464AbiG3EQG (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sat, 30 Jul 2022 00:16:06 -0400
-Received: from mail-yw1-f179.google.com (mail-yw1-f179.google.com [209.85.128.179])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 494C7255BD;
-        Fri, 29 Jul 2022 21:16:03 -0700 (PDT)
-Received: by mail-yw1-f179.google.com with SMTP id 00721157ae682-31f443e276fso67866417b3.1;
-        Fri, 29 Jul 2022 21:16:03 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=fFgeLGDEXPjOLoUZJYNTF+ABbc7/QLMmmIBC+Ua0eXw=;
-        b=mRVQ1C2qSFk38q8RHRGoly5s1xIrOa9l7Ae/vdguNp5Yme5JTZ2fnftV8/Rxp7aFP5
-         sA82Agx5h0BETSUyESNj7E3F7TsEfIcdYCEf0nGEm0/H/RTpWDocEpyoeLyG5yjbHjQb
-         WfLlgiadDQQx/+7ytlBxecyl2JkImTUx7DKUGjH2K9aFOmzSJ5wEw0jYA2DLVkEiquYD
-         cYcx/ngwPEjUw8N847RjlOTSeFvVhNMpKZQOPUTGfGSF2H3wmmMBZUXljZgqJ9QqcT53
-         DVfMkLFDZfrPqXzZhAakPZPK4lU62p4nyS/6zgVTU1BY4GMRTK044V5/LxyRiMeYd1d8
-         i7xw==
-X-Gm-Message-State: ACgBeo1OiycMSEH7ksAP6sME3iXNpiCH9gpOY1/m2iehGmfqa01m57p9
-        Gr7WqpjG1bqkWIAI5qTalYIPFcFFwvd2i66K4y4=
-X-Google-Smtp-Source: AA6agR5t6rI3A3K9sYbRqGT/vLTbTLQr/bzKrf5x7JfThTPsrmentR3RUNcsQOJ+3Ksbu1oMQT/d1tmHbkGkZvvKWyo=
-X-Received: by 2002:a0d:e682:0:b0:322:b5e1:5ed4 with SMTP id
- p124-20020a0de682000000b00322b5e15ed4mr5561178ywe.220.1659154562409; Fri, 29
- Jul 2022 21:16:02 -0700 (PDT)
+        with ESMTP id S230135AbiG3MUI (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sat, 30 Jul 2022 08:20:08 -0400
+Received: from mga17.intel.com (mga17.intel.com [192.55.52.151])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DBB52A19B
+        for <kvm@vger.kernel.org>; Sat, 30 Jul 2022 05:20:06 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1659183606; x=1690719606;
+  h=date:from:to:cc:subject:message-id:mime-version;
+  bh=pCLGv3g2wk0CNIr1FfigMKEt3WZnTGnj6YVJwIPCAmo=;
+  b=UPb2YjzXUyviY4LgD4GJj4gUGZbToUHQHW4h3LZgi6Y9pdBORoX74aLq
+   AEzPxiyiDxrPiDt2f0NPT94FvlzRp5sxmufYe4b2a1iZ4MB1Ljz84zBPW
+   z6x7jJpawtN9SUU8v/7hA78OOqAyXB2wvmxTHJMczDqHMpq5cbB4V4pXc
+   9WbTKuUbQNYlbD+OMi6UHJnmWq8souUlIPOZ3WZ+r4po4Ek7ClEZnBrYg
+   m6OVJA4X9/ENK5tUwaiHT9Ee1amSFU5CW+qwLPv+Baq/ONPahgs+yi7Jy
+   f+AymWXSeUIpc9Kojfv0hoeRUx+ecYn1psTXG/OMAcF2nf4E9NoZLvLMc
+   A==;
+X-IronPort-AV: E=McAfee;i="6400,9594,10423"; a="269296677"
+X-IronPort-AV: E=Sophos;i="5.93,204,1654585200"; 
+   d="scan'208";a="269296677"
+Received: from fmsmga001.fm.intel.com ([10.253.24.23])
+  by fmsmga107.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 30 Jul 2022 05:20:06 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.93,204,1654585200"; 
+   d="scan'208";a="743798736"
+Received: from lkp-server01.sh.intel.com (HELO e0eace57cfef) ([10.239.97.150])
+  by fmsmga001.fm.intel.com with ESMTP; 30 Jul 2022 05:20:04 -0700
+Received: from kbuild by e0eace57cfef with local (Exim 4.96)
+        (envelope-from <lkp@intel.com>)
+        id 1oHlRr-000CoZ-3B;
+        Sat, 30 Jul 2022 12:20:03 +0000
+Date:   Sat, 30 Jul 2022 20:19:40 +0800
+From:   kernel test robot <lkp@intel.com>
+To:     Paolo Bonzini <pbonzini@redhat.com>
+Cc:     llvm@lists.linux.dev, kbuild-all@lists.01.org, kvm@vger.kernel.org,
+        Robert Hu <robert.hu@intel.com>,
+        Farrah Chen <farrah.chen@intel.com>,
+        Danmei Wei <danmei.wei@intel.com>
+Subject: [kvm:queue 2/3] arch/riscv/kvm/mmu.c:355:61: error: expected '}'
+Message-ID: <202207302002.opeObPd2-lkp@intel.com>
 MIME-Version: 1.0
-References: <20220729084533.54500-1-mailhol.vincent@wanadoo.fr> <YuQdhaUi0ur4l/zb@google.com>
-In-Reply-To: <YuQdhaUi0ur4l/zb@google.com>
-From:   Vincent MAILHOL <mailhol.vincent@wanadoo.fr>
-Date:   Sat, 30 Jul 2022 13:15:51 +0900
-Message-ID: <CAMZ6RqJUtFDKZj9Wo8EjG3nefwM3RztW00FRwXct-KgFo-HSLw@mail.gmail.com>
-Subject: Re: [PATCH] KVM: x86: do not shadow apic global definition
-To:     Sean Christopherson <seanjc@google.com>
-Cc:     kvm@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org,
-        "H . Peter Anvin" <hpa@zytor.com>, linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-X-Spam-Status: No, score=-1.4 required=5.0 tests=BAYES_00,
-        FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,HEADER_FROM_DIFFERENT_DOMAINS,
-        RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_PASS
-        autolearn=no autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+X-Spam-Status: No, score=-5.0 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
+        SPF_HELO_NONE,SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Sat. 30 Jul. 2022 at 02:48, Sean Christopherson <seanjc@google.com> wrote:
-> On Fri, Jul 29, 2022, Vincent Mailhol wrote:
-> > arch/x86/include/asm/apic.h declares a global variable named `apic'.
-> >
-> > Many function arguments from arch/x86/kvm/lapic.h also uses the same
-> > name and thus shadow the global declaration. For each case of
-> > shadowing, rename the function argument from `apic' to `lapic'.
-> >
-> > This patch silences below -Wshadow warnings:
->
-> This is just the tip of the iceberg, nearly every KVM x86 .c file has at least one
-> "apic" variable.  arch/x86/kvm/lapic.c alone has nearly 100.  If this were the very
-> last step before a kernel-wide (or even KVM-wide) enabling of -Wshadow then maybe
-> it would be worth doing, but as it stands IMO it's unnecesary churn.
+tree:   https://git.kernel.org/pub/scm/virt/kvm/kvm.git queue
+head:   93472b79715378a2386598d6632c654a2223267b
+commit: 24688433d2ef9b65af51aa065f649b5f891f6961 [2/3] Merge remote-tracking branch 'kvm/next' into kvm-next-5.20
+config: riscv-randconfig-r012-20220729 (https://download.01.org/0day-ci/archive/20220730/202207302002.opeObPd2-lkp@intel.com/config)
+compiler: clang version 16.0.0 (https://github.com/llvm/llvm-project 52cd00cabf479aa7eb6dbb063b7ba41ea57bce9e)
+reproduce (this is a W=1 build):
+        wget https://raw.githubusercontent.com/intel/lkp-tests/master/sbin/make.cross -O ~/bin/make.cross
+        chmod +x ~/bin/make.cross
+        # install riscv cross compiling tool for clang build
+        # apt-get install binutils-riscv64-linux-gnu
+        # https://git.kernel.org/pub/scm/virt/kvm/kvm.git/commit/?id=24688433d2ef9b65af51aa065f649b5f891f6961
+        git remote add kvm https://git.kernel.org/pub/scm/virt/kvm/kvm.git
+        git fetch --no-tags kvm queue
+        git checkout 24688433d2ef9b65af51aa065f649b5f891f6961
+        # save the config file
+        mkdir build_dir && cp config build_dir/.config
+        COMPILER_INSTALL_PATH=$HOME/0day COMPILER=clang make.cross W=1 O=build_dir ARCH=riscv SHELL=/bin/bash arch/riscv/kvm/
 
-I would say the opposite: in terms of *volume*, warnings from apic.c
-would be the tip of the iceberg and apic.h is the submerged part.
+If you fix the issue, kindly add following tag where applicable
+Reported-by: kernel test robot <lkp@intel.com>
 
-When the warning occurs in a header from the include directory, it
-will spam some random files which include such header. This is
-annoying when trying to triage W=2 warnings because you get totally
-unrelated warning (and W=2 has some useful flags such as
--Wmaybe-uninitialized so there are some insensitive to check it).
+All errors (new ones prefixed by >>):
 
-My intent is only to silence the headers. I do not really care about
-the -Wshadow on *.c files because it is local.
+>> arch/riscv/kvm/mmu.c:355:61: error: expected '}'
+                   .gfp_custom = (in_atomic) ? GFP_ATOMIC | __GFP_ACCOUNT : 0;
+                                                                             ^
+   arch/riscv/kvm/mmu.c:354:39: note: to match this '{'
+           struct kvm_mmu_memory_cache pcache = {
+                                                ^
+>> arch/riscv/kvm/mmu.c:356:3: error: expected expression
+                   .gfp_zero = __GFP_ZERO;
+                   ^
+>> arch/riscv/kvm/mmu.c:359:2: error: type specifier missing, defaults to 'int'; ISO C99 and later do not support implicit int [-Wimplicit-int]
+           end = (gpa + size + PAGE_SIZE - 1) & PAGE_MASK;
+           ^
+           int
+>> arch/riscv/kvm/mmu.c:359:9: error: use of undeclared identifier 'gpa'
+           end = (gpa + size + PAGE_SIZE - 1) & PAGE_MASK;
+                  ^
+>> arch/riscv/kvm/mmu.c:359:15: error: use of undeclared identifier 'size'
+           end = (gpa + size + PAGE_SIZE - 1) & PAGE_MASK;
+                        ^
+   arch/riscv/kvm/mmu.c:360:2: error: type specifier missing, defaults to 'int'; ISO C99 and later do not support implicit int [-Wimplicit-int]
+           pfn = __phys_to_pfn(hpa);
+           ^
+           int
+>> arch/riscv/kvm/mmu.c:360:22: error: use of undeclared identifier 'hpa'
+           pfn = __phys_to_pfn(hpa);
+                               ^
+>> arch/riscv/kvm/mmu.c:362:2: error: expected identifier or '('
+           for (addr = gpa; addr < end; addr += PAGE_SIZE) {
+           ^
+   arch/riscv/kvm/mmu.c:381:1: error: type specifier missing, defaults to 'int'; ISO C99 and later do not support implicit int [-Wimplicit-int]
+   out:
+   ^
+   int
+>> arch/riscv/kvm/mmu.c:381:4: error: expected ';' after top level declarator
+   out:
+      ^
+      ;
+>> arch/riscv/kvm/mmu.c:382:28: error: expected parameter declarator
+           kvm_mmu_free_memory_cache(&pcache);
+                                     ^
+>> arch/riscv/kvm/mmu.c:382:28: error: expected ')'
+   arch/riscv/kvm/mmu.c:382:27: note: to match this '('
+           kvm_mmu_free_memory_cache(&pcache);
+                                    ^
+   arch/riscv/kvm/mmu.c:382:2: error: type specifier missing, defaults to 'int'; ISO C99 and later do not support implicit int [-Wimplicit-int]
+           kvm_mmu_free_memory_cache(&pcache);
+           ^
+           int
+>> arch/riscv/kvm/mmu.c:382:27: error: a function declaration without a prototype is deprecated in all versions of C [-Werror,-Wstrict-prototypes]
+           kvm_mmu_free_memory_cache(&pcache);
+                                    ^
+                                            void
+>> arch/riscv/kvm/mmu.c:382:2: error: a function declaration without a prototype is deprecated in all versions of C and is treated as a zero-parameter prototype in C2x, conflicting with a previous declaration [-Werror,-Wdeprecated-non-prototype]
+           kvm_mmu_free_memory_cache(&pcache);
+           ^
+   include/linux/kvm_host.h:1356:6: note: conflicting prototype is here
+   void kvm_mmu_free_memory_cache(struct kvm_mmu_memory_cache *mc);
+        ^
+>> arch/riscv/kvm/mmu.c:382:2: error: conflicting types for 'kvm_mmu_free_memory_cache'
+           kvm_mmu_free_memory_cache(&pcache);
+           ^
+   include/linux/kvm_host.h:1356:6: note: previous declaration is here
+   void kvm_mmu_free_memory_cache(struct kvm_mmu_memory_cache *mc);
+        ^
+   arch/riscv/kvm/mmu.c:383:2: error: expected identifier or '('
+           return ret;
+           ^
+>> arch/riscv/kvm/mmu.c:384:1: error: extraneous closing brace ('}')
+   }
+   ^
+   18 errors generated.
 
-> What I would really love is to not have the global (and exported!) "apic", but
-> properly solving that, i.e. not just a rename, would require a significant rework.
 
-I double agree. I would also like to rename the global "apic" but I do
-not think this is easily feasible.
+vim +355 arch/riscv/kvm/mmu.c
 
+   345	
+   346	int kvm_riscv_gstage_ioremap(struct kvm *kvm, gpa_t gpa,
+   347				     phys_addr_t hpa, unsigned long size,
+   348				     bool writable, bool in_atomic)
+   349	{
+   350		pte_t pte;
+   351		int ret = 0;
+   352		unsigned long pfn;
+   353		phys_addr_t addr, end;
+   354		struct kvm_mmu_memory_cache pcache = {
+ > 355			.gfp_custom = (in_atomic) ? GFP_ATOMIC | __GFP_ACCOUNT : 0;
+ > 356			.gfp_zero = __GFP_ZERO;
+   357		};
+   358	
+ > 359		end = (gpa + size + PAGE_SIZE - 1) & PAGE_MASK;
+ > 360		pfn = __phys_to_pfn(hpa);
+   361	
+ > 362		for (addr = gpa; addr < end; addr += PAGE_SIZE) {
+   363			pte = pfn_pte(pfn, PAGE_KERNEL_IO);
+   364	
+   365			if (!writable)
+   366				pte = pte_wrprotect(pte);
+   367	
+   368			ret = kvm_mmu_topup_memory_cache(&pcache, gstage_pgd_levels);
+   369			if (ret)
+   370				goto out;
+   371	
+   372			spin_lock(&kvm->mmu_lock);
+   373			ret = gstage_set_pte(kvm, 0, &pcache, addr, &pte);
+   374			spin_unlock(&kvm->mmu_lock);
+   375			if (ret)
+   376				goto out;
+   377	
+   378			pfn++;
+   379		}
+   380	
+ > 381	out:
+ > 382		kvm_mmu_free_memory_cache(&pcache);
+   383		return ret;
+ > 384	}
+   385	
 
-Yours sincerely,
-Vincent Mailhol
+-- 
+0-DAY CI Kernel Test Service
+https://01.org/lkp
