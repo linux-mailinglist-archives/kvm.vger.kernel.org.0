@@ -2,235 +2,266 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id C5C08585D97
-	for <lists+kvm@lfdr.de>; Sun, 31 Jul 2022 07:03:53 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id DEE7B585F01
+	for <lists+kvm@lfdr.de>; Sun, 31 Jul 2022 14:56:32 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231398AbiGaFDt (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sun, 31 Jul 2022 01:03:49 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41772 "EHLO
+        id S236760AbiGaM4S (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sun, 31 Jul 2022 08:56:18 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55936 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230519AbiGaFDr (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sun, 31 Jul 2022 01:03:47 -0400
-Received: from mail-pg1-x52a.google.com (mail-pg1-x52a.google.com [IPv6:2607:f8b0:4864:20::52a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 18A4313DCB
-        for <kvm@vger.kernel.org>; Sat, 30 Jul 2022 22:03:45 -0700 (PDT)
-Received: by mail-pg1-x52a.google.com with SMTP id 12so7076092pga.1
-        for <kvm@vger.kernel.org>; Sat, 30 Jul 2022 22:03:45 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kylehuey.com; s=google;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc;
-        bh=LzB8XuGXprfZz0N1oF/7jRPSpf9FyZkTZ3frqXsBtnc=;
-        b=gEXYE/ZP3mN9LEHWIo967jESNWuZeLpX+BsRSQEr7/bTs5+csJDdmdlrquXNZzrHj8
-         yB1w1IDLEN/ReoNtW8GZbkvfXZUIF38jJA1qO+U4POMf+6YCF7TF1Ej5sEm8JrhSb69c
-         UzxWfCJWJB6ZZVxuK/DehOcqsr710h1ZHAZ9IVtCzvFzjfo7c/kdFoEmW7kFCX6jmfmz
-         sANy1OA3T4zYyEeyXQispCvWsuLjhF/GmeYbTMu3LzlOV5H7ORrLVF4UqyfhpP4nGEmE
-         OMgw3A8x6X5YS7Tsen2gx6V10i1ruSahUIMztiaXIB3mcy1Td+6gmwWEXgdeMoyRzU6P
-         GwrQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc;
-        bh=LzB8XuGXprfZz0N1oF/7jRPSpf9FyZkTZ3frqXsBtnc=;
-        b=YKO1UhlHVxerKYNJH4t0i9K/icx+itpIabTukgJXcPg3xCOw8PzOZT9hRIz7jISC/f
-         Az42NE0XxzRW2YNluUiT6maFYq5lJmJNYDx99Qy1NwpTC+1vg/BpcEit811ofGNs608e
-         pbJVKKFlyHIuw74XJ3YHGeoiVX26aA1r6OE9W4zwUIsgbDniSwCa5kI5qjowIyf5P40V
-         GZ+J+GwqUef/l34hqivmHyuv4KO8TjdvlldGzOydJKonzAogSfKlD7kT9qGge3x5p650
-         9rdHTuKz648+r55xTle3EQxGyqlLBrdVBgdbsvPfKt1OqM9XBl2VGC8cTMvW+ZrEH4Ad
-         E1kA==
-X-Gm-Message-State: AJIora/9eszUUwihLZQQRUTtr+y4a2KBMN1wTADR2+VF07vSwkGPWmpS
-        Meqjh+CPl7hmlCTXFO7lqu5LaQ==
-X-Google-Smtp-Source: AGRyM1sVdAH14sGSgUBwRYIjpmst+tPrJVkOlRxmDnDET70SUsJNKV30xDvo/M2GgAMKxtUtTr9iIQ==
-X-Received: by 2002:a05:6a00:bc5:b0:52b:49c9:d26c with SMTP id x5-20020a056a000bc500b0052b49c9d26cmr10487567pfu.73.1659243824487;
-        Sat, 30 Jul 2022 22:03:44 -0700 (PDT)
-Received: from minbar.home.kylehuey.com (c-71-198-251-229.hsd1.ca.comcast.net. [71.198.251.229])
-        by smtp.gmail.com with ESMTPSA id f14-20020a170902684e00b00162529828aesm6647811pln.109.2022.07.30.22.03.43
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sat, 30 Jul 2022 22:03:44 -0700 (PDT)
-From:   Kyle Huey <me@kylehuey.com>
-X-Google-Original-From: Kyle Huey <khuey@kylehuey.com>
-To:     Dave Hansen <dave.hansen@linux.intel.com>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Borislav Petkov <bp@alien8.de>
-Cc:     Ingo Molnar <mingo@redhat.com>, x86@kernel.org,
-        "H. Peter Anvin" <hpa@zytor.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Andy Lutomirski <luto@kernel.org>,
-        Peter Zijlstra <peterz@infradead.org>,
-        linux-kernel@vger.kernel.org,
-        Robert O'Callahan <robert@ocallahan.org>,
-        David Manouchehri <david.manouchehri@riseup.net>,
-        Kyle Huey <me@kylehuey.com>, kvm@vger.kernel.org,
-        stable@vger.kernel.org
-Subject: [PATCH] x86/fpu: Allow PKRU to be (once again) written by ptrace.
-Date:   Sat, 30 Jul 2022 22:03:42 -0700
-Message-Id: <20220731050342.56513-1-khuey@kylehuey.com>
-X-Mailer: git-send-email 2.37.0
+        with ESMTP id S236776AbiGaM4O (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sun, 31 Jul 2022 08:56:14 -0400
+Received: from NAM10-DM6-obe.outbound.protection.outlook.com (mail-dm6nam10on2059.outbound.protection.outlook.com [40.107.93.59])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 27E68B7F7;
+        Sun, 31 Jul 2022 05:56:11 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=lBp1zV9/T/YjciRiGQmmjgV/oYtS0bKp/Vu5zIjXm4Im76tkqWvYk7bhjfO3yxWbNDCDT9zoFTaLAXRRwFAdZ8d9Q3NmWm2IF0xIV8LZhvlrXxr6K/ZKuM+/+tuyrJX+2hK2OgUz1Oy4r88ib4Z18v4GrIlhvkAlFR98Hpcp4gR1ChuIav16g03cQNF/m5ouQmvx9yws7umClVe0lUJ9xdteIcJ/hMpaBUBx6W/GagqDeCfu3AJt152o22fy5heeP396gKl/OI3+NcSSgbwWh011a48t3YmvnXzIT8OXUgN40qaroyYbY3wpCXhCDkjVAPzGtl+KfkCNrI+sQPhq0g==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=r5WLS7PFOxKaj5WrEon1xA5n1Re/oLhbVCHAUP//ik4=;
+ b=ckFnnMWzGTRPyxy7P5YveNAKqxrlHOgnRgZRPKC5P/uYCsLjZvWavVtbZ1L5b7RMSvbOM2q+OIhtoijkXWctMsHzNlE7TCKJqH/+yOf1LKZEKDmwf3rI51A7hvVTyEcU+ltoB7L5xFXlH4naFQpl5hJGYPbFZcPqFoam5LKPSymvThMdjLwMUf1Sd+K8X/t/3DhHCIT2thWyWRaXY/WLFmhnyeDC+tgpRa8FIkGeZZhwVm7WFnnpdGBKxLX/pP+/y6EinWWqRgsOYFpjAAGgV5xx0j0u3bGCVOuc43PPsWOjmawChdRTqkGs3ilcwDdIEdF4brRxyKp8nGiqnjHTXw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
+ 12.22.5.238) smtp.rcpttodomain=intel.com smtp.mailfrom=nvidia.com; dmarc=pass
+ (p=reject sp=reject pct=100) action=none header.from=nvidia.com; dkim=none
+ (message not signed); arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=r5WLS7PFOxKaj5WrEon1xA5n1Re/oLhbVCHAUP//ik4=;
+ b=i0/LJT9w0gAMTcMsPAJF+A+Oiukt0/wCbtp9L9+sQ5zSaSRHz39+UWCVCLUzPDX/2ZFAZSy48nxLahPH1+ztirmX3FalNNUkwtYiat3v5VDIsX7Jtul33sWYvAi+GRXlosqHiFQFUBFxIZOEPulwfcY/6eSNdFetUWMCdIhC9saslhTHJhu5OCe9JX5kxa8nAocN0QA5iXoyPkZB74n1VBK2E9PJtevig189e3iFQsOK0h1J5d+dYEM8VcnXg9k32mM0WdzZyf6ADj50FR79O/bEZ0zx3NW1RsKhQmwms/A0M3bbV1y7WhVkdslLfHVdbcjZGcuKRm32iyraJdDiqQ==
+Received: from DM6PR05CA0039.namprd05.prod.outlook.com (2603:10b6:5:335::8) by
+ DM6PR12MB3161.namprd12.prod.outlook.com (2603:10b6:5:182::20) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.5482.11; Sun, 31 Jul 2022 12:56:09 +0000
+Received: from DM6NAM11FT048.eop-nam11.prod.protection.outlook.com
+ (2603:10b6:5:335:cafe::9a) by DM6PR05CA0039.outlook.office365.com
+ (2603:10b6:5:335::8) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5458.15 via Frontend
+ Transport; Sun, 31 Jul 2022 12:56:09 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 12.22.5.238)
+ smtp.mailfrom=nvidia.com; dkim=none (message not signed)
+ header.d=none;dmarc=pass action=none header.from=nvidia.com;
+Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
+ 12.22.5.238 as permitted sender) receiver=protection.outlook.com;
+ client-ip=12.22.5.238; helo=mail.nvidia.com; pr=C
+Received: from mail.nvidia.com (12.22.5.238) by
+ DM6NAM11FT048.mail.protection.outlook.com (10.13.173.114) with Microsoft SMTP
+ Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384) id
+ 15.20.5482.10 via Frontend Transport; Sun, 31 Jul 2022 12:56:08 +0000
+Received: from rnnvmail203.nvidia.com (10.129.68.9) by DRHQMAIL105.nvidia.com
+ (10.27.9.14) with Microsoft SMTP Server (TLS) id 15.0.1497.32; Sun, 31 Jul
+ 2022 12:55:55 +0000
+Received: from rnnvmail205.nvidia.com (10.129.68.10) by rnnvmail203.nvidia.com
+ (10.129.68.9) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.986.26; Sun, 31 Jul
+ 2022 05:55:55 -0700
+Received: from vdi.nvidia.com (10.127.8.10) by mail.nvidia.com (10.129.68.10)
+ with Microsoft SMTP Server id 15.2.986.26 via Frontend Transport; Sun, 31 Jul
+ 2022 05:55:52 -0700
+From:   Yishai Hadas <yishaih@nvidia.com>
+To:     <alex.williamson@redhat.com>, <jgg@nvidia.com>
+CC:     <saeedm@nvidia.com>, <kvm@vger.kernel.org>,
+        <netdev@vger.kernel.org>, <kuba@kernel.org>,
+        <kevin.tian@intel.com>, <joao.m.martins@oracle.com>,
+        <leonro@nvidia.com>, <yishaih@nvidia.com>, <maorg@nvidia.com>,
+        <cohuck@redhat.com>
+Subject: [PATCH V3 vfio 00/11] Add device DMA logging support for mlx5 driver
+Date:   Sun, 31 Jul 2022 15:54:52 +0300
+Message-ID: <20220731125503.142683-1-yishaih@nvidia.com>
+X-Mailer: git-send-email 2.21.0
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
+Content-Type: text/plain
+X-EOPAttributedMessage: 0
+X-MS-PublicTrafficType: Email
+X-MS-Office365-Filtering-Correlation-Id: 1a33c687-f70b-4da4-9377-08da72f409ef
+X-MS-TrafficTypeDiagnostic: DM6PR12MB3161:EE_
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: =?us-ascii?Q?uLS47x1TBeOSdOPjfmRj3ascxYigfhPsJJ2pUlcJg3FAtfXrr/5RED6oXt9A?=
+ =?us-ascii?Q?HkhOcIRa8MYhFMLGlsmXQsrtWancwDeADx7mCZHUglNSU3J5CgLnajXxKVSp?=
+ =?us-ascii?Q?MAmFkAiwjFaWl1DcwSgxJOHifczb7GBBOrOQvukC22cwqvVsXJ6qN4C30Ov2?=
+ =?us-ascii?Q?Lwrnaq2lJD1kbSy12NCIasBx3wuvorRIcP3RCaDln0n5ndOMD5uP4cUqXOqf?=
+ =?us-ascii?Q?HSMTvSXLs9oKZtmgLt2lM5yxlxqaXfUq9bILG4FP8lbt5UKd7k5Yp64xrZmf?=
+ =?us-ascii?Q?A1W/XnDOH7j8swuyw/rNlSnqkYOrjvPCEjX7QVaJebDJR/T50e4AWIkj0ryX?=
+ =?us-ascii?Q?P3hLhHRcyqGHKbrL+OnsD8DAmtYB7Hc/KAtTwu8fSLZCESt3gsA7EXdcndyg?=
+ =?us-ascii?Q?B4ykH2fg63GQhXWCZoCg729hiTI7F6Ckzi0+3ujp/VWaTBuDnGrEQah76axA?=
+ =?us-ascii?Q?QArRqfirpLKHvzjXREt0ZSXi2t2w/dB5u/4QFguDuSG3w+o8Uzuo6LRxIWwD?=
+ =?us-ascii?Q?olupkiG4MGZjXV5jjtaxKBTDxuT7KXdZDLJPyxbo6mCedVrOOlQmCagpEI8i?=
+ =?us-ascii?Q?3ag3+XopDPx9gyD6UKkSyTlLYUK5OaB8+2N0cajlqTL4FZAtrwlEc5zbx0xe?=
+ =?us-ascii?Q?QEseJTDX9xo03yuhZyboqTUuLP3xIS8/ID38r803k5KccJJs1tdaEF2t6PFY?=
+ =?us-ascii?Q?SqMbAste6J4qqPFT6eMY7T8chfmfGdPQ6T9q+vMYUaToelp6PJ3QTPsMQWH5?=
+ =?us-ascii?Q?Ix0DOJtFGCmunQ3V2sOHCGQNGKq+7Rp2ddikrBP4wxZqhl/VGyf3G+PaNYm2?=
+ =?us-ascii?Q?i6BjUgcl2QIWZMiBLtLuY3feH1E0NSMf9+ZnSxsnXlBfvTEb6JEKasOqmAE8?=
+ =?us-ascii?Q?B1KY3PQ+amml13ODz8+1kEAmd4NwGvu9lva6dGfxvsTqyQWEBgttwNEOa0fw?=
+ =?us-ascii?Q?eaCCSUJ1DnhpemAFaNVMjQ=3D=3D?=
+X-Forefront-Antispam-Report: CIP:12.22.5.238;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:InfoNoRecords;CAT:NONE;SFS:(13230016)(4636009)(346002)(136003)(39860400002)(376002)(396003)(40470700004)(46966006)(36840700001)(54906003)(6636002)(36860700001)(316002)(41300700001)(7696005)(26005)(40480700001)(82310400005)(36756003)(86362001)(83380400001)(110136005)(2906002)(4326008)(8676002)(70206006)(70586007)(478600001)(2616005)(966005)(186003)(1076003)(336012)(426003)(47076005)(40460700003)(81166007)(8936002)(356005)(5660300002)(82740400003)(36900700001);DIR:OUT;SFP:1101;
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 31 Jul 2022 12:56:08.9535
+ (UTC)
+X-MS-Exchange-CrossTenant-Network-Message-Id: 1a33c687-f70b-4da4-9377-08da72f409ef
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[12.22.5.238];Helo=[mail.nvidia.com]
+X-MS-Exchange-CrossTenant-AuthSource: DM6NAM11FT048.eop-nam11.prod.protection.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Anonymous
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM6PR12MB3161
+X-Spam-Status: No, score=-2.6 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FORGED_SPF_HELO,
+        RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_NONE
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-From: Kyle Huey <me@kylehuey.com>
+This series adds device DMA logging uAPIs and their implementation as
+part of mlx5 driver.
 
-When management of the PKRU register was moved away from XSTATE, emulation
-of PKRU's existence in XSTATE was added for APIs that read XSTATE, but not
-for APIs that write XSTATE. This can be seen by running gdb and executing
-`p $pkru`, `set $pkru = 42`, and `p $pkru`. On affected kernels (5.14+) the
-write to the PKRU register (which gdb performs through ptrace) is ignored.
+DMA logging allows a device to internally record what DMAs the device is
+initiating and report them back to userspace. It is part of the VFIO
+migration infrastructure that allows implementing dirty page tracking
+during the pre copy phase of live migration. Only DMA WRITEs are logged,
+and this API is not connected to VFIO_DEVICE_FEATURE_MIG_DEVICE_STATE.
 
-There are three relevant APIs: PTRACE_SETREGSET with NT_X86_XSTATE,
-sigreturn, and KVM_SET_XSAVE. KVM_SET_XSAVE has its own special handling to
-make PKRU writes take effect (in fpu_copy_uabi_to_guest_fpstate). Push that
-down into copy_uabi_to_xstate and have PTRACE_SETREGSET with NT_X86_XSTATE
-and sigreturn pass in pointers to the appropriate PKRU value.
+The uAPIs are based on the FEATURE ioctl as were introduced earlier by
+the below RFC [1] and follows the notes that were discussed in the
+mailing list.
 
-This also adds code to initialize the PKRU value to the hardware init value
-(namely 0) if the PKRU bit is not set in the XSTATE header to match XRSTOR.
-This is a change to the current KVM_SET_XSAVE behavior.
+It includes:
+- A PROBE option to detect if the device supports DMA logging.
+- A SET option to start device DMA logging in given IOVAs ranges.
+- A GET option to read back and clear the device DMA log.
+- A SET option to stop device DMA logging that was previously started.
 
-Signed-off-by: Kyle Huey <me@kylehuey.com>
-Cc: kvm@vger.kernel.org # For edge case behavior of KVM_SET_XSAVE
-Cc: stable@vger.kernel.org # 5.14+
-Fixes: e84ba47e313dbc097bf859bb6e4f9219883d5f78
----
- arch/x86/kernel/fpu/core.c   | 11 +----------
- arch/x86/kernel/fpu/regset.c |  2 +-
- arch/x86/kernel/fpu/signal.c |  2 +-
- arch/x86/kernel/fpu/xstate.c | 26 +++++++++++++++++++++-----
- arch/x86/kernel/fpu/xstate.h |  4 ++--
- 5 files changed, 26 insertions(+), 19 deletions(-)
+Extra details exist as part of relevant patches in the series.
 
-diff --git a/arch/x86/kernel/fpu/core.c b/arch/x86/kernel/fpu/core.c
-index 0531d6a06df5..dfb79e2ee81f 100644
---- a/arch/x86/kernel/fpu/core.c
-+++ b/arch/x86/kernel/fpu/core.c
-@@ -406,16 +406,7 @@ int fpu_copy_uabi_to_guest_fpstate(struct fpu_guest *gfpu, const void *buf,
- 	if (ustate->xsave.header.xfeatures & ~xcr0)
- 		return -EINVAL;
- 
--	ret = copy_uabi_from_kernel_to_xstate(kstate, ustate);
--	if (ret)
--		return ret;
--
--	/* Retrieve PKRU if not in init state */
--	if (kstate->regs.xsave.header.xfeatures & XFEATURE_MASK_PKRU) {
--		xpkru = get_xsave_addr(&kstate->regs.xsave, XFEATURE_PKRU);
--		*vpkru = xpkru->pkru;
--	}
--	return 0;
-+	return copy_uabi_from_kernel_to_xstate(kstate, ustate, vpkru);
- }
- EXPORT_SYMBOL_GPL(fpu_copy_uabi_to_guest_fpstate);
- #endif /* CONFIG_KVM */
-diff --git a/arch/x86/kernel/fpu/regset.c b/arch/x86/kernel/fpu/regset.c
-index 75ffaef8c299..6d056b68f4ed 100644
---- a/arch/x86/kernel/fpu/regset.c
-+++ b/arch/x86/kernel/fpu/regset.c
-@@ -167,7 +167,7 @@ int xstateregs_set(struct task_struct *target, const struct user_regset *regset,
- 	}
- 
- 	fpu_force_restore(fpu);
--	ret = copy_uabi_from_kernel_to_xstate(fpu->fpstate, kbuf ?: tmpbuf);
-+	ret = copy_uabi_from_kernel_to_xstate(fpu->fpstate, kbuf ?: tmpbuf, &target->thread.pkru);
- 
- out:
- 	vfree(tmpbuf);
-diff --git a/arch/x86/kernel/fpu/signal.c b/arch/x86/kernel/fpu/signal.c
-index 91d4b6de58ab..558076dbde5b 100644
---- a/arch/x86/kernel/fpu/signal.c
-+++ b/arch/x86/kernel/fpu/signal.c
-@@ -396,7 +396,7 @@ static bool __fpu_restore_sig(void __user *buf, void __user *buf_fx,
- 
- 	fpregs = &fpu->fpstate->regs;
- 	if (use_xsave() && !fx_only) {
--		if (copy_sigframe_from_user_to_xstate(fpu->fpstate, buf_fx))
-+		if (copy_sigframe_from_user_to_xstate(tsk, buf_fx))
- 			return false;
- 	} else {
- 		if (__copy_from_user(&fpregs->fxsave, buf_fx,
-diff --git a/arch/x86/kernel/fpu/xstate.c b/arch/x86/kernel/fpu/xstate.c
-index c8340156bfd2..1eea7af4afd9 100644
---- a/arch/x86/kernel/fpu/xstate.c
-+++ b/arch/x86/kernel/fpu/xstate.c
-@@ -1197,7 +1197,7 @@ static int copy_from_buffer(void *dst, unsigned int offset, unsigned int size,
- 
- 
- static int copy_uabi_to_xstate(struct fpstate *fpstate, const void *kbuf,
--			       const void __user *ubuf)
-+			       const void __user *ubuf, u32 *pkru)
- {
- 	struct xregs_state *xsave = &fpstate->regs.xsave;
- 	unsigned int offset, size;
-@@ -1235,6 +1235,22 @@ static int copy_uabi_to_xstate(struct fpstate *fpstate, const void *kbuf,
- 	for (i = 0; i < XFEATURE_MAX; i++) {
- 		mask = BIT_ULL(i);
- 
-+		if (i == XFEATURE_PKRU) {
-+			/*
-+			 * Retrieve PKRU if not in init state, otherwise
-+			 * initialize it.
-+			 */
-+			if (hdr.xfeatures & mask) {
-+				struct pkru_state xpkru = {0};
-+
-+				copy_from_buffer(&xpkru, xstate_offsets[i],
-+						 sizeof(xpkru), kbuf, ubuf);
-+				*pkru = xpkru.pkru;
-+			} else {
-+				*pkru = 0;
-+			}
-+		}
-+
- 		if (hdr.xfeatures & mask) {
- 			void *dst = __raw_xsave_addr(xsave, i);
- 
-@@ -1264,9 +1280,9 @@ static int copy_uabi_to_xstate(struct fpstate *fpstate, const void *kbuf,
-  * Convert from a ptrace standard-format kernel buffer to kernel XSAVE[S]
-  * format and copy to the target thread. Used by ptrace and KVM.
-  */
--int copy_uabi_from_kernel_to_xstate(struct fpstate *fpstate, const void *kbuf)
-+int copy_uabi_from_kernel_to_xstate(struct fpstate *fpstate, const void *kbuf, u32 *pkru)
- {
--	return copy_uabi_to_xstate(fpstate, kbuf, NULL);
-+	return copy_uabi_to_xstate(fpstate, kbuf, NULL, pkru);
- }
- 
- /*
-@@ -1274,10 +1290,10 @@ int copy_uabi_from_kernel_to_xstate(struct fpstate *fpstate, const void *kbuf)
-  * XSAVE[S] format and copy to the target thread. This is called from the
-  * sigreturn() and rt_sigreturn() system calls.
-  */
--int copy_sigframe_from_user_to_xstate(struct fpstate *fpstate,
-+int copy_sigframe_from_user_to_xstate(struct task_struct *tsk,
- 				      const void __user *ubuf)
- {
--	return copy_uabi_to_xstate(fpstate, NULL, ubuf);
-+	return copy_uabi_to_xstate(tsk->thread.fpu.fpstate, NULL, ubuf, &tsk->thread.pkru);
- }
- 
- static bool validate_independent_components(u64 mask)
-diff --git a/arch/x86/kernel/fpu/xstate.h b/arch/x86/kernel/fpu/xstate.h
-index 5ad47031383b..a4ecb04d8d64 100644
---- a/arch/x86/kernel/fpu/xstate.h
-+++ b/arch/x86/kernel/fpu/xstate.h
-@@ -46,8 +46,8 @@ extern void __copy_xstate_to_uabi_buf(struct membuf to, struct fpstate *fpstate,
- 				      u32 pkru_val, enum xstate_copy_mode copy_mode);
- extern void copy_xstate_to_uabi_buf(struct membuf to, struct task_struct *tsk,
- 				    enum xstate_copy_mode mode);
--extern int copy_uabi_from_kernel_to_xstate(struct fpstate *fpstate, const void *kbuf);
--extern int copy_sigframe_from_user_to_xstate(struct fpstate *fpstate, const void __user *ubuf);
-+extern int copy_uabi_from_kernel_to_xstate(struct fpstate *fpstate, const void *kbuf, u32 *pkru);
-+extern int copy_sigframe_from_user_to_xstate(struct task_struct *tsk, const void __user *ubuf);
- 
- 
- extern void fpu__init_cpu_xstate(void);
+In addition, the series adds some infrastructure support for managing an
+IOVA bitmap done by Joao Martins.
+
+It abstracts how an IOVA range is represented in a bitmap that is
+granulated by a given page_size. So it translates all the lifting of
+dealing with user pointers into its corresponding kernel addresses.
+This new functionality abstracts the complexity of user/kernel bitmap
+pointer usage and finally enables an API to set some bits.
+
+This functionality will be used as part of IOMMUFD series for the system
+IOMMU tracking.
+
+Finally, we come with mlx5 implementation based on its device
+specification for the DMA logging APIs.
+
+The matching qemu changes can be previewed here [2].
+They come on top of the v2 migration protocol patches that were sent
+already to the mailing list.
+
+Note:
+- As this series touched mlx5_core parts we may need to send the
+  net/mlx5 patches as a pull request format to VFIO to avoid conflicts
+  before acceptance.
+
+[1] https://lore.kernel.org/all/20220501123301.127279-1-yishaih@nvidia.com/T/
+[2] https://github.com/avihai1122/qemu/commits/device_dirty_tracking
+
+Changes from V2: https://lore.kernel.org/netdev/20220726151232.GF4438@nvidia.com/t/
+Patch #1
+- Add some reserved fields that were missed.
+Patch #3:
+- Improve the UAPI documentation in few places as was asked by Alex and
+  Kevin, based on the discussion in the mailing list.
+Patch #5:
+- Improvements from Joao for his IOVA bitmap patch to be
+  cleaner/simpler as was asked by Alex. It includes the below:
+   * Make iova_to_index and index_to_iova fully symmetrical.
+   * Use 'sizeof(*iter->data) * BITS_PER_BYTE' in both index_to_iova
+     and iova_to_index.
+   * Remove iova_bitmap_init() and just stay with iova_bitmap_iter_init().
+   * s/left/remaining/
+   * To not use @remaining variable for both index and iova/length.
+   * Remove stale comment on max dirty bitmap bits.
+   * Remove DIV_ROUNDUP from iova_to_index() helper and replace with a
+     division.
+   * Use iova rather than length where appropriate, while noting with
+     commentary the usage of length as next relative IOVA.
+   * Rework pinning to be internal and remove that from the iova iter
+     API caller.
+   * get() and put() now teardown iova_bitmap::dirty npages.
+   * Move unnecessary includes into the C file.
+   * Add theory of operation and theory of usage in the header file.
+   * Add more comments on private helpers on less obvious logic
+   * Add documentation on all public APIs.
+  * Change commit to reflect new usage of APIs.
+Patch #6:
+- Drop the hard-coded 1024 for LOG_MAX_RANGES and replace to consider
+  PAGE_SIZE as was suggested by Jason.
+- Return -E2BIG as Alex suggested.
+- Adapt the loop upon logging report to new IOVA bit map stuff.
+
+Changes from V1: https://lore.kernel.org/netdev/202207052209.x00Iykkp-lkp@intel.com/T/
+
+- Patch #6: Fix a note given by krobot, select INTERVAL_TREE for VFIO.
+
+Changes from V0: https://lore.kernel.org/netdev/202207011231.1oPQhSzo-lkp@intel.com/T/
+
+- Drop the first 2 patches that Alex merged already.
+- Fix a note given by krobot, based on Jason's suggestion.
+- Some improvements from Joao for his IOVA bitmap patch to be
+  cleaner/simpler. It includes the below:
+    * Rename iova_bitmap_array_length to iova_bitmap_iova_to_index.
+    * Rename iova_bitmap_index_to_length to iova_bitmap_index_to_iova.
+    * Change iova_bitmap_iova_to_index to take an iova_bitmap_iter
+      as an argument to pair with iova_bitmap_index_to_length.
+    * Make iova_bitmap_iter_done() use >= instead of
+      substraction+comparison. This fixes iova_bitmap_iter_done()
+      return as it was previously returning when !done.
+    * Remove iova_bitmap_iter_length().
+    * Simplify iova_bitmap_length() overcomplicated trailing end check
+    * Convert all sizeof(u64) into sizeof(*iter->data).
+    * Use u64 __user for ::data instead of void in both struct and
+      initialization of iova_bitmap.
+
+Yishai
+
+Jason Gunthorpe (1):
+  vfio: Move vfio.c to vfio_main.c
+
+Joao Martins (1):
+  vfio: Add an IOVA bitmap support
+
+Yishai Hadas (9):
+  net/mlx5: Introduce ifc bits for page tracker
+  net/mlx5: Query ADV_VIRTUALIZATION capabilities
+  vfio: Introduce DMA logging uAPIs
+  vfio: Introduce the DMA logging feature support
+  vfio/mlx5: Init QP based resources for dirty tracking
+  vfio/mlx5: Create and destroy page tracker object
+  vfio/mlx5: Report dirty pages from tracker
+  vfio/mlx5: Manage error scenarios on tracker
+  vfio/mlx5: Set the driver DMA logging callbacks
+
+ drivers/net/ethernet/mellanox/mlx5/core/fw.c  |   6 +
+ .../net/ethernet/mellanox/mlx5/core/main.c    |   1 +
+ drivers/vfio/Kconfig                          |   1 +
+ drivers/vfio/Makefile                         |   4 +
+ drivers/vfio/iova_bitmap.c                    | 224 ++++
+ drivers/vfio/pci/mlx5/cmd.c                   | 995 +++++++++++++++++-
+ drivers/vfio/pci/mlx5/cmd.h                   |  63 +-
+ drivers/vfio/pci/mlx5/main.c                  |   9 +-
+ drivers/vfio/pci/vfio_pci_core.c              |   5 +
+ drivers/vfio/{vfio.c => vfio_main.c}          | 159 +++
+ include/linux/iova_bitmap.h                   | 189 ++++
+ include/linux/mlx5/device.h                   |   9 +
+ include/linux/mlx5/mlx5_ifc.h                 |  82 +-
+ include/linux/vfio.h                          |  21 +-
+ include/uapi/linux/vfio.h                     |  88 ++
+ 15 files changed, 1838 insertions(+), 18 deletions(-)
+ create mode 100644 drivers/vfio/iova_bitmap.c
+ rename drivers/vfio/{vfio.c => vfio_main.c} (93%)
+ create mode 100644 include/linux/iova_bitmap.h
+
 -- 
-2.37.0
+2.18.1
 
