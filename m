@@ -2,85 +2,74 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 5A731585B07
-	for <lists+kvm@lfdr.de>; Sat, 30 Jul 2022 17:30:27 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id C5C08585D97
+	for <lists+kvm@lfdr.de>; Sun, 31 Jul 2022 07:03:53 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235114AbiG3PaV (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sat, 30 Jul 2022 11:30:21 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51826 "EHLO
+        id S231398AbiGaFDt (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sun, 31 Jul 2022 01:03:49 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41772 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235039AbiG3PaR (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sat, 30 Jul 2022 11:30:17 -0400
-Received: from mail-lf1-x130.google.com (mail-lf1-x130.google.com [IPv6:2a00:1450:4864:20::130])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 018BD1113
-        for <kvm@vger.kernel.org>; Sat, 30 Jul 2022 08:30:14 -0700 (PDT)
-Received: by mail-lf1-x130.google.com with SMTP id bq11so6095728lfb.5
-        for <kvm@vger.kernel.org>; Sat, 30 Jul 2022 08:30:14 -0700 (PDT)
+        with ESMTP id S230519AbiGaFDr (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sun, 31 Jul 2022 01:03:47 -0400
+Received: from mail-pg1-x52a.google.com (mail-pg1-x52a.google.com [IPv6:2607:f8b0:4864:20::52a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 18A4313DCB
+        for <kvm@vger.kernel.org>; Sat, 30 Jul 2022 22:03:45 -0700 (PDT)
+Received: by mail-pg1-x52a.google.com with SMTP id 12so7076092pga.1
+        for <kvm@vger.kernel.org>; Sat, 30 Jul 2022 22:03:45 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=semihalf.com; s=google;
-        h=subject:to:cc:references:from:message-id:date:user-agent
-         :mime-version:in-reply-to:content-language:content-transfer-encoding;
-        bh=Shasy3oM/UnNVI3MkMReNR3M/LSkhB3SgHfHS7qVxiE=;
-        b=R1q+yhnFk9WD3jHtTF9gau37yzpt6W/+NU6hqUgUvXFpNUjeyhAAtxAc7eE6un1D5K
-         986SjpabDCuABTTvg/N4dNQIr7rYsDyxnd59cEFNJ4/1PwDrVbtOQAtzgnsqAS0C4vo4
-         Rf9BxrtKIO4SYglaIjsQoC6DlQVjeNKDA21ODAikECjqBf4Cp+wH5Rn7RZfG30WEDgzi
-         wsyowNA8DZ2RcKA1EOHf+iKlBLaLv8CR/5gXOuia35HKa/hOUxxgqZb4vCY4I1JnuRBD
-         RA3CFAF+faf1kUgQl92s+vt7eBLGctyLQxms6N+mARbp+BVSUWudlygIulrn6zdkl22R
-         dpDw==
+        d=kylehuey.com; s=google;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc;
+        bh=LzB8XuGXprfZz0N1oF/7jRPSpf9FyZkTZ3frqXsBtnc=;
+        b=gEXYE/ZP3mN9LEHWIo967jESNWuZeLpX+BsRSQEr7/bTs5+csJDdmdlrquXNZzrHj8
+         yB1w1IDLEN/ReoNtW8GZbkvfXZUIF38jJA1qO+U4POMf+6YCF7TF1Ej5sEm8JrhSb69c
+         UzxWfCJWJB6ZZVxuK/DehOcqsr710h1ZHAZ9IVtCzvFzjfo7c/kdFoEmW7kFCX6jmfmz
+         sANy1OA3T4zYyEeyXQispCvWsuLjhF/GmeYbTMu3LzlOV5H7ORrLVF4UqyfhpP4nGEmE
+         OMgw3A8x6X5YS7Tsen2gx6V10i1ruSahUIMztiaXIB3mcy1Td+6gmwWEXgdeMoyRzU6P
+         GwrQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=Shasy3oM/UnNVI3MkMReNR3M/LSkhB3SgHfHS7qVxiE=;
-        b=MYUnR/I8vj4u82dBupvigrp/hExjUeXAATAC/4I6Ve90Ikcc0F5whcnhkCx4RDLOrV
-         FZUex2P0qIbRwDWjsXzpwryMUyC87Wj0Ud08K4n0mQgODTu4egnRP0GSPyVij1v4RTSb
-         1eAw2fjV1AGXPQf9llj7lmMqYvrTLOAJ370HuFmLUS3N0Al5ebwsZ9bMxAp0zBERz9Ik
-         PuGRNmz3sdssjUQBVuqEkPVWBe+tFv6Nk9milCOw+imMPfNlFkm6k6Gm927rHBJtawh8
-         fETXKr++4VFvID4pDEEiA1EhKsdCiiycUVFhu0zilyxE1vUg7E8DHLLsf8rQz+U5Beo1
-         HzuQ==
-X-Gm-Message-State: AJIora+Nb5kq4XqacjH6Wl4VdnajZzTYERowijRWlF3PkV7n2p1NDATY
-        waGnAXTCmhwtgAYIIjpCTyDxRw==
-X-Google-Smtp-Source: AGRyM1uu0X/n7gE0GOUllHj7Si6tU/Zvf7+IuLYK1jIXUyQQ/oCCJj4m/N4F2vHP6tzPcxWT6xBCdg==
-X-Received: by 2002:a05:6512:2591:b0:48a:d133:66f3 with SMTP id bf17-20020a056512259100b0048ad13366f3mr3111959lfb.470.1659195013168;
-        Sat, 30 Jul 2022 08:30:13 -0700 (PDT)
-Received: from ?IPv6:2a02:a31b:33d:9c00:463a:87e3:44fc:2b2f? ([2a02:a31b:33d:9c00:463a:87e3:44fc:2b2f])
-        by smtp.gmail.com with ESMTPSA id e6-20020a2ea546000000b0025dd6c8933csm1007503ljn.114.2022.07.30.08.30.11
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Sat, 30 Jul 2022 08:30:12 -0700 (PDT)
-Subject: Re: [PATCH 3/3] KVM: irqfd: Postpone resamplefd notify for oneshot
- interrupts
-To:     "Liu, Rong L" <rong.l.liu@intel.com>,
-        "Christopherson,, Sean" <seanjc@google.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>
-Cc:     Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        Dave Hansen <dave.hansen@linux.intel.com>,
-        "x86@kernel.org" <x86@kernel.org>,
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc;
+        bh=LzB8XuGXprfZz0N1oF/7jRPSpf9FyZkTZ3frqXsBtnc=;
+        b=YKO1UhlHVxerKYNJH4t0i9K/icx+itpIabTukgJXcPg3xCOw8PzOZT9hRIz7jISC/f
+         Az42NE0XxzRW2YNluUiT6maFYq5lJmJNYDx99Qy1NwpTC+1vg/BpcEit811ofGNs608e
+         pbJVKKFlyHIuw74XJ3YHGeoiVX26aA1r6OE9W4zwUIsgbDniSwCa5kI5qjowIyf5P40V
+         GZ+J+GwqUef/l34hqivmHyuv4KO8TjdvlldGzOydJKonzAogSfKlD7kT9qGge3x5p650
+         9rdHTuKz648+r55xTle3EQxGyqlLBrdVBgdbsvPfKt1OqM9XBl2VGC8cTMvW+ZrEH4Ad
+         E1kA==
+X-Gm-Message-State: AJIora/9eszUUwihLZQQRUTtr+y4a2KBMN1wTADR2+VF07vSwkGPWmpS
+        Meqjh+CPl7hmlCTXFO7lqu5LaQ==
+X-Google-Smtp-Source: AGRyM1sVdAH14sGSgUBwRYIjpmst+tPrJVkOlRxmDnDET70SUsJNKV30xDvo/M2GgAMKxtUtTr9iIQ==
+X-Received: by 2002:a05:6a00:bc5:b0:52b:49c9:d26c with SMTP id x5-20020a056a000bc500b0052b49c9d26cmr10487567pfu.73.1659243824487;
+        Sat, 30 Jul 2022 22:03:44 -0700 (PDT)
+Received: from minbar.home.kylehuey.com (c-71-198-251-229.hsd1.ca.comcast.net. [71.198.251.229])
+        by smtp.gmail.com with ESMTPSA id f14-20020a170902684e00b00162529828aesm6647811pln.109.2022.07.30.22.03.43
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sat, 30 Jul 2022 22:03:44 -0700 (PDT)
+From:   Kyle Huey <me@kylehuey.com>
+X-Google-Original-From: Kyle Huey <khuey@kylehuey.com>
+To:     Dave Hansen <dave.hansen@linux.intel.com>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Borislav Petkov <bp@alien8.de>
+Cc:     Ingo Molnar <mingo@redhat.com>, x86@kernel.org,
         "H. Peter Anvin" <hpa@zytor.com>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        Eric Auger <eric.auger@redhat.com>,
-        Alex Williamson <alex.williamson@redhat.com>,
-        Zhenyu Wang <zhenyuw@linux.intel.com>,
-        Tomasz Nowicki <tn@semihalf.com>,
-        Grzegorz Jaszczyk <jaz@semihalf.com>,
-        Dmitry Torokhov <dtor@google.com>
-References: <20220715155928.26362-1-dmy@semihalf.com>
- <20220715155928.26362-4-dmy@semihalf.com>
- <MW3PR11MB45542DAB98E5A7AAAD38FE30C7999@MW3PR11MB4554.namprd11.prod.outlook.com>
-From:   Dmytro Maluka <dmy@semihalf.com>
-Message-ID: <9054d9f9-f41e-05c7-ce8d-628a6c827c40@semihalf.com>
-Date:   Sat, 30 Jul 2022 17:30:10 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.13.0
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Andy Lutomirski <luto@kernel.org>,
+        Peter Zijlstra <peterz@infradead.org>,
+        linux-kernel@vger.kernel.org,
+        Robert O'Callahan <robert@ocallahan.org>,
+        David Manouchehri <david.manouchehri@riseup.net>,
+        Kyle Huey <me@kylehuey.com>, kvm@vger.kernel.org,
+        stable@vger.kernel.org
+Subject: [PATCH] x86/fpu: Allow PKRU to be (once again) written by ptrace.
+Date:   Sat, 30 Jul 2022 22:03:42 -0700
+Message-Id: <20220731050342.56513-1-khuey@kylehuey.com>
+X-Mailer: git-send-email 2.37.0
 MIME-Version: 1.0
-In-Reply-To: <MW3PR11MB45542DAB98E5A7AAAD38FE30C7999@MW3PR11MB4554.namprd11.prod.outlook.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_DNSWL_NONE,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
         SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -88,243 +77,160 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 7/29/22 11:21 PM, Liu, Rong L wrote:
-> Hi Dmytro,
-> 
->> -----Original Message-----
->> From: Dmytro Maluka <dmy@semihalf.com>
->> Sent: Friday, July 15, 2022 8:59 AM
->> To: Christopherson,, Sean <seanjc@google.com>; Paolo Bonzini
->> <pbonzini@redhat.com>; kvm@vger.kernel.org
->> Cc: Thomas Gleixner <tglx@linutronix.de>; Ingo Molnar
->> <mingo@redhat.com>; Borislav Petkov <bp@alien8.de>; Dave Hansen
->> <dave.hansen@linux.intel.com>; x86@kernel.org; H. Peter Anvin
->> <hpa@zytor.com>; linux-kernel@vger.kernel.org; Eric Auger
->> <eric.auger@redhat.com>; Alex Williamson
->> <alex.williamson@redhat.com>; Liu, Rong L <rong.l.liu@intel.com>;
->> Zhenyu Wang <zhenyuw@linux.intel.com>; Tomasz Nowicki
->> <tn@semihalf.com>; Grzegorz Jaszczyk <jaz@semihalf.com>; Dmitry
->> Torokhov <dtor@google.com>; Dmytro Maluka <dmy@semihalf.com>
->> Subject: [PATCH 3/3] KVM: irqfd: Postpone resamplefd notify for oneshot
->> interrupts
->>
->> The existing KVM mechanism for forwarding of level-triggered interrupts
->> using resample eventfd doesn't work quite correctly in the case of
->> interrupts that are handled in a Linux guest as oneshot interrupts
->> (IRQF_ONESHOT). Such an interrupt is acked to the device in its
->> threaded irq handler, i.e. later than it is acked to the interrupt
->> controller (EOI at the end of hardirq), not earlier.
->>
->> Linux keeps such interrupt masked until its threaded handler finishes,
->> to prevent the EOI from re-asserting an unacknowledged interrupt.
->> However, with KVM + vfio (or whatever is listening on the resamplefd)
->> we don't check that the interrupt is still masked in the guest at the
->> moment of EOI. Resamplefd is notified regardless, so vfio prematurely
->> unmasks the host physical IRQ, thus a new (unwanted) physical interrupt
->> is generated in the host and queued for injection to the guest.
->>
->> The fact that the virtual IRQ is still masked doesn't prevent this new
->> physical IRQ from being propagated to the guest, because:
->>
->> 1. It is not guaranteed that the vIRQ will remain masked by the time
->>    when vfio signals the trigger eventfd.
->> 2. KVM marks this IRQ as pending (e.g. setting its bit in the virtual
->>    IRR register of IOAPIC on x86), so after the vIRQ is unmasked, this
->>    new pending interrupt is injected by KVM to the guest anyway.
->>
->> There are observed at least 2 user-visible issues caused by those
->> extra erroneous pending interrupts for oneshot irq in the guest:
->>
->> 1. System suspend aborted due to a pending wakeup interrupt from
->>    ChromeOS EC (drivers/platform/chrome/cros_ec.c).
->> 2. Annoying "invalid report id data" errors from ELAN0000 touchpad
->>    (drivers/input/mouse/elan_i2c_core.c), flooding the guest dmesg
->>    every time the touchpad is touched.
->>
->> This patch fixes the issue on x86 by checking if the interrupt is
->> unmasked when we receive irq ack (EOI) and, in case if it's masked,
->> postponing resamplefd notify until the guest unmasks it.
->>
->> Important notes:
->>
->> 1. It doesn't fix the issue for other archs yet, due to some missing
->>    KVM functionality needed by this patch:
->>      - calling mask notifiers is implemented for x86 only
->>      - irqchip ->is_masked() is implemented for x86 only
->>
->> 2. It introduces an additional spinlock locking in the resample notify
->>    path, since we are no longer just traversing an RCU list of irqfds
->>    but also updating the resampler state. Hopefully this locking won't
->>    noticeably slow down anything for anyone.
->>
->> Regarding #2, there may be an alternative solution worth considering:
->> extend KVM irqfd (userspace) API to send mask and unmask notifications
->> directly to vfio/whatever, in addition to resample notifications, to
->> let vfio check the irq state on its own. There is already locking on
->> vfio side (see e.g. vfio_platform_unmask()), so this way we would avoid
->> introducing any additional locking. Also such mask/unmask notifications
->> could be useful for other cases.
->>
->> Link: https://lore.kernel.org/kvm/31420943-8c5f-125c-a5ee-
->> d2fde2700083@semihalf.com/
->> Suggested-by: Sean Christopherson <seanjc@google.com>
->> Signed-off-by: Dmytro Maluka <dmy@semihalf.com>
->> ---
->>  include/linux/kvm_irqfd.h | 14 ++++++++++++
->>  virt/kvm/eventfd.c        | 45
->> +++++++++++++++++++++++++++++++++++++++
->>  2 files changed, 59 insertions(+)
->>
->> diff --git a/include/linux/kvm_irqfd.h b/include/linux/kvm_irqfd.h
->> index dac047abdba7..01754a1abb9e 100644
->> --- a/include/linux/kvm_irqfd.h
->> +++ b/include/linux/kvm_irqfd.h
->> @@ -19,6 +19,16 @@
->>   * resamplefd.  All resamplers on the same gsi are de-asserted
->>   * together, so we don't need to track the state of each individual
->>   * user.  We can also therefore share the same irq source ID.
->> + *
->> + * A special case is when the interrupt is still masked at the moment
->> + * an irq ack is received. That likely means that the interrupt has
->> + * been acknowledged to the interrupt controller but not acknowledged
->> + * to the device yet, e.g. it might be a Linux guest's threaded
->> + * oneshot interrupt (IRQF_ONESHOT). In this case notifying through
->> + * resamplefd is postponed until the guest unmasks the interrupt,
->> + * which is detected through the irq mask notifier. This prevents
->> + * erroneous extra interrupts caused by premature re-assert of an
->> + * unacknowledged interrupt by the resamplefd listener.
->>   */
-> 
-> I don't really agree with above statement.  Please correct me if I am wrong.  In
-> all modern x86 interrupt infrastructure(lapic/ioapic), for level triggered
-> interrupt, the sequence is always EOI (LAPIC), which is called interrupt ack in
-> the context of this discussion, then unmask (IOAPIC).  Oneshot interrupt is
-> different only because the timing of above 2 events are different from a
-> "normal" level-triggered interrupt.  It is like for level interrupt:  Hardirq ->
-> EOI -> Unmask but for oneshot, it is like: hardirq->EOI, then sometime later
-> threadedirq->unmask.  So based on this, I don't think you need to keep track of
-> whether the interrupt is unmasked or not, just need to call the notifier at the
-> end of unmask, instead of EOI.  And calling notifier at the end of unmask,
-> instead of EOI won't break non-oneshot case.  The only caveat is guest ioapic
-> update (virq unmask) doesn't cause vmexit.  But the assumption is already made
-> that virq unmask causes vmexit.
+From: Kyle Huey <me@kylehuey.com>
 
-This doesn't seem true to me. For example, looking at how Linux handles
-level-triggered IOAPIC interrupts in handle_fasteoi_irq(), AFAICS
-normally it does EOI only, without masking or unmasking.
+When management of the PKRU register was moved away from XSTATE, emulation
+of PKRU's existence in XSTATE was added for APIs that read XSTATE, but not
+for APIs that write XSTATE. This can be seen by running gdb and executing
+`p $pkru`, `set $pkru = 42`, and `p $pkru`. On affected kernels (5.14+) the
+write to the PKRU register (which gdb performs through ptrace) is ignored.
 
-I believe for regular level-triggered interrupts it's like:
+There are three relevant APIs: PTRACE_SETREGSET with NT_X86_XSTATE,
+sigreturn, and KVM_SET_XSAVE. KVM_SET_XSAVE has its own special handling to
+make PKRU writes take effect (in fpu_copy_uabi_to_guest_fpstate). Push that
+down into copy_uabi_to_xstate and have PTRACE_SETREGSET with NT_X86_XSTATE
+and sigreturn pass in pointers to the appropriate PKRU value.
 
-    hardirq -> EOI
+This also adds code to initialize the PKRU value to the hardware init value
+(namely 0) if the PKRU bit is not set in the XSTATE header to match XRSTOR.
+This is a change to the current KVM_SET_XSAVE behavior.
 
-while for oneshot interrupts:
+Signed-off-by: Kyle Huey <me@kylehuey.com>
+Cc: kvm@vger.kernel.org # For edge case behavior of KVM_SET_XSAVE
+Cc: stable@vger.kernel.org # 5.14+
+Fixes: e84ba47e313dbc097bf859bb6e4f9219883d5f78
+---
+ arch/x86/kernel/fpu/core.c   | 11 +----------
+ arch/x86/kernel/fpu/regset.c |  2 +-
+ arch/x86/kernel/fpu/signal.c |  2 +-
+ arch/x86/kernel/fpu/xstate.c | 26 +++++++++++++++++++++-----
+ arch/x86/kernel/fpu/xstate.h |  4 ++--
+ 5 files changed, 26 insertions(+), 19 deletions(-)
 
-    mask -> hardirq -> EOI -> threadedirq -> unmask
+diff --git a/arch/x86/kernel/fpu/core.c b/arch/x86/kernel/fpu/core.c
+index 0531d6a06df5..dfb79e2ee81f 100644
+--- a/arch/x86/kernel/fpu/core.c
++++ b/arch/x86/kernel/fpu/core.c
+@@ -406,16 +406,7 @@ int fpu_copy_uabi_to_guest_fpstate(struct fpu_guest *gfpu, const void *buf,
+ 	if (ustate->xsave.header.xfeatures & ~xcr0)
+ 		return -EINVAL;
+ 
+-	ret = copy_uabi_from_kernel_to_xstate(kstate, ustate);
+-	if (ret)
+-		return ret;
+-
+-	/* Retrieve PKRU if not in init state */
+-	if (kstate->regs.xsave.header.xfeatures & XFEATURE_MASK_PKRU) {
+-		xpkru = get_xsave_addr(&kstate->regs.xsave, XFEATURE_PKRU);
+-		*vpkru = xpkru->pkru;
+-	}
+-	return 0;
++	return copy_uabi_from_kernel_to_xstate(kstate, ustate, vpkru);
+ }
+ EXPORT_SYMBOL_GPL(fpu_copy_uabi_to_guest_fpstate);
+ #endif /* CONFIG_KVM */
+diff --git a/arch/x86/kernel/fpu/regset.c b/arch/x86/kernel/fpu/regset.c
+index 75ffaef8c299..6d056b68f4ed 100644
+--- a/arch/x86/kernel/fpu/regset.c
++++ b/arch/x86/kernel/fpu/regset.c
+@@ -167,7 +167,7 @@ int xstateregs_set(struct task_struct *target, const struct user_regset *regset,
+ 	}
+ 
+ 	fpu_force_restore(fpu);
+-	ret = copy_uabi_from_kernel_to_xstate(fpu->fpstate, kbuf ?: tmpbuf);
++	ret = copy_uabi_from_kernel_to_xstate(fpu->fpstate, kbuf ?: tmpbuf, &target->thread.pkru);
+ 
+ out:
+ 	vfree(tmpbuf);
+diff --git a/arch/x86/kernel/fpu/signal.c b/arch/x86/kernel/fpu/signal.c
+index 91d4b6de58ab..558076dbde5b 100644
+--- a/arch/x86/kernel/fpu/signal.c
++++ b/arch/x86/kernel/fpu/signal.c
+@@ -396,7 +396,7 @@ static bool __fpu_restore_sig(void __user *buf, void __user *buf_fx,
+ 
+ 	fpregs = &fpu->fpstate->regs;
+ 	if (use_xsave() && !fx_only) {
+-		if (copy_sigframe_from_user_to_xstate(fpu->fpstate, buf_fx))
++		if (copy_sigframe_from_user_to_xstate(tsk, buf_fx))
+ 			return false;
+ 	} else {
+ 		if (__copy_from_user(&fpregs->fxsave, buf_fx,
+diff --git a/arch/x86/kernel/fpu/xstate.c b/arch/x86/kernel/fpu/xstate.c
+index c8340156bfd2..1eea7af4afd9 100644
+--- a/arch/x86/kernel/fpu/xstate.c
++++ b/arch/x86/kernel/fpu/xstate.c
+@@ -1197,7 +1197,7 @@ static int copy_from_buffer(void *dst, unsigned int offset, unsigned int size,
+ 
+ 
+ static int copy_uabi_to_xstate(struct fpstate *fpstate, const void *kbuf,
+-			       const void __user *ubuf)
++			       const void __user *ubuf, u32 *pkru)
+ {
+ 	struct xregs_state *xsave = &fpstate->regs.xsave;
+ 	unsigned int offset, size;
+@@ -1235,6 +1235,22 @@ static int copy_uabi_to_xstate(struct fpstate *fpstate, const void *kbuf,
+ 	for (i = 0; i < XFEATURE_MAX; i++) {
+ 		mask = BIT_ULL(i);
+ 
++		if (i == XFEATURE_PKRU) {
++			/*
++			 * Retrieve PKRU if not in init state, otherwise
++			 * initialize it.
++			 */
++			if (hdr.xfeatures & mask) {
++				struct pkru_state xpkru = {0};
++
++				copy_from_buffer(&xpkru, xstate_offsets[i],
++						 sizeof(xpkru), kbuf, ubuf);
++				*pkru = xpkru.pkru;
++			} else {
++				*pkru = 0;
++			}
++		}
++
+ 		if (hdr.xfeatures & mask) {
+ 			void *dst = __raw_xsave_addr(xsave, i);
+ 
+@@ -1264,9 +1280,9 @@ static int copy_uabi_to_xstate(struct fpstate *fpstate, const void *kbuf,
+  * Convert from a ptrace standard-format kernel buffer to kernel XSAVE[S]
+  * format and copy to the target thread. Used by ptrace and KVM.
+  */
+-int copy_uabi_from_kernel_to_xstate(struct fpstate *fpstate, const void *kbuf)
++int copy_uabi_from_kernel_to_xstate(struct fpstate *fpstate, const void *kbuf, u32 *pkru)
+ {
+-	return copy_uabi_to_xstate(fpstate, kbuf, NULL);
++	return copy_uabi_to_xstate(fpstate, kbuf, NULL, pkru);
+ }
+ 
+ /*
+@@ -1274,10 +1290,10 @@ int copy_uabi_from_kernel_to_xstate(struct fpstate *fpstate, const void *kbuf)
+  * XSAVE[S] format and copy to the target thread. This is called from the
+  * sigreturn() and rt_sigreturn() system calls.
+  */
+-int copy_sigframe_from_user_to_xstate(struct fpstate *fpstate,
++int copy_sigframe_from_user_to_xstate(struct task_struct *tsk,
+ 				      const void __user *ubuf)
+ {
+-	return copy_uabi_to_xstate(fpstate, NULL, ubuf);
++	return copy_uabi_to_xstate(tsk->thread.fpu.fpstate, NULL, ubuf, &tsk->thread.pkru);
+ }
+ 
+ static bool validate_independent_components(u64 mask)
+diff --git a/arch/x86/kernel/fpu/xstate.h b/arch/x86/kernel/fpu/xstate.h
+index 5ad47031383b..a4ecb04d8d64 100644
+--- a/arch/x86/kernel/fpu/xstate.h
++++ b/arch/x86/kernel/fpu/xstate.h
+@@ -46,8 +46,8 @@ extern void __copy_xstate_to_uabi_buf(struct membuf to, struct fpstate *fpstate,
+ 				      u32 pkru_val, enum xstate_copy_mode copy_mode);
+ extern void copy_xstate_to_uabi_buf(struct membuf to, struct task_struct *tsk,
+ 				    enum xstate_copy_mode mode);
+-extern int copy_uabi_from_kernel_to_xstate(struct fpstate *fpstate, const void *kbuf);
+-extern int copy_sigframe_from_user_to_xstate(struct fpstate *fpstate, const void __user *ubuf);
++extern int copy_uabi_from_kernel_to_xstate(struct fpstate *fpstate, const void *kbuf, u32 *pkru);
++extern int copy_sigframe_from_user_to_xstate(struct task_struct *tsk, const void __user *ubuf);
+ 
+ 
+ extern void fpu__init_cpu_xstate(void);
+-- 
+2.37.0
 
-I don't quite get what would be the point of unmasking in addition to an
-EOI in the normal case (not in a special case like oneshot interrupt,
-where we mask the interrupt in the beginning of hardirq, so need to
-unmask it later on). Isn't the whole point of "fast EOI" to minimize
-latencies by using just one LAPIC write, no IOAPIC writes?
-
-Thanks,
-Dmytro
-
-> 	
->>  struct kvm_kernel_irqfd_resampler {
->>  	struct kvm *kvm;
->> @@ -28,6 +38,10 @@ struct kvm_kernel_irqfd_resampler {
->>  	 */
->>  	struct list_head list;
->>  	struct kvm_irq_ack_notifier notifier;
->> +	struct kvm_irq_mask_notifier mask_notifier;
->> +	bool masked;
->> +	bool pending;
->> +	spinlock_t lock;
->>  	/*
->>  	 * Entry in list of kvm->irqfd.resampler_list.  Use for sharing
->>  	 * resamplers among irqfds on the same gsi.
->> diff --git a/virt/kvm/eventfd.c b/virt/kvm/eventfd.c
->> index 50ddb1d1a7f0..9ff47ac33790 100644
->> --- a/virt/kvm/eventfd.c
->> +++ b/virt/kvm/eventfd.c
->> @@ -75,6 +75,44 @@ irqfd_resampler_ack(struct kvm_irq_ack_notifier
->> *kian)
->>  	kvm_set_irq(kvm, KVM_IRQFD_RESAMPLE_IRQ_SOURCE_ID,
->>  		    resampler->notifier.gsi, 0, false);
->>
->> +	spin_lock(&resampler->lock);
->> +	if (resampler->masked) {
->> +		resampler->pending = true;
->> +		spin_unlock(&resampler->lock);
->> +		return;
->> +	}
->> +	spin_unlock(&resampler->lock);
->> +
->> +	idx = srcu_read_lock(&kvm->irq_srcu);
->> +
->> +	list_for_each_entry_srcu(irqfd, &resampler->list, resampler_link,
->> +	    srcu_read_lock_held(&kvm->irq_srcu))
->> +		eventfd_signal(irqfd->resamplefd, 1);
->> +
->> +	srcu_read_unlock(&kvm->irq_srcu, idx);
->> +}
->> +
->> +static void
->> +irqfd_resampler_mask(struct kvm_irq_mask_notifier *kimn, bool
->> masked)
->> +{
->> +	struct kvm_kernel_irqfd_resampler *resampler;
->> +	struct kvm *kvm;
->> +	struct kvm_kernel_irqfd *irqfd;
->> +	int idx;
->> +
->> +	resampler = container_of(kimn,
->> +			struct kvm_kernel_irqfd_resampler, mask_notifier);
->> +	kvm = resampler->kvm;
->> +
->> +	spin_lock(&resampler->lock);
->> +	resampler->masked = masked;
->> +	if (masked || !resampler->pending) {
->> +		spin_unlock(&resampler->lock);
->> +		return;
->> +	}
->> +	resampler->pending = false;
->> +	spin_unlock(&resampler->lock);
->> +
->>  	idx = srcu_read_lock(&kvm->irq_srcu);
->>
->>  	list_for_each_entry_srcu(irqfd, &resampler->list, resampler_link,
->> @@ -98,6 +136,8 @@ irqfd_resampler_shutdown(struct
->> kvm_kernel_irqfd *irqfd)
->>  	if (list_empty(&resampler->list)) {
->>  		list_del(&resampler->link);
->>  		kvm_unregister_irq_ack_notifier(kvm, &resampler->notifier);
->> +		kvm_unregister_irq_mask_notifier(kvm, resampler-
->>> mask_notifier.irq,
->> +						 &resampler->mask_notifier);
->>  		kvm_set_irq(kvm, KVM_IRQFD_RESAMPLE_IRQ_SOURCE_ID,
->>  			    resampler->notifier.gsi, 0, false);
->>  		kfree(resampler);
->> @@ -367,11 +407,16 @@ kvm_irqfd_assign(struct kvm *kvm, struct
->> kvm_irqfd *args)
->>  			INIT_LIST_HEAD(&resampler->list);
->>  			resampler->notifier.gsi = irqfd->gsi;
->>  			resampler->notifier.irq_acked = irqfd_resampler_ack;
->> +			resampler->mask_notifier.func = irqfd_resampler_mask;
->> +			kvm_irq_is_masked(kvm, irqfd->gsi, &resampler-
->>> masked);
->> +			spin_lock_init(&resampler->lock);
->>  			INIT_LIST_HEAD(&resampler->link);
->>
->>  			list_add(&resampler->link, &kvm->irqfds.resampler_list);
->>  			kvm_register_irq_ack_notifier(kvm,
->>  						      &resampler->notifier);
->> +			kvm_register_irq_mask_notifier(kvm, irqfd->gsi,
->> +						       &resampler->mask_notifier);
->>  			irqfd->resampler = resampler;
->>  		}
->>
->> --
->> 2.37.0.170.g444d1eabd0-goog
-> 
