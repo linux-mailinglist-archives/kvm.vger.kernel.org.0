@@ -2,63 +2,63 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id BDB90586586
-	for <lists+kvm@lfdr.de>; Mon,  1 Aug 2022 09:12:57 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id BC6E25865DD
+	for <lists+kvm@lfdr.de>; Mon,  1 Aug 2022 09:51:03 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229623AbiHAHM4 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 1 Aug 2022 03:12:56 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54872 "EHLO
+        id S229764AbiHAHvA (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 1 Aug 2022 03:51:00 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47814 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229510AbiHAHMy (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 1 Aug 2022 03:12:54 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 0284C3245E
-        for <kvm@vger.kernel.org>; Mon,  1 Aug 2022 00:12:49 -0700 (PDT)
+        with ESMTP id S229623AbiHAHu5 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 1 Aug 2022 03:50:57 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 0188F380
+        for <kvm@vger.kernel.org>; Mon,  1 Aug 2022 00:50:55 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1659337969;
+        s=mimecast20190719; t=1659340255;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=MaJwcPw6rqMoxKbpURhjt5MI2gMh6mCZlx+/+qZ4dYI=;
-        b=FgLQl+CS4wWxorlCxbOXhZgDCdQr5y4VxDCgfNrtQCASp7hu5CqTh8+GJNSuL0wNAj2e/7
-        pOsLztC3rwVUGPR0KpCuI+1e6QIG6SdEiSAAyHXVOPXn8XCQUZ71sKKD10cX1vSnsf5X+Q
-        0PPrjIoNGL75YfojGaBG3WxaIcM1UjY=
-Received: from mail-qv1-f72.google.com (mail-qv1-f72.google.com
- [209.85.219.72]) by relay.mimecast.com with ESMTP with STARTTLS
+        bh=/+UyS8DzqXh878QkjFjhBHrIJgfcT45MTc/yc/0BW48=;
+        b=AR/jRChUJC3nKAC5e+p67aNuPnxLbUvbZeT2FtzGZtl/XcEpurMYTkM9udOiyZZqBESMqN
+        AQqgE7FKZc+Lb1JTvpK2hL5H81rX5WOaQuY6jlJXfgkyRgoPeSovYqY6u9bKewmp22Jbi7
+        g2MxfphcnSeMGgOOACXhiPaaJWaVVEA=
+Received: from mail-qv1-f70.google.com (mail-qv1-f70.google.com
+ [209.85.219.70]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-632-Q207hRzLOw2p9MaV_b7mEg-1; Mon, 01 Aug 2022 03:12:47 -0400
-X-MC-Unique: Q207hRzLOw2p9MaV_b7mEg-1
-Received: by mail-qv1-f72.google.com with SMTP id q1-20020a056214018100b0047464a85fc4so5884386qvr.7
-        for <kvm@vger.kernel.org>; Mon, 01 Aug 2022 00:12:47 -0700 (PDT)
+ us-mta-505-lzS3lpgRPCWU6Ly90r6nzg-1; Mon, 01 Aug 2022 03:50:54 -0400
+X-MC-Unique: lzS3lpgRPCWU6Ly90r6nzg-1
+Received: by mail-qv1-f70.google.com with SMTP id k7-20020a056214102700b004740a13b3bcso5958132qvr.4
+        for <kvm@vger.kernel.org>; Mon, 01 Aug 2022 00:50:54 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:mime-version:references:in-reply-to:from:date
          :message-id:subject:to:cc:content-transfer-encoding;
-        bh=MaJwcPw6rqMoxKbpURhjt5MI2gMh6mCZlx+/+qZ4dYI=;
-        b=6vwD3PrDumUqB1NqZSWjJ5Wm7B6YGm4TrqrsasDYtoK2SoLcKYm0wTWF8trBZYs/Qw
-         7KArwoEX4MzUJclveSummpq7LUmh/psC96syUdkRq2K1ATzU9oJL8m3h8DkGA97QTH8S
-         pBWeuhdD7t0Qin7jqMRJkWRdPs75I+b7REaKuRMuUKn2VaJobtKxKsU035Cx5Excw1Ma
-         K2GV6Xc0+L9xTe9qcDN9FKvXLfpXg7kMuxjnYaFz3xKcaxQYRqXefKZf8cNrdaPl/wqB
-         Ib1oq2LjMS3GUji4cgSwpFYHP/oK/0YQa8+6OkkwQ0F1M5j3nKrJK5tXgHOG4MugQVqJ
-         SS0A==
-X-Gm-Message-State: AJIora/kn0irAeqFi30nsfNcvtiFfS2K2f359EPYbRBWwOH2dFpuzihn
-        a503F8mmJIdXD4o1Jj+VLk9pHrGAotwRuRcSgV4Z4Y0HJaDuJVxGyOPAQUPKrJqntIxUmZtC6ao
-        wS5OOSpMxLq4N+e/zMIl2aumG+IOO
-X-Received: by 2002:a05:622a:451:b0:31f:4257:4eb2 with SMTP id o17-20020a05622a045100b0031f42574eb2mr12904756qtx.370.1659337967087;
-        Mon, 01 Aug 2022 00:12:47 -0700 (PDT)
-X-Google-Smtp-Source: AGRyM1uy0ZyKis0LvodlojZgZ/Lwc5lXOzt2JS41lLsfg3F+rNCQbg7u1pOKRVQs4wGQcINWsoPevJvX4LSQpQnpx3U=
-X-Received: by 2002:a05:622a:451:b0:31f:4257:4eb2 with SMTP id
- o17-20020a05622a045100b0031f42574eb2mr12904730qtx.370.1659337966813; Mon, 01
- Aug 2022 00:12:46 -0700 (PDT)
+        bh=/+UyS8DzqXh878QkjFjhBHrIJgfcT45MTc/yc/0BW48=;
+        b=KucHB/wrPZjFdFxsWLJ9stsx4Zr2KY/y/FesbYPG4NcXpRfnbOA3X7rCyTiNFJ22Qg
+         TDPmvC77QNyYucR4NpVYdMuXYQu+cvffOEEjri6aTSBhso09troSVPZnHTQya6zrM+b3
+         aa9GERpGPLkyvVm6RAVyk8k/1cTQdkz22U/yvycARgvvK9bTb1PnDZ5Qib/dC5vaQ3qb
+         aA2gIpbfxDyhoP6kkgvTLvVKGuNApeJyLk2mnJrONWFKKEu6RpGywIenR+theGL25Ry8
+         CjeDWgtRm0T9F+j40ZLdTaPIXuwTHflN1gkvXcXppeOy97B7WM18BH/++kuvz4mcZg5z
+         bvig==
+X-Gm-Message-State: AJIora9bYw+iniArtS8ugZNk9SJQ8kZ3HHjcFGk7fS03tHSkLfjmBCMH
+        aaqQgw/uINow2mjUdy8rfLb18ruc6n/b7Czy3BSdmS4o6uXadxQGfS04WJlM+lBlffb2z8y2Ry6
+        5jH2jiR90t++zPffzv39awSu0l0Zg
+X-Received: by 2002:a05:620a:29d5:b0:6b5:dc06:5762 with SMTP id s21-20020a05620a29d500b006b5dc065762mr10847749qkp.522.1659340253455;
+        Mon, 01 Aug 2022 00:50:53 -0700 (PDT)
+X-Google-Smtp-Source: AGRyM1uEC9zxz+Cbnlys5mCZOduhSUlkB8q/ckaxlv+q83GrNX/6hN+UsOcJO8IJBJLH1fTgSYLBBdt5Zmnkz1RfBSk=
+X-Received: by 2002:a05:620a:29d5:b0:6b5:dc06:5762 with SMTP id
+ s21-20020a05620a29d500b006b5dc065762mr10847742qkp.522.1659340253177; Mon, 01
+ Aug 2022 00:50:53 -0700 (PDT)
 MIME-Version: 1.0
-References: <20220722134318.3430667-1-eperezma@redhat.com> <20220722134318.3430667-5-eperezma@redhat.com>
- <22b35cff-bcd5-78b8-cab4-43d2e65dccbe@redhat.com>
-In-Reply-To: <22b35cff-bcd5-78b8-cab4-43d2e65dccbe@redhat.com>
+References: <20220722134318.3430667-1-eperezma@redhat.com> <20220722134318.3430667-8-eperezma@redhat.com>
+ <74d24a62-7017-e937-3bcb-af8f6b605fee@redhat.com>
+In-Reply-To: <74d24a62-7017-e937-3bcb-af8f6b605fee@redhat.com>
 From:   Eugenio Perez Martin <eperezma@redhat.com>
-Date:   Mon, 1 Aug 2022 09:12:11 +0200
-Message-ID: <CAJaqyWe1rpz4LtX++zht7eSq3qGYi1s-Ti6iFV96HjrAYE1JSA@mail.gmail.com>
-Subject: Re: [PATCH v2 4/7] vdpa: Add asid parameter to vhost_vdpa_dma_map/unmap
+Date:   Mon, 1 Aug 2022 09:50:17 +0200
+Message-ID: <CAJaqyWf3Ua5LFxO9E-nJ+2DD0_nEX_-aK=Gw+R20TBcYnwr2Ng@mail.gmail.com>
+Subject: Re: [PATCH v2 7/7] vdpa: Always start CVQ in SVQ mode
 To:     Jason Wang <jasowang@redhat.com>
 Cc:     qemu-level <qemu-devel@nongnu.org>,
         Harpreet Singh Anand <hanand@xilinx.com>,
@@ -77,8 +77,8 @@ Cc:     qemu-level <qemu-devel@nongnu.org>,
         Laurent Vivier <lvivier@redhat.com>
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
-X-Spam-Status: No, score=-2.7 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+X-Spam-Status: No, score=-3.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,
         SPF_HELO_NONE,SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -86,247 +86,343 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Jul 25, 2022 at 11:36 AM Jason Wang <jasowang@redhat.com> wrote:
+On Tue, Jul 26, 2022 at 5:04 AM Jason Wang <jasowang@redhat.com> wrote:
 >
 >
 > =E5=9C=A8 2022/7/22 21:43, Eugenio P=C3=A9rez =E5=86=99=E9=81=93:
-> > So the caller can choose which ASID is destined.
-> >
-> > No need to update the batch functions as they will always be called fro=
-m
-> > memory listener updates at the moment. Memory listener updates will
-> > always update ASID 0, as it's the passthrough ASID.
-> >
-> > All vhost devices's ASID are 0 at this moment.
+> > Isolate control virtqueue in its own group, allowing to intercept contr=
+ol
+> > commands but letting dataplane run totally passthrough to the guest.
 > >
 > > Signed-off-by: Eugenio P=C3=A9rez <eperezma@redhat.com>
 > > ---
-> >   include/hw/virtio/vhost-vdpa.h |  8 +++++---
-> >   hw/virtio/vhost-vdpa.c         | 26 ++++++++++++++++----------
-> >   net/vhost-vdpa.c               |  6 +++---
-> >   hw/virtio/trace-events         |  4 ++--
-> >   4 files changed, 26 insertions(+), 18 deletions(-)
+> >   hw/virtio/vhost-vdpa.c |   3 +-
+> >   net/vhost-vdpa.c       | 158 +++++++++++++++++++++++++++++++++++++++-=
+-
+> >   2 files changed, 156 insertions(+), 5 deletions(-)
 > >
-> > diff --git a/include/hw/virtio/vhost-vdpa.h b/include/hw/virtio/vhost-v=
-dpa.h
-> > index 1111d85643..6560bb9d78 100644
-> > --- a/include/hw/virtio/vhost-vdpa.h
-> > +++ b/include/hw/virtio/vhost-vdpa.h
-> > @@ -29,6 +29,7 @@ typedef struct vhost_vdpa {
-> >       int index;
-> >       uint32_t msg_type;
-> >       bool iotlb_batch_begin_sent;
-> > +    uint32_t address_space_id;
-> >       MemoryListener listener;
-> >       struct vhost_vdpa_iova_range iova_range;
-> >       uint64_t acked_features;
-> > @@ -42,8 +43,9 @@ typedef struct vhost_vdpa {
-> >       VhostVDPAHostNotifier notifier[VIRTIO_QUEUE_MAX];
-> >   } VhostVDPA;
-> >
-> > -int vhost_vdpa_dma_map(struct vhost_vdpa *v, hwaddr iova, hwaddr size,
-> > -                       void *vaddr, bool readonly);
-> > -int vhost_vdpa_dma_unmap(struct vhost_vdpa *v, hwaddr iova, hwaddr siz=
-e);
-> > +int vhost_vdpa_dma_map(struct vhost_vdpa *v, uint32_t asid, hwaddr iov=
-a,
-> > +                       hwaddr size, void *vaddr, bool readonly);
-> > +int vhost_vdpa_dma_unmap(struct vhost_vdpa *v, uint32_t asid, hwaddr i=
-ova,
-> > +                         hwaddr size);
-> >
-> >   #endif
 > > diff --git a/hw/virtio/vhost-vdpa.c b/hw/virtio/vhost-vdpa.c
-> > index e1ed56b26d..79623badf2 100644
+> > index 79623badf2..fe1c85b086 100644
 > > --- a/hw/virtio/vhost-vdpa.c
 > > +++ b/hw/virtio/vhost-vdpa.c
-> > @@ -72,22 +72,24 @@ static bool vhost_vdpa_listener_skipped_section(Mem=
-oryRegionSection *section,
-> >       return false;
-> >   }
-> >
-> > -int vhost_vdpa_dma_map(struct vhost_vdpa *v, hwaddr iova, hwaddr size,
-> > -                       void *vaddr, bool readonly)
-> > +int vhost_vdpa_dma_map(struct vhost_vdpa *v, uint32_t asid, hwaddr iov=
-a,
-> > +                       hwaddr size, void *vaddr, bool readonly)
+> > @@ -668,7 +668,8 @@ static int vhost_vdpa_set_backend_cap(struct vhost_=
+dev *dev)
 > >   {
-> >       struct vhost_msg_v2 msg =3D {};
-> >       int fd =3D v->device_fd;
-> >       int ret =3D 0;
+> >       uint64_t features;
+> >       uint64_t f =3D 0x1ULL << VHOST_BACKEND_F_IOTLB_MSG_V2 |
+> > -        0x1ULL << VHOST_BACKEND_F_IOTLB_BATCH;
+> > +        0x1ULL << VHOST_BACKEND_F_IOTLB_BATCH |
+> > +        0x1ULL << VHOST_BACKEND_F_IOTLB_ASID;
+> >       int r;
 > >
-> >       msg.type =3D v->msg_type;
-> > +    msg.asid =3D asid;
-> >       msg.iotlb.iova =3D iova;
-> >       msg.iotlb.size =3D size;
-> >       msg.iotlb.uaddr =3D (uint64_t)(uintptr_t)vaddr;
-> >       msg.iotlb.perm =3D readonly ? VHOST_ACCESS_RO : VHOST_ACCESS_RW;
-> >       msg.iotlb.type =3D VHOST_IOTLB_UPDATE;
+> >       if (vhost_vdpa_call(dev, VHOST_GET_BACKEND_FEATURES, &features)) =
+{
+> > diff --git a/net/vhost-vdpa.c b/net/vhost-vdpa.c
+> > index 6c1c64f9b1..f5075ef487 100644
+> > --- a/net/vhost-vdpa.c
+> > +++ b/net/vhost-vdpa.c
+> > @@ -37,6 +37,9 @@ typedef struct VhostVDPAState {
+> >       /* Control commands shadow buffers */
+> >       void *cvq_cmd_out_buffer, *cvq_cmd_in_buffer;
 > >
-> > -   trace_vhost_vdpa_dma_map(v, fd, msg.type, msg.iotlb.iova, msg.iotlb=
-.size,
-> > -                            msg.iotlb.uaddr, msg.iotlb.perm, msg.iotlb=
-.type);
-> > +    trace_vhost_vdpa_dma_map(v, fd, msg.type, msg.asid, msg.iotlb.iova=
-,
-> > +                             msg.iotlb.size, msg.iotlb.uaddr, msg.iotl=
-b.perm,
-> > +                             msg.iotlb.type);
-> >
-> >       if (write(fd, &msg, sizeof(msg)) !=3D sizeof(msg)) {
-> >           error_report("failed to write, fd=3D%d, errno=3D%d (%s)",
-> > @@ -98,18 +100,20 @@ int vhost_vdpa_dma_map(struct vhost_vdpa *v, hwadd=
-r iova, hwaddr size,
-> >       return ret;
-> >   }
-> >
-> > -int vhost_vdpa_dma_unmap(struct vhost_vdpa *v, hwaddr iova, hwaddr siz=
-e)
-> > +int vhost_vdpa_dma_unmap(struct vhost_vdpa *v, uint32_t asid, hwaddr i=
-ova,
-> > +                         hwaddr size)
-> >   {
-> >       struct vhost_msg_v2 msg =3D {};
-> >       int fd =3D v->device_fd;
-> >       int ret =3D 0;
-> >
-> >       msg.type =3D v->msg_type;
-> > +    msg.asid =3D asid;
-> >       msg.iotlb.iova =3D iova;
-> >       msg.iotlb.size =3D size;
-> >       msg.iotlb.type =3D VHOST_IOTLB_INVALIDATE;
-> >
-> > -    trace_vhost_vdpa_dma_unmap(v, fd, msg.type, msg.iotlb.iova,
-> > +    trace_vhost_vdpa_dma_unmap(v, fd, msg.type, msg.asid, msg.iotlb.io=
-va,
-> >                                  msg.iotlb.size, msg.iotlb.type);
-> >
-> >       if (write(fd, &msg, sizeof(msg)) !=3D sizeof(msg)) {
-> > @@ -228,7 +232,7 @@ static void vhost_vdpa_listener_region_add(MemoryLi=
-stener *listener,
-> >       }
-> >
-> >       vhost_vdpa_iotlb_batch_begin_once(v);
-> > -    ret =3D vhost_vdpa_dma_map(v, iova, int128_get64(llsize),
-> > +    ret =3D vhost_vdpa_dma_map(v, 0, iova, int128_get64(llsize),
-> >                                vaddr, section->readonly);
-> >       if (ret) {
-> >           error_report("vhost vdpa map fail!");
-> > @@ -293,7 +297,7 @@ static void vhost_vdpa_listener_region_del(MemoryLi=
-stener *listener,
-> >           vhost_iova_tree_remove(v->iova_tree, result);
-> >       }
-> >       vhost_vdpa_iotlb_batch_begin_once(v);
-> > -    ret =3D vhost_vdpa_dma_unmap(v, iova, int128_get64(llsize));
-> > +    ret =3D vhost_vdpa_dma_unmap(v, 0, iova, int128_get64(llsize));
-> >       if (ret) {
-> >           error_report("vhost_vdpa dma unmap error!");
-> >       }
-> > @@ -884,7 +888,7 @@ static bool vhost_vdpa_svq_unmap_ring(struct vhost_=
-vdpa *v,
-> >       }
-> >
-> >       size =3D ROUND_UP(result->size, qemu_real_host_page_size());
-> > -    r =3D vhost_vdpa_dma_unmap(v, result->iova, size);
-> > +    r =3D vhost_vdpa_dma_unmap(v, v->address_space_id, result->iova, s=
-ize);
-> >       return r =3D=3D 0;
-> >   }
-> >
-> > @@ -926,7 +930,8 @@ static bool vhost_vdpa_svq_map_ring(struct vhost_vd=
-pa *v, DMAMap *needle,
-> >           return false;
-> >       }
-> >
-> > -    r =3D vhost_vdpa_dma_map(v, needle->iova, needle->size + 1,
-> > +    r =3D vhost_vdpa_dma_map(v, v->address_space_id, needle->iova,
-> > +                           needle->size + 1,
-> >                              (void *)(uintptr_t)needle->translated_addr=
-,
-> >                              needle->perm =3D=3D IOMMU_RO);
-> >       if (unlikely(r !=3D 0)) {
-> > @@ -1092,6 +1097,7 @@ static int vhost_vdpa_dev_start(struct vhost_dev =
-*dev, bool started)
-> >
-> >       if (started) {
-> >           vhost_vdpa_host_notifiers_init(dev);
+> > +    /* Number of address spaces supported by the device */
+> > +    unsigned address_space_num;
 > > +
+> >       /* The device always have SVQ enabled */
+> >       bool always_svq;
+> >       bool started;
+> > @@ -100,6 +103,8 @@ static const uint64_t vdpa_svq_device_features =3D
+> >       BIT_ULL(VIRTIO_NET_F_RSC_EXT) |
+> >       BIT_ULL(VIRTIO_NET_F_STANDBY);
+> >
+> > +#define VHOST_VDPA_NET_CVQ_ASID 1
+> > +
+> >   VHostNetState *vhost_vdpa_get_vhost_net(NetClientState *nc)
+> >   {
+> >       VhostVDPAState *s =3D DO_UPCAST(VhostVDPAState, nc, nc);
+> > @@ -214,6 +219,109 @@ static ssize_t vhost_vdpa_receive(NetClientState =
+*nc, const uint8_t *buf,
+> >       return 0;
+> >   }
+> >
+> > +static int vhost_vdpa_get_vring_group(int device_fd,
+> > +                                      struct vhost_vring_state *state)
+> > +{
+> > +    int r =3D ioctl(device_fd, VHOST_VDPA_GET_VRING_GROUP, state);
+> > +    return r < 0 ? -errno : 0;
+> > +}
 >
 >
-> Unnecessary changes.
->
-> Other looks good.
+> It would be more convenient for the caller if we can simply return 0 here=
+.
 >
 
-I'll resend without it.
+I don't follow this, how do we know if the call failed then?
+
+>
+> > +
+> > +/**
+> > + * Check if all the virtqueues of the virtio device are in a different=
+ vq than
+> > + * the last vq. VQ group of last group passed in cvq_group.
+> > + */
+> > +static bool vhost_vdpa_cvq_group_is_independent(struct vhost_vdpa *v,
+> > +                                            struct vhost_vring_state c=
+vq_group)
+> > +{
+> > +    struct vhost_dev *dev =3D v->dev;
+> > +    int ret;
+> > +
+> > +    for (int i =3D 0; i < (dev->vq_index_end - 1); ++i) {
+> > +        struct vhost_vring_state vq_group =3D {
+> > +            .index =3D i,
+> > +        };
+> > +
+> > +        ret =3D vhost_vdpa_get_vring_group(v->device_fd, &vq_group);
+> > +        if (unlikely(ret)) {
+> > +            goto call_err;
+> > +        }
+> > +        if (unlikely(vq_group.num =3D=3D cvq_group.num)) {
+> > +            error_report("CVQ %u group is the same as VQ %u one (%u)",
+> > +                         cvq_group.index, vq_group.index, cvq_group.nu=
+m);
+>
+>
+> Any reason we need error_report() here?
+>
+
+We can move it to a migration blocker.
+
+> Btw, I'd suggest to introduce new field in vhost_vdpa, then we can get
+> and store the group_id there during init.
+>
+> This could be useful for the future e.g PASID virtualization.
+>
+
+Answering below.
+
+>
+> > +            return false;
+> > +        }
+> > +    }
+> > +
+> > +    return true;
+> > +
+> > +call_err:
+> > +    error_report("Can't read vq group, errno=3D%d (%s)", -ret, g_strer=
+ror(-ret));
+> > +    return false;
+> > +}
+> > +
+> > +static int vhost_vdpa_set_address_space_id(struct vhost_vdpa *v,
+> > +                                           unsigned vq_group,
+> > +                                           unsigned asid_num)
+> > +{
+> > +    struct vhost_vring_state asid =3D {
+> > +        .index =3D vq_group,
+> > +        .num =3D asid_num,
+> > +    };
+> > +    int ret;
+> > +
+> > +    ret =3D ioctl(v->device_fd, VHOST_VDPA_SET_GROUP_ASID, &asid);
+> > +    if (unlikely(ret < 0)) {
+> > +        error_report("Can't set vq group %u asid %u, errno=3D%d (%s)",
+> > +            asid.index, asid.num, errno, g_strerror(errno));
+> > +    }
+> > +    return ret;
+> > +}
+> > +
+> > +static void vhost_vdpa_net_prepare(NetClientState *nc)
+> > +{
+> > +    VhostVDPAState *s =3D DO_UPCAST(VhostVDPAState, nc, nc);
+> > +    struct vhost_vdpa *v =3D &s->vhost_vdpa;
+> > +    struct vhost_dev *dev =3D v->dev;
+> > +    struct vhost_vring_state cvq_group =3D {
+> > +        .index =3D v->dev->vq_index_end - 1,
+> > +    };
+> > +    int r;
+> > +
+> > +    assert(nc->info->type =3D=3D NET_CLIENT_DRIVER_VHOST_VDPA);
+> > +
+> > +    if (dev->nvqs !=3D 1 || dev->vq_index + dev->nvqs !=3D dev->vq_ind=
+ex_end) {
+> > +        /* Only interested in CVQ */
+> > +        return;
+> > +    }
+> > +
+> > +    if (s->always_svq) {
+> > +        /* SVQ is already enabled */
+> > +        return;
+> > +    }
+> > +
+> > +    if (s->address_space_num < 2) {
+> > +        v->shadow_vqs_enabled =3D false;
+> > +        return;
+> > +    }
+> > +
+> > +    r =3D vhost_vdpa_get_vring_group(v->device_fd, &cvq_group);
+> > +    if (unlikely(r)) {
+> > +        error_report("Can't read cvq group, errno=3D%d (%s)", r, g_str=
+error(-r));
+> > +        v->shadow_vqs_enabled =3D false;
+> > +        return;
+> > +    }
+> > +
+> > +    if (!vhost_vdpa_cvq_group_is_independent(v, cvq_group)) {
+> > +        v->shadow_vqs_enabled =3D false;
+> > +        return;
+> > +    }
+> > +
+> > +    r =3D vhost_vdpa_set_address_space_id(v, cvq_group.num,
+> > +                                        VHOST_VDPA_NET_CVQ_ASID);
+> > +    v->shadow_vqs_enabled =3D r =3D=3D 0;
+> > +    s->vhost_vdpa.address_space_id =3D r =3D=3D 0 ? 1 : 0;
+>
+>
+> I'd expect this to be done net_init_vhost_vdpa(). Or any advantage of
+> initializing thing here?
+>
+
+We don't know the CVQ index at initialization time, since the guest is
+not even running so it has not acked the features. So we cannot know
+its VQ group, which is needed to call set_address_space_id.
+
+In my opinion, we shouldn't even cache "cvq has group id N", since the
+device could return a different group id between resets (for example,
+because the negotiation of different features).
+
+>
+> > +}
+> > +
+> >   static void vhost_vdpa_cvq_unmap_buf(struct vhost_vdpa *v, void *addr=
+)
+> >   {
+> >       VhostIOVATree *tree =3D v->iova_tree;
+> > @@ -432,6 +540,7 @@ static NetClientInfo net_vhost_vdpa_info =3D {
+> >           .type =3D NET_CLIENT_DRIVER_VHOST_VDPA,
+> >           .size =3D sizeof(VhostVDPAState),
+> >           .receive =3D vhost_vdpa_receive,
+> > +        .prepare =3D vhost_vdpa_net_prepare,
+> >           .start =3D vhost_vdpa_net_start,
+> >           .cleanup =3D vhost_vdpa_cleanup,
+> >           .has_vnet_hdr =3D vhost_vdpa_has_vnet_hdr,
+> > @@ -542,12 +651,40 @@ static const VhostShadowVirtqueueOps vhost_vdpa_n=
+et_svq_ops =3D {
+> >       .avail_handler =3D vhost_vdpa_net_handle_ctrl_avail,
+> >   };
+> >
+> > +static bool vhost_vdpa_get_as_num(int vdpa_device_fd, unsigned *num_as=
+,
+> > +                                  Error **errp)
+>
+>
+> Let's simply return int as the #as here.
+>
+
+If as is uint32_t, should we return int64_t and both leave negative
+values for errors and check that #as <=3D UINT32_MAX then?
 
 Thanks!
 
 > Thanks
 >
 >
-> >           ok =3D vhost_vdpa_svqs_start(dev);
-> >           if (unlikely(!ok)) {
-> >               return -1;
-> > diff --git a/net/vhost-vdpa.c b/net/vhost-vdpa.c
-> > index 75143ded8b..8203200c2a 100644
-> > --- a/net/vhost-vdpa.c
-> > +++ b/net/vhost-vdpa.c
-> > @@ -229,7 +229,7 @@ static void vhost_vdpa_cvq_unmap_buf(struct vhost_v=
-dpa *v, void *addr)
-> >           return;
-> >       }
-> >
-> > -    r =3D vhost_vdpa_dma_unmap(v, map->iova, map->size + 1);
-> > +    r =3D vhost_vdpa_dma_unmap(v, v->address_space_id, map->iova, map-=
->size + 1);
-> >       if (unlikely(r !=3D 0)) {
-> >           error_report("Device cannot unmap: %s(%d)", g_strerror(r), r)=
+> > +{
+> > +    uint64_t features;
+> > +    int r;
+> > +
+> > +    r =3D ioctl(vdpa_device_fd, VHOST_GET_BACKEND_FEATURES, &features)=
 ;
-> >       }
-> > @@ -278,8 +278,8 @@ static bool vhost_vdpa_cvq_map_buf(struct vhost_vdp=
-a *v,
-> >           return false;
+> > +    if (unlikely(r < 0)) {
+> > +        error_setg_errno(errp, errno, "Cannot get backend features");
+> > +        return r;
+> > +    }
+> > +
+> > +    if (!(features & BIT_ULL(VHOST_BACKEND_F_IOTLB_ASID))) {
+> > +        *num_as =3D 1;
+> > +        return 0;
+> > +    }
+> > +
+> > +    r =3D ioctl(vdpa_device_fd, VHOST_VDPA_GET_AS_NUM, num_as);
+> > +    if (unlikely(r < 0)) {
+> > +        error_setg_errno(errp, errno,
+> > +                         "Cannot retrieve number of supported ASs");
+> > +        return r;
+> > +    }
+> > +
+> > +    return 0;
+> > +}
+> > +
+> >   static NetClientState *net_vhost_vdpa_init(NetClientState *peer,
+> >                                              const char *device,
+> >                                              const char *name,
+> >                                              int vdpa_device_fd,
+> >                                              int queue_pair_index,
+> >                                              int nvqs,
+> > +                                           unsigned nas,
+> >                                              bool is_datapath,
+> >                                              bool svq,
+> >                                              VhostIOVATree *iova_tree)
+> > @@ -566,6 +703,7 @@ static NetClientState *net_vhost_vdpa_init(NetClien=
+tState *peer,
+> >       snprintf(nc->info_str, sizeof(nc->info_str), TYPE_VHOST_VDPA);
+> >       s =3D DO_UPCAST(VhostVDPAState, nc, nc);
+> >
+> > +    s->address_space_num =3D nas;
+> >       s->vhost_vdpa.device_fd =3D vdpa_device_fd;
+> >       s->vhost_vdpa.index =3D queue_pair_index;
+> >       s->always_svq =3D svq;
+> > @@ -651,6 +789,8 @@ int net_init_vhost_vdpa(const Netdev *netdev, const=
+ char *name,
+> >       g_autoptr(VhostIOVATree) iova_tree =3D NULL;
+> >       NetClientState *nc;
+> >       int queue_pairs, r, i, has_cvq =3D 0;
+> > +    unsigned num_as =3D 1;
+> > +    bool svq_cvq;
+> >
+> >       assert(netdev->type =3D=3D NET_CLIENT_DRIVER_VHOST_VDPA);
+> >       opts =3D &netdev->u.vhost_vdpa;
+> > @@ -676,7 +816,17 @@ int net_init_vhost_vdpa(const Netdev *netdev, cons=
+t char *name,
+> >           return queue_pairs;
 > >       }
 > >
-> > -    r =3D vhost_vdpa_dma_map(v, map.iova, vhost_vdpa_net_cvq_cmd_page_=
-len(), buf,
-> > -                           !write);
-> > +    r =3D vhost_vdpa_dma_map(v, v->address_space_id, map.iova,
-> > +                           vhost_vdpa_net_cvq_cmd_page_len(), buf, !wr=
-ite);
-> >       if (unlikely(r < 0)) {
-> >           goto dma_map_err;
-> >       }
-> > diff --git a/hw/virtio/trace-events b/hw/virtio/trace-events
-> > index 20af2e7ebd..36e5ae75f6 100644
-> > --- a/hw/virtio/trace-events
-> > +++ b/hw/virtio/trace-events
-> > @@ -26,8 +26,8 @@ vhost_user_write(uint32_t req, uint32_t flags) "req:%=
-d flags:0x%"PRIx32""
-> >   vhost_user_create_notifier(int idx, void *n) "idx:%d n:%p"
+> > -    if (opts->x_svq) {
+> > +    svq_cvq =3D opts->x_svq;
+> > +    if (has_cvq && !opts->x_svq) {
+> > +        r =3D vhost_vdpa_get_as_num(vdpa_device_fd, &num_as, errp);
+> > +        if (unlikely(r < 0)) {
+> > +            return r;
+> > +        }
+> > +
+> > +        svq_cvq =3D num_as > 1;
+> > +    }
+> > +
+> > +    if (opts->x_svq || svq_cvq) {
+> >           struct vhost_vdpa_iova_range iova_range;
 > >
-> >   # vhost-vdpa.c
-> > -vhost_vdpa_dma_map(void *vdpa, int fd, uint32_t msg_type, uint64_t iov=
-a, uint64_t size, uint64_t uaddr, uint8_t perm, uint8_t type) "vdpa:%p fd: =
-%d msg_type: %"PRIu32" iova: 0x%"PRIx64" size: 0x%"PRIx64" uaddr: 0x%"PRIx6=
-4" perm: 0x%"PRIx8" type: %"PRIu8
-> > -vhost_vdpa_dma_unmap(void *vdpa, int fd, uint32_t msg_type, uint64_t i=
-ova, uint64_t size, uint8_t type) "vdpa:%p fd: %d msg_type: %"PRIu32" iova:=
- 0x%"PRIx64" size: 0x%"PRIx64" type: %"PRIu8
-> > +vhost_vdpa_dma_map(void *vdpa, int fd, uint32_t msg_type, uint32_t asi=
-d, uint64_t iova, uint64_t size, uint64_t uaddr, uint8_t perm, uint8_t type=
-) "vdpa:%p fd: %d msg_type: %"PRIu32" asid: %"PRIu32" iova: 0x%"PRIx64" siz=
-e: 0x%"PRIx64" uaddr: 0x%"PRIx64" perm: 0x%"PRIx8" type: %"PRIu8
-> > +vhost_vdpa_dma_unmap(void *vdpa, int fd, uint32_t msg_type, uint32_t a=
-sid, uint64_t iova, uint64_t size, uint8_t type) "vdpa:%p fd: %d msg_type: =
-%"PRIu32" asid: %"PRIu32" iova: 0x%"PRIx64" size: 0x%"PRIx64" type: %"PRIu8
-> >   vhost_vdpa_listener_begin_batch(void *v, int fd, uint32_t msg_type, u=
-int8_t type)  "vdpa:%p fd: %d msg_type: %"PRIu32" type: %"PRIu8
-> >   vhost_vdpa_listener_commit(void *v, int fd, uint32_t msg_type, uint8_=
-t type)  "vdpa:%p fd: %d msg_type: %"PRIu32" type: %"PRIu8
-> >   vhost_vdpa_listener_region_add(void *vdpa, uint64_t iova, uint64_t ll=
-end, void *vaddr, bool readonly) "vdpa: %p iova 0x%"PRIx64" llend 0x%"PRIx6=
-4" vaddr: %p read-only: %d"
+> >           uint64_t invalid_dev_features =3D
+> > @@ -699,15 +849,15 @@ int net_init_vhost_vdpa(const Netdev *netdev, con=
+st char *name,
+> >
+> >       for (i =3D 0; i < queue_pairs; i++) {
+> >           ncs[i] =3D net_vhost_vdpa_init(peer, TYPE_VHOST_VDPA, name,
+> > -                                     vdpa_device_fd, i, 2, true, opts-=
+>x_svq,
+> > -                                     iova_tree);
+> > +                                     vdpa_device_fd, i, 2, num_as, tru=
+e,
+> > +                                     opts->x_svq, iova_tree);
+> >           if (!ncs[i])
+> >               goto err;
+> >       }
+> >
+> >       if (has_cvq) {
+> >           nc =3D net_vhost_vdpa_init(peer, TYPE_VHOST_VDPA, name,
+> > -                                 vdpa_device_fd, i, 1, false,
+> > +                                 vdpa_device_fd, i, 1, num_as, false,
+> >                                    opts->x_svq, iova_tree);
+> >           if (!nc)
+> >               goto err;
 >
 
