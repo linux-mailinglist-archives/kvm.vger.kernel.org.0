@@ -2,93 +2,44 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 61A4B586F73
-	for <lists+kvm@lfdr.de>; Mon,  1 Aug 2022 19:21:06 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id A634F587052
+	for <lists+kvm@lfdr.de>; Mon,  1 Aug 2022 20:23:12 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231979AbiHARVE (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 1 Aug 2022 13:21:04 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36870 "EHLO
+        id S232032AbiHASXK (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 1 Aug 2022 14:23:10 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56794 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229885AbiHARVC (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 1 Aug 2022 13:21:02 -0400
-Received: from mail-pj1-x1033.google.com (mail-pj1-x1033.google.com [IPv6:2607:f8b0:4864:20::1033])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0A7B460FC
-        for <kvm@vger.kernel.org>; Mon,  1 Aug 2022 10:21:01 -0700 (PDT)
-Received: by mail-pj1-x1033.google.com with SMTP id f7so11599242pjp.0
-        for <kvm@vger.kernel.org>; Mon, 01 Aug 2022 10:21:01 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc;
-        bh=fCk/XHp8B9iXH6n1wItqgYGmM7fwmMYgI5yP8mbmH3U=;
-        b=IDqkq0RRB5/0q0fvX92do69q1cmAV0EFEgHWrW70RErB2+5n+m61no3QcSCeUCyUlx
-         uvEQW4vuCXpwC5S61++fwjKgE3nUx0FQnjgPU3XFVIVpP+LUmI7iynZ6/f65Ejd1AaC9
-         NvU5Y1vDmH5Dko03H7Y0arebgyzLqYB/j7gHew5AaaCS3ISq94S1W4PACPtorR2QfRd5
-         L14zFBc9ZRRBZUzZr469ACZiS9xJCL4dWXy4JX/+sw2KPfdGq2DlaXW85e1qylNvtxw6
-         awyxapPLGplyeVQ3VjeAEr8lvkfl6G5kgatCXsmSgZOAdBt2P5yKrAC5ZsxLZ1d6RHz1
-         lHLQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc;
-        bh=fCk/XHp8B9iXH6n1wItqgYGmM7fwmMYgI5yP8mbmH3U=;
-        b=AjA20vr1HmPE5PA/6YrcLxoRQ4IoMZcr6JzZo3srbYC7Ob3EQiS878KrKG4OTIeG/z
-         YBcjPBKjnuK1LqZrsYlmTwu2clevorxvTu0VHaF6wfZ7jJ8y+nVOj9DRfTMi5VG/serh
-         r5I6MN0gTc1bHlxWBf5jyIdH3Re0Ud2oEuNC3hH5ar7XUGZoaAAlNeOimKIWJAe19Df0
-         xdJelBIHxISvGtvQMQdhH5LiSnQevOQPCOLZKpcd3rLpXeR1O1P3MHIq659y9BZ9xz9t
-         1f7akkMGU3yAzx8J16XVWSjpAItBIPBbkCchwIXfVs4mXUK07dAbo3PlLfNV096OGyPt
-         7wvQ==
-X-Gm-Message-State: ACgBeo0eRsCydnfFUUdlDfnIzUePCJwMkeRDwtNzVA+jFbB4SsDqBC9R
-        NtStpFQVVPlyJAlGVKEIViUvIQ==
-X-Google-Smtp-Source: AA6agR72h6LzCvsibpvxaxXVJaAf1hKXItzbo4mmcP0PdraAjvoT0eodhuHPNH3+KjI/0w/NW86UyA==
-X-Received: by 2002:a17:90b:1c85:b0:1f1:d78a:512b with SMTP id oo5-20020a17090b1c8500b001f1d78a512bmr20754163pjb.92.1659374460388;
-        Mon, 01 Aug 2022 10:21:00 -0700 (PDT)
-Received: from google.com (7.104.168.34.bc.googleusercontent.com. [34.168.104.7])
-        by smtp.gmail.com with ESMTPSA id n3-20020a170902d2c300b0016bdf2220desm3355943plc.263.2022.08.01.10.20.57
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 01 Aug 2022 10:20:58 -0700 (PDT)
-Date:   Mon, 1 Aug 2022 17:20:51 +0000
-From:   Sean Christopherson <seanjc@google.com>
-To:     Maxim Levitsky <mlevitsk@redhat.com>
-Cc:     kvm@vger.kernel.org, Wanpeng Li <wanpengli@tencent.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Jani Nikula <jani.nikula@linux.intel.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Tvrtko Ursulin <tvrtko.ursulin@linux.intel.com>,
-        Rodrigo Vivi <rodrigo.vivi@intel.com>,
-        Zhenyu Wang <zhenyuw@linux.intel.com>,
-        Joonas Lahtinen <joonas.lahtinen@linux.intel.com>,
-        Tom Lendacky <thomas.lendacky@amd.com>,
-        Ingo Molnar <mingo@redhat.com>,
-        David Airlie <airlied@linux.ie>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org,
-        intel-gfx@lists.freedesktop.org, Daniel Vetter <daniel@ffwll.ch>,
-        Borislav Petkov <bp@alien8.de>, Joerg Roedel <joro@8bytes.org>,
-        linux-kernel@vger.kernel.org, Jim Mattson <jmattson@google.com>,
-        Zhi Wang <zhi.a.wang@intel.com>,
-        Brijesh Singh <brijesh.singh@amd.com>,
-        "H. Peter Anvin" <hpa@zytor.com>,
-        intel-gvt-dev@lists.freedesktop.org,
-        dri-devel@lists.freedesktop.org
-Subject: Re: [RFC PATCH v3 04/19] KVM: x86: mmu: allow to enable write
- tracking externally
-Message-ID: <YugLc5LLPJkt89z6@google.com>
-References: <20220427200314.276673-1-mlevitsk@redhat.com>
- <20220427200314.276673-5-mlevitsk@redhat.com>
- <YoZyWOh4NPA0uN5J@google.com>
- <5ed0d0e5a88bbee2f95d794dbbeb1ad16789f319.camel@redhat.com>
- <c22a18631c2067871b9ed8a9246ad58fa1ab8947.camel@redhat.com>
- <Yt6/9V0S9of7dueW@google.com>
- <7c4cf32dca42ab84bdb427a9e4862dbf5509f961.camel@redhat.com>
+        with ESMTP id S230258AbiHASXJ (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 1 Aug 2022 14:23:09 -0400
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id D79ED1EC64
+        for <kvm@vger.kernel.org>; Mon,  1 Aug 2022 11:23:07 -0700 (PDT)
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 2A04A139F;
+        Mon,  1 Aug 2022 11:23:08 -0700 (PDT)
+Received: from [10.57.43.143] (unknown [10.57.43.143])
+        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 9097F3F67D;
+        Mon,  1 Aug 2022 11:23:06 -0700 (PDT)
+Message-ID: <a2b33f4d-aad6-1239-465d-118e4f30e509@arm.com>
+Date:   Mon, 1 Aug 2022 19:23:05 +0100
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <7c4cf32dca42ab84bdb427a9e4862dbf5509f961.camel@redhat.com>
-X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-        USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=ham
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:91.0)
+ Gecko/20100101 Thunderbird/91.11.0
+Subject: Re: [kvm-unit-tests PATCH v3 00/27] EFI and ACPI support for arm64
+Content-Language: en-GB
+To:     Alexandru Elisei <alexandru.elisei@arm.com>
+Cc:     kvm@vger.kernel.org, andrew.jones@linux.dev, pbonzini@redhat.com,
+        jade.alglave@arm.com, ricarkol@google.com
+References: <20220630100324.3153655-1-nikos.nikoleris@arm.com>
+ <YtbNin3VTyIT/yYF@monolith.localdoman>
+ <86e94983-0c69-88c8-f37f-c772ab6a4847@arm.com>
+ <Ytq3Lxwa4fKG63GM@monolith.localdoman>
+From:   Nikos Nikoleris <nikos.nikoleris@arm.com>
+In-Reply-To: <Ytq3Lxwa4fKG63GM@monolith.localdoman>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Spam-Status: No, score=-6.9 required=5.0 tests=BAYES_00,NICE_REPLY_A,
+        RCVD_IN_DNSWL_HI,SPF_HELO_NONE,SPF_NONE autolearn=ham
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -96,90 +47,110 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Jul 28, 2022, Maxim Levitsky wrote:
-> On Mon, 2022-07-25 at 16:08 +0000, Sean Christopherson wrote:
-> > On Wed, Jul 20, 2022, Maxim Levitsky wrote:
-> > And on that topic, do you have performance numbers to justify using a single
-> > shared node?  E.g. if every table instance has its own notifier, then no additional
-> > refcounting is needed. 
+Hi Alex,
+
+On 22/07/2022 15:41, Alexandru Elisei wrote:
+> Hi Nikos,
 > 
-> The thing is that KVM goes over the list of notifiers and calls them for
-> every write from the emulator in fact even just for mmio write, and when you
-> enable write tracking on a page, you just write protect the page and add a
-> mark in the page track array, which is roughly 
+> On Fri, Jul 22, 2022 at 11:57:09AM +0100, Nikos Nikoleris wrote:
+>> Hi Alex,
+>>
+>> On 19/07/2022 16:28, Alexandru Elisei wrote:
+>>> Hi,
+>>>
+>>> I've been trying to test the seris and I've come across some issues.
+> [..]
+>>>
+>>> The second error I'm encountering is when I try the selftest-setup test:
+>>>
+>>> [..]
+>>> ProtectUefiImageCommon - 0x4D046040
+>>>     - 0x000000004BEC4000 - 0x000000000001F600
+>>> SetUefiImageMemoryAttributes - 0x000000004BEC4000 - 0x0000000000001000 (0x0000000000004008)
+>>> SetUefiImageMemoryAttributes - 0x000000004BEC5000 - 0x0000000000010000 (0x0000000000020008)
+>>> SetUefiImageMemoryAttributes - 0x000000004BED5000 - 0x000000000000F000 (0x0000000000004008)
+>>> InstallProtocolInterface: 752F3136-4E16-4FDC-A22A-E5F46812F4CA 4F8014E8
+>>> SetUefiImageMemoryAttributes - 0x000000004F640000 - 0x0000000000040000 (0x0000000000000008)
+>>> SetUefiImageMemoryAttributes - 0x000000004C2D0000 - 0x0000000000040000 (0x0000000000000008)
+>>> SetUefiImageMemoryAttributes - 0x000000004C280000 - 0x0000000000040000 (0x0000000000000008)
+>>> SetUefiImageMemoryAttributes - 0x000000004C230000 - 0x0000000000040000 (0x0000000000000008)
+>>> SetUefiImageMemoryAttributes - 0x000000004C140000 - 0x0000000000040000 (0x0000000000000008)
+>>> SetUefiImageMemoryAttributes - 0x000000004F600000 - 0x0000000000030000 (0x0000000000000008)
+>>> SetUefiImageMemoryAttributes - 0x000000004C040000 - 0x0000000000030000 (0x0000000000000008)
+>>> SetUefiImageMemoryAttributes - 0x000000004BFC0000 - 0x0000000000030000 (0x0000000000000008)
+>>> Load address: 4bec4000
+>>> PC: 4beca400 PC offset: 6400
+>>> Unhandled exception ec=0x25 (DABT_EL1)
+>>> Vector: 4 (el1h_sync)
+>>> ESR_EL1:         96000000, ec=0x25 (DABT_EL1)
+>>> FAR_EL1: 0000fffffffff0f8 (valid)
+>>> Exception frame registers:
+>>> pc : [<000000004beca400>] lr : [<000000004beca42c>] pstate: 400002c5
+>>> sp : 000000004f7ffe40
+>>> x29: 000000004f7ffff0 x28: 0000000000000000
+>>> x27: 000000004d046040 x26: 0000000000000000
+>>> x25: 0000000000000703 x24: 0000000000000050
+>>> x23: 0000000009011000 x22: 0000000000000000
+>>> x21: 000000000000001f x20: 0000fffffffff000
+>>> x19: 0000000043f92000 x18: 0000000000000000
+>>> x17: 00000000ffffa6ab x16: 000000004f513ebc
+>>> x15: 0000000000000002 x14: 000000004bed5000
+>>> x13: 000000004bee4000 x12: 000000004bed4000
+>>> x11: 000000004bec4000 x10: 000000004c03febc
+>>> x9 : 000000004bee2938 x8 : 0000000000000000
+>>> x7 : 0000000000000000 x6 : 000000004bee2900
+>>> x5 : 000000004bee2908 x4 : 0000000048000000
+>>> x3 : 0000000048000000 x2 : 000000004bee2928
+>>> x1 : 0000000000000003 x0 : ffffffffffffffff
+>>>
+>>>
+>>> EXIT: STATUS=127
+>>>
+>>> The preceding lines were omitted for brevity, the entire log can be found
+>>> at [1] (expires in 6 months).
+>>>
+>>> Command used to launch the test:
+>>>
+>>> $ QEMU=/path/to/qemu/build/qemu-system-aarch64 EFI_UEFI=/path/to/QEMU_EFI.fd taskset -c 4-5 arm/efi/run arm/selftest.efi -smp 2 -m 256 -append "setup smp=2 mem=256"
+>>>
+>>> qemu has been built from source, tag v7.0.0, configured with:
+>>>
+>>> $ ./configure --target-list=aarch64-softmmu --disable-vnc --disable-gtk --disable-bpf
+>>>
+>>> EDK2 image has been built from commit e1eef3a8b01a ("NetworkPkg: Add Wi-Fi
+>>> Wpa3 support in WifiConnectManager"):
+>>>
+>>> $ build -a AARCH64 -t GCC5 -p ArmVirtPkg/ArmVirtQemu.dsc -b DEBUG
+>>>
+>>> I tried to disassemble selftest.efi: $ objdump -d selftest.efi, but there
+>>> were no debug symbols in the output and it was impossible to figure what is
+>>> going on.
+>>>
+>>> [1] https://pastebin.com/0mcap1BU
+>>
+>> I haven't been to able to reproduce this. I've build from source qemu and
+>> EDK2 from source (the revisions you provided) and I've used gcc-10 to
+>> compile KUT but selftest-smp passes.
 > 
-> 'don't install spte, don't install mmio spte, but just emulate the page fault if it hits this page'
+> That's weird, I've compiled kvm-unit-tests with gcc 10.3.0 [1] and I'm still
+> seeing the error (tried it on my x86 machine), for both selftest-setup
+> selftest-smp.
 > 
-> So adding more than a bare minimum to this list, seems just a bit wrong.
-
-Hmm, I see what you're saying.  To some extent, having a minimal page tracker
-implementation is just that, an implementation detail.  But for better or worse,
-the existing API effectively pushes range checking to the callers.  I agree that
-breaking from that pattern would be odd.
-
-> >  It's not obvious that a shared node will provide better performance, e.g.
-> >  if there are only a handful of AVIC tables being shadowed, then a linear
-> >  walk of all nodes is likely fast enough, and doesn't bring the risk of a
-> >  write potentially being stalled due to having to acquire a VM-scoped
-> >  mutex.
+> Did you compile qemu and edk2 with gcc 10.3.0? Or did you use some other
+> compiler?
 > 
-> The thing is that if I register multiple notifiers, they all will be called anyway,
-> but yes I can use container_of, and discover which table the notifier belongs to,
-> instead of having a hash table where I lookup the GFN of the fault.
+> [1] https://developer.arm.com/-/media/Files/downloads/gnu-a/10.3-2021.07/binrel/gcc-arm-10.3-2021.07-x86_64-aarch64-none-linux-gnu.tar.xz
 > 
-> The above means practically that all the shadow physid tables will be in a linear
-> list of notifiers, so I could indeed avoid per vm mutex on the write tracking,
-> however for simplicity I probably will still need it because I do modify the page,
-> and having per physid table mutex complicates things.
-> 
-> Currently in my code the locking is very simple and somewhat dumb, but the performance
-> is very good because the code isn't executed often, most of the time the AVIC hardware
-> works alone without any VM exits.
 
-Yes, but because the code isn't executed often, pretty much any solution will
-provide good performance.
+Thanks, I managed to reproduce this and found that with this 
+configuration there are more mem_regions than the assumed max. To work 
+around it you can change NR_EXTRA_MEM_REGIONS in lib/arm/setup.c to
 
-> Once the code is accepted upstream, it's one of the things that can be improved.
-> 
-> Note though that I still need a hash table and a mutex because on each VM entry,
-> the guest can use a different physid table, so I need to lookup it, and create it,
-> if not found, which would require read/write of the hash table and thus a mutex.
+#define NR_EXTRA_MEM_REGIONS    32
 
-One of the points I'm trying to make is that a hash table isn't strictly required.
-E.g. if I understand the update rules correctly, I believe tables can be tracked
-via an RCU-protected list, with vCPUs taking a spinlock and doing synchronize_rcu()
-when adding/removing a table.  That would avoid having to take any "real" locks in
-the page track notifier.
+Doubling it would hopefully be enough to run tests for now but I will 
+also try to find out a better way to do this.
 
-The VM-scoped mutex worries me as it will be a bottleneck if L1 is running multiple
-L2 VMs.  E.g. if L1 is frequently switching vmcs12 and thus avic_physical_id, then
-nested VMRUN will effectively get serialized.  That is mitigated to some extent by
-an RCU-protected list, as a sane L1 will use a single table for each L2, and so a
-vCPU will need to add/remove a table if and only if it's the first/last vCPU to
-start/stop running an L2 VM.
+Thanks,
 
-> > > I can also stash this boolean (like 'bool registered;') into the 'struct
-> > > kvm_page_track_notifier_node',  and thus allow the
-> > > kvm_page_track_register_notifier to be called more that once -  then I can
-> > > also get rid of __kvm_page_track_register_notifier. 
-> > 
-> > No, allowing redundant registration without proper refcounting leads to pain,
-> > e.g. X registers, Y registers, X unregisters, kaboom.
-> > 
-> 
-> True, but then what about adding a refcount to 'struct kvm_page_track_notifier_node'
-> instead of a boolean, and allowing redundant registration?
-> Probably not worth it, in which case I am OK to add a refcount to my avic code.
-
-Ya, I would rather force AVIC to do the refcounting.  Existing users don't need a
-refcount, and doing the refcounting in AVIC code means kvm_page_track_notifier_node
-can WARN on redundant registration, i.e. can sanity check the AVIC code to some
-extent.
-
-> Or maybe just scrap the whole thing and just leave registration and
-> activation of the write tracking as two separate things? Honestly now that
-> looks like the most clean solution.
-
-It's the easiest, but IMO it's not the cleanest.  Allowing notifiers to be
-registered without tracking being enabled is undesirable, especially since we know
-we can prevent it.
+Nikos
