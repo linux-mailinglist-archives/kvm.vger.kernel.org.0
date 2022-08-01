@@ -2,144 +2,169 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 5956C586D4E
-	for <lists+kvm@lfdr.de>; Mon,  1 Aug 2022 16:55:43 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 33FC3586D8B
+	for <lists+kvm@lfdr.de>; Mon,  1 Aug 2022 17:19:45 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229943AbiHAOzk (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 1 Aug 2022 10:55:40 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38324 "EHLO
+        id S233381AbiHAPTn (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 1 Aug 2022 11:19:43 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53538 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233084AbiHAOzi (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 1 Aug 2022 10:55:38 -0400
-Received: from mga02.intel.com (mga02.intel.com [134.134.136.20])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 302333135E
-        for <kvm@vger.kernel.org>; Mon,  1 Aug 2022 07:55:36 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1659365736; x=1690901736;
-  h=date:from:to:cc:subject:message-id:mime-version;
-  bh=rBaWJChfrcUG5CbbzxogRNPHvAG5/zEO1VrBaPIogX4=;
-  b=Zwer4a2qD+OsS8mEESTzaardQScAWjWe5VVYJknIWbQ5f2rbVh6tNeW8
-   diQLaOObmR/qMFQhbmB9aBfjkwNTMLvEUaucOK7YMcCi4zF89HkINX4RM
-   pGu5m+6IV5UxqL/FvdSCHsWgLsTAGYTt7SEgBvOux/bJ/bJCTxdbHMXqf
-   h4FplZAjdRK7MICluH1ytThXhktOp6f8qU+0c7hxMaOYPr1yVkgEK4HK1
-   QnqWVnaPbR+tbba50Gzj3vzFYCdNSsAtItkQZsSWWMu5Q/jaRJBY3m4tW
-   /xonwvjbrSS47UchpvsN6sRtjst2yEyf32AjpSQ56kE5TuQ8ydz6Bhour
-   A==;
-X-IronPort-AV: E=McAfee;i="6400,9594,10426"; a="276064947"
-X-IronPort-AV: E=Sophos;i="5.93,208,1654585200"; 
-   d="scan'208";a="276064947"
-Received: from orsmga003.jf.intel.com ([10.7.209.27])
-  by orsmga101.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 01 Aug 2022 07:55:35 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.93,208,1654585200"; 
-   d="scan'208";a="552534158"
-Received: from lkp-server01.sh.intel.com (HELO e0eace57cfef) ([10.239.97.150])
-  by orsmga003.jf.intel.com with ESMTP; 01 Aug 2022 07:55:33 -0700
-Received: from kbuild by e0eace57cfef with local (Exim 4.96)
-        (envelope-from <lkp@intel.com>)
-        id 1oIWpR-000F7H-0D;
-        Mon, 01 Aug 2022 14:55:33 +0000
-Date:   Mon, 1 Aug 2022 22:55:09 +0800
-From:   kernel test robot <lkp@intel.com>
-To:     Sean Christopherson <seanjc@google.com>
-Cc:     kbuild-all@lists.01.org, kvm@vger.kernel.org,
-        Robert Hu <robert.hu@intel.com>,
-        Farrah Chen <farrah.chen@intel.com>,
-        Danmei Wei <danmei.wei@intel.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Mingwei Zhang <mizhang@google.com>
-Subject: [kvm:queue 15/59] arch/x86/kvm/mmu/mmu.c:6391:19: warning: variable
- 'pfn' set but not used
-Message-ID: <202208012252.xEVcZw4r-lkp@intel.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-X-Spam-Status: No, score=-4.0 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,HEXHASH_WORD,
-        RCVD_IN_DNSWL_MED,RCVD_IN_MSPIKE_H3,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,
-        SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
+        with ESMTP id S233150AbiHAPTl (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 1 Aug 2022 11:19:41 -0400
+Received: from mail-pf1-x44a.google.com (mail-pf1-x44a.google.com [IPv6:2607:f8b0:4864:20::44a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C5AE52AE26
+        for <kvm@vger.kernel.org>; Mon,  1 Aug 2022 08:19:40 -0700 (PDT)
+Received: by mail-pf1-x44a.google.com with SMTP id t9-20020a056a00138900b0052dc8a1b97dso147518pfg.2
+        for <kvm@vger.kernel.org>; Mon, 01 Aug 2022 08:19:40 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112;
+        h=cc:to:from:subject:mime-version:message-id:date:from:to:cc;
+        bh=S/2jI0VtfXi7m6ZMf+qwyQLgOYuMiCIT7wBl4PXRX+g=;
+        b=OqEy/n2odJcpLuQeQrEW3uvv4W6U5wbHVoh+YVePDwAMenajqwhMu4ssIBWUMxydvo
+         PKYVsYiXs6raDPcmybsCA24N7Xr/PKhc3cv0Vwr6BMp4HyuldkXfgDcjH9L3QbzEG3q5
+         bnNJS2cnVbxfJyehbXL9D+5LzG6I9WBICeXtTSON6X+SPopmA/aqmPqDBG7bmgqEp6PG
+         5KtSDvU7j4UB39QtuZW1XmQ721oGR4wdvlfPYnTwC+l7niSzawHFaz2uGJslDdVkhgFL
+         9D7Sf0+Iz1Jj8kgeI9C//InH/tv88mSYgGkCu1saaRUz09yZ27m4tFnY+LnZQP+AJSP8
+         CdjA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=cc:to:from:subject:mime-version:message-id:date:x-gm-message-state
+         :from:to:cc;
+        bh=S/2jI0VtfXi7m6ZMf+qwyQLgOYuMiCIT7wBl4PXRX+g=;
+        b=hrz2OBL8a32mCRQETybbwy4ow2WleB4EomoUKXsqMTnUHQN18sZiK+b+EcgnMzuVik
+         gN5gjVjbxuQ2dYkg432s1scMwjWCyT+SVpdlWJt0pdR8tpZhkixg1xDLg2p0gw9LLqdk
+         MVng+/YvItRx1vAs/Uox7Z90mRwkwLYMwnVYTVXKtMeF+vvL7kmPEH8IQZnDN7iiDDI7
+         5aWNz4LPo8FOmA5tLOvn8wVJ5Ot0CrBOpIr1Wvc17bmXZdpq26ybl3uzcNm2lQyANyp0
+         jwqNCQG6KaVpbrykZvxE+Rp5ZlTjQ3TtpLfXKCng1VfKxrFEK3jdeJeU/DxpxTed49wa
+         gXrQ==
+X-Gm-Message-State: AJIora+cqPoM0eN47+FZqgw0Nyf8xqjy7FHXOgm6eLg+1WveSI3l/SHx
+        gfThT5r2Nbcd6mgXu+eb7cTteaxXIQko
+X-Google-Smtp-Source: AGRyM1tmitgRItVDG9wYYQJP7lV6j2QhkGGFMfWO4zg8l7GgEPHyefkScB+izDXwBytqYaqte5+sZLs4g3s8
+X-Received: from vipin.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:479f])
+ (user=vipinsh job=sendgmr) by 2002:a63:6c45:0:b0:419:b668:6d with SMTP id
+ h66-20020a636c45000000b00419b668006dmr13395927pgc.548.1659367180173; Mon, 01
+ Aug 2022 08:19:40 -0700 (PDT)
+Date:   Mon,  1 Aug 2022 08:19:28 -0700
+Message-Id: <20220801151928.270380-1-vipinsh@google.com>
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.37.1.455.g008518b4e5-goog
+Subject: [PATCH] KVM: x86/mmu: Make page tables for eager page splitting NUMA aware
+From:   Vipin Sharma <vipinsh@google.com>
+To:     seanjc@google.com, dmatlack@google.com, pbonzini@redhat.com
+Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Vipin Sharma <vipinsh@google.com>
+Content-Type: text/plain; charset="UTF-8"
+X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL autolearn=unavailable
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-tree:   https://git.kernel.org/pub/scm/virt/kvm/kvm.git queue
-head:   93472b79715378a2386598d6632c654a2223267b
-commit: a8ac499bb6abbd55fe60f1dc2d053f4b5b13aa73 [15/59] KVM: x86/mmu: Don't require refcounted "struct page" to create huge SPTEs
-config: i386-randconfig-a013-20220801 (https://download.01.org/0day-ci/archive/20220801/202208012252.xEVcZw4r-lkp@intel.com/config)
-compiler: gcc-11 (Debian 11.3.0-3) 11.3.0
-reproduce (this is a W=1 build):
-        # https://git.kernel.org/pub/scm/virt/kvm/kvm.git/commit/?id=a8ac499bb6abbd55fe60f1dc2d053f4b5b13aa73
-        git remote add kvm https://git.kernel.org/pub/scm/virt/kvm/kvm.git
-        git fetch --no-tags kvm queue
-        git checkout a8ac499bb6abbd55fe60f1dc2d053f4b5b13aa73
-        # save the config file
-        mkdir build_dir && cp config build_dir/.config
-        make W=1 O=build_dir ARCH=i386 SHELL=/bin/bash arch/x86/kvm/
+tdp_mmu_alloc_sp_for_split() allocates page tables for Eager Page
+Splitting.  Currently it does not specify a NUMA node preference, so it
+will try to allocate from the local node. The thread doing eager page
+splitting is supplied by the userspace and may not be running on the same
+node where it would be best for page tables to be allocated.
 
-If you fix the issue, kindly add following tag where applicable
-Reported-by: kernel test robot <lkp@intel.com>
+We can improve TDP MMU eager page splitting by making
+tdp_mmu_alloc_sp_for_split() NUMA-aware. Specifically, when splitting a
+huge page, allocate the new lower level page tables on the same node as the
+huge page.
 
-All warnings (new ones prefixed by >>):
+__get_free_page() is replaced by alloc_page_nodes(). This introduces two
+functional changes.
 
-   arch/x86/kvm/mmu/mmu.c: In function 'kvm_mmu_zap_collapsible_spte':
->> arch/x86/kvm/mmu/mmu.c:6391:19: warning: variable 'pfn' set but not used [-Wunused-but-set-variable]
-    6391 |         kvm_pfn_t pfn;
-         |                   ^~~
+  1. __get_free_page() removes gfp flag __GFP_HIGHMEM via call to
+  __get_free_pages(). This should not be an issue  as __GFP_HIGHMEM flag is
+  not passed in tdp_mmu_alloc_sp_for_split() anyway.
 
+  2. __get_free_page() calls alloc_pages() and use thread's mempolicy for
+  the NUMA node allocation. From this commit, thread's mempolicy will not
+  be used and first preference will be to allocate on the node where huge
+  page was present.
 
-vim +/pfn +6391 arch/x86/kvm/mmu/mmu.c
+dirty_log_perf_test for 416 vcpu and 1GB/vcpu configuration on a 8 NUMA
+node machine showed dirty memory time improvements between 2% - 35% in
+multiple runs.
 
-a3fe5dbda0a4bb7 arch/x86/kvm/mmu/mmu.c David Matlack       2022-01-19  6383  
-3ea3b7fa9af0679 arch/x86/kvm/mmu.c     Wanpeng Li          2015-04-03  6384  static bool kvm_mmu_zap_collapsible_spte(struct kvm *kvm,
-0a234f5dd06582e arch/x86/kvm/mmu/mmu.c Sean Christopherson 2021-02-12  6385  					 struct kvm_rmap_head *rmap_head,
-269e9552d208179 arch/x86/kvm/mmu/mmu.c Hamza Mahfooz       2021-07-12  6386  					 const struct kvm_memory_slot *slot)
-3ea3b7fa9af0679 arch/x86/kvm/mmu.c     Wanpeng Li          2015-04-03  6387  {
-3ea3b7fa9af0679 arch/x86/kvm/mmu.c     Wanpeng Li          2015-04-03  6388  	u64 *sptep;
-3ea3b7fa9af0679 arch/x86/kvm/mmu.c     Wanpeng Li          2015-04-03  6389  	struct rmap_iterator iter;
-3ea3b7fa9af0679 arch/x86/kvm/mmu.c     Wanpeng Li          2015-04-03  6390  	int need_tlb_flush = 0;
-ba049e93aef7e8c arch/x86/kvm/mmu.c     Dan Williams        2016-01-15 @6391  	kvm_pfn_t pfn;
-3ea3b7fa9af0679 arch/x86/kvm/mmu.c     Wanpeng Li          2015-04-03  6392  	struct kvm_mmu_page *sp;
-3ea3b7fa9af0679 arch/x86/kvm/mmu.c     Wanpeng Li          2015-04-03  6393  
-0d5367900a319ab arch/x86/kvm/mmu.c     Xiao Guangrong      2015-05-13  6394  restart:
-018aabb56d6109c arch/x86/kvm/mmu.c     Takuya Yoshikawa    2015-11-20  6395  	for_each_rmap_spte(rmap_head, &iter, sptep) {
-573546820b792ef arch/x86/kvm/mmu/mmu.c Sean Christopherson 2020-06-22  6396  		sp = sptep_to_sp(sptep);
-3ea3b7fa9af0679 arch/x86/kvm/mmu.c     Wanpeng Li          2015-04-03  6397  		pfn = spte_to_pfn(*sptep);
-3ea3b7fa9af0679 arch/x86/kvm/mmu.c     Wanpeng Li          2015-04-03  6398  
-3ea3b7fa9af0679 arch/x86/kvm/mmu.c     Wanpeng Li          2015-04-03  6399  		/*
-decf63336e35642 arch/x86/kvm/mmu.c     Xiao Guangrong      2015-04-14  6400  		 * We cannot do huge page mapping for indirect shadow pages,
-decf63336e35642 arch/x86/kvm/mmu.c     Xiao Guangrong      2015-04-14  6401  		 * which are found on the last rmap (level = 1) when not using
-decf63336e35642 arch/x86/kvm/mmu.c     Xiao Guangrong      2015-04-14  6402  		 * tdp; such shadow pages are synced with the page table in
-decf63336e35642 arch/x86/kvm/mmu.c     Xiao Guangrong      2015-04-14  6403  		 * the guest, and the guest page table is using 4K page size
-decf63336e35642 arch/x86/kvm/mmu.c     Xiao Guangrong      2015-04-14  6404  		 * mapping if the indirect sp has level = 1.
-3ea3b7fa9af0679 arch/x86/kvm/mmu.c     Wanpeng Li          2015-04-03  6405  		 */
-5d49f08c2e08c1f arch/x86/kvm/mmu/mmu.c Sean Christopherson 2022-04-29  6406  		if (sp->role.direct &&
-9eba50f8d7fcb61 arch/x86/kvm/mmu/mmu.c Sean Christopherson 2021-02-12  6407  		    sp->role.level < kvm_mmu_max_mapping_level(kvm, slot, sp->gfn,
-a8ac499bb6abbd5 arch/x86/kvm/mmu/mmu.c Sean Christopherson 2022-07-15  6408  							       PG_LEVEL_NUM)) {
-9202aee816c84d6 arch/x86/kvm/mmu/mmu.c Sean Christopherson 2022-07-15  6409  			kvm_zap_one_rmap_spte(kvm, rmap_head, sptep);
-40ef75a758b291d arch/x86/kvm/mmu.c     Lan Tianyu          2018-12-06  6410  
-40ef75a758b291d arch/x86/kvm/mmu.c     Lan Tianyu          2018-12-06  6411  			if (kvm_available_flush_tlb_with_range())
-40ef75a758b291d arch/x86/kvm/mmu.c     Lan Tianyu          2018-12-06  6412  				kvm_flush_remote_tlbs_with_address(kvm, sp->gfn,
-40ef75a758b291d arch/x86/kvm/mmu.c     Lan Tianyu          2018-12-06  6413  					KVM_PAGES_PER_HPAGE(sp->role.level));
-40ef75a758b291d arch/x86/kvm/mmu.c     Lan Tianyu          2018-12-06  6414  			else
-3ea3b7fa9af0679 arch/x86/kvm/mmu.c     Wanpeng Li          2015-04-03  6415  				need_tlb_flush = 1;
-40ef75a758b291d arch/x86/kvm/mmu.c     Lan Tianyu          2018-12-06  6416  
-0d5367900a319ab arch/x86/kvm/mmu.c     Xiao Guangrong      2015-05-13  6417  			goto restart;
-0d5367900a319ab arch/x86/kvm/mmu.c     Xiao Guangrong      2015-05-13  6418  		}
-3ea3b7fa9af0679 arch/x86/kvm/mmu.c     Wanpeng Li          2015-04-03  6419  	}
-3ea3b7fa9af0679 arch/x86/kvm/mmu.c     Wanpeng Li          2015-04-03  6420  
-3ea3b7fa9af0679 arch/x86/kvm/mmu.c     Wanpeng Li          2015-04-03  6421  	return need_tlb_flush;
-3ea3b7fa9af0679 arch/x86/kvm/mmu.c     Wanpeng Li          2015-04-03  6422  }
-3ea3b7fa9af0679 arch/x86/kvm/mmu.c     Wanpeng Li          2015-04-03  6423  
+Suggested-by: David Matlack <dmatlack@google.com>
+Signed-off-by: Vipin Sharma <vipinsh@google.com>
+---
+ arch/x86/kvm/mmu/tdp_mmu.c | 24 +++++++++++++++++++-----
+ 1 file changed, 19 insertions(+), 5 deletions(-)
 
-:::::: The code at line 6391 was first introduced by commit
-:::::: ba049e93aef7e8c571567088b1b73f4f5b99272a kvm: rename pfn_t to kvm_pfn_t
-
-:::::: TO: Dan Williams <dan.j.williams@intel.com>
-:::::: CC: Linus Torvalds <torvalds@linux-foundation.org>
-
+diff --git a/arch/x86/kvm/mmu/tdp_mmu.c b/arch/x86/kvm/mmu/tdp_mmu.c
+index bf2ccf9debcaa..1e30e18fc6a03 100644
+--- a/arch/x86/kvm/mmu/tdp_mmu.c
++++ b/arch/x86/kvm/mmu/tdp_mmu.c
+@@ -1402,9 +1402,19 @@ bool kvm_tdp_mmu_wrprot_slot(struct kvm *kvm,
+ 	return spte_set;
+ }
+ 
+-static struct kvm_mmu_page *__tdp_mmu_alloc_sp_for_split(gfp_t gfp)
++/*
++ * Caller's responsibility to pass a valid spte which has the shadow page
++ * present.
++ */
++static int tdp_mmu_spte_to_nid(u64 spte)
++{
++	return page_to_nid(pfn_to_page(spte_to_pfn(spte)));
++}
++
++static struct kvm_mmu_page *__tdp_mmu_alloc_sp_for_split(int nid, gfp_t gfp)
+ {
+ 	struct kvm_mmu_page *sp;
++	struct page *spt_page;
+ 
+ 	gfp |= __GFP_ZERO;
+ 
+@@ -1412,11 +1422,12 @@ static struct kvm_mmu_page *__tdp_mmu_alloc_sp_for_split(gfp_t gfp)
+ 	if (!sp)
+ 		return NULL;
+ 
+-	sp->spt = (void *)__get_free_page(gfp);
+-	if (!sp->spt) {
++	spt_page = alloc_pages_node(nid, gfp, 0);
++	if (!spt_page) {
+ 		kmem_cache_free(mmu_page_header_cache, sp);
+ 		return NULL;
+ 	}
++	sp->spt = page_address(spt_page);
+ 
+ 	return sp;
+ }
+@@ -1426,6 +1437,9 @@ static struct kvm_mmu_page *tdp_mmu_alloc_sp_for_split(struct kvm *kvm,
+ 						       bool shared)
+ {
+ 	struct kvm_mmu_page *sp;
++	int nid;
++
++	nid = tdp_mmu_spte_to_nid(iter->old_spte);
+ 
+ 	/*
+ 	 * Since we are allocating while under the MMU lock we have to be
+@@ -1436,7 +1450,7 @@ static struct kvm_mmu_page *tdp_mmu_alloc_sp_for_split(struct kvm *kvm,
+ 	 * If this allocation fails we drop the lock and retry with reclaim
+ 	 * allowed.
+ 	 */
+-	sp = __tdp_mmu_alloc_sp_for_split(GFP_NOWAIT | __GFP_ACCOUNT);
++	sp = __tdp_mmu_alloc_sp_for_split(nid, GFP_NOWAIT | __GFP_ACCOUNT);
+ 	if (sp)
+ 		return sp;
+ 
+@@ -1448,7 +1462,7 @@ static struct kvm_mmu_page *tdp_mmu_alloc_sp_for_split(struct kvm *kvm,
+ 		write_unlock(&kvm->mmu_lock);
+ 
+ 	iter->yielded = true;
+-	sp = __tdp_mmu_alloc_sp_for_split(GFP_KERNEL_ACCOUNT);
++	sp = __tdp_mmu_alloc_sp_for_split(nid, GFP_KERNEL_ACCOUNT);
+ 
+ 	if (shared)
+ 		read_lock(&kvm->mmu_lock);
 -- 
-0-DAY CI Kernel Test Service
-https://01.org/lkp
+2.37.1.455.g008518b4e5-goog
+
