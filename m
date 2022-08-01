@@ -2,128 +2,187 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 67CDB586DF9
-	for <lists+kvm@lfdr.de>; Mon,  1 Aug 2022 17:44:01 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 04F2F586E19
+	for <lists+kvm@lfdr.de>; Mon,  1 Aug 2022 17:54:18 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231410AbiHAPn7 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 1 Aug 2022 11:43:59 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45906 "EHLO
+        id S232851AbiHAPyO (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 1 Aug 2022 11:54:14 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53998 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231144AbiHAPn6 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 1 Aug 2022 11:43:58 -0400
-Received: from mail-pl1-x631.google.com (mail-pl1-x631.google.com [IPv6:2607:f8b0:4864:20::631])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 37F3A14D01
-        for <kvm@vger.kernel.org>; Mon,  1 Aug 2022 08:43:57 -0700 (PDT)
-Received: by mail-pl1-x631.google.com with SMTP id m2so4048361pls.4
-        for <kvm@vger.kernel.org>; Mon, 01 Aug 2022 08:43:57 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc;
-        bh=srygWdx8d4se0PmEFGFe6jDGC1ROcbuSUTTUzXR+U60=;
-        b=UBQr3olEQOSB/KKSSuv6X2/OWLC0qDCajvMUWhtTnpIezahdrC29P2taYJ7JcBD2Yt
-         G+pgegJ4gU8RhkcXRnGMPSdxuUvJsCudQ7uWYgw/dAfDsczAmgQcHXFAvCK9tvzkHRRv
-         J4sx96tb0UHpMVEltPpuUWP3/86K6A4kZZDKSWTuvPzF6CC9aWp6ME0eW0d4BiqsGdKq
-         9oYIffAdAgi5H/zXGKQ5v3AuKyw6ke9geqv3pMkSw8HB0KpqvFLxaH6I3Y9DasmK+rHP
-         NDOMLGWV0Lw8H2HGTviObas4tGW7vcDel27AxcskQa4SJBc2HkXeNtp5YArFCFdEEr4H
-         HyMw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc;
-        bh=srygWdx8d4se0PmEFGFe6jDGC1ROcbuSUTTUzXR+U60=;
-        b=SDKBsNo6XoHTyUSKmzbKCM//rtaO7uuegB1Kj0SfaS+7UW0jLZt7Gxs81/hkWJuDBG
-         Q8gInFzR509K00agC1w45K8Zbq6c9DosWIUcfkU8Xsj+RZ+ptp50jUOVNaNsfoC7etYC
-         SaxbkqoMpvTHmUr/2DtElPXf8oSmmMTdqyiAKI9ZriDrRxsjpA+Q35LxXu/5QcvaBpl1
-         zJfzdEudTRuQYddhWBlRm9yowefbGnrlv31KjG/FprmVSc39lLMSE3zGIFSN64AgsGjw
-         jHsDV/fHF/EO/zB+bDIgKdbPTBDvmHTaDgK7PVO/GW9fiwHHotu24ZMHC6tPNM11Lzra
-         WbLw==
-X-Gm-Message-State: ACgBeo08Qnq+onLhuEHuIRhAe1oqEB9VJjSGHQrkYO0WRtrNd4JSwxsO
-        zoeUv7ryPc/UyVMcSaIF22wkHw==
-X-Google-Smtp-Source: AA6agR5nlbTBKy69JPsbsgakwUHpDOTbE3KRr+tIryr+gj7s3empLDRv9U6XD86NUgqryiNgT7lMjQ==
-X-Received: by 2002:a17:902:d487:b0:16e:e328:fd41 with SMTP id c7-20020a170902d48700b0016ee328fd41mr7340018plg.73.1659368636576;
-        Mon, 01 Aug 2022 08:43:56 -0700 (PDT)
-Received: from google.com (7.104.168.34.bc.googleusercontent.com. [34.168.104.7])
-        by smtp.gmail.com with ESMTPSA id i127-20020a625485000000b0052d87effe9asm2332755pfb.18.2022.08.01.08.43.55
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 01 Aug 2022 08:43:56 -0700 (PDT)
-Date:   Mon, 1 Aug 2022 15:43:52 +0000
-From:   Sean Christopherson <seanjc@google.com>
-To:     Like Xu <like.xu.linux@gmail.com>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org
-Subject: Re: [kvm-unit-tests  PATCH] x86/pmu: Reset the expected count of the
- fixed counter 0 when i386
-Message-ID: <Yuf0uJeN5n3AvXPg@google.com>
-References: <20220801131814.24364-1-likexu@tencent.com>
+        with ESMTP id S233724AbiHAPyN (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 1 Aug 2022 11:54:13 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id A288637F9C
+        for <kvm@vger.kernel.org>; Mon,  1 Aug 2022 08:54:12 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1659369251;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=bDrzxcK/hdqF7u8DnUOKQqM/ecXSwkQXnfqic59uxkQ=;
+        b=fvr0vBXom4gOmnQZyFA3o+5Q7lCG2q0AqnabgG2DsUDk+0TDXXWdHSNqK+Zf/7evgp+Xry
+        eJPIsnCRX2JlYu4eK8oYLEUanrDTYtuuikw7kKLfuqFu1vn1ARVVt715s3lOHsDckt6IBv
+        xRp+kxvf8Aa0smWHEAc+KC6mFI9L8/o=
+Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
+ [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-102-9GoOoRyOOP-3kn0drtBscw-1; Mon, 01 Aug 2022 11:54:06 -0400
+X-MC-Unique: 9GoOoRyOOP-3kn0drtBscw-1
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.rdu2.redhat.com [10.11.54.2])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id AF7D4101A586;
+        Mon,  1 Aug 2022 15:54:05 +0000 (UTC)
+Received: from starship (unknown [10.40.194.242])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 7D3AB40E80F4;
+        Mon,  1 Aug 2022 15:53:59 +0000 (UTC)
+Message-ID: <ad3a01ffe9c6f7fa40a4b51ac88d8fad56606435.camel@redhat.com>
+Subject: Re: [RFC PATCH v3 04/19] KVM: x86: mmu: allow to enable write
+ tracking externally
+From:   Maxim Levitsky <mlevitsk@redhat.com>
+To:     Sean Christopherson <seanjc@google.com>
+Cc:     kvm@vger.kernel.org, Wanpeng Li <wanpengli@tencent.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Jani Nikula <jani.nikula@linux.intel.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Tvrtko Ursulin <tvrtko.ursulin@linux.intel.com>,
+        Rodrigo Vivi <rodrigo.vivi@intel.com>,
+        Zhenyu Wang <zhenyuw@linux.intel.com>,
+        Joonas Lahtinen <joonas.lahtinen@linux.intel.com>,
+        Tom Lendacky <thomas.lendacky@amd.com>,
+        Ingo Molnar <mingo@redhat.com>,
+        David Airlie <airlied@linux.ie>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org,
+        intel-gfx@lists.freedesktop.org, Daniel Vetter <daniel@ffwll.ch>,
+        Borislav Petkov <bp@alien8.de>, Joerg Roedel <joro@8bytes.org>,
+        linux-kernel@vger.kernel.org, Jim Mattson <jmattson@google.com>,
+        Zhi Wang <zhi.a.wang@intel.com>,
+        Brijesh Singh <brijesh.singh@amd.com>,
+        "H. Peter Anvin" <hpa@zytor.com>,
+        intel-gvt-dev@lists.freedesktop.org,
+        dri-devel@lists.freedesktop.org
+Date:   Mon, 01 Aug 2022 18:53:58 +0300
+In-Reply-To: <7c4cf32dca42ab84bdb427a9e4862dbf5509f961.camel@redhat.com>
+References: <20220427200314.276673-1-mlevitsk@redhat.com>
+         <20220427200314.276673-5-mlevitsk@redhat.com> <YoZyWOh4NPA0uN5J@google.com>
+         <5ed0d0e5a88bbee2f95d794dbbeb1ad16789f319.camel@redhat.com>
+         <c22a18631c2067871b9ed8a9246ad58fa1ab8947.camel@redhat.com>
+         <Yt6/9V0S9of7dueW@google.com>
+         <7c4cf32dca42ab84bdb427a9e4862dbf5509f961.camel@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
+User-Agent: Evolution 3.36.5 (3.36.5-2.fc32) 
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20220801131814.24364-1-likexu@tencent.com>
-X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-        USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=ham
-        autolearn_force=no version=3.4.6
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.84 on 10.11.54.2
+X-Spam-Status: No, score=-2.7 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        SPF_HELO_NONE,SPF_NONE autolearn=unavailable autolearn_force=no
+        version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Aug 01, 2022, Like Xu wrote:
-> From: Like Xu <likexu@tencent.com>
+On Thu, 2022-07-28 at 10:46 +0300, Maxim Levitsky wrote:
+> On Mon, 2022-07-25 at 16:08 +0000, Sean Christopherson wrote:
+> > On Wed, Jul 20, 2022, Maxim Levitsky wrote:
+> > > On Sun, 2022-05-22 at 13:22 +0300, Maxim Levitsky wrote:
+> > > > On Thu, 2022-05-19 at 16:37 +0000, Sean Christopherson wrote:
+> > > > > On Wed, Apr 27, 2022, Maxim Levitsky wrote:
+> > > > > > @@ -5753,6 +5752,10 @@ int kvm_mmu_init_vm(struct kvm *kvm)
+> > > Now for nested AVIC, this is what I would like to do:
+> > >  
+> > > - just like mmu, I prefer to register the write tracking notifier, when the
+> > >   VM is created.
+> > > 
+> > > - just like mmu, write tracking should only be enabled when nested AVIC is
+> > >   actually used first time, so that write tracking is not always enabled when
+> > >   you just boot a VM with nested avic supported, since the VM might not use
+> > >   nested at all.
+> > >  
+> > > Thus I either need to use the __kvm_page_track_register_notifier too for AVIC
+> > > (and thus need to export it) or I need to have a boolean
+> > > (nested_avic_was_used_once) and register the write tracking notifier only
+> > > when false and do it not on VM creation but on first attempt to use nested
+> > > AVIC.
+> > >  
+> > > Do you think this is worth it? I mean there is some value of registering the
+> > > notifier only when needed (this way it is not called for nothing) but it does
+> > > complicate things a bit.
+> > 
+> > Compared to everything else that you're doing in the nested AVIC code, refcounting
+> > the shared kvm_page_track_notifier_node object is a trivial amount of complexity.
+> Makes sense.
 > 
-> The pmu test check_counter_overflow() always fails with the "./configure
-> --arch=i386". The cnt.count obtained from the latter run of measure()
-> (based on fixed counter 0) is not equal to the expected value (based
-> on gp counter 0) and there is a positive error with a value of 2.
+> > And on that topic, do you have performance numbers to justify using a single
+> > shared node?  E.g. if every table instance has its own notifier, then no additional
+> > refcounting is needed. 
 > 
-> The two extra instructions come from inline wrmsr() and inline rdmsr()
-> inside the global_disable() binary code block. Specifically, for each msr
-> access, the i386 code will have two assembly mov instructions before
-> rdmsr/wrmsr (mark it for fixed counter 0, bit 32), but only one assembly
-> mov is needed for x86_64 and gp counter 0 on i386.
+> The thing is that KVM goes over the list of notifiers and calls them for every write from the emulator
+> in fact even just for mmio write, and when you enable write tracking on a page,
+> you just write protect the page and add a mark in the page track array, which is roughly 
 > 
-> Fix the expected init cnt.count for fixed counter 0 overflow based on
-> the same fixed counter 0, not always using gp counter 0.
+> 'don't install spte, don't install mmio spte, but just emulate the page fault if it hits this page'
 > 
-> Signed-off-by: Like Xu <likexu@tencent.com>
-> ---
->  x86/pmu.c | 4 ++++
->  1 file changed, 4 insertions(+)
+> So adding more than a bare minimum to this list, seems just a bit wrong.
 > 
-> diff --git a/x86/pmu.c b/x86/pmu.c
-> index 01be1e9..4bb24e9 100644
-> --- a/x86/pmu.c
-> +++ b/x86/pmu.c
-> @@ -304,6 +304,10 @@ static void check_counter_overflow(void)
->  
->  		if (i == nr_gp_counters) {
->  			cnt.ctr = fixed_events[0].unit_sel;
-> +			cnt.count = 0;
-> +			measure(&cnt, 1);
+> 
+> >  It's not obvious that a shared node will provide better
+> > performance, e.g. if there are only a handful of AVIC tables being shadowed, then
+> > a linear walk of all nodes is likely fast enough, and doesn't bring the risk of
+> > a write potentially being stalled due to having to acquire a VM-scoped mutex.
+> 
+> The thing is that if I register multiple notifiers, they all will be called anyway,
+> but yes I can use container_of, and discover which table the notifier belongs to,
+> instead of having a hash table where I lookup the GFN of the fault.
+> 
+> The above means practically that all the shadow physid tables will be in a linear
+> list of notifiers, so I could indeed avoid per vm mutex on the write tracking,
+> however for simplicity I probably will still need it because I do modify the page,
+> and having per physid table mutex complicates things.
+> 
+> Currently in my code the locking is very simple and somewhat dumb, but the performance
+> is very good because the code isn't executed often, most of the time the AVIC hardware
+> works alone without any VM exits.
+> 
+> Once the code is accepted upstream, it's one of the things that can be improved.
+> 
+> 
+> Note though that I still need a hash table and a mutex because on each VM entry,
+> the guest can use a different physid table, so I need to lookup it, and create it,
+> if not found, which would require read/write of the hash table and thus a mutex.
+> 
+> 
+> 
+> > > I can also stash this boolean (like 'bool registered;') into the 'struct
+> > > kvm_page_track_notifier_node',  and thus allow the
+> > > kvm_page_track_register_notifier to be called more that once -  then I can
+> > > also get rid of __kvm_page_track_register_notifier. 
+> > 
+> > No, allowing redundant registration without proper refcounting leads to pain,
+> > e.g. X registers, Y registers, X unregisters, kaboom.
+> > 
+> 
+> True, but then what about adding a refcount to 'struct kvm_page_track_notifier_node'
+> instead of a boolean, and allowing redundant registration? 
+> Probably not worth it, in which case I am OK to add a refcount to my avic code.
+> 
+> Or maybe just scrap the whole thing and just leave registration and activation of the
+> write tracking as two separate things? Honestly now that looks like the most clean
+> solution.
 
-Not directly related to this patch...
 
-Unless I've missed something, every invocation of start_event() and measure() first
-sets evt.count=0.  Rather than force every caller to ensure count is zeroed, why not
-zero the count during start_event() and then drop all of the manual zeroing?
-
-diff --git a/x86/pmu.c b/x86/pmu.c
-index 01be1e90..ef804272 100644
---- a/x86/pmu.c
-+++ b/x86/pmu.c
-@@ -141,7 +141,7 @@ static void global_disable(pmu_counter_t *cnt)
-
- static void start_event(pmu_counter_t *evt)
- {
--    wrmsr(evt->ctr, evt->count);
-+    wrmsr(evt->ctr, 0);
-     if (is_gp(evt))
-            wrmsr(MSR_P6_EVNTSEL0 + event_to_global_idx(evt),
-                            evt->config | EVNTSEL_EN);
+Kind ping on this. Do you still want me to enable write tracking on the notifier registeration,
+or scrap the idea?
 
 
-Accumulating counts can be handled by reading the current count before start_event(),
-and doing something like stuffing a high count to test an edge case could be handled
-by an inner helper, e.g. by adding __start_event().
+Best regards,
+	Maxim Levitsky
+> 
+> Best regards,
+> 	Maxim Levitsky
+
+
