@@ -2,214 +2,248 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 3AD8D587078
-	for <lists+kvm@lfdr.de>; Mon,  1 Aug 2022 20:43:28 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 8E62F587145
+	for <lists+kvm@lfdr.de>; Mon,  1 Aug 2022 21:16:05 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233468AbiHASn1 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 1 Aug 2022 14:43:27 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39230 "EHLO
+        id S231583AbiHATQD (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 1 Aug 2022 15:16:03 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39626 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233319AbiHASnZ (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 1 Aug 2022 14:43:25 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 4DA87764E
-        for <kvm@vger.kernel.org>; Mon,  1 Aug 2022 11:43:24 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1659379403;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=9VSxu6kH6OVSyxacr8C8nn8K1lJQbLqb/x2+RqZOLy0=;
-        b=WE0ivlyJ6r9h0RKMD8UVf4uHHNiDn6NqB5vj4SwzwcOifYoJrCc2BAvqcNxrWLrKcxIuOL
-        hu7WAev/+903rDwbvjqz5myXSNA6EBll//9waBdVHF6VOTJDIuy1fyZ4RVis+sNL7Nyhb6
-        EHhDOdZaNVlM7ai5iuYrDagkMLfTNNQ=
-Received: from mail-io1-f70.google.com (mail-io1-f70.google.com
- [209.85.166.70]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-567-b8Ba2GHBPLidwsZwnHT0PA-1; Mon, 01 Aug 2022 14:43:13 -0400
-X-MC-Unique: b8Ba2GHBPLidwsZwnHT0PA-1
-Received: by mail-io1-f70.google.com with SMTP id z1-20020a6b6501000000b0067c6495c03dso4152533iob.8
-        for <kvm@vger.kernel.org>; Mon, 01 Aug 2022 11:43:13 -0700 (PDT)
+        with ESMTP id S234739AbiHATPk (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 1 Aug 2022 15:15:40 -0400
+Received: from mail-pj1-x102d.google.com (mail-pj1-x102d.google.com [IPv6:2607:f8b0:4864:20::102d])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 32E25DE92
+        for <kvm@vger.kernel.org>; Mon,  1 Aug 2022 12:15:20 -0700 (PDT)
+Received: by mail-pj1-x102d.google.com with SMTP id e8-20020a17090a280800b001f2fef7886eso13065100pjd.3
+        for <kvm@vger.kernel.org>; Mon, 01 Aug 2022 12:15:20 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc;
+        bh=/oStoCO0mT6rZhV2DeGrwB0VNg7LosUxnetqgViVbr8=;
+        b=T0yeick6KigupptQPl0zhobPECqEarbUKCRNYbFsOAGJk283U6Of+l8cdV6KfiiymE
+         zMqH+SadPLlqjJh3jr8zjYlKQS+pYwCURHiSdaN8oA62/D8xaYkwgjidUhAq2rPb5X6z
+         86axOgJEUpSTgqUUla9elQf0w8hwVO/ENf7HIhwh0PBgg/d1Blz0oZOkWgSN7MXsqDl7
+         okfu7Fyl00s/FO7ZANQ23iAoAIxEqIbqA2SBrnJPE7V+F5szdtI1WZucUwXC4s8DzXN2
+         gAFFtsHGvU5H2pfXtt9KXusED3CaoOVP1oCC/PGnZG9BM7uGh4KP2kRGibZPN/eQEh76
+         O75A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:in-reply-to
-         :references:organization:mime-version:content-transfer-encoding;
-        bh=9VSxu6kH6OVSyxacr8C8nn8K1lJQbLqb/x2+RqZOLy0=;
-        b=RFsX5AyYLrWsleE3FNTHqQ3AXM4cKmYXiz/f7DiM48Iukdi0nOr9KUVEaMHTFIGWal
-         tIj0DEA5E0D9qbmQ5OWz0xINCZBrVQiXLcQK4pgPcxWOh3sKQ1GzzLQWBrTp/oK19E4T
-         n6QUDSZtbEmVsqU5X9RhKKu7rpMBajp8Z6ZCQq6Ac6xm9wy+aI7FkmcEjaeLzzDJpLpm
-         YaBUt1co4YXsmcDVeLnVnEPczPhKEBFp/pAlKMkmRG8cxzUy70rZGcAEGqI8mhitgpP3
-         fexorcm8b5BngQxC++iRanuR85WT8E3qIeW7Fg1k275KPWaCC4Kc6W1ZAExVikQxSggi
-         bzbw==
-X-Gm-Message-State: AJIora9j+WDQpccegK9Su8rG/UqlpsoNhIve8a/b6VDQf6UwCHcPlWA6
-        ouM7560VDgnh4lMSHMJye74/YFmjaP1Y4bfuVOopL3GM30ofYtkLUPqPdvOW9aRlcqEFVuXnW3z
-        PNeMqLCY42pyz
-X-Received: by 2002:a05:6e02:12c7:b0:2dc:8862:15ed with SMTP id i7-20020a056e0212c700b002dc886215edmr6218130ilm.253.1659379375619;
-        Mon, 01 Aug 2022 11:42:55 -0700 (PDT)
-X-Google-Smtp-Source: AGRyM1vPhYcUSteoNNgux6SlllUg3TqHUG5Z8FH+OPi18qAeH1VyuLr2yZZAoZeI2cQIAMhW3mQv6g==
-X-Received: by 2002:a05:6e02:12c7:b0:2dc:8862:15ed with SMTP id i7-20020a056e0212c700b002dc886215edmr6218115ilm.253.1659379375287;
-        Mon, 01 Aug 2022 11:42:55 -0700 (PDT)
-Received: from redhat.com ([38.15.36.239])
-        by smtp.gmail.com with ESMTPSA id cs12-20020a056638470c00b003427bb38ccasm771291jab.54.2022.08.01.11.42.54
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc;
+        bh=/oStoCO0mT6rZhV2DeGrwB0VNg7LosUxnetqgViVbr8=;
+        b=Gp79jxGq7ER9th2QvAJrsSpQ3km6fz5nl5yRk+EFpHgjf+pbBDg7CIhs2c4wgccKnj
+         wJbx5jbuwYIV69dJUF1rxixSzrJfnMTOGxjW3MZxeMlbv61iFagt/Lj+VpBQ5mIn3jt9
+         MF+tMsavkVklnVfu/YChUikH4lwI3YUi06nS8utG5U9TCqN0+jIGXTBr3trXTQXv+ZxW
+         BhA+jRon79DCfn6W4kB5nv/leVl8CcceiuXhWW0Z8TJjGV+DRkd3qEPUNRn3ANayRSsx
+         5/c13ZmVZV2Dx0LRtknNIEQcZ9tDlTnSThVedVxYYf53vkFh7Om+uTneyeWoOtmOlfCk
+         YOKg==
+X-Gm-Message-State: ACgBeo28U6hgNDqU0XEiag7faTKcpI91RdVupHZLeKrUKN2BO4QkVpHP
+        2vsE/9Dj3ZZBHXXwnpLUd3r9jw==
+X-Google-Smtp-Source: AA6agR4D8nyYYlDLtp3y9WVX5Prh8hDInUk2g83okT4qkBAwKcL+s+5gZbDGkpDSQ4RzA44uWUltfw==
+X-Received: by 2002:a17:90a:988:b0:1f2:3dff:f1dd with SMTP id 8-20020a17090a098800b001f23dfff1ddmr20814591pjo.150.1659381320073;
+        Mon, 01 Aug 2022 12:15:20 -0700 (PDT)
+Received: from google.com (220.181.82.34.bc.googleusercontent.com. [34.82.181.220])
+        by smtp.gmail.com with ESMTPSA id y6-20020a63de46000000b0040c40b022fbsm7575223pgi.94.2022.08.01.12.15.18
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 01 Aug 2022 11:42:54 -0700 (PDT)
-Date:   Mon, 1 Aug 2022 12:42:53 -0600
-From:   Alex Williamson <alex.williamson@redhat.com>
-To:     Abhishek Sahu <abhsahu@nvidia.com>
-Cc:     Jason Gunthorpe <jgg@nvidia.com>,
-        Cornelia Huck <cohuck@redhat.com>,
-        Yishai Hadas <yishaih@nvidia.com>,
-        Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>,
-        Kevin Tian <kevin.tian@intel.com>,
-        "Rafael J . Wysocki" <rafael@kernel.org>,
-        Max Gurtovoy <mgurtovoy@nvidia.com>,
-        Bjorn Helgaas <bhelgaas@google.com>,
-        linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-        linux-pm@vger.kernel.org, linux-pci@vger.kernel.org
-Subject: Re: [PATCH v5 1/5] vfio: Add the device features for the low power
- entry and exit
-Message-ID: <20220801124253.11c24d91.alex.williamson@redhat.com>
-In-Reply-To: <f903e2b9-f85b-a4c8-4706-f463919723a3@nvidia.com>
-References: <20220719121523.21396-1-abhsahu@nvidia.com>
-        <20220719121523.21396-2-abhsahu@nvidia.com>
-        <20220721163445.49d15daf.alex.williamson@redhat.com>
-        <aaef2e78-1ed2-fe8b-d167-8ea2dcbe45b6@nvidia.com>
-        <20220725160928.43a17560.alex.williamson@redhat.com>
-        <bd7bca18-ae07-c04a-23d3-bf71245da0cc@nvidia.com>
-        <20220726172356.GH4438@nvidia.com>
-        <f903e2b9-f85b-a4c8-4706-f463919723a3@nvidia.com>
-Organization: Red Hat
+        Mon, 01 Aug 2022 12:15:19 -0700 (PDT)
+Date:   Mon, 1 Aug 2022 12:15:15 -0700
+From:   Ricardo Koller <ricarkol@google.com>
+To:     Marc Zyngier <maz@kernel.org>
+Cc:     kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu,
+        Andrew Jones <andrew.jones@linux.dev>,
+        alexandru.elisei@arm.com, eric.auger@redhat.com,
+        oliver.upton@linux.dev, reijiw@google.com
+Subject: Re: [kvm-unit-tests PATCH 3/3] arm: pmu: Remove checks for !overflow
+ in chained counters tests
+Message-ID: <YugmQ3lDPcw9qb0v@google.com>
+References: <20220718154910.3923412-1-ricarkol@google.com>
+ <20220718154910.3923412-4-ricarkol@google.com>
+ <87sfmiwywd.wl-maz@kernel.org>
+ <87r122wynd.wl-maz@kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-3.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,
-        SPF_HELO_NONE,SPF_NONE autolearn=unavailable autolearn_force=no
-        version=3.4.6
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <87r122wynd.wl-maz@kernel.org>
+X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
+        USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, 27 Jul 2022 11:37:02 +0530
-Abhishek Sahu <abhsahu@nvidia.com> wrote:
-
-> On 7/26/2022 10:53 PM, Jason Gunthorpe wrote:
-> > On Tue, Jul 26, 2022 at 06:17:18PM +0530, Abhishek Sahu wrote:  
-> >>  Thanks Alex for your thorough review of uAPI.
-> >>  I have incorporated all the suggestions.
-> >>  Following is the updated uAPI.
-> >>  
-> >>  /*
-> >>   * Upon VFIO_DEVICE_FEATURE_SET, allow the device to be moved into a low power
-> >>   * state with the platform-based power management.  Device use of lower power
-> >>   * states depends on factors managed by the runtime power management core,
-> >>   * including system level support and coordinating support among dependent
-> >>   * devices.  Enabling device low power entry does not guarantee lower power
-> >>   * usage by the device, nor is a mechanism provided through this feature to
-> >>   * know the current power state of the device.  If any device access happens
-> >>   * (either from the host or through the vfio uAPI) when the device is in the
-> >>   * low power state, then the host will move the device out of the low power
-> >>   * state as necessary prior to the access.  Once the access is completed, the
-> >>   * device may re-enter the low power state.  For single shot low power support
-> >>   * with wake-up notification, see
-> >>   * VFIO_DEVICE_FEATURE_LOW_POWER_ENTRY_WITH_WAKEUP below.  Access to mmap'd
-> >>   * device regions is disabled on LOW_POWER_ENTRY and may only be resumed after
-> >>   * calling LOW_POWER_EXIT.
-> >>   */
-> >>  #define VFIO_DEVICE_FEATURE_LOW_POWER_ENTRY 3
-> >>  
-> >>  /*
-> >>   * This device feature has the same behavior as
-> >>   * VFIO_DEVICE_FEATURE_LOW_POWER_ENTRY with the exception that the user
-> >>   * provides an eventfd for wake-up notification.  
+On Sat, Jul 30, 2022 at 01:52:38PM +0100, Marc Zyngier wrote:
+> Crumbs... With Drew's new email this time.
+> 
+> On Sat, 30 Jul 2022 13:47:14 +0100,
+> Marc Zyngier <maz@kernel.org> wrote:
 > > 
-> > It feels like this should be one entry point instead of two.
+> > Hi Ricardo,
 > > 
-> > A flag "automatic re-sleep" and an optional eventfd (-1 means not
-> > provided) seems to capture both of these behaviors in a bit clearer
-> > and extendable way.
+> > On Mon, 18 Jul 2022 16:49:10 +0100,
+> > Ricardo Koller <ricarkol@google.com> wrote:
+> > > 
+> > > A chained event overflowing on the low counter can set the overflow flag
+> > > in PMOVS.  KVM does not set it, but real HW and the fast-model seem to.
+> > > Moreover, the AArch64.IncrementEventCounter() pseudocode in the ARM ARM
+> > > (DDI 0487H.a, J1.1.1 "aarch64/debug") also sets the PMOVS bit on
+> > > overflow.
+> > > 
+> > > The pmu chain tests fail on bare metal when checking the overflow flag
+> > > of the low counter _not_ being set on overflow.  Fix by removing the
+> > > checks.
+> > > 
+> > > Signed-off-by: Ricardo Koller <ricarkol@google.com>
+> > > ---
+> > >  arm/pmu.c | 21 ++++++++++-----------
+> > >  1 file changed, 10 insertions(+), 11 deletions(-)
+> > > 
+> > > diff --git a/arm/pmu.c b/arm/pmu.c
+> > > index a7899c3c..4f2c5096 100644
+> > > --- a/arm/pmu.c
+> > > +++ b/arm/pmu.c
+> > > @@ -581,7 +581,6 @@ static void test_chained_counters(void)
+> > >  	precise_instrs_loop(22, pmu.pmcr_ro | PMU_PMCR_E);
+> > >  
+> > >  	report(read_regn_el0(pmevcntr, 1) == 1, "CHAIN counter #1 incremented");
+> > > -	report(!read_sysreg(pmovsclr_el0), "no overflow recorded for chained incr #1");
+> > >  
+> > >  	/* test 64b overflow */
+> > >  
+> > > @@ -593,7 +592,7 @@ static void test_chained_counters(void)
+> > >  	precise_instrs_loop(22, pmu.pmcr_ro | PMU_PMCR_E);
+> > >  	report_info("overflow reg = 0x%lx", read_sysreg(pmovsclr_el0));
+> > >  	report(read_regn_el0(pmevcntr, 1) == 2, "CHAIN counter #1 set to 2");
+> > > -	report(!read_sysreg(pmovsclr_el0), "no overflow recorded for chained incr #2");
+> > > +	report((read_sysreg(pmovsclr_el0) & 0x2) == 0, "no overflow recorded for chained incr #2");
+> > >  
+> > >  	write_regn_el0(pmevcntr, 0, PRE_OVERFLOW);
+> > >  	write_regn_el0(pmevcntr, 1, ALL_SET);
+> > > @@ -601,7 +600,7 @@ static void test_chained_counters(void)
+> > >  	precise_instrs_loop(22, pmu.pmcr_ro | PMU_PMCR_E);
+> > >  	report_info("overflow reg = 0x%lx", read_sysreg(pmovsclr_el0));
+> > >  	report(!read_regn_el0(pmevcntr, 1), "CHAIN counter #1 wrapped");
+> > > -	report(read_sysreg(pmovsclr_el0) == 0x2, "overflow on chain counter");
+> > > +	report(read_sysreg(pmovsclr_el0) & 0x2, "overflow on chain counter");
+> > >  }
+> > >  
+> > >  static void test_chained_sw_incr(void)
+> > > @@ -626,10 +625,10 @@ static void test_chained_sw_incr(void)
+> > >  	for (i = 0; i < 100; i++)
+> > >  		write_sysreg(0x1, pmswinc_el0);
+> > >  
+> > > -	report(!read_sysreg(pmovsclr_el0) && (read_regn_el0(pmevcntr, 1) == 1),
+> > > -		"no overflow and chain counter incremented after 100 SW_INCR/CHAIN");
+> > > +	report(read_regn_el0(pmevcntr, 1) == 1,
+> > > +			"no chain counter incremented after 100 SW_INCR/CHAIN");
+> > >  	report_info("overflow=0x%lx, #0=%ld #1=%ld", read_sysreg(pmovsclr_el0),
+> > > -		    read_regn_el0(pmevcntr, 0), read_regn_el0(pmevcntr, 1));
+> > > +			read_regn_el0(pmevcntr, 0), read_regn_el0(pmevcntr, 1));
+> > >  
+> > >  	/* 64b SW_INCR and overflow on CHAIN counter*/
+> > >  	pmu_reset();
+> > > @@ -644,7 +643,7 @@ static void test_chained_sw_incr(void)
+> > >  	for (i = 0; i < 100; i++)
+> > >  		write_sysreg(0x1, pmswinc_el0);
+> > >  
+> > > -	report((read_sysreg(pmovsclr_el0) == 0x2) &&
+> > > +	report((read_sysreg(pmovsclr_el0) & 0x2) &&
+> > >  		(read_regn_el0(pmevcntr, 1) == 0) &&
+> > >  		(read_regn_el0(pmevcntr, 0) == 84),
+> > >  		"overflow on chain counter and expected values after 100 SW_INCR/CHAIN");
+> > > @@ -727,8 +726,8 @@ static void test_chain_promotion(void)
+> > >  	report_info("MEM_ACCESS counter #0 has value 0x%lx",
+> > >  		    read_regn_el0(pmevcntr, 0));
+> > >  
+> > > -	report((read_regn_el0(pmevcntr, 1) == 1) && !read_sysreg(pmovsclr_el0),
+> > > -		"CHAIN counter enabled: CHAIN counter was incremented and no overflow");
+> > > +	report((read_regn_el0(pmevcntr, 1) == 1),
+> > > +		"CHAIN counter enabled: CHAIN counter was incremented");
+> > >  
+> > >  	report_info("CHAIN counter #1 = 0x%lx, overflow=0x%lx",
+> > >  		read_regn_el0(pmevcntr, 1), read_sysreg(pmovsclr_el0));
+> > > @@ -755,8 +754,8 @@ static void test_chain_promotion(void)
+> > >  	report_info("MEM_ACCESS counter #0 has value 0x%lx",
+> > >  		    read_regn_el0(pmevcntr, 0));
+> > >  
+> > > -	report((read_regn_el0(pmevcntr, 1) == 1) && !read_sysreg(pmovsclr_el0),
+> > > -		"32b->64b: CHAIN counter incremented and no overflow");
+> > > +	report((read_regn_el0(pmevcntr, 1) == 1),
+> > > +		"32b->64b: CHAIN counter incremented");
+> > >  
+> > >  	report_info("CHAIN counter #1 = 0x%lx, overflow=0x%lx",
+> > >  		read_regn_el0(pmevcntr, 1), read_sysreg(pmovsclr_el0));
+> > 
+> > I'm looking at fixing KVM to match this (see the binch of hacks at
+> > [1]), and still getting a couple of failures in the PMU overflow tests
+> > despite my best effort to fix the code:
+> > 
+> > $ ./arm-run  arm/pmu.flat --append pmu-overflow-interrupt
+> > /usr/bin/qemu-system-aarch64 -nodefaults -machine virt,gic-version=host -accel kvm -cpu host -device virtio-serial-device -device virtconsole,chardev=ctd -chardev testdev,id=ctd -device pci-testdev -display none -serial stdio -kernel arm/pmu.flat --append pmu-overflow-interrupt # -initrd /tmp/tmp.RQ6FmkvXay
+> > INFO: PMU version: 0x1
+> > INFO: PMU implementer/ID code: 0x41("A")/0x3
+> > INFO: Implements 6 event counters
+> > PASS: pmu: pmu-overflow-interrupt: no overflow interrupt after preset
+> > PASS: pmu: pmu-overflow-interrupt: no overflow interrupt after counting
+> > INFO: pmu: pmu-overflow-interrupt: overflow=0x0
+> > PASS: pmu: pmu-overflow-interrupt: overflow interrupts expected on #0 and #1
+> > FAIL: pmu: pmu-overflow-interrupt: no overflow interrupt expected on 32b boundary
+> > FAIL: pmu: pmu-overflow-interrupt: expect overflow interrupt on odd counter
+> > SUMMARY: 5 tests, 2 unexpected failures
+> > 
+> > Looking at the kut code, I'm wondering whether you're still missing a
+> > couple of extra fixes such as:
+> > 
+> > diff --git a/arm/pmu.c b/arm/pmu.c
+> > index 4f2c5096..e0b9f71a 100644
+> > --- a/arm/pmu.c
+> > +++ b/arm/pmu.c
+> > @@ -861,8 +861,8 @@ static void test_overflow_interrupt(void)
+> >  	write_regn_el0(pmevcntr, 0, PRE_OVERFLOW);
+> >  	isb();
+> >  	mem_access_loop(addr, 200, pmu.pmcr_ro | PMU_PMCR_E);
+> > -	report(expect_interrupts(0),
+> > -		"no overflow interrupt expected on 32b boundary");
+> > +	report(expect_interrupts(1),
+> > +		"expect overflow interrupt on 32b counter");
+> >  
+> >  	/* overflow on odd counter */
+> >  	pmu_reset_stats();
+> > @@ -870,8 +870,8 @@ static void test_overflow_interrupt(void)
+> >  	write_regn_el0(pmevcntr, 1, ALL_SET);
+> >  	isb();
+> >  	mem_access_loop(addr, 400, pmu.pmcr_ro | PMU_PMCR_E);
+> > -	report(expect_interrupts(0x2),
+> > -		"expect overflow interrupt on odd counter");
+> > +	report(expect_interrupts(0x3),
+> > +		"expect overflow interrupt on even+odd counters");
+> >  }
+> >  #endif
+> >  
+> > With that, all PMU tests pass. Am I missing something? Did you notice
+> > these failing on HW?
+> > 
 
-I think the mutual exclusion between re-entrant mode and one-shot is
-quite a bit more subtle in the version below, so I don't particularly
-find this cleaner.  Potentially we could have variant drivers support
-one w/o the other in the previously proposed model as well.  It's
-interesting to see this suggestion since since we seem to have a theme
-of making features single purpose elsewhere.  Thanks,
+Actually, yes. But, I wasn't 100% sure. I tried a PMU passthrough
+prototype on both real HW and the fast-model, and with
+test_overflow_interrupt() I see an interrupt overflow hitting EL2. I
+wasn't sure whether I should be forwarding it to the guest.
 
-Alex 
+Thanks,
+Ricardo
 
+> > Thanks,
+> > 
+> > 	M.
+> > 
+> > [1] https://git.kernel.org/pub/scm/linux/kernel/git/maz/arm-platforms.git/log/?h=kvm-arm64/pmu-chained
+> > 
+> > -- 
+> > Without deviation from the norm, progress is not possible.
 > 
->  We discussed about that in the earlier version of the patch series.
->  Since we have different exit related handling, so to avoid confusion
->  we proceeded with 2 separate variants for the low power entry. Also,
->  we don't need any parameter for the first case.
-> 
->  But, I can do the changes to make a single entry point, if we conclude
->  for that. 
-> 
->  From my side, I have explored how the uAPI looks like if
->  we go with this approach.
-> 
->  /*
->   * Upon VFIO_DEVICE_FEATURE_SET, allow the device to be moved into a low power
->   * state with the platform-based power management.  Device use of lower power
->   * states depends on factors managed by the runtime power management core,
->   * including system level support and coordinating support among dependent
->   * devices.  Enabling device low power entry does not guarantee lower power
->   * usage by the device, nor is a mechanism provided through this feature to
->   * know the current power state of the device.  If any device access happens
->   * (either from the host or through the vfio uAPI) when the device is in the
->   * low power state, then the host will move the device out of the low power
->   * state as necessary prior to the access.  Once the access is completed, the
->   * device re-entry to a low power state will be controlled through
->   * VFIO_DEVICE_LOW_POWER_REENTERY_DISABLE flag.
->   *
->   * If LOW_POWER_REENTERY_DISABLE flag is not set, the device may re-enter the
->   * low power state.  Access to mmap'd device regions is disabled on
->   * LOW_POWER_ENTRY and may only be resumed after calling LOW_POWER_EXIT.
->   *
->   * If LOW_POWER_REENTERY_DISABLE flag is set, then user needs to provide an
->   * eventfd for wake-up notification.  When the device moves out of the low
->   * power state for the wake-up, the host will not allow the device to re-enter
->   * a low power state without a subsequent user call to LOW_POWER_ENTRY.
->   * Access to mmap'd device regions is disabled on LOW_POWER_ENTRY and may only
->   * be resumed after the low power exit.  The low power exit can happen either
->   * through LOW_POWER_EXIT or through any other access (where the wake-up
->   * notification has been generated).  The access to mmap'd device regions will
->   * not trigger low power exit.
->   *
->   * The notification through the provided eventfd will be generated only when
->   * the device has entered and is resumed from a low power state after
->   * calling this device feature IOCTL.  A device that has not entered low power
->   * state, as managed through the runtime power management core, will not
->   * generate a notification through the provided eventfd on access.  Calling the
->   * LOW_POWER_EXIT feature is optional in the case where notification has been
->   * signaled on the provided eventfd that a resume from low power has occurred.
->   *
->   * The wakeup_eventfd needs to be valid only if LOW_POWER_REENTERY_DISABLE
->   * flag is set, otherwise, it will be ignored.
->   */
->  #define VFIO_DEVICE_FEATURE_LOW_POWER_ENTRY 3
->  
->  struct vfio_device_low_power_entry_with_wakeup {
->  	__u32 flags;
->  #define VFIO_DEVICE_LOW_POWER_REENTERY_DISABLE	(1 << 0)
->  	__s32 wakeup_eventfd;
->  };
->  
->  /*
->   * Upon VFIO_DEVICE_FEATURE_SET, disallow use of device low power states as
->   * previously enabled via VFIO_DEVICE_FEATURE_LOW_POWER_ENTRY device feature.
->   * This device feature IOCTL may itself generate a wakeup eventfd notification
->   * if the device had previously entered a low power state with
->   * VFIO_DEVICE_LOW_POWER_REENTERY_DISABLE flag set.
->   */
->  #define VFIO_DEVICE_FEATURE_LOW_POWER_EXIT 4
-> 
->  Thanks,
->  Abhishek
-> 
-
+> -- 
+> Without deviation from the norm, progress is not possible.
