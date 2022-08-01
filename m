@@ -2,84 +2,64 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 332C2586B51
-	for <lists+kvm@lfdr.de>; Mon,  1 Aug 2022 14:50:29 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id DD622586BC9
+	for <lists+kvm@lfdr.de>; Mon,  1 Aug 2022 15:18:38 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235107AbiHAMuZ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 1 Aug 2022 08:50:25 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49338 "EHLO
+        id S230390AbiHANSg (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 1 Aug 2022 09:18:36 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51074 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234539AbiHAMuG (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 1 Aug 2022 08:50:06 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 9C9762620
-        for <kvm@vger.kernel.org>; Mon,  1 Aug 2022 05:43:36 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1659357815;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=WS+3ThxPSCx9TTKskcZREuLQziOp6sjXVWQAmlUDQSk=;
-        b=Jt2NONQt6VY0n8NAjfzRrH6RwbDoOfjaqMvU7fGG51e6HpgSVtmuRrihyDfp7FRk5G+Ayf
-        jkdMxQqV/nqRutJnzvYHtLeMsb8EbMJkfYRXIOpgYNmCRZEdAJYYtwYByoLHTjZi0hn1YH
-        JvhsjL0+1kHftFPx2JCldv6foovfKtw=
-Received: from mail-ed1-f71.google.com (mail-ed1-f71.google.com
- [209.85.208.71]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-616-lBnU1-TNMIOzhYzdL5FIJg-1; Mon, 01 Aug 2022 08:43:34 -0400
-X-MC-Unique: lBnU1-TNMIOzhYzdL5FIJg-1
-Received: by mail-ed1-f71.google.com with SMTP id s17-20020a056402521100b0043ade613038so7121761edd.17
-        for <kvm@vger.kernel.org>; Mon, 01 Aug 2022 05:43:34 -0700 (PDT)
+        with ESMTP id S229953AbiHANSf (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 1 Aug 2022 09:18:35 -0400
+Received: from mail-pg1-x52d.google.com (mail-pg1-x52d.google.com [IPv6:2607:f8b0:4864:20::52d])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1B7CA2B267
+        for <kvm@vger.kernel.org>; Mon,  1 Aug 2022 06:18:35 -0700 (PDT)
+Received: by mail-pg1-x52d.google.com with SMTP id i71so4120256pge.9
+        for <kvm@vger.kernel.org>; Mon, 01 Aug 2022 06:18:35 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=g3uW/u8IS+It3J0szOW84VRij0/I3c1Tajm068uaOKs=;
+        b=j4bUPpxHfl/mO8/8NOgq2HD15KVdoSupsR3MX6c/hBiVS/6OCFEoacQUYzmrtS6WrY
+         s1aiPhii4P5RK+HbrPLxJevnfobqZWd9heM2ZAGmWxmu1H0n7N1o+pWTle3wJK0lyIJO
+         28A7W02RIWMXMb1DypJFNZIQlGdkTJtAQzZPqGEXtg1mE6rsTPV5Pip4r9isxvgPtNru
+         77AWIySiMnEmpRaKuwk95UIbDJ4oTVrA6DWYpiDoCAAGYLAQtocPBL6pyUmLI0SAXoUO
+         8vFcC4cC/+wMRg8S5o3SwQv311KrFhS1rc6CErGbNTWeCFH6nVlMGDhkeSOe3SY2q68I
+         BbaQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc;
-        bh=WS+3ThxPSCx9TTKskcZREuLQziOp6sjXVWQAmlUDQSk=;
-        b=1qmTDKUTKoofirMAJIuwWGop5fBreAP+xCGuqoTrUGZbl5XaOOE5UKkElF15OZ8BAa
-         bCOWaNs3wUcDmgVLwF7QS9rWzMemrv4PVAtFLtncNP2KDg/VmQgu2yS6ArUtF7OQHrJb
-         Ygj3qqt69X59/o2M+h6Ui0cyo+e1tI0jIluLi4apkEyY8nvLBjJzwEjoHaXwhvaCRAOc
-         8Pr6KafTMAT8aKsMpg8lIhyjXxkuXBUgrEYvV34eNPI749hqGvhxl2UWUW9nNlj+oIFc
-         5umwGXrDm2OPTOUQRe+NHxSfw9nMQOEoUU+wgBpbglph3kgisAZbxikLIG7L8qY6YQji
-         +y2A==
-X-Gm-Message-State: AJIora/PXibRYyYfU6c082oVUMXS2z8GHDnJnvEVHeIjfpFkHrMp4Qa9
-        dUEjPd/f6L3w28rpgrcc2I6fM8nE8RMqIiF0k30y9X9+Z14JNauz+jkvROif51PFIlhIdRwRsIv
-        HikWTbnUdgi1b
-X-Received: by 2002:a05:6402:430a:b0:43b:ea0d:dc59 with SMTP id m10-20020a056402430a00b0043bea0ddc59mr15559105edc.387.1659357812822;
-        Mon, 01 Aug 2022 05:43:32 -0700 (PDT)
-X-Google-Smtp-Source: AGRyM1vOjWj0y3iMX53pyz5V46T+O5+5Aq6q+J+CKRYTdzRlJRudv67mcAECsSA+HsYERrnBrII1gA==
-X-Received: by 2002:a05:6402:430a:b0:43b:ea0d:dc59 with SMTP id m10-20020a056402430a00b0043bea0ddc59mr15559087edc.387.1659357812628;
-        Mon, 01 Aug 2022 05:43:32 -0700 (PDT)
-Received: from ?IPV6:2001:b07:6468:f312:9af8:e5f5:7516:fa89? ([2001:b07:6468:f312:9af8:e5f5:7516:fa89])
-        by smtp.googlemail.com with ESMTPSA id d27-20020a056402517b00b0043577da51f1sm6740601ede.81.2022.08.01.05.43.31
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 01 Aug 2022 05:43:31 -0700 (PDT)
-Message-ID: <54fbb1e1-c9b1-db59-6388-1aab74eb5b11@redhat.com>
-Date:   Mon, 1 Aug 2022 14:43:00 +0200
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=g3uW/u8IS+It3J0szOW84VRij0/I3c1Tajm068uaOKs=;
+        b=wqzLCE3m3KaKP3A+EBGHtWMfXtlmVAlLcSrKJnWe6k3Zboag0005CpU3BvJJM8v07Z
+         RGJlTDWlEErv2uyZRkP9cjOTgeQ3R9Hy64yRvGnR8jS8NOr9AvKf9+wW8r7/yO75TiEt
+         WJiPVrtJ2jgwsniHKumNMaRCpNk2Ap9jnZn0oLSXUhVrRY7I/whd+sA/pzrbVvXBI28I
+         wNG+Rg4suvw8J4453sMEO4z1XVh+51Gy7ykRkQZrfsfKrKWKiDRR54TQDttAuSJf8Uzi
+         i6VV3kZ9rO/jkdKoONWFzwT1Xx3v6KM5QzQpjY3Ps/sQ39F0UfBlzmrYkYPzYosjU/X7
+         WuTQ==
+X-Gm-Message-State: AJIora8ybshpVzKufLRYIH/g72DEvuA9jkHZSpKVUgNT8zLQ5YMk/eDb
+        Y1gCJMyfFb3p1QyJbIGpOu0=
+X-Google-Smtp-Source: AGRyM1s9DpiF4Mvi+gMi8V++frjUY3EuI743BMIKlaWzVeXZLCPLYGrHwkLZCG2awbwkKX1b6tMbNQ==
+X-Received: by 2002:a63:f355:0:b0:419:8dfd:45d0 with SMTP id t21-20020a63f355000000b004198dfd45d0mr13289679pgj.226.1659359914373;
+        Mon, 01 Aug 2022 06:18:34 -0700 (PDT)
+Received: from localhost.localdomain ([103.7.29.32])
+        by smtp.gmail.com with ESMTPSA id i27-20020aa796fb000000b0052ab912b0fasm8621351pfq.2.2022.08.01.06.18.31
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 01 Aug 2022 06:18:33 -0700 (PDT)
+From:   Like Xu <like.xu.linux@gmail.com>
+X-Google-Original-From: Like Xu <likexu@tencent.com>
+To:     Paolo Bonzini <pbonzini@redhat.com>
+Cc:     Sean Christopherson <seanjc@google.com>, kvm@vger.kernel.org
+Subject: [kvm-unit-tests  PATCH] x86/pmu: Reset the expected count of the fixed counter 0 when i386
+Date:   Mon,  1 Aug 2022 21:18:14 +0800
+Message-Id: <20220801131814.24364-1-likexu@tencent.com>
+X-Mailer: git-send-email 2.37.1
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.11.0
-Subject: Re: [PATCH 4/5] selftests/kvm/x86_64: set rax before vmcall
-Content-Language: en-US
-To:     Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Andrei Vagin <avagin@google.com>
-Cc:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-        Sean Christopherson <seanjc@google.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jianfeng Tan <henry.tjf@antfin.com>,
-        Adin Scannell <ascannell@google.com>,
-        Konstantin Bogomolov <bogomolov@google.com>,
-        Etienne Perot <eperot@google.com>
-References: <20220722230241.1944655-1-avagin@google.com>
- <20220722230241.1944655-5-avagin@google.com> <87y1w819o7.fsf@redhat.com>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-In-Reply-To: <87y1w819o7.fsf@redhat.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-2.7 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
-        RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_NONE autolearn=unavailable
+Content-Transfer-Encoding: 8bit
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
+        RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS autolearn=ham
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -87,10 +67,42 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 8/1/22 13:32, Vitaly Kuznetsov wrote:
-> Fixes: ac4a4d6de22e ("selftests: kvm: test enforcement of paravirtual cpuid features")
+From: Like Xu <likexu@tencent.com>
 
-Queued, thanks.
+The pmu test check_counter_overflow() always fails with the "./configure
+--arch=i386". The cnt.count obtained from the latter run of measure()
+(based on fixed counter 0) is not equal to the expected value (based
+on gp counter 0) and there is a positive error with a value of 2.
 
-Paolo
+The two extra instructions come from inline wrmsr() and inline rdmsr()
+inside the global_disable() binary code block. Specifically, for each msr
+access, the i386 code will have two assembly mov instructions before
+rdmsr/wrmsr (mark it for fixed counter 0, bit 32), but only one assembly
+mov is needed for x86_64 and gp counter 0 on i386.
+
+Fix the expected init cnt.count for fixed counter 0 overflow based on
+the same fixed counter 0, not always using gp counter 0.
+
+Signed-off-by: Like Xu <likexu@tencent.com>
+---
+ x86/pmu.c | 4 ++++
+ 1 file changed, 4 insertions(+)
+
+diff --git a/x86/pmu.c b/x86/pmu.c
+index 01be1e9..4bb24e9 100644
+--- a/x86/pmu.c
++++ b/x86/pmu.c
+@@ -304,6 +304,10 @@ static void check_counter_overflow(void)
+ 
+ 		if (i == nr_gp_counters) {
+ 			cnt.ctr = fixed_events[0].unit_sel;
++			cnt.count = 0;
++			measure(&cnt, 1);
++			count = cnt.count;
++			cnt.count = 1 - count;
+ 			cnt.count &= (1ull << pmu_fixed_counter_width()) - 1;
+ 		}
+ 
+-- 
+2.37.1
 
