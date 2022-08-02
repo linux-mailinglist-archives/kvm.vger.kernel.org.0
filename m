@@ -2,210 +2,291 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id BEC44587DEB
-	for <lists+kvm@lfdr.de>; Tue,  2 Aug 2022 16:09:44 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 8B521587DF6
+	for <lists+kvm@lfdr.de>; Tue,  2 Aug 2022 16:12:41 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237197AbiHBOJn (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 2 Aug 2022 10:09:43 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38768 "EHLO
+        id S237250AbiHBOMj convert rfc822-to-8bit (ORCPT
+        <rfc822;lists+kvm@lfdr.de>); Tue, 2 Aug 2022 10:12:39 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40690 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234097AbiHBOJm (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 2 Aug 2022 10:09:42 -0400
-Received: from mail-pj1-x1030.google.com (mail-pj1-x1030.google.com [IPv6:2607:f8b0:4864:20::1030])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 890AD2B25B
-        for <kvm@vger.kernel.org>; Tue,  2 Aug 2022 07:09:41 -0700 (PDT)
-Received: by mail-pj1-x1030.google.com with SMTP id f7so14044408pjp.0
-        for <kvm@vger.kernel.org>; Tue, 02 Aug 2022 07:09:41 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc;
-        bh=2gNvEAENo1OIVuK749BPGwDzRCqdAQhy7NAuMimv7uU=;
-        b=TL7SWXq4x35jo30zd59pKFzHPuDAJhaqqiYFTExOJUX8Qnt3qbbyi5FRV5JhIEV/xx
-         X5jB/2QnlvfDGZdRPFOBrOJQ5CqFJpI/IfMuqzQVXHcDdg069C+Cd41J+taSOaOyJELx
-         LH3ltSlzWikLuXgVvEs7NsEeTjHwr8dycY8AJAwA9ijPrV4X74kOC4VsDiWcjTkaAbBZ
-         crnr3GvdIDGNx6MXmBEUtgE0RcU6Sk+Yb3tX8AkL1SrHTXWL3ucNTBh/VT5Q6DzdAmOf
-         Xwxk+OC34KFrc0O4J/Yg3nXVGYSheer2jHJX2wERezRAj5dio2pSmH2MKXSMrrYkWQ3Q
-         TCDQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc;
-        bh=2gNvEAENo1OIVuK749BPGwDzRCqdAQhy7NAuMimv7uU=;
-        b=FHBfnN12EmUCJA45iutVa6pZkx3UHMUvfF/YDGkErkDf3RIDvMb736CDtHfbCW8Col
-         Bb71qjeyxJLbUoHLWbkcfqMWy7twi3tP7uBPcvBfVMHavEH+iMUU6efd4N6CLj2g+8j1
-         CSdrGxEJ8tMtfLiTSKMdFr5nAHhLReVdyPN/RsVNs7qMVM6NafNvUkaWYYTQF97b7GE2
-         KFPz9GjYnk14If4x3rRm1JMJgOcuK4vSWmCjXupzbL3UQG7Uib2L7UMec8vSkHVvPz55
-         oDkq4x+j49XwzcuVyJT1/pkcZ7c5xM8WZADaCLZgNdNygSJDRAU0KNN6HzJcLrmNMfTC
-         8WwA==
-X-Gm-Message-State: ACgBeo0kYK8ManvYOw8ROgV/nayfRWEqOmxSNcvcrvB7IBXdjdljZt/N
-        83kHKMaLbE1KIMgO3kAUKNwAmg==
-X-Google-Smtp-Source: AA6agR5GQ1NVe4vUCI8/Kh7Cm9nzm2Ne3oyf9Equi45y5D1WPzqdheuHpkzaG8A4MYjfM6RxsPdu9Q==
-X-Received: by 2002:a17:90b:1e46:b0:1f2:9f69:3f5e with SMTP id pi6-20020a17090b1e4600b001f29f693f5emr24533367pjb.228.1659449380854;
-        Tue, 02 Aug 2022 07:09:40 -0700 (PDT)
-Received: from google.com (7.104.168.34.bc.googleusercontent.com. [34.168.104.7])
-        by smtp.gmail.com with ESMTPSA id k16-20020a170902ce1000b0016d05661f00sm11790595plg.189.2022.08.02.07.09.40
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 02 Aug 2022 07:09:40 -0700 (PDT)
-Date:   Tue, 2 Aug 2022 14:09:36 +0000
-From:   Sean Christopherson <seanjc@google.com>
-To:     Like Xu <like.xu.linux@gmail.com>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org
-Subject: Re: [kvm-unit-tests PATCH] x86/pmu: Reset the expected count of the
- fixed counter 0 when i386
-Message-ID: <YukwIDuo/uN3CXT3@google.com>
-References: <20220801131814.24364-1-likexu@tencent.com>
- <Yuf0uJeN5n3AvXPg@google.com>
- <9dce3dbb-ffa1-687a-d1c4-8234d1bf6cfb@gmail.com>
+        with ESMTP id S237239AbiHBOMg (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 2 Aug 2022 10:12:36 -0400
+Received: from smtp237.sjtu.edu.cn (smtp237.sjtu.edu.cn [202.120.2.237])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BC9DA2CC83;
+        Tue,  2 Aug 2022 07:12:31 -0700 (PDT)
+Received: from mta91.sjtu.edu.cn (unknown [10.118.0.91])
+        by smtp237.sjtu.edu.cn (Postfix) with ESMTPS id 4341010087D61;
+        Tue,  2 Aug 2022 22:12:29 +0800 (CST)
+Received: from localhost (localhost.localdomain [127.0.0.1])
+        by mta91.sjtu.edu.cn (Postfix) with ESMTP id F1A5737C840;
+        Tue,  2 Aug 2022 22:12:28 +0800 (CST)
+X-Virus-Scanned: amavisd-new at 
+Received: from mta91.sjtu.edu.cn ([127.0.0.1])
+        by localhost (mta91.sjtu.edu.cn [127.0.0.1]) (amavisd-new, port 10026)
+        with ESMTP id smPo4zYW0rFd; Tue,  2 Aug 2022 22:12:28 +0800 (CST)
+Received: from mstore105.sjtu.edu.cn (mstore101.sjtu.edu.cn [10.118.0.105])
+        by mta91.sjtu.edu.cn (Postfix) with ESMTP id C559637C83E;
+        Tue,  2 Aug 2022 22:12:28 +0800 (CST)
+Date:   Tue, 2 Aug 2022 22:12:28 +0800 (CST)
+From:   Guo Zhi <qtxuning1999@sjtu.edu.cn>
+To:     jasowang <jasowang@redhat.com>
+Cc:     eperezma <eperezma@redhat.com>, sgarzare <sgarzare@redhat.com>,
+        Michael Tsirkin <mst@redhat.com>,
+        netdev <netdev@vger.kernel.org>,
+        linux-kernel <linux-kernel@vger.kernel.org>,
+        kvm list <kvm@vger.kernel.org>,
+        virtualization <virtualization@lists.linux-foundation.org>
+Message-ID: <682271447.4491372.1659449548731.JavaMail.zimbra@sjtu.edu.cn>
+In-Reply-To: <CACGkMEuwgZRt=J_2i-XugMZtcG-xZ7ZF1RpTjmErT5+RCcZ1OQ@mail.gmail.com>
+References: <20220721084341.24183-1-qtxuning1999@sjtu.edu.cn> <20220721084341.24183-2-qtxuning1999@sjtu.edu.cn> <16a232ad-e0a1-fd4c-ae3e-27db168daacb@redhat.com> <2a8838c4-2e6f-6de7-dcdc-572699ff3dc9@sjtu.edu.cn> <CACGkMEuwgZRt=J_2i-XugMZtcG-xZ7ZF1RpTjmErT5+RCcZ1OQ@mail.gmail.com>
+Subject: Re: [RFC 1/5] vhost: reorder used descriptors in a batch
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <9dce3dbb-ffa1-687a-d1c4-8234d1bf6cfb@gmail.com>
-X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-        USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=ham
-        autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=GB2312
+Content-Transfer-Encoding: 8BIT
+X-Originating-IP: [202.120.40.82]
+X-Mailer: Zimbra 8.8.15_GA_4308 (ZimbraWebClient - GC103 (Mac)/8.8.15_GA_3928)
+Thread-Topic: vhost: reorder used descriptors in a batch
+Thread-Index: gYSHAypU71dHjeHu3qHrKll86luNWw==
+X-Spam-Status: No, score=-0.4 required=5.0 tests=BAYES_00,RCVD_IN_SORBS_WEB,
+        SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Aug 02, 2022, Like Xu wrote:
-> On 1/8/2022 11:43 pm, Sean Christopherson wrote:
-> > Not directly related to this patch...
-> > 
-> > Unless I've missed something, every invocation of start_event() and measure() first
-> > sets evt.count=0.  Rather than force every caller to ensure count is zeroed, why not
-> > zero the count during start_event() and then drop all of the manual zeroing?
-> > 
+
+
+----- Original Message -----
+> From: "jasowang" <jasowang@redhat.com>
+> To: "Guo Zhi" <qtxuning1999@sjtu.edu.cn>
+> Cc: "eperezma" <eperezma@redhat.com>, "sgarzare" <sgarzare@redhat.com>, "Michael Tsirkin" <mst@redhat.com>, "netdev"
+> <netdev@vger.kernel.org>, "linux-kernel" <linux-kernel@vger.kernel.org>, "kvm list" <kvm@vger.kernel.org>,
+> "virtualization" <virtualization@lists.linux-foundation.org>
+> Sent: Friday, July 29, 2022 3:32:02 PM
+> Subject: Re: [RFC 1/5] vhost: reorder used descriptors in a batch
+
+> On Thu, Jul 28, 2022 at 4:26 PM Guo Zhi <qtxuning1999@sjtu.edu.cn> wrote:
+>>
+>> On 2022/7/26 15:36, Jason Wang wrote:
+>>
+>>
+>> ÔÚ 2022/7/21 16:43, Guo Zhi Ð´µÀ:
+>>
+>> Device may not use descriptors in order, for example, NIC and SCSI may
+>> not call __vhost_add_used_n with buffers in order.  It's the task of
+>> __vhost_add_used_n to order them.
+>>
+>>
+>>
+>> I'm not sure this is ture. Having ooo descriptors is probably by design to have
+>> better performance.
+>>
+>> This might be obvious for device that may have elevator or QOS stuffs.
+>>
+>> I suspect the right thing to do here is, for the device that can't perform
+>> better in the case of IN_ORDER, let's simply not offer IN_ORDER (zerocopy or
+>> scsi). And for the device we know it can perform better, non-zercopy ethernet
+>> device we can do that.
+>>
+>>
+>>   This commit reorder the buffers using
+>> vq->heads, only the batch is begin from the expected start point and is
+>> continuous can the batch be exposed to driver.  And only writing out a
+>> single used ring for a batch of descriptors, according to VIRTIO 1.1
+>> spec.
+>>
+>>
+>>
+>> So this sounds more like a "workaround" of the device that can't consume buffer
+>> in order, I suspect it can help in performance.
+>>
+>> More below.
+>>
+>>
+>>
+>> Signed-off-by: Guo Zhi <qtxuning1999@sjtu.edu.cn>
+>> ---
+>>   drivers/vhost/vhost.c | 44 +++++++++++++++++++++++++++++++++++++++++--
+>>   drivers/vhost/vhost.h |  3 +++
+>>   2 files changed, 45 insertions(+), 2 deletions(-)
+>>
+>> diff --git a/drivers/vhost/vhost.c b/drivers/vhost/vhost.c
+>> index 40097826c..e2e77e29f 100644
+>> --- a/drivers/vhost/vhost.c
+>> +++ b/drivers/vhost/vhost.c
+>> @@ -317,6 +317,7 @@ static void vhost_vq_reset(struct vhost_dev *dev,
+>>       vq->used_flags = 0;
+>>       vq->log_used = false;
+>>       vq->log_addr = -1ull;
+>> +    vq->next_used_head_idx = 0;
+>>       vq->private_data = NULL;
+>>       vq->acked_features = 0;
+>>       vq->acked_backend_features = 0;
+>> @@ -398,6 +399,8 @@ static long vhost_dev_alloc_iovecs(struct vhost_dev *dev)
+>>                         GFP_KERNEL);
+>>           if (!vq->indirect || !vq->log || !vq->heads)
+>>               goto err_nomem;
+>> +
+>> +        memset(vq->heads, 0, sizeof(*vq->heads) * dev->iov_limit);
+>>       }
+>>       return 0;
+>>   @@ -2374,12 +2377,49 @@ static int __vhost_add_used_n(struct vhost_virtqueue
+>>   *vq,
+>>                   unsigned count)
+>>   {
+>>       vring_used_elem_t __user *used;
+>> +    struct vring_desc desc;
+>>       u16 old, new;
+>>       int start;
+>> +    int begin, end, i;
+>> +    int copy_n = count;
+>> +
+>> +    if (vhost_has_feature(vq, VIRTIO_F_IN_ORDER)) {
+>>
+>>
+>>
+>> How do you guarantee that ids of heads are contiguous?
+>>
+>> There is no need to be contiguous for ids of heads.
+>>
+>> For example, I have three buffer { .id = 0, 15}, {.id = 20, 30} {.id = 15, 20}
+>> for vhost_add_used_n. Then I will let the vq->heads[0].len=15.
+>> vq->heads[15].len=5, vq->heads[20].len=10 as reorder. Once I found there is no
+>> hold in the batched descriptors. I will expose them to driver.
 > 
-> None object to this idea, after all, there is obvious redundancy here.
+> So spec said:
 > 
-> > diff --git a/x86/pmu.c b/x86/pmu.c
-> > index 01be1e90..ef804272 100644
-> > --- a/x86/pmu.c
-> > +++ b/x86/pmu.c
-> > @@ -141,7 +141,7 @@ static void global_disable(pmu_counter_t *cnt)
-> > 
-> >   static void start_event(pmu_counter_t *evt)
-> >   {
-> > -    wrmsr(evt->ctr, evt->count);
-> > +    wrmsr(evt->ctr, 0);
+> "If VIRTIO_F_IN_ORDER has been negotiated, driver uses descriptors in
+> ring order: starting from offset 0 in the table, and wrapping around
+> at the end of the table."
 > 
-> Now we have to fix the last call to measure() in check_counter_overflow(),
-> since it will also call start_event() after it has been modified and in that
-> case, the requested high count has to be passed in from another function
-> parameter.
+> And
+> 
+> "VIRTIO_F_IN_ORDER(35)This feature indicates that all buffers are used
+> by the device in the same order in which they have been made
+> available."
+> 
+> This means your example is not an IN_ORDER device.
+> 
+> The driver should submit buffers (assuming each buffer have one
+> descriptor) in order {id = 0, 15}, {id = 1, 30} and {id = 2, 20}.
+> 
+> And even if it is submitted in order, we can not use a batch because:
+> 
+> "The skipped buffers (for which no used ring entry was written) are
+> assumed to have been used (read or written) by the device completely."
+> 
+> This means for TX we are probably ok, but for rx, unless we know the
+> buffers were written completely, we can't write them in a batch.
+> 
+> I'd suggest to do cross testing for this series:
+> 
+> 1) testing vhost IN_ORDER support with DPDK virtio PMD
+> 2) testing virtio IN_ORDER with DPDK vhost-user via testpmd
+> 
+> Thanks
+> 
+You are correct, for rx we can't do a batch because we have to let the driver know the length of buffers.
 
-Drat, I suspected an overflow case would want to use a non-zero count, and I
-explicitly looked for that case and _still_ missed it.
+I think these circumstances can offer batch:
+1. tx
+2. rx with RX_MRGBUF feature, which introduce a header for each received buffer
 
-Anyways, why not just open code measure() for that one-off case?
+Consider batch is not a mandatory requirement for in order feature according to spec.
+I'd like to let current RFC patch focus on in order implementation, and send another 
+patch series to improve performance by batching on above circumstances.
 
-		__start_event(&cnt, cnt.count);
-		loop();
-		stop_event(&cnt);
+What's your opinon.
 
-> Also, the naming of start_event() does not imply that the counter will be set
-> to zero implicitly, it just lets a counter continue to run, not caring about
-> the current value of the counter, which is more flexible.
-
-Sure, but flexibility isn't the only consideration.  Readability and robustness
-also matter.  And IMO, requiring callers to zero out a field in the common case
-isn't exactly flexible.
-
-Looking at pmu.c more, measure() is guilty of the same bad behavior.  It forces
-the common case to pass in unnecessary information in order to give flexibility to
-a single use case.  It's just syntatic sugar, but it really does help readers as
-it's not obvious that the "1" specifies the number of events, whereas measure_one()
-vs. measure_many() are relatively self-explanatory.
-
----
- x86/pmu.c | 19 ++++++++++++-------
- 1 file changed, 12 insertions(+), 7 deletions(-)
-
-diff --git a/x86/pmu.c b/x86/pmu.c
-index 01be1e90..e67f1fc2 100644
---- a/x86/pmu.c
-+++ b/x86/pmu.c
-@@ -177,7 +177,7 @@ static void stop_event(pmu_counter_t *evt)
- 	evt->count = rdmsr(evt->ctr);
- }
-
--static void measure(pmu_counter_t *evt, int count)
-+static void measure_many(pmu_counter_t *evt, int count)
- {
- 	int i;
- 	for (i = 0; i < count; i++)
-@@ -187,6 +187,11 @@ static void measure(pmu_counter_t *evt, int count)
- 		stop_event(&evt[i]);
- }
-
-+static void measure_one(pmu_counter_t *evt)
-+{
-+	measure_many(evt, 1);
-+}
-+
- static bool verify_event(uint64_t count, struct pmu_event *e)
- {
- 	// printf("%d <= %ld <= %d\n", e->min, count, e->max);
-@@ -210,7 +215,7 @@ static void check_gp_counter(struct pmu_event *evt)
-
- 	for (i = 0; i < nr_gp_counters; i++, cnt.ctr++) {
- 		cnt.count = 0;
--		measure(&cnt, 1);
-+		measure_one(&cnt);
- 		report(verify_event(cnt.count, evt), "%s-%d", evt->name, i);
- 	}
- }
-@@ -238,7 +243,7 @@ static void check_fixed_counters(void)
- 	for (i = 0; i < nr_fixed_counters; i++) {
- 		cnt.count = 0;
- 		cnt.ctr = fixed_events[i].unit_sel;
--		measure(&cnt, 1);
-+		measure_one(&cnt);
- 		report(verify_event(cnt.count, &fixed_events[i]), "fixed-%d", i);
- 	}
- }
-@@ -267,7 +272,7 @@ static void check_counters_many(void)
- 		n++;
- 	}
-
--	measure(cnt, n);
-+	measure_many(cnt, n);
-
- 	for (i = 0; i < n; i++)
- 		if (!verify_counter(&cnt[i]))
-@@ -286,7 +291,7 @@ static void check_counter_overflow(void)
- 		.config = EVNTSEL_OS | EVNTSEL_USR | gp_events[1].unit_sel /* instructions */,
- 		.count = 0,
- 	};
--	measure(&cnt, 1);
-+	measure_one(&cnt);
- 	count = cnt.count;
-
- 	/* clear status before test */
-@@ -312,7 +317,7 @@ static void check_counter_overflow(void)
- 		else
- 			cnt.config &= ~EVNTSEL_INT;
- 		idx = event_to_global_idx(&cnt);
--		measure(&cnt, 1);
-+		measure_one(&cnt);
- 		report(cnt.count == 1, "cntr-%d", i);
- 		status = rdmsr(MSR_CORE_PERF_GLOBAL_STATUS);
- 		report(status & (1ull << idx), "status-%d", i);
-@@ -333,7 +338,7 @@ static void check_gp_counter_cmask(void)
- 		.count = 0,
- 	};
- 	cnt.config |= (0x2 << EVNTSEL_CMASK_SHIFT);
--	measure(&cnt, 1);
-+	measure_one(&cnt);
- 	report(cnt.count < gp_events[1].min, "cmask");
- }
-
-
-base-commit: 14b54ed754c8a8cae7a22895e4a0b745a3227a4b
---
-
+Thanks
+> 
+>>
+>>
+>> +        /* calculate descriptor chain length for each used buffer */
+>>
+>>
+>>
+>> I'm a little bit confused about this comment, we have heads[i].len for this?
+>>
+>> Maybe I should not use vq->heads, some misleading.
+>>
+>>
+>> +        for (i = 0; i < count; i++) {
+>> +            begin = heads[i].id;
+>> +            end = begin;
+>> +            vq->heads[begin].len = 0;
+>>
+>>
+>>
+>> Does this work for e.g RX virtqueue?
+>>
+>>
+>> +            do {
+>> +                vq->heads[begin].len += 1;
+>> +                if (unlikely(vhost_get_desc(vq, &desc, end))) {
+>>
+>>
+>>
+>> Let's try hard to avoid more userspace copy here, it's the source of performance
+>> regression.
+>>
+>> Thanks
+>>
+>>
+>> +                    vq_err(vq, "Failed to get descriptor: idx %d addr %p\n",
+>> +                           end, vq->desc + end);
+>> +                    return -EFAULT;
+>> +                }
+>> +            } while ((end = next_desc(vq, &desc)) != -1);
+>> +        }
+>> +
+>> +        count = 0;
+>> +        /* sort and batch continuous used ring entry */
+>> +        while (vq->heads[vq->next_used_head_idx].len != 0) {
+>> +            count++;
+>> +            i = vq->next_used_head_idx;
+>> +            vq->next_used_head_idx = (vq->next_used_head_idx +
+>> +                          vq->heads[vq->next_used_head_idx].len)
+>> +                          % vq->num;
+>> +            vq->heads[i].len = 0;
+>> +        }
+>> +        /* only write out a single used ring entry with the id corresponding
+>> +         * to the head entry of the descriptor chain describing the last buffer
+>> +         * in the batch.
+>> +         */
+>> +        heads[0].id = i;
+>> +        copy_n = 1;
+>> +    }
+>>         start = vq->last_used_idx & (vq->num - 1);
+>>       used = vq->used->ring + start;
+>> -    if (vhost_put_used(vq, heads, start, count)) {
+>> +    if (vhost_put_used(vq, heads, start, copy_n)) {
+>>           vq_err(vq, "Failed to write used");
+>>           return -EFAULT;
+>>       }
+>> @@ -2410,7 +2450,7 @@ int vhost_add_used_n(struct vhost_virtqueue *vq, struct
+>> vring_used_elem *heads,
+>>         start = vq->last_used_idx & (vq->num - 1);
+>>       n = vq->num - start;
+>> -    if (n < count) {
+>> +    if (n < count && !vhost_has_feature(vq, VIRTIO_F_IN_ORDER)) {
+>>           r = __vhost_add_used_n(vq, heads, n);
+>>           if (r < 0)
+>>               return r;
+>> diff --git a/drivers/vhost/vhost.h b/drivers/vhost/vhost.h
+>> index d9109107a..7b2c0fbb5 100644
+>> --- a/drivers/vhost/vhost.h
+>> +++ b/drivers/vhost/vhost.h
+>> @@ -107,6 +107,9 @@ struct vhost_virtqueue {
+>>       bool log_used;
+>>       u64 log_addr;
+>>   +    /* Sort heads in order */
+>> +    u16 next_used_head_idx;
+>> +
+>>       struct iovec iov[UIO_MAXIOV];
+>>       struct iovec iotlb_iov[64];
+>>       struct iovec *indirect;
+>>
+>>
+>>
