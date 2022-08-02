@@ -2,205 +2,154 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 0E5E1587FAC
-	for <lists+kvm@lfdr.de>; Tue,  2 Aug 2022 18:06:18 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 1179C587FC1
+	for <lists+kvm@lfdr.de>; Tue,  2 Aug 2022 18:08:47 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231877AbiHBQGQ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 2 Aug 2022 12:06:16 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41174 "EHLO
+        id S235133AbiHBQIc (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 2 Aug 2022 12:08:32 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42370 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229515AbiHBQGP (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 2 Aug 2022 12:06:15 -0400
-Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B63B532B
-        for <kvm@vger.kernel.org>; Tue,  2 Aug 2022 09:06:14 -0700 (PDT)
-Received: from pps.filterd (m0098421.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.17.1.5/8.17.1.5) with ESMTP id 272FvMKw000707
-        for <kvm@vger.kernel.org>; Tue, 2 Aug 2022 16:06:14 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=date : from : to : cc :
- subject : message-id : in-reply-to : references : mime-version :
- content-type : content-transfer-encoding; s=pp1;
- bh=44OqCcbHmyjOx5yfXgmpZKIIsmIXnti14el6PuB8Wd4=;
- b=Xo+GVfWFK4ljMGYidBV4mcUY2ydNpEhVWWLqPO25Jze4XLtAWcVc7yyKgh4NwMPLHylB
- I98fekKVUQebC5bySQgSDvgaEn/eIwnw0mItkcjzGYypAYBXJ6UGrkHZ18jFHpMgsdb+
- aZk3jE47wH46rxbG44sY0KgzRSZ0MSZ7f5RLhmo5BT/xCG4jUoJw+Sahp0nwtxrth1bK
- HQbslmcDpR8DnnWY+MbGL/N0GKzPdqdK4j6TdFC1N2wg5QejrgAP45s7N7ddm6EFHRaJ
- m8/wRFooyVDPhv++tz7xvkDy5wppKYVbuVAJ8H9rZgWLlUN6UI42mALrTd8sf0LGfz65 7w== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3hq7128afu-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT)
-        for <kvm@vger.kernel.org>; Tue, 02 Aug 2022 16:06:13 +0000
-Received: from m0098421.ppops.net (m0098421.ppops.net [127.0.0.1])
-        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 272FwBTu004187
-        for <kvm@vger.kernel.org>; Tue, 2 Aug 2022 16:06:13 GMT
-Received: from ppma06fra.de.ibm.com (48.49.7a9f.ip4.static.sl-reverse.com [159.122.73.72])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3hq7128adn-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 02 Aug 2022 16:06:13 +0000
-Received: from pps.filterd (ppma06fra.de.ibm.com [127.0.0.1])
-        by ppma06fra.de.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 272G6BiV008955;
-        Tue, 2 Aug 2022 16:06:11 GMT
-Received: from b06avi18878370.portsmouth.uk.ibm.com (b06avi18878370.portsmouth.uk.ibm.com [9.149.26.194])
-        by ppma06fra.de.ibm.com with ESMTP id 3hmuwhscsg-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 02 Aug 2022 16:06:11 +0000
-Received: from d06av21.portsmouth.uk.ibm.com (d06av21.portsmouth.uk.ibm.com [9.149.105.232])
-        by b06avi18878370.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 272G6NhS31523126
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Tue, 2 Aug 2022 16:06:23 GMT
-Received: from d06av21.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 1586452050;
-        Tue,  2 Aug 2022 16:06:08 +0000 (GMT)
-Received: from p-imbrenda (unknown [9.145.9.152])
-        by d06av21.portsmouth.uk.ibm.com (Postfix) with ESMTP id B93FC5204E;
-        Tue,  2 Aug 2022 16:06:07 +0000 (GMT)
-Date:   Tue, 2 Aug 2022 18:06:05 +0200
-From:   Claudio Imbrenda <imbrenda@linux.ibm.com>
-To:     Nico Boehr <nrb@linux.ibm.com>
-Cc:     kvm@vger.kernel.org, frankja@linux.ibm.com, thuth@redhat.com
-Subject: Re: [kvm-unit-tests PATCH v3 3/3] s390x: smp: add tests for calls
- in wait state
-Message-ID: <20220802180605.2b546603@p-imbrenda>
-In-Reply-To: <20220725155420.2009109-4-nrb@linux.ibm.com>
-References: <20220725155420.2009109-1-nrb@linux.ibm.com>
-        <20220725155420.2009109-4-nrb@linux.ibm.com>
-Organization: IBM
-X-Mailer: Claws Mail 4.1.0 (GTK 3.24.34; x86_64-redhat-linux-gnu)
+        with ESMTP id S237455AbiHBQI0 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 2 Aug 2022 12:08:26 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 10A681EAFD
+        for <kvm@vger.kernel.org>; Tue,  2 Aug 2022 09:08:18 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1659456497;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding;
+        bh=OHgHeZvbsCddOPjrnD78ijq3oLOZjtLV7czbHRgeiKU=;
+        b=XYMPdMIteoliGWv02rLEb+Sgc6PYrrdXIJfmVGzuufJ3ZrmMnNxt+JF1BLMVX7MwopCTo+
+        7GhvUeo2TQdcv4GnoM2vfy2oeCU63Jhore27LzDhmlnKjSsx+jVdvxS0aFyrGjNVKtoQK0
+        htlfJioNg3X0VkahhmYrTWAVcGkYGIM=
+Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
+ [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-220-u44ZjnreN9qMV_WCv4fKnA-1; Tue, 02 Aug 2022 12:08:13 -0400
+X-MC-Unique: u44ZjnreN9qMV_WCv4fKnA-1
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.rdu2.redhat.com [10.11.54.6])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 2516A8037B5;
+        Tue,  2 Aug 2022 16:08:00 +0000 (UTC)
+Received: from fedora.redhat.com (unknown [10.40.194.108])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id A773F2166B26;
+        Tue,  2 Aug 2022 16:07:57 +0000 (UTC)
+From:   Vitaly Kuznetsov <vkuznets@redhat.com>
+To:     kvm@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>,
+        Sean Christopherson <seanjc@google.com>
+Cc:     Anirudh Rayabharam <anrayabh@linux.microsoft.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Maxim Levitsky <mlevitsk@redhat.com>,
+        Nathan Chancellor <nathan@kernel.org>,
+        Michael Kelley <mikelley@microsoft.com>,
+        linux-hyperv@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: [PATCH v5 00/26] KVM: VMX: Support updated eVMCSv1 revision + use vmcs_config for L1 VMX MSRs
+Date:   Tue,  2 Aug 2022 18:07:30 +0200
+Message-Id: <20220802160756.339464-1-vkuznets@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-ORIG-GUID: lHRDKSkHP-mptnp4MBxNcp6ALLyp7ijP
-X-Proofpoint-GUID: zwY2Qz5S3hemoCUF-TysTptTye7IhvrE
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.205,Aquarius:18.0.883,Hydra:6.0.517,FMLib:17.11.122.1
- definitions=2022-08-02_10,2022-08-02_01,2022-06-22_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 phishscore=0 clxscore=1015
- priorityscore=1501 spamscore=0 mlxscore=0 suspectscore=0 mlxlogscore=999
- malwarescore=0 adultscore=0 bulkscore=0 impostorscore=0 lowpriorityscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2206140000
- definitions=main-2208020075
-X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_EF,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_PASS
-        autolearn=ham autolearn_force=no version=3.4.6
+Content-Type: text/plain
+Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 2.78 on 10.11.54.6
+X-Spam-Status: No, score=-2.7 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        SPF_HELO_NONE,SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, 25 Jul 2022 17:54:20 +0200
-Nico Boehr <nrb@linux.ibm.com> wrote:
+Changes since v4:
+- Rebase to the latest kvm/queue (93472b797153).
+- Add "KVM: VMX: Don't toggle VM_ENTRY_IA32E_MODE for 32-bit kernels/KVM"
+  [Sean].
+- Use "__always_inline" [Sean, Nathan, Paolo]. 
+- Collect R-b tags [Max, Sean, Kai].
+- Use two-dimentional 'evmcs_unsupported_ctls' array in PATCH 09 [Paolo].
+- Numerous indentation fixes [Sean].
+- KVM_{REQ,OPT}_VMX_* -> KVM_{REQUIRED,OPTIONAL}_VMX_* [Sean].
+- Minor changes to commit messages, comments,... [Sean, Max].
 
-> When the SIGP interpretation facility is in use a SIGP external call to
-> a waiting CPU will result in an exit of the calling cpu. For non-pv
-> guests it's a code 56 (partial execution) exit otherwise its a code 108
-> (secure instruction notification) exit. Those exits are handled
-> differently from a normal SIGP instruction intercept that happens
-> without interpretation and hence need to be tested.
-> 
-> Signed-off-by: Nico Boehr <nrb@linux.ibm.com>
-> ---
->  s390x/smp.c | 78 +++++++++++++++++++++++++++++++++++++++++++++++++++++
->  1 file changed, 78 insertions(+)
-> 
-> diff --git a/s390x/smp.c b/s390x/smp.c
-> index 12c40cadaed2..d59ca38e7a37 100644
-> --- a/s390x/smp.c
-> +++ b/s390x/smp.c
-> @@ -356,6 +356,83 @@ static void test_calls(void)
->  	}
->  }
->  
-> +static void call_in_wait_ext_int_fixup(struct stack_frame_int *stack)
-> +{
-> +	/* Clear wait bit so we don't immediately wait again after the fixup */
-> +	lowcore.ext_old_psw.mask &= ~PSW_MASK_WAIT;
-> +
-> +	stack->crs[0] &= ~BIT(current_sigp_call_case->cr0_bit);
-> +}
-> +
-> +static void call_in_wait_setup(void)
-> +{
-> +	expect_ext_int();
-> +	ctl_set_bit(0, current_sigp_call_case->cr0_bit);
-> +	register_ext_cleanup_func(call_in_wait_ext_int_fixup);
-> +
-> +	set_flag(1);
-> +}
-> +
-> +static void call_in_wait_received(void)
-> +{
-> +	report(lowcore.ext_int_code == current_sigp_call_case->ext_int_expected_type, "received");
-> +	register_ext_cleanup_func(NULL);
-> +
-> +	set_flag(1);
-> +}
-> +
-> +static void test_calls_in_wait(void)
-> +{
-> +	int i;
-> +	struct psw psw;
-> +
-> +	report_prefix_push("psw wait");
-> +	for (i = 0; i < ARRAY_SIZE(cases_sigp_call); i++) {
-> +		current_sigp_call_case = &cases_sigp_call[i];
-> +
-> +		report_prefix_push(current_sigp_call_case->name);
-> +		if (!current_sigp_call_case->supports_pv && uv_os_is_guest()) {
-> +			report_skip("Not supported under PV");
-> +			report_prefix_pop();
-> +			continue;
-> +		}
-> +
-> +		/* Let the secondary CPU setup the external mask and the external interrupt cleanup function */
-> +		set_flag(0);
-> +		psw.mask = extract_psw_mask();
-> +		psw.addr = (unsigned long)call_in_wait_setup;
-> +		smp_cpu_start(1, psw);
-> +
-> +		/* Wait until the receiver has finished setup */
-> +		wait_for_flag();
-> +		set_flag(0);
-> +
-> +		/*
-> +		 * To avoid races, we need to know that the secondary CPU has entered wait,
-> +		 * but the architecture provides no way to check whether the secondary CPU
-> +		 * is in wait.
-> +		 *
-> +		 * But since a waiting CPU is considered operating, simply stop the CPU, set
-> +		 * up the restart new PSW mask in wait, send the restart interrupt and then
-> +		 * wait until the CPU becomes operating (done by smp_cpu_start).
-> +		 */
-> +		smp_cpu_stop(1);
-> +		expect_ext_int();
+Original description:
 
-which external interrupt are you expecting on this CPU?
+Enlightened VMCS v1 definition was updates to include fields for the
+following features:
+    - PerfGlobalCtrl
+    - EnclsExitingBitmap
+    - TSC scaling
+    - GuestLbrCtl
+    - CET
+    - SSP
+While the information is missing in the publicly available TLFS, the
+updated definition comes with a new feature bit in CPUID.0x4000000A.EBX
+(BIT 0). Use a made up HV_X64_NESTED_EVMCS1_2022_UPDATE name for it.
 
-> +		psw.mask = extract_psw_mask() | PSW_MASK_EXT | PSW_MASK_WAIT;
-> +		psw.addr = (unsigned long)call_in_wait_received;
-> +		smp_cpu_start(1, psw);
-> +
-> +		smp_sigp(1, current_sigp_call_case->call, 0, NULL);
-> +
-> +		/* Wait until the receiver has handled the call */
-> +		wait_for_flag();
-> +		smp_cpu_stop(1);
-> +
-> +		report_prefix_pop();
-> +	}
-> +	report_prefix_pop();
-> +}
-> +
->  static void test_sense_running(void)
->  {
->  	report_prefix_push("sense_running");
-> @@ -474,6 +551,7 @@ int main(void)
->  	test_store_status();
->  	test_set_prefix();
->  	test_calls();
-> +	test_calls_in_wait();
->  	test_sense_running();
->  	test_reset();
->  	test_reset_initial();
+Add support for the new revision to KVM. SSP, CET and GuestLbrCtl
+features are not currently supported by KVM.
+
+While on it, implement Sean's idea to use vmcs_config for setting up
+L1 VMX control MSRs instead of re-reading host MSRs.
+
+Jim Mattson (1):
+  KVM: x86: VMX: Replace some Intel model numbers with mnemonics
+
+Sean Christopherson (2):
+  KVM: VMX: Don't toggle VM_ENTRY_IA32E_MODE for 32-bit kernels/KVM
+  KVM: VMX: Adjust CR3/INVPLG interception for EPT=y at runtime, not
+    setup
+
+Vitaly Kuznetsov (23):
+  KVM: x86: hyper-v: Expose access to debug MSRs in the partition
+    privilege flags
+  x86/hyperv: Fix 'struct hv_enlightened_vmcs' definition
+  x86/hyperv: Update 'struct hv_enlightened_vmcs' definition
+  KVM: VMX: Define VMCS-to-EVMCS conversion for the new fields
+  KVM: nVMX: Support several new fields in eVMCSv1
+  KVM: x86: hyper-v: Cache HYPERV_CPUID_NESTED_FEATURES CPUID leaf
+  KVM: selftests: Add ENCLS_EXITING_BITMAP{,HIGH} VMCS fields
+  KVM: selftests: Switch to updated eVMCSv1 definition
+  KVM: VMX: nVMX: Support TSC scaling and PERF_GLOBAL_CTRL with
+    enlightened VMCS
+  KVM: selftests: Enable TSC scaling in evmcs selftest
+  KVM: VMX: Get rid of eVMCS specific VMX controls sanitization
+  KVM: VMX: Check VM_ENTRY_IA32E_MODE in setup_vmcs_config()
+  KVM: VMX: Check CPU_BASED_{INTR,NMI}_WINDOW_EXITING in
+    setup_vmcs_config()
+  KVM: VMX: Tweak the special handling of SECONDARY_EXEC_ENCLS_EXITING
+    in setup_vmcs_config()
+  KVM: VMX: Extend VMX controls macro shenanigans
+  KVM: VMX: Move CPU_BASED_CR8_{LOAD,STORE}_EXITING filtering out of
+    setup_vmcs_config()
+  KVM: VMX: Add missing VMEXIT controls to vmcs_config
+  KVM: VMX: Add missing CPU based VM execution controls to vmcs_config
+  KVM: VMX: Move LOAD_IA32_PERF_GLOBAL_CTRL errata handling out of
+    setup_vmcs_config()
+  KVM: nVMX: Always set required-1 bits of pinbased_ctls to
+    PIN_BASED_ALWAYSON_WITHOUT_TRUE_MSR
+  KVM: nVMX: Use sanitized allowed-1 bits for VMX control MSRs
+  KVM: VMX: Cache MSR_IA32_VMX_MISC in vmcs_config
+  KVM: nVMX: Use cached host MSR_IA32_VMX_MISC value for setting up
+    nested MSR
+
+ arch/x86/include/asm/hyperv-tlfs.h            |  30 +-
+ arch/x86/include/asm/kvm_host.h               |   2 +
+ arch/x86/kvm/hyperv.c                         |  20 +-
+ arch/x86/kvm/vmx/capabilities.h               |  14 +-
+ arch/x86/kvm/vmx/evmcs.c                      | 127 +++++++--
+ arch/x86/kvm/vmx/evmcs.h                      |  18 +-
+ arch/x86/kvm/vmx/nested.c                     |  70 +++--
+ arch/x86/kvm/vmx/nested.h                     |   2 +-
+ arch/x86/kvm/vmx/vmx.c                        | 256 ++++++++----------
+ arch/x86/kvm/vmx/vmx.h                        | 162 +++++++++--
+ include/asm-generic/hyperv-tlfs.h             |   2 +
+ .../selftests/kvm/include/x86_64/evmcs.h      |  45 ++-
+ .../selftests/kvm/include/x86_64/vmx.h        |   2 +
+ .../testing/selftests/kvm/x86_64/evmcs_test.c |  31 ++-
+ 14 files changed, 521 insertions(+), 260 deletions(-)
+
+-- 
+2.35.3
 
