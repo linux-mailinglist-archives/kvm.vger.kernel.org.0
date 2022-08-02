@@ -2,50 +2,51 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 7523B5880D1
-	for <lists+kvm@lfdr.de>; Tue,  2 Aug 2022 19:12:44 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 807D95880D3
+	for <lists+kvm@lfdr.de>; Tue,  2 Aug 2022 19:13:05 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230386AbiHBRMk (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 2 Aug 2022 13:12:40 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43864 "EHLO
+        id S232471AbiHBRM7 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 2 Aug 2022 13:12:59 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44154 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229514AbiHBRMi (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 2 Aug 2022 13:12:38 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id E07C21D327
-        for <kvm@vger.kernel.org>; Tue,  2 Aug 2022 10:12:34 -0700 (PDT)
+        with ESMTP id S232919AbiHBRM5 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 2 Aug 2022 13:12:57 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 53C2941D38
+        for <kvm@vger.kernel.org>; Tue,  2 Aug 2022 10:12:46 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1659460354;
+        s=mimecast20190719; t=1659460365;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:mime-version:mime-version:
+         to:to:cc:cc:mime-version:mime-version:
          content-transfer-encoding:content-transfer-encoding;
         bh=smMl5gAfucW+7WdrXT3ubU1ei4sZcF0TVQS1QS95BKU=;
-        b=U/jsxfq6FfzlxMOnW9sAzcddhg5zV5kQ9kdTirahPcVunZm9yflN2bV54naVGybp4fpr1O
-        r/a7ZvsD2ck/rqZg8o8O3iMx7btXutxcHda+jsNYAxruB6lvaEpp72b6+7f/R45TDBRFKf
-        D/i4EKdxDv1IQ/FXpZS8E9ox1OnX99I=
-Received: from mimecast-mx02.redhat.com (mx3-rdu2.redhat.com
- [66.187.233.73]) by relay.mimecast.com with ESMTP with STARTTLS
+        b=V/uAljxyt5GePp6lxFR9gopdOPcPm+YunVy02Q+wTDfuIw+1+jPxY3U7Amc+Yxu56db68p
+        zI5z/0fOytos1gwMJ+kNVWMKOVHyC0TVAXrED0QPI+rGZ+fr6g/RKoobkCuhuvuNh71D4m
+        eBYyYOFCkXuytZpGW9K4F0ffSfuwCsA=
+Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
+ [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-591-powD2K7bMUi7f4cPUK5YqQ-1; Tue, 02 Aug 2022 13:12:32 -0400
-X-MC-Unique: powD2K7bMUi7f4cPUK5YqQ-1
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.rdu2.redhat.com [10.11.54.8])
+ us-mta-244-_pWh2Q_XNwyZDD5FLn-MJw-1; Tue, 02 Aug 2022 13:12:44 -0400
+X-MC-Unique: _pWh2Q_XNwyZDD5FLn-MJw-1
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.rdu2.redhat.com [10.11.54.1])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 4597E3C02B84;
-        Tue,  2 Aug 2022 17:12:32 +0000 (UTC)
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id DEFFB85A587;
+        Tue,  2 Aug 2022 17:12:43 +0000 (UTC)
 Received: from virtlab701.virt.lab.eng.bos.redhat.com (virtlab701.virt.lab.eng.bos.redhat.com [10.19.152.228])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 1A4FAC15D4F;
-        Tue,  2 Aug 2022 17:12:32 +0000 (UTC)
+        by smtp.corp.redhat.com (Postfix) with ESMTP id B1EF840466A6;
+        Tue,  2 Aug 2022 17:12:43 +0000 (UTC)
 From:   Paolo Bonzini <pbonzini@redhat.com>
-To:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org
+To:     torvalds@linux-foundation.org
+Cc:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org
 Subject: [GIT PULL] KVM changes for Linux 5.20 merge window
-Date:   Tue,  2 Aug 2022 13:12:31 -0400
-Message-Id: <20220802171231.1267184-1-pbonzini@redhat.com>
+Date:   Tue,  2 Aug 2022 13:12:43 -0400
+Message-Id: <20220802171243.1267278-1-pbonzini@redhat.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 2.85 on 10.11.54.8
-X-Spam-Status: No, score=-3.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,
+X-Scanned-By: MIMEDefang 2.84 on 10.11.54.1
+X-Spam-Status: No, score=-2.7 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
         SPF_HELO_NONE,SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
