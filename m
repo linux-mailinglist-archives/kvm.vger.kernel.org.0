@@ -2,65 +2,51 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 988AE587560
-	for <lists+kvm@lfdr.de>; Tue,  2 Aug 2022 04:01:21 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 6EFDB58759D
+	for <lists+kvm@lfdr.de>; Tue,  2 Aug 2022 04:47:51 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232255AbiHBCBT (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 1 Aug 2022 22:01:19 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49742 "EHLO
+        id S235736AbiHBCrr convert rfc822-to-8bit (ORCPT
+        <rfc822;lists+kvm@lfdr.de>); Mon, 1 Aug 2022 22:47:47 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46876 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235904AbiHBCBR (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 1 Aug 2022 22:01:17 -0400
-Received: from mga09.intel.com (mga09.intel.com [134.134.136.24])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C85F3F5AE;
-        Mon,  1 Aug 2022 19:01:15 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1659405675; x=1690941675;
-  h=message-id:date:mime-version:subject:to:cc:references:
-   from:in-reply-to:content-transfer-encoding;
-  bh=QFlgAKqTB8gdWypxOP5EQfQFZ19EkRrqD1V34Ml/mk0=;
-  b=GnzOnI0/32UPZfU7T1W71NKY12KPvzAKT3YhNujOg9XeftIr/K2b0LuV
-   zdqvwewrwI+H9V1AX3irNLM9OqVhQAxU0Rm0rJ7XLKSUwBvAKuGqmBYkm
-   PtKYnwsgK7CN/PH0xdLqqRkyfz4d4+C47I7lDI/zvFgaIKLSsgZWZQiy1
-   iLNwSuUYF7qOWM/xIuSRC81IVs7oOwZyB16/xpHA4VTyMpUrcaYuDraBS
-   X+pZZkkOnPwlMEyEoWqgZPXcDk5IYgjpymVSkANvqvHNk5Z7CBC2uuJOy
-   HXVXlHEQ/LsAoXvdTsyb1trn1e1rAoWmu59kfiFeYnb5XC2+9UowS6HM9
-   A==;
-X-IronPort-AV: E=McAfee;i="6400,9594,10426"; a="290072321"
-X-IronPort-AV: E=Sophos;i="5.93,209,1654585200"; 
-   d="scan'208";a="290072321"
-Received: from fmsmga008.fm.intel.com ([10.253.24.58])
-  by orsmga102.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 01 Aug 2022 19:01:15 -0700
-X-IronPort-AV: E=Sophos;i="5.93,209,1654585200"; 
-   d="scan'208";a="661419442"
-Received: from xinyuwa2-mobl1.ccr.corp.intel.com (HELO [10.255.28.181]) ([10.255.28.181])
-  by fmsmga008-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 01 Aug 2022 19:01:12 -0700
-Message-ID: <7bd30975-fdcc-7d87-af4a-448b92bb6e02@linux.intel.com>
-Date:   Tue, 2 Aug 2022 10:01:10 +0800
-MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
- Thunderbird/102.1.0
-Subject: Re: [PATCH v5 1/22] x86/virt/tdx: Detect TDX during kernel boot
-To:     Kai Huang <kai.huang@intel.com>, linux-kernel@vger.kernel.org,
-        kvm@vger.kernel.org
-Cc:     seanjc@google.com, pbonzini@redhat.com, dave.hansen@intel.com,
-        len.brown@intel.com, tony.luck@intel.com,
-        rafael.j.wysocki@intel.com, reinette.chatre@intel.com,
-        dan.j.williams@intel.com, peterz@infradead.org, ak@linux.intel.com,
-        kirill.shutemov@linux.intel.com,
-        sathyanarayanan.kuppuswamy@linux.intel.com,
-        isaku.yamahata@intel.com
-References: <cover.1655894131.git.kai.huang@intel.com>
- <062075b36150b119bf2d0a1262de973b0a2b11a7.1655894131.git.kai.huang@intel.com>
-From:   "Wu, Binbin" <binbin.wu@linux.intel.com>
-In-Reply-To: <062075b36150b119bf2d0a1262de973b0a2b11a7.1655894131.git.kai.huang@intel.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-4.9 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_DNSWL_MED,
-        RCVD_IN_MSPIKE_H3,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE
-        autolearn=ham autolearn_force=no version=3.4.6
+        with ESMTP id S231213AbiHBCrm (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 1 Aug 2022 22:47:42 -0400
+Received: from smtp236.sjtu.edu.cn (smtp236.sjtu.edu.cn [202.120.2.236])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0CF691AF28;
+        Mon,  1 Aug 2022 19:47:34 -0700 (PDT)
+Received: from proxy01.sjtu.edu.cn (unknown [202.112.26.54])
+        by smtp236.sjtu.edu.cn (Postfix) with ESMTPS id D39291008B391;
+        Tue,  2 Aug 2022 10:47:32 +0800 (CST)
+Received: from localhost (localhost [127.0.0.1])
+        by proxy01.sjtu.edu.cn (Postfix) with ESMTP id AC7D6203D801B;
+        Tue,  2 Aug 2022 10:47:32 +0800 (CST)
+X-Virus-Scanned: amavisd-new at proxy01.sjtu.edu.cn
+Received: from proxy01.sjtu.edu.cn ([127.0.0.1])
+        by localhost (proxy01.sjtu.edu.cn [127.0.0.1]) (amavisd-new, port 10026)
+        with ESMTP id z8dqFZ4H9EgJ; Tue,  2 Aug 2022 10:47:32 +0800 (CST)
+Received: from smtpclient.apple (unknown [58.45.124.125])
+        (Authenticated sender: qtxuning1999@sjtu.edu.cn)
+        by proxy01.sjtu.edu.cn (Postfix) with ESMTPSA id D593B203D8011;
+        Tue,  2 Aug 2022 10:47:05 +0800 (CST)
+From:   Guo Zhi <qtxuning1999@sjtu.edu.cn>
+Content-Type: text/plain;
+        charset=us-ascii
+Content-Transfer-Encoding: 8BIT
+Mime-Version: 1.0 (Mac OS X Mail 15.0 \(3693.20.0.1.32\))
+Subject: Re: [RFC 3/5] vhost_test: batch used buffer
+Date:   Tue, 2 Aug 2022 10:47:01 +0800
+In-Reply-To: <CAJaqyWfgUqdP6mkOUdouvQSst=qc7MOTaigC-EiTg9-gojHqzg@mail.gmail.com>
+Cc:     jasowang <jasowang@redhat.com>, sgarzare <sgarzare@redhat.com>,
+        Michael Tsirkin <mst@redhat.com>,
+        netdev <netdev@vger.kernel.org>,
+        linux-kernel <linux-kernel@vger.kernel.org>,
+        kvm list <kvm@vger.kernel.org>,
+        virtualization <virtualization@lists.linux-foundation.org>
+To:     eperezma <eperezma@redhat.com>
+Message-Id: <5E347090-9EB2-4961-B435-D6783CB46CAF@sjtu.edu.cn>
+X-Mailer: Apple Mail (2.3693.20.0.1.32)
+X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,SPF_HELO_NONE,
+        SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
@@ -68,33 +54,72 @@ List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
 
-On 2022/6/22 19:15, Kai Huang wrote:
-> +	/*
-> +	 * TDX guarantees at least two TDX KeyIDs are configured by
-> +	 * BIOS, otherwise SEAMRR is disabled.  Invalid TDX private
-> +	 * range means kernel bug (TDX is broken).
-> +	 */
-> +	if (WARN_ON(!tdx_keyid_start || tdx_keyid_num < 2)) {
-Do you think it's better to define a meaningful macro instead of the 
-number here and below?
-> +		tdx_keyid_start = tdx_keyid_num = 0;
-> +		return -EINVAL;
-> +	}
-> +
-> +	return 0;
-> +}
-> +
 
-> +
-> +/**
-> + * platform_tdx_enabled() - Return whether BIOS has enabled TDX
-> + *
-> + * Return whether BIOS has enabled TDX regardless whether the TDX module
-> + * has been loaded or not.
-> + */
-> +bool platform_tdx_enabled(void)
-> +{
-> +	return tdx_keyid_num >= 2;
-> +}
->
->
+----- Original Message -----
+From: "eperezma" <eperezma@redhat.com>
+To: "Guo Zhi" <qtxuning1999@sjtu.edu.cn>
+Cc: "jasowang" <jasowang@redhat.com>, "sgarzare" <sgarzare@redhat.com>, "Michael Tsirkin" <mst@redhat.com>, "netdev" <netdev@vger.kernel.org>, "linux-kernel" <linux-kernel@vger.kernel.org>, "kvm list" <kvm@vger.kernel.org>, "virtualization" <virtualization@lists.linux-foundation.org>
+Sent: Friday, July 22, 2022 3:12:47 PM
+Subject: Re: [RFC 3/5] vhost_test: batch used buffer
+
+On Thu, Jul 21, 2022 at 10:44 AM Guo Zhi <qtxuning1999@sjtu.edu.cn> wrote:
+> 
+> Only add to used ring when a batch a buffer have all been used.  And if
+> in order feature negotiated, add randomness to the used buffer's order,
+> test the ability of vhost to reorder batched buffer.
+> 
+> Signed-off-by: Guo Zhi <qtxuning1999@sjtu.edu.cn>
+> ---
+> drivers/vhost/test.c | 15 ++++++++++++++-
+> 1 file changed, 14 insertions(+), 1 deletion(-)
+> 
+> diff --git a/drivers/vhost/test.c b/drivers/vhost/test.c
+> index bc8e7fb1e..1c9c40c11 100644
+> --- a/drivers/vhost/test.c
+> +++ b/drivers/vhost/test.c
+> @@ -43,6 +43,9 @@ struct vhost_test {
+> static void handle_vq(struct vhost_test *n)
+> {
+>        struct vhost_virtqueue *vq = &n->vqs[VHOST_TEST_VQ];
+> +       struct vring_used_elem *heads = kmalloc(sizeof(*heads)
+> +                       * vq->num, GFP_KERNEL);
+> +       int batch_idx = 0;
+>        unsigned out, in;
+>        int head;
+>        size_t len, total_len = 0;
+> @@ -84,11 +87,21 @@ static void handle_vq(struct vhost_test *n)
+>                        vq_err(vq, "Unexpected 0 len for TX\n");
+>                        break;
+>                }
+> -               vhost_add_used_and_signal(&n->dev, vq, head, 0);
+> +               heads[batch_idx].id = cpu_to_vhost32(vq, head);
+> +               heads[batch_idx++].len = cpu_to_vhost32(vq, len);
+>                total_len += len;
+>                if (unlikely(vhost_exceeds_weight(vq, 0, total_len)))
+>                        break;
+>        }
+> +       if (batch_idx) {
+> +               if (vhost_has_feature(vq, VIRTIO_F_IN_ORDER) && batch_idx >= 2) {
+
+Maybe to add a module parameter to test this? Instead of trusting in
+feature negotiation, "unorder_used=1" or something like that.
+
+vhost.c:vhost_add_used_and_signal_n should support receiving buffers
+in order or out of order whether F_IN_ORDER is negotiated or not.
+
+Thanks!
+
+
+
+> +                       vhost_add_used_and_signal_n(&n->dev, vq, &heads[batch_idx / 2],
+> +                                                   batch_idx - batch_idx / 2);
+> +                       vhost_add_used_and_signal_n(&n->dev, vq, heads, batch_idx / 2);
+> +               } else {
+> +                       vhost_add_used_and_signal_n(&n->dev, vq, heads, batch_idx);
+> +               }
+> +       }
+> 
+>        mutex_unlock(&vq->mutex);
+> }
+> --
+> 2.17.1
