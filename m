@@ -2,130 +2,129 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 8882B587878
-	for <lists+kvm@lfdr.de>; Tue,  2 Aug 2022 09:56:31 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id E72D75878A1
+	for <lists+kvm@lfdr.de>; Tue,  2 Aug 2022 10:04:34 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236208AbiHBH43 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 2 Aug 2022 03:56:29 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35924 "EHLO
+        id S236272AbiHBIEd (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 2 Aug 2022 04:04:33 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42734 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S236121AbiHBH4V (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 2 Aug 2022 03:56:21 -0400
-Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 735A531DD9
-        for <kvm@vger.kernel.org>; Tue,  2 Aug 2022 00:56:20 -0700 (PDT)
-Received: from pps.filterd (m0098409.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.17.1.5/8.17.1.5) with ESMTP id 2727g14k003002
-        for <kvm@vger.kernel.org>; Tue, 2 Aug 2022 07:56:20 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
- mime-version : subject : to : cc : references : from : in-reply-to :
- content-type : content-transfer-encoding; s=pp1;
- bh=emwPPD6OXXQo+hg7zw1i46RIHjHaRUovL/XuRpcPt4E=;
- b=owQ1sMbXk8GRef6GNjFVMeuh8xQsTy78UXZZYPioiKackLsM3mYLhZLGu8tTeC+AD92c
- eqXqvUwhK+nyCRdBBWBeOgijDaRtlEezNTCIKpWho8+Gtb6nqqVA7aCRpT8Hps3aEisA
- EzhxQp98R22aQLY73J+jYDgQ/IYKSi48ERM4DLFaDpfkwcgo1A6LDOdkBlzLyPxHL/VK
- H7v79a8yML/DNYTIMqPR/kLzOPiNOfagqWF93eNHTbmY3eQu1FM02YmBteuBZYvAeJLo
- A3iXvA2wmBYF6Gw//miAjl+KSV12MS2zOGbPcqjSZk/6IdNrDZ2D3zl9vYxKJw7W32N7 0Q== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3hpyrvrb5h-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT)
-        for <kvm@vger.kernel.org>; Tue, 02 Aug 2022 07:56:20 +0000
-Received: from m0098409.ppops.net (m0098409.ppops.net [127.0.0.1])
-        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 2727hSoH012513
-        for <kvm@vger.kernel.org>; Tue, 2 Aug 2022 07:56:19 GMT
-Received: from ppma04ams.nl.ibm.com (63.31.33a9.ip4.static.sl-reverse.com [169.51.49.99])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3hpyrvrb4t-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 02 Aug 2022 07:56:19 +0000
-Received: from pps.filterd (ppma04ams.nl.ibm.com [127.0.0.1])
-        by ppma04ams.nl.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 2727qJNo001727;
-        Tue, 2 Aug 2022 07:56:17 GMT
-Received: from b06avi18878370.portsmouth.uk.ibm.com (b06avi18878370.portsmouth.uk.ibm.com [9.149.26.194])
-        by ppma04ams.nl.ibm.com with ESMTP id 3hmv98kdaa-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 02 Aug 2022 07:56:17 +0000
-Received: from d06av22.portsmouth.uk.ibm.com (d06av22.portsmouth.uk.ibm.com [9.149.105.58])
-        by b06avi18878370.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 2727uTc032309504
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Tue, 2 Aug 2022 07:56:29 GMT
-Received: from d06av22.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 1532F4C04E;
-        Tue,  2 Aug 2022 07:56:14 +0000 (GMT)
-Received: from d06av22.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id CA34F4C046;
-        Tue,  2 Aug 2022 07:56:12 +0000 (GMT)
-Received: from [9.145.60.210] (unknown [9.145.60.210])
-        by d06av22.portsmouth.uk.ibm.com (Postfix) with ESMTP;
-        Tue,  2 Aug 2022 07:56:12 +0000 (GMT)
-Message-ID: <f08b1d12-f7ee-ae77-9c8c-ada4131d9324@linux.ibm.com>
-Date:   Tue, 2 Aug 2022 09:56:12 +0200
+        with ESMTP id S232855AbiHBIEc (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 2 Aug 2022 04:04:32 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 249F412770
+        for <kvm@vger.kernel.org>; Tue,  2 Aug 2022 01:04:31 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1659427470;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=PnAgHb+qwkYr0eoeRI+miU3649J+IzbjO84fBGvUAWw=;
+        b=ep/F+MZJgno/g4KEO/PavR5Zz8NweHNiutfkARlrXbMorBdcM3f+Coq3MPazmXeRb70fD6
+        2CeqrtNeEfHJlPtWAGQe5cPAEc5PYED7hKyOVTgec39YGbLU3vxDAZYy15AEZtWbFwB/F6
+        JeoCtUKLSkA7szepzyTe7lEl1MQEdTw=
+Received: from mail-qv1-f72.google.com (mail-qv1-f72.google.com
+ [209.85.219.72]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-271-JM6nMdL2NDyo0AFvZV5fpA-1; Tue, 02 Aug 2022 04:04:29 -0400
+X-MC-Unique: JM6nMdL2NDyo0AFvZV5fpA-1
+Received: by mail-qv1-f72.google.com with SMTP id a11-20020ad45c4b000000b004747a998b9eso7783134qva.9
+        for <kvm@vger.kernel.org>; Tue, 02 Aug 2022 01:04:29 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc;
+        bh=PnAgHb+qwkYr0eoeRI+miU3649J+IzbjO84fBGvUAWw=;
+        b=T6PYQhs7j3iwwYr8yY3V8i0Dxf3hN7xAaZ2fCyH5PVhDpmJDRC6Jz/nxoXvsqgsLnS
+         veO8aBePCDHHx1Cdmz3xJgDAkKbQeeLUaIxGdKzwlntzgAulJ2rT0nD99TRzEesBz1Wm
+         BIh3S+qeDj+AjbQIiJJXHe/z4jGy+oyntLAKYRdWD4N1XUuYP79HYMcNfw/Q96rtSPNK
+         NwosRZ1aw68Bv3b4BMhoQ8HEAiw78UQJWQ0tgQZxqZq/aQRMCyDnOuDN0ZN1DmDe3Jzk
+         NuI+ZRFjOv25uJEdvKmzqriSn3wHneqqwM52bE5ZbmcoNjR18+fV/5QylDRZMKo1GxcF
+         V61Q==
+X-Gm-Message-State: AJIora/pNjp+6Gh4YDBpA8AiHzHLa/AxAwfAXm5r874FhYZ/kRXNgmvu
+        ddk/mPvkxGEvdbQX9+J7Cn0gW2K84/feJeFMivcBdJ+RoKiMZm5A0qv2gXp3zBB6VWJMwDanUyg
+        vDP6ezT2DmO/P
+X-Received: by 2002:ac8:5b96:0:b0:31f:1931:b2b1 with SMTP id a22-20020ac85b96000000b0031f1931b2b1mr17183316qta.17.1659427468872;
+        Tue, 02 Aug 2022 01:04:28 -0700 (PDT)
+X-Google-Smtp-Source: AGRyM1t8d3getE7v6ehQxa40+uRjwcWSGfnrWrzaZU1/gX3jMXiALvanlrDyYV5QWSN3xAJSiT9vUw==
+X-Received: by 2002:ac8:5b96:0:b0:31f:1931:b2b1 with SMTP id a22-20020ac85b96000000b0031f1931b2b1mr17183303qta.17.1659427468660;
+        Tue, 02 Aug 2022 01:04:28 -0700 (PDT)
+Received: from sgarzare-redhat (host-79-46-200-178.retail.telecomitalia.it. [79.46.200.178])
+        by smtp.gmail.com with ESMTPSA id g18-20020a05620a40d200b006b8d1914504sm636431qko.22.2022.08.02.01.04.23
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 02 Aug 2022 01:04:28 -0700 (PDT)
+Date:   Tue, 2 Aug 2022 10:04:17 +0200
+From:   Stefano Garzarella <sgarzare@redhat.com>
+To:     Vishnu Dasa <vdasa@vmware.com>
+Cc:     Arseniy Krasnov <AVKrasnov@sberdevices.ru>,
+        Bryan Tan <bryantan@vmware.com>,
+        Pv-drivers <Pv-drivers@vmware.com>,
+        "David S. Miller" <davem@davemloft.net>,
+        "edumazet@google.com" <edumazet@google.com>,
+        Jakub Kicinski <kuba@kernel.org>,
+        Paolo Abeni <pabeni@redhat.com>,
+        Stefan Hajnoczi <stefanha@redhat.com>,
+        "Michael S. Tsirkin" <mst@redhat.com>,
+        "kys@microsoft.com" <kys@microsoft.com>,
+        "haiyangz@microsoft.com" <haiyangz@microsoft.com>,
+        "sthemmin@microsoft.com" <sthemmin@microsoft.com>,
+        "wei.liu@kernel.org" <wei.liu@kernel.org>,
+        Dexuan Cui <decui@microsoft.com>,
+        Krasnov Arseniy <oxffffaa@gmail.com>,
+        "virtualization@lists.linux-foundation.org" 
+        <virtualization@lists.linux-foundation.org>,
+        "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "linux-hyperv@vger.kernel.org" <linux-hyperv@vger.kernel.org>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        kernel <kernel@sberdevices.ru>
+Subject: Re: [RFC PATCH v2 0/9] vsock: updates for SO_RCVLOWAT handling
+Message-ID: <20220802080417.xyfwdidlirklr4oj@sgarzare-redhat>
+References: <19e25833-5f5c-f9b9-ac0f-1945ea17638d@sberdevices.ru>
+ <20220727123710.pwzy6ag3gavotxda@sgarzare-redhat>
+ <D7315A7C-D288-4BDC-A8BF-B8631D8664BA@vmware.com>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.9.0
-Subject: Re: [kvm-unit-tests PATCH 1/6] s390x: snippets: asm: Add a macro to
- write an exception PSW
-Content-Language: en-US
-To:     Nico Boehr <nrb@linux.ibm.com>, kvm@vger.kernel.org
-Cc:     imbrenda@linux.ibm.com, seiden@linux.ibm.com, scgl@linux.ibm.com,
-        thuth@redhat.com
-References: <20220729082633.277240-1-frankja@linux.ibm.com>
- <20220729082633.277240-2-frankja@linux.ibm.com>
- <165942423514.253051.2592124003163681093@localhost.localdomain>
-From:   Janosch Frank <frankja@linux.ibm.com>
-In-Reply-To: <165942423514.253051.2592124003163681093@localhost.localdomain>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-ORIG-GUID: IKuwG1uwaL9-rP9t-pdMhIyuOppNuUo5
-X-Proofpoint-GUID: ydd73ltZwn8QOXBlQBS3Jiz7FM51oh74
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.205,Aquarius:18.0.883,Hydra:6.0.517,FMLib:17.11.122.1
- definitions=2022-08-02_03,2022-08-01_01,2022-06-22_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501
- malwarescore=0 lowpriorityscore=0 impostorscore=0 clxscore=1015
- bulkscore=0 spamscore=0 suspectscore=0 mlxscore=0 adultscore=0
- mlxlogscore=999 phishscore=0 classifier=spam adjust=0 reason=mlx
- scancount=1 engine=8.12.0-2206140000 definitions=main-2208020036
-X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,
-        SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=us-ascii; format=flowed
+Content-Disposition: inline
+In-Reply-To: <D7315A7C-D288-4BDC-A8BF-B8631D8664BA@vmware.com>
+X-Spam-Status: No, score=-3.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,
+        SPF_HELO_NONE,SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 8/2/22 09:10, Nico Boehr wrote:
-> Quoting Janosch Frank (2022-07-29 10:26:28)
-> [...]
->> diff --git a/s390x/snippets/asm/snippet-pv-diag-500.S b/s390x/snippets/asm/snippet-pv-diag-500.S
->> index 8dd66bd9..f4d75388 100644
->> --- a/s390x/snippets/asm/snippet-pv-diag-500.S
->> +++ b/s390x/snippets/asm/snippet-pv-diag-500.S
->> @@ -8,6 +8,7 @@
->>    *  Janosch Frank <frankja@linux.ibm.com>
->>    */
->>   #include <asm/asm-offsets.h>
->> +#include "macros.S"
->>   .section .text
->>   
->>   /* Clean and pre-load registers that are used for diag 500 */
->> @@ -21,10 +22,7 @@ lghi %r3, 3
->>   lghi   %r4, 4
->>   
->>   /* Let's jump to the next label on a PGM */
->> -xgr    %r5, %r5
->> -stg    %r5, GEN_LC_PGM_NEW_PSW
-> 
-> So previously the PSW mask was zero and hence we had 24-bit addressing, no? Now, we have bits 31 and 32 one and hence 64 bit addressing.
+Hi Vishnu,
 
-Yes
-Also the linker script patch will exchange the mask for an invalid one 
-so we need to replace both the mask and the address.
+On Tue, Aug 02, 2022 at 05:35:22AM +0000, Vishnu Dasa wrote:
+>> On Jul 27, 2022, at 5:37 AM, Stefano Garzarella <sgarzare@redhat.com> 
+>> wrote:
+>> Hi Arseniy,
+>>
+>> On Mon, Jul 25, 2022 at 07:54:05AM +0000, Arseniy Krasnov wrote:
 
-> 
-> I guess 24-bit addressing is not appropriate here (or at least doesn't matter too much), so I guess this is intended, isn't it?
+[...]
 
+>>>
+>>> 3) vmci/vsock:
+>>>  Same as 2), but i'm not sure about this changes. Will be very good,
+>>>  to get comments from someone who knows this code.
+>>
+>> I CCed VMCI maintainers to the patch and also to this cover, maybe
+>> better to keep them in the loop for next versions.
+>>
+>> (Jorgen's and Rajesh's emails bounced back, so I'm CCing here only
+>> Bryan, Vishnu, and pv-drivers@vmware.com)
+>
+>Hi Stefano,
+>Jorgen and Rajesh are no longer with VMware.  There's a patch in
+>flight to remove Rajesh from the MAINTAINERS file (Jorgen is already
+>removed).
 
-Claudio complained about the addressing change so I moved it over to 
-full 64 bit.
+Thanks for the update! I will contact you and Bryan for any questions 
+with VMCI in the future :-)
+
+Stefano
+
