@@ -2,126 +2,93 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id B1C5C5884CF
-	for <lists+kvm@lfdr.de>; Wed,  3 Aug 2022 01:41:44 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id CA1395884D3
+	for <lists+kvm@lfdr.de>; Wed,  3 Aug 2022 01:43:04 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229648AbiHBXln (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 2 Aug 2022 19:41:43 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43488 "EHLO
+        id S234573AbiHBXnB (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 2 Aug 2022 19:43:01 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44218 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229568AbiHBXlk (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 2 Aug 2022 19:41:40 -0400
-Received: from mail-pl1-x634.google.com (mail-pl1-x634.google.com [IPv6:2607:f8b0:4864:20::634])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B31A751A2A
-        for <kvm@vger.kernel.org>; Tue,  2 Aug 2022 16:41:39 -0700 (PDT)
-Received: by mail-pl1-x634.google.com with SMTP id w7so14828403ply.12
-        for <kvm@vger.kernel.org>; Tue, 02 Aug 2022 16:41:39 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc;
-        bh=iTI6R7KJRLoQz0Ou6npQPtCdRk1U91+pQrT2aXmYFB8=;
-        b=Oh9t50zfLcxshPY/AFGfgwtjfzyvMdtWg8eEtOildHv377TPfNSEx5a4qDS+cFTrhx
-         Y76eiJJLg/PQ4Q5yIQ7c+0CGejiX6bLs/lrnyErzMKPq4qGCoYy9zaJme1NvO8eZR/tG
-         TfA4Q0+tUcbM+tuMAFVY7uAw0pO17bAtiBvNZE0koCICsSAlYun9lOfYNCwm4mw2MAAS
-         kgeXIyG1cb25J2Kuftn/qS1T00GEDdCITB5ujQHnp79WgHsQKZ5gYWXcj9lJ2e/0bY6K
-         tPD6MGOChvpHuIKtkMjIDlS8pXMStdVfmoMOoK3e5hyVKqfg3GhhYOYIY8OzZ/EvJF/P
-         uAbw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc;
-        bh=iTI6R7KJRLoQz0Ou6npQPtCdRk1U91+pQrT2aXmYFB8=;
-        b=VzTono8YxLfQhmUHT0XuXDWvR7n17SnQr/ibkXQ7xR29oS4QLBONSHouH5aqGS72Og
-         cBNSAjgy7OEuoX34vUGD2ET82M93BRrQWkq0rnCVuYpWcFZ0i9IZil7V33KOTM30n9ZE
-         XA0q1QJseb7PBk+dhDtXL93d4H1Bn5BZGL/T0VMCkDFMuynvE5/jqNwlNf/WCdk+QlBX
-         MoVXdlb/lUb57xtpRB7h/eq1Ku6OTxs2hoTLwHQTBvzAUuKzSOqs63oxPB5GnEiyev5F
-         5VjSF1gC+//6JZ5KQHE0TXr6DqQNFTgZXJROP6k4uIlGzgXE+OowAFoTPssxZQTrjIjT
-         Iw0Q==
-X-Gm-Message-State: ACgBeo0yNTdNLBiQh+8YQOl5bvnlkjC1oVMMixULzQ1WISuOjbR12iGW
-        8II+KEv38YMD9SwpgtWHDzDUcQ==
-X-Google-Smtp-Source: AA6agR4Z47AtYT5XZEOgUPdpd2Nl5IkEKWyGkiFppvyFrhAnLUfrk+dL6GJ7CEKbN1M8HaBhYr9IJg==
-X-Received: by 2002:a17:902:d50c:b0:16f:736:33a0 with SMTP id b12-20020a170902d50c00b0016f073633a0mr4854120plg.137.1659483699097;
-        Tue, 02 Aug 2022 16:41:39 -0700 (PDT)
-Received: from google.com (7.104.168.34.bc.googleusercontent.com. [34.168.104.7])
-        by smtp.gmail.com with ESMTPSA id u62-20020a627941000000b0052ac12e7596sm1436806pfc.114.2022.08.02.16.41.38
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 02 Aug 2022 16:41:38 -0700 (PDT)
-Date:   Tue, 2 Aug 2022 23:41:34 +0000
-From:   Sean Christopherson <seanjc@google.com>
-To:     Michal Luczaj <mhal@rbox.co>
-Cc:     kvm@vger.kernel.org, pbonzini@redhat.com, shuah@kernel.org,
-        linux-kselftest@vger.kernel.org
-Subject: Re: [kvm-unit-tests PATCH v2] x86: Test illegal LEA handling
-Message-ID: <Yum2LpZS9vtCaCBm@google.com>
-References: <YuQQiv862oWDpgt5@google.com>
- <20220731204653.2516-1-mhal@rbox.co>
- <YugC4rUvdbroNk3M@google.com>
- <c2001bfa-7602-e99a-dc41-1d9d993581ac@rbox.co>
+        with ESMTP id S229568AbiHBXnA (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 2 Aug 2022 19:43:00 -0400
+Received: from mga06.intel.com (mga06b.intel.com [134.134.136.31])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 755AD51A37;
+        Tue,  2 Aug 2022 16:42:59 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1659483779; x=1691019779;
+  h=message-id:subject:from:to:cc:date:in-reply-to:
+   references:content-transfer-encoding:mime-version;
+  bh=k1gNX86YincOcL9VRCK/r4AXXqCHM/b4AG11KWtCuDY=;
+  b=WmqGv8SlJxLkEFy0UeAb6izDAfkkTAz3TtTOJbf2fWWrDUAmebDM+Zo/
+   ceV2xWxcBH7HrtokDyL9CajbJARFFpJ1jU90We0ktTxPdDzyxq4aD7/Dj
+   wnSiRBctTUkvJEARZ8+zK5uBikQNEpBzKCKEveT8yYrpIOzKEpjTecn9w
+   SjUkC1psv8enKIYnJA09w3j5crsPy3hMRzaPinDeIP97hAQHnBw03Zjl9
+   nsdm+skB/RaEcBl1P52vIXbqWJeCPclHobnCdt4djkZ/36LlZTwh0QTvR
+   jv3bPVLPm/SCnZNQ16C2rd2w0DH53AcKsco5LjT1vKgYRprLxWCkVFObB
+   g==;
+X-IronPort-AV: E=McAfee;i="6400,9594,10427"; a="351256633"
+X-IronPort-AV: E=Sophos;i="5.93,212,1654585200"; 
+   d="scan'208";a="351256633"
+Received: from orsmga008.jf.intel.com ([10.7.209.65])
+  by orsmga104.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 02 Aug 2022 16:42:59 -0700
+X-IronPort-AV: E=Sophos;i="5.93,212,1654585200"; 
+   d="scan'208";a="630917735"
+Received: from gvenka2-desk.amr.corp.intel.com (HELO khuang2-desk.gar.corp.intel.com) ([10.212.85.17])
+  by orsmga008-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 02 Aug 2022 16:42:57 -0700
+Message-ID: <72b51c373e09fe8f0a6a65c40d75753348c64ce1.camel@intel.com>
+Subject: Re: [PATCH 2/4] KVM: x86/mmu: Fully re-evaluate MMIO caching when
+ SPTE masks change
+From:   Kai Huang <kai.huang@intel.com>
+To:     Sean Christopherson <seanjc@google.com>
+Cc:     Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org, Michael Roth <michael.roth@amd.com>,
+        Tom Lendacky <thomas.lendacky@amd.com>
+Date:   Wed, 03 Aug 2022 11:42:55 +1200
+In-Reply-To: <YumtzyBgNLWGh466@google.com>
+References: <20220728221759.3492539-3-seanjc@google.com>
+         <9104e22da628fef86a6e8a02d9d2e81814a9d598.camel@intel.com>
+         <YuP3zGmpiALuXfW+@google.com>
+         <f313c41ed50e187ae5de87b32325c6cd4cc17c79.camel@intel.com>
+         <YufgCR9CpeoVWKF7@google.com>
+         <244f619a4e7a1c7079830d12379872a111da418d.camel@intel.com>
+         <YuhfuQbHy4P9EZcw@google.com>
+         <4fd3cea874b69f1c8bbcaf19538c7fdcb9c22aab.camel@intel.com>
+         <YumT+6joTz2M1zZP@google.com>
+         <ebbccf92d7ab97bd79dac5529f109aa5b92542ab.camel@intel.com>
+         <YumtzyBgNLWGh466@google.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+User-Agent: Evolution 3.44.3 (3.44.3-1.fc36) 
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <c2001bfa-7602-e99a-dc41-1d9d993581ac@rbox.co>
-X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-        USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=ham
-        autolearn_force=no version=3.4.6
+X-Spam-Status: No, score=-5.0 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
+        SPF_HELO_NONE,SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Aug 03, 2022, Michal Luczaj wrote:
-> On 8/1/22 18:44, Sean Christopherson wrote:
-> > On Sun, Jul 31, 2022, Michal Luczaj wrote:
-> >> +{
-> >> +	exceptions = 0;
-> >> +	handle_exception(UD_VECTOR, illegal_lea_handler);
-> > 
-> > No need to use a custom handler (ignore any patterns in emulator.c that suggest
-> > it's "mandatory", emulator is one of the oldest test).  ASM_TRY() can handle all
-> > of this without any globals.
-> > ...
-> > static void test_illegal_lea(void)
-> > {
-> > 	unsigned int vector;
-> > 
-> > 	asm volatile (ASM_TRY("1f")
-> > 		      KVM_FEP ".byte 0x8d; .byte 0xc0\n\t"
-> > 		      "1:"
-> > 		      : : : "memory", "eax");
-> > 
-> > 	vector = exception_vector();
-> > 	report(vector == UD_VECTOR,
-> > 	       "Wanted #UD on LEA with /reg, got vector = %d", vector);
-> > }
-> 
-> I must be missing something important. There is
-> `handle_exception(UD_VECTOR, 0)` early in `main()` which simply undoes
-> `handle_exception(6, check_exception_table)` set by `setup_idt()`. If
-> there's no more exception table walk for #UD, `ASM_TRY` alone can't
-> possibly work, am I corrent?
+On Tue, 2022-08-02 at 23:05 +0000, Sean Christopherson wrote:
+> On Wed, Aug 03, 2022, Kai Huang wrote:
+> > On Tue, 2022-08-02 at 21:15 +0000, Sean Christopherson wrote:
+> > > On Tue, Aug 02, 2022, Kai Huang wrote:
+> > > > But we are not checking any of those in kvm_mmu_set_mmio_spte_mask(=
+), right? :)
+> > >=20
+> > > No, but we really should.
+> >=20
+> > I can come up a patch if you are not planning to do so?
+>=20
+> Hmm, I'll throw one together, it's simple enough (famous last words) and =
+it'll
+> need to be tested on AMD as well.
 
-Argh, you're correct, I didn't realize the test zapped the IDT entry.  That's a
-bug, the test shouldn't zap entries, the whole point of handle_exception() returning
-the old handler is so that the caller can restore it.  Grr.
+Sure.
 
-> If so, am I supposed to restore the `check_exception_table()` handler? Or
-> maybe using `test_for_exception()` would be more elegant:
+--=20
+Thanks,
+-Kai
 
-Hmm, I prefer ASM_TRY() over test_for_exception(), having to define a function
-just to emit a single instruction is silly.  What I'd really prefer is that we
-wouldn't have so many ways for doing the same basic thing (obviously not your
-fault, just ranting/whining).
 
-If you have bandwidth, can you create a small series to clean up emulator.c to at
-least take a step in the right direction?
-
-  1. Save/restore the handlers.
-  2. Use ASM_TRY for the UD_VECTOR cases (KVM_FEP probing and illegal MOVBE)
-  3. Add this testcase as described above.
-
-Ideally the test wouldn't use handle_exception() at all, but that's a much bigger
-mess and a future problem.
