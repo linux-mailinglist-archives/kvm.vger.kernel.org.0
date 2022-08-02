@@ -2,72 +2,133 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 0221B5875A2
-	for <lists+kvm@lfdr.de>; Tue,  2 Aug 2022 04:51:10 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 19C835875D3
+	for <lists+kvm@lfdr.de>; Tue,  2 Aug 2022 05:09:00 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235781AbiHBCvI (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 1 Aug 2022 22:51:08 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49390 "EHLO
+        id S235690AbiHBDIu (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 1 Aug 2022 23:08:50 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59684 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232446AbiHBCvG (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 1 Aug 2022 22:51:06 -0400
-Received: from mail-yw1-x112c.google.com (mail-yw1-x112c.google.com [IPv6:2607:f8b0:4864:20::112c])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 261CD17E31
-        for <kvm@vger.kernel.org>; Mon,  1 Aug 2022 19:51:06 -0700 (PDT)
-Received: by mail-yw1-x112c.google.com with SMTP id 00721157ae682-32269d60830so127738037b3.2
-        for <kvm@vger.kernel.org>; Mon, 01 Aug 2022 19:51:06 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=mime-version:reply-to:from:date:message-id:subject:to;
-        bh=IniFjyVHQ6lWflzIsICmJ5JUtVB9MkE1WWkHF07cmBg=;
-        b=P9YY8uMybYjbcSn33EGLwaWPGYNqd5+TB4SyBunASL1+iiOyWEl0asr2mbBGvnMkP9
-         TuBiThXirS0gGhoCQ1+mCQbens0y0ChElUfCtkPfr4w2i76pfPMZAUdCfHnUZup5Enls
-         rbv18IgcddfvKjUSJN2nY8hydQ/J4LWxNADGjXXkB3dUVnUV9WmKHc7WZB9f9DyvntWb
-         gZXLmErTUI0VoiQi6FhApbUvdC0sauRw1I+oZJFeQJIdCQam5LWtommWYNUE2ntATwEJ
-         EjqPHLV8ZFArGdV78QGjt7psumxS/yc/N9BE1mem0twJZUPvH+ZOBZlQe3p11KXTSJuU
-         iv7g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:reply-to:from:date:message-id
-         :subject:to;
-        bh=IniFjyVHQ6lWflzIsICmJ5JUtVB9MkE1WWkHF07cmBg=;
-        b=WyC6PfVBSQnui3bhGs9NFo37xP++oDZHLMNVPrPn/PZXxcCeG6sjVdt2aiA/1fUEQd
-         xRTGEeuBMWGI6H6sN1HEibJiR7Y2zWz0w6YlXu8rGFaTEaztxISz+zxyMqv6TntI784P
-         6B89TcBMkreJt2E8QqnEfGf8Q4TqPKgZ60czJskF09UI2oZKdL4uYe0iAUjoaxD7Zm9Z
-         3jfYW3T2Xa/M92oKosnIADMgjby0NGiv6dRFzokdB1KyU6e/ZEtyft6lTHnbgbMrInGz
-         mN4uL3DeC25UucdZgp4TM53lgfQyBlr5qgHkzEb3xJp0dGuIYJVXhNFhEZAsJwpBwgCG
-         fFDg==
-X-Gm-Message-State: ACgBeo2lPGaRHqk0gIc4LEMkU8X3IAudAhcsVTpM3Gl5Yk7jX9pw0z2R
-        cU2Gk5XZSUrHF48+XzFJBrROffQNnH0ZBzG6ohM=
-X-Google-Smtp-Source: AA6agR7KAWziftQFAMaQ3HheLbcgYNFfOD0sPObkGtKtXveI66YrwebL/uX7hatGbi/vtBFCXyQPIP40pNo0Kw2wZfM=
-X-Received: by 2002:a81:b142:0:b0:31f:ba7c:5b56 with SMTP id
- p63-20020a81b142000000b0031fba7c5b56mr15943741ywh.390.1659408665364; Mon, 01
- Aug 2022 19:51:05 -0700 (PDT)
+        with ESMTP id S235717AbiHBDIf (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 1 Aug 2022 23:08:35 -0400
+Received: from smtp236.sjtu.edu.cn (smtp236.sjtu.edu.cn [202.120.2.236])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1A5E619030;
+        Mon,  1 Aug 2022 20:08:34 -0700 (PDT)
+Received: from mta90.sjtu.edu.cn (unknown [10.118.0.90])
+        by smtp236.sjtu.edu.cn (Postfix) with ESMTPS id 2FD961008B38A;
+        Tue,  2 Aug 2022 11:08:32 +0800 (CST)
+Received: from localhost (localhost.localdomain [127.0.0.1])
+        by mta90.sjtu.edu.cn (Postfix) with ESMTP id 19F4C37C894;
+        Tue,  2 Aug 2022 11:08:32 +0800 (CST)
+X-Virus-Scanned: amavisd-new at 
+Received: from mta90.sjtu.edu.cn ([127.0.0.1])
+        by localhost (mta90.sjtu.edu.cn [127.0.0.1]) (amavisd-new, port 10026)
+        with ESMTP id LaZN_f53Rf0S; Tue,  2 Aug 2022 11:08:32 +0800 (CST)
+Received: from mstore105.sjtu.edu.cn (mstore101.sjtu.edu.cn [10.118.0.105])
+        by mta90.sjtu.edu.cn (Postfix) with ESMTP id E00F837C893;
+        Tue,  2 Aug 2022 11:08:31 +0800 (CST)
+Date:   Tue, 2 Aug 2022 11:08:31 +0800 (CST)
+From:   Guo Zhi <qtxuning1999@sjtu.edu.cn>
+To:     eperezma <eperezma@redhat.com>
+Cc:     jasowang <jasowang@redhat.com>, sgarzare <sgarzare@redhat.com>,
+        Michael Tsirkin <mst@redhat.com>,
+        netdev <netdev@vger.kernel.org>,
+        linux-kernel <linux-kernel@vger.kernel.org>,
+        kvm list <kvm@vger.kernel.org>,
+        virtualization <virtualization@lists.linux-foundation.org>
+Message-ID: <104238481.4321239.1659409711735.JavaMail.zimbra@sjtu.edu.cn>
+In-Reply-To: <CAJaqyWfgUqdP6mkOUdouvQSst=qc7MOTaigC-EiTg9-gojHqzg@mail.gmail.com>
+References: <20220721084341.24183-1-qtxuning1999@sjtu.edu.cn> <20220721084341.24183-4-qtxuning1999@sjtu.edu.cn> <CAJaqyWfgUqdP6mkOUdouvQSst=qc7MOTaigC-EiTg9-gojHqzg@mail.gmail.com>
+Subject: Re: [RFC 3/5] vhost_test: batch used buffer
 MIME-Version: 1.0
-Received: by 2002:a05:6900:ac9:0:0:0:0 with HTTP; Mon, 1 Aug 2022 19:51:05
- -0700 (PDT)
-Reply-To: usdepartmenttreasury63@gmail.com
-From:   "U.S DEPARTMENT TREASURY" <boiatoaka@gmail.com>
-Date:   Tue, 2 Aug 2022 02:51:05 +0000
-Message-ID: <CADjH9Kh2tFQddOMrrjOt2mNVFeyN+GTcMRmg+A6NhcswmxLhgg@mail.gmail.com>
-Subject: 
-To:     undisclosed-recipients:;
-Content-Type: text/plain; charset="UTF-8"
-X-Spam-Status: No, score=4.9 required=5.0 tests=BAYES_50,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,FREEMAIL_REPLYTO,
-        FREEMAIL_REPLYTO_END_DIGIT,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-        UNDISC_FREEM autolearn=no autolearn_force=no version=3.4.6
-X-Spam-Level: ****
+Content-Type: text/plain; charset=GB2312
+Content-Transfer-Encoding: 7bit
+X-Originating-IP: [58.45.124.125]
+X-Mailer: Zimbra 8.8.15_GA_4308 (ZimbraWebClient - GC103 (Mac)/8.8.15_GA_3928)
+Thread-Topic: vhost_test: batch used buffer
+Thread-Index: EUV1DBWPmVSAUFFwArkDHJZP+/kacQ==
+X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,SPF_HELO_NONE,
+        SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
--- 
-Hello,
 
-You have an important message get back to me for more information.
 
-Mr. Marcus Hamlin
-Deputy U.S. Department of the Treasury
+----- Original Message -----
+From: "eperezma" <eperezma@redhat.com>
+To: "Guo Zhi" <qtxuning1999@sjtu.edu.cn>
+Cc: "jasowang" <jasowang@redhat.com>, "sgarzare" <sgarzare@redhat.com>, "Michael Tsirkin" <mst@redhat.com>, "netdev" <netdev@vger.kernel.org>, "linux-kernel" <linux-kernel@vger.kernel.org>, "kvm list" <kvm@vger.kernel.org>, "virtualization" <virtualization@lists.linux-foundation.org>
+Sent: Friday, July 22, 2022 3:12:47 PM
+Subject: Re: [RFC 3/5] vhost_test: batch used buffer
+
+On Thu, Jul 21, 2022 at 10:44 AM Guo Zhi <qtxuning1999@sjtu.edu.cn> wrote:
+>
+> Only add to used ring when a batch a buffer have all been used.  And if
+> in order feature negotiated, add randomness to the used buffer's order,
+> test the ability of vhost to reorder batched buffer.
+>
+> Signed-off-by: Guo Zhi <qtxuning1999@sjtu.edu.cn>
+> ---
+>  drivers/vhost/test.c | 15 ++++++++++++++-
+>  1 file changed, 14 insertions(+), 1 deletion(-)
+>
+> diff --git a/drivers/vhost/test.c b/drivers/vhost/test.c
+> index bc8e7fb1e..1c9c40c11 100644
+> --- a/drivers/vhost/test.c
+> +++ b/drivers/vhost/test.c
+> @@ -43,6 +43,9 @@ struct vhost_test {
+>  static void handle_vq(struct vhost_test *n)
+>  {
+>         struct vhost_virtqueue *vq = &n->vqs[VHOST_TEST_VQ];
+> +       struct vring_used_elem *heads = kmalloc(sizeof(*heads)
+> +                       * vq->num, GFP_KERNEL);
+> +       int batch_idx = 0;
+>         unsigned out, in;
+>         int head;
+>         size_t len, total_len = 0;
+> @@ -84,11 +87,21 @@ static void handle_vq(struct vhost_test *n)
+>                         vq_err(vq, "Unexpected 0 len for TX\n");
+>                         break;
+>                 }
+> -               vhost_add_used_and_signal(&n->dev, vq, head, 0);
+> +               heads[batch_idx].id = cpu_to_vhost32(vq, head);
+> +               heads[batch_idx++].len = cpu_to_vhost32(vq, len);
+>                 total_len += len;
+>                 if (unlikely(vhost_exceeds_weight(vq, 0, total_len)))
+>                         break;
+>         }
+> +       if (batch_idx) {
+> +               if (vhost_has_feature(vq, VIRTIO_F_IN_ORDER) && batch_idx >= 2) {
+
+Maybe to add a module parameter to test this? Instead of trusting in
+feature negotiation, "unorder_used=1" or something like that.
+
+vhost.c:vhost_add_used_and_signal_n should support receiving buffers
+in order or out of order whether F_IN_ORDER is negotiated or not.
+
+Thanks!
+
+Maybe to add a module parameter to test this? Instead of trusting in
+feature negotiation, "unorder_used=1" or something like that.
+
+vhost.c:vhost_add_used_and_signal_n should support receiving buffers
+in order or out of order whether F_IN_ORDER is negotiated or not.
+
+Thanks!
+
+> +                       vhost_add_used_and_signal_n(&n->dev, vq, &heads[batch_idx / 2],
+> +                                                   batch_idx - batch_idx / 2);
+> +                       vhost_add_used_and_signal_n(&n->dev, vq, heads, batch_idx / 2);
+> +               } else {
+> +                       vhost_add_used_and_signal_n(&n->dev, vq, heads, batch_idx);
+> +               }
+> +       }
+>
+>         mutex_unlock(&vq->mutex);
+>  }
+> --
+> 2.17.1
+>
