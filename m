@@ -2,41 +2,41 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 9CB11587852
-	for <lists+kvm@lfdr.de>; Tue,  2 Aug 2022 09:50:08 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id C8B84587853
+	for <lists+kvm@lfdr.de>; Tue,  2 Aug 2022 09:50:18 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236282AbiHBHuH (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 2 Aug 2022 03:50:07 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54956 "EHLO
+        id S236244AbiHBHuQ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 2 Aug 2022 03:50:16 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54078 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S236277AbiHBHtq (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 2 Aug 2022 03:49:46 -0400
+        with ESMTP id S236254AbiHBHty (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 2 Aug 2022 03:49:54 -0400
 Received: from mga18.intel.com (mga18.intel.com [134.134.136.126])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 04CA14C628
-        for <kvm@vger.kernel.org>; Tue,  2 Aug 2022 00:49:34 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B03354C624
+        for <kvm@vger.kernel.org>; Tue,  2 Aug 2022 00:49:40 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1659426575; x=1690962575;
+  t=1659426580; x=1690962580;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=nnEzWTZZAQAOd1+B5KqBcumEqs9fwgWi9g0A4eLHcuo=;
-  b=eFvKqs1TXux+vWbZSrPMZUsiOz66pUMl8E+/eEJHQbGQZQquVeY5fmOG
-   RbkqV/W9mt2EAt59IHbC88IoqiTp837nx/ae/qna+eVGIu3PLqkdL9uSe
-   8CZBUdk1Xk2B6Ia82NYu1h1cv9vIFmbuWYVMzexgax1iFnVu2qF+/hFoT
-   mzj2Aoza9WjVh2TfTosGtrzIYtLiXoEVBPSZrCOBAgNg/awwZQsmSYyaK
-   Bwa9mOMGtmzZGQOhkGDgTwa7PlZjPV6OSAscSrr9cUywAvghX6BHvHrjp
-   cQ579mtc/4oFT/7jifHI0VszlgOH/ZDUo0iVgop641LV0/Jc7mO6wlJBn
-   A==;
-X-IronPort-AV: E=McAfee;i="6400,9594,10426"; a="272393067"
+  bh=8Na4gjIIIvpTGjfvRlvlpW4Ad9Wbd5fuFRSEbFIOYN0=;
+  b=L1DpfZWWlVSqynB5svsyZdnewWYZMzaCOHpwI9/Mp8ARW0krazpvCMNP
+   EKR1+viejJG3OBsRUF7AOPS5N/7+FzwI3vzv75i12HOxdtUimjDoYcARY
+   waNtAj8kEmZy6k3l7jNhnv5TqsEv+VVHbtuPI0iqgZfpNq/96D/7Jaxnn
+   8sYG4CteTGyFMDsJxwx+WrFgxjm6CutZ/FIjiv1CSRYmRVg49er53zPiY
+   UnVEf9Ctj8RV8Wa0zt8BjNCOivq+MmAh0aAqrSeIVAC7W7gez/LkKswc0
+   iCtqLYbXfWJb1x2zeoiBW0oQXWXxxhqL23OdRdgD8Ky4/2zC/0uh7TYsh
+   g==;
+X-IronPort-AV: E=McAfee;i="6400,9594,10426"; a="272393077"
 X-IronPort-AV: E=Sophos;i="5.93,210,1654585200"; 
-   d="scan'208";a="272393067"
+   d="scan'208";a="272393077"
 Received: from orsmga008.jf.intel.com ([10.7.209.65])
-  by orsmga106.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 02 Aug 2022 00:49:34 -0700
+  by orsmga106.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 02 Aug 2022 00:49:38 -0700
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="5.93,210,1654585200"; 
-   d="scan'208";a="630604175"
+   d="scan'208";a="630604198"
 Received: from lxy-dell.sh.intel.com ([10.239.48.38])
-  by orsmga008.jf.intel.com with ESMTP; 02 Aug 2022 00:49:30 -0700
+  by orsmga008.jf.intel.com with ESMTP; 02 Aug 2022 00:49:34 -0700
 From:   Xiaoyao Li <xiaoyao.li@intel.com>
 To:     Paolo Bonzini <pbonzini@redhat.com>,
         Isaku Yamahata <isaku.yamahata@gmail.com>,
@@ -53,9 +53,9 @@ To:     Paolo Bonzini <pbonzini@redhat.com>,
 Cc:     Connor Kuehl <ckuehl@redhat.com>, erdemaktas@google.com,
         kvm@vger.kernel.org, qemu-devel@nongnu.org, seanjc@google.com,
         xiaoyao.li@intel.com
-Subject: [PATCH v1 23/40] i386/tdx: Don't initialize pc.rom for TDX VMs
-Date:   Tue,  2 Aug 2022 15:47:33 +0800
-Message-Id: <20220802074750.2581308-24-xiaoyao.li@intel.com>
+Subject: [PATCH v1 24/40] i386/tdx: Track mem_ptr for each firmware entry of TDVF
+Date:   Tue,  2 Aug 2022 15:47:34 +0800
+Message-Id: <20220802074750.2581308-25-xiaoyao.li@intel.com>
 X-Mailer: git-send-email 2.27.0
 In-Reply-To: <20220802074750.2581308-1-xiaoyao.li@intel.com>
 References: <20220802074750.2581308-1-xiaoyao.li@intel.com>
@@ -71,60 +71,130 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-For TDX, the address below 1MB are entirely general RAM. No need to
-initialize pc.rom memory region for TDs.
+For each TDVF sections, QEMU needs to copy the content to guest
+private memory via KVM API (KVM_TDX_INIT_MEM_REGION).
+
+Introduce a field @mem_ptr for TdxFirmwareEntry to track the memory
+pointer of each TDVF sections. So that QEMU can add/copy them to guest
+private memory later.
+
+TDVF sections can be classified into two groups:
+ - Firmware itself, e.g., TDVF BFV and CFV, that located separately from
+   guest RAM. Its memory pointer is the bios pointer.
+
+ - Sections located at guest RAM, e.g., TEMP_MEM and TD_HOB.
+   mmap a new memory range for them.
+
+Register a machine_init_done callback to do the stuff.
 
 Signed-off-by: Xiaoyao Li <xiaoyao.li@intel.com>
+Acked-by: Gerd Hoffmann <kraxel@redhat.com>
 ---
-This is more as a workaround of the issue that for q35 machine type, the
-real memslot update (which requires memslot deletion )for pc.rom happens
-after tdx_init_memory_region. It leads to the private memory ADD'ed
-before get lost. I haven't work out a good solution to resolve the
-order issue. So just skip the pc.rom setup to avoid memslot deletion.
----
- hw/i386/pc.c | 21 ++++++++++++---------
- 1 file changed, 12 insertions(+), 9 deletions(-)
+ hw/i386/tdvf.c         |  1 +
+ include/hw/i386/tdvf.h |  7 +++++++
+ target/i386/kvm/tdx.c  | 32 ++++++++++++++++++++++++++++++++
+ 3 files changed, 40 insertions(+)
 
-diff --git a/hw/i386/pc.c b/hw/i386/pc.c
-index 1f62971759bf..c089dc49485d 100644
---- a/hw/i386/pc.c
-+++ b/hw/i386/pc.c
-@@ -62,6 +62,7 @@
- #include "sysemu/reset.h"
- #include "sysemu/runstate.h"
- #include "kvm/kvm_i386.h"
-+#include "kvm/tdx.h"
- #include "hw/xen/xen.h"
- #include "hw/xen/start_info.h"
- #include "ui/qemu-spice.h"
-@@ -1084,16 +1085,18 @@ void pc_memory_init(PCMachineState *pcms,
-     /* Initialize PC system firmware */
-     pc_system_firmware_init(pcms, rom_memory);
- 
--    option_rom_mr = g_malloc(sizeof(*option_rom_mr));
--    memory_region_init_ram(option_rom_mr, NULL, "pc.rom", PC_ROM_SIZE,
--                           &error_fatal);
--    if (pcmc->pci_enabled) {
--        memory_region_set_readonly(option_rom_mr, true);
-+    if (!is_tdx_vm()) {
-+        option_rom_mr = g_malloc(sizeof(*option_rom_mr));
-+        memory_region_init_ram(option_rom_mr, NULL, "pc.rom", PC_ROM_SIZE,
-+                            &error_fatal);
-+        if (pcmc->pci_enabled) {
-+            memory_region_set_readonly(option_rom_mr, true);
-+        }
-+        memory_region_add_subregion_overlap(rom_memory,
-+                                            PC_ROM_MIN_VGA,
-+                                            option_rom_mr,
-+                                            1);
+diff --git a/hw/i386/tdvf.c b/hw/i386/tdvf.c
+index a40198f9407a..dca209098f7a 100644
+--- a/hw/i386/tdvf.c
++++ b/hw/i386/tdvf.c
+@@ -187,6 +187,7 @@ int tdvf_parse_metadata(TdxFirmware *fw, void *flash_ptr, int size)
      }
--    memory_region_add_subregion_overlap(rom_memory,
--                                        PC_ROM_MIN_VGA,
--                                        option_rom_mr,
--                                        1);
+     g_free(sections);
  
-     fw_cfg = fw_cfg_arch_create(machine,
-                                 x86ms->boot_cpus, x86ms->apic_id_limit);
++    fw->mem_ptr = flash_ptr;
+     return 0;
+ 
+ err:
+diff --git a/include/hw/i386/tdvf.h b/include/hw/i386/tdvf.h
+index 593341eb2e93..d880af245a73 100644
+--- a/include/hw/i386/tdvf.h
++++ b/include/hw/i386/tdvf.h
+@@ -39,13 +39,20 @@ typedef struct TdxFirmwareEntry {
+     uint64_t size;
+     uint32_t type;
+     uint32_t attributes;
++
++    void *mem_ptr;
+ } TdxFirmwareEntry;
+ 
+ typedef struct TdxFirmware {
++    void *mem_ptr;
++
+     uint32_t nr_entries;
+     TdxFirmwareEntry *entries;
+ } TdxFirmware;
+ 
++#define for_each_tdx_fw_entry(fw, e)    \
++    for (e = (fw)->entries; e != (fw)->entries + (fw)->nr_entries; e++)
++
+ int tdvf_parse_metadata(TdxFirmware *fw, void *flash_ptr, int size);
+ 
+ #endif /* HW_I386_TDVF_H */
+diff --git a/target/i386/kvm/tdx.c b/target/i386/kvm/tdx.c
+index 25b3e2058cb3..95a9c2b26516 100644
+--- a/target/i386/kvm/tdx.c
++++ b/target/i386/kvm/tdx.c
+@@ -12,12 +12,15 @@
+  */
+ 
+ #include "qemu/osdep.h"
++#include "qemu/mmap-alloc.h"
+ #include "qapi/error.h"
+ #include "qom/object_interfaces.h"
+ #include "standard-headers/asm-x86/kvm_para.h"
+ #include "sysemu/kvm.h"
++#include "sysemu/sysemu.h"
+ 
+ #include "hw/i386/x86.h"
++#include "hw/i386/tdvf.h"
+ #include "kvm_i386.h"
+ #include "tdx.h"
+ #include "../cpu-internal.h"
+@@ -450,6 +453,33 @@ static void update_tdx_cpuid_lookup_by_tdx_caps(void)
+             (tdx_caps->xfam_fixed1 & CPUID_XSTATE_XSS_MASK) >> 32;
+ }
+ 
++static void tdx_finalize_vm(Notifier *notifier, void *unused)
++{
++    TdxFirmware *tdvf = &tdx_guest->tdvf;
++    TdxFirmwareEntry *entry;
++
++    for_each_tdx_fw_entry(tdvf, entry) {
++        switch (entry->type) {
++        case TDVF_SECTION_TYPE_BFV:
++        case TDVF_SECTION_TYPE_CFV:
++            entry->mem_ptr = tdvf->mem_ptr + entry->data_offset;
++            break;
++        case TDVF_SECTION_TYPE_TD_HOB:
++        case TDVF_SECTION_TYPE_TEMP_MEM:
++            entry->mem_ptr = qemu_ram_mmap(-1, entry->size,
++                                           qemu_real_host_page_size(), 0, 0);
++            break;
++        default:
++            error_report("Unsupported TDVF section %d", entry->type);
++            exit(1);
++        }
++    }
++}
++
++static Notifier tdx_machine_done_notify = {
++    .notify = tdx_finalize_vm,
++};
++
+ int tdx_kvm_init(MachineState *ms, Error **errp)
+ {
+     TdxGuest *tdx = (TdxGuest *)object_dynamic_cast(OBJECT(ms->cgs),
+@@ -470,6 +500,8 @@ int tdx_kvm_init(MachineState *ms, Error **errp)
+      */
+     kvm_readonly_mem_allowed = false;
+ 
++    qemu_add_machine_init_done_notifier(&tdx_machine_done_notify);
++
+     tdx_guest = tdx;
+ 
+     return 0;
 -- 
 2.27.0
 
