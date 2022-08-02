@@ -2,159 +2,220 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 846965874B1
-	for <lists+kvm@lfdr.de>; Tue,  2 Aug 2022 02:05:59 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id CF0435874E4
+	for <lists+kvm@lfdr.de>; Tue,  2 Aug 2022 02:49:31 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235211AbiHBAFr (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 1 Aug 2022 20:05:47 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40256 "EHLO
+        id S234882AbiHBAt0 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 1 Aug 2022 20:49:26 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:32916 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235433AbiHBAFp (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 1 Aug 2022 20:05:45 -0400
-Received: from mga17.intel.com (mga17.intel.com [192.55.52.151])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7CE96632A;
-        Mon,  1 Aug 2022 17:05:44 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1659398744; x=1690934744;
-  h=message-id:subject:from:to:cc:date:in-reply-to:
-   references:content-transfer-encoding:mime-version;
-  bh=rWuQPCu40e7gDnk51I9xaScsexta3PguED9KE//tWpI=;
-  b=fDJLHrptnYkvZNmDOlek/jf19QzA4LIV+r/mYZUhAuHqYiUnlfJIRf3b
-   ZY93agzveLCkHA4goNk7KHdv2QAahCzlC+IREhvuZ1XXkYUGtDbbENytz
-   XY8I31WmFT4XRZSpTirnuCsfoQ9rrDTsNaYh32sxzXHgqczueU+LWkQWl
-   /AcgyC8t5lgTpKpjm4hZIaU4aKNEISwA6OtXQJRVx18CevC1bzzDRJE9/
-   VdoJQF1jp0LL0+McNSYBSr7Apg0Y+F9I0sZk3iUjruFpx1DDNKHbC9us3
-   IUIVrgiacXoRTuiiyReCH9QLhwi6Bvg42F/kr3jQEFZ+GBA0Lrun3qCCk
-   w==;
-X-IronPort-AV: E=McAfee;i="6400,9594,10426"; a="269660282"
-X-IronPort-AV: E=Sophos;i="5.93,209,1654585200"; 
-   d="scan'208";a="269660282"
-Received: from orsmga001.jf.intel.com ([10.7.209.18])
-  by fmsmga107.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 01 Aug 2022 17:05:44 -0700
-X-IronPort-AV: E=Sophos;i="5.93,209,1654585200"; 
-   d="scan'208";a="635091573"
-Received: from vgutierr-mobl1.amr.corp.intel.com (HELO khuang2-desk.gar.corp.intel.com) ([10.212.22.230])
-  by orsmga001-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 01 Aug 2022 17:05:42 -0700
-Message-ID: <4fd3cea874b69f1c8bbcaf19538c7fdcb9c22aab.camel@intel.com>
-Subject: Re: [PATCH 2/4] KVM: x86/mmu: Fully re-evaluate MMIO caching when
- SPTE masks change
-From:   Kai Huang <kai.huang@intel.com>
-To:     Sean Christopherson <seanjc@google.com>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org, Michael Roth <michael.roth@amd.com>,
-        Tom Lendacky <thomas.lendacky@amd.com>
-Date:   Tue, 02 Aug 2022 12:05:39 +1200
-In-Reply-To: <YuhfuQbHy4P9EZcw@google.com>
-References: <20220728221759.3492539-1-seanjc@google.com>
-         <20220728221759.3492539-3-seanjc@google.com>
-         <9104e22da628fef86a6e8a02d9d2e81814a9d598.camel@intel.com>
-         <YuP3zGmpiALuXfW+@google.com>
-         <f313c41ed50e187ae5de87b32325c6cd4cc17c79.camel@intel.com>
-         <YufgCR9CpeoVWKF7@google.com>
-         <244f619a4e7a1c7079830d12379872a111da418d.camel@intel.com>
-         <YuhfuQbHy4P9EZcw@google.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-User-Agent: Evolution 3.44.3 (3.44.3-1.fc36) 
+        with ESMTP id S234875AbiHBAtX (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 1 Aug 2022 20:49:23 -0400
+Received: from mail-pl1-x631.google.com (mail-pl1-x631.google.com [IPv6:2607:f8b0:4864:20::631])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BFAFA26ACD
+        for <kvm@vger.kernel.org>; Mon,  1 Aug 2022 17:49:19 -0700 (PDT)
+Received: by mail-pl1-x631.google.com with SMTP id o3so11997886ple.5
+        for <kvm@vger.kernel.org>; Mon, 01 Aug 2022 17:49:19 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc;
+        bh=fYrbrS8yv9H/RvUOOyuHQrSi1loIQEHWMZ/8CZZ3RXc=;
+        b=gO0RsnmpomRU40aaGuswU5stzk1dV4NDc3pxJ6zSc9zcDzvqVHJEsaTU46TCCnnEDM
+         VIM2Q44ozglwDHGobO6GUhmj4taro6Si7I5uJlkeFvBIDIYNgCZMO9DNDT/Fr4nlOf8j
+         FKfGYbL8I576CFY482PM+hUdjOGAEqqzJXYVPR8s7R687SE/sN2YRJ0jIEeCCsAk1y6f
+         DVn0KhP6WN2ELlJd8pOY+UaucR7IsHDggLN+juJdfB22mcm/n8UKO1ldaQKA7IYzA1tt
+         upHroORCIR8C9toovIJlWRMZF59BNixyWef3Z9805sHHgrSaCK+JCYEP+TBUe8H+AEPS
+         tz/g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc;
+        bh=fYrbrS8yv9H/RvUOOyuHQrSi1loIQEHWMZ/8CZZ3RXc=;
+        b=jaVnd4Hz49/NMOv0wF+w6RRLAZIxS3rauJKyMmpgBiJ4DUNARr1RBMIT06Lk7UEM8I
+         brY4tZdXYcWd1rv9nzD07hT+yg+sPVPJeyC4OPtFrYv52cc6s4GHcXGaIMiIQHWLh6am
+         3koFbFxkAOH/TJVw6nIxQpuSTmk9VMGskpzLTebkfzImWL44fdUaX3WZNaffIcuBPWAd
+         Vvskq3ety+8h0EVnYpIQXDokUL8KZ0DA6uGZCg/GG6Q/UsOlSpUf+/CiWRWOr8bdGojX
+         SwyPGFG6+39QknY71gioNaht6cQlOo4SHtroKpgEK7bo3vNjNb8VcLc4dN3KP16yOwew
+         IfFQ==
+X-Gm-Message-State: ACgBeo296FeDuNNPGTIKPKcGI6TgAkMBILkZTu6kEiJY3VLSNpMt/Ayx
+        gjAE0qCclDFabmakr7WRdIlEHg==
+X-Google-Smtp-Source: AA6agR5NFcyJ/Eqf8Y9BodOFj30Va8ngMe4AFfAM05tfz+rj1jrOYkiljXtYcYQIlQH1KwHfCRTqmw==
+X-Received: by 2002:a17:903:1209:b0:16c:ece7:f68b with SMTP id l9-20020a170903120900b0016cece7f68bmr19190691plh.112.1659401359068;
+        Mon, 01 Aug 2022 17:49:19 -0700 (PDT)
+Received: from google.com (7.104.168.34.bc.googleusercontent.com. [34.168.104.7])
+        by smtp.gmail.com with ESMTPSA id o1-20020a170902d4c100b0016c4147e48asm5966869plg.219.2022.08.01.17.49.18
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 01 Aug 2022 17:49:18 -0700 (PDT)
+Date:   Tue, 2 Aug 2022 00:49:14 +0000
+From:   Sean Christopherson <seanjc@google.com>
+To:     Chao Peng <chao.p.peng@linux.intel.com>
+Cc:     Wei Wang <wei.w.wang@linux.intel.com>,
+        "Gupta, Pankaj" <pankaj.gupta@amd.com>, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org, linux-mm@kvack.org,
+        linux-fsdevel@vger.kernel.org, linux-api@vger.kernel.org,
+        linux-doc@vger.kernel.org, qemu-devel@nongnu.org,
+        linux-kselftest@vger.kernel.org,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Jonathan Corbet <corbet@lwn.net>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+        x86@kernel.org, "H . Peter Anvin" <hpa@zytor.com>,
+        Hugh Dickins <hughd@google.com>,
+        Jeff Layton <jlayton@kernel.org>,
+        "J . Bruce Fields" <bfields@fieldses.org>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        Shuah Khan <shuah@kernel.org>, Mike Rapoport <rppt@kernel.org>,
+        Steven Price <steven.price@arm.com>,
+        "Maciej S . Szmigiero" <mail@maciej.szmigiero.name>,
+        Vlastimil Babka <vbabka@suse.cz>,
+        Vishal Annapurve <vannapurve@google.com>,
+        Yu Zhang <yu.c.zhang@linux.intel.com>,
+        "Kirill A . Shutemov" <kirill.shutemov@linux.intel.com>,
+        luto@kernel.org, jun.nakajima@intel.com, dave.hansen@intel.com,
+        ak@linux.intel.com, david@redhat.com, aarcange@redhat.com,
+        ddutile@redhat.com, dhildenb@redhat.com,
+        Quentin Perret <qperret@google.com>,
+        Michael Roth <michael.roth@amd.com>, mhocko@suse.com,
+        Muchun Song <songmuchun@bytedance.com>
+Subject: Re: [PATCH v7 11/14] KVM: Register/unregister the guest private
+ memory regions
+Message-ID: <Yuh0ikhoh+tCK6VW@google.com>
+References: <20220719140843.GA84779@chaop.bj.intel.com>
+ <36e671d2-6b95-8e4f-c2ac-fee4b2670c6e@amd.com>
+ <20220720150706.GB124133@chaop.bj.intel.com>
+ <d0fd229d-afa6-c66d-3e55-09ac5877453e@amd.com>
+ <YtgrkXqP/GIi9ujZ@google.com>
+ <45ae9f57-d595-f202-abb5-26a03a2ca131@linux.intel.com>
+ <20220721092906.GA153288@chaop.bj.intel.com>
+ <YtmT2irvgInX1kPp@google.com>
+ <20220725130417.GA304216@chaop.bj.intel.com>
+ <YuQ64RgWqdoAAGdY@google.com>
 MIME-Version: 1.0
-X-Spam-Status: No, score=-5.0 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
-        SPF_HELO_NONE,SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <YuQ64RgWqdoAAGdY@google.com>
+X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
+        USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=unavailable
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, 2022-08-01 at 23:20 +0000, Sean Christopherson wrote:
-> On Tue, Aug 02, 2022, Kai Huang wrote:
-> > On Mon, 2022-08-01 at 14:15 +0000, Sean Christopherson wrote:
-> > > Another thing to note is that only the value needs to be per-VM, the =
-mask can be
-> > > KVM-wide, i.e. "mask =3D SUPPRESS_VE | RWX" will work for TDX and non=
--TDX VMs when
-> > > EPT is enabled.
-> >=20
-> > Yeah, but is more like VMX and TDX both *happen* to have the same mask?=
-=20
-> > Theoretically,  VMX only need RWX to trigger EPT misconfiguration but d=
-oesn't
-> > need SUPPRESS_VE.
->=20
-> Right, SUPPRESS_VE isn't strictly necessary, but KVM already deliberately=
- avoids
-> bit 63 because it has meaning, e.g. SUPPRESS_VE for EPT and NX for PAE an=
-d 64-bit
-> paging. =20
->=20
-> > I don't see making mask/value both per-vm is a big issue?
->=20
-> Yes and no.
->=20
-> No, in the sense that it's not a big issue in terms of code. =20
->=20
-> Yes, because of the connotations of having a per-VM mask.  While having S=
-UPPRESS_VE
-> in the mask for non-TDX EPT isn't strictly necessary, it's also not stric=
-tly necessary
-> to _not_ have it in the mask. =C2=A0
->=20
+On Fri, Jul 29, 2022, Sean Christopherson wrote:
+> On Mon, Jul 25, 2022, Chao Peng wrote:
+> > On Thu, Jul 21, 2022 at 05:58:50PM +0000, Sean Christopherson wrote:
+> > > On Thu, Jul 21, 2022, Chao Peng wrote:
+> > > > On Thu, Jul 21, 2022 at 03:34:59PM +0800, Wei Wang wrote:
+> > > > > 
+> > > > > 
+> > > > > On 7/21/22 00:21, Sean Christopherson wrote:
+> > > > > Maybe you could tag it with cgs for all the confidential guest support
+> > > > > related stuff: e.g. kvm_vm_ioctl_set_cgs_mem()
+> > > > > 
+> > > > > bool is_private = ioctl == KVM_MEMORY_ENCRYPT_REG_REGION;
+> > > > > ...
+> > > > > kvm_vm_ioctl_set_cgs_mem(, is_private)
+> > > > 
+> > > > If we plan to widely use such abbr. through KVM (e.g. it's well known),
+> > > > I'm fine.
+> > > 
+> > > I'd prefer to stay away from "confidential guest", and away from any VM-scoped
+> > > name for that matter.  User-unmappable memmory has use cases beyond hiding guest
+> > > state from the host, e.g. userspace could use inaccessible/unmappable memory to
+> > > harden itself against unintentional access to guest memory.
+> > > 
+> > > > I actually use mem_attr in patch: https://lkml.org/lkml/2022/7/20/610
+> > > > But I also don't quite like it, it's so generic and sounds say nothing.
+> > > > 
+> > > > But I do want a name can cover future usages other than just 
+> > > > private/shared (pKVM for example may have a third state).
+> > > 
+> > > I don't think there can be a third top-level state.  Memory is either private to
+> > > the guest or it's not.  There can be sub-states, e.g. memory could be selectively
+> > > shared or encrypted with a different key, in which case we'd need metadata to
+> > > track that state.
+> > > 
+> > > Though that begs the question of whether or not private_fd is the correct
+> > > terminology.  E.g. if guest memory is backed by a memfd that can't be mapped by
+> > > userspace (currently F_SEAL_INACCESSIBLE), but something else in the kernel plugs
+> > > that memory into a device or another VM, then arguably that memory is shared,
+> > > especially the multi-VM scenario.
+> > > 
+> > > For TDX and SNP "private vs. shared" is likely the correct terminology given the
+> > > current specs, but for generic KVM it's probably better to align with whatever
+> > > terminology is used for memfd.  "inaccessible_fd" and "user_inaccessible_fd" are
+> > > a bit odd since the fd itself is accesible.
+> > > 
+> > > What about "user_unmappable"?  E.g.
+> > > 
+> > >   F_SEAL_USER_UNMAPPABLE, MFD_USER_UNMAPPABLE, KVM_HAS_USER_UNMAPPABLE_MEMORY,
+> > >   MEMFILE_F_USER_INACCESSIBLE, user_unmappable_fd, etc...
+> > 
+> > For KVM I also think user_unmappable looks better than 'private', e.g.
+> > user_unmappable_fd/KVM_HAS_USER_UNMAPPABLE_MEMORY sounds more
+> > appropriate names. For memfd however, I don't feel that strong to change
+> > it from current 'inaccessible' to 'user_unmappable', one of the reason
+> > is it's not just about unmappable, but actually also inaccessible
+> > through direct ioctls like read()/write().
+> 
+> Heh, I _knew_ there had to be a catch.  I agree that INACCESSIBLE is better for
+> memfd.
 
-I think the 'mask' itself is ambiguous, i.e. it doesn't say in what circums=
-tance
-we should include one bit to the mask.  My understanding is any bit in the
-'mask' should at least be related to the 'value' that can enable MMIO cachi=
-ng.
+Thought about this some more...
 
-So if SUPPRESS_VE bit is not related to non-TDX EPT (as we want EPT
-misconfiguration, but not EPT violation), I don't see why we need to includ=
-e it
-to the  'mask'.
+I think we should avoid UNMAPPABLE even on the KVM side of things for the core
+memslots functionality and instead be very literal, e.g.
 
-> In other words, having a per-VM mask incorrectly
-> implies that TDX _must_ have a different mask.
+	KVM_HAS_FD_BASED_MEMSLOTS
+	KVM_MEM_FD_VALID
 
-I interpret as TDX _can_, but not _must_.=20
+We'll still need KVM_HAS_USER_UNMAPPABLE_MEMORY, but it won't be tied directly to
+the memslot.  Decoupling the two thingis will require a bit of extra work, but the
+code impact should be quite small, e.g. explicitly query and propagate
+MEMFILE_F_USER_INACCESSIBLE to kvm_memory_slot to track if a memslot can be private.
+And unless I'm missing something, it won't require an additional memslot flag.
+The biggest oddity (if we don't also add KVM_MEM_PRIVATE) is that KVM would
+effectively ignore the hva for fd-based memslots for VM types that don't support
+private memory, i.e. userspace can't opt out of using the fd-based backing, but that
+doesn't seem like a deal breaker.
 
->=20
-> It's also one more piece of information that developers have to track dow=
-n and
-> account for, i.e. one more thing we can screw up.
->=20
-> The other aspect of MMIO SPTEs are that the mask bits must not overlap th=
-e generation
-> bits or shadow-present bit, and changing any of those bits requires caref=
-ul
-> consideration, i.e. defining the set of _allowed_ mask bits on a per-VM b=
-asis would
-> incur significant complexity without providing meaningful benefit. =C2=A0
->=20
+Decoupling private memory from fd-based memslots will allow using fd-based memslots
+for backing VMs even if the memory is user mappable, which opens up potentially
+interesting use cases.  It would also allow testing some parts of fd-based memslots
+with existing VMs.
 
-Agreed on this.
+The big advantage of KVM's hva-based memslots is that KVM doesn't care what's backing
+a memslot, and so (in thoery) enabling new backing stores for KVM is free.  It's not
+always free, but at this point I think we've eliminated most of the hiccups, e.g. x86's
+MMU should no longer require additional enlightenment to support huge pages for new
+backing types.
 
-But we are not checking any of those in kvm_mmu_set_mmio_spte_mask(), right=
-? :)
+On the flip-side, a big disadvantage of hva-based memslots is that KVM doesn't
+_know_ what's backing a memslot.  This is one of the major reasons, if not _the_
+main reason at this point, why KVM binds a VM to a single virtual address space.
+Running with different hva=>pfn mappings would either be completely unsafe or
+prohibitively expensive (nearly impossible?) to ensure.
 
-Also Isaku's patch extends kvm_mmu_set_mmio_spte_mask() to take 'kvm' or 'v=
-cpu'
-as parameter so it's easy to check there -- not 100% sure about other place=
-s,
-though.
+With fd-based memslots, KVM essentially binds a memslot directly to the backing
+store.  This allows KVM to do a "deep" comparison of a memslot between two address
+spaces simply by checking that the backing store is the same.  For intra-host/copyless
+migration (to upgrade the userspace VMM), being able to do a deep comparison would
+theoretically allow transferring KVM's page tables between VMs instead of forcing
+the target VM to rebuild the page tables.  There are memcg complications (and probably
+many others) for transferring page tables, but I'm pretty sure it could work.
 
-> As a result,
-> it's highly unlikely that we'll ever want to opportunsitically "reclaim" =
-bit 63
-> for MMIO SPTEs, so there's practically zero cost if it's included in the =
-mask for
-> non-TDX EPT.
-
-Sorry I don't understand this.  If we will never "reclaim" bit 63 for MMIO =
-SPTEs
-(for non-TDX EPT), then why bother including it to the mask?
-
---=20
-Thanks,
--Kai
-
-
+I don't have a concrete use case (this is a recent idea on my end), but since we're
+already adding fd-based memory, I can't think of a good reason not make it more generic
+for not much extra cost.  And there are definitely classes of VMs for which fd-based
+memory would Just Work, e.g. large VMs that are never oversubscribed on memory don't
+need to support reclaim, so the fact that fd-based memslots won't support page aging
+(among other things) right away is a non-issue.
