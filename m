@@ -2,97 +2,114 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 80D15587797
-	for <lists+kvm@lfdr.de>; Tue,  2 Aug 2022 09:12:23 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id C3B80587799
+	for <lists+kvm@lfdr.de>; Tue,  2 Aug 2022 09:13:03 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235830AbiHBHMT (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 2 Aug 2022 03:12:19 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51764 "EHLO
+        id S235588AbiHBHNB (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 2 Aug 2022 03:13:01 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52126 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235759AbiHBHMO (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 2 Aug 2022 03:12:14 -0400
-Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 782C649B5C
-        for <kvm@vger.kernel.org>; Tue,  2 Aug 2022 00:12:10 -0700 (PDT)
-Received: from pps.filterd (m0098399.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.17.1.5/8.17.1.5) with ESMTP id 2726vqDg011796
-        for <kvm@vger.kernel.org>; Tue, 2 Aug 2022 07:12:10 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=content-type :
- mime-version : content-transfer-encoding : in-reply-to : references :
- subject : cc : to : from : message-id : date; s=pp1;
- bh=vN/aNtrLroRGVLLpZlQLVbcriTwmcJwUJignruRKN/E=;
- b=bTYLzRCf35Ct4FcBnQ2MoCR23REkN6pS28mAl0T4pgzCayPovMPnzwEyzSrvyAY1gqnE
- OF+OKb8PS/YqGYWrGdZjrovYurdVqrXgWriByqXz8L2VKFMUimsbEUbpYuu9LlQlD2Bt
- Mghb1QeoJ8G6VrfhntMQ0i+H2rZnnw9XNOBdnm3Li0ZhnHVjAMcdfZSbkp9HFvAhEDA0
- FfPjNFFoCsBKUPFpWSLJLJdAbdHikIUIkMGyk7LMP09X/57XL24czk/lemLl7OWt5bKX
- vzFAPbcfTogf18j+zqtSB0nIUamvK4Gc7yOf1AuMN7fDz4KRli1fHrXfmvwui05w792v SA== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3hpy4arecq-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT)
-        for <kvm@vger.kernel.org>; Tue, 02 Aug 2022 07:12:09 +0000
-Received: from m0098399.ppops.net (m0098399.ppops.net [127.0.0.1])
-        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 2726wHhA012936
-        for <kvm@vger.kernel.org>; Tue, 2 Aug 2022 07:12:09 GMT
-Received: from ppma03ams.nl.ibm.com (62.31.33a9.ip4.static.sl-reverse.com [169.51.49.98])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3hpy4arec0-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 02 Aug 2022 07:12:09 +0000
-Received: from pps.filterd (ppma03ams.nl.ibm.com [127.0.0.1])
-        by ppma03ams.nl.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 27275bb5011727;
-        Tue, 2 Aug 2022 07:12:07 GMT
-Received: from b06cxnps3075.portsmouth.uk.ibm.com (d06relay10.portsmouth.uk.ibm.com [9.149.109.195])
-        by ppma03ams.nl.ibm.com with ESMTP id 3hmv98ub5y-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 02 Aug 2022 07:12:07 +0000
-Received: from d06av26.portsmouth.uk.ibm.com (d06av26.portsmouth.uk.ibm.com [9.149.105.62])
-        by b06cxnps3075.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 2727C4ga28246470
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Tue, 2 Aug 2022 07:12:04 GMT
-Received: from d06av26.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id F077AAE056;
-        Tue,  2 Aug 2022 07:12:03 +0000 (GMT)
-Received: from d06av26.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id D556AAE055;
-        Tue,  2 Aug 2022 07:12:03 +0000 (GMT)
-Received: from li-ca45c2cc-336f-11b2-a85c-c6e71de567f1.ibm.com (unknown [9.171.89.124])
-        by d06av26.portsmouth.uk.ibm.com (Postfix) with ESMTP;
-        Tue,  2 Aug 2022 07:12:03 +0000 (GMT)
-Content-Type: text/plain; charset="utf-8"
+        with ESMTP id S232759AbiHBHM4 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 2 Aug 2022 03:12:56 -0400
+Received: from mail-pj1-x1044.google.com (mail-pj1-x1044.google.com [IPv6:2607:f8b0:4864:20::1044])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 03C3932DBA;
+        Tue,  2 Aug 2022 00:12:56 -0700 (PDT)
+Received: by mail-pj1-x1044.google.com with SMTP id x2-20020a17090ab00200b001f4da5cdc9cso7513547pjq.0;
+        Tue, 02 Aug 2022 00:12:55 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc;
+        bh=H+nBQdQuCW3uq6+l/DiJOsc5BtydpsXCE4yEPObq9cM=;
+        b=S8XcWuxRhvqJVqCZ1mQt3cZirZHBpz0stnQbyQ7jBziyzl5P2TIWlFa3rR2VCeP8tu
+         KzU9ugu6MCN2unvnXWYVkY86Ck803pJHXwrhYDRFTubkZVMaVTK83epzzN3HEoKf76yC
+         uxxoIC625B80mJDPAjLNiAdniWh+90k293VuXFWpKP7LF1wEKnOEsg89hW686oFYqudh
+         ahjj7sw61M4gKBPvnklfF6leifjRfU2u5//nezKattkQLRRJKHxVpmvDaK0QTxx7oQQN
+         IzY6qCPKX+DVSt+JxrrJkzhiUQh7DwQr47kB/ZkqBwguElX/wCZfJt/e5BYxsRN0hf2p
+         N/dA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc;
+        bh=H+nBQdQuCW3uq6+l/DiJOsc5BtydpsXCE4yEPObq9cM=;
+        b=2WAhd34XTVdVj6KVVuKXU8TBVaiYNeRuMfyUlN37pAiyJUWxZZKY/Fwq5S63xbFuSk
+         zndIo0hfJe95eUt0UbUyKMpwTpb8QKli/0cLZQ8A1ZAC882sc7B/ugUDy83Jj29am/eC
+         T+UFiXDnPgA1fs7pmivTVDcjW6FHE11LScRKeKedDXBIwx0YlTfKXbalRHOVC9QF5XFI
+         rIi/NSIt0O4kgp8k+Z5KKTFRUtnS52Ze6wXs+zWhMc3abz5hoIq0Tx0PN01C1at0aIOm
+         CjIQpdpTV827PIWnlU2h0hZ3u6OAqkrC80bzcJQFQZHt0U1LbdtilKd0/ngJ49g/wkWF
+         LQMw==
+X-Gm-Message-State: ACgBeo3sYx0JU5SCj92yyfiCjlik124J8NOuqqjLVJxGXxlQ+1RnnR63
+        gkWYMFheX1y/kX5GAev2EGK9fw+akcY=
+X-Google-Smtp-Source: AA6agR6XWcVoRurLS07GBJOFohs3JZHIf7SiDbCoGZKzwZP6ERMTgzFG0+ZoZt2/Q6XStXyvre4R4g==
+X-Received: by 2002:a17:90b:164b:b0:1f5:15ae:3206 with SMTP id il11-20020a17090b164b00b001f515ae3206mr5331278pjb.140.1659424375397;
+        Tue, 02 Aug 2022 00:12:55 -0700 (PDT)
+Received: from CLOUDLIANG-MB2.tencent.com ([103.7.29.32])
+        by smtp.gmail.com with ESMTPSA id x21-20020a1709027c1500b0016dd4b1ceb5sm8843833pll.124.2022.08.02.00.12.52
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 02 Aug 2022 00:12:55 -0700 (PDT)
+From:   Jinrong Liang <ljr.kernel@gmail.com>
+X-Google-Original-From: Jinrong Liang <cloudliang@tencent.com>
+To:     Paolo Bonzini <pbonzini@redhat.com>
+Cc:     Wanpeng Li <wanpengli@tencent.com>,
+        Sean Christopherson <seanjc@google.com>,
+        Jim Mattson <jmattson@google.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Joerg Roedel <joro@8bytes.org>,
+        Jinrong Liang <cloudliang@tencent.com>, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+Subject: [PATCH] selftests: kvm: Fix a compile error in selftests/kvm/rseq_test.c
+Date:   Tue,  2 Aug 2022 15:12:40 +0800
+Message-Id: <20220802071240.84626-1-cloudliang@tencent.com>
+X-Mailer: git-send-email 2.32.1 (Apple Git-133)
 MIME-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
-In-Reply-To: <20220729082633.277240-3-frankja@linux.ibm.com>
-References: <20220729082633.277240-1-frankja@linux.ibm.com> <20220729082633.277240-3-frankja@linux.ibm.com>
-Subject: Re: [kvm-unit-tests PATCH 2/6] s390x: MAKEFILE: Use $< instead of pathsubst
-Cc:     imbrenda@linux.ibm.com, seiden@linux.ibm.com, scgl@linux.ibm.com,
-        thuth@redhat.com
-To:     Janosch Frank <frankja@linux.ibm.com>, kvm@vger.kernel.org
-From:   Nico Boehr <nrb@linux.ibm.com>
-Message-ID: <165942432367.253051.17368935462468430956@localhost.localdomain>
-User-Agent: alot/0.8.1
-Date:   Tue, 02 Aug 2022 09:12:03 +0200
-X-TM-AS-GCONF: 00
-X-Proofpoint-ORIG-GUID: BJjHkErNpeCeBMv3Fz9nO49f8QX2_zQ0
-X-Proofpoint-GUID: SSI5oMSBeyxxGzNE7YamvmL60pdLG2R4
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.205,Aquarius:18.0.883,Hydra:6.0.517,FMLib:17.11.122.1
- definitions=2022-08-02_03,2022-08-01_01,2022-06-22_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 malwarescore=0 suspectscore=0
- adultscore=0 mlxlogscore=611 mlxscore=0 bulkscore=0 phishscore=0
- clxscore=1015 impostorscore=0 spamscore=0 lowpriorityscore=0
- priorityscore=1501 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2206140000 definitions=main-2208020033
-X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_EF,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_PASS
-        autolearn=ham autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
+        RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Quoting Janosch Frank (2022-07-29 10:26:29)
-> No need to mangle strings if we already have the value at hand.
->=20
-> Signed-off-by: Janosch Frank <frankja@linux.ibm.com>
+From: Jinrong Liang <cloudliang@tencent.com>
 
-Reviewed-by: Nico Boehr <nrb@linux.ibm.com>
+The following warning appears when executing:
+	make -C tools/testing/selftests/kvm
+
+rseq_test.c: In function ‘main’:
+rseq_test.c:237:33: warning: implicit declaration of function ‘gettid’; did you mean ‘getgid’? [-Wimplicit-function-declaration]
+          (void *)(unsigned long)gettid());
+                                 ^~~~~~
+                                 getgid
+/usr/bin/ld: /tmp/ccr5mMko.o: in function `main':
+../kvm/tools/testing/selftests/kvm/rseq_test.c:237: undefined reference to `gettid'
+collect2: error: ld returned 1 exit status
+make: *** [../lib.mk:173: ../kvm/tools/testing/selftests/kvm/rseq_test] Error 1
+
+Use the more compatible syscall(SYS_gettid) instead of gettid() to fix it.
+More subsequent reuse may cause it to be wrapped in a lib file.
+
+Signed-off-by: Jinrong Liang <cloudliang@tencent.com>
+---
+ tools/testing/selftests/kvm/rseq_test.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/tools/testing/selftests/kvm/rseq_test.c b/tools/testing/selftests/kvm/rseq_test.c
+index a54d4d05a058..299d316cc759 100644
+--- a/tools/testing/selftests/kvm/rseq_test.c
++++ b/tools/testing/selftests/kvm/rseq_test.c
+@@ -229,7 +229,7 @@ int main(int argc, char *argv[])
+ 	ucall_init(vm, NULL);
+ 
+ 	pthread_create(&migration_thread, NULL, migration_worker,
+-		       (void *)(unsigned long)gettid());
++		       (void *)(unsigned long)syscall(SYS_gettid));
+ 
+ 	for (i = 0; !done; i++) {
+ 		vcpu_run(vcpu);
+-- 
+2.37.1
+
