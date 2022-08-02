@@ -2,107 +2,62 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id CF0435874E4
-	for <lists+kvm@lfdr.de>; Tue,  2 Aug 2022 02:49:31 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 6CDC45874E9
+	for <lists+kvm@lfdr.de>; Tue,  2 Aug 2022 02:55:15 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234882AbiHBAt0 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 1 Aug 2022 20:49:26 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:32916 "EHLO
+        id S231544AbiHBAzD (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 1 Aug 2022 20:55:03 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35334 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234875AbiHBAtX (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 1 Aug 2022 20:49:23 -0400
-Received: from mail-pl1-x631.google.com (mail-pl1-x631.google.com [IPv6:2607:f8b0:4864:20::631])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BFAFA26ACD
-        for <kvm@vger.kernel.org>; Mon,  1 Aug 2022 17:49:19 -0700 (PDT)
-Received: by mail-pl1-x631.google.com with SMTP id o3so11997886ple.5
-        for <kvm@vger.kernel.org>; Mon, 01 Aug 2022 17:49:19 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc;
-        bh=fYrbrS8yv9H/RvUOOyuHQrSi1loIQEHWMZ/8CZZ3RXc=;
-        b=gO0RsnmpomRU40aaGuswU5stzk1dV4NDc3pxJ6zSc9zcDzvqVHJEsaTU46TCCnnEDM
-         VIM2Q44ozglwDHGobO6GUhmj4taro6Si7I5uJlkeFvBIDIYNgCZMO9DNDT/Fr4nlOf8j
-         FKfGYbL8I576CFY482PM+hUdjOGAEqqzJXYVPR8s7R687SE/sN2YRJ0jIEeCCsAk1y6f
-         DVn0KhP6WN2ELlJd8pOY+UaucR7IsHDggLN+juJdfB22mcm/n8UKO1ldaQKA7IYzA1tt
-         upHroORCIR8C9toovIJlWRMZF59BNixyWef3Z9805sHHgrSaCK+JCYEP+TBUe8H+AEPS
-         tz/g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc;
-        bh=fYrbrS8yv9H/RvUOOyuHQrSi1loIQEHWMZ/8CZZ3RXc=;
-        b=jaVnd4Hz49/NMOv0wF+w6RRLAZIxS3rauJKyMmpgBiJ4DUNARr1RBMIT06Lk7UEM8I
-         brY4tZdXYcWd1rv9nzD07hT+yg+sPVPJeyC4OPtFrYv52cc6s4GHcXGaIMiIQHWLh6am
-         3koFbFxkAOH/TJVw6nIxQpuSTmk9VMGskpzLTebkfzImWL44fdUaX3WZNaffIcuBPWAd
-         Vvskq3ety+8h0EVnYpIQXDokUL8KZ0DA6uGZCg/GG6Q/UsOlSpUf+/CiWRWOr8bdGojX
-         SwyPGFG6+39QknY71gioNaht6cQlOo4SHtroKpgEK7bo3vNjNb8VcLc4dN3KP16yOwew
-         IfFQ==
-X-Gm-Message-State: ACgBeo296FeDuNNPGTIKPKcGI6TgAkMBILkZTu6kEiJY3VLSNpMt/Ayx
-        gjAE0qCclDFabmakr7WRdIlEHg==
-X-Google-Smtp-Source: AA6agR5NFcyJ/Eqf8Y9BodOFj30Va8ngMe4AFfAM05tfz+rj1jrOYkiljXtYcYQIlQH1KwHfCRTqmw==
-X-Received: by 2002:a17:903:1209:b0:16c:ece7:f68b with SMTP id l9-20020a170903120900b0016cece7f68bmr19190691plh.112.1659401359068;
-        Mon, 01 Aug 2022 17:49:19 -0700 (PDT)
-Received: from google.com (7.104.168.34.bc.googleusercontent.com. [34.168.104.7])
-        by smtp.gmail.com with ESMTPSA id o1-20020a170902d4c100b0016c4147e48asm5966869plg.219.2022.08.01.17.49.18
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 01 Aug 2022 17:49:18 -0700 (PDT)
-Date:   Tue, 2 Aug 2022 00:49:14 +0000
-From:   Sean Christopherson <seanjc@google.com>
-To:     Chao Peng <chao.p.peng@linux.intel.com>
-Cc:     Wei Wang <wei.w.wang@linux.intel.com>,
-        "Gupta, Pankaj" <pankaj.gupta@amd.com>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org, linux-mm@kvack.org,
-        linux-fsdevel@vger.kernel.org, linux-api@vger.kernel.org,
-        linux-doc@vger.kernel.org, qemu-devel@nongnu.org,
-        linux-kselftest@vger.kernel.org,
+        with ESMTP id S229505AbiHBAzB (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 1 Aug 2022 20:55:01 -0400
+Received: from mga12.intel.com (mga12.intel.com [192.55.52.136])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 594F025E95
+        for <kvm@vger.kernel.org>; Mon,  1 Aug 2022 17:55:00 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1659401700; x=1690937700;
+  h=date:from:to:cc:subject:message-id:mime-version;
+  bh=C8LS4TGJ5r8pXQI7E6To8/yPXWG+MGLaW4BGHuenJn8=;
+  b=O21gxaogDLBq44ALjSvmk4eRqHyPi9t2HPRnpOzA7FEFBJlrjNQQP8dK
+   jC34A4LUFXKixz9y1sNCOaWmgU9G4gtDwD+FPwSn4s2EyYMMmqJr0J9V7
+   tLBCbtk0ZI8U3J4mBqOHSoLbbqxnf8xCdr7sdVnQ2pu017O3FKQyaD9G1
+   C6qvMIlRFYsVtjBW88vu37XKBXbUwm9F9e/Z5bfGHMmrPn73YMb3CJ8x+
+   CGTMc5xaIDcKpmZdLzQ5waGg6NqhwlQfWetkKmFzhqZv9mrrOLLmZLZUP
+   fv61+cYw0UYjhhPI+jbDSGcTziZo/o/Uam8kCw6hmSOzg3JxT2486Za3V
+   Q==;
+X-IronPort-AV: E=McAfee;i="6400,9594,10426"; a="269055597"
+X-IronPort-AV: E=Sophos;i="5.93,209,1654585200"; 
+   d="scan'208";a="269055597"
+Received: from orsmga008.jf.intel.com ([10.7.209.65])
+  by fmsmga106.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 01 Aug 2022 17:55:00 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.93,209,1654585200"; 
+   d="scan'208";a="630488106"
+Received: from lkp-server01.sh.intel.com (HELO e0eace57cfef) ([10.239.97.150])
+  by orsmga008.jf.intel.com with ESMTP; 01 Aug 2022 17:54:57 -0700
+Received: from kbuild by e0eace57cfef with local (Exim 4.96)
+        (envelope-from <lkp@intel.com>)
+        id 1oIgBU-000FXH-3C;
+        Tue, 02 Aug 2022 00:54:56 +0000
+Date:   Tue, 2 Aug 2022 08:54:02 +0800
+From:   kernel test robot <lkp@intel.com>
+To:     Sean Christopherson <seanjc@google.com>
+Cc:     llvm@lists.linux.dev, kbuild-all@lists.01.org, kvm@vger.kernel.org,
+        Robert Hu <robert.hu@intel.com>,
+        Farrah Chen <farrah.chen@intel.com>,
+        Danmei Wei <danmei.wei@intel.com>,
         Paolo Bonzini <pbonzini@redhat.com>,
-        Jonathan Corbet <corbet@lwn.net>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        x86@kernel.org, "H . Peter Anvin" <hpa@zytor.com>,
-        Hugh Dickins <hughd@google.com>,
-        Jeff Layton <jlayton@kernel.org>,
-        "J . Bruce Fields" <bfields@fieldses.org>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        Shuah Khan <shuah@kernel.org>, Mike Rapoport <rppt@kernel.org>,
-        Steven Price <steven.price@arm.com>,
-        "Maciej S . Szmigiero" <mail@maciej.szmigiero.name>,
-        Vlastimil Babka <vbabka@suse.cz>,
-        Vishal Annapurve <vannapurve@google.com>,
-        Yu Zhang <yu.c.zhang@linux.intel.com>,
-        "Kirill A . Shutemov" <kirill.shutemov@linux.intel.com>,
-        luto@kernel.org, jun.nakajima@intel.com, dave.hansen@intel.com,
-        ak@linux.intel.com, david@redhat.com, aarcange@redhat.com,
-        ddutile@redhat.com, dhildenb@redhat.com,
-        Quentin Perret <qperret@google.com>,
-        Michael Roth <michael.roth@amd.com>, mhocko@suse.com,
-        Muchun Song <songmuchun@bytedance.com>
-Subject: Re: [PATCH v7 11/14] KVM: Register/unregister the guest private
- memory regions
-Message-ID: <Yuh0ikhoh+tCK6VW@google.com>
-References: <20220719140843.GA84779@chaop.bj.intel.com>
- <36e671d2-6b95-8e4f-c2ac-fee4b2670c6e@amd.com>
- <20220720150706.GB124133@chaop.bj.intel.com>
- <d0fd229d-afa6-c66d-3e55-09ac5877453e@amd.com>
- <YtgrkXqP/GIi9ujZ@google.com>
- <45ae9f57-d595-f202-abb5-26a03a2ca131@linux.intel.com>
- <20220721092906.GA153288@chaop.bj.intel.com>
- <YtmT2irvgInX1kPp@google.com>
- <20220725130417.GA304216@chaop.bj.intel.com>
- <YuQ64RgWqdoAAGdY@google.com>
+        Mingwei Zhang <mizhang@google.com>
+Subject: [kvm:queue 15/59] arch/x86/kvm/mmu/mmu.c:6391:12: error: variable
+ 'pfn' set but not used
+Message-ID: <202208020810.BX9p3C93-lkp@intel.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <YuQ64RgWqdoAAGdY@google.com>
-X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-        USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=unavailable
+X-Spam-Status: No, score=-4.0 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,HEXHASH_WORD,
+        RCVD_IN_DNSWL_MED,SPF_HELO_PASS,SPF_NONE autolearn=ham
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -110,112 +65,83 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Jul 29, 2022, Sean Christopherson wrote:
-> On Mon, Jul 25, 2022, Chao Peng wrote:
-> > On Thu, Jul 21, 2022 at 05:58:50PM +0000, Sean Christopherson wrote:
-> > > On Thu, Jul 21, 2022, Chao Peng wrote:
-> > > > On Thu, Jul 21, 2022 at 03:34:59PM +0800, Wei Wang wrote:
-> > > > > 
-> > > > > 
-> > > > > On 7/21/22 00:21, Sean Christopherson wrote:
-> > > > > Maybe you could tag it with cgs for all the confidential guest support
-> > > > > related stuff: e.g. kvm_vm_ioctl_set_cgs_mem()
-> > > > > 
-> > > > > bool is_private = ioctl == KVM_MEMORY_ENCRYPT_REG_REGION;
-> > > > > ...
-> > > > > kvm_vm_ioctl_set_cgs_mem(, is_private)
-> > > > 
-> > > > If we plan to widely use such abbr. through KVM (e.g. it's well known),
-> > > > I'm fine.
-> > > 
-> > > I'd prefer to stay away from "confidential guest", and away from any VM-scoped
-> > > name for that matter.  User-unmappable memmory has use cases beyond hiding guest
-> > > state from the host, e.g. userspace could use inaccessible/unmappable memory to
-> > > harden itself against unintentional access to guest memory.
-> > > 
-> > > > I actually use mem_attr in patch: https://lkml.org/lkml/2022/7/20/610
-> > > > But I also don't quite like it, it's so generic and sounds say nothing.
-> > > > 
-> > > > But I do want a name can cover future usages other than just 
-> > > > private/shared (pKVM for example may have a third state).
-> > > 
-> > > I don't think there can be a third top-level state.  Memory is either private to
-> > > the guest or it's not.  There can be sub-states, e.g. memory could be selectively
-> > > shared or encrypted with a different key, in which case we'd need metadata to
-> > > track that state.
-> > > 
-> > > Though that begs the question of whether or not private_fd is the correct
-> > > terminology.  E.g. if guest memory is backed by a memfd that can't be mapped by
-> > > userspace (currently F_SEAL_INACCESSIBLE), but something else in the kernel plugs
-> > > that memory into a device or another VM, then arguably that memory is shared,
-> > > especially the multi-VM scenario.
-> > > 
-> > > For TDX and SNP "private vs. shared" is likely the correct terminology given the
-> > > current specs, but for generic KVM it's probably better to align with whatever
-> > > terminology is used for memfd.  "inaccessible_fd" and "user_inaccessible_fd" are
-> > > a bit odd since the fd itself is accesible.
-> > > 
-> > > What about "user_unmappable"?  E.g.
-> > > 
-> > >   F_SEAL_USER_UNMAPPABLE, MFD_USER_UNMAPPABLE, KVM_HAS_USER_UNMAPPABLE_MEMORY,
-> > >   MEMFILE_F_USER_INACCESSIBLE, user_unmappable_fd, etc...
-> > 
-> > For KVM I also think user_unmappable looks better than 'private', e.g.
-> > user_unmappable_fd/KVM_HAS_USER_UNMAPPABLE_MEMORY sounds more
-> > appropriate names. For memfd however, I don't feel that strong to change
-> > it from current 'inaccessible' to 'user_unmappable', one of the reason
-> > is it's not just about unmappable, but actually also inaccessible
-> > through direct ioctls like read()/write().
-> 
-> Heh, I _knew_ there had to be a catch.  I agree that INACCESSIBLE is better for
-> memfd.
+tree:   https://git.kernel.org/pub/scm/virt/kvm/kvm.git queue
+head:   93472b79715378a2386598d6632c654a2223267b
+commit: a8ac499bb6abbd55fe60f1dc2d053f4b5b13aa73 [15/59] KVM: x86/mmu: Don't require refcounted "struct page" to create huge SPTEs
+config: i386-randconfig-a002 (https://download.01.org/0day-ci/archive/20220802/202208020810.BX9p3C93-lkp@intel.com/config)
+compiler: clang version 16.0.0 (https://github.com/llvm/llvm-project 52cd00cabf479aa7eb6dbb063b7ba41ea57bce9e)
+reproduce (this is a W=1 build):
+        wget https://raw.githubusercontent.com/intel/lkp-tests/master/sbin/make.cross -O ~/bin/make.cross
+        chmod +x ~/bin/make.cross
+        # https://git.kernel.org/pub/scm/virt/kvm/kvm.git/commit/?id=a8ac499bb6abbd55fe60f1dc2d053f4b5b13aa73
+        git remote add kvm https://git.kernel.org/pub/scm/virt/kvm/kvm.git
+        git fetch --no-tags kvm queue
+        git checkout a8ac499bb6abbd55fe60f1dc2d053f4b5b13aa73
+        # save the config file
+        mkdir build_dir && cp config build_dir/.config
+        COMPILER_INSTALL_PATH=$HOME/0day COMPILER=clang make.cross W=1 O=build_dir ARCH=i386 SHELL=/bin/bash
 
-Thought about this some more...
+If you fix the issue, kindly add following tag where applicable
+Reported-by: kernel test robot <lkp@intel.com>
 
-I think we should avoid UNMAPPABLE even on the KVM side of things for the core
-memslots functionality and instead be very literal, e.g.
+All errors (new ones prefixed by >>):
 
-	KVM_HAS_FD_BASED_MEMSLOTS
-	KVM_MEM_FD_VALID
+>> arch/x86/kvm/mmu/mmu.c:6391:12: error: variable 'pfn' set but not used [-Werror,-Wunused-but-set-variable]
+           kvm_pfn_t pfn;
+                     ^
+   1 error generated.
 
-We'll still need KVM_HAS_USER_UNMAPPABLE_MEMORY, but it won't be tied directly to
-the memslot.  Decoupling the two thingis will require a bit of extra work, but the
-code impact should be quite small, e.g. explicitly query and propagate
-MEMFILE_F_USER_INACCESSIBLE to kvm_memory_slot to track if a memslot can be private.
-And unless I'm missing something, it won't require an additional memslot flag.
-The biggest oddity (if we don't also add KVM_MEM_PRIVATE) is that KVM would
-effectively ignore the hva for fd-based memslots for VM types that don't support
-private memory, i.e. userspace can't opt out of using the fd-based backing, but that
-doesn't seem like a deal breaker.
 
-Decoupling private memory from fd-based memslots will allow using fd-based memslots
-for backing VMs even if the memory is user mappable, which opens up potentially
-interesting use cases.  It would also allow testing some parts of fd-based memslots
-with existing VMs.
+vim +/pfn +6391 arch/x86/kvm/mmu/mmu.c
 
-The big advantage of KVM's hva-based memslots is that KVM doesn't care what's backing
-a memslot, and so (in thoery) enabling new backing stores for KVM is free.  It's not
-always free, but at this point I think we've eliminated most of the hiccups, e.g. x86's
-MMU should no longer require additional enlightenment to support huge pages for new
-backing types.
+a3fe5dbda0a4bb arch/x86/kvm/mmu/mmu.c David Matlack       2022-01-19  6383  
+3ea3b7fa9af067 arch/x86/kvm/mmu.c     Wanpeng Li          2015-04-03  6384  static bool kvm_mmu_zap_collapsible_spte(struct kvm *kvm,
+0a234f5dd06582 arch/x86/kvm/mmu/mmu.c Sean Christopherson 2021-02-12  6385  					 struct kvm_rmap_head *rmap_head,
+269e9552d20817 arch/x86/kvm/mmu/mmu.c Hamza Mahfooz       2021-07-12  6386  					 const struct kvm_memory_slot *slot)
+3ea3b7fa9af067 arch/x86/kvm/mmu.c     Wanpeng Li          2015-04-03  6387  {
+3ea3b7fa9af067 arch/x86/kvm/mmu.c     Wanpeng Li          2015-04-03  6388  	u64 *sptep;
+3ea3b7fa9af067 arch/x86/kvm/mmu.c     Wanpeng Li          2015-04-03  6389  	struct rmap_iterator iter;
+3ea3b7fa9af067 arch/x86/kvm/mmu.c     Wanpeng Li          2015-04-03  6390  	int need_tlb_flush = 0;
+ba049e93aef7e8 arch/x86/kvm/mmu.c     Dan Williams        2016-01-15 @6391  	kvm_pfn_t pfn;
+3ea3b7fa9af067 arch/x86/kvm/mmu.c     Wanpeng Li          2015-04-03  6392  	struct kvm_mmu_page *sp;
+3ea3b7fa9af067 arch/x86/kvm/mmu.c     Wanpeng Li          2015-04-03  6393  
+0d5367900a319a arch/x86/kvm/mmu.c     Xiao Guangrong      2015-05-13  6394  restart:
+018aabb56d6109 arch/x86/kvm/mmu.c     Takuya Yoshikawa    2015-11-20  6395  	for_each_rmap_spte(rmap_head, &iter, sptep) {
+573546820b792e arch/x86/kvm/mmu/mmu.c Sean Christopherson 2020-06-22  6396  		sp = sptep_to_sp(sptep);
+3ea3b7fa9af067 arch/x86/kvm/mmu.c     Wanpeng Li          2015-04-03  6397  		pfn = spte_to_pfn(*sptep);
+3ea3b7fa9af067 arch/x86/kvm/mmu.c     Wanpeng Li          2015-04-03  6398  
+3ea3b7fa9af067 arch/x86/kvm/mmu.c     Wanpeng Li          2015-04-03  6399  		/*
+decf63336e3564 arch/x86/kvm/mmu.c     Xiao Guangrong      2015-04-14  6400  		 * We cannot do huge page mapping for indirect shadow pages,
+decf63336e3564 arch/x86/kvm/mmu.c     Xiao Guangrong      2015-04-14  6401  		 * which are found on the last rmap (level = 1) when not using
+decf63336e3564 arch/x86/kvm/mmu.c     Xiao Guangrong      2015-04-14  6402  		 * tdp; such shadow pages are synced with the page table in
+decf63336e3564 arch/x86/kvm/mmu.c     Xiao Guangrong      2015-04-14  6403  		 * the guest, and the guest page table is using 4K page size
+decf63336e3564 arch/x86/kvm/mmu.c     Xiao Guangrong      2015-04-14  6404  		 * mapping if the indirect sp has level = 1.
+3ea3b7fa9af067 arch/x86/kvm/mmu.c     Wanpeng Li          2015-04-03  6405  		 */
+5d49f08c2e08c1 arch/x86/kvm/mmu/mmu.c Sean Christopherson 2022-04-29  6406  		if (sp->role.direct &&
+9eba50f8d7fcb6 arch/x86/kvm/mmu/mmu.c Sean Christopherson 2021-02-12  6407  		    sp->role.level < kvm_mmu_max_mapping_level(kvm, slot, sp->gfn,
+a8ac499bb6abbd arch/x86/kvm/mmu/mmu.c Sean Christopherson 2022-07-15  6408  							       PG_LEVEL_NUM)) {
+9202aee816c84d arch/x86/kvm/mmu/mmu.c Sean Christopherson 2022-07-15  6409  			kvm_zap_one_rmap_spte(kvm, rmap_head, sptep);
+40ef75a758b291 arch/x86/kvm/mmu.c     Lan Tianyu          2018-12-06  6410  
+40ef75a758b291 arch/x86/kvm/mmu.c     Lan Tianyu          2018-12-06  6411  			if (kvm_available_flush_tlb_with_range())
+40ef75a758b291 arch/x86/kvm/mmu.c     Lan Tianyu          2018-12-06  6412  				kvm_flush_remote_tlbs_with_address(kvm, sp->gfn,
+40ef75a758b291 arch/x86/kvm/mmu.c     Lan Tianyu          2018-12-06  6413  					KVM_PAGES_PER_HPAGE(sp->role.level));
+40ef75a758b291 arch/x86/kvm/mmu.c     Lan Tianyu          2018-12-06  6414  			else
+3ea3b7fa9af067 arch/x86/kvm/mmu.c     Wanpeng Li          2015-04-03  6415  				need_tlb_flush = 1;
+40ef75a758b291 arch/x86/kvm/mmu.c     Lan Tianyu          2018-12-06  6416  
+0d5367900a319a arch/x86/kvm/mmu.c     Xiao Guangrong      2015-05-13  6417  			goto restart;
+0d5367900a319a arch/x86/kvm/mmu.c     Xiao Guangrong      2015-05-13  6418  		}
+3ea3b7fa9af067 arch/x86/kvm/mmu.c     Wanpeng Li          2015-04-03  6419  	}
+3ea3b7fa9af067 arch/x86/kvm/mmu.c     Wanpeng Li          2015-04-03  6420  
+3ea3b7fa9af067 arch/x86/kvm/mmu.c     Wanpeng Li          2015-04-03  6421  	return need_tlb_flush;
+3ea3b7fa9af067 arch/x86/kvm/mmu.c     Wanpeng Li          2015-04-03  6422  }
+3ea3b7fa9af067 arch/x86/kvm/mmu.c     Wanpeng Li          2015-04-03  6423  
 
-On the flip-side, a big disadvantage of hva-based memslots is that KVM doesn't
-_know_ what's backing a memslot.  This is one of the major reasons, if not _the_
-main reason at this point, why KVM binds a VM to a single virtual address space.
-Running with different hva=>pfn mappings would either be completely unsafe or
-prohibitively expensive (nearly impossible?) to ensure.
+:::::: The code at line 6391 was first introduced by commit
+:::::: ba049e93aef7e8c571567088b1b73f4f5b99272a kvm: rename pfn_t to kvm_pfn_t
 
-With fd-based memslots, KVM essentially binds a memslot directly to the backing
-store.  This allows KVM to do a "deep" comparison of a memslot between two address
-spaces simply by checking that the backing store is the same.  For intra-host/copyless
-migration (to upgrade the userspace VMM), being able to do a deep comparison would
-theoretically allow transferring KVM's page tables between VMs instead of forcing
-the target VM to rebuild the page tables.  There are memcg complications (and probably
-many others) for transferring page tables, but I'm pretty sure it could work.
+:::::: TO: Dan Williams <dan.j.williams@intel.com>
+:::::: CC: Linus Torvalds <torvalds@linux-foundation.org>
 
-I don't have a concrete use case (this is a recent idea on my end), but since we're
-already adding fd-based memory, I can't think of a good reason not make it more generic
-for not much extra cost.  And there are definitely classes of VMs for which fd-based
-memory would Just Work, e.g. large VMs that are never oversubscribed on memory don't
-need to support reclaim, so the fact that fd-based memslots won't support page aging
-(among other things) right away is a non-issue.
+-- 
+0-DAY CI Kernel Test Service
+https://01.org/lkp
