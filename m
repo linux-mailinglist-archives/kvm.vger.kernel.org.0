@@ -2,225 +2,142 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id C0AC8587863
-	for <lists+kvm@lfdr.de>; Tue,  2 Aug 2022 09:51:26 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 92793587877
+	for <lists+kvm@lfdr.de>; Tue,  2 Aug 2022 09:56:18 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236333AbiHBHvW (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 2 Aug 2022 03:51:22 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55010 "EHLO
+        id S236138AbiHBH4R (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 2 Aug 2022 03:56:17 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35846 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S236281AbiHBHvB (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 2 Aug 2022 03:51:01 -0400
-Received: from mga18.intel.com (mga18.intel.com [134.134.136.126])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1AFC84E61E
-        for <kvm@vger.kernel.org>; Tue,  2 Aug 2022 00:50:47 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1659426647; x=1690962647;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=9d4oyG/CgkmpO9z/n+w9m0bZC20Lw31cejDyMq0TkvM=;
-  b=UF8/2+9TfnyevLe4BRBSdJQd2LfJz8RJS/Fh6J7Z0X2GiOpi/FBgQqpf
-   JKLJ93zJ+oKIAn/IvhIxZOMbcXlOoNWEKmv+HA4Kn7LePJzb4L2Defcp9
-   Sr1VPIsNQW55nTCu9rnX/yuHARrbceRrrv3nvIJKkWtbaO9MBGBdGhNIs
-   MB+lfhJndwFM59Pxj6XyrLyHoc/SA7BxclMs/RB+auyXYUEpb51QI3k7N
-   0CxC3nRyySiMpDtq45wpb5VYkAGKzTTf+9iMJvlwyQFdInX8uI/G6OgHu
-   3DxQ6gVCzbPrefdM8YYl2U6DXtl/Fj/4Y8eV9/Y/moUEnyGC61WwwJ/f/
-   A==;
-X-IronPort-AV: E=McAfee;i="6400,9594,10426"; a="272393267"
-X-IronPort-AV: E=Sophos;i="5.93,210,1654585200"; 
-   d="scan'208";a="272393267"
-Received: from orsmga008.jf.intel.com ([10.7.209.65])
-  by orsmga106.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 02 Aug 2022 00:50:46 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.93,210,1654585200"; 
-   d="scan'208";a="630604543"
-Received: from lxy-dell.sh.intel.com ([10.239.48.38])
-  by orsmga008.jf.intel.com with ESMTP; 02 Aug 2022 00:50:42 -0700
-From:   Xiaoyao Li <xiaoyao.li@intel.com>
-To:     Paolo Bonzini <pbonzini@redhat.com>,
-        Isaku Yamahata <isaku.yamahata@gmail.com>,
-        Gerd Hoffmann <kraxel@redhat.com>,
-        =?UTF-8?q?Daniel=20P=20=2E=20Berrang=C3=A9?= <berrange@redhat.com>,
-        =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>,
-        Richard Henderson <richard.henderson@linaro.org>,
-        "Michael S . Tsirkin" <mst@redhat.com>,
-        Marcel Apfelbaum <marcel.apfelbaum@gmail.com>,
-        Cornelia Huck <cohuck@redhat.com>,
-        Marcelo Tosatti <mtosatti@redhat.com>,
-        Laszlo Ersek <lersek@redhat.com>,
-        Eric Blake <eblake@redhat.com>
-Cc:     Connor Kuehl <ckuehl@redhat.com>, erdemaktas@google.com,
-        kvm@vger.kernel.org, qemu-devel@nongnu.org, seanjc@google.com,
-        xiaoyao.li@intel.com
-Subject: [PATCH v1 40/40] docs: Add TDX documentation
-Date:   Tue,  2 Aug 2022 15:47:50 +0800
-Message-Id: <20220802074750.2581308-41-xiaoyao.li@intel.com>
-X-Mailer: git-send-email 2.27.0
-In-Reply-To: <20220802074750.2581308-1-xiaoyao.li@intel.com>
-References: <20220802074750.2581308-1-xiaoyao.li@intel.com>
+        with ESMTP id S236097AbiHBH4P (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 2 Aug 2022 03:56:15 -0400
+Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6DD9E2F039
+        for <kvm@vger.kernel.org>; Tue,  2 Aug 2022 00:56:12 -0700 (PDT)
+Received: from pps.filterd (m0098410.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.17.1.5/8.17.1.5) with ESMTP id 2726JqrV017339
+        for <kvm@vger.kernel.org>; Tue, 2 Aug 2022 07:56:12 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=content-type :
+ mime-version : content-transfer-encoding : in-reply-to : references :
+ subject : cc : to : from : message-id : date; s=pp1;
+ bh=G5HbnzUMyyWfmSmuw1IUitPpb27UD7goA569dNx8+mU=;
+ b=aY3VkkdIXauwyMhoMg2Ze1SyKagXt69eV4zsqNZuz3GbAUwDaAL1/mQIe9WsXB8XGn3M
+ zs2VC61RFtuYSM9Q7kdM2bFsoa1uO1u73fscLwcwqjJJOldCPl03FUHZV0a+jjeDoFA7
+ ht7y0lpuErTvHLpu6MMzKQSdMUzamWML9TFQtSEZFjohnPyD8Nmhy6hrrg04tNodFqA+
+ hhF9bWKCl7Qrijky/tYoK/ctORhH6pO6ZEOhEjNPnXOJVpXXcaFbbi0E1R7FB1m3RhKo
+ 8+G2ffC4X6Lo2WoARDY/mzTAFJau92f4JfIDj4I2kAGc4rAHTvl4/S2U9M6Lb5S6DWTG 7w== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3hpxjetkk1-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT)
+        for <kvm@vger.kernel.org>; Tue, 02 Aug 2022 07:56:12 +0000
+Received: from m0098410.ppops.net (m0098410.ppops.net [127.0.0.1])
+        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 2726ZgEQ010590
+        for <kvm@vger.kernel.org>; Tue, 2 Aug 2022 07:56:11 GMT
+Received: from ppma04ams.nl.ibm.com (63.31.33a9.ip4.static.sl-reverse.com [169.51.49.99])
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3hpxjetkj5-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Tue, 02 Aug 2022 07:56:11 +0000
+Received: from pps.filterd (ppma04ams.nl.ibm.com [127.0.0.1])
+        by ppma04ams.nl.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 2727pmfM001625;
+        Tue, 2 Aug 2022 07:56:09 GMT
+Received: from b06cxnps4075.portsmouth.uk.ibm.com (d06relay12.portsmouth.uk.ibm.com [9.149.109.197])
+        by ppma04ams.nl.ibm.com with ESMTP id 3hmv98kda2-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Tue, 02 Aug 2022 07:56:09 +0000
+Received: from b06wcsmtp001.portsmouth.uk.ibm.com (b06wcsmtp001.portsmouth.uk.ibm.com [9.149.105.160])
+        by b06cxnps4075.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 2727u6Ib29688200
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Tue, 2 Aug 2022 07:56:06 GMT
+Received: from b06wcsmtp001.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id EFEB2A4066;
+        Tue,  2 Aug 2022 07:56:05 +0000 (GMT)
+Received: from b06wcsmtp001.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id D7B20A4064;
+        Tue,  2 Aug 2022 07:56:05 +0000 (GMT)
+Received: from li-ca45c2cc-336f-11b2-a85c-c6e71de567f1.ibm.com (unknown [9.171.89.124])
+        by b06wcsmtp001.portsmouth.uk.ibm.com (Postfix) with ESMTP;
+        Tue,  2 Aug 2022 07:56:05 +0000 (GMT)
+Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-0.7 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,HK_RANDOM_ENVFROM,
-        HK_RANDOM_FROM,SPF_HELO_NONE,SPF_NONE autolearn=no autolearn_force=no
-        version=3.4.6
+Content-Transfer-Encoding: quoted-printable
+In-Reply-To: <20220729082633.277240-6-frankja@linux.ibm.com>
+References: <20220729082633.277240-1-frankja@linux.ibm.com> <20220729082633.277240-6-frankja@linux.ibm.com>
+Subject: Re: [kvm-unit-tests PATCH 5/6] lib: s390x: Use a new asce for each PV guest
+Cc:     imbrenda@linux.ibm.com, seiden@linux.ibm.com, scgl@linux.ibm.com,
+        thuth@redhat.com
+To:     Janosch Frank <frankja@linux.ibm.com>, kvm@vger.kernel.org
+From:   Nico Boehr <nrb@linux.ibm.com>
+Message-ID: <165942696565.253051.14140437182743201110@localhost.localdomain>
+User-Agent: alot/0.8.1
+Date:   Tue, 02 Aug 2022 09:56:05 +0200
+X-TM-AS-GCONF: 00
+X-Proofpoint-ORIG-GUID: ooq0o0T0ByUMUBk7QR8c_6BiTrrwAC1I
+X-Proofpoint-GUID: NsYaBgl0MtKrpBqgWJIvZiZ_S3S7Hsw7
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.205,Aquarius:18.0.883,Hydra:6.0.517,FMLib:17.11.122.1
+ definitions=2022-08-02_03,2022-08-01_01,2022-06-22_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 clxscore=1015 mlxscore=0
+ adultscore=0 spamscore=0 lowpriorityscore=0 phishscore=0
+ priorityscore=1501 bulkscore=0 suspectscore=0 impostorscore=0
+ mlxlogscore=999 malwarescore=0 classifier=spam adjust=0 reason=mlx
+ scancount=1 engine=8.12.0-2206140000 definitions=main-2208020036
+X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_EF,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_PASS
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Add docs/system/i386/tdx.rst for TDX support, and add tdx in
-confidential-guest-support.rst
+Quoting Janosch Frank (2022-07-29 10:26:32)
+> Every PV guest needs its own ASCE so let's copy the topmost table
+> designated by CR1 to create a new ASCE for the PV guest. Before and
+> after SIE we now need to switch ASCEs to and from the PV guest / test
+> ASCE. The SIE assembly function does that automatically.
+>=20
+> Signed-off-by: Janosch Frank <frankja@linux.ibm.com>
 
-Signed-off-by: Xiaoyao Li <xiaoyao.li@intel.com>
+Reviewed-by: Nico Boehr <nrb@linux.ibm.com>
 
----
-changes in v5:
- - add the restriction that kernel-irqchip must be split
----
- docs/system/confidential-guest-support.rst |   1 +
- docs/system/i386/tdx.rst                   | 105 +++++++++++++++++++++
- docs/system/target-i386.rst                |   1 +
- 3 files changed, 107 insertions(+)
- create mode 100644 docs/system/i386/tdx.rst
+with two tiny things for you to consider.
 
-diff --git a/docs/system/confidential-guest-support.rst b/docs/system/confidential-guest-support.rst
-index 0c490dbda2b7..66129fbab64c 100644
---- a/docs/system/confidential-guest-support.rst
-+++ b/docs/system/confidential-guest-support.rst
-@@ -38,6 +38,7 @@ Supported mechanisms
- Currently supported confidential guest mechanisms are:
- 
- * AMD Secure Encrypted Virtualization (SEV) (see :doc:`i386/amd-memory-encryption`)
-+* Intel Trust Domain Extension (TDX) (see :doc:`i386/tdx`)
- * POWER Protected Execution Facility (PEF) (see :ref:`power-papr-protected-execution-facility-pef`)
- * s390x Protected Virtualization (PV) (see :doc:`s390x/protvirt`)
- 
-diff --git a/docs/system/i386/tdx.rst b/docs/system/i386/tdx.rst
-new file mode 100644
-index 000000000000..1f95e742f75c
---- /dev/null
-+++ b/docs/system/i386/tdx.rst
-@@ -0,0 +1,105 @@
-+Intel Trusted Domain eXtension (TDX)
-+====================================
-+
-+Intel Trusted Domain eXtensions (TDX) refers to an Intel technology that extends
-+Virtual Machine Extensions (VMX) and Multi-Key Total Memory Encryption (MKTME)
-+with a new kind of virtual machine guest called a Trust Domain (TD). A TD runs
-+in a CPU mode that is designed to protect the confidentiality of its memory
-+contents and its CPU state from any other software, including the hosting
-+Virtual Machine Monitor (VMM), unless explicitly shared by the TD itself.
-+
-+Prerequisites
-+-------------
-+
-+To run TD, the physical machine needs to have TDX module loaded and initialized
-+while KVM hypervisor has TDX support and has TDX enabled. If those requirements
-+are met, the ``KVM_CAP_VM_TYPES`` will report the support of ``KVM_X86_TDX_VM``.
-+
-+Trust Domain Virtual Firmware (TDVF)
-+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-+
-+Trust Domain Virtual Firmware (TDVF) is required to provide TD services to boot
-+TD Guest OS. TDVF needs to be copied to guest private memory and measured before
-+a TD boots.
-+
-+The VM scope ``MEMORY_ENCRYPT_OP`` ioctl provides command ``KVM_TDX_INIT_MEM_REGION``
-+to copy the TDVF image to TD's private memory space.
-+
-+Since TDX doesn't support readonly memslot, TDVF cannot be mapped as pflash
-+device and it actually works as RAM. "-bios" option is chosen to load TDVF.
-+
-+OVMF is the opensource firmware that implements the TDVF support. Thus the
-+command line to specify and load TDVF is ``-bios OVMF.fd``
-+
-+Feature Control
-+---------------
-+
-+Unlike non-TDX VM, the CPU features (enumerated by CPU or MSR) of a TD is not
-+under full control of VMM. VMM can only configure part of features of a TD on
-+``KVM_TDX_INIT_VM`` command of VM scope ``MEMORY_ENCRYPT_OP`` ioctl.
-+
-+The configurable features have three types:
-+
-+- Attributes:
-+  - PKS (bit 30) controls whether Supervisor Protection Keys is exposed to TD,
-+  which determines related CPUID bit and CR4 bit;
-+  - PERFMON (bit 63) controls whether PMU is exposed to TD.
-+
-+- XSAVE related features (XFAM):
-+  XFAM is a 64b mask, which has the same format as XCR0 or IA32_XSS MSR. It
-+  determines the set of extended features available for use by the guest TD.
-+
-+- CPUID features:
-+  Only some bits of some CPUID leaves are directly configurable by VMM.
-+
-+What features can be configured is reported via TDX capabilities.
-+
-+TDX capabilities
-+~~~~~~~~~~~~~~~~
-+
-+The VM scope ``MEMORY_ENCRYPT_OP`` ioctl provides command ``KVM_TDX_CAPABILITIES``
-+to get the TDX capabilities from KVM. It returns a data structure of
-+``struct kvm_tdx_capabilites``, which tells the supported configuration of
-+attributes, XFAM and CPUIDs.
-+
-+Launching a TD (TDX VM)
-+-----------------------
-+
-+To launch a TDX guest:
-+
-+.. parsed-literal::
-+
-+    |qemu_system_x86| \\
-+        -machine ...,kernel-irqchip=split,confidential-guest-support=tdx0 \\
-+        -object tdx-guest,id=tdx0 \\
-+        -bios OVMF.fd \\
-+
-+Debugging
-+---------
-+
-+Bit 0 of TD attributes, is DEBUG bit, which decides if the TD runs in off-TD
-+debug mode. When in off-TD debug mode, TD's VCPU state and private memory are
-+accessible via given SEAMCALLs. This requires KVM to expose APIs to invoke those
-+SEAMCALLs and resonponding QEMU change.
-+
-+It's targeted as future work.
-+
-+restrictions
-+------------
-+
-+ - kernel-irqchip must be split;
-+
-+ - No readonly support for private memory;
-+
-+ - No SMM support: SMM support requires manipulating the guset register states
-+   which is not allowed;
-+
-+Live Migration
-+--------------
-+
-+TODO
-+
-+References
-+----------
-+
-+- `TDX Homepage <https://www.intel.com/content/www/us/en/developer/articles/technical/intel-trust-domain-extensions.html>`__
-diff --git a/docs/system/target-i386.rst b/docs/system/target-i386.rst
-index e64c0130772d..25aa626b4a33 100644
---- a/docs/system/target-i386.rst
-+++ b/docs/system/target-i386.rst
-@@ -30,6 +30,7 @@ Architectural features
-    i386/kvm-pv
-    i386/sgx
-    i386/amd-memory-encryption
-+   i386/tdx
- 
- .. _pcsys_005freq:
- 
--- 
-2.27.0
+[...]
+> diff --git a/lib/s390x/uv.c b/lib/s390x/uv.c
+> index 3b4cafa9..99775929 100644
+> --- a/lib/s390x/uv.c
+> +++ b/lib/s390x/uv.c
+> @@ -76,7 +76,8 @@ void uv_init(void)
+>         int cc;
+> =20
+>         /* Let's not do this twice */
+> -       assert(!initialized);
+> +       if (initialized)
+> +               return;
 
+Caught me a bit by surprise, maybe you want to point out this change in the=
+ commit message.
+
+[...]
+> +/*
+> + * Create a new ASCE for the UV config because they can't be shared
+> + * for security reasons. We just simply copy the top most table into a
+> + * fresh set of allocated pages and use those pages as the asce.
+> + */
+> +static uint64_t create_asce(void)
+> +{
+> +       void *pgd_new, *pgd_old;
+> +       uint64_t asce =3D stctg(1);
+> +
+> +       pgd_new =3D memalign_pages_flags(PAGE_SIZE, PAGE_SIZE * 4, 0);
+> +       pgd_old =3D (void *)(asce & PAGE_MASK);
+> +
+> +       memcpy(pgd_new, pgd_old, PAGE_SIZE * 4);
+> +
+> +       asce =3D __pa(pgd_new) | ASCE_DT_REGION1 | REGION_TABLE_LENGTH | =
+ASCE_P;
+
+I am wondering whether it might make sense to copy over the flags from cr1 =
+so we don't have to worry about keeping them in sync?
+
+But possibly it is sufficiently unlikely that these will ever change...
