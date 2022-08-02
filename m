@@ -2,131 +2,156 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id CA4715877C0
-	for <lists+kvm@lfdr.de>; Tue,  2 Aug 2022 09:23:57 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 1B6BE587819
+	for <lists+kvm@lfdr.de>; Tue,  2 Aug 2022 09:45:24 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233381AbiHBHX4 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 2 Aug 2022 03:23:56 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60670 "EHLO
+        id S236063AbiHBHpV (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 2 Aug 2022 03:45:21 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49480 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231804AbiHBHXy (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 2 Aug 2022 03:23:54 -0400
-Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 51883D13A
-        for <kvm@vger.kernel.org>; Tue,  2 Aug 2022 00:23:53 -0700 (PDT)
-Received: from pps.filterd (m0098421.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.17.1.5/8.17.1.5) with ESMTP id 2727Kx3g013529
-        for <kvm@vger.kernel.org>; Tue, 2 Aug 2022 07:23:52 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=content-type :
- mime-version : content-transfer-encoding : in-reply-to : references :
- subject : cc : to : from : message-id : date; s=pp1;
- bh=1wqfdxOedA2+aoZ327yxXWYfd/O8FsqIMjUM0v5B+Fk=;
- b=m3Gpj4XPReBIeISBNyoND1qycQ4vRsFFfmrguRP4ocu/SueEL88DoQTMR11hw7p5johT
- E/mpgk/wxt6MwngmIQF4M3Nl3F6RV0P11Ka79xo5EZnl07PKiJ+STMyCPJ+30WNF/bMf
- nrPUyWlbZJrLbVcsAOKAPeivN0oStnERM5TkGk1Bp9TfWPRdOOEyIPjOCLF/PQILEApn
- ny/YnDQUDRYwONljw5OKYZEwdCHMMk88qBDDaq1kBCVjgAIS0uwAXMZAO4BiR9/rfQzp
- Lk4pgSBkCybGRI4IBj7N4dLfEb7hUV1kStbhiFMbytiEUiIoSKjOc0YP6ijAYKT9yQ8W lg== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3hpyf4r2cv-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT)
-        for <kvm@vger.kernel.org>; Tue, 02 Aug 2022 07:23:52 +0000
-Received: from m0098421.ppops.net (m0098421.ppops.net [127.0.0.1])
-        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 2727M4bE016595
-        for <kvm@vger.kernel.org>; Tue, 2 Aug 2022 07:23:51 GMT
-Received: from ppma03fra.de.ibm.com (6b.4a.5195.ip4.static.sl-reverse.com [149.81.74.107])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3hpyf4r2c3-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 02 Aug 2022 07:23:51 +0000
-Received: from pps.filterd (ppma03fra.de.ibm.com [127.0.0.1])
-        by ppma03fra.de.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 2727LaBr028529;
-        Tue, 2 Aug 2022 07:23:50 GMT
-Received: from b06cxnps4075.portsmouth.uk.ibm.com (d06relay12.portsmouth.uk.ibm.com [9.149.109.197])
-        by ppma03fra.de.ibm.com with ESMTP id 3hmv98tej7-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 02 Aug 2022 07:23:49 +0000
-Received: from d06av25.portsmouth.uk.ibm.com (d06av25.portsmouth.uk.ibm.com [9.149.105.61])
-        by b06cxnps4075.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 2727NkLA23855596
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Tue, 2 Aug 2022 07:23:46 GMT
-Received: from d06av25.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id B17D311C04C;
-        Tue,  2 Aug 2022 07:23:46 +0000 (GMT)
-Received: from d06av25.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 963B711C04A;
-        Tue,  2 Aug 2022 07:23:46 +0000 (GMT)
-Received: from li-ca45c2cc-336f-11b2-a85c-c6e71de567f1.ibm.com (unknown [9.171.89.124])
-        by d06av25.portsmouth.uk.ibm.com (Postfix) with ESMTP;
-        Tue,  2 Aug 2022 07:23:46 +0000 (GMT)
-Content-Type: text/plain; charset="utf-8"
+        with ESMTP id S236051AbiHBHpT (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 2 Aug 2022 03:45:19 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 9AB13C63
+        for <kvm@vger.kernel.org>; Tue,  2 Aug 2022 00:45:18 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1659426317;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=n2QKGORUPt90s3M7laRV8rZjur0eTOpV52LUAMCgLrw=;
+        b=SdwpePurLXJkTrCb/HGoH0MtAygR9YCTPip3ypPssLZcxjOiOdQnBWGAAh0Sj/hVAJPxFE
+        xoyL8DT5lkvtmI8Oov8xHOxRaPBLiB6pVUm1EyLHjcFDtqP5vrs+dlv0obsxajEyq6fRg9
+        YT8KEtZUoVZGw55BPQBfRGXB0vrbvOo=
+Received: from mail-lj1-f200.google.com (mail-lj1-f200.google.com
+ [209.85.208.200]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-307-Enk-IhLVNNGSuA-Fnnrdiw-1; Tue, 02 Aug 2022 03:45:14 -0400
+X-MC-Unique: Enk-IhLVNNGSuA-Fnnrdiw-1
+Received: by mail-lj1-f200.google.com with SMTP id bi26-20020a05651c231a00b0025e4ba4f7e5so1206128ljb.16
+        for <kvm@vger.kernel.org>; Tue, 02 Aug 2022 00:45:13 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc;
+        bh=n2QKGORUPt90s3M7laRV8rZjur0eTOpV52LUAMCgLrw=;
+        b=6z22yV6n7VLRxTbmh2Iq0BonUGGCOoFAuxrxVInKWDGp477Note/y3HqMchU0SFRog
+         FI0cA1fkiEn65PjBUedOPyp2pRxTMJaI5hqwfuG76Xtkwv4ysyhu2Z+Ycu2Gi5uE3edM
+         qmyzaZv3bKLwDhy+7RE+Wsu06YG+QielqU0U0G+jJFwRLVyplGbWF7Dcto1SKYUisKEJ
+         Dujyy8QbuWKe2wrGm1Ndyvh/A4t1Wq/cFJrkkq8DnrjvO2APbdC0aJAbER0R8Ek18tP5
+         okr1JPFp2Epf87eadarZzOaA3SyYpfDOACeLGnNWhwJhMGqEIjoAQGNCUGDEIfXuHhYE
+         fOmw==
+X-Gm-Message-State: AJIora9dTlJGCxQDYqDGCDgUo4nnG2c2PNZF9bMxENT45zNyfcyoYGuc
+        44ensGI9D5uRUhowsz5BhhJP5nTOGic/wIUs7I/+/AzIDZVxiWDdNYIkcOfH9BB3drKh8QOXjBj
+        5M1nCPQrCbnmlKUPuxGuXLh44D9pn
+X-Received: by 2002:a2e:82c6:0:b0:25d:eef5:8096 with SMTP id n6-20020a2e82c6000000b0025deef58096mr6288542ljh.201.1659426312321;
+        Tue, 02 Aug 2022 00:45:12 -0700 (PDT)
+X-Google-Smtp-Source: AGRyM1tIVif5PVmN7a8VhTns7vhbkHiwcEFEE4L31UG6gd+2t07IqYSwiB0aIDCfwMP5XF9mr/mf+ZUHXWrTlopG4R8=
+X-Received: by 2002:a2e:82c6:0:b0:25d:eef5:8096 with SMTP id
+ n6-20020a2e82c6000000b0025deef58096mr6288536ljh.201.1659426312110; Tue, 02
+ Aug 2022 00:45:12 -0700 (PDT)
 MIME-Version: 1.0
+References: <20220721084341.24183-1-qtxuning1999@sjtu.edu.cn>
+ <20220721084341.24183-4-qtxuning1999@sjtu.edu.cn> <CAJaqyWfgUqdP6mkOUdouvQSst=qc7MOTaigC-EiTg9-gojHqzg@mail.gmail.com>
+ <1D1ABF88-B503-4BE0-AC83-3326EAA62510@sjtu.edu.cn>
+In-Reply-To: <1D1ABF88-B503-4BE0-AC83-3326EAA62510@sjtu.edu.cn>
+From:   Stefano Garzarella <sgarzare@redhat.com>
+Date:   Tue, 2 Aug 2022 09:45:00 +0200
+Message-ID: <CAGxU2F4-aBTP=CwzTKutiSqHQL++zfMmK_dCoR+t=BJA9AvhFQ@mail.gmail.com>
+Subject: Re: [RFC 3/5] vhost_test: batch used buffer
+To:     Zhi Guo <qtxuning1999@sjtu.edu.cn>
+Cc:     Eugenio Perez Martin <eperezma@redhat.com>,
+        Jason Wang <jasowang@redhat.com>,
+        Michael Tsirkin <mst@redhat.com>,
+        netdev <netdev@vger.kernel.org>,
+        linux-kernel <linux-kernel@vger.kernel.org>,
+        kvm list <kvm@vger.kernel.org>,
+        virtualization <virtualization@lists.linux-foundation.org>
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
-In-Reply-To: <20220729082633.277240-5-frankja@linux.ibm.com>
-References: <20220729082633.277240-1-frankja@linux.ibm.com> <20220729082633.277240-5-frankja@linux.ibm.com>
-Subject: Re: [kvm-unit-tests PATCH 4/6] lib: s390x: sie: Improve validity handling and make it vm specific
-Cc:     imbrenda@linux.ibm.com, seiden@linux.ibm.com, scgl@linux.ibm.com,
-        thuth@redhat.com
-To:     Janosch Frank <frankja@linux.ibm.com>, kvm@vger.kernel.org
-From:   Nico Boehr <nrb@linux.ibm.com>
-Message-ID: <165942502640.253051.3127986017528310393@localhost.localdomain>
-User-Agent: alot/0.8.1
-Date:   Tue, 02 Aug 2022 09:23:46 +0200
-X-TM-AS-GCONF: 00
-X-Proofpoint-ORIG-GUID: qE8RsTN3vrfVKVVCdlFTZFdxmehqJoRO
-X-Proofpoint-GUID: xdLgHgZq1vfAwdHFnKyuWEupBiGV0a5L
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.205,Aquarius:18.0.883,Hydra:6.0.517,FMLib:17.11.122.1
- definitions=2022-08-02_03,2022-08-01_01,2022-06-22_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 clxscore=1015 malwarescore=0
- adultscore=0 impostorscore=0 phishscore=0 priorityscore=1501
- mlxlogscore=888 bulkscore=0 spamscore=0 suspectscore=0 mlxscore=0
- lowpriorityscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2206140000 definitions=main-2208020033
-X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_EF,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_PASS
-        autolearn=ham autolearn_force=no version=3.4.6
+X-Spam-Status: No, score=-3.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,
+        SPF_HELO_NONE,SPF_NONE autolearn=unavailable autolearn_force=no
+        version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Quoting Janosch Frank (2022-07-29 10:26:31)
-> The current library doesn't support running multiple vms at once as it
-> stores the validity once and not per vm. Let's move the validity
-> handling into the vm and introduce a new function to retrieve the vir.
->=20
-> Signed-off-by: Janosch Frank <frankja@linux.ibm.com>
+On Tue, Aug 2, 2022 at 4:45 AM Zhi Guo <qtxuning1999@sjtu.edu.cn> wrote:
+>
+>
+>
+> 2022=E5=B9=B47=E6=9C=8822=E6=97=A5 =E4=B8=8B=E5=8D=883:12=EF=BC=8CEugenio=
+ Perez Martin <eperezma@redhat.com> =E5=86=99=E9=81=93=EF=BC=9A
+>
+> On Thu, Jul 21, 2022 at 10:44 AM Guo Zhi <qtxuning1999@sjtu.edu.cn> wrote=
+:
+>
+>
+> Only add to used ring when a batch a buffer have all been used.  And if
+> in order feature negotiated, add randomness to the used buffer's order,
+> test the ability of vhost to reorder batched buffer.
+>
+> Signed-off-by: Guo Zhi <qtxuning1999@sjtu.edu.cn>
+> ---
+> drivers/vhost/test.c | 15 ++++++++++++++-
+> 1 file changed, 14 insertions(+), 1 deletion(-)
+>
+> diff --git a/drivers/vhost/test.c b/drivers/vhost/test.c
+> index bc8e7fb1e..1c9c40c11 100644
+> --- a/drivers/vhost/test.c
+> +++ b/drivers/vhost/test.c
+> @@ -43,6 +43,9 @@ struct vhost_test {
+> static void handle_vq(struct vhost_test *n)
+> {
+>        struct vhost_virtqueue *vq =3D &n->vqs[VHOST_TEST_VQ];
+> +       struct vring_used_elem *heads =3D kmalloc(sizeof(*heads)
+> +                       * vq->num, GFP_KERNEL);
+> +       int batch_idx =3D 0;
+>        unsigned out, in;
+>        int head;
+>        size_t len, total_len =3D 0;
+> @@ -84,11 +87,21 @@ static void handle_vq(struct vhost_test *n)
+>                        vq_err(vq, "Unexpected 0 len for TX\n");
+>                        break;
+>                }
+> -               vhost_add_used_and_signal(&n->dev, vq, head, 0);
+> +               heads[batch_idx].id =3D cpu_to_vhost32(vq, head);
+> +               heads[batch_idx++].len =3D cpu_to_vhost32(vq, len);
+>                total_len +=3D len;
+>                if (unlikely(vhost_exceeds_weight(vq, 0, total_len)))
+>                        break;
+>        }
+> +       if (batch_idx) {
+> +               if (vhost_has_feature(vq, VIRTIO_F_IN_ORDER) && batch_idx=
+ >=3D 2) {
+>
+>
+> Maybe to add a module parameter to test this? Instead of trusting in
+> feature negotiation, "unorder_used=3D1" or something like that.
+>
+> vhost.c:vhost_add_used_and_signal_n should support receiving buffers
+> in order or out of order whether F_IN_ORDER is negotiated or not.
+>
+> Thanks!
+>
+> That=E2=80=99s a good idea, The reorder feature in vhost is a "workaround=
+=E2=80=9D solution for the device that can't consume buffer in order,
+> If that device support in order feature, The reorder in vhost will not be=
+ used.
+> So we can add a parameter in vhost_test can config in order or not in ord=
+er usage for used descriptors.
+> A global parameter in vhost_test.c is enough?
 
-Reviewed-by: Nico Boehr <nrb@linux.ibm.com>
+Maybe a module parameter is easier to use (or a sysfs file), and to
+test we don't need to recompile the module every time.
 
-One tiny suggestion below.
+In view of having a CI, it's definitely easier to set the module
+parameter than to recompile it.
 
-[...]
-> diff --git a/lib/s390x/sie.c b/lib/s390x/sie.c
-> index 00aff713..c3a53ad6 100644
-> --- a/lib/s390x/sie.c
-> +++ b/lib/s390x/sie.c
-> @@ -15,19 +15,21 @@
->  #include <libcflat.h>
->  #include <alloc_page.h>
-> =20
-> -static bool validity_expected;
-> -static uint16_t vir;           /* Validity interception reason */
-> -
-> -void sie_expect_validity(void)
-> +void sie_expect_validity(struct vm *vm)
->  {
-> -       validity_expected =3D true;
-> -       vir =3D 0;
-> +       vm->validity_expected =3D true;
->  }
-> =20
-> -void sie_check_validity(uint16_t vir_exp)
-> +uint16_t sie_get_validity(struct vm *vm)
->  {
-> +       return vm->sblk->ipb >> 16;
-> +}
+Thanks,
+Stefano
 
-Since one should only call this function when we had a validity, maybe add:
-
-assert (vm->sblk->icptcode =3D=3D ICPT_VALIDITY);
