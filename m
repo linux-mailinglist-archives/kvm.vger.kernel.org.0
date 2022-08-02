@@ -2,41 +2,41 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 95EA1587843
-	for <lists+kvm@lfdr.de>; Tue,  2 Aug 2022 09:49:17 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id C92F9587845
+	for <lists+kvm@lfdr.de>; Tue,  2 Aug 2022 09:49:22 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236180AbiHBHtQ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 2 Aug 2022 03:49:16 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53896 "EHLO
+        id S236190AbiHBHtU (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 2 Aug 2022 03:49:20 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54456 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S236174AbiHBHs4 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 2 Aug 2022 03:48:56 -0400
+        with ESMTP id S236161AbiHBHtB (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 2 Aug 2022 03:49:01 -0400
 Received: from mga11.intel.com (mga11.intel.com [192.55.52.93])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A57704BD0D
-        for <kvm@vger.kernel.org>; Tue,  2 Aug 2022 00:48:55 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E51004BD36
+        for <kvm@vger.kernel.org>; Tue,  2 Aug 2022 00:48:59 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1659426535; x=1690962535;
+  t=1659426539; x=1690962539;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=3TWTH6DVHDtYd4mhcblFfo639B1xzWKXEQFDJ90i5hI=;
-  b=APDjBywqflTU5zqM6OQQpyYZ8SA1l7dDyNR2b9JFTmQeSw4AjwG9jsg3
-   78rsFPSmBseWyyw4CplI4R9N6nq7J9gigXchC9GJXwOaY7AbEgOzcoTDm
-   I4wfKunGZUndXOBuBmcUK9/+IbYzhFrrkFq8mzeQjyEpijKK48VZfbhHs
-   bg28Yh810ORZUpxhQWdAbZnWOBat9LWLqWpmbpQOZKvjMzwXa0LyNLSSc
-   F0W9BI9J/ta4vPEBfLGxtfcRR4+Qos3SPVMA84alSXi8SP93WkzkizosD
-   rkUgXS14P2KdcNb7e4fd/lbczAtWcSEtLvPO1+Nr8L8c2nJyaQClzQbaV
-   w==;
-X-IronPort-AV: E=McAfee;i="6400,9594,10426"; a="286908583"
+  bh=llgtqfRW17L8raNa4ie9Vz+9QCbmcsWc5ycFx5pSCnM=;
+  b=e/PqihLmXENYob+xUf+t+Xow0q5GdR9FusojiYhWeDBsGqltS6CMzQXc
+   5gQX5lQpt+k4v/DI6CjQvMB2TDk76WFSAbeiwgWXb+W85HmYxBDSludKI
+   DVeCd+s/32daD23gPUNXuAL36munQx1SIdXpPFojHsJ/4AIJClOnXPzbE
+   +1fPSVHEmqR+0XqQE5qZytI74RBF3KAKxRBBYvtvW5kMjEYkEmBYptllY
+   txeNaMRdnY5s7dy/VU4f2+fqjNBwQZcDEvot2bEXSYwblXeE1i1TGZl9y
+   YorKJ//IAiOxHb8vLGxJBAZAu4i+77eduQQb4vNma2j0XXaX8QPLezQFL
+   g==;
+X-IronPort-AV: E=McAfee;i="6400,9594,10426"; a="286908604"
 X-IronPort-AV: E=Sophos;i="5.93,210,1654585200"; 
-   d="scan'208";a="286908583"
+   d="scan'208";a="286908604"
 Received: from orsmga008.jf.intel.com ([10.7.209.65])
-  by fmsmga102.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 02 Aug 2022 00:48:55 -0700
+  by fmsmga102.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 02 Aug 2022 00:48:59 -0700
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="5.93,210,1654585200"; 
-   d="scan'208";a="630603998"
+   d="scan'208";a="630604023"
 Received: from lxy-dell.sh.intel.com ([10.239.48.38])
-  by orsmga008.jf.intel.com with ESMTP; 02 Aug 2022 00:48:51 -0700
+  by orsmga008.jf.intel.com with ESMTP; 02 Aug 2022 00:48:55 -0700
 From:   Xiaoyao Li <xiaoyao.li@intel.com>
 To:     Paolo Bonzini <pbonzini@redhat.com>,
         Isaku Yamahata <isaku.yamahata@gmail.com>,
@@ -53,9 +53,9 @@ To:     Paolo Bonzini <pbonzini@redhat.com>,
 Cc:     Connor Kuehl <ckuehl@redhat.com>, erdemaktas@google.com,
         kvm@vger.kernel.org, qemu-devel@nongnu.org, seanjc@google.com,
         xiaoyao.li@intel.com
-Subject: [PATCH v1 14/40] i386/tdx: Initialize TDX before creating TD vcpus
-Date:   Tue,  2 Aug 2022 15:47:24 +0800
-Message-Id: <20220802074750.2581308-15-xiaoyao.li@intel.com>
+Subject: [PATCH v1 15/40] i386/tdx: Add property sept-ve-disable for tdx-guest object
+Date:   Tue,  2 Aug 2022 15:47:25 +0800
+Message-Id: <20220802074750.2581308-16-xiaoyao.li@intel.com>
 X-Mailer: git-send-email 2.27.0
 In-Reply-To: <20220802074750.2581308-1-xiaoyao.li@intel.com>
 References: <20220802074750.2581308-1-xiaoyao.li@intel.com>
@@ -71,166 +71,86 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Invoke KVM_TDX_INIT in kvm_arch_pre_create_vcpu() that KVM_TDX_INIT
-configures global TD state, e.g. the canonical CPUID config, and must
-be executed prior to creating vCPUs.
+Bit 28, named SEPT_VE_DISABLE, disables	EPT violation conversion to #VE
+on guest TD access of PENDING pages when set to 1. Some guest OS (e.g.,
+Linux TD guest) may require this bit set as 1. Otherwise refuse to boot.
 
-Use kvm_x86_arch_cpuid() to setup the CPUID settings for TDX VM and
-tie x86cpu->enable_pmu with TD's attributes.
-
-Note, this doesn't address the fact that QEMU may change the CPUID
-configuration when creating vCPUs, i.e. punts on refactoring QEMU to
-provide a stable CPUID config prior to kvm_arch_init().
+Add sept-ve-disable property for tdx-guest object, for user to configure
+this bit.
 
 Signed-off-by: Xiaoyao Li <xiaoyao.li@intel.com>
 ---
- accel/kvm/kvm-all.c        |  9 ++++++++-
- target/i386/kvm/kvm.c      |  8 ++++++++
- target/i386/kvm/tdx-stub.c |  5 +++++
- target/i386/kvm/tdx.c      | 34 ++++++++++++++++++++++++++++++++++
- target/i386/kvm/tdx.h      |  4 ++++
- 5 files changed, 59 insertions(+), 1 deletion(-)
+ qapi/qom.json         |  4 +++-
+ target/i386/kvm/tdx.c | 24 ++++++++++++++++++++++++
+ 2 files changed, 27 insertions(+), 1 deletion(-)
 
-diff --git a/accel/kvm/kvm-all.c b/accel/kvm/kvm-all.c
-index c26d602f5476..c1348c380680 100644
---- a/accel/kvm/kvm-all.c
-+++ b/accel/kvm/kvm-all.c
-@@ -473,10 +473,17 @@ int kvm_init_vcpu(CPUState *cpu, Error **errp)
+diff --git a/qapi/qom.json b/qapi/qom.json
+index 38177848abc1..2a5486bfed3e 100644
+--- a/qapi/qom.json
++++ b/qapi/qom.json
+@@ -835,10 +835,12 @@
+ #
+ # Properties for tdx-guest objects.
+ #
++# @sept-ve-disable: bit 28 of TD attributes (default: 0)
++#
+ # Since: 7.2
+ ##
+ { 'struct': 'TdxGuestProperties',
+-  'data': { }}
++  'data': { '*sept-ve-disable': 'bool' } }
  
-     trace_kvm_init_vcpu(cpu->cpu_index, kvm_arch_vcpu_id(cpu));
+ ##
+ # @ObjectType:
+diff --git a/target/i386/kvm/tdx.c b/target/i386/kvm/tdx.c
+index ecb0205651bd..bf57f270ac9d 100644
+--- a/target/i386/kvm/tdx.c
++++ b/target/i386/kvm/tdx.c
+@@ -30,6 +30,8 @@
+                                      (1U << KVM_FEATURE_PV_SCHED_YIELD) | \
+                                      (1U << KVM_FEATURE_MSI_EXT_DEST_ID))
  
-+    /*
-+     * tdx_pre_create_vcpu() may call cpu_x86_cpuid(). It in turn may call
-+     * kvm_vm_ioctl(). Set cpu->kvm_state in advance to avoid NULL pointer
-+     * dereference.
-+     */
-+    cpu->kvm_state = s;
-     ret = kvm_arch_pre_create_vcpu(cpu);
-     if (ret < 0) {
-         error_setg_errno(errp, -ret,
-                          "kvm_init_vcpu: kvm_arch_pre_create_vcpu() failed");
-+        cpu->kvm_state = NULL;
-         goto err;
-     }
++#define TDX_TD_ATTRIBUTES_SEPT_VE_DISABLE   BIT_ULL(28)
++
+ #define TDX_ATTRIBUTES_MAX_BITS      64
  
-@@ -484,11 +491,11 @@ int kvm_init_vcpu(CPUState *cpu, Error **errp)
-     if (ret < 0) {
-         error_setg_errno(errp, -ret, "kvm_init_vcpu: kvm_get_vcpu failed (%lu)",
-                          kvm_arch_vcpu_id(cpu));
-+        cpu->kvm_state = NULL;
-         goto err;
-     }
- 
-     cpu->kvm_fd = ret;
--    cpu->kvm_state = s;
-     cpu->vcpu_dirty = true;
-     cpu->dirty_pages = 0;
-     cpu->throttle_us_per_full = 0;
-diff --git a/target/i386/kvm/kvm.c b/target/i386/kvm/kvm.c
-index 9c0d5be5cc23..4f491f871f3e 100644
---- a/target/i386/kvm/kvm.c
-+++ b/target/i386/kvm/kvm.c
-@@ -2197,6 +2197,14 @@ int kvm_arch_init_vcpu(CPUState *cs)
+ static FeatureMask tdx_attrs_ctrl_fields[TDX_ATTRIBUTES_MAX_BITS] = {
+@@ -490,6 +492,24 @@ out:
      return r;
  }
  
-+int kvm_arch_pre_create_vcpu(CPUState *cpu)
++static bool tdx_guest_get_sept_ve_disable(Object *obj, Error **errp)
 +{
-+    if (is_tdx_vm())
-+        return tdx_pre_create_vcpu(cpu);
++    TdxGuest *tdx = TDX_GUEST(obj);
 +
-+    return 0;
++    return !!(tdx->attributes & TDX_TD_ATTRIBUTES_SEPT_VE_DISABLE);
 +}
 +
- int kvm_arch_destroy_vcpu(CPUState *cs)
- {
-     X86CPU *cpu = X86_CPU(cs);
-diff --git a/target/i386/kvm/tdx-stub.c b/target/i386/kvm/tdx-stub.c
-index 1df24735201e..2871de9d7b56 100644
---- a/target/i386/kvm/tdx-stub.c
-+++ b/target/i386/kvm/tdx-stub.c
-@@ -7,3 +7,8 @@ int tdx_kvm_init(MachineState *ms, Error **errp)
- {
-     return -EINVAL;
- }
-+
-+int tdx_pre_create_vcpu(CPUState *cpu)
++static void tdx_guest_set_sept_ve_disable(Object *obj, bool value, Error **errp)
 +{
-+    return -EINVAL;
-+}
-diff --git a/target/i386/kvm/tdx.c b/target/i386/kvm/tdx.c
-index 6fe47cf4e29e..ecb0205651bd 100644
---- a/target/i386/kvm/tdx.c
-+++ b/target/i386/kvm/tdx.c
-@@ -458,6 +458,38 @@ int tdx_kvm_init(MachineState *ms, Error **errp)
-     return 0;
- }
- 
-+int tdx_pre_create_vcpu(CPUState *cpu)
-+{
-+    MachineState *ms = MACHINE(qdev_get_machine());
-+    X86CPU *x86cpu = X86_CPU(cpu);
-+    CPUX86State *env = &x86cpu->env;
-+    struct kvm_tdx_init_vm init_vm;
-+    int r = 0;
++    TdxGuest *tdx = TDX_GUEST(obj);
 +
-+    qemu_mutex_lock(&tdx_guest->lock);
-+    if (tdx_guest->initialized) {
-+        goto out;
++    if (value) {
++        tdx->attributes |= TDX_TD_ATTRIBUTES_SEPT_VE_DISABLE;
++    } else {
++        tdx->attributes &= ~TDX_TD_ATTRIBUTES_SEPT_VE_DISABLE;
 +    }
-+
-+    memset(&init_vm, 0, sizeof(init_vm));
-+    init_vm.cpuid.nent = kvm_x86_arch_cpuid(env, init_vm.entries, 0);
-+
-+    init_vm.attributes = tdx_guest->attributes;
-+    init_vm.max_vcpus = ms->smp.cpus;
-+
-+    r = tdx_vm_ioctl(KVM_TDX_INIT_VM, 0, &init_vm);
-+    if (r < 0) {
-+        error_report("KVM_TDX_INIT_VM failed %s", strerror(-r));
-+        goto out;
-+    }
-+
-+    tdx_guest->initialized = true;
-+
-+out:
-+    qemu_mutex_unlock(&tdx_guest->lock);
-+    return r;
 +}
 +
  /* tdx guest */
  OBJECT_DEFINE_TYPE_WITH_INTERFACES(TdxGuest,
                                     tdx_guest,
-@@ -470,6 +502,8 @@ static void tdx_guest_init(Object *obj)
- {
-     TdxGuest *tdx = TDX_GUEST(obj);
+@@ -505,6 +525,10 @@ static void tdx_guest_init(Object *obj)
+     qemu_mutex_init(&tdx->lock);
  
-+    qemu_mutex_init(&tdx->lock);
-+
      tdx->attributes = 0;
++
++    object_property_add_bool(obj, "sept-ve-disable",
++                             tdx_guest_get_sept_ve_disable,
++                             tdx_guest_set_sept_ve_disable);
  }
  
-diff --git a/target/i386/kvm/tdx.h b/target/i386/kvm/tdx.h
-index 06599b65b827..46a24ee8c7cc 100644
---- a/target/i386/kvm/tdx.h
-+++ b/target/i386/kvm/tdx.h
-@@ -17,6 +17,9 @@ typedef struct TdxGuestClass {
- typedef struct TdxGuest {
-     ConfidentialGuestSupport parent_obj;
- 
-+    QemuMutex lock;
-+
-+    bool initialized;
-     uint64_t attributes;    /* TD attributes */
- } TdxGuest;
- 
-@@ -29,5 +32,6 @@ bool is_tdx_vm(void);
- int tdx_kvm_init(MachineState *ms, Error **errp);
- void tdx_get_supported_cpuid(uint32_t function, uint32_t index, int reg,
-                              uint32_t *ret);
-+int tdx_pre_create_vcpu(CPUState *cpu);
- 
- #endif /* QEMU_I386_TDX_H */
+ static void tdx_guest_finalize(Object *obj)
 -- 
 2.27.0
 
