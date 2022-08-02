@@ -2,129 +2,98 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id E72D75878A1
-	for <lists+kvm@lfdr.de>; Tue,  2 Aug 2022 10:04:34 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id EB0385878D7
+	for <lists+kvm@lfdr.de>; Tue,  2 Aug 2022 10:17:29 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236272AbiHBIEd (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 2 Aug 2022 04:04:33 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42734 "EHLO
+        id S236339AbiHBIR2 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 2 Aug 2022 04:17:28 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54674 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232855AbiHBIEc (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 2 Aug 2022 04:04:32 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 249F412770
-        for <kvm@vger.kernel.org>; Tue,  2 Aug 2022 01:04:31 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1659427470;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=PnAgHb+qwkYr0eoeRI+miU3649J+IzbjO84fBGvUAWw=;
-        b=ep/F+MZJgno/g4KEO/PavR5Zz8NweHNiutfkARlrXbMorBdcM3f+Coq3MPazmXeRb70fD6
-        2CeqrtNeEfHJlPtWAGQe5cPAEc5PYED7hKyOVTgec39YGbLU3vxDAZYy15AEZtWbFwB/F6
-        JeoCtUKLSkA7szepzyTe7lEl1MQEdTw=
-Received: from mail-qv1-f72.google.com (mail-qv1-f72.google.com
- [209.85.219.72]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-271-JM6nMdL2NDyo0AFvZV5fpA-1; Tue, 02 Aug 2022 04:04:29 -0400
-X-MC-Unique: JM6nMdL2NDyo0AFvZV5fpA-1
-Received: by mail-qv1-f72.google.com with SMTP id a11-20020ad45c4b000000b004747a998b9eso7783134qva.9
-        for <kvm@vger.kernel.org>; Tue, 02 Aug 2022 01:04:29 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc;
-        bh=PnAgHb+qwkYr0eoeRI+miU3649J+IzbjO84fBGvUAWw=;
-        b=T6PYQhs7j3iwwYr8yY3V8i0Dxf3hN7xAaZ2fCyH5PVhDpmJDRC6Jz/nxoXvsqgsLnS
-         veO8aBePCDHHx1Cdmz3xJgDAkKbQeeLUaIxGdKzwlntzgAulJ2rT0nD99TRzEesBz1Wm
-         BIh3S+qeDj+AjbQIiJJXHe/z4jGy+oyntLAKYRdWD4N1XUuYP79HYMcNfw/Q96rtSPNK
-         NwosRZ1aw68Bv3b4BMhoQ8HEAiw78UQJWQ0tgQZxqZq/aQRMCyDnOuDN0ZN1DmDe3Jzk
-         NuI+ZRFjOv25uJEdvKmzqriSn3wHneqqwM52bE5ZbmcoNjR18+fV/5QylDRZMKo1GxcF
-         V61Q==
-X-Gm-Message-State: AJIora/pNjp+6Gh4YDBpA8AiHzHLa/AxAwfAXm5r874FhYZ/kRXNgmvu
-        ddk/mPvkxGEvdbQX9+J7Cn0gW2K84/feJeFMivcBdJ+RoKiMZm5A0qv2gXp3zBB6VWJMwDanUyg
-        vDP6ezT2DmO/P
-X-Received: by 2002:ac8:5b96:0:b0:31f:1931:b2b1 with SMTP id a22-20020ac85b96000000b0031f1931b2b1mr17183316qta.17.1659427468872;
-        Tue, 02 Aug 2022 01:04:28 -0700 (PDT)
-X-Google-Smtp-Source: AGRyM1t8d3getE7v6ehQxa40+uRjwcWSGfnrWrzaZU1/gX3jMXiALvanlrDyYV5QWSN3xAJSiT9vUw==
-X-Received: by 2002:ac8:5b96:0:b0:31f:1931:b2b1 with SMTP id a22-20020ac85b96000000b0031f1931b2b1mr17183303qta.17.1659427468660;
-        Tue, 02 Aug 2022 01:04:28 -0700 (PDT)
-Received: from sgarzare-redhat (host-79-46-200-178.retail.telecomitalia.it. [79.46.200.178])
-        by smtp.gmail.com with ESMTPSA id g18-20020a05620a40d200b006b8d1914504sm636431qko.22.2022.08.02.01.04.23
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 02 Aug 2022 01:04:28 -0700 (PDT)
-Date:   Tue, 2 Aug 2022 10:04:17 +0200
-From:   Stefano Garzarella <sgarzare@redhat.com>
-To:     Vishnu Dasa <vdasa@vmware.com>
-Cc:     Arseniy Krasnov <AVKrasnov@sberdevices.ru>,
-        Bryan Tan <bryantan@vmware.com>,
-        Pv-drivers <Pv-drivers@vmware.com>,
-        "David S. Miller" <davem@davemloft.net>,
-        "edumazet@google.com" <edumazet@google.com>,
-        Jakub Kicinski <kuba@kernel.org>,
-        Paolo Abeni <pabeni@redhat.com>,
-        Stefan Hajnoczi <stefanha@redhat.com>,
-        "Michael S. Tsirkin" <mst@redhat.com>,
-        "kys@microsoft.com" <kys@microsoft.com>,
-        "haiyangz@microsoft.com" <haiyangz@microsoft.com>,
-        "sthemmin@microsoft.com" <sthemmin@microsoft.com>,
-        "wei.liu@kernel.org" <wei.liu@kernel.org>,
-        Dexuan Cui <decui@microsoft.com>,
-        Krasnov Arseniy <oxffffaa@gmail.com>,
-        "virtualization@lists.linux-foundation.org" 
-        <virtualization@lists.linux-foundation.org>,
-        "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "linux-hyperv@vger.kernel.org" <linux-hyperv@vger.kernel.org>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        kernel <kernel@sberdevices.ru>
-Subject: Re: [RFC PATCH v2 0/9] vsock: updates for SO_RCVLOWAT handling
-Message-ID: <20220802080417.xyfwdidlirklr4oj@sgarzare-redhat>
-References: <19e25833-5f5c-f9b9-ac0f-1945ea17638d@sberdevices.ru>
- <20220727123710.pwzy6ag3gavotxda@sgarzare-redhat>
- <D7315A7C-D288-4BDC-A8BF-B8631D8664BA@vmware.com>
+        with ESMTP id S233640AbiHBIR1 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 2 Aug 2022 04:17:27 -0400
+Received: from mx0a-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 521AB19285
+        for <kvm@vger.kernel.org>; Tue,  2 Aug 2022 01:17:26 -0700 (PDT)
+Received: from pps.filterd (m0098419.ppops.net [127.0.0.1])
+        by mx0b-001b2d01.pphosted.com (8.17.1.5/8.17.1.5) with ESMTP id 2728Dhc8015748
+        for <kvm@vger.kernel.org>; Tue, 2 Aug 2022 08:17:25 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=content-type :
+ mime-version : content-transfer-encoding : in-reply-to : references :
+ subject : cc : to : from : message-id : date; s=pp1;
+ bh=HoCaPLzItMNVKHbnJ0/3Fwrm8BsAjpytYUYeHTKo6GE=;
+ b=KAf2551M2etR/sgbX8duNxNOM+vvoVjjwKjj/20sx8L1k4V1I7G+4D6q9+5JrTd4z7h3
+ guXSlUyXUTuUoX8TyM46mUTN0JeIFF9fnzlwoYQ7KzU2eiu8eyzCnhGUltdaRIRJx+iD
+ 5IqurqGdj2Iwu0n+UQPYQ1ezbq4k/C+EhBAbYTRQGeB3K07NmlKPsrJfl0vG7apkZIu/
+ lsKppr6S32g0soxDgRgTpCEaISxRHZz9DpYdFbhhfDTvGy4gAwNjHAXC6pGGudj/y4eI
+ yizgnA44wIlEEWO6OjRDPFmc32Y6QMy0uNDRxMnX8NRCWUK7xsVmqW/jeG2XNTg3VIGa LA== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0b-001b2d01.pphosted.com (PPS) with ESMTPS id 3hq07sr51m-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT)
+        for <kvm@vger.kernel.org>; Tue, 02 Aug 2022 08:17:25 +0000
+Received: from m0098419.ppops.net (m0098419.ppops.net [127.0.0.1])
+        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 2728Dou8016283
+        for <kvm@vger.kernel.org>; Tue, 2 Aug 2022 08:17:25 GMT
+Received: from ppma04ams.nl.ibm.com (63.31.33a9.ip4.static.sl-reverse.com [169.51.49.99])
+        by mx0b-001b2d01.pphosted.com (PPS) with ESMTPS id 3hq07sr4xs-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Tue, 02 Aug 2022 08:17:24 +0000
+Received: from pps.filterd (ppma04ams.nl.ibm.com [127.0.0.1])
+        by ppma04ams.nl.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 27287pds014358;
+        Tue, 2 Aug 2022 08:17:02 GMT
+Received: from b06cxnps4075.portsmouth.uk.ibm.com (d06relay12.portsmouth.uk.ibm.com [9.149.109.197])
+        by ppma04ams.nl.ibm.com with ESMTP id 3hmv98ke32-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Tue, 02 Aug 2022 08:17:01 +0000
+Received: from d06av25.portsmouth.uk.ibm.com (d06av25.portsmouth.uk.ibm.com [9.149.105.61])
+        by b06cxnps4075.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 2728GwJF27066826
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Tue, 2 Aug 2022 08:16:58 GMT
+Received: from d06av25.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id C93DF11C052;
+        Tue,  2 Aug 2022 08:16:58 +0000 (GMT)
+Received: from d06av25.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id ADEE911C04C;
+        Tue,  2 Aug 2022 08:16:58 +0000 (GMT)
+Received: from li-ca45c2cc-336f-11b2-a85c-c6e71de567f1.ibm.com (unknown [9.171.89.124])
+        by d06av25.portsmouth.uk.ibm.com (Postfix) with ESMTP;
+        Tue,  2 Aug 2022 08:16:58 +0000 (GMT)
+Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii; format=flowed
-Content-Disposition: inline
-In-Reply-To: <D7315A7C-D288-4BDC-A8BF-B8631D8664BA@vmware.com>
-X-Spam-Status: No, score=-3.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,
-        SPF_HELO_NONE,SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
+Content-Transfer-Encoding: quoted-printable
+In-Reply-To: <20220729082633.277240-7-frankja@linux.ibm.com>
+References: <20220729082633.277240-1-frankja@linux.ibm.com> <20220729082633.277240-7-frankja@linux.ibm.com>
+Subject: Re: [kvm-unit-tests PATCH 6/6] lib: s390x: sie: Properly populate SCA
+Cc:     imbrenda@linux.ibm.com, seiden@linux.ibm.com, scgl@linux.ibm.com,
+        thuth@redhat.com
+To:     Janosch Frank <frankja@linux.ibm.com>, kvm@vger.kernel.org
+From:   Nico Boehr <nrb@linux.ibm.com>
+Message-ID: <165942821849.253051.4844800369210383799@localhost.localdomain>
+User-Agent: alot/0.8.1
+Date:   Tue, 02 Aug 2022 10:16:58 +0200
+X-TM-AS-GCONF: 00
+X-Proofpoint-ORIG-GUID: YjO1A99swQ250GeQjbtPYMkbalHsX7kE
+X-Proofpoint-GUID: LdvPa8hPXf_2-5Tc9qApczhI6od63w_f
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.205,Aquarius:18.0.883,Hydra:6.0.517,FMLib:17.11.122.1
+ definitions=2022-08-02_03,2022-08-01_01,2022-06-22_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 clxscore=1015
+ lowpriorityscore=0 suspectscore=0 adultscore=0 mlxscore=0 bulkscore=0
+ priorityscore=1501 impostorscore=0 spamscore=0 phishscore=0 malwarescore=0
+ mlxlogscore=786 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2206140000 definitions=main-2208020038
+X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_EF,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_PASS
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi Vishnu,
+Quoting Janosch Frank (2022-07-29 10:26:33)
+> CPU0 is the only cpu that's being used but we should still mark it as
+> online and set the SDA in the SCA.
+>=20
+> Signed-off-by: Janosch Frank <frankja@linux.ibm.com>
 
-On Tue, Aug 02, 2022 at 05:35:22AM +0000, Vishnu Dasa wrote:
->> On Jul 27, 2022, at 5:37 AM, Stefano Garzarella <sgarzare@redhat.com> 
->> wrote:
->> Hi Arseniy,
->>
->> On Mon, Jul 25, 2022 at 07:54:05AM +0000, Arseniy Krasnov wrote:
-
-[...]
-
->>>
->>> 3) vmci/vsock:
->>>  Same as 2), but i'm not sure about this changes. Will be very good,
->>>  to get comments from someone who knows this code.
->>
->> I CCed VMCI maintainers to the patch and also to this cover, maybe
->> better to keep them in the loop for next versions.
->>
->> (Jorgen's and Rajesh's emails bounced back, so I'm CCing here only
->> Bryan, Vishnu, and pv-drivers@vmware.com)
->
->Hi Stefano,
->Jorgen and Rajesh are no longer with VMware.  There's a patch in
->flight to remove Rajesh from the MAINTAINERS file (Jorgen is already
->removed).
-
-Thanks for the update! I will contact you and Bryan for any questions 
-with VMCI in the future :-)
-
-Stefano
-
+Reviewed-by: Nico Boehr <nrb@linux.ibm.com>
