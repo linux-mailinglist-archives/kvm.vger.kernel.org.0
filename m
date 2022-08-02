@@ -2,136 +2,196 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id D9E6F5883B5
-	for <lists+kvm@lfdr.de>; Tue,  2 Aug 2022 23:43:37 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id A998058841C
+	for <lists+kvm@lfdr.de>; Wed,  3 Aug 2022 00:20:21 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234780AbiHBVnf (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 2 Aug 2022 17:43:35 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53096 "EHLO
+        id S234937AbiHBWTl (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 2 Aug 2022 18:19:41 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49742 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231161AbiHBVnd (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 2 Aug 2022 17:43:33 -0400
-Received: from mail-pg1-x52b.google.com (mail-pg1-x52b.google.com [IPv6:2607:f8b0:4864:20::52b])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 14AED19C01
-        for <kvm@vger.kernel.org>; Tue,  2 Aug 2022 14:43:32 -0700 (PDT)
-Received: by mail-pg1-x52b.google.com with SMTP id 206so9966945pgb.0
-        for <kvm@vger.kernel.org>; Tue, 02 Aug 2022 14:43:32 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date:from:to
-         :cc;
-        bh=glIoMvy+V8piFljmDBSx1DXBvemkA6EbTrCh0bvpQQM=;
-        b=bXtC5cvRALUa/1WE0ly/zfA9Ixmtzw5XKDDqJ7xA/MZ2JEiS0E84uQe9/5YDrlj1j1
-         bPiKiu1wZ5qOKDN9EkX5fFU1UgNTVLbTTuGJNjJDmLCSdzSNfL3IFteLCTlz1lCwvgdJ
-         7l/KGtCLKdTW+9LqNbdBak5iOfLoU8BzAyb4p4MRp62KCRXTcK6aEv+iuElX9guDUtF9
-         A9dlpmOgwwMBQOSSCcAvoaHZLyxMFgFL+ccMmbyx7gdDjnIyRr1uqbTp0VCd0PXpZJbt
-         C0s+liN2XOmtcDLOR5jgbx/uMe7kL1/foBA5s7E8Pi+GDq7JLbzmPxvQcQ8JFgeawTOH
-         LZ2g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date
-         :x-gm-message-state:from:to:cc;
-        bh=glIoMvy+V8piFljmDBSx1DXBvemkA6EbTrCh0bvpQQM=;
-        b=xZXjPGqFgbR+CZseMvIQsHCli/m98JylOJGya2g8wDV26QN0/2Tf3ZIGGSBjN39NJE
-         TabIkv7du7fwAdWy7OF0ktr1goEL7V726eDabzrACy2h2RrW6ThHiGsmvaGdc7DrLemM
-         RzBX88MHoSRjRgxuVDt3J19TD97OLM2jxJRZbQV50dNN34jryl/qVybvv4bYTqnM4WcP
-         WZ3CwS41z1KGbYeN+IkCOq2aol+brbrpA3LklQGrsvaIEdhzdPiXzhn2EGJqan1pQK/h
-         tPrEmCLf3ouCQl/Imv8RALZFL5Pv+KplGbGdj6ZaFKGvE6YUpe32RPRVVpKm/OMBgrYh
-         PPUg==
-X-Gm-Message-State: AJIora/mkSx7a3b3cvue74M6/hJmJDTqkRE6WpOfNGifJi2vv+OM95dF
-        JLs5umoiYSgz0U3a/SHKRDzdLQ==
-X-Google-Smtp-Source: AGRyM1t8NwHkIq41xaU0E/q8nllWxF+IG4nAKsFzU5BfqUvk9QC8EJW8Bvrd7zkDShHaMjlywqZsRw==
-X-Received: by 2002:a05:6a00:16ca:b0:52b:cc59:9488 with SMTP id l10-20020a056a0016ca00b0052bcc599488mr22807097pfc.0.1659476611335;
-        Tue, 02 Aug 2022 14:43:31 -0700 (PDT)
-Received: from google.com (7.104.168.34.bc.googleusercontent.com. [34.168.104.7])
-        by smtp.gmail.com with ESMTPSA id a9-20020a170902ecc900b0016c28fbd7e5sm149763plh.268.2022.08.02.14.43.30
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 02 Aug 2022 14:43:30 -0700 (PDT)
-Date:   Tue, 2 Aug 2022 21:43:26 +0000
-From:   Sean Christopherson <seanjc@google.com>
-To:     Dmytro Maluka <dmy@semihalf.com>
+        with ESMTP id S229787AbiHBWTk (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 2 Aug 2022 18:19:40 -0400
+Received: from mga07.intel.com (mga07.intel.com [134.134.136.100])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 461D8F584;
+        Tue,  2 Aug 2022 15:19:39 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1659478779; x=1691014779;
+  h=message-id:subject:from:to:cc:date:in-reply-to:
+   references:content-transfer-encoding:mime-version;
+  bh=rVk3Q1NSe0FUTqWPvIopaXse8VnflA9IUoUyNUenB6g=;
+  b=gOlu/Ca1qluypRBfl8Ul9L1XgT98cOdLlUUa3kwgpBAT6HEdM8Rohe51
+   f2nhkrcGEz27J1gCMCbIS9XBdmZavxnpcdnr7/vMFajgGBDukD36MD0ec
+   aZDenkK7x8pal+GnbGgf6X5dELQPlFumVquKh4g1nfNI9VVrFUfBf0WnC
+   Hv4s5Pk8U8voJqh9RYmnC9SFukWhCxJwTZwtXKNdBJebVh20JFa0BkvsN
+   DJ+SDj+vbxG8+VRylFnr870hd5M1JIv4IIONQQgEs3r14KBJplQyhY0Lv
+   Iu4SUkedMJaPIDhaepIMXe5avq9g7iu66mj0uPfH2wG4Yvj+J+Sc2RTDn
+   Q==;
+X-IronPort-AV: E=McAfee;i="6400,9594,10427"; a="353534423"
+X-IronPort-AV: E=Sophos;i="5.93,212,1654585200"; 
+   d="scan'208";a="353534423"
+Received: from fmsmga003.fm.intel.com ([10.253.24.29])
+  by orsmga105.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 02 Aug 2022 15:19:38 -0700
+X-IronPort-AV: E=Sophos;i="5.93,212,1654585200"; 
+   d="scan'208";a="692015435"
+Received: from gvenka2-desk.amr.corp.intel.com (HELO khuang2-desk.gar.corp.intel.com) ([10.212.85.17])
+  by fmsmga003-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 02 Aug 2022 15:19:36 -0700
+Message-ID: <ebbccf92d7ab97bd79dac5529f109aa5b92542ab.camel@intel.com>
+Subject: Re: [PATCH 2/4] KVM: x86/mmu: Fully re-evaluate MMIO caching when
+ SPTE masks change
+From:   Kai Huang <kai.huang@intel.com>
+To:     Sean Christopherson <seanjc@google.com>
 Cc:     Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org,
-        "H. Peter Anvin" <hpa@zytor.com>, linux-kernel@vger.kernel.org,
-        Eric Auger <eric.auger@redhat.com>,
-        Alex Williamson <alex.williamson@redhat.com>,
-        Rong L Liu <rong.l.liu@intel.com>,
-        Zhenyu Wang <zhenyuw@linux.intel.com>,
-        Tomasz Nowicki <tn@semihalf.com>,
-        Grzegorz Jaszczyk <jaz@semihalf.com>,
-        Dmitry Torokhov <dtor@google.com>
-Subject: Re: [PATCH 1/3] KVM: x86: Move kvm_(un)register_irq_mask_notifier()
- to generic KVM
-Message-ID: <Yumafj7MQrG6nRjr@google.com>
-References: <20220715155928.26362-1-dmy@semihalf.com>
- <20220715155928.26362-2-dmy@semihalf.com>
- <YuLZng8mW0qn4MFk@google.com>
- <1cdff41c-c917-1344-02bc-ad5cf5c79ab1@semihalf.com>
+        linux-kernel@vger.kernel.org, Michael Roth <michael.roth@amd.com>,
+        Tom Lendacky <thomas.lendacky@amd.com>
+Date:   Wed, 03 Aug 2022 10:19:35 +1200
+In-Reply-To: <YumT+6joTz2M1zZP@google.com>
+References: <20220728221759.3492539-1-seanjc@google.com>
+         <20220728221759.3492539-3-seanjc@google.com>
+         <9104e22da628fef86a6e8a02d9d2e81814a9d598.camel@intel.com>
+         <YuP3zGmpiALuXfW+@google.com>
+         <f313c41ed50e187ae5de87b32325c6cd4cc17c79.camel@intel.com>
+         <YufgCR9CpeoVWKF7@google.com>
+         <244f619a4e7a1c7079830d12379872a111da418d.camel@intel.com>
+         <YuhfuQbHy4P9EZcw@google.com>
+         <4fd3cea874b69f1c8bbcaf19538c7fdcb9c22aab.camel@intel.com>
+         <YumT+6joTz2M1zZP@google.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+User-Agent: Evolution 3.44.3 (3.44.3-1.fc36) 
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <1cdff41c-c917-1344-02bc-ad5cf5c79ab1@semihalf.com>
-X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-        USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=unavailable
-        autolearn_force=no version=3.4.6
+X-Spam-Status: No, score=-5.0 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
+        SPF_HELO_NONE,SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Jul 29, 2022, Dmytro Maluka wrote:
-> On 7/28/22 20:46, Sean Christopherson wrote:
-> > On Fri, Jul 15, 2022, Dmytro Maluka wrote:
-> >> In preparation for implementing postponing resamplefd event until the
-> >> interrupt is unmasked, move kvm_(un)register_irq_mask_notifier() from
-> >> x86 to arch-independent code to make it usable by irqfd.
-> > 
-> > This patch needs to move more than just the helpers, e.g. mask_notifier_list
-> > needs to be in "struct kvm", not "stuct kvm_arch".
-> > 
-> > arch/arm64/kvm/../../../virt/kvm/eventfd.c: In function ‘kvm_register_irq_mask_notifier’:
-> > arch/arm64/kvm/../../../virt/kvm/eventfd.c:528:51: error: ‘struct kvm_arch’ has no member named ‘mask_notifier_list’
-> >   528 |         hlist_add_head_rcu(&kimn->link, &kvm->arch.mask_notifier_list);
-> >       |                                                   ^
-> > make[3]: *** [scripts/Makefile.build:249: arch/arm64/kvm/../../../virt/kvm/eventfd.o] Error 1
-> > make[3]: *** Waiting for unfinished jobs....
-> >   AR      kernel/entry/built-in.a
-> 
-> Oops, sorry.
-> 
-> > And kvm_fire_mask_notifiers() should probably be moved as well, otherwise there's
-> > no point in moving the registration to common code.
-> 
-> Good point, we can move it right away, even though it is not called on
-> other architectures for now.
-> 
-> > The other option would be to make the generic functions wrappers around arch-specific
-> > hooks.  But IIRC won't this eventually be needed for other architectures?
-> 
-> Right, I assume we will eventually need it for ARM at least. Not in the
-> near future though, and at the moment I have no non-x86 hardware on hand
-> to implement it for other architectures.
-> 
-> Actually I feel a bit uncomfortable with generic irqfd relying on
-> kvm_register_irq_mask_notifier() which silently has no effect on other
-> architectures. Maybe it's better to keep
-> kvm_(un)register_irq_mask_notifier() in the x86 code, and for the
-> generic code add a weak version which e.g. just prints a warning like
-> "irq mask notifiers not implemented on this arch". (Or maybe instead of
-> weak functions introduce arch-specific hooks as you suggested, and print
-> such a warning if no hook is provided.) What do you think?
+On Tue, 2022-08-02 at 21:15 +0000, Sean Christopherson wrote:
+> On Tue, Aug 02, 2022, Kai Huang wrote:
+> > On Mon, 2022-08-01 at 23:20 +0000, Sean Christopherson wrote:
+> > > On Tue, Aug 02, 2022, Kai Huang wrote:
+> > > > On Mon, 2022-08-01 at 14:15 +0000, Sean Christopherson wrote:
+> > > > > Another thing to note is that only the value needs to be per-VM, =
+the mask can be
+> > > > > KVM-wide, i.e. "mask =3D SUPPRESS_VE | RWX" will work for TDX and=
+ non-TDX VMs when
+> > > > > EPT is enabled.
+> > > >=20
+> > > > Yeah, but is more like VMX and TDX both *happen* to have the same m=
+ask?=20
+> > > > Theoretically,  VMX only need RWX to trigger EPT misconfiguration b=
+ut doesn't
+> > > > need SUPPRESS_VE.
+> > >=20
+> > > Right, SUPPRESS_VE isn't strictly necessary, but KVM already delibera=
+tely avoids
+> > > bit 63 because it has meaning, e.g. SUPPRESS_VE for EPT and NX for PA=
+E and 64-bit
+> > > paging. =20
+> > >=20
+> > > > I don't see making mask/value both per-vm is a big issue?
+> > >=20
+> > > Yes and no.
+> > >=20
+> > > No, in the sense that it's not a big issue in terms of code. =20
+> > >=20
+> > > Yes, because of the connotations of having a per-VM mask.  While havi=
+ng SUPPRESS_VE
+> > > in the mask for non-TDX EPT isn't strictly necessary, it's also not s=
+trictly necessary
+> > > to _not_ have it in the mask. =C2=A0
+> > >=20
+> >=20
+> > I think the 'mask' itself is ambiguous, i.e. it doesn't say in what cir=
+cumstance
+> > we should include one bit to the mask.  My understanding is any bit in =
+the
+> > 'mask' should at least be related to the 'value' that can enable MMIO c=
+aching.
+>=20
+> The purpose of the mask isn't ambiguous, though it's definitely not well =
+documented.
+> The mask defines what bits should be included in the check to identify an=
+ MMIO SPTE.
 
-If the entire concept of having mask notifiers is x86 specific, then moving it to
-generic code obviously doesn't make sense.  But if the concept applies to other
-archictectures, then IMO the list belongs in "struct kvm" with generic, common
-helpers, even if no other arch calls kvm_fire_mask_notifiers() at this time.
+Yes this is true.
 
-Paolo and/or non-x86 folks, any thoughts?
+> =20
+> > So if SUPPRESS_VE bit is not related to non-TDX EPT (as we want EPT
+> > misconfiguration, but not EPT violation), I don't see why we need to in=
+clude it
+> > to the  'mask'.
+>=20
+> Again, it's not strictly necessary, but by doing so we don't need a per-V=
+M mask.
+> And KVM should also never set SUPPRESS_VE for MMIO SPTEs, i.e. checking t=
+hat bit
+> by including it in the mask adds some sanitcy check (albeit a miniscule a=
+mount).
+
+OK.
+
+>=20
+> > > In other words, having a per-VM mask incorrectly implies that TDX _mu=
+st_
+> > > have a different mask.
+> >=20
+> > I interpret as TDX _can_, but not _must_.=20
+>=20
+> Right, but if we write the KVM code such that it doesn't have a different=
+ mask,
+> then even that "can" is wrong/misleading.
+>=20
+> > > It's also one more piece of information that developers have to track=
+ down and
+> > > account for, i.e. one more thing we can screw up.
+> > >=20
+> > > The other aspect of MMIO SPTEs are that the mask bits must not overla=
+p the generation
+> > > bits or shadow-present bit, and changing any of those bits requires c=
+areful
+> > > consideration, i.e. defining the set of _allowed_ mask bits on a per-=
+VM basis would
+> > > incur significant complexity without providing meaningful benefit. =
+=C2=A0
+> > >=20
+> >=20
+> > Agreed on this.
+> >=20
+> > But we are not checking any of those in kvm_mmu_set_mmio_spte_mask(), r=
+ight? :)
+>=20
+> No, but we really should.
+
+I can come up a patch if you are not planning to do so?
+
+>=20
+> > Also Isaku's patch extends kvm_mmu_set_mmio_spte_mask() to take 'kvm' o=
+r 'vcpu'
+> > as parameter so it's easy to check there -- not 100% sure about other p=
+laces,
+> > though.
+> >=20
+> > > As a result,
+> > > it's highly unlikely that we'll ever want to opportunsitically "recla=
+im" bit 63
+> > > for MMIO SPTEs, so there's practically zero cost if it's included in =
+the mask for
+> > > non-TDX EPT.
+> >=20
+> > Sorry I don't understand this.  If we will never "reclaim" bit 63 for M=
+MIO SPTEs
+> > (for non-TDX EPT), then why bother including it to the mask?
+>=20
+> Because then we don't need to track a per-VM mask.
+
+OK.
+
+--=20
+Thanks,
+-Kai
+
+
