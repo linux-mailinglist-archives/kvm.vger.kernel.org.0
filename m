@@ -2,115 +2,203 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 11F22588A41
-	for <lists+kvm@lfdr.de>; Wed,  3 Aug 2022 12:18:11 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 607AA588ABF
+	for <lists+kvm@lfdr.de>; Wed,  3 Aug 2022 12:46:39 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236468AbiHCKSH (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 3 Aug 2022 06:18:07 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56630 "EHLO
+        id S233605AbiHCKqh (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 3 Aug 2022 06:46:37 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52068 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233057AbiHCKSD (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 3 Aug 2022 06:18:03 -0400
-Received: from mga06.intel.com (mga06b.intel.com [134.134.136.31])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CB8E0B3C;
-        Wed,  3 Aug 2022 03:18:02 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1659521882; x=1691057882;
-  h=date:from:to:cc:subject:message-id:reply-to:references:
-   mime-version:in-reply-to;
-  bh=wFam+LDcRbKILr0ubXYReeOGRVLmWUy4n8feDpXT4KY=;
-  b=jixmJUcG97PKX5ZUa28+bVmJitLlvDDyE5XCz7Ngn6Sxs2fCCk346OQh
-   /e7FPrzxv/OdN4siefyhkCmDrmkJFuKi1quptgBEu6/s5XmygcajKBJyS
-   ZrsivssBk6Q7Shs30NldTHjA62ZsniOd/HXGIDXlrTKGtCc5gAS4ZwvNo
-   qo42XvQaBejZVxpSQUtCDI1QrL1sCc3Xo8xti8W/but3T4lGXOid1a2+Z
-   es7fB9RoKojXChzirRk7Rdgt+2K7OkYwaS65MVYx5fSlXPS65iNPv2qhQ
-   +W/GCziMYhi4xBvRcr6NoRpWxw/cDdJjsMT1swi02fnY9YKHgpQp6glME
-   Q==;
-X-IronPort-AV: E=McAfee;i="6400,9594,10427"; a="351350449"
-X-IronPort-AV: E=Sophos;i="5.93,213,1654585200"; 
-   d="scan'208";a="351350449"
-Received: from orsmga008.jf.intel.com ([10.7.209.65])
-  by orsmga104.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 03 Aug 2022 03:18:02 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.93,213,1654585200"; 
-   d="scan'208";a="631095811"
-Received: from chaop.bj.intel.com (HELO localhost) ([10.240.193.75])
-  by orsmga008.jf.intel.com with ESMTP; 03 Aug 2022 03:17:51 -0700
-Date:   Wed, 3 Aug 2022 18:13:04 +0800
-From:   Chao Peng <chao.p.peng@linux.intel.com>
-To:     Sean Christopherson <seanjc@google.com>
-Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
-        linux-mm@kvack.org, linux-fsdevel@vger.kernel.org,
-        linux-api@vger.kernel.org, linux-doc@vger.kernel.org,
-        qemu-devel@nongnu.org, linux-kselftest@vger.kernel.org,
+        with ESMTP id S229784AbiHCKqf (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 3 Aug 2022 06:46:35 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 29584DBE
+        for <kvm@vger.kernel.org>; Wed,  3 Aug 2022 03:46:33 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1659523592;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=MdnLN5PIt1FMlGFlixO3xRUWYIqpyA/qYv0kgPzaN/4=;
+        b=gh1IOWhDRhQEZtdGYYJmDUSd3VwuOeI4Z2qtSzknxrOLuey4j1+GL3h7gJyH9WNZKPcMHo
+        Fux9woyBNL8huyJzbqONtcBXl1DerbWzqJ4dPgqfE1llDQInGxOUCP6XxtPio3MnVEqYYK
+        OcuNpwUV5U5aOu7jvJyVe4bhiNMMNZQ=
+Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
+ [209.85.128.72]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-102-qj-VmAJEOWStmarPZCgYDA-1; Wed, 03 Aug 2022 06:46:31 -0400
+X-MC-Unique: qj-VmAJEOWStmarPZCgYDA-1
+Received: by mail-wm1-f72.google.com with SMTP id p2-20020a05600c1d8200b003a3262d9c51so873229wms.6
+        for <kvm@vger.kernel.org>; Wed, 03 Aug 2022 03:46:31 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to:user-agent;
+        bh=MdnLN5PIt1FMlGFlixO3xRUWYIqpyA/qYv0kgPzaN/4=;
+        b=mye50JvAi/k3KWZKTyH6IzenqUkdncVs10judhp/JkRLfq6mJQNL7bQZU6DkhGebJF
+         TlRq4yFdzLanCXrKMOMcLSe7GVepwv5pVwkq0xFHxO0VcRjH1BSJ0GTJmuAFnOFjw/Yl
+         IRAkEP0NVRRRGT1RcAtsP453YE+Dk+dEbXwVJcZQp73X1yXFM3L8vS5WnMTdxOdrJcNe
+         JdY0zdnfxYlZ360IpQHWlBeKJ7L+SPNYdsHmLudaU48inaGaPWtjFCMMkwuo0+InGwlI
+         Don/STtPCQDVLO4VEsu0AJJ3a7zkykk05xtG/Cl8nQU6lYS9ZrmwAwnLfmQrQ/G3aggc
+         8TQg==
+X-Gm-Message-State: ACgBeo0+qj1p89HxzYtr519dos6MTlrfKmJvaXcUiE1oxvoTzZdgtrQc
+        Wr4UeYGyOTTaBQFOKVOZ3ZGcc5wHpF3psAh6ZAaU8JYtEMp+5gF8a/UioWub5F4Ccmlijz751XW
+        HRTJrDfYxVGyL
+X-Received: by 2002:a05:600c:4b96:b0:3a4:e8c6:97fa with SMTP id e22-20020a05600c4b9600b003a4e8c697famr2388951wmp.102.1659523590290;
+        Wed, 03 Aug 2022 03:46:30 -0700 (PDT)
+X-Google-Smtp-Source: AA6agR469/a5z2MM262xtAy5hyusMtpj0BUZe7dtHcbtdxY+7tPKtrPBq6S4/4D+U15jJicJLhkp6A==
+X-Received: by 2002:a05:600c:4b96:b0:3a4:e8c6:97fa with SMTP id e22-20020a05600c4b9600b003a4e8c697famr2388909wmp.102.1659523590082;
+        Wed, 03 Aug 2022 03:46:30 -0700 (PDT)
+Received: from work-vm (cpc109025-salf6-2-0-cust480.10-2.cable.virginm.net. [82.30.61.225])
+        by smtp.gmail.com with ESMTPSA id m1-20020a7bcb81000000b003a3278d5cafsm1958553wmi.28.2022.08.03.03.46.27
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 03 Aug 2022 03:46:29 -0700 (PDT)
+Date:   Wed, 3 Aug 2022 11:46:26 +0100
+From:   "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+To:     Alberto Faria <afaria@redhat.com>,
+        Markus Armbruster <armbru@redhat.com>
+Cc:     qemu-devel@nongnu.org,
+        =?iso-8859-1?Q?Marc-Andr=E9?= Lureau 
+        <marcandre.lureau@redhat.com>,
+        Stefano Garzarella <sgarzare@redhat.com>,
+        Hannes Reinecke <hare@suse.com>,
+        Vladimir Sementsov-Ogievskiy <vsementsov@yandex-team.ru>,
+        "Maciej S. Szmigiero" <maciej.szmigiero@oracle.com>,
+        Peter Lieven <pl@kamp.de>, kvm@vger.kernel.org,
+        Xie Yongji <xieyongji@bytedance.com>,
+        Eric Auger <eric.auger@redhat.com>,
+        Hanna Reitz <hreitz@redhat.com>,
+        Jeff Cody <codyprime@gmail.com>,
+        Eric Blake <eblake@redhat.com>,
+        "Denis V. Lunev" <den@openvz.org>,
+        Daniel =?iso-8859-1?Q?P=2E_Berrang=E9?= <berrange@redhat.com>,
+        Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <f4bug@amsat.org>,
+        Christian Schoenebeck <qemu_oss@crudebyte.com>,
+        Stefan Weil <sw@weilnetz.de>, Klaus Jensen <its@irrelevant.dk>,
+        Laurent Vivier <lvivier@redhat.com>,
+        Alberto Garcia <berto@igalia.com>,
+        Michael Roth <michael.roth@amd.com>,
+        Juan Quintela <quintela@redhat.com>,
+        David Hildenbrand <david@redhat.com>, qemu-block@nongnu.org,
+        Konstantin Kostiuk <kkostiuk@redhat.com>,
+        Kevin Wolf <kwolf@redhat.com>,
+        Gerd Hoffmann <kraxel@redhat.com>,
+        Stefan Hajnoczi <stefanha@redhat.com>,
+        Marcelo Tosatti <mtosatti@redhat.com>,
+        Greg Kurz <groug@kaod.org>,
+        "Michael S. Tsirkin" <mst@redhat.com>, Amit Shah <amit@kernel.org>,
         Paolo Bonzini <pbonzini@redhat.com>,
-        Jonathan Corbet <corbet@lwn.net>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        x86@kernel.org, "H . Peter Anvin" <hpa@zytor.com>,
-        Hugh Dickins <hughd@google.com>,
-        Jeff Layton <jlayton@kernel.org>,
-        "J . Bruce Fields" <bfields@fieldses.org>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        Shuah Khan <shuah@kernel.org>, Mike Rapoport <rppt@kernel.org>,
-        Steven Price <steven.price@arm.com>,
-        "Maciej S . Szmigiero" <mail@maciej.szmigiero.name>,
-        Vlastimil Babka <vbabka@suse.cz>,
-        Vishal Annapurve <vannapurve@google.com>,
-        Yu Zhang <yu.c.zhang@linux.intel.com>,
-        "Kirill A . Shutemov" <kirill.shutemov@linux.intel.com>,
-        luto@kernel.org, jun.nakajima@intel.com, dave.hansen@intel.com,
-        ak@linux.intel.com, david@redhat.com, aarcange@redhat.com,
-        ddutile@redhat.com, dhildenb@redhat.com,
-        Quentin Perret <qperret@google.com>,
-        Michael Roth <michael.roth@amd.com>, mhocko@suse.com,
-        Muchun Song <songmuchun@bytedance.com>
-Subject: Re: [PATCH v7 08/14] KVM: Rename mmu_notifier_*
-Message-ID: <20220803101304.GE607465@chaop.bj.intel.com>
-Reply-To: Chao Peng <chao.p.peng@linux.intel.com>
-References: <20220706082016.2603916-1-chao.p.peng@linux.intel.com>
- <20220706082016.2603916-9-chao.p.peng@linux.intel.com>
- <YuQutJAhKWcsrrYl@google.com>
+        Alex Williamson <alex.williamson@redhat.com>,
+        Peter Xu <peterx@redhat.com>,
+        Raphael Norwitz <raphael.norwitz@nutanix.com>,
+        Ronnie Sahlberg <ronniesahlberg@gmail.com>,
+        Jason Wang <jasowang@redhat.com>,
+        Emanuele Giuseppe Esposito <eesposit@redhat.com>,
+        Richard Henderson <richard.henderson@linaro.org>,
+        Marcel Apfelbaum <marcel.apfelbaum@gmail.com>,
+        Dmitry Fleytman <dmitry.fleytman@gmail.com>,
+        Eduardo Habkost <eduardo@habkost.net>,
+        Fam Zheng <fam@euphon.net>, Thomas Huth <thuth@redhat.com>,
+        Keith Busch <kbusch@kernel.org>,
+        Alex =?iso-8859-1?Q?Benn=E9e?= <alex.bennee@linaro.org>,
+        "Richard W.M. Jones" <rjones@redhat.com>,
+        John Snow <jsnow@redhat.com>
+Subject: Re: [RFC v2 02/10] Drop unused static function return values
+Message-ID: <YupSAhFRK962i+nL@work-vm>
+References: <20220729130040.1428779-1-afaria@redhat.com>
+ <20220729130040.1428779-3-afaria@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <YuQutJAhKWcsrrYl@google.com>
-X-Spam-Status: No, score=-4.9 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,SPF_HELO_NONE,
-        SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
+In-Reply-To: <20220729130040.1428779-3-afaria@redhat.com>
+User-Agent: Mutt/2.2.6 (2022-06-05)
+X-Spam-Status: No, score=-2.7 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        SPF_HELO_NONE,SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Jul 29, 2022 at 07:02:12PM +0000, Sean Christopherson wrote:
-> On Wed, Jul 06, 2022, Chao Peng wrote:
-> > The sync mechanism between mmu_notifier and page fault handler employs
-> > fields mmu_notifier_seq/count and mmu_notifier_range_start/end. For the
-> > to be added private memory, there is the same mechanism needed but not
-> > rely on mmu_notifier (It uses new introduced memfile_notifier). This
-> > patch renames the existing fields and related helper functions to a
-> > neutral name mmu_updating_* so private memory can reuse.
+* Alberto Faria (afaria@redhat.com) wrote:
+> Make non-void static functions whose return values are ignored by
+> all callers return void instead.
 > 
-> mmu_updating_* is too broad of a term, e.g. page faults and many other operations
-> also update the mmu.  Although the name most definitely came from the mmu_notifier,
-> it's not completely inaccurate for other sources, e.g. KVM's MMU is still being
-> notified of something, even if the source is not the actual mmu_notifier.
+> These functions were found by static-analyzer.py.
 > 
-> If we really want a different name, I'd vote for nomenclature that captures the
-> invalidation aspect, which is really what the variables are all trackng, e.g.
+> Not all occurrences of this problem were fixed.
 > 
->   mmu_invalidate_seq
->   mmu_invalidate_in_progress
->   mmu_invalidate_range_start
->   mmu_invalidate_range_end
+> Signed-off-by: Alberto Faria <afaria@redhat.com>
 
-Looks good to me. Thanks.
+<snip>
 
-Chao
+> diff --git a/migration/migration.c b/migration/migration.c
+> index e03f698a3c..4698080f96 100644
+> --- a/migration/migration.c
+> +++ b/migration/migration.c
+> @@ -175,7 +175,7 @@ static MigrationIncomingState *current_incoming;
+>  
+>  static GSList *migration_blockers;
+>  
+> -static bool migration_object_check(MigrationState *ms, Error **errp);
+> +static void migration_object_check(MigrationState *ms, Error **errp);
+>  static int migration_maybe_pause(MigrationState *s,
+>                                   int *current_active_state,
+>                                   int new_state);
+> @@ -4485,15 +4485,15 @@ static void migration_instance_init(Object *obj)
+>   * Return true if check pass, false otherwise. Error will be put
+>   * inside errp if provided.
+>   */
+> -static bool migration_object_check(MigrationState *ms, Error **errp)
+> +static void migration_object_check(MigrationState *ms, Error **errp)
+>  {
+
+I'm not sure if this is a good change.
+Where we have a function that returns an error via an Error ** it's
+normal practice for us to return a bool to say whether it generated an
+error.
+
+Now, in our case we only call it with error_fatal:
+
+    migration_object_check(current_migration, &error_fatal);
+
+so the bool isn't used/checked.
+
+So I'm a bit conflicted:
+
+  a) Using error_fatal is the easiest way to handle this function
+  b) Things taking Error ** normally do return a flag value
+  c) But it's not used in this case.
+
+Hmm.
+
+Dave
+
+>      MigrationCapabilityStatusList *head = NULL;
+>      /* Assuming all off */
+> -    bool cap_list[MIGRATION_CAPABILITY__MAX] = { 0 }, ret;
+> +    bool cap_list[MIGRATION_CAPABILITY__MAX] = { 0 };
+>      int i;
+>  
+>      if (!migrate_params_check(&ms->parameters, errp)) {
+> -        return false;
+> +        return;
+>      }
+>  
+>      for (i = 0; i < MIGRATION_CAPABILITY__MAX; i++) {
+> @@ -4502,12 +4502,10 @@ static bool migration_object_check(MigrationState *ms, Error **errp)
+>          }
+>      }
+>  
+> -    ret = migrate_caps_check(cap_list, head, errp);
+> +    migrate_caps_check(cap_list, head, errp);
+>  
+>      /* It works with head == NULL */
+>      qapi_free_MigrationCapabilityStatusList(head);
+> -
+> -    return ret;
+>  }
+-- 
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+
