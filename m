@@ -2,81 +2,72 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 665475890CC
-	for <lists+kvm@lfdr.de>; Wed,  3 Aug 2022 18:50:41 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 5F9EB5890D7
+	for <lists+kvm@lfdr.de>; Wed,  3 Aug 2022 18:53:20 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236711AbiHCQuj (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 3 Aug 2022 12:50:39 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38918 "EHLO
+        id S237137AbiHCQxQ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 3 Aug 2022 12:53:16 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40580 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S236910AbiHCQuh (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 3 Aug 2022 12:50:37 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 39CD86422
-        for <kvm@vger.kernel.org>; Wed,  3 Aug 2022 09:50:36 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1659545435;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=NEAncNPlqkr+KXbJj8athp1uFouyJqzbCLtpoJ5cyp8=;
-        b=Aro9KG989BstdoM0rTY5zTMYhqRe8B6trXLUzEDQ3b4RUic1pzz14vhgfch6pvE6fAwN1y
-        uEWKiO6VfOctcfxbhdLmr6DKHpD9G19EGkZWHWjT2OF+4w6vvAaTaPavuF0aFfnOyAL61I
-        9mabz9MvCgj8Ew8gaDtu5D3gOoC/A+s=
-Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
- [209.85.128.69]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-515-XkqfN1lGPrOcnF-4Al-gSA-1; Wed, 03 Aug 2022 12:50:34 -0400
-X-MC-Unique: XkqfN1lGPrOcnF-4Al-gSA-1
-Received: by mail-wm1-f69.google.com with SMTP id m4-20020a7bce04000000b003a386063752so341057wmc.1
-        for <kvm@vger.kernel.org>; Wed, 03 Aug 2022 09:50:33 -0700 (PDT)
+        with ESMTP id S236717AbiHCQxO (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 3 Aug 2022 12:53:14 -0400
+Received: from mail-pj1-x1036.google.com (mail-pj1-x1036.google.com [IPv6:2607:f8b0:4864:20::1036])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 29A663FA2F
+        for <kvm@vger.kernel.org>; Wed,  3 Aug 2022 09:53:14 -0700 (PDT)
+Received: by mail-pj1-x1036.google.com with SMTP id o5-20020a17090a3d4500b001ef76490983so2727144pjf.2
+        for <kvm@vger.kernel.org>; Wed, 03 Aug 2022 09:53:14 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc;
+        bh=4Tus1R0xuYRBtU57ePhS4E0yErBE8jqpbyDcNdaMSVs=;
+        b=hOAAnwWYgICjdTGqOw5garJoe78sf1ZPhQp/JtblQa1n8WVvtl1Fg/5jWqoeYo+rV6
+         7IfjUmYUrRJxxpVkbn6d6UqnIwUQF5h+dTk9ur292aTyc3sqiAWEaEKgtiA3adPZmThc
+         Ehdvbzz0F2xF6f1w74818d4nrbakcb+oJf8WVILrmoeGG6YWj5cyxlo59sXgwRAcDgcr
+         o3l21zBhmUQYo/J09tb7tT0p92hNAebXF4z9EW3tCROG+TB0AQ9ljtAyoMIa2tTGv29k
+         sCC9GynpxgwcvxRd6jkW8LT9FUX/kthjaOzCWdWvOuOyVMCKT87QcHxQ9jWr7T2/c74f
+         6iZw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc;
-        bh=NEAncNPlqkr+KXbJj8athp1uFouyJqzbCLtpoJ5cyp8=;
-        b=M1kqGJrEJrD83g2Kg8Jsxt8CWv6+IxSNvmsA/fCDr5hwtPCCO4dvk5TO+LEDXQkAm9
-         Lz91wYQyiBRNWV0q5seK+ehtA4Ku67qEcZjy1tOjEYesFU86VBuOwsVEsYsHGZk3sbrh
-         wF8gYY4u81OjOiZgbljke/ZDZgGdmbuXu7I4+7iWATKJ5v2/yLyDh7ywMh3M38Z+O+JZ
-         eWtfAJdnBolNzyOGXzt+VuYDGUqqikwjoQu0M16H2+yACOljQPAEZjV4SQG6mPvkUuY8
-         cTlvGBQOUPEztcKX+53ph6jaBcwtC6yyPVw/te+wSAbGzWCSQRnylxBSlqLa9hoyxzdP
-         094A==
-X-Gm-Message-State: ACgBeo2Pmwoj+lGzkn5tYjYfZLoFkmMaHyMOTJae9UQ7S50sDKvC+Ox0
-        zyZv2uPXOvKH6j4Ij1F/pmDJqcwSJpRSKIUZuXMsz1ziRX3+t9iFQlVlUUUupijq4Nx3DHNJNR9
-        8x8CSlOOvaLSK
-X-Received: by 2002:a05:600c:a07:b0:39e:da6e:fc49 with SMTP id z7-20020a05600c0a0700b0039eda6efc49mr3311580wmp.143.1659545432885;
-        Wed, 03 Aug 2022 09:50:32 -0700 (PDT)
-X-Google-Smtp-Source: AA6agR7LYhF69Tj8wD+f/h1aP1S1C3q4Vuqt0UQwJUlPcBc6I3wqZsJ7PBentjPZpGxljsIotWaNsg==
-X-Received: by 2002:a05:600c:a07:b0:39e:da6e:fc49 with SMTP id z7-20020a05600c0a0700b0039eda6efc49mr3311560wmp.143.1659545432684;
-        Wed, 03 Aug 2022 09:50:32 -0700 (PDT)
-Received: from ?IPV6:2001:b07:add:ec09:c399:bc87:7b6c:fb2a? ([2001:b07:add:ec09:c399:bc87:7b6c:fb2a])
-        by smtp.googlemail.com with ESMTPSA id y11-20020a056000108b00b0021e4f595590sm18411537wrw.28.2022.08.03.09.50.27
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 03 Aug 2022 09:50:31 -0700 (PDT)
-Message-ID: <e7468f00-5d1a-5d9d-ae14-060cdf0f9558@redhat.com>
-Date:   Wed, 3 Aug 2022 18:50:25 +0200
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc;
+        bh=4Tus1R0xuYRBtU57ePhS4E0yErBE8jqpbyDcNdaMSVs=;
+        b=WL+XX2QpTk8s7IPpfLyQEymznlqv/izcf52C7sk7upUl+dgd0WQ2391yHZRKSJIcTo
+         9uFYXI1GetWlbTwvKB7aRFtIThFr0X/cV1ce0yyu6aXq4+/Bgu0wZCzm1udHKUK/r2vW
+         Y9PfXcarHdqdlHDExgq4n3ooY1JDCJPN+SgvnCEwaY0aV9Za05p6Q4sxRqM54ECx8pzD
+         8eTCcKclzFQXM9S2pBQVCYn/C78M7b1YFjReS40gMRbsnplPmoiQ3xexNyqGCJKwIw9Q
+         g0azsuRlusxIpKebesdYQD1aHPj5JOoEAvSmlIrK2BQR83DyDknm3TvNGsf//R+qkQQ7
+         WXZg==
+X-Gm-Message-State: ACgBeo2jbHL8JF86D0T0aF3vMDNqlnGAoeK3D6OSYazkwHH5WnH12Nhf
+        wfUz75Et9t3Gyn4y21IZFI0aZQ==
+X-Google-Smtp-Source: AA6agR7kWU1ywQmU447El8WR3xMws9kT7tW9gC1cfIkjl3e897HcALT+8//M66UiFUkC7BWWKnEm0Q==
+X-Received: by 2002:a17:903:1d2:b0:16f:1664:dd3b with SMTP id e18-20020a17090301d200b0016f1664dd3bmr3275358plh.60.1659545593573;
+        Wed, 03 Aug 2022 09:53:13 -0700 (PDT)
+Received: from google.com (7.104.168.34.bc.googleusercontent.com. [34.168.104.7])
+        by smtp.gmail.com with ESMTPSA id 145-20020a621497000000b00527dba9e37bsm13168880pfu.73.2022.08.03.09.53.13
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 03 Aug 2022 09:53:13 -0700 (PDT)
+Date:   Wed, 3 Aug 2022 16:53:09 +0000
+From:   Sean Christopherson <seanjc@google.com>
+To:     Mingwei Zhang <mizhang@google.com>
+Cc:     Paolo Bonzini <pbonzini@redhat.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org, David Matlack <dmatlack@google.com>
+Subject: Re: [PATCH v2 2/2] kvm: nVMX: add tracepoint for kvm:kvm_nested_vmrun
+Message-ID: <Yuqn9QFA6ycHXgJx@google.com>
+References: <20220718171333.1321831-1-mizhang@google.com>
+ <20220718171333.1321831-3-mizhang@google.com>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.11.0
-Subject: Re: [PATCH MANUALSEL 5.18 1/6] KVM: x86: do not report a vCPU as
- preempted outside instruction boundaries
-Content-Language: en-US
-To:     Sasha Levin <sashal@kernel.org>, linux-kernel@vger.kernel.org,
-        stable@vger.kernel.org
-Cc:     Jann Horn <jannh@google.com>, tglx@linutronix.de, mingo@redhat.com,
-        bp@alien8.de, dave.hansen@linux.intel.com, x86@kernel.org,
-        kvm@vger.kernel.org
-References: <20220614021116.1101331-1-sashal@kernel.org>
- <YrI25yOy7WMqr+x3@sashalap>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-In-Reply-To: <YrI25yOy7WMqr+x3@sashalap>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-3.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
-        RCVD_IN_DNSWL_LOW,SPF_HELO_NONE,SPF_NONE autolearn=unavailable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20220718171333.1321831-3-mizhang@google.com>
+X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
+        USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=unavailable
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -84,14 +75,15 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 6/21/22 23:23, Sasha Levin wrote:
-> Paolo, ping?
+Capitalize KVM in the shortlog, i.e. "KVM: nVMX:".
 
-Sorry I missed the whole bunch of MANUALSEL patches.
+On Mon, Jul 18, 2022, Mingwei Zhang wrote:
+> From: David Matlack <dmatlack@google.com>
+> 
+> This tracepoint is called by nested SVM during emulated VMRUN. Call
+> also during emulated VMLAUNCH and VMRESUME in nested VMX.
 
-Acked-by: Paolo Bonzini <pbonzini@redhat.com>
+Please reword this so it's a more coherent statement of what the patch does, e.g.
 
-for all six.
-
-Paolo
-
+  Call trace_kvm_nested_vmenter() during nested VMLAUNCH/VMRESUME to
+  bring parity with nSVM's usage of the tracepoint during nested VMRUN.
