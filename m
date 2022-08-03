@@ -2,252 +2,123 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id A2625588C95
-	for <lists+kvm@lfdr.de>; Wed,  3 Aug 2022 15:01:50 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 4EBF1588CE2
+	for <lists+kvm@lfdr.de>; Wed,  3 Aug 2022 15:23:01 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236097AbiHCNBt (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 3 Aug 2022 09:01:49 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57660 "EHLO
+        id S236292AbiHCNW7 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 3 Aug 2022 09:22:59 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44080 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235709AbiHCNBr (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 3 Aug 2022 09:01:47 -0400
-Received: from mail-pj1-x1029.google.com (mail-pj1-x1029.google.com [IPv6:2607:f8b0:4864:20::1029])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 81081B7E7;
-        Wed,  3 Aug 2022 06:01:46 -0700 (PDT)
-Received: by mail-pj1-x1029.google.com with SMTP id q7-20020a17090a7a8700b001f300db8677so1964516pjf.5;
-        Wed, 03 Aug 2022 06:01:46 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=from:to:cc:subject:date:message-id:in-reply-to:references
-         :mime-version:content-transfer-encoding;
-        bh=kkm/gMyaSfsgZa6BAvqiI+XJ+6EHE76B0lrGvtObm68=;
-        b=L/SijQ11QQB4tA2T/w89ghqjitftl7G35W0WKZ3y6fMlQ+KHVOLgBzPuVBWsUIrOLi
-         MUU4xW5lisRPxH/PtGgzP3/1X26bFTOGlnkAZ63bO8HPmTHj+x6Pf0OzweHmJkxAzK7O
-         Jlwa6Gpgb2bJNknRoSnrobta3oK8MpK2mto6zEBDSpLAoLfUCKeeaX6guUFZwmM4DkuB
-         FSn2t0DmmiPigBX2GauHNx94MZ+bvSsA3UXwFXAPhGWGaL0lGxITIjUclUqGB47RK9sE
-         amybsoxbepanZyPD0YbKqS8PjDQoO58Q0cVnGI3UBXgwfcDyHoDSos+7T/wQUxXlg5O9
-         X1xw==
+        with ESMTP id S235611AbiHCNW6 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 3 Aug 2022 09:22:58 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id A0B5B19C31
+        for <kvm@vger.kernel.org>; Wed,  3 Aug 2022 06:22:57 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1659532976;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=r+gknjCfxt0fEOnt+pVR0+jPvwgnjQqFJO2CdOTgi0A=;
+        b=SKmQPvD7Hi+SkHNTWyCTcK4BVzl85qbLGS33wujAyrCOQbCwWjXT20tTcjDfnIjIrX4UFD
+        Y6vN8hLYYwDmykGlCaA8AuAUDrTYlqi9VUPj+YhoqWSlkl8PpoR+2Lb6HP4K4ZgAE4iwHc
+        Bv0hH973SOygfP15QzoiPdEJMS9N7kQ=
+Received: from mail-ed1-f71.google.com (mail-ed1-f71.google.com
+ [209.85.208.71]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-361-P379gEKiNyqF0pUR8HMjRw-1; Wed, 03 Aug 2022 09:22:55 -0400
+X-MC-Unique: P379gEKiNyqF0pUR8HMjRw-1
+Received: by mail-ed1-f71.google.com with SMTP id h6-20020a05640250c600b0043d9964d2ceso5860070edb.4
+        for <kvm@vger.kernel.org>; Wed, 03 Aug 2022 06:22:55 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
-         :references:mime-version:content-transfer-encoding;
-        bh=kkm/gMyaSfsgZa6BAvqiI+XJ+6EHE76B0lrGvtObm68=;
-        b=CW5mW9qrhBLcUb0QNs9JnkGgtYhAKjSXxiEAxIR5JCcT8FwIk7cagZ884T+DdGo7P4
-         1pLDZBYKda6uE6Knm1FrUrfk9aOpaT3qwKkyOnuZEKgg6hsv7wc09ZKzCFJIoFLo+Lai
-         zduXAuKFqzqJnJIgRBNH1hMelsiXrT0+pDhtjj78pmQfN45GX3F5N0s7v/3QhUUr4nVD
-         FNgLx3cGe5V0dQHRFOgpN7Jd+K7D4Ag5s1eCBmUrHj21Jr57fWiMs54RQg5KbHyEpQwe
-         AbQvlAFGisRH93ptEeVUyirirAWT++7/VnyAO5Ag9POSBm8W7og6YdC/mXtTU72twMrq
-         7Sog==
-X-Gm-Message-State: ACgBeo2ya1iDNvsH9NS6XQDiPamhp0/f8qvArrRNV6fxRKKktDSUTL7y
-        CCeV/BRAFoRGX1QTwbTnlGM=
-X-Google-Smtp-Source: AA6agR5oniDmiwWiAAG3wuydieVGKh0x6Lwc+40CC2AWxzv1cu6xbRlS/gV7Dc6Jy85GJGXJ55zUnA==
-X-Received: by 2002:a17:90b:ec7:b0:1f2:fa08:44cd with SMTP id gz7-20020a17090b0ec700b001f2fa0844cdmr4767178pjb.183.1659531705888;
-        Wed, 03 Aug 2022 06:01:45 -0700 (PDT)
-Received: from localhost.localdomain ([103.7.29.32])
-        by smtp.gmail.com with ESMTPSA id k3-20020a170902c40300b0016f1ef2cd44sm198058plk.154.2022.08.03.06.01.44
+        h=x-gm-message-state:from:to:cc:subject:in-reply-to:references:date
+         :message-id:mime-version;
+        bh=r+gknjCfxt0fEOnt+pVR0+jPvwgnjQqFJO2CdOTgi0A=;
+        b=ik1kNGsXs+ujZ9lx6tRWuGTAfsa4M746FY2DVd5bGfU/8nCK88eWFdTmmCtHLZpUKr
+         HL6zE341333wh5zqmBcdM8R6qC6Iojdq1vuZHYw/ajcOAgMnK0Kgs6dB79HcJI+qGSFF
+         U7QNf6jbtSNICGKyqQlP/OwUXJY7+wiI4adgANeiKkE+YcWOeDAUHFAk9iD/vLlBl2dW
+         dwjbk1nTQeUii+kDvrvY1Gk4ngu4hUKmrAUsq4nuhq5LuPVODQZ9F9uj6oLInPtpvPx5
+         Yot9a2K1l6ZyU9ACJliCJc0QXJb/tH0GjzeBSoIr8nhRg+PHKVVC0CcXRs9xZr2vg60h
+         NRQw==
+X-Gm-Message-State: ACgBeo0gdI0vHs+HJw+q6oz3U0KjrUJnljw/iVIqUXlhJ27pf3NI8vMv
+        gL/uH4YyvOKQocaLSoOlqKIoO4SLOP87DoykSYG/pPl4sfxPSFbfb6OVwcZGv74OhotDYkURx3I
+        n2jb6OiQTRklJ
+X-Received: by 2002:a17:907:2da6:b0:730:8b30:e517 with SMTP id gt38-20020a1709072da600b007308b30e517mr11135809ejc.291.1659532974347;
+        Wed, 03 Aug 2022 06:22:54 -0700 (PDT)
+X-Google-Smtp-Source: AA6agR7QXzIvyo5JHfdTWJxkKXD5/xn7PyCYwfwoPD1cdJzUdavBBqrMT6feXNS0/L/XKVI9iTydcQ==
+X-Received: by 2002:a17:907:2da6:b0:730:8b30:e517 with SMTP id gt38-20020a1709072da600b007308b30e517mr11135794ejc.291.1659532974112;
+        Wed, 03 Aug 2022 06:22:54 -0700 (PDT)
+Received: from fedora (nat-2.ign.cz. [91.219.240.2])
+        by smtp.gmail.com with ESMTPSA id f14-20020a17090631ce00b006f3ef214daesm7263746ejf.20.2022.08.03.06.22.52
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 03 Aug 2022 06:01:45 -0700 (PDT)
-From:   Like Xu <like.xu.linux@gmail.com>
-X-Google-Original-From: Like Xu <likexu@tencent.com>
-To:     Sean Christopherson <seanjc@google.com>,
-        Paolo Bonzini <pbonzini@redhat.com>
-Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: [PATCH v2 2/2] KVM: x86/svm/pmu: Rewrite get_gp_pmc_amd() for more counters scalability
-Date:   Wed,  3 Aug 2022 21:01:24 +0800
-Message-Id: <20220803130124.72340-2-likexu@tencent.com>
-X-Mailer: git-send-email 2.37.1
-In-Reply-To: <20220803130124.72340-1-likexu@tencent.com>
-References: <20220803130124.72340-1-likexu@tencent.com>
+        Wed, 03 Aug 2022 06:22:53 -0700 (PDT)
+From:   Vitaly Kuznetsov <vkuznets@redhat.com>
+To:     Sean Christopherson <seanjc@google.com>
+Cc:     kvm@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Michael Kelley <mikelley@microsoft.com>,
+        Siddharth Chandrasekaran <sidcha@amazon.de>,
+        Yuan Yao <yuan.yao@linux.intel.com>,
+        Maxim Levitsky <mlevitsk@redhat.com>,
+        linux-hyperv@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v8 33/39] KVM: selftests: nVMX: Allocate Hyper-V
+ partition assist page
+In-Reply-To: <YtnGd4OT3FQJ75b8@google.com>
+References: <20220714134929.1125828-1-vkuznets@redhat.com>
+ <20220714134929.1125828-34-vkuznets@redhat.com>
+ <YtnGd4OT3FQJ75b8@google.com>
+Date:   Wed, 03 Aug 2022 15:22:52 +0200
+Message-ID: <877d3p1mxf.fsf@redhat.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
-        RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS autolearn=ham
-        autolearn_force=no version=3.4.6
+Content-Type: text/plain
+X-Spam-Status: No, score=-3.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,
+        SPF_HELO_NONE,SPF_NONE autolearn=unavailable autolearn_force=no
+        version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-From: Like Xu <likexu@tencent.com>
+Sean Christopherson <seanjc@google.com> writes:
 
-If the number of AMD gp counters continues to grow, the code will
-be very clumsy and the switch-case design of inline get_gp_pmc_amd()
-will also bloat the kernel text size.
+> On Thu, Jul 14, 2022, Vitaly Kuznetsov wrote:
+>> In preparation to testing Hyper-V L2 TLB flush hypercalls, allocate
+>> so-called Partition assist page and link it to 'struct vmx_pages'.
+>> 
+>> Reviewed-by: Maxim Levitsky <mlevitsk@redhat.com>
+>> Signed-off-by: Vitaly Kuznetsov <vkuznets@redhat.com>
+>> ---
+>>  tools/testing/selftests/kvm/include/x86_64/vmx.h | 4 ++++
+>>  tools/testing/selftests/kvm/lib/x86_64/vmx.c     | 7 +++++++
+>>  2 files changed, 11 insertions(+)
+>> 
+>> diff --git a/tools/testing/selftests/kvm/include/x86_64/vmx.h b/tools/testing/selftests/kvm/include/x86_64/vmx.h
+>> index cc3604f8f1d3..f7c8184c1de8 100644
+>> --- a/tools/testing/selftests/kvm/include/x86_64/vmx.h
+>> +++ b/tools/testing/selftests/kvm/include/x86_64/vmx.h
+>> @@ -570,6 +570,10 @@ struct vmx_pages {
+>>  	uint64_t enlightened_vmcs_gpa;
+>>  	void *enlightened_vmcs;
+>>  
+>> +	void *partition_assist_hva;
+>> +	uint64_t partition_assist_gpa;
+>> +	void *partition_assist;
+>
+> Rather than duplicate this and other Hyper-V stuff, can you first add a struct
+> to hold the Hyper-V pages, along with a helper to populate them?  I'd even throw
+> in the eVMCS stuff, it's trivial for the helper to have a flag saying "don't bother
+> allocating eVMCS".  That will give us an easier path to allocating these pages
+> if and only if the test actually wants to enable Hyper-V stuff.
 
-The target code is taught to manage two groups of MSRs, each
-representing a different version of the AMD PMU counter MSRs.
-The MSR addresses of each group are contiguous, with no holes,
-and there is no intersection between two sets of addresses,
-but they are discrete in functionality by design like this:
+Good suggestion and a good excuse to do another refresh/rebase as this
+apparently missed 5.20 merge window. 
 
-[Group A : All counter MSRs are tightly bound to all event select MSRs ]
+v9 is coming to rescue!
 
-  MSR_K7_EVNTSEL0			0xc0010000
-  MSR_K7_EVNTSELi			0xc0010000 + i
-  ...
-  MSR_K7_EVNTSEL3			0xc0010003
-  MSR_K7_PERFCTR0			0xc0010004
-  MSR_K7_PERFCTRi			0xc0010004 + i
-  ...
-  MSR_K7_PERFCTR3			0xc0010007
-
-[Group B : The counter MSRs are interleaved with the event select MSRs ]
-
-  MSR_F15H_PERF_CTL0		0xc0010200
-  MSR_F15H_PERF_CTR0		(0xc0010200 + 1)
-  ...
-  MSR_F15H_PERF_CTLi		(0xc0010200 + 2 * i)
-  MSR_F15H_PERF_CTRi		(0xc0010200 + 2 * i + 1)
-  ...
-  MSR_F15H_PERF_CTL5		(0xc0010200 + 2 * 5)
-  MSR_F15H_PERF_CTR5		(0xc0010200 + 2 * 5 + 1)
-
-Rewrite get_gp_pmc_amd() in this way: first determine which group of
-registers is accessed, then determine if it matches its requested type,
-applying different scaling ratios respectively, and finally get pmc_idx
-to pass into amd_pmc_idx_to_pmc().
-
-Signed-off-by: Like Xu <likexu@tencent.com>
----
-v1: https://lore.kernel.org/kvm/20220510115718.93335-3-likexu@tencent.com/
-v1 -> v2 Changelog:
-- Move amd_pmc_idx_to_pmc() to the front for reuse;
-- Apply msr_base and ratio semantics to the switch statement;
-
- arch/x86/kvm/svm/pmu.c | 85 +++++++++---------------------------------
- 1 file changed, 17 insertions(+), 68 deletions(-)
-
-diff --git a/arch/x86/kvm/svm/pmu.c b/arch/x86/kvm/svm/pmu.c
-index d1c3b766841e..d90af8cdd405 100644
---- a/arch/x86/kvm/svm/pmu.c
-+++ b/arch/x86/kvm/svm/pmu.c
-@@ -23,90 +23,49 @@ enum pmu_type {
- 	PMU_TYPE_EVNTSEL,
- };
- 
--enum index {
--	INDEX_ZERO = 0,
--	INDEX_ONE,
--	INDEX_TWO,
--	INDEX_THREE,
--	INDEX_FOUR,
--	INDEX_FIVE,
--	INDEX_ERROR,
--};
--
--static enum index msr_to_index(u32 msr)
-+static struct kvm_pmc *amd_pmc_idx_to_pmc(struct kvm_pmu *pmu, int pmc_idx)
- {
--	switch (msr) {
--	case MSR_F15H_PERF_CTL0:
--	case MSR_F15H_PERF_CTR0:
--	case MSR_K7_EVNTSEL0:
--	case MSR_K7_PERFCTR0:
--		return INDEX_ZERO;
--	case MSR_F15H_PERF_CTL1:
--	case MSR_F15H_PERF_CTR1:
--	case MSR_K7_EVNTSEL1:
--	case MSR_K7_PERFCTR1:
--		return INDEX_ONE;
--	case MSR_F15H_PERF_CTL2:
--	case MSR_F15H_PERF_CTR2:
--	case MSR_K7_EVNTSEL2:
--	case MSR_K7_PERFCTR2:
--		return INDEX_TWO;
--	case MSR_F15H_PERF_CTL3:
--	case MSR_F15H_PERF_CTR3:
--	case MSR_K7_EVNTSEL3:
--	case MSR_K7_PERFCTR3:
--		return INDEX_THREE;
--	case MSR_F15H_PERF_CTL4:
--	case MSR_F15H_PERF_CTR4:
--		return INDEX_FOUR;
--	case MSR_F15H_PERF_CTL5:
--	case MSR_F15H_PERF_CTR5:
--		return INDEX_FIVE;
--	default:
--		return INDEX_ERROR;
--	}
-+	unsigned int num_counters = pmu->nr_arch_gp_counters;
-+
-+	if (pmc_idx >= num_counters)
-+		return NULL;
-+
-+	return &pmu->gp_counters[array_index_nospec(pmc_idx, num_counters)];
- }
- 
- static inline struct kvm_pmc *get_gp_pmc_amd(struct kvm_pmu *pmu, u32 msr,
- 					     enum pmu_type type)
- {
- 	struct kvm_vcpu *vcpu = pmu_to_vcpu(pmu);
-+	unsigned int idx;
- 
- 	if (!vcpu->kvm->arch.enable_pmu)
- 		return NULL;
- 
- 	switch (msr) {
--	case MSR_F15H_PERF_CTL0:
--	case MSR_F15H_PERF_CTL1:
--	case MSR_F15H_PERF_CTL2:
--	case MSR_F15H_PERF_CTL3:
--	case MSR_F15H_PERF_CTL4:
--	case MSR_F15H_PERF_CTL5:
-+	case MSR_F15H_PERF_CTL0 ... MSR_F15H_PERF_CTR5:
- 		if (!guest_cpuid_has(vcpu, X86_FEATURE_PERFCTR_CORE))
- 			return NULL;
--		fallthrough;
-+		idx = (unsigned int)((msr - MSR_F15H_PERF_CTL0) / 2);
-+		if ((msr == (MSR_F15H_PERF_CTL0 + 2 * idx)) !=
-+		    (type == PMU_TYPE_EVNTSEL))
-+			return NULL;
-+		break;
- 	case MSR_K7_EVNTSEL0 ... MSR_K7_EVNTSEL3:
- 		if (type != PMU_TYPE_EVNTSEL)
- 			return NULL;
-+		idx = msr - MSR_K7_EVNTSEL0;
- 		break;
--	case MSR_F15H_PERF_CTR0:
--	case MSR_F15H_PERF_CTR1:
--	case MSR_F15H_PERF_CTR2:
--	case MSR_F15H_PERF_CTR3:
--	case MSR_F15H_PERF_CTR4:
--	case MSR_F15H_PERF_CTR5:
--		if (!guest_cpuid_has(vcpu, X86_FEATURE_PERFCTR_CORE))
--			return NULL;
--		fallthrough;
- 	case MSR_K7_PERFCTR0 ... MSR_K7_PERFCTR3:
- 		if (type != PMU_TYPE_COUNTER)
- 			return NULL;
-+		idx = msr - MSR_K7_PERFCTR0;
- 		break;
- 	default:
- 		return NULL;
- 	}
- 
--	return &pmu->gp_counters[msr_to_index(msr)];
-+	return amd_pmc_idx_to_pmc(pmu, idx);
- }
- 
- static bool amd_hw_event_available(struct kvm_pmc *pmc)
-@@ -122,16 +81,6 @@ static bool amd_pmc_is_enabled(struct kvm_pmc *pmc)
- 	return true;
- }
- 
--static struct kvm_pmc *amd_pmc_idx_to_pmc(struct kvm_pmu *pmu, int pmc_idx)
--{
--	unsigned int num_counters = pmu->nr_arch_gp_counters;
--
--	if (pmc_idx >= num_counters)
--		return NULL;
--
--	return &pmu->gp_counters[array_index_nospec(pmc_idx, num_counters)];
--}
--
- static bool amd_is_valid_rdpmc_ecx(struct kvm_vcpu *vcpu, unsigned int idx)
- {
- 	struct kvm_pmu *pmu = vcpu_to_pmu(vcpu);
 -- 
-2.37.1
+Vitaly
 
