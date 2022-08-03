@@ -2,84 +2,82 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 72ACA588E12
-	for <lists+kvm@lfdr.de>; Wed,  3 Aug 2022 15:58:19 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 8CA65588E18
+	for <lists+kvm@lfdr.de>; Wed,  3 Aug 2022 15:59:21 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238162AbiHCN6Q (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 3 Aug 2022 09:58:16 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50242 "EHLO
+        id S238177AbiHCN7U (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 3 Aug 2022 09:59:20 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52796 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S238326AbiHCN6N (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 3 Aug 2022 09:58:13 -0400
-Received: from mail.sberdevices.ru (mail.sberdevices.ru [45.89.227.171])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2D106DF46;
-        Wed,  3 Aug 2022 06:58:10 -0700 (PDT)
-Received: from s-lin-edge02.sberdevices.ru (localhost [127.0.0.1])
-        by mail.sberdevices.ru (Postfix) with ESMTP id 677FC5FD2E;
-        Wed,  3 Aug 2022 16:58:08 +0300 (MSK)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=sberdevices.ru;
-        s=mail; t=1659535088;
-        bh=J9ER1HEmraVRx9h4m7Z/Hk7Bb9oPnBAWW3L1QrdyfYY=;
-        h=From:To:Subject:Date:Message-ID:Content-Type:MIME-Version;
-        b=kn/GaERL4M8G6sFAX1LPUGgkXbjOoyQU8UQX5Ai8IreW1Sv3Am839Z1n39MG0xaG5
-         Wd4/t6EICVjXSsadyhFlvpdRfh7gkepaUVSGgbRxOkapjcfb8HrbCEveaW4LQKIXax
-         IrZpbzJC7MIC1h1UfmM0n3BjH8ZaT63g+Z+WZaxbn0ECVrmqaw1KTDnzd9AsG21+R1
-         5QJZq9EYtt0cBrQQD6KwfIG3Fk+fRXGKMBsNpI0tuLg45Txb4UJd5VLUeIVM8VP8L/
-         psxM3bIE1D2Yn5qLg3SM4xs3Sjvk+03ajg9lH4NaG0blyTP12E0SFtUC0jhcVmnsRI
-         an/c2LSRKkTeA==
-Received: from S-MS-EXCH02.sberdevices.ru (S-MS-EXCH02.sberdevices.ru [172.16.1.5])
-        by mail.sberdevices.ru (Postfix) with ESMTP;
-        Wed,  3 Aug 2022 16:58:07 +0300 (MSK)
-From:   Arseniy Krasnov <AVKrasnov@sberdevices.ru>
-To:     Stefano Garzarella <sgarzare@redhat.com>,
-        "David S. Miller" <davem@davemloft.net>,
-        "edumazet@google.com" <edumazet@google.com>,
-        "Jakub Kicinski" <kuba@kernel.org>,
-        Paolo Abeni <pabeni@redhat.com>,
-        "kys@microsoft.com" <kys@microsoft.com>,
-        "haiyangz@microsoft.com" <haiyangz@microsoft.com>,
-        "sthemmin@microsoft.com" <sthemmin@microsoft.com>,
-        "wei.liu@kernel.org" <wei.liu@kernel.org>,
-        Dexuan Cui <decui@microsoft.com>,
-        Stefan Hajnoczi <stefanha@redhat.com>,
-        Bryan Tan <bryantan@vmware.com>,
-        Vishnu Dasa <vdasa@vmware.com>,
-        VMware PV-Drivers Reviewers <pv-drivers@vmware.com>,
-        Krasnov Arseniy <oxffffaa@gmail.com>,
-        "Arseniy Krasnov" <AVKrasnov@sberdevices.ru>
-CC:     "virtualization@lists.linux-foundation.org" 
-        <virtualization@lists.linux-foundation.org>,
-        "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "linux-hyperv@vger.kernel.org" <linux-hyperv@vger.kernel.org>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        kernel <kernel@sberdevices.ru>
-Subject: [RFC PATCH v3 4/9] vmci/vsock: use 'target' in notify_poll_in
- callback
-Thread-Topic: [RFC PATCH v3 4/9] vmci/vsock: use 'target' in notify_poll_in
- callback
-Thread-Index: AQHYp0EHffgjd/zij0eqhutm7RAwxw==
-Date:   Wed, 3 Aug 2022 13:57:54 +0000
-Message-ID: <2e420c8e-9550-c8c5-588f-e13b79a057ff@sberdevices.ru>
-In-Reply-To: <2ac35e2c-26a8-6f6d-2236-c4692600db9e@sberdevices.ru>
-Accept-Language: en-US, ru-RU
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-x-originating-ip: [172.16.1.12]
-Content-Type: text/plain; charset="utf-8"
-Content-ID: <DBC437AB8ABBA54AB5A398157F78EA17@sberdevices.ru>
-Content-Transfer-Encoding: base64
+        with ESMTP id S238391AbiHCN7S (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 3 Aug 2022 09:59:18 -0400
+Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DC10EDF1D
+        for <kvm@vger.kernel.org>; Wed,  3 Aug 2022 06:59:17 -0700 (PDT)
+Received: from pps.filterd (m0098409.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.17.1.5/8.17.1.5) with ESMTP id 273DEkDC014144
+        for <kvm@vger.kernel.org>; Wed, 3 Aug 2022 13:59:17 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=from : to : cc : subject
+ : date : message-id : mime-version : content-transfer-encoding; s=pp1;
+ bh=t3df+8UzzZVAtk3TNGU8oKzEn1iU4Q32bEA2zO9Euwg=;
+ b=c7sio3wMG7inBToAW3F3EG1fRK5XyLxTj6mlkIonlolYRQC8vOOpqUUb1WB64UlmY6k/
+ lhukLlMzcyXzA8JRWWQ2RUDjHHaeemaEBV9wDZSU27LjuYA0eFVIzd3+rxaPv0BR6ViB
+ 9jjMr1/7XXEbQ4jaB1iywAIC2lonVM7BW9ngg/yDc3yYPfFfZD3aIyRZ9+9z6hgngy8t
+ S5UCvz73HCrQMVfbCxCTao/WAq4UUWwGjhSzLmUMACIVp1UrcbQO2nn+EnFQcx4Nqk18
+ 47beY8OtnIP5RjJWLKE4D1NJOP8lt0unkY0VhtV6akP1qFjD2JpG3CI1LQVrO/AkSNNC mA== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3hqsr0sd2p-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT)
+        for <kvm@vger.kernel.org>; Wed, 03 Aug 2022 13:59:17 +0000
+Received: from m0098409.ppops.net (m0098409.ppops.net [127.0.0.1])
+        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 273DhqSX031536
+        for <kvm@vger.kernel.org>; Wed, 3 Aug 2022 13:59:17 GMT
+Received: from ppma04ams.nl.ibm.com (63.31.33a9.ip4.static.sl-reverse.com [169.51.49.99])
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3hqsr0sd1v-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Wed, 03 Aug 2022 13:59:17 +0000
+Received: from pps.filterd (ppma04ams.nl.ibm.com [127.0.0.1])
+        by ppma04ams.nl.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 273DptE6001328;
+        Wed, 3 Aug 2022 13:59:14 GMT
+Received: from b06cxnps3075.portsmouth.uk.ibm.com (d06relay10.portsmouth.uk.ibm.com [9.149.109.195])
+        by ppma04ams.nl.ibm.com with ESMTP id 3hmv98n0j1-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Wed, 03 Aug 2022 13:59:14 +0000
+Received: from d06av24.portsmouth.uk.ibm.com (d06av24.portsmouth.uk.ibm.com [9.149.105.60])
+        by b06cxnps3075.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 273Dwp7S25821680
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Wed, 3 Aug 2022 13:58:51 GMT
+Received: from d06av24.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 7F20442041;
+        Wed,  3 Aug 2022 13:58:51 +0000 (GMT)
+Received: from d06av24.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 41AC54203F;
+        Wed,  3 Aug 2022 13:58:51 +0000 (GMT)
+Received: from a46lp57.lnxne.boe (unknown [9.152.108.100])
+        by d06av24.portsmouth.uk.ibm.com (Postfix) with ESMTP;
+        Wed,  3 Aug 2022 13:58:51 +0000 (GMT)
+From:   Nico Boehr <nrb@linux.ibm.com>
+To:     kvm@vger.kernel.org
+Cc:     frankja@linux.ibm.com, imbrenda@linux.ibm.com, thuth@redhat.com
+Subject: [kvm-unit-tests PATCH v3 0/1] s390x: verify EQBS/SQBS is unavailable
+Date:   Wed,  3 Aug 2022 15:58:50 +0200
+Message-Id: <20220803135851.384805-1-nrb@linux.ibm.com>
+X-Mailer: git-send-email 2.36.1
 MIME-Version: 1.0
-X-KSMG-Rule-ID: 4
-X-KSMG-Message-Action: clean
-X-KSMG-AntiSpam-Status: not scanned, disabled by settings
-X-KSMG-AntiSpam-Interceptor-Info: not scanned
-X-KSMG-AntiPhishing: not scanned, disabled by settings
-X-KSMG-AntiVirus: Kaspersky Secure Mail Gateway, version 1.1.2.30, bases: 2022/08/03 07:41:00 #20041172
-X-KSMG-AntiVirus-Status: Clean, skipped
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,SPF_HELO_NONE,SPF_PASS
+Content-Transfer-Encoding: 8bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: zhW506mVZVYUwPqc_t7zAGhPvd9X9mTr
+X-Proofpoint-ORIG-GUID: CL8wYIOUUnd8ku5MoDq-H1xw2GAGtoIw
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.205,Aquarius:18.0.883,Hydra:6.0.517,FMLib:17.11.122.1
+ definitions=2022-08-03_03,2022-08-02_01,2022-06-22_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 impostorscore=0
+ malwarescore=0 priorityscore=1501 adultscore=0 bulkscore=0 mlxlogscore=697
+ suspectscore=0 clxscore=1015 spamscore=0 mlxscore=0 lowpriorityscore=0
+ phishscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2206140000 definitions=main-2208030060
+X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_EF,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_PASS
         autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -87,43 +85,19 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-VGhpcyBjYWxsYmFjayBjb250cm9scyBzZXR0aW5nIG9mIFBPTExJTixQT0xMUkROT1JNIG91dHB1
-dCBiaXRzIG9mIHBvbGwoKQ0Kc3lzY2FsbCxidXQgaW4gc29tZSBjYXNlcyxpdCBpcyBpbmNvcnJl
-Y3RseSB0byBzZXQgaXQsIHdoZW4gc29ja2V0IGhhcw0KYXQgbGVhc3QgMSBieXRlcyBvZiBhdmFp
-bGFibGUgZGF0YS4gVXNlICd0YXJnZXQnIHdoaWNoIGlzIGFscmVhZHkgZXhpc3RzDQphbmQgZXF1
-YWwgdG8gc2tfcmN2bG93YXQgaW4gdGhpcyBjYXNlLg0KDQpTaWduZWQtb2ZmLWJ5OiBBcnNlbml5
-IEtyYXNub3YgPEFWS3Jhc25vdkBzYmVyZGV2aWNlcy5ydT4NCi0tLQ0KIG5ldC92bXdfdnNvY2sv
-dm1jaV90cmFuc3BvcnRfbm90aWZ5LmMgICAgICAgIHwgOCArKysrLS0tLQ0KIG5ldC92bXdfdnNv
-Y2svdm1jaV90cmFuc3BvcnRfbm90aWZ5X3FzdGF0ZS5jIHwgOCArKysrLS0tLQ0KIDIgZmlsZXMg
-Y2hhbmdlZCwgOCBpbnNlcnRpb25zKCspLCA4IGRlbGV0aW9ucygtKQ0KDQpkaWZmIC0tZ2l0IGEv
-bmV0L3Ztd192c29jay92bWNpX3RyYW5zcG9ydF9ub3RpZnkuYyBiL25ldC92bXdfdnNvY2svdm1j
-aV90cmFuc3BvcnRfbm90aWZ5LmMNCmluZGV4IGQ2OWZjNGI1OTVhZC4uODUyMDk3ZTJiOWU2IDEw
-MDY0NA0KLS0tIGEvbmV0L3Ztd192c29jay92bWNpX3RyYW5zcG9ydF9ub3RpZnkuYw0KKysrIGIv
-bmV0L3Ztd192c29jay92bWNpX3RyYW5zcG9ydF9ub3RpZnkuYw0KQEAgLTM0MCwxMiArMzQwLDEy
-IEBAIHZtY2lfdHJhbnNwb3J0X25vdGlmeV9wa3RfcG9sbF9pbihzdHJ1Y3Qgc29jayAqc2ssDQog
-ew0KIAlzdHJ1Y3QgdnNvY2tfc29jayAqdnNrID0gdnNvY2tfc2soc2spOw0KIA0KLQlpZiAodnNv
-Y2tfc3RyZWFtX2hhc19kYXRhKHZzaykpIHsNCisJaWYgKHZzb2NrX3N0cmVhbV9oYXNfZGF0YSh2
-c2spID49IHRhcmdldCkgew0KIAkJKmRhdGFfcmVhZHlfbm93ID0gdHJ1ZTsNCiAJfSBlbHNlIHsN
-Ci0JCS8qIFdlIGNhbid0IHJlYWQgcmlnaHQgbm93IGJlY2F1c2UgdGhlcmUgaXMgbm90aGluZyBp
-biB0aGUNCi0JCSAqIHF1ZXVlLiBBc2sgZm9yIG5vdGlmaWNhdGlvbnMgd2hlbiB0aGVyZSBpcyBz
-b21ldGhpbmcgdG8NCi0JCSAqIHJlYWQuDQorCQkvKiBXZSBjYW4ndCByZWFkIHJpZ2h0IG5vdyBi
-ZWNhdXNlIHRoZXJlIGlzIG5vdCBlbm91Z2ggZGF0YQ0KKwkJICogaW4gdGhlIHF1ZXVlLiBBc2sg
-Zm9yIG5vdGlmaWNhdGlvbnMgd2hlbiB0aGVyZSBpcyBzb21ldGhpbmcNCisJCSAqIHRvIHJlYWQu
-DQogCQkgKi8NCiAJCWlmIChzay0+c2tfc3RhdGUgPT0gVENQX0VTVEFCTElTSEVEKSB7DQogCQkJ
-aWYgKCFzZW5kX3dhaXRpbmdfcmVhZChzaywgMSkpDQpkaWZmIC0tZ2l0IGEvbmV0L3Ztd192c29j
-ay92bWNpX3RyYW5zcG9ydF9ub3RpZnlfcXN0YXRlLmMgYi9uZXQvdm13X3Zzb2NrL3ZtY2lfdHJh
-bnNwb3J0X25vdGlmeV9xc3RhdGUuYw0KaW5kZXggMGYzNmQ3YzQ1ZGIzLi4xMmYwY2I4ZmU5OTgg
-MTAwNjQ0DQotLS0gYS9uZXQvdm13X3Zzb2NrL3ZtY2lfdHJhbnNwb3J0X25vdGlmeV9xc3RhdGUu
-Yw0KKysrIGIvbmV0L3Ztd192c29jay92bWNpX3RyYW5zcG9ydF9ub3RpZnlfcXN0YXRlLmMNCkBA
-IC0xNjEsMTIgKzE2MSwxMiBAQCB2bWNpX3RyYW5zcG9ydF9ub3RpZnlfcGt0X3BvbGxfaW4oc3Ry
-dWN0IHNvY2sgKnNrLA0KIHsNCiAJc3RydWN0IHZzb2NrX3NvY2sgKnZzayA9IHZzb2NrX3NrKHNr
-KTsNCiANCi0JaWYgKHZzb2NrX3N0cmVhbV9oYXNfZGF0YSh2c2spKSB7DQorCWlmICh2c29ja19z
-dHJlYW1faGFzX2RhdGEodnNrKSA+PSB0YXJnZXQpIHsNCiAJCSpkYXRhX3JlYWR5X25vdyA9IHRy
-dWU7DQogCX0gZWxzZSB7DQotCQkvKiBXZSBjYW4ndCByZWFkIHJpZ2h0IG5vdyBiZWNhdXNlIHRo
-ZXJlIGlzIG5vdGhpbmcgaW4gdGhlDQotCQkgKiBxdWV1ZS4gQXNrIGZvciBub3RpZmljYXRpb25z
-IHdoZW4gdGhlcmUgaXMgc29tZXRoaW5nIHRvDQotCQkgKiByZWFkLg0KKwkJLyogV2UgY2FuJ3Qg
-cmVhZCByaWdodCBub3cgYmVjYXVzZSB0aGVyZSBpcyBub3QgZW5vdWdoIGRhdGENCisJCSAqIGlu
-IHRoZSBxdWV1ZS4gQXNrIGZvciBub3RpZmljYXRpb25zIHdoZW4gdGhlcmUgaXMgc29tZXRoaW5n
-DQorCQkgKiB0byByZWFkLg0KIAkJICovDQogCQlpZiAoc2stPnNrX3N0YXRlID09IFRDUF9FU1RB
-QkxJU0hFRCkNCiAJCQl2c29ja19ibG9ja191cGRhdGVfd3JpdGVfd2luZG93KHNrKTsNCi0tIA0K
-Mi4yNS4xDQo=
+v2->v3:
+---
+- Claudio pointed out the clobber of r1 is unneeded, so remove it.
+
+QEMU doesn't provide EQBS/SQBS instructions, so we should check they
+result in an exception.
+
+Nico Boehr (1):
+  s390x: verify EQBS/SQBS is unavailable
+
+ s390x/intercept.c | 29 +++++++++++++++++++++++++++++
+ 1 file changed, 29 insertions(+)
+
+-- 
+2.36.1
+
