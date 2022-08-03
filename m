@@ -2,41 +2,41 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id D3882588FBC
-	for <lists+kvm@lfdr.de>; Wed,  3 Aug 2022 17:51:36 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 7CFBB588FBE
+	for <lists+kvm@lfdr.de>; Wed,  3 Aug 2022 17:51:46 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238344AbiHCPve (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 3 Aug 2022 11:51:34 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49906 "EHLO
+        id S238374AbiHCPvi (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 3 Aug 2022 11:51:38 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49648 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S238387AbiHCPvD (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 3 Aug 2022 11:51:03 -0400
+        with ESMTP id S236513AbiHCPvH (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 3 Aug 2022 11:51:07 -0400
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id A45E243314
-        for <kvm@vger.kernel.org>; Wed,  3 Aug 2022 08:50:54 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id D04F1DFA3
+        for <kvm@vger.kernel.org>; Wed,  3 Aug 2022 08:50:56 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1659541853;
+        s=mimecast20190719; t=1659541855;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=Beu1AQm9n7nTfMyN9Np+GAEvHHJH5+9TMEzmmDh6rKI=;
-        b=Q4jYkSxMdaISB5w+C4rkKAB8lYI0fRRWCJpP8EBCIW0liqZjiHKmRRpU1FhhVC07HPxHjx
-        dvu8gxP97Z+j1MzxlSsJLCeXfXGSrQvrTrdnnWT+l925LCHoQLt31KjqIlkTHWjBqoL6ae
-        Lx0v+6JO0zFf4d/g4m6I0nLAgFAKghI=
+        bh=2n5o7mheKtO8vvklO92VzMiud5N3yOqYKtpNEIS5Hpk=;
+        b=h4grGN8531g+/k9qYOFk4mmWqDMYWN2JvyjK1fgxJ4t9uZdFdH5BVwkIlbMchIpZ6VSnkR
+        5IpoDPMiiD/hB1VaRYriYOrPnsGxhfzsnRS0lpwROZmATy6lL0lFKl2I6rE1Kzj3H31TP/
+        YOkRq5RDKun8sZcJlSQKYfk/oFohO4o=
 Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
  [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-617-dQ4-KMAhMEyFCp80zOmB-Q-1; Wed, 03 Aug 2022 11:50:47 -0400
-X-MC-Unique: dQ4-KMAhMEyFCp80zOmB-Q-1
+ us-mta-389-ETP-vPSoN2KOmkDW-D7iGQ-1; Wed, 03 Aug 2022 11:50:51 -0400
+X-MC-Unique: ETP-vPSoN2KOmkDW-D7iGQ-1
 Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.rdu2.redhat.com [10.11.54.3])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 6D34285A587;
-        Wed,  3 Aug 2022 15:50:46 +0000 (UTC)
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 6F032802E5C;
+        Wed,  3 Aug 2022 15:50:50 +0000 (UTC)
 Received: from localhost.localdomain (unknown [10.40.194.242])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id CA2F11121314;
-        Wed,  3 Aug 2022 15:50:42 +0000 (UTC)
+        by smtp.corp.redhat.com (Postfix) with ESMTP id CC9C31121314;
+        Wed,  3 Aug 2022 15:50:46 +0000 (UTC)
 From:   Maxim Levitsky <mlevitsk@redhat.com>
 To:     kvm@vger.kernel.org
 Cc:     Borislav Petkov <bp@alien8.de>,
@@ -51,9 +51,9 @@ Cc:     Borislav Petkov <bp@alien8.de>,
         "H. Peter Anvin" <hpa@zytor.com>, Joerg Roedel <joro@8bytes.org>,
         Vitaly Kuznetsov <vkuznets@redhat.com>,
         Paolo Bonzini <pbonzini@redhat.com>
-Subject: [PATCH v3 07/13] KVM: x86: emulator/smm: add structs for KVM's smram layout
-Date:   Wed,  3 Aug 2022 18:50:05 +0300
-Message-Id: <20220803155011.43721-8-mlevitsk@redhat.com>
+Subject: [PATCH v3 08/13] KVM: x86: emulator/smm: use smram structs in the common code
+Date:   Wed,  3 Aug 2022 18:50:06 +0300
+Message-Id: <20220803155011.43721-9-mlevitsk@redhat.com>
 In-Reply-To: <20220803155011.43721-1-mlevitsk@redhat.com>
 References: <20220803155011.43721-1-mlevitsk@redhat.com>
 MIME-Version: 1.0
@@ -61,287 +61,222 @@ Content-Transfer-Encoding: 8bit
 X-Scanned-By: MIMEDefang 2.78 on 10.11.54.3
 X-Spam-Status: No, score=-3.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,
-        SPF_HELO_NONE,SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
+        SPF_HELO_NONE,SPF_NONE autolearn=unavailable autolearn_force=no
+        version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Those structs will be used to read/write the smram state image.
-
-Also document the differences between KVM's SMRAM layout and SMRAM
-layout that is used by real Intel/AMD cpus.
+Switch from using a raw array to 'union kvm_smram'.
 
 Signed-off-by: Maxim Levitsky <mlevitsk@redhat.com>
 ---
- arch/x86/kvm/emulate.c     |   6 +
- arch/x86/kvm/kvm_emulate.h | 218 +++++++++++++++++++++++++++++++++++++
- arch/x86/kvm/x86.c         |   1 +
- 3 files changed, 225 insertions(+)
+ arch/x86/include/asm/kvm_host.h |  5 +++--
+ arch/x86/kvm/emulate.c          | 12 +++++++-----
+ arch/x86/kvm/kvm_emulate.h      |  3 ++-
+ arch/x86/kvm/svm/svm.c          |  8 ++++++--
+ arch/x86/kvm/vmx/vmx.c          |  4 ++--
+ arch/x86/kvm/x86.c              | 16 ++++++++--------
+ 6 files changed, 28 insertions(+), 20 deletions(-)
 
-diff --git a/arch/x86/kvm/emulate.c b/arch/x86/kvm/emulate.c
-index 18551611cb13af..55d9328e6074a2 100644
---- a/arch/x86/kvm/emulate.c
-+++ b/arch/x86/kvm/emulate.c
-@@ -5864,3 +5864,9 @@ bool emulator_can_use_gpa(struct x86_emulate_ctxt *ctxt)
- 
- 	return true;
- }
-+
-+void  __init kvm_emulator_init(void)
-+{
-+	__check_smram32_offsets();
-+	__check_smram64_offsets();
-+}
-diff --git a/arch/x86/kvm/kvm_emulate.h b/arch/x86/kvm/kvm_emulate.h
-index 89246446d6aa9d..dd0ae61e44a116 100644
---- a/arch/x86/kvm/kvm_emulate.h
-+++ b/arch/x86/kvm/kvm_emulate.h
-@@ -13,6 +13,7 @@
- #define _ASM_X86_KVM_X86_EMULATE_H
- 
- #include <asm/desc_defs.h>
-+#include <linux/build_bug.h>
- #include "fpu.h"
+diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
+index e8281d64a4315a..d752fabde94ad2 100644
+--- a/arch/x86/include/asm/kvm_host.h
++++ b/arch/x86/include/asm/kvm_host.h
+@@ -204,6 +204,7 @@ typedef enum exit_fastpath_completion fastpath_t;
  
  struct x86_emulate_ctxt;
-@@ -503,6 +504,223 @@ enum x86_intercept {
- 	nr_x86_intercepts
- };
+ struct x86_exception;
++union kvm_smram;
+ enum x86_intercept;
+ enum x86_intercept_stage;
  
-+
-+/* 32 bit KVM's emulated SMM layout. Loosely based on Intel's layout */
-+
-+struct kvm_smm_seg_state_32 {
-+	u32 flags;
-+	u32 limit;
-+	u32 base;
-+} __packed;
-+
-+struct kvm_smram_state_32 {
-+	u32 reserved1[62];
-+	u32 smbase;
-+	u32 smm_revision;
-+	u32 reserved2[5];
-+	u32 cr4; /* CR4 is not present in Intel/AMD SMRAM image */
-+	u32 reserved3[5];
-+
-+	/*
-+	 * Segment state is not present/documented in the Intel/AMD SMRAM image
-+	 * Instead this area on Intel/AMD contains IO/HLT restart flags.
-+	 */
-+	struct kvm_smm_seg_state_32 ds;
-+	struct kvm_smm_seg_state_32 fs;
-+	struct kvm_smm_seg_state_32 gs;
-+	struct kvm_smm_seg_state_32 idtr; /* IDTR has only base and limit */
-+	struct kvm_smm_seg_state_32 tr;
-+	u32 reserved;
-+	struct kvm_smm_seg_state_32 gdtr; /* GDTR has only base and limit */
-+	struct kvm_smm_seg_state_32 ldtr;
-+	struct kvm_smm_seg_state_32 es;
-+	struct kvm_smm_seg_state_32 cs;
-+	struct kvm_smm_seg_state_32 ss;
-+
-+	u32 es_sel;
-+	u32 cs_sel;
-+	u32 ss_sel;
-+	u32 ds_sel;
-+	u32 fs_sel;
-+	u32 gs_sel;
-+	u32 ldtr_sel;
-+	u32 tr_sel;
-+
-+	u32 dr7;
-+	u32 dr6;
-+	u32 gprs[8]; /* GPRS in the "natural" X86 order (EAX/ECX/EDX.../EDI) */
-+	u32 eip;
-+	u32 eflags;
-+	u32 cr3;
-+	u32 cr0;
-+} __packed;
-+
-+
-+static inline void __check_smram32_offsets(void)
-+{
-+#define __CHECK_SMRAM32_OFFSET(field, offset) \
-+	ASSERT_STRUCT_OFFSET(struct kvm_smram_state_32, field, offset - 0xFE00)
-+
-+	__CHECK_SMRAM32_OFFSET(reserved1,	0xFE00);
-+	__CHECK_SMRAM32_OFFSET(smbase,		0xFEF8);
-+	__CHECK_SMRAM32_OFFSET(smm_revision,	0xFEFC);
-+	__CHECK_SMRAM32_OFFSET(reserved2,	0xFF00);
-+	__CHECK_SMRAM32_OFFSET(cr4,		0xFF14);
-+	__CHECK_SMRAM32_OFFSET(reserved3,	0xFF18);
-+	__CHECK_SMRAM32_OFFSET(ds,		0xFF2C);
-+	__CHECK_SMRAM32_OFFSET(fs,		0xFF38);
-+	__CHECK_SMRAM32_OFFSET(gs,		0xFF44);
-+	__CHECK_SMRAM32_OFFSET(idtr,		0xFF50);
-+	__CHECK_SMRAM32_OFFSET(tr,		0xFF5C);
-+	__CHECK_SMRAM32_OFFSET(gdtr,		0xFF6C);
-+	__CHECK_SMRAM32_OFFSET(ldtr,		0xFF78);
-+	__CHECK_SMRAM32_OFFSET(es,		0xFF84);
-+	__CHECK_SMRAM32_OFFSET(cs,		0xFF90);
-+	__CHECK_SMRAM32_OFFSET(ss,		0xFF9C);
-+	__CHECK_SMRAM32_OFFSET(es_sel,		0xFFA8);
-+	__CHECK_SMRAM32_OFFSET(cs_sel,		0xFFAC);
-+	__CHECK_SMRAM32_OFFSET(ss_sel,		0xFFB0);
-+	__CHECK_SMRAM32_OFFSET(ds_sel,		0xFFB4);
-+	__CHECK_SMRAM32_OFFSET(fs_sel,		0xFFB8);
-+	__CHECK_SMRAM32_OFFSET(gs_sel,		0xFFBC);
-+	__CHECK_SMRAM32_OFFSET(ldtr_sel,	0xFFC0);
-+	__CHECK_SMRAM32_OFFSET(tr_sel,		0xFFC4);
-+	__CHECK_SMRAM32_OFFSET(dr7,		0xFFC8);
-+	__CHECK_SMRAM32_OFFSET(dr6,		0xFFCC);
-+	__CHECK_SMRAM32_OFFSET(gprs,		0xFFD0);
-+	__CHECK_SMRAM32_OFFSET(eip,		0xFFF0);
-+	__CHECK_SMRAM32_OFFSET(eflags,		0xFFF4);
-+	__CHECK_SMRAM32_OFFSET(cr3,		0xFFF8);
-+	__CHECK_SMRAM32_OFFSET(cr0,		0xFFFC);
-+#undef __CHECK_SMRAM32_OFFSET
-+}
-+
-+
-+/* 64 bit KVM's emulated SMM layout. Based on AMD64 layout */
-+
-+struct kvm_smm_seg_state_64 {
-+	u16 selector;
-+	u16 attributes;
-+	u32 limit;
-+	u64 base;
-+};
-+
-+struct kvm_smram_state_64 {
-+
-+	struct kvm_smm_seg_state_64 es;
-+	struct kvm_smm_seg_state_64 cs;
-+	struct kvm_smm_seg_state_64 ss;
-+	struct kvm_smm_seg_state_64 ds;
-+	struct kvm_smm_seg_state_64 fs;
-+	struct kvm_smm_seg_state_64 gs;
-+	struct kvm_smm_seg_state_64 gdtr; /* GDTR has only base and limit*/
-+	struct kvm_smm_seg_state_64 ldtr;
-+	struct kvm_smm_seg_state_64 idtr; /* IDTR has only base and limit*/
-+	struct kvm_smm_seg_state_64 tr;
-+
-+	/* I/O restart and auto halt restart are not implemented by KVM */
-+	u64 io_restart_rip;
-+	u64 io_restart_rcx;
-+	u64 io_restart_rsi;
-+	u64 io_restart_rdi;
-+	u32 io_restart_dword;
-+	u32 reserved1;
-+	u8 io_inst_restart;
-+	u8 auto_hlt_restart;
-+	u8 reserved2[6];
-+
-+	u64 efer;
-+
-+	/*
-+	 * Two fields below are implemented on AMD only, to store
-+	 * SVM guest vmcb address if the #SMI was received while in the guest mode.
-+	 */
-+	u64 svm_guest_flag;
-+	u64 svm_guest_vmcb_gpa;
-+	u64 svm_guest_virtual_int; /* unknown purpose, not implemented */
-+
-+	u32 reserved3[3];
-+	u32 smm_revison;
-+	u32 smbase;
-+	u32 reserved4[5];
-+
-+	/* ssp and svm_* fields below are not implemented by KVM */
-+	u64 ssp;
-+	u64 svm_guest_pat;
-+	u64 svm_host_efer;
-+	u64 svm_host_cr4;
-+	u64 svm_host_cr3;
-+	u64 svm_host_cr0;
-+
-+	u64 cr4;
-+	u64 cr3;
-+	u64 cr0;
-+	u64 dr7;
-+	u64 dr6;
-+	u64 rflags;
-+	u64 rip;
-+	u64 gprs[16]; /* GPRS in a reversed "natural" X86 order (R15/R14/../RCX/RAX.) */
-+};
-+
-+
-+static inline void __check_smram64_offsets(void)
-+{
-+#define __CHECK_SMRAM64_OFFSET(field, offset) \
-+	ASSERT_STRUCT_OFFSET(struct kvm_smram_state_64, field, offset - 0xFE00)
-+
-+	__CHECK_SMRAM64_OFFSET(es,			0xFE00);
-+	__CHECK_SMRAM64_OFFSET(cs,			0xFE10);
-+	__CHECK_SMRAM64_OFFSET(ss,			0xFE20);
-+	__CHECK_SMRAM64_OFFSET(ds,			0xFE30);
-+	__CHECK_SMRAM64_OFFSET(fs,			0xFE40);
-+	__CHECK_SMRAM64_OFFSET(gs,			0xFE50);
-+	__CHECK_SMRAM64_OFFSET(gdtr,			0xFE60);
-+	__CHECK_SMRAM64_OFFSET(ldtr,			0xFE70);
-+	__CHECK_SMRAM64_OFFSET(idtr,			0xFE80);
-+	__CHECK_SMRAM64_OFFSET(tr,			0xFE90);
-+	__CHECK_SMRAM64_OFFSET(io_restart_rip,		0xFEA0);
-+	__CHECK_SMRAM64_OFFSET(io_restart_rcx,		0xFEA8);
-+	__CHECK_SMRAM64_OFFSET(io_restart_rsi,		0xFEB0);
-+	__CHECK_SMRAM64_OFFSET(io_restart_rdi,		0xFEB8);
-+	__CHECK_SMRAM64_OFFSET(io_restart_dword,	0xFEC0);
-+	__CHECK_SMRAM64_OFFSET(reserved1,		0xFEC4);
-+	__CHECK_SMRAM64_OFFSET(io_inst_restart,		0xFEC8);
-+	__CHECK_SMRAM64_OFFSET(auto_hlt_restart,	0xFEC9);
-+	__CHECK_SMRAM64_OFFSET(reserved2,		0xFECA);
-+	__CHECK_SMRAM64_OFFSET(efer,			0xFED0);
-+	__CHECK_SMRAM64_OFFSET(svm_guest_flag,		0xFED8);
-+	__CHECK_SMRAM64_OFFSET(svm_guest_vmcb_gpa,	0xFEE0);
-+	__CHECK_SMRAM64_OFFSET(svm_guest_virtual_int,	0xFEE8);
-+	__CHECK_SMRAM64_OFFSET(reserved3,		0xFEF0);
-+	__CHECK_SMRAM64_OFFSET(smm_revison,		0xFEFC);
-+	__CHECK_SMRAM64_OFFSET(smbase,			0xFF00);
-+	__CHECK_SMRAM64_OFFSET(reserved4,		0xFF04);
-+	__CHECK_SMRAM64_OFFSET(ssp,			0xFF18);
-+	__CHECK_SMRAM64_OFFSET(svm_guest_pat,		0xFF20);
-+	__CHECK_SMRAM64_OFFSET(svm_host_efer,		0xFF28);
-+	__CHECK_SMRAM64_OFFSET(svm_host_cr4,		0xFF30);
-+	__CHECK_SMRAM64_OFFSET(svm_host_cr3,		0xFF38);
-+	__CHECK_SMRAM64_OFFSET(svm_host_cr0,		0xFF40);
-+	__CHECK_SMRAM64_OFFSET(cr4,			0xFF48);
-+	__CHECK_SMRAM64_OFFSET(cr3,			0xFF50);
-+	__CHECK_SMRAM64_OFFSET(cr0,			0xFF58);
-+	__CHECK_SMRAM64_OFFSET(dr7,			0xFF60);
-+	__CHECK_SMRAM64_OFFSET(dr6,			0xFF68);
-+	__CHECK_SMRAM64_OFFSET(rflags,			0xFF70);
-+	__CHECK_SMRAM64_OFFSET(rip,			0xFF78);
-+	__CHECK_SMRAM64_OFFSET(gprs,			0xFF80);
-+#undef __CHECK_SMRAM64_OFFSET
-+}
-+
-+union kvm_smram {
-+	struct kvm_smram_state_64 smram64;
-+	struct kvm_smram_state_32 smram32;
-+	u8 bytes[512];
-+};
-+
-+void  __init kvm_emulator_init(void);
-+
-+
- /* Host execution mode. */
- #if defined(CONFIG_X86_32)
- #define X86EMUL_MODE_HOST X86EMUL_MODE_PROT32
-diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-index 33560bfa0cac6e..bea7e5015d592e 100644
---- a/arch/x86/kvm/x86.c
-+++ b/arch/x86/kvm/x86.c
-@@ -13355,6 +13355,7 @@ EXPORT_TRACEPOINT_SYMBOL_GPL(kvm_vmgexit_msr_protocol_exit);
- static int __init kvm_x86_init(void)
+@@ -1600,8 +1601,8 @@ struct kvm_x86_ops {
+ 	void (*setup_mce)(struct kvm_vcpu *vcpu);
+ 
+ 	int (*smi_allowed)(struct kvm_vcpu *vcpu, bool for_injection);
+-	int (*enter_smm)(struct kvm_vcpu *vcpu, char *smstate);
+-	int (*leave_smm)(struct kvm_vcpu *vcpu, const char *smstate);
++	int (*enter_smm)(struct kvm_vcpu *vcpu, union kvm_smram *smram);
++	int (*leave_smm)(struct kvm_vcpu *vcpu, const union kvm_smram *smram);
+ 	void (*enable_smi_window)(struct kvm_vcpu *vcpu);
+ 
+ 	int (*mem_enc_ioctl)(struct kvm *kvm, void __user *argp);
+diff --git a/arch/x86/kvm/emulate.c b/arch/x86/kvm/emulate.c
+index 55d9328e6074a2..610978d00b52b0 100644
+--- a/arch/x86/kvm/emulate.c
++++ b/arch/x86/kvm/emulate.c
+@@ -2594,16 +2594,18 @@ static int rsm_load_state_64(struct x86_emulate_ctxt *ctxt,
+ static int em_rsm(struct x86_emulate_ctxt *ctxt)
  {
- 	kvm_mmu_x86_module_init();
-+	kvm_emulator_init();
+ 	unsigned long cr0, cr4, efer;
+-	char buf[512];
++	const union kvm_smram smram;
+ 	u64 smbase;
+ 	int ret;
+ 
++	BUILD_BUG_ON(sizeof(smram) != 512);
++
+ 	if ((ctxt->ops->get_hflags(ctxt) & X86EMUL_SMM_MASK) == 0)
+ 		return emulate_ud(ctxt);
+ 
+ 	smbase = ctxt->ops->get_smbase(ctxt);
+ 
+-	ret = ctxt->ops->read_phys(ctxt, smbase + 0xfe00, buf, sizeof(buf));
++	ret = ctxt->ops->read_phys(ctxt, smbase + 0xfe00, (void *)&smram, sizeof(smram));
+ 	if (ret != X86EMUL_CONTINUE)
+ 		return X86EMUL_UNHANDLEABLE;
+ 
+@@ -2653,15 +2655,15 @@ static int em_rsm(struct x86_emulate_ctxt *ctxt)
+ 	 * state (e.g. enter guest mode) before loading state from the SMM
+ 	 * state-save area.
+ 	 */
+-	if (ctxt->ops->leave_smm(ctxt, buf))
++	if (ctxt->ops->leave_smm(ctxt, &smram))
+ 		goto emulate_shutdown;
+ 
+ #ifdef CONFIG_X86_64
+ 	if (emulator_has_longmode(ctxt))
+-		ret = rsm_load_state_64(ctxt, buf);
++		ret = rsm_load_state_64(ctxt, (const char *)&smram);
+ 	else
+ #endif
+-		ret = rsm_load_state_32(ctxt, buf);
++		ret = rsm_load_state_32(ctxt, (const char *)&smram);
+ 
+ 	if (ret != X86EMUL_CONTINUE)
+ 		goto emulate_shutdown;
+diff --git a/arch/x86/kvm/kvm_emulate.h b/arch/x86/kvm/kvm_emulate.h
+index dd0ae61e44a116..76c0b8e7890b5d 100644
+--- a/arch/x86/kvm/kvm_emulate.h
++++ b/arch/x86/kvm/kvm_emulate.h
+@@ -19,6 +19,7 @@
+ struct x86_emulate_ctxt;
+ enum x86_intercept;
+ enum x86_intercept_stage;
++union kvm_smram;
+ 
+ struct x86_exception {
+ 	u8 vector;
+@@ -236,7 +237,7 @@ struct x86_emulate_ops {
+ 
+ 	unsigned (*get_hflags)(struct x86_emulate_ctxt *ctxt);
+ 	void (*exiting_smm)(struct x86_emulate_ctxt *ctxt);
+-	int (*leave_smm)(struct x86_emulate_ctxt *ctxt, const char *smstate);
++	int (*leave_smm)(struct x86_emulate_ctxt *ctxt, const union kvm_smram *smram);
+ 	void (*triple_fault)(struct x86_emulate_ctxt *ctxt);
+ 	int (*set_xcr)(struct x86_emulate_ctxt *ctxt, u32 index, u64 xcr);
+ };
+diff --git a/arch/x86/kvm/svm/svm.c b/arch/x86/kvm/svm/svm.c
+index 38f873cb6f2c14..688315d1dfabd1 100644
+--- a/arch/x86/kvm/svm/svm.c
++++ b/arch/x86/kvm/svm/svm.c
+@@ -4433,12 +4433,14 @@ static int svm_smi_allowed(struct kvm_vcpu *vcpu, bool for_injection)
+ 	return 1;
+ }
+ 
+-static int svm_enter_smm(struct kvm_vcpu *vcpu, char *smstate)
++static int svm_enter_smm(struct kvm_vcpu *vcpu, union kvm_smram *smram)
+ {
+ 	struct vcpu_svm *svm = to_svm(vcpu);
+ 	struct kvm_host_map map_save;
+ 	int ret;
+ 
++	char *smstate = (char *)smram;
++
+ 	if (!is_guest_mode(vcpu))
+ 		return 0;
+ 
+@@ -4480,7 +4482,7 @@ static int svm_enter_smm(struct kvm_vcpu *vcpu, char *smstate)
  	return 0;
  }
- module_init(kvm_x86_init);
+ 
+-static int svm_leave_smm(struct kvm_vcpu *vcpu, const char *smstate)
++static int svm_leave_smm(struct kvm_vcpu *vcpu, const union kvm_smram *smram)
+ {
+ 	struct vcpu_svm *svm = to_svm(vcpu);
+ 	struct kvm_host_map map, map_save;
+@@ -4488,6 +4490,8 @@ static int svm_leave_smm(struct kvm_vcpu *vcpu, const char *smstate)
+ 	struct vmcb *vmcb12;
+ 	int ret;
+ 
++	const char *smstate = (const char *)smram;
++
+ 	if (!guest_cpuid_has(vcpu, X86_FEATURE_LM))
+ 		return 0;
+ 
+diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
+index d7f8331d6f7e72..fdb7e9280e9150 100644
+--- a/arch/x86/kvm/vmx/vmx.c
++++ b/arch/x86/kvm/vmx/vmx.c
+@@ -7919,7 +7919,7 @@ static int vmx_smi_allowed(struct kvm_vcpu *vcpu, bool for_injection)
+ 	return !is_smm(vcpu);
+ }
+ 
+-static int vmx_enter_smm(struct kvm_vcpu *vcpu, char *smstate)
++static int vmx_enter_smm(struct kvm_vcpu *vcpu, union kvm_smram *smram)
+ {
+ 	struct vcpu_vmx *vmx = to_vmx(vcpu);
+ 
+@@ -7940,7 +7940,7 @@ static int vmx_enter_smm(struct kvm_vcpu *vcpu, char *smstate)
+ 	return 0;
+ }
+ 
+-static int vmx_leave_smm(struct kvm_vcpu *vcpu, const char *smstate)
++static int vmx_leave_smm(struct kvm_vcpu *vcpu, const union kvm_smram *smram)
+ {
+ 	struct vcpu_vmx *vmx = to_vmx(vcpu);
+ 	int ret;
+diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+index bea7e5015d592e..cbbe49bdc58787 100644
+--- a/arch/x86/kvm/x86.c
++++ b/arch/x86/kvm/x86.c
+@@ -8054,9 +8054,9 @@ static void emulator_exiting_smm(struct x86_emulate_ctxt *ctxt)
+ }
+ 
+ static int emulator_leave_smm(struct x86_emulate_ctxt *ctxt,
+-				  const char *smstate)
++			      const union kvm_smram *smram)
+ {
+-	return static_call(kvm_x86_leave_smm)(emul_to_vcpu(ctxt), smstate);
++	return static_call(kvm_x86_leave_smm)(emul_to_vcpu(ctxt), smram);
+ }
+ 
+ static void emulator_triple_fault(struct x86_emulate_ctxt *ctxt)
+@@ -9979,25 +9979,25 @@ static void enter_smm(struct kvm_vcpu *vcpu)
+ 	struct kvm_segment cs, ds;
+ 	struct desc_ptr dt;
+ 	unsigned long cr0;
+-	char buf[512];
++	union kvm_smram smram;
+ 
+-	memset(buf, 0, 512);
++	memset(smram.bytes, 0, sizeof(smram.bytes));
+ #ifdef CONFIG_X86_64
+ 	if (guest_cpuid_has(vcpu, X86_FEATURE_LM))
+-		enter_smm_save_state_64(vcpu, buf);
++		enter_smm_save_state_64(vcpu, (char *)&smram);
+ 	else
+ #endif
+-		enter_smm_save_state_32(vcpu, buf);
++		enter_smm_save_state_32(vcpu, (char *)&smram);
+ 
+ 	/*
+ 	 * Give enter_smm() a chance to make ISA-specific changes to the vCPU
+ 	 * state (e.g. leave guest mode) after we've saved the state into the
+ 	 * SMM state-save area.
+ 	 */
+-	static_call(kvm_x86_enter_smm)(vcpu, buf);
++	static_call(kvm_x86_enter_smm)(vcpu, &smram);
+ 
+ 	kvm_smm_changed(vcpu, true);
+-	kvm_vcpu_write_guest(vcpu, vcpu->arch.smbase + 0xfe00, buf, sizeof(buf));
++	kvm_vcpu_write_guest(vcpu, vcpu->arch.smbase + 0xfe00, &smram, sizeof(smram));
+ 
+ 	if (static_call(kvm_x86_get_nmi_mask)(vcpu))
+ 		vcpu->arch.hflags |= HF_SMM_INSIDE_NMI_MASK;
 -- 
 2.26.3
 
