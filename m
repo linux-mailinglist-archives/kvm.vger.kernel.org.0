@@ -2,218 +2,119 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 97B3F588F28
-	for <lists+kvm@lfdr.de>; Wed,  3 Aug 2022 17:12:55 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 5DDC9588FA7
+	for <lists+kvm@lfdr.de>; Wed,  3 Aug 2022 17:50:27 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237975AbiHCPMy (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 3 Aug 2022 11:12:54 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47780 "EHLO
+        id S237785AbiHCPuY (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 3 Aug 2022 11:50:24 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49098 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S237952AbiHCPMv (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 3 Aug 2022 11:12:51 -0400
-Received: from mail-yb1-xb32.google.com (mail-yb1-xb32.google.com [IPv6:2607:f8b0:4864:20::b32])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A53BA3AE5D
-        for <kvm@vger.kernel.org>; Wed,  3 Aug 2022 08:12:48 -0700 (PDT)
-Received: by mail-yb1-xb32.google.com with SMTP id n8so28862657yba.2
-        for <kvm@vger.kernel.org>; Wed, 03 Aug 2022 08:12:48 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kylehuey.com; s=google;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc;
-        bh=XZXEy3cvHjx2bX+d6U1ZgIae2UNxoQkQn7NuGYQFw2Y=;
-        b=eTkF0CuqpfS6zseV19j0r6CXBKG181mwXlnys1i2gnvTKj/TyMYrzZY9ZONUS6/YgB
-         pgXCgeuoJdwWFZ0Tp8cZaTfQ9boA7FfUSKFm3CnBonoiqSMQnrjQi9lnw2O9/p+WGbEl
-         ZoGY/gg4XypN8QWyIQ0GHnHTB9l1qerbVGW0PHOkkYoNLytYZb0s7cyAXUb/SgC8mrPH
-         56FxDPvQjt57Cc+sE0bOCZ51QyBmSONXoMWjp65PR6BoCTnpg1aVRF1IqrtzmSwxKkTi
-         8OX76ZsMiYmOH9NZSNaX1pT9mCzT1EaeWc8V001UKdGvDnCNrU+5T9YdzXrOp7lzbjwk
-         SUIg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc;
-        bh=XZXEy3cvHjx2bX+d6U1ZgIae2UNxoQkQn7NuGYQFw2Y=;
-        b=QZqy2vHR3AYh25vFynfPBr0vSQMK1uhB9/BurO9VMZu06/TkHuz+YPsKBZ6+QD5TfT
-         RSNgdF1vx/cxo2oSbyxT0V77k3avkoSt68Yxnos88CYYfLKoBD2vAr20WBcvoZrSKd3S
-         yteFiZufdCsaLYcl06WNT4xs42YkJIfDEz39pPqBWnIjCRfVhqM9EOPyYvZc58YV6c+u
-         NzQKVMR6yjp/dUuawStnuGISrrZxlf0zZeyAtodSMa+TkYAPVMu+HWkY3HXhno3hyRGq
-         40z+SdGrC8H0nTPesnouobguOCB8BalEFpj/e47hVquhxPb+dYVysg5ncPTOVU8xPDsC
-         sQfA==
-X-Gm-Message-State: ACgBeo300Qhg2holPS6IcOMxPliYnvI4OmRL9DjF88K0AvNAOUc96tfS
-        GLGSyERLeWZaRq9xh0C/rcXTbq/fSiAWwzBcTlHL+A==
-X-Google-Smtp-Source: AA6agR7v/HPFCTCefE30aAswl27LuEi01dCUtvdjZs8cqGMByB77wUzH4MdPg6auWGZLmUWuRbRJxX8tKh78xz8UH6o=
-X-Received: by 2002:a25:9d8d:0:b0:676:a71d:edad with SMTP id
- v13-20020a259d8d000000b00676a71dedadmr19251128ybp.94.1659539567685; Wed, 03
- Aug 2022 08:12:47 -0700 (PDT)
-MIME-Version: 1.0
-References: <20220731050342.56513-1-khuey@kylehuey.com> <Yuo59tV071/i6yhf@gmail.com>
-In-Reply-To: <Yuo59tV071/i6yhf@gmail.com>
-From:   Kyle Huey <me@kylehuey.com>
-Date:   Wed, 3 Aug 2022 08:12:34 -0700
-Message-ID: <CAP045ArF0SX84tDr=iZoK=EnXK2LsXYut3-KMkCxQO2OOhn=0A@mail.gmail.com>
-Subject: Re: [PATCH] x86/fpu: Allow PKRU to be (once again) written by ptrace.
-To:     Ingo Molnar <mingo@kernel.org>
-Cc:     Dave Hansen <dave.hansen@linux.intel.com>,
+        with ESMTP id S236130AbiHCPuX (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 3 Aug 2022 11:50:23 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id A460D262B
+        for <kvm@vger.kernel.org>; Wed,  3 Aug 2022 08:50:22 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1659541821;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding;
+        bh=/BrQz+CyfVcc2k2vo2CUTQfHHEz6+03jB7eKZ/pazJY=;
+        b=CCMVAYOScJitjppS0TLVBXpqN25jlY499umtVOWGOb9cw27GB7iTsa9/Wc5KABICw1kw0c
+        KaoWUW+igEjbJ+NirCWHK6DyI7hl/6dfk/ps6Q8AhvYnx+MmBmWAHaVqzVyP/z0q/Gz5+f
+        0qD1xda3nc3MjgG0uqCEiIXL4xQ2p4g=
+Received: from mimecast-mx02.redhat.com (mx3-rdu2.redhat.com
+ [66.187.233.73]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-358-3w-6go72NbWtFWzI4ESLZQ-1; Wed, 03 Aug 2022 11:50:17 -0400
+X-MC-Unique: 3w-6go72NbWtFWzI4ESLZQ-1
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.rdu2.redhat.com [10.11.54.3])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 2BDCD2919EAE;
+        Wed,  3 Aug 2022 15:50:17 +0000 (UTC)
+Received: from localhost.localdomain (unknown [10.40.194.242])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 877F01121314;
+        Wed,  3 Aug 2022 15:50:12 +0000 (UTC)
+From:   Maxim Levitsky <mlevitsk@redhat.com>
+To:     kvm@vger.kernel.org
+Cc:     Borislav Petkov <bp@alien8.de>,
+        Dave Hansen <dave.hansen@linux.intel.com>,
+        linux-kernel@vger.kernel.org, Wanpeng Li <wanpengli@tencent.com>,
+        Maxim Levitsky <mlevitsk@redhat.com>,
+        Ingo Molnar <mingo@redhat.com>,
+        Sean Christopherson <seanjc@google.com>, x86@kernel.org,
+        Jim Mattson <jmattson@google.com>,
+        Kees Cook <keescook@chromium.org>,
         Thomas Gleixner <tglx@linutronix.de>,
-        Borislav Petkov <bp@alien8.de>, Ingo Molnar <mingo@redhat.com>,
-        x86@kernel.org, "H. Peter Anvin" <hpa@zytor.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Andy Lutomirski <luto@kernel.org>,
-        Peter Zijlstra <peterz@infradead.org>,
-        linux-kernel@vger.kernel.org,
-        "Robert O'Callahan" <robert@ocallahan.org>,
-        David Manouchehri <david.manouchehri@riseup.net>,
-        kvm@vger.kernel.org, stable@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        SPF_HELO_NONE,SPF_PASS autolearn=unavailable autolearn_force=no
-        version=3.4.6
+        "H. Peter Anvin" <hpa@zytor.com>, Joerg Roedel <joro@8bytes.org>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Paolo Bonzini <pbonzini@redhat.com>
+Subject: [PATCH v3 00/13] SMM emulation and interrupt shadow fixes
+Date:   Wed,  3 Aug 2022 18:49:58 +0300
+Message-Id: <20220803155011.43721-1-mlevitsk@redhat.com>
+Content-Type: text/plain; charset="utf-8"
+MIME-Version: 1.0
+Content-Transfer-Encoding: quoted-printable
+X-Scanned-By: MIMEDefang 2.78 on 10.11.54.3
+X-Spam-Status: No, score=-2.7 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        SPF_HELO_NONE,SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Aug 3, 2022 at 2:03 AM Ingo Molnar <mingo@kernel.org> wrote:
->
->
-> * Kyle Huey <me@kylehuey.com> wrote:
->
-> > From: Kyle Huey <me@kylehuey.com>
-> >
-> > When management of the PKRU register was moved away from XSTATE, emulation
-> > of PKRU's existence in XSTATE was added for APIs that read XSTATE, but not
-> > for APIs that write XSTATE. This can be seen by running gdb and executing
-> > `p $pkru`, `set $pkru = 42`, and `p $pkru`. On affected kernels (5.14+) the
-> > write to the PKRU register (which gdb performs through ptrace) is ignored.
-> >
-> > There are three relevant APIs: PTRACE_SETREGSET with NT_X86_XSTATE,
-> > sigreturn, and KVM_SET_XSAVE. KVM_SET_XSAVE has its own special handling to
-> > make PKRU writes take effect (in fpu_copy_uabi_to_guest_fpstate). Push that
-> > down into copy_uabi_to_xstate and have PTRACE_SETREGSET with NT_X86_XSTATE
-> > and sigreturn pass in pointers to the appropriate PKRU value.
-> >
-> > This also adds code to initialize the PKRU value to the hardware init value
-> > (namely 0) if the PKRU bit is not set in the XSTATE header to match XRSTOR.
-> > This is a change to the current KVM_SET_XSAVE behavior.
-> >
-> > Signed-off-by: Kyle Huey <me@kylehuey.com>
-> > Cc: kvm@vger.kernel.org # For edge case behavior of KVM_SET_XSAVE
-> > Cc: stable@vger.kernel.org # 5.14+
-> > Fixes: e84ba47e313dbc097bf859bb6e4f9219883d5f78
-> > ---
-> >  arch/x86/kernel/fpu/core.c   | 11 +----------
-> >  arch/x86/kernel/fpu/regset.c |  2 +-
-> >  arch/x86/kernel/fpu/signal.c |  2 +-
-> >  arch/x86/kernel/fpu/xstate.c | 26 +++++++++++++++++++++-----
-> >  arch/x86/kernel/fpu/xstate.h |  4 ++--
-> >  5 files changed, 26 insertions(+), 19 deletions(-)
-> >
-> > diff --git a/arch/x86/kernel/fpu/core.c b/arch/x86/kernel/fpu/core.c
-> > index 0531d6a06df5..dfb79e2ee81f 100644
-> > --- a/arch/x86/kernel/fpu/core.c
-> > +++ b/arch/x86/kernel/fpu/core.c
-> > @@ -406,16 +406,7 @@ int fpu_copy_uabi_to_guest_fpstate(struct fpu_guest *gfpu, const void *buf,
-> >       if (ustate->xsave.header.xfeatures & ~xcr0)
-> >               return -EINVAL;
-> >
-> > -     ret = copy_uabi_from_kernel_to_xstate(kstate, ustate);
-> > -     if (ret)
-> > -             return ret;
-> > -
-> > -     /* Retrieve PKRU if not in init state */
-> > -     if (kstate->regs.xsave.header.xfeatures & XFEATURE_MASK_PKRU) {
-> > -             xpkru = get_xsave_addr(&kstate->regs.xsave, XFEATURE_PKRU);
-> > -             *vpkru = xpkru->pkru;
-> > -     }
-> > -     return 0;
-> > +     return copy_uabi_from_kernel_to_xstate(kstate, ustate, vpkru);
-> >  }
-> >  EXPORT_SYMBOL_GPL(fpu_copy_uabi_to_guest_fpstate);
-> >  #endif /* CONFIG_KVM */
-> > diff --git a/arch/x86/kernel/fpu/regset.c b/arch/x86/kernel/fpu/regset.c
-> > index 75ffaef8c299..6d056b68f4ed 100644
-> > --- a/arch/x86/kernel/fpu/regset.c
-> > +++ b/arch/x86/kernel/fpu/regset.c
-> > @@ -167,7 +167,7 @@ int xstateregs_set(struct task_struct *target, const struct user_regset *regset,
-> >       }
-> >
-> >       fpu_force_restore(fpu);
-> > -     ret = copy_uabi_from_kernel_to_xstate(fpu->fpstate, kbuf ?: tmpbuf);
-> > +     ret = copy_uabi_from_kernel_to_xstate(fpu->fpstate, kbuf ?: tmpbuf, &target->thread.pkru);
-> >
-> >  out:
-> >       vfree(tmpbuf);
-> > diff --git a/arch/x86/kernel/fpu/signal.c b/arch/x86/kernel/fpu/signal.c
-> > index 91d4b6de58ab..558076dbde5b 100644
-> > --- a/arch/x86/kernel/fpu/signal.c
-> > +++ b/arch/x86/kernel/fpu/signal.c
-> > @@ -396,7 +396,7 @@ static bool __fpu_restore_sig(void __user *buf, void __user *buf_fx,
-> >
-> >       fpregs = &fpu->fpstate->regs;
-> >       if (use_xsave() && !fx_only) {
-> > -             if (copy_sigframe_from_user_to_xstate(fpu->fpstate, buf_fx))
-> > +             if (copy_sigframe_from_user_to_xstate(tsk, buf_fx))
-> >                       return false;
-> >       } else {
-> >               if (__copy_from_user(&fpregs->fxsave, buf_fx,
-> > diff --git a/arch/x86/kernel/fpu/xstate.c b/arch/x86/kernel/fpu/xstate.c
-> > index c8340156bfd2..1eea7af4afd9 100644
-> > --- a/arch/x86/kernel/fpu/xstate.c
-> > +++ b/arch/x86/kernel/fpu/xstate.c
-> > @@ -1197,7 +1197,7 @@ static int copy_from_buffer(void *dst, unsigned int offset, unsigned int size,
-> >
-> >
-> >  static int copy_uabi_to_xstate(struct fpstate *fpstate, const void *kbuf,
-> > -                            const void __user *ubuf)
-> > +                            const void __user *ubuf, u32 *pkru)
-> >  {
-> >       struct xregs_state *xsave = &fpstate->regs.xsave;
-> >       unsigned int offset, size;
-> > @@ -1235,6 +1235,22 @@ static int copy_uabi_to_xstate(struct fpstate *fpstate, const void *kbuf,
-> >       for (i = 0; i < XFEATURE_MAX; i++) {
-> >               mask = BIT_ULL(i);
-> >
-> > +             if (i == XFEATURE_PKRU) {
-> > +                     /*
-> > +                      * Retrieve PKRU if not in init state, otherwise
-> > +                      * initialize it.
-> > +                      */
-> > +                     if (hdr.xfeatures & mask) {
-> > +                             struct pkru_state xpkru = {0};
-> > +
-> > +                             copy_from_buffer(&xpkru, xstate_offsets[i],
-> > +                                              sizeof(xpkru), kbuf, ubuf);
->
-> Shouldn't the failure case of copy_from_buffer() be handled?
+This patch series is a result of long debug work to find out why=0D
+sometimes guests with win11 secure boot=0D
+were failing during boot.=0D
+=0D
+During writing a unit test I found another bug, turns out=0D
+that on rsm emulation, if the rsm instruction was done in real=0D
+or 32 bit mode, KVM would truncate the restored RIP to 32 bit.=0D
+=0D
+I also refactored the way we write SMRAM so it is easier=0D
+now to understand what is going on.=0D
+=0D
+The main bug in this series which I fixed is that we=0D
+allowed #SMI to happen during the STI interrupt shadow,=0D
+and we did nothing to both reset it on #SMI handler=0D
+entry and restore it on RSM.=0D
+=0D
+V3: addressed most of the review feedback from Sean (thanks!)=0D
+=0D
+Best regards,=0D
+	Maxim Levitsky=0D
+=0D
+Maxim Levitsky (13):=0D
+  bug: introduce ASSERT_STRUCT_OFFSET=0D
+  KVM: x86: emulator: em_sysexit should update ctxt->mode=0D
+  KVM: x86: emulator: introduce emulator_recalc_and_set_mode=0D
+  KVM: x86: emulator: update the emulation mode after rsm=0D
+  KVM: x86: emulator: update the emulation mode after CR0 write=0D
+  KVM: x86: emulator/smm: number of GPRs in the SMRAM image depends on=0D
+    the image format=0D
+  KVM: x86: emulator/smm: add structs for KVM's smram layout=0D
+  KVM: x86: emulator/smm: use smram structs in the common code=0D
+  KVM: x86: emulator/smm: use smram struct for 32 bit smram load/restore=0D
+  KVM: x86: emulator/smm: use smram struct for 64 bit smram load/restore=0D
+  KVM: x86: SVM: use smram structs=0D
+  KVM: x86: SVM: don't save SVM state to SMRAM when VM is not long mode=0D
+    capable=0D
+  KVM: x86: emulator/smm: preserve interrupt shadow in SMRAM=0D
+=0D
+ arch/x86/include/asm/kvm_host.h |  11 +-=0D
+ arch/x86/kvm/emulate.c          | 305 +++++++++++++++++---------------=0D
+ arch/x86/kvm/kvm_emulate.h      | 223 ++++++++++++++++++++++-=0D
+ arch/x86/kvm/svm/svm.c          |  30 ++--=0D
+ arch/x86/kvm/vmx/vmcs12.h       |   5 +-=0D
+ arch/x86/kvm/vmx/vmx.c          |   4 +-=0D
+ arch/x86/kvm/x86.c              | 175 +++++++++---------=0D
+ include/linux/build_bug.h       |   9 +=0D
+ 8 files changed, 497 insertions(+), 265 deletions(-)=0D
+=0D
+-- =0D
+2.26.3=0D
+=0D
 
-Yes, it should be. The sigreturn case could hit it.
-
-> Also, what's the security model for this register, do we trust all input
-> values user-space provides for the PKRU field in the XSTATE? I realize that
-> WRPKRU already gives user-space write access to the register - but does the
-> CPU write it all into the XSTATE, with no restrictions on content
-> whatsoever?
-
-There is no security model for this register. The CPU does write
-whatever is given to WRPKRU (or XRSTOR) into the PKRU register. The
-pkeys(7) man page notes:
-
-Protection keys have the potential to add a layer of security and
-reliability to applications. But they have not been primarily designed
-as a security feature. For instance, WRPKRU is a completely
-unprivileged instruction, so pkeys are useless in any case that an
-attacker controls the PKRU register or can execute arbitrary
-instructions.
-
-And the ERIM paper
-(https://www.usenix.org/system/files/sec19-vahldiek-oberwagner_0.pdf)
-explicitly contemplates the need to protect against the less
-privileged code containing WRPKRU and XRSTOR instructions (though they
-do seem to have missed the implicit XRSTOR in sigreturn).
-
-> Thanks,
->
->         Ingo
-
-- Kyle
