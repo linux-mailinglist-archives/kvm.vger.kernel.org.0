@@ -2,122 +2,150 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 59E05588DDE
-	for <lists+kvm@lfdr.de>; Wed,  3 Aug 2022 15:50:05 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 7C747588DE4
+	for <lists+kvm@lfdr.de>; Wed,  3 Aug 2022 15:51:21 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238697AbiHCNtx (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 3 Aug 2022 09:49:53 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33978 "EHLO
+        id S238294AbiHCNvT (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 3 Aug 2022 09:51:19 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33854 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S238558AbiHCNtT (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 3 Aug 2022 09:49:19 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 750892409F
-        for <kvm@vger.kernel.org>; Wed,  3 Aug 2022 06:47:28 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1659534447;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=8+WNP5g0MFdn4fojH2m6YlFR7oOtayB1+T9v33lYjzc=;
-        b=irKxB+h5ZgU0JljDWuFRucS4ycnjFyMOgZbDZVa+WWIKrprgAv5nEc0iTZBE/GT/po0ggm
-        1gtAg4vTQZ3dAgSAqRBKl1DN9R1pXTWO9+EV5RfaL3XHoIL1uONG6jDXdEbM5R2V9sAk4D
-        azSignQUmCoKuKsB7ozpsNklvxlLHwE=
-Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
- [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-620-889pXwtuP1ahCrL8VRjzig-1; Wed, 03 Aug 2022 09:47:24 -0400
-X-MC-Unique: 889pXwtuP1ahCrL8VRjzig-1
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.rdu2.redhat.com [10.11.54.6])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id E74038037B5;
-        Wed,  3 Aug 2022 13:47:23 +0000 (UTC)
-Received: from fedora.redhat.com (unknown [10.40.195.93])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 37D2D2166B26;
-        Wed,  3 Aug 2022 13:47:21 +0000 (UTC)
-From:   Vitaly Kuznetsov <vkuznets@redhat.com>
-To:     kvm@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>,
-        Sean Christopherson <seanjc@google.com>
-Cc:     Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Michael Kelley <mikelley@microsoft.com>,
-        Siddharth Chandrasekaran <sidcha@amazon.de>,
-        Yuan Yao <yuan.yao@linux.intel.com>,
-        Maxim Levitsky <mlevitsk@redhat.com>,
-        linux-hyperv@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: [PATCH v9 40/40] KVM: selftests: Rename 'evmcs_test' to 'hyperv_evmcs'
-Date:   Wed,  3 Aug 2022 15:47:20 +0200
-Message-Id: <20220803134720.399620-1-vkuznets@redhat.com>
-In-Reply-To: <20220803134110.397885-1-vkuznets@redhat.com>
-References: <20220803134110.397885-1-vkuznets@redhat.com>
+        with ESMTP id S237977AbiHCNvB (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 3 Aug 2022 09:51:01 -0400
+Received: from mail.sberdevices.ru (mail.sberdevices.ru [45.89.227.171])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3F809205E3;
+        Wed,  3 Aug 2022 06:48:26 -0700 (PDT)
+Received: from s-lin-edge02.sberdevices.ru (localhost [127.0.0.1])
+        by mail.sberdevices.ru (Postfix) with ESMTP id E6DFA5FD2E;
+        Wed,  3 Aug 2022 16:48:23 +0300 (MSK)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=sberdevices.ru;
+        s=mail; t=1659534503;
+        bh=mAMukG4zOFmQ0mJDgVLGygbis/vBX4+8MbEbbiDl3IA=;
+        h=From:To:Subject:Date:Message-ID:Content-Type:MIME-Version;
+        b=BebLyj5e7Y5KXiXpPs0JrRIufDwlxbC/JjpQwjuHLL+FBwf71SlHuX0qHgpUgjL9H
+         80uBQ+gQ+3Bj8pavJHhFP06JKpSIEhXfZ2bVbo4YQSXDS2C/AQbvO8rFDVHMmPkBEv
+         HdaWaUSM/uJH9R/fau3Pp/ibEhRv6HnElQmMkZXN55CAjzkme2s/nvtM6mVf7t6vXY
+         5OWRLdWg+1bxdvJAPneCyecCC0QDOGBfxDvf207wFQmkQPw8LL3H0QhJXQ3TrBMWki
+         85XZKHUpOWW5xKZ6aFJmZ0gtges7c0PnanWDFHonWuMv/xg0gHlXoW1yFohp2B7SDE
+         16kzR2xaonDlw==
+Received: from S-MS-EXCH02.sberdevices.ru (S-MS-EXCH02.sberdevices.ru [172.16.1.5])
+        by mail.sberdevices.ru (Postfix) with ESMTP;
+        Wed,  3 Aug 2022 16:48:19 +0300 (MSK)
+From:   Arseniy Krasnov <AVKrasnov@sberdevices.ru>
+To:     Stefano Garzarella <sgarzare@redhat.com>,
+        "David S. Miller" <davem@davemloft.net>,
+        "edumazet@google.com" <edumazet@google.com>,
+        "Jakub Kicinski" <kuba@kernel.org>,
+        Paolo Abeni <pabeni@redhat.com>,
+        "kys@microsoft.com" <kys@microsoft.com>,
+        "haiyangz@microsoft.com" <haiyangz@microsoft.com>,
+        "sthemmin@microsoft.com" <sthemmin@microsoft.com>,
+        "wei.liu@kernel.org" <wei.liu@kernel.org>,
+        Dexuan Cui <decui@microsoft.com>,
+        Stefan Hajnoczi <stefanha@redhat.com>,
+        Bryan Tan <bryantan@vmware.com>,
+        Vishnu Dasa <vdasa@vmware.com>,
+        VMware PV-Drivers Reviewers <pv-drivers@vmware.com>,
+        Krasnov Arseniy <oxffffaa@gmail.com>,
+        "Arseniy Krasnov" <AVKrasnov@sberdevices.ru>
+CC:     "virtualization@lists.linux-foundation.org" 
+        <virtualization@lists.linux-foundation.org>,
+        "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "linux-hyperv@vger.kernel.org" <linux-hyperv@vger.kernel.org>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        kernel <kernel@sberdevices.ru>
+Subject: [RFC PATCH v3 0/9] vsock: updates for SO_RCVLOWAT handling
+Thread-Topic: [RFC PATCH v3 0/9] vsock: updates for SO_RCVLOWAT handling
+Thread-Index: AQHYpz+pcvNrW+Wes06KlvYKyF5H+Q==
+Date:   Wed, 3 Aug 2022 13:48:06 +0000
+Message-ID: <2ac35e2c-26a8-6f6d-2236-c4692600db9e@sberdevices.ru>
+Accept-Language: en-US, ru-RU
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+x-originating-ip: [172.16.1.12]
+Content-Type: text/plain; charset="utf-8"
+Content-ID: <70E7F8912CC1A849924AB89DEEDC1AD3@sberdevices.ru>
+Content-Transfer-Encoding: base64
 MIME-Version: 1.0
-Content-Type: text/plain
-Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 2.78 on 10.11.54.6
-X-Spam-Status: No, score=-2.7 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        SPF_HELO_NONE,SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
+X-KSMG-Rule-ID: 4
+X-KSMG-Message-Action: clean
+X-KSMG-AntiSpam-Status: not scanned, disabled by settings
+X-KSMG-AntiSpam-Interceptor-Info: not scanned
+X-KSMG-AntiPhishing: not scanned, disabled by settings
+X-KSMG-AntiVirus: Kaspersky Secure Mail Gateway, version 1.1.2.30, bases: 2022/08/03 07:41:00 #20041172
+X-KSMG-AntiVirus-Status: Clean, skipped
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,SPF_HELO_NONE,SPF_PASS
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Conform to the rest of Hyper-V emulation selftests which have 'hyperv'
-prefix. Get rid of '_test' suffix as well as the purpose of this code
-is fairly obvious.
-
-Signed-off-by: Vitaly Kuznetsov <vkuznets@redhat.com>
----
- tools/testing/selftests/kvm/.gitignore                          | 2 +-
- tools/testing/selftests/kvm/Makefile                            | 2 +-
- .../selftests/kvm/x86_64/{evmcs_test.c => hyperv_evmcs.c}       | 0
- 3 files changed, 2 insertions(+), 2 deletions(-)
- rename tools/testing/selftests/kvm/x86_64/{evmcs_test.c => hyperv_evmcs.c} (100%)
-
-diff --git a/tools/testing/selftests/kvm/.gitignore b/tools/testing/selftests/kvm/.gitignore
-index 9305809537f2..a73b3f4b8911 100644
---- a/tools/testing/selftests/kvm/.gitignore
-+++ b/tools/testing/selftests/kvm/.gitignore
-@@ -15,7 +15,6 @@
- /x86_64/cpuid_test
- /x86_64/cr4_cpuid_sync_test
- /x86_64/debug_regs
--/x86_64/evmcs_test
- /x86_64/emulator_error_test
- /x86_64/fix_hypercall_test
- /x86_64/get_msr_index_features
-@@ -23,6 +22,7 @@
- /x86_64/kvm_pv_test
- /x86_64/hyperv_clock
- /x86_64/hyperv_cpuid
-+/x86_64/hyperv_evmcs
- /x86_64/hyperv_features
- /x86_64/hyperv_ipi
- /x86_64/hyperv_svm_test
-diff --git a/tools/testing/selftests/kvm/Makefile b/tools/testing/selftests/kvm/Makefile
-index 6d43e7da431c..1f1ac0de201b 100644
---- a/tools/testing/selftests/kvm/Makefile
-+++ b/tools/testing/selftests/kvm/Makefile
-@@ -78,11 +78,11 @@ TEST_PROGS_x86_64 += x86_64/nx_huge_pages_test.sh
- TEST_GEN_PROGS_x86_64 = x86_64/cpuid_test
- TEST_GEN_PROGS_x86_64 += x86_64/cr4_cpuid_sync_test
- TEST_GEN_PROGS_x86_64 += x86_64/get_msr_index_features
--TEST_GEN_PROGS_x86_64 += x86_64/evmcs_test
- TEST_GEN_PROGS_x86_64 += x86_64/emulator_error_test
- TEST_GEN_PROGS_x86_64 += x86_64/fix_hypercall_test
- TEST_GEN_PROGS_x86_64 += x86_64/hyperv_clock
- TEST_GEN_PROGS_x86_64 += x86_64/hyperv_cpuid
-+TEST_GEN_PROGS_x86_64 += x86_64/hyperv_evmcs
- TEST_GEN_PROGS_x86_64 += x86_64/hyperv_features
- TEST_GEN_PROGS_x86_64 += x86_64/hyperv_ipi
- TEST_GEN_PROGS_x86_64 += x86_64/hyperv_svm_test
-diff --git a/tools/testing/selftests/kvm/x86_64/evmcs_test.c b/tools/testing/selftests/kvm/x86_64/hyperv_evmcs.c
-similarity index 100%
-rename from tools/testing/selftests/kvm/x86_64/evmcs_test.c
-rename to tools/testing/selftests/kvm/x86_64/hyperv_evmcs.c
--- 
-2.35.3
-
+SGVsbG8sDQoNClRoaXMgcGF0Y2hzZXQgaW5jbHVkZXMgc29tZSB1cGRhdGVzIGZvciBTT19SQ1ZM
+T1dBVDoNCg0KMSkgYWZfdnNvY2s6DQogICBEdXJpbmcgbXkgZXhwZXJpbWVudHMgd2l0aCB6ZXJv
+Y29weSByZWNlaXZlLCBpIGZvdW5kLCB0aGF0IGluIHNvbWUNCiAgIGNhc2VzLCBwb2xsKCkgaW1w
+bGVtZW50YXRpb24gdmlvbGF0ZXMgUE9TSVg6IHdoZW4gc29ja2V0IGhhcyBub24tDQogICBkZWZh
+dWx0IFNPX1JDVkxPV0FUKGUuZy4gbm90IDEpLCBwb2xsKCkgd2lsbCBhbHdheXMgc2V0IFBPTExJ
+TiBhbmQNCiAgIFBPTExSRE5PUk0gYml0cyBpbiAncmV2ZW50cycgZXZlbiBudW1iZXIgb2YgYnl0
+ZXMgYXZhaWxhYmxlIHRvIHJlYWQNCiAgIG9uIHNvY2tldCBpcyBzbWFsbGVyIHRoYW4gU09fUkNW
+TE9XQVQgdmFsdWUuIEluIHRoaXMgY2FzZSx1c2VyIHNlZXMNCiAgIFBPTExJTiBmbGFnIGFuZCB0
+aGVuIHRyaWVzIHRvIHJlYWQgZGF0YShmb3IgZXhhbXBsZSB1c2luZyAgJ3JlYWQoKScNCiAgIGNh
+bGwpLCBidXQgcmVhZCBjYWxsIHdpbGwgYmUgYmxvY2tlZCwgYmVjYXVzZSAgU09fUkNWTE9XQVQg
+bG9naWMgaXMNCiAgIHN1cHBvcnRlZCBpbiBkZXF1ZXVlIGxvb3AgaW4gYWZfdnNvY2suYy4gQnV0
+IHRoZSBzYW1lIHRpbWUsICBQT1NJWA0KICAgcmVxdWlyZXMgdGhhdDoNCg0KICAgIlBPTExJTiAg
+ICAgRGF0YSBvdGhlciB0aGFuIGhpZ2gtcHJpb3JpdHkgZGF0YSBtYXkgYmUgcmVhZCB3aXRob3V0
+DQogICAgICAgICAgICAgICBibG9ja2luZy4NCiAgICBQT0xMUkROT1JNIE5vcm1hbCBkYXRhIG1h
+eSBiZSByZWFkIHdpdGhvdXQgYmxvY2tpbmcuIg0KDQogICBTZWUgaHR0cHM6Ly93d3cub3Blbi1z
+dGQub3JnL2p0YzEvc2MyMi9vcGVuL240MjE3LnBkZiwgcGFnZSAyOTMuDQoNCiAgIFNvLCB3ZSBo
+YXZlLCB0aGF0IHBvbGwoKSBzeXNjYWxsIHJldHVybnMgUE9MTElOLCBidXQgcmVhZCBjYWxsIHdp
+bGwNCiAgIGJlIGJsb2NrZWQuDQoNCiAgIEFsc28gaW4gbWFuIHBhZ2Ugc29ja2V0KDcpIGkgZm91
+bmQgdGhhdDoNCg0KICAgIlNpbmNlIExpbnV4IDIuNi4yOCwgc2VsZWN0KDIpLCBwb2xsKDIpLCBh
+bmQgZXBvbGwoNykgaW5kaWNhdGUgYQ0KICAgc29ja2V0IGFzIHJlYWRhYmxlIG9ubHkgaWYgYXQg
+bGVhc3QgU09fUkNWTE9XQVQgYnl0ZXMgYXJlIGF2YWlsYWJsZS4iDQoNCiAgIEkgY2hlY2tlZCBU
+Q1AgY2FsbGJhY2sgZm9yIHBvbGwoKShuZXQvaXB2NC90Y3AuYywgdGNwX3BvbGwoKSksIGl0DQog
+ICB1c2VzIFNPX1JDVkxPV0FUIHZhbHVlIHRvIHNldCBQT0xMSU4gYml0LCBhbHNvIGkndmUgdGVz
+dGVkIFRDUCB3aXRoDQogICB0aGlzIGNhc2UgZm9yIFRDUCBzb2NrZXQsIGl0IHdvcmtzIGFzIFBP
+U0lYIHJlcXVpcmVkLg0KDQogICBJJ3ZlIGFkZGVkIHNvbWUgZml4ZXMgdG8gYWZfdnNvY2suYyBh
+bmQgdmlydGlvX3RyYW5zcG9ydF9jb21tb24uYywNCiAgIHRlc3QgaXMgYWxzbyBpbXBsZW1lbnRl
+ZC4NCg0KMikgdmlydGlvL3Zzb2NrOg0KICAgSXQgYWRkcyBzb21lIG9wdGltaXphdGlvbiB0byB3
+YWtlIHVwcywgd2hlbiBuZXcgZGF0YSBhcnJpdmVkLiBOb3csDQogICBTT19SQ1ZMT1dBVCBpcyBj
+b25zaWRlcmVkIGJlZm9yZSB3YWtlIHVwIHNsZWVwZXJzIHdobyB3YWl0IG5ldyBkYXRhLg0KICAg
+VGhlcmUgaXMgbm8gc2Vuc2UsIHRvIGtpY2sgd2FpdGVyLCB3aGVuIG51bWJlciBvZiBhdmFpbGFi
+bGUgYnl0ZXMNCiAgIGluIHNvY2tldCdzIHF1ZXVlIDwgU09fUkNWTE9XQVQsIGJlY2F1c2UgaWYg
+d2Ugd2FrZSB1cCByZWFkZXIgaW4NCiAgIHRoaXMgY2FzZSwgaXQgd2lsbCB3YWl0IGZvciBTT19S
+Q1ZMT1dBVCBkYXRhIGFueXdheSBkdXJpbmcgZGVxdWV1ZSwNCiAgIG9yIGluIHBvbGwoKSBjYXNl
+LCBQT0xMSU4vUE9MTFJETk9STSBiaXRzIHdvbid0IGJlIHNldCwgc28gc3VjaA0KICAgZXhpdCBm
+cm9tIHBvbGwoKSB3aWxsIGJlICJzcHVyaW91cyIuIFRoaXMgbG9naWMgaXMgYWxzbyB1c2VkIGlu
+IFRDUA0KICAgc29ja2V0cy4NCg0KMykgdm1jaS92c29jazoNCiAgIFNhbWUgYXMgMiksIGJ1dCBp
+J20gbm90IHN1cmUgYWJvdXQgdGhpcyBjaGFuZ2VzLiBXaWxsIGJlIHZlcnkgZ29vZCwNCiAgIHRv
+IGdldCBjb21tZW50cyBmcm9tIHNvbWVvbmUgd2hvIGtub3dzIHRoaXMgY29kZS4NCg0KNCkgSHlw
+ZXItVjoNCiAgIEFzIERleHVhbiBDdWkgbWVudGlvbmVkLCBmb3IgSHlwZXItViB0cmFuc3BvcnQg
+aXQgaXMgZGlmZmljdWx0IHRvDQogICBzdXBwb3J0IFNPX1JDVkxPV0FULCBzbyBoZSBzdWdnZXN0
+ZWQgdG8gZGlzYWJsZSB0aGlzIGZlYXR1cmUgZm9yDQogICBIeXBlci1WLg0KDQpUaGFuayBZb3UN
+Cg0KQXJzZW5peSBLcmFzbm92KDkpOg0KIHZzb2NrOiBTT19SQ1ZMT1dBVCB0cmFuc3BvcnQgc2V0
+IGNhbGxiYWNrDQogaHZfc29jazogZGlzYWJsZSBTT19SQ1ZMT1dBVCBzdXBwb3J0DQogdmlydGlv
+L3Zzb2NrOiB1c2UgJ3RhcmdldCcgaW4gbm90aWZ5X3BvbGxfaW4gY2FsbGJhY2sNCiB2bWNpL3Zz
+b2NrOiB1c2UgJ3RhcmdldCcgaW4gbm90aWZ5X3BvbGxfaW4gY2FsbGJhY2sNCiB2c29jazogcGFz
+cyBzb2NrX3Jjdmxvd2F0IHRvIG5vdGlmeV9wb2xsX2luIGFzIHRhcmdldA0KIHZzb2NrOiBhZGQg
+QVBJIGNhbGwgZm9yIGRhdGEgcmVhZHkNCiB2aXJ0aW8vdnNvY2s6IGNoZWNrIFNPX1JDVkxPV0FU
+IGJlZm9yZSB3YWtlIHVwIHJlYWRlcg0KIHZtY2kvdnNvY2s6IGNoZWNrIFNPX1JDVkxPV0FUIGJl
+Zm9yZSB3YWtlIHVwIHJlYWRlcg0KIHZzb2NrX3Rlc3Q6IFBPTExJTiArIFNPX1JDVkxPV0FUIHRl
+c3QNCg0KIGluY2x1ZGUvbmV0L2FmX3Zzb2NrLmggICAgICAgICAgICAgICAgICAgICAgIHwgICAy
+ICsNCiBuZXQvdm13X3Zzb2NrL2FmX3Zzb2NrLmMgICAgICAgICAgICAgICAgICAgICB8ICAzOCAr
+KysrKysrKystDQogbmV0L3Ztd192c29jay9oeXBlcnZfdHJhbnNwb3J0LmMgICAgICAgICAgICAg
+fCAgIDcgKysNCiBuZXQvdm13X3Zzb2NrL3ZpcnRpb190cmFuc3BvcnRfY29tbW9uLmMgICAgICB8
+ICAgNyArLQ0KIG5ldC92bXdfdnNvY2svdm1jaV90cmFuc3BvcnRfbm90aWZ5LmMgICAgICAgIHwg
+IDEwICstLQ0KIG5ldC92bXdfdnNvY2svdm1jaV90cmFuc3BvcnRfbm90aWZ5X3FzdGF0ZS5jIHwg
+IDEyICstLQ0KIHRvb2xzL3Rlc3RpbmcvdnNvY2svdnNvY2tfdGVzdC5jICAgICAgICAgICAgIHwg
+MTA3ICsrKysrKysrKysrKysrKysrKysrKysrKysrKw0KIDcgZmlsZXMgY2hhbmdlZCwgMTY2IGlu
+c2VydGlvbnMoKyksIDE3IGRlbGV0aW9ucygtKQ0KDQogQ2hhbmdlbG9nOg0KDQogdjEgLT4gdjI6
+DQogMSkgUGF0Y2hlcyBmb3IgVk1DSSB0cmFuc3BvcnQoc2FtZSBhcyBmb3IgdmlydGlvLXZzb2Nr
+KS4NCiAyKSBQYXRjaGVzIGZvciBIeXBlci1WIHRyYW5zcG9ydChkaXNhYmxpbmcgU09fUkNWTE9X
+QVQgc2V0dGluZykuDQogMykgV2FpdGluZyBsb2dpYyBpbiB0ZXN0IHdhcyB1cGRhdGVkKHNsZWVw
+KCkgLT4gcG9sbCgpKS4NCg0KIHYyIC0+IHYzOg0KIDEpIFBhdGNoZXMgd2VyZSByZW9yZGVyZWQu
+DQogMikgQ29tbWl0IG1lc3NhZ2UgdXBkYXRlZCBpbiAwMDA1Lg0KIDMpIENoZWNrICd0cmFuc3Bv
+cnQnIHBvaW50ZXIgaW4gMDAwMSBmb3IgTlVMTC4NCiA0KSBDaGVjayAndmFsdWUnIGluIDAwMDEg
+Zm9yID4gYnVmZmVyX3NpemUuDQoNCi0tIA0KMi4yNS4xDQo=
