@@ -2,79 +2,123 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 78D505892C5
-	for <lists+kvm@lfdr.de>; Wed,  3 Aug 2022 21:29:06 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id D030D5892CE
+	for <lists+kvm@lfdr.de>; Wed,  3 Aug 2022 21:35:01 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238776AbiHCT3C (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 3 Aug 2022 15:29:02 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33490 "EHLO
+        id S237012AbiHCTfA (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 3 Aug 2022 15:35:00 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38446 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S238728AbiHCT2o (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 3 Aug 2022 15:28:44 -0400
-Received: from mail-pj1-x1033.google.com (mail-pj1-x1033.google.com [IPv6:2607:f8b0:4864:20::1033])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D5BBF5D0C7
-        for <kvm@vger.kernel.org>; Wed,  3 Aug 2022 12:27:54 -0700 (PDT)
-Received: by mail-pj1-x1033.google.com with SMTP id gj1so2474156pjb.0
-        for <kvm@vger.kernel.org>; Wed, 03 Aug 2022 12:27:54 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc;
-        bh=2y77GU73GtesLx1ZtH3/2t6LiwaKzcbAcF+3XUlOrIE=;
-        b=ZH+4bGmCfY18KAUOE0TU56IB4CqJVxXkcOQi9Q2oQu2TJFaVC+lQvxvnm4cJXO/lJ/
-         JDo/qLDm3aRMqyMt9rbB+2GbNVSq/8Loujui7cCWZpE2Z3E+lndxAX59/EBkLhaRc4K7
-         ZSrXHpVnRGTyL4Y2Pcmfe6dFShdWLnJ4DPmcVvByLJ74NfEAbTwo7svQ2RhoXBEQDPb7
-         u79e712PkBSY3GKz4d49RA94T1BdHLHT3wL4oUdP8eRjF6kX7lth2vy5H05adtjuqe50
-         5N9kVsCOfPrO11UzsQFPcUASUE7l3nmd2k5B5CGKF6GsHS206mQRtapxewsFXo2agSgQ
-         yzkA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc;
-        bh=2y77GU73GtesLx1ZtH3/2t6LiwaKzcbAcF+3XUlOrIE=;
-        b=qlCO1YGChfc4mna0qaZLiET3yMyLkaH00aacZ4Oyj2iXXF1FcraMrV0rDMXEtLOLd2
-         oPjX5YhGMlDoPTgTxNTjM8EmwMtYoFpzk/r/D1SYk/4XnMrAtdNcrbqgmif1Iv5rgq2o
-         tQL3Bm2eoSTQ97sdPQ9dw0svAOZLlwibdZ31OOw0DCpejxasRPnNplp6x6bVFfRsjZUO
-         GmQuRKPXjpqe/v4ngxcyC4nKnfiCW33Ra9O9lQW/9wq16VpGOS6qt5MRdYN/SDluPWNs
-         RCxDRXGCj+Kh+woWyKbRptmvML616Tq0trX/yDegE19WuM/kgA0UZ4cSCmjWjLOYaWHl
-         +Jlg==
-X-Gm-Message-State: ACgBeo02tp7Bv+mX6CP+bKYKMMCPcDPdcTOtC+Q+YDL1mHOUzYlCwTtP
-        hHs9q26i0ypMXPAlDnDN++yelg==
-X-Google-Smtp-Source: AA6agR4i/AQ75/75Xk1rPA/tsU66D3+h7/pEvk8iU6Wt5s+DCUbse2toF9wf4QBfO2T6t+oN1ruWsg==
-X-Received: by 2002:a17:902:ec90:b0:16e:d8d8:c2db with SMTP id x16-20020a170902ec9000b0016ed8d8c2dbmr19613146plg.69.1659554866328;
-        Wed, 03 Aug 2022 12:27:46 -0700 (PDT)
-Received: from google.com (7.104.168.34.bc.googleusercontent.com. [34.168.104.7])
-        by smtp.gmail.com with ESMTPSA id n4-20020a1709026a8400b0016be834d54asm2298951plk.306.2022.08.03.12.27.45
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 03 Aug 2022 12:27:45 -0700 (PDT)
-Date:   Wed, 3 Aug 2022 19:27:41 +0000
-From:   Sean Christopherson <seanjc@google.com>
-To:     Mingwei Zhang <mizhang@google.com>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>,
+        with ESMTP id S229782AbiHCTe6 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 3 Aug 2022 15:34:58 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id CCC30E5E
+        for <kvm@vger.kernel.org>; Wed,  3 Aug 2022 12:34:56 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1659555295;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=ol5/DqxddFZ4BAtkyhBvW+y2rS0eKBcgrLEzGa8qNys=;
+        b=dZLqyr9gxUedtBk5bKJJNhTq2VvtoAtMhWZhCHPoz7Gf2lL332SzmJBbADVPHFc0BmB1R6
+        CV+3+3xdvrI1+yGyVZs9NfMzklLCoqvrB/tXBAHUng/+p9Ot7EUMpdE7JsIvV83kLPhkoE
+        9N80pfSJ1rtfg4ofW2zME4E/mmKQJyI=
+Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
+ [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-132-gOk7WubEMHGqo2gqfqE9rA-1; Wed, 03 Aug 2022 15:34:52 -0400
+X-MC-Unique: gOk7WubEMHGqo2gqfqE9rA-1
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.rdu2.redhat.com [10.11.54.3])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 375958032F1;
+        Wed,  3 Aug 2022 19:34:52 +0000 (UTC)
+Received: from starship (unknown [10.40.194.242])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 7C1F41121314;
+        Wed,  3 Aug 2022 19:34:49 +0000 (UTC)
+Message-ID: <17505e309d02cf5a96e33f75ccdd6437a8c79222.camel@redhat.com>
+Subject: Re: [PATCH 1/5] KVM: x86: Get vmcs12 pages before checking pending
+ interrupts
+From:   Maxim Levitsky <mlevitsk@redhat.com>
+To:     Mingwei Zhang <mizhang@google.com>,
+        Paolo Bonzini <pbonzini@redhat.com>
+Cc:     Sean Christopherson <seanjc@google.com>,
         Vitaly Kuznetsov <vkuznets@redhat.com>,
         Wanpeng Li <wanpengli@tencent.com>,
         Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org, David Matlack <dmatlack@google.com>
-Subject: Re: [PATCH v2 1/2] KVM: nested/x86: update trace_kvm_nested_vmrun()
- to suppot VMX
-Message-ID: <YurMLf3MDAK0RiZc@google.com>
-References: <20220718171333.1321831-1-mizhang@google.com>
- <20220718171333.1321831-2-mizhang@google.com>
- <YuqnP318U1Cwd6qX@google.com>
+        Joerg Roedel <joro@8bytes.org>, kvm <kvm@vger.kernel.org>,
+        LKML <linux-kernel@vger.kernel.org>,
+        Oliver Upton <oupton@google.com>
+Date:   Wed, 03 Aug 2022 22:34:48 +0300
+In-Reply-To: <CAL715WLQa5yz7SWAfOBUzQigv2JG1Ao+rwbeSJ++rKccVoZeag@mail.gmail.com>
+References: <20220802230718.1891356-1-mizhang@google.com>
+         <20220802230718.1891356-2-mizhang@google.com>
+         <b03adf94-5af2-ff5e-1dbb-6dd212790083@redhat.com>
+         <CAL715WLQa5yz7SWAfOBUzQigv2JG1Ao+rwbeSJ++rKccVoZeag@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+User-Agent: Evolution 3.36.5 (3.36.5-2.fc32) 
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <YuqnP318U1Cwd6qX@google.com>
-X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-        USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=unavailable
-        autolearn_force=no version=3.4.6
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.78 on 10.11.54.3
+X-Spam-Status: No, score=-2.7 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        SPF_HELO_NONE,SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Almost forgot, s/suppot/support in the shortlog.
+On Wed, 2022-08-03 at 10:51 -0700, Mingwei Zhang wrote:
+> On Wed, Aug 3, 2022 at 10:18 AM Paolo Bonzini <pbonzini@redhat.com> wrote:
+> > On 8/3/22 01:07, Mingwei Zhang wrote:
+> > > +     /*
+> > > +      * We must first get the vmcs12 pages before checking for interrupts
+> > > +      * that might unblock the guest if L1 is using virtual-interrupt
+> > > +      * delivery.
+> > > +      */
+> > > +     if (kvm_check_request(KVM_REQ_GET_NESTED_STATE_PAGES, vcpu)) {
+> > > +             /*
+> > > +              * If we have to ask user-space to post-copy a page,
+> > > +              * then we have to keep trying to get all of the
+> > > +              * VMCS12 pages until we succeed.
+> > > +              */
+> > > +             if (unlikely(!kvm_x86_ops.nested_ops->get_nested_state_pages(vcpu))) {
+> > > +                     kvm_make_request(KVM_REQ_GET_NESTED_STATE_PAGES, vcpu);
+> > > +                     return 0;
+> > > +             }
+> > > +     }
+> > > +
+> > 
+> > I think request handling (except for KVM_REQ_EVENT) could be more
+> > generically moved from vcpu_enter_guest() to vcpu_run().
+> 
+> Yeah, sounds good to me. I can come up with an updated version. At
+> least, I will remove the repeat request here.
+
+
+Now it all makes sense. I do think that KVM_REQ_GET_NESTED_STATE_PAGES processing
+when the vCPU is halted is indeed missing.
+
+This reminds me that I would be *very* happy to remove the KVM_REQ_GET_NESTED_STATE_PAGES,
+if by any chance there is an agreement to do so upstream.
+This is yet another reason to do so to be honest.
+Just my 0.2 cents of course.
+
+
+Best regards,
+	Maxim Levitsky
+
+
+
+PS:
+This also reminded me of an related issue:
+https://lore.kernel.org/lkml/20220427173758.517087-1-pbonzini@redhat.com/T/
+Any update on it?
+
+> 
+> > Paolo
+> > 
+
+
