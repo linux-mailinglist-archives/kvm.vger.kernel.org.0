@@ -2,46 +2,47 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id CAAAB588AF2
-	for <lists+kvm@lfdr.de>; Wed,  3 Aug 2022 13:12:25 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 1A527588AF7
+	for <lists+kvm@lfdr.de>; Wed,  3 Aug 2022 13:15:34 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233974AbiHCLMY (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 3 Aug 2022 07:12:24 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38038 "EHLO
+        id S235819AbiHCLPc (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 3 Aug 2022 07:15:32 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39830 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231218AbiHCLMW (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 3 Aug 2022 07:12:22 -0400
+        with ESMTP id S231533AbiHCLP3 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 3 Aug 2022 07:15:29 -0400
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id A9C3613D1A
-        for <kvm@vger.kernel.org>; Wed,  3 Aug 2022 04:12:21 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 500A36366
+        for <kvm@vger.kernel.org>; Wed,  3 Aug 2022 04:15:28 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1659525140;
-        h=from:from:reply-to:reply-to:subject:subject:date:date:
-         message-id:message-id:to:to:cc:cc:mime-version:mime-version:
-         content-type:content-type:in-reply-to:in-reply-to:  references:references;
-        bh=UVLsaq8vm6rwHmKpwoi0S+QiSXhLzFWkEp/HUF0ol+g=;
-        b=gbenNWR5QclK5p8VXKVfacI7oIknwBZAg32NMfcPES489pFtKCrhB05ZNwAgUNJHvpHGPP
-        g2ZDvZ9UkN9Ay0iqYU0JNKs/NZleBpVHVMC/p61VcHRHzOP8bTbN39v9zv5Ve3muJ6oPbq
-        ViAEujgkMJE0UhQFnWW/9Wfw4tHE0nU=
-Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
- [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
+        s=mimecast20190719; t=1659525327;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=sUVTZf/4WKqKxZhRfAnc9gqjvrADArxtA3wnFEDvJVk=;
+        b=FELfcfq0X3SwIchmixZFplsu+xBGi3KepkyUGMEmI+bl8Tis0BskQI2zOHa+LuYxjuPlZU
+        FbZVxytVOXX4cxmbTQl1WufaIvjaS+R/5r1Y7w1ugmRYIKIzOg/tmo+8mc6o7G0/g0/EGt
+        7vSvz44oaDxY1M1Q71OfvwmQusQpT20=
+Received: from mimecast-mx02.redhat.com (mx3-rdu2.redhat.com
+ [66.187.233.73]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-339-mAJdp3ugOqCWA1koI0CIxA-1; Wed, 03 Aug 2022 07:12:19 -0400
-X-MC-Unique: mAJdp3ugOqCWA1koI0CIxA-1
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.rdu2.redhat.com [10.11.54.8])
+ us-mta-635-dwO613NlPCWMpTKCrm_fGw-1; Wed, 03 Aug 2022 07:15:24 -0400
+X-MC-Unique: dwO613NlPCWMpTKCrm_fGw-1
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.rdu2.redhat.com [10.11.54.3])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 3F900185A794;
-        Wed,  3 Aug 2022 11:12:18 +0000 (UTC)
-Received: from redhat.com (unknown [10.33.36.173])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id 2CBEDC28100;
-        Wed,  3 Aug 2022 11:12:07 +0000 (UTC)
-Date:   Wed, 3 Aug 2022 12:12:01 +0100
-From:   Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-To:     "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Cc:     Alberto Faria <afaria@redhat.com>,
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id DE2063C35F01;
+        Wed,  3 Aug 2022 11:15:21 +0000 (UTC)
+Received: from localhost (unknown [10.39.192.98])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 26FF51121314;
+        Wed,  3 Aug 2022 11:15:21 +0000 (UTC)
+Date:   Wed, 3 Aug 2022 12:15:20 +0100
+From:   "Richard W.M. Jones" <rjones@redhat.com>
+To:     Alberto Faria <afaria@redhat.com>
+Cc:     "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
         Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org,
-        =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>,
+        =?iso-8859-1?Q?Marc-Andr=E9?= Lureau 
+        <marcandre.lureau@redhat.com>,
         Stefano Garzarella <sgarzare@redhat.com>,
         Hannes Reinecke <hare@suse.com>,
         Vladimir Sementsov-Ogievskiy <vsementsov@yandex-team.ru>,
@@ -53,7 +54,8 @@ Cc:     Alberto Faria <afaria@redhat.com>,
         Jeff Cody <codyprime@gmail.com>,
         Eric Blake <eblake@redhat.com>,
         "Denis V. Lunev" <den@openvz.org>,
-        Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <f4bug@amsat.org>,
+        Daniel =?iso-8859-1?Q?P=2E_Berrang=E9?= <berrange@redhat.com>,
+        Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <f4bug@amsat.org>,
         Christian Schoenebeck <qemu_oss@crudebyte.com>,
         Stefan Weil <sw@weilnetz.de>, Klaus Jensen <its@irrelevant.dk>,
         Laurent Vivier <lvivier@redhat.com>,
@@ -81,21 +83,20 @@ Cc:     Alberto Faria <afaria@redhat.com>,
         Eduardo Habkost <eduardo@habkost.net>,
         Fam Zheng <fam@euphon.net>, Thomas Huth <thuth@redhat.com>,
         Keith Busch <kbusch@kernel.org>,
-        Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>,
-        "Richard W.M. Jones" <rjones@redhat.com>,
+        Alex =?iso-8859-1?Q?Benn=E9e?= <alex.bennee@linaro.org>,
         John Snow <jsnow@redhat.com>
 Subject: Re: [RFC v2 02/10] Drop unused static function return values
-Message-ID: <YupYAXJTkSSwOTgV@redhat.com>
-Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+Message-ID: <20220803111520.GO1127@redhat.com>
 References: <20220729130040.1428779-1-afaria@redhat.com>
  <20220729130040.1428779-3-afaria@redhat.com>
  <YupSAhFRK962i+nL@work-vm>
+ <CAELaAXyh0MzuVzDCfhC8hJNAwb=niwFRsXqhc63JiWGxxitkqg@mail.gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <YupSAhFRK962i+nL@work-vm>
-User-Agent: Mutt/2.2.6 (2022-06-05)
-X-Scanned-By: MIMEDefang 2.85 on 10.11.54.8
+In-Reply-To: <CAELaAXyh0MzuVzDCfhC8hJNAwb=niwFRsXqhc63JiWGxxitkqg@mail.gmail.com>
+User-Agent: Mutt/1.5.21 (2010-09-15)
+X-Scanned-By: MIMEDefang 2.78 on 10.11.54.3
 X-Spam-Status: No, score=-3.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,
         SPF_HELO_NONE,SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
@@ -105,68 +106,106 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Aug 03, 2022 at 11:46:26AM +0100, Dr. David Alan Gilbert wrote:
-> * Alberto Faria (afaria@redhat.com) wrote:
-> > Make non-void static functions whose return values are ignored by
-> > all callers return void instead.
-> > 
-> > These functions were found by static-analyzer.py.
-> > 
-> > Not all occurrences of this problem were fixed.
-> > 
-> > Signed-off-by: Alberto Faria <afaria@redhat.com>
+On Wed, Aug 03, 2022 at 12:07:19PM +0100, Alberto Faria wrote:
+> On Wed, Aug 3, 2022 at 11:46 AM Dr. David Alan Gilbert
+> <dgilbert@redhat.com> wrote:
+> >
+> > * Alberto Faria (afaria@redhat.com) wrote:
+> > > Make non-void static functions whose return values are ignored by
+> > > all callers return void instead.
+> > >
+> > > These functions were found by static-analyzer.py.
+> > >
+> > > Not all occurrences of this problem were fixed.
+> > >
+> > > Signed-off-by: Alberto Faria <afaria@redhat.com>
+> >
+> > <snip>
+> >
+> > > diff --git a/migration/migration.c b/migration/migration.c
+> > > index e03f698a3c..4698080f96 100644
+> > > --- a/migration/migration.c
+> > > +++ b/migration/migration.c
+> > > @@ -175,7 +175,7 @@ static MigrationIncomingState *current_incoming;
+> > >
+> > >  static GSList *migration_blockers;
+> > >
+> > > -static bool migration_object_check(MigrationState *ms, Error **errp);
+> > > +static void migration_object_check(MigrationState *ms, Error **errp);
+> > >  static int migration_maybe_pause(MigrationState *s,
+> > >                                   int *current_active_state,
+> > >                                   int new_state);
+> > > @@ -4485,15 +4485,15 @@ static void migration_instance_init(Object *obj)
+> > >   * Return true if check pass, false otherwise. Error will be put
+> > >   * inside errp if provided.
+> > >   */
+> > > -static bool migration_object_check(MigrationState *ms, Error **errp)
+> > > +static void migration_object_check(MigrationState *ms, Error **errp)
+> > >  {
+> >
+> > I'm not sure if this is a good change.
+> > Where we have a function that returns an error via an Error ** it's
+> > normal practice for us to return a bool to say whether it generated an
+> > error.
+> >
+> > Now, in our case we only call it with error_fatal:
+> >
+> >     migration_object_check(current_migration, &error_fatal);
+> >
+> > so the bool isn't used/checked.
+> >
+> > So I'm a bit conflicted:
+> >
+> >   a) Using error_fatal is the easiest way to handle this function
+> >   b) Things taking Error ** normally do return a flag value
+> >   c) But it's not used in this case.
+> >
+> > Hmm.
 > 
-> <snip>
+> I guess this generalizes to the bigger question of whether a global
+> "return-value-never-used" check makes sense and brings value. Maybe
+> there are too many cases where it would be preferable to keep the
+> return value for consistency? Maybe they're not that many and could be
+> tagged with __attribute__((unused))?
 > 
-> > diff --git a/migration/migration.c b/migration/migration.c
-> > index e03f698a3c..4698080f96 100644
-> > --- a/migration/migration.c
-> > +++ b/migration/migration.c
-> > @@ -175,7 +175,7 @@ static MigrationIncomingState *current_incoming;
-> >  
-> >  static GSList *migration_blockers;
-> >  
-> > -static bool migration_object_check(MigrationState *ms, Error **errp);
-> > +static void migration_object_check(MigrationState *ms, Error **errp);
-> >  static int migration_maybe_pause(MigrationState *s,
-> >                                   int *current_active_state,
-> >                                   int new_state);
-> > @@ -4485,15 +4485,15 @@ static void migration_instance_init(Object *obj)
-> >   * Return true if check pass, false otherwise. Error will be put
-> >   * inside errp if provided.
-> >   */
-> > -static bool migration_object_check(MigrationState *ms, Error **errp)
-> > +static void migration_object_check(MigrationState *ms, Error **errp)
-> >  {
-> 
-> I'm not sure if this is a good change.
-> Where we have a function that returns an error via an Error ** it's
-> normal practice for us to return a bool to say whether it generated an
-> error.
-> 
-> Now, in our case we only call it with error_fatal:
-> 
->     migration_object_check(current_migration, &error_fatal);
-> 
-> so the bool isn't used/checked.
-> 
-> So I'm a bit conflicted:
-> 
->   a) Using error_fatal is the easiest way to handle this function
->   b) Things taking Error ** normally do return a flag value
->   c) But it's not used in this case.
+> But in this particular case, perhaps we could drop the Error **errp
+> parameter and directly pass &error_fatal to migrate_params_check() and
+> migrate_caps_check().
 
-Yep, migration_object_check is following our recommended design
-pattern for error reporting. It is valid to either check the
-return value, or pass error_fatal / error_abort.
+If it helps to think about this, Coverity checks for consistency.
+Across the whole code base, is the return value of a function used or
+ignored consistently.  You will see Coverity errors like:
 
-The fact that no /current/ callers happen to check the return
-value is not a reason to make it 'void'.
+      Error: CHECKED_RETURN (CWE-252): [#def37]
+      libnbd-1.12.5/fuse/operations.c:180: check_return: Calling "nbd_poll" without checking return value (as is done elsewhere 5 out of 6 times).
+      libnbd-1.12.5/examples/aio-connect-read.c:96: example_checked: Example 1: "nbd_poll(nbd, -1)" has its value checked in "nbd_poll(nbd, -1) == -1".
+      libnbd-1.12.5/examples/aio-connect-read.c:128: example_checked: Example 2: "nbd_poll(nbd, -1)" has its value checked in "nbd_poll(nbd, -1) == -1".
+      libnbd-1.12.5/examples/strict-structured-reads.c:246: example_checked: Example 3: "nbd_poll(nbd, -1)" has its value checked in "nbd_poll(nbd, -1) == -1".
+      libnbd-1.12.5/ocaml/nbd-c.c:2599: example_assign: Example 4: Assigning: "r" = return value from "nbd_poll(h, timeout)".
+      libnbd-1.12.5/ocaml/nbd-c.c:2602: example_checked: Example 4 (cont.): "r" has its value checked in "r == -1".
+      libnbd-1.12.5/python/methods.c:2806: example_assign: Example 5: Assigning: "ret" = return value from "nbd_poll(h, timeout)".
+      libnbd-1.12.5/python/methods.c:2808: example_checked: Example 5 (cont.): "ret" has its value checked in "ret == -1".
+      #  178|       /* Dispatch work while there are commands in flight. */
+      #  179|       while (thread->in_flight > 0)
+      #  180|->       nbd_poll (h, -1);
+      #  181|     }
+      #  182|
 
-With regards,
-Daniel
+What it's saying is that in this code base, nbd_poll's return value
+was checked by the caller 5 out of 6 times, but ignored here.  (This
+turned out to be a real bug which we fixed).
+
+It seems like the check implemented in your patch is: If the return
+value is used 0 times anywhere in the code base, change the return
+value to 'void'.  Coverity would not flag this.
+
+Maybe a consistent use check is better?
+
+Rich.
+
 -- 
-|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
-|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
-|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
+Richard Jones, Virtualization Group, Red Hat http://people.redhat.com/~rjones
+Read my programming and virtualization blog: http://rwmj.wordpress.com
+libguestfs lets you edit virtual machines.  Supports shell scripting,
+bindings from many languages.  http://libguestfs.org
 
