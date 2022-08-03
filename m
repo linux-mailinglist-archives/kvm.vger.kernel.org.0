@@ -2,142 +2,204 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id A6BCD589455
-	for <lists+kvm@lfdr.de>; Thu,  4 Aug 2022 00:17:47 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 458DB589470
+	for <lists+kvm@lfdr.de>; Thu,  4 Aug 2022 00:35:30 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237044AbiHCWRq (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 3 Aug 2022 18:17:46 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46092 "EHLO
+        id S236278AbiHCWf2 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 3 Aug 2022 18:35:28 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57344 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229579AbiHCWRp (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 3 Aug 2022 18:17:45 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 04EA533A16
-        for <kvm@vger.kernel.org>; Wed,  3 Aug 2022 15:17:43 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1659565063;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=5PFxMgYfFCdZL4v0oQUXz30WFkkB8QIe0HmjbyswfQI=;
-        b=R5I1gEWzbEqnPFY/97ZzY3TCL9vxzkaAxDURU9+Zf4pQa/BDfkvaN+EbHOxaFARtuBNvFi
-        4u79OQrfFXkTHRvdJ9MAqbkmdwGIfhFCRwLxoFztR1+ZEHzhCqo61yfX4dWkgzBcoPjXn4
-        gNbttr9tNrqird2+TTNfD19hb8c2FAk=
-Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
- [209.85.128.72]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-333-KO-Kt6M0MvuyqvZngLKKhQ-1; Wed, 03 Aug 2022 18:17:41 -0400
-X-MC-Unique: KO-Kt6M0MvuyqvZngLKKhQ-1
-Received: by mail-wm1-f72.google.com with SMTP id ay19-20020a05600c1e1300b003a315c2c1c0so1637835wmb.7
-        for <kvm@vger.kernel.org>; Wed, 03 Aug 2022 15:17:41 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
-         :content-language:to:cc:references:from:in-reply-to
-         :content-transfer-encoding;
-        bh=5PFxMgYfFCdZL4v0oQUXz30WFkkB8QIe0HmjbyswfQI=;
-        b=b+69AN/jT40bPTtM3yCrbK1FiKxXMtxUUjXy1Q94sTyDlxRXcjroRKqWN+lpwqht14
-         x8cCqx9GnTuFtvJRzNCZgDoSlxezpCozty7iSsV7tuBYBVubhR3WzO16IFtGw0r6EMH5
-         iOU0leBMlPgxzG9zGZJR02xmJX+vVm2vVlAYFf6bKRKwG5/GSQDKPilRtitrPAoz+gbq
-         a0Mh+P4Pag1H1UEKghZ/laeYBF2WmI4zttVJ//jlk7BAchQ86Gk7W+th8czMDjIm8ZRL
-         IYI6hKsRInUMxvcfJgRyifg4Ek9ScNQdNuPBhbxTOem5iyk4oICaI0UHsQ10RpunAne/
-         0JRg==
-X-Gm-Message-State: ACgBeo2h8n4SqCMvKm+X6XCYFWnGNlnmCJX/eQWRuD2SNkOCDFk87dvH
-        Ui+I3u/nGFMPOYkf7fGQyYM0n1kIn5Bmu036LCsOMndddcrE7jj0dTTiscApT3E9OqG8k4PrNfa
-        m8FJU7SpmLTK1
-X-Received: by 2002:a05:600c:1e8d:b0:3a5:74d:c61c with SMTP id be13-20020a05600c1e8d00b003a5074dc61cmr394777wmb.70.1659565060805;
-        Wed, 03 Aug 2022 15:17:40 -0700 (PDT)
-X-Google-Smtp-Source: AA6agR6mP1RbPaA6+u4RyBxggtu94n8BuENrjyAV18zoCadth/3F+oj3NjNAQW/G9Tz0XdjMeqIDKw==
-X-Received: by 2002:a05:600c:1e8d:b0:3a5:74d:c61c with SMTP id be13-20020a05600c1e8d00b003a5074dc61cmr394765wmb.70.1659565060527;
-        Wed, 03 Aug 2022 15:17:40 -0700 (PDT)
-Received: from [192.168.0.5] (ip-109-42-112-229.web.vodafone.de. [109.42.112.229])
-        by smtp.gmail.com with ESMTPSA id i18-20020adfaad2000000b0021d70a871cbsm19626133wrc.32.2022.08.03.15.17.39
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 03 Aug 2022 15:17:39 -0700 (PDT)
-Message-ID: <b1383c10-fa60-56b5-7d57-7d6d59efd572@redhat.com>
-Date:   Thu, 4 Aug 2022 00:17:38 +0200
+        with ESMTP id S229842AbiHCWf0 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 3 Aug 2022 18:35:26 -0400
+Received: from mga11.intel.com (mga11.intel.com [192.55.52.93])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8E6AF6548;
+        Wed,  3 Aug 2022 15:35:25 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1659566125; x=1691102125;
+  h=message-id:subject:from:to:cc:date:in-reply-to:
+   references:content-transfer-encoding:mime-version;
+  bh=8uQDDoTajgNNE0ToZaY3VXDgbd7kX/Xr+wrnhNi7pvE=;
+  b=BXDxpJA5ZHmu+sj8z7WtQ57ZmXeqsN4p8ghcWs7GAzRfEt53AwiYQ6db
+   aRsyqdzX5Rfbn5RzYYRS5tPPlXDqP26L6fy7cgM1JA9qLrgJCjVwTkbVI
+   CukHpaR3xwf4dQLZcdQSC8lO3WNRBgyhQXReUwlZeZIo8dHGN/Gnv4zTy
+   s9GRStDrp5A9WsJQgXTwkQ4UnLHT3/7BYTuY7W0xz1l/a1WbTenNeBoiK
+   1y6UHCLwqksC7WbRvMKcgD5JoOTRZoDkvyamgiqJj7oYQK9/UITjLWY2o
+   XjfDTj+25pyWnvoAnSAFV7HXNlOrvY4bUNnpdQuWWrcVEN5NGaDLIqGYx
+   A==;
+X-IronPort-AV: E=McAfee;i="6400,9594,10428"; a="287353258"
+X-IronPort-AV: E=Sophos;i="5.93,214,1654585200"; 
+   d="scan'208";a="287353258"
+Received: from fmsmga008.fm.intel.com ([10.253.24.58])
+  by fmsmga102.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 03 Aug 2022 15:35:25 -0700
+X-IronPort-AV: E=Sophos;i="5.93,214,1654585200"; 
+   d="scan'208";a="662272541"
+Received: from jangus-mobl.amr.corp.intel.com (HELO khuang2-desk.gar.corp.intel.com) ([10.212.8.236])
+  by fmsmga008-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 03 Aug 2022 15:35:21 -0700
+Message-ID: <28ece806443e4de04d7e587d7e678d58259f9c5b.camel@intel.com>
+Subject: Re: [PATCH v5 07/22] x86/virt/tdx: Implement SEAMCALL function
+From:   Kai Huang <kai.huang@intel.com>
+To:     Dave Hansen <dave.hansen@intel.com>, linux-kernel@vger.kernel.org,
+        kvm@vger.kernel.org
+Cc:     seanjc@google.com, pbonzini@redhat.com, len.brown@intel.com,
+        tony.luck@intel.com, rafael.j.wysocki@intel.com,
+        reinette.chatre@intel.com, dan.j.williams@intel.com,
+        peterz@infradead.org, ak@linux.intel.com,
+        kirill.shutemov@linux.intel.com,
+        sathyanarayanan.kuppuswamy@linux.intel.com,
+        isaku.yamahata@intel.com
+Date:   Thu, 04 Aug 2022 10:35:19 +1200
+In-Reply-To: <54cf3e98-49d3-81f5-58e6-ca62671ab457@intel.com>
+References: <cover.1655894131.git.kai.huang@intel.com>
+         <095e6bbc57b4470e1e9a9104059a5238c9775f00.1655894131.git.kai.huang@intel.com>
+         <069a062e-a4a6-09af-7b74-7f4929f2ec0b@intel.com>
+         <5ce7ebfe54160ea35e432bf50207ebed32db31fc.camel@intel.com>
+         <84e93539-a2f9-f68e-416a-ea3d8fc725af@intel.com>
+         <6bef368ccc68676e4acaecc4b6dc52f598ea7f2f.camel@intel.com>
+         <ea03e55499f556388c0a5f9ed565e72e213c276f.camel@intel.com>
+         <978c3d37-97c9-79b9-426a-2c27db34c38a@intel.com>
+         <0b20f1878d31658a9e3cd3edaf3826fe8731346e.camel@intel.com>
+         <c96a78c6a8caf25b01e450f139c934688d1735b0.camel@intel.com>
+         <54cf3e98-49d3-81f5-58e6-ca62671ab457@intel.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+User-Agent: Evolution 3.44.3 (3.44.3-1.fc36) 
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.11.0
-Subject: Re: [kvm-unit-tests PATCH v3 1/1] s390x: verify EQBS/SQBS is
- unavailable
-Content-Language: en-US
-To:     Nico Boehr <nrb@linux.ibm.com>, kvm@vger.kernel.org
-Cc:     frankja@linux.ibm.com, imbrenda@linux.ibm.com
-References: <20220803135851.384805-1-nrb@linux.ibm.com>
- <20220803135851.384805-2-nrb@linux.ibm.com>
-From:   Thomas Huth <thuth@redhat.com>
-In-Reply-To: <20220803135851.384805-2-nrb@linux.ibm.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-3.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
-        RCVD_IN_DNSWL_LOW,SPF_HELO_NONE,SPF_NONE autolearn=ham
-        autolearn_force=no version=3.4.6
+X-Spam-Status: No, score=-7.7 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_HI,
+        SPF_HELO_NONE,SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 03/08/2022 15.58, Nico Boehr wrote:
-> QEMU doesn't provide EQBS/SQBS instructions, so we should check they
-> result in an exception.
+On Wed, 2022-08-03 at 07:20 -0700, Dave Hansen wrote:
+> On 8/2/22 19:37, Kai Huang wrote:
+> > On Thu, 2022-07-21 at 13:52 +1200, Kai Huang wrote:
+> > > Also, if I understand correctly above, your suggestion is we want to =
+prevent any
+> > > CMR memory going offline so it won't be hot-removed (assuming we can =
+get CMRs
+> > > during boot).=C2=A0 This looks contradicts to the requirement of bein=
+g able to allow
+> > > moving memory from core-mm to driver.=C2=A0 When we offline the memor=
+y, we cannot
+> > > know whether the memory will be used by driver, or later hot-removed.
+> > Hi Dave,
+> >=20
+> > The high level flow of device hot-removal is:
+> >=20
+> > acpi_scan_hot_remove()
+> > 	-> acpi_scan_try_to_offline()
+> > 		-> acpi_bus_offline()
+> > 			-> device_offline()
+> > 				-> memory_subsys_offline()
+> > 	-> acpi_bus_trim()
+> > 		-> acpi_memory_device_remove()
+> >=20
+> >=20
+> > And memory_subsys_offline() can also be triggered via /sysfs:
+> >=20
+> > 	echo 0 > /sys/devices/system/memory/memory30/online
+> >=20
+> > After the memory block is offline, my understanding is kernel can theor=
+etically
+> > move it to, i.e. ZONE_DEVICE via memremap_pages().
+> >=20
+> > As you can see memory_subsys_offline() is the entry point of memory dev=
+ice
+> > offline (before it the code is generic for all ACPI device), and it can=
+not
+> > distinguish whether the removal is from ACPI event, or from /sysfs, so =
+it seems
+> > we are unable to refuse to offline memory in  memory_subsys_offline() w=
+hen it is
+> > called from ACPI event.
+> >=20
+> > Any comments?
+>=20
+> I suggest refactoring the code in a way that makes it possible to
+> distinguish the two cases.
+>=20
+> It's not like you have some binary kernel.  You have the source code for
+> the whole thing and can propose changes *ANYWHERE* you need.  Even better=
+:
+>=20
+> $ grep -A2 ^ACPI\$ MAINTAINERS
+> ACPI
+> M:	"Rafael J. Wysocki" <rafael@kernel.org>
+> R:	Len Brown <lenb@kernel.org>
+>=20
+> The maintainer of ACPI works for our employer.  Plus, he's a nice
+> helpful guy that you can go ask how you might refactor this or
+> approaches you might take.  Have you talked to Rafael about this issue?
 
-I somewhat fail to see the exact purpose of this patch... QEMU still doesn't 
-emulate a lot of other instructions, too, so why are we checking now these 
-QBS instructions? Why not all the others? Why do we need a test to verify 
-that there is an exception in this case - was there a bug somewhere that 
-didn't cause an exception in certain circumstances?
+Rafael once also suggested to set hotplug.enabled to 0 as your code shows b=
+elow,
+but we just got the TDX architecture behaviour of memory hotplug clarified =
+from
+Intel TDX guys recently.=20
 
-> Signed-off-by: Nico Boehr <nrb@linux.ibm.com>
-> ---
->   s390x/intercept.c | 29 +++++++++++++++++++++++++++++
->   1 file changed, 29 insertions(+)
-> 
-> diff --git a/s390x/intercept.c b/s390x/intercept.c
-> index 9e826b6c79ad..48eb2d22a2cc 100644
-> --- a/s390x/intercept.c
-> +++ b/s390x/intercept.c
-> @@ -197,6 +197,34 @@ static void test_diag318(void)
->   
->   }
->   
-> +static void test_qbs(void)
-> +{
-> +	report_prefix_push("qbs");
+> Also, from a two-minute grepping session, I noticed this:
+>=20
+> > static acpi_status acpi_bus_offline(acpi_handle handle, u32 lvl, void *=
+data,
+> >                                     void **ret_p)
+> > {
+> ...
+> >         if (device->handler && !device->handler->hotplug.enabled) {
+> >                 *ret_p =3D &device->dev;
+> >                 return AE_SUPPORT;
+> >         }
+>=20
+> It looks to me like if you simply set:
+>=20
+> 	memory_device_handler->hotplug.enabled =3D false;
+>=20
+> you'll get most of the behavior you want.  ACPI memory hotplug would not
+> work and the changes would be confined to the ACPI world.  The
+> "lower-level" bus-based hotplug would be unaffected.
+>=20
+> Now, I don't know what kind of locking would be needed to muck with a
+> global structure like that.  But, it's a start.
 
-You should definitely add a comment here, explaining why this is only a test 
-for QEMU and saying that this could be removed as soon as QEMU implements 
-these instructions later - otherwise this would be very confusing to the 
-readers later (if they forget or cannot check the commit message).
+This has two problems:
 
-> +	if (!host_is_qemu()) {
-> +		report_skip("QEMU-only test");
-> +		report_prefix_pop();
-> +		return;
-> +	}
-> +
-> +	report_prefix_push("sqbs");
-> +	expect_pgm_int();
-> +	asm volatile(
-> +		"	.insn   rsy,0xeb000000008a,0,0,0(0)\n"
-> +		: : : "memory", "cc");
-> +	check_pgm_int_code(PGM_INT_CODE_OPERATION);
-> +	report_prefix_pop();
-> +
-> +	report_prefix_push("eqbs");
-> +	expect_pgm_int();
-> +	asm volatile(
-> +		"	.insn   rrf,0xb99c0000,0,0,0,0\n"
-> +		: : : "memory", "cc");
-> +	check_pgm_int_code(PGM_INT_CODE_OPERATION);
-> +	report_prefix_pop();
-> +
-> +	report_prefix_pop();
-> +}
+1) This approach cannot distinguish non-CMR memory hotplug and CMR memory
+hotplug, as it disables ACPI memory hotplug for all.  But this is fine as w=
+e
+want to reject non-CMR memory hotplug anyway.  We just need to explain clea=
+rly
+in changelog.
 
-  Thomas
+2) This won't allow the kernel to speak out "BIOS  bug" when CMR memory hot=
+plug
+actually happens.  Instead, we can only print out "hotplug is disabled due =
+to
+TDX is enabled by BIOS." when we set hotplug.enable to false.
+
+Assuming above is OK, I'll explore this option.  I'll also do some research=
+ to
+see if it's still possible to speak out "BIOS bug" in this approach but it'=
+s not
+a mandatory requirement to me now.
+
+Also, if print out "BIOS bug" for CMR memory hotplug isn't mandatory, then =
+we
+can just detect TDX during kernel boot, and disable hotplug when TDX is ena=
+bled
+by BIOS, but don't need to use "winner-take-all" approach.  The former is
+clearer and easier to implement.  I'll go with the former approach if I don=
+'t
+hear objection from you.
+
+And ACPI CPU hotplug can also use the same way.
+
+Please let me know any comments.  Thanks!
+
+--=20
+Thanks,
+-Kai
 
 
