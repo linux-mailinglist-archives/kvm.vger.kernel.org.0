@@ -2,41 +2,41 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 760FC588FB2
-	for <lists+kvm@lfdr.de>; Wed,  3 Aug 2022 17:51:10 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 38DE9588FB3
+	for <lists+kvm@lfdr.de>; Wed,  3 Aug 2022 17:51:12 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237726AbiHCPvI (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 3 Aug 2022 11:51:08 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50074 "EHLO
+        id S238296AbiHCPvK (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 3 Aug 2022 11:51:10 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50162 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S238317AbiHCPuv (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 3 Aug 2022 11:50:51 -0400
+        with ESMTP id S238291AbiHCPuy (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 3 Aug 2022 11:50:54 -0400
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 22A8FBCB6
-        for <kvm@vger.kernel.org>; Wed,  3 Aug 2022 08:50:44 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 2ED1F5FFC
+        for <kvm@vger.kernel.org>; Wed,  3 Aug 2022 08:50:47 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1659541843;
+        s=mimecast20190719; t=1659541846;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=LmwB0r7xATrpDyRlyUFgvOk4mUnvm3hP8rUm/cmUZV8=;
-        b=KEJbekhtR/XqmhQY0sETXiS3JicF3L0nmCTo7TE9+ktsKvsX66Jolsyo4E2g3b525Pu02V
-        MFEj8nloJMasvoUcqyB89PXA/nN0VQDrUuFg6DrrIcqMaWYCaAierrrPBUST3l6kL2b3eg
-        qODmNiN5p2CID2P5Ud8FsUP3uZU6JKs=
-Received: from mimecast-mx02.redhat.com (mx3-rdu2.redhat.com
- [66.187.233.73]) by relay.mimecast.com with ESMTP with STARTTLS
+        bh=VtSzKXeXuo8UPe5oGViC3ZV9LBnnbbE6LXAjjaS3w3c=;
+        b=fXVQCSltXNHf7oGBN3jD8HRjTN/b1CWEbijgAcdHE12/JGxcTvwTDUhed+d+aJa4yjwmh6
+        vBMoFa+YQlg4615TAvzsZxx8k99t7cgKfJHJ3vyFCdmdUmGrHhZc7ZBU4LOQ8Y2OJ5Ti36
+        C4JpIiolL4FQemI8R3WFAOueFMR8Qoo=
+Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
+ [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-408-XCfdXdIDMCOVUNhfW_Rq0A-1; Wed, 03 Aug 2022 11:50:39 -0400
-X-MC-Unique: XCfdXdIDMCOVUNhfW_Rq0A-1
+ us-mta-30-dM8-sA2IPP-VlC_VoGipsQ-1; Wed, 03 Aug 2022 11:50:43 -0400
+X-MC-Unique: dM8-sA2IPP-VlC_VoGipsQ-1
 Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.rdu2.redhat.com [10.11.54.3])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 3AD7D3C0D841;
-        Wed,  3 Aug 2022 15:50:38 +0000 (UTC)
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 6A87E185A794;
+        Wed,  3 Aug 2022 15:50:42 +0000 (UTC)
 Received: from localhost.localdomain (unknown [10.40.194.242])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 991C11121315;
-        Wed,  3 Aug 2022 15:50:34 +0000 (UTC)
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 9A3A21121314;
+        Wed,  3 Aug 2022 15:50:38 +0000 (UTC)
 From:   Maxim Levitsky <mlevitsk@redhat.com>
 To:     kvm@vger.kernel.org
 Cc:     Borislav Petkov <bp@alien8.de>,
@@ -51,9 +51,9 @@ Cc:     Borislav Petkov <bp@alien8.de>,
         "H. Peter Anvin" <hpa@zytor.com>, Joerg Roedel <joro@8bytes.org>,
         Vitaly Kuznetsov <vkuznets@redhat.com>,
         Paolo Bonzini <pbonzini@redhat.com>
-Subject: [PATCH v3 05/13] KVM: x86: emulator: update the emulation mode after CR0 write
-Date:   Wed,  3 Aug 2022 18:50:03 +0300
-Message-Id: <20220803155011.43721-6-mlevitsk@redhat.com>
+Subject: [PATCH v3 06/13] KVM: x86: emulator/smm: number of GPRs in the SMRAM image depends on the image format
+Date:   Wed,  3 Aug 2022 18:50:04 +0300
+Message-Id: <20220803155011.43721-7-mlevitsk@redhat.com>
 In-Reply-To: <20220803155011.43721-1-mlevitsk@redhat.com>
 References: <20220803155011.43721-1-mlevitsk@redhat.com>
 MIME-Version: 1.0
@@ -68,49 +68,43 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-CR0.PE toggles real/protected mode, thus its update
-should update the emulation mode.
+On 64 bit host, if the guest doesn't have X86_FEATURE_LM, KVM will
+access 16 gprs to 32-bit smram image, causing out-ouf-bound ram
+access.
 
-This is likely a benign bug because there is no writeback
-of state, other than the RIP increment, and when toggling
-CR0.PE, the CPU has to execute code from a very low memory address.
+On 32 bit host, the rsm_load_state_64/enter_smm_save_state_64
+is compiled out, thus access overflow can't happen.
 
-Also CR0.PG toggle when EFER.LMA is set, toggles the long mode.
+Fixes: b443183a25ab61 ("KVM: x86: Reduce the number of emulator GPRs to '8' for 32-bit KVM")
 
 Signed-off-by: Maxim Levitsky <mlevitsk@redhat.com>
+Reviewed-by: Sean Christopherson <seanjc@google.com>
 ---
- arch/x86/kvm/emulate.c | 14 +++++++++++++-
- 1 file changed, 13 insertions(+), 1 deletion(-)
+ arch/x86/kvm/emulate.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
 diff --git a/arch/x86/kvm/emulate.c b/arch/x86/kvm/emulate.c
-index 5e91b26cc1d8aa..765ec65b2861ba 100644
+index 765ec65b2861ba..18551611cb13af 100644
 --- a/arch/x86/kvm/emulate.c
 +++ b/arch/x86/kvm/emulate.c
-@@ -3658,11 +3658,23 @@ static int em_movbe(struct x86_emulate_ctxt *ctxt)
+@@ -2473,7 +2473,7 @@ static int rsm_load_state_32(struct x86_emulate_ctxt *ctxt,
+ 	ctxt->eflags =             GET_SMSTATE(u32, smstate, 0x7ff4) | X86_EFLAGS_FIXED;
+ 	ctxt->_eip =               GET_SMSTATE(u32, smstate, 0x7ff0);
  
- static int em_cr_write(struct x86_emulate_ctxt *ctxt)
- {
--	if (ctxt->ops->set_cr(ctxt, ctxt->modrm_reg, ctxt->src.val))
-+	int cr_num = ctxt->modrm_reg;
-+	int r;
-+
-+	if (ctxt->ops->set_cr(ctxt, cr_num, ctxt->src.val))
- 		return emulate_gp(ctxt, 0);
+-	for (i = 0; i < NR_EMULATOR_GPRS; i++)
++	for (i = 0; i < 8; i++)
+ 		*reg_write(ctxt, i) = GET_SMSTATE(u32, smstate, 0x7fd0 + i * 4);
  
- 	/* Disable writeback. */
- 	ctxt->dst.type = OP_NONE;
-+
-+	if (cr_num == 0) {
-+		/* CR0 write might have updated CR0.PE and/or CR0.PG
-+		 * which can affect the cpu execution mode */
-+		r = emulator_recalc_and_set_mode(ctxt);
-+		if (r != X86EMUL_CONTINUE)
-+			return r;
-+	}
-+
- 	return X86EMUL_CONTINUE;
- }
+ 	val = GET_SMSTATE(u32, smstate, 0x7fcc);
+@@ -2530,7 +2530,7 @@ static int rsm_load_state_64(struct x86_emulate_ctxt *ctxt,
+ 	u16 selector;
+ 	int i, r;
  
+-	for (i = 0; i < NR_EMULATOR_GPRS; i++)
++	for (i = 0; i < 16; i++)
+ 		*reg_write(ctxt, i) = GET_SMSTATE(u64, smstate, 0x7ff8 - i * 8);
+ 
+ 	ctxt->_eip   = GET_SMSTATE(u64, smstate, 0x7f78);
 -- 
 2.26.3
 
