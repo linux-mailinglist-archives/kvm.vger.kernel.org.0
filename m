@@ -2,110 +2,107 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 8278E58914F
-	for <lists+kvm@lfdr.de>; Wed,  3 Aug 2022 19:25:49 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id CFED158915B
+	for <lists+kvm@lfdr.de>; Wed,  3 Aug 2022 19:26:37 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238072AbiHCRZr (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 3 Aug 2022 13:25:47 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35338 "EHLO
+        id S238120AbiHCR0g (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 3 Aug 2022 13:26:36 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36282 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S236279AbiHCRZp (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 3 Aug 2022 13:25:45 -0400
-Received: from mail-wm1-x329.google.com (mail-wm1-x329.google.com [IPv6:2a00:1450:4864:20::329])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A1B2A17AA1;
-        Wed,  3 Aug 2022 10:25:42 -0700 (PDT)
-Received: by mail-wm1-x329.google.com with SMTP id 8-20020a05600c024800b003a2fe343db1so1179884wmj.1;
-        Wed, 03 Aug 2022 10:25:42 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=sender:date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=GXZ4xXNRwdNX246uTCDjp/6UfuNozlv9ogOaTndHxOo=;
-        b=BqcDSD4qn8OphNeXpd4d1tICbsWAbV05Cvz+aFGaHqgRoneYmfEIQI10k2dCySJ0oG
-         uD2WrHSD66whZkjrFUTtw0Cl9ZNMwWzlBvEPk/5HwAhrvRgfpvgWgst01K/6+4r6ckV8
-         3pDECBqxeMSC2SgqdcphAHHqEw0WbFd00j4k0yJebkVBonPd44SLNvBtqSxZQVF4tYii
-         cmnypkd1Tb990NlTdqggfgVNlTBH1xAlHz+xCO71uEyKLvwSV8DuYF+wapx/FCxeJ4ku
-         AgpkIaJpMEj2n9xtMl+b0i4bk1dewK6pXeZpClNTRJ+Am3qGIGHi5RzV7biuwysveun+
-         5KjQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:sender:date:from:to:cc:subject:message-id
-         :references:mime-version:content-disposition:in-reply-to;
-        bh=GXZ4xXNRwdNX246uTCDjp/6UfuNozlv9ogOaTndHxOo=;
-        b=rvP3lRA4s2rGq7xFZHGYIJ3mWjP3b+aDfEKAbLxgMvJaeiV2H7SlnyqmHsOKWVzlRm
-         fVZmfMRysrCbVohNjsNYJQ9aQLsQZ55V5Ixsjq48UFkc/tpVwiqsTKbPxcU5EWH/VKc5
-         ustAHOvj36iWt5FYLWPLdC6HipoiT4RK/f7XdhWlz8OC9G0cgOrXjZwWNvxo/hCBRa5E
-         79LwskcF+kdJ+HeHqf9ereOCzeopkkpUred3fOmvc9dXackUsAS9OX1gEWuA+uwTr008
-         GZhaUl9p+R2B0AkBB/AuLuIdHHpFrPfiPMkJfnVmfWU+EAENuBGMJZm3eBlD9+6yk42k
-         mOLA==
-X-Gm-Message-State: ACgBeo2oDqITane6Kux9IEqm7vF3kjIv4bTXaEFRwul3TMgiFfX10eOg
-        Az7hd/hGmambK9Qky24CDi0=
-X-Google-Smtp-Source: AA6agR7uecIPoAy4JexF43f01e/Ul4jeTMonddQbm0RbqwtLyfKDXjbJXnVTFT8AB1q0vYGU0QVTTg==
-X-Received: by 2002:a05:600c:2854:b0:3a3:1551:d7d with SMTP id r20-20020a05600c285400b003a315510d7dmr3400140wmb.174.1659547541214;
-        Wed, 03 Aug 2022 10:25:41 -0700 (PDT)
-Received: from gmail.com (84-236-113-167.pool.digikabel.hu. [84.236.113.167])
-        by smtp.gmail.com with ESMTPSA id s14-20020a5d424e000000b0021d7fa77710sm18608588wrr.92.2022.08.03.10.25.40
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 03 Aug 2022 10:25:40 -0700 (PDT)
-Sender: Ingo Molnar <mingo.kernel.org@gmail.com>
-Date:   Wed, 3 Aug 2022 19:25:38 +0200
-From:   Ingo Molnar <mingo@kernel.org>
-To:     Kyle Huey <me@kylehuey.com>
-Cc:     Dave Hansen <dave.hansen@linux.intel.com>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Borislav Petkov <bp@alien8.de>, Ingo Molnar <mingo@redhat.com>,
-        x86@kernel.org, "H. Peter Anvin" <hpa@zytor.com>,
+        with ESMTP id S238199AbiHCR0c (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 3 Aug 2022 13:26:32 -0400
+Received: from out2.migadu.com (out2.migadu.com [IPv6:2001:41d0:2:aacc::])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 60EBA5466C;
+        Wed,  3 Aug 2022 10:26:31 -0700 (PDT)
+Date:   Wed, 3 Aug 2022 19:26:27 +0200
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+        t=1659547588;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=8NMuAukSe+1ZysY/i41tuUcdy8SvruIfHl+Sl/siV2I=;
+        b=Z3/Zvlb12ML3SvK7r4emgW2rDeOpkLqAI/R2u089c21HLyhGeB4csl3io4K9D/coa6xh/3
+        tHJt6l9aKkoI9p/WmOwzbWxt+BtEEYCxUhgk8Fxb3cut4MEpd8gG6N/JEJ+jpZQxBD4Ck4
+        bNtYM+l9Qnk0ulasgj1rnH2HGpnfBXs=
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From:   Andrew Jones <andrew.jones@linux.dev>
+To:     Sean Christopherson <seanjc@google.com>
+Cc:     Jinrong Liang <ljr.kernel@gmail.com>,
         Paolo Bonzini <pbonzini@redhat.com>,
-        Andy Lutomirski <luto@kernel.org>,
-        Peter Zijlstra <peterz@infradead.org>,
-        linux-kernel@vger.kernel.org,
-        Robert O'Callahan <robert@ocallahan.org>,
-        David Manouchehri <david.manouchehri@riseup.net>,
-        kvm@vger.kernel.org, stable@vger.kernel.org
-Subject: Re: [PATCH] x86/fpu: Allow PKRU to be (once again) written by ptrace.
-Message-ID: <Yuqvkufu7Hu4drL6@gmail.com>
-References: <20220731050342.56513-1-khuey@kylehuey.com>
- <Yuo59tV071/i6yhf@gmail.com>
- <CAP045ArF0SX84tDr=iZoK=EnXK2LsXYut3-KMkCxQO2OOhn=0A@mail.gmail.com>
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Joerg Roedel <joro@8bytes.org>,
+        Jinrong Liang <cloudliang@tencent.com>, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+Subject: Re: [PATCH] selftests: kvm: Fix a compile error in
+ selftests/kvm/rseq_test.c
+Message-ID: <20220803172627.kccwzda6eshx3vol@kamzik>
+References: <20220802071240.84626-1-cloudliang@tencent.com>
+ <20220802150830.rgzeg47enbpsucbr@kamzik>
+ <CAFg_LQWB5hV9CLnavsCmsLbQCMdj1wqe-gVP7vp_mRGt+Eh+nQ@mail.gmail.com>
+ <20220803142637.3y5fj2cwyvbrwect@kamzik>
+ <YuqeDetNukKp9lyF@google.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <CAP045ArF0SX84tDr=iZoK=EnXK2LsXYut3-KMkCxQO2OOhn=0A@mail.gmail.com>
-X-Spam-Status: No, score=-1.5 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_EF,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-        HEADER_FROM_DIFFERENT_DOMAINS,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,
-        SPF_PASS autolearn=no autolearn_force=no version=3.4.6
+In-Reply-To: <YuqeDetNukKp9lyF@google.com>
+X-Migadu-Flow: FLOW_OUT
+X-Migadu-Auth-User: linux.dev
+X-Spam-Status: No, score=-2.8 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,SPF_HELO_PASS,
+        SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-
-* Kyle Huey <me@kylehuey.com> wrote:
-
-> > Also, what's the security model for this register, do we trust all 
-> > input values user-space provides for the PKRU field in the XSTATE? I 
-> > realize that WRPKRU already gives user-space write access to the 
-> > register - but does the CPU write it all into the XSTATE, with no 
-> > restrictions on content whatsoever?
+On Wed, Aug 03, 2022 at 04:10:53PM +0000, Sean Christopherson wrote:
+> On Wed, Aug 03, 2022, Andrew Jones wrote:
+> > On Wed, Aug 03, 2022 at 09:58:51PM +0800, Jinrong Liang wrote:
+> > > My ldd version is (GNU libc) 2.28, and I get a compilation error in this case.
+> > > But I use another ldd (Ubuntu GLIBC 2.31-0ubuntu9.2) 2.31 is compiling fine.
+> > > This shows that compilation errors may occur in different GNU libc environments.
+> > > Would it be more appropriate to use syscall for better compatibility?
+> > 
+> > OK, it's a pity, but no big deal to use syscall().
 > 
-> There is no security model for this register. The CPU does write whatever 
-> is given to WRPKRU (or XRSTOR) into the PKRU register. The pkeys(7) man 
-> page notes:
+> Ya, https://man7.org/linux/man-pages/man2/gettid.2.html says:
 > 
-> Protection keys have the potential to add a layer of security and 
-> reliability to applications. But they have not been primarily designed as 
-> a security feature. For instance, WRPKRU is a completely unprivileged 
-> instruction, so pkeys are useless in any case that an attacker controls 
-> the PKRU register or can execute arbitrary instructions.
+>   The gettid() system call first appeared on Linux in kernel 2.4.11.  Library
+>   support was added in glibc 2.30.
+> 
+> But there are already two other instances of syscall(SYS_gettid) in KVM selftests,
+> tools/testing/selftests/kvm/lib/assert.c even adds a _gettid() wrapper.
 
-Ok - allowing ptrace to set the full 32 bits of the PKRU register seems OK 
-then, and is 100% equivalent to using WRPKRU, right? So there's no implicit 
-masking/clearing of bits depending on how many keys are available, or other 
-details where WRPKRU might differ from a pure 32-bit per thread write, 
-correct?
+Ha! And I found four more in selftests...
+
+testing/selftests/powerpc/include/utils.h
+testing/selftests/proc/proc.h
+testing/selftests/rseq/param_test.c
+testing/selftests/sched/cs_prctl_test.c
+
+and even more in tools...
+
+> 
+> So rather than having to remember (or discover) to use syscall(SYS_gettid), I wonder
+> if it's possible to conditionally define gettid()?  E.g. check for GLIBC version?
+> Or do
+> 
+>   #define gettid() syscall(SYS_gettid)
+> 
+> so that it's always available and simply overrides the library's gettid() if it's
+> provided?
+
+Sounds good to me. Now the question is where to put it? kvm_util.h,
+test_util.h, or maybe we should create a new header just for stuff
+like this?
+
+It doesn't really "fit" in kvm_util.h, but if we put it there, then we
+greatly reduce the chance that we'll have to revisit this issue again.
+We could also create a new header just for stuff like this and then
+include that from kvm_util.h...
 
 Thanks,
-
-	Ingo
+drew
