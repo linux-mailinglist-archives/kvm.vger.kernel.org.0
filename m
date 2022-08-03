@@ -2,75 +2,70 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 120625892A7
-	for <lists+kvm@lfdr.de>; Wed,  3 Aug 2022 21:21:54 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 05FDA5892AF
+	for <lists+kvm@lfdr.de>; Wed,  3 Aug 2022 21:27:09 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237997AbiHCTVw (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 3 Aug 2022 15:21:52 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57510 "EHLO
+        id S237855AbiHCT1G (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 3 Aug 2022 15:27:06 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60054 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S236531AbiHCTVu (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 3 Aug 2022 15:21:50 -0400
-Received: from mail-pg1-x52b.google.com (mail-pg1-x52b.google.com [IPv6:2607:f8b0:4864:20::52b])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B0EC63E767
-        for <kvm@vger.kernel.org>; Wed,  3 Aug 2022 12:21:48 -0700 (PDT)
-Received: by mail-pg1-x52b.google.com with SMTP id f11so15967253pgj.7
-        for <kvm@vger.kernel.org>; Wed, 03 Aug 2022 12:21:48 -0700 (PDT)
+        with ESMTP id S234135AbiHCT1E (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 3 Aug 2022 15:27:04 -0400
+Received: from mail-pl1-x649.google.com (mail-pl1-x649.google.com [IPv6:2607:f8b0:4864:20::649])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A1E5B56BBD
+        for <kvm@vger.kernel.org>; Wed,  3 Aug 2022 12:27:03 -0700 (PDT)
+Received: by mail-pl1-x649.google.com with SMTP id k11-20020a170902ce0b00b0016a15fe2627so11114746plg.22
+        for <kvm@vger.kernel.org>; Wed, 03 Aug 2022 12:27:03 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc;
-        bh=L3BXoDAnjXKl7DF5MAL+W0kL9WnJVL0b1/HkhEfMB6o=;
-        b=TjQRomc0BncZKstd0VtuEoVthcM/oSbSEL77eNSNYn0WzPnp2Edcq9KcBb1Vq9iXMx
-         2FmV8jclNZmRNGHba1FWsdthmkJ3V4XXTaPSkSqHuDG+9xKpKQMzBZUI3PtLAXEjMSIz
-         Gsakob4IjBskgerDp8blcso3BMVVtiZZkx/Wh29jgydRdN9W2q6mqYzP6nrkyvIwEGKp
-         aA43mf6vjD++eHQcpNNLrIcszEocGgEAwKLJL4QV4ONcaqkiXH7d2l0r8KzwbTGlDJhS
-         vSQNrYdhUKAT6TmlwJoMLYxkENEXLhmJxpPs3aqiGDEtrp8sozaZxufTWJ3DaD6N/QRB
-         gDdQ==
+        h=cc:to:from:subject:mime-version:message-id:date:reply-to:from:to:cc;
+        bh=3RPOTZgLH8z1mj6S/J2PJvuGpfhZNmF41DEbta7HrMo=;
+        b=gKuIIBdvQdBJu4sMYgx0Q90wW6lAC9OxXICWsrcsxMFPRuEUESQwb5lFSQVlxB5M3l
+         KYvk4/WS21iPidCi1NOprQmF5glOHs1jagHWpFq4vyPuxvEGlvDBSF3G/SEIARiwW58W
+         dkcwKi1TGOe2JtSdnws1BPabQEsQa68tBLCq1ON+yguApZeW0273w6rIIo8KHUtOJ0oE
+         abP2CCLzkEMHdbdIn8XM6a700vkIVxoQNYLM28ri08U8AXVy3PGSJ/cmn39/4eejnV24
+         lXnpQIMPF/jz6Sg11yUn1r/RGmjtK44kIbygKPZBdd8Vrm7S1QZ/vpaPwiQl7e1TzuKn
+         cvlg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc;
-        bh=L3BXoDAnjXKl7DF5MAL+W0kL9WnJVL0b1/HkhEfMB6o=;
-        b=1m0C1smF4As8LcYsu/zjLHiJROECbjHp3zFlwR26WL8omfN81FoaYsquIxA6Qgdrdz
-         2lm+BVAMgINATZmpxSnd2/fIpK0Z5hgi87SprrVCWOKeW5TOjehBAMvhi/6i8ecVYmg3
-         CqbqVDBC2YeYkdrgj6qVA5Pc88ANLgQVqfLRlp7v9PALYwV2qD24uSjtcwnbrtuBtDVa
-         s7PLJyo3jUVtEVGJVd/H10nqbnp8j27UMPyZPubBO937NkKBKgUKsw7P3hHRN2EiCjQt
-         +47XAKtAdPdNxPUeczM7X2lb6mIc8ZT9WEezhIi1aLtXrUVdIEMn8ARse5pYOYrelniQ
-         v21Q==
-X-Gm-Message-State: AJIora+xVqs/K8F8/b9JuZjpxd8tgL8HjzFHc+TptROKp8V2KLrvnhFk
-        EYEdcKfBV5tGlvH4cVcQjm4efg==
-X-Google-Smtp-Source: AGRyM1sYEfRp+NhnfWgOD9pnywTRoeKibbqNbFltK9LYASso7bT1OFsTtRUBKZ37SNcDWD/PUDLZ6A==
-X-Received: by 2002:a05:6a00:234f:b0:525:1f7c:f2bf with SMTP id j15-20020a056a00234f00b005251f7cf2bfmr27173548pfj.14.1659554508054;
-        Wed, 03 Aug 2022 12:21:48 -0700 (PDT)
-Received: from google.com (7.104.168.34.bc.googleusercontent.com. [34.168.104.7])
-        by smtp.gmail.com with ESMTPSA id t124-20020a635f82000000b0040d75537824sm8339323pgb.86.2022.08.03.12.21.47
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 03 Aug 2022 12:21:47 -0700 (PDT)
-Date:   Wed, 3 Aug 2022 19:21:43 +0000
+        h=cc:to:from:subject:mime-version:message-id:date:reply-to
+         :x-gm-message-state:from:to:cc;
+        bh=3RPOTZgLH8z1mj6S/J2PJvuGpfhZNmF41DEbta7HrMo=;
+        b=d5D1lvf0zGoRocrs7FjCZPipsmFJ9vlCjUX78AzyKt/U1UwaG8njNJDYRmKijnorJ1
+         2cVivIn67J7qrpjny6toW0n8LneBJkabvpoMoicVvwuoK+bP52x0vldbcQSRxR8awT0+
+         goaoAHBkyS6w42hAWlu7385P1t50KypDDr3FglctxUDSHiCV+4plZQYsh6MDggtDTLoZ
+         DiaPE2T6TVKGkCEBfb7SYKNSB1TGc0nexmN82TchyQ4zDgq8jBFzeDD7aoERDNy5NZF1
+         LyrKXy9j3ulwx/aEHVd6yKeiRbM2sHKoJS3X4fZxEEzTK6RjFcw8z+sdRlKrsFaUXK8e
+         2JWw==
+X-Gm-Message-State: ACgBeo2SgWqs4bwtRrNNgU8KKKBBF9XCUEDubZtrq5avlONnxbAZGBCA
+        RnHg+9uzcfQw1fnerfPYLDurCzKlY8g=
+X-Google-Smtp-Source: AA6agR5/G+xmOFeILNiqYjsu2HB21yEsKdqFRR0RpP9Yl20POWePtSeiNqhqUeJqaXc6xllutDPlQynosOU=
+X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
+ (user=seanjc job=sendgmr) by 2002:a17:903:32d2:b0:16e:dfed:b4b6 with SMTP id
+ i18-20020a17090332d200b0016edfedb4b6mr18139404plr.108.1659554823230; Wed, 03
+ Aug 2022 12:27:03 -0700 (PDT)
+Reply-To: Sean Christopherson <seanjc@google.com>
+Date:   Wed,  3 Aug 2022 19:26:51 +0000
+Message-Id: <20220803192658.860033-1-seanjc@google.com>
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.37.1.559.g78731f0fdb-goog
+Subject: [PATCH v2 0/7] KVM: x86: Intel PERF_CAPABILITIES fixes and cleanups
 From:   Sean Christopherson <seanjc@google.com>
-To:     Oliver Upton <oliver.upton@linux.dev>
-Cc:     Mingwei Zhang <mizhang@google.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-Subject: Re: [PATCH 2/5] selftests: KVM/x86: Fix vcpu_{save,load}_state() by
- adding APIC state into kvm_x86_state
-Message-ID: <YurKx+gFAWPvj35L@google.com>
-References: <20220802230718.1891356-1-mizhang@google.com>
- <20220802230718.1891356-3-mizhang@google.com>
- <YurCI5PQu44UJ0a7@google.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <YurCI5PQu44UJ0a7@google.com>
-X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-        USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=unavailable
+To:     Peter Zijlstra <peterz@infradead.org>,
+        Ingo Molnar <mingo@redhat.com>,
+        Arnaldo Carvalho de Melo <acme@kernel.org>,
+        Sean Christopherson <seanjc@google.com>,
+        Paolo Bonzini <pbonzini@redhat.com>
+Cc:     Mark Rutland <mark.rutland@arm.com>,
+        Alexander Shishkin <alexander.shishkin@linux.intel.com>,
+        Jiri Olsa <jolsa@kernel.org>,
+        Namhyung Kim <namhyung@kernel.org>,
+        linux-perf-users@vger.kernel.org, linux-kernel@vger.kernel.org,
+        kvm@vger.kernel.org, Like Xu <like.xu.linux@gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL autolearn=ham
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -78,60 +73,51 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-KVM: selftests: for the shortlog.
+Bug fixes and cleanups related to KVM's handling of PERF_CAPABILITIES.
 
-On Wed, Aug 03, 2022, Oliver Upton wrote:
-> Hi Mingwei,
-> 
-> On Tue, Aug 02, 2022 at 11:07:15PM +0000, Mingwei Zhang wrote:
-> > Fix vcpu_{save,load}_state() by adding APIC state into kvm_x86_state and
-> > properly save/restore it in vcpu_{save,load}_state(). When vcpu resets,
-> > APIC state become software disabled in kernel and thus the corresponding
-> > vCPU is not able to receive posted interrupts [1].  So, add APIC
-> > save/restore in userspace in selftest library code.
-> 
-> Of course, there are no hard rules around it but IMO a changelog is
-> easier to grok if it first describes the what/why of the problem, then
-> afterwards how it is fixed by the commit.
+Bug #1 - Refresh KVM's vPMU after userspace writes PERF_CAPABILITIES, and
+then leverage that fix to avoiding checking guest_cpuid_has(X86_FEATURE_PDCM)
+during VM-Enter, which is slow enough that it shows up in perf traces[*].
 
-I strongly disagree.  :-)  To some extent, it's a personal preference, e.g. I
-find it easier to understand the details (why something is a problem) if I have
-the extra context of how a problem is fixed (or: what code was broken).
+Bug #2 - Don't advertise PMU_CAP_LBR_FMT to userspace if perf has disabled
+LBRs, e.g. because probing one or more LBR MSRs during setup hit a #GP.
 
-But beyond personal preference, there are less subjective reasons for stating
-what a patch does before diving into details.  First and foremost, what code is
-actually being changed is the most important information, and so that information
-should be easy to find.  Changelogs that bury the "what's actually changing" in a
-one-liner after 3+ paragraphs of background make it very hard to find that information.
+The non-KVM patches remove unnecessary stubs and unreachable error paths,
+which allows for a cleaner fix for bug #2.
 
-Maybe for initial review one could argue that "what's the bug" is more important,
-but for skimming logs and git archeology, the gory details matter less and less.
-E.g. when doing a series of "git blame", the details of each change along the way
-are useless, the details only matter for the culprit; I just want to quickly
-determine whether or not a commit might be of interest.
+[*] https://gist.github.com/avagin/f50a6d569440c9ae382281448c187f4e
 
-Another argument for stating "what's changing" first is that it's almost always
-possible to state "what's changing" in a single sentence.  Conversely, all but the
-most simple bugs require multiple sentences or paragraphs to fully describe the
-problem.  If both the "what's changing" and "what's the bug" are super short then
-the order doesn't matter.  But if one is shorter (almost always the "what's changing),
-then covering the shorter one first is advantageous because it's less of an
-inconvenience for readers/reviewers that have a strict ordering preference.  E.g.
-having to skip one sentence to get to the stuff you care about is less painful than
-me having to skip three paragraphs to get to the stuff that I care about.
+v2:
+ - Add patches to fix bug #2. [Like]
+ - Add a patch to clean up the capability check.
+ - Tweak the changelog for the PMU refresh bug fix to call out that
+   KVM should disallow changing feature MSRs after KVM_RUN. [Like]
 
-I think the underlying problem with this changelog (and the shortlog) is that it's
-too literal about what is being fixed.  Shortlogs and changelogs shouldn't be
-play-by-play descriptions of the code changes, they should be abstractions of the
-problem and the fix.  E.g. 
+v1: https://lore.kernel.org/all/20220727233424.2968356-1-seanjc@google.com
 
-  KVM: selftests: Save/restore vAPIC state in "migration" tests
-  
-  Save/restore vAPIC state as part of vCPU save/load so that it's preserved
-  across VM "migration".  This will allow testing that posted interrupts
-  are properly handled across VM migration.
+Sean Christopherson (7):
+  KVM: x86: Refresh PMU after writes to MSR_IA32_PERF_CAPABILITIES
+  perf/x86/core: Remove unnecessary stubs provided for KVM-only helpers
+  perf/x86/core: Drop the unnecessary return value from
+    x86_perf_get_lbr()
+  KVM: VMX: Advertise PMU LBRs if and only if perf supports LBRs
+  KVM: VMX: Use proper type-safe functions for vCPU => LBRs helpers
+  KVM: VMX: Adjust number of LBR records for PERF_CAPABILITIES at
+    refresh
+  KVM: VMX: Simplify capability check when handling PERF_CAPABILITIES
+    write
 
-With that, the first sentence covers both the "what's changing" and provides a
-high-level description of the "bug" it's fixing.  And the second sentence covers
-(a) "why do we want this patch", (b) "why wasn't this a problem before", and (c)
-"what's the urgency of this patch".
+ arch/x86/events/intel/lbr.c       |  6 +---
+ arch/x86/include/asm/perf_event.h | 55 ++++++++-----------------------
+ arch/x86/kvm/vmx/capabilities.h   |  5 ++-
+ arch/x86/kvm/vmx/pmu_intel.c      | 12 ++-----
+ arch/x86/kvm/vmx/vmx.c            |  6 ++--
+ arch/x86/kvm/vmx/vmx.h            | 53 +++++++++++++++++------------
+ arch/x86/kvm/x86.c                |  4 +--
+ 7 files changed, 58 insertions(+), 83 deletions(-)
+
+
+base-commit: 93472b79715378a2386598d6632c654a2223267b
+-- 
+2.37.1.559.g78731f0fdb-goog
+
