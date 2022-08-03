@@ -2,75 +2,73 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 0D5E45890BE
-	for <lists+kvm@lfdr.de>; Wed,  3 Aug 2022 18:46:09 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 9EE225890C9
+	for <lists+kvm@lfdr.de>; Wed,  3 Aug 2022 18:50:18 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237251AbiHCQpy (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 3 Aug 2022 12:45:54 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34742 "EHLO
+        id S232563AbiHCQuP (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 3 Aug 2022 12:50:15 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37866 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S236054AbiHCQpi (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 3 Aug 2022 12:45:38 -0400
-Received: from mail-pg1-x52e.google.com (mail-pg1-x52e.google.com [IPv6:2607:f8b0:4864:20::52e])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D12DA1ADB6
-        for <kvm@vger.kernel.org>; Wed,  3 Aug 2022 09:45:35 -0700 (PDT)
-Received: by mail-pg1-x52e.google.com with SMTP id f11so15599715pgj.7
-        for <kvm@vger.kernel.org>; Wed, 03 Aug 2022 09:45:35 -0700 (PDT)
+        with ESMTP id S236561AbiHCQuO (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 3 Aug 2022 12:50:14 -0400
+Received: from mail-pg1-x52c.google.com (mail-pg1-x52c.google.com [IPv6:2607:f8b0:4864:20::52c])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2F4B6BF8
+        for <kvm@vger.kernel.org>; Wed,  3 Aug 2022 09:50:12 -0700 (PDT)
+Received: by mail-pg1-x52c.google.com with SMTP id s206so15630461pgs.3
+        for <kvm@vger.kernel.org>; Wed, 03 Aug 2022 09:50:12 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:from:to:cc;
-        bh=zvXdeRuA5sLY5zynbWXHtTh6B+8PVsCOPRs6rWFCsCI=;
-        b=a4BdvhaGeDTpBJ744nfOprIfMN+VxMz6rcQGh159BErSpIQVDJJ8K5rcpUOiwkJIbq
-         ccSLQ1wgw9Ep9j++KSkTPXDXO8/n+JRs7l5XCCIZ2GAm8bzHnkQI0OPS40LNIPmfAsJ/
-         irRjfhnjq1cav+2d3lCNenk0kDxX+Ku/+0+0GtHaX2d1tChKTD8jju2INtlYSBOggylg
-         te/7q5M3lPuUquNndM2le/pCUfAFV7mv4Ymt/pySn7yd/xEeMb7Q6SUTYYfZOfmuGdb8
-         K+KRJjNHk2q55xTTigO8fVlwxsnr74LeBxbLHMgJ0ufrF3+9YIzk0RvatoJfq+gSYkLa
-         W1TQ==
+        bh=jkIYKsD9lrw3uE90N/4tV6//zCQKJHpCWp1vVAkBqpg=;
+        b=O1bIaiehSPJ023eJzn0byVCJzUWKRdGefLRKyjRS46PMir40fV3t3+NLw/kDLxrwJ2
+         VgQwIUD4kdVWxa6cUir+v3PqxA6hDA82wt8FrnII62+OY4JgP7JNdRygd/Isd7n9uOMd
+         /fzhD6PYZrOiRfY2xKOcGm3qlOcgfOlFaMttgInqfaex7BnAsL0Ca4WXlQ8xVv/WM17O
+         Az7cNW/eLHZr8eofqRNxCSlvJeszlPaF7NONwZVCN5JeVvkb4JnBLaoSBeHKK0Mng7yC
+         OnN2Pvgq/UWvbwyE2I7bzWuKqP5eEs+ICIiWNvXUovvFun+GmqXK6hsmxu3AWSyWWQbL
+         3+Cw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:x-gm-message-state:from:to:cc;
-        bh=zvXdeRuA5sLY5zynbWXHtTh6B+8PVsCOPRs6rWFCsCI=;
-        b=QSBJ5oIcHaBhLNNkTzHgs61paZ6NpNtIm6hcWP5Ff1KSgyjbnt/DWc9cyY7CgggTIJ
-         2iKhjptFvJ6Pa0JxP0VWufMkxMjB/D1CYOWzxCtXarNtYGHjJ0a0uR5vHZ5SDW9gVxsI
-         q1z7C0WlEy9AAVbKBV163VqdAmuksAPcG90u9M5E+fAxngjg1+aeBxltB/BxH2qBrwqt
-         q2jO0q0JCDup/hPOu4h0cRhJeLNoTnuOg7vGW5GvtIR9cRY+sDQO8065cnIsR6NEczTF
-         irsvhmxhbMOrlq55dQfGNMFBzihLYDBoMm6lWd2E7EnyddO3F+6szqRsFVwhwtORIrQI
-         JBFQ==
-X-Gm-Message-State: ACgBeo0IDS2aUgcb/VhM23CXnD6gOg+HMyhU1fO/12/Q+Cnx/0Ersqjy
-        taOlYN8maQ+qwAH4APAo4lNTiw==
-X-Google-Smtp-Source: AA6agR6Au7Zfg+OM55tlZl8j7l1vuaz6zzcbeNJcOPK1uMadkFvbbF8MajabNMEfQA8B9JXdsg9kGA==
-X-Received: by 2002:a05:6a00:1993:b0:52d:951a:d0ad with SMTP id d19-20020a056a00199300b0052d951ad0admr13205062pfl.47.1659545134954;
-        Wed, 03 Aug 2022 09:45:34 -0700 (PDT)
-Received: from google.com (33.5.83.34.bc.googleusercontent.com. [34.83.5.33])
-        by smtp.gmail.com with ESMTPSA id u3-20020a17090341c300b0016d9d6d05f7sm2245614ple.273.2022.08.03.09.45.34
+        bh=jkIYKsD9lrw3uE90N/4tV6//zCQKJHpCWp1vVAkBqpg=;
+        b=j7HYmFEesEnpHAp9ZZrwMLRZhj765smeLmup3DUe0UHI9fPDE6d0nhj0IGrt6cRsvq
+         wXl9Awymt1MQvfUzQKivMXE4tp9JEvXxcmrY3SMR5bg+AePwmUlRTL7aJrFBj/L2WRE/
+         6qL3bbcZFPJILAwFRwTK3sVpbKPicEFj6negMzaTHKSEagXBNBDQym5H0oi47KF6OeSR
+         r0qOBocjmnUWMD5547Vg3GXdbBsH38VczIbpdrM+ARh4RKCpLB0llVXnbAqYMVpv6bOj
+         VmqbppdbpeZwFq+bnMgQIYlqdjPQnofcjgKsWw0VG0aVqwxjAh6jq2l4Drws/rzOgOK+
+         o7eg==
+X-Gm-Message-State: ACgBeo01SSzAaUtK6MkNcc+I6lVfHFV3VPOHBpXrJ8bhOoTQhhTETaxe
+        Sh6PrlywQGjYz31ryTJxkn+5Ug==
+X-Google-Smtp-Source: AA6agR6Gpgcfh7KmFXDbxj8v9aK/yRABJ1gY0ELz/5l4842hvZCikwR38aHSAZfIt8ay5GOW0u59Xw==
+X-Received: by 2002:aa7:8421:0:b0:52d:344f:8674 with SMTP id q1-20020aa78421000000b0052d344f8674mr19325405pfn.60.1659545411518;
+        Wed, 03 Aug 2022 09:50:11 -0700 (PDT)
+Received: from google.com (7.104.168.34.bc.googleusercontent.com. [34.168.104.7])
+        by smtp.gmail.com with ESMTPSA id o11-20020a170903210b00b0016d2db82962sm2151834ple.16.2022.08.03.09.50.10
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 03 Aug 2022 09:45:34 -0700 (PDT)
-Date:   Wed, 3 Aug 2022 16:45:30 +0000
-From:   Mingwei Zhang <mizhang@google.com>
-To:     Maxim Levitsky <mlevitsk@redhat.com>
+        Wed, 03 Aug 2022 09:50:11 -0700 (PDT)
+Date:   Wed, 3 Aug 2022 16:50:07 +0000
+From:   Sean Christopherson <seanjc@google.com>
+To:     Mingwei Zhang <mizhang@google.com>
 Cc:     Paolo Bonzini <pbonzini@redhat.com>,
-        Sean Christopherson <seanjc@google.com>,
         Vitaly Kuznetsov <vkuznets@redhat.com>,
         Wanpeng Li <wanpengli@tencent.com>,
         Jim Mattson <jmattson@google.com>,
         Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org, Oliver Upton <oupton@google.com>
-Subject: Re: [PATCH 1/5] KVM: x86: Get vmcs12 pages before checking pending
- interrupts
-Message-ID: <YuqmKkxEsDwBvayo@google.com>
-References: <20220802230718.1891356-1-mizhang@google.com>
- <20220802230718.1891356-2-mizhang@google.com>
- <060419e118445978549f0c7d800f96a9728c157c.camel@redhat.com>
+        linux-kernel@vger.kernel.org, David Matlack <dmatlack@google.com>
+Subject: Re: [PATCH v2 1/2] KVM: nested/x86: update trace_kvm_nested_vmrun()
+ to suppot VMX
+Message-ID: <YuqnP318U1Cwd6qX@google.com>
+References: <20220718171333.1321831-1-mizhang@google.com>
+ <20220718171333.1321831-2-mizhang@google.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <060419e118445978549f0c7d800f96a9728c157c.camel@redhat.com>
+In-Reply-To: <20220718171333.1321831-2-mizhang@google.com>
 X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
         ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-        USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=unavailable
+        USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=ham
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -78,90 +76,140 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Aug 03, 2022, Maxim Levitsky wrote:
-> On Tue, 2022-08-02 at 23:07 +0000, Mingwei Zhang wrote:
-> > From: Oliver Upton <oupton@google.com>
-> > 
-> > vmx_guest_apic_has_interrupts implicitly depends on the virtual APIC
-> > page being present + mapped into the kernel address space. However, with
-> > demand paging we break this dependency, as the KVM_REQ_GET_VMCS12_PAGES
-> > event isn't assessed before entering vcpu_block.
-> > 
-> > Fix this by getting vmcs12 pages before inspecting the guest's APIC
-> > page. Note that upstream does not have this issue, as they will directly
-> > get the vmcs12 pages on vmlaunch/vmresume instead of relying on the
-> > event request mechanism. However, the upstream approach is problematic,
-> > as the vmcs12 pages will not be present if a live migration occurred
-> > before checking the virtual APIC page.
-> 
-> Since this patch is intended for upstream, I don't fully understand
-> the meaning of the above paragraph.
+If we want to add a unique identifier for nested x86, use "KVM: x86/nested:" to
+align with the MMU and to make `grep "KVM: x86"` viable.  Ideally, we'd align with
+nVMX and nSVM, but nx86 is pretty gross and looks like a typo.
 
-My apology. Some of the statement needs to be updated, which I should do
-before sending. But I think the point here is that there is a missing
-get_nested_state_pages() call here within vcpu_block() when there is the
-request of KVM_REQ_GET_NESTED_STATE_PAGES.
+I have a slight preference for using a plain "KVM: x86:", as I suspect we'll never
+have enough common nested to make it worth differentiating, but I've no objection
+if you want to go with "KVM: x86/nested:".
 
+On Mon, Jul 18, 2022, Mingwei Zhang wrote:
+> Update trace_kvm_nested_vmrun() to support VMX by adding a new field 'isa';
+> update the output to print out VMX/SVM related naming respectively,
+> eg., vmcb vs. vmcs; npt vs. ept.
 > 
-> 
-> > 
-> > Signed-off-by: Oliver Upton <oupton@google.com>
-> > Signed-off-by: Mingwei Zhang <mizhang@google.com>
-> > ---
-> >  arch/x86/kvm/x86.c | 17 +++++++++++++++++
-> >  1 file changed, 17 insertions(+)
-> > 
-> > diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-> > index 5366f884e9a7..1d3d8127aaea 100644
-> > --- a/arch/x86/kvm/x86.c
-> > +++ b/arch/x86/kvm/x86.c
-> > @@ -10599,6 +10599,23 @@ static inline int vcpu_block(struct kvm_vcpu *vcpu)
-> >  {
-> >  	bool hv_timer;
-> >  
-> > +	/*
-> > +	 * We must first get the vmcs12 pages before checking for interrupts
-> > +	 * that might unblock the guest if L1 is using virtual-interrupt
-> > +	 * delivery.
-> > +	 */
-> > +	if (kvm_check_request(KVM_REQ_GET_NESTED_STATE_PAGES, vcpu)) {
-> > +		/*
-> > +		 * If we have to ask user-space to post-copy a page,
-> > +		 * then we have to keep trying to get all of the
-> > +		 * VMCS12 pages until we succeed.
-> > +		 */
-> > +		if (unlikely(!kvm_x86_ops.nested_ops->get_nested_state_pages(vcpu))) {
-> > +			kvm_make_request(KVM_REQ_GET_NESTED_STATE_PAGES, vcpu);
-> > +			return 0;
-> > +		}
-> > +	}
-> > +
-> >  	if (!kvm_arch_vcpu_runnable(vcpu)) {
-> >  		/*
-> >  		 * Switch to the software timer before halt-polling/blocking as
-> 
-> 
-> If I understand correctly, you are saying that if apic backing page is migrated in post copy
-> then 'get_nested_state_pages' will return false and thus fail?
+> In addition, print nested EPT/NPT address instead of the 1bit of nested
+> ept/npt on/off. This should convey more information in the trace. When
+> nested ept/npt is not used, simply print "0x0" so that we don't lose any
+> information.
 
-What I mean is that when the vCPU was halted and then migrated in this
-case, KVM did not call get_nested_state_pages() before getting into
-kvm_arch_vcpu_runnable(). This function checks the apic backing page and
-fails on that check and triggered the warning.
-> 
-> AFAIK both SVM and VMX versions of 'get_nested_state_pages' assume that this is not the case
-> for many things like MSR bitmaps and such - they always uses non atomic versions
-> of guest memory access like 'kvm_vcpu_read_guest' and 'kvm_vcpu_map' which
-> supposed to block if they attempt to access HVA which is not present, and then
-> userfaultd should take over and wake them up.
+Adding a new field that's not related to the VMX vs. SVM change belongs in a
+separate patch.
 
-You are right here.
+> Opportunistically update the call site of trace_kvm_nested_vmrun() to make
+> one line per parameter.
 > 
-> If that still fails, nested VM entry is usually failed, and/or the whole VM
-> is crashed with 'KVM_EXIT_INTERNAL_ERROR'.
+> Signed-off-by: Mingwei Zhang <mizhang@google.com>
+> ---
+>  arch/x86/kvm/svm/nested.c |  7 +++++--
+>  arch/x86/kvm/trace.h      | 29 ++++++++++++++++++++---------
+>  2 files changed, 25 insertions(+), 11 deletions(-)
 > 
-> Anything I missed? 
-> 
-> Best regards,
-> 	Maxim Levitsky
+> diff --git a/arch/x86/kvm/svm/nested.c b/arch/x86/kvm/svm/nested.c
+> index ba7cd26f438f..8581164b6808 100644
+> --- a/arch/x86/kvm/svm/nested.c
+> +++ b/arch/x86/kvm/svm/nested.c
+> @@ -724,11 +724,14 @@ int enter_svm_guest_mode(struct kvm_vcpu *vcpu, u64 vmcb12_gpa,
+>  	struct vcpu_svm *svm = to_svm(vcpu);
+>  	int ret;
+>  
+> -	trace_kvm_nested_vmrun(svm->vmcb->save.rip, vmcb12_gpa,
+> +	trace_kvm_nested_vmrun(svm->vmcb->save.rip,
+> +			       vmcb12_gpa,
+>  			       vmcb12->save.rip,
+>  			       vmcb12->control.int_ctl,
+>  			       vmcb12->control.event_inj,
+> -			       vmcb12->control.nested_ctl);
+> +			       vmcb12->control.nested_ctl,
+> +			       vmcb12->control.nested_cr3,
+> +			       KVM_ISA_SVM);
+>  
+>  	trace_kvm_nested_intercepts(vmcb12->control.intercepts[INTERCEPT_CR] & 0xffff,
+>  				    vmcb12->control.intercepts[INTERCEPT_CR] >> 16,
+> diff --git a/arch/x86/kvm/trace.h b/arch/x86/kvm/trace.h
+> index de4762517569..aac4c8bd2c3a 100644
+> --- a/arch/x86/kvm/trace.h
+> +++ b/arch/x86/kvm/trace.h
+> @@ -580,8 +580,10 @@ TRACE_EVENT(kvm_pv_eoi,
+>   */
+>  TRACE_EVENT(kvm_nested_vmrun,
+
+I think it makes sense to rename this to kvm_nested_vmenter.  VMRUN is SVM-only,
+and tracepoints aren't ABI.
+
+>  	    TP_PROTO(__u64 rip, __u64 vmcb, __u64 nested_rip, __u32 int_ctl,
+> -		     __u32 event_inj, bool npt),
+> -	    TP_ARGS(rip, vmcb, nested_rip, int_ctl, event_inj, npt),
+> +		     __u32 event_inj, bool npt_enabled, __u64 npt_addr,
+> +		     __u32 isa),
+> +	    TP_ARGS(rip, vmcb, nested_rip, int_ctl, event_inj, npt_enabled,
+> +		    npt_addr, isa),
+>  
+>  	TP_STRUCT__entry(
+>  		__field(	__u64,		rip		)
+> @@ -589,7 +591,9 @@ TRACE_EVENT(kvm_nested_vmrun,
+>  		__field(	__u64,		nested_rip	)
+>  		__field(	__u32,		int_ctl		)
+>  		__field(	__u32,		event_inj	)
+> -		__field(	bool,		npt		)
+> +		__field(	bool,		npt_enabled	)
+
+s/npt_enabled/tdp_enabled, or maybe ntdp_enabled?
+
+> +		__field(	__u64,		npt_addr	)
+
+Hmm, either
+
+  s/npt_addr/nested_pgd
+
+or 
+
+  s/npt_addr/guest_pgd
+
+"npt_addr" or "tdp_addr" is too ambiguous, e.g. it can be interpreted as the address
+of a TDP page fault.
+
+My vote would be for "guest_pgd" and then pass in the non-nested CR3 when L1 isn't
+using nTDP.
+
+> +		__field(	__u32,		isa		)
+>  	),
+>  
+>  	TP_fast_assign(
+> @@ -598,14 +602,21 @@ TRACE_EVENT(kvm_nested_vmrun,
+>  		__entry->nested_rip	= nested_rip;
+>  		__entry->int_ctl	= int_ctl;
+>  		__entry->event_inj	= event_inj;
+> -		__entry->npt		= npt;
+> +		__entry->npt_enabled	= npt_enabled;
+> +		__entry->npt_addr	= npt_addr;
+> +		__entry->isa		= isa;
+>  	),
+>  
+> -	TP_printk("rip: 0x%016llx vmcb: 0x%016llx nrip: 0x%016llx int_ctl: 0x%08x "
+> -		  "event_inj: 0x%08x npt: %s",
+> -		__entry->rip, __entry->vmcb, __entry->nested_rip,
+> -		__entry->int_ctl, __entry->event_inj,
+> -		__entry->npt ? "on" : "off")
+> +	TP_printk("rip: 0x%016llx %s: 0x%016llx nested rip: 0x%016llx "
+> +		  "int_ctl: 0x%08x event_inj: 0x%08x nested %s: 0x%016llx",
+
+This needs to explicitly print "nTDP on/off".  As proposed, "nested ept/npt: %addr"
+doesn't capture that.  (a) addr=0 is perfectly legal, and (b) addr!=0 is also legal
+if nTDP isn't enabled, i.e. a non-zero nested_cr3/eptp is ignore by hardware
+
+> +		__entry->rip,
+> +		__entry->isa == KVM_ISA_VMX ? "vmcs" : "vmcb",
+> +		__entry->vmcb,
+> +		__entry->nested_rip,
+> +		__entry->int_ctl,
+> +		__entry->event_inj,
+> +		__entry->isa == KVM_ISA_VMX ? "ept" : "npt",
+> +		__entry->npt_enabled ? __entry->npt_addr : 0x0)
+>  );
+>  
+>  TRACE_EVENT(kvm_nested_intercepts,
+> -- 
+> 2.37.0.170.g444d1eabd0-goog
 > 
