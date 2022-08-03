@@ -2,210 +2,187 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 1A527588AF7
-	for <lists+kvm@lfdr.de>; Wed,  3 Aug 2022 13:15:34 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id A54DE588AFC
+	for <lists+kvm@lfdr.de>; Wed,  3 Aug 2022 13:18:25 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235819AbiHCLPc (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 3 Aug 2022 07:15:32 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39830 "EHLO
+        id S235594AbiHCLSX (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 3 Aug 2022 07:18:23 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40878 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231533AbiHCLP3 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 3 Aug 2022 07:15:29 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 500A36366
-        for <kvm@vger.kernel.org>; Wed,  3 Aug 2022 04:15:28 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1659525327;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=sUVTZf/4WKqKxZhRfAnc9gqjvrADArxtA3wnFEDvJVk=;
-        b=FELfcfq0X3SwIchmixZFplsu+xBGi3KepkyUGMEmI+bl8Tis0BskQI2zOHa+LuYxjuPlZU
-        FbZVxytVOXX4cxmbTQl1WufaIvjaS+R/5r1Y7w1ugmRYIKIzOg/tmo+8mc6o7G0/g0/EGt
-        7vSvz44oaDxY1M1Q71OfvwmQusQpT20=
-Received: from mimecast-mx02.redhat.com (mx3-rdu2.redhat.com
- [66.187.233.73]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-635-dwO613NlPCWMpTKCrm_fGw-1; Wed, 03 Aug 2022 07:15:24 -0400
-X-MC-Unique: dwO613NlPCWMpTKCrm_fGw-1
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.rdu2.redhat.com [10.11.54.3])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id DE2063C35F01;
-        Wed,  3 Aug 2022 11:15:21 +0000 (UTC)
-Received: from localhost (unknown [10.39.192.98])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 26FF51121314;
-        Wed,  3 Aug 2022 11:15:21 +0000 (UTC)
-Date:   Wed, 3 Aug 2022 12:15:20 +0100
-From:   "Richard W.M. Jones" <rjones@redhat.com>
-To:     Alberto Faria <afaria@redhat.com>
-Cc:     "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
-        Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org,
-        =?iso-8859-1?Q?Marc-Andr=E9?= Lureau 
-        <marcandre.lureau@redhat.com>,
-        Stefano Garzarella <sgarzare@redhat.com>,
-        Hannes Reinecke <hare@suse.com>,
-        Vladimir Sementsov-Ogievskiy <vsementsov@yandex-team.ru>,
-        "Maciej S. Szmigiero" <maciej.szmigiero@oracle.com>,
-        Peter Lieven <pl@kamp.de>, kvm@vger.kernel.org,
-        Xie Yongji <xieyongji@bytedance.com>,
-        Eric Auger <eric.auger@redhat.com>,
-        Hanna Reitz <hreitz@redhat.com>,
-        Jeff Cody <codyprime@gmail.com>,
-        Eric Blake <eblake@redhat.com>,
-        "Denis V. Lunev" <den@openvz.org>,
-        Daniel =?iso-8859-1?Q?P=2E_Berrang=E9?= <berrange@redhat.com>,
-        Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <f4bug@amsat.org>,
-        Christian Schoenebeck <qemu_oss@crudebyte.com>,
-        Stefan Weil <sw@weilnetz.de>, Klaus Jensen <its@irrelevant.dk>,
-        Laurent Vivier <lvivier@redhat.com>,
-        Alberto Garcia <berto@igalia.com>,
-        Michael Roth <michael.roth@amd.com>,
-        Juan Quintela <quintela@redhat.com>,
-        David Hildenbrand <david@redhat.com>, qemu-block@nongnu.org,
-        Konstantin Kostiuk <kkostiuk@redhat.com>,
-        Kevin Wolf <kwolf@redhat.com>,
-        Gerd Hoffmann <kraxel@redhat.com>,
-        Stefan Hajnoczi <stefanha@redhat.com>,
-        Marcelo Tosatti <mtosatti@redhat.com>,
-        Greg Kurz <groug@kaod.org>,
-        "Michael S. Tsirkin" <mst@redhat.com>, Amit Shah <amit@kernel.org>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Alex Williamson <alex.williamson@redhat.com>,
-        Peter Xu <peterx@redhat.com>,
-        Raphael Norwitz <raphael.norwitz@nutanix.com>,
-        Ronnie Sahlberg <ronniesahlberg@gmail.com>,
-        Jason Wang <jasowang@redhat.com>,
-        Emanuele Giuseppe Esposito <eesposit@redhat.com>,
-        Richard Henderson <richard.henderson@linaro.org>,
-        Marcel Apfelbaum <marcel.apfelbaum@gmail.com>,
-        Dmitry Fleytman <dmitry.fleytman@gmail.com>,
-        Eduardo Habkost <eduardo@habkost.net>,
-        Fam Zheng <fam@euphon.net>, Thomas Huth <thuth@redhat.com>,
-        Keith Busch <kbusch@kernel.org>,
-        Alex =?iso-8859-1?Q?Benn=E9e?= <alex.bennee@linaro.org>,
-        John Snow <jsnow@redhat.com>
-Subject: Re: [RFC v2 02/10] Drop unused static function return values
-Message-ID: <20220803111520.GO1127@redhat.com>
-References: <20220729130040.1428779-1-afaria@redhat.com>
- <20220729130040.1428779-3-afaria@redhat.com>
- <YupSAhFRK962i+nL@work-vm>
- <CAELaAXyh0MzuVzDCfhC8hJNAwb=niwFRsXqhc63JiWGxxitkqg@mail.gmail.com>
+        with ESMTP id S230301AbiHCLSW (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 3 Aug 2022 07:18:22 -0400
+Received: from mx0a-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 08AED6556;
+        Wed,  3 Aug 2022 04:18:17 -0700 (PDT)
+Received: from pps.filterd (m0098419.ppops.net [127.0.0.1])
+        by mx0b-001b2d01.pphosted.com (8.17.1.5/8.17.1.5) with ESMTP id 273BDx4N016762;
+        Wed, 3 Aug 2022 11:18:17 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
+ mime-version : subject : to : cc : references : from : in-reply-to :
+ content-type : content-transfer-encoding; s=pp1;
+ bh=McV4fypsvkKkaJAZIm/hv3s9f3nELW6Xwbubor1WJ7M=;
+ b=i6PCKcKL/DOCP/AQRtHyZ4s6ZcN3llxmmboIo+LurjJo6qYoDla7ByKJQ2vM95MLwi10
+ K7Lb2zDURkluJshv+BFBZIKNR+umO3LmFDiFHHdz8R5ZjfiEvDCuLfEbONaPuWK3dFYO
+ nytqTedQRlqhQvAhWIcafaClN2dnJic9KHQ5zEOOF3w5hqv4ckkm/M0jT2bNjtMKHer8
+ iJIDfcopdx/fU9+IUO5G9HK1wGa4p2Vm6VXZkzA1Tw5t7uWu347kmbFviM9ce/5QfMdC
+ oEYaVHg2itqeXDMXg40dbNJ5Sq7qZxV94GDdQ56ZrG4W6FEdtt7ypf++8qSool0ehJAW cQ== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0b-001b2d01.pphosted.com (PPS) with ESMTPS id 3hqqy903tx-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Wed, 03 Aug 2022 11:18:16 +0000
+Received: from m0098419.ppops.net (m0098419.ppops.net [127.0.0.1])
+        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 273BEQDq019213;
+        Wed, 3 Aug 2022 11:18:16 GMT
+Received: from ppma06fra.de.ibm.com (48.49.7a9f.ip4.static.sl-reverse.com [159.122.73.72])
+        by mx0b-001b2d01.pphosted.com (PPS) with ESMTPS id 3hqqy903t6-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Wed, 03 Aug 2022 11:18:16 +0000
+Received: from pps.filterd (ppma06fra.de.ibm.com [127.0.0.1])
+        by ppma06fra.de.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 273ArWNw022126;
+        Wed, 3 Aug 2022 11:18:14 GMT
+Received: from b06avi18626390.portsmouth.uk.ibm.com (b06avi18626390.portsmouth.uk.ibm.com [9.149.26.192])
+        by ppma06fra.de.ibm.com with ESMTP id 3hmuwhsqrc-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Wed, 03 Aug 2022 11:18:14 +0000
+Received: from d06av26.portsmouth.uk.ibm.com (d06av26.portsmouth.uk.ibm.com [9.149.105.62])
+        by b06avi18626390.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 273BFtMX26345808
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Wed, 3 Aug 2022 11:15:55 GMT
+Received: from d06av26.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 02E69AE051;
+        Wed,  3 Aug 2022 11:18:11 +0000 (GMT)
+Received: from d06av26.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id A57DBAE04D;
+        Wed,  3 Aug 2022 11:18:10 +0000 (GMT)
+Received: from [9.145.59.133] (unknown [9.145.59.133])
+        by d06av26.portsmouth.uk.ibm.com (Postfix) with ESMTP;
+        Wed,  3 Aug 2022 11:18:10 +0000 (GMT)
+Message-ID: <6ab20b3d-f271-336a-c3f7-36e5ac7f88a6@linux.ibm.com>
+Date:   Wed, 3 Aug 2022 13:18:10 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <CAELaAXyh0MzuVzDCfhC8hJNAwb=niwFRsXqhc63JiWGxxitkqg@mail.gmail.com>
-User-Agent: Mutt/1.5.21 (2010-09-15)
-X-Scanned-By: MIMEDefang 2.78 on 10.11.54.3
-X-Spam-Status: No, score=-3.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,
-        SPF_HELO_NONE,SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.9.0
+Subject: Re: [kvm-unit-tests PATCH v3] s390x: uv-host: Add access checks for
+ donated memory
+Content-Language: en-US
+To:     Claudio Imbrenda <imbrenda@linux.ibm.com>
+Cc:     kvm@vger.kernel.org, linux-s390@vger.kernel.org, thuth@redhat.com,
+        seiden@linux.ibm.com, nrb@linux.ibm.com, scgl@linux.ibm.com
+References: <20220707111912.51ecc0f2@p-imbrenda>
+ <20220725130859.48740-1-frankja@linux.ibm.com>
+ <20220803114602.5359a8a4@p-imbrenda>
+From:   Janosch Frank <frankja@linux.ibm.com>
+In-Reply-To: <20220803114602.5359a8a4@p-imbrenda>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-ORIG-GUID: it5Zy0hcsq0D29D1TVdzuKizLOHEHfZj
+X-Proofpoint-GUID: AR25Du0UfydZwc7XwES8Elt0yAF9tYGX
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.205,Aquarius:18.0.883,Hydra:6.0.517,FMLib:17.11.122.1
+ definitions=2022-08-03_03,2022-08-02_01,2022-06-22_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 adultscore=0 mlxscore=0
+ bulkscore=0 impostorscore=0 lowpriorityscore=0 spamscore=0 malwarescore=0
+ clxscore=1015 phishscore=0 priorityscore=1501 mlxlogscore=999
+ suspectscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2206140000 definitions=main-2208030049
+X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,
+        SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Aug 03, 2022 at 12:07:19PM +0100, Alberto Faria wrote:
-> On Wed, Aug 3, 2022 at 11:46 AM Dr. David Alan Gilbert
-> <dgilbert@redhat.com> wrote:
-> >
-> > * Alberto Faria (afaria@redhat.com) wrote:
-> > > Make non-void static functions whose return values are ignored by
-> > > all callers return void instead.
-> > >
-> > > These functions were found by static-analyzer.py.
-> > >
-> > > Not all occurrences of this problem were fixed.
-> > >
-> > > Signed-off-by: Alberto Faria <afaria@redhat.com>
-> >
-> > <snip>
-> >
-> > > diff --git a/migration/migration.c b/migration/migration.c
-> > > index e03f698a3c..4698080f96 100644
-> > > --- a/migration/migration.c
-> > > +++ b/migration/migration.c
-> > > @@ -175,7 +175,7 @@ static MigrationIncomingState *current_incoming;
-> > >
-> > >  static GSList *migration_blockers;
-> > >
-> > > -static bool migration_object_check(MigrationState *ms, Error **errp);
-> > > +static void migration_object_check(MigrationState *ms, Error **errp);
-> > >  static int migration_maybe_pause(MigrationState *s,
-> > >                                   int *current_active_state,
-> > >                                   int new_state);
-> > > @@ -4485,15 +4485,15 @@ static void migration_instance_init(Object *obj)
-> > >   * Return true if check pass, false otherwise. Error will be put
-> > >   * inside errp if provided.
-> > >   */
-> > > -static bool migration_object_check(MigrationState *ms, Error **errp)
-> > > +static void migration_object_check(MigrationState *ms, Error **errp)
-> > >  {
-> >
-> > I'm not sure if this is a good change.
-> > Where we have a function that returns an error via an Error ** it's
-> > normal practice for us to return a bool to say whether it generated an
-> > error.
-> >
-> > Now, in our case we only call it with error_fatal:
-> >
-> >     migration_object_check(current_migration, &error_fatal);
-> >
-> > so the bool isn't used/checked.
-> >
-> > So I'm a bit conflicted:
-> >
-> >   a) Using error_fatal is the easiest way to handle this function
-> >   b) Things taking Error ** normally do return a flag value
-> >   c) But it's not used in this case.
-> >
-> > Hmm.
+On 8/3/22 11:46, Claudio Imbrenda wrote:
+> On Mon, 25 Jul 2022 13:08:59 +0000
+> Janosch Frank <frankja@linux.ibm.com> wrote:
 > 
-> I guess this generalizes to the bigger question of whether a global
-> "return-value-never-used" check makes sense and brings value. Maybe
-> there are too many cases where it would be preferable to keep the
-> return value for consistency? Maybe they're not that many and could be
-> tagged with __attribute__((unused))?
+>> Let's check if the UV really protected all the memory we donated.
+>>
+>> Signed-off-by: Janosch Frank <frankja@linux.ibm.com>
+>> ---
+>>   s390x/uv-host.c | 37 +++++++++++++++++++++++++++++++++++++
+>>   1 file changed, 37 insertions(+)
+>>
+>> diff --git a/s390x/uv-host.c b/s390x/uv-host.c
+>> index dfcebe10..ba6c9008 100644
+>> --- a/s390x/uv-host.c
+>> +++ b/s390x/uv-host.c
+>> @@ -45,6 +45,32 @@ static void cpu_loop(void)
+>>   	for (;;) {}
+>>   }
+>>   
+>> +/*
+>> + * Checks if a memory area is protected as secure memory.
+>> + * Will return true if all pages are protected, false otherwise.
+>> + */
+>> +static bool access_check_3d(uint64_t *access_ptr, uint64_t len)
+>> +{
+>> +	assert(!(len & ~PAGE_MASK));
+>> +	assert(!((uint64_t)access_ptr & ~PAGE_MASK));
+>> +
+>> +	while (len) {
+>> +		expect_pgm_int();
+>> +		READ_ONCE(*access_ptr);
+>> +		if (clear_pgm_int() != PGM_INT_CODE_SECURE_STOR_ACCESS)
+>> +			return false;
+>> +		expect_pgm_int();
+>> +		WRITE_ONCE(*access_ptr, 42);
+>> +		if (clear_pgm_int() != PGM_INT_CODE_SECURE_STOR_ACCESS)
+>> +			return false;
+>> +
+>> +		access_ptr += PAGE_SIZE / sizeof(access_ptr);
 > 
-> But in this particular case, perhaps we could drop the Error **errp
-> parameter and directly pass &error_fatal to migrate_params_check() and
-> migrate_caps_check().
+> this looks ugly, although in principle the correct way to handle a
+> pointer. In this specific case it's techically wrong though (you
+> actually want sizeof(*access_ptr) )
+> 
+> what about making access_ptr a char*?
+> 
+> then you can do just
+> 
+> 	access_ptr += PAGE_SIZE;
+> 
+> and you can keep the READ_ONCE and WRITE_ONCE as they are
 
-If it helps to think about this, Coverity checks for consistency.
-Across the whole code base, is the return value of a function used or
-ignored consistently.  You will see Coverity errors like:
+Sure
 
-      Error: CHECKED_RETURN (CWE-252): [#def37]
-      libnbd-1.12.5/fuse/operations.c:180: check_return: Calling "nbd_poll" without checking return value (as is done elsewhere 5 out of 6 times).
-      libnbd-1.12.5/examples/aio-connect-read.c:96: example_checked: Example 1: "nbd_poll(nbd, -1)" has its value checked in "nbd_poll(nbd, -1) == -1".
-      libnbd-1.12.5/examples/aio-connect-read.c:128: example_checked: Example 2: "nbd_poll(nbd, -1)" has its value checked in "nbd_poll(nbd, -1) == -1".
-      libnbd-1.12.5/examples/strict-structured-reads.c:246: example_checked: Example 3: "nbd_poll(nbd, -1)" has its value checked in "nbd_poll(nbd, -1) == -1".
-      libnbd-1.12.5/ocaml/nbd-c.c:2599: example_assign: Example 4: Assigning: "r" = return value from "nbd_poll(h, timeout)".
-      libnbd-1.12.5/ocaml/nbd-c.c:2602: example_checked: Example 4 (cont.): "r" has its value checked in "r == -1".
-      libnbd-1.12.5/python/methods.c:2806: example_assign: Example 5: Assigning: "ret" = return value from "nbd_poll(h, timeout)".
-      libnbd-1.12.5/python/methods.c:2808: example_checked: Example 5 (cont.): "ret" has its value checked in "ret == -1".
-      #  178|       /* Dispatch work while there are commands in flight. */
-      #  179|       while (thread->in_flight > 0)
-      #  180|->       nbd_poll (h, -1);
-      #  181|     }
-      #  182|
-
-What it's saying is that in this code base, nbd_poll's return value
-was checked by the caller 5 out of 6 times, but ignored here.  (This
-turned out to be a real bug which we fixed).
-
-It seems like the check implemented in your patch is: If the return
-value is used 0 times anywhere in the code base, change the return
-value to 'void'.  Coverity would not flag this.
-
-Maybe a consistent use check is better?
-
-Rich.
-
--- 
-Richard Jones, Virtualization Group, Red Hat http://people.redhat.com/~rjones
-Read my programming and virtualization blog: http://rwmj.wordpress.com
-libguestfs lets you edit virtual machines.  Supports shell scripting,
-bindings from many languages.  http://libguestfs.org
+> 
+>> +		len -= PAGE_SIZE;
+>> +	}
+>> +
+>> +	return true;
+>> +}
+>> +
+>>   static struct cmd_list cmds[] = {
+>>   	{ "init", UVC_CMD_INIT_UV, sizeof(struct uv_cb_init), BIT_UVC_CMD_INIT_UV },
+>>   	{ "create conf", UVC_CMD_CREATE_SEC_CONF, sizeof(struct uv_cb_cgc), BIT_UVC_CMD_CREATE_SEC_CONF },
+>> @@ -332,6 +358,10 @@ static void test_cpu_create(void)
+>>   	report(rc == 0 && uvcb_csc.header.rc == UVC_RC_EXECUTED &&
+>>   	       uvcb_csc.cpu_handle, "success");
+>>   
+>> +	rc = access_check_3d((uint64_t *)uvcb_csc.stor_origin,
+>> +			     uvcb_qui.cpu_stor_len);
+>> +	report(rc, "Storage protection");
+>> +
+>>   	tmp = uvcb_csc.stor_origin;
+>>   	uvcb_csc.stor_origin = (unsigned long)memalign(PAGE_SIZE, uvcb_qui.cpu_stor_len);
+>>   	rc = uv_call(0, (uint64_t)&uvcb_csc);
+>> @@ -430,6 +460,13 @@ static void test_config_create(void)
+>>   	rc = uv_call(0, (uint64_t)&uvcb_cgc);
+>>   	report(rc == 0 && uvcb_cgc.header.rc == UVC_RC_EXECUTED, "successful");
+>>   
+>> +	rc = access_check_3d((uint64_t *)uvcb_cgc.conf_var_stor_origin, vsize);
+>> +	report(rc, "Base storage protection");
+>> +
+>> +	rc = access_check_3d((uint64_t *)uvcb_cgc.conf_base_stor_origin,
+>> +			     uvcb_qui.conf_base_phys_stor_len);
+>> +	report(rc, "Variable storage protection");
+>> +
+>>   	uvcb_cgc.header.rc = 0;
+>>   	uvcb_cgc.header.rrc = 0;
+>>   	tmp = uvcb_cgc.guest_handle;
+> 
 
