@@ -2,69 +2,70 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id D82B85891C8
-	for <lists+kvm@lfdr.de>; Wed,  3 Aug 2022 19:51:41 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 6B949589219
+	for <lists+kvm@lfdr.de>; Wed,  3 Aug 2022 20:16:42 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236829AbiHCRvk (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 3 Aug 2022 13:51:40 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56268 "EHLO
+        id S236438AbiHCSQk (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 3 Aug 2022 14:16:40 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45648 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231966AbiHCRvh (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 3 Aug 2022 13:51:37 -0400
-Received: from mail-pj1-x102e.google.com (mail-pj1-x102e.google.com [IPv6:2607:f8b0:4864:20::102e])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1E5E23D594
-        for <kvm@vger.kernel.org>; Wed,  3 Aug 2022 10:51:37 -0700 (PDT)
-Received: by mail-pj1-x102e.google.com with SMTP id t2-20020a17090a4e4200b001f21572f3a4so2938846pjl.0
-        for <kvm@vger.kernel.org>; Wed, 03 Aug 2022 10:51:37 -0700 (PDT)
+        with ESMTP id S236439AbiHCSQj (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 3 Aug 2022 14:16:39 -0400
+Received: from mail-pj1-x1036.google.com (mail-pj1-x1036.google.com [IPv6:2607:f8b0:4864:20::1036])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 03187CDF
+        for <kvm@vger.kernel.org>; Wed,  3 Aug 2022 11:16:38 -0700 (PDT)
+Received: by mail-pj1-x1036.google.com with SMTP id v16-20020a17090abb9000b001f25244c65dso2841051pjr.2
+        for <kvm@vger.kernel.org>; Wed, 03 Aug 2022 11:16:37 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc;
-        bh=4D8pS8ERyLJtCBiCTu4ctfzlqVz56jvHc/H6j2NigrA=;
-        b=Z0fwwqlgUha4Y0G9rz55tuuuixBANbKNQyHR3jeT3z0QVS2uiIk9XZdG53qZ54P60v
-         3wxlm+QboutDiOOrWOLxVfC+YNopTY2A29ys42kd/7rRAaJc+OuncnDnBwzg1fCD0V7B
-         43ANZCPuD61AuIY7nuNLSqEaHvrrcANNRuREoZyPvr1ZBbzq2dOoUSLsCtyKLY78VcRZ
-         W6JJttAgAM7/DtJD4eeUysnswkU8LHy2135NAJdWRECE46ki+GXrhdKShvr3KwS2ltIe
-         7wYmVpegB3APS/HGDhDIzbea6k35puFS8Zng0O7XsvkLMjiB93UZGFzOaayBa1LkZps7
-         AiRA==
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc;
+        bh=n3OqQ1qt6381kut5lhocnFM6Mud/KXG24G59RX3JKvo=;
+        b=snN9dp/8Ihbn1V1jiBTonCB/uBM1Fto9bCu8+Tgl8owfsj34qe3qI9uNBoF4GZeddX
+         PXVBc1ni/eW2sjioXPB39X+5QNJbo7ybnzNpjUJ+FfLOlcWnt8/+Ra9CTNN8xtufGKG7
+         Py841IM3ZPPnSD+CrQnAr6GPbSOoKmi6sTmPFPRNbJU4TAxJVYNZwI5RL1Y0vTdNKzxk
+         IfmAR0NUa2tT7ogz7aTrwMC1+lh6ZnrxVzMm+I+40hb7NUILUqqy7eDZa5wBt//iAQu8
+         5O0CUk0HFKikNyJX4TnjvrajFdOY5vLfi1Itxq6NhD6VBN9blwi/DE2tgqbPvxOkxELc
+         jOiw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc;
-        bh=4D8pS8ERyLJtCBiCTu4ctfzlqVz56jvHc/H6j2NigrA=;
-        b=gTSR2PjqZbtW3vD2vD2lSDCJbydhHFdjrZNgexvDuI3QWCmlRcgObOamNjZajwE3bl
-         BNBArBrgUmUT+PZkciMM/4KOYoef83/YeZcqT/f77aJKS+IlcYY+bA5dvPU7CtXmdN06
-         JE0018o188PCs9vsBBvu/k789Rnhf7yp2tYMH25ZCOOrZDSdJh+BNwZCNZ8lQbnPpf36
-         FeuYvv+SSbCabKczCtAyWU57p1oJQBBTqZ1U9qzYdPuT+8hYVFxapv7YJzMd6soQJq2D
-         UNOOn3H1U6CrC6boQmsOJWpZpgfYlZbRz28nA5drthaiLW0O2dIj9avoIcUpzIFD1HKs
-         QEEQ==
-X-Gm-Message-State: ACgBeo2YnEvPKKH0iDOt0GqtrlrDqVhstn3cjcSttC/1aK7zQ2Ql1wZW
-        ISCPFABcTPreANKuo612alK6V8GM/RrnXvmAQ2qymg==
-X-Google-Smtp-Source: AA6agR5nBdAsOBirgmfKdfCNuWrNWKn1Pogobu7DJGB6nDcTpqU9Kas2cF3iahp8zsZiPKZiNEQJamoz/gGtL+sZVh4=
-X-Received: by 2002:a17:90b:224e:b0:1f4:ebed:16f6 with SMTP id
- hk14-20020a17090b224e00b001f4ebed16f6mr5954295pjb.17.1659549096461; Wed, 03
- Aug 2022 10:51:36 -0700 (PDT)
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc;
+        bh=n3OqQ1qt6381kut5lhocnFM6Mud/KXG24G59RX3JKvo=;
+        b=2rh8iTc0v6q1Rx1Ri80BQHXGidwD3WEgHHMb20/9I4Ix1d6t2BjLFeF1KMUx9Wf65F
+         mnlmMsLPZ3uqwd62OBbtZFMX2REJaZl2dL332XTiWrwz7DT4Gf4G81jdfxoz/qosntay
+         UM18BSSVy9ncWxOqFv5vOPvkpRmFk8EtQyqVDHHZUU5B0e756u0uHJqtm9lwWOTuECQd
+         kD9df3jDkSeXFB4ObrxCml2coHNqR8/LCY90EabwOquK30NI6Y29KqXX8nR8P85GleE8
+         Bp/qZGF1Kcr5NhaEF1KwbOcoN5pPhZ/m+6s/AaIkMLm9fnVQWzpa1meI1qTjOjA9Xcq7
+         yRcg==
+X-Gm-Message-State: ACgBeo2tGq+Wb+cIgIL6y78VaOy9Ni23FTpziaYZ4tg9RAMxXt4zpBk1
+        E/mdxaECML5XXJ/ied7mRy8fTlGLu5S7QA==
+X-Google-Smtp-Source: AA6agR6PVHQOlBigGLDa0E5o/cqkh079TRET5auSCAnAwCTORRGwJ2/VOSKUD0rORDTNATW1S29a8A==
+X-Received: by 2002:a17:902:8e89:b0:16d:69b7:49b4 with SMTP id bg9-20020a1709028e8900b0016d69b749b4mr27149586plb.167.1659550597347;
+        Wed, 03 Aug 2022 11:16:37 -0700 (PDT)
+Received: from google.com (7.104.168.34.bc.googleusercontent.com. [34.168.104.7])
+        by smtp.gmail.com with ESMTPSA id u6-20020a170903124600b0016dbb5bbeebsm2323261plh.228.2022.08.03.11.16.36
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 03 Aug 2022 11:16:36 -0700 (PDT)
+Date:   Wed, 3 Aug 2022 18:16:32 +0000
+From:   Sean Christopherson <seanjc@google.com>
+To:     Michal Luczaj <mhal@rbox.co>
+Cc:     kvm@vger.kernel.org, pbonzini@redhat.com, shuah@kernel.org,
+        linux-kselftest@vger.kernel.org
+Subject: Re: [kvm-unit-tests PATCH 4/4] x86: Extend ASM_TRY to handle #UD
+ thrown by FEP-triggered emulator
+Message-ID: <Yuq7gMTpRqGlVdcW@google.com>
+References: <Yum2LpZS9vtCaCBm@google.com>
+ <20220803172508.1215-1-mhal@rbox.co>
+ <20220803172508.1215-4-mhal@rbox.co>
 MIME-Version: 1.0
-References: <20220802230718.1891356-1-mizhang@google.com> <20220802230718.1891356-2-mizhang@google.com>
- <b03adf94-5af2-ff5e-1dbb-6dd212790083@redhat.com>
-In-Reply-To: <b03adf94-5af2-ff5e-1dbb-6dd212790083@redhat.com>
-From:   Mingwei Zhang <mizhang@google.com>
-Date:   Wed, 3 Aug 2022 10:51:25 -0700
-Message-ID: <CAL715WLQa5yz7SWAfOBUzQigv2JG1Ao+rwbeSJ++rKccVoZeag@mail.gmail.com>
-Subject: Re: [PATCH 1/5] KVM: x86: Get vmcs12 pages before checking pending interrupts
-To:     Paolo Bonzini <pbonzini@redhat.com>
-Cc:     Sean Christopherson <seanjc@google.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>, kvm <kvm@vger.kernel.org>,
-        LKML <linux-kernel@vger.kernel.org>,
-        Oliver Upton <oupton@google.com>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20220803172508.1215-4-mhal@rbox.co>
 X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
         ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-        USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=unavailable
+        USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=ham
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -72,33 +73,173 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Aug 3, 2022 at 10:18 AM Paolo Bonzini <pbonzini@redhat.com> wrote:
->
-> On 8/3/22 01:07, Mingwei Zhang wrote:
-> > +     /*
-> > +      * We must first get the vmcs12 pages before checking for interrupts
-> > +      * that might unblock the guest if L1 is using virtual-interrupt
-> > +      * delivery.
-> > +      */
-> > +     if (kvm_check_request(KVM_REQ_GET_NESTED_STATE_PAGES, vcpu)) {
-> > +             /*
-> > +              * If we have to ask user-space to post-copy a page,
-> > +              * then we have to keep trying to get all of the
-> > +              * VMCS12 pages until we succeed.
-> > +              */
-> > +             if (unlikely(!kvm_x86_ops.nested_ops->get_nested_state_pages(vcpu))) {
-> > +                     kvm_make_request(KVM_REQ_GET_NESTED_STATE_PAGES, vcpu);
-> > +                     return 0;
-> > +             }
-> > +     }
-> > +
->
-> I think request handling (except for KVM_REQ_EVENT) could be more
-> generically moved from vcpu_enter_guest() to vcpu_run().
+On Wed, Aug 03, 2022, Michal Luczaj wrote:
+> TRY_ASM() mishandles #UD thrown by the forced-emulation-triggered emulator.
+> While the faulting address stored in the exception table points at forced
+> emulation prefix, when #UD comes, RIP is 5 bytes (size of KVM_FEP) ahead
+> and the exception ends up unhandled.
 
-Yeah, sounds good to me. I can come up with an updated version. At
-least, I will remove the repeat request here.
+Ah, but that's only the behavior if FEP is allowed.  If FEP is disabled, then the
+#UD will be on the prefix.
 
->
-> Paolo
->
+> Suggested-by: Sean Christopherson <seanjc@google.com>
+
+Heh, I didn't really suggest this because I didn't even realize it was a problem :-)
+
+> Signed-off-by: Michal Luczaj <mhal@rbox.co>
+> ---
+> While here, I've also took the opportunity to merge both 32 and 64-bit
+> versions of ASM_TRY() (.dc.a for .long and .quad), but perhaps there
+> were some reasons for not using .dc.a?
+
+This should be a separate patch, and probably as the very last patch in case dc.a
+isn't viable for whatever reason.  I've never seen/used dc.a so I really have no
+idea whether or not it's ok to use.
+
+As a "safe" alternative that can be done before adding ASM_TRY_FEP(), we can steal
+the kernel's __ASM_SEL() approach so that you don't have to implement two versions
+of ASM_TRY_FEP().  That's worth doing because __ASM_SEL() can probably be used in
+other places too.  Patch at the bottom.
+
+>  lib/x86/desc.h | 11 +++++------
+>  x86/emulator.c |  4 ++--
+>  2 files changed, 7 insertions(+), 8 deletions(-)
+> 
+> diff --git a/lib/x86/desc.h b/lib/x86/desc.h
+> index 2a285eb..99cc224 100644
+> --- a/lib/x86/desc.h
+> +++ b/lib/x86/desc.h
+> @@ -80,21 +80,20 @@ typedef struct  __attribute__((packed)) {
+>  	u16 iomap_base;
+>  } tss64_t;
+>  
+> -#ifdef __x86_64
+>  #define ASM_TRY(catch)			\
+>  	"movl $0, %%gs:4 \n\t"		\
+>  	".pushsection .data.ex \n\t"	\
+> -	".quad 1111f, " catch "\n\t"	\
+> +	".dc.a 1111f, " catch "\n\t"	\
+>  	".popsection \n\t"		\
+>  	"1111:"
+> -#else
+> -#define ASM_TRY(catch)			\
+> +
+> +#define ASM_TRY_PREFIXED(prefix, catch)	\
+
+Rather than a generic ASM_TRY_PREFIXED, I think it makes sense to add an explicit
+ASM_TRY_FEP() that takes in only the label and hardcodes the FEP prefix.  The "#UD
+skips the prefix" behavior is unique to "successful" forced emulation, so this is
+literally the only scenario where skipping a prefix is expected/correct.
+
+*sigh*
+
+That'll require moving the KVM_FEP definition, but that's a good change on its
+own.  Probably throw it in lib/x86/processor.h?
+
+>  	"movl $0, %%gs:4 \n\t"		\
+>  	".pushsection .data.ex \n\t"	\
+> -	".long 1111f, " catch "\n\t"	\
+> +	".dc.a 1111f, " catch "\n\t"	\
+>  	".popsection \n\t"		\
+> +	prefix "\n\t"			\
+>  	"1111:"
+> -#endif
+>  
+>  /*
+>   * selector     32-bit                        64-bit
+> diff --git a/x86/emulator.c b/x86/emulator.c
+> index df0bc49..d2a5302 100644
+> --- a/x86/emulator.c
+> +++ b/x86/emulator.c
+> @@ -900,8 +900,8 @@ static void test_illegal_lea(void)
+>  {
+>  	unsigned int vector;
+>  
+> -	asm volatile (ASM_TRY("1f")
+> -		      KVM_FEP ".byte 0x8d; .byte 0xc0\n\t"
+> +	asm volatile (ASM_TRY_PREFIXED(KVM_FEP, "1f")
+> +		      ".byte 0x8d; .byte 0xc0\n\t"
+
+Put this patch earlier in the series, before test_illegal_lea() is introduced.
+Both so that there's no unnecessary churn, and also because running the illegal
+LEA testcase without this patch will fail.
+
+>  		      "1:"
+>  		      : : : "memory", "eax");
+
+---
+From: Sean Christopherson <seanjc@google.com>
+Date: Wed, 3 Aug 2022 11:09:41 -0700
+Subject: [PATCH] x86: Dedup 32-bit vs. 64-bit ASM_TRY() by stealing kernel's
+ __ASM_SEL()
+
+Steal the kernel's __ASM_SEL() implementation and use it to consolidate
+ASM_TRY().  The only difference between the 32-bit and 64-bit versions is
+the size of the address stored in the table.
+
+No functional change intended.
+
+Signed-off-by: Sean Christopherson <seanjc@google.com>
+---
+ lib/x86/desc.h      | 19 +++++--------------
+ lib/x86/processor.h | 12 ++++++++++++
+ 2 files changed, 17 insertions(+), 14 deletions(-)
+
+diff --git a/lib/x86/desc.h b/lib/x86/desc.h
+index 2a285eb6..e670ebf2 100644
+--- a/lib/x86/desc.h
++++ b/lib/x86/desc.h
+@@ -80,21 +80,12 @@ typedef struct  __attribute__((packed)) {
+ 	u16 iomap_base;
+ } tss64_t;
+
+-#ifdef __x86_64
+-#define ASM_TRY(catch)			\
+-	"movl $0, %%gs:4 \n\t"		\
+-	".pushsection .data.ex \n\t"	\
+-	".quad 1111f, " catch "\n\t"	\
+-	".popsection \n\t"		\
++#define ASM_TRY(catch)						\
++	"movl $0, %%gs:4 \n\t"					\
++	".pushsection .data.ex \n\t"				\
++	__ASM_SEL(.long, .quad) " 1111f,  " catch "\n\t"	\
++	".popsection \n\t"					\
+ 	"1111:"
+-#else
+-#define ASM_TRY(catch)			\
+-	"movl $0, %%gs:4 \n\t"		\
+-	".pushsection .data.ex \n\t"	\
+-	".long 1111f, " catch "\n\t"	\
+-	".popsection \n\t"		\
+-	"1111:"
+-#endif
+
+ /*
+  * selector     32-bit                        64-bit
+diff --git a/lib/x86/processor.h b/lib/x86/processor.h
+index 03242206..30e2de87 100644
+--- a/lib/x86/processor.h
++++ b/lib/x86/processor.h
+@@ -19,6 +19,18 @@
+ #  define S "4"
+ #endif
+
++#ifdef __ASSEMBLY__
++#define __ASM_FORM(x, ...)	x,## __VA_ARGS__
++#else
++#define __ASM_FORM(x, ...)	" " xstr(x,##__VA_ARGS__) " "
++#endif
++
++#ifndef __x86_64__
++#define __ASM_SEL(a,b)		__ASM_FORM(a)
++#else
++#define __ASM_SEL(a,b)		__ASM_FORM(b)
++#endif
++
+ #define DB_VECTOR 1
+ #define BP_VECTOR 3
+ #define UD_VECTOR 6
+
+base-commit: a106b30d39425b7afbaa3bbd4aab16fd26d333e7
+--
+
