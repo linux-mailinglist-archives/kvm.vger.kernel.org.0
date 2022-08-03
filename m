@@ -2,60 +2,62 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 55F44588C94
+	by mail.lfdr.de (Postfix) with ESMTP id A2625588C95
 	for <lists+kvm@lfdr.de>; Wed,  3 Aug 2022 15:01:50 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235925AbiHCNBs (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 3 Aug 2022 09:01:48 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57658 "EHLO
+        id S236097AbiHCNBt (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 3 Aug 2022 09:01:49 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57660 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231533AbiHCNBr (ORCPT <rfc822;kvm@vger.kernel.org>);
+        with ESMTP id S235709AbiHCNBr (ORCPT <rfc822;kvm@vger.kernel.org>);
         Wed, 3 Aug 2022 09:01:47 -0400
-Received: from mail-pg1-x52d.google.com (mail-pg1-x52d.google.com [IPv6:2607:f8b0:4864:20::52d])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C524DB8C;
-        Wed,  3 Aug 2022 06:01:44 -0700 (PDT)
-Received: by mail-pg1-x52d.google.com with SMTP id 13so597084pgc.8;
-        Wed, 03 Aug 2022 06:01:44 -0700 (PDT)
+Received: from mail-pj1-x1029.google.com (mail-pj1-x1029.google.com [IPv6:2607:f8b0:4864:20::1029])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 81081B7E7;
+        Wed,  3 Aug 2022 06:01:46 -0700 (PDT)
+Received: by mail-pj1-x1029.google.com with SMTP id q7-20020a17090a7a8700b001f300db8677so1964516pjf.5;
+        Wed, 03 Aug 2022 06:01:46 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
-        h=from:to:cc:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=U/sZgVfzX4POYhlxOsTuA0LPr+8HMxvmYXlH0o3YoUE=;
-        b=qoiK89xyuHlqVm3orh4O+7OWn58FOg5dYSTTkfwcLZX1E0ik3uNbTg1oJ7KLgFtE8B
-         DojwHscPtbW3J0uc7fkoWXDwQSEziQbwvNrLlg8LMvx/UAcQz9QRofqmmgsW6+Ch/3KQ
-         IEmdLiD7AzGQVs4sIWb9XZJJhjsnQsOZIE+REcjJyU+IgY+zUFsRKUq7d0T9UlD8PMgB
-         wM+VM2lobiC/XzucCmPTFfTUn0jjPOzdQZuNc5uAGmFHNtwQK4kLFSY2t3iZzDnNtyRl
-         QF/a1K5ItJvzZVrHKMvGM8vi0Ahb9uu93YOefUqiZPqlc6PN0vMjxz+hkOmFe+NVaK6b
-         WI1g==
+        h=from:to:cc:subject:date:message-id:in-reply-to:references
+         :mime-version:content-transfer-encoding;
+        bh=kkm/gMyaSfsgZa6BAvqiI+XJ+6EHE76B0lrGvtObm68=;
+        b=L/SijQ11QQB4tA2T/w89ghqjitftl7G35W0WKZ3y6fMlQ+KHVOLgBzPuVBWsUIrOLi
+         MUU4xW5lisRPxH/PtGgzP3/1X26bFTOGlnkAZ63bO8HPmTHj+x6Pf0OzweHmJkxAzK7O
+         Jlwa6Gpgb2bJNknRoSnrobta3oK8MpK2mto6zEBDSpLAoLfUCKeeaX6guUFZwmM4DkuB
+         FSn2t0DmmiPigBX2GauHNx94MZ+bvSsA3UXwFXAPhGWGaL0lGxITIjUclUqGB47RK9sE
+         amybsoxbepanZyPD0YbKqS8PjDQoO58Q0cVnGI3UBXgwfcDyHoDSos+7T/wQUxXlg5O9
+         X1xw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=U/sZgVfzX4POYhlxOsTuA0LPr+8HMxvmYXlH0o3YoUE=;
-        b=k12Ucp3xiPK1WoXOWU3U+BlPZxHfyKadTheYHBkAGPetHJqAOCd9HMSKlKmDBvN67j
-         P/U6IXFRYcbLFENr06081sCR/giTJRP2Bi3hESKgKTgrAnwtgB2JAoPfxnMhAFXmPhxT
-         naUH6FugG/CEht/vfbZhJpJmF3EXzRJTQzhd0TItc3L+AKkewpl3Kq3DlIAi4lBmedfi
-         mIuNU4yJHmgiz7Pq44f43m9hRPShKgo7jPRWXOeVlVfu+bIX7dbtOXK2rnGrzk1mdvD6
-         bJhKG+TtzWgRCp7V6Y6dfENP1dX3nWguW6OJQXvB3ux4+zkLYQKhtM4ghVkyG4mcmhmd
-         3f2A==
-X-Gm-Message-State: ACgBeo0uua5hiekIBCq7gX3KZeVvmoyQ7B0Bw7M617BCuezKje3KBqfL
-        sxYzl0HbwA44cCMxxKSKGUFVphJm9psT4Q==
-X-Google-Smtp-Source: AA6agR5MQ3+8xknkh8zg6JGjb63NY1F/qZugc3HDmF6I6Ty3Vi0LykC3EUz44gyanOD/URjEUaneXQ==
-X-Received: by 2002:a63:214:0:b0:41c:b4fc:f3a6 with SMTP id 20-20020a630214000000b0041cb4fcf3a6mr845669pgc.132.1659531703921;
-        Wed, 03 Aug 2022 06:01:43 -0700 (PDT)
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
+         :references:mime-version:content-transfer-encoding;
+        bh=kkm/gMyaSfsgZa6BAvqiI+XJ+6EHE76B0lrGvtObm68=;
+        b=CW5mW9qrhBLcUb0QNs9JnkGgtYhAKjSXxiEAxIR5JCcT8FwIk7cagZ884T+DdGo7P4
+         1pLDZBYKda6uE6Knm1FrUrfk9aOpaT3qwKkyOnuZEKgg6hsv7wc09ZKzCFJIoFLo+Lai
+         zduXAuKFqzqJnJIgRBNH1hMelsiXrT0+pDhtjj78pmQfN45GX3F5N0s7v/3QhUUr4nVD
+         FNgLx3cGe5V0dQHRFOgpN7Jd+K7D4Ag5s1eCBmUrHj21Jr57fWiMs54RQg5KbHyEpQwe
+         AbQvlAFGisRH93ptEeVUyirirAWT++7/VnyAO5Ag9POSBm8W7og6YdC/mXtTU72twMrq
+         7Sog==
+X-Gm-Message-State: ACgBeo2ya1iDNvsH9NS6XQDiPamhp0/f8qvArrRNV6fxRKKktDSUTL7y
+        CCeV/BRAFoRGX1QTwbTnlGM=
+X-Google-Smtp-Source: AA6agR5oniDmiwWiAAG3wuydieVGKh0x6Lwc+40CC2AWxzv1cu6xbRlS/gV7Dc6Jy85GJGXJ55zUnA==
+X-Received: by 2002:a17:90b:ec7:b0:1f2:fa08:44cd with SMTP id gz7-20020a17090b0ec700b001f2fa0844cdmr4767178pjb.183.1659531705888;
+        Wed, 03 Aug 2022 06:01:45 -0700 (PDT)
 Received: from localhost.localdomain ([103.7.29.32])
-        by smtp.gmail.com with ESMTPSA id k3-20020a170902c40300b0016f1ef2cd44sm198058plk.154.2022.08.03.06.01.41
+        by smtp.gmail.com with ESMTPSA id k3-20020a170902c40300b0016f1ef2cd44sm198058plk.154.2022.08.03.06.01.44
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 03 Aug 2022 06:01:43 -0700 (PDT)
+        Wed, 03 Aug 2022 06:01:45 -0700 (PDT)
 From:   Like Xu <like.xu.linux@gmail.com>
 X-Google-Original-From: Like Xu <likexu@tencent.com>
 To:     Sean Christopherson <seanjc@google.com>,
         Paolo Bonzini <pbonzini@redhat.com>
 Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: [PATCH v2 1/2] KVM: x86/svm/pmu: Direct access pmu->gp_counter[] to implement amd_*_to_pmc()
-Date:   Wed,  3 Aug 2022 21:01:23 +0800
-Message-Id: <20220803130124.72340-1-likexu@tencent.com>
+Subject: [PATCH v2 2/2] KVM: x86/svm/pmu: Rewrite get_gp_pmc_amd() for more counters scalability
+Date:   Wed,  3 Aug 2022 21:01:24 +0800
+Message-Id: <20220803130124.72340-2-likexu@tencent.com>
 X-Mailer: git-send-email 2.37.1
+In-Reply-To: <20220803130124.72340-1-likexu@tencent.com>
+References: <20220803130124.72340-1-likexu@tencent.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
@@ -70,92 +72,182 @@ X-Mailing-List: kvm@vger.kernel.org
 
 From: Like Xu <likexu@tencent.com>
 
-AMD only has gp counters, whose corresponding vPMCs are initialised
-and stored in pmu->gp_counter[] in order of idx, so we can access this
-array directly based on any valid pmc->idx, without any help from other
-interfaces at all. The amd_rdpmc_ecx_to_pmc() can now reuse this part
-of the code quite naturally.
+If the number of AMD gp counters continues to grow, the code will
+be very clumsy and the switch-case design of inline get_gp_pmc_amd()
+will also bloat the kernel text size.
 
-Opportunistically apply array_index_nospec() to reduce the attack
-surface for speculative execution and remove the dead code.
+The target code is taught to manage two groups of MSRs, each
+representing a different version of the AMD PMU counter MSRs.
+The MSR addresses of each group are contiguous, with no holes,
+and there is no intersection between two sets of addresses,
+but they are discrete in functionality by design like this:
+
+[Group A : All counter MSRs are tightly bound to all event select MSRs ]
+
+  MSR_K7_EVNTSEL0			0xc0010000
+  MSR_K7_EVNTSELi			0xc0010000 + i
+  ...
+  MSR_K7_EVNTSEL3			0xc0010003
+  MSR_K7_PERFCTR0			0xc0010004
+  MSR_K7_PERFCTRi			0xc0010004 + i
+  ...
+  MSR_K7_PERFCTR3			0xc0010007
+
+[Group B : The counter MSRs are interleaved with the event select MSRs ]
+
+  MSR_F15H_PERF_CTL0		0xc0010200
+  MSR_F15H_PERF_CTR0		(0xc0010200 + 1)
+  ...
+  MSR_F15H_PERF_CTLi		(0xc0010200 + 2 * i)
+  MSR_F15H_PERF_CTRi		(0xc0010200 + 2 * i + 1)
+  ...
+  MSR_F15H_PERF_CTL5		(0xc0010200 + 2 * 5)
+  MSR_F15H_PERF_CTR5		(0xc0010200 + 2 * 5 + 1)
+
+Rewrite get_gp_pmc_amd() in this way: first determine which group of
+registers is accessed, then determine if it matches its requested type,
+applying different scaling ratios respectively, and finally get pmc_idx
+to pass into amd_pmc_idx_to_pmc().
 
 Signed-off-by: Like Xu <likexu@tencent.com>
 ---
-v1: https://lore.kernel.org/kvm/20220510115718.93335-2-likexu@tencent.com/
+v1: https://lore.kernel.org/kvm/20220510115718.93335-3-likexu@tencent.com/
 v1 -> v2 Changelog:
-- Remove unused helper get_msr_base();
+- Move amd_pmc_idx_to_pmc() to the front for reuse;
+- Apply msr_base and ratio semantics to the switch statement;
 
- arch/x86/kvm/svm/pmu.c | 41 +++++------------------------------------
- 1 file changed, 5 insertions(+), 36 deletions(-)
+ arch/x86/kvm/svm/pmu.c | 85 +++++++++---------------------------------
+ 1 file changed, 17 insertions(+), 68 deletions(-)
 
 diff --git a/arch/x86/kvm/svm/pmu.c b/arch/x86/kvm/svm/pmu.c
-index f24613a108c5..d1c3b766841e 100644
+index d1c3b766841e..d90af8cdd405 100644
 --- a/arch/x86/kvm/svm/pmu.c
 +++ b/arch/x86/kvm/svm/pmu.c
-@@ -33,23 +33,6 @@ enum index {
- 	INDEX_ERROR,
+@@ -23,90 +23,49 @@ enum pmu_type {
+ 	PMU_TYPE_EVNTSEL,
  };
  
--static unsigned int get_msr_base(struct kvm_pmu *pmu, enum pmu_type type)
--{
--	struct kvm_vcpu *vcpu = pmu_to_vcpu(pmu);
+-enum index {
+-	INDEX_ZERO = 0,
+-	INDEX_ONE,
+-	INDEX_TWO,
+-	INDEX_THREE,
+-	INDEX_FOUR,
+-	INDEX_FIVE,
+-	INDEX_ERROR,
+-};
 -
--	if (guest_cpuid_has(vcpu, X86_FEATURE_PERFCTR_CORE)) {
--		if (type == PMU_TYPE_COUNTER)
--			return MSR_F15H_PERF_CTR;
--		else
--			return MSR_F15H_PERF_CTL;
--	} else {
--		if (type == PMU_TYPE_COUNTER)
--			return MSR_K7_PERFCTR0;
--		else
--			return MSR_K7_EVNTSEL0;
+-static enum index msr_to_index(u32 msr)
++static struct kvm_pmc *amd_pmc_idx_to_pmc(struct kvm_pmu *pmu, int pmc_idx)
+ {
+-	switch (msr) {
+-	case MSR_F15H_PERF_CTL0:
+-	case MSR_F15H_PERF_CTR0:
+-	case MSR_K7_EVNTSEL0:
+-	case MSR_K7_PERFCTR0:
+-		return INDEX_ZERO;
+-	case MSR_F15H_PERF_CTL1:
+-	case MSR_F15H_PERF_CTR1:
+-	case MSR_K7_EVNTSEL1:
+-	case MSR_K7_PERFCTR1:
+-		return INDEX_ONE;
+-	case MSR_F15H_PERF_CTL2:
+-	case MSR_F15H_PERF_CTR2:
+-	case MSR_K7_EVNTSEL2:
+-	case MSR_K7_PERFCTR2:
+-		return INDEX_TWO;
+-	case MSR_F15H_PERF_CTL3:
+-	case MSR_F15H_PERF_CTR3:
+-	case MSR_K7_EVNTSEL3:
+-	case MSR_K7_PERFCTR3:
+-		return INDEX_THREE;
+-	case MSR_F15H_PERF_CTL4:
+-	case MSR_F15H_PERF_CTR4:
+-		return INDEX_FOUR;
+-	case MSR_F15H_PERF_CTL5:
+-	case MSR_F15H_PERF_CTR5:
+-		return INDEX_FIVE;
+-	default:
+-		return INDEX_ERROR;
 -	}
--}
--
- static enum index msr_to_index(u32 msr)
- {
- 	switch (msr) {
-@@ -141,18 +124,12 @@ static bool amd_pmc_is_enabled(struct kvm_pmc *pmc)
- 
- static struct kvm_pmc *amd_pmc_idx_to_pmc(struct kvm_pmu *pmu, int pmc_idx)
- {
--	unsigned int base = get_msr_base(pmu, PMU_TYPE_COUNTER);
--	struct kvm_vcpu *vcpu = pmu_to_vcpu(pmu);
 +	unsigned int num_counters = pmu->nr_arch_gp_counters;
- 
--	if (guest_cpuid_has(vcpu, X86_FEATURE_PERFCTR_CORE)) {
--		/*
--		 * The idx is contiguous. The MSRs are not. The counter MSRs
--		 * are interleaved with the event select MSRs.
--		 */
--		pmc_idx *= 2;
--	}
++
 +	if (pmc_idx >= num_counters)
 +		return NULL;
- 
--	return get_gp_pmc_amd(pmu, base + pmc_idx, PMU_TYPE_COUNTER);
++
 +	return &pmu->gp_counters[array_index_nospec(pmc_idx, num_counters)];
  }
  
- static bool amd_is_valid_rdpmc_ecx(struct kvm_vcpu *vcpu, unsigned int idx)
-@@ -168,15 +145,7 @@ static bool amd_is_valid_rdpmc_ecx(struct kvm_vcpu *vcpu, unsigned int idx)
- static struct kvm_pmc *amd_rdpmc_ecx_to_pmc(struct kvm_vcpu *vcpu,
- 	unsigned int idx, u64 *mask)
+ static inline struct kvm_pmc *get_gp_pmc_amd(struct kvm_pmu *pmu, u32 msr,
+ 					     enum pmu_type type)
  {
--	struct kvm_pmu *pmu = vcpu_to_pmu(vcpu);
--	struct kvm_pmc *counters;
--
--	idx &= ~(3u << 30);
--	if (idx >= pmu->nr_arch_gp_counters)
--		return NULL;
--	counters = pmu->gp_counters;
--
--	return &counters[idx];
-+	return amd_pmc_idx_to_pmc(vcpu_to_pmu(vcpu), idx & ~(3u << 30));
+ 	struct kvm_vcpu *vcpu = pmu_to_vcpu(pmu);
++	unsigned int idx;
+ 
+ 	if (!vcpu->kvm->arch.enable_pmu)
+ 		return NULL;
+ 
+ 	switch (msr) {
+-	case MSR_F15H_PERF_CTL0:
+-	case MSR_F15H_PERF_CTL1:
+-	case MSR_F15H_PERF_CTL2:
+-	case MSR_F15H_PERF_CTL3:
+-	case MSR_F15H_PERF_CTL4:
+-	case MSR_F15H_PERF_CTL5:
++	case MSR_F15H_PERF_CTL0 ... MSR_F15H_PERF_CTR5:
+ 		if (!guest_cpuid_has(vcpu, X86_FEATURE_PERFCTR_CORE))
+ 			return NULL;
+-		fallthrough;
++		idx = (unsigned int)((msr - MSR_F15H_PERF_CTL0) / 2);
++		if ((msr == (MSR_F15H_PERF_CTL0 + 2 * idx)) !=
++		    (type == PMU_TYPE_EVNTSEL))
++			return NULL;
++		break;
+ 	case MSR_K7_EVNTSEL0 ... MSR_K7_EVNTSEL3:
+ 		if (type != PMU_TYPE_EVNTSEL)
+ 			return NULL;
++		idx = msr - MSR_K7_EVNTSEL0;
+ 		break;
+-	case MSR_F15H_PERF_CTR0:
+-	case MSR_F15H_PERF_CTR1:
+-	case MSR_F15H_PERF_CTR2:
+-	case MSR_F15H_PERF_CTR3:
+-	case MSR_F15H_PERF_CTR4:
+-	case MSR_F15H_PERF_CTR5:
+-		if (!guest_cpuid_has(vcpu, X86_FEATURE_PERFCTR_CORE))
+-			return NULL;
+-		fallthrough;
+ 	case MSR_K7_PERFCTR0 ... MSR_K7_PERFCTR3:
+ 		if (type != PMU_TYPE_COUNTER)
+ 			return NULL;
++		idx = msr - MSR_K7_PERFCTR0;
+ 		break;
+ 	default:
+ 		return NULL;
+ 	}
+ 
+-	return &pmu->gp_counters[msr_to_index(msr)];
++	return amd_pmc_idx_to_pmc(pmu, idx);
  }
  
- static bool amd_is_valid_msr(struct kvm_vcpu *vcpu, u32 msr)
+ static bool amd_hw_event_available(struct kvm_pmc *pmc)
+@@ -122,16 +81,6 @@ static bool amd_pmc_is_enabled(struct kvm_pmc *pmc)
+ 	return true;
+ }
+ 
+-static struct kvm_pmc *amd_pmc_idx_to_pmc(struct kvm_pmu *pmu, int pmc_idx)
+-{
+-	unsigned int num_counters = pmu->nr_arch_gp_counters;
+-
+-	if (pmc_idx >= num_counters)
+-		return NULL;
+-
+-	return &pmu->gp_counters[array_index_nospec(pmc_idx, num_counters)];
+-}
+-
+ static bool amd_is_valid_rdpmc_ecx(struct kvm_vcpu *vcpu, unsigned int idx)
+ {
+ 	struct kvm_pmu *pmu = vcpu_to_pmu(vcpu);
 -- 
 2.37.1
 
