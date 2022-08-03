@@ -2,155 +2,204 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id E87E8589143
-	for <lists+kvm@lfdr.de>; Wed,  3 Aug 2022 19:23:49 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 7A3C0589156
+	for <lists+kvm@lfdr.de>; Wed,  3 Aug 2022 19:26:05 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236024AbiHCRXs (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 3 Aug 2022 13:23:48 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33298 "EHLO
+        id S238252AbiHCR0C (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 3 Aug 2022 13:26:02 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35714 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S236321AbiHCRXp (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 3 Aug 2022 13:23:45 -0400
-Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 00ABC53D06
-        for <kvm@vger.kernel.org>; Wed,  3 Aug 2022 10:23:44 -0700 (PDT)
-Received: from pps.filterd (m0098399.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.17.1.5/8.17.1.5) with ESMTP id 273HCCL7026236
-        for <kvm@vger.kernel.org>; Wed, 3 Aug 2022 17:23:44 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=date : from : to : cc :
- subject : message-id : in-reply-to : references : mime-version :
- content-type : content-transfer-encoding; s=pp1;
- bh=zGn+PE4WoQGp9O7mkVvyxRdZh4gLEjToor/Vy048WLQ=;
- b=UDXb4YcHOGSkdK4XlEIhanwCSPc8Xj0a/aBNQniK78l9ZyFCsikn+975gduu/UJ0IdxQ
- fXOeGPKOuHKvDrAYbEHGT6WZsS4SOgYw2kC5YRfishoX24vQTq3TTqUgG2SFMxMNfg6y
- VfhBVbNcMIlGJoNK8sUNFJyOwVm+3RwChbLJuCD2h2dZM1RyCAPEvHwWZzTx6OuDn4k8
- sHH0ieyOVNs4yCjTqv/U1ck3SANKpw4FCA9HBQE/hOuj5meLXA5bRrX5P5BqF1cmnGxg
- EBjYLdS5142X1JHmusC36rrXQ2YBtOCaH2n/Mk/1qJ4hg6AD55HWliAd5jcsec4PjSul jg== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3hqw748as0-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT)
-        for <kvm@vger.kernel.org>; Wed, 03 Aug 2022 17:23:44 +0000
-Received: from m0098399.ppops.net (m0098399.ppops.net [127.0.0.1])
-        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 273HLXBW001092
-        for <kvm@vger.kernel.org>; Wed, 3 Aug 2022 17:23:44 GMT
-Received: from ppma04ams.nl.ibm.com (63.31.33a9.ip4.static.sl-reverse.com [169.51.49.99])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3hqw748arb-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Wed, 03 Aug 2022 17:23:44 +0000
-Received: from pps.filterd (ppma04ams.nl.ibm.com [127.0.0.1])
-        by ppma04ams.nl.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 273HM2iD005933;
-        Wed, 3 Aug 2022 17:23:41 GMT
-Received: from b06avi18626390.portsmouth.uk.ibm.com (b06avi18626390.portsmouth.uk.ibm.com [9.149.26.192])
-        by ppma04ams.nl.ibm.com with ESMTP id 3hmv98n7jf-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Wed, 03 Aug 2022 17:23:41 +0000
-Received: from b06wcsmtp001.portsmouth.uk.ibm.com (b06wcsmtp001.portsmouth.uk.ibm.com [9.149.105.160])
-        by b06avi18626390.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 273HLLTq32375124
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Wed, 3 Aug 2022 17:21:21 GMT
-Received: from b06wcsmtp001.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id B3FA2A405C;
-        Wed,  3 Aug 2022 17:23:37 +0000 (GMT)
-Received: from b06wcsmtp001.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 22CA3A4054;
-        Wed,  3 Aug 2022 17:23:37 +0000 (GMT)
-Received: from p-imbrenda (unknown [9.145.1.230])
-        by b06wcsmtp001.portsmouth.uk.ibm.com (Postfix) with ESMTP;
-        Wed,  3 Aug 2022 17:23:36 +0000 (GMT)
-Date:   Wed, 3 Aug 2022 19:23:34 +0200
-From:   Claudio Imbrenda <imbrenda@linux.ibm.com>
-To:     Nico Boehr <nrb@linux.ibm.com>
-Cc:     kvm@vger.kernel.org, frankja@linux.ibm.com, thuth@redhat.com
-Subject: Re: [kvm-unit-tests PATCH v3 1/1] s390x: verify EQBS/SQBS is
- unavailable
-Message-ID: <20220803192334.44ebe902@p-imbrenda>
-In-Reply-To: <20220803135851.384805-2-nrb@linux.ibm.com>
-References: <20220803135851.384805-1-nrb@linux.ibm.com>
-        <20220803135851.384805-2-nrb@linux.ibm.com>
-Organization: IBM
-X-Mailer: Claws Mail 4.1.0 (GTK 3.24.34; x86_64-redhat-linux-gnu)
+        with ESMTP id S238144AbiHCRZ6 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 3 Aug 2022 13:25:58 -0400
+Received: from mailtransmit04.runbox.com (mailtransmit04.runbox.com [IPv6:2a0c:5a00:149::25])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 04FE454CB4
+        for <kvm@vger.kernel.org>; Wed,  3 Aug 2022 10:25:52 -0700 (PDT)
+Received: from mailtransmit03.runbox ([10.9.9.163] helo=aibo.runbox.com)
+        by mailtransmit04.runbox.com with esmtps  (TLS1.2) tls TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256
+        (Exim 4.93)
+        (envelope-from <mhal@rbox.co>)
+        id 1oJI7z-00HAOl-8X; Wed, 03 Aug 2022 19:25:51 +0200
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=rbox.co;
+        s=selector1; h=Content-Transfer-Encoding:MIME-Version:References:In-Reply-To:
+        Message-Id:Date:Subject:Cc:To:From;
+        bh=NshaTYGPUytVAiFIgTnSQ8VvvxN9xUZEd+zF7dxyupY=; b=mvB+k1Kz2OTx7oQrN9A4ZJX6li
+        yP5e39nlfW5zYVlcXQ1dkYFdP1CUYC5ONfheSDrvkBO5zOjAgYIgNulVDHvJTrmhSr1cqmgXdt+8r
+        iM9t3oIFGCgsWWsUShN0IbFcCacRF36AimEq9Y1YHwHtqIXgw4yIJS/LJy/yjakS7Q44cvQM8NL7j
+        yN7p4m/5cnN2ucaNGNlojw6zBW9NG5k7xXL05Bqh7Ed+3bYqnCuh0wbHdePnBMtT/Gz6/qXVD0bAY
+        puJ834Q8qimVLW08+HmbT4IBkQVAvIr4IQ/d/5ACbsgMHo7TXpbtFzVxQFno9uBydIBzkHxdGWxVA
+        yC3NtffA==;
+Received: from [10.9.9.73] (helo=submission02.runbox)
+        by mailtransmit03.runbox with esmtp (Exim 4.86_2)
+        (envelope-from <mhal@rbox.co>)
+        id 1oJI7y-0004oO-Sb; Wed, 03 Aug 2022 19:25:51 +0200
+Received: by submission02.runbox with esmtpsa  [Authenticated ID (604044)]  (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+        (Exim 4.90_1)
+        id 1oJI7c-0000yh-O7; Wed, 03 Aug 2022 19:25:28 +0200
+From:   Michal Luczaj <mhal@rbox.co>
+To:     seanjc@google.com
+Cc:     kvm@vger.kernel.org, pbonzini@redhat.com, shuah@kernel.org,
+        linux-kselftest@vger.kernel.org, Michal Luczaj <mhal@rbox.co>
+Subject: [kvm-unit-tests PATCH 1/4] x86: emulator.c cleanup: Save and restore exception handlers
+Date:   Wed,  3 Aug 2022 19:25:05 +0200
+Message-Id: <20220803172508.1215-1-mhal@rbox.co>
+X-Mailer: git-send-email 2.37.1
+In-Reply-To: <Yum2LpZS9vtCaCBm@google.com>
+References: <Yum2LpZS9vtCaCBm@google.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-ORIG-GUID: xElsWv234KaUVPUiH2wr-98-TMqCcrGC
-X-Proofpoint-GUID: VAieu46CVuhe9fRzMW1elVcyqO1ltFBC
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.205,Aquarius:18.0.883,Hydra:6.0.517,FMLib:17.11.122.1
- definitions=2022-08-03_04,2022-08-02_01,2022-06-22_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 clxscore=1015 spamscore=0
- phishscore=0 priorityscore=1501 bulkscore=0 mlxlogscore=999 adultscore=0
- impostorscore=0 mlxscore=0 lowpriorityscore=0 malwarescore=0
- suspectscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2206140000 definitions=main-2208030076
-X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_EF,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_PASS
-        autolearn=ham autolearn_force=no version=3.4.6
+Content-Transfer-Encoding: 8bit
+X-Spam-Status: No, score=-2.8 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,RCVD_IN_DNSWL_LOW,
+        SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed,  3 Aug 2022 15:58:51 +0200
-Nico Boehr <nrb@linux.ibm.com> wrote:
+Users of handle_exception() should always save and restore the handlers.
 
-> QEMU doesn't provide EQBS/SQBS instructions, so we should check they
-> result in an exception.
-> 
-> Signed-off-by: Nico Boehr <nrb@linux.ibm.com>
+Suggested-by: Sean Christopherson <seanjc@google.com>
+Signed-off-by: Michal Luczaj <mhal@rbox.co>
+---
+I took the liberty of fixing the indentation of functions I've touched.
 
-Reviewed-by: Claudio Imbrenda <imbrenda@linux.ibm.com>
+ x86/emulator.c | 78 ++++++++++++++++++++++++++------------------------
+ 1 file changed, 41 insertions(+), 37 deletions(-)
 
-> ---
->  s390x/intercept.c | 29 +++++++++++++++++++++++++++++
->  1 file changed, 29 insertions(+)
-> 
-> diff --git a/s390x/intercept.c b/s390x/intercept.c
-> index 9e826b6c79ad..48eb2d22a2cc 100644
-> --- a/s390x/intercept.c
-> +++ b/s390x/intercept.c
-> @@ -197,6 +197,34 @@ static void test_diag318(void)
->  
->  }
->  
-> +static void test_qbs(void)
-> +{
-> +	report_prefix_push("qbs");
-> +	if (!host_is_qemu()) {
-> +		report_skip("QEMU-only test");
-> +		report_prefix_pop();
-> +		return;
-> +	}
-> +
-> +	report_prefix_push("sqbs");
-> +	expect_pgm_int();
-> +	asm volatile(
-> +		"	.insn   rsy,0xeb000000008a,0,0,0(0)\n"
-> +		: : : "memory", "cc");
-> +	check_pgm_int_code(PGM_INT_CODE_OPERATION);
-> +	report_prefix_pop();
-> +
-> +	report_prefix_push("eqbs");
-> +	expect_pgm_int();
-> +	asm volatile(
-> +		"	.insn   rrf,0xb99c0000,0,0,0,0\n"
-> +		: : : "memory", "cc");
-> +	check_pgm_int_code(PGM_INT_CODE_OPERATION);
-> +	report_prefix_pop();
-> +
-> +	report_prefix_pop();
-> +}
-> +
->  struct {
->  	const char *name;
->  	void (*func)(void);
-> @@ -208,6 +236,7 @@ struct {
->  	{ "stidp", test_stidp, false },
->  	{ "testblock", test_testblock, false },
->  	{ "diag318", test_diag318, false },
-> +	{ "qbs", test_qbs, false },
->  	{ NULL, NULL, false }
->  };
->  
+diff --git a/x86/emulator.c b/x86/emulator.c
+index cd78e3c..769a049 100644
+--- a/x86/emulator.c
++++ b/x86/emulator.c
+@@ -710,6 +710,7 @@ static __attribute__((target("sse2"))) void test_sse_exceptions(void *cross_mem)
+ 	void *page2 = (void *)(&bytes[4096]);
+ 	struct pte_search search;
+ 	pteval_t orig_pte;
++	handler old;
+ 
+ 	// setup memory for unaligned access
+ 	mem = (uint32_t *)(&bytes[8]);
+@@ -725,10 +726,10 @@ static __attribute__((target("sse2"))) void test_sse_exceptions(void *cross_mem)
+ 	asm("movupd %1, %0" : "=m"(*mem) : "x"(vv) : "memory");
+ 	report(sseeq(v, mem), "movupd unaligned");
+ 	exceptions = 0;
+-	handle_exception(GP_VECTOR, unaligned_movaps_handler);
++	old = handle_exception(GP_VECTOR, unaligned_movaps_handler);
+ 	asm("movaps %1, %0\n\t unaligned_movaps_cont:"
+ 			: "=m"(*mem) : "x"(vv));
+-	handle_exception(GP_VECTOR, 0);
++	handle_exception(GP_VECTOR, old);
+ 	report(exceptions == 1, "unaligned movaps exception");
+ 
+ 	// setup memory for cross page access
+@@ -746,10 +747,10 @@ static __attribute__((target("sse2"))) void test_sse_exceptions(void *cross_mem)
+ 	invlpg(page2);
+ 
+ 	exceptions = 0;
+-	handle_exception(PF_VECTOR, cross_movups_handler);
++	old = handle_exception(PF_VECTOR, cross_movups_handler);
+ 	asm("movups %1, %0\n\t cross_movups_cont:" : "=m"(*mem) : "x"(vv) :
+ 			"memory");
+-	handle_exception(PF_VECTOR, 0);
++	handle_exception(PF_VECTOR, old);
+ 	report(exceptions == 1, "movups crosspage exception");
+ 
+ 	// restore invalidated page
+@@ -817,36 +818,38 @@ static void advance_rip_and_note_exception(struct ex_regs *regs)
+ 
+ static void test_mmx_movq_mf(uint64_t *mem)
+ {
+-    /* movq %mm0, (%rax) */
+-    extern char movq_start, movq_end;
+-
+-    uint16_t fcw = 0;  /* all exceptions unmasked */
+-    write_cr0(read_cr0() & ~6);  /* TS, EM */
+-    exceptions = 0;
+-    handle_exception(MF_VECTOR, advance_rip_and_note_exception);
+-    asm volatile("fninit; fldcw %0" : : "m"(fcw));
+-    asm volatile("fldz; fldz; fdivp"); /* generate exception */
+-
+-    rip_advance = &movq_end - &movq_start;
+-    asm(KVM_FEP "movq_start: movq %mm0, (%rax); movq_end:");
+-    /* exit MMX mode */
+-    asm volatile("fnclex; emms");
+-    report(exceptions == 1, "movq mmx generates #MF");
+-    handle_exception(MF_VECTOR, 0);
++	/* movq %mm0, (%rax) */
++	extern char movq_start, movq_end;
++	handler old;
++
++	uint16_t fcw = 0;  /* all exceptions unmasked */
++	write_cr0(read_cr0() & ~6);  /* TS, EM */
++	exceptions = 0;
++	old = handle_exception(MF_VECTOR, advance_rip_and_note_exception);
++	asm volatile("fninit; fldcw %0" : : "m"(fcw));
++	asm volatile("fldz; fldz; fdivp"); /* generate exception */
++
++	rip_advance = &movq_end - &movq_start;
++	asm(KVM_FEP "movq_start: movq %mm0, (%rax); movq_end:");
++	/* exit MMX mode */
++	asm volatile("fnclex; emms");
++	report(exceptions == 1, "movq mmx generates #MF");
++	handle_exception(MF_VECTOR, old);
+ }
+ 
+ static void test_jmp_noncanonical(uint64_t *mem)
+ {
+ 	extern char nc_jmp_start, nc_jmp_end;
++	handler old;
+ 
+ 	*mem = 0x1111111111111111ul;
+ 
+ 	exceptions = 0;
+ 	rip_advance = &nc_jmp_end - &nc_jmp_start;
+-	handle_exception(GP_VECTOR, advance_rip_and_note_exception);
++	old = handle_exception(GP_VECTOR, advance_rip_and_note_exception);
+ 	asm volatile ("nc_jmp_start: jmp *%0; nc_jmp_end:" : : "m"(*mem));
+ 	report(exceptions == 1, "jump to non-canonical address");
+-	handle_exception(GP_VECTOR, 0);
++	handle_exception(GP_VECTOR, old);
+ }
+ 
+ static void test_movabs(uint64_t *mem)
+@@ -979,22 +982,23 @@ static void ss_bad_rpl(struct ex_regs *regs)
+ 
+ static void test_sreg(volatile uint16_t *mem)
+ {
+-    u16 ss = read_ss();
++	u16 ss = read_ss();
++	handler old;
+ 
+-    // check for null segment load
+-    *mem = 0;
+-    asm volatile("mov %0, %%ss" : : "m"(*mem));
+-    report(read_ss() == 0, "mov null, %%ss");
+-
+-    // check for exception when ss.rpl != cpl on null segment load
+-    exceptions = 0;
+-    handle_exception(GP_VECTOR, ss_bad_rpl);
+-    *mem = 3;
+-    asm volatile("mov %0, %%ss; ss_bad_rpl_cont:" : : "m"(*mem));
+-    report(exceptions == 1 && read_ss() == 0,
+-           "mov null, %%ss (with ss.rpl != cpl)");
+-    handle_exception(GP_VECTOR, 0);
+-    write_ss(ss);
++	// check for null segment load
++	*mem = 0;
++	asm volatile("mov %0, %%ss" : : "m"(*mem));
++	report(read_ss() == 0, "mov null, %%ss");
++
++	// check for exception when ss.rpl != cpl on null segment load
++	exceptions = 0;
++	old = handle_exception(GP_VECTOR, ss_bad_rpl);
++	*mem = 3;
++	asm volatile("mov %0, %%ss; ss_bad_rpl_cont:" : : "m"(*mem));
++	report(exceptions == 1 && read_ss() == 0,
++	       "mov null, %%ss (with ss.rpl != cpl)");
++	handle_exception(GP_VECTOR, old);
++	write_ss(ss);
+ }
+ 
+ static uint64_t usr_gs_mov(void)
+-- 
+2.37.1
 
