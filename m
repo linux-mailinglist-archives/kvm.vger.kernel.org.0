@@ -2,114 +2,120 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 12D76588599
-	for <lists+kvm@lfdr.de>; Wed,  3 Aug 2022 03:58:16 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 0DD5B5885D4
+	for <lists+kvm@lfdr.de>; Wed,  3 Aug 2022 04:37:29 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234951AbiHCB6N (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 2 Aug 2022 21:58:13 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34790 "EHLO
+        id S235407AbiHCChZ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 2 Aug 2022 22:37:25 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54888 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S236006AbiHCB5v (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 2 Aug 2022 21:57:51 -0400
+        with ESMTP id S235213AbiHCChY (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 2 Aug 2022 22:37:24 -0400
 Received: from mga07.intel.com (mga07.intel.com [134.134.136.100])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C8FC456B90
-        for <kvm@vger.kernel.org>; Tue,  2 Aug 2022 18:57:47 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DF93C19295;
+        Tue,  2 Aug 2022 19:37:23 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1659491867; x=1691027867;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=lX8nJwznbbItYIRdF9sQ+TpjIVKEM9yi99c8n2atRuo=;
-  b=eIbKSoXOtdE7huX6pk47EgvCnKb2W+mpUMZdw3zDub+3a5iBLmEWEUg1
-   rFIlqqSkdxTDnq+JtDA8aQayFkZtcJuiwMUaj+KY/mptVfRVpfo45j+E/
-   pADptuqr9RdyX5SOKMLFyJyavR1JeUvGXBxddyUOP31hGSK9aUmjkpVrH
-   I7j4ID5QwG/kNjnzWDK5R+k0P3w9kKJ5fNIwv714OOG7c2ZV92oImkiCp
-   uzGfu4MoCYsplDjgdmI0U/fYzVemypcpKS2ipizdsTAijR0glpVMpWG5f
-   AgUUF0TYaxcPb415kf62wccKlVwH5Acm8yXfQXFyteFK3Va4sAxwSM2DW
-   A==;
-X-IronPort-AV: E=McAfee;i="6400,9594,10427"; a="353563701"
+  t=1659494243; x=1691030243;
+  h=message-id:subject:from:to:cc:date:in-reply-to:
+   references:content-transfer-encoding:mime-version;
+  bh=NwZXSWxoFI06XNo3KYNX+k/6/v1+eTXuw3wSaDO0CNo=;
+  b=THz3EbsxvPSR3ylAQd6dJzbfJGCWkCa49CertntVPns+cntM+N1AXfz8
+   ZwTSDc2KseyRSgSKvhHcoaHKtCuTq2Lxy0LgwRP+hR8i+GJv9Nj/+X7hG
+   SoNBkdZBp9tBqjPQ2h7YbVnooZt8xsYluosMZYTCEmqhhnwQXB1e6XAic
+   Y7OiwaQPnJMELK8uNhHZHmT48o5Fk44dOxQi8nILDv1g/D9fl4eYIKqCP
+   k+QEHKu+66OnRd/XhHZLyv7NDZ3x2YilYkSJx5GTuET9gimIwMLcq6z4y
+   Xh/i2Z8dhsT1UIxni+H+u4CgvNGMECVofCCjLwysQo7wB5rf/jwQlryy6
+   Q==;
+X-IronPort-AV: E=McAfee;i="6400,9594,10427"; a="353569275"
 X-IronPort-AV: E=Sophos;i="5.93,212,1654585200"; 
-   d="scan'208";a="353563701"
-Received: from orsmga008.jf.intel.com ([10.7.209.65])
-  by orsmga105.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 02 Aug 2022 18:57:47 -0700
+   d="scan'208";a="353569275"
+Received: from orsmga003.jf.intel.com ([10.7.209.27])
+  by orsmga105.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 02 Aug 2022 19:37:23 -0700
 X-IronPort-AV: E=Sophos;i="5.93,212,1654585200"; 
-   d="scan'208";a="630953193"
-Received: from jifangxi-mobl2.ccr.corp.intel.com (HELO localhost) ([10.249.168.16])
-  by orsmga008-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 02 Aug 2022 18:57:45 -0700
-Date:   Wed, 3 Aug 2022 09:57:42 +0800
-From:   Yu Zhang <yu.c.zhang@linux.intel.com>
-To:     Sean Christopherson <seanjc@google.com>
-Cc:     pbonzini@redhat.com, kvm@vger.kernel.org
-Subject: Re: [kvm-unit-tests PATCH] X86: Set up EPT before running
- vmx_pf_exception_test
-Message-ID: <20220803015742.v2kzo5edaqdmi456@linux.intel.com>
-References: <20220715113334.52491-1-yu.c.zhang@linux.intel.com>
- <YumMC1hAVpTWLmap@google.com>
+   d="scan'208";a="553152795"
+Received: from gvenka2-desk.amr.corp.intel.com (HELO khuang2-desk.gar.corp.intel.com) ([10.212.85.17])
+  by orsmga003-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 02 Aug 2022 19:37:20 -0700
+Message-ID: <c96a78c6a8caf25b01e450f139c934688d1735b0.camel@intel.com>
+Subject: Re: [PATCH v5 07/22] x86/virt/tdx: Implement SEAMCALL function
+From:   Kai Huang <kai.huang@intel.com>
+To:     Dave Hansen <dave.hansen@intel.com>, linux-kernel@vger.kernel.org,
+        kvm@vger.kernel.org
+Cc:     seanjc@google.com, pbonzini@redhat.com, len.brown@intel.com,
+        tony.luck@intel.com, rafael.j.wysocki@intel.com,
+        reinette.chatre@intel.com, dan.j.williams@intel.com,
+        peterz@infradead.org, ak@linux.intel.com,
+        kirill.shutemov@linux.intel.com,
+        sathyanarayanan.kuppuswamy@linux.intel.com,
+        isaku.yamahata@intel.com
+Date:   Wed, 03 Aug 2022 14:37:18 +1200
+In-Reply-To: <0b20f1878d31658a9e3cd3edaf3826fe8731346e.camel@intel.com>
+References: <cover.1655894131.git.kai.huang@intel.com>
+         <095e6bbc57b4470e1e9a9104059a5238c9775f00.1655894131.git.kai.huang@intel.com>
+         <069a062e-a4a6-09af-7b74-7f4929f2ec0b@intel.com>
+         <5ce7ebfe54160ea35e432bf50207ebed32db31fc.camel@intel.com>
+         <84e93539-a2f9-f68e-416a-ea3d8fc725af@intel.com>
+         <6bef368ccc68676e4acaecc4b6dc52f598ea7f2f.camel@intel.com>
+         <ea03e55499f556388c0a5f9ed565e72e213c276f.camel@intel.com>
+         <978c3d37-97c9-79b9-426a-2c27db34c38a@intel.com>
+         <0b20f1878d31658a9e3cd3edaf3826fe8731346e.camel@intel.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+User-Agent: Evolution 3.44.3 (3.44.3-1.fc36) 
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <YumMC1hAVpTWLmap@google.com>
-User-Agent: NeoMutt/20171215
-X-Spam-Status: No, score=-4.9 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,SPF_HELO_NONE,
-        SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
+X-Spam-Status: No, score=-5.0 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
+        SPF_HELO_NONE,SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Aug 02, 2022 at 08:41:47PM +0000, Sean Christopherson wrote:
-> On Fri, Jul 15, 2022, Yu Zhang wrote:
-> > Although currently vmx_pf_exception_test can succeed, its
-> > success is actually because we are using identical mappings
-> > in the page tables and EB.PF is not set by L1. In practice,
-> > the #PFs shall be expected by L1, if it is using shadowing
-> > for L2.
-> 
-> I'm a bit lost.  Is there an actual failure somewhere?  AFAICT, this passes when
-> run as L1 or L2, with or without EPT enabled.
+On Thu, 2022-07-21 at 13:52 +1200, Kai Huang wrote:
+> Also, if I understand correctly above, your suggestion is we want to prev=
+ent any
+> CMR memory going offline so it won't be hot-removed (assuming we can get =
+CMRs
+> during boot).=C2=A0 This looks contradicts to the requirement of being ab=
+le to allow
+> moving memory from core-mm to driver.=C2=A0 When we offline the memory, w=
+e cannot
+> know whether the memory will be used by driver, or later hot-removed.
 
-Thanks for your reply, Sean.
+Hi Dave,
 
-There's no failure. But IMHO, there should have been(for the
-vmx_pf_exception_test, not the access test) -  L1 shall expect
-#PF induced VM exits, when it is using shadow for L2.
+The high level flow of device hot-removal is:
 
-B.R.
-Yu
+acpi_scan_hot_remove()
+	-> acpi_scan_try_to_offline()
+		-> acpi_bus_offline()
+			-> device_offline()
+				-> memory_subsys_offline()
+	-> acpi_bus_trim()
+		-> acpi_memory_device_remove()
 
 
-> > So just set up the EPT, and clear the EB.PT, then L1 has the
-> > right to claim a failure if a #PF is encountered.
-> > 
-> > Signed-off-by: Yu Zhang <yu.c.zhang@linux.intel.com>
-> > ---
-> >  x86/vmx_tests.c | 11 +++++++++++
-> >  1 file changed, 11 insertions(+)
-> > 
-> > diff --git a/x86/vmx_tests.c b/x86/vmx_tests.c > > index
-4d581e7..cc90611 100644
-> > --- a/x86/vmx_tests.c
-> > +++ b/x86/vmx_tests.c
-> > @@ -10639,6 +10639,17 @@ static void __vmx_pf_exception_test(invalidate_tlb_t inv_fn, void *data)
-> >  
-> >  static void vmx_pf_exception_test(void)
-> >  {
-> > +	u32 eb;
-> > +
-> > +	if (setup_ept(false)) {
-> > +		printf("EPT not supported.\n");
-> > +		return;
-> > +	}
-> > +
-> > +	eb = vmcs_read(EXC_BITMAP);
-> > +	eb &= ~(1 << PF_VECTOR);
-> > +	vmcs_write(EXC_BITMAP, eb);
-> > +
-> >  	__vmx_pf_exception_test(NULL, NULL);
-> >  }
-> >  
-> > -- 
-> > 2.25.1
-> > 
+And memory_subsys_offline() can also be triggered via /sysfs:
+
+	echo 0 > /sys/devices/system/memory/memory30/online
+
+After the memory block is offline, my understanding is kernel can theoretic=
+ally
+move it to, i.e. ZONE_DEVICE via memremap_pages().
+
+As you can see memory_subsys_offline() is the entry point of memory device
+offline (before it the code is generic for all ACPI device), and it cannot
+distinguish whether the removal is from ACPI event, or from /sysfs, so it s=
+eems
+we are unable to refuse to offline memory in  memory_subsys_offline() when =
+it is
+called from ACPI event.
+
+Any comments?
+
+--=20
+Thanks,
+-Kai
+
+
