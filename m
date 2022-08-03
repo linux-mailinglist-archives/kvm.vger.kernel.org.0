@@ -2,58 +2,57 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 7383C58948B
-	for <lists+kvm@lfdr.de>; Thu,  4 Aug 2022 00:50:11 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 75E1B58948E
+	for <lists+kvm@lfdr.de>; Thu,  4 Aug 2022 00:50:24 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238422AbiHCWuK (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 3 Aug 2022 18:50:10 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37100 "EHLO
+        id S238551AbiHCWuP (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 3 Aug 2022 18:50:15 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37332 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S238292AbiHCWuH (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 3 Aug 2022 18:50:07 -0400
-Received: from mail-pj1-x1049.google.com (mail-pj1-x1049.google.com [IPv6:2607:f8b0:4864:20::1049])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A582122B29
-        for <kvm@vger.kernel.org>; Wed,  3 Aug 2022 15:50:06 -0700 (PDT)
-Received: by mail-pj1-x1049.google.com with SMTP id f16-20020a17090a4a9000b001f234757bbbso7818346pjh.6
-        for <kvm@vger.kernel.org>; Wed, 03 Aug 2022 15:50:06 -0700 (PDT)
+        with ESMTP id S238292AbiHCWuL (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 3 Aug 2022 18:50:11 -0400
+Received: from mail-yw1-x1149.google.com (mail-yw1-x1149.google.com [IPv6:2607:f8b0:4864:20::1149])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 81F3E4D4C2
+        for <kvm@vger.kernel.org>; Wed,  3 Aug 2022 15:50:08 -0700 (PDT)
+Received: by mail-yw1-x1149.google.com with SMTP id 00721157ae682-31f56f635a9so153483947b3.4
+        for <kvm@vger.kernel.org>; Wed, 03 Aug 2022 15:50:08 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
         h=cc:to:from:subject:references:mime-version:message-id:in-reply-to
          :date:reply-to:from:to:cc;
-        bh=BinmiOfwZUwriSfE/jKfvIa+BhtB258YTBKvkrhds/k=;
-        b=YBP8ZqxYF8Tug3wBIRwfnlWJdaehUc5PKJv5CtD3iCzc2O3XCWILD1oDCXoBjRp1um
-         C0sRQtwcLFxC1kudvQYaatAvKPh2MvFWIdmLZz52haz0SX78kS1DjkqZhHtbgr74NoCK
-         4sVXFuM9sChx1HTw4f7iiPubtoYGTxgpEOZZu4X77wUcm6RUEqaZ51XcuHFyeIVulZGI
-         005RFfZ0EE5g8Ho7mPzH3sltKhf7NyA02py+uutV2A7TtSL/TZPpqlIFGOOPUjFOhQZR
-         tAb53vrPImn3C1dwFuYgfwEwjUOoYOAgRsByB9rCoJM/bMnxFtY90apBaysNWQRkM/Vo
-         fT+w==
+        bh=SPa2O+7Mze0bsq8ap8FmcbiFuFSXZGJKxHFkzvC7sT8=;
+        b=mDV2yaRQ40EVKU/eNX/FCSCMbrm3jI3NTGk+xe5bhVD9DzGKwvGcHuXotUJbowBoaE
+         cjVjtTKgs+CH4nn/bvEP5KVZaboce2sBNMMbfqK5N22Xgtj95BsewTqXyj4tixPlQBbJ
+         l3adCyQl/4S9dz7hR29gXjSqueoATUfHAqSZEJPnLhsA3taMs/cB89DrBOigZpQjNgqp
+         A9NALz2pEEzsY/k8KKqZ2eld7+xe8ZT32e4cDLzMxXjPhEDbyrIB4WACv4XOGoNX8mlK
+         Rak3qAyp2O3eDEn9wVvJq8MXcgd95xZKoXMARo54eAS1dPnbfMTY8jfp1AGf8mI69jRP
+         hofQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=cc:to:from:subject:references:mime-version:message-id:in-reply-to
          :date:reply-to:x-gm-message-state:from:to:cc;
-        bh=BinmiOfwZUwriSfE/jKfvIa+BhtB258YTBKvkrhds/k=;
-        b=uUYpyh9pQxp+WJzqWN2fZotU0fAs5bJsG3aeudhg+cEY3y8/3RdAg/kgG8LIJQ7HJB
-         cvUGuqNFHAtGs1I8euN/S0tLPmS4C8P9KT/n0AgONb3kNZyX6s6ycOSBlT8/KRm+5jPR
-         yJ0eEFDMKLab1B4mBjS6+ETFRZrRc4VZLpSPNfBKf3mnEYwUEigZGHDQWPeIdVnrHca3
-         9hga2vsn5gZkPHG7Y9CtilR6EeV47CEj1fhUNlP284Cc9M9DqnxvyhYR3ZX1pS6/IobB
-         ws0DiEgbNMe/nco+bljNZj0A//iBoc9VyarNyW6tgugm5RKv27oKOtlSKOP+Eir95bK5
-         PcYw==
-X-Gm-Message-State: ACgBeo2sdJjm6RP0cBMSLOEkA/es6ypkliqCZ501P1evO8R91WmNw2qz
-        JZdJU/HfokNlTmHRIU2qNaWCPtLWVdc=
-X-Google-Smtp-Source: AA6agR5M1IyGllx0H/SA379auBedhX+CTq+VpjGbPdb4R3jGjkYJceFlhEpLJ6LqPjRjDjPxzOxr3dBAJbU=
+        bh=SPa2O+7Mze0bsq8ap8FmcbiFuFSXZGJKxHFkzvC7sT8=;
+        b=jaFUy+XowH1xB404IemyIkNilRr6XWKdhtkhVajCwWD8GWTPwqSusiEwcRs9pLGxVa
+         fUhQU38f6e8D9OGdfenFEe+D4iY612hEdFK2lBHGdmNlbL/eIAphk3wDw/NlFPtH6//v
+         wqFOhdIhM/ECbrPLWRPJ45JJVd87xIzNmX+/NyOG39l+/FcwuIlZzDu3Wvz8UKjPK2oE
+         1GfkgcNRBIUPWrRbp6U1hqwAvld4D7IbPHCT+ZreZgluUOEngusmP1834eBDLGcAqY1l
+         m32tgwNtzS7EFbVjvENzBrEgVddAONL44onc4iujd652irN2ORTF9t51jyeS7w4cQ/Fj
+         dMww==
+X-Gm-Message-State: ACgBeo1Mgdr2wZAY/VBkjfXpiSCQ2HcCPHPPFH3uvPzErC0jqN8srGZd
+        8rWnBiJsurSYcNCHgXVYDrfzz/aLMyA=
+X-Google-Smtp-Source: AA6agR4vvYuZchZorwqNL4ADWM2SVsdXLpazfIk0/fo45JEQlQw8DGJMrYjsMUzBSUry6w5MQIFt772ped0=
 X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a17:90a:df03:b0:1f3:396c:dd94 with SMTP id
- gp3-20020a17090adf0300b001f3396cdd94mr501620pjb.1.1659567005567; Wed, 03 Aug
- 2022 15:50:05 -0700 (PDT)
+ (user=seanjc job=sendgmr) by 2002:a25:7a82:0:b0:671:6802:fb8d with SMTP id
+ v124-20020a257a82000000b006716802fb8dmr20992881ybc.224.1659567007526; Wed, 03
+ Aug 2022 15:50:07 -0700 (PDT)
 Reply-To: Sean Christopherson <seanjc@google.com>
-Date:   Wed,  3 Aug 2022 22:49:56 +0000
+Date:   Wed,  3 Aug 2022 22:49:57 +0000
 In-Reply-To: <20220803224957.1285926-1-seanjc@google.com>
-Message-Id: <20220803224957.1285926-3-seanjc@google.com>
+Message-Id: <20220803224957.1285926-4-seanjc@google.com>
 Mime-Version: 1.0
 References: <20220803224957.1285926-1-seanjc@google.com>
 X-Mailer: git-send-email 2.37.1.559.g78731f0fdb-goog
-Subject: [PATCH v2 2/3] KVM: x86/mmu: Fully re-evaluate MMIO caching when SPTE
- masks change
+Subject: [PATCH v2 3/3] KVM: SVM: Disable SEV-ES support if MMIO caching is disable
 From:   Sean Christopherson <seanjc@google.com>
 To:     Sean Christopherson <seanjc@google.com>,
         Paolo Bonzini <pbonzini@redhat.com>
@@ -72,104 +71,122 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Fully re-evaluate whether or not MMIO caching can be enabled when SPTE
-masks change; simply clearing enable_mmio_caching when a configuration
-isn't compatible with caching fails to handle the scenario where the
-masks are updated, e.g. by VMX for EPT or by SVM to account for the C-bit
-location, and toggle compatibility from false=>true.
+Disable SEV-ES if MMIO caching is disabled as SEV-ES relies on MMIO SPTEs
+generating #NPF(RSVD), which are reflected by the CPU into the guest as
+a #VC.  With SEV-ES, the untrusted host, a.k.a. KVM, doesn't have access
+to the guest instruction stream or register state and so can't directly
+emulate in response to a #NPF on an emulated MMIO GPA.  Disabling MMIO
+caching means guest accesses to emulated MMIO ranges cause #NPF(!PRESENT),
+and those flavors of #NPF cause automatic VM-Exits, not #VC.
 
-Snapshot the original module param so that re-evaluating MMIO caching
-preserves userspace's desire to allow caching.  Use a snapshot approach
-so that enable_mmio_caching still reflects KVM's actual behavior.
+Adjust KVM's MMIO masks to account for the C-bit location prior to doing
+SEV(-ES) setup, and document that dependency between adjusting the MMIO
+SPTE mask and SEV(-ES) setup.
 
-Fixes: 8b9e74bfbf8c ("KVM: x86/mmu: Use enable_mmio_caching to track if MMIO caching is enabled")
+Fixes: b09763da4dd8 ("KVM: x86/mmu: Add module param to disable MMIO caching (for testing)")
 Reported-by: Michael Roth <michael.roth@amd.com>
+Tested-by: Michael Roth <michael.roth@amd.com>
 Cc: Tom Lendacky <thomas.lendacky@amd.com>
 Cc: stable@vger.kernel.org
-Tested-by: Michael Roth <michael.roth@amd.com>
 Signed-off-by: Sean Christopherson <seanjc@google.com>
 ---
- arch/x86/kvm/mmu/mmu.c  |  4 ++++
- arch/x86/kvm/mmu/spte.c | 19 +++++++++++++++++++
- arch/x86/kvm/mmu/spte.h |  1 +
- 3 files changed, 24 insertions(+)
+ arch/x86/kvm/mmu.h      |  2 ++
+ arch/x86/kvm/mmu/spte.c |  1 +
+ arch/x86/kvm/mmu/spte.h |  2 --
+ arch/x86/kvm/svm/sev.c  | 10 ++++++++++
+ arch/x86/kvm/svm/svm.c  |  9 ++++++---
+ 5 files changed, 19 insertions(+), 5 deletions(-)
 
-diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
-index bf808107a56b..48f34016cb0b 100644
---- a/arch/x86/kvm/mmu/mmu.c
-+++ b/arch/x86/kvm/mmu/mmu.c
-@@ -6699,11 +6699,15 @@ static int set_nx_huge_pages(const char *val, const struct kernel_param *kp)
- /*
-  * nx_huge_pages needs to be resolved to true/false when kvm.ko is loaded, as
-  * its default value of -1 is technically undefined behavior for a boolean.
-+ * Forward the module init call to SPTE code so that it too can handle module
-+ * params that need to be resolved/snapshot.
-  */
- void __init kvm_mmu_x86_module_init(void)
- {
- 	if (nx_huge_pages == -1)
- 		__set_nx_huge_pages(get_nx_auto_mode());
-+
-+	kvm_mmu_spte_module_init();
- }
+diff --git a/arch/x86/kvm/mmu.h b/arch/x86/kvm/mmu.h
+index a99acec925eb..6bdaacb6faa0 100644
+--- a/arch/x86/kvm/mmu.h
++++ b/arch/x86/kvm/mmu.h
+@@ -6,6 +6,8 @@
+ #include "kvm_cache_regs.h"
+ #include "cpuid.h"
  
- /*
++extern bool __read_mostly enable_mmio_caching;
++
+ #define PT_WRITABLE_SHIFT 1
+ #define PT_USER_SHIFT 2
+ 
 diff --git a/arch/x86/kvm/mmu/spte.c b/arch/x86/kvm/mmu/spte.c
-index 7314d27d57a4..66f76f5a15bd 100644
+index 66f76f5a15bd..03ca740bf721 100644
 --- a/arch/x86/kvm/mmu/spte.c
 +++ b/arch/x86/kvm/mmu/spte.c
-@@ -20,6 +20,7 @@
- #include <asm/vmx.h>
- 
+@@ -22,6 +22,7 @@
  bool __read_mostly enable_mmio_caching = true;
-+static bool __ro_after_init allow_mmio_caching;
+ static bool __ro_after_init allow_mmio_caching;
  module_param_named(mmio_caching, enable_mmio_caching, bool, 0444);
++EXPORT_SYMBOL_GPL(enable_mmio_caching);
  
  u64 __read_mostly shadow_host_writable_mask;
-@@ -43,6 +44,18 @@ u64 __read_mostly shadow_nonpresent_or_rsvd_lower_gfn_mask;
- 
- u8 __read_mostly shadow_phys_bits;
- 
-+void __init kvm_mmu_spte_module_init(void)
-+{
-+	/*
-+	 * Snapshot userspace's desire to allow MMIO caching.  Whether or not
-+	 * KVM can actually enable MMIO caching depends on vendor-specific
-+	 * hardware capabilities and other module params that can't be resolved
-+	 * until the vendor module is loaded, i.e. enable_mmio_caching can and
-+	 * will change when the vendor module is (re)loaded.
-+	 */
-+	allow_mmio_caching = enable_mmio_caching;
-+}
-+
- static u64 generation_mmio_spte_mask(u64 gen)
- {
- 	u64 mask;
-@@ -340,6 +353,12 @@ void kvm_mmu_set_mmio_spte_mask(u64 mmio_value, u64 mmio_mask, u64 access_mask)
- 	BUG_ON((u64)(unsigned)access_mask != access_mask);
- 	WARN_ON(mmio_value & shadow_nonpresent_or_rsvd_lower_gfn_mask);
- 
-+	/*
-+	 * Reset to the original module param value to honor userspace's desire
-+	 * to (dis)allow MMIO caching.  Update the param itself so that
-+	 * userspace can see whether or not KVM is actually using MMIO caching.
-+	 */
-+	enable_mmio_caching = allow_mmio_caching;
- 	if (!enable_mmio_caching)
- 		mmio_value = 0;
- 
+ u64 __read_mostly shadow_mmu_writable_mask;
 diff --git a/arch/x86/kvm/mmu/spte.h b/arch/x86/kvm/mmu/spte.h
-index cabe3fbb4f39..26b144ffd146 100644
+index 26b144ffd146..9a9414b8d1d6 100644
 --- a/arch/x86/kvm/mmu/spte.h
 +++ b/arch/x86/kvm/mmu/spte.h
-@@ -450,6 +450,7 @@ static inline u64 restore_acc_track_spte(u64 spte)
+@@ -5,8 +5,6 @@
  
- u64 kvm_mmu_changed_pte_notifier_make_spte(u64 old_spte, kvm_pfn_t new_pfn);
+ #include "mmu_internal.h"
  
-+void __init kvm_mmu_spte_module_init(void);
- void kvm_mmu_reset_all_pte_masks(void);
+-extern bool __read_mostly enable_mmio_caching;
+-
+ /*
+  * A MMU present SPTE is backed by actual memory and may or may not be present
+  * in hardware.  E.g. MMIO SPTEs are not considered present.  Use bit 11, as it
+diff --git a/arch/x86/kvm/svm/sev.c b/arch/x86/kvm/svm/sev.c
+index b0e793e7d85c..28064060413a 100644
+--- a/arch/x86/kvm/svm/sev.c
++++ b/arch/x86/kvm/svm/sev.c
+@@ -22,6 +22,7 @@
+ #include <asm/trapnr.h>
+ #include <asm/fpu/xcr.h>
  
- #endif
++#include "mmu.h"
+ #include "x86.h"
+ #include "svm.h"
+ #include "svm_ops.h"
+@@ -2221,6 +2222,15 @@ void __init sev_hardware_setup(void)
+ 	if (!sev_es_enabled)
+ 		goto out;
+ 
++	/*
++	 * SEV-ES requires MMIO caching as KVM doesn't have access to the guest
++	 * instruction stream, i.e. can't emulate in response to a #NPF and
++	 * instead relies on #NPF(RSVD) being reflected into the guest as #VC
++	 * (the guest can then do a #VMGEXIT to request MMIO emulation).
++	 */
++	if (!enable_mmio_caching)
++		goto out;
++
+ 	/* Does the CPU support SEV-ES? */
+ 	if (!boot_cpu_has(X86_FEATURE_SEV_ES))
+ 		goto out;
+diff --git a/arch/x86/kvm/svm/svm.c b/arch/x86/kvm/svm/svm.c
+index 38f873cb6f2c..f3813dbacb9f 100644
+--- a/arch/x86/kvm/svm/svm.c
++++ b/arch/x86/kvm/svm/svm.c
+@@ -5034,13 +5034,16 @@ static __init int svm_hardware_setup(void)
+ 	/* Setup shadow_me_value and shadow_me_mask */
+ 	kvm_mmu_set_me_spte_mask(sme_me_mask, sme_me_mask);
+ 
+-	/* Note, SEV setup consumes npt_enabled. */
++	svm_adjust_mmio_mask();
++
++	/*
++	 * Note, SEV setup consumes npt_enabled and enable_mmio_caching (which
++	 * may be modified by svm_adjust_mmio_mask()).
++	 */
+ 	sev_hardware_setup();
+ 
+ 	svm_hv_hardware_setup();
+ 
+-	svm_adjust_mmio_mask();
+-
+ 	for_each_possible_cpu(cpu) {
+ 		r = svm_cpu_init(cpu);
+ 		if (r)
 -- 
 2.37.1.559.g78731f0fdb-goog
 
