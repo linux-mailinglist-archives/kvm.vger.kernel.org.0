@@ -2,65 +2,46 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 69880588AE3
-	for <lists+kvm@lfdr.de>; Wed,  3 Aug 2022 13:08:11 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id CAAAB588AF2
+	for <lists+kvm@lfdr.de>; Wed,  3 Aug 2022 13:12:25 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235889AbiHCLII (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 3 Aug 2022 07:08:08 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35302 "EHLO
+        id S233974AbiHCLMY (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 3 Aug 2022 07:12:24 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38038 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230272AbiHCLIF (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 3 Aug 2022 07:08:05 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 685011AD83
-        for <kvm@vger.kernel.org>; Wed,  3 Aug 2022 04:08:02 -0700 (PDT)
+        with ESMTP id S231218AbiHCLMW (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 3 Aug 2022 07:12:22 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id A9C3613D1A
+        for <kvm@vger.kernel.org>; Wed,  3 Aug 2022 04:12:21 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1659524877;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=OcEGkV3/zb941iwtTvPuEZEmPDY+7QrxrqNr180ZZIM=;
-        b=EXnBTWgk7q4UR1FObTR1KXDcuaKuwLX50/tFmOEHCpAt6jUH95j3gJOdyInQ3gHt7/OXPP
-        PHb6VMjYuE1iLmzmYdQB60urU5gNs6qzGvQYhj57d07DYFWFLo81I61ycSVFqsm5FSdGDH
-        CGmVmBMEJGhYSUgIf3ii3QyafapZAqs=
-Received: from mail-il1-f199.google.com (mail-il1-f199.google.com
- [209.85.166.199]) by relay.mimecast.com with ESMTP with STARTTLS
+        s=mimecast20190719; t=1659525140;
+        h=from:from:reply-to:reply-to:subject:subject:date:date:
+         message-id:message-id:to:to:cc:cc:mime-version:mime-version:
+         content-type:content-type:in-reply-to:in-reply-to:  references:references;
+        bh=UVLsaq8vm6rwHmKpwoi0S+QiSXhLzFWkEp/HUF0ol+g=;
+        b=gbenNWR5QclK5p8VXKVfacI7oIknwBZAg32NMfcPES489pFtKCrhB05ZNwAgUNJHvpHGPP
+        g2ZDvZ9UkN9Ay0iqYU0JNKs/NZleBpVHVMC/p61VcHRHzOP8bTbN39v9zv5Ve3muJ6oPbq
+        ViAEujgkMJE0UhQFnWW/9Wfw4tHE0nU=
+Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
+ [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-644-lSrXrvr0MwqyaDXHpvg1JA-1; Wed, 03 Aug 2022 07:07:56 -0400
-X-MC-Unique: lSrXrvr0MwqyaDXHpvg1JA-1
-Received: by mail-il1-f199.google.com with SMTP id m7-20020a056e021c2700b002ddc7d2d529so10222917ilh.9
-        for <kvm@vger.kernel.org>; Wed, 03 Aug 2022 04:07:56 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=OcEGkV3/zb941iwtTvPuEZEmPDY+7QrxrqNr180ZZIM=;
-        b=mB/Xr3KspGEodyQr/NVJ7BJgeD3BKZonyc66h0G57Nh3rhpgZOosBm6tCa5DLJPuV6
-         /GMngUeo2cktmLUB0QjpGedUCL6vUWHmBPiCaa5UpoOEONFrmgbgPWfnXekZf9UY3rz0
-         KjNMA2YBXCoFc7ENzj0dfr8MT1z8/Ie3XwXSSr6/DRr21uVSUDUp+Ft+YJ1G20fA27mC
-         SN2BW9ljn7cIqJnPqwkrEuRXFK0QGvm4TUyJLrcb5grX1JS+yQ9rGHyKyvuS1U+Q+dna
-         cudM+KiLq+/UNxEMl8yCD//rYTYa3k7TMCMHXlsAVLbYHtdMz31ZbM9FVlYNMHsDAYXA
-         J01A==
-X-Gm-Message-State: AJIora+WTrC/v4Im7ZSk899W9/8j5kTh3sMr3VsMiNbFgbPkqVlcFqlp
-        ezcbZTtgzV5lNE84ZYeE9+gH8f2Pnqtpl37QTNG95WfDq4wWDCZcfJf0vLet4Ag7n9GS58aej4d
-        aRkV/JGVF+lvFBRVm3eiOn8pABVgg
-X-Received: by 2002:a05:6602:15c8:b0:67c:45c7:40c9 with SMTP id f8-20020a05660215c800b0067c45c740c9mr8972988iow.138.1659524875505;
-        Wed, 03 Aug 2022 04:07:55 -0700 (PDT)
-X-Google-Smtp-Source: AGRyM1sIC6UsjJFVZWXBncAJfjfkGBkh360OVyksDTVgRe9qvGO4zJpINBXeKgqj4Vm5Jwl/M2m4t3qQIO9kZjook7k=
-X-Received: by 2002:a05:6602:15c8:b0:67c:45c7:40c9 with SMTP id
- f8-20020a05660215c800b0067c45c740c9mr8972980iow.138.1659524875284; Wed, 03
- Aug 2022 04:07:55 -0700 (PDT)
-MIME-Version: 1.0
-References: <20220729130040.1428779-1-afaria@redhat.com> <20220729130040.1428779-3-afaria@redhat.com>
- <YupSAhFRK962i+nL@work-vm>
-In-Reply-To: <YupSAhFRK962i+nL@work-vm>
-From:   Alberto Faria <afaria@redhat.com>
-Date:   Wed, 3 Aug 2022 12:07:19 +0100
-Message-ID: <CAELaAXyh0MzuVzDCfhC8hJNAwb=niwFRsXqhc63JiWGxxitkqg@mail.gmail.com>
-Subject: Re: [RFC v2 02/10] Drop unused static function return values
+ us-mta-339-mAJdp3ugOqCWA1koI0CIxA-1; Wed, 03 Aug 2022 07:12:19 -0400
+X-MC-Unique: mAJdp3ugOqCWA1koI0CIxA-1
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.rdu2.redhat.com [10.11.54.8])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 3F900185A794;
+        Wed,  3 Aug 2022 11:12:18 +0000 (UTC)
+Received: from redhat.com (unknown [10.33.36.173])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id 2CBEDC28100;
+        Wed,  3 Aug 2022 11:12:07 +0000 (UTC)
+Date:   Wed, 3 Aug 2022 12:12:01 +0100
+From:   Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
 To:     "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Cc:     Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org,
-        =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@redhat.com>,
+Cc:     Alberto Faria <afaria@redhat.com>,
+        Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org,
+        =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>,
         Stefano Garzarella <sgarzare@redhat.com>,
         Hannes Reinecke <hare@suse.com>,
         Vladimir Sementsov-Ogievskiy <vsementsov@yandex-team.ru>,
@@ -72,8 +53,7 @@ Cc:     Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org,
         Jeff Cody <codyprime@gmail.com>,
         Eric Blake <eblake@redhat.com>,
         "Denis V. Lunev" <den@openvz.org>,
-        =?UTF-8?Q?Daniel_P=2E_Berrang=C3=A9?= <berrange@redhat.com>,
-        =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>,
+        Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <f4bug@amsat.org>,
         Christian Schoenebeck <qemu_oss@crudebyte.com>,
         Stefan Weil <sw@weilnetz.de>, Klaus Jensen <its@irrelevant.dk>,
         Laurent Vivier <lvivier@redhat.com>,
@@ -101,12 +81,23 @@ Cc:     Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org,
         Eduardo Habkost <eduardo@habkost.net>,
         Fam Zheng <fam@euphon.net>, Thomas Huth <thuth@redhat.com>,
         Keith Busch <kbusch@kernel.org>,
-        =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>,
+        Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>,
         "Richard W.M. Jones" <rjones@redhat.com>,
         John Snow <jsnow@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
-X-Spam-Status: No, score=-2.7 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+Subject: Re: [RFC v2 02/10] Drop unused static function return values
+Message-ID: <YupYAXJTkSSwOTgV@redhat.com>
+Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+References: <20220729130040.1428779-1-afaria@redhat.com>
+ <20220729130040.1428779-3-afaria@redhat.com>
+ <YupSAhFRK962i+nL@work-vm>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <YupSAhFRK962i+nL@work-vm>
+User-Agent: Mutt/2.2.6 (2022-06-05)
+X-Scanned-By: MIMEDefang 2.85 on 10.11.54.8
+X-Spam-Status: No, score=-3.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,
         SPF_HELO_NONE,SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -114,29 +105,27 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Aug 3, 2022 at 11:46 AM Dr. David Alan Gilbert
-<dgilbert@redhat.com> wrote:
->
+On Wed, Aug 03, 2022 at 11:46:26AM +0100, Dr. David Alan Gilbert wrote:
 > * Alberto Faria (afaria@redhat.com) wrote:
 > > Make non-void static functions whose return values are ignored by
 > > all callers return void instead.
-> >
+> > 
 > > These functions were found by static-analyzer.py.
-> >
+> > 
 > > Not all occurrences of this problem were fixed.
-> >
+> > 
 > > Signed-off-by: Alberto Faria <afaria@redhat.com>
->
+> 
 > <snip>
->
+> 
 > > diff --git a/migration/migration.c b/migration/migration.c
 > > index e03f698a3c..4698080f96 100644
 > > --- a/migration/migration.c
 > > +++ b/migration/migration.c
 > > @@ -175,7 +175,7 @@ static MigrationIncomingState *current_incoming;
-> >
+> >  
 > >  static GSList *migration_blockers;
-> >
+> >  
 > > -static bool migration_object_check(MigrationState *ms, Error **errp);
 > > +static void migration_object_check(MigrationState *ms, Error **errp);
 > >  static int migration_maybe_pause(MigrationState *s,
@@ -149,35 +138,35 @@ On Wed, Aug 3, 2022 at 11:46 AM Dr. David Alan Gilbert
 > > -static bool migration_object_check(MigrationState *ms, Error **errp)
 > > +static void migration_object_check(MigrationState *ms, Error **errp)
 > >  {
->
+> 
 > I'm not sure if this is a good change.
 > Where we have a function that returns an error via an Error ** it's
 > normal practice for us to return a bool to say whether it generated an
 > error.
->
+> 
 > Now, in our case we only call it with error_fatal:
->
+> 
 >     migration_object_check(current_migration, &error_fatal);
->
+> 
 > so the bool isn't used/checked.
->
+> 
 > So I'm a bit conflicted:
->
+> 
 >   a) Using error_fatal is the easiest way to handle this function
 >   b) Things taking Error ** normally do return a flag value
 >   c) But it's not used in this case.
->
-> Hmm.
 
-I guess this generalizes to the bigger question of whether a global
-"return-value-never-used" check makes sense and brings value. Maybe
-there are too many cases where it would be preferable to keep the
-return value for consistency? Maybe they're not that many and could be
-tagged with __attribute__((unused))?
+Yep, migration_object_check is following our recommended design
+pattern for error reporting. It is valid to either check the
+return value, or pass error_fatal / error_abort.
 
-But in this particular case, perhaps we could drop the Error **errp
-parameter and directly pass &error_fatal to migrate_params_check() and
-migrate_caps_check().
+The fact that no /current/ callers happen to check the return
+value is not a reason to make it 'void'.
 
-Alberto
+With regards,
+Daniel
+-- 
+|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
+|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
+|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
 
