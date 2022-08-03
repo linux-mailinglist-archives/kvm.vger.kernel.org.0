@@ -2,113 +2,147 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 7543858861B
-	for <lists+kvm@lfdr.de>; Wed,  3 Aug 2022 05:56:02 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 423D45886D9
+	for <lists+kvm@lfdr.de>; Wed,  3 Aug 2022 07:41:53 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234626AbiHCD4A (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 2 Aug 2022 23:56:00 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37354 "EHLO
+        id S235850AbiHCFlv (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 3 Aug 2022 01:41:51 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38078 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231321AbiHCDz5 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 2 Aug 2022 23:55:57 -0400
-Received: from mga17.intel.com (mga17.intel.com [192.55.52.151])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id ECCD61C132;
-        Tue,  2 Aug 2022 20:55:56 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1659498956; x=1691034956;
-  h=message-id:date:mime-version:subject:to:cc:references:
-   from:in-reply-to:content-transfer-encoding;
-  bh=Yed2xDQxcr169RPtxD0uw3z2E263LSsDStAx8f8VF3c=;
-  b=fi2oFDsNikcOF7QXdA7cKBdnFrofQugjsNDdhCWOsovzmuK4X4np/3lL
-   NToq3Se/WY8EfBQAOkiV1I+ap7/3aR7OIYbZPA2mPVE+0gGQ+w+udU1kI
-   8zrmP87Z7e7Ko1zfWxKY+QY2bwFaXbcrD+y94cU4gGJ12lGs8wAseEB1Y
-   5IJrKX+PSgoMvlo/ERBiuOseSmkKygrdJaJ/uTICEKuEzgv8mn5dXVzxP
-   c8Iune3jh3sQFtZa5Dx0hhAxmeHBLM5cMYX+AMZ/tXHJWb+BhBep2c0ly
-   aea3ehSGLsGzvi+vmPkFj8DqG1ai9aI0cwjFggG+rO0P/UllQLErS151n
-   w==;
-X-IronPort-AV: E=McAfee;i="6400,9594,10427"; a="269955785"
-X-IronPort-AV: E=Sophos;i="5.93,213,1654585200"; 
-   d="scan'208";a="269955785"
-Received: from fmsmga008.fm.intel.com ([10.253.24.58])
-  by fmsmga107.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 02 Aug 2022 20:55:56 -0700
-X-IronPort-AV: E=Sophos;i="5.93,213,1654585200"; 
-   d="scan'208";a="661904672"
-Received: from wmoon-mobl.gar.corp.intel.com (HELO [10.255.29.176]) ([10.255.29.176])
-  by fmsmga008-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 02 Aug 2022 20:55:51 -0700
-Message-ID: <27de096d-4386-fb46-fd6d-229bea7b7a4a@linux.intel.com>
-Date:   Wed, 3 Aug 2022 11:55:49 +0800
+        with ESMTP id S235844AbiHCFlu (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 3 Aug 2022 01:41:50 -0400
+Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7A32F550A8
+        for <kvm@vger.kernel.org>; Tue,  2 Aug 2022 22:41:49 -0700 (PDT)
+Received: from pps.filterd (m0098409.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.17.1.5/8.17.1.5) with ESMTP id 2735SrZI028659
+        for <kvm@vger.kernel.org>; Wed, 3 Aug 2022 05:41:49 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=content-type :
+ mime-version : content-transfer-encoding : in-reply-to : references : cc :
+ to : subject : from : message-id : date; s=pp1;
+ bh=LyCE+3zsj8ebl+/2SYVtylg+zfCBK962s66FGf8pISY=;
+ b=RlRvQeQKDQ+hZSFBiYqEPuF1V8CvzQg2lb8OWYiG5eewMFEogezpQOWWHbeEeLFPPsNs
+ OXQehymW1hDgBCzE+gos/cLilL3bKSZz2fLd6fPhrc/97dMu3yUHxJlkpsvQcKP3SBfE
+ RLOdSqMMfLorTFdqn0eHcONmRGToMbFW1nHwuQ7HkdZypMqnh8/j7DpYQ/Fp5yNFXt5c
+ 1UYAC/l6ueBkzOhmJbIbnsn6saUxiXW7AYEAVj9xAhxLJmYsscLuT04RsYVXFXydpHcq
+ c+Mg2ySH/8VhDwbOYfdXcgGwF7zb3ZFlD4nu/9aJF5b8UIa6UNPwwSHJ4YX9TaDTbS25 HQ== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3hqjwfre94-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT)
+        for <kvm@vger.kernel.org>; Wed, 03 Aug 2022 05:41:49 +0000
+Received: from m0098409.ppops.net (m0098409.ppops.net [127.0.0.1])
+        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 2735TKIo029221
+        for <kvm@vger.kernel.org>; Wed, 3 Aug 2022 05:41:48 GMT
+Received: from ppma03fra.de.ibm.com (6b.4a.5195.ip4.static.sl-reverse.com [149.81.74.107])
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3hqjwfre81-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Wed, 03 Aug 2022 05:41:48 +0000
+Received: from pps.filterd (ppma03fra.de.ibm.com [127.0.0.1])
+        by ppma03fra.de.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 2735b03D024731;
+        Wed, 3 Aug 2022 05:41:46 GMT
+Received: from b06avi18878370.portsmouth.uk.ibm.com (b06avi18878370.portsmouth.uk.ibm.com [9.149.26.194])
+        by ppma03fra.de.ibm.com with ESMTP id 3hmv98uamj-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Wed, 03 Aug 2022 05:41:45 +0000
+Received: from d06av22.portsmouth.uk.ibm.com (d06av22.portsmouth.uk.ibm.com [9.149.105.58])
+        by b06avi18878370.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 2735fw6h32047574
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Wed, 3 Aug 2022 05:41:58 GMT
+Received: from d06av22.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id B815F4C046;
+        Wed,  3 Aug 2022 05:41:42 +0000 (GMT)
+Received: from d06av22.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 9518E4C044;
+        Wed,  3 Aug 2022 05:41:42 +0000 (GMT)
+Received: from li-ca45c2cc-336f-11b2-a85c-c6e71de567f1.ibm.com (unknown [9.171.22.238])
+        by d06av22.portsmouth.uk.ibm.com (Postfix) with ESMTP;
+        Wed,  3 Aug 2022 05:41:42 +0000 (GMT)
+Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
- Thunderbird/102.1.0
-Subject: Re: [PATCH v5 02/22] cc_platform: Add new attribute to prevent ACPI
- CPU hotplug
-To:     Kai Huang <kai.huang@intel.com>, linux-kernel@vger.kernel.org,
-        kvm@vger.kernel.org
-Cc:     linux-acpi@vger.kernel.org, seanjc@google.com, pbonzini@redhat.com,
-        dave.hansen@intel.com, len.brown@intel.com, tony.luck@intel.com,
-        rafael.j.wysocki@intel.com, reinette.chatre@intel.com,
-        dan.j.williams@intel.com, peterz@infradead.org, ak@linux.intel.com,
-        kirill.shutemov@linux.intel.com,
-        sathyanarayanan.kuppuswamy@linux.intel.com,
-        isaku.yamahata@intel.com, thomas.lendacky@amd.com,
-        Tianyu.Lan@microsoft.com, rdunlap@infradead.org, Jason@zx2c4.com,
-        juri.lelli@redhat.com, mark.rutland@arm.com, frederic@kernel.org,
-        yuehaibing@huawei.com, dongli.zhang@oracle.com
-References: <cover.1655894131.git.kai.huang@intel.com>
- <f4bff93d83814ea1f54494f51ce3e5d954cf0f5b.1655894131.git.kai.huang@intel.com>
-From:   Binbin Wu <binbin.wu@linux.intel.com>
-In-Reply-To: <f4bff93d83814ea1f54494f51ce3e5d954cf0f5b.1655894131.git.kai.huang@intel.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-4.9 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_DNSWL_MED,
-        SPF_HELO_NONE,SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
+Content-Transfer-Encoding: quoted-printable
+In-Reply-To: <20220802181420.7444039f@p-imbrenda>
+References: <20220802145102.128841-1-nrb@linux.ibm.com> <20220802181420.7444039f@p-imbrenda>
+Cc:     kvm@vger.kernel.org, frankja@linux.ibm.com, thuth@redhat.com
+To:     Claudio Imbrenda <imbrenda@linux.ibm.com>
+Subject: Re: [kvm-unit-tests PATCH v1] s390x: verify EQBS/SQBS is unavailable
+From:   Nico Boehr <nrb@linux.ibm.com>
+Message-ID: <165950530239.11298.11374325126507764794@localhost.localdomain>
+User-Agent: alot/0.8.1
+Date:   Wed, 03 Aug 2022 07:41:42 +0200
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: X8B0up-ejsRe4Ni8ksdlWrcQ1Mrnjo6h
+X-Proofpoint-ORIG-GUID: LYiHTe5HWc-VWp1qouSwBLtY8zB85BOG
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.205,Aquarius:18.0.883,Hydra:6.0.517,FMLib:17.11.122.1
+ definitions=2022-08-03_03,2022-08-02_01,2022-06-22_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 adultscore=0 impostorscore=0
+ mlxlogscore=873 spamscore=0 lowpriorityscore=0 malwarescore=0
+ clxscore=1015 phishscore=0 suspectscore=0 priorityscore=1501 mlxscore=0
+ bulkscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2206140000 definitions=main-2208030028
+X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_EF,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_PASS
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+Quoting Claudio Imbrenda (2022-08-02 18:14:20)
+[...]
+> > diff --git a/s390x/intercept.c b/s390x/intercept.c
+> > index 9e826b6c79ad..73b06b5fc6e8 100644
+> > --- a/s390x/intercept.c
+> > +++ b/s390x/intercept.c
+> > @@ -197,6 +197,55 @@ static void test_diag318(void)
+> > =20
+> >  }
+> > =20
+> > +static inline int sqbs(u64 token)
+> > +{
+> > +     unsigned long _token =3D token;
+> > +     int cc;
+> > +
+> > +     asm volatile(
+> > +             "       lgr 1,%[token]\n"
+> > +             "       .insn   rsy,0xeb000000008a,0,0,0(0)\n"
+> > +             "       ipm %[cc]\n"
+> > +             "       srl %[cc],28\n"
+> > +             : [cc] "=3D&d" (cc)
+>=20
+> do you really need all those extra things?
+>=20
+> can't you just reduce this whole function to:
+>=20
+> asm volatile("  .insn   rsy,0xeb000000008a,0,0,0(0)\n");
+>=20
+> in the end we don't care what happens, we only want it to fail with an
+> operation exception
+>=20
+> (ok maybe you need to add some clobbers to make sure things work as
+> they should in case the instruction is actually executed)
 
-On 2022/6/22 19:15, Kai Huang wrote:
->   
-> @@ -357,6 +358,17 @@ static int acpi_processor_add(struct acpi_device *device,
->   	struct device *dev;
->   	int result = 0;
->   
-> +	/*
-> +	 * If the confidential computing platform doesn't support ACPI
-> +	 * memory hotplug, the BIOS should never deliver such event to
-memory or cpu hotplug?
+I don't mind changing that, will do.
 
+[...]
+> > +static void test_qbs(void)
+> > +{
+> > +     report_prefix_push("sqbs");
+> > +     expect_pgm_int();
+> > +     sqbs(0xffffffdeadbeefULL);
+> > +     check_pgm_int_code(PGM_INT_CODE_OPERATION);
+> > +     report_prefix_pop();
+> > +
+> > +     report_prefix_push("eqbs");
+> > +     expect_pgm_int();
+> > +     eqbs(0xffffffdeadbeefULL);
+> > +     check_pgm_int_code(PGM_INT_CODE_OPERATION);
+> > +     report_prefix_pop();
+> > +}
+>=20
+> we expect those to fail only in qemu, right?
+> maybe this should be fenced and skip the tests when running in other
+> environments
 
-> +	 * the kernel.  Report ACPI CPU hot-add as a BIOS bug and ignore
-> +	 * the new CPU.
-> +	 */
-> +	if (cc_platform_has(CC_ATTR_ACPI_CPU_HOTPLUG_DISABLED)) {
-> +		dev_err(&device->dev, "[BIOS bug]: Platform doesn't support ACPI CPU hotplug.  New CPU ignored.\n");
-> +		return -EINVAL;
-> +	}
-> +
->   	pr = kzalloc(sizeof(struct acpi_processor), GFP_KERNEL);
->   	if (!pr)
->   		return -ENOMEM;
-> @@ -434,6 +446,17 @@ static void acpi_processor_remove(struct acpi_device *device)
->   	if (!device || !acpi_driver_data(device))
->   		return;
->   
-> +	/*
-> +	 * The confidential computing platform is broken if ACPI memory
-ditto
-
-
-> +	 * hot-removal isn't supported but it happened anyway.  Assume
-> +	 * it's not guaranteed that the kernel can continue to work
-> +	 * normally.  Just BUG().
-> +	 */
-> +	if (cc_platform_has(CC_ATTR_ACPI_CPU_HOTPLUG_DISABLED)) {
-> +		dev_err(&device->dev, "Platform doesn't support ACPI CPU hotplug. BUG().\n");
-> +		BUG();
-> +	}
->
+OK will do.
