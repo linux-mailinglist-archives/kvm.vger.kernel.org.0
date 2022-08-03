@@ -2,117 +2,141 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 99C9D588C17
-	for <lists+kvm@lfdr.de>; Wed,  3 Aug 2022 14:29:55 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 5F670588C22
+	for <lists+kvm@lfdr.de>; Wed,  3 Aug 2022 14:31:05 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237983AbiHCM3y (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 3 Aug 2022 08:29:54 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36382 "EHLO
+        id S235368AbiHCMbD (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 3 Aug 2022 08:31:03 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38190 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S237945AbiHCM3x (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 3 Aug 2022 08:29:53 -0400
-Received: from mail-pf1-x435.google.com (mail-pf1-x435.google.com [IPv6:2607:f8b0:4864:20::435])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7B908FD0D;
-        Wed,  3 Aug 2022 05:29:52 -0700 (PDT)
-Received: by mail-pf1-x435.google.com with SMTP id f192so6856476pfa.9;
-        Wed, 03 Aug 2022 05:29:52 -0700 (PDT)
+        with ESMTP id S238107AbiHCMaz (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 3 Aug 2022 08:30:55 -0400
+Received: from mail-yw1-x1135.google.com (mail-yw1-x1135.google.com [IPv6:2607:f8b0:4864:20::1135])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3E5BE13D5B
+        for <kvm@vger.kernel.org>; Wed,  3 Aug 2022 05:30:54 -0700 (PDT)
+Received: by mail-yw1-x1135.google.com with SMTP id 00721157ae682-31f41584236so169669247b3.5
+        for <kvm@vger.kernel.org>; Wed, 03 Aug 2022 05:30:54 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=message-id:date:mime-version:user-agent:subject:content-language:to
-         :cc:references:from:in-reply-to:content-transfer-encoding;
-        bh=G9PkH1/+GSbUEltcAckBvLGPMw9ebhk3UR1knPNLOvw=;
-        b=H/bRb9Kwk/bGwyd2hcLSttkHtaI3MrIO/s2OzV56iHRYxjMs0qsifuzdE7dX4IvKEE
-         nmvpYl5ku3U9U63wrULY1ffbd+IfBIMrqR06i/fHa6VWO+enWRu0UUfus6ce/HT32isN
-         JEhQzAFoOmtPgrl4MiuRuVJjFEE5i71LFV2nHkUN6w9TdY4Xwt1T1phEuQVyp/p2o7vL
-         AaEs/wRTz8U2Hq+c4OKSRz89SVEoCHqVebYOHIU6w6x+Y1VZDFxiAvGVvlbrNDDV4BMJ
-         vGrxgKGp46R+eR7J5d6k6pI1TZS0RBCPKisPmsfMIZCc5OWd1u0TzgDsEOnAK3zj584n
-         QB3Q==
+        d=linaro.org; s=google;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc;
+        bh=EnEMZUisXgxKUeKdBWNakeH0nco9cqyUMj7sIOSeHts=;
+        b=wBjZ4EWoT3IXM2rvQgo/t7iMO7Z6AqfGm1GIQmNIFjGGTHlyeJG7j1I2OSrRNvcZI4
+         24k2WM2IKnHBV+ZCeUtBpy9JaD4ym2P6O+Sx6iXEqf2s+MM7dXPgBrJhpqxTlshnWOMT
+         /XRRnl44vtKcEGy1+RuPHeeVZJb9bUtlui8lVbF4jDWRWBfRpg9A9wh22QqGgYpyZro9
+         6mPOg56X+aQwz5+G9KEi4Ju7IBHwv2yJCyMFsdag7FlqLd4YMjaQmfBhB889xA+9o19G
+         YBs3fUN7HMTCdp4gc1AwBypOKpTd50FqXhhWGSbE7h8UTKaX2R5dZPh3u2SRGxGR64Xy
+         7m6w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
-         :content-language:to:cc:references:from:in-reply-to
-         :content-transfer-encoding;
-        bh=G9PkH1/+GSbUEltcAckBvLGPMw9ebhk3UR1knPNLOvw=;
-        b=YJZe+a5yyq9boiCjSG0L/oKfJxEsqecg0yRFyzQ9lqBcxvmhGnTT0cvlyS6k5qT/F/
-         FwuVNdpoYorXpvBgTlWvXZJAmpJJ01N/48EcSuawaz4vQOZtz4tKSAmMJ121Ou0FgHaQ
-         UjSqED9ayE5VngpHPv656N7EIHCcJ3SUn6hWryTo5S6cgnQcfkZ2gLqL6MRj5cOfBxa8
-         Z4iSZVjJxmpiYihgOAw769iVcALJEwQ8cGh74BJuDaxjz4EQPWih4w3vMPuwZ565+ESf
-         eCD2tN6WnAk/KNB3s/wTm1upowGDzzpfvBFPGoVV42FvpzKHgVU/wCuJBxO7ZzsJ0WX4
-         /M5A==
-X-Gm-Message-State: AJIora/eOiYr6qhOihUMeptRgfrBrIvOyTdmeI5ngRyAHYDigbmtwLC1
-        hjpOOEUqmgRUrXS0q3n/oj0=
-X-Google-Smtp-Source: AGRyM1s8bondd8Jp4I0QaatBDW4onlA7wRxIJAUprYTmbXa3rVXPggduaz3fc7qDzbNej1zDsCgZEw==
-X-Received: by 2002:a65:49c5:0:b0:412:6e3e:bd91 with SMTP id t5-20020a6549c5000000b004126e3ebd91mr20998201pgs.221.1659529791821;
-        Wed, 03 Aug 2022 05:29:51 -0700 (PDT)
-Received: from [192.168.255.10] ([103.7.29.32])
-        by smtp.gmail.com with ESMTPSA id g205-20020a6252d6000000b0052d952b3276sm5916311pfb.103.2022.08.03.05.29.49
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 03 Aug 2022 05:29:51 -0700 (PDT)
-Message-ID: <cb631fe5-103d-30f5-d800-4748f4ea41fa@gmail.com>
-Date:   Wed, 3 Aug 2022 20:29:43 +0800
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc;
+        bh=EnEMZUisXgxKUeKdBWNakeH0nco9cqyUMj7sIOSeHts=;
+        b=siGDbKV6Xc0cJ+RAZanv+g8nhyQtpDvyAPFDu5uX4yhSaMT7huPSK6zKodtQIwFLk2
+         0k8qqWWUx3oU4SznNTSLxv+MO56XY9Ks7Byrhsv3mYXk3RHihAQctE3zXbmWkj7337rX
+         +zpjPfX36AMPw4YHFmDmzVEABkIIUoKqHDD++DpXJZWpV5dEMexF9xchUosomOcQ+5h1
+         s4432Kh2VZ44oTI6oFaPDkbeKp8lcX2vhxKnoF7kAMz6gpmaJ86snwlN8CgPV0iCoycX
+         mjE7mGMkNd4dBaYCDNsYVfbaD9EoHt7IuRHnVAICoXkd85bMo/IWAIoGYHF0FBzYnwm3
+         77DQ==
+X-Gm-Message-State: ACgBeo2DsyB00imXh0iO9Ug0332xN/Z/YP68poL/Gfk4YyuQ42JqbC3E
+        TXB6ewNOdP1Aki6C7Ws1gRzaxDa/JeK4+WfxBxLswhkG4gA=
+X-Google-Smtp-Source: AA6agR6Acf24aJyXoKtZHIzM4mHsOgSx8fBe4RDwSTNj0C85t8ZJsrkChHB/cJrEukq03vD9OsUKczAH0kPtBUTlaZM=
+X-Received: by 2002:a0d:d2c3:0:b0:31e:62ea:3303 with SMTP id
+ u186-20020a0dd2c3000000b0031e62ea3303mr23699810ywd.64.1659529853465; Wed, 03
+ Aug 2022 05:30:53 -0700 (PDT)
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:91.0)
- Gecko/20100101 Thunderbird/91.11.0
-Subject: Re: [PATCH 1/3] KVM: x86: Refresh PMU after writes to
- MSR_IA32_PERF_CAPABILITIES
-Content-Language: en-US
-To:     Sean Christopherson <seanjc@google.com>
-Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Paolo Bonzini <pbonzini@redhat.com>
-References: <20220727233424.2968356-1-seanjc@google.com>
- <20220727233424.2968356-2-seanjc@google.com>
-From:   Like Xu <like.xu.linux@gmail.com>
-In-Reply-To: <20220727233424.2968356-2-seanjc@google.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+References: <20220729130040.1428779-1-afaria@redhat.com> <20220729130040.1428779-3-afaria@redhat.com>
+In-Reply-To: <20220729130040.1428779-3-afaria@redhat.com>
+From:   Peter Maydell <peter.maydell@linaro.org>
+Date:   Wed, 3 Aug 2022 13:30:13 +0100
+Message-ID: <CAFEAcA83Eaw59H7ha0hScvX1yF8LrJatWqD-hnX0eVy+Ne4EUQ@mail.gmail.com>
+Subject: Re: [RFC v2 02/10] Drop unused static function return values
+To:     Alberto Faria <afaria@redhat.com>
+Cc:     qemu-devel@nongnu.org,
+        =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@redhat.com>,
+        Stefano Garzarella <sgarzare@redhat.com>,
+        Hannes Reinecke <hare@suse.com>,
+        "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
+        Vladimir Sementsov-Ogievskiy <vsementsov@yandex-team.ru>,
+        "Maciej S. Szmigiero" <maciej.szmigiero@oracle.com>,
+        Peter Lieven <pl@kamp.de>, kvm@vger.kernel.org,
+        Xie Yongji <xieyongji@bytedance.com>,
+        Eric Auger <eric.auger@redhat.com>,
+        Hanna Reitz <hreitz@redhat.com>,
+        Jeff Cody <codyprime@gmail.com>,
+        Eric Blake <eblake@redhat.com>,
+        "Denis V. Lunev" <den@openvz.org>,
+        =?UTF-8?Q?Daniel_P=2E_Berrang=C3=A9?= <berrange@redhat.com>,
+        =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>,
+        Christian Schoenebeck <qemu_oss@crudebyte.com>,
+        Stefan Weil <sw@weilnetz.de>, Klaus Jensen <its@irrelevant.dk>,
+        Laurent Vivier <lvivier@redhat.com>,
+        Alberto Garcia <berto@igalia.com>,
+        Michael Roth <michael.roth@amd.com>,
+        Juan Quintela <quintela@redhat.com>,
+        David Hildenbrand <david@redhat.com>, qemu-block@nongnu.org,
+        Konstantin Kostiuk <kkostiuk@redhat.com>,
+        Kevin Wolf <kwolf@redhat.com>,
+        Gerd Hoffmann <kraxel@redhat.com>,
+        Stefan Hajnoczi <stefanha@redhat.com>,
+        Marcelo Tosatti <mtosatti@redhat.com>,
+        Greg Kurz <groug@kaod.org>,
+        "Michael S. Tsirkin" <mst@redhat.com>, Amit Shah <amit@kernel.org>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Alex Williamson <alex.williamson@redhat.com>,
+        Peter Xu <peterx@redhat.com>,
+        Raphael Norwitz <raphael.norwitz@nutanix.com>,
+        Ronnie Sahlberg <ronniesahlberg@gmail.com>,
+        Jason Wang <jasowang@redhat.com>,
+        Emanuele Giuseppe Esposito <eesposit@redhat.com>,
+        Richard Henderson <richard.henderson@linaro.org>,
+        Marcel Apfelbaum <marcel.apfelbaum@gmail.com>,
+        Dmitry Fleytman <dmitry.fleytman@gmail.com>,
+        Eduardo Habkost <eduardo@habkost.net>,
+        Fam Zheng <fam@euphon.net>, Thomas Huth <thuth@redhat.com>,
+        Keith Busch <kbusch@kernel.org>,
+        =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>,
+        "Richard W.M. Jones" <rjones@redhat.com>,
+        John Snow <jsnow@redhat.com>,
+        Markus Armbruster <armbru@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
 X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,NICE_REPLY_A,
-        RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS autolearn=ham
-        autolearn_force=no version=3.4.6
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 28/7/2022 7:34 am, Sean Christopherson wrote:
-> Refresh the PMU if userspace modifies MSR_IA32_PERF_CAPABILITIES.  KVM
-> consumes the vCPU's PERF_CAPABILITIES when enumerating PEBS support, but
-> relies on CPUID updates to refresh the PMU.  I.e. KVM will do the wrong
-> thing if userspace stuffs PERF_CAPABILITIES _after_ setting guest CPUID.
-> 
-> Opportunistically fix a curly-brace indentation.
-> 
-> Fixes: c59a1f106f5c ("KVM: x86/pmu: Add IA32_PEBS_ENABLE MSR emulation for extended PEBS")
+On Fri, 29 Jul 2022 at 14:09, Alberto Faria <afaria@redhat.com> wrote:
+>
+> Make non-void static functions whose return values are ignored by
+> all callers return void instead.
+>
+> These functions were found by static-analyzer.py.
+>
+> Not all occurrences of this problem were fixed.
+>
+> Signed-off-by: Alberto Faria <afaria@redhat.com>
 
-Shouldn't it be: Fixes: 27461da31089 ("KVM: x86/pmu: Support full width counting") ?
+>  65 files changed, 248 insertions(+), 403 deletions(-)
 
-Now, all the dots have been connected. As punishment, I'd like to cook this 
-patch set more
-with trackable tests so that you have more time for other things that are not 
-housekeeping.
+The problem with a patch like this is that it rolls up into a
+single patch changes to the API of many functions in multiple
+subsystems across the whole codebase. Some of those changes
+might be right; some might be wrong. No single person is going
+to be in a position to review the whole lot, and a +248-403
+patch email makes it very unwieldy to try to discuss.
 
-Thank you, Sean.
+If you want to propose some of these I think you need to:
+ * split it out so that you're only suggesting changes in
+   one subsystem at a time
+ * look at the places you are suggesting changes, to see if
+   the correct answer is actually "add the missing error
+   check in the caller(s)"
+ * not change places that are following standard API patterns
+   like "return bool and have an Error** argument"
 
-> Cc: Like Xu <like.xu.linux@gmail.com>
-> Signed-off-by: Sean Christopherson <seanjc@google.com>
-> ---
->   arch/x86/kvm/x86.c | 4 ++--
->   1 file changed, 2 insertions(+), 2 deletions(-)
-> 
-> diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-> index 5366f884e9a7..362c538285db 100644
-> --- a/arch/x86/kvm/x86.c
-> +++ b/arch/x86/kvm/x86.c
-> @@ -3543,9 +3543,9 @@ int kvm_set_msr_common(struct kvm_vcpu *vcpu, struct msr_data *msr_info)
->   			return 1;
->   
->   		vcpu->arch.perf_capabilities = data;
-> -
-> +		kvm_pmu_refresh(vcpu);
->   		return 0;
-> -		}
-> +	}
->   	case MSR_EFER:
->   		return set_efer(vcpu, msr_info);
->   	case MSR_K7_HWCR:
+thanks
+-- PMM
