@@ -2,64 +2,62 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 75CA2588FF3
-	for <lists+kvm@lfdr.de>; Wed,  3 Aug 2022 18:00:23 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 39189588FFD
+	for <lists+kvm@lfdr.de>; Wed,  3 Aug 2022 18:03:18 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237831AbiHCQAW (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 3 Aug 2022 12:00:22 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:32930 "EHLO
+        id S236981AbiHCQDR (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 3 Aug 2022 12:03:17 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35740 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S237785AbiHCQAR (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 3 Aug 2022 12:00:17 -0400
-Received: from mail-pj1-x1030.google.com (mail-pj1-x1030.google.com [IPv6:2607:f8b0:4864:20::1030])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 233C2F28
-        for <kvm@vger.kernel.org>; Wed,  3 Aug 2022 09:00:15 -0700 (PDT)
-Received: by mail-pj1-x1030.google.com with SMTP id pm17so11378580pjb.3
-        for <kvm@vger.kernel.org>; Wed, 03 Aug 2022 09:00:15 -0700 (PDT)
+        with ESMTP id S231493AbiHCQDP (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 3 Aug 2022 12:03:15 -0400
+Received: from mail-io1-xd36.google.com (mail-io1-xd36.google.com [IPv6:2607:f8b0:4864:20::d36])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CA2641A836
+        for <kvm@vger.kernel.org>; Wed,  3 Aug 2022 09:03:14 -0700 (PDT)
+Received: by mail-io1-xd36.google.com with SMTP id l24so13193780ion.13
+        for <kvm@vger.kernel.org>; Wed, 03 Aug 2022 09:03:14 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc;
-        bh=TnL6Z7gPDsAzl4E22/lYC/c8b9hCptQxGpX2XrfTXsM=;
-        b=taTUbRxSaAlDUkwmEee2E1/jjyxFZlncjPIqgD71yvHHHv1cz7dftnY+g07ANm8OtB
-         seurE1R/lE7/8y0sZthcX5u6uXB9XG7vTNpqjFPCvbVdF4z2t7teSrROI/RcNJeiC602
-         WwsuqQmIx+r/a9KhZ7f+JmTRLrWtCutS+BQ1V/MgJo6Z1UKFxBZ4Rcfy31jjbBci7k+L
-         iE4FNymh11KFFGT0y6CSl1k4/Wgvdqxz1XdLTwHQX9AyniKnhhO4LF63xvO8mYrdElqZ
-         bNoHBU/2qb4YDj9zGOqeG7skSUOV31nPoCzObCBpvXy684C31t5EW426XAQ1+L7VMwmk
-         tn6w==
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc;
+        bh=7OygQDDOouiCiPlbWs7isceuYzV4DhEDfDd1Dqaw+Fk=;
+        b=E2jMAjUkqHKj0vnFAxpfKrRcV7XNkEoSEbS/+BpgFbNEaGQdfJogCTXFyTTg3oPdxu
+         W4Tg6IOdDVeix86om4oE8kGNrzh9M7t/I5oop39zGGh9naC7R1e239QiPSlOC6Zl1Vj2
+         6MUgEnkwt1g+02rvhOq4hZbXbGUWqyLcE8Zlbj/oq+sQtpuhmIVJp4gml2ezY48ZumFI
+         oj4C/3DDYbpIWHIxJXicHUZzIeGjqaDLswcDU0kE0SDZoPs85eANnO1uCfAYieNfcWHQ
+         AkY7Vhn5ggpuxKKJA9qcgNsOucsoeyr7RQKxxD1Sj0Qzsm/DV62sJA4dsLACAT97zcda
+         kioA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc;
-        bh=TnL6Z7gPDsAzl4E22/lYC/c8b9hCptQxGpX2XrfTXsM=;
-        b=lXGxybWc0wDLijPefPWFuXcSH5HXeBKMIxVrHRgjMAOR0txX6aNQ2LpUvRR4pLiS7U
-         z3vntxjVJwliTujD8oJM1xo6wOu8YsCd45Vfzs/QtHEOO/cmEMJAGsZQf13cq/1UV/9o
-         DxyJ8iwCKqzJwVxl7G1YGxAmziQb+hyRNDvDLou2jN47v+RHF124HYd/VQNlW/vRg1QG
-         BAHGw50Vz0J5wgXq9mpItUCU3Ws/ph6DLP1YbQg3sVITayMXTH64kperYHNyWtpv0Fwr
-         jWkIvRepAuc0OnFeC6bmbN9jVFY9ik68duwMg7uufNEnblWExaTYkElOp8uvc5ONSGk4
-         a5eA==
-X-Gm-Message-State: ACgBeo3bqyxSTVje2gTWwOYOr2JoU7xyT5y4Gh9EF1mdjL20QgkMl9a0
-        IZ3I4zxPXiokNwl4ste4rq7amg==
-X-Google-Smtp-Source: AA6agR62rnw906v6qY62bcnzZ6pz5FlLwVe85O1as/2aNzO2VnCaQOii5/CqP5e4RvYcn5rJaMZP0A==
-X-Received: by 2002:a17:902:d64a:b0:16d:570c:9d7b with SMTP id y10-20020a170902d64a00b0016d570c9d7bmr26603326plh.1.1659542414547;
-        Wed, 03 Aug 2022 09:00:14 -0700 (PDT)
-Received: from google.com (7.104.168.34.bc.googleusercontent.com. [34.168.104.7])
-        by smtp.gmail.com with ESMTPSA id b9-20020a170902d50900b0016dbdf7b97bsm2172550plg.266.2022.08.03.09.00.13
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 03 Aug 2022 09:00:13 -0700 (PDT)
-Date:   Wed, 3 Aug 2022 16:00:09 +0000
-From:   Sean Christopherson <seanjc@google.com>
-To:     Jim Mattson <jmattson@google.com>
-Cc:     kvm@vger.kernel.org, pbonzini@redhat.com
-Subject: Re: [kvm-unit-tests PATCH] x86: kvmclock: Fix a non-prototype
- function declaration
-Message-ID: <YuqbiVTntu1MOV9H@google.com>
-References: <20220722230157.2429624-1-jmattson@google.com>
- <CALMp9eSkB8KN4sm==VOZWaa1jJfzoiPWen4OGE0fTdAHSdGxzQ@mail.gmail.com>
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc;
+        bh=7OygQDDOouiCiPlbWs7isceuYzV4DhEDfDd1Dqaw+Fk=;
+        b=k7doAjjWWTZ59Mb+GHyyvqqXme/4z7Dvs69v7BOFj4ZhcvspKyKDw4CSPqdDQYKM1J
+         XkHRmHOcFUKD4N1/OnNlUGffZdQcNrCd5N/nbyUcE2JoexTx2QRI/6rsJK66Oq/KyhdR
+         JY9inX66LeD4xxAB0ULe4p3xR0WARHo1+mwL2Lwxl9YZn4YSawTNNae2yHs/w6f11azN
+         qh0G6Q36z4qi/Zkfltp3dTdrNtvINfd5Avz1QaYAVqa5voWxob10eFV5Pp7fmWQdM/Mi
+         WmvY2DGpLJHFmpaowXm27+EeXErLXoU3fg0JezEnvkJFrJYpsisGLbaJT0XJrocKa/LK
+         yUoQ==
+X-Gm-Message-State: AJIora/mbUcBMI4tjqOI56iiRw1jOOOyu0WcOAa+/qnOTgu5YznKU7Ff
+        8qIDnFSFSZJ98yJvP050f3grqG89DhVMnktsDEM9Tw==
+X-Google-Smtp-Source: AGRyM1s4mmvAjontxpiPUsqZ9BL+Z+O7jvL4u8eHKd3PuNbn9A7qwR3L2BfuiAthTAB+fTMfrg1DJ1ld3fzRbyA4n14=
+X-Received: by 2002:a6b:6105:0:b0:67b:e68f:c9ee with SMTP id
+ v5-20020a6b6105000000b0067be68fc9eemr9828309iob.154.1659542593947; Wed, 03
+ Aug 2022 09:03:13 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <CALMp9eSkB8KN4sm==VOZWaa1jJfzoiPWen4OGE0fTdAHSdGxzQ@mail.gmail.com>
+References: <20220614021116.1101331-1-sashal@kernel.org> <YrI25yOy7WMqr+x3@sashalap>
+In-Reply-To: <YrI25yOy7WMqr+x3@sashalap>
+From:   Jann Horn <jannh@google.com>
+Date:   Wed, 3 Aug 2022 18:02:37 +0200
+Message-ID: <CAG48ez36K0YzkQRF4UNf6HccackSKXvb4BYm=tqjNw8hjXm1cQ@mail.gmail.com>
+Subject: Re: [PATCH MANUALSEL 5.18 1/6] KVM: x86: do not report a vCPU as
+ preempted outside instruction boundaries
+To:     Sasha Levin <sashal@kernel.org>,
+        Paolo Bonzini <pbonzini@redhat.com>
+Cc:     linux-kernel@vger.kernel.org, stable@vger.kernel.org,
+        tglx@linutronix.de, mingo@redhat.com, bp@alien8.de,
+        dave.hansen@linux.intel.com, x86@kernel.org, kvm@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
         ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
@@ -71,12 +69,9 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Aug 03, 2022, Jim Mattson wrote:
-> On Fri, Jul 22, 2022 at 4:02 PM Jim Mattson <jmattson@google.com> wrote:
-> >
-> > Avoid a -Wstrict-prototypes clang warning.
-> >
-> > Signed-off-by: Jim Mattson <jmattson@google.com>
-> > ---
+On Tue, Jun 21, 2022 at 11:23 PM Sasha Levin <sashal@kernel.org> wrote:
+>
+> Paolo, ping?
 
-Reviewed-by: Sean Christopherson <seanjc@google.com>
+What happened here? From what I can tell, even the backports that
+Sasha already wrote didn't get applied?
