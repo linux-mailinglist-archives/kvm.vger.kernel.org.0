@@ -2,93 +2,139 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id B7688588C49
-	for <lists+kvm@lfdr.de>; Wed,  3 Aug 2022 14:39:36 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id D6BF8588C5E
+	for <lists+kvm@lfdr.de>; Wed,  3 Aug 2022 14:47:42 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235355AbiHCMjf (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 3 Aug 2022 08:39:35 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43856 "EHLO
+        id S235594AbiHCMrk (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 3 Aug 2022 08:47:40 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49872 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233057AbiHCMje (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 3 Aug 2022 08:39:34 -0400
-Received: from mail-oi1-x230.google.com (mail-oi1-x230.google.com [IPv6:2607:f8b0:4864:20::230])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E834C24BDF
-        for <kvm@vger.kernel.org>; Wed,  3 Aug 2022 05:39:32 -0700 (PDT)
-Received: by mail-oi1-x230.google.com with SMTP id bb16so19720015oib.11
-        for <kvm@vger.kernel.org>; Wed, 03 Aug 2022 05:39:32 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=to:subject:message-id:date:from:in-reply-to:references:mime-version
-         :from:to:cc;
-        bh=BTGHx16QK/ZyJ8XnHN8yrExP4SwB3/TppkdkcnSErPE=;
-        b=LiUJ4PmA2ryKFx3WQcnn+uFoV1eGk+kN0FU/QzH27A0g9liPwG7ZHTG5BMwAo6pS4j
-         dCf4143b61C2sCjTJvZiyVD/FQLUWJhXTSV2DfXMYHoPW/oN4qRdsovFI802muVoX3ZB
-         MnGzbSicSpBz440sT+VJAlax5n3Sqlsqu+uGTkW541gxBfQk7dCVl8q0cXLGRRs7v/Tv
-         pMh8+4LQdyVGj3wfIITmBCbPM5jf/rphiRDo4iyn9xiMrBaykytpPoCe1S7UIcpTCEz7
-         SWPDbxmE4rJYlh67Tz9Qnl+ypyOGHpqpsdgapNZE5aAAphhu4CPrviwvghv3rxpSzS7Q
-         W8lg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=to:subject:message-id:date:from:in-reply-to:references:mime-version
-         :x-gm-message-state:from:to:cc;
-        bh=BTGHx16QK/ZyJ8XnHN8yrExP4SwB3/TppkdkcnSErPE=;
-        b=jRKPMAklLtObnYY7GgezE4DunbCGMf4Ofi/PICESgWM1+OO99SW7nK5EYaDYkV1gN3
-         +1LaI6y24lpd29tzrLvBSFlVfzyj7wGZY+GpEIfdPFruqQkx4R3zCMo8A829/pGO/vo4
-         b81qk6PHDoIwFD8DQHQZsPerNJ12ebnKcR3OcS3y4hYOmxNb7uKb79yRBaJrW79+nSf5
-         1W4+3ovMM4lQR5UDZHfyLymyKyXLxiKAtDVLlSJJ2nN6pEnn7/CAgUGHXQSRLY08HIqB
-         5xNXpRgslGFZqbqf7Edgo9lf3NPTj3KDepjUnNe4iZrmaofQrqVCNXkpLUPAJ77VXqaF
-         UGXg==
-X-Gm-Message-State: ACgBeo3JXqnNhXz/IzUf/EaBHMut1JrgO15ICByToWIgh347V66LySmU
-        BtdQmpmy8WE5jneo2E3x3gocIAfGsy9R3KeUo2Npc3Eu3Wc=
-X-Google-Smtp-Source: AA6agR4QXZGX1HJ1V2f+EyMVrovnb2zAtZVKUqpXUeCUmsn/DBTomdpkzjpCGVLeMGrCLXNKoxKP2BS+ZWgHHubu5Mk=
-X-Received: by 2002:a05:6808:f12:b0:33e:c452:9ce9 with SMTP id
- m18-20020a0568080f1200b0033ec4529ce9mr1548015oiw.181.1659530371813; Wed, 03
- Aug 2022 05:39:31 -0700 (PDT)
+        with ESMTP id S233507AbiHCMrj (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 3 Aug 2022 08:47:39 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id D827F1B783
+        for <kvm@vger.kernel.org>; Wed,  3 Aug 2022 05:47:37 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1659530857;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=FMdpM/OP9u8lYFgWeie1F84KL7NowsI+iQPfWJZUWX0=;
+        b=GUjU6LFNny3rFiHAE1VXQfFGCdcC0xGuR+ubZmspESr7dvYVJoE6onMgZ0rJR9EOXEA0Jc
+        4KO7Dasea6a4jB5N9pYxfpVWoMBipAckvsGmrdy96i61kmF+VKNlEI6J+KeG/oikghlDKe
+        14h3g/Ijx6HKF5RM7YOG8jNQyXLdKpU=
+Received: from mimecast-mx02.redhat.com (mx3-rdu2.redhat.com
+ [66.187.233.73]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-315-lxmSs-WXMHS3bO82KMEA4Q-1; Wed, 03 Aug 2022 08:47:33 -0400
+X-MC-Unique: lxmSs-WXMHS3bO82KMEA4Q-1
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.rdu2.redhat.com [10.11.54.1])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 4EF031C16B4F;
+        Wed,  3 Aug 2022 12:47:32 +0000 (UTC)
+Received: from localhost (unknown [10.39.192.98])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 5773E40CFD0A;
+        Wed,  3 Aug 2022 12:47:30 +0000 (UTC)
+Date:   Wed, 3 Aug 2022 13:47:29 +0100
+From:   "Richard W.M. Jones" <rjones@redhat.com>
+To:     Peter Maydell <peter.maydell@linaro.org>
+Cc:     Daniel =?iso-8859-1?Q?P=2E_Berrang=E9?= <berrange@redhat.com>,
+        Alberto Faria <afaria@redhat.com>,
+        "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
+        Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org,
+        =?iso-8859-1?Q?Marc-Andr=E9?= Lureau 
+        <marcandre.lureau@redhat.com>,
+        Stefano Garzarella <sgarzare@redhat.com>,
+        Hannes Reinecke <hare@suse.com>,
+        Vladimir Sementsov-Ogievskiy <vsementsov@yandex-team.ru>,
+        "Maciej S. Szmigiero" <maciej.szmigiero@oracle.com>,
+        Peter Lieven <pl@kamp.de>, kvm@vger.kernel.org,
+        Xie Yongji <xieyongji@bytedance.com>,
+        Eric Auger <eric.auger@redhat.com>,
+        Hanna Reitz <hreitz@redhat.com>,
+        Jeff Cody <codyprime@gmail.com>,
+        Eric Blake <eblake@redhat.com>,
+        "Denis V. Lunev" <den@openvz.org>,
+        Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <f4bug@amsat.org>,
+        Christian Schoenebeck <qemu_oss@crudebyte.com>,
+        Stefan Weil <sw@weilnetz.de>, Klaus Jensen <its@irrelevant.dk>,
+        Laurent Vivier <lvivier@redhat.com>,
+        Alberto Garcia <berto@igalia.com>,
+        Michael Roth <michael.roth@amd.com>,
+        Juan Quintela <quintela@redhat.com>,
+        David Hildenbrand <david@redhat.com>, qemu-block@nongnu.org,
+        Konstantin Kostiuk <kkostiuk@redhat.com>,
+        Kevin Wolf <kwolf@redhat.com>,
+        Gerd Hoffmann <kraxel@redhat.com>,
+        Stefan Hajnoczi <stefanha@redhat.com>,
+        Marcelo Tosatti <mtosatti@redhat.com>,
+        Greg Kurz <groug@kaod.org>,
+        "Michael S. Tsirkin" <mst@redhat.com>, Amit Shah <amit@kernel.org>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Alex Williamson <alex.williamson@redhat.com>,
+        Peter Xu <peterx@redhat.com>,
+        Raphael Norwitz <raphael.norwitz@nutanix.com>,
+        Ronnie Sahlberg <ronniesahlberg@gmail.com>,
+        Jason Wang <jasowang@redhat.com>,
+        Emanuele Giuseppe Esposito <eesposit@redhat.com>,
+        Richard Henderson <richard.henderson@linaro.org>,
+        Marcel Apfelbaum <marcel.apfelbaum@gmail.com>,
+        Dmitry Fleytman <dmitry.fleytman@gmail.com>,
+        Eduardo Habkost <eduardo@habkost.net>,
+        Fam Zheng <fam@euphon.net>, Thomas Huth <thuth@redhat.com>,
+        Keith Busch <kbusch@kernel.org>,
+        Alex =?iso-8859-1?Q?Benn=E9e?= <alex.bennee@linaro.org>,
+        John Snow <jsnow@redhat.com>
+Subject: Re: [RFC v2 02/10] Drop unused static function return values
+Message-ID: <20220803124729.GR1127@redhat.com>
+References: <20220729130040.1428779-1-afaria@redhat.com>
+ <20220729130040.1428779-3-afaria@redhat.com>
+ <YupSAhFRK962i+nL@work-vm>
+ <CAELaAXyh0MzuVzDCfhC8hJNAwb=niwFRsXqhc63JiWGxxitkqg@mail.gmail.com>
+ <20220803111520.GO1127@redhat.com>
+ <Yupd96RyyEcm1BCb@redhat.com>
+ <CAFEAcA8Eg5RqEDs3ydOZ8jRX5T6Vxjz1_QfPvYCtTneN0mBXuA@mail.gmail.com>
 MIME-Version: 1.0
-References: <20220722230157.2429624-1-jmattson@google.com>
-In-Reply-To: <20220722230157.2429624-1-jmattson@google.com>
-From:   Jim Mattson <jmattson@google.com>
-Date:   Wed, 3 Aug 2022 05:39:19 -0700
-Message-ID: <CALMp9eSkB8KN4sm==VOZWaa1jJfzoiPWen4OGE0fTdAHSdGxzQ@mail.gmail.com>
-Subject: Re: [kvm-unit-tests PATCH] x86: kvmclock: Fix a non-prototype
- function declaration
-To:     kvm@vger.kernel.org, pbonzini@redhat.com,
-        Sean Christopherson <seanjc@google.com>
-Content-Type: text/plain; charset="UTF-8"
-X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-        USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=ham
-        autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <CAFEAcA8Eg5RqEDs3ydOZ8jRX5T6Vxjz1_QfPvYCtTneN0mBXuA@mail.gmail.com>
+User-Agent: Mutt/1.5.21 (2010-09-15)
+X-Scanned-By: MIMEDefang 2.84 on 10.11.54.1
+X-Spam-Status: No, score=-3.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,
+        SPF_HELO_NONE,SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Jul 22, 2022 at 4:02 PM Jim Mattson <jmattson@google.com> wrote:
->
-> Avoid a -Wstrict-prototypes clang warning.
->
-> Signed-off-by: Jim Mattson <jmattson@google.com>
-> ---
->  x86/kvmclock.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
->
-> diff --git a/x86/kvmclock.c b/x86/kvmclock.c
-> index f190048c9bde..f9f21032fea9 100644
-> --- a/x86/kvmclock.c
-> +++ b/x86/kvmclock.c
-> @@ -222,7 +222,7 @@ static cycle_t pvclock_clocksource_read(struct pvclock_vcpu_time_info *src)
->         return ret;
->  }
->
-> -cycle_t kvm_clock_read()
-> +cycle_t kvm_clock_read(void)
->  {
->          struct pvclock_vcpu_time_info *src;
->          cycle_t ret;
-> --
-> 2.37.1.359.gd136c6c3e2-goog
+On Wed, Aug 03, 2022 at 01:25:34PM +0100, Peter Maydell wrote:
+> On Wed, 3 Aug 2022 at 12:44, Daniel P. Berrangé <berrange@redhat.com> wrote:
+> > Inconsistent return value checking is designed-in behaviour for
+> > QEMU's current Error handling coding pattern with error_abort/fatal.
+> 
+> Yes; I habitually mark as false-positive Coverity reports about
+> missing error checks where it has not noticed that the error
+> handling is done via the errp pointer.
 
-Ping.
+Presumably the advantage of having a qemu-specific static analyser is
+it'll be able to ignore certain cases, eg. spotting if error_abort is
+a parameter and allowing (requiring even?) the return value to be
+ignored.
+
+Coverity allows custom models too, but obviously that's all
+proprietary software.
+
+Rich.
+
+-- 
+Richard Jones, Virtualization Group, Red Hat http://people.redhat.com/~rjones
+Read my programming and virtualization blog: http://rwmj.wordpress.com
+Fedora Windows cross-compiler. Compile Windows programs, test, and
+build Windows installers. Over 100 libraries supported.
+http://fedoraproject.org/wiki/MinGW
+
