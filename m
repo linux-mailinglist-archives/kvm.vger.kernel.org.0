@@ -2,41 +2,41 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 7AC77588D89
-	for <lists+kvm@lfdr.de>; Wed,  3 Aug 2022 15:46:05 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id E920B588D84
+	for <lists+kvm@lfdr.de>; Wed,  3 Aug 2022 15:46:03 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237988AbiHCNpw (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 3 Aug 2022 09:45:52 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60622 "EHLO
+        id S238143AbiHCNp4 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 3 Aug 2022 09:45:56 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60662 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S238107AbiHCNpt (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 3 Aug 2022 09:45:49 -0400
+        with ESMTP id S238116AbiHCNpu (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 3 Aug 2022 09:45:50 -0400
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 6874A1C917
-        for <kvm@vger.kernel.org>; Wed,  3 Aug 2022 06:45:48 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 346FB18E1F
+        for <kvm@vger.kernel.org>; Wed,  3 Aug 2022 06:45:49 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1659534347;
+        s=mimecast20190719; t=1659534348;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=B7Bnmjr1GYcy9AYoYFcWJ7ZyYTvu6PCIgTkw/CC+mfQ=;
-        b=WGbnKNjul6GbebAT2uetfKO8UaYtC/bP1IGOoRqqTz2xbuCdJQCQMrV86WS9l2F1iYOI4z
-        QurI1zFeqZIvzSUqwm/UVlQFQW4i5wmk4gUqB1rsmpMaPe+aSmj1NjSBgM25WAHmwnACYT
-        P00u8DXGVt9XmU4oYUpwAk9ufxPt3XQ=
-Received: from mimecast-mx02.redhat.com (mx3-rdu2.redhat.com
- [66.187.233.73]) by relay.mimecast.com with ESMTP with STARTTLS
+        bh=K+oxgk4T+NwDaR94J7G6p9nDk8ZYP0vBbLe54p9zMO8=;
+        b=GekaSgThh50ayVMrga2hcmb3LuacI7vne3rUia06n2mRkvCPzsnTX9UI4amv2aYkgZqNP4
+        /xJuD9X+25ylMyWBdQixzhwsroK3cZ28V2nx4q0HcuWntgcZ92yRCnjgum+UKRxjTZFnuZ
+        H+YYXTnTKjZ/qxibamwW7GCLUzJQ6k0=
+Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
+ [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-606-kBTFjs_mMI2X5-iNfCnS1w-1; Wed, 03 Aug 2022 09:45:41 -0400
-X-MC-Unique: kBTFjs_mMI2X5-iNfCnS1w-1
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.rdu2.redhat.com [10.11.54.6])
+ us-mta-146-p9A8tPOMP8q1oHuZjLdMOw-1; Wed, 03 Aug 2022 09:45:44 -0400
+X-MC-Unique: p9A8tPOMP8q1oHuZjLdMOw-1
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.rdu2.redhat.com [10.11.54.4])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 5B684382C96F;
-        Wed,  3 Aug 2022 13:45:40 +0000 (UTC)
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id C9AAD8853C4;
+        Wed,  3 Aug 2022 13:45:43 +0000 (UTC)
 Received: from fedora.redhat.com (unknown [10.40.195.93])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 100BC2166B26;
-        Wed,  3 Aug 2022 13:45:37 +0000 (UTC)
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 7CC3D2026D4C;
+        Wed,  3 Aug 2022 13:45:41 +0000 (UTC)
 From:   Vitaly Kuznetsov <vkuznets@redhat.com>
 To:     kvm@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>,
         Sean Christopherson <seanjc@google.com>
@@ -47,15 +47,15 @@ Cc:     Wanpeng Li <wanpengli@tencent.com>,
         Yuan Yao <yuan.yao@linux.intel.com>,
         Maxim Levitsky <mlevitsk@redhat.com>,
         linux-hyperv@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: [PATCH v9 11/40] KVM: x86: hyper-v: Create a separate fifo for L2 TLB flush
-Date:   Wed,  3 Aug 2022 15:45:37 +0200
-Message-Id: <20220803134537.399208-1-vkuznets@redhat.com>
+Subject: [PATCH v9 12/40] KVM: x86: hyper-v: Use preallocated buffer in 'struct kvm_vcpu_hv' instead of on-stack 'sparse_banks'
+Date:   Wed,  3 Aug 2022 15:45:40 +0200
+Message-Id: <20220803134540.399220-1-vkuznets@redhat.com>
 In-Reply-To: <20220803134110.397885-1-vkuznets@redhat.com>
 References: <20220803134110.397885-1-vkuznets@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain
 Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 2.78 on 10.11.54.6
+X-Scanned-By: MIMEDefang 2.78 on 10.11.54.4
 X-Spam-Status: No, score=-2.7 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
         SPF_HELO_NONE,SPF_NONE autolearn=unavailable autolearn_force=no
@@ -66,128 +66,73 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-To handle L2 TLB flush requests, KVM needs to use a separate fifo from
-regular (L1) Hyper-V TLB flush requests: e.g. when a request to flush
-something in L2 is made, the target vCPU can transition from L2 to L1,
-receive a request to flush a GVA for L1 and then try to enter L2 back.
-The first request needs to be processed at this point. Similarly,
-requests to flush GVAs in L1 must wait until L2 exits to L1.
+To make kvm_hv_flush_tlb() ready to handle L2 TLB flush requests, KVM needs
+to allow for all 64 sparse vCPU banks regardless of KVM_MAX_VCPUs as L1
+may use vCPU overcommit for L2. To avoid growing on-stack allocation, make
+'sparse_banks' part of per-vCPU 'struct kvm_vcpu_hv' which is allocated
+dynamically.
 
-No functional change as KVM doesn't handle L2 TLB flush requests from
-L2 yet.
+Note: sparse_set_to_vcpu_mask() can't currently be used to handle L2
+requests as KVM does not keep L2 VM_ID -> L2 VCPU_ID -> L1 vCPU mappings,
+i.e. its vp_bitmap array is still bounded by the number of L1 vCPUs and so
+can remain an on-stack allocation.
 
+Reviewed-by: Maxim Levitsky <mlevitsk@redhat.com>
 Signed-off-by: Vitaly Kuznetsov <vkuznets@redhat.com>
 ---
- arch/x86/include/asm/kvm_host.h |  8 +++++++-
- arch/x86/kvm/hyperv.c           | 11 +++++++----
- arch/x86/kvm/hyperv.h           | 18 +++++++++++++++---
- 3 files changed, 29 insertions(+), 8 deletions(-)
+ arch/x86/include/asm/kvm_host.h | 3 +++
+ arch/x86/kvm/hyperv.c           | 6 ++++--
+ 2 files changed, 7 insertions(+), 2 deletions(-)
 
 diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
-index c16f74beb047..83c2331f7701 100644
+index 83c2331f7701..ca8183647b6d 100644
 --- a/arch/x86/include/asm/kvm_host.h
 +++ b/arch/x86/include/asm/kvm_host.h
-@@ -612,6 +612,12 @@ struct kvm_vcpu_hv_synic {
-  */
- #define KVM_HV_TLB_FLUSHALL_ENTRY  ((u64)-1)
- 
-+enum hv_tlb_flush_fifos {
-+	HV_L1_TLB_FLUSH_FIFO,
-+	HV_L2_TLB_FLUSH_FIFO,
-+	HV_NR_TLB_FLUSH_FIFOS,
-+};
-+
- struct kvm_vcpu_hv_tlb_flush_fifo {
- 	spinlock_t write_lock;
- 	DECLARE_KFIFO(entries, u64, KVM_HV_TLB_FLUSH_FIFO_SIZE);
-@@ -637,7 +643,7 @@ struct kvm_vcpu_hv {
- 		u32 syndbg_cap_eax; /* HYPERV_CPUID_SYNDBG_PLATFORM_CAPABILITIES.EAX */
+@@ -644,6 +644,9 @@ struct kvm_vcpu_hv {
  	} cpuid_cache;
  
--	struct kvm_vcpu_hv_tlb_flush_fifo tlb_flush_fifo;
-+	struct kvm_vcpu_hv_tlb_flush_fifo tlb_flush_fifo[HV_NR_TLB_FLUSH_FIFOS];
+ 	struct kvm_vcpu_hv_tlb_flush_fifo tlb_flush_fifo[HV_NR_TLB_FLUSH_FIFOS];
++
++	/* Preallocated buffer for handling hypercalls passing sparse vCPU set */
++	u64 sparse_banks[HV_MAX_SPARSE_VCPU_BANKS];
  };
  
  /* Xen HVM per vcpu emulation context */
 diff --git a/arch/x86/kvm/hyperv.c b/arch/x86/kvm/hyperv.c
-index b903c9de8d39..d27fb4a6d94b 100644
+index d27fb4a6d94b..401649a9d288 100644
 --- a/arch/x86/kvm/hyperv.c
 +++ b/arch/x86/kvm/hyperv.c
-@@ -956,8 +956,10 @@ static int kvm_hv_vcpu_init(struct kvm_vcpu *vcpu)
+@@ -1910,6 +1910,8 @@ void kvm_hv_vcpu_flush_tlb(struct kvm_vcpu *vcpu)
  
- 	hv_vcpu->vp_index = vcpu->vcpu_idx;
- 
--	INIT_KFIFO(hv_vcpu->tlb_flush_fifo.entries);
--	spin_lock_init(&hv_vcpu->tlb_flush_fifo.write_lock);
-+	for (i = 0; i < HV_NR_TLB_FLUSH_FIFOS; i++) {
-+		INIT_KFIFO(hv_vcpu->tlb_flush_fifo[i].entries);
-+		spin_lock_init(&hv_vcpu->tlb_flush_fifo[i].write_lock);
-+	}
- 
- 	return 0;
- }
-@@ -1843,7 +1845,8 @@ static void hv_tlb_flush_enqueue(struct kvm_vcpu *vcpu, u64 *entries, int count)
- 	if (!hv_vcpu)
- 		return;
- 
--	tlb_flush_fifo = &hv_vcpu->tlb_flush_fifo;
-+	/* kvm_hv_flush_tlb() is not ready to handle requests for L2s yet */
-+	tlb_flush_fifo = &hv_vcpu->tlb_flush_fifo[HV_L1_TLB_FLUSH_FIFO];
- 
- 	spin_lock_irqsave(&tlb_flush_fifo->write_lock, flags);
- 
-@@ -1880,7 +1883,7 @@ void kvm_hv_vcpu_flush_tlb(struct kvm_vcpu *vcpu)
- 		return;
- 	}
- 
--	tlb_flush_fifo = &hv_vcpu->tlb_flush_fifo;
-+	tlb_flush_fifo = kvm_hv_get_tlb_flush_fifo(vcpu, is_guest_mode(vcpu));
- 
- 	count = kfifo_out(&tlb_flush_fifo->entries, entries, KVM_HV_TLB_FLUSH_FIFO_SIZE);
- 
-diff --git a/arch/x86/kvm/hyperv.h b/arch/x86/kvm/hyperv.h
-index e5b32266ff7d..8a902b59aa46 100644
---- a/arch/x86/kvm/hyperv.h
-+++ b/arch/x86/kvm/hyperv.h
-@@ -22,6 +22,7 @@
- #define __ARCH_X86_KVM_HYPERV_H__
- 
- #include <linux/kvm_host.h>
-+#include "x86.h"
- 
- /*
-  * The #defines related to the synthetic debugger are required by KDNet, but
-@@ -147,16 +148,27 @@ int kvm_vm_ioctl_hv_eventfd(struct kvm *kvm, struct kvm_hyperv_eventfd *args);
- int kvm_get_hv_cpuid(struct kvm_vcpu *vcpu, struct kvm_cpuid2 *cpuid,
- 		     struct kvm_cpuid_entry2 __user *entries);
- 
-+static inline struct kvm_vcpu_hv_tlb_flush_fifo *kvm_hv_get_tlb_flush_fifo(struct kvm_vcpu *vcpu,
-+									   bool is_guest_mode)
-+{
-+	struct kvm_vcpu_hv *hv_vcpu = to_hv_vcpu(vcpu);
-+	int i = is_guest_mode ? HV_L2_TLB_FLUSH_FIFO :
-+				HV_L1_TLB_FLUSH_FIFO;
-+
-+	/* KVM does not handle L2 TLB flush requests yet */
-+	WARN_ON_ONCE(i != HV_L1_TLB_FLUSH_FIFO);
-+
-+	return &hv_vcpu->tlb_flush_fifo[i];
-+}
- 
- static inline void kvm_hv_vcpu_empty_flush_tlb(struct kvm_vcpu *vcpu)
+ static u64 kvm_hv_flush_tlb(struct kvm_vcpu *vcpu, struct kvm_hv_hcall *hc)
  {
- 	struct kvm_vcpu_hv_tlb_flush_fifo *tlb_flush_fifo;
--	struct kvm_vcpu_hv *hv_vcpu = to_hv_vcpu(vcpu);
++	struct kvm_vcpu_hv *hv_vcpu = to_hv_vcpu(vcpu);
++	u64 *sparse_banks = hv_vcpu->sparse_banks;
+ 	struct kvm *kvm = vcpu->kvm;
+ 	struct hv_tlb_flush_ex flush_ex;
+ 	struct hv_tlb_flush flush;
+@@ -1923,7 +1925,6 @@ static u64 kvm_hv_flush_tlb(struct kvm_vcpu *vcpu, struct kvm_hv_hcall *hc)
+ 	u64 __tlb_flush_entries[KVM_HV_TLB_FLUSH_FIFO_SIZE - 1];
+ 	u64 *tlb_flush_entries;
+ 	u64 valid_bank_mask;
+-	u64 sparse_banks[KVM_HV_MAX_SPARSE_VCPU_SET_BITS];
+ 	struct kvm_vcpu *v;
+ 	unsigned long i;
+ 	bool all_cpus;
+@@ -2075,11 +2076,12 @@ static void kvm_hv_send_ipi_to_many(struct kvm *kvm, u32 vector,
  
--	if (!hv_vcpu || !kvm_check_request(KVM_REQ_HV_TLB_FLUSH, vcpu))
-+	if (!to_hv_vcpu(vcpu) || !kvm_check_request(KVM_REQ_HV_TLB_FLUSH, vcpu))
- 		return;
+ static u64 kvm_hv_send_ipi(struct kvm_vcpu *vcpu, struct kvm_hv_hcall *hc)
+ {
++	struct kvm_vcpu_hv *hv_vcpu = to_hv_vcpu(vcpu);
++	u64 *sparse_banks = hv_vcpu->sparse_banks;
+ 	struct kvm *kvm = vcpu->kvm;
+ 	struct hv_send_ipi_ex send_ipi_ex;
+ 	struct hv_send_ipi send_ipi;
+ 	u64 valid_bank_mask;
+-	u64 sparse_banks[KVM_HV_MAX_SPARSE_VCPU_SET_BITS];
+ 	u32 vector;
+ 	bool all_cpus;
  
--	tlb_flush_fifo = &hv_vcpu->tlb_flush_fifo;
-+	tlb_flush_fifo = kvm_hv_get_tlb_flush_fifo(vcpu, is_guest_mode(vcpu));
- 
- 	kfifo_reset_out(&tlb_flush_fifo->entries);
- }
 -- 
 2.35.3
 
