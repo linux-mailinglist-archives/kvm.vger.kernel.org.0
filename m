@@ -2,111 +2,148 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id D855558911E
-	for <lists+kvm@lfdr.de>; Wed,  3 Aug 2022 19:18:32 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id EEA9F589141
+	for <lists+kvm@lfdr.de>; Wed,  3 Aug 2022 19:23:28 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237305AbiHCRS3 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 3 Aug 2022 13:18:29 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56250 "EHLO
+        id S236999AbiHCRX1 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 3 Aug 2022 13:23:27 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33078 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S236364AbiHCRS1 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 3 Aug 2022 13:18:27 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 253D14BD2B
-        for <kvm@vger.kernel.org>; Wed,  3 Aug 2022 10:18:23 -0700 (PDT)
+        with ESMTP id S236321AbiHCRXZ (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 3 Aug 2022 13:23:25 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id D666F53D06
+        for <kvm@vger.kernel.org>; Wed,  3 Aug 2022 10:23:24 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1659547102;
+        s=mimecast20190719; t=1659547404;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=Ba3iLOxgTjgaPYB0G8OKdC5j0xGnpNwkrDCBhoUvC78=;
-        b=S4sEF4NuTEJPZmh3khtPdVeLz4ob9jeGQoNn+h9axP/5XmgqFzxgd87j3xAuEAtibR8xd+
-        CttklH3BWXPlls2BT3gUZO2zWN23lZnW2ox29FG8PrJ4LrshyK1x+t2im4ExE9WQa3jlPu
-        QbtX6J+mJblIxRkxY/llroGKo5y8Pas=
-Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
- [209.85.128.72]) by relay.mimecast.com with ESMTP with STARTTLS
+         content-transfer-encoding:content-transfer-encoding;
+        bh=slZPL044q+C7rvNYiFVId3G4VN1Old5kmH5KWkstxKI=;
+        b=ULwOmNT7I59igavVvPM3ulz/QAupCS2ZpYPY/HnHYsgjAImd8x/DMhPoDGTE1TBTaTbAiw
+        t4W8gKMgTz1V3CNDuxKKNhERlW/3jXnJitd5erZQNEdMLsGvY+OMdPTOIsWkMx4vVkoOn1
+        oo5e2ypm/kAtbAl50Jf8kIiH+6hKN/o=
+Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
+ [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-468-X9hvHMDfO4eRQcGwPY6L5A-1; Wed, 03 Aug 2022 13:18:21 -0400
-X-MC-Unique: X9hvHMDfO4eRQcGwPY6L5A-1
-Received: by mail-wm1-f72.google.com with SMTP id h133-20020a1c218b000000b003a4f57eaeaaso28172wmh.8
-        for <kvm@vger.kernel.org>; Wed, 03 Aug 2022 10:18:15 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=content-transfer-encoding:in-reply-to:subject:from:references:cc:to
-         :content-language:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc;
-        bh=Ba3iLOxgTjgaPYB0G8OKdC5j0xGnpNwkrDCBhoUvC78=;
-        b=kix83ksgfW2SlB8z7I+Rokmw3NOYJEwEFioLVoH0+HMmKWalEzxMQXqMbd4i6fzjID
-         zwxTID92rbMBBkwDzJr6QAWRLWne0DreI2Wr/2Forg682/E2Z4PkhDiUYKLD9eSJv4Pd
-         Csw+ksCPAMX1b1y2xrK0pko/fiRJZsvMtbk6naCxZJ9qzcDmCus5c0nPEjDTXYUPOBOz
-         2Y4CTXD3OI2ljmXBSxVi0Oovk62VUWHElplqes5JpveWKLSERkIf6/PwEchKvE9AncF/
-         O13MXgWCvskW6Sek3VxuoG0Xtbo9y72Tem7s2cu42ZsgCTgx98cN8LBpK+qm5LKODhlB
-         EGZg==
-X-Gm-Message-State: ACgBeo125X2rgNCBi0hKd5RXIVQgLE3TT5Np8NkovIwElOMTEJWsmcnf
-        VJGlh94XuzbCWbfG/N1HTVbTBCUgYwA+1VJXvRr9M850E6zrxDqQQSx3dTEONwR9B6fAWtXR8hK
-        7k0hE32iDunbd
-X-Received: by 2002:a1c:e90c:0:b0:3a0:4c68:f109 with SMTP id q12-20020a1ce90c000000b003a04c68f109mr3437859wmc.56.1659547094876;
-        Wed, 03 Aug 2022 10:18:14 -0700 (PDT)
-X-Google-Smtp-Source: AA6agR7qPAL4aXq9EjlDqJBMgbr8yOpDW7Xvl8NhQdGLuc+XlQUGjcNM+XZObOHc3oNQB2gvCpWf1Q==
-X-Received: by 2002:a1c:e90c:0:b0:3a0:4c68:f109 with SMTP id q12-20020a1ce90c000000b003a04c68f109mr3437848wmc.56.1659547094668;
-        Wed, 03 Aug 2022 10:18:14 -0700 (PDT)
-Received: from ?IPV6:2001:b07:add:ec09:c399:bc87:7b6c:fb2a? ([2001:b07:add:ec09:c399:bc87:7b6c:fb2a])
-        by smtp.googlemail.com with ESMTPSA id b13-20020a5d4b8d000000b0021e519eba9bsm18700259wrt.42.2022.08.03.10.18.07
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 03 Aug 2022 10:18:14 -0700 (PDT)
-Message-ID: <b03adf94-5af2-ff5e-1dbb-6dd212790083@redhat.com>
-Date:   Wed, 3 Aug 2022 19:18:05 +0200
+ us-mta-131-PWmVzDHwPjewsbEIYBPatg-1; Wed, 03 Aug 2022 13:18:55 -0400
+X-MC-Unique: PWmVzDHwPjewsbEIYBPatg-1
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.rdu2.redhat.com [10.11.54.3])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 7CBE810AF7C9;
+        Wed,  3 Aug 2022 17:18:26 +0000 (UTC)
+Received: from eperezma.remote.csb (unknown [10.39.192.202])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id BE7DA1121314;
+        Wed,  3 Aug 2022 17:18:23 +0000 (UTC)
+From:   =?UTF-8?q?Eugenio=20P=C3=A9rez?= <eperezma@redhat.com>
+To:     qemu-devel@nongnu.org
+Cc:     Jason Wang <jasowang@redhat.com>,
+        Stefan Hajnoczi <stefanha@redhat.com>,
+        Gautam Dawar <gdawar@xilinx.com>,
+        Cornelia Huck <cohuck@redhat.com>,
+        Eli Cohen <eli@mellanox.com>,
+        Stefano Garzarella <sgarzare@redhat.com>,
+        Harpreet Singh Anand <hanand@xilinx.com>,
+        Zhu Lingshan <lingshan.zhu@intel.com>,
+        Laurent Vivier <lvivier@redhat.com>,
+        "Michael S. Tsirkin" <mst@redhat.com>, kvm@vger.kernel.org,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Liuxiangdong <liuxiangdong5@huawei.com>,
+        Parav Pandit <parav@mellanox.com>, Cindy Lu <lulu@redhat.com>,
+        "Gonglei (Arei)" <arei.gonglei@huawei.com>
+Subject: [PATCH v3 0/7] ASID support in vhost-vdpa net
+Date:   Wed,  3 Aug 2022 19:18:14 +0200
+Message-Id: <20220803171821.481336-1-eperezma@redhat.com>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.11.0
-Content-Language: en-US
-To:     Mingwei Zhang <mizhang@google.com>
-Cc:     Sean Christopherson <seanjc@google.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org, Oliver Upton <oupton@google.com>
-References: <20220802230718.1891356-1-mizhang@google.com>
- <20220802230718.1891356-2-mizhang@google.com>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-Subject: Re: [PATCH 1/5] KVM: x86: Get vmcs12 pages before checking pending
- interrupts
-In-Reply-To: <20220802230718.1891356-2-mizhang@google.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-2.7 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
-        RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_NONE autolearn=ham
-        autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+X-Scanned-By: MIMEDefang 2.78 on 10.11.54.3
+X-Spam-Status: No, score=-3.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,
+        SPF_HELO_NONE,SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 8/3/22 01:07, Mingwei Zhang wrote:
-> +	/*
-> +	 * We must first get the vmcs12 pages before checking for interrupts
-> +	 * that might unblock the guest if L1 is using virtual-interrupt
-> +	 * delivery.
-> +	 */
-> +	if (kvm_check_request(KVM_REQ_GET_NESTED_STATE_PAGES, vcpu)) {
-> +		/*
-> +		 * If we have to ask user-space to post-copy a page,
-> +		 * then we have to keep trying to get all of the
-> +		 * VMCS12 pages until we succeed.
-> +		 */
-> +		if (unlikely(!kvm_x86_ops.nested_ops->get_nested_state_pages(vcpu))) {
-> +			kvm_make_request(KVM_REQ_GET_NESTED_STATE_PAGES, vcpu);
-> +			return 0;
-> +		}
-> +	}
-> +
-
-I think request handling (except for KVM_REQ_EVENT) could be more 
-generically moved from vcpu_enter_guest() to vcpu_run().
-
-Paolo
+Control VQ is the way net devices use to send changes to the device state, =
+like=0D
+the number of active queues or its mac address.=0D
+=0D
+QEMU needs to intercept this queue so it can track these changes and is abl=
+e to=0D
+migrate the device. It can do it from 1576dbb5bbc4 ("vdpa: Add x-svq to=0D
+NetdevVhostVDPAOptions"). However, to enable x-svq implies to shadow all Vi=
+rtIO=0D
+device's virtqueues, which will damage performance.=0D
+=0D
+This series adds address space isolation, so the device and the guest=0D
+communicate directly with them (passthrough) and CVQ communication is split=
+ in=0D
+two: The guest communicates with QEMU and QEMU forwards the commands to the=
+=0D
+device.=0D
+=0D
+This series is based on [1], and this needs to be applied on top of that.  =
+Each=0D
+one of them adds a feature on isolation and could be merged individually on=
+ce=0D
+conflicts are solved.=0D
+=0D
+Comments are welcome. Thanks!=0D
+=0D
+v3:=0D
+- Do not return an error but just print a warning if vdpa device initializa=
+tion=0D
+  returns failure while getting AS num of VQ groups=0D
+- Delete extra newline=0D
+=0D
+v2:=0D
+- Much as commented on series [1], handle vhost_net backend through=0D
+  NetClientInfo callbacks instead of directly.=0D
+- Fix not freeing SVQ properly when device does not support CVQ=0D
+- Add BIT_ULL missed checking device's backend feature for _F_ASID.=0D
+=0D
+[1] https://lists.nongnu.org/archive/html/qemu-devel/2022-08/msg00349.html=
+=0D
+=0D
+Eugenio P=C3=A9rez (7):=0D
+  linux-headers: Update kernel headers=0D
+  vdpa: Use v->shadow_vqs_enabled in vhost_vdpa_svqs_start & stop=0D
+  vdpa: Allocate SVQ unconditionally=0D
+  vdpa: Add asid parameter to vhost_vdpa_dma_map/unmap=0D
+  vdpa: Store x-svq parameter in VhostVDPAState=0D
+  vhost_net: Add NetClientInfo prepare callback=0D
+  vdpa: Always start CVQ in SVQ mode=0D
+=0D
+ include/hw/virtio/vhost-vdpa.h               |   8 +-=0D
+ include/net/net.h                            |   2 +=0D
+ include/standard-headers/asm-x86/bootparam.h |   7 +-=0D
+ include/standard-headers/drm/drm_fourcc.h    |  69 +++++++++=0D
+ include/standard-headers/linux/ethtool.h     |   1 +=0D
+ include/standard-headers/linux/input.h       |  12 +-=0D
+ include/standard-headers/linux/pci_regs.h    |   1 +=0D
+ include/standard-headers/linux/vhost_types.h |  11 +-=0D
+ include/standard-headers/linux/virtio_ids.h  |  14 +-=0D
+ linux-headers/asm-arm64/kvm.h                |  27 ++++=0D
+ linux-headers/asm-generic/unistd.h           |   4 +-=0D
+ linux-headers/asm-riscv/kvm.h                |  20 +++=0D
+ linux-headers/asm-riscv/unistd.h             |   3 +-=0D
+ linux-headers/asm-x86/kvm.h                  |  11 +-=0D
+ linux-headers/asm-x86/mman.h                 |  14 --=0D
+ linux-headers/linux/kvm.h                    |  56 ++++++-=0D
+ linux-headers/linux/userfaultfd.h            |  10 +-=0D
+ linux-headers/linux/vfio.h                   |   4 +-=0D
+ linux-headers/linux/vhost.h                  |  26 +++-=0D
+ hw/net/vhost_net.c                           |   4 +=0D
+ hw/virtio/vhost-vdpa.c                       |  65 ++++----=0D
+ net/vhost-vdpa.c                             | 154 ++++++++++++++++++-=0D
+ hw/virtio/trace-events                       |   4 +-=0D
+ 23 files changed, 434 insertions(+), 93 deletions(-)=0D
+=0D
+-- =0D
+2.31.1=0D
+=0D
 
