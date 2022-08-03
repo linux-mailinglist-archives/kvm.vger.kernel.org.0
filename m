@@ -2,139 +2,146 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id EF0CA588522
-	for <lists+kvm@lfdr.de>; Wed,  3 Aug 2022 02:28:59 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id DA12258856D
+	for <lists+kvm@lfdr.de>; Wed,  3 Aug 2022 03:30:20 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234895AbiHCA26 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 2 Aug 2022 20:28:58 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43772 "EHLO
+        id S235433AbiHCBaS (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 2 Aug 2022 21:30:18 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49106 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232190AbiHCA24 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 2 Aug 2022 20:28:56 -0400
-Received: from mga05.intel.com (mga05.intel.com [192.55.52.43])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 994EB1EC60;
-        Tue,  2 Aug 2022 17:28:55 -0700 (PDT)
+        with ESMTP id S232077AbiHCBaP (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 2 Aug 2022 21:30:15 -0400
+Received: from mga12.intel.com (mga12.intel.com [192.55.52.136])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 65B4810A1;
+        Tue,  2 Aug 2022 18:30:14 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1659486535; x=1691022535;
+  t=1659490214; x=1691026214;
   h=message-id:subject:from:to:cc:date:in-reply-to:
    references:content-transfer-encoding:mime-version;
-  bh=TfQo5e0rtAyCyb4NV08DshIcOTwVxaVMa7Lp5tjW1KA=;
-  b=NcLk9nQ0M21TKVnBrVwX77W4kfl63BxU5TunBUwIJ84NH8PArCfkpPxy
-   WmIsTLiy9xX066ICL+q1BiF5YjUousGKqt+HqS+WDcxUMnx1Inyp01gug
-   vNaDKUC1p0JFX/UbjkcLNyEsW1v55irY9OA5oKCyzwjBPa93jB0wbCdnC
-   thVwvhJCtRrEdawi1pcfPF3SqaArzd8CYZPUWgL73tNZfFITm5uDq8Qfh
-   jUtRsa8G2lxt0gB1kayuzYkRjXhBKmV7iT8ED+5agBYj0/Xksb5ONMGTo
-   R/MkcQVyMg5SHeKZl7/CT7Quj3pAfw0xeDaZiBJrwiaGsa7/EJneNYi32
-   g==;
-X-IronPort-AV: E=McAfee;i="6400,9594,10427"; a="375849543"
+  bh=l6tf+gFEwiZ1TzfGKtSasMdKi0NoDSHlgfiI31cXsXo=;
+  b=GMK82YgQo48DiiXpf/rVeSth50ldU5KGPeNwOVckW3XEWZ6BgMpFrUix
+   JnGDnFqw4xpQmzjWlWWf1KhNu1/8hRpmmoqcehiFtk0IsAvY10V2u45Fb
+   7LqLG3LYdQx/8YZtfqK0mUunQm6ZIBEkeJ5wS44CPCSIYfQ74Nt8Iehgg
+   XSPinD1DCgteXO6l6e708GDOhic3lslcJvkHurHBN2XE9RIiB+e+Ge5Xv
+   JdeiBmCybit6PzC+dHpL19K/g+6ADU4+tEAJZwl5IKV7S1FDjtpZ5uKB4
+   472l04RuX3zGBC+X22uLIRePzG9MwmtZVMRyQVH5rNvqY8fDZ9baEY/JQ
+   A==;
+X-IronPort-AV: E=McAfee;i="6400,9594,10427"; a="269328390"
 X-IronPort-AV: E=Sophos;i="5.93,212,1654585200"; 
-   d="scan'208";a="375849543"
-Received: from fmsmga007.fm.intel.com ([10.253.24.52])
-  by fmsmga105.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 02 Aug 2022 17:28:55 -0700
+   d="scan'208";a="269328390"
+Received: from fmsmga005.fm.intel.com ([10.253.24.32])
+  by fmsmga106.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 02 Aug 2022 18:30:14 -0700
 X-IronPort-AV: E=Sophos;i="5.93,212,1654585200"; 
-   d="scan'208";a="606205339"
+   d="scan'208";a="930195098"
 Received: from gvenka2-desk.amr.corp.intel.com (HELO khuang2-desk.gar.corp.intel.com) ([10.212.85.17])
-  by fmsmga007-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 02 Aug 2022 17:28:53 -0700
-Message-ID: <39fd60434e0f4bac4c7c59b7983f16752924c932.camel@intel.com>
-Subject: Re: [RFC PATCH v6 036/104] KVM: x86/mmu: Explicitly check for MMIO
- spte in fast page fault
+  by fmsmga005-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 02 Aug 2022 18:30:11 -0700
+Message-ID: <d3236016c46da2cbdf314839255e8806ae23f228.camel@intel.com>
+Subject: Re: [PATCH v5 12/22] x86/virt/tdx: Convert all memory regions in
+ memblock to TDX memory
 From:   Kai Huang <kai.huang@intel.com>
-To:     David Matlack <dmatlack@google.com>
-Cc:     Sean Christopherson <seanjc@google.com>,
-        "Yamahata, Isaku" <isaku.yamahata@intel.com>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "isaku.yamahata@gmail.com" <isaku.yamahata@gmail.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        "erdemaktas@google.com" <erdemaktas@google.com>,
-        Sagi Shahar <sagis@google.com>
-Date:   Wed, 03 Aug 2022 12:28:51 +1200
-In-Reply-To: <CALzav=esHsBL7XL91HmqT89+VBeAhR3avSbdUWk-OScD=eoymQ@mail.gmail.com>
-References: <cover.1651774250.git.isaku.yamahata@intel.com>
-         <d1a1da631b44f425d929767fda74c90de2d87a8d.1651774250.git.isaku.yamahata@intel.com>
-         <YuhTPxZNhxFs+xjc@google.com> <YuhheIdg47zCDiNi@google.com>
-         <29929897856941e0896954011d0ecc34@intel.com>
-         <CALzav=esHsBL7XL91HmqT89+VBeAhR3avSbdUWk-OScD=eoymQ@mail.gmail.com>
+To:     Dave Hansen <dave.hansen@intel.com>, linux-kernel@vger.kernel.org,
+        kvm@vger.kernel.org
+Cc:     seanjc@google.com, pbonzini@redhat.com, len.brown@intel.com,
+        tony.luck@intel.com, rafael.j.wysocki@intel.com,
+        reinette.chatre@intel.com, dan.j.williams@intel.com,
+        peterz@infradead.org, ak@linux.intel.com,
+        kirill.shutemov@linux.intel.com,
+        sathyanarayanan.kuppuswamy@linux.intel.com,
+        isaku.yamahata@intel.com
+Date:   Wed, 03 Aug 2022 13:30:09 +1200
+In-Reply-To: <da423f82faec260150b158381a24300f3cd00ffa.camel@intel.com>
+References: <cover.1655894131.git.kai.huang@intel.com>
+         <8288396be7fedd10521a28531e138579594d757a.1655894131.git.kai.huang@intel.com>
+         <20d63398-928f-0c6f-47ec-8e225c049ad8@intel.com>
+         <76d7604ff21b26252733165478d5c54035d84d98.camel@intel.com>
+         <880f3991-09e5-2f96-d5ba-213cff05c458@intel.com>
+         <da423f82faec260150b158381a24300f3cd00ffa.camel@intel.com>
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 User-Agent: Evolution 3.44.3 (3.44.3-1.fc36) 
 MIME-Version: 1.0
 X-Spam-Status: No, score=-5.0 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
-        SPF_HELO_NONE,SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
+        SPF_HELO_PASS,SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, 2022-08-02 at 09:34 -0700, David Matlack wrote:
-> On Mon, Aug 1, 2022 at 6:46 PM Huang, Kai <kai.huang@intel.com> wrote:
+On Fri, 2022-07-08 at 11:34 +1200, Kai Huang wrote:
+> > Why not just entirely remove the lower 1MB from the memblock structure
+> > on TDX systems?=C2=A0 Do something equivalent to adding this on the ker=
+nel
+> > command line:
 > >=20
-> > > On Mon, Aug 01, 2022, David Matlack wrote:
-> > > > On Thu, May 05, 2022 at 11:14:30AM -0700, isaku.yamahata@intel.com =
-wrote:
-> > > > > From: Sean Christopherson <sean.j.christopherson@intel.com>
-> > > > >=20
-> > > > > Explicitly check for an MMIO spte in the fast page fault flow.  T=
-DX
-> > > > > will use a not-present entry for MMIO sptes, which can be mistake=
-n
-> > > > > for an access-tracked spte since both have SPTE_SPECIAL_MASK set.
-> > > > >=20
-> > > > > MMIO sptes are handled in handle_mmio_page_fault for non-TDX VMs,=
- so
-> > > > > this patch does not affect them.  TDX will handle MMIO emulation
-> > > > > through a hypercall instead.
-> > > > >=20
-> > > > > Signed-off-by: Sean Christopherson <sean.j.christopherson@intel.c=
-om>
-> > > > > Signed-off-by: Isaku Yamahata <isaku.yamahata@intel.com>
-> > > > > ---
-> > > > >  arch/x86/kvm/mmu/mmu.c | 2 +-
-> > > > >  1 file changed, 1 insertion(+), 1 deletion(-)
-> > > > >=20
-> > > > > diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c inde=
-x
-> > > > > d1c37295bb6e..4a12d862bbb6 100644
-> > > > > --- a/arch/x86/kvm/mmu/mmu.c
-> > > > > +++ b/arch/x86/kvm/mmu/mmu.c
-> > > > > @@ -3184,7 +3184,7 @@ static int fast_page_fault(struct kvm_vcpu =
-*vcpu,
-> > > struct kvm_page_fault *fault)
-> > > > >           else
-> > > > >                   sptep =3D fast_pf_get_last_sptep(vcpu, fault->a=
-ddr,
-> > > &spte);
-> > > > >=20
-> > > > > -         if (!is_shadow_present_pte(spte))
-> > > > > +         if (!is_shadow_present_pte(spte) || is_mmio_spte(spte))
-> > > >=20
-> > > > I wonder if this patch is really necessary. is_shadow_present_pte()
-> > > > checks if SPTE_MMU_PRESENT_MASK is set (which is bit 11, not
-> > > > shadow_present_mask). Do TDX VMs set bit 11 in MMIO SPTEs?
-> > >=20
-> > > This patch should be unnecessary, TDX's not-present SPTEs was one of =
-my
-> > > motivations
-> > > for adding MMU_PRESENT.   Bit 11 most definitely must not be set for =
-MMIO
-> > > SPTEs.
-> >=20
-> > As we already discussed, Isaku will drop this patch.
+> > =C2=A0	memmap=3D1M$0x0
 >=20
-> Ah, I missed that discussion. Can you share a link so I can catch up?
+> I will explore this option.=C2=A0 Thanks!
 
-Sure.  Isaku has sent out v7 of this series:
+Hi Dave,
 
-https://lore.kernel.org/lkml/20220727220456.GA3669189@ls.amr.corp.intel.com=
-/T/#m8d2229ce31b9bcd084cc43e3478154f5f24d7506
+After investigating and testing, we cannot simply remove first 1MB from e82=
+0
+table which is similar to what 'memmap=3D1M$0x0' does, as the kernel needs =
+low
+memory as trampoline to bring up all APs.
 
-For this particular patch, see here:
+Currently I am doing below:
 
-https://lore.kernel.org/lkml/20220727220456.GA3669189@ls.amr.corp.intel.com=
-/T/#mcdb118103460c55f8b850e784d1ed57724c0fe2f
+--- a/arch/x86/realmode/init.c
++++ b/arch/x86/realmode/init.c
+@@ -65,6 +65,17 @@ void __init reserve_real_mode(void)
+         * setup_arch().
+         */
+        memblock_reserve(0, SZ_1M);
++
++       /*
++        * As one step of initializing the TDX module (on-demand), the
++        * kernel will later verify all memory regions in memblock are
++        * truly TDX-capable and convert all of them to TDX memory.
++        * The first 1MB may not be enumerated as TDX-capable memory.
++        * To avoid failure to verify, explicitly remove the first 1MB
++        * from memblock for a TDX (BIOS) enabled system.
++        */
++       if (platform_tdx_enabled())
++               memblock_remove(0, SZ_1M);
+
+I tested an it worked (I didn't observe any problem), but am I missing
+something?
+
+Also, regarding to whether we can remove platform_tdx_enabled() at all, I l=
+ooked
+into the spec again and there's no MSR or CPUID from which we can check TDX=
+ is
+enabled by BIOS -- except checking the SEAMRR_MASK MSR, which is basically
+platform_tdx_enabled() also did.
+
+Checking MSR_MTRRcap.SEAMRR bit isn't enough as it will be true as long as =
+the
+hardware supports SEAMRR, but it doesn't tell whether SEAMRR(TDX) is enable=
+d by
+BIOS.
+
+So if above code is reasonable, I think we can still detect TDX during boot=
+ and
+keep platform_tdx_enabled(). =C2=A0
+
+It also detects TDX KeyIDs, which isn't necessary for removing the first 1M=
+B
+here (nor for kexec() support), but detecting TDX KeyIDs must be done anywa=
+y
+either during kernel boot or during initializing TDX module.
+
+Detecting TDX KeyID at boot time also has an advantage that in the future w=
+e can
+expose KeyIDs via /sysfs and userspace can know how many TDs the machine ca=
+n
+support w/o having to initializing the  TDX module first (we received such
+requirement from customer but yes it is arguable).
+
+Any comments?
 
 --=20
 Thanks,
