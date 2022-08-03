@@ -2,247 +2,213 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 9EE15588FC7
-	for <lists+kvm@lfdr.de>; Wed,  3 Aug 2022 17:52:36 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id F0690588FCC
+	for <lists+kvm@lfdr.de>; Wed,  3 Aug 2022 17:53:09 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238266AbiHCPwd (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 3 Aug 2022 11:52:33 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49562 "EHLO
+        id S237911AbiHCPxH (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 3 Aug 2022 11:53:07 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50576 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235668AbiHCPvx (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 3 Aug 2022 11:51:53 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 497EF4D806
-        for <kvm@vger.kernel.org>; Wed,  3 Aug 2022 08:51:15 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1659541873;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=PD5y4cQGbEfNPI2pCjHVa112SuT0OnV1h5+PPA1jp5U=;
-        b=aY9BVgqiA35uZwfPMnM1WKViMfyOGSYBNBTCt4nY7n3mLaJXyXIQNwUmqDg5YfzNGFlBAo
-        gboFcu8oklJNr5TQWsyBtNfd0iG/MHU4L3bDtXgm7gAl/uX8gFpv7DOK68i6dI6TUukyUb
-        9u+3bSnODj+OaViSJ5LNtpvh33sO9pk=
-Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
- [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-634-ENQY38BNMcuj35Ofl0mepA-1; Wed, 03 Aug 2022 11:51:11 -0400
-X-MC-Unique: ENQY38BNMcuj35Ofl0mepA-1
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.rdu2.redhat.com [10.11.54.3])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 0F7E6185A79C;
-        Wed,  3 Aug 2022 15:51:11 +0000 (UTC)
-Received: from localhost.localdomain (unknown [10.40.194.242])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id DD6ED1121314;
-        Wed,  3 Aug 2022 15:51:06 +0000 (UTC)
-From:   Maxim Levitsky <mlevitsk@redhat.com>
-To:     kvm@vger.kernel.org
-Cc:     Borislav Petkov <bp@alien8.de>,
-        Dave Hansen <dave.hansen@linux.intel.com>,
-        linux-kernel@vger.kernel.org, Wanpeng Li <wanpengli@tencent.com>,
-        Maxim Levitsky <mlevitsk@redhat.com>,
-        Ingo Molnar <mingo@redhat.com>,
-        Sean Christopherson <seanjc@google.com>, x86@kernel.org,
-        Jim Mattson <jmattson@google.com>,
-        Kees Cook <keescook@chromium.org>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        "H. Peter Anvin" <hpa@zytor.com>, Joerg Roedel <joro@8bytes.org>,
+        with ESMTP id S238347AbiHCPwh (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 3 Aug 2022 11:52:37 -0400
+Received: from mail-pg1-x532.google.com (mail-pg1-x532.google.com [IPv6:2607:f8b0:4864:20::532])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 843BD3898
+        for <kvm@vger.kernel.org>; Wed,  3 Aug 2022 08:51:31 -0700 (PDT)
+Received: by mail-pg1-x532.google.com with SMTP id 12so15493633pga.1
+        for <kvm@vger.kernel.org>; Wed, 03 Aug 2022 08:51:31 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc;
+        bh=nQ/PVBdgsWcgdstxLD2wNHSv0oGBQkwDPYWARWt/BZk=;
+        b=UqknoREV8mEy68zQSBU2lbsWwGYJTvDQqRAleSTHvyIJ9duv+KK5mptQRpjJ4+gqwT
+         NxHvbORsCprsREjtYZh1buxFH+7EmVZpQLTV3+hYE+0dFCTXjJEnC3b96X8evdOb5AvE
+         k4iA+m9355bZUR/pB9mbPpAtkahMb5UJRUeDN+StvBc9wiJ05Fv5gikb+f1UBTkXZ9Wb
+         T3uxjZMlPupTU7GmMz1t23PVXrEuoowTqTk0zL5Hyru097c+kpaUrTX0+tZJiyZrRiOO
+         fkDHAGmtMrFQ7XABTAs6+c7PxqPyw3Ku9zCqwf6gSHK8zwJF3t1nJjjVSt++BhLBcJPe
+         c9cg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc;
+        bh=nQ/PVBdgsWcgdstxLD2wNHSv0oGBQkwDPYWARWt/BZk=;
+        b=h5V82Arj6oZuHOdonwKYejqmPkC+MNy+w5kKK8+NWpOjVUtSU2k3HiRDKwW1hCYzPC
+         P5z3hrHduSO59uwo4MWjpBz1Gz8+yXutBVsDXqqTB1qx1XYPFN9MUJq8gcR6005Nm+Lu
+         xgNX+AKc0K11vq+BSSoRZ/fzR5n/JvX9oXi2okFpoBVxLfx5uKHYxsgn+vdUQd4WmH3a
+         CETjNeK/juhZi20ymJeM7bUWmj2tGu7B74G8PsdwcH+7jZfVZ13uQgH5VITPHjMETFKy
+         q1e7A8WWdqK/piVphKAi/TIQu18zEmZxNFeZhhKgjI45I6V5wSMlWMFatvK+yCkLv7RZ
+         XmEA==
+X-Gm-Message-State: AJIora8Wc4fPKzraDgNaObK8gBkPQFa5hf6ZBOjzU0muFI7RA3KShPNS
+        n3+Vv68pOipxiqNYZ9JeX/3dNA==
+X-Google-Smtp-Source: AGRyM1uDNFXI+kxeHIg+ULHnKLrtLVM3YAsuBREDsfvLxR8PwpGaMsjug1I+UmNiUr91nJEzTB4ZRg==
+X-Received: by 2002:a63:d014:0:b0:41a:13b3:69d9 with SMTP id z20-20020a63d014000000b0041a13b369d9mr21261764pgf.202.1659541889184;
+        Wed, 03 Aug 2022 08:51:29 -0700 (PDT)
+Received: from google.com (7.104.168.34.bc.googleusercontent.com. [34.168.104.7])
+        by smtp.gmail.com with ESMTPSA id x187-20020a6231c4000000b0052c4b3e6f6asm13535782pfx.97.2022.08.03.08.51.28
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 03 Aug 2022 08:51:28 -0700 (PDT)
+Date:   Wed, 3 Aug 2022 15:51:24 +0000
+From:   Sean Christopherson <seanjc@google.com>
+To:     Chao Peng <chao.p.peng@linux.intel.com>
+Cc:     Wei Wang <wei.w.wang@linux.intel.com>,
+        "Gupta, Pankaj" <pankaj.gupta@amd.com>, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org, linux-mm@kvack.org,
+        linux-fsdevel@vger.kernel.org, linux-api@vger.kernel.org,
+        linux-doc@vger.kernel.org, qemu-devel@nongnu.org,
+        linux-kselftest@vger.kernel.org,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Jonathan Corbet <corbet@lwn.net>,
         Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Paolo Bonzini <pbonzini@redhat.com>
-Subject: [PATCH v3 13/13] KVM: x86: emulator/smm: preserve interrupt shadow in SMRAM
-Date:   Wed,  3 Aug 2022 18:50:11 +0300
-Message-Id: <20220803155011.43721-14-mlevitsk@redhat.com>
-In-Reply-To: <20220803155011.43721-1-mlevitsk@redhat.com>
-References: <20220803155011.43721-1-mlevitsk@redhat.com>
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+        x86@kernel.org, "H . Peter Anvin" <hpa@zytor.com>,
+        Hugh Dickins <hughd@google.com>,
+        Jeff Layton <jlayton@kernel.org>,
+        "J . Bruce Fields" <bfields@fieldses.org>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        Shuah Khan <shuah@kernel.org>, Mike Rapoport <rppt@kernel.org>,
+        Steven Price <steven.price@arm.com>,
+        "Maciej S . Szmigiero" <mail@maciej.szmigiero.name>,
+        Vlastimil Babka <vbabka@suse.cz>,
+        Vishal Annapurve <vannapurve@google.com>,
+        Yu Zhang <yu.c.zhang@linux.intel.com>,
+        "Kirill A . Shutemov" <kirill.shutemov@linux.intel.com>,
+        luto@kernel.org, jun.nakajima@intel.com, dave.hansen@intel.com,
+        ak@linux.intel.com, david@redhat.com, aarcange@redhat.com,
+        ddutile@redhat.com, dhildenb@redhat.com,
+        Quentin Perret <qperret@google.com>,
+        Michael Roth <michael.roth@amd.com>, mhocko@suse.com,
+        Muchun Song <songmuchun@bytedance.com>
+Subject: Re: [PATCH v7 11/14] KVM: Register/unregister the guest private
+ memory regions
+Message-ID: <YuqZfPvRo+3GvLF1@google.com>
+References: <d0fd229d-afa6-c66d-3e55-09ac5877453e@amd.com>
+ <YtgrkXqP/GIi9ujZ@google.com>
+ <45ae9f57-d595-f202-abb5-26a03a2ca131@linux.intel.com>
+ <20220721092906.GA153288@chaop.bj.intel.com>
+ <YtmT2irvgInX1kPp@google.com>
+ <20220725130417.GA304216@chaop.bj.intel.com>
+ <YuQ64RgWqdoAAGdY@google.com>
+ <Yuh0ikhoh+tCK6VW@google.com>
+ <YulTH7bL4MwT5v5K@google.com>
+ <20220803094827.GA607465@chaop.bj.intel.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 2.78 on 10.11.54.3
-X-Spam-Status: No, score=-2.7 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        SPF_HELO_NONE,SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20220803094827.GA607465@chaop.bj.intel.com>
+X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
+        USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=unavailable
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-When #SMI is asserted, the CPU can be in interrupt shadow
-due to sti or mov ss.
+On Wed, Aug 03, 2022, Chao Peng wrote:
+> On Tue, Aug 02, 2022 at 04:38:55PM +0000, Sean Christopherson wrote:
+> > On Tue, Aug 02, 2022, Sean Christopherson wrote:
+> > > I think we should avoid UNMAPPABLE even on the KVM side of things for the core
+> > > memslots functionality and instead be very literal, e.g.
+> > > 
+> > > 	KVM_HAS_FD_BASED_MEMSLOTS
+> > > 	KVM_MEM_FD_VALID
+> > > 
+> > > We'll still need KVM_HAS_USER_UNMAPPABLE_MEMORY, but it won't be tied directly to
+> > > the memslot.  Decoupling the two thingis will require a bit of extra work, but the
+> > > code impact should be quite small, e.g. explicitly query and propagate
+> > > MEMFILE_F_USER_INACCESSIBLE to kvm_memory_slot to track if a memslot can be private.
+> > > And unless I'm missing something, it won't require an additional memslot flag.
+> > > The biggest oddity (if we don't also add KVM_MEM_PRIVATE) is that KVM would
+> > > effectively ignore the hva for fd-based memslots for VM types that don't support
+> > > private memory, i.e. userspace can't opt out of using the fd-based backing, but that
+> > > doesn't seem like a deal breaker.
+> 
+> I actually love this idea. I don't mind adding extra code for potential
+> usage other than confidential VMs if we can have a workable solution for
+> it.
+> 
+> > 
+> > Hrm, but basing private memory on top of a generic FD_VALID would effectively require
+> > shared memory to use hva-based memslots for confidential VMs.  That'd yield a very
+> > weird API, e.g. non-confidential VMs could be backed entirely by fd-based memslots,
+> > but confidential VMs would be forced to use hva-based memslots.
+> 
+> It would work if we can treat userspace_addr as optional for
+> KVM_MEM_FD_VALID, e.g. userspace can opt in to decide whether needing
+> the mappable part or not for a regular VM and we can enforce KVM for
+> confidential VMs. But the u64 type of userspace_addr doesn't allow us to
+> express a 'null' value so sounds like we will end up needing another
+> flag anyway.
+> 
+> In concept, we could have three cofigurations here:
+>   1. hva-only: without any flag and use userspace_addr;
+>   2. fd-only:  another new flag is needed and use fd/offset;
+>   3. hva/fd mixed: both userspace_addr and fd/offset is effective.
+>      KVM_MEM_PRIVATE is a subset of it for confidential VMs. Not sure
+>      regular VM also wants this.
 
-It is not mandatory in  Intel/AMD prm to have the #SMI
-blocked during the shadow, and on top of
-that, since neither SVM nor VMX has true support for SMI
-window, waiting for one instruction would mean single stepping
-the guest.
+My mental model breaks things down slightly differently, though the end result is
+more or less the same. 
 
-Instead, allow #SMI in this case, but both reset the interrupt
-window and stash its value in SMRAM to restore it on exit
-from SMM.
+After this series, there will be two types of memory: private and "regular" (I'm
+trying to avoid "shared").  "Regular" memory is always hva-based (userspace_addr),
+and private always fd-based (fd+offset).
 
-This fixes rare failures seen mostly on windows guests on VMX,
-when #SMI falls on the sti instruction which mainfest in
-VM entry failure due to EFLAGS.IF not being set, but STI interrupt
-window still being set in the VMCS.
+In the future, if we want to support fd-based memory for "regular" memory, then
+as you said we'd need to add a new flag, and a new fd+offset pair.
 
+At that point, we'd have two new (relatively to current) flags:
 
-Signed-off-by: Maxim Levitsky <mlevitsk@redhat.com>
----
- arch/x86/kvm/emulate.c     | 17 ++++++++++++++---
- arch/x86/kvm/kvm_emulate.h | 10 ++++++----
- arch/x86/kvm/x86.c         | 12 ++++++++++++
- 3 files changed, 32 insertions(+), 7 deletions(-)
+  KVM_MEM_PRIVATE_FD_VALID
+  KVM_MEM_FD_VALID
 
-diff --git a/arch/x86/kvm/emulate.c b/arch/x86/kvm/emulate.c
-index 4bdbc5893a1657..b4bc45cec3249d 100644
---- a/arch/x86/kvm/emulate.c
-+++ b/arch/x86/kvm/emulate.c
-@@ -2447,7 +2447,7 @@ static int rsm_load_state_32(struct x86_emulate_ctxt *ctxt,
- 			     const struct kvm_smram_state_32 *smstate)
- {
- 	struct desc_ptr dt;
--	int i;
-+	int i, r;
- 
- 	ctxt->eflags =  smstate->eflags | X86_EFLAGS_FIXED;
- 	ctxt->_eip =  smstate->eip;
-@@ -2482,8 +2482,16 @@ static int rsm_load_state_32(struct x86_emulate_ctxt *ctxt,
- 
- 	ctxt->ops->set_smbase(ctxt, smstate->smbase);
- 
--	return rsm_enter_protected_mode(ctxt, smstate->cr0,
--					smstate->cr3, smstate->cr4);
-+	r = rsm_enter_protected_mode(ctxt, smstate->cr0,
-+				     smstate->cr3, smstate->cr4);
-+
-+	if (r != X86EMUL_CONTINUE)
-+		return r;
-+
-+	ctxt->ops->set_int_shadow(ctxt, 0);
-+	ctxt->interruptibility = (u8)smstate->int_shadow;
-+
-+	return X86EMUL_CONTINUE;
- }
- 
- #ifdef CONFIG_X86_64
-@@ -2532,6 +2540,9 @@ static int rsm_load_state_64(struct x86_emulate_ctxt *ctxt,
- 	rsm_load_seg_64(ctxt, &smstate->fs, VCPU_SREG_FS);
- 	rsm_load_seg_64(ctxt, &smstate->gs, VCPU_SREG_GS);
- 
-+	ctxt->ops->set_int_shadow(ctxt, 0);
-+	ctxt->interruptibility = (u8)smstate->int_shadow;
-+
- 	return X86EMUL_CONTINUE;
- }
- #endif
-diff --git a/arch/x86/kvm/kvm_emulate.h b/arch/x86/kvm/kvm_emulate.h
-index 76c0b8e7890b5d..a7313add0f2a58 100644
---- a/arch/x86/kvm/kvm_emulate.h
-+++ b/arch/x86/kvm/kvm_emulate.h
-@@ -234,6 +234,7 @@ struct x86_emulate_ops {
- 	bool (*guest_has_rdpid)(struct x86_emulate_ctxt *ctxt);
- 
- 	void (*set_nmi_mask)(struct x86_emulate_ctxt *ctxt, bool masked);
-+	void (*set_int_shadow)(struct x86_emulate_ctxt *ctxt, u8 shadow);
- 
- 	unsigned (*get_hflags)(struct x86_emulate_ctxt *ctxt);
- 	void (*exiting_smm)(struct x86_emulate_ctxt *ctxt);
-@@ -518,7 +519,8 @@ struct kvm_smram_state_32 {
- 	u32 reserved1[62];
- 	u32 smbase;
- 	u32 smm_revision;
--	u32 reserved2[5];
-+	u32 reserved2[4];
-+	u32 int_shadow; /* KVM extension */
- 	u32 cr4; /* CR4 is not present in Intel/AMD SMRAM image */
- 	u32 reserved3[5];
- 
-@@ -566,6 +568,7 @@ static inline void __check_smram32_offsets(void)
- 	__CHECK_SMRAM32_OFFSET(smbase,		0xFEF8);
- 	__CHECK_SMRAM32_OFFSET(smm_revision,	0xFEFC);
- 	__CHECK_SMRAM32_OFFSET(reserved2,	0xFF00);
-+	__CHECK_SMRAM32_OFFSET(int_shadow,	0xFF10);
- 	__CHECK_SMRAM32_OFFSET(cr4,		0xFF14);
- 	__CHECK_SMRAM32_OFFSET(reserved3,	0xFF18);
- 	__CHECK_SMRAM32_OFFSET(ds,		0xFF2C);
-@@ -625,7 +628,7 @@ struct kvm_smram_state_64 {
- 	u64 io_restart_rsi;
- 	u64 io_restart_rdi;
- 	u32 io_restart_dword;
--	u32 reserved1;
-+	u32 int_shadow;
- 	u8 io_inst_restart;
- 	u8 auto_hlt_restart;
- 	u8 reserved2[6];
-@@ -663,7 +666,6 @@ struct kvm_smram_state_64 {
- 	u64 gprs[16]; /* GPRS in a reversed "natural" X86 order (R15/R14/../RCX/RAX.) */
- };
- 
--
- static inline void __check_smram64_offsets(void)
- {
- #define __CHECK_SMRAM64_OFFSET(field, offset) \
-@@ -684,7 +686,7 @@ static inline void __check_smram64_offsets(void)
- 	__CHECK_SMRAM64_OFFSET(io_restart_rsi,		0xFEB0);
- 	__CHECK_SMRAM64_OFFSET(io_restart_rdi,		0xFEB8);
- 	__CHECK_SMRAM64_OFFSET(io_restart_dword,	0xFEC0);
--	__CHECK_SMRAM64_OFFSET(reserved1,		0xFEC4);
-+	__CHECK_SMRAM64_OFFSET(int_shadow,		0xFEC4);
- 	__CHECK_SMRAM64_OFFSET(io_inst_restart,		0xFEC8);
- 	__CHECK_SMRAM64_OFFSET(auto_hlt_restart,	0xFEC9);
- 	__CHECK_SMRAM64_OFFSET(reserved2,		0xFECA);
-diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-index 4e3ef63baf83df..ae4c20cec7a9fc 100644
---- a/arch/x86/kvm/x86.c
-+++ b/arch/x86/kvm/x86.c
-@@ -8041,6 +8041,11 @@ static void emulator_set_nmi_mask(struct x86_emulate_ctxt *ctxt, bool masked)
- 	static_call(kvm_x86_set_nmi_mask)(emul_to_vcpu(ctxt), masked);
- }
- 
-+static void emulator_set_int_shadow(struct x86_emulate_ctxt *ctxt, u8 shadow)
-+{
-+	 static_call(kvm_x86_set_interrupt_shadow)(emul_to_vcpu(ctxt), shadow);
-+}
-+
- static unsigned emulator_get_hflags(struct x86_emulate_ctxt *ctxt)
- {
- 	return emul_to_vcpu(ctxt)->arch.hflags;
-@@ -8121,6 +8126,7 @@ static const struct x86_emulate_ops emulate_ops = {
- 	.guest_has_fxsr      = emulator_guest_has_fxsr,
- 	.guest_has_rdpid     = emulator_guest_has_rdpid,
- 	.set_nmi_mask        = emulator_set_nmi_mask,
-+	.set_int_shadow      = emulator_set_int_shadow,
- 	.get_hflags          = emulator_get_hflags,
- 	.exiting_smm         = emulator_exiting_smm,
- 	.leave_smm           = emulator_leave_smm,
-@@ -9903,6 +9909,8 @@ static void enter_smm_save_state_32(struct kvm_vcpu *vcpu, struct kvm_smram_stat
- 	smram->cr4 = kvm_read_cr4(vcpu);
- 	smram->smm_revision = 0x00020000;
- 	smram->smbase = vcpu->arch.smbase;
-+
-+	smram->int_shadow = static_call(kvm_x86_get_interrupt_shadow)(vcpu);
- }
- 
- #ifdef CONFIG_X86_64
-@@ -9951,6 +9959,8 @@ static void enter_smm_save_state_64(struct kvm_vcpu *vcpu, struct kvm_smram_stat
- 	enter_smm_save_seg_64(vcpu, &smram->ds, VCPU_SREG_DS);
- 	enter_smm_save_seg_64(vcpu, &smram->fs, VCPU_SREG_FS);
- 	enter_smm_save_seg_64(vcpu, &smram->gs, VCPU_SREG_GS);
-+
-+	smram->int_shadow = static_call(kvm_x86_get_interrupt_shadow)(vcpu);
- }
- #endif
- 
-@@ -9987,6 +9997,8 @@ static void enter_smm(struct kvm_vcpu *vcpu)
- 	kvm_set_rflags(vcpu, X86_EFLAGS_FIXED);
- 	kvm_rip_write(vcpu, 0x8000);
- 
-+	static_call(kvm_x86_set_interrupt_shadow)(vcpu, 0);
-+
- 	cr0 = vcpu->arch.cr0 & ~(X86_CR0_PE | X86_CR0_EM | X86_CR0_TS | X86_CR0_PG);
- 	static_call(kvm_x86_set_cr0)(vcpu, cr0);
- 	vcpu->arch.cr0 = cr0;
--- 
-2.26.3
+along with two new pairs of fd+offset (private_* and "regular").  Mapping those
+to your above list:
+  
+  1.  Neither *_FD_VALID flag set.
+  2a. Both PRIVATE_FD_VALID and FD_VALID are set
+  2b. FD_VALID is set and the VM doesn't support private memory
+  3.  Only PRIVATE_FD_VALID is set (which private memory support in the VM).
 
+Thus, "regular" VMs can't have a mix in a single memslot because they can't use
+private memory.
+
+> There is no direct relationship between unmappable and fd-based since
+> even fd-based can also be mappable for regular VM?
+
+Yep.
+
+> > Ignore this idea for now.  If there's an actual use case for generic fd-based memory
+> > then we'll want a separate flag, fd, and offset, i.e. that support could be added
+> > independent of KVM_MEM_PRIVATE.
+> 
+> If we ignore this idea now (which I'm also fine), do you still think we
+> need change KVM_MEM_PRIVATE to KVM_MEM_USER_UNMAPPBLE?
+
+Hmm, no.  After working through this, I think it's safe to say KVM_MEM_USER_UNMAPPABLE
+is bad name because we could end up with "regular" memory that's backed by an
+inaccessible (unmappable) file.
+
+One alternative would be to call it KVM_MEM_PROTECTED.  That shouldn't cause
+problems for the known use of "private" (TDX and SNP), and it gives us a little
+wiggle room, e.g. if we ever get a use case where VMs can share memory that is
+otherwise protected.
+
+That's a pretty big "if" though, and odds are good we'd need more memslot flags and
+fd+offset pairs to allow differentiating "private" vs. "protected-shared" without
+forcing userspace to punch holes in memslots, so I don't know that hedging now will
+buy us anything.
+
+So I'd say that if people think KVM_MEM_PRIVATE brings additional and meaningful
+clarity over KVM_MEM_PROTECTECD, then lets go with PRIVATE.  But if PROTECTED is
+just as good, go with PROTECTED as it gives us a wee bit of wiggle room for the
+future.
+
+Note, regardless of what name we settle on, I think it makes to do the
+KVM_PRIVATE_MEM_SLOTS => KVM_INTERNAL_MEM_SLOTS rename.
