@@ -2,123 +2,110 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 709FF589155
-	for <lists+kvm@lfdr.de>; Wed,  3 Aug 2022 19:26:01 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 8278E58914F
+	for <lists+kvm@lfdr.de>; Wed,  3 Aug 2022 19:25:49 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238214AbiHCR0A (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 3 Aug 2022 13:26:00 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35548 "EHLO
+        id S238072AbiHCRZr (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 3 Aug 2022 13:25:47 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35338 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S238108AbiHCRZw (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 3 Aug 2022 13:25:52 -0400
-Received: from mailtransmit04.runbox.com (mailtransmit04.runbox.com [IPv6:2a0c:5a00:149::25])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3F6D4205FF
-        for <kvm@vger.kernel.org>; Wed,  3 Aug 2022 10:25:51 -0700 (PDT)
-Received: from mailtransmit03.runbox ([10.9.9.163] helo=aibo.runbox.com)
-        by mailtransmit04.runbox.com with esmtps  (TLS1.2) tls TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256
-        (Exim 4.93)
-        (envelope-from <mhal@rbox.co>)
-        id 1oJI7x-00HAO1-8u; Wed, 03 Aug 2022 19:25:49 +0200
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=rbox.co;
-        s=selector1; h=Content-Transfer-Encoding:MIME-Version:References:In-Reply-To:
-        Message-Id:Date:Subject:Cc:To:From;
-        bh=Cx0Wbu9tyWYXwdm9srrl7Da37mHrI+iH5dMu+ikSwWw=; b=h+P/lTGz3ka57OzpXgCr0uqp46
-        6Zb2FVw64ncpK4nMyMH4jpz/PD4ScjWWaoe7yiF6QZ8fqJodpeioCW0qKrKAEzBYGAq+qcMfBLwlp
-        ZNaI9lahhpHv2Ay3tjAULdfhROirXJnq3lpDURwrVa3D1+WJINmNtsR0yWa6+EKtCfW3MwoPgGeWR
-        GClOLlizfRXKMv1HnTnaiQfkvbGL5QRg0r+/sO3KKS+1+k3/BkcYiahd2csDGJI++cb7AbdyT4JAv
-        qvL3I4I/AQmHoOe9kgBCM30RbZH7qS7JvqKy6X9cEwlPR3W/mxgGElGOC7eYCyCxB77xTtmEd8y/a
-        lEohw0iw==;
-Received: from [10.9.9.73] (helo=submission02.runbox)
-        by mailtransmit03.runbox with esmtp (Exim 4.86_2)
-        (envelope-from <mhal@rbox.co>)
-        id 1oJI7t-0004o7-4l; Wed, 03 Aug 2022 19:25:49 +0200
-Received: by submission02.runbox with esmtpsa  [Authenticated ID (604044)]  (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
-        (Exim 4.90_1)
-        id 1oJI7p-0000yh-Oq; Wed, 03 Aug 2022 19:25:41 +0200
-From:   Michal Luczaj <mhal@rbox.co>
-To:     seanjc@google.com
-Cc:     kvm@vger.kernel.org, pbonzini@redhat.com, shuah@kernel.org,
-        linux-kselftest@vger.kernel.org, Michal Luczaj <mhal@rbox.co>
-Subject: [kvm-unit-tests PATCH 4/4] x86: Extend ASM_TRY to handle #UD thrown by FEP-triggered emulator
-Date:   Wed,  3 Aug 2022 19:25:08 +0200
-Message-Id: <20220803172508.1215-4-mhal@rbox.co>
-X-Mailer: git-send-email 2.37.1
-In-Reply-To: <20220803172508.1215-1-mhal@rbox.co>
-References: <Yum2LpZS9vtCaCBm@google.com>
- <20220803172508.1215-1-mhal@rbox.co>
+        with ESMTP id S236279AbiHCRZp (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 3 Aug 2022 13:25:45 -0400
+Received: from mail-wm1-x329.google.com (mail-wm1-x329.google.com [IPv6:2a00:1450:4864:20::329])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A1B2A17AA1;
+        Wed,  3 Aug 2022 10:25:42 -0700 (PDT)
+Received: by mail-wm1-x329.google.com with SMTP id 8-20020a05600c024800b003a2fe343db1so1179884wmj.1;
+        Wed, 03 Aug 2022 10:25:42 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=sender:date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=GXZ4xXNRwdNX246uTCDjp/6UfuNozlv9ogOaTndHxOo=;
+        b=BqcDSD4qn8OphNeXpd4d1tICbsWAbV05Cvz+aFGaHqgRoneYmfEIQI10k2dCySJ0oG
+         uD2WrHSD66whZkjrFUTtw0Cl9ZNMwWzlBvEPk/5HwAhrvRgfpvgWgst01K/6+4r6ckV8
+         3pDECBqxeMSC2SgqdcphAHHqEw0WbFd00j4k0yJebkVBonPd44SLNvBtqSxZQVF4tYii
+         cmnypkd1Tb990NlTdqggfgVNlTBH1xAlHz+xCO71uEyKLvwSV8DuYF+wapx/FCxeJ4ku
+         AgpkIaJpMEj2n9xtMl+b0i4bk1dewK6pXeZpClNTRJ+Am3qGIGHi5RzV7biuwysveun+
+         5KjQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:sender:date:from:to:cc:subject:message-id
+         :references:mime-version:content-disposition:in-reply-to;
+        bh=GXZ4xXNRwdNX246uTCDjp/6UfuNozlv9ogOaTndHxOo=;
+        b=rvP3lRA4s2rGq7xFZHGYIJ3mWjP3b+aDfEKAbLxgMvJaeiV2H7SlnyqmHsOKWVzlRm
+         fVZmfMRysrCbVohNjsNYJQ9aQLsQZ55V5Ixsjq48UFkc/tpVwiqsTKbPxcU5EWH/VKc5
+         ustAHOvj36iWt5FYLWPLdC6HipoiT4RK/f7XdhWlz8OC9G0cgOrXjZwWNvxo/hCBRa5E
+         79LwskcF+kdJ+HeHqf9ereOCzeopkkpUred3fOmvc9dXackUsAS9OX1gEWuA+uwTr008
+         GZhaUl9p+R2B0AkBB/AuLuIdHHpFrPfiPMkJfnVmfWU+EAENuBGMJZm3eBlD9+6yk42k
+         mOLA==
+X-Gm-Message-State: ACgBeo2oDqITane6Kux9IEqm7vF3kjIv4bTXaEFRwul3TMgiFfX10eOg
+        Az7hd/hGmambK9Qky24CDi0=
+X-Google-Smtp-Source: AA6agR7uecIPoAy4JexF43f01e/Ul4jeTMonddQbm0RbqwtLyfKDXjbJXnVTFT8AB1q0vYGU0QVTTg==
+X-Received: by 2002:a05:600c:2854:b0:3a3:1551:d7d with SMTP id r20-20020a05600c285400b003a315510d7dmr3400140wmb.174.1659547541214;
+        Wed, 03 Aug 2022 10:25:41 -0700 (PDT)
+Received: from gmail.com (84-236-113-167.pool.digikabel.hu. [84.236.113.167])
+        by smtp.gmail.com with ESMTPSA id s14-20020a5d424e000000b0021d7fa77710sm18608588wrr.92.2022.08.03.10.25.40
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 03 Aug 2022 10:25:40 -0700 (PDT)
+Sender: Ingo Molnar <mingo.kernel.org@gmail.com>
+Date:   Wed, 3 Aug 2022 19:25:38 +0200
+From:   Ingo Molnar <mingo@kernel.org>
+To:     Kyle Huey <me@kylehuey.com>
+Cc:     Dave Hansen <dave.hansen@linux.intel.com>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Borislav Petkov <bp@alien8.de>, Ingo Molnar <mingo@redhat.com>,
+        x86@kernel.org, "H. Peter Anvin" <hpa@zytor.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Andy Lutomirski <luto@kernel.org>,
+        Peter Zijlstra <peterz@infradead.org>,
+        linux-kernel@vger.kernel.org,
+        Robert O'Callahan <robert@ocallahan.org>,
+        David Manouchehri <david.manouchehri@riseup.net>,
+        kvm@vger.kernel.org, stable@vger.kernel.org
+Subject: Re: [PATCH] x86/fpu: Allow PKRU to be (once again) written by ptrace.
+Message-ID: <Yuqvkufu7Hu4drL6@gmail.com>
+References: <20220731050342.56513-1-khuey@kylehuey.com>
+ <Yuo59tV071/i6yhf@gmail.com>
+ <CAP045ArF0SX84tDr=iZoK=EnXK2LsXYut3-KMkCxQO2OOhn=0A@mail.gmail.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-2.8 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,RCVD_IN_DNSWL_LOW,
-        SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CAP045ArF0SX84tDr=iZoK=EnXK2LsXYut3-KMkCxQO2OOhn=0A@mail.gmail.com>
+X-Spam-Status: No, score=-1.5 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_EF,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+        HEADER_FROM_DIFFERENT_DOMAINS,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,
+        SPF_PASS autolearn=no autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-TRY_ASM() mishandles #UD thrown by the forced-emulation-triggered emulator.
-While the faulting address stored in the exception table points at forced
-emulation prefix, when #UD comes, RIP is 5 bytes (size of KVM_FEP) ahead
-and the exception ends up unhandled.
 
-Suggested-by: Sean Christopherson <seanjc@google.com>
-Signed-off-by: Michal Luczaj <mhal@rbox.co>
----
-While here, I've also took the opportunity to merge both 32 and 64-bit
-versions of ASM_TRY() (.dc.a for .long and .quad), but perhaps there
-were some reasons for not using .dc.a?
+* Kyle Huey <me@kylehuey.com> wrote:
 
- lib/x86/desc.h | 11 +++++------
- x86/emulator.c |  4 ++--
- 2 files changed, 7 insertions(+), 8 deletions(-)
+> > Also, what's the security model for this register, do we trust all 
+> > input values user-space provides for the PKRU field in the XSTATE? I 
+> > realize that WRPKRU already gives user-space write access to the 
+> > register - but does the CPU write it all into the XSTATE, with no 
+> > restrictions on content whatsoever?
+> 
+> There is no security model for this register. The CPU does write whatever 
+> is given to WRPKRU (or XRSTOR) into the PKRU register. The pkeys(7) man 
+> page notes:
+> 
+> Protection keys have the potential to add a layer of security and 
+> reliability to applications. But they have not been primarily designed as 
+> a security feature. For instance, WRPKRU is a completely unprivileged 
+> instruction, so pkeys are useless in any case that an attacker controls 
+> the PKRU register or can execute arbitrary instructions.
 
-diff --git a/lib/x86/desc.h b/lib/x86/desc.h
-index 2a285eb..99cc224 100644
---- a/lib/x86/desc.h
-+++ b/lib/x86/desc.h
-@@ -80,21 +80,20 @@ typedef struct  __attribute__((packed)) {
- 	u16 iomap_base;
- } tss64_t;
- 
--#ifdef __x86_64
- #define ASM_TRY(catch)			\
- 	"movl $0, %%gs:4 \n\t"		\
- 	".pushsection .data.ex \n\t"	\
--	".quad 1111f, " catch "\n\t"	\
-+	".dc.a 1111f, " catch "\n\t"	\
- 	".popsection \n\t"		\
- 	"1111:"
--#else
--#define ASM_TRY(catch)			\
-+
-+#define ASM_TRY_PREFIXED(prefix, catch)	\
- 	"movl $0, %%gs:4 \n\t"		\
- 	".pushsection .data.ex \n\t"	\
--	".long 1111f, " catch "\n\t"	\
-+	".dc.a 1111f, " catch "\n\t"	\
- 	".popsection \n\t"		\
-+	prefix "\n\t"			\
- 	"1111:"
--#endif
- 
- /*
-  * selector     32-bit                        64-bit
-diff --git a/x86/emulator.c b/x86/emulator.c
-index df0bc49..d2a5302 100644
---- a/x86/emulator.c
-+++ b/x86/emulator.c
-@@ -900,8 +900,8 @@ static void test_illegal_lea(void)
- {
- 	unsigned int vector;
- 
--	asm volatile (ASM_TRY("1f")
--		      KVM_FEP ".byte 0x8d; .byte 0xc0\n\t"
-+	asm volatile (ASM_TRY_PREFIXED(KVM_FEP, "1f")
-+		      ".byte 0x8d; .byte 0xc0\n\t"
- 		      "1:"
- 		      : : : "memory", "eax");
- 
--- 
-2.37.1
+Ok - allowing ptrace to set the full 32 bits of the PKRU register seems OK 
+then, and is 100% equivalent to using WRPKRU, right? So there's no implicit 
+masking/clearing of bits depending on how many keys are available, or other 
+details where WRPKRU might differ from a pure 32-bit per thread write, 
+correct?
 
+Thanks,
+
+	Ingo
