@@ -2,232 +2,117 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 889C8589A44
-	for <lists+kvm@lfdr.de>; Thu,  4 Aug 2022 12:06:27 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 00E4E589AA1
+	for <lists+kvm@lfdr.de>; Thu,  4 Aug 2022 12:59:50 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238660AbiHDKGZ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 4 Aug 2022 06:06:25 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46390 "EHLO
+        id S239158AbiHDK4k (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 4 Aug 2022 06:56:40 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46500 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229622AbiHDKGV (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 4 Aug 2022 06:06:21 -0400
-Received: from mga09.intel.com (mga09.intel.com [134.134.136.24])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EC8341144A;
-        Thu,  4 Aug 2022 03:06:19 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1659607580; x=1691143580;
-  h=message-id:subject:from:to:cc:date:in-reply-to:
-   references:content-transfer-encoding:mime-version;
-  bh=6LzfFaMcibOIFh7i21tihe87Mm/yg4T+Qwrw9BpYauo=;
-  b=lOp1D+Op7RAfv6xZlk2wLfpM9kHsbdx40SrGiKnv98x9vhx9vKxypALQ
-   4JCkv0szEWjsYNjpKHaGpT7ZD7LaPYnQAhmL34Eh8BS4Wb71z6G95hCip
-   ZGYlbLDi0Tl9C+PcXfcq/BjQqSsmEKyUQmtvTkysnFNhrZsE8NUk3ERoe
-   O7nv0i0tAlXoCpe0usFSkfV9zU4jZOyhhTaZyJx1xmncCD8TMxeU0IVdU
-   qP/jxNdNzWKDTaVuLyuA7hpg7EjZUx9/7lQ7LKIG8krZGzk5607/5Wpsz
-   Tn7v/AhWw8Eg4nxO54JUrFxSVTwBYe9DuUs4jL5UjyzMzxdfoQYrZ27vd
-   g==;
-X-IronPort-AV: E=McAfee;i="6400,9594,10428"; a="290671289"
-X-IronPort-AV: E=Sophos;i="5.93,215,1654585200"; 
-   d="scan'208";a="290671289"
-Received: from orsmga007.jf.intel.com ([10.7.209.58])
-  by orsmga102.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 04 Aug 2022 03:06:19 -0700
-X-IronPort-AV: E=Sophos;i="5.93,215,1654585200"; 
-   d="scan'208";a="599954926"
-Received: from bshamoun-mobl4.amr.corp.intel.com (HELO khuang2-desk.gar.corp.intel.com) ([10.212.8.236])
-  by orsmga007-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 04 Aug 2022 03:06:16 -0700
-Message-ID: <7e4bdbf988addfa811e3317e6da7ef691bd46c3a.camel@intel.com>
-Subject: Re: [PATCH v5 07/22] x86/virt/tdx: Implement SEAMCALL function
-From:   Kai Huang <kai.huang@intel.com>
-To:     Dave Hansen <dave.hansen@intel.com>, linux-kernel@vger.kernel.org,
-        kvm@vger.kernel.org
-Cc:     seanjc@google.com, pbonzini@redhat.com, len.brown@intel.com,
-        tony.luck@intel.com, rafael.j.wysocki@intel.com,
-        reinette.chatre@intel.com, dan.j.williams@intel.com,
-        peterz@infradead.org, ak@linux.intel.com,
-        kirill.shutemov@linux.intel.com,
-        sathyanarayanan.kuppuswamy@linux.intel.com,
-        isaku.yamahata@intel.com
-Date:   Thu, 04 Aug 2022 22:06:13 +1200
-In-Reply-To: <28ece806443e4de04d7e587d7e678d58259f9c5b.camel@intel.com>
-References: <cover.1655894131.git.kai.huang@intel.com>
-         <095e6bbc57b4470e1e9a9104059a5238c9775f00.1655894131.git.kai.huang@intel.com>
-         <069a062e-a4a6-09af-7b74-7f4929f2ec0b@intel.com>
-         <5ce7ebfe54160ea35e432bf50207ebed32db31fc.camel@intel.com>
-         <84e93539-a2f9-f68e-416a-ea3d8fc725af@intel.com>
-         <6bef368ccc68676e4acaecc4b6dc52f598ea7f2f.camel@intel.com>
-         <ea03e55499f556388c0a5f9ed565e72e213c276f.camel@intel.com>
-         <978c3d37-97c9-79b9-426a-2c27db34c38a@intel.com>
-         <0b20f1878d31658a9e3cd3edaf3826fe8731346e.camel@intel.com>
-         <c96a78c6a8caf25b01e450f139c934688d1735b0.camel@intel.com>
-         <54cf3e98-49d3-81f5-58e6-ca62671ab457@intel.com>
-         <28ece806443e4de04d7e587d7e678d58259f9c5b.camel@intel.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-User-Agent: Evolution 3.44.3 (3.44.3-1.fc36) 
+        with ESMTP id S239183AbiHDK40 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 4 Aug 2022 06:56:26 -0400
+Received: from smtp-out2.suse.de (smtp-out2.suse.de [IPv6:2001:67c:2178:6::1d])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1D5ED13E33;
+        Thu,  4 Aug 2022 03:56:25 -0700 (PDT)
+Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
+        (No client certificate requested)
+        by smtp-out2.suse.de (Postfix) with ESMTPS id 84CC520EDD;
+        Thu,  4 Aug 2022 10:56:23 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
+        t=1659610583; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=mlktYDm7Q9WWK6B+W/bogBPhH4hH8aSA3B4MxQAXBh8=;
+        b=TPP8b3t9rP/4eLEeZXO6gehvwrqcL7GwZPmNp1ThS0tbE/j1542zCGpq07mMbmExjzmwlX
+        lXfgzuJ0CY6iYJqXmo4ApAu9S70VWGRjriAiRy5aI4x0SlodVrU8dHzjD3ON/ppZumNNz6
+        +x3nxSFky7Yjy+JgErlSstlF1EA2l8I=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
+        s=susede2_ed25519; t=1659610583;
+        h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=mlktYDm7Q9WWK6B+W/bogBPhH4hH8aSA3B4MxQAXBh8=;
+        b=o817tBQaO2BN6keT74Cjjte1SJotvXncGsbi9oVX1SnL7Y2Brd2tIf1H/kzQQWeXDBGYly
+        BMVwf/IvHGGT+ZCA==
+Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
+        (No client certificate requested)
+        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id 06ED513A94;
+        Thu,  4 Aug 2022 10:56:23 +0000 (UTC)
+Received: from dovecot-director2.suse.de ([192.168.254.65])
+        by imap2.suse-dmz.suse.de with ESMTPSA
+        id YtDiANel62J/GwAAMHmgww
+        (envelope-from <vbabka@suse.cz>); Thu, 04 Aug 2022 10:56:23 +0000
+Message-ID: <5c6e8435-22bb-234a-87a1-96c9f4e93dc9@suse.cz>
+Date:   Thu, 4 Aug 2022 12:56:22 +0200
 MIME-Version: 1.0
-X-Spam-Status: No, score=-5.0 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
-        RCVD_IN_MSPIKE_H3,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE
-        autolearn=ham autolearn_force=no version=3.4.6
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.0.3
+Subject: Re: [PATCH Part2 v6 27/49] KVM: SVM: Mark the private vma unmerable
+ for SEV-SNP guests
+Content-Language: en-US
+To:     Ashish Kalra <Ashish.Kalra@amd.com>, x86@kernel.org,
+        linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        linux-coco@lists.linux.dev, linux-mm@kvack.org,
+        linux-crypto@vger.kernel.org
+Cc:     tglx@linutronix.de, mingo@redhat.com, jroedel@suse.de,
+        thomas.lendacky@amd.com, hpa@zytor.com, ardb@kernel.org,
+        pbonzini@redhat.com, seanjc@google.com, vkuznets@redhat.com,
+        jmattson@google.com, luto@kernel.org, dave.hansen@linux.intel.com,
+        slp@redhat.com, pgonda@google.com, peterz@infradead.org,
+        srinivas.pandruvada@linux.intel.com, rientjes@google.com,
+        dovmurik@linux.ibm.com, tobin@ibm.com, bp@alien8.de,
+        michael.roth@amd.com, kirill@shutemov.name, ak@linux.intel.com,
+        tony.luck@intel.com, marcorr@google.com,
+        sathyanarayanan.kuppuswamy@linux.intel.com, alpergun@google.com,
+        dgilbert@redhat.com, jarkko@kernel.org
+References: <cover.1655761627.git.ashish.kalra@amd.com>
+ <bb10f0a4c5eb13a5338f77ef34f08f1190d4ae30.1655761627.git.ashish.kalra@amd.com>
+From:   Vlastimil Babka <vbabka@suse.cz>
+In-Reply-To: <bb10f0a4c5eb13a5338f77ef34f08f1190d4ae30.1655761627.git.ashish.kalra@amd.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-Spam-Status: No, score=-1.4 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,SPF_HELO_NONE,
+        SPF_SOFTFAIL autolearn=no autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, 2022-08-04 at 10:35 +1200, Kai Huang wrote:
-> On Wed, 2022-08-03 at 07:20 -0700, Dave Hansen wrote:
-> > On 8/2/22 19:37, Kai Huang wrote:
-> > > On Thu, 2022-07-21 at 13:52 +1200, Kai Huang wrote:
-> > > > Also, if I understand correctly above, your suggestion is we want t=
-o prevent any
-> > > > CMR memory going offline so it won't be hot-removed (assuming we ca=
-n get CMRs
-> > > > during boot).=C2=A0 This looks contradicts to the requirement of be=
-ing able to allow
-> > > > moving memory from core-mm to driver.=C2=A0 When we offline the mem=
-ory, we cannot
-> > > > know whether the memory will be used by driver, or later hot-remove=
-d.
-> > > Hi Dave,
-> > >=20
-> > > The high level flow of device hot-removal is:
-> > >=20
-> > > acpi_scan_hot_remove()
-> > > 	-> acpi_scan_try_to_offline()
-> > > 		-> acpi_bus_offline()
-> > > 			-> device_offline()
-> > > 				-> memory_subsys_offline()
-> > > 	-> acpi_bus_trim()
-> > > 		-> acpi_memory_device_remove()
-> > >=20
-> > >=20
-> > > And memory_subsys_offline() can also be triggered via /sysfs:
-> > >=20
-> > > 	echo 0 > /sys/devices/system/memory/memory30/online
-> > >=20
-> > > After the memory block is offline, my understanding is kernel can the=
-oretically
-> > > move it to, i.e. ZONE_DEVICE via memremap_pages().
-> > >=20
-> > > As you can see memory_subsys_offline() is the entry point of memory d=
-evice
-> > > offline (before it the code is generic for all ACPI device), and it c=
-annot
-> > > distinguish whether the removal is from ACPI event, or from /sysfs, s=
-o it seems
-> > > we are unable to refuse to offline memory in  memory_subsys_offline()=
- when it is
-> > > called from ACPI event.
-> > >=20
-> > > Any comments?
-> >=20
-> > I suggest refactoring the code in a way that makes it possible to
-> > distinguish the two cases.
-> >=20
-> > It's not like you have some binary kernel.  You have the source code fo=
-r
-> > the whole thing and can propose changes *ANYWHERE* you need.  Even bett=
-er:
-> >=20
-> > $ grep -A2 ^ACPI\$ MAINTAINERS
-> > ACPI
-> > M:	"Rafael J. Wysocki" <rafael@kernel.org>
-> > R:	Len Brown <lenb@kernel.org>
-> >=20
-> > The maintainer of ACPI works for our employer.  Plus, he's a nice
-> > helpful guy that you can go ask how you might refactor this or
-> > approaches you might take.  Have you talked to Rafael about this issue?
->=20
-> Rafael once also suggested to set hotplug.enabled to 0 as your code shows=
- below,
-> but we just got the TDX architecture behaviour of memory hotplug clarifie=
-d from
-> Intel TDX guys recently.=20
->=20
-> > Also, from a two-minute grepping session, I noticed this:
-> >=20
-> > > static acpi_status acpi_bus_offline(acpi_handle handle, u32 lvl, void=
- *data,
-> > >                                     void **ret_p)
-> > > {
-> > ...
-> > >         if (device->handler && !device->handler->hotplug.enabled) {
-> > >                 *ret_p =3D &device->dev;
-> > >                 return AE_SUPPORT;
-> > >         }
-> >=20
-> > It looks to me like if you simply set:
-> >=20
-> > 	memory_device_handler->hotplug.enabled =3D false;
-> >=20
-> > you'll get most of the behavior you want.  ACPI memory hotplug would no=
-t
-> > work and the changes would be confined to the ACPI world.  The
-> > "lower-level" bus-based hotplug would be unaffected.
-> >=20
-> > Now, I don't know what kind of locking would be needed to muck with a
-> > global structure like that.  But, it's a start.
->=20
-> This has two problems:
->=20
-> 1) This approach cannot distinguish non-CMR memory hotplug and CMR memory
-> hotplug, as it disables ACPI memory hotplug for all.  But this is fine as=
- we
-> want to reject non-CMR memory hotplug anyway.  We just need to explain cl=
-early
-> in changelog.
->=20
-> 2) This won't allow the kernel to speak out "BIOS  bug" when CMR memory h=
-otplug
-> actually happens.  Instead, we can only print out "hotplug is disabled du=
-e to
-> TDX is enabled by BIOS." when we set hotplug.enable to false.
->=20
-> Assuming above is OK, I'll explore this option.  I'll also do some resear=
-ch to
-> see if it's still possible to speak out "BIOS bug" in this approach but i=
-t's not
-> a mandatory requirement to me now.
->=20
-> Also, if print out "BIOS bug" for CMR memory hotplug isn't mandatory, the=
-n we
-> can just detect TDX during kernel boot, and disable hotplug when TDX is e=
-nabled
-> by BIOS, but don't need to use "winner-take-all" approach.  The former is
-> clearer and easier to implement.  I'll go with the former approach if I d=
-on't
-> hear objection from you.
->=20
-> And ACPI CPU hotplug can also use the same way.
->=20
-> Please let me know any comments.  Thanks!
->=20
+On 6/21/22 01:08, Ashish Kalra wrote:
+> From: Brijesh Singh <brijesh.singh@amd.com>
+> 
+> When SEV-SNP is enabled, the guest private pages are added in the RMP
+> table; while adding the pages, the rmp_make_private() unmaps the pages
+> from the direct map. If KSM attempts to access those unmapped pages then
+> it will trigger #PF (page-not-present).
+> 
+> Encrypted guest pages cannot be shared between the process, so an
+> userspace should not mark the region mergeable but to be safe, mark the
+> process vma unmerable before adding the pages in the RMP table.
+> 
+> Signed-off-by: Brijesh Singh <brijesh.singh@amd.com>
 
-One more reason why "winner-take-all" approach doesn't work:=C2=A0
+Note this doesn't really mark the vma unmergeable, rather it unmarks it as
+mergeable, and unmerges any already merged pages.
+Which seems like a good idea. Is snp_launch_update() the only place that
+needs it or can private pages be added elsewhere too?
 
-If we allow ACPI memory hotplug to happen but choose to disable it in the
-handler using "winner-take-all", then at the beginning the ACPI code will
-actually create a /sysfs entry for hotplug.enabled to allow userspace to ch=
-ange
-it:
+However, AFAICS nothing stops userspace to do another
+madvise(MADV_MERGEABLE) afterwards, so we should make somehow sure that ksm
+will still be prevented, as we should protect the kernel even from a buggy
+userspace. So either we stop it with a flag at vma level (see ksm_madvise()
+for which flags currently stop it), or page level - currently only
+PageAnon() pages are handled. The vma level is probably easier/cheaper.
 
-	/sys/firmware/acpi/hotplug/memory/enabled
+It's also possible that this will solve itself with the switch to UPM as
+those vma's or pages might be incompatible with ksm naturally (didn't check
+closely), and then this patch can be just dropped. But we should double-check.
 
-Which means even we set hotplug.enabled to false at some point, userspace c=
-an
-turn it on again.  The only way is to not create this /sysfs entry at the
-beginning.
-
-With "winner-take-all" approach, I don't think we should avoid creating the
-/sysfs entry.  Nor we should introduce arch-specific hook to, i.e. prevent
-/sysfs entry being changed by userspace.
-
-So instead of "winner-take-all" approach, I'll introduce a new kernel comma=
-nd
-line to allow user to choose between ACPI CPU/memory hotplug vs TDX.  This
-command line should not impact the "software" CPU/memory hotplug even when =
-user
-choose to use TDX.  In this case, this is similar to "winner-take-all" anyw=
-ay.
