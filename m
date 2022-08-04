@@ -2,415 +2,130 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 3A29C589B2A
-	for <lists+kvm@lfdr.de>; Thu,  4 Aug 2022 13:44:52 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id A411F589B7A
+	for <lists+kvm@lfdr.de>; Thu,  4 Aug 2022 14:11:51 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231982AbiHDLoo (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 4 Aug 2022 07:44:44 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51350 "EHLO
+        id S239650AbiHDML2 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 4 Aug 2022 08:11:28 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42008 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230092AbiHDLon (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 4 Aug 2022 07:44:43 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id F1355BE25
-        for <kvm@vger.kernel.org>; Thu,  4 Aug 2022 04:44:41 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1659613481;
+        with ESMTP id S232031AbiHDML1 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 4 Aug 2022 08:11:27 -0400
+Received: from mail.skyhub.de (mail.skyhub.de [5.9.137.197])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4CD4125E98;
+        Thu,  4 Aug 2022 05:11:26 -0700 (PDT)
+Received: from zn.tnic (p200300ea970f4fa7329c23fffea6a903.dip0.t-ipconnect.de [IPv6:2003:ea:970f:4fa7:329c:23ff:fea6:a903])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by mail.skyhub.de (SuperMail on ZX Spectrum 128k) with ESMTPSA id A09BE1EC056A;
+        Thu,  4 Aug 2022 14:11:20 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alien8.de; s=dkim;
+        t=1659615080;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=qGUgdNZOpqhptyxWX57AXLZa9Rrvi3bP4c6znlUiWHM=;
-        b=csR6hH2t4VAZBdTg9WazQQsrf/Kz7ezl+5r6+LEC4Bh6hIyRAAuI1EX+XmCTSw5QB8By+3
-        L1JQF7ISSIlweFTmXUcFLg9uXFABq2Zu1qwrwbpPFT5uNZoz60ABTSZCBZZmOl7bFYNPwY
-        TotBTH2EGI7WJmG5TG4BGbPPuv0FfdM=
-Received: from mail-ot1-f69.google.com (mail-ot1-f69.google.com
- [209.85.210.69]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-348-3IHgZl2cOta8pt6NmZ76gg-1; Thu, 04 Aug 2022 07:44:40 -0400
-X-MC-Unique: 3IHgZl2cOta8pt6NmZ76gg-1
-Received: by mail-ot1-f69.google.com with SMTP id a13-20020a05683012cd00b0061c9b55da16so8488584otq.9
-        for <kvm@vger.kernel.org>; Thu, 04 Aug 2022 04:44:39 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc;
-        bh=qGUgdNZOpqhptyxWX57AXLZa9Rrvi3bP4c6znlUiWHM=;
-        b=tenwgPgoDsr3QhjGaVQPXTTnUM1CjujyRWSBklvNAyE3Amc0bqH+PGJTy49ti5ruod
-         7SmZ42tADPCaQoXJ89XIR6hsw1FG2bWAJ6pGf+/lANKREvbAfr0LeD4L2Jes7tGzjbpp
-         FVHIWBYnMkWGNF1vNhv+Kb8oDYZ25dLEcbvV5nIhrApoK0WcVYn1myIuz8pCYovy4JPK
-         wFUf/RFWDy89n/dbuWj0I7j253jBt1Px4gI5YkWrPDYx8rPJQipUfVU9+F9wLeb1qu96
-         7YwPXTJHCrZmHTEmjTJSz4+KWsauY1fzqf7rtSkKINYbyMcsmTt4cUVcJgfIeurpyDgB
-         FDrg==
-X-Gm-Message-State: ACgBeo2B/EMy5iLsIfZ7zYc3X1g8m1C5tVT+7/NbmEjADxugBXzrg4v3
-        1X30WyqRUsY01ETSFpPhxelwV2U/yf9BTY55RUH4T9qjW2nLMqW1bG4wPx9iw0qE1iiyREreRTn
-        TfEaE5ar8WqgvgfHtqilYfV+m7G3e
-X-Received: by 2002:a05:6808:2187:b0:33a:c507:d4f3 with SMTP id be7-20020a056808218700b0033ac507d4f3mr3818814oib.205.1659613479153;
-        Thu, 04 Aug 2022 04:44:39 -0700 (PDT)
-X-Google-Smtp-Source: AA6agR7CvLNiv7ihbP3vmMtIxLNq2FMsyngO6KymXwziIXsiatyNW+aiMIFSUucXkpOhEe5YRj5ZG7xxdz695BM04Ec=
-X-Received: by 2002:a05:6808:2187:b0:33a:c507:d4f3 with SMTP id
- be7-20020a056808218700b0033ac507d4f3mr3818772oib.205.1659613477336; Thu, 04
- Aug 2022 04:44:37 -0700 (PDT)
+         content-transfer-encoding:in-reply-to:in-reply-to:  references:references;
+        bh=dnIT6BfnSCaKhEYKVBp/iA/Xm7t6NZGreWnaebbwv6k=;
+        b=W0AeNaoVM6CH3GtewEuI+fIELWnyUWnbtPopu0teCfDVXAA+IY0af/WCp/fUXMNVQlR+TK
+        T7iY6EHSMJ5d5w6FvIBUxFmeoZ0H7X7gmQt0AFqnck6ptA9thEH0t2Ga6yTQM2/CzR8WOk
+        nJnFZXaVIpDqFzGDdrWHxjYY2fcrKx4=
+Date:   Thu, 4 Aug 2022 14:11:16 +0200
+From:   Borislav Petkov <bp@alien8.de>
+To:     "Kalra, Ashish" <Ashish.Kalra@amd.com>
+Cc:     "x86@kernel.org" <x86@kernel.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "linux-coco@lists.linux.dev" <linux-coco@lists.linux.dev>,
+        "linux-mm@kvack.org" <linux-mm@kvack.org>,
+        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
+        "tglx@linutronix.de" <tglx@linutronix.de>,
+        "mingo@redhat.com" <mingo@redhat.com>,
+        "jroedel@suse.de" <jroedel@suse.de>,
+        "Lendacky, Thomas" <Thomas.Lendacky@amd.com>,
+        "hpa@zytor.com" <hpa@zytor.com>,
+        "ardb@kernel.org" <ardb@kernel.org>,
+        "pbonzini@redhat.com" <pbonzini@redhat.com>,
+        "seanjc@google.com" <seanjc@google.com>,
+        "vkuznets@redhat.com" <vkuznets@redhat.com>,
+        "jmattson@google.com" <jmattson@google.com>,
+        "luto@kernel.org" <luto@kernel.org>,
+        "dave.hansen@linux.intel.com" <dave.hansen@linux.intel.com>,
+        "slp@redhat.com" <slp@redhat.com>,
+        "pgonda@google.com" <pgonda@google.com>,
+        "peterz@infradead.org" <peterz@infradead.org>,
+        "srinivas.pandruvada@linux.intel.com" 
+        <srinivas.pandruvada@linux.intel.com>,
+        "rientjes@google.com" <rientjes@google.com>,
+        "dovmurik@linux.ibm.com" <dovmurik@linux.ibm.com>,
+        "tobin@ibm.com" <tobin@ibm.com>,
+        "Roth, Michael" <Michael.Roth@amd.com>,
+        "vbabka@suse.cz" <vbabka@suse.cz>,
+        "kirill@shutemov.name" <kirill@shutemov.name>,
+        "ak@linux.intel.com" <ak@linux.intel.com>,
+        "tony.luck@intel.com" <tony.luck@intel.com>,
+        "marcorr@google.com" <marcorr@google.com>,
+        "sathyanarayanan.kuppuswamy@linux.intel.com" 
+        <sathyanarayanan.kuppuswamy@linux.intel.com>,
+        "alpergun@google.com" <alpergun@google.com>,
+        "dgilbert@redhat.com" <dgilbert@redhat.com>,
+        "jarkko@kernel.org" <jarkko@kernel.org>
+Subject: Re: [PATCH Part2 v6 07/49] x86/sev: Invalid pages from direct map
+ when adding it to RMP table
+Message-ID: <Yuu3ZK+/hL+saV27@zn.tnic>
+References: <cover.1655761627.git.ashish.kalra@amd.com>
+ <243778c282cd55a554af9c11d2ecd3ff9ea6820f.1655761627.git.ashish.kalra@amd.com>
+ <YuFvbm/Zck9Tr5pq@zn.tnic>
+ <SN6PR12MB27676E6CEDF242F2D33CA2AB8E9A9@SN6PR12MB2767.namprd12.prod.outlook.com>
 MIME-Version: 1.0
-References: <20220729130040.1428779-1-afaria@redhat.com>
-In-Reply-To: <20220729130040.1428779-1-afaria@redhat.com>
-From:   =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@redhat.com>
-Date:   Thu, 4 Aug 2022 15:44:26 +0400
-Message-ID: <CAMxuvazGhtbPUSoM-NiAbTnRnOQ=MEnkMAVyVgOg4zc37HJ1-w@mail.gmail.com>
-Subject: Re: [RFC v2 00/10] Introduce an extensible static analyzer
-To:     Alberto Faria <afaria@redhat.com>
-Cc:     qemu-devel@nongnu.org, Stefano Garzarella <sgarzare@redhat.com>,
-        Hannes Reinecke <hare@suse.com>,
-        "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
-        Vladimir Sementsov-Ogievskiy <vsementsov@yandex-team.ru>,
-        "Maciej S. Szmigiero" <maciej.szmigiero@oracle.com>,
-        Peter Lieven <pl@kamp.de>, kvm@vger.kernel.org,
-        Xie Yongji <xieyongji@bytedance.com>,
-        Eric Auger <eric.auger@redhat.com>,
-        Hanna Reitz <hreitz@redhat.com>,
-        Jeff Cody <codyprime@gmail.com>,
-        Eric Blake <eblake@redhat.com>,
-        "Denis V. Lunev" <den@openvz.org>,
-        =?UTF-8?Q?Daniel_P=2E_Berrang=C3=A9?= <berrange@redhat.com>,
-        =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>,
-        Christian Schoenebeck <qemu_oss@crudebyte.com>,
-        Stefan Weil <sw@weilnetz.de>, Klaus Jensen <its@irrelevant.dk>,
-        Laurent Vivier <lvivier@redhat.com>,
-        Alberto Garcia <berto@igalia.com>,
-        Michael Roth <michael.roth@amd.com>,
-        Juan Quintela <quintela@redhat.com>,
-        David Hildenbrand <david@redhat.com>, qemu-block@nongnu.org,
-        Konstantin Kostiuk <kkostiuk@redhat.com>,
-        Kevin Wolf <kwolf@redhat.com>,
-        Gerd Hoffmann <kraxel@redhat.com>,
-        Stefan Hajnoczi <stefanha@redhat.com>,
-        Marcelo Tosatti <mtosatti@redhat.com>,
-        Greg Kurz <groug@kaod.org>,
-        "Michael S. Tsirkin" <mst@redhat.com>, Amit Shah <amit@kernel.org>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Alex Williamson <alex.williamson@redhat.com>,
-        Peter Xu <peterx@redhat.com>,
-        Raphael Norwitz <raphael.norwitz@nutanix.com>,
-        Ronnie Sahlberg <ronniesahlberg@gmail.com>,
-        Jason Wang <jasowang@redhat.com>,
-        Emanuele Giuseppe Esposito <eesposit@redhat.com>,
-        Richard Henderson <richard.henderson@linaro.org>,
-        Marcel Apfelbaum <marcel.apfelbaum@gmail.com>,
-        Dmitry Fleytman <dmitry.fleytman@gmail.com>,
-        Eduardo Habkost <eduardo@habkost.net>,
-        Fam Zheng <fam@euphon.net>, Thomas Huth <thuth@redhat.com>,
-        Keith Busch <kbusch@kernel.org>,
-        =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>,
-        "Richard W.M. Jones" <rjones@redhat.com>,
-        John Snow <jsnow@redhat.com>,
-        Markus Armbruster <armbru@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
-X-Spam-Status: No, score=-2.7 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        SPF_HELO_NONE,SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <SN6PR12MB27676E6CEDF242F2D33CA2AB8E9A9@SN6PR12MB2767.namprd12.prod.outlook.com>
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,SPF_HELO_NONE,SPF_PASS
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi
+On Mon, Aug 01, 2022 at 11:57:09PM +0000, Kalra, Ashish wrote:
+> You mean set_memory_present() ?
 
-On Fri, Jul 29, 2022 at 5:01 PM Alberto Faria <afaria@redhat.com> wrote:
->
-> This series introduces a static analyzer for QEMU. It consists of a
-> single static-analyzer.py script that relies on libclang's Python
-> bindings, and provides a common framework on which arbitrary static
-> analysis checks can be developed and run against QEMU's code base.
->
-> Summary of the series:
->
->   - Patch 1 adds the base static analyzer, along with a simple check
->     that finds static functions whose return value is never used, and
->     patch 2 fixes many occurrences of this.
->
->   - Patch 3 introduces support for output-comparison check tests, and
->     adds some tests to the abovementioned check.
->
->   - Patch 4 makes the analyzer skip checks on a translation unit when it
->     hasn't been modified since the last time those checks passed.
->
->   - Patch 5 adds a check to ensure that non-coroutine_fn functions don't
->     perform direct calls to coroutine_fn functions, and patch 6 fixes
->     some violations of this rule.
->
->   - Patch 7 adds a check to ensure that operations on coroutine_fn
->     pointers make sense, like assignment and indirect calls, and patch 8
->     fixes some problems detected by the check. (Implementing this check
->     properly is complicated, since AFAICT annotation attributes cannot
->     be applied directly to types. This part still needs a lot of work.)
->
->   - Patch 9 introduces a no_coroutine_fn marker for functions that
->     should not be called from coroutines, makes generated_co_wrapper
->     evaluate to no_coroutine_fn, and adds a check enforcing this rule.
->     Patch 10 fixes some violations that it finds.
->
-> The current primary motivation for this work is enforcing rules around
-> block layer coroutines, which is why most of the series focuses on that.
-> However, the static analyzer is intended to be sufficiently generic to
-> satisfy other present and future QEMU static analysis needs.
->
-> Performance isn't great, but with some more optimization, the analyzer
-> should be fast enough to be used iteratively during development, given
-> that it avoids reanalyzing unmodified translation units, and that users
-> can restrict the set of translation units under consideration. It should
-> also be fast enough to run in CI (?).
->
-> Consider a small QEMU configuration and build (all commands were run on
-> the same 12-thread laptop):
->
->     $ cd build && time ../configure --target-list=x86_64-softmmu && cd ..
->     [...]
->
->     real    0m17.232s
->     user    0m13.261s
->     sys     0m3.895s
->
->     $ time make -C build -j $(nproc) all
->     [...]
->
->     real    2m39.029s
->     user    14m49.370s
->     sys     1m57.364s
->
->     $ time make -C build -j $(nproc) check
->     [...]
->
->     real    2m46.349s
->     user    6m4.718s
->     sys     4m15.660s
->
-> We can run the static analyzer against all translation units enabled in
-> this configuration:
->
->     $ time ./static-analyzer.py build
->     util/qemu-coroutine.c:122:23: non-coroutine_fn function calls coroutine_fn qemu_coroutine_self()
->     io/channel.c:152:17: non-coroutine_fn function calls coroutine_fn qio_channel_yield()
->     [...]
->     Analyzed 1649 translation units in 520.3 seconds.
->
->     real    8m42.342s
->     user    95m51.759s
->     sys     0m21.576s
->
-> You will need libclang's Python bindings to run this. Try `dnf install
-> python3-clang` or `apt install python3-clang`.
->
-> It takes around 1 to 2 seconds for the analyzer to load the compilation
-> database, determine which translation units to analyze, etc. The
-> durations reported by the analyzer itself don't include those steps,
-> which is why they differ from what `time` reports.
->
-> We can also analyze only some of the translation units:
->
->     $ time ./static-analyzer.py build block
->     block/raw-format.c:420:12: non-coroutine_fn function calls coroutine_fn bdrv_co_ioctl()
->     block/blkverify.c:266:12: non-coroutine_fn function calls coroutine_fn bdrv_co_flush()
->     [...]
->     Analyzed 21 translation units (58 other were up-to-date) in 5.8 seconds.
->
->     real    0m7.031s
->     user    0m40.951s
->     sys     0m1.299s
->
-> Since the previous command had already analyzed all translation units,
-> only the ones that had problems were reanalyzed.
->
-> Now skipping all the actual checks, but still parsing and building the
-> AST for each translation unit, and adding --force to reanalyze all
-> translation units:
->
->     $ time ./static-analyzer.py build --force --skip-checks
->     Analyzed 1649 translation units in 41.2 seconds.
->
->     real    0m42.296s
->     user    7m14.256s
->     sys     0m15.803s
->
-> And now running a single check:
->
->     $ time ./static-analyzer.py build --force --check return-value-never-used
->     Analyzed 1649 translation units in 157.6 seconds.
->
->     real    2m38.759s
->     user    29m28.930s
->     sys     0m17.968s
->
-> TODO:
->   - Run in GitLab CI (?).
->   - Finish the "coroutine_fn" check.
->   - Add check tests where missing.
->   - Avoid redundant AST traversals while keeping checks modular.
->   - More optimization.
+Right, that.
 
-Great work so far! This seems easier to hack than my attempt to use
-clang-tidy to write some qemu checks
-(https://github.com/elmarco/clang-tools-extra)
+We have set_memory_np() but set_memory_present(). Talk about
+consistence... ;-\
 
-The code seems quite generic, I wonder if such a tool in python wasn't
-already developed (I couldn't find it easily searching on github).
+> But again, calling set_direct_map_invalid_noflush() is easier to
+> understand from the calling function's point of view as it correlates
+> to the functionality of invalidating the page from kernel direct map ?
 
-Why not make it standalone from qemu? Similar to
-https://gitlab.com/qemu-project/python-qemu-qmp, you could have your
-own release management, issue tracker, code formatting, license, CI
-etc. (you should add copyright header in each file, at least that's
-pretty much required in qemu nowadays). You could also have the
-qemu-specific checks there imho (clang-tidy has google & llvm specific
-checks too)
+You mean, we prefer easy to understand to performance?
 
-It would be nice to write some docs, in docs/devel/testing.rst and
-some new meson/ninja/make targets to run the checks directly from a
-build tree.
+set_direct_map_invalid_noflush() means crap to me. I have to go look it
+up - set memory P or NP is much clearer.
 
-On fc36, I had several dependencies I needed to install manually (imho
-they should have been pulled by python3-clang), but more annoyingly I
-got:
-clang.cindex.LibclangError: libclang.so: cannot open shared object
-file: No such file or directory. To provide a path to libclang use
-Config.set_library_path() or Config.set_library_file().
+The patch which added those things you consider easier to understand is:
 
-clang-libs doesn't install libclang.so, I wonder why. I made a link
-manually and it works, but it's probably incorrect. I'll try to open
-issues for the clang packaging.
+commit d253ca0c3865a8d9a8c01143cf20425e0be4d0ce
+Author: Rick Edgecombe <rick.p.edgecombe@intel.com>
+Date:   Thu Apr 25 17:11:34 2019 -0700
 
-cheers
+    x86/mm/cpa: Add set_direct_map_*() functions
+    
+    Add two new functions set_direct_map_default_noflush() and
+    set_direct_map_invalid_noflush() for setting the direct map alias for the
+    page to its default valid permissions and to an invalid state that cannot
+    be cached in a TLB, respectively. These functions do not flush the TLB.
 
+I don't see how this fits with your use case...
 
->
-> v2:
->   - Fix parsing of compilation database commands.
->   - Reorganize checks and split them into separate modules.
->   - Make "return-value-never-used" ignore __attribute__((unused)) funcs.
->   - Add a visitor() abstraction wrapping clang_visitChildren() that is
->     faster than using Cursor.get_children() with recursion.
->   - Add support for implementing tests for checks, and add some tests to
->     "return-value-never-used".
->   - Use dependency information provided by Ninja to skip checks on
->     translation units that haven't been modified since they last passed
->     those checks.
->   - Ignore translation units from git submodules.
->   - And more.
->
-> Alberto Faria (10):
->   Add an extensible static analyzer
->   Drop unused static function return values
->   static-analyzer: Support adding tests to checks
->   static-analyzer: Avoid reanalyzing unmodified translation units
->   static-analyzer: Enforce coroutine_fn restrictions for direct calls
->   Fix some direct calls from non-coroutine_fn to coroutine_fn
->   static-analyzer: Enforce coroutine_fn restrictions on function
->     pointers
->   Fix some bad coroutine_fn indirect calls and pointer assignments
->   block: Add no_coroutine_fn marker
->   Fix some calls from coroutine_fn to no_coroutine_fn
->
->  accel/kvm/kvm-all.c                        |  12 +-
->  accel/tcg/plugin-gen.c                     |   9 +-
->  accel/tcg/translate-all.c                  |   9 +-
->  audio/audio.c                              |   5 +-
->  block.c                                    |   2 +-
->  block/backup.c                             |   2 +-
->  block/block-copy.c                         |   4 +-
->  block/commit.c                             |   2 +-
->  block/dirty-bitmap.c                       |   6 +-
->  block/file-posix.c                         |   6 +-
->  block/io.c                                 |  52 +-
->  block/mirror.c                             |   4 +-
->  block/monitor/block-hmp-cmds.c             |   2 +-
->  block/nvme.c                               |   3 +-
->  block/parallels.c                          |  28 +-
->  block/qcow.c                               |  10 +-
->  block/qcow2-bitmap.c                       |   6 +-
->  block/qcow2-snapshot.c                     |   6 +-
->  block/qcow2.c                              |  38 +-
->  block/qcow2.h                              |  14 +-
->  block/qed-table.c                          |   2 +-
->  block/qed.c                                |  14 +-
->  block/quorum.c                             |   7 +-
->  block/ssh.c                                |   6 +-
->  block/throttle-groups.c                    |   3 +-
->  block/vdi.c                                |  17 +-
->  block/vhdx.c                               |   8 +-
->  block/vmdk.c                               |  11 +-
->  block/vpc.c                                |   4 +-
->  block/vvfat.c                              |  11 +-
->  blockdev.c                                 |   2 +-
->  chardev/char-ringbuf.c                     |   4 +-
->  contrib/ivshmem-server/main.c              |   4 +-
->  contrib/vhost-user-blk/vhost-user-blk.c    |   5 +-
->  dump/dump.c                                |   4 +-
->  fsdev/virtfs-proxy-helper.c                |   3 +-
->  gdbstub.c                                  |  18 +-
->  hw/audio/intel-hda.c                       |   7 +-
->  hw/audio/pcspk.c                           |   7 +-
->  hw/char/virtio-serial-bus.c                |  14 +-
->  hw/display/cirrus_vga.c                    |   5 +-
->  hw/hyperv/vmbus.c                          |  10 +-
->  hw/i386/intel_iommu.c                      |  28 +-
->  hw/i386/pc_q35.c                           |   5 +-
->  hw/ide/pci.c                               |   4 +-
->  hw/net/rtl8139.c                           |   3 +-
->  hw/net/virtio-net.c                        |   6 +-
->  hw/net/vmxnet3.c                           |   3 +-
->  hw/nvme/ctrl.c                             |  17 +-
->  hw/nvram/fw_cfg.c                          |   3 +-
->  hw/scsi/megasas.c                          |   6 +-
->  hw/scsi/mptconfig.c                        |   7 +-
->  hw/scsi/mptsas.c                           |  14 +-
->  hw/scsi/scsi-bus.c                         |   6 +-
->  hw/usb/dev-audio.c                         |  13 +-
->  hw/usb/hcd-ehci.c                          |   6 +-
->  hw/usb/hcd-ohci.c                          |   4 +-
->  hw/usb/hcd-xhci.c                          |  56 +-
->  hw/vfio/common.c                           |  21 +-
->  hw/virtio/vhost-vdpa.c                     |   3 +-
->  hw/virtio/vhost.c                          |  11 +-
->  hw/virtio/virtio-iommu.c                   |   4 +-
->  hw/virtio/virtio-mem.c                     |   9 +-
->  include/block/block-common.h               |   2 +-
->  include/block/block-hmp-cmds.h             |   2 +-
->  include/block/block-io.h                   |   5 +-
->  include/block/block_int-common.h           |  12 +-
->  include/qemu/coroutine.h                   |  43 +-
->  io/channel-command.c                       |  10 +-
->  migration/migration.c                      |  12 +-
->  net/dump.c                                 |  16 +-
->  net/vhost-vdpa.c                           |   8 +-
->  qemu-img.c                                 |   6 +-
->  qga/commands-posix-ssh.c                   |  10 +-
->  softmmu/physmem.c                          |  18 +-
->  softmmu/qtest.c                            |   5 +-
->  static-analyzer.py                         | 801 +++++++++++++++++++++
->  static_analyzer/__init__.py                | 348 +++++++++
->  static_analyzer/coroutine_fn.py            | 280 +++++++
->  static_analyzer/no_coroutine_fn.py         | 111 +++
->  static_analyzer/return_value_never_used.py | 220 ++++++
->  subprojects/libvduse/libvduse.c            |  12 +-
->  subprojects/libvhost-user/libvhost-user.c  |  24 +-
->  target/i386/host-cpu.c                     |   3 +-
->  target/i386/kvm/kvm.c                      |  19 +-
->  tcg/optimize.c                             |   3 +-
->  tests/qtest/libqos/malloc.c                |   5 +-
->  tests/qtest/libqos/qgraph.c                |   3 +-
->  tests/qtest/test-x86-cpuid-compat.c        |   8 +-
->  tests/qtest/virtio-9p-test.c               |   6 +-
->  tests/unit/test-aio-multithread.c          |   5 +-
->  tests/vhost-user-bridge.c                  |  19 +-
->  ui/vnc.c                                   |  23 +-
->  util/aio-posix.c                           |   7 +-
->  util/uri.c                                 |  18 +-
->  95 files changed, 2160 insertions(+), 519 deletions(-)
->  create mode 100755 static-analyzer.py
->  create mode 100644 static_analyzer/__init__.py
->  create mode 100644 static_analyzer/coroutine_fn.py
->  create mode 100644 static_analyzer/no_coroutine_fn.py
->  create mode 100644 static_analyzer/return_value_never_used.py
->
-> --
-> 2.37.1
->
+Also, your helpers are called restore_direct_map and
+invalidate_direct_map. That's already explaining what this is supposed
+to do.
 
+-- 
+Regards/Gruss,
+    Boris.
+
+https://people.kernel.org/tglx/notes-about-netiquette
