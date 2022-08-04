@@ -2,62 +2,62 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id DB21A589DB5
-	for <lists+kvm@lfdr.de>; Thu,  4 Aug 2022 16:40:05 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id BB06A589DD5
+	for <lists+kvm@lfdr.de>; Thu,  4 Aug 2022 16:45:04 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S240057AbiHDOkB (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 4 Aug 2022 10:40:01 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52994 "EHLO
+        id S234776AbiHDOpD (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 4 Aug 2022 10:45:03 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57716 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S240060AbiHDOju (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 4 Aug 2022 10:39:50 -0400
+        with ESMTP id S239825AbiHDOo6 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 4 Aug 2022 10:44:58 -0400
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 4502A4D820
-        for <kvm@vger.kernel.org>; Thu,  4 Aug 2022 07:39:34 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 1C02295A8
+        for <kvm@vger.kernel.org>; Thu,  4 Aug 2022 07:44:54 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1659623973;
+        s=mimecast20190719; t=1659624293;
         h=from:from:reply-to:reply-to:subject:subject:date:date:
          message-id:message-id:to:to:cc:cc:mime-version:mime-version:
          content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=IoEVNA5Csx+V7GmeVHVVn6ViAtHF0BGVPyJivuLEoMQ=;
-        b=K187uhMV4FsBCh6oOuAxjL7o/krF60+9EmUgqHmtq1I1uAsay9ct+2BZ7v6bkQ057XMZeQ
-        G0XAnPgEHCPLKsvEg7N3xbXr9PczT17oV67KFclMNm5557Khv7i8pZa2vbU5Rd1TYyBrX9
-        pHLE3qktGH3JKhPvxlySUdE0TeRlcf4=
-Received: from mail-qt1-f198.google.com (mail-qt1-f198.google.com
- [209.85.160.198]) by relay.mimecast.com with ESMTP with STARTTLS
+        bh=1xoIDuGyBXKEVu088HJARC4Hxu4Fhl/Q45ASGAGm74M=;
+        b=LqmJsJuJvv7lO3Wmi9wJJco80hTO1UlUtxk8C4qDS0N21RIXgwoSNYRMsk+yFIZh9QDdNk
+        WkPQuO4Yue+Wk03V+IWLJR5lo8qgud5l1jFaB4/1VOpu3SRme5tNbOBg9QRdYr7tZBzG0x
+        yK/ryqyK47soiV4hplWYZ54Lcf8WKAM=
+Received: from mail-qk1-f200.google.com (mail-qk1-f200.google.com
+ [209.85.222.200]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-340-tCzKBT5UOdG_sMrhqJRtuQ-1; Thu, 04 Aug 2022 10:39:32 -0400
-X-MC-Unique: tCzKBT5UOdG_sMrhqJRtuQ-1
-Received: by mail-qt1-f198.google.com with SMTP id k3-20020ac86043000000b0033cab47c483so4262088qtm.4
-        for <kvm@vger.kernel.org>; Thu, 04 Aug 2022 07:39:32 -0700 (PDT)
+ us-mta-458-zlYGlG1DOCy46a7LJ1Y44A-1; Thu, 04 Aug 2022 10:44:52 -0400
+X-MC-Unique: zlYGlG1DOCy46a7LJ1Y44A-1
+Received: by mail-qk1-f200.google.com with SMTP id n15-20020a05620a294f00b006b5768a0ed0so15886755qkp.7
+        for <kvm@vger.kernel.org>; Thu, 04 Aug 2022 07:44:52 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=content-transfer-encoding:in-reply-to:from:references:cc:to
          :content-language:subject:reply-to:user-agent:mime-version:date
          :message-id:x-gm-message-state:from:to:cc;
-        bh=IoEVNA5Csx+V7GmeVHVVn6ViAtHF0BGVPyJivuLEoMQ=;
-        b=QJc1pTJewDXP94cJJ0kpSRupugp7VyN9HAnAPKxnO8ETwY/y7YEHViOdLd9S4dI1jX
-         dI9NSlzdHXguJCOwPSkp4S+sZRQ/Fa4ZgfqmLwnzSl9QmkmlesCGW35R4W1+nDxUyCdD
-         r62yDp6jOulFEPNEySVo6RrYuswmlHGfMDbA1QA14wWn/3xIrENDgFvBc+z2SB2MORiQ
-         PmSs+kHyG02w4O26rcD77HHd4w9kAJArRl0OjsdTJU3ve72ZhXtbSwfTZyu5ttLxDwg7
-         M3mZg3KQqa1nqNSRTLXJgvA2rGU0h5gszuhEumjzDu+DVxmN+404tyBcTAvdRm0wVuwN
-         ZSow==
-X-Gm-Message-State: ACgBeo0SyvT8bbRlCeHEi1IswrYK6wPGkDeNTWM+qN1FoUftEZZildLY
-        0jpzwV6DmDjJpD88RCS89ks12AmL9n33ngYQjMN/RggFL/tyJmp3nUNrgnGuXvu2Hsvpyhs43mk
-        EGWASz1YVhEYq
-X-Received: by 2002:a05:620a:11a7:b0:6b8:fbf8:4321 with SMTP id c7-20020a05620a11a700b006b8fbf84321mr1646766qkk.659.1659623971909;
-        Thu, 04 Aug 2022 07:39:31 -0700 (PDT)
-X-Google-Smtp-Source: AA6agR5d19XAB9SSecPelcVNPfIHBJKvPBI5uZlug9nCUX3BMzyLIPH7Hs1IgXuNkCmW6C77YY/wbQ==
-X-Received: by 2002:a05:620a:11a7:b0:6b8:fbf8:4321 with SMTP id c7-20020a05620a11a700b006b8fbf84321mr1646748qkk.659.1659623971657;
-        Thu, 04 Aug 2022 07:39:31 -0700 (PDT)
+        bh=1xoIDuGyBXKEVu088HJARC4Hxu4Fhl/Q45ASGAGm74M=;
+        b=8RH7Qdnh9FsqTkUDcX7AyLBQBfupEYrholfHZFMfKAGhV7wkEsZwZOKoCGV9KQl1C7
+         NQILgnhl77VGeuhzpzOW3JcVMZ5eVGfvYlQOwyKKSOogHnC8+sz16UOe8gfeoIThg+u3
+         g0F+7Lwc0e6Bl6zupbMMfmYntPWVt6b88fdbc4EeGZzuF4w7jl0tLiopJH83VutLXCQi
+         ggzGaK6mcPQ2TPWkbCM9gdnHpvYu7d5qXGb2lxMkzUfrR//syjq96HBabdNioSNIdZX/
+         55HwDXpod7T7iZ1zy0uS0yJOjDc93Sz3BLBefulqb7pw//yaKeTFTC/iFs2kag8A8it1
+         4PJg==
+X-Gm-Message-State: ACgBeo302d3qceBg3JF/4uT1triH0RTKuOcCAbRXZrgnbzp4hI2e7XqA
+        hZh33PhNNc50b3wILWPiKX25F3SVj6ruIFYm4uY7ugyfKOCygEIe9QbR9aBECkPCqKE2mOiq711
+        47a9O8uQ27LY2
+X-Received: by 2002:a05:6214:d4c:b0:474:88a1:137c with SMTP id 12-20020a0562140d4c00b0047488a1137cmr1745471qvr.120.1659624291297;
+        Thu, 04 Aug 2022 07:44:51 -0700 (PDT)
+X-Google-Smtp-Source: AA6agR6dq7MDnT1mJNssRXoBcx/6uOiUJ/U7E/YkguCtnL+d3gdnnyLHfV2F1SBlWU2IXMQYo+9Efw==
+X-Received: by 2002:a05:6214:d4c:b0:474:88a1:137c with SMTP id 12-20020a0562140d4c00b0047488a1137cmr1745452qvr.120.1659624291065;
+        Thu, 04 Aug 2022 07:44:51 -0700 (PDT)
 Received: from ?IPV6:2a01:e0a:59e:9d80:527b:9dff:feef:3874? ([2a01:e0a:59e:9d80:527b:9dff:feef:3874])
-        by smtp.gmail.com with ESMTPSA id w4-20020a05620a424400b006b8d1914504sm812519qko.22.2022.08.04.07.39.29
+        by smtp.gmail.com with ESMTPSA id g18-20020a05620a40d200b006b5f9b7ac87sm940093qko.26.2022.08.04.07.44.48
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 04 Aug 2022 07:39:30 -0700 (PDT)
-Message-ID: <069a98a2-d4a1-8599-9deb-069115d5d22c@redhat.com>
-Date:   Thu, 4 Aug 2022 16:39:27 +0200
+        Thu, 04 Aug 2022 07:44:50 -0700 (PDT)
+Message-ID: <00a09605-75d2-2a95-29dc-b5613a52a168@redhat.com>
+Date:   Thu, 4 Aug 2022 16:44:47 +0200
 MIME-Version: 1.0
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
  Thunderbird/91.11.0
@@ -66,16 +66,15 @@ Subject: Re: Add vfio-platform support for ONESHOT irq forwarding?
 Content-Language: en-US
 To:     "Liu, Rong L" <rong.l.liu@intel.com>,
         Dmytro Maluka <dmy@semihalf.com>,
-        Micah Morton <mortonm@chromium.org>
-Cc:     Alex Williamson <alex.williamson@redhat.com>,
+        "Christopherson,, Sean" <seanjc@google.com>
+Cc:     Micah Morton <mortonm@chromium.org>,
+        Alex Williamson <alex.williamson@redhat.com>,
         "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "Christopherson,, Sean" <seanjc@google.com>,
         Paolo Bonzini <pbonzini@redhat.com>,
         Tomasz Nowicki <tn@semihalf.com>,
         Grzegorz Jaszczyk <jaz@semihalf.com>,
         Dmitry Torokhov <dtor@google.com>
-References: <CAJ-EccMWBJAzwECcJtFh9kXwtVVezWv_Zd0vcqPMPwKk=XFqYQ@mail.gmail.com>
- <20210125133611.703c4b90@omen.home.shazbot.org>
+References: <20210125133611.703c4b90@omen.home.shazbot.org>
  <c57d94ca-5674-7aa7-938a-aa6ec9db2830@redhat.com>
  <CAJ-EccPf0+1N_dhNTGctJ7gT2GUmsQnt==CXYKSA-xwMvY5NLg@mail.gmail.com>
  <8ab9378e-1eb3-3cf3-a922-1c63bada6fd8@redhat.com>
@@ -83,16 +82,18 @@ References: <CAJ-EccMWBJAzwECcJtFh9kXwtVVezWv_Zd0vcqPMPwKk=XFqYQ@mail.gmail.com>
  <CAJ-EccNAHGHZjYvT8LV9h8oWvVe+YvcD0dwF7e5grxymhi5Pug@mail.gmail.com>
  <99d0e32c-e4eb-5223-a342-c5178a53b692@redhat.com>
  <31420943-8c5f-125c-a5ee-d2fde2700083@semihalf.com>
- <0a974041-0c61-e98b-d335-76f94618b5a7@redhat.com>
- <d6f3205c-6229-3b58-cdc2-a5d0f6cfb98f@semihalf.com>
- <MW3PR11MB455491C48BD1F630654CD491C7959@MW3PR11MB4554.namprd11.prod.outlook.com>
+ <YsXzGkRIVVYEQNE3@google.com>
+ <94423bc0-a6d3-f19f-981b-9da113e36432@semihalf.com>
+ <Ysb09r+XXcVZyok4@google.com>
+ <aaec2781-2983-6195-2216-bf4aeeb86d7f@semihalf.com>
+ <MW3PR11MB45544BF267FD3926F90A2158C7869@MW3PR11MB4554.namprd11.prod.outlook.com>
 From:   Eric Auger <eric.auger@redhat.com>
-In-Reply-To: <MW3PR11MB455491C48BD1F630654CD491C7959@MW3PR11MB4554.namprd11.prod.outlook.com>
+In-Reply-To: <MW3PR11MB45544BF267FD3926F90A2158C7869@MW3PR11MB4554.namprd11.prod.outlook.com>
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-0.7 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+X-Spam-Status: No, score=-2.7 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
-        RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_NONE,URI_DOTEDU autolearn=no
+        RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_NONE autolearn=ham
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -100,109 +101,133 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-H Liu,
-
-On 7/26/22 00:03, Liu, Rong L wrote:
-> Hi Eric,
+Hi,
+On 7/12/22 18:02, Liu, Rong L wrote:
+> Hi Sean and Dmytro,
 >
 >> -----Original Message-----
 >> From: Dmytro Maluka <dmy@semihalf.com>
->> Sent: Thursday, July 7, 2022 2:16 AM
->> To: eric.auger@redhat.com; Micah Morton <mortonm@chromium.org>
->> Cc: Alex Williamson <alex.williamson@redhat.com>;
->> kvm@vger.kernel.org; Christopherson,, Sean <seanjc@google.com>;
->> Paolo Bonzini <pbonzini@redhat.com>; Liu, Rong L
->> <rong.l.liu@intel.com>; Tomasz Nowicki <tn@semihalf.com>; Grzegorz
->> Jaszczyk <jaz@semihalf.com>; Dmitry Torokhov <dtor@google.com>
+>> Sent: Thursday, July 7, 2022 10:39 AM
+>> To: Christopherson,, Sean <seanjc@google.com>
+>> Cc: Auger Eric <eric.auger@redhat.com>; Micah Morton
+>> <mortonm@chromium.org>; Alex Williamson
+>> <alex.williamson@redhat.com>; kvm@vger.kernel.org; Paolo Bonzini
+>> <pbonzini@redhat.com>; Liu, Rong L <rong.l.liu@intel.com>; Tomasz
+>> Nowicki <tn@semihalf.com>; Grzegorz Jaszczyk <jaz@semihalf.com>;
+>> Dmitry Torokhov <dtor@google.com>
 >> Subject: Re: Add vfio-platform support for ONESHOT irq forwarding?
 >>
->> Hi Eric,
->>
->> On 7/7/22 10:25 AM, Eric Auger wrote:
->>>> Again, this doesn't seem to be true. Just as explained in my above
->>>> reply to Alex, the guest deactivates (EOI) the vIRQ already after the
->>>> completion of the vIRQ hardirq handler, not the vIRQ thread.
+>> On 7/7/22 17:00, Sean Christopherson wrote:
+>>> On Thu, Jul 07, 2022, Dmytro Maluka wrote:
+>>>> Hi Sean,
 >>>>
->>>> So VFIO unmask handler gets called too early, before the interrupt
->>>> gets serviced and acked in the vIRQ thread.
->>> Fair enough, on vIRQ hardirq handler the physical IRQ gets unmasked.
->>> This event occurs on guest EOI, which triggers the resamplefd. But what
->>> is the state of the vIRQ? Isn't it stil masked until the vIRQ thread
->>> completes, preventing the physical IRQ from being propagated to the
->> guest?
+>>>> On 7/6/22 10:39 PM, Sean Christopherson wrote:
+>>>>> On Wed, Jul 06, 2022, Dmytro Maluka wrote:
+>>>>>> This is not a problem on native, since for oneshot irq we keep the
+>>>>>> interrupt masked until the thread exits, so that the EOI at the end
+>>>>>> of hardirq doesn't result in immediate re-assert. In vfio + KVM
+>>>>>> case, however, the host doesn't check that the interrupt is still
+>>>>>> masked in the guest, so
+>>>>>> vfio_platform_unmask() is called regardless.
+>>>>> Isn't not checking that an interrupt is unmasked the real bug?
+>>>>> Fudging around vfio (or whatever is doing the premature unmasking)
+>>>>> bugs by delaying an ack notification in KVM is a hack, no?
+>>>> Yes, not checking that an interrupt is unmasked is IMO a bug, and my
+>>>> patch actually adds this missing checking, only that it adds it in
+>>>> KVM, not in VFIO. :)
+>>>>
+>>>> Arguably it's not a bug that VFIO is not checking the guest interrupt
+>>>> state on its own, provided that the resample notification it receives
+>>>> is always a notification that the interrupt has been actually acked.
+>>>> That is the motivation behind postponing ack notification in KVM in
+>>>> my patch: it is to ensure that KVM "ack notifications" are always
+>>>> actual ack notifications (as the name suggests), not just "eoi
+>> notifications".
+>>> But EOI is an ACK.  It's software saying "this interrupt has been
+>> consumed".
 >>
->> Even if vIRQ is still masked by the time when
->> vfio_automasked_irq_handler() signals the eventfd (which in itself is
->> not guaranteed, I guess), I believe KVM is buffering this event, so
->> after the vIRQ is unmasked, this new IRQ will be injected to the guest
->> anyway.
+>> Ok, I see we've had some mutual misunderstanding of the term "ack"
+>> here.
+>> EOI is an ACK in the interrupt controller sense, while I was talking about
+>> an ACK in the device sense, i.e. a device-specific action, done in a device
+>> driver's IRQ handler, which makes the device de-assert the IRQ line (so
+>> that the IRQ will not get re-asserted after an EOI or unmask).
 >>
->>>> It seems the obvious fix is to postpone sending irq ack notifications
->>>> in KVM from EOI to unmask (for oneshot interrupts only). Luckily, we
->>>> don't need to provide KVM with the info that the given interrupt is
->>>> oneshot. KVM can just find it out from the fact that the interrupt is
->>>> masked at the time of EOI.
->>> you mean the vIRQ right?
->> Right.
+>> So the problem I'm trying to fix stems from the peculiarity of "oneshot"
+>> interrupts: an ACK in the device sense is done in a threaded handler, i.e.
+>> after an ACK in the interrupt controller sense, not before it.
 >>
->>> Before going further and we invest more time in that thread, please
->>> could you give us additional context info and confidence
->>> in/understanding of the stakes. This thread is from Jan 2021 and was
->>> discontinued for a while. vfio-platform currently only is enabled on
->> ARM
->>> and maintained for very few devices which properly implement reset
->>> callbacks and duly use an underlying IOMMU.
-> Do you have more questions about this issue after following info and POC from
-> Dmytro?
-> I agree that we tried to extend the vfio infrastructure to x86 and a few more
-> devices which may not "traditionally" supported by current vfio implementation. 
-> However if we view vfio as a general infrastructure to be used for pass-thru
-> devices (this is what we intend to do, implementation may vary),   Oneshot
-> interrupt is not properly handled. 
-
-sorry for the delay, I was out of office and it took me some time to
-catch up.
-
-Yes the problem and context is clearer now after the last emails. I now
-understand the vEOI (inducing the VFIO pIRQ unmask) is done before the
-device interrupt line is deasserted by the threaded handler and the vIRQ
-unmask is done, causing spurious hits of the same oneshot IRQ.
+>> In the meantime I've realized one more reason why my patch is wrong.
+>> kvm_notify_acked_irq() is an internal KVM thing which is supposed to
+>> notify interested parts of KVM about an ACK rather in the interrupt
+>> controller sense, i.e. about an EOI as it is doing already.
+>>
+>> VFIO, on the other hand, rather expects a notification about an ACK in the
+>> device sense. So it still seems a good idea to me to postpone sending
+>> notifications to VFIO until an IRQ gets unmasked, but this postponing
+>> should be done not for the entire kvm_notify_acked_irq() but only for
+>> eventfd_signal() on resamplefd in irqfd_resampler_ack().
+>>
+>> Thanks for making me think about that.
+>>
+>>>> That said, your idea of checking the guest interrupt status in VFIO
+>>>> (or whatever is listening on the resample eventfd) makes sense to me
+>>>> too. The problem, though, is that it's KVM that knows the guest
+>>>> interrupt status, so KVM would need to let VFIO/whatever know it
+>>>> somehow. (I'm assuming we are focusing on the case of KVM kernel
+>>>> irqchip, not userspace or split irqchip.) So do you have in mind
+>>>> adding something like "maskfd" and "unmaskfd" to KVM IRQFD
+>> interface,
+>>>> in addition to resamplefd? If so, I'm actually in favor of such an
+>>>> idea, as I think it would be also useful for other purposes, regardless
+>> of oneshot interrupts.
+>>> Unless I'm misreading things, KVM already provides a mask notifier,
+>>> irqfd just needs to be wired up to use
+>> kvm_(un)register_irq_mask_notifier().
+>>
+> Interesting...  I initially thought that kvm doesn't "trap" on ioapic's mmio
+> write.  However, I just traced kvm/ioapic.c and it turns out
+> ioapic_write_indirect() was called many times.   Does trapping on ioapic's mmio
+> write cause vmexit on edge-triggered interrupt exit?  It seems the case because
+> IOREGSEL and IOWIN of IOAPIC are memory mapped but not the redirection entry
+> register for each IRQ (that is why the name indirect_write), in order to unmask
+> redirection entry register on the exit of each interrupt (edge-triggered or
+> level-triggered), kernel needs to write to IORESEL, which means vmexit if kvm
+> traps on ioapic's mmio write.  However, for pass-thru device which uses
+> edge-triggered interrupt (handled by vfio or something similar),  interrupt
+> (pIRQ) is enabled by vfio and it seems unnecessary to cause a vmexit when guest
+> updates virtual ioapic.  I think the situation is similar for level-triggered
+> interrupt.  So 2 vmexits for each level-triggered interrupt completion, one for
+> EOI on lapic and another for unmask of IOAPIC register.  Does this sound right? 
+> I thought with vfio (or similar architecture), there is no vmexit necessary on
+> edge-triggered interrupt completion and only one vmexit for level triggered
+> interrupt completion, except the caveats of oneshot interrupt.  Maybe I
+> misunderstand something?
+Currently, no vmexit for edge-sensitive and 1 vmexit for level-sensitive
+is what happens on ARM shared peripheral interrupts at least.
+Note there is one setup that could remove the need for the vmexit on
+vEOI: irq_bypass mode
+(https://www.linux-kvm.org/images/a/a8/01x04-ARMdevice.pdf slide 12-14):
+on GIC you have a mode that allows automatic completion of the physical
+IRQ when the corresponding vIRQ is completed. This mode would not be
+compatible with oneshort_irq.
+At some point we worked on this enablement but given the lack of
+vfio-platform customers this work was paused so we still have the
+mask/unmask vfio dance.
 
 Thanks
 
 Eric
+
 >
-> From this discussion when oneshot interrupt is first upstreamed:
-> https://lkml.iu.edu/hypermail/linux/kernel/0908.1/02114.html it says: "... we
-> need to keep the interrupt line masked until the threaded handler has executed. 
-> ... The interrupt line is unmasked after the thread handler function has been
-> executed." using today's vfio architecture, (physical) interrupt line is
-> unmasked by vfio after EOI introduced vmexit, instead after the threaded
-> function has been executed (or in x86 world, when virtual interrupt is
-> unmasked): this totally violates how oneshot irq should be used.   We have a few
-> internal discussions and we couldn't find a solution which are both correct and
-> efficient.  But at least we can target a "correct" solution first and that will
-> help us resolve bugs we have on our products now.
->
->> Sure. We are not really using vfio-platform for the devices we are
->> concerned with, since those are not DMA capable devices, and some of
->> them are not really platform devices but I2C or SPI devices. Instead we
->> are using (hopefully temporarily) Micah's module for forwarding
->> arbitrary IRQs [1][2] which mostly reimplements the VFIO irq forwarding
->> mechanism.
+>> Thanks for the tip. I'll take a look into implementing this idea.
 >>
->> Also with a few simple hacks I managed to use vfio-platform for the same
->> thing (just as a PoC) and confirmed, unsurprisingly, that the problems
->> with oneshot interrupts are observed with vfio-platform as well.
+>> It seems you agree that fixing this issue via a change in KVM (in irqfd, not
+>> in ioapic) seems to be the way to go.
 >>
->> [1]
->> https://chromium.googlesource.com/chromiumos/third_party/kernel/+/
->> refs/heads/chromeos-5.10-manatee/virt/lib/platirqforward.c
->>
->> [2]
->> https://lkml.kernel.org/kvm/CAJ-
->> EccPU8KpU96PM2PtroLjdNVDbvnxwKwWJr2B+RBKuXEr7Vw@mail.gmail
->> .com/T/
+>> An immediate problem I see with kvm_(un)register_irq_mask_notifier()
+>> is that it is currently available for x86 only. Also, mask notifiers are called
+>> under ioapic->lock (I'm not sure yet if that is good or bad news for us).
 >>
 >> Thanks,
 >> Dmytro
