@@ -2,68 +2,64 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id EFFCA58A3DE
-	for <lists+kvm@lfdr.de>; Fri,  5 Aug 2022 01:23:52 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id DCE1358A3E6
+	for <lists+kvm@lfdr.de>; Fri,  5 Aug 2022 01:26:31 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S240005AbiHDXXu (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 4 Aug 2022 19:23:50 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39614 "EHLO
+        id S240039AbiHDX02 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 4 Aug 2022 19:26:28 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41580 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234184AbiHDXXs (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 4 Aug 2022 19:23:48 -0400
-Received: from mail-pf1-x42e.google.com (mail-pf1-x42e.google.com [IPv6:2607:f8b0:4864:20::42e])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3703E52DE1
-        for <kvm@vger.kernel.org>; Thu,  4 Aug 2022 16:23:47 -0700 (PDT)
-Received: by mail-pf1-x42e.google.com with SMTP id z187so799050pfb.12
-        for <kvm@vger.kernel.org>; Thu, 04 Aug 2022 16:23:47 -0700 (PDT)
+        with ESMTP id S235305AbiHDX00 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 4 Aug 2022 19:26:26 -0400
+Received: from mail-pl1-x634.google.com (mail-pl1-x634.google.com [IPv6:2607:f8b0:4864:20::634])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0EA0E6068A
+        for <kvm@vger.kernel.org>; Thu,  4 Aug 2022 16:26:25 -0700 (PDT)
+Received: by mail-pl1-x634.google.com with SMTP id p18so1164169plr.8
+        for <kvm@vger.kernel.org>; Thu, 04 Aug 2022 16:26:25 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:from:to:cc;
-        bh=1h56T+GF0bC064cXeA855D8CjIl/Gq1Kdu3reSRrqBI=;
-        b=qEzRAGXdmEDfDJ+CfwhA/pwWYgR2fu9PYCiNa2nJkNLppvE4A/aGqwYoR6OKi++roG
-         HIfMywN7bxEaWj5ps1VHfYbwEOkb1cbA1wmawhm2scdWlyXZUkCZ9i+uZ49/FLH2OVHU
-         1UpruqnLv1jFOQoLvtAFTmlFhuZKxMWzCCu5tgUJUJ+EJ1VOuT6rSP8QEnyi1g6vL50y
-         steY61/RoY+kPuu9bWf02aS5XwspwD4RSmRmO+9YxzDM+2lEYOQMNzNyTAC13Hc10pVZ
-         Pa7R4hIrJ6RcXipbbk/aqTI+t/b0tZVRR2mx4RfdOQ0TIJu3lDRCpWVBbh1HI2tjks1c
-         PruA==
+        bh=X5uKb7oCa10gcyiDKzDcavbggNqrev4ZJSWyFhL2ZME=;
+        b=BT3MIvNVasV8rpqD768caM6CuFWvDKKqhHwnYFxxwEVwJ017DEtxT0u2vN2BCDc0Gt
+         e4L/vUPagK0dI19Yme/Ip9x+lBqc6avUtolieL59W9UyNt/N4r/rKvYp7vYXVwRDUF7s
+         NbYM9k2HDZ3j/kadLpE7O/gkR5CeJxedH0mtjmxlt6QvEIM/qqRbNdbDWNbz71uXVo+n
+         cnFUl40T8EI/KpzsmiNSNUyw7xxIYOnYYS1AFk0JSiVEERfhWrcrDprmtNi9kCM/z4y2
+         Y7DdLj30gCQXc62PN9C8N+S7uIdQ14LWrEDQdMelNc1lxPzT3imvtu/fycdMATdBGWUw
+         vEcg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:x-gm-message-state:from:to:cc;
-        bh=1h56T+GF0bC064cXeA855D8CjIl/Gq1Kdu3reSRrqBI=;
-        b=fLRp00UBT4Yk+sV9r2E33CQAvmL6vUgOdJiaIviDvzq7VZB4WpaKAWFY0gK8paZnya
-         RkZ1oq56MdObpTsWHGLeCsoD39KcBZnHcIAB0WBfD8nc2p7NpUyHuxYyAswDBZssXRsL
-         xkjPyA5pMA4sePqH2v1dzjnqF69LCYmJl5R5fHAAnV5DQPBNXkMAP83SB5QZfi0nWZYI
-         Z+/C04qltNP/hkkJcVp76VJVhll9kuY3G2oxXBt4dkPdDmuHcPD3u/Z3eNd3KGXa6LIX
-         ckKKADmUuLpGKn56+6o05ZP2dums5P/zCoQ9ZoLmS9nbHejn7eb/YEvtH65NIl1iKClY
-         Mwqg==
-X-Gm-Message-State: ACgBeo3MZyoADW2b0GJ2qjckrUP/sq8yvNvdkQofpitGUkfycqMv/AbQ
-        lv81iuMTbeyaP+JxIyUV0/8XvA==
-X-Google-Smtp-Source: AA6agR4IWgC9IuMM9zJP8m4skrduVubby7ccpw1GNk0NMJYpp/lX6AmSa1azZp/z/oEIV7K4IuyymQ==
-X-Received: by 2002:a05:6a00:2181:b0:51b:560b:dd30 with SMTP id h1-20020a056a00218100b0051b560bdd30mr3937001pfi.44.1659655426435;
-        Thu, 04 Aug 2022 16:23:46 -0700 (PDT)
+        bh=X5uKb7oCa10gcyiDKzDcavbggNqrev4ZJSWyFhL2ZME=;
+        b=jXvd4ekNzNN3PqWlw0mg6D/J03RQUFtoZNLsM95/sjXKHY8I9oLH6mHnn2HuunKlnA
+         FtS5kijXSClBX/yjWmYT3wnvFAZ2nVp+hXfmdlTzWjlMQVaslR3OmnJqy+pl97q8Pd+W
+         liYY2/ck5//rDPH5pX8WhIQYKo67hcHSkX9THx5mPR9WYnJFGsekeV8wppc8t02QisVU
+         3bQh81AMCs0JemzXkp5NFr4b8kSSKwm+/cXTeSCXetkuKKQ5ELQIxQG1BqSkHvR7raIV
+         OgEthsQuhDbcUlSWOrSdYLONRLMr7EUtciyz0qBzti+KkYlkBtlwqRL2qYZybgKlrQsj
+         lp4A==
+X-Gm-Message-State: ACgBeo1hXCKLQPdstwq/1ac51FmSMy2F4ODHbxX7c36s7BOE0n+y7mpO
+        nd30G/bX3luIxk3EQaknRJPMag==
+X-Google-Smtp-Source: AA6agR4r8lTtmd7jklaYdAihB6LjgBXY/8c5Gd88XpvZbJW3hbzGUE3F+WQaa2lGMrpcQ1kIbpEW4A==
+X-Received: by 2002:a17:90a:a2a:b0:1f3:1479:e869 with SMTP id o39-20020a17090a0a2a00b001f31479e869mr4432295pjo.41.1659655584329;
+        Thu, 04 Aug 2022 16:26:24 -0700 (PDT)
 Received: from google.com (7.104.168.34.bc.googleusercontent.com. [34.168.104.7])
-        by smtp.gmail.com with ESMTPSA id g64-20020a625243000000b0052d6ad246a4sm1550629pfb.144.2022.08.04.16.23.45
+        by smtp.gmail.com with ESMTPSA id x194-20020a6286cb000000b0052abfc4b4a4sm1641077pfd.12.2022.08.04.16.26.23
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 04 Aug 2022 16:23:45 -0700 (PDT)
-Date:   Thu, 4 Aug 2022 23:23:41 +0000
+        Thu, 04 Aug 2022 16:26:23 -0700 (PDT)
+Date:   Thu, 4 Aug 2022 23:26:20 +0000
 From:   Sean Christopherson <seanjc@google.com>
-To:     David Matlack <dmatlack@google.com>
-Cc:     isaku.yamahata@intel.com, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org, isaku.yamahata@gmail.com,
-        Paolo Bonzini <pbonzini@redhat.com>, erdemaktas@google.com,
-        Sagi Shahar <sagis@google.com>
-Subject: Re: [RFC PATCH v6 037/104] KVM: x86/mmu: Allow non-zero value for
- non-present SPTE
-Message-ID: <YuxU/VXlSwVip7ys@google.com>
-References: <cover.1651774250.git.isaku.yamahata@intel.com>
- <bfa4f7415a1d059bd3a4c6d14105f2baf2d03ba6.1651774250.git.isaku.yamahata@intel.com>
- <YuxOHPpkhKnnstqw@google.com>
+To:     Like Xu <like.xu.linux@gmail.com>
+Cc:     Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+Subject: Re: [PATCH] selftests: kvm/x86: test if it checks all the bits in
+ the LBR_FMT bit-field
+Message-ID: <YuxVnDif6UMcFZ5I@google.com>
+References: <20220804073819.76460-1-likexu@tencent.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <YuxOHPpkhKnnstqw@google.com>
+In-Reply-To: <20220804073819.76460-1-likexu@tencent.com>
 X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
         ENV_AND_HDR_SPF_MATCH,FSL_HELO_FAKE,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,
@@ -75,78 +71,110 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Aug 04, 2022, David Matlack wrote:
-> On Thu, May 05, 2022 at 11:14:31AM -0700, isaku.yamahata@intel.com wrote:
-> > +static inline void kvm_init_shadow_page(void *page)
-> > +{
-> > +#ifdef CONFIG_X86_64
-> > +	int ign;
-> > +
-> > +	WARN_ON_ONCE(shadow_nonpresent_value != SHADOW_NONPRESENT_VALUE);
-> > +	asm volatile (
-> > +		"rep stosq\n\t"
-> > +		: "=c"(ign), "=D"(page)
-> > +		: "a"(SHADOW_NONPRESENT_VALUE), "c"(4096/8), "D"(page)
-> > +		: "memory"
-> > +	);
+On Thu, Aug 04, 2022, Like Xu wrote:
+> From: Like Xu <likexu@tencent.com>
 > 
-> Use memset64()?
-
-Huh.  The optimized x86-64 versions were added in 2017 (4c51248533ad ("x86: implement
-memset16, memset32 & memset64"), so I can't even claim I wrote this before there
-was a perfect fit.
-
-> > @@ -5643,7 +5687,8 @@ int kvm_mmu_create(struct kvm_vcpu *vcpu)
-> >  	vcpu->arch.mmu_page_header_cache.kmem_cache = mmu_page_header_cache;
-> >  	vcpu->arch.mmu_page_header_cache.gfp_zero = __GFP_ZERO;
-> >  
-> > -	vcpu->arch.mmu_shadow_page_cache.gfp_zero = __GFP_ZERO;
-> > +	if (!(is_tdp_mmu_enabled(vcpu->kvm) && shadow_nonpresent_value))
-> > +		vcpu->arch.mmu_shadow_page_cache.gfp_zero = __GFP_ZERO;
+> User space only enable guest LBR feature when the exactly supported
+> LBR format value is initialized to the MSR_IA32_PERF_CAPABILITIES.
+> The input is also invalid if only partially supported bits are set.
 > 
-> Is there any reason to prefer using __GFP_ZERO? I suspect the code would
-> be simpler if KVM unconditionally initialized shadow pages.
-
-Hmm, we'd have to implement kvm_init_shadow_page() for 32-bit builds, and I don't
-love having "gfp_zero" but not using it when we need zeros, but if the end result
-is simpler, I'm definitely ok with omitting __GFP_ZERO and always flowing through
-kvm_init_shadow_page().
-
-> > diff --git a/arch/x86/kvm/mmu/spte.h b/arch/x86/kvm/mmu/spte.h
-> > index fbbab180395e..3319ca7f8f48 100644
-> > --- a/arch/x86/kvm/mmu/spte.h
-> > +++ b/arch/x86/kvm/mmu/spte.h
-> > @@ -140,6 +140,19 @@ static_assert(MMIO_SPTE_GEN_LOW_BITS == 8 && MMIO_SPTE_GEN_HIGH_BITS == 11);
-> >  
-> >  #define MMIO_SPTE_GEN_MASK		GENMASK_ULL(MMIO_SPTE_GEN_LOW_BITS + MMIO_SPTE_GEN_HIGH_BITS - 1, 0)
-> >  
-> > +/*
-> > + * non-present SPTE value for both VMX and SVM for TDP MMU.
-> > + * For SVM NPT, for non-present spte (bit 0 = 0), other bits are ignored.
-> > + * For VMX EPT, bit 63 is ignored if #VE is disabled.
-> > + *              bit 63 is #VE suppress if #VE is enabled.
-> > + */
-> > +#ifdef CONFIG_X86_64
-> > +#define SHADOW_NONPRESENT_VALUE	BIT_ULL(63)
-> > +static_assert(!(SHADOW_NONPRESENT_VALUE & SPTE_MMU_PRESENT_MASK));
-> > +#else
-> > +#define SHADOW_NONPRESENT_VALUE	0ULL
-> > +#endif
+> Note for PEBS feature, the PEBS_FORMAT bit field is the primary concern,
+> thus if the PEBS_FORMAT input is empty, the other bits check about PEBS
+> (like PEBS_TRAP or ARCH_REG) will be ignored.
 > 
-> The terminology "shadow_nonpresent" implies it would be the opposite of
-> e.g.  is_shadow_present_pte(), when in fact they are completely
-> different concepts.
-
-You can fight Paolo over that one :-)  I agree it looks a bit odd when juxtaposed
-with is_shadow_present_pte(), but at the same time I agree with Paolo that
-SHADOW_INIT_VALUE is also funky.
-
-https://lore.kernel.org/all/9dfc44d6-6b20-e864-8d4f-09ab7d489b97@redhat.com
-
-> Also, this is a good opportunity to follow the same naming terminology
-> as REMOVED_SPTE in the TDP MMU.
+> Signed-off-by: Like Xu <likexu@tencent.com>
+> ---
+>  tools/testing/selftests/kvm/x86_64/vmx_pmu_caps_test.c | 9 ++++++++-
+>  1 file changed, 8 insertions(+), 1 deletion(-)
 > 
-> How about EMPTY_SPTE?
+> diff --git a/tools/testing/selftests/kvm/x86_64/vmx_pmu_caps_test.c b/tools/testing/selftests/kvm/x86_64/vmx_pmu_caps_test.c
+> index 6ec901dab61e..98483947f921 100644
+> --- a/tools/testing/selftests/kvm/x86_64/vmx_pmu_caps_test.c
+> +++ b/tools/testing/selftests/kvm/x86_64/vmx_pmu_caps_test.c
+> @@ -13,6 +13,7 @@
+>  
+>  #define _GNU_SOURCE /* for program_invocation_short_name */
+>  #include <sys/ioctl.h>
+> +#include <linux/bitmap.h>
+>  
+>  #include "kvm_util.h"
+>  #include "vmx.h"
+> @@ -56,7 +57,7 @@ int main(int argc, char *argv[])
+>  	const struct kvm_cpuid_entry2 *entry_a_0;
+>  	struct kvm_vm *vm;
+>  	struct kvm_vcpu *vcpu;
+> -	int ret;
+> +	int ret, bit;
+>  	union cpuid10_eax eax;
+>  	union perf_capabilities host_cap;
+>  
+> @@ -97,6 +98,12 @@ int main(int argc, char *argv[])
+>  	ret = _vcpu_set_msr(vcpu, MSR_IA32_PERF_CAPABILITIES, 0x30);
+>  	TEST_ASSERT(ret == 0, "Bad PERF_CAPABILITIES didn't fail.");
+>  
+> +	/* testcase 4, reject LBR_FMT if only partially supported bits are set */
+> +	for_each_set_bit(bit, (unsigned long *)&host_cap.capabilities, 6) {
+> +		ret = _vcpu_set_msr(vcpu, MSR_IA32_PERF_CAPABILITIES, BIT_ULL(bit));
+> +		TEST_ASSERT(ret == 0, "Bad PERF_CAPABILITIES didn't fail.");
+> +	}
 
-No, because "empty" implies there's nothing there, and it very much matters that
-the SUPPRESS_VE bit is set for TDX.
+Rather than add another testcase and target only a subset of possible values, what
+about replacing (fixing IMO) testcase #3 with fully exhaustive approach?
+
+---
+From: Sean Christopherson <seanjc@google.com>
+Date: Thu, 4 Aug 2022 12:18:15 -0700
+Subject: [PATCH] KVM: selftests: Test all possible "invalid"
+ PERF_CAPABILITIES.LBR_FMT vals
+
+Test all possible input values to verify that KVM rejects all values
+except the exact host value.  Due to the LBR format affecting the core
+functionality of LBRs, KVM can't emulate "other" formats, so even though
+there are a variety of legal values, KVM should reject anything but an
+exact host match.
+
+Suggested-by: Like Xu <like.xu.linux@gmail.com>
+Signed-off-by: Sean Christopherson <seanjc@google.com>
+---
+ .../selftests/kvm/x86_64/vmx_pmu_caps_test.c    | 17 ++++++++++++-----
+ 1 file changed, 12 insertions(+), 5 deletions(-)
+
+diff --git a/tools/testing/selftests/kvm/x86_64/vmx_pmu_caps_test.c b/tools/testing/selftests/kvm/x86_64/vmx_pmu_caps_test.c
+index 6ec901dab61e..069589c52f41 100644
+--- a/tools/testing/selftests/kvm/x86_64/vmx_pmu_caps_test.c
++++ b/tools/testing/selftests/kvm/x86_64/vmx_pmu_caps_test.c
+@@ -59,6 +59,7 @@ int main(int argc, char *argv[])
+ 	int ret;
+ 	union cpuid10_eax eax;
+ 	union perf_capabilities host_cap;
++	uint64_t val;
+
+ 	host_cap.capabilities = kvm_get_feature_msr(MSR_IA32_PERF_CAPABILITIES);
+ 	host_cap.capabilities &= (PMU_CAP_FW_WRITES | PMU_CAP_LBR_FMT);
+@@ -91,11 +92,17 @@ int main(int argc, char *argv[])
+ 	vcpu_set_msr(vcpu, MSR_IA32_PERF_CAPABILITIES, host_cap.lbr_format);
+ 	ASSERT_EQ(vcpu_get_msr(vcpu, MSR_IA32_PERF_CAPABILITIES), (u64)host_cap.lbr_format);
+
+-	/* testcase 3, check invalid LBR format is rejected */
+-	/* Note, on Arch LBR capable platforms, LBR_FMT in perf capability msr is 0x3f,
+-	 * to avoid the failure, use a true invalid format 0x30 for the test. */
+-	ret = _vcpu_set_msr(vcpu, MSR_IA32_PERF_CAPABILITIES, 0x30);
+-	TEST_ASSERT(ret == 0, "Bad PERF_CAPABILITIES didn't fail.");
++	/*
++	 * Testcase 3, check that an "invalid" LBR format is rejected.  Only an
++	 * exact match of the host's format (and 0/disabled) is allowed.
++	 */
++	for (val = 1; val <= PMU_CAP_LBR_FMT; val++) {
++		if (val == (host_cap.capabilities & PMU_CAP_LBR_FMT))
++			continue;
++
++		ret = _vcpu_set_msr(vcpu, MSR_IA32_PERF_CAPABILITIES, val);
++		TEST_ASSERT(!ret, "Bad LBR FMT = 0x%lx didn't fail", val);
++	}
+
+ 	printf("Completed perf capability tests.\n");
+ 	kvm_vm_free(vm);
+
+base-commit: 93472b79715378a2386598d6632c654a2223267b
+--
+
