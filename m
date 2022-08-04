@@ -2,391 +2,225 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 5706A589581
-	for <lists+kvm@lfdr.de>; Thu,  4 Aug 2022 02:55:52 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 47D8C5895AD
+	for <lists+kvm@lfdr.de>; Thu,  4 Aug 2022 03:36:51 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238350AbiHDAzq (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 3 Aug 2022 20:55:46 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60524 "EHLO
+        id S238951AbiHDBgu (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 3 Aug 2022 21:36:50 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52798 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229686AbiHDAzp (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 3 Aug 2022 20:55:45 -0400
-Received: from mga12.intel.com (mga12.intel.com [192.55.52.136])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8CF725F991
-        for <kvm@vger.kernel.org>; Wed,  3 Aug 2022 17:55:43 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1659574543; x=1691110543;
-  h=message-id:date:mime-version:subject:to:cc:references:
-   from:in-reply-to:content-transfer-encoding;
-  bh=2IIzPWOk3DqtrWxR6dUAjM0LWxdelKWs6P5Il64ydy0=;
-  b=PJ4v6+bXAMZMDa/vPY3x5urcdZXAd2AnzdeXwR9yB4nVpeiV3+PBcyZY
-   162VIG2ImfnDWtuYcAOy+Y1HnnhTbFTBeoxdczyZP3y2EFYoEA/PkR/y5
-   enZdXt9meSIxYdVVv8CzQYurqwqN+r4NIo+O0OgVUTefLNe+5PGnoJelv
-   BMjt7S4u6UtQOiw+sN57XDwuE7C1agLhOrBJLhmO3KfqH0B+eqta4e5kH
-   q7ZplfuXfNyPXt+1ownHBwV0fMlPQdXZu1AivFhA/jm0z9zghEhff/MK1
-   Sc+9Em5AuktiaE7nW9k+Q1KgTGPT95wXRvGtFAmAPzdebaImSkJQqQGZp
-   A==;
-X-IronPort-AV: E=McAfee;i="6400,9594,10428"; a="269583699"
-X-IronPort-AV: E=Sophos;i="5.93,214,1654585200"; 
-   d="scan'208";a="269583699"
-Received: from orsmga006.jf.intel.com ([10.7.209.51])
-  by fmsmga106.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 03 Aug 2022 17:55:43 -0700
-X-IronPort-AV: E=Sophos;i="5.93,214,1654585200"; 
-   d="scan'208";a="578864940"
-Received: from xiaoyaol-hp-g830.ccr.corp.intel.com (HELO [10.249.170.178]) ([10.249.170.178])
-  by orsmga006-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 03 Aug 2022 17:55:36 -0700
-Message-ID: <7ed7eb7b-2b9d-76cb-5d45-63f0e9dbde1c@intel.com>
-Date:   Thu, 4 Aug 2022 08:55:33 +0800
+        with ESMTP id S229728AbiHDBgq (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 3 Aug 2022 21:36:46 -0400
+Received: from mail-wr1-x42b.google.com (mail-wr1-x42b.google.com [IPv6:2a00:1450:4864:20::42b])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C998D22B27
+        for <kvm@vger.kernel.org>; Wed,  3 Aug 2022 18:36:44 -0700 (PDT)
+Received: by mail-wr1-x42b.google.com with SMTP id bk11so13678462wrb.10
+        for <kvm@vger.kernel.org>; Wed, 03 Aug 2022 18:36:44 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc;
+        bh=9RuCDA+INl34oJD/W+EPuam1+8E6DH21uoRnJj9a9WY=;
+        b=QONRPYMQ6w78/JipPhnXTUEL1narrgVyWzYucO6P8wP9tuZYqKTXukIkQxqOiW9/wB
+         zonMdrDz7WkAFQlenAGCPWdEFReccnffdcvG3OAsx1esT/OoljSm6smFqovSDbk2cSCo
+         m8kEKEni77EDz0dDsWHfy2czTWf33MU8Q7wvIMy9kjsaRlWQkQNLPVOp6ig4b58S9to5
+         iUQQ2aVk4S1o4TDHlSAS7i+N3UlQ5ueklJgzuI5DYAONUW+PSEFa7xndYI+E8kOdIt+l
+         /4FFE3jHoGVjSW8Hq5+g87hrReHif37GNPWZQRCmwBjeQ6WmnvFOmXaMqJ6/8y1m7ZFz
+         mjkw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc;
+        bh=9RuCDA+INl34oJD/W+EPuam1+8E6DH21uoRnJj9a9WY=;
+        b=20yDHMDLi7G2XR6bPDhQZEG+g+rjAWdTptentmDh0EGO49oaohSIG/eRYwAmU97h9O
+         r0IgnkuDZqZVv5m0k5iaCk/SXRXcDGBnh2dmorM6OAVp1mUJb4QnUo1AoePAf9ot76Tm
+         7mftXywnvqEWKoF8pCT3GvJP0+JbksPTyG0v2QlSf/eoqqxG46M/ymWAOrW4TQQGijrz
+         P/y54ucIvHjEB4AHozYo2ie6Kwfcmc2Ar5zPbbFz+e2vgkXjYmtdwtVU2r/B6ieOQ2P7
+         D7gSr0Gj5QVHeZ9G1YLUTyxcJO98/TA7k6vB9ymAhmw2j923Pz6nKLC5leRMcwyZbRfE
+         TQwQ==
+X-Gm-Message-State: ACgBeo3Hv04RX3n2RqaAzNDSpeo4fHXU2cwb4pMqajJj2x84ybInKuUZ
+        dA18P7DjFH+MI2DGfR4u5jaigkW6lW7wu9Xl92GQ6w==
+X-Google-Smtp-Source: AA6agR7bEW6PQMnUtZPYhyD9J/TfI4S+nXU25vVVP0jSt/YdTED12c1D3PmOyLU1rN6W4ccvzR3FxTo7RPsZo1zyL5s=
+X-Received: by 2002:a05:6000:10c3:b0:21f:15aa:1b68 with SMTP id
+ b3-20020a05600010c300b0021f15aa1b68mr16401506wrx.693.1659577003160; Wed, 03
+ Aug 2022 18:36:43 -0700 (PDT)
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:91.0) Gecko/20100101
- Firefox/91.0 Thunderbird/91.11.0
-Subject: Re: [PATCH v1 08/40] i386/tdx: Adjust the supported CPUID based on
- TDX restrictions
-Content-Language: en-US
-To:     Chenyi Qiang <chenyi.qiang@intel.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Isaku Yamahata <isaku.yamahata@gmail.com>,
-        Gerd Hoffmann <kraxel@redhat.com>,
-        =?UTF-8?Q?Daniel_P_=2e_Berrang=c3=a9?= <berrange@redhat.com>,
-        =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>,
-        Richard Henderson <richard.henderson@linaro.org>,
-        "Michael S . Tsirkin" <mst@redhat.com>,
-        Marcel Apfelbaum <marcel.apfelbaum@gmail.com>,
-        Cornelia Huck <cohuck@redhat.com>,
-        Marcelo Tosatti <mtosatti@redhat.com>,
-        Laszlo Ersek <lersek@redhat.com>,
-        Eric Blake <eblake@redhat.com>
-Cc:     Connor Kuehl <ckuehl@redhat.com>, erdemaktas@google.com,
-        kvm@vger.kernel.org, qemu-devel@nongnu.org, seanjc@google.com
-References: <20220802074750.2581308-1-xiaoyao.li@intel.com>
- <20220802074750.2581308-9-xiaoyao.li@intel.com>
- <200d5aa2-f1e3-2b8b-7963-e605f9a5731e@intel.com>
-From:   Xiaoyao Li <xiaoyao.li@intel.com>
-In-Reply-To: <200d5aa2-f1e3-2b8b-7963-e605f9a5731e@intel.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-3.0 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,HK_RANDOM_ENVFROM,
-        HK_RANDOM_FROM,NICE_REPLY_A,RCVD_IN_DNSWL_MED,SPF_HELO_PASS,SPF_NONE
-        autolearn=ham autolearn_force=no version=3.4.6
+References: <20220709011726.1006267-1-aaronlewis@google.com>
+ <20220709011726.1006267-2-aaronlewis@google.com> <CALMp9eRxCyneOJqh+o=dibs7xCtUYr_ot6yju8Tm+pMo478gQw@mail.gmail.com>
+In-Reply-To: <CALMp9eRxCyneOJqh+o=dibs7xCtUYr_ot6yju8Tm+pMo478gQw@mail.gmail.com>
+From:   Aaron Lewis <aaronlewis@google.com>
+Date:   Thu, 4 Aug 2022 01:36:31 +0000
+Message-ID: <CAAAPnDHxwWDJwbW02MW8oz2VBDfEskPC7PJ47Z2TOFJaQZmnVg@mail.gmail.com>
+Subject: Re: [PATCH v3 1/5] kvm: x86/pmu: Introduce masked events to the pmu
+ event filter
+To:     Jim Mattson <jmattson@google.com>
+Cc:     kvm@vger.kernel.org, pbonzini@redhat.com, seanjc@google.com
+Content-Type: text/plain; charset="UTF-8"
+X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
+        USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 8/3/2022 3:33 PM, Chenyi Qiang wrote:
-> 
-> 
-> On 8/2/2022 3:47 PM, Xiaoyao Li wrote:
->> According to Chapter "CPUID Virtualization" in TDX module spec, CPUID
->> bits of TD can be classified into 6 types:
->>
->> ------------------------------------------------------------------------
->> 1 | As configured | configurable by VMM, independent of native value;
->> ------------------------------------------------------------------------
->> 2 | As configured | configurable by VMM if the bit is supported natively
->>      (if native)   | Otherwise it equals as native(0).
->> ------------------------------------------------------------------------
->> 3 | Fixed         | fixed to 0/1
->> ------------------------------------------------------------------------
->> 4 | Native        | reflect the native value
->> ------------------------------------------------------------------------
->> 5 | Calculated    | calculated by TDX module.
->> ------------------------------------------------------------------------
->> 6 | Inducing #VE  | get #VE exception
->> ------------------------------------------------------------------------
->>
->> Note:
->> 1. All the configurable XFAM related features and TD attributes related
->>     features fall into type #2. And fixed0/1 bits of XFAM and TD
->>     attributes fall into type #3.
->>
->> 2. For CPUID leaves not listed in "CPUID virtualization Overview" table
->>     in TDX module spec. When they are queried, TDX module injects #VE to
->>     TDs. For this case, TDs can request CPUID emulation from VMM via
->>     TDVMCALL and the values are fully controlled by VMM.
->>
->> Due to TDX module has its own virtualization policy on CPUID bits, it 
->> leads
->> to what reported via KVM_GET_SUPPORTED_CPUID diverges from the supported
->> CPUID bits for TDS. In order to keep a consistent CPUID configuration
->> between VMM and TDs. Adjust supported CPUID for TDs based on TDX
->> restrictions.
->>
->> Currently only focus on the CPUID leaves recognized by QEMU's
->> feature_word_info[] that are indexed by a FeatureWord.
->>
->> Introduce a TDX CPUID lookup table, which maintains 1 entry for each
->> FeatureWord. Each entry has below fields:
->>
->>   - tdx_fixed0/1: The bits that are fixed as 0/1;
->>
->>   - vmm_fixup:   The bits that are configurable from the view of TDX 
->> module.
->>                  But they requires emulation of VMM when they are 
->> configured
->>             as enabled. For those, they are not supported if VMM doesn't
->>         report them as supported. So they need be fixed up by
->>         checking if VMM supports them.
->>
->>   - inducing_ve: TD gets #VE when querying this CPUID leaf. The result is
->>                  totally configurable by VMM.
->>
->>   - supported_on_ve: It's valid only when @inducing_ve is true. It 
->> represents
->>             the maximum feature set supported that be emulated
->>             for TDs.
->>
->> By applying TDX CPUID lookup table and TDX capabilities reported from
->> TDX module, the supported CPUID for TDs can be obtained from following
->> steps:
->>
->> - get the base of VMM supported feature set;
->>
->> - if the leaf is not a FeatureWord just return VMM's value without
->>    modification;
->>
->> - if the leaf is an inducing_ve type, applying supported_on_ve mask and
->>    return;
->>
->> - include all native bits, it covers type #2, #4, and parts of type #1.
->>    (it also includes some unsupported bits. The following step will
->>     correct it.)
->>
->> - apply fixed0/1 to it (it covers #3, and rectifies the previous step);
->>
->> - add configurable bits (it covers the other part of type #1);
->>
->> - fix the ones in vmm_fixup;
->>
->> - filter the one has valid .supported field;
-> 
-> What does .supported field filter mean here?
-> 
->>
->> (Calculated type is ignored since it's determined at runtime).
->>
->> Co-developed-by: Chenyi Qiang <chenyi.qiang@intel.com>
->> Signed-off-by: Chenyi Qiang <chenyi.qiang@intel.com>
->> Signed-off-by: Xiaoyao Li <xiaoyao.li@intel.com>
->> ---
->>   target/i386/cpu.h     |  16 +++
->>   target/i386/kvm/kvm.c |   4 +
->>   target/i386/kvm/tdx.c | 255 ++++++++++++++++++++++++++++++++++++++++++
->>   target/i386/kvm/tdx.h |   2 +
->>   4 files changed, 277 insertions(+)
->>
->> diff --git a/target/i386/cpu.h b/target/i386/cpu.h
->> index 82004b65b944..cc9da9fc4318 100644
->> --- a/target/i386/cpu.h
->> +++ b/target/i386/cpu.h
->> @@ -771,6 +771,8 @@ uint64_t 
->> x86_cpu_get_supported_feature_word(FeatureWord w,
->>   /* Support RDFSBASE/RDGSBASE/WRFSBASE/WRGSBASE */
->>   #define CPUID_7_0_EBX_FSGSBASE          (1U << 0)
->> +/* Support for TSC adjustment MSR 0x3B */
->> +#define CPUID_7_0_EBX_TSC_ADJUST        (1U << 1)
->>   /* Support SGX */
->>   #define CPUID_7_0_EBX_SGX               (1U << 2)
->>   /* 1st Group of Advanced Bit Manipulation Extensions */
->> @@ -789,8 +791,12 @@ uint64_t 
->> x86_cpu_get_supported_feature_word(FeatureWord w,
->>   #define CPUID_7_0_EBX_INVPCID           (1U << 10)
->>   /* Restricted Transactional Memory */
->>   #define CPUID_7_0_EBX_RTM               (1U << 11)
->> +/* Cache QoS Monitoring */
->> +#define CPUID_7_0_EBX_PQM               (1U << 12)
->>   /* Memory Protection Extension */
->>   #define CPUID_7_0_EBX_MPX               (1U << 14)
->> +/* Resource Director Technology Allocation */
->> +#define CPUID_7_0_EBX_RDT_A             (1U << 15)
->>   /* AVX-512 Foundation */
->>   #define CPUID_7_0_EBX_AVX512F           (1U << 16)
->>   /* AVX-512 Doubleword & Quadword Instruction */
->> @@ -846,10 +852,16 @@ uint64_t 
->> x86_cpu_get_supported_feature_word(FeatureWord w,
->>   #define CPUID_7_0_ECX_AVX512VNNI        (1U << 11)
->>   /* Support for VPOPCNT[B,W] and VPSHUFBITQMB */
->>   #define CPUID_7_0_ECX_AVX512BITALG      (1U << 12)
->> +/* Intel Total Memory Encryption */
->> +#define CPUID_7_0_ECX_TME               (1U << 13)
->>   /* POPCNT for vectors of DW/QW */
->>   #define CPUID_7_0_ECX_AVX512_VPOPCNTDQ  (1U << 14)
->> +/* Placeholder for bit 15 */
->> +#define CPUID_7_0_ECX_FZM               (1U << 15)
->>   /* 5-level Page Tables */
->>   #define CPUID_7_0_ECX_LA57              (1U << 16)
->> +/* MAWAU for MPX */
->> +#define CPUID_7_0_ECX_MAWAU             (31U << 17)
->>   /* Read Processor ID */
->>   #define CPUID_7_0_ECX_RDPID             (1U << 22)
->>   /* Bus Lock Debug Exception */
->> @@ -860,6 +872,8 @@ uint64_t 
->> x86_cpu_get_supported_feature_word(FeatureWord w,
->>   #define CPUID_7_0_ECX_MOVDIRI           (1U << 27)
->>   /* Move 64 Bytes as Direct Store Instruction */
->>   #define CPUID_7_0_ECX_MOVDIR64B         (1U << 28)
->> +/* ENQCMD and ENQCMDS instructions */
->> +#define CPUID_7_0_ECX_ENQCMD            (1U << 29)
->>   /* Support SGX Launch Control */
->>   #define CPUID_7_0_ECX_SGX_LC            (1U << 30)
->>   /* Protection Keys for Supervisor-mode Pages */
->> @@ -877,6 +891,8 @@ uint64_t 
->> x86_cpu_get_supported_feature_word(FeatureWord w,
->>   #define CPUID_7_0_EDX_SERIALIZE         (1U << 14)
->>   /* TSX Suspend Load Address Tracking instruction */
->>   #define CPUID_7_0_EDX_TSX_LDTRK         (1U << 16)
->> +/* PCONFIG instruction */
->> +#define CPUID_7_0_EDX_PCONFIG           (1U << 18)
->>   /* Architectural LBRs */
->>   #define CPUID_7_0_EDX_ARCH_LBR          (1U << 19)
->>   /* AVX512_FP16 instruction */
->> diff --git a/target/i386/kvm/kvm.c b/target/i386/kvm/kvm.c
->> index 9e30fa9f4eb5..9930902ae890 100644
->> --- a/target/i386/kvm/kvm.c
->> +++ b/target/i386/kvm/kvm.c
->> @@ -492,6 +492,10 @@ uint32_t kvm_arch_get_supported_cpuid(KVMState 
->> *s, uint32_t function,
->>           ret |= 1U << KVM_HINTS_REALTIME;
->>       }
->> +    if (is_tdx_vm()) {
->> +        tdx_get_supported_cpuid(function, index, reg, &ret);
->> +    }
->> +
->>       return ret;
->>   }
->> diff --git a/target/i386/kvm/tdx.c b/target/i386/kvm/tdx.c
->> index fdd6bec58758..e3e9a424512e 100644
->> --- a/target/i386/kvm/tdx.c
->> +++ b/target/i386/kvm/tdx.c
->> @@ -14,11 +14,134 @@
->>   #include "qemu/osdep.h"
->>   #include "qapi/error.h"
->>   #include "qom/object_interfaces.h"
->> +#include "standard-headers/asm-x86/kvm_para.h"
->>   #include "sysemu/kvm.h"
->>   #include "hw/i386/x86.h"
->>   #include "kvm_i386.h"
->>   #include "tdx.h"
->> +#include "../cpu-internal.h"
->> +
->> +#define TDX_SUPPORTED_KVM_FEATURES  ((1U << KVM_FEATURE_NOP_IO_DELAY) 
->> | \
->> +                                     (1U << KVM_FEATURE_PV_UNHALT) | \
->> +                                     (1U << KVM_FEATURE_PV_TLB_FLUSH) 
->> | \
->> +                                     (1U << KVM_FEATURE_PV_SEND_IPI) | \
->> +                                     (1U << KVM_FEATURE_POLL_CONTROL) 
->> | \
->> +                                     (1U << 
->> KVM_FEATURE_PV_SCHED_YIELD) | \
->> +                                     (1U << 
->> KVM_FEATURE_MSI_EXT_DEST_ID))
->> +
->> +typedef struct KvmTdxCpuidLookup {
->> +    uint32_t tdx_fixed0;
->> +    uint32_t tdx_fixed1;
->> +
->> +    /*
->> +     * The CPUID bits that are configurable from the view of TDX module
->> +     * but require VMM emulation if configured to enabled by VMM.
->> +     *
->> +     * For those bits, they cannot be enabled actually if VMM 
->> (KVM/QEMU) cannot
->> +     * virtualize them.
->> +     */
->> +    uint32_t vmm_fixup;
->> +
->> +    bool inducing_ve;
->> +    /*
->> +     * The maximum supported feature set for given inducing-#VE leaf.
->> +     * It's valid only when .inducing_ve is true.
->> +     */
->> +    uint32_t supported_on_ve;
->> +} KvmTdxCpuidLookup;
->> +
->> + /*
->> +  * QEMU maintained TDX CPUID lookup tables, which reflects how 
->> CPUIDs are
->> +  * virtualized for guest TDs based on "CPUID virtualization" of TDX 
->> spec.
->> +  *
->> +  * Note:
->> +  *
->> +  * This table will be updated runtime by tdx_caps reported by platform.
->> +  *
->> +  */
->> +static KvmTdxCpuidLookup tdx_cpuid_lookup[FEATURE_WORDS] = {
->> +    [FEAT_1_EDX] = {
->> +        .tdx_fixed0 =
->> +            BIT(10) | BIT(20) | CPUID_IA64,
->> +        .tdx_fixed1 =
->> +            CPUID_MSR | CPUID_PAE | CPUID_MCE | CPUID_APIC |
->> +            CPUID_MTRR | CPUID_MCA | CPUID_CLFLUSH | CPUID_DTS,
->> +        .vmm_fixup =
->> +            CPUID_ACPI | CPUID_PBE,
->> +    },
->> +    [FEAT_1_ECX] = {
->> +        .tdx_fixed0 =
->> +            CPUID_EXT_MONITOR | CPUID_EXT_VMX | CPUID_EXT_SMX |
->> +            BIT(16),
->> +        .tdx_fixed1 =
->> +            CPUID_EXT_CX16 | CPUID_EXT_PDCM | CPUID_EXT_X2APIC |
->> +            CPUID_EXT_AES | CPUID_EXT_XSAVE | CPUID_EXT_RDRAND |
->> +            CPUID_EXT_HYPERVISOR,
->> +        .vmm_fixup =
->> +            CPUID_EXT_EST | CPUID_EXT_TM2 | CPUID_EXT_XTPR | 
->> CPUID_EXT_DCA,
->> +    },
->> +    [FEAT_8000_0001_EDX] = {
-> 
-> ...
-> 
->> +        .tdx_fixed1 =
->> +            CPUID_EXT2_NX | CPUID_EXT2_PDPE1GB | CPUID_EXT2_RDTSCP |
->> +            CPUID_EXT2_LM,
->> +    },
->> +    [FEAT_7_0_EBX] = {
->> +        .tdx_fixed0 =
->> +            CPUID_7_0_EBX_TSC_ADJUST | CPUID_7_0_EBX_SGX | 
->> CPUID_7_0_EBX_MPX,
->> +        .tdx_fixed1 =
->> +            CPUID_7_0_EBX_FSGSBASE | CPUID_7_0_EBX_RTM |
->> +            CPUID_7_0_EBX_RDSEED | CPUID_7_0_EBX_SMAP |
->> +            CPUID_7_0_EBX_CLFLUSHOPT | CPUID_7_0_EBX_CLWB |
->> +            CPUID_7_0_EBX_SHA_NI,
->> +        .vmm_fixup =
->> +            CPUID_7_0_EBX_PQM | CPUID_7_0_EBX_RDT_A,
->> +    },
->> +    [FEAT_7_0_ECX] = {
->> +        .tdx_fixed0 =
->> +            CPUID_7_0_ECX_FZM | CPUID_7_0_ECX_MAWAU |
->> +            CPUID_7_0_ECX_ENQCMD | CPUID_7_0_ECX_SGX_LC,
->> +        .tdx_fixed1 =
->> +            CPUID_7_0_ECX_MOVDIR64B | CPUID_7_0_ECX_BUS_LOCK_DETECT,
->> +        .vmm_fixup =
->> +            CPUID_7_0_ECX_TME,
->> +    },
->> +    [FEAT_7_0_EDX] = {
->> +        .tdx_fixed1 =
->> +            CPUID_7_0_EDX_SPEC_CTRL | CPUID_7_0_EDX_ARCH_CAPABILITIES |
->> +            CPUID_7_0_EDX_CORE_CAPABILITY | 
->> CPUID_7_0_EDX_SPEC_CTRL_SSBD,
->> +        .vmm_fixup =
->> +            CPUID_7_0_EDX_PCONFIG,
->> +    },
->> +    [FEAT_8000_0001_EDX] = {
->> +        .tdx_fixed1 =
->> +            CPUID_EXT2_NX | CPUID_EXT2_PDPE1GB |
->> +            CPUID_EXT2_RDTSCP | CPUID_EXT2_LM,
->> +    },
-> 
-> duplicated FEAT_8000_0001_EDX item.
-> 
+On Tue, Aug 2, 2022 at 5:19 PM Jim Mattson <jmattson@google.com> wrote:
+>
+> On Fri, Jul 8, 2022 at 6:17 PM Aaron Lewis <aaronlewis@google.com> wrote:
+> >
+> > This feature is enabled by setting the flags field to
+> > KVM_PMU_EVENT_FLAG_MASKED_EVENTS.
+> >
+> > Events can be encoded by using KVM_PMU_EVENT_ENCODE_MASKED_EVENT().
+> >
+> > It is an error to have a bit set outside valid encoded bits, and calls
+> > to KVM_SET_PMU_EVENT_FILTER will return -EINVAL in such cases,
+> > including bits that are set in the high nybble[1] for AMD if called on
+> > Intel.
+> >
+> > [1] bits 35:32 in the event and bits 11:8 in the eventsel.
+>
+> I think there is some confusion in the documentation and the code
+> regarding what an 'eventsel' is. Yes, Intel started it, with
+> "performance event select registers" that contain an "event select"
+> field, but the 64-bit object you refer to as an 'event' here in the
+> commit message is typically referred to as an 'eventsel' in the code
 
-fixed.
+Yeah, it does look like 'eventsel' is more commonly used in the kernel
+to refer to the "performance event select register".  I do see a few
+locations where 'eventsel' refers to an eventsel's event.  Maybe I can
+rename those in a separate series to avoid future confusion, though
+another reason I named it that way is because the SDM and APM both
+refer to the eventsel's event as an "event select" which naturally
+makes sense to call it eventsel.  I figured we'd want to be consistent
+with the docs.
 
-Thanks,
--Xiaoyao
+If we prefer to call the 64-bit object 'eventsel', then what do we
+call the eventsel's event?  Maybe 'eventsel's event' is good enough,
+however, it's unfortunate "event select" is overloaded like it is
+because I don't feel the need to say "eventsel's unit mask".
+
+I'm open to other suggestions as well.  There's got to be something
+better than that.
+
+> below. Maybe it's too late to avoid confusion, but I'd suggest
+> referring to the 64-bit object as a "PMU event filter entry," or
+> something like that.
+>
+
+What about "filtered event"?
+
+> > +}
+> >
+> > +static bool allowed_by_masked_events(struct kvm_pmu_event_filter *filter,
+> > +                                    u64 eventsel)
+> > +{
+> > +       if (is_filtered(filter, eventsel, /*invert=*/false))
+> > +               if (!is_filtered(filter, eventsel, /*invert=*/true))
+>
+> Perhaps you could eliminate the ugly parameter comments if you
+> maintained the "normal" and inverted entries in separate lists. It
+> might also speed things up for the common case, assuming that inverted
+> entries are uncommon.
+
+Is it really that ugly?  I thought it made it more clear, so you don't
+have to jump to the function to see what the bool does.
+
+I can see an argument for walking a shorter list for inverted entries
+in the common case.
+
+To do this I'll likely make an internal copy of the struct like
+'struct kvm_x86_msr_filter' to avoid the flexible array at the end of
+the pmu event filter, and to not mess with the current ABI.  I'll just
+have two lists at the end: one for regular entries and one for
+inverted entries.  If there's a better approach I'm all ears.
+
+>
+> > +                       return filter->action == KVM_PMU_EVENT_ALLOW;
+> > +
+> > +       return filter->action == KVM_PMU_EVENT_DENY;
+> > +}
+> > +
+> > +static bool allowed_by_default_events(struct kvm_pmu_event_filter *filter,
+> > +                                   u64 eventsel)
+> > +{
+> > +       u64 key = eventsel & AMD64_RAW_EVENT_MASK_NB;
+> > +
+> > +       if (bsearch(&key, filter->events, filter->nevents,
+> > +                   sizeof(u64), cmp_u64))
+> > +               return filter->action == KVM_PMU_EVENT_ALLOW;
+> > +
+> > +       return filter->action == KVM_PMU_EVENT_DENY;
+> > +}
+> > +
+> >  void reprogram_gp_counter(struct kvm_pmc *pmc, u64 eventsel)
+> >  {
+> >         u64 config;
+> > @@ -226,14 +318,11 @@ void reprogram_gp_counter(struct kvm_pmc *pmc, u64 eventsel)
+> >
+> >         filter = srcu_dereference(kvm->arch.pmu_event_filter, &kvm->srcu);
+> >         if (filter) {
+> > -               __u64 key = eventsel & AMD64_RAW_EVENT_MASK_NB;
+> > -
+> > -               if (bsearch(&key, filter->events, filter->nevents,
+> > -                           sizeof(__u64), cmp_u64))
+> > -                       allow_event = filter->action == KVM_PMU_EVENT_ALLOW;
+> > -               else
+> > -                       allow_event = filter->action == KVM_PMU_EVENT_DENY;
+> > +               allow_event = (filter->flags & KVM_PMU_EVENT_FLAG_MASKED_EVENTS) ?
+> > +                       allowed_by_masked_events(filter, eventsel) :
+> > +                       allowed_by_default_events(filter, eventsel);
+>
+> If you converted all of the legacy filters into masked filters by
+> simply setting the mask field to '0xff' when copying from userspace,
+> you wouldn't need the complexity of two different matching algorithms.
+
+Agreed that it will simplify the code, but it will make the legacy
+case slower because instead of being able to directly search for a
+filtered event, we will have to walk the list of matching eventsel's
+events looking for a match.
+
+
+> > @@ -603,10 +706,18 @@ int kvm_vm_ioctl_set_pmu_event_filter(struct kvm *kvm, void __user *argp)
+> >         /* Ensure nevents can't be changed between the user copies. */
+> >         *filter = tmp;
+> >
+> > +       r = -EINVAL;
+> > +       /* To maintain backwards compatibility don't validate flags == 0. */
+> > +       if (filter->flags != 0 && has_invalid_event(filter))
+> > +               goto cleanup;
+> > +
+> > +       if (filter->flags & KVM_PMU_EVENT_FLAG_MASKED_EVENTS)
+> > +               cmp = cmp_eventsel_event;
+> > +
+> >         /*
+> >          * Sort the in-kernel list so that we can search it with bsearch.
+> >          */
+> > -       sort(&filter->events, filter->nevents, sizeof(__u64), cmp_u64, NULL);
+> > +       sort(&filter->events, filter->nevents, sizeof(u64), cmp, NULL);
+>
+> I don't believe two different comparison functions are necessary. In
+> the legacy case, when setting up the filter, you should be able to
+> simply discard any filter entries that have extraneous bits set,
+> because they will never match.
+
+For masked events we need the list ordered by eventsel's event, to
+ensure they are contiguous.  For the legacy case we just need the list
+sorted in a way that allows us to quickly find a matching eventsel's
+event + unit mask.  This lends itself well to a generic u64 sort, but
+by doing this the eventsel's events will not be contiguous, which
+doesn't lend itself to searching for a masked event.  To get this to
+work for both cases I think we'd have to rearrange the sort to put the
+bits for the eventsel's event above the unit mask when doing the
+compare, which would slow the sort and compare down with all the bit
+twiddling going on.
+
+Or if the legacy case adopted how masked events work and ate the extra
+cost for a walk rather than a direct search we could join them.
+
+>
+> >         mutex_lock(&kvm->lock);
+> >         filter = rcu_replace_pointer(kvm->arch.pmu_event_filter, filter,
