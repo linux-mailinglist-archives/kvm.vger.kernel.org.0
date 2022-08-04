@@ -2,143 +2,353 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 2727758A067
-	for <lists+kvm@lfdr.de>; Thu,  4 Aug 2022 20:22:09 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id E962F58A147
+	for <lists+kvm@lfdr.de>; Thu,  4 Aug 2022 21:32:00 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S239158AbiHDSWI (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 4 Aug 2022 14:22:08 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54994 "EHLO
+        id S239098AbiHDTb7 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 4 Aug 2022 15:31:59 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41406 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S237748AbiHDSWD (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 4 Aug 2022 14:22:03 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 2AB6C6C118
-        for <kvm@vger.kernel.org>; Thu,  4 Aug 2022 11:22:03 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1659637322;
-        h=from:from:reply-to:reply-to:subject:subject:date:date:
-         message-id:message-id:to:to:cc:cc:mime-version:mime-version:
-         content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=v75w6GLObgAtRIZl7LRPPpod4VI56HpyexDqTUTHWM0=;
-        b=CX4/8zGCFripggy7NsHVsRSbwSjoULoC9mvmis5Bg5BadMXiRiu9cVTGx51vAlH1QODzTD
-        8tiNyhzZHTSzF6ULwEM1Kk0K2hRy+6/N8S/C4TDXvxrJiwrWeu8rcLP63t1MVvlR6j361M
-        +Ce2DA0wesqUsw/lMF5XloNy611nz6I=
-Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
- [209.85.128.70]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-663-KOGGk2AkO_-SPrdAuoUZ3A-1; Thu, 04 Aug 2022 14:22:01 -0400
-X-MC-Unique: KOGGk2AkO_-SPrdAuoUZ3A-1
-Received: by mail-wm1-f70.google.com with SMTP id bh18-20020a05600c3d1200b003a32044cc9fso179795wmb.6
-        for <kvm@vger.kernel.org>; Thu, 04 Aug 2022 11:22:00 -0700 (PDT)
+        with ESMTP id S233660AbiHDTb5 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 4 Aug 2022 15:31:57 -0400
+Received: from mail-lj1-x230.google.com (mail-lj1-x230.google.com [IPv6:2a00:1450:4864:20::230])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B87E6175BD
+        for <kvm@vger.kernel.org>; Thu,  4 Aug 2022 12:31:55 -0700 (PDT)
+Received: by mail-lj1-x230.google.com with SMTP id q7so856587ljp.13
+        for <kvm@vger.kernel.org>; Thu, 04 Aug 2022 12:31:55 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=semihalf.com; s=google;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :from:to:cc;
+        bh=chkiXuTSMte5/THSO1tKei1y+9khIVgeexFrnoY+bEQ=;
+        b=eRQtWhnDrpUQxTRxk74hhVpjgWMp66pOQsJ5r2WONBpJj4FuwPSv4IZeuBwPkYATDM
+         CsON1/KkYaNL8vB/+uLkaJImNlniLAroOrxN589qcDVEwBXoAQL0dCR9ZW6QvgC4/A16
+         3/pmQOoBcuIhdHsIFh0Vr50UF2T6C/HXkgirCLP+eGQvO1HPC7KVT2qhjrSqsI1SbafK
+         4Fn1AdyAxbbB/qJkHgofF4AXnKfItvAccMh72hSznZWlwFztGeF0xb7niju22v6cJyih
+         LehffY7OiQglwW3QsUUARwKXl0QxeKib7P7ZeN+Le6WXIcl19XzgOn+rXX7d2zlvEFdy
+         coKw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:reply-to:user-agent:mime-version:date
-         :message-id:x-gm-message-state:from:to:cc;
-        bh=v75w6GLObgAtRIZl7LRPPpod4VI56HpyexDqTUTHWM0=;
-        b=2vdPr7cULkmZdT2Tn7xyz/5hFv/uGdTIhYvEpkwy14sqB7EdKQHMoJooefYFVmAHHD
-         nnrP3EdUdMm5IkfKy/ik4KYjUIqGG09DCwtLLVMZ1oqxZnMVucgcdqSRNngZcC+zl0WH
-         hhbm1z8r9G3j+BFQP3B/PxEqPauXtuKdzOhhMNluln2rVkyDJ98sGkWB6M+itqS44DOe
-         1w7jUs16D4QoweRsh9OHS6ae6GiDVqh6qVwYwu7vJ1uxDlvgy7IOd0IYVeW5zxFnZ4f4
-         TqNtDjRlgde+vn9QdxhygJcXd+E2vrOZFbi59fsCcCGcEN55bZE6ltPwVnbFtSsMe3z1
-         0P6w==
-X-Gm-Message-State: ACgBeo1dWrmxKhtoDfSmLrHsfDHOCzHh4YiHe28Hb3OSVZo7D3SB3HG7
-        4g4+dL3O8Yf9rE81swjsQBQn4yxx7znqEjZ4FX/M4s24ltXkqXVDlulsfQ1RL2b+Nxoifj6bBuo
-        oY0+Mx6kEpWSq
-X-Received: by 2002:a05:600c:1e8d:b0:3a5:74d:c61c with SMTP id be13-20020a05600c1e8d00b003a5074dc61cmr2313603wmb.70.1659637319691;
-        Thu, 04 Aug 2022 11:21:59 -0700 (PDT)
-X-Google-Smtp-Source: AA6agR5qa6u4rvLgdrkeGZQ58TN8wqu+0q3xLX/YnoDM93GtPS6AXXdj3d2Nxn1Y47VQUM/Q9USHMw==
-X-Received: by 2002:a05:600c:1e8d:b0:3a5:74d:c61c with SMTP id be13-20020a05600c1e8d00b003a5074dc61cmr2313594wmb.70.1659637319521;
-        Thu, 04 Aug 2022 11:21:59 -0700 (PDT)
-Received: from ?IPV6:2a01:e0a:59e:9d80:527b:9dff:feef:3874? ([2a01:e0a:59e:9d80:527b:9dff:feef:3874])
-        by smtp.gmail.com with ESMTPSA id bi19-20020a05600c3d9300b003a342933727sm7203839wmb.3.2022.08.04.11.21.57
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc;
+        bh=chkiXuTSMte5/THSO1tKei1y+9khIVgeexFrnoY+bEQ=;
+        b=7FGWd7MsCknsQ56q6x1y/zhcJTq3IvaGMTbB/gFTOxPKFfT9hz7gnQMyyVO/PSIeK3
+         obXG95+JOamKGsaLnkGfMzjk5PVUhsGjmwW9AMfRHiC+/id8dkL96kFBs/5y5O4AMmFg
+         fPxdTTFIb5ow/KVhu4p6PluQcKmpaUwdUL4jrAn86Mp579LardOYQwoyLCWkEfudv8JR
+         LUlVfSqvKDraUphrUPnwj1MmtWV2KLKXleQ4+iZ11rSc+vqGhU96zQ/iWlA+VnpKJXCX
+         SwqS/JZRP6lFkZpgTrT0POz6xhg764yLDKTeznrogJpwI8Mcd0MxzKnchQ5XN+wxd5ue
+         HNCg==
+X-Gm-Message-State: ACgBeo3XH+YR1wDB+vpibUwj0axj5pux5vRXUivn3NxD8X7LNlfB0Cyc
+        kJNQOXbZ0gaeKSekNZgZ+FhyTw==
+X-Google-Smtp-Source: AA6agR5FBNHMWUF39W4eHNXQwadDmXYbh6xjHi7hmIYySZLly6YhNzTJWxBc2WinoFioVm2jq4OlPg==
+X-Received: by 2002:a2e:a7cf:0:b0:25d:9fe6:7065 with SMTP id x15-20020a2ea7cf000000b0025d9fe67065mr1076334ljp.138.1659641513943;
+        Thu, 04 Aug 2022 12:31:53 -0700 (PDT)
+Received: from [10.43.1.253] ([83.142.187.84])
+        by smtp.gmail.com with ESMTPSA id z5-20020a05651c11c500b0025e505fef30sm209203ljo.63.2022.08.04.12.31.52
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 04 Aug 2022 11:21:58 -0700 (PDT)
-Message-ID: <33adcdb9-9f29-a253-6491-314dcd08e0c8@redhat.com>
-Date:   Thu, 4 Aug 2022 20:21:56 +0200
+        Thu, 04 Aug 2022 12:31:53 -0700 (PDT)
+Message-ID: <47623b4c-5067-b882-01aa-41455f1c3c3f@semihalf.com>
+Date:   Thu, 4 Aug 2022 21:31:51 +0200
 MIME-Version: 1.0
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
  Thunderbird/91.11.0
-Reply-To: eric.auger@redhat.com
-Subject: Re: [kvm-unit-tests PATCH v2 2/3] arm: pmu: Reset the pmu registers
- before starting some tests
+Subject: Re: [PATCH 2/3] KVM: x86: Add kvm_irq_is_masked()
 Content-Language: en-US
-To:     Ricardo Koller <ricarkol@google.com>, kvm@vger.kernel.org,
-        kvmarm@lists.cs.columbia.edu, andrew.jones@linux.dev
-Cc:     maz@kernel.org, alexandru.elisei@arm.com, oliver.upton@linux.dev,
-        reijiw@google.com
-References: <20220803182328.2438598-1-ricarkol@google.com>
- <20220803182328.2438598-3-ricarkol@google.com>
-From:   Eric Auger <eric.auger@redhat.com>
-In-Reply-To: <20220803182328.2438598-3-ricarkol@google.com>
+To:     eric.auger@redhat.com, Sean Christopherson <seanjc@google.com>,
+        Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org
+Cc:     Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+        Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org,
+        "H. Peter Anvin" <hpa@zytor.com>, linux-kernel@vger.kernel.org,
+        Alex Williamson <alex.williamson@redhat.com>,
+        Rong L Liu <rong.l.liu@intel.com>,
+        Zhenyu Wang <zhenyuw@linux.intel.com>,
+        Tomasz Nowicki <tn@semihalf.com>,
+        Grzegorz Jaszczyk <jaz@semihalf.com>,
+        Dmitry Torokhov <dtor@google.com>
+References: <20220715155928.26362-1-dmy@semihalf.com>
+ <20220715155928.26362-3-dmy@semihalf.com>
+ <06cdd944-a00c-9dea-192f-7d6156e487fb@redhat.com>
+From:   Dmytro Maluka <dmy@semihalf.com>
+In-Reply-To: <06cdd944-a00c-9dea-192f-7d6156e487fb@redhat.com>
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-3.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
-        RCVD_IN_DNSWL_LOW,SPF_HELO_NONE,SPF_NONE autolearn=ham
-        autolearn_force=no version=3.4.6
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_DNSWL_NONE,
+        SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi Ricardo,
+Hi Eric,
 
-On 8/3/22 20:23, Ricardo Koller wrote:
-> Some registers like the PMOVS reset to an architecturally UNKNOWN value.
-> Most tests expect them to be reset (mostly zeroed) using pmu_reset().
-> Add a pmu_reset() on all the tests that need one.
->
-> As a bonus, fix a couple of comments related to the register state
-> before a sub-test.
->
-> Signed-off-by: Ricardo Koller <ricarkol@google.com>
-Reviewed-by: Eric Auger <eric.auger@redhat.com>
+On 8/4/22 19:14, Eric Auger wrote:
+> Hi Dmytro
+> 
+> On 7/15/22 17:59, Dmytro Maluka wrote:
+>> In order to implement postponing resamplefd event until an interrupt is
+>> unmasked, we need not only to track changes of the interrupt mask state
+>> (which is made possible by the previous patch "KVM: x86: Move
+>> kvm_(un)register_irq_mask_notifier() to generic KVM") but also to know
+>> its initial mask state at the time of registering a resamplefd
+> it is not obvious to me why the vIRQ is supposed to be masked at
+> resamplefd registration time. I would have expected the check to be done
+> in the resamplefd notifier instead (when the vEOI actually happens)?
 
-Eric
-> ---
->  arm/pmu.c | 6 ++++--
->  1 file changed, 4 insertions(+), 2 deletions(-)
->
-> diff --git a/arm/pmu.c b/arm/pmu.c
-> index 76156f78..7c5bc259 100644
-> --- a/arm/pmu.c
-> +++ b/arm/pmu.c
-> @@ -826,7 +826,7 @@ static void test_overflow_interrupt(void)
->  	write_regn_el0(pmevcntr, 1, PRE_OVERFLOW);
->  	isb();
->  
-> -	/* interrupts are disabled */
-> +	/* interrupts are disabled (PMINTENSET_EL1 == 0) */
->  
->  	mem_access_loop(addr, 200, pmu.pmcr_ro | PMU_PMCR_E);
->  	report(expect_interrupts(0), "no overflow interrupt after preset");
-> @@ -841,7 +841,7 @@ static void test_overflow_interrupt(void)
->  	isb();
->  	report(expect_interrupts(0), "no overflow interrupt after counting");
->  
-> -	/* enable interrupts */
-> +	/* enable interrupts (PMINTENSET_EL1 <= ALL_SET) */
->  
->  	pmu_reset_stats();
->  
-> @@ -889,6 +889,7 @@ static bool check_cycles_increase(void)
->  	bool success = true;
->  
->  	/* init before event access, this test only cares about cycle count */
-> +	pmu_reset();
->  	set_pmcntenset(1 << PMU_CYCLE_IDX);
->  	set_pmccfiltr(0); /* count cycles in EL0, EL1, but not EL2 */
->  
-> @@ -943,6 +944,7 @@ static bool check_cpi(int cpi)
->  	uint32_t pmcr = get_pmcr() | PMU_PMCR_LC | PMU_PMCR_C | PMU_PMCR_E;
->  
->  	/* init before event access, this test only cares about cycle count */
-> +	pmu_reset();
->  	set_pmcntenset(1 << PMU_CYCLE_IDX);
->  	set_pmccfiltr(0); /* count cycles in EL0, EL1, but not EL2 */
->  
+Great point, thanks. Indeed, it's not crucial to know the vIRQ mask
+state at the registration time. It might be ok to check it later, at the
+first vEOI after registration. So the wording should be changed to
+"...but also to know its initial mask state before any mask notifier has
+fired".
 
+As I wrote in [1], the initialization of the mask state in this patchset
+is actually racy (we may miss mask state change at initialization), and
+I was about to send v2 which fixes this race by implementing
+kvm_register_and_fire_irq_mask_notifier() as suggested in [1]. Now your
+suggestion has made me think wouldn't it be possible to avoid this race
+in a simpler way, by checking the vIRQ state directly in the ack (vEOI)
+notifier.
+
+It seems it still would be racy, e.g.:
+
+1. ack notifier checks the vIRQ state, it is masked
+2. the vIRQ gets unmasked
+3. mask notifier fires, but the vIRQ is not flagged as postponed yet, so
+   mask notifier doesn't notify resamplefd
+4. ack notifier flags the vIRQ as postponed and doesn't notify
+   resamplefd either
+
+=> unmask event lost => the physical IRQ is not unmasked by vfio.
+
+This race could be avoided if the ack notifier checked the vIRQ state
+under resampler->lock, i.e. synchronized with the mask notifier. But
+that would deadlock, for the same reason as mentioned in [1]: checking
+the vIRQ state requires locking KVM irqchip lock (e.g. ioapic->lock on
+x86) whereas the mask notifier is called under this lock.
+
+[1] https://lore.kernel.org/lkml/c7b7860e-ae3a-7b98-e97e-28a62470c470@semihalf.com/
+
+Thanks,
+Dmytro
+
+> 
+> Eric
+>> listener. So implement kvm_irq_is_masked() for that.
+>>
+>> Actually, for now it's implemented for x86 only (see below).
+>>
+>> The implementation is trickier than I'd like it to be, for 2 reasons:
+>>
+>> 1. Interrupt (GSI) to irqchip pin mapping is not a 1:1 mapping: an IRQ
+>>    may map to multiple pins on different irqchips. I guess the only
+>>    reason for that is to support x86 interrupts 0-15 for which we don't
+>>    know if the guest uses PIC or IOAPIC. For this reason kvm_set_irq()
+>>    delivers interrupt to both, assuming the guest will ignore the
+>>    unused one. For the same reason, in kvm_irq_is_masked() we should
+>>    also take into account the mask state of both irqchips. We consider
+>>    an interrupt unmasked if and only if it is unmasked in at least one
+>>    of PIC or IOAPIC, assuming that in the unused one all the interrupts
+>>    should be masked.
+>>
+>> 2. For now ->is_masked() implemented for x86 only, so need to handle
+>>    the case when ->is_masked() is not provided by the irqchip. In such
+>>    case kvm_irq_is_masked() returns failure, and its caller may fall
+>>    back to an assumption that an interrupt is always unmasked.
+>>
+>> Link: https://lore.kernel.org/kvm/31420943-8c5f-125c-a5ee-d2fde2700083@semihalf.com/
+>> Signed-off-by: Dmytro Maluka <dmy@semihalf.com>
+>> ---
+>>  arch/x86/include/asm/kvm_host.h |  1 +
+>>  arch/x86/kvm/i8259.c            | 11 +++++++++++
+>>  arch/x86/kvm/ioapic.c           | 11 +++++++++++
+>>  arch/x86/kvm/ioapic.h           |  1 +
+>>  arch/x86/kvm/irq_comm.c         | 16 ++++++++++++++++
+>>  include/linux/kvm_host.h        |  3 +++
+>>  virt/kvm/irqchip.c              | 34 +++++++++++++++++++++++++++++++++
+>>  7 files changed, 77 insertions(+)
+>>
+>> diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
+>> index 39a867d68721..64618b890700 100644
+>> --- a/arch/x86/include/asm/kvm_host.h
+>> +++ b/arch/x86/include/asm/kvm_host.h
+>> @@ -1840,6 +1840,7 @@ static inline int __kvm_irq_line_state(unsigned long *irq_state,
+>>  
+>>  int kvm_pic_set_irq(struct kvm_pic *pic, int irq, int irq_source_id, int level);
+>>  void kvm_pic_clear_all(struct kvm_pic *pic, int irq_source_id);
+>> +bool kvm_pic_irq_is_masked(struct kvm_pic *pic, int irq);
+>>  
+>>  void kvm_inject_nmi(struct kvm_vcpu *vcpu);
+>>  
+>> diff --git a/arch/x86/kvm/i8259.c b/arch/x86/kvm/i8259.c
+>> index e1bb6218bb96..2d1ed3bc7cc5 100644
+>> --- a/arch/x86/kvm/i8259.c
+>> +++ b/arch/x86/kvm/i8259.c
+>> @@ -211,6 +211,17 @@ void kvm_pic_clear_all(struct kvm_pic *s, int irq_source_id)
+>>  	pic_unlock(s);
+>>  }
+>>  
+>> +bool kvm_pic_irq_is_masked(struct kvm_pic *s, int irq)
+>> +{
+>> +	bool ret;
+>> +
+>> +	pic_lock(s);
+>> +	ret = !!(s->pics[irq >> 3].imr & (1 << irq));
+>> +	pic_unlock(s);
+>> +
+>> +	return ret;
+>> +}
+>> +
+>>  /*
+>>   * acknowledge interrupt 'irq'
+>>   */
+>> diff --git a/arch/x86/kvm/ioapic.c b/arch/x86/kvm/ioapic.c
+>> index 765943d7cfa5..874f68a65c87 100644
+>> --- a/arch/x86/kvm/ioapic.c
+>> +++ b/arch/x86/kvm/ioapic.c
+>> @@ -478,6 +478,17 @@ void kvm_ioapic_clear_all(struct kvm_ioapic *ioapic, int irq_source_id)
+>>  	spin_unlock(&ioapic->lock);
+>>  }
+>>  
+>> +bool kvm_ioapic_irq_is_masked(struct kvm_ioapic *ioapic, int irq)
+>> +{
+>> +	bool ret;
+>> +
+>> +	spin_lock(&ioapic->lock);
+>> +	ret = !!ioapic->redirtbl[irq].fields.mask;
+>> +	spin_unlock(&ioapic->lock);
+>> +
+>> +	return ret;
+>> +}
+>> +
+>>  static void kvm_ioapic_eoi_inject_work(struct work_struct *work)
+>>  {
+>>  	int i;
+>> diff --git a/arch/x86/kvm/ioapic.h b/arch/x86/kvm/ioapic.h
+>> index 539333ac4b38..fe1f51319992 100644
+>> --- a/arch/x86/kvm/ioapic.h
+>> +++ b/arch/x86/kvm/ioapic.h
+>> @@ -114,6 +114,7 @@ void kvm_ioapic_destroy(struct kvm *kvm);
+>>  int kvm_ioapic_set_irq(struct kvm_ioapic *ioapic, int irq, int irq_source_id,
+>>  		       int level, bool line_status);
+>>  void kvm_ioapic_clear_all(struct kvm_ioapic *ioapic, int irq_source_id);
+>> +bool kvm_ioapic_irq_is_masked(struct kvm_ioapic *ioapic, int irq);
+>>  void kvm_get_ioapic(struct kvm *kvm, struct kvm_ioapic_state *state);
+>>  void kvm_set_ioapic(struct kvm *kvm, struct kvm_ioapic_state *state);
+>>  void kvm_ioapic_scan_entry(struct kvm_vcpu *vcpu,
+>> diff --git a/arch/x86/kvm/irq_comm.c b/arch/x86/kvm/irq_comm.c
+>> index 43e13892ed34..5bff6d6ac54f 100644
+>> --- a/arch/x86/kvm/irq_comm.c
+>> +++ b/arch/x86/kvm/irq_comm.c
+>> @@ -34,6 +34,13 @@ static int kvm_set_pic_irq(struct kvm_kernel_irq_routing_entry *e,
+>>  	return kvm_pic_set_irq(pic, e->irqchip.pin, irq_source_id, level);
+>>  }
+>>  
+>> +static bool kvm_is_masked_pic_irq(struct kvm_kernel_irq_routing_entry *e,
+>> +				     struct kvm *kvm)
+>> +{
+>> +	struct kvm_pic *pic = kvm->arch.vpic;
+>> +	return kvm_pic_irq_is_masked(pic, e->irqchip.pin);
+>> +}
+>> +
+>>  static int kvm_set_ioapic_irq(struct kvm_kernel_irq_routing_entry *e,
+>>  			      struct kvm *kvm, int irq_source_id, int level,
+>>  			      bool line_status)
+>> @@ -43,6 +50,13 @@ static int kvm_set_ioapic_irq(struct kvm_kernel_irq_routing_entry *e,
+>>  				line_status);
+>>  }
+>>  
+>> +static bool kvm_is_masked_ioapic_irq(struct kvm_kernel_irq_routing_entry *e,
+>> +				     struct kvm *kvm)
+>> +{
+>> +	struct kvm_ioapic *ioapic = kvm->arch.vioapic;
+>> +	return kvm_ioapic_irq_is_masked(ioapic, e->irqchip.pin);
+>> +}
+>> +
+>>  int kvm_irq_delivery_to_apic(struct kvm *kvm, struct kvm_lapic *src,
+>>  		struct kvm_lapic_irq *irq, struct dest_map *dest_map)
+>>  {
+>> @@ -275,11 +289,13 @@ int kvm_set_routing_entry(struct kvm *kvm,
+>>  			if (ue->u.irqchip.pin >= PIC_NUM_PINS / 2)
+>>  				return -EINVAL;
+>>  			e->set = kvm_set_pic_irq;
+>> +			e->is_masked = kvm_is_masked_pic_irq;
+>>  			break;
+>>  		case KVM_IRQCHIP_IOAPIC:
+>>  			if (ue->u.irqchip.pin >= KVM_IOAPIC_NUM_PINS)
+>>  				return -EINVAL;
+>>  			e->set = kvm_set_ioapic_irq;
+>> +			e->is_masked = kvm_is_masked_ioapic_irq;
+>>  			break;
+>>  		default:
+>>  			return -EINVAL;
+>> diff --git a/include/linux/kvm_host.h b/include/linux/kvm_host.h
+>> index 9e12ef503157..e8bfb3b0d4d1 100644
+>> --- a/include/linux/kvm_host.h
+>> +++ b/include/linux/kvm_host.h
+>> @@ -625,6 +625,8 @@ struct kvm_kernel_irq_routing_entry {
+>>  	int (*set)(struct kvm_kernel_irq_routing_entry *e,
+>>  		   struct kvm *kvm, int irq_source_id, int level,
+>>  		   bool line_status);
+>> +	bool (*is_masked)(struct kvm_kernel_irq_routing_entry *e,
+>> +			  struct kvm *kvm);
+>>  	union {
+>>  		struct {
+>>  			unsigned irqchip;
+>> @@ -1598,6 +1600,7 @@ int kvm_set_msi(struct kvm_kernel_irq_routing_entry *irq_entry, struct kvm *kvm,
+>>  int kvm_arch_set_irq_inatomic(struct kvm_kernel_irq_routing_entry *e,
+>>  			       struct kvm *kvm, int irq_source_id,
+>>  			       int level, bool line_status);
+>> +int kvm_irq_is_masked(struct kvm *kvm, int irq, bool *masked);
+>>  bool kvm_irq_has_notifier(struct kvm *kvm, unsigned irqchip, unsigned pin);
+>>  void kvm_notify_acked_gsi(struct kvm *kvm, int gsi);
+>>  void kvm_notify_acked_irq(struct kvm *kvm, unsigned irqchip, unsigned pin);
+>> diff --git a/virt/kvm/irqchip.c b/virt/kvm/irqchip.c
+>> index 58e4f88b2b9f..9252ebedba55 100644
+>> --- a/virt/kvm/irqchip.c
+>> +++ b/virt/kvm/irqchip.c
+>> @@ -97,6 +97,40 @@ int kvm_set_irq(struct kvm *kvm, int irq_source_id, u32 irq, int level,
+>>  	return ret;
+>>  }
+>>  
+>> +/*
+>> + * Return value:
+>> + *  = 0   Interrupt mask state successfully written to `masked`
+>> + *  < 0   Failed to read interrupt mask state
+>> + */
+>> +int kvm_irq_is_masked(struct kvm *kvm, int irq, bool *masked)
+>> +{
+>> +	struct kvm_kernel_irq_routing_entry irq_set[KVM_NR_IRQCHIPS];
+>> +	int ret = -1, i, idx;
+>> +
+>> +	/* Not possible to detect if the guest uses the PIC or the
+>> +	 * IOAPIC. So assume the interrupt to be unmasked iff it is
+>> +	 * unmasked in at least one of both.
+>> +	 */
+>> +	idx = srcu_read_lock(&kvm->irq_srcu);
+>> +	i = kvm_irq_map_gsi(kvm, irq_set, irq);
+>> +	srcu_read_unlock(&kvm->irq_srcu, idx);
+>> +
+>> +	while (i--) {
+>> +		if (!irq_set[i].is_masked)
+>> +			continue;
+>> +
+>> +		if (!irq_set[i].is_masked(&irq_set[i], kvm)) {
+>> +			*masked = false;
+>> +			return 0;
+>> +		}
+>> +		ret = 0;
+>> +	}
+>> +	if (!ret)
+>> +		*masked = true;
+>> +
+>> +	return ret;
+>> +}
+>> +
+>>  static void free_irq_routing_table(struct kvm_irq_routing_table *rt)
+>>  {
+>>  	int i;
+> 
