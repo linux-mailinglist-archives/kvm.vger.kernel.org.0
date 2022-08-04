@@ -2,243 +2,283 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id D823858966F
-	for <lists+kvm@lfdr.de>; Thu,  4 Aug 2022 05:16:49 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id E6A61589719
+	for <lists+kvm@lfdr.de>; Thu,  4 Aug 2022 06:36:16 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238755AbiHDDQm (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 3 Aug 2022 23:16:42 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55818 "EHLO
+        id S238498AbiHDEgJ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 4 Aug 2022 00:36:09 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38846 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S238292AbiHDDQi (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 3 Aug 2022 23:16:38 -0400
-Received: from mail-pl1-x62d.google.com (mail-pl1-x62d.google.com [IPv6:2607:f8b0:4864:20::62d])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 181755F98A
-        for <kvm@vger.kernel.org>; Wed,  3 Aug 2022 20:16:35 -0700 (PDT)
-Received: by mail-pl1-x62d.google.com with SMTP id 17so2690519plj.10
-        for <kvm@vger.kernel.org>; Wed, 03 Aug 2022 20:16:35 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kylehuey.com; s=google;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc;
-        bh=0Eidlkaci04rHoeZFe7JPn0wdB0zBqovVdfDYpCgudw=;
-        b=ROdIXNMccLVEnJtpOwGav/0wNNCzgREpIq+MQUlTjRT0tCJoPfGpubTVJ1LHnaruTr
-         OZgYaRXIvMlhGs9skVZFDZSRfFYzEmoebwyR/gMMEFyXwbePhNKufjN8A4OeUu84uCTb
-         Rq2vUq5JtHLNTDNdXnrQB2OCoBOtSNAQO5x19A2bdHN2mXnFvq2hDNFNsld68uWMWABH
-         cOHPcV2qz/8PDhGBcCS3lLI+AfKgqdEqVktdUVNMtwoIx4DnPv5JD5MnPSrLsGaVZ8vB
-         iIVQwUEHnmvhA7LzASwb0dPEwg5Fu5BWMXKk5kfGoz/9CG0Xi9mKPYXZsskrLun9Y//k
-         j3Mw==
+        with ESMTP id S238486AbiHDEgH (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 4 Aug 2022 00:36:07 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id E43B5656D
+        for <kvm@vger.kernel.org>; Wed,  3 Aug 2022 21:36:05 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1659587765;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=3pusb/gArFFwJGvdatRkIk+S/33mt+/MIat6GqC/G1Q=;
+        b=h3Y4pS11Gbkr/UXGMlhcbN854JqAnxSWqdl3HVXGGwWJI0Ul+6H1ng6hv4PhWOGDguU80B
+        mTAIq3qdKxs5Bh6R7rXzan0j+U+e5vDxX6TXiOO/1k5altWLGjNMm2rbsnUHPcOhWPDWQA
+        AE1//R60LZnlwZURCC7FBmyewMIqOg8=
+Received: from mail-pj1-f72.google.com (mail-pj1-f72.google.com
+ [209.85.216.72]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-191-pGY34mJmPnWOGq_DU8e4PA-1; Thu, 04 Aug 2022 00:36:01 -0400
+X-MC-Unique: pGY34mJmPnWOGq_DU8e4PA-1
+Received: by mail-pj1-f72.google.com with SMTP id 92-20020a17090a09e500b001d917022847so8207622pjo.1
+        for <kvm@vger.kernel.org>; Wed, 03 Aug 2022 21:36:01 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc;
-        bh=0Eidlkaci04rHoeZFe7JPn0wdB0zBqovVdfDYpCgudw=;
-        b=56flvoyp/A3zM+pXjC/FrhqmDBxwQQn5QKfjP15ke1PUl71ZibDJjHZ3/P8N1G3xF/
-         DujOTD2+teq+tTPi8exndEzdV8R9wueUvsu291FhM9XfMH7k/fP1/XeCAYZiESHKeUqu
-         YG2H61E/9yuuT4xuv+8bf9RIGVrTX9+n9Z5zpHiVDQQnXlQm4E9WMiQg5vEenTRg9Pev
-         0PVpkQag95YuE9OAuQ8yJ61jfo54qod2aSQRYu60iHBnm2U7XVZSuX1Ayqyje20fkAIT
-         0JaLLGEoML8zt2jOLuFG8EGejxSnBoF5FYyfJSSga80Jt5e+UPSneLv3DJJr5QtPtBAf
-         g05Q==
-X-Gm-Message-State: ACgBeo2MyNmjeaxKu98VKZ24VK4FOGuiLauM+Q6cAvsIAWw/z0pnStLO
-        CQnKaHbHAL93uG28jdrxzkeA2jQ5jrKksuII
-X-Google-Smtp-Source: AA6agR7Ks9ZG70ZGVbxOdEryKUq3Xnv+8QfCWcNgh9DQpzlr4m1G4zvNLtyqeMU7Pdi4Gcva1NGZrg==
-X-Received: by 2002:a17:90a:e7c7:b0:1f2:bea3:37df with SMTP id kb7-20020a17090ae7c700b001f2bea337dfmr8330056pjb.133.1659582995107;
-        Wed, 03 Aug 2022 20:16:35 -0700 (PDT)
-Received: from minbar.home.kylehuey.com (c-71-198-251-229.hsd1.ca.comcast.net. [71.198.251.229])
-        by smtp.gmail.com with ESMTPSA id q6-20020a17090a68c600b001f2e20edd14sm2334699pjj.45.2022.08.03.20.16.33
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 03 Aug 2022 20:16:34 -0700 (PDT)
-From:   Kyle Huey <me@kylehuey.com>
-X-Google-Original-From: Kyle Huey <khuey@kylehuey.com>
-To:     Dave Hansen <dave.hansen@linux.intel.com>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Borislav Petkov <bp@alien8.de>
-Cc:     Ingo Molnar <mingo@redhat.com>, x86@kernel.org,
-        "H. Peter Anvin" <hpa@zytor.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Andy Lutomirski <luto@kernel.org>,
-        Peter Zijlstra <peterz@infradead.org>,
-        linux-kernel@vger.kernel.org,
-        Robert O'Callahan <robert@ocallahan.org>,
-        David Manouchehri <david.manouchehri@riseup.net>,
-        Kyle Huey <me@kylehuey.com>, Borislav Petkov <bp@suse.de>,
-        kvm@vger.kernel.org, stable@vger.kernel.org
-Subject: [PATCH v2] x86/fpu: Allow PKRU to be (once again) written by ptrace.
-Date:   Wed,  3 Aug 2022 20:16:32 -0700
-Message-Id: <20220804031632.52921-1-khuey@kylehuey.com>
-X-Mailer: git-send-email 2.37.0
+        h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
+         :content-language:to:cc:references:from:in-reply-to
+         :content-transfer-encoding;
+        bh=3pusb/gArFFwJGvdatRkIk+S/33mt+/MIat6GqC/G1Q=;
+        b=WI2puVU+drmWY4bA5J1pd7g4/9Gw8wuiHjOVQOUIYyumt7hDz3N2i9YjmC5rDZAC/t
+         N9URqittd5VrMdRIxyYJzbVNmmgR3y9yZrnaH1um1ZsmfnP4s6GVyUCfywPlStSqpmmA
+         RgiZbD3CSNYjmlCaqckRmuVJBPZEFtue0gWjGp7bufYf45+VqYWaLIaWYm/6kHDpIkmk
+         oCwtEqQdveBqnSzVqlQqJEwKIx2L2mrVWU5Yrde1eaxxqh/+jzC4Vv6mqj7BMgPK6HDe
+         PrjLAQqTKfnPSNmSnlZw1J+SrX3Cdp9FZL4PVz+fCZAqt3agTeAP6wunlgY/cxuxn7ST
+         SIFw==
+X-Gm-Message-State: ACgBeo1V2IFSB/IX/rm1apkltzslyDi1Xu28+pHoPHEaHokOUl5W/QwK
+        9y4JTLte2ZW096orHeIVYMmdicsOfT4SSpBd5fyY7rUwXfnsK11L4THyGcJAh0x1hFIEDCzw6pU
+        c9Cfe9wpW1QKK
+X-Received: by 2002:a63:688a:0:b0:412:6728:4bf3 with SMTP id d132-20020a63688a000000b0041267284bf3mr129808pgc.339.1659587760492;
+        Wed, 03 Aug 2022 21:36:00 -0700 (PDT)
+X-Google-Smtp-Source: AA6agR48+uv2EDVbrKWm5/8sZOq5h+c4brLjiVHqiPOE++XMa6GPhG1Nt2KEPsW41VUaRCkmfzgRAg==
+X-Received: by 2002:a63:688a:0:b0:412:6728:4bf3 with SMTP id d132-20020a63688a000000b0041267284bf3mr129785pgc.339.1659587760107;
+        Wed, 03 Aug 2022 21:36:00 -0700 (PDT)
+Received: from [10.72.12.192] ([209.132.188.80])
+        by smtp.gmail.com with ESMTPSA id l7-20020a170903244700b0016cd74dae66sm2920856pls.28.2022.08.03.21.35.54
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 03 Aug 2022 21:35:59 -0700 (PDT)
+Message-ID: <a0b976bd-112b-1c0c-34f2-a9de38241fb8@redhat.com>
+Date:   Thu, 4 Aug 2022 12:35:52 +0800
 MIME-Version: 1.0
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:91.0)
+ Gecko/20100101 Thunderbird/91.11.0
+Subject: Re: [PATCH v3 4/7] vdpa: Add asid parameter to
+ vhost_vdpa_dma_map/unmap
+Content-Language: en-US
+To:     =?UTF-8?Q?Eugenio_P=c3=a9rez?= <eperezma@redhat.com>,
+        qemu-devel@nongnu.org
+Cc:     Stefan Hajnoczi <stefanha@redhat.com>,
+        Gautam Dawar <gdawar@xilinx.com>,
+        Cornelia Huck <cohuck@redhat.com>,
+        Eli Cohen <eli@mellanox.com>,
+        Stefano Garzarella <sgarzare@redhat.com>,
+        Harpreet Singh Anand <hanand@xilinx.com>,
+        Zhu Lingshan <lingshan.zhu@intel.com>,
+        Laurent Vivier <lvivier@redhat.com>,
+        "Michael S. Tsirkin" <mst@redhat.com>, kvm@vger.kernel.org,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Liuxiangdong <liuxiangdong5@huawei.com>,
+        Parav Pandit <parav@mellanox.com>, Cindy Lu <lulu@redhat.com>,
+        "Gonglei (Arei)" <arei.gonglei@huawei.com>
+References: <20220803171821.481336-1-eperezma@redhat.com>
+ <20220803171821.481336-5-eperezma@redhat.com>
+From:   Jason Wang <jasowang@redhat.com>
+In-Reply-To: <20220803171821.481336-5-eperezma@redhat.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
+X-Spam-Status: No, score=-3.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
+        RCVD_IN_DNSWL_LOW,SPF_HELO_NONE,SPF_NONE autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-From: Kyle Huey <me@kylehuey.com>
 
-When management of the PKRU register was moved away from XSTATE, emulation
-of PKRU's existence in XSTATE was added for APIs that read XSTATE, but not
-for APIs that write XSTATE. This can be seen by running gdb and executing
-`p $pkru`, `set $pkru = 42`, and `p $pkru`. On affected kernels (5.14+) the
-write to the PKRU register (which gdb performs through ptrace) is ignored.
+在 2022/8/4 01:18, Eugenio Pérez 写道:
+> So the caller can choose which ASID is destined.
+>
+> No need to update the batch functions as they will always be called from
+> memory listener updates at the moment. Memory listener updates will
+> always update ASID 0, as it's the passthrough ASID.
+>
+> All vhost devices's ASID are 0 at this moment.
+>
+> Signed-off-by: Eugenio Pérez <eperezma@redhat.com>
+> ---
+> v3: Deleted unneeded space
+> ---
+>   include/hw/virtio/vhost-vdpa.h |  8 +++++---
+>   hw/virtio/vhost-vdpa.c         | 25 +++++++++++++++----------
+>   net/vhost-vdpa.c               |  6 +++---
+>   hw/virtio/trace-events         |  4 ++--
+>   4 files changed, 25 insertions(+), 18 deletions(-)
+>
+> diff --git a/include/hw/virtio/vhost-vdpa.h b/include/hw/virtio/vhost-vdpa.h
+> index 1111d85643..6560bb9d78 100644
+> --- a/include/hw/virtio/vhost-vdpa.h
+> +++ b/include/hw/virtio/vhost-vdpa.h
+> @@ -29,6 +29,7 @@ typedef struct vhost_vdpa {
+>       int index;
+>       uint32_t msg_type;
+>       bool iotlb_batch_begin_sent;
+> +    uint32_t address_space_id;
+>       MemoryListener listener;
+>       struct vhost_vdpa_iova_range iova_range;
+>       uint64_t acked_features;
+> @@ -42,8 +43,9 @@ typedef struct vhost_vdpa {
+>       VhostVDPAHostNotifier notifier[VIRTIO_QUEUE_MAX];
+>   } VhostVDPA;
+>   
+> -int vhost_vdpa_dma_map(struct vhost_vdpa *v, hwaddr iova, hwaddr size,
+> -                       void *vaddr, bool readonly);
+> -int vhost_vdpa_dma_unmap(struct vhost_vdpa *v, hwaddr iova, hwaddr size);
+> +int vhost_vdpa_dma_map(struct vhost_vdpa *v, uint32_t asid, hwaddr iova,
+> +                       hwaddr size, void *vaddr, bool readonly);
+> +int vhost_vdpa_dma_unmap(struct vhost_vdpa *v, uint32_t asid, hwaddr iova,
+> +                         hwaddr size);
+>   
+>   #endif
+> diff --git a/hw/virtio/vhost-vdpa.c b/hw/virtio/vhost-vdpa.c
+> index 2fefcc66ad..131100841c 100644
+> --- a/hw/virtio/vhost-vdpa.c
+> +++ b/hw/virtio/vhost-vdpa.c
+> @@ -72,22 +72,24 @@ static bool vhost_vdpa_listener_skipped_section(MemoryRegionSection *section,
+>       return false;
+>   }
+>   
+> -int vhost_vdpa_dma_map(struct vhost_vdpa *v, hwaddr iova, hwaddr size,
+> -                       void *vaddr, bool readonly)
+> +int vhost_vdpa_dma_map(struct vhost_vdpa *v, uint32_t asid, hwaddr iova,
+> +                       hwaddr size, void *vaddr, bool readonly)
+>   {
+>       struct vhost_msg_v2 msg = {};
+>       int fd = v->device_fd;
+>       int ret = 0;
+>   
+>       msg.type = v->msg_type;
+> +    msg.asid = asid;
 
-There are three relevant APIs: PTRACE_SETREGSET with NT_X86_XSTATE,
-sigreturn, and KVM_SET_XSAVE. KVM_SET_XSAVE has its own special handling to
-make PKRU writes take effect (in fpu_copy_uabi_to_guest_fpstate). Push that
-down into copy_uabi_to_xstate and have PTRACE_SETREGSET with NT_X86_XSTATE
-and sigreturn pass in pointers to the appropriate PKRU value.
 
-This also adds code to initialize the PKRU value to the hardware init value
-(namely 0) if the PKRU bit is not set in the XSTATE header to match XRSTOR.
-This is a change to the current KVM_SET_XSAVE behavior.
+I wonder what happens if we're running is a kernel without ASID support.
 
-Changelog since v1:
-- Handles the error case of copy_to_buffer().
+Does it work since asid will be simply ignored? Can we have a case that 
+we want asid!=0 on old kernel?
 
-Signed-off-by: Kyle Huey <me@kylehuey.com>
-Cc: Dave Hansen <dave.hansen@linux.intel.com>
-Cc: Thomas Gleixner <tglx@linutronix.de>
-Cc: Borislav Petkov <bp@suse.de>
-Cc: kvm@vger.kernel.org # For edge case behavior of KVM_SET_XSAVE
-Cc: stable@vger.kernel.org # 5.14+
-Fixes: e84ba47e313d ("x86/fpu: Hook up PKRU into ptrace()")
----
- arch/x86/kernel/fpu/core.c   | 11 +----------
- arch/x86/kernel/fpu/regset.c |  2 +-
- arch/x86/kernel/fpu/signal.c |  2 +-
- arch/x86/kernel/fpu/xstate.c | 28 +++++++++++++++++++++++-----
- arch/x86/kernel/fpu/xstate.h |  4 ++--
- 5 files changed, 28 insertions(+), 19 deletions(-)
+Thanks
 
-diff --git a/arch/x86/kernel/fpu/core.c b/arch/x86/kernel/fpu/core.c
-index 0531d6a06df5..dfb79e2ee81f 100644
---- a/arch/x86/kernel/fpu/core.c
-+++ b/arch/x86/kernel/fpu/core.c
-@@ -406,16 +406,7 @@ int fpu_copy_uabi_to_guest_fpstate(struct fpu_guest *gfpu, const void *buf,
- 	if (ustate->xsave.header.xfeatures & ~xcr0)
- 		return -EINVAL;
- 
--	ret = copy_uabi_from_kernel_to_xstate(kstate, ustate);
--	if (ret)
--		return ret;
--
--	/* Retrieve PKRU if not in init state */
--	if (kstate->regs.xsave.header.xfeatures & XFEATURE_MASK_PKRU) {
--		xpkru = get_xsave_addr(&kstate->regs.xsave, XFEATURE_PKRU);
--		*vpkru = xpkru->pkru;
--	}
--	return 0;
-+	return copy_uabi_from_kernel_to_xstate(kstate, ustate, vpkru);
- }
- EXPORT_SYMBOL_GPL(fpu_copy_uabi_to_guest_fpstate);
- #endif /* CONFIG_KVM */
-diff --git a/arch/x86/kernel/fpu/regset.c b/arch/x86/kernel/fpu/regset.c
-index 75ffaef8c299..6d056b68f4ed 100644
---- a/arch/x86/kernel/fpu/regset.c
-+++ b/arch/x86/kernel/fpu/regset.c
-@@ -167,7 +167,7 @@ int xstateregs_set(struct task_struct *target, const struct user_regset *regset,
- 	}
- 
- 	fpu_force_restore(fpu);
--	ret = copy_uabi_from_kernel_to_xstate(fpu->fpstate, kbuf ?: tmpbuf);
-+	ret = copy_uabi_from_kernel_to_xstate(fpu->fpstate, kbuf ?: tmpbuf, &target->thread.pkru);
- 
- out:
- 	vfree(tmpbuf);
-diff --git a/arch/x86/kernel/fpu/signal.c b/arch/x86/kernel/fpu/signal.c
-index 91d4b6de58ab..558076dbde5b 100644
---- a/arch/x86/kernel/fpu/signal.c
-+++ b/arch/x86/kernel/fpu/signal.c
-@@ -396,7 +396,7 @@ static bool __fpu_restore_sig(void __user *buf, void __user *buf_fx,
- 
- 	fpregs = &fpu->fpstate->regs;
- 	if (use_xsave() && !fx_only) {
--		if (copy_sigframe_from_user_to_xstate(fpu->fpstate, buf_fx))
-+		if (copy_sigframe_from_user_to_xstate(tsk, buf_fx))
- 			return false;
- 	} else {
- 		if (__copy_from_user(&fpregs->fxsave, buf_fx,
-diff --git a/arch/x86/kernel/fpu/xstate.c b/arch/x86/kernel/fpu/xstate.c
-index c8340156bfd2..e01d3514ae68 100644
---- a/arch/x86/kernel/fpu/xstate.c
-+++ b/arch/x86/kernel/fpu/xstate.c
-@@ -1197,7 +1197,7 @@ static int copy_from_buffer(void *dst, unsigned int offset, unsigned int size,
- 
- 
- static int copy_uabi_to_xstate(struct fpstate *fpstate, const void *kbuf,
--			       const void __user *ubuf)
-+			       const void __user *ubuf, u32 *pkru)
- {
- 	struct xregs_state *xsave = &fpstate->regs.xsave;
- 	unsigned int offset, size;
-@@ -1235,6 +1235,24 @@ static int copy_uabi_to_xstate(struct fpstate *fpstate, const void *kbuf,
- 	for (i = 0; i < XFEATURE_MAX; i++) {
- 		mask = BIT_ULL(i);
- 
-+		if (i == XFEATURE_PKRU) {
-+			/*
-+			 * Retrieve PKRU if not in init state, otherwise
-+			 * initialize it.
-+			 */
-+			if (hdr.xfeatures & mask) {
-+				struct pkru_state xpkru = {0};
-+
-+				if (copy_from_buffer(&xpkru, xstate_offsets[i],
-+						     sizeof(xpkru), kbuf, ubuf))
-+					return -EFAULT;
-+
-+				*pkru = xpkru.pkru;
-+			} else {
-+				*pkru = 0;
-+			}
-+		}
-+
- 		if (hdr.xfeatures & mask) {
- 			void *dst = __raw_xsave_addr(xsave, i);
- 
-@@ -1264,9 +1282,9 @@ static int copy_uabi_to_xstate(struct fpstate *fpstate, const void *kbuf,
-  * Convert from a ptrace standard-format kernel buffer to kernel XSAVE[S]
-  * format and copy to the target thread. Used by ptrace and KVM.
-  */
--int copy_uabi_from_kernel_to_xstate(struct fpstate *fpstate, const void *kbuf)
-+int copy_uabi_from_kernel_to_xstate(struct fpstate *fpstate, const void *kbuf, u32 *pkru)
- {
--	return copy_uabi_to_xstate(fpstate, kbuf, NULL);
-+	return copy_uabi_to_xstate(fpstate, kbuf, NULL, pkru);
- }
- 
- /*
-@@ -1274,10 +1292,10 @@ int copy_uabi_from_kernel_to_xstate(struct fpstate *fpstate, const void *kbuf)
-  * XSAVE[S] format and copy to the target thread. This is called from the
-  * sigreturn() and rt_sigreturn() system calls.
-  */
--int copy_sigframe_from_user_to_xstate(struct fpstate *fpstate,
-+int copy_sigframe_from_user_to_xstate(struct task_struct *tsk,
- 				      const void __user *ubuf)
- {
--	return copy_uabi_to_xstate(fpstate, NULL, ubuf);
-+	return copy_uabi_to_xstate(tsk->thread.fpu.fpstate, NULL, ubuf, &tsk->thread.pkru);
- }
- 
- static bool validate_independent_components(u64 mask)
-diff --git a/arch/x86/kernel/fpu/xstate.h b/arch/x86/kernel/fpu/xstate.h
-index 5ad47031383b..a4ecb04d8d64 100644
---- a/arch/x86/kernel/fpu/xstate.h
-+++ b/arch/x86/kernel/fpu/xstate.h
-@@ -46,8 +46,8 @@ extern void __copy_xstate_to_uabi_buf(struct membuf to, struct fpstate *fpstate,
- 				      u32 pkru_val, enum xstate_copy_mode copy_mode);
- extern void copy_xstate_to_uabi_buf(struct membuf to, struct task_struct *tsk,
- 				    enum xstate_copy_mode mode);
--extern int copy_uabi_from_kernel_to_xstate(struct fpstate *fpstate, const void *kbuf);
--extern int copy_sigframe_from_user_to_xstate(struct fpstate *fpstate, const void __user *ubuf);
-+extern int copy_uabi_from_kernel_to_xstate(struct fpstate *fpstate, const void *kbuf, u32 *pkru);
-+extern int copy_sigframe_from_user_to_xstate(struct task_struct *tsk, const void __user *ubuf);
- 
- 
- extern void fpu__init_cpu_xstate(void);
--- 
-2.37.0
+
+>       msg.iotlb.iova = iova;
+>       msg.iotlb.size = size;
+>       msg.iotlb.uaddr = (uint64_t)(uintptr_t)vaddr;
+>       msg.iotlb.perm = readonly ? VHOST_ACCESS_RO : VHOST_ACCESS_RW;
+>       msg.iotlb.type = VHOST_IOTLB_UPDATE;
+>   
+> -   trace_vhost_vdpa_dma_map(v, fd, msg.type, msg.iotlb.iova, msg.iotlb.size,
+> -                            msg.iotlb.uaddr, msg.iotlb.perm, msg.iotlb.type);
+> +    trace_vhost_vdpa_dma_map(v, fd, msg.type, msg.asid, msg.iotlb.iova,
+> +                             msg.iotlb.size, msg.iotlb.uaddr, msg.iotlb.perm,
+> +                             msg.iotlb.type);
+>   
+>       if (write(fd, &msg, sizeof(msg)) != sizeof(msg)) {
+>           error_report("failed to write, fd=%d, errno=%d (%s)",
+> @@ -98,18 +100,20 @@ int vhost_vdpa_dma_map(struct vhost_vdpa *v, hwaddr iova, hwaddr size,
+>       return ret;
+>   }
+>   
+> -int vhost_vdpa_dma_unmap(struct vhost_vdpa *v, hwaddr iova, hwaddr size)
+> +int vhost_vdpa_dma_unmap(struct vhost_vdpa *v, uint32_t asid, hwaddr iova,
+> +                         hwaddr size)
+>   {
+>       struct vhost_msg_v2 msg = {};
+>       int fd = v->device_fd;
+>       int ret = 0;
+>   
+>       msg.type = v->msg_type;
+> +    msg.asid = asid;
+>       msg.iotlb.iova = iova;
+>       msg.iotlb.size = size;
+>       msg.iotlb.type = VHOST_IOTLB_INVALIDATE;
+>   
+> -    trace_vhost_vdpa_dma_unmap(v, fd, msg.type, msg.iotlb.iova,
+> +    trace_vhost_vdpa_dma_unmap(v, fd, msg.type, msg.asid, msg.iotlb.iova,
+>                                  msg.iotlb.size, msg.iotlb.type);
+>   
+>       if (write(fd, &msg, sizeof(msg)) != sizeof(msg)) {
+> @@ -229,7 +233,7 @@ static void vhost_vdpa_listener_region_add(MemoryListener *listener,
+>       }
+>   
+>       vhost_vdpa_iotlb_batch_begin_once(v);
+> -    ret = vhost_vdpa_dma_map(v, iova, int128_get64(llsize),
+> +    ret = vhost_vdpa_dma_map(v, 0, iova, int128_get64(llsize),
+>                                vaddr, section->readonly);
+>       if (ret) {
+>           error_report("vhost vdpa map fail!");
+> @@ -299,7 +303,7 @@ static void vhost_vdpa_listener_region_del(MemoryListener *listener,
+>           vhost_iova_tree_remove(v->iova_tree, result);
+>       }
+>       vhost_vdpa_iotlb_batch_begin_once(v);
+> -    ret = vhost_vdpa_dma_unmap(v, iova, int128_get64(llsize));
+> +    ret = vhost_vdpa_dma_unmap(v, 0, iova, int128_get64(llsize));
+>       if (ret) {
+>           error_report("vhost_vdpa dma unmap error!");
+>       }
+> @@ -890,7 +894,7 @@ static bool vhost_vdpa_svq_unmap_ring(struct vhost_vdpa *v,
+>       }
+>   
+>       size = ROUND_UP(result->size, qemu_real_host_page_size());
+> -    r = vhost_vdpa_dma_unmap(v, result->iova, size);
+> +    r = vhost_vdpa_dma_unmap(v, v->address_space_id, result->iova, size);
+>       return r == 0;
+>   }
+>   
+> @@ -932,7 +936,8 @@ static bool vhost_vdpa_svq_map_ring(struct vhost_vdpa *v, DMAMap *needle,
+>           return false;
+>       }
+>   
+> -    r = vhost_vdpa_dma_map(v, needle->iova, needle->size + 1,
+> +    r = vhost_vdpa_dma_map(v, v->address_space_id, needle->iova,
+> +                           needle->size + 1,
+>                              (void *)(uintptr_t)needle->translated_addr,
+>                              needle->perm == IOMMU_RO);
+>       if (unlikely(r != 0)) {
+> diff --git a/net/vhost-vdpa.c b/net/vhost-vdpa.c
+> index f933ba53a3..f96c3cb1da 100644
+> --- a/net/vhost-vdpa.c
+> +++ b/net/vhost-vdpa.c
+> @@ -239,7 +239,7 @@ static void vhost_vdpa_cvq_unmap_buf(struct vhost_vdpa *v, void *addr)
+>           return;
+>       }
+>   
+> -    r = vhost_vdpa_dma_unmap(v, map->iova, map->size + 1);
+> +    r = vhost_vdpa_dma_unmap(v, v->address_space_id, map->iova, map->size + 1);
+>       if (unlikely(r != 0)) {
+>           error_report("Device cannot unmap: %s(%d)", g_strerror(r), r);
+>       }
+> @@ -288,8 +288,8 @@ static bool vhost_vdpa_cvq_map_buf(struct vhost_vdpa *v,
+>           return false;
+>       }
+>   
+> -    r = vhost_vdpa_dma_map(v, map.iova, vhost_vdpa_net_cvq_cmd_page_len(), buf,
+> -                           !write);
+> +    r = vhost_vdpa_dma_map(v, v->address_space_id, map.iova,
+> +                           vhost_vdpa_net_cvq_cmd_page_len(), buf, !write);
+>       if (unlikely(r < 0)) {
+>           goto dma_map_err;
+>       }
+> diff --git a/hw/virtio/trace-events b/hw/virtio/trace-events
+> index 20af2e7ebd..36e5ae75f6 100644
+> --- a/hw/virtio/trace-events
+> +++ b/hw/virtio/trace-events
+> @@ -26,8 +26,8 @@ vhost_user_write(uint32_t req, uint32_t flags) "req:%d flags:0x%"PRIx32""
+>   vhost_user_create_notifier(int idx, void *n) "idx:%d n:%p"
+>   
+>   # vhost-vdpa.c
+> -vhost_vdpa_dma_map(void *vdpa, int fd, uint32_t msg_type, uint64_t iova, uint64_t size, uint64_t uaddr, uint8_t perm, uint8_t type) "vdpa:%p fd: %d msg_type: %"PRIu32" iova: 0x%"PRIx64" size: 0x%"PRIx64" uaddr: 0x%"PRIx64" perm: 0x%"PRIx8" type: %"PRIu8
+> -vhost_vdpa_dma_unmap(void *vdpa, int fd, uint32_t msg_type, uint64_t iova, uint64_t size, uint8_t type) "vdpa:%p fd: %d msg_type: %"PRIu32" iova: 0x%"PRIx64" size: 0x%"PRIx64" type: %"PRIu8
+> +vhost_vdpa_dma_map(void *vdpa, int fd, uint32_t msg_type, uint32_t asid, uint64_t iova, uint64_t size, uint64_t uaddr, uint8_t perm, uint8_t type) "vdpa:%p fd: %d msg_type: %"PRIu32" asid: %"PRIu32" iova: 0x%"PRIx64" size: 0x%"PRIx64" uaddr: 0x%"PRIx64" perm: 0x%"PRIx8" type: %"PRIu8
+> +vhost_vdpa_dma_unmap(void *vdpa, int fd, uint32_t msg_type, uint32_t asid, uint64_t iova, uint64_t size, uint8_t type) "vdpa:%p fd: %d msg_type: %"PRIu32" asid: %"PRIu32" iova: 0x%"PRIx64" size: 0x%"PRIx64" type: %"PRIu8
+>   vhost_vdpa_listener_begin_batch(void *v, int fd, uint32_t msg_type, uint8_t type)  "vdpa:%p fd: %d msg_type: %"PRIu32" type: %"PRIu8
+>   vhost_vdpa_listener_commit(void *v, int fd, uint32_t msg_type, uint8_t type)  "vdpa:%p fd: %d msg_type: %"PRIu32" type: %"PRIu8
+>   vhost_vdpa_listener_region_add(void *vdpa, uint64_t iova, uint64_t llend, void *vaddr, bool readonly) "vdpa: %p iova 0x%"PRIx64" llend 0x%"PRIx64" vaddr: %p read-only: %d"
 
