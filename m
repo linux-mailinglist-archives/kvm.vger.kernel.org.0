@@ -2,158 +2,171 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 5FA6E58B2A7
-	for <lists+kvm@lfdr.de>; Sat,  6 Aug 2022 01:06:22 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id D0A4158B2C1
+	for <lists+kvm@lfdr.de>; Sat,  6 Aug 2022 01:30:53 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S241751AbiHEXGU (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 5 Aug 2022 19:06:20 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60552 "EHLO
+        id S241618AbiHEXaw (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 5 Aug 2022 19:30:52 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46270 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S241626AbiHEXFk (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 5 Aug 2022 19:05:40 -0400
-Received: from mail-yb1-xb49.google.com (mail-yb1-xb49.google.com [IPv6:2607:f8b0:4864:20::b49])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id ECD947AC15
-        for <kvm@vger.kernel.org>; Fri,  5 Aug 2022 16:05:34 -0700 (PDT)
-Received: by mail-yb1-xb49.google.com with SMTP id y81-20020a253254000000b0067ba548d2a1so1528910yby.15
-        for <kvm@vger.kernel.org>; Fri, 05 Aug 2022 16:05:34 -0700 (PDT)
+        with ESMTP id S238141AbiHEXav (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 5 Aug 2022 19:30:51 -0400
+Received: from mail-lf1-x12b.google.com (mail-lf1-x12b.google.com [IPv6:2a00:1450:4864:20::12b])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F08881A817
+        for <kvm@vger.kernel.org>; Fri,  5 Aug 2022 16:30:49 -0700 (PDT)
+Received: by mail-lf1-x12b.google.com with SMTP id z25so5395447lfr.2
+        for <kvm@vger.kernel.org>; Fri, 05 Aug 2022 16:30:49 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
-        h=cc:to:from:subject:references:mime-version:message-id:in-reply-to
-         :date:reply-to:from:to:cc;
-        bh=a0sejF7LmfikJFmz6Lcl1SsiJbupoK1D9mnUFihc8VU=;
-        b=UN/syhFvQS+2ABKiiRlWZevZVkyMjjsByGEV3Y+bQXxcB7y8FC9Cnha9pEVQ3n/745
-         /w8b0GESJducYshuMoCL1A7OIB2kBBFDLaSBFg9h/hv20ySYOCKWDLaR9uE4WeZ6jFrz
-         dFQARovx6wq+grTzXeYH+njsy/flyfO2ANOL6T9SMKwbJcOojBc/xwLN1GYhfGeVqa8K
-         ADZV9TDVUXSfMbcyGCxOphzyU3qBtO71i/D+A5xccpK0vLo7/5tV5jtD0ap9M431NbaF
-         LZQe0Fe/wU6HURE6VJ6LhW2Qog4ffqgDMyThZgPU142k2eXGz+LQ34I1TzLTiQjuTmR4
-         D3yA==
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc;
+        bh=5+e88HfQH2lIucsXxwkZxdyfP+2njFIpGKdmQ0s6vaQ=;
+        b=ZK8Dljk4TO46z8nvkk219ZxDRYc85V4rtZtlROQhonB3PPjOO2z0gTucP8WSJdOsKe
+         qbGdeJOABn0xfboUvrMhnjnYC7+mQvxuFGsvcfVL2IdEgEOgYpgBzgQhuhgKcjZ6l80q
+         7DLaTUu2PpD0ClnNPaU1NAQvEGM+Voi6VXTVzJuNxhyP4GKlyTId4Gw1eRPCfScJhoxh
+         MrKfzPxGa+JXf/Skg/YJcDDyECArSk5+EuGP33YpIYG99HBZuAaCX8lzPH8g/9vmeRA1
+         7lCOCLqML6TfLAOLeNOxWiaesSJor/7yCdZmoJaO1uBlXWzv0DZYj/gFyJ4jR5nUISGa
+         nf7Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=cc:to:from:subject:references:mime-version:message-id:in-reply-to
-         :date:reply-to:x-gm-message-state:from:to:cc;
-        bh=a0sejF7LmfikJFmz6Lcl1SsiJbupoK1D9mnUFihc8VU=;
-        b=jyBPBgCNfaCkog9t0h5l9zO31rNRQDHUNbha/nQggsCDJE/dR6C1r6djqELsqWy8tM
-         uoWHoWc+iDSKyqRyMP8xY9rFUCTc2By4tmiGTkcbQgXutR3SsYlaTJyhBVJfeWk6jpuK
-         JFQLe6gPYIm8tDjT0VozaGHDE73B0jCu4be9KZyzmFHtU8PWCyZBfRsc/+Mt/URSSTVw
-         wSV6TtFmVoMvePs5vMVjJAy8Q/efC7fI3jEubsW8a6Gop8OgSbRCboLZhWrwJ/ziqmRS
-         bPPC9Mg2sL/Iz1gxjKB/22BeOlCHG4lfFyR5A2og2h0GJigARnthcVdb7vqqp3toJ0Zw
-         5/kw==
-X-Gm-Message-State: ACgBeo3iLkqe+W64ZhiVFteEzRaVS68KvaOn26rpT6UUT9anrnKZLiVE
-        7SWaeiFvwfrt/cEFghj/3g+ftKNYn28=
-X-Google-Smtp-Source: AA6agR4jfD1+2IaL8aoXi2FQlkXtc/IkU6FWDrTk0ASjCLegEJ1d43RrPHpEHZDnVTBaOUPannz8B4FmaYw=
-X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a81:b91:0:b0:324:f022:5d5e with SMTP id
- 139-20020a810b91000000b00324f0225d5emr8124524ywl.353.1659740733576; Fri, 05
- Aug 2022 16:05:33 -0700 (PDT)
-Reply-To: Sean Christopherson <seanjc@google.com>
-Date:   Fri,  5 Aug 2022 23:05:13 +0000
-In-Reply-To: <20220805230513.148869-1-seanjc@google.com>
-Message-Id: <20220805230513.148869-9-seanjc@google.com>
-Mime-Version: 1.0
-References: <20220805230513.148869-1-seanjc@google.com>
-X-Mailer: git-send-email 2.37.1.559.g78731f0fdb-goog
-Subject: [PATCH v3 8/8] KVM: x86/mmu: explicitly check nx_hugepage in disallowed_hugepage_adjust()
-From:   Sean Christopherson <seanjc@google.com>
-To:     Sean Christopherson <seanjc@google.com>,
-        Paolo Bonzini <pbonzini@redhat.com>
-Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
-        David Matlack <dmatlack@google.com>,
-        Yan Zhao <yan.y.zhao@intel.com>,
-        Mingwei Zhang <mizhang@google.com>,
-        Ben Gardon <bgardon@google.com>
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc;
+        bh=5+e88HfQH2lIucsXxwkZxdyfP+2njFIpGKdmQ0s6vaQ=;
+        b=7no/mwuTvXBtSVGt/7vhJOsnXN7C/O67+vSmar/zyso7sz20ntw7y4KdJb0CpBMFVU
+         oL7Kgr6Sxx29emMU3pxB1VhBCg2U1GOO6KyKVj/DuZU9zmjnvaCYMVXcVmyn9J+RoH8V
+         pVY0YmJDx2ApaU8MAk7V2aUBzRH7yuk4p+3i3hlJlUt+5EhI8R//fi1EfySN8a6rNJq5
+         2SvpxJ3DfLstRq9DcX/x7rHEi3CJFB5thDv3TcNGIQ0JkpCFAYlDfzS0TmP3hZIizmbs
+         kAI7tzeuIEAre65rjqqnzXH88qXS4P3qoWKk/X/arzQePgYC3AOLlJjsLW7+99+b3n06
+         Kl8Q==
+X-Gm-Message-State: ACgBeo2qnY0xOoPErM1W078YqU/bXUtn7i2Mz33YHxfI58vF4cifvz82
+        r+eaAJrocUgdKNTv6pC1ujUUlLJFJMEea82sDfckyg==
+X-Google-Smtp-Source: AA6agR71hMou1+TenheE26zSVkyrFcJSLp/xxnA0rMCiPfBjfVp6MbcTrdFToBJoN9OoHXbHFye0UY5qBwCaNzGDYu8=
+X-Received: by 2002:a05:6512:b03:b0:489:e00a:b32 with SMTP id
+ w3-20020a0565120b0300b00489e00a0b32mr2883849lfu.368.1659742248023; Fri, 05
+ Aug 2022 16:30:48 -0700 (PDT)
+MIME-Version: 1.0
+References: <20220801151928.270380-1-vipinsh@google.com> <YuhPT2drgqL+osLl@google.com>
+ <YuhoJUoPBOu5eMz8@google.com> <YulRZ+uXFOE1y2dj@google.com>
+ <YuldSf4T2j4rIrIo@google.com> <4ccbafb5-9157-ec73-c751-ec71164f8688@redhat.com>
+ <Yul3A4CmaAHMui2Z@google.com> <cedcced0-b92c-07bd-ef2b-272ae58fdf40@redhat.com>
+In-Reply-To: <cedcced0-b92c-07bd-ef2b-272ae58fdf40@redhat.com>
+From:   Vipin Sharma <vipinsh@google.com>
+Date:   Fri, 5 Aug 2022 16:30:11 -0700
+Message-ID: <CAHVum0c=s8DH=p8zJcGzYDsfLY_qHEmvD1uF58h5WoUk6ZF8rQ@mail.gmail.com>
+Subject: Re: [PATCH] KVM: x86/mmu: Make page tables for eager page splitting
+ NUMA aware
+To:     Paolo Bonzini <pbonzini@redhat.com>,
+        Sean Christopherson <seanjc@google.com>,
+        David Matlack <dmatlack@google.com>
+Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
-X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL
-        autolearn=unavailable autolearn_force=no version=3.4.6
+X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
+        T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-From: Mingwei Zhang <mizhang@google.com>
+On Wed, Aug 3, 2022 at 8:08 AM Paolo Bonzini <pbonzini@redhat.com> wrote:
+>
+> On 8/2/22 21:12, Sean Christopherson wrote:
+> > Ah crud, I misread the patch.  I was thinking tdp_mmu_spte_to_nid() was getting
+> > the node for the existing shadow page, but it's actually getting the node for the
+> > underlying physical huge page.
+> >
+> > That means this patch is broken now that KVM doesn't require a "struct page" to
+> > create huge SPTEs (commit  a8ac499bb6ab ("KVM: x86/mmu: Don't require refcounted
+> > "struct page" to create huge SPTEs").  I.e. this will explode as pfn_to_page()
+> > may return garbage.
+> >
+> >       return page_to_nid(pfn_to_page(spte_to_pfn(spte)));
+>
+> I was about to say that yesterday.  However my knowledge of struct page
+> things has been proved to be spotty enough, that I wasn't 100% sure of
+> that.  But yeah, with a fresh mind it's quite obvious that anything that
+> goes through hva_to_pfn_remap and similar paths will fail.
+>
+> > That said, I still don't like this patch, at least not as a one-off thing.  I do
+> > like the idea of having page table allocations follow the node requested for the
+> > target pfn, what I don't like is having one-off behavior that silently overrides
+> > userspace policy.
+>
+> Yes, I totally agree with making it all or nothing.
+>
+> > I would much rather we solve the problem for all page table allocations, maybe
+> > with a KVM_CAP or module param?  Unfortunately, that's a very non-trivial change
+> > because it will probably require having a per-node cache in each of the per-vCPU
+> > caches.
+>
+> A module parameter is fine.  If you care about performance to this
+> level, your userspace is probably homogeneous enough.
+>
 
-Explicitly check if a NX huge page is disallowed when determining if a
-page fault needs to be forced to use a smaller sized page.  KVM currently
-assumes that the NX huge page mitigation is the only scenario where KVM
-will force a shadow page instead of a huge page, and so unnecessarily
-keeps an existing shadow page instead of replacing it with a huge page.
+Thank you all for the feedback and suggestions.
 
-Any scenario that causes KVM to zap leaf SPTEs may result in having a SP
-that can be made huge without violating the NX huge page mitigation.
-E.g. prior to commit 5ba7c4c6d1c7 ("KVM: x86/MMU: Zap non-leaf SPTEs when
-disabling dirty logging"), KVM would keep shadow pages after disabling
-dirty logging due to a live migration being canceled, resulting in
-degraded performance due to running with 4kb pages instead of huge pages.
+Regarding dirty_log_perf_test, I will send out a patch to add an
+option which will tag vcpus to physical cpus using sched_setaffinity()
+calls. This should increase accuracy for the test.
 
-Although the dirty logging case is "fixed", that fix is coincidental,
-i.e. is an implementation detail, and there are other scenarios where KVM
-will zap leaf SPTEs.  E.g. zapping leaf SPTEs in response to a host page
-migration (mmu_notifier invalidation) to create a huge page would yield a
-similar result; KVM would see the shadow-present non-leaf SPTE and assume
-a huge page is disallowed.
+ It seems like we are agreeing on two things:
 
-Fixes: b8e8c8303ff2 ("kvm: mmu: ITLB_MULTIHIT mitigation")
-Reviewed-by: Ben Gardon <bgardon@google.com>
-Reviewed-by: David Matlack <dmatlack@google.com>
-Signed-off-by: Mingwei Zhang <mizhang@google.com>
-[sean: add barrier comments, use spte_to_child_sp(), massage changelog]
-Signed-off-by: Sean Christopherson <seanjc@google.com>
----
- arch/x86/kvm/mmu/mmu.c     | 17 +++++++++++++++--
- arch/x86/kvm/mmu/tdp_mmu.c |  3 ++-
- 2 files changed, 17 insertions(+), 3 deletions(-)
+1. Keep the same behavior for the page table pages allocation for both
+during the page fault and during eager page splitting.
+2. Page table pages should be allocated on the same node where the
+underlying guest memory page is residing.
 
-diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
-index 1442129c85e0..3ddfc82868fd 100644
---- a/arch/x86/kvm/mmu/mmu.c
-+++ b/arch/x86/kvm/mmu/mmu.c
-@@ -3090,6 +3090,19 @@ void disallowed_hugepage_adjust(struct kvm_page_fault *fault, u64 spte, int cur_
- 	    cur_level == fault->goal_level &&
- 	    is_shadow_present_pte(spte) &&
- 	    !is_large_pte(spte)) {
-+		u64 page_mask;
-+
-+		/*
-+		 * Ensure nx_huge_page_disallowed is read after checking for a
-+		 * present shadow page.  A different vCPU may be concurrently
-+		 * installing the shadow page if mmu_lock is held for read.
-+		 * Pairs with the smp_wmb() in kvm_tdp_mmu_map().
-+		 */
-+		smp_rmb();
-+
-+		if (!spte_to_child_sp(spte)->nx_huge_page_disallowed)
-+			return;
-+
- 		/*
- 		 * A small SPTE exists for this pfn, but FNAME(fetch)
- 		 * and __direct_map would like to create a large PTE
-@@ -3097,8 +3110,8 @@ void disallowed_hugepage_adjust(struct kvm_page_fault *fault, u64 spte, int cur_
- 		 * patching back for them into pfn the next 9 bits of
- 		 * the address.
- 		 */
--		u64 page_mask = KVM_PAGES_PER_HPAGE(cur_level) -
--				KVM_PAGES_PER_HPAGE(cur_level - 1);
-+		page_mask = KVM_PAGES_PER_HPAGE(cur_level) -
-+			    KVM_PAGES_PER_HPAGE(cur_level - 1);
- 		fault->pfn |= fault->gfn & page_mask;
- 		fault->goal_level--;
- 	}
-diff --git a/arch/x86/kvm/mmu/tdp_mmu.c b/arch/x86/kvm/mmu/tdp_mmu.c
-index 526d38704e5c..c5314ca95e08 100644
---- a/arch/x86/kvm/mmu/tdp_mmu.c
-+++ b/arch/x86/kvm/mmu/tdp_mmu.c
-@@ -1202,7 +1202,8 @@ int kvm_tdp_mmu_map(struct kvm_vcpu *vcpu, struct kvm_page_fault *fault)
- 			/*
- 			 * Ensure nx_huge_page_disallowed is visible before the
- 			 * SP is marked present, as mmu_lock is held for read.
--			 * Pairs with the smp_rmb() in tdp_mmu_unlink_sp().
-+			 * Pairs with the smp_rmb() in tdp_mmu_unlink_sp() and
-+			 * in disallowed_hugepage_adjust().
- 			 */
- 			smp_wmb();
- 
--- 
-2.37.1.559.g78731f0fdb-goog
+Here are the two approaches, please provide feedback on which one
+looks more appropriate before I start spamming your inbox with my
+patches
 
+Approach A:
+Have per numa node cache for page table pages allocation
+
+Instead of having only one mmu_shadow_page_cache per vcpu, we provide
+multiple caches for each node
+
+either:
+mmu_shadow_page_cache[MAX_NUMNODES]
+or
+mmu_shadow_page_cache->objects[MAX_NUMNODES * KVM_ARCH_NR_OBJS_PER_MEMORY_CACHE]
+
+We can decrease KVM_ARCH_NR_OBJS_PER_MEMORY_CACHE to some lower value
+instead of 40 to control memory consumption.
+
+When a fault happens, use the pfn to find which node the page should
+belong to and use the corresponding cache to get page table pages.
+
+struct *page = kvm_pfn_to_refcounted_page(pfn);
+int nid;
+if(page) {
+      nid = page_to_nid(page);
+} else {
+     nid = numa_node_id();
+}
+
+...
+tdp_mmu_alloc_sp(nid, vcpu);
+...
+
+static struct kvm_mmu_page *tdp_mmu_alloc_sp(int nid, struct kvm_vcpu *vcpu) {
+...
+      sp->spt = kvm_mmu_memory_cache_alloc(nid,
+&vcpu->arch.mmu_shadow_page_cache);
+...
+}
+
+
+Since we are changing cache allocation for page table pages, should we
+also make similar changes for other caches like mmu_page_header_cache,
+mmu_gfn_array_cache, and mmu_pte_list_desc_cache? I am not sure how
+good this idea is.
+
+Approach B:
+Ask page from the specific node on fault path with option to fallback
+to the original cache and default task policy.
+
+This is what Sean's rough patch looks like.
