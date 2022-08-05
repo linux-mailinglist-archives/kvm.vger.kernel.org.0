@@ -2,135 +2,141 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id D7CB058AF89
-	for <lists+kvm@lfdr.de>; Fri,  5 Aug 2022 20:06:15 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 40F2E58AF96
+	for <lists+kvm@lfdr.de>; Fri,  5 Aug 2022 20:11:19 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238385AbiHESGM (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 5 Aug 2022 14:06:12 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46702 "EHLO
+        id S240899AbiHESLR (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 5 Aug 2022 14:11:17 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49694 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230098AbiHESGK (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 5 Aug 2022 14:06:10 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id F3E8274E1B
-        for <kvm@vger.kernel.org>; Fri,  5 Aug 2022 11:06:08 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1659722768;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=gTG5sYKz5wYWpj0OuPtAuT0vzoUTMIRW2UW4E5SQLSQ=;
-        b=EqtatFDulK1RwYEUXVMucgeZtcmVXqtT8a4mf7nysaZnENR/B78tcR/PjnyTpZs7euqc4r
-        /xsrR39d50VVRXAPVuQ+Fry6vuDwWyRKOM9Nc8HfsLjvPZQjxweQffVfEiqPz5dhr2xZqE
-        oFEPcIKVnFDX4tLmD5mv3ASVCl9MFrw=
-Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
- [209.85.128.70]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-595-Tg0_9b2wODyen7KMNKMgnw-1; Fri, 05 Aug 2022 14:06:06 -0400
-X-MC-Unique: Tg0_9b2wODyen7KMNKMgnw-1
-Received: by mail-wm1-f70.google.com with SMTP id p15-20020a05600c1d8f00b003a522af6df8so598749wms.1
-        for <kvm@vger.kernel.org>; Fri, 05 Aug 2022 11:06:06 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=content-transfer-encoding:in-reply-to:organization:from:references
-         :cc:to:content-language:subject:user-agent:mime-version:date
-         :message-id:x-gm-message-state:from:to:cc;
-        bh=gTG5sYKz5wYWpj0OuPtAuT0vzoUTMIRW2UW4E5SQLSQ=;
-        b=qIjOVdbzfPnVcehqpSZ1rSX3iyGBwpH1bliL2j/cwjgqKcBiyuY8voz+x/uije9Xb5
-         jKM+Oog9uJRSWNHTpCbkzhGp+l3JbYZdUAIUvNwrFErYPXBop0/vKq7tPyvF5L1012XV
-         FBOWNL6BKekNMfrYUnNrdWeaQHsNayXxkl7BFZ3G9KTHlMDZCCIjkS1+6PXaspweRD8E
-         o23kYJqOLp0qE4cHtMwQwTSO9jtQldb/kBB8+YPaMtC20BMz4/VUjScJUctKjMXLMB8v
-         DSCnAFr8M+UJHsKQow2c+GsyaGi0YnIBE6azENan/JafU8XoEoELavnwtpcmts4pIjhs
-         DDyg==
-X-Gm-Message-State: ACgBeo192KrrpoIsWhxeKlh59pj7fvSJmunmA0xHCw1xedXsXU7pD6Vh
-        hRf4uV3Exei+9rT0fpR3fprUBPxmRbmLNwa6ZwJFa0lrA3svbJOl0JesTvk6e+edR5v/YAa2ESs
-        +WKKe10ciNCW7
-X-Received: by 2002:a05:6000:811:b0:220:6262:ac66 with SMTP id bt17-20020a056000081100b002206262ac66mr4741205wrb.529.1659722765759;
-        Fri, 05 Aug 2022 11:06:05 -0700 (PDT)
-X-Google-Smtp-Source: AA6agR4YiYJd4RGqr8HPcVnnEu37Kzz2xizPBJ/DFAoYEPdnVgyVJMfvEXwBl3Yrl6juKrdXAyBEpQ==
-X-Received: by 2002:a05:6000:811:b0:220:6262:ac66 with SMTP id bt17-20020a056000081100b002206262ac66mr4741186wrb.529.1659722765470;
-        Fri, 05 Aug 2022 11:06:05 -0700 (PDT)
-Received: from ?IPV6:2003:cb:c706:fb00:f5c3:24b2:3d03:9d52? (p200300cbc706fb00f5c324b23d039d52.dip0.t-ipconnect.de. [2003:cb:c706:fb00:f5c3:24b2:3d03:9d52])
-        by smtp.gmail.com with ESMTPSA id j6-20020a05600c190600b003a31b79dc0esm26070221wmq.1.2022.08.05.11.06.03
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 05 Aug 2022 11:06:05 -0700 (PDT)
-Message-ID: <a2b8fa73-4efd-426f-abcd-7975ff9a7101@redhat.com>
-Date:   Fri, 5 Aug 2022 20:06:03 +0200
+        with ESMTP id S229697AbiHESLP (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 5 Aug 2022 14:11:15 -0400
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EF52229839;
+        Fri,  5 Aug 2022 11:11:13 -0700 (PDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id 8CBD761830;
+        Fri,  5 Aug 2022 18:11:13 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 91F51C433D6;
+        Fri,  5 Aug 2022 18:11:10 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1659723072;
+        bh=uhsU2yeYQMb8fBkEMlPeo+n2vx1ZR0ocIn28vvJncwk=;
+        h=Date:From:To:Cc:Subject:From;
+        b=gH90EbPR6ETqG2olJRa1NFfdoe3plAI05vQYCjX6mFcgIMfmxFSa5ozj6KJVkGTkG
+         c5e6m8r4VDePVhDczpr4ExiZ1GXLYnFCDAEEHQymVkeynv+8aKWoVM2zB8xJy3BYzk
+         y3Iz9xaLfoiHTa7k1DFkKN+0nGySY2xVHA1kPngSr57yDMyL1SVIV4plCxDvBD4XS1
+         qnubREx0SXLIIogO2ESbJVDfkX17Pw7C9BO/7FszG2ADDnqEfekjtCUL+7B4zrleMq
+         HlRJNuera50lgcaP3n5+SNykti/JkDFJ1+n5mTkN6IQOjCTQ6bHqKOEdoQeRKbis8d
+         vG/XVRTGMMusA==
+Date:   Fri, 5 Aug 2022 19:11:06 +0100
+From:   Will Deacon <will@kernel.org>
+To:     mst@redhat.com, stefanha@redhat.com
+Cc:     jasowang@redhat.com, torvalds@linux-foundation.org,
+        ascull@google.com, maz@kernel.org, keirf@google.com,
+        jiyong@google.com, kernel-team@android.com,
+        linux-kernel@vger.kernel.org,
+        virtualization@lists.linux-foundation.org, kvm@vger.kernel.org
+Subject: IOTLB support for vhost/vsock breaks crosvm on Android
+Message-ID: <20220805181105.GA29848@willie-the-truck>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.11.0
-Subject: Re: [PATCH v7 01/14] mm: Add F_SEAL_AUTO_ALLOCATE seal to memfd
-Content-Language: en-US
-To:     Paolo Bonzini <pbonzini@redhat.com>,
-        Chao Peng <chao.p.peng@linux.intel.com>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org, linux-mm@kvack.org,
-        linux-fsdevel@vger.kernel.org, linux-api@vger.kernel.org,
-        linux-doc@vger.kernel.org, qemu-devel@nongnu.org,
-        linux-kselftest@vger.kernel.org
-Cc:     Jonathan Corbet <corbet@lwn.net>,
-        Sean Christopherson <seanjc@google.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        x86@kernel.org, "H . Peter Anvin" <hpa@zytor.com>,
-        Hugh Dickins <hughd@google.com>,
-        Jeff Layton <jlayton@kernel.org>,
-        "J . Bruce Fields" <bfields@fieldses.org>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        Shuah Khan <shuah@kernel.org>, Mike Rapoport <rppt@kernel.org>,
-        Steven Price <steven.price@arm.com>,
-        "Maciej S . Szmigiero" <mail@maciej.szmigiero.name>,
-        Vlastimil Babka <vbabka@suse.cz>,
-        Vishal Annapurve <vannapurve@google.com>,
-        Yu Zhang <yu.c.zhang@linux.intel.com>,
-        "Kirill A . Shutemov" <kirill.shutemov@linux.intel.com>,
-        luto@kernel.org, jun.nakajima@intel.com, dave.hansen@intel.com,
-        ak@linux.intel.com, aarcange@redhat.com, ddutile@redhat.com,
-        dhildenb@redhat.com, Quentin Perret <qperret@google.com>,
-        Michael Roth <michael.roth@amd.com>, mhocko@suse.com,
-        Muchun Song <songmuchun@bytedance.com>
-References: <20220706082016.2603916-1-chao.p.peng@linux.intel.com>
- <20220706082016.2603916-2-chao.p.peng@linux.intel.com>
- <f39c4f63-a511-4beb-b3a4-66589ddb5475@redhat.com>
- <472207cf-ff71-563b-7b66-0c7bea9ea8ad@redhat.com>
-From:   David Hildenbrand <david@redhat.com>
-Organization: Red Hat
-In-Reply-To: <472207cf-ff71-563b-7b66-0c7bea9ea8ad@redhat.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-3.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
-        RCVD_IN_DNSWL_LOW,SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE
-        autolearn=unavailable autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+User-Agent: Mutt/1.10.1 (2018-07-13)
+X-Spam-Status: No, score=-7.7 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_HI,
+        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 05.08.22 19:55, Paolo Bonzini wrote:
-> On 7/21/22 11:44, David Hildenbrand wrote:
->>
->> Also, I*think*  you can place pages via userfaultfd into shmem. Not
->> sure if that would count "auto alloc", but it would certainly bypass
->> fallocate().
-> 
-> Yeah, userfaultfd_register would probably have to forbid this for 
-> F_SEAL_AUTO_ALLOCATE vmas.  Maybe the memfile_node can be reused for 
-> this, adding a new MEMFILE_F_NO_AUTO_ALLOCATE flags?  Then 
-> userfault_register would do something like 
-> memfile_node_get_flags(vma->vm_file) and check the result.
+Hi folks,
 
-An alternative is to simply have the shmem allocation fail in a similar
-way. Maybe it does already, I haven't checked (don't think so).
+[tl;dr a change from ~18 months ago breaks Android userspace and I don't
+ know what to do about it]
 
+As part of the development work for next year's Android, we've recently
+been bringing up a 5.15 KVM host and have observed that vsock no longer
+works for communicating with a guest because crosvm gets an unexpected
+-EFAULT back from the VHOST_VSOCK_SET_RUNNING ioctl():
 
--- 
+ | E crosvm : vpipe worker thread exited with error: VhostVsockStart(IoctlError(Os { code: 14, kind: Uncategorized, message: "Bad address" }))
+
+The same guest payload works correctly on a 5.10 KVM host kernel.
+
+After some digging, we narrowed this change in behaviour down to
+e13a6915a03f ("vhost/vsock: add IOTLB API support") and further digging
+reveals that the infamous VIRTIO_F_ACCESS_PLATFORM feature flag is to
+blame. Indeed, our tests once again pass if we revert that patch (there's
+a trivial conflict with the later addition of VIRTIO_VSOCK_F_SEQPACKET
+but otherwise it reverts cleanly).
+
+On Android, KVM runs in a mode where the host kernel is, by default,
+unable to access guest memory [1] and so memory used for virtio (e.g.
+the rings and descriptor data) needs to be shared explicitly with the
+host using hypercalls issued by the guest. We implement this on top of
+restricted DMA [2], whereby the guest allocates a pool of shared memory
+during boot and bounces all virtio transfers through this window. In
+order to get the guest to use the DMA API for virtio devices (which is
+required for the SWIOTLB code to kick in and do the aforementioned
+bouncing), crosvm sets the VIRTIO_F_ACCESS_PLATFORM feature flag on its
+emulated devices and this is picked up by virtio_has_dma_quirk() in the
+guest kernel. This has been working well for us so far.
+
+With e13a6915a03f, the vhost backend for vsock now advertises
+VIRTIO_F_ACCESS_PLATFORM in its response to the VHOST_GET_FEATURES
+ioctl() and accepts it in the VHOST_SET_FEATURES as a mechanism to
+enable the IOTLB feature (note: this is nothing to do with SWIOTLB!).
+This feature is used for emulation of a virtual IOMMU and requires
+explicit support for issuing IOTLB messages (see VHOST_IOTLB_MSG and
+VHOST_IOTLB_MSG_V2) from userspace to manage address translations for
+the virtio device.
+
+Looking at how crosvm uses these vhost ioctl()s, we can see:
+
+        let avail_features = self
+            .vhost_handle
+            .get_features()
+            .map_err(Error::VhostGetFeatures)?;
+
+        let features: c_ulonglong = self.acked_features & avail_features;
+        self.vhost_handle
+            .set_features(features)
+            .map_err(Error::VhostSetFeatures)?;
+
+where 'acked_features' is the feature set negotiated between crosvm and
+the guest, while 'avail_features' is the supported feature set
+advertised by vhost. The intersection of these now includes
+VIRTIO_F_ACCESS_PLATFORM in the 5.15 kernel and so we quietly start
+enabling IOTLB, despite not having any of the necessary support in
+crosvm and therefore the vsock thread effectively grinds to a halt and
+we cannot communicate with the guest.
+
+The fundamental issue is, I think, that VIRTIO_F_ACCESS_PLATFORM is
+being used for two very different things within the same device; for the
+guest it basically means "use the DMA API, it knows what to do" but for
+vhost it very specifically means "enable IOTLB". We've recently had
+other problems with this flag [3] but in this case it used to work
+reliably and now it doesn't anymore.
+
+So how should we fix this? One possibility is for us to hack crosvm to
+clear the VIRTIO_F_ACCESS_PLATFORM flag when setting the vhost features,
+but others here have reasonably pointed out that they didn't expect a
+kernel change to break userspace. On the flip side, the offending commit
+in the kernel isn't exactly new (it's from the end of 2020!) and so it's
+likely that others (e.g. QEMU) are using this feature. I also strongly
+suspect that vhost net suffers from exactly the same issue, we just
+don't happen to be using that (yet) in Android.
+
 Thanks,
 
-David / dhildenb
+Will
 
+[1] https://lwn.net/Articles/836693/
+[2] https://lwn.net/Articles/841916/
+[3] https://lore.kernel.org/lkml/YtkCQsSvE9AZyrys@google.com/
