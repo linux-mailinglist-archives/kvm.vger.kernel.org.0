@@ -2,94 +2,144 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id C19FA58B047
-	for <lists+kvm@lfdr.de>; Fri,  5 Aug 2022 21:20:43 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 0AE3A58B070
+	for <lists+kvm@lfdr.de>; Fri,  5 Aug 2022 21:40:50 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237041AbiHETUm (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 5 Aug 2022 15:20:42 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38288 "EHLO
+        id S241284AbiHETks (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 5 Aug 2022 15:40:48 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50510 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231262AbiHETUl (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 5 Aug 2022 15:20:41 -0400
-Received: from mail-pj1-x1030.google.com (mail-pj1-x1030.google.com [IPv6:2607:f8b0:4864:20::1030])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D33D865563
-        for <kvm@vger.kernel.org>; Fri,  5 Aug 2022 12:20:39 -0700 (PDT)
-Received: by mail-pj1-x1030.google.com with SMTP id b4so3597075pji.4
-        for <kvm@vger.kernel.org>; Fri, 05 Aug 2022 12:20:39 -0700 (PDT)
+        with ESMTP id S238395AbiHETkr (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 5 Aug 2022 15:40:47 -0400
+Received: from mail-lf1-x12c.google.com (mail-lf1-x12c.google.com [IPv6:2a00:1450:4864:20::12c])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9B5EE11451
+        for <kvm@vger.kernel.org>; Fri,  5 Aug 2022 12:40:45 -0700 (PDT)
+Received: by mail-lf1-x12c.google.com with SMTP id e15so4840680lfs.0
+        for <kvm@vger.kernel.org>; Fri, 05 Aug 2022 12:40:45 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc;
-        bh=IhDLsJTpz87Cy+fNuAZT2J8Hez0P/MUUAjyAsKcVzbI=;
-        b=W3PjcWGQyq9VzdGezgKF1FM0JcwC/10BlsekTmcRtMv2qRJb6WMu15fF0kdfpQ3T/o
-         lIiIscQkshoX9XaEOzKof2RVf0XpS9JfcAWtR5DPJA6pvT6h43q9MayBVW84vZK+rhvp
-         IL3jB2RYuVOXtwdTUiE194dqeBHer/FygeCyBVxGsNP+oJwHtOtAot3WfG4blKVS9HEd
-         BigYZ+97gEP181SdTIODvgQzfugrrIBzgVcVpz9A8tsi59DJ31JakYQkzaysHANynN/a
-         uq2oO8l7E0zaqocANWoXm/NibjwFhm8EQzBpBzv4LI/Hx8Pl9YvBQckEaamV/hc9i1GJ
-         hU4g==
+        d=semihalf.com; s=google;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc;
+        bh=rty6mPaEYkYj+hk2AIwEoGnTyks1fl0dWOatixd39IQ=;
+        b=ZVdfbFAYeIUhGFL1MsmiiKPKr/iDRfw7LNLWovNYdZMMSqGycmpqxqzuBFS59yToBK
+         MPF47XlwvkHwloFZ0QU+WvcrJW+xDfoqtCH6+uSUqgYSW2NOjGo2det5Od7Njoq5Ml6/
+         +CwAoGIa929cRNttmpn9qxEz7B25vEtt9azLRc4iOHcQBoQNErztOE3hjKnLTHyzGigl
+         4mvtAuLzu+sJRNekNhuKmQSjb7IotNHEnum47KHJxbGqltNqRcXB5U3smOfpln9CRsBE
+         QX1tQ+doOlI35hmgOmUSmYGQtWtHtzm0jO8ApsmID8pbklD+AmnrFFEawPFrZlRm05Ee
+         pU5A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc;
-        bh=IhDLsJTpz87Cy+fNuAZT2J8Hez0P/MUUAjyAsKcVzbI=;
-        b=QmXqSJhD7Usaq/NwWKng2gErq4FiHaJD778BfCLvIaOJLiMea9JVvj4ILCQ6NIrn0v
-         fZDcViuuTAOEU1NEG5/5RbvOTAUhth+rhkIM3wryAaoULl/zN4HjoetPYV6v7Bl4eYcR
-         ZZw3bI3cW+bCi/iNhteVJGlZ6442MsAUZqGOgRRxKAw4BzIzsVC6pESyVayOY+7/Q/2V
-         nrtWCLam8n5CIdyZ6OJMGwmyqbHXh40hwkC349hWsL+MRVjWLSMnTUAqCoe20hrBZ7u+
-         1iToSaupzMoolpiYxCgo130yz592ILxo0IuU4SbLo6h+oo+6EERFhiFtFpV+hj1t4fcu
-         SOTA==
-X-Gm-Message-State: ACgBeo1n4+gtXOLPYSqTKYz3i7JWP/ETwpEXB+lBtPF7xJasedkSbaLL
-        qiVL8UHBi0GLqJpErIsxSAnNVw==
-X-Google-Smtp-Source: AA6agR4tbY3NZ6pC933xQAX5Ly3Tkn6sKLHM406XwsMUKj+oSoI8h5UgNskw7q2W4bwl36T7bjchMw==
-X-Received: by 2002:a17:90a:b30a:b0:1f4:e12b:6f61 with SMTP id d10-20020a17090ab30a00b001f4e12b6f61mr9087126pjr.153.1659727239193;
-        Fri, 05 Aug 2022 12:20:39 -0700 (PDT)
-Received: from google.com (7.104.168.34.bc.googleusercontent.com. [34.168.104.7])
-        by smtp.gmail.com with ESMTPSA id b76-20020a63344f000000b0040caab35e5bsm1795697pga.89.2022.08.05.12.20.38
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc;
+        bh=rty6mPaEYkYj+hk2AIwEoGnTyks1fl0dWOatixd39IQ=;
+        b=zox1oxlzW5iUjyu3GXO5Twbwp0itBSEzcKXljIOfgy2uQpuu+BXSiIJw7I9tK2JhCm
+         4WppHeBWqz/052vSUW0GSuJcTqWCWS9hM/XmzrcwSY6yDM1KU1DLWjhLJ9vCihFo+2Uy
+         5+jx2yGIjcZ84LRbNCC5wx8wNSF2QVmbU7cDptG2aAhlTUyMb0kcEf84UY81Tgt8T2UX
+         FttFo2J21ZeyMi0XNZJnbZqeJcPPQT92HulGucZFTiCWROIYl/0i/xaMBbabuiQMQo0d
+         LOCBsBjdbDUVTriHRCgCjnT3341EnosMUIIQyRlTD0vxXeFk7VDu3r0O3xWt9YwFex8N
+         5VIw==
+X-Gm-Message-State: ACgBeo1Qdzx4bq/ksITOPF5ObR2YfczSIIO6TFRG7KTjIWRdsmFh8O53
+        Q8qol8Y/oq5pMBEtEm+lI0SCvw==
+X-Google-Smtp-Source: AA6agR4yyOputGlNoeiiinUA89rWH8MyQHy5pMHZ5HQQAH93EmzS4UkCpxA03zHmJI4OgjW4LGuxNA==
+X-Received: by 2002:a05:6512:3981:b0:48a:6fb9:74b7 with SMTP id j1-20020a056512398100b0048a6fb974b7mr2647305lfu.98.1659728443958;
+        Fri, 05 Aug 2022 12:40:43 -0700 (PDT)
+Received: from dmaluka.office.semihalf.net ([83.142.187.84])
+        by smtp.gmail.com with ESMTPSA id o4-20020a056512230400b0048a407f41bbsm560079lfu.238.2022.08.05.12.40.42
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 05 Aug 2022 12:20:38 -0700 (PDT)
-Date:   Fri, 5 Aug 2022 19:20:35 +0000
-From:   Sean Christopherson <seanjc@google.com>
-To:     Oliver Upton <oliver.upton@linux.dev>
-Cc:     kvm@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>,
-        Oliver Upton <oupton@google.com>
-Subject: Re: [PATCH v3 4/6] KVM: Pass the name of the VM fd to
- kvm_create_vm_debugfs()
-Message-ID: <Yu1tg3z08hb7Vqon@google.com>
-References: <20220720092259.3491733-1-oliver.upton@linux.dev>
- <20220720092259.3491733-5-oliver.upton@linux.dev>
+        Fri, 05 Aug 2022 12:40:43 -0700 (PDT)
+From:   Dmytro Maluka <dmy@semihalf.com>
+To:     Sean Christopherson <seanjc@google.com>,
+        Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org
+Cc:     Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+        Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org,
+        "H. Peter Anvin" <hpa@zytor.com>, linux-kernel@vger.kernel.org,
+        Eric Auger <eric.auger@redhat.com>,
+        Alex Williamson <alex.williamson@redhat.com>,
+        Rong L Liu <rong.l.liu@intel.com>,
+        Zhenyu Wang <zhenyuw@linux.intel.com>,
+        Tomasz Nowicki <tn@semihalf.com>,
+        Grzegorz Jaszczyk <jaz@semihalf.com>, upstream@semihalf.com,
+        Dmitry Torokhov <dtor@google.com>,
+        Dmytro Maluka <dmy@semihalf.com>
+Subject: [PATCH v2 0/5] KVM: Fix oneshot interrupts forwarding
+Date:   Fri,  5 Aug 2022 21:39:14 +0200
+Message-Id: <20220805193919.1470653-1-dmy@semihalf.com>
+X-Mailer: git-send-email 2.37.1.559.g78731f0fdb-goog
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20220720092259.3491733-5-oliver.upton@linux.dev>
-X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        ENV_AND_HDR_SPF_MATCH,FSL_HELO_FAKE,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,
-        SPF_PASS,T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL
-        autolearn=ham autolearn_force=no version=3.4.6
+Content-Transfer-Encoding: 8bit
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Jul 20, 2022, Oliver Upton wrote:
-> From: Oliver Upton <oupton@google.com>
-> 
-> At the time the VM fd is used in kvm_create_vm_debugfs(), the fd has
-> been allocated but not yet installed. It is only really useful as an
-> identifier in strings for the VM (such as debugfs).
-> 
-> Treat it exactly as such by passing the string name of the fd to
-> kvm_create_vm_debugfs(), futureproofing against possible misuse of the
-> VM fd.
+The existing KVM mechanism for forwarding of level-triggered interrupts
+using resample eventfd doesn't work quite correctly in the case of
+interrupts that are handled in a Linux guest as oneshot interrupts
+(IRQF_ONESHOT). Such an interrupt is acked to the device in its
+threaded irq handler, i.e. later than it is acked to the interrupt
+controller (EOI at the end of hardirq), not earlier. The existing KVM
+code doesn't take that into account, which results in erroneous extra
+interrupts in the guest caused by premature re-assert of an
+unacknowledged IRQ by the host.
 
-One last whine session,
+This patch series fixes this issue (for now on x86 only) by checking if
+the interrupt is unmasked when we receive irq ack (EOI) and, in case if
+it's masked, postponing resamplefd notify until the guest unmasks it.
 
-  kvm_create_vm_debugfs() to guard against attempts to consume the fd
-  before it is installed.
+Patches 1 and 2 extend the existing support for irq mask notifiers in
+KVM, which is a prerequisite needed for KVM irqfd to use mask notifiers
+to know when an interrupt is masked or unmasked.
 
-> Suggested-by: Sean Christopherson <seanjc@google.com>
-> Signed-off-by: Oliver Upton <oupton@google.com>
-> ---
+Patch 3 implements the actual fix: postponing resamplefd notify in irqfd
+until the irq is unmasked.
 
-Reviewed-by: Sean Christopherson <seanjc@google.com>
+Patches 4 and 5 just do some optional renaming for consistency, as we
+are now using irq mask notifiers in irqfd along with irq ack notifiers.
+
+Please see individual patches for more details.
+
+v2:
+  - Fixed compilation failure on non-x86: mask_notifier_list moved from
+    x86 "struct kvm_arch" to generic "struct kvm".
+  - kvm_fire_mask_notifiers() also moved from x86 to generic code, even
+    though it is not called on other architectures for now.
+  - Instead of kvm_irq_is_masked() implemented
+    kvm_register_and_fire_irq_mask_notifier() to fix potential race
+    when reading the initial IRQ mask state.
+  - Renamed for clarity:
+      - irqfd_resampler_mask() -> irqfd_resampler_mask_notify()
+      - kvm_irq_has_notifier() -> kvm_irq_has_ack_notifier()
+      - resampler->notifier -> resampler->ack_notifier
+  - Reorganized code in irqfd_resampler_ack() and
+    irqfd_resampler_mask_notify() to make it easier to follow.
+  - Don't follow unwanted "return type on separate line" style for
+    irqfd_resampler_mask_notify().
+
+Dmytro Maluka (5):
+  KVM: x86: Move irq mask notifiers from x86 to generic KVM
+  KVM: x86: Add kvm_register_and_fire_irq_mask_notifier()
+  KVM: irqfd: Postpone resamplefd notify for oneshot interrupts
+  KVM: irqfd: Rename resampler->notifier
+  KVM: Rename kvm_irq_has_notifier()
+
+ arch/x86/include/asm/kvm_host.h |  17 +---
+ arch/x86/kvm/i8259.c            |   6 ++
+ arch/x86/kvm/ioapic.c           |   8 +-
+ arch/x86/kvm/ioapic.h           |   1 +
+ arch/x86/kvm/irq_comm.c         |  74 +++++++++++------
+ arch/x86/kvm/x86.c              |   1 -
+ include/linux/kvm_host.h        |  21 ++++-
+ include/linux/kvm_irqfd.h       |  16 +++-
+ virt/kvm/eventfd.c              | 136 ++++++++++++++++++++++++++++----
+ virt/kvm/kvm_main.c             |   1 +
+ 10 files changed, 221 insertions(+), 60 deletions(-)
+
+-- 
+2.37.1.559.g78731f0fdb-goog
+
