@@ -2,67 +2,101 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 4C0C758AA03
-	for <lists+kvm@lfdr.de>; Fri,  5 Aug 2022 13:17:20 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 8C47B58AA48
+	for <lists+kvm@lfdr.de>; Fri,  5 Aug 2022 13:42:49 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237967AbiHELRT (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 5 Aug 2022 07:17:19 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44004 "EHLO
+        id S240334AbiHELms (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 5 Aug 2022 07:42:48 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60210 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229600AbiHELRS (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 5 Aug 2022 07:17:18 -0400
+        with ESMTP id S236411AbiHELmq (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 5 Aug 2022 07:42:46 -0400
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 7B5D1101F4
-        for <kvm@vger.kernel.org>; Fri,  5 Aug 2022 04:17:17 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id BB82322BD9
+        for <kvm@vger.kernel.org>; Fri,  5 Aug 2022 04:42:45 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1659698236;
+        s=mimecast20190719; t=1659699764;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=cyh9GNwkSeiWX8VVWJet6cmrStrv1Y1BhHYKMAKCy08=;
-        b=OZDn0RpjnajK1pDUxeYQSpp42IRseNSRUDBZsPkMPrgKZhEnGdqXUZeNYSN9uKcKFYvmih
-        Oek2kBzgQFUKkC3k8apLwj71k4LnOPyT3lWOTF5cGEFyB6gZkBkMTPaqSh0x/Bd+DQkXHQ
-        nJ3zW/yEJnu0QE0DXpWvAVgrfFKymxQ=
-Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
- [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
+        bh=YULnOCGvgRdgsuI4kIdPgoqcS1vxVsdQD9rykb/ZF+A=;
+        b=WMaf6u9a4blHsgbOYWxR8N98FzHqgGdCOt5cFQl+++WjihmsFniazitTEO3sbiq5ik/oKX
+        lSO3ob995z+25TR+WmL97I+y8fpbNGYBeoVe8S3NhXUssREpuhLupmUiYVsKg0U8Uye2Kt
+        mIB+Mhj7jkz0A01/uoTDHMNQiQ4VGWE=
+Received: from mail-ed1-f70.google.com (mail-ed1-f70.google.com
+ [209.85.208.70]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-99-FaJGjcO_OzyZLoIQnp8_ow-1; Fri, 05 Aug 2022 07:17:13 -0400
-X-MC-Unique: FaJGjcO_OzyZLoIQnp8_ow-1
-Received: from smtp.corp.redhat.com (int-mx09.intmail.prod.int.rdu2.redhat.com [10.11.54.9])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 14C7785A585;
-        Fri,  5 Aug 2022 11:17:13 +0000 (UTC)
-Received: from virtlab701.virt.lab.eng.bos.redhat.com (virtlab701.virt.lab.eng.bos.redhat.com [10.19.152.228])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id C24E5492CA2;
-        Fri,  5 Aug 2022 11:17:12 +0000 (UTC)
-From:   Paolo Bonzini <pbonzini@redhat.com>
-To:     Sean Christopherson <seanjc@google.com>
-Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Kai Huang <kai.huang@intel.com>,
-        Michael Roth <michael.roth@amd.com>,
-        Tom Lendacky <thomas.lendacky@amd.com>
-Subject: Re: [PATCH v2 0/3] KVM: x86/mmu: MMIO caching bug fixes
-Date:   Fri,  5 Aug 2022 07:17:06 -0400
-Message-Id: <20220805111706.1431548-1-pbonzini@redhat.com>
-In-Reply-To: <20220803224957.1285926-1-seanjc@google.com>
-References: 
+ us-mta-171-CJLsVd0BP_yh5_mMlqM5JQ-1; Fri, 05 Aug 2022 07:42:43 -0400
+X-MC-Unique: CJLsVd0BP_yh5_mMlqM5JQ-1
+Received: by mail-ed1-f70.google.com with SMTP id b6-20020a056402278600b0043e686058feso1455048ede.10
+        for <kvm@vger.kernel.org>; Fri, 05 Aug 2022 04:42:43 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc;
+        bh=YULnOCGvgRdgsuI4kIdPgoqcS1vxVsdQD9rykb/ZF+A=;
+        b=tIIWAP/2/tnsRIDo/cvh6yHyFrfWu2Trt3g+OFFsYzK08vMXGRv/s3wKzm9JtvIN4Y
+         LvdXrKUv0KaEWdFlH17WC0DSirHTC2f8jEvtPVuJ+dI+y8Z4nhb2A29rMuvjimR1li/8
+         G8FLlFcyoUis/sICa6XDGE5Fh7PszVCvlEp4cPQY9Iwkx3jzKa7vLkTyuQ0+AQETezkI
+         bDnX9PGaj4tAkRqLrOOjsbxSf3zT+Pv3+XbMRRvlDN2goM5Bne8DjxZlaK+tP5EzTZTR
+         RIlgwncWRHskDSRMj4kvI73ddQp+l8SRk6vm65OXS3NYUyS5KAvulkvCVaRG4q9fkqs3
+         kZtg==
+X-Gm-Message-State: ACgBeo3JL62IDiQYisxsplzDO8eDH1FgqVPQ15MgPqACch3NfBL9L8uC
+        zpcjcBA3xGl9SLliKL+U6quzPx+UUqb6oFKOH2zmKCbZaHUzEe5Di41TTkG/3y/jLqENTwhfTXG
+        qNgVtiCHqTzvl
+X-Received: by 2002:a17:907:2848:b0:730:cab8:3ce5 with SMTP id el8-20020a170907284800b00730cab83ce5mr5037959ejc.718.1659699761908;
+        Fri, 05 Aug 2022 04:42:41 -0700 (PDT)
+X-Google-Smtp-Source: AA6agR5HxMkRlLw6inVe2Nj6HJM817DYecrkEFv6oGLkdtosgwkO1ubuip5wVqyzC5bFkkcud/Rczw==
+X-Received: by 2002:a17:907:2848:b0:730:cab8:3ce5 with SMTP id el8-20020a170907284800b00730cab83ce5mr5037937ejc.718.1659699761664;
+        Fri, 05 Aug 2022 04:42:41 -0700 (PDT)
+Received: from ?IPV6:2001:b07:6468:f312:9af8:e5f5:7516:fa89? ([2001:b07:6468:f312:9af8:e5f5:7516:fa89])
+        by smtp.googlemail.com with ESMTPSA id f17-20020a056402005100b0043ceb444515sm1979801edu.5.2022.08.05.04.42.40
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 05 Aug 2022 04:42:41 -0700 (PDT)
+Message-ID: <ae0a0049-8db0-501b-79e4-cd32758156fb@redhat.com>
+Date:   Fri, 5 Aug 2022 13:42:40 +0200
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 2.85 on 10.11.54.9
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.11.0
+Subject: Re: [kvm-unit-tests PATCH 2/4] x86: emulator.c cleanup: Use ASM_TRY
+ for the UD_VECTOR cases
+Content-Language: en-US
+To:     Sean Christopherson <seanjc@google.com>,
+        Michal Luczaj <mhal@rbox.co>
+Cc:     kvm@vger.kernel.org, shuah@kernel.org,
+        linux-kselftest@vger.kernel.org
+References: <Yum2LpZS9vtCaCBm@google.com> <20220803172508.1215-1-mhal@rbox.co>
+ <20220803172508.1215-2-mhal@rbox.co> <Yuq8mumnrww9rlnz@google.com>
+From:   Paolo Bonzini <pbonzini@redhat.com>
+In-Reply-To: <Yuq8mumnrww9rlnz@google.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 X-Spam-Status: No, score=-3.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,
-        SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham
-        autolearn_force=no version=3.4.6
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
+        RCVD_IN_DNSWL_LOW,SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Queued, thanks.
+On 8/3/22 20:21, Sean Christopherson wrote:
+>> I've noticed test_illegal_movbe() does not execute with KVM_FEP.
+>> Just making sure: is it intentional?
+> It's intentional.  FEP isn't needed because KVM emulates MOVBE on #UD when it's
+> not supported by the host, e.g. to allow migrating to an older host.
+> 
+> 	GP(EmulateOnUD | ModRM, &three_byte_0f_38_f0),
+> 	GP(EmulateOnUD | ModRM, &three_byte_0f_38_f1),
+> 
+
+*puts historian hat on*
+
+The original reason was to test Linux using MOVBE even on non-Atom 
+machines, when MOVBE was only on Atoms. :)
 
 Paolo
-
 
