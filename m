@@ -2,99 +2,145 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 478C558B09E
-	for <lists+kvm@lfdr.de>; Fri,  5 Aug 2022 21:59:39 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 6191058B287
+	for <lists+kvm@lfdr.de>; Sat,  6 Aug 2022 00:57:32 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S240859AbiHET7h (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 5 Aug 2022 15:59:37 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33380 "EHLO
+        id S241439AbiHEW5a (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 5 Aug 2022 18:57:30 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54680 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S241255AbiHET7g (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 5 Aug 2022 15:59:36 -0400
-Received: from mail-pj1-x102c.google.com (mail-pj1-x102c.google.com [IPv6:2607:f8b0:4864:20::102c])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6E8F046DBB
-        for <kvm@vger.kernel.org>; Fri,  5 Aug 2022 12:59:35 -0700 (PDT)
-Received: by mail-pj1-x102c.google.com with SMTP id x2-20020a17090ab00200b001f4da5cdc9cso9255888pjq.0
-        for <kvm@vger.kernel.org>; Fri, 05 Aug 2022 12:59:35 -0700 (PDT)
+        with ESMTP id S241268AbiHEW52 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 5 Aug 2022 18:57:28 -0400
+Received: from mail-ej1-x631.google.com (mail-ej1-x631.google.com [IPv6:2a00:1450:4864:20::631])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 63FE112A8A
+        for <kvm@vger.kernel.org>; Fri,  5 Aug 2022 15:57:27 -0700 (PDT)
+Received: by mail-ej1-x631.google.com with SMTP id w19so7357984ejc.7
+        for <kvm@vger.kernel.org>; Fri, 05 Aug 2022 15:57:27 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc;
-        bh=QWBm7lqUfCm1gEiD6q+yqH0sezQKK+ZMj4BJuVRBJdk=;
-        b=qEpk93t1+HB2zZDgqU94m7lSWi878nc3XrE45Y2MX6mcUpmfVDhwFRuFILBIUKh5s2
-         dX3sXkw++IGfGudzBxIcvBuJI0DPBYyquChZ4VF5IAPPYbBuxxU5roFf/GAoHojQSjzT
-         oWZJh240TBtujRK0DNWC4bPtTXjI5sfR1H/kJDf2tas+Y3rr/9r54yuOBTeuYk4Gk0te
-         evcVLDQTwDSYcg7w9dTPeBrl24LDh+/I1l2NLkeeemwBJNdMhy8XgcS6cfrfIeqSYtUt
-         RD4R60OSGQ73+hWCw9Nl1B2km6C+3GjYvNJEk3YuZ7AscGFoyjzjzPhVPrtV6djgw9lI
-         l8rQ==
+        d=linux-foundation.org; s=google;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc;
+        bh=NC4cysuywW8XEpGdMjzU9OYVRS8Z3YSMAD203AMlbrk=;
+        b=PNM6Y8lm9ttp+NtlMA+qdF4huhKjki+bO3qHRvhBcY+z3fHP/eUCW5t5Gi/UerFvRG
+         kz0DAnJwoIcevopFDxtDsQgEAG8CrQpDfXEGOJ1PH0xz1l7AMECbSvLvUELV++v9xVlY
+         H/TFMy3P0J0tlCY9z9/FBqus6oF44i1nNmUY8=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc;
-        bh=QWBm7lqUfCm1gEiD6q+yqH0sezQKK+ZMj4BJuVRBJdk=;
-        b=d8lPas1xTznJLbqbhsdjY84Uc2gwimuQTyc3Jik/+oRHpnQsRmqkX/30sUWWY7WXx4
-         EyjMwC5KvxkC7/DRszaHAufWcj/spktQ62X771nSVd5I9fiBhla+mWxxJUSJheH5jsmb
-         Fgt69/tOwXkXsGux9R3Fk/L6c2kTf2T97Rx697mQzcm7aB1XpIKEjeGnK1RmfWAEegVC
-         ZwO88EDQ13uZ0r2Dj9bjwGn/KZFkJPRYq0Ho9XoW0SEbN/MXzsXsMbrK+GvdPRivS6sr
-         ++Ppf5sgLP6j3S0iDCvkbxRbcg1lZ+q0xOrWn5MjV4Br7ksAAuMzTT8Gn6pyQy7Wgwpz
-         ogtQ==
-X-Gm-Message-State: ACgBeo2tHW4GVTmJ2S7g990qL8rdtn75F7+cQ6mjdhRpqyZ+vgkJEqhh
-        7neMKm1QohZfGVgQwJFUTqTPJA==
-X-Google-Smtp-Source: AA6agR6hPDsYpzfLfbDVz6nqPYj5F+irxuz9Zv5G2qnYofzc5OQEFOB2B/m/fQm3dWRDga+ztSAonw==
-X-Received: by 2002:a17:902:aa48:b0:16f:1364:788b with SMTP id c8-20020a170902aa4800b0016f1364788bmr8387357plr.109.1659729574798;
-        Fri, 05 Aug 2022 12:59:34 -0700 (PDT)
-Received: from google.com (7.104.168.34.bc.googleusercontent.com. [34.168.104.7])
-        by smtp.gmail.com with ESMTPSA id x134-20020a62868c000000b0052e67e9402dsm3436825pfd.106.2022.08.05.12.59.34
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 05 Aug 2022 12:59:34 -0700 (PDT)
-Date:   Fri, 5 Aug 2022 19:59:31 +0000
-From:   Sean Christopherson <seanjc@google.com>
-To:     Michal Luczaj <mhal@rbox.co>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>, kvm <kvm@vger.kernel.org>,
-        shuah <shuah@kernel.org>,
-        linux-kselftest <linux-kselftest@vger.kernel.org>
-Subject: Re: [kvm-unit-tests PATCH 2/4] x86: emulator.c cleanup: Use ASM_TRY
- for the UD_VECTOR cases
-Message-ID: <Yu12o0mKMUdnQ8Ol@google.com>
-References: <ae0a0049-8db0-501b-79e4-cd32758156fb@redhat.com>
- <E1oK2U0-0000qn-CI@rmmprod05.runbox>
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc;
+        bh=NC4cysuywW8XEpGdMjzU9OYVRS8Z3YSMAD203AMlbrk=;
+        b=zemAsd1ZAHE4b4R2iG0WbdVdE85ppyyJpnKroQy0dqgU5gZZNxOU0mf4MEhtDozBoH
+         yQ4XAFJCpfwvsL8Qa69yIYK3V+ckVgcUdICN2V32o1oP1gNxDpWSTecb3dej4bqFbolK
+         sZZZ/dcMrpHpsDc0QU36oIINBkEH0Z0RyvrInMIHHo18EhT/08ObNq2ZzdUnVWm4OWax
+         +vc39MAti2i/P1HYSpfvzAd1AuJldiSZ9kb3+dlcreeD4MPPSAuCRWqCylUR/jbaGuNR
+         FDEtZqB8QQvEb5njiQNc6qji/7vMg6t0au0qvT05UT0R0nJpTAuOoyEeFJWvs1xK63F+
+         /hZg==
+X-Gm-Message-State: ACgBeo05sjR8HK7VYz9DDBSCUN4IE25csncTmwwUo7vhHK+vaVwlxCLc
+        xBUDeaJBJ3EKDhTtbgjckekuD1raPgqD2j8A
+X-Google-Smtp-Source: AA6agR6mw5jYu1F0R+KiLd/LA7Fiammv2ND5bA29mPPepypCPSqBWj6JtzvwmBBr5wzIWg9uZgw4sw==
+X-Received: by 2002:a17:906:8c7:b0:730:c1a9:e187 with SMTP id o7-20020a17090608c700b00730c1a9e187mr6653501eje.55.1659740245650;
+        Fri, 05 Aug 2022 15:57:25 -0700 (PDT)
+Received: from mail-wm1-f54.google.com (mail-wm1-f54.google.com. [209.85.128.54])
+        by smtp.gmail.com with ESMTPSA id cx20-20020a05640222b400b0043d7b19abd0sm578532edb.39.2022.08.05.15.57.25
+        for <kvm@vger.kernel.org>
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 05 Aug 2022 15:57:25 -0700 (PDT)
+Received: by mail-wm1-f54.google.com with SMTP id v131-20020a1cac89000000b003a4bb3f786bso4591451wme.0
+        for <kvm@vger.kernel.org>; Fri, 05 Aug 2022 15:57:25 -0700 (PDT)
+X-Received: by 2002:a05:600c:1d94:b0:3a4:ffd9:bb4a with SMTP id
+ p20-20020a05600c1d9400b003a4ffd9bb4amr5768966wms.8.1659740244625; Fri, 05 Aug
+ 2022 15:57:24 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <E1oK2U0-0000qn-CI@rmmprod05.runbox>
-X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        ENV_AND_HDR_SPF_MATCH,FSL_HELO_FAKE,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,
-        SPF_PASS,T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL
-        autolearn=unavailable autolearn_force=no version=3.4.6
+References: <20220805181105.GA29848@willie-the-truck>
+In-Reply-To: <20220805181105.GA29848@willie-the-truck>
+From:   Linus Torvalds <torvalds@linux-foundation.org>
+Date:   Fri, 5 Aug 2022 15:57:08 -0700
+X-Gmail-Original-Message-ID: <CAHk-=wip-Lju3ZdNwknS6ouyw+nKXeRSnhqVyNo8WSEdk-BfGw@mail.gmail.com>
+Message-ID: <CAHk-=wip-Lju3ZdNwknS6ouyw+nKXeRSnhqVyNo8WSEdk-BfGw@mail.gmail.com>
+Subject: Re: IOTLB support for vhost/vsock breaks crosvm on Android
+To:     Will Deacon <will@kernel.org>
+Cc:     mst@redhat.com, stefanha@redhat.com, jasowang@redhat.com,
+        ascull@google.com, maz@kernel.org, keirf@google.com,
+        jiyong@google.com, kernel-team@android.com,
+        linux-kernel@vger.kernel.org,
+        virtualization@lists.linux-foundation.org, kvm@vger.kernel.org,
+        Stefano Garzarella <sgarzare@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
+X-Spam-Status: No, score=-1.8 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+        RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
+        autolearn=no autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Aug 05, 2022, Michal Luczaj wrote:
-> On Fri, 5 Aug 2022 13:42:40 +0200, Paolo Bonzini <pbonzini@redhat.com> wrote:
-> > On 8/3/22 20:21, Sean Christopherson wrote:
-> > >> I've noticed test_illegal_movbe() does not execute with KVM_FEP.
-> > >> Just making sure: is it intentional?
-> > > It's intentional.  FEP isn't needed because KVM emulates MOVBE on #UD when it's
-> > > not supported by the host, e.g. to allow migrating to an older host.
-> > > 
-> > > 	GP(EmulateOnUD | ModRM, &three_byte_0f_38_f0),
-> > > 	GP(EmulateOnUD | ModRM, &three_byte_0f_38_f1),
-> > > 
-> > 
-> > *puts historian hat on*
-> > 
-> > The original reason was to test Linux using MOVBE even on non-Atom 
-> > machines, when MOVBE was only on Atoms. :)
-> 
-> So the emulator's logic for MOVBE is meant to be tested only when the
-> guest supports MOVBE while the host does not?
+On Fri, Aug 5, 2022 at 11:11 AM Will Deacon <will@kernel.org> wrote:
+>
+> [tl;dr a change from ~18 months ago breaks Android userspace and I don't
+>  know what to do about it]
 
-Ah, I see what you're asking.  No, it's perfectly legal to test MOVBE emulation
-on hosts that support MOVBE, i.e. using FEP is allowed.  But because KVM emulates
-MOVBE on #UD and the KUT testcase is guaranteed to generate a #UD (barring a
-hardware bug), there's no need to use FEP.  And not using FEP is advantageous
-because it avoids depending on an opt-in non-production module param.
+Augh.
+
+I had hoped that android being "closer" to upstream would have meant
+that somebody actually tests android with upstream kernels. People
+occasionally talk about it, but apparently it's not actually done.
+
+Or maybe it's done onl;y with a very limited android user space.
+
+The whole "we notice that something that happened 18 months ago broke
+our environment" is kind of broken.
+
+> After some digging, we narrowed this change in behaviour down to
+> e13a6915a03f ("vhost/vsock: add IOTLB API support") and further digging
+> reveals that the infamous VIRTIO_F_ACCESS_PLATFORM feature flag is to
+> blame. Indeed, our tests once again pass if we revert that patch (there's
+> a trivial conflict with the later addition of VIRTIO_VSOCK_F_SEQPACKET
+> but otherwise it reverts cleanly).
+
+I have to say, this smells for *so* many reasons.
+
+Why is "IOMMU support" called "VIRTIO_F_ACCESS_PLATFORM"?
+
+That seems insane, but seems fundamental in that commit e13a6915a03f
+("vhost/vsock: add IOTLB API support")
+
+This code
+
+        if ((features & (1ULL << VIRTIO_F_ACCESS_PLATFORM))) {
+                if (vhost_init_device_iotlb(&vsock->dev, true))
+                        goto err;
+        }
+
+just makes me go "What?"  It makes no sense. Why isn't that feature
+called something-something-IOTLB?
+
+Can we please just split that flag into two, and have that odd
+"platform access" be one bit, and the "enable iommu" be an entirely
+different bit?
+
+Now, since clearly nobody runs Android on newer kernels, I do think
+that the actual bit number choice should probably be one that makes
+the non-android use case binaries continue to work. And then the
+android system binaries that use this could maybe be compiled to know
+about *both* bits,. and work regardless?
+
+I'm also hoping that maybe Google android people could actually do
+some *testing*? I know, that sounds like a lot to ask, but humor me.
+Even if the product team runs stuff that is 18 months old, how about
+the dev team have a machine or two that actually tests current
+kernels, so that it's not a "oh, a few years have passed, and now we
+notice that a change doesn't work for us" situation any more.
+
+Is that really too much to ask for a big company like google?
+
+And hey, it's possible that the bit encoding is *so* incestuous that
+it's really hard to split it into two. But it really sounds to me like
+somebody mindlessly re-used a feature bit for a *completely* different
+thing. Why?
+
+Why have feature bits at all, when you then re-use the same bit for
+two different features? It kind of seems to defeat the whole purpose.
+
+                 Linus
