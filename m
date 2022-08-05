@@ -2,99 +2,338 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 2E96358AB37
-	for <lists+kvm@lfdr.de>; Fri,  5 Aug 2022 15:03:05 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id A2BA858AB65
+	for <lists+kvm@lfdr.de>; Fri,  5 Aug 2022 15:11:57 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S240832AbiHENDD (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 5 Aug 2022 09:03:03 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56682 "EHLO
+        id S237867AbiHENL4 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 5 Aug 2022 09:11:56 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34650 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S236060AbiHENDC (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 5 Aug 2022 09:03:02 -0400
-Received: from mail-ej1-x62e.google.com (mail-ej1-x62e.google.com [IPv6:2a00:1450:4864:20::62e])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A753827FE4
-        for <kvm@vger.kernel.org>; Fri,  5 Aug 2022 06:02:59 -0700 (PDT)
-Received: by mail-ej1-x62e.google.com with SMTP id tl27so4957277ejc.1
-        for <kvm@vger.kernel.org>; Fri, 05 Aug 2022 06:02:59 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=ventanamicro.com; s=google;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc;
-        bh=0XuiDf7ZoorVaLM+ZvCJPN0Mvu7jh9ql5l2EsEhr6Do=;
-        b=JsBJZy5qI1My4jnleZ6nW8bQNRruNmU5La8PExjmrcUHXBadstNssmsT/mkIpSaie4
-         VKWLmY2/yW0JdXBEHSIHRB93nAv+zHt/6UX6qViePP06c6hqboq3v4BW/Erx9P3XCJzj
-         rgttPsyrThmV82/wk9C06ONY9SpYglBZjpQMSZ0UqI3/Y9zXOVTyU74XBKzdmoxK1xaM
-         OSre9z8nHoV9yjG2Pb2uF2X7ZF0ixQ7o9eEsmuhbLW8G8+Omp/tuOXSOdBax5nUPydhq
-         CrWpgp8fP+bJKBwk0Ed/yr4MI+g0WYiV9m+8nqqtYFP4L8T+LcV3b8mOt/8UhUjCbXVv
-         qKwg==
+        with ESMTP id S235890AbiHENLy (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 5 Aug 2022 09:11:54 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id A8FEA1AD8D
+        for <kvm@vger.kernel.org>; Fri,  5 Aug 2022 06:11:53 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1659705112;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=AyPKB0mAxCNUUWTYUlhhyb+rMbnmnQZaMJrhaPpuC5o=;
+        b=FR3DLY6NClwfoONa1EZtU7gSpmoBUnwAKre2xBwNC9K2RdzQLD8rZbz3xRnnHQAf8cafqS
+        UrpHv5PANLq5VtqdV+0OlMfFDuuhcMqZ8zqF9BKvXlF4bHyKLJvmZD7iTuRwnSExna/wpV
+        6hXLQh8CdxxKEQDYA7XNXPkn9R5CLRA=
+Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
+ [209.85.221.72]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-602-1HZzRCprPYKgGIajTCKr2g-1; Fri, 05 Aug 2022 09:11:51 -0400
+X-MC-Unique: 1HZzRCprPYKgGIajTCKr2g-1
+Received: by mail-wr1-f72.google.com with SMTP id w17-20020adfbad1000000b0021f0acd5398so489295wrg.1
+        for <kvm@vger.kernel.org>; Fri, 05 Aug 2022 06:11:50 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc;
-        bh=0XuiDf7ZoorVaLM+ZvCJPN0Mvu7jh9ql5l2EsEhr6Do=;
-        b=4ynpZ131J5PqpGjN73PB9aC9C5vlz5cW7Mtswj9VbTEAu755kmlGxjJaPnPYHQG39v
-         jK3cAfhHEWdEM2tpaerSq7ko+ZqZmnKzq873nqnU+SLQU2Xn3RxiSrVpUh3AP0W5GFCw
-         eRwPDsRBh+R08Tp751b/+DL1zTrTiPRZAR5TgYgwu50KZIvd9iuL1R4PGk93ZgR+JMtQ
-         Cbe2oCPN+jX0iXhMvANs124LR2ZkgV76apYf2dHxv5p6oElKaf/Zzt+498Xvf0EI7w50
-         e1G4Y/+pLx+IAMrXeitIKHZ50Cp7bhF2RFyWa9zX79rZ5RXaVgM0gYwejbaax6KZR8bL
-         OmjQ==
-X-Gm-Message-State: ACgBeo3nq+eCeZIW0pocUV/+R/l7UqqaBB3pSwjAeTZgu+Q5qtaRX2lF
-        l7HgZTlrtZu9VUwUa3w/26Apmrq1OmWnhQ==
-X-Google-Smtp-Source: AA6agR7lByrCnadveJD+BqR40UPm2GGfJ92K8HT36mw+5wkAGAvvn6OnKuKpOgVBxyPD9H74YT15mA==
-X-Received: by 2002:a17:907:7ea7:b0:72b:6e6b:4895 with SMTP id qb39-20020a1709077ea700b0072b6e6b4895mr5100014ejc.338.1659704578006;
-        Fri, 05 Aug 2022 06:02:58 -0700 (PDT)
-Received: from localhost (cst2-173-67.cust.vodafone.cz. [31.30.173.67])
-        by smtp.gmail.com with ESMTPSA id j27-20020a056402239b00b0043d6ece495asm2039293eda.55.2022.08.05.06.02.57
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 05 Aug 2022 06:02:57 -0700 (PDT)
-From:   Andrew Jones <ajones@ventanamicro.com>
-To:     kvm@vger.kernel.org, kvm-riscv@lists.infradead.org
-Cc:     Paolo Bonzini <pbonzini@redhat.com>,
-        Anup Patel <anup@brainfault.org>
-Subject: [PATCH] RISC-V: KVM: Fix compile after merge
-Date:   Fri,  5 Aug 2022 15:02:56 +0200
-Message-Id: <20220805130256.683070-1-ajones@ventanamicro.com>
-X-Mailer: git-send-email 2.37.1
+        h=content-transfer-encoding:in-reply-to:subject:organization:from
+         :references:cc:to:content-language:user-agent:mime-version:date
+         :message-id:x-gm-message-state:from:to:cc;
+        bh=AyPKB0mAxCNUUWTYUlhhyb+rMbnmnQZaMJrhaPpuC5o=;
+        b=dvHcPtK4Q1OhQ+EnS6VfbfVhZRWrpo/T4xTo5rQqKYTDTgPpeoV5flveALHqEtYb30
+         BwsveUu9rOwhXigBH8vffYOfn6uZYax8FTsexvBuysD7ImLUwWxPFWI1UYzW+rFlrvyg
+         SS07VYDTafmkuaV3QpChcXf1OYBEDG/iHFlNCUiTIdQ30Yn5npReg7M7WFF73clzx/Og
+         JtbJjrnY8rBKT7sdV/CCfQNs23zgjOxN+xfsg3O9dhVqGMII37ciwSg8G8cZBEBNUWUZ
+         YBfwrOSBdmvh3T1edv2Zg2lg9hoaRa3hgekdn+BFys+qhMREybSiWdHoDUqzu2uPwcrF
+         h80Q==
+X-Gm-Message-State: ACgBeo1+L7wNTL+fwqpQ6JVI7uGMHVNeQ+1ZQ2VmbmK0zf5Bgkd5DPje
+        jwZxO2alVRZF5yt6faqlC7EhNtQLVez+erBPxiyCqpU5p5a1Q0mGZ+CaR3q4OKN2DK7jaFjdGQj
+        7vpIBh46WlP/a
+X-Received: by 2002:a05:600c:22d8:b0:3a5:1450:669e with SMTP id 24-20020a05600c22d800b003a51450669emr4266313wmg.102.1659705109370;
+        Fri, 05 Aug 2022 06:11:49 -0700 (PDT)
+X-Google-Smtp-Source: AA6agR4maTuPBUIPkvn2YU8/xJs1p/whDw6HWacNW7NECuUlgU3tCxwmiRypaxnYb/j68PL3fr0dTA==
+X-Received: by 2002:a05:600c:22d8:b0:3a5:1450:669e with SMTP id 24-20020a05600c22d800b003a51450669emr4266282wmg.102.1659705109038;
+        Fri, 05 Aug 2022 06:11:49 -0700 (PDT)
+Received: from ?IPV6:2003:cb:c706:fb00:f5c3:24b2:3d03:9d52? (p200300cbc706fb00f5c324b23d039d52.dip0.t-ipconnect.de. [2003:cb:c706:fb00:f5c3:24b2:3d03:9d52])
+        by smtp.gmail.com with ESMTPSA id b21-20020a05600c06d500b0039c5ab7167dsm8505998wmn.48.2022.08.05.06.11.47
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 05 Aug 2022 06:11:48 -0700 (PDT)
+Message-ID: <c0c10ef9-b811-f259-9117-f056612c8bd1@redhat.com>
+Date:   Fri, 5 Aug 2022 15:11:46 +0200
 MIME-Version: 1.0
-Content-type: text/plain
-Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
-        autolearn_force=no version=3.4.6
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.11.0
+Content-Language: en-US
+To:     Chao Peng <chao.p.peng@linux.intel.com>, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org, linux-mm@kvack.org,
+        linux-fsdevel@vger.kernel.org, linux-api@vger.kernel.org,
+        linux-doc@vger.kernel.org, qemu-devel@nongnu.org,
+        linux-kselftest@vger.kernel.org
+Cc:     Paolo Bonzini <pbonzini@redhat.com>,
+        Jonathan Corbet <corbet@lwn.net>,
+        Sean Christopherson <seanjc@google.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+        x86@kernel.org, "H . Peter Anvin" <hpa@zytor.com>,
+        Hugh Dickins <hughd@google.com>,
+        Jeff Layton <jlayton@kernel.org>,
+        "J . Bruce Fields" <bfields@fieldses.org>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        Shuah Khan <shuah@kernel.org>, Mike Rapoport <rppt@kernel.org>,
+        Steven Price <steven.price@arm.com>,
+        "Maciej S . Szmigiero" <mail@maciej.szmigiero.name>,
+        Vlastimil Babka <vbabka@suse.cz>,
+        Vishal Annapurve <vannapurve@google.com>,
+        Yu Zhang <yu.c.zhang@linux.intel.com>,
+        "Kirill A . Shutemov" <kirill.shutemov@linux.intel.com>,
+        luto@kernel.org, jun.nakajima@intel.com, dave.hansen@intel.com,
+        ak@linux.intel.com, aarcange@redhat.com, ddutile@redhat.com,
+        dhildenb@redhat.com, Quentin Perret <qperret@google.com>,
+        Michael Roth <michael.roth@amd.com>, mhocko@suse.com,
+        Muchun Song <songmuchun@bytedance.com>
+References: <20220706082016.2603916-1-chao.p.peng@linux.intel.com>
+ <20220706082016.2603916-3-chao.p.peng@linux.intel.com>
+From:   David Hildenbrand <david@redhat.com>
+Organization: Red Hat
+Subject: Re: [PATCH v7 02/14] selftests/memfd: Add tests for
+ F_SEAL_AUTO_ALLOCATE
+In-Reply-To: <20220706082016.2603916-3-chao.p.peng@linux.intel.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-Spam-Status: No, score=-2.7 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
+        RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE
+        autolearn=unavailable autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-The compiler usually complains that we've forgotten to dot our i's and
-cross our t's, but this time it was complaining that we dotted our
-commas. Undot the commas (a.k.a change ; to ,) to restore compilation.
+On 06.07.22 10:20, Chao Peng wrote:
+> Add tests to verify sealing memfds with the F_SEAL_AUTO_ALLOCATE works
+> as expected.
+> 
+> Signed-off-by: Chao Peng <chao.p.peng@linux.intel.com>
+> ---
+>  tools/testing/selftests/memfd/memfd_test.c | 166 +++++++++++++++++++++
+>  1 file changed, 166 insertions(+)
+> 
+> diff --git a/tools/testing/selftests/memfd/memfd_test.c b/tools/testing/selftests/memfd/memfd_test.c
+> index 94df2692e6e4..b849ece295fd 100644
+> --- a/tools/testing/selftests/memfd/memfd_test.c
+> +++ b/tools/testing/selftests/memfd/memfd_test.c
+> @@ -9,6 +9,7 @@
+>  #include <fcntl.h>
+>  #include <linux/memfd.h>
+>  #include <sched.h>
+> +#include <setjmp.h>
+>  #include <stdio.h>
+>  #include <stdlib.h>
+>  #include <signal.h>
+> @@ -232,6 +233,31 @@ static void mfd_fail_open(int fd, int flags, mode_t mode)
+>  	}
+>  }
+>  
+> +static void mfd_assert_fallocate(int fd)
+> +{
+> +	int r;
+> +
+> +	r = fallocate(fd, 0, 0, mfd_def_size);
+> +	if (r < 0) {
+> +		printf("fallocate(ALLOC) failed: %m\n");
+> +		abort();
+> +	}
+> +}
+> +
+> +static void mfd_assert_punch_hole(int fd)
+> +{
+> +	int r;
+> +
+> +	r = fallocate(fd,
+> +		      FALLOC_FL_PUNCH_HOLE | FALLOC_FL_KEEP_SIZE,
+> +		      0,
+> +		      mfd_def_size);
+> +	if (r < 0) {
+> +		printf("fallocate(PUNCH_HOLE) failed: %m\n");
+> +		abort();
+> +	}
+> +}
+> +
+>  static void mfd_assert_read(int fd)
+>  {
+>  	char buf[16];
+> @@ -594,6 +620,94 @@ static void mfd_fail_grow_write(int fd)
+>  	}
+>  }
+>  
+> +static void mfd_assert_hole_write(int fd)
+> +{
+> +	ssize_t l;
+> +	void *p;
+> +	char *p1;
+> +
+> +	/*
+> +	 * huegtlbfs does not support write, but we want to
+> +	 * verify everything else here.
+> +	 */
+> +	if (!hugetlbfs_test) {
+> +		/* verify direct write() succeeds */
+> +		l = write(fd, "\0\0\0\0", 4);
+> +		if (l != 4) {
+> +			printf("write() failed: %m\n");
+> +			abort();
+> +		}
+> +	}
+> +
+> +	/* verify mmaped write succeeds */
+> +	p = mmap(NULL,
+> +		 mfd_def_size,
+> +		 PROT_READ | PROT_WRITE,
+> +		 MAP_SHARED,
+> +		 fd,
+> +		 0);
+> +	if (p == MAP_FAILED) {
+> +		printf("mmap() failed: %m\n");
+> +		abort();
+> +	}
+> +	p1 = (char *)p + mfd_def_size - 1;
+> +	*p1 = 'H';
+> +	if (*p1 != 'H') {
+> +		printf("mmaped write failed: %m\n");
+> +		abort();
+> +
+> +	}
+> +	munmap(p, mfd_def_size);
+> +}
+> +
+> +sigjmp_buf jbuf, *sigbuf;
+> +static void sig_handler(int sig, siginfo_t *siginfo, void *ptr)
+> +{
+> +	if (sig == SIGBUS) {
+> +		if (sigbuf)
+> +			siglongjmp(*sigbuf, 1);
+> +		abort();
+> +	}
+> +}
+> +
+> +static void mfd_fail_hole_write(int fd)
+> +{
+> +	ssize_t l;
+> +	void *p;
+> +	char *p1;
+> +
+> +	/* verify direct write() fails */
+> +	l = write(fd, "data", 4);
+> +	if (l > 0) {
+> +		printf("expected failure on write(), but got %d: %m\n", (int)l);
+> +		abort();
+> +	}
+> +
+> +	/* verify mmaped write fails */
+> +	p = mmap(NULL,
+> +		 mfd_def_size,
+> +		 PROT_READ | PROT_WRITE,
+> +		 MAP_SHARED,
+> +		 fd,
+> +		 0);
+> +	if (p == MAP_FAILED) {
+> +		printf("mmap() failed: %m\n");
+> +		abort();
+> +	}
+> +
+> +	sigbuf = &jbuf;
+> +	if (sigsetjmp(*sigbuf, 1))
+> +		goto out;
+> +
+> +	/* Below write should trigger SIGBUS signal */
+> +	p1 = (char *)p + mfd_def_size - 1;
+> +	*p1 = 'H';
 
-Applies to kvm/queue.
+Maybe you want to verify separately, that bothj
 
-Fixes: 24688433d2ef ("Merge remote-tracking branch 'kvm/next' into kvm-next-5.20")
-Signed-off-by: Andrew Jones <ajones@ventanamicro.com>
----
- arch/riscv/kvm/mmu.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+> +	printf("failed to receive SIGBUS for mmaped write: %m\n");
+> +	abort();
+> +out:
+> +	munmap(p, mfd_def_size);
+> +}
+> +
+>  static int idle_thread_fn(void *arg)
+>  {
+>  	sigset_t set;
+> @@ -880,6 +994,57 @@ static void test_seal_resize(void)
+>  	close(fd);
+>  }
+>  
+> +/*
+> + * Test F_SEAL_AUTO_ALLOCATE
+> + * Test whether F_SEAL_AUTO_ALLOCATE actually prevents allocation.
+> + */
+> +static void test_seal_auto_allocate(void)
+> +{
+> +	struct sigaction act;
+> +	int fd;
+> +
+> +	printf("%s SEAL-AUTO-ALLOCATE\n", memfd_str);
+> +
+> +	memset(&act, 0, sizeof(act));
+> +	act.sa_sigaction = sig_handler;
+> +	act.sa_flags = SA_SIGINFO;
+> +	if (sigaction(SIGBUS, &act, 0)) {
+> +		printf("sigaction() failed: %m\n");
+> +		abort();
+> +	}
+> +
+> +	fd = mfd_assert_new("kern_memfd_seal_auto_allocate",
+> +			    mfd_def_size,
+> +			    MFD_CLOEXEC | MFD_ALLOW_SEALING);
+> +
+> +	/* read/write should pass if F_SEAL_AUTO_ALLOCATE not set */
+> +	mfd_assert_read(fd);
+> +	mfd_assert_hole_write(fd);
+> +
+> +	mfd_assert_has_seals(fd, 0);
+> +	mfd_assert_add_seals(fd, F_SEAL_AUTO_ALLOCATE);
+> +	mfd_assert_has_seals(fd, F_SEAL_AUTO_ALLOCATE);
+> +
+> +	/* read/write should pass for pre-allocated area */
+> +	mfd_assert_read(fd);
+> +	mfd_assert_hole_write(fd);
+> +
+> +	mfd_assert_punch_hole(fd);
+> +
+> +	/* read should pass, write should fail in hole */
+> +	mfd_assert_read(fd);
+> +	mfd_fail_hole_write(fd);
+> +
+> +	mfd_assert_fallocate(fd);
+> +
+> +	/* read/write should pass after fallocate */
+> +	mfd_assert_read(fd);
+> +	mfd_assert_hole_write(fd);
+> +
+> +	close(fd);
+> +}
 
-diff --git a/arch/riscv/kvm/mmu.c b/arch/riscv/kvm/mmu.c
-index f9edfe31656c..3a35b2d95697 100644
---- a/arch/riscv/kvm/mmu.c
-+++ b/arch/riscv/kvm/mmu.c
-@@ -352,8 +352,8 @@ int kvm_riscv_gstage_ioremap(struct kvm *kvm, gpa_t gpa,
- 	unsigned long pfn;
- 	phys_addr_t addr, end;
- 	struct kvm_mmu_memory_cache pcache = {
--		.gfp_custom = (in_atomic) ? GFP_ATOMIC | __GFP_ACCOUNT : 0;
--		.gfp_zero = __GFP_ZERO;
-+		.gfp_custom = (in_atomic) ? GFP_ATOMIC | __GFP_ACCOUNT : 0,
-+		.gfp_zero = __GFP_ZERO,
- 	};
- 
- 	end = (gpa + size + PAGE_SIZE - 1) & PAGE_MASK;
+What might make sense is to verify for the following operations:
+* read()
+* write()
+* read via mmap
+* write via mmap
+
+After sealing on a hole, that there is *still* a hole and that only the
+read() might succeed, with a comment stating that shmem optimized for
+read on holes by reading from the shared zeropage.
+
+I'd suggest decoupling hole_write from hole_mmap_write and similarly
+have hole_read and hole_mmap_read.
+
+You should be able to use fstat() to obtain the number of allocated
+blocks to check that fairly easily.
+
 -- 
-2.37.1
+Thanks,
+
+David / dhildenb
 
