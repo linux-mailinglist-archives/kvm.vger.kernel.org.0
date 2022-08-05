@@ -2,124 +2,94 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 5000F58AF40
-	for <lists+kvm@lfdr.de>; Fri,  5 Aug 2022 19:55:53 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 97D2E58AF81
+	for <lists+kvm@lfdr.de>; Fri,  5 Aug 2022 20:03:35 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S241531AbiHERzt (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 5 Aug 2022 13:55:49 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38140 "EHLO
+        id S240958AbiHESDe (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 5 Aug 2022 14:03:34 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44496 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S241489AbiHERzq (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 5 Aug 2022 13:55:46 -0400
-Received: from mail-ed1-x52f.google.com (mail-ed1-x52f.google.com [IPv6:2a00:1450:4864:20::52f])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 110CAE0E9;
-        Fri,  5 Aug 2022 10:55:45 -0700 (PDT)
-Received: by mail-ed1-x52f.google.com with SMTP id z22so4288157edd.6;
-        Fri, 05 Aug 2022 10:55:44 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=sender:message-id:date:mime-version:user-agent:subject
-         :content-language:to:cc:references:from:in-reply-to
-         :content-transfer-encoding;
-        bh=3pDyPaXmSjg1dfYYTVcD5twgm0VJEcQCaH5PzUebh+o=;
-        b=NasTXfyIKwSXshhH6uRWdhVe4jCKkDoBRipCni1OVWDHHkSZE8iK0Vhw289lgKT2uv
-         qS6eMQm42wwQy1UZM4kkyrdch99ditPm3awIimLr82sU3if3bt8aw/xZpAu/zujUoS54
-         cekJu+G0f5hLStL7JaE8TqYvMOIiGi/Jpq7aUtENnLq1amafw+ZX0Y2XkXTjLvABPgZy
-         B2U3SlVeDIS9e9u0kjZ4XgI66qvYPgtf+Dc14Ob180027TtXQXfKeB9PzzQrAjBFtZj5
-         NCEt46wYh/AQ0HNsMQk9lnmN60NZeyIIR4J9rMfvYs5Q3+KGn6pMjwuXrHIEpd4ll7dC
-         5XQA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:sender:message-id:date:mime-version:user-agent
-         :subject:content-language:to:cc:references:from:in-reply-to
-         :content-transfer-encoding;
-        bh=3pDyPaXmSjg1dfYYTVcD5twgm0VJEcQCaH5PzUebh+o=;
-        b=TVlx1kQ+ha3dWHQG8yoWH5f/MhMl/SOMwkbKc0Qb06cl3SA4nN3h4wptGqxB7i9qUc
-         sJGHAs7gb6itmZxkzn8PZdteNdCtSM0QyeDqXLxB+3NDeGCvirpN5KdRp5ySspcUwfx3
-         gyj1WhNz/xPWvlXw7Z3XeKrSg3/XwxXtaygwD4YvFrXcP1Gb/2Ra2+3e3ZLD2onnXjMz
-         yA8KUwYuvfh4o5kQHUqQjpiKcv6W5yrVP6tXsvR8Y5hqwfFNmtTmj26UiGKBQXVueuk/
-         R0LlCXaAPxffPeCOgrnCagzMjaKxTxnVavBli9qKRDc4+phh5CI7e/1Nz12rsj0wVGQ+
-         zV5g==
-X-Gm-Message-State: ACgBeo2phJFfYh2nwdG4n7DvZeWHLPGjrvxqqA6arqu/6XQckarWDOTj
-        OyYKRgQ//b0uCruObqkQ/lIjOgr2WQxwjA==
-X-Google-Smtp-Source: AA6agR5VWBwmuMByhlGp2jZk5km25TlB77WRs6fSjW6q6o8glqXJyrvjZip6gTq1ZgU4MWVWBbx1Kw==
-X-Received: by 2002:a05:6402:5518:b0:43a:9e32:b6fc with SMTP id fi24-20020a056402551800b0043a9e32b6fcmr8004431edb.252.1659722143505;
-        Fri, 05 Aug 2022 10:55:43 -0700 (PDT)
-Received: from ?IPV6:2001:b07:6468:f312:9af8:e5f5:7516:fa89? ([2001:b07:6468:f312:9af8:e5f5:7516:fa89])
-        by smtp.googlemail.com with ESMTPSA id b11-20020a17090630cb00b0072b36cbcdaasm1809391ejb.92.2022.08.05.10.55.39
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 05 Aug 2022 10:55:42 -0700 (PDT)
-Sender: Paolo Bonzini <paolo.bonzini@gmail.com>
-Message-ID: <472207cf-ff71-563b-7b66-0c7bea9ea8ad@redhat.com>
-Date:   Fri, 5 Aug 2022 19:55:38 +0200
+        with ESMTP id S232434AbiHESDc (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 5 Aug 2022 14:03:32 -0400
+Received: from mga09.intel.com (mga09.intel.com [134.134.136.24])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6D124FCC;
+        Fri,  5 Aug 2022 11:03:31 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1659722611; x=1691258611;
+  h=message-id:date:mime-version:subject:to:cc:references:
+   from:in-reply-to:content-transfer-encoding;
+  bh=4UbjXMUoFUj6pk9VzCRvRkLjyHe1GWl9h8Xxca2jeaI=;
+  b=YU9duljHeyHGz1u8aVmDmtgo7T4Y0VZn/Tw9Z0ZCBIV3whIApgl2mJHZ
+   d5ZahDTZYWfwGxej7vhKZAW/RzKUzIoWCIvsuvwMx+qkwXtu25AZqMvvB
+   kP1Sb/OCGtl5uNN/fCiCyWwqV8x6wIX/LBIu1P9ciQDo5dbnfcuL8QPNG
+   vX6TL515MlyXLKyw9L0XGTsGpg0LgSOeIws/Hg9pSsNbGt7JwPFHTwbg0
+   mCg5fKJJOzeyfUeVuUymJjSqvdVB7ebjn05IkUcaLD2LPuBz2hp5PVeTx
+   59W/OcByViqR8KdSZThX2ygKJyI8BPyla3Vnwl6zWBvcISBa8D7jK1/Kt
+   g==;
+X-IronPort-AV: E=McAfee;i="6400,9594,10430"; a="291031704"
+X-IronPort-AV: E=Sophos;i="5.93,216,1654585200"; 
+   d="scan'208";a="291031704"
+Received: from orsmga006.jf.intel.com ([10.7.209.51])
+  by orsmga102.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 05 Aug 2022 11:03:31 -0700
+X-IronPort-AV: E=Sophos;i="5.93,216,1654585200"; 
+   d="scan'208";a="579584529"
+Received: from rderber-mobl1.amr.corp.intel.com (HELO [10.212.217.71]) ([10.212.217.71])
+  by orsmga006-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 05 Aug 2022 11:03:30 -0700
+Message-ID: <d815d964-3a31-024b-7f07-04da86cc62ae@intel.com>
+Date:   Fri, 5 Aug 2022 11:03:31 -0700
 MIME-Version: 1.0
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
  Thunderbird/91.11.0
-Subject: Re: [PATCH v7 01/14] mm: Add F_SEAL_AUTO_ALLOCATE seal to memfd
+Subject: Re: [PATCH v2] x86/fpu: Allow PKRU to be (once again) written by
+ ptrace.
 Content-Language: en-US
-To:     David Hildenbrand <david@redhat.com>,
-        Chao Peng <chao.p.peng@linux.intel.com>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org, linux-mm@kvack.org,
-        linux-fsdevel@vger.kernel.org, linux-api@vger.kernel.org,
-        linux-doc@vger.kernel.org, qemu-devel@nongnu.org,
-        linux-kselftest@vger.kernel.org
-Cc:     Jonathan Corbet <corbet@lwn.net>,
-        Sean Christopherson <seanjc@google.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>,
+To:     Kyle Huey <me@kylehuey.com>,
+        Dave Hansen <dave.hansen@linux.intel.com>,
         Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        x86@kernel.org, "H . Peter Anvin" <hpa@zytor.com>,
-        Hugh Dickins <hughd@google.com>,
-        Jeff Layton <jlayton@kernel.org>,
-        "J . Bruce Fields" <bfields@fieldses.org>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        Shuah Khan <shuah@kernel.org>, Mike Rapoport <rppt@kernel.org>,
-        Steven Price <steven.price@arm.com>,
-        "Maciej S . Szmigiero" <mail@maciej.szmigiero.name>,
-        Vlastimil Babka <vbabka@suse.cz>,
-        Vishal Annapurve <vannapurve@google.com>,
-        Yu Zhang <yu.c.zhang@linux.intel.com>,
-        "Kirill A . Shutemov" <kirill.shutemov@linux.intel.com>,
-        luto@kernel.org, jun.nakajima@intel.com, dave.hansen@intel.com,
-        ak@linux.intel.com, aarcange@redhat.com, ddutile@redhat.com,
-        dhildenb@redhat.com, Quentin Perret <qperret@google.com>,
-        Michael Roth <michael.roth@amd.com>, mhocko@suse.com,
-        Muchun Song <songmuchun@bytedance.com>
-References: <20220706082016.2603916-1-chao.p.peng@linux.intel.com>
- <20220706082016.2603916-2-chao.p.peng@linux.intel.com>
- <f39c4f63-a511-4beb-b3a4-66589ddb5475@redhat.com>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-In-Reply-To: <f39c4f63-a511-4beb-b3a4-66589ddb5475@redhat.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
+        Borislav Petkov <bp@alien8.de>
+Cc:     Ingo Molnar <mingo@redhat.com>, x86@kernel.org,
+        "H. Peter Anvin" <hpa@zytor.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Andy Lutomirski <luto@kernel.org>,
+        Peter Zijlstra <peterz@infradead.org>,
+        linux-kernel@vger.kernel.org,
+        Robert O'Callahan <robert@ocallahan.org>,
+        David Manouchehri <david.manouchehri@riseup.net>,
+        Borislav Petkov <bp@suse.de>, kvm@vger.kernel.org,
+        stable@vger.kernel.org
+References: <20220804031632.52921-1-khuey@kylehuey.com>
+ <b3464e21-95e8-a80e-bf98-3c90c06afb91@intel.com>
+From:   Dave Hansen <dave.hansen@intel.com>
+In-Reply-To: <b3464e21-95e8-a80e-bf98-3c90c06afb91@intel.com>
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-1.5 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_EF,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-        HEADER_FROM_DIFFERENT_DOMAINS,NICE_REPLY_A,RCVD_IN_DNSWL_NONE,
-        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=no
-        autolearn_force=no version=3.4.6
+X-Spam-Status: No, score=-5.0 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
+        RCVD_IN_DNSWL_MED,RCVD_IN_MSPIKE_H3,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,
+        SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no
+        version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 7/21/22 11:44, David Hildenbrand wrote:
-> 
-> Also, I*think*  you can place pages via userfaultfd into shmem. Not
-> sure if that would count "auto alloc", but it would certainly bypass
-> fallocate().
+On 8/5/22 10:24, Dave Hansen wrote:
+> On 8/3/22 20:16, Kyle Huey wrote:
+>> When management of the PKRU register was moved away from XSTATE, emulation
+>> of PKRU's existence in XSTATE was added for APIs that read XSTATE, but not
+>> for APIs that write XSTATE. This can be seen by running gdb and executing
+>> `p $pkru`, `set $pkru = 42`, and `p $pkru`. On affected kernels (5.14+) the
+>> write to the PKRU register (which gdb performs through ptrace) is ignored.
+> Do you happen to have a reproducer for this sitting around?  I'd love to
+> get an addition to the pkeys selftest/ in place to make sure we don't
+> break this again.  PKRU is a very special snowflake.
 
-Yeah, userfaultfd_register would probably have to forbid this for 
-F_SEAL_AUTO_ALLOCATE vmas.  Maybe the memfile_node can be reused for 
-this, adding a new MEMFILE_F_NO_AUTO_ALLOCATE flags?  Then 
-userfault_register would do something like 
-memfile_node_get_flags(vma->vm_file) and check the result.
+Let me put this another way: I'm much more likely to quickly merge fixes
+that come with a selftest that demonstrates the breakage and the fix.
+An in-kernel test ensures:
 
-This means moving this patch later, after "mm: Introduce memfile_notifier".
-
-Thanks,
-
-Paolo
+1. There is a problem now
+2. The patch fixes the problem
+3. The problem does not recur
