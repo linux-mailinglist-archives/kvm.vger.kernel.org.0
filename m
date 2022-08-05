@@ -2,150 +2,124 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 33CBE58AEE8
-	for <lists+kvm@lfdr.de>; Fri,  5 Aug 2022 19:30:02 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 5000F58AF40
+	for <lists+kvm@lfdr.de>; Fri,  5 Aug 2022 19:55:53 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S241185AbiHER37 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 5 Aug 2022 13:29:59 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44306 "EHLO
+        id S241531AbiHERzt (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 5 Aug 2022 13:55:49 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38140 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S241100AbiHER3z (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 5 Aug 2022 13:29:55 -0400
-Received: from mail-pf1-x449.google.com (mail-pf1-x449.google.com [IPv6:2607:f8b0:4864:20::449])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EB56B2C12F
-        for <kvm@vger.kernel.org>; Fri,  5 Aug 2022 10:29:53 -0700 (PDT)
-Received: by mail-pf1-x449.google.com with SMTP id w124-20020a627b82000000b0052d8ebfc055so1480648pfc.19
-        for <kvm@vger.kernel.org>; Fri, 05 Aug 2022 10:29:53 -0700 (PDT)
+        with ESMTP id S241489AbiHERzq (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 5 Aug 2022 13:55:46 -0400
+Received: from mail-ed1-x52f.google.com (mail-ed1-x52f.google.com [IPv6:2a00:1450:4864:20::52f])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 110CAE0E9;
+        Fri,  5 Aug 2022 10:55:45 -0700 (PDT)
+Received: by mail-ed1-x52f.google.com with SMTP id z22so4288157edd.6;
+        Fri, 05 Aug 2022 10:55:44 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=cc:to:from:subject:references:mime-version:message-id:in-reply-to
-         :date:reply-to:from:to:cc;
-        bh=e3KAREkpALrV805apy/PR/815kpRUNyRkecRR9ka60I=;
-        b=s7N8DoTy9J5L3pDUtmYf7WwNsc0rFgtyd//8fTsC4PsYsqL01l+itwXylbdINPpF42
-         zPqY+T5YPKXBC3/JvrM3fdfnqfj/eeTcdNWnvE2iwA5uirekuCrZ+3S9oVF/pisilJ8V
-         LJnz35HXY/vNeAkyWc9LeE7xQN7v1LIDjP0xhck2iHjbmhSHWtJDWRMYTkGiEu18k8tW
-         2j0XG9x6d3IpbZgWahqwD8bBO6zToasLMve6pEoNb59EoXystkjZTr6HZAMiG4EppzGa
-         0GOmS6f0zKmKP584mT1zChMCT4aA8jfOhHAOmOSPahOmuEAYMiDzD5/RGMCPQFcKLllQ
-         aq3g==
+        d=gmail.com; s=20210112;
+        h=sender:message-id:date:mime-version:user-agent:subject
+         :content-language:to:cc:references:from:in-reply-to
+         :content-transfer-encoding;
+        bh=3pDyPaXmSjg1dfYYTVcD5twgm0VJEcQCaH5PzUebh+o=;
+        b=NasTXfyIKwSXshhH6uRWdhVe4jCKkDoBRipCni1OVWDHHkSZE8iK0Vhw289lgKT2uv
+         qS6eMQm42wwQy1UZM4kkyrdch99ditPm3awIimLr82sU3if3bt8aw/xZpAu/zujUoS54
+         cekJu+G0f5hLStL7JaE8TqYvMOIiGi/Jpq7aUtENnLq1amafw+ZX0Y2XkXTjLvABPgZy
+         B2U3SlVeDIS9e9u0kjZ4XgI66qvYPgtf+Dc14Ob180027TtXQXfKeB9PzzQrAjBFtZj5
+         NCEt46wYh/AQ0HNsMQk9lnmN60NZeyIIR4J9rMfvYs5Q3+KGn6pMjwuXrHIEpd4ll7dC
+         5XQA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=cc:to:from:subject:references:mime-version:message-id:in-reply-to
-         :date:reply-to:x-gm-message-state:from:to:cc;
-        bh=e3KAREkpALrV805apy/PR/815kpRUNyRkecRR9ka60I=;
-        b=nnFoDx6vsCsgC1hU8aD0/2pKBpocKVAnxRGVHx6MT811lb46QkSdn9w7tVGMeNcGp+
-         z0WGjlFHvkkQII99cgp+XmxrplWOv+K8AdQHrGzEyOyzdw9aaBb5wuxjyh9Ww2gu19TG
-         anhbxPmFi4WB/46N7jvr3F/A9LqYN2k6No/NtRLafMuhDHTRDQpUfqpU86QrQlVNj3oT
-         jk19RcFUUBPZqlmsS1Lbf/C8yZL9g4BBxsYaAXyUXim2BTUDcKxksAiiNXdqhOcXHWlq
-         7985e/R2ObGmJxsqO2Zr1g4weYWpofHgH/c7s2/PE8oqQPnqRDD8bXC/EwBMm3svQn9b
-         hiPg==
-X-Gm-Message-State: ACgBeo2f91TiUZiLbbgoF9Sj689IIaSmgPmToxJdjV4zEALe8poJ9IWL
-        +OCeRzsh4xO+mgE+V0i/z9khbLlbPhM=
-X-Google-Smtp-Source: AA6agR7cDzyiCPI5AYha+X3FMq8JCwRkuQH5rIHqmN9FcS0gSD5AMv3QZdmmLboxNF++r74yljs+DnBr5gk=
-X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a17:90b:4a8f:b0:1f5:ee3:a6a1 with SMTP id
- lp15-20020a17090b4a8f00b001f50ee3a6a1mr17251912pjb.149.1659720593556; Fri, 05
- Aug 2022 10:29:53 -0700 (PDT)
-Reply-To: Sean Christopherson <seanjc@google.com>
-Date:   Fri,  5 Aug 2022 17:29:45 +0000
-In-Reply-To: <20220805172945.35412-1-seanjc@google.com>
-Message-Id: <20220805172945.35412-4-seanjc@google.com>
-Mime-Version: 1.0
-References: <20220805172945.35412-1-seanjc@google.com>
-X-Mailer: git-send-email 2.37.1.559.g78731f0fdb-goog
-Subject: [RFC PATCH 3/3] KVM: x86: Disallow writes to immutable feature MSRs
- after KVM_RUN
-From:   Sean Christopherson <seanjc@google.com>
-To:     Sean Christopherson <seanjc@google.com>,
-        Paolo Bonzini <pbonzini@redhat.com>
-Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Like Xu <like.xu.linux@gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL
-        autolearn=ham autolearn_force=no version=3.4.6
+        h=x-gm-message-state:sender:message-id:date:mime-version:user-agent
+         :subject:content-language:to:cc:references:from:in-reply-to
+         :content-transfer-encoding;
+        bh=3pDyPaXmSjg1dfYYTVcD5twgm0VJEcQCaH5PzUebh+o=;
+        b=TVlx1kQ+ha3dWHQG8yoWH5f/MhMl/SOMwkbKc0Qb06cl3SA4nN3h4wptGqxB7i9qUc
+         sJGHAs7gb6itmZxkzn8PZdteNdCtSM0QyeDqXLxB+3NDeGCvirpN5KdRp5ySspcUwfx3
+         gyj1WhNz/xPWvlXw7Z3XeKrSg3/XwxXtaygwD4YvFrXcP1Gb/2Ra2+3e3ZLD2onnXjMz
+         yA8KUwYuvfh4o5kQHUqQjpiKcv6W5yrVP6tXsvR8Y5hqwfFNmtTmj26UiGKBQXVueuk/
+         R0LlCXaAPxffPeCOgrnCagzMjaKxTxnVavBli9qKRDc4+phh5CI7e/1Nz12rsj0wVGQ+
+         zV5g==
+X-Gm-Message-State: ACgBeo2phJFfYh2nwdG4n7DvZeWHLPGjrvxqqA6arqu/6XQckarWDOTj
+        OyYKRgQ//b0uCruObqkQ/lIjOgr2WQxwjA==
+X-Google-Smtp-Source: AA6agR5VWBwmuMByhlGp2jZk5km25TlB77WRs6fSjW6q6o8glqXJyrvjZip6gTq1ZgU4MWVWBbx1Kw==
+X-Received: by 2002:a05:6402:5518:b0:43a:9e32:b6fc with SMTP id fi24-20020a056402551800b0043a9e32b6fcmr8004431edb.252.1659722143505;
+        Fri, 05 Aug 2022 10:55:43 -0700 (PDT)
+Received: from ?IPV6:2001:b07:6468:f312:9af8:e5f5:7516:fa89? ([2001:b07:6468:f312:9af8:e5f5:7516:fa89])
+        by smtp.googlemail.com with ESMTPSA id b11-20020a17090630cb00b0072b36cbcdaasm1809391ejb.92.2022.08.05.10.55.39
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 05 Aug 2022 10:55:42 -0700 (PDT)
+Sender: Paolo Bonzini <paolo.bonzini@gmail.com>
+Message-ID: <472207cf-ff71-563b-7b66-0c7bea9ea8ad@redhat.com>
+Date:   Fri, 5 Aug 2022 19:55:38 +0200
+MIME-Version: 1.0
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.11.0
+Subject: Re: [PATCH v7 01/14] mm: Add F_SEAL_AUTO_ALLOCATE seal to memfd
+Content-Language: en-US
+To:     David Hildenbrand <david@redhat.com>,
+        Chao Peng <chao.p.peng@linux.intel.com>, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org, linux-mm@kvack.org,
+        linux-fsdevel@vger.kernel.org, linux-api@vger.kernel.org,
+        linux-doc@vger.kernel.org, qemu-devel@nongnu.org,
+        linux-kselftest@vger.kernel.org
+Cc:     Jonathan Corbet <corbet@lwn.net>,
+        Sean Christopherson <seanjc@google.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+        x86@kernel.org, "H . Peter Anvin" <hpa@zytor.com>,
+        Hugh Dickins <hughd@google.com>,
+        Jeff Layton <jlayton@kernel.org>,
+        "J . Bruce Fields" <bfields@fieldses.org>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        Shuah Khan <shuah@kernel.org>, Mike Rapoport <rppt@kernel.org>,
+        Steven Price <steven.price@arm.com>,
+        "Maciej S . Szmigiero" <mail@maciej.szmigiero.name>,
+        Vlastimil Babka <vbabka@suse.cz>,
+        Vishal Annapurve <vannapurve@google.com>,
+        Yu Zhang <yu.c.zhang@linux.intel.com>,
+        "Kirill A . Shutemov" <kirill.shutemov@linux.intel.com>,
+        luto@kernel.org, jun.nakajima@intel.com, dave.hansen@intel.com,
+        ak@linux.intel.com, aarcange@redhat.com, ddutile@redhat.com,
+        dhildenb@redhat.com, Quentin Perret <qperret@google.com>,
+        Michael Roth <michael.roth@amd.com>, mhocko@suse.com,
+        Muchun Song <songmuchun@bytedance.com>
+References: <20220706082016.2603916-1-chao.p.peng@linux.intel.com>
+ <20220706082016.2603916-2-chao.p.peng@linux.intel.com>
+ <f39c4f63-a511-4beb-b3a4-66589ddb5475@redhat.com>
+From:   Paolo Bonzini <pbonzini@redhat.com>
+In-Reply-To: <f39c4f63-a511-4beb-b3a4-66589ddb5475@redhat.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Spam-Status: No, score=-1.5 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_EF,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+        HEADER_FROM_DIFFERENT_DOMAINS,NICE_REPLY_A,RCVD_IN_DNSWL_NONE,
+        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=no
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Disallow writes to feature MSRs after KVM_RUN to prevent userspace from
-changing the vCPU model after running the vCPU.  Similar to guest CPUID,
-KVM uses feature MSRs to configure intercepts, determine what operations
-are/aren't allowed, etc.  Changing the capabilities while the vCPU is
-active will at best yield unpredictable guest behavior, and at worst
-could be dangerous to KVM.
+On 7/21/22 11:44, David Hildenbrand wrote:
+> 
+> Also, I*think*  you can place pages via userfaultfd into shmem. Not
+> sure if that would count "auto alloc", but it would certainly bypass
+> fallocate().
 
-Allow writing the current value, e.g. so that userspace can blindly set
-all MSRs when emulating RESET, and unconditionally allow writes to
-MSR_IA32_UCODE_REV so that userspace can emulate patch loads.
+Yeah, userfaultfd_register would probably have to forbid this for 
+F_SEAL_AUTO_ALLOCATE vmas.  Maybe the memfile_node can be reused for 
+this, adding a new MEMFILE_F_NO_AUTO_ALLOCATE flags?  Then 
+userfault_register would do something like 
+memfile_node_get_flags(vma->vm_file) and check the result.
 
-Special case the VMX MSRs to keep the generic list small, i.e. so that
-KVM can do a linear walk of the generic list without incurring meaningful
-overhead.
+This means moving this patch later, after "mm: Introduce memfile_notifier".
 
-Cc: Like Xu <like.xu.linux@gmail.com>
-Signed-off-by: Sean Christopherson <seanjc@google.com>
----
- arch/x86/kvm/x86.c | 37 +++++++++++++++++++++++++++++++++++++
- 1 file changed, 37 insertions(+)
+Thanks,
 
-diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-index a1c65b77fb16..4da26a1f14c1 100644
---- a/arch/x86/kvm/x86.c
-+++ b/arch/x86/kvm/x86.c
-@@ -1541,6 +1541,26 @@ static u32 msr_based_features[ARRAY_SIZE(msr_based_features_all_except_vmx) +
- 			      (KVM_LAST_EMULATED_VMX_MSR - KVM_FIRST_EMULATED_VMX_MSR + 1)];
- static unsigned int num_msr_based_features;
- 
-+/*
-+ * All feature MSRs except uCode revID, which tracks the currently loaded uCode
-+ * patch, are immutable once the vCPU model is defined.
-+ */
-+static bool kvm_is_immutable_feature_msr(u32 msr)
-+{
-+	int i;
-+
-+	if (msr >= KVM_FIRST_EMULATED_VMX_MSR && msr <= KVM_LAST_EMULATED_VMX_MSR)
-+		return true;
-+
-+	for (i = 0; i < ARRAY_SIZE(msr_based_features_all_except_vmx); i++) {
-+		if (msr == msr_based_features_all_except_vmx[i])
-+			return msr != MSR_IA32_UCODE_REV;
-+	}
-+
-+	return false;
-+}
-+
-+
- static u64 kvm_get_arch_capabilities(void)
- {
- 	u64 data = 0;
-@@ -2136,6 +2156,23 @@ static int do_get_msr(struct kvm_vcpu *vcpu, unsigned index, u64 *data)
- 
- static int do_set_msr(struct kvm_vcpu *vcpu, unsigned index, u64 *data)
- {
-+	u64 val;
-+
-+	/*
-+	 * Disallow writes to immutable feature MSRs after KVM_RUN.  KVM does
-+	 * not support modifying the guest vCPU model on the fly, e.g. changing
-+	 * the nVMX capabilities while L2 is running is nonsensical.  Ignore
-+	 * writes of the same value, e.g. to allow userspace to blindly stuff
-+	 * all MSRs when emulating RESET.
-+	 */
-+	if (vcpu->arch.last_vmentry_cpu != -1 &&
-+	    kvm_is_immutable_feature_msr(index)) {
-+		if (do_get_msr(vcpu, index, &val) || *data != val)
-+			return -EINVAL;
-+
-+		return 0;
-+	}
-+
- 	return kvm_set_msr_ignored_check(vcpu, index, *data, true);
- }
- 
--- 
-2.37.1.559.g78731f0fdb-goog
-
+Paolo
