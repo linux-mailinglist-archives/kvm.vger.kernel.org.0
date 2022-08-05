@@ -2,64 +2,64 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 3458C58B029
-	for <lists+kvm@lfdr.de>; Fri,  5 Aug 2022 21:04:06 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 79E7F58B02D
+	for <lists+kvm@lfdr.de>; Fri,  5 Aug 2022 21:07:06 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234824AbiHETEE (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 5 Aug 2022 15:04:04 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57264 "EHLO
+        id S241265AbiHETHE (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 5 Aug 2022 15:07:04 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59256 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S240804AbiHETEB (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 5 Aug 2022 15:04:01 -0400
-Received: from mail-pl1-x633.google.com (mail-pl1-x633.google.com [IPv6:2607:f8b0:4864:20::633])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1913B7B783
-        for <kvm@vger.kernel.org>; Fri,  5 Aug 2022 12:04:01 -0700 (PDT)
-Received: by mail-pl1-x633.google.com with SMTP id t2so3419530ply.2
-        for <kvm@vger.kernel.org>; Fri, 05 Aug 2022 12:04:01 -0700 (PDT)
+        with ESMTP id S241150AbiHETHB (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 5 Aug 2022 15:07:01 -0400
+Received: from mail-pg1-x52a.google.com (mail-pg1-x52a.google.com [IPv6:2607:f8b0:4864:20::52a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 17F963A4B1
+        for <kvm@vger.kernel.org>; Fri,  5 Aug 2022 12:07:00 -0700 (PDT)
+Received: by mail-pg1-x52a.google.com with SMTP id s206so3421884pgs.3
+        for <kvm@vger.kernel.org>; Fri, 05 Aug 2022 12:07:00 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:from:to:cc;
-        bh=BUYKpxJyiOtJFBunJ05WlmO0A1IF2A4Ebr5PfaULMVE=;
-        b=OrqtE7X9d6ueps6hGET9eoykhba9z/Og3RcUy4atHyCTjtRtPGInxkHKq3PX3xFD6t
-         8+N7dxWyle1388CQvl5O3QuOd53xeFtsPXw2e1jI2KdSTyWCzb1NldV/lwb32OefUP+Y
-         yvnZxouU5BDQa+bB7LJyrKJKvKclP3DCPc+jomcCp1ERvCf/h86ZhGRRDEoa79M9tpBo
-         FAz3k9PJbRtISWvDjd/aRQhMoWtoApxE6+6OGJm5ewoMRHUqTH4JMCNBV4VvPx02n45u
-         ZLigAdAWqm8s1MapPhk1SSvszVsA9YLpi+bJUD8mdJ6cTYBsoo8LuE9CN7LGadu2xgnA
-         6izw==
+        bh=8OaelCQwLAmX8DnBKBU4Ne2mRwL6NSrpZ9PHD8kwTfg=;
+        b=SAB+P7PszONb/nw54Oc8HuLcyuhTcgNk7V84Tu5GnWeiqsjwgNmmPXRQyRYXYagjNn
+         o2x7NpKmQ11Q+8xx8TaesL/+iZYmhDj7KtL1W0xTkzs9C/869CaoTb91TjccOdzgsjcO
+         Y/CTjAcn5GVf5wtoU9bZAIwOkhLSIFV957M8n27H5E69AS3vc+GzW4Gpxq6FaK3RB7V9
+         NMW3YdzLiiCA2ueksJmCxhc1EHAvv+EphlZhIvePy7/28t3Kyt2ceXGUdE9bq3luGiD2
+         XFbjN9MNzfpscT1S0KJEfq6P8kUd+eU7bQpv6ezO8Ui5F5IAxz3QdnE59SRa9GSm8MCa
+         oLsQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:x-gm-message-state:from:to:cc;
-        bh=BUYKpxJyiOtJFBunJ05WlmO0A1IF2A4Ebr5PfaULMVE=;
-        b=oXQVn4pE7P118eG4zVukjGsEVW79/Z7geDbb+IQ/0zD0aI7jd3NfA6KO1DXVd5Jspy
-         zf2FqII4lx0mZZkKZnNuQsp+PDBKmSj9pmqnATVomXm2QY4S/wcy2JillkEO5kKD77ry
-         BI0BBEi4ICdvKjI64Hxt+L8gH7+M0kn6ErTMk9FIAXYZWGNQAcpTDB/QcViWOa9QeNS9
-         JqUV3h6lIkYCwV9kDP+90Ve99Mqh5pd3iDCsJgvPSafZ2t+y5KP4T4fvPGY5yYMaKgrD
-         T/ob8WvQoEthBGOnnP+iijlXFWopZ3T6dr3Mt4Z2I+60BiynW541m7LpzseqiAPyjzyq
-         2x9A==
-X-Gm-Message-State: ACgBeo2Yk6CmqyHBJaef3JrgxeMxIKh6Ogn/5QKvxfX33ZUzzHnSA8pv
-        gv4ztdnIyfB48xolG0qXXIOlQiwrf7/8JQ==
-X-Google-Smtp-Source: AA6agR5/km+TzSr69vIvEj7V0e3pJmrmLDt+cb1/qZ4J5kBcek37Vab77wG5huCHoqHNjK6VGd0mPw==
-X-Received: by 2002:a17:90b:180f:b0:1f4:e294:d322 with SMTP id lw15-20020a17090b180f00b001f4e294d322mr17555205pjb.163.1659726240448;
-        Fri, 05 Aug 2022 12:04:00 -0700 (PDT)
+        bh=8OaelCQwLAmX8DnBKBU4Ne2mRwL6NSrpZ9PHD8kwTfg=;
+        b=O9MMffOoGLG/W/0k3jJRVIAo9ypfrDzWq7NI96RcY49DCVONT2NPXDma6VkUC7Su8K
+         Ew5D7z89hJJPkFQRZA28Xxzm0lNGDvV339HFwL2SuL7DSS6ol0Wa1AVLGwz555NK5EGV
+         lUA/qZTHfBzTDWa/JsuGdC2TC1Hkg42hlfTfaWpQOOlOgtvw1y9uGoBDX70tAtkXamQk
+         RHwidOGe5vhsp7mnbJzx+Qs3NaWYaYmY3UiJJUnF2mvwJq2r9vxob/rM4z5uasllqwSi
+         Sk8nt0XTimpSZiTm+L9o3z360xaAwKkBLk/r4yTPDXC50poZSYIUAoduEQ6FmETn+lMZ
+         XD7g==
+X-Gm-Message-State: ACgBeo3gHcLj4bF4jLR/mS+G8P//6S4RegiBWhRSW28bdCyhCA8gbpJa
+        MARAIpx+hPcm1oMC5watTNWspQ==
+X-Google-Smtp-Source: AA6agR7SKHHLKIEFew9WyMsb8o4XpZDoFy21+jRdAzZwbUSUMRe+S+9BBWgkreLz5MO59nf+sNEMFw==
+X-Received: by 2002:a05:6a00:2991:b0:52e:b387:b3c6 with SMTP id cj17-20020a056a00299100b0052eb387b3c6mr5178908pfb.11.1659726419475;
+        Fri, 05 Aug 2022 12:06:59 -0700 (PDT)
 Received: from google.com (7.104.168.34.bc.googleusercontent.com. [34.168.104.7])
-        by smtp.gmail.com with ESMTPSA id b4-20020a170902d50400b0016f12cc0ecdsm3425960plg.274.2022.08.05.12.04.00
+        by smtp.gmail.com with ESMTPSA id w200-20020a627bd1000000b005281d926733sm3357482pfc.199.2022.08.05.12.06.58
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 05 Aug 2022 12:04:00 -0700 (PDT)
-Date:   Fri, 5 Aug 2022 19:03:56 +0000
+        Fri, 05 Aug 2022 12:06:58 -0700 (PDT)
+Date:   Fri, 5 Aug 2022 19:06:55 +0000
 From:   Sean Christopherson <seanjc@google.com>
 To:     Oliver Upton <oliver.upton@linux.dev>
 Cc:     kvm@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>,
         Oliver Upton <oupton@google.com>
-Subject: Re: [PATCH v3 3/6] KVM: Get an fd before creating the VM
-Message-ID: <Yu1pnPkiAtOM80Jx@google.com>
+Subject: Re: [PATCH v3 2/6] KVM: Shove vcpu stats_id init into kvm_vcpu_init()
+Message-ID: <Yu1qT0ly3y3qkmKn@google.com>
 References: <20220720092259.3491733-1-oliver.upton@linux.dev>
- <20220720092259.3491733-4-oliver.upton@linux.dev>
+ <20220720092259.3491733-3-oliver.upton@linux.dev>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20220720092259.3491733-4-oliver.upton@linux.dev>
+In-Reply-To: <20220720092259.3491733-3-oliver.upton@linux.dev>
 X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
         ENV_AND_HDR_SPF_MATCH,FSL_HELO_FAKE,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,
@@ -74,16 +74,18 @@ X-Mailing-List: kvm@vger.kernel.org
 On Wed, Jul 20, 2022, Oliver Upton wrote:
 > From: Oliver Upton <oupton@google.com>
 > 
-> Allocate a VM's fd at the very beginning of kvm_dev_ioctl_create_vm() so
-> that KVM can use the fd value to generate strigns, e.g. for debugfs,
+> Initialize stats_id alongside other kvm_vcpu fields to futureproof
+> against possible initialization order mistakes in KVM.
 
-s/strigns/strings
+Nit, I dislike the handwaving, it doesn't take much effort to explain exactly
+what this guards against.
 
-> when creating and initializing the VM.
+  Initialize stats_id alongside other kvm_vcpu fields to make it more
+  difficult to unintentionally access stats_id before it's set.
+
+> No functional change intended.
 > 
 > Signed-off-by: Oliver Upton <oupton@google.com>
 > ---
-
-Typo aside,
 
 Reviewed-by: Sean Christopherson <seanjc@google.com>
