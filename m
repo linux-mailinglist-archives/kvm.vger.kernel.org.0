@@ -2,55 +2,74 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 28BE758ADDE
-	for <lists+kvm@lfdr.de>; Fri,  5 Aug 2022 18:06:00 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 48DA758ADF4
+	for <lists+kvm@lfdr.de>; Fri,  5 Aug 2022 18:17:51 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S241316AbiHEQF5 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 5 Aug 2022 12:05:57 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43938 "EHLO
+        id S241038AbiHEQRs (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 5 Aug 2022 12:17:48 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50898 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S241235AbiHEQFx (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 5 Aug 2022 12:05:53 -0400
-Received: from sin.source.kernel.org (sin.source.kernel.org [145.40.73.55])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 89B8E402CA;
-        Fri,  5 Aug 2022 09:05:51 -0700 (PDT)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by sin.source.kernel.org (Postfix) with ESMTPS id C4734CE2ABB;
-        Fri,  5 Aug 2022 16:05:49 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id C9298C433D7;
-        Fri,  5 Aug 2022 16:05:47 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1659715548;
-        bh=meLN3iFq0dB6/cRPWbxA3YaJYvQo+JhwHofyvaOjkjA=;
-        h=Date:From:To:Cc:Subject:In-Reply-To:From;
-        b=NbUpIVz3tIzfFG4V82gy2lgVrqrJgDHgNQKYqnqcc9wsh8f3ZCxDp8t9FlJDYylzv
-         +Iu3a5h4Oa/48zEzWvJ5n7fxdlhFiaayxvOGAM5zduVXc1ew5pkQOhCIyGAheh+wto
-         mECOAk/aaIKLCzR5MmhxOm+Z552Te38YesDwSMU1fG3u/gCBrGCxfL9anSCux5Irjg
-         noqkXknHkKnRo3zvoeWuisCJfsbbCMEn5aaPr74JUaV9r1kY3/5YAMIxPnZqsCwjvh
-         SrSvXLJziQ3ZRqApUsruuxrCVwbyFKklJ4dYx1zMJl1i/+XBwGXy+kTfIzRPME+C1I
-         hI0cNl8b7GJPg==
-Date:   Fri, 5 Aug 2022 11:05:45 -0500
-From:   Bjorn Helgaas <helgaas@kernel.org>
-To:     "Arinzon, David" <darinzon@amazon.com>
-Cc:     "linux-pci@vger.kernel.org" <linux-pci@vger.kernel.org>,
-        "Dagan, Noam" <ndagan@amazon.com>,
-        "Agroskin, Shay" <shayagr@amazon.com>,
-        "Brandes, Shai" <shaibran@amazon.com>,
-        "Kiyanovski, Arthur" <akiyano@amazon.com>,
-        "mk@semihalf.com" <mk@semihalf.com>,
-        Alex Williamson <alex.williamson@redhat.com>,
-        Cornelia Huck <cohuck@redhat.com>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-Subject: Re: vfio/pci - uAPI for WC
-Message-ID: <20220805160545.GA1020364@bhelgaas>
+        with ESMTP id S231545AbiHEQRr (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 5 Aug 2022 12:17:47 -0400
+Received: from mail-yw1-x112b.google.com (mail-yw1-x112b.google.com [IPv6:2607:f8b0:4864:20::112b])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6418248E95
+        for <kvm@vger.kernel.org>; Fri,  5 Aug 2022 09:17:46 -0700 (PDT)
+Received: by mail-yw1-x112b.google.com with SMTP id 00721157ae682-31f661b3f89so28515427b3.11
+        for <kvm@vger.kernel.org>; Fri, 05 Aug 2022 09:17:46 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=atishpatra.org; s=google;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc;
+        bh=eU9F5KTyLXS6Ehm35W4ZJ4KkazoKzToP1yWNY4wU9Kg=;
+        b=OTIMcxvVmtHvZYnx9w+o/IIVHMVnFTjtZpg0iBHBJF/Skq2sQZgscB+aLiUJLN0sfj
+         ysp6VTKukTmrHLmujjUvOzPbY2bFxqoHBmuaRFR/pAJBoyv7X1Nu520OafIyx6Qr6bOV
+         +R3D5siCAJFSmOozQy6OIy6w4KtvhRp01pfrA=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc;
+        bh=eU9F5KTyLXS6Ehm35W4ZJ4KkazoKzToP1yWNY4wU9Kg=;
+        b=BccEsY+w+lpDP63Pg79PKnX3nfzSRptTXIdbiAov0J0qBYNyEWKFZtv50BLlFBY/P2
+         4suqzgZyzUPJt3n5SjnCj4wQrQyKKv+3V+Yr9UB7SeP7LtMlDNnvYrpqSeTHqipJ+6Nb
+         0HISMSZQo96R+cozsQ5rF23YT7TRrEPnQlyJ6Gr+vnLzewzoUJF5qm+ITIRkNPwAItnL
+         /Ts59YBi2pI7ycjqCJP+C0G00xZRw9vL4DA0eqW8bgyKo3ZvmdwUuMJfWClrGzX0fXoy
+         7bp3t4pRJjISOigX+81+HOeNmFTK6w5wLDkh+yexFS9foxEzF6loXlIY9VO3oC4pVh53
+         GCcA==
+X-Gm-Message-State: ACgBeo3rpiyRkNO8nIQ5VfRf5lzPddEtZKz/NsZN4TkutLgeHMofUxTD
+        k0J10xPE9JyxdKWJzDpqgldJ77onar5FqCbrNTmN
+X-Google-Smtp-Source: AA6agR62cKws3SRTlgdcM1pts0cZpN6r3mdMoI/TrJcr4NwaVIxxT+6rUb3vilx/LYfVks/NtNXlI1usDhozpgqRr64=
+X-Received: by 2002:a81:5251:0:b0:31f:56c6:b69 with SMTP id
+ g78-20020a815251000000b0031f56c60b69mr6801352ywb.75.1659716265625; Fri, 05
+ Aug 2022 09:17:45 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <d42f195bffa444719065f4e84098fe0c@EX13D47EUB004.ant.amazon.com>
-X-Spam-Status: No, score=-7.7 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_HI,
+References: <20220722165047.519994-1-atishp@rivosinc.com> <20220722165047.519994-4-atishp@rivosinc.com>
+ <CAOnJCUK1JppQkZ+bv7mNpCm95i3gGZ5wHaRc2wiBGyp3zj2Dhw@mail.gmail.com>
+In-Reply-To: <CAOnJCUK1JppQkZ+bv7mNpCm95i3gGZ5wHaRc2wiBGyp3zj2Dhw@mail.gmail.com>
+From:   Atish Patra <atishp@atishpatra.org>
+Date:   Fri, 5 Aug 2022 09:17:35 -0700
+Message-ID: <CAOnJCUJrwVim1c8BpLYrHUAhHc-jO8w_wV5EuBc_3DhSb8DjLQ@mail.gmail.com>
+Subject: Re: [PATCH v7 3/4] RISC-V: Prefer sstc extension if available
+To:     Stephen Boyd <sboyd@kernel.org>,
+        Palmer Dabbelt <palmer@dabbelt.com>,
+        Palmer Dabbelt <palmer@rivosinc.com>
+Cc:     "linux-kernel@vger.kernel.org List" <linux-kernel@vger.kernel.org>,
+        Atish Patra <atishp@rivosinc.com>,
+        Anup Patel <anup@brainfault.org>,
+        Albert Ou <aou@eecs.berkeley.edu>,
+        Daniel Lezcano <daniel.lezcano@linaro.org>,
+        Guo Ren <guoren@kernel.org>, Heiko Stuebner <heiko@sntech.de>,
+        "open list:KERNEL VIRTUAL MACHINE FOR RISC-V (KVM/riscv)" 
+        <kvm-riscv@lists.infradead.org>, KVM General <kvm@vger.kernel.org>,
+        linux-riscv <linux-riscv@lists.infradead.org>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Paul Walmsley <paul.walmsley@sifive.com>,
+        Rob Herring <robh@kernel.org>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Tsukasa OI <research_trasio@irq.a4lg.com>,
+        Wei Fu <wefu@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
         SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
@@ -59,35 +78,95 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-[+cc Alex, Cornelia, kvm, lkml (from "get_maintainer.pl drivers/vfio")
-and rewrapped for plain-text readability]
-On Thu, Aug 04, 2022 at 09:47:36AM +0000, Arinzon, David wrote:
-> Hi,
-> 
-> There's currently no mechanism for vfio that exposes WC-related
-> operations (check if memory is WC capable, ask to WC memory) to user
-> space module entities, such as DPDK, for example.
+On Mon, Jul 25, 2022 at 10:49 PM Atish Patra <atishp@atishpatra.org> wrote:
 >
-> This topic has been previously discussed in [1], [2] and [3], but
-> there was no follow-up.
+> On Fri, Jul 22, 2022 at 9:50 AM Atish Patra <atishp@rivosinc.com> wrote:
+> >
+> > RISC-V ISA has sstc extension which allows updating the next clock event
+> > via a CSR (stimecmp) instead of an SBI call. This should happen dynamically
+> > if sstc extension is available. Otherwise, it will fallback to SBI call
+> > to maintain backward compatibility.
+> >
+> > Reviewed-by: Anup Patel <anup@brainfault.org>
+> > Signed-off-by: Atish Patra <atishp@rivosinc.com>
+> > ---
+> >  drivers/clocksource/timer-riscv.c | 25 ++++++++++++++++++++++++-
+> >  1 file changed, 24 insertions(+), 1 deletion(-)
+> >
+> > diff --git a/drivers/clocksource/timer-riscv.c b/drivers/clocksource/timer-riscv.c
+> > index 593d5a957b69..05f6cf067289 100644
+> > --- a/drivers/clocksource/timer-riscv.c
+> > +++ b/drivers/clocksource/timer-riscv.c
+> > @@ -7,6 +7,9 @@
+> >   * either be read from the "time" and "timeh" CSRs, and can use the SBI to
+> >   * setup events, or directly accessed using MMIO registers.
+> >   */
+> > +
+> > +#define pr_fmt(fmt) "riscv-timer: " fmt
+> > +
+> >  #include <linux/clocksource.h>
+> >  #include <linux/clockchips.h>
+> >  #include <linux/cpu.h>
+> > @@ -20,14 +23,28 @@
+> >  #include <linux/of_irq.h>
+> >  #include <clocksource/timer-riscv.h>
+> >  #include <asm/smp.h>
+> > +#include <asm/hwcap.h>
+> >  #include <asm/sbi.h>
+> >  #include <asm/timex.h>
+> >
+> > +static DEFINE_STATIC_KEY_FALSE(riscv_sstc_available);
+> > +
+> >  static int riscv_clock_next_event(unsigned long delta,
+> >                 struct clock_event_device *ce)
+> >  {
+> > +       u64 next_tval = get_cycles64() + delta;
+> > +
+> >         csr_set(CSR_IE, IE_TIE);
+> > -       sbi_set_timer(get_cycles64() + delta);
+> > +       if (static_branch_likely(&riscv_sstc_available)) {
+> > +#if defined(CONFIG_32BIT)
+> > +               csr_write(CSR_STIMECMP, next_tval & 0xFFFFFFFF);
+> > +               csr_write(CSR_STIMECMPH, next_tval >> 32);
+> > +#else
+> > +               csr_write(CSR_STIMECMP, next_tval);
+> > +#endif
+> > +       } else
+> > +               sbi_set_timer(next_tval);
+> > +
+> >         return 0;
+> >  }
+> >
+> > @@ -165,6 +182,12 @@ static int __init riscv_timer_init_dt(struct device_node *n)
+> >         if (error)
+> >                 pr_err("cpu hp setup state failed for RISCV timer [%d]\n",
+> >                        error);
+> > +
+> > +       if (riscv_isa_extension_available(NULL, SSTC)) {
+> > +               pr_info("Timer interrupt in S-mode is available via sstc extension\n");
+> > +               static_branch_enable(&riscv_sstc_available);
+> > +       }
+> > +
+> >         return error;
+> >  }
+> >
+> > --
+> > 2.25.1
+> >
 >
-> This capability is very useful for DPDK, specifically to the DPDK
-> ENA driver that uses vfio-pci, which requires memory to be WC on the
-> TX path. Without WC, higher CPU utilization and performance
-> degradation are observed.
+> Hi Stephen,
+> Can you please review this whenever you get a chance ? We probably
+> need an ACK at least :)
 >
-> In the above mentioned discussions, three options were suggested:
-> sysfs, ioctl, mmap extension (extra attributes).
-> 
-> Was there any progress on this area? Is there someone who's looking
-> into this?
->
-> We're leaning towards the ioctl option, if there are no objections,
-> we'd come up with an RFC.
 
-> [1]: https://patchwork.kernel.org/project/kvm/patch/20171009025000.39435-1-aik@ozlabs.ru/
-> [2]: https://lore.kernel.org/linux-pci/2b539df4c9ec703458e46da2fc879ee3b310b31c.camel@kernel.crashing.org/
-> [3]: https://lore.kernel.org/lkml/20210429162906.32742-2-sdonthineni@nvidia.com/
-> 
-> Thanks,
-> David
+Ping ?
+
+> --
+> Regards,
+> Atish
+
+
+
+-- 
+Regards,
+Atish
