@@ -2,58 +2,58 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id B142158A43E
-	for <lists+kvm@lfdr.de>; Fri,  5 Aug 2022 02:41:48 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 8A8C758A440
+	for <lists+kvm@lfdr.de>; Fri,  5 Aug 2022 02:41:50 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233937AbiHEAlr (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 4 Aug 2022 20:41:47 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49492 "EHLO
+        id S234270AbiHEAls (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 4 Aug 2022 20:41:48 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49510 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233049AbiHEAlp (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 4 Aug 2022 20:41:45 -0400
-Received: from mail-pj1-x104a.google.com (mail-pj1-x104a.google.com [IPv6:2607:f8b0:4864:20::104a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 331B56FA02
-        for <kvm@vger.kernel.org>; Thu,  4 Aug 2022 17:41:44 -0700 (PDT)
-Received: by mail-pj1-x104a.google.com with SMTP id o4-20020a17090ac08400b001f560755c39so384877pjs.2
-        for <kvm@vger.kernel.org>; Thu, 04 Aug 2022 17:41:44 -0700 (PDT)
+        with ESMTP id S233821AbiHEAlq (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 4 Aug 2022 20:41:46 -0400
+Received: from mail-pl1-x649.google.com (mail-pl1-x649.google.com [IPv6:2607:f8b0:4864:20::649])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E86A36FA03
+        for <kvm@vger.kernel.org>; Thu,  4 Aug 2022 17:41:45 -0700 (PDT)
+Received: by mail-pl1-x649.google.com with SMTP id e15-20020a17090301cf00b0016dc94ddcc5so709585plh.3
+        for <kvm@vger.kernel.org>; Thu, 04 Aug 2022 17:41:45 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
         h=cc:to:from:subject:references:mime-version:message-id:in-reply-to
          :date:from:to:cc;
-        bh=02kVlxhYR2wVflGJuMXecQx6sdKKlCZWwBiydCGT0N0=;
-        b=mNlSYnq6hfwiRO2PfUx1N9QufaqsC8RVb0nXYm9bGrV/jU1Gv68Qq3dcN7TiNykXwS
-         P1RS/Kd0KNN2cL4R+wWsBAgh2ksiWg5u5UsDvA6S9F6ygt0n+uN8E1nGedmNYOiuzSSd
-         CuatSUd7aFmeKIcwxfEOnCcJiXUIpfDyAs9yJyb8QCcoHXhNVDrfOZLEjo0PuQcJTuKj
-         TE1COhE/xMo3599H6//88h6zTtgKMZ+TNO3LAsSv6AMxH7hxWpGmZ7VqTKrZryjAmrod
-         i+MuPgkDwhXNCF+rlUoJQJsWGJnE2LI3ihv5oFAkh4sOyWVPGB9R8+t0WUcRF69wvLqR
-         dB+Q==
+        bh=IkUE99B0TchNS4vqhItmmclxhXXwJ9wxAc8kOQ5+evM=;
+        b=iVfcJW8RlHTsp+7/8Ai9Ar6TcPX/EvMkfx9Ea9osF8B/WeFcKJTGR5MvNNv1C9aR3D
+         dPpsi/u/rJgjH15v3faO9zC5EdKesI2rs6biTyr0ayp3x4Opjln4sViOrhtDPkYsZN7/
+         zHVUvjuftQKLseSsX4XYZlVEgF6fOEz2Xj8E/EaEbrafUJIVz6AUoLSnACjkTHbWvkHQ
+         f5aJ8ht6Mq6aHZvmE4wyLtd09SO09NWmoNiCvYnmZXQotuzZoZUKbZu3Hn0r4aDZvoYI
+         UXPhVBkqEinpEnZKG2rptUcvNeJS4pVhflPwPB9WGEvk98udF50S2IvLo9GRJhqGi9GH
+         BhQw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=cc:to:from:subject:references:mime-version:message-id:in-reply-to
          :date:x-gm-message-state:from:to:cc;
-        bh=02kVlxhYR2wVflGJuMXecQx6sdKKlCZWwBiydCGT0N0=;
-        b=JwIBcJX53zPkpBlJUeY4Rm5uKeGccCi4zmZ5/FdY7b3MAwKkjs3g9LHdFWeLaB4VI0
-         RA95D1tYEpZyNCn+pzicnoDqMFGaUIBzPogG6l/rsGxEiKEI0kugU/pCdRdAZYS7vHQt
-         NpB8NSmOB7Osz1xBtFcFF2A3bedeSopgg2fW4B9TO7eP3n/q4oZdIe8FRk7avFF7U1cM
-         zrW/0/MeNIVDzmh2Dw36AM0tOl3zExdVKq3XqB1f3a+Jgp125sLRahAMR+jot9dsbCb3
-         0cOOAr2O/U5QpPQuOEQLbflrLiYXMGK+iIN+lf4042jQ/vzAeY0CgIslWvIjbGEB5Wfj
-         /4gg==
-X-Gm-Message-State: ACgBeo02bSMyqir/YgeDGyO3oLZB84z7sTi53XLUyZoE5yMfyRSMeMMQ
-        lARnoxq84akzf9y2xz0yQ+panXSnRPiB+uk8ceInrIcsbp13NFBfFSuBRufz8pLaH+itqP0h3Qv
-        bIJPWrY0Orj4aEvGyP/SCeSa6OT9/sjj7yTQMohDYCh+8xpK1A5xIbG+dASp41Uo=
-X-Google-Smtp-Source: AA6agR5i3eO0h3ui+dDSWAFqYIZiKGGMjyuqnTDX2nt72TATzBHKJ0uEQLFGv6WNY0C+7E/6UPHqCb/NsdA7eA==
+        bh=IkUE99B0TchNS4vqhItmmclxhXXwJ9wxAc8kOQ5+evM=;
+        b=Z+7i+mBtDSNsxZBcyff+3xi1eFe0Q2njgy6x2U8VC5Niw5+q86IdZSmkufw+sf0WZA
+         sYIqeQ9If9U62eQo6eTWqu3nEgfiiKWx6tivebr0/vkmUDaWncU1Cqc6fJi65J2AHTlS
+         peCc+czppBHpeG79DryVsAxlyoU2KlDWdJOifrAGGGpsFfzh6SywljWG6euAJrGEU351
+         9whUi2pURA9/GQ8TkXapDHvmSS9bP2kFCLtx2QD9BarKADaiBXUMEC8+NkKmJU01vy89
+         JLDk95rAGUvmNBMfYQSItT4s0fqGvxfFZ7V/JmP0WTyAHNCXlfV15jjiDB+Fq3kN1huj
+         Ws6Q==
+X-Gm-Message-State: ACgBeo1Cntd2zWEz5JIXfcYlKPFitrzIW3FWKsRgvvnppkAaqBcMydCF
+        97ExFChOmtaZ5cVi1vSoIsL5SDD06b+rWfxTjaJXzQiOVjPooP86/CLelGNnKAKdSc2PYMhqpux
+        +oQB9SLSo/6soNuQL6j5NtdUH5vkVkKiDDL49Lls5nktE81gHbfqmw8s4xxZJi+k=
+X-Google-Smtp-Source: AA6agR4TcLN6Lga7RRZ0+dyIKf0ldH3fBJqtB88WLNxRgIPNyZKd3Bc+sF7uqhYAz2fvChCj+ulwcPDPdw6XaQ==
 X-Received: from ricarkol2.c.googlers.com ([fda3:e722:ac3:cc00:24:72f4:c0a8:62fe])
- (user=ricarkol job=sendgmr) by 2002:a05:6a00:1996:b0:52e:b0f7:8c83 with SMTP
- id d22-20020a056a00199600b0052eb0f78c83mr1489248pfl.59.1659660103577; Thu, 04
- Aug 2022 17:41:43 -0700 (PDT)
-Date:   Thu,  4 Aug 2022 17:41:37 -0700
+ (user=ricarkol job=sendgmr) by 2002:a17:902:a616:b0:16d:b3cf:9fe3 with SMTP
+ id u22-20020a170902a61600b0016db3cf9fe3mr4127366plq.99.1659660105374; Thu, 04
+ Aug 2022 17:41:45 -0700 (PDT)
+Date:   Thu,  4 Aug 2022 17:41:38 -0700
 In-Reply-To: <20220805004139.990531-1-ricarkol@google.com>
-Message-Id: <20220805004139.990531-2-ricarkol@google.com>
+Message-Id: <20220805004139.990531-3-ricarkol@google.com>
 Mime-Version: 1.0
 References: <20220805004139.990531-1-ricarkol@google.com>
 X-Mailer: git-send-email 2.37.1.559.g78731f0fdb-goog
-Subject: [kvm-unit-tests PATCH v3 1/3] arm: pmu: Add missing isb()'s after sys
- register writing
+Subject: [kvm-unit-tests PATCH v3 2/3] arm: pmu: Reset the pmu registers
+ before starting some tests
 From:   Ricardo Koller <ricarkol@google.com>
 To:     kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu,
         andrew.jones@linux.dev
@@ -71,127 +71,57 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-There are various pmu tests that require an isb() between enabling
-counting and the actual counting. This can lead to count registers
-reporting less events than expected; the actual enabling happens after
-some events have happened.  For example, some missing isb()'s in the
-pmu-sw-incr test lead to the following errors on bare-metal:
+Some registers like the PMOVS reset to an architecturally UNKNOWN value.
+Most tests expect them to be reset (mostly zeroed) using pmu_reset().
+Add a pmu_reset() on all the tests that need one.
 
-	INFO: pmu: pmu-sw-incr: SW_INCR counter #0 has value 4294967280
-	PASS: pmu: pmu-sw-incr: PWSYNC does not increment if PMCR.E is unset
-	FAIL: pmu: pmu-sw-incr: counter #1 after + 100 SW_INCR
-	FAIL: pmu: pmu-sw-incr: counter #0 after + 100 SW_INCR
-	INFO: pmu: pmu-sw-incr: counter values after 100 SW_INCR #0=82 #1=98
-	PASS: pmu: pmu-sw-incr: overflow on counter #0 after 100 SW_INCR
-	SUMMARY: 4 tests, 2 unexpected failures
+As a bonus, fix a couple of comments related to the register state
+before a sub-test.
 
-Add the missing isb()'s on all failing tests, plus some others that seem
-required:
-- after clearing the overflow signal in the IRQ handler to make spurious
-  interrupts less likely.
-- after direct writes to PMSWINC_EL0 for software to read the correct
-  value for PMEVNCTR0_EL0 (from ARM DDI 0487H.a, page D13-5237).
-
+Reviewed-by: Eric Auger <eric.auger@redhat.com>
 Signed-off-by: Ricardo Koller <ricarkol@google.com>
 ---
- arm/pmu.c | 17 +++++++++++++++++
- 1 file changed, 17 insertions(+)
+ arm/pmu.c | 6 ++++--
+ 1 file changed, 4 insertions(+), 2 deletions(-)
 
 diff --git a/arm/pmu.c b/arm/pmu.c
-index 15c542a2..4c601b05 100644
+index 4c601b05..12e7d84e 100644
 --- a/arm/pmu.c
 +++ b/arm/pmu.c
-@@ -307,6 +307,7 @@ static void irq_handler(struct pt_regs *regs)
- 			}
- 		}
- 		write_sysreg(ALL_SET, pmovsclr_el0);
-+		isb();
- 	} else {
- 		pmu_stats.unexpected = true;
- 	}
-@@ -534,10 +535,12 @@ static void test_sw_incr(void)
- 	write_sysreg_s(0x3, PMCNTENSET_EL0);
+@@ -826,7 +826,7 @@ static void test_overflow_interrupt(void)
+ 	write_regn_el0(pmevcntr, 1, PRE_OVERFLOW);
+ 	isb();
  
- 	write_regn_el0(pmevcntr, 0, PRE_OVERFLOW);
-+	isb();
+-	/* interrupts are disabled */
++	/* interrupts are disabled (PMINTENSET_EL1 == 0) */
  
- 	for (i = 0; i < 100; i++)
- 		write_sysreg(0x1, pmswinc_el0);
- 
-+	isb();
- 	report_info("SW_INCR counter #0 has value %ld", read_regn_el0(pmevcntr, 0));
- 	report(read_regn_el0(pmevcntr, 0) == PRE_OVERFLOW,
- 		"PWSYNC does not increment if PMCR.E is unset");
-@@ -547,10 +550,12 @@ static void test_sw_incr(void)
- 	write_regn_el0(pmevcntr, 0, PRE_OVERFLOW);
- 	write_sysreg_s(0x3, PMCNTENSET_EL0);
- 	set_pmcr(pmu.pmcr_ro | PMU_PMCR_E);
-+	isb();
- 
- 	for (i = 0; i < 100; i++)
- 		write_sysreg(0x3, pmswinc_el0);
- 
-+	isb();
- 	report(read_regn_el0(pmevcntr, 0)  == 84, "counter #1 after + 100 SW_INCR");
- 	report(read_regn_el0(pmevcntr, 1)  == 100,
- 		"counter #0 after + 100 SW_INCR");
-@@ -618,9 +623,12 @@ static void test_chained_sw_incr(void)
- 
- 	write_regn_el0(pmevcntr, 0, PRE_OVERFLOW);
- 	set_pmcr(pmu.pmcr_ro | PMU_PMCR_E);
-+	isb();
-+
- 	for (i = 0; i < 100; i++)
- 		write_sysreg(0x1, pmswinc_el0);
- 
-+	isb();
- 	report(!read_sysreg(pmovsclr_el0) && (read_regn_el0(pmevcntr, 1) == 1),
- 		"no overflow and chain counter incremented after 100 SW_INCR/CHAIN");
- 	report_info("overflow=0x%lx, #0=%ld #1=%ld", read_sysreg(pmovsclr_el0),
-@@ -634,9 +642,12 @@ static void test_chained_sw_incr(void)
- 	write_regn_el0(pmevcntr, 1, ALL_SET);
- 	write_sysreg_s(0x3, PMCNTENSET_EL0);
- 	set_pmcr(pmu.pmcr_ro | PMU_PMCR_E);
-+	isb();
-+
- 	for (i = 0; i < 100; i++)
- 		write_sysreg(0x1, pmswinc_el0);
- 
-+	isb();
- 	report((read_sysreg(pmovsclr_el0) == 0x2) &&
- 		(read_regn_el0(pmevcntr, 1) == 0) &&
- 		(read_regn_el0(pmevcntr, 0) == 84),
-@@ -821,10 +832,14 @@ static void test_overflow_interrupt(void)
+ 	mem_access_loop(addr, 200, pmu.pmcr_ro | PMU_PMCR_E);
  	report(expect_interrupts(0), "no overflow interrupt after preset");
- 
- 	set_pmcr(pmu.pmcr_ro | PMU_PMCR_E);
-+	isb();
-+
- 	for (i = 0; i < 100; i++)
- 		write_sysreg(0x2, pmswinc_el0);
- 
-+	isb();
- 	set_pmcr(pmu.pmcr_ro);
-+	isb();
+@@ -842,7 +842,7 @@ static void test_overflow_interrupt(void)
+ 	isb();
  	report(expect_interrupts(0), "no overflow interrupt after counting");
  
- 	/* enable interrupts */
-@@ -879,6 +894,7 @@ static bool check_cycles_increase(void)
+-	/* enable interrupts */
++	/* enable interrupts (PMINTENSET_EL1 <= ALL_SET) */
+ 
+ 	pmu_reset_stats();
+ 
+@@ -890,6 +890,7 @@ static bool check_cycles_increase(void)
+ 	bool success = true;
+ 
+ 	/* init before event access, this test only cares about cycle count */
++	pmu_reset();
+ 	set_pmcntenset(1 << PMU_CYCLE_IDX);
  	set_pmccfiltr(0); /* count cycles in EL0, EL1, but not EL2 */
  
- 	set_pmcr(get_pmcr() | PMU_PMCR_LC | PMU_PMCR_C | PMU_PMCR_E);
-+	isb();
+@@ -944,6 +945,7 @@ static bool check_cpi(int cpi)
+ 	uint32_t pmcr = get_pmcr() | PMU_PMCR_LC | PMU_PMCR_C | PMU_PMCR_E;
  
- 	for (int i = 0; i < NR_SAMPLES; i++) {
- 		uint64_t a, b;
-@@ -894,6 +910,7 @@ static bool check_cycles_increase(void)
- 	}
+ 	/* init before event access, this test only cares about cycle count */
++	pmu_reset();
+ 	set_pmcntenset(1 << PMU_CYCLE_IDX);
+ 	set_pmccfiltr(0); /* count cycles in EL0, EL1, but not EL2 */
  
- 	set_pmcr(get_pmcr() & ~PMU_PMCR_E);
-+	isb();
- 
- 	return success;
- }
 -- 
 2.37.1.559.g78731f0fdb-goog
 
