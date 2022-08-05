@@ -2,86 +2,115 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id DAB0158B018
-	for <lists+kvm@lfdr.de>; Fri,  5 Aug 2022 20:55:51 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 381A458B023
+	for <lists+kvm@lfdr.de>; Fri,  5 Aug 2022 21:01:37 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S241136AbiHESzt (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 5 Aug 2022 14:55:49 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52274 "EHLO
+        id S237004AbiHETBg (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 5 Aug 2022 15:01:36 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55408 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S236448AbiHESzs (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 5 Aug 2022 14:55:48 -0400
-Received: from mailtransmit04.runbox.com (mailtransmit04.runbox.com [IPv6:2a0c:5a00:149::25])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 43DB5DF53
-        for <kvm@vger.kernel.org>; Fri,  5 Aug 2022 11:55:47 -0700 (PDT)
-Received: from mailtransmit02.runbox ([10.9.9.162] helo=aibo.runbox.com)
-        by mailtransmit04.runbox.com with esmtps  (TLS1.2) tls TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256
-        (Exim 4.93)
-        (envelope-from <mhal@rbox.co>)
-        id 1oK2U1-003eCU-5P; Fri, 05 Aug 2022 20:55:41 +0200
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=rbox.co;
-        s=selector1; h=Message-Id:In-Reply-To:Date:Subject:CC:To:From:MIME-Version:
-        Content-Transfer-Encoding:Content-Type;
-        bh=Re2VYOmUvCPJIl2+PrIKUcavLpF01PTLx7a9jzfSfHY=; b=IJ4RSb0ufgyOQ+YFh9ycQX/J4I
-        SfdZMZuhEUaZiVD+oA8GYGkUddYmaXzUoPRyVyrJffSeJIJjWqAFw+sB/DE9MX1r8aGOpR/CFId4I
-        vD7JX1V0C5/nmZJ2vdb2hndQ7+DSml4q0Ep4vBv9B3WjXY/4Hlt6PB5RMwlWutVbwzFjw83xfvKtj
-        CcQ6K9Fwd6raA4RVz4+WezUcVIwJbpw9yRzqVFa/ZqnXqliY/m2fpLX7VsG0l4XierP8rkkSJT8Jv
-        B71w9nrzCvgeXeVVHH/q2YqqzHrXKCUlF7tujbRshzV4VYpR63/7LyTbSVF/i48o8v9JHkl8AhXiE
-        qqBcnf7w==;
-Received: from [10.9.9.127] (helo=rmmprod05.runbox)
-        by mailtransmit02.runbox with esmtp (Exim 4.86_2)
-        (envelope-from <mhal@rbox.co>)
-        id 1oK2U0-00041Z-E0; Fri, 05 Aug 2022 20:55:40 +0200
-Received: from mail by rmmprod05.runbox with local (Exim 4.86_2)
-        (envelope-from <mhal@rbox.co>)
-        id 1oK2U0-0000qn-CI; Fri, 05 Aug 2022 20:55:40 +0200
-Content-Type: text/plain; charset="utf-8"
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+        with ESMTP id S233431AbiHETBe (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 5 Aug 2022 15:01:34 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 28E22193E0
+        for <kvm@vger.kernel.org>; Fri,  5 Aug 2022 12:01:34 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1659726093;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=7jrr///GTPolXMT+fiyn3eyuZH49mBtYTjRUTuSdpSs=;
+        b=hnFsI5wvrpQnr3PeCsype4VcxGnTIYeFeva3eMPUbkRuY4OIPV1Wy0pRrAdPmdGaveIzIG
+        GxVq2MbVsd0Gp0MKDb4xujqqkt800OHu3TtbSJVRpLfiujZ4+2cyJUXY68PNaEIRSm0Uo/
+        UME3NEXRK0/vGFH7bB3JFdy3o+sOmvY=
+Received: from mail-io1-f72.google.com (mail-io1-f72.google.com
+ [209.85.166.72]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-177-BZqsGK-kN1mx2Vqo5WnCbA-1; Fri, 05 Aug 2022 15:01:24 -0400
+X-MC-Unique: BZqsGK-kN1mx2Vqo5WnCbA-1
+Received: by mail-io1-f72.google.com with SMTP id u5-20020a6b4905000000b00681e48dbd92so1904011iob.21
+        for <kvm@vger.kernel.org>; Fri, 05 Aug 2022 12:01:24 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=content-transfer-encoding:mime-version:organization:references
+         :in-reply-to:message-id:subject:cc:to:from:date:x-gm-message-state
+         :from:to:cc;
+        bh=7jrr///GTPolXMT+fiyn3eyuZH49mBtYTjRUTuSdpSs=;
+        b=nrr3q3UIl2g0XPzJ7iha/+thNHyO2QrJQlFdKFsySd+CaVtohd8D5spPIE0bgVaH0v
+         I5Em/fnW7kK8+8N6vSRMakn/lG6c5VOa1S7PGafCERBlyjSl3nZoQ1pUC6N8T1afDILx
+         yg1mII+RFEDTWyAhvg1azIumGmM8RdRR2R+UrvQGCsA6HlXKcFErQ+62k7VZeWli1E+S
+         sjPFKiVXGD+GiChCWat/XGlr0iVkgINuOUQL6NSWGljvWEDG8pEjgSN/NN8VTqswksyp
+         fZOqCncF1z/kWUz30kz/erVye1fgTE+Xu5NlNbIHA7RHgemQCanDsZMKrA3PLHiCe2oY
+         /f2g==
+X-Gm-Message-State: ACgBeo1etHN2fbVDJDKDCDRUHUlonErv2N4fVuaoNJqjO9LzW+Tomk6C
+        sdIs0/I1sqVdzGLHcQuOBHPImV4yhfxvUeXGCa+wLgB8agkpkZNkTNrFXRgW06k7RlfFUd8ftqf
+        YATsLXzIlv6Th
+X-Received: by 2002:a05:6638:1305:b0:33f:7e59:4bc7 with SMTP id r5-20020a056638130500b0033f7e594bc7mr3471392jad.316.1659726083691;
+        Fri, 05 Aug 2022 12:01:23 -0700 (PDT)
+X-Google-Smtp-Source: AA6agR5tl8wkqOGSRQbqQPvsP8x/sMHa+aTSdU4oxacleMUjEkM/f7HmEieSFt52FFtURojAjdepMg==
+X-Received: by 2002:a05:6638:1305:b0:33f:7e59:4bc7 with SMTP id r5-20020a056638130500b0033f7e594bc7mr3471385jad.316.1659726083508;
+        Fri, 05 Aug 2022 12:01:23 -0700 (PDT)
+Received: from redhat.com ([38.15.36.239])
+        by smtp.gmail.com with ESMTPSA id f43-20020a02242b000000b00342744f18a9sm1983541jaa.99.2022.08.05.12.01.22
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 05 Aug 2022 12:01:23 -0700 (PDT)
+Date:   Fri, 5 Aug 2022 13:01:21 -0600
+From:   Alex Williamson <alex.williamson@redhat.com>
+To:     Jason Gunthorpe <jgg@nvidia.com>
+Cc:     Yishai Hadas <yishaih@nvidia.com>, saeedm@nvidia.com,
+        kvm@vger.kernel.org, netdev@vger.kernel.org, kuba@kernel.org,
+        kevin.tian@intel.com, joao.m.martins@oracle.com, leonro@nvidia.com,
+        maorg@nvidia.com, cohuck@redhat.com
+Subject: Re: [PATCH V3 vfio 04/11] vfio: Move vfio.c to vfio_main.c
+Message-ID: <20220805130121.36a2697d.alex.williamson@redhat.com>
+In-Reply-To: <Yu08gdx2Py9vAN1n@nvidia.com>
+References: <20220731125503.142683-1-yishaih@nvidia.com>
+        <20220731125503.142683-5-yishaih@nvidia.com>
+        <Yu08gdx2Py9vAN1n@nvidia.com>
+Organization: Red Hat
 MIME-Version: 1.0
-Received: from [Authenticated alias (604044)] by runbox.com with http
- (RMM6); Fri, 05 Aug 2022 18:55:40 GMT
-From:   "Michal Luczaj" <mhal@rbox.co>
-To:     "Paolo Bonzini" <pbonzini@redhat.com>
-CC:     "Sean Christopherson" <seanjc@google.com>,
-        "kvm" <kvm@vger.kernel.org>, "shuah" <shuah@kernel.org>,
-        "linux-kselftest" <linux-kselftest@vger.kernel.org>
-Subject: Re: [kvm-unit-tests PATCH 2/4] x86: emulator.c cleanup: Use
- ASM_TRY for the UD_VECTOR cases
-Date:   Fri, 05 Aug 2022 20:55:40 +0200 (CEST)
-X-RMM-Aliasid: 604044
-X-Mailer: RMM6
-In-Reply-To: <ae0a0049-8db0-501b-79e4-cd32758156fb@redhat.com>
-Message-Id: <E1oK2U0-0000qn-CI@rmmprod05.runbox>
-X-Spam-Status: No, score=-2.8 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,RCVD_IN_DNSWL_LOW,
-        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,UNPARSEABLE_RELAY
-        autolearn=unavailable autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-Spam-Status: No, score=-3.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,
+        SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=unavailable
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, 5 Aug 2022 13:42:40 +0200, Paolo Bonzini <pbonzini@redhat.com> wrot=
-e:
-> On 8/3/22 20:21, Sean Christopherson wrote:
-> >> I've noticed test_illegal_movbe() does not execute with KVM_FEP.
-> >> Just making sure: is it intentional?
-> > It's intentional.  FEP isn't needed because KVM emulates MOVBE on #UD w=
-hen it's
-> > not supported by the host, e.g. to allow migrating to an older host.
-> >=20
-> > 	GP(EmulateOnUD | ModRM, &three_byte_0f_38_f0),
-> > 	GP(EmulateOnUD | ModRM, &three_byte_0f_38_f1),
-> >=20
->=20
-> *puts historian hat on*
->=20
-> The original reason was to test Linux using MOVBE even on non-Atom=20
-> machines, when MOVBE was only on Atoms. :)
+On Fri, 5 Aug 2022 12:51:29 -0300
+Jason Gunthorpe <jgg@nvidia.com> wrote:
 
-So the emulator's logic for MOVBE is meant to be tested only when the
-guest supports MOVBE while the host does not?
+> On Sun, Jul 31, 2022 at 03:54:56PM +0300, Yishai Hadas wrote:
+> > From: Jason Gunthorpe <jgg@nvidia.com>
+> > 
+> > If a source file has the same name as a module then kbuild only supports
+> > a single source file in the module.
+> > 
+> > Rename vfio.c to vfio_main.c so that we can have more that one .c file
+> > in vfio.ko.
+> > 
+> > Signed-off-by: Jason Gunthorpe <jgg@nvidia.com>
+> > Signed-off-by: Yishai Hadas <yishaih@nvidia.com>
+> > 
+> > ---
+> >  drivers/vfio/Makefile                | 2 ++
+> >  drivers/vfio/{vfio.c => vfio_main.c} | 0
+> >  2 files changed, 2 insertions(+)
+> >  rename drivers/vfio/{vfio.c => vfio_main.c} (100%)  
+> 
+> Alex, could you grab this patch for the current merge window?
+> 
+> It is a PITA to rebase across, it would be nice to have the rename in
+> rc1
 
-Michal
+No objection from me, I'll see if Linus picks up my current pull
+request and either pull this in or send it separately next week.
+Thanks,
+
+Alex
+
