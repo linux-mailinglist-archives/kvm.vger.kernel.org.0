@@ -2,74 +2,162 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id D55D758B814
-	for <lists+kvm@lfdr.de>; Sat,  6 Aug 2022 21:59:55 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 5CEB758B879
+	for <lists+kvm@lfdr.de>; Sat,  6 Aug 2022 23:48:15 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234053AbiHFT5I (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sat, 6 Aug 2022 15:57:08 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39100 "EHLO
+        id S233665AbiHFVsJ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sat, 6 Aug 2022 17:48:09 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35964 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233898AbiHFT4a (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sat, 6 Aug 2022 15:56:30 -0400
-Received: from smtp.smtpout.orange.fr (smtp07.smtpout.orange.fr [80.12.242.129])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C363412AC9
-        for <kvm@vger.kernel.org>; Sat,  6 Aug 2022 12:56:16 -0700 (PDT)
-Received: from pop-os.home ([90.11.190.129])
-        by smtp.orange.fr with ESMTPA
-        id KPuAob2sMGDTnKPuAobw3d; Sat, 06 Aug 2022 21:56:14 +0200
-X-ME-Helo: pop-os.home
-X-ME-Auth: YWZlNiIxYWMyZDliZWIzOTcwYTEyYzlhMmU3ZiQ1M2U2MzfzZDfyZTMxZTBkMTYyNDBjNDJlZmQ3ZQ==
-X-ME-Date: Sat, 06 Aug 2022 21:56:14 +0200
-X-ME-IP: 90.11.190.129
-From:   Christophe JAILLET <christophe.jaillet@wanadoo.fr>
-To:     Diana Craciun <diana.craciun@oss.nxp.com>,
-        Alex Williamson <alex.williamson@redhat.com>,
-        Cornelia Huck <cohuck@redhat.com>
-Cc:     linux-kernel@vger.kernel.org, kernel-janitors@vger.kernel.org,
-        Christophe JAILLET <christophe.jaillet@wanadoo.fr>,
-        kvm@vger.kernel.org
-Subject: [PATCH] vfio/fsl-mc: Fix a typo in a comment
-Date:   Sat,  6 Aug 2022 21:56:13 +0200
-Message-Id: <2b65bf8d2b4d940cafbafcede07c23c35f042f5a.1659815764.git.christophe.jaillet@wanadoo.fr>
-X-Mailer: git-send-email 2.34.1
+        with ESMTP id S233212AbiHFVsH (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sat, 6 Aug 2022 17:48:07 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 71CFBBF4B
+        for <kvm@vger.kernel.org>; Sat,  6 Aug 2022 14:48:06 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1659822485;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=G/Yc0SN4MCdHWQQL7Yeq1p7bShR2bu8cCKLfrIoQmUw=;
+        b=Bxjk7i2uxin8fFhTh73iLy5UQtn3iyObyFsYoC5yrkLzfC1T2JUEuFQ9LVZdGSj89jUMML
+        4hNazkhOm87CrN4AupzUHS7ShdwyjGIgto+BblWf5hcPRIBR1zMZGqbK+muhYy7zAcAjXx
+        C1wrWzYdQ76qWCjF5lsKTOUBX39URVY=
+Received: from mail-lf1-f72.google.com (mail-lf1-f72.google.com
+ [209.85.167.72]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-561-VAb4klPqNu2wqppToTxGiw-1; Sat, 06 Aug 2022 17:48:03 -0400
+X-MC-Unique: VAb4klPqNu2wqppToTxGiw-1
+Received: by mail-lf1-f72.google.com with SMTP id n17-20020ac242d1000000b0048af11cb0f4so1176654lfl.19
+        for <kvm@vger.kernel.org>; Sat, 06 Aug 2022 14:48:03 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc;
+        bh=G/Yc0SN4MCdHWQQL7Yeq1p7bShR2bu8cCKLfrIoQmUw=;
+        b=zl+woBqqL1yGSFary09/gtj+MH9UOYxw9plxQxpTJQ+hQ7IbToD9rBdM3YtunLHFpP
+         gBWEJ/nwnzdniQA2a8F9GsQp38b5EW7D255k/CwnZUZUX3Lwet5Eiv1QH0Wvh0PLNc43
+         GZUFq2nz/ZcYoNBGerd8y2VZakqd6BZNT4J/Dfw3k8c2DcFXzhnR28Vm8bnIpCVCGKtm
+         diL3s2ei7YRxj5j160SGciqOSPxWgLTKrGHOhWdpMDlhvlUcD+kHf0vjKszGx1D+y9uW
+         X1RQd+hst1HTXstdUB/5wp45JCX6vxDkmsT1CQUeKKh2YNC5abeXasZ9MZHE4mDT+hHw
+         olxQ==
+X-Gm-Message-State: ACgBeo2la1HrTtxV9yv1V/25QWLhrLkrCMh9Wbbvw0+G9FjZAbM1CArI
+        HJrlVLmyGa6hK26Ui2eZUkJlLT9c3qN1eoypu+4nIlnbPCusDWAw/OHaIUw7CRv/iL6651TZDUh
+        4tCVQVkNeglAqG439SoAOa5dxRqYE
+X-Received: by 2002:a2e:96c1:0:b0:258:e8ec:3889 with SMTP id d1-20020a2e96c1000000b00258e8ec3889mr3830092ljj.6.1659822481966;
+        Sat, 06 Aug 2022 14:48:01 -0700 (PDT)
+X-Google-Smtp-Source: AA6agR4Bq+qQub/hc9Zw+AFp/9p2wRrQxN4NisZClKldO2MHMROZVH32qxdSbMaJa+L5k/npjjS1q4gBM/6yk6Y4QVk=
+X-Received: by 2002:a2e:96c1:0:b0:258:e8ec:3889 with SMTP id
+ d1-20020a2e96c1000000b00258e8ec3889mr3830084ljj.6.1659822481766; Sat, 06 Aug
+ 2022 14:48:01 -0700 (PDT)
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,RCVD_IN_DNSWL_NONE,
-        RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
-        autolearn=ham autolearn_force=no version=3.4.6
+References: <20220805181105.GA29848@willie-the-truck> <20220806074828.zwzgn5gj47gjx5og@sgarzare-redhat>
+ <20220806094239.GA30268@willie-the-truck> <CAD60JZMbbkwFHqCm_iCrOrKgRLBUMkDQfuJ=Q1T-sZt59eTBrw@mail.gmail.com>
+ <20220806143443.GA30658@willie-the-truck>
+In-Reply-To: <20220806143443.GA30658@willie-the-truck>
+From:   Stefan Hajnoczi <shajnocz@redhat.com>
+Date:   Sat, 6 Aug 2022 17:47:50 -0400
+Message-ID: <CAD60JZOwho3D-_gXZTT3aYSgo04Pd=VrM7QyJbgfp8PYqzOvgw@mail.gmail.com>
+Subject: Re: IOTLB support for vhost/vsock breaks crosvm on Android
+To:     Will Deacon <will@kernel.org>
+Cc:     Stefano Garzarella <sgarzare@redhat.com>,
+        Michael Tsirkin <mst@redhat.com>,
+        Stefan Hajnoczi <stefanha@redhat.com>,
+        Jason Wang <jasowang@redhat.com>,
+        torvalds@linux-foundation.org, ascull@google.com, maz@kernel.org,
+        keirf@google.com, jiyong@google.com, kernel-team@android.com,
+        linux-kernel@vger.kernel.org,
+        virtualization@lists.linux-foundation.org, kvm@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+X-Spam-Status: No, score=-3.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,
+        SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-L and S are swapped/
-s/VFIO_FLS_MC/VFIO_FSL_MC/
+On Sat, Aug 6, 2022 at 10:35 AM Will Deacon <will@kernel.org> wrote:
+>
+> On Sat, Aug 06, 2022 at 06:52:15AM -0400, Stefan Hajnoczi wrote:
+> > On Sat, Aug 6, 2022 at 5:50 AM Will Deacon <will@kernel.org> wrote:
+> > > On Sat, Aug 06, 2022 at 09:48:28AM +0200, Stefano Garzarella wrote:
+> > > > On Fri, Aug 05, 2022 at 07:11:06PM +0100, Will Deacon wrote:
+> > > > If the VMM implements the translation feature, it is right in my opinion
+> > > > that it does not enable the feature for the vhost device. Otherwise, if it
+> > > > wants the vhost device to do the translation, enable the feature and send
+> > > > the IOTLB messages to set the translation.
+> > > >
+> > > > QEMU for example masks features when not required or supported.
+> > > > crosvm should negotiate only the features it supports.
+> > > >
+> > > > @Michael and @Jason can correct me, but if a vhost device negotiates
+> > > > VIRTIO_F_ACCESS_PLATFORM, then it expects the VMM to send IOTLB messages to
+> > > > set the translation.
+> > >
+> > > As above, the issue is that vhost now unconditionally advertises this in
+> > > VHOST_GET_FEATURES and so a VMM with no knowledge of IOTLB can end up
+> > > enabling it by accident.
+> >
+> > Unconditionally exposing all vhost feature bits to the guest is
+> > incorrect. The emulator must filter out only the feature bits that it
+> > supports.
+>
+> I've evidently done a bad job of explaining this, sorry.
+>
+> crosvm _does_ filter the feature bits which it passes to vhost. It takes the
+> feature set which it has negotiated with the guest and then takes the
+> intersection of this set with the set of features which vhost advertises.
+> The result is what is passed to VHOST_SET_FEATURES. I included the rust
+> for this in my initial mail, but in C it might look something like:
+>
+>         u64 features = negotiate_features_with_guest(dev);
+>
+>         ioctl(vhost_fd, VHOST_GET_FEATURES, &vhost_features);
+>         vhost_features &= features;     /* Mask out unsupported features */
+>         ioctl(vhost_fd, VHOST_SET_FEATURES, &vhost_features);
 
-Signed-off-by: Christophe JAILLET <christophe.jaillet@wanadoo.fr>
----
-All the dev_ logging functions in the file have the "VFIO_FSL_MC: "
-prefix.
-As they are dev_ function, the driver should already be displayed.
+This is unrelated to the current issue, but this code looks wrong.
+VHOST_GET_FEATURES must be called before negotiating with the guest.
+The device features must be restricted by vhost before advertising
+them to the guest. For example, if a new crosvm binary runs on an old
+kernel then feature bits crosvm negotiated with the guest may not be
+supported by the vhost kernel module and the device is broken.
 
-So, does it make sense or could they be all removed?
----
- drivers/vfio/fsl-mc/vfio_fsl_mc.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+> The problem is that crosvm has negotiated VIRTIO_F_ACCESS_PLATFORM with
+> the guest so that restricted DMA is used for the virtio devices. With
+> e13a6915a03f, VIRTIO_F_ACCESS_PLATFORM is now advertised by
+> VHOST_GET_FEATURES and so IOTLB is enabled by the sequence above.
+>
+> > For example, see QEMU's vhost-net device's vhost feature bit allowlist:
+> > https://gitlab.com/qemu-project/qemu/-/blob/master/hw/net/vhost_net.c#L40
+>
+> I agree that changing crosvm to use an allowlist would fix the problem,
+> I'm just questioning whether we should be changing userspace at all to
+> resolve this issue.
+>
+> > The reason why the emulator (crosvm/QEMU/etc) must filter out feature
+> > bits is that vhost devices are full VIRTIO devices. They are a subset
+> > of a VIRTIO device and the emulator is responsible for the rest of the
+> > device. Some features will require both vhost and emulator support.
+> > Therefore it is incorrect to expect the device to work correctly if
+> > the vhost feature bits are passed through to the guest.
+>
+> I think crosvm is trying to cater for this by masking out the features
+> it doesn't know about.
 
-diff --git a/drivers/vfio/fsl-mc/vfio_fsl_mc.c b/drivers/vfio/fsl-mc/vfio_fsl_mc.c
-index 3feff729f3ce..66d01db1d240 100644
---- a/drivers/vfio/fsl-mc/vfio_fsl_mc.c
-+++ b/drivers/vfio/fsl-mc/vfio_fsl_mc.c
-@@ -110,7 +110,7 @@ static void vfio_fsl_mc_close_device(struct vfio_device *core_vdev)
- 
- 	if (WARN_ON(ret))
- 		dev_warn(&mc_cont->dev,
--			 "VFIO_FLS_MC: reset device has failed (%d)\n", ret);
-+			 "VFIO_FSL_MC: reset device has failed (%d)\n", ret);
- 
- 	vfio_fsl_mc_irqs_cleanup(vdev);
- 
--- 
-2.34.1
+Can you point to the guest driver code for restricted DMA? It's
+unclear to me what the guest drivers are doing and whether that is
+VIRTIO spec compliant. Is the driver compliant with VIRTIO 1.2 "6.1
+Driver Requirements: Reserved Feature Bits":
+
+  A driver SHOULD accept VIRTIO_F_ACCESS_PLATFORM if it is offered,
+and it MUST then either disable the IOMMU or configure the IOMMU to
+translate bus addresses passed to the device into physical addresses
+in memory. If VIRTIO_F_ACCESS_PLATFORM is not offered, then a driver
+MUST pass only physical addresses to the device.
+
+Stefan
 
