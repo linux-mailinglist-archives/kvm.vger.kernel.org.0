@@ -2,81 +2,103 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id E65F258B51C
-	for <lists+kvm@lfdr.de>; Sat,  6 Aug 2022 12:53:14 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id CC4CB58B521
+	for <lists+kvm@lfdr.de>; Sat,  6 Aug 2022 13:08:15 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230288AbiHFKxN (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sat, 6 Aug 2022 06:53:13 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55406 "EHLO
+        id S230379AbiHFLIO (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sat, 6 Aug 2022 07:08:14 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33316 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229797AbiHFKxM (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sat, 6 Aug 2022 06:53:12 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 5437CE008
-        for <kvm@vger.kernel.org>; Sat,  6 Aug 2022 03:53:10 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1659783189;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=HoXZYNXSL5fLTvts22bXZSeKXcAG3hKrGWdYE5IH2uY=;
-        b=Nr3qZza7tnQQZcddDs4nPi5bcyObj+3I7XA+5DZloDGmmNViI40aF1VDCmkW+jkhhQXrN3
-        t1JZH0lTJAnuPqMgp/zhxOeSf+wf2tkC7OuFhROAPnzADNIQ+Y8HBF4XtozyHjk+mhySBk
-        W4VwerI1SVQN6xt7zaixUV7+6rGASWQ=
-Received: from mail-lj1-f200.google.com (mail-lj1-f200.google.com
- [209.85.208.200]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-16-g7s6nzs8N3ybkrcOAQlRag-1; Sat, 06 Aug 2022 06:53:08 -0400
-X-MC-Unique: g7s6nzs8N3ybkrcOAQlRag-1
-Received: by mail-lj1-f200.google.com with SMTP id u7-20020a2e2e07000000b0025e4fbba9f0so1461430lju.13
-        for <kvm@vger.kernel.org>; Sat, 06 Aug 2022 03:53:07 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc;
-        bh=HoXZYNXSL5fLTvts22bXZSeKXcAG3hKrGWdYE5IH2uY=;
-        b=0HEqdODtd+iU/Tdaf5h2GmW+BKGfAaNZFT2Gap0j4B5pmIXGmpjWbF2+lcJ6YXipfq
-         B0SdRld4P0TEHvIE+CF34+hhSAKio+3Ww51fh1M22nbHXdWhxgWYxl48/qXrO5QsdNgL
-         +2A4p0A7ic4t59GozacdyaIu1VPxQCzVVpguYGlUyIhG72GRG6q4ocrqD+XFaJpKG8D7
-         3qLOEZJHRUbYQL+Fjs9BcWa+aI8KWt+xmTPeUtulT/H/SXO7Raj6rWQxty2Vhbhd8Are
-         MwDb2uzRnN8wfoBecPUiODWz87HZUTHXjpm1GJCtl1r0izsZdeNVFs1oObxBfXjF3T7h
-         FFFQ==
-X-Gm-Message-State: ACgBeo0yJEc+XlJJu4THJ9VBCTtpJC5he7AZ8FdX6NdiM1or4bsb9Rxr
-        GiLj3/6YJtgB+e0rtv52rUXrhLJ4sDPkS8Ea2IQxdKGEb2BylHAvQFhXIXDRGGfDvchMWpUwygx
-        jO7oMqMRrV0GkMkD71xbTskTWRyIE
-X-Received: by 2002:a19:ab02:0:b0:48b:3f9:add1 with SMTP id u2-20020a19ab02000000b0048b03f9add1mr3725684lfe.329.1659783186774;
-        Sat, 06 Aug 2022 03:53:06 -0700 (PDT)
-X-Google-Smtp-Source: AA6agR68ndpqPOOxRv2oo+THbpQNjgqPKLoS/uiP2MJpF6wKiapM7segimQKmjhNFxOTs1KVU4EO6HP0z4kLPfWE/JQ=
-X-Received: by 2002:a19:ab02:0:b0:48b:3f9:add1 with SMTP id
- u2-20020a19ab02000000b0048b03f9add1mr3725668lfe.329.1659783186556; Sat, 06
- Aug 2022 03:53:06 -0700 (PDT)
+        with ESMTP id S229695AbiHFLIN (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sat, 6 Aug 2022 07:08:13 -0400
+Received: from mailtransmit04.runbox.com (mailtransmit04.runbox.com [IPv6:2a0c:5a00:149::25])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BAAD6EE38;
+        Sat,  6 Aug 2022 04:08:10 -0700 (PDT)
+Received: from mailtransmit02.runbox ([10.9.9.162] helo=aibo.runbox.com)
+        by mailtransmit04.runbox.com with esmtps  (TLS1.2) tls TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256
+        (Exim 4.93)
+        (envelope-from <mhal@rbox.co>)
+        id 1oKHf4-005H9H-N1; Sat, 06 Aug 2022 13:08:06 +0200
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=rbox.co;
+        s=selector1; h=Message-Id:In-Reply-To:Date:Subject:CC:To:From:MIME-Version:
+        Content-Transfer-Encoding:Content-Type;
+        bh=4k4hrKfuKMWTUDyGqGN1lIamEwVduqLB33bUAdj0r8c=; b=XZFxd3Pb8OTvVOLg3kWw+3fg3u
+        bA0o1gNWlSN+gfLPr41aKhdIsZHFJBCMeyU5Il5W/DJJ34LXaL9oGZIHNqtYcJBZe7JJ5V+N4sLXa
+        i10ukM1uGEp/YitBsQ0m6PyHAXPX8aJsYcdkLgqSJpHkpGefo4oBjFfnOSzS+D/cIDDR5TZWc1hfP
+        vcSvtGGInAGONkfIPp2V1a9ag+rvRJ14PU2auLNMrFRwdLPJmh+zBvMAQ+56MNcYaKMZebIFUlACU
+        35Xfb0QLLZaOMLf4xSXn/jgiREdhoBFVLEVA9uGubJIdigBjq6CmUxgqUBDXNCBMEZI+7dcZFsAAG
+        dHrHGSzA==;
+Received: from [10.9.9.127] (helo=rmmprod05.runbox)
+        by mailtransmit02.runbox with esmtp (Exim 4.86_2)
+        (envelope-from <mhal@rbox.co>)
+        id 1oKHf4-0003Vw-8K; Sat, 06 Aug 2022 13:08:06 +0200
+Received: from mail by rmmprod05.runbox with local (Exim 4.86_2)
+        (envelope-from <mhal@rbox.co>)
+        id 1oKHf4-0001d6-6W; Sat, 06 Aug 2022 13:08:06 +0200
+Content-Type: text/plain; charset="utf-8"
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 MIME-Version: 1.0
-References: <20220805181105.GA29848@willie-the-truck> <20220806074828.zwzgn5gj47gjx5og@sgarzare-redhat>
- <20220806094239.GA30268@willie-the-truck> <CAD60JZMbbkwFHqCm_iCrOrKgRLBUMkDQfuJ=Q1T-sZt59eTBrw@mail.gmail.com>
-In-Reply-To: <CAD60JZMbbkwFHqCm_iCrOrKgRLBUMkDQfuJ=Q1T-sZt59eTBrw@mail.gmail.com>
-From:   Stefan Hajnoczi <shajnocz@redhat.com>
-Date:   Sat, 6 Aug 2022 06:52:55 -0400
-Message-ID: <CAD60JZN2rTWAXoSVtpOVGABw+rLGuQn=DLTEsN+UnHOMEEiLQA@mail.gmail.com>
-Subject: Re: IOTLB support for vhost/vsock breaks crosvm on Android
-To:     Will Deacon <will@kernel.org>
-Cc:     Stefano Garzarella <sgarzare@redhat.com>, mst@redhat.com,
-        Stefan Hajnoczi <stefanha@redhat.com>,
-        Jason Wang <jasowang@redhat.com>,
-        torvalds@linux-foundation.org, ascull@google.com, maz@kernel.org,
-        keirf@google.com, jiyong@google.com, kernel-team@android.com,
-        linux-kernel@vger.kernel.org,
-        virtualization@lists.linux-foundation.org, kvm@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-X-Spam-Status: No, score=-2.7 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham
-        autolearn_force=no version=3.4.6
+Received: from [Authenticated alias (604044)] by runbox.com with http
+ (RMM6); Sat, 06 Aug 2022 11:08:06 GMT
+From:   "Michal Luczaj" <mhal@rbox.co>
+To:     "Nadav Amit" <nadav.amit@gmail.com>
+CC:     "Paolo Bonzini" <pbonzini@redhat.com>, "kvm" <kvm@vger.kernel.org>,
+        "shuah" <shuah@kernel.org>,
+        "linux-kselftest" <linux-kselftest@vger.kernel.org>,
+        "Sean Christopherson" <seanjc@google.com>
+Subject: Re: [kvm-unit-tests PATCH 2/4] x86: emulator.c cleanup: Use
+ ASM_TRY for the UD_VECTOR cases
+Date:   Sat, 06 Aug 2022 13:08:06 +0200 (CEST)
+X-RMM-Aliasid: 604044
+X-Mailer: RMM6
+In-Reply-To: <CA0EBF68-648D-483F-B629-7C1B70D1E73C@gmail.com>
+Message-Id: <E1oKHf4-0001d6-6W@rmmprod05.runbox>
+X-Spam-Status: No, score=-2.8 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,RCVD_IN_DNSWL_LOW,
+        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,UNPARSEABLE_RELAY
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-s/vhost devices are full VIRTIO devices/vhost devices are not full
-VIRTIO devices/
+On Fri, 5 Aug 2022 19:00:12 -0700, Nadav Amit <nadav.amit@gmail.com> wrote:
+> On Aug 5, 2022, at 12:59 PM, Sean Christopherson <seanjc@google.com> wrot=
+e:
+> > On Fri, Aug 05, 2022, Michal Luczaj wrote:
+> >> On Fri, 5 Aug 2022 13:42:40 +0200, Paolo Bonzini <pbonzini@redhat.com>=
+ wrote:
+> >>> The original reason was to test Linux using MOVBE even on non-Atom=20
+> >>> machines, when MOVBE was only on Atoms. :)
+> >>=20
+> >> So the emulator's logic for MOVBE is meant to be tested only when the
+> >> guest supports MOVBE while the host does not?
+> >=20
+> > Ah, I see what you're asking.  No, it's perfectly legal to test MOVBE e=
+mulation
+> > on hosts that support MOVBE, i.e. using FEP is allowed.  But because KV=
+M emulates
+> > MOVBE on #UD and the KUT testcase is guaranteed to generate a #UD (barr=
+ing a
+> > hardware bug), there's no need to use FEP.  And not using FEP is advant=
+ageous
+> > because it avoids depending on an opt-in non-production module param.
+>=20
+> If history is discussed, the test was created long before FEP. Without FE=
+P,
+> the way to force the emulator to emulate an instruction was to set the
+> instruction in memory that is not mapped to the guest. But, as Sean state=
+d,
+> this test always triggers #UD, so it was not necessary.
+>=20
+> The purpose of this test was to check a KVM fix for a bug that was found
+> during fuzzing:
+>=20
+> https://lore.kernel.org/all/5475DC42.6000201@redhat.com/T/#m3a0da02d7c750=
+c28816b08c43cf2ca03252b8bad
 
+OK, I think I finally get it. Thank you, guys, for all the details.
+
+Michal
