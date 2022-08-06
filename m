@@ -2,72 +2,74 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 9AB6D58B44F
-	for <lists+kvm@lfdr.de>; Sat,  6 Aug 2022 09:48:47 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id A2F5358B488
+	for <lists+kvm@lfdr.de>; Sat,  6 Aug 2022 10:17:55 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S241657AbiHFHsk (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sat, 6 Aug 2022 03:48:40 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45710 "EHLO
+        id S241712AbiHFIRt (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sat, 6 Aug 2022 04:17:49 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33918 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S241526AbiHFHsi (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sat, 6 Aug 2022 03:48:38 -0400
+        with ESMTP id S241596AbiHFIRr (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sat, 6 Aug 2022 04:17:47 -0400
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 29F3E62ED
-        for <kvm@vger.kernel.org>; Sat,  6 Aug 2022 00:48:37 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id A7A7E13F86
+        for <kvm@vger.kernel.org>; Sat,  6 Aug 2022 01:17:46 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1659772115;
+        s=mimecast20190719; t=1659773865;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          in-reply-to:in-reply-to:references:references;
-        bh=HKJdR7LmnnVRebjUrt3OcGVl+hsgXLOn3cSlJAzVRJE=;
-        b=X7R6Wbqw5Uotgxq2toBSU9QB41VQGYVeVsiv8hE3/B6AuamsN58xDnLOObX6a860uQVdK6
-        3ntJsJMAOFshjJrv7ggSBsnQhtONEZP66qZFqbp/ylnVBdEzqzmo248Dn6vzAfbgcgArsu
-        4BFUMnl/miBgjR9u5E0niaPCdDoCMcY=
-Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
- [209.85.128.71]) by relay.mimecast.com with ESMTP with STARTTLS
+        bh=QUhhyhwWziHPf4owDIioKjw2klBpNCGgWh43vGMAw90=;
+        b=eymqhqULnNwPdR4y/XJIfPseMVkZTHtfB/KVj1NoTA26DQrewPmvdelDRiuL/7pTf40LoK
+        vpIDDNBn86wZVVrJ4nFOU6JCC/wfREhTDopUTAPPNWwqAseYxCObRiaZG4Tx1Tzj7U3H3E
+        tW/wCumOoe5dy8yGjRnTpJaX0p7n2QE=
+Received: from mail-qk1-f200.google.com (mail-qk1-f200.google.com
+ [209.85.222.200]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-46-pnCcptezPeWEGOADy_D_gw-1; Sat, 06 Aug 2022 03:48:34 -0400
-X-MC-Unique: pnCcptezPeWEGOADy_D_gw-1
-Received: by mail-wm1-f71.google.com with SMTP id v64-20020a1cac43000000b003a4bea31b4dso5345454wme.3
-        for <kvm@vger.kernel.org>; Sat, 06 Aug 2022 00:48:34 -0700 (PDT)
+ us-mta-518-TL0Da7HLO7iF_JKQNzdP8A-1; Sat, 06 Aug 2022 04:17:42 -0400
+X-MC-Unique: TL0Da7HLO7iF_JKQNzdP8A-1
+Received: by mail-qk1-f200.google.com with SMTP id x22-20020a05620a259600b006b552a69231so3766124qko.18
+        for <kvm@vger.kernel.org>; Sat, 06 Aug 2022 01:17:42 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:x-gm-message-state:from:to:cc;
-        bh=HKJdR7LmnnVRebjUrt3OcGVl+hsgXLOn3cSlJAzVRJE=;
-        b=WDDIuGhaF9K4jTZ5Gde3MOn08XqMAfqyKvOaNTmBOuLel0+H2nE2qOAAmsDHEG9Ze8
-         9c8TO/pImW3QSh6nJwQzF+bxVG6pafnIPvSDvUtNPUhSI6aS9JUUnke24YGNE1og0/52
-         DAXVVSAZh42lNjpSWDGbTzroPztUynOypkgXL7gLeCdDLYbrYiYSQRZvQExdVv+FAWyo
-         s96qA0FWvQrona/ApHAWc96fchbqG27kiAolT3b8tjbNY+fbxlMj6I11fexDLYoPJ4Oi
-         G5QssYcIb8oss1tBC4uCtR/Oz7w3e2G0GnDPJNUh+2L+IypqksP8/TVJ5sIkoqht6tdc
-         D4+A==
-X-Gm-Message-State: ACgBeo3QK6Ch8wXwRYuSlIGVfpDO/ZUL8BQCaH/Hvly95T08DklrN1IX
-        YAIGzzsnpynmGFbIuneeJhSvpkBPPvCTBWO49raJBYlIcX1bfknmdquUi6VBf3nG5Efh+ezQeY+
-        bXn0jtQvSuGOQ
-X-Received: by 2002:a7b:c4d7:0:b0:3a4:f135:cae5 with SMTP id g23-20020a7bc4d7000000b003a4f135cae5mr11772928wmk.201.1659772113113;
-        Sat, 06 Aug 2022 00:48:33 -0700 (PDT)
-X-Google-Smtp-Source: AA6agR4rrYxYHIgJq15RsQNATquLdbvDE9omfk3WwIkXFCvrg+NGUdxv0J2OY4G92BAAYWQDoOPCsQ==
-X-Received: by 2002:a7b:c4d7:0:b0:3a4:f135:cae5 with SMTP id g23-20020a7bc4d7000000b003a4f135cae5mr11772902wmk.201.1659772112862;
-        Sat, 06 Aug 2022 00:48:32 -0700 (PDT)
+        bh=QUhhyhwWziHPf4owDIioKjw2klBpNCGgWh43vGMAw90=;
+        b=xgaopNwvQYi02Jy4SQG31lSsZIQYe2IN54Sv5DxW8/19RI/Vf51kwGyhO1NhFELamf
+         qA62Ct/4pJCk8ZxZqift/C7KEaIKGKTakUUVsPIcTGO9fADEpxlBilQzkdna06UNHajC
+         Dll4yLiE/ke7Xx87pdhMkhupPQUYloDXyayC97RfalyEbWs5KXMudxqt4t4opaqsO6ot
+         JbRRMBJELIqGbC7VjEEB5GFnOYhOx1hmFF1c1yCMJo6UWerClWjiEujOsKt9A2gZNyT4
+         1drnW2du+AqWNX4I1LJjQ/xXZrT2xiMOD1JPmsslVaMWoQpdRVc/AjmTH0tLOyNQ3QV4
+         D/dw==
+X-Gm-Message-State: ACgBeo3Jt/v6DEjtJEIhwg+aS/Gau8RWH4VdlWNEvOA1MBywdqP2XHUL
+        LsLFSewAUDDzCM3jNRnWxdSee/VfzRxmef3e/AS4UAYnG/Up5cA6DWgC6GqkpBvs6RU9XHCmOyD
+        H9mAgucrYBcX4
+X-Received: by 2002:a05:622a:d5:b0:31e:eb65:e832 with SMTP id p21-20020a05622a00d500b0031eeb65e832mr9059519qtw.92.1659773862200;
+        Sat, 06 Aug 2022 01:17:42 -0700 (PDT)
+X-Google-Smtp-Source: AA6agR7tYxINyBqtVppCff7bDw/5gEb1ZvpfEu6NMMMRX3xBGvdOSDUK2l2oCDIf8Yd83eFnoOADtA==
+X-Received: by 2002:a05:622a:d5:b0:31e:eb65:e832 with SMTP id p21-20020a05622a00d500b0031eeb65e832mr9059511qtw.92.1659773861963;
+        Sat, 06 Aug 2022 01:17:41 -0700 (PDT)
 Received: from sgarzare-redhat (host-79-46-200-178.retail.telecomitalia.it. [79.46.200.178])
-        by smtp.gmail.com with ESMTPSA id p3-20020a05600c1d8300b003a3186fa559sm7389606wms.29.2022.08.06.00.48.31
+        by smtp.gmail.com with ESMTPSA id u4-20020a05620a430400b006b5988b2ca8sm4658290qko.40.2022.08.06.01.17.38
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sat, 06 Aug 2022 00:48:32 -0700 (PDT)
-Date:   Sat, 6 Aug 2022 09:48:28 +0200
+        Sat, 06 Aug 2022 01:17:40 -0700 (PDT)
+Date:   Sat, 6 Aug 2022 10:17:32 +0200
 From:   Stefano Garzarella <sgarzare@redhat.com>
-To:     Will Deacon <will@kernel.org>
-Cc:     mst@redhat.com, stefanha@redhat.com, jasowang@redhat.com,
-        torvalds@linux-foundation.org, ascull@google.com, maz@kernel.org,
-        keirf@google.com, jiyong@google.com, kernel-team@android.com,
+To:     Linus Torvalds <torvalds@linux-foundation.org>, mst@redhat.com,
+        jasowang@redhat.com
+Cc:     Will Deacon <will@kernel.org>, stefanha@redhat.com,
+        ascull@google.com, maz@kernel.org, keirf@google.com,
+        jiyong@google.com, kernel-team@android.com,
         linux-kernel@vger.kernel.org,
         virtualization@lists.linux-foundation.org, kvm@vger.kernel.org
 Subject: Re: IOTLB support for vhost/vsock breaks crosvm on Android
-Message-ID: <20220806074828.zwzgn5gj47gjx5og@sgarzare-redhat>
+Message-ID: <20220806081732.a553jsoe2sfwghjg@sgarzare-redhat>
 References: <20220805181105.GA29848@willie-the-truck>
+ <CAHk-=wip-Lju3ZdNwknS6ouyw+nKXeRSnhqVyNo8WSEdk-BfGw@mail.gmail.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii; format=flowed
 Content-Disposition: inline
-In-Reply-To: <20220805181105.GA29848@willie-the-truck>
+In-Reply-To: <CAHk-=wip-Lju3ZdNwknS6ouyw+nKXeRSnhqVyNo8WSEdk-BfGw@mail.gmail.com>
 X-Spam-Status: No, score=-2.7 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
         SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=unavailable
@@ -78,113 +80,102 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi Will,
+Hi Linus,
 
-On Fri, Aug 05, 2022 at 07:11:06PM +0100, Will Deacon wrote:
->Hi folks,
+On Fri, Aug 05, 2022 at 03:57:08PM -0700, Linus Torvalds wrote:
+>On Fri, Aug 5, 2022 at 11:11 AM Will Deacon <will@kernel.org> wrote:
+>>
+>> [tl;dr a change from ~18 months ago breaks Android userspace and I don't
+>>  know what to do about it]
 >
->[tl;dr a change from ~18 months ago breaks Android userspace and I don't
-> know what to do about it]
+>Augh.
 >
->As part of the development work for next year's Android, we've recently
->been bringing up a 5.15 KVM host and have observed that vsock no longer
->works for communicating with a guest because crosvm gets an unexpected
->-EFAULT back from the VHOST_VSOCK_SET_RUNNING ioctl():
+>I had hoped that android being "closer" to upstream would have meant
+>that somebody actually tests android with upstream kernels. People
+>occasionally talk about it, but apparently it's not actually done.
 >
-> | E crosvm : vpipe worker thread exited with error: VhostVsockStart(IoctlError(Os { code: 14, kind: Uncategorized, message: "Bad address" }))
+>Or maybe it's done onl;y with a very limited android user space.
 >
->The same guest payload works correctly on a 5.10 KVM host kernel.
+>The whole "we notice that something that happened 18 months ago broke
+>our environment" is kind of broken.
 >
->After some digging, we narrowed this change in behaviour down to
->e13a6915a03f ("vhost/vsock: add IOTLB API support") and further digging
->reveals that the infamous VIRTIO_F_ACCESS_PLATFORM feature flag is to
->blame. Indeed, our tests once again pass if we revert that patch (there's
->a trivial conflict with the later addition of VIRTIO_VSOCK_F_SEQPACKET
->but otherwise it reverts cleanly).
+>> After some digging, we narrowed this change in behaviour down to
+>> e13a6915a03f ("vhost/vsock: add IOTLB API support") and further digging
+>> reveals that the infamous VIRTIO_F_ACCESS_PLATFORM feature flag is to
+>> blame. Indeed, our tests once again pass if we revert that patch (there's
+>> a trivial conflict with the later addition of VIRTIO_VSOCK_F_SEQPACKET
+>> but otherwise it reverts cleanly).
 >
->On Android, KVM runs in a mode where the host kernel is, by default,
->unable to access guest memory [1] and so memory used for virtio (e.g.
->the rings and descriptor data) needs to be shared explicitly with the
->host using hypercalls issued by the guest. We implement this on top of
->restricted DMA [2], whereby the guest allocates a pool of shared memory
->during boot and bounces all virtio transfers through this window. In
->order to get the guest to use the DMA API for virtio devices (which is
->required for the SWIOTLB code to kick in and do the aforementioned
->bouncing), crosvm sets the VIRTIO_F_ACCESS_PLATFORM feature flag on its
->emulated devices and this is picked up by virtio_has_dma_quirk() in the
->guest kernel. This has been working well for us so far.
+>I have to say, this smells for *so* many reasons.
 >
->With e13a6915a03f, the vhost backend for vsock now advertises
->VIRTIO_F_ACCESS_PLATFORM in its response to the VHOST_GET_FEATURES
->ioctl() and accepts it in the VHOST_SET_FEATURES as a mechanism to
->enable the IOTLB feature (note: this is nothing to do with SWIOTLB!).
->This feature is used for emulation of a virtual IOMMU and requires
->explicit support for issuing IOTLB messages (see VHOST_IOTLB_MSG and
->VHOST_IOTLB_MSG_V2) from userspace to manage address translations for
->the virtio device.
+>Why is "IOMMU support" called "VIRTIO_F_ACCESS_PLATFORM"?
 >
->Looking at how crosvm uses these vhost ioctl()s, we can see:
+>That seems insane, but seems fundamental in that commit e13a6915a03f
+>("vhost/vsock: add IOTLB API support")
 >
->        let avail_features = self
->            .vhost_handle
->            .get_features()
->            .map_err(Error::VhostGetFeatures)?;
+>This code
 >
->        let features: c_ulonglong = self.acked_features & avail_features;
->        self.vhost_handle
->            .set_features(features)
->            .map_err(Error::VhostSetFeatures)?;
+>        if ((features & (1ULL << VIRTIO_F_ACCESS_PLATFORM))) {
+>                if (vhost_init_device_iotlb(&vsock->dev, true))
+>                        goto err;
+>        }
+>
+>just makes me go "What?"  It makes no sense. Why isn't that feature
+>called something-something-IOTLB?
+
+I honestly don't know the reason for the name but 
+VIRTIO_F_ACCESS_PLATFORM comes from the virtio specification:
+   https://docs.oasis-open.org/virtio/virtio/v1.2/cs01/virtio-v1.2-cs01.html#x1-6600006
+
+   VIRTIO_F_ACCESS_PLATFORM(33)
+      This feature indicates that the device can be used on a platform
+      where device access to data in memory is limited and/or translated.
+      E.g. this is the case if the device can be located behind an IOMMU
+      that translates bus addresses from the device into physical
+      addresses in memory, if the device can be limited to only access
+      certain memory addresses or if special commands such as a cache
+      flush can be needed to synchronise data in memory with the device.
+      Whether accesses are actually limited or translated is described by
+      platform-specific means. If this feature bit is set to 0, then the
+      device has same access to memory addresses supplied to it as the
+      driver has. In particular, the device will always use physical
+      addresses matching addresses used by the driver (typically meaning
+      physical addresses used by the CPU) and not translated further, and
+      can access any address supplied to it by the driver. When clear,
+      this overrides any platform-specific description of whether device
+      access is limited or translated in any way, e.g. whether an IOMMU
+      may be present.
 
 >
->where 'acked_features' is the feature set negotiated between crosvm and
->the guest, while 'avail_features' is the supported feature set
->advertised by vhost. The intersection of these now includes
->VIRTIO_F_ACCESS_PLATFORM in the 5.15 kernel and so we quietly start
->enabling IOTLB, despite not having any of the necessary support in
->crosvm and therefore the vsock thread effectively grinds to a halt and
->we cannot communicate with the guest.
->
->The fundamental issue is, I think, that VIRTIO_F_ACCESS_PLATFORM is
->being used for two very different things within the same device; for the
->guest it basically means "use the DMA API, it knows what to do" but for
->vhost it very specifically means "enable IOTLB". We've recently had
->other problems with this flag [3] but in this case it used to work
->reliably and now it doesn't anymore.
->
->So how should we fix this? One possibility is for us to hack crosvm to
->clear the VIRTIO_F_ACCESS_PLATFORM flag when setting the vhost 
+>Can we please just split that flag into two, and have that odd
+>"platform access" be one bit, and the "enable iommu" be an entirely
+>different bit?
 
-Why do you consider this a hack?
+IIUC the problem here is that the VMM does the translation and then for 
+the device there is actually no need to translate, so this feature 
+should not be negotiated by crosvm and vhost-vsock, but just between 
+guest's driver and crosvm.
 
-If the VMM implements the translation feature, it is right in my opinion 
-that it does not enable the feature for the vhost device. Otherwise, if 
-it wants the vhost device to do the translation, enable the feature and 
-send the IOTLB messages to set the translation.
+Perhaps the confusion is that we use VIRTIO_F_ACCESS_PLATFORM both 
+between guest and VMM and between VMM and vhost device.
 
-QEMU for example masks features when not required or supported.
-crosvm should negotiate only the features it supports.
-
-@Michael and @Jason can correct me, but if a vhost device negotiates 
-VIRTIO_F_ACCESS_PLATFORM, then it expects the VMM to send IOTLB messages 
-to set the translation.
-
-Indeed that patch was to fix 
+In fact, prior to commit e13a6915a03f ("vhost/vsock: add IOTLB API 
+support"), vhost-vsock did not work when a VMM (e.g., QEMU) tried to 
+negotiate translation with the device: 
 https://bugzilla.redhat.com/show_bug.cgi?id=1894101
 
->features,
->but others here have reasonably pointed out that they didn't expect a
->kernel change to break userspace. On the flip side, the offending commit
->in the kernel isn't exactly new (it's from the end of 2020!) and so it's
->likely that others (e.g. QEMU) are using this feature.
+The simplest solution is that crosvm doesn't negotiate 
+VIRTIO_F_ACCESS_PLATFORM with the vhost-vsock device if it doesn't want 
+to use translation and send messages to set it.
 
-Yep, QEMU can use it.
+In fact before commit e13a6915a03f ("vhost/vsock: add IOTLB API 
+support") this feature was not exposed by the vhost-vsock device, so it 
+was never negotiated. Now crosvm is enabling a new feature (not masking 
+guest-negotiated features) so I don't think it's a break in user space, 
+if the user space enable it.
 
->I also strongly
->suspect that vhost net suffers from exactly the same issue, we just
->don't happen to be using that (yet) in Android.
-
-I think so too, the implementation in vsock was done following 
-vhost-net.
+I tried to explain what I understood when I made the change, Michael and 
+Jason surely can add more information.
 
 Thanks,
 Stefano
