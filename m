@@ -2,76 +2,127 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 2BDBF58B8AD
-	for <lists+kvm@lfdr.de>; Sun,  7 Aug 2022 01:41:38 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 1F89358B9AC
+	for <lists+kvm@lfdr.de>; Sun,  7 Aug 2022 07:21:48 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231152AbiHFXld (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sat, 6 Aug 2022 19:41:33 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51576 "EHLO
+        id S232587AbiHGFVr (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sun, 7 Aug 2022 01:21:47 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44826 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229911AbiHFXlc (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sat, 6 Aug 2022 19:41:32 -0400
-Received: from mail.rv.npu.gov.ua (mail.rv.npu.gov.ua [85.159.5.210])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C8992DF64
-        for <kvm@vger.kernel.org>; Sat,  6 Aug 2022 16:41:29 -0700 (PDT)
-Received: from localhost (localhost [127.0.0.1])
-        by mail.rv.npu.gov.ua (Postfix) with ESMTP id B97BF4224ACA;
-        Sun,  7 Aug 2022 02:41:03 +0300 (EEST)
-Received: from mail.rv.npu.gov.ua ([127.0.0.1])
-        by localhost (mail.rv.npu.gov.ua [127.0.0.1]) (amavisd-new, port 10032)
-        with ESMTP id X08ype5JYmv8; Sun,  7 Aug 2022 02:41:02 +0300 (EEST)
-Received: from localhost (localhost [127.0.0.1])
-        by mail.rv.npu.gov.ua (Postfix) with ESMTP id 3B5894224ADA;
-        Sun,  7 Aug 2022 02:41:02 +0300 (EEST)
-DKIM-Filter: OpenDKIM Filter v2.10.3 mail.rv.npu.gov.ua 3B5894224ADA
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=rv.npu.gov.ua;
-        s=D9C6921A-69F2-11EB-967E-80F8358BD1FC; t=1659829262;
-        bh=rXKZG/8bQHY28IslpDmB9+1lxzhBpWrTxjnUDTFW+HM=;
-        h=MIME-Version:To:From:Date:Message-Id;
-        b=SydCjRwdMgQpMF8F/PnQni7ydWONI77wvsd67SvA3p9C0tLEbsh6D7JUSokeoYx5l
-         CfJrcxo7031au4VMXMPbU6HZfirwjllC9BYugUj2uR9pahP9BIgq6/HvXLGEVM/1r/
-         iLbHUyVOqoGo9NB4uqvrJvpHGyEaWSJqgIBDEBgPaQ3AAP3q1KB3We6pSWh8R7cu6V
-         eBpBoORK+JsxxbEGqtnQPTuZgplHJmY6pZMa0h+wSSAmOLAvTlEGNU7zvPEmZ3bpg0
-         5iTaexGBuCaL1zOYECTv5CDUVNJXe12HraX3NllfU1p6idTVM/YsIw3A0bpYztyokx
-         c/oz5YC2JRMsw==
-X-Virus-Scanned: amavisd-new at rv.npu.gov.ua
-Received: from mail.rv.npu.gov.ua ([127.0.0.1])
-        by localhost (mail.rv.npu.gov.ua [127.0.0.1]) (amavisd-new, port 10026)
-        with ESMTP id kLvNEEioTSJq; Sun,  7 Aug 2022 02:41:02 +0300 (EEST)
-Received: from DESKTOP-CJHK18M.home (gateway [101.19.1.22])
-        by mail.rv.npu.gov.ua (Postfix) with ESMTPSA id 855624224ACA;
-        Sun,  7 Aug 2022 02:40:59 +0300 (EEST)
-Content-Type: text/plain; charset="iso-8859-1"
-MIME-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
-Content-Description: Mail message body
-Subject: Re:
-To:     Recipients <kt@rv.npu.gov.ua>
-From:   "MacKenzie Scott" <kt@rv.npu.gov.ua>
-Date:   Sun, 07 Aug 2022 07:41:17 +0800
-Reply-To: mackenziescott@reservasgoldenwayki.com
-Message-Id: <20220806234059.855624224ACA@mail.rv.npu.gov.ua>
-X-Spam-Status: No, score=2.0 required=5.0 tests=BAYES_50,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,LOTS_OF_MONEY,RCVD_IN_BL_SPAMCOP_NET,
-        RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
-        autolearn=no autolearn_force=no version=3.4.6
-X-Spam-Level: **
+        with ESMTP id S229503AbiHGFVq (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sun, 7 Aug 2022 01:21:46 -0400
+Received: from mail-pl1-x64a.google.com (mail-pl1-x64a.google.com [IPv6:2607:f8b0:4864:20::64a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 755DB9FF1
+        for <kvm@vger.kernel.org>; Sat,  6 Aug 2022 22:21:44 -0700 (PDT)
+Received: by mail-pl1-x64a.google.com with SMTP id q11-20020a170902dacb00b0016efd6984c3so4130293plx.17
+        for <kvm@vger.kernel.org>; Sat, 06 Aug 2022 22:21:44 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112;
+        h=cc:to:from:subject:mime-version:message-id:date:reply-to:from:to:cc;
+        bh=wL7mrEXqfR7JkKlCwq5zI7WLd3+pttvpM4+bm7PFSkk=;
+        b=td44USCIMowH+HhS9q4p7b7/tjImuqz7RNoC0QYh04RMX07eZiQS8YRYR7zeU+rLgz
+         RvODkyy+D7SheD20nDz23JU1C7BzyfcEQrLpSysAdSFhswD3w3/M2w1GTSJ3LrzEkXlB
+         YyE0KJtBKwONeVVeGX8q2bK9ny+rmvxOlorvE+1mfG6X+SmR/n5lFbZkXSk6CsY5Kftd
+         Fe64lRNEUqfgcakMisE2hVtTY6hx3bmy7ozzBApT5RvxvUq6/uNIrmLQ7eqUQ5ZZLx4n
+         Kbyf5DktrFs5AUiSYBiO6eb3ejVGVcwiC5DFjSQ1ibbL58hXM8GELyHN8SJXYCbentqr
+         TmKA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=cc:to:from:subject:mime-version:message-id:date:reply-to
+         :x-gm-message-state:from:to:cc;
+        bh=wL7mrEXqfR7JkKlCwq5zI7WLd3+pttvpM4+bm7PFSkk=;
+        b=7x3qh/AtLuxFXTK8FOXvXVWA9LAsrYdOsGyjN0DZMn4jNMgSKfzas7uvHBmPT0KBVD
+         G8VqZjvyja2ayOXL1wKUQyxvquwvMwFYQBuqbXVfuHbet/m+8KdtC4gtlO9vrp1Cn5s5
+         jFHK9AKMCeuytLIigcG2zbdqkCCiH4CKYaQjW+4OqdLQOXmYEWahdpl4JczvTMyHhsWn
+         uIC7FzJ1Zks70THiYSHnAXS1pWL58EKvzVFi+AmsiEA4raNn2HCWSsOJv41fdjSIu5VH
+         Lu8J87rvi3XjSL4Pqh54EZZauOszybQTsdlvB6alUnrJ6LGUnMtriJ5e8NgD08SUm3A/
+         YNow==
+X-Gm-Message-State: ACgBeo31JS57Sp8v39l/SuL1LpiscmzfS0UAVQHKM/fAmfESlYsnS8rV
+        0fmjIsIYMRJikKBH9LyMI4bit9ldbtT8
+X-Google-Smtp-Source: AA6agR5UG0ecnpmdzg3o3T19ioM2IbaTT48m4kmAqOm4YlBYWxq0i/H8i61rClkn0qQ1NnwNF6YNxg/TcGAd
+X-Received: from mizhang-super.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:1071])
+ (user=mizhang job=sendgmr) by 2002:a17:90b:1941:b0:1f3:2636:895 with SMTP id
+ nk1-20020a17090b194100b001f326360895mr15333323pjb.26.1659849704025; Sat, 06
+ Aug 2022 22:21:44 -0700 (PDT)
+Reply-To: Mingwei Zhang <mizhang@google.com>
+Date:   Sun,  7 Aug 2022 05:21:41 +0000
+Message-Id: <20220807052141.69186-1-mizhang@google.com>
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.37.1.559.g78731f0fdb-goog
+Subject: [PATCH] KVM: x86/mmu: rename trace function name for asynchronous
+ page fault
+From:   Mingwei Zhang <mizhang@google.com>
+To:     Sean Christopherson <seanjc@google.com>,
+        Paolo Bonzini <pbonzini@redhat.com>
+Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Mingwei Zhang <mizhang@google.com>
+Content-Type: text/plain; charset="UTF-8"
+X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hello, =
+Rename the tracepoint function from trace_kvm_async_pf_doublefault() to
+trace_kvm_async_pf_repeated_fault() to make it clear, since double fault
+has nothing to do with this trace function.
 
-                          =
+Asynchronous Page Fault (APF) is an artifact generated by KVM when it
+cannot find a physical page to satisfy an EPT violation. KVM uses APF to
+tell the guest OS to do something else such as scheduling other guest
+processes to make forward progress. However, when another guest process
+also touches a previously APFed page, KVM halts the vCPU instead of
+generating a repeated APF to avoid wasting cycles.
 
-I'm MacKenzie Scott Ex-wife of Amazon CEO and founder, I'm donating $ 4 bil=
-lion Dollars to charities, individuals, colleges across the Globe from Scot=
-t's foundation, to provide immediate support to people suffering economical=
-ly from COVID-19 pandemic and you're one of the lucky winners, i have a don=
-ation grant worth $100,800,000.00 Dollars for you, you can contact me for m=
-ore information if you're interested.
+Double fault (#DF) clearly has a different meaning and a different
+consequence when triggered. #DF requires two nested contributory exceptions
+instead of two page faults faulting at the same address. A prevous bug on
+APF indicates that it may trigger a double fault in the guest [1] and
+clearly this trace function has nothing to do with it. So rename this
+function should be a valid choice.
 
-Regards,
-MacKenzie Scott.
+No functional change intended.
+
+[1] https://www.spinics.net/lists/kvm/msg214957.html
+
+Signed-off-by: Mingwei Zhang <mizhang@google.com>
+---
+ arch/x86/kvm/mmu/mmu.c     | 2 +-
+ include/trace/events/kvm.h | 2 +-
+ 2 files changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
+index 06ac8c7cef67..0004ec68fc5c 100644
+--- a/arch/x86/kvm/mmu/mmu.c
++++ b/arch/x86/kvm/mmu/mmu.c
+@@ -4164,7 +4164,7 @@ static int kvm_faultin_pfn(struct kvm_vcpu *vcpu, struct kvm_page_fault *fault)
+ 	if (!fault->prefetch && kvm_can_do_async_pf(vcpu)) {
+ 		trace_kvm_try_async_get_page(fault->addr, fault->gfn);
+ 		if (kvm_find_async_pf_gfn(vcpu, fault->gfn)) {
+-			trace_kvm_async_pf_doublefault(fault->addr, fault->gfn);
++			trace_kvm_async_pf_repeated_fault(fault->addr, fault->gfn);
+ 			kvm_make_request(KVM_REQ_APF_HALT, vcpu);
+ 			return RET_PF_RETRY;
+ 		} else if (kvm_arch_setup_async_pf(vcpu, fault->addr, fault->gfn)) {
+diff --git a/include/trace/events/kvm.h b/include/trace/events/kvm.h
+index 37e1e1a2d67d..3bd31ea23fee 100644
+--- a/include/trace/events/kvm.h
++++ b/include/trace/events/kvm.h
+@@ -282,7 +282,7 @@ DEFINE_EVENT(kvm_async_get_page_class, kvm_try_async_get_page,
+ 	TP_ARGS(gva, gfn)
+ );
+ 
+-DEFINE_EVENT(kvm_async_get_page_class, kvm_async_pf_doublefault,
++DEFINE_EVENT(kvm_async_get_page_class, kvm_async_pf_repeated_fault,
+ 
+ 	TP_PROTO(u64 gva, u64 gfn),
+ 
+
+base-commit: 1612c382ffbdf1f673caec76502b1c00e6d35363
+-- 
+2.37.1.559.g78731f0fdb-goog
+
