@@ -2,38 +2,38 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id BECBE58BD5E
-	for <lists+kvm@lfdr.de>; Mon,  8 Aug 2022 00:06:55 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id F0C3058BD51
+	for <lists+kvm@lfdr.de>; Mon,  8 Aug 2022 00:06:50 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238239AbiHGWGL (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sun, 7 Aug 2022 18:06:11 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52194 "EHLO
+        id S236861AbiHGWE4 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sun, 7 Aug 2022 18:04:56 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49536 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235227AbiHGWEQ (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sun, 7 Aug 2022 18:04:16 -0400
-Received: from mga03.intel.com (mga03.intel.com [134.134.136.65])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 28471B1FE;
-        Sun,  7 Aug 2022 15:02:50 -0700 (PDT)
+        with ESMTP id S235132AbiHGWDJ (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sun, 7 Aug 2022 18:03:09 -0400
+Received: from mga07.intel.com (mga07.intel.com [134.134.136.100])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 577BD9FFB;
+        Sun,  7 Aug 2022 15:02:43 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1659909770; x=1691445770;
+  t=1659909763; x=1691445763;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=+RLSEkk8hP5mPTKnzqkpoUCY4hz/kV0kMgNFS/Wah7k=;
-  b=Azdj7wbcNnV9ZvczQiJ+2ZbiakdhgpI0p6m70DFR8X0F6XVcGEgB4O4d
-   J1TRfcPjc0L8CaCRkts/K8hOQMnultftf73J9Yq1ZiRH9sb/pBG9UYzam
-   rk5DvTpoEa/DRrV4a4Q9pygobhx9x5POaPLA9pI0CAwwLplT0xX4VJSiU
-   v4Ex0DGe1mh7RWrnEBpm8Gs1sdD9nln3nxoxCq+L3BebW1aXq0E8g07x1
-   GdLxN5j2+PldN7tb6U9Mski6kk4MMfDXwXHctSIOAVgoKbuzY9S5FQ8oj
-   eucWx6eAoVFcXgeUY7WAXC5zEQq/41a2Vvem9FFEeRXITdi0JW1PGadYZ
-   g==;
-X-IronPort-AV: E=McAfee;i="6400,9594,10432"; a="291695700"
+  bh=sBVEBvsiXpGhRktIyqHD6URD/GZwHPTPIZHkhUKR5DE=;
+  b=ORspSPGbZz1FyXEChPqEFgpwbESEWxdLLOQtfqFWyXPu7b3Fxb6QETLS
+   zkkCx/RgEsn72C4TneqZ1tMbIl7+wfeA3yW95DAD3hmbbo5e9lkLosOyS
+   ek89LZwvbDiCgkt+heqvQdtFoHG0e5lKpBvbI+3ag49tzbbwUdhEqESN8
+   sHVUQQJ+GSzSZTB7j5geYGJoemARCmnI2R1SBnaqXtwbpU2e03t6Cek6y
+   tW1Xy6QWsAP98wA3XOR6B4D1JtX5/TnXDILRTsZVEu6ADyhLTC8HzKPi0
+   qR7JU71xm8wLnUmVZLrthKnQfdWf9GvtvZdJXBDP+gXwGyUCTXbUxZsra
+   A==;
+X-IronPort-AV: E=McAfee;i="6400,9594,10432"; a="354465753"
 X-IronPort-AV: E=Sophos;i="5.93,220,1654585200"; 
-   d="scan'208";a="291695700"
+   d="scan'208";a="354465753"
 Received: from fmsmga008.fm.intel.com ([10.253.24.58])
-  by orsmga103.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 07 Aug 2022 15:02:38 -0700
+  by orsmga105.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 07 Aug 2022 15:02:38 -0700
 X-IronPort-AV: E=Sophos;i="5.93,220,1654585200"; 
-   d="scan'208";a="663682641"
+   d="scan'208";a="663682645"
 Received: from ls.sc.intel.com (HELO localhost) ([143.183.96.54])
   by fmsmga008-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 07 Aug 2022 15:02:38 -0700
 From:   isaku.yamahata@intel.com
@@ -42,9 +42,9 @@ Cc:     isaku.yamahata@intel.com, isaku.yamahata@gmail.com,
         Paolo Bonzini <pbonzini@redhat.com>, erdemaktas@google.com,
         Sean Christopherson <seanjc@google.com>,
         Sagi Shahar <sagis@google.com>
-Subject: [PATCH v8 060/103] KVM: TDX: Create initial guest memory
-Date:   Sun,  7 Aug 2022 15:01:45 -0700
-Message-Id: <0bc9a674de49ef7097049834a99fc41949b7b4df.1659854790.git.isaku.yamahata@intel.com>
+Subject: [PATCH v8 061/103] KVM: TDX: Finalize VM initialization
+Date:   Sun,  7 Aug 2022 15:01:46 -0700
+Message-Id: <b2e5d0871155f7f742ac3eb33f8948058b3b18bd.1659854790.git.isaku.yamahata@intel.com>
 X-Mailer: git-send-email 2.25.1
 In-Reply-To: <cover.1659854790.git.isaku.yamahata@intel.com>
 References: <cover.1659854790.git.isaku.yamahata@intel.com>
@@ -62,298 +62,85 @@ X-Mailing-List: kvm@vger.kernel.org
 
 From: Isaku Yamahata <isaku.yamahata@intel.com>
 
-Because the guest memory is protected in TDX, the creation of the initial
-guest memory requires a dedicated TDX module API, tdh_mem_page_add, instead
-of directly copying the memory contents into the guest memory in the case
-of the default VM type.  KVM MMU page fault handler callback,
-private_page_add, handles it.
+To protect the initial contents of the guest TD, the TDX module measures
+the guest TD during the build process as SHA-384 measurement.  The
+measurement of the guest TD contents needs to be completed to make the
+guest TD ready to run.
 
-Define new subcommand, KVM_TDX_INIT_MEM_REGION, of VM-scoped
-KVM_MEMORY_ENCRYPT_OP.  It assigns the guest page, copies the initial
-memory contents into the guest memory, encrypts the guest memory.  At the
-same time, optionally it extends memory measurement of the TDX guest.  It
-calls the KVM MMU page fault(EPT-violation) handler to trigger the
-callbacks for it.
+Add a new subcommand, KVM_TDX_FINALIZE_VM, for VM-scoped
+KVM_MEMORY_ENCRYPT_OP to finalize the measurement and mark the TDX VM ready
+to run.
 
 Signed-off-by: Isaku Yamahata <isaku.yamahata@intel.com>
 ---
- arch/x86/include/uapi/asm/kvm.h       |   9 ++
- arch/x86/kvm/mmu/mmu.c                |   1 +
- arch/x86/kvm/vmx/tdx.c                | 147 +++++++++++++++++++++++++-
- arch/x86/kvm/vmx/tdx.h                |   2 +
- tools/arch/x86/include/uapi/asm/kvm.h |   9 ++
- 5 files changed, 163 insertions(+), 5 deletions(-)
+ arch/x86/include/uapi/asm/kvm.h       |  1 +
+ arch/x86/kvm/vmx/tdx.c                | 21 +++++++++++++++++++++
+ tools/arch/x86/include/uapi/asm/kvm.h |  1 +
+ 3 files changed, 23 insertions(+)
 
 diff --git a/arch/x86/include/uapi/asm/kvm.h b/arch/x86/include/uapi/asm/kvm.h
-index 3cd723b7e2cf..787644687586 100644
+index 787644687586..bee5957a583a 100644
 --- a/arch/x86/include/uapi/asm/kvm.h
 +++ b/arch/x86/include/uapi/asm/kvm.h
-@@ -540,6 +540,7 @@ enum kvm_tdx_cmd_id {
- 	KVM_TDX_CAPABILITIES = 0,
+@@ -541,6 +541,7 @@ enum kvm_tdx_cmd_id {
  	KVM_TDX_INIT_VM,
  	KVM_TDX_INIT_VCPU,
-+	KVM_TDX_INIT_MEM_REGION,
+ 	KVM_TDX_INIT_MEM_REGION,
++	KVM_TDX_FINALIZE_VM,
  
  	KVM_TDX_CMD_NR_MAX,
  };
-@@ -617,4 +618,12 @@ struct kvm_tdx_init_vm {
- 	};
- };
- 
-+#define KVM_TDX_MEASURE_MEMORY_REGION	(1UL << 0)
-+
-+struct kvm_tdx_init_mem_region {
-+	__u64 source_addr;
-+	__u64 gpa;
-+	__u64 nr_pages;
-+};
-+
- #endif /* _ASM_X86_KVM_H */
-diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
-index 8d3b45db07eb..526bf5ecefbf 100644
---- a/arch/x86/kvm/mmu/mmu.c
-+++ b/arch/x86/kvm/mmu/mmu.c
-@@ -5423,6 +5423,7 @@ int kvm_mmu_load(struct kvm_vcpu *vcpu)
- out:
- 	return r;
- }
-+EXPORT_SYMBOL(kvm_mmu_load);
- 
- void kvm_mmu_unload(struct kvm_vcpu *vcpu)
- {
 diff --git a/arch/x86/kvm/vmx/tdx.c b/arch/x86/kvm/vmx/tdx.c
-index edb5af011794..7970a2cfa909 100644
+index 7970a2cfa909..8400388b8ddf 100644
 --- a/arch/x86/kvm/vmx/tdx.c
 +++ b/arch/x86/kvm/vmx/tdx.c
-@@ -544,6 +544,21 @@ void tdx_load_mmu_pgd(struct kvm_vcpu *vcpu, hpa_t root_hpa, int pgd_level)
- 	td_vmcs_write64(to_tdx(vcpu), SHARED_EPT_POINTER, root_hpa & PAGE_MASK);
+@@ -1221,6 +1221,24 @@ static int tdx_init_mem_region(struct kvm *kvm, struct kvm_tdx_cmd *cmd)
+ 	return ret;
  }
  
-+static void tdx_measure_page(struct kvm_tdx *kvm_tdx, hpa_t gpa)
-+{
-+	struct tdx_module_output out;
-+	u64 err;
-+	int i;
-+
-+	for (i = 0; i < PAGE_SIZE; i += TDX_EXTENDMR_CHUNKSIZE) {
-+		err = tdh_mr_extend(kvm_tdx->tdr.pa, gpa + i, &out);
-+		if (KVM_BUG_ON(err, &kvm_tdx->kvm)) {
-+			pr_tdx_error(TDH_MR_EXTEND, err, &out);
-+			break;
-+		}
-+	}
-+}
-+
- static void tdx_unpin_pfn(struct kvm *kvm, kvm_pfn_t pfn)
- {
- 	struct page *page = pfn_to_page(pfn);
-@@ -559,27 +574,58 @@ static void __tdx_sept_set_private_spte(struct kvm *kvm, gfn_t gfn,
- 	hpa_t hpa = pfn_to_hpa(pfn);
- 	gpa_t gpa = gfn_to_gpa(gfn);
- 	struct tdx_module_output out;
-+	hpa_t source_pa;
- 	u64 err;
- 
- 	if (WARN_ON_ONCE(is_error_noslot_pfn(pfn) ||
- 			 !kvm_pfn_to_refcounted_page(pfn)))
- 		return;
- 
--	/* TODO: handle large pages. */
--	if (KVM_BUG_ON(level != PG_LEVEL_4K, kvm))
--		return;
--
- 	/* To prevent page migration, do nothing on mmu notifier. */
- 	get_page(pfn_to_page(pfn));
- 
-+	/* Build-time faults are induced and handled via TDH_MEM_PAGE_ADD. */
- 	if (likely(is_td_finalized(kvm_tdx))) {
-+		/* TODO: handle large pages. */
-+		if (KVM_BUG_ON(level != PG_LEVEL_4K, kvm))
-+			return;
-+
- 		err = tdh_mem_page_aug(kvm_tdx->tdr.pa, gpa, hpa, &out);
- 		if (KVM_BUG_ON(err, kvm)) {
- 			pr_tdx_error(TDH_MEM_PAGE_AUG, err, &out);
--			put_page(pfn_to_page(pfn));
-+			tdx_unpin_pfn(kvm, pfn);
- 		}
- 		return;
- 	}
-+
-+	/* KVM_INIT_MEM_REGION, tdx_init_mem_region(), supports only 4K page. */
-+	if (KVM_BUG_ON(level != PG_LEVEL_4K, kvm))
-+		return;
-+
-+	/*
-+	 * In case of TDP MMU, fault handler can run concurrently.  Note
-+	 * 'source_pa' is a TD scope variable, meaning if there are multiple
-+	 * threads reaching here with all needing to access 'source_pa', it
-+	 * will break.  However fortunately this won't happen, because below
-+	 * TDH_MEM_PAGE_ADD code path is only used when VM is being created
-+	 * before it is running, using KVM_TDX_INIT_MEM_REGION ioctl (which
-+	 * always uses vcpu 0's page table and protected by vcpu->mutex).
-+	 */
-+	if (KVM_BUG_ON(kvm_tdx->source_pa == INVALID_PAGE, kvm)) {
-+		tdx_unpin_pfn(kvm, pfn);
-+		return;
-+	}
-+
-+	source_pa = kvm_tdx->source_pa & ~KVM_TDX_MEASURE_MEMORY_REGION;
-+
-+	err = tdh_mem_page_add(kvm_tdx->tdr.pa, gpa, hpa, source_pa, &out);
-+	if (KVM_BUG_ON(err, kvm)) {
-+		pr_tdx_error(TDH_MEM_PAGE_ADD, err, &out);
-+		tdx_unpin_pfn(kvm, pfn);
-+	} else if ((kvm_tdx->source_pa & KVM_TDX_MEASURE_MEMORY_REGION))
-+		tdx_measure_page(kvm_tdx, gpa);
-+
-+	kvm_tdx->source_pa = INVALID_PAGE;
- }
- 
- static void tdx_sept_set_private_spte(struct kvm *kvm, gfn_t gfn,
-@@ -1087,6 +1133,94 @@ void tdx_flush_tlb(struct kvm_vcpu *vcpu)
- 		cpu_relax();
- }
- 
-+#define TDX_SEPT_PFERR	PFERR_WRITE_MASK
-+
-+static int tdx_init_mem_region(struct kvm *kvm, struct kvm_tdx_cmd *cmd)
++static int tdx_td_finalizemr(struct kvm *kvm)
 +{
 +	struct kvm_tdx *kvm_tdx = to_kvm_tdx(kvm);
-+	struct kvm_tdx_init_mem_region region;
-+	struct kvm_vcpu *vcpu;
-+	struct page *page;
-+	kvm_pfn_t pfn;
-+	int idx, ret = 0;
++	u64 err;
 +
-+	/* The BSP vCPU must be created before initializing memory regions. */
-+	if (!atomic_read(&kvm->online_vcpus))
++	if (!is_td_initialized(kvm) || is_td_finalized(kvm_tdx))
 +		return -EINVAL;
 +
-+	if (cmd->flags & ~KVM_TDX_MEASURE_MEMORY_REGION)
-+		return -EINVAL;
-+
-+	if (copy_from_user(&region, (void __user *)cmd->data, sizeof(region)))
-+		return -EFAULT;
-+
-+	/* Sanity check */
-+	if (!IS_ALIGNED(region.source_addr, PAGE_SIZE) ||
-+	    !IS_ALIGNED(region.gpa, PAGE_SIZE) ||
-+	    !region.nr_pages ||
-+	    region.gpa + (region.nr_pages << PAGE_SHIFT) <= region.gpa ||
-+	    !kvm_is_private_gpa(kvm, region.gpa) ||
-+	    !kvm_is_private_gpa(kvm, region.gpa + (region.nr_pages << PAGE_SHIFT)))
-+		return -EINVAL;
-+
-+	vcpu = kvm_get_vcpu(kvm, 0);
-+	if (mutex_lock_killable(&vcpu->mutex))
-+		return -EINTR;
-+
-+	vcpu_load(vcpu);
-+	idx = srcu_read_lock(&kvm->srcu);
-+
-+	kvm_mmu_reload(vcpu);
-+
-+	while (region.nr_pages) {
-+		if (signal_pending(current)) {
-+			ret = -ERESTARTSYS;
-+			break;
-+		}
-+
-+		if (need_resched())
-+			cond_resched();
-+
-+
-+		/* Pin the source page. */
-+		ret = get_user_pages_fast(region.source_addr, 1, 0, &page);
-+		if (ret < 0)
-+			break;
-+		if (ret != 1) {
-+			ret = -ENOMEM;
-+			break;
-+		}
-+
-+		kvm_tdx->source_pa = pfn_to_hpa(page_to_pfn(page)) |
-+				     (cmd->flags & KVM_TDX_MEASURE_MEMORY_REGION);
-+
-+		pfn = kvm_mmu_map_tdp_page(vcpu, region.gpa, TDX_SEPT_PFERR,
-+					   PG_LEVEL_4K);
-+		if (is_error_noslot_pfn(pfn) || kvm->vm_bugged)
-+			ret = -EFAULT;
-+		else
-+			ret = 0;
-+
-+		put_page(page);
-+		if (ret)
-+			break;
-+
-+		region.source_addr += PAGE_SIZE;
-+		region.gpa += PAGE_SIZE;
-+		region.nr_pages--;
++	err = tdh_mr_finalize(kvm_tdx->tdr.pa);
++	if (WARN_ON_ONCE(err)) {
++		pr_tdx_error(TDH_MR_FINALIZE, err, NULL);
++		return -EIO;
 +	}
 +
-+	srcu_read_unlock(&kvm->srcu, idx);
-+	vcpu_put(vcpu);
-+
-+	mutex_unlock(&vcpu->mutex);
-+
-+	if (copy_to_user((void __user *)cmd->data, &region, sizeof(region)))
-+		ret = -EFAULT;
-+
-+	return ret;
++	kvm_tdx->finalized = true;
++	return 0;
 +}
 +
  int tdx_vm_ioctl(struct kvm *kvm, void __user *argp)
  {
  	struct kvm_tdx_cmd tdx_cmd;
-@@ -1103,6 +1237,9 @@ int tdx_vm_ioctl(struct kvm *kvm, void __user *argp)
- 	case KVM_TDX_INIT_VM:
- 		r = tdx_td_init(kvm, &tdx_cmd);
+@@ -1240,6 +1258,9 @@ int tdx_vm_ioctl(struct kvm *kvm, void __user *argp)
+ 	case KVM_TDX_INIT_MEM_REGION:
+ 		r = tdx_init_mem_region(kvm, &tdx_cmd);
  		break;
-+	case KVM_TDX_INIT_MEM_REGION:
-+		r = tdx_init_mem_region(kvm, &tdx_cmd);
++	case KVM_TDX_FINALIZE_VM:
++		r = tdx_td_finalizemr(kvm);
 +		break;
  	default:
  		r = -EINVAL;
  		goto out;
-diff --git a/arch/x86/kvm/vmx/tdx.h b/arch/x86/kvm/vmx/tdx.h
-index d1b1cd60ff6f..eace70f4a0a1 100644
---- a/arch/x86/kvm/vmx/tdx.h
-+++ b/arch/x86/kvm/vmx/tdx.h
-@@ -25,6 +25,8 @@ struct kvm_tdx {
- 	u64 xfam;
- 	int hkid;
- 
-+	hpa_t source_pa;
-+
- 	bool finalized;
- 	atomic_t tdh_mem_track;
- 
 diff --git a/tools/arch/x86/include/uapi/asm/kvm.h b/tools/arch/x86/include/uapi/asm/kvm.h
-index 938fcf6bc002..f6d6da7515bf 100644
+index f6d6da7515bf..2eb46f5dcc0a 100644
 --- a/tools/arch/x86/include/uapi/asm/kvm.h
 +++ b/tools/arch/x86/include/uapi/asm/kvm.h
-@@ -534,6 +534,7 @@ enum kvm_tdx_cmd_id {
- 	KVM_TDX_CAPABILITIES = 0,
+@@ -535,6 +535,7 @@ enum kvm_tdx_cmd_id {
  	KVM_TDX_INIT_VM,
  	KVM_TDX_INIT_VCPU,
-+	KVM_TDX_INIT_MEM_REGION,
+ 	KVM_TDX_INIT_MEM_REGION,
++	KVM_TDX_FINALIZE_VM,
  
  	KVM_TDX_CMD_NR_MAX,
  };
-@@ -611,4 +612,12 @@ struct kvm_tdx_init_vm {
- 	};
- };
- 
-+#define KVM_TDX_MEASURE_MEMORY_REGION	(1UL << 0)
-+
-+struct kvm_tdx_init_mem_region {
-+	__u64 source_addr;
-+	__u64 gpa;
-+	__u64 nr_pages;
-+};
-+
- #endif /* _ASM_X86_KVM_H */
 -- 
 2.25.1
 
