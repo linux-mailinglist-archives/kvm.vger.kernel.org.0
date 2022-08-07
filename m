@@ -2,57 +2,55 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id B14FE58BD99
-	for <lists+kvm@lfdr.de>; Mon,  8 Aug 2022 00:18:49 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 0341258BDDF
+	for <lists+kvm@lfdr.de>; Mon,  8 Aug 2022 00:32:23 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237279AbiHGWNp (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sun, 7 Aug 2022 18:13:45 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37436 "EHLO
+        id S242302AbiHGWb5 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sun, 7 Aug 2022 18:31:57 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35536 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S237216AbiHGWJp (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sun, 7 Aug 2022 18:09:45 -0400
-Received: from mga12.intel.com (mga12.intel.com [192.55.52.136])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3C221CE18;
-        Sun,  7 Aug 2022 15:03:37 -0700 (PDT)
+        with ESMTP id S242162AbiHGWbh (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sun, 7 Aug 2022 18:31:37 -0400
+Received: from mga06.intel.com (mga06b.intel.com [134.134.136.31])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 11FCF17E21;
+        Sun,  7 Aug 2022 15:18:48 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1659909817; x=1691445817;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=/iL/5HKwTLM57fOI1n7l4Rg3A8WpxBIbgeC/p+evIPo=;
-  b=f9pSCo+4/Wu3ChloEKSn1X/727C4EFsuwlFPq37T5HV4HhXetNHZ/4To
-   j/HG0U546skpSwlMQ4rahV9L3lX2qWF+Cl1hAMxvedmJE/tiDR+nfm8rk
-   j/Mwu7iyM/gB2EFQiVEB54NL1gGXE7g8HOVNy3wn9JJWKtxJ77CjBaVdA
-   vUe//EVx+wss6b2gYwcwN6uklNstnFHwppo/tQnWtzy9k79tnjslRfhwP
-   obawE34hk34EPBJ101QohbRLGcN7kpBXWUDyXVpY8MrO6KUfCC1Z31pkF
-   mJBt5AxP9XxzOTskQ1KuxVYD7tG2MVsBYKNzw1DGpHXjMCIYkzMjOX4hY
+  t=1659910728; x=1691446728;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=qOGpO5cIeXubBrJsMlEwitkZ6Kq01lMoaTC4paN5KMw=;
+  b=j/yWsI482zbpXY7pk300rInAKNcqi7bwoNanOXd+taVUfA2gmejTzteH
+   PoOs0mj3uOuRE2WiuldqSQ1g3iy+Am5ImLDZSli3GkadaM8/cs3X2NA4r
+   jhRAE4Xf1u96MHxL7kouBZesZcbK9zKPUP7TgfMzhGzrdmE0pxYduVEHT
+   1R8wAQizhr4U494hvZkmq1281lugOGLKHB3jPgDI6t/PqB9w2AqvdE6zb
+   dvN8zi52HOUb62On/GD+P0X4xNBxia5PKX/3m5JaLjs/GtzPOTbe6FKvK
+   dI+Xv4VvJe8JaBRyXwf4n15JFKJu6FaxsFAZjZzcBjGYBx0uJUdmp/yym
    w==;
-X-IronPort-AV: E=McAfee;i="6400,9594,10432"; a="270240425"
-X-IronPort-AV: E=Sophos;i="5.93,220,1654585200"; 
-   d="scan'208";a="270240425"
-Received: from fmsmga008.fm.intel.com ([10.253.24.58])
-  by fmsmga106.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 07 Aug 2022 15:02:45 -0700
-X-IronPort-AV: E=Sophos;i="5.93,220,1654585200"; 
-   d="scan'208";a="663682785"
+X-IronPort-AV: E=McAfee;i="6400,9594,10432"; a="352192026"
+X-IronPort-AV: E=Sophos;i="5.93,221,1654585200"; 
+   d="scan'208";a="352192026"
+Received: from orsmga006.jf.intel.com ([10.7.209.51])
+  by orsmga104.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 07 Aug 2022 15:18:47 -0700
+X-IronPort-AV: E=Sophos;i="5.93,221,1654585200"; 
+   d="scan'208";a="580109237"
 Received: from ls.sc.intel.com (HELO localhost) ([143.183.96.54])
-  by fmsmga008-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 07 Aug 2022 15:02:45 -0700
+  by orsmga006-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 07 Aug 2022 15:18:47 -0700
 From:   isaku.yamahata@intel.com
 To:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org
 Cc:     isaku.yamahata@intel.com, isaku.yamahata@gmail.com,
         Paolo Bonzini <pbonzini@redhat.com>, erdemaktas@google.com,
         Sean Christopherson <seanjc@google.com>,
         Sagi Shahar <sagis@google.com>
-Subject: [PATCH v8 103/103] KVM: x86: design documentation on TDX support of x86 KVM TDP MMU
-Date:   Sun,  7 Aug 2022 15:02:28 -0700
-Message-Id: <2d75ad1098b6bd6b2559472bbeedaf50e797612c.1659854791.git.isaku.yamahata@intel.com>
+Subject: [RFC PATCH 00/13] KVM TDX: TDP MMU: large page support
+Date:   Sun,  7 Aug 2022 15:18:33 -0700
+Message-Id: <cover.1659854957.git.isaku.yamahata@intel.com>
 X-Mailer: git-send-email 2.25.1
-In-Reply-To: <cover.1659854790.git.isaku.yamahata@intel.com>
-References: <cover.1659854790.git.isaku.yamahata@intel.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-Spam-Status: No, score=-5.0 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
-        SPF_HELO_PASS,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham
+        SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -62,439 +60,132 @@ X-Mailing-List: kvm@vger.kernel.org
 
 From: Isaku Yamahata <isaku.yamahata@intel.com>
 
-Add a high level design document on TDX changes to TDP MMU.
+This patch series is based on "v8 KVM TDX: basic feature support".  It
+implements large page support for TDP MMU by allowing populating of the large
+page and splitting it when necessary.  It's not supported to merge 4K/2M pages
+into 2M/1G pages.
 
-Signed-off-by: Isaku Yamahata <isaku.yamahata@intel.com>
-Co-developed-by: Bagas Sanjaya <bagasdotme@gmail.com>
-Signed-off-by: Bagas Sanjaya <bagasdotme@gmail.com>
----
- Documentation/virt/kvm/tdx-tdp-mmu.rst | 417 +++++++++++++++++++++++++
- 1 file changed, 417 insertions(+)
- create mode 100644 Documentation/virt/kvm/tdx-tdp-mmu.rst
+Feedback for options to merge sub-pages into a large page are welcome.
 
-diff --git a/Documentation/virt/kvm/tdx-tdp-mmu.rst b/Documentation/virt/kvm/tdx-tdp-mmu.rst
-new file mode 100644
-index 000000000000..2d91c94e6d8f
---- /dev/null
-+++ b/Documentation/virt/kvm/tdx-tdp-mmu.rst
-@@ -0,0 +1,417 @@
-+.. SPDX-License-Identifier: GPL-2.0
-+
-+Design of TDP MMU for TDX support
-+=================================
-+This document describes a (high level) design for TDX support of KVM TDP MMU of
-+x86 KVM.
-+
-+In this document, we use "TD" or "guest TD" to differentiate it from the current
-+"VM" (Virtual Machine), which is supported by KVM today.
-+
-+
-+Background of TDX
-+=================
-+TD private memory is designed to hold TD private content, encrypted by the CPU
-+using the TD ephemeral key.  An encryption engine holds a table of encryption
-+keys, and an encryption key is selected for each memory transaction based on a
-+Host Key Identifier (HKID).  By design, the host VMM does not have access to the
-+encryption keys.
-+
-+In the first generation of MKTME, HKID is "stolen" from the physical address by
-+allocating a configurable number of bits from the top of the physical address.
-+The HKID space is partitioned into shared HKIDs for legacy MKTME accesses and
-+private HKIDs for SEAM-mode-only accesses.  We use 0 for the shared HKID on the
-+host so that MKTME can be opaque or bypassed on the host.
-+
-+During TDX non-root operation (i.e. guest TD), memory accesses can be qualified
-+as either shared or private, based on the value of a new SHARED bit in the Guest
-+Physical Address (GPA).  The CPU translates shared GPAs using the usual VMX EPT
-+(Extended Page Table) or "Shared EPT" (in this document), which resides in the
-+host VMM memory.  The Shared EPT is directly managed by the host VMM - the same
-+as with the current VMX.  Since guest TDs usually require I/O, and the data
-+exchange needs to be done via shared memory, thus KVM needs to use the current
-+EPT functionality even for TDs.
-+
-+The CPU translates private GPAs using a separate Secure EPT.  The Secure EPT
-+pages are encrypted and integrity-protected with the TD's ephemeral private key.
-+Secure EPT can be managed _indirectly_ by the host VMM, using the TDX interface
-+functions (SEAMCALLs), and thus conceptually Secure EPT is a subset of EPT
-+because not all functionalities are available.
-+
-+Since the execution of such interface functions takes much longer time than
-+accessing memory directly, in KVM we use the existing TDP code to mirror the
-+Secure EPT for the TD. And we think there are at least two options today in
-+terms of the timing for executing such SEAMCALLs:
-+
-+1. synchronous, i.e. while walking the TDP page tables, or
-+2. post-walk, i.e. record what needs to be done to the real Secure EPT during
-+   the walk, and execute SEAMCALLs later.
-+
-+The option 1 seems to be more intuitive and simpler, but the Secure EPT
-+concurrency rules are different from the ones of the TDP or EPT. For example,
-+MEM.SEPT.RD acquire shared access to the whole Secure EPT tree of the target
-+
-+Secure EPT(SEPT) operations
-+---------------------------
-+Secure EPT is an Extended Page Table for GPA-to-HPA translation of TD private
-+HPA.  A Secure EPT is designed to be encrypted with the TD's ephemeral private
-+key. SEPT pages are allocated by the host VMM via Intel TDX functions, but their
-+content is intended to be hidden and is not architectural.
-+
-+Unlike the conventional EPT, the CPU can't directly read/write its entry.
-+Instead, TDX SEAMCALL API is used.  Several SEAMCALLs correspond to operation on
-+the EPT entry.
-+
-+* TDH.MEM.SEPT.ADD():
-+
-+  Add a secure EPT page from the secure EPT tree.  This corresponds to updating
-+  the non-leaf EPT entry with present bit set
-+
-+* TDH.MEM.SEPT.REMOVE():
-+
-+  Remove the secure page from the secure EPT tree.  There is no corresponding
-+  to the EPT operation.
-+
-+* TDH.MEM.SEPT.RD():
-+
-+  Read the secure EPT entry.  This corresponds to reading the EPT entry as
-+  memory.  Please note that this is much slower than direct memory reading.
-+
-+* TDH.MEM.PAGE.ADD() and TDH.MEM.PAGE.AUG():
-+
-+  Add a private page to the secure EPT tree.  This corresponds to updating the
-+  leaf EPT entry with present bit set.
-+
-+* THD.MEM.PAGE.REMOVE():
-+
-+  Remove a private page from the secure EPT tree.  There is no corresponding
-+  to the EPT operation.
-+
-+* TDH.MEM.RANGE.BLOCK():
-+
-+  This (mostly) corresponds to clearing the present bit of the leaf EPT entry.
-+  Note that the private page is still linked in the secure EPT.  To remove it
-+  from the secure EPT, TDH.MEM.SEPT.REMOVE() and TDH.MEM.PAGE.REMOVE() needs to
-+  be called.
-+
-+* TDH.MEM.TRACK():
-+
-+  Increment the TLB epoch counter. This (mostly) corresponds to EPT TLB flush.
-+  Note that the private page is still linked in the secure EPT.  To remove it
-+  from the secure EPT, tdh_mem_page_remove() needs to be called.
-+
-+
-+Adding private page
-+-------------------
-+The procedure of populating the private page looks as follows.
-+
-+1. TDH.MEM.SEPT.ADD(512G level)
-+2. TDH.MEM.SEPT.ADD(1G level)
-+3. TDH.MEM.SEPT.ADD(2M level)
-+4. TDH.MEM.PAGE.AUG(4K level)
-+
-+Those operations correspond to updating the EPT entries.
-+
-+Dropping private page and TLB shootdown
-+---------------------------------------
-+The procedure of dropping the private page looks as follows.
-+
-+1. TDH.MEM.RANGE.BLOCK(4K level)
-+
-+   This mostly corresponds to clear the present bit in the EPT entry.  This
-+   prevents (or blocks) TLB entry from creating in the future.  Note that the
-+   private page is still linked in the secure EPT tree and the existing cache
-+   entry in the TLB isn't flushed.
-+
-+2. TDH.MEM.TRACK(range) and TLB shootdown
-+
-+   This mostly corresponds to the EPT TLB shootdown.  Because all vcpus share
-+   the same Secure EPT, all vcpus need to flush TLB.
-+
-+   * TDH.MEM.TRACK(range) by one vcpu.  It increments the global internal TLB
-+     epoch counter.
-+
-+   * send IPI to remote vcpus
-+   * Other vcpu exits to VMM from guest TD and then re-enter. TDH.VP.ENTER().
-+   * TDH.VP.ENTER() checks the TLB epoch counter and If its TLB is old, flush
-+     TLB.
-+
-+   Note that only single vcpu issues tdh_mem_track().
-+
-+   Note that the private page is still linked in the secure EPT tree, unlike the
-+   conventional EPT.
-+
-+3. TDH.MEM.PAGE.PROMOTE, TDH.MEM.PAGEDEMOTE(), TDH.MEM.PAGE.RELOCATE(), or
-+   TDH.MEM.PAGE.REMOVE()
-+
-+   There is no corresponding operation to the conventional EPT.
-+
-+   * When changing page size (e.g. 4K <-> 2M) TDH.MEM.PAGE.PROMOTE() or
-+     TDH.MEM.PAGE.DEMOTE() is used.  During those operation, the guest page is
-+     kept referenced in the Secure EPT.
-+
-+   * When migrating page, TDH.MEM.PAGE.RELOCATE().  This requires both source
-+     page and destination page.
-+   * when destroying TD, TDH.MEM.PAGE.REMOVE() removes the private page from the
-+     secure EPT tree.  In this case TLB shootdown is not needed because vcpus
-+     don't run any more.
-+
-+The basic idea for TDX support
-+==============================
-+Because shared EPT is the same as the existing EPT, use the existing logic for
-+shared EPT.  On the other hand, secure EPT requires additional operations
-+instead of directly reading/writing of the EPT entry.
-+
-+On EPT violation, The KVM mmu walks down the EPT tree from the root, determines
-+the EPT entry to operate, and updates the entry. If necessary, a TLB shootdown
-+is done.  Because it's very slow to directly walk secure EPT by TDX SEAMCALL,
-+TDH.MEM.SEPT.RD(), the mirror of secure EPT is created and maintained.  Add
-+hooks to KVM MMU to reuse the existing code.
-+
-+EPT violation on shared GPA
-+---------------------------
-+(1) EPT violation on shared GPA or zapping shared GPA
-+    ::
-+
-+        walk down shared EPT tree (the existing code)
-+                |
-+                |
-+                V
-+        shared EPT tree (CPU refers.)
-+
-+(2) update the EPT entry. (the existing code)
-+
-+    TLB shootdown in the case of zapping.
-+
-+
-+EPT violation on private GPA
-+----------------------------
-+(1) EPT violation on private GPA or zapping private GPA
-+    ::
-+
-+        walk down the mirror of secure EPT tree (mostly same as the existing code)
-+            |
-+            |
-+            V
-+        mirror of secure EPT tree (KVM MMU software only. reuse of the existing code)
-+
-+(2) update the (mirrored) EPT entry. (mostly same as the existing code)
-+
-+(3) call the hooks with what EPT entry is changed
-+    ::
-+
-+           |
-+        NEW: hooks in KVM MMU
-+           |
-+           V
-+        secure EPT root(CPU refers)
-+
-+(4) the TDX backend calls necessary TDX SEAMCALLs to update real secure EPT.
-+
-+The major modification is to add hooks for the TDX backend for additional
-+operations and to pass down which EPT, shared EPT, or private EPT is used, and
-+twist the behavior if we're operating on private EPT.
-+
-+The following depicts the relationship.
-+::
-+
-+                    KVM                             |       TDX module
-+                     |                              |           |
-+        -------------+----------                    |           |
-+        |                      |                    |           |
-+        V                      V                    |           |
-+     shared GPA           private GPA               |           |
-+  CPU shared EPT pointer  KVM private EPT pointer   |  CPU secure EPT pointer
-+        |                      |                    |           |
-+        |                      |                    |           |
-+        V                      V                    |           V
-+  shared EPT                private EPT<-------mirror----->Secure EPT
-+        |                      |                    |           |
-+        |                      \--------------------+------\    |
-+        |                                           |      |    |
-+        V                                           |      V    V
-+  shared guest page                                 |    private guest page
-+                                                    |
-+                                                    |
-+                              non-encrypted memory  |    encrypted memory
-+                                                    |
-+
-+shared EPT: CPU and KVM walk with shared GPA
-+            Maintained by the existing code
-+private EPT: KVM walks with private GPA
-+             Maintained by the twisted existing code
-+secure EPT: CPU walks with private GPA.
-+            Maintained by TDX module with TDX SEAMCALLs via hooks
-+
-+
-+Tracking private EPT page
-+=========================
-+Shared EPT pages are managed by struct kvm_mmu_page.  They are linked in a list
-+structure.  When necessary, the list is traversed to operate on.  Private EPT
-+pages have different characteristics.  For example, private pages can't be
-+swapped out.  When shrinking memory, we'd like to traverse only shared EPT pages
-+and skip private EPT pages.  Likewise, page migration isn't supported for
-+private pages (yet).  Introduce an additional list to track shared EPT pages and
-+track private EPT pages independently.
-+
-+At the beginning of EPT violation, the fault handler knows fault GPA, thus it
-+knows which EPT to operate on, private or shared.  If it's private EPT,
-+an additional task is done.  Something like "if (private) { callback a hook }".
-+Since the fault handler has deep function calls, it's cumbersome to hold the
-+information of which EPT is operating.  Options to mitigate it are
-+
-+1. Pass the information as an argument for the function call.
-+2. Record the information in struct kvm_mmu_page somehow.
-+3. Record the information in vcpu structure.
-+
-+Option 2 was chosen.  Because option 1 requires modifying all the functions.  It
-+would affect badly to the normal case.  Option 3 doesn't work well because in
-+some cases, we need to walk both private and shared EPT.
-+
-+The role of the EPT page can be utilized and one bit can be curved out from
-+unused bits in struct kvm_mmu_page_role.  When allocating the EPT page,
-+initialize the information. Mostly struct kvm_mmu_page is available because
-+we're operating on EPT pages.
-+
-+
-+The conversion of private GPA and shared GPA
-+============================================
-+A page of a given GPA can be assigned to only private GPA xor shared GPA at one
-+time.  The GPA can't be accessed simultaneously via both private GPA and shared
-+GPA.  On guest startup, all the GPAs are assigned as private.  Guest converts
-+the range of GPA to shared (or private) from private (or shared) by MapGPA
-+hypercall.  MapGPA hypercall takes the start GPA and the size of the region.  If
-+the given start GPA is shared, VMM converts the region into shared (if it's
-+already shared, nop).  If the start GPA is private, VMM converts the region into
-+private.  It implies the guest won't access the unmapped region. private(or
-+shared) region after converting to shared(or private).
-+
-+If the guest TD triggers an EPT violation on the already converted region, the
-+access won't be allowed (loop in EPT violation) until other vcpu converts back
-+the region.
-+
-+KVM MMU records which GPA is allowed to access, private or shared by xarray.
-+
-+
-+The original TDP MMU and race condition
-+=======================================
-+Because vcpus share the EPT, once the EPT entry is zapped, we need to shootdown
-+TLB.  Send IPI to remote vcpus.  Remote vcpus flush their down TLBs.  Until TLB
-+shootdown is done, vcpus may reference the zapped guest page.
-+
-+TDP MMU uses read lock of mmu_lock to mitigate vcpu contention.  When read lock
-+is obtained, it depends on the atomic update of the EPT entry.  (On the other
-+hand legacy MMU uses write lock.)  When vcpu is populating/zapping the EPT entry
-+with a read lock held, other vcpu may be populating or zapping the same EPT
-+entry at the same time.
-+
-+To avoid the race condition, the entry is frozen.  It means the EPT entry is set
-+to the special value, REMOVED_SPTE which clears the present bit.  And then after
-+TLB shootdown, update the EPT entry to the final value.
-+
-+Concurrent zapping
-+------------------
-+1. read lock
-+2. freeze the EPT entry (atomically set the value to REMOVED_SPTE)
-+   If other vcpu froze the entry, restart page fault.
-+3. TLB shootdown
-+
-+   * send IPI to remote vcpus
-+   * TLB flush (local and remote)
-+
-+   For each entry update, TLB shootdown is needed because of the
-+   concurrency.
-+4. atomically set the EPT entry to the final value
-+5. read unlock
-+
-+Concurrent populating
-+---------------------
-+In the case of populating the non-present EPT entry, atomically update the EPT
-+entry.
-+
-+1. read lock
-+
-+2. atomically update the EPT entry
-+   If other vcpu frozen the entry or updated the entry, restart page fault.
-+
-+3. read unlock
-+
-+In the case of updating the present EPT entry (e.g. page migration), the
-+operation is split into two.  Zapping the entry and populating the entry.
-+
-+1. read lock
-+2. zap the EPT entry.  follow the concurrent zapping case.
-+3. populate the non-present EPT entry.
-+4. read unlock
-+
-+Non-concurrent batched zapping
-+------------------------------
-+In some cases, zapping the ranges is done exclusively with a write lock held.
-+In this case, the TLB shootdown is batched into one.
-+
-+1. write lock
-+2. zap the EPT entries by traversing them
-+3. TLB shootdown
-+4. write unlock
-+
-+For Secure EPT, TDX SEAMCALLs are needed in addition to updating the mirrored
-+EPT entry.
-+
-+TDX concurrent zapping
-+----------------------
-+Add a hook for TDX SEAMCALLs at the step of the TLB shootdown.
-+
-+1. read lock
-+2. freeze the EPT entry(set the value to REMOVED_SPTE)
-+3. TLB shootdown via a hook
-+
-+   * TLB.MEM.RANGE.BLOCK()
-+   * TLB.MEM.TRACK()
-+   * send IPI to remote vcpus
-+
-+4. set the EPT entry to the final value
-+5. read unlock
-+
-+TDX concurrent populating
-+-------------------------
-+TDX SEAMCALLs are required in addition to operating the mirrored EPT entry.  The
-+frozen entry is utilized by following the zapping case to avoid the race
-+condition.  A hook can be added.
-+
-+1. read lock
-+2. freeze the EPT entry
-+3. hook
-+
-+   * TDH_MEM_SEPT_ADD() for non-leaf or TDH_MEM_PAGE_AUG() for leaf.
-+
-+4. set the EPT entry to the final value
-+5. read unlock
-+
-+Without freezing the entry, the following race can happen.  Suppose two vcpus
-+are faulting on the same GPA and the 2M and 4K level entries aren't populated
-+yet.
-+
-+* vcpu 1: update 2M level EPT entry
-+* vcpu 2: update 4K level EPT entry
-+* vcpu 2: TDX SEAMCALL to update 4K secure EPT entry => error
-+* vcpu 1: TDX SEAMCALL to update 2M secure EPT entry
-+
-+
-+TDX non-concurrent batched zapping
-+----------------------------------
-+For simplicity, the procedure of concurrent populating is utilized.  The
-+procedure can be optimized later.
-+
-+
-+Co-existing with unmapping guest private memory
-+===============================================
-+TODO.  This needs to be addressed.
-+
-+
-+Restrictions or future work
-+===========================
-+The following features aren't supported yet at the moment.
-+
-+* optimizing non-concurrent zap
-+* Large page
-+* Page migration
+Options for merging sub-pages into a large page
+===============================================
+A) Merge pages into a large page on scanning by NX page recovery daemon actively.
+   + implementation would be simple
+   - inefficient as implementation because it always scans subpages.
+   - inefficient because it merges unused pages.
+B) On normal EPT violation, check whether pages can be merged into a large page
+   after mapping it.
+   + scanning part isn't needed.
+   - inefficient to add more logic to a fast path
+C) Use TDH.MEM.RANGE.BLOCK instead of zapping EPT entry.  And record that the
+   entry is blocked.  On EPT violation, check if the entry is blocked or not.
+   If the EPT violation is caused by a blocked Secure-EPT entry, trigger the
+   page merge logic.
+   + reuse scanning logic (NX recovery daemon)
+   + take advantage of EPT violation
+   - would be complex
+     Block instead of zap, track blocked Secure-EPT entry, and unblock it on the
+     EPT violation and then page merge logic.
+
+
+The current implementation (splitting large pages when necessary)
+=================================================================
+* It already tracking whether GFN is private or shared.  When it's changed,
+  update lpage_info to prevent a large page.
+* TDX provides page level on Secure EPT violation.  Pass around the page level
+  that the lower level functions needs.
+* Even if the page is the large page in the host, at the EPT level, only some
+  sub-pages are mapped.  In such cases abandon to map large pages and step into
+  the sub-page level, unlike the conventional EPT.
+* When zapping spte and the spte is for a large page, split and zap it unlike
+  the conventional EPT because otherwise the protected page contents will be
+  lost.
+* It's not implemented to merge pages into a large page.
+
+
+Discussion for merging pages into large page
+============================================
+The live migration support for TDX is planned.  It means dirty page logging will
+be supported and a large page will be split on enabling dirty page logging.
+After disabling it, the pages should be merged into large pages for performance.
+
+The current implementation for the conventional EPT is
+* THP or NX page recovery zaps EPT entries. This step doesn't directly map a
+  large page.
+* On the next EPT violation, when a large page is possible, map it as a large
+  page.
+
+This is because
+* To avoid unnecessary page merging for cold SPTE by mapping large pages on EPT
+  violation.  This is desirable for the TDX case to avoid unnecessary Secure-EPT
+  operation.
+* Reuse KVM page fault path.
+  For TDX, the new logic is needed to merge sub-pages into a large page.
+
+TDX operation
+-------------
+* EPT violation trick
+Such track (zapping the EPT entry to trigger EPT violation) doesn't work for
+TDX.  For TDX, it will lose the contents of the protected page to zap a page
+because the protected guest page is un-associated from the guest TD.  Instead,
+TDX provides a different way to trigger EPT violation without losing the page
+contents so that VMM can detect guest TD activity by blocking/unblocking
+Secure-EPT entry.  TDH.MEM.RANGE.BLOCK and TDH.MEM.RANGE.UNBLOCK.  They
+correspond to clearing/setting a present bit in an EPT entry with page contents
+still kept.  By TDH.MEM.RANGE.BLOCK and TLB shoot down, VMM can cause guest TD
+to trigger EPT violation.  After that, VMM can unblock it by
+TDH.MEM.RANGE.UNBLOCK and resume guest TD execution.  The procedure is as
+follows.
+
+  - Block Secure-EPT entry by TDH.MEM.RANGE.BLOCK.
+  - TLB shoot down.
+  - Wait for guest TD to trigger EPT violation.
+  - Unblock Secure-EPT entry by TDH.MEM.RANGE.UNBLOCK to resume the guest TD.
+
+* merging sub-pages into a large page
+The following steps are needed.
+- Ensure that all sub-pages are mapped.
+- TLB shoot down.
+- Merge sub-pages into a large page (TDH.MEM.PAGE.PROMOTE).
+  This requires all sub-pages are mapped.
+- Cache flush Secure EPT page used to map subpages.
+
+
+Thanks,
+
+Chao Peng (1):
+  KVM: Update lpage info when private/shared memory are mixed
+
+Xiaoyao Li (12):
+  KVM: TDP_MMU: Go to next level if smaller private mapping exists
+  KVM: TDX: Pass page level to cache flush before TDX SEAMCALL
+  KVM: TDX: Pass KVM page level to tdh_mem_page_add() and
+    tdh_mem_page_aug()
+  KVM: TDX: Pass size to tdx_measure_page()
+  KVM: TDX: Pass size to reclaim_page()
+  KVM: TDX: Update tdx_sept_{set,drop}_private_spte() to support large
+    page
+  KVM: MMU: Introduce level info in PFERR code
+  KVM: TDX: Pin pages via get_page() right before ADD/AUG'ed to TDs
+  KVM: MMU: Pass desired page level in err code for page fault handler
+  KVM: TDP_MMU: Split the large page when zap leaf
+  KVM: TDX: Split a large page when 4KB page within it converted to
+    shared
+  KVM: x86: remove struct kvm_arch.tdp_max_page_level
+
+ arch/x86/include/asm/kvm_host.h |  14 ++-
+ arch/x86/kvm/mmu/mmu.c          | 158 ++++++++++++++++++++++++++++-
+ arch/x86/kvm/mmu/mmu_internal.h |   4 +-
+ arch/x86/kvm/mmu/tdp_mmu.c      |  31 +++++-
+ arch/x86/kvm/vmx/common.h       |   6 +-
+ arch/x86/kvm/vmx/tdx.c          | 174 +++++++++++++++++++++-----------
+ arch/x86/kvm/vmx/tdx_arch.h     |  20 ++++
+ arch/x86/kvm/vmx/tdx_ops.h      |  46 ++++++---
+ arch/x86/kvm/vmx/vmx.c          |   2 +-
+ include/linux/kvm_host.h        |  10 ++
+ virt/kvm/kvm_main.c             |   9 +-
+ 11 files changed, 390 insertions(+), 84 deletions(-)
+
 -- 
 2.25.1
 
