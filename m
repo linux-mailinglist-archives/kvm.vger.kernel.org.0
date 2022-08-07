@@ -2,70 +2,46 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 775AE58BA79
-	for <lists+kvm@lfdr.de>; Sun,  7 Aug 2022 11:49:57 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 1B9C658BAAC
+	for <lists+kvm@lfdr.de>; Sun,  7 Aug 2022 13:45:29 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232576AbiHGJt2 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sun, 7 Aug 2022 05:49:28 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44498 "EHLO
+        id S233713AbiHGLpD convert rfc822-to-8bit (ORCPT
+        <rfc822;lists+kvm@lfdr.de>); Sun, 7 Aug 2022 07:45:03 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60086 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231962AbiHGJt1 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sun, 7 Aug 2022 05:49:27 -0400
-X-Greylist: delayed 2909 seconds by postgrey-1.37 at lindbergh.monkeyblade.net; Sun, 07 Aug 2022 02:49:24 PDT
-Received: from vps-4763125.topmindpiolhos.com.br (vps-4763125.topmindpiolhos.com.br [162.214.118.74])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CCD34B866
-        for <kvm@vger.kernel.org>; Sun,  7 Aug 2022 02:49:24 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=traderspiolhos.com; s=default; h=Content-Type:MIME-Version:Message-ID:
-        Reply-To:From:Date:Subject:To:Sender:Cc:Content-Transfer-Encoding:Content-ID:
-        Content-Description:Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc
-        :Resent-Message-ID:In-Reply-To:References:List-Id:List-Help:List-Unsubscribe:
-        List-Subscribe:List-Post:List-Owner:List-Archive;
-        bh=4gnyRr34heQXLVUx0ZfC2guSa88f9QCMsPrwnQm68u8=; b=f5alwh+h/p65BNYiRBFjNw3QdT
-        gS2SEd52+BNei7TQetrBamz9lJIX/c8w02aH8MuZDPPiBvsGT9AP52gSmTY8OknTUs6Ru4yCRFn2c
-        VeY0Xs6DWh19lX+zDQw5icXdD1R4gka9M+BotflRVrF8vvcL6pSXcuBwbwHaMD1nuVE2k5RsStkEw
-        eKCX8ovP7Ujl8SMo28ByzphjWR9Em+yoaXrizRLUKYkNkLpOIvV9zDB71n3ilc+D58Vh3KoTIYTMP
-        tFhFPQ6N1Mm74M2JrDIq3OUulBftkJaicZK6SZ4amJz/EEYPfilWdB33q2pnl3RcR873+OaDU9wi1
-        AiqSUGdA==;
-Received: from traderspiolhos by vps-4763125.topmindpiolhos.com.br with local (Exim 4.95)
-        (envelope-from <traderspiolhos@vps-4763125.topmindpiolhos.com.br>)
-        id 1oKc9X-0007Tb-9n
-        for kvm@vger.kernel.org;
-        Sun, 07 Aug 2022 06:00:55 -0300
+        with ESMTP id S232726AbiHGLpC (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sun, 7 Aug 2022 07:45:02 -0400
+X-Greylist: delayed 542 seconds by postgrey-1.37 at lindbergh.monkeyblade.net; Sun, 07 Aug 2022 04:44:48 PDT
+Received: from stage1.maxing.jp (unknown [133.242.88.153])
+        by lindbergh.monkeyblade.net (Postfix) with SMTP id E1DBA219
+        for <kvm@vger.kernel.org>; Sun,  7 Aug 2022 04:44:48 -0700 (PDT)
+Received: by stage1.maxing.jp (Postfix, from userid 48)
+        id BA8251F0168C; Sun,  7 Aug 2022 19:53:58 +0900 (JST)
 To:     kvm@vger.kernel.org
-Subject: A FINANCIAL CRISIS CAN MAKE YOU VERY RICH!
-X-PHP-Script: traderspiolhos.com/index.php for 156.146.63.156
-X-PHP-Originating-Script: 1064:class-phpmailer.php
-Date:   Sun, 7 Aug 2022 09:00:55 +0000
-From:   Traders Piolhos <edmar@traderspiolhos.com.br>
-Reply-To: edmar@traderspiolhos.com.br
-Message-ID: <37326bf4a978783a8def539c1abd5758@traderspiolhos.com>
-X-Mailer: PHPMailer 5.2.27 (https://github.com/PHPMailer/PHPMailer)
+Subject: =?UTF-8?Q?=E6=A0=AA=E5=BC=8F=E4=BC=9A=E7=A4=BEMGM_"EARN_OVER_$1200_PER_DA?=  =?UTF-8?Q?Y_ONLINE_WITH_THE_BITCOIN_PROFIT_METHOD!"?=
+X-PHP-Originating-Script: 504:class-phpmailer.php
+Date:   Sun, 7 Aug 2022 10:53:58 +0000
+From:   =?UTF-8?B?5qCq5byP5Lya56S+TUdN?= <info@m-g-m.co.jp>
+Reply-To: info@m-g-m.co.jp
+Message-ID: <85cb2e7e705f3eed60ac72a042107808@m-g-m.co.jp>
+X-Mailer: PHPMailer 5.2.22 (https://github.com/PHPMailer/PHPMailer)
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
-X-AntiAbuse: This header was added to track abuse, please include it with any abuse report
-X-AntiAbuse: Primary Hostname - vps-4763125.topmindpiolhos.com.br
-X-AntiAbuse: Original Domain - vger.kernel.org
-X-AntiAbuse: Originator/Caller UID/GID - [1064 991] / [47 12]
-X-AntiAbuse: Sender Address Domain - vps-4763125.topmindpiolhos.com.br
-X-Get-Message-Sender-Via: vps-4763125.topmindpiolhos.com.br: authenticated_id: traderspiolhos/only user confirmed/virtual account not confirmed
-X-Authenticated-Sender: vps-4763125.topmindpiolhos.com.br: traderspiolhos
-X-Source: 
-X-Source-Args: 
-X-Source-Dir: 
-X-Spam-Status: No, score=4.9 required=5.0 tests=BAYES_50,DKIM_SIGNED,
-        DKIM_VALID,PHP_SCRIPT,RCVD_IN_VALIDITY_RPBL,SPF_HELO_NONE,SPF_NONE,
-        SUBJ_ALL_CAPS,T_SCC_BODY_TEXT_LINE autolearn=no autolearn_force=no
-        version=3.4.6
-X-Spam-Level: ****
+Content-Transfer-Encoding: 8BIT
+X-Spam-Status: No, score=3.6 required=5.0 tests=BAYES_50,
+        HEADER_FROM_DIFFERENT_DOMAINS,RCVD_IN_VALIDITY_RPBL,RDNS_NONE,
+        SPF_HELO_NONE,SPF_NONE,SUBJ_ALL_CAPS,T_SCC_BODY_TEXT_LINE autolearn=no
+        autolearn_force=no version=3.4.6
+X-Spam-Level: ***
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Message Body:
-A FINANCIAL CRISIS CAN MAKE YOU VERY RICH! https://telegra.ph/Cryptocurrency-makes-people-millionaires-at-15-people-per-hour---Page-255555-08-02
+メッセージ本文:
+BITCOIN WILL MAKE YOU A BILLIONAIRE https://telegra.ph/Cryptocurrency-makes-people-millionaires-at-15-people-per-hour---Page-762577-08-02
 
---
+-- 
+このメールは MGM (http://m-g-m.co.jp) のお問い合わせフォームから送信されました
 
