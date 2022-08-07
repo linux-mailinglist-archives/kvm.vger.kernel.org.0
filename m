@@ -2,79 +2,51 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id E0E8B58BB0C
-	for <lists+kvm@lfdr.de>; Sun,  7 Aug 2022 15:35:20 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 2F5C858BB46
+	for <lists+kvm@lfdr.de>; Sun,  7 Aug 2022 16:29:44 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233860AbiHGNfT (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sun, 7 Aug 2022 09:35:19 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47546 "EHLO
+        id S234040AbiHGO3H (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sun, 7 Aug 2022 10:29:07 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39992 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231571AbiHGNfR (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sun, 7 Aug 2022 09:35:17 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 9B11810C1
-        for <kvm@vger.kernel.org>; Sun,  7 Aug 2022 06:35:16 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1659879315;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=kUQoZ+Z3T3noJLGRnWhyvuGBcgQof1Le7Re/cjImcLw=;
-        b=O3wQz7IEr8AyBH53UrbV+N8ZjvDixx5BvWma5nwK5jFNyc7Mc/+WbYJC/u6g19I1FCDPPu
-        1EnEv2RqHwnL7sHpkr8VZd50AGh6QIK83NDRu22IxoS77aXwmPGtD37tczYgibRgcTCwOc
-        OIeR7hJ/tKGRSXFZm0XazeaxtRD0f/E=
-Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
- [209.85.128.70]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-247-B09LUSBZPViSCbu4JQ2A7Q-1; Sun, 07 Aug 2022 09:35:14 -0400
-X-MC-Unique: B09LUSBZPViSCbu4JQ2A7Q-1
-Received: by mail-wm1-f70.google.com with SMTP id 18-20020a05600c029200b003a500b612e2so3560485wmk.9
-        for <kvm@vger.kernel.org>; Sun, 07 Aug 2022 06:35:14 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc;
-        bh=kUQoZ+Z3T3noJLGRnWhyvuGBcgQof1Le7Re/cjImcLw=;
-        b=s+bO9gA9wm/BrQySYFkpwkhjTCPgVU7jN+YyIkoGwKMyRLLJzprs6nrnkuiUfQS6AB
-         /oOwNSv2EHI61zg5F1RZEk7FvAyxFCDFZxsDu/HYnUuyVRkhCQUL4mXw2UY0u4iGpNZt
-         Mw0/mEU8aW1eQ8U6gkjI135NMtjoF2yQulzQDrJvO91U2L/0FYKnsEbJXG4G6BvxOtEd
-         3kbxrx14WrFx34BDvsySDocn91llSiCVkttlD6UrOvUhujg7cg3ydgG8dRrbMsD6wLwu
-         joWNN1+RhRyHCd3uLcxf7jwUBwz4Rjh+LayDeREwF9ZA42+pE72iiLvAyO0NKakzdvCq
-         tlww==
-X-Gm-Message-State: ACgBeo0mF5QUcsu3bL/FhsNkmOrz3XF1QHMms1zZaosMryRfTRZ7rBT3
-        gUJH3Y5NaQS4TvEd5WsYqAP675J451TvmlVRJJY0Myr+Zp6YjqFuhPPpu4y6kpnpaV4kiA1YeEF
-        NXohxVDp4SScZ
-X-Received: by 2002:a05:600c:35c7:b0:3a3:2612:f823 with SMTP id r7-20020a05600c35c700b003a32612f823mr9706777wmq.33.1659879313166;
-        Sun, 07 Aug 2022 06:35:13 -0700 (PDT)
-X-Google-Smtp-Source: AA6agR6b3gJMHnoTNtj37IngASsHIWEjuA+66KHlhEYj9gzwpL5gbhYjiJ9U3VuycAq+eyh6uwiMbA==
-X-Received: by 2002:a05:600c:35c7:b0:3a3:2612:f823 with SMTP id r7-20020a05600c35c700b003a32612f823mr9706761wmq.33.1659879312980;
-        Sun, 07 Aug 2022 06:35:12 -0700 (PDT)
-Received: from redhat.com ([2.52.21.123])
-        by smtp.gmail.com with ESMTPSA id y12-20020adfdf0c000000b0021f138e07acsm8993628wrl.35.2022.08.07.06.35.10
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 07 Aug 2022 06:35:12 -0700 (PDT)
-Date:   Sun, 7 Aug 2022 09:35:07 -0400
-From:   "Michael S. Tsirkin" <mst@redhat.com>
-To:     Christoph Hellwig <hch@infradead.org>
-Cc:     Linus Torvalds <torvalds@linux-foundation.org>,
-        Will Deacon <will@kernel.org>, stefanha@redhat.com,
-        jasowang@redhat.com, ascull@google.com, maz@kernel.org,
-        keirf@google.com, jiyong@google.com, kernel-team@android.com,
-        linux-kernel@vger.kernel.org,
-        virtualization@lists.linux-foundation.org, kvm@vger.kernel.org,
-        Stefano Garzarella <sgarzare@redhat.com>
-Subject: Re: IOTLB support for vhost/vsock breaks crosvm on Android
-Message-ID: <20220807092733-mutt-send-email-mst@kernel.org>
-References: <20220805181105.GA29848@willie-the-truck>
- <CAHk-=wip-Lju3ZdNwknS6ouyw+nKXeRSnhqVyNo8WSEdk-BfGw@mail.gmail.com>
- <Yu9hHef3VawCbJT9@infradead.org>
+        with ESMTP id S233861AbiHGO3E (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sun, 7 Aug 2022 10:29:04 -0400
+Received: from mailtransmit04.runbox.com (mailtransmit04.runbox.com [IPv6:2a0c:5a00:149::25])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8707F643F
+        for <kvm@vger.kernel.org>; Sun,  7 Aug 2022 07:29:01 -0700 (PDT)
+Received: from mailtransmit02.runbox ([10.9.9.162] helo=aibo.runbox.com)
+        by mailtransmit04.runbox.com with esmtps  (TLS1.2) tls TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256
+        (Exim 4.93)
+        (envelope-from <mhal@rbox.co>)
+        id 1oKhH1-007tOn-BV; Sun, 07 Aug 2022 16:28:59 +0200
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=rbox.co;
+        s=selector1; h=Content-Transfer-Encoding:MIME-Version:Message-Id:Date:Subject
+        :Cc:To:From; bh=hU8RmU3mC43bYO/3II8WhH3BjhmQ39MPcPi1Fs4z90o=; b=kdGHXWPABwzkv
+        snV9+B7bi8mk0yStz3gU1V8mWdloaNsP+AcqnU94TPhO1Ks7XysD+pvgTR6Vi4NcbhtKCGhDOmRYB
+        ZJtQQalEPmlre/thYvya302UEd+uJ+C3kWY5l2y7qsFR1S2CHZxzKyQfyL5dvn8RIV0YJqiRVF1T8
+        V1nsqD6ZqrV9jpFTJ3biNFl3sFyarGJY/XJmJvZlY04pSDtjd1jLc9fhuxV6PDk1ssVcGU7jM0Bfg
+        vTqRpVreOAA0Qj9gegx2O5E95m7xLUo5Pj0ZY+BJUb2PQZ5B69IbxLzMJhYI2kOTH6H/kk8Cocn2j
+        BPcZiYWIrWyg5TA47nfSg==;
+Received: from [10.9.9.74] (helo=submission03.runbox)
+        by mailtransmit02.runbox with esmtp (Exim 4.86_2)
+        (envelope-from <mhal@rbox.co>)
+        id 1oKhH1-0007k8-0P; Sun, 07 Aug 2022 16:28:59 +0200
+Received: by submission03.runbox with esmtpsa  [Authenticated ID (604044)]  (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+        (Exim 4.90_1)
+        id 1oKhGh-0002az-98; Sun, 07 Aug 2022 16:28:39 +0200
+From:   Michal Luczaj <mhal@rbox.co>
+To:     seanjc@google.com
+Cc:     kvm@vger.kernel.org, pbonzini@redhat.com, shuah@kernel.org,
+        linux-kselftest@vger.kernel.org, mhal@rbox.co
+Subject: [kvm-unit-tests PATCH v2 0/5] Test for illegal LEA & related fixes
+Date:   Sun,  7 Aug 2022 16:28:27 +0200
+Message-Id: <20220807142832.1576-1-mhal@rbox.co>
+X-Mailer: git-send-email 2.37.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <Yu9hHef3VawCbJT9@infradead.org>
-X-Spam-Status: No, score=-3.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,
-        SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham
+Content-Transfer-Encoding: 8bit
+X-Spam-Status: No, score=-2.8 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,RCVD_IN_DNSWL_LOW,
+        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -82,25 +54,29 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Sat, Aug 06, 2022 at 11:52:13PM -0700, Christoph Hellwig wrote:
-> It really is vhost that seems to abuse it so that if the guest
-> claims it can handle VIRTIO_F_ACCESS_PLATFORM (which every modern
-> guest should) it enables magic behavior, which I don't think is what
-> the virtio spec intended.
+Is this a correct way to put Sean's and Paolo's patches into this
+series? I wasn't sure which patches are accepted or what is the current
+base-commit, but I haven't seen the tip of kvm-unit-tests repo moving,
+so here is it.
 
-Well the magic behavour happens to be used by QEMU to
-implement a virtual IOMMU. And when you have a virtual
-IOMMU you generally want VIRTIO_F_ACCESS_PLATFORM.
-This is how it came to be reused for that.
+Michal Luczaj (3):
+  x86: emulator.c cleanup: Save and restore exception handlers
+  x86: emulator.c cleanup: Use ASM_TRY() for the UD_VECTOR cases
+  x86: Test emulator's handling of LEA with /reg
 
-And since QEMU never passed guest features to vhost
-unfiltered we never saw the issue even with old QEMU
-versions on new kernels.
+Paolo Bonzini (1):
+  x86: Introduce ASM_TRY_FEP() to handle exceptions thrown by
+    FEP-triggered emulator
 
-It seems natural to pass features unfiltered and we never even said
-userspace should not do it, so it's quite understandable that this is
-what corsvm did.
+Sean Christopherson (1):
+  x86: Dedup 32-bit vs. 64-bit ASM_TRY() by stealing kernel's
+    __ASM_SEL()
+
+ lib/x86/desc.h      |  22 +++----
+ lib/x86/processor.h |  12 ++++
+ x86/emulator.c      | 136 ++++++++++++++++++++++++--------------------
+ 3 files changed, 93 insertions(+), 77 deletions(-)
 
 -- 
-MST
+2.37.1
 
