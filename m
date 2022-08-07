@@ -2,127 +2,74 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 1F89358B9AC
-	for <lists+kvm@lfdr.de>; Sun,  7 Aug 2022 07:21:48 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 201BF58B9DC
+	for <lists+kvm@lfdr.de>; Sun,  7 Aug 2022 08:52:42 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232587AbiHGFVr (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sun, 7 Aug 2022 01:21:47 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44826 "EHLO
+        id S233336AbiHGGwj (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sun, 7 Aug 2022 02:52:39 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53564 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229503AbiHGFVq (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sun, 7 Aug 2022 01:21:46 -0400
-Received: from mail-pl1-x64a.google.com (mail-pl1-x64a.google.com [IPv6:2607:f8b0:4864:20::64a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 755DB9FF1
-        for <kvm@vger.kernel.org>; Sat,  6 Aug 2022 22:21:44 -0700 (PDT)
-Received: by mail-pl1-x64a.google.com with SMTP id q11-20020a170902dacb00b0016efd6984c3so4130293plx.17
-        for <kvm@vger.kernel.org>; Sat, 06 Aug 2022 22:21:44 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=cc:to:from:subject:mime-version:message-id:date:reply-to:from:to:cc;
-        bh=wL7mrEXqfR7JkKlCwq5zI7WLd3+pttvpM4+bm7PFSkk=;
-        b=td44USCIMowH+HhS9q4p7b7/tjImuqz7RNoC0QYh04RMX07eZiQS8YRYR7zeU+rLgz
-         RvODkyy+D7SheD20nDz23JU1C7BzyfcEQrLpSysAdSFhswD3w3/M2w1GTSJ3LrzEkXlB
-         YyE0KJtBKwONeVVeGX8q2bK9ny+rmvxOlorvE+1mfG6X+SmR/n5lFbZkXSk6CsY5Kftd
-         Fe64lRNEUqfgcakMisE2hVtTY6hx3bmy7ozzBApT5RvxvUq6/uNIrmLQ7eqUQ5ZZLx4n
-         Kbyf5DktrFs5AUiSYBiO6eb3ejVGVcwiC5DFjSQ1ibbL58hXM8GELyHN8SJXYCbentqr
-         TmKA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=cc:to:from:subject:mime-version:message-id:date:reply-to
-         :x-gm-message-state:from:to:cc;
-        bh=wL7mrEXqfR7JkKlCwq5zI7WLd3+pttvpM4+bm7PFSkk=;
-        b=7x3qh/AtLuxFXTK8FOXvXVWA9LAsrYdOsGyjN0DZMn4jNMgSKfzas7uvHBmPT0KBVD
-         G8VqZjvyja2ayOXL1wKUQyxvquwvMwFYQBuqbXVfuHbet/m+8KdtC4gtlO9vrp1Cn5s5
-         jFHK9AKMCeuytLIigcG2zbdqkCCiH4CKYaQjW+4OqdLQOXmYEWahdpl4JczvTMyHhsWn
-         uIC7FzJ1Zks70THiYSHnAXS1pWL58EKvzVFi+AmsiEA4raNn2HCWSsOJv41fdjSIu5VH
-         Lu8J87rvi3XjSL4Pqh54EZZauOszybQTsdlvB6alUnrJ6LGUnMtriJ5e8NgD08SUm3A/
-         YNow==
-X-Gm-Message-State: ACgBeo31JS57Sp8v39l/SuL1LpiscmzfS0UAVQHKM/fAmfESlYsnS8rV
-        0fmjIsIYMRJikKBH9LyMI4bit9ldbtT8
-X-Google-Smtp-Source: AA6agR5UG0ecnpmdzg3o3T19ioM2IbaTT48m4kmAqOm4YlBYWxq0i/H8i61rClkn0qQ1NnwNF6YNxg/TcGAd
-X-Received: from mizhang-super.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:1071])
- (user=mizhang job=sendgmr) by 2002:a17:90b:1941:b0:1f3:2636:895 with SMTP id
- nk1-20020a17090b194100b001f326360895mr15333323pjb.26.1659849704025; Sat, 06
- Aug 2022 22:21:44 -0700 (PDT)
-Reply-To: Mingwei Zhang <mizhang@google.com>
-Date:   Sun,  7 Aug 2022 05:21:41 +0000
-Message-Id: <20220807052141.69186-1-mizhang@google.com>
-Mime-Version: 1.0
-X-Mailer: git-send-email 2.37.1.559.g78731f0fdb-goog
-Subject: [PATCH] KVM: x86/mmu: rename trace function name for asynchronous
- page fault
-From:   Mingwei Zhang <mizhang@google.com>
-To:     Sean Christopherson <seanjc@google.com>,
-        Paolo Bonzini <pbonzini@redhat.com>
-Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Mingwei Zhang <mizhang@google.com>
-Content-Type: text/plain; charset="UTF-8"
-X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL
-        autolearn=ham autolearn_force=no version=3.4.6
+        with ESMTP id S230156AbiHGGwi (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sun, 7 Aug 2022 02:52:38 -0400
+Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:3::133])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 94017A18A;
+        Sat,  6 Aug 2022 23:52:36 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=bombadil.20210309; h=In-Reply-To:Content-Type:MIME-Version
+        :References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
+        Content-Transfer-Encoding:Content-ID:Content-Description;
+        bh=T5G3kNwYRK7zLNUCU3R4YTUeZT4VSRInrZ5Z/Pp3Lkw=; b=dCJLYoEWdMdq7/FPcLfiG3jJ3W
+        wv4d+6ODFzDjRx+CPUhu0szsBENo+10WjIWSfgFDu2Ee0AWGv+cDPHlYrZuy6lXjevoWiSI071j0l
+        CUUKF2QWwn4hZjEzNAiW9mL3Tvl/7cLETJ6yvSC/ZWFZ+Zzm+IU1c8VfwKR5wJX4+3FUzubPbehxK
+        R/DdhY1UjhTq1kFAj+grLPDvto3F2m5EE/IC4lrC/a+LQEoeGVoLvsqqnuWm+59a9mXfwcGlicWsD
+        NZRhuAHRJshRVzaEFOsu5cfFZLH8U9Qxab1KuBhwvdgDtlwJxsG9XC3ZBMgn9dmpramTuL7rqo7nb
+        AghKr/vg==;
+Received: from hch by bombadil.infradead.org with local (Exim 4.94.2 #2 (Red Hat Linux))
+        id 1oKa8z-007LfM-Rq; Sun, 07 Aug 2022 06:52:13 +0000
+Date:   Sat, 6 Aug 2022 23:52:13 -0700
+From:   Christoph Hellwig <hch@infradead.org>
+To:     Linus Torvalds <torvalds@linux-foundation.org>
+Cc:     Will Deacon <will@kernel.org>, mst@redhat.com, stefanha@redhat.com,
+        jasowang@redhat.com, ascull@google.com, maz@kernel.org,
+        keirf@google.com, jiyong@google.com, kernel-team@android.com,
+        linux-kernel@vger.kernel.org,
+        virtualization@lists.linux-foundation.org, kvm@vger.kernel.org,
+        Stefano Garzarella <sgarzare@redhat.com>
+Subject: Re: IOTLB support for vhost/vsock breaks crosvm on Android
+Message-ID: <Yu9hHef3VawCbJT9@infradead.org>
+References: <20220805181105.GA29848@willie-the-truck>
+ <CAHk-=wip-Lju3ZdNwknS6ouyw+nKXeRSnhqVyNo8WSEdk-BfGw@mail.gmail.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CAHk-=wip-Lju3ZdNwknS6ouyw+nKXeRSnhqVyNo8WSEdk-BfGw@mail.gmail.com>
+X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
+X-Spam-Status: No, score=-2.8 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,SPF_HELO_NONE,
+        SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no
+        version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Rename the tracepoint function from trace_kvm_async_pf_doublefault() to
-trace_kvm_async_pf_repeated_fault() to make it clear, since double fault
-has nothing to do with this trace function.
+On Fri, Aug 05, 2022 at 03:57:08PM -0700, Linus Torvalds wrote:
+> Why is "IOMMU support" called "VIRTIO_F_ACCESS_PLATFORM"?
 
-Asynchronous Page Fault (APF) is an artifact generated by KVM when it
-cannot find a physical page to satisfy an EPT violation. KVM uses APF to
-tell the guest OS to do something else such as scheduling other guest
-processes to make forward progress. However, when another guest process
-also touches a previously APFed page, KVM halts the vCPU instead of
-generating a repeated APF to avoid wasting cycles.
+Because, as far as the virtio spec and virtio "guest" implementation is
+concerned it is not about IOMMU support at all.  It is about treating
+virtio DMA as real DMA by the platform, which lets the platform let
+whatever method of DMA mapping it needs to the virtio device.  This
+is needed to make sure harware virtio device are treated like actual
+hardware and not like a magic thing bypassing the normal PCIe rules.
 
-Double fault (#DF) clearly has a different meaning and a different
-consequence when triggered. #DF requires two nested contributory exceptions
-instead of two page faults faulting at the same address. A prevous bug on
-APF indicates that it may trigger a double fault in the guest [1] and
-clearly this trace function has nothing to do with it. So rename this
-function should be a valid choice.
+Using an IOMMU if one is present for bus is just one thing, others
+are using offets of DMAs that are very common on non-x86 platforms,
+or doing the horrible cache flushing needed on devices where PCIe
+is not cache coherent.
 
-No functional change intended.
-
-[1] https://www.spinics.net/lists/kvm/msg214957.html
-
-Signed-off-by: Mingwei Zhang <mizhang@google.com>
----
- arch/x86/kvm/mmu/mmu.c     | 2 +-
- include/trace/events/kvm.h | 2 +-
- 2 files changed, 2 insertions(+), 2 deletions(-)
-
-diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
-index 06ac8c7cef67..0004ec68fc5c 100644
---- a/arch/x86/kvm/mmu/mmu.c
-+++ b/arch/x86/kvm/mmu/mmu.c
-@@ -4164,7 +4164,7 @@ static int kvm_faultin_pfn(struct kvm_vcpu *vcpu, struct kvm_page_fault *fault)
- 	if (!fault->prefetch && kvm_can_do_async_pf(vcpu)) {
- 		trace_kvm_try_async_get_page(fault->addr, fault->gfn);
- 		if (kvm_find_async_pf_gfn(vcpu, fault->gfn)) {
--			trace_kvm_async_pf_doublefault(fault->addr, fault->gfn);
-+			trace_kvm_async_pf_repeated_fault(fault->addr, fault->gfn);
- 			kvm_make_request(KVM_REQ_APF_HALT, vcpu);
- 			return RET_PF_RETRY;
- 		} else if (kvm_arch_setup_async_pf(vcpu, fault->addr, fault->gfn)) {
-diff --git a/include/trace/events/kvm.h b/include/trace/events/kvm.h
-index 37e1e1a2d67d..3bd31ea23fee 100644
---- a/include/trace/events/kvm.h
-+++ b/include/trace/events/kvm.h
-@@ -282,7 +282,7 @@ DEFINE_EVENT(kvm_async_get_page_class, kvm_try_async_get_page,
- 	TP_ARGS(gva, gfn)
- );
- 
--DEFINE_EVENT(kvm_async_get_page_class, kvm_async_pf_doublefault,
-+DEFINE_EVENT(kvm_async_get_page_class, kvm_async_pf_repeated_fault,
- 
- 	TP_PROTO(u64 gva, u64 gfn),
- 
-
-base-commit: 1612c382ffbdf1f673caec76502b1c00e6d35363
--- 
-2.37.1.559.g78731f0fdb-goog
-
+It really is vhost that seems to abuse it so that if the guest
+claims it can handle VIRTIO_F_ACCESS_PLATFORM (which every modern
+guest should) it enables magic behavior, which I don't think is what
+the virtio spec intended.
