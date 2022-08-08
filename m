@@ -2,75 +2,75 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 503D958CA43
-	for <lists+kvm@lfdr.de>; Mon,  8 Aug 2022 16:16:03 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 6D73E58CA91
+	for <lists+kvm@lfdr.de>; Mon,  8 Aug 2022 16:33:28 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S243198AbiHHOQC (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 8 Aug 2022 10:16:02 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45076 "EHLO
+        id S243535AbiHHOdZ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 8 Aug 2022 10:33:25 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58882 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S238533AbiHHOPn (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 8 Aug 2022 10:15:43 -0400
-Received: from mail-pj1-x1031.google.com (mail-pj1-x1031.google.com [IPv6:2607:f8b0:4864:20::1031])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7664ACF1
-        for <kvm@vger.kernel.org>; Mon,  8 Aug 2022 07:15:41 -0700 (PDT)
-Received: by mail-pj1-x1031.google.com with SMTP id h21-20020a17090aa89500b001f31a61b91dso14690763pjq.4
-        for <kvm@vger.kernel.org>; Mon, 08 Aug 2022 07:15:41 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kylehuey.com; s=google;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc;
-        bh=NEESYvDT/BJdEgvpyNjs+spCsn2Msi4VFPZJphnNrY4=;
-        b=SMU/RenqpvWlJQC9hd650+eqbL9sBtQeVL1aBkM8TB2J5ncOgtqY5upnV5WMNchjRc
-         gUia6DW+ZtkCU9SD3G19H/e+B6eqBc5Zo/Y2aJHslslPwMKfby4Je2zq5m2MROCgStHw
-         AxwFB6KLMKwncYvbX/7EYNyLqMy3S312/YuDmTlSTkb0E4V/ROVL44LNMJY6QFd0jmbP
-         vcAPpG0xQJp5LQbxqwC/WJNYTq1W/DXErX/shB4Wy3o2CsMDrkaz7WHbIleQlAeOHME6
-         +K32QOYCK8eCDhZAeTKvkJNpkhThUm0mZsm0OkKBv0hGp1E7rgVoPtMbUWzJyDBmmtiF
-         3SXA==
+        with ESMTP id S243327AbiHHOdW (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 8 Aug 2022 10:33:22 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id E805E10FFF
+        for <kvm@vger.kernel.org>; Mon,  8 Aug 2022 07:33:21 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1659969200;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=/1TLUgVlg2OyYCJ+DZaddQK6OMJhjwa3jOmWOJ1SScI=;
+        b=clbVW0ltbBfk5fvvzO9LD1+p9tPIQA2Yw6GNIOQxet6V5bdcHh1TSKeF9mhPAU48emcZM9
+        dCFRucpT2l1lSwletZBlFGu3AOdBGhmdo2pmI6Cq8UpWTMCc+IDtqsjV7lJrSWsHQppUb2
+        WxTn1xQfJBTDdHvL0wXzyf/veBuMsQ4=
+Received: from mail-lj1-f198.google.com (mail-lj1-f198.google.com
+ [209.85.208.198]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-619-uUca9_m6N1iFRz3AwU0Eng-1; Mon, 08 Aug 2022 10:33:18 -0400
+X-MC-Unique: uUca9_m6N1iFRz3AwU0Eng-1
+Received: by mail-lj1-f198.google.com with SMTP id g3-20020a2e9cc3000000b00253cc2b5ab5so2513025ljj.19
+        for <kvm@vger.kernel.org>; Mon, 08 Aug 2022 07:33:18 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc;
-        bh=NEESYvDT/BJdEgvpyNjs+spCsn2Msi4VFPZJphnNrY4=;
-        b=64LGinwZ4phDDy8Og2z4l3bjSLm/P3WVQFeP5ISNgKc98elaR/v3FSZ0+ZN7ESNogQ
-         QEyWmUMEsW074DbT22KVSOimj7IkC0ydYIsw1+4fis9bAVMUqwR0OCe53h0dKEtmvWjI
-         m19CpJMDJEJ6C3BfGMbnLA/YW/ESzQc3Jia3fe54RfKq8Mft4i1jPh1StdgHMZuyn2Im
-         /xhxhUjt/2N6ZYQtT4bpYIWx2QPw9CI70jp0wUBZ/aPJZzJ+tVLrBP3DQGUkj9fntsX7
-         DuAElKdangjJJj9V/kwSH3zgMLFn3DBk1XpqyKFp8CfDZ1bdgvfc52Z2I5gbMHaIXSAW
-         fE4Q==
-X-Gm-Message-State: ACgBeo1x7LTrM2yHfY4xkAQBXG8SkGTOHI5q0jnPu12BX6e6ry9Fz6kH
-        VyO9TZygo0m8rspWijEIxwlkdQ==
-X-Google-Smtp-Source: AA6agR7+smwBq7SlVbjiSb7yOM0nK+h43dg5VfmaYD1uco0aW9dly5xTRItvd1HqLxBVSjU9YG+XPQ==
-X-Received: by 2002:a17:903:2287:b0:16f:942e:4119 with SMTP id b7-20020a170903228700b0016f942e4119mr14212040plh.3.1659968140801;
-        Mon, 08 Aug 2022 07:15:40 -0700 (PDT)
-Received: from minbar.home.kylehuey.com (c-71-198-251-229.hsd1.ca.comcast.net. [71.198.251.229])
-        by smtp.gmail.com with ESMTPSA id l7-20020a170902f68700b0016eede528b4sm8967357plg.61.2022.08.08.07.15.39
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 08 Aug 2022 07:15:40 -0700 (PDT)
-From:   Kyle Huey <me@kylehuey.com>
-X-Google-Original-From: Kyle Huey <khuey@kylehuey.com>
-To:     Dave Hansen <dave.hansen@linux.intel.com>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Borislav Petkov <bp@alien8.de>
-Cc:     Ingo Molnar <mingo@redhat.com>, x86@kernel.org,
-        "H. Peter Anvin" <hpa@zytor.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Andy Lutomirski <luto@kernel.org>,
-        Peter Zijlstra <peterz@infradead.org>,
-        linux-kernel@vger.kernel.org, linux-kselftest@vger.kernel.org,
-        Robert O'Callahan <robert@ocallahan.org>,
-        David Manouchehri <david.manouchehri@riseup.net>,
-        Kyle Huey <me@kylehuey.com>, Borislav Petkov <bp@suse.de>,
-        kvm@vger.kernel.org, stable@vger.kernel.org
-Subject: [PATCH v5 1/2] x86/fpu: Allow PKRU to be (once again) written by ptrace.
-Date:   Mon,  8 Aug 2022 07:15:37 -0700
-Message-Id: <20220808141538.102394-1-khuey@kylehuey.com>
-X-Mailer: git-send-email 2.37.1
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc;
+        bh=/1TLUgVlg2OyYCJ+DZaddQK6OMJhjwa3jOmWOJ1SScI=;
+        b=W6IbyL+iFTcGiyqhCfP2kZgNIebtp5tPxnDhY8vI5bEOp++lxOSwCrs0/a/raXIrpY
+         Q3fZmecy2kYVCIp4nMqSdhPwHpmlj3aYxOkG8MALt735A0MwVOZP1ZPWOYqTkCGeyam2
+         Hj6zrObODLJ2ZaAhOpwzIZM3bURYtrB3cDWxm4+X0VwGZXXVP3qbDFYxWdPrVSbFUUV3
+         Q7Hq9vXKPOR74/93S2Vx5+jjTEhcDm1z7ye3pd9DkUV4/HM3xX+ugxokg3wzpkiZNSsI
+         XM/8FfqGVGOHXyMpAiMzqPPE6sLbpM9FlJHilMSiN5hizI/hnBJI4rkcRqQxwYThtezQ
+         GOyw==
+X-Gm-Message-State: ACgBeo0SSyJybrS8keYFoQYxkl3+XONEEEgVj5GcSOAVaZ+QTSUJMYgN
+        h5XWCS5gBCkme3j1HbDaorZdvW1IxV2ITz5KhEeLVLgiEesKIv6zrgtZVHWcPfPu2nDuI2dkZjn
+        /SBRVuob8emJB2BX2nMufaNyMdJmw
+X-Received: by 2002:a05:6512:68a:b0:48b:9d3d:b19b with SMTP id t10-20020a056512068a00b0048b9d3db19bmr3474990lfe.174.1659969196986;
+        Mon, 08 Aug 2022 07:33:16 -0700 (PDT)
+X-Google-Smtp-Source: AA6agR64B2Y+NvP5GJggrT7xDmjVOaBSl5qxOdsgKfM9DJRfPYV4TZXGTwlEJml+bcB9a8mUktIhhfJarGLbZfr6iPk=
+X-Received: by 2002:a05:6512:68a:b0:48b:9d3d:b19b with SMTP id
+ t10-20020a056512068a00b0048b9d3db19bmr3474977lfe.174.1659969196714; Mon, 08
+ Aug 2022 07:33:16 -0700 (PDT)
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
+References: <20220805181105.GA29848@willie-the-truck> <20220807042408-mutt-send-email-mst@kernel.org>
+ <20220808101850.GA31984@willie-the-truck> <20220808083958-mutt-send-email-mst@kernel.org>
+In-Reply-To: <20220808083958-mutt-send-email-mst@kernel.org>
+From:   Stefan Hajnoczi <shajnocz@redhat.com>
+Date:   Mon, 8 Aug 2022 10:33:05 -0400
+Message-ID: <CAD60JZOWLU2U9EoUmG6kLHMUYv0j_y4V8TOzzyk=XHQJaG38mg@mail.gmail.com>
+Subject: Re: IOTLB support for vhost/vsock breaks crosvm on Android
+To:     "Michael S. Tsirkin" <mst@redhat.com>
+Cc:     Will Deacon <will@kernel.org>,
+        Stefan Hajnoczi <stefanha@redhat.com>,
+        Jason Wang <jasowang@redhat.com>,
+        torvalds@linux-foundation.org, ascull@google.com, maz@kernel.org,
+        keirf@google.com, jiyong@google.com, kernel-team@android.com,
+        linux-kernel@vger.kernel.org,
+        virtualization@lists.linux-foundation.org, kvm@vger.kernel.org,
+        crosvm-dev@chromium.org
+Content-Type: text/plain; charset="UTF-8"
+X-Spam-Status: No, score=-3.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,
+        SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=unavailable
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -78,188 +78,135 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-From: Kyle Huey <me@kylehuey.com>
+On Mon, Aug 8, 2022 at 8:46 AM Michael S. Tsirkin <mst@redhat.com> wrote:
+>
+> On Mon, Aug 08, 2022 at 11:18:50AM +0100, Will Deacon wrote:
+> > Hi Michael,
+> >
+> > On Sun, Aug 07, 2022 at 09:14:43AM -0400, Michael S. Tsirkin wrote:
+> > > Will, thanks very much for the analysis and the writeup!
+> >
+> > No problem, and thanks for following up.
+> >
+> > > On Fri, Aug 05, 2022 at 07:11:06PM +0100, Will Deacon wrote:
+> > > > So how should we fix this? One possibility is for us to hack crosvm to
+> > > > clear the VIRTIO_F_ACCESS_PLATFORM flag when setting the vhost features,
+> > > > but others here have reasonably pointed out that they didn't expect a
+> > > > kernel change to break userspace. On the flip side, the offending commit
+> > > > in the kernel isn't exactly new (it's from the end of 2020!) and so it's
+> > > > likely that others (e.g. QEMU) are using this feature.
+> > >
+> > > Exactly, that's the problem.
+> > >
+> > > vhost is reusing the virtio bits and it's only natural that
+> > > what you are doing would happen.
+> > >
+> > > To be precise, this is what we expected people to do (and what QEMU does):
+> > >
+> > >
+> > > #define QEMU_VHOST_FEATURES ((1 << VIRTIO_F_VERSION_1) |
+> > >                          (1 << VIRTIO_NET_F_RX_MRG) | .... )
+> > >
+> > > VHOST_GET_FEATURES(... &host_features);
+> > > host_features &= QEMU_VHOST_FEATURES
+> > > VHOST_SET_FEATURES(host_features & guest_features)
+> > >
+> > >
+> > > Here QEMU_VHOST_FEATURES are the bits userspace knows about.
+> > >
+> > > Our assumption was that whatever userspace enables, it
+> > > knows what the effect on vhost is going to be.
+> > >
+> > > But yes, I understand absolutely how someone would instead just use the
+> > > guest features. It is unfortunate that we did not catch this in time.
+> > >
+> > >
+> > > In hindsight, we should have just created vhost level macros
+> > > instead of reusing virtio ones. Would address the concern
+> > > about naming: PLATFORM_ACCESS makes sense for the
+> > > guest since there it means "whatever access rules platform has",
+> > > but for vhost a better name would be VHOST_F_IOTLB.
+> > > We should have also taken greater pains to document what
+> > > we expect userspace to do. I remember now how I thought about something
+> > > like this but after coding this up in QEMU I forgot to document this :(
+> > > Also, I suspect given the history the GET/SET features ioctl and burned
+> > > wrt extending it and we have to use a new when we add new features.
+> > > All this we can do going forward.
+> >
+> > Makes sense. The crosvm developers are also pretty friendly in my
+> > experience, so I'm sure they wouldn't mind being involved in discussions
+> > around any future ABI extensions. Just be aware that they _very_ recently
+> > moved their mailing lists, so I think it lives here now:
+> >
+> > https://groups.google.com/a/chromium.org/g/crosvm-dev
+> >
+> > > But what can we do about the specific issue?
+> > > I am not 100% sure since as Will points out, QEMU and other
+> > > userspace already rely on the current behaviour.
+> > >
+> > > Looking at QEMU specifically, it always sends some translations at
+> > > startup, this in order to handle device rings.
+> > >
+> > > So, *maybe* we can get away with assuming that if no IOTLB ioctl was
+> > > ever invoked then this userspace does not know about IOTLB and
+> > > translation should ignore IOTLB completely.
+> >
+> > There was a similar suggestion from Stefano:
+> >
+> > https://lore.kernel.org/r/20220806105225.crkui6nw53kbm5ge@sgarzare-redhat
+> >
+> > about spotting the backend ioctl for IOTLB and using that to enable
+> > the negotiation of F_ACCESS_PLATFORM. Would that work for qemu?
+>
+> Hmm I would worry that this disables the feature for old QEMU :(
+>
+>
+> > > I am a bit nervous about breaking some *other* userspace which actually
+> > > wants device to be blocked from accessing memory until IOTLB
+> > > has been setup. If we get it wrong we are making guest
+> > > and possibly even host vulnerable.
+> > > And of course just revering is not an option either since there
+> > > are now whole stacks depending on the feature.
+> >
+> > Absolutely, I'm not seriously suggesting the revert. I just did it locally
+> > to confirm the issue I was seeing.
+> >
+> > > Will I'd like your input on whether you feel a hack in the kernel
+> > > is justified here.
+> >
+> > If we can come up with something that we have confidence in and won't be a
+> > pig to maintain, then I think we should do it, but otherwise we can go ahead
+> > and change crosvm to mask out this feature flag on the vhost side for now.
+> > We mainly wanted to raise the issue to illustrate that this flag continues
+> > to attract problems in the hope that it might inform further usage and/or
+> > spec work in this area.
+> >
+> > In any case, I'm happy to test any kernel patches with our setup if you
+> > want to give it a shot.
+>
+> Thanks!
+> I'm a bit concerned that the trick I proposed changes the configuration
+> where iotlb was not set up from "access to memory not allowed" to
+> "access to all memory allowed". This just might have security
+> implications if some application assumed the former.
+> And the one Stefano proposed disables IOTLB for old QEMU versions.
 
-When management of the PKRU register was moved away from XSTATE, emulation
-of PKRU's existence in XSTATE was added for APIs that read XSTATE, but not
-for APIs that write XSTATE. This can be seen by running gdb and executing
-`p $pkru`, `set $pkru = 42`, and `p $pkru`. On affected kernels (5.14+) the
-write to the PKRU register (which gdb performs through ptrace) is ignored.
+Adding hacks to vhost in order to work around userspace applications
+that misunderstand the vhost model seems like a it will lead to
+problems.
 
-There are three relevant APIs: PTRACE_SETREGSET with NT_X86_XSTATE,
-sigreturn, and KVM_SET_XSAVE. KVM_SET_XSAVE has its own special handling to
-make PKRU writes take effect (in fpu_copy_uabi_to_guest_fpstate). Push that
-down into copy_uabi_to_xstate and have PTRACE_SETREGSET with NT_X86_XSTATE
-and sigreturn pass in pointers to the appropriate PKRU value.
+Userspace applications need to follow the vhost model: vhost is
+designed for virtqueue passthrough, but the rest of the vhost
+interface is not suitable for pass through. It's similar to how VFIO
+PCI passthrough needs to do a significant amount of stuff in userspace
+to emulate a PCI configuration space and it won't work properly if you
+pass through the physical PCI device's PCI configuration space.
 
-This also adds code to initialize the PKRU value to the hardware init value
-(namely 0) if the PKRU bit is not set in the XSTATE header to match XRSTOR.
-This is a change to the current KVM_SET_XSAVE behavior.
+The emulator has to mediate between the guest device and vhost device
+because it still emulates the VIRTIO transport, configuration space,
+device lifecycle, etc even when all virtqueues are passed through.
 
-Changelog since v4:
-- Selftest additionally checks PKRU readbacks through ptrace.
-- Selftest flips all PKRU bits (except the key used for PROT_EXEC).
+Let's document this for vhost and vDPA because it is not obvious.
 
-Changelog since v3:
-- The v3 patch is now part 1 of 2.
-- Adds a selftest in part 2 of 2.
-
-Changelog since v2:
-- Removed now unused variables in fpu_copy_uabi_to_guest_fpstate
-
-Changelog since v1:
-- Handles the error case of copy_to_buffer().
-
-Signed-off-by: Kyle Huey <me@kylehuey.com>
-Cc: Dave Hansen <dave.hansen@linux.intel.com>
-Cc: Thomas Gleixner <tglx@linutronix.de>
-Cc: Borislav Petkov <bp@suse.de>
-Cc: kvm@vger.kernel.org # For edge case behavior of KVM_SET_XSAVE
-Cc: stable@vger.kernel.org # 5.14+
-Fixes: e84ba47e313d ("x86/fpu: Hook up PKRU into ptrace()")
----
- arch/x86/kernel/fpu/core.c   | 13 +------------
- arch/x86/kernel/fpu/regset.c |  2 +-
- arch/x86/kernel/fpu/signal.c |  2 +-
- arch/x86/kernel/fpu/xstate.c | 28 +++++++++++++++++++++++-----
- arch/x86/kernel/fpu/xstate.h |  4 ++--
- 5 files changed, 28 insertions(+), 21 deletions(-)
-
-diff --git a/arch/x86/kernel/fpu/core.c b/arch/x86/kernel/fpu/core.c
-index 3b28c5b25e12..46b935bc87c8 100644
---- a/arch/x86/kernel/fpu/core.c
-+++ b/arch/x86/kernel/fpu/core.c
-@@ -391,8 +391,6 @@ int fpu_copy_uabi_to_guest_fpstate(struct fpu_guest *gfpu, const void *buf,
- {
- 	struct fpstate *kstate = gfpu->fpstate;
- 	const union fpregs_state *ustate = buf;
--	struct pkru_state *xpkru;
--	int ret;
- 
- 	if (!cpu_feature_enabled(X86_FEATURE_XSAVE)) {
- 		if (ustate->xsave.header.xfeatures & ~XFEATURE_MASK_FPSSE)
-@@ -406,16 +404,7 @@ int fpu_copy_uabi_to_guest_fpstate(struct fpu_guest *gfpu, const void *buf,
- 	if (ustate->xsave.header.xfeatures & ~xcr0)
- 		return -EINVAL;
- 
--	ret = copy_uabi_from_kernel_to_xstate(kstate, ustate);
--	if (ret)
--		return ret;
--
--	/* Retrieve PKRU if not in init state */
--	if (kstate->regs.xsave.header.xfeatures & XFEATURE_MASK_PKRU) {
--		xpkru = get_xsave_addr(&kstate->regs.xsave, XFEATURE_PKRU);
--		*vpkru = xpkru->pkru;
--	}
--	return 0;
-+	return copy_uabi_from_kernel_to_xstate(kstate, ustate, vpkru);
- }
- EXPORT_SYMBOL_GPL(fpu_copy_uabi_to_guest_fpstate);
- #endif /* CONFIG_KVM */
-diff --git a/arch/x86/kernel/fpu/regset.c b/arch/x86/kernel/fpu/regset.c
-index 75ffaef8c299..6d056b68f4ed 100644
---- a/arch/x86/kernel/fpu/regset.c
-+++ b/arch/x86/kernel/fpu/regset.c
-@@ -167,7 +167,7 @@ int xstateregs_set(struct task_struct *target, const struct user_regset *regset,
- 	}
- 
- 	fpu_force_restore(fpu);
--	ret = copy_uabi_from_kernel_to_xstate(fpu->fpstate, kbuf ?: tmpbuf);
-+	ret = copy_uabi_from_kernel_to_xstate(fpu->fpstate, kbuf ?: tmpbuf, &target->thread.pkru);
- 
- out:
- 	vfree(tmpbuf);
-diff --git a/arch/x86/kernel/fpu/signal.c b/arch/x86/kernel/fpu/signal.c
-index 91d4b6de58ab..558076dbde5b 100644
---- a/arch/x86/kernel/fpu/signal.c
-+++ b/arch/x86/kernel/fpu/signal.c
-@@ -396,7 +396,7 @@ static bool __fpu_restore_sig(void __user *buf, void __user *buf_fx,
- 
- 	fpregs = &fpu->fpstate->regs;
- 	if (use_xsave() && !fx_only) {
--		if (copy_sigframe_from_user_to_xstate(fpu->fpstate, buf_fx))
-+		if (copy_sigframe_from_user_to_xstate(tsk, buf_fx))
- 			return false;
- 	} else {
- 		if (__copy_from_user(&fpregs->fxsave, buf_fx,
-diff --git a/arch/x86/kernel/fpu/xstate.c b/arch/x86/kernel/fpu/xstate.c
-index c8340156bfd2..e01d3514ae68 100644
---- a/arch/x86/kernel/fpu/xstate.c
-+++ b/arch/x86/kernel/fpu/xstate.c
-@@ -1197,7 +1197,7 @@ static int copy_from_buffer(void *dst, unsigned int offset, unsigned int size,
- 
- 
- static int copy_uabi_to_xstate(struct fpstate *fpstate, const void *kbuf,
--			       const void __user *ubuf)
-+			       const void __user *ubuf, u32 *pkru)
- {
- 	struct xregs_state *xsave = &fpstate->regs.xsave;
- 	unsigned int offset, size;
-@@ -1235,6 +1235,24 @@ static int copy_uabi_to_xstate(struct fpstate *fpstate, const void *kbuf,
- 	for (i = 0; i < XFEATURE_MAX; i++) {
- 		mask = BIT_ULL(i);
- 
-+		if (i == XFEATURE_PKRU) {
-+			/*
-+			 * Retrieve PKRU if not in init state, otherwise
-+			 * initialize it.
-+			 */
-+			if (hdr.xfeatures & mask) {
-+				struct pkru_state xpkru = {0};
-+
-+				if (copy_from_buffer(&xpkru, xstate_offsets[i],
-+						     sizeof(xpkru), kbuf, ubuf))
-+					return -EFAULT;
-+
-+				*pkru = xpkru.pkru;
-+			} else {
-+				*pkru = 0;
-+			}
-+		}
-+
- 		if (hdr.xfeatures & mask) {
- 			void *dst = __raw_xsave_addr(xsave, i);
- 
-@@ -1264,9 +1282,9 @@ static int copy_uabi_to_xstate(struct fpstate *fpstate, const void *kbuf,
-  * Convert from a ptrace standard-format kernel buffer to kernel XSAVE[S]
-  * format and copy to the target thread. Used by ptrace and KVM.
-  */
--int copy_uabi_from_kernel_to_xstate(struct fpstate *fpstate, const void *kbuf)
-+int copy_uabi_from_kernel_to_xstate(struct fpstate *fpstate, const void *kbuf, u32 *pkru)
- {
--	return copy_uabi_to_xstate(fpstate, kbuf, NULL);
-+	return copy_uabi_to_xstate(fpstate, kbuf, NULL, pkru);
- }
- 
- /*
-@@ -1274,10 +1292,10 @@ int copy_uabi_from_kernel_to_xstate(struct fpstate *fpstate, const void *kbuf)
-  * XSAVE[S] format and copy to the target thread. This is called from the
-  * sigreturn() and rt_sigreturn() system calls.
-  */
--int copy_sigframe_from_user_to_xstate(struct fpstate *fpstate,
-+int copy_sigframe_from_user_to_xstate(struct task_struct *tsk,
- 				      const void __user *ubuf)
- {
--	return copy_uabi_to_xstate(fpstate, NULL, ubuf);
-+	return copy_uabi_to_xstate(tsk->thread.fpu.fpstate, NULL, ubuf, &tsk->thread.pkru);
- }
- 
- static bool validate_independent_components(u64 mask)
-diff --git a/arch/x86/kernel/fpu/xstate.h b/arch/x86/kernel/fpu/xstate.h
-index 5ad47031383b..a4ecb04d8d64 100644
---- a/arch/x86/kernel/fpu/xstate.h
-+++ b/arch/x86/kernel/fpu/xstate.h
-@@ -46,8 +46,8 @@ extern void __copy_xstate_to_uabi_buf(struct membuf to, struct fpstate *fpstate,
- 				      u32 pkru_val, enum xstate_copy_mode copy_mode);
- extern void copy_xstate_to_uabi_buf(struct membuf to, struct task_struct *tsk,
- 				    enum xstate_copy_mode mode);
--extern int copy_uabi_from_kernel_to_xstate(struct fpstate *fpstate, const void *kbuf);
--extern int copy_sigframe_from_user_to_xstate(struct fpstate *fpstate, const void __user *ubuf);
-+extern int copy_uabi_from_kernel_to_xstate(struct fpstate *fpstate, const void *kbuf, u32 *pkru);
-+extern int copy_sigframe_from_user_to_xstate(struct task_struct *tsk, const void __user *ubuf);
- 
- 
- extern void fpu__init_cpu_xstate(void);
--- 
-2.37.1
+Stefan
 
