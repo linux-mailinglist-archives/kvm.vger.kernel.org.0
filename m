@@ -2,58 +2,58 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 92DA158CC56
-	for <lists+kvm@lfdr.de>; Mon,  8 Aug 2022 18:47:19 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id C27A858CC57
+	for <lists+kvm@lfdr.de>; Mon,  8 Aug 2022 18:47:20 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S242993AbiHHQrS (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 8 Aug 2022 12:47:18 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40776 "EHLO
+        id S238062AbiHHQrT (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 8 Aug 2022 12:47:19 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40820 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S238062AbiHHQrP (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 8 Aug 2022 12:47:15 -0400
-Received: from mail-yb1-xb49.google.com (mail-yb1-xb49.google.com [IPv6:2607:f8b0:4864:20::b49])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 83FE5101DA
-        for <kvm@vger.kernel.org>; Mon,  8 Aug 2022 09:47:14 -0700 (PDT)
-Received: by mail-yb1-xb49.google.com with SMTP id m123-20020a253f81000000b0066ff6484995so7861338yba.22
-        for <kvm@vger.kernel.org>; Mon, 08 Aug 2022 09:47:14 -0700 (PDT)
+        with ESMTP id S242930AbiHHQrQ (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 8 Aug 2022 12:47:16 -0400
+Received: from mail-pg1-x549.google.com (mail-pg1-x549.google.com [IPv6:2607:f8b0:4864:20::549])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9B46B13F85
+        for <kvm@vger.kernel.org>; Mon,  8 Aug 2022 09:47:15 -0700 (PDT)
+Received: by mail-pg1-x549.google.com with SMTP id p8-20020a63e648000000b0041d8ca4939dso1010893pgj.8
+        for <kvm@vger.kernel.org>; Mon, 08 Aug 2022 09:47:15 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
         h=cc:to:from:subject:references:mime-version:message-id:in-reply-to
          :date:reply-to:from:to:cc;
-        bh=Wn8v/P3tNnUb1MG28HGMCGnZxpGFZ1P+4PmpRvu3+60=;
-        b=nEjeczVtpBrIS8I7dvglwCKBL3jZZuyVv++eMwJIvOOqwhcZxTJdeMhM/XcD9IRDAo
-         pdOIAWUZukkegFAnzq+MzGi3l3ZBRQMjSbQbqqAaVeAVuQO1CJ5UX7jM3zZ5lTP5IqSI
-         l1lD7vCWzpthvO6DRJ1/A3ACLdZDPjoMiJwjYeHnHoehihsxDFyqg8+VhKQG+pLcZ8p3
-         cX+XS0v/SH8KszBCIjUjFub6eQjB3gA3KVYkXKmOS14mnLjI/aQ47a6oOBmLifCwTN/T
-         yikkdyrLpCVEbHlLlp6P2AVWUAxKmnOXpHm1ZOeSqIrOPBvhZmLhCSwYd6F1TlE0a4bP
-         e+TA==
+        bh=ESRtOl/PFPrPJMlMbMpUz4WH8ydEni6gyWl+42u6F8g=;
+        b=tBk9PygMyHusbykohQuAbJdP9jUwhn8Kvj78IOntbsBNMSm7W2PDpbgaEs1Pccap25
+         YYR39QMBWERiDVTNvEZGZeiAfEpF1MgMYIPu90aFtBFt821yAwruGmnC9fWE2AMlcQrW
+         pLhSBlh6lt7EmTXee5DQ90IKYazFFhYv5Z/0Ojid26wr6l+PiQkLJethq8U/rPJNbd9g
+         SYD3O3AmZiwymp8C9CNkfrYdHJhXU5XKwSkqGqeCWZNkEs/CDgJjU5hJNNCZzHi/x+kx
+         C3u6EOnd/asIAZJsFj0gEZT+C9RTJanlwerMmMVRn+khM8Dnnybktw4G7WTslGpr6d7Y
+         VzOg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=cc:to:from:subject:references:mime-version:message-id:in-reply-to
          :date:reply-to:x-gm-message-state:from:to:cc;
-        bh=Wn8v/P3tNnUb1MG28HGMCGnZxpGFZ1P+4PmpRvu3+60=;
-        b=JUeokvDNU9N0pMgANR5MTPcGtvftVRyyrwRAb7nyqhzz0aRBLhGFepeBSRReb/Ox+d
-         3/oR8Yg/ZMpmTAZ6vLiRQbxMoj+kuVpuUQoZHk9/3V/ptV+vaBnyZ2f8xg/8JZib0LtO
-         72dUjBhQmpTWlyM4kWNkCBiH9JPKc3JC3fkB3KgL7iXtomGqbVevEI+9tup+ghqeN36y
-         DX9cnIIne/5p88fIH7P/MbFatm5RjHGYJGglo9GMy0sg51qfHNSgFB+bL6C86lRFzf7m
-         X8llysEI0QHhSj/vPqsZMhCoxiH+X4n2N56pYGbfY1fZCEkPRX+loYgtqr1vlh8+GXTo
-         AGXg==
-X-Gm-Message-State: ACgBeo2CTomf93pwqVpjv9BfJjoj0ebwjdggfPoyIETPN1lpFksbDC2Q
-        UP+QGfG+tS/f3tASHfLnprIpY1uJoEM=
-X-Google-Smtp-Source: AA6agR4d8J2XfNVnEOLARXCnMSVeMaBmq3jgzKctSOAH7bM53Umltsl8HImAaVa7keFu9YsPtZCxONfvQH0=
+        bh=ESRtOl/PFPrPJMlMbMpUz4WH8ydEni6gyWl+42u6F8g=;
+        b=v8Pi19Kxmou/4jzt6rJywNfss7A33hawWJh8celQsFS3G1tmbF71brNK70MVGsTOil
+         LNKVd6PGdE70r8IaeTdmhKdHQd63WwHPWbxbCiwGqcDKwUJTGrkE5yQm9NsGlKHThFTR
+         qOvvKjoQ9m6frUfLZVMImie9UPhCxiZCXcADBGSn9S4quxrG1hGZiy2yANEgsR9F2Ibu
+         hzYSv91iQYoyzpJNBO5L1cQ2imNidoZB0qoIuZz37M+fLm6KeuHY0q9KuApQMGQhUOdy
+         H68Mlj4C+JhdqxZUFTv7GNOqrHHtyp3PeaSGyRzdj85CIWtM1GPpVfOKe34qelT5S/nk
+         d8+A==
+X-Gm-Message-State: ACgBeo3LEpv2dV/JNE+8FteRxFmx6GpPl/M8jnO6iYLadujA7sddZNYv
+        6GTHi7U1IT6ffVAeu5wmTwpRWa5RE4A=
+X-Google-Smtp-Source: AA6agR5uoVEOMo5cTjayCLC+mnJpHL3rP7ADVqOV+P/bzannnpLEjhYLPS7mwmipPsZ41RS06XajiBhinkQ=
 X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a81:a20e:0:b0:322:a052:471e with SMTP id
- w14-20020a81a20e000000b00322a052471emr19210670ywg.183.1659977233843; Mon, 08
- Aug 2022 09:47:13 -0700 (PDT)
+ (user=seanjc job=sendgmr) by 2002:aa7:9157:0:b0:52f:20d6:e4f6 with SMTP id
+ 23-20020aa79157000000b0052f20d6e4f6mr8049637pfi.40.1659977235193; Mon, 08 Aug
+ 2022 09:47:15 -0700 (PDT)
 Reply-To: Sean Christopherson <seanjc@google.com>
-Date:   Mon,  8 Aug 2022 16:47:02 +0000
+Date:   Mon,  8 Aug 2022 16:47:03 +0000
 In-Reply-To: <20220808164707.537067-1-seanjc@google.com>
-Message-Id: <20220808164707.537067-3-seanjc@google.com>
+Message-Id: <20220808164707.537067-4-seanjc@google.com>
 Mime-Version: 1.0
 References: <20220808164707.537067-1-seanjc@google.com>
 X-Mailer: git-send-email 2.37.1.559.g78731f0fdb-goog
-Subject: [kvm-unit-tests PATCH v3 2/7] x86: Dedup 32-bit vs. 64-bit ASM_TRY()
- by stealing kernel's __ASM_SEL()
+Subject: [kvm-unit-tests PATCH v3 3/7] x86: Introduce ASM_TRY_FEP() to handle
+ exceptions on forced emulation
 From:   Sean Christopherson <seanjc@google.com>
 To:     Paolo Bonzini <pbonzini@redhat.com>
 Cc:     kvm@vger.kernel.org, Sean Christopherson <seanjc@google.com>,
@@ -69,67 +69,76 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Steal the kernel's __ASM_SEL() implementation and use it to consolidate
-ASM_TRY().  The only difference between the 32-bit and 64-bit versions is
-the size of the address stored in the table.
+From: Michal Luczaj <mhal@rbox.co>
 
-No functional change intended.
+Introduce ASM_TRY_FEP() to allow using the try-catch method to handle
+exceptions that occur on forced emulation.  ASM_TRY() mishandles
+exceptions thrown by the forced-emulation-triggered emulator. While the
+faulting address stored in the exception table points at forced emulation
+prefix, when an exceptions comes, RIP is 5 bytes (size of KVM_FEP) ahead
+due to KVM advancing RIP to skip the prefix and the exception ends up
+unhandled.
 
+Signed-off-by: Michal Luczaj <mhal@rbox.co>
 Signed-off-by: Sean Christopherson <seanjc@google.com>
 ---
- lib/x86/desc.h | 31 +++++++++++++++++--------------
- 1 file changed, 17 insertions(+), 14 deletions(-)
+ lib/x86/desc.h | 13 ++++++++++---
+ x86/emulator.c |  1 -
+ x86/pmu.c      |  1 -
+ 3 files changed, 10 insertions(+), 5 deletions(-)
 
 diff --git a/lib/x86/desc.h b/lib/x86/desc.h
-index 2a285eb..10ba8cb 100644
+index 10ba8cb..8f708fd 100644
 --- a/lib/x86/desc.h
 +++ b/lib/x86/desc.h
-@@ -3,6 +3,18 @@
- 
- #include <setjmp.h>
- 
-+#ifdef __ASSEMBLY__
-+#define __ASM_FORM(x, ...)	x,## __VA_ARGS__
-+#else
-+#define __ASM_FORM(x, ...)	" " xstr(x,##__VA_ARGS__) " "
-+#endif
-+
-+#ifndef __x86_64__
-+#define __ASM_SEL(a,b)		__ASM_FORM(a)
-+#else
-+#define __ASM_SEL(a,b)		__ASM_FORM(b)
-+#endif
-+
- void setup_idt(void);
- void load_idt(void);
- void setup_alt_stack(void);
-@@ -80,21 +92,12 @@ typedef struct  __attribute__((packed)) {
+@@ -92,13 +92,20 @@ typedef struct  __attribute__((packed)) {
  	u16 iomap_base;
  } tss64_t;
  
--#ifdef __x86_64
--#define ASM_TRY(catch)			\
--	"movl $0, %%gs:4 \n\t"		\
--	".pushsection .data.ex \n\t"	\
--	".quad 1111f, " catch "\n\t"	\
--	".popsection \n\t"		\
-+#define ASM_TRY(catch)						\
-+	"movl $0, %%gs:4 \n\t"					\
-+	".pushsection .data.ex \n\t"				\
-+	__ASM_SEL(.long, .quad) " 1111f,  " catch "\n\t"	\
-+	".popsection \n\t"					\
+-#define ASM_TRY(catch)						\
+-	"movl $0, %%gs:4 \n\t"					\
+-	".pushsection .data.ex \n\t"				\
++#define __ASM_TRY(prefix, catch)				\
++	"movl $0, %%gs:4\n\t"					\
++	".pushsection .data.ex\n\t"				\
+ 	__ASM_SEL(.long, .quad) " 1111f,  " catch "\n\t"	\
+ 	".popsection \n\t"					\
++	prefix "\n\t"						\
  	"1111:"
--#else
--#define ASM_TRY(catch)			\
--	"movl $0, %%gs:4 \n\t"		\
--	".pushsection .data.ex \n\t"	\
--	".long 1111f, " catch "\n\t"	\
--	".popsection \n\t"		\
--	"1111:"
--#endif
  
++#define ASM_TRY(catch) __ASM_TRY("", catch)
++
++/* Forced emulation prefix, used to invoke the emulator unconditionally. */
++#define KVM_FEP "ud2; .byte 'k', 'v', 'm';"
++#define ASM_TRY_FEP(catch) __ASM_TRY(KVM_FEP, catch)
++
  /*
   * selector     32-bit                        64-bit
+  * 0x00         NULL descriptor               NULL descriptor
+diff --git a/x86/emulator.c b/x86/emulator.c
+index 769a049..6dc88f1 100644
+--- a/x86/emulator.c
++++ b/x86/emulator.c
+@@ -18,7 +18,6 @@
+ static int exceptions;
+ 
+ /* Forced emulation prefix, used to invoke the emulator unconditionally.  */
+-#define KVM_FEP "ud2; .byte 'k', 'v', 'm';"
+ #define KVM_FEP_LENGTH 5
+ static int fep_available = 1;
+ 
+diff --git a/x86/pmu.c b/x86/pmu.c
+index 01be1e9..457c5b9 100644
+--- a/x86/pmu.c
++++ b/x86/pmu.c
+@@ -33,7 +33,6 @@
+ 
+ #define N 1000000
+ 
+-#define KVM_FEP "ud2; .byte 'k', 'v', 'm';"
+ // These values match the number of instructions and branches in the
+ // assembly block in check_emulated_instr().
+ #define EXPECTED_INSTR 17
 -- 
 2.37.1.559.g78731f0fdb-goog
 
