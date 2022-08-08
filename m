@@ -2,54 +2,58 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 49E9658CC54
-	for <lists+kvm@lfdr.de>; Mon,  8 Aug 2022 18:47:16 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id A68C258CC55
+	for <lists+kvm@lfdr.de>; Mon,  8 Aug 2022 18:47:17 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237851AbiHHQrO (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 8 Aug 2022 12:47:14 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40752 "EHLO
+        id S238317AbiHHQrP (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 8 Aug 2022 12:47:15 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40760 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S237349AbiHHQrM (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 8 Aug 2022 12:47:12 -0400
-Received: from mail-yw1-x114a.google.com (mail-yw1-x114a.google.com [IPv6:2607:f8b0:4864:20::114a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 835E413E25
-        for <kvm@vger.kernel.org>; Mon,  8 Aug 2022 09:47:11 -0700 (PDT)
-Received: by mail-yw1-x114a.google.com with SMTP id 00721157ae682-3282fe8f48fso81842597b3.17
-        for <kvm@vger.kernel.org>; Mon, 08 Aug 2022 09:47:11 -0700 (PDT)
+        with ESMTP id S230034AbiHHQrN (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 8 Aug 2022 12:47:13 -0400
+Received: from mail-pf1-x449.google.com (mail-pf1-x449.google.com [IPv6:2607:f8b0:4864:20::449])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AA802101DA
+        for <kvm@vger.kernel.org>; Mon,  8 Aug 2022 09:47:12 -0700 (PDT)
+Received: by mail-pf1-x449.google.com with SMTP id v20-20020aa78514000000b0052dbe80d632so4052752pfn.23
+        for <kvm@vger.kernel.org>; Mon, 08 Aug 2022 09:47:12 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
-        h=cc:to:from:subject:mime-version:message-id:date:reply-to:from:to:cc;
-        bh=21T0lLwfpFcDdGp7iyIEH8TXI8vyushZ5PUV2QIwO1I=;
-        b=msmRk7imkEx/dJZX6xagFoNej2MiSCvDNqbfglHJuC5OYu/4e2YqdvSwkZkgTbgCaU
-         oIqKxg8LGXqVyilujgfYxV92W7oAPuBeNknnYMXsoQzYHkt4zKGKWOhFzG898tPM93bV
-         e04X7rSq2hti63YSVhTS4tyv54/jkhw/CW9UYyLcjyukZ/Opn7lY3BbgjIHUy9+RbKVN
-         9v3Lx7y6Q6ZRWWufqnO9vCzuIw9B4luFrCuFRrjS94gGmhrPkNIl866sdl6gGKmsNgJj
-         0ZdH3PcolFG1mD66TEZW1x6CyoTEINxWOweS+LeNb/Z4uJFUiVTSAOxfOh2ugBem7aRz
-         fmMg==
+        h=cc:to:from:subject:references:mime-version:message-id:in-reply-to
+         :date:reply-to:from:to:cc;
+        bh=4lFLZlh9JeLDXYfo5F4rtQ5w1EoxuDdnNMWwds7AxOA=;
+        b=CLsyg2KBD15nY3iaPGbnaVmmO9SkjIIwYvNF3hOTUDNwIHC4fXzbfxGqLTuMH/i2kb
+         eyaBXdRm1QropFQKtr6/Y7ZzjPDdlq+ax/2z7ObRcfzmY5l5H3KDjL2RFYjxVmwnbRVB
+         vuOh0NZY04JvIkqYHFbPTjFTXRrQ7UmxstU30qQmRN88Zy2fYtij+WgcjtvxlgWz4w9Q
+         GasdRBSYlSNjrNfXI+x2mX3j388SAQu6sE/UZwlqx32juIxKxig/YEsLKvuZp5BhjtVt
+         BdeU7wbeIN95Tc0Itjzt56sc6FzgClSbvrY27QC8FP+xZacweW7Vs1EJv3zSzWmN+S+o
+         IcnQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=cc:to:from:subject:mime-version:message-id:date:reply-to
-         :x-gm-message-state:from:to:cc;
-        bh=21T0lLwfpFcDdGp7iyIEH8TXI8vyushZ5PUV2QIwO1I=;
-        b=CmppkK1hCagRaOmphfpBKNPimWeCOy+H0z38/mvgfiQa0zvr7jORDxRM8gfqL1X/Bz
-         PeXbl8liWXtzR/aF08dRiRbPBat/jSYCdrSuGy5bsDkw19mTcnKi89CSBKtRo98t3ilP
-         /3wdtZYbSjae1/o65PaDE/XITpALw/pver5CjODIwwfMJMxUz5spDpj2rsUDDSeSPtV/
-         cfVnqOZIjiEqQeiVrdxTNbb1Fu/D9ybL/UydEuRtSVRf3yKf0YMpeT3+Ys45+gEiKuYc
-         3tGgouZ/2LP9JbKWvf0lFEkW/335sj3m2tCmJyPnq4EbRtEjupa5I/uJHWWNfVZ+FYNU
-         A2qA==
-X-Gm-Message-State: ACgBeo0enYYNlunLdQx05sLB6HP0HZFSCV+5DDZ+ERoHoI+ULp23+wA4
-        z0rTFaziyaHG/wSa5IwLh7ea7c5h6bM=
-X-Google-Smtp-Source: AA6agR4pk46G3DGzfaMO+qy1QtRBmJaNcG1qphi2H63gZKWuvLSne99PdT19GJUFCZAHoqrSZa1jJ7HFT9Q=
+        h=cc:to:from:subject:references:mime-version:message-id:in-reply-to
+         :date:reply-to:x-gm-message-state:from:to:cc;
+        bh=4lFLZlh9JeLDXYfo5F4rtQ5w1EoxuDdnNMWwds7AxOA=;
+        b=D5fdvpSywIdGQIEXpUcaaGR9Dx6rj59PWJU/YdUqeZR4sNY+/ltcsg5eS+A6rylLRj
+         qvEgl+ufyo0bw/RwEX6Wf72F5NIm7eX//zjKJrCGavmnfF3Y/NjV/2JghI1ghzNqZ4we
+         Gk1fXleewuLUSlE+tSuQYfwpLlYYy9pem2W/7sQ0B6E/OYPoIkgN61tQTG+mm+StXfJ3
+         97SSD2u1pL7OMtttxx79DqcpfOoV6M42Z2Lyo352QQ4/FMVEJHCj/Z5Cp2LvK1Xa1Zdm
+         UNl6vHo7xrc2ykS4YDgfg4g5B4stRBlUjIvYMq62dmLONIRGqI8vcY9AZktgu0yGsTpx
+         GpKA==
+X-Gm-Message-State: ACgBeo2TmJokppeo4UoIEY4SG7xGHHWK581XlWre39vmfoxNYGlVxkPN
+        vpAk0VU2sjMhqjnIIQwXXMjUA7Nxz0s=
+X-Google-Smtp-Source: AA6agR63xy56w3xtvtMKcc/TtOhF4qGo5LgDcG7H+BvweIEMjdpjBb9jlD/xcVYv7007GXIid7lK3v9EKH4=
 X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a81:2597:0:b0:328:2f39:6852 with SMTP id
- l145-20020a812597000000b003282f396852mr19232525ywl.404.1659977230861; Mon, 08
- Aug 2022 09:47:10 -0700 (PDT)
+ (user=seanjc job=sendgmr) by 2002:a05:6a00:2294:b0:52e:2371:8bb with SMTP id
+ f20-20020a056a00229400b0052e237108bbmr19045559pfe.42.1659977232211; Mon, 08
+ Aug 2022 09:47:12 -0700 (PDT)
 Reply-To: Sean Christopherson <seanjc@google.com>
-Date:   Mon,  8 Aug 2022 16:47:00 +0000
-Message-Id: <20220808164707.537067-1-seanjc@google.com>
+Date:   Mon,  8 Aug 2022 16:47:01 +0000
+In-Reply-To: <20220808164707.537067-1-seanjc@google.com>
+Message-Id: <20220808164707.537067-2-seanjc@google.com>
 Mime-Version: 1.0
+References: <20220808164707.537067-1-seanjc@google.com>
 X-Mailer: git-send-email 2.37.1.559.g78731f0fdb-goog
-Subject: [kvm-unit-tests PATCH v3 0/7] x86: Illegal LEA test and FEP cleanups
+Subject: [kvm-unit-tests PATCH v3 1/7] x86: emulator.c: Save and restore
+ exception handlers
 From:   Sean Christopherson <seanjc@google.com>
 To:     Paolo Bonzini <pbonzini@redhat.com>
 Cc:     kvm@vger.kernel.org, Sean Christopherson <seanjc@google.com>,
@@ -65,36 +69,150 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Slightly reworked version of Michal's series clean up the FEP mess and add
-a testcase for illegal LEA.  Core ideas are all the same, just moved the
-common FEP functionality to desc.h to make it easier to use in other tests.
+From: Michal Luczaj <mhal@rbox.co>
 
-v3:
- - Define __ASM_SEL/__ASM_FORM in desc.h to fix circular dependency.
- - Move ASM_TRY_FEP() to desc.h
- - Add is_fep_available() helper to simplify probing FEP.
- - Use is_fep_available() in PMU test.
+Users of handle_exception() should always save and restore the handlers.
+Leave the #UD cases alone, they will be handled separately by converting
+them to ASM_TRY().
 
-Michal Luczaj (4):
-  x86: emulator.c: Save and restore exception handlers
-  x86: Introduce ASM_TRY_FEP() to handle exceptions on forced emulation
-  x86: emulator.c: Use ASM_TRY() for the UD_VECTOR cases
-  x86: Test emulator's handling of LEA with /reg
+Suggested-by: Sean Christopherson <seanjc@google.com>
+Signed-off-by: Michal Luczaj <mhal@rbox.co>
+Signed-off-by: Sean Christopherson <seanjc@google.com>
+---
+ x86/emulator.c | 72 ++++++++++++++++++++++++++------------------------
+ 1 file changed, 38 insertions(+), 34 deletions(-)
 
-Sean Christopherson (3):
-  x86: Dedup 32-bit vs. 64-bit ASM_TRY() by stealing kernel's
-    __ASM_SEL()
-  x86: Add helper to detect if forced emulation prefix is available
-  x86/pmu: Run the "emulation" test iff forced emulation is available
-
- lib/x86/desc.h    |  52 ++++++++++++++-----
- x86/emulator.c    | 127 +++++++++++++++++++++++-----------------------
- x86/pmu.c         |  18 +++----
- x86/unittests.cfg |   7 ---
- 4 files changed, 110 insertions(+), 94 deletions(-)
-
-
-base-commit: a106b30d39425b7afbaa3bbd4aab16fd26d333e7
+diff --git a/x86/emulator.c b/x86/emulator.c
+index cd78e3c..769a049 100644
+--- a/x86/emulator.c
++++ b/x86/emulator.c
+@@ -710,6 +710,7 @@ static __attribute__((target("sse2"))) void test_sse_exceptions(void *cross_mem)
+ 	void *page2 = (void *)(&bytes[4096]);
+ 	struct pte_search search;
+ 	pteval_t orig_pte;
++	handler old;
+ 
+ 	// setup memory for unaligned access
+ 	mem = (uint32_t *)(&bytes[8]);
+@@ -725,10 +726,10 @@ static __attribute__((target("sse2"))) void test_sse_exceptions(void *cross_mem)
+ 	asm("movupd %1, %0" : "=m"(*mem) : "x"(vv) : "memory");
+ 	report(sseeq(v, mem), "movupd unaligned");
+ 	exceptions = 0;
+-	handle_exception(GP_VECTOR, unaligned_movaps_handler);
++	old = handle_exception(GP_VECTOR, unaligned_movaps_handler);
+ 	asm("movaps %1, %0\n\t unaligned_movaps_cont:"
+ 			: "=m"(*mem) : "x"(vv));
+-	handle_exception(GP_VECTOR, 0);
++	handle_exception(GP_VECTOR, old);
+ 	report(exceptions == 1, "unaligned movaps exception");
+ 
+ 	// setup memory for cross page access
+@@ -746,10 +747,10 @@ static __attribute__((target("sse2"))) void test_sse_exceptions(void *cross_mem)
+ 	invlpg(page2);
+ 
+ 	exceptions = 0;
+-	handle_exception(PF_VECTOR, cross_movups_handler);
++	old = handle_exception(PF_VECTOR, cross_movups_handler);
+ 	asm("movups %1, %0\n\t cross_movups_cont:" : "=m"(*mem) : "x"(vv) :
+ 			"memory");
+-	handle_exception(PF_VECTOR, 0);
++	handle_exception(PF_VECTOR, old);
+ 	report(exceptions == 1, "movups crosspage exception");
+ 
+ 	// restore invalidated page
+@@ -817,36 +818,38 @@ static void advance_rip_and_note_exception(struct ex_regs *regs)
+ 
+ static void test_mmx_movq_mf(uint64_t *mem)
+ {
+-    /* movq %mm0, (%rax) */
+-    extern char movq_start, movq_end;
++	/* movq %mm0, (%rax) */
++	extern char movq_start, movq_end;
++	handler old;
+ 
+-    uint16_t fcw = 0;  /* all exceptions unmasked */
+-    write_cr0(read_cr0() & ~6);  /* TS, EM */
+-    exceptions = 0;
+-    handle_exception(MF_VECTOR, advance_rip_and_note_exception);
+-    asm volatile("fninit; fldcw %0" : : "m"(fcw));
+-    asm volatile("fldz; fldz; fdivp"); /* generate exception */
++	uint16_t fcw = 0;  /* all exceptions unmasked */
++	write_cr0(read_cr0() & ~6);  /* TS, EM */
++	exceptions = 0;
++	old = handle_exception(MF_VECTOR, advance_rip_and_note_exception);
++	asm volatile("fninit; fldcw %0" : : "m"(fcw));
++	asm volatile("fldz; fldz; fdivp"); /* generate exception */
+ 
+-    rip_advance = &movq_end - &movq_start;
+-    asm(KVM_FEP "movq_start: movq %mm0, (%rax); movq_end:");
+-    /* exit MMX mode */
+-    asm volatile("fnclex; emms");
+-    report(exceptions == 1, "movq mmx generates #MF");
+-    handle_exception(MF_VECTOR, 0);
++	rip_advance = &movq_end - &movq_start;
++	asm(KVM_FEP "movq_start: movq %mm0, (%rax); movq_end:");
++	/* exit MMX mode */
++	asm volatile("fnclex; emms");
++	report(exceptions == 1, "movq mmx generates #MF");
++	handle_exception(MF_VECTOR, old);
+ }
+ 
+ static void test_jmp_noncanonical(uint64_t *mem)
+ {
+ 	extern char nc_jmp_start, nc_jmp_end;
++	handler old;
+ 
+ 	*mem = 0x1111111111111111ul;
+ 
+ 	exceptions = 0;
+ 	rip_advance = &nc_jmp_end - &nc_jmp_start;
+-	handle_exception(GP_VECTOR, advance_rip_and_note_exception);
++	old = handle_exception(GP_VECTOR, advance_rip_and_note_exception);
+ 	asm volatile ("nc_jmp_start: jmp *%0; nc_jmp_end:" : : "m"(*mem));
+ 	report(exceptions == 1, "jump to non-canonical address");
+-	handle_exception(GP_VECTOR, 0);
++	handle_exception(GP_VECTOR, old);
+ }
+ 
+ static void test_movabs(uint64_t *mem)
+@@ -979,22 +982,23 @@ static void ss_bad_rpl(struct ex_regs *regs)
+ 
+ static void test_sreg(volatile uint16_t *mem)
+ {
+-    u16 ss = read_ss();
++	u16 ss = read_ss();
++	handler old;
+ 
+-    // check for null segment load
+-    *mem = 0;
+-    asm volatile("mov %0, %%ss" : : "m"(*mem));
+-    report(read_ss() == 0, "mov null, %%ss");
++	// check for null segment load
++	*mem = 0;
++	asm volatile("mov %0, %%ss" : : "m"(*mem));
++	report(read_ss() == 0, "mov null, %%ss");
+ 
+-    // check for exception when ss.rpl != cpl on null segment load
+-    exceptions = 0;
+-    handle_exception(GP_VECTOR, ss_bad_rpl);
+-    *mem = 3;
+-    asm volatile("mov %0, %%ss; ss_bad_rpl_cont:" : : "m"(*mem));
+-    report(exceptions == 1 && read_ss() == 0,
+-           "mov null, %%ss (with ss.rpl != cpl)");
+-    handle_exception(GP_VECTOR, 0);
+-    write_ss(ss);
++	// check for exception when ss.rpl != cpl on null segment load
++	exceptions = 0;
++	old = handle_exception(GP_VECTOR, ss_bad_rpl);
++	*mem = 3;
++	asm volatile("mov %0, %%ss; ss_bad_rpl_cont:" : : "m"(*mem));
++	report(exceptions == 1 && read_ss() == 0,
++	       "mov null, %%ss (with ss.rpl != cpl)");
++	handle_exception(GP_VECTOR, old);
++	write_ss(ss);
+ }
+ 
+ static uint64_t usr_gs_mov(void)
 -- 
 2.37.1.559.g78731f0fdb-goog
 
