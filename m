@@ -2,64 +2,69 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id ECAC758CD04
-	for <lists+kvm@lfdr.de>; Mon,  8 Aug 2022 19:48:30 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 3B54458CE3D
+	for <lists+kvm@lfdr.de>; Mon,  8 Aug 2022 21:03:53 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S244173AbiHHRs3 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 8 Aug 2022 13:48:29 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53684 "EHLO
+        id S244165AbiHHTDv (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 8 Aug 2022 15:03:51 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55126 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S244022AbiHHRsB (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 8 Aug 2022 13:48:01 -0400
-Received: from mail-ed1-x534.google.com (mail-ed1-x534.google.com [IPv6:2a00:1450:4864:20::534])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 53D0063B6
-        for <kvm@vger.kernel.org>; Mon,  8 Aug 2022 10:47:48 -0700 (PDT)
-Received: by mail-ed1-x534.google.com with SMTP id t5so12235369edc.11
-        for <kvm@vger.kernel.org>; Mon, 08 Aug 2022 10:47:48 -0700 (PDT)
+        with ESMTP id S237349AbiHHTDt (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 8 Aug 2022 15:03:49 -0400
+Received: from mail-il1-x133.google.com (mail-il1-x133.google.com [IPv6:2607:f8b0:4864:20::133])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9901019022
+        for <kvm@vger.kernel.org>; Mon,  8 Aug 2022 12:03:48 -0700 (PDT)
+Received: by mail-il1-x133.google.com with SMTP id r6so5348869ilc.12
+        for <kvm@vger.kernel.org>; Mon, 08 Aug 2022 12:03:48 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=content-transfer-encoding:to:subject:message-id:date:from:sender
-         :reply-to:mime-version:from:to:cc;
-        bh=TcA92jQhUmVL9NUdzNddBpPNztYcniP4mrRV38OuDxw=;
-        b=On5UtQoPkiQI086zlK2ATDZ2C/qPbmf4WrLtcB+ZbDR6pXmdHaKN/8cTXHLZhgVRnn
-         Jt3h03CFGmnJsXVaItXx7OZGeUmiEHrKdpjVNcryptPStixsnFJl44gBPBQFSdF7l+cr
-         IrdHtrYIz56oiqyuLh2XEecZ2zf8hTgPU4GinS1a2Mr8fuU74I20QQg4boiHoxUi0gKM
-         KbArVXBDO0cLmDHDNJcXYfP6gh1oISleAnhAzk42ghbbHicaa2OFPkltk10B+5XAqlx/
-         7XH9sPOIK8PhEiAj1/YzXnskLw0uwd2p9ltq2wVXeBxVNXSvybBM++NNMXJ4/WRWxuwo
-         iYfQ==
+        d=csp-edu.20210112.gappssmtp.com; s=20210112;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc;
+        bh=syAtPX/fEfY/Znj5vIFhc6XP8gBHOtdfC9U66uE+0pg=;
+        b=PinGFxYR+g6qD+2+1uClXpDIeha9HqBTjdj78StBVEeLhFTubqtiFpLXdAfzJQsnIB
+         N/MrX8QQinIl1NXg0uIFgSy+pzaDOur/RGU9txFVKv8TIuFtAszffnMyt1h/mMeSu9bv
+         c10YPiJpVMd3y0+ns4MfWt0kkhWpeO6n6iwpXg3eFUwTmn7FkDdRCD2kidAjQuigBNhX
+         Ixx13wqu5MyktG3tnvQ/5y1P+7rO5xKE2WPPawWBOYLq+iUSh7Q9HsDP4bRBKdNrPB8O
+         7M403iCvz/LeaZfwjpV/6dTg2e5ImH4hWYiWkvz7LgJ3S+sQ0HEWNB1dCk5p8Gslf/SG
+         jSqA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=content-transfer-encoding:to:subject:message-id:date:from:sender
-         :reply-to:mime-version:x-gm-message-state:from:to:cc;
-        bh=TcA92jQhUmVL9NUdzNddBpPNztYcniP4mrRV38OuDxw=;
-        b=iabxQ4Bvdxt3WWpjrJFfn5EdJAGTKcnDhp+bpI0iU4h8a24ErhLlZx5dR6z66BjOXq
-         0gZLDxtacUMbMcXNo7cumlCtBgfrtw0qZoto8lq2R4HlcQAMHi7azFiJvjn6hO5OdvTQ
-         7LUheZK6MMHkwukDVl/BhWhksRB8WQXNkn4IzFhPR4IgFA4W8rBh89X+0MisPHPNEHeG
-         UPuMb44K987htQwTyOK5Stu6wz73KTlGrtXlX+KdEM1FbUrx2D3PwpFcA3zF4tdwB/ge
-         VX98he2ElkSbAQVs3NBQ09zqhDqT0QOTDkH4xHBxZh8aktzYM4isBXdXBgkxka1Tb/G0
-         rbGQ==
-X-Gm-Message-State: ACgBeo1pKvtZsGXa2WOFcqQcpY8qwmV1SPrfS0C6QygHVGDJdhOwCRfI
-        Hvia+ox9fq4KQDvPweq/88CFUcdQhf9HJQO/SWQ=
-X-Google-Smtp-Source: AA6agR46lZaYhrsCTTVKGYJMk3clzkRoJBLA+nuJjtpBIRnfUddYKSy9PIPpX3+ZijwWc1JiyVyxz5wRaDaQBq+L14o=
-X-Received: by 2002:a05:6402:35d5:b0:43d:a02f:cbfb with SMTP id
- z21-20020a05640235d500b0043da02fcbfbmr18037323edc.275.1659980866370; Mon, 08
- Aug 2022 10:47:46 -0700 (PDT)
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc;
+        bh=syAtPX/fEfY/Znj5vIFhc6XP8gBHOtdfC9U66uE+0pg=;
+        b=InMmm4cAelXZtT18edCQDqox9zSJmjQlP5FuKT8TOrl0RwQrB1wVgjflBeOXNlvf2e
+         DORai71AjmOx5HDvUaniaxn4Cryuf9yq+nTOtp6PfFenqtfS7ioH5TSt0//jeaMW39QZ
+         5GkLmb4hDBAk76CUg+xkCDQofyXkuBFErsajuk9Mum6CY+fhtPkgy5oPeG6/RonOqCkq
+         aHflfW1/RSGnT4YD8+vrQyCLfGCfqBQrpHPjguVyI/mSToZ38K1siXaDZy/ReWqrKeFd
+         K+B9ffIhzAotTdNE64JvThVh9WdhDybT3bmjYE8Qww76uWgG+DI2NIICD7dgAGKXAzm4
+         4Njg==
+X-Gm-Message-State: ACgBeo2iQwPleSJFstErM9ORxHkngf0QJig478LZ6zdBaysQ8UglxNlR
+        QMWxCV/bHxIDP0dJFyfMegLB/Q==
+X-Google-Smtp-Source: AA6agR7c1UwS8w8jUikUvEkKhIpyqDOzMB9e62cctTro+gFeq58kURPib4bcwlSqgRjrBUEKVsO6fw==
+X-Received: by 2002:a05:6e02:1ca5:b0:2df:3283:b4a8 with SMTP id x5-20020a056e021ca500b002df3283b4a8mr9468668ill.131.1659985428040;
+        Mon, 08 Aug 2022 12:03:48 -0700 (PDT)
+Received: from kernel-dev-1 (75-168-113-69.mpls.qwest.net. [75.168.113.69])
+        by smtp.gmail.com with ESMTPSA id c11-20020a02a60b000000b0032b3a781754sm5541725jam.24.2022.08.08.12.03.47
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 08 Aug 2022 12:03:47 -0700 (PDT)
+From:   Coleman Dietsch <dietschc@csp.edu>
+To:     dietschc@csp.edu, kvm@vger.kernel.org
+Cc:     Sean Christopherson <seanjc@google.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+        Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org,
+        "H . Peter Anvin" <hpa@zytor.com>, linux-kernel@vger.kernel.org,
+        skhan@linuxfoundation.org, Pavel Skripkin <paskripkin@gmail.com>,
+        linux-kernel-mentees@lists.linuxfoundation.org
+Subject: [PATCH v3 0/2] KVM: x86/xen: Prevent Xen timer init when running
+Date:   Mon,  8 Aug 2022 14:02:10 -0500
+Message-Id: <20220808190211.323827-1-dietschc@csp.edu>
+X-Mailer: git-send-email 2.34.1
 MIME-Version: 1.0
-Reply-To: sgtkaylama@gmail.com
-Sender: jj7303405@gmail.com
-Received: by 2002:a05:6f02:126:b0:20:ecf3:415e with HTTP; Mon, 8 Aug 2022
- 10:47:45 -0700 (PDT)
-From:   sgtkaylama <sgtkaylama@gmail.com>
-Date:   Mon, 8 Aug 2022 17:47:45 +0000
-X-Google-Sender-Auth: ZwQgVIY_Z4tt6RjxL4zHFg3oEAk
-Message-ID: <CABUCCYyd9yK1dfqR1DxfSHLPvJD8fLfPNA9C=OyF6w-5JjnJ5g@mail.gmail.com>
-Subject: 
-To:     undisclosed-recipients:;
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: base64
-X-Spam-Status: No, score=0.8 required=5.0 tests=BAYES_50,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_ENVFROM_END_DIGIT,
-        FREEMAIL_FROM,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
+Content-Transfer-Encoding: 8bit
+X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
         T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -67,5 +72,56 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-16nXnNeV150sINeU15DXnSDXp9eZ15HXnNeqINeQ16og16nXqteZINeU15TXldeT16LXldeqINeU
-16fXldeT157XldeqINep15zXmT8NCg==
+The following issue was discovered by syzbot:
+WARNING: ODEBUG bug in kvm_xen_vcpu_set_attr.
+
+When running the syzbot reproducer code, the following crash dump occurs:
+
+ODEBUG: init active (active state 0)
+object type: hrtimer hint: xen_timer_callbac0
+RIP: 0010:debug_print_object+0x16e/0x250 lib/debugobjects.c:502
+Call Trace:
+__debug_object_init
+debug_hrtimer_init
+debug_init
+hrtimer_init
+kvm_xen_init_timer
+kvm_xen_vcpu_set_attr
+kvm_arch_vcpu_ioctl
+kvm_vcpu_ioctl
+vfs_ioctl
+
+The ODEBUG bug crash appears to be happening when vcpu->arch.xen.timer is
+already set and kvm_xen_init_timer() is called, which appears to be the
+result of two separate issues.
+
+The first issue is that kvm_xen_init_timer() is run "every"
+KVM_XEN_VCPU_ATTR_TYPE_TIMER. This is addressed in patch 1.
+
+The second issue is that the stop xen timer code should be run before
+changing the IRQ vector. This is addressed in patch 2 with some cleanup.
+
+version 3 changes
+-removed ambiguous comment
+-updated another comment to be more descriptive
+-continue cleaning up changelogs
+
+version 2 changes (mostly feedback from Sean Christopherson)
+-split patch into 2 patches
+-fix changelogs to be more descriptive
+-fix formatting issues
+-add check for existing xen timer before trying to initialize another one
+-removed conditional for kvm_xen_stop_timer() so that it always runs
+-ensure that xen timer is stopped before changing IRQ vector
+-streamlined switch case KVM_XEN_VCPU_ATTR_TYPE_TIMER a bit
+
+Coleman Dietsch (2):
+  KVM: x86/xen: Initialize Xen timer only once
+  KVM: x86/xen: Stop Xen timer before changing IRQ
+
+ arch/x86/kvm/xen.c | 31 ++++++++++++++++---------------
+ 1 file changed, 16 insertions(+), 15 deletions(-)
+
+-- 
+2.34.1
+
