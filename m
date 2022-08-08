@@ -2,58 +2,58 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 013BE58C761
-	for <lists+kvm@lfdr.de>; Mon,  8 Aug 2022 13:14:31 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 5E70958C777
+	for <lists+kvm@lfdr.de>; Mon,  8 Aug 2022 13:23:03 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S242819AbiHHLO3 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 8 Aug 2022 07:14:29 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58192 "EHLO
+        id S242839AbiHHLW6 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 8 Aug 2022 07:22:58 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34972 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232740AbiHHLO1 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 8 Aug 2022 07:14:27 -0400
+        with ESMTP id S242753AbiHHLWw (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 8 Aug 2022 07:22:52 -0400
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 49CBA6322
-        for <kvm@vger.kernel.org>; Mon,  8 Aug 2022 04:14:26 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 55367B48A
+        for <kvm@vger.kernel.org>; Mon,  8 Aug 2022 04:22:51 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1659957265;
+        s=mimecast20190719; t=1659957770;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          in-reply-to:in-reply-to:references:references;
-        bh=yY0JFPsIeaqtqI4iFArqAoOxJZBsLvWKUrWCsvYe/Bc=;
-        b=g5INBvX+6CvKAqjWw2DupmWSeLQhrfClfnREWRG+f5r64a4dVFAIFqEeJ71jRvItmTqlWz
-        6ZI1n/LaDmtHQij4QY0n6vdF46VILNDzhHeAaDasqvJtHMkfbh/va1a+2c2A9gNBgPwG8n
-        vQ7HYvUsRJIvtubc2cunhBPo7YpCmr4=
-Received: from mail-qv1-f71.google.com (mail-qv1-f71.google.com
- [209.85.219.71]) by relay.mimecast.com with ESMTP with STARTTLS
+        bh=URbW2eSWd9Zk4XsSgq7TMx84SxxtNx0WE1Teja98lDs=;
+        b=Meln5ggVtFtV7fMXRCk93yxBCAC0N3HI5JzgFdrHH+8PwgA+CFEqp8SuwdfiT3P9OJBiF+
+        RaYhEYxaiEuG4nHD443rdfDrFEEov299f6XdF8ZrtJnh6pL+Yzst1AZ7575G4/vZULMPh3
+        GW8PvilMYKdQbQ1YXT2PLjsJ+1yBjnU=
+Received: from mail-qv1-f70.google.com (mail-qv1-f70.google.com
+ [209.85.219.70]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-247-UCN7B1GVOsuEJLPI6kAS7A-1; Mon, 08 Aug 2022 07:14:24 -0400
-X-MC-Unique: UCN7B1GVOsuEJLPI6kAS7A-1
-Received: by mail-qv1-f71.google.com with SMTP id dp8-20020a05621409c800b0047b6911be44so284735qvb.7
-        for <kvm@vger.kernel.org>; Mon, 08 Aug 2022 04:14:24 -0700 (PDT)
+ us-mta-649-pu9kQnbPPP6Iipdn5J76sQ-1; Mon, 08 Aug 2022 07:22:49 -0400
+X-MC-Unique: pu9kQnbPPP6Iipdn5J76sQ-1
+Received: by mail-qv1-f70.google.com with SMTP id np4-20020a056214370400b00476809b9caeso4283401qvb.0
+        for <kvm@vger.kernel.org>; Mon, 08 Aug 2022 04:22:49 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:x-gm-message-state:from:to:cc;
-        bh=yY0JFPsIeaqtqI4iFArqAoOxJZBsLvWKUrWCsvYe/Bc=;
-        b=RfB4timnzLy8s/9RXNfI7u8gcTbpLkowtewhrl6DpTC4wCzfW7eK9sz5SUcAmra+GF
-         x7PyZ+YgCw0RfhQrMQ8jOZnNsVCH5viDy9Y6fNIZuVQuolswlA5Ufhg7W8muhwrLf9RG
-         GSrckNxd0B+bV1pobQjitSwg2me4z0/thd6Z0WW6fv/jBuRYDqQlIO2EPYzT2HOg62Sq
-         u8x2R3lM0t5fBTpYRyisPrFwJKAy9AXFKpSWQ+CRJK3fse/uElfVff3Z7fEE1gJUOX1l
-         qry+dR+NFbrLOmOpUTHY05rO1xR0RwXLlfvuE0clIIbxa8SvoikefcxuzlNmhGTGrFxk
-         Wi9w==
-X-Gm-Message-State: ACgBeo00Qod/F2kMU7tnp7Gjh97gcC5urdPUoQtTnjeJ6w5i8ql6tNke
-        TyeYpyZ/QWo8a55R2f8QpMSxyxpH8IUNAU6HuvUUQW7y4Gzlomij2x3RjfuH6Rls9EUHqYbmG8+
-        UeYxgJB6y00kc
-X-Received: by 2002:a37:9602:0:b0:6b8:753c:729d with SMTP id y2-20020a379602000000b006b8753c729dmr13647126qkd.83.1659957263904;
-        Mon, 08 Aug 2022 04:14:23 -0700 (PDT)
-X-Google-Smtp-Source: AA6agR639ZIMRG4InAc+BbR2p/NP4CtcHRuLRLUW7+Hgtww1NkwTDOVGrJ0yy9vLlJVxPTxPb1lKOQ==
-X-Received: by 2002:a37:9602:0:b0:6b8:753c:729d with SMTP id y2-20020a379602000000b006b8753c729dmr13647106qkd.83.1659957263654;
-        Mon, 08 Aug 2022 04:14:23 -0700 (PDT)
+        bh=URbW2eSWd9Zk4XsSgq7TMx84SxxtNx0WE1Teja98lDs=;
+        b=Y0M5AePB4LdggtID0KkyyuADSqFbY36vmvJj59Kaiz0TumOKEa3UZ6vhsiFZsaKt6x
+         7F/gT5JvB5aJkXHue3ohYPki1t50TYAxmXQbR4nELl1fp4PT71XO3A//Hi7zj165JsdL
+         jKdaO3tQ6DsBFCeiiv8i1tPMoW7L00F38BA88t+EGVZYMkFlN9xpBymD5Y1qc6E6a0vF
+         O2xHnfgCLklCeE6NSOvYOETsbcb2i6DqIfWoBbVjMCCUZITYXBbTqX3Ue13YPzHIziLj
+         ELE9yTqxJAyZjsSp6v5nffEsZZpn81IKGkojgYYw7cIMHIAHwlj+6tOWKGn9ygwehtvX
+         kg0w==
+X-Gm-Message-State: ACgBeo0wg8f8PAC3bNgWd9K0/+d+iTzoAJdl8HvNaZ6HaI/l7IMBD1IL
+        JiYa2SQfhuBYf5Tt2TOxLp4UGEiLeDZn0j20gy+FVmrkHazsSBfPM5Dm5D1TBNJure6andQVYyl
+        ILkhfTXVx252s
+X-Received: by 2002:ac8:7d4c:0:b0:31f:344c:d843 with SMTP id h12-20020ac87d4c000000b0031f344cd843mr15965570qtb.391.1659957769101;
+        Mon, 08 Aug 2022 04:22:49 -0700 (PDT)
+X-Google-Smtp-Source: AA6agR4Y11HcDyoSXw2Ny4GAR0UM/JIRPfgg4DREbcZuxzaq//Kny6tPDJul5MmPL+netL0Z9mFe1A==
+X-Received: by 2002:ac8:7d4c:0:b0:31f:344c:d843 with SMTP id h12-20020ac87d4c000000b0031f344cd843mr15965542qtb.391.1659957768859;
+        Mon, 08 Aug 2022 04:22:48 -0700 (PDT)
 Received: from sgarzare-redhat (host-79-46-200-178.retail.telecomitalia.it. [79.46.200.178])
-        by smtp.gmail.com with ESMTPSA id n1-20020ac86741000000b00342f932c47csm1906952qtp.46.2022.08.08.04.14.19
+        by smtp.gmail.com with ESMTPSA id g3-20020a05620a40c300b006b919c6749esm7398094qko.91.2022.08.08.04.22.44
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 08 Aug 2022 04:14:22 -0700 (PDT)
-Date:   Mon, 8 Aug 2022 13:14:12 +0200
+        Mon, 08 Aug 2022 04:22:48 -0700 (PDT)
+Date:   Mon, 8 Aug 2022 13:22:39 +0200
 From:   Stefano Garzarella <sgarzare@redhat.com>
 To:     Arseniy Krasnov <AVKrasnov@sberdevices.ru>
 Cc:     "David S. Miller" <davem@davemloft.net>,
@@ -77,14 +77,13 @@ Cc:     "David S. Miller" <davem@davemloft.net>,
         "linux-hyperv@vger.kernel.org" <linux-hyperv@vger.kernel.org>,
         "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
         kernel <kernel@sberdevices.ru>
-Subject: Re: [RFC PATCH v3 9/9] vsock_test: POLLIN + SO_RCVLOWAT test
-Message-ID: <20220808111412.iywihoyszvswomlb@sgarzare-redhat>
+Subject: Re: [RFC PATCH v3 0/9] vsock: updates for SO_RCVLOWAT handling
+Message-ID: <20220808112239.jwzrp7krsyk6za5s@sgarzare-redhat>
 References: <2ac35e2c-26a8-6f6d-2236-c4692600db9e@sberdevices.ru>
- <1f50d595-cd37-ad61-f165-5632162dc682@sberdevices.ru>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii; format=flowed
 Content-Disposition: inline
-In-Reply-To: <1f50d595-cd37-ad61-f165-5632162dc682@sberdevices.ru>
+In-Reply-To: <2ac35e2c-26a8-6f6d-2236-c4692600db9e@sberdevices.ru>
 X-Spam-Status: No, score=-3.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,
         SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham
@@ -95,86 +94,29 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Aug 03, 2022 at 02:07:58PM +0000, Arseniy Krasnov wrote:
->This adds test to check,that when poll() returns POLLIN,POLLRDNORM bits,
->next read call won't block.
->
->Signed-off-by: Arseniy Krasnov <AVKrasnov@sberdevices.ru>
->---
-> tools/testing/vsock/vsock_test.c | 107 +++++++++++++++++++++++++++++++
-> 1 file changed, 107 insertions(+)
->
->diff --git a/tools/testing/vsock/vsock_test.c b/tools/testing/vsock/vsock_test.c
->index dc577461afc2..920dc5d5d979 100644
->--- a/tools/testing/vsock/vsock_test.c
->+++ b/tools/testing/vsock/vsock_test.c
->@@ -18,6 +18,7 @@
-> #include <sys/socket.h>
-> #include <time.h>
-> #include <sys/mman.h>
->+#include <poll.h>
->
-> #include "timeout.h"
-> #include "control.h"
->@@ -596,6 +597,107 @@ static void test_seqpacket_invalid_rec_buffer_server(const struct test_opts *opt
-> 	close(fd);
-> }
->
->+static void test_stream_poll_rcvlowat_server(const struct test_opts *opts)
->+{
->+#define RCVLOWAT_BUF_SIZE 128
->+	int fd;
->+	int i;
->+
->+	fd = vsock_stream_accept(VMADDR_CID_ANY, 1234, NULL);
->+	if (fd < 0) {
->+		perror("accept");
->+		exit(EXIT_FAILURE);
->+	}
->+
->+	/* Send 1 byte. */
->+	send_byte(fd, 1, 0);
->+
->+	control_writeln("SRVSENT");
->+
->+	/* Wait until client is ready to receive rest of data. */
->+	control_expectln("CLNSENT");
->+
->+	for (i = 0; i < RCVLOWAT_BUF_SIZE - 1; i++)
->+		send_byte(fd, 1, 0);
->+
->+	/* Keep socket in active state. */
->+	control_expectln("POLLDONE");
->+
->+	close(fd);
->+}
->+
->+static void test_stream_poll_rcvlowat_client(const struct test_opts *opts)
->+{
->+	unsigned long lowat_val = RCVLOWAT_BUF_SIZE;
->+	char buf[RCVLOWAT_BUF_SIZE];
->+	struct pollfd fds;
->+	ssize_t read_res;
->+	short poll_flags;
->+	int fd;
->+
->+	fd = vsock_stream_connect(opts->peer_cid, 1234);
->+	if (fd < 0) {
->+		perror("connect");
->+		exit(EXIT_FAILURE);
->+	}
->+
->+	if (setsockopt(fd, SOL_SOCKET, SO_RCVLOWAT,
->+			&lowat_val, sizeof(lowat_val))) {
+Hi Arseniy,
 
-A small checkpatch warning that you can fix since you have to resend:
+On Wed, Aug 03, 2022 at 01:48:06PM +0000, Arseniy Krasnov wrote:
+>Hello,
+>
+>This patchset includes some updates for SO_RCVLOWAT:
 
-CHECK: Alignment should match open parenthesis
-#76: FILE: tools/testing/vsock/vsock_test.c:645:
-+	if (setsockopt(fd, SOL_SOCKET, SO_RCVLOWAT,
-+			&lowat_val, sizeof(lowat_val))) {
+I have reviewed all the patches, run tests and everything seems okay :-)
 
-total: 0 errors, 0 warnings, 1 checks, 125 lines checked
+I left some minor comments and asked Bryan and Vishnu to take a better 
+look at VMCI patches.
+
+In general I ask you to revisit the patch descriptions a bit (for 
+example adding a space after punctuation). The next version I think can 
+be without RFC.
+
+Remember to send it with the net-next tag.
+Note: net-next is closed for now since we are in the merge window.
+It should re-open in a week (you can check here: 
+http://vger.kernel.org/~davem/net-next.html).
+
+I'll be on vacation the next 2 weeks (Aug 15 - 28), but I'll try to 
+check out your patches!
 
 Thanks,
 Stefano
