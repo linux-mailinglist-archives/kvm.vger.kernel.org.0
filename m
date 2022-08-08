@@ -2,55 +2,92 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 6582958C63E
-	for <lists+kvm@lfdr.de>; Mon,  8 Aug 2022 12:19:03 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id ED94058C64C
+	for <lists+kvm@lfdr.de>; Mon,  8 Aug 2022 12:23:54 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S242343AbiHHKTB (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 8 Aug 2022 06:19:01 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42574 "EHLO
+        id S242553AbiHHKXw (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 8 Aug 2022 06:23:52 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45464 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234440AbiHHKS7 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 8 Aug 2022 06:18:59 -0400
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 36414DF85;
-        Mon,  8 Aug 2022 03:18:58 -0700 (PDT)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id B3E4461025;
-        Mon,  8 Aug 2022 10:18:57 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id DF7ADC433D6;
-        Mon,  8 Aug 2022 10:18:54 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1659953937;
-        bh=ngKdrHPPGQycLh/g1tjJowsh64MZ7HYYVtSZuwLBhDw=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=mPr1rVffPPJhu6WgJNp5Uww3hXXtLdrKyCUJB439k/dXUPz2yUQ3ISIDxuQKWeOPd
-         /VNZ7QwkAS0s5l5tNcDK1xoJnSnaOko2XpciZAGq40b8TAgE9FSm4s8ArS7js+Yhg1
-         NbUonhGZInnD/WFda2qKyw/G7kM1dHeADT3O7AvmDyrdahms1xQecgl6qhIBSjFZNa
-         sgnD611KuQclGHte+N3p5FdSZkZNFVX0AmppnLqk8O3MbIn/cnhSpRmddkBKNn/xWw
-         YbkqVzuIYUi19CBOGCgkc84MqYymfiI2NvwWKFT6hNHMRnJmm23/YRJCB/uLjVv8tq
-         /g1y8jUorBRyg==
-Date:   Mon, 8 Aug 2022 11:18:50 +0100
-From:   Will Deacon <will@kernel.org>
-To:     "Michael S. Tsirkin" <mst@redhat.com>
-Cc:     stefanha@redhat.com, jasowang@redhat.com,
-        torvalds@linux-foundation.org, ascull@google.com, maz@kernel.org,
-        keirf@google.com, jiyong@google.com, kernel-team@android.com,
-        linux-kernel@vger.kernel.org,
-        virtualization@lists.linux-foundation.org, kvm@vger.kernel.org
-Subject: Re: IOTLB support for vhost/vsock breaks crosvm on Android
-Message-ID: <20220808101850.GA31984@willie-the-truck>
-References: <20220805181105.GA29848@willie-the-truck>
- <20220807042408-mutt-send-email-mst@kernel.org>
+        with ESMTP id S242508AbiHHKXv (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 8 Aug 2022 06:23:51 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 9F5F81277F
+        for <kvm@vger.kernel.org>; Mon,  8 Aug 2022 03:23:50 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1659954229;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=CZ+7qMtAooG6dh841vB4xXZOc4YcIi/wWT2HlYib+T4=;
+        b=F4xuVoQefaFtd2hMeUFYJ5sWl318QhAp4S3OwAF/1V0ERfhH5k4aClst9WWTbqOM41GHCa
+        qx4my3fY/xC/J8I+mfVHw5LKD6dunFZDghWxwM96w3dtLpitszUvzXUyNA8pcY8yh8UOtK
+        So+1rDgKv8dMfvWCBEdHnZT+VVc4EpU=
+Received: from mail-qk1-f197.google.com (mail-qk1-f197.google.com
+ [209.85.222.197]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-5-Bvog2lqsMoO_NiS3KslJ1A-1; Mon, 08 Aug 2022 06:23:46 -0400
+X-MC-Unique: Bvog2lqsMoO_NiS3KslJ1A-1
+Received: by mail-qk1-f197.google.com with SMTP id bi22-20020a05620a319600b006b92f4b2ebbso4598011qkb.22
+        for <kvm@vger.kernel.org>; Mon, 08 Aug 2022 03:23:46 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc;
+        bh=CZ+7qMtAooG6dh841vB4xXZOc4YcIi/wWT2HlYib+T4=;
+        b=j5FJMBZrO1OWhA05tJkSkejViAsvIWODgsEa8rj5JeMwVLG4cN+zrj4DFDWh0XSGfJ
+         PQYjieDj2+eL9YNOLU/u8kWsHE2ABt0qwT/8gxJWCtHopGvM52metDWbdI/Vzv26Likr
+         pLoOPlbim3H+eP5RVlUXoWUn4KB0LOutlx3o1b18MNhp6bZKO9X2d0NtMGcoUfEdH3bQ
+         YeqjtD2EHP4Qaj8Tqy9ixZg8FLrz+bOoVUkNLUJ9l/L3JsWwGUQGJgXXddLl6uHJDiHU
+         4ks1uV/rPNu4of1gcJZ4aXkRkl55AfmPTFxD8YEtiEHoIJg8SCY8EEqfckkwsaUoFAz4
+         zkBA==
+X-Gm-Message-State: ACgBeo3iDZDJzyDFt32vY/dY6J0PoSivOuY22zynn6HCDM+P1VqY7fdT
+        4e4qouQyE+HpstNs7RciZeIiB4J39i9/UpAFT+46RZjKpCrLeF88c644aahmRRTLxRus3vtTm3J
+        gOh7mSK8p703W
+X-Received: by 2002:ac8:7d4e:0:b0:31f:33db:69bc with SMTP id h14-20020ac87d4e000000b0031f33db69bcmr15622440qtb.482.1659954226106;
+        Mon, 08 Aug 2022 03:23:46 -0700 (PDT)
+X-Google-Smtp-Source: AA6agR6JBzf5xAfbbDtzMbPLn2U0H6BGM6n6lSlv4ISjtq6rY6A09Oo3blf5b3eQhOOQ/S3L7JLDWA==
+X-Received: by 2002:ac8:7d4e:0:b0:31f:33db:69bc with SMTP id h14-20020ac87d4e000000b0031f33db69bcmr15622424qtb.482.1659954225867;
+        Mon, 08 Aug 2022 03:23:45 -0700 (PDT)
+Received: from sgarzare-redhat (host-79-46-200-178.retail.telecomitalia.it. [79.46.200.178])
+        by smtp.gmail.com with ESMTPSA id k5-20020a05620a414500b006b93ef659c3sm4308518qko.39.2022.08.08.03.23.40
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 08 Aug 2022 03:23:44 -0700 (PDT)
+Date:   Mon, 8 Aug 2022 12:23:35 +0200
+From:   Stefano Garzarella <sgarzare@redhat.com>
+To:     Arseniy Krasnov <AVKrasnov@sberdevices.ru>
+Cc:     "David S. Miller" <davem@davemloft.net>,
+        "edumazet@google.com" <edumazet@google.com>,
+        Jakub Kicinski <kuba@kernel.org>,
+        Paolo Abeni <pabeni@redhat.com>,
+        "kys@microsoft.com" <kys@microsoft.com>,
+        "haiyangz@microsoft.com" <haiyangz@microsoft.com>,
+        "sthemmin@microsoft.com" <sthemmin@microsoft.com>,
+        "wei.liu@kernel.org" <wei.liu@kernel.org>,
+        Dexuan Cui <decui@microsoft.com>,
+        Stefan Hajnoczi <stefanha@redhat.com>,
+        Bryan Tan <bryantan@vmware.com>,
+        Vishnu Dasa <vdasa@vmware.com>,
+        VMware PV-Drivers Reviewers <pv-drivers@vmware.com>,
+        Krasnov Arseniy <oxffffaa@gmail.com>,
+        "virtualization@lists.linux-foundation.org" 
+        <virtualization@lists.linux-foundation.org>,
+        "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "linux-hyperv@vger.kernel.org" <linux-hyperv@vger.kernel.org>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        kernel <kernel@sberdevices.ru>
+Subject: Re: [RFC PATCH v3 1/9] vsock: SO_RCVLOWAT transport set callback
+Message-ID: <20220808102335.nkviqobpgcmcaqhn@sgarzare-redhat>
+References: <2ac35e2c-26a8-6f6d-2236-c4692600db9e@sberdevices.ru>
+ <45822644-8e37-1625-5944-63fd5fc20dd3@sberdevices.ru>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=us-ascii; format=flowed
 Content-Disposition: inline
-In-Reply-To: <20220807042408-mutt-send-email-mst@kernel.org>
-User-Agent: Mutt/1.10.1 (2018-07-13)
-X-Spam-Status: No, score=-7.7 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_HI,
-        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
+In-Reply-To: <45822644-8e37-1625-5944-63fd5fc20dd3@sberdevices.ru>
+X-Spam-Status: No, score=-3.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,
+        SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=unavailable
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -58,115 +95,108 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi Michael,
+On Wed, Aug 03, 2022 at 01:51:05PM +0000, Arseniy Krasnov wrote:
+>This adds transport specific callback for SO_RCVLOWAT, because in some
+>transports it may be difficult to know current available number of bytes
+>ready to read. Thus, when SO_RCVLOWAT is set, transport may reject it.
+>
+>Signed-off-by: Arseniy Krasnov <AVKrasnov@sberdevices.ru>
+>---
+> include/net/af_vsock.h   |  1 +
+> net/vmw_vsock/af_vsock.c | 25 +++++++++++++++++++++++++
+> 2 files changed, 26 insertions(+)
+>
+>diff --git a/include/net/af_vsock.h b/include/net/af_vsock.h
+>index f742e50207fb..eae5874bae35 100644
+>--- a/include/net/af_vsock.h
+>+++ b/include/net/af_vsock.h
+>@@ -134,6 +134,7 @@ struct vsock_transport {
+> 	u64 (*stream_rcvhiwat)(struct vsock_sock *);
+> 	bool (*stream_is_active)(struct vsock_sock *);
+> 	bool (*stream_allow)(u32 cid, u32 port);
+>+	int (*set_rcvlowat)(struct vsock_sock *, int);
 
-On Sun, Aug 07, 2022 at 09:14:43AM -0400, Michael S. Tsirkin wrote:
-> Will, thanks very much for the analysis and the writeup!
+checkpatch suggests to add identifier names. For some we put them in, 
+for others we didn't, but I suggest putting them in for the new ones 
+because I think it's clearer too.
 
-No problem, and thanks for following up.
+WARNING: function definition argument 'struct vsock_sock *' should also 
+have an identifier name
+#25: FILE: include/net/af_vsock.h:137:
++	int (*set_rcvlowat)(struct vsock_sock *, int);
 
-> On Fri, Aug 05, 2022 at 07:11:06PM +0100, Will Deacon wrote:
-> > So how should we fix this? One possibility is for us to hack crosvm to
-> > clear the VIRTIO_F_ACCESS_PLATFORM flag when setting the vhost features,
-> > but others here have reasonably pointed out that they didn't expect a
-> > kernel change to break userspace. On the flip side, the offending commit
-> > in the kernel isn't exactly new (it's from the end of 2020!) and so it's
-> > likely that others (e.g. QEMU) are using this feature.
-> 
-> Exactly, that's the problem.
-> 
-> vhost is reusing the virtio bits and it's only natural that
-> what you are doing would happen.
-> 
-> To be precise, this is what we expected people to do (and what QEMU does):
-> 
-> 
-> #define QEMU_VHOST_FEATURES ((1 << VIRTIO_F_VERSION_1) |
-> 			     (1 << VIRTIO_NET_F_RX_MRG) | .... )
-> 
-> VHOST_GET_FEATURES(... &host_features);
-> host_features &= QEMU_VHOST_FEATURES
-> VHOST_SET_FEATURES(host_features & guest_features)
-> 
-> 
-> Here QEMU_VHOST_FEATURES are the bits userspace knows about.
-> 
-> Our assumption was that whatever userspace enables, it
-> knows what the effect on vhost is going to be.
-> 
-> But yes, I understand absolutely how someone would instead just use the
-> guest features. It is unfortunate that we did not catch this in time.
-> 
-> 
-> In hindsight, we should have just created vhost level macros
-> instead of reusing virtio ones. Would address the concern
-> about naming: PLATFORM_ACCESS makes sense for the
-> guest since there it means "whatever access rules platform has",
-> but for vhost a better name would be VHOST_F_IOTLB.
-> We should have also taken greater pains to document what
-> we expect userspace to do. I remember now how I thought about something
-> like this but after coding this up in QEMU I forgot to document this :(
-> Also, I suspect given the history the GET/SET features ioctl and burned
-> wrt extending it and we have to use a new when we add new features.
-> All this we can do going forward.
+WARNING: function definition argument 'int' should also have an identifier name
+#25: FILE: include/net/af_vsock.h:137:
++	int (*set_rcvlowat)(struct vsock_sock *, int);
 
-Makes sense. The crosvm developers are also pretty friendly in my
-experience, so I'm sure they wouldn't mind being involved in discussions
-around any future ABI extensions. Just be aware that they _very_ recently
-moved their mailing lists, so I think it lives here now:
+total: 0 errors, 2 warnings, 0 checks, 44 lines checked
 
-https://groups.google.com/a/chromium.org/g/crosvm-dev
+>
+> 	/* SEQ_PACKET. */
+> 	ssize_t (*seqpacket_dequeue)(struct vsock_sock *vsk, struct msghdr *msg,
+>diff --git a/net/vmw_vsock/af_vsock.c b/net/vmw_vsock/af_vsock.c
+>index f04abf662ec6..016ad5ff78b7 100644
+>--- a/net/vmw_vsock/af_vsock.c
+>+++ b/net/vmw_vsock/af_vsock.c
+>@@ -2129,6 +2129,30 @@ vsock_connectible_recvmsg(struct socket *sock, struct msghdr *msg, size_t len,
+> 	return err;
+> }
+>
+>+static int vsock_set_rcvlowat(struct sock *sk, int val)
+>+{
+>+	const struct vsock_transport *transport;
+>+	struct vsock_sock *vsk;
+>+	int err = 0;
+>+
+>+	vsk = vsock_sk(sk);
+>+
+>+	if (val > vsk->buffer_size)
+>+		return -EINVAL;
+>+
+>+	transport = vsk->transport;
+>+
+>+	if (!transport)
+>+		return -EOPNOTSUPP;
 
-> But what can we do about the specific issue?
-> I am not 100% sure since as Will points out, QEMU and other
-> userspace already rely on the current behaviour.
-> 
-> Looking at QEMU specifically, it always sends some translations at
-> startup, this in order to handle device rings.
-> 
-> So, *maybe* we can get away with assuming that if no IOTLB ioctl was
-> ever invoked then this userspace does not know about IOTLB and
-> translation should ignore IOTLB completely.
+I don't know whether it is better in this case to write it in 
+sk->sk_rcvlowat, maybe we can return EOPNOTSUPP only when the trasport 
+is assigned and set_rcvlowat is not defined. This is because usually the 
+options are set just after creation, when the transport is practically 
+unassigned.
 
-There was a similar suggestion from Stefano:
+I mean something like this:
 
-https://lore.kernel.org/r/20220806105225.crkui6nw53kbm5ge@sgarzare-redhat
+         if (transport) {
+                 if (transport->set_rcvlowat)
+                         return transport->set_rcvlowat(vsk, val);
+                 else
+                         return -EOPNOTSUPP;
+         }
 
-about spotting the backend ioctl for IOTLB and using that to enable
-the negotiation of F_ACCESS_PLATFORM. Would that work for qemu?
+         WRITE_ONCE(sk->sk_rcvlowat, val ? : 1);
 
-> I am a bit nervous about breaking some *other* userspace which actually
-> wants device to be blocked from accessing memory until IOTLB
-> has been setup. If we get it wrong we are making guest
-> and possibly even host vulnerable.
-> And of course just revering is not an option either since there
-> are now whole stacks depending on the feature.
+         return 0;
 
-Absolutely, I'm not seriously suggesting the revert. I just did it locally
-to confirm the issue I was seeing.
+>+
+>+	if (transport->set_rcvlowat)
+>+		err = transport->set_rcvlowat(vsk, val);
+>+	else
+>+		WRITE_ONCE(sk->sk_rcvlowat, val ? : 1);
+>+
+>+	return err;
+>+}
+>+
+> static const struct proto_ops vsock_stream_ops = {
+> 	.family = PF_VSOCK,
+> 	.owner = THIS_MODULE,
+>@@ -2148,6 +2172,7 @@ static const struct proto_ops vsock_stream_ops = {
+> 	.recvmsg = vsock_connectible_recvmsg,
+> 	.mmap = sock_no_mmap,
+> 	.sendpage = sock_no_sendpage,
+>+	.set_rcvlowat = vsock_set_rcvlowat,
+> };
+>
+> static const struct proto_ops vsock_seqpacket_ops = {
+>-- 
+>2.25.1
 
-> Will I'd like your input on whether you feel a hack in the kernel
-> is justified here.
-
-If we can come up with something that we have confidence in and won't be a
-pig to maintain, then I think we should do it, but otherwise we can go ahead
-and change crosvm to mask out this feature flag on the vhost side for now.
-We mainly wanted to raise the issue to illustrate that this flag continues
-to attract problems in the hope that it might inform further usage and/or
-spec work in this area.
-
-In any case, I'm happy to test any kernel patches with our setup if you
-want to give it a shot.
-
-> Also yes, I think it's a good idea to change crosvm anyway.  While the
-> work around I describe might make sense upstream I don't think it's a
-> reasonable thing to do in stable kernels.
-> I think I'll prepare a patch documenting the legal vhost features
-> as a 1st step even though crosvm is rust so it's not importing
-> the header directly, right?
-
-Documentation is a good idea regardless, so thanks for that. Even though
-crosvm has its own bindings for the vhost ioctl()s, the documentation
-can be reference or duplicated once it's available in the kernel headers.
-
-Will
