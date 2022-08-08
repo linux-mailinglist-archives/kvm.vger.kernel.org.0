@@ -2,64 +2,67 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 3B54458CE3D
-	for <lists+kvm@lfdr.de>; Mon,  8 Aug 2022 21:03:53 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id EF8B558CE4B
+	for <lists+kvm@lfdr.de>; Mon,  8 Aug 2022 21:06:44 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S244165AbiHHTDv (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 8 Aug 2022 15:03:51 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55126 "EHLO
+        id S244228AbiHHTGl (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 8 Aug 2022 15:06:41 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57560 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S237349AbiHHTDt (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 8 Aug 2022 15:03:49 -0400
-Received: from mail-il1-x133.google.com (mail-il1-x133.google.com [IPv6:2607:f8b0:4864:20::133])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9901019022
-        for <kvm@vger.kernel.org>; Mon,  8 Aug 2022 12:03:48 -0700 (PDT)
-Received: by mail-il1-x133.google.com with SMTP id r6so5348869ilc.12
-        for <kvm@vger.kernel.org>; Mon, 08 Aug 2022 12:03:48 -0700 (PDT)
+        with ESMTP id S236838AbiHHTGi (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 8 Aug 2022 15:06:38 -0400
+Received: from mail-io1-xd35.google.com (mail-io1-xd35.google.com [IPv6:2607:f8b0:4864:20::d35])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 82327B83
+        for <kvm@vger.kernel.org>; Mon,  8 Aug 2022 12:06:37 -0700 (PDT)
+Received: by mail-io1-xd35.google.com with SMTP id i84so7874541ioa.6
+        for <kvm@vger.kernel.org>; Mon, 08 Aug 2022 12:06:37 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=csp-edu.20210112.gappssmtp.com; s=20210112;
         h=content-transfer-encoding:mime-version:message-id:date:subject:cc
          :to:from:from:to:cc;
-        bh=syAtPX/fEfY/Znj5vIFhc6XP8gBHOtdfC9U66uE+0pg=;
-        b=PinGFxYR+g6qD+2+1uClXpDIeha9HqBTjdj78StBVEeLhFTubqtiFpLXdAfzJQsnIB
-         N/MrX8QQinIl1NXg0uIFgSy+pzaDOur/RGU9txFVKv8TIuFtAszffnMyt1h/mMeSu9bv
-         c10YPiJpVMd3y0+ns4MfWt0kkhWpeO6n6iwpXg3eFUwTmn7FkDdRCD2kidAjQuigBNhX
-         Ixx13wqu5MyktG3tnvQ/5y1P+7rO5xKE2WPPawWBOYLq+iUSh7Q9HsDP4bRBKdNrPB8O
-         7M403iCvz/LeaZfwjpV/6dTg2e5ImH4hWYiWkvz7LgJ3S+sQ0HEWNB1dCk5p8Gslf/SG
-         jSqA==
+        bh=DfkYWLinzITcd/FJI51hf3bH49wjjl87W/fTyl+XXYA=;
+        b=KnuCUT3+QBXT0EVXP+LbdiSG5CLJ3zJmeNDuR+4pqdnGPgyDrAg7SnOg8S1imSdBkf
+         MtLWzaleN9Zvz8IwTnM4do1QofcWTqe8Jq2AMdRxO3aRnWuEH/Eu6rcGWyweC0GZQ4nb
+         kU433WHsLh3X0wXBa9p01pHjHYZpDMocJkCxizLpVE0Sduc+GWzWGH0chtieR7/BDp0D
+         cijh+MCJGYfQnXcdnARpuNT25CsPPeoklFEuhrA44f6aWpu8F5h4HZeDNymhEvYvA1dg
+         Muu9xYQU3NT6ZRwXYPhgg/xRD2lfeILv6lS/N9YWuaTxTyB2wOadymrXSjFdKn7VS6SE
+         17Sw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=content-transfer-encoding:mime-version:message-id:date:subject:cc
          :to:from:x-gm-message-state:from:to:cc;
-        bh=syAtPX/fEfY/Znj5vIFhc6XP8gBHOtdfC9U66uE+0pg=;
-        b=InMmm4cAelXZtT18edCQDqox9zSJmjQlP5FuKT8TOrl0RwQrB1wVgjflBeOXNlvf2e
-         DORai71AjmOx5HDvUaniaxn4Cryuf9yq+nTOtp6PfFenqtfS7ioH5TSt0//jeaMW39QZ
-         5GkLmb4hDBAk76CUg+xkCDQofyXkuBFErsajuk9Mum6CY+fhtPkgy5oPeG6/RonOqCkq
-         aHflfW1/RSGnT4YD8+vrQyCLfGCfqBQrpHPjguVyI/mSToZ38K1siXaDZy/ReWqrKeFd
-         K+B9ffIhzAotTdNE64JvThVh9WdhDybT3bmjYE8Qww76uWgG+DI2NIICD7dgAGKXAzm4
-         4Njg==
-X-Gm-Message-State: ACgBeo2iQwPleSJFstErM9ORxHkngf0QJig478LZ6zdBaysQ8UglxNlR
-        QMWxCV/bHxIDP0dJFyfMegLB/Q==
-X-Google-Smtp-Source: AA6agR7c1UwS8w8jUikUvEkKhIpyqDOzMB9e62cctTro+gFeq58kURPib4bcwlSqgRjrBUEKVsO6fw==
-X-Received: by 2002:a05:6e02:1ca5:b0:2df:3283:b4a8 with SMTP id x5-20020a056e021ca500b002df3283b4a8mr9468668ill.131.1659985428040;
-        Mon, 08 Aug 2022 12:03:48 -0700 (PDT)
+        bh=DfkYWLinzITcd/FJI51hf3bH49wjjl87W/fTyl+XXYA=;
+        b=xhi1IYvd5P43MAZcSsp3xYi1WXoAGFqKBAUIS9f5AKOZ6DOPIVD/vOuZ6CPHrWMT0h
+         VxxgWNaXOYZqLQbe5DnWCP2ZmB6jB6EC9d8Q+LCsMpaEAiSJsMmif4RDpNqYWaQvW0UX
+         DAlQQTO+FTIdrLrnfscgFsJo+xOEGFbT3mT90DJ+lr/pOmJrminJkJWh0r9hHXzzSQ/A
+         KYmD9n45jM8+7O69Drks8qAr4bpqNZ35THtUcTivIMqJqq1yz1NyXqnPfC4hdMnQ/bGh
+         HyXzEeJUDVvPmkdRIJzCHoXnFrPrUIrXpy7H75csjANtVu3a1XvatKcpGOQ1KptAWZg/
+         0CfA==
+X-Gm-Message-State: ACgBeo3g1+JK0cevNMu8yevc38bmwmiMWz5AmuAlZGMdvZWp14KY9tn/
+        jjIfw09FHtGAph7fNeBVtLM1oQ==
+X-Google-Smtp-Source: AA6agR4juG/N3jgczX70o0Dl3DOvEQ4/ob1i7PWSjLhiBKoVD/uHlbCBcNDorCHqYK4EVygW1FnuOg==
+X-Received: by 2002:a02:238b:0:b0:33f:4ccb:3139 with SMTP id u133-20020a02238b000000b0033f4ccb3139mr8959740jau.20.1659985596901;
+        Mon, 08 Aug 2022 12:06:36 -0700 (PDT)
 Received: from kernel-dev-1 (75-168-113-69.mpls.qwest.net. [75.168.113.69])
-        by smtp.gmail.com with ESMTPSA id c11-20020a02a60b000000b0032b3a781754sm5541725jam.24.2022.08.08.12.03.47
+        by smtp.gmail.com with ESMTPSA id c29-20020a02331d000000b003429ee6ca96sm5380638jae.1.2022.08.08.12.06.36
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 08 Aug 2022 12:03:47 -0700 (PDT)
+        Mon, 08 Aug 2022 12:06:36 -0700 (PDT)
 From:   Coleman Dietsch <dietschc@csp.edu>
-To:     dietschc@csp.edu, kvm@vger.kernel.org
-Cc:     Sean Christopherson <seanjc@google.com>,
+To:     kvm@vger.kernel.org
+Cc:     Coleman Dietsch <dietschc@csp.edu>,
+        Sean Christopherson <seanjc@google.com>,
         Paolo Bonzini <pbonzini@redhat.com>,
         Thomas Gleixner <tglx@linutronix.de>,
         Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
         Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org,
         "H . Peter Anvin" <hpa@zytor.com>, linux-kernel@vger.kernel.org,
         skhan@linuxfoundation.org, Pavel Skripkin <paskripkin@gmail.com>,
-        linux-kernel-mentees@lists.linuxfoundation.org
-Subject: [PATCH v3 0/2] KVM: x86/xen: Prevent Xen timer init when running
-Date:   Mon,  8 Aug 2022 14:02:10 -0500
-Message-Id: <20220808190211.323827-1-dietschc@csp.edu>
+        linux-kernel-mentees@lists.linuxfoundation.org,
+        stable@vger.kernel.org,
+        syzbot+e54f930ed78eb0f85281@syzkaller.appspotmail.com
+Subject: [PATCH v3 1/2] KVM: x86/xen: Initialize Xen timer only once
+Date:   Mon,  8 Aug 2022 14:06:06 -0500
+Message-Id: <20220808190607.323899-2-dietschc@csp.edu>
 X-Mailer: git-send-email 2.34.1
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
@@ -72,10 +75,11 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-The following issue was discovered by syzbot:
-WARNING: ODEBUG bug in kvm_xen_vcpu_set_attr.
+Add a check for existing xen timers before initializing a new one.
 
-When running the syzbot reproducer code, the following crash dump occurs:
+Currently kvm_xen_init_timer() is called on every
+KVM_XEN_VCPU_ATTR_TYPE_TIMER, which is causing the following ODEBUG
+crash when vcpu->arch.xen.timer is already set.
 
 ODEBUG: init active (active state 0)
 object type: hrtimer hint: xen_timer_callbac0
@@ -91,37 +95,30 @@ kvm_arch_vcpu_ioctl
 kvm_vcpu_ioctl
 vfs_ioctl
 
-The ODEBUG bug crash appears to be happening when vcpu->arch.xen.timer is
-already set and kvm_xen_init_timer() is called, which appears to be the
-result of two separate issues.
+Fixes: 536395260582 ("KVM: x86/xen: handle PV timers oneshot mode")
+Cc: stable@vger.kernel.org
+Link: https://syzkaller.appspot.com/bug?id=8234a9dfd3aafbf092cc5a7cd9842e3ebc45fc42
+Reported-by: syzbot+e54f930ed78eb0f85281@syzkaller.appspotmail.com
+Signed-off-by: Coleman Dietsch <dietschc@csp.edu>
+---
+ arch/x86/kvm/xen.c | 4 +++-
+ 1 file changed, 3 insertions(+), 1 deletion(-)
 
-The first issue is that kvm_xen_init_timer() is run "every"
-KVM_XEN_VCPU_ATTR_TYPE_TIMER. This is addressed in patch 1.
-
-The second issue is that the stop xen timer code should be run before
-changing the IRQ vector. This is addressed in patch 2 with some cleanup.
-
-version 3 changes
--removed ambiguous comment
--updated another comment to be more descriptive
--continue cleaning up changelogs
-
-version 2 changes (mostly feedback from Sean Christopherson)
--split patch into 2 patches
--fix changelogs to be more descriptive
--fix formatting issues
--add check for existing xen timer before trying to initialize another one
--removed conditional for kvm_xen_stop_timer() so that it always runs
--ensure that xen timer is stopped before changing IRQ vector
--streamlined switch case KVM_XEN_VCPU_ATTR_TYPE_TIMER a bit
-
-Coleman Dietsch (2):
-  KVM: x86/xen: Initialize Xen timer only once
-  KVM: x86/xen: Stop Xen timer before changing IRQ
-
- arch/x86/kvm/xen.c | 31 ++++++++++++++++---------------
- 1 file changed, 16 insertions(+), 15 deletions(-)
-
+diff --git a/arch/x86/kvm/xen.c b/arch/x86/kvm/xen.c
+index a0c05ccbf4b1..6e554041e862 100644
+--- a/arch/x86/kvm/xen.c
++++ b/arch/x86/kvm/xen.c
+@@ -713,7 +713,9 @@ int kvm_xen_vcpu_set_attr(struct kvm_vcpu *vcpu, struct kvm_xen_vcpu_attr *data)
+ 				break;
+ 			}
+ 			vcpu->arch.xen.timer_virq = data->u.timer.port;
+-			kvm_xen_init_timer(vcpu);
++
++			if (!vcpu->arch.xen.timer.function)
++				kvm_xen_init_timer(vcpu);
+ 
+ 			/* Restart the timer if it's set */
+ 			if (data->u.timer.expires_ns)
 -- 
 2.34.1
 
