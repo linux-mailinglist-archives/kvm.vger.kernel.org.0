@@ -2,156 +2,100 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 2C88D58C523
-	for <lists+kvm@lfdr.de>; Mon,  8 Aug 2022 10:57:35 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 3173258C52A
+	for <lists+kvm@lfdr.de>; Mon,  8 Aug 2022 10:58:51 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238111AbiHHI5Z (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 8 Aug 2022 04:57:25 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40428 "EHLO
+        id S237366AbiHHI6t (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 8 Aug 2022 04:58:49 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41206 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233665AbiHHI5Y (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 8 Aug 2022 04:57:24 -0400
-Received: from ams.source.kernel.org (ams.source.kernel.org [145.40.68.75])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1F805D90;
-        Mon,  8 Aug 2022 01:57:23 -0700 (PDT)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by ams.source.kernel.org (Postfix) with ESMTPS id C5059B80E2F;
-        Mon,  8 Aug 2022 08:57:21 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7477AC43140;
-        Mon,  8 Aug 2022 08:57:20 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1659949040;
-        bh=41hkDjozTj/9771T7sIgIeayf3FHl7toj5PGFhaQaig=;
-        h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
-        b=dRlv8aBv9gmYQMMRysynhf3+XtHFgW0vc2MSDpq11XWpjmVBBFePhsFad6FIRSf1W
-         tImr2wyVSdaBHT8jVVAQfiaytLde2W87xEJx4Df/laMM9224zInWE82a7NLGZrryuz
-         2wtKizJOrLfkkMgUUNaO5tYKddjmEvijmG1/FbwM2BnXNXDpxjskwo5n3/RjUvHFUa
-         N1me2DWIpOScQhDCo0zH5e7U0XnO0jGzxHrsiS6a1R4zmDmoyc7a/Brr4kPuG3cuWd
-         JyqqkVDXHpjQsGSR+u4fr2n0qySMsY4Shs9RB6DPIJ/nF5UlzHVA7hUX3zJDEOAfCc
-         qAg4YUBkDJpVQ==
-Received: by mail-ot1-f52.google.com with SMTP id m22-20020a0568301e7600b006369227f745so6053488otr.7;
-        Mon, 08 Aug 2022 01:57:20 -0700 (PDT)
-X-Gm-Message-State: ACgBeo2BKF0Lmw9t2IJMiiXC6DdzkaiQUI+In5GVCrNP6R/Jx13/xEtr
-        tRmDWI0/vP2V6EAOewUkAB6Bcb+64XgBJ9hV2T0=
-X-Google-Smtp-Source: AA6agR5Ts3sAfj1MljLE3v8RoF3iPVaZ/RVb7hUbopz7S2rwzd3IMWydqeAW1PpniXu8oQ28JweXQ0oxg2FizGG4Lyk=
-X-Received: by 2002:a05:6830:928:b0:636:aaa7:813b with SMTP id
- v40-20020a056830092800b00636aaa7813bmr5058008ott.140.1659949039556; Mon, 08
- Aug 2022 01:57:19 -0700 (PDT)
+        with ESMTP id S236126AbiHHI6h (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 8 Aug 2022 04:58:37 -0400
+Received: from mga05.intel.com (mga05.intel.com [192.55.52.43])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3F63813E38
+        for <kvm@vger.kernel.org>; Mon,  8 Aug 2022 01:58:36 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1659949116; x=1691485116;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=pvMgcmAhjFBY6Z506Vgh8jh6X3m82T4afmcR2kHV3X8=;
+  b=Ny+MHxvIDeyYtMMp79W5CyQ81jRESqEtOl55iT81wVJzBd1wobpgrqD7
+   uT+cw64UZ0+ePxad0ZQZwibXiYkSW27QCEVZ52klmEf0UsQt0K6g2ejkC
+   i7GJ5bKVTXVrB06ssrkK3SUkQfxjhSjIRJTkOgx57l/3lq8OIUcU9Kba5
+   LFuaiflvx+tBS02v2KjkWi5XXEtMB2ZXEwWQX/qChUblHffTmA+JYJCmr
+   kzOEx6sI7BknV4JdLmjIVczMh+o39a5ZrvJnU9IX0Wd42JFxuI86IqBGr
+   Yf7VymNrPc1fZdbRUPHb08OM9qMNcFgcHvjUSpa89h4VyKfeiMPZsA6xm
+   Q==;
+X-IronPort-AV: E=McAfee;i="6400,9594,10432"; a="376835040"
+X-IronPort-AV: E=Sophos;i="5.93,221,1654585200"; 
+   d="scan'208";a="376835040"
+Received: from fmsmga005.fm.intel.com ([10.253.24.32])
+  by fmsmga105.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 08 Aug 2022 01:58:36 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.93,221,1654585200"; 
+   d="scan'208";a="931970528"
+Received: from lxy-dell.sh.intel.com ([10.239.48.38])
+  by fmsmga005.fm.intel.com with ESMTP; 08 Aug 2022 01:58:34 -0700
+From:   Xiaoyao Li <xiaoyao.li@intel.com>
+To:     Paolo Bonzini <pbonzini@redhat.com>,
+        Marcelo Tosatti <mtosatti@redhat.com>
+Cc:     qemu-devel@nongnu.org, kvm@vger.kernel.org
+Subject: [PATCH v2 0/8] Make Intel PT configurable
+Date:   Mon,  8 Aug 2022 16:58:26 +0800
+Message-Id: <20220808085834.3227541-1-xiaoyao.li@intel.com>
+X-Mailer: git-send-email 2.27.0
 MIME-Version: 1.0
-References: <20220722165047.519994-1-atishp@rivosinc.com> <20220722165047.519994-4-atishp@rivosinc.com>
-In-Reply-To: <20220722165047.519994-4-atishp@rivosinc.com>
-From:   Guo Ren <guoren@kernel.org>
-Date:   Mon, 8 Aug 2022 16:57:07 +0800
-X-Gmail-Original-Message-ID: <CAJF2gTR8yOwHNJBvq07eNTBAHansRhDq57HYrUYLnRV+WuSD_g@mail.gmail.com>
-Message-ID: <CAJF2gTR8yOwHNJBvq07eNTBAHansRhDq57HYrUYLnRV+WuSD_g@mail.gmail.com>
-Subject: Re: [PATCH v7 3/4] RISC-V: Prefer sstc extension if available
-To:     Atish Patra <atishp@rivosinc.com>
-Cc:     linux-kernel@vger.kernel.org, Anup Patel <anup@brainfault.org>,
-        Albert Ou <aou@eecs.berkeley.edu>,
-        Atish Patra <atishp@atishpatra.org>,
-        Daniel Lezcano <daniel.lezcano@linaro.org>,
-        Heiko Stuebner <heiko@sntech.de>,
-        kvm-riscv@lists.infradead.org, kvm@vger.kernel.org,
-        linux-riscv@lists.infradead.org,
-        Palmer Dabbelt <palmer@dabbelt.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Paul Walmsley <paul.walmsley@sifive.com>,
-        Rob Herring <robh@kernel.org>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Tsukasa OI <research_trasio@irq.a4lg.com>,
-        Wei Fu <wefu@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
-X-Spam-Status: No, score=-7.7 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_HI,
-        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
-        autolearn_force=no version=3.4.6
+Content-Transfer-Encoding: 8bit
+X-Spam-Status: No, score=-3.0 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,HK_RANDOM_ENVFROM,
+        HK_RANDOM_FROM,RCVD_IN_DNSWL_MED,SPF_HELO_NONE,SPF_NONE,
+        T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Looks good to me. The patch is concise, and static_branch is properly used.
+Initial virtualization of Intel PT was added by making it as fixed
+feature set of ICX's capabilities. However, it breaks the Intel PT exposure
+on SPR machine because SPR has less PT capabilities of
+CPUID(0x14,1):EBX[15:0].
 
-Reviewed-by: Guo Ren <guoren@kernel.org>
+This series aims to make Intel PT configurable that named CPU model can
+define its own PT feature set and "-cpu host/max" can use host pass-through
+feature set of Intel PT.
 
-On Sat, Jul 23, 2022 at 12:51 AM Atish Patra <atishp@rivosinc.com> wrote:
->
-> RISC-V ISA has sstc extension which allows updating the next clock event
-> via a CSR (stimecmp) instead of an SBI call. This should happen dynamically
-> if sstc extension is available. Otherwise, it will fallback to SBI call
-> to maintain backward compatibility.
->
-> Reviewed-by: Anup Patel <anup@brainfault.org>
-> Signed-off-by: Atish Patra <atishp@rivosinc.com>
-> ---
->  drivers/clocksource/timer-riscv.c | 25 ++++++++++++++++++++++++-
->  1 file changed, 24 insertions(+), 1 deletion(-)
->
-> diff --git a/drivers/clocksource/timer-riscv.c b/drivers/clocksource/timer-riscv.c
-> index 593d5a957b69..05f6cf067289 100644
-> --- a/drivers/clocksource/timer-riscv.c
-> +++ b/drivers/clocksource/timer-riscv.c
-> @@ -7,6 +7,9 @@
->   * either be read from the "time" and "timeh" CSRs, and can use the SBI to
->   * setup events, or directly accessed using MMIO registers.
->   */
-> +
-> +#define pr_fmt(fmt) "riscv-timer: " fmt
-> +
->  #include <linux/clocksource.h>
->  #include <linux/clockchips.h>
->  #include <linux/cpu.h>
-> @@ -20,14 +23,28 @@
->  #include <linux/of_irq.h>
->  #include <clocksource/timer-riscv.h>
->  #include <asm/smp.h>
-> +#include <asm/hwcap.h>
->  #include <asm/sbi.h>
->  #include <asm/timex.h>
->
-> +static DEFINE_STATIC_KEY_FALSE(riscv_sstc_available);
-> +
->  static int riscv_clock_next_event(unsigned long delta,
->                 struct clock_event_device *ce)
->  {
-> +       u64 next_tval = get_cycles64() + delta;
-> +
->         csr_set(CSR_IE, IE_TIE);
-> -       sbi_set_timer(get_cycles64() + delta);
-> +       if (static_branch_likely(&riscv_sstc_available)) {
-> +#if defined(CONFIG_32BIT)
-> +               csr_write(CSR_STIMECMP, next_tval & 0xFFFFFFFF);
-> +               csr_write(CSR_STIMECMPH, next_tval >> 32);
-> +#else
-> +               csr_write(CSR_STIMECMP, next_tval);
-> +#endif
-> +       } else
-> +               sbi_set_timer(next_tval);
-> +
->         return 0;
->  }
->
-> @@ -165,6 +182,12 @@ static int __init riscv_timer_init_dt(struct device_node *n)
->         if (error)
->                 pr_err("cpu hp setup state failed for RISCV timer [%d]\n",
->                        error);
-> +
-> +       if (riscv_isa_extension_available(NULL, SSTC)) {
-> +               pr_info("Timer interrupt in S-mode is available via sstc extension\n");
-> +               static_branch_enable(&riscv_sstc_available);
-> +       }
-> +
->         return error;
->  }
->
-> --
-> 2.25.1
->
+At the same time, it also ensures existing named CPU model to generate
+the same PT CPUID set as before to not break live migration.
 
+Changes in v2:
+- split out 3 patches (per Eduardo's comment)
+- determine if the named cpu model uses default Intel PT capabilities (to
+  be compatible with the old behavior) by condition that all PT feature
+  leaves are all zero.
+
+v1: https://lore.kernel.org/qemu-devel/20210909144150.1728418-1-xiaoyao.li@intel.com/
+
+Xiaoyao Li (8):
+  target/i386: Print CPUID subleaf info for unsupported feature
+  target/i386/intel-pt: Fix INTEL_PT_ADDR_RANGES_NUM_MASK
+  target/i386/intel-pt: Introduce FeatureWordInfo for Intel PT CPUID
+    leaf 0xD
+  target/i386/intel-pt: print special message for
+    INTEL_PT_ADDR_RANGES_NUM
+  target/i386/intel-pt: Rework/rename the default INTEL-PT feature set
+  target/i386/intel-pt: Enable host pass through of Intel PT
+  target/i386/intel-pt: Define specific PT feature set for
+    IceLake-server and Snowridge
+  target/i386/intel-pt: Access MSR_IA32_RTIT_ADDRn based on guest CPUID
+    configuration
+
+ target/i386/cpu.c     | 291 +++++++++++++++++++++++++++++++-----------
+ target/i386/cpu.h     |  40 +++++-
+ target/i386/kvm/kvm.c |   8 +-
+ 3 files changed, 261 insertions(+), 78 deletions(-)
 
 -- 
-Best Regards
- Guo Ren
+2.27.0
+
