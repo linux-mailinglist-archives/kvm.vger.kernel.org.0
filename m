@@ -2,85 +2,120 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id B818558CB46
-	for <lists+kvm@lfdr.de>; Mon,  8 Aug 2022 17:28:06 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 2D82F58CB54
+	for <lists+kvm@lfdr.de>; Mon,  8 Aug 2022 17:35:24 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S243636AbiHHP2G (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 8 Aug 2022 11:28:06 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40350 "EHLO
+        id S243543AbiHHPfR (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 8 Aug 2022 11:35:17 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44262 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S243316AbiHHP1y (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 8 Aug 2022 11:27:54 -0400
-Received: from mail-pf1-x431.google.com (mail-pf1-x431.google.com [IPv6:2607:f8b0:4864:20::431])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0976214005
-        for <kvm@vger.kernel.org>; Mon,  8 Aug 2022 08:27:54 -0700 (PDT)
-Received: by mail-pf1-x431.google.com with SMTP id b133so8392736pfb.6
-        for <kvm@vger.kernel.org>; Mon, 08 Aug 2022 08:27:54 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc;
-        bh=6EhfGnyFyfo/ortCKW/6YMzIhO+eS1k9nO7B1q/r9pQ=;
-        b=ipcWPQ4r5SOTmHdFaWDyzYl7sr/T8mVvXFrXPnKe3sXnhoCaUiHdceGHpYs4VoIT4g
-         egYf2m1+rJ3W9RLYDihkilDg76flKhNbU2JozYCXUnD0YqnDdswjFiaIonr1YIYriaiu
-         BW81ij6knRBoY9s9PatXvqOPnOs1NdC/VP+KabIrtHffpoki1hBP98jMiRPJZCZLwGdp
-         7tYLL47JtnfP25Y87U5onjHwpwQSe0jHZIXb3Y4I/VW+kJ7tfnRHWj/N2gji9wf/CGp8
-         OYyudyJObGevxU494U7SHLlOxaW4vf6rDWAP0tkFqu2sq6juFi8cI7mo5tYXuDi1mhhW
-         oMEw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc;
-        bh=6EhfGnyFyfo/ortCKW/6YMzIhO+eS1k9nO7B1q/r9pQ=;
-        b=CfOzaC52L+fZCwyZw1xh23oW8j30QL7+YBVs5uO3s6nGbIuz5GXMikHvNWR4/5IbmI
-         Wl2VH+KfEmevlfrM6FvIyJJVmM0s1AcZnqS5O57XVUgkclmyG+bLy++QzWOUg/bsZxkm
-         10U8nU1KdahyZFEf6vPjb4fzEyyq0/StXpCRqu+u9op8ZSVcOHNsMX5OzRZdFF2zimRi
-         ++IFj5bn95IllciSBetnE66SEKgzlgtipJgC5CysT6ZZ/9TqKZQHnsloCnXifRKkjsn0
-         QmZsaGJTTbXXkw5WAHCGN7WrHmznbiEQsqGUnxlBIpaZzg0C7dv7FQ3VtcP2z89tE0jm
-         wv+g==
-X-Gm-Message-State: ACgBeo2VI2KI5WNV62AtyDJ7ppMHNLyABGOXVbIyWTu7j46AfvJewgZI
-        8a23xMOYgNrqF3UkZF1pktip5nh2EZkDSw==
-X-Google-Smtp-Source: AA6agR4Rnf8A+8xtrvnphN11wUQN7ICXf7ikA7BaMe/wYY9EnMpRPjODRrEy9Ai4TjucpuH/tIgKlQ==
-X-Received: by 2002:a63:6304:0:b0:41c:1926:2aa9 with SMTP id x4-20020a636304000000b0041c19262aa9mr15723014pgb.425.1659972473399;
-        Mon, 08 Aug 2022 08:27:53 -0700 (PDT)
-Received: from google.com (7.104.168.34.bc.googleusercontent.com. [34.168.104.7])
-        by smtp.gmail.com with ESMTPSA id 19-20020a170902c21300b0016be368fb30sm8758280pll.212.2022.08.08.08.27.52
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 08 Aug 2022 08:27:52 -0700 (PDT)
-Date:   Mon, 8 Aug 2022 15:27:48 +0000
-From:   Sean Christopherson <seanjc@google.com>
-To:     Michal Luczaj <mhal@rbox.co>
-Cc:     kvm@vger.kernel.org, pbonzini@redhat.com, shuah@kernel.org,
-        linux-kselftest@vger.kernel.org
-Subject: Re: [kvm-unit-tests PATCH v2 1/5] x86: emulator.c cleanup: Save and
- restore exception handlers
-Message-ID: <YvErdKUzy/ML8faK@google.com>
-References: <20220807142832.1576-1-mhal@rbox.co>
- <20220807142832.1576-2-mhal@rbox.co>
+        with ESMTP id S235291AbiHHPfM (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 8 Aug 2022 11:35:12 -0400
+Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 73E941D8
+        for <kvm@vger.kernel.org>; Mon,  8 Aug 2022 08:35:11 -0700 (PDT)
+Received: from pps.filterd (m0098417.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.17.1.5/8.17.1.5) with ESMTP id 278EhcvO010649
+        for <kvm@vger.kernel.org>; Mon, 8 Aug 2022 15:35:10 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=content-type :
+ mime-version : content-transfer-encoding : in-reply-to : references : to :
+ from : subject : cc : message-id : date; s=pp1;
+ bh=SLnkxhjH3YEIj0mMQyDV92oOuLh83a90jRYcf39Ewpg=;
+ b=f/mLpZyClmWHmQQs6hUnsR6bjqZGiX7VFME7ZAbH5PgmbKllFPFjVwKJeSlVVLs4/9wo
+ cVUK658NbUVyys/ID/SdX9ND5NY6mj8g8cmUL3e09Imxhh7E5WznFAnU430QofXiZMx5
+ pxlTZQPzMIvrto2Du5V5SoN7zIV4AMkUCv7FDFGgasX3mCfQllxmfXUq8PF2bA07+pMD
+ 0HkOeli+/EtKy7/fKdkq4UrqNwikXVmZ8RPR3VY3WMP6XZxWjE2DPt7wX04IsaKtfoa5
+ ScMl6nmaGWZg83Rg3Ag/x1y7flpgO0TGnzsn2cQJbv4rw9vKG6kJ91Elw3zYMkIil2FH /A== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3hu4gdhsjx-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT)
+        for <kvm@vger.kernel.org>; Mon, 08 Aug 2022 15:35:10 +0000
+Received: from m0098417.ppops.net (m0098417.ppops.net [127.0.0.1])
+        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 278EiCGW012246
+        for <kvm@vger.kernel.org>; Mon, 8 Aug 2022 15:35:10 GMT
+Received: from ppma04fra.de.ibm.com (6a.4a.5195.ip4.static.sl-reverse.com [149.81.74.106])
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3hu4gdhsj7-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Mon, 08 Aug 2022 15:35:10 +0000
+Received: from pps.filterd (ppma04fra.de.ibm.com [127.0.0.1])
+        by ppma04fra.de.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 278FK8Vw005698;
+        Mon, 8 Aug 2022 15:35:08 GMT
+Received: from b06cxnps3075.portsmouth.uk.ibm.com (d06relay10.portsmouth.uk.ibm.com [9.149.109.195])
+        by ppma04fra.de.ibm.com with ESMTP id 3hsfx8ssde-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Mon, 08 Aug 2022 15:35:08 +0000
+Received: from b06wcsmtp001.portsmouth.uk.ibm.com (b06wcsmtp001.portsmouth.uk.ibm.com [9.149.105.160])
+        by b06cxnps3075.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 278FZ4ID17433000
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Mon, 8 Aug 2022 15:35:04 GMT
+Received: from b06wcsmtp001.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id DABC0A4054;
+        Mon,  8 Aug 2022 15:35:04 +0000 (GMT)
+Received: from b06wcsmtp001.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id BFC3DA405C;
+        Mon,  8 Aug 2022 15:35:04 +0000 (GMT)
+Received: from li-ca45c2cc-336f-11b2-a85c-c6e71de567f1.ibm.com (unknown [9.171.67.147])
+        by b06wcsmtp001.portsmouth.uk.ibm.com (Postfix) with ESMTP;
+        Mon,  8 Aug 2022 15:35:04 +0000 (GMT)
+Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20220807142832.1576-2-mhal@rbox.co>
-X-Spam-Status: No, score=-14.5 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        ENV_AND_HDR_SPF_MATCH,FSL_HELO_FAKE,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,
-        SPF_PASS,T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL
-        autolearn=no autolearn_force=no version=3.4.6
+Content-Transfer-Encoding: quoted-printable
+In-Reply-To: <20220802180605.2b546603@p-imbrenda>
+References: <20220725155420.2009109-1-nrb@linux.ibm.com> <20220725155420.2009109-4-nrb@linux.ibm.com> <20220802180605.2b546603@p-imbrenda>
+To:     Claudio Imbrenda <imbrenda@linux.ibm.com>
+From:   Nico Boehr <nrb@linux.ibm.com>
+Subject: Re: [kvm-unit-tests PATCH v3 3/3] s390x: smp: add tests for calls in wait state
+Cc:     kvm@vger.kernel.org, frankja@linux.ibm.com, thuth@redhat.com
+Message-ID: <165997290456.24812.10898048641766802245@localhost.localdomain>
+User-Agent: alot/0.8.1
+Date:   Mon, 08 Aug 2022 17:35:04 +0200
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: hF7eJggEL7D8u6E0Ay59cPRWhu2yy3iz
+X-Proofpoint-ORIG-GUID: jRPLD-keRP5QSBnveDgX9BU0WHDMYTrk
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.205,Aquarius:18.0.883,Hydra:6.0.517,FMLib:17.11.122.1
+ definitions=2022-08-08_10,2022-08-08_01,2022-06-22_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501 mlxscore=0
+ malwarescore=0 mlxlogscore=814 clxscore=1015 impostorscore=0 phishscore=0
+ bulkscore=0 spamscore=0 suspectscore=0 lowpriorityscore=0 adultscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2206140000
+ definitions=main-2208080075
+X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_EF,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_PASS,
+        T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Sun, Aug 07, 2022, Michal Luczaj wrote:
-> Users of handle_exception() should always save and restore the handlers.
+Quoting Claudio Imbrenda (2022-08-02 18:06:05)
+[...]
+> > diff --git a/s390x/smp.c b/s390x/smp.c
+> > index 12c40cadaed2..d59ca38e7a37 100644
+> > --- a/s390x/smp.c
+> > +++ b/s390x/smp.c
+[...]
+> > +static void test_calls_in_wait(void)
+> > +{
+[...]
+> > +             /*
+> > +              * To avoid races, we need to know that the secondary CPU=
+ has entered wait,
+> > +              * but the architecture provides no way to check whether =
+the secondary CPU
+> > +              * is in wait.
+> > +              *
+> > +              * But since a waiting CPU is considered operating, simpl=
+y stop the CPU, set
+> > +              * up the restart new PSW mask in wait, send the restart =
+interrupt and then
+> > +              * wait until the CPU becomes operating (done by smp_cpu_=
+start).
+> > +              */
+> > +             smp_cpu_stop(1);
+> > +             expect_ext_int();
+>=20
+> which external interrupt are you expecting on this CPU?
 
-Might be worth calling out that #UD is intentionally left alone and will be fixed
-separately.  No need for to spin a new version though, Paolo can add the note (or
-not) if he wants.
-
-> Suggested-by: Sean Christopherson <seanjc@google.com>
-> Signed-off-by: Michal Luczaj <mhal@rbox.co>
-> ---
-
-Reviewed-by: Sean Christopherson <seanjc@google.com>
+Right, leftover code, can be removed. Will be fixed.
