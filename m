@@ -2,162 +2,304 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 5262058DC7D
+	by mail.lfdr.de (Postfix) with ESMTP id 9D36458DC7E
 	for <lists+kvm@lfdr.de>; Tue,  9 Aug 2022 18:52:46 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S245080AbiHIQwn (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 9 Aug 2022 12:52:43 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35390 "EHLO
+        id S245110AbiHIQwp (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 9 Aug 2022 12:52:45 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35392 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S245072AbiHIQwl (ORCPT <rfc822;kvm@vger.kernel.org>);
+        with ESMTP id S245076AbiHIQwl (ORCPT <rfc822;kvm@vger.kernel.org>);
         Tue, 9 Aug 2022 12:52:41 -0400
-Received: from mail-oi1-x22f.google.com (mail-oi1-x22f.google.com [IPv6:2607:f8b0:4864:20::22f])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DC99622BC2
-        for <kvm@vger.kernel.org>; Tue,  9 Aug 2022 09:52:37 -0700 (PDT)
-Received: by mail-oi1-x22f.google.com with SMTP id c185so14530203oia.7
-        for <kvm@vger.kernel.org>; Tue, 09 Aug 2022 09:52:37 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc;
-        bh=U/D22wA89KCZ8FoM5lxlmalnb8zbCkLG8x+Wao6IKHs=;
-        b=gri5en4j1Nf3AVExb/xtD1i/SndOYTeJjQtSC4usRK/O5d48jIap8p682Zeazqp1Pe
-         ipEbBmYcoxs2HYZIFr0omCnqtPLNcjZBirFyZdioPg2ZHJTdjjl3rybGv5A8NN8sEr2D
-         j/46Th9HahRaqHle8jwPoK5mftTBUmii9vmBapkxypM1FxDjqyr8XLKNjh7zeXnt2/do
-         wB/lJlW0htmLpjlsTEnwrlPtWZEKxAXiszhwYqKQSPvWhm0V6psnPZtA7vYtrguTQ8qm
-         P0tnIJh4/g7qzJlNnNSX9XeWQuoDh5KaFvMiDWpq29FKzA3WM7kDA7XCjhYsgnVyiCoB
-         uyiA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc;
-        bh=U/D22wA89KCZ8FoM5lxlmalnb8zbCkLG8x+Wao6IKHs=;
-        b=1S83R3nUtuEHYAa+cjtNV8UiYtJBeapXAvrQnUMASPj8Wxz+aOjQhCI4veOUzyd0U0
-         iwyDCHSQYS+XFBPLBiO6wiRPqvDEA5kFAy1MTFQtmRt0Y2T9Y9y/qpWQuBDCl9xmdlB9
-         ujc4O59HJva7gfRxCq6XZxnTanLlcBE317HhCzu7AK6wM50MIwfaLGDrTpXj0Z9vpnQn
-         A0T2YcrIQ/by5gA0sBSziairNVNOIZEDTBpa+o+Z0KmM1sm5Uo00W8UxKBot90dSH3DH
-         UerBfAOqxmDR8xNYgpH02q8PSERhixYpmAhYKPU3nFfIjrQZNOcK3La6IA2QtIqxVyOP
-         6B2g==
-X-Gm-Message-State: ACgBeo2q4zfyxi9UTG1dVrBsoUsqrbT7mn6Zr9D8NpQ88nzuTW6iwbMa
-        poUnNdwaOCz3mnNeyIs8hWbYqWa2gu4AYCWM48L/Pw==
-X-Google-Smtp-Source: AA6agR4EANbHbB06m6UK0Z8LDAx9jyRV3DCFcB8+aJ4dmS8ZHdO7iP7HvmWEfgbIWxIpnUmtw3QmaRRsASv33ufBVR4=
-X-Received: by 2002:a05:6808:16a3:b0:326:a585:95b8 with SMTP id
- bb35-20020a05680816a300b00326a58595b8mr13853758oib.281.1660063957038; Tue, 09
- Aug 2022 09:52:37 -0700 (PDT)
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 9FB8122BC5
+        for <kvm@vger.kernel.org>; Tue,  9 Aug 2022 09:52:38 -0700 (PDT)
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id E8CE423A;
+        Tue,  9 Aug 2022 09:52:38 -0700 (PDT)
+Received: from monolith.localdoman (unknown [172.31.20.19])
+        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 0CE463F67D;
+        Tue,  9 Aug 2022 09:52:36 -0700 (PDT)
+Date:   Tue, 9 Aug 2022 17:53:13 +0100
+From:   Alexandru Elisei <alexandru.elisei@arm.com>
+To:     Nikos Nikoleris <nikos.nikoleris@arm.com>
+Cc:     pbonzini@redhat.com, thuth@redhat.com, andrew.jones@linux.dev,
+        kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu
+Subject: Re: [kvm-unit-tests RFC PATCH 19/19] arm/arm64: Rework the cache
+ maintenance in asm_mmu_disable
+Message-ID: <YvKQ+VfMHR1XytJK@monolith.localdoman>
+References: <20220809091558.14379-1-alexandru.elisei@arm.com>
+ <20220809091558.14379-20-alexandru.elisei@arm.com>
+ <3fba260d-bfca-14ea-7bdd-3e55f3d1e276@arm.com>
+ <YvJtwWcKkcxLUVif@monolith.localdoman>
+ <3ff46ed4-4c83-2f00-90b0-4407b9c331d5@arm.com>
 MIME-Version: 1.0
-References: <20220801151928.270380-1-vipinsh@google.com> <YuhPT2drgqL+osLl@google.com>
- <YuhoJUoPBOu5eMz8@google.com> <YulRZ+uXFOE1y2dj@google.com>
- <YuldSf4T2j4rIrIo@google.com> <4ccbafb5-9157-ec73-c751-ec71164f8688@redhat.com>
- <Yul3A4CmaAHMui2Z@google.com> <cedcced0-b92c-07bd-ef2b-272ae58fdf40@redhat.com>
- <CAHVum0c=s8DH=p8zJcGzYDsfLY_qHEmvD1uF58h5WoUk6ZF8rQ@mail.gmail.com>
-In-Reply-To: <CAHVum0c=s8DH=p8zJcGzYDsfLY_qHEmvD1uF58h5WoUk6ZF8rQ@mail.gmail.com>
-From:   David Matlack <dmatlack@google.com>
-Date:   Tue, 9 Aug 2022 09:52:10 -0700
-Message-ID: <CALzav=ccxkAWk7ddqbJ_qPL2-=bXVZUEpWgwKpJ1oCtc_8w7WQ@mail.gmail.com>
-Subject: Re: [PATCH] KVM: x86/mmu: Make page tables for eager page splitting
- NUMA aware
-To:     Vipin Sharma <vipinsh@google.com>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>,
-        Sean Christopherson <seanjc@google.com>,
-        kvm list <kvm@vger.kernel.org>,
-        LKML <linux-kernel@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
-X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-        T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL
-        autolearn=unavailable autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <3ff46ed4-4c83-2f00-90b0-4407b9c331d5@arm.com>
+X-Spam-Status: No, score=-6.9 required=5.0 tests=BAYES_00,RCVD_IN_DNSWL_HI,
+        SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Aug 5, 2022 at 4:30 PM Vipin Sharma <vipinsh@google.com> wrote:
-[...]
->
-> Here are the two approaches, please provide feedback on which one
-> looks more appropriate before I start spamming your inbox with my
-> patches
->
-> Approach A:
-> Have per numa node cache for page table pages allocation
->
-> Instead of having only one mmu_shadow_page_cache per vcpu, we provide
-> multiple caches for each node
->
-> either:
-> mmu_shadow_page_cache[MAX_NUMNODES]
-> or
-> mmu_shadow_page_cache->objects[MAX_NUMNODES * KVM_ARCH_NR_OBJS_PER_MEMORY_CACHE]
+Hi,
 
-I think the former approach will work better. The objects[] array is
-allocated dynamically during top-up now, so if a vCPU never allocates
-a page table to map memory on a given node, KVM will never have to
-allocate an objects[] array for that node. Whereas with the latter
-approach KVM would have to allocate the entire objects[] array
-up-front.
+On Tue, Aug 09, 2022 at 04:53:18PM +0100, Nikos Nikoleris wrote:
+> On 09/08/2022 15:22, Alexandru Elisei wrote:
+> > On Tue, Aug 09, 2022 at 02:53:34PM +0100, Nikos Nikoleris wrote:
+> > > Hi Alex,
+> > > 
+> > > On 09/08/2022 10:15, Alexandru Elisei wrote:
+> > > > asm_mmu_disable is overly ambitious and provably incorrect:
+> > > > 
+> > > > 1. It tries to clean and invalidate the data caches for the *entire*
+> > > > memory, which is highly unnecessary, as it's very unlikely that a test
+> > > > will write to the entire memory, and even more unlikely that a test will
+> > > > modify the text section of the test image.
+> > > > 
+> > > 
+> > > While it appears that we don't modify the text section, there is some
+> > > loading happening before we start executing a test. Are you sure that the
+> > > loader doesn't leave the memory dirty?
+> > 
+> > Yes, it's in the boot protocol for Linux [1]. I also mentioned this in the
+> > commit message for the previous patch.
+> > 
+> > [1] https://elixir.bootlin.com/linux/v5.19/source/Documentation/arm64/booting.rst#L180
+> > 
+> 
+> I see, thanks!
+> 
+> Right now {asm_,}mmu_disable() is not used anywhere. So this patch will
+> introduce the assumption that mmu_disable() can be safely called only if we
+> didn't perform any writes, outside the test's stack, doesn't it?
 
->
-> We can decrease KVM_ARCH_NR_OBJS_PER_MEMORY_CACHE to some lower value
-> instead of 40 to control memory consumption.
+This patch introduces the assumption that the code that disables the MMU
+will do the necessary cache maintenance. I should reword the commit
+message to make it clearer.
 
-I'm not sure we are getting any performance benefit from the cache
-size being so high. It doesn't fundamentally change the number of
-times a vCPU thread will have to call __get_free_page(), it just
-batches more of those calls together. Assuming reducing the cache size
-doesn't impact performance, I think it's a good idea to reduce it as
-part of this feature.
+> 
+> When we add support for EFI, there is a lot happening from efi_main() until
+> we get to the point where we can mmu_disable(), cleaning just the (new)
+> stack of the test seems risky.
 
-KVM needs at most PT64_ROOT_MAX_LEVEL (5) page tables to handle a
-fault. So we could decrease the mmu_shadow_page_cache.objects[]
-capacity to PT64_ROOT_MAX_LEVEL (5) and support up to 8 NUMA nodes
-without increasing memory usage. If a user wants to run a VM on an
-even larger machine, I think it's safe to consume a few extra bytes
-for the vCPU shadow page caches at that point (the machine probably
-has 10s of TiB of RAM).
+Well, that's an understatement, the code disabling the MMU definitly needs
+to do the necessary cache maintenance! asm_mmu_disable() is not a silver
+bullet that removes the need to do any cache maintenace, the previous patch
+explains what needs to be done and why. If you're looking for inspiration
+about what maintenance to be done for UEFI, I suggest you look there. Or
+even better, you can reuse that code, which I think is the better approach
+for the UEFI series going forward, but that's a discussion for the UEFI
+thread.
 
->
-> When a fault happens, use the pfn to find which node the page should
-> belong to and use the corresponding cache to get page table pages.
->
-> struct *page = kvm_pfn_to_refcounted_page(pfn);
-> int nid;
-> if(page) {
->       nid = page_to_nid(page);
-> } else {
->      nid = numa_node_id();
-> }
->
-> ...
-> tdp_mmu_alloc_sp(nid, vcpu);
-> ...
->
-> static struct kvm_mmu_page *tdp_mmu_alloc_sp(int nid, struct kvm_vcpu *vcpu) {
-> ...
->       sp->spt = kvm_mmu_memory_cache_alloc(nid,
-> &vcpu->arch.mmu_shadow_page_cache);
-> ...
-> }
->
->
-> Since we are changing cache allocation for page table pages, should we
-> also make similar changes for other caches like mmu_page_header_cache,
-> mmu_gfn_array_cache, and mmu_pte_list_desc_cache? I am not sure how
-> good this idea is.
+> 
+> > > 
+> > > > 2. There is no corresponding dcache invalidate command for the entire
+> > > > memory in asm_mmu_enable, leaving it up to the test that disabled the
+> > > > MMU to do the cache maintenance in an asymmetrical fashion: only for
+> > > > re-enabling the MMU, but not for disabling it.
+> > > > 
+> > > > 3. It's missing the DMB SY memory barrier to ensure that the dcache
+> > > > maintenance is performed after the last store executed in program order
+> > > > before calling asm_mmu_disable.
+> > > > 
+> > > 
+> > > I am not sure why this is needed. In general, iiuc, a store to location x
+> > > followed by a DC CVAC to x in program order don't need an barrier (see Arm
+> > > ARM ARM DDI 0487G.b "Data cache maintenance instructions" at K11.5.1 and
+> > 
+> > Just a note, the latest public version is H.a.
+> > 
+> > K11.5.1 looks to me like it deals with ordering of the cache maintenance
+> > operations with regards to memory accesses that are *after* the CMO in
+> > program order, this patch is about memory accesses that are *before* the
+> > CMO in program order.
+> > 
+> 
+> The AArch64 example in K11.5.1 has a memory instruction before and after the
+> CMO:
+> 
+> STR W5, [X1]
+> DC CVAC, X1
+> DMB ISH
+> STR W0, [X4]
+> 
+> The first store and the DC CVAC access the same cache line and there is no
+> need for a memory barrier in between. The second store is assumed to be to a
+> different location and that's why we need a barrier to order it with respect
+> to the DC CVAC.
 
-We don't currently have a reason to make these objects NUMA-aware, so
-I would only recommend it if it somehow makes the code a lot simpler.
+It's explained why the DMB is not necessary in the section that you've
+referenced. I'll reproduce the paragraph:
 
->
-> Approach B:
-> Ask page from the specific node on fault path with option to fallback
-> to the original cache and default task policy.
->
-> This is what Sean's rough patch looks like.
+"All data cache instructions, other than DC ZVA, that specify an address:
 
-This would definitely be a simpler approach but could increase the
-amount of time a vCPU thread holds the MMU lock when handling a fault,
-since KVM would start performing GFP_NOWAIT allocations under the
-lock. So my preference would be to try the cache approach first and
-see how complex it turns out to be.
+Execute in program order relative to loads or stores that have all of the
+following properties:
+
+—Access an address in Normal memory with either Inner Write Through or
+Inner Write Back attributes within the same cache line of minimum size, as
+indicated by CTR_EL0.DMinLine.
+
+—Use an address with the same cacheability attributes as the address passed
+to the data cache instruction."
+
+Both the store and the dcache clean access the same cache line, indexed by
+the adress in register X1. Does that make sense to you?
+
+> 
+> > > "Ordering and completion of data and instruction cache instructions" at
+> > > D4-2656). It doesn't hurt to have it but I think it's unnecessary.
+> > 
+> > D4-2656 is about PAC, I assume you meant D4-2636 judging from the section
+> > name (please correct me if I'm wrong): >
+> > "All data cache instructions, other than DC ZVA, that specify an address:
+> > [..]
+> > Can execute in any order relative to loads or stores that access any
+> > address with the Device memory attribute, or with Normal memory with Inner
+> > Non-cacheable attribute unless a DMB or DSB is executed between the
+> > instructions."
+> > 
+> > Since the maintenance is performed with the MMU off, I think the DMB SY is
+> > required as per the architecture.
+> > 
+> > I prefer to keep the maintenance after the MMU is disabled, to allow for
+> > any kind of translation table setups that a test might conjure up (a test
+> > in theory can create and install its own translation tables).
+> > 
+> 
+> Right, so between the stores and the DC CVAC, we've switched the MMU off, in
+> which case the DMB SY might be necessary. I was missing this part.
+                       ^^^^^^^^^^^^^^^^^^^
+		       might be necessary or might be **unnecessary**?
+
+I would say that it's definitely unecessary according to the
+architecture, not "might be".
+
+> 
+> The benefits of this design choice (switch the MMU off then clean data) are
+> still unclear to me. This patch is modifying the CMO operation to perform
+> only a clean. Why can't we clean the data cache before we switch off the MMU
+> and use the same translation we used to write to it.
+
+What do you mean by "translation"? Same VA to PA mapping? Or same address
+attributes? If it's the latter, the architecture is pretty clear that this
+is correct and expected.
+
+If it's the VA to PA mapping, asm_mmu_disable is called with an identify
+mapped stack, otherwise following the ret at the end of the function,
+asm_mmu_disable would not return to the calling function (when the MMU is
+disabled, all addresses are flat mapped, and x30/lr will point to some
+bogus address). mmu_disable() even has an assert to check that the stack is
+identify mapped.
+
+So I really do think that the order of the operations is correct. Unless
+you can prove otherwise.
+
+Why is it so important to you that the dcache is cleaned with the MMU on?
+It's correct either way, so I'm interested to know why you are so keen on
+doing it with the MMU enabled. I've already told you my reason for doing it
+with the MMU disabled, I'm waiting to hear yours.
+
+Thanks,
+Alex
+
+> 
+> Thanks,
+> 
+> Nikos
+> 
+> > Thanks,
+> > Alex
+> > 
+> > > 
+> > > Thanks,
+> > > 
+> > > Nikos
+> > > 
+> > > > Fix all of the issues in one go, by doing the cache maintenance only for
+> > > > the stack, as that is out of the control of the C code, and add the missing
+> > > > memory barrier.
+> > > > 
+> > > > The code used to test that mmu_disable works correctly is similar to the
+> > > > code used to test commit 410b3bf09e76 ("arm/arm64: Perform dcache clean
+> > > > + invalidate after turning MMU off"), with extra cache maintenance
+> > > > added:
+> > > > 
+> > > > +#include <alloc_page.h>
+> > > > +#include <asm/cacheflush.h>
+> > > > +#include <asm/mmu.h>
+> > > >    int main(int argc, char **argv)
+> > > >    {
+> > > > +       int *x = alloc_page();
+> > > > +       bool pass = true;
+> > > > +       int i;
+> > > > +
+> > > > +       for  (i = 0; i < 1000000; i++) {
+> > > > +               *x = 0x42;
+> > > > +               dcache_clean_addr_poc((unsigned long)x);
+> > > > +               mmu_disable();
+> > > > +               if (*x != 0x42) {
+> > > > +                       pass = false;
+> > > > +                       break;
+> > > > +               }
+> > > > +               *x = 0x50;
+> > > > +               /* Needed for the invalidation only. */
+> > > > +               dcache_clean_inval_addr_poc((unsigned long)x);
+> > > > +               mmu_enable(current_thread_info()->pgtable);
+> > > > +               if (*x != 0x50) {
+> > > > +                       pass = false;
+> > > > +                       break;
+> > > > +               }
+> > > > +       }
+> > > > +       report(pass, "MMU disable cache maintenance");
+> > > > 
+> > > > Signed-off-by: Alexandru Elisei <alexandru.elisei@arm.com>
+> > > > ---
+> > > >    arm/cstart.S   | 11 ++++++-----
+> > > >    arm/cstart64.S | 11 +++++------
+> > > >    2 files changed, 11 insertions(+), 11 deletions(-)
+> > > > 
+> > > > diff --git a/arm/cstart.S b/arm/cstart.S
+> > > > index fc7c558802f1..b27de44f30a6 100644
+> > > > --- a/arm/cstart.S
+> > > > +++ b/arm/cstart.S
+> > > > @@ -242,11 +242,12 @@ asm_mmu_disable:
+> > > >    	mcr	p15, 0, r0, c1, c0, 0
+> > > >    	isb
+> > > > -	ldr	r0, =__phys_offset
+> > > > -	ldr	r0, [r0]
+> > > > -	ldr	r1, =__phys_end
+> > > > -	ldr	r1, [r1]
+> > > > -	dcache_by_line_op dccimvac, sy, r0, r1, r2, r3
+> > > > +	dmb	sy
+> > > > +	mov	r0, sp
+> > > > +	lsr	r0, #THREAD_SHIFT
+> > > > +	lsl	r0, #THREAD_SHIFT
+> > > > +	add	r1, r0, #THREAD_SIZE
+> > > > +	dcache_by_line_op dccmvac, sy, r0, r1, r3, r4
+> > > >    	mov     pc, lr
+> > > > diff --git a/arm/cstart64.S b/arm/cstart64.S
+> > > > index 1ce6b9e14d23..af4970775298 100644
+> > > > --- a/arm/cstart64.S
+> > > > +++ b/arm/cstart64.S
+> > > > @@ -283,12 +283,11 @@ asm_mmu_disable:
+> > > >    	msr	sctlr_el1, x0
+> > > >    	isb
+> > > > -	/* Clean + invalidate the entire memory */
+> > > > -	adrp	x0, __phys_offset
+> > > > -	ldr	x0, [x0, :lo12:__phys_offset]
+> > > > -	adrp	x1, __phys_end
+> > > > -	ldr	x1, [x1, :lo12:__phys_end]
+> > > > -	dcache_by_line_op civac, sy, x0, x1, x2, x3
+> > > > +	dmb	sy
+> > > > +	mov	x9, sp
+> > > > +	and	x9, x9, #THREAD_MASK
+> > > > +	add	x10, x9, #THREAD_SIZE
+> > > > +	dcache_by_line_op cvac, sy, x9, x10, x11, x12
+> > > >    	ret
