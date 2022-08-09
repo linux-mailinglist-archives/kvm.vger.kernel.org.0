@@ -2,99 +2,90 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id D7BA458D3F1
-	for <lists+kvm@lfdr.de>; Tue,  9 Aug 2022 08:41:58 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 6D78058D456
+	for <lists+kvm@lfdr.de>; Tue,  9 Aug 2022 09:16:45 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237907AbiHIGl4 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 9 Aug 2022 02:41:56 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50368 "EHLO
+        id S238723AbiHIHQn (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 9 Aug 2022 03:16:43 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44516 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229886AbiHIGlz (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 9 Aug 2022 02:41:55 -0400
-Received: from gandalf.ozlabs.org (mail.ozlabs.org [IPv6:2404:9400:2221:ea00::3])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2E3DC201AC;
-        Mon,  8 Aug 2022 23:41:54 -0700 (PDT)
-Received: from authenticated.ozlabs.org (localhost [127.0.0.1])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange ECDHE (P-256) server-signature RSA-PSS (4096 bits) server-digest SHA256)
+        with ESMTP id S238173AbiHIHQl (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 9 Aug 2022 03:16:41 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id E9EE320BFC
+        for <kvm@vger.kernel.org>; Tue,  9 Aug 2022 00:16:40 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1660029400;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=pFDs6xidhpbw1qYaUFr1MfUDhoMVpVETbRmiPl3tRsM=;
+        b=fXa1CMGcAXRVWNbH3E/l6WQrDeXMQ20xhdrLw5OvDmN+dmqEB4kG2lH6s3hGyrN2qtu01M
+        kFD90sce6ZgEz7J5uKMS/xlqUQTsG94jHmgV5bVcwOSAL6zMnqlO++Uxo1MNdFvwgD6cWf
+        Xq+U71d4E8kv2DHjKENTSANZMayCez8=
+Received: from mimecast-mx02.redhat.com (mx3-rdu2.redhat.com
+ [66.187.233.73]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-607-wVvB783QNq-aMoXaZIWmxA-1; Tue, 09 Aug 2022 03:16:38 -0400
+X-MC-Unique: wVvB783QNq-aMoXaZIWmxA-1
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.rdu2.redhat.com [10.11.54.7])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mail.ozlabs.org (Postfix) with ESMTPSA id 4M23Q51vQhz4x1J;
-        Tue,  9 Aug 2022 16:41:49 +1000 (AEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=canb.auug.org.au;
-        s=201702; t=1660027309;
-        bh=t7xPe4mFK0bZ6Qo96hN1grLRamjl9/fDy4qsW9o1yao=;
-        h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-        b=fEbx9fu5mU8mWYGSWVZ5+wtKaxv+E9YaCe1bRVLFHGRUXJhYWtWcwJrhk3CbrykJP
-         TEQrShx2I6T8+g0npT8t9qDKmdmeyQlJr154kSxgYCKK8JniNX95FS5949rUHF8FZY
-         2hPqrGWTw+HdjVFREU7egoRgdoJJLH5WaatNPs6ioJQLnhpG4yORiSs0f9XAnO4LFW
-         Y486lKak2wAa6j8U4FDCjtZx45VQ7e2fhbocCJyjeulvX1zGzHv7fpS3dJLX7/4M+u
-         H8nABk1lnFNM9OoKcoBbNl0pbBnHgni0OwlvrM91bPG0OZeE8zRNBNV3MIwsygOwg7
-         f8ENTCNn++M3g==
-Date:   Tue, 9 Aug 2022 16:41:47 +1000
-From:   Stephen Rothwell <sfr@canb.auug.org.au>
-To:     Paolo Bonzini <pbonzini@redhat.com>, KVM <kvm@vger.kernel.org>
-Cc:     Ben Gardon <bgardon@google.com>,
-        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-        Linux Next Mailing List <linux-next@vger.kernel.org>
-Subject: Re: linux-next: build warning after merge of the kvm tree
-Message-ID: <20220809164147.131f87d0@canb.auug.org.au>
-In-Reply-To: <20220627181937.3be67263@canb.auug.org.au>
-References: <20220627181937.3be67263@canb.auug.org.au>
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 37B753801FE4;
+        Tue,  9 Aug 2022 07:16:38 +0000 (UTC)
+Received: from oldenburg.str.redhat.com (unknown [10.39.193.65])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id 2DC411415125;
+        Tue,  9 Aug 2022 07:16:35 +0000 (UTC)
+From:   Florian Weimer <fweimer@redhat.com>
+To:     Gavin Shan <gshan@redhat.com>
+Cc:     kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org,
+        linux-kselftest@vger.kernel.org, linux-kernel@vger.kernel.org,
+        pbonzini@redhat.com, maz@kernel.org, oliver.upton@linux.dev,
+        andrew.jones@linux.dev, seanjc@google.com,
+        mathieu.desnoyers@efficios.com, yihyu@redhat.com,
+        shan.gavin@gmail.com
+Subject: Re: [PATCH 1/2] KVM: selftests: Make rseq compatible with glibc-2.35
+References: <20220809060627.115847-1-gshan@redhat.com>
+        <20220809060627.115847-2-gshan@redhat.com>
+        <8735e6ncxw.fsf@oldenburg.str.redhat.com>
+        <7844e3fa-e49e-de75-e424-e82d3a023dd6@redhat.com>
+Date:   Tue, 09 Aug 2022 09:16:33 +0200
+In-Reply-To: <7844e3fa-e49e-de75-e424-e82d3a023dd6@redhat.com> (Gavin Shan's
+        message of "Tue, 9 Aug 2022 18:45:26 +1000")
+Message-ID: <87o7wtnay6.fsf@oldenburg.str.redhat.com>
+User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/27.2 (gnu/linux)
 MIME-Version: 1.0
-Content-Type: multipart/signed; boundary="Sig_/I9PiRdCK0D2PIzWbH9QXuTA";
- protocol="application/pgp-signature"; micalg=pgp-sha256
-X-Spam-Status: No, score=-2.7 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,RCVD_IN_DNSWL_LOW,SPF_HELO_PASS,SPF_PASS,
-        T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
+Content-Type: text/plain
+X-Scanned-By: MIMEDefang 2.85 on 10.11.54.7
+X-Spam-Status: No, score=-3.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,
+        SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
---Sig_/I9PiRdCK0D2PIzWbH9QXuTA
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: quoted-printable
+* Gavin Shan:
 
-Hi all,
-
-On Mon, 27 Jun 2022 18:19:37 +1000 Stephen Rothwell <sfr@canb.auug.org.au> =
-wrote:
+>> __builtin_thread_pointer doesn't work on all architectures/GCC
+>> versions.
+>> Is this a problem for selftests?
+>> 
 >
-> After merging the kvm tree, today's linux-next build (htmldocs) produced
-> this warning:
->=20
-> Documentation/virt/kvm/api.rst:8210: WARNING: Title underline too short.
->=20
-> 8.38 KVM_CAP_VM_DISABLE_NX_HUGE_PAGES
-> ---------------------------
-> Documentation/virt/kvm/api.rst:8217: WARNING: Unexpected indentation.
->=20
-> Introduced by commit
->=20
->   084cc29f8bbb ("KVM: x86/MMU: Allow NX huge pages to be disabled on a pe=
-r-vm basis")
+> It's a problem as the test case is running on all architectures. I think I
+> need introduce our own __builtin_thread_pointer() for where it's not
+> supported: (1) PowerPC  (2) x86 without GCC 11
+>
+> Please let me know if I still have missed cases where
+> __buitin_thread_pointer() isn't supported?
 
-I am still seeing these warnings.  That commit is now in Linus' tree :-(
+As far as I know, these are the two outliers that also have rseq
+support.  The list is a bit longer if we also consider non-rseq
+architectures (csky, hppa, ia64, m68k, microblaze, sparc, don't know
+about the Linux architectures without glibc support).
 
---=20
-Cheers,
-Stephen Rothwell
+Thanks,
+Florian
 
---Sig_/I9PiRdCK0D2PIzWbH9QXuTA
-Content-Type: application/pgp-signature
-Content-Description: OpenPGP digital signature
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEENIC96giZ81tWdLgKAVBC80lX0GwFAmLyAasACgkQAVBC80lX
-0GxzEAf8DP+uDFaAE+MwTdQRewbg4DOgLjJ6S87Udp7ChDA/l/VwhJcm8XSgZv84
-on5HcTl70X6U8/8+yeU9EIn6tDNXOhM4cn9gRe/WgLkZ0ziOQ+WhOl7cny1NIqNO
-MqmRU37tLuWwJLLprRjsL8T4ylnvonwpR0xPDo2WVksahg218nG6C2/IU5J0v1yn
-1e/703shgbXHfkxBzEo11BUWPU0ALlKaVrdq9Sj34kU9NPBddA4xmrLuRX42D2QT
-pj4bf4C5eRaMTVrbMOl8tZjSNtcReOuHCnWsmyTKvxANkCzZsg/QEvL0d8spq4Ug
-kYwBn0VucKHXqvbu/7zKjXRM4LLg4Q==
-=C1gV
------END PGP SIGNATURE-----
-
---Sig_/I9PiRdCK0D2PIzWbH9QXuTA--
