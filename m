@@ -2,172 +2,170 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 407FC58D6B2
-	for <lists+kvm@lfdr.de>; Tue,  9 Aug 2022 11:46:12 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 0CDF358D6BA
+	for <lists+kvm@lfdr.de>; Tue,  9 Aug 2022 11:48:59 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236932AbiHIJqJ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 9 Aug 2022 05:46:09 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39170 "EHLO
+        id S239247AbiHIJs5 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 9 Aug 2022 05:48:57 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40890 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234415AbiHIJp7 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 9 Aug 2022 05:45:59 -0400
-Received: from mail.sberdevices.ru (mail.sberdevices.ru [45.89.227.171])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 527BF22B33;
-        Tue,  9 Aug 2022 02:45:54 -0700 (PDT)
-Received: from s-lin-edge02.sberdevices.ru (localhost [127.0.0.1])
-        by mail.sberdevices.ru (Postfix) with ESMTP id 5676D5FD05;
-        Tue,  9 Aug 2022 12:45:53 +0300 (MSK)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=sberdevices.ru;
-        s=mail; t=1660038353;
-        bh=IGkP5efRwetbWNENRXfmghJykzmtvL4M8qfOS/4+dCg=;
-        h=From:To:Subject:Date:Message-ID:Content-Type:MIME-Version;
-        b=VZ0A/yjl9PctemwH18AaXxKD8a2Yl2XDkcgBdL85nxOGMLqfe1RFDhVfI0tpqnmOc
-         oOy5oupGAZdcUI+I4A8V8eSamoCGHDA2vIA3xcLSDslYsZWwElMPdDnRRvjXXpTYNL
-         15XqkpzG4+c3cvTfoigf4xXdU0d2KfQbac8rDxy0mA+/3mvVbZrXkBeWsV2JhXOwES
-         AycNnc8811ZR6V1SExgcQgeiNtF0KU2Mv+gk/6TW9bEg7p/MAYGVhtWx1sGxcsUj81
-         5ziyCoy4myX4t78roGFQJyBgP/NPbPWJCAcso4mXb6YXF9l4qn8OSGKgSwQwZjE+O8
-         Go23ukI2ma/iQ==
-Received: from S-MS-EXCH02.sberdevices.ru (S-MS-EXCH02.sberdevices.ru [172.16.1.5])
-        by mail.sberdevices.ru (Postfix) with ESMTP;
-        Tue,  9 Aug 2022 12:45:52 +0300 (MSK)
-From:   Arseniy Krasnov <AVKrasnov@sberdevices.ru>
-To:     Stefano Garzarella <sgarzare@redhat.com>
-CC:     "David S. Miller" <davem@davemloft.net>,
-        "edumazet@google.com" <edumazet@google.com>,
-        Jakub Kicinski <kuba@kernel.org>,
-        Paolo Abeni <pabeni@redhat.com>,
-        "kys@microsoft.com" <kys@microsoft.com>,
-        "haiyangz@microsoft.com" <haiyangz@microsoft.com>,
-        "sthemmin@microsoft.com" <sthemmin@microsoft.com>,
-        "wei.liu@kernel.org" <wei.liu@kernel.org>,
-        "Dexuan Cui" <decui@microsoft.com>,
-        Stefan Hajnoczi <stefanha@redhat.com>,
-        Bryan Tan <bryantan@vmware.com>,
-        Vishnu Dasa <vdasa@vmware.com>,
-        "VMware PV-Drivers Reviewers" <pv-drivers@vmware.com>,
-        Krasnov Arseniy <oxffffaa@gmail.com>,
-        "virtualization@lists.linux-foundation.org" 
-        <virtualization@lists.linux-foundation.org>,
-        "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "linux-hyperv@vger.kernel.org" <linux-hyperv@vger.kernel.org>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        kernel <kernel@sberdevices.ru>
-Subject: Re: [RFC PATCH v3 1/9] vsock: SO_RCVLOWAT transport set callback
-Thread-Topic: [RFC PATCH v3 1/9] vsock: SO_RCVLOWAT transport set callback
-Thread-Index: AQHYp0ATlQNqO/GwP0WKlu98/YZplK2koQqAgAAB2ICAAYOigIAAAlCA
-Date:   Tue, 9 Aug 2022 09:45:47 +0000
-Message-ID: <d9bd1c16-7096-d267-a0ff-d3742b0dcf56@sberdevices.ru>
-References: <2ac35e2c-26a8-6f6d-2236-c4692600db9e@sberdevices.ru>
- <45822644-8e37-1625-5944-63fd5fc20dd3@sberdevices.ru>
- <20220808102335.nkviqobpgcmcaqhn@sgarzare-redhat>
- <CAGxU2F513N+0sB0fEz4EF7+NeELhW9w9Rk6hh5K7QQO+eXRymA@mail.gmail.com>
- <1ea271c1-d492-d7f7-5016-7650a72b6139@sberdevices.ru>
-In-Reply-To: <1ea271c1-d492-d7f7-5016-7650a72b6139@sberdevices.ru>
-Accept-Language: en-US, ru-RU
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-x-originating-ip: [172.16.1.12]
-Content-Type: text/plain; charset="utf-8"
-Content-ID: <D2868DFFEAF5C640B9B38E18318BDD06@sberdevices.ru>
-Content-Transfer-Encoding: base64
+        with ESMTP id S238705AbiHIJs4 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 9 Aug 2022 05:48:56 -0400
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 7C8101EADD
+        for <kvm@vger.kernel.org>; Tue,  9 Aug 2022 02:48:55 -0700 (PDT)
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 0801B23A;
+        Tue,  9 Aug 2022 02:48:56 -0700 (PDT)
+Received: from monolith.localdoman (unknown [172.31.20.19])
+        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 270AD3F67D;
+        Tue,  9 Aug 2022 02:48:54 -0700 (PDT)
+Date:   Tue, 9 Aug 2022 10:49:39 +0100
+From:   Alexandru Elisei <alexandru.elisei@arm.com>
+To:     pbonzini@redhat.com, thuth@redhat.com, andrew.jones@linux.dev,
+        kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu,
+        nikos.nikoleris@arm.com
+Subject: Re: [kvm-unit-tests RFC PATCH 00/19] arm/arm64: Rework cache
+ maintenance at boot
+Message-ID: <YvItLoy20gj+WWGk@monolith.localdoman>
+References: <20220809091558.14379-1-alexandru.elisei@arm.com>
 MIME-Version: 1.0
-X-KSMG-Rule-ID: 4
-X-KSMG-Message-Action: clean
-X-KSMG-AntiSpam-Status: not scanned, disabled by settings
-X-KSMG-AntiSpam-Interceptor-Info: not scanned
-X-KSMG-AntiPhishing: not scanned, disabled by settings
-X-KSMG-AntiVirus: Kaspersky Secure Mail Gateway, version 1.1.2.30, bases: 2022/08/09 07:32:00 #20083496
-X-KSMG-AntiVirus-Status: Clean, skipped
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,SPF_HELO_NONE,SPF_PASS,
-        T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20220809091558.14379-1-alexandru.elisei@arm.com>
+X-Spam-Status: No, score=-6.9 required=5.0 tests=BAYES_00,RCVD_IN_DNSWL_HI,
+        SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-T24gMDkuMDguMjAyMiAxMjozNywgQXJzZW5peSBLcmFzbm92IHdyb3RlOg0KPiBPbiAwOC4wOC4y
-MDIyIDEzOjMwLCBTdGVmYW5vIEdhcnphcmVsbGEgd3JvdGU6DQo+PiBPbiBNb24sIEF1ZyA4LCAy
-MDIyIGF0IDEyOjIzIFBNIFN0ZWZhbm8gR2FyemFyZWxsYSA8c2dhcnphcmVAcmVkaGF0LmNvbT4g
-d3JvdGU6DQo+Pj4NCj4+PiBPbiBXZWQsIEF1ZyAwMywgMjAyMiBhdCAwMTo1MTowNVBNICswMDAw
-LCBBcnNlbml5IEtyYXNub3Ygd3JvdGU6DQo+Pj4+IFRoaXMgYWRkcyB0cmFuc3BvcnQgc3BlY2lm
-aWMgY2FsbGJhY2sgZm9yIFNPX1JDVkxPV0FULCBiZWNhdXNlIGluIHNvbWUNCj4+Pj4gdHJhbnNw
-b3J0cyBpdCBtYXkgYmUgZGlmZmljdWx0IHRvIGtub3cgY3VycmVudCBhdmFpbGFibGUgbnVtYmVy
-IG9mIGJ5dGVzDQo+Pj4+IHJlYWR5IHRvIHJlYWQuIFRodXMsIHdoZW4gU09fUkNWTE9XQVQgaXMg
-c2V0LCB0cmFuc3BvcnQgbWF5IHJlamVjdCBpdC4NCj4+Pj4NCj4+Pj4gU2lnbmVkLW9mZi1ieTog
-QXJzZW5peSBLcmFzbm92IDxBVktyYXNub3ZAc2JlcmRldmljZXMucnU+DQo+Pj4+IC0tLQ0KPj4+
-PiBpbmNsdWRlL25ldC9hZl92c29jay5oICAgfCAgMSArDQo+Pj4+IG5ldC92bXdfdnNvY2svYWZf
-dnNvY2suYyB8IDI1ICsrKysrKysrKysrKysrKysrKysrKysrKysNCj4+Pj4gMiBmaWxlcyBjaGFu
-Z2VkLCAyNiBpbnNlcnRpb25zKCspDQo+Pj4+DQo+Pj4+IGRpZmYgLS1naXQgYS9pbmNsdWRlL25l
-dC9hZl92c29jay5oIGIvaW5jbHVkZS9uZXQvYWZfdnNvY2suaA0KPj4+PiBpbmRleCBmNzQyZTUw
-MjA3ZmIuLmVhZTU4NzRiYWUzNSAxMDA2NDQNCj4+Pj4gLS0tIGEvaW5jbHVkZS9uZXQvYWZfdnNv
-Y2suaA0KPj4+PiArKysgYi9pbmNsdWRlL25ldC9hZl92c29jay5oDQo+Pj4+IEBAIC0xMzQsNiAr
-MTM0LDcgQEAgc3RydWN0IHZzb2NrX3RyYW5zcG9ydCB7DQo+Pj4+ICAgICAgIHU2NCAoKnN0cmVh
-bV9yY3ZoaXdhdCkoc3RydWN0IHZzb2NrX3NvY2sgKik7DQo+Pj4+ICAgICAgIGJvb2wgKCpzdHJl
-YW1faXNfYWN0aXZlKShzdHJ1Y3QgdnNvY2tfc29jayAqKTsNCj4+Pj4gICAgICAgYm9vbCAoKnN0
-cmVhbV9hbGxvdykodTMyIGNpZCwgdTMyIHBvcnQpOw0KPj4+PiArICAgICAgaW50ICgqc2V0X3Jj
-dmxvd2F0KShzdHJ1Y3QgdnNvY2tfc29jayAqLCBpbnQpOw0KPj4+DQo+Pj4gY2hlY2twYXRjaCBz
-dWdnZXN0cyB0byBhZGQgaWRlbnRpZmllciBuYW1lcy4gRm9yIHNvbWUgd2UgcHV0IHRoZW0gaW4s
-DQo+Pj4gZm9yIG90aGVycyB3ZSBkaWRuJ3QsIGJ1dCBJIHN1Z2dlc3QgcHV0dGluZyB0aGVtIGlu
-IGZvciB0aGUgbmV3IG9uZXMNCj4+PiBiZWNhdXNlIEkgdGhpbmsgaXQncyBjbGVhcmVyIHRvby4N
-Cj4+Pg0KPj4+IFdBUk5JTkc6IGZ1bmN0aW9uIGRlZmluaXRpb24gYXJndW1lbnQgJ3N0cnVjdCB2
-c29ja19zb2NrIConIHNob3VsZCBhbHNvDQo+Pj4gaGF2ZSBhbiBpZGVudGlmaWVyIG5hbWUNCj4+
-PiAjMjU6IEZJTEU6IGluY2x1ZGUvbmV0L2FmX3Zzb2NrLmg6MTM3Og0KPj4+ICsgICAgICAgaW50
-ICgqc2V0X3Jjdmxvd2F0KShzdHJ1Y3QgdnNvY2tfc29jayAqLCBpbnQpOw0KPj4+DQo+Pj4gV0FS
-TklORzogZnVuY3Rpb24gZGVmaW5pdGlvbiBhcmd1bWVudCAnaW50JyBzaG91bGQgYWxzbyBoYXZl
-IGFuIGlkZW50aWZpZXIgbmFtZQ0KPj4+ICMyNTogRklMRTogaW5jbHVkZS9uZXQvYWZfdnNvY2su
-aDoxMzc6DQo+Pj4gKyAgICAgICBpbnQgKCpzZXRfcmN2bG93YXQpKHN0cnVjdCB2c29ja19zb2Nr
-ICosIGludCk7DQo+Pj4NCj4+PiB0b3RhbDogMCBlcnJvcnMsIDIgd2FybmluZ3MsIDAgY2hlY2tz
-LCA0NCBsaW5lcyBjaGVja2VkDQo+Pj4NCj4+Pj4NCj4+Pj4gICAgICAgLyogU0VRX1BBQ0tFVC4g
-Ki8NCj4+Pj4gICAgICAgc3NpemVfdCAoKnNlcXBhY2tldF9kZXF1ZXVlKShzdHJ1Y3QgdnNvY2tf
-c29jayAqdnNrLCBzdHJ1Y3QgbXNnaGRyICptc2csDQo+Pj4+IGRpZmYgLS1naXQgYS9uZXQvdm13
-X3Zzb2NrL2FmX3Zzb2NrLmMgYi9uZXQvdm13X3Zzb2NrL2FmX3Zzb2NrLmMNCj4+Pj4gaW5kZXgg
-ZjA0YWJmNjYyZWM2Li4wMTZhZDVmZjc4YjcgMTAwNjQ0DQo+Pj4+IC0tLSBhL25ldC92bXdfdnNv
-Y2svYWZfdnNvY2suYw0KPj4+PiArKysgYi9uZXQvdm13X3Zzb2NrL2FmX3Zzb2NrLmMNCj4+Pj4g
-QEAgLTIxMjksNiArMjEyOSwzMCBAQCB2c29ja19jb25uZWN0aWJsZV9yZWN2bXNnKHN0cnVjdCBz
-b2NrZXQgKnNvY2ssIHN0cnVjdCBtc2doZHIgKm1zZywgc2l6ZV90IGxlbiwNCj4+Pj4gICAgICAg
-cmV0dXJuIGVycjsNCj4+Pj4gfQ0KPj4+Pg0KPj4+PiArc3RhdGljIGludCB2c29ja19zZXRfcmN2
-bG93YXQoc3RydWN0IHNvY2sgKnNrLCBpbnQgdmFsKQ0KPj4+PiArew0KPj4+PiArICAgICAgY29u
-c3Qgc3RydWN0IHZzb2NrX3RyYW5zcG9ydCAqdHJhbnNwb3J0Ow0KPj4+PiArICAgICAgc3RydWN0
-IHZzb2NrX3NvY2sgKnZzazsNCj4+Pj4gKyAgICAgIGludCBlcnIgPSAwOw0KPj4+PiArDQo+Pj4+
-ICsgICAgICB2c2sgPSB2c29ja19zayhzayk7DQo+Pj4+ICsNCj4+Pj4gKyAgICAgIGlmICh2YWwg
-PiB2c2stPmJ1ZmZlcl9zaXplKQ0KPj4+PiArICAgICAgICAgICAgICByZXR1cm4gLUVJTlZBTDsN
-Cj4+Pj4gKw0KPj4+PiArICAgICAgdHJhbnNwb3J0ID0gdnNrLT50cmFuc3BvcnQ7DQo+Pj4+ICsN
-Cj4+Pj4gKyAgICAgIGlmICghdHJhbnNwb3J0KQ0KPj4+PiArICAgICAgICAgICAgICByZXR1cm4g
-LUVPUE5PVFNVUFA7DQo+Pj4NCj4+PiBJIGRvbid0IGtub3cgd2hldGhlciBpdCBpcyBiZXR0ZXIg
-aW4gdGhpcyBjYXNlIHRvIHdyaXRlIGl0IGluDQo+Pj4gc2stPnNrX3Jjdmxvd2F0LCBtYXliZSB3
-ZSBjYW4gcmV0dXJuIEVPUE5PVFNVUFAgb25seSB3aGVuIHRoZSB0cmFzcG9ydA0KPj4+IGlzIGFz
-c2lnbmVkIGFuZCBzZXRfcmN2bG93YXQgaXMgbm90IGRlZmluZWQuIFRoaXMgaXMgYmVjYXVzZSB1
-c3VhbGx5IHRoZQ0KPj4+IG9wdGlvbnMgYXJlIHNldCBqdXN0IGFmdGVyIGNyZWF0aW9uLCB3aGVu
-IHRoZSB0cmFuc3BvcnQgaXMgcHJhY3RpY2FsbHkNCj4+PiB1bmFzc2lnbmVkLg0KPj4+DQo+Pj4g
-SSBtZWFuIHNvbWV0aGluZyBsaWtlIHRoaXM6DQo+Pj4NCj4+PiAgICAgICAgICBpZiAodHJhbnNw
-b3J0KSB7DQo+Pj4gICAgICAgICAgICAgICAgICBpZiAodHJhbnNwb3J0LT5zZXRfcmN2bG93YXQp
-DQo+Pj4gICAgICAgICAgICAgICAgICAgICAgICAgIHJldHVybiB0cmFuc3BvcnQtPnNldF9yY3Zs
-b3dhdCh2c2ssIHZhbCk7DQo+Pj4gICAgICAgICAgICAgICAgICBlbHNlDQo+Pj4gICAgICAgICAg
-ICAgICAgICAgICAgICAgIHJldHVybiAtRU9QTk9UU1VQUDsNCj4+PiAgICAgICAgICB9DQo+Pj4N
-Cj4+PiAgICAgICAgICBXUklURV9PTkNFKHNrLT5za19yY3Zsb3dhdCwgdmFsID8gOiAxKTsNCj4+
-Pg0KPj4+ICAgICAgICAgIHJldHVybiAwOw0KPj4NCj4+IFNpbmNlIGh2X3NvY2sgaW1wbGVtZW50
-cyBgc2V0X3Jjdmxvd2F0YCB0byByZXR1cm4gRU9QTk9UU1VQUC4gbWF5YmUgd2UgDQo+PiBjYW4g
-anVzdCBkbyB0aGUgZm9sbG93aW5nOg0KPj4NCj4+ICAgICAgICAgaWYgKHRyYW5zcG9ydCAmJiB0
-cmFuc3BvcnQtPnNldF9yY3Zsb3dhdCkNCj4+ICAgICAgICAgICAgICAgICByZXR1cm4gdHJhbnNw
-b3J0LT5zZXRfcmN2bG93YXQodnNrLCB2YWwpOw0KPj4NCj4+ICAgICAgICAgV1JJVEVfT05DRShz
-ay0+c2tfcmN2bG93YXQsIHZhbCA/IDogMSk7DQo+PiAgICAgICAgIHJldHVybiAwOw0KPj4NCj4+
-IFRoYXQgaXMsIHRoZSBkZWZhdWx0IGJlaGF2aW9yIGlzIHRvIHNldCBzay0+c2tfcmN2bG93YXQs
-IGJ1dCBmb3IgDQo+PiB0cmFuc3BvcnRzIHRoYXQgd2FudCBhIGRpZmZlcmVudCBiZWhhdmlvciwg
-dGhleSBuZWVkIHRvIGRlZmluZSANCj4+IHNldF9yY3Zsb3dhdCgpIChsaWtlIGh2X3NvY2spLg0K
-PiBIbSBvaywgaSBzZWUuIEkndmUgaW1wbGVtZW50ZWQgbG9naWMgd2hlbiBub24tZW1wdHkgdHJh
-bnNwb3J0IGlzIHJlcXVpcmVkLCBiZWNhdXNlIGh5cGVydiB0cmFuc3BvcnQNCj4gZm9yYmlkcyB0
-byBzZXQgU09fUkNWTE9XQVQsIHNvIHVzZXIgbmVlZHMgdG8gY2FsbCB0aGlzIHNldHNvY2tvcHQg
-QUZURVIgdHJhbnNwb3J0IGlzIGFzc2lnbmVkKHRvIGNoZWNrDQo+IHRoYXQgdHJhbnNwb3J0IGFs
-bG93cyBpdC4gTm90IGFmdGVyIHNvY2tldCBjcmVhdGlvbiBhcyBZb3UgbWVudGlvbmVkIGFib3Zl
-KS4gT3RoZXJ3aXNlIHRoZXJlIGlzIG5vIHNlbnNlDQo+IGluIHN1Y2ggY2FsbGJhY2sgLSBpdCB3
-aWxsIGJlIG5ldmVyIHVzZWQuIEFsc28gaW4gY29kZSBhYm92ZSAtIGZvciBoeXBlcnYgd2Ugd2ls
-bCBoYXZlIGRpZmZlcmVudCBiZWhhdmlvcg0KPiBkZXBlbmRzIG9uIHdoZW4gc2V0X3Jjdmxvd2F0
-IGlzIGNhbGxlZDogYmVmb3JlIG9yIGFmdGVyIHRyYW5zcG9ydCBhc3NpZ25tZW50LiBJcyBpdCBv
-az8NCnNvcnJ5LCBpIG1lYW46IGZvciBoeXBlcnYsIGlmIHVzZXIgc2V0cyBza19yY3Zsb3dhdCBi
-ZWZvcmUgdHJhbnNwb3J0IGlzIGFzc2lnbmVkLCBpdCBzZWVzIDAgLSBzdWNjZXNzLCBidXQgaW4g
-ZmFjdA0KaHlwZXJ2IHRyYW5zcG9ydCBmb3JiaWRzIHRoaXMgb3B0aW9uLg0KPj4NCj4+IFRoYW5r
-cywNCj4+IFN0ZWZhbm8NCj4+DQo+IA0KDQo=
+Hi,
+
+Forgot to add a link to the gitlab branch with the series [1].
+
+[1] https://gitlab.arm.com/linux-arm/kvm-unit-tests-ae/-/tree/arm-arm64-rework-cache-maintenance-at-boot-v1
+
+Thanks,
+Alex
+
+On Tue, Aug 09, 2022 at 10:15:39AM +0100, Alexandru Elisei wrote:
+> I got the idea for this series as I was looking at the UEFI support series
+> [1]. More specifically, I realized that the cache maintenance performed by
+> asm_mmu_disable is insuficient. Patch #19 ("arm/arm64: Rework the cache
+> maintenance in asm_mmu_disable") describes what is wrong with
+> asm_mmu_disable. A detailed explanation of what cache maintenance is needed
+> and why is needed can be found in patch #18 ("arm/arm64: Perform dcache
+> maintenance at boot").
+> 
+> Then I realized that I couldn't fix only asm_mmu_disable, and leave the
+> rest of kvm-unit-tests without the needed cache maintenance, so here it is,
+> my attempt at adding the cache maintenace operations (from now on, CMOs)
+> required by the architecture.
+> 
+> My approach is to try to enable the MMU and build the translation tables as
+> soon as possible, to avoid as much of cache maintenance as possible. I
+> didn't want to do it in the early assembly code, like Linux, because I like
+> the fact that kvm-unit-tests keeps the assembly code to a minimum, and I
+> wanted to preserve that. So I made the physical allocator simpler (patches
+> #2-#6) so it can be used to create the translation tables immediately after
+> the memory regions are populated.
+> 
+> After moving some code around, especially how the secondaries are brought
+> online, the dcache maintenance is implemented in patch #18 ("arm/arm64:
+> Perform dcache maintenance at boot").
+> 
+> The series is an RFC, and I open to suggestions about how to do things
+> better; I'm happy to rework the entire series if a better approach is
+> proposed.
+> 
+> Why is this needed? Nobody complained about test failing because of missing
+> CMOs before, so why add them now? I see two reasons for the series:
+> 
+> 1. For architectural correctness. The emphasis has been so far on the test
+> themselves to be architectural compliant, but I believe that the boot code
+> should get the same treatment. kvm-unit-tests has started to be used in
+> different ways than before, and I don't think that we should limit
+> ourselves to running under one hypervisor, or running under a hypervisor at
+> all. Which brings me to point number 2.
+> 
+> 2. If nothing else, this can serve as a showcase for the UEFI support
+> series for the required cache maintenance. Although I hope that UEFI
+> support will end up sharing at least some of the boot code with the
+> non-UEFI boot path.
+> 
+> This is an RFC and has some rough edges, probably also bugs, but I believe
+> the concept to be sound. If/when the series stabilizes, I'll probably split
+> it into separate series (for example, the __ASSEMBLY__ define patch could
+> probably be separate from the others). Tested by running all the arm and
+> arm64 tests on a rockpro64 with qemu.
+> 
+> [1] https://lore.kernel.org/all/20220630100324.3153655-1-nikos.nikoleris@arm.com/
+> 
+> Alexandru Elisei (19):
+>   Makefile: Define __ASSEMBLY__ for assembly files
+>   lib/alloc_phys: Initialize align_min
+>   lib/alloc_phys: Use phys_alloc_aligned_safe and rename it to
+>     memalign_early
+>   powerpc: Use the page allocator
+>   lib/alloc_phys: Remove locking
+>   lib/alloc_phys: Remove allocation accounting
+>   arm/arm64: Mark the phys_end parameter as unused in setup_mmu()
+>   arm/arm64: Use pgd_alloc() to allocate mmu_idmap
+>   arm/arm64: Zero secondary CPUs' stack
+>   arm/arm64: Enable the MMU early
+>   arm/arm64: Map the UART when creating the translation tables
+>   arm/arm64: assembler.h: Replace size with end address for
+>     dcache_by_line_op
+>   arm: page.h: Add missing libcflat.h include
+>   arm/arm64: Add C functions for doing cache maintenance
+>   lib/alloc_phys: Add callback to perform cache maintenance
+>   arm/arm64: Allocate secondaries' stack using the page allocator
+>   arm/arm64: Configure secondaries' stack before enabling the MMU
+>   arm/arm64: Perform dcache maintenance at boot
+>   arm/arm64: Rework the cache maintenance in asm_mmu_disable
+> 
+>  Makefile                   |   5 +-
+>  arm/Makefile.arm           |   4 +-
+>  arm/Makefile.arm64         |   4 +-
+>  arm/Makefile.common        |   4 +-
+>  arm/cstart.S               |  59 ++++++++++++------
+>  arm/cstart64.S             |  56 +++++++++++++----
+>  lib/alloc_phys.c           | 122 ++++++++++++-------------------------
+>  lib/alloc_phys.h           |  13 +++-
+>  lib/arm/asm/assembler.h    |  15 ++---
+>  lib/arm/asm/cacheflush.h   |   1 +
+>  lib/arm/asm/mmu-api.h      |   1 +
+>  lib/arm/asm/mmu.h          |   6 --
+>  lib/arm/asm/page.h         |   2 +
+>  lib/arm/asm/pgtable.h      |  52 ++++++++++++++--
+>  lib/arm/asm/thread_info.h  |   3 +-
+>  lib/arm/cache.S            |  89 +++++++++++++++++++++++++++
+>  lib/arm/io.c               |   5 ++
+>  lib/arm/io.h               |   3 +
+>  lib/arm/mmu.c              |  60 +++++++++++-------
+>  lib/arm/processor.c        |   6 +-
+>  lib/arm/setup.c            |  66 ++++++++++++++++----
+>  lib/arm/smp.c              |   9 ++-
+>  lib/arm64/asm/assembler.h  |  11 ++--
+>  lib/arm64/asm/cacheflush.h |  32 ++++++++++
+>  lib/arm64/asm/mmu.h        |   5 --
+>  lib/arm64/asm/pgtable.h    |  67 ++++++++++++++++++--
+>  lib/arm64/cache.S          |  85 ++++++++++++++++++++++++++
+>  lib/arm64/processor.c      |   5 +-
+>  lib/devicetree.c           |   2 +-
+>  lib/powerpc/setup.c        |   8 +++
+>  powerpc/Makefile.common    |   1 +
+>  powerpc/cstart64.S         |   1 -
+>  powerpc/spapr_hcall.c      |   5 +-
+>  33 files changed, 608 insertions(+), 199 deletions(-)
+>  create mode 100644 lib/arm/asm/cacheflush.h
+>  create mode 100644 lib/arm/cache.S
+>  create mode 100644 lib/arm64/asm/cacheflush.h
+>  create mode 100644 lib/arm64/cache.S
+> 
+> -- 
+> 2.37.1
+> 
