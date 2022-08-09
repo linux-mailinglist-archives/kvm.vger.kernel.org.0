@@ -2,139 +2,105 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 8FDBA58D9F9
-	for <lists+kvm@lfdr.de>; Tue,  9 Aug 2022 15:56:57 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id B9CCA58DA14
+	for <lists+kvm@lfdr.de>; Tue,  9 Aug 2022 16:07:40 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S242671AbiHIN4t (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 9 Aug 2022 09:56:49 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34912 "EHLO
+        id S234672AbiHIOHi (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 9 Aug 2022 10:07:38 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40540 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S244780AbiHIN4W (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 9 Aug 2022 09:56:22 -0400
-Received: from smtp-fw-6001.amazon.com (smtp-fw-6001.amazon.com [52.95.48.154])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CEAC518368;
-        Tue,  9 Aug 2022 06:56:21 -0700 (PDT)
+        with ESMTP id S234266AbiHIOHg (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 9 Aug 2022 10:07:36 -0400
+Received: from mail-pl1-x634.google.com (mail-pl1-x634.google.com [IPv6:2607:f8b0:4864:20::634])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E33E712ABC
+        for <kvm@vger.kernel.org>; Tue,  9 Aug 2022 07:07:35 -0700 (PDT)
+Received: by mail-pl1-x634.google.com with SMTP id 13so10008627plo.12
+        for <kvm@vger.kernel.org>; Tue, 09 Aug 2022 07:07:35 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
-  t=1660053382; x=1691589382;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=odYNCkcIAQcBKQptQexLin/WRKzdil3fPD/Uqu4HkkI=;
-  b=aEFzcalQ97hAG4bs2JdRqWh1VYvGCJfnHi664tJe/d/FqlvKXVw2DGNF
-   0sl4Mb77jMqaH3pw2ip5ztIa2t/6kYAuQ4kVNeWE0WSFPGYG3tWmustKj
-   S1MyZYCrFhh3nnAJx34sgJL686GkGPuP7OCHq+najECXbN6sNphKBVeTe
-   U=;
-Received: from iad12-co-svc-p1-lb1-vlan2.amazon.com (HELO email-inbound-relay-iad-1a-b09d0114.us-east-1.amazon.com) ([10.43.8.2])
-  by smtp-border-fw-6001.iad6.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 09 Aug 2022 13:56:08 +0000
-Received: from EX13D24EUC003.ant.amazon.com (iad12-ws-svc-p26-lb9-vlan3.iad.amazon.com [10.40.163.38])
-        by email-inbound-relay-iad-1a-b09d0114.us-east-1.amazon.com (Postfix) with ESMTPS id 35EAD80383;
-        Tue,  9 Aug 2022 13:55:58 +0000 (UTC)
-Received: from dev-dsk-sabrapan-1c-164a86ac.eu-west-1.amazon.com
- (10.43.162.227) by EX13D24EUC003.ant.amazon.com (10.43.164.217) with
- Microsoft SMTP Server (TLS) id 15.0.1497.36; Tue, 9 Aug 2022 13:55:48 +0000
-From:   Sabin Rapan <sabrapan@amazon.com>
-To:     <ashish.kalra@amd.com>
-CC:     <ak@linux.intel.com>, <alpergun@google.com>, <ardb@kernel.org>,
-        <bp@alien8.de>, <dave.hansen@linux.intel.com>,
-        <dgilbert@redhat.com>, <dovmurik@linux.ibm.com>, <hpa@zytor.com>,
-        <jarkko@kernel.org>, <jmattson@google.com>, <jroedel@suse.de>,
-        <kirill@shutemov.name>, <kvm@vger.kernel.org>,
-        <linux-coco@lists.linux.dev>, <linux-crypto@vger.kernel.org>,
-        <linux-kernel@vger.kernel.org>, <linux-mm@kvack.org>,
-        <luto@kernel.org>, <marcorr@google.com>, <michael.roth@amd.com>,
-        <mingo@redhat.com>, <pbonzini@redhat.com>, <peterz@infradead.org>,
-        <pgonda@google.com>, <rientjes@google.com>,
-        <sathyanarayanan.kuppuswamy@linux.intel.com>, <seanjc@google.com>,
-        <slp@redhat.com>, <srinivas.pandruvada@linux.intel.com>,
-        <tglx@linutronix.de>, <thomas.lendacky@amd.com>, <tobin@ibm.com>,
-        <tony.luck@intel.com>, <vbabka@suse.cz>, <vkuznets@redhat.com>,
-        <x86@kernel.org>
-Subject: Re: [PATCH Part2 v6 26/49] KVM: SVM: Add KVM_SEV_SNP_LAUNCH_UPDATE command 
-Date:   Tue, 9 Aug 2022 13:55:35 +0000
-Message-ID: <20220809135535.88234-1-sabrapan@amazon.com>
-X-Mailer: git-send-email 2.37.1
-In-Reply-To: <fdf036c1e2fdf770da8238b31056206be08a7c1b.1655761627.git.ashish.kalra@amd.com>
-References: <fdf036c1e2fdf770da8238b31056206be08a7c1b.1655761627.git.ashish.kalra@amd.com>
+        d=google.com; s=20210112;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc;
+        bh=NnEsu78UdgWUFfbUzx2FaqG+fLzRYJgztuHCMcvogJA=;
+        b=oDtJsLEQQYL30wcvIv5F3ooBK0Zf/9c8h4+kW5/jz5Nl67dgnb73eDU7C8tmnt4nYY
+         cCMyJmMxEiHiWPNM5WQB2io2rxq9bgmB+TaseJV90fL2r3xfh5kJ6m5B6y7/BiuHZEc2
+         xde5cBI2o6E657tDSS6U8BOe2jW6sBWiX9XXvh65MlJJUS7AaWOV4KvFfxIIfmZCuNwc
+         oOoe0EJLXJhc0M3MGpwUWJQ1cAhegx+jjeoZ433VUWG15wBgZfP+Bpz4F5TPaAVFcv1G
+         xIwBkATQVJVHWkK6kqQjZYTL5Jpf+PTD6HmUUJaV9clHvHt2RUqA3nIziuDGmoL3H5PH
+         aSCw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc;
+        bh=NnEsu78UdgWUFfbUzx2FaqG+fLzRYJgztuHCMcvogJA=;
+        b=t3Y3xgpeQZ3BejjlEtWqqcFDeP+4FqZc+yRGLt/KMGIZmRVztUEOVyIcqFzUWnl7lX
+         yJy45BOtITMX8LdQG8GEukAY0kNTKFgEnPoSgjFecKIhzeRed7w+RLDx0ER/qYsXj0h/
+         jgx8UI76W3F2+6g2krITq3i0Nt8T5GjrYEJDKB7pZ7wgaoSacwvgTdEJqly/OLitP97O
+         +n/Ro2K/46g+wmSJhGI9Q9b/Mlm148LF80m8vHLKNHoEKyECHvXbn1v+FJvFm+G6BHsv
+         vOmKvSgVWb9dVdyRo/fI7+C1a0X6yRdDsT1LXkGcmMunH7+mjOmhanG8/t6+EZS8pjnT
+         XgLA==
+X-Gm-Message-State: ACgBeo344iJ1J8+C7asslSzBhbY+D0FjKJEIXTONQSBgUmjD8ewnbnlw
+        G2feI/m+t98Ve3f1S8Nb5fV7Fw==
+X-Google-Smtp-Source: AA6agR4aiTL+Daci9AK1TqyyNVqT0wIL4ZZnOZ8/yvhfKaMJTNse+c98EGQik7SdrsdREq1iYR++YQ==
+X-Received: by 2002:a17:902:b903:b0:170:9964:b47b with SMTP id bf3-20020a170902b90300b001709964b47bmr12764209plb.83.1660054055288;
+        Tue, 09 Aug 2022 07:07:35 -0700 (PDT)
+Received: from google.com (7.104.168.34.bc.googleusercontent.com. [34.168.104.7])
+        by smtp.gmail.com with ESMTPSA id c14-20020a170902d48e00b0017086b082c1sm8154199plg.173.2022.08.09.07.07.34
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 09 Aug 2022 07:07:34 -0700 (PDT)
+Date:   Tue, 9 Aug 2022 14:07:30 +0000
+From:   Sean Christopherson <seanjc@google.com>
+To:     David Woodhouse <dwmw2@infradead.org>
+Cc:     Paolo Bonzini <pbonzini@redhat.com>,
+        Coleman Dietsch <dietschc@csp.edu>, kvm@vger.kernel.org,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+        Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org,
+        "H . Peter Anvin" <hpa@zytor.com>, linux-kernel@vger.kernel.org,
+        skhan@linuxfoundation.org, Pavel Skripkin <paskripkin@gmail.com>,
+        linux-kernel-mentees@lists.linuxfoundation.org,
+        stable@vger.kernel.org,
+        syzbot+e54f930ed78eb0f85281@syzkaller.appspotmail.com
+Subject: Re: [PATCH v3 2/2] KVM: x86/xen: Stop Xen timer before changing IRQ
+Message-ID: <YvJqIsQsg+ThMg/C@google.com>
+References: <20220808190607.323899-2-dietschc@csp.edu>
+ <20220808190607.323899-3-dietschc@csp.edu>
+ <c648744c096588d30771a22efa6d65c31fffd06c.camel@infradead.org>
+ <43e258cc-71ac-bde4-d1f8-9eb9519928d3@redhat.com>
+ <4fc1371b83001b4eed1617c37bec6b9d007e45c2.camel@infradead.org>
 MIME-Version: 1.0
-X-Originating-IP: [10.43.162.227]
-X-ClientProxiedBy: EX13D40UWC003.ant.amazon.com (10.43.162.246) To
- EX13D24EUC003.ant.amazon.com (10.43.164.217)
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-12.5 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
-        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,USER_IN_DEF_SPF_WL
-        autolearn=ham autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <4fc1371b83001b4eed1617c37bec6b9d007e45c2.camel@infradead.org>
+X-Spam-Status: No, score=-14.5 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+        ENV_AND_HDR_SPF_MATCH,FSL_HELO_FAKE,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,
+        SPF_PASS,T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL
+        autolearn=no autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-> +static bool is_hva_registered(struct kvm *kvm, hva_t hva, size_t len)
-> +{
-> +	struct kvm_sev_info *sev = &to_kvm_svm(kvm)->sev_info;
-> +	struct list_head *head = &sev->regions_list;
-> +	struct enc_region *i;
-> +
-> +	lockdep_assert_held(&kvm->lock);
-> +
-> +	list_for_each_entry(i, head, list) {
-> +		u64 start = i->uaddr;
-> +		u64 end = start + i->size;
-> +
-> +		if (start <= hva && end >= (hva + len))
-> +			return true;
-> +	}
-> +
-> +	return false;
-> +}
+On Tue, Aug 09, 2022, David Woodhouse wrote:
+> On Tue, 2022-08-09 at 14:59 +0200, Paolo Bonzini wrote:
+> > On 8/9/22 11:22, David Woodhouse wrote:
+> > > On Mon, 2022-08-08 at 14:06 -0500, Coleman Dietsch wrote:
+> > > > Stop Xen timer (if it's running) prior to changing the IRQ vector and
+> > > > potentially (re)starting the timer. Changing the IRQ vector while the
+> > > > timer is still running can result in KVM injecting a garbage event, e.g.
+> > > > vm_xen_inject_timer_irqs() could see a non-zero xen.timer_pending from
+> > > > a previous timer but inject the new xen.timer_virq.
+> > > 
+> > > Hm, wasn't that already addressed in the first patch I saw, which just
+> > > called kvm_xen_stop_timer() unconditionally before (possibly) setting
+> > > it up again?
+> > 
+> > Which patch is that?
+> 
+> The one I acked in
+> https://lore.kernel.org/all/9bad724858b6a06c25ead865b2b3d9dfc216d01c.camel@infradead.org/
 
-Since KVM_MEMORY_ENCRYPT_REG_REGION should be called for every memory region the user gives to kvm,
-is the regions_list any different from kvm's memslots?
-
-> +
-> +static int snp_launch_update(struct kvm *kvm, struct kvm_sev_cmd *argp)
-> +{
-> +	struct kvm_sev_info *sev = &to_kvm_svm(kvm)->sev_info;
-> +	struct sev_data_snp_launch_update data = {0};
-> +	struct kvm_sev_snp_launch_update params;
-> +	unsigned long npages, pfn, n = 0;
-> +	int *error = &argp->error;
-> +	struct page **inpages;
-> +	int ret, i, level;
-> +	u64 gfn;
-> +
-> +	if (!sev_snp_guest(kvm))
-> +		return -ENOTTY;
-> +
-> +	if (!sev->snp_context)
-> +		return -EINVAL;
-> +
-> +	if (copy_from_user(&params, (void __user *)(uintptr_t)argp->data, sizeof(params)))
-> +		return -EFAULT;
-> +
-> +	/* Verify that the specified address range is registered. */
-> +	if (!is_hva_registered(kvm, params.uaddr, params.len))
-> +		return -EINVAL;
-> +
-> +	/*
-> +	 * The userspace memory is already locked so technically we don't
-> +	 * need to lock it again. Later part of the function needs to know
-> +	 * pfn so call the sev_pin_memory() so that we can get the list of
-> +	 * pages to iterate through.
-> +	 */
-> +	inpages = sev_pin_memory(kvm, params.uaddr, params.len, &npages, 1);
-> +	if (!inpages)
-> +		return -ENOMEM;
-
-sev_pin_memory will call pin_user_pages() which fails for PFNMAP vmas that you
-would get if you use memory allocated from an IO driver.
-Using gfn_to_pfn instead will make this work with vmas backed by pages or raw
-pfn mappings.
-
-
-
-
-Amazon Development Center (Romania) S.R.L. registered office: 27A Sf. Lazar Street, UBC5, floor 2, Iasi, Iasi County, 700045, Romania. Registered in Romania. Registration number J22/2621/2005.
-
+It's effectively the same patch.  I had asked Coleman to split it into two separate
+patches: (1) fix the re-initialization of an active timer bug and (2) stop the active
+timer before changing the vector (this patch).
