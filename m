@@ -2,68 +2,68 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id F001558E147
-	for <lists+kvm@lfdr.de>; Tue,  9 Aug 2022 22:44:15 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 9940058E150
+	for <lists+kvm@lfdr.de>; Tue,  9 Aug 2022 22:46:08 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S245467AbiHIUoL (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 9 Aug 2022 16:44:11 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33848 "EHLO
+        id S1343675AbiHIUqE (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 9 Aug 2022 16:46:04 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35732 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S245562AbiHIUoI (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 9 Aug 2022 16:44:08 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id C0E6020BF8
-        for <kvm@vger.kernel.org>; Tue,  9 Aug 2022 13:44:07 -0700 (PDT)
+        with ESMTP id S1343850AbiHIUpj (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 9 Aug 2022 16:45:39 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 14A6EB4B2
+        for <kvm@vger.kernel.org>; Tue,  9 Aug 2022 13:45:32 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1660077846;
+        s=mimecast20190719; t=1660077931;
         h=from:from:reply-to:reply-to:subject:subject:date:date:
          message-id:message-id:to:to:cc:cc:mime-version:mime-version:
          content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=hF/O21/fgaT52LT5WFrobNDlRU8CsVUcEjOpjpcHhzo=;
-        b=L/gsN0rVs+lRCHHYzBD0PNIefJDbCS63X9tNLkatTe4JbegjlM9iY99NkcXx/9HUfbAj4g
-        AGLMeBpCOUCyygbSwiALyBJDeP+bYALfpsEP3M7fraZhHVhssKxoTFkg0F6ANIRmE7dANK
-        osP/meZjsSnIyno9wnGmOwlDqtWlWxw=
-Received: from mail-qk1-f198.google.com (mail-qk1-f198.google.com
- [209.85.222.198]) by relay.mimecast.com with ESMTP with STARTTLS
+        bh=H/i6fOhflSC2Z18Mj3rM5lG4QJQLFl+L71qd8wct29I=;
+        b=WeRbD6rsdE8hvd3iJbvJOzDQghUDc+eeAHj6sTAx2FV1Tn0htJcLenF0xugxaaI4T4OVrR
+        WwHiavnSYmjmomgZLU2cDH753AQlR8N1gAveoDP+aKujgU9QqV+s8AVhfekT0V/M0X3zSw
+        LBO2+hEx7ZFggwAflYM64WbyVCdHWj8=
+Received: from mail-qt1-f200.google.com (mail-qt1-f200.google.com
+ [209.85.160.200]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-455-QhVT6_ejOOiMm0SNAlyx8w-1; Tue, 09 Aug 2022 16:44:05 -0400
-X-MC-Unique: QhVT6_ejOOiMm0SNAlyx8w-1
-Received: by mail-qk1-f198.google.com with SMTP id az14-20020a05620a170e00b006b666c4627bso11197586qkb.23
-        for <kvm@vger.kernel.org>; Tue, 09 Aug 2022 13:44:05 -0700 (PDT)
+ us-mta-102-Y82fgQMPPsOcRqvf097ioQ-1; Tue, 09 Aug 2022 16:45:30 -0400
+X-MC-Unique: Y82fgQMPPsOcRqvf097ioQ-1
+Received: by mail-qt1-f200.google.com with SMTP id hf13-20020a05622a608d00b003214b6b3777so9847314qtb.13
+        for <kvm@vger.kernel.org>; Tue, 09 Aug 2022 13:45:30 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=content-transfer-encoding:in-reply-to:from:references:cc:to
          :content-language:subject:reply-to:user-agent:mime-version:date
          :message-id:x-gm-message-state:from:to:cc;
-        bh=hF/O21/fgaT52LT5WFrobNDlRU8CsVUcEjOpjpcHhzo=;
-        b=X0mrUlVMU7zoCxi3ZMG7J3lfgd7cd0HGwdxaAZTpjbYXYe3kTW+Uh3jzMfch0FTKLB
-         9I8oXvEka/7jIlKpZ6y4FBTLKfpmmLBytkO9aNkJdW4lr7K5TiyLq/rSUnF0xMOpxVFz
-         A+AiRc2xlzHgHwI5CclLULudpmlnSZClsF1BbNV1i2oDS6rAU9jIvb9IfStzYMjwhnMy
-         +Ha0c3OOtvpf7/ZvC8w6vgw6jOqUp/IDrgE2qDObY7Q4alTROKEJqbmpnyEjRlqbLmEq
-         qDpNmLFTuP27Dhz4LQq2sxFV/f7qROVrPKMIHZVw6OGY8+kMLh43rgvMWuO5OF5qJMFX
-         OjBA==
-X-Gm-Message-State: ACgBeo1d+w9I4yCjNyds0foGPtctOQCLEPAEDJ6kgRjos22HVI6LU4pD
-        IteDYlEgncKTl7sJUNeJnaMSkfqkdhW5RxbuwYD37n89rjCZ2ulKIf56BzY2JEpq+Od+Nremg1E
-        +QW++6r8AGh43
-X-Received: by 2002:a05:620a:3704:b0:6b8:f15d:f119 with SMTP id de4-20020a05620a370400b006b8f15df119mr17840448qkb.138.1660077845088;
-        Tue, 09 Aug 2022 13:44:05 -0700 (PDT)
-X-Google-Smtp-Source: AA6agR6rehb2XWTsVKGarJ0QY3eUvRu065leXZcH51vY+vGnqGzlMYQADu5i34fa6GFG0Yq+lfe3CQ==
-X-Received: by 2002:a05:620a:3704:b0:6b8:f15d:f119 with SMTP id de4-20020a05620a370400b006b8f15df119mr17840423qkb.138.1660077844792;
-        Tue, 09 Aug 2022 13:44:04 -0700 (PDT)
+        bh=H/i6fOhflSC2Z18Mj3rM5lG4QJQLFl+L71qd8wct29I=;
+        b=s3QUEVdszL/CADriFXZI3GS4LkAW2SFmuHC3pZKzB0QbOifKTcar6kRgGuAN5uxFo7
+         2FcgbIbKMgItL1rapTYH06C71Fh5H7/zl54gy+4C/3Z2OtKXJUlwgag7mSXRuERmjLKf
+         qhpnP/1jucvmWHg2olNymn1CHL90dN3PWk4rlaBZVXzlKdaz+ttTEN2J1VWT0TgBapM4
+         ataZxtq4Ud05IzEgxumYnhZuSig6nIkeIKu+sExhwwfOjTR5wJ5+W0W8faEQpuXszpxF
+         +NZQvC5pbrzH97J+KD0G8IIrAS6rsxns2bfQDbPug2+K8mjXVh2WXg9VWYGDgn0xcaVs
+         rHXw==
+X-Gm-Message-State: ACgBeo2Z7wvp6D0eOJ2KoJrctF+nwdw1KNsLY9liRCkqDhFxHPQBN/jc
+        pbcVZmP7/iq8R7Iue9qil0t0NjXDicsZl8igTKyP4KSicQ9319bziXIzfWkNvbdso0V+32Jnekq
+        DFH0rNhwJsf+p
+X-Received: by 2002:a05:622a:394:b0:31f:4518:2656 with SMTP id j20-20020a05622a039400b0031f45182656mr21801069qtx.174.1660077930264;
+        Tue, 09 Aug 2022 13:45:30 -0700 (PDT)
+X-Google-Smtp-Source: AA6agR7T3x9qb5STCbT5iYR3g4AYyyOkm6wcALFX9S2H0JvmSUuJXwQELjGl514Pn9qv1FASiP0oqw==
+X-Received: by 2002:a05:622a:394:b0:31f:4518:2656 with SMTP id j20-20020a05622a039400b0031f45182656mr21801048qtx.174.1660077929984;
+        Tue, 09 Aug 2022 13:45:29 -0700 (PDT)
 Received: from ?IPV6:2a01:e0a:59e:9d80:527b:9dff:feef:3874? ([2a01:e0a:59e:9d80:527b:9dff:feef:3874])
-        by smtp.gmail.com with ESMTPSA id q15-20020ac8450f000000b0034303785596sm2947990qtn.34.2022.08.09.13.44.00
+        by smtp.gmail.com with ESMTPSA id x21-20020a05620a0ed500b006b615cd8c13sm11404289qkm.106.2022.08.09.13.45.26
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 09 Aug 2022 13:44:04 -0700 (PDT)
-Message-ID: <3fe7398d-6496-717c-c0f0-f7af3c69cdd0@redhat.com>
-Date:   Tue, 9 Aug 2022 22:43:59 +0200
+        Tue, 09 Aug 2022 13:45:29 -0700 (PDT)
+Message-ID: <56ab2bc2-378b-3ece-2d45-e0f484087aa7@redhat.com>
+Date:   Tue, 9 Aug 2022 22:45:25 +0200
 MIME-Version: 1.0
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
  Thunderbird/91.11.0
 Reply-To: eric.auger@redhat.com
-Subject: Re: [PATCH v2 2/5] KVM: x86: Add
- kvm_register_and_fire_irq_mask_notifier()
+Subject: Re: [PATCH v2 3/5] KVM: irqfd: Postpone resamplefd notify for oneshot
+ interrupts
 Content-Language: en-US
 To:     Dmytro Maluka <dmy@semihalf.com>,
         Sean Christopherson <seanjc@google.com>,
@@ -80,14 +80,14 @@ Cc:     Thomas Gleixner <tglx@linutronix.de>,
         Dmitry Torokhov <dtor@google.com>,
         Marc Zyngier <maz@kernel.org>
 References: <20220805193919.1470653-1-dmy@semihalf.com>
- <20220805193919.1470653-3-dmy@semihalf.com>
+ <20220805193919.1470653-4-dmy@semihalf.com>
 From:   Eric Auger <eric.auger@redhat.com>
-In-Reply-To: <20220805193919.1470653-3-dmy@semihalf.com>
+In-Reply-To: <20220805193919.1470653-4-dmy@semihalf.com>
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-3.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+X-Spam-Status: No, score=-2.7 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
-        RCVD_IN_DNSWL_LOW,SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE
+        RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE
         autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -98,247 +98,186 @@ X-Mailing-List: kvm@vger.kernel.org
 Hi Dmytro,
 
 On 8/5/22 21:39, Dmytro Maluka wrote:
-> In order to implement postponing resamplefd notification until an
-> interrupt is unmasked, we need not only to track changes of the
-> interrupt mask state (which is already possible with
-> kvm_register_irq_mask_notifier()) but also to know its initial
-> mask state before any mask notifier has fired.
+> The existing KVM mechanism for forwarding of level-triggered interrupts
+> using resample eventfd doesn't work quite correctly in the case of
+> interrupts that are handled in a Linux guest as oneshot interrupts
+> (IRQF_ONESHOT). Such an interrupt is acked to the device in its
+> threaded irq handler, i.e. later than it is acked to the interrupt
+> controller (EOI at the end of hardirq), not earlier.
 >
-> Moreover, we need to do this initial check of the IRQ mask state in a
-> race-free way, to ensure that we will not miss any further mask or
-> unmask events after we check the initial mask state.
+> Linux keeps such interrupt masked until its threaded handler finishes,
+> to prevent the EOI from re-asserting an unacknowledged interrupt.
+> However, with KVM + vfio (or whatever is listening on the resamplefd)
+> we don't check that the interrupt is still masked in the guest at the
+> moment of EOI. Resamplefd is notified regardless, so vfio prematurely
+> unmasks the host physical IRQ, thus a new (unwanted) physical interrupt
+> is generated in the host and queued for injection to the guest.
 >
-> So implement kvm_register_and_fire_irq_mask_notifier() which atomically
-> registers an IRQ mask notifier and calls it with the current mask value
-> of the IRQ. It does that using the same locking order as when calling
-> notifier normally via kvm_fire_mask_notifiers(), to prevent deadlocks.
+> The fact that the virtual IRQ is still masked doesn't prevent this new
+> physical IRQ from being propagated to the guest, because:
 >
-> Its implementation needs to be arch-specific since it relies on
-> arch-specific synchronization (e.g. ioapic->lock and pic->lock on x86,
-> or a per-IRQ lock on ARM vGIC) for serializing our initial reading of
-> the IRQ mask state with a pending change of this mask state.
+> 1. It is not guaranteed that the vIRQ will remain masked by the time
+>    when vfio signals the trigger eventfd.
+> 2. KVM marks this IRQ as pending (e.g. setting its bit in the virtual
+>    IRR register of IOAPIC on x86), so after the vIRQ is unmasked, this
+>    new pending interrupt is injected by KVM to the guest anyway.
 >
-> For now implement it for x86 only, and for other archs add a weak dummy
-> implementation which doesn't really call the notifier (as other archs
-> don't currently implement calling notifiers normally via
-> kvm_fire_mask_notifiers() either, i.e. registering mask notifiers has no
-> effect on those archs anyway).
+> There are observed at least 2 user-visible issues caused by those
+> extra erroneous pending interrupts for oneshot irq in the guest:
 >
+> 1. System suspend aborted due to a pending wakeup interrupt from
+>    ChromeOS EC (drivers/platform/chrome/cros_ec.c).
+> 2. Annoying "invalid report id data" errors from ELAN0000 touchpad
+>    (drivers/input/mouse/elan_i2c_core.c), flooding the guest dmesg
+>    every time the touchpad is touched.
+>
+> This patch fixes the issue on x86 by checking if the interrupt is
+> unmasked when we receive irq ack (EOI) and, in case if it's masked,
+> postponing resamplefd notify until the guest unmasks it.
+>
+> It doesn't fix the issue for other archs yet, since it relies on KVM
+> irq mask notifiers functionality which currently works only on x86.
+> On other archs we can register mask notifiers but they are never called.
+> So on other archs resampler->masked is always false, so the behavior is
+> the same as before this patch.
+>
+> Link: https://lore.kernel.org/kvm/31420943-8c5f-125c-a5ee-d2fde2700083@semihalf.com/
+> Suggested-by: Sean Christopherson <seanjc@google.com>
 > Signed-off-by: Dmytro Maluka <dmy@semihalf.com>
-> Link: https://lore.kernel.org/lkml/c7b7860e-ae3a-7b98-e97e-28a62470c470@semihalf.com/
 > ---
->  arch/x86/include/asm/kvm_host.h |  1 +
->  arch/x86/kvm/i8259.c            |  6 ++++
->  arch/x86/kvm/ioapic.c           |  6 ++++
->  arch/x86/kvm/ioapic.h           |  1 +
->  arch/x86/kvm/irq_comm.c         | 57 +++++++++++++++++++++++++++++++++
->  include/linux/kvm_host.h        |  4 +++
->  virt/kvm/eventfd.c              | 31 ++++++++++++++++--
->  7 files changed, 104 insertions(+), 2 deletions(-)
+>  include/linux/kvm_irqfd.h | 14 ++++++++++
+>  virt/kvm/eventfd.c        | 56 +++++++++++++++++++++++++++++++++++----
+>  2 files changed, 65 insertions(+), 5 deletions(-)
 >
-> diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
-> index dc76617f11c1..cf0571ed2968 100644
-> --- a/arch/x86/include/asm/kvm_host.h
-> +++ b/arch/x86/include/asm/kvm_host.h
-> @@ -1834,6 +1834,7 @@ static inline int __kvm_irq_line_state(unsigned long *irq_state,
->  
->  int kvm_pic_set_irq(struct kvm_pic *pic, int irq, int irq_source_id, int level);
->  void kvm_pic_clear_all(struct kvm_pic *pic, int irq_source_id);
-> +bool kvm_pic_irq_is_masked(struct kvm_pic *s, int irq);
->  
->  void kvm_inject_nmi(struct kvm_vcpu *vcpu);
->  
-> diff --git a/arch/x86/kvm/i8259.c b/arch/x86/kvm/i8259.c
-> index e1bb6218bb96..1eb3127f6047 100644
-> --- a/arch/x86/kvm/i8259.c
-> +++ b/arch/x86/kvm/i8259.c
-> @@ -211,6 +211,12 @@ void kvm_pic_clear_all(struct kvm_pic *s, int irq_source_id)
->  	pic_unlock(s);
->  }
->  
-> +/* Called with s->lock held. */
-> +bool kvm_pic_irq_is_masked(struct kvm_pic *s, int irq)
-> +{
-> +	return !!(s->pics[irq >> 3].imr & (1 << irq));
-> +}
-> +
->  /*
->   * acknowledge interrupt 'irq'
+> diff --git a/include/linux/kvm_irqfd.h b/include/linux/kvm_irqfd.h
+> index dac047abdba7..01754a1abb9e 100644
+> --- a/include/linux/kvm_irqfd.h
+> +++ b/include/linux/kvm_irqfd.h
+> @@ -19,6 +19,16 @@
+>   * resamplefd.  All resamplers on the same gsi are de-asserted
+>   * together, so we don't need to track the state of each individual
+>   * user.  We can also therefore share the same irq source ID.
+> + *
+> + * A special case is when the interrupt is still masked at the moment
+> + * an irq ack is received. That likely means that the interrupt has
+> + * been acknowledged to the interrupt controller but not acknowledged
+> + * to the device yet, e.g. it might be a Linux guest's threaded
+> + * oneshot interrupt (IRQF_ONESHOT). In this case notifying through
+> + * resamplefd is postponed until the guest unmasks the interrupt,
+> + * which is detected through the irq mask notifier. This prevents
+> + * erroneous extra interrupts caused by premature re-assert of an
+> + * unacknowledged interrupt by the resamplefd listener.
 >   */
-> diff --git a/arch/x86/kvm/ioapic.c b/arch/x86/kvm/ioapic.c
-> index 765943d7cfa5..fab11de1f885 100644
-> --- a/arch/x86/kvm/ioapic.c
-> +++ b/arch/x86/kvm/ioapic.c
-> @@ -478,6 +478,12 @@ void kvm_ioapic_clear_all(struct kvm_ioapic *ioapic, int irq_source_id)
->  	spin_unlock(&ioapic->lock);
->  }
->  
-> +/* Called with ioapic->lock held. */
-> +bool kvm_ioapic_irq_is_masked(struct kvm_ioapic *ioapic, int irq)
-> +{
-> +	return !!ioapic->redirtbl[irq].fields.mask;
-> +}
-> +
->  static void kvm_ioapic_eoi_inject_work(struct work_struct *work)
->  {
->  	int i;
-> diff --git a/arch/x86/kvm/ioapic.h b/arch/x86/kvm/ioapic.h
-> index 539333ac4b38..fe1f51319992 100644
-> --- a/arch/x86/kvm/ioapic.h
-> +++ b/arch/x86/kvm/ioapic.h
-> @@ -114,6 +114,7 @@ void kvm_ioapic_destroy(struct kvm *kvm);
->  int kvm_ioapic_set_irq(struct kvm_ioapic *ioapic, int irq, int irq_source_id,
->  		       int level, bool line_status);
->  void kvm_ioapic_clear_all(struct kvm_ioapic *ioapic, int irq_source_id);
-> +bool kvm_ioapic_irq_is_masked(struct kvm_ioapic *ioapic, int irq);
->  void kvm_get_ioapic(struct kvm *kvm, struct kvm_ioapic_state *state);
->  void kvm_set_ioapic(struct kvm *kvm, struct kvm_ioapic_state *state);
->  void kvm_ioapic_scan_entry(struct kvm_vcpu *vcpu,
-> diff --git a/arch/x86/kvm/irq_comm.c b/arch/x86/kvm/irq_comm.c
-> index f27e4c9c403e..4bd4218821a2 100644
-> --- a/arch/x86/kvm/irq_comm.c
-> +++ b/arch/x86/kvm/irq_comm.c
-> @@ -234,6 +234,63 @@ void kvm_free_irq_source_id(struct kvm *kvm, int irq_source_id)
->  	mutex_unlock(&kvm->irq_lock);
->  }
->  
-> +void kvm_register_and_fire_irq_mask_notifier(struct kvm *kvm, int irq,
-> +					     struct kvm_irq_mask_notifier *kimn)
-> +{
-> +	struct kvm_pic *pic = kvm->arch.vpic;
-> +	struct kvm_ioapic *ioapic = kvm->arch.vioapic;
-> +	struct kvm_kernel_irq_routing_entry entries[KVM_NR_IRQCHIPS];
-> +	struct kvm_kernel_irq_routing_entry *pic_e = NULL, *ioapic_e = NULL;
-> +	int idx, i, n;
+>  struct kvm_kernel_irqfd_resampler {
+>  	struct kvm *kvm;
+> @@ -28,6 +38,10 @@ struct kvm_kernel_irqfd_resampler {
+>  	 */
+>  	struct list_head list;
+>  	struct kvm_irq_ack_notifier notifier;
+> +	struct kvm_irq_mask_notifier mask_notifier;
 > +	bool masked;
-> +
-> +	mutex_lock(&kvm->irq_lock);
-> +
-> +	/*
-> +	 * Not possible to detect if the guest uses the PIC or the
-> +	 * IOAPIC. So assume the interrupt to be unmasked iff it is
-> +	 * unmasked in at least one of both.
-> +	 */
-> +	idx = srcu_read_lock(&kvm->irq_srcu);
-> +	n = kvm_irq_map_gsi(kvm, entries, irq);
-> +	srcu_read_unlock(&kvm->irq_srcu, idx);
-> +
-> +	for (i = 0; i < n; i++) {
-> +		if (entries[i].type != KVM_IRQ_ROUTING_IRQCHIP)
-> +			continue;
-> +
-> +		switch (entries[i].irqchip.irqchip) {
-> +		case KVM_IRQCHIP_PIC_MASTER:
-> +		case KVM_IRQCHIP_PIC_SLAVE:
-> +			pic_e = &entries[i];
-> +			break;
-> +		case KVM_IRQCHIP_IOAPIC:
-> +			ioapic_e = &entries[i];
-> +			break;
-> +		default:
-> +			break;
-> +		}
-> +	}
-> +
-> +	if (pic_e)
-> +		spin_lock(&pic->lock);
-> +	if (ioapic_e)
-> +		spin_lock(&ioapic->lock);
-> +
-> +	__kvm_register_irq_mask_notifier(kvm, irq, kimn);
-> +
-> +	masked = (!pic_e || kvm_pic_irq_is_masked(pic, pic_e->irqchip.pin)) &&
-> +		 (!ioapic_e || kvm_ioapic_irq_is_masked(ioapic, ioapic_e->irqchip.pin));
-Looks a bit cryptic to me. Don't you want pic_e && masked on pic ||
-ioapic_e && masked on ioapic?
-
-> +	kimn->func(kimn, masked);
-> +
-> +	if (ioapic_e)
-> +		spin_unlock(&ioapic->lock);
-> +	if (pic_e)
-> +		spin_unlock(&pic->lock);
-> +
-> +	mutex_unlock(&kvm->irq_lock);
-> +}
-> +
->  bool kvm_arch_can_set_irq_routing(struct kvm *kvm)
->  {
->  	return irqchip_in_kernel(kvm);
-> diff --git a/include/linux/kvm_host.h b/include/linux/kvm_host.h
-> index dd5f14e31996..55233eb18eb4 100644
-> --- a/include/linux/kvm_host.h
-> +++ b/include/linux/kvm_host.h
-> @@ -1608,8 +1608,12 @@ void kvm_register_irq_ack_notifier(struct kvm *kvm,
->  				   struct kvm_irq_ack_notifier *kian);
->  void kvm_unregister_irq_ack_notifier(struct kvm *kvm,
->  				   struct kvm_irq_ack_notifier *kian);
-> +void __kvm_register_irq_mask_notifier(struct kvm *kvm, int irq,
-> +				      struct kvm_irq_mask_notifier *kimn);
->  void kvm_register_irq_mask_notifier(struct kvm *kvm, int irq,
->  				    struct kvm_irq_mask_notifier *kimn);
-> +void kvm_register_and_fire_irq_mask_notifier(struct kvm *kvm, int irq,
-> +					     struct kvm_irq_mask_notifier *kimn);
->  void kvm_unregister_irq_mask_notifier(struct kvm *kvm, int irq,
->  				      struct kvm_irq_mask_notifier *kimn);
->  void kvm_fire_mask_notifiers(struct kvm *kvm, unsigned irqchip, unsigned pin,
+> +	bool pending;
+> +	spinlock_t lock;
+>  	/*
+>  	 * Entry in list of kvm->irqfd.resampler_list.  Use for sharing
+>  	 * resamplers among irqfds on the same gsi.
 > diff --git a/virt/kvm/eventfd.c b/virt/kvm/eventfd.c
-> index 39403d9fbdcc..3007d956b626 100644
+> index 3007d956b626..f98dcce3959c 100644
 > --- a/virt/kvm/eventfd.c
 > +++ b/virt/kvm/eventfd.c
-> @@ -519,15 +519,42 @@ void kvm_unregister_irq_ack_notifier(struct kvm *kvm,
->  	kvm_arch_post_irq_ack_notifier_list_update(kvm);
->  }
+> @@ -67,6 +67,7 @@ irqfd_resampler_ack(struct kvm_irq_ack_notifier *kian)
+>  	struct kvm *kvm;
+>  	struct kvm_kernel_irqfd *irqfd;
+>  	int idx;
+> +	bool notify = true;
 >  
-> +void __kvm_register_irq_mask_notifier(struct kvm *kvm, int irq,
-> +				      struct kvm_irq_mask_notifier *kimn)
-> +{
-> +	kimn->irq = irq;
-> +	hlist_add_head_rcu(&kimn->link, &kvm->irq_mask_notifier_list);
+>  	resampler = container_of(kian,
+>  			struct kvm_kernel_irqfd_resampler, notifier);
+> @@ -75,13 +76,52 @@ irqfd_resampler_ack(struct kvm_irq_ack_notifier *kian)
+>  	kvm_set_irq(kvm, KVM_IRQFD_RESAMPLE_IRQ_SOURCE_ID,
+>  		    resampler->notifier.gsi, 0, false);
+>  
+> -	idx = srcu_read_lock(&kvm->irq_srcu);
+> +	spin_lock(&resampler->lock);
+> +	if (resampler->masked) {
+> +		notify = false;
+> +		resampler->pending = true;
+> +	}
+> +	spin_unlock(&resampler->lock);
+> +
+> +	if (notify) {
+> +		idx = srcu_read_lock(&kvm->irq_srcu);
+>  
+> -	list_for_each_entry_srcu(irqfd, &resampler->list, resampler_link,
+> -	    srcu_read_lock_held(&kvm->irq_srcu))
+> -		eventfd_signal(irqfd->resamplefd, 1);
+> +		list_for_each_entry_srcu(irqfd, &resampler->list, resampler_link,
+> +		    srcu_read_lock_held(&kvm->irq_srcu))
+> +			eventfd_signal(irqfd->resamplefd, 1);
+nit: you may introduce a helper for above code as the code is duplicated.
+>  
+> -	srcu_read_unlock(&kvm->irq_srcu, idx);
+> +		srcu_read_unlock(&kvm->irq_srcu, idx);
+> +	}
 > +}
 > +
->  void kvm_register_irq_mask_notifier(struct kvm *kvm, int irq,
->  				    struct kvm_irq_mask_notifier *kimn)
->  {
->  	mutex_lock(&kvm->irq_lock);
-> -	kimn->irq = irq;
-> -	hlist_add_head_rcu(&kimn->link, &kvm->irq_mask_notifier_list);
-> +	__kvm_register_irq_mask_notifier(kvm, irq, kimn);
->  	mutex_unlock(&kvm->irq_lock);
+> +static void irqfd_resampler_mask_notify(struct kvm_irq_mask_notifier *kimn,
+> +					bool masked)
+> +{
+> +	struct kvm_kernel_irqfd_resampler *resampler;
+> +	struct kvm *kvm;
+> +	struct kvm_kernel_irqfd *irqfd;
+> +	int idx;
+> +	bool notify;
+> +
+> +	resampler = container_of(kimn,
+> +			struct kvm_kernel_irqfd_resampler, mask_notifier);
+> +	kvm = resampler->kvm;
+> +
+> +	spin_lock(&resampler->lock);
+> +	notify = !masked && resampler->pending;
+> +	resampler->masked = masked;
+> +	resampler->pending = false;
+> +	spin_unlock(&resampler->lock);
+> +
+> +	if (notify) {
+> +		idx = srcu_read_lock(&kvm->irq_srcu);
+> +
+> +		list_for_each_entry_srcu(irqfd, &resampler->list, resampler_link,
+> +		    srcu_read_lock_held(&kvm->irq_srcu))
+> +			eventfd_signal(irqfd->resamplefd, 1);
+> +
+> +		srcu_read_unlock(&kvm->irq_srcu, idx);
+> +	}
 >  }
 >  
-> +/*
-> + * kvm_register_and_fire_irq_mask_notifier() registers the notifier and
-> + * immediately calls it with the current mask value of the IRQ. It does
-> + * that atomically, so that we will find out the initial mask state of
-> + * the IRQ and will not miss any further mask or unmask events. It does
-> + * that using the same locking order as when calling notifier normally
-> + * via kvm_fire_mask_notifiers(), to prevent deadlocks.
-you may document somewhere that it must be called before
-
-kvm_register_irq_ack_notifier()
-
-> + *
-> + * Implementation is arch-specific since it relies on arch-specific
-> + * (irqchip-specific) synchronization. Below is a weak dummy
-> + * implementation for archs not implementing it yet, as those archs
-> + * don't implement calling notifiers normally via
-> + * kvm_fire_mask_notifiers() either, i.e. registering mask notifiers
-> + * has no effect on those archs anyway.
-I would advise you to put Marc in the loop for the whole series (adding
-him in CC).
+>  static void
+> @@ -98,6 +138,8 @@ irqfd_resampler_shutdown(struct kvm_kernel_irqfd *irqfd)
+>  	if (list_empty(&resampler->list)) {
+>  		list_del(&resampler->link);
+>  		kvm_unregister_irq_ack_notifier(kvm, &resampler->notifier);
+> +		kvm_unregister_irq_mask_notifier(kvm, resampler->mask_notifier.irq,
+> +						 &resampler->mask_notifier);
+>  		kvm_set_irq(kvm, KVM_IRQFD_RESAMPLE_IRQ_SOURCE_ID,
+>  			    resampler->notifier.gsi, 0, false);
+>  		kfree(resampler);
+> @@ -367,9 +409,13 @@ kvm_irqfd_assign(struct kvm *kvm, struct kvm_irqfd *args)
+>  			INIT_LIST_HEAD(&resampler->list);
+>  			resampler->notifier.gsi = irqfd->gsi;
+>  			resampler->notifier.irq_acked = irqfd_resampler_ack;
+> +			resampler->mask_notifier.func = irqfd_resampler_mask_notify;
+> +			spin_lock_init(&resampler->lock);
+>  			INIT_LIST_HEAD(&resampler->link);
+>  
+>  			list_add(&resampler->link, &kvm->irqfds.resampler_list);
+> +			kvm_register_and_fire_irq_mask_notifier(kvm, irqfd->gsi,
+> +								&resampler->mask_notifier);
+>  			kvm_register_irq_ack_notifier(kvm,
+>  						      &resampler->notifier);
+>  			irqfd->resampler = resampler;
+Adding Marc in CC
 
 Thanks
 
 Eric
-> + */
-> +void __weak kvm_register_and_fire_irq_mask_notifier(struct kvm *kvm, int irq,
-> +						    struct kvm_irq_mask_notifier *kimn)
-> +{
-> +	kvm_register_irq_mask_notifier(kvm, irq, kimn);
-> +}
-> +
->  void kvm_unregister_irq_mask_notifier(struct kvm *kvm, int irq,
->  				      struct kvm_irq_mask_notifier *kimn)
->  {
 
