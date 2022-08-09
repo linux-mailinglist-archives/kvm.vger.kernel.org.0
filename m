@@ -2,252 +2,233 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id AAE4458E3BF
-	for <lists+kvm@lfdr.de>; Wed, 10 Aug 2022 01:30:37 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 88D9358E3DB
+	for <lists+kvm@lfdr.de>; Wed, 10 Aug 2022 01:51:07 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229496AbiHIXag (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 9 Aug 2022 19:30:36 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48792 "EHLO
+        id S229674AbiHIXvF (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 9 Aug 2022 19:51:05 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35138 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229449AbiHIXaf (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 9 Aug 2022 19:30:35 -0400
-Received: from mail-lf1-x129.google.com (mail-lf1-x129.google.com [IPv6:2a00:1450:4864:20::129])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 04B0E491EC
-        for <kvm@vger.kernel.org>; Tue,  9 Aug 2022 16:30:34 -0700 (PDT)
-Received: by mail-lf1-x129.google.com with SMTP id bq11so19044403lfb.5
-        for <kvm@vger.kernel.org>; Tue, 09 Aug 2022 16:30:33 -0700 (PDT)
+        with ESMTP id S229637AbiHIXvC (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 9 Aug 2022 19:51:02 -0400
+Received: from mail-pg1-x535.google.com (mail-pg1-x535.google.com [IPv6:2607:f8b0:4864:20::535])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E3A1C7B795;
+        Tue,  9 Aug 2022 16:51:01 -0700 (PDT)
+Received: by mail-pg1-x535.google.com with SMTP id c24so7961036pgg.11;
+        Tue, 09 Aug 2022 16:51:01 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=semihalf.com; s=google;
-        h=content-transfer-encoding:content-language:in-reply-to:mime-version
-         :user-agent:date:message-id:from:references:cc:to:subject:from:to:cc;
-        bh=iZRwQQqJlrwLCsKGlbObwH22s/7VDIFNBtxo7IR0iGM=;
-        b=phR66Nr/T+MuFGa2vBt/kFwbuJkQC6v36BuX7nbJpfOOFVL6bDB6NzutH535gBOgxG
-         EJ6DsY13KJ/BobITbT+druSIqjWbJpVSOyiP0NSOQh/U+hPf/UaXLGgHxWhakaWZ/6/G
-         O3eqhGdsvnOH6IhZEZeIUSYjAMCJDtRgDDCqfh7oStDhQJMlX4cfV7bnURNaCT4Bqhwx
-         bYDUkyJWvVeB7kxY3xmrSxuVylGEMufLS78IXMI3EAYzewz9sqzVbxukFq54gZD7ZmQ4
-         aZAB95yWTBYeYECyKhTfzZNJ3V1mrIdFyg2L+MEz9Gf0XjH6GP3ETbQ0jwF8fnOQ/vHa
-         qfAg==
+        d=gmail.com; s=20210112;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc;
+        bh=A8JRpCQzq2C7QuMe4NRu7pqz793xIE1JgEiojeA+Mg4=;
+        b=YlB2XvljIjzQPq3LRBihgS34XDDtuKdeTT/Kca4/74WgxEGwR1ZcekUzJKsrIoz6Fk
+         wjg2KWQ3kDRA+vdXB4rIWIil3Vg2YUBrMdJCFJmsxm8hwK1ONtRV9TGuwdh2kvzXfXJB
+         P3VGAVMXNeEeb6eew/BFtndWE4TXA0781JDEXRHVfVoucFLkC1kfBgyISLjcvMMylgyu
+         xZ5ILlxkNGOuzTC7NdVmgs8K1LaEoIM3qLc3+5sXQpY3dJ3dO2S7EIVy7IM74pImdfMh
+         yPOzF7LL0173kAGYfK1QAVbbcyg90oDR1HJQ/1BGld3KNNU//9MOa/Kuma8g6L0G6LSR
+         qWdw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=content-transfer-encoding:content-language:in-reply-to:mime-version
-         :user-agent:date:message-id:from:references:cc:to:subject
-         :x-gm-message-state:from:to:cc;
-        bh=iZRwQQqJlrwLCsKGlbObwH22s/7VDIFNBtxo7IR0iGM=;
-        b=UCTWA9k1QuTm/VTefnbQhYS0H/EDrkh2WBoUvAhPqDy/bNNbNRZ8YJCUr3M7KY5pbg
-         0mvAxhiwtSQ9k+ZgdJeyVhjDC4widSKEGLr30W8aQYq1TBy9MaXGdgL6FMmTlcHKLvvC
-         VXhakf4/a48SqSmTsDdlptkjayUzKEtoc9VdgRkfO75m0DDNRlhQ+W9YSgk83xl4zsPw
-         8rQuBMCh3pYTr6EDTjWF28gd1/qWqeazMNyCX9yvAy+xgNp549KB9yr20o8GRKOij+AX
-         QYchx8UDurfqCjIUsnwrIkrpiDbWWz295saUSorIoWqnJ9USbRaK0x/kFza9+JCUcdzH
-         zkkA==
-X-Gm-Message-State: ACgBeo2yD44EP60CY5/CXu+FVgZvEBpzb2MV+2lqdJewKG61jHeraGCb
-        GuaxO8UO0rnGRXjAPUngyNu5WQ==
-X-Google-Smtp-Source: AA6agR4HXcuGe5cAqbmjBRAOeYTzCU2ft9E8H6Qi7D7Mpgg02VczWM5eOi8Ny7jylCnwcxCBE4aPaw==
-X-Received: by 2002:ac2:4832:0:b0:48b:1899:b364 with SMTP id 18-20020ac24832000000b0048b1899b364mr8928921lft.534.1660087832351;
-        Tue, 09 Aug 2022 16:30:32 -0700 (PDT)
-Received: from ?IPv6:2a02:a31b:33d:9c00:463a:87e3:44fc:2b2f? ([2a02:a31b:33d:9c00:463a:87e3:44fc:2b2f])
-        by smtp.gmail.com with ESMTPSA id be36-20020a05651c172400b0025e48907929sm156503ljb.23.2022.08.09.16.30.30
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 09 Aug 2022 16:30:31 -0700 (PDT)
-Subject: Re: [PATCH v2 0/5] KVM: Fix oneshot interrupts forwarding
-To:     "Dong, Eddie" <eddie.dong@intel.com>,
-        "Christopherson,, Sean" <seanjc@google.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>
-Cc:     Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        Dave Hansen <dave.hansen@linux.intel.com>,
-        "x86@kernel.org" <x86@kernel.org>,
-        "H. Peter Anvin" <hpa@zytor.com>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        Eric Auger <eric.auger@redhat.com>,
-        Alex Williamson <alex.williamson@redhat.com>,
-        "Liu, Rong L" <rong.l.liu@intel.com>,
-        Zhenyu Wang <zhenyuw@linux.intel.com>,
-        Tomasz Nowicki <tn@semihalf.com>,
-        Grzegorz Jaszczyk <jaz@semihalf.com>,
-        "upstream@semihalf.com" <upstream@semihalf.com>,
-        Dmitry Torokhov <dtor@google.com>,
-        Marc Zyngier <maz@kernel.org>
-References: <20220805193919.1470653-1-dmy@semihalf.com>
- <BL0PR11MB30429034B6D59253AF22BCE08A639@BL0PR11MB3042.namprd11.prod.outlook.com>
- <c5d8f537-5695-42f0-88a9-de80e21f5f4c@semihalf.com>
- <BL0PR11MB304213273FA9FAC4EBC70FF88A629@BL0PR11MB3042.namprd11.prod.outlook.com>
-From:   Dmytro Maluka <dmy@semihalf.com>
-Message-ID: <ef9ffbde-445e-f00f-23c1-27e23b6cca4f@semihalf.com>
-Date:   Wed, 10 Aug 2022 01:30:29 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.13.0
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc;
+        bh=A8JRpCQzq2C7QuMe4NRu7pqz793xIE1JgEiojeA+Mg4=;
+        b=nNL49lxK9wOV+GyKNgJ0CYP/ymG6n2jGmTNoEqwpmqdMwHFOvBlSE3jyKl4SqemuEO
+         iotVvldJK7LoigH2h0LJ/8kYZ2Ylw7EIoxYZzTPW2yJLtw5qqeMrEzGXANE/7Qn9oXdh
+         sSs0beHnpMpAZQYnnvkJta9IMTbC9Y5XkM7HU3iCVMhJig1qQtDRmPp7jTO2b+VwthZt
+         TdzGoPXbzhVJTzKgm0RP8fRy1aulB9hF8vMMjbn8JMbTiJHXoqZWr01p6Os/m1ELvL8A
+         l3j+y1Bi++RN9AV74K/uyhHllxr7zkyxDd2SuByMPXBF3WbvceLQ9C2fUQXQt4SDTCUC
+         l+8w==
+X-Gm-Message-State: ACgBeo0AEyLLeKHnKL06g8yfb91DyzRbxCnjBqi4Ev3k1CXmba6q9tyq
+        Zlj0VM9z+hsm5r1vY238yww=
+X-Google-Smtp-Source: AA6agR6hbY0Uamzn6SRiOPSJMYmJM+4t3To4ftou4MRLOXsOzfr1/N+AEM9bfItpSNmlmqo+Zg29fg==
+X-Received: by 2002:a63:ec04:0:b0:41c:1149:4523 with SMTP id j4-20020a63ec04000000b0041c11494523mr20526073pgh.62.1660089061164;
+        Tue, 09 Aug 2022 16:51:01 -0700 (PDT)
+Received: from localhost ([192.55.54.49])
+        by smtp.gmail.com with ESMTPSA id v12-20020a17090a4ecc00b001f260b1954bsm175813pjl.13.2022.08.09.16.51.00
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 09 Aug 2022 16:51:00 -0700 (PDT)
+Date:   Tue, 9 Aug 2022 16:50:59 -0700
+From:   Isaku Yamahata <isaku.yamahata@gmail.com>
+To:     David Matlack <dmatlack@google.com>
+Cc:     isaku.yamahata@intel.com, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org, isaku.yamahata@gmail.com,
+        Paolo Bonzini <pbonzini@redhat.com>
+Subject: Re: [PATCH v7 044/102] KVM: x86/mmu: Add a private pointer to struct
+ kvm_mmu_page
+Message-ID: <20220809235059.GA515657@ls.amr.corp.intel.com>
+References: <cover.1656366337.git.isaku.yamahata@intel.com>
+ <392839e09c48ff4e14a598ff6ed8bd56429bf17b.1656366338.git.isaku.yamahata@intel.com>
+ <YuLt72E66iuvRtl7@google.com>
 MIME-Version: 1.0
-In-Reply-To: <BL0PR11MB304213273FA9FAC4EBC70FF88A629@BL0PR11MB3042.namprd11.prod.outlook.com>
 Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
+Content-Disposition: inline
+In-Reply-To: <YuLt72E66iuvRtl7@google.com>
 X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_DNSWL_NONE,
-        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
-        autolearn_force=no version=3.4.6
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
+        RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 8/9/22 10:01 PM, Dong, Eddie wrote:
-> 
-> 
->> -----Original Message-----
->> From: Dmytro Maluka <dmy@semihalf.com>
->> Sent: Tuesday, August 9, 2022 12:24 AM
->> To: Dong, Eddie <eddie.dong@intel.com>; Christopherson,, Sean
->> <seanjc@google.com>; Paolo Bonzini <pbonzini@redhat.com>;
->> kvm@vger.kernel.org
->> Cc: Thomas Gleixner <tglx@linutronix.de>; Ingo Molnar <mingo@redhat.com>;
->> Borislav Petkov <bp@alien8.de>; Dave Hansen <dave.hansen@linux.intel.com>;
->> x86@kernel.org; H. Peter Anvin <hpa@zytor.com>; linux-
->> kernel@vger.kernel.org; Eric Auger <eric.auger@redhat.com>; Alex
->> Williamson <alex.williamson@redhat.com>; Liu, Rong L <rong.l.liu@intel.com>;
->> Zhenyu Wang <zhenyuw@linux.intel.com>; Tomasz Nowicki
->> <tn@semihalf.com>; Grzegorz Jaszczyk <jaz@semihalf.com>;
->> upstream@semihalf.com; Dmitry Torokhov <dtor@google.com>
->> Subject: Re: [PATCH v2 0/5] KVM: Fix oneshot interrupts forwarding
->>
->> On 8/9/22 1:26 AM, Dong, Eddie wrote:
->>>>
->>>> The existing KVM mechanism for forwarding of level-triggered
->>>> interrupts using resample eventfd doesn't work quite correctly in the
->>>> case of interrupts that are handled in a Linux guest as oneshot
->>>> interrupts (IRQF_ONESHOT). Such an interrupt is acked to the device
->>>> in its threaded irq handler, i.e. later than it is acked to the
->>>> interrupt controller (EOI at the end of hardirq), not earlier. The
->>>> existing KVM code doesn't take that into account, which results in
->>>> erroneous extra interrupts in the guest caused by premature re-assert of an
->> unacknowledged IRQ by the host.
->>>
->>> Interesting...  How it behaviors in native side?
->>
->> In native it behaves correctly, since Linux masks such a oneshot interrupt at the
->> beginning of hardirq, so that the EOI at the end of hardirq doesn't result in its
->> immediate re-assert, and then unmasks it later, after its threaded irq handler
->> completes.
->>
->> In handle_fasteoi_irq():
->>
->> 	if (desc->istate & IRQS_ONESHOT)
->> 		mask_irq(desc);
->>
->> 	handle_irq_event(desc);
->>
->> 	cond_unmask_eoi_irq(desc, chip);
->>
->>
->> and later in unmask_threaded_irq():
->>
->> 	unmask_irq(desc);
->>
->> I also mentioned that in patch #3 description:
->> "Linux keeps such interrupt masked until its threaded handler finishes, to
->> prevent the EOI from re-asserting an unacknowledged interrupt.
-> 
-> That makes sense. Can you include the full story in cover letter too?
+On Thu, Jul 28, 2022 at 01:13:35PM -0700,
+David Matlack <dmatlack@google.com> wrote:
 
-Ok, I will.
-
+> On Mon, Jun 27, 2022 at 02:53:36PM -0700, isaku.yamahata@intel.com wrote:
+> > From: Isaku Yamahata <isaku.yamahata@intel.com>
+> > 
+> > For private GPA, CPU refers a private page table whose contents are
+> > encrypted.  The dedicated APIs to operate on it (e.g. updating/reading its
+> > PTE entry) are used and their cost is expensive.
+> > 
+> > When KVM resolves KVM page fault, it walks the page tables.  To reuse the
+> > existing KVM MMU code and mitigate the heavy cost to directly walk
+> > encrypted private page table, allocate a more page to mirror the existing
+> > KVM page table.  Resolve KVM page fault with the existing code, and do
+> > additional operations necessary for the mirrored private page table.  To
+> > distinguish such cases, the existing KVM page table is called a shared page
+> > table (i.e. no mirrored private page table), and the KVM page table with
+> > mirrored private page table is called a private page table.  The
+> > relationship is depicted below.
+> > 
+> > Add private pointer to struct kvm_mmu_page for mirrored private page table
+> > and add helper functions to allocate/initialize/free a mirrored private
+> > page table page.  Also, add helper functions to check if a given
+> > kvm_mmu_page is private.  The later patch introduces hooks to operate on
+> > the mirrored private page table.
+> > 
+> >               KVM page fault                     |
+> >                      |                           |
+> >                      V                           |
+> >         -------------+----------                 |
+> >         |                      |                 |
+> >         V                      V                 |
+> >      shared GPA           private GPA            |
+> >         |                      |                 |
+> >         V                      V                 |
+> >  CPU/KVM shared PT root  KVM private PT root     |  CPU private PT root
+> >         |                      |                 |           |
+> >         V                      V                 |           V
+> >      shared PT            private PT <----mirror----> mirrored private PT
+> >         |                      |                 |           |
+> >         |                      \-----------------+------\    |
+> >         |                                        |      |    |
+> >         V                                        |      V    V
+> >   shared guest page                              |    private guest page
+> >                                                  |
+> >                            non-encrypted memory  |    encrypted memory
+> >                                                  |
+> > PT: page table
+> > 
+> > Both CPU and KVM refer to CPU/KVM shared page table.  Private page table
+> > is used only by KVM.  CPU refers to mirrored private page table.
+> > 
+> > Signed-off-by: Isaku Yamahata <isaku.yamahata@intel.com>
+> > ---
+> >  arch/x86/include/asm/kvm_host.h |  1 +
+> >  arch/x86/kvm/mmu/mmu.c          |  9 ++++
+> >  arch/x86/kvm/mmu/mmu_internal.h | 84 +++++++++++++++++++++++++++++++++
+> >  arch/x86/kvm/mmu/tdp_mmu.c      |  3 ++
+> >  4 files changed, 97 insertions(+)
+> > 
+> > diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
+> > index f4d4ed41641b..bfc934dc9a33 100644
+> > --- a/arch/x86/include/asm/kvm_host.h
+> > +++ b/arch/x86/include/asm/kvm_host.h
+> > @@ -716,6 +716,7 @@ struct kvm_vcpu_arch {
+> >  	struct kvm_mmu_memory_cache mmu_shadow_page_cache;
+> >  	struct kvm_mmu_memory_cache mmu_gfn_array_cache;
+> >  	struct kvm_mmu_memory_cache mmu_page_header_cache;
+> > +	struct kvm_mmu_memory_cache mmu_private_sp_cache;
+> >  
+> >  	/*
+> >  	 * QEMU userspace and the guest each have their own FPU state.
+> > diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
+> > index c517c7bca105..a5bf3e40e209 100644
+> > --- a/arch/x86/kvm/mmu/mmu.c
+> > +++ b/arch/x86/kvm/mmu/mmu.c
+> > @@ -691,6 +691,13 @@ static int mmu_topup_shadow_page_cache(struct kvm_vcpu *vcpu)
+> >  	int start, end, i, r;
+> >  	bool is_tdp_mmu = is_tdp_mmu_enabled(vcpu->kvm);
+> >  
+> > +	if (kvm_gfn_shared_mask(vcpu->kvm)) {
+> > +		r = kvm_mmu_topup_memory_cache(&vcpu->arch.mmu_private_sp_cache,
+> > +					       PT64_ROOT_MAX_LEVEL);
+> > +		if (r)
+> > +			return r;
+> > +	}
+> > +
+> >  	if (is_tdp_mmu && shadow_nonpresent_value)
+> >  		start = kvm_mmu_memory_cache_nr_free_objects(mc);
+> >  
+> > @@ -732,6 +739,7 @@ static void mmu_free_memory_caches(struct kvm_vcpu *vcpu)
+> >  {
+> >  	kvm_mmu_free_memory_cache(&vcpu->arch.mmu_pte_list_desc_cache);
+> >  	kvm_mmu_free_memory_cache(&vcpu->arch.mmu_shadow_page_cache);
+> > +	kvm_mmu_free_memory_cache(&vcpu->arch.mmu_private_sp_cache);
+> >  	kvm_mmu_free_memory_cache(&vcpu->arch.mmu_gfn_array_cache);
+> >  	kvm_mmu_free_memory_cache(&vcpu->arch.mmu_page_header_cache);
+> >  }
+> > @@ -1736,6 +1744,7 @@ static struct kvm_mmu_page *kvm_mmu_alloc_page(struct kvm_vcpu *vcpu, int direct
+> >  	if (!direct)
+> >  		sp->gfns = kvm_mmu_memory_cache_alloc(&vcpu->arch.mmu_gfn_array_cache);
+> >  	set_page_private(virt_to_page(sp->spt), (unsigned long)sp);
+> > +	kvm_mmu_init_private_sp(sp, NULL);
+> >  
+> >  	/*
+> >  	 * active_mmu_pages must be a FIFO list, as kvm_zap_obsolete_pages()
+> > diff --git a/arch/x86/kvm/mmu/mmu_internal.h b/arch/x86/kvm/mmu/mmu_internal.h
+> > index 44a04fad4bed..9f3a6bea60a3 100644
+> > --- a/arch/x86/kvm/mmu/mmu_internal.h
+> > +++ b/arch/x86/kvm/mmu/mmu_internal.h
+> > @@ -55,6 +55,10 @@ struct kvm_mmu_page {
+> >  	u64 *spt;
+> >  	/* hold the gfn of each spte inside spt */
+> >  	gfn_t *gfns;
+> > +#ifdef CONFIG_KVM_MMU_PRIVATE
+> > +	/* associated private shadow page, e.g. SEPT page. */
+> > +	void *private_sp;
+> > +#endif
 > 
+> write_flooding_count and unsync_children are only used in shadow MMU SPs
+> and private_sp is only used in TDP MMU SPs. So it seems like we could
+> put these together in a union and drop CONFIG_KVM_MMU_PRIVATE without
+> increasing the size of kvm_mmu_page. i.e.
+
+I introduced KVM_MMU_PRIVATE as a alias to INTEL_TDX_HOST because I don't want
+to use it in kvm/mmu and I'd like KVM_MMU_PRIVATE (a sort of) independent from
+INTEL_TDX_HOST.  Anyway once the patch series is merged, we can drop
+KVM_MMU_PRIVATE.
+
+
+> 	union {
+> 		struct {
+> 			unsigned int unsync_children;
+> 			/* Number of writes since the last time traversal visited this page.  */
+> 			atomic_t write_flooding_count;
+> 		};
+> 		/*
+> 		 * The associated private shadow page table, e.g. for Secure EPT.
+> 		 * Only valid if tdp_mmu_page is true.
+> 		 */
+> 		void *private_spt;
+> 	};
 > 
->> However, with KVM + vfio (or whatever is listening on the resamplefd) we don't
->> check that the interrupt is still masked in the guest at the moment of EOI.
->> Resamplefd is notified regardless, so vfio prematurely unmasks the host
->> physical IRQ, thus a new (unwanted) physical interrupt is generated in the host
->> and queued for injection to the guest."
->>
+> Then change is_private_sp() to:
 > 
-> Emulation of level triggered IRQ is a pain point ☹
-> I read we need to emulate the "level" of the IRQ pin (connecting from device to IRQchip, i.e. ioapic here).
-> Technically, the guest can change the polarity of vIOAPIC, which will lead to a new  virtual IRQ 
-> even w/o host side interrupt.  
-
-Thanks, interesting point. Do you mean that this behavior (a new vIRQ as
-a result of polarity change) may already happen with the existing KVM code?
-
-It doesn't seem so to me. AFAICT, KVM completely ignores the vIOAPIC
-polarity bit, in particular it doesn't handle change of the polarity by
-the guest (i.e. doesn't update the virtual IRR register, and so on), so
-it shouldn't result in a new interrupt.
-
-Since commit 100943c54e09 ("kvm: x86: ignore ioapic polarity") there
-seems to be an assumption that KVM interpretes the IRQ level value as
-active (asserted) vs inactive (deasserted) rather than high vs low, i.e.
-the polarity doesn't matter to KVM.
-
-So, since both sides (KVM emulating the IOAPIC, and vfio/whatever
-emulating an external interrupt source) seem to operate on a level of
-abstraction of "asserted" vs "de-asserted" interrupt state regardless of
-the polarity, and that seems not a bug but a feature, it seems that we
-don't need to emulate the IRQ level as such. Or am I missing something?
-
-OTOH, I guess this means that the existing KVM's emulation of
-level-triggered interrupts is somewhat limited (a guest may legitimately
-expect an interrupt fired as a result of polarity change, and that case
-is not supported by KVM). But that is rather out of scope of the oneshot
-interrupts issue addressed by this patchset.
-
-> "pending" field of kvm_kernel_irqfd_resampler in patch 3 means more an event rather than an interrupt level.
+> static inline bool is_private_sp(struct kvm_mmu_page *sp)
+> {
+> 	return sp->tdp_mmu_page && sp->private_sp;
+> }
 > 
-> 
->>>
->>>>
->>>> This patch series fixes this issue (for now on x86 only) by checking
->>>> if the interrupt is unmasked when we receive irq ack (EOI) and, in
->>>> case if it's masked, postponing resamplefd notify until the guest unmasks it.
->>>>
->>>> Patches 1 and 2 extend the existing support for irq mask notifiers in
->>>> KVM, which is a prerequisite needed for KVM irqfd to use mask
->>>> notifiers to know when an interrupt is masked or unmasked.
->>>>
->>>> Patch 3 implements the actual fix: postponing resamplefd notify in
->>>> irqfd until the irq is unmasked.
->>>>
->>>> Patches 4 and 5 just do some optional renaming for consistency, as we
->>>> are now using irq mask notifiers in irqfd along with irq ack notifiers.
->>>>
->>>> Please see individual patches for more details.
->>>>
->>>> v2:
->>>>   - Fixed compilation failure on non-x86: mask_notifier_list moved from
->>>>     x86 "struct kvm_arch" to generic "struct kvm".
->>>>   - kvm_fire_mask_notifiers() also moved from x86 to generic code, even
->>>>     though it is not called on other architectures for now.
->>>>   - Instead of kvm_irq_is_masked() implemented
->>>>     kvm_register_and_fire_irq_mask_notifier() to fix potential race
->>>>     when reading the initial IRQ mask state.
->>>>   - Renamed for clarity:
->>>>       - irqfd_resampler_mask() -> irqfd_resampler_mask_notify()
->>>>       - kvm_irq_has_notifier() -> kvm_irq_has_ack_notifier()
->>>>       - resampler->notifier -> resampler->ack_notifier
->>>>   - Reorganized code in irqfd_resampler_ack() and
->>>>     irqfd_resampler_mask_notify() to make it easier to follow.
->>>>   - Don't follow unwanted "return type on separate line" style for
->>>>     irqfd_resampler_mask_notify().
->>>>
->>>> Dmytro Maluka (5):
->>>>   KVM: x86: Move irq mask notifiers from x86 to generic KVM
->>>>   KVM: x86: Add kvm_register_and_fire_irq_mask_notifier()
->>>>   KVM: irqfd: Postpone resamplefd notify for oneshot interrupts
->>>>   KVM: irqfd: Rename resampler->notifier
->>>>   KVM: Rename kvm_irq_has_notifier()
->>>>
->>>>  arch/x86/include/asm/kvm_host.h |  17 +---
->>>>  arch/x86/kvm/i8259.c            |   6 ++
->>>>  arch/x86/kvm/ioapic.c           |   8 +-
->>>>  arch/x86/kvm/ioapic.h           |   1 +
->>>>  arch/x86/kvm/irq_comm.c         |  74 +++++++++++------
->>>>  arch/x86/kvm/x86.c              |   1 -
->>>>  include/linux/kvm_host.h        |  21 ++++-
->>>>  include/linux/kvm_irqfd.h       |  16 +++-
->>>>  virt/kvm/eventfd.c              | 136 ++++++++++++++++++++++++++++----
->>>>  virt/kvm/kvm_main.c             |   1 +
->>>>  10 files changed, 221 insertions(+), 60 deletions(-)
->>>>
->>>> --
->>>> 2.37.1.559.g78731f0fdb-goog
->>>
+> This will allow us to drop CONFIG_KVM_MMU_PRIVATE, the only benefit of
+> which I see is to avoid increasing the size of kvm_mmu_page. However
+> to actually realize that benefit Cloud vendors (for example) would have
+> to create separate kernel builds for TDX and non-TDX hosts, which seems
+> like a huge hassel.
+
+Good idea. I'll use union.
+-- 
+Isaku Yamahata <isaku.yamahata@gmail.com>
