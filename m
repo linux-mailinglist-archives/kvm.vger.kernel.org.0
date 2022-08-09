@@ -2,203 +2,278 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 8F09F58D9ED
-	for <lists+kvm@lfdr.de>; Tue,  9 Aug 2022 15:51:48 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id C9AB358D9F2
+	for <lists+kvm@lfdr.de>; Tue,  9 Aug 2022 15:53:59 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S244640AbiHINvr (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 9 Aug 2022 09:51:47 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60002 "EHLO
+        id S244672AbiHINx5 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 9 Aug 2022 09:53:57 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33168 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S239746AbiHINvm (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 9 Aug 2022 09:51:42 -0400
-Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8400EBF4;
-        Tue,  9 Aug 2022 06:51:40 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=casper.20170209; h=MIME-Version:Content-Type:References:
-        In-Reply-To:Date:Cc:To:From:Subject:Message-ID:Sender:Reply-To:
-        Content-Transfer-Encoding:Content-ID:Content-Description;
-        bh=//Tju6UR8JQSjjvOc8R7xQQEI50bRDuNbY4ENlpXBOU=; b=TpghGpX4Q+BeePWi+coPxavwCG
-        bjRxWfkICk0usEtyeSktt7JNqB3WVRNiHBN/JyEckAACJY0pysxdr5OUY1u9uzcBvWa+kxbqB9Qak
-        D97kyi34IoHL2A79ZMmLzrKU12cUw5lVxU7b/EcpeeCN9B7REC5UwKh+p/TeZyEuObSCApnUz3kku
-        QcJYULljAuCEGYeh6DosIccu553gAaUuWK8axZcWdl0CX5hJsuEL4FbEMFEeuIxOlqYvw0RkbXPzM
-        OFS5ItVc0VcHWIhkGAboXj96IUTFJtbGJPiCN2q9g9q4vOOC+Bfd3YogoqUlXQsUb7vZnYnoZji3P
-        TmZjY+2Q==;
-Received: from [2001:8b0:10b:1:4a2a:e3ff:fe14:8625] (helo=u3832b3a9db3152.ant.amazon.com)
-        by casper.infradead.org with esmtpsa (Exim 4.94.2 #2 (Red Hat Linux))
-        id 1oLPdt-00FQ2R-RE; Tue, 09 Aug 2022 13:51:34 +0000
-Message-ID: <4fc1371b83001b4eed1617c37bec6b9d007e45c2.camel@infradead.org>
-Subject: Re: [PATCH v3 2/2] KVM: x86/xen: Stop Xen timer before changing IRQ
-From:   David Woodhouse <dwmw2@infradead.org>
-To:     Paolo Bonzini <pbonzini@redhat.com>,
-        Coleman Dietsch <dietschc@csp.edu>, kvm@vger.kernel.org
-Cc:     Sean Christopherson <seanjc@google.com>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org,
-        "H . Peter Anvin" <hpa@zytor.com>, linux-kernel@vger.kernel.org,
-        skhan@linuxfoundation.org, Pavel Skripkin <paskripkin@gmail.com>,
-        linux-kernel-mentees@lists.linuxfoundation.org,
-        stable@vger.kernel.org,
-        syzbot+e54f930ed78eb0f85281@syzkaller.appspotmail.com
-Date:   Tue, 09 Aug 2022 14:51:32 +0100
-In-Reply-To: <43e258cc-71ac-bde4-d1f8-9eb9519928d3@redhat.com>
-References: <20220808190607.323899-2-dietschc@csp.edu>
-         <20220808190607.323899-3-dietschc@csp.edu>
-         <c648744c096588d30771a22efa6d65c31fffd06c.camel@infradead.org>
-         <43e258cc-71ac-bde4-d1f8-9eb9519928d3@redhat.com>
-Content-Type: multipart/signed; micalg="sha-256"; protocol="application/pkcs7-signature";
-        boundary="=-OHRVuSN7bJcJSl4kVZbB"
-User-Agent: Evolution 3.36.5-0ubuntu1 
+        with ESMTP id S239746AbiHINx4 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 9 Aug 2022 09:53:56 -0400
+Received: from EUR04-VI1-obe.outbound.protection.outlook.com (mail-eopbgr80077.outbound.protection.outlook.com [40.107.8.77])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 75C5B2610
+        for <kvm@vger.kernel.org>; Tue,  9 Aug 2022 06:53:54 -0700 (PDT)
+ARC-Seal: i=2; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=pass;
+ b=DbCeHyVdRMVm9RcqgejGuWvfmDxvQREDrVKT4RIgu1pCgEIWzDicfAl0FRl1dZ8ovQMDyvhsDFHE+VUiOjP6gldjWBSXBWPukpF0RDZ1WdBDQyAF83u1evGIt8xDuqvwJXZGoMjXCGfidIPi1LJR7Xa1GGXPHX4aWAvNznQ7DJbCZ1785uv5M4XYOlBReHooVdTmmIXsPP/kzAcwIrUHrWWRJKRNosaACTnMrP9nb0gXZDPd7pzZNWT561Q5s5R59th3cZJZJWJtnbxp4JN/Y0rE3xad7DZGQ23Di2Y5Qs+d2eBI+YKkMpIliuZFNJyriezZB+z299XQURlgq+CZQg==
+ARC-Message-Signature: i=2; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=YCDv48U3BLl490S4d2Gd37kg/2WlkPVnCcewTiOQ4gE=;
+ b=NJJKARDk9a/U04MhO/Su49k/JQcGJODxLwrVOEYyqvaC81a2I/YHYWy8v9i2fhuF0oSifYgNJG7H4Q5Vn/AECRkSWTIBBGcCvAPUw0bWY0FBPY+LV6Nq3y4WkLsbjJSr276L62Te3kanaCaFdlx5iKdp8U/TYtzG3gXAgf+Sz/frQrvkvUVjY7UrBEBpbRG4SvPW1+pQm8CdOtxS6qIEzeJxoSr7XquL7awxzSLec1xvBgqWfJz7Fd15Z3OchkRm2mShXEpjYu2XFdafML34OUFmZp0+J2zb2snsmc86CXgfx69cnq/yAAWDFHiuQ3YU4q92PUX6u0exTuh6PPOYbQ==
+ARC-Authentication-Results: i=2; mx.microsoft.com 1; spf=pass (sender ip is
+ 63.35.35.123) smtp.rcpttodomain=vger.kernel.org smtp.mailfrom=arm.com;
+ dmarc=pass (p=none sp=none pct=100) action=none header.from=arm.com;
+ dkim=pass (signature was verified) header.d=armh.onmicrosoft.com; arc=pass (0
+ oda=1 ltdi=1 spf=[1,1,smtp.mailfrom=arm.com] dkim=[1,1,header.d=arm.com]
+ dmarc=[1,1,header.from=arm.com])
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=armh.onmicrosoft.com;
+ s=selector2-armh-onmicrosoft-com;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=YCDv48U3BLl490S4d2Gd37kg/2WlkPVnCcewTiOQ4gE=;
+ b=h61R5Cy3TOFcENXvDWGm9jHQd4cFIKjOxPMEjUuz5zCcX1k30sRGoEGQM+wkOFYbYIPjRlXFOVOpWm/e1t0yRnTFt+4QwKAPij6UJ0EETsBBmLiGsYzBGkeR3vWDrRIg70WhqfuiZOLoOKpSn9b8XyZTfXn4uqwz5yQLDtewrKA=
+Received: from DU2P251CA0015.EURP251.PROD.OUTLOOK.COM (2603:10a6:10:230::19)
+ by DB7PR08MB3275.eurprd08.prod.outlook.com (2603:10a6:5:24::26) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5504.14; Tue, 9 Aug
+ 2022 13:53:51 +0000
+Received: from DBAEUR03FT051.eop-EUR03.prod.protection.outlook.com
+ (2603:10a6:10:230:cafe::20) by DU2P251CA0015.outlook.office365.com
+ (2603:10a6:10:230::19) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5504.21 via Frontend
+ Transport; Tue, 9 Aug 2022 13:53:51 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 63.35.35.123)
+ smtp.mailfrom=arm.com; dkim=pass (signature was verified)
+ header.d=armh.onmicrosoft.com;dmarc=pass action=none header.from=arm.com;
+Received-SPF: Pass (protection.outlook.com: domain of arm.com designates
+ 63.35.35.123 as permitted sender) receiver=protection.outlook.com;
+ client-ip=63.35.35.123; helo=64aa7808-outbound-1.mta.getcheckrecipient.com;
+ pr=C
+Received: from 64aa7808-outbound-1.mta.getcheckrecipient.com (63.35.35.123) by
+ DBAEUR03FT051.mail.protection.outlook.com (100.127.142.148) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.5504.16 via Frontend Transport; Tue, 9 Aug 2022 13:53:51 +0000
+Received: ("Tessian outbound fa99bf31ee7d:v123"); Tue, 09 Aug 2022 13:53:51 +0000
+X-CheckRecipientChecked: true
+X-CR-MTA-CID: 0e11ca4bd0cb821e
+X-CR-MTA-TID: 64aa7808
+Received: from b1dbd22baf1b.2
+        by 64aa7808-outbound-1.mta.getcheckrecipient.com id 673CA2B8-717E-4042-A88F-F9A388FF180D.1;
+        Tue, 09 Aug 2022 13:53:44 +0000
+Received: from EUR04-VI1-obe.outbound.protection.outlook.com
+    by 64aa7808-outbound-1.mta.getcheckrecipient.com with ESMTPS id b1dbd22baf1b.2
+    (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384);
+    Tue, 09 Aug 2022 13:53:44 +0000
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=IhyYnuvT+4obDFJikM/BMsqSHmSALvpQZYOrbTiMztdp9b4V8HA9zOAq1r/JLrtHOph3e5XHa/N/nCcKDlllil9P8/HmkiemIKdcrvToNDoI1WiPiSliXxm8dq+S7/QgIC3ciK6fXHJZpckiKr7AUBOecAoE+G0n2UsIIXdVhOnAvQrJWbYDYX5ub/bml48PM83duHjuJG6G1eAA/QVV1ByWyTd9w1EYolF5pdVqJS89Kmyg38d8XvLvj6pBWWp9Dq4QY8evR2IRerFvp4M13FnTgjsLq/dCSig1WkDIcHnBQlqinC0vfvt05w1Ngn1hjuXF2aNnInFaviVUemrR7A==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=YCDv48U3BLl490S4d2Gd37kg/2WlkPVnCcewTiOQ4gE=;
+ b=ethCCN4+s74sHYvVkWyL+YkBxWz/Stq9KyN2GEB4ckud8pCe1OL3L660ItCpPkxDJZv46+yn8DB/oGnjfsubr1qp9rqyxX/1tK/4Zkuaunj/Dd6Eh4sTWoTK9IhVaUBx4gbq7/Vm3a7K6JrrdhKNTg7zCgIRlHQXAKe416ZKi486Y4WSoF9l9FHk+tiOkVFjvZ0DqUPKIFznRxzBhCJHTNRYFKAH/buiEC63TFu0sUl8NWl0cIO57q1fzrfrO/KhZMn0DOuC32LSFVdbBLJRt0iIXbuOJEdI57jdgnjYg1bR+VrVoq1QmSBIwWfVuZUMZEP4EDgUsmLWpPaMD188pQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=arm.com; dmarc=pass action=none header.from=arm.com; dkim=pass
+ header.d=arm.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=armh.onmicrosoft.com;
+ s=selector2-armh-onmicrosoft-com;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=YCDv48U3BLl490S4d2Gd37kg/2WlkPVnCcewTiOQ4gE=;
+ b=h61R5Cy3TOFcENXvDWGm9jHQd4cFIKjOxPMEjUuz5zCcX1k30sRGoEGQM+wkOFYbYIPjRlXFOVOpWm/e1t0yRnTFt+4QwKAPij6UJ0EETsBBmLiGsYzBGkeR3vWDrRIg70WhqfuiZOLoOKpSn9b8XyZTfXn4uqwz5yQLDtewrKA=
+Authentication-Results-Original: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=arm.com;
+Received: from PAXPR08MB7017.eurprd08.prod.outlook.com (2603:10a6:102:1df::21)
+ by AS8PR08MB8222.eurprd08.prod.outlook.com (2603:10a6:20b:52a::12) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5504.15; Tue, 9 Aug
+ 2022 13:53:41 +0000
+Received: from PAXPR08MB7017.eurprd08.prod.outlook.com
+ ([fe80::3199:7b81:627:45e9]) by PAXPR08MB7017.eurprd08.prod.outlook.com
+ ([fe80::3199:7b81:627:45e9%7]) with mapi id 15.20.5504.021; Tue, 9 Aug 2022
+ 13:53:40 +0000
+Message-ID: <3fba260d-bfca-14ea-7bdd-3e55f3d1e276@arm.com>
+Date:   Tue, 9 Aug 2022 14:53:34 +0100
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:91.0)
+ Gecko/20100101 Thunderbird/91.12.0
+Subject: Re: [kvm-unit-tests RFC PATCH 19/19] arm/arm64: Rework the cache
+ maintenance in asm_mmu_disable
+Content-Language: en-GB
+To:     Alexandru Elisei <alexandru.elisei@arm.com>, pbonzini@redhat.com,
+        thuth@redhat.com, andrew.jones@linux.dev, kvm@vger.kernel.org,
+        kvmarm@lists.cs.columbia.edu
+References: <20220809091558.14379-1-alexandru.elisei@arm.com>
+ <20220809091558.14379-20-alexandru.elisei@arm.com>
+From:   Nikos Nikoleris <nikos.nikoleris@arm.com>
+In-Reply-To: <20220809091558.14379-20-alexandru.elisei@arm.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: quoted-printable
+X-ClientProxiedBy: LO4P123CA0313.GBRP123.PROD.OUTLOOK.COM
+ (2603:10a6:600:197::12) To PAXPR08MB7017.eurprd08.prod.outlook.com
+ (2603:10a6:102:1df::21)
 MIME-Version: 1.0
-X-SRS-Rewrite: SMTP reverse-path rewritten from <dwmw2@infradead.org> by casper.infradead.org. See http://www.infradead.org/rpr.html
-X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,SPF_HELO_NONE,
-        SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no
-        version=3.4.6
+X-MS-Office365-Filtering-Correlation-Id: 2c2783ff-37ea-4c5a-f0ab-08da7a0e9752
+X-MS-TrafficTypeDiagnostic: AS8PR08MB8222:EE_|DBAEUR03FT051:EE_|DB7PR08MB3275:EE_
+x-checkrecipientrouted: true
+NoDisclaimer: true
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam-Untrusted: BCL:0;
+X-Microsoft-Antispam-Message-Info-Original: mVP0v+OJusJOd40RZ2uNA5fD/BzvCK2GKSdaj1x0IJqA4uoG2qHvwwmKugpnFEpkmy4Py58XWszaQkZEGwms/tUWMD1u73FEfN9IQAC0eAPjR+Jm0cduV5lNVGJtpihpNGWO6ONpLqdcVhRUVJqI9EXYpig0qqHyGbcylBZ42VFBM8jfx2h630ey4Js83gXC36EymtcfspmUqiZKAXclJfKHd1qKqXtU1dwYQ3o9i1QyeIwzInmRV0OQj9emLwmMOXFZgZwYmNSRIlZSfwNojNjod6lTr1aMCOsVQ7QOwE2yr5sh03xkhmrpN/eLljGwjY527zzp3TCJ+1F1Wwhv8KB2JVvoltiPRJVWMBO74DrUGO1N6JJdYAh9zgHnBjGuymcpoGrdHLISWCWOpo5NdAXuhnNcIsLGpBhnswAkT5G1C5lY77xYo7rboszGBWC/0cIb2Q6mQZ176qn2n+al0dPwWNyOZL0NjfGmGxKz+dOgfjazBcIix5QjAgEM+wQnNKFCKygWGod8ijfAQynTIjLSRqrRSi85t1NxcP/HOKrv3G0HtLzBO38UfizbmMzligRt5CK9GC2IqguLrL6uUdNcEGD7Gmdaje9vcAnC76u6ht2np7NZiBe9HEdG/f+ns97HequAZGKW7WCc1JYoaSO3NzGsjszL7QA2R665M6CyXrjfMNLUJQDgrzb8MB/YStefh2+BW6JBlF6wAq8rsISliHg2vKuT2PQNSIUng6rSR6BFnJYdLos1cSZ07Km24OxDB5ruq91cmM0nzBvVdpgZAX8JuGdCiMI1xVV8lCbJN6SyONNM9mDuCWooUIQGbFEW+SWHf1Rptf6wnwBF5Q==
+X-Forefront-Antispam-Report-Untrusted: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PAXPR08MB7017.eurprd08.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230016)(4636009)(376002)(346002)(39860400002)(366004)(396003)(136003)(6486002)(5660300002)(478600001)(8936002)(31686004)(8676002)(66476007)(66556008)(316002)(44832011)(36756003)(31696002)(2906002)(26005)(66946007)(38100700002)(186003)(6666004)(53546011)(6506007)(83380400001)(41300700001)(6512007)(2616005)(86362001)(43740500002)(45980500001);DIR:OUT;SFP:1101;
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: AS8PR08MB8222
+Original-Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=arm.com;
+X-EOPAttributedMessage: 0
+X-MS-Exchange-Transport-CrossTenantHeadersStripped: DBAEUR03FT051.eop-EUR03.prod.protection.outlook.com
+X-MS-PublicTrafficType: Email
+X-MS-Office365-Filtering-Correlation-Id-Prvs: c44f3dec-778a-48e3-543b-08da7a0e90f4
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: iKOCJfNJItsEB9T8cfW53rd36eOMVyJjzLtWmP3vlns1JAHNL06EE0v0diV413FHHu67e4F3DjjltIF0SgLU7Xem4iaJ9il0MZuBW9D6jxgwI4jXZlhfhJL/q7z4yb+d1+/8zxKIaQzPNnL8FIGK+XbHqMjWc63NJ5Ui8e7Pf4xdIalWFhvyxjziFUuzZnSTxQiZtVicTtUNVN4m1vltdzpYrOJSs/i9e8T7cqU6zcY+T1Q3GWr28N0Dib52ZoLIMRXMwtzMGMSiuw6+dsFEyQAJG1mln9Kfq9my+wRA4CDowNNOqaL1upUhN+jhPInGVlSU63TkYNNrxWRNSUhrm1Ly8rhOoEmjex3dR7bsJlGAOqqMR+oAtrVkg0TaHJ7MHMYxp+0fgU1SkVFXYwzp3Orw9qIEJZxHsOUQXtzejzc3JpPOA0cuTi01p0aWkg15m2F/nn8N7srJXpzgPazoFGhi0SFk3I4xSXX7aKrV4FzjFhubd9l7Vlov5wetY5Lbkz9Pvn2TTviVK8YzsqEkm7Miivru0JLELBPBNaXkECQxkFQAZuGKZh5fiwo7UICXEidtbp6wJABIy7+E+5App+EnGcmzMQ5FmLuliLT0uajwR0pl27xamCFg2TgKfCujS6eapOerheREhSlE5SOndIUtfmJbXp1g8NWQoujRZtRTKl+tLKdfqqn1n/ZAOhwEZUn4QV+hWSSYOh53QWmgrg8nH2DKGLKZt4ZebNDVMXFU3ne7bSNJJjll6HEeEXWwHllgnRJNEVVnHC+jyVMLZDhu1PmIn9q3VnVSDwZSpYeYUyutQxTwuohq3t7/CzBWAtfUokcCW2eoIvBuEjM8Pg==
+X-Forefront-Antispam-Report: CIP:63.35.35.123;CTRY:IE;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:64aa7808-outbound-1.mta.getcheckrecipient.com;PTR:ec2-63-35-35-123.eu-west-1.compute.amazonaws.com;CAT:NONE;SFS:(13230016)(4636009)(396003)(376002)(39860400002)(346002)(136003)(46966006)(36840700001)(40470700004)(8676002)(6512007)(478600001)(186003)(83380400001)(2616005)(70206006)(70586007)(47076005)(82310400005)(86362001)(31696002)(6486002)(40480700001)(6506007)(41300700001)(53546011)(316002)(6666004)(26005)(336012)(81166007)(2906002)(31686004)(36756003)(40460700003)(44832011)(8936002)(356005)(36860700001)(82740400003)(5660300002)(43740500002);DIR:OUT;SFP:1101;
+X-OriginatorOrg: arm.com
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 09 Aug 2022 13:53:51.3272
+ (UTC)
+X-MS-Exchange-CrossTenant-Network-Message-Id: 2c2783ff-37ea-4c5a-f0ab-08da7a0e9752
+X-MS-Exchange-CrossTenant-Id: f34e5979-57d9-4aaa-ad4d-b122a662184d
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=f34e5979-57d9-4aaa-ad4d-b122a662184d;Ip=[63.35.35.123];Helo=[64aa7808-outbound-1.mta.getcheckrecipient.com]
+X-MS-Exchange-CrossTenant-AuthSource: DBAEUR03FT051.eop-EUR03.prod.protection.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Anonymous
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DB7PR08MB3275
+X-Spam-Status: No, score=-0.9 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,FORGED_SPF_HELO,NICE_REPLY_A,RCVD_IN_DNSWL_NONE,
+        RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_NONE,T_SCC_BODY_TEXT_LINE,
+        UNPARSEABLE_RELAY autolearn=no autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+Hi Alex,
 
---=-OHRVuSN7bJcJSl4kVZbB
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+On 09/08/2022 10:15, Alexandru Elisei wrote:
+> asm_mmu_disable is overly ambitious and provably incorrect:
+>
+> 1. It tries to clean and invalidate the data caches for the *entire*
+> memory, which is highly unnecessary, as it's very unlikely that a test
+> will write to the entire memory, and even more unlikely that a test will
+> modify the text section of the test image.
+>
 
-On Tue, 2022-08-09 at 14:59 +0200, Paolo Bonzini wrote:
-> On 8/9/22 11:22, David Woodhouse wrote:
-> > On Mon, 2022-08-08 at 14:06 -0500, Coleman Dietsch wrote:
-> > > Stop Xen timer (if it's running) prior to changing the IRQ vector and
-> > > potentially (re)starting the timer. Changing the IRQ vector while the
-> > > timer is still running can result in KVM injecting a garbage event, e=
-.g.
-> > > vm_xen_inject_timer_irqs() could see a non-zero xen.timer_pending fro=
-m
-> > > a previous timer but inject the new xen.timer_virq.
-> >=20
-> > Hm, wasn't that already addressed in the first patch I saw, which just
-> > called kvm_xen_stop_timer() unconditionally before (possibly) setting
-> > it up again?
->=20
-> Which patch is that?
+While it appears that we don't modify the text section, there is some
+loading happening before we start executing a test. Are you sure that
+the loader doesn't leave the memory dirty?
 
-The one I acked in
-https://lore.kernel.org/all/9bad724858b6a06c25ead865b2b3d9dfc216d01c.camel@=
-infradead.org/
+> 2. There is no corresponding dcache invalidate command for the entire
+> memory in asm_mmu_enable, leaving it up to the test that disabled the
+> MMU to do the cache maintenance in an asymmetrical fashion: only for
+> re-enabling the MMU, but not for disabling it.
+>
+> 3. It's missing the DMB SY memory barrier to ensure that the dcache
+> maintenance is performed after the last store executed in program order
+> before calling asm_mmu_disable.
+>
 
---=-OHRVuSN7bJcJSl4kVZbB
-Content-Type: application/pkcs7-signature; name="smime.p7s"
-Content-Disposition: attachment; filename="smime.p7s"
-Content-Transfer-Encoding: base64
+I am not sure why this is needed. In general, iiuc, a store to location
+x followed by a DC CVAC to x in program order don't need an barrier (see
+Arm ARM ARM DDI 0487G.b "Data cache maintenance instructions" at K11.5.1
+and "Ordering and completion of data and instruction cache instructions"
+at D4-2656). It doesn't hurt to have it but I think it's unnecessary.
 
-MIAGCSqGSIb3DQEHAqCAMIACAQExDzANBglghkgBZQMEAgEFADCABgkqhkiG9w0BBwEAAKCCEkQw
-ggYQMIID+KADAgECAhBNlCwQ1DvglAnFgS06KwZPMA0GCSqGSIb3DQEBDAUAMIGIMQswCQYDVQQG
-EwJVUzETMBEGA1UECBMKTmV3IEplcnNleTEUMBIGA1UEBxMLSmVyc2V5IENpdHkxHjAcBgNVBAoT
-FVRoZSBVU0VSVFJVU1QgTmV0d29yazEuMCwGA1UEAxMlVVNFUlRydXN0IFJTQSBDZXJ0aWZpY2F0
-aW9uIEF1dGhvcml0eTAeFw0xODExMDIwMDAwMDBaFw0zMDEyMzEyMzU5NTlaMIGWMQswCQYDVQQG
-EwJHQjEbMBkGA1UECBMSR3JlYXRlciBNYW5jaGVzdGVyMRAwDgYDVQQHEwdTYWxmb3JkMRgwFgYD
-VQQKEw9TZWN0aWdvIExpbWl0ZWQxPjA8BgNVBAMTNVNlY3RpZ28gUlNBIENsaWVudCBBdXRoZW50
-aWNhdGlvbiBhbmQgU2VjdXJlIEVtYWlsIENBMIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKC
-AQEAyjztlApB/975Rrno1jvm2pK/KxBOqhq8gr2+JhwpKirSzZxQgT9tlC7zl6hn1fXjSo5MqXUf
-ItMltrMaXqcESJuK8dtK56NCSrq4iDKaKq9NxOXFmqXX2zN8HHGjQ2b2Xv0v1L5Nk1MQPKA19xeW
-QcpGEGFUUd0kN+oHox+L9aV1rjfNiCj3bJk6kJaOPabPi2503nn/ITX5e8WfPnGw4VuZ79Khj1YB
-rf24k5Ee1sLTHsLtpiK9OjG4iQRBdq6Z/TlVx/hGAez5h36bBJMxqdHLpdwIUkTqT8se3ed0PewD
-ch/8kHPo5fZl5u1B0ecpq/sDN/5sCG52Ds+QU5O5EwIDAQABo4IBZDCCAWAwHwYDVR0jBBgwFoAU
-U3m/WqorSs9UgOHYm8Cd8rIDZsswHQYDVR0OBBYEFAnA8vwL2pTbX/4r36iZQs/J4K0AMA4GA1Ud
-DwEB/wQEAwIBhjASBgNVHRMBAf8ECDAGAQH/AgEAMB0GA1UdJQQWMBQGCCsGAQUFBwMCBggrBgEF
-BQcDBDARBgNVHSAECjAIMAYGBFUdIAAwUAYDVR0fBEkwRzBFoEOgQYY/aHR0cDovL2NybC51c2Vy
-dHJ1c3QuY29tL1VTRVJUcnVzdFJTQUNlcnRpZmljYXRpb25BdXRob3JpdHkuY3JsMHYGCCsGAQUF
-BwEBBGowaDA/BggrBgEFBQcwAoYzaHR0cDovL2NydC51c2VydHJ1c3QuY29tL1VTRVJUcnVzdFJT
-QUFkZFRydXN0Q0EuY3J0MCUGCCsGAQUFBzABhhlodHRwOi8vb2NzcC51c2VydHJ1c3QuY29tMA0G
-CSqGSIb3DQEBDAUAA4ICAQBBRHUAqznCFfXejpVtMnFojADdF9d6HBA4kMjjsb0XMZHztuOCtKF+
-xswhh2GqkW5JQrM8zVlU+A2VP72Ky2nlRA1GwmIPgou74TZ/XTarHG8zdMSgaDrkVYzz1g3nIVO9
-IHk96VwsacIvBF8JfqIs+8aWH2PfSUrNxP6Ys7U0sZYx4rXD6+cqFq/ZW5BUfClN/rhk2ddQXyn7
-kkmka2RQb9d90nmNHdgKrwfQ49mQ2hWQNDkJJIXwKjYA6VUR/fZUFeCUisdDe/0ABLTI+jheXUV1
-eoYV7lNwNBKpeHdNuO6Aacb533JlfeUHxvBz9OfYWUiXu09sMAviM11Q0DuMZ5760CdO2VnpsXP4
-KxaYIhvqPqUMWqRdWyn7crItNkZeroXaecG03i3mM7dkiPaCkgocBg0EBYsbZDZ8bsG3a08LwEsL
-1Ygz3SBsyECa0waq4hOf/Z85F2w2ZpXfP+w8q4ifwO90SGZZV+HR/Jh6rEaVPDRF/CEGVqR1hiuQ
-OZ1YL5ezMTX0ZSLwrymUE0pwi/KDaiYB15uswgeIAcA6JzPFf9pLkAFFWs1QNyN++niFhsM47qod
-x/PL+5jR87myx5uYdBEQkkDc+lKB1Wct6ucXqm2EmsaQ0M95QjTmy+rDWjkDYdw3Ms6mSWE3Bn7i
-5ZgtwCLXgAIe5W8mybM2JzCCBhQwggT8oAMCAQICEQDGvhmWZ0DEAx0oURL6O6l+MA0GCSqGSIb3
-DQEBCwUAMIGWMQswCQYDVQQGEwJHQjEbMBkGA1UECBMSR3JlYXRlciBNYW5jaGVzdGVyMRAwDgYD
-VQQHEwdTYWxmb3JkMRgwFgYDVQQKEw9TZWN0aWdvIExpbWl0ZWQxPjA8BgNVBAMTNVNlY3RpZ28g
-UlNBIENsaWVudCBBdXRoZW50aWNhdGlvbiBhbmQgU2VjdXJlIEVtYWlsIENBMB4XDTIyMDEwNzAw
-MDAwMFoXDTI1MDEwNjIzNTk1OVowJDEiMCAGCSqGSIb3DQEJARYTZHdtdzJAaW5mcmFkZWFkLm9y
-ZzCCAiIwDQYJKoZIhvcNAQEBBQADggIPADCCAgoCggIBALQ3GpC2bomUqk+91wLYBzDMcCj5C9m6
-oZaHwvmIdXftOgTbCJXADo6G9T7BBAebw2JV38EINgKpy/ZHh7htyAkWYVoFsFPrwHounto8xTsy
-SSePMiPlmIdQ10BcVSXMUJ3Juu16GlWOnAMJY2oYfEzmE7uT9YgcBqKCo65pTFmOnR/VVbjJk4K2
-xE34GC2nAdUQkPFuyaFisicc6HRMOYXPuF0DuwITEKnjxgNjP+qDrh0db7PAjO1D4d5ftfrsf+kd
-RR4gKVGSk8Tz2WwvtLAroJM4nXjNPIBJNT4w/FWWc/5qPHJy2U+eITZ5LLE5s45mX2oPFknWqxBo
-bQZ8a9dsZ3dSPZBvE9ZrmtFLrVrN4eo1jsXgAp1+p7bkfqd3BgBEmfsYWlBXO8rVXfvPgLs32VdV
-NZxb/CDWPqBsiYv0Hv3HPsz07j5b+/cVoWqyHDKzkaVbxfq/7auNVRmPB3v5SWEsH8xi4Bez2V9U
-KxfYCnqsjp8RaC2/khxKt0A552Eaxnz/4ly/2C7wkwTQnBmdlFYhAflWKQ03Ufiu8t3iBE3VJbc2
-5oMrglj7TRZrmKq3CkbFnX0fyulB+kHimrt6PIWn7kgyl9aelIl6vtbhMA+l0nfrsORMa4kobqQ5
-C5rveVgmcIad67EDa+UqEKy/GltUwlSh6xy+TrK1tzDvAgMBAAGjggHMMIIByDAfBgNVHSMEGDAW
-gBQJwPL8C9qU21/+K9+omULPyeCtADAdBgNVHQ4EFgQUzMeDMcimo0oz8o1R1Nver3ZVpSkwDgYD
-VR0PAQH/BAQDAgWgMAwGA1UdEwEB/wQCMAAwHQYDVR0lBBYwFAYIKwYBBQUHAwQGCCsGAQUFBwMC
-MEAGA1UdIAQ5MDcwNQYMKwYBBAGyMQECAQEBMCUwIwYIKwYBBQUHAgEWF2h0dHBzOi8vc2VjdGln
-by5jb20vQ1BTMFoGA1UdHwRTMFEwT6BNoEuGSWh0dHA6Ly9jcmwuc2VjdGlnby5jb20vU2VjdGln
-b1JTQUNsaWVudEF1dGhlbnRpY2F0aW9uYW5kU2VjdXJlRW1haWxDQS5jcmwwgYoGCCsGAQUFBwEB
-BH4wfDBVBggrBgEFBQcwAoZJaHR0cDovL2NydC5zZWN0aWdvLmNvbS9TZWN0aWdvUlNBQ2xpZW50
-QXV0aGVudGljYXRpb25hbmRTZWN1cmVFbWFpbENBLmNydDAjBggrBgEFBQcwAYYXaHR0cDovL29j
-c3Auc2VjdGlnby5jb20wHgYDVR0RBBcwFYETZHdtdzJAaW5mcmFkZWFkLm9yZzANBgkqhkiG9w0B
-AQsFAAOCAQEAyW6MUir5dm495teKqAQjDJwuFCi35h4xgnQvQ/fzPXmtR9t54rpmI2TfyvcKgOXp
-qa7BGXNFfh1JsqexVkIqZP9uWB2J+uVMD+XZEs/KYNNX2PvIlSPrzIB4Z2wyIGQpaPLlYflrrVFK
-v9CjT2zdqvy2maK7HKOQRt3BiJbVG5lRiwbbygldcALEV9ChWFfgSXvrWDZspnU3Gjw/rMHrGnql
-Htlyebp3pf3fSS9kzQ1FVtVIDrL6eqhTwJxe+pXSMMqFiN0whpBtXdyDjzBtQTaZJ7zTT/vlehc/
-tDuqZwGHm/YJy883Ll+GP3NvOkgaRGWEuYWJJ6hFCkXYjyR9IzCCBhQwggT8oAMCAQICEQDGvhmW
-Z0DEAx0oURL6O6l+MA0GCSqGSIb3DQEBCwUAMIGWMQswCQYDVQQGEwJHQjEbMBkGA1UECBMSR3Jl
-YXRlciBNYW5jaGVzdGVyMRAwDgYDVQQHEwdTYWxmb3JkMRgwFgYDVQQKEw9TZWN0aWdvIExpbWl0
-ZWQxPjA8BgNVBAMTNVNlY3RpZ28gUlNBIENsaWVudCBBdXRoZW50aWNhdGlvbiBhbmQgU2VjdXJl
-IEVtYWlsIENBMB4XDTIyMDEwNzAwMDAwMFoXDTI1MDEwNjIzNTk1OVowJDEiMCAGCSqGSIb3DQEJ
-ARYTZHdtdzJAaW5mcmFkZWFkLm9yZzCCAiIwDQYJKoZIhvcNAQEBBQADggIPADCCAgoCggIBALQ3
-GpC2bomUqk+91wLYBzDMcCj5C9m6oZaHwvmIdXftOgTbCJXADo6G9T7BBAebw2JV38EINgKpy/ZH
-h7htyAkWYVoFsFPrwHounto8xTsySSePMiPlmIdQ10BcVSXMUJ3Juu16GlWOnAMJY2oYfEzmE7uT
-9YgcBqKCo65pTFmOnR/VVbjJk4K2xE34GC2nAdUQkPFuyaFisicc6HRMOYXPuF0DuwITEKnjxgNj
-P+qDrh0db7PAjO1D4d5ftfrsf+kdRR4gKVGSk8Tz2WwvtLAroJM4nXjNPIBJNT4w/FWWc/5qPHJy
-2U+eITZ5LLE5s45mX2oPFknWqxBobQZ8a9dsZ3dSPZBvE9ZrmtFLrVrN4eo1jsXgAp1+p7bkfqd3
-BgBEmfsYWlBXO8rVXfvPgLs32VdVNZxb/CDWPqBsiYv0Hv3HPsz07j5b+/cVoWqyHDKzkaVbxfq/
-7auNVRmPB3v5SWEsH8xi4Bez2V9UKxfYCnqsjp8RaC2/khxKt0A552Eaxnz/4ly/2C7wkwTQnBmd
-lFYhAflWKQ03Ufiu8t3iBE3VJbc25oMrglj7TRZrmKq3CkbFnX0fyulB+kHimrt6PIWn7kgyl9ae
-lIl6vtbhMA+l0nfrsORMa4kobqQ5C5rveVgmcIad67EDa+UqEKy/GltUwlSh6xy+TrK1tzDvAgMB
-AAGjggHMMIIByDAfBgNVHSMEGDAWgBQJwPL8C9qU21/+K9+omULPyeCtADAdBgNVHQ4EFgQUzMeD
-Mcimo0oz8o1R1Nver3ZVpSkwDgYDVR0PAQH/BAQDAgWgMAwGA1UdEwEB/wQCMAAwHQYDVR0lBBYw
-FAYIKwYBBQUHAwQGCCsGAQUFBwMCMEAGA1UdIAQ5MDcwNQYMKwYBBAGyMQECAQEBMCUwIwYIKwYB
-BQUHAgEWF2h0dHBzOi8vc2VjdGlnby5jb20vQ1BTMFoGA1UdHwRTMFEwT6BNoEuGSWh0dHA6Ly9j
-cmwuc2VjdGlnby5jb20vU2VjdGlnb1JTQUNsaWVudEF1dGhlbnRpY2F0aW9uYW5kU2VjdXJlRW1h
-aWxDQS5jcmwwgYoGCCsGAQUFBwEBBH4wfDBVBggrBgEFBQcwAoZJaHR0cDovL2NydC5zZWN0aWdv
-LmNvbS9TZWN0aWdvUlNBQ2xpZW50QXV0aGVudGljYXRpb25hbmRTZWN1cmVFbWFpbENBLmNydDAj
-BggrBgEFBQcwAYYXaHR0cDovL29jc3Auc2VjdGlnby5jb20wHgYDVR0RBBcwFYETZHdtdzJAaW5m
-cmFkZWFkLm9yZzANBgkqhkiG9w0BAQsFAAOCAQEAyW6MUir5dm495teKqAQjDJwuFCi35h4xgnQv
-Q/fzPXmtR9t54rpmI2TfyvcKgOXpqa7BGXNFfh1JsqexVkIqZP9uWB2J+uVMD+XZEs/KYNNX2PvI
-lSPrzIB4Z2wyIGQpaPLlYflrrVFKv9CjT2zdqvy2maK7HKOQRt3BiJbVG5lRiwbbygldcALEV9Ch
-WFfgSXvrWDZspnU3Gjw/rMHrGnqlHtlyebp3pf3fSS9kzQ1FVtVIDrL6eqhTwJxe+pXSMMqFiN0w
-hpBtXdyDjzBtQTaZJ7zTT/vlehc/tDuqZwGHm/YJy883Ll+GP3NvOkgaRGWEuYWJJ6hFCkXYjyR9
-IzGCBMcwggTDAgEBMIGsMIGWMQswCQYDVQQGEwJHQjEbMBkGA1UECBMSR3JlYXRlciBNYW5jaGVz
-dGVyMRAwDgYDVQQHEwdTYWxmb3JkMRgwFgYDVQQKEw9TZWN0aWdvIExpbWl0ZWQxPjA8BgNVBAMT
-NVNlY3RpZ28gUlNBIENsaWVudCBBdXRoZW50aWNhdGlvbiBhbmQgU2VjdXJlIEVtYWlsIENBAhEA
-xr4ZlmdAxAMdKFES+jupfjANBglghkgBZQMEAgEFAKCCAeswGAYJKoZIhvcNAQkDMQsGCSqGSIb3
-DQEHATAcBgkqhkiG9w0BCQUxDxcNMjIwODA5MTM1MTMyWjAvBgkqhkiG9w0BCQQxIgQgjO4oTsGM
-bV9lRcdwuJLrWdgqSwYELZGIKYFINjM9kUAwgb0GCSsGAQQBgjcQBDGBrzCBrDCBljELMAkGA1UE
-BhMCR0IxGzAZBgNVBAgTEkdyZWF0ZXIgTWFuY2hlc3RlcjEQMA4GA1UEBxMHU2FsZm9yZDEYMBYG
-A1UEChMPU2VjdGlnbyBMaW1pdGVkMT4wPAYDVQQDEzVTZWN0aWdvIFJTQSBDbGllbnQgQXV0aGVu
-dGljYXRpb24gYW5kIFNlY3VyZSBFbWFpbCBDQQIRAMa+GZZnQMQDHShREvo7qX4wgb8GCyqGSIb3
-DQEJEAILMYGvoIGsMIGWMQswCQYDVQQGEwJHQjEbMBkGA1UECBMSR3JlYXRlciBNYW5jaGVzdGVy
-MRAwDgYDVQQHEwdTYWxmb3JkMRgwFgYDVQQKEw9TZWN0aWdvIExpbWl0ZWQxPjA8BgNVBAMTNVNl
-Y3RpZ28gUlNBIENsaWVudCBBdXRoZW50aWNhdGlvbiBhbmQgU2VjdXJlIEVtYWlsIENBAhEAxr4Z
-lmdAxAMdKFES+jupfjANBgkqhkiG9w0BAQEFAASCAgBXZhIWnK7NLICwlkdcq238gf8iXFJ/xrIS
-3dPdBC1mrKZSJxeJtzuyRWsG30H9VEPLHxPzeDTelJRazbOdkiIo1L/I3jaKoxnhG8v8Pfnu487W
-nst1kHwTVi9XkRRse+maOxZYUrdLfroKvo7NLmKASlxP4U4oYtmFMcWMZJsldubm1dTz5eaLqtvy
-OdeU61IEoQIcJcn9mvIj2y8lDeyZFRDnlmwa/i2thwHN2M6fc1YQNcRKz8df/DhWYPioOvB7TEOw
-Nj70r6TN2bAzFwZ/Cs9Fg75kAO2aPEgZFgH8iGtoPKFADuQcUVT6LB5spyKw2RHtXMldjQqypXcf
-pu1sqLtpAq4KMCdiNpE7Q5SptxC3ieJZyMkfEzMppnMJlREUYLZKXq6u6DBHjr2m/GZY4DR0TMur
-1NmX+qrFUMS5NjObtjYSAnV0JEkIp711+3Aah9o8sNS7ce7gNrIPLA1FMePGXgRRiV1eodO76V8h
-XHnrGDU8ijfT7Di0vkfY/LWTioBQ1CATW6F0cewwBmYFouQe+AU7P1VFrACYASzytkTWTYxxeqPk
-1BFyoMCuABESHwxclWANV0b5hOb4iC408/rqDZ3iJQgY7EA7W+VqpixSm/6Cv/pYe5Dyr1sLi1Rf
-647Af5v47bN4uRWCP5/afvlQeNutJk/uxlEkda82dQAAAAAAAA==
+Thanks,
 
+Nikos
 
---=-OHRVuSN7bJcJSl4kVZbB--
-
+> Fix all of the issues in one go, by doing the cache maintenance only for
+> the stack, as that is out of the control of the C code, and add the missi=
+ng
+> memory barrier.
+>
+> The code used to test that mmu_disable works correctly is similar to the
+> code used to test commit 410b3bf09e76 ("arm/arm64: Perform dcache clean
+> + invalidate after turning MMU off"), with extra cache maintenance
+> added:
+>
+> +#include <alloc_page.h>
+> +#include <asm/cacheflush.h>
+> +#include <asm/mmu.h>
+>   int main(int argc, char **argv)
+>   {
+> +       int *x =3D alloc_page();
+> +       bool pass =3D true;
+> +       int i;
+> +
+> +       for  (i =3D 0; i < 1000000; i++) {
+> +               *x =3D 0x42;
+> +               dcache_clean_addr_poc((unsigned long)x);
+> +               mmu_disable();
+> +               if (*x !=3D 0x42) {
+> +                       pass =3D false;
+> +                       break;
+> +               }
+> +               *x =3D 0x50;
+> +               /* Needed for the invalidation only. */
+> +               dcache_clean_inval_addr_poc((unsigned long)x);
+> +               mmu_enable(current_thread_info()->pgtable);
+> +               if (*x !=3D 0x50) {
+> +                       pass =3D false;
+> +                       break;
+> +               }
+> +       }
+> +       report(pass, "MMU disable cache maintenance");
+>
+> Signed-off-by: Alexandru Elisei <alexandru.elisei@arm.com>
+> ---
+>   arm/cstart.S   | 11 ++++++-----
+>   arm/cstart64.S | 11 +++++------
+>   2 files changed, 11 insertions(+), 11 deletions(-)
+>
+> diff --git a/arm/cstart.S b/arm/cstart.S
+> index fc7c558802f1..b27de44f30a6 100644
+> --- a/arm/cstart.S
+> +++ b/arm/cstart.S
+> @@ -242,11 +242,12 @@ asm_mmu_disable:
+>       mcr     p15, 0, r0, c1, c0, 0
+>       isb
+>
+> -     ldr     r0, =3D__phys_offset
+> -     ldr     r0, [r0]
+> -     ldr     r1, =3D__phys_end
+> -     ldr     r1, [r1]
+> -     dcache_by_line_op dccimvac, sy, r0, r1, r2, r3
+> +     dmb     sy
+> +     mov     r0, sp
+> +     lsr     r0, #THREAD_SHIFT
+> +     lsl     r0, #THREAD_SHIFT
+> +     add     r1, r0, #THREAD_SIZE
+> +     dcache_by_line_op dccmvac, sy, r0, r1, r3, r4
+>
+>       mov     pc, lr
+>
+> diff --git a/arm/cstart64.S b/arm/cstart64.S
+> index 1ce6b9e14d23..af4970775298 100644
+> --- a/arm/cstart64.S
+> +++ b/arm/cstart64.S
+> @@ -283,12 +283,11 @@ asm_mmu_disable:
+>       msr     sctlr_el1, x0
+>       isb
+>
+> -     /* Clean + invalidate the entire memory */
+> -     adrp    x0, __phys_offset
+> -     ldr     x0, [x0, :lo12:__phys_offset]
+> -     adrp    x1, __phys_end
+> -     ldr     x1, [x1, :lo12:__phys_end]
+> -     dcache_by_line_op civac, sy, x0, x1, x2, x3
+> +     dmb     sy
+> +     mov     x9, sp
+> +     and     x9, x9, #THREAD_MASK
+> +     add     x10, x9, #THREAD_SIZE
+> +     dcache_by_line_op cvac, sy, x9, x10, x11, x12
+>
+>       ret
+>
+IMPORTANT NOTICE: The contents of this email and any attachments are confid=
+ential and may also be privileged. If you are not the intended recipient, p=
+lease notify the sender immediately and do not disclose the contents to any=
+ other person, use it for any purpose, or store or copy the information in =
+any medium. Thank you.
