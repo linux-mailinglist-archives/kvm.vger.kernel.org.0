@@ -2,52 +2,52 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id E2BFB58D164
-	for <lists+kvm@lfdr.de>; Tue,  9 Aug 2022 02:34:35 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id A4B7E58D16A
+	for <lists+kvm@lfdr.de>; Tue,  9 Aug 2022 02:36:59 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S244729AbiHIAee (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 8 Aug 2022 20:34:34 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36776 "EHLO
+        id S244666AbiHIAg6 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 8 Aug 2022 20:36:58 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38576 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S244690AbiHIAec (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 8 Aug 2022 20:34:32 -0400
-Received: from mail-pf1-x42c.google.com (mail-pf1-x42c.google.com [IPv6:2607:f8b0:4864:20::42c])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8C29C19C17
-        for <kvm@vger.kernel.org>; Mon,  8 Aug 2022 17:34:29 -0700 (PDT)
-Received: by mail-pf1-x42c.google.com with SMTP id f28so9500186pfk.1
-        for <kvm@vger.kernel.org>; Mon, 08 Aug 2022 17:34:29 -0700 (PDT)
+        with ESMTP id S236904AbiHIAg4 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 8 Aug 2022 20:36:56 -0400
+Received: from mail-pf1-x436.google.com (mail-pf1-x436.google.com [IPv6:2607:f8b0:4864:20::436])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 17EAD12AB3
+        for <kvm@vger.kernel.org>; Mon,  8 Aug 2022 17:36:56 -0700 (PDT)
+Received: by mail-pf1-x436.google.com with SMTP id k14so7458639pfh.0
+        for <kvm@vger.kernel.org>; Mon, 08 Aug 2022 17:36:56 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:from:to:cc;
-        bh=6C9ArOHrYaAILM0KZ4kBvP+nUNIqPYA+uHHXGsdeawA=;
-        b=P7WoNvVpS3okL4YI3o5uz9544qztcUEr1d+LExJylyHYHQZklqf4z8S2h44Nc5Rqre
-         qNENlB9cRxxMXJSQLaVPA0ibUYmjuaUJxWHlEQg7XuwMMHiCKjfD800w6HWCWFW97jG/
-         ipFPUBO9QJxq33W2C+jnkG+6srCtqkLKyelalaRu86/MhVjtgfzdbu2VciP74lTDXia9
-         tcw8AMqrymPwqEMiio9pnZkOQSBjcxgOGJcbHeqKSwXLqqqiqfSq/J4xmKGbmk8N1IHN
-         DNkD36mh4S1SoQfCQvhfZ0UTfN6afTiLMOCwOk8MufKvKKOHJeMYrKKHKZ0GG2/hN1yX
-         s3pw==
+        bh=a/4gloR0juBdlHHYNcJlbW/FTcwo8LAnogSl5yyVZ1Y=;
+        b=Qd1JgbOfAQNNkH2ORrSMNQ5Hz4GYqKxE6fcYDw3qmHkJH5xcda/qjULZOLi8Yh8fA5
+         PX4UJcXc1GpZleJAwkkKWTg0TrA+g5HSpVYLnyo+gIo4rUvSDSuyKy5x9n1xza8X5Vp+
+         jg9oMmtRuuiBDWU2pA9e071NnCUTpVJ5R7H9+u9rxmsE9rJinMf0HR4WvlqMSvaRtll3
+         cANxEoezLIyL9tIkQr84jQosUCYuv6m1Gn3j6G14K/zI5tk4Ovt7Q6J64bG1nMs3fmVe
+         Ji/5nMH9QiMltWsP+MpoREAP5S3/DXrzX6H8avLaRRKm039Asf0ZM4WZ0A4jwpDogp0u
+         fdzQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:x-gm-message-state:from:to:cc;
-        bh=6C9ArOHrYaAILM0KZ4kBvP+nUNIqPYA+uHHXGsdeawA=;
-        b=b+CXnkGr55ZVVoTqmtTjIz6O+Y3hOvrUTQOn4oIWYR1jJDMpTdsAw1Fdd+Pb/wyjPZ
-         YiERBmU0uSREQ7LhGBoRJRheTfbFo2dKcVDLt7YNTjijc2jNZ5RiDvzznMMHwVdwHTiR
-         jwby6XT1/s6KTp5m2GxgaXNJxI1cQzaela4tZ/8UZGqOOlB1hgH4taLurfsvkoN42eZ5
-         bZaN7QLVJxx1VN82gxqbFFgv65xCGBKQ3f0geeS/kQLt9R0kZa2GALw2somDrWHgAv1l
-         KWyp99z+pBFUKvNbyjPS2i6ublZ12ivogv/87NEGSxkUw74GhieNB9fnU01QZORs6j8D
-         1Dvw==
-X-Gm-Message-State: ACgBeo1/b2+IWOV5ZwxYg9PIShVPxvQR9UPRGMNShtVjwtLJ3+BJJFIq
-        ZRVAvcAiLO32Dm1uIrEwNvjMHw==
-X-Google-Smtp-Source: AA6agR4Gz5g5vG/l/tZyqtSjI3vc8zXtknoeHx9hIKW+yKI0a0eBaFzsrwCevFsok5EYWzWVjhoKBA==
-X-Received: by 2002:a63:ea11:0:b0:41d:9296:21e6 with SMTP id c17-20020a63ea11000000b0041d929621e6mr4696671pgi.603.1660005268964;
-        Mon, 08 Aug 2022 17:34:28 -0700 (PDT)
+        bh=a/4gloR0juBdlHHYNcJlbW/FTcwo8LAnogSl5yyVZ1Y=;
+        b=WLopafGt9RCIFchpUSpW39zkehBl5DssSz5xDK/Fyl6KBr6EJW98kaeU/YZaltNnie
+         4aGecXIuoDT75gc7V6nJ2gH+mOJY6/tdSCbiNjzK59W0sGKHTGrz2GCfmlElSpMMRie6
+         MSmZF2d6UW4kjnkmh6nA0rgNlKFRoOy+E2rOAoym9UK05ti1jUjqGqNbCYFXtzWFTE+S
+         axTnuhKnrI06KaAe0JXU37eEZjATSJOe2e8e20pJg2v7ZbVqZZqfY8NHGhaBONu1/96c
+         sRmxci+yucptsVzQuo1VAq1ovvmwJRtr6mJK7+sO9e0H0Jh1Ix64VLBb4geW7CiI1Seh
+         De2w==
+X-Gm-Message-State: ACgBeo0q7rRZ+ZvxdlyiBfp8gjrYL7Z5vixexrYXmWqoUsiF9Q042AE+
+        O94CNqwq2fRsRswnBhKJMz+b7A==
+X-Google-Smtp-Source: AA6agR6I9AqcP5FN+oFJsgJk1bziGLbi1GyQZllwCS+9VU1jyl56wRMIelcm1R7MYNSCzPlx78Ksww==
+X-Received: by 2002:a05:6a00:1706:b0:52f:6f75:991b with SMTP id h6-20020a056a00170600b0052f6f75991bmr5124904pfc.34.1660005415453;
+        Mon, 08 Aug 2022 17:36:55 -0700 (PDT)
 Received: from google.com (7.104.168.34.bc.googleusercontent.com. [34.168.104.7])
-        by smtp.gmail.com with ESMTPSA id o13-20020a17090a420d00b001f260b1954bsm8740402pjg.13.2022.08.08.17.34.28
+        by smtp.gmail.com with ESMTPSA id n2-20020a17090ade8200b001eff36b1f2asm8804317pjv.0.2022.08.08.17.36.54
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 08 Aug 2022 17:34:28 -0700 (PDT)
-Date:   Tue, 9 Aug 2022 00:34:24 +0000
+        Mon, 08 Aug 2022 17:36:55 -0700 (PDT)
+Date:   Tue, 9 Aug 2022 00:36:51 +0000
 From:   Sean Christopherson <seanjc@google.com>
 To:     Coleman Dietsch <dietschc@csp.edu>
 Cc:     kvm@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>,
@@ -57,16 +57,14 @@ Cc:     kvm@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>,
         "H . Peter Anvin" <hpa@zytor.com>, linux-kernel@vger.kernel.org,
         skhan@linuxfoundation.org, Pavel Skripkin <paskripkin@gmail.com>,
         linux-kernel-mentees@lists.linuxfoundation.org,
-        stable@vger.kernel.org,
-        syzbot+e54f930ed78eb0f85281@syzkaller.appspotmail.com
-Subject: Re: [PATCH v3 2/2] KVM: x86/xen: Stop Xen timer before changing IRQ
-Message-ID: <YvGrkII3Sgw/qTeo@google.com>
-References: <20220808190607.323899-2-dietschc@csp.edu>
- <20220808190607.323899-3-dietschc@csp.edu>
+        David Woodhouse <dwmw2@infradead.org>
+Subject: Re: [PATCH v3 0/2] KVM: x86/xen: Prevent Xen timer init when running
+Message-ID: <YvGsIwSwMdt7BRXL@google.com>
+References: <20220808190211.323827-1-dietschc@csp.edu>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20220808190607.323899-3-dietschc@csp.edu>
+In-Reply-To: <20220808190211.323827-1-dietschc@csp.edu>
 X-Spam-Status: No, score=-14.5 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
         ENV_AND_HDR_SPF_MATCH,FSL_HELO_FAKE,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,
@@ -78,18 +76,16 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Aug 08, 2022, Coleman Dietsch wrote:
-> Stop Xen timer (if it's running) prior to changing the IRQ vector and
-> potentially (re)starting the timer. Changing the IRQ vector while the
-> timer is still running can result in KVM injecting a garbage event, e.g.
-> vm_xen_inject_timer_irqs() could see a non-zero xen.timer_pending from
-> a previous timer but inject the new xen.timer_virq.
-> 
-> Fixes: 536395260582 ("KVM: x86/xen: handle PV timers oneshot mode")
-> Cc: stable@vger.kernel.org
-> Link: https://syzkaller.appspot.com/bug?id=8234a9dfd3aafbf092cc5a7cd9842e3ebc45fc42
-> Reported-by: syzbot+e54f930ed78eb0f85281@syzkaller.appspotmail.com
-> Signed-off-by: Coleman Dietsch <dietschc@csp.edu>
-> ---
++David
 
-Reviewed-by: Sean Christopherson <seanjc@google.com>
+On Mon, Aug 08, 2022, Coleman Dietsch wrote:
+> Coleman Dietsch (2):
+>   KVM: x86/xen: Initialize Xen timer only once
+>   KVM: x86/xen: Stop Xen timer before changing IRQ
+
+Paolo, can you grab these for the current cycle?  FWIW, I believe David's ack still
+stands too.
+
+Thanks!
+
+[*] https://lore.kernel.org/all/9bad724858b6a06c25ead865b2b3d9dfc216d01c.camel@infradead.org
