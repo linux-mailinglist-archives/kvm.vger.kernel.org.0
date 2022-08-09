@@ -2,354 +2,223 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id D9CEC58DCC4
-	for <lists+kvm@lfdr.de>; Tue,  9 Aug 2022 19:04:40 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id BAC1158DCCC
+	for <lists+kvm@lfdr.de>; Tue,  9 Aug 2022 19:07:54 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S245353AbiHIREj (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 9 Aug 2022 13:04:39 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46574 "EHLO
+        id S245229AbiHIRHt (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 9 Aug 2022 13:07:49 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49384 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S244833AbiHIREi (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 9 Aug 2022 13:04:38 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id D000B19D
-        for <kvm@vger.kernel.org>; Tue,  9 Aug 2022 10:04:36 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1660064675;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=3ggyF3qBTxPKaPyoDbI+mbJnJpmZPQ1Uw301kTnxMnY=;
-        b=fTl6h8Bn2cUPcwtgb1LnIvcb5umczyR2s0jBA+zWVjHfSYQJN5f9cfJ+48KiPONj0EUSsd
-        9ijoL+FioEkLsf5ImehpzDI7ZLydx3m03iNlQCl7Qd0iKKPyXsLj1SNdtEpawJEQE020BU
-        1nLGeTBqX4/+wVPCaZY9eT8Mf996BPU=
-Received: from mail-qt1-f199.google.com (mail-qt1-f199.google.com
- [209.85.160.199]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-656-2eh6vJP4P-icMb-DU0Xw4Q-1; Tue, 09 Aug 2022 13:04:34 -0400
-X-MC-Unique: 2eh6vJP4P-icMb-DU0Xw4Q-1
-Received: by mail-qt1-f199.google.com with SMTP id bl15-20020a05622a244f00b0034218498b06so9476219qtb.14
-        for <kvm@vger.kernel.org>; Tue, 09 Aug 2022 10:04:34 -0700 (PDT)
+        with ESMTP id S245289AbiHIRHq (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 9 Aug 2022 13:07:46 -0400
+Received: from mail-wr1-x432.google.com (mail-wr1-x432.google.com [IPv6:2a00:1450:4864:20::432])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 28D5C20BD1
+        for <kvm@vger.kernel.org>; Tue,  9 Aug 2022 10:07:44 -0700 (PDT)
+Received: by mail-wr1-x432.google.com with SMTP id j1so15055706wrw.1
+        for <kvm@vger.kernel.org>; Tue, 09 Aug 2022 10:07:44 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc;
+        bh=VJbu0Vi6JsT3Ge0NwSkLjoyGgFVaYGY0641GU+LZJhY=;
+        b=fvzM2GUUaZrmgyVaFSQsiiQM6O8bpQ/PHWn3++zGuNq8x5xtQK6QUVR+M6h/6+eyVl
+         BFh1AMDIrR0975z9iHhMgrOs3gvIryx6m0goQhg4HIxelRl4ejAApEZyZIOCZWZPS+3H
+         mDCMikiOSOjQgNN1pfpNxeG0l0TLzGV/AO4HjsTWeUVbhKLVPT+WNkxahiDHH+ad240E
+         BOfsX+l6T+Ryuijm/PB6KafjYGc37tS4PbGk7elfEA+jENKRYefWU2GdCa80YgS5odqA
+         1okFqqk+BPMfXfqESUGDnOikPzimREsT6/x38FcXY3TMg5pHO+ovKb+hXqYKNs7JLLCS
+         tDVw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc;
-        bh=3ggyF3qBTxPKaPyoDbI+mbJnJpmZPQ1Uw301kTnxMnY=;
-        b=tblN4zABh2gLSoBu6KQ0W+Kd1a4u7IobGveViFdL1V7z8/MQOl12loG8P2RaLcBP8F
-         chBKBLyPHZoDRzTFY9edqF8j5zc8IcBjaw0Ero+dxZ/qyWaifL+JvQW7mbdedU7hzpqM
-         2QzKZ5yXUXAMxSWGOQbEIPjuNmicLx3D6yEWS33xc5SH+jziJVnkpXoYJrpznR/DBuW2
-         6otHM7wpI2n5QyZCcAAmfzM8ZRojVnQvkfQ0gnVcomRkBsmyu/Esm40y0Aoq1FmcE6rk
-         P0viJJgxogqgjsRGZTZalHGVO8SCTmUTBJyLgXWWLWLGX0fXdVGN9yxJZHlbtASJBXEz
-         TFgg==
-X-Gm-Message-State: ACgBeo25ctXhUKjPgSmdl4kC051q0OKBXOcZruV8hH6mAQurf1JcJ9EO
-        Pmk5TOuJK+tEECIbgt84nqSpaBfTlIf1YF22wtZFvrtj0SSxbqQXFgHdsNhW/uteD4DbW2dF/PE
-        07McWhTRk6NS/K6js9Gi1z/A5MYXy
-X-Received: by 2002:a05:6214:5003:b0:474:a0c1:99b2 with SMTP id jo3-20020a056214500300b00474a0c199b2mr20252428qvb.64.1660064673995;
-        Tue, 09 Aug 2022 10:04:33 -0700 (PDT)
-X-Google-Smtp-Source: AA6agR6WLTwUVaH9hGoj9vBPDQHc7BgO5qrXTZ7W+EatftNaKCVTisR4Eh0yQuY34Mwa2cfSbMg4TUtLjaS2qKsElac=
-X-Received: by 2002:a05:6214:5003:b0:474:a0c1:99b2 with SMTP id
- jo3-20020a056214500300b00474a0c199b2mr20252389qvb.64.1660064673637; Tue, 09
- Aug 2022 10:04:33 -0700 (PDT)
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc;
+        bh=VJbu0Vi6JsT3Ge0NwSkLjoyGgFVaYGY0641GU+LZJhY=;
+        b=QZafIHv9z1MSN6JuqVvBjHj3N67xRmA6UhUSmFPRspi+gsGjg456VwnnZaEZ+9DK/T
+         rMzpWAyKtxsoTjouQ4QxFvnzyOXplOBzYv21mOxOKtmBb/0Mkv5rCld+2aDtoDkgARfU
+         TheEESwegeHVh5klT856271OdxaQRyqIG3YSJLDQm7m9Ab/i08ZsbUvHBqqInIXHvplI
+         +aE1yBBae23xCLjR0nd+Ed8po/Ho1Ahc2zcN4LJ4uYUf1WqYWQNJ0Us31YiFG/bWxuAm
+         GrpN903SBZOIk+t2m85Fo74RIV0zQwo3LyAvjbtUcWN/QUo3dPOLE4Bf11f89f+kgV8B
+         Wt0g==
+X-Gm-Message-State: ACgBeo06envojjQi51PuTG8DTw+81GV3btgI2PeiNofgON0AceSxzC2+
+        jiXz5DMOpKI3bopXtTPK+SNRDTjJwVINRhJVkA6OIQ==
+X-Google-Smtp-Source: AA6agR6C6pGEJaHlcmIccbzG3l/LXUY9JxyRHbDjX/tgVsupnrZl7Tfk4Mg07ARiaMT3fu1Krv5Y6YtR9iIcV6+0gNU=
+X-Received: by 2002:adf:e28d:0:b0:21e:4c3b:b446 with SMTP id
+ v13-20020adfe28d000000b0021e4c3bb446mr14597055wri.300.1660064863280; Tue, 09
+ Aug 2022 10:07:43 -0700 (PDT)
 MIME-Version: 1.0
-References: <20220805163909.872646-1-eperezma@redhat.com> <20220805163909.872646-5-eperezma@redhat.com>
- <CACGkMEsxjBzsc1eonoR07027DsG3huGZUUodJZnK84PRyNQbAg@mail.gmail.com>
-In-Reply-To: <CACGkMEsxjBzsc1eonoR07027DsG3huGZUUodJZnK84PRyNQbAg@mail.gmail.com>
-From:   Eugenio Perez Martin <eperezma@redhat.com>
-Date:   Tue, 9 Aug 2022 19:03:57 +0200
-Message-ID: <CAJaqyWddD=SENCUniHanPnGUjid3kFJ_8b2okR+2jU1amecjng@mail.gmail.com>
-Subject: Re: [PATCH v4 4/6] vdpa: Add asid parameter to vhost_vdpa_dma_map/unmap
-To:     Jason Wang <jasowang@redhat.com>
-Cc:     qemu-devel <qemu-devel@nongnu.org>,
-        Stefan Hajnoczi <stefanha@redhat.com>,
-        Eli Cohen <eli@mellanox.com>,
-        Zhu Lingshan <lingshan.zhu@intel.com>,
-        "Michael S. Tsirkin" <mst@redhat.com>,
-        Gautam Dawar <gdawar@xilinx.com>,
-        Stefano Garzarella <sgarzare@redhat.com>,
-        Parav Pandit <parav@mellanox.com>, Cindy Lu <lulu@redhat.com>,
-        "Gonglei (Arei)" <arei.gonglei@huawei.com>,
-        Cornelia Huck <cohuck@redhat.com>, kvm <kvm@vger.kernel.org>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Liuxiangdong <liuxiangdong5@huawei.com>,
-        Laurent Vivier <lvivier@redhat.com>,
-        Harpreet Singh Anand <hanand@xilinx.com>
+References: <20220711093218.10967-1-adrian.hunter@intel.com>
+ <20220711093218.10967-6-adrian.hunter@intel.com> <CAP-5=fUChJLqfJ__joVhtKwgjLTtBtMm8M0vt9eaOfLMmck85g@mail.gmail.com>
+ <0e415212-b828-34d3-fd1b-ba518149bf89@intel.com>
+In-Reply-To: <0e415212-b828-34d3-fd1b-ba518149bf89@intel.com>
+From:   Ian Rogers <irogers@google.com>
+Date:   Tue, 9 Aug 2022 10:07:30 -0700
+Message-ID: <CAP-5=fXNWfn_SX6aBHAQ=RPRHwDpnTmV_QpRoHRWX-J06TZ-BA@mail.gmail.com>
+Subject: Re: [PATCH 05/35] perf tools: Factor out evsel__id_hdr_size()
+To:     Adrian Hunter <adrian.hunter@intel.com>
+Cc:     Arnaldo Carvalho de Melo <acme@kernel.org>,
+        Jiri Olsa <jolsa@redhat.com>,
+        Namhyung Kim <namhyung@kernel.org>,
+        Andi Kleen <ak@linux.intel.com>, linux-kernel@vger.kernel.org,
+        kvm@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Spam-Status: No, score=-2.7 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham
-        autolearn_force=no version=3.4.6
+X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
+        T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Aug 9, 2022 at 9:21 AM Jason Wang <jasowang@redhat.com> wrote:
+On Tue, Aug 9, 2022 at 4:50 AM Adrian Hunter <adrian.hunter@intel.com> wrote:
 >
-> On Sat, Aug 6, 2022 at 12:39 AM Eugenio P=C3=A9rez <eperezma@redhat.com> =
-wrote:
+> On 19/07/22 20:09, Ian Rogers wrote:
+> > On Mon, Jul 11, 2022 at 2:32 AM Adrian Hunter <adrian.hunter@intel.com> wrote:
+> >>
+> >> Factor out evsel__id_hdr_size() so it can be reused.
+> >>
+> >> This is needed by perf inject. When injecting events from a guest perf.data
+> >> file, there is a possibility that the sample ID numbers conflict. To
+> >> re-write an ID sample, the old one needs to be removed first, which means
+> >> determining how big it is with evsel__id_hdr_size() and then subtracting
+> >> that from the event size.
+> >>
+> >> Signed-off-by: Adrian Hunter <adrian.hunter@intel.com>
+> >> ---
+> >>  tools/perf/util/evlist.c | 28 +---------------------------
+> >>  tools/perf/util/evsel.c  | 26 ++++++++++++++++++++++++++
+> >>  tools/perf/util/evsel.h  |  2 ++
+> >>  3 files changed, 29 insertions(+), 27 deletions(-)
+> >>
+> >> diff --git a/tools/perf/util/evlist.c b/tools/perf/util/evlist.c
+> >> index 48af7d379d82..03fbe151b0c4 100644
+> >> --- a/tools/perf/util/evlist.c
+> >> +++ b/tools/perf/util/evlist.c
+> >> @@ -1244,34 +1244,8 @@ bool evlist__valid_read_format(struct evlist *evlist)
+> >>  u16 evlist__id_hdr_size(struct evlist *evlist)
+> >>  {
+> >>         struct evsel *first = evlist__first(evlist);
+> >> -       struct perf_sample *data;
+> >> -       u64 sample_type;
+> >> -       u16 size = 0;
+> >>
+> >> -       if (!first->core.attr.sample_id_all)
+> >> -               goto out;
+> >> -
+> >> -       sample_type = first->core.attr.sample_type;
+> >> -
+> >> -       if (sample_type & PERF_SAMPLE_TID)
+> >> -               size += sizeof(data->tid) * 2;
+> >> -
+> >> -       if (sample_type & PERF_SAMPLE_TIME)
+> >> -               size += sizeof(data->time);
+> >> -
+> >> -       if (sample_type & PERF_SAMPLE_ID)
+> >> -               size += sizeof(data->id);
+> >> -
+> >> -       if (sample_type & PERF_SAMPLE_STREAM_ID)
+> >> -               size += sizeof(data->stream_id);
+> >> -
+> >> -       if (sample_type & PERF_SAMPLE_CPU)
+> >> -               size += sizeof(data->cpu) * 2;
+> >> -
+> >> -       if (sample_type & PERF_SAMPLE_IDENTIFIER)
+> >> -               size += sizeof(data->id);
+> >> -out:
+> >> -       return size;
+> >> +       return first->core.attr.sample_id_all ? evsel__id_hdr_size(first) : 0;
+> >>  }
+> >>
+> >>  bool evlist__valid_sample_id_all(struct evlist *evlist)
+> >> diff --git a/tools/perf/util/evsel.c b/tools/perf/util/evsel.c
+> >> index a67cc3f2fa74..9a30ccb7b104 100644
+> >> --- a/tools/perf/util/evsel.c
+> >> +++ b/tools/perf/util/evsel.c
+> >> @@ -2724,6 +2724,32 @@ int evsel__parse_sample_timestamp(struct evsel *evsel, union perf_event *event,
+> >>         return 0;
+> >>  }
+> >>
+> >> +u16 evsel__id_hdr_size(struct evsel *evsel)
+> >> +{
+> >> +       u64 sample_type = evsel->core.attr.sample_type;
 > >
-> > So the caller can choose which ASID is destined.
-> >
-> > No need to update the batch functions as they will always be called fro=
-m
-> > memory listener updates at the moment. Memory listener updates will
-> > always update ASID 0, as it's the passthrough ASID.
-> >
-> > All vhost devices's ASID are 0 at this moment.
-> >
-> > Signed-off-by: Eugenio P=C3=A9rez <eperezma@redhat.com>
-> > ---
-> > v4: Add comment specifying behavior if device does not support _F_ASID
-> >
-> > v3: Deleted unneeded space
-> > ---
-> >  include/hw/virtio/vhost-vdpa.h |  8 +++++---
-> >  hw/virtio/vhost-vdpa.c         | 25 +++++++++++++++----------
-> >  net/vhost-vdpa.c               |  6 +++---
-> >  hw/virtio/trace-events         |  4 ++--
-> >  4 files changed, 25 insertions(+), 18 deletions(-)
-> >
-> > diff --git a/include/hw/virtio/vhost-vdpa.h b/include/hw/virtio/vhost-v=
-dpa.h
-> > index 1111d85643..6560bb9d78 100644
-> > --- a/include/hw/virtio/vhost-vdpa.h
-> > +++ b/include/hw/virtio/vhost-vdpa.h
-> > @@ -29,6 +29,7 @@ typedef struct vhost_vdpa {
-> >      int index;
-> >      uint32_t msg_type;
-> >      bool iotlb_batch_begin_sent;
-> > +    uint32_t address_space_id;
-> >      MemoryListener listener;
-> >      struct vhost_vdpa_iova_range iova_range;
-> >      uint64_t acked_features;
-> > @@ -42,8 +43,9 @@ typedef struct vhost_vdpa {
-> >      VhostVDPAHostNotifier notifier[VIRTIO_QUEUE_MAX];
-> >  } VhostVDPA;
-> >
-> > -int vhost_vdpa_dma_map(struct vhost_vdpa *v, hwaddr iova, hwaddr size,
-> > -                       void *vaddr, bool readonly);
-> > -int vhost_vdpa_dma_unmap(struct vhost_vdpa *v, hwaddr iova, hwaddr siz=
-e);
-> > +int vhost_vdpa_dma_map(struct vhost_vdpa *v, uint32_t asid, hwaddr iov=
-a,
-> > +                       hwaddr size, void *vaddr, bool readonly);
-> > +int vhost_vdpa_dma_unmap(struct vhost_vdpa *v, uint32_t asid, hwaddr i=
-ova,
-> > +                         hwaddr size);
-> >
-> >  #endif
-> > diff --git a/hw/virtio/vhost-vdpa.c b/hw/virtio/vhost-vdpa.c
-> > index 34922ec20d..3eb67b27b7 100644
-> > --- a/hw/virtio/vhost-vdpa.c
-> > +++ b/hw/virtio/vhost-vdpa.c
-> > @@ -72,22 +72,24 @@ static bool vhost_vdpa_listener_skipped_section(Mem=
-oryRegionSection *section,
-> >      return false;
-> >  }
-> >
-> > -int vhost_vdpa_dma_map(struct vhost_vdpa *v, hwaddr iova, hwaddr size,
-> > -                       void *vaddr, bool readonly)
-> > +int vhost_vdpa_dma_map(struct vhost_vdpa *v, uint32_t asid, hwaddr iov=
-a,
-> > +                       hwaddr size, void *vaddr, bool readonly)
-> >  {
-> >      struct vhost_msg_v2 msg =3D {};
-> >      int fd =3D v->device_fd;
-> >      int ret =3D 0;
-> >
-> >      msg.type =3D v->msg_type;
-> > +    msg.asid =3D asid; /* 0 if vdpa device does not support asid */
+> > As this just uses core, would it be more appropriate to put it in libperf?
 >
-> So this comment is still kind of confusing.
+> AFAIK we move to libperf only as needed.
+
+I don't think there is an expectation yet that libperf is stable - I
+hope not as I need to nuke the CPU map empty function. So, the cost of
+putting something there rather than perf is minimal, and perf can be
+just a consumer of libperf as any other tool - which builds confidence
+the API in libperf is complete. Jiri has posted patches in the past
+migrating parse-events, there's no "need" for that but the point is to
+improve the library API. I think this is the same case and minimal
+cost given only core is being used. Given we're actively migrating
+util APIs to libperf I think it is better to introduce simple APIs
+like this in libperf rather than creating something that someone will
+later have to migrate.
+
+> >
+> >> +       u16 size = 0;
+> >
+> > Perhaps size_t or int? u16 seems odd.
 >
-> Does it mean the caller can guarantee that asid is 0 when ASID is not
-> supported?
+> Event header size member is 16-bit
 
-That's right.
+sizeof is generally considered size_t so the code as-is has implicit
+truncation - again I'll stand by it looking odd.
 
-> Even if this is true, does it silently depend on the
-> behaviour that the asid field is extended from the reserved field of
-> the ABI?
+Thanks,
+Ian
+
+> >
+> >> +
+> >> +       if (sample_type & PERF_SAMPLE_TID)
+> >> +               size += sizeof(u64);
+> >> +
+> >> +       if (sample_type & PERF_SAMPLE_TIME)
+> >> +               size += sizeof(u64);
+> >> +
+> >> +       if (sample_type & PERF_SAMPLE_ID)
+> >> +               size += sizeof(u64);
+> >> +
+> >> +       if (sample_type & PERF_SAMPLE_STREAM_ID)
+> >> +               size += sizeof(u64);
+> >> +
+> >> +       if (sample_type & PERF_SAMPLE_CPU)
+> >> +               size += sizeof(u64);
+> >> +
+> >> +       if (sample_type & PERF_SAMPLE_IDENTIFIER)
+> >> +               size += sizeof(u64);
+> >> +
+> >> +       return size;
+> >> +}
+> >> +
+> >>  struct tep_format_field *evsel__field(struct evsel *evsel, const char *name)
+> >>  {
+> >>         return tep_find_field(evsel->tp_format, name);
+> >> diff --git a/tools/perf/util/evsel.h b/tools/perf/util/evsel.h
+> >> index 92bed8e2f7d8..699448f2bc2b 100644
+> >> --- a/tools/perf/util/evsel.h
+> >> +++ b/tools/perf/util/evsel.h
+> >> @@ -381,6 +381,8 @@ int evsel__parse_sample(struct evsel *evsel, union perf_event *event,
+> >>  int evsel__parse_sample_timestamp(struct evsel *evsel, union perf_event *event,
+> >>                                   u64 *timestamp);
+> >>
+> >> +u16 evsel__id_hdr_size(struct evsel *evsel);
+> >> +
+> >
+> > A comment would be nice, I know this is just moving code about but
+> > this is a new function.
+> >
+> > Thanks,
+> > Ian
+> >
+> >>  static inline struct evsel *evsel__next(struct evsel *evsel)
+> >>  {
+> >>         return list_entry(evsel->core.node.next, struct evsel, core.node);
+> >> --
+> >> 2.25.1
+> >>
 >
-
-I don't get this part.
-
-Regarding the ABI, the reserved bytes will be there either the device
-support asid or not, since the actual iotlb message is after the
-reserved field. And they were already zeroed by msg =3D {} on top of the
-function. So if the caller always sets asid =3D 0, there is no change on
-this part.
-
-> (I still wonder if it's better to avoid using msg.asid if the kernel
-> doesn't support that).
->
-
-We can add a conditional on v->dev->backend_features & _F_ASID.
-
-But that is not the only case where ASID will not be used: If the vq
-group does not match with the supported configuration (like if CVQ is
-not in the independent group). This case is already handled by setting
-all vhost_vdpa of the virtio device to asid =3D 0, so adding that extra
-check seems redundant to me.
-
-I'm not against adding it though: It can prevent bugs. Since it would
-be a bug of qemu, maybe it's better to add an assertion?
-
-Thanks!
-
-> Thanks
->
-> >      msg.iotlb.iova =3D iova;
-> >      msg.iotlb.size =3D size;
-> >      msg.iotlb.uaddr =3D (uint64_t)(uintptr_t)vaddr;
-> >      msg.iotlb.perm =3D readonly ? VHOST_ACCESS_RO : VHOST_ACCESS_RW;
-> >      msg.iotlb.type =3D VHOST_IOTLB_UPDATE;
-> >
-> > -   trace_vhost_vdpa_dma_map(v, fd, msg.type, msg.iotlb.iova, msg.iotlb=
-.size,
-> > -                            msg.iotlb.uaddr, msg.iotlb.perm, msg.iotlb=
-.type);
-> > +    trace_vhost_vdpa_dma_map(v, fd, msg.type, msg.asid, msg.iotlb.iova=
-,
-> > +                             msg.iotlb.size, msg.iotlb.uaddr, msg.iotl=
-b.perm,
-> > +                             msg.iotlb.type);
-> >
-> >      if (write(fd, &msg, sizeof(msg)) !=3D sizeof(msg)) {
-> >          error_report("failed to write, fd=3D%d, errno=3D%d (%s)",
-> > @@ -98,18 +100,20 @@ int vhost_vdpa_dma_map(struct vhost_vdpa *v, hwadd=
-r iova, hwaddr size,
-> >      return ret;
-> >  }
-> >
-> > -int vhost_vdpa_dma_unmap(struct vhost_vdpa *v, hwaddr iova, hwaddr siz=
-e)
-> > +int vhost_vdpa_dma_unmap(struct vhost_vdpa *v, uint32_t asid, hwaddr i=
-ova,
-> > +                         hwaddr size)
-> >  {
-> >      struct vhost_msg_v2 msg =3D {};
-> >      int fd =3D v->device_fd;
-> >      int ret =3D 0;
-> >
-> >      msg.type =3D v->msg_type;
-> > +    msg.asid =3D asid; /* 0 if vdpa device does not support asid */
-> >      msg.iotlb.iova =3D iova;
-> >      msg.iotlb.size =3D size;
-> >      msg.iotlb.type =3D VHOST_IOTLB_INVALIDATE;
-> >
-> > -    trace_vhost_vdpa_dma_unmap(v, fd, msg.type, msg.iotlb.iova,
-> > +    trace_vhost_vdpa_dma_unmap(v, fd, msg.type, msg.asid, msg.iotlb.io=
-va,
-> >                                 msg.iotlb.size, msg.iotlb.type);
-> >
-> >      if (write(fd, &msg, sizeof(msg)) !=3D sizeof(msg)) {
-> > @@ -229,7 +233,7 @@ static void vhost_vdpa_listener_region_add(MemoryLi=
-stener *listener,
-> >      }
-> >
-> >      vhost_vdpa_iotlb_batch_begin_once(v);
-> > -    ret =3D vhost_vdpa_dma_map(v, iova, int128_get64(llsize),
-> > +    ret =3D vhost_vdpa_dma_map(v, 0, iova, int128_get64(llsize),
-> >                               vaddr, section->readonly);
-> >      if (ret) {
-> >          error_report("vhost vdpa map fail!");
-> > @@ -303,7 +307,7 @@ static void vhost_vdpa_listener_region_del(MemoryLi=
-stener *listener,
-> >          vhost_iova_tree_remove(v->iova_tree, result);
-> >      }
-> >      vhost_vdpa_iotlb_batch_begin_once(v);
-> > -    ret =3D vhost_vdpa_dma_unmap(v, iova, int128_get64(llsize));
-> > +    ret =3D vhost_vdpa_dma_unmap(v, 0, iova, int128_get64(llsize));
-> >      if (ret) {
-> >          error_report("vhost_vdpa dma unmap error!");
-> >      }
-> > @@ -894,7 +898,7 @@ static bool vhost_vdpa_svq_unmap_ring(struct vhost_=
-vdpa *v,
-> >      }
-> >
-> >      size =3D ROUND_UP(result->size, qemu_real_host_page_size());
-> > -    r =3D vhost_vdpa_dma_unmap(v, result->iova, size);
-> > +    r =3D vhost_vdpa_dma_unmap(v, v->address_space_id, result->iova, s=
-ize);
-> >      return r =3D=3D 0;
-> >  }
-> >
-> > @@ -936,7 +940,8 @@ static bool vhost_vdpa_svq_map_ring(struct vhost_vd=
-pa *v, DMAMap *needle,
-> >          return false;
-> >      }
-> >
-> > -    r =3D vhost_vdpa_dma_map(v, needle->iova, needle->size + 1,
-> > +    r =3D vhost_vdpa_dma_map(v, v->address_space_id, needle->iova,
-> > +                           needle->size + 1,
-> >                             (void *)(uintptr_t)needle->translated_addr,
-> >                             needle->perm =3D=3D IOMMU_RO);
-> >      if (unlikely(r !=3D 0)) {
-> > diff --git a/net/vhost-vdpa.c b/net/vhost-vdpa.c
-> > index 7c0d600aea..9b932442f0 100644
-> > --- a/net/vhost-vdpa.c
-> > +++ b/net/vhost-vdpa.c
-> > @@ -239,7 +239,7 @@ static void vhost_vdpa_cvq_unmap_buf(struct vhost_v=
-dpa *v, void *addr)
-> >          return;
-> >      }
-> >
-> > -    r =3D vhost_vdpa_dma_unmap(v, map->iova, map->size + 1);
-> > +    r =3D vhost_vdpa_dma_unmap(v, v->address_space_id, map->iova, map-=
->size + 1);
-> >      if (unlikely(r !=3D 0)) {
-> >          error_report("Device cannot unmap: %s(%d)", g_strerror(r), r);
-> >      }
-> > @@ -279,8 +279,8 @@ static int vhost_vdpa_cvq_map_buf(struct vhost_vdpa=
- *v, void *buf, size_t size,
-> >          return r;
-> >      }
-> >
-> > -    r =3D vhost_vdpa_dma_map(v, map.iova, vhost_vdpa_net_cvq_cmd_page_=
-len(), buf,
-> > -                           !write);
-> > +    r =3D vhost_vdpa_dma_map(v, v->address_space_id, map.iova,
-> > +                           vhost_vdpa_net_cvq_cmd_page_len(), buf, !wr=
-ite);
-> >      if (unlikely(r < 0)) {
-> >          goto dma_map_err;
-> >      }
-> > diff --git a/hw/virtio/trace-events b/hw/virtio/trace-events
-> > index 20af2e7ebd..36e5ae75f6 100644
-> > --- a/hw/virtio/trace-events
-> > +++ b/hw/virtio/trace-events
-> > @@ -26,8 +26,8 @@ vhost_user_write(uint32_t req, uint32_t flags) "req:%=
-d flags:0x%"PRIx32""
-> >  vhost_user_create_notifier(int idx, void *n) "idx:%d n:%p"
-> >
-> >  # vhost-vdpa.c
-> > -vhost_vdpa_dma_map(void *vdpa, int fd, uint32_t msg_type, uint64_t iov=
-a, uint64_t size, uint64_t uaddr, uint8_t perm, uint8_t type) "vdpa:%p fd: =
-%d msg_type: %"PRIu32" iova: 0x%"PRIx64" size: 0x%"PRIx64" uaddr: 0x%"PRIx6=
-4" perm: 0x%"PRIx8" type: %"PRIu8
-> > -vhost_vdpa_dma_unmap(void *vdpa, int fd, uint32_t msg_type, uint64_t i=
-ova, uint64_t size, uint8_t type) "vdpa:%p fd: %d msg_type: %"PRIu32" iova:=
- 0x%"PRIx64" size: 0x%"PRIx64" type: %"PRIu8
-> > +vhost_vdpa_dma_map(void *vdpa, int fd, uint32_t msg_type, uint32_t asi=
-d, uint64_t iova, uint64_t size, uint64_t uaddr, uint8_t perm, uint8_t type=
-) "vdpa:%p fd: %d msg_type: %"PRIu32" asid: %"PRIu32" iova: 0x%"PRIx64" siz=
-e: 0x%"PRIx64" uaddr: 0x%"PRIx64" perm: 0x%"PRIx8" type: %"PRIu8
-> > +vhost_vdpa_dma_unmap(void *vdpa, int fd, uint32_t msg_type, uint32_t a=
-sid, uint64_t iova, uint64_t size, uint8_t type) "vdpa:%p fd: %d msg_type: =
-%"PRIu32" asid: %"PRIu32" iova: 0x%"PRIx64" size: 0x%"PRIx64" type: %"PRIu8
-> >  vhost_vdpa_listener_begin_batch(void *v, int fd, uint32_t msg_type, ui=
-nt8_t type)  "vdpa:%p fd: %d msg_type: %"PRIu32" type: %"PRIu8
-> >  vhost_vdpa_listener_commit(void *v, int fd, uint32_t msg_type, uint8_t=
- type)  "vdpa:%p fd: %d msg_type: %"PRIu32" type: %"PRIu8
-> >  vhost_vdpa_listener_region_add(void *vdpa, uint64_t iova, uint64_t lle=
-nd, void *vaddr, bool readonly) "vdpa: %p iova 0x%"PRIx64" llend 0x%"PRIx64=
-" vaddr: %p read-only: %d"
-> > --
-> > 2.31.1
-> >
->
-
