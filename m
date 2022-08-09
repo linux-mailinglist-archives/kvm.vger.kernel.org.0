@@ -2,193 +2,178 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id C6D4D58D175
-	for <lists+kvm@lfdr.de>; Tue,  9 Aug 2022 02:48:54 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 8EC1658D194
+	for <lists+kvm@lfdr.de>; Tue,  9 Aug 2022 02:57:57 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S244740AbiHIAsu (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 8 Aug 2022 20:48:50 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44220 "EHLO
+        id S244781AbiHIA54 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 8 Aug 2022 20:57:56 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49256 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S244457AbiHIAst (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 8 Aug 2022 20:48:49 -0400
-Received: from mail-pj1-x102d.google.com (mail-pj1-x102d.google.com [IPv6:2607:f8b0:4864:20::102d])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 82DC7BA5;
-        Mon,  8 Aug 2022 17:48:48 -0700 (PDT)
-Received: by mail-pj1-x102d.google.com with SMTP id p14-20020a17090a74ce00b001f4d04492faso10732277pjl.4;
-        Mon, 08 Aug 2022 17:48:48 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=Kc/KcJ1/Sv1U6ib2VY1BnVwQKDPVKyoIb6rAay5qsDk=;
-        b=GTQhdKq+HAQSElM2peGsEfvfgGlLkW7iKwWMoibdtUVsogjDZ/uf5Rq1i61eZv+8pf
-         McFcn5RG016LhQXNUN4g4C0PHUh/xhADsEQHV8szcP1JPjFNBnfGvsKoTm8nJpd00rM5
-         pLh6/j17DYpRPkmbzhShc2XAuQSgl2HPCymWxY4g58kdYzugjBQ2PWmzU5P1xD0uzjeQ
-         gNuY4/lwfQrU6nEypTYajrAL/Gu4e30BTESa+lBcc5AHR29HPnI29y9u0lXuPE5pinlt
-         bF41znDXlJ/H/oblskhGNhR9UK75YVCQHtw0f/7myHjr8a3wft3FTDmXVdSje1kgOg3n
-         M8Uw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=Kc/KcJ1/Sv1U6ib2VY1BnVwQKDPVKyoIb6rAay5qsDk=;
-        b=cQ2M0gZeP614KXLRgA49ZJBbYWAu5zUP/VI6ERs0xa+FHcLE8kuPFO4wIZZAYxDxZE
-         xmgjK+m0ev+Ld5CZWmw9gHT55YZ5OZv+/X9MkzSyMl6RrkbzImuaf3F2/JvJQZ10xEat
-         fL0vYrdAltTzw1SrqDMmohpb9cb7CJm1+ZYZfWR4B03HPAGfTH5BnB1NRvC1nIQMMYgW
-         V5SS+6z5pdMoDAo14V+DNvjOKcbTw1EA+QqUs4tlkGMrtTwUgPRIdSu4oCJNqdwSFF4C
-         D69UYT0hhVgXlsfyZYW3cgnWS+/4wCxRfF/22+gGPZsKaHUPU1cPf8jyx4KkuaBX8kmY
-         b6hg==
-X-Gm-Message-State: ACgBeo2GAkp2wsPHDAI+WFB2+5p5pzZQQC/hRk3Ur4UiCiyTLo+sSSR7
-        qp6eKmKi+CpHWFEQ72/UCJk=
-X-Google-Smtp-Source: AA6agR4YkiEr2P0xVTrp4gHmVMHYklRXP4SftIM3aBYOHNueBfvuU0tMM+hZQEqZLRpDR0I19wlv5A==
-X-Received: by 2002:a17:90b:907:b0:1f7:6b77:dcbc with SMTP id bo7-20020a17090b090700b001f76b77dcbcmr3835112pjb.244.1660006127840;
-        Mon, 08 Aug 2022 17:48:47 -0700 (PDT)
-Received: from localhost ([192.55.54.49])
-        by smtp.gmail.com with ESMTPSA id i22-20020a17090a059600b001f516895294sm8651021pji.40.2022.08.08.17.48.46
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 08 Aug 2022 17:48:47 -0700 (PDT)
-Date:   Mon, 8 Aug 2022 17:48:45 -0700
-From:   Isaku Yamahata <isaku.yamahata@gmail.com>
-To:     Sean Christopherson <seanjc@google.com>
-Cc:     Kai Huang <kai.huang@intel.com>,
-        Isaku Yamahata <isaku.yamahata@gmail.com>,
-        isaku.yamahata@intel.com, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>
-Subject: Re: [PATCH v7 041/102] KVM: VMX: Introduce test mode related to EPT
- violation VE
-Message-ID: <20220809004845.GC504743@ls.amr.corp.intel.com>
-References: <cover.1656366337.git.isaku.yamahata@intel.com>
- <cadf3221e3f7b911c810f15cfe300dd5337a966d.1656366338.git.isaku.yamahata@intel.com>
- <52915310c9118a124da2380daf3d753a818de05e.camel@intel.com>
- <20220719144936.GX1379820@ls.amr.corp.intel.com>
- <9945dbf586d8738b7cf0af53bfb760da9eb9e882.camel@intel.com>
- <20220727233955.GC3669189@ls.amr.corp.intel.com>
- <af9e3b06ba9e16df4bfd768dfdd78f2e0277cbe5.camel@intel.com>
- <YuLtj4/pgUZBc6f9@google.com>
+        with ESMTP id S233226AbiHIA5y (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 8 Aug 2022 20:57:54 -0400
+Received: from mail.efficios.com (mail.efficios.com [167.114.26.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 38ECF1BEAE;
+        Mon,  8 Aug 2022 17:57:52 -0700 (PDT)
+Received: from localhost (localhost [127.0.0.1])
+        by mail.efficios.com (Postfix) with ESMTP id 6584D3FC698;
+        Mon,  8 Aug 2022 20:57:51 -0400 (EDT)
+Received: from mail.efficios.com ([127.0.0.1])
+        by localhost (mail03.efficios.com [127.0.0.1]) (amavisd-new, port 10032)
+        with ESMTP id L-cbIrCayAKv; Mon,  8 Aug 2022 20:57:50 -0400 (EDT)
+Received: from localhost (localhost [127.0.0.1])
+        by mail.efficios.com (Postfix) with ESMTP id B22A93FC697;
+        Mon,  8 Aug 2022 20:57:50 -0400 (EDT)
+DKIM-Filter: OpenDKIM Filter v2.10.3 mail.efficios.com B22A93FC697
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=efficios.com;
+        s=default; t=1660006670;
+        bh=fHIX23eKmWI7H4gFYuEyjtQ4fI/u8qNcHkF2ldepniQ=;
+        h=Date:From:To:Message-ID:MIME-Version;
+        b=ACfv8WIfdHAvgNTeJK+6js4kcLL0eqSO+nmbNobRKBkXpzfW2HxFGy0SM8OiO6bow
+         29WBIW3Em2nhNU+NWYZulOoWyvR0YGKNkJAXPIDMTbdz7bqo+A+u0eDmTQD0dkC4+S
+         I2hQs3fw9uJmxY94fYeFkh7fig3tQPJPf7Xz30S2wDpf7TldDCd2SBpXmWi8/e+tGD
+         BuG8wwzUWFPJQ+51WyjoHdP2AS01X9gm1yXEF+zMObmLJVAu6D/n5P7GQTPVGPRTRj
+         5lfp8gF05l8aFGySZwl48XyV03oRh19SCkOnnZFZw/Dheu8BSdJMkBX6ZgSH3+GM+X
+         Y/r69vikkBb3g==
+X-Virus-Scanned: amavisd-new at efficios.com
+Received: from mail.efficios.com ([127.0.0.1])
+        by localhost (mail03.efficios.com [127.0.0.1]) (amavisd-new, port 10026)
+        with ESMTP id 9rN7wNNTIody; Mon,  8 Aug 2022 20:57:50 -0400 (EDT)
+Received: from mail03.efficios.com (mail03.efficios.com [167.114.26.124])
+        by mail.efficios.com (Postfix) with ESMTP id A2BBD3FC2DE;
+        Mon,  8 Aug 2022 20:57:50 -0400 (EDT)
+Date:   Mon, 8 Aug 2022 20:57:50 -0400 (EDT)
+From:   Mathieu Desnoyers <mathieu.desnoyers@efficios.com>
+To:     Gavin Shan <gshan@redhat.com>
+Cc:     Florian Weimer <fweimer@redhat.com>,
+        Sean Christopherson <seanjc@google.com>, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org, linux-kselftest@vger.kernel.org,
+        Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <1675511593.114778.1660006670558.JavaMail.zimbra@efficios.com>
+In-Reply-To: <465d3599-2433-7f6e-66fc-b4018ba258cf@redhat.com>
+References: <875yj2n2r0.fsf@oldenburg.str.redhat.com> <465d3599-2433-7f6e-66fc-b4018ba258cf@redhat.com>
+Subject: Re: tools/testing/selftests/kvm/rseq_test and glibc 2.35
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <YuLtj4/pgUZBc6f9@google.com>
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
-        RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
-        autolearn=ham autolearn_force=no version=3.4.6
+Content-Transfer-Encoding: 7bit
+X-Originating-IP: [167.114.26.124]
+X-Mailer: Zimbra 8.8.15_GA_4304 (zclient/8.8.15_GA_4304)
+Thread-Topic: tools/testing/selftests/kvm/rseq_test and glibc 2.35
+Thread-Index: tLu7f3UTxnUwftC9I0Hq80rlQtlKdQ==
+X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,SPF_HELO_NONE,
+        SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no
+        version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Jul 28, 2022 at 08:11:59PM +0000,
-Sean Christopherson <seanjc@google.com> wrote:
 
-> On Thu, Jul 28, 2022, Kai Huang wrote:
-> > On Wed, 2022-07-27 at 16:39 -0700, Isaku Yamahata wrote:
-> > > On Wed, Jul 20, 2022 at 05:13:08PM +1200,
-> > > Kai Huang <kai.huang@intel.com> wrote:
-> > > 
-> > > > On Tue, 2022-07-19 at 07:49 -0700, Isaku Yamahata wrote:
-> > > > > On Fri, Jul 08, 2022 at 02:23:43PM +1200,
-> > > > > Kai Huang <kai.huang@intel.com> wrote:
-> > > > > 
-> > > > > > On Mon, 2022-06-27 at 14:53 -0700, isaku.yamahata@intel.com wrote:
-> > > > > > > From: Isaku Yamahata <isaku.yamahata@intel.com>
-> > > > > > > 
-> > > > > > > To support TDX, KVM is enhanced to operate with #VE.  For TDX, KVM programs
-> > > > > > > to inject #VE conditionally and set #VE suppress bit in EPT entry.  For VMX
-> > > > > > > case, #VE isn't used.  If #VE happens for VMX, it's a bug.  To be
-> > > > > > > defensive (test that VMX case isn't broken), introduce option
-> > > > > > > ept_violation_ve_test and when it's set, set error.
-> > > > > > 
-> > > > > > I don't see why we need this patch.  It may be helpful during your test, but why
-> > > > > > do we need this patch for formal submission?
-> > > > > > 
-> > > > > > And for a normal guest, what prevents one vcpu from sending #VE IPI to another
-> > > > > > vcpu?
-> > > > > 
-> > > > > Paolo suggested it as follows.  Maybe it should be kernel config.
-> > > > > (I forgot to add suggested-by. I'll add it)
-> > > > > 
-> > > > > https://lore.kernel.org/lkml/84d56339-4a8a-6ddb-17cb-12074588ba9c@redhat.com/
-> > > > > 
-> > > > > > 
-> > > > 
-> > > > OK.  But can we assume a normal guest won't sending #VE IPI?
-> > > 
-> > > Theoretically nothing prevents that.  I wouldn't way "normal".
-> > > Anyway this is off by default.
+----- Gavin Shan <gshan@redhat.com> wrote:
+> Hi Florian,
+> 
+> On 8/9/22 2:01 AM, Florian Weimer wrote:
+> > It has come to my attention that the KVM rseq test apparently needs to
+> > be ported to glibc 2.35.  The background is that on aarch64, rseq is the
+> > only way to get a practically useful sched_getcpu.  (There's no hidden
+> > per-task CPU state the vDSO could reveal as the CPU ID.)
 > > 
-> > I don't think whether it is on or off by default matters.
 > 
-> It matters in the sense that the module param is intended purely for testing, i.e.
-> there's zero reason to ever enable it in production.  That changes what is and
-> wasn't isn't a reasonable response to an unexpected #VE.
+> Yes, kvm/selftests/rseq needs to support glibc 2.35. The question is
+> about glibc 2.34 or 2.35 because kvm/selftest/rseq fails on glibc 2.34
 > 
-> > If it can happen legitimately in the guest, it doesn't look right to print
-> > out something like below:
+> I would guess upstream-glibc-2.35 feature is enabled on downstream
+> glibc-2.34?
+> 
+> # ./rseq_test
+> ==== Test Assertion Failure ====
+>    rseq_test.c:60: !r
+>    pid=112043 tid=112043 errno=22 - Invalid argument
+>       1	0x0000000000401973: main at rseq_test.c:226
+>       2	0x0000ffff84b6c79b: ?? ??:0
+>       3	0x0000ffff84b6c86b: ?? ??:0
+>       4	0x0000000000401b6f: _start at ??:?
+>    rseq failed, errno = 22 (Invalid argument)
+> # rpm -aq | grep glibc-2
+> glibc-2.34-39.el9.aarch64
+> 
+> 
+> > The main rseq tests have already been adjusted via:
 > > 
-> > 	pr_err("VMEXIT due to unexpected #VE.\n");
+> > commit 233e667e1ae3e348686bd9dd0172e62a09d852e1
+> > Author: Mathieu Desnoyers <mathieu.desnoyers@efficios.com>
+> > Date:   Mon Jan 24 12:12:45 2022 -0500
+> > 
+> >      selftests/rseq: Uplift rseq selftests for compatibility with glibc-2.35
+> >      
+> >      glibc-2.35 (upcoming release date 2022-02-01) exposes the rseq per-thread
+> >      data in the TCB, accessible at an offset from the thread pointer, rather
+> >      than through an actual Thread-Local Storage (TLS) variable, as the
+> >      Linux kernel selftests initially expected.
+> >      
+> >      The __rseq_abi TLS and glibc-2.35's ABI for per-thread data cannot
+> >      actively coexist in a process, because the kernel supports only a single
+> >      rseq registration per thread.
+> >      
+> >      Here is the scheme introduced to ensure selftests can work both with an
+> >      older glibc and with glibc-2.35+:
+> >      
+> >      - librseq exposes its own "rseq_offset, rseq_size, rseq_flags" ABI.
+> >      
+> >      - librseq queries for glibc rseq ABI (__rseq_offset, __rseq_size,
+> >        __rseq_flags) using dlsym() in a librseq library constructor. If those
+> >        are found, copy their values into rseq_offset, rseq_size, and
+> >        rseq_flags.
+> >      
+> >      - Else, if those glibc symbols are not found, handle rseq registration
+> >        from librseq and use its own IE-model TLS to implement the rseq ABI
+> >        per-thread storage.
+> >      
+> >      Signed-off-by: Mathieu Desnoyers <mathieu.desnoyers@efficios.com>
+> >      Signed-off-by: Peter Zijlstra (Intel) <peterz@infradead.org>
+> >      Link: https://lkml.kernel.org/r/20220124171253.22072-8-mathieu.desnoyers@efficios.com
+> > 
+> > But I don't see a similar adjustment for
+> > tools/testing/selftests/kvm/rseq_test.c.  As an additional wrinkle,
+> > you'd have to start calling getcpu (glibc function or system call)
+> > because comparing rseq.cpu_id against sched_getcpu won't test anything
+> > anymore once glibc implements sched_getcpu using rseq.
+> > 
+> > We noticed this because our downstream glibc version, while based on
+> > 2.34, enables rseq registration by default.  To facilitate coordination
+> > with rseq application usage, we also backported the __rseq_* ABI
+> > symbols, so the selftests could use that even in our downstream version.
+> > (We enable the glibc tunables downstream, but they are an optional
+> > glibc feature, so it's probably better in the long run to fix the kernel
+> > selftests rather than using the tunables as a workaround.)
+> > 
 > 
-> Agreed.  In this particular case I think the right approach is to treat an
-> unexpected #VE as a fatal KVM bug.  Yes, disabling EPT violation #VEs would likely
-> allow the guest to live, but as above the module param should never be enabled in
-> production.  And if we get a #VE with the module param disabled, then KVM is truly
-> in the weeds and killing the VM is the safe option.
+> Thanks for the pointer. It makes sense. So it means rseq registration has
+> been done by glibc TLS? In this case, kvm/selftests/rseq is unable to
+> register again.
+
+The registration is done by glibc initialization and thread startup code.
+
 > 
-> E.g. something like
+> I will come up something similiar for kvm/selftest/rseq.
 
-Thanks, I finally ended up with the following.
+Make sure to chech the rseq selftests fixes recently pulled in the current merge window as well. One is relevant:
 
-diff --git a/arch/x86/kvm/vmx/vmcs.h b/arch/x86/kvm/vmx/vmcs.h
-index ac290a44a693..9277676057a7 100644
---- a/arch/x86/kvm/vmx/vmcs.h
-+++ b/arch/x86/kvm/vmx/vmcs.h
-@@ -140,6 +140,11 @@ static inline bool is_nm_fault(u32 intr_info)
- 	return is_exception_n(intr_info, NM_VECTOR);
- }
- 
-+static inline bool is_ve_fault(u32 intr_info)
-+{
-+	return is_exception_n(intr_info, VE_VECTOR);
-+}
-+
- /* Undocumented: icebp/int1 */
- static inline bool is_icebp(u32 intr_info)
- {
-diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
-index 881db80ceee9..c3e4c0d17b63 100644
---- a/arch/x86/kvm/vmx/vmx.c
-+++ b/arch/x86/kvm/vmx/vmx.c
-@@ -5047,6 +5047,12 @@ static int handle_exception_nmi(struct kvm_vcpu *vcpu)
- 	if (is_invalid_opcode(intr_info))
- 		return handle_ud(vcpu);
- 
-+	/*
-+	 * #VE isn't supposed to happen.  Although vcpu can send
-+	 */
-+	if (KVM_BUG_ON(is_ve_fault(intr_info), vcpu->kvm))
-+		return -EIO;
-+
- 	error_code = 0;
- 	if (intr_info & INTR_INFO_DELIVER_CODE_MASK)
- 		error_code = vmcs_read32(VM_EXIT_INTR_ERROR_CODE);
-@@ -5167,14 +5173,7 @@ static int handle_exception_nmi(struct kvm_vcpu *vcpu)
- 		if (handle_guest_split_lock(kvm_rip_read(vcpu)))
- 			return 1;
- 		fallthrough;
--	case VE_VECTOR:
- 	default:
--		if (ept_violation_ve_test && ex_no == VE_VECTOR) {
--			pr_err("VMEXIT due to unexpected #VE.\n");
--			secondary_exec_controls_clearbit(
--				vmx, SECONDARY_EXEC_EPT_VIOLATION_VE);
--			return 1;
--		}
- 		kvm_run->exit_reason = KVM_EXIT_EXCEPTION;
- 		kvm_run->ex.exception = ex_no;
- 		kvm_run->ex.error_code = error_code;
+https://github.com/torvalds/linux/commit/d1a997ba4c1bf65497d956aea90de42a6398f73a
 
+We may want to find a way to remove this duplicated rseq.c code eventually.
 
+Thanks,
+
+Mathieu
+
+> 
+> Thanks,
+> Gavin
+> 
 
 -- 
-Isaku Yamahata <isaku.yamahata@gmail.com>
+Mathieu Desnoyers
+EfficiOS Inc.
+http://www.efficios.com
