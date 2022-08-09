@@ -2,197 +2,121 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 5AF6C58DA38
-	for <lists+kvm@lfdr.de>; Tue,  9 Aug 2022 16:22:19 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 4635F58DA63
+	for <lists+kvm@lfdr.de>; Tue,  9 Aug 2022 16:32:38 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S243147AbiHIOWS (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 9 Aug 2022 10:22:18 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48074 "EHLO
+        id S229653AbiHIOce (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 9 Aug 2022 10:32:34 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53490 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231130AbiHIOWP (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 9 Aug 2022 10:22:15 -0400
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 8FD8D12A84
-        for <kvm@vger.kernel.org>; Tue,  9 Aug 2022 07:22:14 -0700 (PDT)
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id CDBA823A;
-        Tue,  9 Aug 2022 07:22:14 -0700 (PDT)
-Received: from monolith.localdoman (unknown [172.31.20.19])
-        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id EDE7F3F5A1;
-        Tue,  9 Aug 2022 07:22:12 -0700 (PDT)
-Date:   Tue, 9 Aug 2022 15:22:57 +0100
-From:   Alexandru Elisei <alexandru.elisei@arm.com>
-To:     Nikos Nikoleris <nikos.nikoleris@arm.com>
-Cc:     pbonzini@redhat.com, thuth@redhat.com, andrew.jones@linux.dev,
-        kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu
-Subject: Re: [kvm-unit-tests RFC PATCH 19/19] arm/arm64: Rework the cache
- maintenance in asm_mmu_disable
-Message-ID: <YvJtwWcKkcxLUVif@monolith.localdoman>
-References: <20220809091558.14379-1-alexandru.elisei@arm.com>
- <20220809091558.14379-20-alexandru.elisei@arm.com>
- <3fba260d-bfca-14ea-7bdd-3e55f3d1e276@arm.com>
+        with ESMTP id S243824AbiHIOcS (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 9 Aug 2022 10:32:18 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id A67AA1D323
+        for <kvm@vger.kernel.org>; Tue,  9 Aug 2022 07:32:14 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1660055533;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=BnCnqK3XkuMaWvfU+WTbvm+XzlcWU8Yyqm7Yd0LhLkE=;
+        b=dbVxKXuojFdlEse5LAMyCD87Sx3gEFBjjwA+k2N+m+AaeME9Ury7QOGAxA/mlk4QJVIK/l
+        b/1Vust447NRwq3u5BE5fFlqp7lfI5qWJiMK0JXo6kLjVdwIJJ/765JBB2ikENzMtMXJZH
+        DJshuK+Pxzf0CwvwajHn9FUM0n/+a2Y=
+Received: from mail-ed1-f70.google.com (mail-ed1-f70.google.com
+ [209.85.208.70]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-269-YRbqkfawM6CSJmx_Oifswg-1; Tue, 09 Aug 2022 10:32:06 -0400
+X-MC-Unique: YRbqkfawM6CSJmx_Oifswg-1
+Received: by mail-ed1-f70.google.com with SMTP id y16-20020a056402359000b0043db5186943so7352421edc.3
+        for <kvm@vger.kernel.org>; Tue, 09 Aug 2022 07:32:06 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc;
+        bh=BnCnqK3XkuMaWvfU+WTbvm+XzlcWU8Yyqm7Yd0LhLkE=;
+        b=vNwgm4bzXCATFQkuudFteJCNO3VSv1sX0rZ8iYQ88SxtUkoT7EZ3qiYcu6jOp+VM7A
+         o/kPGDi7bHhwzPHCPY+/8yMm42UPmZdUWDz4TQqfLHR4NpuCU87vh44gl65qrU78MWD9
+         4eOmLQZdl976aT4P2obA7JtvKTMMBC1W+UyK1GerhCV43eT9MOxsvBkQhwao/rxSnczP
+         FCRVWUolUWkpkqfDRXZVLJWzEXMeB1+iv0ts0SmL+7/zIvV90tTZKiGSNSCQCsf70pWt
+         wW/BIoSWcz78clRm8kwQAZVgDtoKBeeadf3yxLyQKGava7J/l12FuM0Kx6ir9338v9yn
+         3x1A==
+X-Gm-Message-State: ACgBeo0WZWp0xoENtioJ9PQnJBTW3fBJnF19Vpcdipbke0jdtHp4FYUD
+        J00CmZj7hYf6bn2xJtAie1AEVqtBZOEXo0ZgymFuKMaMy0OklM6gCjojJsWPsahHVOJG1+ulx5W
+        WI4xEtkhjXMNa
+X-Received: by 2002:a17:907:781a:b0:730:cd06:3572 with SMTP id la26-20020a170907781a00b00730cd063572mr17474400ejc.487.1660055525247;
+        Tue, 09 Aug 2022 07:32:05 -0700 (PDT)
+X-Google-Smtp-Source: AA6agR5wYRs9LRq936vKKUril1vIXeztDIFofWVQmtrcvT9o55Wcn05sEztvAoT0YGyT1d3Ak9sm9A==
+X-Received: by 2002:a17:907:781a:b0:730:cd06:3572 with SMTP id la26-20020a170907781a00b00730cd063572mr17474380ejc.487.1660055524915;
+        Tue, 09 Aug 2022 07:32:04 -0700 (PDT)
+Received: from ?IPV6:2001:b07:6468:f312:5e2c:eb9a:a8b6:fd3e? ([2001:b07:6468:f312:5e2c:eb9a:a8b6:fd3e])
+        by smtp.googlemail.com with ESMTPSA id r27-20020a056402035b00b0043c92c44c53sm6053094edw.93.2022.08.09.07.32.00
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 09 Aug 2022 07:32:03 -0700 (PDT)
+Message-ID: <953d2e99-ed1a-384d-6d3a-0f656a243f82@redhat.com>
+Date:   Tue, 9 Aug 2022 16:31:59 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <3fba260d-bfca-14ea-7bdd-3e55f3d1e276@arm.com>
-X-Spam-Status: No, score=-6.9 required=5.0 tests=BAYES_00,RCVD_IN_DNSWL_HI,
-        SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham
-        autolearn_force=no version=3.4.6
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.12.0
+Subject: Re: [PATCH v3 2/2] KVM: x86/xen: Stop Xen timer before changing IRQ
+Content-Language: en-US
+To:     David Woodhouse <dwmw2@infradead.org>,
+        Sean Christopherson <seanjc@google.com>
+Cc:     Coleman Dietsch <dietschc@csp.edu>, kvm@vger.kernel.org,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+        Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org,
+        "H . Peter Anvin" <hpa@zytor.com>, linux-kernel@vger.kernel.org,
+        skhan@linuxfoundation.org, Pavel Skripkin <paskripkin@gmail.com>,
+        linux-kernel-mentees@lists.linuxfoundation.org,
+        stable@vger.kernel.org,
+        syzbot+e54f930ed78eb0f85281@syzkaller.appspotmail.com,
+        metikaya <metikaya@amazon.co.uk>
+References: <20220808190607.323899-2-dietschc@csp.edu>
+ <20220808190607.323899-3-dietschc@csp.edu>
+ <c648744c096588d30771a22efa6d65c31fffd06c.camel@infradead.org>
+ <43e258cc-71ac-bde4-d1f8-9eb9519928d3@redhat.com>
+ <4fc1371b83001b4eed1617c37bec6b9d007e45c2.camel@infradead.org>
+ <YvJqIsQsg+ThMg/C@google.com>
+ <0b5dcab333906f166fcdbc296373cc5e08bec79f.camel@infradead.org>
+From:   Paolo Bonzini <pbonzini@redhat.com>
+In-Reply-To: <0b5dcab333906f166fcdbc296373cc5e08bec79f.camel@infradead.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Spam-Status: No, score=-3.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
+        RCVD_IN_DNSWL_LOW,SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE
+        autolearn=unavailable autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Aug 09, 2022 at 02:53:34PM +0100, Nikos Nikoleris wrote:
-> Hi Alex,
+On 8/9/22 16:16, David Woodhouse wrote:
+> I find the new version a bit harder to follow, with its init-then-stop-
+> then-start logic:
 > 
-> On 09/08/2022 10:15, Alexandru Elisei wrote:
-> > asm_mmu_disable is overly ambitious and provably incorrect:
-> > 
-> > 1. It tries to clean and invalidate the data caches for the *entire*
-> > memory, which is highly unnecessary, as it's very unlikely that a test
-> > will write to the entire memory, and even more unlikely that a test will
-> > modify the text section of the test image.
-> > 
+> 	case KVM_XEN_VCPU_ATTR_TYPE_TIMER:
+> 		if (data->u.timer.port &&
+> 		    data->u.timer.priority != KVM_IRQ_ROUTING_XEN_EVTCHN_PRIO_2LEVEL) {
+> 			r = -EINVAL;
+> 			break;
+>                  }
 > 
-> While it appears that we don't modify the text section, there is some
-> loading happening before we start executing a test. Are you sure that the
-> loader doesn't leave the memory dirty?
-
-Yes, it's in the boot protocol for Linux [1]. I also mentioned this in the
-commit message for the previous patch.
-
-[1] https://elixir.bootlin.com/linux/v5.19/source/Documentation/arm64/booting.rst#L180
-
+> 		if (!vcpu->arch.xen.timer.function)
+> 			kvm_xen_init_timer(vcpu);
 > 
-> > 2. There is no corresponding dcache invalidate command for the entire
-> > memory in asm_mmu_enable, leaving it up to the test that disabled the
-> > MMU to do the cache maintenance in an asymmetrical fashion: only for
-> > re-enabling the MMU, but not for disabling it.
-> > 
-> > 3. It's missing the DMB SY memory barrier to ensure that the dcache
-> > maintenance is performed after the last store executed in program order
-> > before calling asm_mmu_disable.
-> > 
-> 
-> I am not sure why this is needed. In general, iiuc, a store to location x
-> followed by a DC CVAC to x in program order don't need an barrier (see Arm
-> ARM ARM DDI 0487G.b "Data cache maintenance instructions" at K11.5.1 and
+> 		/* Stop the timer (if it's running) before changing the vector */
+> 		kvm_xen_stop_timer(vcpu);
+> 		vcpu->arch.xen.timer_virq = data->u.timer.port;
 
-Just a note, the latest public version is H.a.
 
-K11.5.1 looks to me like it deals with ordering of the cache maintenance
-operations with regards to memory accesses that are *after* the CMO in
-program order, this patch is about memory accesses that are *before* the
-CMO in program order.
+I think this is fine, if anything the kvm_xen_stop_timer() call could be 
+placed in an "else" but I'm leaning towards applying this version of the 
+patch.
 
-> "Ordering and completion of data and instruction cache instructions" at
-> D4-2656). It doesn't hurt to have it but I think it's unnecessary.
+Paolo
 
-D4-2656 is about PAC, I assume you meant D4-2636 judging from the section
-name (please correct me if I'm wrong):
-
-"All data cache instructions, other than DC ZVA, that specify an address:
-[..]
-Can execute in any order relative to loads or stores that access any
-address with the Device memory attribute, or with Normal memory with Inner
-Non-cacheable attribute unless a DMB or DSB is executed between the
-instructions."
-
-Since the maintenance is performed with the MMU off, I think the DMB SY is
-required as per the architecture.
-
-I prefer to keep the maintenance after the MMU is disabled, to allow for
-any kind of translation table setups that a test might conjure up (a test
-in theory can create and install its own translation tables).
-
-Thanks,
-Alex
-
-> 
-> Thanks,
-> 
-> Nikos
-> 
-> > Fix all of the issues in one go, by doing the cache maintenance only for
-> > the stack, as that is out of the control of the C code, and add the missing
-> > memory barrier.
-> > 
-> > The code used to test that mmu_disable works correctly is similar to the
-> > code used to test commit 410b3bf09e76 ("arm/arm64: Perform dcache clean
-> > + invalidate after turning MMU off"), with extra cache maintenance
-> > added:
-> > 
-> > +#include <alloc_page.h>
-> > +#include <asm/cacheflush.h>
-> > +#include <asm/mmu.h>
-> >   int main(int argc, char **argv)
-> >   {
-> > +       int *x = alloc_page();
-> > +       bool pass = true;
-> > +       int i;
-> > +
-> > +       for  (i = 0; i < 1000000; i++) {
-> > +               *x = 0x42;
-> > +               dcache_clean_addr_poc((unsigned long)x);
-> > +               mmu_disable();
-> > +               if (*x != 0x42) {
-> > +                       pass = false;
-> > +                       break;
-> > +               }
-> > +               *x = 0x50;
-> > +               /* Needed for the invalidation only. */
-> > +               dcache_clean_inval_addr_poc((unsigned long)x);
-> > +               mmu_enable(current_thread_info()->pgtable);
-> > +               if (*x != 0x50) {
-> > +                       pass = false;
-> > +                       break;
-> > +               }
-> > +       }
-> > +       report(pass, "MMU disable cache maintenance");
-> > 
-> > Signed-off-by: Alexandru Elisei <alexandru.elisei@arm.com>
-> > ---
-> >   arm/cstart.S   | 11 ++++++-----
-> >   arm/cstart64.S | 11 +++++------
-> >   2 files changed, 11 insertions(+), 11 deletions(-)
-> > 
-> > diff --git a/arm/cstart.S b/arm/cstart.S
-> > index fc7c558802f1..b27de44f30a6 100644
-> > --- a/arm/cstart.S
-> > +++ b/arm/cstart.S
-> > @@ -242,11 +242,12 @@ asm_mmu_disable:
-> >   	mcr	p15, 0, r0, c1, c0, 0
-> >   	isb
-> > -	ldr	r0, =__phys_offset
-> > -	ldr	r0, [r0]
-> > -	ldr	r1, =__phys_end
-> > -	ldr	r1, [r1]
-> > -	dcache_by_line_op dccimvac, sy, r0, r1, r2, r3
-> > +	dmb	sy
-> > +	mov	r0, sp
-> > +	lsr	r0, #THREAD_SHIFT
-> > +	lsl	r0, #THREAD_SHIFT
-> > +	add	r1, r0, #THREAD_SIZE
-> > +	dcache_by_line_op dccmvac, sy, r0, r1, r3, r4
-> >   	mov     pc, lr
-> > diff --git a/arm/cstart64.S b/arm/cstart64.S
-> > index 1ce6b9e14d23..af4970775298 100644
-> > --- a/arm/cstart64.S
-> > +++ b/arm/cstart64.S
-> > @@ -283,12 +283,11 @@ asm_mmu_disable:
-> >   	msr	sctlr_el1, x0
-> >   	isb
-> > -	/* Clean + invalidate the entire memory */
-> > -	adrp	x0, __phys_offset
-> > -	ldr	x0, [x0, :lo12:__phys_offset]
-> > -	adrp	x1, __phys_end
-> > -	ldr	x1, [x1, :lo12:__phys_end]
-> > -	dcache_by_line_op civac, sy, x0, x1, x2, x3
-> > +	dmb	sy
-> > +	mov	x9, sp
-> > +	and	x9, x9, #THREAD_MASK
-> > +	add	x10, x9, #THREAD_SIZE
-> > +	dcache_by_line_op cvac, sy, x9, x10, x11, x12
-> >   	ret
