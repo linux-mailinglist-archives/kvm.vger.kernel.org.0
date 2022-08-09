@@ -2,102 +2,193 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 68F2858E3DE
-	for <lists+kvm@lfdr.de>; Wed, 10 Aug 2022 01:51:51 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 517C158E3E4
+	for <lists+kvm@lfdr.de>; Wed, 10 Aug 2022 01:53:01 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229699AbiHIXvs (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 9 Aug 2022 19:51:48 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35860 "EHLO
+        id S229763AbiHIXw6 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 9 Aug 2022 19:52:58 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36904 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229473AbiHIXvq (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 9 Aug 2022 19:51:46 -0400
-Received: from mail-pg1-x536.google.com (mail-pg1-x536.google.com [IPv6:2607:f8b0:4864:20::536])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DFB1956B91
-        for <kvm@vger.kernel.org>; Tue,  9 Aug 2022 16:51:45 -0700 (PDT)
-Received: by mail-pg1-x536.google.com with SMTP id 73so12795032pgb.9
-        for <kvm@vger.kernel.org>; Tue, 09 Aug 2022 16:51:45 -0700 (PDT)
+        with ESMTP id S229740AbiHIXw4 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 9 Aug 2022 19:52:56 -0400
+Received: from mail-pg1-x534.google.com (mail-pg1-x534.google.com [IPv6:2607:f8b0:4864:20::534])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 08E557FE49;
+        Tue,  9 Aug 2022 16:52:56 -0700 (PDT)
+Received: by mail-pg1-x534.google.com with SMTP id r22so10410241pgm.5;
+        Tue, 09 Aug 2022 16:52:56 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
+        d=gmail.com; s=20210112;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:from:to:cc;
-        bh=t8QA2tksbD31DfrMNyQZwHcagOyGgK4LmqpD2Mjd3ks=;
-        b=FdBXj2iya/LVg+aZaZK6+vt3jeh2/o+1xHTSAXVuRM5bMpU8wwW6M5upnJSuoTJE3N
-         XdHyZLOBrtQwyPrE9HLYfWwXvCTDOSFz24i5FD1JcS+vb/n1nXURsCzKKDgd1ufCtCT3
-         x/rMTrgIYQ9DEqE4PrMRxNKB5XmsP3O3SbkEvnMEVdYrTllJ1Y1M3ml9RHVmHR/bO5Fi
-         dNbYbnt30yAwhsHyULeJm+S6UlpDwF2aDzokq2Dm6E0E2RFg/QzuZlkcUSz6K7NT9QlA
-         prBFtFUX2rpKlzwCSlprWGn939XugjuzyZ9Lw5w6G/u1FJOLP1HRIDnHRYlBtOXbXVwk
-         dKOQ==
+        bh=USyZqluqA43/rUeAlF5/qHhmGQX9P9xzVxOeyhsHrvo=;
+        b=SblroUSOOLZI9EyIoCySuNHP1s7lQ4EB0GJBNMbxczzgvB6Cjx4iTILWJjVL1NIn10
+         O3Kt8as6sruzWeO+AyaPM22TEB5loFFcRNAjTp2XY4+2d5nCFihsevc7W4PTK6GlqxuP
+         8+/d1ysOzkY2RhADMhQj5ula+0F44kwZxBXlsRse7tmbr3E7r+0Oa3lZ2QqG4wXRmJJc
+         JVzmRGPZ1V17YNkW3JfaCohkOrCNFZp2b8w0nkAIixNbaBW5HEDW3ebzfvvbAan0NyzY
+         uxpL/YmR26UZh19qV71YN83zrNash1aLrYj9D1HWRX4WyTEWJnLWozWJj8HdkkGRpLWT
+         vvNg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:x-gm-message-state:from:to:cc;
-        bh=t8QA2tksbD31DfrMNyQZwHcagOyGgK4LmqpD2Mjd3ks=;
-        b=8Ipl8VFIqTPOseW6TUtZbX4zVf9tas80zMlxM70AJv0bzW/PR5tecSC/XbSdVaMBG7
-         VaDSpJSnpn7elc7WYcsXspMdUTqZwO0StFERzrzB7u64qNFgXnlUrVR1G1ubL4HbqKW9
-         Moj5vtOkBxjbVTiUbIT48fLcr0G19tuakjqt3uLaykU4GfMe/hNI7OjOkpCE6dYSHiVR
-         UKTPmc0AN1C8m/ITvFVJ06vOIS9l6ajEf3XXABpvpFpDLmoi20qGA58DF5MhjVZljjFO
-         ouROahG17H4fg1ebcK62/0QiWk0LYQAltI+B9+sumwXhe/WA3w7THtS7iEt1X6O0ZQ2X
-         WEgQ==
-X-Gm-Message-State: ACgBeo0tCuUFFQ1HPc+K65FzQqmUPCfLMaMT13GY8+v2gGZn023RLuU0
-        xARtUCfuK3f5udPbdHng4S0NYq3+P9ntFA==
-X-Google-Smtp-Source: AA6agR7XZH+x6V6XY09gZfStY5OxSK0OFe/hNzxXbUIUUdwPBfyiUJKSdoFPrWHCD5oR1IWqJHaqCg==
-X-Received: by 2002:aa7:948b:0:b0:52e:e0cd:183a with SMTP id z11-20020aa7948b000000b0052ee0cd183amr18148655pfk.59.1660089105320;
-        Tue, 09 Aug 2022 16:51:45 -0700 (PDT)
-Received: from google.com (7.104.168.34.bc.googleusercontent.com. [34.168.104.7])
-        by smtp.gmail.com with ESMTPSA id g6-20020a1709026b4600b0016edb59f670sm11460869plt.6.2022.08.09.16.51.44
+        bh=USyZqluqA43/rUeAlF5/qHhmGQX9P9xzVxOeyhsHrvo=;
+        b=5maIxL5WLiE+OwRSTATzU3+mYnIuh9fco0E7Xr4LSDw0OkZfsC1yvqlKvD5i36CItt
+         gbS4I59CC5P39wj1p7KDCNhCOBDbozplbWHegxBpfw0M2CG+dqKF7Dlz/76awRQoXKUj
+         sIQEDcWMiQBmx9HW1EsHAMT5N/Mb9/Z/HIPBJI7S/UGow3SM/1YD4tNQ/c/Uul2JpYA9
+         YStVUUJd13bA50m/JJD4e8mBJgQwmD9rdFniFmr3A9F4LiETd8sDBaIDE89DJgm9lQex
+         d03cGrkyWKDSkNSE0IXbV2MN71r5X2rDtZPjxsUBzGjho6VJg+mKBTfiGUd6tfnNBk8a
+         ultA==
+X-Gm-Message-State: ACgBeo1dK1HXcCb7rzwn5MS4s01gdsrYaZ5+nsgCseS6SZgPA1+1frPf
+        qs2ogn6rN8EdUQ8XtPrL9LM=
+X-Google-Smtp-Source: AA6agR4/36cbFq4wzIyIuGRtwDJNLqYFTUty6nCiqEwJxhLvnbLrAOBCp95pG3tuAq36Jcirste9BQ==
+X-Received: by 2002:a05:6a00:1581:b0:52f:332d:9c98 with SMTP id u1-20020a056a00158100b0052f332d9c98mr12567697pfk.64.1660089175349;
+        Tue, 09 Aug 2022 16:52:55 -0700 (PDT)
+Received: from localhost ([192.55.54.49])
+        by smtp.gmail.com with ESMTPSA id w18-20020a170902e89200b0016efa52d428sm11417479plg.218.2022.08.09.16.52.54
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 09 Aug 2022 16:51:44 -0700 (PDT)
-Date:   Tue, 9 Aug 2022 23:51:41 +0000
-From:   Sean Christopherson <seanjc@google.com>
+        Tue, 09 Aug 2022 16:52:54 -0700 (PDT)
+Date:   Tue, 9 Aug 2022 16:52:54 -0700
+From:   Isaku Yamahata <isaku.yamahata@gmail.com>
 To:     David Matlack <dmatlack@google.com>
-Cc:     Vipin Sharma <vipinsh@google.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        kvm list <kvm@vger.kernel.org>,
-        LKML <linux-kernel@vger.kernel.org>
-Subject: Re: [PATCH] KVM: x86/mmu: Make page tables for eager page splitting
- NUMA aware
-Message-ID: <YvLzDUjpJHmZtn0i@google.com>
-References: <20220801151928.270380-1-vipinsh@google.com>
- <YuhPT2drgqL+osLl@google.com>
- <YuhoJUoPBOu5eMz8@google.com>
- <YulRZ+uXFOE1y2dj@google.com>
- <YuldSf4T2j4rIrIo@google.com>
- <4ccbafb5-9157-ec73-c751-ec71164f8688@redhat.com>
- <Yul3A4CmaAHMui2Z@google.com>
- <cedcced0-b92c-07bd-ef2b-272ae58fdf40@redhat.com>
- <CAHVum0c=s8DH=p8zJcGzYDsfLY_qHEmvD1uF58h5WoUk6ZF8rQ@mail.gmail.com>
- <CALzav=ccxkAWk7ddqbJ_qPL2-=bXVZUEpWgwKpJ1oCtc_8w7WQ@mail.gmail.com>
+Cc:     isaku.yamahata@intel.com, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org, isaku.yamahata@gmail.com,
+        Paolo Bonzini <pbonzini@redhat.com>
+Subject: Re: [PATCH v7 044/102] KVM: x86/mmu: Add a private pointer to struct
+ kvm_mmu_page
+Message-ID: <20220809235254.GB515657@ls.amr.corp.intel.com>
+References: <cover.1656366337.git.isaku.yamahata@intel.com>
+ <392839e09c48ff4e14a598ff6ed8bd56429bf17b.1656366338.git.isaku.yamahata@intel.com>
+ <YuLmf+dovudTbjqh@google.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <CALzav=ccxkAWk7ddqbJ_qPL2-=bXVZUEpWgwKpJ1oCtc_8w7WQ@mail.gmail.com>
-X-Spam-Status: No, score=-14.5 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        ENV_AND_HDR_SPF_MATCH,FSL_HELO_FAKE,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,
-        SPF_PASS,T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL
-        autolearn=no autolearn_force=no version=3.4.6
+In-Reply-To: <YuLmf+dovudTbjqh@google.com>
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
+        RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Aug 09, 2022, David Matlack wrote:
-> On Fri, Aug 5, 2022 at 4:30 PM Vipin Sharma <vipinsh@google.com> wrote:
-> > Approach B:
-> > Ask page from the specific node on fault path with option to fallback
-> > to the original cache and default task policy.
-> >
-> > This is what Sean's rough patch looks like.
+On Thu, Jul 28, 2022 at 12:41:51PM -0700,
+David Matlack <dmatlack@google.com> wrote:
+
+> > diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
+> > index f4d4ed41641b..bfc934dc9a33 100644
+> > --- a/arch/x86/include/asm/kvm_host.h
+> > +++ b/arch/x86/include/asm/kvm_host.h
+> > @@ -716,6 +716,7 @@ struct kvm_vcpu_arch {
+> >  	struct kvm_mmu_memory_cache mmu_shadow_page_cache;
+> >  	struct kvm_mmu_memory_cache mmu_gfn_array_cache;
+> >  	struct kvm_mmu_memory_cache mmu_page_header_cache;
+> > +	struct kvm_mmu_memory_cache mmu_private_sp_cache;
 > 
-> This would definitely be a simpler approach but could increase the
-> amount of time a vCPU thread holds the MMU lock when handling a fault,
-> since KVM would start performing GFP_NOWAIT allocations under the
-> lock. So my preference would be to try the cache approach first and
-> see how complex it turns out to be.
+> I notice that mmu_private_sp_cache.gfp_zero is left unset so these pages
+> may contain garbage. Is this by design because the TDX module can't rely
+> on the contents being zero and has to take care of initializing the page
+> itself? i.e. GFP_ZERO would be a waste of cycles?
+> 
+> If I'm correct please include a comment here in the next revision to
+> explain why GFP_ZERO is not necessary.
 
-Ya, as discussed off-list, I don't like my idea either :-)
+Yes, exactly.  Here is the added comments.
+ /*
+  * This cache is to allocate pages used for Secure-EPT used by the TDX
+  * module.  Because the TDX module doesn't trust VMM and initializes the
+  * pages itself, KVM doesn't initialize them.  Allocate pages with
+  * garbage and give them to the TDX module.
+  */
 
-The pfn and thus node information is available before mmu_lock is acquired, so I
-don't see any reason to defer the allocation other than to reduce the memory
-footprint, and that's a solvable problem one way or another.
+> >  	/*
+> >  	 * QEMU userspace and the guest each have their own FPU state.
+> > diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
+> > index c517c7bca105..a5bf3e40e209 100644
+> > --- a/arch/x86/kvm/mmu/mmu.c
+> > +++ b/arch/x86/kvm/mmu/mmu.c
+> > @@ -691,6 +691,13 @@ static int mmu_topup_shadow_page_cache(struct kvm_vcpu *vcpu)
+> >  	int start, end, i, r;
+> >  	bool is_tdp_mmu = is_tdp_mmu_enabled(vcpu->kvm);
+> >  
+> > +	if (kvm_gfn_shared_mask(vcpu->kvm)) {
+> > +		r = kvm_mmu_topup_memory_cache(&vcpu->arch.mmu_private_sp_cache,
+> > +					       PT64_ROOT_MAX_LEVEL);
+> > +		if (r)
+> > +			return r;
+> > +	}
+> > +
+> >  	if (is_tdp_mmu && shadow_nonpresent_value)
+> >  		start = kvm_mmu_memory_cache_nr_free_objects(mc);
+> >  
+> > @@ -732,6 +739,7 @@ static void mmu_free_memory_caches(struct kvm_vcpu *vcpu)
+> >  {
+> >  	kvm_mmu_free_memory_cache(&vcpu->arch.mmu_pte_list_desc_cache);
+> >  	kvm_mmu_free_memory_cache(&vcpu->arch.mmu_shadow_page_cache);
+> > +	kvm_mmu_free_memory_cache(&vcpu->arch.mmu_private_sp_cache);
+> >  	kvm_mmu_free_memory_cache(&vcpu->arch.mmu_gfn_array_cache);
+> >  	kvm_mmu_free_memory_cache(&vcpu->arch.mmu_page_header_cache);
+> >  }
+> > @@ -1736,6 +1744,7 @@ static struct kvm_mmu_page *kvm_mmu_alloc_page(struct kvm_vcpu *vcpu, int direct
+> >  	if (!direct)
+> >  		sp->gfns = kvm_mmu_memory_cache_alloc(&vcpu->arch.mmu_gfn_array_cache);
+> >  	set_page_private(virt_to_page(sp->spt), (unsigned long)sp);
+> > +	kvm_mmu_init_private_sp(sp, NULL);
+> 
+> This is unnecessary. kvm_mmu_page structs are zero-initialized so
+> private_sp will already be NULL.
+
+Ok. 
+
+
+> >  
+> >  	/*
+> >  	 * active_mmu_pages must be a FIFO list, as kvm_zap_obsolete_pages()
+> > diff --git a/arch/x86/kvm/mmu/mmu_internal.h b/arch/x86/kvm/mmu/mmu_internal.h
+> > index 44a04fad4bed..9f3a6bea60a3 100644
+> > --- a/arch/x86/kvm/mmu/mmu_internal.h
+> > +++ b/arch/x86/kvm/mmu/mmu_internal.h
+> > @@ -55,6 +55,10 @@ struct kvm_mmu_page {
+> >  	u64 *spt;
+> >  	/* hold the gfn of each spte inside spt */
+> >  	gfn_t *gfns;
+> > +#ifdef CONFIG_KVM_MMU_PRIVATE
+> > +	/* associated private shadow page, e.g. SEPT page. */
+> 
+> Can we use "Secure EPT" instead of SEPT in KVM code and comments? (i.e.
+> also including variable names like sept_page -> secure_ept_page)
+> 
+> "SEPT" looks like a mispelling of SPTE, which is used all over KVM. It
+> will be difficult to read code that contains both acronyms.
+
+Makes sense. Will update it.
+
+
+> > +	void *private_sp;
+> 
+> Please name this "private_spt" and move it up next to "spt".
+> 
+> sp" or "shadow page" is used to refer to kvm_mmu_page structs. For
+> example, look at all the code in KVM that uses `struct kvm_mmu_page *sp`.
+> 
+> "spt" is "shadow page table", i.e. the actual page table memory. See
+> kvm_mmu_page.spt. Calling this field "private_spt" makes it obvious that
+> this pointer is pointing to a page table.
+> 
+> Also please update the language in the comment accordingly to "private
+> shadow page table".
+
+I'll rename as follows
+
+private_sp => private_spt
+spet_page => private_spt
+mmu_private_sp_cache => mmu_private_spt_cache
+kvm_mmu_init_private_sp => kvm_mmu_inite_private_spt
+kvm_mmu_alloc_private_sp => kvm_mmu_alloc_private_spt
+kvm_mmu_free_private_sp => kvm_mmu_free_private_spt
+kvm_alloc_private_sp_for_split => kvm_alloc_private_spt_for_split
+
+Thanks,
+-- 
+Isaku Yamahata <isaku.yamahata@gmail.com>
