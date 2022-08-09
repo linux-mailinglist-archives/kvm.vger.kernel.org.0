@@ -2,79 +2,69 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 86C5558DA74
-	for <lists+kvm@lfdr.de>; Tue,  9 Aug 2022 16:40:37 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id E981B58DA7C
+	for <lists+kvm@lfdr.de>; Tue,  9 Aug 2022 16:44:27 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S243868AbiHIOkg (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 9 Aug 2022 10:40:36 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59498 "EHLO
+        id S244181AbiHIOo0 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 9 Aug 2022 10:44:26 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33392 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S243764AbiHIOke (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 9 Aug 2022 10:40:34 -0400
-Received: from mail-pj1-x1033.google.com (mail-pj1-x1033.google.com [IPv6:2607:f8b0:4864:20::1033])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2349A26F0
-        for <kvm@vger.kernel.org>; Tue,  9 Aug 2022 07:40:33 -0700 (PDT)
-Received: by mail-pj1-x1033.google.com with SMTP id s5-20020a17090a13c500b001f4da9ffe5fso17845113pjf.5
-        for <kvm@vger.kernel.org>; Tue, 09 Aug 2022 07:40:33 -0700 (PDT)
+        with ESMTP id S239432AbiHIOoY (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 9 Aug 2022 10:44:24 -0400
+Received: from mail-pg1-x535.google.com (mail-pg1-x535.google.com [IPv6:2607:f8b0:4864:20::535])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 15F691CB1D
+        for <kvm@vger.kernel.org>; Tue,  9 Aug 2022 07:44:24 -0700 (PDT)
+Received: by mail-pg1-x535.google.com with SMTP id s206so11561969pgs.3
+        for <kvm@vger.kernel.org>; Tue, 09 Aug 2022 07:44:24 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:from:to:cc;
-        bh=OdbOjGUjW12bCfbeWBjGSJ1Nu6Rk3c5Ky+ZI53W01wg=;
-        b=TaXG+ej0jDZE0fRN4noaJtSFB5ltkCHj7OE6Qr0NL5hSpQhtaKSX0RdDRHiXlYQdy7
-         MSEMDDxfpGEWa+w6jBWpVEwFG41oOAiq602dOmmdikaoW+Jsupla/nPEcG2Wug4G8QeI
-         R/6wu3IwfV1cXrxn1hb2o5uHm34Q7XMdvKznNBglR8Vqp2fkXdJwB9/T97p/P5tbfJC2
-         iJC6RTuGl32t6ZBKATAv6goAxQVAAVbtv3vsIH6qp290lpHClC8dvzuVSIkWK6lUJDt0
-         ctBxtIYfoWBW7cm+VQpAFbdsgBentT5METMZgPILhQltDG0Q34WrrfR8jy3B1NmYNvwD
-         EmWw==
+        bh=sQaSKkyDjB+FQ3HzSLhOg2i25ze0crFVErbWzPkt/Zc=;
+        b=TtPlrcxxlmo9ZkUT8y1+7uhoK/yYlArtMOuSYswo0SbRQ/o1/yipPl94rPdlURLWsP
+         2q//srgE5YLXE/xmtbf2rOobJeXNWnA4oa2iHliH7RQ5wI1rvNvgi+SkREBo0nnngEnE
+         4e+PLdfAgWqjeCYc1N0qJyZrJ9xDXVHnCq8W/BVTuJ5+hD7RdZ+oTh28P4WR6ZXIfgLT
+         16NZLP1d5E3Rp3jUPAZccbo3EdEQkPYV08AauJAv5FNtMcFfUUmcowCOs0QbNVZxSkwJ
+         RKh1NVDxSN8lEijoyShLcvsrlUthqosuXDtyzGtuBYJw2DA1bxyYalLy23o2QONPZQn8
+         vrlA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:x-gm-message-state:from:to:cc;
-        bh=OdbOjGUjW12bCfbeWBjGSJ1Nu6Rk3c5Ky+ZI53W01wg=;
-        b=7Qv5DCbnU06sYeC0fFZ74B62h3HXMoW+Okrj/mhGDcNUYuYdZxMRW0bE9trZ5YfHsv
-         ddRvUCrHfTHwdzwlapJKzUO013ny5GAJVIroT7YxLzvaFGpAUvqflUfr/S61clr1RPv/
-         kT+785BVxWqub3kh0t57thQHWNEcy8Su+e8XQg/cdGJAMNJ7AMXlR9MYLpmF5w5D3Esk
-         nx/KuZDm3mLW3D1K5fF/F8505d2gN+eT8l+29DBbgzxCGY3Z+B5ezqNG3F2sKEzEULv4
-         HzsZ7FWEsDbPtD7+WBAr6zrKS+Ci4RPLA9MHJzGrbkJhkqu3v05/1ctmKhzcW7m+3/GR
-         xNVw==
-X-Gm-Message-State: ACgBeo14zvBYhhjfNlm5WxH55iBOQzZQIEnrOzSkuUf4+NEvNL+6+Sus
-        qTRumv20qcquLaMWN/LY7dGXGQ==
-X-Google-Smtp-Source: AA6agR5dJBGAgBiZdySMn0shi1wg9/jp8sdMtEe28i2vcg1gxytljbDTOA1J7khCTdbdWwzUz3C3pA==
-X-Received: by 2002:a17:903:22c1:b0:16f:3d1:f5c with SMTP id y1-20020a17090322c100b0016f03d10f5cmr23843077plg.155.1660056032526;
-        Tue, 09 Aug 2022 07:40:32 -0700 (PDT)
+        bh=sQaSKkyDjB+FQ3HzSLhOg2i25ze0crFVErbWzPkt/Zc=;
+        b=hq7pcSZH5NHridTviwOPJJ3wglKOZyCDeWME2y6j3T9OKsJRwKILlsFn5Bk74Bfb1y
+         Q9LMtZifpfzsynvAKxerw64lVKjzAWx3lo/YfgWepL57ja4HcMIFM1tfDhlkfuU83bsm
+         jtoMCmh4I2Nq3XOEvkMyQHAenawFBQMrz5xIYsjz3SAjRMmaNmELPGQnyrC1DD9DcigQ
+         40RqG7R7m80Ic735sYeAAAdPyStc2M5/tMCtUBIRfg9TB1KAWK0W8h2k9R58Z6LISrSp
+         UPJVosZ2ux8pCuHnR72G0N+5xaznCt9vcetYx2VzJPSv5VsNX1ysuxvc0yjwDtFwDGhB
+         qAtg==
+X-Gm-Message-State: ACgBeo3Lw/dP63G/td6wLKu5nnlimDzTkJiiUovo018MjWzuIB55ooKR
+        CgR0h6Q665g/a82G7Zl7fYv18A==
+X-Google-Smtp-Source: AA6agR7a9nCuq1rJkBxpRBMDI+gJdD7UQJPvNPjQ6amUFvnHsxM4MKFggber94U1O+ZzMgKjahIipw==
+X-Received: by 2002:a05:6a00:1a88:b0:52f:52df:ce1d with SMTP id e8-20020a056a001a8800b0052f52dfce1dmr9515422pfv.13.1660056263396;
+        Tue, 09 Aug 2022 07:44:23 -0700 (PDT)
 Received: from google.com (7.104.168.34.bc.googleusercontent.com. [34.168.104.7])
-        by smtp.gmail.com with ESMTPSA id q11-20020a170902dacb00b0016dcfedfe30sm11056894plx.90.2022.08.09.07.40.31
+        by smtp.gmail.com with ESMTPSA id u8-20020a170903124800b0016f15140e55sm10849480plh.189.2022.08.09.07.44.22
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 09 Aug 2022 07:40:31 -0700 (PDT)
-Date:   Tue, 9 Aug 2022 14:40:28 +0000
+        Tue, 09 Aug 2022 07:44:22 -0700 (PDT)
+Date:   Tue, 9 Aug 2022 14:44:19 +0000
 From:   Sean Christopherson <seanjc@google.com>
 To:     Paolo Bonzini <pbonzini@redhat.com>
-Cc:     David Woodhouse <dwmw2@infradead.org>,
-        Coleman Dietsch <dietschc@csp.edu>, kvm@vger.kernel.org,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org,
-        "H . Peter Anvin" <hpa@zytor.com>, linux-kernel@vger.kernel.org,
-        skhan@linuxfoundation.org, Pavel Skripkin <paskripkin@gmail.com>,
-        linux-kernel-mentees@lists.linuxfoundation.org,
-        stable@vger.kernel.org,
-        syzbot+e54f930ed78eb0f85281@syzkaller.appspotmail.com,
-        metikaya <metikaya@amazon.co.uk>
-Subject: Re: [PATCH v3 2/2] KVM: x86/xen: Stop Xen timer before changing IRQ
-Message-ID: <YvJx3Dje4zS/c+H0@google.com>
-References: <20220808190607.323899-2-dietschc@csp.edu>
- <20220808190607.323899-3-dietschc@csp.edu>
- <c648744c096588d30771a22efa6d65c31fffd06c.camel@infradead.org>
- <43e258cc-71ac-bde4-d1f8-9eb9519928d3@redhat.com>
- <4fc1371b83001b4eed1617c37bec6b9d007e45c2.camel@infradead.org>
- <YvJqIsQsg+ThMg/C@google.com>
- <0b5dcab333906f166fcdbc296373cc5e08bec79f.camel@infradead.org>
- <953d2e99-ed1a-384d-6d3a-0f656a243f82@redhat.com>
+Cc:     Yan Zhao <yan.y.zhao@intel.com>, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org, David Matlack <dmatlack@google.com>,
+        Mingwei Zhang <mizhang@google.com>,
+        Ben Gardon <bgardon@google.com>
+Subject: Re: [PATCH v3 5/8] KVM: x86/mmu: Set disallowed_nx_huge_page in TDP
+ MMU before setting SPTE
+Message-ID: <YvJyw96QZdf6YPAX@google.com>
+References: <20220805230513.148869-1-seanjc@google.com>
+ <20220805230513.148869-6-seanjc@google.com>
+ <YvHT0dA0BGgCQ8L+@yzhao56-desk.sh.intel.com>
+ <331dc774-c662-9475-1175-725cb2382bb2@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <953d2e99-ed1a-384d-6d3a-0f656a243f82@redhat.com>
+In-Reply-To: <331dc774-c662-9475-1175-725cb2382bb2@redhat.com>
 X-Spam-Status: No, score=-14.5 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
         ENV_AND_HDR_SPF_MATCH,FSL_HELO_FAKE,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,
@@ -87,29 +77,80 @@ List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
 On Tue, Aug 09, 2022, Paolo Bonzini wrote:
-> On 8/9/22 16:16, David Woodhouse wrote:
-> > I find the new version a bit harder to follow, with its init-then-stop-
-> > then-start logic:
+> On 8/9/22 05:26, Yan Zhao wrote:
+> > hi Sean,
 > > 
-> > 	case KVM_XEN_VCPU_ATTR_TYPE_TIMER:
-> > 		if (data->u.timer.port &&
-> > 		    data->u.timer.priority != KVM_IRQ_ROUTING_XEN_EVTCHN_PRIO_2LEVEL) {
-> > 			r = -EINVAL;
-> > 			break;
-> >                  }
+> > I understand this smp_rmb() is intended to prevent the reading of
+> > p->nx_huge_page_disallowed from happening before it's set to true in
+> > kvm_tdp_mmu_map(). Is this understanding right?
 > > 
-> > 		if (!vcpu->arch.xen.timer.function)
-> > 			kvm_xen_init_timer(vcpu);
-> > 
-> > 		/* Stop the timer (if it's running) before changing the vector */
-> > 		kvm_xen_stop_timer(vcpu);
-> > 		vcpu->arch.xen.timer_virq = data->u.timer.port;
+> > If it's true, then do we also need the smp_rmb() for read of sp->gfn in
+> > handle_removed_pt()? (or maybe for other fields in sp in other places?)
 > 
-> 
-> I think this is fine, if anything the kvm_xen_stop_timer() call could be
-> placed in an "else" but I'm leaning towards applying this version of the
-> patch.
+> No, in that case the barrier is provided by rcu_dereference().  In fact, I
+> am not sure the barriers are needed in this patch either (but the comments
+> are :)):
 
-I wanted to separate the "init" from the "stop+start", e.g. if there were a more
-appropriate place for invoking kvm_xen_init_timer() I would have suggested moving
-the call outside of KVM_XEN_VCPU_ATTR_TYPE_TIMER entirely.
+Yeah, I'm 99% certain the barriers aren't strictly required, but I didn't love the
+idea of depending on other implementation details for the barriers.  Of course I
+completely overlooked the fact that all other sp fields would need the same
+barriers...
+
+> - the write barrier is certainly not needed because it is implicit in
+> tdp_mmu_set_spte_atomic's cmpxchg64
+> 
+> - the read barrier _should_ also be provided by rcu_dereference(pt), but I'm
+> not 100% sure about that. The reasoning is that you have
+> 
+> (1)	iter->old spte = READ_ONCE(*rcu_dereference(iter->sptep));
+> 	...
+> (2)	tdp_ptep_t pt = spte_to_child_pt(old_spte, level);
+> (3)	struct kvm_mmu_page *sp = sptep_to_sp(rcu_dereference(pt));
+> 	...
+> (4)	if (sp->nx_huge_page_disallowed) {
+> 
+> and (4) is definitely ordered after (1) thanks to the READ_ONCE hidden
+> within (3) and the data dependency from old_spte to sp.
+
+Yes, I think that's correct.  Callers must verify the SPTE is present before getting
+the associated child shadow page.  KVM does have instances where a shadow page is
+retrieved from the SPTE _pointer_, but that's the parent shadow page, i.e. isn't
+guarded by the SPTE being present.
+
+	struct kvm_mmu_page *sp = sptep_to_sp(rcu_dereference(iter->sptep));
+
+Something like this is as a separate patch?
+
+diff --git a/arch/x86/kvm/mmu/tdp_iter.h b/arch/x86/kvm/mmu/tdp_iter.h
+index f0af385c56e0..9d982ccf4567 100644
+--- a/arch/x86/kvm/mmu/tdp_iter.h
++++ b/arch/x86/kvm/mmu/tdp_iter.h
+@@ -13,6 +13,12 @@
+  * to be zapped while holding mmu_lock for read, and to allow TLB flushes to be
+  * batched without having to collect the list of zapped SPs.  Flows that can
+  * remove SPs must service pending TLB flushes prior to dropping RCU protection.
++ *
++ * The READ_ONCE() ensures that, if the SPTE points at a child shadow page, all
++ * fields in struct kvm_mmu_page will be read after the caller observes the
++ * present SPTE (KVM must check that the SPTE is present before following the
++ * SPTE's pfn to its associated shadow page).  Pairs with the implicit memory
++ * barrier in tdp_mmu_set_spte_atomic().
+  */
+ static inline u64 kvm_tdp_mmu_read_spte(tdp_ptep_t sptep)
+ {
+diff --git a/arch/x86/kvm/mmu/tdp_mmu.c b/arch/x86/kvm/mmu/tdp_mmu.c
+index bf2ccf9debca..ca50296e3696 100644
+--- a/arch/x86/kvm/mmu/tdp_mmu.c
++++ b/arch/x86/kvm/mmu/tdp_mmu.c
+@@ -645,6 +645,11 @@ static inline int tdp_mmu_set_spte_atomic(struct kvm *kvm,
+        lockdep_assert_held_read(&kvm->mmu_lock);
+
+        /*
++        * The atomic CMPXCHG64 provides an implicit memory barrier and ensures
++        * that, if the SPTE points at a shadow page, all struct kvm_mmu_page
++        * fields are visible to readers before the SPTE is marked present.
++        * Pairs with ordering guarantees provided by kvm_tdp_mmu_read_spte().
++        *
+         * Note, fast_pf_fix_direct_spte() can also modify TDP MMU SPTEs and
+         * does not hold the mmu_lock.
+         */
