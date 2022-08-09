@@ -2,105 +2,153 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 5688A58D484
-	for <lists+kvm@lfdr.de>; Tue,  9 Aug 2022 09:27:06 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 54C4158D57C
+	for <lists+kvm@lfdr.de>; Tue,  9 Aug 2022 10:38:19 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238144AbiHIH1F (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 9 Aug 2022 03:27:05 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52254 "EHLO
+        id S240820AbiHIIiR (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 9 Aug 2022 04:38:17 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41240 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S237496AbiHIH1C (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 9 Aug 2022 03:27:02 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id A37AF20F61
-        for <kvm@vger.kernel.org>; Tue,  9 Aug 2022 00:27:01 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1660030020;
-        h=from:from:reply-to:reply-to:subject:subject:date:date:
-         message-id:message-id:to:to:cc:cc:mime-version:mime-version:
-         content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=58ycySmE5DZLA6nFa+M3yTmfckqgxGPNOPL3Wz/hH9I=;
-        b=eWDcQlx/TwE5DuAUj5ipHX3ZRpNsLlbn3aXdscU9mFBiUcL2xeQvKj9o1sr4O9nr3y7z7O
-        fc0p2nQOartzo/BvopfxRM6XdCy6+1znAKH9MScbBZNzCDxzKPdsx9UagQCpEsWKeGgDwU
-        vP6pXzJYZ3wrRLR/U8fhL6hqpMcoDL0=
-Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
- [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-626-bNGKTN3lOaC_mqGjTKJ4WA-1; Tue, 09 Aug 2022 03:26:56 -0400
-X-MC-Unique: bNGKTN3lOaC_mqGjTKJ4WA-1
-Received: from smtp.corp.redhat.com (int-mx09.intmail.prod.int.rdu2.redhat.com [10.11.54.9])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 16E1A8039A6;
-        Tue,  9 Aug 2022 07:26:56 +0000 (UTC)
-Received: from [10.64.54.189] (vpn2-54-189.bne.redhat.com [10.64.54.189])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id ADF60492C3B;
-        Tue,  9 Aug 2022 07:26:51 +0000 (UTC)
-Reply-To: Gavin Shan <gshan@redhat.com>
-Subject: Re: [PATCH 1/2] KVM: selftests: Make rseq compatible with glibc-2.35
-To:     Florian Weimer <fweimer@redhat.com>
-Cc:     kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org,
-        linux-kselftest@vger.kernel.org, linux-kernel@vger.kernel.org,
-        pbonzini@redhat.com, maz@kernel.org, oliver.upton@linux.dev,
-        andrew.jones@linux.dev, seanjc@google.com,
-        mathieu.desnoyers@efficios.com, yihyu@redhat.com,
-        shan.gavin@gmail.com
-References: <20220809060627.115847-1-gshan@redhat.com>
- <20220809060627.115847-2-gshan@redhat.com>
- <8735e6ncxw.fsf@oldenburg.str.redhat.com>
- <7844e3fa-e49e-de75-e424-e82d3a023dd6@redhat.com>
- <87o7wtnay6.fsf@oldenburg.str.redhat.com>
-From:   Gavin Shan <gshan@redhat.com>
-Message-ID: <616d4de6-81f6-9d14-4e57-4a79fec45690@redhat.com>
-Date:   Tue, 9 Aug 2022 19:27:44 +1000
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.2.0
+        with ESMTP id S229976AbiHIIiQ (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 9 Aug 2022 04:38:16 -0400
+Received: from mga02.intel.com (mga02.intel.com [134.134.136.20])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 225F51EAFE;
+        Tue,  9 Aug 2022 01:38:15 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1660034295; x=1691570295;
+  h=message-id:date:mime-version:subject:to:cc:references:
+   from:in-reply-to:content-transfer-encoding;
+  bh=uz6Rv3ZWjocJjMhymMHh6vkFnqaEDU/d8bs+q2jM1zk=;
+  b=MlO1e2BmZICiQh4/ShctlqChmmRy8b1gDus09iwTz6D6etFsWynXtIeB
+   FcxUYCFsV0LoRaioKb/xs7qhpD+bcVfofxO10U2CNiET0fU6yY04kvZwM
+   4bougcwyXTTWio3LOBXPfb1tuota15+unGZWyO5njPuRwcnb6m/6Fchnl
+   6L0q9QvEstHG64Qo4fBOp6gBMYzyyT1T+l/65lCAs54H4JSAc/gWErYcC
+   8jR0IrhagpJ4W70ZbKWiHf9q/IsGb39VbIKHniLh20vUtq8m4Klua15dp
+   xI5MPr1dLhGQ3oZdlsJpmfnuBZCcEHjkTt0ClYO7rWy9jSMoq9V9f2c6P
+   Q==;
+X-IronPort-AV: E=McAfee;i="6400,9594,10433"; a="277721031"
+X-IronPort-AV: E=Sophos;i="5.93,224,1654585200"; 
+   d="scan'208";a="277721031"
+Received: from fmsmga004.fm.intel.com ([10.253.24.48])
+  by orsmga101.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 09 Aug 2022 01:38:14 -0700
+X-IronPort-AV: E=Sophos;i="5.93,224,1654585200"; 
+   d="scan'208";a="672808501"
+Received: from binbinwu-mobl.ccr.corp.intel.com (HELO [10.249.171.147]) ([10.249.171.147])
+  by fmsmga004-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 09 Aug 2022 01:38:12 -0700
+Message-ID: <e63b0606-9819-d1db-872a-b1d414d38dcb@linux.intel.com>
+Date:   Tue, 9 Aug 2022 16:38:10 +0800
 MIME-Version: 1.0
-In-Reply-To: <87o7wtnay6.fsf@oldenburg.str.redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
+ Thunderbird/102.1.0
+Subject: Re: [PATCH v8 004/103] KVM: VMX: Move out vmx_x86_ops to 'main.c' to
+ wrap VMX and TDX
+To:     isaku.yamahata@intel.com, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+Cc:     isaku.yamahata@gmail.com, Paolo Bonzini <pbonzini@redhat.com>,
+        erdemaktas@google.com, Sean Christopherson <seanjc@google.com>,
+        Sagi Shahar <sagis@google.com>
+References: <cover.1659854790.git.isaku.yamahata@intel.com>
+ <005b92abc8b8ada2896af662d4459323ee6b7e36.1659854790.git.isaku.yamahata@intel.com>
+From:   Binbin Wu <binbin.wu@linux.intel.com>
+In-Reply-To: <005b92abc8b8ada2896af662d4459323ee6b7e36.1659854790.git.isaku.yamahata@intel.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.85 on 10.11.54.9
-X-Spam-Status: No, score=-2.7 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
-        RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE
-        autolearn=unavailable autolearn_force=no version=3.4.6
+X-Spam-Status: No, score=-4.9 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_DNSWL_MED,
+        RCVD_IN_MSPIKE_H3,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE,
+        T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi Florian,
 
-On 8/9/22 5:16 PM, Florian Weimer wrote:
->>> __builtin_thread_pointer doesn't work on all architectures/GCC
->>> versions.
->>> Is this a problem for selftests?
->>>
->>
->> It's a problem as the test case is running on all architectures. I think I
->> need introduce our own __builtin_thread_pointer() for where it's not
->> supported: (1) PowerPC  (2) x86 without GCC 11
->>
->> Please let me know if I still have missed cases where
->> __buitin_thread_pointer() isn't supported?
-> 
-> As far as I know, these are the two outliers that also have rseq
-> support.  The list is a bit longer if we also consider non-rseq
-> architectures (csky, hppa, ia64, m68k, microblaze, sparc, don't know
-> about the Linux architectures without glibc support).
-> 
+On 2022/8/8 6:00, isaku.yamahata@intel.com wrote:
+> From: Sean Christopherson <sean.j.christopherson@intel.com>
+>
+> KVM accesses Virtual Machine Control Structure (VMCS) with VMX instructions
+> to operate on VM.  TDX defines its data structure and TDX SEAMCALL APIs for
+> VMM to operate on Trust Domain (TD) instead.
+>
+> Trust Domain Virtual Processor State (TDVPS) is the root control structure
+> of a TD VCPU.  It helps the TDX module control the operation of the VCPU,
+> and holds the VCPU state while the VCPU is not running. TDVPS is opaque to
+> software and DMA access, accessible only by using the TDX module interface
+> functions (such as TDH.VP.RD, TDH.VP.WR ,..).  TDVPS includes TD VMCS, and
+> TD VMCS auxiliary structures, such as virtual APIC page, virtualization
+> exception information, etc.  TDVPS is composed of Trust Domain Virtual
+> Processor Root (TDVPR) which is the root page of TDVPS and Trust Domain
+> Virtual Processor eXtension (TDVPX) pages which extend TDVPR to help
+> provide enough physical space for the logical TDVPS structure.
+>
+> Also, we have a new structure, Trust Domain Control Structure (TDCS) is the
+> main control structure of a guest TD, and encrypted (using the guest TD's
+> ephemeral private key).  At a high level, TDCS holds information for
+> controlling TD operation as a whole, execution, EPTP, MSR bitmaps, etc. KVM
+> needs to set it up.  Note that MSR bitmaps are held as part of TDCS (unlike
+> VMX) because they are meant to have the same value for all VCPUs of the
+> same TD.  TDCS is a multi-page logical structure composed of multiple Trust
+> Domain Control Extension (TDCX) physical pages.  Trust Domain Root (TDR) is
+> the root control structure of a guest TD and is encrypted using the TDX
+> global private key. It holds a minimal set of state variables that enable
+> guest TD control even during times when the TD's private key is not known,
+> or when the TD's key management state does not permit access to memory
+> encrypted using the TD's private key.
+>
+> The following shows the relationship between those structures.
+>
+>          TDR--> TDCS                     per-TD
+>           |       \--> TDCX
+>           \
+>            \--> TDVPS                    per-TD VCPU
+>                   \--> TDVPR and TDVPX
+>
+> The existing global struct kvm_x86_ops already defines an interface which
+> fits with TDX.  But kvm_x86_ops is system-wide, not per-VM structure.  To
+> allow VMX to coexist with TDs, the kvm_x86_ops callbacks will have wrappers
+> "if (tdx) tdx_op() else vmx_op()" to switch VMX or TDX at run time.
+>
+> To split the runtime switch, the VMX implementation, and the TDX
+> implementation, add main.c, and move out the vmx_x86_ops hooks in
+> preparation for adding TDX, which can coexist with VMX, i.e. KVM can run
+> both VMs and TDs.  Use 'vt' for the naming scheme as a nod to VT-x and as a
+> concatenation of VmxTdx.
+>
+> The current code looks as follows.
+> In vmx.c
+>    static vmx_op() { ... }
+>    static struct kvm_x86_ops vmx_x86_ops = {
+>          .op = vmx_op,
+>    initialization code
+>
+> The eventually converted code will look like
+> In vmx.c, keep the VMX operations.
+>    vmx_op() { ... }
+>    VMX initialization
+> In tdx.c, define the TDX operations.
+>    tdx_op() { ... }
+>    TDX initialization
+> In x86_ops.h, declare the VMX and TDX operations.
+>    vmx_op();
+>    tdx_op();
+> In main.c, define common wrappers for VMX and VMX.
 
-For kvm/selftests, there are 3 architectures involved actually. So we
-just need consider 4 cases: aarch64, x86, s390 and other. For other
-case, we just use __builtin_thread_pointer() to maintain code's
-integrity, but it's not called at all.
+LGTM.
+One typo here, VMX and TDX.
 
-I think kvm/selftest is always relying on glibc if I'm correct.
 
-Thanks,
-Gavin
-
+>    static vt_ops() { if (tdx) tdx_ops() else vmx_ops() }
+>    static struct kvm_x86_ops vt_x86_ops = {
+>          .op = vt_op,
+>    initialization to call VMX and TDX initialization
+>
+> Opportunistically, fix the name inconsistency from vmx_create_vcpu() and
+> vmx_free_vcpu() to vmx_vcpu_create() and vxm_vcpu_free().
+>
+> Co-developed-by: Xiaoyao Li <xiaoyao.li@intel.com>
+> Signed-off-by: Xiaoyao Li <xiaoyao.li@intel.com>
+> Signed-off-by: Sean Christopherson <sean.j.christopherson@intel.com>
+> Signed-off-by: Isaku Yamahata <isaku.yamahata@intel.com>
+> Reviewed-by: Paolo Bonzini <pbonzini@redhat.com>
