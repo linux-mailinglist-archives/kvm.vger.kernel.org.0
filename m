@@ -2,41 +2,39 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 47F4758DB66
-	for <lists+kvm@lfdr.de>; Tue,  9 Aug 2022 17:53:40 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id E50AD58DBAA
+	for <lists+kvm@lfdr.de>; Tue,  9 Aug 2022 18:10:00 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S239040AbiHIPxi (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 9 Aug 2022 11:53:38 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51268 "EHLO
+        id S244805AbiHIQJ7 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 9 Aug 2022 12:09:59 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33404 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S242268AbiHIPxd (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 9 Aug 2022 11:53:33 -0400
+        with ESMTP id S244637AbiHIQJ4 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 9 Aug 2022 12:09:56 -0400
 Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 959B317049
-        for <kvm@vger.kernel.org>; Tue,  9 Aug 2022 08:53:32 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id E744E113A
+        for <kvm@vger.kernel.org>; Tue,  9 Aug 2022 09:09:54 -0700 (PDT)
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 22B3723A;
-        Tue,  9 Aug 2022 08:53:33 -0700 (PDT)
+        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 7458123A;
+        Tue,  9 Aug 2022 09:09:55 -0700 (PDT)
 Received: from [192.168.12.23] (unknown [172.31.20.19])
-        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id D466A3F5A1;
-        Tue,  9 Aug 2022 08:53:30 -0700 (PDT)
-Message-ID: <3ff46ed4-4c83-2f00-90b0-4407b9c331d5@arm.com>
-Date:   Tue, 9 Aug 2022 16:53:18 +0100
+        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 8B7FA3F5A1;
+        Tue,  9 Aug 2022 09:09:52 -0700 (PDT)
+Message-ID: <d93612b3-5fca-48ee-4c80-94e11c045dcd@arm.com>
+Date:   Tue, 9 Aug 2022 17:09:42 +0100
 MIME-Version: 1.0
 User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:91.0)
  Gecko/20100101 Thunderbird/91.12.0
-Subject: Re: [kvm-unit-tests RFC PATCH 19/19] arm/arm64: Rework the cache
- maintenance in asm_mmu_disable
+Subject: Re: [kvm-unit-tests PATCH v3 00/27] EFI and ACPI support for arm64
 Content-Language: en-GB
 To:     Alexandru Elisei <alexandru.elisei@arm.com>
-Cc:     pbonzini@redhat.com, thuth@redhat.com, andrew.jones@linux.dev,
-        kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu
-References: <20220809091558.14379-1-alexandru.elisei@arm.com>
- <20220809091558.14379-20-alexandru.elisei@arm.com>
- <3fba260d-bfca-14ea-7bdd-3e55f3d1e276@arm.com>
- <YvJtwWcKkcxLUVif@monolith.localdoman>
+Cc:     kvm@vger.kernel.org, andrew.jones@linux.dev, drjones@redhat.com,
+        pbonzini@redhat.com, jade.alglave@arm.com, ricarkol@google.com,
+        seanjc@google.com, zixuanwang@google.com
+References: <20220630100324.3153655-1-nikos.nikoleris@arm.com>
+ <YvJB/KCLSQK836ae@monolith.localdoman>
 From:   Nikos Nikoleris <nikos.nikoleris@arm.com>
-In-Reply-To: <YvJtwWcKkcxLUVif@monolith.localdoman>
+In-Reply-To: <YvJB/KCLSQK836ae@monolith.localdoman>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 X-Spam-Status: No, score=-6.9 required=5.0 tests=BAYES_00,NICE_REPLY_A,
@@ -48,193 +46,246 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 09/08/2022 15:22, Alexandru Elisei wrote:
-> On Tue, Aug 09, 2022 at 02:53:34PM +0100, Nikos Nikoleris wrote:
->> Hi Alex,
->>
->> On 09/08/2022 10:15, Alexandru Elisei wrote:
->>> asm_mmu_disable is overly ambitious and provably incorrect:
->>>
->>> 1. It tries to clean and invalidate the data caches for the *entire*
->>> memory, which is highly unnecessary, as it's very unlikely that a test
->>> will write to the entire memory, and even more unlikely that a test will
->>> modify the text section of the test image.
->>>
->>
->> While it appears that we don't modify the text section, there is some
->> loading happening before we start executing a test. Are you sure that the
->> loader doesn't leave the memory dirty?
-> 
-> Yes, it's in the boot protocol for Linux [1]. I also mentioned this in the
-> commit message for the previous patch.
-> 
-> [1] https://elixir.bootlin.com/linux/v5.19/source/Documentation/arm64/booting.rst#L180
-> 
+Hi,
 
-I see, thanks!
-
-Right now {asm_,}mmu_disable() is not used anywhere. So this patch will 
-introduce the assumption that mmu_disable() can be safely called only if 
-we didn't perform any writes, outside the test's stack, doesn't it?
-
-When we add support for EFI, there is a lot happening from efi_main() 
-until we get to the point where we can mmu_disable(), cleaning just the 
-(new) stack of the test seems risky.
-
->>
->>> 2. There is no corresponding dcache invalidate command for the entire
->>> memory in asm_mmu_enable, leaving it up to the test that disabled the
->>> MMU to do the cache maintenance in an asymmetrical fashion: only for
->>> re-enabling the MMU, but not for disabling it.
->>>
->>> 3. It's missing the DMB SY memory barrier to ensure that the dcache
->>> maintenance is performed after the last store executed in program order
->>> before calling asm_mmu_disable.
->>>
->>
->> I am not sure why this is needed. In general, iiuc, a store to location x
->> followed by a DC CVAC to x in program order don't need an barrier (see Arm
->> ARM ARM DDI 0487G.b "Data cache maintenance instructions" at K11.5.1 and
+On 09/08/2022 12:16, Alexandru Elisei wrote:
+> Hi,
 > 
-> Just a note, the latest public version is H.a.
+> Adding Sean and Zixuan, as they were involved in the initial x86 UEFI
+> support.
 > 
-> K11.5.1 looks to me like it deals with ordering of the cache maintenance
-> operations with regards to memory accesses that are *after* the CMO in
-> program order, this patch is about memory accesses that are *before* the
-> CMO in program order.
+> This version of the UEFI support for arm64 jumps to lib/efi.c::efi_main
+> after performing the relocation. I'll post an abbreviated/simplified
+> version of efi_main() for reference:
+> 
+> efi_status_t efi_main(efi_handle_t handle, efi_system_table_t *sys_tab)
+> {
+> 	/* Get image, cmdline and memory map parameters from UEFI */
+> 
+>          efi_exit_boot_services(handle, &efi_bootinfo.mem_map);
+> 
+>          /* Set up arch-specific resources */
+>          setup_efi(&efi_bootinfo);
+> 
+>          /* Run the test case */
+>          ret = main(__argc, __argv, __environ);
+> 
+>          /* Shutdown the guest VM */
+>          efi_exit(ret);
+> 
+>          /* Unreachable */
+>          return EFI_UNSUPPORTED;
+> }
+> 
+> Note that the assumption that efi_main() makes is that setup_efi() doesn't
+> change the stack from the stack that the UEFI implementation allocated, in
+> order for setup_efi() to be able to return to efi_main().
+> 
+> arm64 requires explicit data cache maintenance to keep the contents of the
+> caches in sync with memory when writing with MMU off/reading with MMU on
+> and viceversa. More details of what is needed is why here [1] and here [2].
+> These operations must also be performed for the stack because the stack is
+> always used when running C code.
+> 
+> What this means is that if arm64 wants to be able to run C code when the
+> MMU is disabled and when it is enabled, then it must perform data cache
+> operations for the stack memory. Which is impossible if the stack has been
+> allocated by UEFI, as kvm-unit-tests has no way of knowing its size, as it
+> isn't specified in the UEFI spec*. As a result, either efi_main needs to be
+> changed such that setup_efi() never returns, or arm64 must implement its
+> own version of efi_main() (or however it will end up being called).
 > 
 
-The AArch64 example in K11.5.1 has a memory instruction before and after 
-the CMO:
+I think it's possible to know the size of the stack. In 22/27 "arm64: 
+Use code from the gnu-efi when booting with EFI", we change the top of 
+the stack we start executing C code. Then at any point we can get the 
+bottom of the stack.
 
-STR W5, [X1]
-DC CVAC, X1
-DMB ISH
-STR W0, [X4]
-
-The first store and the DC CVAC access the same cache line and there is 
-no need for a memory barrier in between. The second store is assumed to 
-be to a different location and that's why we need a barrier to order it 
-with respect to the DC CVAC.
-
->> "Ordering and completion of data and instruction cache instructions" at
->> D4-2656). It doesn't hurt to have it but I think it's unnecessary.
-> 
-> D4-2656 is about PAC, I assume you meant D4-2636 judging from the section
-> name (please correct me if I'm wrong): >
-> "All data cache instructions, other than DC ZVA, that specify an address:
-> [..]
-> Can execute in any order relative to loads or stores that access any
-> address with the Device memory attribute, or with Normal memory with Inner
-> Non-cacheable attribute unless a DMB or DSB is executed between the
-> instructions."
-> 
-> Since the maintenance is performed with the MMU off, I think the DMB SY is
-> required as per the architecture.
-> 
-> I prefer to keep the maintenance after the MMU is disabled, to allow for
-> any kind of translation table setups that a test might conjure up (a test
-> in theory can create and install its own translation tables).
-> 
-
-Right, so between the stores and the DC CVAC, we've switched the MMU 
-off, in which case the DMB SY might be necessary. I was missing this part.
-
-The benefits of this design choice (switch the MMU off then clean data) 
-are still unclear to me. This patch is modifying the CMO operation to 
-perform only a clean. Why can't we clean the data cache before we switch 
-off the MMU and use the same translation we used to write to it.
+But I doubt cleaning the stack is sufficient. What about the .data 
+segment. Take for example, mem_regions. We populate them with the MMU 
+on. We then use them to create page tables. We will need to clean them 
+too. I won't be surprised if there is more data we would need to clean.
 
 Thanks,
 
 Nikos
 
+> One way to get around this is never to run C code with the MMU off. That's
+> relatively easy to do in the boot code, as the translation tables can be
+> constructed with the MMU on, and then a fairly small assembly sequence is
+> required to install them.
+> 
+> But arm64 also has two mechanisms for disabling the MMU:
+> 
+> 1. At compile time, the user can request a test to start with the MMU off,
+> by setting the flag AUXINFO_MMU_OFF. So when booting as an UEFI app,
+> kvm-unit-tests must disable the MMU.
+> 
+> 2. A function called mmu_disable() which allows a test to explicitly
+> disable the MMU.
+> 
+> If we want to keep the UEFI allocated stack, then both mechanism must be
+> forbidden when running under UEFI. I dislike this idea, because those two
+> mechanisms allow kvm-unit-tests to run tests which otherwise wouldn't have
+> been possible with a normal operating system, which, except for the early
+> boot code, runs with the MMU enabled.
+> 
+> Any thoughts or comments about this?
+> 
+> *UEFI v2.8 states about the stack: "128 KiB or more of available stack
+> space" (page 35), but EDK2 allocates 64KiB [3]. So without any firmware
+> call to query the size of the stack, kvm-unit-tests cannot rely on it being
+> a specific size.
+> 
+> [1] https://lore.kernel.org/kvm/20220809091558.14379-19-alexandru.elisei@arm.com/
+> [2] https://lore.kernel.org/kvm/20220809091558.14379-20-alexandru.elisei@arm.com/
+> [3] https://github.com/tianocore/edk2/blob/master/ArmPlatformPkg/ArmPlatformPkg.dec#L71
+> 
 > Thanks,
 > Alex
 > 
+> On Thu, Jun 30, 2022 at 11:02:57AM +0100, Nikos Nikoleris wrote:
+>> Hello,
+>>
+>> This patch series adds initial support for building arm64 tests as EFI
+>> tests and running them under QEMU. Much like x86_64 we import external
+>> dependencies from gnu-efi and adapt them to work with types and other
+>> assumptions from kvm-unit-tests. In addition, this series adds support
+>> for enumerating parts of the system using ACPI.
+>>
+>> The first set of patches moves the existing ACPI code to the common
+>> lib path. Then, it extends definitions and functions to allow for more
+>> robust discovery of ACPI tables. In arm64, we add support for setting
+>> up the PSCI conduit, discovering the UART, timers and cpus via
+>> ACPI. The code retains existing behavior and gives priority to
+>> discovery through DT when one has been provided.
+>>
+>> In the second set of patches, we add support for getting the command
+>> line from the EFI shell. This is a requirement for many of the
+>> existing arm64 tests.
+>>
+>> In the third set of patches, we import code from gnu-efi, make minor
+>> changes and add an alternative setup sequence from arm64 systems that
+>> boot through EFI. Finally, we add support in the build system and a
+>> run script which is used to run an EFI app.
+>>
+>> After this set of patches one can build arm64 EFI tests:
+>>
+>> $> ./configure --enable-efi
+>> $> make
+>>
+>> And use the run script to run an EFI tests:
+>>
+>> $> ./arm/efi/run ./arm/selftest.efi -smp 2 -m 256 -append "setup smp=2 mem=256"
+>>
+>> Or all tests:
+>>
+>> $> ./run_tests.sh
+>>
+>> There are a few items that this series does not address but they would
+>> be useful to have:
+>>   - Support for booting the system from EL2. Currently, we assume that a
+>>     tests starts running at EL1. This the case when we run with EFI, it's
+>>     not always the case in hardware.
+>>   - Support for reading environment variables and populating __envp.
+>>   - Support for discovering the PCI subsystem using ACPI.
+>>   - Get rid of other assumptions (e.g., vmalloc area) that don't hold on real HW.
+>>
+>> git branch: https://github.com/relokin/kvm-unit-tests/pull/new/target-efi-upstream-v3-rebased
+>>
+>> v2: https://lore.kernel.org/kvm/20220506205605.359830-1-nikos.nikoleris@arm.com/
+>>
+>> Changes in v3:
+>>   - Addressed feedback from Drew, Alex and Ricardo. Many thanks for the reviews!
+>>   - Added support for discovering the GIC through ACPI
+>>   - Added a missing header file (<elf.h>)
+>>   - Added support for correctly parsing the outcome of tests (./run_tests)
 >>
 >> Thanks,
 >>
 >> Nikos
 >>
->>> Fix all of the issues in one go, by doing the cache maintenance only for
->>> the stack, as that is out of the control of the C code, and add the missing
->>> memory barrier.
->>>
->>> The code used to test that mmu_disable works correctly is similar to the
->>> code used to test commit 410b3bf09e76 ("arm/arm64: Perform dcache clean
->>> + invalidate after turning MMU off"), with extra cache maintenance
->>> added:
->>>
->>> +#include <alloc_page.h>
->>> +#include <asm/cacheflush.h>
->>> +#include <asm/mmu.h>
->>>    int main(int argc, char **argv)
->>>    {
->>> +       int *x = alloc_page();
->>> +       bool pass = true;
->>> +       int i;
->>> +
->>> +       for  (i = 0; i < 1000000; i++) {
->>> +               *x = 0x42;
->>> +               dcache_clean_addr_poc((unsigned long)x);
->>> +               mmu_disable();
->>> +               if (*x != 0x42) {
->>> +                       pass = false;
->>> +                       break;
->>> +               }
->>> +               *x = 0x50;
->>> +               /* Needed for the invalidation only. */
->>> +               dcache_clean_inval_addr_poc((unsigned long)x);
->>> +               mmu_enable(current_thread_info()->pgtable);
->>> +               if (*x != 0x50) {
->>> +                       pass = false;
->>> +                       break;
->>> +               }
->>> +       }
->>> +       report(pass, "MMU disable cache maintenance");
->>>
->>> Signed-off-by: Alexandru Elisei <alexandru.elisei@arm.com>
->>> ---
->>>    arm/cstart.S   | 11 ++++++-----
->>>    arm/cstart64.S | 11 +++++------
->>>    2 files changed, 11 insertions(+), 11 deletions(-)
->>>
->>> diff --git a/arm/cstart.S b/arm/cstart.S
->>> index fc7c558802f1..b27de44f30a6 100644
->>> --- a/arm/cstart.S
->>> +++ b/arm/cstart.S
->>> @@ -242,11 +242,12 @@ asm_mmu_disable:
->>>    	mcr	p15, 0, r0, c1, c0, 0
->>>    	isb
->>> -	ldr	r0, =__phys_offset
->>> -	ldr	r0, [r0]
->>> -	ldr	r1, =__phys_end
->>> -	ldr	r1, [r1]
->>> -	dcache_by_line_op dccimvac, sy, r0, r1, r2, r3
->>> +	dmb	sy
->>> +	mov	r0, sp
->>> +	lsr	r0, #THREAD_SHIFT
->>> +	lsl	r0, #THREAD_SHIFT
->>> +	add	r1, r0, #THREAD_SIZE
->>> +	dcache_by_line_op dccmvac, sy, r0, r1, r3, r4
->>>    	mov     pc, lr
->>> diff --git a/arm/cstart64.S b/arm/cstart64.S
->>> index 1ce6b9e14d23..af4970775298 100644
->>> --- a/arm/cstart64.S
->>> +++ b/arm/cstart64.S
->>> @@ -283,12 +283,11 @@ asm_mmu_disable:
->>>    	msr	sctlr_el1, x0
->>>    	isb
->>> -	/* Clean + invalidate the entire memory */
->>> -	adrp	x0, __phys_offset
->>> -	ldr	x0, [x0, :lo12:__phys_offset]
->>> -	adrp	x1, __phys_end
->>> -	ldr	x1, [x1, :lo12:__phys_end]
->>> -	dcache_by_line_op civac, sy, x0, x1, x2, x3
->>> +	dmb	sy
->>> +	mov	x9, sp
->>> +	and	x9, x9, #THREAD_MASK
->>> +	add	x10, x9, #THREAD_SIZE
->>> +	dcache_by_line_op cvac, sy, x9, x10, x11, x12
->>>    	ret
+>> Alexandru Elisei (1):
+>>    lib: arm: Print test exit status
+>>
+>> Andrew Jones (3):
+>>    arm/arm64: mmu_disable: Clean and invalidate before disabling
+>>    arm/arm64: Rename etext to _etext
+>>    arm64: Add a new type of memory type flag MR_F_RESERVED
+>>
+>> Nikos Nikoleris (23):
+>>    lib: Fix style for acpi.{c,h}
+>>    x86: Avoid references to fields of ACPI tables
+>>    lib: Ensure all struct definition for ACPI tables are packed
+>>    lib: Add support for the XSDT ACPI table
+>>    lib: Extend the definition of the ACPI table FADT
+>>    devicetree: Check if fdt is NULL before returning that a DT is
+>>      available
+>>    arm/arm64: Add support for setting up the PSCI conduit through ACPI
+>>    arm/arm64: Add support for discovering the UART through ACPI
+>>    arm/arm64: Add support for timer initialization through ACPI
+>>    arm/arm64: Add support for cpu initialization through ACPI
+>>    arm/arm64: Add support for gic initialization through ACPI
+>>    lib/printf: Support for precision modifier in printf
+>>    lib/printf: Add support for printing wide strings
+>>    lib/efi: Add support for getting the cmdline
+>>    lib: Avoid ms_abi for calls related to EFI on arm64
+>>    arm/arm64: Add a setup sequence for systems that boot through EFI
+>>    arm64: Copy code from GNU-EFI
+>>    arm64: Change GNU-EFI imported file to use defined types
+>>    arm64: Use code from the gnu-efi when booting with EFI
+>>    lib: Avoid external dependency in libelf
+>>    x86: Move x86_64-specific EFI CFLAGS to x86_64 Makefile
+>>    arm64: Add support for efi in Makefile
+>>    arm64: Add an efi/run script
+>>
+>>   scripts/runtime.bash        |  14 +-
+>>   arm/efi/run                 |  61 +++++++
+>>   arm/run                     |  14 +-
+>>   configure                   |  15 +-
+>>   Makefile                    |   4 -
+>>   arm/Makefile.arm            |   6 +
+>>   arm/Makefile.arm64          |  18 +-
+>>   arm/Makefile.common         |  48 +++--
+>>   x86/Makefile.x86_64         |   4 +
+>>   lib/linux/efi.h             |  25 +++
+>>   lib/arm/asm/setup.h         |   3 +
+>>   lib/arm/asm/timer.h         |   2 +
+>>   lib/acpi.h                  | 348 ++++++++++++++++++++++++++++--------
+>>   lib/argv.h                  |   1 +
+>>   lib/elf.h                   |  57 ++++++
+>>   lib/libcflat.h              |   1 +
+>>   lib/acpi.c                  | 129 ++++++++-----
+>>   lib/argv.c                  |   2 +-
+>>   lib/arm/gic.c               | 127 ++++++++++++-
+>>   lib/arm/io.c                |  29 ++-
+>>   lib/arm/mmu.c               |   4 +
+>>   lib/arm/psci.c              |  25 ++-
+>>   lib/arm/setup.c             | 247 ++++++++++++++++++++-----
+>>   lib/arm/timer.c             |  79 ++++++++
+>>   lib/devicetree.c            |   2 +-
+>>   lib/efi.c                   | 102 +++++++++++
+>>   lib/printf.c                | 194 ++++++++++++++++++--
+>>   arm/efi/elf_aarch64_efi.lds |  63 +++++++
+>>   arm/flat.lds                |   2 +-
+>>   arm/cstart.S                |  29 ++-
+>>   arm/cstart64.S              |  28 ++-
+>>   arm/efi/crt0-efi-aarch64.S  | 143 +++++++++++++++
+>>   arm/dummy.c                 |   4 +
+>>   arm/efi/reloc_aarch64.c     |  93 ++++++++++
+>>   arm/micro-bench.c           |   4 +-
+>>   arm/timer.c                 |  10 +-
+>>   x86/s3.c                    |  19 +-
+>>   x86/vmexit.c                |   2 +-
+>>   38 files changed, 1700 insertions(+), 258 deletions(-)
+>>   create mode 100755 arm/efi/run
+>>   create mode 100644 lib/elf.h
+>>   create mode 100644 lib/arm/timer.c
+>>   create mode 100644 arm/efi/elf_aarch64_efi.lds
+>>   create mode 100644 arm/efi/crt0-efi-aarch64.S
+>>   create mode 100644 arm/dummy.c
+>>   create mode 100644 arm/efi/reloc_aarch64.c
+>>
+>> -- 
+>> 2.25.1
+>>
