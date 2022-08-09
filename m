@@ -2,221 +2,213 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id D9AA358D251
-	for <lists+kvm@lfdr.de>; Tue,  9 Aug 2022 05:17:19 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 8F28058D27A
+	for <lists+kvm@lfdr.de>; Tue,  9 Aug 2022 05:48:59 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232779AbiHIDRO (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 8 Aug 2022 23:17:14 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60562 "EHLO
+        id S233139AbiHIDs5 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 8 Aug 2022 23:48:57 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48554 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230207AbiHIDRL (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 8 Aug 2022 23:17:11 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id D0EBB1CFE5
-        for <kvm@vger.kernel.org>; Mon,  8 Aug 2022 20:17:09 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1660015028;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=Hku1ARqVHLsqVqdvmF+LjymmoxAfWd7fJEwt8euY7i0=;
-        b=Z/zV5QLDemmKIISnVp1STvTOv6rPulWHZxk10JSrXTepChG94Rxs+w9cDtIUGFbLB0zZs7
-        OEvmEj0IyHKBqdRNhpyj//QcsfuRCuQRIPFk5sPjGTVngSR+OOGEzzdfu76a6pGM7b8fe1
-        wVVuUnjO7we+uWgOEiLAvsqSKzZbp9o=
-Received: from mail-lf1-f72.google.com (mail-lf1-f72.google.com
- [209.85.167.72]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-484-Tkwf5KasNYKqsY2tmS9imA-1; Mon, 08 Aug 2022 23:17:07 -0400
-X-MC-Unique: Tkwf5KasNYKqsY2tmS9imA-1
-Received: by mail-lf1-f72.google.com with SMTP id j30-20020ac2551e000000b0048af37f6d46so2445721lfk.3
-        for <kvm@vger.kernel.org>; Mon, 08 Aug 2022 20:17:07 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=Hku1ARqVHLsqVqdvmF+LjymmoxAfWd7fJEwt8euY7i0=;
-        b=hEElzkiK22KF3U3Vki2gYdCvH1MKszGUmgQFDaAzGNtyxnS0IeeVhtAv9zu3VGWYhY
-         ACdYO5am914O4XQXV5/GnaQz/U4PqKmpijZRnSk1pabDH7AwpsCcVGbMPLKcG19jRgJ7
-         0O7qf1flJDB8eu/7qWAJlwKerVzIFnesF105RubHjoYpOZK81haXyStV4+LGCIbdK4kg
-         qevesahgPWeb3hfZAhctn0GNsw7SLLcN+Gg0cCU/ruWRMToxUO2kZj3xFT9oUi5Dgsjn
-         dBdCRU1YHniakukffX854YS4gPe3sjZxscokW6CyRBzQjtzSJC9opiWh6yaaGO39OcdN
-         Tf4A==
-X-Gm-Message-State: ACgBeo3c6wFnmAMTr4hIoAh15m9u2+lndeU9xRhKzF5XFmtoj/BLqH34
-        bLy1OPQP8awKoDF7GziMU1+NVKpDpRlwT4Vv3aUNOGlILoO3nQJyuC71/YQHsplAEDDdWwsSIp7
-        TEOuxT2V5tQlE1VmTQQc5z7hnCwJ9
-X-Received: by 2002:ac2:43b0:0:b0:48b:1eb:d1e5 with SMTP id t16-20020ac243b0000000b0048b01ebd1e5mr7802368lfl.641.1660015025960;
-        Mon, 08 Aug 2022 20:17:05 -0700 (PDT)
-X-Google-Smtp-Source: AA6agR7IIJpQH67XtqBk2btElSlMlkfd1jKVQZZDaJZRMuF0mI0fTAKzJBNGyrFKYdgj7FYSxj45QVLxamo/Nzjw/oE=
-X-Received: by 2002:ac2:43b0:0:b0:48b:1eb:d1e5 with SMTP id
- t16-20020ac243b0000000b0048b01ebd1e5mr7802355lfl.641.1660015025739; Mon, 08
- Aug 2022 20:17:05 -0700 (PDT)
+        with ESMTP id S234019AbiHIDsE (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 8 Aug 2022 23:48:04 -0400
+Received: from mga02.intel.com (mga02.intel.com [134.134.136.20])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6E271FD7;
+        Mon,  8 Aug 2022 20:46:55 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1660016815; x=1691552815;
+  h=date:from:to:cc:subject:message-id:reply-to:references:
+   in-reply-to:mime-version;
+  bh=XhgU589VGrs6MDuNdb+WxgCDizeiUb6J6oz60c7Z+fU=;
+  b=VY2UR0Y6veen5yq6Rq4OS15NAo550xAsK43D7XiB3rOC365/PDcvnTTX
+   iPS+zmu4M+k8hBssap6XFqGgspVqdIpg7Eqm3WYqQkyhS4erourwP+27B
+   X5YD0EcDbKmwtUo61MIQxHAGBJE+ZbCB5Ck+k1ZYtTpahML1kc2A8/9Zd
+   V+GdfWWZlWhjZrbRypz7NbTZOp4jOB8O1LE9wUf+oG5Rh5bLtiHqVlP0w
+   ynGqfUgtuPhT9Ooo4tqq3QHTgXG2BaiRFJgWrOs2bwBGXLhNvHhJM6iUH
+   sLslzPGViBCz7VdcQJkOsHWql5zTN5kYGkSlYIsya9Fq4fMzH8BFKYW+j
+   w==;
+X-IronPort-AV: E=McAfee;i="6400,9594,10433"; a="277681917"
+X-IronPort-AV: E=Sophos;i="5.93,223,1654585200"; 
+   d="scan'208";a="277681917"
+Received: from orsmga006.jf.intel.com ([10.7.209.51])
+  by orsmga101.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 08 Aug 2022 20:46:55 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.93,223,1654585200"; 
+   d="scan'208";a="580633749"
+Received: from fmsmsx602.amr.corp.intel.com ([10.18.126.82])
+  by orsmga006.jf.intel.com with ESMTP; 08 Aug 2022 20:46:54 -0700
+Received: from fmsmsx608.amr.corp.intel.com (10.18.126.88) by
+ fmsmsx602.amr.corp.intel.com (10.18.126.82) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2375.28; Mon, 8 Aug 2022 20:46:54 -0700
+Received: from fmsedg601.ED.cps.intel.com (10.1.192.135) by
+ fmsmsx608.amr.corp.intel.com (10.18.126.88) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2375.28 via Frontend Transport; Mon, 8 Aug 2022 20:46:54 -0700
+Received: from NAM11-BN8-obe.outbound.protection.outlook.com (104.47.58.168)
+ by edgegateway.intel.com (192.55.55.70) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2375.28; Mon, 8 Aug 2022 20:46:54 -0700
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=gkqCxNM7K8zALBCU0Rfgmkoj1Suh9jp91v+2hHQ776WsGU76yQ+qpQlOL3X3oY5av127E+XM/axn9MGqamITxyW0+ubPRv2tM9EUG2DOuvjwJ58FZxBEKqCsQVBoqg4i7BG3S73NzZZjru9rcSrPm/LOKLZe8cARGCu9aI/WD97QlanmDbHEnpMc1PIW1GwNTehMkSoO6Z8me+5JWAT1gr+eJf4ZLD57Lg1NelQ1WxmG0rJEQydsfPbYEQvseJvWtqm0A9zjUxwaBSn/SxY4c2zM3mm7YreTul3a6p9NpraGJhk+9usFeVjo4r/gC8wZQeYzXBHkbUop3GQDF5cNRw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=1z9Q5cMuP5t2fDZlV1oIn/DvwHrkOZx61m89WUtA614=;
+ b=UFEr7WAvuseRhBwyPogOzls8tVDKEeV4Xgjy96tAFSuy6MFazLchYUtL0hAhkfrKqxhcbitoRKLlsoLmO6XCt2emge8iS3k+5YIOKFvshMGyHrv7P9AM8OFZ4tyGJpJLzKbas92r8xuudH8+O0rk5clHuGpKwxCSBhm4rC9iIv7JYWgNLDVPkN9FZNtWdmfs7calhCdVXeK+9DL2rIdzTn0k9uu6oPvw+V3XCP4jZaOWBWk1p/YlwY3m4p7BfCk/dU4KwH0sK38k5mKjSWMCfHkCtZA4xwypDT5cjyT0Y8W3Vh3ln40qqeqOLKkwDBccwf27vNjscQfRtxcw5rmuHA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+Received: from MN0PR11MB5964.namprd11.prod.outlook.com (2603:10b6:208:373::17)
+ by MN2PR11MB4128.namprd11.prod.outlook.com (2603:10b6:208:139::25) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5504.16; Tue, 9 Aug
+ 2022 03:46:47 +0000
+Received: from MN0PR11MB5964.namprd11.prod.outlook.com
+ ([fe80::bc51:e72e:5555:ccdc]) by MN0PR11MB5964.namprd11.prod.outlook.com
+ ([fe80::bc51:e72e:5555:ccdc%6]) with mapi id 15.20.5504.020; Tue, 9 Aug 2022
+ 03:46:47 +0000
+Date:   Tue, 9 Aug 2022 11:26:09 +0800
+From:   Yan Zhao <yan.y.zhao@intel.com>
+To:     Sean Christopherson <seanjc@google.com>
+CC:     Paolo Bonzini <pbonzini@redhat.com>, <kvm@vger.kernel.org>,
+        <linux-kernel@vger.kernel.org>,
+        David Matlack <dmatlack@google.com>,
+        "Mingwei Zhang" <mizhang@google.com>,
+        Ben Gardon <bgardon@google.com>
+Subject: Re: [PATCH v3 5/8] KVM: x86/mmu: Set disallowed_nx_huge_page in TDP
+ MMU before setting SPTE
+Message-ID: <YvHT0dA0BGgCQ8L+@yzhao56-desk.sh.intel.com>
+Reply-To: Yan Zhao <yan.y.zhao@intel.com>
+References: <20220805230513.148869-1-seanjc@google.com>
+ <20220805230513.148869-6-seanjc@google.com>
+Content-Type: text/plain; charset="us-ascii"
+Content-Disposition: inline
+In-Reply-To: <20220805230513.148869-6-seanjc@google.com>
+X-ClientProxiedBy: SG2PR02CA0103.apcprd02.prod.outlook.com
+ (2603:1096:4:92::19) To MN0PR11MB5964.namprd11.prod.outlook.com
+ (2603:10b6:208:373::17)
 MIME-Version: 1.0
-References: <20220805181105.GA29848@willie-the-truck> <20220807042408-mutt-send-email-mst@kernel.org>
- <20220808101850.GA31984@willie-the-truck> <20220808083958-mutt-send-email-mst@kernel.org>
-In-Reply-To: <20220808083958-mutt-send-email-mst@kernel.org>
-From:   Jason Wang <jasowang@redhat.com>
-Date:   Tue, 9 Aug 2022 11:16:54 +0800
-Message-ID: <CACGkMEv2vij4bSOwxajXan=+b_aQ_=Y3Ttjj3H9R_Q5fhEFxtg@mail.gmail.com>
-Subject: Re: IOTLB support for vhost/vsock breaks crosvm on Android
-To:     "Michael S. Tsirkin" <mst@redhat.com>
-Cc:     Will Deacon <will@kernel.org>,
-        Stefan Hajnoczi <stefanha@redhat.com>,
-        Linus Torvalds <torvalds@linux-foundation.org>,
-        ascull@google.com, Marc Zyngier <maz@kernel.org>,
-        Keir Fraser <keirf@google.com>, jiyong@google.com,
-        kernel-team@android.com,
-        linux-kernel <linux-kernel@vger.kernel.org>,
-        virtualization <virtualization@lists.linux-foundation.org>,
-        kvm <kvm@vger.kernel.org>, crosvm-dev@chromium.org
-Content-Type: text/plain; charset="UTF-8"
-X-Spam-Status: No, score=-2.7 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham
-        autolearn_force=no version=3.4.6
+X-MS-PublicTrafficType: Email
+X-MS-Office365-Filtering-Correlation-Id: f28fc66f-654d-4178-07f4-08da79b9c8be
+X-MS-TrafficTypeDiagnostic: MN2PR11MB4128:EE_
+X-LD-Processed: 46c98d88-e344-4ed4-8496-4ed7712e255d,ExtAddr
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: wWN6babUi2ndm8u+tg7ChBATw+NCbYoXaxHGCM20uHNUIvwADziKW5XTIviQCToScpcXqiTILan+ZMTioHPm+dOqNLJaq885EXuMyOuIm37wvf5lP0iF/vz7fNdHFx9loGo6TYULJCZDJ/hMWr7SKUdzSY8AQCFlq9jLjL68ZLIXmkNLvu/mao+l4Wxb52pBQVd6xvmZQ3FdIuJQb0T0RvcU7sD/Lh7ocXJNir9xri7FaE5jDcrY+q/dXabyNlrswWFbRmwSZzyLEfROklOELJSuewwt1i4PtHOs52pm5578BKyAX2zJlwIlKEAmFvmhnENnH36QjjNzCUXNxxTd/DooODLFla24COPPnFeHI5VZV7b6P9CMJhBj42ZY3cQiLwiA5wCrc3dKAnNq/1GiTmRnjCmvzGzMZETHoZ22vLkGH0MtYgZfhS2l4ufxmej/5kEJeVMdLS+SgjUlYTG6LVpzOkOAxAXZQ1asX8kYmVuDeJC7y+rNiXTX9z1wVTr0Zo5Ykp1VH/wqZswmXVUXCl3MKMUtC+dNOWwnYyQ/teq+OFw1r1CTN2N+XrguCFFzYyGAgLlByUs5CeTuXVNxjJfHB2klPRAeO0cAeVcXOXgbx8TWKe1x76437hKe5EGj/ObEfaRsTAX6qDqpAw0b2+AnLir4g2x98JUJTps4k+6exx7DRtJ6QH7+9G07O5ypMMNNsZE5T5++XkwtSwuHhLuDKRe6TO7pxOMDR/YlDwFgzhfRjDdnEFc6/cKfl8WvlwTyyE4nbXRKyN53+8U475OU84697lm1RHkVqDcPM7Q=
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:MN0PR11MB5964.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230016)(396003)(136003)(376002)(346002)(39860400002)(366004)(186003)(3450700001)(5660300002)(478600001)(6486002)(66556008)(6506007)(6512007)(26005)(66476007)(66946007)(6666004)(41300700001)(86362001)(38100700002)(2906002)(83380400001)(6916009)(4326008)(8676002)(8936002)(316002)(54906003)(82960400001)(14583001);DIR:OUT;SFP:1102;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?6E7T+vcsyrp1EvyboplgrPR9RxYMIffK22zWzhzhue0Cqgyz7bW/PmWcl5nV?=
+ =?us-ascii?Q?yic9F8AP9Uef+146JOnSw81/dXC5n5/jFrxq/q59LjGyekzBIcjaQiTv0KDH?=
+ =?us-ascii?Q?QYPihaGjxMdl4ZK6iln71u52gLDmXzIu3ZqEPaE/NL6e7yqH1Ki9G4uQRsd0?=
+ =?us-ascii?Q?WUqZcw/b52GOiYeWLfBg09I6EodlxKAIggSr0a4riYmOFjyK3dw5O8G4GaFw?=
+ =?us-ascii?Q?RFtREBzmGyCir36zJPlWTkR+A9w/i5m/AMw6lhbovC8uLxj+6zm71n7+Vtv/?=
+ =?us-ascii?Q?XOWkiu9DiWcj9sGpHdGZw9iQoqmrS2jwc3TR2h4Wof8MKmEAchSuRJa9/ImV?=
+ =?us-ascii?Q?3H4wA3fRYwvjI4Pkmg7sGmhIlk37kYskQm7d/zQXLKpQ0/KUbE3brNn4GyuD?=
+ =?us-ascii?Q?3OpqQzzfoRRTp/ROP3ORtcmuMprMrxwskW6apNSgTkgr9qi1kF3SiMDwhbQp?=
+ =?us-ascii?Q?YY26YxT1HDgJ7uHQg0zpMR6Q2Z4JtcLhtpa6ludR6gtvml+xIBuYmbhyKUOF?=
+ =?us-ascii?Q?VFufABRXvYSvbDM7HR03sBHOHvRSZM/V80iOVRKfN5raLPzjQh/L/eTzySK/?=
+ =?us-ascii?Q?JwzirsyyAWMQqWMGbATROC9KPUuYrzKHpUNuffl1176fd2ZTrld5LuOkqx+I?=
+ =?us-ascii?Q?5cmUCx6EeanXZNhjE+5esH7sGpUXBvQfU1CKx19AsMLYvRpBoikJ4uTnsaFb?=
+ =?us-ascii?Q?ecTjbdq/53Dk5ZHX4Roq/mEDPgiKF2vkAZ4LJ0GyRGl6LX5yd05ibl0Gi2bQ?=
+ =?us-ascii?Q?moi+Yojnn7L/+EcJdGPBD4AC5GaHhVBHuUIRMHwF40NqrCzDITjN9SqIuK/h?=
+ =?us-ascii?Q?oUsYndRh7Wvb8ytOetwBXZv6NJYc6ptrQ5/4xoz06r9iI+gB5sTWKdsdP7sd?=
+ =?us-ascii?Q?F9aWbdURPq2v73zmSm4uOKEsxlRdMtz+hbOfQTQ/Y3TyWNhkBZBsIgK+Vu20?=
+ =?us-ascii?Q?EJhrLNFpLVPXRSXWL0ioX3QBWS4Agt3z8cbB+Xqk/Snv2eZpwi2580+HKoqp?=
+ =?us-ascii?Q?MMD0auqa6dXJPUWP2utzdtYdpwAVkrNGjeHAz8muwl1za3WqsSXZop7OpiBM?=
+ =?us-ascii?Q?xMIS7EbEd7oIV2tNKmEXLS2syYEj2e8+wGtgzO4ruy94xust8OLRFneLavl1?=
+ =?us-ascii?Q?c44V45NDGkr510Z3x65EDhTcTIG6iBXljmqh57A+afZHdXiKv7SlY+UbPI7Y?=
+ =?us-ascii?Q?6Ec+jHwsVQJ6k69k8pSPa/ZbK+6mEtY/qKCirmmuRXmNbcodXrSrU+9uNIy7?=
+ =?us-ascii?Q?afnZ1ut7u2eABJNgNxOFzaRXxW14Uci2WgTSLb5zdEEQPG/+L8kRPSyJ0awv?=
+ =?us-ascii?Q?0CQxOIoD+xTrPL5FPTDaFsQg4fyD450Mix4Svi84gVt64lkAzDmiWMhG0pVr?=
+ =?us-ascii?Q?McexYU00ncShceBExJqoqh+uN7KJMmLLLtwAMUKwDBiZEu9ljJBwrfLCsFy3?=
+ =?us-ascii?Q?AD7j/rSDyFF0HeiY5LjifFNb3ecrR1/s9z7YTLJY5SAqexGRFRY++p3ulkTC?=
+ =?us-ascii?Q?LXoNb5uknwpFYCKWg6Z5CCOBkfG9d0qK5Vw4BzvCqr5X0csIJC+IwfnIJde0?=
+ =?us-ascii?Q?nJm9D+F/DvCRxpl81O739L+tv7vFbLdhAjSYMAiN?=
+X-MS-Exchange-CrossTenant-Network-Message-Id: f28fc66f-654d-4178-07f4-08da79b9c8be
+X-MS-Exchange-CrossTenant-AuthSource: MN0PR11MB5964.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 09 Aug 2022 03:46:47.1716
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: eRaf6RYnA0freNjWd7TFJDq3QzQaQn0X0LjStHiJBEzSEsHFEMQxgz77kZTkjwwPWpPWZ6/Gkr/a56dLB/qxNA==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: MN2PR11MB4128
+X-OriginatorOrg: intel.com
+X-Spam-Status: No, score=-5.0 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
+        RCVD_IN_MSPIKE_H3,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE,
+        T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Aug 8, 2022 at 8:45 PM Michael S. Tsirkin <mst@redhat.com> wrote:
+On Fri, Aug 05, 2022 at 11:05:10PM +0000, Sean Christopherson wrote:
+> Set nx_huge_page_disallowed in TDP MMU shadow pages before making the SP
+> visible to other readers, i.e. before setting its SPTE.  This will allow
+> KVM to query the flag when determining if a shadow page can be replaced
+> by a NX huge page without violating the rules of the mitigation.
+> 
+> Note, the shadow/legacy MMU holds mmu_lock for write, so it's impossible
+> for another CPU to see a shadow page without an up-to-date
+> nx_huge_page_disallowed, i.e. only the TDP MMU needs the complicated
+> dance.
+> 
+> Signed-off-by: Sean Christopherson <seanjc@google.com>
+> Reviewed-by: David Matlack <dmatlack@google.com>
+> ---
+>  arch/x86/kvm/mmu/mmu.c          | 28 +++++++++++++-------
+>  arch/x86/kvm/mmu/mmu_internal.h |  5 ++--
+>  arch/x86/kvm/mmu/tdp_mmu.c      | 46 +++++++++++++++++++++++----------
+>  3 files changed, 53 insertions(+), 26 deletions(-)
 >
-> On Mon, Aug 08, 2022 at 11:18:50AM +0100, Will Deacon wrote:
-> > Hi Michael,
-> >
-> > On Sun, Aug 07, 2022 at 09:14:43AM -0400, Michael S. Tsirkin wrote:
-> > > Will, thanks very much for the analysis and the writeup!
-> >
-> > No problem, and thanks for following up.
-> >
-> > > On Fri, Aug 05, 2022 at 07:11:06PM +0100, Will Deacon wrote:
-> > > > So how should we fix this? One possibility is for us to hack crosvm to
-> > > > clear the VIRTIO_F_ACCESS_PLATFORM flag when setting the vhost features,
-> > > > but others here have reasonably pointed out that they didn't expect a
-> > > > kernel change to break userspace. On the flip side, the offending commit
-> > > > in the kernel isn't exactly new (it's from the end of 2020!) and so it's
-> > > > likely that others (e.g. QEMU) are using this feature.
-> > >
-> > > Exactly, that's the problem.
-> > >
-> > > vhost is reusing the virtio bits and it's only natural that
-> > > what you are doing would happen.
-> > >
-> > > To be precise, this is what we expected people to do (and what QEMU does):
-> > >
-> > >
-> > > #define QEMU_VHOST_FEATURES ((1 << VIRTIO_F_VERSION_1) |
-> > >                          (1 << VIRTIO_NET_F_RX_MRG) | .... )
-> > >
-> > > VHOST_GET_FEATURES(... &host_features);
-> > > host_features &= QEMU_VHOST_FEATURES
-> > > VHOST_SET_FEATURES(host_features & guest_features)
-> > >
-> > >
-> > > Here QEMU_VHOST_FEATURES are the bits userspace knows about.
-> > >
-> > > Our assumption was that whatever userspace enables, it
-> > > knows what the effect on vhost is going to be.
-> > >
-> > > But yes, I understand absolutely how someone would instead just use the
-> > > guest features. It is unfortunate that we did not catch this in time.
-> > >
-> > >
-> > > In hindsight, we should have just created vhost level macros
-> > > instead of reusing virtio ones. Would address the concern
-> > > about naming: PLATFORM_ACCESS makes sense for the
-> > > guest since there it means "whatever access rules platform has",
-> > > but for vhost a better name would be VHOST_F_IOTLB.
-> > > We should have also taken greater pains to document what
-> > > we expect userspace to do. I remember now how I thought about something
-> > > like this but after coding this up in QEMU I forgot to document this :(
-> > > Also, I suspect given the history the GET/SET features ioctl and burned
-> > > wrt extending it and we have to use a new when we add new features.
-> > > All this we can do going forward.
-> >
-> > Makes sense. The crosvm developers are also pretty friendly in my
-> > experience, so I'm sure they wouldn't mind being involved in discussions
-> > around any future ABI extensions. Just be aware that they _very_ recently
-> > moved their mailing lists, so I think it lives here now:
-> >
-> > https://groups.google.com/a/chromium.org/g/crosvm-dev
-> >
-> > > But what can we do about the specific issue?
-> > > I am not 100% sure since as Will points out, QEMU and other
-> > > userspace already rely on the current behaviour.
-> > >
-> > > Looking at QEMU specifically, it always sends some translations at
-> > > startup, this in order to handle device rings.
-> > >
-> > > So, *maybe* we can get away with assuming that if no IOTLB ioctl was
-> > > ever invoked then this userspace does not know about IOTLB and
-> > > translation should ignore IOTLB completely.
-> >
-> > There was a similar suggestion from Stefano:
-> >
-> > https://lore.kernel.org/r/20220806105225.crkui6nw53kbm5ge@sgarzare-redhat
-> >
-> > about spotting the backend ioctl for IOTLB and using that to enable
-> > the negotiation of F_ACCESS_PLATFORM. Would that work for qemu?
->
-> Hmm I would worry that this disables the feature for old QEMU :(
->
->
-> > > I am a bit nervous about breaking some *other* userspace which actually
-> > > wants device to be blocked from accessing memory until IOTLB
-> > > has been setup. If we get it wrong we are making guest
-> > > and possibly even host vulnerable.
-> > > And of course just revering is not an option either since there
-> > > are now whole stacks depending on the feature.
-> >
-> > Absolutely, I'm not seriously suggesting the revert. I just did it locally
-> > to confirm the issue I was seeing.
-> >
-> > > Will I'd like your input on whether you feel a hack in the kernel
-> > > is justified here.
-> >
-> > If we can come up with something that we have confidence in and won't be a
-> > pig to maintain, then I think we should do it, but otherwise we can go ahead
-> > and change crosvm to mask out this feature flag on the vhost side for now.
-> > We mainly wanted to raise the issue to illustrate that this flag continues
-> > to attract problems in the hope that it might inform further usage and/or
-> > spec work in this area.
-> >
-> > In any case, I'm happy to test any kernel patches with our setup if you
-> > want to give it a shot.
->
-> Thanks!
-> I'm a bit concerned that the trick I proposed changes the configuration
-> where iotlb was not set up from "access to memory not allowed" to
-> "access to all memory allowed". This just might have security
-> implications if some application assumed the former.
-> And the one Stefano proposed disables IOTLB for old QEMU versions.
+<snip>
 
-Yes, if there is no choice, having some known cases that are broken is
-better than silently breaking unknown setups.
+> diff --git a/arch/x86/kvm/mmu/tdp_mmu.c b/arch/x86/kvm/mmu/tdp_mmu.c
+> index 0e94182c87be..34994ca3d45b 100644
+> --- a/arch/x86/kvm/mmu/tdp_mmu.c
+> +++ b/arch/x86/kvm/mmu/tdp_mmu.c
+> @@ -392,8 +392,19 @@ static void tdp_mmu_unlink_sp(struct kvm *kvm, struct kvm_mmu_page *sp,
+>  		lockdep_assert_held_write(&kvm->mmu_lock);
+>  
+>  	list_del(&sp->link);
+> -	if (sp->nx_huge_page_disallowed)
+> -		unaccount_nx_huge_page(kvm, sp);
+> +
+> +	/*
+> +	 * Ensure nx_huge_page_disallowed is read after observing the present
+> +	 * shadow page.  A different vCPU may have _just_ finished installing
+> +	 * the shadow page if mmu_lock is held for read.  Pairs with the
+> +	 * smp_wmb() in kvm_tdp_mmu_map().
+> +	 */
+> +	smp_rmb();
+hi Sean,
+
+I understand this smp_rmb() is intended to prevent the reading of
+p->nx_huge_page_disallowed from happening before it's set to true in
+kvm_tdp_mmu_map(). Is this understanding right?
+
+If it's true, then do we also need the smp_rmb() for read of sp->gfn in
+handle_removed_pt()? (or maybe for other fields in sp in other places?)
 
 Thanks
+Yan
 
->
->
->
-> > > Also yes, I think it's a good idea to change crosvm anyway.  While the
-> > > work around I describe might make sense upstream I don't think it's a
-> > > reasonable thing to do in stable kernels.
-> > > I think I'll prepare a patch documenting the legal vhost features
-> > > as a 1st step even though crosvm is rust so it's not importing
-> > > the header directly, right?
-> >
-> > Documentation is a good idea regardless, so thanks for that. Even though
-> > crosvm has its own bindings for the vhost ioctl()s, the documentation
-> > can be reference or duplicated once it's available in the kernel headers.
-> >
-> > Will
->
-> So for crosvm change, I will post the documentation change and
-> you guys can discuss?
->
-> --
-> MST
->
+> +
+> +	if (sp->nx_huge_page_disallowed) {
+> +		sp->nx_huge_page_disallowed = false;
+> +		untrack_possible_nx_huge_page(kvm, sp);
+> +	}
+>  
+>  	if (shared)
+>  		spin_unlock(&kvm->arch.tdp_mmu_pages_lock);
+
+
+
 
