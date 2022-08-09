@@ -2,118 +2,134 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id B8DC958D8B1
-	for <lists+kvm@lfdr.de>; Tue,  9 Aug 2022 14:22:03 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 4635458D8CA
+	for <lists+kvm@lfdr.de>; Tue,  9 Aug 2022 14:36:24 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S241261AbiHIMWC (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 9 Aug 2022 08:22:02 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57154 "EHLO
+        id S242678AbiHIMgW (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 9 Aug 2022 08:36:22 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36494 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232784AbiHIMWB (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 9 Aug 2022 08:22:01 -0400
-Received: from mail.efficios.com (mail.efficios.com [167.114.26.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BC04B1F637;
-        Tue,  9 Aug 2022 05:21:56 -0700 (PDT)
-Received: from localhost (localhost [127.0.0.1])
-        by mail.efficios.com (Postfix) with ESMTP id 88CEC4290E7;
-        Tue,  9 Aug 2022 08:21:55 -0400 (EDT)
-Received: from mail.efficios.com ([127.0.0.1])
-        by localhost (mail03.efficios.com [127.0.0.1]) (amavisd-new, port 10032)
-        with ESMTP id VA4D7GnKn4e5; Tue,  9 Aug 2022 08:21:55 -0400 (EDT)
-Received: from localhost (localhost [127.0.0.1])
-        by mail.efficios.com (Postfix) with ESMTP id EAB714290E4;
-        Tue,  9 Aug 2022 08:21:54 -0400 (EDT)
-DKIM-Filter: OpenDKIM Filter v2.10.3 mail.efficios.com EAB714290E4
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=efficios.com;
-        s=default; t=1660047715;
-        bh=yaql+OHmxrSRIFF3ySv247yWXrCOS5bC0G5bebaliwY=;
-        h=Date:From:To:Message-ID:MIME-Version;
-        b=Cn+kTKgqSdyG27J2H72mf4t7c15Au8g0GzhEvNz82ew6t2XB62VW85zMC0MY4dO66
-         bfWxHqgEmSuz2N6fGJxDi2PCxm7zQ5tOxLQrFdbKtfvJgay3+exr5GJPIFoUx4dOUF
-         Hs9bv613auRXhX3OOMEIXadBZwbe49mmmU+Z1TGwpUovxvzTXVkI5AspHT2sRMNDeh
-         O/Ci0Tn7PSSp5/XAVWk+uhuhg8zJC/E+H3BnLIGYP4Z5OxJMvrh79dKHY4pwvmh+FM
-         BPordgJZ9kuWcQ8vRQFX8V6e9EhLgvzLLHWlgKZGhLyvkmnZp93GdAZKn0UfcJdh7x
-         xlWuUUYH2AY0Q==
-X-Virus-Scanned: amavisd-new at efficios.com
-Received: from mail.efficios.com ([127.0.0.1])
-        by localhost (mail03.efficios.com [127.0.0.1]) (amavisd-new, port 10026)
-        with ESMTP id GOweDkJi16HZ; Tue,  9 Aug 2022 08:21:54 -0400 (EDT)
-Received: from mail03.efficios.com (mail03.efficios.com [167.114.26.124])
-        by mail.efficios.com (Postfix) with ESMTP id D8B874291F7;
-        Tue,  9 Aug 2022 08:21:54 -0400 (EDT)
-Date:   Tue, 9 Aug 2022 08:21:54 -0400 (EDT)
-From:   Mathieu Desnoyers <mathieu.desnoyers@efficios.com>
-To:     Gavin Shan <gshan@redhat.com>
-Cc:     Florian Weimer <fweimer@redhat.com>, kvmarm@lists.cs.columbia.edu,
-        kvm@vger.kernel.org, linux-kselftest@vger.kernel.org,
-        linux-kernel@vger.kernel.org, pbonzini@redhat.com, maz@kernel.org,
-        oliver upton <oliver.upton@linux.dev>,
-        andrew jones <andrew.jones@linux.dev>, seanjc@google.com,
-        yihyu@redhat.com, shan gavin <shan.gavin@gmail.com>
-Message-ID: <797306043.114963.1660047714774.JavaMail.zimbra@efficios.com>
-In-Reply-To: <616d4de6-81f6-9d14-4e57-4a79fec45690@redhat.com>
-References: <20220809060627.115847-1-gshan@redhat.com> <20220809060627.115847-2-gshan@redhat.com> <8735e6ncxw.fsf@oldenburg.str.redhat.com> <7844e3fa-e49e-de75-e424-e82d3a023dd6@redhat.com> <87o7wtnay6.fsf@oldenburg.str.redhat.com> <616d4de6-81f6-9d14-4e57-4a79fec45690@redhat.com>
-Subject: Re: [PATCH 1/2] KVM: selftests: Make rseq compatible with
- glibc-2.35
+        with ESMTP id S242651AbiHIMgV (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 9 Aug 2022 08:36:21 -0400
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 43A29186D6
+        for <kvm@vger.kernel.org>; Tue,  9 Aug 2022 05:36:20 -0700 (PDT)
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id A97FA23A;
+        Tue,  9 Aug 2022 05:36:20 -0700 (PDT)
+Received: from [192.168.12.23] (unknown [172.31.20.19])
+        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 5861A3F5A1;
+        Tue,  9 Aug 2022 05:36:18 -0700 (PDT)
+Message-ID: <6d3498f8-80f7-be78-fbdf-643014828c54@arm.com>
+Date:   Tue, 9 Aug 2022 13:36:09 +0100
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:91.0)
+ Gecko/20100101 Thunderbird/91.12.0
+Subject: Re: [kvm-unit-tests RFC PATCH 01/19] Makefile: Define __ASSEMBLY__
+ for assembly files
+Content-Language: en-GB
+To:     Alexandru Elisei <alexandru.elisei@arm.com>, pbonzini@redhat.com,
+        thuth@redhat.com, andrew.jones@linux.dev, kvm@vger.kernel.org,
+        kvmarm@lists.cs.columbia.edu
+References: <20220809091558.14379-1-alexandru.elisei@arm.com>
+ <20220809091558.14379-2-alexandru.elisei@arm.com>
+From:   Nikos Nikoleris <nikos.nikoleris@arm.com>
+In-Reply-To: <20220809091558.14379-2-alexandru.elisei@arm.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
-X-Originating-IP: [167.114.26.124]
-X-Mailer: Zimbra 8.8.15_GA_4304 (zclient/8.8.15_GA_4304)
-Thread-Topic: selftests: Make rseq compatible with glibc-2.35
-Thread-Index: oHLHOFY5Vh2uVE5+gR7UtW52F8t44g==
-X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,SPF_HELO_NONE,
-        SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no
-        version=3.4.6
+X-Spam-Status: No, score=-6.9 required=5.0 tests=BAYES_00,NICE_REPLY_A,
+        RCVD_IN_DNSWL_HI,SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+On 09/08/2022 10:15, Alexandru Elisei wrote:
+> There are 25 header files today (found with grep -r "#ifndef __ASSEMBLY__)
+> with functionality relies on the __ASSEMBLY__ prepocessor constant being
+> correctly defined to work correctly. So far, kvm-unit-tests has relied on
+> the assembly files to define the constant before including any header
+> files which depend on it.
+> 
+> Let's make sure that nobody gets this wrong and define it as a compiler
+> constant when compiling assembly files. __ASSEMBLY__ is now defined for all
+> .S files, even those that didn't set it explicitely before.
+> 
 
------ Gavin Shan <gshan@redhat.com> wrote:
-> Hi Florian,
-> 
-> On 8/9/22 5:16 PM, Florian Weimer wrote:
-> >>> __builtin_thread_pointer doesn't work on all architectures/GCC
-> >>> versions.
-> >>> Is this a problem for selftests?
-> >>>
-> >>
-> >> It's a problem as the test case is running on all architectures. I think I
-> >> need introduce our own __builtin_thread_pointer() for where it's not
-> >> supported: (1) PowerPC  (2) x86 without GCC 11
-> >>
-> >> Please let me know if I still have missed cases where
-> >> __buitin_thread_pointer() isn't supported?
-> > 
-> > As far as I know, these are the two outliers that also have rseq
-> > support.  The list is a bit longer if we also consider non-rseq
-> > architectures (csky, hppa, ia64, m68k, microblaze, sparc, don't know
-> > about the Linux architectures without glibc support).
-> > 
-> 
-> For kvm/selftests, there are 3 architectures involved actually. So we
-> just need consider 4 cases: aarch64, x86, s390 and other. For other
-> case, we just use __builtin_thread_pointer() to maintain code's
-> integrity, but it's not called at all.
-> 
-> I think kvm/selftest is always relying on glibc if I'm correct.
+This is a great idea.
 
-All those are handled in the rseq selftests and in librseq. Why duplicate all that logic again?
+Reviewed-by: Nikos Nikoleris <nikos.nikoleris@arm.com>
 
 Thanks,
 
-Mathieu 
+Nikos
 
+> Signed-off-by: Alexandru Elisei <alexandru.elisei@arm.com>
+> ---
+>   Makefile           | 5 ++++-
+>   arm/cstart.S       | 1 -
+>   arm/cstart64.S     | 1 -
+>   powerpc/cstart64.S | 1 -
+>   4 files changed, 4 insertions(+), 4 deletions(-)
 > 
-> Thanks,
-> Gavin
-> 
-
--- 
-Mathieu Desnoyers
-EfficiOS Inc.
-http://www.efficios.com
+> diff --git a/Makefile b/Makefile
+> index 6ed5deaccb41..42c61aa45d50 100644
+> --- a/Makefile
+> +++ b/Makefile
+> @@ -94,6 +94,9 @@ CFLAGS += $(wmissing_parameter_type)
+>   CFLAGS += $(wold_style_declaration)
+>   CFLAGS += -Woverride-init -Wmissing-prototypes -Wstrict-prototypes
+>   
+> +AFLAGS  = $(CFLAGS)
+> +AFLAGS += -D__ASSEMBLY__
+> +
+>   autodepend-flags = -MMD -MF $(dir $*).$(notdir $*).d
+>   
+>   LDFLAGS += $(CFLAGS)
+> @@ -117,7 +120,7 @@ directories:
+>   	@mkdir -p $(OBJDIRS)
+>   
+>   %.o: %.S
+> -	$(CC) $(CFLAGS) -c -nostdlib -o $@ $<
+> +	$(CC) $(AFLAGS) -c -nostdlib -o $@ $<
+>   
+>   -include */.*.d */*/.*.d
+>   
+> diff --git a/arm/cstart.S b/arm/cstart.S
+> index 7036e67fc0d8..39260e0fa470 100644
+> --- a/arm/cstart.S
+> +++ b/arm/cstart.S
+> @@ -5,7 +5,6 @@
+>    *
+>    * This work is licensed under the terms of the GNU LGPL, version 2.
+>    */
+> -#define __ASSEMBLY__
+>   #include <auxinfo.h>
+>   #include <asm/assembler.h>
+>   #include <asm/thread_info.h>
+> diff --git a/arm/cstart64.S b/arm/cstart64.S
+> index e4ab7d06251e..d62360cf3859 100644
+> --- a/arm/cstart64.S
+> +++ b/arm/cstart64.S
+> @@ -5,7 +5,6 @@
+>    *
+>    * This work is licensed under the terms of the GNU GPL, version 2.
+>    */
+> -#define __ASSEMBLY__
+>   #include <auxinfo.h>
+>   #include <asm/asm-offsets.h>
+>   #include <asm/assembler.h>
+> diff --git a/powerpc/cstart64.S b/powerpc/cstart64.S
+> index 972851f9ed65..1a823385fd0f 100644
+> --- a/powerpc/cstart64.S
+> +++ b/powerpc/cstart64.S
+> @@ -5,7 +5,6 @@
+>    *
+>    * This work is licensed under the terms of the GNU LGPL, version 2.
+>    */
+> -#define __ASSEMBLY__
+>   #include <asm/hcall.h>
+>   #include <asm/ppc_asm.h>
+>   #include <asm/rtas.h>
