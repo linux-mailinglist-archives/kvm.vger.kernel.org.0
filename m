@@ -2,223 +2,155 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id BAC1158DCCC
-	for <lists+kvm@lfdr.de>; Tue,  9 Aug 2022 19:07:54 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id F384158DCD1
+	for <lists+kvm@lfdr.de>; Tue,  9 Aug 2022 19:08:15 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S245229AbiHIRHt (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 9 Aug 2022 13:07:49 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49384 "EHLO
+        id S245284AbiHIRIO (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 9 Aug 2022 13:08:14 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49706 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S245289AbiHIRHq (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 9 Aug 2022 13:07:46 -0400
-Received: from mail-wr1-x432.google.com (mail-wr1-x432.google.com [IPv6:2a00:1450:4864:20::432])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 28D5C20BD1
-        for <kvm@vger.kernel.org>; Tue,  9 Aug 2022 10:07:44 -0700 (PDT)
-Received: by mail-wr1-x432.google.com with SMTP id j1so15055706wrw.1
-        for <kvm@vger.kernel.org>; Tue, 09 Aug 2022 10:07:44 -0700 (PDT)
+        with ESMTP id S245144AbiHIRIK (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 9 Aug 2022 13:08:10 -0400
+Received: from mail-yb1-xb2a.google.com (mail-yb1-xb2a.google.com [IPv6:2607:f8b0:4864:20::b2a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9AC6D20BD1
+        for <kvm@vger.kernel.org>; Tue,  9 Aug 2022 10:08:08 -0700 (PDT)
+Received: by mail-yb1-xb2a.google.com with SMTP id 7so19403545ybw.0
+        for <kvm@vger.kernel.org>; Tue, 09 Aug 2022 10:08:08 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
+        d=atishpatra.org; s=google;
         h=cc:to:subject:message-id:date:from:in-reply-to:references
          :mime-version:from:to:cc;
-        bh=VJbu0Vi6JsT3Ge0NwSkLjoyGgFVaYGY0641GU+LZJhY=;
-        b=fvzM2GUUaZrmgyVaFSQsiiQM6O8bpQ/PHWn3++zGuNq8x5xtQK6QUVR+M6h/6+eyVl
-         BFh1AMDIrR0975z9iHhMgrOs3gvIryx6m0goQhg4HIxelRl4ejAApEZyZIOCZWZPS+3H
-         mDCMikiOSOjQgNN1pfpNxeG0l0TLzGV/AO4HjsTWeUVbhKLVPT+WNkxahiDHH+ad240E
-         BOfsX+l6T+Ryuijm/PB6KafjYGc37tS4PbGk7elfEA+jENKRYefWU2GdCa80YgS5odqA
-         1okFqqk+BPMfXfqESUGDnOikPzimREsT6/x38FcXY3TMg5pHO+ovKb+hXqYKNs7JLLCS
-         tDVw==
+        bh=bepKw/LEtAGRfDcwveDu9uQHog0KI2Ak5eWQ5Bh1L6c=;
+        b=Bu0RWS8B/pKGZqeXil99Hd+xifsOSY94tVAatqvQ956DT2XUBDWf3L62iEJ1nlLRHN
+         +VHNyGHI0svtzTTu7HCgURdaKyzT0hZXkZVuqi1s+wuPcZjt9G+Y7VuW69jux1R8FZD0
+         Wux70e6GEJi+E2bj5AtDlHhxNdQG2ZpisvYdM=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=cc:to:subject:message-id:date:from:in-reply-to:references
          :mime-version:x-gm-message-state:from:to:cc;
-        bh=VJbu0Vi6JsT3Ge0NwSkLjoyGgFVaYGY0641GU+LZJhY=;
-        b=QZafIHv9z1MSN6JuqVvBjHj3N67xRmA6UhUSmFPRspi+gsGjg456VwnnZaEZ+9DK/T
-         rMzpWAyKtxsoTjouQ4QxFvnzyOXplOBzYv21mOxOKtmBb/0Mkv5rCld+2aDtoDkgARfU
-         TheEESwegeHVh5klT856271OdxaQRyqIG3YSJLDQm7m9Ab/i08ZsbUvHBqqInIXHvplI
-         +aE1yBBae23xCLjR0nd+Ed8po/Ho1Ahc2zcN4LJ4uYUf1WqYWQNJ0Us31YiFG/bWxuAm
-         GrpN903SBZOIk+t2m85Fo74RIV0zQwo3LyAvjbtUcWN/QUo3dPOLE4Bf11f89f+kgV8B
-         Wt0g==
-X-Gm-Message-State: ACgBeo06envojjQi51PuTG8DTw+81GV3btgI2PeiNofgON0AceSxzC2+
-        jiXz5DMOpKI3bopXtTPK+SNRDTjJwVINRhJVkA6OIQ==
-X-Google-Smtp-Source: AA6agR6C6pGEJaHlcmIccbzG3l/LXUY9JxyRHbDjX/tgVsupnrZl7Tfk4Mg07ARiaMT3fu1Krv5Y6YtR9iIcV6+0gNU=
-X-Received: by 2002:adf:e28d:0:b0:21e:4c3b:b446 with SMTP id
- v13-20020adfe28d000000b0021e4c3bb446mr14597055wri.300.1660064863280; Tue, 09
- Aug 2022 10:07:43 -0700 (PDT)
+        bh=bepKw/LEtAGRfDcwveDu9uQHog0KI2Ak5eWQ5Bh1L6c=;
+        b=5lD2HhXjFkyHoir2NQ/maY7tbglUAAt3Mt+ENC8VzWRL3RYc/cXm+CsXKpeqBFu34r
+         ieE2i3WQ1hunESp45rjZAqjsLaJF77iEbPatkGzpbJ77YXubmjug4w4MtNM2HnjjbYtQ
+         quoWKm1jaUMmpc8CTM2yFvOsk6OJVDoQKo8ZG2Q5hn8cYM1wJgJeHgkzZOrysY7Ke3F9
+         ORY9FJiaDyw/q250vUhaL6V5RFI/0wuf2reUuGQF1r2r9XSQAUMK+PgEgOhP+YYj/oQ+
+         l3+CmeCX97v2TY+6L7NkIY7Wn+zHhHaRBQDCa4v43FzjFaOV3qnGsa/aSBbLnVevmLsc
+         NtWQ==
+X-Gm-Message-State: ACgBeo0Kfgyu+DHqDutySXJ9WMHOlxQzJ9vNIkyJzI/KGgwuvmJBH9uz
+        CMIakg4VI5sbFUB+tzmsogSnMM/aaQIFjob/72+6
+X-Google-Smtp-Source: AA6agR4sATcRkB2d0u/CrgxX/HJwI6/I9eM5hDsVMbdUeC4uqpTwesM5LXawIa2GRbCVrUAjXoWrtTDWp300zVQ0g10=
+X-Received: by 2002:a5b:40a:0:b0:670:ee95:c8f1 with SMTP id
+ m10-20020a5b040a000000b00670ee95c8f1mr21385580ybp.121.1660064887851; Tue, 09
+ Aug 2022 10:08:07 -0700 (PDT)
 MIME-Version: 1.0
-References: <20220711093218.10967-1-adrian.hunter@intel.com>
- <20220711093218.10967-6-adrian.hunter@intel.com> <CAP-5=fUChJLqfJ__joVhtKwgjLTtBtMm8M0vt9eaOfLMmck85g@mail.gmail.com>
- <0e415212-b828-34d3-fd1b-ba518149bf89@intel.com>
-In-Reply-To: <0e415212-b828-34d3-fd1b-ba518149bf89@intel.com>
-From:   Ian Rogers <irogers@google.com>
-Date:   Tue, 9 Aug 2022 10:07:30 -0700
-Message-ID: <CAP-5=fXNWfn_SX6aBHAQ=RPRHwDpnTmV_QpRoHRWX-J06TZ-BA@mail.gmail.com>
-Subject: Re: [PATCH 05/35] perf tools: Factor out evsel__id_hdr_size()
-To:     Adrian Hunter <adrian.hunter@intel.com>
-Cc:     Arnaldo Carvalho de Melo <acme@kernel.org>,
-        Jiri Olsa <jolsa@redhat.com>,
-        Namhyung Kim <namhyung@kernel.org>,
-        Andi Kleen <ak@linux.intel.com>, linux-kernel@vger.kernel.org,
-        kvm@vger.kernel.org
+References: <20220722165047.519994-1-atishp@rivosinc.com> <20220722165047.519994-4-atishp@rivosinc.com>
+In-Reply-To: <20220722165047.519994-4-atishp@rivosinc.com>
+From:   Atish Patra <atishp@atishpatra.org>
+Date:   Tue, 9 Aug 2022 10:07:56 -0700
+Message-ID: <CAOnJCUJ246giiHpSFSe_B1wjwxrYGpKJF-VeGLL_QBmBO7Zfvw@mail.gmail.com>
+Subject: Re: [PATCH v7 3/4] RISC-V: Prefer sstc extension if available
+To:     Daniel Lezcano <daniel.lezcano@linaro.org>,
+        Palmer Dabbelt <palmer@dabbelt.com>
+Cc:     linux-kernel@vger.kernel.org, Atish Patra <atishp@rivosinc.com>,
+        Anup Patel <anup@brainfault.org>,
+        Albert Ou <aou@eecs.berkeley.edu>, Guo Ren <guoren@kernel.org>,
+        Heiko Stuebner <heiko@sntech.de>,
+        kvm-riscv@lists.infradead.org, kvm@vger.kernel.org,
+        linux-riscv@lists.infradead.org,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Paul Walmsley <paul.walmsley@sifive.com>,
+        Rob Herring <robh@kernel.org>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Tsukasa OI <research_trasio@irq.a4lg.com>,
+        Wei Fu <wefu@redhat.com>
 Content-Type: text/plain; charset="UTF-8"
-X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-        T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL
-        autolearn=ham autolearn_force=no version=3.4.6
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=unavailable
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Aug 9, 2022 at 4:50 AM Adrian Hunter <adrian.hunter@intel.com> wrote:
+On Fri, Jul 22, 2022 at 9:50 AM Atish Patra <atishp@rivosinc.com> wrote:
 >
-> On 19/07/22 20:09, Ian Rogers wrote:
-> > On Mon, Jul 11, 2022 at 2:32 AM Adrian Hunter <adrian.hunter@intel.com> wrote:
-> >>
-> >> Factor out evsel__id_hdr_size() so it can be reused.
-> >>
-> >> This is needed by perf inject. When injecting events from a guest perf.data
-> >> file, there is a possibility that the sample ID numbers conflict. To
-> >> re-write an ID sample, the old one needs to be removed first, which means
-> >> determining how big it is with evsel__id_hdr_size() and then subtracting
-> >> that from the event size.
-> >>
-> >> Signed-off-by: Adrian Hunter <adrian.hunter@intel.com>
-> >> ---
-> >>  tools/perf/util/evlist.c | 28 +---------------------------
-> >>  tools/perf/util/evsel.c  | 26 ++++++++++++++++++++++++++
-> >>  tools/perf/util/evsel.h  |  2 ++
-> >>  3 files changed, 29 insertions(+), 27 deletions(-)
-> >>
-> >> diff --git a/tools/perf/util/evlist.c b/tools/perf/util/evlist.c
-> >> index 48af7d379d82..03fbe151b0c4 100644
-> >> --- a/tools/perf/util/evlist.c
-> >> +++ b/tools/perf/util/evlist.c
-> >> @@ -1244,34 +1244,8 @@ bool evlist__valid_read_format(struct evlist *evlist)
-> >>  u16 evlist__id_hdr_size(struct evlist *evlist)
-> >>  {
-> >>         struct evsel *first = evlist__first(evlist);
-> >> -       struct perf_sample *data;
-> >> -       u64 sample_type;
-> >> -       u16 size = 0;
-> >>
-> >> -       if (!first->core.attr.sample_id_all)
-> >> -               goto out;
-> >> -
-> >> -       sample_type = first->core.attr.sample_type;
-> >> -
-> >> -       if (sample_type & PERF_SAMPLE_TID)
-> >> -               size += sizeof(data->tid) * 2;
-> >> -
-> >> -       if (sample_type & PERF_SAMPLE_TIME)
-> >> -               size += sizeof(data->time);
-> >> -
-> >> -       if (sample_type & PERF_SAMPLE_ID)
-> >> -               size += sizeof(data->id);
-> >> -
-> >> -       if (sample_type & PERF_SAMPLE_STREAM_ID)
-> >> -               size += sizeof(data->stream_id);
-> >> -
-> >> -       if (sample_type & PERF_SAMPLE_CPU)
-> >> -               size += sizeof(data->cpu) * 2;
-> >> -
-> >> -       if (sample_type & PERF_SAMPLE_IDENTIFIER)
-> >> -               size += sizeof(data->id);
-> >> -out:
-> >> -       return size;
-> >> +       return first->core.attr.sample_id_all ? evsel__id_hdr_size(first) : 0;
-> >>  }
-> >>
-> >>  bool evlist__valid_sample_id_all(struct evlist *evlist)
-> >> diff --git a/tools/perf/util/evsel.c b/tools/perf/util/evsel.c
-> >> index a67cc3f2fa74..9a30ccb7b104 100644
-> >> --- a/tools/perf/util/evsel.c
-> >> +++ b/tools/perf/util/evsel.c
-> >> @@ -2724,6 +2724,32 @@ int evsel__parse_sample_timestamp(struct evsel *evsel, union perf_event *event,
-> >>         return 0;
-> >>  }
-> >>
-> >> +u16 evsel__id_hdr_size(struct evsel *evsel)
-> >> +{
-> >> +       u64 sample_type = evsel->core.attr.sample_type;
-> >
-> > As this just uses core, would it be more appropriate to put it in libperf?
+> RISC-V ISA has sstc extension which allows updating the next clock event
+> via a CSR (stimecmp) instead of an SBI call. This should happen dynamically
+> if sstc extension is available. Otherwise, it will fallback to SBI call
+> to maintain backward compatibility.
 >
-> AFAIK we move to libperf only as needed.
-
-I don't think there is an expectation yet that libperf is stable - I
-hope not as I need to nuke the CPU map empty function. So, the cost of
-putting something there rather than perf is minimal, and perf can be
-just a consumer of libperf as any other tool - which builds confidence
-the API in libperf is complete. Jiri has posted patches in the past
-migrating parse-events, there's no "need" for that but the point is to
-improve the library API. I think this is the same case and minimal
-cost given only core is being used. Given we're actively migrating
-util APIs to libperf I think it is better to introduce simple APIs
-like this in libperf rather than creating something that someone will
-later have to migrate.
-
-> >
-> >> +       u16 size = 0;
-> >
-> > Perhaps size_t or int? u16 seems odd.
+> Reviewed-by: Anup Patel <anup@brainfault.org>
+> Signed-off-by: Atish Patra <atishp@rivosinc.com>
+> ---
+>  drivers/clocksource/timer-riscv.c | 25 ++++++++++++++++++++++++-
+>  1 file changed, 24 insertions(+), 1 deletion(-)
 >
-> Event header size member is 16-bit
-
-sizeof is generally considered size_t so the code as-is has implicit
-truncation - again I'll stand by it looking odd.
-
-Thanks,
-Ian
-
-> >
-> >> +
-> >> +       if (sample_type & PERF_SAMPLE_TID)
-> >> +               size += sizeof(u64);
-> >> +
-> >> +       if (sample_type & PERF_SAMPLE_TIME)
-> >> +               size += sizeof(u64);
-> >> +
-> >> +       if (sample_type & PERF_SAMPLE_ID)
-> >> +               size += sizeof(u64);
-> >> +
-> >> +       if (sample_type & PERF_SAMPLE_STREAM_ID)
-> >> +               size += sizeof(u64);
-> >> +
-> >> +       if (sample_type & PERF_SAMPLE_CPU)
-> >> +               size += sizeof(u64);
-> >> +
-> >> +       if (sample_type & PERF_SAMPLE_IDENTIFIER)
-> >> +               size += sizeof(u64);
-> >> +
-> >> +       return size;
-> >> +}
-> >> +
-> >>  struct tep_format_field *evsel__field(struct evsel *evsel, const char *name)
-> >>  {
-> >>         return tep_find_field(evsel->tp_format, name);
-> >> diff --git a/tools/perf/util/evsel.h b/tools/perf/util/evsel.h
-> >> index 92bed8e2f7d8..699448f2bc2b 100644
-> >> --- a/tools/perf/util/evsel.h
-> >> +++ b/tools/perf/util/evsel.h
-> >> @@ -381,6 +381,8 @@ int evsel__parse_sample(struct evsel *evsel, union perf_event *event,
-> >>  int evsel__parse_sample_timestamp(struct evsel *evsel, union perf_event *event,
-> >>                                   u64 *timestamp);
-> >>
-> >> +u16 evsel__id_hdr_size(struct evsel *evsel);
-> >> +
-> >
-> > A comment would be nice, I know this is just moving code about but
-> > this is a new function.
-> >
-> > Thanks,
-> > Ian
-> >
-> >>  static inline struct evsel *evsel__next(struct evsel *evsel)
-> >>  {
-> >>         return list_entry(evsel->core.node.next, struct evsel, core.node);
-> >> --
-> >> 2.25.1
-> >>
+> diff --git a/drivers/clocksource/timer-riscv.c b/drivers/clocksource/timer-riscv.c
+> index 593d5a957b69..05f6cf067289 100644
+> --- a/drivers/clocksource/timer-riscv.c
+> +++ b/drivers/clocksource/timer-riscv.c
+> @@ -7,6 +7,9 @@
+>   * either be read from the "time" and "timeh" CSRs, and can use the SBI to
+>   * setup events, or directly accessed using MMIO registers.
+>   */
+> +
+> +#define pr_fmt(fmt) "riscv-timer: " fmt
+> +
+>  #include <linux/clocksource.h>
+>  #include <linux/clockchips.h>
+>  #include <linux/cpu.h>
+> @@ -20,14 +23,28 @@
+>  #include <linux/of_irq.h>
+>  #include <clocksource/timer-riscv.h>
+>  #include <asm/smp.h>
+> +#include <asm/hwcap.h>
+>  #include <asm/sbi.h>
+>  #include <asm/timex.h>
 >
+> +static DEFINE_STATIC_KEY_FALSE(riscv_sstc_available);
+> +
+>  static int riscv_clock_next_event(unsigned long delta,
+>                 struct clock_event_device *ce)
+>  {
+> +       u64 next_tval = get_cycles64() + delta;
+> +
+>         csr_set(CSR_IE, IE_TIE);
+> -       sbi_set_timer(get_cycles64() + delta);
+> +       if (static_branch_likely(&riscv_sstc_available)) {
+> +#if defined(CONFIG_32BIT)
+> +               csr_write(CSR_STIMECMP, next_tval & 0xFFFFFFFF);
+> +               csr_write(CSR_STIMECMPH, next_tval >> 32);
+> +#else
+> +               csr_write(CSR_STIMECMP, next_tval);
+> +#endif
+> +       } else
+> +               sbi_set_timer(next_tval);
+> +
+>         return 0;
+>  }
+>
+> @@ -165,6 +182,12 @@ static int __init riscv_timer_init_dt(struct device_node *n)
+>         if (error)
+>                 pr_err("cpu hp setup state failed for RISCV timer [%d]\n",
+>                        error);
+> +
+> +       if (riscv_isa_extension_available(NULL, SSTC)) {
+> +               pr_info("Timer interrupt in S-mode is available via sstc extension\n");
+> +               static_branch_enable(&riscv_sstc_available);
+> +       }
+> +
+>         return error;
+>  }
+>
+> --
+> 2.25.1
+>
+
+Hi Daniel,
+Can you please review/ack this patch whenever you get a chance ?
+
+
+-- 
+Regards,
+Atish
