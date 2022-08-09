@@ -2,68 +2,136 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 35D8358D4F8
-	for <lists+kvm@lfdr.de>; Tue,  9 Aug 2022 09:55:22 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 16D4258D3FB
+	for <lists+kvm@lfdr.de>; Tue,  9 Aug 2022 08:44:46 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S239068AbiHIHzT (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 9 Aug 2022 03:55:19 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41534 "EHLO
+        id S231733AbiHIGoo (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 9 Aug 2022 02:44:44 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51870 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S239358AbiHIHzG (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 9 Aug 2022 03:55:06 -0400
-Received: from mail.skyhub.de (mail.skyhub.de [5.9.137.197])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E5C9A21815;
-        Tue,  9 Aug 2022 00:55:03 -0700 (PDT)
-Received: from zn.tnic (p200300ea971b98cb329c23fffea6a903.dip0.t-ipconnect.de [IPv6:2003:ea:971b:98cb:329c:23ff:fea6:a903])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        with ESMTP id S233045AbiHIGom (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 9 Aug 2022 02:44:42 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id F2712201AC
+        for <kvm@vger.kernel.org>; Mon,  8 Aug 2022 23:44:41 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1660027481;
+        h=from:from:reply-to:reply-to:subject:subject:date:date:
+         message-id:message-id:to:to:cc:cc:mime-version:mime-version:
+         content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=CR6YkkBfyaob1O/ChtSSoS1BxAeM9gKVCgsFRDj4SAA=;
+        b=ACde3nLx2k27oj9loz+C4lOqef1pYOFIsZVAdqVNa2oZKO5f9vSQHfE7/kjnWrrrl/gJZn
+        PLovaIifQo46V42j+mV1EZF9uKQH1vxeNZlcgMeuUWDVWFwVuAQOxS3bZxQstmRKr6jjAu
+        flCw7Ro2HFJ7RMgLNqIC+H0r50Geqqc=
+Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
+ [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-267-cbov0cI9NWG7_T_0ybwJ4w-1; Tue, 09 Aug 2022 02:44:37 -0400
+X-MC-Unique: cbov0cI9NWG7_T_0ybwJ4w-1
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.rdu2.redhat.com [10.11.54.3])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mail.skyhub.de (SuperMail on ZX Spectrum 128k) with ESMTPSA id 868661EC04CB;
-        Tue,  9 Aug 2022 09:54:58 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alien8.de; s=dkim;
-        t=1660031698;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:in-reply-to:in-reply-to:  references:references;
-        bh=sau2Ier9daCmht+ULzaCXrUckUs+d4ukVHmyxV5uCUA=;
-        b=Vfc/voL25bbBm8PKYA8PJjcrqSPukr4A2TAXTsGgqGooEWH8M10RHHgBZUU/D8JyUSUOst
-        SLG07F4qe1dZ90L9CZBYdJbPUDA3h+ovpXq4kTa7ECE6rTT0vLNReRuZ5Fq5WZDQINYTiX
-        yEpAZYG/rf9BOshZy7B5+Eq7APgZR7g=
-Date:   Tue, 9 Aug 2022 09:54:58 +0200
-From:   Borislav Petkov <bp@alien8.de>
-To:     Liam Ni <zhiguangni01@gmail.com>
-Cc:     seanjc@google.com, pbonzini@redhat.com, tglx@linutronix.de,
-        mingo@redhat.com, dave.hansen@linux.intel.com, hpa@zytor.com,
-        x86@kernel.org, kvm@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH] KVM:make cpuid_entry2_find more efficient
-Message-ID: <YvIS0nvStyUYR7ep@zn.tnic>
-References: <20220809055138.101470-1-zhiguangni01@gmail.com>
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 22A4880391B;
+        Tue,  9 Aug 2022 06:44:37 +0000 (UTC)
+Received: from [10.64.54.189] (vpn2-54-189.bne.redhat.com [10.64.54.189])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id 2BAEA1121315;
+        Tue,  9 Aug 2022 06:44:32 +0000 (UTC)
+Reply-To: Gavin Shan <gshan@redhat.com>
+Subject: Re: [PATCH 1/2] KVM: selftests: Make rseq compatible with glibc-2.35
+To:     Florian Weimer <fweimer@redhat.com>
+Cc:     kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org,
+        linux-kselftest@vger.kernel.org, linux-kernel@vger.kernel.org,
+        pbonzini@redhat.com, maz@kernel.org, oliver.upton@linux.dev,
+        andrew.jones@linux.dev, seanjc@google.com,
+        mathieu.desnoyers@efficios.com, yihyu@redhat.com,
+        shan.gavin@gmail.com
+References: <20220809060627.115847-1-gshan@redhat.com>
+ <20220809060627.115847-2-gshan@redhat.com>
+ <8735e6ncxw.fsf@oldenburg.str.redhat.com>
+From:   Gavin Shan <gshan@redhat.com>
+Message-ID: <7844e3fa-e49e-de75-e424-e82d3a023dd6@redhat.com>
+Date:   Tue, 9 Aug 2022 18:45:26 +1000
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.2.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20220809055138.101470-1-zhiguangni01@gmail.com>
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,SPF_HELO_NONE,SPF_PASS,
-        T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
+In-Reply-To: <8735e6ncxw.fsf@oldenburg.str.redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.78 on 10.11.54.3
+X-Spam-Status: No, score=-3.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
+        RCVD_IN_DNSWL_LOW,SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Aug 09, 2022 at 01:51:38PM +0800, Liam Ni wrote:
-> Compared with the way of obtaining the pointer by
-> fetching the value of the array and then fetching the pointer,
-> the way of obtaining the pointer by the pointer offset is more efficient.
+Hi Florian,
 
-How did you determine that?
+On 8/9/22 4:33 PM, Florian Weimer wrote:
+>> diff --git a/tools/testing/selftests/kvm/rseq_test.c b/tools/testing/selftests/kvm/rseq_test.c
+>> index a54d4d05a058..acb1bf1f06b3 100644
+>> --- a/tools/testing/selftests/kvm/rseq_test.c
+>> +++ b/tools/testing/selftests/kvm/rseq_test.c
+>> @@ -9,6 +9,7 @@
+>>   #include <string.h>
+>>   #include <signal.h>
+>>   #include <syscall.h>
+>> +#include <dlfcn.h>
+>>   #include <sys/ioctl.h>
+>>   #include <sys/sysinfo.h>
+>>   #include <asm/barrier.h>
+> 
+> I'm surprised that there isn't a Makefile update to link with -ldl
+> (still required for glibc 2.33 and earlier).
+> 
 
-Hint: look at the generated assembler before and after your change and
-see if there are any differences.
+In next revision, I will add '-ldl' into tools/testing/selftests/kvm/Makefile.
 
-:-)
 
--- 
-Regards/Gruss,
-    Boris.
+>> @@ -36,6 +37,8 @@ static __thread volatile struct rseq __rseq = {
+>>    */
+>>   #define NR_TASK_MIGRATIONS 100000
+>>   
+>> +static bool __rseq_ownership;
+>> +static volatile struct rseq *__rseq_info;
+>>   static pthread_t migration_thread;
+>>   static cpu_set_t possible_mask;
+>>   static int min_cpu, max_cpu;
+>> @@ -49,11 +52,33 @@ static void guest_code(void)
+>>   		GUEST_SYNC(0);
+>>   }
+>>   
+>> +static void sys_rseq_ownership(void)
+>> +{
+>> +	long *offset;
+>> +	unsigned int *size, *flags;
+>> +
+>> +	offset = dlsym(RTLD_NEXT, "__rseq_offset");
+>> +	size = dlsym(RTLD_NEXT, "__rseq_size");
+>> +	flags = dlsym(RTLD_NEXT, "__rseq_flags");
+>> +
+>> +	if (offset && size && *size && flags) {
+>> +		__rseq_ownership = false;
+>> +		__rseq_info = (struct rseq *)((uintptr_t)__builtin_thread_pointer() +
+>> +					      *offset);
+> 
+> __builtin_thread_pointer doesn't work on all architectures/GCC versions.
+> Is this a problem for selftests?
+> 
 
-https://people.kernel.org/tglx/notes-about-netiquette
+It's a problem as the test case is running on all architectures. I think I
+need introduce our own __builtin_thread_pointer() for where it's not
+supported: (1) PowerPC  (2) x86 without GCC 11
+
+Please let me know if I still have missed cases where __buitin_thread_pointer()
+isn't supported?
+
+Thanks,
+Gavin
+
