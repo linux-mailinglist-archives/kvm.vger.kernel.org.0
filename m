@@ -2,86 +2,82 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id BF5B358D47E
-	for <lists+kvm@lfdr.de>; Tue,  9 Aug 2022 09:24:39 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 42E3458D4AF
+	for <lists+kvm@lfdr.de>; Tue,  9 Aug 2022 09:35:59 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236913AbiHIHYi (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 9 Aug 2022 03:24:38 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50332 "EHLO
+        id S237168AbiHIHf5 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 9 Aug 2022 03:35:57 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57622 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S236139AbiHIHYf (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 9 Aug 2022 03:24:35 -0400
-Received: from mail-lf1-x136.google.com (mail-lf1-x136.google.com [IPv6:2a00:1450:4864:20::136])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B26AF20F61
-        for <kvm@vger.kernel.org>; Tue,  9 Aug 2022 00:24:32 -0700 (PDT)
-Received: by mail-lf1-x136.google.com with SMTP id d14so15783920lfl.13
-        for <kvm@vger.kernel.org>; Tue, 09 Aug 2022 00:24:32 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=semihalf.com; s=google;
-        h=content-transfer-encoding:content-language:in-reply-to:mime-version
-         :user-agent:date:message-id:from:references:cc:to:subject:from:to:cc;
-        bh=tTxM+7+FZK4rcvhtVun0/PJ+nOo+VMVRQjQ1dHG97U0=;
-        b=gDVJfXB4D8sJ6RBnuq1AvXEE5d4tPDGrPdFA+CXJ/lj8Z77S5L25rxif8dSggGlzjs
-         RrYsTkpPnhviTvP6yPRt55PcQClVI9czE5h4RVxiYVgfHeQOvJF998+JDrMNZL3Wdhpi
-         5OGPXURct7ZKChNJhzk94a5MLOffXQ+XeCSSSbHue0+9UDOmZla1ZpgSt7r1m97+wx1k
-         dmTDt/7j+/P3FAuGlKtJRHGAiuGT3Dq2wKRHnF9KDb0Tz3v8GJqAM4pGzn6X5FeIDkGC
-         Ky+ODlwF7cYAPcv/eVSlY2eRQjq5HlAf8Mt1jUMvtZu02vjq0xZ9mjqYjShKAIXEEe41
-         OHvA==
+        with ESMTP id S239422AbiHIHf1 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 9 Aug 2022 03:35:27 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id EA39921257
+        for <kvm@vger.kernel.org>; Tue,  9 Aug 2022 00:34:57 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1660030495;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=1crRyPcZxQ0tLK84/4TAp/fqO/wLTwAcffndcqaI7Nk=;
+        b=CzBikPcDh2vOyWgDJiPdVlIxkp6XIApw4nR7uZSYmzcyqCWaN8UWjI5mj23bZpmGfuO8Ae
+        l3WLV5x5hQb8RfhHJs9vt9s1SolLRpn4907Fs7VGIYmiTsZnKMOHZWXdz+bpfDXjYXbX/I
+        NCZ/YFsDebH4xP4uyeTMcFpQDrY/4qI=
+Received: from mail-lf1-f69.google.com (mail-lf1-f69.google.com
+ [209.85.167.69]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-184-lopMW1poND6_ZKLZTu6OjA-1; Tue, 09 Aug 2022 03:34:12 -0400
+X-MC-Unique: lopMW1poND6_ZKLZTu6OjA-1
+Received: by mail-lf1-f69.google.com with SMTP id e19-20020a05651236d300b0048d16bfadecso91790lfs.21
+        for <kvm@vger.kernel.org>; Tue, 09 Aug 2022 00:34:12 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=content-transfer-encoding:content-language:in-reply-to:mime-version
-         :user-agent:date:message-id:from:references:cc:to:subject
-         :x-gm-message-state:from:to:cc;
-        bh=tTxM+7+FZK4rcvhtVun0/PJ+nOo+VMVRQjQ1dHG97U0=;
-        b=JKRvWru5xQo7ABnZJTxIhha8yWLP/GbjD/AAoj/+XQxkAQEvG3+o4htCpTf08hOGXQ
-         N/GxbnDwQtps18WqjKr6wMYa8sPOFPUv1Lujj3/jTvzuEbAt15EUFrDr+iOwV/VACcvj
-         UqEbwPxLADrOYHF5MngH0rc5o4+c/7QTwKyyOe0vo36JjkTX9VQMsIPQXHRL1jvRS+JX
-         SPCy+fWAW9xSUKIiP1866vfSs3wmI/RVyXH5KJuOyKKARAAXIJR3GTpIGQdXK9xhOR8+
-         62R5cupVJTU0HM+jmZ1GpL8ji509EnP2UGVDF9yf16FBBK86enpVi4Xv1EAvH2eu5tHX
-         sChA==
-X-Gm-Message-State: ACgBeo1yAqaS5b2rVuSjT0LJDw9ueAyszW2SQeTpkOaNz2S2J3P/Mngw
-        RFY65vQgpU7ezguV843TzorjzAe08m43gpI2
-X-Google-Smtp-Source: AA6agR6qAPyNpgqimh0JJNh6Fu2PX+u4s6pGBtxqx02kqH+0tyIkfb1j2BeEEp7jIRNOT1OCqZKzAA==
-X-Received: by 2002:a05:6512:3b28:b0:48b:2071:e423 with SMTP id f40-20020a0565123b2800b0048b2071e423mr8231558lfv.434.1660029871039;
-        Tue, 09 Aug 2022 00:24:31 -0700 (PDT)
-Received: from ?IPv6:2a02:a31b:33d:9c00:463a:87e3:44fc:2b2f? ([2a02:a31b:33d:9c00:463a:87e3:44fc:2b2f])
-        by smtp.gmail.com with ESMTPSA id v5-20020a197405000000b0048a8b6914d2sm1656517lfe.155.2022.08.09.00.24.29
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 09 Aug 2022 00:24:30 -0700 (PDT)
-Subject: Re: [PATCH v2 0/5] KVM: Fix oneshot interrupts forwarding
-To:     "Dong, Eddie" <eddie.dong@intel.com>,
-        "Christopherson,, Sean" <seanjc@google.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>
-Cc:     Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        Dave Hansen <dave.hansen@linux.intel.com>,
-        "x86@kernel.org" <x86@kernel.org>,
-        "H. Peter Anvin" <hpa@zytor.com>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        Eric Auger <eric.auger@redhat.com>,
-        Alex Williamson <alex.williamson@redhat.com>,
-        "Liu, Rong L" <rong.l.liu@intel.com>,
-        Zhenyu Wang <zhenyuw@linux.intel.com>,
-        Tomasz Nowicki <tn@semihalf.com>,
-        Grzegorz Jaszczyk <jaz@semihalf.com>,
-        "upstream@semihalf.com" <upstream@semihalf.com>,
-        Dmitry Torokhov <dtor@google.com>
-References: <20220805193919.1470653-1-dmy@semihalf.com>
- <BL0PR11MB30429034B6D59253AF22BCE08A639@BL0PR11MB3042.namprd11.prod.outlook.com>
-From:   Dmytro Maluka <dmy@semihalf.com>
-Message-ID: <c5d8f537-5695-42f0-88a9-de80e21f5f4c@semihalf.com>
-Date:   Tue, 9 Aug 2022 09:24:28 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.13.0
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc:content-transfer-encoding;
+        bh=1crRyPcZxQ0tLK84/4TAp/fqO/wLTwAcffndcqaI7Nk=;
+        b=Ge52TGkA6uLNYJkrlvBxPw60s6hVSCm52avtqIwoXSAb8FP2+S2auGdlWk3hfHOFe4
+         FXTe8BDM9hLOJRAbBCGMtRXvaph54wIj2Zy7b5NMagoUu2BS9hTcsf4aH70r3PN4KB0g
+         CJb/2j0wa9NRa6VB529xDWydo+3yJBv91vwOULefVU8E0i2oyQvpw162BmI01ZM+oEFZ
+         2/hXlYRGdexHybBar5HNlcXR47SZOOyk3lpcCKV1agcpdc79dnWTmhu0qpTRpVwvfAMa
+         +ExyHr+3f+VH84kEQp69p4NVAJPDAJgmBVeub/+9KCtBgZIrmgwH+lxOsAuPQGw46ZLR
+         xtRA==
+X-Gm-Message-State: ACgBeo0US9FDq+AU4ZJT/X4iy0gqklhpdBe+BpdZ8DIRpLcOJrGEVfSI
+        t6nCMzKiNvW8YQZDwwEL8dj1SdeAnIikBUjBGszWthSfkHX5TyOdj4T1/NOlxSGVRkDJikpvmiW
+        WZ+bjq0t8w0+l5zHd1lCCrfCLf0jS
+X-Received: by 2002:a2e:b983:0:b0:25f:d718:40e8 with SMTP id p3-20020a2eb983000000b0025fd71840e8mr3479147ljp.323.1660030451188;
+        Tue, 09 Aug 2022 00:34:11 -0700 (PDT)
+X-Google-Smtp-Source: AA6agR7s0xpRwoliYYcvGl5opAb0QoMIanRpc991kxHphau8Nj1O6sz3Ib3zN9lIqUpt86IfWevT+GkUwwyXA0lsMGY=
+X-Received: by 2002:a2e:b983:0:b0:25f:d718:40e8 with SMTP id
+ p3-20020a2eb983000000b0025fd71840e8mr3479136ljp.323.1660030450900; Tue, 09
+ Aug 2022 00:34:10 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <BL0PR11MB30429034B6D59253AF22BCE08A639@BL0PR11MB3042.namprd11.prod.outlook.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_DNSWL_NONE,
-        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
+References: <20220805163909.872646-1-eperezma@redhat.com> <20220805163909.872646-7-eperezma@redhat.com>
+In-Reply-To: <20220805163909.872646-7-eperezma@redhat.com>
+From:   Jason Wang <jasowang@redhat.com>
+Date:   Tue, 9 Aug 2022 15:33:59 +0800
+Message-ID: <CACGkMEtOr7JOsOTHiwcrk8FoRWhwHTzBWX30iaKCuHz26UOzNQ@mail.gmail.com>
+Subject: Re: [PATCH v4 6/6] vdpa: Always start CVQ in SVQ mode
+To:     =?UTF-8?Q?Eugenio_P=C3=A9rez?= <eperezma@redhat.com>
+Cc:     qemu-devel <qemu-devel@nongnu.org>,
+        Stefan Hajnoczi <stefanha@redhat.com>,
+        Eli Cohen <eli@mellanox.com>,
+        Zhu Lingshan <lingshan.zhu@intel.com>,
+        "Michael S. Tsirkin" <mst@redhat.com>,
+        Gautam Dawar <gdawar@xilinx.com>,
+        Stefano Garzarella <sgarzare@redhat.com>,
+        Parav Pandit <parav@mellanox.com>, Cindy Lu <lulu@redhat.com>,
+        "Gonglei (Arei)" <arei.gonglei@huawei.com>,
+        Cornelia Huck <cohuck@redhat.com>, kvm <kvm@vger.kernel.org>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Liuxiangdong <liuxiangdong5@huawei.com>,
+        Laurent Vivier <lvivier@redhat.com>,
+        Harpreet Singh Anand <hanand@xilinx.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Spam-Status: No, score=-2.7 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -89,101 +85,288 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 8/9/22 1:26 AM, Dong, Eddie wrote:
->>
->> The existing KVM mechanism for forwarding of level-triggered interrupts using
->> resample eventfd doesn't work quite correctly in the case of interrupts that are
->> handled in a Linux guest as oneshot interrupts (IRQF_ONESHOT). Such an
->> interrupt is acked to the device in its threaded irq handler, i.e. later than it is
->> acked to the interrupt controller (EOI at the end of hardirq), not earlier. The
->> existing KVM code doesn't take that into account, which results in erroneous
->> extra interrupts in the guest caused by premature re-assert of an
->> unacknowledged IRQ by the host.
-> 
-> Interesting...  How it behaviors in native side? 
+On Sat, Aug 6, 2022 at 12:39 AM Eugenio P=C3=A9rez <eperezma@redhat.com> wr=
+ote:
+>
+> Isolate control virtqueue in its own group, allowing to intercept control
+> commands but letting dataplane run totally passthrough to the guest.
+>
+> Signed-off-by: Eugenio P=C3=A9rez <eperezma@redhat.com>
+> ---
+> v4:
+> * Squash vhost_vdpa_cvq_group_is_independent.
+> * Rebased on last CVQ start series, that allocated CVQ cmd bufs at load
+> * Do not check for cvq index on vhost_vdpa_net_prepare, we only have one
+>   that callback registered in that NetClientInfo.
+>
+> v3:
+> * Make asid related queries print a warning instead of returning an
+>   error and stop the start of qemu.
+> ---
+>  hw/virtio/vhost-vdpa.c |   3 +-
+>  net/vhost-vdpa.c       | 124 +++++++++++++++++++++++++++++++++++++++--
+>  2 files changed, 122 insertions(+), 5 deletions(-)
+>
+> diff --git a/hw/virtio/vhost-vdpa.c b/hw/virtio/vhost-vdpa.c
+> index 3eb67b27b7..69f34f4cc5 100644
+> --- a/hw/virtio/vhost-vdpa.c
+> +++ b/hw/virtio/vhost-vdpa.c
+> @@ -678,7 +678,8 @@ static int vhost_vdpa_set_backend_cap(struct vhost_de=
+v *dev)
+>  {
+>      uint64_t features;
+>      uint64_t f =3D 0x1ULL << VHOST_BACKEND_F_IOTLB_MSG_V2 |
+> -        0x1ULL << VHOST_BACKEND_F_IOTLB_BATCH;
+> +        0x1ULL << VHOST_BACKEND_F_IOTLB_BATCH |
+> +        0x1ULL << VHOST_BACKEND_F_IOTLB_ASID;
+>      int r;
+>
+>      if (vhost_vdpa_call(dev, VHOST_GET_BACKEND_FEATURES, &features)) {
+> diff --git a/net/vhost-vdpa.c b/net/vhost-vdpa.c
+> index bf78b1332f..c820a5fd9f 100644
+> --- a/net/vhost-vdpa.c
+> +++ b/net/vhost-vdpa.c
+> @@ -37,6 +37,9 @@ typedef struct VhostVDPAState {
+>      /* Control commands shadow buffers */
+>      void *cvq_cmd_out_buffer, *cvq_cmd_in_buffer;
+>
+> +    /* Number of address spaces supported by the device */
+> +    unsigned address_space_num;
+> +
+>      /* The device always have SVQ enabled */
+>      bool always_svq;
+>      bool started;
+> @@ -100,6 +103,9 @@ static const uint64_t vdpa_svq_device_features =3D
+>      BIT_ULL(VIRTIO_NET_F_RSC_EXT) |
+>      BIT_ULL(VIRTIO_NET_F_STANDBY);
+>
+> +#define VHOST_VDPA_NET_CVQ_PASSTHROUGH 0
 
-In native it behaves correctly, since Linux masks such a oneshot
-interrupt at the beginning of hardirq, so that the EOI at the end of
-hardirq doesn't result in its immediate re-assert, and then unmasks it
-later, after its threaded irq handler completes.
+We need a better name for the macro since it's not easy to see it's an asid=
+.
 
-In handle_fasteoi_irq():
+> +#define VHOST_VDPA_NET_CVQ_ASID 1
+> +
+>  VHostNetState *vhost_vdpa_get_vhost_net(NetClientState *nc)
+>  {
+>      VhostVDPAState *s =3D DO_UPCAST(VhostVDPAState, nc, nc);
+> @@ -224,6 +230,37 @@ static NetClientInfo net_vhost_vdpa_info =3D {
+>          .check_peer_type =3D vhost_vdpa_check_peer_type,
+>  };
+>
+> +static void vhost_vdpa_get_vring_group(int device_fd,
+> +                                       struct vhost_vring_state *state)
+> +{
+> +    int r =3D ioctl(device_fd, VHOST_VDPA_GET_VRING_GROUP, state);
 
-	if (desc->istate & IRQS_ONESHOT)
-		mask_irq(desc);
+Let's hide vhost_vring_state from the caller and simply accept a vq
+index parameter (as the below function did) then we can return the
+group id.
 
-	handle_irq_event(desc);
+The hides low level ABI and simplify the caller's code.
 
-	cond_unmask_eoi_irq(desc, chip);
+> +    if (unlikely(r < 0)) {
+> +        /*
+> +         * Assume all groups are 0, the consequences are the same and we=
+ will
+> +         * not abort device creation
+> +         */
+> +        state->num =3D 0;
+> +    }
+> +}
+> +
+> +static int vhost_vdpa_set_address_space_id(struct vhost_vdpa *v,
+> +                                           unsigned vq_group,
+> +                                           unsigned asid_num)
+> +{
+> +    struct vhost_vring_state asid =3D {
+> +        .index =3D vq_group,
+> +        .num =3D asid_num,
+> +    };
+> +    int ret;
+> +
+> +    ret =3D ioctl(v->device_fd, VHOST_VDPA_SET_GROUP_ASID, &asid);
+> +    if (unlikely(ret < 0)) {
+> +        warn_report("Can't set vq group %u asid %u, errno=3D%d (%s)",
+> +            asid.index, asid.num, errno, g_strerror(errno));
+> +    }
+> +    return ret;
+> +}
+> +
+>  static void vhost_vdpa_cvq_unmap_buf(struct vhost_vdpa *v, void *addr)
+>  {
+>      VhostIOVATree *tree =3D v->iova_tree;
+> @@ -298,11 +335,55 @@ dma_map_err:
+>  static int vhost_vdpa_net_cvq_prepare(NetClientState *nc)
+>  {
+>      VhostVDPAState *s;
+> +    struct vhost_vdpa *v;
+> +    struct vhost_vring_state cvq_group =3D {};
+>      int r;
+>
+>      assert(nc->info->type =3D=3D NET_CLIENT_DRIVER_VHOST_VDPA);
+>
+>      s =3D DO_UPCAST(VhostVDPAState, nc, nc);
+> +    v =3D &s->vhost_vdpa;
+> +    cvq_group.index =3D v->dev->vq_index_end - 1;
+> +
+> +    /* Default values */
 
+Code can explain itself so this comment is probably useless.
 
-and later in unmask_threaded_irq():
+> +    v->shadow_vqs_enabled =3D false;
+> +    s->vhost_vdpa.address_space_id =3D VHOST_VDPA_NET_CVQ_PASSTHROUGH;
+> +
+> +    if (s->always_svq) {
+> +        v->shadow_vqs_enabled =3D true;
 
-	unmask_irq(desc);
+The name of the variable is suboptimal.
 
-I also mentioned that in patch #3 description:
-"Linux keeps such interrupt masked until its threaded handler finishes,
-to prevent the EOI from re-asserting an unacknowledged interrupt.
-However, with KVM + vfio (or whatever is listening on the resamplefd)
-we don't check that the interrupt is still masked in the guest at the
-moment of EOI. Resamplefd is notified regardless, so vfio prematurely
-unmasks the host physical IRQ, thus a new (unwanted) physical interrupt
-is generated in the host and queued for injection to the guest."
+I think we need to differ:
 
-> 
->>
->> This patch series fixes this issue (for now on x86 only) by checking if the
->> interrupt is unmasked when we receive irq ack (EOI) and, in case if it's masked,
->> postponing resamplefd notify until the guest unmasks it.
->>
->> Patches 1 and 2 extend the existing support for irq mask notifiers in KVM,
->> which is a prerequisite needed for KVM irqfd to use mask notifiers to know
->> when an interrupt is masked or unmasked.
->>
->> Patch 3 implements the actual fix: postponing resamplefd notify in irqfd until
->> the irq is unmasked.
->>
->> Patches 4 and 5 just do some optional renaming for consistency, as we are now
->> using irq mask notifiers in irqfd along with irq ack notifiers.
->>
->> Please see individual patches for more details.
->>
->> v2:
->>   - Fixed compilation failure on non-x86: mask_notifier_list moved from
->>     x86 "struct kvm_arch" to generic "struct kvm".
->>   - kvm_fire_mask_notifiers() also moved from x86 to generic code, even
->>     though it is not called on other architectures for now.
->>   - Instead of kvm_irq_is_masked() implemented
->>     kvm_register_and_fire_irq_mask_notifier() to fix potential race
->>     when reading the initial IRQ mask state.
->>   - Renamed for clarity:
->>       - irqfd_resampler_mask() -> irqfd_resampler_mask_notify()
->>       - kvm_irq_has_notifier() -> kvm_irq_has_ack_notifier()
->>       - resampler->notifier -> resampler->ack_notifier
->>   - Reorganized code in irqfd_resampler_ack() and
->>     irqfd_resampler_mask_notify() to make it easier to follow.
->>   - Don't follow unwanted "return type on separate line" style for
->>     irqfd_resampler_mask_notify().
->>
->> Dmytro Maluka (5):
->>   KVM: x86: Move irq mask notifiers from x86 to generic KVM
->>   KVM: x86: Add kvm_register_and_fire_irq_mask_notifier()
->>   KVM: irqfd: Postpone resamplefd notify for oneshot interrupts
->>   KVM: irqfd: Rename resampler->notifier
->>   KVM: Rename kvm_irq_has_notifier()
->>
->>  arch/x86/include/asm/kvm_host.h |  17 +---
->>  arch/x86/kvm/i8259.c            |   6 ++
->>  arch/x86/kvm/ioapic.c           |   8 +-
->>  arch/x86/kvm/ioapic.h           |   1 +
->>  arch/x86/kvm/irq_comm.c         |  74 +++++++++++------
->>  arch/x86/kvm/x86.c              |   1 -
->>  include/linux/kvm_host.h        |  21 ++++-
->>  include/linux/kvm_irqfd.h       |  16 +++-
->>  virt/kvm/eventfd.c              | 136 ++++++++++++++++++++++++++++----
->>  virt/kvm/kvm_main.c             |   1 +
->>  10 files changed, 221 insertions(+), 60 deletions(-)
->>
->> --
->> 2.37.1.559.g78731f0fdb-goog
-> 
+1) shadow all virtqueues
+
+from
+
+2) shadow cvq only
+
+Thanks
+
+> +        goto out;
+> +    }
+> +
+> +    if (s->address_space_num < 2) {
+> +        return 0;
+> +    }
+> +
+> +    /**
+> +     * Check if all the virtqueues of the virtio device are in a differe=
+nt vq
+> +     * than the last vq. VQ group of last group passed in cvq_group.
+> +     */
+> +    vhost_vdpa_get_vring_group(v->device_fd, &cvq_group);
+> +    for (int i =3D 0; i < (v->dev->vq_index_end - 1); ++i) {
+> +        struct vhost_vring_state vq_group =3D {
+> +            .index =3D i,
+> +        };
+> +
+> +        vhost_vdpa_get_vring_group(v->device_fd, &vq_group);
+> +        if (unlikely(vq_group.num =3D=3D cvq_group.num)) {
+> +            warn_report("CVQ %u group is the same as VQ %u one (%u)",
+> +                         cvq_group.index, vq_group.index, cvq_group.num)=
+;
+> +            return 0;
+> +        }
+> +    }
+> +
+> +    r =3D vhost_vdpa_set_address_space_id(v, cvq_group.num,
+> +                                        VHOST_VDPA_NET_CVQ_ASID);
+> +    if (r =3D=3D 0) {
+> +        v->shadow_vqs_enabled =3D true;
+> +        s->vhost_vdpa.address_space_id =3D VHOST_VDPA_NET_CVQ_ASID;
+> +    }
+> +
+> +out:
+>      if (!s->vhost_vdpa.shadow_vqs_enabled) {
+>          return 0;
+>      }
+> @@ -523,12 +604,38 @@ static const VhostShadowVirtqueueOps vhost_vdpa_net=
+_svq_ops =3D {
+>      .avail_handler =3D vhost_vdpa_net_handle_ctrl_avail,
+>  };
+>
+> +static uint32_t vhost_vdpa_get_as_num(int vdpa_device_fd)
+> +{
+> +    uint64_t features;
+> +    unsigned num_as;
+> +    int r;
+> +
+> +    r =3D ioctl(vdpa_device_fd, VHOST_GET_BACKEND_FEATURES, &features);
+> +    if (unlikely(r < 0)) {
+> +        warn_report("Cannot get backend features");
+> +        return 1;
+> +    }
+> +
+> +    if (!(features & BIT_ULL(VHOST_BACKEND_F_IOTLB_ASID))) {
+> +        return 1;
+> +    }
+> +
+> +    r =3D ioctl(vdpa_device_fd, VHOST_VDPA_GET_AS_NUM, &num_as);
+> +    if (unlikely(r < 0)) {
+> +        warn_report("Cannot retrieve number of supported ASs");
+> +        return 1;
+> +    }
+> +
+> +    return num_as;
+> +}
+> +
+>  static NetClientState *net_vhost_vdpa_init(NetClientState *peer,
+>                                             const char *device,
+>                                             const char *name,
+>                                             int vdpa_device_fd,
+>                                             int queue_pair_index,
+>                                             int nvqs,
+> +                                           unsigned nas,
+>                                             bool is_datapath,
+>                                             bool svq,
+>                                             VhostIOVATree *iova_tree)
+> @@ -547,6 +654,7 @@ static NetClientState *net_vhost_vdpa_init(NetClientS=
+tate *peer,
+>      snprintf(nc->info_str, sizeof(nc->info_str), TYPE_VHOST_VDPA);
+>      s =3D DO_UPCAST(VhostVDPAState, nc, nc);
+>
+> +    s->address_space_num =3D nas;
+>      s->vhost_vdpa.device_fd =3D vdpa_device_fd;
+>      s->vhost_vdpa.index =3D queue_pair_index;
+>      s->always_svq =3D svq;
+> @@ -632,6 +740,8 @@ int net_init_vhost_vdpa(const Netdev *netdev, const c=
+har *name,
+>      g_autoptr(VhostIOVATree) iova_tree =3D NULL;
+>      NetClientState *nc;
+>      int queue_pairs, r, i =3D 0, has_cvq =3D 0;
+> +    unsigned num_as =3D 1;
+> +    bool svq_cvq;
+>
+>      assert(netdev->type =3D=3D NET_CLIENT_DRIVER_VHOST_VDPA);
+>      opts =3D &netdev->u.vhost_vdpa;
+> @@ -656,7 +766,13 @@ int net_init_vhost_vdpa(const Netdev *netdev, const =
+char *name,
+>          goto err;
+>      }
+>
+> -    if (opts->x_svq) {
+> +    svq_cvq =3D opts->x_svq;
+> +    if (has_cvq && !opts->x_svq) {
+> +        num_as =3D vhost_vdpa_get_as_num(vdpa_device_fd);
+> +        svq_cvq =3D num_as > 1;
+> +    }
+> +
+> +    if (opts->x_svq || svq_cvq) {
+>          struct vhost_vdpa_iova_range iova_range;
+>
+>          uint64_t invalid_dev_features =3D
+> @@ -679,15 +795,15 @@ int net_init_vhost_vdpa(const Netdev *netdev, const=
+ char *name,
+>
+>      for (i =3D 0; i < queue_pairs; i++) {
+>          ncs[i] =3D net_vhost_vdpa_init(peer, TYPE_VHOST_VDPA, name,
+> -                                     vdpa_device_fd, i, 2, true, opts->x=
+_svq,
+> -                                     iova_tree);
+> +                                     vdpa_device_fd, i, 2, num_as, true,
+> +                                     opts->x_svq, iova_tree);
+>          if (!ncs[i])
+>              goto err;
+>      }
+>
+>      if (has_cvq) {
+>          nc =3D net_vhost_vdpa_init(peer, TYPE_VHOST_VDPA, name,
+> -                                 vdpa_device_fd, i, 1, false,
+> +                                 vdpa_device_fd, i, 1, num_as, false,
+>                                   opts->x_svq, iova_tree);
+>          if (!nc)
+>              goto err;
+> --
+> 2.31.1
+>
+
