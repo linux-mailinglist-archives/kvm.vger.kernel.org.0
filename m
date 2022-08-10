@@ -2,203 +2,346 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id CC4FD58E872
-	for <lists+kvm@lfdr.de>; Wed, 10 Aug 2022 10:12:34 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id DB1CA58E88C
+	for <lists+kvm@lfdr.de>; Wed, 10 Aug 2022 10:18:10 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231462AbiHJIMb (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 10 Aug 2022 04:12:31 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33434 "EHLO
+        id S231608AbiHJISI (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 10 Aug 2022 04:18:08 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37718 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229736AbiHJIMZ (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 10 Aug 2022 04:12:25 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 3F1F281B3D
-        for <kvm@vger.kernel.org>; Wed, 10 Aug 2022 01:12:24 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1660119143;
-        h=from:from:reply-to:reply-to:subject:subject:date:date:
-         message-id:message-id:to:to:cc:cc:mime-version:mime-version:
-         content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=BVu58TYO0FPeW6T6G0V7mzScRg9HM7I3clRpI4N+hAQ=;
-        b=gT5vOG9ITfisuccqcbBP4ZA2+Zp/XudzWhyAXHn1ri6k8G/L+Sk2dfJfQxZICtpv1RZLWb
-        YEEzwKw1FmdLvvcCWcKLWnS1fpK5h9Tf3FvPseeqHD+beXZfNlfYFaaR0G5homKAaZ+qPw
-        ikwjroObE7GX6nxWsyt+oVko+raVt74=
-Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
- [209.85.128.69]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-517-ENSKPukeP2-za_MgdTAftA-1; Wed, 10 Aug 2022 04:12:22 -0400
-X-MC-Unique: ENSKPukeP2-za_MgdTAftA-1
-Received: by mail-wm1-f69.google.com with SMTP id b4-20020a05600c4e0400b003a5a96f1756so760775wmq.0
-        for <kvm@vger.kernel.org>; Wed, 10 Aug 2022 01:12:22 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:reply-to:user-agent:mime-version:date
-         :message-id:x-gm-message-state:from:to:cc;
-        bh=BVu58TYO0FPeW6T6G0V7mzScRg9HM7I3clRpI4N+hAQ=;
-        b=pZvAnD3rSx/TPUSH3BAeB0vSLO9A64+O8RBz3SqXnu3BFaCC3I1YZ8Buar6Y9ekYek
-         ICPnUbzKJtmdCdGlv7oVOUQ6v1DiQy/to0lATYSGRdsSOb8AN1LxSIunzCrNuXzf4iWu
-         ICx+YmUuDPweKYphSDx9ZgkIo0/H2y5XsOMEHI89Hg307kmpTBe9vEQTxq9UkOVBY+KG
-         xPDsIVT8LR45RwToSj9y/E1kCALbFknlYko9qG6hh/6t8DCS2ZoP6yLCjd+sjE9kSaGn
-         6siWudUORpcg9IxcCx6AXAYLhCb6As/1sBBEMAgD8tioOcm7Augkjz4BKVrRdTpqQFF8
-         oOng==
-X-Gm-Message-State: ACgBeo0QYXOYfYoROgAMZfL0KSSsgvdESUbsv5t87HHbkUKyl9Yd1b4j
-        d6p7qKpmP/4h1hVJr4bnGNN1hSt4qh5cdLfKBnfGnev4W8kSHPYWWnX0x4Lu7v+Xzcq863x1GJ/
-        eIJE6wXjeNqcQ
-X-Received: by 2002:a05:600c:1f08:b0:3a3:1b00:c201 with SMTP id bd8-20020a05600c1f0800b003a31b00c201mr1529695wmb.171.1660119141172;
-        Wed, 10 Aug 2022 01:12:21 -0700 (PDT)
-X-Google-Smtp-Source: AA6agR7oCp90BLj4T5HGfpvC4HP9o0gO2Cs98+Ewm/lwRDzAkI2WRcLJZnfEgmVfFNIcV13+azy3JQ==
-X-Received: by 2002:a05:600c:1f08:b0:3a3:1b00:c201 with SMTP id bd8-20020a05600c1f0800b003a31b00c201mr1529662wmb.171.1660119140917;
-        Wed, 10 Aug 2022 01:12:20 -0700 (PDT)
-Received: from ?IPV6:2a01:e0a:59e:9d80:527b:9dff:feef:3874? ([2a01:e0a:59e:9d80:527b:9dff:feef:3874])
-        by smtp.gmail.com with ESMTPSA id x11-20020adfdd8b000000b0020fff0ea0a3sm15273002wrl.116.2022.08.10.01.12.19
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 10 Aug 2022 01:12:20 -0700 (PDT)
-Message-ID: <8ff76b5e-ae28-70c8-2ec5-01662874fb15@redhat.com>
-Date:   Wed, 10 Aug 2022 10:12:18 +0200
+        with ESMTP id S231585AbiHJISH (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 10 Aug 2022 04:18:07 -0400
+Received: from mga03.intel.com (mga03.intel.com [134.134.136.65])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3C04883F39;
+        Wed, 10 Aug 2022 01:18:06 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1660119486; x=1691655486;
+  h=message-id:date:mime-version:subject:to:cc:references:
+   from:in-reply-to:content-transfer-encoding;
+  bh=ipFRmU88e1tOLxRIjyv4mhJWUct3BO5oR+U7KcIdmPE=;
+  b=ASvVOpbZDQUjL8nOgckA4fQjHfAb0oUTqmF4ajEM0dYr+cVvz9SsEtHn
+   zFI9bbPedbJHN9SfXS3003ygH3SrAHkpz/lQwnrwkFZedjiryaBWTYBY0
+   H+fBghkeLjzvcmn83yZqHwIrG5gQM7w+LoazKa+AnJTFt7jKc0i0rwDnm
+   gy6F/4u9GGSwIhJW5qfcw8fyzJsINsutRMByIfsKcK7qjV3KudG179Szm
+   pvU7vg57MyMmQDkviSv5Q7hk7Y8VAvbIQjrJiwo78UGdlKK6PsfBs0Mk8
+   Ht/AOLG6ewOwHNCy/S1GfHxMoGHFqVDHea8i92w9wWwqD6lqsQaib6gPX
+   Q==;
+X-IronPort-AV: E=McAfee;i="6400,9594,10434"; a="292279744"
+X-IronPort-AV: E=Sophos;i="5.93,226,1654585200"; 
+   d="scan'208";a="292279744"
+Received: from fmsmga008.fm.intel.com ([10.253.24.58])
+  by orsmga103.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 10 Aug 2022 01:18:05 -0700
+X-IronPort-AV: E=Sophos;i="5.93,226,1654585200"; 
+   d="scan'208";a="664797408"
+Received: from binbinwu-mobl.ccr.corp.intel.com (HELO [10.238.1.204]) ([10.238.1.204])
+  by fmsmga008-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 10 Aug 2022 01:18:03 -0700
+Message-ID: <cb23e06b-6b3e-22af-f5de-a13af7aab1e4@linux.intel.com>
+Date:   Wed, 10 Aug 2022 16:18:01 +0800
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.11.0
-Reply-To: eric.auger@redhat.com
-Subject: Re: [PATCH v2 0/5] KVM: Fix oneshot interrupts forwarding
-Content-Language: en-US
-To:     Marc Zyngier <maz@kernel.org>, Dmytro Maluka <dmy@semihalf.com>
-Cc:     "Dong, Eddie" <eddie.dong@intel.com>,
-        "Christopherson,, Sean" <seanjc@google.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        Dave Hansen <dave.hansen@linux.intel.com>,
-        "x86@kernel.org" <x86@kernel.org>,
-        "H. Peter Anvin" <hpa@zytor.com>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        Alex Williamson <alex.williamson@redhat.com>,
-        "Liu, Rong L" <rong.l.liu@intel.com>,
-        Zhenyu Wang <zhenyuw@linux.intel.com>,
-        Tomasz Nowicki <tn@semihalf.com>,
-        Grzegorz Jaszczyk <jaz@semihalf.com>,
-        "upstream@semihalf.com" <upstream@semihalf.com>,
-        Dmitry Torokhov <dtor@google.com>
-References: <20220805193919.1470653-1-dmy@semihalf.com>
- <BL0PR11MB30429034B6D59253AF22BCE08A639@BL0PR11MB3042.namprd11.prod.outlook.com>
- <c5d8f537-5695-42f0-88a9-de80e21f5f4c@semihalf.com>
- <BL0PR11MB304213273FA9FAC4EBC70FF88A629@BL0PR11MB3042.namprd11.prod.outlook.com>
- <ef9ffbde-445e-f00f-23c1-27e23b6cca4f@semihalf.com>
- <87o7wsbngz.wl-maz@kernel.org>
-From:   Eric Auger <eric.auger@redhat.com>
-In-Reply-To: <87o7wsbngz.wl-maz@kernel.org>
-Content-Type: text/plain; charset=UTF-8
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
+ Thunderbird/102.1.0
+Subject: Re: [PATCH v8 009/103] KVM: TDX: Initialize the TDX module when
+ loading the KVM intel kernel module
+To:     isaku.yamahata@intel.com, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+Cc:     isaku.yamahata@gmail.com, Paolo Bonzini <pbonzini@redhat.com>,
+        erdemaktas@google.com, Sean Christopherson <seanjc@google.com>,
+        Sagi Shahar <sagis@google.com>
+References: <cover.1659854790.git.isaku.yamahata@intel.com>
+ <b6f8588f51f530e3904d2b98199aba6547032ea4.1659854790.git.isaku.yamahata@intel.com>
+From:   Binbin Wu <binbin.wu@linux.intel.com>
+In-Reply-To: <b6f8588f51f530e3904d2b98199aba6547032ea4.1659854790.git.isaku.yamahata@intel.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-3.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
-        RCVD_IN_DNSWL_LOW,SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE
-        autolearn=ham autolearn_force=no version=3.4.6
+X-Spam-Status: No, score=-4.9 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_DNSWL_MED,
+        SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi Marc,
 
-On 8/10/22 08:51, Marc Zyngier wrote:
-> On Wed, 10 Aug 2022 00:30:29 +0100,
-> Dmytro Maluka <dmy@semihalf.com> wrote:
->> On 8/9/22 10:01 PM, Dong, Eddie wrote:
->>>
->>>> -----Original Message-----
->>>> From: Dmytro Maluka <dmy@semihalf.com>
->>>> Sent: Tuesday, August 9, 2022 12:24 AM
->>>> To: Dong, Eddie <eddie.dong@intel.com>; Christopherson,, Sean
->>>> <seanjc@google.com>; Paolo Bonzini <pbonzini@redhat.com>;
->>>> kvm@vger.kernel.org
->>>> Cc: Thomas Gleixner <tglx@linutronix.de>; Ingo Molnar <mingo@redhat.com>;
->>>> Borislav Petkov <bp@alien8.de>; Dave Hansen <dave.hansen@linux.intel.com>;
->>>> x86@kernel.org; H. Peter Anvin <hpa@zytor.com>; linux-
->>>> kernel@vger.kernel.org; Eric Auger <eric.auger@redhat.com>; Alex
->>>> Williamson <alex.williamson@redhat.com>; Liu, Rong L <rong.l.liu@intel.com>;
->>>> Zhenyu Wang <zhenyuw@linux.intel.com>; Tomasz Nowicki
->>>> <tn@semihalf.com>; Grzegorz Jaszczyk <jaz@semihalf.com>;
->>>> upstream@semihalf.com; Dmitry Torokhov <dtor@google.com>
->>>> Subject: Re: [PATCH v2 0/5] KVM: Fix oneshot interrupts forwarding
->>>>
->>>> On 8/9/22 1:26 AM, Dong, Eddie wrote:
->>>>>> The existing KVM mechanism for forwarding of level-triggered
->>>>>> interrupts using resample eventfd doesn't work quite correctly in the
->>>>>> case of interrupts that are handled in a Linux guest as oneshot
->>>>>> interrupts (IRQF_ONESHOT). Such an interrupt is acked to the device
->>>>>> in its threaded irq handler, i.e. later than it is acked to the
->>>>>> interrupt controller (EOI at the end of hardirq), not earlier. The
->>>>>> existing KVM code doesn't take that into account, which results in
->>>>>> erroneous extra interrupts in the guest caused by premature re-assert of an
->>>> unacknowledged IRQ by the host.
->>>>> Interesting...  How it behaviors in native side?
->>>> In native it behaves correctly, since Linux masks such a oneshot interrupt at the
->>>> beginning of hardirq, so that the EOI at the end of hardirq doesn't result in its
->>>> immediate re-assert, and then unmasks it later, after its threaded irq handler
->>>> completes.
->>>>
->>>> In handle_fasteoi_irq():
->>>>
->>>> 	if (desc->istate & IRQS_ONESHOT)
->>>> 		mask_irq(desc);
->>>>
->>>> 	handle_irq_event(desc);
->>>>
->>>> 	cond_unmask_eoi_irq(desc, chip);
->>>>
->>>>
->>>> and later in unmask_threaded_irq():
->>>>
->>>> 	unmask_irq(desc);
->>>>
->>>> I also mentioned that in patch #3 description:
->>>> "Linux keeps such interrupt masked until its threaded handler finishes, to
->>>> prevent the EOI from re-asserting an unacknowledged interrupt.
->>> That makes sense. Can you include the full story in cover letter too?
->> Ok, I will.
->>
->>>
->>>> However, with KVM + vfio (or whatever is listening on the resamplefd) we don't
->>>> check that the interrupt is still masked in the guest at the moment of EOI.
->>>> Resamplefd is notified regardless, so vfio prematurely unmasks the host
->>>> physical IRQ, thus a new (unwanted) physical interrupt is generated in the host
->>>> and queued for injection to the guest."
-> Sorry to barge in pretty late in the conversation (just been Cc'd on
-> this), but why shouldn't the resamplefd be notified? If there has been
-yeah sorry to get you involved here ;-)
-> an EOI, a new level must be made visible to the guest interrupt
-> controller, no matter what the state of the interrupt masking is.
+On 2022/8/8 6:00, isaku.yamahata@intel.com wrote:
+> From: Isaku Yamahata <isaku.yamahata@intel.com>
 >
-> Whether this new level is actually *presented* to a vCPU is another
-> matter entirely, and is arguably a problem for the interrupt
-> controller emulation.
+> TDX requires several initialization steps for KVM to create guest TDs.
+> Detect CPU feature, enable VMX (TDX is based on VMX), detect the TDX module
+> availability, and initialize it.  This patch implements those steps.
+>
+> There are several options on when to initialize the TDX module.  A.) kernel
+> module loading time, B.) the first guest TD creation time.  A.) was chosen.
+> With B.), a user may hit an error of the TDX initialization when trying to
+> create the first guest TD.  The machine that fails to initialize the TDX
+> module can't boot any guest TD further.  Such failure is undesirable and a
+> surprise because the user expects that the machine can accommodate guest
+> TD, but actually not.  So A.) is better than B.).
+>
+> Introduce a module parameter, enable_tdx, to explicitly enable TDX KVM
+> support.  It's off by default to keep same behavior for those who don't use
+> TDX.  Implement hardware_setup method to detect TDX feature of CPU.
+> Because TDX requires all present CPUs to enable VMX (VMXON).  The x86
+> specific kvm_arch_post_hardware_enable_setup overrides the existing weak
+> symbol of kvm_arch_post_hardware_enable_setup which is called at the KVM
+> module initialization.
+>
+> Suggested-by: Sean Christopherson <seanjc@google.com>
+> Signed-off-by: Isaku Yamahata <isaku.yamahata@intel.com>
+> ---
+>   arch/x86/include/asm/kvm_host.h |  1 +
+>   arch/x86/kvm/Makefile           |  1 +
+>   arch/x86/kvm/vmx/main.c         | 29 ++++++++++-
+>   arch/x86/kvm/vmx/tdx.c          | 89 +++++++++++++++++++++++++++++++++
+>   arch/x86/kvm/vmx/tdx.h          |  4 ++
+>   arch/x86/kvm/vmx/x86_ops.h      |  6 +++
+>   arch/x86/kvm/x86.c              |  8 +++
+>   arch/x86/virt/vmx/tdx/tdx.c     |  1 +
+>   8 files changed, 138 insertions(+), 1 deletion(-)
+>   create mode 100644 arch/x86/kvm/vmx/tdx.c
+>
+> diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
+> index 3d000f060077..f432ad32515c 100644
+> --- a/arch/x86/include/asm/kvm_host.h
+> +++ b/arch/x86/include/asm/kvm_host.h
+> @@ -1659,6 +1659,7 @@ struct kvm_x86_init_ops {
+>   	int (*cpu_has_kvm_support)(void);
+>   	int (*disabled_by_bios)(void);
+>   	int (*hardware_setup)(void);
+> +	int (*post_hardware_enable_setup)(void);
+>   	unsigned int (*handle_intel_pt_intr)(void);
+>   
+>   	struct kvm_x86_ops *runtime_ops;
+> diff --git a/arch/x86/kvm/Makefile b/arch/x86/kvm/Makefile
+> index ee4d0999f20f..e2c05195cb95 100644
+> --- a/arch/x86/kvm/Makefile
+> +++ b/arch/x86/kvm/Makefile
+> @@ -24,6 +24,7 @@ kvm-$(CONFIG_KVM_XEN)	+= xen.o
+>   kvm-intel-y		+= vmx/vmx.o vmx/vmenter.o vmx/pmu_intel.o vmx/vmcs12.o \
+>   			   vmx/evmcs.o vmx/nested.o vmx/posted_intr.o vmx/main.o
+>   kvm-intel-$(CONFIG_X86_SGX_KVM)	+= vmx/sgx.o
+> +kvm-intel-$(CONFIG_INTEL_TDX_HOST)	+= vmx/tdx.o
+>   
+>   kvm-amd-y		+= svm/svm.o svm/vmenter.o svm/pmu.o svm/nested.o svm/avic.o svm/sev.o
+>   
+> diff --git a/arch/x86/kvm/vmx/main.c b/arch/x86/kvm/vmx/main.c
+> index a0252cc0b48d..ac788af17d92 100644
+> --- a/arch/x86/kvm/vmx/main.c
+> +++ b/arch/x86/kvm/vmx/main.c
+> @@ -7,6 +7,32 @@
+>   #include "pmu.h"
+>   #include "tdx.h"
+>   
+> +static bool __read_mostly enable_tdx = IS_ENABLED(CONFIG_INTEL_TDX_HOST);
 
-FWIU on guest EOI the physical line is still asserted so the pIRQ is
-immediatly re-sampled by the interrupt controller (because the
-resamplefd unmasked the physical IRQ) and recorded as a guest IRQ
-(although it is masked at guest level). When the guest actually unmasks
-the vIRQ we do not get a chance to re-evaluate the physical line level.
+So, if CONFIG_INTEL_TDX_HOST is opt-in in kconfig, the code will try to 
+enable TDX.
 
-When running native, when EOI is sent, the physical line is still
-asserted but the IRQ is masked. When unmasking, the line is de-asserted.
+The behavior seems a bit different from what you mentioned in the commit 
+message about the option to "explicitly enable TDX KVM
+support".
 
-Thanks
 
-Eric
->
-> For example on arm64, we expect to be able to read the pending state
-> of an interrupt from the guest irrespective of the masking state of
-> that interrupt. Any change to the interrupt flow should preserve this.
->
-> Thankfully, we don't have the polarity issue (there is no such thing
-> in the GIC architecture) and we only deal with pending/not-pending.
->
-> Thanks,
->
-> 	M.
->
-
+> +module_param_named(tdx, enable_tdx, bool, 0444);
+> +
+> +static __init int vt_hardware_setup(void)
+> +{
+> +	int ret;
+> +
+> +	ret = vmx_hardware_setup();
+> +	if (ret)
+> +		return ret;
+> +
+> +	enable_tdx = enable_tdx && !tdx_hardware_setup(&vt_x86_ops);
+> +
+> +	return 0;
+> +}
+> +
+> +static int __init vt_post_hardware_enable_setup(void)
+> +{
+> +	enable_tdx = enable_tdx && !tdx_module_setup();
+> +	/*
+> +	 * Even if it failed to initialize TDX module, conventional VMX is
+> +	 * available.  Keep VMX usable.
+> +	 */
+> +	return 0;
+> +}
+> +
+>   struct kvm_x86_ops vt_x86_ops __initdata = {
+>   	.name = "kvm_intel",
+>   
+> @@ -148,7 +174,8 @@ struct kvm_x86_ops vt_x86_ops __initdata = {
+>   struct kvm_x86_init_ops vt_init_ops __initdata = {
+>   	.cpu_has_kvm_support = vmx_cpu_has_kvm_support,
+>   	.disabled_by_bios = vmx_disabled_by_bios,
+> -	.hardware_setup = vmx_hardware_setup,
+> +	.hardware_setup = vt_hardware_setup,
+> +	.post_hardware_enable_setup = vt_post_hardware_enable_setup,
+>   	.handle_intel_pt_intr = NULL,
+>   
+>   	.runtime_ops = &vt_x86_ops,
+> diff --git a/arch/x86/kvm/vmx/tdx.c b/arch/x86/kvm/vmx/tdx.c
+> new file mode 100644
+> index 000000000000..e9a17f3666de
+> --- /dev/null
+> +++ b/arch/x86/kvm/vmx/tdx.c
+> @@ -0,0 +1,89 @@
+> +// SPDX-License-Identifier: GPL-2.0
+> +#include <linux/cpu.h>
+> +
+> +#include <asm/tdx.h>
+> +
+> +#include "capabilities.h"
+> +#include "x86_ops.h"
+> +#include "tdx.h"
+> +
+> +#undef pr_fmt
+> +#define pr_fmt(fmt) "tdx: " fmt
+> +
+> +#define TDX_MAX_NR_CPUID_CONFIGS					\
+> +	((sizeof(struct tdsysinfo_struct) -				\
+> +		offsetof(struct tdsysinfo_struct, cpuid_configs))	\
+> +		/ sizeof(struct tdx_cpuid_config))
+> +
+> +struct tdx_capabilities {
+> +	u8 tdcs_nr_pages;
+> +	u8 tdvpx_nr_pages;
+> +
+> +	u64 attrs_fixed0;
+> +	u64 attrs_fixed1;
+> +	u64 xfam_fixed0;
+> +	u64 xfam_fixed1;
+> +
+> +	u32 nr_cpuid_configs;
+> +	struct tdx_cpuid_config cpuid_configs[TDX_MAX_NR_CPUID_CONFIGS];
+> +};
+> +
+> +/* Capabilities of KVM + the TDX module. */
+> +static struct tdx_capabilities tdx_caps;
+> +
+> +int __init tdx_module_setup(void)
+> +{
+> +	const struct tdsysinfo_struct *tdsysinfo;
+> +	int ret = 0;
+> +
+> +	BUILD_BUG_ON(sizeof(*tdsysinfo) != 1024);
+> +	BUILD_BUG_ON(TDX_MAX_NR_CPUID_CONFIGS != 37);
+> +
+> +	ret = tdx_init();
+> +	if (ret) {
+> +		pr_info("Failed to initialize TDX module.\n");
+> +		return ret;
+> +	}
+> +
+> +	tdsysinfo = tdx_get_sysinfo();
+> +	if (tdsysinfo->num_cpuid_config > TDX_MAX_NR_CPUID_CONFIGS)
+> +		return -EIO;
+> +
+> +	tdx_caps = (struct tdx_capabilities) {
+> +		.tdcs_nr_pages = tdsysinfo->tdcs_base_size / PAGE_SIZE,
+> +		/*
+> +		 * TDVPS = TDVPR(4K page) + TDVPX(multiple 4K pages).
+> +		 * -1 for TDVPR.
+> +		 */
+> +		.tdvpx_nr_pages = tdsysinfo->tdvps_base_size / PAGE_SIZE - 1,
+> +		.attrs_fixed0 = tdsysinfo->attributes_fixed0,
+> +		.attrs_fixed1 = tdsysinfo->attributes_fixed1,
+> +		.xfam_fixed0 =	tdsysinfo->xfam_fixed0,
+> +		.xfam_fixed1 = tdsysinfo->xfam_fixed1,
+> +		.nr_cpuid_configs = tdsysinfo->num_cpuid_config,
+> +	};
+> +	if (!memcpy(tdx_caps.cpuid_configs, tdsysinfo->cpuid_configs,
+> +			tdsysinfo->num_cpuid_config *
+> +			sizeof(struct tdx_cpuid_config)))
+> +		return -EIO;
+> +
+> +	return 0;
+> +}
+> +
+> +int __init tdx_hardware_setup(struct kvm_x86_ops *x86_ops)
+> +{
+> +	if (!enable_ept) {
+> +		pr_warn("Cannot enable TDX with EPT disabled\n");
+> +		return -EINVAL;
+> +	}
+> +
+> +	if (!platform_tdx_enabled()) {
+> +		pr_warn("Cannot enable TDX on TDX disabled platform\n");
+> +		return -ENODEV;
+> +	}
+> +
+> +	pr_info("kvm: TDX is supported. x86 phys bits %d\n",
+> +		boot_cpu_data.x86_phys_bits);
+> +
+> +	return 0;
+> +}
+> diff --git a/arch/x86/kvm/vmx/tdx.h b/arch/x86/kvm/vmx/tdx.h
+> index 060bf48ec3d6..54d7a26ed9ee 100644
+> --- a/arch/x86/kvm/vmx/tdx.h
+> +++ b/arch/x86/kvm/vmx/tdx.h
+> @@ -3,6 +3,8 @@
+>   #define __KVM_X86_TDX_H
+>   
+>   #ifdef CONFIG_INTEL_TDX_HOST
+> +int tdx_module_setup(void);
+> +
+>   struct kvm_tdx {
+>   	struct kvm kvm;
+>   	/* TDX specific members follow. */
+> @@ -37,6 +39,8 @@ static inline struct vcpu_tdx *to_tdx(struct kvm_vcpu *vcpu)
+>   	return container_of(vcpu, struct vcpu_tdx, vcpu);
+>   }
+>   #else
+> +static inline int tdx_module_setup(void) { return -ENODEV; };
+> +
+>   struct kvm_tdx {
+>   	struct kvm kvm;
+>   };
+> diff --git a/arch/x86/kvm/vmx/x86_ops.h b/arch/x86/kvm/vmx/x86_ops.h
+> index 90a8c6824833..f318a6258a24 100644
+> --- a/arch/x86/kvm/vmx/x86_ops.h
+> +++ b/arch/x86/kvm/vmx/x86_ops.h
+> @@ -128,4 +128,10 @@ void vmx_cancel_hv_timer(struct kvm_vcpu *vcpu);
+>   #endif
+>   void vmx_setup_mce(struct kvm_vcpu *vcpu);
+>   
+> +#ifdef CONFIG_INTEL_TDX_HOST
+> +int __init tdx_hardware_setup(struct kvm_x86_ops *x86_ops);
+> +#else
+> +static inline int tdx_hardware_setup(struct kvm_x86_ops *x86_ops) { return 0; }
+> +#endif
+> +
+>   #endif /* __KVM_X86_VMX_X86_OPS_H */
+> diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+> index e533cce7a70b..32a2ef718112 100644
+> --- a/arch/x86/kvm/x86.c
+> +++ b/arch/x86/kvm/x86.c
+> @@ -11983,6 +11983,14 @@ int kvm_arch_hardware_setup(void *opaque)
+>   	return 0;
+>   }
+>   
+> +int kvm_arch_post_hardware_enable_setup(void *opaque)
+> +{
+> +	struct kvm_x86_init_ops *ops = opaque;
+> +	if (ops->post_hardware_enable_setup)
+> +		return ops->post_hardware_enable_setup();
+> +	return 0;
+> +}
+> +
+>   void kvm_arch_hardware_unsetup(void)
+>   {
+>   	kvm_unregister_perf_callbacks();
+> diff --git a/arch/x86/virt/vmx/tdx/tdx.c b/arch/x86/virt/vmx/tdx/tdx.c
+> index b9567a2217df..918e79159bbf 100644
+> --- a/arch/x86/virt/vmx/tdx/tdx.c
+> +++ b/arch/x86/virt/vmx/tdx/tdx.c
+> @@ -1283,6 +1283,7 @@ bool platform_tdx_enabled(void)
+>   {
+>   	return tdx_keyid_num >= 2;
+>   }
+> +EXPORT_SYMBOL_GPL(platform_tdx_enabled);
+>   
+>   /**
+>    * tdx_init - Initialize the TDX module
