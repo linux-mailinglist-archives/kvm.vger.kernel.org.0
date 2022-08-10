@@ -2,82 +2,173 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 4985358F1A0
-	for <lists+kvm@lfdr.de>; Wed, 10 Aug 2022 19:34:11 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id CA75158F1A1
+	for <lists+kvm@lfdr.de>; Wed, 10 Aug 2022 19:34:29 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231285AbiHJReK (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 10 Aug 2022 13:34:10 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38778 "EHLO
+        id S232316AbiHJRe3 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 10 Aug 2022 13:34:29 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38996 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230118AbiHJReG (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 10 Aug 2022 13:34:06 -0400
-Received: from out2.migadu.com (out2.migadu.com [IPv6:2001:41d0:2:aacc::])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 67C5680F51
-        for <kvm@vger.kernel.org>; Wed, 10 Aug 2022 10:34:05 -0700 (PDT)
-Date:   Wed, 10 Aug 2022 12:33:56 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-        t=1660152843;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=EIsXvKSqgfKF5lprwB47UCU5MtfY2ezmKVd9Db/rJWQ=;
-        b=opu2mvci43APyNG3UpMrdiqYtHV720jCH0FALFn9J5Op+aPnItMayJsJcV0Rbb7Yl/FPYQ
-        tmJQdDvjRflJ5Ys73dxny6ESWoCLyxmM1LYoepRVsKYbBkmcCzry/7FVo0dZaZkUj0mOKN
-        5nXRdkoRdWazMPBy6hBm5NZUZbTicOQ=
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From:   Oliver Upton <oliver.upton@linux.dev>
-To:     Ricardo Koller <ricarkol@google.com>
-Cc:     kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu,
-        andrew.jones@linux.dev, maz@kernel.org, alexandru.elisei@arm.com,
-        eric.auger@redhat.com, reijiw@google.com
-Subject: Re: [kvm-unit-tests PATCH v3 0/3] arm: pmu: Fixes for bare metal
-Message-ID: <YvPsBKGbHHQP+0oS@google.com>
-References: <20220805004139.990531-1-ricarkol@google.com>
+        with ESMTP id S231719AbiHJRe1 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 10 Aug 2022 13:34:27 -0400
+Received: from mail-lj1-x230.google.com (mail-lj1-x230.google.com [IPv6:2a00:1450:4864:20::230])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DF24A82776
+        for <kvm@vger.kernel.org>; Wed, 10 Aug 2022 10:34:25 -0700 (PDT)
+Received: by mail-lj1-x230.google.com with SMTP id j3so9637729ljo.0
+        for <kvm@vger.kernel.org>; Wed, 10 Aug 2022 10:34:25 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=semihalf.com; s=google;
+        h=content-transfer-encoding:content-language:in-reply-to:mime-version
+         :user-agent:date:message-id:from:references:cc:to:subject:from:to:cc;
+        bh=SspRo8j3eYOak2Or93Ie6jAhlC0rna8TGwHIKsAIEiQ=;
+        b=lOhgyb0o5yEA35AJoSIfAzLAbl2zzGS5GqFCmePaZtF00tBUKojZx+pF8rDF6OHEWM
+         PQ7gg7OQs3rtxsU3sytaJiOc5vFd22H9A4BlRzffRgAtrDwuyP3A/jwTtrIWiBQlTi+f
+         28IY2k6x2rmh32fTZzN6CEMqMp2YzhApGRopKs+Y0FbYuZIWU1eRTsdKfMSs7eCWJ4Af
+         o3YPZop0rvEG3FHRMP11YxfVsirNEXJT/rSPMPJnQZiCYYtzu4dATqRCJhxzM3qhhTVa
+         68qkF0xz4owQtcJH1YpimeS/PgQvjR8foTRt1SZ5PDUwDS/8wDwZ8kYA9EqYd2lZO4nX
+         oA7A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=content-transfer-encoding:content-language:in-reply-to:mime-version
+         :user-agent:date:message-id:from:references:cc:to:subject
+         :x-gm-message-state:from:to:cc;
+        bh=SspRo8j3eYOak2Or93Ie6jAhlC0rna8TGwHIKsAIEiQ=;
+        b=46xyg5vU2fCjIY0JByR+aQrAYohIbnuB9nxAmEeuqBNGsxZLJdGxkbM+xRNFaGNWaO
+         GAtN089ZReenk6+hk6jGfWny430T/pEwRbhSTtpJeE8wYMjjzLNwnZ1W+oNA1TOi+p5v
+         4C6n4fzXfSeTVe8rhjYBbVPJJ2x6mpSb4u379V6GkiNBQnaeyZb3M4SNBcU+LhpKhmaR
+         n5xK6fglJ/TKdEKupeF36V7dRWenYVO8DD0/hCjPxti6lTSWFmWndK356pMOqyMWAtzz
+         2S/SKyRTR7Esg7/xOXAUlCjOGAMOe8OXohsXUE2WhEJl1i5GWPhLNzM+O6i19qzhKhms
+         uTbA==
+X-Gm-Message-State: ACgBeo0rC5kKsIpcP7ZkPb2f/d+TZGb/pDlSu7nzHpfHzgKl5yX/i2nI
+        SknNYs4F1L1dlX0D+hbosS16hNmc7QYgt5L6
+X-Google-Smtp-Source: AA6agR5sPZFBxjtQl34ZjT0NG3HJ01eW3HJOAqyqT/fchHh6VXDzjeNV3FITMPbJIr5RJlsmF2A3nQ==
+X-Received: by 2002:a05:651c:446:b0:25e:5629:213b with SMTP id g6-20020a05651c044600b0025e5629213bmr8665148ljg.53.1660152862760;
+        Wed, 10 Aug 2022 10:34:22 -0700 (PDT)
+Received: from ?IPv6:2a02:a31b:33d:9c00:463a:87e3:44fc:2b2f? ([2a02:a31b:33d:9c00:463a:87e3:44fc:2b2f])
+        by smtp.gmail.com with ESMTPSA id h2-20020ac25962000000b0048b0aa2f87csm407376lfp.181.2022.08.10.10.34.21
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 10 Aug 2022 10:34:22 -0700 (PDT)
+Subject: Re: [PATCH v2 0/5] KVM: Fix oneshot interrupts forwarding
+To:     "Dong, Eddie" <eddie.dong@intel.com>,
+        "Christopherson,, Sean" <seanjc@google.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>
+Cc:     Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+        Dave Hansen <dave.hansen@linux.intel.com>,
+        "x86@kernel.org" <x86@kernel.org>,
+        "H. Peter Anvin" <hpa@zytor.com>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        Eric Auger <eric.auger@redhat.com>,
+        Alex Williamson <alex.williamson@redhat.com>,
+        "Liu, Rong L" <rong.l.liu@intel.com>,
+        Zhenyu Wang <zhenyuw@linux.intel.com>,
+        Tomasz Nowicki <tn@semihalf.com>,
+        Grzegorz Jaszczyk <jaz@semihalf.com>,
+        "upstream@semihalf.com" <upstream@semihalf.com>,
+        Dmitry Torokhov <dtor@google.com>,
+        Marc Zyngier <maz@kernel.org>
+References: <20220805193919.1470653-1-dmy@semihalf.com>
+ <BL0PR11MB30429034B6D59253AF22BCE08A639@BL0PR11MB3042.namprd11.prod.outlook.com>
+ <c5d8f537-5695-42f0-88a9-de80e21f5f4c@semihalf.com>
+ <BL0PR11MB304213273FA9FAC4EBC70FF88A629@BL0PR11MB3042.namprd11.prod.outlook.com>
+ <ef9ffbde-445e-f00f-23c1-27e23b6cca4f@semihalf.com>
+ <BL0PR11MB304290D4AACC3C1E2661C9668A659@BL0PR11MB3042.namprd11.prod.outlook.com>
+From:   Dmytro Maluka <dmy@semihalf.com>
+Message-ID: <f4b162a5-1da6-478f-fcab-d79cece32dde@semihalf.com>
+Date:   Wed, 10 Aug 2022 19:34:20 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.13.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20220805004139.990531-1-ricarkol@google.com>
-X-Migadu-Flow: FLOW_OUT
-X-Migadu-Auth-User: linux.dev
-X-Spam-Status: No, score=-2.8 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,SPF_HELO_PASS,
-        SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no
-        version=3.4.6
+In-Reply-To: <BL0PR11MB304290D4AACC3C1E2661C9668A659@BL0PR11MB3042.namprd11.prod.outlook.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_DNSWL_NONE,
+        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Aug 04, 2022 at 05:41:36PM -0700, Ricardo Koller wrote:
-> There are some tests that fail when running on bare metal (including a
-> passthrough prototype).  There are three issues with the tests.  The
-> first one is that there are some missing isb()'s between enabling event
-> counting and the actual counting. This wasn't an issue on KVM as
-> trapping on registers served as context synchronization events. The
-> second issue is that some tests assume that registers reset to 0.  And
-> finally, the third issue is that overflowing the low counter of a
-> chained event sets the overflow flag in PMVOS and some tests fail by
-> checking for it not being set.
+On 8/10/22 7:17 PM, Dong, Eddie wrote:
+>>>
+>>>
+>>>> However, with KVM + vfio (or whatever is listening on the resamplefd)
+>>>> we don't check that the interrupt is still masked in the guest at the moment
+>> of EOI.
+>>>> Resamplefd is notified regardless, so vfio prematurely unmasks the
+>>>> host physical IRQ, thus a new (unwanted) physical interrupt is
+>>>> generated in the host and queued for injection to the guest."
+>>>>
+>>>
+>>> Emulation of level triggered IRQ is a pain point ☹ I read we need to
+>>> emulate the "level" of the IRQ pin (connecting from device to IRQchip, i.e.
+>> ioapic here).
+>>> Technically, the guest can change the polarity of vIOAPIC, which will
+>>> lead to a new  virtual IRQ even w/o host side interrupt.
+>>
+>> Thanks, interesting point. Do you mean that this behavior (a new vIRQ as a
+>> result of polarity change) may already happen with the existing KVM code?
+>>
+>> It doesn't seem so to me. AFAICT, KVM completely ignores the vIOAPIC polarity
+>> bit, in particular it doesn't handle change of the polarity by the guest (i.e.
+>> doesn't update the virtual IRR register, and so on), so it shouldn't result in a
+>> new interrupt.
 > 
-> Addressed all comments from the previous version:
-> https://lore.kernel.org/kvmarm/20220803182328.2438598-1-ricarkol@google.com/T/#t
-> - adding missing isb() and fixed the commit message (Alexandru).
-> - fixed wording of a report() check (Andrew).
+> Correct, KVM doesn't handle polarity now. Probably because unlikely the commercial OSes 
+> will change polarity.
 > 
-> Thanks!
-> Ricardo
+>>
+>> Since commit 100943c54e09 ("kvm: x86: ignore ioapic polarity") there seems to
+>> be an assumption that KVM interpretes the IRQ level value as active (asserted)
+>> vs inactive (deasserted) rather than high vs low, i.e.
 > 
-> Ricardo Koller (3):
->   arm: pmu: Add missing isb()'s after sys register writing
->   arm: pmu: Reset the pmu registers before starting some tests
->   arm: pmu: Check for overflow in the low counter in chained counters
->     tests
+> Asserted/deasserted vs. high/low is same to me, though asserted/deasserted hints more for event rather than state.
+> 
+>> the polarity doesn't matter to KVM.
+>>
+>> So, since both sides (KVM emulating the IOAPIC, and vfio/whatever emulating
+>> an external interrupt source) seem to operate on a level of abstraction of
+>> "asserted" vs "de-asserted" interrupt state regardless of the polarity, and that
+>> seems not a bug but a feature, it seems that we don't need to emulate the IRQ
+>> level as such. Or am I missing something?
+> 
+> YES, I know current KVM doesn't handle it.  Whether we should support it is another story which I cannot speak for.
+> Paolo and Alex are the right person 😊
+> The reason I mention this is because the complexity to adding a pending event vs. supporting a interrupt pin state is same.
+> I am wondering if we need to revisit it or not.  Behavior closing to real hardware helps us to avoid potential issues IMO, but I am fine to either choice.
 
-For the series:
+I guess that would imply revisiting KVM irqfd interface, since its
+design is based rather on events than states, even for level-triggered
+interrupts:
 
-Reviewed-by: Oliver Upton <oliver.upton@linux.dev>
+- trigger event (from vfio to KVM) to assert an IRQ
+- resample event (from KVM to vfio) to de-assert an IRQ
 
---
-Thanks,
-Oliver
+> 
+>>
+>> OTOH, I guess this means that the existing KVM's emulation of level-triggered
+>> interrupts is somewhat limited (a guest may legitimately expect an interrupt
+>> fired as a result of polarity change, and that case is not supported by KVM). But
+>> that is rather out of scope of the oneshot interrupts issue addressed by this
+>> patchset.
+> 
+> Agree.
+> I didn't know any commercial OSes change polarity either. But I know Xen hypervisor uses polarity under certain condition.
+> One day, we may see the issue when running Xen as a L1 hypervisor.  But this is not the current worry.
+> 
+> 
+>>
+>>> "pending" field of kvm_kernel_irqfd_resampler in patch 3 means more an
+>> event rather than an interrupt level.
+> 
+> I know.  I am fine either.
+> 
+> Thanks Eddie
+> 
+>>>
+>>>
