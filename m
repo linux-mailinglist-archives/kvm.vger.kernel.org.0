@@ -2,67 +2,65 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id D16CF58F4E9
-	for <lists+kvm@lfdr.de>; Thu, 11 Aug 2022 01:33:41 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 86D0858F4EA
+	for <lists+kvm@lfdr.de>; Thu, 11 Aug 2022 01:33:58 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232783AbiHJXdd (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 10 Aug 2022 19:33:33 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55448 "EHLO
+        id S232990AbiHJXdw (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 10 Aug 2022 19:33:52 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55672 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229524AbiHJXdc (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 10 Aug 2022 19:33:32 -0400
-Received: from mail-pg1-x529.google.com (mail-pg1-x529.google.com [IPv6:2607:f8b0:4864:20::529])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 891BF7FE6B
-        for <kvm@vger.kernel.org>; Wed, 10 Aug 2022 16:33:31 -0700 (PDT)
-Received: by mail-pg1-x529.google.com with SMTP id c24so10833780pgg.11
-        for <kvm@vger.kernel.org>; Wed, 10 Aug 2022 16:33:31 -0700 (PDT)
+        with ESMTP id S232797AbiHJXdv (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 10 Aug 2022 19:33:51 -0400
+Received: from mail-pj1-x1034.google.com (mail-pj1-x1034.google.com [IPv6:2607:f8b0:4864:20::1034])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7002184EEA
+        for <kvm@vger.kernel.org>; Wed, 10 Aug 2022 16:33:50 -0700 (PDT)
+Received: by mail-pj1-x1034.google.com with SMTP id t22so16231810pjy.1
+        for <kvm@vger.kernel.org>; Wed, 10 Aug 2022 16:33:50 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:from:to:cc;
-        bh=KboTvwgUFUJZZgdLSyM30lTXnrslAqe3eOSw/sVDlUY=;
-        b=jM6njugBVrh9WNTJQOr6gE5k45aeD/aB+ULFzWYMorDQhSH8zrpJNCjyFiWB34SbY7
-         WrnyyGxzRlMhfroh8aQ737/XyEaYQpiBOOqoRSZnWPMuBT+nx1NiNcTIQyf8DFkWD1zf
-         9wLEzWuB9v3Xgg9qJW1ptkKyd1BRRs47MabRONrogQjvNn0ZozusgLcRGTWRpYlHNk39
-         WpwUFsKxAnqsrgMT5premRn33serrhdKBLJRhP+dYdoskAzny7eySKhtcc/C0yi+HpoH
-         elCYpIACP4H2F6AmMaaul8Yx5pQdJj5SejLLeyrx2olqFCjH5qaM+167ZXvZ5LAicER8
-         IfUw==
+        bh=k5s6kLr9BjRGw2K775MBEjnMd/QwQNtQ/TX5UjErDkQ=;
+        b=rt8xPAtFbh0tAbhfZ7vv+XaBnLWOGI5+o9zjz5GXXSID4adfvbJi0d05x4L2GP09ex
+         guNR08lHt8PjGRE0ijLs9sYifxupHilw/SKdQzKw4XQ6gtPyaDpyCvbkuCGjy/bOYkAu
+         XL4AWHpP9diqhaQJ9SGdDqXEPIS+FixTeSuryW5/eRoUSI06mMHtmACDkd8CLpxHwzj9
+         GTuGkmL85LPxuQs19bd28yy7j0ylAFNyVY3Q4WyRGdwO7DILYujhDv58FMLdVBQOWwDA
+         15/Zx8ULYwlDa4VLyXE9qyBIm56G4yeAv+hwPAzAxx4K9o8QxQ74cGZViJ7896cLwSRJ
+         BX0g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:x-gm-message-state:from:to:cc;
-        bh=KboTvwgUFUJZZgdLSyM30lTXnrslAqe3eOSw/sVDlUY=;
-        b=HWxnPZxJ3aeOUktcecYZ6qN6Roy8F5vQS+cMZsMbsLALjOKQnCf3pjNm41IwGIOXQE
-         sGmpfhoXoKnDv2aaJ6ukMw2Eulghcp3j8CLyvw0wV/GOaB52W5W+R6SrvWGxzkX3y7Qo
-         mpGlMuvM8yM4TFnSSxzI1JfX9MZK/Eut+Ii+gylgtIJr+KUb5H5pKHQUih8sWZkryZGo
-         Fnqtnib9f3LhlQRT7V2/++8ihyMS0OKaFHgjEHYv7qrDxcX0H6t7tUyXeQJVmTPow9a8
-         KR7eiH7ncct5u0Zqdd+n2Kt1tv2i/5ZMB2u16Me3PqKV39AVtFajrt4zdvurISqn6lN9
-         nxTg==
-X-Gm-Message-State: ACgBeo1VSk1MBzP7BjIE1i+q01YUK0TfliGVCTPChwElrloAwD/PVA90
-        TgaK88i1D3Uwx4d9VkEAJ+zguw==
-X-Google-Smtp-Source: AA6agR7L/RXaWNWjaSPyN9BUFzkksyrI4OgzKqR2iz1PyEsp2uz10foTn2uB8rPwHVCSuh3R9Obibw==
-X-Received: by 2002:a05:6a00:1821:b0:52e:3c7c:9297 with SMTP id y33-20020a056a00182100b0052e3c7c9297mr29474982pfa.54.1660174410908;
-        Wed, 10 Aug 2022 16:33:30 -0700 (PDT)
-Received: from google.com (220.181.82.34.bc.googleusercontent.com. [34.82.181.220])
-        by smtp.gmail.com with ESMTPSA id i126-20020a628784000000b0052d33bf14d6sm2603501pfe.63.2022.08.10.16.33.30
+        bh=k5s6kLr9BjRGw2K775MBEjnMd/QwQNtQ/TX5UjErDkQ=;
+        b=1YnXjvB/nDLQ+qz1l1rtp0ZI/UC+LSxVuXKjorWNFvm2VSC3BFuo4Mz3g4IpGzSe8B
+         ySe6Us+cbiF0SH6yahin9CbxWMFqFxAGg2V2pgMUKkYLc3L1K9obiVhPRy6qWGl56yGM
+         f/Sfxvy9mE0fUk2Cb4KucNqdFFGqE6LjyYtntk87BYjRCSJLOuThQrxTwQ8/YMBeA0Cm
+         TPgOB91ZrDukNDku6P5mJpp+iILklcgc0JGk3W9gQUOM+2dUMNljegWwCXfwv9aSrvjP
+         Q/gcUQpsyRrsygaJfa7TH85fQSiyDp08NM6QgKXyHVlUayntjkPhu/YkgzKj3d9Yc7wo
+         /umw==
+X-Gm-Message-State: ACgBeo30MqevynRv21t5Qp492DuxngdYTzeC26bu8M2YKOT3yRHU5nwN
+        oefsFcw+8Iok08h3oj+k0NylUw==
+X-Google-Smtp-Source: AA6agR7+AigVcim7b/kB+NY8DTt5pMNTMcDZXxn7m7VDwN4CCFE6u+b3424Q69Z0aIkUbttMn5+4Zw==
+X-Received: by 2002:a17:902:ab0f:b0:16d:b340:bf8f with SMTP id ik15-20020a170902ab0f00b0016db340bf8fmr29867133plb.140.1660174429764;
+        Wed, 10 Aug 2022 16:33:49 -0700 (PDT)
+Received: from google.com (223.103.125.34.bc.googleusercontent.com. [34.125.103.223])
+        by smtp.gmail.com with ESMTPSA id x129-20020a623187000000b0052e82671a57sm2588212pfx.73.2022.08.10.16.33.48
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 10 Aug 2022 16:33:30 -0700 (PDT)
-Date:   Wed, 10 Aug 2022 16:33:26 -0700
-From:   Ricardo Koller <ricarkol@google.com>
-To:     Andrew Jones <andrew.jones@linux.dev>
-Cc:     kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu, maz@kernel.org,
-        alexandru.elisei@arm.com, eric.auger@redhat.com,
-        oliver.upton@linux.dev, reijiw@google.com
-Subject: Re: [kvm-unit-tests PATCH v3 2/3] arm: pmu: Reset the pmu registers
- before starting some tests
-Message-ID: <YvRARgEDkSI1ken5@google.com>
-References: <20220805004139.990531-1-ricarkol@google.com>
- <20220805004139.990531-3-ricarkol@google.com>
- <20220810190216.hqt3wyzufyvhhpkf@kamzik>
+        Wed, 10 Aug 2022 16:33:48 -0700 (PDT)
+Date:   Wed, 10 Aug 2022 16:33:44 -0700
+From:   David Matlack <dmatlack@google.com>
+To:     Colton Lewis <coltonlewis@google.com>
+Cc:     kvm@vger.kernel.org, pbonzini@redhat.com, maz@kernel.org,
+        seanjc@google.com, oupton@google.com, ricarkol@google.com
+Subject: Re: [PATCH 2/3] KVM: selftests: Randomize which pages are written vs
+ read
+Message-ID: <YvRAWKGXbPzool6j@google.com>
+References: <20220810175830.2175089-1-coltonlewis@google.com>
+ <20220810175830.2175089-3-coltonlewis@google.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20220810190216.hqt3wyzufyvhhpkf@kamzik>
+In-Reply-To: <20220810175830.2175089-3-coltonlewis@google.com>
 X-Spam-Status: No, score=-14.5 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
         ENV_AND_HDR_SPF_MATCH,FSL_HELO_FAKE,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,
@@ -74,75 +72,104 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Aug 10, 2022 at 09:02:16PM +0200, Andrew Jones wrote:
-> On Thu, Aug 04, 2022 at 05:41:38PM -0700, Ricardo Koller wrote:
-> > Some registers like the PMOVS reset to an architecturally UNKNOWN value.
-> > Most tests expect them to be reset (mostly zeroed) using pmu_reset().
-> > Add a pmu_reset() on all the tests that need one.
-> > 
-> > As a bonus, fix a couple of comments related to the register state
-> > before a sub-test.
-> > 
-> > Reviewed-by: Eric Auger <eric.auger@redhat.com>
-> > Signed-off-by: Ricardo Koller <ricarkol@google.com>
-> > ---
-> >  arm/pmu.c | 6 ++++--
-> >  1 file changed, 4 insertions(+), 2 deletions(-)
-> > 
-> > diff --git a/arm/pmu.c b/arm/pmu.c
-> > index 4c601b05..12e7d84e 100644
-> > --- a/arm/pmu.c
-> > +++ b/arm/pmu.c
-> > @@ -826,7 +826,7 @@ static void test_overflow_interrupt(void)
-> >  	write_regn_el0(pmevcntr, 1, PRE_OVERFLOW);
-> >  	isb();
-> >  
-> > -	/* interrupts are disabled */
-> > +	/* interrupts are disabled (PMINTENSET_EL1 == 0) */
-> >  
-> >  	mem_access_loop(addr, 200, pmu.pmcr_ro | PMU_PMCR_E);
-> >  	report(expect_interrupts(0), "no overflow interrupt after preset");
-> > @@ -842,7 +842,7 @@ static void test_overflow_interrupt(void)
-> >  	isb();
-> >  	report(expect_interrupts(0), "no overflow interrupt after counting");
-> >  
-> > -	/* enable interrupts */
-> > +	/* enable interrupts (PMINTENSET_EL1 <= ALL_SET) */
-> >  
-> >  	pmu_reset_stats();
-> >  
-> > @@ -890,6 +890,7 @@ static bool check_cycles_increase(void)
-> >  	bool success = true;
-> >  
-> >  	/* init before event access, this test only cares about cycle count */
-> > +	pmu_reset();
-> 
-> This and the other pmu_reset() call below break compilation on 32-bit arm,
-> because there's no pmu_reset() defined for it.
-I completely missed the 32-bit arm case. Thanks!
+On Wed, Aug 10, 2022 at 05:58:29PM +0000, Colton Lewis wrote:
+> Randomize which pages are written vs read by using the random number
 
-> It'd probably be best if
-> we actually implemented some sort of reset for arm, considering it's being
-> called in common tests.
+Same thing here about stating what the patch does first.
 
-Mind if I start by creating a pmu_reset() for 32-bit arm, which can
-later be used by a general arm_reset()?
+> table for each page modulo 100. This changes how the -w argument
 
+s/-f/-w/
+
+Although I would love it if you renamed -f to -w in the code instead.
+
+> works. It is now a percentage from 0 to 100 inclusive that represents
+> what percentage of accesses are writes. It keeps the same default of
+> 100 percent writes.
 > 
-> Thanks,
-> drew
+> Signed-off-by: Colton Lewis <coltonlewis@google.com>
+> ---
+>  tools/testing/selftests/kvm/dirty_log_perf_test.c | 12 +++++++-----
+
+access_tracking_perf_test.c also uses wr_fract and will need to be
+updated.
+
+>  tools/testing/selftests/kvm/lib/perf_test_util.c  |  4 ++--
+>  2 files changed, 9 insertions(+), 7 deletions(-)
 > 
-> >  	set_pmcntenset(1 << PMU_CYCLE_IDX);
-> >  	set_pmccfiltr(0); /* count cycles in EL0, EL1, but not EL2 */
-> >  
-> > @@ -944,6 +945,7 @@ static bool check_cpi(int cpi)
-> >  	uint32_t pmcr = get_pmcr() | PMU_PMCR_LC | PMU_PMCR_C | PMU_PMCR_E;
-> >  
-> >  	/* init before event access, this test only cares about cycle count */
-> > +	pmu_reset();
-> >  	set_pmcntenset(1 << PMU_CYCLE_IDX);
-> >  	set_pmccfiltr(0); /* count cycles in EL0, EL1, but not EL2 */
-> >  
-> > -- 
-> > 2.37.1.559.g78731f0fdb-goog
-> > 
+> diff --git a/tools/testing/selftests/kvm/dirty_log_perf_test.c b/tools/testing/selftests/kvm/dirty_log_perf_test.c
+> index 80a1cbe7fbb0..dcc5d44fc757 100644
+> --- a/tools/testing/selftests/kvm/dirty_log_perf_test.c
+> +++ b/tools/testing/selftests/kvm/dirty_log_perf_test.c
+> @@ -381,8 +381,8 @@ static void help(char *name)
+>  	       "     (default: 1G)\n");
+>  	printf(" -f: specify the fraction of pages which should be written to\n"
+
+s/fraction/percentage/
+
+>  	       "     as opposed to simply read, in the form\n"
+> -	       "     1/<fraction of pages to write>.\n"
+> -	       "     (default: 1 i.e. all pages are written to.)\n");
+> +	       "     [0-100]%% of pages to write.\n"
+> +	       "     (default: 100 i.e. all pages are written to.)\n");
+
+Mention that the implementation is probabilistic.
+
+>  	printf(" -v: specify the number of vCPUs to run.\n");
+>  	printf(" -o: Overlap guest memory accesses instead of partitioning\n"
+>  	       "     them into a separate region of memory for each vCPU.\n");
+> @@ -399,7 +399,7 @@ int main(int argc, char *argv[])
+>  	int max_vcpus = kvm_check_cap(KVM_CAP_MAX_VCPUS);
+>  	struct test_params p = {
+>  		.iterations = TEST_HOST_LOOP_N,
+> -		.wr_fract = 1,
+> +		.wr_fract = 100,
+
+Please rename wr_fract to e.g. write_percent to reflect the new
+semantics. Same goes for perf_test_set_wr_fract(),
+perf_test_args.wr_fract, etc.
+
+>  		.partition_vcpu_memory_access = true,
+>  		.backing_src = DEFAULT_VM_MEM_SRC,
+>  		.slots = 1,
+> @@ -439,8 +439,10 @@ int main(int argc, char *argv[])
+>  			break;
+>  		case 'f':
+>  			p.wr_fract = atoi(optarg);
+> -			TEST_ASSERT(p.wr_fract >= 1,
+> -				    "Write fraction cannot be less than one");
+> +			TEST_ASSERT(p.wr_fract >= 0,
+> +				    "Write fraction cannot be less than 0");
+> +			TEST_ASSERT(p.wr_fract <= 100,
+> +				    "Write fraction cannot be greater than 100");
+
+nit: This could be combined into a single assert pretty easily.
+
+>  			break;
+>  		case 'v':
+>  			nr_vcpus = atoi(optarg);
+> diff --git a/tools/testing/selftests/kvm/lib/perf_test_util.c b/tools/testing/selftests/kvm/lib/perf_test_util.c
+> index b04e8d2c0f37..3c7b93349fef 100644
+> --- a/tools/testing/selftests/kvm/lib/perf_test_util.c
+> +++ b/tools/testing/selftests/kvm/lib/perf_test_util.c
+> @@ -64,7 +64,7 @@ void perf_test_guest_code(uint32_t vcpu_idx)
+>  		for (i = 0; i < pages; i++) {
+>  			uint64_t addr = gva + (i * pta->guest_page_size);
+>  
+> -			if (i % pta->wr_fract == 0)
+> +			if (random_table[vcpu_idx][i] % 100 < pta->wr_fract)
+>  				*(uint64_t *)addr = 0x0123456789ABCDEF;
+>  			else
+>  				READ_ONCE(*(uint64_t *)addr);
+> @@ -168,7 +168,7 @@ struct kvm_vm *perf_test_create_vm(enum vm_guest_mode mode, int nr_vcpus,
+>  	pr_info("Testing guest mode: %s\n", vm_guest_mode_string(mode));
+>  
+>  	/* By default vCPUs will write to memory. */
+> -	pta->wr_fract = 1;
+> +	pta->wr_fract = 100;
+>  
+>  	/*
+>  	 * Snapshot the non-huge page size.  This is used by the guest code to
+> -- 
+> 2.37.1.559.g78731f0fdb-goog
+> 
