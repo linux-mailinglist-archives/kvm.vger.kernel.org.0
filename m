@@ -2,85 +2,87 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id F0ED858E807
-	for <lists+kvm@lfdr.de>; Wed, 10 Aug 2022 09:46:58 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 8304558E87E
+	for <lists+kvm@lfdr.de>; Wed, 10 Aug 2022 10:14:29 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231301AbiHJHqe (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 10 Aug 2022 03:46:34 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39304 "EHLO
+        id S231584AbiHJIO0 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 10 Aug 2022 04:14:26 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34314 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231216AbiHJHqZ (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 10 Aug 2022 03:46:25 -0400
-Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E2DB967C98
-        for <kvm@vger.kernel.org>; Wed, 10 Aug 2022 00:46:24 -0700 (PDT)
-Received: from pps.filterd (m0187473.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.17.1.5/8.17.1.5) with ESMTP id 27A5caoR031120
-        for <kvm@vger.kernel.org>; Wed, 10 Aug 2022 07:46:24 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=from : to : cc : subject
- : date : message-id : in-reply-to : references : mime-version :
- content-transfer-encoding; s=pp1;
- bh=inFqxBSu9cFJ9q3u/x8sLK3QHoPPZCuBdq/jtlu2Ts4=;
- b=kJ0FOkdSkbAglT0bPONxgtCTWdIYY7WpvMr7+3Krbr2je+y2gbdfZ/jua2ppBD9MHtDM
- AP8M9AEJImtdH6LZBi0Vuj9Fd6uD/OBCskkMa+WzxZYS94jQAM4oimb+nrSiYL62hB8+
- mVZyW11CPsNstsS63Nt1FU6+o9tx6eVD0qUZZLtPUR0MCPUGOzK9W0W2B+1n5hrgg/WX
- iaTgU3WVWa02ffjSdJvFoH2FM9eitGuLuTz3hebZHKWxZ7SnlVdjQBZkcXxC5dNTeWWJ
- /Toy6swiNPIsF1Rp4pNAg3YSno/Xtx1RqIXyQGp9vkBfnjttmWb6rgN/es4p8jHIUDwe DA== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3hv1fvahqj-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT)
-        for <kvm@vger.kernel.org>; Wed, 10 Aug 2022 07:46:24 +0000
-Received: from m0187473.ppops.net (m0187473.ppops.net [127.0.0.1])
-        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 27A7UlZg028591
-        for <kvm@vger.kernel.org>; Wed, 10 Aug 2022 07:46:24 GMT
-Received: from ppma05fra.de.ibm.com (6c.4a.5195.ip4.static.sl-reverse.com [149.81.74.108])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3hv1fvahp1-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Wed, 10 Aug 2022 07:46:23 +0000
-Received: from pps.filterd (ppma05fra.de.ibm.com [127.0.0.1])
-        by ppma05fra.de.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 27A7ZDpl028227;
-        Wed, 10 Aug 2022 07:46:21 GMT
-Received: from b06cxnps3074.portsmouth.uk.ibm.com (d06relay09.portsmouth.uk.ibm.com [9.149.109.194])
-        by ppma05fra.de.ibm.com with ESMTP id 3huwvjgdgn-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Wed, 10 Aug 2022 07:46:21 +0000
-Received: from d06av22.portsmouth.uk.ibm.com (d06av22.portsmouth.uk.ibm.com [9.149.105.58])
-        by b06cxnps3074.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 27A7kI0f29294926
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Wed, 10 Aug 2022 07:46:18 GMT
-Received: from d06av22.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 14AE44C046;
-        Wed, 10 Aug 2022 07:46:18 +0000 (GMT)
-Received: from d06av22.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id E38294C050;
-        Wed, 10 Aug 2022 07:46:17 +0000 (GMT)
-Received: from a46lp57.lnxne.boe (unknown [9.152.108.100])
-        by d06av22.portsmouth.uk.ibm.com (Postfix) with ESMTP;
-        Wed, 10 Aug 2022 07:46:17 +0000 (GMT)
-From:   Nico Boehr <nrb@linux.ibm.com>
-To:     kvm@vger.kernel.org
-Cc:     frankja@linux.ibm.com, imbrenda@linux.ibm.com, thuth@redhat.com
-Subject: [kvm-unit-tests PATCH v4 3/3] s390x: smp: add tests for calls in wait state
-Date:   Wed, 10 Aug 2022 09:46:16 +0200
-Message-Id: <20220810074616.1223561-4-nrb@linux.ibm.com>
-X-Mailer: git-send-email 2.36.1
-In-Reply-To: <20220810074616.1223561-1-nrb@linux.ibm.com>
-References: <20220810074616.1223561-1-nrb@linux.ibm.com>
+        with ESMTP id S229969AbiHJIOZ (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 10 Aug 2022 04:14:25 -0400
+Received: from mga09.intel.com (mga09.intel.com [134.134.136.24])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EB08E82FB0;
+        Wed, 10 Aug 2022 01:14:21 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1660119264; x=1691655264;
+  h=date:from:to:cc:subject:message-id:reply-to:references:
+   mime-version:in-reply-to;
+  bh=E0g83rEnLU+9yWmv16RmjNOqjZtTTbUeUZHLBrUwL7c=;
+  b=guxSelHBZKvw3kWVu/PCc2t6nE6juFIi4qwHX13ikjX+U2vzSL7ehNwQ
+   iZ56Y/JiluVIoCZKWlSCWZnABIj6gtD8q5GFLdon8AgWCQGkfkNKWp/lj
+   X4vs1jdOWAOxegPhqdl/OEsi/Xdz5SgCxtn5zsS5iBUYE3fPop5mqUfIz
+   Mnqtz4S07twlw8f3ssrOndCjTfvgXWJeiaiy9ih122V8GCkK1NIhVBD3H
+   bpktsn2c/WxQJ9Yav+3JofMpabCVWWeVWGiApuA2Zay3EWr5u3HzzLh0D
+   7/KXCJyil3cmpjv+fkcSDu6JKfPsdYXl8JwhYRlNx/z2IVqQC6I0wG8am
+   Q==;
+X-IronPort-AV: E=McAfee;i="6400,9594,10434"; a="291816766"
+X-IronPort-AV: E=Sophos;i="5.93,226,1654585200"; 
+   d="scan'208";a="291816766"
+Received: from orsmga007.jf.intel.com ([10.7.209.58])
+  by orsmga102.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 10 Aug 2022 01:14:21 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.93,226,1654585200"; 
+   d="scan'208";a="601736291"
+Received: from chaop.bj.intel.com (HELO localhost) ([10.240.193.75])
+  by orsmga007.jf.intel.com with ESMTP; 10 Aug 2022 01:14:11 -0700
+Date:   Wed, 10 Aug 2022 16:09:25 +0800
+From:   Chao Peng <chao.p.peng@linux.intel.com>
+To:     Paolo Bonzini <pbonzini@redhat.com>
+Cc:     Sean Christopherson <seanjc@google.com>, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org, linux-mm@kvack.org,
+        linux-fsdevel@vger.kernel.org, linux-api@vger.kernel.org,
+        linux-doc@vger.kernel.org, qemu-devel@nongnu.org,
+        linux-kselftest@vger.kernel.org, Jonathan Corbet <corbet@lwn.net>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+        x86@kernel.org, "H . Peter Anvin" <hpa@zytor.com>,
+        Hugh Dickins <hughd@google.com>,
+        Jeff Layton <jlayton@kernel.org>,
+        "J . Bruce Fields" <bfields@fieldses.org>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        Shuah Khan <shuah@kernel.org>, Mike Rapoport <rppt@kernel.org>,
+        Steven Price <steven.price@arm.com>,
+        "Maciej S . Szmigiero" <mail@maciej.szmigiero.name>,
+        Vlastimil Babka <vbabka@suse.cz>,
+        Vishal Annapurve <vannapurve@google.com>,
+        Yu Zhang <yu.c.zhang@linux.intel.com>,
+        "Kirill A . Shutemov" <kirill.shutemov@linux.intel.com>,
+        luto@kernel.org, jun.nakajima@intel.com, dave.hansen@intel.com,
+        ak@linux.intel.com, david@redhat.com, aarcange@redhat.com,
+        ddutile@redhat.com, dhildenb@redhat.com,
+        Quentin Perret <qperret@google.com>,
+        Michael Roth <michael.roth@amd.com>, mhocko@suse.com,
+        Muchun Song <songmuchun@bytedance.com>
+Subject: Re: [PATCH v7 08/14] KVM: Rename mmu_notifier_*
+Message-ID: <20220810080925.GA862421@chaop.bj.intel.com>
+Reply-To: Chao Peng <chao.p.peng@linux.intel.com>
+References: <20220706082016.2603916-1-chao.p.peng@linux.intel.com>
+ <20220706082016.2603916-9-chao.p.peng@linux.intel.com>
+ <YuQutJAhKWcsrrYl@google.com>
+ <ec3fe997-37d8-22b5-65f1-72f08a16474f@redhat.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-ORIG-GUID: kFIgykuJXNPaYPPfjdefhcQk03-4TUNW
-X-Proofpoint-GUID: rqnA3w_t8SeZ7TdxYv9zatjD7lfzDb1a
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.205,Aquarius:18.0.883,Hydra:6.0.517,FMLib:17.11.122.1
- definitions=2022-08-10_03,2022-08-09_02,2022-06-22_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 phishscore=0 mlxlogscore=910
- adultscore=0 impostorscore=0 suspectscore=0 bulkscore=0 spamscore=0
- priorityscore=1501 clxscore=1015 malwarescore=0 lowpriorityscore=0
- mlxscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2207270000 definitions=main-2208100021
-X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_EF,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_PASS,
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <ec3fe997-37d8-22b5-65f1-72f08a16474f@redhat.com>
+X-Spam-Status: No, score=-4.9 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
+        RCVD_IN_MSPIKE_H3,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE,
         T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -88,133 +90,23 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-When the SIGP interpretation facility is in use a SIGP external call to
-a waiting CPU will result in an exit of the calling cpu. For non-pv
-guests it's a code 56 (partial execution) exit otherwise its a code 108
-(secure instruction notification) exit. Those exits are handled
-differently from a normal SIGP instruction intercept that happens
-without interpretation and hence need to be tested.
+On Fri, Aug 05, 2022 at 09:54:35PM +0200, Paolo Bonzini wrote:
+> On 7/29/22 21:02, Sean Christopherson wrote:
+> > If we really want a different name, I'd vote for nomenclature that captures the
+> > invalidation aspect, which is really what the variables are all trackng, e.g.
+> > 
+> >    mmu_invalidate_seq
+> >    mmu_invalidate_in_progress
+> >    mmu_invalidate_range_start
+> >    mmu_invalidate_range_end
+> > 
+> 
+> Agreed, and this can of course be committed separately if Chao Peng sends it
+> outside this series.
 
-Signed-off-by: Nico Boehr <nrb@linux.ibm.com>
----
- s390x/smp.c | 97 +++++++++++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 97 insertions(+)
+I will do that, probably also includes:
+  06/14 KVM: Rename KVM_PRIVATE_MEM_SLOT
 
-diff --git a/s390x/smp.c b/s390x/smp.c
-index 5a269087581f..91f3e3bcc12a 100644
---- a/s390x/smp.c
-+++ b/s390x/smp.c
-@@ -356,6 +356,102 @@ static void test_calls(void)
- 	}
- }
- 
-+static void call_in_wait_ext_int_fixup(struct stack_frame_int *stack)
-+{
-+	/* Clear wait bit so we don't immediately wait again after the fixup */
-+	lowcore.ext_old_psw.mask &= ~PSW_MASK_WAIT;
-+}
-+
-+static void call_in_wait_setup(void)
-+{
-+	expect_ext_int();
-+	ctl_set_bit(0, current_sigp_call_case->cr0_bit);
-+	register_ext_cleanup_func(call_in_wait_ext_int_fixup);
-+
-+	set_flag(1);
-+}
-+
-+static void call_in_wait_received(void)
-+{
-+	report(lowcore.ext_int_code == current_sigp_call_case->ext_int_expected_type, "received");
-+
-+	set_flag(1);
-+}
-+
-+static void call_in_wait_cleanup(void)
-+{
-+	ctl_clear_bit(0, current_sigp_call_case->cr0_bit);
-+	register_ext_cleanup_func(NULL);
-+
-+	set_flag(1);
-+}
-+
-+static void test_calls_in_wait(void)
-+{
-+	int i;
-+	struct psw psw;
-+
-+	report_prefix_push("psw wait");
-+	for (i = 0; i < ARRAY_SIZE(cases_sigp_call); i++) {
-+		current_sigp_call_case = &cases_sigp_call[i];
-+
-+		report_prefix_push(current_sigp_call_case->name);
-+		if (!current_sigp_call_case->supports_pv && uv_os_is_guest()) {
-+			report_skip("Not supported under PV");
-+			report_prefix_pop();
-+			continue;
-+		}
-+
-+		/* Let the secondary CPU setup the external mask and the external interrupt cleanup function */
-+		set_flag(0);
-+		psw.mask = extract_psw_mask();
-+		psw.addr = (unsigned long)call_in_wait_setup;
-+		smp_cpu_start(1, psw);
-+
-+		/* Wait until the receiver has finished setup */
-+		wait_for_flag();
-+		set_flag(0);
-+
-+		/*
-+		 * To avoid races, we need to know that the secondary CPU has entered wait,
-+		 * but the architecture provides no way to check whether the secondary CPU
-+		 * is in wait.
-+		 *
-+		 * But since a waiting CPU is considered operating, simply stop the CPU, set
-+		 * up the restart new PSW mask in wait, send the restart interrupt and then
-+		 * wait until the CPU becomes operating (done by smp_cpu_start).
-+		 */
-+		smp_cpu_stop(1);
-+		psw.mask = extract_psw_mask() | PSW_MASK_EXT | PSW_MASK_WAIT;
-+		psw.addr = (unsigned long)call_in_wait_received;
-+		smp_cpu_start(1, psw);
-+
-+		smp_sigp(1, current_sigp_call_case->call, 0, NULL);
-+
-+		/* Wait until the receiver has handled the call */
-+		wait_for_flag();
-+		smp_cpu_stop(1);
-+		set_flag(0);
-+
-+		/*
-+		 * Now clean up the mess we have left behind. If the cleanup
-+		 * were part of call_in_wait_received we would not get a chance
-+		 * to catch an interrupt that is presented twice since we would
-+		 * disable the external call on the first interrupt.
-+		 */
-+		psw.mask = extract_psw_mask();
-+		psw.addr = (unsigned long)call_in_wait_cleanup;
-+		smp_cpu_start(1, psw);
-+
-+		/* Wait until the cleanup has been completed */
-+		wait_for_flag();
-+		smp_cpu_stop(1);
-+
-+		report_prefix_pop();
-+	}
-+	report_prefix_pop();
-+}
-+
- static void test_sense_running(void)
- {
- 	report_prefix_push("sense_running");
-@@ -474,6 +570,7 @@ int main(void)
- 	test_store_status();
- 	test_set_prefix();
- 	test_calls();
-+	test_calls_in_wait();
- 	test_sense_running();
- 	test_reset();
- 	test_reset_initial();
--- 
-2.36.1
-
+Chao
+> 
+> Paolo
