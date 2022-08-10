@@ -2,54 +2,57 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 38CF858EF42
-	for <lists+kvm@lfdr.de>; Wed, 10 Aug 2022 17:20:46 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 51B1858EF43
+	for <lists+kvm@lfdr.de>; Wed, 10 Aug 2022 17:20:47 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233074AbiHJPUo (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 10 Aug 2022 11:20:44 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33992 "EHLO
+        id S233110AbiHJPUq (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 10 Aug 2022 11:20:46 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37044 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233140AbiHJPUi (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 10 Aug 2022 11:20:38 -0400
-Received: from mail-yb1-xb4a.google.com (mail-yb1-xb4a.google.com [IPv6:2607:f8b0:4864:20::b4a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2180E275F0
-        for <kvm@vger.kernel.org>; Wed, 10 Aug 2022 08:20:37 -0700 (PDT)
-Received: by mail-yb1-xb4a.google.com with SMTP id n184-20020a2540c1000000b0067691de454cso12327215yba.11
-        for <kvm@vger.kernel.org>; Wed, 10 Aug 2022 08:20:37 -0700 (PDT)
+        with ESMTP id S233156AbiHJPUj (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 10 Aug 2022 11:20:39 -0400
+Received: from mail-pj1-x104a.google.com (mail-pj1-x104a.google.com [IPv6:2607:f8b0:4864:20::104a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CF8142409A
+        for <kvm@vger.kernel.org>; Wed, 10 Aug 2022 08:20:38 -0700 (PDT)
+Received: by mail-pj1-x104a.google.com with SMTP id kb4-20020a17090ae7c400b001f783657496so1328540pjb.6
+        for <kvm@vger.kernel.org>; Wed, 10 Aug 2022 08:20:38 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
-        h=cc:to:from:subject:mime-version:message-id:date:from:to:cc;
-        bh=KP56zBh4EvBGEqVoL4D6U15kXFJ7buVHE9QkBLEHtC8=;
-        b=QbxkmY4fxPn3ZPa+rAkuSv6hX1Y2IrikvlfpUUM2ufZ7ccAYugsIGg+LtUZqgR2QGX
-         svVH9ejDQKcJbIi1K/WYMLViIWxD7Rk9YK/i1XwFk/7+JIN0ZvLBSHv9VsNOqMxqcQJH
-         W3n4ZF3MSkTGn7m+Qev5pRr7tmKXhNeIoKoqJvk1GBG5VWR5mJRACvq2xDJvh6iC/7qc
-         SYPSEJUHGVbCom3QjS2hzzF/8TyEtPVEryfx29btpx6/qBh/kkvnsMjN1RMNDXQ8UsRr
-         drcdl1YKDxFd1dIupQ7BCi7j4a1TcFHm07P3uI/a+8RrfaZv5oowE88Pl+6qD0RO3rmZ
-         vG/w==
+        h=cc:to:from:subject:references:mime-version:message-id:in-reply-to
+         :date:from:to:cc;
+        bh=pTM3VLICBKkRJLIraoN2yuH4ndpvQ9iDrH4IB8fss5I=;
+        b=lCGx5tQ+dKIhHpZkyE+MZbxrlQvpioxRjZ7bmh7+2m+A0y8AOoy+W0jF7eMd1jtOxG
+         EPwXD8JyVuI39oh8FkykSP6/0ABy9z9fM6g8JewNekobOp8MC3aLOcho/pZhpuDjrn6w
+         ptsFU/fy+YOt5n7VbGx7o0YHKZNcIvBFj2RjaOklj8awdiEYiygkBJFs0tZ7Z0cp9Fz3
+         R65Ki0oRTXX7HsmlSUJ29CAOwgwzGNKzEu8s1F+Who4sHJH2OVf1+1WW5ndUY/TKUf5s
+         CPkGIOeV/O5QjBIkAOtA6zHVYnwqmAztNVVTLaYwDFjI00pJ+celv8dtE4aMadvd3r2t
+         NAsQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=cc:to:from:subject:mime-version:message-id:date:x-gm-message-state
-         :from:to:cc;
-        bh=KP56zBh4EvBGEqVoL4D6U15kXFJ7buVHE9QkBLEHtC8=;
-        b=I2yDUdNDhhKDK8pk05mTfqyZArTwq9Tq6aAlfiQXDT6POO2kErIhJIUidbtbToTzy1
-         TbeX3tdaAuf8Oib0ulVymaYLPAlAJ+e70ShX0wyYPMHOGCWWJuFXsDJAWIaNICoEq80T
-         aKd8iPSF9So+Y3ceHBmWH2GLRcAl0M+H0VXH0xr8pghXoCDuJKlypCAdlQ9iWMnPaBsp
-         SDLd1qFnPcXMn6Clg59KgaLgB/0ITmNjmkrZKCBJ2UbmAYai9ofXxw7R6Wr0s1rElAoK
-         HG3DZBhNgDG+yxeYMsRtKXnTLGVVkeXq+momq5i+FdNquqxazONWIfmqaavU7u2h7TvV
-         a4iQ==
-X-Gm-Message-State: ACgBeo0LiGG/VrqbLcgvp3+J3E+GQSm8dD3nTKFObGxf68uT/JTFz6zb
-        Rqbq92PjbdGbis0cbXtoml5vbUS9HltnX1/5JrBow2PlGJAdpCbNTnVWkwqZu7G9PiMi02VAjFK
-        xUhABWuSc1+bS8swb2G5MvKhKDIzwh5cPeva0Dr5bowCo9fdJ7BomjIGusw==
-X-Google-Smtp-Source: AA6agR7cyzY1meKb7HLA3MEnjHTZxWSNYuEhyHK9bPPEI4pmYPqJHKxQVCBhTq2SL952pVdPq5WojJYtnD0=
+        h=cc:to:from:subject:references:mime-version:message-id:in-reply-to
+         :date:x-gm-message-state:from:to:cc;
+        bh=pTM3VLICBKkRJLIraoN2yuH4ndpvQ9iDrH4IB8fss5I=;
+        b=6N72OVHZGbPFammDopPB8iM9IvW3wCAfoefgtS+lcgF+i8wWE4rsqSuGPX0JfV1csN
+         4wJ3JoUlzxhqH2dMwL0+J0EPjUiCvelxl9lwkn4VAQ1h8Ut1SStaW6U5uyWq5h9NkLJO
+         Rg6k2+Yh1rtKDHT5RkaYgwuzaOkL9ZvMnfMRd1d1VybKFpIoETPxcj3U72McNGmujmyS
+         YXqo/6J9XbCQiDH7PABDMyOfuW4WrFuk6Up+wYtEct76laF3Bh64lea5y5tkw3f2arZs
+         mdYaGNZ+OoeQRARW6+8UVxAs5UWHM8vDa3pcUX12WFn4cRJe6w1nkZL6S3TFyHRagayk
+         f6yQ==
+X-Gm-Message-State: ACgBeo3P6ot4MHijlSUwXDyCvq5jeRPVIOGie1DZJxZ2+ceL+fi7g9qJ
+        FpFIZaERBAoIBX6yvAiCRvTQNlWN3/a5Ym4RFRi+7ev9eUbZkH7LRTqNtvTRzfNXm+rg4tKeWaZ
+        SdtwfKGpfoBvLNkHTjTRGQxZB1t6mHEEB5/U+C5EFTjAwEsxyHZf4HDycFA==
+X-Google-Smtp-Source: AA6agR5u7bmiuslS/TLDZgTUSpRz4B0WdpLYWlxKyrIDhaQ9QjML9QMkKIBFIKhsAyG6j9iqiUlyAhJl8fk=
 X-Received: from pgonda1.kir.corp.google.com ([2620:15c:29:203:b185:1827:5b23:bbe2])
- (user=pgonda job=sendgmr) by 2002:a25:41c4:0:b0:67b:a826:7c71 with SMTP id
- o187-20020a2541c4000000b0067ba8267c71mr19812460yba.486.1660144836339; Wed, 10
- Aug 2022 08:20:36 -0700 (PDT)
-Date:   Wed, 10 Aug 2022 08:20:22 -0700
-Message-Id: <20220810152033.946942-1-pgonda@google.com>
+ (user=pgonda job=sendgmr) by 2002:a17:902:ccd0:b0:16c:5d4f:99f3 with SMTP id
+ z16-20020a170902ccd000b0016c5d4f99f3mr27993747ple.139.1660144838210; Wed, 10
+ Aug 2022 08:20:38 -0700 (PDT)
+Date:   Wed, 10 Aug 2022 08:20:23 -0700
+In-Reply-To: <20220810152033.946942-1-pgonda@google.com>
+Message-Id: <20220810152033.946942-2-pgonda@google.com>
 Mime-Version: 1.0
+References: <20220810152033.946942-1-pgonda@google.com>
 X-Mailer: git-send-email 2.37.1.559.g78731f0fdb-goog
-Subject: [V3 00/11] KVM: selftests: Add simple SEV test
+Subject: [V3 01/11] KVM: selftests: move vm_phy_pages_alloc() earlier in file
 From:   Peter Gonda <pgonda@google.com>
 To:     kvm@vger.kernel.org
 Cc:     linux-kernel@vger.kernel.org, marcorr@google.com,
@@ -68,67 +71,187 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-This patch series combines the work Michael Roth has done in supporting
-SEV guests in selftests and the work Sean Christopherson suggested to
-allow ucalls from SEV guests. And the work Sean has sent to consolidate
-the ucall boilerplate code. Along with a very simple version of the
-SEV selftests Michael originally proposed.
+From: Michael Roth <michael.roth@amd.com>
 
-V3
- * Addressed more of andrew.jones@ in ucall patches.
- * Fix build in non-x86 archs.
+Subsequent patches will break some of this code out into file-local
+helper functions, which will be used by functions like vm_vaddr_alloc(),
+which currently are defined earlier in the file, so a forward
+declaration would be needed.
 
-V2
- * Dropped RFC tag
- * Correctly separated Sean's ucall patches into 2 as originally
-   intended.
- * Addressed andrew.jones@ in ucall patches.
- * Fixed ucall pool usage to work for other archs
+Instead, move it earlier in the file, just above vm_vaddr_alloc() and
+and friends, which are the main users.
 
-V1
- * https://lore.kernel.org/all/20220715192956.1873315-1-pgonda@google.com/
+Reviewed-by: Mingwei Zhang <mizhang@google.com>
+Reviewed-by: Andrew Jones <andrew.jones@linux.dev>
+Signed-off-by: Michael Roth <michael.roth@amd.com>
+Signed-off-by: Peter Gonda <pgonda@google.com>
+---
+ tools/testing/selftests/kvm/lib/kvm_util.c | 145 ++++++++++-----------
+ 1 file changed, 72 insertions(+), 73 deletions(-)
 
-Michael Roth (6):
-  KVM: selftests: move vm_phy_pages_alloc() earlier in file
-  KVM: selftests: sparsebit: add const where appropriate
-  KVM: selftests: add hooks for managing encrypted guest memory
-  KVM: selftests: handle encryption bits in page tables
-  KVM: selftests: add support for encrypted vm_vaddr_* allocations
-  KVM: selftests: add library for creating/interacting with SEV guests
-
-Peter Gonda (3):
-  tools: Add atomic_test_and_set_bit()
-  KVM: selftests: Add ucall pool based implementation
-  KVM: selftests: Add simple sev vm testing
-
-Sean Christopherson (2):
-  KVM: selftests: Consolidate common code for popuplating
-  KVM: selftests: Consolidate boilerplate code in get_ucall()
-
- tools/arch/x86/include/asm/atomic.h           |   7 +
- tools/include/asm-generic/atomic-gcc.h        |  15 +
- tools/testing/selftests/kvm/.gitignore        |   1 +
- tools/testing/selftests/kvm/Makefile          |   3 +
- .../selftests/kvm/include/kvm_util_base.h     |  25 ++
- .../testing/selftests/kvm/include/sparsebit.h |  36 +--
- .../selftests/kvm/include/ucall_common.h      |  14 +-
- .../selftests/kvm/include/x86_64/sev.h        |  47 +++
- .../testing/selftests/kvm/lib/aarch64/ucall.c |  38 +--
- tools/testing/selftests/kvm/lib/kvm_util.c    | 267 +++++++++++++-----
- tools/testing/selftests/kvm/lib/riscv/ucall.c |  43 +--
- tools/testing/selftests/kvm/lib/s390x/ucall.c |  40 +--
- tools/testing/selftests/kvm/lib/sparsebit.c   |  48 ++--
- .../testing/selftests/kvm/lib/ucall_common.c  | 139 +++++++++
- .../selftests/kvm/lib/x86_64/processor.c      |  15 +-
- tools/testing/selftests/kvm/lib/x86_64/sev.c  | 249 ++++++++++++++++
- .../testing/selftests/kvm/lib/x86_64/ucall.c  |  39 +--
- .../selftests/kvm/x86_64/sev_all_boot_test.c  | 131 +++++++++
- 18 files changed, 911 insertions(+), 246 deletions(-)
- create mode 100644 tools/testing/selftests/kvm/include/x86_64/sev.h
- create mode 100644 tools/testing/selftests/kvm/lib/ucall_common.c
- create mode 100644 tools/testing/selftests/kvm/lib/x86_64/sev.c
- create mode 100644 tools/testing/selftests/kvm/x86_64/sev_all_boot_test.c
-
+diff --git a/tools/testing/selftests/kvm/lib/kvm_util.c b/tools/testing/selftests/kvm/lib/kvm_util.c
+index 9889fe0d8919..cb3a5f8a53b7 100644
+--- a/tools/testing/selftests/kvm/lib/kvm_util.c
++++ b/tools/testing/selftests/kvm/lib/kvm_util.c
+@@ -1089,6 +1089,78 @@ struct kvm_vcpu *__vm_vcpu_add(struct kvm_vm *vm, uint32_t vcpu_id)
+ 	return vcpu;
+ }
+ 
++/*
++ * Physical Contiguous Page Allocator
++ *
++ * Input Args:
++ *   vm - Virtual Machine
++ *   num - number of pages
++ *   paddr_min - Physical address minimum
++ *   memslot - Memory region to allocate page from
++ *
++ * Output Args: None
++ *
++ * Return:
++ *   Starting physical address
++ *
++ * Within the VM specified by vm, locates a range of available physical
++ * pages at or above paddr_min. If found, the pages are marked as in use
++ * and their base address is returned. A TEST_ASSERT failure occurs if
++ * not enough pages are available at or above paddr_min.
++ */
++vm_paddr_t vm_phy_pages_alloc(struct kvm_vm *vm, size_t num,
++			      vm_paddr_t paddr_min, uint32_t memslot)
++{
++	struct userspace_mem_region *region;
++	sparsebit_idx_t pg, base;
++
++	TEST_ASSERT(num > 0, "Must allocate at least one page");
++
++	TEST_ASSERT((paddr_min % vm->page_size) == 0,
++		"Min physical address not divisible by page size.\n paddr_min: 0x%lx page_size: 0x%x",
++		paddr_min, vm->page_size);
++
++	region = memslot2region(vm, memslot);
++	base = pg = paddr_min >> vm->page_shift;
++
++	do {
++		for (; pg < base + num; ++pg) {
++			if (!sparsebit_is_set(region->unused_phy_pages, pg)) {
++				base = pg = sparsebit_next_set(region->unused_phy_pages, pg);
++				break;
++			}
++		}
++	} while (pg && pg != base + num);
++
++	if (pg == 0) {
++		fprintf(stderr,
++			"No guest physical page available, paddr_min: 0x%lx page_size: 0x%x memslot: %u\n",
++			paddr_min, vm->page_size, memslot);
++		fputs("---- vm dump ----\n", stderr);
++		vm_dump(stderr, vm, 2);
++		abort();
++	}
++
++	for (pg = base; pg < base + num; ++pg)
++		sparsebit_clear(region->unused_phy_pages, pg);
++
++	return base * vm->page_size;
++}
++
++vm_paddr_t vm_phy_page_alloc(struct kvm_vm *vm, vm_paddr_t paddr_min,
++			     uint32_t memslot)
++{
++	return vm_phy_pages_alloc(vm, 1, paddr_min, memslot);
++}
++
++/* Arbitrary minimum physical address used for virtual translation tables. */
++#define KVM_GUEST_PAGE_TABLE_MIN_PADDR 0x180000
++
++vm_paddr_t vm_alloc_page_table(struct kvm_vm *vm)
++{
++	return vm_phy_page_alloc(vm, KVM_GUEST_PAGE_TABLE_MIN_PADDR, 0);
++}
++
+ /*
+  * VM Virtual Address Unused Gap
+  *
+@@ -1735,79 +1807,6 @@ const char *exit_reason_str(unsigned int exit_reason)
+ 	return "Unknown";
+ }
+ 
+-/*
+- * Physical Contiguous Page Allocator
+- *
+- * Input Args:
+- *   vm - Virtual Machine
+- *   num - number of pages
+- *   paddr_min - Physical address minimum
+- *   memslot - Memory region to allocate page from
+- *
+- * Output Args: None
+- *
+- * Return:
+- *   Starting physical address
+- *
+- * Within the VM specified by vm, locates a range of available physical
+- * pages at or above paddr_min. If found, the pages are marked as in use
+- * and their base address is returned. A TEST_ASSERT failure occurs if
+- * not enough pages are available at or above paddr_min.
+- */
+-vm_paddr_t vm_phy_pages_alloc(struct kvm_vm *vm, size_t num,
+-			      vm_paddr_t paddr_min, uint32_t memslot)
+-{
+-	struct userspace_mem_region *region;
+-	sparsebit_idx_t pg, base;
+-
+-	TEST_ASSERT(num > 0, "Must allocate at least one page");
+-
+-	TEST_ASSERT((paddr_min % vm->page_size) == 0, "Min physical address "
+-		"not divisible by page size.\n"
+-		"  paddr_min: 0x%lx page_size: 0x%x",
+-		paddr_min, vm->page_size);
+-
+-	region = memslot2region(vm, memslot);
+-	base = pg = paddr_min >> vm->page_shift;
+-
+-	do {
+-		for (; pg < base + num; ++pg) {
+-			if (!sparsebit_is_set(region->unused_phy_pages, pg)) {
+-				base = pg = sparsebit_next_set(region->unused_phy_pages, pg);
+-				break;
+-			}
+-		}
+-	} while (pg && pg != base + num);
+-
+-	if (pg == 0) {
+-		fprintf(stderr, "No guest physical page available, "
+-			"paddr_min: 0x%lx page_size: 0x%x memslot: %u\n",
+-			paddr_min, vm->page_size, memslot);
+-		fputs("---- vm dump ----\n", stderr);
+-		vm_dump(stderr, vm, 2);
+-		abort();
+-	}
+-
+-	for (pg = base; pg < base + num; ++pg)
+-		sparsebit_clear(region->unused_phy_pages, pg);
+-
+-	return base * vm->page_size;
+-}
+-
+-vm_paddr_t vm_phy_page_alloc(struct kvm_vm *vm, vm_paddr_t paddr_min,
+-			     uint32_t memslot)
+-{
+-	return vm_phy_pages_alloc(vm, 1, paddr_min, memslot);
+-}
+-
+-/* Arbitrary minimum physical address used for virtual translation tables. */
+-#define KVM_GUEST_PAGE_TABLE_MIN_PADDR 0x180000
+-
+-vm_paddr_t vm_alloc_page_table(struct kvm_vm *vm)
+-{
+-	return vm_phy_page_alloc(vm, KVM_GUEST_PAGE_TABLE_MIN_PADDR, 0);
+-}
+-
+ /*
+  * Address Guest Virtual to Host Virtual
+  *
 -- 
 2.37.1.559.g78731f0fdb-goog
 
