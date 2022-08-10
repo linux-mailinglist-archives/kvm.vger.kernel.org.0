@@ -2,88 +2,85 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 49C1E58E9FE
-	for <lists+kvm@lfdr.de>; Wed, 10 Aug 2022 11:45:50 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 3870F58E9DB
+	for <lists+kvm@lfdr.de>; Wed, 10 Aug 2022 11:42:45 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231615AbiHJJps (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 10 Aug 2022 05:45:48 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48802 "EHLO
+        id S232060AbiHJJmm (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 10 Aug 2022 05:42:42 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43002 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232260AbiHJJpi (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 10 Aug 2022 05:45:38 -0400
-Received: from mga02.intel.com (mga02.intel.com [134.134.136.20])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 09D951EAC3;
-        Wed, 10 Aug 2022 02:45:35 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1660124736; x=1691660736;
-  h=date:from:to:cc:subject:message-id:reply-to:references:
-   mime-version:in-reply-to;
-  bh=sBavDjNKIFmd2M6Jg3bF8kVDIymkWHMnSEIr5WIN7a0=;
-  b=O61/zh9nP1a3NA1MGvroQMtaoN5BFj12Ro1Ly3C9SI+LvvDmhryVaJP2
-   CarjfMhP3S2UW8pzfkIzHQX/EkG31FdTc3R+Z8xx694dCplk3YqpOQW4J
-   4WWBMeqVCVSOCG3IamVhM36kB761utc/Eer6Jp+NQnCZQQgSmJjmdq2tE
-   iGeMt5wqLmDfQmRA9jFKLpQWvtmhDKxRUQ3ccKTlRnEtmlKtecqbp02H0
-   SMKVZ70THXKKgFwj59jC7+QeIllAUc1U5rVeufdEZF4WAN9e2j7WGo8k7
-   T/jngFph2gS8+E4vFHrqNbjcS6s1SxTCjT7ssgLMSPRW1UlzIpUY8TH5n
-   w==;
-X-IronPort-AV: E=McAfee;i="6400,9594,10434"; a="277983040"
-X-IronPort-AV: E=Sophos;i="5.93,227,1654585200"; 
-   d="scan'208";a="277983040"
-Received: from orsmga007.jf.intel.com ([10.7.209.58])
-  by orsmga101.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 10 Aug 2022 02:45:35 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.93,227,1654585200"; 
-   d="scan'208";a="601757857"
-Received: from chaop.bj.intel.com (HELO localhost) ([10.240.193.75])
-  by orsmga007.jf.intel.com with ESMTP; 10 Aug 2022 02:45:24 -0700
-Date:   Wed, 10 Aug 2022 17:40:39 +0800
-From:   Chao Peng <chao.p.peng@linux.intel.com>
-To:     David Hildenbrand <david@redhat.com>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org, linux-mm@kvack.org,
-        linux-fsdevel@vger.kernel.org, linux-api@vger.kernel.org,
-        linux-doc@vger.kernel.org, qemu-devel@nongnu.org,
-        linux-kselftest@vger.kernel.org, Jonathan Corbet <corbet@lwn.net>,
-        Sean Christopherson <seanjc@google.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        x86@kernel.org, "H . Peter Anvin" <hpa@zytor.com>,
-        Hugh Dickins <hughd@google.com>,
-        Jeff Layton <jlayton@kernel.org>,
-        "J . Bruce Fields" <bfields@fieldses.org>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        Shuah Khan <shuah@kernel.org>, Mike Rapoport <rppt@kernel.org>,
-        Steven Price <steven.price@arm.com>,
-        "Maciej S . Szmigiero" <mail@maciej.szmigiero.name>,
-        Vlastimil Babka <vbabka@suse.cz>,
-        Vishal Annapurve <vannapurve@google.com>,
-        Yu Zhang <yu.c.zhang@linux.intel.com>,
-        "Kirill A . Shutemov" <kirill.shutemov@linux.intel.com>,
-        luto@kernel.org, jun.nakajima@intel.com, dave.hansen@intel.com,
-        ak@linux.intel.com, aarcange@redhat.com, ddutile@redhat.com,
-        dhildenb@redhat.com, Quentin Perret <qperret@google.com>,
-        Michael Roth <michael.roth@amd.com>, mhocko@suse.com,
-        Muchun Song <songmuchun@bytedance.com>
-Subject: Re: [PATCH v7 01/14] mm: Add F_SEAL_AUTO_ALLOCATE seal to memfd
-Message-ID: <20220810094039.GG862421@chaop.bj.intel.com>
-Reply-To: Chao Peng <chao.p.peng@linux.intel.com>
-References: <20220706082016.2603916-1-chao.p.peng@linux.intel.com>
- <20220706082016.2603916-2-chao.p.peng@linux.intel.com>
- <f39c4f63-a511-4beb-b3a4-66589ddb5475@redhat.com>
- <472207cf-ff71-563b-7b66-0c7bea9ea8ad@redhat.com>
- <a2b8fa73-4efd-426f-abcd-7975ff9a7101@redhat.com>
+        with ESMTP id S231499AbiHJJmP (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 10 Aug 2022 05:42:15 -0400
+Received: from mail.skyhub.de (mail.skyhub.de [5.9.137.197])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CDC072BF1;
+        Wed, 10 Aug 2022 02:42:13 -0700 (PDT)
+Received: from zn.tnic (p200300ea971b9870329c23fffea6a903.dip0.t-ipconnect.de [IPv6:2003:ea:971b:9870:329c:23ff:fea6:a903])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by mail.skyhub.de (SuperMail on ZX Spectrum 128k) with ESMTPSA id 243361EC0495;
+        Wed, 10 Aug 2022 11:42:08 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alien8.de; s=dkim;
+        t=1660124528;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:in-reply-to:in-reply-to:  references:references;
+        bh=Lg0bjIUF/mk/gAoLNHDftsiQImL/TihLBQ1unQ3ZWpQ=;
+        b=AIj2iYxVK4108GPMfeeOPesMiFf/otTqH273QTt3qHw2Qen4RGdW80RP4idJ3ahNdb/3tf
+        YgpmBsp1NHmAdSFu5+S+C3ycqyrXzkpWZXzbIGH+8yYmh5e6NTlQKMUiICNKbHL90GCpBi
+        dsubLvV6cbhLbXTbgsBLObOWi8NOT0U=
+Date:   Wed, 10 Aug 2022 11:42:04 +0200
+From:   Borislav Petkov <bp@alien8.de>
+To:     "Kalra, Ashish" <Ashish.Kalra@amd.com>
+Cc:     "x86@kernel.org" <x86@kernel.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "linux-coco@lists.linux.dev" <linux-coco@lists.linux.dev>,
+        "linux-mm@kvack.org" <linux-mm@kvack.org>,
+        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
+        "tglx@linutronix.de" <tglx@linutronix.de>,
+        "mingo@redhat.com" <mingo@redhat.com>,
+        "jroedel@suse.de" <jroedel@suse.de>,
+        "Lendacky, Thomas" <Thomas.Lendacky@amd.com>,
+        "hpa@zytor.com" <hpa@zytor.com>,
+        "ardb@kernel.org" <ardb@kernel.org>,
+        "pbonzini@redhat.com" <pbonzini@redhat.com>,
+        "seanjc@google.com" <seanjc@google.com>,
+        "vkuznets@redhat.com" <vkuznets@redhat.com>,
+        "jmattson@google.com" <jmattson@google.com>,
+        "luto@kernel.org" <luto@kernel.org>,
+        "dave.hansen@linux.intel.com" <dave.hansen@linux.intel.com>,
+        "slp@redhat.com" <slp@redhat.com>,
+        "pgonda@google.com" <pgonda@google.com>,
+        "peterz@infradead.org" <peterz@infradead.org>,
+        "srinivas.pandruvada@linux.intel.com" 
+        <srinivas.pandruvada@linux.intel.com>,
+        "rientjes@google.com" <rientjes@google.com>,
+        "dovmurik@linux.ibm.com" <dovmurik@linux.ibm.com>,
+        "tobin@ibm.com" <tobin@ibm.com>,
+        "Roth, Michael" <Michael.Roth@amd.com>,
+        "vbabka@suse.cz" <vbabka@suse.cz>,
+        "kirill@shutemov.name" <kirill@shutemov.name>,
+        "ak@linux.intel.com" <ak@linux.intel.com>,
+        "tony.luck@intel.com" <tony.luck@intel.com>,
+        "marcorr@google.com" <marcorr@google.com>,
+        "sathyanarayanan.kuppuswamy@linux.intel.com" 
+        <sathyanarayanan.kuppuswamy@linux.intel.com>,
+        "alpergun@google.com" <alpergun@google.com>,
+        "dgilbert@redhat.com" <dgilbert@redhat.com>,
+        "jarkko@kernel.org" <jarkko@kernel.org>
+Subject: Re: [PATCH Part2 v6 09/49] x86/fault: Add support to handle the RMP
+ fault for user address
+Message-ID: <YvN9bKQ0XtUVJE7z@zn.tnic>
+References: <cover.1655761627.git.ashish.kalra@amd.com>
+ <0ecb0a4781be933fcadeb56a85070818ef3566e7.1655761627.git.ashish.kalra@amd.com>
+ <YvKRjxgipxLSNCLe@zn.tnic>
+ <SN6PR12MB2767322F8C573EDFA1C20AD78E659@SN6PR12MB2767.namprd12.prod.outlook.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <a2b8fa73-4efd-426f-abcd-7975ff9a7101@redhat.com>
-X-Spam-Status: No, score=-4.9 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
-        RCVD_IN_MSPIKE_H3,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE,
+In-Reply-To: <SN6PR12MB2767322F8C573EDFA1C20AD78E659@SN6PR12MB2767.namprd12.prod.outlook.com>
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,SPF_HELO_NONE,SPF_PASS,
         T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -91,34 +88,65 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Aug 05, 2022 at 08:06:03PM +0200, David Hildenbrand wrote:
-> On 05.08.22 19:55, Paolo Bonzini wrote:
-> > On 7/21/22 11:44, David Hildenbrand wrote:
-> >>
-> >> Also, I*think*  you can place pages via userfaultfd into shmem. Not
-> >> sure if that would count "auto alloc", but it would certainly bypass
-> >> fallocate().
-> > 
-> > Yeah, userfaultfd_register would probably have to forbid this for 
-> > F_SEAL_AUTO_ALLOCATE vmas.  Maybe the memfile_node can be reused for 
-> > this, adding a new MEMFILE_F_NO_AUTO_ALLOCATE flags?  Then 
-> > userfault_register would do something like 
-> > memfile_node_get_flags(vma->vm_file) and check the result.
+On Wed, Aug 10, 2022 at 03:59:34AM +0000, Kalra, Ashish wrote:
+> Actually SNP feature can be enabled globally, but SNP is activated on a per VM basis.
 > 
-> An alternative is to simply have the shmem allocation fail in a similar
-> way. Maybe it does already, I haven't checked (don't think so).
+> From the APM:
+> The term SNP-enabled indicates that SEV-SNP is globally enabled in the SYSCFG 
+> MSR. The term SNP-active indicates that SEV-SNP is enabled for a specific VM in the 
+> SEV_FEATURES field of its VMSA
 
-This sounds a better option. We don't need uAPI changes for
-userfault_register uAPI but I guess we will still need a KVM uAPI,
-either on the memslot or on the whole VM since Roth said this feature
-should be optional because some usages may want to disable it for
-performance reason. For details please see discussion:
-  https://lkml.org/lkml/2022/6/23/1905
+Aha, and I was wondering whether "globally" meant the RMP needs to cover
+all physical memory but I guess that isn't the case:
 
-Chao
-> 
-> 
-> -- 
-> Thanks,
-> 
-> David / dhildenb
+"RMP-Covered: Checks that the target page is covered by the RMP. A page
+is covered by the RMP if its corresponding RMP entry is below RMP_END.
+Any page not covered by the RMP is considered a Hypervisor-Owned page."
+
+> >You need to elaborate more here: a RMP fault can happen and then the
+> >page can get unmapped? What is the exact scenario here?
+>
+> Yes, if the page gets unmapped while the RMP fault was being handled,
+> will add more explanation here.
+
+So what's the logic here to return 1, i.e., retry?
+
+Why should a fault for a page that gets unmapped be retried? The fault
+in that case should be ignored, IMO. It'll have the same effect to
+return from do_user_addr_fault() there, without splitting but you need
+to have a separate return value definition so that it is clear what
+needs to happen. And that return value should be != 0 so that the
+current check still works.
+
+> Actually, the above computes an index into the RMP table.
+
+What index in the RMP table?
+
+> It is basically an index into the 4K page within the hugepage mapped
+> in the RMP table or in other words an index into the RMP table entry
+> for 4K page(s) corresponding to a hugepage.
+
+So pte_index(address) and for 1G pages, pmd_index(address).
+
+So no reinventing the wheel if we already have helpers for that.
+
+> It is mainly a wrapper around__split_huge_pmd() for SNP use case where
+> the host hugepage is split to be in sync with the RMP table.
+
+I see what it is. And I'm saying this looks wrong. You're enforcing page
+splitting to be a valid thing to do only for SEV machines. Why?
+
+Why is
+
+        if (!IS_ENABLED(CONFIG_AMD_MEM_ENCRYPT))
+                return VM_FAULT_SIGBUS;
+
+there at all?
+
+This is generic code you're touching - not arch/x86/.
+
+-- 
+Regards/Gruss,
+    Boris.
+
+https://people.kernel.org/tglx/notes-about-netiquette
