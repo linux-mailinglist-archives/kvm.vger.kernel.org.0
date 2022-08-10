@@ -2,132 +2,92 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 604E958F4ED
-	for <lists+kvm@lfdr.de>; Thu, 11 Aug 2022 01:35:59 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 9626C58F4F2
+	for <lists+kvm@lfdr.de>; Thu, 11 Aug 2022 01:38:05 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233522AbiHJXft (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 10 Aug 2022 19:35:49 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58130 "EHLO
+        id S232655AbiHJXh4 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 10 Aug 2022 19:37:56 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33438 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233761AbiHJXfa (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 10 Aug 2022 19:35:30 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id D975E6CF6E
-        for <kvm@vger.kernel.org>; Wed, 10 Aug 2022 16:35:27 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1660174507;
-        h=from:from:reply-to:reply-to:subject:subject:date:date:
-         message-id:message-id:to:to:cc:cc:mime-version:mime-version:
-         content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=p4aqIasYhaSzV49q+EWgbsENRoxcrDk8IPfuEQBuSyc=;
-        b=AmysuECMBK366zTUC8ssSB0JeSkJWhT5I7CmYMhQLDKW0+PT3K0XnqucWERJcm1KtuqZln
-        y46rk+6e16k8kQ2ILPhkJjApg38pCgt6KqO2bRaqKb63n74l2dkblXEsVPCJiSDARVwY1B
-        pZmwTS+TifKJrptqgqBkfXzXpiF4H7Y=
-Received: from mimecast-mx02.redhat.com (mx3-rdu2.redhat.com
- [66.187.233.73]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-13-BD_3TpmPM_y3UTMOCkcRrg-1; Wed, 10 Aug 2022 19:35:04 -0400
-X-MC-Unique: BD_3TpmPM_y3UTMOCkcRrg-1
-Received: from smtp.corp.redhat.com (int-mx10.intmail.prod.int.rdu2.redhat.com [10.11.54.10])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 6A52D29DD9A3;
-        Wed, 10 Aug 2022 23:35:03 +0000 (UTC)
-Received: from [10.64.54.77] (vpn2-54-77.bne.redhat.com [10.64.54.77])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id 798FF492C3B;
-        Wed, 10 Aug 2022 23:34:59 +0000 (UTC)
-Reply-To: Gavin Shan <gshan@redhat.com>
-Subject: Re: [PATCH 1/2] KVM: selftests: Make rseq compatible with glibc-2.35
-To:     Paolo Bonzini <pbonzini@redhat.com>,
-        Mathieu Desnoyers <mathieu.desnoyers@efficios.com>
-Cc:     Florian Weimer <fweimer@redhat.com>,
-        kvmarm <kvmarm@lists.cs.columbia.edu>,
-        KVM list <kvm@vger.kernel.org>,
-        linux-kselftest <linux-kselftest@vger.kernel.org>,
-        linux-kernel <linux-kernel@vger.kernel.org>,
-        maz <maz@kernel.org>, oliver upton <oliver.upton@linux.dev>,
-        andrew jones <andrew.jones@linux.dev>,
-        Sean Christopherson <seanjc@google.com>,
-        yihyu <yihyu@redhat.com>, shan gavin <shan.gavin@gmail.com>
-References: <20220809060627.115847-1-gshan@redhat.com>
- <20220809060627.115847-2-gshan@redhat.com>
- <8735e6ncxw.fsf@oldenburg.str.redhat.com>
- <7844e3fa-e49e-de75-e424-e82d3a023dd6@redhat.com>
- <87o7wtnay6.fsf@oldenburg.str.redhat.com>
- <616d4de6-81f6-9d14-4e57-4a79fec45690@redhat.com>
- <797306043.114963.1660047714774.JavaMail.zimbra@efficios.com>
- <bb97efaf-4f58-c192-a489-e71ebbebce8c@redhat.com>
- <392275844.358.1660133856396.JavaMail.zimbra@efficios.com>
- <ae135a39-4190-041b-93dd-be2610125631@redhat.com>
-From:   Gavin Shan <gshan@redhat.com>
-Message-ID: <49d8b8fb-4053-cdd2-4d3c-9bf693c23a47@redhat.com>
-Date:   Thu, 11 Aug 2022 09:34:57 +1000
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.2.0
+        with ESMTP id S230282AbiHJXhy (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 10 Aug 2022 19:37:54 -0400
+Received: from mail-pg1-x534.google.com (mail-pg1-x534.google.com [IPv6:2607:f8b0:4864:20::534])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6F77A175A1
+        for <kvm@vger.kernel.org>; Wed, 10 Aug 2022 16:37:53 -0700 (PDT)
+Received: by mail-pg1-x534.google.com with SMTP id 12so15706293pga.1
+        for <kvm@vger.kernel.org>; Wed, 10 Aug 2022 16:37:53 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc;
+        bh=/E6nBCcLsQwwDZ/U1TZhczKKBZUxXj9p9RGy5ZKcpWc=;
+        b=KIp0QySzSV1Fmfo2pNMcNcneRmnI/xACVdmspYl1Avy30ceVPUOOCAuNpVXKJdfByB
+         A//wYIRlMJY2ug244yb8jP4ZhWUeu2dgcIR27wXcYmeRcv1o/IuDE6gZXEIHDSOXGYZP
+         HeNYY5RMXBHu86d1AiXFVOeNPVvYDfLH4kSmCj67Y2chfXqlhXe81MyqBuoKJqFH+0Yd
+         Vg6r427fQ4K+qT0+uzl3ZPKkQVtPx52sM77//aaf9XjPzvoqxGs1trxikx0G5Dsz1ue9
+         zU+d/QpE6sxzDkNR8jP53K5sjdRPuot6YYSBQMlLZ3c4Rqvd3WKU06yfY/fHhKDuxE/1
+         p1Qw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc;
+        bh=/E6nBCcLsQwwDZ/U1TZhczKKBZUxXj9p9RGy5ZKcpWc=;
+        b=ZTovvRUk6pWtj6ywsMEcCFE8MtHI7xsHMXSLUDSSGvY5NVL1w894EQRAaUUWlozjls
+         C8hF3W8W9GF+tCBy5Oz0baj5zLlqw28QESF8SCNrA6dIFFWwYbmTMhbEfj2UGOnISTjg
+         bCD3xKpdcO5KMjxCjfeV6y7WATajVNGS00PbkqoORtZPKC4Joo9Ke2IRw/r9RwzL4eSW
+         YMZh48NEELefL72atGwdMYfCax3GZ8rswph5c2Vxxbj46KGLFhSTx8YBu3FMc5ALoGSm
+         qrUa5dmJ9faYlLQxhM/SHzMeNmeKyfzP1N+LprNwk+WgT0J+IyMOdHrOCWSKVG4Mr1/v
+         b1dA==
+X-Gm-Message-State: ACgBeo0kfkIHIgSCaBJ0PVIUl24H7IZMAAxN964DgSF3dgDKw/I7keEp
+        0MnEZmnAq/i0FX0vjyJLO6Dv/w==
+X-Google-Smtp-Source: AA6agR5IkMWQN8IzhJxauA9aBwsBCCM83w9h4nhiouQnkIT6U7d1XjGsfkQ88Yy88S0aj5Sw/qiAqQ==
+X-Received: by 2002:a63:c5:0:b0:40d:d290:24ef with SMTP id 188-20020a6300c5000000b0040dd29024efmr24608214pga.141.1660174672769;
+        Wed, 10 Aug 2022 16:37:52 -0700 (PDT)
+Received: from google.com (223.103.125.34.bc.googleusercontent.com. [34.125.103.223])
+        by smtp.gmail.com with ESMTPSA id r24-20020aa79638000000b0052ad6d627a6sm2538496pfg.166.2022.08.10.16.37.51
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 10 Aug 2022 16:37:51 -0700 (PDT)
+Date:   Wed, 10 Aug 2022 16:37:47 -0700
+From:   David Matlack <dmatlack@google.com>
+To:     Colton Lewis <coltonlewis@google.com>
+Cc:     kvm@vger.kernel.org, pbonzini@redhat.com, maz@kernel.org,
+        seanjc@google.com, oupton@google.com, ricarkol@google.com
+Subject: Re: [PATCH 2/3] KVM: selftests: Randomize which pages are written vs
+ read
+Message-ID: <YvRBS5ZJ/kx92TnC@google.com>
+References: <20220810175830.2175089-1-coltonlewis@google.com>
+ <20220810175830.2175089-3-coltonlewis@google.com>
+ <YvRAWKGXbPzool6j@google.com>
 MIME-Version: 1.0
-In-Reply-To: <ae135a39-4190-041b-93dd-be2610125631@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 2.85 on 10.11.54.10
-X-Spam-Status: No, score=-3.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
-        RCVD_IN_DNSWL_LOW,SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE
-        autolearn=unavailable autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <YvRAWKGXbPzool6j@google.com>
+X-Spam-Status: No, score=-14.5 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+        ENV_AND_HDR_SPF_MATCH,FSL_HELO_FAKE,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,
+        SPF_PASS,T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL
+        autolearn=no autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi Paolo and Mathieu,
-
-On 8/10/22 10:19 PM, Paolo Bonzini wrote:
-> On 8/10/22 14:17, Mathieu Desnoyers wrote:
->> Indeed, this hack seems to be a good approach to immediately fix things without
->> moving around all source files and headers. In the longer term, I'd prefer Sean's
->> proposal to move rseq.c to tools/lib/ (and to move rseq headers to tools/include/rseq/).
->> This can be done in a follow up phase though. I'll put a note on my todo list
->> for after I come back from vacation.
+On Wed, Aug 10, 2022 at 04:33:44PM -0700, David Matlack wrote:
+> On Wed, Aug 10, 2022 at 05:58:29PM +0000, Colton Lewis wrote:
+> > Randomize which pages are written vs read by using the random number
 > 
-> Great, Gavin, are you going to repost using librseq?
+> Same thing here about stating what the patch does first.
+
+Sorry -- you do state what the patch does first here. But I think it
+could just be a little more direct and specific. e.g.
+
+  Replace the -f<fraction> option in dirty_log_perf_test.c with
+  -w<percent>, to allow the user to specify the percentage of which
+  pages are written.
+
 > 
-
-It seems you've merged v2. I will post additional patches to
-use tools/lib/librseq.so, depending on what Mathieu will have.
-
-Mathieu, Please let me know if there are anything I can help.
-
->>> Yeah, rseq_test should reuse librseq code.  The simplest way,
->>> if slightly hackish, is to do something like
->>>
->>> diff --git a/tools/testing/selftests/kvm/Makefile
->>> b/tools/testing/selftests/kvm/Makefile
->>> index 690b499c3471..6c192b0ec304 100644
->>> --- a/tools/testing/selftests/kvm/Makefile
->>> +++ b/tools/testing/selftests/kvm/Makefile
->>> @@ -37,6 +37,7 @@ ifeq ($(ARCH),riscv)
->>>      UNAME_M := riscv
->>>  endif
->>>
->>>  LIBKVM += lib/assert.c
->>>  LIBKVM += lib/elf.c
->>>  LIBKVM += lib/guest_modes.c
->>> @@ -198,7 +199,7 @@ endif
->>>  CFLAGS += -Wall -Wstrict-prototypes -Wuninitialized -O2 -g -std=gnu99 \
->>>      -fno-stack-protector -fno-PIE -I$(LINUX_TOOL_INCLUDE) \
->>>      -I$(LINUX_TOOL_ARCH_INCLUDE) -I$(LINUX_HDR_PATH) -Iinclude \
->>> -    -I$(<D) -Iinclude/$(UNAME_M) -I.. $(EXTRA_CFLAGS) $(KHDR_INCLUDES)
->>> +    -I$(<D) -Iinclude/$(UNAME_M) -I.. $(EXTRA_CFLAGS) $(KHDR_INCLUDES) -I../rseq
->>>
->>>  no-pie-option := $(call try-run, echo 'int main() { return 0; }' | \
->>>          $(CC) -Werror -no-pie -x c - -o "$$TMP", -no-pie)
->>>
->>>
->>> and just #include "../rseq/rseq.c" in rseq_test.c.
-
-Thanks,
-Gavin
-
+> > table for each page modulo 100. This changes how the -w argument
+> > works. It is now a percentage from 0 to 100 inclusive that represents
+> > what percentage of accesses are writes. It keeps the same default of
+> > 100 percent writes.
