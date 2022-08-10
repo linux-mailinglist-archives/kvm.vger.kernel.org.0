@@ -2,277 +2,150 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id BDA4358E3F1
-	for <lists+kvm@lfdr.de>; Wed, 10 Aug 2022 01:57:50 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id C103758E424
+	for <lists+kvm@lfdr.de>; Wed, 10 Aug 2022 02:38:01 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229918AbiHIX5s (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 9 Aug 2022 19:57:48 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41898 "EHLO
+        id S229567AbiHJAh5 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 9 Aug 2022 20:37:57 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44002 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229871AbiHIX5o (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 9 Aug 2022 19:57:44 -0400
-Received: from mail-lj1-x22b.google.com (mail-lj1-x22b.google.com [IPv6:2a00:1450:4864:20::22b])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D670A8048D
-        for <kvm@vger.kernel.org>; Tue,  9 Aug 2022 16:57:42 -0700 (PDT)
-Received: by mail-lj1-x22b.google.com with SMTP id x9so10858905ljj.13
-        for <kvm@vger.kernel.org>; Tue, 09 Aug 2022 16:57:42 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=semihalf.com; s=google;
-        h=content-transfer-encoding:content-language:in-reply-to:mime-version
-         :user-agent:date:message-id:from:references:cc:to:subject:from:to:cc;
-        bh=ZbqTbaXWd/Bj5BMjd3dqX6jTh0Tp2n0ayotMyOw0NOs=;
-        b=pZyKrLhPvmleL69wqPqzryGUpBIZ+9IqLPQc896uhVbmWYsVj/54Sok/OUij48RenF
-         PymqGYujgef9tO++QpzqfCBFhPvQSrWUZmskgm3SA82+LEWTwNgXy8ei/YVAkMK6hlDB
-         DzfVKUcUI6DdCH/3dV1VQlgha+f5IPMiLJlGCTyifxOiShj6X5QVXOzodBlXDNgUiZiH
-         XOL8nI7TdqQFcS5gyzMQ4AtAXf1u1XB5K5vjZTKgTsN7LrKHlLMEEpkdoFYiZkm66gv1
-         JwXKGJsWvQnIvVOfQ0Sx85zgQgS3a7nXXDxAUuW3xfkHQvDYP9OIF84HCjlXFd5sffKC
-         IeBQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=content-transfer-encoding:content-language:in-reply-to:mime-version
-         :user-agent:date:message-id:from:references:cc:to:subject
-         :x-gm-message-state:from:to:cc;
-        bh=ZbqTbaXWd/Bj5BMjd3dqX6jTh0Tp2n0ayotMyOw0NOs=;
-        b=eQFMVUfajiRRNyyankXV4BBaw8Mk9j8cIMpuyeRkeh0+kEVsccNCWpKiJIB74DXhTO
-         vazWIwBhyHIobhVRGcobmkNtv0aKXEVuiEj2Tvzn23/3HAjPtIhlmR2AtosEezQidK+C
-         ZFF5A6hb1BLv9T2/2qIjVYKsJoA4tKFreWIamFvnWYFyJuolNNjQdw69R6LvaoizhVkl
-         p9PqrimaqQYQKb25mr6LcWr4VvQJoivPHvEY9mDIeqV+mgyA80KUWxBY4IubfE6/iCcw
-         3VlXpCD0GrQsYPqMje4mbuaSaF4f+ODJFCn02vXwbMI9FiCZ6X0aJfwSZOudyEB6Q7yt
-         oG1A==
-X-Gm-Message-State: ACgBeo2t9tLaFVxJyhN+q+mT8hRmOrRZz6bWDQ+zzyKhfuptj8u7sTrr
-        GqS1FTxzI8a0EM/ovz3VXgXqqg==
-X-Google-Smtp-Source: AA6agR4gSdzegAdFtDDPFuCu0UTkWoMQ1IVFDR0kvz4aVgObkpg1QuQHXTxC5gb+kaar6OrNVE2IPA==
-X-Received: by 2002:a2e:b750:0:b0:25e:71da:5baf with SMTP id k16-20020a2eb750000000b0025e71da5bafmr8268833ljo.166.1660089461060;
-        Tue, 09 Aug 2022 16:57:41 -0700 (PDT)
-Received: from ?IPv6:2a02:a31b:33d:9c00:463a:87e3:44fc:2b2f? ([2a02:a31b:33d:9c00:463a:87e3:44fc:2b2f])
-        by smtp.gmail.com with ESMTPSA id c5-20020a056512324500b0048abf3a550asm125471lfr.224.2022.08.09.16.57.39
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 09 Aug 2022 16:57:40 -0700 (PDT)
-Subject: Re: [PATCH v2 3/5] KVM: irqfd: Postpone resamplefd notify for oneshot
- interrupts
-To:     eric.auger@redhat.com, Sean Christopherson <seanjc@google.com>,
-        Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org
-Cc:     Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org,
-        "H. Peter Anvin" <hpa@zytor.com>, linux-kernel@vger.kernel.org,
-        Alex Williamson <alex.williamson@redhat.com>,
-        Rong L Liu <rong.l.liu@intel.com>,
-        Zhenyu Wang <zhenyuw@linux.intel.com>,
-        Tomasz Nowicki <tn@semihalf.com>,
-        Grzegorz Jaszczyk <jaz@semihalf.com>, upstream@semihalf.com,
-        Dmitry Torokhov <dtor@google.com>,
-        Marc Zyngier <maz@kernel.org>
-References: <20220805193919.1470653-1-dmy@semihalf.com>
- <20220805193919.1470653-4-dmy@semihalf.com>
- <56ab2bc2-378b-3ece-2d45-e0f484087aa7@redhat.com>
-From:   Dmytro Maluka <dmy@semihalf.com>
-Message-ID: <6ecd1bcc-0f5d-8183-615a-037a9670e136@semihalf.com>
-Date:   Wed, 10 Aug 2022 01:57:39 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.13.0
+        with ESMTP id S229495AbiHJAhz (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 9 Aug 2022 20:37:55 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id D8AAF7822A
+        for <kvm@vger.kernel.org>; Tue,  9 Aug 2022 17:37:52 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1660091871;
+        h=from:from:reply-to:reply-to:subject:subject:date:date:
+         message-id:message-id:to:to:cc:cc:mime-version:mime-version:
+         content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=gI8W3vKU6gx264pJaXZH00m10/hIkZkbLO7K9QwADAU=;
+        b=cTKVvPk2yBlttuCOl7JUT/6nDbyzPmwP8aVqEXhkFsMQ3E/qKuJ4yKcLWKYLbQc4BFjGb/
+        1O5qblJvaIpPJKVMTyEEoJEY8KKP1YE0UeHrR7zP9UW5ACz8myhJ59SvGIn7Bzk4rqtgwo
+        hZrWcUSF0GJNWquYleGZ+wNyOnvgB+I=
+Received: from mimecast-mx02.redhat.com (mx3-rdu2.redhat.com
+ [66.187.233.73]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-3-eDbrPmK5OK6ImuSrx8J66w-1; Tue, 09 Aug 2022 20:37:48 -0400
+X-MC-Unique: eDbrPmK5OK6ImuSrx8J66w-1
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.rdu2.redhat.com [10.11.54.5])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id AA5863802AC2;
+        Wed, 10 Aug 2022 00:37:47 +0000 (UTC)
+Received: from [10.64.54.189] (vpn2-54-189.bne.redhat.com [10.64.54.189])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id 10C089459C;
+        Wed, 10 Aug 2022 00:37:42 +0000 (UTC)
+Reply-To: Gavin Shan <gshan@redhat.com>
+Subject: Re: [PATCH 1/2] KVM: selftests: Make rseq compatible with glibc-2.35
+To:     Sean Christopherson <seanjc@google.com>,
+        Mathieu Desnoyers <mathieu.desnoyers@efficios.com>
+Cc:     shuah <shuah@kernel.org>, Florian Weimer <fweimer@redhat.com>,
+        kvmarm@lists.cs.columbia.edu, KVM list <kvm@vger.kernel.org>,
+        linux-kselftest <linux-kselftest@vger.kernel.org>,
+        linux-kernel <linux-kernel@vger.kernel.org>,
+        Paolo Bonzini <pbonzini@redhat.com>, maz <maz@kernel.org>,
+        oliver upton <oliver.upton@linux.dev>,
+        andrew jones <andrew.jones@linux.dev>, yihyu@redhat.com,
+        shan gavin <shan.gavin@gmail.com>
+References: <20220809060627.115847-1-gshan@redhat.com>
+ <20220809060627.115847-2-gshan@redhat.com>
+ <8735e6ncxw.fsf@oldenburg.str.redhat.com>
+ <7844e3fa-e49e-de75-e424-e82d3a023dd6@redhat.com>
+ <87o7wtnay6.fsf@oldenburg.str.redhat.com>
+ <616d4de6-81f6-9d14-4e57-4a79fec45690@redhat.com>
+ <797306043.114963.1660047714774.JavaMail.zimbra@efficios.com>
+ <1014177394.115022.1660052656961.JavaMail.zimbra@efficios.com>
+ <YvLT1fd8ddybF5Uw@google.com>
+From:   Gavin Shan <gshan@redhat.com>
+Message-ID: <8c1f33b4-a5a1-fcfa-4521-36253ffa22c8@redhat.com>
+Date:   Wed, 10 Aug 2022 10:37:40 +1000
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.2.0
 MIME-Version: 1.0
-In-Reply-To: <56ab2bc2-378b-3ece-2d45-e0f484087aa7@redhat.com>
-Content-Type: text/plain; charset=utf-8
+In-Reply-To: <YvLT1fd8ddybF5Uw@google.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_DNSWL_NONE,
-        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=unavailable
-        autolearn_force=no version=3.4.6
+X-Scanned-By: MIMEDefang 2.79 on 10.11.54.5
+X-Spam-Status: No, score=-3.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
+        RCVD_IN_DNSWL_LOW,SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE
+        autolearn=unavailable autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 8/9/22 10:45 PM, Eric Auger wrote:
-> Hi Dmytro,
-> 
-> On 8/5/22 21:39, Dmytro Maluka wrote:
->> The existing KVM mechanism for forwarding of level-triggered interrupts
->> using resample eventfd doesn't work quite correctly in the case of
->> interrupts that are handled in a Linux guest as oneshot interrupts
->> (IRQF_ONESHOT). Such an interrupt is acked to the device in its
->> threaded irq handler, i.e. later than it is acked to the interrupt
->> controller (EOI at the end of hardirq), not earlier.
->>
->> Linux keeps such interrupt masked until its threaded handler finishes,
->> to prevent the EOI from re-asserting an unacknowledged interrupt.
->> However, with KVM + vfio (or whatever is listening on the resamplefd)
->> we don't check that the interrupt is still masked in the guest at the
->> moment of EOI. Resamplefd is notified regardless, so vfio prematurely
->> unmasks the host physical IRQ, thus a new (unwanted) physical interrupt
->> is generated in the host and queued for injection to the guest.
->>
->> The fact that the virtual IRQ is still masked doesn't prevent this new
->> physical IRQ from being propagated to the guest, because:
->>
->> 1. It is not guaranteed that the vIRQ will remain masked by the time
->>    when vfio signals the trigger eventfd.
->> 2. KVM marks this IRQ as pending (e.g. setting its bit in the virtual
->>    IRR register of IOAPIC on x86), so after the vIRQ is unmasked, this
->>    new pending interrupt is injected by KVM to the guest anyway.
->>
->> There are observed at least 2 user-visible issues caused by those
->> extra erroneous pending interrupts for oneshot irq in the guest:
->>
->> 1. System suspend aborted due to a pending wakeup interrupt from
->>    ChromeOS EC (drivers/platform/chrome/cros_ec.c).
->> 2. Annoying "invalid report id data" errors from ELAN0000 touchpad
->>    (drivers/input/mouse/elan_i2c_core.c), flooding the guest dmesg
->>    every time the touchpad is touched.
->>
->> This patch fixes the issue on x86 by checking if the interrupt is
->> unmasked when we receive irq ack (EOI) and, in case if it's masked,
->> postponing resamplefd notify until the guest unmasks it.
->>
->> It doesn't fix the issue for other archs yet, since it relies on KVM
->> irq mask notifiers functionality which currently works only on x86.
->> On other archs we can register mask notifiers but they are never called.
->> So on other archs resampler->masked is always false, so the behavior is
->> the same as before this patch.
->>
->> Link: https://lore.kernel.org/kvm/31420943-8c5f-125c-a5ee-d2fde2700083@semihalf.com/
->> Suggested-by: Sean Christopherson <seanjc@google.com>
->> Signed-off-by: Dmytro Maluka <dmy@semihalf.com>
->> ---
->>  include/linux/kvm_irqfd.h | 14 ++++++++++
->>  virt/kvm/eventfd.c        | 56 +++++++++++++++++++++++++++++++++++----
->>  2 files changed, 65 insertions(+), 5 deletions(-)
->>
->> diff --git a/include/linux/kvm_irqfd.h b/include/linux/kvm_irqfd.h
->> index dac047abdba7..01754a1abb9e 100644
->> --- a/include/linux/kvm_irqfd.h
->> +++ b/include/linux/kvm_irqfd.h
->> @@ -19,6 +19,16 @@
->>   * resamplefd.  All resamplers on the same gsi are de-asserted
->>   * together, so we don't need to track the state of each individual
->>   * user.  We can also therefore share the same irq source ID.
->> + *
->> + * A special case is when the interrupt is still masked at the moment
->> + * an irq ack is received. That likely means that the interrupt has
->> + * been acknowledged to the interrupt controller but not acknowledged
->> + * to the device yet, e.g. it might be a Linux guest's threaded
->> + * oneshot interrupt (IRQF_ONESHOT). In this case notifying through
->> + * resamplefd is postponed until the guest unmasks the interrupt,
->> + * which is detected through the irq mask notifier. This prevents
->> + * erroneous extra interrupts caused by premature re-assert of an
->> + * unacknowledged interrupt by the resamplefd listener.
->>   */
->>  struct kvm_kernel_irqfd_resampler {
->>  	struct kvm *kvm;
->> @@ -28,6 +38,10 @@ struct kvm_kernel_irqfd_resampler {
->>  	 */
->>  	struct list_head list;
->>  	struct kvm_irq_ack_notifier notifier;
->> +	struct kvm_irq_mask_notifier mask_notifier;
->> +	bool masked;
->> +	bool pending;
->> +	spinlock_t lock;
->>  	/*
->>  	 * Entry in list of kvm->irqfd.resampler_list.  Use for sharing
->>  	 * resamplers among irqfds on the same gsi.
->> diff --git a/virt/kvm/eventfd.c b/virt/kvm/eventfd.c
->> index 3007d956b626..f98dcce3959c 100644
->> --- a/virt/kvm/eventfd.c
->> +++ b/virt/kvm/eventfd.c
->> @@ -67,6 +67,7 @@ irqfd_resampler_ack(struct kvm_irq_ack_notifier *kian)
->>  	struct kvm *kvm;
->>  	struct kvm_kernel_irqfd *irqfd;
->>  	int idx;
->> +	bool notify = true;
->>  
->>  	resampler = container_of(kian,
->>  			struct kvm_kernel_irqfd_resampler, notifier);
->> @@ -75,13 +76,52 @@ irqfd_resampler_ack(struct kvm_irq_ack_notifier *kian)
->>  	kvm_set_irq(kvm, KVM_IRQFD_RESAMPLE_IRQ_SOURCE_ID,
->>  		    resampler->notifier.gsi, 0, false);
->>  
->> -	idx = srcu_read_lock(&kvm->irq_srcu);
->> +	spin_lock(&resampler->lock);
->> +	if (resampler->masked) {
->> +		notify = false;
->> +		resampler->pending = true;
->> +	}
->> +	spin_unlock(&resampler->lock);
->> +
->> +	if (notify) {
->> +		idx = srcu_read_lock(&kvm->irq_srcu);
->>  
->> -	list_for_each_entry_srcu(irqfd, &resampler->list, resampler_link,
->> -	    srcu_read_lock_held(&kvm->irq_srcu))
->> -		eventfd_signal(irqfd->resamplefd, 1);
->> +		list_for_each_entry_srcu(irqfd, &resampler->list, resampler_link,
->> +		    srcu_read_lock_held(&kvm->irq_srcu))
->> +			eventfd_signal(irqfd->resamplefd, 1);
-> nit: you may introduce a helper for above code as the code is duplicated.
+Hi Mathieu and Sean,
 
-Ack.
+On 8/10/22 7:38 AM, Sean Christopherson wrote:
+> On Tue, Aug 09, 2022, Mathieu Desnoyers wrote:
+>> ----- On Aug 9, 2022, at 8:21 AM, Mathieu Desnoyers mathieu.desnoyers@efficios.com wrote:
+>>> ----- Gavin Shan <gshan@redhat.com> wrote:
+>>>> On 8/9/22 5:16 PM, Florian Weimer wrote:
+>>>>>>> __builtin_thread_pointer doesn't work on all architectures/GCC
+>>>>>>> versions.
+>>>>>>> Is this a problem for selftests?
+>>>>>>>
+>>>>>>
+>>>>>> It's a problem as the test case is running on all architectures. I think I
+>>>>>> need introduce our own __builtin_thread_pointer() for where it's not
+>>>>>> supported: (1) PowerPC  (2) x86 without GCC 11
+>>>>>>
+>>>>>> Please let me know if I still have missed cases where
+>>>>>> __buitin_thread_pointer() isn't supported?
+>>>>>
+>>>>> As far as I know, these are the two outliers that also have rseq
+>>>>> support.  The list is a bit longer if we also consider non-rseq
+>>>>> architectures (csky, hppa, ia64, m68k, microblaze, sparc, don't know
+>>>>> about the Linux architectures without glibc support).
+>>>>>
+>>>>
+>>>> For kvm/selftests, there are 3 architectures involved actually. So we
+>>>> just need consider 4 cases: aarch64, x86, s390 and other. For other
+>>>> case, we just use __builtin_thread_pointer() to maintain code's
+>>>> integrity, but it's not called at all.
+>>>>
+>>>> I think kvm/selftest is always relying on glibc if I'm correct.
+>>>
+>>> All those are handled in the rseq selftests and in librseq. Why duplicate all
+>>> that logic again?
+>>
+>> More to the point, considering that we have all the relevant rseq registration
+>> code in tools/testing/selftests/rseq/rseq.c already, and the relevant thread
+>> pointer getter code in tools/testing/selftests/rseq/rseq-*thread-pointer.h,
+>> is there an easy way to get test applications in tools/testing/selftests/kvm
+>> and in tools/testing/selftests/rseq to share that common code ?
+>>
+>> Keeping duplicated compatibility code is bad for long-term maintainability.
+> 
+> Any reason not to simply add tools/lib/rseq.c and then expose a helper to get the
+> registered rseq struct?
+> 
 
->>  
->> -	srcu_read_unlock(&kvm->irq_srcu, idx);
->> +		srcu_read_unlock(&kvm->irq_srcu, idx);
->> +	}
->> +}
->> +
->> +static void irqfd_resampler_mask_notify(struct kvm_irq_mask_notifier *kimn,
->> +					bool masked)
->> +{
->> +	struct kvm_kernel_irqfd_resampler *resampler;
->> +	struct kvm *kvm;
->> +	struct kvm_kernel_irqfd *irqfd;
->> +	int idx;
->> +	bool notify;
->> +
->> +	resampler = container_of(kimn,
->> +			struct kvm_kernel_irqfd_resampler, mask_notifier);
->> +	kvm = resampler->kvm;
->> +
->> +	spin_lock(&resampler->lock);
->> +	notify = !masked && resampler->pending;
->> +	resampler->masked = masked;
->> +	resampler->pending = false;
->> +	spin_unlock(&resampler->lock);
->> +
->> +	if (notify) {
->> +		idx = srcu_read_lock(&kvm->irq_srcu);
->> +
->> +		list_for_each_entry_srcu(irqfd, &resampler->list, resampler_link,
->> +		    srcu_read_lock_held(&kvm->irq_srcu))
->> +			eventfd_signal(irqfd->resamplefd, 1);
->> +
->> +		srcu_read_unlock(&kvm->irq_srcu, idx);
->> +	}
->>  }
->>  
->>  static void
->> @@ -98,6 +138,8 @@ irqfd_resampler_shutdown(struct kvm_kernel_irqfd *irqfd)
->>  	if (list_empty(&resampler->list)) {
->>  		list_del(&resampler->link);
->>  		kvm_unregister_irq_ack_notifier(kvm, &resampler->notifier);
->> +		kvm_unregister_irq_mask_notifier(kvm, resampler->mask_notifier.irq,
->> +						 &resampler->mask_notifier);
->>  		kvm_set_irq(kvm, KVM_IRQFD_RESAMPLE_IRQ_SOURCE_ID,
->>  			    resampler->notifier.gsi, 0, false);
->>  		kfree(resampler);
->> @@ -367,9 +409,13 @@ kvm_irqfd_assign(struct kvm *kvm, struct kvm_irqfd *args)
->>  			INIT_LIST_HEAD(&resampler->list);
->>  			resampler->notifier.gsi = irqfd->gsi;
->>  			resampler->notifier.irq_acked = irqfd_resampler_ack;
->> +			resampler->mask_notifier.func = irqfd_resampler_mask_notify;
->> +			spin_lock_init(&resampler->lock);
->>  			INIT_LIST_HEAD(&resampler->link);
->>  
->>  			list_add(&resampler->link, &kvm->irqfds.resampler_list);
->> +			kvm_register_and_fire_irq_mask_notifier(kvm, irqfd->gsi,
->> +								&resampler->mask_notifier);
->>  			kvm_register_irq_ack_notifier(kvm,
->>  						      &resampler->notifier);
->>  			irqfd->resampler = resampler;
-> Adding Marc in CC
-> 
-> Thanks
-> 
-> Eric
-> 
+There are couple of reasons, not to share tools/testing/selftests/rseq/librseq.so
+or add tools/lib/librseq.so. Please let me know if the arguments making sense
+to you?
+
+- By design, selftests/rseq and selftests/kvm are parallel. It's going to introduce
+   unnecessary dependency for selftests/kvm to use selftests/rseq/librseq.so. To me,
+   it makes the maintainability even harder.
+
+- What selftests/kvm needs is rseq-thread-pointer.h, which accounts for ~5% of
+   functionalities, provided by selftests/rseq/librseq.so.
+
+- I'm not too much familiar with selftests/rseq, but it seems it need heavy
+   rework before it can become tools/lib/librseq.so. However, I'm not sure if
+   the effort is worthwhile. The newly added library is fully used by
+   testtests/rseq. ~5% of that is going to be used by selftests/kvm.
+   In this case, we still have cross-dependency issue.
+
+I personally prefer not to use selftests/rseq/librseq.so or add tools/lib/librseq.so,
+but I need your feedback. Please share your thoughts.
+Thanks,
+Gavin
+
