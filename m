@@ -2,127 +2,165 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 6EEBF58EA28
-	for <lists+kvm@lfdr.de>; Wed, 10 Aug 2022 11:59:25 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id C95AB58EA2C
+	for <lists+kvm@lfdr.de>; Wed, 10 Aug 2022 12:01:06 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230050AbiHJJ7X (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 10 Aug 2022 05:59:23 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34232 "EHLO
+        id S231502AbiHJKBE (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 10 Aug 2022 06:01:04 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36352 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229563AbiHJJ7W (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 10 Aug 2022 05:59:22 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id C5E276EF24
-        for <kvm@vger.kernel.org>; Wed, 10 Aug 2022 02:59:21 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1660125561;
-        h=from:from:reply-to:reply-to:subject:subject:date:date:
-         message-id:message-id:to:to:cc:cc:mime-version:mime-version:
-         content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=8foxS5OTM5HYev6CZ4Rcys+eRHI332c6y7bWUfe28UQ=;
-        b=STjijo96uCdlUwsbi31XeZJZsw53koWkYy7wSMDYxhmiMOiFqCJWJHkblJNiv9uSzRmpaS
-        INTL73y9WYMF9Y2kHzG8+Goe0blAhZp6lzzOHZA5ntoUJFwseTqqn4dSX6T8/1kwk5m+kT
-        9zTJzbWif5NfP8HUuuK42xLAn288xQY=
-Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
- [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-608-LYXixRy1MdShMhEGEMMVFg-1; Wed, 10 Aug 2022 05:59:16 -0400
-X-MC-Unique: LYXixRy1MdShMhEGEMMVFg-1
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.rdu2.redhat.com [10.11.54.6])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 7F5AC811E81;
-        Wed, 10 Aug 2022 09:59:15 +0000 (UTC)
-Received: from [10.64.54.77] (vpn2-54-77.bne.redhat.com [10.64.54.77])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id D98C02166B29;
-        Wed, 10 Aug 2022 09:59:10 +0000 (UTC)
-Reply-To: Gavin Shan <gshan@redhat.com>
-Subject: Re: [PATCH 1/2] KVM: selftests: Make rseq compatible with glibc-2.35
-To:     Paolo Bonzini <pbonzini@redhat.com>,
-        Mathieu Desnoyers <mathieu.desnoyers@efficios.com>
-Cc:     Florian Weimer <fweimer@redhat.com>, kvmarm@lists.cs.columbia.edu,
-        kvm@vger.kernel.org, linux-kselftest@vger.kernel.org,
-        linux-kernel@vger.kernel.org, maz@kernel.org,
-        oliver upton <oliver.upton@linux.dev>,
-        andrew jones <andrew.jones@linux.dev>, seanjc@google.com,
-        yihyu@redhat.com, shan gavin <shan.gavin@gmail.com>
-References: <20220809060627.115847-1-gshan@redhat.com>
- <20220809060627.115847-2-gshan@redhat.com>
- <8735e6ncxw.fsf@oldenburg.str.redhat.com>
- <7844e3fa-e49e-de75-e424-e82d3a023dd6@redhat.com>
- <87o7wtnay6.fsf@oldenburg.str.redhat.com>
- <616d4de6-81f6-9d14-4e57-4a79fec45690@redhat.com>
- <797306043.114963.1660047714774.JavaMail.zimbra@efficios.com>
- <bb97efaf-4f58-c192-a489-e71ebbebce8c@redhat.com>
-From:   Gavin Shan <gshan@redhat.com>
-Message-ID: <5be21a93-8a28-0214-59f0-21b56b0946a2@redhat.com>
-Date:   Wed, 10 Aug 2022 19:59:07 +1000
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.2.0
+        with ESMTP id S229445AbiHJKBD (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 10 Aug 2022 06:01:03 -0400
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 254C756BBB
+        for <kvm@vger.kernel.org>; Wed, 10 Aug 2022 03:01:01 -0700 (PDT)
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 82C711FB;
+        Wed, 10 Aug 2022 03:01:01 -0700 (PDT)
+Received: from [192.168.12.23] (unknown [172.31.20.19])
+        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 6295B3F70D;
+        Wed, 10 Aug 2022 03:00:59 -0700 (PDT)
+Message-ID: <976c1d7b-a95d-cb5f-3602-55573e40289a@arm.com>
+Date:   Wed, 10 Aug 2022 11:00:47 +0100
 MIME-Version: 1.0
-In-Reply-To: <bb97efaf-4f58-c192-a489-e71ebbebce8c@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 2.78 on 10.11.54.6
-X-Spam-Status: No, score=-2.7 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
-        RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE
-        autolearn=unavailable autolearn_force=no version=3.4.6
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:91.0)
+ Gecko/20100101 Thunderbird/91.12.0
+Subject: Re: [kvm-unit-tests RFC PATCH 09/19] arm/arm64: Zero secondary CPUs'
+ stack
+Content-Language: en-GB
+To:     Alexandru Elisei <alexandru.elisei@arm.com>
+Cc:     pbonzini@redhat.com, thuth@redhat.com, andrew.jones@linux.dev,
+        kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu
+References: <20220809091558.14379-1-alexandru.elisei@arm.com>
+ <20220809091558.14379-10-alexandru.elisei@arm.com>
+ <38ec5559-7c2a-9820-724d-6a192ea83ecb@arm.com>
+ <YvN9oLwmCESQoFun@monolith.localdoman>
+From:   Nikos Nikoleris <nikos.nikoleris@arm.com>
+In-Reply-To: <YvN9oLwmCESQoFun@monolith.localdoman>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Spam-Status: No, score=-6.9 required=5.0 tests=BAYES_00,NICE_REPLY_A,
+        RCVD_IN_DNSWL_HI,SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi Paolo,
-
-On 8/10/22 7:14 PM, Paolo Bonzini wrote:
-> On 8/9/22 14:21, Mathieu Desnoyers wrote:
->>> For kvm/selftests, there are 3 architectures involved actually. So we
->>> just need consider 4 cases: aarch64, x86, s390 and other. For other
->>> case, we just use __builtin_thread_pointer() to maintain code's
->>> integrity, but it's not called at all.
+On 10/08/2022 10:42, Alexandru Elisei wrote:
+> Hi Nikos,
+> 
+> On Tue, Aug 09, 2022 at 01:56:13PM +0100, Nikos Nikoleris wrote:
+>> On 09/08/2022 10:15, Alexandru Elisei wrote:
+>>> For the boot CPU, the entire stack is zeroed in the entry code. For the
+>>> secondaries, only struct thread_info, which lives at the bottom of the
+>>> stack, is zeroed in thread_info_init().
 >>>
->>> I think kvm/selftest is always relying on glibc if I'm correct.
->> All those are handled in the rseq selftests and in librseq. Why duplicate all that logic again?
+>>
+>> That's a good point.
+>>
+>>> Be consistent and zero the entire stack for the secondaries. This should
+>>> also improve reproducibility of the testsuite, as all the stacks now start
+>>> with the same contents, which is zero. And now that all the stacks are
+>>> zeroed in the entry code, there is no need to explicitely zero struct
+>>> thread_info in thread_info_init().
+>>>
+>>
+>> Wouldn't it make more sense to call memset(sp, 0, THREAD_SIZE); from
+>> thread_stack_alloc() instead and avoid doing this in assembly? Do we expect
 > 
-> Yeah, rseq_test should reuse librseq code.  The simplest way,
-> if slightly hackish, is to do something like
+> I prefer to do the zero'ing in assembly because:
 > 
-> diff --git a/tools/testing/selftests/kvm/Makefile b/tools/testing/selftests/kvm/Makefile
-> index 690b499c3471..6c192b0ec304 100644
-> --- a/tools/testing/selftests/kvm/Makefile
-> +++ b/tools/testing/selftests/kvm/Makefile
-> @@ -37,6 +37,7 @@ ifeq ($(ARCH),riscv)
->       UNAME_M := riscv
->   endif
+> 1. For consistency, which is one of the main reasons this patch exists.
 > 
->   LIBKVM += lib/assert.c
->   LIBKVM += lib/elf.c
->   LIBKVM += lib/guest_modes.c
-> @@ -198,7 +199,7 @@ endif
->   CFLAGS += -Wall -Wstrict-prototypes -Wuninitialized -O2 -g -std=gnu99 \
->       -fno-stack-protector -fno-PIE -I$(LINUX_TOOL_INCLUDE) \
->       -I$(LINUX_TOOL_ARCH_INCLUDE) -I$(LINUX_HDR_PATH) -Iinclude \
-> -    -I$(<D) -Iinclude/$(UNAME_M) -I.. $(EXTRA_CFLAGS) $(KHDR_INCLUDES)
-> +    -I$(<D) -Iinclude/$(UNAME_M) -I.. $(EXTRA_CFLAGS) $(KHDR_INCLUDES) -I../rseq
-> 
->   no-pie-option := $(call try-run, echo 'int main() { return 0; }' | \
->           $(CC) -Werror -no-pie -x c - -o "$$TMP", -no-pie)
-> 
-> 
-> and just #include "../rseq/rseq.c" in rseq_test.c.
+> 2. I don't want to deal with all the cache maintenance that is required for
+> inter-CPU communication. Let's keep it simple.
 > 
 
-Thank you. It's really a nice idea. I think it's best way to share
-"../rseq/rseq.c". In this way, we needn't to rely on "../rseq/librseq.so",
-which is compiled by "../rseq/Makefile".
+I see that's a very good point. For this reason, I agree initializing to 
+0 is better done locally.
 
-I will modify the code accordingly in v2 :)
+Since you brought this up, we might have to worry about the thread_info 
+fields we initialize in __thread_info_init(). But this is a problem for 
+another patch.
+
+Reviewed-by: Nikos Nikoleris <nikos.nikoleris@arm.com>
 
 Thanks,
-Gavin
 
+Nikos
+
+>> anyone to jump to secondary_entry without calling thread_stack_alloc()
+>> first?
+> 
+> It's impossible to jump to secondary_data.entry without allocating the
+> stack first, because it's impossible to run C code without a valid stack.
+>  > Thanks,
+> Alex
+> 
+>>
+>> Thanks,
+>>
+>> Nikos
+>>
+>>> Signed-off-by: Alexandru Elisei <alexandru.elisei@arm.com>
+>>> ---
+>>>    arm/cstart.S          | 6 ++++++
+>>>    arm/cstart64.S        | 3 +++
+>>>    lib/arm/processor.c   | 1 -
+>>>    lib/arm64/processor.c | 1 -
+>>>    4 files changed, 9 insertions(+), 2 deletions(-)
+>>>
+>>> diff --git a/arm/cstart.S b/arm/cstart.S
+>>> index 39260e0fa470..39e70f40986a 100644
+>>> --- a/arm/cstart.S
+>>> +++ b/arm/cstart.S
+>>> @@ -151,7 +151,13 @@ secondary_entry:
+>>>    	 */
+>>>    	ldr	r1, =secondary_data
+>>>    	ldr	r0, [r1]
+>>> +	mov	r2, r0
+>>> +	lsr	r2, #THREAD_SHIFT
+>>> +	lsl	r2, #THREAD_SHIFT
+>>> +	add	r3, r2, #THREAD_SIZE
+>>> +	zero_range r2, r3, r4, r5
+>>>    	mov	sp, r0
+>>> +
+>>>    	bl	exceptions_init
+>>>    	bl	enable_vfp
+>>> diff --git a/arm/cstart64.S b/arm/cstart64.S
+>>> index d62360cf3859..54773676d1d5 100644
+>>> --- a/arm/cstart64.S
+>>> +++ b/arm/cstart64.S
+>>> @@ -156,6 +156,9 @@ secondary_entry:
+>>>    	/* set the stack */
+>>>    	adrp	x0, secondary_data
+>>>    	ldr	x0, [x0, :lo12:secondary_data]
+>>> +	and	x1, x0, #THREAD_MASK
+>>> +	add	x2, x1, #THREAD_SIZE
+>>> +	zero_range x1, x2
+>>>    	mov	sp, x0
+>>>    	/* finish init in C code */
+>>> diff --git a/lib/arm/processor.c b/lib/arm/processor.c
+>>> index 9d5759686b73..ceff1c0a1bd2 100644
+>>> --- a/lib/arm/processor.c
+>>> +++ b/lib/arm/processor.c
+>>> @@ -117,7 +117,6 @@ void do_handle_exception(enum vector v, struct pt_regs *regs)
+>>>    void thread_info_init(struct thread_info *ti, unsigned int flags)
+>>>    {
+>>> -	memset(ti, 0, sizeof(struct thread_info));
+>>>    	ti->cpu = mpidr_to_cpu(get_mpidr());
+>>>    	ti->flags = flags;
+>>>    }
+>>> diff --git a/lib/arm64/processor.c b/lib/arm64/processor.c
+>>> index 831207c16587..268b2858f0be 100644
+>>> --- a/lib/arm64/processor.c
+>>> +++ b/lib/arm64/processor.c
+>>> @@ -232,7 +232,6 @@ void install_vector_handler(enum vector v, vector_fn fn)
+>>>    static void __thread_info_init(struct thread_info *ti, unsigned int flags)
+>>>    {
+>>> -	memset(ti, 0, sizeof(struct thread_info));
+>>>    	ti->cpu = mpidr_to_cpu(get_mpidr());
+>>>    	ti->flags = flags;
+>>>    }
