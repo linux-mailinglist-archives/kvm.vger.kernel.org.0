@@ -2,189 +2,125 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id AF40158EBFF
-	for <lists+kvm@lfdr.de>; Wed, 10 Aug 2022 14:29:29 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 77D7458EC02
+	for <lists+kvm@lfdr.de>; Wed, 10 Aug 2022 14:30:03 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231933AbiHJM32 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 10 Aug 2022 08:29:28 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54816 "EHLO
+        id S231559AbiHJMaC (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 10 Aug 2022 08:30:02 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54938 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232272AbiHJM3Y (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 10 Aug 2022 08:29:24 -0400
-Received: from mail.efficios.com (mail.efficios.com [167.114.26.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3E5A677545;
-        Wed, 10 Aug 2022 05:29:21 -0700 (PDT)
-Received: from localhost (localhost [127.0.0.1])
-        by mail.efficios.com (Postfix) with ESMTP id 68B2143EA36;
-        Wed, 10 Aug 2022 08:29:20 -0400 (EDT)
-Received: from mail.efficios.com ([127.0.0.1])
-        by localhost (mail03.efficios.com [127.0.0.1]) (amavisd-new, port 10032)
-        with ESMTP id h3gb2233B6MC; Wed, 10 Aug 2022 08:29:19 -0400 (EDT)
-Received: from localhost (localhost [127.0.0.1])
-        by mail.efficios.com (Postfix) with ESMTP id 6CD9E43ED02;
-        Wed, 10 Aug 2022 08:29:19 -0400 (EDT)
-DKIM-Filter: OpenDKIM Filter v2.10.3 mail.efficios.com 6CD9E43ED02
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=efficios.com;
-        s=default; t=1660134559;
-        bh=QBchzkobu6L+jcpw+dUlEz0k3O8E4+6GRlWJ0MXHIvs=;
-        h=Date:From:To:Message-ID:MIME-Version;
-        b=PI+Lh9go6DchA6I6ZfU44MkHtWrACOshp+vTuj5r62mRjexFkHf0bTwM97qiZ/UB3
-         X+UMSBKCbjhj4tGMCQnyIO2LqeuSeymfaH6LhpEZt8iYn+q/jF/v9aZKRuhorjXNnR
-         KdIyZvvD81ucWRIWTXKs0B+rCjlzsXOSGYyPnMZ7Atx0AWP1t7xbIo1DIng+pAORyl
-         Ae7SiOp0Ot3nfCnUtBJMe3V/u1tuw8BlefFcxJKDUBnq1mg/9xP4/3qpxMPuv2G0X9
-         mpl2nMqj00hi17podl51qHx2TpsJ/tJuPGhGJS/+somd7WwcN9zHiCLod2ZNGidtDh
-         8ZR/tYJ9G9qGQ==
-X-Virus-Scanned: amavisd-new at efficios.com
-Received: from mail.efficios.com ([127.0.0.1])
-        by localhost (mail03.efficios.com [127.0.0.1]) (amavisd-new, port 10026)
-        with ESMTP id 9xQH-mneLfu7; Wed, 10 Aug 2022 08:29:19 -0400 (EDT)
-Received: from mail03.efficios.com (mail03.efficios.com [167.114.26.124])
-        by mail.efficios.com (Postfix) with ESMTP id 5327143E933;
-        Wed, 10 Aug 2022 08:29:19 -0400 (EDT)
-Date:   Wed, 10 Aug 2022 08:29:19 -0400 (EDT)
-From:   Mathieu Desnoyers <mathieu.desnoyers@efficios.com>
-To:     Gavin Shan <gshan@redhat.com>
-Cc:     Sean Christopherson <seanjc@google.com>, shuah <shuah@kernel.org>,
-        Florian Weimer <fweimer@redhat.com>,
-        kvmarm <kvmarm@lists.cs.columbia.edu>,
-        KVM list <kvm@vger.kernel.org>,
-        linux-kselftest <linux-kselftest@vger.kernel.org>,
-        linux-kernel <linux-kernel@vger.kernel.org>,
-        Paolo Bonzini <pbonzini@redhat.com>, maz <maz@kernel.org>,
-        oliver upton <oliver.upton@linux.dev>,
-        andrew jones <andrew.jones@linux.dev>,
-        yihyu <yihyu@redhat.com>, shan gavin <shan.gavin@gmail.com>
-Message-ID: <1316061904.375.1660134559269.JavaMail.zimbra@efficios.com>
-In-Reply-To: <8c1f33b4-a5a1-fcfa-4521-36253ffa22c8@redhat.com>
-References: <20220809060627.115847-1-gshan@redhat.com> <7844e3fa-e49e-de75-e424-e82d3a023dd6@redhat.com> <87o7wtnay6.fsf@oldenburg.str.redhat.com> <616d4de6-81f6-9d14-4e57-4a79fec45690@redhat.com> <797306043.114963.1660047714774.JavaMail.zimbra@efficios.com> <1014177394.115022.1660052656961.JavaMail.zimbra@efficios.com> <YvLT1fd8ddybF5Uw@google.com> <8c1f33b4-a5a1-fcfa-4521-36253ffa22c8@redhat.com>
-Subject: Re: [PATCH 1/2] KVM: selftests: Make rseq compatible with
- glibc-2.35
+        with ESMTP id S232308AbiHJM3f (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 10 Aug 2022 08:29:35 -0400
+Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1E0FA74DF5
+        for <kvm@vger.kernel.org>; Wed, 10 Aug 2022 05:29:34 -0700 (PDT)
+Received: from pps.filterd (m0098417.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.17.1.5/8.17.1.5) with ESMTP id 27AAYxKh019200
+        for <kvm@vger.kernel.org>; Wed, 10 Aug 2022 12:29:33 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=content-type :
+ mime-version : content-transfer-encoding : in-reply-to : references : to :
+ from : subject : cc : message-id : date; s=pp1;
+ bh=k8bpOkvzOdmnuG8Cr7xgO7pc0Xa712G4ywGxD0GTha0=;
+ b=fEdyHtCbI4N61NGyQVfi8EN+Q+SM7cRMFhOUkz1w2+thNCXyTVhhqJxqBrI9pIrIljHN
+ BL+P55aUSHgkx7xgrioGHFFKK+14lljG/7gvzgYFZUWB0XR/CoGqF+AdqWBruArB9f+i
+ KqEBKe21dzHLzwKdLEWyi0y8l1RudZFoBdWJkSGKnjXcKxbxGxELf0FF6VIC1sX63/jh
+ ehzKwQCoJ7eqE1QsmES6ikdrekm/lKUWRK6eTbru3OQtdWqDyC1E29ru4hwiVubEkj2e
+ xZgg3u220kTNSw9q2O9JifZAujCaZlKYw0IMCudvjelI8jnb3+ROSKYf3QUCi5DjoNZD jQ== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3hv5r6d614-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT)
+        for <kvm@vger.kernel.org>; Wed, 10 Aug 2022 12:29:33 +0000
+Received: from m0098417.ppops.net (m0098417.ppops.net [127.0.0.1])
+        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 27AC8Cq4010617
+        for <kvm@vger.kernel.org>; Wed, 10 Aug 2022 12:29:32 GMT
+Received: from ppma03ams.nl.ibm.com (62.31.33a9.ip4.static.sl-reverse.com [169.51.49.98])
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3hv5r6d60a-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Wed, 10 Aug 2022 12:29:32 +0000
+Received: from pps.filterd (ppma03ams.nl.ibm.com [127.0.0.1])
+        by ppma03ams.nl.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 27ACRL2n014892;
+        Wed, 10 Aug 2022 12:29:31 GMT
+Received: from b06cxnps4075.portsmouth.uk.ibm.com (d06relay12.portsmouth.uk.ibm.com [9.149.109.197])
+        by ppma03ams.nl.ibm.com with ESMTP id 3huwvg0tpv-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Wed, 10 Aug 2022 12:29:30 +0000
+Received: from d06av24.portsmouth.uk.ibm.com (d06av24.portsmouth.uk.ibm.com [9.149.105.60])
+        by b06cxnps4075.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 27ACTRpu29098338
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Wed, 10 Aug 2022 12:29:27 GMT
+Received: from d06av24.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id C83DB42047;
+        Wed, 10 Aug 2022 12:29:27 +0000 (GMT)
+Received: from d06av24.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id AC57942045;
+        Wed, 10 Aug 2022 12:29:27 +0000 (GMT)
+Received: from li-ca45c2cc-336f-11b2-a85c-c6e71de567f1.ibm.com (unknown [9.171.57.169])
+        by d06av24.portsmouth.uk.ibm.com (Postfix) with ESMTP;
+        Wed, 10 Aug 2022 12:29:27 +0000 (GMT)
+Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
-X-Originating-IP: [167.114.26.124]
-X-Mailer: Zimbra 8.8.15_GA_4372 (ZimbraWebClient - FF103 (Linux)/8.8.15_GA_4372)
-Thread-Topic: selftests: Make rseq compatible with glibc-2.35
-Thread-Index: Hmn4zQY3JK/eFlOJPqqhWHevLMt86A==
-X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,SPF_HELO_NONE,
-        SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no
-        version=3.4.6
+Content-Transfer-Encoding: quoted-printable
+In-Reply-To: <20220810120822.51ead12d@p-imbrenda>
+References: <20220722060043.733796-1-nrb@linux.ibm.com> <20220722060043.733796-4-nrb@linux.ibm.com> <20220810120822.51ead12d@p-imbrenda>
+To:     Claudio Imbrenda <imbrenda@linux.ibm.com>
+From:   Nico Boehr <nrb@linux.ibm.com>
+Subject: Re: [kvm-unit-tests PATCH v3 3/4] s390x: add extint loop test
+Cc:     kvm@vger.kernel.org, frankja@linux.ibm.com, thuth@redhat.com
+Message-ID: <166013456744.24812.12686537606143025741@localhost.localdomain>
+User-Agent: alot/0.8.1
+Date:   Wed, 10 Aug 2022 14:29:27 +0200
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: vZIoibSbQVWrrHdQSiKy5_hBpLgFX5v8
+X-Proofpoint-ORIG-GUID: QJ_X_tgWUA1yfjFgQlhurECGTJhe9Et0
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.205,Aquarius:18.0.883,Hydra:6.0.517,FMLib:17.11.122.1
+ definitions=2022-08-10_06,2022-08-10_01,2022-06-22_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 adultscore=0 impostorscore=0
+ mlxscore=0 bulkscore=0 priorityscore=1501 spamscore=0 phishscore=0
+ mlxlogscore=732 suspectscore=0 lowpriorityscore=0 clxscore=1015
+ malwarescore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2207270000 definitions=main-2208100037
+X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_EF,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_PASS,
+        T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
------ On Aug 9, 2022, at 8:37 PM, Gavin Shan gshan@redhat.com wrote:
+Quoting Claudio Imbrenda (2022-08-10 12:08:22)
+> > diff --git a/s390x/panic-loop-extint.c b/s390x/panic-loop-extint.c
+> > new file mode 100644
+> > index 000000000000..d3a3f06d9a34
+> > --- /dev/null
+> > +++ b/s390x/panic-loop-extint.c
+[...]
+> > +static void ext_int_handler(void)
+> > +{
+> > +     /*
+> > +      * return to ext_old_psw. This gives us the chance to print the r=
+eturn_fail
+> > +      * in case something goes wrong.
+> > +      */
+> > +     asm volatile (
+> > +             "lpswe %[ext_old_psw]\n"
+> > +             :
+> > +             : [ext_old_psw] "Q"(lowcore.ext_old_psw)
+> > +             : "memory"
+> > +     );
+> > +}
+>=20
+> why should ext_old_psw contain a good PSW? wouldn't it contain the
+> PSW at the time of the interrupt? (which in this case is the new PSW)
 
-> Hi Mathieu and Sean,
-> 
-> On 8/10/22 7:38 AM, Sean Christopherson wrote:
->> On Tue, Aug 09, 2022, Mathieu Desnoyers wrote:
->>> ----- On Aug 9, 2022, at 8:21 AM, Mathieu Desnoyers
->>> mathieu.desnoyers@efficios.com wrote:
->>>> ----- Gavin Shan <gshan@redhat.com> wrote:
->>>>> On 8/9/22 5:16 PM, Florian Weimer wrote:
->>>>>>>> __builtin_thread_pointer doesn't work on all architectures/GCC
->>>>>>>> versions.
->>>>>>>> Is this a problem for selftests?
->>>>>>>>
->>>>>>>
->>>>>>> It's a problem as the test case is running on all architectures. I think I
->>>>>>> need introduce our own __builtin_thread_pointer() for where it's not
->>>>>>> supported: (1) PowerPC  (2) x86 without GCC 11
->>>>>>>
->>>>>>> Please let me know if I still have missed cases where
->>>>>>> __buitin_thread_pointer() isn't supported?
->>>>>>
->>>>>> As far as I know, these are the two outliers that also have rseq
->>>>>> support.  The list is a bit longer if we also consider non-rseq
->>>>>> architectures (csky, hppa, ia64, m68k, microblaze, sparc, don't know
->>>>>> about the Linux architectures without glibc support).
->>>>>>
->>>>>
->>>>> For kvm/selftests, there are 3 architectures involved actually. So we
->>>>> just need consider 4 cases: aarch64, x86, s390 and other. For other
->>>>> case, we just use __builtin_thread_pointer() to maintain code's
->>>>> integrity, but it's not called at all.
->>>>>
->>>>> I think kvm/selftest is always relying on glibc if I'm correct.
->>>>
->>>> All those are handled in the rseq selftests and in librseq. Why duplicate all
->>>> that logic again?
->>>
->>> More to the point, considering that we have all the relevant rseq registration
->>> code in tools/testing/selftests/rseq/rseq.c already, and the relevant thread
->>> pointer getter code in tools/testing/selftests/rseq/rseq-*thread-pointer.h,
->>> is there an easy way to get test applications in tools/testing/selftests/kvm
->>> and in tools/testing/selftests/rseq to share that common code ?
->>>
->>> Keeping duplicated compatibility code is bad for long-term maintainability.
->> 
->> Any reason not to simply add tools/lib/rseq.c and then expose a helper to get
->> the
->> registered rseq struct?
->> 
-> 
-> There are couple of reasons, not to share
-> tools/testing/selftests/rseq/librseq.so
-> or add tools/lib/librseq.so. Please let me know if the arguments making sense
-> to you?
-> 
-> - By design, selftests/rseq and selftests/kvm are parallel. It's going to
-> introduce
->   unnecessary dependency for selftests/kvm to use selftests/rseq/librseq.so. To
->   me,
->   it makes the maintainability even harder.
+That's right in case the interrupt loop occurs, it doesn't make much sense =
+to return to ext_old_psw. But in this case lpswe will never be executed any=
+ways.
 
-In terms of build system, yes, selftests/rseq and selftests/kvm are side-by-side,
-and I agree it is odd to have a cross-dependency.
+> but this should never happen anyway, right?
 
-That's where moving rseq.c to tools/lib/ makes sense.
-
-> 
-> - What selftests/kvm needs is rseq-thread-pointer.h, which accounts for ~5% of
->   functionalities, provided by selftests/rseq/librseq.so.
-
-I've never seen this type of argument used to prevent using a library before, except
-on extremely memory-constrained devices, which is not our target here.
-
-Even if you would only use 1% of the features of a library, it does not justify
-reimplementing that 1% if that code already sits within the same project (kernel
-selftests).
-
-> 
-> - I'm not too much familiar with selftests/rseq, but it seems it need heavy
->   rework before it can become tools/lib/librseq.so. However, I'm not sure if
->   the effort is worthwhile. The newly added library is fully used by
->   testtests/rseq. ~5% of that is going to be used by selftests/kvm.
->   In this case, we still have cross-dependency issue.
-
-No, it's just moving files around and a bit of Makefile modifications. That's
-the simple part.
-
-> 
-> I personally prefer not to use selftests/rseq/librseq.so or add
-> tools/lib/librseq.so,
-> but I need your feedback. Please share your thoughts.
-
-I strongly favor that we use a two steps approach:
-
-1) immediate fix: include ../rseq/rseq.c into your test code and use the headers,
-   as proposed by Paolo.
-
-2) I'll move librseq code into tools/lib/ and tools/include/rseq/, and adapt the
-   users accordingly. (after the end of my vacation)
-
-Thanks,
-
-Mathieu
-
-> Thanks,
-> Gavin
-
--- 
-Mathieu Desnoyers
-EfficiOS Inc.
-http://www.efficios.com
+Exactly, this is just supposed to be a safety net in case the interrupt loo=
+p doesn't happen. If you want, we could remove it and just leave an empty f=
+unction here. Then, we will just run into the kvm-unit-tests timeout and fa=
+il as well, but I prefer the fail fast.
