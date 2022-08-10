@@ -2,73 +2,92 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id AF59358E617
-	for <lists+kvm@lfdr.de>; Wed, 10 Aug 2022 06:16:00 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id DB94158E694
+	for <lists+kvm@lfdr.de>; Wed, 10 Aug 2022 07:08:32 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230504AbiHJEP1 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 10 Aug 2022 00:15:27 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43084 "EHLO
+        id S230319AbiHJFIB (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 10 Aug 2022 01:08:01 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53362 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230469AbiHJEO5 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 10 Aug 2022 00:14:57 -0400
-Received: from mail-pj1-x1032.google.com (mail-pj1-x1032.google.com [IPv6:2607:f8b0:4864:20::1032])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 00C6F74DF8
-        for <kvm@vger.kernel.org>; Tue,  9 Aug 2022 21:14:54 -0700 (PDT)
-Received: by mail-pj1-x1032.google.com with SMTP id t2-20020a17090a4e4200b001f21572f3a4so952471pjl.0
-        for <kvm@vger.kernel.org>; Tue, 09 Aug 2022 21:14:54 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :from:to:cc;
-        bh=joIHlmtU9aNzTyrRih0VFEwqdUcFvKemePsuzu7P53I=;
-        b=LUWA3l+KMkY7UC78lzTyO5g6ONgEBn//seGt/ChCe2Bra+j4DYB3DAcyv/EC+eqOvJ
-         5bDlnc5JsI5Yu/OE40CZItO+ZGHKUUIbofMj352I/CO4CoaUuMdolMA1opVyMphVnOg1
-         xzefAbSpx/hVIENWCcXyaWeBzNNQg2IaYJE38L4wjfQEvA8M7tNcsR36iKD4ymbbUsS3
-         DeeIES3ia0uP6AjPPah+eZJVvzx3vQR1DYDWuZCkF1+dcq4FTcVh+u4wj9VEC+vxHl71
-         6GUZdMf24QMLO5W96vcj9p+a7b3EJUBfrdVo3XjAPkcJMndIIf64SN230KzAn6iDRpN4
-         O1zw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc;
-        bh=joIHlmtU9aNzTyrRih0VFEwqdUcFvKemePsuzu7P53I=;
-        b=3Fsrwiun6TNhQ3r1rdjgYvbTLEmZ4CnnXWe5/6+lGgvlZO3RusweSxF5PAfLdZus/h
-         QjsH8fh7dCKByPhrsGP7/0dlFTEetT57sAJ2Dy5V13rNJP99IAq3fosNfx4wrqKh71f0
-         8PlpcCG50KWMVKAFWrRmTr78S7Flp4DgRmMg4W4n3P7YybLOUyjSN2LIuAbpPbCNDd+Y
-         IzfBQuj2zAI9vfW3hVbz4joni36GjGA+FDvmV9mPSDga7X/DmzSMtL+DoiZ3RxMt8LJz
-         TuXfFNOzMRKiZtAiIWrrbHj0zxktb7KOWY6JCezSOD1dnMISz2g7jD6wm/+T2HzroDCY
-         6+OA==
-X-Gm-Message-State: ACgBeo3jsTX2RrXC5xgSFvKA44BaTtiA9HvbN9CAP9zfGgVxB7Kw6KL0
-        IdbySmtePvw5byo8Pz2TyZUDkg==
-X-Google-Smtp-Source: AA6agR5jm5dPBybBKAx+4wHE/Z7SAt0NR32mnW+HwMvL5wtxmNb4JTbErp9uKZtmhD3IavG1OpVj3g==
-X-Received: by 2002:a17:902:f54a:b0:16f:16bb:778e with SMTP id h10-20020a170902f54a00b0016f16bb778emr25421177plf.37.1660104894282;
-        Tue, 09 Aug 2022 21:14:54 -0700 (PDT)
-Received: from ?IPV6:2600:1700:38d4:55df:46ae:d2a2:e3d1:af67? ([2600:1700:38d4:55df:46ae:d2a2:e3d1:af67])
-        by smtp.gmail.com with ESMTPSA id l37-20020a635b65000000b0041bcd8f3958sm8796291pgm.44.2022.08.09.21.14.53
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 09 Aug 2022 21:14:53 -0700 (PDT)
-Message-ID: <ec0a2c7c-66f3-c9f4-5807-49fa001474fe@google.com>
-Date:   Tue, 9 Aug 2022 21:14:52 -0700
+        with ESMTP id S230317AbiHJFH5 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 10 Aug 2022 01:07:57 -0400
+Received: from NAM10-DM6-obe.outbound.protection.outlook.com (mail-dm6nam10on2060.outbound.protection.outlook.com [40.107.93.60])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5E89182FBC
+        for <kvm@vger.kernel.org>; Tue,  9 Aug 2022 22:07:56 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=drnHzegzCYTf2+kqWw12iOmnHDCGTc0P/ERp0ODfVJ+HttYFnCGX1dNTk1OaPL0/wFm1pn5TsfI+yhSs33yOqzoiYk0bt5oAbDFROohvNl6sjLajmTPCjwaoQFSWSygnrOb3o/pm4M+c2w6/2x0s3luFbKqmIznX0gFbIteYZQSqLJ70ckbqZEBz6nnXWWpqVneUvx+PAdC25jqgD8qgLSK6yPlg4btLNs3bk30IJkm9JHlw8oJEMURou65/D3C1+sNnwPmhlyQY7XIRfK0xv03hXvv4b0K4kUR4vxU6YBcPTVCkRh8uo1NKulwZeCbruzwvMaOC59gcaHHMuTmQeQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=A3o4Od+GGInd+nZLwUrKiUdFqkrpG8YV8vRxAnk/uwM=;
+ b=evLvQL//N1FfdDTMlcERiI1CPOVzk3NN8ceS6Sf6u8mOpjVwwYh1uW2jH/tRlgn1EPPTH7JF/lho4SkH025qD9wq2tZUIx/ZI85o3zUpZg9bnY/YJpI2gJiHsXZ0sr20ItxwpyugadBuJ964WxnNSPztZNzEW5bjRoCZ3t6jNaQ/WZMcTFXlISldhVxOFtSQ718S7z2tiVaHeTbJySdZJsNEU6jQBVF8lJsoHuatF8wtp/AZoT57zFcJONyZjN1H7a/JqwExU2qMWrmKthZoNmsVq7c5ALrp8YDW8dZaDSu+QaH/Mesr6MdrJgME23euFAeUCUaUHllVEbFQosV1IA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
+ 165.204.84.17) smtp.rcpttodomain=redhat.com smtp.mailfrom=amd.com; dmarc=pass
+ (p=quarantine sp=quarantine pct=100) action=none header.from=amd.com;
+ dkim=none (message not signed); arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=A3o4Od+GGInd+nZLwUrKiUdFqkrpG8YV8vRxAnk/uwM=;
+ b=pfoq05YjNJT6K7tNwCqCdoDie9FSL81NJne4DZj2/GHjqQxO+221qau0HrpfYgWW2dRcTlB5hjaLxHyrl2GF19rDxiWooNyn6tbWkAJkavehgXEbChn7gD2K+q2A2btvweqmsMhtiUaVrBVNn5lCdrhxyKEAzESF0MRKYfjuLW8=
+Received: from BN0PR04CA0141.namprd04.prod.outlook.com (2603:10b6:408:ed::26)
+ by DM6PR12MB4140.namprd12.prod.outlook.com (2603:10b6:5:221::13) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5504.16; Wed, 10 Aug
+ 2022 05:07:54 +0000
+Received: from BN8NAM11FT063.eop-nam11.prod.protection.outlook.com
+ (2603:10b6:408:ed:cafe::60) by BN0PR04CA0141.outlook.office365.com
+ (2603:10b6:408:ed::26) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5504.16 via Frontend
+ Transport; Wed, 10 Aug 2022 05:07:54 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 165.204.84.17)
+ smtp.mailfrom=amd.com; dkim=none (message not signed)
+ header.d=none;dmarc=pass action=none header.from=amd.com;
+Received-SPF: Pass (protection.outlook.com: domain of amd.com designates
+ 165.204.84.17 as permitted sender) receiver=protection.outlook.com;
+ client-ip=165.204.84.17; helo=SATLEXMB04.amd.com; pr=C
+Received: from SATLEXMB04.amd.com (165.204.84.17) by
+ BN8NAM11FT063.mail.protection.outlook.com (10.13.177.110) with Microsoft SMTP
+ Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.20.5525.11 via Frontend Transport; Wed, 10 Aug 2022 05:07:54 +0000
+Received: from bhadra.amd.com (10.180.168.240) by SATLEXMB04.amd.com
+ (10.181.40.145) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2375.28; Wed, 10 Aug
+ 2022 00:07:52 -0500
+From:   Manali Shukla <manali.shukla@amd.com>
+To:     <pbonzini@redhat.com>, <seanjc@google.com>
+CC:     <kvm@vger.kernel.org>, <aaronlewis@google.com>
+Subject: [kvm-unit-tests PATCH v2 0/4] x86: nSVM: Add testing for routing L2 exceptions
+Date:   Wed, 10 Aug 2022 05:07:34 +0000
+Message-ID: <20220810050738.7442-1-manali.shukla@amd.com>
+X-Mailer: git-send-email 2.34.1
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.11.0
-Subject: Re: [PATCH v2] kvm: x86: mmu: Always flush TLBs when enabling dirty
- logging
-Content-Language: en-US
-To:     Sean Christopherson <seanjc@google.com>
-Cc:     kvm@vger.kernel.org, pbonzini@redhat.com, dmatlack@google.com
-References: <20220728222833.3850065-1-junaids@google.com>
- <Yu1hOJSucP3NNYM1@google.com>
-From:   Junaid Shahid <junaids@google.com>
-In-Reply-To: <Yu1hOJSucP3NNYM1@google.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        ENV_AND_HDR_SPF_MATCH,NICE_REPLY_A,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,
-        SPF_PASS,T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-Originating-IP: [10.180.168.240]
+X-ClientProxiedBy: SATLEXMB03.amd.com (10.181.40.144) To SATLEXMB04.amd.com
+ (10.181.40.145)
+X-EOPAttributedMessage: 0
+X-MS-PublicTrafficType: Email
+X-MS-Office365-Filtering-Correlation-Id: f5d1cc0b-65ba-4190-fd48-08da7a8e4878
+X-MS-TrafficTypeDiagnostic: DM6PR12MB4140:EE_
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: y1JqaH5MAlmGfz3+M0XbHi6vI4DQ7uUyDnH8IGZ/u78rxTtMntw5iGGVqkwDpa3GLpBKia2sv7HosOB6+wcK2Eb9LCAX27R93OH/Nred/Bwk45YjzCf/oyfR+wr9PL4dzbhD91tSNT6rkUVAsqI9jxCsizaVmBlV/NQ6AH/rflhCrjd+rxqBkz/lHu6DixAhZ0GbUSl5aDKfwkSwB56IbSJS7a8KXMNZrYaS6vvm10NKX/XuICxAHfw2iYAB/WsBru7quDwinzIZbOwlGieD2Ojq+MFcqFWzLSpmvKvEJ/vTZWLDtasF3JWTfRBYlLh30ZomNOUcSDs6KW6gd+ofude8HOyBuGjT5ciQChNyA5ern05bGZeVsWvMjYEIDCIiTSdvYvTj98913+xr2EHyLp/VarLe7WQMPx1XAHY2BB419N9VYNcZcMvvd+0W/4JXOHeF1rB5qpvFl5u8H6Thnw7q8V+FRpSSB6azXwSIQuw3RxJEe1VstzZgZO1C1DNF4kM82YDbJGeiicinnVUHw3NkQdIFFftO0NPpabsXi8yUIqXeq7z+PxGRFCvaDDQppItpFuLf6tGi03Ff8KwHNd4FKbPCv6/fFADRxojyvMBBzvOBk6Ih8UEyzaTtRDymRLQpSMaASnBOnhqF78vg1LUzQJmCsy9+r0OxCtRaXaStBQcmKG04bwIwpueTwXbPgWj08QcV6C1kRImZ/prXSvb3mZX/8yFkM0mJfPC/i99s/gEEqCu7ELU6Lo5SeIrJd5oaYH5CZfP/ta/jPOrdIPj8JxWfnL0srn0fQ/JmzQ3C9RoUydWq8OEODcqPXRH802qH0HhKUdsYTcQ1yWiy00aRNNp3bi9Rnr7rQO9sb3PLBk88G7eUYn9FAtYFaO3dWlw3ONVyYkfNcofVXju3CA==
+X-Forefront-Antispam-Report: CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:SATLEXMB04.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230016)(4636009)(136003)(396003)(39860400002)(376002)(346002)(36840700001)(46966006)(40470700004)(6666004)(478600001)(966005)(36756003)(81166007)(82740400003)(356005)(16526019)(426003)(83380400001)(186003)(2616005)(1076003)(336012)(47076005)(26005)(41300700001)(54906003)(110136005)(86362001)(40480700001)(82310400005)(7696005)(70586007)(5660300002)(8676002)(4326008)(70206006)(40460700003)(316002)(44832011)(36860700001)(8936002)(2906002)(36900700001);DIR:OUT;SFP:1101;
+X-OriginatorOrg: amd.com
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 10 Aug 2022 05:07:54.5398
+ (UTC)
+X-MS-Exchange-CrossTenant-Network-Message-Id: f5d1cc0b-65ba-4190-fd48-08da7a8e4878
+X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=3dd8961f-e488-4e60-8e11-a82d994e183d;Ip=[165.204.84.17];Helo=[SATLEXMB04.amd.com]
+X-MS-Exchange-CrossTenant-AuthSource: BN8NAM11FT063.eop-nam11.prod.protection.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Anonymous
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM6PR12MB4140
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_PASS,T_SCC_BODY_TEXT_LINE
         autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -76,164 +95,47 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 8/5/22 11:28, Sean Christopherson wrote:
-> On Thu, Jul 28, 2022, Junaid Shahid wrote:
->>   	/*
->> +	 * The caller will flush the TLBs after this function returns.
->> +	 *
-> 
-> This comment is still stale, e.g. it contains a blurb that talks about skipping
-> the flush based on MMU-writable.
-> 
-> 	 * So to determine if a TLB flush is truly required, KVM
-> 	 * will clear a separate software-only bit (MMU-writable) and skip the
-> 	 * flush if-and-only-if this bit was already clear.
-> 
-> My preference is to drop this comment entirely and fold it into a single mega
-> comment in kvm_mmu_slot_apply_flags().  More below.
-> 
->>   	 * It's also safe to flush TLBs out of mmu lock here as currently this
->>   	 * function is only used for dirty logging, in which case flushing TLB
->>   	 * out of mmu lock also guarantees no dirty pages will be lost in
->>   	 * dirty_bitmap.
->>   	 */
->> -	if (flush)
->> -		kvm_arch_flush_remote_tlbs_memslot(kvm, memslot);
->>   }
-> 
-> ...
-> 
->> diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
->> index f389691d8c04..f8b215405fe3 100644
->> --- a/arch/x86/kvm/x86.c
->> +++ b/arch/x86/kvm/x86.c
->> @@ -12448,6 +12448,25 @@ static void kvm_mmu_slot_apply_flags(struct kvm *kvm,
->>   		} else {
->>   			kvm_mmu_slot_remove_write_access(kvm, new, PG_LEVEL_4K);
->>   		}
->> +
->> +		/*
->> +		 * We need to flush the TLBs in either of the following cases:
-> 
-> Please avoid "we" and pronouns in general.  It's fairly obvious that "we" refers
-> to KVM in this case, but oftentimes pronouns can be ambiguous, e.g. "we" can refer
-> to the developer, userspace, KVM, etc...
-> 
-> Smushing the two comments together, how about this as fixup?
+Series is inspired by vmx exception test framework series[1].
 
-Looks good. I'll incorporate this in the patch.
+Set up a test framework that verifies an exception occurring in L2 is
+forwarded to the right place (L1 or L2).
 
-Thanks,
-Junaid
+Tests two conditions for each exception.
+1) Exception generated in L2, is handled by L2 when L2 exception handler
+   is registered.
+2) Exception generated in L2, is handled by L1 when intercept exception
+   bit map is set in L1.
 
-> 
-> ---
->   arch/x86/kvm/mmu/mmu.c | 23 ------------------
->   arch/x86/kvm/x86.c     | 55 ++++++++++++++++++++++++++++++------------
->   2 files changed, 40 insertions(+), 38 deletions(-)
-> 
-> diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
-> index 14d543f8373c..749c2d39c7bc 100644
-> --- a/arch/x86/kvm/mmu/mmu.c
-> +++ b/arch/x86/kvm/mmu/mmu.c
-> @@ -6097,29 +6097,6 @@ void kvm_mmu_slot_remove_write_access(struct kvm *kvm,
->   		kvm_tdp_mmu_wrprot_slot(kvm, memslot, start_level);
->   		read_unlock(&kvm->mmu_lock);
->   	}
-> -
-> -	/*
-> -	 * The caller will flush TLBs to ensure that guest writes are reflected
-> -	 * in the dirty bitmap before the memslot update completes, i.e. before
-> -	 * enabling dirty logging is visible to userspace.
-> -	 *
-> -	 * Perform the TLB flush outside the mmu_lock to reduce the amount of
-> -	 * time the lock is held. However, this does mean that another CPU can
-> -	 * now grab mmu_lock and encounter a write-protected SPTE while CPUs
-> -	 * still have a writable mapping for the associated GFN in their TLB.
-> -	 *
-> -	 * This is safe but requires KVM to be careful when making decisions
-> -	 * based on the write-protection status of an SPTE. Specifically, KVM
-> -	 * also write-protects SPTEs to monitor changes to guest page tables
-> -	 * during shadow paging, and must guarantee no CPUs can write to those
-> -	 * page before the lock is dropped. As mentioned in the previous
-> -	 * paragraph, a write-protected SPTE is no guarantee that CPU cannot
-> -	 * perform writes. So to determine if a TLB flush is truly required, KVM
-> -	 * will clear a separate software-only bit (MMU-writable) and skip the
-> -	 * flush if-and-only-if this bit was already clear.
-> -	 *
-> -	 * See is_writable_pte() for more details.
-> -	 */
->   }
-> 
->   static inline bool need_topup(struct kvm_mmu_memory_cache *cache, int min)
-> diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-> index 7a5e0be2c8ef..430ca4d304a7 100644
-> --- a/arch/x86/kvm/x86.c
-> +++ b/arch/x86/kvm/x86.c
-> @@ -12474,21 +12474,46 @@ static void kvm_mmu_slot_apply_flags(struct kvm *kvm,
->   		}
-> 
->   		/*
-> -		 * We need to flush the TLBs in either of the following cases:
-> -		 *
-> -		 * 1. We had to clear the Dirty bits for some SPTEs
-> -		 * 2. We had to write-protect some SPTEs and any of those SPTEs
-> -		 *    had the MMU-Writable bit set, regardless of whether the
-> -		 *    actual hardware Writable bit was set. This is because as
-> -		 *    long as the SPTE is MMU-Writable, some CPU may still have
-> -		 *    writable TLB entries for it, even after the Writable bit
-> -		 *    has been cleared. For more details, see the comments for
-> -		 *    is_writable_pte() [specifically the case involving
-> -		 *    access-tracking SPTEs].
-> -		 *
-> -		 * In almost all cases, one of the above conditions will be true.
-> -		 * So it is simpler (and probably slightly more efficient) to
-> -		 * just flush the TLBs unconditionally.
-> +		 * Unconditionally flush the TLBs after enabling dirty logging.
-> +		 * A flush is almost always going to be necessary (see below),
-> +		 * and unconditionally flushing allows the helpers to omit
-> +		 * the subtly complex checks when removing write access.
-> +		 *
-> +		 * Do the flush outside of mmu_lock to reduce the amount of
-> +		 * time mmu_lock is held.  Flushing after dropping mmu_lock is
-> +		 * safe as KVM only needs to guarantee the slot is fully
-> +		 * write-protected before returning to userspace, i.e. before
-> +		 * userspace can consume the dirty status.
-> +		 *
-> +		 * Flushing outside of mmu_lock requires KVM to be careful when
-> +		 * making decisions based on writable status of an SPTE, e.g. a
-> +		 * !writable SPTE doesn't guarantee a CPU can't perform writes.
-> +		 *
-> +		 * Specifically, KVM also write-protects guest page tables to
-> +		 * monitor changes when using shadow paging, and must guarantee
-> +		 * no CPUs can write to those page before mmu_lock is dropped.
-> +		 * Because CPUs may have stale TLB entries at this point, a
-> +		 * !writable SPTE doesn't guarantee CPUs can't perform writes.
-> +		 *
-> +		 * KVM also allows making SPTES writable outside of mmu_lock,
-> +		 * e.g. to allow dirty logging without taking mmu_lock.
-> +		 *
-> +		 * To handle these scenarios, KVM uses a separate software-only
-> +		 * bit (MMU-writable) to track if a SPTE is !writable due to
-> +		 * a guest page table being write-protected (KVM clears the
-> +		 * MMU-writable flag when write-protecting for shadow paging).
-> +		 *
-> +		 * The use of MMU-writable is also the primary motivation for
-> +		 * the unconditional flush.  Because KVM must guarantee that a
-> +		 * CPU doesn't contain stale, writable TLB entries for a
-> +		 * !MMU-writable SPTE, KVM must flush if it encounters any
-> +		 * MMU-writable SPTE regardless of whether the actual hardware
-> +		 * writable bit was set.  I.e. KVM is almost guaranteed to need
-> +		 * to flush, while unconditionally flushing allows the "remove
-> +		 * write access" helpers to ignore MMU-writable entirely.
-> +		 *
-> +		 * See is_writable_pte() for more details (the case involving
-> +		 * access-tracked SPTEs is particularly relevant).
->   		 */
->   		kvm_arch_flush_remote_tlbs_memslot(kvm, new);
->   	}
-> 
-> base-commit: c00bb4ce5a8aa2156b31ac6b18285e52e1762d21
-> --
-> 
+Above tests were added to verify 8 different exceptions.
+#GP, #UD, #DE, #DB, #AC, #OF, #BP, #NM.
+
+There are 4 patches in this series
+1) Added test infrastructure and exception tests.
+2) Move #BP test to exception test framework.
+3) Move #OF test to exception test framework.
+4) Move part of #NM test to exception test framework because
+   #NM has a test case which checks the condition for which #NM should not
+   be generated, all the test cases under #NM test except this test case have been
+   moved to exception test framework because of the exception test framework
+   design.
+
+v1->v2
+1) Rebased to latest kvm-unit-tests. 
+2) Move 3 different exception test cases #BP, #OF and #NM exception to
+   exception test framework.
+
+[1] https://lore.kernel.org/all/20220125203127.1161838-1-aaronlewis@google.com/
+[2] https://lore.kernel.org/kvm/a090c16f-c307-9548-9739-ceb71687514f@amd.com/
+
+Manali Shukla (4):
+  x86: nSVM: Add an exception test framework and tests
+  x86: nSVM: Move #BP test to exception test framework
+  x86: nSVM: Move #OF test to exception test framework
+  x86: nSVM: Move part of #NM test to exception test framework
+
+ x86/svm_tests.c | 197 ++++++++++++++++++++++++++++++++++--------------
+ 1 file changed, 142 insertions(+), 55 deletions(-)
+
+-- 
+2.34.1
 
