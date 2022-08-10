@@ -2,147 +2,179 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id DE59758E74E
-	for <lists+kvm@lfdr.de>; Wed, 10 Aug 2022 08:30:04 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id E366958E769
+	for <lists+kvm@lfdr.de>; Wed, 10 Aug 2022 08:51:50 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231213AbiHJG37 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 10 Aug 2022 02:29:59 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33696 "EHLO
+        id S230468AbiHJGvn (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 10 Aug 2022 02:51:43 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48010 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230183AbiHJG35 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 10 Aug 2022 02:29:57 -0400
-Received: from mga07.intel.com (mga07.intel.com [134.134.136.100])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 75AE76D9E5;
-        Tue,  9 Aug 2022 23:29:52 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1660112992; x=1691648992;
-  h=message-id:date:mime-version:subject:to:cc:references:
-   from:in-reply-to:content-transfer-encoding;
-  bh=/Ds8O1YzSAsNmagYl2xaHo5bsSvzjPd1whfcQT8kpU0=;
-  b=YsUmCycusRtcc0NO6oug1IUVKfqzzylcRuwBq63mj+anKCVyv7QU1lb2
-   7Qp8TiOhCgbcYTmhDRqigHgx74m4Kowfu7xuXqM8tQI5ocq9pnuycbqqd
-   S739npVbpjsiK+txbSHpwyUfPbRUQhW1GsuE5NdCnzqBy4KWlEAEls+ow
-   98OJWHB18xJKdU5yHX7N8/MaX/jqt65XdXnghHRI5jfj3lZsTcyC/maSe
-   eMtKzIuTL36e84e4lDWZ0V6Km5m5cpeTFAazx+5bwBw6c6qT1db5yxukH
-   7KCjVFD56W6G1y9lV4m7ZwfYqmPlzwdDFYUWco+a8wNJgw5czzcA9FWSS
-   w==;
-X-IronPort-AV: E=McAfee;i="6400,9594,10434"; a="355010827"
-X-IronPort-AV: E=Sophos;i="5.93,226,1654585200"; 
-   d="scan'208";a="355010827"
-Received: from fmsmga008.fm.intel.com ([10.253.24.58])
-  by orsmga105.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 09 Aug 2022 23:29:51 -0700
-X-IronPort-AV: E=Sophos;i="5.93,226,1654585200"; 
-   d="scan'208";a="664761300"
-Received: from xiaoyaol-hp-g830.ccr.corp.intel.com (HELO [10.249.173.89]) ([10.249.173.89])
-  by fmsmga008-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 09 Aug 2022 23:29:50 -0700
-Message-ID: <40c9ecc1-e223-160b-4939-07e4f7200781@intel.com>
-Date:   Wed, 10 Aug 2022 14:29:47 +0800
-MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:91.0) Gecko/20100101
- Firefox/91.0 Thunderbird/91.12.0
-Subject: Re: [RFC PATCH 3/3] KVM: x86: Disallow writes to immutable feature
- MSRs after KVM_RUN
-Content-Language: en-US
-To:     Sean Christopherson <seanjc@google.com>,
-        Paolo Bonzini <pbonzini@redhat.com>
-Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Like Xu <like.xu.linux@gmail.com>
-References: <20220805172945.35412-1-seanjc@google.com>
- <20220805172945.35412-4-seanjc@google.com>
-From:   Xiaoyao Li <xiaoyao.li@intel.com>
-In-Reply-To: <20220805172945.35412-4-seanjc@google.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-3.0 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,HK_RANDOM_ENVFROM,
-        HK_RANDOM_FROM,NICE_REPLY_A,RCVD_IN_DNSWL_MED,SPF_HELO_NONE,SPF_NONE,
-        T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
+        with ESMTP id S229475AbiHJGvm (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 10 Aug 2022 02:51:42 -0400
+Received: from ams.source.kernel.org (ams.source.kernel.org [145.40.68.75])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id ADC0171BD7;
+        Tue,  9 Aug 2022 23:51:40 -0700 (PDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by ams.source.kernel.org (Postfix) with ESMTPS id 54603B81AE6;
+        Wed, 10 Aug 2022 06:51:39 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0EE0CC433D6;
+        Wed, 10 Aug 2022 06:51:38 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1660114298;
+        bh=ahGwuAXwFB0kVpDwl1Y5QMjaxY0VAa6qcPz8jo98lIE=;
+        h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+        b=m1ftmx62OGBQQmdEb6o+nyAu7gFB4JAfHm56Ki/zP1RKC9oYM8J2yq92YFlfE56iZ
+         T0FB389el0kFaEqL7QVnE4LXCA/uKqL6qtdfH3L1l+zgdXvq0E9SvyQ2Pn0GwLbX1R
+         IMmdf7zr3AulKgyCjldeSx8mNd1xqH1c9fzThLRGAGW5WHJ6L1JTbSYGnHEgXsmYoh
+         tc0vcch8qKebPkbsxJnhKxbYplgNBqalAYI0gTwD0jwA8bXmNV6lD/0DL9NIk1onOb
+         M+xlMN1v0QvjDhIl1viQJCYbqblmlKVGYdQWvbdsgbYnIfGK0SMHixU8i5xG8bYv1S
+         K9hVJOj4Jmyag==
+Received: from ip-185-104-136-29.ptr.icomera.net ([185.104.136.29] helo=wait-a-minute.misterjones.org)
+        by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+        (Exim 4.95)
+        (envelope-from <maz@kernel.org>)
+        id 1oLfZ0-0024Yo-Rg;
+        Wed, 10 Aug 2022 07:51:35 +0100
+Date:   Wed, 10 Aug 2022 07:51:24 +0100
+Message-ID: <87o7wsbngz.wl-maz@kernel.org>
+From:   Marc Zyngier <maz@kernel.org>
+To:     Dmytro Maluka <dmy@semihalf.com>
+Cc:     "Dong, Eddie" <eddie.dong@intel.com>,
+        "Christopherson,, Sean" <seanjc@google.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+        Dave Hansen <dave.hansen@linux.intel.com>,
+        "x86@kernel.org" <x86@kernel.org>,
+        "H. Peter Anvin" <hpa@zytor.com>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        Eric Auger <eric.auger@redhat.com>,
+        Alex Williamson <alex.williamson@redhat.com>,
+        "Liu, Rong L" <rong.l.liu@intel.com>,
+        Zhenyu Wang <zhenyuw@linux.intel.com>,
+        Tomasz Nowicki <tn@semihalf.com>,
+        Grzegorz Jaszczyk <jaz@semihalf.com>,
+        "upstream@semihalf.com" <upstream@semihalf.com>,
+        Dmitry Torokhov <dtor@google.com>
+Subject: Re: [PATCH v2 0/5] KVM: Fix oneshot interrupts forwarding
+In-Reply-To: <ef9ffbde-445e-f00f-23c1-27e23b6cca4f@semihalf.com>
+References: <20220805193919.1470653-1-dmy@semihalf.com>
+        <BL0PR11MB30429034B6D59253AF22BCE08A639@BL0PR11MB3042.namprd11.prod.outlook.com>
+        <c5d8f537-5695-42f0-88a9-de80e21f5f4c@semihalf.com>
+        <BL0PR11MB304213273FA9FAC4EBC70FF88A629@BL0PR11MB3042.namprd11.prod.outlook.com>
+        <ef9ffbde-445e-f00f-23c1-27e23b6cca4f@semihalf.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/27.1
+ (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.104.136.29
+X-SA-Exim-Rcpt-To: dmy@semihalf.com, eddie.dong@intel.com, seanjc@google.com, pbonzini@redhat.com, kvm@vger.kernel.org, tglx@linutronix.de, mingo@redhat.com, bp@alien8.de, dave.hansen@linux.intel.com, x86@kernel.org, hpa@zytor.com, linux-kernel@vger.kernel.org, eric.auger@redhat.com, alex.williamson@redhat.com, rong.l.liu@intel.com, zhenyuw@linux.intel.com, tn@semihalf.com, jaz@semihalf.com, upstream@semihalf.com, dtor@google.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+X-Spam-Status: No, score=-7.7 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_HI,
+        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 8/6/2022 1:29 AM, Sean Christopherson wrote:
-> Disallow writes to feature MSRs after KVM_RUN to prevent userspace from
-> changing the vCPU model after running the vCPU.  Similar to guest CPUID,
-> KVM uses feature MSRs to configure intercepts, determine what operations
-> are/aren't allowed, etc.  Changing the capabilities while the vCPU is
-> active will at best yield unpredictable guest behavior, and at worst
-> could be dangerous to KVM.
+On Wed, 10 Aug 2022 00:30:29 +0100,
+Dmytro Maluka <dmy@semihalf.com> wrote:
 > 
-> Allow writing the current value, e.g. so that userspace can blindly set
-> all MSRs when emulating RESET, and unconditionally allow writes to
-> MSR_IA32_UCODE_REV so that userspace can emulate patch loads.
+> On 8/9/22 10:01 PM, Dong, Eddie wrote:
+> > 
+> > 
+> >> -----Original Message-----
+> >> From: Dmytro Maluka <dmy@semihalf.com>
+> >> Sent: Tuesday, August 9, 2022 12:24 AM
+> >> To: Dong, Eddie <eddie.dong@intel.com>; Christopherson,, Sean
+> >> <seanjc@google.com>; Paolo Bonzini <pbonzini@redhat.com>;
+> >> kvm@vger.kernel.org
+> >> Cc: Thomas Gleixner <tglx@linutronix.de>; Ingo Molnar <mingo@redhat.com>;
+> >> Borislav Petkov <bp@alien8.de>; Dave Hansen <dave.hansen@linux.intel.com>;
+> >> x86@kernel.org; H. Peter Anvin <hpa@zytor.com>; linux-
+> >> kernel@vger.kernel.org; Eric Auger <eric.auger@redhat.com>; Alex
+> >> Williamson <alex.williamson@redhat.com>; Liu, Rong L <rong.l.liu@intel.com>;
+> >> Zhenyu Wang <zhenyuw@linux.intel.com>; Tomasz Nowicki
+> >> <tn@semihalf.com>; Grzegorz Jaszczyk <jaz@semihalf.com>;
+> >> upstream@semihalf.com; Dmitry Torokhov <dtor@google.com>
+> >> Subject: Re: [PATCH v2 0/5] KVM: Fix oneshot interrupts forwarding
+> >>
+> >> On 8/9/22 1:26 AM, Dong, Eddie wrote:
+> >>>>
+> >>>> The existing KVM mechanism for forwarding of level-triggered
+> >>>> interrupts using resample eventfd doesn't work quite correctly in the
+> >>>> case of interrupts that are handled in a Linux guest as oneshot
+> >>>> interrupts (IRQF_ONESHOT). Such an interrupt is acked to the device
+> >>>> in its threaded irq handler, i.e. later than it is acked to the
+> >>>> interrupt controller (EOI at the end of hardirq), not earlier. The
+> >>>> existing KVM code doesn't take that into account, which results in
+> >>>> erroneous extra interrupts in the guest caused by premature re-assert of an
+> >> unacknowledged IRQ by the host.
+> >>>
+> >>> Interesting...  How it behaviors in native side?
+> >>
+> >> In native it behaves correctly, since Linux masks such a oneshot interrupt at the
+> >> beginning of hardirq, so that the EOI at the end of hardirq doesn't result in its
+> >> immediate re-assert, and then unmasks it later, after its threaded irq handler
+> >> completes.
+> >>
+> >> In handle_fasteoi_irq():
+> >>
+> >> 	if (desc->istate & IRQS_ONESHOT)
+> >> 		mask_irq(desc);
+> >>
+> >> 	handle_irq_event(desc);
+> >>
+> >> 	cond_unmask_eoi_irq(desc, chip);
+> >>
+> >>
+> >> and later in unmask_threaded_irq():
+> >>
+> >> 	unmask_irq(desc);
+> >>
+> >> I also mentioned that in patch #3 description:
+> >> "Linux keeps such interrupt masked until its threaded handler finishes, to
+> >> prevent the EOI from re-asserting an unacknowledged interrupt.
+> > 
+> > That makes sense. Can you include the full story in cover letter too?
 > 
-> Special case the VMX MSRs to keep the generic list small, i.e. so that
-> KVM can do a linear walk of the generic list without incurring meaningful
-> overhead.
+> Ok, I will.
 > 
-> Cc: Like Xu <like.xu.linux@gmail.com>
-> Signed-off-by: Sean Christopherson <seanjc@google.com>
-> ---
->   arch/x86/kvm/x86.c | 37 +++++++++++++++++++++++++++++++++++++
->   1 file changed, 37 insertions(+)
-> 
-> diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-> index a1c65b77fb16..4da26a1f14c1 100644
-> --- a/arch/x86/kvm/x86.c
-> +++ b/arch/x86/kvm/x86.c
-> @@ -1541,6 +1541,26 @@ static u32 msr_based_features[ARRAY_SIZE(msr_based_features_all_except_vmx) +
->   			      (KVM_LAST_EMULATED_VMX_MSR - KVM_FIRST_EMULATED_VMX_MSR + 1)];
->   static unsigned int num_msr_based_features;
->   
-> +/*
-> + * All feature MSRs except uCode revID, which tracks the currently loaded uCode
-> + * patch, are immutable once the vCPU model is defined.
-> + */
-> +static bool kvm_is_immutable_feature_msr(u32 msr)
-> +{
-> +	int i;
-> +
-> +	if (msr >= KVM_FIRST_EMULATED_VMX_MSR && msr <= KVM_LAST_EMULATED_VMX_MSR)
-> +		return true;
-> +
-> +	for (i = 0; i < ARRAY_SIZE(msr_based_features_all_except_vmx); i++) {
-> +		if (msr == msr_based_features_all_except_vmx[i])
-> +			return msr != MSR_IA32_UCODE_REV;
-> +	}
-> +
-> +	return false;
-> +}
-> +
-> +
->   static u64 kvm_get_arch_capabilities(void)
->   {
->   	u64 data = 0;
-> @@ -2136,6 +2156,23 @@ static int do_get_msr(struct kvm_vcpu *vcpu, unsigned index, u64 *data)
->   
->   static int do_set_msr(struct kvm_vcpu *vcpu, unsigned index, u64 *data)
->   {
-> +	u64 val;
-> +
-> +	/*
-> +	 * Disallow writes to immutable feature MSRs after KVM_RUN.  KVM does
-> +	 * not support modifying the guest vCPU model on the fly, e.g. changing
-> +	 * the nVMX capabilities while L2 is running is nonsensical.  Ignore
-> +	 * writes of the same value, e.g. to allow userspace to blindly stuff
-> +	 * all MSRs when emulating RESET.
-> +	 */
-> +	if (vcpu->arch.last_vmentry_cpu != -1 &&
+> > 
+> > 
+> >> However, with KVM + vfio (or whatever is listening on the resamplefd) we don't
+> >> check that the interrupt is still masked in the guest at the moment of EOI.
+> >> Resamplefd is notified regardless, so vfio prematurely unmasks the host
+> >> physical IRQ, thus a new (unwanted) physical interrupt is generated in the host
+> >> and queued for injection to the guest."
 
-can we extract "vcpu->arch.last_vmentry_cpu != -1" into a function like 
-kvm_vcpu_has_runned() ?
+Sorry to barge in pretty late in the conversation (just been Cc'd on
+this), but why shouldn't the resamplefd be notified? If there has been
+an EOI, a new level must be made visible to the guest interrupt
+controller, no matter what the state of the interrupt masking is.
 
-> +	    kvm_is_immutable_feature_msr(index)) {
-> +		if (do_get_msr(vcpu, index, &val) || *data != val)
-> +			return -EINVAL;
-> +
-> +		return 0;
-> +	}
-> +
->   	return kvm_set_msr_ignored_check(vcpu, index, *data, true);
->   }
->   
+Whether this new level is actually *presented* to a vCPU is another
+matter entirely, and is arguably a problem for the interrupt
+controller emulation.
 
+For example on arm64, we expect to be able to read the pending state
+of an interrupt from the guest irrespective of the masking state of
+that interrupt. Any change to the interrupt flow should preserve this.
+
+Thankfully, we don't have the polarity issue (there is no such thing
+in the GIC architecture) and we only deal with pending/not-pending.
+
+Thanks,
+
+	M.
+
+-- 
+Without deviation from the norm, progress is not possible.
