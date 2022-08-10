@@ -2,148 +2,154 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 31C1058EA4A
-	for <lists+kvm@lfdr.de>; Wed, 10 Aug 2022 12:10:25 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id CD3F158EA36
+	for <lists+kvm@lfdr.de>; Wed, 10 Aug 2022 12:05:53 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231708AbiHJKKY (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 10 Aug 2022 06:10:24 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45168 "EHLO
+        id S231508AbiHJKFv (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 10 Aug 2022 06:05:51 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40236 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231648AbiHJKKT (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 10 Aug 2022 06:10:19 -0400
-Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2E50E51A0C
-        for <kvm@vger.kernel.org>; Wed, 10 Aug 2022 03:10:18 -0700 (PDT)
-Received: from pps.filterd (m0098399.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.17.1.5/8.17.1.5) with ESMTP id 27AA8HhA002358
-        for <kvm@vger.kernel.org>; Wed, 10 Aug 2022 10:10:17 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=date : from : to : cc :
- subject : message-id : in-reply-to : references : mime-version :
- content-type : content-transfer-encoding; s=pp1;
- bh=/7kf125brmJmNMN4UAkm1+531Rt80/lOMajQBIf7qdI=;
- b=jYHK0mBDdTrqaiPs85uLho3zelg4qHra5PI7J6VY4FUPdhnKStGq2SLV8E+g0WTLd4TO
- yBsKQ+3irGuPy2siD7i/k5oWwgTVbXFVXrMvSo/mM+DFNjISgysMeb18CFU/bGZqSXGF
- 83CPN4+2fq5yT2pmMpX32AX/VGmH4omFu7asR2SI20N6sO1RWHlhXQit1jEE9+gy4do0
- ZkC0A1vk1k5KEdwcj9A599QldN5il1OXzVAXdJdJe3QdMP1FA3c1n9gcHn25lL0ecEyW
- +q/51r4J4HbNU+ncxeSYaa77DNSlsQ7BVtduaNgJrwAm+lNETSeKBxSJc5Bj+OjsFkvz kg== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3hv65w0p6a-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT)
-        for <kvm@vger.kernel.org>; Wed, 10 Aug 2022 10:10:17 +0000
-Received: from m0098399.ppops.net (m0098399.ppops.net [127.0.0.1])
-        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 27A9HDXa002442
-        for <kvm@vger.kernel.org>; Wed, 10 Aug 2022 10:10:17 GMT
-Received: from ppma01fra.de.ibm.com (46.49.7a9f.ip4.static.sl-reverse.com [159.122.73.70])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3hv65w0p55-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Wed, 10 Aug 2022 10:10:17 +0000
-Received: from pps.filterd (ppma01fra.de.ibm.com [127.0.0.1])
-        by ppma01fra.de.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 27AA8ROL015892;
-        Wed, 10 Aug 2022 10:10:14 GMT
-Received: from b06avi18626390.portsmouth.uk.ibm.com (b06avi18626390.portsmouth.uk.ibm.com [9.149.26.192])
-        by ppma01fra.de.ibm.com with ESMTP id 3huww0rpdx-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Wed, 10 Aug 2022 10:10:14 +0000
-Received: from d06av23.portsmouth.uk.ibm.com (d06av23.portsmouth.uk.ibm.com [9.149.105.59])
-        by b06avi18626390.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 27AA7fhj32375252
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Wed, 10 Aug 2022 10:07:41 GMT
-Received: from d06av23.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 919C4A4053;
-        Wed, 10 Aug 2022 10:10:11 +0000 (GMT)
-Received: from d06av23.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 454FEA404D;
-        Wed, 10 Aug 2022 10:10:11 +0000 (GMT)
-Received: from p-imbrenda (unknown [9.145.0.105])
-        by d06av23.portsmouth.uk.ibm.com (Postfix) with ESMTP;
-        Wed, 10 Aug 2022 10:10:11 +0000 (GMT)
-Date:   Wed, 10 Aug 2022 11:59:41 +0200
-From:   Claudio Imbrenda <imbrenda@linux.ibm.com>
-To:     Nico Boehr <nrb@linux.ibm.com>
-Cc:     kvm@vger.kernel.org, frankja@linux.ibm.com, thuth@redhat.com
-Subject: Re: [kvm-unit-tests PATCH v3 2/4] lib: s390x: add CPU timer
- functions to time.h
-Message-ID: <20220810115941.2a25c1e1@p-imbrenda>
-In-Reply-To: <20220722060043.733796-3-nrb@linux.ibm.com>
-References: <20220722060043.733796-1-nrb@linux.ibm.com>
-        <20220722060043.733796-3-nrb@linux.ibm.com>
-Organization: IBM
-X-Mailer: Claws Mail 4.1.0 (GTK 3.24.34; x86_64-redhat-linux-gnu)
+        with ESMTP id S229481AbiHJKFu (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 10 Aug 2022 06:05:50 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 2144953D1D
+        for <kvm@vger.kernel.org>; Wed, 10 Aug 2022 03:05:48 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1660125947;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=83RYZm97KNj9NYPWWYz4fzmlCpq267m27613RMfC+Pg=;
+        b=UHeEaq1VsJh0smxEW5O4pSxnHz5WOcUVkyByN8C1d/kkzrKLEagB5waD//NXUY/Eks+7xT
+        B6VDiPUTtQMxQZdd3KuyHXxKqbBCF2GtO/RkMcwSQVIOQeygDAhyNeh4naClHzUuT3Hh+W
+        iXrFgrt7f/IEYgpEnELBjnbQetKS9Bw=
+Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
+ [209.85.128.70]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-624-LyKownNmN9G_kcb7XutelA-1; Wed, 10 Aug 2022 06:05:45 -0400
+X-MC-Unique: LyKownNmN9G_kcb7XutelA-1
+Received: by mail-wm1-f70.google.com with SMTP id n1-20020a7bcbc1000000b003a4e8c818f5so414078wmi.6
+        for <kvm@vger.kernel.org>; Wed, 10 Aug 2022 03:05:45 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=content-transfer-encoding:in-reply-to:subject:organization:from
+         :references:cc:to:content-language:user-agent:mime-version:date
+         :message-id:x-gm-message-state:from:to:cc;
+        bh=83RYZm97KNj9NYPWWYz4fzmlCpq267m27613RMfC+Pg=;
+        b=TcCJXs0TFmZOI463vztDjDzKQJQxJRkWqHoCjkXj/0oXEvBK59/TZIw94zWfVHYKLh
+         YVJQWgg8SPhBOixU3+sHRXvOy76pdlKX66NLtQbBx/PPh2Q91AtZX7aPmm5EH3lY8IqB
+         F92myXh5gM+4Qb1stg4c5rPo6rbmBFDosnUHUs4ViqOCYevv1ShjJG6LUlVf1YCPHMgL
+         4NrHZmt8Ht9Voiwx6aLc//RocRo3YIIOK3V/pC/hc0SqcCYWVina6HscVURbvWL2IZZE
+         bPvuahnW1isSlXOm4kBgnHay+NMNWYRwoyv9EMgNLlj8V2Yt1xLkJZRHxhaM9IYq1AxW
+         KIVA==
+X-Gm-Message-State: ACgBeo37/TMTZkhNemktf8HNhnRZ8+jMQ/r423wjHfVjyOm1E2ybNh+1
+        T7eWAfjjsLbR9Y5/l2afZz6XfVypIzgmHqnRO6/w6/ILXwtipMONmwoxDZ6rPsg12rylE61DmQx
+        Svk5VHHO/C00w
+X-Received: by 2002:a5d:64ae:0:b0:220:6c4c:5a60 with SMTP id m14-20020a5d64ae000000b002206c4c5a60mr17058809wrp.636.1660125944499;
+        Wed, 10 Aug 2022 03:05:44 -0700 (PDT)
+X-Google-Smtp-Source: AA6agR5i72uisBNMVtDIvVDVfSxV1hzWrZROoCbvcTeBej4J7CIdnSDFuFoSBTJk3opG5+sXP+xgow==
+X-Received: by 2002:a5d:64ae:0:b0:220:6c4c:5a60 with SMTP id m14-20020a5d64ae000000b002206c4c5a60mr17058769wrp.636.1660125944245;
+        Wed, 10 Aug 2022 03:05:44 -0700 (PDT)
+Received: from ?IPV6:2003:cb:c707:1600:a3ce:b459:ef57:7b93? (p200300cbc7071600a3ceb459ef577b93.dip0.t-ipconnect.de. [2003:cb:c707:1600:a3ce:b459:ef57:7b93])
+        by smtp.gmail.com with ESMTPSA id t188-20020a1c46c5000000b003a327f19bf9sm1793951wma.14.2022.08.10.03.05.42
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 10 Aug 2022 03:05:43 -0700 (PDT)
+Message-ID: <00f1aa03-bc82-ffce-569b-e2d5c459992c@redhat.com>
+Date:   Wed, 10 Aug 2022 12:05:42 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.11.0
+Content-Language: en-US
+To:     Chao Peng <chao.p.peng@linux.intel.com>
+Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+        linux-mm@kvack.org, linux-fsdevel@vger.kernel.org,
+        linux-api@vger.kernel.org, linux-doc@vger.kernel.org,
+        qemu-devel@nongnu.org, linux-kselftest@vger.kernel.org,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Jonathan Corbet <corbet@lwn.net>,
+        Sean Christopherson <seanjc@google.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+        x86@kernel.org, "H . Peter Anvin" <hpa@zytor.com>,
+        Hugh Dickins <hughd@google.com>,
+        Jeff Layton <jlayton@kernel.org>,
+        "J . Bruce Fields" <bfields@fieldses.org>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        Shuah Khan <shuah@kernel.org>, Mike Rapoport <rppt@kernel.org>,
+        Steven Price <steven.price@arm.com>,
+        "Maciej S . Szmigiero" <mail@maciej.szmigiero.name>,
+        Vlastimil Babka <vbabka@suse.cz>,
+        Vishal Annapurve <vannapurve@google.com>,
+        Yu Zhang <yu.c.zhang@linux.intel.com>,
+        "Kirill A . Shutemov" <kirill.shutemov@linux.intel.com>,
+        luto@kernel.org, jun.nakajima@intel.com, dave.hansen@intel.com,
+        ak@linux.intel.com, aarcange@redhat.com, ddutile@redhat.com,
+        dhildenb@redhat.com, Quentin Perret <qperret@google.com>,
+        Michael Roth <michael.roth@amd.com>, mhocko@suse.com,
+        Muchun Song <songmuchun@bytedance.com>
+References: <20220706082016.2603916-1-chao.p.peng@linux.intel.com>
+ <20220706082016.2603916-4-chao.p.peng@linux.intel.com>
+ <13394075-fca0-6f2b-92a2-f1291fcec9a3@redhat.com>
+ <20220810092232.GC862421@chaop.bj.intel.com>
+From:   David Hildenbrand <david@redhat.com>
+Organization: Red Hat
+Subject: Re: [PATCH v7 03/14] mm: Introduce memfile_notifier
+In-Reply-To: <20220810092232.GC862421@chaop.bj.intel.com>
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-ORIG-GUID: VavckzkIUV4w2L_AokGaH0hBrl-1PYPh
-X-Proofpoint-GUID: RpHNsX9EcQEEnHnk5D72LmdUW4SgXfpv
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.205,Aquarius:18.0.883,Hydra:6.0.517,FMLib:17.11.122.1
- definitions=2022-08-10_05,2022-08-09_02,2022-06-22_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 spamscore=0 mlxlogscore=999
- impostorscore=0 lowpriorityscore=0 malwarescore=0 clxscore=1011
- suspectscore=0 priorityscore=1501 phishscore=0 mlxscore=0 adultscore=0
- bulkscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2207270000 definitions=main-2208100031
-X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_EF,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_PASS,
-        T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
+X-Spam-Status: No, score=-2.7 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
+        RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE
+        autolearn=unavailable autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, 22 Jul 2022 08:00:41 +0200
-Nico Boehr <nrb@linux.ibm.com> wrote:
-
-> Upcoming changes will make use of the CPU timer, so add a convenience
-> function to set the CPU timer.
+On 10.08.22 11:22, Chao Peng wrote:
+> On Fri, Aug 05, 2022 at 03:22:58PM +0200, David Hildenbrand wrote:
+>> On 06.07.22 10:20, Chao Peng wrote:
+>>> This patch introduces memfile_notifier facility so existing memory file
+>>> subsystems (e.g. tmpfs/hugetlbfs) can provide memory pages to allow a
+>>> third kernel component to make use of memory bookmarked in the memory
+>>> file and gets notified when the pages in the memory file become
+>>> invalidated.
+>>
+>> Stupid question, but why is this called "memfile_notifier" and not
+>> "memfd_notifier". We're only dealing with memfd's after all ... which
+>> are anonymous files essentially. Or what am I missing? Are there any
+>> other plans for fs than plain memfd support that I am not aware of?
 > 
-> Since shifts for both CPU timer and TOD clock are the same, introduce a
-> new define S390_CLOCK_SHIFT_US. The respective shifts for CPU timer and
-> TOD clock reference it, so the semantic difference between the two
-> defines is kept.
-> 
-> Signed-off-by: Nico Boehr <nrb@linux.ibm.com>
+> There were some discussions on this in v3.
+>   https://lkml.org/lkml/2021/12/28/484
+> Sean commented it's OK to abstract it from memfd but he also wants the
+> kAPI (name) should not bind to memfd to make room for future non-memfd
+> usages.
 
-Reviewed-by: Claudio Imbrenda <imbrenda@linux.ibm.com>
+Sorry, but how is "memfile" any better? memfd abstracted to memfile?! :)
 
-> ---
->  lib/s390x/asm/time.h | 17 ++++++++++++++++-
->  1 file changed, 16 insertions(+), 1 deletion(-)
-> 
-> diff --git a/lib/s390x/asm/time.h b/lib/s390x/asm/time.h
-> index 7652a151e87a..d8d91d68a667 100644
-> --- a/lib/s390x/asm/time.h
-> +++ b/lib/s390x/asm/time.h
-> @@ -11,9 +11,13 @@
->  #ifndef _ASMS390X_TIME_H_
->  #define _ASMS390X_TIME_H_
->  
-> -#define STCK_SHIFT_US	(63 - 51)
-> +#define S390_CLOCK_SHIFT_US	(63 - 51)
-> +
-> +#define STCK_SHIFT_US	S390_CLOCK_SHIFT_US
->  #define STCK_MAX	((1UL << 52) - 1)
->  
-> +#define CPU_TIMER_SHIFT_US	S390_CLOCK_SHIFT_US
-> +
->  static inline uint64_t get_clock_us(void)
->  {
->  	uint64_t clk;
-> @@ -45,4 +49,15 @@ static inline void mdelay(unsigned long ms)
->  	udelay(ms * 1000);
->  }
->  
-> +static inline void cpu_timer_set_ms(int64_t timeout_ms)
-> +{
-> +	int64_t timer_value = (timeout_ms * 1000) << CPU_TIMER_SHIFT_US;
-> +
-> +	asm volatile (
-> +		"spt %[timer_value]\n"
-> +		:
-> +		: [timer_value] "Q" (timer_value)
-> +	);
-> +}
-> +
->  #endif
+I understand Sean's suggestion about abstracting, but if the new name
+makes it harder to grasp and there isn't really an alternative to memfd
+in sight, I'm not so sure I enjoy the tried abstraction here.
+
+Otherwise we'd have to get creative now and discuss something like
+"file_population_notifer" or "mapping_population_notifer" and I am not
+sure that our time is well spent doing so right now.
+
+... as this is kernel-internal, we can always adjust the name as we
+please later, once we *actually* now what the abstraction should be.
+Until then I'd suggest to KIS and soft-glue this to memfd.
+
+Or am I missing something important?
+
+-- 
+Thanks,
+
+David / dhildenb
 
