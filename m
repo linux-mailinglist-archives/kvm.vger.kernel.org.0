@@ -2,228 +2,132 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 69F1458F4FB
-	for <lists+kvm@lfdr.de>; Thu, 11 Aug 2022 01:49:43 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id E7DBE58F4FE
+	for <lists+kvm@lfdr.de>; Thu, 11 Aug 2022 01:53:19 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233418AbiHJXtc (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 10 Aug 2022 19:49:32 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43734 "EHLO
+        id S233580AbiHJXxM (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 10 Aug 2022 19:53:12 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46748 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229868AbiHJXtb (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 10 Aug 2022 19:49:31 -0400
-Received: from mail-pj1-x1035.google.com (mail-pj1-x1035.google.com [IPv6:2607:f8b0:4864:20::1035])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 330D85FAFE
-        for <kvm@vger.kernel.org>; Wed, 10 Aug 2022 16:49:30 -0700 (PDT)
-Received: by mail-pj1-x1035.google.com with SMTP id s5-20020a17090a13c500b001f4da9ffe5fso3720603pjf.5
-        for <kvm@vger.kernel.org>; Wed, 10 Aug 2022 16:49:30 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc;
-        bh=7q5JxAK0vHP9WT28bouEchKLTJ6x5HjHy5iEOu3hB8g=;
-        b=PQP3OmQ8yy9mPCmXBeVfxwFXkr4rJXuMjfuNJ0PoTW7plQEqGQEwt+anuiCzU2LLM7
-         0BMrZ2OG75sJ3N/xOwXrsjiRn4bJvlXbTEesyyS02KbptsUbsdiTBQmIrROBlmJcxmyW
-         N3LhnPfaNAgZayfd7ErQ5vQ5DmSqAnjhIibUFsOAJJ6QuyUwIt7j9bcDRfzlUO9nNoze
-         LZfRxXiq7X+dw87uvbVGWxFB8DBwOKFJiiqbgixZaDTaYNlEcZ/Ov2cdHZ+oV8PumFxq
-         viOnEW6cFNUVq/VAxLwRbxmGD6Tl74W+bV5vCLVC7Icf6WSXUY023GHFDeh+2TOy7Jh0
-         kHfQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc;
-        bh=7q5JxAK0vHP9WT28bouEchKLTJ6x5HjHy5iEOu3hB8g=;
-        b=gLUh3vyAVyUoWvAC1iTbrFxvTdGsMtYgJwRwVrfeXD2neGd3ws/q2opJWBG8mHjFla
-         ajC9HkBNfpa85Ta8nTw9VDil53wtrhT9ygcJDh9GaRmFrT2OVObo7D1AIBnhPGAoWKp8
-         tDpkOANnAI0Zp33r4ckyZjNYVB2WPZVin7DBPqJUmCjRhEZgmJx1rlIExe3LuZQB9nPT
-         WE3UtSEMbG/WzimkDwnzpBWfaaVQgD+ZxDJ6Jde7KN9sQZAIz3VBfK8+aQiOTzNPyRW6
-         5dWMjn0Otx9ppBfXz0B3HuVPCBRNiioiziDNmO6oIo99fGZdPMSWGckm9wp5lvMTUPul
-         Wh9A==
-X-Gm-Message-State: ACgBeo0dqo2f2pe2Mh6DxnpisMEacErMp1jEHN+H+cu05TYgcYTiDYej
-        6pYYEOvPt2ifmGU0enjxZrqjWg==
-X-Google-Smtp-Source: AA6agR6GvbYePxHJa+JbOqCl3fHy/qnN0YbcZ3tFyqY1yfTtN4Gk0LXuPjSVZ7swjL2m8fkCCplPrw==
-X-Received: by 2002:a17:90b:4d88:b0:1f3:34aa:9167 with SMTP id oj8-20020a17090b4d8800b001f334aa9167mr5892651pjb.133.1660175369525;
-        Wed, 10 Aug 2022 16:49:29 -0700 (PDT)
-Received: from google.com (223.103.125.34.bc.googleusercontent.com. [34.125.103.223])
-        by smtp.gmail.com with ESMTPSA id p11-20020a635b0b000000b0041a615381d5sm10492868pgb.4.2022.08.10.16.49.27
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 10 Aug 2022 16:49:28 -0700 (PDT)
-Date:   Wed, 10 Aug 2022 16:49:23 -0700
-From:   David Matlack <dmatlack@google.com>
-To:     Colton Lewis <coltonlewis@google.com>
-Cc:     kvm@vger.kernel.org, pbonzini@redhat.com, maz@kernel.org,
-        seanjc@google.com, oupton@google.com, ricarkol@google.com
-Subject: Re: [PATCH 3/3] KVM: selftests: Randomize page access order
-Message-ID: <YvREA1VJA3ryF+io@google.com>
-References: <20220810175830.2175089-1-coltonlewis@google.com>
- <20220810175830.2175089-4-coltonlewis@google.com>
+        with ESMTP id S229868AbiHJXxK (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 10 Aug 2022 19:53:10 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id ABFD31D0F2
+        for <kvm@vger.kernel.org>; Wed, 10 Aug 2022 16:53:08 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1660175587;
+        h=from:from:reply-to:reply-to:subject:subject:date:date:
+         message-id:message-id:to:to:cc:cc:mime-version:mime-version:
+         content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=RK+rr0mfAx0H6DNfJ38VHaiOqlQCgpVZGMqD2Vgy3AU=;
+        b=TPyFX7bL90IFrpgQWHO3L4GUarxCWNc7UdWFVTXyzCDv2VXYtf8PX/qxIThGf5wmZ6WkJF
+        In76RF2zn5v6tWPQiOXnrSVscmm6gpfp/o3P+KHvxwSY8ZXYOPNdgUCmo1mPRIMse0h7WC
+        J8NETjLAPGxHQNsr8ezRBcm/v+lFzH8=
+Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
+ [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-414-xWnBAyr8PHS6t1-mPqJvlw-1; Wed, 10 Aug 2022 19:53:03 -0400
+X-MC-Unique: xWnBAyr8PHS6t1-mPqJvlw-1
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.rdu2.redhat.com [10.11.54.5])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 4495885A587;
+        Wed, 10 Aug 2022 23:53:03 +0000 (UTC)
+Received: from [10.64.54.77] (vpn2-54-77.bne.redhat.com [10.64.54.77])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id 8611C9459C;
+        Wed, 10 Aug 2022 23:52:58 +0000 (UTC)
+Reply-To: Gavin Shan <gshan@redhat.com>
+Subject: Re: [PATCH 1/2] KVM: selftests: Make rseq compatible with glibc-2.35
+To:     Mathieu Desnoyers <mathieu.desnoyers@efficios.com>,
+        Sean Christopherson <seanjc@google.com>
+Cc:     shuah <shuah@kernel.org>, Florian Weimer <fweimer@redhat.com>,
+        kvmarm <kvmarm@lists.cs.columbia.edu>,
+        KVM list <kvm@vger.kernel.org>,
+        linux-kselftest <linux-kselftest@vger.kernel.org>,
+        linux-kernel <linux-kernel@vger.kernel.org>,
+        Paolo Bonzini <pbonzini@redhat.com>, maz <maz@kernel.org>,
+        oliver upton <oliver.upton@linux.dev>,
+        andrew jones <andrew.jones@linux.dev>,
+        yihyu <yihyu@redhat.com>, shan gavin <shan.gavin@gmail.com>
+References: <20220809060627.115847-1-gshan@redhat.com>
+ <8735e6ncxw.fsf@oldenburg.str.redhat.com>
+ <7844e3fa-e49e-de75-e424-e82d3a023dd6@redhat.com>
+ <87o7wtnay6.fsf@oldenburg.str.redhat.com>
+ <616d4de6-81f6-9d14-4e57-4a79fec45690@redhat.com>
+ <797306043.114963.1660047714774.JavaMail.zimbra@efficios.com>
+ <1014177394.115022.1660052656961.JavaMail.zimbra@efficios.com>
+ <YvLT1fd8ddybF5Uw@google.com>
+ <1478461718.353.1660133626967.JavaMail.zimbra@efficios.com>
+From:   Gavin Shan <gshan@redhat.com>
+Message-ID: <1191ef05-ef2c-fe8e-656d-cb89141b36fb@redhat.com>
+Date:   Thu, 11 Aug 2022 09:52:55 +1000
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.2.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20220810175830.2175089-4-coltonlewis@google.com>
-X-Spam-Status: No, score=-14.5 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        ENV_AND_HDR_SPF_MATCH,FSL_HELO_FAKE,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,
-        SPF_PASS,T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL
-        autolearn=no autolearn_force=no version=3.4.6
+In-Reply-To: <1478461718.353.1660133626967.JavaMail.zimbra@efficios.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.79 on 10.11.54.5
+X-Spam-Status: No, score=-2.7 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
+        RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Aug 10, 2022 at 05:58:30PM +0000, Colton Lewis wrote:
-> Add the ability to use random_table to randomize the order in which
-> pages are accessed. Add the -a argument to enable this new
-> behavior. This should make accesses less predictable and make for a
-> more realistic test. It includes the possibility that the same pages
-> may be hit multiple times during an iteration.
-> 
-> Signed-off-by: Colton Lewis <coltonlewis@google.com>
-> ---
->  .../testing/selftests/kvm/dirty_log_perf_test.c | 11 +++++++++--
->  .../selftests/kvm/include/perf_test_util.h      |  2 ++
->  .../testing/selftests/kvm/lib/perf_test_util.c  | 17 ++++++++++++++++-
->  3 files changed, 27 insertions(+), 3 deletions(-)
-> 
-> diff --git a/tools/testing/selftests/kvm/dirty_log_perf_test.c b/tools/testing/selftests/kvm/dirty_log_perf_test.c
-> index dcc5d44fc757..265cb4f7e088 100644
-> --- a/tools/testing/selftests/kvm/dirty_log_perf_test.c
-> +++ b/tools/testing/selftests/kvm/dirty_log_perf_test.c
-> @@ -132,6 +132,7 @@ struct test_params {
->  	bool partition_vcpu_memory_access;
->  	enum vm_mem_backing_src_type backing_src;
->  	int slots;
-> +	bool random_access;
->  	uint32_t random_seed;
->  };
->  
-> @@ -227,6 +228,7 @@ static void run_test(enum vm_guest_mode mode, void *arg)
->  				 p->partition_vcpu_memory_access);
->  
->  	perf_test_set_wr_fract(vm, p->wr_fract);
-> +	perf_test_set_random_access(vm, p->random_access);
->  
->  	guest_num_pages = (nr_vcpus * guest_percpu_mem_size) >> vm->page_shift;
->  	guest_num_pages = vm_adjust_num_guest_pages(mode, guest_num_pages);
-> @@ -357,10 +359,11 @@ static void run_test(enum vm_guest_mode mode, void *arg)
->  static void help(char *name)
->  {
->  	puts("");
-> -	printf("usage: %s [-h] [-i iterations] [-p offset] [-g] "
-> +	printf("usage: %s [-h] [-a] [-r random seed] [-i iterations] [-p offset] [-g] "
->  	       "[-m mode] [-n] [-b vcpu bytes] [-v vcpus] [-o] [-s mem type]"
->  	       "[-x memslots]\n", name);
->  	puts("");
-> +	printf(" -a: access memory randomly rather than in order.\n");
->  	printf(" -i: specify iteration counts (default: %"PRIu64")\n",
->  	       TEST_HOST_LOOP_N);
->  	printf(" -g: Do not enable KVM_CAP_MANUAL_DIRTY_LOG_PROTECT2. This\n"
-> @@ -403,6 +406,7 @@ int main(int argc, char *argv[])
->  		.partition_vcpu_memory_access = true,
->  		.backing_src = DEFAULT_VM_MEM_SRC,
->  		.slots = 1,
-> +		.random_access = false,
->  		.random_seed = time(NULL),
->  	};
->  	int opt;
-> @@ -414,8 +418,11 @@ int main(int argc, char *argv[])
->  
->  	guest_modes_append_default();
->  
-> -	while ((opt = getopt(argc, argv, "eghi:p:m:nb:f:v:or:s:x:")) != -1) {
-> +	while ((opt = getopt(argc, argv, "aeghi:p:m:nb:f:v:or:s:x:")) != -1) {
->  		switch (opt) {
-> +		case 'a':
-> +			p.random_access = true;
-> +			break;
->  		case 'e':
->  			/* 'e' is for evil. */
->  			run_vcpus_while_disabling_dirty_logging = true;
-> diff --git a/tools/testing/selftests/kvm/include/perf_test_util.h b/tools/testing/selftests/kvm/include/perf_test_util.h
-> index 597875d0c3db..6c6f81ce2216 100644
-> --- a/tools/testing/selftests/kvm/include/perf_test_util.h
-> +++ b/tools/testing/selftests/kvm/include/perf_test_util.h
-> @@ -39,6 +39,7 @@ struct perf_test_args {
->  
->  	/* Run vCPUs in L2 instead of L1, if the architecture supports it. */
->  	bool nested;
-> +	bool random_access;
->  
->  	struct perf_test_vcpu_args vcpu_args[KVM_MAX_VCPUS];
->  };
-> @@ -56,6 +57,7 @@ struct kvm_vm *perf_test_create_vm(enum vm_guest_mode mode, int nr_vcpus,
->  void perf_test_destroy_vm(struct kvm_vm *vm);
->  
->  void perf_test_set_wr_fract(struct kvm_vm *vm, int wr_fract);
-> +void perf_test_set_random_access(struct kvm_vm *vm, bool random_access);
->  
->  void perf_test_start_vcpu_threads(int vcpus, void (*vcpu_fn)(struct perf_test_vcpu_args *));
->  void perf_test_join_vcpu_threads(int vcpus);
-> diff --git a/tools/testing/selftests/kvm/lib/perf_test_util.c b/tools/testing/selftests/kvm/lib/perf_test_util.c
-> index 3c7b93349fef..9838d1ad9166 100644
-> --- a/tools/testing/selftests/kvm/lib/perf_test_util.c
-> +++ b/tools/testing/selftests/kvm/lib/perf_test_util.c
-> @@ -52,6 +52,9 @@ void perf_test_guest_code(uint32_t vcpu_idx)
->  	struct perf_test_vcpu_args *vcpu_args = &pta->vcpu_args[vcpu_idx];
->  	uint64_t gva;
->  	uint64_t pages;
-> +	uint64_t addr;
-> +	bool random_access = pta->random_access;
-> +	bool populated = false;
->  	int i;
->  
->  	gva = vcpu_args->gva;
-> @@ -62,7 +65,11 @@ void perf_test_guest_code(uint32_t vcpu_idx)
->  
->  	while (true) {
->  		for (i = 0; i < pages; i++) {
-> -			uint64_t addr = gva + (i * pta->guest_page_size);
-> +			if (populated && random_access)
+Hi Mathieu,
 
-Skipping the populate phase makes sense to ensure everything is
-populated I guess. What was your rational?
+On 8/10/22 10:13 PM, Mathieu Desnoyers wrote:
+> ----- On Aug 9, 2022, at 5:38 PM, Sean Christopherson seanjc@google.com wrote: 
+>> On Tue, Aug 09, 2022, Mathieu Desnoyers wrote:
+>>> ----- On Aug 9, 2022, at 8:21 AM, Mathieu Desnoyers
+>>> mathieu.desnoyers@efficios.com wrote:
 
-Either way I think this policy should be driven by the test, rather than
-harde-coded in perf_test_guest_code(). i.e. Move the call
-perf_test_set_random_access() in dirty_log_perf_test.c to just after the
-population phase.
+[...]
 
-> +				addr = gva +
-> +					((random_table[vcpu_idx][i] % pages) * pta->guest_page_size);
-> +			else
-> +				addr = gva + (i * pta->guest_page_size);
->  
->  			if (random_table[vcpu_idx][i] % 100 < pta->wr_fract)
->  				*(uint64_t *)addr = 0x0123456789ABCDEF;
-> @@ -70,6 +77,7 @@ void perf_test_guest_code(uint32_t vcpu_idx)
->  				READ_ONCE(*(uint64_t *)addr);
->  		}
->  
-> +		populated = true;
->  		GUEST_SYNC(1);
->  	}
->  }
-> @@ -169,6 +177,7 @@ struct kvm_vm *perf_test_create_vm(enum vm_guest_mode mode, int nr_vcpus,
->  
->  	/* By default vCPUs will write to memory. */
->  	pta->wr_fract = 100;
-> +	pta->random_access = false;
->  
->  	/*
->  	 * Snapshot the non-huge page size.  This is used by the guest code to
-> @@ -276,6 +285,12 @@ void perf_test_set_wr_fract(struct kvm_vm *vm, int wr_fract)
->  	sync_global_to_guest(vm, perf_test_args);
->  }
->  
-> +void perf_test_set_random_access(struct kvm_vm *vm, bool random_access)
-> +{
-> +	perf_test_args.random_access = random_access;
-> +	sync_global_to_guest(vm, perf_test_args);
-> +}
-> +
->  uint64_t __weak perf_test_nested_pages(int nr_vcpus)
->  {
->  	return 0;
-> -- 
-> 2.37.1.559.g78731f0fdb-goog
+>>>>
+>>>> All those are handled in the rseq selftests and in librseq. Why duplicate all
+>>>> that logic again?
+>>>
+>>> More to the point, considering that we have all the relevant rseq registration
+>>> code in tools/testing/selftests/rseq/rseq.c already, and the relevant thread
+>>> pointer getter code in tools/testing/selftests/rseq/rseq-*thread-pointer.h,
+>>> is there an easy way to get test applications in tools/testing/selftests/kvm
+>>> and in tools/testing/selftests/rseq to share that common code ?
+>>>
+>>> Keeping duplicated compatibility code is bad for long-term maintainability.
+>>
+>> Any reason not to simply add tools/lib/rseq.c and then expose a helper to get
+>> the
+>> registered rseq struct?
 > 
+> Indeed, moving rseq.c to tools/lib/ would allow building a .so from any selftest
+> which needs to use it.
+> 
+> And we could move the relevant rseq helper header files to tools/include/rseq/*
+> as well.
+> 
+> Thoughts ?
+> 
+
+One question is how librseq.so can be built automatically, when I'm going to
+build tools/testing/selftests/kvm/rseq_test.
+
+     # cd linux/tools/testing/selftests/kvm
+     # make rseq_test
+
+It's not perfect if I have to build tools/lib/librseq.so in advance, in order
+to build tools/testing/selftests/kvm/rseq_test for the sake of dependency.
+
+Thanks,
+Gavin
+
+
+
+
