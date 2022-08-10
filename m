@@ -2,150 +2,145 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id E4AFB58E8A8
-	for <lists+kvm@lfdr.de>; Wed, 10 Aug 2022 10:24:44 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 02F3A58E8F3
+	for <lists+kvm@lfdr.de>; Wed, 10 Aug 2022 10:41:39 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231674AbiHJIYn (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 10 Aug 2022 04:24:43 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44648 "EHLO
+        id S231753AbiHJIle (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 10 Aug 2022 04:41:34 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37642 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231219AbiHJIYl (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 10 Aug 2022 04:24:41 -0400
-Received: from mga04.intel.com (mga04.intel.com [192.55.52.120])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4721885F88;
-        Wed, 10 Aug 2022 01:24:40 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1660119880; x=1691655880;
-  h=date:from:to:cc:subject:message-id:reply-to:references:
-   mime-version:in-reply-to;
-  bh=6kT9mTMxRWS6E11jw9PH26Anrkm3qIMlLthMQe7yaTk=;
-  b=A7UeecBqYGcs818PljT93xy7yN1I2Hi5FEH2T4fJYUXeHBAvSV2hAUeT
-   V4kOGW7cqdLNQGRqAE35GoDPubqecUgDgeo3tvEnL/VsnybJAPHJhFG7g
-   CDGEQ2uCQtpCja9UOh0kL0/L1jc49///IAFQma+JN52Xk+US5sxjeLiZf
-   vLyzwrbDHKDC8sd0pImoKZ/QAVMcZ/yLzTg4lXSEc0KqkaLrMlkPZb/+A
-   YjlKv73oklEKEeKz0iDgI7CIXtho+lUjcTppRypanTTJ0AOmW5dRSfC8y
-   Acvtk/7HG6P6X0gh0DwN5G2xxOvyTGRApzwRJM/PEeFpG0ZkcayhPCMwF
-   g==;
-X-IronPort-AV: E=McAfee;i="6400,9594,10434"; a="289784598"
-X-IronPort-AV: E=Sophos;i="5.93,226,1654585200"; 
-   d="scan'208";a="289784598"
-Received: from orsmga007.jf.intel.com ([10.7.209.58])
-  by fmsmga104.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 10 Aug 2022 01:24:39 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.93,226,1654585200"; 
-   d="scan'208";a="601738890"
-Received: from chaop.bj.intel.com (HELO localhost) ([10.240.193.75])
-  by orsmga007.jf.intel.com with ESMTP; 10 Aug 2022 01:24:29 -0700
-Date:   Wed, 10 Aug 2022 16:19:43 +0800
-From:   Chao Peng <chao.p.peng@linux.intel.com>
-To:     Isaku Yamahata <isaku.yamahata@gmail.com>
-Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
-        linux-mm@kvack.org, linux-fsdevel@vger.kernel.org,
-        linux-api@vger.kernel.org, linux-doc@vger.kernel.org,
-        qemu-devel@nongnu.org, linux-kselftest@vger.kernel.org,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Jonathan Corbet <corbet@lwn.net>,
-        Sean Christopherson <seanjc@google.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>,
+        with ESMTP id S231791AbiHJIlP (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 10 Aug 2022 04:41:15 -0400
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B200A5FADF;
+        Wed, 10 Aug 2022 01:41:13 -0700 (PDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id 117E260F2F;
+        Wed, 10 Aug 2022 08:41:13 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 671A9C433D6;
+        Wed, 10 Aug 2022 08:41:12 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1660120872;
+        bh=W+5o4r15y/YZOMNcS6zt9psCyFTlTq1LiJF1ngryy9A=;
+        h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+        b=n222h+XwRK28pcXwKMTejItjWNIhfdJF4v4oQ68ChMut2KZ2ek8ntZJZtXUNNceNW
+         60cmbWLmjDFZYqbsj67G9f9oz9y6k8d2sFngcHo9HETmFNJ4Wn7jAXv3/tmV9dOqQ6
+         gOM9idD/tfYzyJftuRzBeGDr+XgaHM6wSk3lQ+5nbTi3+TEb4UUNsifolRvJ3aCeYP
+         5ZQ106rYfnlffPsl0oMgkKIg0hURsRiZo2r4KcCmt8F2ZlmOvIp5EEBtp3mTQzm+K8
+         YZBDvVDYyoDrXJXiImHtVkQ/85oeExgjgp8prerilhThxfgSEzvvtkrUHj2QtURbMM
+         lWIp7H1ogPpPg==
+Received: from [104.132.45.97] (helo=wait-a-minute.misterjones.org)
+        by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+        (Exim 4.95)
+        (envelope-from <maz@kernel.org>)
+        id 1oLhH3-0025Xw-Vx;
+        Wed, 10 Aug 2022 09:41:10 +0100
+Date:   Wed, 10 Aug 2022 09:41:07 +0100
+Message-ID: <87mtccbie4.wl-maz@kernel.org>
+From:   Marc Zyngier <maz@kernel.org>
+To:     eric.auger@redhat.com, Dmytro Maluka <dmy@semihalf.com>
+Cc:     Sean Christopherson <seanjc@google.com>,
+        Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org,
         Thomas Gleixner <tglx@linutronix.de>,
         Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        x86@kernel.org, "H . Peter Anvin" <hpa@zytor.com>,
-        Hugh Dickins <hughd@google.com>,
-        Jeff Layton <jlayton@kernel.org>,
-        "J . Bruce Fields" <bfields@fieldses.org>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        Shuah Khan <shuah@kernel.org>, Mike Rapoport <rppt@kernel.org>,
-        Steven Price <steven.price@arm.com>,
-        "Maciej S . Szmigiero" <mail@maciej.szmigiero.name>,
-        Vlastimil Babka <vbabka@suse.cz>,
-        Vishal Annapurve <vannapurve@google.com>,
-        Yu Zhang <yu.c.zhang@linux.intel.com>,
-        "Kirill A . Shutemov" <kirill.shutemov@linux.intel.com>,
-        luto@kernel.org, jun.nakajima@intel.com, dave.hansen@intel.com,
-        ak@linux.intel.com, david@redhat.com, aarcange@redhat.com,
-        ddutile@redhat.com, dhildenb@redhat.com,
-        Quentin Perret <qperret@google.com>,
-        Michael Roth <michael.roth@amd.com>, mhocko@suse.com,
-        Muchun Song <songmuchun@bytedance.com>
-Subject: Re: [PATCH v7 07/14] KVM: Use gfn instead of hva for
- mmu_notifier_retry
-Message-ID: <20220810081943.GB862421@chaop.bj.intel.com>
-Reply-To: Chao Peng <chao.p.peng@linux.intel.com>
-References: <20220706082016.2603916-1-chao.p.peng@linux.intel.com>
- <20220706082016.2603916-8-chao.p.peng@linux.intel.com>
- <20220804071044.GA4091749@ls.amr.corp.intel.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20220804071044.GA4091749@ls.amr.corp.intel.com>
-X-Spam-Status: No, score=-4.9 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,SPF_HELO_NONE,
-        SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no
-        version=3.4.6
+        Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org,
+        "H. Peter Anvin" <hpa@zytor.com>, linux-kernel@vger.kernel.org,
+        Alex Williamson <alex.williamson@redhat.com>,
+        Rong L Liu <rong.l.liu@intel.com>,
+        Zhenyu Wang <zhenyuw@linux.intel.com>,
+        Tomasz Nowicki <tn@semihalf.com>,
+        Grzegorz Jaszczyk <jaz@semihalf.com>, upstream@semihalf.com,
+        Dmitry Torokhov <dtor@google.com>
+Subject: Re: [PATCH v2 3/5] KVM: irqfd: Postpone resamplefd notify for oneshot interrupts
+In-Reply-To: <56ab2bc2-378b-3ece-2d45-e0f484087aa7@redhat.com>
+References: <20220805193919.1470653-1-dmy@semihalf.com>
+        <20220805193919.1470653-4-dmy@semihalf.com>
+        <56ab2bc2-378b-3ece-2d45-e0f484087aa7@redhat.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/27.1
+ (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 104.132.45.97
+X-SA-Exim-Rcpt-To: eric.auger@redhat.com, dmy@semihalf.com, seanjc@google.com, pbonzini@redhat.com, kvm@vger.kernel.org, tglx@linutronix.de, mingo@redhat.com, bp@alien8.de, dave.hansen@linux.intel.com, x86@kernel.org, hpa@zytor.com, linux-kernel@vger.kernel.org, alex.williamson@redhat.com, rong.l.liu@intel.com, zhenyuw@linux.intel.com, tn@semihalf.com, jaz@semihalf.com, upstream@semihalf.com, dtor@google.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+X-Spam-Status: No, score=-7.7 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_HI,
+        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Aug 04, 2022 at 12:10:44AM -0700, Isaku Yamahata wrote:
-> On Wed, Jul 06, 2022 at 04:20:09PM +0800,
-> Chao Peng <chao.p.peng@linux.intel.com> wrote:
+On Tue, 09 Aug 2022 21:45:25 +0100,
+Eric Auger <eric.auger@redhat.com> wrote:
 > 
-> > diff --git a/include/linux/kvm_host.h b/include/linux/kvm_host.h
-> > index 0bdb6044e316..e9153b54e2a4 100644
-> > --- a/include/linux/kvm_host.h
-> > +++ b/include/linux/kvm_host.h
-> > @@ -1362,10 +1362,8 @@ void kvm_mmu_free_memory_cache(struct kvm_mmu_memory_cache *mc);
-> >  void *kvm_mmu_memory_cache_alloc(struct kvm_mmu_memory_cache *mc);
-> >  #endif
-> >  
-> > -void kvm_inc_notifier_count(struct kvm *kvm, unsigned long start,
-> > -				   unsigned long end);
-> > -void kvm_dec_notifier_count(struct kvm *kvm, unsigned long start,
-> > -				   unsigned long end);
-> > +void kvm_inc_notifier_count(struct kvm *kvm, gfn_t start, gfn_t end);
-> > +void kvm_dec_notifier_count(struct kvm *kvm, gfn_t start, gfn_t end);
-> >  
-> >  long kvm_arch_dev_ioctl(struct file *filp,
-> >  			unsigned int ioctl, unsigned long arg);
+> Hi Dmytro,
 > 
-> The corresponding changes in kvm_main.c are missing.
+> On 8/5/22 21:39, Dmytro Maluka wrote:
+> > The existing KVM mechanism for forwarding of level-triggered interrupts
+> > using resample eventfd doesn't work quite correctly in the case of
+> > interrupts that are handled in a Linux guest as oneshot interrupts
+> > (IRQF_ONESHOT). Such an interrupt is acked to the device in its
+> > threaded irq handler, i.e. later than it is acked to the interrupt
+> > controller (EOI at the end of hardirq), not earlier.
+> >
+> > Linux keeps such interrupt masked until its threaded handler finishes,
+> > to prevent the EOI from re-asserting an unacknowledged interrupt.
+> > However, with KVM + vfio (or whatever is listening on the resamplefd)
+> > we don't check that the interrupt is still masked in the guest at the
+> > moment of EOI. Resamplefd is notified regardless, so vfio prematurely
+> > unmasks the host physical IRQ, thus a new (unwanted) physical interrupt
+> > is generated in the host and queued for injection to the guest.
+> >
+> > The fact that the virtual IRQ is still masked doesn't prevent this new
+> > physical IRQ from being propagated to the guest, because:
+> >
+> > 1. It is not guaranteed that the vIRQ will remain masked by the time
+> >    when vfio signals the trigger eventfd.
+> > 2. KVM marks this IRQ as pending (e.g. setting its bit in the virtual
+> >    IRR register of IOAPIC on x86), so after the vIRQ is unmasked, this
+> >    new pending interrupt is injected by KVM to the guest anyway.
+> >
+> > There are observed at least 2 user-visible issues caused by those
+> > extra erroneous pending interrupts for oneshot irq in the guest:
+> >
+> > 1. System suspend aborted due to a pending wakeup interrupt from
+> >    ChromeOS EC (drivers/platform/chrome/cros_ec.c).
+> > 2. Annoying "invalid report id data" errors from ELAN0000 touchpad
+> >    (drivers/input/mouse/elan_i2c_core.c), flooding the guest dmesg
+> >    every time the touchpad is touched.
+> >
+> > This patch fixes the issue on x86 by checking if the interrupt is
+> > unmasked when we receive irq ack (EOI) and, in case if it's masked,
+> > postponing resamplefd notify until the guest unmasks it.
+> >
+> > It doesn't fix the issue for other archs yet, since it relies on KVM
+> > irq mask notifiers functionality which currently works only on x86.
+> > On other archs we can register mask notifiers but they are never called.
+> > So on other archs resampler->masked is always false, so the behavior is
+> > the same as before this patch.
 
-Exactly! Actually it's in the next patch while it should indeed in
-this patch.
+The core issue seems that you would like to be able to retire a
+interrupt from what has been queued into the guest by a previous
+resampling (because the line has effectively dropped in the meantime).
 
-Chao
-> 
-> diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
-> index b2c79bef61bd..0184e327f6f5 100644
-> --- a/virt/kvm/kvm_main.c
-> +++ b/virt/kvm/kvm_main.c
-> @@ -711,8 +711,7 @@ static void kvm_mmu_notifier_change_pte(struct mmu_notifier *mn,
->         kvm_handle_hva_range(mn, address, address + 1, pte, kvm_set_spte_gfn);
->  }
->  
-> -void kvm_inc_notifier_count(struct kvm *kvm, unsigned long start,
-> -                                  unsigned long end)
-> +void kvm_inc_notifier_count(struct kvm *kvm, gfn_t start, gfn_t end)
->  {
->         /*
->          * The count increase must become visible at unlock time as no
-> @@ -786,8 +785,7 @@ static int kvm_mmu_notifier_invalidate_range_start(struct mmu_notifier *mn,
->         return 0;
->  }
->  
-> -void kvm_dec_notifier_count(struct kvm *kvm, unsigned long start,
-> -                                  unsigned long end)
-> +void kvm_dec_notifier_count(struct kvm *kvm, gfn_t start, gfn_t end)
->  {
->         /*
->          * This sequence increase will notify the kvm page fault that
-> 
-> 
-> -- 
-> Isaku Yamahata <isaku.yamahata@gmail.com>
+On arm64, it would be easy enough to sample the pending state of the
+physical line and adjust the state of the virtual interrupt
+accordingly. This would at least have the advantage of preserving the
+illusion of an interrupt being directly routed to the guest and its
+pending state being preserved between EOI and unmask.
+
+It isn't perfect either though as, assuming the guest can ack the
+interrupt on the device without exiting, the line would still appear
+as pending until the next exit, possibly the unmask.
+
+	M.
+
+-- 
+Without deviation from the norm, progress is not possible.
