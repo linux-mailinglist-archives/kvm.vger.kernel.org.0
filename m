@@ -2,52 +2,92 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 8BA0858F076
-	for <lists+kvm@lfdr.de>; Wed, 10 Aug 2022 18:33:39 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 16D1158F11A
+	for <lists+kvm@lfdr.de>; Wed, 10 Aug 2022 19:02:54 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231557AbiHJQdh (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 10 Aug 2022 12:33:37 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33976 "EHLO
+        id S233067AbiHJRCw (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 10 Aug 2022 13:02:52 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34934 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232741AbiHJQdU (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 10 Aug 2022 12:33:20 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 4EE6D82773
-        for <kvm@vger.kernel.org>; Wed, 10 Aug 2022 09:33:19 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1660149198;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding;
-        bh=hb75NAZceQx6eWwtD7RWmVxQSgiFbxhxAQC8UFBs3s8=;
-        b=DmjWBrHObMwKgWgSMSsnvylih7Mhiud0Dhf/KuUGRKK6ZUBx9Av6wjxDAg9eqr9FmQItim
-        Nnk+CrKUEQHW/1FqbZPypep2rftJOuP90LmTL4x+mYg2g5YnmTLmUcDOJxDRm6VLG9pBNb
-        ABSdlvqcn4aU3Z5NgZwEPmKagZpwEEg=
-Received: from mimecast-mx02.redhat.com (mx3-rdu2.redhat.com
- [66.187.233.73]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-47-3dOtdr5HOWuIndUkJGFMyA-1; Wed, 10 Aug 2022 12:33:17 -0400
-X-MC-Unique: 3dOtdr5HOWuIndUkJGFMyA-1
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.rdu2.redhat.com [10.11.54.5])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id D462F3833283
-        for <kvm@vger.kernel.org>; Wed, 10 Aug 2022 16:33:16 +0000 (UTC)
-Received: from virtlab701.virt.lab.eng.bos.redhat.com (virtlab701.virt.lab.eng.bos.redhat.com [10.19.152.228])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id C235B9459C
-        for <kvm@vger.kernel.org>; Wed, 10 Aug 2022 16:33:16 +0000 (UTC)
-From:   Paolo Bonzini <pbonzini@redhat.com>
-To:     kvm@vger.kernel.org
-Subject: [PATCH kvm-unit-tests] ioapic: poll for completion of other CPUs in level-triggered SMP tests
-Date:   Wed, 10 Aug 2022 12:33:16 -0400
-Message-Id: <20220810163316.55454-1-pbonzini@redhat.com>
+        with ESMTP id S233396AbiHJRCg (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 10 Aug 2022 13:02:36 -0400
+Received: from mail-lj1-x22a.google.com (mail-lj1-x22a.google.com [IPv6:2a00:1450:4864:20::22a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5A2CC43E61
+        for <kvm@vger.kernel.org>; Wed, 10 Aug 2022 10:02:34 -0700 (PDT)
+Received: by mail-lj1-x22a.google.com with SMTP id u6so11372347ljk.8
+        for <kvm@vger.kernel.org>; Wed, 10 Aug 2022 10:02:34 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=semihalf.com; s=google;
+        h=content-transfer-encoding:content-language:in-reply-to:mime-version
+         :user-agent:date:message-id:from:references:cc:to:subject:from:to:cc;
+        bh=f7wY4+TCVlOsefMDOe5awPGi8MWMNO4jCwUTni3WBgc=;
+        b=IKghbtR1o4EFWP9t2qaIK2WuGTpVZIRjdZFCrnenMelm3fh7CLCb/GXs99g3LH37sR
+         35YcAyViC+Icacu+wTzjuDYkyH5K/6Onu+qVtQMYvmOWTHmGpiM71iDhzkuZ5ozE81yG
+         2ZttwdwictUX/n+o7APxIOi+vbVmWngMUqsrHSp6I8mFbgKE8kSn9d1SZLGsm5QACKdE
+         uLNPaTke2LdHPSvXm2Kcp6Os+t2LQW9QmVUvfuxUkBNwJj3pKF2DOOgRfbUpaGcmZc6T
+         t1DBYSUbkPvRTlesThbyz3d8iapSIhhhgXbtQ12hMP0m3qQ1yGQVRZldptcH+A0woh4T
+         ANug==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=content-transfer-encoding:content-language:in-reply-to:mime-version
+         :user-agent:date:message-id:from:references:cc:to:subject
+         :x-gm-message-state:from:to:cc;
+        bh=f7wY4+TCVlOsefMDOe5awPGi8MWMNO4jCwUTni3WBgc=;
+        b=z6N/JDBxlxm7fj9ozgTaTbRnT4URp+qVx6wc5zr7nCbkpuyfB1GgzCsRtzrtGG2TR4
+         GxqTOtIja1g79T8/4W/DKP8WkbiGqgC3+7ypdRHePJfqFBHan3I3wZEZ3nCo5RjFLDbT
+         pBsboAyqZ/xPXQQPgmquJHtdtYme4dRGnogG/N/Bp8//4PKTf7YpC2rJlWUzm3cIMnqq
+         zyuFU9KN6nX5ZDuW1Mx+sMzLlp/Yi+ND1eaD8K0zJFEP9iVzwsRBvyvsFtVT4ArddHPr
+         eXDLSxZSsetY1yfTV02nVqlJYsxHRb0S7kReZ0/hyFysDP/mbaFlsQh/5XBf58PWgNvY
+         eOww==
+X-Gm-Message-State: ACgBeo0n3Km4+mLlqi2jbjX9PrMShln05Ae3CMQyJc/8JPUzCPUAB6UD
+        oOT+F+gTlcg9xRZYs6KRSzPhJg==
+X-Google-Smtp-Source: AA6agR47JGqH+QGZWdmLoxLNsBnQGaubUo6vgEWZ34kHa6N2an6+qcjSIXbfzwYYmyDwLI7LvDViwg==
+X-Received: by 2002:a2e:9415:0:b0:25e:477b:adc9 with SMTP id i21-20020a2e9415000000b0025e477badc9mr8380761ljh.109.1660150952622;
+        Wed, 10 Aug 2022 10:02:32 -0700 (PDT)
+Received: from ?IPv6:2a02:a31b:33d:9c00:463a:87e3:44fc:2b2f? ([2a02:a31b:33d:9c00:463a:87e3:44fc:2b2f])
+        by smtp.gmail.com with ESMTPSA id m3-20020a2e8703000000b0025e87b1fdbcsm459930lji.63.2022.08.10.10.02.31
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 10 Aug 2022 10:02:32 -0700 (PDT)
+Subject: Re: [PATCH v2 0/5] KVM: Fix oneshot interrupts forwarding
+To:     Marc Zyngier <maz@kernel.org>, eric.auger@redhat.com
+Cc:     "Dong, Eddie" <eddie.dong@intel.com>,
+        "Christopherson,, Sean" <seanjc@google.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+        Dave Hansen <dave.hansen@linux.intel.com>,
+        "x86@kernel.org" <x86@kernel.org>,
+        "H. Peter Anvin" <hpa@zytor.com>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        Alex Williamson <alex.williamson@redhat.com>,
+        "Liu, Rong L" <rong.l.liu@intel.com>,
+        Zhenyu Wang <zhenyuw@linux.intel.com>,
+        Tomasz Nowicki <tn@semihalf.com>,
+        Grzegorz Jaszczyk <jaz@semihalf.com>,
+        "upstream@semihalf.com" <upstream@semihalf.com>,
+        Dmitry Torokhov <dtor@google.com>
+References: <20220805193919.1470653-1-dmy@semihalf.com>
+ <BL0PR11MB30429034B6D59253AF22BCE08A639@BL0PR11MB3042.namprd11.prod.outlook.com>
+ <c5d8f537-5695-42f0-88a9-de80e21f5f4c@semihalf.com>
+ <BL0PR11MB304213273FA9FAC4EBC70FF88A629@BL0PR11MB3042.namprd11.prod.outlook.com>
+ <ef9ffbde-445e-f00f-23c1-27e23b6cca4f@semihalf.com>
+ <87o7wsbngz.wl-maz@kernel.org>
+ <8ff76b5e-ae28-70c8-2ec5-01662874fb15@redhat.com>
+ <87r11ouu9y.wl-maz@kernel.org>
+From:   Dmytro Maluka <dmy@semihalf.com>
+Message-ID: <72e40c17-e5cd-1ffd-9a38-00b47e1cbd8e@semihalf.com>
+Date:   Wed, 10 Aug 2022 19:02:29 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.13.0
 MIME-Version: 1.0
-Content-Type: text/plain
-Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 2.79 on 10.11.54.5
-X-Spam-Status: No, score=-3.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,
-        SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham
+In-Reply-To: <87r11ouu9y.wl-maz@kernel.org>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_DNSWL_NONE,
+        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -55,72 +95,146 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-The IOAPIC does not do anything if a level-triggered interrupt is asserted
-while its REMOTE_IRR bit is set in the redirection table, and this can
-cause a race condition between test_ioapic_physical_destination_mode
-and test_ioapic_logical_destination_mode.  If CPU 1 is still running in
-ioapic_isr_85 and has not sent the EOI, while CPU 0 has already reached
-the set_irq_line(0x0e, 1) line of test_ioapic_logical_destination_mode,
-the interrupt is dropped and the test hangs.
+Hi Marc,
 
-For some reason, this has started to occur about 20-30% of the time with
-a 5.20-rc0 debug kernel.  With this patch, the ioapic test has survived
-100 iterations without failing.
+On 8/10/22 3:01 PM, Marc Zyngier wrote:
+> On Wed, 10 Aug 2022 09:12:18 +0100,
+> Eric Auger <eric.auger@redhat.com> wrote:
+>>
+>> Hi Marc,
+>>
+>> On 8/10/22 08:51, Marc Zyngier wrote:
+>>> On Wed, 10 Aug 2022 00:30:29 +0100,
+>>> Dmytro Maluka <dmy@semihalf.com> wrote:
+>>>> On 8/9/22 10:01 PM, Dong, Eddie wrote:
+>>>>>
+>>>>>> -----Original Message-----
+>>>>>> From: Dmytro Maluka <dmy@semihalf.com>
+>>>>>> Sent: Tuesday, August 9, 2022 12:24 AM
+>>>>>> To: Dong, Eddie <eddie.dong@intel.com>; Christopherson,, Sean
+>>>>>> <seanjc@google.com>; Paolo Bonzini <pbonzini@redhat.com>;
+>>>>>> kvm@vger.kernel.org
+>>>>>> Cc: Thomas Gleixner <tglx@linutronix.de>; Ingo Molnar <mingo@redhat.com>;
+>>>>>> Borislav Petkov <bp@alien8.de>; Dave Hansen <dave.hansen@linux.intel.com>;
+>>>>>> x86@kernel.org; H. Peter Anvin <hpa@zytor.com>; linux-
+>>>>>> kernel@vger.kernel.org; Eric Auger <eric.auger@redhat.com>; Alex
+>>>>>> Williamson <alex.williamson@redhat.com>; Liu, Rong L <rong.l.liu@intel.com>;
+>>>>>> Zhenyu Wang <zhenyuw@linux.intel.com>; Tomasz Nowicki
+>>>>>> <tn@semihalf.com>; Grzegorz Jaszczyk <jaz@semihalf.com>;
+>>>>>> upstream@semihalf.com; Dmitry Torokhov <dtor@google.com>
+>>>>>> Subject: Re: [PATCH v2 0/5] KVM: Fix oneshot interrupts forwarding
+>>>>>>
+>>>>>> On 8/9/22 1:26 AM, Dong, Eddie wrote:
+>>>>>>>> The existing KVM mechanism for forwarding of level-triggered
+>>>>>>>> interrupts using resample eventfd doesn't work quite correctly in the
+>>>>>>>> case of interrupts that are handled in a Linux guest as oneshot
+>>>>>>>> interrupts (IRQF_ONESHOT). Such an interrupt is acked to the device
+>>>>>>>> in its threaded irq handler, i.e. later than it is acked to the
+>>>>>>>> interrupt controller (EOI at the end of hardirq), not earlier. The
+>>>>>>>> existing KVM code doesn't take that into account, which results in
+>>>>>>>> erroneous extra interrupts in the guest caused by premature re-assert of an
+>>>>>> unacknowledged IRQ by the host.
+>>>>>>> Interesting...  How it behaviors in native side?
+>>>>>> In native it behaves correctly, since Linux masks such a oneshot interrupt at the
+>>>>>> beginning of hardirq, so that the EOI at the end of hardirq doesn't result in its
+>>>>>> immediate re-assert, and then unmasks it later, after its threaded irq handler
+>>>>>> completes.
+>>>>>>
+>>>>>> In handle_fasteoi_irq():
+>>>>>>
+>>>>>> 	if (desc->istate & IRQS_ONESHOT)
+>>>>>> 		mask_irq(desc);
+>>>>>>
+>>>>>> 	handle_irq_event(desc);
+>>>>>>
+>>>>>> 	cond_unmask_eoi_irq(desc, chip);
+>>>>>>
+>>>>>>
+>>>>>> and later in unmask_threaded_irq():
+>>>>>>
+>>>>>> 	unmask_irq(desc);
+>>>>>>
+>>>>>> I also mentioned that in patch #3 description:
+>>>>>> "Linux keeps such interrupt masked until its threaded handler finishes, to
+>>>>>> prevent the EOI from re-asserting an unacknowledged interrupt.
+>>>>> That makes sense. Can you include the full story in cover letter too?
+>>>> Ok, I will.
+>>>>
+>>>>>
+>>>>>> However, with KVM + vfio (or whatever is listening on the resamplefd) we don't
+>>>>>> check that the interrupt is still masked in the guest at the moment of EOI.
+>>>>>> Resamplefd is notified regardless, so vfio prematurely unmasks the host
+>>>>>> physical IRQ, thus a new (unwanted) physical interrupt is generated in the host
+>>>>>> and queued for injection to the guest."
+>>> Sorry to barge in pretty late in the conversation (just been Cc'd on
+>>> this), but why shouldn't the resamplefd be notified? If there has been
+>> yeah sorry to get you involved here ;-)
+> 
+> No problem!
+> 
+>>> an EOI, a new level must be made visible to the guest interrupt
+>>> controller, no matter what the state of the interrupt masking is.
+>>>
+>>> Whether this new level is actually *presented* to a vCPU is another
+>>> matter entirely, and is arguably a problem for the interrupt
+>>> controller emulation.
+>>
+>> FWIU on guest EOI the physical line is still asserted so the pIRQ is
+>> immediatly re-sampled by the interrupt controller (because the
+>> resamplefd unmasked the physical IRQ) and recorded as a guest IRQ
+>> (although it is masked at guest level). When the guest actually unmasks
+>> the vIRQ we do not get a chance to re-evaluate the physical line level.
+> 
+> Indeed, and maybe this is what should be fixed instead of moving the
+> resampling point around (I was suggesting something along these lines
+> in [1]).
+> 
+> We already do this on arm64 for the timer, and it should be easy
+> enough it generalise to any interrupt backed by the GIC (there is an
+> in-kernel API to sample the pending state). No idea how that translate
+> for other architectures though.
 
-Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
----
- x86/ioapic.c | 10 ++++++++++
- 1 file changed, 10 insertions(+)
+Actually I'm now thinking about changing the behavior implemented in my
+patchset, which is:
 
-diff --git a/x86/ioapic.c b/x86/ioapic.c
-index 7cbccd7..4f578ce 100644
---- a/x86/ioapic.c
-+++ b/x86/ioapic.c
-@@ -6,6 +6,12 @@
- #include "isr.h"
- #include "delay.h"
- 
-+static void poll_remote_irr(unsigned line)
-+{
-+	while (ioapic_read_redir(line).remote_irr)
-+		cpu_relax();
-+}
-+
- static void toggle_irq_line(unsigned line)
- {
- 	set_irq_line(line, 1);
-@@ -214,6 +220,7 @@ static void test_ioapic_level_tmr_smp(bool expected_tmr_before)
- 	report(tmr_before == expected_tmr_before && g_tmr_79,
- 	       "TMR for ioapic level interrupts (expected %s)",
- 	       expected_tmr_before ? "true" : "false");
-+	poll_remote_irr(0xe);
- }
- 
- static int g_isr_98;
-@@ -402,6 +409,7 @@ static void test_ioapic_self_reconfigure(void)
- 	set_irq_line(0x0e, 1);
- 	e = ioapic_read_redir(0xe);
- 	report(g_isr_84 == 1 && e.remote_irr == 0, "Reconfigure self");
-+	poll_remote_irr(0xe);
- }
- 
- static volatile int g_isr_85;
-@@ -429,6 +437,7 @@ static void test_ioapic_physical_destination_mode(void)
- 		pause();
- 	} while(g_isr_85 != 1);
- 	report(g_isr_85 == 1, "ioapic physical destination mode");
-+	poll_remote_irr(0xe);
- }
- 
- static volatile int g_isr_86;
-@@ -461,6 +470,7 @@ static void test_ioapic_logical_destination_mode(void)
- 		pause();
- 	} while(g_isr_86 < nr_vcpus);
- 	report(g_isr_86 == nr_vcpus, "ioapic logical destination mode");
-+	poll_remote_irr(0xe);
- }
- 
- int main(void)
--- 
-2.31.1
+    1. If vEOI happens for a masked vIRQ, don't notify resamplefd, so
+       that no new physical IRQ is generated, and the vIRQ is not set as
+       pending.
 
+    2. After this vIRQ is unmasked by the guest, notify resamplefd.
+
+to the following one:
+
+    1. If vEOI happens for a masked vIRQ, notify resamplefd as usual,
+       but also remember this vIRQ as, let's call it, "pending oneshot".
+
+    2. A new physical IRQ is immediately generated, so the vIRQ is
+       properly set as pending.
+
+    3. After the vIRQ is unmasked by the guest, check and find out that
+       it is not just pending but also "pending oneshot", so don't
+       deliver it to a vCPU. Instead, immediately notify resamplefd once
+       again.
+
+In other words, don't avoid extra physical interrupts in the host
+(rather, use those extra interrupts for properly updating the pending
+state of the vIRQ) but avoid propagating those extra interrupts to the
+guest.
+
+Does this sound reasonable to you?
+
+Your suggestion to sample the pending state of the physical IRQ sounds
+interesting too. But as you said, it's yet to be checked how feasible it
+would be on architectures other than arm64. Also it assumes that the IRQ
+in question is a forwarded physical interrupt, while I can imagine that
+KVM's resamplefd could in principle also be useful for implementing
+purely emulated interrupts.
+
+Do you see any advantages of sampling the physical IRQ pending state
+over remembering the "pending oneshot" state as described above?
+
+> 
+> 	M.
+> 
+> [1] https://lore.kernel.org/r/87mtccbie4.wl-maz@kernel.org
+> 
