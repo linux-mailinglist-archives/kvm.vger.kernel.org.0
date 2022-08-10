@@ -2,100 +2,98 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 9195058F3C9
-	for <lists+kvm@lfdr.de>; Wed, 10 Aug 2022 23:24:46 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id D147658F3D4
+	for <lists+kvm@lfdr.de>; Wed, 10 Aug 2022 23:31:11 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233436AbiHJVYg (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 10 Aug 2022 17:24:36 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33446 "EHLO
+        id S231602AbiHJVbB (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 10 Aug 2022 17:31:01 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39964 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232960AbiHJVYc (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 10 Aug 2022 17:24:32 -0400
-Received: from vps-vb.mhejs.net (vps-vb.mhejs.net [37.28.154.113])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7B40D71712;
-        Wed, 10 Aug 2022 14:24:28 -0700 (PDT)
-Received: from MUA
-        by vps-vb.mhejs.net with esmtps  (TLS1.2) tls TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256
-        (Exim 4.94.2)
-        (envelope-from <mail@maciej.szmigiero.name>)
-        id 1oLtBb-0001Cc-92; Wed, 10 Aug 2022 23:24:19 +0200
-Message-ID: <bf9e8a9c-5172-b61a-be6e-87a919442fbd@maciej.szmigiero.name>
-Date:   Wed, 10 Aug 2022 23:24:13 +0200
-MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.9.0
-Content-Language: en-US
-To:     Santosh Shukla <santosh.shukla@amd.com>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>,
-        Sean Christopherson <seanjc@google.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        Tom Lendacky <thomas.lendacky@amd.com>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org, mlevitsk@redhat.com
-References: <20220810061226.1286-1-santosh.shukla@amd.com>
- <20220810061226.1286-6-santosh.shukla@amd.com>
-From:   "Maciej S. Szmigiero" <mail@maciej.szmigiero.name>
-Subject: Re: [PATCHv3 5/8] KVM: SVM: Add VNMI support in inject_nmi
-In-Reply-To: <20220810061226.1286-6-santosh.shukla@amd.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,NICE_REPLY_A,
-        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
-        autolearn_force=no version=3.4.6
+        with ESMTP id S233150AbiHJVa7 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 10 Aug 2022 17:30:59 -0400
+Received: from mail-yw1-x114a.google.com (mail-yw1-x114a.google.com [IPv6:2607:f8b0:4864:20::114a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D5A885B7AA
+        for <kvm@vger.kernel.org>; Wed, 10 Aug 2022 14:30:58 -0700 (PDT)
+Received: by mail-yw1-x114a.google.com with SMTP id 00721157ae682-32a144ac47fso30900087b3.8
+        for <kvm@vger.kernel.org>; Wed, 10 Aug 2022 14:30:58 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112;
+        h=cc:to:from:subject:mime-version:message-id:date:from:to:cc;
+        bh=d5xbPugTDLWV3T4HexGWlKQR5TkIJ9FBtzj7sNTtEx8=;
+        b=imNyFB4pO/pGOQCPC171v2WAZmYpon7AM/WI+V1x7SMcriUIjF9zj3SgNAU4ZIK2Lx
+         1L9Bkc68hewOZGMez/idOmhmgu5fm7X4IxQw4APXVnFcWW4SYungLTg/w0qFHzzFMz3Z
+         mK5hqKHXwIFGs/iL/bOMOLfhOb2bXN3Ybxm34VKHz7M+j9wbjXgZAjlkQgU3Yp7eYukL
+         2L6xTez6ijam4ExUB1i2Sk7jXYgULts4a6WcsJLXN1IoVYGn5VFht2519hW5kQNVo31S
+         Hog57FMO7SmWY7oODIQKSfbqT4tLpzXt1SN26l0IiSV11drlsn383ENYNLOynG2Jh+UL
+         7x/g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=cc:to:from:subject:mime-version:message-id:date:x-gm-message-state
+         :from:to:cc;
+        bh=d5xbPugTDLWV3T4HexGWlKQR5TkIJ9FBtzj7sNTtEx8=;
+        b=WbJFLrYweckZWSwa5kA3MoXxsX4+5RLU60fcGxw/AV4ZTsp3Eg66eqKo/nTO4UpdER
+         UonOdE1YT72iYx7PQfPgCfxTaqLUTRrjtdqm4gUJ/rxAOo9eN/b1ADJcDr0C5aNXwoTb
+         Kvyt5K1kJIyVW6u/en0ZlE8pWTwVaZ+r8GvAeYNeJUPGdxDLBi1+z4Kcz4KUtszvHicL
+         98bUJ7tqppxU6ET78cbkQDTEvndjtF7ZcK2lzfNb9MZKODOxdsQrz1vslN02F7umazK/
+         9mgGzvhtJltkk9D47qOlazpRzpJfLf0LXs36Mh342pkBhizy9cza3/JgZt9fYEIDYMfU
+         Q+6Q==
+X-Gm-Message-State: ACgBeo2kjceRkU/DW/ZZdC60tSDtuT+gmjEJ8AHeMhRWS4vRZp4r6in5
+        ncSb/63vJ5OCqB4U7fDGLwO2Ohkq08B883HdTgG3HGMm7MD0Ff0MBHaex54eJfRzwTXLD8+v/Q/
+        Ow4+aPXChvyVBxox3vc7huWxmhHTDdK24HPQHLOOGu0p5HivVxiKs67U8AwVm0u4=
+X-Google-Smtp-Source: AA6agR6ibWhOUCspDbW4kPdiyMGFnnJAw2YuRRXI/n1k7uSHiuBqE5790Uj+Ho604OJhWrsAwPyy6SlxQ6fSyg==
+X-Received: from loggerhead.c.googlers.com ([fda3:e722:ac3:cc00:24:72f4:c0a8:29a])
+ (user=jmattson job=sendgmr) by 2002:a05:690c:826:b0:32a:c39d:191d with SMTP
+ id by6-20020a05690c082600b0032ac39d191dmr3821426ywb.157.1660167058142; Wed,
+ 10 Aug 2022 14:30:58 -0700 (PDT)
+Date:   Wed, 10 Aug 2022 14:30:50 -0700
+Message-Id: <20220810213050.2655000-1-jmattson@google.com>
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.37.1.559.g78731f0fdb-goog
+Subject: [PATCH] KVM: VMX: Heed the 'msr' argument in msr_write_intercepted()
+From:   Jim Mattson <jmattson@google.com>
+To:     kvm@vger.kernel.org, pbonzini@redhat.com
+Cc:     Jim Mattson <jmattson@google.com>,
+        Sean Christopherson <seanjc@google.com>
+Content-Type: text/plain; charset="UTF-8"
+X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 10.08.2022 08:12, Santosh Shukla wrote:
-> Inject the NMI by setting V_NMI in the VMCB interrupt control. processor
-> will clear V_NMI to acknowledge processing has started and will keep the
-> V_NMI_MASK set until the processor is done with processing the NMI event.
-> 
-> Signed-off-by: Santosh Shukla <santosh.shukla@amd.com>
-> ---
-> v3:
-> - Removed WARN_ON check.
-> 
-> v2:
-> - Added WARN_ON check for vnmi pending.
-> - use `get_vnmi_vmcb` to get correct vmcb so to inject vnmi.
-> 
->   arch/x86/kvm/svm/svm.c | 7 +++++++
->   1 file changed, 7 insertions(+)
-> 
-> diff --git a/arch/x86/kvm/svm/svm.c b/arch/x86/kvm/svm/svm.c
-> index e260e8cb0c81..8c4098b8a63e 100644
-> --- a/arch/x86/kvm/svm/svm.c
-> +++ b/arch/x86/kvm/svm/svm.c
-> @@ -3479,7 +3479,14 @@ static void pre_svm_run(struct kvm_vcpu *vcpu)
->   static void svm_inject_nmi(struct kvm_vcpu *vcpu)
->   {
->   	struct vcpu_svm *svm = to_svm(vcpu);
-> +	struct vmcb *vmcb = NULL;
->   
-> +	if (is_vnmi_enabled(svm)) {
+Regardless of the 'msr' argument passed to the VMX version of
+msr_write_intercepted(), the function always checks to see if a
+specific MSR (IA32_SPEC_CTRL) is intercepted for write.  This behavior
+seems unintentional and unexpected.
 
-I guess this should be "is_vnmi_enabled(svm) && !svm->nmi_l1_to_l2"
-since if nmi_l1_to_l2 is true then the NMI to be injected originally
-comes from L1's VMCB12 EVENTINJ field.
+Modify the function so that it checks to see if the provided 'msr'
+index is intercepted for write.
 
-As you said in the cover letter, this field has different semantics
-than vNMI - specifically, it should allow injecting even if L2 is in
-NMI blocking state (it's then up to L1 to keep track of NMI injectability
-for its L2 guest - so L0 should be transparently injecting it when L1
-wants so).
+Fixes: 67f4b9969c30 ("KVM: nVMX: Handle dynamic MSR intercept toggling")
+Cc: Sean Christopherson <seanjc@google.com>
+Signed-off-by: Jim Mattson <jmattson@google.com>
+---
+ arch/x86/kvm/vmx/vmx.c | 3 +--
+ 1 file changed, 1 insertion(+), 2 deletions(-)
 
-> +		vmcb = get_vnmi_vmcb(svm);
-> +		vmcb->control.int_ctl |= V_NMI_PENDING;
-> +		++vcpu->stat.nmi_injections;
-> +		return;
-> +	}
->   	svm->vmcb->control.event_inj = SVM_EVTINJ_VALID | SVM_EVTINJ_TYPE_NMI;
->   
->   	if (svm->nmi_l1_to_l2)
+diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
+index d7f8331d6f7e..c9b49a09e6b5 100644
+--- a/arch/x86/kvm/vmx/vmx.c
++++ b/arch/x86/kvm/vmx/vmx.c
+@@ -843,8 +843,7 @@ static bool msr_write_intercepted(struct vcpu_vmx *vmx, u32 msr)
+ 	if (!(exec_controls_get(vmx) & CPU_BASED_USE_MSR_BITMAPS))
+ 		return true;
+ 
+-	return vmx_test_msr_bitmap_write(vmx->loaded_vmcs->msr_bitmap,
+-					 MSR_IA32_SPEC_CTRL);
++	return vmx_test_msr_bitmap_write(vmx->loaded_vmcs->msr_bitmap, msr);
+ }
+ 
+ unsigned int __vmx_vcpu_run_flags(struct vcpu_vmx *vmx)
+-- 
+2.37.1.559.g78731f0fdb-goog
 
-Thanks,
-Maciej
