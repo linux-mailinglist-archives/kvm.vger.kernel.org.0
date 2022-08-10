@@ -2,114 +2,133 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 72BFE58EEEC
-	for <lists+kvm@lfdr.de>; Wed, 10 Aug 2022 17:03:38 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 38CF858EF42
+	for <lists+kvm@lfdr.de>; Wed, 10 Aug 2022 17:20:46 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232916AbiHJPDh (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 10 Aug 2022 11:03:37 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46798 "EHLO
+        id S233074AbiHJPUo (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 10 Aug 2022 11:20:44 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33992 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232601AbiHJPDf (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 10 Aug 2022 11:03:35 -0400
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id BBB8A760C3
-        for <kvm@vger.kernel.org>; Wed, 10 Aug 2022 08:03:33 -0700 (PDT)
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 022E41424;
-        Wed, 10 Aug 2022 08:03:34 -0700 (PDT)
-Received: from monolith.localdoman (unknown [172.31.20.19])
-        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 8DF893F67D;
-        Wed, 10 Aug 2022 08:03:31 -0700 (PDT)
-Date:   Wed, 10 Aug 2022 16:04:12 +0100
-From:   Alexandru Elisei <alexandru.elisei@arm.com>
-To:     Sean Christopherson <seanjc@google.com>
-Cc:     Nikos Nikoleris <nikos.nikoleris@arm.com>, kvm@vger.kernel.org,
-        andrew.jones@linux.dev, drjones@redhat.com, pbonzini@redhat.com,
-        jade.alglave@arm.com, ricarkol@google.com, zixuanwang@google.com
-Subject: Re: [kvm-unit-tests PATCH v3 00/27] EFI and ACPI support for arm64
-Message-ID: <YvPI1xunDNtAV5jo@monolith.localdoman>
-References: <20220630100324.3153655-1-nikos.nikoleris@arm.com>
- <YvJB/KCLSQK836ae@monolith.localdoman>
- <YvJ9dni3JCUHNsF1@google.com>
- <YvN3jk4VUD9Dhl0H@monolith.localdoman>
- <YvPHhwtc6LX62Y+E@google.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <YvPHhwtc6LX62Y+E@google.com>
-X-Spam-Status: No, score=-6.9 required=5.0 tests=BAYES_00,RCVD_IN_DNSWL_HI,
-        SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham
-        autolearn_force=no version=3.4.6
+        with ESMTP id S233140AbiHJPUi (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 10 Aug 2022 11:20:38 -0400
+Received: from mail-yb1-xb4a.google.com (mail-yb1-xb4a.google.com [IPv6:2607:f8b0:4864:20::b4a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2180E275F0
+        for <kvm@vger.kernel.org>; Wed, 10 Aug 2022 08:20:37 -0700 (PDT)
+Received: by mail-yb1-xb4a.google.com with SMTP id n184-20020a2540c1000000b0067691de454cso12327215yba.11
+        for <kvm@vger.kernel.org>; Wed, 10 Aug 2022 08:20:37 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112;
+        h=cc:to:from:subject:mime-version:message-id:date:from:to:cc;
+        bh=KP56zBh4EvBGEqVoL4D6U15kXFJ7buVHE9QkBLEHtC8=;
+        b=QbxkmY4fxPn3ZPa+rAkuSv6hX1Y2IrikvlfpUUM2ufZ7ccAYugsIGg+LtUZqgR2QGX
+         svVH9ejDQKcJbIi1K/WYMLViIWxD7Rk9YK/i1XwFk/7+JIN0ZvLBSHv9VsNOqMxqcQJH
+         W3n4ZF3MSkTGn7m+Qev5pRr7tmKXhNeIoKoqJvk1GBG5VWR5mJRACvq2xDJvh6iC/7qc
+         SYPSEJUHGVbCom3QjS2hzzF/8TyEtPVEryfx29btpx6/qBh/kkvnsMjN1RMNDXQ8UsRr
+         drcdl1YKDxFd1dIupQ7BCi7j4a1TcFHm07P3uI/a+8RrfaZv5oowE88Pl+6qD0RO3rmZ
+         vG/w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=cc:to:from:subject:mime-version:message-id:date:x-gm-message-state
+         :from:to:cc;
+        bh=KP56zBh4EvBGEqVoL4D6U15kXFJ7buVHE9QkBLEHtC8=;
+        b=I2yDUdNDhhKDK8pk05mTfqyZArTwq9Tq6aAlfiQXDT6POO2kErIhJIUidbtbToTzy1
+         TbeX3tdaAuf8Oib0ulVymaYLPAlAJ+e70ShX0wyYPMHOGCWWJuFXsDJAWIaNICoEq80T
+         aKd8iPSF9So+Y3ceHBmWH2GLRcAl0M+H0VXH0xr8pghXoCDuJKlypCAdlQ9iWMnPaBsp
+         SDLd1qFnPcXMn6Clg59KgaLgB/0ITmNjmkrZKCBJ2UbmAYai9ofXxw7R6Wr0s1rElAoK
+         HG3DZBhNgDG+yxeYMsRtKXnTLGVVkeXq+momq5i+FdNquqxazONWIfmqaavU7u2h7TvV
+         a4iQ==
+X-Gm-Message-State: ACgBeo0LiGG/VrqbLcgvp3+J3E+GQSm8dD3nTKFObGxf68uT/JTFz6zb
+        Rqbq92PjbdGbis0cbXtoml5vbUS9HltnX1/5JrBow2PlGJAdpCbNTnVWkwqZu7G9PiMi02VAjFK
+        xUhABWuSc1+bS8swb2G5MvKhKDIzwh5cPeva0Dr5bowCo9fdJ7BomjIGusw==
+X-Google-Smtp-Source: AA6agR7cyzY1meKb7HLA3MEnjHTZxWSNYuEhyHK9bPPEI4pmYPqJHKxQVCBhTq2SL952pVdPq5WojJYtnD0=
+X-Received: from pgonda1.kir.corp.google.com ([2620:15c:29:203:b185:1827:5b23:bbe2])
+ (user=pgonda job=sendgmr) by 2002:a25:41c4:0:b0:67b:a826:7c71 with SMTP id
+ o187-20020a2541c4000000b0067ba8267c71mr19812460yba.486.1660144836339; Wed, 10
+ Aug 2022 08:20:36 -0700 (PDT)
+Date:   Wed, 10 Aug 2022 08:20:22 -0700
+Message-Id: <20220810152033.946942-1-pgonda@google.com>
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.37.1.559.g78731f0fdb-goog
+Subject: [V3 00/11] KVM: selftests: Add simple SEV test
+From:   Peter Gonda <pgonda@google.com>
+To:     kvm@vger.kernel.org
+Cc:     linux-kernel@vger.kernel.org, marcorr@google.com,
+        seanjc@google.com, michael.roth@amd.com, thomas.lendacky@amd.com,
+        joro@8bytes.org, mizhang@google.com, pbonzini@redhat.com,
+        andrew.jones@linux.dev, vannapurve@google.com,
+        Peter Gonda <pgonda@google.com>
+Content-Type: text/plain; charset="UTF-8"
+X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL
+        autolearn=unavailable autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi Sean,
+This patch series combines the work Michael Roth has done in supporting
+SEV guests in selftests and the work Sean Christopherson suggested to
+allow ucalls from SEV guests. And the work Sean has sent to consolidate
+the ucall boilerplate code. Along with a very simple version of the
+SEV selftests Michael originally proposed.
 
-On Wed, Aug 10, 2022 at 02:58:15PM +0000, Sean Christopherson wrote:
-> On Wed, Aug 10, 2022, Alexandru Elisei wrote:
-> > Hi Sean,
-> > 
-> > On Tue, Aug 09, 2022 at 03:29:58PM +0000, Sean Christopherson wrote:
-> > > On Tue, Aug 09, 2022, Alexandru Elisei wrote:
-> > > > Note that the assumption that efi_main() makes is that setup_efi() doesn't
-> > > > change the stack from the stack that the UEFI implementation allocated, in
-> > > > order for setup_efi() to be able to return to efi_main().
-> > > 
-> > > On the x86 side, efi_main() now runs with a KUT-controlled stack since commit
-> > > 
-> > >   d316d12a ("x86: efi: Provide a stack within testcase memory")
-> > > 
-> > > > If we want to keep the UEFI allocated stack, then both mechanism must be
-> > > > forbidden when running under UEFI. I dislike this idea, because those two
-> > > > mechanisms allow kvm-unit-tests to run tests which otherwise wouldn't have
-> > > > been possible with a normal operating system, which, except for the early
-> > > > boot code, runs with the MMU enabled.
-> > > 
-> > > Agreed.  IMO, KUT should stop using UEFI-controlled data as early as possible.
-> > > The original x86 behavior was effectively a temporary solution to get UEFI working
-> > > without needing to simultaneously rework the common early boot flows.
-> > 
-> > Yes, this is also what I am thinking, the stack is poorly specified in the
-> > specification because the specification doesn't expect an application to
-> > keep using it after calling EFI_BOOT_SERVICES.Exit(). Plus, using the UEFI
-> > allocated stack makes the test less reproducible, as even EDK2 today
-> > diverges from the spec wrt the stack, and other UEFI implementations might
-> > do things differently. And with just like all software, there might be bugs
-> > in the firmware. IMO, the more control kvm-unit-tests has over its
-> > resources, the more robust the tests are.
-> > 
-> > What I was thinking is rewriting efi_main to return setup_efi(),
-> > something like this:
-> > 
-> > void efi_main(efi_handle_t handle, efi_system_table_t *sys_tab)
-> > {
-> > 	/* Get image, cmdline and memory map parameters from UEFI */
-> > 
-> >         efi_exit_boot_services(handle, &efi_bootinfo.mem_map);
-> > 
-> >         /* Set up arch-specific resources, not expected to return. */
-> >         setup_efi(&efi_bootinfo);
-> > }
-> > 
-> > Which would allow all architectures to change their environment as they see
-> > fit, as setup_efi() is not expected to return. Architectures would have to
-> > be made aware of the efi_exit() function though.
-> 
-> And they'd also have to invoke the test's main().  Why can't ARM switch to a KUT
-> stack before calling efi_main()?  The stack is a rather special case, I don't think
-> it's unreasonable to require architectures to handle that before efi_main().
+V3
+ * Addressed more of andrew.jones@ in ucall patches.
+ * Fix build in non-x86 archs.
 
-Sorry, missed the part from your earlier reply about x86 switching to a
-kvm-unit-tests controlled stack. I was just going to say that, when I saw
-your reply.
+V2
+ * Dropped RFC tag
+ * Correctly separated Sean's ucall patches into 2 as originally
+   intended.
+ * Addressed andrew.jones@ in ucall patches.
+ * Fixed ucall pool usage to work for other archs
 
-I agree, it's entirely feasible for arm64 to switch to its own stack before
-calling efi_main(), in which case it can call efi_main() without any
-changes to efi_main().
+V1
+ * https://lore.kernel.org/all/20220715192956.1873315-1-pgonda@google.com/
 
-Thanks for your input.
+Michael Roth (6):
+  KVM: selftests: move vm_phy_pages_alloc() earlier in file
+  KVM: selftests: sparsebit: add const where appropriate
+  KVM: selftests: add hooks for managing encrypted guest memory
+  KVM: selftests: handle encryption bits in page tables
+  KVM: selftests: add support for encrypted vm_vaddr_* allocations
+  KVM: selftests: add library for creating/interacting with SEV guests
 
-Alex
+Peter Gonda (3):
+  tools: Add atomic_test_and_set_bit()
+  KVM: selftests: Add ucall pool based implementation
+  KVM: selftests: Add simple sev vm testing
+
+Sean Christopherson (2):
+  KVM: selftests: Consolidate common code for popuplating
+  KVM: selftests: Consolidate boilerplate code in get_ucall()
+
+ tools/arch/x86/include/asm/atomic.h           |   7 +
+ tools/include/asm-generic/atomic-gcc.h        |  15 +
+ tools/testing/selftests/kvm/.gitignore        |   1 +
+ tools/testing/selftests/kvm/Makefile          |   3 +
+ .../selftests/kvm/include/kvm_util_base.h     |  25 ++
+ .../testing/selftests/kvm/include/sparsebit.h |  36 +--
+ .../selftests/kvm/include/ucall_common.h      |  14 +-
+ .../selftests/kvm/include/x86_64/sev.h        |  47 +++
+ .../testing/selftests/kvm/lib/aarch64/ucall.c |  38 +--
+ tools/testing/selftests/kvm/lib/kvm_util.c    | 267 +++++++++++++-----
+ tools/testing/selftests/kvm/lib/riscv/ucall.c |  43 +--
+ tools/testing/selftests/kvm/lib/s390x/ucall.c |  40 +--
+ tools/testing/selftests/kvm/lib/sparsebit.c   |  48 ++--
+ .../testing/selftests/kvm/lib/ucall_common.c  | 139 +++++++++
+ .../selftests/kvm/lib/x86_64/processor.c      |  15 +-
+ tools/testing/selftests/kvm/lib/x86_64/sev.c  | 249 ++++++++++++++++
+ .../testing/selftests/kvm/lib/x86_64/ucall.c  |  39 +--
+ .../selftests/kvm/x86_64/sev_all_boot_test.c  | 131 +++++++++
+ 18 files changed, 911 insertions(+), 246 deletions(-)
+ create mode 100644 tools/testing/selftests/kvm/include/x86_64/sev.h
+ create mode 100644 tools/testing/selftests/kvm/lib/ucall_common.c
+ create mode 100644 tools/testing/selftests/kvm/lib/x86_64/sev.c
+ create mode 100644 tools/testing/selftests/kvm/x86_64/sev_all_boot_test.c
+
+-- 
+2.37.1.559.g78731f0fdb-goog
+
