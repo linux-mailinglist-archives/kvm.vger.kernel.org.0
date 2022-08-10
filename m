@@ -2,126 +2,190 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 760DC58EC73
-	for <lists+kvm@lfdr.de>; Wed, 10 Aug 2022 14:57:06 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id A89EB58ECAC
+	for <lists+kvm@lfdr.de>; Wed, 10 Aug 2022 15:02:10 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232362AbiHJM4x (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 10 Aug 2022 08:56:53 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51482 "EHLO
+        id S232473AbiHJNCE (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 10 Aug 2022 09:02:04 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60532 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232348AbiHJM4j (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 10 Aug 2022 08:56:39 -0400
-Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4DB965C349;
-        Wed, 10 Aug 2022 05:56:38 -0700 (PDT)
-Received: from pps.filterd (m0098410.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.17.1.5/8.17.1.5) with ESMTP id 27ACoQWp012677;
-        Wed, 10 Aug 2022 12:56:38 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=from : to : cc : subject
- : date : message-id : in-reply-to : references : mime-version :
- content-transfer-encoding; s=pp1;
- bh=8+oT9Nis5SKah9qTR3TP8xCyoTW/s4DlrF3m5iveus0=;
- b=aookoxmhPpcIx/2uPVoefBQqhfRaBKurFGSfLopJrnOJiIWEIoxL4S7+79PRqkURK4Nm
- QVtqdGX63UotogcdRWPPgTzKOZMUk9m48eBZKQGwFxcHkHkxaAPE0LhHq3f/511yKaIG
- oaLmaqU5ucPPKLCZreqr1Z9W2SYSY7FmSpp3XtrpiJrKUFxUvPxP9+arzgeSoyOQPJ18
- /YLX5L6ggPtdVfaHqs1YCLhUylip6G2xtTQHdPvrRcIb6kkTP3ZJVaPH8nPfG3TpKJT3
- Pb8Xr5QAvs0VhoP25v7QAu9beIDR/Y5eunDE+FzaobQ8j5rQsa0B2/4Kma//GWR01ab1 SA== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3hv6dcw2g1-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Wed, 10 Aug 2022 12:56:37 +0000
-Received: from m0098410.ppops.net (m0098410.ppops.net [127.0.0.1])
-        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 27ACpaRR019554;
-        Wed, 10 Aug 2022 12:56:37 GMT
-Received: from ppma05fra.de.ibm.com (6c.4a.5195.ip4.static.sl-reverse.com [149.81.74.108])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3hv6dcw2en-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Wed, 10 Aug 2022 12:56:37 +0000
-Received: from pps.filterd (ppma05fra.de.ibm.com [127.0.0.1])
-        by ppma05fra.de.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 27ACpU2k021444;
-        Wed, 10 Aug 2022 12:56:34 GMT
-Received: from b06cxnps3074.portsmouth.uk.ibm.com (d06relay09.portsmouth.uk.ibm.com [9.149.109.194])
-        by ppma05fra.de.ibm.com with ESMTP id 3huwvjgmr9-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Wed, 10 Aug 2022 12:56:34 +0000
-Received: from d06av22.portsmouth.uk.ibm.com (d06av22.portsmouth.uk.ibm.com [9.149.105.58])
-        by b06cxnps3074.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 27ACuVbV18874850
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Wed, 10 Aug 2022 12:56:31 GMT
-Received: from d06av22.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 2EC584C044;
-        Wed, 10 Aug 2022 12:56:31 +0000 (GMT)
-Received: from d06av22.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 7DFA54C040;
-        Wed, 10 Aug 2022 12:56:30 +0000 (GMT)
-Received: from p-imbrenda.bredband2.com (unknown [9.145.0.105])
-        by d06av22.portsmouth.uk.ibm.com (Postfix) with ESMTP;
-        Wed, 10 Aug 2022 12:56:30 +0000 (GMT)
-From:   Claudio Imbrenda <imbrenda@linux.ibm.com>
-To:     kvm@vger.kernel.org
-Cc:     borntraeger@de.ibm.com, frankja@linux.ibm.com, thuth@redhat.com,
-        pasic@linux.ibm.com, david@redhat.com, linux-s390@vger.kernel.org,
-        linux-kernel@vger.kernel.org, scgl@linux.ibm.com,
-        seiden@linux.ibm.com, nrb@linux.ibm.com
-Subject: [PATCH v13 6/6] KVM: s390: pv: module parameter to fence asynchronous destroy
-Date:   Wed, 10 Aug 2022 14:56:25 +0200
-Message-Id: <20220810125625.45295-7-imbrenda@linux.ibm.com>
-X-Mailer: git-send-email 2.37.1
-In-Reply-To: <20220810125625.45295-1-imbrenda@linux.ibm.com>
-References: <20220810125625.45295-1-imbrenda@linux.ibm.com>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-ORIG-GUID: eFnpAkKohgDH_k706ceUmYZbBM5b18gU
-X-Proofpoint-GUID: MOTEmYVFB1IHnFsteb1kTmxixtJp15uB
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.205,Aquarius:18.0.883,Hydra:6.0.517,FMLib:17.11.122.1
- definitions=2022-08-10_07,2022-08-10_01,2022-06-22_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxscore=0 suspectscore=0
- priorityscore=1501 clxscore=1015 lowpriorityscore=0 malwarescore=0
- adultscore=0 impostorscore=0 mlxlogscore=999 bulkscore=0 spamscore=0
- phishscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2207270000 definitions=main-2208100037
-X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_EF,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_PASS,
-        T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
+        with ESMTP id S232461AbiHJNBv (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 10 Aug 2022 09:01:51 -0400
+Received: from ams.source.kernel.org (ams.source.kernel.org [145.40.68.75])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 01EAA6C770;
+        Wed, 10 Aug 2022 06:01:51 -0700 (PDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by ams.source.kernel.org (Postfix) with ESMTPS id B952BB81C5A;
+        Wed, 10 Aug 2022 13:01:49 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7BEC7C433D6;
+        Wed, 10 Aug 2022 13:01:48 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1660136508;
+        bh=sqRsv3j2KsslosUdoJUnMtju0RyhTkbMMdJP4XMtR88=;
+        h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+        b=jchSJKp9p/5pLvSZH+39SU4q8ijN/x2AHcXrL9qN7AoW7AiB37LS/ES63Pop4KgUE
+         40jkUWqzDfg0AKJ2PjdaR2uNXq3O2hzR8T9y7jVvL97ErOwZgfxRzykt+rz5D9O9o5
+         noHoK+EoDIdFoTRBXks8SetidjeJBTi5fSk6jo35EekFhZKcNJtorj7gv7zhToAqZZ
+         lvVOH5zmAywU5k9/X3T51lhVAGYLPoq7UZalTH6GU87bynLB8wNppLPxvrgGSgoQrZ
+         Vjh6ltoEUaF7xDpvaRAxbK7NWHm/tCyeQtSYn3j8kteRpWdqJZP2S51ghk0H7AFaCB
+         8DZ8Jx8ZFfkJg==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=why.misterjones.org)
+        by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+        (Exim 4.95)
+        (envelope-from <maz@kernel.org>)
+        id 1oLlLG-0028Hw-Ap;
+        Wed, 10 Aug 2022 14:01:46 +0100
+Date:   Wed, 10 Aug 2022 14:01:45 +0100
+Message-ID: <87r11ouu9y.wl-maz@kernel.org>
+From:   Marc Zyngier <maz@kernel.org>
+To:     eric.auger@redhat.com
+Cc:     Dmytro Maluka <dmy@semihalf.com>,
+        "Dong, Eddie" <eddie.dong@intel.com>,
+        "Christopherson,, Sean" <seanjc@google.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+        Dave Hansen <dave.hansen@linux.intel.com>,
+        "x86@kernel.org" <x86@kernel.org>,
+        "H. Peter Anvin" <hpa@zytor.com>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        Alex Williamson <alex.williamson@redhat.com>,
+        "Liu, Rong L" <rong.l.liu@intel.com>,
+        Zhenyu Wang <zhenyuw@linux.intel.com>,
+        Tomasz Nowicki <tn@semihalf.com>,
+        Grzegorz Jaszczyk <jaz@semihalf.com>,
+        "upstream@semihalf.com" <upstream@semihalf.com>,
+        Dmitry Torokhov <dtor@google.com>
+Subject: Re: [PATCH v2 0/5] KVM: Fix oneshot interrupts forwarding
+In-Reply-To: <8ff76b5e-ae28-70c8-2ec5-01662874fb15@redhat.com>
+References: <20220805193919.1470653-1-dmy@semihalf.com>
+        <BL0PR11MB30429034B6D59253AF22BCE08A639@BL0PR11MB3042.namprd11.prod.outlook.com>
+        <c5d8f537-5695-42f0-88a9-de80e21f5f4c@semihalf.com>
+        <BL0PR11MB304213273FA9FAC4EBC70FF88A629@BL0PR11MB3042.namprd11.prod.outlook.com>
+        <ef9ffbde-445e-f00f-23c1-27e23b6cca4f@semihalf.com>
+        <87o7wsbngz.wl-maz@kernel.org>
+        <8ff76b5e-ae28-70c8-2ec5-01662874fb15@redhat.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/27.1
+ (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: eric.auger@redhat.com, dmy@semihalf.com, eddie.dong@intel.com, seanjc@google.com, pbonzini@redhat.com, kvm@vger.kernel.org, tglx@linutronix.de, mingo@redhat.com, bp@alien8.de, dave.hansen@linux.intel.com, x86@kernel.org, hpa@zytor.com, linux-kernel@vger.kernel.org, alex.williamson@redhat.com, rong.l.liu@intel.com, zhenyuw@linux.intel.com, tn@semihalf.com, jaz@semihalf.com, upstream@semihalf.com, dtor@google.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+X-Spam-Status: No, score=-7.7 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_HI,
+        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Add the module parameter "async_destroy", to allow the asynchronous
-destroy mechanism to be switched off. This might be useful for
-debugging purposes.
+On Wed, 10 Aug 2022 09:12:18 +0100,
+Eric Auger <eric.auger@redhat.com> wrote:
+> 
+> Hi Marc,
+> 
+> On 8/10/22 08:51, Marc Zyngier wrote:
+> > On Wed, 10 Aug 2022 00:30:29 +0100,
+> > Dmytro Maluka <dmy@semihalf.com> wrote:
+> >> On 8/9/22 10:01 PM, Dong, Eddie wrote:
+> >>>
+> >>>> -----Original Message-----
+> >>>> From: Dmytro Maluka <dmy@semihalf.com>
+> >>>> Sent: Tuesday, August 9, 2022 12:24 AM
+> >>>> To: Dong, Eddie <eddie.dong@intel.com>; Christopherson,, Sean
+> >>>> <seanjc@google.com>; Paolo Bonzini <pbonzini@redhat.com>;
+> >>>> kvm@vger.kernel.org
+> >>>> Cc: Thomas Gleixner <tglx@linutronix.de>; Ingo Molnar <mingo@redhat.com>;
+> >>>> Borislav Petkov <bp@alien8.de>; Dave Hansen <dave.hansen@linux.intel.com>;
+> >>>> x86@kernel.org; H. Peter Anvin <hpa@zytor.com>; linux-
+> >>>> kernel@vger.kernel.org; Eric Auger <eric.auger@redhat.com>; Alex
+> >>>> Williamson <alex.williamson@redhat.com>; Liu, Rong L <rong.l.liu@intel.com>;
+> >>>> Zhenyu Wang <zhenyuw@linux.intel.com>; Tomasz Nowicki
+> >>>> <tn@semihalf.com>; Grzegorz Jaszczyk <jaz@semihalf.com>;
+> >>>> upstream@semihalf.com; Dmitry Torokhov <dtor@google.com>
+> >>>> Subject: Re: [PATCH v2 0/5] KVM: Fix oneshot interrupts forwarding
+> >>>>
+> >>>> On 8/9/22 1:26 AM, Dong, Eddie wrote:
+> >>>>>> The existing KVM mechanism for forwarding of level-triggered
+> >>>>>> interrupts using resample eventfd doesn't work quite correctly in the
+> >>>>>> case of interrupts that are handled in a Linux guest as oneshot
+> >>>>>> interrupts (IRQF_ONESHOT). Such an interrupt is acked to the device
+> >>>>>> in its threaded irq handler, i.e. later than it is acked to the
+> >>>>>> interrupt controller (EOI at the end of hardirq), not earlier. The
+> >>>>>> existing KVM code doesn't take that into account, which results in
+> >>>>>> erroneous extra interrupts in the guest caused by premature re-assert of an
+> >>>> unacknowledged IRQ by the host.
+> >>>>> Interesting...  How it behaviors in native side?
+> >>>> In native it behaves correctly, since Linux masks such a oneshot interrupt at the
+> >>>> beginning of hardirq, so that the EOI at the end of hardirq doesn't result in its
+> >>>> immediate re-assert, and then unmasks it later, after its threaded irq handler
+> >>>> completes.
+> >>>>
+> >>>> In handle_fasteoi_irq():
+> >>>>
+> >>>> 	if (desc->istate & IRQS_ONESHOT)
+> >>>> 		mask_irq(desc);
+> >>>>
+> >>>> 	handle_irq_event(desc);
+> >>>>
+> >>>> 	cond_unmask_eoi_irq(desc, chip);
+> >>>>
+> >>>>
+> >>>> and later in unmask_threaded_irq():
+> >>>>
+> >>>> 	unmask_irq(desc);
+> >>>>
+> >>>> I also mentioned that in patch #3 description:
+> >>>> "Linux keeps such interrupt masked until its threaded handler finishes, to
+> >>>> prevent the EOI from re-asserting an unacknowledged interrupt.
+> >>> That makes sense. Can you include the full story in cover letter too?
+> >> Ok, I will.
+> >>
+> >>>
+> >>>> However, with KVM + vfio (or whatever is listening on the resamplefd) we don't
+> >>>> check that the interrupt is still masked in the guest at the moment of EOI.
+> >>>> Resamplefd is notified regardless, so vfio prematurely unmasks the host
+> >>>> physical IRQ, thus a new (unwanted) physical interrupt is generated in the host
+> >>>> and queued for injection to the guest."
+> > Sorry to barge in pretty late in the conversation (just been Cc'd on
+> > this), but why shouldn't the resamplefd be notified? If there has been
+> yeah sorry to get you involved here ;-)
 
-The parameter is enabled by default since the feature is opt-in anyway.
+No problem!
 
-Signed-off-by: Claudio Imbrenda <imbrenda@linux.ibm.com>
-Reviewed-by: Janosch Frank <frankja@linux.ibm.com>
----
- arch/s390/kvm/kvm-s390.c | 8 +++++++-
- 1 file changed, 7 insertions(+), 1 deletion(-)
+> > an EOI, a new level must be made visible to the guest interrupt
+> > controller, no matter what the state of the interrupt masking is.
+> >
+> > Whether this new level is actually *presented* to a vCPU is another
+> > matter entirely, and is arguably a problem for the interrupt
+> > controller emulation.
+> 
+> FWIU on guest EOI the physical line is still asserted so the pIRQ is
+> immediatly re-sampled by the interrupt controller (because the
+> resamplefd unmasked the physical IRQ) and recorded as a guest IRQ
+> (although it is masked at guest level). When the guest actually unmasks
+> the vIRQ we do not get a chance to re-evaluate the physical line level.
 
-diff --git a/arch/s390/kvm/kvm-s390.c b/arch/s390/kvm/kvm-s390.c
-index 4a20a6be6601..8c7af96c4546 100644
---- a/arch/s390/kvm/kvm-s390.c
-+++ b/arch/s390/kvm/kvm-s390.c
-@@ -209,7 +209,13 @@ unsigned int diag9c_forwarding_hz;
- module_param(diag9c_forwarding_hz, uint, 0644);
- MODULE_PARM_DESC(diag9c_forwarding_hz, "Maximum diag9c forwarding per second, 0 to turn off");
- 
--static int async_destroy;
-+/*
-+ * allow asynchronous deinit for protected guests; enable by default since
-+ * the feature is opt-in anyway
-+ */
-+static int async_destroy = 1;
-+module_param(async_destroy, int, 0444);
-+MODULE_PARM_DESC(async_destroy, "Asynchronous destroy for protected guests");
- 
- /*
-  * For now we handle at most 16 double words as this is what the s390 base
+Indeed, and maybe this is what should be fixed instead of moving the
+resampling point around (I was suggesting something along these lines
+in [1]).
+
+We already do this on arm64 for the timer, and it should be easy
+enough it generalise to any interrupt backed by the GIC (there is an
+in-kernel API to sample the pending state). No idea how that translate
+for other architectures though.
+
+	M.
+
+[1] https://lore.kernel.org/r/87mtccbie4.wl-maz@kernel.org
+
 -- 
-2.37.1
-
+Without deviation from the norm, progress is not possible.
