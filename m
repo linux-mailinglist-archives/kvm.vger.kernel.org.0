@@ -2,100 +2,143 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id DD22E58F32E
-	for <lists+kvm@lfdr.de>; Wed, 10 Aug 2022 21:31:09 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id B321058F338
+	for <lists+kvm@lfdr.de>; Wed, 10 Aug 2022 21:34:12 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233265AbiHJTbI (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 10 Aug 2022 15:31:08 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33482 "EHLO
+        id S233201AbiHJTeK (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 10 Aug 2022 15:34:10 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36274 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233171AbiHJTbD (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 10 Aug 2022 15:31:03 -0400
-Received: from mail-pl1-x64a.google.com (mail-pl1-x64a.google.com [IPv6:2607:f8b0:4864:20::64a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3AF47792C7
-        for <kvm@vger.kernel.org>; Wed, 10 Aug 2022 12:30:56 -0700 (PDT)
-Received: by mail-pl1-x64a.google.com with SMTP id l11-20020a170902f68b00b0016ee1c2c0deso10176150plg.2
-        for <kvm@vger.kernel.org>; Wed, 10 Aug 2022 12:30:56 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=cc:to:from:subject:references:mime-version:message-id:in-reply-to
-         :date:from:to:cc;
-        bh=4ClZUMx8TnkVPiWPppNyKCT9yBDdrvfugyfW4aVoXbY=;
-        b=eth5rcymjcTo6VYe4CYLR2cfYrhUHSgDwphDXVe5M9W77uVjamZK3zEQPkOaz8MeS4
-         v18WcYItKk9ZR7udLSpcf89ncUrsRl8E52JO0GZ6cpgSHrfsX2fYCvuid4bHHF8HPf6M
-         VsybieO28xH93+w4aUORM8rnRRWfPK8qg4uhN+vSJcDmX/KTUojSyVAaty4iu025crUn
-         vhfdnOeVpgVQ0zQfeT5i0V29ivvaM60SPNcLfBkYjlU1gOQKl/2a8hwlEyB9SnHFD9wY
-         ljJ/GYwGbhbF9yHI2U65mevgovogtg33yQx8TLgb2O2HkI/g6wZ4HGrZlviH543LdqlE
-         x1eA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=cc:to:from:subject:references:mime-version:message-id:in-reply-to
-         :date:x-gm-message-state:from:to:cc;
-        bh=4ClZUMx8TnkVPiWPppNyKCT9yBDdrvfugyfW4aVoXbY=;
-        b=nx2RbAoB1TLwsd+ck+fHjDikyt4pottPRhsYr5MZ3yWXhONWhbwXqeQR0fvIr9gcOb
-         q0ENNG6iQ9QlKAJ5RqUXIW+odFY79lMlXyXI9kXwLrmwBkK3EXo+PWPYk8MNlZiHFQag
-         3PPDgJn+xXUKLwIufHmkxM17/PjyL5NRMf5ICcbKEAkTubr/6+FNOBcMMfcxfb+iLgOt
-         gAa4jOFtflEIPRy0PlpB8pMeNCbgU4Ylwl06HQ0KtIyH2lOchQ5m53liFr8luAjcXmwR
-         OA26yVDh82kCi0Hi2wsXUGLJJ45F5GN561Eo8fipuNfzgQrIDTez8qqBymF4+EEaSfqp
-         I+dQ==
-X-Gm-Message-State: ACgBeo2PDHsDGPxI5V9yLFLugs1vkSwWIvOvdNzBtV0L/4puztt8I5HE
-        ybGdS3Csx9qMOCMmMqvYUylNWpk=
-X-Google-Smtp-Source: AA6agR5ruBssTN91JyZyYKhtoX72CT7taSbOJaMPbA/aSzLBfq1S0116heTn2cGcPhGw5MM6Pcu1B5w=
-X-Received: from pcc-desktop.svl.corp.google.com ([2620:15c:2ce:200:4d8b:fb2a:2ecb:c2bb])
- (user=pcc job=sendgmr) by 2002:a17:90a:fe10:b0:1f3:1de7:fe1b with SMTP id
- ck16-20020a17090afe1000b001f31de7fe1bmr5057895pjb.189.1660159855775; Wed, 10
- Aug 2022 12:30:55 -0700 (PDT)
-Date:   Wed, 10 Aug 2022 12:30:33 -0700
-In-Reply-To: <20220810193033.1090251-1-pcc@google.com>
-Message-Id: <20220810193033.1090251-8-pcc@google.com>
-Mime-Version: 1.0
-References: <20220810193033.1090251-1-pcc@google.com>
-X-Mailer: git-send-email 2.37.1.559.g78731f0fdb-goog
-Subject: [PATCH v3 7/7] Documentation: document the ABI changes for KVM_CAP_ARM_MTE
-From:   Peter Collingbourne <pcc@google.com>
-To:     linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu
-Cc:     Peter Collingbourne <pcc@google.com>,
-        Cornelia Huck <cohuck@redhat.com>,
-        Catalin Marinas <catalin.marinas@arm.com>,
-        Will Deacon <will@kernel.org>, Marc Zyngier <maz@kernel.org>,
-        Evgenii Stepanov <eugenis@google.com>, kvm@vger.kernel.org,
-        Steven Price <steven.price@arm.com>,
-        Vincenzo Frascino <vincenzo.frascino@arm.com>
-Content-Type: text/plain; charset="UTF-8"
-X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL
-        autolearn=ham autolearn_force=no version=3.4.6
+        with ESMTP id S232960AbiHJTeJ (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 10 Aug 2022 15:34:09 -0400
+Received: from out1.migadu.com (out1.migadu.com [IPv6:2001:41d0:2:863f::])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E5C887695F
+        for <kvm@vger.kernel.org>; Wed, 10 Aug 2022 12:34:08 -0700 (PDT)
+Date:   Wed, 10 Aug 2022 14:33:53 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+        t=1660160047;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=Xd7ZEh3Cai7T9+89O7KBFEDHECO3gMJG4kN2ocTFX7A=;
+        b=gZ45Svi4/xPi8Uqm/3lqwxOfKntmq36LjsWKSmUW6nYlWib/04Y6vZ31GUKn3YNO8cljdM
+        EQzpyHEIhidWwAm6OXLz4+hBTEHeQdL2c1GgIGcj6VZ5bhoUKGHdzJQhwwImYP4jWLyL0C
+        wZqU6VogFnXuXNTqPRwlJKPkEb7vfro=
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From:   Oliver Upton <oliver.upton@linux.dev>
+To:     Ricardo Koller <ricarkol@google.com>
+Cc:     Marc Zyngier <maz@kernel.org>,
+        linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
+        kvm@vger.kernel.org, James Morse <james.morse@arm.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        Alexandru Elisei <alexandru.elisei@arm.com>,
+        kernel-team@android.com
+Subject: Re: [PATCH 0/9] KVM: arm64: PMU: Fixing chained events, and PMUv3p5
+ support
+Message-ID: <YvQIIWnUkCGl9Ltp@google.com>
+References: <20220805135813.2102034-1-maz@kernel.org>
+ <YvP8/m9uDI2PcyoP@google.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <YvP8/m9uDI2PcyoP@google.com>
+X-Migadu-Flow: FLOW_OUT
+X-Migadu-Auth-User: linux.dev
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        SPF_HELO_PASS,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Document both the restriction on VM_MTE_ALLOWED mappings and
-the relaxation for shared mappings.
+Hi Ricardo,
 
-Signed-off-by: Peter Collingbourne <pcc@google.com>
----
- Documentation/virt/kvm/api.rst | 5 +++--
- 1 file changed, 3 insertions(+), 2 deletions(-)
+On Wed, Aug 10, 2022 at 11:46:22AM -0700, Ricardo Koller wrote:
+> On Fri, Aug 05, 2022 at 02:58:04PM +0100, Marc Zyngier wrote:
+> > Ricardo recently reported[1] that our PMU emulation was busted when it
+> > comes to chained events, as we cannot expose the overflow on a 32bit
+> > boundary (which the architecture requires).
+> > 
+> > This series aims at fixing this (by deleting a lot of code), and as a
+> > bonus adds support for PMUv3p5, as this requires us to fix a few more
+> > things.
+> > 
+> > Tested on A53 (PMUv3) and FVP (PMUv3p5).
+> > 
+> > [1] https://lore.kernel.org/r/20220805004139.990531-1-ricarkol@google.com
+> > 
+> > Marc Zyngier (9):
+> >   KVM: arm64: PMU: Align chained counter implementation with
+> >     architecture pseudocode
+> >   KVM: arm64: PMU: Distinguish between 64bit counter and 64bit overflow
+> >   KVM: arm64: PMU: Only narrow counters that are not 64bit wide
+> >   KVM: arm64: PMU: Add counter_index_to_*reg() helpers
+> >   KVM: arm64: PMU: Simplify setting a counter to a specific value
+> >   KVM: arm64: PMU: Move the ID_AA64DFR0_EL1.PMUver limit to VM creation
+> >   KVM: arm64: PMU: Aleven ID_AA64DFR0_EL1.PMUver to be set from userspace
+> >   KVM: arm64: PMU: Implement PMUv3p5 long counter support
+> >   KVM: arm64: PMU: Aleven PMUv3p5 to be exposed to the guest
+> > 
+> >  arch/arm64/include/asm/kvm_host.h |   1 +
+> >  arch/arm64/kvm/arm.c              |   6 +
+> >  arch/arm64/kvm/pmu-emul.c         | 372 ++++++++++--------------------
+> >  arch/arm64/kvm/sys_regs.c         |  65 +++++-
+> >  include/kvm/arm_pmu.h             |  16 +-
+> >  5 files changed, 208 insertions(+), 252 deletions(-)
+> > 
+> > -- 
+> > 2.34.1
+> > 
+> 
+> Hi Marc,
+> 
+> There is one extra potential issue with exposing PMUv3p5. I see this
+> weird behavior when doing passthrough ("bare metal") on the fast-model
+> configured to emulate PMUv3p5: the [63:32] half of the counters
+> overflowing at 32-bits is still incremented.
+> 
+>   Fast model - ARMv8.5:
+>    
+> 	Assuming the initial state is even=0xFFFFFFFF and odd=0x0,
+> 	incrementing the even counter leads to:
+> 
+> 	0x00000001_00000000	0x00000000_00000001		0x1
+> 	even counter		odd counter			PMOVSET
+> 
+> 	Assuming the initial state is even=0xFFFFFFFF and odd=0xFFFFFFFF,
+> 	incrementing the even counter leads to:
+> 
+> 	0x00000001_00000000	0x00000001_00000000		0x3
+> 	even counter		odd counter			PMOVSET
 
-diff --git a/Documentation/virt/kvm/api.rst b/Documentation/virt/kvm/api.rst
-index 9788b19f9ff7..30e0c35828ef 100644
---- a/Documentation/virt/kvm/api.rst
-+++ b/Documentation/virt/kvm/api.rst
-@@ -7486,8 +7486,9 @@ hibernation of the host; however the VMM needs to manually save/restore the
- tags as appropriate if the VM is migrated.
- 
- When this capability is enabled all memory in memslots must be mapped as
--not-shareable (no MAP_SHARED), attempts to create a memslot with a
--MAP_SHARED mmap will result in an -EINVAL return.
-+``MAP_ANONYMOUS`` or with a RAM-based file mapping (``tmpfs``, ``memfd``),
-+attempts to create a memslot with an invalid mmap will result in an
-+-EINVAL return.
- 
- When enabled the VMM may make use of the ``KVM_ARM_MTE_COPY_TAGS`` ioctl to
- perform a bulk copy of tags to/from the guest.
--- 
-2.37.1.559.g78731f0fdb-goog
+This is to be expected, actually. PMUv8p5 counters are always 64 bit,
+regardless of the configured overflow.
 
+DDI 0487H D8.3 Behavior on overflow
+
+  If FEAT_PMUv3p5 is implemented, 64-bit event counters are implemented,
+  HDCR.HPMN is not 0, and either n is in the range [0 .. (HDCR.HPMN-1)]
+  or EL2 is not implemented, then event counter overflow is configured
+  by PMCR.LP:
+
+  — When PMCR.LP is set to 0, if incrementing PMEVCNTR<n> causes an unsigned
+    overflow of bits [31:0] of the event counter, the PE sets PMOVSCLR[n] to 1.
+  — When PMCR.LP is set to 1, if incrementing PMEVCNTR<n> causes an unsigned
+    overflow of bits [63:0] of the event counter, the PE sets PMOVSCLR[n] to 1.
+
+  [...]
+
+  For all 64-bit counters, incrementing the counter is the same whether an
+  unsigned overflow occurs at [31:0] or [63:0]. If the counter increments
+  for an event, bits [63:0] are always incremented.
+
+Do you see this same (expected) failure w/ Marc's series?
+
+--
+Thanks,
+Oliver
