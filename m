@@ -2,152 +2,151 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 96B4F58E966
-	for <lists+kvm@lfdr.de>; Wed, 10 Aug 2022 11:16:43 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 04F7658E996
+	for <lists+kvm@lfdr.de>; Wed, 10 Aug 2022 11:28:14 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231453AbiHJJQl (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 10 Aug 2022 05:16:41 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42400 "EHLO
+        id S232076AbiHJJ1m (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 10 Aug 2022 05:27:42 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54004 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230433AbiHJJQj (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 10 Aug 2022 05:16:39 -0400
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 74694642D9
-        for <kvm@vger.kernel.org>; Wed, 10 Aug 2022 02:16:38 -0700 (PDT)
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 9D7891FB;
-        Wed, 10 Aug 2022 02:16:38 -0700 (PDT)
-Received: from monolith.localdoman (unknown [172.31.20.19])
-        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 38A283F70D;
-        Wed, 10 Aug 2022 02:16:36 -0700 (PDT)
-Date:   Wed, 10 Aug 2022 10:17:17 +0100
-From:   Alexandru Elisei <alexandru.elisei@arm.com>
-To:     Sean Christopherson <seanjc@google.com>
-Cc:     Nikos Nikoleris <nikos.nikoleris@arm.com>, kvm@vger.kernel.org,
-        andrew.jones@linux.dev, drjones@redhat.com, pbonzini@redhat.com,
-        jade.alglave@arm.com, ricarkol@google.com, zixuanwang@google.com
-Subject: Re: [kvm-unit-tests PATCH v3 00/27] EFI and ACPI support for arm64
-Message-ID: <YvN3jk4VUD9Dhl0H@monolith.localdoman>
-References: <20220630100324.3153655-1-nikos.nikoleris@arm.com>
- <YvJB/KCLSQK836ae@monolith.localdoman>
- <YvJ9dni3JCUHNsF1@google.com>
+        with ESMTP id S232058AbiHJJ13 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 10 Aug 2022 05:27:29 -0400
+Received: from mga07.intel.com (mga07.intel.com [134.134.136.100])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D7D146B648;
+        Wed, 10 Aug 2022 02:27:28 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1660123648; x=1691659648;
+  h=date:from:to:cc:subject:message-id:reply-to:references:
+   mime-version:in-reply-to;
+  bh=tUwaauJkG9H9jpzDjix3eFFhcAHzm8fbdGUPBBoncrI=;
+  b=MM/P6jH6MliPsW0XXGQm0jiy++NWrykY/WTFdl9Jc01IEBqiretP+fpQ
+   hGaRBEoOnUMsSrlpa429LIp4kagMjmbHkXqdNP0P84rpcs/wph62NHWD9
+   bktQIKk8sgWerQVShl45PjvqXGSr/oqob9WglaqCXg4c98TufQXDLATBo
+   x9C0jCWj+ez5wC/+mTvfm5XWwbwwlY5nrbjPIW2DeB6iTBzaz3rWjEV6c
+   7jig7dUo/O+dreymwVjaqrLVay40KDxh9ROFzZ1p0xycaL7hcD8dFjyz1
+   5v/vxjgMEMc3AL7I6FurcDlLHgdgSe2Y/D2lJfcOQAO6uTX8/xx/6KS+j
+   g==;
+X-IronPort-AV: E=McAfee;i="6400,9594,10434"; a="355042407"
+X-IronPort-AV: E=Sophos;i="5.93,226,1654585200"; 
+   d="scan'208";a="355042407"
+Received: from fmsmga008.fm.intel.com ([10.253.24.58])
+  by orsmga105.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 10 Aug 2022 02:27:28 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.93,226,1654585200"; 
+   d="scan'208";a="664820289"
+Received: from chaop.bj.intel.com (HELO localhost) ([10.240.193.75])
+  by fmsmga008.fm.intel.com with ESMTP; 10 Aug 2022 02:27:17 -0700
+Date:   Wed, 10 Aug 2022 17:22:32 +0800
+From:   Chao Peng <chao.p.peng@linux.intel.com>
+To:     David Hildenbrand <david@redhat.com>
+Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+        linux-mm@kvack.org, linux-fsdevel@vger.kernel.org,
+        linux-api@vger.kernel.org, linux-doc@vger.kernel.org,
+        qemu-devel@nongnu.org, linux-kselftest@vger.kernel.org,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Jonathan Corbet <corbet@lwn.net>,
+        Sean Christopherson <seanjc@google.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+        x86@kernel.org, "H . Peter Anvin" <hpa@zytor.com>,
+        Hugh Dickins <hughd@google.com>,
+        Jeff Layton <jlayton@kernel.org>,
+        "J . Bruce Fields" <bfields@fieldses.org>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        Shuah Khan <shuah@kernel.org>, Mike Rapoport <rppt@kernel.org>,
+        Steven Price <steven.price@arm.com>,
+        "Maciej S . Szmigiero" <mail@maciej.szmigiero.name>,
+        Vlastimil Babka <vbabka@suse.cz>,
+        Vishal Annapurve <vannapurve@google.com>,
+        Yu Zhang <yu.c.zhang@linux.intel.com>,
+        "Kirill A . Shutemov" <kirill.shutemov@linux.intel.com>,
+        luto@kernel.org, jun.nakajima@intel.com, dave.hansen@intel.com,
+        ak@linux.intel.com, aarcange@redhat.com, ddutile@redhat.com,
+        dhildenb@redhat.com, Quentin Perret <qperret@google.com>,
+        Michael Roth <michael.roth@amd.com>, mhocko@suse.com,
+        Muchun Song <songmuchun@bytedance.com>
+Subject: Re: [PATCH v7 03/14] mm: Introduce memfile_notifier
+Message-ID: <20220810092232.GC862421@chaop.bj.intel.com>
+Reply-To: Chao Peng <chao.p.peng@linux.intel.com>
+References: <20220706082016.2603916-1-chao.p.peng@linux.intel.com>
+ <20220706082016.2603916-4-chao.p.peng@linux.intel.com>
+ <13394075-fca0-6f2b-92a2-f1291fcec9a3@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <YvJ9dni3JCUHNsF1@google.com>
-X-Spam-Status: No, score=-6.9 required=5.0 tests=BAYES_00,RCVD_IN_DNSWL_HI,
-        SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham
-        autolearn_force=no version=3.4.6
+In-Reply-To: <13394075-fca0-6f2b-92a2-f1291fcec9a3@redhat.com>
+X-Spam-Status: No, score=-4.9 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,SPF_HELO_NONE,
+        SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no
+        version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi Sean,
-
-On Tue, Aug 09, 2022 at 03:29:58PM +0000, Sean Christopherson wrote:
-> On Tue, Aug 09, 2022, Alexandru Elisei wrote:
-> > Hi,
-> > 
-> > Adding Sean and Zixuan, as they were involved in the initial x86 UEFI
-> > support.
-> > 
-> > This version of the UEFI support for arm64 jumps to lib/efi.c::efi_main
-> > after performing the relocation. I'll post an abbreviated/simplified
-> > version of efi_main() for reference:
-> > 
-> > efi_status_t efi_main(efi_handle_t handle, efi_system_table_t *sys_tab)
-> > {
-> > 	/* Get image, cmdline and memory map parameters from UEFI */
-> > 
-> >         efi_exit_boot_services(handle, &efi_bootinfo.mem_map);
-> > 
-> >         /* Set up arch-specific resources */
-> >         setup_efi(&efi_bootinfo);
-> > 
-> >         /* Run the test case */
-> >         ret = main(__argc, __argv, __environ);
-> > 
-> >         /* Shutdown the guest VM */
-> >         efi_exit(ret);
-> > 
-> >         /* Unreachable */
-> >         return EFI_UNSUPPORTED;
-> > }
-> > 
-> > Note that the assumption that efi_main() makes is that setup_efi() doesn't
-> > change the stack from the stack that the UEFI implementation allocated, in
-> > order for setup_efi() to be able to return to efi_main().
+On Fri, Aug 05, 2022 at 03:22:58PM +0200, David Hildenbrand wrote:
+> On 06.07.22 10:20, Chao Peng wrote:
+> > This patch introduces memfile_notifier facility so existing memory file
+> > subsystems (e.g. tmpfs/hugetlbfs) can provide memory pages to allow a
+> > third kernel component to make use of memory bookmarked in the memory
+> > file and gets notified when the pages in the memory file become
+> > invalidated.
 > 
-> On the x86 side, efi_main() now runs with a KUT-controlled stack since commit
-> 
->   d316d12a ("x86: efi: Provide a stack within testcase memory")
-> 
-> > If we want to keep the UEFI allocated stack, then both mechanism must be
-> > forbidden when running under UEFI. I dislike this idea, because those two
-> > mechanisms allow kvm-unit-tests to run tests which otherwise wouldn't have
-> > been possible with a normal operating system, which, except for the early
-> > boot code, runs with the MMU enabled.
-> 
-> Agreed.  IMO, KUT should stop using UEFI-controlled data as early as possible.
-> The original x86 behavior was effectively a temporary solution to get UEFI working
-> without needing to simultaneously rework the common early boot flows.
+> Stupid question, but why is this called "memfile_notifier" and not
+> "memfd_notifier". We're only dealing with memfd's after all ... which
+> are anonymous files essentially. Or what am I missing? Are there any
+> other plans for fs than plain memfd support that I am not aware of?
 
-Yes, this is also what I am thinking, the stack is poorly specified in the
-specification because the specification doesn't expect an application to
-keep using it after calling EFI_BOOT_SERVICES.Exit(). Plus, using the UEFI
-allocated stack makes the test less reproducible, as even EDK2 today
-diverges from the spec wrt the stack, and other UEFI implementations might
-do things differently. And with just like all software, there might be bugs
-in the firmware. IMO, the more control kvm-unit-tests has over its
-resources, the more robust the tests are.
-
-What I was thinking is rewriting efi_main to return setup_efi(),
-something like this:
-
-void efi_main(efi_handle_t handle, efi_system_table_t *sys_tab)
-{
-	/* Get image, cmdline and memory map parameters from UEFI */
-
-        efi_exit_boot_services(handle, &efi_bootinfo.mem_map);
-
-        /* Set up arch-specific resources, not expected to return. */
-        setup_efi(&efi_bootinfo);
-}
-
-Which would allow all architectures to change their environment as they see
-fit, as setup_efi() is not expected to return. Architectures would have to
-be made aware of the efi_exit() function though.
-
-If you like that approach, I can give it a go, though I'm very rusty when
-it comes to x86.
-
-Thanks,
-Alex
+There were some discussions on this in v3.
+  https://lkml.org/lkml/2021/12/28/484
+Sean commented it's OK to abstract it from memfd but he also wants the
+kAPI (name) should not bind to memfd to make room for future non-memfd
+usages.
 
 > 
-> Side topic, I think the x86 code now has a benign bug.  The old code contained an
-> adjustment to RSP to undo some stack shenanigans (can't figure out why those
-> shenanigans exist), but now the adjustment happens on the KUT stack, which doesn't
-> need to be fixed up.
+> > 
+> > It will be used for KVM to use a file descriptor as the guest memory
+> > backing store and KVM will use this memfile_notifier interface to
+> > interact with memory file subsystems. In the future there might be other
+> > consumers (e.g. VFIO with encrypted device memory).
+> > 
+> > It consists below components:
+> >  - memfile_backing_store: Each supported memory file subsystem can be
+> >    implemented as a memory backing store which bookmarks memory and
+> >    provides callbacks for other kernel systems (memfile_notifier
+> >    consumers) to interact with.
+> >  - memfile_notifier: memfile_notifier consumers defines callbacks and
+> >    associate them to a file using memfile_register_notifier().
+> >  - memfile_node: A memfile_node is associated with the file (inode) from
+> >    the backing store and includes feature flags and a list of registered
+> >    memfile_notifier for notifying.
+> > 
+> > In KVM usages, userspace is in charge of guest memory lifecycle: it first
+> > allocates pages in memory backing store and then passes the fd to KVM and
+> > lets KVM register memory slot to memory backing store via
+> > memfile_register_notifier.
 > 
-> It's a moot point since efi_main() should never return, but it looks odd.  And it
-> seems like KUT should intentionally explode if efi_main() returns, e.g. do this
-> over two patches:
+> Can we add documentation/description in any form how the different
+> functions exposed in linux/memfile_notifier.h are supposed to be used?
+
+Yeah, code comments can be added.
+
 > 
-> diff --git a/x86/efi/crt0-efi-x86_64.S b/x86/efi/crt0-efi-x86_64.S
-> index 1708ed55..e62891bc 100644
-> --- a/x86/efi/crt0-efi-x86_64.S
-> +++ b/x86/efi/crt0-efi-x86_64.S
-> @@ -62,10 +62,7 @@ _start:
->         lea stacktop(%rip), %rsp
->  
->         call efi_main
-> -       addq $8, %rsp
-> -
-> -.exit: 
-> -       ret
-> +       ud2
->  
->         // hand-craft a dummy .reloc section so EFI knows it's a relocatable executable:
+> Staring at memfile_node_set_flags() and memfile_notifier_invalidate()
+> it's not immediately clear to me who's supposed to call that and under
+> which conditions.
+
+I will also amend the commit message.
+
+Chao
+> 
+> -- 
+> Thanks,
+> 
+> David / dhildenb
