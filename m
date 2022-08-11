@@ -2,130 +2,143 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 4281758FD9F
-	for <lists+kvm@lfdr.de>; Thu, 11 Aug 2022 15:44:15 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 09CD458FDC5
+	for <lists+kvm@lfdr.de>; Thu, 11 Aug 2022 15:54:21 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234998AbiHKNoM (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 11 Aug 2022 09:44:12 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54330 "EHLO
+        id S234931AbiHKNyP (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 11 Aug 2022 09:54:15 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36282 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234939AbiHKNoL (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 11 Aug 2022 09:44:11 -0400
-Received: from mga17.intel.com (mga17.intel.com [192.55.52.151])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A369661D5B;
-        Thu, 11 Aug 2022 06:44:10 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1660225450; x=1691761450;
-  h=date:from:to:cc:subject:message-id:reply-to:references:
-   mime-version:in-reply-to;
-  bh=6G1vjfFDPRBJq3hrus4RUCAj1Ik6SbGGx7LGPLT4CKc=;
-  b=d4c4cnSceeeu7pOr1M6yPJGfJ3fVRak7yxgC47zNN1IUy5Tdxab8FQpQ
-   cnBQ7gPpd/hvDbuy5gyByOuMb4lwo8Im4oHMUbzDm0qlCTHn/ijQFZOvj
-   Mq3lq+LDZMrEPRr48zUj5FDkcV8nz5k9ctL5KIPNwWcpCtzi1hkz1qA6q
-   pWtjiYJKJbCH2SMClUXcoA9fT++42hoDozM5J4GtXDH6azUGtBvupYHp5
-   MElZW9qgLRhScPlvOPYRA8D2igtaz9uCPWI1Q3gwwFAcoWWRDjFf8DJPw
-   0BgRP0lvXbrnQokLfItXaKv0DQOp2FbifwnxcSyaisiM8C2qnOGVb1Sxb
-   A==;
-X-IronPort-AV: E=McAfee;i="6400,9594,10435"; a="271731755"
-X-IronPort-AV: E=Sophos;i="5.93,230,1654585200"; 
-   d="scan'208";a="271731755"
-Received: from fmsmga008.fm.intel.com ([10.253.24.58])
-  by fmsmga107.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 11 Aug 2022 06:44:10 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.93,230,1654585200"; 
-   d="scan'208";a="665377410"
-Received: from chaop.bj.intel.com (HELO localhost) ([10.240.193.75])
-  by fmsmga008.fm.intel.com with ESMTP; 11 Aug 2022 06:43:59 -0700
-Date:   Thu, 11 Aug 2022 21:39:14 +0800
-From:   Chao Peng <chao.p.peng@linux.intel.com>
-To:     Quentin Perret <qperret@google.com>
-Cc:     Sean Christopherson <seanjc@google.com>,
-        David Hildenbrand <david@redhat.com>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org, linux-mm@kvack.org,
-        linux-fsdevel@vger.kernel.org, linux-api@vger.kernel.org,
-        linux-doc@vger.kernel.org, qemu-devel@nongnu.org,
-        linux-kselftest@vger.kernel.org,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Jonathan Corbet <corbet@lwn.net>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        x86@kernel.org, "H . Peter Anvin" <hpa@zytor.com>,
-        Hugh Dickins <hughd@google.com>,
-        Jeff Layton <jlayton@kernel.org>,
-        "J . Bruce Fields" <bfields@fieldses.org>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        Shuah Khan <shuah@kernel.org>, Mike Rapoport <rppt@kernel.org>,
-        Steven Price <steven.price@arm.com>,
-        "Maciej S . Szmigiero" <mail@maciej.szmigiero.name>,
-        Vlastimil Babka <vbabka@suse.cz>,
-        Vishal Annapurve <vannapurve@google.com>,
-        Yu Zhang <yu.c.zhang@linux.intel.com>,
-        "Kirill A . Shutemov" <kirill.shutemov@linux.intel.com>,
-        luto@kernel.org, jun.nakajima@intel.com, dave.hansen@intel.com,
-        ak@linux.intel.com, aarcange@redhat.com, ddutile@redhat.com,
-        dhildenb@redhat.com, Michael Roth <michael.roth@amd.com>,
-        mhocko@suse.com, Muchun Song <songmuchun@bytedance.com>,
-        Will Deacon <will@kernel.org>, Fuad Tabba <tabba@google.com>
-Subject: Re: [PATCH v7 03/14] mm: Introduce memfile_notifier
-Message-ID: <20220811133914.GC916119@chaop.bj.intel.com>
-Reply-To: Chao Peng <chao.p.peng@linux.intel.com>
-References: <20220706082016.2603916-1-chao.p.peng@linux.intel.com>
- <20220706082016.2603916-4-chao.p.peng@linux.intel.com>
- <13394075-fca0-6f2b-92a2-f1291fcec9a3@redhat.com>
- <20220810092232.GC862421@chaop.bj.intel.com>
- <00f1aa03-bc82-ffce-569b-e2d5c459992c@redhat.com>
- <YvPC87FMgF7uac7z@google.com>
- <YvT1zOQtTQl2t300@google.com>
+        with ESMTP id S235135AbiHKNyJ (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 11 Aug 2022 09:54:09 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 36EB9642FE
+        for <kvm@vger.kernel.org>; Thu, 11 Aug 2022 06:54:08 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1660226047;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding;
+        bh=5kJeSSsfCq2FY3f7RK2Q/BBcFFU0NepVqdZJEXZ6UQI=;
+        b=EXWzPevJpBIHjqCvHHV41JmTVmrxLMgrywin7BQsp6von3JBsP8hLXBvBJ2Vuh6vbtE9A4
+        3cTTrusuTStoEgidCsoaUq8yYNNWJ4q9XaSH4hvGcVJtZvRNl4WNAvXWI0lmwe56uBAKtB
+        24xzByykDG7oo16KmlohocB0CI68P68=
+Received: from mimecast-mx02.redhat.com (mx3-rdu2.redhat.com
+ [66.187.233.73]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-659-FQ17yzFNMV-zJv8IcbJuMg-1; Thu, 11 Aug 2022 09:54:03 -0400
+X-MC-Unique: FQ17yzFNMV-zJv8IcbJuMg-1
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.rdu2.redhat.com [10.11.54.2])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 87E2C1C04B6E;
+        Thu, 11 Aug 2022 13:54:02 +0000 (UTC)
+Received: from eperezma.remote.csb (unknown [10.39.192.231])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id CE41640D2827;
+        Thu, 11 Aug 2022 13:53:55 +0000 (UTC)
+From:   =?UTF-8?q?Eugenio=20P=C3=A9rez?= <eperezma@redhat.com>
+To:     virtualization@lists.linux-foundation.org,
+        Jason Wang <jasowang@redhat.com>,
+        "Michael S. Tsirkin" <mst@redhat.com>, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org, netdev@vger.kernel.org
+Cc:     ecree.xilinx@gmail.com, gautam.dawar@amd.com,
+        Zhang Min <zhang.min9@zte.com.cn>, pabloc@xilinx.com,
+        Piotr.Uminski@intel.com, Dan Carpenter <dan.carpenter@oracle.com>,
+        tanuj.kamde@amd.com, Zhu Lingshan <lingshan.zhu@intel.com>,
+        martinh@xilinx.com,
+        Christophe JAILLET <christophe.jaillet@wanadoo.fr>,
+        lvivier@redhat.com, martinpo@xilinx.com, hanand@xilinx.com,
+        Eli Cohen <elic@nvidia.com>, lulu@redhat.com,
+        habetsm.xilinx@gmail.com, Parav Pandit <parav@nvidia.com>,
+        Longpeng <longpeng2@huawei.com>,
+        Wu Zongyong <wuzongyong@linux.alibaba.com>,
+        Si-Wei Liu <si-wei.liu@oracle.com>,
+        Stefano Garzarella <sgarzare@redhat.com>, dinang@xilinx.com,
+        Xie Yongji <xieyongji@bytedance.com>
+Subject: [PATCH v8 0/3] Implement vdpasim suspend operation
+Date:   Thu, 11 Aug 2022 15:53:50 +0200
+Message-Id: <20220811135353.2549658-1-eperezma@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <YvT1zOQtTQl2t300@google.com>
-X-Spam-Status: No, score=-4.9 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,SPF_HELO_NONE,
-        SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no
-        version=3.4.6
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+X-Scanned-By: MIMEDefang 2.84 on 10.11.54.2
+X-Spam-Status: No, score=-3.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,
+        SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=unavailable
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Aug 11, 2022 at 12:27:56PM +0000, Quentin Perret wrote:
-> +CC Fuad
-> 
-> On Wednesday 10 Aug 2022 at 14:38:43 (+0000), Sean Christopherson wrote:
-> > > I understand Sean's suggestion about abstracting, but if the new name
-> > > makes it harder to grasp and there isn't really an alternative to memfd
-> > > in sight, I'm not so sure I enjoy the tried abstraction here.
-> > 
-> > ARM's pKVM implementation is potentially (hopefully) going to switch to this API
-> > (as a consumer) sooner than later.  If they anticipate being able to use memfd,
-> > then there's unlikely to be a second backing type any time soon.
-> > 
-> > Quentin, Will?
-> 
-> Yep, Fuad is currently trying to port the pKVM mm stuff on top of this
-> series to see how well it fits, so stay tuned.
+Implement suspend operation for vdpa_sim devices, so vhost-vdpa will offer=
+=0D
+that backend feature and userspace can effectively suspend the device.=0D
+=0D
+This is a must before getting virtqueue indexes (base) for live migration,=
+=0D
+since the device could modify them after userland gets them. There are=0D
+individual ways to perform that action for some devices=0D
+(VHOST_NET_SET_BACKEND, VHOST_VSOCK_SET_RUNNING, ...) but there was no=0D
+way to perform it for any vhost device (and, in particular, vhost-vdpa).=0D
+=0D
+After a successful return of ioctl the device must not process more virtque=
+ue=0D
+descriptors. The device can answer to read or writes of config fields as if=
+ it=0D
+were not suspended. In particular, writing to "queue_enable" with a value o=
+f 1=0D
+will not make the device start processing virtqueue buffers.=0D
+=0D
+In the future, we will provide features similar to=0D
+VHOST_USER_GET_INFLIGHT_FD so the device can save pending operations.=0D
+=0D
+Applied on top of vhost branch.=0D
+=0D
+Comments are welcome.=0D
+=0D
+v8:=0D
+* v7 but incremental from vhost instead of isolated.=0D
+=0D
+v7:=0D
+* Remove ioctl leftover argument and update doc accordingly.=0D
+=0D
+v6:=0D
+* Remove the resume operation, making the ioctl simpler. We can always add=
+=0D
+  another ioctl for VM_STOP/VM_RESUME operation later.=0D
+* s/stop/suspend/ to differentiate more from reset.=0D
+* Clarify scope of the suspend operation.=0D
+=0D
+v5:=0D
+* s/not stop/resume/ in doc.=0D
+=0D
+v4:=0D
+* Replace VHOST_STOP to VHOST_VDPA_STOP in vhost ioctl switch case too.=0D
+=0D
+v3:=0D
+* s/VHOST_STOP/VHOST_VDPA_STOP/=0D
+* Add documentation and requirements of the ioctl above its definition.=0D
+=0D
+v2:=0D
+* Replace raw _F_STOP with BIT_ULL(_F_STOP).=0D
+* Fix obtaining of stop ioctl arg (it was not obtained but written).=0D
+* Add stop to vdpa_sim_blk.=0D
+=0D
+[1] git://git.kernel.org/pub/scm/linux/kernel/git/mst/vhost.git=0D
+=0D
+Eugenio P=C3=A9rez (3):=0D
+  vdpa: delete unreachable branch on vdpasim_suspend=0D
+  vdpa: Remove wrong doc of VHOST_VDPA_SUSPEND ioctl=0D
+  vhost: Remove invalid parameter of VHOST_VDPA_SUSPEND ioctl=0D
+=0D
+ drivers/vdpa/vdpa_sim/vdpa_sim.c |  7 -------=0D
+ include/linux/vdpa.h             |  2 +-=0D
+ include/uapi/linux/vhost.h       | 17 ++++++-----------=0D
+ 3 files changed, 7 insertions(+), 19 deletions(-)=0D
+=0D
+-- =0D
+2.31.1=0D
+=0D
 
-Good to hear that.
-
->I think there is still
-> some room for discussion around page conversions (private->shared etc),
-> and we'll need a clearer idea of what the code might look like to have a
-> constructive discussion,
-
-That's fine. Looking forward to your feedbacks.
-
->but so far it does seem like using a memfd (the
-> new private one or perhaps just memfd_secret, to be discussed) + memfd
-> notifiers is a promising option.
-
-If it still memfd (even memfd_secret), maybe we can use the name
-memfd_notifier?
-
-Chao
