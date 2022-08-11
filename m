@@ -2,93 +2,67 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 40BF358F74C
-	for <lists+kvm@lfdr.de>; Thu, 11 Aug 2022 07:36:17 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id C5C0F58F764
+	for <lists+kvm@lfdr.de>; Thu, 11 Aug 2022 07:50:52 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234015AbiHKFgE (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 11 Aug 2022 01:36:04 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54652 "EHLO
+        id S234009AbiHKFuw (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 11 Aug 2022 01:50:52 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36500 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233806AbiHKFgB (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 11 Aug 2022 01:36:01 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 86C4417051
-        for <kvm@vger.kernel.org>; Wed, 10 Aug 2022 22:36:00 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1660196159;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=1PCUDSqmLKN2Mlp7gJOvD0wMAFZjw97KA+2ssjA/d5A=;
-        b=AKETq6hRC+MpzLUhdZkgVgmGYxQ79LTtqDJXRP/ATanl06xhVGnVZZyEyL/pNJ9rlDqxUU
-        p2mwvqWSd0v3iKp1H9CVSh8N590w7b4rO0GB9ETgtR/cIOoX/2bkMO87wsmhdPFv7lGOsP
-        miqzZvxccd7SSbY5ap8lhooiop/klNY=
-Received: from mail-qv1-f70.google.com (mail-qv1-f70.google.com
- [209.85.219.70]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-647-WfyThY5LPrOviJVw9GbgGw-1; Thu, 11 Aug 2022 01:35:58 -0400
-X-MC-Unique: WfyThY5LPrOviJVw9GbgGw-1
-Received: by mail-qv1-f70.google.com with SMTP id k17-20020ad44511000000b00478bd83e375so8931197qvu.17
-        for <kvm@vger.kernel.org>; Wed, 10 Aug 2022 22:35:58 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc;
-        bh=1PCUDSqmLKN2Mlp7gJOvD0wMAFZjw97KA+2ssjA/d5A=;
-        b=0ubM44v9N2qYIMYieyH8XWYMsBZpXSvs8s9vNMXO7jXpB2d5uK9D+fQ9u5/UVga+vc
-         aPv06vHIoYFqETFI19cmN4JoBw3XRo7lZDpUh44rTAFYIsVlK2Q6+c/ybh6bOov2Q+np
-         mA1eITfFOBce15j5xHwDK+TscXdnvKHScB0xp4pDnASUsUuv/in7JUwAc1dLfeEKGEv2
-         EDct4JOUCB/f8qRlSbTKMEWeugck4/jFqMxRP9pGjHrecimVdCekxbLgkzTzld1XHZpy
-         Rj3gYyqeFFUJqCgRiwKquz+hnAiOTdIXl+BaqAP49h2Hf9vW3vDFHBZmEvbuZLR5Lld8
-         3GyA==
-X-Gm-Message-State: ACgBeo2uEsBmrwvtNnBA3MKF87YMH3bdfzvred8ltbDWTwW9P/XX+EBQ
-        z5T4zydcXEaKTiCQZIqX74kBCP+ExKAQFJNCcaGUmF4HqnynUU5h9JbR15e9G/rtB/nzpi7ETVZ
-        8XwxZtfRy42gHKjOtn48LdMO0l4oK
-X-Received: by 2002:a37:74f:0:b0:6b9:c9ce:b86f with SMTP id 76-20020a37074f000000b006b9c9ceb86fmr576003qkh.193.1660196157677;
-        Wed, 10 Aug 2022 22:35:57 -0700 (PDT)
-X-Google-Smtp-Source: AA6agR45v/I+FF3SnUkGenVkbLRvx2Dlfsel/4Yt8Xh4sSTFVFijLac+a/dkfGCbHEAx8EzuNsSMP06jx0ECj3Fcois=
-X-Received: by 2002:a37:74f:0:b0:6b9:c9ce:b86f with SMTP id
- 76-20020a37074f000000b006b9c9ceb86fmr575975qkh.193.1660196157457; Wed, 10 Aug
- 2022 22:35:57 -0700 (PDT)
-MIME-Version: 1.0
-References: <20220810171512.2343333-1-eperezma@redhat.com> <20220810151907-mutt-send-email-mst@kernel.org>
-In-Reply-To: <20220810151907-mutt-send-email-mst@kernel.org>
-From:   Eugenio Perez Martin <eperezma@redhat.com>
-Date:   Thu, 11 Aug 2022 07:35:21 +0200
-Message-ID: <CAJaqyWdyFt5tvjFQuC3pO6eXV0ogtV8DeCTCRw0y6HFeON0_+w@mail.gmail.com>
-Subject: Re: [PATCH v7 0/4] Implement vdpasim suspend operation
-To:     "Michael S. Tsirkin" <mst@redhat.com>
-Cc:     kvm list <kvm@vger.kernel.org>,
-        linux-kernel <linux-kernel@vger.kernel.org>,
-        Jason Wang <jasowang@redhat.com>,
-        virtualization <virtualization@lists.linux-foundation.org>,
-        netdev <netdev@vger.kernel.org>,
-        Dinan Gunawardena <dinang@xilinx.com>,
-        Martin Porter <martinpo@xilinx.com>,
-        Wu Zongyong <wuzongyong@linux.alibaba.com>,
-        "Uminski, Piotr" <Piotr.Uminski@intel.com>,
-        "Dawar, Gautam" <gautam.dawar@amd.com>, ecree.xilinx@gmail.com,
-        Martin Petrus Hubertus Habets <martinh@xilinx.com>,
-        Stefano Garzarella <sgarzare@redhat.com>,
-        Pablo Cascon Katchadourian <pabloc@xilinx.com>,
-        habetsm.xilinx@gmail.com, Laurent Vivier <lvivier@redhat.com>,
-        Zhu Lingshan <lingshan.zhu@intel.com>,
-        "Kamde, Tanuj" <tanuj.kamde@amd.com>,
-        Longpeng <longpeng2@huawei.com>, Cindy Lu <lulu@redhat.com>,
-        Harpreet Singh Anand <hanand@xilinx.com>,
-        Parav Pandit <parav@nvidia.com>,
-        Si-Wei Liu <si-wei.liu@oracle.com>,
-        Eli Cohen <elic@nvidia.com>,
-        Xie Yongji <xieyongji@bytedance.com>,
-        Zhang Min <zhang.min9@zte.com.cn>,
-        Dan Carpenter <dan.carpenter@oracle.com>,
-        Christophe JAILLET <christophe.jaillet@wanadoo.fr>
+        with ESMTP id S229786AbiHKFuu (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 11 Aug 2022 01:50:50 -0400
+Received: from ams.source.kernel.org (ams.source.kernel.org [IPv6:2604:1380:4601:e00::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 73E6732BAE
+        for <kvm@vger.kernel.org>; Wed, 10 Aug 2022 22:50:49 -0700 (PDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by ams.source.kernel.org (Postfix) with ESMTPS id 31894B81EFE
+        for <kvm@vger.kernel.org>; Thu, 11 Aug 2022 05:50:48 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPS id DA5B4C433D7
+        for <kvm@vger.kernel.org>; Thu, 11 Aug 2022 05:50:46 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1660197046;
+        bh=5xJSXspv4HKb1uZdbq50haWAnvd3H1I2OeA05Xb+dNA=;
+        h=From:To:Subject:Date:In-Reply-To:References:From;
+        b=KEgiX7Ge+JfG7mdpqdtrjCUCVNuGyXZKtyJBRG8pAHlclvBSZwWO+aMsk6lz1M6u2
+         3KDdB9VD+CL1E1hzz/909YE56IZWqBpaujpcktTt6aykR2+58AOfwI6Lm6EfXBBm9t
+         Sq2Sw3LhwwOBoU0zpfC445qS+Op9HaP+fznGSfTz8uOEjxAWjGBQ+lodt9td7QuoEl
+         V0W2yROwWWoj2+cL5Ni1iOEEizK+580qz0AOuaL899QOLNO+r9u7g1VnckNsujfQO6
+         sLrPf1vTMwxyQ6cvMvQQaKCiEtfi83jwBIaSEi0mPTw2p7OWZTtWhWfBhPkpopanPb
+         SAj+sCluIT4eQ==
+Received: by aws-us-west-2-korg-bugzilla-1.web.codeaurora.org (Postfix, from userid 48)
+        id C733DC433E9; Thu, 11 Aug 2022 05:50:46 +0000 (UTC)
+From:   bugzilla-daemon@kernel.org
+To:     kvm@vger.kernel.org
+Subject: [Bug 216349] Kernel panic in a Ubuntu VM running on Proxmox
+Date:   Thu, 11 Aug 2022 05:50:46 +0000
+X-Bugzilla-Reason: None
+X-Bugzilla-Type: changed
+X-Bugzilla-Watch-Reason: AssignedTo virtualization_kvm@kernel-bugs.osdl.org
+X-Bugzilla-Product: Virtualization
+X-Bugzilla-Component: kvm
+X-Bugzilla-Version: unspecified
+X-Bugzilla-Keywords: 
+X-Bugzilla-Severity: normal
+X-Bugzilla-Who: jdpark.au@gmail.com
+X-Bugzilla-Status: NEW
+X-Bugzilla-Resolution: 
+X-Bugzilla-Priority: P1
+X-Bugzilla-Assigned-To: virtualization_kvm@kernel-bugs.osdl.org
+X-Bugzilla-Flags: 
+X-Bugzilla-Changed-Fields: 
+Message-ID: <bug-216349-28872-AZaPIhhGFa@https.bugzilla.kernel.org/>
+In-Reply-To: <bug-216349-28872@https.bugzilla.kernel.org/>
+References: <bug-216349-28872@https.bugzilla.kernel.org/>
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
-X-Spam-Status: No, score=-3.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,
-        SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=unavailable
+X-Bugzilla-URL: https://bugzilla.kernel.org/
+Auto-Submitted: auto-generated
+MIME-Version: 1.0
+X-Spam-Status: No, score=-7.7 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_HI,
+        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -96,92 +70,22 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Aug 10, 2022 at 9:20 PM Michael S. Tsirkin <mst@redhat.com> wrote:
->
-> On Wed, Aug 10, 2022 at 07:15:08PM +0200, Eugenio P=C3=A9rez wrote:
-> > Implement suspend operation for vdpa_sim devices, so vhost-vdpa will of=
-fer
-> > that backend feature and userspace can effectively suspend the device.
-> >
-> > This is a must before getting virtqueue indexes (base) for live migrati=
-on,
-> > since the device could modify them after userland gets them. There are
-> > individual ways to perform that action for some devices
-> > (VHOST_NET_SET_BACKEND, VHOST_VSOCK_SET_RUNNING, ...) but there was no
-> > way to perform it for any vhost device (and, in particular, vhost-vdpa)=
-.
-> >
-> > After a successful return of ioctl the device must not process more vir=
-tqueue
-> > descriptors. The device can answer to read or writes of config fields a=
-s if it
-> > were not suspended. In particular, writing to "queue_enable" with a val=
-ue of 1
-> > will not make the device start processing virtqueue buffers.
-> >
-> > In the future, we will provide features similar to
-> > VHOST_USER_GET_INFLIGHT_FD so the device can save pending operations.
-> >
-> > Applied on top of [1] branch after removing the old commits.
->
-> Except, I can't really do this without invaliding all testing.
-> Can't you post an incremental patch?
->
+https://bugzilla.kernel.org/show_bug.cgi?id=3D216349
 
-Oops, sorry.
+--- Comment #4 from John Park (jdpark.au@gmail.com) ---
+I'm not sure how verbose I should be in the bug report but I thought it wou=
+ld
+be worth mentioning that in attempting to troubleshoot, I changed the machi=
+ne
+type in Proxmox from i440fx to q35 but this made no difference, I got anoth=
+er
+kernel panic today using q35 but unfortunately I forgot to change the inter=
+face
+in my netconsole config so I didn't get any log of the panic. I've taken a
+screenshot of the console and uploaded it anyway.
 
-I can send it for doc and internal code. But is it ok to remove an
-ioctl arg with incremental patches?
+--=20
+You may reply to this email to add a comment.
 
-Thanks!
-
-> > Comments are welcome.
-> >
-> > v7:
-> > * Remove ioctl leftover argument and update doc accordingly.
->
-> > v6:
-> > * Remove the resume operation, making the ioctl simpler. We can always =
-add
-> >   another ioctl for VM_STOP/VM_RESUME operation later.
-> > * s/stop/suspend/ to differentiate more from reset.
-> > * Clarify scope of the suspend operation.
-> >
-> > v5:
-> > * s/not stop/resume/ in doc.
-> >
-> > v4:
-> > * Replace VHOST_STOP to VHOST_VDPA_STOP in vhost ioctl switch case too.
-> >
-> > v3:
-> > * s/VHOST_STOP/VHOST_VDPA_STOP/
-> > * Add documentation and requirements of the ioctl above its definition.
-> >
-> > v2:
-> > * Replace raw _F_STOP with BIT_ULL(_F_STOP).
-> > * Fix obtaining of stop ioctl arg (it was not obtained but written).
-> > * Add stop to vdpa_sim_blk.
-> >
-> > [1] git://git.kernel.org/pub/scm/linux/kernel/git/mst/vhost.git
-> >
-> > Eugenio P=C3=A9rez (4):
-> >   vdpa: Add suspend operation
-> >   vhost-vdpa: introduce SUSPEND backend feature bit
-> >   vhost-vdpa: uAPI to suspend the device
-> >   vdpa_sim: Implement suspend vdpa op
-> >
-> >  drivers/vdpa/vdpa_sim/vdpa_sim.c     | 14 +++++++++++
-> >  drivers/vdpa/vdpa_sim/vdpa_sim.h     |  1 +
-> >  drivers/vdpa/vdpa_sim/vdpa_sim_blk.c |  3 +++
-> >  drivers/vdpa/vdpa_sim/vdpa_sim_net.c |  3 +++
-> >  drivers/vhost/vdpa.c                 | 35 +++++++++++++++++++++++++++-
-> >  include/linux/vdpa.h                 |  4 ++++
-> >  include/uapi/linux/vhost.h           |  9 +++++++
-> >  include/uapi/linux/vhost_types.h     |  2 ++
-> >  8 files changed, 70 insertions(+), 1 deletion(-)
-> >
-> > --
-> > 2.31.1
-> >
->
-
+You are receiving this mail because:
+You are watching the assignee of the bug.=
