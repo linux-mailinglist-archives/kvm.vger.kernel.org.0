@@ -2,125 +2,199 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id B63AD58FC29
-	for <lists+kvm@lfdr.de>; Thu, 11 Aug 2022 14:28:08 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 4ECAE58FC65
+	for <lists+kvm@lfdr.de>; Thu, 11 Aug 2022 14:35:55 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234805AbiHKM2G (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 11 Aug 2022 08:28:06 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34892 "EHLO
+        id S235143AbiHKMfw (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 11 Aug 2022 08:35:52 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45484 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234000AbiHKM2E (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 11 Aug 2022 08:28:04 -0400
-Received: from mail-ed1-x532.google.com (mail-ed1-x532.google.com [IPv6:2a00:1450:4864:20::532])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 940218E991
-        for <kvm@vger.kernel.org>; Thu, 11 Aug 2022 05:28:02 -0700 (PDT)
-Received: by mail-ed1-x532.google.com with SMTP id z20so20821908edb.9
-        for <kvm@vger.kernel.org>; Thu, 11 Aug 2022 05:28:02 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc;
-        bh=3MRcVxkQskaoR9Gu8vTdfe3SAmvath2jQNxcSxuvW1Y=;
-        b=NHGbxl9pUrdbk/qb8xkMm4zoxhQhX6Rs444HQVekSH5HLue8co3CqoPnGbERLio2dM
-         LGx24QotE4kcbcEEhmgdmUCglkMRj9LUgkSP/KpiNA700mP6h94Dn1d/wFOg8IXrTV5Q
-         7t8086tWE8qBuYhtW+ve33VVpMjT6RO9u3JV6fo+OXTJ5nEqqLqt5Xfar1N/31vDl+kb
-         /Qc9CeYpCrRSPvgdT5jKrAYi+Bis7pm8rvEJBRuOqCqT9rTRlL5ZiL661wC2BrmdE5CH
-         +f94perJ/2Z6mBI0Mqi+Tsy+mMxy6HBFjWyJQNFav6rilu1dhdspBsJwb60836MPgNiY
-         wunw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc;
-        bh=3MRcVxkQskaoR9Gu8vTdfe3SAmvath2jQNxcSxuvW1Y=;
-        b=UTsbmlxQiPYZ9j3w0z+a92ggDGr3Lqj9hvfkLglzA1vuQ+07J/aOvge8pXbiMp374e
-         9DPVyCa5RwB0q8wC76fsMf7il1yakZ1Vyw16wGpUbMZNy4b/MgnIOVam4T0rx0yb+L/z
-         5tXcZJ4zBTBKwjnado7qj4h036t14uDrCvQd9dDNVfDG0igTntAlY09mH33EC4+tM1WN
-         0eJnXClvh0mIbDg/WrlQp5udGITs5Z3+6EZNxSn0YC5O0xhHBbkT8TBRq4qiWYdfJK0R
-         CF73jyS/LIJEwgRbtq+PNk9S8/Wgm5HBkaNyKEofLEx8cY8Q/1BBq5lmHqIYNsAYXLEa
-         fIow==
-X-Gm-Message-State: ACgBeo1HwFjODXKb2evKyzIktfj7UokQTP+dnK9G3GPcD6i3ujF9R7uv
-        X9c5gRb9oCcfT0B3QlpyxKaTgg==
-X-Google-Smtp-Source: AA6agR6+Oii1v3EbiMDbdYw7/ayqCsy6sGwTAVm4xglPzXzpkb8k3QGndmL9Qe4QpGf4syQIGgATXw==
-X-Received: by 2002:a05:6402:3583:b0:43d:6943:44a with SMTP id y3-20020a056402358300b0043d6943044amr30188049edc.409.1660220881001;
-        Thu, 11 Aug 2022 05:28:01 -0700 (PDT)
-Received: from google.com (64.227.90.34.bc.googleusercontent.com. [34.90.227.64])
-        by smtp.gmail.com with ESMTPSA id v20-20020a170906381400b007307d099ed7sm3440458ejc.121.2022.08.11.05.27.59
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 11 Aug 2022 05:27:59 -0700 (PDT)
-Date:   Thu, 11 Aug 2022 12:27:56 +0000
-From:   Quentin Perret <qperret@google.com>
-To:     Sean Christopherson <seanjc@google.com>
-Cc:     David Hildenbrand <david@redhat.com>,
-        Chao Peng <chao.p.peng@linux.intel.com>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org, linux-mm@kvack.org,
-        linux-fsdevel@vger.kernel.org, linux-api@vger.kernel.org,
-        linux-doc@vger.kernel.org, qemu-devel@nongnu.org,
-        linux-kselftest@vger.kernel.org,
+        with ESMTP id S235321AbiHKMfu (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 11 Aug 2022 08:35:50 -0400
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 759ECB11;
+        Thu, 11 Aug 2022 05:35:49 -0700 (PDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id 127C26144A;
+        Thu, 11 Aug 2022 12:35:49 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5C772C433D6;
+        Thu, 11 Aug 2022 12:35:48 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1660221348;
+        bh=Ez2d8p0eeWF0OIsRxbzSqCD6kWS8Wmg/mVwzdTqnfik=;
+        h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+        b=SMKTZh3lBX58gL8LiJd0G9Y/XmGZmVQ9cWhbJ1tzRGV5PDMH9GBugkdKUIj7tCiDJ
+         wMvBWEe0+Pt0N5LGrZSRdwrV8d1WD8A7QWtE7aL0WnbRonpEQDwjLPa9ADXKrT7un0
+         ZKUp2MRYcK7oIQqMO1khFHuySUQ/7uSKFf/OSPXjG2BJr7E47w21J0SdukxySwA16G
+         y45OL1ZYV0C5GvHGq1oRE/DNaiyEswbHzBHNc0Qis/ZRblwrEVWk1+8LxQNQx19y0W
+         q9P36gE3q3zIQrEy5LdBLN315tz8cstENlvLsUgkGM49kXIl47+Cbi/o2iOJNgvcCv
+         LR3qbem7ALuuQ==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=why.misterjones.org)
+        by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+        (Exim 4.95)
+        (envelope-from <maz@kernel.org>)
+        id 1oM7Pe-002L20-4i;
+        Thu, 11 Aug 2022 13:35:46 +0100
+Date:   Thu, 11 Aug 2022 13:35:45 +0100
+Message-ID: <87mtcbufdq.wl-maz@kernel.org>
+From:   Marc Zyngier <maz@kernel.org>
+To:     Dmytro Maluka <dmy@semihalf.com>
+Cc:     "Dong, Eddie" <eddie.dong@intel.com>,
+        "Christopherson,, Sean" <seanjc@google.com>,
         Paolo Bonzini <pbonzini@redhat.com>,
-        Jonathan Corbet <corbet@lwn.net>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
         Thomas Gleixner <tglx@linutronix.de>,
         Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        x86@kernel.org, "H . Peter Anvin" <hpa@zytor.com>,
-        Hugh Dickins <hughd@google.com>,
-        Jeff Layton <jlayton@kernel.org>,
-        "J . Bruce Fields" <bfields@fieldses.org>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        Shuah Khan <shuah@kernel.org>, Mike Rapoport <rppt@kernel.org>,
-        Steven Price <steven.price@arm.com>,
-        "Maciej S . Szmigiero" <mail@maciej.szmigiero.name>,
-        Vlastimil Babka <vbabka@suse.cz>,
-        Vishal Annapurve <vannapurve@google.com>,
-        Yu Zhang <yu.c.zhang@linux.intel.com>,
-        "Kirill A . Shutemov" <kirill.shutemov@linux.intel.com>,
-        luto@kernel.org, jun.nakajima@intel.com, dave.hansen@intel.com,
-        ak@linux.intel.com, aarcange@redhat.com, ddutile@redhat.com,
-        dhildenb@redhat.com, Michael Roth <michael.roth@amd.com>,
-        mhocko@suse.com, Muchun Song <songmuchun@bytedance.com>,
-        Will Deacon <will@kernel.org>, Fuad Tabba <tabba@google.com>
-Subject: Re: [PATCH v7 03/14] mm: Introduce memfile_notifier
-Message-ID: <YvT1zOQtTQl2t300@google.com>
-References: <20220706082016.2603916-1-chao.p.peng@linux.intel.com>
- <20220706082016.2603916-4-chao.p.peng@linux.intel.com>
- <13394075-fca0-6f2b-92a2-f1291fcec9a3@redhat.com>
- <20220810092232.GC862421@chaop.bj.intel.com>
- <00f1aa03-bc82-ffce-569b-e2d5c459992c@redhat.com>
- <YvPC87FMgF7uac7z@google.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <YvPC87FMgF7uac7z@google.com>
-X-Spam-Status: No, score=-14.5 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        ENV_AND_HDR_SPF_MATCH,FSL_HELO_FAKE,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,
-        SPF_PASS,T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL
-        autolearn=no autolearn_force=no version=3.4.6
+        Dave Hansen <dave.hansen@linux.intel.com>,
+        "x86@kernel.org" <x86@kernel.org>,
+        "H. Peter Anvin" <hpa@zytor.com>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        Eric Auger <eric.auger@redhat.com>,
+        Alex Williamson <alex.williamson@redhat.com>,
+        "Liu, Rong L" <rong.l.liu@intel.com>,
+        Zhenyu Wang <zhenyuw@linux.intel.com>,
+        Tomasz Nowicki <tn@semihalf.com>,
+        Grzegorz Jaszczyk <jaz@semihalf.com>,
+        "upstream@semihalf.com" <upstream@semihalf.com>,
+        Dmitry Torokhov <dtor@google.com>
+Subject: Re: [PATCH v2 0/5] KVM: Fix oneshot interrupts forwarding
+In-Reply-To: <3bdcda9f-ac2f-14df-2932-cf16912fe71b@semihalf.com>
+References: <20220805193919.1470653-1-dmy@semihalf.com>
+        <BL0PR11MB30429034B6D59253AF22BCE08A639@BL0PR11MB3042.namprd11.prod.outlook.com>
+        <c5d8f537-5695-42f0-88a9-de80e21f5f4c@semihalf.com>
+        <BL0PR11MB304213273FA9FAC4EBC70FF88A629@BL0PR11MB3042.namprd11.prod.outlook.com>
+        <ef9ffbde-445e-f00f-23c1-27e23b6cca4f@semihalf.com>
+        <87o7wsbngz.wl-maz@kernel.org>
+        <3bdcda9f-ac2f-14df-2932-cf16912fe71b@semihalf.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/27.1
+ (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: dmy@semihalf.com, eddie.dong@intel.com, seanjc@google.com, pbonzini@redhat.com, kvm@vger.kernel.org, tglx@linutronix.de, mingo@redhat.com, bp@alien8.de, dave.hansen@linux.intel.com, x86@kernel.org, hpa@zytor.com, linux-kernel@vger.kernel.org, eric.auger@redhat.com, alex.williamson@redhat.com, rong.l.liu@intel.com, zhenyuw@linux.intel.com, tn@semihalf.com, jaz@semihalf.com, upstream@semihalf.com, dtor@google.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+X-Spam-Status: No, score=-7.7 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_HI,
+        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-+CC Fuad
-
-On Wednesday 10 Aug 2022 at 14:38:43 (+0000), Sean Christopherson wrote:
-> > I understand Sean's suggestion about abstracting, but if the new name
-> > makes it harder to grasp and there isn't really an alternative to memfd
-> > in sight, I'm not so sure I enjoy the tried abstraction here.
+On Wed, 10 Aug 2022 18:06:53 +0100,
+Dmytro Maluka <dmy@semihalf.com> wrote:
 > 
-> ARM's pKVM implementation is potentially (hopefully) going to switch to this API
-> (as a consumer) sooner than later.  If they anticipate being able to use memfd,
-> then there's unlikely to be a second backing type any time soon.
+> Hi Marc,
 > 
-> Quentin, Will?
+> On 8/10/22 8:51 AM, Marc Zyngier wrote:
+> > On Wed, 10 Aug 2022 00:30:29 +0100,
+> > Dmytro Maluka <dmy@semihalf.com> wrote:
+> >>
+> >> On 8/9/22 10:01 PM, Dong, Eddie wrote:
+> >>>
+> >>>
+> >>>> -----Original Message-----
+> >>>> From: Dmytro Maluka <dmy@semihalf.com>
+> >>>> Sent: Tuesday, August 9, 2022 12:24 AM
+> >>>> To: Dong, Eddie <eddie.dong@intel.com>; Christopherson,, Sean
+> >>>> <seanjc@google.com>; Paolo Bonzini <pbonzini@redhat.com>;
+> >>>> kvm@vger.kernel.org
+> >>>> Cc: Thomas Gleixner <tglx@linutronix.de>; Ingo Molnar <mingo@redhat.com>;
+> >>>> Borislav Petkov <bp@alien8.de>; Dave Hansen <dave.hansen@linux.intel.com>;
+> >>>> x86@kernel.org; H. Peter Anvin <hpa@zytor.com>; linux-
+> >>>> kernel@vger.kernel.org; Eric Auger <eric.auger@redhat.com>; Alex
+> >>>> Williamson <alex.williamson@redhat.com>; Liu, Rong L <rong.l.liu@intel.com>;
+> >>>> Zhenyu Wang <zhenyuw@linux.intel.com>; Tomasz Nowicki
+> >>>> <tn@semihalf.com>; Grzegorz Jaszczyk <jaz@semihalf.com>;
+> >>>> upstream@semihalf.com; Dmitry Torokhov <dtor@google.com>
+> >>>> Subject: Re: [PATCH v2 0/5] KVM: Fix oneshot interrupts forwarding
+> >>>>
+> >>>> On 8/9/22 1:26 AM, Dong, Eddie wrote:
+> >>>>>>
+> >>>>>> The existing KVM mechanism for forwarding of level-triggered
+> >>>>>> interrupts using resample eventfd doesn't work quite correctly in the
+> >>>>>> case of interrupts that are handled in a Linux guest as oneshot
+> >>>>>> interrupts (IRQF_ONESHOT). Such an interrupt is acked to the device
+> >>>>>> in its threaded irq handler, i.e. later than it is acked to the
+> >>>>>> interrupt controller (EOI at the end of hardirq), not earlier. The
+> >>>>>> existing KVM code doesn't take that into account, which results in
+> >>>>>> erroneous extra interrupts in the guest caused by premature re-assert of an
+> >>>> unacknowledged IRQ by the host.
+> >>>>>
+> >>>>> Interesting...  How it behaviors in native side?
+> >>>>
+> >>>> In native it behaves correctly, since Linux masks such a oneshot interrupt at the
+> >>>> beginning of hardirq, so that the EOI at the end of hardirq doesn't result in its
+> >>>> immediate re-assert, and then unmasks it later, after its threaded irq handler
+> >>>> completes.
+> >>>>
+> >>>> In handle_fasteoi_irq():
+> >>>>
+> >>>> 	if (desc->istate & IRQS_ONESHOT)
+> >>>> 		mask_irq(desc);
+> >>>>
+> >>>> 	handle_irq_event(desc);
+> >>>>
+> >>>> 	cond_unmask_eoi_irq(desc, chip);
+> >>>>
+> >>>>
+> >>>> and later in unmask_threaded_irq():
+> >>>>
+> >>>> 	unmask_irq(desc);
+> >>>>
+> >>>> I also mentioned that in patch #3 description:
+> >>>> "Linux keeps such interrupt masked until its threaded handler finishes, to
+> >>>> prevent the EOI from re-asserting an unacknowledged interrupt.
+> >>>
+> >>> That makes sense. Can you include the full story in cover letter too?
+> >>
+> >> Ok, I will.
+> >>
+> >>>
+> >>>
+> >>>> However, with KVM + vfio (or whatever is listening on the resamplefd) we don't
+> >>>> check that the interrupt is still masked in the guest at the moment of EOI.
+> >>>> Resamplefd is notified regardless, so vfio prematurely unmasks the host
+> >>>> physical IRQ, thus a new (unwanted) physical interrupt is generated in the host
+> >>>> and queued for injection to the guest."
+> > 
+> > Sorry to barge in pretty late in the conversation (just been Cc'd on
+> > this), but why shouldn't the resamplefd be notified? If there has been
+> > an EOI, a new level must be made visible to the guest interrupt
+> > controller, no matter what the state of the interrupt masking is.
+> > 
+> > Whether this new level is actually *presented* to a vCPU is another
+> > matter entirely, and is arguably a problem for the interrupt
+> > controller emulation.
+> > 
+> > For example on arm64, we expect to be able to read the pending state
+> > of an interrupt from the guest irrespective of the masking state of
+> > that interrupt. Any change to the interrupt flow should preserve this.
+> 
+> I'd like to understand the problem better, so could you please give some
+> examples of cases where it is required/useful/desirable to read the
+> correct pending state of a guest interrupt?
 
-Yep, Fuad is currently trying to port the pKVM mm stuff on top of this
-series to see how well it fits, so stay tuned. I think there is still
-some room for discussion around page conversions (private->shared etc),
-and we'll need a clearer idea of what the code might look like to have a
-constructive discussion, but so far it does seem like using a memfd (the
-new private one or perhaps just memfd_secret, to be discussed) + memfd
-notifiers is a promising option.
+I'm not sure I understand the question. It is *always* desirable to
+present the correct information to the guest.
+
+For example, a guest could periodically poll the pending interrupt
+registers and only enable interrupts that are pending. Is it a good
+idea? No. Is it expected to work? Absolutely.
+
+And yes, we go out of our way to make sure these things actually work,
+because one day or another, you'll find a guest that does exactly
+that.
+
+Thanks,
+
+	M.
+
+-- 
+Without deviation from the norm, progress is not possible.
