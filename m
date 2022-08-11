@@ -2,102 +2,155 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 5CB3158F8A1
-	for <lists+kvm@lfdr.de>; Thu, 11 Aug 2022 09:54:50 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id BD69558F8A2
+	for <lists+kvm@lfdr.de>; Thu, 11 Aug 2022 09:56:04 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234280AbiHKHys (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 11 Aug 2022 03:54:48 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60570 "EHLO
+        id S234307AbiHKH4C (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 11 Aug 2022 03:56:02 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33728 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234307AbiHKHyp (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 11 Aug 2022 03:54:45 -0400
-Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D2B998E993
-        for <kvm@vger.kernel.org>; Thu, 11 Aug 2022 00:54:44 -0700 (PDT)
-Received: from pps.filterd (m0098399.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.17.1.5/8.17.1.5) with ESMTP id 27B6iH6N026945
-        for <kvm@vger.kernel.org>; Thu, 11 Aug 2022 07:54:44 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=content-type :
- mime-version : content-transfer-encoding : in-reply-to : references : to :
- from : subject : cc : message-id : date; s=pp1;
- bh=rYr+a4GvS/NBKYKhTdMu7oesP+H5CI3VpW7I/ptjvOI=;
- b=r718MaRPlqI3id/xb2+GEhDlrUZ8LwZl/MKz8NfF/4GNhUnFq7CPnSOWoT1kH2L+hRnI
- qf3GuHtheGIaDHNkTsEcfQAJfHlvHacLkzqePxRvq947NkX61cxWPL5T3mABrMPf5XjW
- sjxUbdkT29qAuPPTPgmzZu1U41zXxnRO05QtUBK0RUK3C235EBJJWy9dM0l3Xb5+tyJc
- CcamE77hEQeIhYZh+hueE3iAK7ujU9w0Sw6UmbHvlFWyoVrRUyE9lkWwl34s0hzdriCc
- ueN7y39IOwWdTpFJ9uqIqB64KxHeXlG19qv80lcLmPPniaVOeY4yRAQTr/cHhvVTzZIh 7Q== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3hvvrphtd1-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT)
-        for <kvm@vger.kernel.org>; Thu, 11 Aug 2022 07:54:44 +0000
-Received: from m0098399.ppops.net (m0098399.ppops.net [127.0.0.1])
-        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 27B6iSE0031508
-        for <kvm@vger.kernel.org>; Thu, 11 Aug 2022 07:54:44 GMT
-Received: from ppma06ams.nl.ibm.com (66.31.33a9.ip4.static.sl-reverse.com [169.51.49.102])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3hvvrphtcc-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 11 Aug 2022 07:54:43 +0000
-Received: from pps.filterd (ppma06ams.nl.ibm.com [127.0.0.1])
-        by ppma06ams.nl.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 27B7p884013896;
-        Thu, 11 Aug 2022 07:54:41 GMT
-Received: from b06cxnps3074.portsmouth.uk.ibm.com (d06relay09.portsmouth.uk.ibm.com [9.149.109.194])
-        by ppma06ams.nl.ibm.com with ESMTP id 3huwvf1q16-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 11 Aug 2022 07:54:41 +0000
-Received: from d06av24.portsmouth.uk.ibm.com (d06av24.portsmouth.uk.ibm.com [9.149.105.60])
-        by b06cxnps3074.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 27B7scJW32506188
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Thu, 11 Aug 2022 07:54:38 GMT
-Received: from d06av24.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 71E1E4203F;
-        Thu, 11 Aug 2022 07:54:38 +0000 (GMT)
-Received: from d06av24.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 4689042042;
-        Thu, 11 Aug 2022 07:54:38 +0000 (GMT)
-Received: from li-ca45c2cc-336f-11b2-a85c-c6e71de567f1.ibm.com (unknown [9.171.35.74])
-        by d06av24.portsmouth.uk.ibm.com (Postfix) with ESMTP;
-        Thu, 11 Aug 2022 07:54:38 +0000 (GMT)
-Content-Type: text/plain; charset="utf-8"
+        with ESMTP id S233535AbiHKHz7 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 11 Aug 2022 03:55:59 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id D820312D04
+        for <kvm@vger.kernel.org>; Thu, 11 Aug 2022 00:55:57 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1660204556;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:
+         content-transfer-encoding:content-transfer-encoding;
+        bh=iVXrwd35fMsbVFUzhqFqFRUwBHy2TM6hy8L8OrvAwkQ=;
+        b=N2Ejgm2Xge+dS7Z2sUItQXMtGvFCAasQgks6CLSIjX1neZLIXsQxTzHg/S+Ja+vDmTeXcE
+        TYPTARxbG6ZCMbYtqpWgtpfXDDQmQanfjPfAENUGuvjkHCGWxNY5A+jGaQDepjdpbS0iVm
+        9e7RZeJ33knkmhGepaSHFIxjQbdhZYo=
+Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
+ [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-17-gx9w36wYO2WA-Vp_6awxnQ-1; Thu, 11 Aug 2022 03:55:55 -0400
+X-MC-Unique: gx9w36wYO2WA-Vp_6awxnQ-1
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.rdu2.redhat.com [10.11.54.2])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id B759119705A7;
+        Thu, 11 Aug 2022 07:55:54 +0000 (UTC)
+Received: from virtlab701.virt.lab.eng.bos.redhat.com (virtlab701.virt.lab.eng.bos.redhat.com [10.19.152.228])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 9A7D140D2827;
+        Thu, 11 Aug 2022 07:55:54 +0000 (UTC)
+From:   Paolo Bonzini <pbonzini@redhat.com>
+To:     torvalds@linux-foundation.org
+Cc:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org
+Subject: [GIT PULL] Second batch of KVM changes for Linux 5.20 merge window
+Date:   Thu, 11 Aug 2022 03:55:54 -0400
+Message-Id: <20220811075554.198111-1-pbonzini@redhat.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
-In-Reply-To: <20220810151302.67aa3d3c@p-imbrenda>
-References: <20220722060043.733796-1-nrb@linux.ibm.com> <20220722060043.733796-4-nrb@linux.ibm.com> <20220810120822.51ead12d@p-imbrenda> <166013456744.24812.12686537606143025741@localhost.localdomain> <20220810151302.67aa3d3c@p-imbrenda>
-To:     Claudio Imbrenda <imbrenda@linux.ibm.com>
-From:   Nico Boehr <nrb@linux.ibm.com>
-Subject: Re: [kvm-unit-tests PATCH v3 3/4] s390x: add extint loop test
-Cc:     kvm@vger.kernel.org, frankja@linux.ibm.com, thuth@redhat.com
-Message-ID: <166020447794.24812.2478143576932288604@localhost.localdomain>
-User-Agent: alot/0.8.1
-Date:   Thu, 11 Aug 2022 09:54:37 +0200
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: NH3phdTcDy4xPAoPdvSqsgIr4hOWiZQs
-X-Proofpoint-ORIG-GUID: VUYYel9HfWiA-FrVQz2sMJWMP3QxahGB
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.205,Aquarius:18.0.883,Hydra:6.0.517,FMLib:17.11.122.1
- definitions=2022-08-11_03,2022-08-10_01,2022-06-22_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 adultscore=0 spamscore=0
- lowpriorityscore=0 clxscore=1015 phishscore=0 mlxscore=0 impostorscore=0
- suspectscore=0 bulkscore=0 priorityscore=1501 mlxlogscore=641
- malwarescore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2207270000 definitions=main-2208110020
-X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_EF,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_PASS,
-        T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
+Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 2.84 on 10.11.54.2
+X-Spam-Status: No, score=-3.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,
+        SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Quoting Claudio Imbrenda (2022-08-10 15:13:02)
-[...]
-> just add a comment to explain that
+Linus,
 
-Yes makes sense, thanks. I came up with this:
+The following changes since commit 6614a3c3164a5df2b54abb0b3559f51041cf705b:
 
-/*
- * When the interrupt loop occurs, this instruction will never be
- * executed.
- * In case the loop isn't triggered return to pgm_old_psw so we can fail
- * fast and don't have to rely on the kvm-unit-tests timeout.
- */
+  Merge tag 'mm-stable-2022-08-03' of git://git.kernel.org/pub/scm/linux/kernel/git/akpm/mm (2022-08-05 16:32:45 -0700)
+
+are available in the Git repository at:
+
+  https://git.kernel.org/pub/scm/virt/kvm/kvm.git tags/for-linus
+
+for you to fetch changes up to 19a7cc817a380f7a412d7d76e145e9e2bc47e52f:
+
+  KVM: x86/MMU: properly format KVM_CAP_VM_DISABLE_NX_HUGE_PAGES capability table (2022-08-11 02:35:37 -0400)
+
+----------------------------------------------------------------
+* Xen timer fixes
+
+* Documentation formatting fixes
+
+* Make rseq selftest compatible with glibc-2.35
+
+* Fix handling of illegal LEA reg, reg
+
+* Cleanup creation of debugfs entries
+
+* Fix steal time cache handling bug
+
+* Fixes for MMIO caching
+
+* Optimize computation of number of LBRs
+
+* Fix uninitialized field in guest_maxphyaddr < host_maxphyaddr path
+
+----------------------------------------------------------------
+Bagas Sanjaya (2):
+      Documentation: KVM: extend KVM_CAP_VM_DISABLE_NX_HUGE_PAGES heading underline
+      KVM: x86/MMU: properly format KVM_CAP_VM_DISABLE_NX_HUGE_PAGES capability table
+
+Coleman Dietsch (2):
+      KVM: x86/xen: Initialize Xen timer only once
+      KVM: x86/xen: Stop Xen timer before changing IRQ
+
+Gavin Shan (2):
+      KVM: selftests: Make rseq compatible with glibc-2.35
+      KVM: selftests: Use getcpu() instead of sched_getcpu() in rseq_test
+
+Michal Luczaj (1):
+      KVM: x86: emulator: Fix illegal LEA handling
+
+Mingwei Zhang (1):
+      KVM: x86/mmu: rename trace function name for asynchronous page fault
+
+Oliver Upton (5):
+      KVM: Shove vm stats_id init into kvm_create_vm()
+      KVM: Shove vcpu stats_id init into kvm_vcpu_init()
+      KVM: Get an fd before creating the VM
+      KVM: Pass the name of the VM fd to kvm_create_vm_debugfs()
+      KVM: Actually create debugfs in kvm_create_vm()
+
+Paolo Bonzini (3):
+      selftests: kvm: fix compilation
+      KVM: x86: revalidate steal time cache if MSR value changes
+      KVM: x86: do not report preemption if the steal time cache is stale
+
+Sean Christopherson (9):
+      KVM: x86: Bug the VM if an accelerated x2APIC trap occurs on a "bad" reg
+      KVM: x86: Tag kvm_mmu_x86_module_init() with __init
+      KVM: x86/mmu: Fully re-evaluate MMIO caching when SPTE masks change
+      KVM: SVM: Disable SEV-ES support if MMIO caching is disable
+      KVM: x86/mmu: Add sanity check that MMIO SPTE mask doesn't overlap gen
+      KVM: selftests: Test all possible "invalid" PERF_CAPABILITIES.LBR_FMT vals
+      KVM: x86: Refresh PMU after writes to MSR_IA32_PERF_CAPABILITIES
+      KVM: VMX: Use proper type-safe functions for vCPU => LBRs helpers
+      KVM: VMX: Adjust number of LBR records for PERF_CAPABILITIES at refresh
+
+Yu Zhang (1):
+      KVM: X86: avoid uninitialized 'fault.async_page_fault' from fixed-up #PF
+
+ Documentation/virt/kvm/api.rst                     | 10 +--
+ arch/x86/include/asm/kvm_host.h                    |  2 +-
+ arch/x86/kvm/emulate.c                             |  6 +-
+ arch/x86/kvm/lapic.c                               |  8 ++-
+ arch/x86/kvm/mmu.h                                 |  2 +
+ arch/x86/kvm/mmu/mmu.c                             |  8 ++-
+ arch/x86/kvm/mmu/spte.c                            | 28 ++++++++
+ arch/x86/kvm/mmu/spte.h                            | 17 ++++-
+ arch/x86/kvm/svm/sev.c                             | 10 +++
+ arch/x86/kvm/svm/svm.c                             |  9 ++-
+ arch/x86/kvm/vmx/pmu_intel.c                       | 12 +---
+ arch/x86/kvm/vmx/vmx.h                             | 29 +++++---
+ arch/x86/kvm/x86.c                                 | 13 ++--
+ arch/x86/kvm/xen.c                                 | 31 +++++----
+ include/trace/events/kvm.h                         |  2 +-
+ tools/testing/selftests/kvm/Makefile               |  7 +-
+ tools/testing/selftests/kvm/rseq_test.c            | 58 ++++++++--------
+ .../selftests/kvm/x86_64/vmx_pmu_caps_test.c       | 17 +++--
+ virt/kvm/kvm_main.c                                | 81 ++++++++++++----------
+ 19 files changed, 221 insertions(+), 129 deletions(-)
+
