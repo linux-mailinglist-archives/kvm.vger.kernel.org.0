@@ -2,141 +2,163 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id A50ED58FD52
-	for <lists+kvm@lfdr.de>; Thu, 11 Aug 2022 15:22:39 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id D4BB858FD40
+	for <lists+kvm@lfdr.de>; Thu, 11 Aug 2022 15:18:44 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235314AbiHKNWh (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 11 Aug 2022 09:22:37 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34544 "EHLO
+        id S234955AbiHKNSo (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 11 Aug 2022 09:18:44 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59850 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235108AbiHKNWf (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 11 Aug 2022 09:22:35 -0400
-Received: from mga03.intel.com (mga03.intel.com [134.134.136.65])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C1864816AE;
-        Thu, 11 Aug 2022 06:22:33 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1660224153; x=1691760153;
-  h=date:from:to:cc:subject:message-id:reply-to:references:
-   mime-version:in-reply-to;
-  bh=TXGp2l7srz7CG/35HC62yaH3SzOuZ/KTY0IN1dEpGAI=;
-  b=T5Vzi5QzJt1rxP32GUX/mrs4MWVVTlwuxjMi9Y89Am1NkOMIJGTnmTNd
-   Zdg6TTt9BernHTVXvKdFu70eG2bDgOCyY2Tj7pJqxNSBByrt4YQuF1DVh
-   ySRvMMo6Bqi+PwOJXo7qFkt5EZjjljg1mMZ+4DyR5NxOPWuVZ3vmWA90X
-   L2+DuVmzXchnKnjwWqaCWWg+M0nfRWTXBNSMoHgoSYhOU7qUQeUr1XeCs
-   0Mz38l6tm5lLClygUQcHARxAM0uo6S45FtDw0Zaf0syOJvBHvIxgh3eHU
-   qIR8fakSdWch+/EOw1YROjUJuDqi1vAnIEBsIraZu7CQtL4STibM3njJg
-   w==;
-X-IronPort-AV: E=McAfee;i="6400,9594,10435"; a="292602176"
-X-IronPort-AV: E=Sophos;i="5.93,228,1654585200"; 
-   d="scan'208";a="292602176"
-Received: from fmsmga007.fm.intel.com ([10.253.24.52])
-  by orsmga103.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 11 Aug 2022 06:22:33 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.93,228,1654585200"; 
-   d="scan'208";a="608920719"
-Received: from chaop.bj.intel.com (HELO localhost) ([10.240.193.75])
-  by fmsmga007.fm.intel.com with ESMTP; 11 Aug 2022 06:22:23 -0700
-Date:   Thu, 11 Aug 2022 21:17:38 +0800
-From:   Chao Peng <chao.p.peng@linux.intel.com>
-To:     David Hildenbrand <david@redhat.com>
-Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
-        linux-mm@kvack.org, linux-fsdevel@vger.kernel.org,
-        linux-api@vger.kernel.org, linux-doc@vger.kernel.org,
-        qemu-devel@nongnu.org, linux-kselftest@vger.kernel.org,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Jonathan Corbet <corbet@lwn.net>,
-        Sean Christopherson <seanjc@google.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        x86@kernel.org, "H . Peter Anvin" <hpa@zytor.com>,
-        Hugh Dickins <hughd@google.com>,
-        Jeff Layton <jlayton@kernel.org>,
-        "J . Bruce Fields" <bfields@fieldses.org>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        Shuah Khan <shuah@kernel.org>, Mike Rapoport <rppt@kernel.org>,
-        Steven Price <steven.price@arm.com>,
-        "Maciej S . Szmigiero" <mail@maciej.szmigiero.name>,
-        Vlastimil Babka <vbabka@suse.cz>,
-        Vishal Annapurve <vannapurve@google.com>,
-        Yu Zhang <yu.c.zhang@linux.intel.com>,
-        "Kirill A . Shutemov" <kirill.shutemov@linux.intel.com>,
-        luto@kernel.org, jun.nakajima@intel.com, dave.hansen@intel.com,
-        ak@linux.intel.com, aarcange@redhat.com, ddutile@redhat.com,
-        dhildenb@redhat.com, Quentin Perret <qperret@google.com>,
-        Michael Roth <michael.roth@amd.com>, mhocko@suse.com,
-        Muchun Song <songmuchun@bytedance.com>
-Subject: Re: [PATCH v7 05/14] mm/memfd: Introduce MFD_INACCESSIBLE flag
-Message-ID: <20220811131738.GA916119@chaop.bj.intel.com>
-Reply-To: Chao Peng <chao.p.peng@linux.intel.com>
-References: <20220706082016.2603916-1-chao.p.peng@linux.intel.com>
- <20220706082016.2603916-6-chao.p.peng@linux.intel.com>
- <203c752f-9439-b5ae-056c-27b2631dcb81@redhat.com>
- <20220810093741.GE862421@chaop.bj.intel.com>
- <64ab9678-c72d-b6d9-8532-346cc9c06814@redhat.com>
+        with ESMTP id S234050AbiHKNSm (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 11 Aug 2022 09:18:42 -0400
+Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9D48D7D7B1
+        for <kvm@vger.kernel.org>; Thu, 11 Aug 2022 06:18:41 -0700 (PDT)
+Received: from pps.filterd (m0098399.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.17.1.5/8.17.1.5) with ESMTP id 27BCPfsY003946
+        for <kvm@vger.kernel.org>; Thu, 11 Aug 2022 13:18:41 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=from : to : cc : subject
+ : date : message-id : in-reply-to : references : mime-version :
+ content-transfer-encoding; s=pp1;
+ bh=UsH2trbXqUjzVwhYOja1tdE0vFkXGfhYwz9Tneiq40A=;
+ b=Dz854EUQ5ribUbAedr694CqZSIKqmExiMXNkv/nXOP946Fhzl+8J+YxyPWdKLxQu7xq7
+ iN9N+N6lP7Br4E1coEZldS3KeDpN3M297AJRE/WNKTjGu9ghjozYyhvWKIirmgkUxNIs
+ UX0xV6tzOu/e/zCCdQOyWXciVQHcuZbNzZWHkrY3emAGxmxuK+/Qj2x/KGF2gTyEia4j
+ rHHwJMCQOHPrJhrKOCncHcfUYEELydfJ27c+sRYElwwdtzMJyFQLJsJfKavgI+WMw52t
+ xdk9IH3+Wu0MMVtcNDc2ro0lKgj9YU/MeteBFK+nh3W3Czd1dXlgVOCT55p4kDKgjxwS jw== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3hw1rt1x8m-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT)
+        for <kvm@vger.kernel.org>; Thu, 11 Aug 2022 13:18:41 +0000
+Received: from m0098399.ppops.net (m0098399.ppops.net [127.0.0.1])
+        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 27BCRgeG012258
+        for <kvm@vger.kernel.org>; Thu, 11 Aug 2022 13:18:40 GMT
+Received: from ppma06ams.nl.ibm.com (66.31.33a9.ip4.static.sl-reverse.com [169.51.49.102])
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3hw1rt1x7v-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Thu, 11 Aug 2022 13:18:40 +0000
+Received: from pps.filterd (ppma06ams.nl.ibm.com [127.0.0.1])
+        by ppma06ams.nl.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 27BD5sXp009886;
+        Thu, 11 Aug 2022 13:18:38 GMT
+Received: from b06avi18878370.portsmouth.uk.ibm.com (b06avi18878370.portsmouth.uk.ibm.com [9.149.26.194])
+        by ppma06ams.nl.ibm.com with ESMTP id 3huwvf225c-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Thu, 11 Aug 2022 13:18:38 +0000
+Received: from b06wcsmtp001.portsmouth.uk.ibm.com (b06wcsmtp001.portsmouth.uk.ibm.com [9.149.105.160])
+        by b06avi18878370.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 27BDIqgs30081438
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Thu, 11 Aug 2022 13:18:52 GMT
+Received: from b06wcsmtp001.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 1394CA405B;
+        Thu, 11 Aug 2022 13:18:35 +0000 (GMT)
+Received: from b06wcsmtp001.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 63F6DA4054;
+        Thu, 11 Aug 2022 13:18:34 +0000 (GMT)
+Received: from linux6.. (unknown [9.114.12.104])
+        by b06wcsmtp001.portsmouth.uk.ibm.com (Postfix) with ESMTP;
+        Thu, 11 Aug 2022 13:18:34 +0000 (GMT)
+From:   Janosch Frank <frankja@linux.ibm.com>
+To:     imbrenda@linux.ibm.com
+Cc:     kvm@vger.kernel.org, seiden@linux.ibm.com, nrb@linux.ibm.com,
+        scgl@linux.ibm.com, thuth@redhat.com
+Subject: [kvm-unit-tests PATCH v4] s390x: uv-host: Add access checks for donated memory
+Date:   Thu, 11 Aug 2022 13:18:24 +0000
+Message-Id: <20220811131824.25847-1-frankja@linux.ibm.com>
+X-Mailer: git-send-email 2.34.1
+In-Reply-To: <20220803114602.5359a8a4@p-imbrenda>
+References: <20220803114602.5359a8a4@p-imbrenda>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <64ab9678-c72d-b6d9-8532-346cc9c06814@redhat.com>
-X-Spam-Status: No, score=-4.9 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,SPF_HELO_NONE,
-        SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no
-        version=3.4.6
+Content-Transfer-Encoding: 8bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-ORIG-GUID: iPAjPfi2s8CqS7NTp4c5Vd1jSThJDn8l
+X-Proofpoint-GUID: 6x1RXqwyogF1IwZljwc3fCkNfG9Zfcjn
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.205,Aquarius:18.0.883,Hydra:6.0.517,FMLib:17.11.122.1
+ definitions=2022-08-11_10,2022-08-11_01,2022-06-22_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 lowpriorityscore=0
+ clxscore=1015 priorityscore=1501 malwarescore=0 phishscore=0 spamscore=0
+ adultscore=0 mlxlogscore=888 bulkscore=0 suspectscore=0 impostorscore=0
+ mlxscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2207270000 definitions=main-2208110041
+X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_EF,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_PASS,
+        T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Aug 10, 2022 at 11:55:19AM +0200, David Hildenbrand wrote:
-> On 10.08.22 11:37, Chao Peng wrote:
-> > On Fri, Aug 05, 2022 at 03:28:50PM +0200, David Hildenbrand wrote:
-> >> On 06.07.22 10:20, Chao Peng wrote:
-> >>> Introduce a new memfd_create() flag indicating the content of the
-> >>> created memfd is inaccessible from userspace through ordinary MMU
-> >>> access (e.g., read/write/mmap). However, the file content can be
-> >>> accessed via a different mechanism (e.g. KVM MMU) indirectly.
-> >>>
-> >>> It provides semantics required for KVM guest private memory support
-> >>> that a file descriptor with this flag set is going to be used as the
-> >>> source of guest memory in confidential computing environments such
-> >>> as Intel TDX/AMD SEV but may not be accessible from host userspace.
-> >>>
-> >>> The flag can not coexist with MFD_ALLOW_SEALING, future sealing is
-> >>> also impossible for a memfd created with this flag.
-> >>
-> >> It's kind of weird to have it that way. Why should the user have to
-> >> care? It's the notifier requirement to have that, no?
-> >>
-> >> Why can't we handle that when register a notifier? If anything is
-> >> already mapped, fail registering the notifier if the notifier has these
-> >> demands. If registering succeeds, block it internally.
-> >>
-> >> Or what am I missing? We might not need the memfile set flag semantics
-> >> eventually and would not have to expose such a flag to user space.
-> > 
-> > This makes sense if doable. The major concern was: is there a reliable
-> > way to detect this (already mapped) at the time of memslot registering.
-> 
-> If too complicated, we could simplify to "was this ever mapped" and fail
-> for now. Hooking into shmem_mmap() might be sufficient for that to get
-> notified about the first mmap.
-> 
-> As an alternative, mapping_mapped() or similar *might* do what we want.
+Let's check if the UV really protected all the memory we donated.
 
-mapping_mapped() sounds the right one, I remember SEV people want first
-map then unmap. "was this ever mapped" may not work for them.
+Signed-off-by: Janosch Frank <frankja@linux.ibm.com>
+Reviewed-by: Nico Boehr <nrb@linux.ibm.com>
+---
+ s390x/uv-host.c | 37 +++++++++++++++++++++++++++++++++++++
+ 1 file changed, 37 insertions(+)
 
-Thanks,
-Chao
-> 
-> 
-> 
-> -- 
-> Thanks,
-> 
-> David / dhildenb
+diff --git a/s390x/uv-host.c b/s390x/uv-host.c
+index dfcebe10..8d2da5d3 100644
+--- a/s390x/uv-host.c
++++ b/s390x/uv-host.c
+@@ -45,6 +45,32 @@ static void cpu_loop(void)
+ 	for (;;) {}
+ }
+ 
++/*
++ * Checks if a memory area is protected as secure memory.
++ * Will return true if all pages are protected, false otherwise.
++ */
++static bool access_check_3d(uint8_t *access_ptr, uint64_t len)
++{
++	assert(!(len & ~PAGE_MASK));
++	assert(!((uint64_t)access_ptr & ~PAGE_MASK));
++
++	while (len) {
++		expect_pgm_int();
++		READ_ONCE(*access_ptr);
++		if (clear_pgm_int() != PGM_INT_CODE_SECURE_STOR_ACCESS)
++			return false;
++		expect_pgm_int();
++		WRITE_ONCE(*access_ptr, 42);
++		if (clear_pgm_int() != PGM_INT_CODE_SECURE_STOR_ACCESS)
++			return false;
++
++		access_ptr += PAGE_SIZE;
++		len -= PAGE_SIZE;
++	}
++
++	return true;
++}
++
+ static struct cmd_list cmds[] = {
+ 	{ "init", UVC_CMD_INIT_UV, sizeof(struct uv_cb_init), BIT_UVC_CMD_INIT_UV },
+ 	{ "create conf", UVC_CMD_CREATE_SEC_CONF, sizeof(struct uv_cb_cgc), BIT_UVC_CMD_CREATE_SEC_CONF },
+@@ -332,6 +358,10 @@ static void test_cpu_create(void)
+ 	report(rc == 0 && uvcb_csc.header.rc == UVC_RC_EXECUTED &&
+ 	       uvcb_csc.cpu_handle, "success");
+ 
++	rc = access_check_3d((uint8_t *)uvcb_csc.stor_origin,
++			     uvcb_qui.cpu_stor_len);
++	report(rc, "Storage protection");
++
+ 	tmp = uvcb_csc.stor_origin;
+ 	uvcb_csc.stor_origin = (unsigned long)memalign(PAGE_SIZE, uvcb_qui.cpu_stor_len);
+ 	rc = uv_call(0, (uint64_t)&uvcb_csc);
+@@ -430,6 +460,13 @@ static void test_config_create(void)
+ 	rc = uv_call(0, (uint64_t)&uvcb_cgc);
+ 	report(rc == 0 && uvcb_cgc.header.rc == UVC_RC_EXECUTED, "successful");
+ 
++	rc = access_check_3d((uint8_t *)uvcb_cgc.conf_var_stor_origin, vsize);
++	report(rc, "Base storage protection");
++
++	rc = access_check_3d((uint8_t *)uvcb_cgc.conf_base_stor_origin,
++			     uvcb_qui.conf_base_phys_stor_len);
++	report(rc, "Variable storage protection");
++
+ 	uvcb_cgc.header.rc = 0;
+ 	uvcb_cgc.header.rrc = 0;
+ 	tmp = uvcb_cgc.guest_handle;
+-- 
+2.34.1
+
