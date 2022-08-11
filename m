@@ -2,275 +2,1299 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 989325905B6
-	for <lists+kvm@lfdr.de>; Thu, 11 Aug 2022 19:21:46 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 103245905BA
+	for <lists+kvm@lfdr.de>; Thu, 11 Aug 2022 19:22:21 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235108AbiHKRVm (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 11 Aug 2022 13:21:42 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53056 "EHLO
+        id S236708AbiHKRWR (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 11 Aug 2022 13:22:17 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53546 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234753AbiHKRVW (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 11 Aug 2022 13:21:22 -0400
-Received: from NAM04-BN8-obe.outbound.protection.outlook.com (mail-bn8nam04on2076.outbound.protection.outlook.com [40.107.100.76])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id ADE40615D;
-        Thu, 11 Aug 2022 10:18:57 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=MZSaBef4TEsOmXRDVarUw+7ZrGNXv2K756yktGPhrOlVVGXAUCcQvxii/MHrM8TXXTF+JRzP9B1zwfR1AO5B34aC1kVoccDvhMuEfCwuHug/v0z8Eu3fBOKizfta1ft5FzazMy3BGYMoFhJsxaIZYWTV43giqDyW85EJd1czC7cVafNh9Eoxi+zMvosqDcRTT18SecutEU1V4rciEHfK50pXR6Vusfwp7Vr3rv7OmhzmpL3yWBAizCvgOw1EvJ2f9O4jXP6U+DBCATiCgf6pUUYHvXhv13qEoNKaOEbfCQu/cAPiQcPTa665AcF+pFqDX7slg0qJPKvzJROwb+fQ/g==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=U0Q+GMF8RnpImoOKnalWiQCx1kkpxe9UeWby1WECuPo=;
- b=A8HO17JKeO5qACAGm5sV3V8Oktd/wSvWEADN6Mz4/ZCgwzPEjDpz9DZVauE5yXvaoJyrCRpfV2t7xmXpY/IpAs0HFnBUXWCJCKuobYhN56IX4T0iirDrQAaRubB5ItaJD+oPljhERpPJAWOvOpZ7NWXDsHfnbw1G4oQixlSHkSkRVi2PDZUTvSToT1qfZr07P3Tri9rWMUCwZZRaO2YeYyCBILe8r1f5VI06QQBVntk/Ac/GylxzMKWVwOk/NG/zcNL0sZja/EiM8tFO2MIxk0x9tN/Y7XqEEhgAckKVYSU/NHBDFhHgtlfttxHjRJ0Uat8qjVubTC6ewJBWnsU+Pg==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
- header.d=amd.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=U0Q+GMF8RnpImoOKnalWiQCx1kkpxe9UeWby1WECuPo=;
- b=DxS3JzX7bhK0Q6a6xk0lm4NK75h6bnkTH6HPH7w3tuZmIphCK9ckWD70FOQu22w8LCmE8BC4IG+N0TtgSiL8OJfTsH5IVOA4FprlJGP59Hv8NvSIzT0j1fFAJdPa9KQ59WJ2mAXn3zyvWnlaIwzAnr6fNgvqbNLmAKBLhffCrTU=
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=amd.com;
-Received: from DS7PR12MB6309.namprd12.prod.outlook.com (2603:10b6:8:96::19) by
- BN6PR12MB1331.namprd12.prod.outlook.com (2603:10b6:404:17::16) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.5525.10; Thu, 11 Aug 2022 17:18:55 +0000
-Received: from DS7PR12MB6309.namprd12.prod.outlook.com
- ([fe80::d9f4:5879:843b:55da]) by DS7PR12MB6309.namprd12.prod.outlook.com
- ([fe80::d9f4:5879:843b:55da%9]) with mapi id 15.20.5525.011; Thu, 11 Aug 2022
- 17:18:54 +0000
-Message-ID: <9dc91ce8-4cb6-37e6-4c25-27a72dc11dd0@amd.com>
-Date:   Thu, 11 Aug 2022 22:48:28 +0530
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.11.0
-Subject: Re: [PATCH v7 00/14] KVM: mm: fd-based approach for supporting KVM
- guest private memory
-Content-Language: en-US
-To:     "Gupta, Pankaj" <pankaj.gupta@amd.com>,
-        Chao Peng <chao.p.peng@linux.intel.com>,
-        Sean Christopherson <seanjc@google.com>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>,
-        Jonathan Corbet <corbet@lwn.net>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        x86@kernel.org, "H . Peter Anvin" <hpa@zytor.com>,
-        Hugh Dickins <hughd@google.com>,
-        Jeff Layton <jlayton@kernel.org>,
-        "J . Bruce Fields" <bfields@fieldses.org>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        Shuah Khan <shuah@kernel.org>, Mike Rapoport <rppt@kernel.org>,
-        Steven Price <steven.price@arm.com>,
-        "Maciej S . Szmigiero" <mail@maciej.szmigiero.name>,
-        Vlastimil Babka <vbabka@suse.cz>,
-        Vishal Annapurve <vannapurve@google.com>,
-        Yu Zhang <yu.c.zhang@linux.intel.com>,
-        "Kirill A . Shutemov" <kirill.shutemov@linux.intel.com>,
-        luto@kernel.org, jun.nakajima@intel.com, dave.hansen@intel.com,
-        ak@linux.intel.com, david@redhat.com, aarcange@redhat.com,
-        ddutile@redhat.com, dhildenb@redhat.com,
-        Quentin Perret <qperret@google.com>,
-        Michael Roth <michael.roth@amd.com>, mhocko@suse.com,
-        Muchun Song <songmuchun@bytedance.com>, bharata@amd.com,
-        kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
-        linux-mm@kvack.org, linux-kselftest@vger.kernel.org,
-        linux-api@vger.kernel.org, linux-doc@vger.kernel.org,
-        qemu-devel@nongnu.org, linux-fsdevel@vger.kernel.org
-References: <20220706082016.2603916-1-chao.p.peng@linux.intel.com>
- <b21f41e5-0322-bbfb-b9c2-db102488592d@amd.com>
- <9e86daea-5619-a216-fe02-0562cf14c501@amd.com>
-From:   "Nikunj A. Dadhania" <nikunj@amd.com>
-In-Reply-To: <9e86daea-5619-a216-fe02-0562cf14c501@amd.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-X-ClientProxiedBy: MAXP287CA0011.INDP287.PROD.OUTLOOK.COM
- (2603:1096:a00:49::24) To DS7PR12MB6309.namprd12.prod.outlook.com
- (2603:10b6:8:96::19)
+        with ESMTP id S236251AbiHKRWD (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 11 Aug 2022 13:22:03 -0400
+Received: from mga09.intel.com (mga09.intel.com [134.134.136.24])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C00C055B6;
+        Thu, 11 Aug 2022 10:19:44 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1660238384; x=1691774384;
+  h=message-id:date:mime-version:subject:to:cc:references:
+   from:in-reply-to:content-transfer-encoding;
+  bh=HaM7ltJcP71ySGrHR3YRze6Z8RdSBuajt+u9PP2+jLA=;
+  b=Xq30Rb827YiRX21OcKvJtI7NwvBXnAvs1kCunr2Mvx8V2q6O3nYlUdZA
+   D88ulFfFlD3spXr/fDzft4otEs3bz8XIT1vlvfWyr5ZcXgomDB6nMpJVd
+   HhcsiqCJC0j49aIf2WwZ/aAD6czMcVzDz3JEOuushj/1r0cRXNDeQ3jew
+   SwXbRhLcW+skWzozgKwXo49/+/dMFRww2SRtLBy/0wI19gH9kA2yk3fBN
+   IhD9mKqOluP9ctoeuXJZ5YNmWNFkLXrEkISKwNnXKEV2l5M91BNvadSUl
+   +Z4Dy3alI7+hlz29OPH0++zETd4vPoNMl2YKR9YGUEqK0q9JNVHJUP3e+
+   w==;
+X-IronPort-AV: E=McAfee;i="6400,9594,10436"; a="292206221"
+X-IronPort-AV: E=Sophos;i="5.93,230,1654585200"; 
+   d="scan'208";a="292206221"
+Received: from fmsmga008.fm.intel.com ([10.253.24.58])
+  by orsmga102.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 11 Aug 2022 10:19:44 -0700
+X-IronPort-AV: E=Sophos;i="5.93,230,1654585200"; 
+   d="scan'208";a="665467167"
+Received: from ahunter6-mobl1.ger.corp.intel.com (HELO [10.0.2.15]) ([10.252.35.150])
+  by fmsmga008-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 11 Aug 2022 10:19:41 -0700
+Message-ID: <a17cff0a-44d4-5d36-f08f-82d304b217bc@intel.com>
+Date:   Thu, 11 Aug 2022 20:19:36 +0300
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: 379cd098-9b17-488d-83c1-08da7bbd9171
-X-MS-TrafficTypeDiagnostic: BN6PR12MB1331:EE_
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: hc5lnYGd2vo0XhUDJcP36nHWl9vMGYwfiHWkAwwBnuDDo9wx2AVhNarl6CPGUe/XmbKOvq7CsflgDLlFw7Jf5zutvXURws1N23muzArCppBlkAViL3Hy5c+GcclFEOdsfvtr1neAU5AU8xrOUqTtPVC7hN7GupGPBUBSjFhogsj7fVipssZw9OfoiPmaspNG5/bE32d2uv5w9ZnL2hrhcr5fed3utQKJaBLswubr66xJi7eunVhLBa3XalQkpcRaBecNKrcZvLTIJ8LVw6cKkrF1v3Eqq18Gb4upnIfePuCdhsUOnIFIEPPj0mI8OWmuSLuykyjbBP6ZyPlqRVy6Gr8VpQeRIG7b/AphgDt7gvhHkRTrbcKa6OT2q5V+oH+A4pAfemsNwiJ5E/kAmcxKD86eqGT5mT2s4bKqZrl93eLCAZ7APsuQ/a4XQ6WyZTkojY3MGSOugWYNogw2O/Av1vLh6iDan8JtQ89jFuGekApn2KFzP7q0mHURFO3buof7WP2BTtR3/0HycTz4u169cSRrCcLtwWuGzwVKpiI6TBAH29vhwHP9IM+TnFM7hts8Zyij8aOJPwXbULOdiLcVoyFjtIK94nf0tgEltDXYnsUP0f6lXdPX7eFWJTse/wShP7oMx1YrKpWAK6C6RYgZdSv1XLc0SfP9gYB1jmVMg9ec5NbhJDSa01h1uwGlD1lgUrLlUAK5xLorGCiZw+NKtli52i/1b1mizyXXOSKoGwpQt9r69D7uTGfLJ2DeULtVQ1UsWJ87djWag6uXDFiOqbkDkSHf+T8ret2NnvZcNrZZLhilisG0FVEBILHhoicd6QDdtNGJvDICQalSs0fbuhW6ZZiJWDNcGCs9YQIjJT3iMCbEG40XuxN91ZVhWvTEyil18Oj2zNEKlrOaaYDQMw==
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DS7PR12MB6309.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230016)(4636009)(136003)(396003)(376002)(39860400002)(346002)(366004)(6486002)(966005)(31696002)(4326008)(2906002)(7406005)(38100700002)(8676002)(66556008)(66946007)(66476007)(5660300002)(8936002)(316002)(110136005)(54906003)(36756003)(6506007)(53546011)(41300700001)(186003)(26005)(7416002)(31686004)(6666004)(2616005)(478600001)(83380400001)(6512007)(45980500001)(43740500002);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?dVB6YjYrcFEyeXdqSGsveVFwSGN2MG1KS0xydE9UMjdvMzA3MWJtSjhhSElr?=
- =?utf-8?B?clRFZUhoWEdJSUxhMFEvUWNXVmNGZnR2eEdQM1FCV2RwSjBqSzcxTWRBaWlz?=
- =?utf-8?B?M1Q0cVFuUDVXakhBdGhWS1VtczRxYlV3NEk5ZlpyZ24rZzZMN2FFRjh4a0FU?=
- =?utf-8?B?Uk5VUUU1bGhycFB6SjlqVU1EMWlXaHFFSFFkWjRPWGN4bVdKMVYyNkhJdEx6?=
- =?utf-8?B?eVg5cUsrVk11RStYTGhzSVN2b0ZMUWhqaVEyOFdFZDhvclVLckZGajBwMzFD?=
- =?utf-8?B?a1FhK1JTZDEvOXpneU5ZY1RkS2VONldJcmdweHo2blRvQzVrYWJNck85SFRZ?=
- =?utf-8?B?cWtuK282VUo3cXRoMStPV2dwV09qdDlnNWdUek9DNThTZWhKZ2FkOTJNaVhp?=
- =?utf-8?B?ZzNkMlM2SlQ2Z04xanpqUWM2b2liK3FYUXdvWmhxU0dFbHpxMG1qU1JNa3JF?=
- =?utf-8?B?RkV5cUhnZFhucExEOXd4dUF6RDV5OS83cnRjQWtvQk5RL3gxMGpYMUpXOGFn?=
- =?utf-8?B?WDFZSFlqemhIYjZ4SGo3YWJDMEp4TlJNektOMHlCN1VIUlRMZk1oRXlHOGg5?=
- =?utf-8?B?RjlURjBYZ0tuVVdoVWx0TFhRNEJ4aWJMZElIR2lhZFc3eElBT2dwM092NG5E?=
- =?utf-8?B?ZjRpdThTUlpxWTVvZC93ZFg4OTh3SjJGblBlN0NFZytTNTVvcHpPN3pGOVJR?=
- =?utf-8?B?MWFGeXo5ZTIwRDhUTlVZVVdsaEZMdnVIeXJwVmlsaWlOSUFZZEJEVTlVdGl6?=
- =?utf-8?B?d0FkM0NWajVwaS9TVVVOZ2V0OUtZa1RBMEtLR1dqcEJUT2p1a0NtdTZCVGt2?=
- =?utf-8?B?TzhZUk1mL1krbGlFNmE5TlpPVXIzR0dvYUQvaTNTNG9mNVBNZTN4NDY4Y0VK?=
- =?utf-8?B?Z2hLVHFDdm5aeHo3ZWR1K0xxd1MwdGx2SmRTNlh0cmhiVENNaFJNdWpiK3hK?=
- =?utf-8?B?bjdRN3pQZ2pURTA1NC9xdE1GRlNFMlZwdXdTSXRRTHNMV01yL1hMamdKS3Jr?=
- =?utf-8?B?ZmZ2NTJ1MU9UakZGMXlQQ2g4U3ROYmlrUkE1b3RrTDgxTkRBVkZkR1pVSENT?=
- =?utf-8?B?N2RkNzdGMjR3b1NsenZkb01xaFJaWGlhSVJQMTlmc1N1R3IxTzNJbU9VUEYv?=
- =?utf-8?B?MkRRckh5cXhYZE1sL2ZNVTNIbzBXZVRhYVE3MENDcDVJMTNrUTJMRW5Ia2Fh?=
- =?utf-8?B?dEFYNFg4djFsWU9LcDU5K1BQY2pkYVl0d010NUE1a1JyNXprZGFuV2dkWitL?=
- =?utf-8?B?N0poZVpyM1Yza2c4MElhckVyOEJ0MDdHZElwQ2lxd0c0QlZlK3Z2V0I3REFE?=
- =?utf-8?B?dVBUZzJtRlNTMkxIYU9VRE5GVGJRekw3YzVJUW5sL3RyUUhOU2ExbXZsKzVN?=
- =?utf-8?B?c0JwanNBRGpRTjV0OURFRzBpVGw5OVgzWHZydXoxaGNzQkEvSXZEYU9IVEla?=
- =?utf-8?B?c3BYTmNsd2JjUkM3ejJBODhVak0yelBqc25XdTJld0dmUlJkVW5kSHE2VThB?=
- =?utf-8?B?SEt3MWZCMWIrRXA4N1pBcEY4cTdGUlg3MXd1MENOU0FXaUdobFlTYXBWNEx4?=
- =?utf-8?B?MGxnY0ZadTNFUVNkZUk2eVlIVVVVNlVlM3BXalBuM2dteU5xNS9DY1EzenR6?=
- =?utf-8?B?QVdwUWpjTlcxV29GWWhBUWgyZ0lUbGhvKzBCOFhjQlBEVW1xN1U2T1pxZEtm?=
- =?utf-8?B?cENDNzlmdkJWaEZscFZGV2FNeTNseGZzYXZhdlR1eEEvbGxGVVo3MThuVzN4?=
- =?utf-8?B?NlNTMTN1dmY1VEh2QksyTVJodHpZdGhhUHFpQnFYOUUyTXd6UmJiN1oxRE9V?=
- =?utf-8?B?eXpEQUpKY1liY3BhbHJ2cm9scDc2VTlqZjFKMDZEVDh4RFlYZ3gzRHhSOHU4?=
- =?utf-8?B?Um90ZmRIR2JOYXdtWHNQdXR5MUlmZjJCUjFDYmRSQ28rWXhHdnRqOHd5WDVm?=
- =?utf-8?B?elUrNGJmeXB5S1ZVRWpIWHcxL2szd2NXRmhBL2NIaU1VM2VSVzhwSVo5NE8y?=
- =?utf-8?B?Sk1IVXhPSDJmSWtESUgrcHozZHZ1NTFyVGQwc3ZqZG5nYitpWkpwL2orSFdP?=
- =?utf-8?B?Z25KTHlpSmwyNHlMNG5Xb01DdCsrZEJ5RVVPa24rMkVZQkF1VjBPajErSzdx?=
- =?utf-8?Q?+LxI5Rbfb5Lrp3OQ4CYC03uXG?=
-X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 379cd098-9b17-488d-83c1-08da7bbd9171
-X-MS-Exchange-CrossTenant-AuthSource: DS7PR12MB6309.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 11 Aug 2022 17:18:54.7860
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: jQP+OVxTHHfPohLGhI42vAtiLu+vO3sfkCsem3mf9smex9JK+yuTVoaeP0H1thakz1NT35ipbR0DYXVVoR5SRA==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: BN6PR12MB1331
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_DNSWL_NONE,
-        RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_PASS,T_SCC_BODY_TEXT_LINE
-        autolearn=ham autolearn_force=no version=3.4.6
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Firefox/91.0 Thunderbird/91.11.0
+Subject: Re: [PATCH 24/35] perf inject: Add support for injecting guest
+ sideband events
+Content-Language: en-US
+To:     Ian Rogers <irogers@google.com>
+Cc:     Arnaldo Carvalho de Melo <acme@kernel.org>,
+        Jiri Olsa <jolsa@redhat.com>,
+        Namhyung Kim <namhyung@kernel.org>,
+        Andi Kleen <ak@linux.intel.com>, linux-kernel@vger.kernel.org,
+        kvm@vger.kernel.org
+References: <20220711093218.10967-1-adrian.hunter@intel.com>
+ <20220711093218.10967-25-adrian.hunter@intel.com>
+ <CAP-5=fXTHWoY-LudTnKDGCMRN61zyvSMtORduUjJ_eXgpai8BA@mail.gmail.com>
+From:   Adrian Hunter <adrian.hunter@intel.com>
+Organization: Intel Finland Oy, Registered Address: PL 281, 00181 Helsinki,
+ Business Identity Code: 0357606 - 4, Domiciled in Helsinki
+In-Reply-To: <CAP-5=fXTHWoY-LudTnKDGCMRN61zyvSMtORduUjJ_eXgpai8BA@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-Spam-Status: No, score=-5.0 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
+        RCVD_IN_DNSWL_MED,RCVD_IN_MSPIKE_H3,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,
+        SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no
+        version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 11/08/22 17:00, Gupta, Pankaj wrote:
+On 20/07/22 04:06, Ian Rogers wrote:
+> On Mon, Jul 11, 2022 at 2:33 AM Adrian Hunter <adrian.hunter@intel.com> wrote:
+>>
+>> Inject events from a perf.data file recorded in a virtual machine into
+>> a perf.data file recorded on the host at the same time.
+>>
+>> Only side band events (e.g. mmap, comm, fork, exit etc) and build IDs are
+>> injected.  Additionally, the guest kcore_dir is copied as kcore_dir__
+>> appended to the machine PID.
+>>
+>> This is non-trivial because:
+>>  o It is not possible to process 2 sessions simultaneously so instead
+>>  events are first written to a temporary file.
+>>  o To avoid conflict, guest sample IDs are replaced with new unused sample
+>>  IDs.
+>>  o Guest event's CPU is changed to be the host CPU because it is more
+>>  useful for reporting and analysis.
+>>  o Sample ID is mapped to machine PID which is recorded with VCPU in the
+>>  id index. This is important to allow guest events to be related to the
+>>  guest machine and VCPU.
+>>  o Timestamps must be converted.
+>>  o Events are inserted to obey finished-round ordering.
+>>
+>> The anticipated use-case is:
+>>  - start recording sideband events in a guest machine
+>>  - start recording an AUX area trace on the host which can trace also the
+>>  guest (e.g. Intel PT)
+>>  - run test case on the guest
+>>  - stop recording on the host
+>>  - stop recording on the guest
+>>  - copy the guest perf.data file to the host
+>>  - inject the guest perf.data file sideband events into the host perf.data
+>>  file using perf inject
+>>  - the resulting perf.data file can now be used
+>>
+>> Subsequent patches provide Intel PT support for this.
+>>
+>> Signed-off-by: Adrian Hunter <adrian.hunter@intel.com>
+>> ---
+>>  tools/perf/Documentation/perf-inject.txt |   17 +
+>>  tools/perf/builtin-inject.c              | 1043 +++++++++++++++++++++-
+>>  2 files changed, 1059 insertions(+), 1 deletion(-)
+>>
+>> diff --git a/tools/perf/Documentation/perf-inject.txt b/tools/perf/Documentation/perf-inject.txt
+>> index 0570a1ccd344..646aa31586ed 100644
+>> --- a/tools/perf/Documentation/perf-inject.txt
+>> +++ b/tools/perf/Documentation/perf-inject.txt
+>> @@ -85,6 +85,23 @@ include::itrace.txt[]
+>>         without updating it. Currently this option is supported only by
+>>         Intel PT, refer linkperf:perf-intel-pt[1]
+>>
+>> +--guest-data=<path>,<pid>[,<time offset>[,<time scale>]]::
+>> +       Insert events from a perf.data file recorded in a virtual machine at
+>> +       the same time as the input perf.data file was recorded on the host.
+>> +       The Process ID (PID) of the QEMU hypervisor process must be provided,
+>> +       and the time offset and time scale (multiplier) will likely be needed
+>> +       to convert guest time stamps into host time stamps. For example, for
+>> +       x86 the TSC Offset and Multiplier could be provided for a virtual machine
+>> +       using Linux command line option no-kvmclock.
+>> +       Currently only mmap, mmap2, comm, task, context_switch, ksymbol,
+>> +       and text_poke events are inserted, as well as build ID information.
+>> +       The QEMU option -name debug-threads=on is needed so that thread names
+>> +       can be used to determine which thread is running which VCPU. Note
+>> +       libvirt seems to use this by default.
+>> +       When using perf record in the guest, option --sample-identifier
+>> +       should be used, and also --buildid-all and --switch-events may be
+>> +       useful.
+>> +
 > 
->>> This is the v7 of this series which tries to implement the fd-based KVM
->>> guest private memory. The patches are based on latest kvm/queue branch
->>> commit:
->>>
->>>    b9b71f43683a (kvm/queue) KVM: x86/mmu: Buffer nested MMU
->>> split_desc_cache only by default capacity
->>>
->>> Introduction
->>> ------------
->>> In general this patch series introduce fd-based memslot which provides
->>> guest memory through memory file descriptor fd[offset,size] instead of
->>> hva/size. The fd can be created from a supported memory filesystem
->>> like tmpfs/hugetlbfs etc. which we refer as memory backing store. KVM
->>> and the the memory backing store exchange callbacks when such memslot
->>> gets created. At runtime KVM will call into callbacks provided by the
->>> backing store to get the pfn with the fd+offset. Memory backing store
->>> will also call into KVM callbacks when userspace punch hole on the fd
->>> to notify KVM to unmap secondary MMU page table entries.
->>>
->>> Comparing to existing hva-based memslot, this new type of memslot allows
->>> guest memory unmapped from host userspace like QEMU and even the kernel
->>> itself, therefore reduce attack surface and prevent bugs.
->>>
->>> Based on this fd-based memslot, we can build guest private memory that
->>> is going to be used in confidential computing environments such as Intel
->>> TDX and AMD SEV. When supported, the memory backing store can provide
->>> more enforcement on the fd and KVM can use a single memslot to hold both
->>> the private and shared part of the guest memory.
->>>
->>> mm extension
->>> ---------------------
->>> Introduces new MFD_INACCESSIBLE flag for memfd_create(), the file
->>> created with these flags cannot read(), write() or mmap() etc via normal
->>> MMU operations. The file content can only be used with the newly
->>> introduced memfile_notifier extension.
->>>
->>> The memfile_notifier extension provides two sets of callbacks for KVM to
->>> interact with the memory backing store:
->>>    - memfile_notifier_ops: callbacks for memory backing store to notify
->>>      KVM when memory gets invalidated.
->>>    - backing store callbacks: callbacks for KVM to call into memory
->>>      backing store to request memory pages for guest private memory.
->>>
->>> The memfile_notifier extension also provides APIs for memory backing
->>> store to register/unregister itself and to trigger the notifier when the
->>> bookmarked memory gets invalidated.
->>>
->>> The patchset also introduces a new memfd seal F_SEAL_AUTO_ALLOCATE to
->>> prevent double allocation caused by unintentional guest when we only
->>> have a single side of the shared/private memfds effective.
->>>
->>> memslot extension
->>> -----------------
->>> Add the private fd and the fd offset to existing 'shared' memslot so
->>> that both private/shared guest memory can live in one single memslot.
->>> A page in the memslot is either private or shared. Whether a guest page
->>> is private or shared is maintained through reusing existing SEV ioctls
->>> KVM_MEMORY_ENCRYPT_{UN,}REG_REGION.
->>>
->>> Test
->>> ----
->>> To test the new functionalities of this patch TDX patchset is needed.
->>> Since TDX patchset has not been merged so I did two kinds of test:
->>>
->>> -  Regresion test on kvm/queue (this patchset)
->>>     Most new code are not covered. Code also in below repo:
->>>     https://github.com/chao-p/linux/tree/privmem-v7
->>>
->>> -  New Funational test on latest TDX code
->>>     The patch is rebased to latest TDX code and tested the new
->>>     funcationalities. See below repos:
->>>     Linux: https://github.com/chao-p/linux/tree/privmem-v7-tdx
->>>     QEMU: https://github.com/chao-p/qemu/tree/privmem-v7
->>
->> While debugging an issue with SEV+UPM, found that fallocate() returns
->> an error in QEMU which is not handled (EINTR). With the below handling
->> of EINTR subsequent fallocate() succeeds:
->>
->>
->> diff --git a/backends/hostmem-memfd-private.c b/backends/hostmem-memfd-private.c
->> index af8fb0c957..e8597ed28d 100644
->> --- a/backends/hostmem-memfd-private.c
->> +++ b/backends/hostmem-memfd-private.c
->> @@ -39,7 +39,7 @@ priv_memfd_backend_memory_alloc(HostMemoryBackend *backend, Error **errp)
->>       MachineState *machine = MACHINE(qdev_get_machine());
->>       uint32_t ram_flags;
->>       char *name;
->> -    int fd, priv_fd;
->> +    int fd, priv_fd, ret;
->>         if (!backend->size) {
->>           error_setg(errp, "can't create backend with size 0");
->> @@ -65,7 +65,15 @@ priv_memfd_backend_memory_alloc(HostMemoryBackend *backend, Error **errp)
->>                                      backend->size, ram_flags, fd, 0, errp);
->>       g_free(name);
->>   -    fallocate(priv_fd, 0, 0, backend->size);
->> +again:
->> +    ret = fallocate(priv_fd, 0, 0, backend->size);
->> +    if (ret) {
->> +           perror("Fallocate failed: \n");
->> +           if (errno == EINTR)
->> +                   goto again;
->> +           else
->> +                   exit(1);
->> +    }
->>
->> However, fallocate() preallocates full guest memory before starting the guest.
->> With this behaviour guest memory is *not* demand pinned. Is there a way to
->> prevent fallocate() from reserving full guest memory?
+> Would other hypervisors based on kvm like gVisor work if they
+> implemented name-debug-threads?
+
+AFAICT gVisor is not a machine level hypervisor so the issue does not arise.
+
 > 
-> Isn't the pinning being handled by the corresponding host memory backend with mmu > notifier and architecture support while doing the memory operations e.g page> migration and swapping/reclaim (not supported currently AFAIU). But yes, we need> to allocate entire guest memory with the new flags MEMFILE_F_{UNMOVABLE, UNRECLAIMABLE etc}.
+>>  SEE ALSO
+>>  --------
+>>  linkperf:perf-record[1], linkperf:perf-report[1], linkperf:perf-archive[1],
+>> diff --git a/tools/perf/builtin-inject.c b/tools/perf/builtin-inject.c
+>> index c800911f68e7..fd4547bb75f7 100644
+>> --- a/tools/perf/builtin-inject.c
+>> +++ b/tools/perf/builtin-inject.c
+>> @@ -26,6 +26,7 @@
+>>  #include "util/thread.h"
+>>  #include "util/namespaces.h"
+>>  #include "util/util.h"
+>> +#include "util/tsc.h"
+>>
+>>  #include <internal/lib.h>
+>>
+>> @@ -35,8 +36,70 @@
+>>
+>>  #include <linux/list.h>
+>>  #include <linux/string.h>
+>> +#include <linux/zalloc.h>
+>> +#include <linux/hash.h>
+>>  #include <errno.h>
+>>  #include <signal.h>
+>> +#include <inttypes.h>
+>> +
+>> +struct guest_event {
+>> +       struct perf_sample              sample;
+>> +       union perf_event                *event;
+>> +       char                            event_buf[PERF_SAMPLE_MAX_SIZE];
+>> +};
+>> +
+>> +struct guest_id {
+>> +       /* hlist_node must be first, see free_hlist() */
+>> +       struct hlist_node               node;
+>> +       u64                             id;
+>> +       u64                             host_id;
+>> +       u32                             vcpu;
+>> +};
+>> +
+>> +struct guest_tid {
+>> +       /* hlist_node must be first, see free_hlist() */
+>> +       struct hlist_node               node;
+>> +       /* Thread ID of QEMU thread */
+>> +       u32                             tid;
+>> +       u32                             vcpu;
+>> +};
+>> +
+>> +struct guest_vcpu {
+>> +       /* Current host CPU */
+>> +       u32                             cpu;
+>> +       /* Thread ID of QEMU thread */
+>> +       u32                             tid;
+>> +};
+>> +
+>> +struct guest_session {
+>> +       char                            *perf_data_file;
+>> +       u32                             machine_pid;
+>> +       u64                             time_offset;
+>> +       double                          time_scale;
+>> +       struct perf_tool                tool;
+>> +       struct perf_data                data;
+>> +       struct perf_session             *session;
+>> +       char                            *tmp_file_name;
+>> +       int                             tmp_fd;
+>> +       struct perf_tsc_conversion      host_tc;
+>> +       struct perf_tsc_conversion      guest_tc;
+>> +       bool                            copy_kcore_dir;
+>> +       bool                            have_tc;
+>> +       bool                            fetched;
+>> +       bool                            ready;
+>> +       u16                             dflt_id_hdr_size;
+>> +       u64                             dflt_id;
+>> +       u64                             highest_id;
+>> +       /* Array of guest_vcpu */
+>> +       struct guest_vcpu               *vcpu;
+>> +       size_t                          vcpu_cnt;
+>> +       /* Hash table for guest_id */
+>> +       struct hlist_head               heads[PERF_EVLIST__HLIST_SIZE];
+>> +       /* Hash table for guest_tid */
+>> +       struct hlist_head               tids[PERF_EVLIST__HLIST_SIZE];
+>> +       /* Place to stash next guest event */
+>> +       struct guest_event              ev;
+>> +};
+>>
+>>  struct perf_inject {
+>>         struct perf_tool        tool;
+>> @@ -59,6 +122,7 @@ struct perf_inject {
+>>         struct itrace_synth_opts itrace_synth_opts;
+>>         char                    event_copy[PERF_SAMPLE_MAX_SIZE];
+>>         struct perf_file_section secs[HEADER_FEAT_BITS];
+>> +       struct guest_session    guest_session;
+>>  };
+>>
+>>  struct event_entry {
+>> @@ -698,6 +762,841 @@ static int perf_inject__sched_stat(struct perf_tool *tool,
+>>         return perf_event__repipe(tool, event_sw, &sample_sw, machine);
+>>  }
+>>
+>> +static struct guest_vcpu *guest_session__vcpu(struct guest_session *gs, u32 vcpu)
+>> +{
+>> +       if (realloc_array_as_needed(gs->vcpu, gs->vcpu_cnt, vcpu, NULL))
+>> +               return NULL;
+>> +       return &gs->vcpu[vcpu];
+>> +}
+>> +
+>> +static int guest_session__output_bytes(struct guest_session *gs, void *buf, size_t sz)
+>> +{
+>> +       ssize_t ret = writen(gs->tmp_fd, buf, sz);
+>> +
+>> +       return ret < 0 ? ret : 0;
+>> +}
+>> +
+>> +static int guest_session__repipe(struct perf_tool *tool,
+>> +                                union perf_event *event,
+>> +                                struct perf_sample *sample __maybe_unused,
+>> +                                struct machine *machine __maybe_unused)
+>> +{
+>> +       struct guest_session *gs = container_of(tool, struct guest_session, tool);
+>> +
+>> +       return guest_session__output_bytes(gs, event, event->header.size);
+>> +}
+>> +
+>> +static int guest_session__map_tid(struct guest_session *gs, u32 tid, u32 vcpu)
+>> +{
+>> +       struct guest_tid *guest_tid = zalloc(sizeof(*guest_tid));
+>> +       int hash;
+>> +
+>> +       if (!guest_tid)
+>> +               return -ENOMEM;
+>> +
+>> +       guest_tid->tid = tid;
+>> +       guest_tid->vcpu = vcpu;
+>> +       hash = hash_32(guest_tid->tid, PERF_EVLIST__HLIST_BITS);
+>> +       hlist_add_head(&guest_tid->node, &gs->tids[hash]);
+>> +
+>> +       return 0;
+>> +}
+>> +
+>> +static int host_peek_vm_comms_cb(struct perf_session *session __maybe_unused,
+>> +                                union perf_event *event,
+>> +                                u64 offset __maybe_unused, void *data)
+>> +{
+>> +       struct guest_session *gs = data;
+>> +       unsigned int vcpu;
+>> +       struct guest_vcpu *guest_vcpu;
+>> +       int ret;
+>> +
+>> +       if (event->header.type != PERF_RECORD_COMM ||
+>> +           event->comm.pid != gs->machine_pid)
+>> +               return 0;
+>> +
+>> +       /*
+>> +        * QEMU option -name debug-threads=on, causes thread names formatted as
+>> +        * below, although it is not an ABI. Also libvirt seems to use this by
+>> +        * default. Here we rely on it to tell us which thread is which VCPU.
+>> +        */
+>> +       ret = sscanf(event->comm.comm, "CPU %u/KVM", &vcpu);
+>> +       if (ret <= 0)
+>> +               return ret;
+>> +       pr_debug("Found VCPU: tid %u comm %s vcpu %u\n",
+>> +                event->comm.tid, event->comm.comm, vcpu);
+>> +       if (vcpu > INT_MAX) {
+>> +               pr_err("Invalid VCPU %u\n", vcpu);
+>> +               return -EINVAL;
+>> +       }
+>> +       guest_vcpu = guest_session__vcpu(gs, vcpu);
+>> +       if (!guest_vcpu)
+>> +               return -ENOMEM;
+>> +       if (guest_vcpu->tid && guest_vcpu->tid != event->comm.tid) {
+>> +               pr_err("Fatal error: Two threads found with the same VCPU\n");
+>> +               return -EINVAL;
+>> +       }
+>> +       guest_vcpu->tid = event->comm.tid;
+>> +
+>> +       return guest_session__map_tid(gs, event->comm.tid, vcpu);
+>> +}
+>> +
+>> +static int host_peek_vm_comms(struct perf_session *session, struct guest_session *gs)
+>> +{
+>> +       return perf_session__peek_events(session, session->header.data_offset,
+>> +                                        session->header.data_size,
+>> +                                        host_peek_vm_comms_cb, gs);
+>> +}
+>> +
+>> +static bool evlist__is_id_used(struct evlist *evlist, u64 id)
+>> +{
+>> +       return evlist__id2sid(evlist, id);
+>> +}
+>> +
+>> +static u64 guest_session__allocate_new_id(struct guest_session *gs, struct evlist *host_evlist)
+>> +{
+>> +       do {
+>> +               gs->highest_id += 1;
+>> +       } while (!gs->highest_id || evlist__is_id_used(host_evlist, gs->highest_id));
+>> +
+>> +       return gs->highest_id;
+>> +}
+>> +
+>> +static int guest_session__map_id(struct guest_session *gs, u64 id, u64 host_id, u32 vcpu)
+>> +{
+>> +       struct guest_id *guest_id = zalloc(sizeof(*guest_id));
+>> +       int hash;
+>> +
+>> +       if (!guest_id)
+>> +               return -ENOMEM;
+>> +
+>> +       guest_id->id = id;
+>> +       guest_id->host_id = host_id;
+>> +       guest_id->vcpu = vcpu;
+>> +       hash = hash_64(guest_id->id, PERF_EVLIST__HLIST_BITS);
+>> +       hlist_add_head(&guest_id->node, &gs->heads[hash]);
+>> +
+>> +       return 0;
+>> +}
+>> +
+>> +static u64 evlist__find_highest_id(struct evlist *evlist)
+>> +{
+>> +       struct evsel *evsel;
+>> +       u64 highest_id = 1;
+>> +
+>> +       evlist__for_each_entry(evlist, evsel) {
+>> +               u32 j;
+>> +
+>> +               for (j = 0; j < evsel->core.ids; j++) {
+>> +                       u64 id = evsel->core.id[j];
+>> +
+>> +                       if (id > highest_id)
+>> +                               highest_id = id;
+>> +               }
+>> +       }
+>> +
+>> +       return highest_id;
+>> +}
+>> +
+>> +static int guest_session__map_ids(struct guest_session *gs, struct evlist *host_evlist)
+>> +{
+>> +       struct evlist *evlist = gs->session->evlist;
+>> +       struct evsel *evsel;
+>> +       int ret;
+>> +
+>> +       evlist__for_each_entry(evlist, evsel) {
+>> +               u32 j;
+>> +
+>> +               for (j = 0; j < evsel->core.ids; j++) {
+>> +                       struct perf_sample_id *sid;
+>> +                       u64 host_id;
+>> +                       u64 id;
+>> +
+>> +                       id = evsel->core.id[j];
+>> +                       sid = evlist__id2sid(evlist, id);
+>> +                       if (!sid || sid->cpu.cpu == -1)
+>> +                               continue;
+>> +                       host_id = guest_session__allocate_new_id(gs, host_evlist);
+>> +                       ret = guest_session__map_id(gs, id, host_id, sid->cpu.cpu);
+>> +                       if (ret)
+>> +                               return ret;
+>> +               }
+>> +       }
+>> +
+>> +       return 0;
+>> +}
+>> +
+>> +static struct guest_id *guest_session__lookup_id(struct guest_session *gs, u64 id)
+>> +{
+>> +       struct hlist_head *head;
+>> +       struct guest_id *guest_id;
+>> +       int hash;
+>> +
+>> +       hash = hash_64(id, PERF_EVLIST__HLIST_BITS);
+>> +       head = &gs->heads[hash];
+>> +
+>> +       hlist_for_each_entry(guest_id, head, node)
+>> +               if (guest_id->id == id)
+>> +                       return guest_id;
+>> +
+>> +       return NULL;
+>> +}
+>> +
+>> +static int process_attr(struct perf_tool *tool, union perf_event *event,
+>> +                       struct perf_sample *sample __maybe_unused,
+>> +                       struct machine *machine __maybe_unused)
+>> +{
+>> +       struct perf_inject *inject = container_of(tool, struct perf_inject, tool);
+>> +
+>> +       return perf_event__process_attr(tool, event, &inject->session->evlist);
+>> +}
+>> +
+>> +static int guest_session__add_attr(struct guest_session *gs, struct evsel *evsel)
+>> +{
+>> +       struct perf_inject *inject = container_of(gs, struct perf_inject, guest_session);
+>> +       struct perf_event_attr attr = evsel->core.attr;
+>> +       u64 *id_array;
+>> +       u32 *vcpu_array;
+>> +       int ret = -ENOMEM;
+>> +       u32 i;
+>> +
+>> +       id_array = calloc(evsel->core.ids, sizeof(*id_array));
+>> +       if (!id_array)
+>> +               return -ENOMEM;
+>> +
+>> +       vcpu_array = calloc(evsel->core.ids, sizeof(*vcpu_array));
+>> +       if (!vcpu_array)
+>> +               goto out;
+>> +
+>> +       for (i = 0; i < evsel->core.ids; i++) {
+>> +               u64 id = evsel->core.id[i];
+>> +               struct guest_id *guest_id = guest_session__lookup_id(gs, id);
+>> +
+>> +               if (!guest_id) {
+>> +                       pr_err("Failed to find guest id %"PRIu64"\n", id);
+>> +                       ret = -EINVAL;
+>> +                       goto out;
+>> +               }
+>> +               id_array[i] = guest_id->host_id;
+>> +               vcpu_array[i] = guest_id->vcpu;
+>> +       }
+>> +
+>> +       attr.sample_type |= PERF_SAMPLE_IDENTIFIER;
+>> +       attr.exclude_host = 1;
+>> +       attr.exclude_guest = 0;
+>> +
+>> +       ret = perf_event__synthesize_attr(&inject->tool, &attr, evsel->core.ids,
+>> +                                         id_array, process_attr);
+>> +       if (ret)
+>> +               pr_err("Failed to add guest attr.\n");
+>> +
+>> +       for (i = 0; i < evsel->core.ids; i++) {
+>> +               struct perf_sample_id *sid;
+>> +               u32 vcpu = vcpu_array[i];
+>> +
+>> +               sid = evlist__id2sid(inject->session->evlist, id_array[i]);
+>> +               /* Guest event is per-thread from the host point of view */
+>> +               sid->cpu.cpu = -1;
+>> +               sid->tid = gs->vcpu[vcpu].tid;
+>> +               sid->machine_pid = gs->machine_pid;
+>> +               sid->vcpu.cpu = vcpu;
+>> +       }
+>> +out:
+>> +       free(vcpu_array);
+>> +       free(id_array);
+>> +       return ret;
+>> +}
+>> +
+>> +static int guest_session__add_attrs(struct guest_session *gs)
+>> +{
+>> +       struct evlist *evlist = gs->session->evlist;
+>> +       struct evsel *evsel;
+>> +       int ret;
+>> +
+>> +       evlist__for_each_entry(evlist, evsel) {
+>> +               ret = guest_session__add_attr(gs, evsel);
+>> +               if (ret)
+>> +                       return ret;
+>> +       }
+>> +
+>> +       return 0;
+>> +}
+>> +
+>> +static int synthesize_id_index(struct perf_inject *inject, size_t new_cnt)
+>> +{
+>> +       struct perf_session *session = inject->session;
+>> +       struct evlist *evlist = session->evlist;
+>> +       struct machine *machine = &session->machines.host;
+>> +       size_t from = evlist->core.nr_entries - new_cnt;
+>> +
+>> +       return __perf_event__synthesize_id_index(&inject->tool, perf_event__repipe,
+>> +                                                evlist, machine, from);
+>> +}
+>> +
+>> +static struct guest_tid *guest_session__lookup_tid(struct guest_session *gs, u32 tid)
+>> +{
+>> +       struct hlist_head *head;
+>> +       struct guest_tid *guest_tid;
+>> +       int hash;
+>> +
+>> +       hash = hash_32(tid, PERF_EVLIST__HLIST_BITS);
+>> +       head = &gs->tids[hash];
+>> +
+>> +       hlist_for_each_entry(guest_tid, head, node)
+>> +               if (guest_tid->tid == tid)
+>> +                       return guest_tid;
+>> +
+>> +       return NULL;
+>> +}
+>> +
+>> +static bool dso__is_in_kernel_space(struct dso *dso)
+>> +{
+>> +       if (dso__is_vdso(dso))
+>> +               return false;
+>> +
+>> +       return dso__is_kcore(dso) ||
+>> +              dso->kernel ||
+>> +              is_kernel_module(dso->long_name, PERF_RECORD_MISC_CPUMODE_UNKNOWN);
+>> +}
+>> +
+>> +static u64 evlist__first_id(struct evlist *evlist)
+>> +{
+>> +       struct evsel *evsel;
+>> +
+>> +       evlist__for_each_entry(evlist, evsel) {
+>> +               if (evsel->core.ids)
+>> +                       return evsel->core.id[0];
+>> +       }
+>> +       return 0;
+>> +}
+>> +
+>> +static int process_build_id(struct perf_tool *tool,
+>> +                           union perf_event *event,
+>> +                           struct perf_sample *sample __maybe_unused,
+>> +                           struct machine *machine __maybe_unused)
+>> +{
+>> +       struct perf_inject *inject = container_of(tool, struct perf_inject, tool);
+>> +
+>> +       return perf_event__process_build_id(inject->session, event);
+>> +}
+>> +
+>> +static int synthesize_build_id(struct perf_inject *inject, struct dso *dso, pid_t machine_pid)
+>> +{
+>> +       struct machine *machine = perf_session__findnew_machine(inject->session, machine_pid);
+>> +       u8 cpumode = dso__is_in_kernel_space(dso) ?
+>> +                       PERF_RECORD_MISC_GUEST_KERNEL :
+>> +                       PERF_RECORD_MISC_GUEST_USER;
+>> +
+>> +       if (!machine)
+>> +               return -ENOMEM;
+>> +
+>> +       dso->hit = 1;
+>> +
+>> +       return perf_event__synthesize_build_id(&inject->tool, dso, cpumode,
+>> +                                              process_build_id, machine);
+>> +}
+>> +
+>> +static int guest_session__add_build_ids(struct guest_session *gs)
+>> +{
+>> +       struct perf_inject *inject = container_of(gs, struct perf_inject, guest_session);
+>> +       struct machine *machine = &gs->session->machines.host;
+>> +       struct dso *dso;
+>> +       int ret;
+>> +
+>> +       /* Build IDs will be put in the Build ID feature section */
+>> +       perf_header__set_feat(&inject->session->header, HEADER_BUILD_ID);
+>> +
+>> +       dsos__for_each_with_build_id(dso, &machine->dsos.head) {
+>> +               ret = synthesize_build_id(inject, dso, gs->machine_pid);
+>> +               if (ret)
+>> +                       return ret;
+>> +       }
+>> +
+>> +       return 0;
+>> +}
+>> +
+>> +static int guest_session__ksymbol_event(struct perf_tool *tool,
+>> +                                       union perf_event *event,
+>> +                                       struct perf_sample *sample __maybe_unused,
+>> +                                       struct machine *machine __maybe_unused)
+>> +{
+>> +       struct guest_session *gs = container_of(tool, struct guest_session, tool);
+>> +
+>> +       /* Only support out-of-line i.e. no BPF support */
+>> +       if (event->ksymbol.ksym_type != PERF_RECORD_KSYMBOL_TYPE_OOL)
+>> +               return 0;
+>> +
+>> +       return guest_session__output_bytes(gs, event, event->header.size);
+>> +}
+>> +
+>> +static int guest_session__start(struct guest_session *gs, const char *name, bool force)
+>> +{
+>> +       char tmp_file_name[] = "/tmp/perf-inject-guest_session-XXXXXX";
+>> +       struct perf_session *session;
+>> +       int ret;
+>> +
+>> +       /* Only these events will be injected */
+>> +       gs->tool.mmap           = guest_session__repipe;
+>> +       gs->tool.mmap2          = guest_session__repipe;
+>> +       gs->tool.comm           = guest_session__repipe;
+>> +       gs->tool.fork           = guest_session__repipe;
+>> +       gs->tool.exit           = guest_session__repipe;
+>> +       gs->tool.lost           = guest_session__repipe;
+>> +       gs->tool.context_switch = guest_session__repipe;
+>> +       gs->tool.ksymbol        = guest_session__ksymbol_event;
+>> +       gs->tool.text_poke      = guest_session__repipe;
+>> +       /*
+>> +        * Processing a build ID creates a struct dso with that build ID. Later,
+>> +        * all guest dsos are iterated and the build IDs processed into the host
+>> +        * session where they will be output to the Build ID feature section
+>> +        * when the perf.data file header is written.
+>> +        */
+>> +       gs->tool.build_id       = perf_event__process_build_id;
+>> +       /* Process the id index to know what VCPU an ID belongs to */
+>> +       gs->tool.id_index       = perf_event__process_id_index;
+>> +
+>> +       gs->tool.ordered_events = true;
+>> +       gs->tool.ordering_requires_timestamps = true;
+>> +
+>> +       gs->data.path   = name;
+>> +       gs->data.force  = force;
+>> +       gs->data.mode   = PERF_DATA_MODE_READ;
+>> +
+>> +       session = perf_session__new(&gs->data, &gs->tool);
+>> +       if (IS_ERR(session))
+>> +               return PTR_ERR(session);
+>> +       gs->session = session;
+>> +
+>> +       /*
+>> +        * Initial events have zero'd ID samples. Get default ID sample size
+>> +        * used for removing them.
+>> +        */
+>> +       gs->dflt_id_hdr_size = session->machines.host.id_hdr_size;
+>> +       /* And default ID for adding back a host-compatible ID sample */
+>> +       gs->dflt_id = evlist__first_id(session->evlist);
+>> +       if (!gs->dflt_id) {
+>> +               pr_err("Guest data has no sample IDs");
+>> +               return -EINVAL;
+>> +       }
+>> +
+>> +       /* Temporary file for guest events */
+>> +       gs->tmp_file_name = strdup(tmp_file_name);
+>> +       if (!gs->tmp_file_name)
+>> +               return -ENOMEM;
+>> +       gs->tmp_fd = mkstemp(gs->tmp_file_name);
+>> +       if (gs->tmp_fd < 0)
+>> +               return -errno;
+>> +
+>> +       if (zstd_init(&gs->session->zstd_data, 0) < 0)
+>> +               pr_warning("Guest session decompression initialization failed.\n");
+>> +
+>> +       /*
+>> +        * perf does not support processing 2 sessions simultaneously, so output
+>> +        * guest events to a temporary file.
+>> +        */
+>> +       ret = perf_session__process_events(gs->session);
+>> +       if (ret)
+>> +               return ret;
+>> +
+>> +       if (lseek(gs->tmp_fd, 0, SEEK_SET))
+>> +               return -errno;
+>> +
+>> +       return 0;
+>> +}
+>> +
+>> +/* Free hlist nodes assuming hlist_node is the first member of hlist entries */
+>> +static void free_hlist(struct hlist_head *heads, size_t hlist_sz)
+>> +{
+>> +       struct hlist_node *pos, *n;
+>> +       size_t i;
+>> +
+>> +       for (i = 0; i < hlist_sz; ++i) {
+>> +               hlist_for_each_safe(pos, n, &heads[i]) {
+>> +                       hlist_del(pos);
+>> +                       free(pos);
+>> +               }
+>> +       }
+>> +}
+>> +
+>> +static void guest_session__exit(struct guest_session *gs)
+>> +{
+>> +       if (gs->session) {
+>> +               perf_session__delete(gs->session);
+>> +               free_hlist(gs->heads, PERF_EVLIST__HLIST_SIZE);
+>> +               free_hlist(gs->tids, PERF_EVLIST__HLIST_SIZE);
+>> +       }
+>> +       if (gs->tmp_file_name) {
+>> +               if (gs->tmp_fd >= 0)
+>> +                       close(gs->tmp_fd);
+>> +               unlink(gs->tmp_file_name);
+>> +               free(gs->tmp_file_name);
+>> +       }
+>> +       free(gs->vcpu);
+>> +       free(gs->perf_data_file);
+>> +}
+>> +
+>> +static void get_tsc_conv(struct perf_tsc_conversion *tc, struct perf_record_time_conv *time_conv)
+>> +{
+>> +       tc->time_shift          = time_conv->time_shift;
+>> +       tc->time_mult           = time_conv->time_mult;
+>> +       tc->time_zero           = time_conv->time_zero;
+>> +       tc->time_cycles         = time_conv->time_cycles;
+>> +       tc->time_mask           = time_conv->time_mask;
+>> +       tc->cap_user_time_zero  = time_conv->cap_user_time_zero;
+>> +       tc->cap_user_time_short = time_conv->cap_user_time_short;
+>> +}
+>> +
+>> +static void guest_session__get_tc(struct guest_session *gs)
+>> +{
+>> +       struct perf_inject *inject = container_of(gs, struct perf_inject, guest_session);
+>> +
+>> +       get_tsc_conv(&gs->host_tc, &inject->session->time_conv);
+>> +       get_tsc_conv(&gs->guest_tc, &gs->session->time_conv);
+>> +}
+>> +
+>> +static void guest_session__convert_time(struct guest_session *gs, u64 guest_time, u64 *host_time)
+>> +{
+>> +       u64 tsc;
+>> +
+>> +       if (!guest_time) {
+>> +               *host_time = 0;
+>> +               return;
+>> +       }
+>> +
+>> +       if (gs->guest_tc.cap_user_time_zero)
+>> +               tsc = perf_time_to_tsc(guest_time, &gs->guest_tc);
+>> +       else
+>> +               tsc = guest_time;
+>> +
+>> +       /*
+>> +        * This is the correct order of operations for x86 if the TSC Offset and
+>> +        * Multiplier values are used.
+>> +        */
+>> +       tsc -= gs->time_offset;
+>> +       tsc /= gs->time_scale;
+>> +
+>> +       if (gs->host_tc.cap_user_time_zero)
+>> +               *host_time = tsc_to_perf_time(tsc, &gs->host_tc);
+>> +       else
+>> +               *host_time = tsc;
+>> +}
+>> +
+>> +static int guest_session__fetch(struct guest_session *gs)
+>> +{
+>> +       void *buf = gs->ev.event_buf;
+>> +       struct perf_event_header *hdr = buf;
+>> +       size_t hdr_sz = sizeof(*hdr);
+>> +       ssize_t ret;
+>> +
+>> +       ret = readn(gs->tmp_fd, buf, hdr_sz);
+>> +       if (ret < 0)
+>> +               return ret;
+>> +
+>> +       if (!ret) {
+>> +               /* Zero size means EOF */
+>> +               hdr->size = 0;
+>> +               return 0;
+>> +       }
+>> +
+>> +       buf += hdr_sz;
+>> +
+>> +       ret = readn(gs->tmp_fd, buf, hdr->size - hdr_sz);
+>> +       if (ret < 0)
+>> +               return ret;
+>> +
+>> +       gs->ev.event = (union perf_event *)gs->ev.event_buf;
+>> +       gs->ev.sample.time = 0;
+>> +
+>> +       if (hdr->type >= PERF_RECORD_USER_TYPE_START) {
+>> +               pr_err("Unexpected type fetching guest event");
+>> +               return 0;
+>> +       }
+>> +
+>> +       ret = evlist__parse_sample(gs->session->evlist, gs->ev.event, &gs->ev.sample);
+>> +       if (ret) {
+>> +               pr_err("Parse failed fetching guest event");
+>> +               return ret;
+>> +       }
+>> +
+>> +       if (!gs->have_tc) {
+>> +               guest_session__get_tc(gs);
+>> +               gs->have_tc = true;
+>> +       }
+>> +
+>> +       guest_session__convert_time(gs, gs->ev.sample.time, &gs->ev.sample.time);
+>> +
+>> +       return 0;
+>> +}
+>> +
+>> +static int evlist__append_id_sample(struct evlist *evlist, union perf_event *ev,
+>> +                                   const struct perf_sample *sample)
+>> +{
+>> +       struct evsel *evsel;
+>> +       void *array;
+>> +       int ret;
+>> +
+>> +       evsel = evlist__id2evsel(evlist, sample->id);
+>> +       array = ev;
+>> +
+>> +       if (!evsel) {
+>> +               pr_err("No evsel for id %"PRIu64"\n", sample->id);
+>> +               return -EINVAL;
+>> +       }
+>> +
+>> +       array += ev->header.size;
+>> +       ret = perf_event__synthesize_id_sample(array, evsel->core.attr.sample_type, sample);
+>> +       if (ret < 0)
+>> +               return ret;
+>> +
+>> +       if (ret & 7) {
+>> +               pr_err("Bad id sample size %d\n", ret);
+>> +               return -EINVAL;
+>> +       }
+>> +
+>> +       ev->header.size += ret;
+>> +
+>> +       return 0;
+>> +}
+>> +
+>> +static int guest_session__inject_events(struct guest_session *gs, u64 timestamp)
+>> +{
+>> +       struct perf_inject *inject = container_of(gs, struct perf_inject, guest_session);
+>> +       int ret;
+>> +
+>> +       if (!gs->ready)
+>> +               return 0;
+>> +
+>> +       while (1) {
+>> +               struct perf_sample *sample;
+>> +               struct guest_id *guest_id;
+>> +               union perf_event *ev;
+>> +               u16 id_hdr_size;
+>> +               u8 cpumode;
+>> +               u64 id;
+>> +
+>> +               if (!gs->fetched) {
+>> +                       ret = guest_session__fetch(gs);
+>> +                       if (ret)
+>> +                               return ret;
+>> +                       gs->fetched = true;
+>> +               }
+>> +
+>> +               ev = gs->ev.event;
+>> +               sample = &gs->ev.sample;
+>> +
+>> +               if (!ev->header.size)
+>> +                       return 0; /* EOF */
+>> +
+>> +               if (sample->time > timestamp)
+>> +                       return 0;
+>> +
+>> +               /* Change cpumode to guest */
+>> +               cpumode = ev->header.misc & PERF_RECORD_MISC_CPUMODE_MASK;
+>> +               if (cpumode & PERF_RECORD_MISC_USER)
+>> +                       cpumode = PERF_RECORD_MISC_GUEST_USER;
+>> +               else
+>> +                       cpumode = PERF_RECORD_MISC_GUEST_KERNEL;
+>> +               ev->header.misc &= ~PERF_RECORD_MISC_CPUMODE_MASK;
+>> +               ev->header.misc |= cpumode;
+>> +
+>> +               id = sample->id;
+>> +               if (!id) {
+>> +                       id = gs->dflt_id;
+>> +                       id_hdr_size = gs->dflt_id_hdr_size;
+>> +               } else {
+>> +                       struct evsel *evsel = evlist__id2evsel(gs->session->evlist, id);
+>> +
+>> +                       id_hdr_size = evsel__id_hdr_size(evsel);
+>> +               }
+>> +
+>> +               if (id_hdr_size & 7) {
+>> +                       pr_err("Bad id_hdr_size %u\n", id_hdr_size);
+>> +                       return -EINVAL;
+>> +               }
+>> +
+>> +               if (ev->header.size & 7) {
+>> +                       pr_err("Bad event size %u\n", ev->header.size);
+>> +                       return -EINVAL;
+>> +               }
+>> +
+>> +               /* Remove guest id sample */
+>> +               ev->header.size -= id_hdr_size;
+>> +
+>> +               if (ev->header.size & 7) {
+>> +                       pr_err("Bad raw event size %u\n", ev->header.size);
+>> +                       return -EINVAL;
+>> +               }
+>> +
+>> +               guest_id = guest_session__lookup_id(gs, id);
+>> +               if (!guest_id) {
+>> +                       pr_err("Guest event with unknown id %llu\n",
+>> +                              (unsigned long long)id);
+>> +                       return -EINVAL;
+>> +               }
+>> +
+>> +               /* Change to host ID to avoid conflicting ID values */
+>> +               sample->id = guest_id->host_id;
+>> +               sample->stream_id = guest_id->host_id;
+>> +
+>> +               if (sample->cpu != (u32)-1) {
+>> +                       if (sample->cpu >= gs->vcpu_cnt) {
+>> +                               pr_err("Guest event with unknown VCPU %u\n",
+>> +                                      sample->cpu);
+>> +                               return -EINVAL;
+>> +                       }
+>> +                       /* Change to host CPU instead of guest VCPU */
+>> +                       sample->cpu = gs->vcpu[sample->cpu].cpu;
+>> +               }
+>> +
+>> +               /* New id sample with new ID and CPU */
+>> +               ret = evlist__append_id_sample(inject->session->evlist, ev, sample);
+>> +               if (ret)
+>> +                       return ret;
+>> +
+>> +               if (ev->header.size & 7) {
+>> +                       pr_err("Bad new event size %u\n", ev->header.size);
+>> +                       return -EINVAL;
+>> +               }
+>> +
+>> +               gs->fetched = false;
+>> +
+>> +               ret = output_bytes(inject, ev, ev->header.size);
+>> +               if (ret)
+>> +                       return ret;
+>> +       }
+>> +}
+>> +
+>> +static int guest_session__flush_events(struct guest_session *gs)
+>> +{
+>> +       return guest_session__inject_events(gs, -1);
+>> +}
+>> +
+>> +static int host__repipe(struct perf_tool *tool,
+>> +                       union perf_event *event,
+>> +                       struct perf_sample *sample,
+>> +                       struct machine *machine)
+>> +{
+>> +       struct perf_inject *inject = container_of(tool, struct perf_inject, tool);
+>> +       int ret;
+>> +
+>> +       ret = guest_session__inject_events(&inject->guest_session, sample->time);
+>> +       if (ret)
+>> +               return ret;
+>> +
+>> +       return perf_event__repipe(tool, event, sample, machine);
+>> +}
+>> +
+>> +static int host__finished_init(struct perf_session *session, union perf_event *event)
+>> +{
+>> +       struct perf_inject *inject = container_of(session->tool, struct perf_inject, tool);
+>> +       struct guest_session *gs = &inject->guest_session;
+>> +       int ret;
+>> +
+>> +       /*
+>> +        * Peek through host COMM events to find QEMU threads and the VCPU they
+>> +        * are running.
+>> +        */
+>> +       ret = host_peek_vm_comms(session, gs);
+>> +       if (ret)
+>> +               return ret;
+>> +
+>> +       if (!gs->vcpu_cnt) {
+>> +               pr_err("No VCPU theads found for pid %u\n", gs->machine_pid);
+>> +               return -EINVAL;
+>> +       }
+>> +
+>> +       /*
+>> +        * Allocate new (unused) host sample IDs and map them to the guest IDs.
+>> +        */
+>> +       gs->highest_id = evlist__find_highest_id(session->evlist);
+>> +       ret = guest_session__map_ids(gs, session->evlist);
+>> +       if (ret)
+>> +               return ret;
+>> +
+>> +       ret = guest_session__add_attrs(gs);
+>> +       if (ret)
+>> +               return ret;
+>> +
+>> +       ret = synthesize_id_index(inject, gs->session->evlist->core.nr_entries);
+>> +       if (ret) {
+>> +               pr_err("Failed to synthesize id_index\n");
+>> +               return ret;
+>> +       }
+>> +
+>> +       ret = guest_session__add_build_ids(gs);
+>> +       if (ret) {
+>> +               pr_err("Failed to add guest build IDs\n");
+>> +               return ret;
+>> +       }
+>> +
+>> +       gs->ready = true;
+>> +
+>> +       ret = guest_session__inject_events(gs, 0);
+>> +       if (ret)
+>> +               return ret;
+>> +
+>> +       return perf_event__repipe_op2_synth(session, event);
+>> +}
+>> +
+>> +/*
+>> + * Obey finished-round ordering. The FINISHED_ROUND event is first processed
+>> + * which flushes host events to file up until the last flush time. Then inject
+>> + * guest events up to the same time. Finally write out the FINISHED_ROUND event
+>> + * itself.
+>> + */
+>> +static int host__finished_round(struct perf_tool *tool,
+>> +                               union perf_event *event,
+>> +                               struct ordered_events *oe)
+>> +{
+>> +       struct perf_inject *inject = container_of(tool, struct perf_inject, tool);
+>> +       int ret = perf_event__process_finished_round(tool, event, oe);
+>> +       u64 timestamp = ordered_events__last_flush_time(oe);
+>> +
+>> +       if (ret)
+>> +               return ret;
+>> +
+>> +       ret = guest_session__inject_events(&inject->guest_session, timestamp);
+>> +       if (ret)
+>> +               return ret;
+>> +
+>> +       return perf_event__repipe_oe_synth(tool, event, oe);
+>> +}
+>> +
+>> +static int host__context_switch(struct perf_tool *tool,
+>> +                               union perf_event *event,
+>> +                               struct perf_sample *sample,
+>> +                               struct machine *machine)
+>> +{
+>> +       struct perf_inject *inject = container_of(tool, struct perf_inject, tool);
+>> +       bool out = event->header.misc & PERF_RECORD_MISC_SWITCH_OUT;
+>> +       struct guest_session *gs = &inject->guest_session;
+>> +       u32 pid = event->context_switch.next_prev_pid;
+>> +       u32 tid = event->context_switch.next_prev_tid;
+>> +       struct guest_tid *guest_tid;
+>> +       u32 vcpu;
+>> +
+>> +       if (out || pid != gs->machine_pid)
+>> +               goto out;
+>> +
+>> +       guest_tid = guest_session__lookup_tid(gs, tid);
+>> +       if (!guest_tid)
+>> +               goto out;
+>> +
+>> +       if (sample->cpu == (u32)-1) {
+>> +               pr_err("Switch event does not have CPU\n");
+>> +               return -EINVAL;
+>> +       }
+>> +
+>> +       vcpu = guest_tid->vcpu;
+>> +       if (vcpu >= gs->vcpu_cnt)
+>> +               return -EINVAL;
+>> +
+>> +       /* Guest is switching in, record which CPU the VCPU is now running on */
+>> +       gs->vcpu[vcpu].cpu = sample->cpu;
+>> +out:
+>> +       return host__repipe(tool, event, sample, machine);
+>> +}
+>> +
+>>  static void sig_handler(int sig __maybe_unused)
+>>  {
+>>         session_done = 1;
+>> @@ -767,6 +1666,61 @@ static int parse_vm_time_correlation(const struct option *opt, const char *str,
+>>         return inject->itrace_synth_opts.vm_tm_corr_args ? 0 : -ENOMEM;
+>>  }
+>>
+>> +static int parse_guest_data(const struct option *opt, const char *str, int unset)
+>> +{
+>> +       struct perf_inject *inject = opt->value;
+>> +       struct guest_session *gs = &inject->guest_session;
+>> +       char *tok;
+>> +       char *s;
+>> +
+>> +       if (unset)
+>> +               return 0;
+>> +
+>> +       if (!str)
+>> +               goto bad_args;
+>> +
+>> +       s = strdup(str);
+>> +       if (!s)
+>> +               return -ENOMEM;
+>> +
+>> +       gs->perf_data_file = strsep(&s, ",");
+>> +       if (!gs->perf_data_file)
+>> +               goto bad_args;
+>> +
+>> +       gs->copy_kcore_dir = has_kcore_dir(gs->perf_data_file);
+>> +       if (gs->copy_kcore_dir)
+>> +               inject->output.is_dir = true;
+>> +
+>> +       tok = strsep(&s, ",");
+>> +       if (!tok)
+>> +               goto bad_args;
+>> +       gs->machine_pid = strtoul(tok, NULL, 0);
+>> +       if (!inject->guest_session.machine_pid)
+>> +               goto bad_args;
+>> +
+>> +       gs->time_scale = 1;
+>> +
+>> +       tok = strsep(&s, ",");
+>> +       if (!tok)
+>> +               goto out;
+>> +       gs->time_offset = strtoull(tok, NULL, 0);
+>> +
+>> +       tok = strsep(&s, ",");
+>> +       if (!tok)
+>> +               goto out;
+>> +       gs->time_scale = strtod(tok, NULL);
+>> +       if (!gs->time_scale)
+>> +               goto bad_args;
+>> +out:
+>> +       return 0;
+>> +
+>> +bad_args:
+>> +       pr_err("--guest-data option requires guest perf.data file name, "
+>> +              "guest machine PID, and optionally guest timestamp offset, "
+>> +              "and guest timestamp scale factor, separated by commas.\n");
+>> +       return -1;
+>> +}
+>> +
+>>  static int save_section_info_cb(struct perf_file_section *section,
+>>                                 struct perf_header *ph __maybe_unused,
+>>                                 int feat, int fd __maybe_unused, void *data)
+>> @@ -896,6 +1850,22 @@ static int copy_kcore_dir(struct perf_inject *inject)
+>>         return ret;
+>>  }
+>>
+>> +static int guest_session__copy_kcore_dir(struct guest_session *gs)
+>> +{
+>> +       struct perf_inject *inject = container_of(gs, struct perf_inject, guest_session);
+>> +       char *cmd;
+>> +       int ret;
+>> +
+>> +       ret = asprintf(&cmd, "cp -r -n %s/kcore_dir %s/kcore_dir__%u >/dev/null 2>&1",
+>> +                      gs->perf_data_file, inject->output.path, gs->machine_pid);
+>> +       if (ret < 0)
+>> +               return ret;
+>> +       pr_debug("%s\n", cmd);
+>> +       ret = system(cmd);
+>> +       free(cmd);
+>> +       return ret;
+>> +}
+>> +
+>>  static int output_fd(struct perf_inject *inject)
+>>  {
+>>         return inject->in_place_update ? -1 : perf_data__fd(&inject->output);
+>> @@ -904,6 +1874,7 @@ static int output_fd(struct perf_inject *inject)
+>>  static int __cmd_inject(struct perf_inject *inject)
+>>  {
+>>         int ret = -EINVAL;
+>> +       struct guest_session *gs = &inject->guest_session;
+>>         struct perf_session *session = inject->session;
+>>         int fd = output_fd(inject);
+>>         u64 output_data_offset;
+>> @@ -968,6 +1939,47 @@ static int __cmd_inject(struct perf_inject *inject)
+>>                 output_data_offset = roundup(8192 + session->header.data_offset, 4096);
+>>                 if (inject->strip)
+>>                         strip_init(inject);
+>> +       } else if (gs->perf_data_file) {
+>> +               char *name = gs->perf_data_file;
+>> +
+>> +               /*
+>> +                * Not strictly necessary, but keep these events in order wrt
+>> +                * guest events.
+>> +                */
+>> +               inject->tool.mmap               = host__repipe;
+>> +               inject->tool.mmap2              = host__repipe;
+>> +               inject->tool.comm               = host__repipe;
+>> +               inject->tool.fork               = host__repipe;
+>> +               inject->tool.exit               = host__repipe;
+>> +               inject->tool.lost               = host__repipe;
+>> +               inject->tool.context_switch     = host__repipe;
+>> +               inject->tool.ksymbol            = host__repipe;
+>> +               inject->tool.text_poke          = host__repipe;
+>> +               /*
+>> +                * Once the host session has initialized, set up sample ID
+>> +                * mapping and feed in guest attrs, build IDs and initial
+>> +                * events.
+>> +                */
+>> +               inject->tool.finished_init      = host__finished_init;
+>> +               /* Obey finished round ordering */
+>> +               inject->tool.finished_round     = host__finished_round,
+>> +               /* Keep track of which CPU a VCPU is runnng on */
+>> +               inject->tool.context_switch     = host__context_switch;
+>> +               /*
+>> +                * Must order events to be able to obey finished round
+>> +                * ordering.
+>> +                */
+>> +               inject->tool.ordered_events     = true;
+>> +               inject->tool.ordering_requires_timestamps = true;
+>> +               /* Set up a separate session to process guest perf.data file */
+>> +               ret = guest_session__start(gs, name, session->data->force);
+>> +               if (ret) {
+>> +                       pr_err("Failed to process %s, error %d\n", name, ret);
+>> +                       return ret;
+>> +               }
+>> +               /* Allow space in the header for guest attributes */
+>> +               output_data_offset += gs->session->header.data_offset;
+>> +               output_data_offset = roundup(output_data_offset, 4096);
+>>         }
+>>
+>>         if (!inject->itrace_synth_opts.set)
+>> @@ -980,6 +1992,18 @@ static int __cmd_inject(struct perf_inject *inject)
+>>         if (ret)
+>>                 return ret;
+>>
+>> +       if (gs->session) {
+>> +               /*
+>> +                * Remaining guest events have later timestamps. Flush them
+>> +                * out to file.
+>> +                */
+>> +               ret = guest_session__flush_events(gs);
+>> +               if (ret) {
+>> +                       pr_err("Failed to flush guest events\n");
+>> +                       return ret;
+>> +               }
+>> +       }
+>> +
+>>         if (!inject->is_pipe && !inject->in_place_update) {
+>>                 struct inject_fc inj_fc = {
+>>                         .fc.copy = feat_copy_cb,
+>> @@ -1014,8 +2038,17 @@ static int __cmd_inject(struct perf_inject *inject)
+>>
+>>                 if (inject->copy_kcore_dir) {
+>>                         ret = copy_kcore_dir(inject);
+>> -                       if (ret)
+>> +                       if (ret) {
+>> +                               pr_err("Failed to copy kcore\n");
+>>                                 return ret;
+>> +                       }
+>> +               }
+>> +               if (gs->copy_kcore_dir) {
+>> +                       ret = guest_session__copy_kcore_dir(gs);
+>> +                       if (ret) {
+>> +                               pr_err("Failed to copy guest kcore\n");
+>> +                               return ret;
+>> +                       }
+>>                 }
+>>         }
+>>
+>> @@ -1113,6 +2146,12 @@ int cmd_inject(int argc, const char **argv)
+>>                 OPT_CALLBACK_OPTARG(0, "vm-time-correlation", &inject, NULL, "opts",
+>>                                     "correlate time between VM guests and the host",
+>>                                     parse_vm_time_correlation),
+>> +               OPT_CALLBACK_OPTARG(0, "guest-data", &inject, NULL, "opts",
+>> +                                   "inject events from a guest perf.data file",
+>> +                                   parse_guest_data),
+>> +               OPT_STRING(0, "guestmount", &symbol_conf.guestmount, "directory",
+>> +                          "guest mount directory under which every guest os"
+>> +                          " instance has a subdir"),
+> 
+> Should guestmount also be in the man page? Also should it have a
+> hyphen like guest-data?
 
-That is correct, but the question is when does the memory allocated, as these flags are set,
-memory is neither moved nor reclaimed. In current scenario, if I start a 32GB guest, all 32GB is
-allocated.
+Sent a patch to update the man page.
 
-Regards
-Nikunj
+It is "guestmount" in other tools so we should stick with that.
+
+> 
+> Thanks,
+> Ian
+> 
+>>                 OPT_END()
+>>         };
+>>         const char * const inject_usage[] = {
+>> @@ -1243,6 +2282,8 @@ int cmd_inject(int argc, const char **argv)
+>>
+>>         ret = __cmd_inject(&inject);
+>>
+>> +       guest_session__exit(&inject.guest_session);
+>> +
+>>  out_delete:
+>>         zstd_fini(&(inject.session->zstd_data));
+>>         perf_session__delete(inject.session);
+>> --
+>> 2.25.1
+>>
+
