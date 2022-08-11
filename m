@@ -2,58 +2,58 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 63277590698
-	for <lists+kvm@lfdr.de>; Thu, 11 Aug 2022 21:07:42 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id F0F9B5906C8
+	for <lists+kvm@lfdr.de>; Thu, 11 Aug 2022 21:07:56 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236022AbiHKSwZ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 11 Aug 2022 14:52:25 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33074 "EHLO
+        id S236024AbiHKSw0 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 11 Aug 2022 14:52:26 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33086 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S236000AbiHKSwV (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 11 Aug 2022 14:52:21 -0400
-Received: from mail-yw1-x114a.google.com (mail-yw1-x114a.google.com [IPv6:2607:f8b0:4864:20::114a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7AC699DB7C
-        for <kvm@vger.kernel.org>; Thu, 11 Aug 2022 11:52:20 -0700 (PDT)
-Received: by mail-yw1-x114a.google.com with SMTP id 00721157ae682-32851d0f8beso157618607b3.22
-        for <kvm@vger.kernel.org>; Thu, 11 Aug 2022 11:52:20 -0700 (PDT)
+        with ESMTP id S235971AbiHKSwW (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 11 Aug 2022 14:52:22 -0400
+Received: from mail-pl1-x649.google.com (mail-pl1-x649.google.com [IPv6:2607:f8b0:4864:20::649])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5CD699DF8A
+        for <kvm@vger.kernel.org>; Thu, 11 Aug 2022 11:52:21 -0700 (PDT)
+Received: by mail-pl1-x649.google.com with SMTP id d3-20020a170902cec300b0016f04e2e730so11709698plg.1
+        for <kvm@vger.kernel.org>; Thu, 11 Aug 2022 11:52:21 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
         h=cc:to:from:subject:references:mime-version:message-id:in-reply-to
          :date:from:to:cc;
-        bh=hZ5qGKKiUKkw1fqPsVoeWYEgPkjp69U3hEQvPplzfvk=;
-        b=GU5lkgJX69idfN2d8JbckBIkC4aHLRil8U4m/JOxyBQ0FK87bDtii7WCALqoXtsYEu
-         8gt3Oi7J6uaZ7e77mig5FNqzNOAEz8h0GA21MH/Qy6x/l7lH1i2Cwj1wfI4cU5Ssjj9q
-         xSIUnJyrv7l9JbMaz6NOwDRKQoNGbrRgLmtLx5uVvTyL0SY+SflE9iphBpBO2Zyfg1H0
-         4LDMkO4qiSOAqzVLSzqPwPbJTvbqNnm457gBp1yAt4sGcru0y/w3USkBBvk+M39juQ5o
-         uaJlabuMoyHSrfc+SIWXoQKDDtfD0GDcwK0gkzyIinHiHXRmF+4ShhXkXZ4orxtUgzuj
-         KStA==
+        bh=p/ppzg47C+97FQWYd9dFXNdGPOMPqma4qKXwXuPgUEk=;
+        b=RJJ9hUqaDoF3x4wOjJ6z7ndtxl2qLnCUzPGlaHF/3CmeduXZqBg0iE3BFQ6Qv6dMO/
+         VRfyehBYbA3v6+h71gG32HcjhWcsm902d74UQtzlSDwyV9IBMwVFGwHUtIJPehvPvktb
+         f7Aj88/tOSjsxK1DZTWoSTRMbh/yOQQeQrAR8XXj26NlYY1PHDq+ziqMlCfexDtvebn4
+         lR5i0DH5dYvNjcKsS1oJaqaeOOyqTuMJ4Sn5ZhWbm/JU5T9/Iq50GoIdz4dL/kyo09zt
+         n6/hVmqQOZV4QwxtUD5K13b3bzgAatKkOa3BjhYIMi1+VCDar6qi9bsS46jhc9MbNqv/
+         pmBg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=cc:to:from:subject:references:mime-version:message-id:in-reply-to
          :date:x-gm-message-state:from:to:cc;
-        bh=hZ5qGKKiUKkw1fqPsVoeWYEgPkjp69U3hEQvPplzfvk=;
-        b=bANFzQABSLJpyO7kRrb/tzmsLuucBZoos/nPVbMJZO6tlrFeab3uf8hrBrCTeSXxHt
-         dlAsTH1LaVeuMOZa/LZvP0qyg2gG5ip7MMTa6GeQLlc/vpn8JbUEvFUPSajL6NGD9DpI
-         OWJjQEg46zvkU9LUdp7g8sLAqJLcD8cbDVX24qdVw8yza3xT+ffBg2blP70fUj8MAf+s
-         7qKblcAJgl1YCrcJHjY/2EIL89P+IqSA+DhGr52jbjcNE63g8SoN9E2+q64ssl59mc8I
-         dzIruXPtiOFGCrshgKUK32z2iUYrwd1qqFBJH/m3Ndk1imPNx5dSXVHtISQBDyJGZHus
-         4Zqg==
-X-Gm-Message-State: ACgBeo1vzPqbGBuJKlefwnFU07kTdHR/YqbKvi2P2x74c0EA/XPpYXll
-        ZfpxPXcHnb3rmyL0CR9fLsxpcPJH9WLUEnZUGSt1MnsNuZoByY3QAFufS7HRvGaScrm0H7tYPfm
-        FA5DhxvSZawTmGNdjFhCuTTfzYEF/UYAS56iTKj5xE/lrh6C/FibEd/sdxsNpYBc=
-X-Google-Smtp-Source: AA6agR70CWqtzcvuMK/sClY7Dw2wWjBzu7ZjCcMyhILiex8btb4PBZ86HtRsiEPXyfjMX31didUmEKfO3RYZ8g==
+        bh=p/ppzg47C+97FQWYd9dFXNdGPOMPqma4qKXwXuPgUEk=;
+        b=vO5A4473QIxEUIQ8B3wQIE+G1vVOHDBsjaefpOCKjE9tNWIeip1aTADRybtkMaw5OE
+         GQNGndUqH2nIQ2km1/utmVhv9zYXVmBU+A3eGcwcrdf/U/f2xjPUXfBIOe8RdCQPXpI4
+         t5GlvT1VBGgVmG+4ZBYPxe/XYgDs7Uc2ctN0Mjj3SMpRm+eMsTYbgIUaBQ4NaOyASqnv
+         kjmUxAhgRp/8ykNehuDALIvPJkkMI3TEyWEiE0NOuanYHv23bU/No9cYfIgqOa+LovGa
+         s29OfnIGEB5v5+nM4JurxX6tvagqY8H8NyiBrXBMM6yA0i0ASluFEYT0S6Ql4JX4f1qa
+         I6pw==
+X-Gm-Message-State: ACgBeo0K9sug/nIGFgAN/yp3pJPpU0NERcsVkT9PwUHmI7W4Uqg9nXU8
+        0n32zWQhafjyN0KiC1IdRACR5dWAiuFayLGDMYsvkEJd/odX1aUYOFU4Xb2URcP9bIeHgsVTC/I
+        LZrb0Y3Nj8/+LvxDyz36sbw3GwJow2Ly/9P9nxSonjpRUP/SMaY8PT7bErHCxFlg=
+X-Google-Smtp-Source: AA6agR6YJTzzjFaC/q8A+drTaKkj/pLNeMM2KQKA4NMyV74jrlBe6FcpX+iBRMu2+bl5ZMHk/CQLEBN52PR/rg==
 X-Received: from ricarkol2.c.googlers.com ([fda3:e722:ac3:cc00:24:72f4:c0a8:62fe])
- (user=ricarkol job=sendgmr) by 2002:a81:9b47:0:b0:325:2240:ce5 with SMTP id
- s68-20020a819b47000000b0032522400ce5mr620224ywg.210.1660243939175; Thu, 11
- Aug 2022 11:52:19 -0700 (PDT)
-Date:   Thu, 11 Aug 2022 11:52:09 -0700
+ (user=ricarkol job=sendgmr) by 2002:a05:6a00:174e:b0:52b:c705:a42c with SMTP
+ id j14-20020a056a00174e00b0052bc705a42cmr554586pfc.68.1660243940729; Thu, 11
+ Aug 2022 11:52:20 -0700 (PDT)
+Date:   Thu, 11 Aug 2022 11:52:10 -0700
 In-Reply-To: <20220811185210.234711-1-ricarkol@google.com>
-Message-Id: <20220811185210.234711-4-ricarkol@google.com>
+Message-Id: <20220811185210.234711-5-ricarkol@google.com>
 Mime-Version: 1.0
 References: <20220811185210.234711-1-ricarkol@google.com>
 X-Mailer: git-send-email 2.37.1.559.g78731f0fdb-goog
-Subject: [kvm-unit-tests PATCH v4 3/4] arm: pmu: Reset the pmu registers
- before starting some tests
+Subject: [kvm-unit-tests PATCH v4 4/4] arm: pmu: Check for overflow in the low
+ counter in chained counters tests
 From:   Ricardo Koller <ricarkol@google.com>
 To:     kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu,
         andrew.jones@linux.dev
@@ -71,56 +71,123 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Some registers like the PMOVS reset to an architecturally UNKNOWN value.
-Most tests expect them to be reset (mostly zeroed) using pmu_reset().
-Add a pmu_reset() on all the tests that need one.
+A chained event overflowing on the low counter can set the overflow flag
+in PMOVS.  KVM does not set it, but real HW and the fast-model seem to.
+Moreover, the AArch64.IncrementEventCounter() pseudocode in the ARM ARM
+(DDI 0487H.a, J1.1.1 "aarch64/debug") also sets the PMOVS bit on
+overflow.
 
-As a bonus, fix a couple of comments related to the register state
-before a sub-test.
+The pmu chain tests fail on bare metal when checking the overflow flag
+of the low counter _not_ being set on overflow.  Fix by checking for
+overflow. Note that this test fails in KVM without the respective fix.
 
 Reviewed-by: Eric Auger <eric.auger@redhat.com>
 Signed-off-by: Ricardo Koller <ricarkol@google.com>
 ---
- arm/pmu.c | 6 ++++--
- 1 file changed, 4 insertions(+), 2 deletions(-)
+ arm/pmu.c | 33 ++++++++++++++++++---------------
+ 1 file changed, 18 insertions(+), 15 deletions(-)
 
 diff --git a/arm/pmu.c b/arm/pmu.c
-index a5260178..756e0d26 100644
+index 756e0d26..cd47b14b 100644
 --- a/arm/pmu.c
 +++ b/arm/pmu.c
-@@ -842,7 +842,7 @@ static void test_overflow_interrupt(void)
- 	write_regn_el0(pmevcntr, 1, PRE_OVERFLOW);
+@@ -599,7 +599,7 @@ static void test_chained_counters(void)
+ 	precise_instrs_loop(22, pmu.pmcr_ro | PMU_PMCR_E);
+ 
+ 	report(read_regn_el0(pmevcntr, 1) == 1, "CHAIN counter #1 incremented");
+-	report(!read_sysreg(pmovsclr_el0), "no overflow recorded for chained incr #1");
++	report(read_sysreg(pmovsclr_el0) == 0x1, "overflow recorded for chained incr #1");
+ 
+ 	/* test 64b overflow */
+ 
+@@ -611,7 +611,7 @@ static void test_chained_counters(void)
+ 	precise_instrs_loop(22, pmu.pmcr_ro | PMU_PMCR_E);
+ 	report_info("overflow reg = 0x%lx", read_sysreg(pmovsclr_el0));
+ 	report(read_regn_el0(pmevcntr, 1) == 2, "CHAIN counter #1 set to 2");
+-	report(!read_sysreg(pmovsclr_el0), "no overflow recorded for chained incr #2");
++	report(read_sysreg(pmovsclr_el0) == 0x1, "overflow recorded for chained incr #2");
+ 
+ 	write_regn_el0(pmevcntr, 0, PRE_OVERFLOW);
+ 	write_regn_el0(pmevcntr, 1, ALL_SET);
+@@ -619,7 +619,7 @@ static void test_chained_counters(void)
+ 	precise_instrs_loop(22, pmu.pmcr_ro | PMU_PMCR_E);
+ 	report_info("overflow reg = 0x%lx", read_sysreg(pmovsclr_el0));
+ 	report(!read_regn_el0(pmevcntr, 1), "CHAIN counter #1 wrapped");
+-	report(read_sysreg(pmovsclr_el0) == 0x2, "overflow on chain counter");
++	report(read_sysreg(pmovsclr_el0) == 0x3, "overflow on even and odd counters");
+ }
+ 
+ static void test_chained_sw_incr(void)
+@@ -645,8 +645,9 @@ static void test_chained_sw_incr(void)
+ 		write_sysreg(0x1, pmswinc_el0);
+ 
  	isb();
+-	report(!read_sysreg(pmovsclr_el0) && (read_regn_el0(pmevcntr, 1) == 1),
+-		"no overflow and chain counter incremented after 100 SW_INCR/CHAIN");
++	report((read_sysreg(pmovsclr_el0) == 0x1) &&
++		(read_regn_el0(pmevcntr, 1) == 1),
++		"overflow and chain counter incremented after 100 SW_INCR/CHAIN");
+ 	report_info("overflow=0x%lx, #0=%ld #1=%ld", read_sysreg(pmovsclr_el0),
+ 		    read_regn_el0(pmevcntr, 0), read_regn_el0(pmevcntr, 1));
  
--	/* interrupts are disabled */
-+	/* interrupts are disabled (PMINTENSET_EL1 == 0) */
+@@ -664,10 +665,10 @@ static void test_chained_sw_incr(void)
+ 		write_sysreg(0x1, pmswinc_el0);
  
+ 	isb();
+-	report((read_sysreg(pmovsclr_el0) == 0x2) &&
++	report((read_sysreg(pmovsclr_el0) == 0x3) &&
+ 		(read_regn_el0(pmevcntr, 1) == 0) &&
+ 		(read_regn_el0(pmevcntr, 0) == 84),
+-		"overflow on chain counter and expected values after 100 SW_INCR/CHAIN");
++		"expected overflows and values after 100 SW_INCR/CHAIN");
+ 	report_info("overflow=0x%lx, #0=%ld #1=%ld", read_sysreg(pmovsclr_el0),
+ 		    read_regn_el0(pmevcntr, 0), read_regn_el0(pmevcntr, 1));
+ }
+@@ -747,8 +748,9 @@ static void test_chain_promotion(void)
+ 	report_info("MEM_ACCESS counter #0 has value 0x%lx",
+ 		    read_regn_el0(pmevcntr, 0));
+ 
+-	report((read_regn_el0(pmevcntr, 1) == 1) && !read_sysreg(pmovsclr_el0),
+-		"CHAIN counter enabled: CHAIN counter was incremented and no overflow");
++	report((read_regn_el0(pmevcntr, 1) == 1) &&
++		(read_sysreg(pmovsclr_el0) == 0x1),
++		"CHAIN counter enabled: CHAIN counter was incremented and overflow");
+ 
+ 	report_info("CHAIN counter #1 = 0x%lx, overflow=0x%lx",
+ 		read_regn_el0(pmevcntr, 1), read_sysreg(pmovsclr_el0));
+@@ -775,8 +777,9 @@ static void test_chain_promotion(void)
+ 	report_info("MEM_ACCESS counter #0 has value 0x%lx",
+ 		    read_regn_el0(pmevcntr, 0));
+ 
+-	report((read_regn_el0(pmevcntr, 1) == 1) && !read_sysreg(pmovsclr_el0),
+-		"32b->64b: CHAIN counter incremented and no overflow");
++	report((read_regn_el0(pmevcntr, 1) == 1) &&
++		(read_sysreg(pmovsclr_el0) == 0x1),
++		"32b->64b: CHAIN counter incremented and overflow");
+ 
+ 	report_info("CHAIN counter #1 = 0x%lx, overflow=0x%lx",
+ 		read_regn_el0(pmevcntr, 1), read_sysreg(pmovsclr_el0));
+@@ -884,8 +887,8 @@ static void test_overflow_interrupt(void)
+ 	write_regn_el0(pmevcntr, 0, PRE_OVERFLOW);
+ 	isb();
  	mem_access_loop(addr, 200, pmu.pmcr_ro | PMU_PMCR_E);
- 	report(expect_interrupts(0), "no overflow interrupt after preset");
-@@ -858,7 +858,7 @@ static void test_overflow_interrupt(void)
- 	isb();
- 	report(expect_interrupts(0), "no overflow interrupt after counting");
+-	report(expect_interrupts(0),
+-		"no overflow interrupt expected on 32b boundary");
++	report(expect_interrupts(0x1),
++		"expect overflow interrupt on 32b boundary");
  
--	/* enable interrupts */
-+	/* enable interrupts (PMINTENSET_EL1 <= ALL_SET) */
- 
+ 	/* overflow on odd counter */
  	pmu_reset_stats();
- 
-@@ -906,6 +906,7 @@ static bool check_cycles_increase(void)
- 	bool success = true;
- 
- 	/* init before event access, this test only cares about cycle count */
-+	pmu_reset();
- 	set_pmcntenset(1 << PMU_CYCLE_IDX);
- 	set_pmccfiltr(0); /* count cycles in EL0, EL1, but not EL2 */
- 
-@@ -960,6 +961,7 @@ static bool check_cpi(int cpi)
- 	uint32_t pmcr = get_pmcr() | PMU_PMCR_LC | PMU_PMCR_C | PMU_PMCR_E;
- 
- 	/* init before event access, this test only cares about cycle count */
-+	pmu_reset();
- 	set_pmcntenset(1 << PMU_CYCLE_IDX);
- 	set_pmccfiltr(0); /* count cycles in EL0, EL1, but not EL2 */
+@@ -893,8 +896,8 @@ static void test_overflow_interrupt(void)
+ 	write_regn_el0(pmevcntr, 1, ALL_SET);
+ 	isb();
+ 	mem_access_loop(addr, 400, pmu.pmcr_ro | PMU_PMCR_E);
+-	report(expect_interrupts(0x2),
+-		"expect overflow interrupt on odd counter");
++	report(expect_interrupts(0x3),
++		"expect overflow interrupt on even and odd counter");
+ }
+ #endif
  
 -- 
 2.37.1.559.g78731f0fdb-goog
