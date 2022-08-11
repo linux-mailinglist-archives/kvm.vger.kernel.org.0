@@ -2,94 +2,238 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 0228358FD66
-	for <lists+kvm@lfdr.de>; Thu, 11 Aug 2022 15:30:50 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id B69D658FD7E
+	for <lists+kvm@lfdr.de>; Thu, 11 Aug 2022 15:38:13 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235569AbiHKNas (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 11 Aug 2022 09:30:48 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41046 "EHLO
+        id S234841AbiHKNiL (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 11 Aug 2022 09:38:11 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48276 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235451AbiHKNam (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 11 Aug 2022 09:30:42 -0400
-Received: from mail-pf1-x42e.google.com (mail-pf1-x42e.google.com [IPv6:2607:f8b0:4864:20::42e])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5A69E6C109;
-        Thu, 11 Aug 2022 06:30:41 -0700 (PDT)
-Received: by mail-pf1-x42e.google.com with SMTP id f30so16114612pfq.4;
-        Thu, 11 Aug 2022 06:30:41 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :from:to:cc;
-        bh=01vDtU88eCW5oD/3dn74II/8dGaHIJjwfRBEKULz+Ko=;
-        b=WizdRfX4kJ9hcmdF4NeLaiTx+zNIwoHMN9U88yYQD2WZ0SX7p0018GcFFdSEAVZA/T
-         0RvjX3ePnH4gHEGue+d2o9tmGuYhiN8xaQ/ACOi4ktNRzu+7twhaDm/g5EOmi83dyvXs
-         qjR04olAmCHCZ54kngN3gIXK7TeJOzf6luHUinxGojbie0ixEiCCjOhpxkkufkuMzZZy
-         JE0FtSvN2+nplqnNMf8fX2YIyz6r0IUc3j/3fEI7UhMdiWr9HpVsvU4+ufAXHB2SerRR
-         dUsfea858QiBjWVqX51OZ0bRCsdhxYzKxnWGESIb2ar+ozMbCWVbcXP3rKB20jLhMdas
-         9jnA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc;
-        bh=01vDtU88eCW5oD/3dn74II/8dGaHIJjwfRBEKULz+Ko=;
-        b=ATzcaYI/Ai5Kkxq9AZWRrmXc75OuNhitG60oTqvQDIM4+wnaQKvFufg+6TwA3qEPQ7
-         QhmK7O44wBDcwjX9cn+n13jD6FaUZ5FjE7hF1dzA2DH8j08Dglh8MkNz8vr0si/vPuOE
-         CaeLkn4RjdcDdO43zdTqHpe0+R9pzJ4ASKsdrV9obmxAyo1ciYrGtf/lfd6/uy0qcJfz
-         R6tV18yhJCmDCo426F5vLKqGGoE7oUsLTbEtXkfm7kjA3l3paVu1B+RLpMP9ZzjNfRSH
-         giveSd8Tk1325p0yw+F1KE2yeyJP4LbXfN1S+HYScPy0h+658B7iYPnLivt4HMDP955H
-         uvlQ==
-X-Gm-Message-State: ACgBeo2z83hdb+Z3hRt9xEAe1zjvZH20pF8Wp0xKJ1WjSzwryC0XDEdO
-        vN0+XWoeT1UkxI0BbIzTbMQ=
-X-Google-Smtp-Source: AA6agR7RqRgGF7gnHBdcw3opMUr1MxD/qxKr4atILgFzBkbhrCw1horw85HYBR1is/Y0dbIQzLHz+A==
-X-Received: by 2002:aa7:88c4:0:b0:52f:755c:a354 with SMTP id k4-20020aa788c4000000b0052f755ca354mr15639081pff.81.1660224640865;
-        Thu, 11 Aug 2022 06:30:40 -0700 (PDT)
-Received: from [192.168.43.80] (subs32-116-206-28-16.three.co.id. [116.206.28.16])
-        by smtp.gmail.com with ESMTPSA id p2-20020a170902780200b00170d34cf7f3sm6563336pll.257.2022.08.11.06.30.38
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 11 Aug 2022 06:30:40 -0700 (PDT)
-Message-ID: <1db2a0cd-bef1-213c-a411-3d39d378743a@gmail.com>
-Date:   Thu, 11 Aug 2022 20:30:36 +0700
+        with ESMTP id S234070AbiHKNiK (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 11 Aug 2022 09:38:10 -0400
+Received: from mga12.intel.com (mga12.intel.com [192.55.52.136])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AB89F89CDD;
+        Thu, 11 Aug 2022 06:38:08 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1660225088; x=1691761088;
+  h=date:from:to:cc:subject:message-id:reply-to:references:
+   mime-version:in-reply-to;
+  bh=3YSnNJEECrBHaKlYPHVfDKRlWH4sV/biWsKMZr6LyGA=;
+  b=MWoLHKviM73gfIL2KJTHk8ig6DjGOjaBIjHcegsJukfHnWQuGmmFAt2B
+   7cG9DWUuf4SWs42W6T4Dtrskj/uHCbDf9l0nKIu4n9EqfiLrukeZLw32n
+   5+BnHIN7lPdwG2KLJvm7wEUEz7lYLP324fF4I+zAIy/f6m7t/YF7iivCh
+   r/sakBT79yX2InpTW8l5QAff1BLcMpZXjRY9hHBy56b/VxzAl/3/akpYX
+   vnB+Z/pyIgI0hHMMhNO175fI36ujBeq/+e7spOCLdfEnWKGh62V9bEXke
+   tpfKcXToRSoLyHDE/J97Fzj2AOoTAj3J33dJUjmneTEE8roN2I+rFIoWF
+   A==;
+X-IronPort-AV: E=McAfee;i="6400,9594,10435"; a="271121805"
+X-IronPort-AV: E=Sophos;i="5.93,230,1654585200"; 
+   d="scan'208";a="271121805"
+Received: from fmsmga008.fm.intel.com ([10.253.24.58])
+  by fmsmga106.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 11 Aug 2022 06:37:52 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.93,230,1654585200"; 
+   d="scan'208";a="665375567"
+Received: from chaop.bj.intel.com (HELO localhost) ([10.240.193.75])
+  by fmsmga008.fm.intel.com with ESMTP; 11 Aug 2022 06:37:40 -0700
+Date:   Thu, 11 Aug 2022 21:32:55 +0800
+From:   Chao Peng <chao.p.peng@linux.intel.com>
+To:     "Gupta, Pankaj" <pankaj.gupta@amd.com>
+Cc:     "Nikunj A. Dadhania" <nikunj@amd.com>,
+        Sean Christopherson <seanjc@google.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Jonathan Corbet <corbet@lwn.net>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+        x86@kernel.org, "H . Peter Anvin" <hpa@zytor.com>,
+        Hugh Dickins <hughd@google.com>,
+        Jeff Layton <jlayton@kernel.org>,
+        "J . Bruce Fields" <bfields@fieldses.org>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        Shuah Khan <shuah@kernel.org>, Mike Rapoport <rppt@kernel.org>,
+        Steven Price <steven.price@arm.com>,
+        "Maciej S . Szmigiero" <mail@maciej.szmigiero.name>,
+        Vlastimil Babka <vbabka@suse.cz>,
+        Vishal Annapurve <vannapurve@google.com>,
+        Yu Zhang <yu.c.zhang@linux.intel.com>,
+        "Kirill A . Shutemov" <kirill.shutemov@linux.intel.com>,
+        luto@kernel.org, jun.nakajima@intel.com, dave.hansen@intel.com,
+        ak@linux.intel.com, david@redhat.com, aarcange@redhat.com,
+        ddutile@redhat.com, dhildenb@redhat.com,
+        Quentin Perret <qperret@google.com>,
+        Michael Roth <michael.roth@amd.com>, mhocko@suse.com,
+        Muchun Song <songmuchun@bytedance.com>, bharata@amd.com,
+        kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+        linux-mm@kvack.org, linux-kselftest@vger.kernel.org,
+        linux-api@vger.kernel.org, linux-doc@vger.kernel.org,
+        qemu-devel@nongnu.org, linux-fsdevel@vger.kernel.org
+Subject: Re: [PATCH v7 00/14] KVM: mm: fd-based approach for supporting KVM
+ guest private memory
+Message-ID: <20220811133255.GB916119@chaop.bj.intel.com>
+Reply-To: Chao Peng <chao.p.peng@linux.intel.com>
+References: <20220706082016.2603916-1-chao.p.peng@linux.intel.com>
+ <b21f41e5-0322-bbfb-b9c2-db102488592d@amd.com>
+ <9e86daea-5619-a216-fe02-0562cf14c501@amd.com>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.12.0
-Subject: Re: [PATCH next 0/2] Documentation: KVM:
- KVM_CAP_VM_DISABLE_NX_HUGE_PAGES documentation fixes
-Content-Language: en-US
-To:     Paolo Bonzini <pbonzini@redhat.com>
-Cc:     linux-doc@vger.kernel.org, Jonathan Corbet <corbet@lwn.net>,
-        David Matlack <dmatlack@google.com>,
-        Ben Gardon <bgardon@google.com>, Peter Xu <peterx@redhat.com>,
-        kvm@vger.kernel.org, linux-next@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-References: <20220811063601.195105-1-pbonzini@redhat.com>
-From:   Bagas Sanjaya <bagasdotme@gmail.com>
-In-Reply-To: <20220811063601.195105-1-pbonzini@redhat.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-0.6 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,NICE_REPLY_A,
-        RCVD_IN_DNSWL_NONE,RCVD_IN_SORBS_WEB,SPF_HELO_NONE,SPF_PASS,
-        T_SCC_BODY_TEXT_LINE autolearn=no autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <9e86daea-5619-a216-fe02-0562cf14c501@amd.com>
+X-Spam-Status: No, score=-4.9 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,SPF_HELO_PASS,
+        SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no
+        version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 8/11/22 13:36, Paolo Bonzini wrote:
-> Queued, thanks.
+On Thu, Aug 11, 2022 at 01:30:06PM +0200, Gupta, Pankaj wrote:
 > 
-> Paolo
+> > > This is the v7 of this series which tries to implement the fd-based KVM
+> > > guest private memory. The patches are based on latest kvm/queue branch
+> > > commit:
+> > > 
+> > >    b9b71f43683a (kvm/queue) KVM: x86/mmu: Buffer nested MMU
+> > > split_desc_cache only by default capacity
+> > > 
+> > > Introduction
+> > > ------------
+> > > In general this patch series introduce fd-based memslot which provides
+> > > guest memory through memory file descriptor fd[offset,size] instead of
+> > > hva/size. The fd can be created from a supported memory filesystem
+> > > like tmpfs/hugetlbfs etc. which we refer as memory backing store. KVM
+> > > and the the memory backing store exchange callbacks when such memslot
+> > > gets created. At runtime KVM will call into callbacks provided by the
+> > > backing store to get the pfn with the fd+offset. Memory backing store
+> > > will also call into KVM callbacks when userspace punch hole on the fd
+> > > to notify KVM to unmap secondary MMU page table entries.
+> > > 
+> > > Comparing to existing hva-based memslot, this new type of memslot allows
+> > > guest memory unmapped from host userspace like QEMU and even the kernel
+> > > itself, therefore reduce attack surface and prevent bugs.
+> > > 
+> > > Based on this fd-based memslot, we can build guest private memory that
+> > > is going to be used in confidential computing environments such as Intel
+> > > TDX and AMD SEV. When supported, the memory backing store can provide
+> > > more enforcement on the fd and KVM can use a single memslot to hold both
+> > > the private and shared part of the guest memory.
+> > > 
+> > > mm extension
+> > > ---------------------
+> > > Introduces new MFD_INACCESSIBLE flag for memfd_create(), the file
+> > > created with these flags cannot read(), write() or mmap() etc via normal
+> > > MMU operations. The file content can only be used with the newly
+> > > introduced memfile_notifier extension.
+> > > 
+> > > The memfile_notifier extension provides two sets of callbacks for KVM to
+> > > interact with the memory backing store:
+> > >    - memfile_notifier_ops: callbacks for memory backing store to notify
+> > >      KVM when memory gets invalidated.
+> > >    - backing store callbacks: callbacks for KVM to call into memory
+> > >      backing store to request memory pages for guest private memory.
+> > > 
+> > > The memfile_notifier extension also provides APIs for memory backing
+> > > store to register/unregister itself and to trigger the notifier when the
+> > > bookmarked memory gets invalidated.
+> > > 
+> > > The patchset also introduces a new memfd seal F_SEAL_AUTO_ALLOCATE to
+> > > prevent double allocation caused by unintentional guest when we only
+> > > have a single side of the shared/private memfds effective.
+> > > 
+> > > memslot extension
+> > > -----------------
+> > > Add the private fd and the fd offset to existing 'shared' memslot so
+> > > that both private/shared guest memory can live in one single memslot.
+> > > A page in the memslot is either private or shared. Whether a guest page
+> > > is private or shared is maintained through reusing existing SEV ioctls
+> > > KVM_MEMORY_ENCRYPT_{UN,}REG_REGION.
+> > > 
+> > > Test
+> > > ----
+> > > To test the new functionalities of this patch TDX patchset is needed.
+> > > Since TDX patchset has not been merged so I did two kinds of test:
+> > > 
+> > > -  Regresion test on kvm/queue (this patchset)
+> > >     Most new code are not covered. Code also in below repo:
+> > >     https://github.com/chao-p/linux/tree/privmem-v7
+> > > 
+> > > -  New Funational test on latest TDX code
+> > >     The patch is rebased to latest TDX code and tested the new
+> > >     funcationalities. See below repos:
+> > >     Linux: https://github.com/chao-p/linux/tree/privmem-v7-tdx
+> > >     QEMU: https://github.com/chao-p/qemu/tree/privmem-v7
+> > 
+> > While debugging an issue with SEV+UPM, found that fallocate() returns
+> > an error in QEMU which is not handled (EINTR). With the below handling
+> > of EINTR subsequent fallocate() succeeds:
+
+QEMU code has not well-tested so it's not strange you met problem. But
+from the man page, there is signal was caught for EINTR, do you know
+the signal number?
+
+Thanks for you patch but before we change it in QEMU I want to make sure
+it's indeed a QEMU issue (e.g. not a kernel isssue).
+
+> > 
+> > 
+> > diff --git a/backends/hostmem-memfd-private.c b/backends/hostmem-memfd-private.c
+> > index af8fb0c957..e8597ed28d 100644
+> > --- a/backends/hostmem-memfd-private.c
+> > +++ b/backends/hostmem-memfd-private.c
+> > @@ -39,7 +39,7 @@ priv_memfd_backend_memory_alloc(HostMemoryBackend *backend, Error **errp)
+> >       MachineState *machine = MACHINE(qdev_get_machine());
+> >       uint32_t ram_flags;
+> >       char *name;
+> > -    int fd, priv_fd;
+> > +    int fd, priv_fd, ret;
+> >       if (!backend->size) {
+> >           error_setg(errp, "can't create backend with size 0");
+> > @@ -65,7 +65,15 @@ priv_memfd_backend_memory_alloc(HostMemoryBackend *backend, Error **errp)
+> >                                      backend->size, ram_flags, fd, 0, errp);
+> >       g_free(name);
+> > -    fallocate(priv_fd, 0, 0, backend->size);
+> > +again:
+> > +    ret = fallocate(priv_fd, 0, 0, backend->size);
+> > +    if (ret) {
+> > +           perror("Fallocate failed: \n");
+> > +           if (errno == EINTR)
+> > +                   goto again;
+> > +           else
+> > +                   exit(1);
+> > +    }
+> > 
+> > However, fallocate() preallocates full guest memory before starting the guest.
+> > With this behaviour guest memory is *not* demand pinned. Is there a way to
+> > prevent fallocate() from reserving full guest memory?
+> 
+> Isn't the pinning being handled by the corresponding host memory backend
+> with mmu notifier and architecture support while doing the memory operations
+> e.g page migration and swapping/reclaim (not supported
+> currently AFAIU). But yes, we need to allocate entire guest memory with the
+> new flags MEMFILE_F_{UNMOVABLE, UNRECLAIMABLE etc}.
+
+Right.
+
 > 
 > 
-
-Thanks for picking this up. However, Stephen noted that the issue is
-already showed up on mainline [1]. Maybe this series should be queued
-for 6.0 release (as -rc fixes), right?
-
-[1]: https://lore.kernel.org/linux-next/20220809164147.131f87d0@canb.auug.org.au/
-
--- 
-An old man doll... just what I always wanted! - Clara
+> Thanks,
+> Pankaj
+> 
+> > 
+> > > An example QEMU command line for TDX test:
+> > > -object tdx-guest,id=tdx,debug=off,sept-ve-disable=off \
+> > > -machine confidential-guest-support=tdx \
+> > > -object memory-backend-memfd-private,id=ram1,size=${mem} \
+> > > -machine memory-backend=ram1
+> > > 
+> > 
+> > Regards,
+> > Nikunj
+> > 
+> > 
