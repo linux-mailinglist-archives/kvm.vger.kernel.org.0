@@ -2,165 +2,282 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 4E14B58FEAB
-	for <lists+kvm@lfdr.de>; Thu, 11 Aug 2022 17:00:56 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 2742458FF09
+	for <lists+kvm@lfdr.de>; Thu, 11 Aug 2022 17:15:42 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235396AbiHKPAy (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 11 Aug 2022 11:00:54 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46704 "EHLO
+        id S235583AbiHKPPk (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 11 Aug 2022 11:15:40 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60216 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234066AbiHKPAw (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 11 Aug 2022 11:00:52 -0400
-Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F084E237C2
-        for <kvm@vger.kernel.org>; Thu, 11 Aug 2022 08:00:51 -0700 (PDT)
-Received: from pps.filterd (m0098421.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.17.1.5/8.17.1.5) with ESMTP id 27BElCdx002528
-        for <kvm@vger.kernel.org>; Thu, 11 Aug 2022 15:00:51 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=from : to : cc : subject
- : date : message-id : in-reply-to : references : mime-version :
- content-transfer-encoding; s=pp1;
- bh=JwrE3WYdlRmp/SZ39ZRaiBz1d+IkeHOLbTNY8ng7qGg=;
- b=cQ9ROcVbJ7fsWp3OT7Emrs7fdIjNcZCy0jrlvVv4b5UNau8bcpAjZ+8falp5iH71WGDT
- zrDJedyG/uj6jlzrj52tcpv8vHxToISWhshpNjrJo4gxyrgx9Tj5syF9vr+SRo54mjVe
- VKgFCFBzvCW5ZfBsTZyCIzM+d/tyD7Cea00bUYHHc3rXCDTx5NJOaNldKbDAabvp/cyn
- KuGn8qnRhdA7tA+d/Q1JQ11mzLxTxbrHRScapCMkk5gCgUkQmME2kOeA34IIVODvGLj+
- U9LsRcRLs0KXzi9vdNKR6AomsYIgp5ZAMEJDkytyYAFi15oDfRGmLyIs9ITnfrpfvL5o 0w== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3hw3u38e6g-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT)
-        for <kvm@vger.kernel.org>; Thu, 11 Aug 2022 15:00:50 +0000
-Received: from m0098421.ppops.net (m0098421.ppops.net [127.0.0.1])
-        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 27BEm95d008214
-        for <kvm@vger.kernel.org>; Thu, 11 Aug 2022 15:00:50 GMT
-Received: from ppma06ams.nl.ibm.com (66.31.33a9.ip4.static.sl-reverse.com [169.51.49.102])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3hw3u38e5j-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 11 Aug 2022 15:00:49 +0000
-Received: from pps.filterd (ppma06ams.nl.ibm.com [127.0.0.1])
-        by ppma06ams.nl.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 27BEpUmW003113;
-        Thu, 11 Aug 2022 15:00:48 GMT
-Received: from b06cxnps4074.portsmouth.uk.ibm.com (d06relay11.portsmouth.uk.ibm.com [9.149.109.196])
-        by ppma06ams.nl.ibm.com with ESMTP id 3huwvf26b0-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 11 Aug 2022 15:00:48 +0000
-Received: from d06av25.portsmouth.uk.ibm.com (d06av25.portsmouth.uk.ibm.com [9.149.105.61])
-        by b06cxnps4074.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 27BF0i9a33620346
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Thu, 11 Aug 2022 15:00:44 GMT
-Received: from d06av25.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id D381311C04A;
-        Thu, 11 Aug 2022 15:00:44 +0000 (GMT)
-Received: from d06av25.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 2F7DB11C04C;
-        Thu, 11 Aug 2022 15:00:44 +0000 (GMT)
-Received: from linux6.. (unknown [9.114.12.104])
-        by d06av25.portsmouth.uk.ibm.com (Postfix) with ESMTP;
-        Thu, 11 Aug 2022 15:00:44 +0000 (GMT)
-From:   Janosch Frank <frankja@linux.ibm.com>
-To:     imbrenda@linux.ibm.com
-Cc:     kvm@vger.kernel.org, seiden@linux.ibm.com, nrb@linux.ibm.com,
-        scgl@linux.ibm.com, thuth@redhat.com
-Subject: [kvm-unit-tests PATCH v5] s390x: uv-host: Add access checks for donated memory
-Date:   Thu, 11 Aug 2022 15:00:39 +0000
-Message-Id: <20220811150039.29938-1-frankja@linux.ibm.com>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <20220811161716.358a68eb@p-imbrenda>
-References: <20220811161716.358a68eb@p-imbrenda>
+        with ESMTP id S230133AbiHKPPh (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 11 Aug 2022 11:15:37 -0400
+Received: from smtp-out1.suse.de (smtp-out1.suse.de [IPv6:2001:67c:2178:6::1c])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 540F2286F7;
+        Thu, 11 Aug 2022 08:15:36 -0700 (PDT)
+Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
+        (No client certificate requested)
+        by smtp-out1.suse.de (Postfix) with ESMTPS id E395833EFF;
+        Thu, 11 Aug 2022 15:15:32 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
+        t=1660230932; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=dv8tKv3OUdHDCQfi0VQ7vHr13ckzQG77B94aNlhjOeQ=;
+        b=PpnBlUY4aqlGiGMBCxpPGWBEA3WIbH2RayFY0g30cClSNMaCp6t45hlUt3O7JZlE3987SD
+        nqNw/L/o/rEbpQXcnX5b45zDFlji0Q9srWt7uFhe+JycsZMSAEAgwDaf7znAqQDUHAam+B
+        V8Gk3yFGBkUbUmC3ZwVcrzFDFlHbafk=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
+        s=susede2_ed25519; t=1660230932;
+        h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=dv8tKv3OUdHDCQfi0VQ7vHr13ckzQG77B94aNlhjOeQ=;
+        b=CMANYdpAA3aoqUFDck9sEo5MrUg6SbyPvvCX5XYjaXWnWyTRguRIXXBpysvI1whls88e6w
+        5NPMQZv4AH5EHrBw==
+Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
+        (No client certificate requested)
+        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id 5EEF013A9B;
+        Thu, 11 Aug 2022 15:15:32 +0000 (UTC)
+Received: from dovecot-director2.suse.de ([192.168.254.65])
+        by imap2.suse-dmz.suse.de with ESMTPSA
+        id AXhGFhQd9WJwGgAAMHmgww
+        (envelope-from <vbabka@suse.cz>); Thu, 11 Aug 2022 15:15:32 +0000
+Message-ID: <263a89da-d533-412e-a798-6d1334ff10e9@suse.cz>
+Date:   Thu, 11 Aug 2022 17:15:32 +0200
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-ORIG-GUID: jpx7IbPp90hErCDwasiHHYqmH9I2keED
-X-Proofpoint-GUID: XbpXK4yeCeWA-zJH0BeO2TGj82AeWPIH
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.205,Aquarius:18.0.883,Hydra:6.0.517,FMLib:17.11.122.1
- definitions=2022-08-11_11,2022-08-11_01,2022-06-22_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501
- malwarescore=0 suspectscore=0 spamscore=0 bulkscore=0 phishscore=0
- mlxlogscore=847 mlxscore=0 impostorscore=0 lowpriorityscore=0 adultscore=0
- clxscore=1015 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2207270000 definitions=main-2208110049
-X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_EF,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_PASS,
-        T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.1.0
+From:   vbabka@suse.cz
+Subject: Re: [PATCH Part2 v6 09/49] x86/fault: Add support to handle the RMP
+ fault for user address
+To:     Ashish Kalra <Ashish.Kalra@amd.com>, x86@kernel.org,
+        linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        linux-coco@lists.linux.dev, linux-mm@kvack.org,
+        linux-crypto@vger.kernel.org
+Cc:     tglx@linutronix.de, mingo@redhat.com, jroedel@suse.de,
+        thomas.lendacky@amd.com, hpa@zytor.com, ardb@kernel.org,
+        pbonzini@redhat.com, seanjc@google.com, vkuznets@redhat.com,
+        jmattson@google.com, luto@kernel.org, dave.hansen@linux.intel.com,
+        slp@redhat.com, pgonda@google.com, peterz@infradead.org,
+        srinivas.pandruvada@linux.intel.com, rientjes@google.com,
+        dovmurik@linux.ibm.com, tobin@ibm.com, bp@alien8.de,
+        michael.roth@amd.com, kirill@shutemov.name, ak@linux.intel.com,
+        tony.luck@intel.com, marcorr@google.com,
+        sathyanarayanan.kuppuswamy@linux.intel.com, alpergun@google.com,
+        dgilbert@redhat.com, jarkko@kernel.org
+References: <cover.1655761627.git.ashish.kalra@amd.com>
+ <0ecb0a4781be933fcadeb56a85070818ef3566e7.1655761627.git.ashish.kalra@amd.com>
+Content-Language: en-US
+In-Reply-To: <0ecb0a4781be933fcadeb56a85070818ef3566e7.1655761627.git.ashish.kalra@amd.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-Spam-Status: No, score=-1.4 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,SPF_HELO_NONE,
+        SPF_SOFTFAIL,T_SCC_BODY_TEXT_LINE autolearn=no autolearn_force=no
+        version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Let's check if the UV really protected all the memory we donated.
+On 6/21/22 01:03, Ashish Kalra wrote:
+> From: Brijesh Singh <brijesh.singh@amd.com>
+> 
+> When SEV-SNP is enabled globally, a write from the host goes through the
+> RMP check. When the host writes to pages, hardware checks the following
+> conditions at the end of page walk:
+> 
+> 1. Assigned bit in the RMP table is zero (i.e page is shared).
+> 2. If the page table entry that gives the sPA indicates that the target
+>    page size is a large page, then all RMP entries for the 4KB
+>    constituting pages of the target must have the assigned bit 0.
+> 3. Immutable bit in the RMP table is not zero.
+> 
+> The hardware will raise page fault if one of the above conditions is not
+> met. Try resolving the fault instead of taking fault again and again. If
+> the host attempts to write to the guest private memory then send the
+> SIGBUS signal to kill the process. If the page level between the host and
+> RMP entry does not match, then split the address to keep the RMP and host
+> page levels in sync.
+> 
+> Signed-off-by: Brijesh Singh <brijesh.singh@amd.com>
+> ---
+>  arch/x86/mm/fault.c      | 66 ++++++++++++++++++++++++++++++++++++++++
+>  include/linux/mm.h       |  3 +-
+>  include/linux/mm_types.h |  3 ++
+>  mm/memory.c              | 13 ++++++++
+>  4 files changed, 84 insertions(+), 1 deletion(-)
+> 
+> diff --git a/arch/x86/mm/fault.c b/arch/x86/mm/fault.c
+> index a4c270e99f7f..f5de9673093a 100644
+> --- a/arch/x86/mm/fault.c
+> +++ b/arch/x86/mm/fault.c
+> @@ -19,6 +19,7 @@
+>  #include <linux/uaccess.h>		/* faulthandler_disabled()	*/
+>  #include <linux/efi.h>			/* efi_crash_gracefully_on_page_fault()*/
+>  #include <linux/mm_types.h>
+> +#include <linux/sev.h>			/* snp_lookup_rmpentry()	*/
+>  
+>  #include <asm/cpufeature.h>		/* boot_cpu_has, ...		*/
+>  #include <asm/traps.h>			/* dotraplinkage, ...		*/
+> @@ -1209,6 +1210,60 @@ do_kern_addr_fault(struct pt_regs *regs, unsigned long hw_error_code,
+>  }
+>  NOKPROBE_SYMBOL(do_kern_addr_fault);
+>  
+> +static inline size_t pages_per_hpage(int level)
+> +{
+> +	return page_level_size(level) / PAGE_SIZE;
+> +}
+> +
+> +/*
+> + * Return 1 if the caller need to retry, 0 if it the address need to be split
+> + * in order to resolve the fault.
+> + */
+> +static int handle_user_rmp_page_fault(struct pt_regs *regs, unsigned long error_code,
+> +				      unsigned long address)
+> +{
+> +	int rmp_level, level;
+> +	pte_t *pte;
+> +	u64 pfn;
+> +
+> +	pte = lookup_address_in_mm(current->mm, address, &level);
+> +
+> +	/*
+> +	 * It can happen if there was a race between an unmap event and
+> +	 * the RMP fault delivery.
+> +	 */
+> +	if (!pte || !pte_present(*pte))
+> +		return 1;
+> +
+> +	pfn = pte_pfn(*pte);
+> +
+> +	/* If its large page then calculte the fault pfn */
+> +	if (level > PG_LEVEL_4K) {
+> +		unsigned long mask;
+> +
+> +		mask = pages_per_hpage(level) - pages_per_hpage(level - 1);
+> +		pfn |= (address >> PAGE_SHIFT) & mask;
+> +	}
+> +
+> +	/*
+> +	 * If its a guest private page, then the fault cannot be resolved.
+> +	 * Send a SIGBUS to terminate the process.
+> +	 */
+> +	if (snp_lookup_rmpentry(pfn, &rmp_level)) {
+> +		do_sigbus(regs, error_code, address, VM_FAULT_SIGBUS);
+> +		return 1;
+> +	}
+> +
+> +	/*
+> +	 * The backing page level is higher than the RMP page level, request
+> +	 * to split the page.
+> +	 */
+> +	if (level > rmp_level)
+> +		return 0;
 
-Signed-off-by: Janosch Frank <frankja@linux.ibm.com>
-Reviewed-by: Nico Boehr <nrb@linux.ibm.com>
----
-This patch is clearly cursed :)
----
- s390x/uv-host.c | 37 +++++++++++++++++++++++++++++++++++++
- 1 file changed, 37 insertions(+)
+I don't see any checks that make sure this is in fact a THP, and not e.g.
+hugetlb (which is disallowed only later in patch 25/49), or even something
+else unexpected. Calling blindly __split_huge_pmd() in
+handle_split_page_fault() on anything that's not a THP will just make it
+return without splitting anything, and then this will result in a page fault
+loop? Some kind of warning and a SIGBUS would be more safe I think.
 
-diff --git a/s390x/uv-host.c b/s390x/uv-host.c
-index dfcebe10..191e8b3f 100644
---- a/s390x/uv-host.c
-+++ b/s390x/uv-host.c
-@@ -45,6 +45,32 @@ static void cpu_loop(void)
- 	for (;;) {}
- }
- 
-+/*
-+ * Checks if a memory area is protected as secure memory.
-+ * Will return true if all pages are protected, false otherwise.
-+ */
-+static bool access_check_3d(uint8_t *access_ptr, uint64_t len)
-+{
-+	assert(!(len & ~PAGE_MASK));
-+	assert(!((uint64_t)access_ptr & ~PAGE_MASK));
-+
-+	while (len) {
-+		expect_pgm_int();
-+		READ_ONCE(*access_ptr);
-+		if (clear_pgm_int() != PGM_INT_CODE_SECURE_STOR_ACCESS)
-+			return false;
-+		expect_pgm_int();
-+		WRITE_ONCE(*access_ptr, 42);
-+		if (clear_pgm_int() != PGM_INT_CODE_SECURE_STOR_ACCESS)
-+			return false;
-+
-+		access_ptr += PAGE_SIZE;
-+		len -= PAGE_SIZE;
-+	}
-+
-+	return true;
-+}
-+
- static struct cmd_list cmds[] = {
- 	{ "init", UVC_CMD_INIT_UV, sizeof(struct uv_cb_init), BIT_UVC_CMD_INIT_UV },
- 	{ "create conf", UVC_CMD_CREATE_SEC_CONF, sizeof(struct uv_cb_cgc), BIT_UVC_CMD_CREATE_SEC_CONF },
-@@ -332,6 +358,10 @@ static void test_cpu_create(void)
- 	report(rc == 0 && uvcb_csc.header.rc == UVC_RC_EXECUTED &&
- 	       uvcb_csc.cpu_handle, "success");
- 
-+	rc = access_check_3d((uint8_t *)uvcb_csc.stor_origin,
-+			     uvcb_qui.cpu_stor_len);
-+	report(rc, "Storage protection");
-+
- 	tmp = uvcb_csc.stor_origin;
- 	uvcb_csc.stor_origin = (unsigned long)memalign(PAGE_SIZE, uvcb_qui.cpu_stor_len);
- 	rc = uv_call(0, (uint64_t)&uvcb_csc);
-@@ -430,6 +460,13 @@ static void test_config_create(void)
- 	rc = uv_call(0, (uint64_t)&uvcb_cgc);
- 	report(rc == 0 && uvcb_cgc.header.rc == UVC_RC_EXECUTED, "successful");
- 
-+	rc = access_check_3d((uint8_t *)uvcb_cgc.conf_base_stor_origin,
-+			     uvcb_qui.conf_base_phys_stor_len);
-+	report(rc, "Base storage protection");
-+
-+	rc = access_check_3d((uint8_t *)uvcb_cgc.conf_var_stor_origin, vsize);
-+	report(rc, "Variable storage protection");
-+
- 	uvcb_cgc.header.rc = 0;
- 	uvcb_cgc.header.rrc = 0;
- 	tmp = uvcb_cgc.guest_handle;
--- 
-2.34.1
+> +
+> +	return 1;
+> +}
+> +
+>  /*
+>   * Handle faults in the user portion of the address space.  Nothing in here
+>   * should check X86_PF_USER without a specific justification: for almost
+> @@ -1306,6 +1361,17 @@ void do_user_addr_fault(struct pt_regs *regs,
+>  	if (error_code & X86_PF_INSTR)
+>  		flags |= FAULT_FLAG_INSTRUCTION;
+>  
+> +	/*
+> +	 * If its an RMP violation, try resolving it.
+> +	 */
+> +	if (error_code & X86_PF_RMP) {
+> +		if (handle_user_rmp_page_fault(regs, error_code, address))
+> +			return;
+> +
+> +		/* Ask to split the page */
+> +		flags |= FAULT_FLAG_PAGE_SPLIT;
+> +	}
+> +
+>  #ifdef CONFIG_X86_64
+>  	/*
+>  	 * Faults in the vsyscall page might need emulation.  The
+> diff --git a/include/linux/mm.h b/include/linux/mm.h
+> index de32c0383387..2ccc562d166f 100644
+> --- a/include/linux/mm.h
+> +++ b/include/linux/mm.h
+> @@ -463,7 +463,8 @@ static inline bool fault_flag_allow_retry_first(enum fault_flag flags)
+>  	{ FAULT_FLAG_USER,		"USER" }, \
+>  	{ FAULT_FLAG_REMOTE,		"REMOTE" }, \
+>  	{ FAULT_FLAG_INSTRUCTION,	"INSTRUCTION" }, \
+> -	{ FAULT_FLAG_INTERRUPTIBLE,	"INTERRUPTIBLE" }
+> +	{ FAULT_FLAG_INTERRUPTIBLE,	"INTERRUPTIBLE" }, \
+> +	{ FAULT_FLAG_PAGE_SPLIT,	"PAGESPLIT" }
+>  
+>  /*
+>   * vm_fault is filled by the pagefault handler and passed to the vma's
+> diff --git a/include/linux/mm_types.h b/include/linux/mm_types.h
+> index 6dfaf271ebf8..aa2d8d48ce3e 100644
+> --- a/include/linux/mm_types.h
+> +++ b/include/linux/mm_types.h
+> @@ -818,6 +818,8 @@ typedef struct {
+>   *                      mapped R/O.
+>   * @FAULT_FLAG_ORIG_PTE_VALID: whether the fault has vmf->orig_pte cached.
+>   *                        We should only access orig_pte if this flag set.
+> + * @FAULT_FLAG_PAGE_SPLIT: The fault was due page size mismatch, split the
+> + *                         region to smaller page size and retry.
+>   *
+>   * About @FAULT_FLAG_ALLOW_RETRY and @FAULT_FLAG_TRIED: we can specify
+>   * whether we would allow page faults to retry by specifying these two
+> @@ -855,6 +857,7 @@ enum fault_flag {
+>  	FAULT_FLAG_INTERRUPTIBLE =	1 << 9,
+>  	FAULT_FLAG_UNSHARE =		1 << 10,
+>  	FAULT_FLAG_ORIG_PTE_VALID =	1 << 11,
+> +	FAULT_FLAG_PAGE_SPLIT =		1 << 12,
+>  };
+>  
+>  typedef unsigned int __bitwise zap_flags_t;
+> diff --git a/mm/memory.c b/mm/memory.c
+> index 7274f2b52bca..c2187ffcbb8e 100644
+> --- a/mm/memory.c
+> +++ b/mm/memory.c
+> @@ -4945,6 +4945,15 @@ static vm_fault_t handle_pte_fault(struct vm_fault *vmf)
+>  	return 0;
+>  }
+>  
+> +static int handle_split_page_fault(struct vm_fault *vmf)
+> +{
+> +	if (!IS_ENABLED(CONFIG_AMD_MEM_ENCRYPT))
+> +		return VM_FAULT_SIGBUS;
+> +
+> +	__split_huge_pmd(vmf->vma, vmf->pmd, vmf->address, false, NULL);
+> +	return 0;
+> +}
+> +
+>  /*
+>   * By the time we get here, we already hold the mm semaphore
+>   *
+> @@ -5024,6 +5033,10 @@ static vm_fault_t __handle_mm_fault(struct vm_area_struct *vma,
+>  				pmd_migration_entry_wait(mm, vmf.pmd);
+>  			return 0;
+>  		}
+> +
+> +		if (flags & FAULT_FLAG_PAGE_SPLIT)
+> +			return handle_split_page_fault(&vmf);
+> +
+>  		if (pmd_trans_huge(vmf.orig_pmd) || pmd_devmap(vmf.orig_pmd)) {
+>  			if (pmd_protnone(vmf.orig_pmd) && vma_is_accessible(vma))
+>  				return do_huge_pmd_numa_page(&vmf);
 
