@@ -2,41 +2,41 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id AB74358FDD3
-	for <lists+kvm@lfdr.de>; Thu, 11 Aug 2022 15:55:28 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 339FA58FDCE
+	for <lists+kvm@lfdr.de>; Thu, 11 Aug 2022 15:55:27 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235212AbiHKNyZ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 11 Aug 2022 09:54:25 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36428 "EHLO
+        id S235230AbiHKNyc (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 11 Aug 2022 09:54:32 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36596 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235059AbiHKNyO (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 11 Aug 2022 09:54:14 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 6726460695
-        for <kvm@vger.kernel.org>; Thu, 11 Aug 2022 06:54:13 -0700 (PDT)
+        with ESMTP id S235191AbiHKNyV (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 11 Aug 2022 09:54:21 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id E06616EF3B
+        for <kvm@vger.kernel.org>; Thu, 11 Aug 2022 06:54:19 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1660226052;
+        s=mimecast20190719; t=1660226059;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=ZhGKF7+dCMLetRacbIFf8HUIdAhXW0qkVdcin2fPWSI=;
-        b=jBZGCMEDLyAmBuLlgWF7NN1AWjH5iuP5T71HEJzKupD61ES/c48adMrzIDrJ6m4qBZ5YJ8
-        agK5l18nbFUg3YD3tuELp1FgzGwGjc93sh1T3TeG7z+Rdioh525ynMzbKSup8ksn/9zK0c
-        BGu7IopISTS2cQsaqinlMGOcHu68a/c=
+        bh=7Qqan27qkIlEMWlFRm4oE0aMcqVLoB6Ybk+9lIy2V1I=;
+        b=Ghoci6S5HTtjjPxAecG2GPqrLIIEXbiRyoJBFC4/Jax6V52VFlVZdEnlM8yBMrv8t1FlBY
+        ifrURlQHzG8SlQi27qx9dbL4q7rqp00yW0ShpCDFUGhgKaJnZnuW7aBZx4G/ybubDlzGv0
+        NVQ0X7E4GpT0I26HBVFjOnCT+NckGJY=
 Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
  [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-644-BK5UrAvbNpOGfXyxE2r_8g-1; Thu, 11 Aug 2022 09:54:09 -0400
-X-MC-Unique: BK5UrAvbNpOGfXyxE2r_8g-1
+ us-mta-221-pUYzMhu_Om-5Y3E5QtubUg-1; Thu, 11 Aug 2022 09:54:14 -0400
+X-MC-Unique: pUYzMhu_Om-5Y3E5QtubUg-1
 Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.rdu2.redhat.com [10.11.54.2])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 1FBCE8117B0;
-        Thu, 11 Aug 2022 13:54:08 +0000 (UTC)
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 727F9811E84;
+        Thu, 11 Aug 2022 13:54:13 +0000 (UTC)
 Received: from eperezma.remote.csb (unknown [10.39.192.231])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id CD95D40D2827;
-        Thu, 11 Aug 2022 13:54:02 +0000 (UTC)
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 6E21640D2827;
+        Thu, 11 Aug 2022 13:54:08 +0000 (UTC)
 From:   =?UTF-8?q?Eugenio=20P=C3=A9rez?= <eperezma@redhat.com>
 To:     virtualization@lists.linux-foundation.org,
         Jason Wang <jasowang@redhat.com>,
@@ -56,18 +56,18 @@ Cc:     ecree.xilinx@gmail.com, gautam.dawar@amd.com,
         Si-Wei Liu <si-wei.liu@oracle.com>,
         Stefano Garzarella <sgarzare@redhat.com>, dinang@xilinx.com,
         Xie Yongji <xieyongji@bytedance.com>
-Subject: [PATCH v8 1/3] vdpa: delete unreachable branch on vdpasim_suspend
-Date:   Thu, 11 Aug 2022 15:53:51 +0200
-Message-Id: <20220811135353.2549658-2-eperezma@redhat.com>
+Subject: [PATCH v8 2/3] vdpa: Remove wrong doc of VHOST_VDPA_SUSPEND ioctl
+Date:   Thu, 11 Aug 2022 15:53:52 +0200
+Message-Id: <20220811135353.2549658-3-eperezma@redhat.com>
 In-Reply-To: <20220811135353.2549658-1-eperezma@redhat.com>
 References: <20220811135353.2549658-1-eperezma@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 X-Scanned-By: MIMEDefang 2.84 on 10.11.54.2
-X-Spam-Status: No, score=-2.7 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=unavailable
+X-Spam-Status: No, score=-3.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,
+        SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -79,30 +79,50 @@ It was a leftover from previous versions.
 
 Signed-off-by: Eugenio Pérez <eperezma@redhat.com>
 ---
- drivers/vdpa/vdpa_sim/vdpa_sim.c | 7 -------
- 1 file changed, 7 deletions(-)
+ include/linux/vdpa.h       |  2 +-
+ include/uapi/linux/vhost.h | 15 +++++----------
+ 2 files changed, 6 insertions(+), 11 deletions(-)
 
-diff --git a/drivers/vdpa/vdpa_sim/vdpa_sim.c b/drivers/vdpa/vdpa_sim/vdpa_sim.c
-index 213883487f9b..79a50edf8998 100644
---- a/drivers/vdpa/vdpa_sim/vdpa_sim.c
-+++ b/drivers/vdpa/vdpa_sim/vdpa_sim.c
-@@ -509,16 +509,9 @@ static int vdpasim_reset(struct vdpa_device *vdpa)
- static int vdpasim_suspend(struct vdpa_device *vdpa)
- {
- 	struct vdpasim *vdpasim = vdpa_to_sim(vdpa);
--	int i;
+diff --git a/include/linux/vdpa.h b/include/linux/vdpa.h
+index d282f464d2f1..6c4e6ea7f7eb 100644
+--- a/include/linux/vdpa.h
++++ b/include/linux/vdpa.h
+@@ -218,7 +218,7 @@ struct vdpa_map_file {
+  * @reset:			Reset device
+  *				@vdev: vdpa device
+  *				Returns integer: success (0) or error (< 0)
+- * @suspend:			Suspend or resume the device (optional)
++ * @suspend:			Suspend the device (optional)
+  *				@vdev: vdpa device
+  *				Returns integer: success (0) or error (< 0)
+  * @get_config_size:		Get the size of the configuration space includes
+diff --git a/include/uapi/linux/vhost.h b/include/uapi/linux/vhost.h
+index 6d9f45163155..89fcb2afe472 100644
+--- a/include/uapi/linux/vhost.h
++++ b/include/uapi/linux/vhost.h
+@@ -171,17 +171,12 @@
+ #define VHOST_VDPA_SET_GROUP_ASID	_IOW(VHOST_VIRTIO, 0x7C, \
+ 					     struct vhost_vring_state)
  
- 	spin_lock(&vdpasim->lock);
- 	vdpasim->running = false;
--	if (vdpasim->running) {
--		/* Check for missed buffers */
--		for (i = 0; i < vdpasim->dev_attr.nvqs; ++i)
--			vdpasim_kick_vq(vdpa, i);
--
--	}
- 	spin_unlock(&vdpasim->lock);
+-/* Suspend or resume a device so it does not process virtqueue requests anymore
++/* Suspend a device so it does not process virtqueue requests anymore
+  *
+- * After the return of ioctl with suspend != 0, the device must finish any
+- * pending operations like in flight requests. It must also preserve all the
+- * necessary state (the virtqueue vring base plus the possible device specific
+- * states) that is required for restoring in the future. The device must not
+- * change its configuration after that point.
+- *
+- * After the return of ioctl with suspend == 0, the device can continue
+- * processing buffers as long as typical conditions are met (vq is enabled,
+- * DRIVER_OK status bit is enabled, etc).
++ * After the return of ioctl the device must finish any pending operations. It
++ * must also preserve all the necessary state (the virtqueue vring base plus
++ * the possible device specific states) that is required for restoring in the
++ * future. The device must not change its configuration after that point.
+  */
+ #define VHOST_VDPA_SUSPEND		_IOW(VHOST_VIRTIO, 0x7D, int)
  
- 	return 0;
 -- 
 2.31.1
 
