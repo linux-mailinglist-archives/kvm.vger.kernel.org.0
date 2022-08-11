@@ -2,325 +2,203 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 025AC58F99F
-	for <lists+kvm@lfdr.de>; Thu, 11 Aug 2022 10:58:50 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 3464758FA53
+	for <lists+kvm@lfdr.de>; Thu, 11 Aug 2022 11:59:14 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234819AbiHKI6q convert rfc822-to-8bit (ORCPT
-        <rfc822;lists+kvm@lfdr.de>); Thu, 11 Aug 2022 04:58:46 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38878 "EHLO
+        id S234638AbiHKJ7C (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 11 Aug 2022 05:59:02 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36502 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234288AbiHKI6p (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 11 Aug 2022 04:58:45 -0400
-Received: from smtp236.sjtu.edu.cn (smtp236.sjtu.edu.cn [202.120.2.236])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DA55F93500;
-        Thu, 11 Aug 2022 01:58:38 -0700 (PDT)
-Received: from mta90.sjtu.edu.cn (unknown [10.118.0.90])
-        by smtp236.sjtu.edu.cn (Postfix) with ESMTPS id 489ED1008B38D;
-        Thu, 11 Aug 2022 16:58:36 +0800 (CST)
-Received: from localhost (localhost.localdomain [127.0.0.1])
-        by mta90.sjtu.edu.cn (Postfix) with ESMTP id 367A037C894;
-        Thu, 11 Aug 2022 16:58:36 +0800 (CST)
-X-Virus-Scanned: amavisd-new at 
-Received: from mta90.sjtu.edu.cn ([127.0.0.1])
-        by localhost (mta90.sjtu.edu.cn [127.0.0.1]) (amavisd-new, port 10026)
-        with ESMTP id b23Tk3-bSQrg; Thu, 11 Aug 2022 16:58:36 +0800 (CST)
-Received: from mstore105.sjtu.edu.cn (mstore101.sjtu.edu.cn [10.118.0.105])
-        by mta90.sjtu.edu.cn (Postfix) with ESMTP id E110D37C893;
-        Thu, 11 Aug 2022 16:58:35 +0800 (CST)
-Date:   Thu, 11 Aug 2022 16:58:35 +0800 (CST)
-From:   Guo Zhi <qtxuning1999@sjtu.edu.cn>
-To:     jasowang <jasowang@redhat.com>
-Cc:     eperezma <eperezma@redhat.com>, sgarzare <sgarzare@redhat.com>,
-        Michael Tsirkin <mst@redhat.com>,
-        netdev <netdev@vger.kernel.org>,
-        linux-kernel <linux-kernel@vger.kernel.org>,
-        kvm list <kvm@vger.kernel.org>,
-        virtualization <virtualization@lists.linux-foundation.org>
-Message-ID: <1086777713.7205476.1660208315800.JavaMail.zimbra@sjtu.edu.cn>
-In-Reply-To: <CACGkMEt4GzC7t0qqc2SgUWDRB9Amr+XDKiYOKmogrOyfCBFwvA@mail.gmail.com>
-References: <20220721084341.24183-1-qtxuning1999@sjtu.edu.cn> <20220721084341.24183-2-qtxuning1999@sjtu.edu.cn> <16a232ad-e0a1-fd4c-ae3e-27db168daacb@redhat.com> <2a8838c4-2e6f-6de7-dcdc-572699ff3dc9@sjtu.edu.cn> <CACGkMEuwgZRt=J_2i-XugMZtcG-xZ7ZF1RpTjmErT5+RCcZ1OQ@mail.gmail.com> <682271447.4491372.1659449548731.JavaMail.zimbra@sjtu.edu.cn> <CACGkMEt4GzC7t0qqc2SgUWDRB9Amr+XDKiYOKmogrOyfCBFwvA@mail.gmail.com>
-Subject: Re: [RFC 1/5] vhost: reorder used descriptors in a batch
+        with ESMTP id S229540AbiHKJ67 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 11 Aug 2022 05:58:59 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 0656B91096
+        for <kvm@vger.kernel.org>; Thu, 11 Aug 2022 02:58:57 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1660211937;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=/R7Dryv+d3GV8pIXJrc5C98POWrIYtqGZwBiNr+Dx9I=;
+        b=R/Nvp7V91kusqwT9k4PzuN7jZvNUv/gvSztRZ5DAlrxSTXYo926VipWA6/8rY6WmBxBO8/
+        HvWtdMkAmECg+ZL0dGU0uzjtXGhFpoSB9IJNNncESX/iFzoKxzZLtu0R3flqTpnBYucUim
+        w7fICKaxUoIRf593/gMqYgKEADCWP/8=
+Received: from mail-qk1-f198.google.com (mail-qk1-f198.google.com
+ [209.85.222.198]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_128_GCM_SHA256) id
+ us-mta-350-i3wzJ6BtOvyeeyI4_5Pd3Q-1; Thu, 11 Aug 2022 05:58:55 -0400
+X-MC-Unique: i3wzJ6BtOvyeeyI4_5Pd3Q-1
+Received: by mail-qk1-f198.google.com with SMTP id bi22-20020a05620a319600b006b92f4b2ebbso11579864qkb.22
+        for <kvm@vger.kernel.org>; Thu, 11 Aug 2022 02:58:55 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc;
+        bh=/R7Dryv+d3GV8pIXJrc5C98POWrIYtqGZwBiNr+Dx9I=;
+        b=P9bJlG5x61oS5Q/quO6T3SytfI3Pi/NiOCW6ttp3dhJVkM0gVSWsqFMRStBVQkAzIG
+         5NE+4IBPt5Tz+4m+yvmfLzHJRHfepHqYdSKe4iHKdJryK4wMAZorxoViGn0xBcxhmFrb
+         wkfQmowO3iFyYEmGtFQv0T3is6XcRdnx10/e+NPd70qTMrdn+K6qF0mxwgNA0XEWuP7U
+         GbBWPiOpqtBNdcWmHO52hZqChUHP7kpJ89LiPFjZG3yWn2ZYz07A08b+d4xBjBGwA6/l
+         l2do+z05koZSBdyxKm3l7npFF9iryWpCV2cV2zKqqwQASZSmOs3fP5MRS0Oow00sGEvV
+         nKxg==
+X-Gm-Message-State: ACgBeo2boFOWWG1uMmZZix/xW199ZGF0qlq4SjlCuctCbsXJlWsx3Jh9
+        vD6BgZFgnty/P9JXGLQlr5gSGR5eLJKkgtw0WTfXo748bPgZZ8Cu7ovKANy+2VUtDBBlOYti+6x
+        NHB/I7tBOyVI1pELphhrgXnkOT/0a
+X-Received: by 2002:a05:620a:f10:b0:6aa:318e:55a9 with SMTP id v16-20020a05620a0f1000b006aa318e55a9mr23448004qkl.559.1660211935146;
+        Thu, 11 Aug 2022 02:58:55 -0700 (PDT)
+X-Google-Smtp-Source: AA6agR46iI6RWBek+haxJNWFLlFbtaxPouhpPjWxx1Oi5kVglzYBHHk8gTkRWafFNCXiOMZYpxsi+7dCewFJ21Y2Eu8=
+X-Received: by 2002:a05:620a:f10:b0:6aa:318e:55a9 with SMTP id
+ v16-20020a05620a0f1000b006aa318e55a9mr23447989qkl.559.1660211934843; Thu, 11
+ Aug 2022 02:58:54 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=GB2312
-Content-Transfer-Encoding: 8BIT
-X-Originating-IP: [113.222.45.197]
-X-Mailer: Zimbra 8.8.15_GA_4308 (ZimbraWebClient - GC103 (Mac)/8.8.15_GA_3928)
-Thread-Topic: vhost: reorder used descriptors in a batch
-Thread-Index: M16IR97jTiXFP6299ulwkGGu3xALKQ==
-X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,SPF_HELO_NONE,
-        SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no
-        version=3.4.6
+References: <20220810171512.2343333-1-eperezma@redhat.com> <20220810171512.2343333-4-eperezma@redhat.com>
+ <20220811042847-mutt-send-email-mst@kernel.org>
+In-Reply-To: <20220811042847-mutt-send-email-mst@kernel.org>
+From:   Eugenio Perez Martin <eperezma@redhat.com>
+Date:   Thu, 11 Aug 2022 11:58:18 +0200
+Message-ID: <CAJaqyWc46O6TNZzVSizDXnWk4KkM40O9+M2CNVOdkLzUdXmFqQ@mail.gmail.com>
+Subject: Re: [PATCH v7 3/4] vhost-vdpa: uAPI to suspend the device
+To:     "Michael S. Tsirkin" <mst@redhat.com>
+Cc:     kvm list <kvm@vger.kernel.org>,
+        linux-kernel <linux-kernel@vger.kernel.org>,
+        Jason Wang <jasowang@redhat.com>,
+        virtualization <virtualization@lists.linux-foundation.org>,
+        netdev <netdev@vger.kernel.org>,
+        Dinan Gunawardena <dinang@xilinx.com>,
+        Martin Porter <martinpo@xilinx.com>,
+        Wu Zongyong <wuzongyong@linux.alibaba.com>,
+        "Uminski, Piotr" <Piotr.Uminski@intel.com>,
+        "Dawar, Gautam" <gautam.dawar@amd.com>, ecree.xilinx@gmail.com,
+        Martin Petrus Hubertus Habets <martinh@xilinx.com>,
+        Stefano Garzarella <sgarzare@redhat.com>,
+        Pablo Cascon Katchadourian <pabloc@xilinx.com>,
+        habetsm.xilinx@gmail.com, Laurent Vivier <lvivier@redhat.com>,
+        Zhu Lingshan <lingshan.zhu@intel.com>,
+        "Kamde, Tanuj" <tanuj.kamde@amd.com>,
+        Longpeng <longpeng2@huawei.com>, Cindy Lu <lulu@redhat.com>,
+        Harpreet Singh Anand <hanand@xilinx.com>,
+        Parav Pandit <parav@nvidia.com>,
+        Si-Wei Liu <si-wei.liu@oracle.com>,
+        Eli Cohen <elic@nvidia.com>,
+        Xie Yongji <xieyongji@bytedance.com>,
+        Zhang Min <zhang.min9@zte.com.cn>,
+        Dan Carpenter <dan.carpenter@oracle.com>,
+        Christophe JAILLET <christophe.jaillet@wanadoo.fr>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Spam-Status: No, score=-2.7 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+On Thu, Aug 11, 2022 at 10:29 AM Michael S. Tsirkin <mst@redhat.com> wrote:
+>
+> On Wed, Aug 10, 2022 at 07:15:11PM +0200, Eugenio P=C3=A9rez wrote:
+> > The ioctl adds support for suspending the device from userspace.
+> >
+> > This is a must before getting virtqueue indexes (base) for live migrati=
+on,
+> > since the device could modify them after userland gets them. There are
+> > individual ways to perform that action for some devices
+> > (VHOST_NET_SET_BACKEND, VHOST_VSOCK_SET_RUNNING, ...) but there was no
+> > way to perform it for any vhost device (and, in particular, vhost-vdpa)=
+.
+> >
+> > After a successful return of the ioctl call the device must not process
+> > more virtqueue descriptors. The device can answer to read or writes of
+> > config fields as if it were not suspended. In particular, writing to
+> > "queue_enable" with a value of 1 will not make the device start
+> > processing buffers of the virtqueue.
+> >
+> > Signed-off-by: Eugenio P=C3=A9rez <eperezma@redhat.com>
+> > Message-Id: <20220623160738.632852-4-eperezma@redhat.com>
+> > Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
+>
+> You are not supposed to include upstream maintainer's signoff
+> like this.
+>
 
+I'm very sorry, I modified the commits in your vhost branch and I left
+the signoff (and message-id) lines by mistake.
 
------ Original Message -----
-> From: "jasowang" <jasowang@redhat.com>
-> To: "Guo Zhi" <qtxuning1999@sjtu.edu.cn>
-> Cc: "eperezma" <eperezma@redhat.com>, "sgarzare" <sgarzare@redhat.com>, "Michael Tsirkin" <mst@redhat.com>, "netdev"
-> <netdev@vger.kernel.org>, "linux-kernel" <linux-kernel@vger.kernel.org>, "kvm list" <kvm@vger.kernel.org>,
-> "virtualization" <virtualization@lists.linux-foundation.org>
-> Sent: Thursday, August 4, 2022 1:04:16 PM
-> Subject: Re: [RFC 1/5] vhost: reorder used descriptors in a batch
+> > ---
+> > v7: Delete argument to ioctl, unused
+> > ---
+> >  drivers/vhost/vdpa.c       | 19 +++++++++++++++++++
+> >  include/uapi/linux/vhost.h |  9 +++++++++
+> >  2 files changed, 28 insertions(+)
+> >
+> > diff --git a/drivers/vhost/vdpa.c b/drivers/vhost/vdpa.c
+> > index 3d636e192061..7fa671ac4bdf 100644
+> > --- a/drivers/vhost/vdpa.c
+> > +++ b/drivers/vhost/vdpa.c
+> > @@ -478,6 +478,22 @@ static long vhost_vdpa_get_vqs_count(struct vhost_=
+vdpa *v, u32 __user *argp)
+> >       return 0;
+> >  }
+> >
+> > +/* After a successful return of ioctl the device must not process more
+> > + * virtqueue descriptors. The device can answer to read or writes of c=
+onfig
+> > + * fields as if it were not suspended. In particular, writing to "queu=
+e_enable"
+> > + * with a value of 1 will not make the device start processing buffers=
+.
+> > + */
+> > +static long vhost_vdpa_suspend(struct vhost_vdpa *v)
+> > +{
+> > +     struct vdpa_device *vdpa =3D v->vdpa;
+> > +     const struct vdpa_config_ops *ops =3D vdpa->config;
+> > +
+> > +     if (!ops->suspend)
+> > +             return -EOPNOTSUPP;
+> > +
+> > +     return ops->suspend(vdpa);
+> > +}
+> > +
+> >  static long vhost_vdpa_vring_ioctl(struct vhost_vdpa *v, unsigned int =
+cmd,
+> >                                  void __user *argp)
+> >  {
+> > @@ -654,6 +670,9 @@ static long vhost_vdpa_unlocked_ioctl(struct file *=
+filep,
+> >       case VHOST_VDPA_GET_VQS_COUNT:
+> >               r =3D vhost_vdpa_get_vqs_count(v, argp);
+> >               break;
+> > +     case VHOST_VDPA_SUSPEND:
+> > +             r =3D vhost_vdpa_suspend(v);
+> > +             break;
+> >       default:
+> >               r =3D vhost_dev_ioctl(&v->vdev, cmd, argp);
+> >               if (r =3D=3D -ENOIOCTLCMD)
+> > diff --git a/include/uapi/linux/vhost.h b/include/uapi/linux/vhost.h
+> > index cab645d4a645..f9f115a7c75b 100644
+> > --- a/include/uapi/linux/vhost.h
+> > +++ b/include/uapi/linux/vhost.h
+> > @@ -171,4 +171,13 @@
+> >  #define VHOST_VDPA_SET_GROUP_ASID    _IOW(VHOST_VIRTIO, 0x7C, \
+> >                                            struct vhost_vring_state)
+> >
+> > +/* Suspend a device so it does not process virtqueue requests anymore
+> > + *
+> > + * After the return of ioctl the device must preserve all the necessar=
+y state
+> > + * (the virtqueue vring base plus the possible device specific states)=
+ that is
+> > + * required for restoring in the future. The device must not change it=
+s
+> > + * configuration after that point.
+> > + */
+> > +#define VHOST_VDPA_SUSPEND           _IO(VHOST_VIRTIO, 0x7D)
+> > +
+> >  #endif
+> > --
+> > 2.31.1
+>
 
-> On Tue, Aug 2, 2022 at 10:12 PM Guo Zhi <qtxuning1999@sjtu.edu.cn> wrote:
->>
->>
->>
->> ----- Original Message -----
->> > From: "jasowang" <jasowang@redhat.com>
->> > To: "Guo Zhi" <qtxuning1999@sjtu.edu.cn>
->> > Cc: "eperezma" <eperezma@redhat.com>, "sgarzare" <sgarzare@redhat.com>, "Michael
->> > Tsirkin" <mst@redhat.com>, "netdev"
->> > <netdev@vger.kernel.org>, "linux-kernel" <linux-kernel@vger.kernel.org>, "kvm
->> > list" <kvm@vger.kernel.org>,
->> > "virtualization" <virtualization@lists.linux-foundation.org>
->> > Sent: Friday, July 29, 2022 3:32:02 PM
->> > Subject: Re: [RFC 1/5] vhost: reorder used descriptors in a batch
->>
->> > On Thu, Jul 28, 2022 at 4:26 PM Guo Zhi <qtxuning1999@sjtu.edu.cn> wrote:
->> >>
->> >> On 2022/7/26 15:36, Jason Wang wrote:
->> >>
->> >>
->> >> ÔÚ 2022/7/21 16:43, Guo Zhi Ð´µÀ:
->> >>
->> >> Device may not use descriptors in order, for example, NIC and SCSI may
->> >> not call __vhost_add_used_n with buffers in order.  It's the task of
->> >> __vhost_add_used_n to order them.
->> >>
->> >>
->> >>
->> >> I'm not sure this is ture. Having ooo descriptors is probably by design to have
->> >> better performance.
->> >>
->> >> This might be obvious for device that may have elevator or QOS stuffs.
->> >>
->> >> I suspect the right thing to do here is, for the device that can't perform
->> >> better in the case of IN_ORDER, let's simply not offer IN_ORDER (zerocopy or
->> >> scsi). And for the device we know it can perform better, non-zercopy ethernet
->> >> device we can do that.
->> >>
->> >>
->> >>   This commit reorder the buffers using
->> >> vq->heads, only the batch is begin from the expected start point and is
->> >> continuous can the batch be exposed to driver.  And only writing out a
->> >> single used ring for a batch of descriptors, according to VIRTIO 1.1
->> >> spec.
->> >>
->> >>
->> >>
->> >> So this sounds more like a "workaround" of the device that can't consume buffer
->> >> in order, I suspect it can help in performance.
->> >>
->> >> More below.
->> >>
->> >>
->> >>
->> >> Signed-off-by: Guo Zhi <qtxuning1999@sjtu.edu.cn>
->> >> ---
->> >>   drivers/vhost/vhost.c | 44 +++++++++++++++++++++++++++++++++++++++++--
->> >>   drivers/vhost/vhost.h |  3 +++
->> >>   2 files changed, 45 insertions(+), 2 deletions(-)
->> >>
->> >> diff --git a/drivers/vhost/vhost.c b/drivers/vhost/vhost.c
->> >> index 40097826c..e2e77e29f 100644
->> >> --- a/drivers/vhost/vhost.c
->> >> +++ b/drivers/vhost/vhost.c
->> >> @@ -317,6 +317,7 @@ static void vhost_vq_reset(struct vhost_dev *dev,
->> >>       vq->used_flags = 0;
->> >>       vq->log_used = false;
->> >>       vq->log_addr = -1ull;
->> >> +    vq->next_used_head_idx = 0;
->> >>       vq->private_data = NULL;
->> >>       vq->acked_features = 0;
->> >>       vq->acked_backend_features = 0;
->> >> @@ -398,6 +399,8 @@ static long vhost_dev_alloc_iovecs(struct vhost_dev *dev)
->> >>                         GFP_KERNEL);
->> >>           if (!vq->indirect || !vq->log || !vq->heads)
->> >>               goto err_nomem;
->> >> +
->> >> +        memset(vq->heads, 0, sizeof(*vq->heads) * dev->iov_limit);
->> >>       }
->> >>       return 0;
->> >>   @@ -2374,12 +2377,49 @@ static int __vhost_add_used_n(struct vhost_virtqueue
->> >>   *vq,
->> >>                   unsigned count)
->> >>   {
->> >>       vring_used_elem_t __user *used;
->> >> +    struct vring_desc desc;
->> >>       u16 old, new;
->> >>       int start;
->> >> +    int begin, end, i;
->> >> +    int copy_n = count;
->> >> +
->> >> +    if (vhost_has_feature(vq, VIRTIO_F_IN_ORDER)) {
->> >>
->> >>
->> >>
->> >> How do you guarantee that ids of heads are contiguous?
->> >>
->> >> There is no need to be contiguous for ids of heads.
->> >>
->> >> For example, I have three buffer { .id = 0, 15}, {.id = 20, 30} {.id = 15, 20}
->> >> for vhost_add_used_n. Then I will let the vq->heads[0].len=15.
->> >> vq->heads[15].len=5, vq->heads[20].len=10 as reorder. Once I found there is no
->> >> hold in the batched descriptors. I will expose them to driver.
->> >
->> > So spec said:
->> >
->> > "If VIRTIO_F_IN_ORDER has been negotiated, driver uses descriptors in
->> > ring order: starting from offset 0 in the table, and wrapping around
->> > at the end of the table."
->> >
->> > And
->> >
->> > "VIRTIO_F_IN_ORDER(35)This feature indicates that all buffers are used
->> > by the device in the same order in which they have been made
->> > available."
->> >
->> > This means your example is not an IN_ORDER device.
->> >
->> > The driver should submit buffers (assuming each buffer have one
->> > descriptor) in order {id = 0, 15}, {id = 1, 30} and {id = 2, 20}.
->> >
->> > And even if it is submitted in order, we can not use a batch because:
->> >
->> > "The skipped buffers (for which no used ring entry was written) are
->> > assumed to have been used (read or written) by the device completely."
->> >
->> > This means for TX we are probably ok, but for rx, unless we know the
->> > buffers were written completely, we can't write them in a batch.
->> >
->> > I'd suggest to do cross testing for this series:
->> >
->> > 1) testing vhost IN_ORDER support with DPDK virtio PMD
->> > 2) testing virtio IN_ORDER with DPDK vhost-user via testpmd
->> >
->> > Thanks
->> >
->> You are correct, for rx we can't do a batch because we have to let the driver
->> know the length of buffers.
-> 
-> Note that we can do a batch for rx when we know all the buffers have
-> been fully written.
-> 
->>
->> I think these circumstances can offer batch:
->> 1. tx
->> 2. rx with RX_MRGBUF feature, which introduce a header for each received buffer
->>
->> Consider batch is not a mandatory requirement for in order feature according to
->> spec.
->> I'd like to let current RFC patch focus on in order implementation, and send
->> another
->> patch series to improve performance by batching on above circumstances.
-> 
-> That's fine, how about simply starting from the patch that offers
-> IN_ORDER when zerocopy is disabled?
-> 
-
-Yeah, I'd like to start from vsock device, which doesn't use zerocopy
-
-Thanks
-> Thanks
-> 
->>
->> What's your opinon.
->>
->> Thanks
->> >
->> >>
->> >>
->> >> +        /* calculate descriptor chain length for each used buffer */
->> >>
->> >>
->> >>
->> >> I'm a little bit confused about this comment, we have heads[i].len for this?
->> >>
->> >> Maybe I should not use vq->heads, some misleading.
->> >>
->> >>
->> >> +        for (i = 0; i < count; i++) {
->> >> +            begin = heads[i].id;
->> >> +            end = begin;
->> >> +            vq->heads[begin].len = 0;
->> >>
->> >>
->> >>
->> >> Does this work for e.g RX virtqueue?
->> >>
->> >>
->> >> +            do {
->> >> +                vq->heads[begin].len += 1;
->> >> +                if (unlikely(vhost_get_desc(vq, &desc, end))) {
->> >>
->> >>
->> >>
->> >> Let's try hard to avoid more userspace copy here, it's the source of performance
->> >> regression.
->> >>
->> >> Thanks
->> >>
->> >>
->> >> +                    vq_err(vq, "Failed to get descriptor: idx %d addr %p\n",
->> >> +                           end, vq->desc + end);
->> >> +                    return -EFAULT;
->> >> +                }
->> >> +            } while ((end = next_desc(vq, &desc)) != -1);
->> >> +        }
->> >> +
->> >> +        count = 0;
->> >> +        /* sort and batch continuous used ring entry */
->> >> +        while (vq->heads[vq->next_used_head_idx].len != 0) {
->> >> +            count++;
->> >> +            i = vq->next_used_head_idx;
->> >> +            vq->next_used_head_idx = (vq->next_used_head_idx +
->> >> +                          vq->heads[vq->next_used_head_idx].len)
->> >> +                          % vq->num;
->> >> +            vq->heads[i].len = 0;
->> >> +        }
->> >> +        /* only write out a single used ring entry with the id corresponding
->> >> +         * to the head entry of the descriptor chain describing the last buffer
->> >> +         * in the batch.
->> >> +         */
->> >> +        heads[0].id = i;
->> >> +        copy_n = 1;
->> >> +    }
->> >>         start = vq->last_used_idx & (vq->num - 1);
->> >>       used = vq->used->ring + start;
->> >> -    if (vhost_put_used(vq, heads, start, count)) {
->> >> +    if (vhost_put_used(vq, heads, start, copy_n)) {
->> >>           vq_err(vq, "Failed to write used");
->> >>           return -EFAULT;
->> >>       }
->> >> @@ -2410,7 +2450,7 @@ int vhost_add_used_n(struct vhost_virtqueue *vq, struct
->> >> vring_used_elem *heads,
->> >>         start = vq->last_used_idx & (vq->num - 1);
->> >>       n = vq->num - start;
->> >> -    if (n < count) {
->> >> +    if (n < count && !vhost_has_feature(vq, VIRTIO_F_IN_ORDER)) {
->> >>           r = __vhost_add_used_n(vq, heads, n);
->> >>           if (r < 0)
->> >>               return r;
->> >> diff --git a/drivers/vhost/vhost.h b/drivers/vhost/vhost.h
->> >> index d9109107a..7b2c0fbb5 100644
->> >> --- a/drivers/vhost/vhost.h
->> >> +++ b/drivers/vhost/vhost.h
->> >> @@ -107,6 +107,9 @@ struct vhost_virtqueue {
->> >>       bool log_used;
->> >>       u64 log_addr;
->> >>   +    /* Sort heads in order */
->> >> +    u16 next_used_head_idx;
->> >> +
->> >>       struct iovec iov[UIO_MAXIOV];
->> >>       struct iovec iotlb_iov[64];
->> >>       struct iovec *indirect;
->> >>
->> >>
->> >>
->>
