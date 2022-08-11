@@ -2,117 +2,102 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 2F16B58F833
-	for <lists+kvm@lfdr.de>; Thu, 11 Aug 2022 09:17:28 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 5CB3158F8A1
+	for <lists+kvm@lfdr.de>; Thu, 11 Aug 2022 09:54:50 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234022AbiHKHR0 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 11 Aug 2022 03:17:26 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53278 "EHLO
+        id S234280AbiHKHys (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 11 Aug 2022 03:54:48 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60570 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233563AbiHKHRZ (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 11 Aug 2022 03:17:25 -0400
-Received: from mga18.intel.com (mga18.intel.com [134.134.136.126])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 00902760C4
-        for <kvm@vger.kernel.org>; Thu, 11 Aug 2022 00:17:24 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1660202245; x=1691738245;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=3KYvpST+bKbnrxkz5t5MctHL3D3UTy9lSqp411H2Tmk=;
-  b=hoTHbxTvPf/vNlz1nZvKijsPNSmbtbLiPYL581suHHKXlSR2ZhhtLkNr
-   8+hnvsOE7EH9q4zS8vYynOpNm/cu7cVU9vC7xI6J06T3wmfGxnV+j4VWH
-   SWAOZtFOR+CQG4bYCa3VzAsKOXbsHEkHRaoxYDQydlQFeSRSA/cdUalM9
-   Y5mqNZLp6TRstrJfjQ6Bq3Qh4hHUs3Migp0G807MzviI/Ix4V/HChJko7
-   +RpI6OuSrFgzo/aYse1kDkgUH9PfQoXVzokpUkPPhTGt7FibzeN3M05he
-   ro8YGRZ/yJYcQ6o5CuVmXo6/uKOqtIAIFl7XS8dJChpk6fNYVYbPpRj/R
-   A==;
-X-IronPort-AV: E=McAfee;i="6400,9594,10435"; a="274335637"
-X-IronPort-AV: E=Sophos;i="5.93,228,1654585200"; 
-   d="scan'208";a="274335637"
-Received: from orsmga003.jf.intel.com ([10.7.209.27])
-  by orsmga106.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 11 Aug 2022 00:16:58 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.93,228,1654585200"; 
-   d="scan'208";a="556029924"
-Received: from lkp-server02.sh.intel.com (HELO d10ab0927833) ([10.239.97.151])
-  by orsmga003.jf.intel.com with ESMTP; 11 Aug 2022 00:16:55 -0700
-Received: from kbuild by d10ab0927833 with local (Exim 4.96)
-        (envelope-from <lkp@intel.com>)
-        id 1oM2R4-00005F-1n;
-        Thu, 11 Aug 2022 07:16:54 +0000
-Date:   Thu, 11 Aug 2022 15:16:08 +0800
-From:   kernel test robot <lkp@intel.com>
-To:     Peter Collingbourne <pcc@google.com>,
-        linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu
-Cc:     kbuild-all@lists.01.org, Peter Collingbourne <pcc@google.com>,
-        Cornelia Huck <cohuck@redhat.com>,
-        Catalin Marinas <catalin.marinas@arm.com>,
-        Will Deacon <will@kernel.org>, Marc Zyngier <maz@kernel.org>,
-        Evgenii Stepanov <eugenis@google.com>, kvm@vger.kernel.org,
-        Steven Price <steven.price@arm.com>,
-        Vincenzo Frascino <vincenzo.frascino@arm.com>
-Subject: Re: [PATCH v3 3/7] mm: Add PG_arch_3 page flag
-Message-ID: <202208111500.62e0Bl2l-lkp@intel.com>
-References: <20220810193033.1090251-4-pcc@google.com>
+        with ESMTP id S234307AbiHKHyp (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 11 Aug 2022 03:54:45 -0400
+Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D2B998E993
+        for <kvm@vger.kernel.org>; Thu, 11 Aug 2022 00:54:44 -0700 (PDT)
+Received: from pps.filterd (m0098399.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.17.1.5/8.17.1.5) with ESMTP id 27B6iH6N026945
+        for <kvm@vger.kernel.org>; Thu, 11 Aug 2022 07:54:44 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=content-type :
+ mime-version : content-transfer-encoding : in-reply-to : references : to :
+ from : subject : cc : message-id : date; s=pp1;
+ bh=rYr+a4GvS/NBKYKhTdMu7oesP+H5CI3VpW7I/ptjvOI=;
+ b=r718MaRPlqI3id/xb2+GEhDlrUZ8LwZl/MKz8NfF/4GNhUnFq7CPnSOWoT1kH2L+hRnI
+ qf3GuHtheGIaDHNkTsEcfQAJfHlvHacLkzqePxRvq947NkX61cxWPL5T3mABrMPf5XjW
+ sjxUbdkT29qAuPPTPgmzZu1U41zXxnRO05QtUBK0RUK3C235EBJJWy9dM0l3Xb5+tyJc
+ CcamE77hEQeIhYZh+hueE3iAK7ujU9w0Sw6UmbHvlFWyoVrRUyE9lkWwl34s0hzdriCc
+ ueN7y39IOwWdTpFJ9uqIqB64KxHeXlG19qv80lcLmPPniaVOeY4yRAQTr/cHhvVTzZIh 7Q== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3hvvrphtd1-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT)
+        for <kvm@vger.kernel.org>; Thu, 11 Aug 2022 07:54:44 +0000
+Received: from m0098399.ppops.net (m0098399.ppops.net [127.0.0.1])
+        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 27B6iSE0031508
+        for <kvm@vger.kernel.org>; Thu, 11 Aug 2022 07:54:44 GMT
+Received: from ppma06ams.nl.ibm.com (66.31.33a9.ip4.static.sl-reverse.com [169.51.49.102])
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3hvvrphtcc-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Thu, 11 Aug 2022 07:54:43 +0000
+Received: from pps.filterd (ppma06ams.nl.ibm.com [127.0.0.1])
+        by ppma06ams.nl.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 27B7p884013896;
+        Thu, 11 Aug 2022 07:54:41 GMT
+Received: from b06cxnps3074.portsmouth.uk.ibm.com (d06relay09.portsmouth.uk.ibm.com [9.149.109.194])
+        by ppma06ams.nl.ibm.com with ESMTP id 3huwvf1q16-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Thu, 11 Aug 2022 07:54:41 +0000
+Received: from d06av24.portsmouth.uk.ibm.com (d06av24.portsmouth.uk.ibm.com [9.149.105.60])
+        by b06cxnps3074.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 27B7scJW32506188
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Thu, 11 Aug 2022 07:54:38 GMT
+Received: from d06av24.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 71E1E4203F;
+        Thu, 11 Aug 2022 07:54:38 +0000 (GMT)
+Received: from d06av24.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 4689042042;
+        Thu, 11 Aug 2022 07:54:38 +0000 (GMT)
+Received: from li-ca45c2cc-336f-11b2-a85c-c6e71de567f1.ibm.com (unknown [9.171.35.74])
+        by d06av24.portsmouth.uk.ibm.com (Postfix) with ESMTP;
+        Thu, 11 Aug 2022 07:54:38 +0000 (GMT)
+Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20220810193033.1090251-4-pcc@google.com>
-X-Spam-Status: No, score=-2.7 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,SPF_HELO_NONE,
-        SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no
-        version=3.4.6
+Content-Transfer-Encoding: quoted-printable
+In-Reply-To: <20220810151302.67aa3d3c@p-imbrenda>
+References: <20220722060043.733796-1-nrb@linux.ibm.com> <20220722060043.733796-4-nrb@linux.ibm.com> <20220810120822.51ead12d@p-imbrenda> <166013456744.24812.12686537606143025741@localhost.localdomain> <20220810151302.67aa3d3c@p-imbrenda>
+To:     Claudio Imbrenda <imbrenda@linux.ibm.com>
+From:   Nico Boehr <nrb@linux.ibm.com>
+Subject: Re: [kvm-unit-tests PATCH v3 3/4] s390x: add extint loop test
+Cc:     kvm@vger.kernel.org, frankja@linux.ibm.com, thuth@redhat.com
+Message-ID: <166020447794.24812.2478143576932288604@localhost.localdomain>
+User-Agent: alot/0.8.1
+Date:   Thu, 11 Aug 2022 09:54:37 +0200
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: NH3phdTcDy4xPAoPdvSqsgIr4hOWiZQs
+X-Proofpoint-ORIG-GUID: VUYYel9HfWiA-FrVQz2sMJWMP3QxahGB
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.205,Aquarius:18.0.883,Hydra:6.0.517,FMLib:17.11.122.1
+ definitions=2022-08-11_03,2022-08-10_01,2022-06-22_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 adultscore=0 spamscore=0
+ lowpriorityscore=0 clxscore=1015 phishscore=0 mlxscore=0 impostorscore=0
+ suspectscore=0 bulkscore=0 priorityscore=1501 mlxlogscore=641
+ malwarescore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2207270000 definitions=main-2208110020
+X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_EF,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_PASS,
+        T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi Peter,
+Quoting Claudio Imbrenda (2022-08-10 15:13:02)
+[...]
+> just add a comment to explain that
 
-Thank you for the patch! Perhaps something to improve:
+Yes makes sense, thanks. I came up with this:
 
-[auto build test WARNING on arm64/for-next/core]
-[also build test WARNING on linus/master next-20220811]
-[cannot apply to kvmarm/next arm/for-next soc/for-next xilinx-xlnx/master v5.19]
-[If your patch is applied to the wrong git tree, kindly drop us a note.
-And when submitting patch, we suggest to use '--base' as documented in
-https://git-scm.com/docs/git-format-patch#_base_tree_information]
-
-url:    https://github.com/intel-lab-lkp/linux/commits/Peter-Collingbourne/KVM-arm64-permit-MAP_SHARED-mappings-with-MTE-enabled/20220811-033310
-base:   https://git.kernel.org/pub/scm/linux/kernel/git/arm64/linux.git for-next/core
-config: loongarch-defconfig (https://download.01.org/0day-ci/archive/20220811/202208111500.62e0Bl2l-lkp@intel.com/config)
-compiler: loongarch64-linux-gcc (GCC) 12.1.0
-reproduce (this is a W=1 build):
-        wget https://raw.githubusercontent.com/intel/lkp-tests/master/sbin/make.cross -O ~/bin/make.cross
-        chmod +x ~/bin/make.cross
-        # https://github.com/intel-lab-lkp/linux/commit/1a400517d8428df0ec9f86f8d303b2227ee9702f
-        git remote add linux-review https://github.com/intel-lab-lkp/linux
-        git fetch --no-tags linux-review Peter-Collingbourne/KVM-arm64-permit-MAP_SHARED-mappings-with-MTE-enabled/20220811-033310
-        git checkout 1a400517d8428df0ec9f86f8d303b2227ee9702f
-        # save the config file
-        mkdir build_dir && cp config build_dir/.config
-        COMPILER_INSTALL_PATH=$HOME/0day COMPILER=gcc-12.1.0 make.cross W=1 O=build_dir ARCH=loongarch SHELL=/bin/bash
-
-If you fix the issue, kindly add following tag where applicable
-Reported-by: kernel test robot <lkp@intel.com>
-
-All warnings (new ones prefixed by >>):
-
->> mm/memory.c:92:2: warning: #warning Unfortunate NUMA and NUMA Balancing config, growing page-frame for last_cpupid. [-Wcpp]
-      92 | #warning Unfortunate NUMA and NUMA Balancing config, growing page-frame for last_cpupid.
-         |  ^~~~~~~
-
-
-vim +92 mm/memory.c
-
-42b7772812d15b Jan Beulich    2008-07-23  90  
-af27d9403f5b80 Arnd Bergmann  2018-02-16  91  #if defined(LAST_CPUPID_NOT_IN_PAGE_FLAGS) && !defined(CONFIG_COMPILE_TEST)
-90572890d20252 Peter Zijlstra 2013-10-07 @92  #warning Unfortunate NUMA and NUMA Balancing config, growing page-frame for last_cpupid.
-75980e97daccfc Peter Zijlstra 2013-02-22  93  #endif
-75980e97daccfc Peter Zijlstra 2013-02-22  94  
-
--- 
-0-DAY CI Kernel Test Service
-https://01.org/lkp
+/*
+ * When the interrupt loop occurs, this instruction will never be
+ * executed.
+ * In case the loop isn't triggered return to pgm_old_psw so we can fail
+ * fast and don't have to rely on the kvm-unit-tests timeout.
+ */
