@@ -2,41 +2,41 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id C5C0F58F764
-	for <lists+kvm@lfdr.de>; Thu, 11 Aug 2022 07:50:52 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 215B958F766
+	for <lists+kvm@lfdr.de>; Thu, 11 Aug 2022 07:52:20 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234009AbiHKFuw (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 11 Aug 2022 01:50:52 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36500 "EHLO
+        id S234028AbiHKFwI (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 11 Aug 2022 01:52:08 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37632 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229786AbiHKFuu (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 11 Aug 2022 01:50:50 -0400
-Received: from ams.source.kernel.org (ams.source.kernel.org [IPv6:2604:1380:4601:e00::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 73E6732BAE
-        for <kvm@vger.kernel.org>; Wed, 10 Aug 2022 22:50:49 -0700 (PDT)
+        with ESMTP id S229786AbiHKFwH (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 11 Aug 2022 01:52:07 -0400
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F171637FAD
+        for <kvm@vger.kernel.org>; Wed, 10 Aug 2022 22:52:06 -0700 (PDT)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by ams.source.kernel.org (Postfix) with ESMTPS id 31894B81EFE
-        for <kvm@vger.kernel.org>; Thu, 11 Aug 2022 05:50:48 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPS id DA5B4C433D7
-        for <kvm@vger.kernel.org>; Thu, 11 Aug 2022 05:50:46 +0000 (UTC)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id 8FB5561422
+        for <kvm@vger.kernel.org>; Thu, 11 Aug 2022 05:52:06 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 01A37C433B5
+        for <kvm@vger.kernel.org>; Thu, 11 Aug 2022 05:52:06 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1660197046;
-        bh=5xJSXspv4HKb1uZdbq50haWAnvd3H1I2OeA05Xb+dNA=;
+        s=k20201202; t=1660197126;
+        bh=3Oqj+GKWrTlFrszrtQytHinOzsCDAPItWzhSI35v870=;
         h=From:To:Subject:Date:In-Reply-To:References:From;
-        b=KEgiX7Ge+JfG7mdpqdtrjCUCVNuGyXZKtyJBRG8pAHlclvBSZwWO+aMsk6lz1M6u2
-         3KDdB9VD+CL1E1hzz/909YE56IZWqBpaujpcktTt6aykR2+58AOfwI6Lm6EfXBBm9t
-         Sq2Sw3LhwwOBoU0zpfC445qS+Op9HaP+fznGSfTz8uOEjxAWjGBQ+lodt9td7QuoEl
-         V0W2yROwWWoj2+cL5Ni1iOEEizK+580qz0AOuaL899QOLNO+r9u7g1VnckNsujfQO6
-         sLrPf1vTMwxyQ6cvMvQQaKCiEtfi83jwBIaSEi0mPTw2p7OWZTtWhWfBhPkpopanPb
-         SAj+sCluIT4eQ==
+        b=R0oSi21Hsg5A4X4NKfKUXEPHpUGkWxdfFmcuk4+4YOmasO+FS67aioyeFgXzOFETB
+         zzIQlof2yKBkQE6BN6dto6D79o16FQVG3PI4/tYJLYOMNHVS/+MXktGaI41buWOrge
+         Da3CSiCPr3naIWsmDqwybZbmk9axlSRm0ZI0lZm8mJ+JLBxOo91EXFA1YHPX56k+sP
+         bDUhzKIsNmf5rSxk3Tq9K5//e6NMJE4dAPx+1ZUn0dkvL1Qf/5nzcckzTXE9hB12kB
+         5Z9WUYLigE90pf4nbtlZ5f1Y+2CnGHPCN+2TSfhzMlhiAbPCMmPY1HGX30tcRkGMcH
+         8DFZX1zhr67Ig==
 Received: by aws-us-west-2-korg-bugzilla-1.web.codeaurora.org (Postfix, from userid 48)
-        id C733DC433E9; Thu, 11 Aug 2022 05:50:46 +0000 (UTC)
+        id E7E15C433E6; Thu, 11 Aug 2022 05:52:05 +0000 (UTC)
 From:   bugzilla-daemon@kernel.org
 To:     kvm@vger.kernel.org
 Subject: [Bug 216349] Kernel panic in a Ubuntu VM running on Proxmox
-Date:   Thu, 11 Aug 2022 05:50:46 +0000
+Date:   Thu, 11 Aug 2022 05:52:05 +0000
 X-Bugzilla-Reason: None
 X-Bugzilla-Type: changed
 X-Bugzilla-Watch-Reason: AssignedTo virtualization_kvm@kernel-bugs.osdl.org
@@ -51,8 +51,8 @@ X-Bugzilla-Resolution:
 X-Bugzilla-Priority: P1
 X-Bugzilla-Assigned-To: virtualization_kvm@kernel-bugs.osdl.org
 X-Bugzilla-Flags: 
-X-Bugzilla-Changed-Fields: 
-Message-ID: <bug-216349-28872-AZaPIhhGFa@https.bugzilla.kernel.org/>
+X-Bugzilla-Changed-Fields: attachments.created
+Message-ID: <bug-216349-28872-ESmhw6PjRJ@https.bugzilla.kernel.org/>
 In-Reply-To: <bug-216349-28872@https.bugzilla.kernel.org/>
 References: <bug-216349-28872@https.bugzilla.kernel.org/>
 Content-Type: text/plain; charset="UTF-8"
@@ -72,17 +72,10 @@ X-Mailing-List: kvm@vger.kernel.org
 
 https://bugzilla.kernel.org/show_bug.cgi?id=3D216349
 
---- Comment #4 from John Park (jdpark.au@gmail.com) ---
-I'm not sure how verbose I should be in the bug report but I thought it wou=
-ld
-be worth mentioning that in attempting to troubleshoot, I changed the machi=
-ne
-type in Proxmox from i440fx to q35 but this made no difference, I got anoth=
-er
-kernel panic today using q35 but unfortunately I forgot to change the inter=
-face
-in my netconsole config so I didn't get any log of the panic. I've taken a
-screenshot of the console and uploaded it anyway.
+--- Comment #5 from John Park (jdpark.au@gmail.com) ---
+Created attachment 301550
+  --> https://bugzilla.kernel.org/attachment.cgi?id=3D301550&action=3Dedit
+Console output from kernel panic after using q35 machine type
 
 --=20
 You may reply to this email to add a comment.
