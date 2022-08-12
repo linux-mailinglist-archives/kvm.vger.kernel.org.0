@@ -2,283 +2,387 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id D31625911D8
-	for <lists+kvm@lfdr.de>; Fri, 12 Aug 2022 16:05:13 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 6AFE059124C
+	for <lists+kvm@lfdr.de>; Fri, 12 Aug 2022 16:34:33 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238796AbiHLODC (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 12 Aug 2022 10:03:02 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49598 "EHLO
+        id S238530AbiHLOe3 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 12 Aug 2022 10:34:29 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54822 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S238740AbiHLOC7 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 12 Aug 2022 10:02:59 -0400
-Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 04708A8CDD;
-        Fri, 12 Aug 2022 07:02:58 -0700 (PDT)
-Received: from pps.filterd (m0098410.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.17.1.5/8.17.1.5) with ESMTP id 27CDgXEf031256;
-        Fri, 12 Aug 2022 14:02:57 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=date : from : to : cc :
- subject : message-id : in-reply-to : references : mime-version :
- content-type : content-transfer-encoding; s=pp1;
- bh=KMU3L79OXaPaxSQZJmmv4Wo3m1CAnO0IoB1kVCGxomQ=;
- b=nJ36dGyjfJNgE2uXonQn1G0fAk7b449iHdcCD1QUnJflLGQqDHjvzezXtQyRkZb/n9QT
- pIcdHY0lUn0EFURu7oqBYP+ybT3o7RoP4rzs0byBWwWnBZdOjrx86kpuZV4H7IuA9aCx
- UPETN1YZ0UcNKA10nmDQ7RRfF4NY/uqHTzD23qyn1INywd6z/Ekk1DfmB7yP+F/w5IMh
- xcbU5uFdbADJycHC4oepNYI1cAyuZVR/fi4D06szsDctXik17uCQj3qas5+NrAZXgyFr
- +Wq3E2DwQ87/1Kgr33HdXn+gEnx/7zl5QAapIGWxZvFiEQtgp58YfVJL+4QNQGQscyq5 2g== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3hwqyngqar-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Fri, 12 Aug 2022 14:02:57 +0000
-Received: from m0098410.ppops.net (m0098410.ppops.net [127.0.0.1])
-        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 27CDgZh8031320;
-        Fri, 12 Aug 2022 14:02:57 GMT
-Received: from ppma04fra.de.ibm.com (6a.4a.5195.ip4.static.sl-reverse.com [149.81.74.106])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3hwqyngq9n-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Fri, 12 Aug 2022 14:02:56 +0000
-Received: from pps.filterd (ppma04fra.de.ibm.com [127.0.0.1])
-        by ppma04fra.de.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 27CDs6mQ007562;
-        Fri, 12 Aug 2022 14:02:54 GMT
-Received: from b06cxnps4076.portsmouth.uk.ibm.com (d06relay13.portsmouth.uk.ibm.com [9.149.109.198])
-        by ppma04fra.de.ibm.com with ESMTP id 3hw4nxrsrq-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Fri, 12 Aug 2022 14:02:54 +0000
-Received: from d06av22.portsmouth.uk.ibm.com (d06av22.portsmouth.uk.ibm.com [9.149.105.58])
-        by b06cxnps4076.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 27CE2pAO33751366
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Fri, 12 Aug 2022 14:02:51 GMT
-Received: from d06av22.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 41A394C0B7;
-        Fri, 12 Aug 2022 14:02:51 +0000 (GMT)
-Received: from d06av22.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 9597F4C0B4;
-        Fri, 12 Aug 2022 14:02:50 +0000 (GMT)
-Received: from p-imbrenda (unknown [9.145.3.179])
-        by d06av22.portsmouth.uk.ibm.com (Postfix) with ESMTP;
-        Fri, 12 Aug 2022 14:02:50 +0000 (GMT)
-Date:   Fri, 12 Aug 2022 16:02:47 +0200
-From:   Claudio Imbrenda <imbrenda@linux.ibm.com>
-To:     Janosch Frank <frankja@linux.ibm.com>
-Cc:     kvm@vger.kernel.org, borntraeger@de.ibm.com, thuth@redhat.com,
-        pasic@linux.ibm.com, david@redhat.com, linux-s390@vger.kernel.org,
-        linux-kernel@vger.kernel.org, scgl@linux.ibm.com,
-        seiden@linux.ibm.com, nrb@linux.ibm.com
-Subject: Re: [PATCH v13 1/6] KVM: s390: pv: asynchronous destroy for reboot
-Message-ID: <20220812160247.57527886@p-imbrenda>
-In-Reply-To: <b726199f-6c07-fd9a-fd1e-016e6d98971e@linux.ibm.com>
-References: <20220810125625.45295-1-imbrenda@linux.ibm.com>
-        <20220810125625.45295-2-imbrenda@linux.ibm.com>
-        <b726199f-6c07-fd9a-fd1e-016e6d98971e@linux.ibm.com>
-Organization: IBM
-X-Mailer: Claws Mail 4.1.0 (GTK 3.24.34; x86_64-redhat-linux-gnu)
+        with ESMTP id S236950AbiHLOe2 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 12 Aug 2022 10:34:28 -0400
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id B5C61AB07B
+        for <kvm@vger.kernel.org>; Fri, 12 Aug 2022 07:34:26 -0700 (PDT)
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 354F6106F;
+        Fri, 12 Aug 2022 07:34:27 -0700 (PDT)
+Received: from [192.168.12.23] (unknown [172.31.20.19])
+        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id DB0663F5A1;
+        Fri, 12 Aug 2022 07:34:24 -0700 (PDT)
+Message-ID: <8af01455-f228-676c-9cc7-d6933219dd3d@arm.com>
+Date:   Fri, 12 Aug 2022 15:34:15 +0100
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:91.0)
+ Gecko/20100101 Thunderbird/91.12.0
+Subject: Re: [kvm-unit-tests PATCH v3 19/27] arm/arm64: Add a setup sequence
+ for systems that boot through EFI
+Content-Language: en-GB
+To:     Alexandru Elisei <alexandru.elisei@arm.com>
+Cc:     kvm@vger.kernel.org, andrew.jones@linux.dev, drjones@redhat.com,
+        pbonzini@redhat.com, jade.alglave@arm.com, ricarkol@google.com
+References: <20220630100324.3153655-1-nikos.nikoleris@arm.com>
+ <20220630100324.3153655-20-nikos.nikoleris@arm.com>
+ <Yta663UyZcP1j9t1@monolith.localdoman>
+From:   Nikos Nikoleris <nikos.nikoleris@arm.com>
+In-Reply-To: <Yta663UyZcP1j9t1@monolith.localdoman>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: b8JE0hAUAZfoejg5xw4Tfg_N0-UtLCyE
-X-Proofpoint-ORIG-GUID: wjIVfC2gERQFu4WWlUGub0UU4Al6cggd
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.205,Aquarius:18.0.883,Hydra:6.0.517,FMLib:17.11.122.1
- definitions=2022-08-12_08,2022-08-11_01,2022-06-22_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 impostorscore=0
- mlxlogscore=999 malwarescore=0 spamscore=0 priorityscore=1501 mlxscore=0
- clxscore=1015 phishscore=0 adultscore=0 suspectscore=0 lowpriorityscore=0
- bulkscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2207270000 definitions=main-2208120039
-X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_EF,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_PASS,
-        T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
+X-Spam-Status: No, score=-6.9 required=5.0 tests=BAYES_00,NICE_REPLY_A,
+        RCVD_IN_DNSWL_HI,SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, 11 Aug 2022 18:26:13 +0200
-Janosch Frank <frankja@linux.ibm.com> wrote:
-
-
-[...]
-
-> > +	case KVM_PV_ASYNC_CLEANUP_PREPARE:
-> > +		r = -EINVAL;
-> > +		if (!kvm_s390_pv_is_protected(kvm) || !async_destroy)
-> > +			break;
-> > +
-> > +		r = kvm_s390_cpus_from_pv(kvm, &cmd->rc, &cmd->rrc);
-> > +		/*
-> > +		 * If a CPU could not be destroyed, destroy VM will also fail.
-> > +		 * There is no point in trying to destroy it. Instead return
-> > +		 * the rc and rrc from the first CPU that failed destroying.
-> > +		 */
-> > +		if (r)
-> > +			break;
-> > +		r = kvm_s390_pv_set_aside(kvm, &cmd->rc, &cmd->rrc);
-> > +
-> > +		/* no need to block service interrupts any more */
-> > +		clear_bit(IRQ_PEND_EXT_SERVICE, &kvm->arch.float_int.masked_irqs);
-> > +		break;
-> > +	case KVM_PV_ASYNC_CLEANUP_PERFORM:
-> > +		/* This must not be called while holding kvm->lock */  
+On 19/07/2022 15:08, Alexandru Elisei wrote:
+> Hi,
 > 
-> Two things:
-> I know that we don't need to check async_destroy since it will find 
-> nothing to cleanup because the command above is fenced. But I'd still 
-> appreciate the same check here.
+> On Thu, Jun 30, 2022 at 11:03:16AM +0100, Nikos Nikoleris wrote:
+>> This change implements an alternative setup sequence for the system
+>> when we are booting through EFI. The memory map is discovered through
+>> EFI boot services and devices through ACPI.
+>>
+>> This change is based on a change initially proposed by
+>> Andrew Jones <drjones@redhat.com>
+>>
+>> Signed-off-by: Nikos Nikoleris <nikos.nikoleris@arm.com>
+>> ---
+>>   lib/linux/efi.h     |   1 +
+>>   lib/arm/asm/setup.h |   2 +
+>>   lib/arm/setup.c     | 181 +++++++++++++++++++++++++++++++++++++++++++-
+>>   arm/cstart.S        |   1 +
+>>   arm/cstart64.S      |   1 +
+>>   5 files changed, 184 insertions(+), 2 deletions(-)
+>>
+>> diff --git a/lib/linux/efi.h b/lib/linux/efi.h
+>> index 53748dd..89f9a9e 100644
+>> --- a/lib/linux/efi.h
+>> +++ b/lib/linux/efi.h
+>> @@ -63,6 +63,7 @@ typedef guid_t efi_guid_t;
+>>   	(c) & 0xff, ((c) >> 8) & 0xff, d } }
+>>   
+>>   #define ACPI_TABLE_GUID EFI_GUID(0xeb9d2d30, 0x2d88, 0x11d3, 0x9a, 0x16, 0x00, 0x90, 0x27, 0x3f, 0xc1, 0x4d)
+>> +#define ACPI_20_TABLE_GUID EFI_GUID(0x8868e871, 0xe4f1, 0x11d3,  0xbc, 0x22, 0x00, 0x80, 0xc7, 0x3c, 0x88, 0x81)
+>>   
+>>   #define LOADED_IMAGE_PROTOCOL_GUID EFI_GUID(0x5b1b31a1, 0x9562, 0x11d2,  0x8e, 0x3f, 0x00, 0xa0, 0xc9, 0x69, 0x72, 0x3b)
+>>   
+>> diff --git a/lib/arm/asm/setup.h b/lib/arm/asm/setup.h
+>> index 64cd379..c4cd485 100644
+>> --- a/lib/arm/asm/setup.h
+>> +++ b/lib/arm/asm/setup.h
+>> @@ -6,6 +6,7 @@
+>>    * This work is licensed under the terms of the GNU LGPL, version 2.
+>>    */
+>>   #include <libcflat.h>
+>> +#include <efi.h>
+>>   #include <asm/page.h>
+>>   #include <asm/pgtable-hwdef.h>
+>>   
+>> @@ -37,5 +38,6 @@ extern unsigned int mem_region_get_flags(phys_addr_t paddr);
+>>   #define SMP_CACHE_BYTES		L1_CACHE_BYTES
+>>   
+>>   void setup(const void *fdt, phys_addr_t freemem_start);
+>> +efi_status_t setup_efi(efi_bootinfo_t *efi_bootinfo);
+>>   
+>>   #endif /* _ASMARM_SETUP_H_ */
+>> diff --git a/lib/arm/setup.c b/lib/arm/setup.c
+>> index 13513d0..30d04d0 100644
+>> --- a/lib/arm/setup.c
+>> +++ b/lib/arm/setup.c
+>> @@ -34,7 +34,7 @@
+>>   #define NR_EXTRA_MEM_REGIONS	16
+>>   #define NR_INITIAL_MEM_REGIONS	(MAX_DT_MEM_REGIONS + NR_EXTRA_MEM_REGIONS)
+>>   
+>> -extern unsigned long _etext;
+>> +extern unsigned long _text, _etext, _data, _edata;
+>>   
+>>   char *initrd;
+>>   u32 initrd_size;
+>> @@ -44,7 +44,10 @@ int nr_cpus;
+>>   
+>>   static struct mem_region __initial_mem_regions[NR_INITIAL_MEM_REGIONS + 1];
+>>   struct mem_region *mem_regions = __initial_mem_regions;
+>> -phys_addr_t __phys_offset, __phys_end;
+>> +phys_addr_t __phys_offset = (phys_addr_t)-1, __phys_end = 0;
+>> +
+>> +extern void exceptions_init(void);
+>> +extern void asm_mmu_disable(void);
+>>   
+>>   int mpidr_to_cpu(uint64_t mpidr)
+>>   {
+>> @@ -272,3 +275,177 @@ void setup(const void *fdt, phys_addr_t freemem_start)
+>>   	if (!(auxinfo.flags & AUXINFO_MMU_OFF))
+>>   		setup_vm();
+>>   }
+>> +
+>> +#ifdef CONFIG_EFI
+>> +
+>> +#include <efi.h>
+>> +
+>> +static efi_status_t setup_rsdp(efi_bootinfo_t *efi_bootinfo)
+>> +{
+>> +	efi_status_t status;
+>> +	struct rsdp_descriptor *rsdp;
+>> +
+>> +	/*
+>> +	 * RSDP resides in an EFI_ACPI_RECLAIM_MEMORY region, which is not used
+>> +	 * by kvm-unit-tests arm64 memory allocator. So it is not necessary to
+>> +	 * copy the data structure to another memory region to prevent
+>> +	 * unintentional overwrite.
+>> +	 */
+>> +	status = efi_get_system_config_table(ACPI_20_TABLE_GUID, (void **)&rsdp);
+>> +	if (status != EFI_SUCCESS)
+>> +		return status;
+>> +
+>> +	set_efi_rsdp(rsdp);
+>> +
+>> +	return EFI_SUCCESS;
+>> +}
+>> +
+>> +static efi_status_t efi_mem_init(efi_bootinfo_t *efi_bootinfo)
+>> +{
+>> +	int i;
+>> +	unsigned long free_mem_pages = 0;
+>> +	unsigned long free_mem_start = 0;
+>> +	struct efi_boot_memmap *map = &(efi_bootinfo->mem_map);
+>> +	efi_memory_desc_t *buffer = *map->map;
+>> +	efi_memory_desc_t *d = NULL;
+>> +	phys_addr_t base, top;
+>> +	struct mem_region *r;
+>> +	uintptr_t text = (uintptr_t)&_text, etext = __ALIGN((uintptr_t)&_etext, 4096);
+>> +	uintptr_t data = (uintptr_t)&_data, edata = __ALIGN((uintptr_t)&_edata, 4096);
+>> +
+>> +	/*
+>> +	 * Record the largest free EFI_CONVENTIONAL_MEMORY region
+>> +	 * which will be used to set up the memory allocator, so that
+>> +	 * the memory allocator can work in the largest free
+>> +	 * continuous memory region.
+>> +	 */
+>> +	for (i = 0, r = &mem_regions[0]; i < *(map->map_size); i += *(map->desc_size), ++r) {
+>> +		d = (efi_memory_desc_t *)(&((u8 *)buffer)[i]);
+>> +
+>> +		r->start = d->phys_addr;
+>> +		r->end = d->phys_addr + d->num_pages * EFI_PAGE_SIZE;
+>> +
+>> +		switch (d->type) {
+>> +		case EFI_RESERVED_TYPE:
+>> +		case EFI_LOADER_DATA:
+>> +		case EFI_BOOT_SERVICES_CODE:
+>> +		case EFI_BOOT_SERVICES_DATA:
+>> +		case EFI_RUNTIME_SERVICES_CODE:
+>> +		case EFI_RUNTIME_SERVICES_DATA:
+>> +		case EFI_UNUSABLE_MEMORY:
+>> +		case EFI_ACPI_RECLAIM_MEMORY:
+>> +		case EFI_ACPI_MEMORY_NVS:
+>> +		case EFI_PAL_CODE:
+>> +			r->flags = MR_F_RESERVED;
+>> +			break;
+>> +		case EFI_MEMORY_MAPPED_IO:
+>> +		case EFI_MEMORY_MAPPED_IO_PORT_SPACE:
+>> +			r->flags = MR_F_IO;
+>> +			break;
+>> +		case EFI_LOADER_CODE:
+>> +			if (r->start <= text && r->end > text) {
+>> +				/* This is the unit test region. Flag the code separately. */
+>> +				phys_addr_t tmp = r->end;
+>> +
+>> +				assert(etext <= data);
+>> +				assert(edata <= r->end);
+>> +				r->flags = MR_F_CODE;
+>> +				r->end = data;
+>> +				++r;
+>> +				r->start = data;
+>> +				r->end = tmp;
+>> +			} else {
+>> +				r->flags = MR_F_RESERVED;
+>> +			}
+>> +			break;
+>> +		case EFI_CONVENTIONAL_MEMORY:
+>> +			if (free_mem_pages < d->num_pages) {
+>> +				free_mem_pages = d->num_pages;
+>> +				free_mem_start = d->phys_addr;
+>> +			}
+>> +			break;
+>> +		}
+>> +
+>> +		if (!(r->flags & MR_F_IO)) {
+>> +			if (r->start < __phys_offset)
+>> +				__phys_offset = r->start;
+>> +			if (r->end > __phys_end)
+>> +				__phys_end = r->end;
+> 
+> What happens if there are holes between __phys_offset and __phys_end? The
+> boot path for KVM makes sure there are no holes. Wouldn't asm_mmu_disable()
+> trigger a translation fault if the address is not mapped because it
+> corresponds to a hole in the EFI provided memory map?
+> 
+> What happens if the region [__phys_offset, __phys_end) contains one of the
+> EFI reserved memory types? That's not really something that kvm-unit-tests
+> should be poking.
+> 
 
-will add
+That's a good point.
+
+> The efi boot code path changes the semantics for __phys_offset and
+> __phys_end, and that's a recipe for introducing bugs.
+> 
+> I would suggest changing __phys_offset and __phys_end to represent
+> something that applies to both the KVM boot path and the EFI boot path.
+> 
+
+Currently we're using __phys_offset and __phys_end in two places:
+* When we disable the MMU, to clean and invalidate the whole physical 
+address space.
+* In selftest-mem, To compute the amount of memory available to the test.
+
+> One idea that occured to me would be to have separate text, data and
+> available memory regions.  Have __phys_offset and __phys_end express the
+> start and end of the largest contiguous memory region, and initialize the
+> memory allocator from this region. That will also pave the way for handling
+> multiple memory regions from the DT.
+
+For EFI, this didn't work. __phys_end - __phys_offset doesn't produce 
+the amount of memory expected by selftest-mem.
 
 > 
-> Consider adding this to the comment:
-> ", this is asserted inside the function."
+> Or, if you can prove and EFI_LOADER_CODE is always adjacent to
+> EFI_CONVENTIONAL_MEMORY, you can have __phys_offset and __phys_end describe
+> the region from the start of text to the end of EFI_CONVENTIONAL_MEMORY.
+> 
 
-will add
+I don't think we can rely on this assumption. It doesn't hold on when I 
+run experiments locally.
+
+> Thoughts? Suggestions?
+
+Could we get rid of __phys_offset and __phys_end? You wanted to move 
+away from cleaning the whole memory for the purposes of disabling the 
+MMU. We could just clean the regions as we discover them and keep a 
+__phys_size for the purposes of selftest-mem. What do you think?
+
+Thanks,
+
+Nikos
 
 > 
-> > +		r = kvm_s390_pv_deinit_aside_vm(kvm, &cmd->rc, &cmd->rrc);
-> > +		break;
-> >   	case KVM_PV_DISABLE: {
-> >   		r = -EINVAL;
-> >   		if (!kvm_s390_pv_is_protected(kvm))
-> > @@ -2553,7 +2581,7 @@ static int kvm_s390_handle_pv(struct kvm *kvm, struct kvm_pv_cmd *cmd)
-> >   		 */
-> >   		if (r)
-> >   			break;
-> > -		r = kvm_s390_pv_deinit_vm(kvm, &cmd->rc, &cmd->rrc);
-> > +		r = kvm_s390_pv_deinit_cleanup_all(kvm, &cmd->rc, &cmd->rrc);
-> >   
-> >   		/* no need to block service interrupts any more */
-> >   		clear_bit(IRQ_PEND_EXT_SERVICE, &kvm->arch.float_int.masked_irqs);
-> > @@ -2703,6 +2731,9 @@ static int kvm_s390_handle_pv(struct kvm *kvm, struct kvm_pv_cmd *cmd)
-> >   	default:
-> >   		r = -ENOTTY;
-> >   	}
-> > +	if (needslock)
-> > +		mutex_unlock(&kvm->lock);
-> > +
-> >   	return r;
-> >   }
-> >   
-> > @@ -2907,9 +2938,8 @@ long kvm_arch_vm_ioctl(struct file *filp,
-> >   			r = -EINVAL;
-> >   			break;
-> >   		}
-> > -		mutex_lock(&kvm->lock);
-> > +		/* must be called without kvm->lock */  
+> Thanks,
+> Alex
 > 
-> ...as it will acquire and release it by itself.
-
-none of the other switch cases acquire kvm->lock, I actually think the
-comment is redundant as it is, I don't think we need to expand it
-further.
-
-> 
-> >   		r = kvm_s390_handle_pv(kvm, &args);
-> > -		mutex_unlock(&kvm->lock);
-> >   		if (copy_to_user(argp, &args, sizeof(args))) {
-> >   			r = -EFAULT;
-> >   			break;
-> > @@ -3228,6 +3258,8 @@ int kvm_arch_init_vm(struct kvm *kvm, unsigned long type)
-> >   	kvm_s390_vsie_init(kvm);
-> >   	if (use_gisa)
-> >   		kvm_s390_gisa_init(kvm);
-> > +	INIT_LIST_HEAD(&kvm->arch.pv.need_cleanup);
-> > +	kvm->arch.pv.set_aside = NULL;
-> >   	KVM_EVENT(3, "vm 0x%pK created by pid %u", kvm, current->pid);
-> >   
-> >   	return 0;
-> > @@ -3272,11 +3304,9 @@ void kvm_arch_destroy_vm(struct kvm *kvm)
-> >   	/*
-> >   	 * We are already at the end of life and kvm->lock is not taken.
-> >   	 * This is ok as the file descriptor is closed by now and nobody
-> > -	 * can mess with the pv state. To avoid lockdep_assert_held from
-> > -	 * complaining we do not use kvm_s390_pv_is_protected.
-> > +	 * can mess with the pv state.
-> >   	 */
-> > -	if (kvm_s390_pv_get_handle(kvm))
-> > -		kvm_s390_pv_deinit_vm(kvm, &rc, &rrc);
-> > +	kvm_s390_pv_deinit_cleanup_all(kvm, &rc, &rrc);
-> >   	/*
-> >   	 * Remove the mmu notifier only when the whole KVM VM is torn down,
-> >   	 * and only if one was registered to begin with. If the VM is  
-> [...]
-> > +
-> > +/**
-> > + * kvm_s390_pv_set_aside - Set aside a protected VM for later teardown.
-> > + * @kvm: the VM
-> > + * @rc: return value for the RC field of the UVCB
-> > + * @rrc: return value for the RRC field of the UVCB
-> > + *
-> > + * Set aside the protected VM for a subsequent teardown. The VM will be able
-> > + * to continue immediately as a non-secure VM, and the information needed to
-> > + * properly tear down the protected VM is set aside. If another protected VM
-> > + * was already set aside without starting its teardown, this function will
-> > + * fail.
-> > + * The CPUs of the protected VM need to be destroyed beforehand.
-> > + *
-> > + * Context: kvm->lock needs to be held
-> > + *
-> > + * Return: 0 in case of success, -EINVAL if another protected VM was already set
-> > + * aside, -ENOMEM if the system ran out of memory.
-> > + */
-> > +int kvm_s390_pv_set_aside(struct kvm *kvm, u16 *rc, u16 *rrc)
-> > +{
-> > +	struct pv_vm_to_be_destroyed *priv;
-> > +
-> > +	/*
-> > +	 * If another protected VM was already prepared, refuse.  
-> 
-> s/prepared/set aside/
-> or
-> prepared for teardown
-
-prepared for teardown; will fix
-
-> 
-> > +	 * A normal deinitialization has to be performed instead.
-> > +	 */
-> > +	if (kvm->arch.pv.set_aside)
-> > +		return -EINVAL;
-> > +	priv = kmalloc(sizeof(*priv), GFP_KERNEL | __GFP_ZERO);  
-> 
-> kzalloc()?
-
-oops, yes
-
-> 
-> > +	if (!priv)
-> > +		return -ENOMEM;
-> > +
-> > +	priv->stor_var = kvm->arch.pv.stor_var;
-> > +	priv->stor_base = kvm->arch.pv.stor_base;
-> > +	priv->handle = kvm_s390_pv_get_handle(kvm);
-> > +	priv->old_gmap_table = (unsigned long)kvm->arch.gmap->table;
-> > +	WRITE_ONCE(kvm->arch.gmap->guest_handle, 0);
-> > +	if (s390_replace_asce(kvm->arch.gmap)) {
-> > +		kfree(priv);
-> > +		return -ENOMEM;
-> >   	}
-> >   
-> > +	kvm_s390_destroy_lower_2g(kvm);
-> > +	kvm_s390_clear_pv_state(kvm);
-> > +	kvm->arch.pv.set_aside = priv;
-> > +
-> > +	*rc = 1;  
-> 
-> UVC_RC_EXECUTED	
-
-will fix
-
-> 
-> > +	*rrc = 42;  
-> 
-> I'd prefer setting the rrc to 0.
-
-I'd like to convey the information that the "successful" execution was
-actually faked
-
-> 
-> > +	return 0;
-> > +}  
-
+>> +		}
+>> +	}
+>> +	__phys_end &= PHYS_MASK;
+>> +	asm_mmu_disable();
+>> +
+>> +	if (free_mem_pages == 0)
+>> +		return EFI_OUT_OF_RESOURCES;
+>> +
+>> +	assert(sizeof(long) == 8 || free_mem_start < (3ul << 30));
+>> +
+>> +	phys_alloc_init(free_mem_start, free_mem_pages << EFI_PAGE_SHIFT);
+>> +	phys_alloc_set_minimum_alignment(SMP_CACHE_BYTES);
+>> +
+>> +	phys_alloc_get_unused(&base, &top);
+>> +	base = PAGE_ALIGN(base);
+>> +	top = top & PAGE_MASK;
+>> +	assert(sizeof(long) == 8 || !(base >> 32));
+>> +	if (sizeof(long) != 8 && (top >> 32) != 0)
+>> +		top = ((uint64_t)1 << 32);
+>> +	page_alloc_init_area(0, base >> PAGE_SHIFT, top >> PAGE_SHIFT);
+>> +	page_alloc_ops_enable();
+>> +
+>> +	return EFI_SUCCESS;
+>> +}
+>> +
+>> +efi_status_t setup_efi(efi_bootinfo_t *efi_bootinfo)
+>> +{
+>> +	efi_status_t status;
+>> +
+>> +	struct thread_info *ti = current_thread_info();
+>> +
+>> +	memset(ti, 0, sizeof(*ti));
+>> +
+>> +	exceptions_init();
+>> +
+>> +	status = efi_mem_init(efi_bootinfo);
+>> +	if (status != EFI_SUCCESS) {
+>> +		printf("Failed to initialize memory: ");
+>> +		switch (status) {
+>> +		case EFI_OUT_OF_RESOURCES:
+>> +			printf("No free memory region\n");
+>> +			break;
+>> +		default:
+>> +			printf("Unknown error\n");
+>> +			break;
+>> +		}
+>> +		return status;
+>> +	}
+>> +
+>> +	status = setup_rsdp(efi_bootinfo);
+>> +	if (status != EFI_SUCCESS) {
+>> +		printf("Cannot find RSDP in EFI system table\n");
+>> +		return status;
+>> +	}
+>> +
+>> +	psci_set_conduit();
+>> +	cpu_init();
+>> +	/* cpu_init must be called before thread_info_init */
+>> +	thread_info_init(current_thread_info(), 0);
+>> +	/* mem_init must be called before io_init */
+>> +	io_init();
+>> +
+>> +	timer_save_state();
+>> +	if (initrd) {
+>> +		/* environ is currently the only file in the initrd */
+>> +		char *env = malloc(initrd_size);
+>> +
+>> +		memcpy(env, initrd, initrd_size);
+>> +		setup_env(env, initrd_size);
+>> +	}
+>> +
+>> +	if (!(auxinfo.flags & AUXINFO_MMU_OFF))
+>> +		setup_vm();
+>> +
+>> +	return EFI_SUCCESS;
+>> +}
+>> +
+>> +#endif
+>> diff --git a/arm/cstart.S b/arm/cstart.S
+>> index dc324c5..66a55b9 100644
+>> --- a/arm/cstart.S
+>> +++ b/arm/cstart.S
+>> @@ -256,6 +256,7 @@ asm_mmu_disable:
+>>    *
+>>    * Input r0 is the stack top, which is the exception stacks base
+>>    */
+>> +.globl exceptions_init
+>>   exceptions_init:
+>>   	mrc	p15, 0, r2, c1, c0, 0	@ read SCTLR
+>>   	bic	r2, #CR_V		@ SCTLR.V := 0
+>> diff --git a/arm/cstart64.S b/arm/cstart64.S
+>> index 390feb9..55b41ea 100644
+>> --- a/arm/cstart64.S
+>> +++ b/arm/cstart64.S
+>> @@ -276,6 +276,7 @@ asm_mmu_disable:
+>>    * Vectors
+>>    */
+>>   
+>> +.globl exceptions_init
+>>   exceptions_init:
+>>   	adrp	x4, vector_table
+>>   	add	x4, x4, :lo12:vector_table
+>> -- 
+>> 2.25.1
+>>
