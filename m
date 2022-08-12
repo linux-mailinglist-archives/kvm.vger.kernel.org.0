@@ -2,54 +2,54 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 9918B5915F3
-	for <lists+kvm@lfdr.de>; Fri, 12 Aug 2022 21:27:59 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id A706F5915FE
+	for <lists+kvm@lfdr.de>; Fri, 12 Aug 2022 21:33:21 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237176AbiHLT12 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 12 Aug 2022 15:27:28 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56496 "EHLO
+        id S236027AbiHLTdT (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 12 Aug 2022 15:33:19 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60374 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231237AbiHLT1Z (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 12 Aug 2022 15:27:25 -0400
-Received: from mail-oi1-x230.google.com (mail-oi1-x230.google.com [IPv6:2607:f8b0:4864:20::230])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AD28BB08AC
-        for <kvm@vger.kernel.org>; Fri, 12 Aug 2022 12:27:24 -0700 (PDT)
-Received: by mail-oi1-x230.google.com with SMTP id n133so2220192oib.0
-        for <kvm@vger.kernel.org>; Fri, 12 Aug 2022 12:27:24 -0700 (PDT)
+        with ESMTP id S231843AbiHLTdR (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 12 Aug 2022 15:33:17 -0400
+Received: from mail-ot1-x32a.google.com (mail-ot1-x32a.google.com [IPv6:2607:f8b0:4864:20::32a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 99301B14C8
+        for <kvm@vger.kernel.org>; Fri, 12 Aug 2022 12:33:16 -0700 (PDT)
+Received: by mail-ot1-x32a.google.com with SMTP id h9-20020a9d5549000000b0063727299bb4so1184154oti.9
+        for <kvm@vger.kernel.org>; Fri, 12 Aug 2022 12:33:16 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc;
-        bh=RFQCcD+o7jwAXDtp4U1/kPCj0a6x0GtskgYZEyvj9NE=;
-        b=VN5AtKQ/0zk7x64khzHNWqzjm0YpR7+d4JF2kbafdw/v3J3hYRIdcNzqJ8FPF4RhUs
-         QxLkUT7lD4USFVw1hxOGVaETi0LiAOQ7Se5IDMBtHLQrqUhWO9QFA1vmg/sR7Jva4mUN
-         bXy3mS5hSvGH8qcmVfFGwtUzPTOuRVmUxe35w4vwvoeQRrC2muArkWZIRADALVts/l9C
-         r0DlbDCVBXh4HDqzsk0LtHtUdWg1S2ZSvpJr8uxePjMrBacUFb0muvGa4vGkooI5euss
-         QoKyMZdVvCNs8rQQAH6gfCe3pffgGNcqP5ZaavIFXTBtopeW3+iI8Oi2RHV4K9kHIxKw
-         ADXw==
+        bh=pyCzP0WJ+v7YYl7i0GdEcJsuc5xybpRZaZrTHBnUyuI=;
+        b=tjBxXmKuFTbo/X5C0AifdNg85hQbAM5FOzw7DFgL9vEIH0+EFxcG2KUUxhswBHH0RJ
+         AxCBrTV2u74aJ1qjAwWd4l+TbydCdbBAL4YSXWaBntv8f3NaJPz/ykssjHULMNPf3BLK
+         1Gz+eE3jKkZFObGHsDXG6tQKqedsUiEpEhIrdt8nUeoXDHd1wWZ6gpWNhHJTD237nA5R
+         ESMg/BtmQvp6kSM2e3D6zGTgo7NgIvwg7xP+6ISs8N2nJxOncgmPZQOkaxzM0KcwdreB
+         5q+A6A4tDa6vK8LK2+QDrt1vf1RZWewf80LKxMOksOEIbvZHF70DzTenT8LjOvQuuQKj
+         g2Hg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc;
-        bh=RFQCcD+o7jwAXDtp4U1/kPCj0a6x0GtskgYZEyvj9NE=;
-        b=G3dJlZRtYuwgTeq7ByiKN0NYK5pjtmu7nrEgkP0E1RlCU/ESiHMeEUyKry6WFw/2xy
-         IC7Eiq89/MeHcev6mx0KQ5MlOk2mMVowbM7PCa/jPZJfBFhR2wynYGGHcQ2NYVW0yWsg
-         0SLfESM5kW2Zm2lhCStChIA/MhzX7qghuyhWryFws6/dyg0ferXtqlDjFxJQV1Voxmtb
-         BrMkOoi3KE4oBuorK/kbfeRkpv6SHcI07O8sNTd9420qfsvCwQrnCJ7sYVUgJ/lLUZ3+
-         lTaja6GDV73xgKnFZuGhoQQ9wucvHrS4sSQjankHtQJgzqsaA5Tif+PT+MycyM8i7fWj
-         z79A==
-X-Gm-Message-State: ACgBeo3wkKcdW4aRvAalOCMPGLSPobV+S4UGFPvcqL5LgePmKyLAxOyH
-        ZEk2cfL+2nRCA7w3Yx54i/HLbBGyZ820HQlo/6/86Q==
-X-Google-Smtp-Source: AA6agR6UTYEA+QjXIoZYrda4A+K5joJ6JqfQgfoRbqeFCe5cFOm100RmivhhsKSDVQ65QXNMpukAivi55f0ZGzlLtNY=
-X-Received: by 2002:a05:6808:150f:b0:343:3202:91cf with SMTP id
- u15-20020a056808150f00b00343320291cfmr5737538oiw.112.1660332443800; Fri, 12
- Aug 2022 12:27:23 -0700 (PDT)
+        bh=pyCzP0WJ+v7YYl7i0GdEcJsuc5xybpRZaZrTHBnUyuI=;
+        b=GeT29oc9r5b0gqScQG+lxHGKuhUf7JwXLAhz3OdMCMBN5Uo8osG65xQ+XX6sk12Xgd
+         gXx16y04jAhSZR0BPuMwv/YQRK7JhTs5CiFSF+ux5apDRka5oKdoAlTvibNdySb0v3A2
+         6gav5MYfkzKff7qF0VnjK8RI2MbTqgTHlmJs4q5lv92ULHJXbt8ueIJ1cyprAPC4xZEi
+         Wb63Wgqd5v5mNqHfwIP9OMmbLJgTXvEgEhohgEkd2Mv0B9Q+NuAXXoHRxYRDYVF/zZ+L
+         jsFim5P+Ic57NPS1+015RvvlaeTft+6dzClo3G8ulq6/2avrFPL9ZrnATwmRmHD/dBr9
+         KLNw==
+X-Gm-Message-State: ACgBeo0ppWiJejlJcUY55ty0L/5oOxZyAZxqOiwltBdtHGU3w6ZarRwo
+        cvP7iJEYHmXPObMaiZWgk4RY3k2TeMGrJRwU0VxB4g==
+X-Google-Smtp-Source: AA6agR4q5K+d+SumrFuiYTU4yOXlMwxRoORIsQLNRB++Mt2hVl9TwB5nW6XFmnhTrVWMiVw9uD19XytcSSZtjHa9cOw=
+X-Received: by 2002:a9d:6517:0:b0:636:a8e7:4e86 with SMTP id
+ i23-20020a9d6517000000b00636a8e74e86mr2104096otl.367.1660332795744; Fri, 12
+ Aug 2022 12:33:15 -0700 (PDT)
 MIME-Version: 1.0
 References: <20220812014706.43409-1-yuan.yao@intel.com> <20220812020206.foknky4hghgsadby@yy-desk-7060>
 In-Reply-To: <20220812020206.foknky4hghgsadby@yy-desk-7060>
 From:   Jim Mattson <jmattson@google.com>
-Date:   Fri, 12 Aug 2022 12:27:12 -0700
-Message-ID: <CALMp9eSj3SMRkSzgFcFit1up7T8-Wmu7u3ePMVfkqty6CtR6kA@mail.gmail.com>
+Date:   Fri, 12 Aug 2022 12:33:05 -0700
+Message-ID: <CALMp9eRejAUVzFOsASBc-Md8KUeS1mzqOm9WCJ9dBFkc_NeOJg@mail.gmail.com>
 Subject: Re: [PATCH 1/1] kvm: nVMX: Checks "VMCS shadowing" with VMCS link
  pointer for non-root mode VM{READ,WRITE}
 To:     Yuan Yao <yuan.yao@linux.intel.com>
@@ -65,7 +65,7 @@ X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
         ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
         T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL
-        autolearn=ham autolearn_force=no version=3.4.6
+        autolearn=unavailable autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
@@ -140,5 +140,8 @@ PA))
 > >               return nested_vmx_failInvalid(vcpu);
 > >
 > > --
-> > 2.27.0
-> >
+
+These checks are redundant, aren't they?
+
+That is, nested_vmx_exit_handled_vmcs_access() has already checked
+nested_cpu_has_shadow_vmcs(vmcs12).
