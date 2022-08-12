@@ -2,190 +2,325 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id EF346590AB6
-	for <lists+kvm@lfdr.de>; Fri, 12 Aug 2022 05:28:29 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id DAC2F590BBC
+	for <lists+kvm@lfdr.de>; Fri, 12 Aug 2022 08:02:45 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236956AbiHLD20 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 11 Aug 2022 23:28:26 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57310 "EHLO
+        id S237174AbiHLGCo (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 12 Aug 2022 02:02:44 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40664 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S236915AbiHLD2X (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 11 Aug 2022 23:28:23 -0400
-Received: from mail-yb1-xb33.google.com (mail-yb1-xb33.google.com [IPv6:2607:f8b0:4864:20::b33])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 205D9A3D55
-        for <kvm@vger.kernel.org>; Thu, 11 Aug 2022 20:28:21 -0700 (PDT)
-Received: by mail-yb1-xb33.google.com with SMTP id z5so31178227yba.3
-        for <kvm@vger.kernel.org>; Thu, 11 Aug 2022 20:28:21 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=brainfault-org.20210112.gappssmtp.com; s=20210112;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc;
-        bh=5txKBL9+M/Zh/dEDyh3BLW8jRi75RWSJvozBNKtl85E=;
-        b=069qPl4HFPR0BVUbNN8/t9ULIjKgDGN+8+CIKeDRlyn4Z+0BQMeAv8HLyr2A7uIRMb
-         DTYyFkBXttWNlERDv0W8QMV1+bSExeumK9pdf0jHiZfbRynKQnBG9s0d7RlLJHd9aiRe
-         V7KvazQurjutLxWB47wmRBBwJKc8RKAAWu7TOFfuTkT/VVs4ZyDqETACThuIqDowB6+u
-         OuwKcHBEpO1RhREZmY/f8xagDfdIZ2XjI2CXXbGDavFNvDT0QZxexWLjp40toZ0GM99l
-         VbaSvjoN6AzQn3P/HPXVwIFSAqMjXpDn9L85C+ak1vBLfpizvif3CJnbj7jMP78cxK2N
-         hhTQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc;
-        bh=5txKBL9+M/Zh/dEDyh3BLW8jRi75RWSJvozBNKtl85E=;
-        b=kCGjx+RIHzY4XXrGt5ajIN41LddLgecvJ97nsZGi82z7DYiHM96SN4qDM8QdMuyK40
-         twllCCOGyRTBwaTRUSRU4u45+nj1I+5Nx6C4JW9OLOrou+540nmgqm1lwUlxlRaMhBAU
-         5xVFxEJ7Lk2t2iDDoXGyrWRWY/myUl9E0mpcQOaKYxBeZgKvSuGzhevIBZRE74/vAgkn
-         WgxEJKA2Mo2k/1zxqUcvzDsomG0HYYdqOh78VcXpdNo4dw4FotxU4iMeTLNzm0WP59Su
-         pB3di7P1f7x60PoGeP/CpeM56LYBAXk2Mm5e/T6Qklb0HSoiSLXlaPGCro/MgUQw0uFX
-         /T3g==
-X-Gm-Message-State: ACgBeo0qYsmj6ES+6VqnMy2j8SZfl7CwJdz4CgUQD8vkNMk2d4zPm5mq
-        6Vjo5NWiXa29CDI7FLPseys0hrwfp2m5MviivInNeg==
-X-Google-Smtp-Source: AA6agR4o4Q1raUDav8FjGV2/LTFTH8wCa9D0izlQi+GGHZVaPYYuLtkY9Pi5KQaJP1cxq2efa3eXLJ3HQqEv4F5kcsA=
-X-Received: by 2002:a5b:b49:0:b0:67c:cf0:4565 with SMTP id b9-20020a5b0b49000000b0067c0cf04565mr1934978ybr.442.1660274900107;
- Thu, 11 Aug 2022 20:28:20 -0700 (PDT)
+        with ESMTP id S237034AbiHLGCm (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 12 Aug 2022 02:02:42 -0400
+Received: from NAM12-DM6-obe.outbound.protection.outlook.com (mail-dm6nam12on2063.outbound.protection.outlook.com [40.107.243.63])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B504A474C9;
+        Thu, 11 Aug 2022 23:02:40 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=jjUu8bdpxisjN/yM9rGHuyO+TAm4drf8JoeFDQdIEn8abq1o1Hw6J8uaVyd3boabbRXE1DhHtAuhlcoN95QgIqDh+U4EGgTsvvD4s7zc6UShLIQ9a+8nJ3jtT//vXkB6WKRxcVZPBsy1MVb2dwgsc+iug6nr49unFiJ9BLvr9NmTPnrkJerJzuIQCM5/u7nmMG/qAtxQEZhw8G1ozWBebqwweuZNCqkTDsR/stSx7BSjdTcDBHipgRzIbnHLxKetnpT4+Z7AGZ+THF/QqL40VyAtWK87Q1f7b5eJvbkTgSx975cEaZB8NgqEe/5ol7CWhmSf4TaOjtXe9NQrH29mBQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=n+j3ry/HYXAdLfOzgaMLhGtdkK6KMNi80bN2xPWOIZc=;
+ b=Pk6h0CTGQUsPdXS4y7ptfV0ApdHhBopdEUlc+sOfo1uM+U+D77RmHUekA9ALTIHB4zdRGC2RluzIgML1sGjuCQNSoHox4fx3yBHuzYg4kDS9F5CO37hYYpRB8tu3lI0I30Hev5QQd1sCmNrkZnAoAENbhUte4R1v+ciytikOLDdF9FhoAThe7FinAPF/pjogVlmIBBqD2coyzZs4ZEc6l3yUzWfFkMJhxiiC1Lckf2UncdoDXT5pxCtvFnUfdgG5cPIXIeD5aSvCqzzYmW2DCZkR9ycIqWFkfjma6qKjizekYoCvBVQFBawRBlTeg57H02IGK04PMm9879vN3gptig==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
+ header.d=amd.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=n+j3ry/HYXAdLfOzgaMLhGtdkK6KMNi80bN2xPWOIZc=;
+ b=3kHu+ALSOwWkL+KjY1wv5FbNpjInyD7902NvHctwTBuwH1aoGVQmtNz33T1gZtmuGp3sl8dD9k7a8Fb/iWsxMh4mdFluVaNEdo+VysGwmUSU/L8Dni0lvSc0Uwnr0SWQ09gnu36KMVmTc4XL1xdxhxnP1pjo1seJOqe0VdmXuXA=
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=amd.com;
+Received: from CY4PR1201MB0181.namprd12.prod.outlook.com
+ (2603:10b6:910:1f::11) by SA0PR12MB4383.namprd12.prod.outlook.com
+ (2603:10b6:806:94::12) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5525.11; Fri, 12 Aug
+ 2022 06:02:38 +0000
+Received: from CY4PR1201MB0181.namprd12.prod.outlook.com
+ ([fe80::1001:3c79:9504:8d6a]) by CY4PR1201MB0181.namprd12.prod.outlook.com
+ ([fe80::1001:3c79:9504:8d6a%10]) with mapi id 15.20.5504.020; Fri, 12 Aug
+ 2022 06:02:38 +0000
+Message-ID: <1407c70c-0c0b-6955-10bb-d44c5928f2d9@amd.com>
+Date:   Fri, 12 Aug 2022 08:02:25 +0200
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:91.0) Gecko/20100101
+ Thunderbird/91.10.0
+Subject: Re: [PATCH v7 00/14] KVM: mm: fd-based approach for supporting KVM
+ guest private memory
+Content-Language: en-US
+From:   "Gupta, Pankaj" <pankaj.gupta@amd.com>
+To:     "Nikunj A. Dadhania" <nikunj@amd.com>,
+        Chao Peng <chao.p.peng@linux.intel.com>,
+        Sean Christopherson <seanjc@google.com>
+Cc:     Paolo Bonzini <pbonzini@redhat.com>,
+        Jonathan Corbet <corbet@lwn.net>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+        x86@kernel.org, "H . Peter Anvin" <hpa@zytor.com>,
+        Hugh Dickins <hughd@google.com>,
+        Jeff Layton <jlayton@kernel.org>,
+        "J . Bruce Fields" <bfields@fieldses.org>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        Shuah Khan <shuah@kernel.org>, Mike Rapoport <rppt@kernel.org>,
+        Steven Price <steven.price@arm.com>,
+        "Maciej S . Szmigiero" <mail@maciej.szmigiero.name>,
+        Vlastimil Babka <vbabka@suse.cz>,
+        Vishal Annapurve <vannapurve@google.com>,
+        Yu Zhang <yu.c.zhang@linux.intel.com>,
+        "Kirill A . Shutemov" <kirill.shutemov@linux.intel.com>,
+        luto@kernel.org, jun.nakajima@intel.com, dave.hansen@intel.com,
+        ak@linux.intel.com, david@redhat.com, aarcange@redhat.com,
+        ddutile@redhat.com, dhildenb@redhat.com,
+        Quentin Perret <qperret@google.com>,
+        Michael Roth <michael.roth@amd.com>, mhocko@suse.com,
+        Muchun Song <songmuchun@bytedance.com>, bharata@amd.com,
+        kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+        linux-mm@kvack.org, linux-kselftest@vger.kernel.org,
+        linux-api@vger.kernel.org, linux-doc@vger.kernel.org,
+        qemu-devel@nongnu.org, linux-fsdevel@vger.kernel.org
+References: <20220706082016.2603916-1-chao.p.peng@linux.intel.com>
+ <b21f41e5-0322-bbfb-b9c2-db102488592d@amd.com>
+ <9e86daea-5619-a216-fe02-0562cf14c501@amd.com>
+ <9dc91ce8-4cb6-37e6-4c25-27a72dc11dd0@amd.com>
+ <422b9f97-fdf5-54bf-6c56-3c45eff5e174@amd.com>
+In-Reply-To: <422b9f97-fdf5-54bf-6c56-3c45eff5e174@amd.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-ClientProxiedBy: FR3P281CA0048.DEUP281.PROD.OUTLOOK.COM
+ (2603:10a6:d10:4a::20) To CY4PR1201MB0181.namprd12.prod.outlook.com
+ (2603:10b6:910:1f::11)
 MIME-Version: 1.0
-References: <CAAhSdy2UDwZYK+EaKHPXLxyKUMv-OX02EdaBDBgjNF0jdDJ7xQ@mail.gmail.com>
- <mhng-368a1ddb-43d3-4d61-934b-3916c63005d4@palmer-ri-x1c9>
-In-Reply-To: <mhng-368a1ddb-43d3-4d61-934b-3916c63005d4@palmer-ri-x1c9>
-From:   Anup Patel <anup@brainfault.org>
-Date:   Fri, 12 Aug 2022 08:58:08 +0530
-Message-ID: <CAAhSdy2mb6wyqy0NAn9BcTWKMYEc0Z4zU3s3j7oNqBz6eDQ9sg@mail.gmail.com>
-Subject: Re: [PATCH v7 0/4] Add Sstc extension support
-To:     Palmer Dabbelt <palmer@dabbelt.com>
-Cc:     Atish Patra <atishp@rivosinc.com>, linux-kernel@vger.kernel.org,
-        aou@eecs.berkeley.edu, atishp@atishpatra.org,
-        daniel.lezcano@linaro.org, guoren@kernel.org, heiko@sntech.de,
-        kvm-riscv@lists.infradead.org, kvm@vger.kernel.org,
-        linux-riscv@lists.infradead.org, pbonzini@redhat.com,
-        Paul Walmsley <paul.walmsley@sifive.com>, robh@kernel.org,
-        tglx@linutronix.de, research_trasio@irq.a4lg.com, wefu@redhat.com
-Content-Type: text/plain; charset="UTF-8"
-X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_NONE,
-        T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
+X-MS-PublicTrafficType: Email
+X-MS-Office365-Filtering-Correlation-Id: a565cd18-4ca1-4672-c4f8-08da7c2841eb
+X-MS-TrafficTypeDiagnostic: SA0PR12MB4383:EE_
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: EgVftd/usFJWQ3pcGHr/wxaTkOlr95uDC0uZWz4facfuG/qAkzPlSqtiONY399IidA1Hzp6CORGkwp4SBj85+zOBltOKAELrzNexu11rq85bWjBnghU6fGccFnGozQtyXjTnXt6OiUSpT58dWUVILyTxn7gF5havz7Cs76V4HWW0H9Ms6mzm4EM13pDTpTIb2CmYPQExWx1eEfGHX14pp7h6YNUOMgWRie3zIm25jNnIh71waYxSkE0iuKaXU6Wu0M6S/hkZP/1BbPwOuiB2EHp4n2hpgd3La5mAoEeK10JHUed5sM/VEIGnJiS0eGPjd5wpZn/DzW33fzmhIyIyI2npMjzHodTSM+x21fQ7rGqixEXif/xX7cEkcfJ9UJgADh8lk/tbNRaEzLmT/RCIxTA2KAlI2zZwZGK9qNIylHe18aqCCkDOZ7i6AUw5e4IsqkDQTviGAzydzYwjiFhI85xJDq+/xoH5a6CbnxsfLdZyOLvM3spujfpCTVwuSfSpty0uNkJKJfFuzYWp4/CfJWsEeKENTLwiTSDb/MGZcIhyfjpXPXY/Hjh/d4jlB0K9mo1VvzhC8siIh9jKrwHc1uQOIsb6W7u4eLmfvkR9HZtn0oiM7Ar6QeUetPdSAgjwphPdX/uopCv5luh8FerSDK3hfMVICrlancp8iYvXLALGzxC7Rp0f70ufpazmtgKjeYTg75mxkdmjM+ALka0re0gHcG0D9xzIKzor+zFdHawAqRZPuOKSBox/2W6woPufPgipOm0TBvV/6ROTphXYCw==
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CY4PR1201MB0181.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230016)(4636009)(136003)(376002)(366004)(346002)(396003)(39860400002)(186003)(41300700001)(86362001)(6506007)(2616005)(6666004)(26005)(6512007)(36756003)(83380400001)(110136005)(31696002)(54906003)(316002)(4326008)(66946007)(66476007)(66556008)(2906002)(6486002)(5660300002)(478600001)(966005)(8936002)(8676002)(7416002)(7406005)(38100700002)(31686004)(45980500001)(43740500002);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?NEc0NHRqQ3dwRnJwOVR1MEJvMERQWUt3WW1ScGdhSEVBN3VVNy9OeDZBZlVn?=
+ =?utf-8?B?YkI3WjZwdHgwS2UvVk9ma2RrUytaRDFDQUs3eGNFL2ZxdGNLblJicDBBYStt?=
+ =?utf-8?B?VU1SaC9MWCtKSmlnSmxLdUFDUkFHMk9mYzlVSEphNkRpSytyNjNNT1N4alJh?=
+ =?utf-8?B?bnEweTBNZDFmS2xybnlNakdwZU1vK3NGZTNTVWRKR2RmOXRIR1JNVVZ1eXB1?=
+ =?utf-8?B?NVUyVnN4aWRYQy9PMTFqRkJHNzBQbXBiVWkvVzdIeTBUcERJS0hhc3A0Z0ky?=
+ =?utf-8?B?SUZ1cDNzNDZVc01PN05WalZSL0JTdXphS3h3MEhieUxBbzRDeXZMMUlQeUpR?=
+ =?utf-8?B?ODcva3NqN0VnQ3ZpeWF6NFl0SG1VTUhKZFlBUWp2MFZGbFgwZ1czZEZKTFBl?=
+ =?utf-8?B?RGRPUjFuQW01aVJDV0hQMFVOb3FQTnZuTnVwcXQyVnJLTVBTZnBqWGJzTDA3?=
+ =?utf-8?B?dFYxMjBoZTJNWitldS9wK1ZtazlFR24veVZFc3pFVUlzNFFxVDFPd05tQmx1?=
+ =?utf-8?B?L0gvWW5iUE4yUGc2ZlRGelpVR1B0ZVVSWnN1TkRxQlFqNG9Ic2N0UlBjU1hM?=
+ =?utf-8?B?YWg5QkhUemVBdHRzdlZmWFJBaW9NVHM1c29pb1RnWEZjWndtUjZuMDA2Y0pU?=
+ =?utf-8?B?V3VvT2gzSWZnc3llVUJ2UWd2L3RsOGxLbXJzaVJVcmx1Wmw3NGRwdmdGNVZi?=
+ =?utf-8?B?S3hYeWordktsdHRPTUtiWkt5YzdZaHd0dnBuWVEzWDBRQWdCQ0xRbFNzV2pn?=
+ =?utf-8?B?bm1rZ3dzQ2c1MExQa1FPR21kUm1sZ29jMjhQRlRkaUN5OFBBdjV2ZGR1b1gv?=
+ =?utf-8?B?eWtBYXU3bHEvU3NvQ0svdlo5M3FqYjMzdlRRMlY4WXpwMGZFbjJtVzlwaXRt?=
+ =?utf-8?B?STcwQUFSQStCdTlrRVdQVi83aEo0Tjk1dGR6SWM2R29Tc1c1OGRuZzVCWEFn?=
+ =?utf-8?B?NUloYnEzNkNUaVFpazNwcHpqQzdtOTVMUXNRdHJOU3VsK29GY3BmdW5Bdmsx?=
+ =?utf-8?B?aHpsbUVyellVR3pXcjFxWU14alV2cU5qZllGTWN6ZUwzRmozV1N0bHJEekU2?=
+ =?utf-8?B?OXJDYmRndVVodTJjZXQ2dXI4U21Ia3BSOThxZ0JnekFTanNaTWt5dEovK1lv?=
+ =?utf-8?B?MWkxbUl4dUdQT2VZQmZTNFdBcU4xY01QeWhOSUpDVXpEaXhONDZRdzFGSExn?=
+ =?utf-8?B?MzhuaXN1NU5Ua3JSRDJZSUtHNWoxbGpHMVZKSU95TzJnbkpkcko1NW1PaFY5?=
+ =?utf-8?B?eHpFNG5BVEZ5UGZsek9VaHFHMG8rNG0yL0FqT0FSZmduckZMZlRrQittVS9k?=
+ =?utf-8?B?MlNocU9Ydk9WdkZwQTVJTDgvalpHaXhBcDZHUDIvM2EzbllSZmhTUUxXU01W?=
+ =?utf-8?B?R3htT0xHYnlseU1TeXhNQzQvM0puaUdSOWVtcXVpcnV1TFVzYkdVdXc0NS9J?=
+ =?utf-8?B?K1Yyc2ZVeGhOUUdyWEZSZmR1TnZXMDdpUzhGQVRDT0tYM1dZNnB4eS9pQzl3?=
+ =?utf-8?B?RmFSbUMzazBLZ05nUDdIK1hxTjRPTHZ0Mk5KaVdiblFpTWQwcmg2dmEwZzdn?=
+ =?utf-8?B?T3pSMXRDNDRaN0pMYTVvMHZINDVad1ZCbjZraUN2YlFCeE1sVjhTL2NqWG9T?=
+ =?utf-8?B?cGwvdXd2MXhPZVRJc0FnYlhlbVMwaTdnUUtNV3NDcDJTZ3pJbEEwOFU1R2FE?=
+ =?utf-8?B?MnRoeU1tc09PendPN1pFMlBzZ0xSaVBlSjh6aThxTUw1ZWhjVm80b2pZODFt?=
+ =?utf-8?B?alFYK0t3ZzNybTd0TWwyZ2Y1RW9tZFRIN2ZkUGtBZlc4UnVhK3JkckZiazds?=
+ =?utf-8?B?cDJrUS9OSUQ1REpuOTRQanBxNFZnQjgycCsxRHlrY3JHNTkvK3JPVm1uUlp0?=
+ =?utf-8?B?U201aTVuOEtna1Z1TDh2RDRnNko3YkNKYysxamtuTnNFYm8zZkR5S1cxeDIy?=
+ =?utf-8?B?N1Q5U0N3U1hYNmF0cGZmb3JLakYzempkQWxqVTdLY2NFVVlPVHFqb2VZaGMy?=
+ =?utf-8?B?TzlWOTBsMHJsajd3dnVxYkxWQ2pSWGVwOEtlckxqbitzZmZyWFNyOXFHamw4?=
+ =?utf-8?B?cjU1K2xFajFmaWwyZTJuZ0NxRnFSQ3hNNWc3SGp3Y3I1blVtNzJCY0Fxb1Rv?=
+ =?utf-8?Q?Rbsg=3D?=
+X-OriginatorOrg: amd.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: a565cd18-4ca1-4672-c4f8-08da7c2841eb
+X-MS-Exchange-CrossTenant-AuthSource: CY4PR1201MB0181.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 12 Aug 2022 06:02:37.5977
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: kiWooUSidBs9LZPUxTuJU0muLpACZhZgzfwjVonSKVY+46DW3J3ODlybwHzqHlXplbr+GVulBttmrGLYTGXvUA==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SA0PR12MB4383
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_DNSWL_NONE,
+        RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_PASS,T_SCC_BODY_TEXT_LINE
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi Palmer,
 
-On Fri, Aug 12, 2022 at 3:19 AM Palmer Dabbelt <palmer@dabbelt.com> wrote:
->
-> On Fri, 22 Jul 2022 21:47:06 PDT (-0700), anup@brainfault.org wrote:
-> > Hi Palmer,
-> >
-> > On Fri, Jul 22, 2022 at 10:20 PM Atish Patra <atishp@rivosinc.com> wrote:
-> >>
-> >> This series implements Sstc extension support which was ratified recently.
-> >> Before the Sstc extension, an SBI call is necessary to generate timer
-> >> interrupts as only M-mode have access to the timecompare registers. Thus,
-> >> there is significant latency to generate timer interrupts at kernel.
-> >> For virtualized enviornments, its even worse as the KVM handles the SBI call
-> >> and uses a software timer to emulate the timecomapre register.
-> >>
-> >> Sstc extension solves both these problems by defining a stimecmp/vstimecmp
-> >> at supervisor (host/guest) level. It allows kernel to program a timer and
-> >> recieve interrupt without supervisor execution enviornment (M-mode/HS mode)
-> >> intervention.
-> >>
-> >> KVM directly updates the vstimecmp as well if the guest kernel invokes the SBI
-> >> call instead of updating stimecmp directly. This is required because KVM will
-> >> enable sstc extension if the hardware supports it unless the VMM explicitly
-> >> disables it for that guest. The hardware is expected to compare the
-> >> vstimecmp at every cycle if sstc is enabled and any stale value in vstimecmp
-> >> will lead to spurious timer interrupts. This also helps maintaining the
-> >> backward compatibility with older kernels.
-> >>
-> >> Similary, the M-mode firmware(OpenSBI) uses stimecmp for older kernel
-> >> without sstc support as STIP bit in mip is read only for hardware with sstc.
-> >>
-> >> The PATCH 1 & 2 enables the basic infrastructure around Sstc extension while
-> >> PATCH 3 lets kernel use the Sstc extension if it is available in hardware.
-> >> PATCH 4 implements the Sstc extension in KVM.
-> >>
-> >> This series has been tested on Qemu(RV32 & RV64) with additional patches in
-> >> Qemu[2]. This series can also be found at [3].
-> >>
-> >> Changes from v6->v7:
-> >> 1. Fixed a compilation error reported by 0-day bot.
-> >>
-> >> Changes from v5->v6:
-> >> 1. Moved SSTC extension enum below SVPBMT.
-> >>
-> >> Changes from v4->v5:
-> >> 1. Added RB tag.
-> >> 2. Changed the pr-format.
-> >> 3. Rebased on 5.19-rc7 and kvm-queue.
-> >> 4. Moved the henvcfg modification from hardware enable to vcpu_load.
-> >>
-> >> Changes from v3->v4:
-> >> 1. Rebased on 5.18-rc6
-> >> 2. Unified vstimemp & next_cycles.
-> >> 3. Addressed comments in PATCH 3 & 4.
-> >>
-> >> Changes from v2->v3:
-> >> 1. Dropped unrelated KVM fixes from this series.
-> >> 2. Rebased on 5.18-rc3.
-> >>
-> >> Changes from v1->v2:
-> >> 1. Separate the static key from kvm usage
-> >> 2. Makde the sstc specific static key local to the driver/clocksource
-> >> 3. Moved the vstimecmp update code to the vcpu_timer
-> >> 4. Used function pointers instead of static key to invoke vstimecmp vs
-> >>    hrtimer at the run time. This will help in future for migration of vms
-> >>    from/to sstc enabled hardware to non-sstc enabled hardware.
-> >> 5. Unified the vstimer & timer to 1 timer as only one of them will be used
-> >>    at runtime.
-> >>
-> >> [1] https://drive.google.com/file/d/1m84Re2yK8m_vbW7TspvevCDR82MOBaSX/view
-> >> [2] https://github.com/atishp04/qemu/tree/sstc_v6
-> >> [3] https://github.com/atishp04/linux/tree/sstc_v7
-> >>
-> >> Atish Patra (4):
-> >> RISC-V: Add SSTC extension CSR details
-> >> RISC-V: Enable sstc extension parsing from DT
-> >> RISC-V: Prefer sstc extension if available
-> >> RISC-V: KVM: Support sstc extension
-> >
-> > The PATCH4 is dependent on the KVM patches in queue for 5.20.
-> >
-> > I suggest you take PATCH1, PATCH2 and PATCH3. I will send
-> > PATCH4 in second batch/PR for 5.20 assuming you will send the
-> > first three patches in your first PR for 5.20
-> >
-> > Does this sound okay to you ?
->
-> Sorry for being slow here, I just merged the non-KVM ones onto
-> riscv/for-next.  LMK if you want me to try and sort out the KVM bits,
-> the branch base is at palmer/riscv-sstc assuming that's easier for you
-> to just merge in locally.
+>>>>> This is the v7 of this series which tries to implement the fd-based 
+>>>>> KVM
+>>>>> guest private memory. The patches are based on latest kvm/queue branch
+>>>>> commit:
+>>>>>
+>>>>>     b9b71f43683a (kvm/queue) KVM: x86/mmu: Buffer nested MMU
+>>>>> split_desc_cache only by default capacity
+>>>>>
+>>>>> Introduction
+>>>>> ------------
+>>>>> In general this patch series introduce fd-based memslot which provides
+>>>>> guest memory through memory file descriptor fd[offset,size] instead of
+>>>>> hva/size. The fd can be created from a supported memory filesystem
+>>>>> like tmpfs/hugetlbfs etc. which we refer as memory backing store. KVM
+>>>>> and the the memory backing store exchange callbacks when such memslot
+>>>>> gets created. At runtime KVM will call into callbacks provided by the
+>>>>> backing store to get the pfn with the fd+offset. Memory backing store
+>>>>> will also call into KVM callbacks when userspace punch hole on the fd
+>>>>> to notify KVM to unmap secondary MMU page table entries.
+>>>>>
+>>>>> Comparing to existing hva-based memslot, this new type of memslot 
+>>>>> allows
+>>>>> guest memory unmapped from host userspace like QEMU and even the 
+>>>>> kernel
+>>>>> itself, therefore reduce attack surface and prevent bugs.
+>>>>>
+>>>>> Based on this fd-based memslot, we can build guest private memory that
+>>>>> is going to be used in confidential computing environments such as 
+>>>>> Intel
+>>>>> TDX and AMD SEV. When supported, the memory backing store can provide
+>>>>> more enforcement on the fd and KVM can use a single memslot to hold 
+>>>>> both
+>>>>> the private and shared part of the guest memory.
+>>>>>
+>>>>> mm extension
+>>>>> ---------------------
+>>>>> Introduces new MFD_INACCESSIBLE flag for memfd_create(), the file
+>>>>> created with these flags cannot read(), write() or mmap() etc via 
+>>>>> normal
+>>>>> MMU operations. The file content can only be used with the newly
+>>>>> introduced memfile_notifier extension.
+>>>>>
+>>>>> The memfile_notifier extension provides two sets of callbacks for 
+>>>>> KVM to
+>>>>> interact with the memory backing store:
+>>>>>     - memfile_notifier_ops: callbacks for memory backing store to 
+>>>>> notify
+>>>>>       KVM when memory gets invalidated.
+>>>>>     - backing store callbacks: callbacks for KVM to call into memory
+>>>>>       backing store to request memory pages for guest private memory.
+>>>>>
+>>>>> The memfile_notifier extension also provides APIs for memory backing
+>>>>> store to register/unregister itself and to trigger the notifier 
+>>>>> when the
+>>>>> bookmarked memory gets invalidated.
+>>>>>
+>>>>> The patchset also introduces a new memfd seal F_SEAL_AUTO_ALLOCATE to
+>>>>> prevent double allocation caused by unintentional guest when we only
+>>>>> have a single side of the shared/private memfds effective.
+>>>>>
+>>>>> memslot extension
+>>>>> -----------------
+>>>>> Add the private fd and the fd offset to existing 'shared' memslot so
+>>>>> that both private/shared guest memory can live in one single memslot.
+>>>>> A page in the memslot is either private or shared. Whether a guest 
+>>>>> page
+>>>>> is private or shared is maintained through reusing existing SEV ioctls
+>>>>> KVM_MEMORY_ENCRYPT_{UN,}REG_REGION.
+>>>>>
+>>>>> Test
+>>>>> ----
+>>>>> To test the new functionalities of this patch TDX patchset is needed.
+>>>>> Since TDX patchset has not been merged so I did two kinds of test:
+>>>>>
+>>>>> -  Regresion test on kvm/queue (this patchset)
+>>>>>      Most new code are not covered. Code also in below repo:
+>>>>>      
+>>>>> https://github.com/chao-p/linux/tree/privmem-v7
+>>>>>
+>>>>>
+>>>>> -  New Funational test on latest TDX code
+>>>>>      The patch is rebased to latest TDX code and tested the new
+>>>>>      funcationalities. See below repos:
+>>>>>      Linux: 
+>>>>> https://github.com/chao-p/linux/tree/privmem-v7-tdx
+>>>>>
+>>>>>      QEMU: 
+>>>>> https://github.com/chao-p/qemu/tree/privmem-v7
+>>>>>
+>>>>
+>>>> While debugging an issue with SEV+UPM, found that fallocate() returns
+>>>> an error in QEMU which is not handled (EINTR). With the below handling
+>>>> of EINTR subsequent fallocate() succeeds:
+>>>>
+>>>>
+>>>> diff --git a/backends/hostmem-memfd-private.c 
+>>>> b/backends/hostmem-memfd-private.c
+>>>> index af8fb0c957..e8597ed28d 100644
+>>>> --- a/backends/hostmem-memfd-private.c
+>>>> +++ b/backends/hostmem-memfd-private.c
+>>>> @@ -39,7 +39,7 @@ priv_memfd_backend_memory_alloc(HostMemoryBackend 
+>>>> *backend, Error **errp)
+>>>>        MachineState *machine = MACHINE(qdev_get_machine());
+>>>>        uint32_t ram_flags;
+>>>>        char *name;
+>>>> -    int fd, priv_fd;
+>>>> +    int fd, priv_fd, ret;
+>>>>          if (!backend->size) {
+>>>>            error_setg(errp, "can't create backend with size 0");
+>>>> @@ -65,7 +65,15 @@ priv_memfd_backend_memory_alloc(HostMemoryBackend 
+>>>> *backend, Error **errp)
+>>>>                                       backend->size, ram_flags, fd, 
+>>>> 0, errp);
+>>>>        g_free(name);
+>>>>    -    fallocate(priv_fd, 0, 0, backend->size);
+>>>> +again:
+>>>> +    ret = fallocate(priv_fd, 0, 0, backend->size);
+>>>> +    if (ret) {
+>>>> +           perror("Fallocate failed: \n");
+>>>> +           if (errno == EINTR)
+>>>> +                   goto again;
+>>>> +           else
+>>>> +                   exit(1);
+>>>> +    }
+>>>>
+>>>> However, fallocate() preallocates full guest memory before starting 
+>>>> the guest.
+>>>> With this behaviour guest memory is *not* demand pinned. Is there a 
+>>>> way to
+>>>> prevent fallocate() from reserving full guest memory?
+>>>
+>>> Isn't the pinning being handled by the corresponding host memory 
+>>> backend with mmu > notifier and architecture support while doing the 
+>>> memory operations e.g page> migration and swapping/reclaim (not 
+>>> supported currently AFAIU). But yes, we need> to allocate entire 
+>>> guest memory with the new flags MEMFILE_F_{UNMOVABLE, UNRECLAIMABLE 
+>>> etc}.
+>>
+>> That is correct, but the question is when does the memory allocated, 
+>> as these flags are set,
+>> memory is neither moved nor reclaimed. In current scenario, if I start 
+>> a 32GB guest, all 32GB is
+>> allocated.
+> 
+> I guess so if guest memory is private by default.
+> 
+> Other option would be to allocate memory as shared by default and
+> handle on demand allocation and RMPUPDATE with page state change event. 
+> But still that would be done at guest boot time, IIUC.
 
-The KVM RISC-V changes for 5.20 are already merged in Linus's master
-so please go ahead and merge the KVM Sstc patch (i.e. PATCH4 of this
-series) in riscv/for-next with "Acked-by: Anup Patel <anup@brainfault.org>"
+Sorry! Don't want to hijack the other thread so replying here.
+
+I thought the question is for SEV SNP. For SEV, maybe the hypercall with 
+the page state information can be used to allocate memory as we use it 
+or something like quota based memory allocation (just thinking).
+
+> 
+> Might be missing some details on this. So, better to wait for someone 
+> more familiar to answer.
+
+Same applies here :)
 
 Thanks,
-Anup
+Pankaj
 
->
-> >
-> > Regards,
-> > Anup
-> >
-> >>
-> >> arch/riscv/include/asm/csr.h            |   5 +
-> >> arch/riscv/include/asm/hwcap.h          |   1 +
-> >> arch/riscv/include/asm/kvm_vcpu_timer.h |   7 ++
-> >> arch/riscv/include/uapi/asm/kvm.h       |   1 +
-> >> arch/riscv/kernel/cpu.c                 |   1 +
-> >> arch/riscv/kernel/cpufeature.c          |   1 +
-> >> arch/riscv/kvm/vcpu.c                   |   8 +-
-> >> arch/riscv/kvm/vcpu_timer.c             | 144 +++++++++++++++++++++++-
-> >> drivers/clocksource/timer-riscv.c       |  25 +++-
-> >> 9 files changed, 185 insertions(+), 8 deletions(-)
-> >>
-> >> --
-> >> 2.25.1
-> >>
