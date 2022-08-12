@@ -2,114 +2,71 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id DB669590BF6
-	for <lists+kvm@lfdr.de>; Fri, 12 Aug 2022 08:27:17 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id A5F61590C03
+	for <lists+kvm@lfdr.de>; Fri, 12 Aug 2022 08:33:20 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236955AbiHLG0m (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 12 Aug 2022 02:26:42 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34240 "EHLO
+        id S237269AbiHLGdM (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 12 Aug 2022 02:33:12 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40166 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S236330AbiHLG0Q (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 12 Aug 2022 02:26:16 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 454C18A6F4
-        for <kvm@vger.kernel.org>; Thu, 11 Aug 2022 23:26:15 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1660285574;
+        with ESMTP id S229524AbiHLGdM (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 12 Aug 2022 02:33:12 -0400
+Received: from out1.migadu.com (out1.migadu.com [91.121.223.63])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 98ECB92F64
+        for <kvm@vger.kernel.org>; Thu, 11 Aug 2022 23:33:10 -0700 (PDT)
+Date:   Fri, 12 Aug 2022 08:33:00 +0200
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+        t=1660285989;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=IPdDqhne4x6G2lLU0p73M/Ml6BV2ff81inMt9zmg0oQ=;
-        b=G1fXtyVJQEcI+3X2xwtS2vkOdIcPFkYa7wjYRHiGfPXm7hpfAUUHAi5MJELPq9S9FnSvmn
-        XXgm3n0ow37Uh9ynofRxeqOckYv9HhVEsK8Na4cDAjW7jyqjYhBV9QbvNPW8FV8s3EdoTz
-        XohNeG97tvAYOaFQmKLCFN3b9RfMD9k=
-Received: from mimecast-mx02.redhat.com (mx3-rdu2.redhat.com
- [66.187.233.73]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-13-kHfKNj6uOxy9b1DVKnYDhw-1; Fri, 12 Aug 2022 02:26:08 -0400
-X-MC-Unique: kHfKNj6uOxy9b1DVKnYDhw-1
-Received: from smtp.corp.redhat.com (int-mx09.intmail.prod.int.rdu2.redhat.com [10.11.54.9])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 1F8B0296A62F;
-        Fri, 12 Aug 2022 06:26:08 +0000 (UTC)
-Received: from starship (unknown [10.40.192.80])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 76A7D492C3B;
-        Fri, 12 Aug 2022 06:26:03 +0000 (UTC)
-Message-ID: <084f4de105d24f22513c14a83c2254add31f5928.camel@redhat.com>
-Subject: Re: [PATCH v3 03/13] KVM: x86: emulator: introduce
- emulator_recalc_and_set_mode
-From:   Maxim Levitsky <mlevitsk@redhat.com>
-To:     "Yang, Weijiang" <weijiang.yang@intel.com>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>
-Cc:     Borislav Petkov <bp@alien8.de>,
-        Dave Hansen <dave.hansen@linux.intel.com>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Ingo Molnar <mingo@redhat.com>,
-        "Christopherson,, Sean" <seanjc@google.com>,
-        "x86@kernel.org" <x86@kernel.org>,
-        Jim Mattson <jmattson@google.com>,
-        Kees Cook <keescook@chromium.org>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        "H. Peter Anvin" <hpa@zytor.com>, Joerg Roedel <joro@8bytes.org>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Paolo Bonzini <pbonzini@redhat.com>
-In-Reply-To: <2e191acd-0b71-784a-2c14-6e78351788cc@intel.com>
-References: <20220803155011.43721-1-mlevitsk@redhat.com>
-         <20220803155011.43721-4-mlevitsk@redhat.com>
-         <2e191acd-0b71-784a-2c14-6e78351788cc@intel.com>
-Content-Type: text/plain; charset="UTF-8"
+        bh=e/R2RtYnD6Q7wcxCvEyj8OZOZ463/n6rqqGVTkkChbE=;
+        b=nJ5HsilxsH9h4LyeN5wt8CBqCUvIYxKYJWClgIQhvd3847Sl1HbQhj/FWMUUGzCPsUbb6a
+        UJFjToso2iSl1XCSXyZyaW9LRy81BVLs8BW3GoViyvZ3cwR3e6URtZNhaK0+1gufIRRcjg
+        QK59h302zcQ751xgsXc+7ZkFpB1eF4I=
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From:   Andrew Jones <andrew.jones@linux.dev>
+To:     Ricardo Koller <ricarkol@google.com>
+Cc:     kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu, maz@kernel.org,
+        alexandru.elisei@arm.com, eric.auger@redhat.com,
+        oliver.upton@linux.dev, reijiw@google.com
+Subject: Re: [kvm-unit-tests PATCH v4 0/4] arm: pmu: Fixes for bare metal
+Message-ID: <20220812063300.ygeyivgzzkyzg3uo@kamzik>
+References: <20220811185210.234711-1-ricarkol@google.com>
 MIME-Version: 1.0
-Date:   Fri, 12 Aug 2022 09:25:04 +0300
-User-Agent: Evolution 3.36.5 (3.36.5-2.fc32) 
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.85 on 10.11.54.9
-X-Spam-Status: No, score=-3.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,
-        SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham
-        autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20220811185210.234711-1-ricarkol@google.com>
+X-Migadu-Flow: FLOW_OUT
+X-Migadu-Auth-User: linux.dev
+X-Spam-Status: No, score=-2.8 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,SPF_HELO_PASS,
+        SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no
+        version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, 2022-08-11 at 23:33 +0800, Yang, Weijiang wrote:
-> On 8/3/2022 11:50 PM, Maxim Levitsky wrote:
-> > [...]
-> > +static inline int emulator_recalc_and_set_mode(struct x86_emulate_ctxt *ctxt)
-> > +{
-> > +       u64 efer;
-> > +       struct desc_struct cs;
-> > +       u16 selector;
-> > +       u32 base3;
-> > +
-> > +       ctxt->ops->get_msr(ctxt, MSR_EFER, &efer);
-> > +
-> > +       if (!ctxt->ops->get_cr(ctxt, 0) & X86_CR0_PE) {
+On Thu, Aug 11, 2022 at 11:52:06AM -0700, Ricardo Koller wrote:
+> There are some tests that fail when running on bare metal (including a
+> passthrough prototype).  There are three issues with the tests.  The
+> first one is that there are some missing isb()'s between enabling event
+> counting and the actual counting. This wasn't an issue on KVM as
+> trapping on registers served as context synchronization events. The
+> second issue is that some tests assume that registers reset to 0.  And
+> finally, the third issue is that overflowing the low counter of a
+> chained event sets the overflow flag in PMVOS and some tests fail by
+> checking for it not being set.
+> 
+> Addressed all comments from the previous version:
+> https://lore.kernel.org/kvmarm/YvPsBKGbHHQP+0oS@google.com/T/#mb077998e2eb9fb3e15930b3412fd7ba2fb4103ca
+> - add pmu_reset() for 32-bit arm [Andrew]
+> - collect r-b from Alexandru
 
-Ouch, thanks for catching this!!
+You forgot to pick up Oliver's r-b's and his Link suggestion. I can do
+that again, though.
 
-I wonder how I didn't catch this in unit tests....
-(I'll check on this Sunday)
-
-
-Best regards,
-	Maxim Levitsky
-
-> Shouldn't this be:  !(ctxt->ops->get_cr(ctxt, 0) & X86_CR0_PE) ?
-> > +               /* Real mode. cpu must not have long mode active */
-> > +               if (efer & EFER_LMA)
-> > +                       return X86EMUL_UNHANDLEABLE;
-> > +               ctxt->mode = X86EMUL_MODE_REAL;
-> > +               return X86EMUL_CONTINUE;
-> > +       }
-> > +
-> [...]
-> > --
-> > 2.26.3
-> > 
-
-
+Thanks,
+drew
