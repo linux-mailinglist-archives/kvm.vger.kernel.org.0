@@ -2,148 +2,103 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 9193E591032
-	for <lists+kvm@lfdr.de>; Fri, 12 Aug 2022 13:41:45 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 7AFAD59111C
+	for <lists+kvm@lfdr.de>; Fri, 12 Aug 2022 14:56:34 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237622AbiHLLlk (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 12 Aug 2022 07:41:40 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47786 "EHLO
+        id S238779AbiHLM4c (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 12 Aug 2022 08:56:32 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44120 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S237568AbiHLLlh (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 12 Aug 2022 07:41:37 -0400
-Received: from mga09.intel.com (mga09.intel.com [134.134.136.24])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8BA28AE9D4;
-        Fri, 12 Aug 2022 04:41:36 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1660304496; x=1691840496;
-  h=message-id:date:mime-version:subject:to:cc:references:
-   from:in-reply-to:content-transfer-encoding;
-  bh=0e2NNdr9TRqsvhl/nqvRfSFvCOuxTASVTIjG60GZejU=;
-  b=F37Jr59Ag7ZMqbTg6jRhWRjtszC6oe1RNS0/L+BAebhPZd0Y/9PyoNy3
-   AvJR8QHvKYaRf7g5fMIqjcmaDtiYlM1dPhRmnH4AOzZOG39DUJ5EyZGPq
-   rp8Kh30nGDwVBxDe+A2bm5H/l8ExU0hp4Y3tf7JMeIri//YbU9Py9OSNN
-   cVok6gcnCgtIqV2i45CdVsWrd+ryplgYAhMiuvq8JtQTdF+uCmpBDfQTe
-   iltzs0S/vnuOwbykuHR+u601J1WjBk7CMcv9clHax3+rCYX7lA4pZhGxh
-   W0wdzjewBLFM3DsxQjvNxfDBHmUVn1aYzlYNQXXlGmxJLLfhRh9yNLekI
-   A==;
-X-IronPort-AV: E=McAfee;i="6400,9594,10436"; a="292372511"
-X-IronPort-AV: E=Sophos;i="5.93,231,1654585200"; 
-   d="scan'208";a="292372511"
-Received: from fmsmga008.fm.intel.com ([10.253.24.58])
-  by orsmga102.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 12 Aug 2022 04:41:36 -0700
-X-IronPort-AV: E=Sophos;i="5.93,231,1654585200"; 
-   d="scan'208";a="665792934"
-Received: from lingshan-mobl.ccr.corp.intel.com (HELO [10.249.174.213]) ([10.249.174.213])
-  by fmsmga008-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 12 Aug 2022 04:41:33 -0700
-Message-ID: <d07dc70e-e97b-9b9e-3ef2-c3f648c57a05@intel.com>
-Date:   Fri, 12 Aug 2022 19:41:31 +0800
+        with ESMTP id S234474AbiHLM4b (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 12 Aug 2022 08:56:31 -0400
+Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7A9EB79A4E;
+        Fri, 12 Aug 2022 05:56:30 -0700 (PDT)
+Received: from pps.filterd (m0098404.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.17.1.5/8.17.1.5) with ESMTP id 27CCsC7b006372;
+        Fri, 12 Aug 2022 12:56:30 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=content-type :
+ mime-version : content-transfer-encoding : in-reply-to : references : to :
+ from : subject : cc : message-id : date; s=pp1;
+ bh=1WqgJg/FgiFiiI1bZQ4VmnuST/oM+/8DKFwoXkyCzMs=;
+ b=dUpUcio7q0Y79if/XQ1RY/Q9R14WXAoAtBZuCJVeD0/FCgz56wtibPwsrHWdGJvAePka
+ BzRy4TZUVuhygYV465anOjUoTdyifP2Ls+B5b/yZpLb1kNvjh/TM5zZsgdjkHO8vz4hl
+ ZRHrry++ozPoOuV9nLDe9KkHKgmt6u/2VFJY6OzKNBIxXYlf4+r8pU+Z8o/Z4IM8WOSR
+ YJ3fckaYsZ0KA/gCkpJ3YqWUlk9+1D5tfO3tdgIwztrhW6CSme5oKSsOSJ9VJbMFZxdZ
+ YLuljzDLduiZHehWqUKCKVy+AojrN2vlYV3fBeE2h6PFHizUHrA9YBiqFoANWajq+sIS wQ== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3hwq9c81xu-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Fri, 12 Aug 2022 12:56:30 +0000
+Received: from m0098404.ppops.net (m0098404.ppops.net [127.0.0.1])
+        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 27CCsp2x009910;
+        Fri, 12 Aug 2022 12:56:29 GMT
+Received: from ppma04fra.de.ibm.com (6a.4a.5195.ip4.static.sl-reverse.com [149.81.74.106])
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3hwq9c81ww-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Fri, 12 Aug 2022 12:56:29 +0000
+Received: from pps.filterd (ppma04fra.de.ibm.com [127.0.0.1])
+        by ppma04fra.de.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 27CCpsI6016436;
+        Fri, 12 Aug 2022 12:56:27 GMT
+Received: from b06avi18878370.portsmouth.uk.ibm.com (b06avi18878370.portsmouth.uk.ibm.com [9.149.26.194])
+        by ppma04fra.de.ibm.com with ESMTP id 3hw4nxrr7m-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Fri, 12 Aug 2022 12:56:26 +0000
+Received: from d06av26.portsmouth.uk.ibm.com (d06av26.portsmouth.uk.ibm.com [9.149.105.62])
+        by b06avi18878370.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 27CCufnU33358140
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Fri, 12 Aug 2022 12:56:41 GMT
+Received: from d06av26.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id D7772AE055;
+        Fri, 12 Aug 2022 12:56:23 +0000 (GMT)
+Received: from d06av26.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id B881FAE053;
+        Fri, 12 Aug 2022 12:56:23 +0000 (GMT)
+Received: from li-ca45c2cc-336f-11b2-a85c-c6e71de567f1.ibm.com (unknown [9.171.40.207])
+        by d06av26.portsmouth.uk.ibm.com (Postfix) with ESMTP;
+        Fri, 12 Aug 2022 12:56:23 +0000 (GMT)
+Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:91.0) Gecko/20100101
- Firefox/91.0 Thunderbird/91.12.0
-Subject: Re: [PATCH V5 0/6] ifcvf/vDPA: support query device config space
- through netlink
-Content-Language: en-US
-To:     "Michael S. Tsirkin" <mst@redhat.com>
-Cc:     jasowang@redhat.com, virtualization@lists.linux-foundation.org,
-        netdev@vger.kernel.org, kvm@vger.kernel.org, parav@nvidia.com,
-        xieyongji@bytedance.com, gautam.dawar@amd.com
-References: <20220812104500.163625-1-lingshan.zhu@intel.com>
- <20220812071251-mutt-send-email-mst@kernel.org>
- <20220812071638-mutt-send-email-mst@kernel.org>
-From:   "Zhu, Lingshan" <lingshan.zhu@intel.com>
-In-Reply-To: <20220812071638-mutt-send-email-mst@kernel.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-5.0 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
-        RCVD_IN_DNSWL_MED,RCVD_IN_MSPIKE_H3,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,
-        SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no
-        version=3.4.6
+Content-Transfer-Encoding: quoted-printable
+In-Reply-To: <20220810125625.45295-6-imbrenda@linux.ibm.com>
+References: <20220810125625.45295-1-imbrenda@linux.ibm.com> <20220810125625.45295-6-imbrenda@linux.ibm.com>
+To:     Claudio Imbrenda <imbrenda@linux.ibm.com>, kvm@vger.kernel.org
+From:   Nico Boehr <nrb@linux.ibm.com>
+Subject: Re: [PATCH v13 5/6] KVM: s390: pv: support for Destroy fast UVC
+Cc:     borntraeger@de.ibm.com, frankja@linux.ibm.com, thuth@redhat.com,
+        pasic@linux.ibm.com, david@redhat.com, linux-s390@vger.kernel.org,
+        linux-kernel@vger.kernel.org, scgl@linux.ibm.com,
+        seiden@linux.ibm.com
+Message-ID: <166030898350.24812.8013075066735672338@localhost.localdomain>
+User-Agent: alot/0.8.1
+Date:   Fri, 12 Aug 2022 14:56:23 +0200
+X-TM-AS-GCONF: 00
+X-Proofpoint-ORIG-GUID: agHQOIR3QB2wW_PElCWEv8uwOflwiri4
+X-Proofpoint-GUID: LJp77FCU931-bo-5pL8ZFcBvbFZJU9Fk
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.205,Aquarius:18.0.883,Hydra:6.0.517,FMLib:17.11.122.1
+ definitions=2022-08-12_08,2022-08-11_01,2022-06-22_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxscore=0 spamscore=0
+ priorityscore=1501 malwarescore=0 phishscore=0 lowpriorityscore=0
+ impostorscore=0 clxscore=1015 mlxlogscore=916 bulkscore=0 suspectscore=0
+ adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2207270000 definitions=main-2208120034
+X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_EF,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_PASS,
+        T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+Quoting Claudio Imbrenda (2022-08-10 14:56:24)
+> Add support for the Destroy Secure Configuration Fast Ultravisor call,
+> and take advantage of it for asynchronous destroy.
+>=20
+> When supported, the protected guest is destroyed immediately using the
+> new UVC, leaving only the memory to be cleaned up asynchronously.
+>=20
+> Signed-off-by: Claudio Imbrenda <imbrenda@linux.ibm.com>
 
-
-On 8/12/2022 7:17 PM, Michael S. Tsirkin wrote:
-> On Fri, Aug 12, 2022 at 07:14:39AM -0400, Michael S. Tsirkin wrote:
->> On Fri, Aug 12, 2022 at 06:44:54PM +0800, Zhu Lingshan wrote:
->>> This series allows userspace to query device config space of vDPA
->>> devices and the management devices through netlink,
->>> to get multi-queue, feature bits and etc.
->>>
->>> This series has introduced a new netlink attr
->>> VDPA_ATTR_VDPA_DEV_SUPPORTED_FEATURES, this should be used to query
->>> features of vDPA  devices than the management device.
->>>
->>> Please help review.
->> I can't merge this for this merge window.
->> Am I right when I say that the new thing here is patch 5/6 + new
->> comments?
->> If yes I can queue it out of the window, on top.
-> So at this point, can you please send patches on top of the vhost
-> tree? I think these are just patches 3 and 5 but please confirm.
-I will rebase them on vhost tree and resend them soon, main changes are 
-in patch 5,
-we have made MTU, MAC, MQ conditional there. And there are some new 
-comments as
-you suggested.
-
-
-Thanks,
-Zhu Lingshan
->
->
->>> Thanks!
->>> Zhu Lingshan
->>>
->>> Changes rom V4:
->>> (1) Read MAC, MTU, MQ conditionally (Michael)
->>> (2) If VIRTIO_NET_F_MAC not set, don't report MAC to userspace
->>> (3) If VIRTIO_NET_F_MTU not set, report 1500 to userspace
->>> (4) Add comments to the new attr
->>> VDPA_ATTR_VDPA_DEV_SUPPORTED_FEATURES(Michael)
->>> (5) Add comments for reporting the device status as LE(Michael)
->>>
->>> Changes from V3:
->>> (1)drop the fixes tags(Parva)
->>> (2)better commit log for patch 1/6(Michael)
->>> (3)assign num_queues to max_supported_vqs than max_vq_pairs(Jason)
->>> (4)initialize virtio pci capabilities in the probe() function.
->>>
->>> Changes from V2:
->>> Add fixes tags(Parva)
->>>
->>> Changes from V1:
->>> (1) Use __virito16_to_cpu(true, xxx) for the le16 casting(Jason)
->>> (2) Add a comment in ifcvf_get_config_size(), to explain
->>> why we should return the minimum value of
->>> sizeof(struct virtio_net_config) and the onboard
->>> cap size(Jason)
->>> (3) Introduced a new attr VDPA_ATTR_VDPA_DEV_SUPPORTED_FEATURES
->>> (4) Show the changes of iproute2 output before and after 5/6 patch(Jason)
->>> (5) Fix cast warning in vdpa_fill_stats_rec()
->>>
->>> Zhu Lingshan (6):
->>>    vDPA/ifcvf: get_config_size should return a value no greater than dev
->>>      implementation
->>>    vDPA/ifcvf: support userspace to query features and MQ of a management
->>>      device
->>>    vDPA: allow userspace to query features of a vDPA device
->>>    vDPA: !FEATURES_OK should not block querying device config space
->>>    vDPA: Conditionally read fields in virtio-net dev config space
->>>    fix 'cast to restricted le16' warnings in vdpa.c
->>>
->>>   drivers/vdpa/ifcvf/ifcvf_base.c |  13 ++-
->>>   drivers/vdpa/ifcvf/ifcvf_base.h |   2 +
->>>   drivers/vdpa/ifcvf/ifcvf_main.c | 142 +++++++++++++++++---------------
->>>   drivers/vdpa/vdpa.c             |  82 ++++++++++++------
->>>   include/uapi/linux/vdpa.h       |   3 +
->>>   5 files changed, 149 insertions(+), 93 deletions(-)
->>>
->>> -- 
->>> 2.31.1
-
+Reviewed-by: Nico Boehr <nrb@linux.ibm.com>
