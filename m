@@ -2,192 +2,233 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 87226590DBA
-	for <lists+kvm@lfdr.de>; Fri, 12 Aug 2022 10:49:15 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 1066D590DF4
+	for <lists+kvm@lfdr.de>; Fri, 12 Aug 2022 11:17:48 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237695AbiHLItN (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 12 Aug 2022 04:49:13 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34016 "EHLO
+        id S237049AbiHLJRp (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 12 Aug 2022 05:17:45 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59612 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229664AbiHLItJ (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 12 Aug 2022 04:49:09 -0400
-Received: from NAM12-MW2-obe.outbound.protection.outlook.com (mail-mw2nam12on2088.outbound.protection.outlook.com [40.107.244.88])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 61C79A8CFB;
-        Fri, 12 Aug 2022 01:49:08 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=MIIbbVcSTK0hrEDWiu/T1QatObSS2ZZvStn9Xpqwl3R8NSTD9n5uDVXNP6oB8bKEH/s9QTA4UHmbN60QnhRNS4XxoLcNi///Oq41tCnZCMB5gvmRyEMNVUK7wT/3YsI81oa0Th32xho/fHe3RD+n4jZjyjbmjBYnjPx7kLmQXrd8ag1p3ZhzNGzRxh/xQYhidfJBtfk/gmby9fespEIr3Bo/3ITCagtd1ws7UNhIkYaR3wNqhiLzbpKDidB25hpEda4ffmkoem9UbsgwlPqWnBpzrCl+JWLMIQEN3NLfrBQtRgcIuSK3xw/e2BYTgPZqTAkrGbCPR0zm7hbejlDncw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=HbdCV2Ygct+BRmsibKIcSpi3M2XpGECL+BnEDza78a0=;
- b=OyiYz5SyR1JQ6CHUt9REWbbL4L96T0ryzr+RO2uo9YGTUTisPNaR72rrWUTJZEq2h0tktBfQfJJgdh1qEGLUyPmY2yYQayBrho4yIuWbDBHMLDk6DpUwxIqIDKSRjmIjK+95dC/sEgiVDjVK1PMKGMo0Xo9FTWv4zKw0/1GE/eNTd3yGkr5M/8Q+jYHYJZkAFdskpdA6t9T4p9gYgnTaXyVEmmFshUOFLj/L9IAzL+KaYQP31/6ni/MZH059+E37snHdOx3wCp0isnLkxiikFIsAImOzc6DcpibjAgTUPwziqVTGSySUIiJpL8Gvv4Y3Xx9UvLTSNerMDOGmonjXsg==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
- header.d=amd.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=HbdCV2Ygct+BRmsibKIcSpi3M2XpGECL+BnEDza78a0=;
- b=AiS1lgLByPjNExEn8Ked2x3LPMCpZLCw/1rgz5tGVjr2WZR39NXfrU/H4ZDnd0t4rb0xugSDOguZadz1Eq58WFkDLuGA8ILTQSz02E7njMXOJtl9uURt61k92087UnW56ukBZPPrxTgF3RvFaK66SebBznl5LdTxL1qIpVIK9kU=
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=amd.com;
-Received: from DS7PR12MB6309.namprd12.prod.outlook.com (2603:10b6:8:96::19) by
- CY5PR12MB6552.namprd12.prod.outlook.com (2603:10b6:930:40::16) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.5525.11; Fri, 12 Aug 2022 08:49:06 +0000
-Received: from DS7PR12MB6309.namprd12.prod.outlook.com
- ([fe80::d9f4:5879:843b:55da]) by DS7PR12MB6309.namprd12.prod.outlook.com
- ([fe80::d9f4:5879:843b:55da%9]) with mapi id 15.20.5525.011; Fri, 12 Aug 2022
- 08:49:06 +0000
-Message-ID: <1b02db9d-f2f1-94dd-6f37-59481525abff@amd.com>
-Date:   Fri, 12 Aug 2022 14:18:43 +0530
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.11.0
-Subject: Re: [PATCH v7 00/14] KVM: mm: fd-based approach for supporting KVM
- guest private memory
-Content-Language: en-US
-To:     "Gupta, Pankaj" <pankaj.gupta@amd.com>,
-        Chao Peng <chao.p.peng@linux.intel.com>,
-        Sean Christopherson <seanjc@google.com>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>,
-        Jonathan Corbet <corbet@lwn.net>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        x86@kernel.org, "H . Peter Anvin" <hpa@zytor.com>,
-        Hugh Dickins <hughd@google.com>,
-        Jeff Layton <jlayton@kernel.org>,
-        "J . Bruce Fields" <bfields@fieldses.org>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        Shuah Khan <shuah@kernel.org>, Mike Rapoport <rppt@kernel.org>,
-        Steven Price <steven.price@arm.com>,
-        "Maciej S . Szmigiero" <mail@maciej.szmigiero.name>,
-        Vlastimil Babka <vbabka@suse.cz>,
-        Vishal Annapurve <vannapurve@google.com>,
-        Yu Zhang <yu.c.zhang@linux.intel.com>,
-        "Kirill A . Shutemov" <kirill.shutemov@linux.intel.com>,
-        luto@kernel.org, jun.nakajima@intel.com, dave.hansen@intel.com,
-        ak@linux.intel.com, david@redhat.com, aarcange@redhat.com,
-        ddutile@redhat.com, dhildenb@redhat.com,
-        Quentin Perret <qperret@google.com>,
-        Michael Roth <michael.roth@amd.com>, mhocko@suse.com,
-        Muchun Song <songmuchun@bytedance.com>, bharata@amd.com,
-        kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
-        linux-mm@kvack.org, linux-kselftest@vger.kernel.org,
-        linux-api@vger.kernel.org, linux-doc@vger.kernel.org,
-        qemu-devel@nongnu.org, linux-fsdevel@vger.kernel.org
-References: <20220706082016.2603916-1-chao.p.peng@linux.intel.com>
- <b21f41e5-0322-bbfb-b9c2-db102488592d@amd.com>
- <9e86daea-5619-a216-fe02-0562cf14c501@amd.com>
- <9dc91ce8-4cb6-37e6-4c25-27a72dc11dd0@amd.com>
- <422b9f97-fdf5-54bf-6c56-3c45eff5e174@amd.com>
- <1407c70c-0c0b-6955-10bb-d44c5928f2d9@amd.com>
- <1136925c-2e37-6af4-acac-be8bed9f6ed5@amd.com>
-From:   "Nikunj A. Dadhania" <nikunj@amd.com>
-In-Reply-To: <1136925c-2e37-6af4-acac-be8bed9f6ed5@amd.com>
-Content-Type: text/plain; charset=UTF-8
+        with ESMTP id S232010AbiHLJRn (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 12 Aug 2022 05:17:43 -0400
+Received: from mx0a-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D26C9A7AB5
+        for <kvm@vger.kernel.org>; Fri, 12 Aug 2022 02:17:42 -0700 (PDT)
+Received: from pps.filterd (m0098419.ppops.net [127.0.0.1])
+        by mx0b-001b2d01.pphosted.com (8.17.1.5/8.17.1.5) with ESMTP id 27C99JM8007093
+        for <kvm@vger.kernel.org>; Fri, 12 Aug 2022 09:17:42 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=date : from : to : cc :
+ subject : message-id : in-reply-to : references : content-type :
+ content-transfer-encoding : mime-version; s=pp1;
+ bh=5PYKm6ZoJSMOboe3C14rqV4lHf+yHcZx9qxFk51ZJrQ=;
+ b=tLwPI5KTEmCFN3Lua645Gc4vpHK6v+io/FmJmNeX/0vjnb1S+S9E66EXNkbD0HjWdWls
+ aRvYTxZtTguH5kFcOdML98PWpPev5qbXXr4BXtTdA8fbXBq2G2RpuuRRDOUJdHfDCBga
+ vspR3WfHR9sfdvjNCmst8pkjNATWhdwMbfvyCtdA1pHOUdwqqnZ40l8lPOaSZ0qqciaM
+ D1XhD9Jmfpijek1mTXSb8zCyKKGb+jNcCVF1qhCqYx3PDdL+qLW1vwpzV0R5rpBKQ8yg
+ wqlBDEhzoQcw1aHTNZXnsn9srY9NtizYjlHYE/ME0WuzAILh+bfhUKuBhufAuJ5PQso4 hg== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0b-001b2d01.pphosted.com (PPS) with ESMTPS id 3hwk9rsm4r-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT)
+        for <kvm@vger.kernel.org>; Fri, 12 Aug 2022 09:17:41 +0000
+Received: from m0098419.ppops.net (m0098419.ppops.net [127.0.0.1])
+        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 27C99OW1007771
+        for <kvm@vger.kernel.org>; Fri, 12 Aug 2022 09:17:41 GMT
+Received: from ppma04ams.nl.ibm.com (63.31.33a9.ip4.static.sl-reverse.com [169.51.49.99])
+        by mx0b-001b2d01.pphosted.com (PPS) with ESMTPS id 3hwk9rsm44-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Fri, 12 Aug 2022 09:17:41 +0000
+Received: from pps.filterd (ppma04ams.nl.ibm.com [127.0.0.1])
+        by ppma04ams.nl.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 27C96BBE029970;
+        Fri, 12 Aug 2022 09:17:39 GMT
+Received: from b06cxnps4076.portsmouth.uk.ibm.com (d06relay13.portsmouth.uk.ibm.com [9.149.109.198])
+        by ppma04ams.nl.ibm.com with ESMTP id 3hw3wfrudh-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Fri, 12 Aug 2022 09:17:39 +0000
+Received: from d06av22.portsmouth.uk.ibm.com (d06av22.portsmouth.uk.ibm.com [9.149.105.58])
+        by b06cxnps4076.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 27C9Hau934210136
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Fri, 12 Aug 2022 09:17:36 GMT
+Received: from d06av22.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 760894C046;
+        Fri, 12 Aug 2022 09:17:36 +0000 (GMT)
+Received: from d06av22.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 1F0224C040;
+        Fri, 12 Aug 2022 09:17:36 +0000 (GMT)
+Received: from p-imbrenda (unknown [9.145.3.179])
+        by d06av22.portsmouth.uk.ibm.com (Postfix) with ESMTP;
+        Fri, 12 Aug 2022 09:17:36 +0000 (GMT)
+Date:   Fri, 12 Aug 2022 11:17:34 +0200
+From:   Claudio Imbrenda <imbrenda@linux.ibm.com>
+To:     Nico Boehr <nrb@linux.ibm.com>
+Cc:     kvm@vger.kernel.org, frankja@linux.ibm.com, thuth@redhat.com
+Subject: Re: [kvm-unit-tests PATCH v4 1/4] runtime: add support for panic
+ tests
+Message-ID: <20220812111734.21ee38da@p-imbrenda>
+In-Reply-To: <20220812062151.1980937-2-nrb@linux.ibm.com>
+References: <20220812062151.1980937-1-nrb@linux.ibm.com>
+        <20220812062151.1980937-2-nrb@linux.ibm.com>
+Organization: IBM
+X-Mailer: Claws Mail 4.1.0 (GTK 3.24.34; x86_64-redhat-linux-gnu)
+Content-Type: text/plain; charset=US-ASCII
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: jMHW9UylNFEqtqfvK-UVNQp9mvwFu3a0
+X-Proofpoint-ORIG-GUID: wQ55bazfbg_VjUn929Q9CGINbP7Ggh-H
 Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: PN3PR01CA0044.INDPRD01.PROD.OUTLOOK.COM
- (2603:1096:c01:98::21) To DS7PR12MB6309.namprd12.prod.outlook.com
- (2603:10b6:8:96::19)
+X-Proofpoint-UnRewURL: 0 URL was un-rewritten
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: 4b8ea4c5-7219-48d5-451e-08da7c3f838e
-X-MS-TrafficTypeDiagnostic: CY5PR12MB6552:EE_
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: OilCSi020CLS1TDndgn6MI1D/QbhdweB0NZYsnhK9xXjjwTv9j8T/2NrwTd3g1SZ32B/WU4LkXouO911sU1CWTdgMGPh3EsIN8Mehq+uMS+whXISBOb2eRkkbXwApX/J95jH/2BOG0zBavx1+swBT12RjFEuPYdTZ6xFUj+/mNnxUucHJYuuCuqdlHLjYaaztaI7j1JfrPuwSz24ZsGqDsX+8SPvjl/o1pwNoba4Z1wFiOxyHx4ke4TSmB1tx7WSNUgmxNTNC2EUwYiABtxc9l9vtYL+mQv28tIv/NB+TQAuqk9NOThcZ8V1epLsR775mysz5FAYzmfoepUJ/VpPchBJWAvoKx1J4wffjJp6/KeaPXSJDnE91hDVNWNf0FudkUH1wF5cOdLQdws6xBmQLh9hkpZDWs94/dO49waDmvnBi3aiAZIZKlZmLka0+oGupqosNzKj0tveqaBq706fJ1N4m2e5ICTvJuGCuCpg9eLTKVemP6FBznHmV0naac58Y1iBJYe8IvggJE0FwOMt6Sbzf7KGIpbjHtWUuV0IKkqn7AW5KDNYETarw0K1ufzQx2WGERYVmb9DnRCyiNq3+N3vAhJzYwK+neMrBY44gPx1+oXfj1Q2i8gCdwcWcTv4vevuRxeeHSsgLjsnjgxCfeQYju1H3hA1dge+Tj8Cx6CTiZK8q4iBe0WRZcLCaSqljNITld4SIj218jYRs5Z0Klhkf+sf+AVYUY848OdWzXVTbIrOhvTut8s0/gHFcZyg1ZeAV46bFBSY+biVxHmDrOSygdPUJiaBkORjgB3ls9cL60gfF5KsSk4zmBSD5ROEdPF0T/W+t5ks/lOJXiRetA==
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DS7PR12MB6309.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230016)(4636009)(396003)(346002)(39860400002)(136003)(366004)(376002)(316002)(7406005)(7416002)(66946007)(66556008)(66476007)(2906002)(6666004)(53546011)(6506007)(4326008)(26005)(8676002)(41300700001)(38100700002)(6512007)(5660300002)(186003)(31686004)(83380400001)(31696002)(478600001)(54906003)(8936002)(36756003)(110136005)(6486002)(2616005)(45980500001)(43740500002);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?V1BzakVtWk5WelFHVGR4U2xHK1ZkSHJsQmpLTlRTOEtISXhpeUVLZ3BTVkxL?=
- =?utf-8?B?elpTZm1GRXhPeGtZTGIwdGw5SkZ6akY1VVBlWUNCVXRUSUxKTVQ4QmxHRFVs?=
- =?utf-8?B?VHEvVzdReEo4OXBQMjJvYjBITVAxbkY2bklSMjVER1FRQ1MvVUUxNjlWRXlL?=
- =?utf-8?B?NHFkRDNZNlpQd3hKaS9SalIrU0wxQ1AraElTa3pCV2dXRkVWNDVlTXZ2czhP?=
- =?utf-8?B?S2JVS0lMZWpHUE13UCtXZGhJbFVmaU04T2d3WmZod2dpSUVmeTJwb1IzeWw0?=
- =?utf-8?B?ajBZVnFXMnJuR05YWlZheWhIRS8zMTF3QVl4WUIvQnFSVzIvZGZhRGg0ZU9p?=
- =?utf-8?B?bSs0MEVESGRoK2VSTkZCWUJMbWR5WjVpN1dTcDd4b1luZ0s2ZWNta2xhSlZx?=
- =?utf-8?B?NitpbVhoSVhxTGdpckVqNC8yODNsdVVER053cGxWa3cxcGhhTGJ5UVJSK1hG?=
- =?utf-8?B?Vlk4b2dMdnNCM2ZvR01HcDh5L0c2T29XQi9ZY2JNRE1pU0pJR05rS3k2SWls?=
- =?utf-8?B?ZFJRYzBLNm8rWUVDZGg2OEhuaDhvaHA4NEdkVHRuNTJ3akpBNmNucU54RmZo?=
- =?utf-8?B?WFFldHVTUXZQeFNPdVdFTklJVGYzWW1jbkhPMnFXaEtnTnVvZkxML3dPL2NR?=
- =?utf-8?B?dWFqYzB6UkwrTHNSVCsyQ0NqSXFYek5pMWNEOFh0VnZlaTg4OGNNM2pra2Zl?=
- =?utf-8?B?M0JwT0R6dlgzVHoyRm5nSjAwck8rbGlUZjEva0ZXRzlZYUVOQnRUVXhMaVJj?=
- =?utf-8?B?dHJTODF4RFN1eWQrV2lRYS9GN1Z2RDNZOFFSM0paTTJGN3dmcVdSdzlhQUZ4?=
- =?utf-8?B?eDFoSlQxM0lFZ2NrWi93L0FwL2NUYitLTnFnQjNkVS8wR2JSZ0tNbCtMcGc3?=
- =?utf-8?B?Y3ZsaGg2NHNCOEN1NEQ1dzE2ZEEwbE84YnN2ZmRpOFlUN3lTUjFaby80QURh?=
- =?utf-8?B?RTdidEc2Zlg5eTVNR0U4U2ZqS0xpekJoeWFneU1lanZZdHdsMXY5QVNKNEYr?=
- =?utf-8?B?ME9DM2tLMFZJNnNkUXRyakNlYVNCQVhiYkdjckFJY2pGZld2MGRPWElZYk1J?=
- =?utf-8?B?bU96L2tpbzVVQUNnQ3d5cll3dEtlbXBaYk9aOXF0Nk9uTjJkMFpDYkVTK2hw?=
- =?utf-8?B?VHJ0WWg0eTIrY1VhZGJuZjFnREI0OVhmemRmSG9LL1NqZExyT01rcW1KbjZJ?=
- =?utf-8?B?UzhkWHFYSTlzRUN6VERTNzA2WnVDaG5UZ1ptajhwTHFQM2haSTMyQ05obEhS?=
- =?utf-8?B?QzBlMXRuRVRVakJ0Y0pJbm9WbXM0RnFOM2EyWk5yT0V2bnRxZUpxU1ZzaDJh?=
- =?utf-8?B?MmlGSWxxZzJETVZkVWFPaXNXdXFDdjlzKzlIUk51MHBFSDdodk5jdHBGZjJl?=
- =?utf-8?B?S1R0enZyYU1jSjJNZDdiS1lVV3RGUXc1Y2I3c3FYN1NxbHlNUGlHZHEwZEJF?=
- =?utf-8?B?K0k4aGNsTnc4d3pVZjhZSFJMaXkwMjVRVklTM24xQkxaT2NmY0ZGZVNIL3pM?=
- =?utf-8?B?QVZ5ZlJWVnJTNU5TU09CTnFHV1dmU1MxSGFwZlE1Qm55ZVVlSHBnR0JaL3Jt?=
- =?utf-8?B?K3pvWlZZZnExL3U3alpJdnhScFB4WXdkSmo1dG9venBKQXlPZ0FwT0lDSHRk?=
- =?utf-8?B?VEorbGZ5S2VBREE0REhaTDBnN1lLTmF0TUR3MkRFTWU2Ny9weUVWTEpnOVc1?=
- =?utf-8?B?Sm9tS2hQeVRtZ3I2TmU1K2J2UW5IVG5JN01GckE5Ykx2TGYxbDRsbk5oajJH?=
- =?utf-8?B?eXRwMVVDYzgwNEFCeE9BdWwzR3l3bjQveFRrMHZielJFQlZCZmplczNDY1RG?=
- =?utf-8?B?TkdlbGU0eGEwYm5nRUx0NjVMd2hteHBRT2VteksvV0VpTGh3ODlhYzJXblRh?=
- =?utf-8?B?K0s2UUJJTlpLbHRxSjZaUXRJdGp3cnF6bTltcE5vK1BEamxoMzBTS2FIUkJG?=
- =?utf-8?B?dmpWOE5mZ1FrdkVtaWw5eVdMNzJudTh3ZEhLOXQ0eVJKNURlZEVIeFBWbTRo?=
- =?utf-8?B?dExZZXFFWHRPaDNRTzNlTC9ESEhTdTBEMzdadWpPN0R3bjNCQW0zOGVmcGV6?=
- =?utf-8?B?bE5tMGFEenZvZjBaNDkyNlo4R1JyUmZJN1g4TEkvNUJWVmt3d0huVklwYUlr?=
- =?utf-8?Q?+dPjbCuPqix6bdwYb5Lq9p+zb?=
-X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 4b8ea4c5-7219-48d5-451e-08da7c3f838e
-X-MS-Exchange-CrossTenant-AuthSource: DS7PR12MB6309.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 12 Aug 2022 08:49:06.2319
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: zqIvmyWBuV56k8I8EjEpjXZhAHX/35B7BzOpMWW0Nny8mdgzuGFM6RqdI4JCI0PYFdsJ0WvRdm0M7D5hWh2iFQ==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: CY5PR12MB6552
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_DNSWL_NONE,
-        RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_PASS,T_SCC_BODY_TEXT_LINE
-        autolearn=ham autolearn_force=no version=3.4.6
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.205,Aquarius:18.0.883,Hydra:6.0.517,FMLib:17.11.122.1
+ definitions=2022-08-12_06,2022-08-11_01,2022-06-22_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 clxscore=1015
+ lowpriorityscore=0 suspectscore=0 mlxscore=0 malwarescore=0 adultscore=0
+ spamscore=0 priorityscore=1501 impostorscore=0 mlxlogscore=999
+ phishscore=0 bulkscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2207270000 definitions=main-2208120024
+X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_EF,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_PASS,
+        T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+On Fri, 12 Aug 2022 08:21:48 +0200
+Nico Boehr <nrb@linux.ibm.com> wrote:
 
-
-On 12/08/22 12:48, Gupta, Pankaj wrote:
+> QEMU supports a guest state "guest-panicked" which indicates something
+> in the guest went wrong, for example on s390x, when an external
+> interrupt loop was triggered.
 > 
->>>>>>
->>>>>> However, fallocate() preallocates full guest memory before starting the guest.
->>>>>> With this behaviour guest memory is *not* demand pinned. Is there a way to
->>>>>> prevent fallocate() from reserving full guest memory?
->>>>>
->>>>> Isn't the pinning being handled by the corresponding host memory backend with mmu > notifier and architecture support while doing the memory operations e.g page> migration and swapping/reclaim (not supported currently AFAIU). But yes, we need> to allocate entire guest memory with the new flags MEMFILE_F_{UNMOVABLE, UNRECLAIMABLE etc}.
->>>>
->>>> That is correct, but the question is when does the memory allocated, as these flags are set,
->>>> memory is neither moved nor reclaimed. In current scenario, if I start a 32GB guest, all 32GB is
->>>> allocated.
->>>
->>> I guess so if guest memory is private by default.
->>>
->>> Other option would be to allocate memory as shared by default and
->>> handle on demand allocation and RMPUPDATE with page state change event. But still that would be done at guest boot time, IIUC.
->>
->> Sorry! Don't want to hijack the other thread so replying here.
->>
->> I thought the question is for SEV SNP. For SEV, maybe the hypercall with the page state information can be used to allocate memory as we use it or something like quota based memory allocation (just thinking).
+> Since the guest does not continue to run when it is in the
+> guest-panicked state, it is currently impossible to write panicking
+> tests in kvm-unit-tests. Support from the runtime is needed to check
+> that the guest enters the guest-panicked state.
 > 
-> But all this would have considerable performance overhead (if by default memory is shared) and used mostly at boot time. 
+> Similar to migration tests, add a new group panic. Tests in this
+> group must enter the guest-panicked state to succeed.
+> 
+> The runtime will spawn a QEMU instance, connect to the QMP and listen
+> for events. To parse the QMP protocol, jq[1] is used. Same as with
+> netcat in the migration tests, panic tests won't run if jq is not
+> installed.
+> 
+> The guest is created in the stopped state and only continued when
+> connection to the QMP was successful. This ensures no events are missed
+> between QEMU start and the connect to the QMP.
+> 
+> [1] https://stedolan.github.io/jq/
+> 
+> Signed-off-by: Nico Boehr <nrb@linux.ibm.com>
+> Reviewed-by: Thomas Huth <thuth@redhat.com>
 
-> So, preallocating memory (default memory private) seems better approach for both SEV & SEV SNP with later page management (pinning, reclaim) taken care by host memory backend & architecture together.
+Reviewed-by: Claudio Imbrenda <imbrenda@linux.ibm.com>
 
-I am not sure how will pre-allocating memory help, even if guest would not use full memory it will be pre-allocated. Which if I understand correctly is not expected.
+> ---
+>  s390x/run             |  2 +-
+>  scripts/arch-run.bash | 49 +++++++++++++++++++++++++++++++++++++++++++
+>  scripts/runtime.bash  |  3 +++
+>  3 files changed, 53 insertions(+), 1 deletion(-)
+> 
+> diff --git a/s390x/run b/s390x/run
+> index 24138f6803be..f1111dbdbe62 100755
+> --- a/s390x/run
+> +++ b/s390x/run
+> @@ -30,7 +30,7 @@ M+=",accel=$ACCEL"
+>  command="$qemu -nodefaults -nographic $M"
+>  command+=" -chardev stdio,id=con0 -device sclpconsole,chardev=con0"
+>  command+=" -kernel"
+> -command="$(migration_cmd) $(timeout_cmd) $command"
+> +command="$(panic_cmd) $(migration_cmd) $(timeout_cmd) $command"
+>  
+>  # We return the exit code via stdout, not via the QEMU return code
+>  run_qemu_status $command "$@"
+> diff --git a/scripts/arch-run.bash b/scripts/arch-run.bash
+> index 0dfaf017db0a..51e4b97b27d1 100644
+> --- a/scripts/arch-run.bash
+> +++ b/scripts/arch-run.bash
+> @@ -104,6 +104,14 @@ qmp ()
+>  	echo '{ "execute": "qmp_capabilities" }{ "execute":' "$2" '}' | ncat -U $1
+>  }
+>  
+> +qmp_events ()
+> +{
+> +	while ! test -S "$1"; do sleep 0.1; done
+> +	echo '{ "execute": "qmp_capabilities" }{ "execute": "cont" }' |
+> +		ncat --no-shutdown -U $1 |
+> +		jq -c 'select(has("event"))'
+> +}
+> +
+>  run_migration ()
+>  {
+>  	if ! command -v ncat >/dev/null 2>&1; then
+> @@ -164,6 +172,40 @@ run_migration ()
+>  	return $ret
+>  }
+>  
+> +run_panic ()
+> +{
+> +	if ! command -v ncat >/dev/null 2>&1; then
+> +		echo "${FUNCNAME[0]} needs ncat (netcat)" >&2
+> +		return 77
+> +	fi
+> +
+> +	if ! command -v jq >/dev/null 2>&1; then
+> +		echo "${FUNCNAME[0]} needs jq" >&2
+> +		return 77
+> +	fi
+> +
+> +	qmp=$(mktemp -u -t panic-qmp.XXXXXXXXXX)
+> +
+> +	trap 'kill 0; exit 2' INT TERM
+> +	trap 'rm -f ${qmp}' RETURN EXIT
+> +
+> +	# start VM stopped so we don't miss any events
+> +	eval "$@" -chardev socket,id=mon1,path=${qmp},server=on,wait=off \
+> +		-mon chardev=mon1,mode=control -S &
+> +
+> +	panic_event_count=$(qmp_events ${qmp} | jq -c 'select(.event == "GUEST_PANICKED")' | wc -l)
+> +	if [ "$panic_event_count" -lt 1 ]; then
+> +		echo "FAIL: guest did not panic"
+> +		ret=3
+> +	else
+> +		# some QEMU versions report multiple panic events
+> +		echo "PASS: guest panicked"
+> +		ret=1
+> +	fi
+> +
+> +	return $ret
+> +}
+> +
+>  migration_cmd ()
+>  {
+>  	if [ "$MIGRATION" = "yes" ]; then
+> @@ -171,6 +213,13 @@ migration_cmd ()
+>  	fi
+>  }
+>  
+> +panic_cmd ()
+> +{
+> +	if [ "$PANIC" = "yes" ]; then
+> +		echo "run_panic"
+> +	fi
+> +}
+> +
+>  search_qemu_binary ()
+>  {
+>  	local save_path=$PATH
+> diff --git a/scripts/runtime.bash b/scripts/runtime.bash
+> index bbf87cf4ed3f..f8794e9a25ce 100644
+> --- a/scripts/runtime.bash
+> +++ b/scripts/runtime.bash
+> @@ -145,6 +145,9 @@ function run()
+>      if find_word "migration" "$groups"; then
+>          cmdline="MIGRATION=yes $cmdline"
+>      fi
+> +    if find_word "panic" "$groups"; then
+> +        cmdline="PANIC=yes $cmdline"
+> +    fi
+>      if [ "$verbose" = "yes" ]; then
+>          echo $cmdline
+>      fi
 
-Regards
-Nikunj
