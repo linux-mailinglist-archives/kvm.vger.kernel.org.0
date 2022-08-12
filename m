@@ -2,67 +2,83 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id CDD1E591320
-	for <lists+kvm@lfdr.de>; Fri, 12 Aug 2022 17:36:00 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id EFC07591338
+	for <lists+kvm@lfdr.de>; Fri, 12 Aug 2022 17:43:41 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232812AbiHLPfz (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 12 Aug 2022 11:35:55 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58852 "EHLO
+        id S235497AbiHLPnZ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 12 Aug 2022 11:43:25 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38390 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230141AbiHLPfw (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 12 Aug 2022 11:35:52 -0400
-Received: from mga03.intel.com (mga03.intel.com [134.134.136.65])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F0E142C66E;
-        Fri, 12 Aug 2022 08:35:50 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1660318551; x=1691854551;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=G/GD2vLzv/ZHOTeerh03HkXzFkjP+P2UnBkMqio9ZLg=;
-  b=bV+/gnUgI+spA7fw88i+m8y7cELN2ee81mZeRGD1Y3GhykyuBgC3Gzv1
-   H91VnUxHZkAf2syr5pi0gasGm8zDAvm2qr+z45w34IO22wSqlP7/PVpWR
-   2xE1Wjb1Ct82UGDNQUk7b34QINywCeynBoLKxld71MU0jKyyUENUUHKfK
-   YPqTT/l2Rh15SIFHN59Otnlb+lG61n6bztkVgqF7csEHJy1Sry1TfXc2e
-   G3OiWo2ZxFqAxRc4zd+j2uzNIlLFywVVfvwugrG5veR388cUQAQVd3XP9
-   4AwM2l/3xEXpBpWpTj+ORNwXQi3AboAlNUURHgOOUOBcrhSmjlg2Q0Pw4
-   g==;
-X-IronPort-AV: E=McAfee;i="6400,9594,10437"; a="292882052"
-X-IronPort-AV: E=Sophos;i="5.93,233,1654585200"; 
-   d="scan'208";a="292882052"
-Received: from fmsmga002.fm.intel.com ([10.253.24.26])
-  by orsmga103.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 12 Aug 2022 08:35:50 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.93,233,1654585200"; 
-   d="scan'208";a="709023507"
-Received: from lkp-server02.sh.intel.com (HELO 8745164cafc7) ([10.239.97.151])
-  by fmsmga002.fm.intel.com with ESMTP; 12 Aug 2022 08:35:47 -0700
-Received: from kbuild by 8745164cafc7 with local (Exim 4.96)
-        (envelope-from <lkp@intel.com>)
-        id 1oMWhO-0000gS-2R;
-        Fri, 12 Aug 2022 15:35:46 +0000
-Date:   Fri, 12 Aug 2022 23:35:15 +0800
-From:   kernel test robot <lkp@intel.com>
-To:     Yuan Yao <yuan.yao@intel.com>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-Cc:     kbuild-all@lists.01.org, Paolo Bonzini <pbonzini@redhat.com>,
-        Sean Christopherson <seanjc@google.com>,
-        Jim Mattson <jmattson@google.com>,
-        Jon Cargille <jcargill@google.com>,
-        Peter Shier <pshier@google.com>,
-        Oliver Upton <oupton@google.com>,
-        Yuan Yao <yuan.yao@linux.intel.com>
-Subject: Re: [PATCH 1/1] kvm: nVMX: Checks "VMCS shadowing" with VMCS link
- pointer for non-root mode VM{READ,WRITE}
-Message-ID: <202208122325.Mf2ownsy-lkp@intel.com>
-References: <20220812014706.43409-1-yuan.yao@intel.com>
+        with ESMTP id S238721AbiHLPnC (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 12 Aug 2022 11:43:02 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id D423626ADA
+        for <kvm@vger.kernel.org>; Fri, 12 Aug 2022 08:43:01 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1660318980;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding;
+        bh=dU06y8+WFEqxVVNCdptk9Tc9JwQCiUowOye+07FhZZk=;
+        b=TxdUZ9z8AzrGuX232UTOtCCMXPWAbqOtizlNu2FHr4ueRMWxH/pgcIZTj4SavX/vSMMH4n
+        sdnDiqdrpgjJapXfXAILcGs+MKs0eMhu1E4tro/XTSwZs3Q4DIe3CpDiOYMgvfzvY38nA8
+        8oryIiwUwyNMP/7vZvyLLnVU2YW3//U=
+Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
+ [209.85.128.72]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_128_GCM_SHA256) id
+ us-mta-28-Efh4w5DXMc6infrcBjGh-A-1; Fri, 12 Aug 2022 11:42:59 -0400
+X-MC-Unique: Efh4w5DXMc6infrcBjGh-A-1
+Received: by mail-wm1-f72.google.com with SMTP id c66-20020a1c3545000000b003a37b7e0764so4458682wma.5
+        for <kvm@vger.kernel.org>; Fri, 12 Aug 2022 08:42:59 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=content-transfer-encoding:content-disposition:mime-version
+         :message-id:subject:cc:to:from:date:x-gm-message-state:from:to:cc;
+        bh=dU06y8+WFEqxVVNCdptk9Tc9JwQCiUowOye+07FhZZk=;
+        b=ZfkEOPYwZNnLytTRjsWoCHCbK2PCGJVb95Gp+91DXBQdwUlMOMvWxH0rCzSojlsFzl
+         i630QkjwJyJbfj1fapihw3Rnp7E/Q4Brd8n91ohT9KQ6ILs5RSA2ABbyvXW56PK7jcdt
+         rDba2aHYYOzeO02qbErjDjcPEa6d5B0jjH2LT0fsA7lHNev1wvx01pDZCwX9fn7Bepoq
+         QU6W5mDmc7Kjs09RF8Rd+jEZByO0WwrnwhlXpfmsU2K1777OHUBEoCLG4csb5KFZxnke
+         INru+Le57OrWqGoh7UE7ivY0EPTYSDwo+Zi21quPpW43ldo6RGU5Ns1XnvA6p3XB06CU
+         M82g==
+X-Gm-Message-State: ACgBeo2GZCLP0V9y598POGivfGH1bFkRjUuKG0Db+yjDQFylXoPh9bSR
+        LQ23g3YSh+CFOKbKsYzqFIbooRK9qQJ1Ek8768ZcqzlMOq8DG03HkTdAv/6vIzbQBo2KBqfiN2/
+        Nb1ao3vubYKwU
+X-Received: by 2002:a05:6000:1888:b0:222:c96d:862f with SMTP id a8-20020a056000188800b00222c96d862fmr2441131wri.706.1660318978273;
+        Fri, 12 Aug 2022 08:42:58 -0700 (PDT)
+X-Google-Smtp-Source: AA6agR4eX4UTrlOMsC6tsiDzrk0RxUAoIqtKyE9JwEfcKp7sOMME89M6xJltrqsn3/+oIEuf2mbBGw==
+X-Received: by 2002:a05:6000:1888:b0:222:c96d:862f with SMTP id a8-20020a056000188800b00222c96d862fmr2441121wri.706.1660318977953;
+        Fri, 12 Aug 2022 08:42:57 -0700 (PDT)
+Received: from redhat.com ([2.52.152.113])
+        by smtp.gmail.com with ESMTPSA id n18-20020a7bc5d2000000b003a0375c4f73sm3124129wmk.44.2022.08.12.08.42.52
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 12 Aug 2022 08:42:57 -0700 (PDT)
+Date:   Fri, 12 Aug 2022 11:42:50 -0400
+From:   "Michael S. Tsirkin" <mst@redhat.com>
+To:     Linus Torvalds <torvalds@linux-foundation.org>
+Cc:     kvm@vger.kernel.org, virtualization@lists.linux-foundation.org,
+        netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+        alvaro.karsz@solid-run.com, colin.i.king@gmail.com,
+        colin.king@intel.com, dan.carpenter@oracle.com, david@redhat.com,
+        elic@nvidia.com, eperezma@redhat.com, gautam.dawar@xilinx.com,
+        gshan@redhat.com, hdegoede@redhat.com, hulkci@huawei.com,
+        jasowang@redhat.com, jiaming@nfschina.com,
+        kangjie.xu@linux.alibaba.com, lingshan.zhu@intel.com,
+        liubo03@inspur.com, michael.christie@oracle.com, mst@redhat.com,
+        pankaj.gupta@amd.com, peng.fan@nxp.com, quic_mingxue@quicinc.com,
+        robin.murphy@arm.com, sgarzare@redhat.com, suwan.kim027@gmail.com,
+        syoshida@redhat.com, xieyongji@bytedance.com,
+        xuanzhuo@linux.alibaba.com, xuqiang36@huawei.com
+Subject: [GIT PULL] virtio: fatures, fixes
+Message-ID: <20220812114250-mutt-send-email-mst@kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <20220812014706.43409-1-yuan.yao@intel.com>
-X-Spam-Status: No, score=-5.0 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
-        SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham
+Content-Transfer-Encoding: 8bit
+X-Mutt-Fcc: =sent
+X-Spam-Status: No, score=-2.7 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=unavailable
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -70,144 +86,202 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi Yuan,
+The following changes since commit 3d7cb6b04c3f3115719235cc6866b10326de34cd:
 
-Thank you for the patch! Yet something to improve:
+  Linux 5.19 (2022-07-31 14:03:01 -0700)
 
-[auto build test ERROR on kvm/queue]
-[also build test ERROR on mst-vhost/linux-next linus/master v5.19 next-20220812]
-[If your patch is applied to the wrong git tree, kindly drop us a note.
-And when submitting patch, we suggest to use '--base' as documented in
-https://git-scm.com/docs/git-format-patch#_base_tree_information]
+are available in the Git repository at:
 
-url:    https://github.com/intel-lab-lkp/linux/commits/Yuan-Yao/kvm-nVMX-Checks-VMCS-shadowing-with-VMCS-link-pointer-for-non-root-mode-VM-READ-WRITE/20220812-095001
-base:   https://git.kernel.org/pub/scm/virt/kvm/kvm.git queue
-config: x86_64-randconfig-a015 (https://download.01.org/0day-ci/archive/20220812/202208122325.Mf2ownsy-lkp@intel.com/config)
-compiler: gcc-11 (Debian 11.3.0-3) 11.3.0
-reproduce (this is a W=1 build):
-        # https://github.com/intel-lab-lkp/linux/commit/b15f3d4cd8e8f9cf2db64711234ca27ac74142b2
-        git remote add linux-review https://github.com/intel-lab-lkp/linux
-        git fetch --no-tags linux-review Yuan-Yao/kvm-nVMX-Checks-VMCS-shadowing-with-VMCS-link-pointer-for-non-root-mode-VM-READ-WRITE/20220812-095001
-        git checkout b15f3d4cd8e8f9cf2db64711234ca27ac74142b2
-        # save the config file
-        mkdir build_dir && cp config build_dir/.config
-        make W=1 O=build_dir ARCH=x86_64 SHELL=/bin/bash
+  https://git.kernel.org/pub/scm/linux/kernel/git/mst/vhost.git tags/for_linus
 
-If you fix the issue, kindly add following tag where applicable
-Reported-by: kernel test robot <lkp@intel.com>
+for you to fetch changes up to 93e530d2a1c4c0fcce45e01ae6c5c6287a08d3e3:
 
-All errors (new ones prefixed by >>):
+  vdpa/mlx5: Fix possible uninitialized return value (2022-08-11 10:00:36 -0400)
 
-   arch/x86/kvm/vmx/nested.c: In function 'handle_vmread':
->> arch/x86/kvm/vmx/nested.c:5126:49: error: passing argument 1 of 'nested_cpu_has_shadow_vmcs' from incompatible pointer type [-Werror=incompatible-pointer-types]
-    5126 |                      nested_cpu_has_shadow_vmcs(vcpu) &&
-         |                                                 ^~~~
-         |                                                 |
-         |                                                 struct kvm_vcpu *
-   In file included from arch/x86/kvm/vmx/nested.c:13:
-   arch/x86/kvm/vmx/nested.h:215:62: note: expected 'struct vmcs12 *' but argument is of type 'struct kvm_vcpu *'
-     215 | static inline bool nested_cpu_has_shadow_vmcs(struct vmcs12 *vmcs12)
-         |                                               ~~~~~~~~~~~~~~~^~~~~~
-   arch/x86/kvm/vmx/nested.c: In function 'handle_vmwrite':
-   arch/x86/kvm/vmx/nested.c:5237:41: error: passing argument 1 of 'nested_cpu_has_shadow_vmcs' from incompatible pointer type [-Werror=incompatible-pointer-types]
-    5237 |              nested_cpu_has_shadow_vmcs(vcpu) &&
-         |                                         ^~~~
-         |                                         |
-         |                                         struct kvm_vcpu *
-   In file included from arch/x86/kvm/vmx/nested.c:13:
-   arch/x86/kvm/vmx/nested.h:215:62: note: expected 'struct vmcs12 *' but argument is of type 'struct kvm_vcpu *'
-     215 | static inline bool nested_cpu_has_shadow_vmcs(struct vmcs12 *vmcs12)
-         |                                               ~~~~~~~~~~~~~~~^~~~~~
-   cc1: some warnings being treated as errors
+----------------------------------------------------------------
+virtio: fatures, fixes
 
+A huge patchset supporting vq resize using the
+new vq reset capability.
+Features, fixes, cleanups all over the place.
 
-vim +/nested_cpu_has_shadow_vmcs +5126 arch/x86/kvm/vmx/nested.c
+Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
 
-  5098	
-  5099	static int handle_vmread(struct kvm_vcpu *vcpu)
-  5100	{
-  5101		struct vmcs12 *vmcs12 = is_guest_mode(vcpu) ? get_shadow_vmcs12(vcpu)
-  5102							    : get_vmcs12(vcpu);
-  5103		unsigned long exit_qualification = vmx_get_exit_qual(vcpu);
-  5104		u32 instr_info = vmcs_read32(VMX_INSTRUCTION_INFO);
-  5105		struct vcpu_vmx *vmx = to_vmx(vcpu);
-  5106		struct x86_exception e;
-  5107		unsigned long field;
-  5108		u64 value;
-  5109		gva_t gva = 0;
-  5110		short offset;
-  5111		int len, r;
-  5112	
-  5113		if (!nested_vmx_check_permission(vcpu))
-  5114			return 1;
-  5115	
-  5116		/* Decode instruction info and find the field to read */
-  5117		field = kvm_register_read(vcpu, (((instr_info) >> 28) & 0xf));
-  5118	
-  5119		if (!evmptr_is_valid(vmx->nested.hv_evmcs_vmptr)) {
-  5120			/*
-  5121			 * In VMX non-root operation, when the VMCS-link pointer is INVALID_GPA,
-  5122			 * any VMREAD sets the ALU flags for VMfailInvalid.
-  5123			 */
-  5124			if (vmx->nested.current_vmptr == INVALID_GPA ||
-  5125			    (is_guest_mode(vcpu) &&
-> 5126			     nested_cpu_has_shadow_vmcs(vcpu) &&
-  5127			     get_vmcs12(vcpu)->vmcs_link_pointer == INVALID_GPA))
-  5128				return nested_vmx_failInvalid(vcpu);
-  5129	
-  5130			offset = get_vmcs12_field_offset(field);
-  5131			if (offset < 0)
-  5132				return nested_vmx_fail(vcpu, VMXERR_UNSUPPORTED_VMCS_COMPONENT);
-  5133	
-  5134			if (!is_guest_mode(vcpu) && is_vmcs12_ext_field(field))
-  5135				copy_vmcs02_to_vmcs12_rare(vcpu, vmcs12);
-  5136	
-  5137			/* Read the field, zero-extended to a u64 value */
-  5138			value = vmcs12_read_any(vmcs12, field, offset);
-  5139		} else {
-  5140			/*
-  5141			 * Hyper-V TLFS (as of 6.0b) explicitly states, that while an
-  5142			 * enlightened VMCS is active VMREAD/VMWRITE instructions are
-  5143			 * unsupported. Unfortunately, certain versions of Windows 11
-  5144			 * don't comply with this requirement which is not enforced in
-  5145			 * genuine Hyper-V. Allow VMREAD from an enlightened VMCS as a
-  5146			 * workaround, as misbehaving guests will panic on VM-Fail.
-  5147			 * Note, enlightened VMCS is incompatible with shadow VMCS so
-  5148			 * all VMREADs from L2 should go to L1.
-  5149			 */
-  5150			if (WARN_ON_ONCE(is_guest_mode(vcpu)))
-  5151				return nested_vmx_failInvalid(vcpu);
-  5152	
-  5153			offset = evmcs_field_offset(field, NULL);
-  5154			if (offset < 0)
-  5155				return nested_vmx_fail(vcpu, VMXERR_UNSUPPORTED_VMCS_COMPONENT);
-  5156	
-  5157			/* Read the field, zero-extended to a u64 value */
-  5158			value = evmcs_read_any(vmx->nested.hv_evmcs, field, offset);
-  5159		}
-  5160	
-  5161		/*
-  5162		 * Now copy part of this value to register or memory, as requested.
-  5163		 * Note that the number of bits actually copied is 32 or 64 depending
-  5164		 * on the guest's mode (32 or 64 bit), not on the given field's length.
-  5165		 */
-  5166		if (instr_info & BIT(10)) {
-  5167			kvm_register_write(vcpu, (((instr_info) >> 3) & 0xf), value);
-  5168		} else {
-  5169			len = is_64_bit_mode(vcpu) ? 8 : 4;
-  5170			if (get_vmx_mem_address(vcpu, exit_qualification,
-  5171						instr_info, true, len, &gva))
-  5172				return 1;
-  5173			/* _system ok, nested_vmx_check_permission has verified cpl=0 */
-  5174			r = kvm_write_guest_virt_system(vcpu, gva, &value, len, &e);
-  5175			if (r != X86EMUL_CONTINUE)
-  5176				return kvm_handle_memory_failure(vcpu, r, &e);
-  5177		}
-  5178	
-  5179		return nested_vmx_succeed(vcpu);
-  5180	}
-  5181	
+----------------------------------------------------------------
+Alvaro Karsz (1):
+      net: virtio_net: notifications coalescing support
 
--- 
-0-DAY CI Kernel Test Service
-https://01.org/lkp
+Bo Liu (3):
+      virtio: Check dev_set_name() return value
+      vhost-vdpa: Call ida_simple_remove() when failed
+      virtio_vdpa: support the arg sizes of find_vqs()
+
+Colin Ian King (1):
+      vDPA/ifcvf: remove duplicated assignment to pointer cfg
+
+David Hildenbrand (1):
+      drivers/virtio: Clarify CONFIG_VIRTIO_MEM for unsupported architectures
+
+Eli Cohen (3):
+      vdpa/mlx5: Implement susupend virtqueue callback
+      vdpa/mlx5: Support different address spaces for control and data
+      vdpa/mlx5: Fix possible uninitialized return value
+
+Eugenio Pérez (4):
+      vdpa: Add suspend operation
+      vhost-vdpa: introduce SUSPEND backend feature bit
+      vhost-vdpa: uAPI to suspend the device
+      vdpa_sim: Implement suspend vdpa op
+
+Jason Wang (2):
+      virtio_pmem: initialize provider_data through nd_region_desc
+      virtio_pmem: set device ready in probe()
+
+Michael S. Tsirkin (1):
+      virtio: VIRTIO_HARDEN_NOTIFICATION is broken
+
+Mike Christie (2):
+      vhost-scsi: Fix max number of virtqueues
+      vhost scsi: Allow user to control num virtqueues
+
+Minghao Xue (2):
+      dt-bindings: virtio: mmio: add optional wakeup-source property
+      virtio_mmio: add support to set IRQ of a virtio device as wakeup source
+
+Robin Murphy (1):
+      vdpa: Use device_iommu_capable()
+
+Shigeru Yoshida (1):
+      virtio-blk: Avoid use-after-free on suspend/resume
+
+Stefano Garzarella (11):
+      vringh: iterate on iotlb_translate to handle large translations
+      vdpa_sim_blk: use dev_dbg() to print errors
+      vdpa_sim_blk: limit the number of request handled per batch
+      vdpa_sim_blk: call vringh_complete_iotlb() also in the error path
+      vdpa_sim_blk: set number of address spaces and virtqueue groups
+      vdpa_sim: use max_iotlb_entries as a limit in vhost_iotlb_init
+      tools/virtio: fix build
+      vdpa_sim_blk: check if sector is 0 for commands other than read or write
+      vdpa_sim_blk: make vdpasim_blk_check_range usable by other requests
+      vdpa_sim_blk: add support for VIRTIO_BLK_T_FLUSH
+      vdpa_sim_blk: add support for discard and write-zeroes
+
+Xie Yongji (5):
+      vduse: Remove unnecessary spin lock protection
+      vduse: Use memcpy_{to,from}_page() in do_bounce()
+      vduse: Support using userspace pages as bounce buffer
+      vduse: Support registering userspace memory for IOVA regions
+      vduse: Support querying information of IOVA regions
+
+Xu Qiang (1):
+      vdpa/mlx5: Use eth_broadcast_addr() to assign broadcast address
+
+Xuan Zhuo (44):
+      remoteproc: rename len of rpoc_vring to num
+      virtio_ring: remove the arg vq of vring_alloc_desc_extra()
+      virtio: record the maximum queue num supported by the device.
+      virtio: struct virtio_config_ops add callbacks for queue_reset
+      virtio_ring: update the document of the virtqueue_detach_unused_buf for queue reset
+      virtio_ring: extract the logic of freeing vring
+      virtio_ring: split vring_virtqueue
+      virtio_ring: introduce virtqueue_init()
+      virtio_ring: split: stop __vring_new_virtqueue as export symbol
+      virtio_ring: split: __vring_new_virtqueue() accept struct vring_virtqueue_split
+      virtio_ring: split: introduce vring_free_split()
+      virtio_ring: split: extract the logic of alloc queue
+      virtio_ring: split: extract the logic of alloc state and extra
+      virtio_ring: split: extract the logic of vring init
+      virtio_ring: split: extract the logic of attach vring
+      virtio_ring: split: introduce virtqueue_reinit_split()
+      virtio_ring: split: reserve vring_align, may_reduce_num
+      virtio_ring: split: introduce virtqueue_resize_split()
+      virtio_ring: packed: introduce vring_free_packed
+      virtio_ring: packed: extract the logic of alloc queue
+      virtio_ring: packed: extract the logic of alloc state and extra
+      virtio_ring: packed: extract the logic of vring init
+      virtio_ring: packed: extract the logic of attach vring
+      virtio_ring: packed: introduce virtqueue_reinit_packed()
+      virtio_ring: packed: introduce virtqueue_resize_packed()
+      virtio_ring: introduce virtqueue_resize()
+      virtio_pci: struct virtio_pci_common_cfg add queue_notify_data
+      virtio: allow to unbreak/break virtqueue individually
+      virtio: queue_reset: add VIRTIO_F_RING_RESET
+      virtio_ring: struct virtqueue introduce reset
+      virtio_pci: struct virtio_pci_common_cfg add queue_reset
+      virtio_pci: introduce helper to get/set queue reset
+      virtio_pci: extract the logic of active vq for modern pci
+      virtio_pci: support VIRTIO_F_RING_RESET
+      virtio: find_vqs() add arg sizes
+      virtio_pci: support the arg sizes of find_vqs()
+      virtio_mmio: support the arg sizes of find_vqs()
+      virtio: add helper virtio_find_vqs_ctx_size()
+      virtio_net: set the default max ring size by find_vqs()
+      virtio_net: get ringparam by virtqueue_get_vring_max_size()
+      virtio_net: split free_unused_bufs()
+      virtio_net: support rx queue resize
+      virtio_net: support tx queue resize
+      virtio_net: support set_ringparam
+
+Zhang Jiaming (1):
+      vdpa: ifcvf: Fix spelling mistake in comments
+
+Zhu Lingshan (4):
+      vDPA/ifcvf: get_config_size should return a value no greater than dev implementation
+      vDPA/ifcvf: support userspace to query features and MQ of a management device
+      vDPA: !FEATURES_OK should not block querying device config space
+      vDPA: fix 'cast to restricted le16' warnings in vdpa.c
+
+ Documentation/devicetree/bindings/virtio/mmio.yaml |   4 +
+ arch/um/drivers/virtio_uml.c                       |   3 +-
+ drivers/block/virtio_blk.c                         |  24 +-
+ drivers/net/virtio_net.c                           | 325 +++++++-
+ drivers/nvdimm/virtio_pmem.c                       |   9 +-
+ drivers/platform/mellanox/mlxbf-tmfifo.c           |   3 +
+ drivers/remoteproc/remoteproc_core.c               |   4 +-
+ drivers/remoteproc/remoteproc_virtio.c             |  13 +-
+ drivers/s390/virtio/virtio_ccw.c                   |   4 +
+ drivers/vdpa/ifcvf/ifcvf_base.c                    |  14 +-
+ drivers/vdpa/ifcvf/ifcvf_base.h                    |   2 +
+ drivers/vdpa/ifcvf/ifcvf_main.c                    | 144 ++--
+ drivers/vdpa/mlx5/core/mlx5_vdpa.h                 |  11 +
+ drivers/vdpa/mlx5/net/mlx5_vnet.c                  | 175 ++++-
+ drivers/vdpa/vdpa.c                                |  14 +-
+ drivers/vdpa/vdpa_sim/vdpa_sim.c                   |  18 +-
+ drivers/vdpa/vdpa_sim/vdpa_sim.h                   |   1 +
+ drivers/vdpa/vdpa_sim/vdpa_sim_blk.c               | 176 ++++-
+ drivers/vdpa/vdpa_sim/vdpa_sim_net.c               |   3 +
+ drivers/vdpa/vdpa_user/iova_domain.c               | 102 ++-
+ drivers/vdpa/vdpa_user/iova_domain.h               |   8 +
+ drivers/vdpa/vdpa_user/vduse_dev.c                 | 180 +++++
+ drivers/vhost/scsi.c                               |  85 ++-
+ drivers/vhost/vdpa.c                               |  38 +-
+ drivers/vhost/vringh.c                             |  78 +-
+ drivers/virtio/Kconfig                             |  11 +-
+ drivers/virtio/virtio.c                            |   4 +-
+ drivers/virtio/virtio_mmio.c                       |  14 +-
+ drivers/virtio/virtio_pci_common.c                 |  32 +-
+ drivers/virtio/virtio_pci_common.h                 |   3 +-
+ drivers/virtio/virtio_pci_legacy.c                 |   8 +-
+ drivers/virtio/virtio_pci_modern.c                 | 153 +++-
+ drivers/virtio/virtio_pci_modern_dev.c             |  39 +
+ drivers/virtio/virtio_ring.c                       | 814 +++++++++++++++------
+ drivers/virtio/virtio_vdpa.c                       |  18 +-
+ include/linux/mlx5/mlx5_ifc_vdpa.h                 |   8 +
+ include/linux/remoteproc.h                         |   4 +-
+ include/linux/vdpa.h                               |   4 +
+ include/linux/virtio.h                             |  10 +
+ include/linux/virtio_config.h                      |  40 +-
+ include/linux/virtio_pci_modern.h                  |   9 +
+ include/linux/virtio_ring.h                        |  10 -
+ include/uapi/linux/vduse.h                         |  47 ++
+ include/uapi/linux/vhost.h                         |   9 +
+ include/uapi/linux/vhost_types.h                   |   2 +
+ include/uapi/linux/virtio_config.h                 |   7 +-
+ include/uapi/linux/virtio_net.h                    |  34 +-
+ include/uapi/linux/virtio_pci.h                    |   2 +
+ tools/virtio/linux/kernel.h                        |   2 +-
+ tools/virtio/linux/vringh.h                        |   1 +
+ tools/virtio/virtio_test.c                         |   4 +-
+ 51 files changed, 2171 insertions(+), 556 deletions(-)
+
