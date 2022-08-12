@@ -2,79 +2,119 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id DB134590F9C
-	for <lists+kvm@lfdr.de>; Fri, 12 Aug 2022 12:41:52 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 7B09D590FB2
+	for <lists+kvm@lfdr.de>; Fri, 12 Aug 2022 12:53:05 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237954AbiHLKlv (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 12 Aug 2022 06:41:51 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48386 "EHLO
+        id S236803AbiHLKxD (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 12 Aug 2022 06:53:03 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59780 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230201AbiHLKlu (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 12 Aug 2022 06:41:50 -0400
-Received: from mail-pg1-x535.google.com (mail-pg1-x535.google.com [IPv6:2607:f8b0:4864:20::535])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E099B6318
-        for <kvm@vger.kernel.org>; Fri, 12 Aug 2022 03:41:49 -0700 (PDT)
-Received: by mail-pg1-x535.google.com with SMTP id 24so484254pgr.7
-        for <kvm@vger.kernel.org>; Fri, 12 Aug 2022 03:41:49 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=to:subject:message-id:date:from:sender:mime-version:from:to:cc;
-        bh=447DttLGWlnXVhl3+i4qWwJxEj6tFprhGwRHCuyrWEY=;
-        b=bjNpp12yplcN1Ln4lxt6Lwpgmc24Jcm6VfHqAHwIcrhX7ILz7XeuJi75zcWrdt9oKX
-         x23IQZrFoip8FSUT99yyTJCL71Bz7Ot8YL7GvophbL2X59jC5KLhcDxlxHCSzst2ad42
-         941VQJa31FjjMFESrFUiMMa17jVjNO6qSYexU8cj4onOpnd3TPn5Zd7pEPl4GKPP33+E
-         XnbGV/rtHBK58HFFEfwIb8ls7MYSNRItJh9ZfLzzVLH0S9d+U/qzgjy1DVDU+q3+5JUU
-         +TAMaVzIoZhLja84zql8nWP/cjgqRV0hdjIkBw7EmJioruOMENtoNRrhavk9Wuz+QuXw
-         +HLw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=to:subject:message-id:date:from:sender:mime-version
-         :x-gm-message-state:from:to:cc;
-        bh=447DttLGWlnXVhl3+i4qWwJxEj6tFprhGwRHCuyrWEY=;
-        b=v9VI7D0Oc58aF0mgFhvml6i9YD9ArAZxOAjd/mcDPNSjTUIbQdzeUkltU8E7NdvGaO
-         j+Pm5S2kWQIBBkL3BvAaShKLgKb7hcJ1nPKyKwJ+KjaRvHQ8yc6BCV+oxAXjHmqQ4905
-         QyoXwJDMTf0xBBh4DS81Km+DzpvUwS+98gpuWy8bfPdzkV+4IQBflWpdU6rzlOFH4HGY
-         qaBS3ZPivljbSPb80Be/R3Ap6j0fUqfl24BdxlRGE415SugHwXJJv4eUEd7xflItDUWr
-         g2aMv3KPjPD/Bf+0iCC0y/JZaMEYxW5rs1pttVNVvnmPivrfSgPrg4IZa4GwiDjvSZJE
-         k0pQ==
-X-Gm-Message-State: ACgBeo3LeeLT+Xnx6N6obQMavqLq4Dwp/QAE2dKkAvorgXfwOZtUekO7
-        zcnmkDol87YVfEdcgMGB2+l/mhHvayI71MU5wj8=
-X-Google-Smtp-Source: AA6agR5VfAs57M2Qyb/DaWQEopnpArP6AJOXdaUsT7gDzCcCVPTuICif3zrlJexjN0bzFtMqgfEH1dPpFoj+SWOF2FU=
-X-Received: by 2002:a63:1854:0:b0:41d:e04b:44fc with SMTP id
- 20-20020a631854000000b0041de04b44fcmr2613302pgy.237.1660300909376; Fri, 12
- Aug 2022 03:41:49 -0700 (PDT)
+        with ESMTP id S229664AbiHLKxC (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 12 Aug 2022 06:53:02 -0400
+Received: from mga17.intel.com (mga17.intel.com [192.55.52.151])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 502F39BB4C;
+        Fri, 12 Aug 2022 03:53:02 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1660301582; x=1691837582;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=bStvOSpsXVApWkDcCtm3uX/ugByyXgBgVEJUj06LIyE=;
+  b=f+15gZTX6lcJZrIrboxIHDr6j4NagCsR/++oZSPWDfR4gcgevhZqNEcS
+   ABNEMlrGtpabQgsqpd2b6cr0vOktDxqxjJ3HfZhPIRoOrEW9OyenN8+S+
+   CEqk23aX4SQcHmVNI8/HgW6BqOP4nt3mlJBdMqsxUSQ1Mbc6jpG0iuEID
+   MET6o1TfnlONxF2F611fjfXqVk6Jv30xiNCqldzd2DY3gSreLxifA/9YE
+   HCvda+855kjovWlEYamZXrmyvRv1d/SZZMxe+kN1TjcRf/pwZao+xydTK
+   8I6SN0uO3CibEWtczjx9jLpmpmixE7q4WOo0wjjTG9fX0pBCOHIn6cvTo
+   g==;
+X-IronPort-AV: E=McAfee;i="6400,9594,10436"; a="271956259"
+X-IronPort-AV: E=Sophos;i="5.93,231,1654585200"; 
+   d="scan'208";a="271956259"
+Received: from fmsmga008.fm.intel.com ([10.253.24.58])
+  by fmsmga107.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 12 Aug 2022 03:53:02 -0700
+X-IronPort-AV: E=Sophos;i="5.93,231,1654585200"; 
+   d="scan'208";a="665780567"
+Received: from unknown (HELO localhost.localdomain.bj.intel.com) ([10.240.193.73])
+  by fmsmga008-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 12 Aug 2022 03:52:59 -0700
+From:   Zhu Lingshan <lingshan.zhu@intel.com>
+To:     jasowang@redhat.com, mst@redhat.com
+Cc:     virtualization@lists.linux-foundation.org, netdev@vger.kernel.org,
+        kvm@vger.kernel.org, parav@nvidia.com, xieyongji@bytedance.com,
+        gautam.dawar@amd.com, Zhu Lingshan <lingshan.zhu@intel.com>
+Subject: [PATCH V5 0/6] ifcvf/vDPA: support query device config space through netlink
+Date:   Fri, 12 Aug 2022 18:44:54 +0800
+Message-Id: <20220812104500.163625-1-lingshan.zhu@intel.com>
+X-Mailer: git-send-email 2.31.1
 MIME-Version: 1.0
-Sender: bazarkowanigeria@gmail.com
-Received: by 2002:a17:90a:9f91:0:0:0:0 with HTTP; Fri, 12 Aug 2022 03:41:48
- -0700 (PDT)
-From:   "Mrs. Margaret Christopher" <mrsmargaretchristopher01@gmail.com>
-Date:   Fri, 12 Aug 2022 03:41:48 -0700
-X-Google-Sender-Auth: NkFPpjvAzATBc0FSSvfrD19SFA0
-Message-ID: <CAPgaJa37H1J11fSn1a6c05iFMuUz_jnYFkYfy=MuhdoyjqN1_g@mail.gmail.com>
-Subject: Humanitarian Project For Less Privileged.
-To:     undisclosed-recipients:;
-Content-Type: text/plain; charset="UTF-8"
-X-Spam-Status: No, score=0.6 required=5.0 tests=BAYES_50,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
-        RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,T_HK_NAME_FM_MR_MRS,
-        T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+X-Spam-Status: No, score=-5.0 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
+        SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+This series allows userspace to query device config space of vDPA
+devices and the management devices through netlink,
+to get multi-queue, feature bits and etc.
+
+This series has introduced a new netlink attr
+VDPA_ATTR_VDPA_DEV_SUPPORTED_FEATURES, this should be used to query
+features of vDPA  devices than the management device.
+
+Please help review.
+
+Thanks!
+Zhu Lingshan
+
+Changes rom V4:
+(1) Read MAC, MTU, MQ conditionally (Michael)
+(2) If VIRTIO_NET_F_MAC not set, don't report MAC to userspace
+(3) If VIRTIO_NET_F_MTU not set, report 1500 to userspace
+(4) Add comments to the new attr
+VDPA_ATTR_VDPA_DEV_SUPPORTED_FEATURES(Michael)
+(5) Add comments for reporting the device status as LE(Michael)
+
+Changes from V3:
+(1)drop the fixes tags(Parva)
+(2)better commit log for patch 1/6(Michael)
+(3)assign num_queues to max_supported_vqs than max_vq_pairs(Jason)
+(4)initialize virtio pci capabilities in the probe() function.
+
+Changes from V2:
+Add fixes tags(Parva)
+
+Changes from V1:
+(1) Use __virito16_to_cpu(true, xxx) for the le16 casting(Jason)
+(2) Add a comment in ifcvf_get_config_size(), to explain
+why we should return the minimum value of
+sizeof(struct virtio_net_config) and the onboard
+cap size(Jason)
+(3) Introduced a new attr VDPA_ATTR_VDPA_DEV_SUPPORTED_FEATURES
+(4) Show the changes of iproute2 output before and after 5/6 patch(Jason)
+(5) Fix cast warning in vdpa_fill_stats_rec() 
+
+Zhu Lingshan (6):
+  vDPA/ifcvf: get_config_size should return a value no greater than dev
+    implementation
+  vDPA/ifcvf: support userspace to query features and MQ of a management
+    device
+  vDPA: allow userspace to query features of a vDPA device
+  vDPA: !FEATURES_OK should not block querying device config space
+  vDPA: Conditionally read fields in virtio-net dev config space
+  fix 'cast to restricted le16' warnings in vdpa.c
+
+ drivers/vdpa/ifcvf/ifcvf_base.c |  13 ++-
+ drivers/vdpa/ifcvf/ifcvf_base.h |   2 +
+ drivers/vdpa/ifcvf/ifcvf_main.c | 142 +++++++++++++++++---------------
+ drivers/vdpa/vdpa.c             |  82 ++++++++++++------
+ include/uapi/linux/vdpa.h       |   3 +
+ 5 files changed, 149 insertions(+), 93 deletions(-)
+
 -- 
-Hello Dear
+2.31.1
 
-  Am a dying woman here in the hospital, i was diagnose as a
-Coronavirus patient over 2 months ago. I am A business woman who is
-dealing with Gold Exportation, I Am 59 year old from USA California i
-have a charitable and unfufilling  project that am about to handover
-to you, if you are interested to know more about this project please reply me.
-
- Hope to hear from you
-
-Best Regard
-
-Mrs. Margaret
