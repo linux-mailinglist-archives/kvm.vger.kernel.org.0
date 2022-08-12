@@ -2,107 +2,101 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id C6B52591517
-	for <lists+kvm@lfdr.de>; Fri, 12 Aug 2022 19:53:19 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 6AAE059151A
+	for <lists+kvm@lfdr.de>; Fri, 12 Aug 2022 19:57:20 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238086AbiHLRxQ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 12 Aug 2022 13:53:16 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59034 "EHLO
+        id S237116AbiHLR5R (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 12 Aug 2022 13:57:17 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33554 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S238139AbiHLRxN (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 12 Aug 2022 13:53:13 -0400
-Received: from out2.migadu.com (out2.migadu.com [IPv6:2001:41d0:2:aacc::])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 937BEB2847
-        for <kvm@vger.kernel.org>; Fri, 12 Aug 2022 10:53:12 -0700 (PDT)
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-        t=1660326790;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:
-         content-transfer-encoding:content-transfer-encoding;
-        bh=L0jXf6P2p6bz6aHAr7aCyfyKZ4vR3txkHJHPli2GGbc=;
-        b=KM6/8jHpWILyr6sfI23IRlJUyDPgLXa3W2nLzoT0tWzd99NhPIGLijTVZI/J9xZMZGj/gS
-        Pgv4GYBC+ZE2w+qCsfBLdWHg6SscbUbQ3jLnQQmSgSPKnWgm4L8GrLrfT5+vl6ag8+cKpU
-        UTN5cjQBzIvn5pAfCSRsYDXaoF/f60U=
-From:   Oliver Upton <oliver.upton@linux.dev>
-To:     kvm@vger.kernel.org
-Cc:     Paolo Bonzini <pbonzini@redhat.com>,
-        Ben Gardon <bgardon@google.com>,
-        David Matlack <dmatlack@google.com>,
-        Sean Christopherson <seanjc@google.com>,
-        Oliver Upton <oliver.upton@linux.dev>
-Subject: [PATCH] KVM: selftests: Use TEST_REQUIRE() in nx_huge_pages_test
-Date:   Fri, 12 Aug 2022 17:53:01 +0000
-Message-Id: <20220812175301.3915004-1-oliver.upton@linux.dev>
+        with ESMTP id S233349AbiHLR5Q (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 12 Aug 2022 13:57:16 -0400
+Received: from mail-pg1-x52f.google.com (mail-pg1-x52f.google.com [IPv6:2607:f8b0:4864:20::52f])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D4F47A5C72
+        for <kvm@vger.kernel.org>; Fri, 12 Aug 2022 10:57:15 -0700 (PDT)
+Received: by mail-pg1-x52f.google.com with SMTP id r22so1388741pgm.5
+        for <kvm@vger.kernel.org>; Fri, 12 Aug 2022 10:57:15 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc;
+        bh=On7C2WVHpUSP29uDe0Zk7xxqfw94zgRBvMfSSWUNRhE=;
+        b=T7d1TkRsePjPxfnWhD1hH8gtjeKcF1Ui/wCiLf7RviRGolw2Km2Y+mQXkWGuyV2Ysa
+         H6cXOMgIammjqjfKqJgseTSjYpunELu99QkzL6+jdHjRpsMj3LDXqGet5nBZK0RHZkN8
+         T4aiUW+Q2gG89SyvKu+Y9PDPdRwonxwoa+oWRgYQwDgUhwU9KlBRl9pUwnWaqxFo47Pw
+         TBKljNA8DeNhP+p0eTHy6fSsMEsX/g21SUyG1rc+ym7PwX54GSq84BQJp4VFzwTm4QpL
+         OrZAc+rbqWaBvsugzqB0PuiJGXcH73pAc35YUNpxDSkmNDuGwbYD+v4NnaUdExj9lGCS
+         eACw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc;
+        bh=On7C2WVHpUSP29uDe0Zk7xxqfw94zgRBvMfSSWUNRhE=;
+        b=AMk/+XacYqkhrR5gt+PCMZX3NxZL0FYYiHZOwOSh423Dgs4fX1hN3ki2Pd3oP6x1et
+         s7ry4LIkjeDuBp5juk+Z5i6547StIsbuMfKfEd9nn+bC41tzasl5gfZoc+QyBI4u/FBs
+         KuI5XKxU/zWzcRNwKyheqtsawI/vTRmxRrvmbxpCppThiWIufH+p9whoDgtLj6wsJlJU
+         Yy1ec8JZrTVOne9cNinibCKkyBAh50eLlTwAI8/GAj3ramxZvpSjvx6F+9BewTpCuSti
+         XqPYceuRzhgK8mi0QIQ/T6kFycukA2qdYzbm/afkCP2PMlpn9WY/USF/00pduX7SD9pA
+         CjTA==
+X-Gm-Message-State: ACgBeo2DEyX6rhwjtojbqI8qOJDzIytYsdngyAoZIWW8IJyNfaxnytul
+        FAOLnb+wWXFRVtqL9wyHGDbaNw==
+X-Google-Smtp-Source: AA6agR7WF+te4SjtfCu2H/j3kNeq5igrD9TNACHGGoMYEgeEc2wnCVx2meSrLvTN+UvM4hGRXAx43Q==
+X-Received: by 2002:a63:5320:0:b0:41c:89ca:f931 with SMTP id h32-20020a635320000000b0041c89caf931mr3918667pgb.525.1660327035251;
+        Fri, 12 Aug 2022 10:57:15 -0700 (PDT)
+Received: from google.com (220.181.82.34.bc.googleusercontent.com. [34.82.181.220])
+        by smtp.gmail.com with ESMTPSA id v7-20020a632f07000000b0041cd5ddde6fsm1591636pgv.76.2022.08.12.10.57.14
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 12 Aug 2022 10:57:14 -0700 (PDT)
+Date:   Fri, 12 Aug 2022 10:57:10 -0700
+From:   Ricardo Koller <ricarkol@google.com>
+To:     Andrew Jones <andrew.jones@linux.dev>
+Cc:     kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu, maz@kernel.org,
+        alexandru.elisei@arm.com, eric.auger@redhat.com,
+        oliver.upton@linux.dev, reijiw@google.com
+Subject: Re: [kvm-unit-tests PATCH v4 0/4] arm: pmu: Fixes for bare metal
+Message-ID: <YvaUdjguLwvXabIF@google.com>
+References: <20220811185210.234711-1-ricarkol@google.com>
+ <20220812063300.ygeyivgzzkyzg3uo@kamzik>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Migadu-Flow: FLOW_OUT
-X-Migadu-Auth-User: linux.dev
-X-Spam-Status: No, score=-2.8 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,SPF_HELO_PASS,
-        SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no
-        version=3.4.6
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20220812063300.ygeyivgzzkyzg3uo@kamzik>
+X-Spam-Status: No, score=-14.5 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+        ENV_AND_HDR_SPF_MATCH,FSL_HELO_FAKE,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,
+        SPF_PASS,T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL
+        autolearn=no autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Avoid boilerplate for checking test preconditions by using
-TEST_REQUIRE(). While at it, add a precondition for
-KVM_CAP_VM_DISABLE_NX_HUGE_PAGES to skip (instead of silently pass) on
-older kernels.
+On Fri, Aug 12, 2022 at 08:33:00AM +0200, Andrew Jones wrote:
+> On Thu, Aug 11, 2022 at 11:52:06AM -0700, Ricardo Koller wrote:
+> > There are some tests that fail when running on bare metal (including a
+> > passthrough prototype).  There are three issues with the tests.  The
+> > first one is that there are some missing isb()'s between enabling event
+> > counting and the actual counting. This wasn't an issue on KVM as
+> > trapping on registers served as context synchronization events. The
+> > second issue is that some tests assume that registers reset to 0.  And
+> > finally, the third issue is that overflowing the low counter of a
+> > chained event sets the overflow flag in PMVOS and some tests fail by
+> > checking for it not being set.
+> > 
+> > Addressed all comments from the previous version:
+> > https://lore.kernel.org/kvmarm/YvPsBKGbHHQP+0oS@google.com/T/#mb077998e2eb9fb3e15930b3412fd7ba2fb4103ca
+> > - add pmu_reset() for 32-bit arm [Andrew]
+> > - collect r-b from Alexandru
+> 
+> You forgot to pick up Oliver's r-b's and his Link suggestion.
 
-Signed-off-by: Oliver Upton <oliver.upton@linux.dev>
----
- .../selftests/kvm/x86_64/nx_huge_pages_test.c | 24 +++++--------------
- 1 file changed, 6 insertions(+), 18 deletions(-)
+Ahh, yes, sorry Oliver.
 
-diff --git a/tools/testing/selftests/kvm/x86_64/nx_huge_pages_test.c b/tools/testing/selftests/kvm/x86_64/nx_huge_pages_test.c
-index cc6421716400..e19933ea34ca 100644
---- a/tools/testing/selftests/kvm/x86_64/nx_huge_pages_test.c
-+++ b/tools/testing/selftests/kvm/x86_64/nx_huge_pages_test.c
-@@ -118,13 +118,6 @@ void run_test(int reclaim_period_ms, bool disable_nx_huge_pages,
- 	vm = vm_create(1);
- 
- 	if (disable_nx_huge_pages) {
--		/*
--		 * Cannot run the test without NX huge pages if the kernel
--		 * does not support it.
--		 */
--		if (!kvm_check_cap(KVM_CAP_VM_DISABLE_NX_HUGE_PAGES))
--			return;
--
- 		r = __vm_disable_nx_huge_pages(vm);
- 		if (reboot_permissions) {
- 			TEST_ASSERT(!r, "Disabling NX huge pages should succeed if process has reboot permissions");
-@@ -248,18 +241,13 @@ int main(int argc, char **argv)
- 		}
- 	}
- 
--	if (token != MAGIC_TOKEN) {
--		print_skip("This test must be run with the magic token %d.\n"
--			   "This is done by nx_huge_pages_test.sh, which\n"
--			   "also handles environment setup for the test.",
--			   MAGIC_TOKEN);
--		exit(KSFT_SKIP);
--	}
-+	TEST_REQUIRE(kvm_has_cap(KVM_CAP_VM_DISABLE_NX_HUGE_PAGES));
-+	TEST_REQUIRE(reclaim_period_ms > 0);
- 
--	if (!reclaim_period_ms) {
--		print_skip("The NX reclaim period must be specified and non-zero");
--		exit(KSFT_SKIP);
--	}
-+	__TEST_REQUIRE(token == MAGIC_TOKEN,
-+		       "This test must be run with the magic token %d.\n"
-+		       "This is done by nx_huge_pages_test.sh, which\n"
-+		       "also handles environment setup for the test.");
- 
- 	run_test(reclaim_period_ms, false, reboot_permissions);
- 	run_test(reclaim_period_ms, true, reboot_permissions);
+> I can do that again, though.
 
-base-commit: 93472b79715378a2386598d6632c654a2223267b
--- 
-2.37.1.595.g718a3a8f04-goog
+Thanks Andrew
 
+> 
+> Thanks,
+> drew
