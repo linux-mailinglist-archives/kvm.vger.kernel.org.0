@@ -2,387 +2,273 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 6AFE059124C
-	for <lists+kvm@lfdr.de>; Fri, 12 Aug 2022 16:34:33 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 589D4591285
+	for <lists+kvm@lfdr.de>; Fri, 12 Aug 2022 16:54:57 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238530AbiHLOe3 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 12 Aug 2022 10:34:29 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54822 "EHLO
+        id S238086AbiHLOyx (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 12 Aug 2022 10:54:53 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44776 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S236950AbiHLOe2 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 12 Aug 2022 10:34:28 -0400
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id B5C61AB07B
-        for <kvm@vger.kernel.org>; Fri, 12 Aug 2022 07:34:26 -0700 (PDT)
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 354F6106F;
-        Fri, 12 Aug 2022 07:34:27 -0700 (PDT)
-Received: from [192.168.12.23] (unknown [172.31.20.19])
-        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id DB0663F5A1;
-        Fri, 12 Aug 2022 07:34:24 -0700 (PDT)
-Message-ID: <8af01455-f228-676c-9cc7-d6933219dd3d@arm.com>
-Date:   Fri, 12 Aug 2022 15:34:15 +0100
+        with ESMTP id S234450AbiHLOyw (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 12 Aug 2022 10:54:52 -0400
+Received: from mga03.intel.com (mga03.intel.com [134.134.136.65])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 80E5AA1D77;
+        Fri, 12 Aug 2022 07:54:50 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1660316090; x=1691852090;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=omkE3NQsYWGVI5ohyEwid1FFrhnD+QvscZYysRHXkes=;
+  b=KW9ox1H7xyToi61IZpGfWJfc4QXLBxZAMSsIbJq9TMH0IFJ8cuall/Af
+   0FMW0WdNQC8dLaPOrMi/uqnJTc8GGBy0oERhhccsBI6xZ3orUTvVm2WAs
+   5Rn0UIHR+b915Ze9AlzkaBGBdssuEeZRd/ETc31tebeUxxcLOl7ierGCo
+   XKMRdFlj5xYjzvEHvAIfR3F/ToDoxHbV6T5fnX9VPKmkWEIlJiYS8pZsE
+   TnXC5EwK7ybW3uIx4a3Qt2ojmjILEwAoNqnT5lzsQ481EL07uEEta3nbe
+   Upmg1lKECog7x/YEUSdERGyq1bX7RDh3m+fhOa7VwfOaS0aVDmM8leQ8y
+   w==;
+X-IronPort-AV: E=McAfee;i="6400,9594,10437"; a="292874066"
+X-IronPort-AV: E=Sophos;i="5.93,233,1654585200"; 
+   d="scan'208";a="292874066"
+Received: from orsmga002.jf.intel.com ([10.7.209.21])
+  by orsmga103.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 12 Aug 2022 07:54:50 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.93,233,1654585200"; 
+   d="scan'208";a="605935187"
+Received: from lkp-server02.sh.intel.com (HELO 8745164cafc7) ([10.239.97.151])
+  by orsmga002.jf.intel.com with ESMTP; 12 Aug 2022 07:54:46 -0700
+Received: from kbuild by 8745164cafc7 with local (Exim 4.96)
+        (envelope-from <lkp@intel.com>)
+        id 1oMW3i-0000ed-08;
+        Fri, 12 Aug 2022 14:54:46 +0000
+Date:   Fri, 12 Aug 2022 22:54:07 +0800
+From:   kernel test robot <lkp@intel.com>
+To:     Yuan Yao <yuan.yao@intel.com>, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+Cc:     llvm@lists.linux.dev, kbuild-all@lists.01.org,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Sean Christopherson <seanjc@google.com>,
+        Jim Mattson <jmattson@google.com>,
+        Jon Cargille <jcargill@google.com>,
+        Peter Shier <pshier@google.com>,
+        Oliver Upton <oupton@google.com>,
+        Yuan Yao <yuan.yao@linux.intel.com>
+Subject: Re: [PATCH 1/1] kvm: nVMX: Checks "VMCS shadowing" with VMCS link
+ pointer for non-root mode VM{READ,WRITE}
+Message-ID: <202208122237.cw837245-lkp@intel.com>
+References: <20220812014706.43409-1-yuan.yao@intel.com>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:91.0)
- Gecko/20100101 Thunderbird/91.12.0
-Subject: Re: [kvm-unit-tests PATCH v3 19/27] arm/arm64: Add a setup sequence
- for systems that boot through EFI
-Content-Language: en-GB
-To:     Alexandru Elisei <alexandru.elisei@arm.com>
-Cc:     kvm@vger.kernel.org, andrew.jones@linux.dev, drjones@redhat.com,
-        pbonzini@redhat.com, jade.alglave@arm.com, ricarkol@google.com
-References: <20220630100324.3153655-1-nikos.nikoleris@arm.com>
- <20220630100324.3153655-20-nikos.nikoleris@arm.com>
- <Yta663UyZcP1j9t1@monolith.localdoman>
-From:   Nikos Nikoleris <nikos.nikoleris@arm.com>
-In-Reply-To: <Yta663UyZcP1j9t1@monolith.localdoman>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-6.9 required=5.0 tests=BAYES_00,NICE_REPLY_A,
-        RCVD_IN_DNSWL_HI,SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE
-        autolearn=ham autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20220812014706.43409-1-yuan.yao@intel.com>
+X-Spam-Status: No, score=-5.0 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
+        SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 19/07/2022 15:08, Alexandru Elisei wrote:
-> Hi,
-> 
-> On Thu, Jun 30, 2022 at 11:03:16AM +0100, Nikos Nikoleris wrote:
->> This change implements an alternative setup sequence for the system
->> when we are booting through EFI. The memory map is discovered through
->> EFI boot services and devices through ACPI.
->>
->> This change is based on a change initially proposed by
->> Andrew Jones <drjones@redhat.com>
->>
->> Signed-off-by: Nikos Nikoleris <nikos.nikoleris@arm.com>
->> ---
->>   lib/linux/efi.h     |   1 +
->>   lib/arm/asm/setup.h |   2 +
->>   lib/arm/setup.c     | 181 +++++++++++++++++++++++++++++++++++++++++++-
->>   arm/cstart.S        |   1 +
->>   arm/cstart64.S      |   1 +
->>   5 files changed, 184 insertions(+), 2 deletions(-)
->>
->> diff --git a/lib/linux/efi.h b/lib/linux/efi.h
->> index 53748dd..89f9a9e 100644
->> --- a/lib/linux/efi.h
->> +++ b/lib/linux/efi.h
->> @@ -63,6 +63,7 @@ typedef guid_t efi_guid_t;
->>   	(c) & 0xff, ((c) >> 8) & 0xff, d } }
->>   
->>   #define ACPI_TABLE_GUID EFI_GUID(0xeb9d2d30, 0x2d88, 0x11d3, 0x9a, 0x16, 0x00, 0x90, 0x27, 0x3f, 0xc1, 0x4d)
->> +#define ACPI_20_TABLE_GUID EFI_GUID(0x8868e871, 0xe4f1, 0x11d3,  0xbc, 0x22, 0x00, 0x80, 0xc7, 0x3c, 0x88, 0x81)
->>   
->>   #define LOADED_IMAGE_PROTOCOL_GUID EFI_GUID(0x5b1b31a1, 0x9562, 0x11d2,  0x8e, 0x3f, 0x00, 0xa0, 0xc9, 0x69, 0x72, 0x3b)
->>   
->> diff --git a/lib/arm/asm/setup.h b/lib/arm/asm/setup.h
->> index 64cd379..c4cd485 100644
->> --- a/lib/arm/asm/setup.h
->> +++ b/lib/arm/asm/setup.h
->> @@ -6,6 +6,7 @@
->>    * This work is licensed under the terms of the GNU LGPL, version 2.
->>    */
->>   #include <libcflat.h>
->> +#include <efi.h>
->>   #include <asm/page.h>
->>   #include <asm/pgtable-hwdef.h>
->>   
->> @@ -37,5 +38,6 @@ extern unsigned int mem_region_get_flags(phys_addr_t paddr);
->>   #define SMP_CACHE_BYTES		L1_CACHE_BYTES
->>   
->>   void setup(const void *fdt, phys_addr_t freemem_start);
->> +efi_status_t setup_efi(efi_bootinfo_t *efi_bootinfo);
->>   
->>   #endif /* _ASMARM_SETUP_H_ */
->> diff --git a/lib/arm/setup.c b/lib/arm/setup.c
->> index 13513d0..30d04d0 100644
->> --- a/lib/arm/setup.c
->> +++ b/lib/arm/setup.c
->> @@ -34,7 +34,7 @@
->>   #define NR_EXTRA_MEM_REGIONS	16
->>   #define NR_INITIAL_MEM_REGIONS	(MAX_DT_MEM_REGIONS + NR_EXTRA_MEM_REGIONS)
->>   
->> -extern unsigned long _etext;
->> +extern unsigned long _text, _etext, _data, _edata;
->>   
->>   char *initrd;
->>   u32 initrd_size;
->> @@ -44,7 +44,10 @@ int nr_cpus;
->>   
->>   static struct mem_region __initial_mem_regions[NR_INITIAL_MEM_REGIONS + 1];
->>   struct mem_region *mem_regions = __initial_mem_regions;
->> -phys_addr_t __phys_offset, __phys_end;
->> +phys_addr_t __phys_offset = (phys_addr_t)-1, __phys_end = 0;
->> +
->> +extern void exceptions_init(void);
->> +extern void asm_mmu_disable(void);
->>   
->>   int mpidr_to_cpu(uint64_t mpidr)
->>   {
->> @@ -272,3 +275,177 @@ void setup(const void *fdt, phys_addr_t freemem_start)
->>   	if (!(auxinfo.flags & AUXINFO_MMU_OFF))
->>   		setup_vm();
->>   }
->> +
->> +#ifdef CONFIG_EFI
->> +
->> +#include <efi.h>
->> +
->> +static efi_status_t setup_rsdp(efi_bootinfo_t *efi_bootinfo)
->> +{
->> +	efi_status_t status;
->> +	struct rsdp_descriptor *rsdp;
->> +
->> +	/*
->> +	 * RSDP resides in an EFI_ACPI_RECLAIM_MEMORY region, which is not used
->> +	 * by kvm-unit-tests arm64 memory allocator. So it is not necessary to
->> +	 * copy the data structure to another memory region to prevent
->> +	 * unintentional overwrite.
->> +	 */
->> +	status = efi_get_system_config_table(ACPI_20_TABLE_GUID, (void **)&rsdp);
->> +	if (status != EFI_SUCCESS)
->> +		return status;
->> +
->> +	set_efi_rsdp(rsdp);
->> +
->> +	return EFI_SUCCESS;
->> +}
->> +
->> +static efi_status_t efi_mem_init(efi_bootinfo_t *efi_bootinfo)
->> +{
->> +	int i;
->> +	unsigned long free_mem_pages = 0;
->> +	unsigned long free_mem_start = 0;
->> +	struct efi_boot_memmap *map = &(efi_bootinfo->mem_map);
->> +	efi_memory_desc_t *buffer = *map->map;
->> +	efi_memory_desc_t *d = NULL;
->> +	phys_addr_t base, top;
->> +	struct mem_region *r;
->> +	uintptr_t text = (uintptr_t)&_text, etext = __ALIGN((uintptr_t)&_etext, 4096);
->> +	uintptr_t data = (uintptr_t)&_data, edata = __ALIGN((uintptr_t)&_edata, 4096);
->> +
->> +	/*
->> +	 * Record the largest free EFI_CONVENTIONAL_MEMORY region
->> +	 * which will be used to set up the memory allocator, so that
->> +	 * the memory allocator can work in the largest free
->> +	 * continuous memory region.
->> +	 */
->> +	for (i = 0, r = &mem_regions[0]; i < *(map->map_size); i += *(map->desc_size), ++r) {
->> +		d = (efi_memory_desc_t *)(&((u8 *)buffer)[i]);
->> +
->> +		r->start = d->phys_addr;
->> +		r->end = d->phys_addr + d->num_pages * EFI_PAGE_SIZE;
->> +
->> +		switch (d->type) {
->> +		case EFI_RESERVED_TYPE:
->> +		case EFI_LOADER_DATA:
->> +		case EFI_BOOT_SERVICES_CODE:
->> +		case EFI_BOOT_SERVICES_DATA:
->> +		case EFI_RUNTIME_SERVICES_CODE:
->> +		case EFI_RUNTIME_SERVICES_DATA:
->> +		case EFI_UNUSABLE_MEMORY:
->> +		case EFI_ACPI_RECLAIM_MEMORY:
->> +		case EFI_ACPI_MEMORY_NVS:
->> +		case EFI_PAL_CODE:
->> +			r->flags = MR_F_RESERVED;
->> +			break;
->> +		case EFI_MEMORY_MAPPED_IO:
->> +		case EFI_MEMORY_MAPPED_IO_PORT_SPACE:
->> +			r->flags = MR_F_IO;
->> +			break;
->> +		case EFI_LOADER_CODE:
->> +			if (r->start <= text && r->end > text) {
->> +				/* This is the unit test region. Flag the code separately. */
->> +				phys_addr_t tmp = r->end;
->> +
->> +				assert(etext <= data);
->> +				assert(edata <= r->end);
->> +				r->flags = MR_F_CODE;
->> +				r->end = data;
->> +				++r;
->> +				r->start = data;
->> +				r->end = tmp;
->> +			} else {
->> +				r->flags = MR_F_RESERVED;
->> +			}
->> +			break;
->> +		case EFI_CONVENTIONAL_MEMORY:
->> +			if (free_mem_pages < d->num_pages) {
->> +				free_mem_pages = d->num_pages;
->> +				free_mem_start = d->phys_addr;
->> +			}
->> +			break;
->> +		}
->> +
->> +		if (!(r->flags & MR_F_IO)) {
->> +			if (r->start < __phys_offset)
->> +				__phys_offset = r->start;
->> +			if (r->end > __phys_end)
->> +				__phys_end = r->end;
-> 
-> What happens if there are holes between __phys_offset and __phys_end? The
-> boot path for KVM makes sure there are no holes. Wouldn't asm_mmu_disable()
-> trigger a translation fault if the address is not mapped because it
-> corresponds to a hole in the EFI provided memory map?
-> 
-> What happens if the region [__phys_offset, __phys_end) contains one of the
-> EFI reserved memory types? That's not really something that kvm-unit-tests
-> should be poking.
-> 
+Hi Yuan,
 
-That's a good point.
+Thank you for the patch! Yet something to improve:
 
-> The efi boot code path changes the semantics for __phys_offset and
-> __phys_end, and that's a recipe for introducing bugs.
-> 
-> I would suggest changing __phys_offset and __phys_end to represent
-> something that applies to both the KVM boot path and the EFI boot path.
-> 
+[auto build test ERROR on kvm/queue]
+[also build test ERROR on mst-vhost/linux-next linus/master v5.19 next-20220812]
+[If your patch is applied to the wrong git tree, kindly drop us a note.
+And when submitting patch, we suggest to use '--base' as documented in
+https://git-scm.com/docs/git-format-patch#_base_tree_information]
 
-Currently we're using __phys_offset and __phys_end in two places:
-* When we disable the MMU, to clean and invalidate the whole physical 
-address space.
-* In selftest-mem, To compute the amount of memory available to the test.
+url:    https://github.com/intel-lab-lkp/linux/commits/Yuan-Yao/kvm-nVMX-Checks-VMCS-shadowing-with-VMCS-link-pointer-for-non-root-mode-VM-READ-WRITE/20220812-095001
+base:   https://git.kernel.org/pub/scm/virt/kvm/kvm.git queue
+config: i386-randconfig-a011 (https://download.01.org/0day-ci/archive/20220812/202208122237.cw837245-lkp@intel.com/config)
+compiler: clang version 16.0.0 (https://github.com/llvm/llvm-project 5f1c7e2cc5a3c07cbc2412e851a7283c1841f520)
+reproduce (this is a W=1 build):
+        wget https://raw.githubusercontent.com/intel/lkp-tests/master/sbin/make.cross -O ~/bin/make.cross
+        chmod +x ~/bin/make.cross
+        # https://github.com/intel-lab-lkp/linux/commit/b15f3d4cd8e8f9cf2db64711234ca27ac74142b2
+        git remote add linux-review https://github.com/intel-lab-lkp/linux
+        git fetch --no-tags linux-review Yuan-Yao/kvm-nVMX-Checks-VMCS-shadowing-with-VMCS-link-pointer-for-non-root-mode-VM-READ-WRITE/20220812-095001
+        git checkout b15f3d4cd8e8f9cf2db64711234ca27ac74142b2
+        # save the config file
+        mkdir build_dir && cp config build_dir/.config
+        COMPILER_INSTALL_PATH=$HOME/0day COMPILER=clang make.cross W=1 O=build_dir ARCH=i386 SHELL=/bin/bash arch/x86/kvm/
 
-> One idea that occured to me would be to have separate text, data and
-> available memory regions.  Have __phys_offset and __phys_end express the
-> start and end of the largest contiguous memory region, and initialize the
-> memory allocator from this region. That will also pave the way for handling
-> multiple memory regions from the DT.
+If you fix the issue, kindly add following tag where applicable
+Reported-by: kernel test robot <lkp@intel.com>
 
-For EFI, this didn't work. __phys_end - __phys_offset doesn't produce 
-the amount of memory expected by selftest-mem.
+All errors (new ones prefixed by >>):
 
-> 
-> Or, if you can prove and EFI_LOADER_CODE is always adjacent to
-> EFI_CONVENTIONAL_MEMORY, you can have __phys_offset and __phys_end describe
-> the region from the start of text to the end of EFI_CONVENTIONAL_MEMORY.
-> 
+>> arch/x86/kvm/vmx/nested.c:5126:35: error: incompatible pointer types passing 'struct kvm_vcpu *' to parameter of type 'struct vmcs12 *' [-Werror,-Wincompatible-pointer-types]
+                        nested_cpu_has_shadow_vmcs(vcpu) &&
+                                                   ^~~~
+   include/linux/compiler.h:56:47: note: expanded from macro 'if'
+   #define if(cond, ...) if ( __trace_if_var( !!(cond , ## __VA_ARGS__) ) )
+                                                 ^~~~
+   include/linux/compiler.h:58:52: note: expanded from macro '__trace_if_var'
+   #define __trace_if_var(cond) (__builtin_constant_p(cond) ? (cond) : __trace_if_value(cond))
+                                                      ^~~~
+   arch/x86/kvm/vmx/nested.h:215:62: note: passing argument to parameter 'vmcs12' here
+   static inline bool nested_cpu_has_shadow_vmcs(struct vmcs12 *vmcs12)
+                                                                ^
+>> arch/x86/kvm/vmx/nested.c:5126:35: error: incompatible pointer types passing 'struct kvm_vcpu *' to parameter of type 'struct vmcs12 *' [-Werror,-Wincompatible-pointer-types]
+                        nested_cpu_has_shadow_vmcs(vcpu) &&
+                                                   ^~~~
+   include/linux/compiler.h:56:47: note: expanded from macro 'if'
+   #define if(cond, ...) if ( __trace_if_var( !!(cond , ## __VA_ARGS__) ) )
+                                                 ^~~~
+   include/linux/compiler.h:58:61: note: expanded from macro '__trace_if_var'
+   #define __trace_if_var(cond) (__builtin_constant_p(cond) ? (cond) : __trace_if_value(cond))
+                                                               ^~~~
+   arch/x86/kvm/vmx/nested.h:215:62: note: passing argument to parameter 'vmcs12' here
+   static inline bool nested_cpu_has_shadow_vmcs(struct vmcs12 *vmcs12)
+                                                                ^
+>> arch/x86/kvm/vmx/nested.c:5126:35: error: incompatible pointer types passing 'struct kvm_vcpu *' to parameter of type 'struct vmcs12 *' [-Werror,-Wincompatible-pointer-types]
+                        nested_cpu_has_shadow_vmcs(vcpu) &&
+                                                   ^~~~
+   include/linux/compiler.h:56:47: note: expanded from macro 'if'
+   #define if(cond, ...) if ( __trace_if_var( !!(cond , ## __VA_ARGS__) ) )
+                                                 ^~~~
+   include/linux/compiler.h:58:86: note: expanded from macro '__trace_if_var'
+   #define __trace_if_var(cond) (__builtin_constant_p(cond) ? (cond) : __trace_if_value(cond))
+                                                                                        ^~~~
+   include/linux/compiler.h:69:3: note: expanded from macro '__trace_if_value'
+           (cond) ?                                        \
+            ^~~~
+   arch/x86/kvm/vmx/nested.h:215:62: note: passing argument to parameter 'vmcs12' here
+   static inline bool nested_cpu_has_shadow_vmcs(struct vmcs12 *vmcs12)
+                                                                ^
+   arch/x86/kvm/vmx/nested.c:5237:34: error: incompatible pointer types passing 'struct kvm_vcpu *' to parameter of type 'struct vmcs12 *' [-Werror,-Wincompatible-pointer-types]
+                nested_cpu_has_shadow_vmcs(vcpu) &&
+                                           ^~~~
+   include/linux/compiler.h:56:47: note: expanded from macro 'if'
+   #define if(cond, ...) if ( __trace_if_var( !!(cond , ## __VA_ARGS__) ) )
+                                                 ^~~~
+   include/linux/compiler.h:58:52: note: expanded from macro '__trace_if_var'
+   #define __trace_if_var(cond) (__builtin_constant_p(cond) ? (cond) : __trace_if_value(cond))
+                                                      ^~~~
+   arch/x86/kvm/vmx/nested.h:215:62: note: passing argument to parameter 'vmcs12' here
+   static inline bool nested_cpu_has_shadow_vmcs(struct vmcs12 *vmcs12)
+                                                                ^
+   arch/x86/kvm/vmx/nested.c:5237:34: error: incompatible pointer types passing 'struct kvm_vcpu *' to parameter of type 'struct vmcs12 *' [-Werror,-Wincompatible-pointer-types]
+                nested_cpu_has_shadow_vmcs(vcpu) &&
+                                           ^~~~
+   include/linux/compiler.h:56:47: note: expanded from macro 'if'
+   #define if(cond, ...) if ( __trace_if_var( !!(cond , ## __VA_ARGS__) ) )
+                                                 ^~~~
+   include/linux/compiler.h:58:61: note: expanded from macro '__trace_if_var'
+   #define __trace_if_var(cond) (__builtin_constant_p(cond) ? (cond) : __trace_if_value(cond))
+                                                               ^~~~
+   arch/x86/kvm/vmx/nested.h:215:62: note: passing argument to parameter 'vmcs12' here
+   static inline bool nested_cpu_has_shadow_vmcs(struct vmcs12 *vmcs12)
+                                                                ^
+   arch/x86/kvm/vmx/nested.c:5237:34: error: incompatible pointer types passing 'struct kvm_vcpu *' to parameter of type 'struct vmcs12 *' [-Werror,-Wincompatible-pointer-types]
+                nested_cpu_has_shadow_vmcs(vcpu) &&
+                                           ^~~~
+   include/linux/compiler.h:56:47: note: expanded from macro 'if'
+   #define if(cond, ...) if ( __trace_if_var( !!(cond , ## __VA_ARGS__) ) )
+                                                 ^~~~
+   include/linux/compiler.h:58:86: note: expanded from macro '__trace_if_var'
+   #define __trace_if_var(cond) (__builtin_constant_p(cond) ? (cond) : __trace_if_value(cond))
+                                                                                        ^~~~
+   include/linux/compiler.h:69:3: note: expanded from macro '__trace_if_value'
+           (cond) ?                                        \
+            ^~~~
+   arch/x86/kvm/vmx/nested.h:215:62: note: passing argument to parameter 'vmcs12' here
+   static inline bool nested_cpu_has_shadow_vmcs(struct vmcs12 *vmcs12)
+                                                                ^
+   6 errors generated.
 
-I don't think we can rely on this assumption. It doesn't hold on when I 
-run experiments locally.
 
-> Thoughts? Suggestions?
+vim +5126 arch/x86/kvm/vmx/nested.c
 
-Could we get rid of __phys_offset and __phys_end? You wanted to move 
-away from cleaning the whole memory for the purposes of disabling the 
-MMU. We could just clean the regions as we discover them and keep a 
-__phys_size for the purposes of selftest-mem. What do you think?
+  5098	
+  5099	static int handle_vmread(struct kvm_vcpu *vcpu)
+  5100	{
+  5101		struct vmcs12 *vmcs12 = is_guest_mode(vcpu) ? get_shadow_vmcs12(vcpu)
+  5102							    : get_vmcs12(vcpu);
+  5103		unsigned long exit_qualification = vmx_get_exit_qual(vcpu);
+  5104		u32 instr_info = vmcs_read32(VMX_INSTRUCTION_INFO);
+  5105		struct vcpu_vmx *vmx = to_vmx(vcpu);
+  5106		struct x86_exception e;
+  5107		unsigned long field;
+  5108		u64 value;
+  5109		gva_t gva = 0;
+  5110		short offset;
+  5111		int len, r;
+  5112	
+  5113		if (!nested_vmx_check_permission(vcpu))
+  5114			return 1;
+  5115	
+  5116		/* Decode instruction info and find the field to read */
+  5117		field = kvm_register_read(vcpu, (((instr_info) >> 28) & 0xf));
+  5118	
+  5119		if (!evmptr_is_valid(vmx->nested.hv_evmcs_vmptr)) {
+  5120			/*
+  5121			 * In VMX non-root operation, when the VMCS-link pointer is INVALID_GPA,
+  5122			 * any VMREAD sets the ALU flags for VMfailInvalid.
+  5123			 */
+  5124			if (vmx->nested.current_vmptr == INVALID_GPA ||
+  5125			    (is_guest_mode(vcpu) &&
+> 5126			     nested_cpu_has_shadow_vmcs(vcpu) &&
+  5127			     get_vmcs12(vcpu)->vmcs_link_pointer == INVALID_GPA))
+  5128				return nested_vmx_failInvalid(vcpu);
+  5129	
+  5130			offset = get_vmcs12_field_offset(field);
+  5131			if (offset < 0)
+  5132				return nested_vmx_fail(vcpu, VMXERR_UNSUPPORTED_VMCS_COMPONENT);
+  5133	
+  5134			if (!is_guest_mode(vcpu) && is_vmcs12_ext_field(field))
+  5135				copy_vmcs02_to_vmcs12_rare(vcpu, vmcs12);
+  5136	
+  5137			/* Read the field, zero-extended to a u64 value */
+  5138			value = vmcs12_read_any(vmcs12, field, offset);
+  5139		} else {
+  5140			/*
+  5141			 * Hyper-V TLFS (as of 6.0b) explicitly states, that while an
+  5142			 * enlightened VMCS is active VMREAD/VMWRITE instructions are
+  5143			 * unsupported. Unfortunately, certain versions of Windows 11
+  5144			 * don't comply with this requirement which is not enforced in
+  5145			 * genuine Hyper-V. Allow VMREAD from an enlightened VMCS as a
+  5146			 * workaround, as misbehaving guests will panic on VM-Fail.
+  5147			 * Note, enlightened VMCS is incompatible with shadow VMCS so
+  5148			 * all VMREADs from L2 should go to L1.
+  5149			 */
+  5150			if (WARN_ON_ONCE(is_guest_mode(vcpu)))
+  5151				return nested_vmx_failInvalid(vcpu);
+  5152	
+  5153			offset = evmcs_field_offset(field, NULL);
+  5154			if (offset < 0)
+  5155				return nested_vmx_fail(vcpu, VMXERR_UNSUPPORTED_VMCS_COMPONENT);
+  5156	
+  5157			/* Read the field, zero-extended to a u64 value */
+  5158			value = evmcs_read_any(vmx->nested.hv_evmcs, field, offset);
+  5159		}
+  5160	
+  5161		/*
+  5162		 * Now copy part of this value to register or memory, as requested.
+  5163		 * Note that the number of bits actually copied is 32 or 64 depending
+  5164		 * on the guest's mode (32 or 64 bit), not on the given field's length.
+  5165		 */
+  5166		if (instr_info & BIT(10)) {
+  5167			kvm_register_write(vcpu, (((instr_info) >> 3) & 0xf), value);
+  5168		} else {
+  5169			len = is_64_bit_mode(vcpu) ? 8 : 4;
+  5170			if (get_vmx_mem_address(vcpu, exit_qualification,
+  5171						instr_info, true, len, &gva))
+  5172				return 1;
+  5173			/* _system ok, nested_vmx_check_permission has verified cpl=0 */
+  5174			r = kvm_write_guest_virt_system(vcpu, gva, &value, len, &e);
+  5175			if (r != X86EMUL_CONTINUE)
+  5176				return kvm_handle_memory_failure(vcpu, r, &e);
+  5177		}
+  5178	
+  5179		return nested_vmx_succeed(vcpu);
+  5180	}
+  5181	
 
-Thanks,
-
-Nikos
-
-> 
-> Thanks,
-> Alex
-> 
->> +		}
->> +	}
->> +	__phys_end &= PHYS_MASK;
->> +	asm_mmu_disable();
->> +
->> +	if (free_mem_pages == 0)
->> +		return EFI_OUT_OF_RESOURCES;
->> +
->> +	assert(sizeof(long) == 8 || free_mem_start < (3ul << 30));
->> +
->> +	phys_alloc_init(free_mem_start, free_mem_pages << EFI_PAGE_SHIFT);
->> +	phys_alloc_set_minimum_alignment(SMP_CACHE_BYTES);
->> +
->> +	phys_alloc_get_unused(&base, &top);
->> +	base = PAGE_ALIGN(base);
->> +	top = top & PAGE_MASK;
->> +	assert(sizeof(long) == 8 || !(base >> 32));
->> +	if (sizeof(long) != 8 && (top >> 32) != 0)
->> +		top = ((uint64_t)1 << 32);
->> +	page_alloc_init_area(0, base >> PAGE_SHIFT, top >> PAGE_SHIFT);
->> +	page_alloc_ops_enable();
->> +
->> +	return EFI_SUCCESS;
->> +}
->> +
->> +efi_status_t setup_efi(efi_bootinfo_t *efi_bootinfo)
->> +{
->> +	efi_status_t status;
->> +
->> +	struct thread_info *ti = current_thread_info();
->> +
->> +	memset(ti, 0, sizeof(*ti));
->> +
->> +	exceptions_init();
->> +
->> +	status = efi_mem_init(efi_bootinfo);
->> +	if (status != EFI_SUCCESS) {
->> +		printf("Failed to initialize memory: ");
->> +		switch (status) {
->> +		case EFI_OUT_OF_RESOURCES:
->> +			printf("No free memory region\n");
->> +			break;
->> +		default:
->> +			printf("Unknown error\n");
->> +			break;
->> +		}
->> +		return status;
->> +	}
->> +
->> +	status = setup_rsdp(efi_bootinfo);
->> +	if (status != EFI_SUCCESS) {
->> +		printf("Cannot find RSDP in EFI system table\n");
->> +		return status;
->> +	}
->> +
->> +	psci_set_conduit();
->> +	cpu_init();
->> +	/* cpu_init must be called before thread_info_init */
->> +	thread_info_init(current_thread_info(), 0);
->> +	/* mem_init must be called before io_init */
->> +	io_init();
->> +
->> +	timer_save_state();
->> +	if (initrd) {
->> +		/* environ is currently the only file in the initrd */
->> +		char *env = malloc(initrd_size);
->> +
->> +		memcpy(env, initrd, initrd_size);
->> +		setup_env(env, initrd_size);
->> +	}
->> +
->> +	if (!(auxinfo.flags & AUXINFO_MMU_OFF))
->> +		setup_vm();
->> +
->> +	return EFI_SUCCESS;
->> +}
->> +
->> +#endif
->> diff --git a/arm/cstart.S b/arm/cstart.S
->> index dc324c5..66a55b9 100644
->> --- a/arm/cstart.S
->> +++ b/arm/cstart.S
->> @@ -256,6 +256,7 @@ asm_mmu_disable:
->>    *
->>    * Input r0 is the stack top, which is the exception stacks base
->>    */
->> +.globl exceptions_init
->>   exceptions_init:
->>   	mrc	p15, 0, r2, c1, c0, 0	@ read SCTLR
->>   	bic	r2, #CR_V		@ SCTLR.V := 0
->> diff --git a/arm/cstart64.S b/arm/cstart64.S
->> index 390feb9..55b41ea 100644
->> --- a/arm/cstart64.S
->> +++ b/arm/cstart64.S
->> @@ -276,6 +276,7 @@ asm_mmu_disable:
->>    * Vectors
->>    */
->>   
->> +.globl exceptions_init
->>   exceptions_init:
->>   	adrp	x4, vector_table
->>   	add	x4, x4, :lo12:vector_table
->> -- 
->> 2.25.1
->>
+-- 
+0-DAY CI Kernel Test Service
+https://01.org/lkp
