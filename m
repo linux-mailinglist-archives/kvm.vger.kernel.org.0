@@ -2,66 +2,95 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id D367E591AA0
-	for <lists+kvm@lfdr.de>; Sat, 13 Aug 2022 15:30:12 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 368F2591AD1
+	for <lists+kvm@lfdr.de>; Sat, 13 Aug 2022 16:04:18 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S239447AbiHMNaL (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sat, 13 Aug 2022 09:30:11 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36028 "EHLO
+        id S239537AbiHMOEI (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sat, 13 Aug 2022 10:04:08 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35508 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235278AbiHMNaJ (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sat, 13 Aug 2022 09:30:09 -0400
-Received: from ams.source.kernel.org (ams.source.kernel.org [145.40.68.75])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1B0B85C9DD
-        for <kvm@vger.kernel.org>; Sat, 13 Aug 2022 06:30:08 -0700 (PDT)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by ams.source.kernel.org (Postfix) with ESMTPS id CC79CB801B9
-        for <kvm@vger.kernel.org>; Sat, 13 Aug 2022 13:30:06 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 7FFC9C433D6
-        for <kvm@vger.kernel.org>; Sat, 13 Aug 2022 13:30:05 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1660397405;
-        bh=/MbVMEtpSr0YtR2RKRBrO9qWjk7eG5551gI1T2QT698=;
-        h=From:To:Subject:Date:In-Reply-To:References:From;
-        b=fgz4eOYuvkoOQWYaRIJZkQjFkt9KKVyFdJpTFn6VPoBCfTms8Dwm9kh+Vp5tW5En9
-         fZsALq/frMJo8MWM172wbjOjYp7oPsGU5vvmSEVnC66zeud9RjI5hO5gLTjB/HMG3Z
-         SiYh7zl+CuoENBJIEBqvyD4ffP/BjkhLRte6pR6Nz9jF+BQM+LnGRUsRKlm0pVDLem
-         5l+UGosl0kwFRsgKNz3TipVpo4dXISxIwVHAQVRmuvTSIhVrJwfT4stygz3ZcUQpQw
-         TZVSae6PntJ0p0IW3b37+sZeSlX8LEjHP/4SDUh6QJ2lgI/e1XdUHoeSSX4eRr7nFI
-         tIidG25lC/obw==
-Received: by aws-us-west-2-korg-bugzilla-1.web.codeaurora.org (Postfix, from userid 48)
-        id 6B29AC433E6; Sat, 13 Aug 2022 13:30:05 +0000 (UTC)
-From:   bugzilla-daemon@kernel.org
-To:     kvm@vger.kernel.org
-Subject: [Bug 216349] Kernel panic in a Ubuntu VM running on Proxmox
-Date:   Sat, 13 Aug 2022 13:30:05 +0000
-X-Bugzilla-Reason: None
-X-Bugzilla-Type: changed
-X-Bugzilla-Watch-Reason: AssignedTo virtualization_kvm@kernel-bugs.osdl.org
-X-Bugzilla-Product: Virtualization
-X-Bugzilla-Component: kvm
-X-Bugzilla-Version: unspecified
-X-Bugzilla-Keywords: 
-X-Bugzilla-Severity: normal
-X-Bugzilla-Who: jdpark.au@gmail.com
-X-Bugzilla-Status: NEW
-X-Bugzilla-Resolution: 
-X-Bugzilla-Priority: P1
-X-Bugzilla-Assigned-To: virtualization_kvm@kernel-bugs.osdl.org
-X-Bugzilla-Flags: 
-X-Bugzilla-Changed-Fields: 
-Message-ID: <bug-216349-28872-FKkd5elcW1@https.bugzilla.kernel.org/>
-In-Reply-To: <bug-216349-28872@https.bugzilla.kernel.org/>
-References: <bug-216349-28872@https.bugzilla.kernel.org/>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Bugzilla-URL: https://bugzilla.kernel.org/
-Auto-Submitted: auto-generated
+        with ESMTP id S239516AbiHMOEH (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sat, 13 Aug 2022 10:04:07 -0400
+Received: from mail-lj1-x22f.google.com (mail-lj1-x22f.google.com [IPv6:2a00:1450:4864:20::22f])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6C46813F35
+        for <kvm@vger.kernel.org>; Sat, 13 Aug 2022 07:04:06 -0700 (PDT)
+Received: by mail-lj1-x22f.google.com with SMTP id z20so3427719ljq.3
+        for <kvm@vger.kernel.org>; Sat, 13 Aug 2022 07:04:06 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=semihalf.com; s=google;
+        h=content-transfer-encoding:content-language:in-reply-to:mime-version
+         :user-agent:date:message-id:from:references:cc:to:subject:from:to:cc;
+        bh=qyCH1Xo3YO20trnPHb9qoKkPoh3odrsC9eN4HgrltUw=;
+        b=pSjJl9nWWTwf30szirsqzHpUBwAT4x3UZvhP0LsmCQk5oPk2gCWtyKyw7etOt1IYj+
+         B4IXN9FAv7NcHFX2MvF4MWy6MIad0C54UZ+W96jFFi/3UVco/0Yrns3GXb5JIdA74BUn
+         rvohWFIy1n1T3aRJVh5QhOrhzafYQePE/PgVpGFaOUsflOM3NhiIMjW6/HzYKTwE2hrq
+         vvur8llMkR0wo2oFUT3PWlj+CQWyOgcoLu1o152c5dzf6YgdHwMvj4Oa8z4EnFd2k0sI
+         PfwCw1QvZ3ZEeMDMXtEh1mlmRYPS+YHLWrgcs160//0Uhyyi5V+obpdHan8wNTsMAAh1
+         BzDg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=content-transfer-encoding:content-language:in-reply-to:mime-version
+         :user-agent:date:message-id:from:references:cc:to:subject
+         :x-gm-message-state:from:to:cc;
+        bh=qyCH1Xo3YO20trnPHb9qoKkPoh3odrsC9eN4HgrltUw=;
+        b=NgrCViRyBIIM7NOmddndnZHAhi7UnkJEEaCz3yBdfWL1C0AK9VZfWKU/+F+vI5N8vo
+         oum9c5QpHCn4LzOUmvYT52DtzX1JJshF4dpL0B4eKhEFYog4njovA9Hez5kl281vzJBR
+         tilw63/tqejRHIQ09dT3ElU63rZWCnUzK4W3NBJPIiJm/3YnAUBMz6bRuAxf7hsctF8o
+         jdTB56uV7CA8Vlh87atdo9yOjwaONHQLZWs1d/d7tw+g9BVvBGEGwW3l6JmwE6sUnORz
+         eLT0SuWR1fN5viz1eIg0YAIDOAGs8v/e8IE2GkNKAmwHwqZ9941rD8dqS3CRMkqEkdg4
+         voYA==
+X-Gm-Message-State: ACgBeo1/DHQscaeNXlXqDn2L/W0o9l6WPHNBQVOW51kpIEGUkVHp+Uhx
+        mFRlrnUIIhb8an2ZskBvWzm5hw==
+X-Google-Smtp-Source: AA6agR5VxsPrML+qpTqW2rw4vgpk7nmQXlRpcrdzJOBbwoJsnBmFxEP9T1qSfVEidE7fMp/9En26gQ==
+X-Received: by 2002:a2e:bcc5:0:b0:261:737a:1d1f with SMTP id z5-20020a2ebcc5000000b00261737a1d1fmr2121381ljp.418.1660399444627;
+        Sat, 13 Aug 2022 07:04:04 -0700 (PDT)
+Received: from ?IPv6:2a02:a31b:33d:9c00:463a:87e3:44fc:2b2f? ([2a02:a31b:33d:9c00:463a:87e3:44fc:2b2f])
+        by smtp.gmail.com with ESMTPSA id h6-20020a2ea486000000b0025e57b40009sm767472lji.89.2022.08.13.07.04.02
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Sat, 13 Aug 2022 07:04:03 -0700 (PDT)
+Subject: Re: [PATCH v2 0/5] KVM: Fix oneshot interrupts forwarding
+To:     "Liu, Rong L" <rong.l.liu@intel.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Marc Zyngier <maz@kernel.org>,
+        "eric.auger@redhat.com" <eric.auger@redhat.com>
+Cc:     "Dong, Eddie" <eddie.dong@intel.com>,
+        "Christopherson,, Sean" <seanjc@google.com>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+        Dave Hansen <dave.hansen@linux.intel.com>,
+        "x86@kernel.org" <x86@kernel.org>,
+        "H. Peter Anvin" <hpa@zytor.com>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        Alex Williamson <alex.williamson@redhat.com>,
+        Zhenyu Wang <zhenyuw@linux.intel.com>,
+        Tomasz Nowicki <tn@semihalf.com>,
+        Grzegorz Jaszczyk <jaz@semihalf.com>,
+        "upstream@semihalf.com" <upstream@semihalf.com>,
+        Dmitry Torokhov <dtor@google.com>
+References: <20220805193919.1470653-1-dmy@semihalf.com>
+ <BL0PR11MB30429034B6D59253AF22BCE08A639@BL0PR11MB3042.namprd11.prod.outlook.com>
+ <c5d8f537-5695-42f0-88a9-de80e21f5f4c@semihalf.com>
+ <BL0PR11MB304213273FA9FAC4EBC70FF88A629@BL0PR11MB3042.namprd11.prod.outlook.com>
+ <ef9ffbde-445e-f00f-23c1-27e23b6cca4f@semihalf.com>
+ <87o7wsbngz.wl-maz@kernel.org>
+ <8ff76b5e-ae28-70c8-2ec5-01662874fb15@redhat.com>
+ <87r11ouu9y.wl-maz@kernel.org>
+ <72e40c17-e5cd-1ffd-9a38-00b47e1cbd8e@semihalf.com>
+ <d8704ffa-8d9e-2261-1bcf-1b402f955fad@redhat.com>
+ <MW3PR11MB4554AAFB43FA6B0B612150D9C7649@MW3PR11MB4554.namprd11.prod.outlook.com>
+From:   Dmytro Maluka <dmy@semihalf.com>
+Message-ID: <f843fa85-41ce-bf45-d1d7-69341dea2939@semihalf.com>
+Date:   Sat, 13 Aug 2022 16:04:01 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.13.0
 MIME-Version: 1.0
-X-Spam-Status: No, score=-7.7 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_HI,
+In-Reply-To: <MW3PR11MB4554AAFB43FA6B0B612150D9C7649@MW3PR11MB4554.namprd11.prod.outlook.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_DNSWL_NONE,
         SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
@@ -70,88 +99,105 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-https://bugzilla.kernel.org/show_bug.cgi?id=3D216349
+Hi Rong,
 
---- Comment #10 from John Park (jdpark.au@gmail.com) ---
-I experienced another panic today. Log below
+On 8/12/22 12:40 AM, Liu, Rong L wrote:
+> Hi Paolo and Dmytro,
+> 
+>> -----Original Message-----
+>> From: Paolo Bonzini <pbonzini@redhat.com>
+>> Sent: Wednesday, August 10, 2022 11:48 PM
+>> To: Dmytro Maluka <dmy@semihalf.com>; Marc Zyngier
+>> <maz@kernel.org>; eric.auger@redhat.com
+>> Cc: Dong, Eddie <eddie.dong@intel.com>; Christopherson,, Sean
+>> <seanjc@google.com>; kvm@vger.kernel.org; Thomas Gleixner
+>> <tglx@linutronix.de>; Ingo Molnar <mingo@redhat.com>; Borislav
+>> Petkov <bp@alien8.de>; Dave Hansen <dave.hansen@linux.intel.com>;
+>> x86@kernel.org; H. Peter Anvin <hpa@zytor.com>; linux-
+>> kernel@vger.kernel.org; Alex Williamson <alex.williamson@redhat.com>;
+>> Liu, Rong L <rong.l.liu@intel.com>; Zhenyu Wang
+>> <zhenyuw@linux.intel.com>; Tomasz Nowicki <tn@semihalf.com>;
+>> Grzegorz Jaszczyk <jaz@semihalf.com>; upstream@semihalf.com;
+>> Dmitry Torokhov <dtor@google.com>
+>> Subject: Re: [PATCH v2 0/5] KVM: Fix oneshot interrupts forwarding
+>>
+>> On 8/10/22 19:02, Dmytro Maluka wrote:
+>>>      1. If vEOI happens for a masked vIRQ, notify resamplefd as usual,
+>>>         but also remember this vIRQ as, let's call it, "pending oneshot".
+>>>
+> 
+> This is the part always confuses me.   In x86 case, for level triggered
+> interrupt, even if it is not oneshot, there is still "unmask" and the unmask
+> happens in the same sequence as in oneshot interrupt, just timing is different. 
+>  So are you going to differentiate oneshot from "normal" level triggered
+> interrupt or not?   And there is any situation that vEOI happens for an unmasked
+> vIRQ?
 
----
+We were already talking about it in [1] and before. It still seems to me
+that your statement is wrong and that with x86 ioapic, "normal"
+level-triggered interrupts normally stay unmasked all the time, and only
+EOI is used for interrupt completion. To double-confirm that, I was once
+tracing KVM's ioapic_write_indirect() and confirmed that it's not called
+when Linux guest is handling a "normal" level-triggered interrupt.
 
-[38049.665307] traps: PANIC: double fault, error_code: 0x0
-[38049.665352] double fault: 0000 [#1] SMP PTI
-[38049.665362] CPU: 1 PID: 3295 Comm: lighttpd Not tainted 5.15.0-46-generic
-#49-Ubuntu
-[38049.665388] Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS
-rel-1.15.0-0-g2dd4b9b3f840-prebuilt.qemu.org 04/01/2014
-[38049.665395] RIP: 0010:error_entry+0x0/0x130
-[38049.665466] Code: de eb 0a f3 48 0f ae db e9 21 fd ff ff 85 db 0f 85 19 =
-fd
-ff ff 0f 01 f8 e9 11 fd ff ff 66 66 2e 0f 1f 84 00 00 00 00 00 66 90 <fc> 5=
-6 48
-8b 74 24 08 48 89 7c 24 08 52 51 50 41 50 41 51 41 52 41
-[38049.665471] RSP: 0018:ffffb507830aa35d EFLAGS: 00010002
-[38049.665480] RAX: 00007ffe5be0c194 RBX: 00007ffe5be0c1e0 RCX:
-00007ffe5be0c194
-[38049.665484] RDX: 0000000000000070 RSI: 0000000000000010 RDI:
-ffffb507830a3cf8
-[38049.665487] RBP: ffffb507830a3cd8 R08: 0000000000000001 R09:
-0000000000000000
-[38049.665491] R10: 0000000000000001 R11: 0000000000000000 R12:
-ffff91c59f1a9880
-[38049.665494] R13: ffff91c4d1be2d80 R14: 0000000000080800 R15:
-ffff91c49d517700
-[38049.665499] FS:  00007f96e38ef680(0000) GS:ffff91c5bbd00000(0000)
-knlGS:0000000000000000
-[38049.665503] CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-[38049.665507] CR2: ffffb507830aa348 CR3: 00000000090c0000 CR4:
-00000000000006e0
-[38049.665518] Call Trace:
-[38049.665542] Modules linked in: cp210x usbserial cdc_acm tls veth xt_nat
-xt_tcpudp xt_conntrack nft_chain_nat xt_MASQUERADE nf_nat nf_conntrack_netl=
-ink
-nf_conntrack nf_defrag_ipv6 nf_defrag_ipv4 xfrm_user xfrm_algo nft_counter
-xt_addrtype nft_compat nf_tables nfnetlink br_netfilter bridge stp llc over=
-lay
-sch_fq_codel joydev input_leds serio_raw qemu_fw_cfg mac_hid dm_multipath
-scsi_dh_rdac scsi_dh_emc scsi_dh_alua netconsole ipmi_devintf pstore_blk mtd
-ramoops pstore_zone reed_solomon ipmi_msghandler msr efi_pstore ip_tables
-x_tables autofs4 btrfs blake2b_generic zstd_compress raid10 raid456
-async_raid6_recov async_memcpy async_pq async_xor async_tx xor raid6_pq
-libcrc32c raid1 raid0 multipath linear bochs drm_vram_helper drm_ttm_helper=
- ttm
-drm_kms_helper hid_generic syscopyarea sysfillrect sysimgblt fb_sys_fops us=
-bhid
-cec rc_core xhci_pci hid psmouse xhci_pci_renesas drm i2c_piix4 pata_acpi
-virtio_net net_failover failover virtio_scsi floppy
-[38049.687192] ---[ end trace e501d4c27d1b1728 ]---
-[38049.687196] RIP: 0010:error_entry+0x0/0x130
-[38049.687203] Code: de eb 0a f3 48 0f ae db e9 21 fd ff ff 85 db 0f 85 19 =
-fd
-ff ff 0f 01 f8 e9 11 fd ff ff 66 66 2e 0f 1f 84 00 00 00 00 00 66 90 <fc> 5=
-6 48
-8b 74 24 08 48 89 7c 24 08 52 51 50 41 50 41 51 41 52 41
-[38049.687227] RSP: 0018:ffffb507830aa35d EFLAGS: 00010002
-[38049.687229] RAX: 00007ffe5be0c194 RBX: 00007ffe5be0c1e0 RCX:
-00007ffe5be0c194
-[38049.687230] RDX: 0000000000000070 RSI: 0000000000000010 RDI:
-ffffb507830a3cf8
-[38049.687231] RBP: ffffb507830a3cd8 R08: 0000000000000001 R09:
-0000000000000000
-[38049.687241] R10: 0000000000000001 R11: 0000000000000000 R12:
-ffff91c59f1a9880
-[38049.687242] R13: ffff91c4d1be2d80 R14: 0000000000080800 R15:
-ffff91c49d517700
-[38049.687243] FS:  00007f96e38ef680(0000) GS:ffff91c5bbd00000(0000)
-knlGS:0000000000000000
-[38049.687244] CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-[38049.687245] CR2: ffffb507830aa348 CR3: 00000000090c0000 CR4:
-00000000000006e0
-[38049.687249] Kernel panic - not syncing: Fatal exception in interrupt
-[38049.687476] Kernel Offset: 0x34400000 from 0xffffffff81000000 (relocation
-range: 0xffffffff80000000-0xffffffffbfffffff)
+However, it seems that even if you were right and for normal interrupts
+an EOI was always followed by an unmask, this proposal would still work
+correctly. 
 
---=20
-You may reply to this email to add a comment.
+> 
+>  > >      2. A new physical IRQ is immediately generated, so the vIRQ is
+>>>         properly set as pending.
+>>>
+> 
+> I am not sure this is always the case.  For example, a device may not raise a
+> new interrupt until it is notified that "done reading" - by device driver
+> writing to a register or something when device driver finishes reading data.  So
+> how do you handle this situation?
 
-You are receiving this mail because:
-You are watching the assignee of the bug.=
+Right, the device will not raise new interrupts, but also it will not
+lower the currently pending interrupt until "done reading". Precisely
+for this reason the host will receive a new interrupt immediately after
+vfio unmasks the physical IRQ.
+
+It's also possible that the driver will notify "done reading" quite
+early, so the device will lower the interrupt before vfio unmasks it, so
+no new physical interrupt will be generated, - and that is fine too,
+since it means that the physical IRQ is no longer pending, so we don't
+need to notify KVM to set the virtual IRQ status to "pending".
+
+> 
+>>>      3. After the vIRQ is unmasked by the guest, check and find out that
+>>>         it is not just pending but also "pending oneshot", so don't
+>>>         deliver it to a vCPU. Instead, immediately notify resamplefd once
+>>>         again.
+>>>
+> 
+> Does this mean the change of vfio code also?  That seems the case: vfio seems
+> keeping its own internal "state" whether the irq is enabled or not.
+
+I don't quite get why would it require changing vfio. Could you
+elaborate?
+
+[1] https://lore.kernel.org/kvm/9054d9f9-f41e-05c7-ce8d-628a6c827c40@semihalf.com/
+
+Thanks,
+Dmytro
+
+> 
+> Thanks,
+> 
+> Rong
+>>> In other words, don't avoid extra physical interrupts in the host
+>>> (rather, use those extra interrupts for properly updating the pending
+>>> state of the vIRQ) but avoid propagating those extra interrupts to the
+>>> guest.
+>>>
+>>> Does this sound reasonable to you?
+>>
+>> Yeah, this makes sense and it lets the resamplefd set the "pending"
+>> status in the vGIC.  It still has the issue that the interrupt can
+>> remain pending in the guest for longer than it's pending on the host,
+>> but that can't be fixed?
+>>
+>> Paolo
+> 
