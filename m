@@ -2,46 +2,46 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 3B515592514
-	for <lists+kvm@lfdr.de>; Sun, 14 Aug 2022 18:38:49 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id A13FC592533
+	for <lists+kvm@lfdr.de>; Sun, 14 Aug 2022 18:40:11 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S243016AbiHNQhl (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sun, 14 Aug 2022 12:37:41 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57378 "EHLO
+        id S243184AbiHNQjb (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sun, 14 Aug 2022 12:39:31 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36116 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S243111AbiHNQg0 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sun, 14 Aug 2022 12:36:26 -0400
-Received: from ams.source.kernel.org (ams.source.kernel.org [IPv6:2604:1380:4601:e00::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A1A321ADB8;
-        Sun, 14 Aug 2022 09:28:41 -0700 (PDT)
+        with ESMTP id S241457AbiHNQio (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sun, 14 Aug 2022 12:38:44 -0400
+Received: from sin.source.kernel.org (sin.source.kernel.org [IPv6:2604:1380:40e1:4800::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 57CD861107;
+        Sun, 14 Aug 2022 09:29:30 -0700 (PDT)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by ams.source.kernel.org (Postfix) with ESMTPS id 4F35AB80B37;
-        Sun, 14 Aug 2022 16:28:40 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 45407C4347C;
-        Sun, 14 Aug 2022 16:28:38 +0000 (UTC)
+        by sin.source.kernel.org (Postfix) with ESMTPS id A99E3CE0B12;
+        Sun, 14 Aug 2022 16:29:28 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 67E13C43148;
+        Sun, 14 Aug 2022 16:29:26 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1660494519;
-        bh=noI0SHTyTyoNWmj0FmTe9S6Tq2D9OmFbIBtBdSw+lgc=;
+        s=k20201202; t=1660494567;
+        bh=MCE+uIiIuB/Uh9Iht3jUtdPKJvJ8Z8u25fHMsaDGZCE=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=j6JNtLQT7/DCACK25SjLpYQLbXTLy2/dHM/XYr2rnjmf0p/6QPvi4eS5lR3TeMaMq
-         AFY1ti/7PkO2auD6wGXkSserde7lca6i01LvJmEEmsc+ZfV0xlNqrUr3d3ryvuGrKt
-         zbr+bo6HqBMwymb+7VNlYexrOvfxpIdps+jYnCL3AKY5JXQ8AoP/MEoZkgJiQ/7tt/
-         QtSfczsxGFVQ+y0C8FexLIToSZ8JqR3XSSoJKsEY/RJv6/nGvreOAgKiepIth+UNk/
-         f70GuiN76D0SQK9z36l1JSQue8S+ks34mVRxx1oHde7zpVn0QyFfYJYSW4cnYNE5Mi
-         lywE8yLxXVuGg==
+        b=dhr/gCRtZ4gYYohkdr5nZv4EpO7fL5irHDxVadtbHrUCp/NAR/3/lzrL1F643DcDg
+         UEUwiCZCiuQfXlKMuBTqoHXJtoZLubM7IAQ+avsFV+QGfdQUNEhqQ2Q+dmLrsPUSlW
+         tyL1Qf4VZ1GHMOpcCKjzM5XIRjBXOKNJ8szcfgKi25MIvCog+KYc17yF/Qo+V1spUX
+         KRplmKnPrpzTMlE3hbl0ThLbAJYncAYw0L9PhcE4wSPnPKLGlznxQXguxCSLQCbJT4
+         yWts8C1qOUWSImxAL5J9bcvMh27OYVoXCcoB7rFhAA40gQ2cndjooC7b0W942CkfBP
+         Vq1sLoVOCG7MA==
 From:   Sasha Levin <sashal@kernel.org>
 To:     linux-kernel@vger.kernel.org, stable@vger.kernel.org
 Cc:     Schspa Shi <schspa@gmail.com>, Cornelia Huck <cohuck@redhat.com>,
         Alex Williamson <alex.williamson@redhat.com>,
         Sasha Levin <sashal@kernel.org>, kvm@vger.kernel.org
-Subject: [PATCH AUTOSEL 5.4 03/16] vfio: Clear the caps->buf to NULL after free
-Date:   Sun, 14 Aug 2022 12:28:18 -0400
-Message-Id: <20220814162833.2398478-3-sashal@kernel.org>
+Subject: [PATCH AUTOSEL 4.19 03/14] vfio: Clear the caps->buf to NULL after free
+Date:   Sun, 14 Aug 2022 12:29:09 -0400
+Message-Id: <20220814162922.2398723-3-sashal@kernel.org>
 X-Mailer: git-send-email 2.35.1
-In-Reply-To: <20220814162833.2398478-1-sashal@kernel.org>
-References: <20220814162833.2398478-1-sashal@kernel.org>
+In-Reply-To: <20220814162922.2398723-1-sashal@kernel.org>
+References: <20220814162922.2398723-1-sashal@kernel.org>
 MIME-Version: 1.0
 X-stable: review
 X-Patchwork-Hint: Ignore
@@ -75,10 +75,10 @@ Signed-off-by: Sasha Levin <sashal@kernel.org>
  1 file changed, 1 insertion(+)
 
 diff --git a/drivers/vfio/vfio.c b/drivers/vfio/vfio.c
-index 388597930b64..efd3782ead97 100644
+index 7a386fb30bf1..0d146b45e0b4 100644
 --- a/drivers/vfio/vfio.c
 +++ b/drivers/vfio/vfio.c
-@@ -1802,6 +1802,7 @@ struct vfio_info_cap_header *vfio_info_cap_add(struct vfio_info_cap *caps,
+@@ -1808,6 +1808,7 @@ struct vfio_info_cap_header *vfio_info_cap_add(struct vfio_info_cap *caps,
  	buf = krealloc(caps->buf, caps->size + size, GFP_KERNEL);
  	if (!buf) {
  		kfree(caps->buf);
