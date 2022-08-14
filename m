@@ -2,76 +2,52 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 80F9659200E
-	for <lists+kvm@lfdr.de>; Sun, 14 Aug 2022 16:13:43 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 823CF59237B
+	for <lists+kvm@lfdr.de>; Sun, 14 Aug 2022 18:22:08 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S239635AbiHNOND (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sun, 14 Aug 2022 10:13:03 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34080 "EHLO
+        id S241350AbiHNQWD (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sun, 14 Aug 2022 12:22:03 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50668 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S239503AbiHNOM5 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sun, 14 Aug 2022 10:12:57 -0400
-Received: from mail-wr1-x429.google.com (mail-wr1-x429.google.com [IPv6:2a00:1450:4864:20::429])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 33DF79FCE
-        for <kvm@vger.kernel.org>; Sun, 14 Aug 2022 07:12:56 -0700 (PDT)
-Received: by mail-wr1-x429.google.com with SMTP id z16so6335560wrh.12
-        for <kvm@vger.kernel.org>; Sun, 14 Aug 2022 07:12:56 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=conchuod.ie; s=google;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc;
-        bh=Jpi+qYPVkjjgLSftDLRCVgzhzYoBkPjkNBatqeFjYP4=;
-        b=Qq8AUk/9AWVqplZnZsraolgAwvvs+PIe6EeGfq6jN5MM2n6AruvuyymJsCkvpb+OzP
-         DYg/NMqHsO6QTHRAmrKsuXtxegQV5ArT1zwjqST2UY7tF7wobikGXu8YTrZv50Ep0Ae3
-         kQ6O0X7afhbpbhHnOfxIltiwZLRErrqF5lam6sIXJu4xMzzliWzprfPqRkgZB1tMXU1/
-         R7yHX1sH3JLUhkX3H1H84GsxsU9S9kdPrpHmC8xt1v98s+gs4HLrQJ3K/kl6UABKJ4Rr
-         uV7ZKh1Ouv6RetM5zMnnJz7UfMlbuOU52TAUum4YqqIrYAQSjRgz7dY13Phg2BCkc3lq
-         qL4Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc;
-        bh=Jpi+qYPVkjjgLSftDLRCVgzhzYoBkPjkNBatqeFjYP4=;
-        b=yrg3QQTLnv2FZvfWsUVrMKlLhlI9oRhT4qjCGPQHxcQHYQxQH0yJTkXsW7saKOf48C
-         cujgu9n433OFVTSovEzFZOc4APHEt4f5Ax7o7FQcSf6ZlIGyV3XBaslgYbOIwVIeq2ln
-         onUWnGFkIWsF7NiPMH3b6UrWLEapiDJSE0Fpx+d6XOr7M+PGT2QrzRdHnvMy2mKm1ygN
-         1CMcA4PRq1e7C6wCcn7wSethW3Jq9xxSZbfAbeqYh7PFwpjEC3OGcC02OF7dxLvRBifm
-         esQCt+H5bBggrOpUNkXOIju3NC6VP7hxaYNH1bx6RMJmG4A+EtVAIj8t8aAGi+O/zCtH
-         9DXw==
-X-Gm-Message-State: ACgBeo0A+RrHIYzxDgeEJRecBlzd8El3m22XavyadABhq0FNzkE18iDx
-        JWQi04z7abuV1c/SLy9Lo5VOmQ==
-X-Google-Smtp-Source: AA6agR6FYk+iY85iu6ZNNhqlEqAtS2htyInEPS/oNlnm6Idei+lVhLdGdUcw2QokwFea/pPKDyVQbg==
-X-Received: by 2002:adf:f90e:0:b0:21e:417b:dbd with SMTP id b14-20020adff90e000000b0021e417b0dbdmr6282420wrr.425.1660486375541;
-        Sun, 14 Aug 2022 07:12:55 -0700 (PDT)
-Received: from henark71.. ([109.76.58.63])
-        by smtp.gmail.com with ESMTPSA id b8-20020adfde08000000b0021db7b0162esm4625419wrm.105.2022.08.14.07.12.54
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 14 Aug 2022 07:12:55 -0700 (PDT)
-From:   Conor Dooley <mail@conchuod.ie>
-To:     Anup Patel <anup@brainfault.org>,
-        Atish Patra <atishp@atishpatra.org>,
-        Paul Walmsley <paul.walmsley@sifive.com>,
-        Palmer Dabbelt <palmer@dabbelt.com>,
-        Albert Ou <aou@eecs.berkeley.edu>
-Cc:     Conor Dooley <conor.dooley@microchip.com>,
-        Guo Ren <guoren@kernel.org>,
-        Vincent Chen <vincent.chen@sifive.com>,
-        Xianting Tian <xianting.tian@linux.alibaba.com>,
-        Heiko Stuebner <heiko@sntech.de>,
-        Kefeng Wang <wangkefeng.wang@huawei.com>,
-        Tong Tiangen <tongtiangen@huawei.com>, kvm@vger.kernel.org,
-        kvm-riscv@lists.infradead.org, linux-riscv@lists.infradead.org,
-        linux-kernel@vger.kernel.org
-Subject: [PATCH 4/4] riscv: traps: add missing prototype
-Date:   Sun, 14 Aug 2022 15:12:38 +0100
-Message-Id: <20220814141237.493457-5-mail@conchuod.ie>
-X-Mailer: git-send-email 2.37.1
-In-Reply-To: <20220814141237.493457-1-mail@conchuod.ie>
-References: <20220814141237.493457-1-mail@conchuod.ie>
+        with ESMTP id S240805AbiHNQVh (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sun, 14 Aug 2022 12:21:37 -0400
+Received: from ams.source.kernel.org (ams.source.kernel.org [IPv6:2604:1380:4601:e00::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AAD16140C5;
+        Sun, 14 Aug 2022 09:19:55 -0700 (PDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by ams.source.kernel.org (Postfix) with ESMTPS id 703E7B80B37;
+        Sun, 14 Aug 2022 16:19:54 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 61AD2C433D7;
+        Sun, 14 Aug 2022 16:19:52 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1660493993;
+        bh=F63UnVce7yhW3oPQnji/Fdc0PzEcZIF/Mi7RjYEUIDE=;
+        h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+        b=baEWB/00CRaPteYsdN1zKXE/skpSV0ALnUHcbHNfCz0t43ThzXsOOzbYbyQC/ae/J
+         2S2PcQZsf3fBZ1/PcgwoGlLYzf8sOJxkJeQMwg5DGwVmdSx3A0Mda7nerNCdykFwGT
+         7pGBNBVlk5sgEqwfmBSO8dtoTwDPkzOXIevkIidIY4/SEVkQuoGH0TnRHakjwygiIk
+         qaH1jtbI59b94IaPP+Ruk0j2+zDmdfID0uKgwnmstF5qMlW4Pa2UZJo3t53boF/GzR
+         5D1ws8p3cvYn6UjNMRzI3+BVu1y4Rrxi2KW9+9kIq2gnJEGnX4n+AVdqBBy0u+nTub
+         8vRYWslcGhV+Q==
+From:   Sasha Levin <sashal@kernel.org>
+To:     linux-kernel@vger.kernel.org, stable@vger.kernel.org
+Cc:     Schspa Shi <schspa@gmail.com>, Cornelia Huck <cohuck@redhat.com>,
+        Alex Williamson <alex.williamson@redhat.com>,
+        Sasha Levin <sashal@kernel.org>, kvm@vger.kernel.org
+Subject: [PATCH AUTOSEL 5.19 05/48] vfio: Clear the caps->buf to NULL after free
+Date:   Sun, 14 Aug 2022 12:18:58 -0400
+Message-Id: <20220814161943.2394452-5-sashal@kernel.org>
+X-Mailer: git-send-email 2.35.1
+In-Reply-To: <20220814161943.2394452-1-sashal@kernel.org>
+References: <20220814161943.2394452-1-sashal@kernel.org>
 MIME-Version: 1.0
+X-stable: review
+X-Patchwork-Hint: Ignore
 Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+X-Spam-Status: No, score=-7.2 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_HI,
         SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
@@ -80,50 +56,36 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-From: Conor Dooley <conor.dooley@microchip.com>
+From: Schspa Shi <schspa@gmail.com>
 
-Sparse complains:
-arch/riscv/kernel/traps.c:213:6: warning: symbol 'shadow_stack' was not declared. Should it be static?
+[ Upstream commit 6641085e8d7b3f061911517f79a2a15a0a21b97b ]
 
-The variable is used in entry.S, so declare shadow_stack there
-alongside SHADOW_OVERFLOW_STACK_SIZE.
+On buffer resize failure, vfio_info_cap_add() will free the buffer,
+report zero for the size, and return -ENOMEM.  As additional
+hardening, also clear the buffer pointer to prevent any chance of a
+double free.
 
-Fixes: 31da94c25aea ("riscv: add VMAP_STACK overflow detection")
-Signed-off-by: Conor Dooley <conor.dooley@microchip.com>
+Signed-off-by: Schspa Shi <schspa@gmail.com>
+Reviewed-by: Cornelia Huck <cohuck@redhat.com>
+Link: https://lore.kernel.org/r/20220629022948.55608-1-schspa@gmail.com
+Signed-off-by: Alex Williamson <alex.williamson@redhat.com>
+Signed-off-by: Sasha Levin <sashal@kernel.org>
 ---
- arch/riscv/include/asm/thread_info.h | 2 ++
- arch/riscv/kernel/traps.c            | 3 ++-
- 2 files changed, 4 insertions(+), 1 deletion(-)
+ drivers/vfio/vfio.c | 1 +
+ 1 file changed, 1 insertion(+)
 
-diff --git a/arch/riscv/include/asm/thread_info.h b/arch/riscv/include/asm/thread_info.h
-index 78933ac04995..67322f878e0d 100644
---- a/arch/riscv/include/asm/thread_info.h
-+++ b/arch/riscv/include/asm/thread_info.h
-@@ -42,6 +42,8 @@
- 
- #ifndef __ASSEMBLY__
- 
-+extern long shadow_stack[SHADOW_OVERFLOW_STACK_SIZE / sizeof(long)];
-+
- #include <asm/processor.h>
- #include <asm/csr.h>
- 
-diff --git a/arch/riscv/kernel/traps.c b/arch/riscv/kernel/traps.c
-index 39d0f8bba4b4..635e6ec26938 100644
---- a/arch/riscv/kernel/traps.c
-+++ b/arch/riscv/kernel/traps.c
-@@ -20,9 +20,10 @@
- 
- #include <asm/asm-prototypes.h>
- #include <asm/bug.h>
-+#include <asm/csr.h>
- #include <asm/processor.h>
- #include <asm/ptrace.h>
--#include <asm/csr.h>
-+#include <asm/thread_info.h>
- 
- int show_unhandled_signals = 1;
- 
+diff --git a/drivers/vfio/vfio.c b/drivers/vfio/vfio.c
+index e60b06f2ac22..00163b9a2e3f 100644
+--- a/drivers/vfio/vfio.c
++++ b/drivers/vfio/vfio.c
+@@ -1815,6 +1815,7 @@ struct vfio_info_cap_header *vfio_info_cap_add(struct vfio_info_cap *caps,
+ 	buf = krealloc(caps->buf, caps->size + size, GFP_KERNEL);
+ 	if (!buf) {
+ 		kfree(caps->buf);
++		caps->buf = NULL;
+ 		caps->size = 0;
+ 		return ERR_PTR(-ENOMEM);
+ 	}
 -- 
-2.37.1
+2.35.1
 
