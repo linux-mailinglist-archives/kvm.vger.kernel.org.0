@@ -2,126 +2,87 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 9CE60592637
-	for <lists+kvm@lfdr.de>; Sun, 14 Aug 2022 21:40:46 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id C805D5926B8
+	for <lists+kvm@lfdr.de>; Sun, 14 Aug 2022 23:52:13 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231991AbiHNTkl (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sun, 14 Aug 2022 15:40:41 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40418 "EHLO
+        id S232072AbiHNVwM (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sun, 14 Aug 2022 17:52:12 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58590 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229563AbiHNTkj (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sun, 14 Aug 2022 15:40:39 -0400
-Received: from out1-smtp.messagingengine.com (out1-smtp.messagingengine.com [66.111.4.25])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A8EF6DF9C;
-        Sun, 14 Aug 2022 12:40:37 -0700 (PDT)
-Received: from compute4.internal (compute4.nyi.internal [10.202.2.44])
-        by mailout.nyi.internal (Postfix) with ESMTP id 4605B5C0075;
-        Sun, 14 Aug 2022 15:40:35 -0400 (EDT)
-Received: from mailfrontend2 ([10.202.2.163])
-  by compute4.internal (MEProxy); Sun, 14 Aug 2022 15:40:35 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=anarazel.de; h=
-        cc:cc:content-type:date:date:from:from:in-reply-to:in-reply-to
-        :message-id:mime-version:references:reply-to:sender:subject
-        :subject:to:to; s=fm1; t=1660506035; x=1660592435; bh=OFDS3Ok0yf
-        v0moILB97wP3ESPtiwUDtMRJp1ZG51Sj8=; b=uH75q/OzmmB40Yjv4xjn0dDp09
-        XBh1CAgIfN7IU5ALlW1lsT3zSrRb4fCzjb5iG5tYqKExCYNnE7W6NsIV8PnIpzbG
-        WfD8Z1UgArCnHOHDdsCW5VNKaQV0YOsPeSsKoxx5/sTarSD/o8b2t+tWjxFdl92o
-        jASY+/ZepjkQLn6WaOIGBkYb9ykYCgYf0LGVeTztsbVeg7/UlzrwjpPy8MxyRqE3
-        XCQC865gnWwoKtgrd23Vce48ZR1Bzbk3yOogkCCWZDMPzMwC+OX+zzxfNKZL/PdO
-        61fDyxfkNbQxL2ZQgjKMclIhvfEMS7E2lK0dF9I1UMaMyZBoVRQUxPO+YBeQ==
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
-        messagingengine.com; h=cc:cc:content-type:date:date:feedback-id
-        :feedback-id:from:from:in-reply-to:in-reply-to:message-id
-        :mime-version:references:reply-to:sender:subject:subject:to:to
-        :x-me-proxy:x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=
-        fm1; t=1660506035; x=1660592435; bh=OFDS3Ok0yfv0moILB97wP3ESPtiw
-        UDtMRJp1ZG51Sj8=; b=sk9ii4aXH/3jVA9fddHFDm48OBqIaUOntKcROmicKQrh
-        COlH601UOwpnDR12lb7lJgbxzVtkPN+J3jnqZ37l4lpvo/A/bi1gcv2m71S8tZQC
-        AmKOHzGnkCOKCuMF3Ts56/28kOE59E2Qergj2MeKpq98XEQel0zKHpIk7UG5u/+K
-        gtKC0TJpLs2+gMuh2LuxBMaMapmLZRRDZ73bKPkWxZSxi85tVqjh0j5KCydrwMnz
-        Gl+EjrGBzTK0CGaJd2wqEXlACbY0XUri/afSdt9biuZKhK8UF9MwDyxOxqNDBU74
-        HOG4KoNNBN/UQOfoP25aZRwNQZZRyx/OXmwmB0IObw==
-X-ME-Sender: <xms:sU_5YiTe5wqJsCWmf1j7jScCYIoOIuGgK6mBpj5svVgh3xsafPPagQ>
-    <xme:sU_5YnwJdD8vs7LhVGMkKbvEasnvdpHdSAw1qiVcvrH0xH1-VdzNQX_nsZK_NSqKP
-    XcX5WPUwIFCjD3Jxg>
-X-ME-Received: <xmr:sU_5Yv3JnYJt6WwcGb0jGnWSZStf8qsDkC7HXPPaLwTaqX9PKWRubjzLN1ZevacA7OAPWfbu8t2wC6LCJyXIwVWWtXRX3IUQv1Aq344bwM_e9lV8vyzEm2vUHQKt>
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgedvfedrvdehtddgudegudcutefuodetggdotefrod
-    ftvfcurfhrohhfihhlvgemucfhrghsthforghilhdpqfgfvfdpuffrtefokffrpgfnqfgh
-    necuuegrihhlohhuthemuceftddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmd
-    enucfjughrpeffhffvvefukfhfgggtuggjsehttdertddttddvnecuhfhrohhmpeetnhgu
-    rhgvshcuhfhrvghunhguuceorghnughrvghssegrnhgrrhgriigvlhdruggvqeenucggtf
-    frrghtthgvrhhnpedvffefvefhteevffegieetfefhtddvffejvefhueetgeeludehteev
-    udeitedtudenucevlhhushhtvghrufhiiigvpedtnecurfgrrhgrmhepmhgrihhlfhhroh
-    hmpegrnhgurhgvshesrghnrghrrgiivghlrdguvg
-X-ME-Proxy: <xmx:sU_5YuC6x0AkDcy0k1TxCWh67N2aZOXEsAm-BpZ61Nt4Iip923V8Ow>
-    <xmx:sU_5YriVs8ldXhNXKnyeYU1IqQ6BzySWVSpElFy-8gUhc_9WHynEaw>
-    <xmx:sU_5YqqrgFDpjkd4C1j5knMFr1Jgxyt3M_VssQXsbablF7UTuVkNfw>
-    <xmx:s0_5YuMbcnHFU0IF30q_brMWsXuethJVTLzLesNi--Kk-T8meBptkg>
-Feedback-ID: id4a34324:Fastmail
-Received: by mail.messagingengine.com (Postfix) with ESMTPA; Sun,
- 14 Aug 2022 15:40:32 -0400 (EDT)
-Date:   Sun, 14 Aug 2022 12:40:31 -0700
-From:   Andres Freund <andres@anarazel.de>
-To:     "Michael S. Tsirkin" <mst@redhat.com>
-Cc:     Xuan Zhuo <xuanzhuo@linux.alibaba.com>,
-        Linus Torvalds <torvalds@linux-foundation.org>,
-        kvm@vger.kernel.org, virtualization@lists.linux-foundation.org,
-        netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
-        alvaro.karsz@solid-run.com, colin.i.king@gmail.com,
-        colin.king@intel.com, dan.carpenter@oracle.com, david@redhat.com,
-        elic@nvidia.com, eperezma@redhat.com, gautam.dawar@xilinx.com,
-        gshan@redhat.com, hdegoede@redhat.com, hulkci@huawei.com,
-        jasowang@redhat.com, jiaming@nfschina.com,
-        kangjie.xu@linux.alibaba.com, lingshan.zhu@intel.com,
-        liubo03@inspur.com, michael.christie@oracle.com,
-        pankaj.gupta@amd.com, peng.fan@nxp.com, quic_mingxue@quicinc.com,
-        robin.murphy@arm.com, sgarzare@redhat.com, suwan.kim027@gmail.com,
-        syoshida@redhat.com, xieyongji@bytedance.com, xuqiang36@huawei.com
-Subject: Re: [GIT PULL] virtio: fatures, fixes
-Message-ID: <20220814194031.ciql3slc5c34ayjw@awork3.anarazel.de>
-References: <20220812114250-mutt-send-email-mst@kernel.org>
- <20220814004522.33ecrwkmol3uz7aq@awork3.anarazel.de>
- <1660441835.6907768-1-xuanzhuo@linux.alibaba.com>
- <20220814035239.m7rtepyum5xvtu2c@awork3.anarazel.de>
- <20220814043906.xkmhmnp23bqjzz4s@awork3.anarazel.de>
- <20220814045853-mutt-send-email-mst@kernel.org>
+        with ESMTP id S229570AbiHNVwL (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sun, 14 Aug 2022 17:52:11 -0400
+Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B48BA12D26;
+        Sun, 14 Aug 2022 14:52:06 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=casper.20170209; h=Content-Transfer-Encoding:MIME-Version:
+        Message-Id:Date:Subject:Cc:To:From:Sender:Reply-To:Content-Type:Content-ID:
+        Content-Description:In-Reply-To:References;
+        bh=/RNl//CQIdgfxBiYXR2ClSuv26fcHBeLkZBQXo1ac8A=; b=Vfz3IoiDMyXbd/8N1C2zY4t4OO
+        0cNfyaYdHnoPSTcBG5nWEnmmxA7RE3fuAhp7FwUL0ZlrE4S974mAA67zoNnVLmW8to84O4OTACHdd
+        KmT0OkQpJFui+9udyZk1NS0cjqqo4GO3tUUuFMr96zvD4JkuHzJ2QMcQKXk89Sz4YuEhGFuzlWPl7
+        XYYDVM/l5WbDFfORJRnxs/dP/zaYlOt2OcHN0KPR5VD59j/RZUdPyxjcQKih+fRsYS9zz+iGJFwHm
+        ETljBGy3T/Tdodt+QcVe9f6FGTtIkJmZHJeELc46QESdK88XsbUT58mjc5pxtM6+ch8GJnKit1i6E
+        gnHC8WQQ==;
+Received: from [2601:1c0:6280:3f0::a6b3] (helo=casper.infradead.org)
+        by casper.infradead.org with esmtpsa (Exim 4.94.2 #2 (Red Hat Linux))
+        id 1oNLWc-0058iR-Rj; Sun, 14 Aug 2022 21:52:03 +0000
+From:   Randy Dunlap <rdunlap@infradead.org>
+To:     linux-kernel@vger.kernel.org
+Cc:     Randy Dunlap <rdunlap@infradead.org>,
+        kernel test robot <lkp@intel.com>,
+        Matthew Rosato <mjrosato@linux.ibm.com>,
+        Christian Borntraeger <borntraeger@linux.ibm.com>,
+        Pierre Morel <pmorel@linux.ibm.com>,
+        Eric Farman <farman@linux.ibm.com>, linux-s390@vger.kernel.org,
+        kvm@vger.kernel.org
+Subject: [PATCH] vfio-pci/zdev: require KVM to be built-in
+Date:   Sun, 14 Aug 2022 14:51:54 -0700
+Message-Id: <20220814215154.32112-1-rdunlap@infradead.org>
+X-Mailer: git-send-email 2.37.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20220814045853-mutt-send-email-mst@kernel.org>
-X-Spam-Status: No, score=-2.8 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,
-        RCVD_IN_MSPIKE_H3,RCVD_IN_MSPIKE_WL,SPF_HELO_PASS,SPF_PASS,
-        T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
+Content-Transfer-Encoding: 8bit
+X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,SPF_HELO_NONE,
+        SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no
+        version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi,
+Fix build errors when CONFIG_KVM=m:
 
-On 2022-08-14 04:59:48 -0400, Michael S. Tsirkin wrote:
-> On Sat, Aug 13, 2022 at 09:39:06PM -0700, Andres Freund wrote:
-> > Hi,
-> > 
-> > On 2022-08-13 20:52:39 -0700, Andres Freund wrote:
-> > > Is there specific information you'd like from the VM? I just recreated the
-> > > problem and can extract.
-> > 
-> > Actually, after reproducing I seem to now hit a likely different issue. I
-> > guess I should have checked exactly the revision I had a problem with earlier,
-> > rather than doing a git pull (up to aea23e7c464b)
-> 
-> Looks like there's a generic memory corruption so it crashes
-> in random places.
+s390-linux-ld: drivers/vfio/pci/vfio_pci_zdev.o: in function `vfio_pci_zdev_open_device':
+vfio_pci_zdev.c:(.text+0x242): undefined reference to `kvm_s390_pci_register_kvm'
+s390-linux-ld: drivers/vfio/pci/vfio_pci_zdev.o: in function `vfio_pci_zdev_close_device':
+vfio_pci_zdev.c:(.text+0x296): undefined reference to `kvm_s390_pci_unregister_kvm'
 
-Either a generic memory corruption, or something wrong with IO.
+Having a bool Kconfig symbol depend on a tristate symbol can often
+lead to problems like this.
 
-> Would bisect be possible for you?
+Fixes: 8061d1c31f1a ("vfio-pci/zdev: add open/close device hooks")
+Signed-off-by: Randy Dunlap <rdunlap@infradead.org>
+Reported-by: kernel test robot <lkp@intel.com>
+Cc: Matthew Rosato <mjrosato@linux.ibm.com>
+Cc: Christian Borntraeger <borntraeger@linux.ibm.com>
+Cc: Pierre Morel <pmorel@linux.ibm.com>
+Cc: Eric Farman <farman@linux.ibm.com>
+Cc: linux-s390@vger.kernel.org
+Cc: kvm@vger.kernel.org
+---
+ drivers/vfio/pci/Kconfig |    2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-I'll give it a go.
-
-Greetings,
-
-Andres Freund
+--- a/drivers/vfio/pci/Kconfig
++++ b/drivers/vfio/pci/Kconfig
+@@ -46,7 +46,7 @@ endif
+ 
+ config VFIO_PCI_ZDEV_KVM
+ 	bool "VFIO PCI extensions for s390x KVM passthrough"
+-	depends on S390 && KVM
++	depends on S390 && KVM=y
+ 	default y
+ 	help
+ 	  Support s390x-specific extensions to enable support for enhancements
