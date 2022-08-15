@@ -2,58 +2,73 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 0E19F5930C2
-	for <lists+kvm@lfdr.de>; Mon, 15 Aug 2022 16:31:29 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 4FA8859311C
+	for <lists+kvm@lfdr.de>; Mon, 15 Aug 2022 16:57:41 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S242794AbiHOOaO (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 15 Aug 2022 10:30:14 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40648 "EHLO
+        id S233426AbiHOO5j (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 15 Aug 2022 10:57:39 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36902 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S243109AbiHOOaN (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 15 Aug 2022 10:30:13 -0400
-Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6CB8D23BF4;
-        Mon, 15 Aug 2022 07:30:11 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=casper.20170209; h=In-Reply-To:Content-Type:MIME-Version:
-        References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
-        Content-Transfer-Encoding:Content-ID:Content-Description;
-        bh=udinPTaxlmsveuQ7BCs88a/BH/6ZgIvQZPLYDOcFcNI=; b=gWmWI3RjItS53SEQytLQHC8GXu
-        FO09jw9s6iyNzoFlq76tljbHMWR6YY4E0kXQ1MtNbnKc3EX1hD8jsHvc8KhH7o4xeSXDPVYQucuWq
-        53lAh2sMOG+6kPl7lgSAFXOnoYjTvxHGKl6mkU8gbS1EZkZ26WfJSahFFH+gEp3gf56FCl+Cz5QL0
-        FGl7ZYiALFVGF6W72zNN/BOnZ7ZhaLGSCwr9HMIxY8JAPT/6vCfiJnmTnlJ+gNCUPnYlzEM2zwMYN
-        HsveeOOGe5E+MrRhMupvB0RvggLuQhMg2nb3zeoztpXJpEV7UtVPzSFPjbnOb1o254BoKmD7lQ3mW
-        Kid726rg==;
-Received: from j130084.upc-j.chello.nl ([24.132.130.84] helo=worktop.programming.kicks-ass.net)
-        by casper.infradead.org with esmtpsa (Exim 4.94.2 #2 (Red Hat Linux))
-        id 1oNb6T-005n1e-KU; Mon, 15 Aug 2022 14:30:05 +0000
-Received: by worktop.programming.kicks-ass.net (Postfix, from userid 1000)
-        id DA3D6980153; Mon, 15 Aug 2022 16:30:03 +0200 (CEST)
-Date:   Mon, 15 Aug 2022 16:30:03 +0200
-From:   Peter Zijlstra <peterz@infradead.org>
-To:     "Liang, Kan" <kan.liang@linux.intel.com>
-Cc:     Like Xu <like.xu.linux@gmail.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Sean Christopherson <seanjc@google.com>,
-        Jim Mattson <jmattson@google.com>,
-        linux-kernel@vger.kernel.org, kvm@vger.kernel.org
-Subject: Re: [PATCH v2 1/7] perf/x86/core: Update x86_pmu.pebs_capable for
- ICELAKE_{X,D}
-Message-ID: <YvpYa+YagI/7x9MU@worktop.programming.kicks-ass.net>
-References: <20220721103549.49543-1-likexu@tencent.com>
- <20220721103549.49543-2-likexu@tencent.com>
- <959fedce-aada-50e4-ce8d-a842d18439fa@redhat.com>
- <YvoSXyy7ojZ9ird/@worktop.programming.kicks-ass.net>
- <94e6c414-38e1-ebd7-0161-34548f0b5aae@gmail.com>
- <YvozNSvcxet0gX6b@worktop.programming.kicks-ass.net>
- <952632db-b090-ceb9-1467-a6b598ca2b02@linux.intel.com>
+        with ESMTP id S241378AbiHOO5h (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 15 Aug 2022 10:57:37 -0400
+Received: from madras.collabora.co.uk (madras.collabora.co.uk [IPv6:2a00:1098:0:82:1000:25:2eeb:e5ab])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3CBDB1C114;
+        Mon, 15 Aug 2022 07:57:36 -0700 (PDT)
+Received: from [192.168.2.145] (109-252-119-13.nat.spd-mgts.ru [109.252.119.13])
+        (using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
+         key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+        (No client certificate requested)
+        (Authenticated sender: dmitry.osipenko)
+        by madras.collabora.co.uk (Postfix) with ESMTPSA id AF217660159F;
+        Mon, 15 Aug 2022 15:57:33 +0100 (BST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=collabora.com;
+        s=mail; t=1660575454;
+        bh=KOIQe83T8W3PTZZvdYYUaOEgUGqYiTEH3dPZEJGTSvs=;
+        h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+        b=R0pr+S+XKud71JqO0oSgj5fBHiQkKe+luUcuoC8XpozeVUbHX2SCEUdlKefIsilvc
+         bxAix5MdjMLqbdP9m/e6tEz9/5aV1KKdJj6cxlZ1q02RBypUBWMVjoByfYlvfSXIj4
+         iUtVvGoHrc760YssNHb7SjmD8+2WZ7FZ/v7YyzB3RWYCe/lXls3E1wKiBKnvm+Y7Ll
+         iCrg57bqaHcuCwZrs4I5pCi2Dp5XK6wSjjSmZNcDsbaKmbVgAV8/pTM0amG8G4+C5B
+         Qh5qXE7tleLR+RydRlWF4/pJ79fDDYRYkowwl9D6F9i/94tFN2UYDKtR+BoyK1kuke
+         rQvFRYxsOUMDw==
+Message-ID: <c9d89644-409e-0363-69f0-a3b8f2ef0ae4@collabora.com>
+Date:   Mon, 15 Aug 2022 17:57:30 +0300
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <952632db-b090-ceb9-1467-a6b598ca2b02@linux.intel.com>
-X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,SPF_HELO_NONE,
-        SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.12.0
+Subject: Re: [PATCH v1] drm/ttm: Refcount allocated tail pages
+Content-Language: en-US
+To:     =?UTF-8?Q?Christian_K=c3=b6nig?= <christian.koenig@amd.com>,
+        David Airlie <airlied@linux.ie>, Huang Rui <ray.huang@amd.com>,
+        Daniel Vetter <daniel@ffwll.ch>,
+        Trigger Huang <Trigger.Huang@gmail.com>,
+        Gert Wollny <gert.wollny@collabora.com>,
+        Antonio Caggiano <antonio.caggiano@collabora.com>,
+        Paolo Bonzini <pbonzini@redhat.com>
+Cc:     dri-devel@lists.freedesktop.org, linux-kernel@vger.kernel.org,
+        Dmitry Osipenko <digetx@gmail.com>, kvm@vger.kernel.org,
+        kernel@collabora.com, virtualization@lists.linux-foundation.org
+References: <20220815095423.11131-1-dmitry.osipenko@collabora.com>
+ <8230a356-be38-f228-4a8e-95124e8e8db6@amd.com>
+ <134bce02-58d6-8553-bb73-42dfda18a595@collabora.com>
+ <8caf3008-dcf3-985a-631e-e019b277c6f0@amd.com>
+ <4fcc4739-2da9-1b89-209c-876129604d7d@amd.com>
+ <14be3b22-1d60-732b-c695-ddacc6b21055@collabora.com>
+ <2df57a30-2afb-23dc-c7f5-f61c113dd5b4@collabora.com>
+ <57562db8-bacf-e82d-8417-ab6343c1d2fa@amd.com>
+ <86a87de8-24a9-3c53-3ac7-612ca97e41df@collabora.com>
+ <8f749cd0-9a04-7c72-6a4f-a42d501e1489@amd.com>
+ <5340d876-62b8-8a64-aa6d-7736c2c8710f@collabora.com>
+ <594f1013-b925-3c75-be61-2d649f5ca54e@amd.com>
+ <6893d5e9-4b60-0efb-2a87-698b1bcda63e@collabora.com>
+ <73e5ed8d-0d25-7d44-8fa2-e1d61b1f5a04@amd.com>
+From:   Dmitry Osipenko <dmitry.osipenko@collabora.com>
+In-Reply-To: <73e5ed8d-0d25-7d44-8fa2-e1d61b1f5a04@amd.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,SPF_HELO_NONE,
+        SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no
         version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -61,48 +76,51 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Aug 15, 2022 at 09:06:01AM -0400, Liang, Kan wrote:
+On 8/15/22 16:53, Christian König wrote:
+> Am 15.08.22 um 15:45 schrieb Dmitry Osipenko:
+>> [SNIP]
+>>> Well that comment sounds like KVM is doing the right thing, so I'm
+>>> wondering what exactly is going on here.
+>> KVM actually doesn't hold the page reference, it takes the temporal
+>> reference during page fault and then drops the reference once page is
+>> mapped, IIUC. Is it still illegal for TTM? Or there is a possibility for
+>> a race condition here?
+>>
+> 
+> Well the question is why does KVM grab the page reference in the first
+> place?
+> 
+> If that is to prevent the mapping from changing then yes that's illegal
+> and won't work. It can always happen that you grab the address, solve
+> the fault and then immediately fault again because the address you just
+> grabbed is invalidated.
+> 
+> If it's for some other reason than we should probably investigate if we
+> shouldn't stop doing this.
 
-> Goldmont Plus should be the only platform which supports extended PEBS
-> but doesn't have Baseline.
+CC: +Paolo Bonzini who introduced this code
 
-Like so then...
+commit add6a0cd1c5ba51b201e1361b05a5df817083618
+Author: Paolo Bonzini <pbonzini@redhat.com>
+Date:   Tue Jun 7 17:51:18 2016 +0200
 
-diff --git a/arch/x86/events/intel/core.c b/arch/x86/events/intel/core.c
-index 2db93498ff71..cb98a05ee743 100644
---- a/arch/x86/events/intel/core.c
-+++ b/arch/x86/events/intel/core.c
-@@ -6291,10 +6291,8 @@ __init int intel_pmu_init(void)
- 		x86_pmu.pebs_aliases = NULL;
- 		x86_pmu.pebs_prec_dist = true;
- 		x86_pmu.pebs_block = true;
--		x86_pmu.pebs_capable = ~0ULL;
- 		x86_pmu.flags |= PMU_FL_HAS_RSP_1;
- 		x86_pmu.flags |= PMU_FL_NO_HT_SHARING;
--		x86_pmu.flags |= PMU_FL_PEBS_ALL;
- 		x86_pmu.flags |= PMU_FL_INSTR_LATENCY;
- 		x86_pmu.flags |= PMU_FL_MEM_LOADS_AUX;
- 
-@@ -6337,10 +6335,8 @@ __init int intel_pmu_init(void)
- 		x86_pmu.pebs_aliases = NULL;
- 		x86_pmu.pebs_prec_dist = true;
- 		x86_pmu.pebs_block = true;
--		x86_pmu.pebs_capable = ~0ULL;
- 		x86_pmu.flags |= PMU_FL_HAS_RSP_1;
- 		x86_pmu.flags |= PMU_FL_NO_HT_SHARING;
--		x86_pmu.flags |= PMU_FL_PEBS_ALL;
- 		x86_pmu.flags |= PMU_FL_INSTR_LATENCY;
- 		x86_pmu.flags |= PMU_FL_MEM_LOADS_AUX;
- 		x86_pmu.lbr_pt_coexist = true;
-diff --git a/arch/x86/events/intel/ds.c b/arch/x86/events/intel/ds.c
-index ba60427caa6d..ac6dd4c96dbc 100644
---- a/arch/x86/events/intel/ds.c
-+++ b/arch/x86/events/intel/ds.c
-@@ -2262,6 +2262,7 @@ void __init intel_ds_init(void)
- 					PERF_SAMPLE_BRANCH_STACK |
- 					PERF_SAMPLE_TIME;
- 				x86_pmu.flags |= PMU_FL_PEBS_ALL;
-+				x86_pmu.pebs_capable = ~0ULL;
- 				pebs_qual = "-baseline";
- 				x86_get_pmu(smp_processor_id())->capabilities |= PERF_PMU_CAP_EXTENDED_REGS;
- 			} else {
+    KVM: MMU: try to fix up page faults before giving up
+
+    The vGPU folks would like to trap the first access to a BAR by setting
+    vm_ops on the VMAs produced by mmap-ing a VFIO device.  The fault
+handler
+    then can use remap_pfn_range to place some non-reserved pages in the
+VMA.
+
+    This kind of VM_PFNMAP mapping is not handled by KVM, but follow_pfn
+    and fixup_user_fault together help supporting it.  The patch also
+supports
+    VM_MIXEDMAP vmas where the pfns are not reserved and thus subject to
+    reference counting.
+
+@Paolo,
+https://lore.kernel.org/dri-devel/73e5ed8d-0d25-7d44-8fa2-e1d61b1f5a04@amd.com/T/#m7647ce5f8c4749599d2c6bc15a2b45f8d8cf8154
+
+-- 
+Best regards,
+Dmitry
