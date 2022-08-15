@@ -2,297 +2,278 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 44E3B593269
-	for <lists+kvm@lfdr.de>; Mon, 15 Aug 2022 17:47:09 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id E932659327E
+	for <lists+kvm@lfdr.de>; Mon, 15 Aug 2022 17:52:54 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231485AbiHOPrF (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 15 Aug 2022 11:47:05 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36458 "EHLO
+        id S231359AbiHOPwv (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 15 Aug 2022 11:52:51 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41798 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230136AbiHOPqx (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 15 Aug 2022 11:46:53 -0400
-Received: from NAM10-MW2-obe.outbound.protection.outlook.com (mail-mw2nam10on2057.outbound.protection.outlook.com [40.107.94.57])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4F5DABCE
-        for <kvm@vger.kernel.org>; Mon, 15 Aug 2022 08:46:52 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=hEcjQFeXJ6Vk6xtU5Mpc5ZaBjBzaOLscHHDhOxL8/xLUVHL6Ywj2NHqxdkVVfxyjJz4IScPcpD9zUmW+4Zap6JYs5NjLiKZ/FwMPj0l8duu2KuWEzTfnIHnrj+tPfSreMN1oMXZCytIi/cRRnJlTnIDZ8yolFt3v/mt+BXLiJECAQHdhJDkPNElGa6fZHhG3EIO/v29qeu2nSgnU/hbHI8x2wVowIKNjZDKr1/Ys2usYjToSEpJ5syx2t69+B3wN/5CeXo82Q5E+VfhKcIjpfvrzA+z0j/MQHnBXE6ZqcAhzZkmUhMQpzeEAvFyJzUCL1wS15Wc2X+spBJy10CW9uA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=2hhvrfceAeOA50ZIoMBeOtDIcYWm+dYRAI65+hW5Qug=;
- b=TjGN0u4feldsizou15UmKLopyb6IEmobTigUzM2POwlKI2hfJMsupt76UXvP42njfin4Mr2mtriRAAAswNuwgxA0x5QcCLkoEXXKK4uCYcCE0yCYcRnMzG2kejCEbFHLLKuncbDUh5MIVUlC7uwDnxr023WdGN7/m9z9PZI6UBRiuuUdj7N1ogdebv5E+8iqVAMXxGaK+6pqS2KeoDnrnxWlFsK1Mo58MhHRV02yYjkbSdZKUSsssWe4KDHxGZmWVCBM+CnFj/S2m1UKtd76OusT60PhVvt/ggdxGbUDpx7X1CAEu8mgCWqSlTDC8pqg7r2sxxe5mJDqj9ZNATZWGQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
- 12.22.5.234) smtp.rcpttodomain=vger.kernel.org smtp.mailfrom=nvidia.com;
- dmarc=pass (p=reject sp=reject pct=100) action=none header.from=nvidia.com;
- dkim=none (message not signed); arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=2hhvrfceAeOA50ZIoMBeOtDIcYWm+dYRAI65+hW5Qug=;
- b=ANldXUZIyGUfn/448ogCIL5XGTocKYir5GnXioeFsRDCQrU8jZ3eRIwc6HNPbSp17tq2CnoIzu1DXYYz9F8NlQWFBPzDZn3dOaX8iOyQGst31sM8TUb3O5R3AcM5Jt1pN3NRBd/Wu2gGj9fxs2BvjAxtgNyLd0x7MQzqpbtTYXGqd1fPpVhUW5kyds2cOIbijcX8RREmtmSB5yaM0FQPgFhoYTAxuar2PPY5ElaPvCikYJoZPwLW7Za2JkFlE4h2xcW5xaBg8rBEFygXFmxpvIwWsZg7UKU9oShk6AuGudmSdmHxhSMDszPyWRdFPm4pP5HwkCfHdVsn2C03AoP1pw==
-Received: from DM6PR03CA0087.namprd03.prod.outlook.com (2603:10b6:5:333::20)
- by MWHPR12MB1600.namprd12.prod.outlook.com (2603:10b6:301:f::10) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5504.15; Mon, 15 Aug
- 2022 15:46:47 +0000
-Received: from DM6NAM11FT048.eop-nam11.prod.protection.outlook.com
- (2603:10b6:5:333:cafe::c7) by DM6PR03CA0087.outlook.office365.com
- (2603:10b6:5:333::20) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5525.18 via Frontend
- Transport; Mon, 15 Aug 2022 15:46:47 +0000
-X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 12.22.5.234)
- smtp.mailfrom=nvidia.com; dkim=none (message not signed)
- header.d=none;dmarc=pass action=none header.from=nvidia.com;
-Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
- 12.22.5.234 as permitted sender) receiver=protection.outlook.com;
- client-ip=12.22.5.234; helo=mail.nvidia.com; pr=C
-Received: from mail.nvidia.com (12.22.5.234) by
- DM6NAM11FT048.mail.protection.outlook.com (10.13.173.114) with Microsoft SMTP
- Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384) id
- 15.20.5525.11 via Frontend Transport; Mon, 15 Aug 2022 15:46:46 +0000
-Received: from rnnvmail201.nvidia.com (10.129.68.8) by DRHQMAIL101.nvidia.com
- (10.27.9.10) with Microsoft SMTP Server (TLS) id 15.0.1497.38; Mon, 15 Aug
- 2022 15:46:46 +0000
-Received: from [172.27.11.227] (10.126.230.35) by rnnvmail201.nvidia.com
- (10.129.68.8) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.986.29; Mon, 15 Aug
- 2022 08:46:43 -0700
-Message-ID: <0e8a0d16-3c6f-a649-44b3-ab960801d90f@nvidia.com>
-Date:   Mon, 15 Aug 2022 18:46:40 +0300
+        with ESMTP id S229515AbiHOPwt (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 15 Aug 2022 11:52:49 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id DCEF3167F6
+        for <kvm@vger.kernel.org>; Mon, 15 Aug 2022 08:52:48 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1660578767;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=/Nqcs8aa7/L83Uz8Dknl+flwCz9c6FCbM8IP+tpiszM=;
+        b=LJV0rGhk8+m1VfBz1ftBaZDSIud14xwNc7ZzRJBKvi19YB3pahEWHmK4SRNzEgoKlt8b97
+        cbgLG4nHvHwZ/7g36jPbWm/a3SYeMMjLqvEEaN40DTZan3VbbVUAKTdNCAw3VXrEAza5G2
+        7aBsz5tcWzUZgCVm2f+//XZ1k/w7bQc=
+Received: from mail-ed1-f69.google.com (mail-ed1-f69.google.com
+ [209.85.208.69]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_128_GCM_SHA256) id
+ us-mta-532-ie5Iw025P4SFYGw3Azr5vQ-1; Mon, 15 Aug 2022 11:52:46 -0400
+X-MC-Unique: ie5Iw025P4SFYGw3Azr5vQ-1
+Received: by mail-ed1-f69.google.com with SMTP id m22-20020a056402431600b0043d6a88130aso4928976edc.18
+        for <kvm@vger.kernel.org>; Mon, 15 Aug 2022 08:52:46 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date
+         :x-gm-message-state:from:to:cc;
+        bh=/Nqcs8aa7/L83Uz8Dknl+flwCz9c6FCbM8IP+tpiszM=;
+        b=KEd9sqAQIrGlsJ5h55O6G8iTrymqtGJONsiSYob9yJWQ5OBeLsL9rhhO7Mq+OrYcmd
+         +GVLsJytEiKHrGw8n5cnatqN0bA9oKYllrochuUPVI2HDUWMHz5injRRZHZtOiljB8AN
+         92iYKAiB7DzKxlwODm+TLG05K0/JxNlGBitu3hGJCXKl1XGEzWR3+eWzPB5SRwIjCR27
+         AZgsk42GYvBib7XZtR97Jx5CmjB11/u862Kniwr6kA1aDDZe2g6slA3zb8pHlQusiRfN
+         0j+IMC31vWzIW2d2p8YRw7MN52CpCvjblqfVkba0kiVXVrl9Ld9/VvOOmyy4+6Al44an
+         hTbQ==
+X-Gm-Message-State: ACgBeo3xj7B/y89Rzl+Gj5Z2RhzF1WcKuQp4gQ3IcOT6p88+COlUTom6
+        RHHzmyzse7VD/3pGuDOKc17tRTib68RlCebaZKX8o+BvhZ3whie5Gvj5HWE13hQ4yP7fqRGlhaU
+        G29HoSzBHyyN4
+X-Received: by 2002:aa7:d292:0:b0:43d:7923:66cd with SMTP id w18-20020aa7d292000000b0043d792366cdmr14420721edq.403.1660578765285;
+        Mon, 15 Aug 2022 08:52:45 -0700 (PDT)
+X-Google-Smtp-Source: AA6agR6nIFBB+89khXDcKZ1x+E5GSpuggmwuIXVyMYifWU71qMF4gZFv0oZKWPNyImccf4QH1VsZkQ==
+X-Received: by 2002:aa7:d292:0:b0:43d:7923:66cd with SMTP id w18-20020aa7d292000000b0043d792366cdmr14420699edq.403.1660578765066;
+        Mon, 15 Aug 2022 08:52:45 -0700 (PDT)
+Received: from redhat.com ([2.54.169.49])
+        by smtp.gmail.com with ESMTPSA id z28-20020a17090674dc00b00734bfab4d64sm4157408ejl.25.2022.08.15.08.52.42
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 15 Aug 2022 08:52:44 -0700 (PDT)
+Date:   Mon, 15 Aug 2022 11:52:40 -0400
+From:   "Michael S. Tsirkin" <mst@redhat.com>
+To:     Zhu Lingshan <lingshan.zhu@intel.com>
+Cc:     jasowang@redhat.com, virtualization@lists.linux-foundation.org,
+        netdev@vger.kernel.org, kvm@vger.kernel.org, parav@nvidia.com,
+        xieyongji@bytedance.com, gautam.dawar@amd.com
+Subject: Re: [PATCH 2/2] vDPA: conditionally read fields in virtio-net dev
+Message-ID: <20220815114900-mutt-send-email-mst@kernel.org>
+References: <20220815092638.504528-1-lingshan.zhu@intel.com>
+ <20220815092638.504528-3-lingshan.zhu@intel.com>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:91.0) Gecko/20100101
- Thunderbird/91.12.0
-Subject: Re: Bug report: vfio over kernel 5.19 - mm area
-Content-Language: en-US
-To:     Alex Williamson <alex.williamson@redhat.com>, <alex.sierra@amd.com>
-CC:     <akpm@linux-foundation.org>, jason Gunthorpe <jgg@nvidia.com>,
-        "maor Gottlieb" <maorg@nvidia.com>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>, <idok@nvidia.com>,
-        <linux-mm@kvack.org>
-References: <a99ed393-3b17-887f-a1f8-a288da9108a0@nvidia.com>
- <3391f2e5-149a-7825-f89e-8bde3c6d555d@nvidia.com>
- <20220615080228.7a5e7552.alex.williamson@redhat.com>
-From:   Yishai Hadas <yishaih@nvidia.com>
-In-Reply-To: <20220615080228.7a5e7552.alex.williamson@redhat.com>
-Content-Type: text/plain; charset="UTF-8"; format=flowed
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-X-Originating-IP: [10.126.230.35]
-X-ClientProxiedBy: rnnvmail202.nvidia.com (10.129.68.7) To
- rnnvmail201.nvidia.com (10.129.68.8)
-X-EOPAttributedMessage: 0
-X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: fd17533c-3a3b-49c0-1e86-08da7ed55c7c
-X-MS-TrafficTypeDiagnostic: MWHPR12MB1600:EE_
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: =?utf-8?B?WS8rNmx5eUs2S0pmVDZNNUFQUTRCZEEra3NCV3JCNm5zTzBnRTgxK3IxY084?=
- =?utf-8?B?dm9BaTQ3SkFHNGJyUDFUV2ZyblZoU2x4UXlqak5vczZwaU94aUJhNDZ4aUFx?=
- =?utf-8?B?enppTUR2VC94MHZwb3ErbmRsYkNpUXAxdnE3U2FOYWtMb0l6eEF2aHJDUEtJ?=
- =?utf-8?B?R001RUNua2R5MWoyOWJoRHN3bVJkSCtmbG8vRDlQZ0NIQjhScHpxZFZka1lQ?=
- =?utf-8?B?M1NuVUZSVjJqT3BmNmZ0bUZPbHQxWDBKWTNVclloYjI3Y0JkT0oyWFZTRlZD?=
- =?utf-8?B?aU1zWDBORTNDQzdYd3RyUGR0aWZDL1BiNHBOWm9QaHV2Wk1HV2MvNFFZY3g2?=
- =?utf-8?B?cW5uRm1WTWJHWmVwdVdDMnM2ZHdLYXFJa3JGczNDRVRYWVNjcFNGVUlBdTZE?=
- =?utf-8?B?NFJTZklIVk53elBzR3VzTkVrQ1RzQ3Rwa1RzbytIMHo2R1M2aFRFSCthM0Y4?=
- =?utf-8?B?YlBPM3R1Um5pNTBDa1NjLzBYblN3NEpWMHpYb3BDV01Nck5JN3A1ZVV4WjNR?=
- =?utf-8?B?L09CSks4K1dqY2t5SnNKellDS0tNWDJWU2JKejl0dFpLUkdTNVV4Z3cvd1ps?=
- =?utf-8?B?RW5wWlRSTFVnV1NlUmFKUUdEWWpMR3pCVFU2VGt5elFzY3UrQjZkUjVvYytM?=
- =?utf-8?B?bTRKYlU1Q0lhdVlrRVlQSEM1SkZlbHVKWkl1K05xY1Fma0wzWEs0UHB5T1Vi?=
- =?utf-8?B?VWxGLzBzaG1FVFBiQ2ZYQmhJTXNLclMvRnZlbjJmM2Znb3JYdEthenFsUGtX?=
- =?utf-8?B?bDQ2dGlwQktqaWQraFR2aDBKdVB3Q0hhSXJucCtsV0xIUWxqRDA5d3QvT3d0?=
- =?utf-8?B?bk5Ra2dRd051a29LYkZacDFaVjZVcllVZ3craVplQWNqS01FZmp5VTJQMTFn?=
- =?utf-8?B?anMvMi9GZHhDRlUwcEF0WW1oZzV6OUZrN3VnUEJuc1dWSjlBMWlPL0M4QWpz?=
- =?utf-8?B?KzRGWStFekdZUUVQaHVqR3I3L2JaWk5UYUVGcEdRcitsVUI3WHJ3MWoyOTZz?=
- =?utf-8?B?QUgxUThTdGtWclB4WWl6SFQwTUttNmY0L01yVGFUbUdQaDNMZHEwYlllbW9y?=
- =?utf-8?B?U1JtanRycCt4eG9lQ3VPM3BVMTFaTFlmV3YwcHZHUXNWd1gvWGZUNFFRbEht?=
- =?utf-8?B?a2lYZW5xNDduRDBTQURTSUl4bGxaTGQyS3c1RGtpMU1nT2pBVWpNcUZneS84?=
- =?utf-8?B?Mlo4RTh2dGdxSzNPMTd2MWxjU3pZcmNJb1JKc1JScEJEeVI5eG1qZkFyY0NY?=
- =?utf-8?B?TjZwWXRsNG1mdXFTUHlIMGFwMVN4TXhpTjcrem5IZy9IVys5bVF1R1pGSEtX?=
- =?utf-8?B?V0VkSkZqeUpPT2ZLY0JHVzczUUlyNXJ0SFNHaEhsYmhNZi9JN0szZ3plVWxt?=
- =?utf-8?B?SnhxOUtIcTR6VXc9PQ==?=
-X-Forefront-Antispam-Report: CIP:12.22.5.234;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:InfoNoRecords;CAT:NONE;SFS:(13230016)(4636009)(39860400002)(396003)(136003)(346002)(376002)(40470700004)(46966006)(36840700001)(4326008)(70586007)(70206006)(2616005)(53546011)(26005)(16576012)(316002)(8676002)(83380400001)(31686004)(336012)(426003)(47076005)(186003)(16526019)(36756003)(5660300002)(2906002)(81166007)(356005)(86362001)(82740400003)(31696002)(40480700001)(8936002)(478600001)(966005)(41300700001)(110136005)(54906003)(36860700001)(82310400005)(40460700003)(36900700001)(43740500002)(2101003);DIR:OUT;SFP:1101;
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 15 Aug 2022 15:46:46.9712
- (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: fd17533c-3a3b-49c0-1e86-08da7ed55c7c
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[12.22.5.234];Helo=[mail.nvidia.com]
-X-MS-Exchange-CrossTenant-AuthSource: DM6NAM11FT048.eop-nam11.prod.protection.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Anonymous
-X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: MWHPR12MB1600
-X-Spam-Status: No, score=-1.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FORGED_SPF_HELO,
-        NICE_REPLY_A,RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,
-        SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=no autolearn_force=no
-        version=3.4.6
+In-Reply-To: <20220815092638.504528-3-lingshan.zhu@intel.com>
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 15/06/2022 17:02, Alex Williamson wrote:
-> On Wed, 15 Jun 2022 13:52:10 +0300
-> Yishai Hadas <yishaih@nvidia.com> wrote:
->
->> Adding some extra relevant people from the MM area.
->>
->> On 15/06/2022 13:43, Yishai Hadas wrote:
->>> Hi All,
->>>
->>> Any idea what could cause the below break in 5.19 ? we run QEMU and
->>> immediately the machine is stuck.
->>>
->>> Once I run, echo l > /proc/sysrq-trigger could see the below task
->>> which seems to be stuck..
->>>
->>> This basic flow worked fine in 5.18.
-> Spent Friday bisecting this and posted this fix:
->
-> https://lore.kernel.org/all/165490039431.944052.12458624139225785964.stgit@omen/
->
-> I expect you're hotting the same.  Thanks,
->
-> Alex
+On Mon, Aug 15, 2022 at 05:26:38PM +0800, Zhu Lingshan wrote:
+> Some fields of virtio-net device config space are
+> conditional on the feature bits, the spec says:
+> 
+> "The mac address field always exists
+> (though is only valid if VIRTIO_NET_F_MAC is set)"
+> 
+> "max_virtqueue_pairs only exists if VIRTIO_NET_F_MQ
+> or VIRTIO_NET_F_RSS is set"
+> 
+> "mtu only exists if VIRTIO_NET_F_MTU is set"
+> 
+> so we should read MTU, MAC and MQ in the device config
+> space only when these feature bits are offered.
+> 
+> For MQ, if both VIRTIO_NET_F_MQ and VIRTIO_NET_F_RSS are
+> not set, the virtio device should have
+> one queue pair as default value, so when userspace querying queue pair numbers,
+> it should return mq=1 than zero.
+> 
+> For MTU, if VIRTIO_NET_F_MTU is not set, we should not read
+> MTU from the device config sapce.
+> RFC894 <A Standard for the Transmission of IP Datagrams over Ethernet Networks>
+> says:"The minimum length of the data field of a packet sent over an
+> Ethernet is 1500 octets, thus the maximum length of an IP datagram
+> sent over an Ethernet is 1500 octets.  Implementations are encouraged
+> to support full-length packets"
+> 
+> virtio spec says:"The virtio network device is a virtual ethernet card",
+> so the default MTU value should be 1500 for virtio-net.
+> 
+> For MAC, the spec says:"If the VIRTIO_NET_F_MAC feature bit is set,
+> the configuration space mac entry indicates the “physical” address
+> of the network card, otherwise the driver would typically
+> generate a random local MAC address." So there is no
+> default MAC address if VIRTIO_NET_F_MAC not set.
+> 
+> This commits introduces functions vdpa_dev_net_mtu_config_fill()
+> and vdpa_dev_net_mac_config_fill() to fill MTU and MAC.
+> It also fixes vdpa_dev_net_mq_config_fill() to report correct
+> MQ when _F_MQ is not present.
+> 
+> These functions should check devices features than driver
+> features, and struct vdpa_device is not needed as a parameter
+> 
+> The test & userspace tool output:
+> 
+> Feature bit VIRTIO_NET_F_MTU, VIRTIO_NET_F_RSS, VIRTIO_NET_F_MQ
+> and VIRTIO_NET_F_MAC can be mask out by hardcode.
+> 
+> However, it is challenging to "disable" the related fields
+> in the HW device config space, so let's just assume the values
+> are meaningless if the feature bits are not set.
+> 
+> Before this change, when feature bits for RSS, MQ, MTU and MAC
+> are not set, iproute2 output:
+> $vdpa vdpa0: mac 00:e8:ca:11:be:05 link up link_announce false mtu 1500
+>   negotiated_features
 
-Alex,
+where does it get 1500? what if there's e.g. 0 in the mtu field?
 
-It seems that we got the same bug again in V6.0 RC1 ..
-
-The below code [1] from commit [2], put back the 'is_zero_pfn()' under 
-the !(..) and seems buggy.
-
-I would expect the below fix for that [3].
-
-Alex Sierra,
-
-Can you please review the below suggested fix for your patch and send a 
-patch for RC2 accordingly ?
-
-Yishai
-
-[1]
-
-See: 
-https://elixir.bootlin.com/linux/v6.0-rc1/source/include/linux/mm.h#L1549
-
-diff --git a/include/linux/mm.h b/include/linux/mm.h
-index a2d01e49253b..64393ed3330a 100644
---- a/include/linux/mm.h
-+++ b/include/linux/mm.h
-@@ -28,6 +28,7 @@
-  #include <linux/sched.h>
-  #include <linux/pgtable.h>
-  #include <linux/kasan.h>
-+#include <linux/memremap.h>
-
-  struct mempolicy;
-  struct anon_vma;
-@@ -1537,7 +1538,9 @@ static inline bool 
-is_longterm_pinnable_page(struct page *page)
-         if (mt == MIGRATE_CMA || mt == MIGRATE_ISOLATE)
-                 return false;
-  #endif
--       return !is_zone_movable_page(page) || 
-is_zero_pfn(page_to_pfn(page));
-+       return !(is_device_coherent_page(page) ||
-+                is_zone_movable_page(page) ||
-+                is_zero_pfn(page_to_pfn(page)));
-  }
-
-[2] f25cbb7a95a24ff9a2a3bebd308e303942ae6b2c
-Author: Alex Sierra <alex.sierra@amd.com>
-Date:   Fri Jul 15 10:05:10 2022 -0500
-
-     mm: add zone device coherent type memory support
-
-
-[3] Expected fix
-
-diff --git a/include/linux/mm.h b/include/linux/mm.h
-index 3bedc449c14d..b25f9886bd4c 100644
---- a/include/linux/mm.h
-+++ b/include/linux/mm.h
-@@ -1544,9 +1544,9 @@ static inline bool 
-is_longterm_pinnable_page(struct page *page)
-         if (mt == MIGRATE_CMA || mt == MIGRATE_ISOLATE)
-                 return false;
-  #endif
--       return !(is_device_coherent_page(page) ||
--                is_zone_movable_page(page) ||
--                is_zero_pfn(page_to_pfn(page)));
-+       return !is_device_coherent_page(page) ||
-+              !is_zone_movable_page(page) ||
-+              is_zero_pfn(page_to_pfn(page));
-  }
-  #else
-  static inline bool is_longterm_pinnable_page(struct page *page)
-
-
->>> [1162.056583] NMI backtrace for cpu 4
->>> [ 1162.056585] CPU: 4 PID: 1979 Comm: qemu-system-x86 Not tainted
->>> 5.19.0-rc1 #747
->>> [ 1162.056587] Hardware name: QEMU Standard PC (Q35 + ICH9, 2009),
->>> BIOS rel-1.13.0-0-gf21b5a4aeb02-prebuilt.qemu.org 04/01/2014
->>> [ 1162.056588] RIP: 0010:pmd_huge+0x0/0x20
->>> [ 1162.056592] Code: 49 89 44 24 28 48 8b 47 30 49 89 44 24 30 31 c0
->>> 41 5c c3 5b b8 01 00 00 00 5d 41 5c c3 cc cc cc cc cc cc cc cc cc cc
->>> cc cc cc <0f> 1f 44 00 00 31 c0 48 f7 c7 9f ff ff ff 74 0f 81 e7 81 00
->>> 00 00
->>> [ 1162.056594] RSP: 0018:ffff888146253b38 EFLAGS: 00000202
->>> [ 1162.056596] RAX: ffff888101461980 RBX: ffff888146253bc0 RCX:
->>> 000ffffffffff000
->>> [ 1162.056597] RDX: ffff88814fa22000 RSI: 00007f9f68231000 RDI:
->>> 000000010a6b6067
->>> [ 1162.056598] RBP: ffff888111b90dc0 R08: 000000000002f424 R09:
->>> 0000000000000001
->>> [ 1162.056599] R10: ffffffff825c2a40 R11: 0000000000000a08 R12:
->>> ffff88814fa22a08
->>> [ 1162.056600] R13: 000000010a6b6067 R14: 0000000000052202 R15:
->>> 00007f9f68231000
->>> [ 1162.056602] FS:  00007f9f6c228c40(0000) GS:ffff88885f900000(0000)
->>> knlGS:0000000000000000
->>> [ 1162.056605] CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
->>> [ 1162.056606] CR2: 00005643994fd0ed CR3: 00000001496da005 CR4:
->>> 0000000000372ea0
->>> [ 1162.056607] DR0: 0000000000000000 DR1: 0000000000000000 DR2:
->>> 0000000000000000
->>> [ 1162.056609] DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7:
->>> 0000000000000400
->>> [ 1162.056610] Call Trace:
->>> [ 1162.056611]  <TASK>
->>> [ 1162.056611]  follow_page_mask+0x196/0x5e0
->>> [ 1162.056615]  __get_user_pages+0x190/0x5d0
->>> [ 1162.056617]  ? flush_workqueue_prep_pwqs+0x110/0x110
->>> [ 1162.056620]  __gup_longterm_locked+0xaf/0x470
->>> [ 1162.056624]  vaddr_get_pfns+0x8e/0x240 [vfio_iommu_type1]
->>> [ 1162.056628]  ? qi_flush_iotlb+0x83/0xa0
->>> [ 1162.056631]  vfio_pin_pages_remote+0x326/0x460 [vfio_iommu_type1]
->>> [ 1162.056634]  vfio_iommu_type1_ioctl+0x421/0x14f0 [vfio_iommu_type1]
->>> [ 1162.056638]  __x64_sys_ioctl+0x3e4/0x8e0
->>> [ 1162.056641]  do_syscall_64+0x3d/0x90
->>> [ 1162.056644]  entry_SYSCALL_64_after_hwframe+0x46/0xb0
->>> [ 1162.056646] RIP: 0033:0x7f9f6d14317b
->>> [ 1162.056648] Code: 0f 1e fa 48 8b 05 1d ad 0c 00 64 c7 00 26 00 00
->>> 00 48 c7 c0 ff ff ff ff c3 66 0f 1f 44 00 00 f3 0f 1e fa b8 10 00 00
->>> 00 0f 05 <48> 3d 01 f0 ff ff 73 01 c3 48 8b 0d ed ac 0c 00 f7 d8 64 89
->>> 01 48
->>> [ 1162.056650] RSP: 002b:00007fff4fca15b8 EFLAGS: 00000246 ORIG_RAX:
->>> 0000000000000010
->>> [ 1162.056652] RAX: ffffffffffffffda RBX: 0000000000000001 RCX:
->>> 00007f9f6d14317b
->>> [ 1162.056653] RDX: 00007fff4fca1620 RSI: 0000000000003b71 RDI:
->>> 000000000000001c
->>> [ 1162.056654] RBP: 00007fff4fca1650 R08: 0000000000000001 R09:
->>> 0000000000000000
->>> [ 1162.056655] R10: 0000000100000000 R11: 0000000000000246 R12:
->>> 0000000000000000
->>> [ 1162.056656] R13: 0000000000000000 R14: 0000000000000000 R15:
->>> 0000000000000000
->>> [ 1162.056657]  </TASK>
->>>
->>> Yishai
->>>   
-
+> without this commit, function vdpa_dev_net_config_fill()
+> reads all config space fields unconditionally, so let's
+> assume the MAC and MTU are meaningless, and it checks
+> MQ with driver_features, so we don't see max_vq_pairs.
+> 
+> After applying this commit, when feature bits for
+> MQ, RSS, MAC and MTU are not set,iproute2 output:
+> $vdpa dev config show vdpa0
+> vdpa0: link up link_announce false max_vq_pairs 1 mtu 1500
+>   negotiated_features
+> 
+> As explained above:
+> Here is no MAC, because VIRTIO_NET_F_MAC is not set,
+> and there is no default value for MAC. It shows
+> max_vq_paris = 1 because even without MQ feature,
+> a functional virtio-net must have one queue pair.
+> mtu = 1500 is the default value as ethernet
+> required.
+> 
+> This commit also add supplementary comments for
+> __virtio16_to_cpu(true, xxx) operations in
+> vdpa_dev_net_config_fill() and vdpa_fill_stats_rec()
+> 
+> Signed-off-by: Zhu Lingshan <lingshan.zhu@intel.com>
+> ---
+>  drivers/vdpa/vdpa.c | 60 +++++++++++++++++++++++++++++++++++----------
+>  1 file changed, 47 insertions(+), 13 deletions(-)
+> 
+> diff --git a/drivers/vdpa/vdpa.c b/drivers/vdpa/vdpa.c
+> index efb55a06e961..a74660b98979 100644
+> --- a/drivers/vdpa/vdpa.c
+> +++ b/drivers/vdpa/vdpa.c
+> @@ -801,19 +801,44 @@ static int vdpa_nl_cmd_dev_get_dumpit(struct sk_buff *msg, struct netlink_callba
+>  	return msg->len;
+>  }
+>  
+> -static int vdpa_dev_net_mq_config_fill(struct vdpa_device *vdev,
+> -				       struct sk_buff *msg, u64 features,
+> +static int vdpa_dev_net_mq_config_fill(struct sk_buff *msg, u64 features,
+>  				       const struct virtio_net_config *config)
+>  {
+>  	u16 val_u16;
+>  
+> -	if ((features & BIT_ULL(VIRTIO_NET_F_MQ)) == 0)
+> -		return 0;
+> +	if ((features & BIT_ULL(VIRTIO_NET_F_MQ)) == 0 &&
+> +	    (features & BIT_ULL(VIRTIO_NET_F_RSS)) == 0)
+> +		val_u16 = 1;
+> +	else
+> +		val_u16 = __virtio16_to_cpu(true, config->max_virtqueue_pairs);
+>  
+> -	val_u16 = le16_to_cpu(config->max_virtqueue_pairs);
+>  	return nla_put_u16(msg, VDPA_ATTR_DEV_NET_CFG_MAX_VQP, val_u16);
+>  }
+>  
+> +static int vdpa_dev_net_mtu_config_fill(struct sk_buff *msg, u64 features,
+> +					const struct virtio_net_config *config)
+> +{
+> +	u16 val_u16;
+> +
+> +	if ((features & BIT_ULL(VIRTIO_NET_F_MTU)) == 0)
+> +		val_u16 = 1500;
+> +	else
+> +		val_u16 = __virtio16_to_cpu(true, config->mtu);
+> +
+> +	return nla_put_u16(msg, VDPA_ATTR_DEV_NET_CFG_MTU, val_u16);
+> +}
+> +
+> +static int vdpa_dev_net_mac_config_fill(struct sk_buff *msg, u64 features,
+> +					const struct virtio_net_config *config)
+> +{
+> +	if ((features & BIT_ULL(VIRTIO_NET_F_MAC)) == 0)
+> +		return 0;
+> +	else
+> +		return  nla_put(msg, VDPA_ATTR_DEV_NET_CFG_MACADDR,
+> +				sizeof(config->mac), config->mac);
+> +}
+> +
+> +
+>  static int vdpa_dev_net_config_fill(struct vdpa_device *vdev, struct sk_buff *msg)
+>  {
+>  	struct virtio_net_config config = {};
+> @@ -822,18 +847,16 @@ static int vdpa_dev_net_config_fill(struct vdpa_device *vdev, struct sk_buff *ms
+>  
+>  	vdpa_get_config_unlocked(vdev, 0, &config, sizeof(config));
+>  
+> -	if (nla_put(msg, VDPA_ATTR_DEV_NET_CFG_MACADDR, sizeof(config.mac),
+> -		    config.mac))
+> -		return -EMSGSIZE;
+> +	/*
+> +	 * Assume little endian for now, userspace can tweak this for
+> +	 * legacy guest support.
+> +	 */
+> +	val_u16 = __virtio16_to_cpu(true, config.status);
+>  
+>  	val_u16 = __virtio16_to_cpu(true, config.status);
+>  	if (nla_put_u16(msg, VDPA_ATTR_DEV_NET_STATUS, val_u16))
+>  		return -EMSGSIZE;
+>  
+> -	val_u16 = __virtio16_to_cpu(true, config.mtu);
+> -	if (nla_put_u16(msg, VDPA_ATTR_DEV_NET_CFG_MTU, val_u16))
+> -		return -EMSGSIZE;
+> -
+>  	features_driver = vdev->config->get_driver_features(vdev);
+>  	if (nla_put_u64_64bit(msg, VDPA_ATTR_DEV_NEGOTIATED_FEATURES, features_driver,
+>  			      VDPA_ATTR_PAD))
+> @@ -846,7 +869,13 @@ static int vdpa_dev_net_config_fill(struct vdpa_device *vdev, struct sk_buff *ms
+>  			      VDPA_ATTR_PAD))
+>  		return -EMSGSIZE;
+>  
+> -	return vdpa_dev_net_mq_config_fill(vdev, msg, features_driver, &config);
+> +	if (vdpa_dev_net_mac_config_fill(msg, features_device, &config))
+> +		return -EMSGSIZE;
+> +
+> +	if (vdpa_dev_net_mtu_config_fill(msg, features_device, &config))
+> +		return -EMSGSIZE;
+> +
+> +	return vdpa_dev_net_mq_config_fill(msg, features_device, &config);
+>  }
+>  
+>  static int
+> @@ -914,6 +943,11 @@ static int vdpa_fill_stats_rec(struct vdpa_device *vdev, struct sk_buff *msg,
+>  	}
+>  	vdpa_get_config_unlocked(vdev, 0, &config, sizeof(config));
+>  
+> +	/*
+> +	 * Assume little endian for now, userspace can tweak this for
+> +	 * legacy guest support.
+> +	 */
+> +
+>  	max_vqp = __virtio16_to_cpu(true, config.max_virtqueue_pairs);
+>  	if (nla_put_u16(msg, VDPA_ATTR_DEV_NET_CFG_MAX_VQP, max_vqp))
+>  		return -EMSGSIZE;
+> -- 
+> 2.31.1
 
