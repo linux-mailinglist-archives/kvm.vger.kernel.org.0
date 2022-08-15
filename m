@@ -2,157 +2,176 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id D31C6594ED9
-	for <lists+kvm@lfdr.de>; Tue, 16 Aug 2022 04:49:54 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 6CA96594EDD
+	for <lists+kvm@lfdr.de>; Tue, 16 Aug 2022 04:52:57 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S241014AbiHPCtg (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 15 Aug 2022 22:49:36 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38966 "EHLO
+        id S232646AbiHPCw4 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 15 Aug 2022 22:52:56 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43822 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232706AbiHPCtU (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 15 Aug 2022 22:49:20 -0400
-Received: from mga07.intel.com (mga07.intel.com [134.134.136.100])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6200F2B63B0;
-        Mon, 15 Aug 2022 16:14:47 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1660605287; x=1692141287;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=gymUZdI4Zmk7S6OzFKoQtBE8+Fa1MVe79gGq0K3OHDA=;
-  b=UexT5kxawgdxLIEf7dOO+gsdPpN49Kqq+aSpCssKlGvXDUYQOB1MJGRj
-   tuku0qtpDiq25ezr7rzVrPPrLKZzntfb/koLdq7Fa6ZXwYdIaXQtEeniK
-   1mUUw7QojFSQENk50JnSmvyDfaUfZm4xfpjdJRw0bhdDMqMJCY2IUKVmA
-   cSD4IQHAdhUnG/lguA8HdDjJnOL3K2xrhrjCib0lTTHt6PHHP4OzENsrc
-   T54anNaOWTF8pI5V2+izvq9y6ALunYZ8Fx7npzNnBHuxXRZFNjTn19BJj
-   TaxG43HPGci9N3WENUAXOYM7SQbEXmajHtX80wBap0oam9HToPcuN38zb
-   w==;
-X-IronPort-AV: E=McAfee;i="6400,9594,10440"; a="356081466"
-X-IronPort-AV: E=Sophos;i="5.93,239,1654585200"; 
-   d="scan'208";a="356081466"
-Received: from fmsmga004.fm.intel.com ([10.253.24.48])
-  by orsmga105.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 15 Aug 2022 16:14:46 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.93,239,1654585200"; 
-   d="scan'208";a="674992473"
-Received: from lkp-server02.sh.intel.com (HELO 3d2a4d02a2a9) ([10.239.97.151])
-  by fmsmga004.fm.intel.com with ESMTP; 15 Aug 2022 16:14:41 -0700
-Received: from kbuild by 3d2a4d02a2a9 with local (Exim 4.96)
-        (envelope-from <lkp@intel.com>)
-        id 1oNjI8-0001Gb-1I;
-        Mon, 15 Aug 2022 23:14:40 +0000
-Date:   Tue, 16 Aug 2022 07:13:50 +0800
-From:   kernel test robot <lkp@intel.com>
-To:     Bobby Eshleman <bobby.eshleman@gmail.com>
-Cc:     llvm@lists.linux.dev, kbuild-all@lists.01.org,
-        Bobby Eshleman <bobbyeshleman@gmail.com>,
-        Cong Wang <cong.wang@bytedance.com>,
-        Jiang Wang <jiang.wang@bytedance.com>,
-        Stefan Hajnoczi <stefanha@redhat.com>,
-        Stefano Garzarella <sgarzare@redhat.com>,
-        "Michael S. Tsirkin" <mst@redhat.com>,
-        Jason Wang <jasowang@redhat.com>,
-        Eric Dumazet <edumazet@google.com>,
-        Jakub Kicinski <kuba@kernel.org>,
-        Paolo Abeni <pabeni@redhat.com>,
-        "K. Y. Srinivasan" <kys@microsoft.com>,
-        Haiyang Zhang <haiyangz@microsoft.com>,
-        Stephen Hemminger <sthemmin@microsoft.com>,
-        Wei Liu <wei.liu@kernel.org>, Dexuan Cui <decui@microsoft.com>,
-        kvm@vger.kernel.org, virtualization@lists.linux-foundation.org,
-        netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
-        linux-hyperv@vger.kernel.org
-Subject: Re: [PATCH 2/6] vsock: return errors other than -ENOMEM to socket
-Message-ID: <202208160737.gXXFmPbY-lkp@intel.com>
-References: <d81818b868216c774613dd03641fcfe63cc55a45.1660362668.git.bobby.eshleman@bytedance.com>
+        with ESMTP id S232363AbiHPCwl (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 15 Aug 2022 22:52:41 -0400
+Received: from mail-pj1-x1035.google.com (mail-pj1-x1035.google.com [IPv6:2607:f8b0:4864:20::1035])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 363107E02F
+        for <kvm@vger.kernel.org>; Mon, 15 Aug 2022 16:22:24 -0700 (PDT)
+Received: by mail-pj1-x1035.google.com with SMTP id 15-20020a17090a098f00b001f305b453feso15809056pjo.1
+        for <kvm@vger.kernel.org>; Mon, 15 Aug 2022 16:22:24 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc;
+        bh=4qR24wezB7XIRlvkETA/N7hT8rAPhGQSgUyjo2ZKxB8=;
+        b=jDLc3zBHP8SIyt9maXsLdiecLEpzeenXTuoAhbCOraWlinvnPSMpU1XtED2FY69va+
+         Sc6vLmAM5znnAb5VemkidVqifnTO6fryHK/zcxkXgEkbgkz1hhVFhPw3PEhXcRgaGeQU
+         ewm/LgFd0d6ed/DQ7qW3iMxhYTcieFYLzpeSWzbKte3YUDyjm8oWjEXNQiYKgSGP/BNn
+         3naP2+de/18KxoCkpPnmkaXjVfDhHlfQM3itQqTnJRO1EXyOcd03bzc8Sbv07KJRdjl8
+         BvMsj0ILb/0lHOJKf5LJpPHpyjWAYl6ymCIEyA8qtL0D7W3h2IOnzJxlLmhWTCKtH2Kx
+         Bzfw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc;
+        bh=4qR24wezB7XIRlvkETA/N7hT8rAPhGQSgUyjo2ZKxB8=;
+        b=DhJGVY2XCIA/QDc0QPsAZcbCjGKCW2GSRepWBQ7TTNf7jHAO4Al2U1WP3kNwA7XtiF
+         z2GbWomcrom/wUOovkCyOX2y9nQUiPHc+ffr0JsBM0BoydQZt/1qJnrsXFo8CZHMCGRH
+         TE4TpZfAi7F6Kn/QE9Il+EQdT1OQNjBEBLgQRyMzysdQq/y2ihnPUBJObJ2Xc75PBrbe
+         KLCz/rcJq0wxv8Fo++vyWc6DG9HA8awrRvCEcDWSwCTJ2zQ6NxPr0SfrSdORJcEAqg32
+         nnPLlFMIgXjm1q7dHa1iY0NVPZFPuwMnpxU4ayGetTYMSHEjeM8ehHaY4UiDznRu+Pke
+         WK7A==
+X-Gm-Message-State: ACgBeo0ttSTi2oJBQDlHeD6vpZqWhMnVq7ROHpS/4nnwgbL7maIV0qD6
+        +fQFXTX85QwHzFO2EBXHoYSH7w==
+X-Google-Smtp-Source: AA6agR67FDv0ahWYbqJlGdfmccXGi2J7JhtNduZITfHHAjHHuwLBGmN0nDKXf/EqxUf/PwJWzihYPw==
+X-Received: by 2002:a17:902:b114:b0:16e:f1e0:51da with SMTP id q20-20020a170902b11400b0016ef1e051damr9214135plr.0.1660605743263;
+        Mon, 15 Aug 2022 16:22:23 -0700 (PDT)
+Received: from google.com (223.103.125.34.bc.googleusercontent.com. [34.125.103.223])
+        by smtp.gmail.com with ESMTPSA id j4-20020a17090276c400b0016c09a0ef87sm7490714plt.255.2022.08.15.16.22.21
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 15 Aug 2022 16:22:22 -0700 (PDT)
+Date:   Mon, 15 Aug 2022 16:22:17 -0700
+From:   David Matlack <dmatlack@google.com>
+To:     Oliver Upton <oliver.upton@linux.dev>
+Cc:     kvm@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>,
+        Ben Gardon <bgardon@google.com>,
+        Sean Christopherson <seanjc@google.com>
+Subject: Re: [PATCH] KVM: selftests: Use TEST_REQUIRE() in nx_huge_pages_test
+Message-ID: <YvrVKbRAoS1TyO44@google.com>
+References: <20220812175301.3915004-1-oliver.upton@linux.dev>
+ <YvaWKUs+/gLPjOOT@google.com>
+ <YvanIQoL3Y3TlxPB@google.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <d81818b868216c774613dd03641fcfe63cc55a45.1660362668.git.bobby.eshleman@bytedance.com>
-X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
-        SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham
-        autolearn_force=no version=3.4.6
+In-Reply-To: <YvanIQoL3Y3TlxPB@google.com>
+X-Spam-Status: No, score=-14.4 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+        ENV_AND_HDR_SPF_MATCH,FSL_HELO_FAKE,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,
+        SPF_PASS,T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL
+        autolearn=no autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi Bobby,
+On Fri, Aug 12, 2022 at 07:16:49PM +0000, Oliver Upton wrote:
+> On Fri, Aug 12, 2022 at 11:04:25AM -0700, David Matlack wrote:
+> > On Fri, Aug 12, 2022 at 05:53:01PM +0000, Oliver Upton wrote:
+> > > Avoid boilerplate for checking test preconditions by using
+> > > TEST_REQUIRE(). While at it, add a precondition for
+> > > KVM_CAP_VM_DISABLE_NX_HUGE_PAGES to skip (instead of silently pass) on
+> > > older kernels.
+> > > 
+> > > Signed-off-by: Oliver Upton <oliver.upton@linux.dev>
+> > > ---
+> > >  .../selftests/kvm/x86_64/nx_huge_pages_test.c | 24 +++++--------------
+> > >  1 file changed, 6 insertions(+), 18 deletions(-)
+> > > 
+> > > diff --git a/tools/testing/selftests/kvm/x86_64/nx_huge_pages_test.c b/tools/testing/selftests/kvm/x86_64/nx_huge_pages_test.c
+> > > index cc6421716400..e19933ea34ca 100644
+> > > --- a/tools/testing/selftests/kvm/x86_64/nx_huge_pages_test.c
+> > > +++ b/tools/testing/selftests/kvm/x86_64/nx_huge_pages_test.c
+> > > @@ -118,13 +118,6 @@ void run_test(int reclaim_period_ms, bool disable_nx_huge_pages,
+> > >  	vm = vm_create(1);
+> > >  
+> > >  	if (disable_nx_huge_pages) {
+> > > -		/*
+> > > -		 * Cannot run the test without NX huge pages if the kernel
+> > > -		 * does not support it.
+> > > -		 */
+> > > -		if (!kvm_check_cap(KVM_CAP_VM_DISABLE_NX_HUGE_PAGES))
+> > > -			return;
+> > > -
+> > >  		r = __vm_disable_nx_huge_pages(vm);
+> > >  		if (reboot_permissions) {
+> > >  			TEST_ASSERT(!r, "Disabling NX huge pages should succeed if process has reboot permissions");
+> > > @@ -248,18 +241,13 @@ int main(int argc, char **argv)
+> > >  		}
+> > >  	}
+> > >  
+> > > -	if (token != MAGIC_TOKEN) {
+> > > -		print_skip("This test must be run with the magic token %d.\n"
+> > > -			   "This is done by nx_huge_pages_test.sh, which\n"
+> > > -			   "also handles environment setup for the test.",
+> > > -			   MAGIC_TOKEN);
+> > > -		exit(KSFT_SKIP);
+> > > -	}
+> > > +	TEST_REQUIRE(kvm_has_cap(KVM_CAP_VM_DISABLE_NX_HUGE_PAGES));
+> > 
+> > This cap is only needed for run_test(..., true, ...) below so I don't think we should require it for the entire test.
+> 
+> It has always seemed that the test preconditions are a way to pretty-print
+> a failure/skip instead of having some random ioctl fail deeper in the
+> test.
+> 
+> If we really see value in adding predicates for individual test cases
+> then IMO it deserves first-class support in our framework. Otherwise
+> the next test that comes along is bound to open-code the same thing.
 
-Thank you for the patch! Perhaps something to improve:
+Fair point.
 
-[auto build test WARNING on mst-vhost/linux-next]
-[also build test WARNING on linus/master v6.0-rc1]
-[If your patch is applied to the wrong git tree, kindly drop us a note.
-And when submitting patch, we suggest to use '--base' as documented in
-https://git-scm.com/docs/git-format-patch#_base_tree_information]
+> 
+> Can't folks just update their kernel? :-)
 
-url:    https://github.com/intel-lab-lkp/linux/commits/Bobby-Eshleman/virtio-vsock-introduce-dgrams-sk_buff-and-qdisc/20220816-015812
-base:   https://git.kernel.org/pub/scm/linux/kernel/git/mst/vhost.git linux-next
-config: i386-randconfig-a014-20220815 (https://download.01.org/0day-ci/archive/20220816/202208160737.gXXFmPbY-lkp@intel.com/config)
-compiler: clang version 16.0.0 (https://github.com/llvm/llvm-project 6afcc4a459ead8809a0d6d9b4bf7b64bcc13582b)
-reproduce (this is a W=1 build):
-        wget https://raw.githubusercontent.com/intel/lkp-tests/master/sbin/make.cross -O ~/bin/make.cross
-        chmod +x ~/bin/make.cross
-        # https://github.com/intel-lab-lkp/linux/commit/68c9c8216a573cdfe2170cad677854e2f4a34634
-        git remote add linux-review https://github.com/intel-lab-lkp/linux
-        git fetch --no-tags linux-review Bobby-Eshleman/virtio-vsock-introduce-dgrams-sk_buff-and-qdisc/20220816-015812
-        git checkout 68c9c8216a573cdfe2170cad677854e2f4a34634
-        # save the config file
-        mkdir build_dir && cp config build_dir/.config
-        COMPILER_INSTALL_PATH=$HOME/0day COMPILER=clang make.cross W=1 O=build_dir ARCH=i386 SHELL=/bin/bash net/vmw_vsock/
+Consider my suggestion optional. If anyone is backporting this test to
+their kernel they'll also probably backport
+KVM_CAP_VM_DISABLE_NX_HUGE_PAGES ;). So I don't think there will be a
+huge benefit of making the test more flexible.
 
-If you fix the issue, kindly add following tag where applicable
-Reported-by: kernel test robot <lkp@intel.com>
+That aside,
 
-All warnings (new ones prefixed by >>):
+Reviewed-by: David Matlack <dmatlack@google.com>
 
->> net/vmw_vsock/virtio_transport.c:178: warning: This comment starts with '/**', but isn't a kernel-doc comment. Refer Documentation/doc-guide/kernel-doc.rst
-    * Merge the two most recent skbs together if possible.
-
-
-vim +178 net/vmw_vsock/virtio_transport.c
-
-93afaf2cdefaa9 Bobby Eshleman 2022-08-15  176  
-93afaf2cdefaa9 Bobby Eshleman 2022-08-15  177  /**
-93afaf2cdefaa9 Bobby Eshleman 2022-08-15 @178   * Merge the two most recent skbs together if possible.
-93afaf2cdefaa9 Bobby Eshleman 2022-08-15  179   *
-93afaf2cdefaa9 Bobby Eshleman 2022-08-15  180   * Caller must hold the queue lock.
-93afaf2cdefaa9 Bobby Eshleman 2022-08-15  181   */
-93afaf2cdefaa9 Bobby Eshleman 2022-08-15  182  static void
-93afaf2cdefaa9 Bobby Eshleman 2022-08-15  183  virtio_transport_add_to_queue(struct sk_buff_head *queue, struct sk_buff *new)
-93afaf2cdefaa9 Bobby Eshleman 2022-08-15  184  {
-93afaf2cdefaa9 Bobby Eshleman 2022-08-15  185  	struct sk_buff *old;
-93afaf2cdefaa9 Bobby Eshleman 2022-08-15  186  
-93afaf2cdefaa9 Bobby Eshleman 2022-08-15  187  	spin_lock_bh(&queue->lock);
-93afaf2cdefaa9 Bobby Eshleman 2022-08-15  188  	/* In order to reduce skb memory overhead, we merge new packets with
-93afaf2cdefaa9 Bobby Eshleman 2022-08-15  189  	 * older packets if they pass virtio_transport_skbs_can_merge().
-93afaf2cdefaa9 Bobby Eshleman 2022-08-15  190  	 */
-93afaf2cdefaa9 Bobby Eshleman 2022-08-15  191  	if (skb_queue_empty_lockless(queue)) {
-93afaf2cdefaa9 Bobby Eshleman 2022-08-15  192  		__skb_queue_tail(queue, new);
-93afaf2cdefaa9 Bobby Eshleman 2022-08-15  193  		goto out;
-93afaf2cdefaa9 Bobby Eshleman 2022-08-15  194  	}
-93afaf2cdefaa9 Bobby Eshleman 2022-08-15  195  
-93afaf2cdefaa9 Bobby Eshleman 2022-08-15  196  	old = skb_peek_tail(queue);
-93afaf2cdefaa9 Bobby Eshleman 2022-08-15  197  
-93afaf2cdefaa9 Bobby Eshleman 2022-08-15  198  	if (!virtio_transport_skbs_can_merge(old, new)) {
-93afaf2cdefaa9 Bobby Eshleman 2022-08-15  199  		__skb_queue_tail(queue, new);
-93afaf2cdefaa9 Bobby Eshleman 2022-08-15  200  		goto out;
-93afaf2cdefaa9 Bobby Eshleman 2022-08-15  201  	}
-93afaf2cdefaa9 Bobby Eshleman 2022-08-15  202  
-93afaf2cdefaa9 Bobby Eshleman 2022-08-15  203  	memcpy(skb_put(old, new->len), new->data, new->len);
-93afaf2cdefaa9 Bobby Eshleman 2022-08-15  204  	vsock_hdr(old)->len = cpu_to_le32(old->len);
-93afaf2cdefaa9 Bobby Eshleman 2022-08-15  205  	vsock_hdr(old)->buf_alloc = vsock_hdr(new)->buf_alloc;
-93afaf2cdefaa9 Bobby Eshleman 2022-08-15  206  	vsock_hdr(old)->fwd_cnt = vsock_hdr(new)->fwd_cnt;
-93afaf2cdefaa9 Bobby Eshleman 2022-08-15  207  	dev_kfree_skb_any(new);
-93afaf2cdefaa9 Bobby Eshleman 2022-08-15  208  
-93afaf2cdefaa9 Bobby Eshleman 2022-08-15  209  out:
-93afaf2cdefaa9 Bobby Eshleman 2022-08-15  210  	spin_unlock_bh(&queue->lock);
-93afaf2cdefaa9 Bobby Eshleman 2022-08-15  211  }
-93afaf2cdefaa9 Bobby Eshleman 2022-08-15  212  
-
--- 
-0-DAY CI Kernel Test Service
-https://01.org/lkp
+> 
+> --
+> Thanks,
+> Oliver
+> 
+> > That being said, it still might be good to inform the user that the test is being skipped. So perhaps something like this:
+> > 
+> >   ...
+> >   run_test(reclaim_period_ms, false, reboot_permissions);
+> > 
+> >   if (kvm_has_cap(KVM_CAP_VM_DISABLE_NX_HUGE_PAGES))
+> >           run_test(reclaim_period_ms, true, reboot_permissions);
+> >   else
+> >           print_skip("KVM_CAP_VM_DISABLE_NX_HUGE_PAGES not supported");
+> >   ...
+> > 
+> > > +	TEST_REQUIRE(reclaim_period_ms > 0);
+> > >  
+> > > -	if (!reclaim_period_ms) {
+> > > -		print_skip("The NX reclaim period must be specified and non-zero");
+> > > -		exit(KSFT_SKIP);
+> > > -	}
+> > > +	__TEST_REQUIRE(token == MAGIC_TOKEN,
+> > > +		       "This test must be run with the magic token %d.\n"
+> > > +		       "This is done by nx_huge_pages_test.sh, which\n"
+> > > +		       "also handles environment setup for the test.");
+> > >  
+> > >  	run_test(reclaim_period_ms, false, reboot_permissions);
+> > >  	run_test(reclaim_period_ms, true, reboot_permissions);
+> > > 
+> > > base-commit: 93472b79715378a2386598d6632c654a2223267b
+> > > -- 
+> > > 2.37.1.595.g718a3a8f04-goog
+> > > 
