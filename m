@@ -2,161 +2,152 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id D6365592D72
-	for <lists+kvm@lfdr.de>; Mon, 15 Aug 2022 12:53:11 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 17E73592CA8
+	for <lists+kvm@lfdr.de>; Mon, 15 Aug 2022 12:52:09 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S241675AbiHOIKQ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 15 Aug 2022 04:10:16 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39280 "EHLO
+        id S232764AbiHOJTF (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 15 Aug 2022 05:19:05 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43800 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232807AbiHOIKO (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 15 Aug 2022 04:10:14 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 78E0B1EC45
-        for <kvm@vger.kernel.org>; Mon, 15 Aug 2022 01:10:13 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1660551012;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=27lKoSaVUdINu4HuH13l5vYL4jblUD5XULMIR7fcHFc=;
-        b=EwOrUAnwpqbcJq3OEHm4gle65hUcdJQyfcPOi2ucTHCOjjiU0Yesqm9ASRnlyw/XX8gqNK
-        IBZHW6t9l3lRkvbrvHSAB9fNnu00pbdELcdPP9ka4Nw/Rp1CRRprTDdTEE98d7Cug/XG3A
-        YKrVd+R4R76+C0Uz+XGzIUGG7+jzBRI=
-Received: from mail-ed1-f69.google.com (mail-ed1-f69.google.com
- [209.85.208.69]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_128_GCM_SHA256) id
- us-mta-36-nPeKdxFNMN2qKshGVCUNJw-1; Mon, 15 Aug 2022 04:10:10 -0400
-X-MC-Unique: nPeKdxFNMN2qKshGVCUNJw-1
-Received: by mail-ed1-f69.google.com with SMTP id c14-20020a05640227ce00b0043e5df12e2cso4344137ede.15
-        for <kvm@vger.kernel.org>; Mon, 15 Aug 2022 01:10:10 -0700 (PDT)
+        with ESMTP id S231594AbiHOJTA (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 15 Aug 2022 05:19:00 -0400
+Received: from mail-wr1-x435.google.com (mail-wr1-x435.google.com [IPv6:2a00:1450:4864:20::435])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3A65C22509
+        for <kvm@vger.kernel.org>; Mon, 15 Aug 2022 02:18:59 -0700 (PDT)
+Received: by mail-wr1-x435.google.com with SMTP id bs25so8395325wrb.2
+        for <kvm@vger.kernel.org>; Mon, 15 Aug 2022 02:18:59 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc;
+        bh=OOL4Y5kIDK4GpzcnTvXTZTdG7FAR6zzCfj7Cij1BefI=;
+        b=CT2aSa6BZY94dkNNot3yaqnr3j9O7orSKuwxILRsqvRnd8WvEpXenBNae1eQ3He/Vr
+         3AhSFAuhYY2hqrnn0IDDF0KHetLNrj4QcIGdxSVAjSYmODvxB/brvk0Zl7qi20uhok1U
+         L8Vaasnomd+kIjC2rkJJhN7AU6emb3HjWMmp7U1Vlx8usn0ap0gN9exTvoztmuHkK+uZ
+         bbG7qHXipz8305jwg9NNwjHODD3YuBTXoLQlVrnf796/Ss23Cy7QGESwKPeZDSbvamLV
+         pmcUj/wRO29vXhL6WEKTuroMzefWNmVuDRvkPNn4jz3RLjyIYBjxzVAIO2YyineAt7Js
+         iEhA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=mime-version:message-id:date:references:in-reply-to:subject:cc:to
-         :from:x-gm-message-state:from:to:cc;
-        bh=27lKoSaVUdINu4HuH13l5vYL4jblUD5XULMIR7fcHFc=;
-        b=7xyYUYEYWOXwyeqfq1ByRY8flWsoY+0UCCDduOov5EcVAqldr6EL/95g3bEEB/jmvf
-         IQ8jD7ELQ7+INhOcpdy0xZ+e/TRDK9e50m2EN/wWzYwFFS4Sgy4pxeam/D/3EuVX/YFd
-         EAz2KXJ4IYgTRcRGFiZ2iv/Gm+t58DMh7dQDTSi7j0hRyZEZ7XdQTXfwNQFyjLqq9K4D
-         jcTQ4bucqbKgGTsJPfrIAZ51B4DOeB4+x5lQkq3zPknaxJRsckwc3TMYgOmuqSgtQ71Y
-         9QsufsadGNPyAfbiGIgCigPuqOT3RuNQk9BfKzCC5e/IqizJG5K+oqmhdiSP49Xm/cs7
-         Ev7w==
-X-Gm-Message-State: ACgBeo2TzXHq1UDejr50yIRBt3Rgz9+SkuEzFMwvOvz+QSw7ZSP5u2Qq
-        pKCH2YhgUO8UjrQ4XSuTSiyhd1V4vQUSfylnipIpZHn636wRKmu2eqXhQ4tYlmm7sQAplYhKfdG
-        la48TQ9Xdovi+
-X-Received: by 2002:a05:6402:b88:b0:442:5d35:2133 with SMTP id cf8-20020a0564020b8800b004425d352133mr13569767edb.53.1660551009658;
-        Mon, 15 Aug 2022 01:10:09 -0700 (PDT)
-X-Google-Smtp-Source: AA6agR6hclU/vcxB2BCRDttM2wYHPyAa40y3hKKPm2d8l2u3HXLlrSsnS9PHPPW6R6uAupXIcyydIw==
-X-Received: by 2002:a05:6402:b88:b0:442:5d35:2133 with SMTP id cf8-20020a0564020b8800b004425d352133mr13569752edb.53.1660551009372;
-        Mon, 15 Aug 2022 01:10:09 -0700 (PDT)
-Received: from fedora (nat-2.ign.cz. [91.219.240.2])
-        by smtp.gmail.com with ESMTPSA id r21-20020aa7cb95000000b0043cfc872e7dsm6164849edt.10.2022.08.15.01.10.08
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 15 Aug 2022 01:10:08 -0700 (PDT)
-From:   Vitaly Kuznetsov <vkuznets@redhat.com>
-To:     kernel test robot <lkp@intel.com>, kvm@vger.kernel.org
-Cc:     llvm@lists.linux.dev, kbuild-all@lists.01.org,
-        linux-kernel@vger.kernel.org,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        Paolo Bonzini <pbonzini@redhat.com>
-Subject: Re: [stable:linux-5.15.y 5373/9027] arch/x86/kvm/hyperv.c:2185:5:
- warning: stack frame size (1036) exceeds limit (1024) in
- 'kvm_hv_hypercall'
-In-Reply-To: <202208142025.NHKErAjq-lkp@intel.com>
-References: <202208142025.NHKErAjq-lkp@intel.com>
-Date:   Mon, 15 Aug 2022 10:10:07 +0200
-Message-ID: <87zgg6sza8.fsf@redhat.com>
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc;
+        bh=OOL4Y5kIDK4GpzcnTvXTZTdG7FAR6zzCfj7Cij1BefI=;
+        b=Fwqc1UnwulAN2ux6IQsQnbjeDYonF8h6oHM57hnvUrPPfH77ps8ZKo84QPUgdFtS1C
+         EYNLwxIJOn4562P8pobL5b8NpoTHcyAcrhFNn0PPIKNs1mELEyuGDQJSUyRxY9SKUS2h
+         DNsdYSvpYHteal/5i7K7SAZGDcq30zSR4SRqAFSS0gEhcDIuWO3Z5n6dC5oKlu3epJxs
+         ryKVSlMQf9/zDWJr4tlsNDF0IdslYYAxklmhlrilzzwO/8EvrdePxUy7vifyQw7kCKT+
+         yU+iW1cuoLBiLrNcAm5FepcBfn0BpTsE6UgiUxsXtYmQTu19CC2roAcmWfho3W51qFOW
+         n1ng==
+X-Gm-Message-State: ACgBeo1W8qCULxmJuhxS98O2XZNw15hM3CF9IB+0bc9g/NI1tUF0mBvP
+        /2PY8cScmloc+kwGFH6tyYzXIWoZfjtYXUQTh6ojQA==
+X-Google-Smtp-Source: AA6agR4QK9DrJvHonI1zBR+KQRhkzI0CIqlFVXf7sQNjUkmnKeVQNB5PPIgTmo8PY85gS3TgTEj3HFWKmVMVmO9RYPA=
+X-Received: by 2002:a5d:5a82:0:b0:224:f744:1799 with SMTP id
+ bp2-20020a5d5a82000000b00224f7441799mr854866wrb.582.1660555137638; Mon, 15
+ Aug 2022 02:18:57 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain
-X-Spam-Status: No, score=-2.2 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=unavailable
-        autolearn_force=no version=3.4.6
+References: <20220628220938.3657876-1-yosryahmed@google.com>
+ <20220628220938.3657876-2-yosryahmed@google.com> <YsdJPeVOqlj4cf2a@google.com>
+ <CAJD7tkYE+pZdk=-psEP_Rq_1CmDjY7Go+s1LXm-ctryWvUdgLA@mail.gmail.com>
+ <Ys3+UTTC4Qgbm7pQ@google.com> <CAJD7tkY91oiDWTj5FY2Upc5vabsjLk+CBMNzAepXLUdF_GS11w@mail.gmail.com>
+ <CAJD7tkbc+E7f+ENRazf0SO7C3gR2bHiN4B0F1oPn8Pa6juAVfg@mail.gmail.com>
+In-Reply-To: <CAJD7tkbc+E7f+ENRazf0SO7C3gR2bHiN4B0F1oPn8Pa6juAVfg@mail.gmail.com>
+From:   Yosry Ahmed <yosryahmed@google.com>
+Date:   Mon, 15 Aug 2022 02:18:20 -0700
+Message-ID: <CAJD7tkY5SfdhC7-4B7QuJGUVj_Ts+xwCP5FUZ-Lvg=fd1p_xAQ@mail.gmail.com>
+Subject: Re: [PATCH v6 1/4] mm: add NR_SECONDARY_PAGETABLE to count secondary
+ page table uses.
+To:     Andrew Morton <akpm@linux-foundation.org>
+Cc:     Sean Christopherson <seanjc@google.com>, Tejun Heo <tj@kernel.org>,
+        Johannes Weiner <hannes@cmpxchg.org>,
+        Zefan Li <lizefan.x@bytedance.com>,
+        Marc Zyngier <maz@kernel.org>,
+        James Morse <james.morse@arm.com>,
+        Alexandru Elisei <alexandru.elisei@arm.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>,
+        Michal Hocko <mhocko@kernel.org>,
+        Roman Gushchin <roman.gushchin@linux.dev>,
+        Shakeel Butt <shakeelb@google.com>,
+        Oliver Upton <oupton@google.com>,
+        Shaoqin <shaoqin.huang@intel.com>,
+        Cgroups <cgroups@vger.kernel.org>,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+        linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
+        kvm@vger.kernel.org, Linux-MM <linux-mm@kvack.org>
+Content-Type: text/plain; charset="UTF-8"
+X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
+        T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-kernel test robot <lkp@intel.com> writes:
-
-> Hi Vitaly,
+On Mon, Aug 8, 2022 at 1:06 PM Yosry Ahmed <yosryahmed@google.com> wrote:
 >
-> FYI, the error/warning still remains.
+> On Mon, Jul 18, 2022 at 11:26 AM Yosry Ahmed <yosryahmed@google.com> wrote:
+> >
+> > On Tue, Jul 12, 2022 at 4:06 PM Sean Christopherson <seanjc@google.com> wrote:
+> > >
+> > > On Tue, Jul 12, 2022, Yosry Ahmed wrote:
+> > > > Thanks for taking another look at this!
+> > > >
+> > > > On Thu, Jul 7, 2022 at 1:59 PM Sean Christopherson <seanjc@google.com> wrote:
+> > > > >
+> > > > > On Tue, Jun 28, 2022, Yosry Ahmed wrote:
+> > > > > > diff --git a/include/linux/mmzone.h b/include/linux/mmzone.h
+> > > > > > index aab70355d64f3..13190d298c986 100644
+> > > > > > --- a/include/linux/mmzone.h
+> > > > > > +++ b/include/linux/mmzone.h
+> > > > > > @@ -216,6 +216,7 @@ enum node_stat_item {
+> > > > > >       NR_KERNEL_SCS_KB,       /* measured in KiB */
+> > > > > >  #endif
+> > > > > >       NR_PAGETABLE,           /* used for pagetables */
+> > > > > > +     NR_SECONDARY_PAGETABLE, /* secondary pagetables, e.g. kvm shadow pagetables */
+> > > > >
+> > > > > Nit, s/kvm/KVM, and drop the "shadow", which might be misinterpreted as saying KVM
+> > > > > pagetables are only accounted when KVM is using shadow paging.  KVM's usage of "shadow"
+> > > > > is messy, so I totally understand why you included it, but in this case it's unnecessary
+> > > > > and potentially confusing.
+> > > > >
+> > > > > And finally, something that's not a nit.  Should this be wrapped with CONFIG_KVM
+> > > > > (using IS_ENABLED() because KVM can be built as a module)?  That could be removed
+> > > > > if another non-KVM secondary MMU user comes along, but until then, #ifdeffery for
+> > > > > stats the depend on a single feature seems to be the status quo for this code.
+> > > > >
+> > > >
+> > > > I will #ifdef the stat, but I will emphasize in the docs that is
+> > > > currently *only* used for KVM so that it makes sense if users without
+> > > > KVM don't see the stat at all. I will also remove the stat from
+> > > > show_free_areas() in mm/page_alloc.c as it seems like none of the
+> > > > #ifdefed stats show up there.
+> > >
+> > > It's might be worth getting someone from mm/ to weigh in before going through the
+> > > trouble, my suggestion/question is based purely on the existing code.
+> >
+> > Any mm folks with an opinion about this?
+> >
+> > Any preference on whether we should wrap NR_SECONDARY_PAGETABLE stats
+> > with #ifdef CONFIG_KVM for now as it is currently the only source for
+> > this stat?
 >
-
-Yes, this is expected as the patch which is supposed to 'fix' this is
-still pendind. The latest version is here:
-
-https://lore.kernel.org/kvm/20220803134540.399220-1-vkuznets@redhat.com/
-
-...
-
-> tree:   https://git.kernel.org/pub/scm/linux/kernel/git/stable/linux-stable.git linux-5.15.y
-> head:   7217df81279835a7aee62a07aabb7b8fb8c766f2
-> commit: cb188e07105f2216f5efbefac95df4b6ce266906 [5373/9027] KVM: x86: hyper-v: HVCALL_SEND_IPI_EX is an XMM fast hypercall
-> config: i386-allmodconfig (https://download.01.org/0day-ci/archive/20220814/202208142025.NHKErAjq-lkp@intel.com/config)
-> compiler: clang version 16.0.0 (https://github.com/llvm/llvm-project 52cd00cabf479aa7eb6dbb063b7ba41ea57bce9e)
-> reproduce (this is a W=1 build):
->         wget https://raw.githubusercontent.com/intel/lkp-tests/master/sbin/make.cross -O ~/bin/make.cross
->         chmod +x ~/bin/make.cross
->         # https://git.kernel.org/pub/scm/linux/kernel/git/stable/linux-stable.git/commit/?id=cb188e07105f2216f5efbefac95df4b6ce266906
->         git remote add stable https://git.kernel.org/pub/scm/linux/kernel/git/stable/linux-stable.git
->         git fetch --no-tags stable linux-5.15.y
->         git checkout cb188e07105f2216f5efbefac95df4b6ce266906
->         # save the config file
->         mkdir build_dir && cp config build_dir/.config
->         COMPILER_INSTALL_PATH=$HOME/0day COMPILER=clang make.cross W=1 O=build_dir ARCH=i386 SHELL=/bin/bash arch/x86/kvm/
+> Any input here?
 >
-> If you fix the issue, kindly add following tag where applicable
-> Reported-by: kernel test robot <lkp@intel.com>
->
-> All warnings (new ones prefixed by >>):
->
->>> arch/x86/kvm/hyperv.c:2185:5: warning: stack frame size (1036) exceeds limit (1024) in 'kvm_hv_hypercall' [-Wframe-larger-than]
->    int kvm_hv_hypercall(struct kvm_vcpu *vcpu)
->        ^
->    1 warning generated.
->
->
-> vim +/kvm_hv_hypercall +2185 arch/x86/kvm/hyperv.c
->
-> 4ad81a91119df7 Vitaly Kuznetsov         2021-05-21  2184  
-> e83d58874ba1de Andrey Smetanin          2015-07-03 @2185  int kvm_hv_hypercall(struct kvm_vcpu *vcpu)
-> e83d58874ba1de Andrey Smetanin          2015-07-03  2186  {
-> 4e62aa96d6e55c Vitaly Kuznetsov         2021-07-30  2187  	struct kvm_vcpu_hv *hv_vcpu = to_hv_vcpu(vcpu);
-> bd38b32053eb1c Siddharth Chandrasekaran 2021-05-26  2188  	struct kvm_hv_hcall hc;
-> bd38b32053eb1c Siddharth Chandrasekaran 2021-05-26  2189  	u64 ret = HV_STATUS_SUCCESS;
+> Johannes, you have been involved in discussions in earlier versions of
+> this series, any thoughts here?
 
-... but let me repeat myself: (see my previous reply here:
-https://lore.kernel.org/kvm/874jyw2v5n.fsf@redhat.com/)
-The source of the problem seems to be that Clang probably inlines
-kvm_hv_send_ipi() as on-stack variables in kvm_hv_hypercall() can not
-exceed 1024 bytes limit (struct kvm_hv_hcall is 144 bytes, the rest is
-negligible). The patch I mention above will likely fix the issue as it
-significantly reduces on-stack allocations in kvm_hv_send_ipi() but in
-this situation it shouldn't be inlined in the first place.
+Andrew, do you have an opinion on this? If not, I will send a v7 with
+the nits discussed with Sean. I think otherwise this series has
+sufficient ACKs.
 
-(I still hope that I'm wrong finger pointing at the compiler here and
-someone smart will come to correct me :-)
-
-> e83d58874ba1de Andrey Smetanin          2015-07-03  2190  
-> e83d58874ba1de Andrey Smetanin          2015-07-03  2191  	/*
-> e83d58874ba1de Andrey Smetanin          2015-07-03  2192  	 * hypercall generates UD from non zero cpl and real mode
-> e83d58874ba1de Andrey Smetanin          2015-07-03  2193  	 * per HYPER-V spec
-> e83d58874ba1de Andrey Smetanin          2015-07-03  2194  	 */
-> b3646477d458fb Jason Baron              2021-01-14  2195  	if (static_call(kvm_x86_get_cpl)(vcpu) != 0 || !is_protmode(vcpu)) {
-> e83d58874ba1de Andrey Smetanin          2015-07-03  2196  		kvm_queue_exception(vcpu, UD_VECTOR);
-> 0d9c055eaaf41b Andrey Smetanin          2016-02-11  2197  		return 1;
-> e83d58874ba1de Andrey Smetanin          2015-07-03  2198  	}
-> e83d58874ba1de Andrey Smetanin          2015-07-03  2199  
->
-> :::::: The code at line 2185 was first introduced by commit
-> :::::: e83d58874ba1de74c13d3c6b05f95a023c860d25 kvm/x86: move Hyper-V MSR's/hypercall code into hyperv.c file
->
-> :::::: TO: Andrey Smetanin <asmetanin@virtuozzo.com>
-> :::::: CC: Paolo Bonzini <pbonzini@redhat.com>
-
--- 
-Vitaly
-
+Would this be merged through the mm tree or kvm tree? This was based
+on the kvm/queue branch but I think I can rebase it on top of
+mm-unstable, I think all dependencies that this would have added in
+kvm/queue would have been fanned to mm by now.
