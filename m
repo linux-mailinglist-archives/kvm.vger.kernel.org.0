@@ -2,148 +2,185 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id C7561592F5E
-	for <lists+kvm@lfdr.de>; Mon, 15 Aug 2022 15:06:08 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 7C913592F60
+	for <lists+kvm@lfdr.de>; Mon, 15 Aug 2022 15:06:40 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233736AbiHONGG (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 15 Aug 2022 09:06:06 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46416 "EHLO
+        id S242673AbiHONGh (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 15 Aug 2022 09:06:37 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46960 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231493AbiHONGE (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 15 Aug 2022 09:06:04 -0400
-Received: from mga01.intel.com (mga01.intel.com [192.55.52.88])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 22DCF19031;
-        Mon, 15 Aug 2022 06:06:04 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1660568764; x=1692104764;
-  h=message-id:date:mime-version:subject:to:cc:references:
-   from:in-reply-to:content-transfer-encoding;
-  bh=m2EuSMgDC5x1/7VKkKGbdxtg9/vb5ykdj4i/kmeCnAY=;
-  b=GjJ52App2hztcqVIHsAaVntmsVe8zeDm+i9B6AUYlulhDgoQbbmflKfc
-   s932u9uW90MbYQxUB030L9XLGivEb9bPLeeO9uyDTdYgiPxf+g15LQCk2
-   Fqtg9uZfcFpRjPusRhegdNWajGDoFq1hGeLwCLvSBOD/Hvx3u1kJRS6hi
-   kqYjAmKMhBbCgSAVlZeFm9eihVdQCzMMLN4ThTH7pT4bVk6eFcMnTXwNL
-   QGPv4wKhNHN3KqZ40sqtcPkQ2MqfaqFkKpxYXZJqEcm654P13UtRSjzL+
-   OqQa31B7Z7jzZ21A4iFLQxN1454qIVLKTDlQsUDMTpsA2KNsMG0zL9+Ac
-   w==;
-X-IronPort-AV: E=McAfee;i="6400,9594,10440"; a="317936435"
-X-IronPort-AV: E=Sophos;i="5.93,238,1654585200"; 
-   d="scan'208";a="317936435"
-Received: from fmsmga004.fm.intel.com ([10.253.24.48])
-  by fmsmga101.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 15 Aug 2022 06:06:03 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.93,238,1654585200"; 
-   d="scan'208";a="674825396"
-Received: from linux.intel.com ([10.54.29.200])
-  by fmsmga004.fm.intel.com with ESMTP; 15 Aug 2022 06:06:03 -0700
-Received: from [10.252.214.254] (kliang2-mobl1.ccr.corp.intel.com [10.252.214.254])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-        (No client certificate requested)
-        by linux.intel.com (Postfix) with ESMTPS id 64857580C50;
-        Mon, 15 Aug 2022 06:06:02 -0700 (PDT)
-Message-ID: <952632db-b090-ceb9-1467-a6b598ca2b02@linux.intel.com>
-Date:   Mon, 15 Aug 2022 09:06:01 -0400
-MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
- Thunderbird/102.1.2
-Subject: Re: [PATCH v2 1/7] perf/x86/core: Update x86_pmu.pebs_capable for
- ICELAKE_{X,D}
-To:     Peter Zijlstra <peterz@infradead.org>,
-        Like Xu <like.xu.linux@gmail.com>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>,
-        Sean Christopherson <seanjc@google.com>,
-        Jim Mattson <jmattson@google.com>,
-        linux-kernel@vger.kernel.org, kvm@vger.kernel.org
-References: <20220721103549.49543-1-likexu@tencent.com>
- <20220721103549.49543-2-likexu@tencent.com>
- <959fedce-aada-50e4-ce8d-a842d18439fa@redhat.com>
- <YvoSXyy7ojZ9ird/@worktop.programming.kicks-ass.net>
- <94e6c414-38e1-ebd7-0161-34548f0b5aae@gmail.com>
- <YvozNSvcxet0gX6b@worktop.programming.kicks-ass.net>
+        with ESMTP id S229816AbiHONGe (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 15 Aug 2022 09:06:34 -0400
+Received: from NAM04-MW2-obe.outbound.protection.outlook.com (mail-mw2nam04on2081.outbound.protection.outlook.com [40.107.101.81])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8E535193C2;
+        Mon, 15 Aug 2022 06:06:33 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=lRyFump/HJwcrTT0wAnC1PHSKhLUYhuPrpDYZBIcDUta3GY0zI+jKpjyUQPOD+Qi9+KSzwKM47xRgUasqnIpGG3e9fANb5D/dn33czxFzNVmFVLvr/8jS2cnaq/us4cTqhtZ+eeBd0NMd1hNo+CpW0gmzGn7yFhgBV4ndLDVS+fZX2N3C7oI0ZToR/KyDojHEcVqZvGGFzc7eOrqxfaRRbiHRMpn7LQkOOlX4pX6G1DqN3LNKvlj/7GblrREwATM+kxGPo7tMkhFNr3USSZgMD24+yWJJywdTIL2eiMzYFQP+GoF3qH5pcfUellkU86VznHfAm9topycJpcecLxq9A==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=AISMtFVGSFYyr/edr+ThSU7JSWxx2PIyvZRi9+Yu270=;
+ b=D+m+XTEhVgL7xbkOA3PqdVX0+ZWNOaUwjswxsUurewfMhyiHX4exfHBCJmDbgtbnD+VOphtY6wJqrhliJKAF6wACKmVc4KSx7a2xinzUpeDVHZxL/S9XJtPxqRgRUxE8L0qkyHOgxhQZU2A8kTsAEgtEgKo83sHKibAHUkckgW/DeQR6CRfjGept4FWJ4tkAFsrSqDnIuyzu9TYr2/+c4aHNOu5aXmDiA6K2uFNB3+tlhCPd6/aNEsVZDLAUQqt3ODC3CTJRKX6m1OuZBzDAQQTZH1p3/+HMWgikiviiGQ77LPMBdosEGvbMstCrYvgvEuun+ZfqjL2HWkad+iIOeA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
+ header.d=amd.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=AISMtFVGSFYyr/edr+ThSU7JSWxx2PIyvZRi9+Yu270=;
+ b=Wru8UaKhD6XxVqXdYzz4H9i/q/f7O/dbhIRJKqLzHQ/PTZ2I9AzUrA5lHuXdLUTaboPJ1Ym/+IUiZuUMBtaa0n0rj3kER1ldQGYWgvq0Yrq7ZLL1rIlMZsO6uB8vE+7qkvJ/tG6d+cQ1k0tRjsjp+qRT12u4jAmIwPAJ2o3xrrM=
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=amd.com;
+Received: from BN8PR12MB3587.namprd12.prod.outlook.com (2603:10b6:408:43::13)
+ by DM4PR12MB5070.namprd12.prod.outlook.com (2603:10b6:5:389::22) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5504.14; Mon, 15 Aug
+ 2022 13:06:28 +0000
+Received: from BN8PR12MB3587.namprd12.prod.outlook.com
+ ([fe80::905:1701:3b51:7e39]) by BN8PR12MB3587.namprd12.prod.outlook.com
+ ([fe80::905:1701:3b51:7e39%2]) with mapi id 15.20.5504.020; Mon, 15 Aug 2022
+ 13:06:28 +0000
+Message-ID: <594f1013-b925-3c75-be61-2d649f5ca54e@amd.com>
+Date:   Mon, 15 Aug 2022 15:06:22 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.11.0
+Subject: Re: [PATCH v1] drm/ttm: Refcount allocated tail pages
 Content-Language: en-US
-From:   "Liang, Kan" <kan.liang@linux.intel.com>
-In-Reply-To: <YvozNSvcxet0gX6b@worktop.programming.kicks-ass.net>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-7.0 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_DNSWL_HI,
-        RCVD_IN_MSPIKE_H3,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE,
-        T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
+To:     Dmitry Osipenko <dmitry.osipenko@collabora.com>,
+        David Airlie <airlied@linux.ie>, Huang Rui <ray.huang@amd.com>,
+        Daniel Vetter <daniel@ffwll.ch>,
+        Trigger Huang <Trigger.Huang@gmail.com>,
+        Gert Wollny <gert.wollny@collabora.com>,
+        Antonio Caggiano <antonio.caggiano@collabora.com>
+Cc:     dri-devel@lists.freedesktop.org, linux-kernel@vger.kernel.org,
+        Dmitry Osipenko <digetx@gmail.com>, kvm@vger.kernel.org,
+        kernel@collabora.com, virtualization@lists.linux-foundation.org
+References: <20220815095423.11131-1-dmitry.osipenko@collabora.com>
+ <8230a356-be38-f228-4a8e-95124e8e8db6@amd.com>
+ <134bce02-58d6-8553-bb73-42dfda18a595@collabora.com>
+ <8caf3008-dcf3-985a-631e-e019b277c6f0@amd.com>
+ <4fcc4739-2da9-1b89-209c-876129604d7d@amd.com>
+ <14be3b22-1d60-732b-c695-ddacc6b21055@collabora.com>
+ <2df57a30-2afb-23dc-c7f5-f61c113dd5b4@collabora.com>
+ <57562db8-bacf-e82d-8417-ab6343c1d2fa@amd.com>
+ <86a87de8-24a9-3c53-3ac7-612ca97e41df@collabora.com>
+ <8f749cd0-9a04-7c72-6a4f-a42d501e1489@amd.com>
+ <5340d876-62b8-8a64-aa6d-7736c2c8710f@collabora.com>
+From:   =?UTF-8?Q?Christian_K=c3=b6nig?= <christian.koenig@amd.com>
+In-Reply-To: <5340d876-62b8-8a64-aa6d-7736c2c8710f@collabora.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-ClientProxiedBy: AS9PR04CA0129.eurprd04.prod.outlook.com
+ (2603:10a6:20b:531::9) To BN8PR12MB3587.namprd12.prod.outlook.com
+ (2603:10b6:408:43::13)
+MIME-Version: 1.0
+X-MS-PublicTrafficType: Email
+X-MS-Office365-Filtering-Correlation-Id: 7984a87b-a0af-4998-ee1a-08da7ebef6ea
+X-MS-TrafficTypeDiagnostic: DM4PR12MB5070:EE_
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: d0ryZpHj+3nlO13CTkDb86kWXLFNdZN3dd3MEC4RW7SZ3At31Ox84XsCFIbaSp20/vr2p5encYmP/jEAauJY5jQxw6EtJ9ImhEbnhDUmRAkzSSO/sHsKTB+NnOPpok+PT5BcQCNxJHCkYlT7lyYrNb9mnXxh9IhB3it9nkbY+GveMriVKR8zAxrDAMXCGvOv1NF0i9hqWXpdBgPE82gyx2Ic+XjK7GRdmNprc2XANlh9H1oX1GpxSuDf/JOQ8ScZgsUjdrzEv7jMZrK3AWt+u+sQMNQppCFcjt+08Umq1h8cH7gUmm5Emd9pYupeXMVP8AkwfbSD7VdokHHuqXgyvpIICkeSEU4UlkRbIhEyqqjx6RUaPSe6roirgAFkHFwKhh64LpeOxV3FOMkmsy1trxdTt/PHbun266QrHJvGZvJvv1VPEMYdCXShPeYQg3OPZbVvDTfTorl4JjF9IRwtblO+d9ArD5w6iIYyLgZFFZ4YpGIXG+jRTlcPMKUGzaN9r/SdBDZL67HzIerxgjFZ1RW1kkCFPnOnssU8B+FuoVdW+oexGueNPgzGIdadkp5Q8MepZViFXXQSL6yf3efIp7LzEQF8sp2srozVIC1w//pDgwuLNxFht7E8yAAFOm1zZB3NNwx/Td8fmOwvy6QiUJ1MfJqdr8ncaqCZ5zcCCkFLOi1QeQWYAmP01pxOIrDcrDAgGD51byENZpMsEOTqKsUcv9G6hPHNAs+nXAoV+43YJkymtuhvbGASO6GwW9dcjlxODrD9C1vqPl2geFvBggodqJnp6rhJ0OyyzR08Yr2YuhEf7bqDpMUjII1HoOQBCI/+z9ewEIqbLxgtD2gwfKoSVG1qMkpORhldpZyqd7xPgIWBtQ40ZALKxKlE/aja
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BN8PR12MB3587.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230016)(4636009)(39860400002)(376002)(346002)(396003)(136003)(366004)(86362001)(31696002)(38100700002)(4326008)(66556008)(66946007)(316002)(8676002)(66476007)(83380400001)(110136005)(2906002)(8936002)(2616005)(7416002)(5660300002)(6666004)(6506007)(66574015)(53546011)(6512007)(41300700001)(186003)(45080400002)(478600001)(36756003)(31686004)(966005)(6486002)(45980500001)(43740500002);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?S2swYTNIQXJSblNETnJSMlFIdGlUYUV5MFZXMEllR28xNENxdG9KU2tHOTFG?=
+ =?utf-8?B?K3E5MXgvS2xFYkE2RHVsYTVZVE02V3pNMkJDMVhmYTR2SHJTd3hZZmpFYWg0?=
+ =?utf-8?B?UmhpVXN0TVVFWXp2N1BjbjQ1RmRLNDYrUmJNelYzVk90UWhnNlpLcldoa0lS?=
+ =?utf-8?B?eFBwMDZyRU81VzhWNXJ3WEkzRFZLL25VTTEyQVhuODhDdWdsUWloS1paSHd6?=
+ =?utf-8?B?OXNRYyszZXV5VkdLMjMxcWFpRUlEVGJvU0hwTXUwKzBkN3BQWnByWlBsKzZj?=
+ =?utf-8?B?YVRPV3UxY0VXcU1ad0owRjR2VWg5UFJUMzc2MjhQVTZlNzJGd21GL1kwMkVm?=
+ =?utf-8?B?eFcveDN6bURZSE5nT1RPNUdiQXBIV2dXL0VHSmNYMjM2OG5GSzNUUEkyWTQv?=
+ =?utf-8?B?LzNRUC82akdLRllMVlNab3RFMXpLdXFDT0d6RWI1aDAveHdLYm5uMHRYRDIz?=
+ =?utf-8?B?YnhOSG9LK256UlNCdGhrVDdCZk1hWVFUN2tNNEptOW1oYy80ZlB1V2tvL1do?=
+ =?utf-8?B?SFB6WXZ1M1hlR3E2RXFtekcwS0ljWjIvb2ZIQ0pxb0w0N1hqOTcvSnRSOFA4?=
+ =?utf-8?B?WW5VZG5LaVAxTEdrK0orMTB2Y1J1ZE5CcG1EWFZjclJIWUdyMkZRdmxKRXAv?=
+ =?utf-8?B?SFJlMms0bVJld0ZFQ0hUa2Nkd0JsY0N2VFFmVDFTclQ0N2Q4eTR0RjN3M0ZB?=
+ =?utf-8?B?emxJNEJFR0R5T2t2V3FNZkE0RnhzTlB4dVhmcHRad2x0TTNyTUFTbFh6d2hk?=
+ =?utf-8?B?c1BRWE9XOEFlenVCVk52YTRUdkM5Z1oyeEoyVUdZYWt1QWpZQ281dHFMeCs2?=
+ =?utf-8?B?ckdzS0JpZnlUbkNvYXN4NU12SHFDQzZkU3RWcDlvc2t1YnFNODJjMllMNUNH?=
+ =?utf-8?B?cFBCZGRQamJZSVdaTjBlNEl3RzlZNUFobnZ5ekNWckhka1VqTTFQTWoyT01C?=
+ =?utf-8?B?YmRidS8yQldtUThNTGNzSkJkNEpOUU1jOUVyd2NVTlpsQlRuNWRXYmdUTkZU?=
+ =?utf-8?B?YTdCQVMzZHVZMEVRblpDNUV3L0pqZDNmVUxORkRnLzVHYkRQZHBiSk53YTNW?=
+ =?utf-8?B?R3VzazI0TXkxZmZjRXRkM212UUtkNWpzVnJGajhJWGNOdVZ1amdCZ0ozUmdP?=
+ =?utf-8?B?ZVRmL0d6MWhXQTdCS2RzSmFVaDZYT1ZWaHd5QWxVeE1oSm16RmhnVzFaYm5E?=
+ =?utf-8?B?V3U4ZmZGVjZnUTk3aDVHV0FIeEF4eDlraXdXSy9Ya1JCZGkwQVVBR1ZmemJP?=
+ =?utf-8?B?NkovOUNFelgyQ1V2bmxvWW5LUitXOFdrdm02UU1JU1k0eXVKamUyNlZvTVRk?=
+ =?utf-8?B?SUtRTzJDOVlOOTdKRzkyTTB5YlpTSHA5ZzNrdVpyYmg1Z2pBUExtVGxKZXFs?=
+ =?utf-8?B?YUhYR3loMDc3NE5yOGQ5TVpGWWQ4SFFJOE9ncE1OdldaN0lQSVBoOER5ampl?=
+ =?utf-8?B?SUZQSDk0NE0zWFRLNWNMN0o1SS9mdHNBSDhwNWNGZGpRVEN1Vk5QYXhlaEZn?=
+ =?utf-8?B?UDB6UFlwMVVvVEN3cFNlbi9PTnBXQXZwcEs0QThiZHBCcGVnUlkxdU1FWkds?=
+ =?utf-8?B?VktrVDNidW9PZEdva0R3OVJjaW0zUDVkQ09jSEErNnZ2YkFTN1hidUZ3dFBi?=
+ =?utf-8?B?SzVuRlA1a3FQcWU0N2YvaUY4SWxRbExnQWlUN0VsbVhJdW1weXlUWmdUZG1w?=
+ =?utf-8?B?WnMvVE5BZS9PbzVVU0Y1emFDdXJFY0hRUkltbkExdVF2SlJ2NDdBaEtLdkt0?=
+ =?utf-8?B?citBdi9janc1Z1FkcDBnMjRuOUVnRFZFdzY4QnhhM3Q0Z1BLdG5iRlRMZUF2?=
+ =?utf-8?B?RGh2aWZOVVNRZitrb2R4cG1veEQzM2phdEgwelR5di85MWVRMUNpU055TTBu?=
+ =?utf-8?B?SDlvaDlTV2Uzd1M5L2xaWWh3eFF4ZC9NMDZLOEl5ZTVoMi9nN24xTTE0ajVO?=
+ =?utf-8?B?SWZyQU93bGRaenRBVi9QVC8rV3k1V2IrcmJGVjd2YktBZlFyd0M2T0hsRmZG?=
+ =?utf-8?B?MkxwQ0g3YkhzYXY2YzBLeitpelFRalVGQmFMSDNRSnFua3E2SmQzUlo5bmdR?=
+ =?utf-8?B?WUtDcUptdWtETk9tTWc3V1h0OWJYSnNWd1BlQnFmS1d6KzE2Y2FnU3JmRmlV?=
+ =?utf-8?B?YS9TNVdQYkxQNlkya3UrZ2k4RTRoN0k0VFFmSitNek9LZ0pMMGwxVTAyOTND?=
+ =?utf-8?Q?kCPbFAflYwMI76lhRUtn8mGZb43iGnUYe5kx/hu9DSkc?=
+X-OriginatorOrg: amd.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 7984a87b-a0af-4998-ee1a-08da7ebef6ea
+X-MS-Exchange-CrossTenant-AuthSource: BN8PR12MB3587.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 15 Aug 2022 13:06:28.0323
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: mswQRxQ96Rs0EA6QHO2IYBmvTxJX3cT0/rBDyNzoQXqOhgG6CYPCuuw56b67QAw1
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM4PR12MB5070
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_DNSWL_NONE,
+        RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_PASS,T_SCC_BODY_TEXT_LINE
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+Am 15.08.22 um 13:50 schrieb Dmitry Osipenko:
+> On 8/15/22 14:28, Christian König wrote:
+>>>>> Maybe it was discussed privately? In this case I will be happy to get
+>>>>> more info from you about the root of the problem so I could start to
+>>>>> look at how to fix it properly. It's not apparent where the problem is
+>>>>> to a TTM newbie like me.
+>>>>>
+>>>> Well this is completely unfixable. See the whole purpose of TTM is to
+>>>> allow tracing where what is mapped of a buffer object.
+>>>>
+>>>> If you circumvent that and increase the page reference yourself than
+>>>> that whole functionality can't work correctly any more.
+>>> Are you suggesting that the problem is that TTM doesn't see the KVM page
+>>> faults/mappings?
+>> Yes, and no. It's one of the issues, but there is more behind that (e.g.
+>> what happens when TTM switches from pages to local memory for backing a
+>> BO).
+> If KVM page fault could reach TTM, then it should be able to relocate
+> BO. I see now where is the problem, thanks. Although, I'm wondering
+> whether it already works somehow.. I'll try to play with the the AMDGPU
+> shrinker and see what will happen on guest mapping of a relocated BO.
 
+Well the page fault already somehow reaches TTM, otherwise the pfn 
+couldn't be filled in in the first place.
 
-On 2022-08-15 7:51 a.m., Peter Zijlstra wrote:
-> On Mon, Aug 15, 2022 at 05:43:34PM +0800, Like Xu wrote:
-> 
->>> diff --git a/arch/x86/events/intel/core.c b/arch/x86/events/intel/core.c
->>> index 2db93498ff71..b42c1beb9924 100644
->>> --- a/arch/x86/events/intel/core.c
->>> +++ b/arch/x86/events/intel/core.c
->>> @@ -5933,7 +5933,6 @@ __init int intel_pmu_init(void)
->>>   		x86_pmu.pebs_aliases = NULL;
->>>   		x86_pmu.pebs_prec_dist = true;
->>>   		x86_pmu.lbr_pt_coexist = true;
->>> -		x86_pmu.pebs_capable = ~0ULL;
->>>   		x86_pmu.flags |= PMU_FL_HAS_RSP_1;
->>>   		x86_pmu.flags |= PMU_FL_PEBS_ALL;
->>>   		x86_pmu.get_event_constraints = glp_get_event_constraints;
->>> @@ -6291,7 +6290,6 @@ __init int intel_pmu_init(void)
->>>   		x86_pmu.pebs_aliases = NULL;
->>>   		x86_pmu.pebs_prec_dist = true;
->>>   		x86_pmu.pebs_block = true;
->>> -		x86_pmu.pebs_capable = ~0ULL;
->>>   		x86_pmu.flags |= PMU_FL_HAS_RSP_1;
->>>   		x86_pmu.flags |= PMU_FL_NO_HT_SHARING;
->>>   		x86_pmu.flags |= PMU_FL_PEBS_ALL;
->>> @@ -6337,7 +6335,6 @@ __init int intel_pmu_init(void)
->>>   		x86_pmu.pebs_aliases = NULL;
->>>   		x86_pmu.pebs_prec_dist = true;
->>>   		x86_pmu.pebs_block = true;
->>> -		x86_pmu.pebs_capable = ~0ULL;
->>>   		x86_pmu.flags |= PMU_FL_HAS_RSP_1;
->>>   		x86_pmu.flags |= PMU_FL_NO_HT_SHARING;
->>>   		x86_pmu.flags |= PMU_FL_PEBS_ALL;
->>> diff --git a/arch/x86/events/intel/ds.c b/arch/x86/events/intel/ds.c
->>> index ba60427caa6d..e2da643632b9 100644
->>> --- a/arch/x86/events/intel/ds.c
->>> +++ b/arch/x86/events/intel/ds.c
->>> @@ -2258,6 +2258,7 @@ void __init intel_ds_init(void)
->>>   			x86_pmu.drain_pebs = intel_pmu_drain_pebs_icl;
->>>   			x86_pmu.pebs_record_size = sizeof(struct pebs_basic);
->>>   			if (x86_pmu.intel_cap.pebs_baseline) {
->>> +				x86_pmu.pebs_capable = ~0ULL;
->>
->> The two features of "Extended PEBS (about pebs_capable)" and "Adaptive PEBS
->> (about pebs_baseline)"
->> are orthogonal, although the two are often supported together.
-> 
-> The SDM explicitly states that PEBS Baseline implies Extended PEBS. See
-> 3-19.8 (April 22 edition).
-> 
-> The question is if there is hardware that has Extended PEBS but doesn't
-> have Baseline; and I simply don't know and was hoping Kan could find
-> out.
+The issues is more that KVM should never ever grab a page reference to 
+pages mapped with VM_IO or VM_PFNMAP.
 
-Goldmont Plus should be the only platform which supports extended PEBS
-but doesn't have Baseline.
+Essentially we need to apply the same restriction as with 
+get_user_pages() here.
 
-> 
-> That said; the above patch can be further improved by also removing the
-> PMU_FL_PEBS_ALL lines, which is already set by intel_ds_init().
+>> Another question is why is KVM accessing the page structure in the first
+>> place? The VMA is mapped with VM_PFNMAP and VM_IO, KVM should never ever
+>> touch any of those pages.
+> https://nam11.safelinks.protection.outlook.com/?url=https%3A%2F%2Felixir.bootlin.com%2Flinux%2Fv5.19%2Fsource%2Fvirt%2Fkvm%2Fkvm_main.c%23L2549&amp;data=05%7C01%7Cchristian.koenig%40amd.com%7C2f38c27f20f842fc582a08da7eb4580d%7C3dd8961fe4884e608e11a82d994e183d%7C0%7C0%7C637961610314049167%7CUnknown%7CTWFpbGZsb3d8eyJWIjoiMC4wLjAwMDAiLCJQIjoiV2luMzIiLCJBTiI6Ik1haWwiLCJXVCI6Mn0%3D%7C3000%7C%7C%7C&amp;sdata=Pu5F1EF9UvDPdOQ7sjJ1WDRt5XpFZmAMXdkexnDpEmU%3D&amp;reserved=0
 
-I think we have to keep PMU_FL_PEBS_ALL for the Goldmont Plus. But we
-can remove it for SPR and ADL in intel_pmu_init(), since it's already
-set in the intel_ds_init() for the Baseline.
+Well that comment sounds like KVM is doing the right thing, so I'm 
+wondering what exactly is going on here.
 
-Thanks,
-Kan
-> 
-> In general though; the point is, we shouldn't be doing the FMS table
-> thing for discoverable features. Having pebs_capable = ~0 and
-> PMU_FL_PEBS_ALL on something with BASELINE set is just wrong.
+Regards,
+Christian.
+
+>
+
