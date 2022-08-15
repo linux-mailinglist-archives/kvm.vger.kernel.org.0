@@ -2,43 +2,50 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 0751D592C67
-	for <lists+kvm@lfdr.de>; Mon, 15 Aug 2022 12:51:49 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 04176592D4B
+	for <lists+kvm@lfdr.de>; Mon, 15 Aug 2022 12:53:00 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S242298AbiHOKJT (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 15 Aug 2022 06:09:19 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56706 "EHLO
+        id S232365AbiHOKMW (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 15 Aug 2022 06:12:22 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59786 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231851AbiHOKJS (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 15 Aug 2022 06:09:18 -0400
-Received: from madras.collabora.co.uk (madras.collabora.co.uk [46.235.227.172])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3D06D165A4;
-        Mon, 15 Aug 2022 03:09:17 -0700 (PDT)
-Received: from [IPV6:2a00:5f00:102:0:10b3:10ff:fe5d:4ec1] (unknown [IPv6:2a00:5f00:102:0:10b3:10ff:fe5d:4ec1])
-        (using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
-         key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-        (No client certificate requested)
-        (Authenticated sender: dmitry.osipenko)
-        by madras.collabora.co.uk (Postfix) with ESMTPSA id 76D4166016A1;
-        Mon, 15 Aug 2022 11:09:14 +0100 (BST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=collabora.com;
-        s=mail; t=1660558155;
-        bh=IxA0RyRCASMAbomjQ2FWjdpXxwbEqxEzDpKA7fGLa7Q=;
-        h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-        b=go6c+u43kUxsC/J1y+p7RUVs759KcyhNIhYyXhunR6hhypP/9riSdcsuKp9xYkp9z
-         zhxWZeGVtPTWSmnnhLpvXwmlqZUubpnEZ5Rn75kcnFUaMdCAuWKmi4tYq9T3Jwy6Y3
-         2OZZQkT9PP/tBSmpvDs5SFHnzaPpglhOQkYAV3nbdIL+5J5nE6pKG9NVZO6vUuL7Rh
-         7zCsGxGex5LS/fC62BDhwS6clWn0oioBq7sPlILr5ze//9trIq4GRbpsdv/U9Wgykt
-         qR0xDhFOJK2vibBgqzspHgpag3ADM+XPkgfYvDrP7s4iXjtWFZQYCG5Iq/UML8QGTY
-         GFlSyHuGlBNNQ==
-Message-ID: <134bce02-58d6-8553-bb73-42dfda18a595@collabora.com>
-Date:   Mon, 15 Aug 2022 13:09:11 +0300
-MIME-Version: 1.0
+        with ESMTP id S231539AbiHOKMC (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 15 Aug 2022 06:12:02 -0400
+Received: from NAM10-DM6-obe.outbound.protection.outlook.com (mail-dm6nam10on2040.outbound.protection.outlook.com [40.107.93.40])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4C3EB140EE;
+        Mon, 15 Aug 2022 03:12:00 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=PpLg0rsFmKM7VFh23UmJBWRKIh5xY08pqwfpHN23eQ7+EDZtk0Y+74HXPcfc0OXYGKYZlD5qIuNrxwvWaigOHzY5o3dIcOVJMEMrWudVQD4WAIoQNmaumi/lqwk+iK1sjOaDQLu4MSY2l7zDMjGunXNNaEzVpWdzXS/WS58ZfWP/5ofT05BXy6vVmHD+m/5YPQ9HZIiBx0dypIgdLEVoRDh5zXSELHOw/z2xeXBz4mnYljW/l63zwwPHCgcUxsfFRmoOIx8sYKiv7HtdWD29zIEvTpiK2s4qr5e/nZznE/E/UERhsjstwtke4wWcu0q6SRmlmlAIDrklKMR3zolcTA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=inBftJlKOMmZecCK/n1gTNUguOSc1CLw7dOvEg19/Pg=;
+ b=NcoTxid62cmoD266XwIYPFBLF8tILBiBIaIJm1vky1tTUgJFKGgy30We1ImudjmwagLv+EDUdcE+EZ/lUQoNyfCfqKqcIPPOxL4jL1GorXHOi9yBshnHCFNfJf9rrA/LiyLmPOakk0JZgbudcxJOGmNJKXQip8gHn6TaE1rbcY/3VJe4MejYHbe/NAFvne6AEIw6/YOmCqlm4VysL3Q0fUxBfaWp5rnQM6Levk7TfpU/pRfKZdxv0CXmbhwZ0f/sg2M5CyVearA6EV14Lbc3Qieew977NOrwzLrk9hqvguhHNjf+NlfjXVwRQG0RCDqQhq61g9ReXcsEX74AaN5wBA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
+ header.d=amd.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=inBftJlKOMmZecCK/n1gTNUguOSc1CLw7dOvEg19/Pg=;
+ b=3zw4PBaMbwgJ3G/LLZ1RRtJiNsEB0tzlMhit4ylwMnjoEri/eJ+Njo+IK4jY9+HYQ4iQ1He4Jo4frdvOfjl+1QXImOqGCW4fGua5Q3bZi7FkamA6SErbVBxUNu4I3lGX/MLa1XWlMXck1hbgx6ZPIZ71soTK/aU/Bpta9Dn0xcM=
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=amd.com;
+Received: from BN8PR12MB3587.namprd12.prod.outlook.com (2603:10b6:408:43::13)
+ by DM6PR12MB4251.namprd12.prod.outlook.com (2603:10b6:5:21e::12) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5525.10; Mon, 15 Aug
+ 2022 10:11:58 +0000
+Received: from BN8PR12MB3587.namprd12.prod.outlook.com
+ ([fe80::905:1701:3b51:7e39]) by BN8PR12MB3587.namprd12.prod.outlook.com
+ ([fe80::905:1701:3b51:7e39%2]) with mapi id 15.20.5504.020; Mon, 15 Aug 2022
+ 10:11:58 +0000
+Message-ID: <8caf3008-dcf3-985a-631e-e019b277c6f0@amd.com>
+Date:   Mon, 15 Aug 2022 12:11:52 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.12.0
+ Thunderbird/91.11.0
 Subject: Re: [PATCH v1] drm/ttm: Refcount allocated tail pages
 Content-Language: en-US
-To:     =?UTF-8?Q?Christian_K=c3=b6nig?= <christian.koenig@amd.com>,
+To:     Dmitry Osipenko <dmitry.osipenko@collabora.com>,
         David Airlie <airlied@linux.ie>, Huang Rui <ray.huang@amd.com>,
         Daniel Vetter <daniel@ffwll.ch>,
         Trigger Huang <Trigger.Huang@gmail.com>,
@@ -49,49 +56,118 @@ Cc:     dri-devel@lists.freedesktop.org, linux-kernel@vger.kernel.org,
         kernel@collabora.com, virtualization@lists.linux-foundation.org
 References: <20220815095423.11131-1-dmitry.osipenko@collabora.com>
  <8230a356-be38-f228-4a8e-95124e8e8db6@amd.com>
-From:   Dmitry Osipenko <dmitry.osipenko@collabora.com>
-In-Reply-To: <8230a356-be38-f228-4a8e-95124e8e8db6@amd.com>
-Content-Type: text/plain; charset=UTF-8
+ <134bce02-58d6-8553-bb73-42dfda18a595@collabora.com>
+From:   =?UTF-8?Q?Christian_K=c3=b6nig?= <christian.koenig@amd.com>
+In-Reply-To: <134bce02-58d6-8553-bb73-42dfda18a595@collabora.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
+X-ClientProxiedBy: AM5PR1001CA0059.EURPRD10.PROD.OUTLOOK.COM
+ (2603:10a6:206:15::36) To BN8PR12MB3587.namprd12.prod.outlook.com
+ (2603:10b6:408:43::13)
+MIME-Version: 1.0
+X-MS-PublicTrafficType: Email
+X-MS-Office365-Filtering-Correlation-Id: 2408e371-ee95-4125-1e74-08da7ea69670
+X-MS-TrafficTypeDiagnostic: DM6PR12MB4251:EE_
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: KJd+JUXroGqBlZeIjxVJPR0fYPhp+jCxlNu5ZuzHzCPQqWHm+thcrc9fLoJJB6LAY3mcck7S8tEm/5GBm0x7edn9Wld8BQa7lT7m3A534By3T/d/D8sXApqgU29FMQu84XHNSeaF+6T5DmLEvQl2cd/dchuMRpJLUsgDtWd1QvAmqQa13AHN9Riw4cu5VdEwgKYhl+f44hwIO86/qtz42J5hU2WjWX3xjqxeJ3GFry2Fxq5AXInDMa7S/boNcSs5c5pmFxzYGfrbNxABOxbzfk330O7C0ZAAvgevaVaN98yg32S07ZKTAZTorNXamJlCYzSVKz+0h6tdRBdDhS977HOvQYLm3CcZyGGGVfoEMdBMVAg1d3nvc8io+MhhA91MOFiIPg+tsTAYTbmnmZdHJ54z6pR5JfMgSHcUQKk1L4R/TtglIXTliuMYNFwUwyHrenn8XCUYQXaV3BJBjtM02R9atwQ6pjY/tHNiJNOCnQz+Y/1id++1pEFW2Cb8e7aGHfEBdaFDaOAVHr/3bEB+ia0Vi6e0N2LqPNyYHuXs+gmq0LxAWA4t3mZsKSZLkRIHpxhAAxXyVbNkwy5skyYjkAUUuivl3YwA4xE5uVPDDxTUsvBYa5cQoLbkmhhyCgHRoVXaK/OgA3+4qQ31tRTONL+kTwmj1VrTW5jr9JrCuFIqNCMzht9izWhSjWf7EyXobuMrDmk0Fs7tyWHaiBy8lGKPnSXz/bwH/ivS8QqMMKtci5Sr9Jb+OcrV/MFbInfmp7siuSjxs0h8TM4eFxss4nIUYjOcLP9oGCMfCKXeMbDwnmqSMEFX84zEcrC4sKHIc+lyTMhBjfRxUkS+M6wGLQ==
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BN8PR12MB3587.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230016)(4636009)(396003)(346002)(136003)(366004)(39860400002)(376002)(7416002)(8936002)(5660300002)(31696002)(2906002)(86362001)(41300700001)(66476007)(66574015)(186003)(6666004)(2616005)(6506007)(6512007)(83380400001)(478600001)(53546011)(38100700002)(66556008)(4326008)(8676002)(316002)(110136005)(6486002)(36756003)(66946007)(31686004)(43740500002)(45980500001);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?WnNzaThMU0owZUY1bGFHVjdzbEpvNGVQUDlrYytJS2x0dDNiSmQ5dlUxODMz?=
+ =?utf-8?B?UU5kTWtaZ2Z5OUllRlRwVStCZXJkcE5kOHo2ajNsayt2ZTE3amd0ZUZ1elJs?=
+ =?utf-8?B?eEttVy9EWTNlTWpPM3JBSEhKcU5IaDVpdHkyLzlOZEdwMDFweEtZbUFsR2F6?=
+ =?utf-8?B?eWlqaVM0UXNabngxTnVMV3lQc05ZalRvWTZZbTJYVVBwbW5pQXM1YnJaaTZU?=
+ =?utf-8?B?TFdmVSsvT1dwSVNYMG1DbVlubUNtdnU2dGhObFVSSTJkcXh6RkZJTGZQOFl2?=
+ =?utf-8?B?Zi9mSWcxS2R2MUswbldONFNlcnlVcERmM1RZa3FMSjFZdThRZVA2VkN3TFpK?=
+ =?utf-8?B?UGIrenBMU3dpbis4VFV3djRXaGhNSnovSEJlSVFzR1lMT2VscHhIbTU3RGNL?=
+ =?utf-8?B?SW1iU1FVQkswTytHZHdtdEZ1TFhySmdmTy8wUjdHQ29pRmh6aEs4TzJyNEc0?=
+ =?utf-8?B?UDFEREx2c1FDUW1KZ2EzdXlIS0U4ZTA3MEEwOFFqMmhkZU1vN2VoK1dDR0Uv?=
+ =?utf-8?B?cEJWYWd2M0xxRGdSSUtoMi96TUxFS3RuRVYyWHBiZndTOFV5K3NDU24zZTls?=
+ =?utf-8?B?YWpqRDVsT1puZDNBS1ZKTFFWVWZ6L1pTMU9OQlVhQ1BXeENzTCsxaXRYZUhy?=
+ =?utf-8?B?YURtL2FWd2NYbTBvSy94QTA5ZlhwZ3NMKzRXVFJFL2NkbUJKOExpd1FUSkhs?=
+ =?utf-8?B?dFRBZXFEYWxuV2x2bXRuRU52eGE1RExRdG00bWVRYnFOQWRsb0U4OUlqR0Zq?=
+ =?utf-8?B?M0NTOGVqU09kTlBEeTBJNXowOFBQN2Z5cnRvb1d3R2xaWjl5MG5XZ2JZcDYy?=
+ =?utf-8?B?ZTlZeThlZFh3YXFTSGVGTmo3VTRCK2RnYVlvMS9mdkgrcHhzMStVSmVXeVJT?=
+ =?utf-8?B?WFZDMUw2RUhPYk9ZQThIOStUbzdRYXRsUmZiZnRaRG83c01yQjRpYUtjQ1lF?=
+ =?utf-8?B?YlF3OGVtSDkvNkFPcUlSS3Rzekk4MVkvSlRQTHg2MUZBRWw2VG50TGdMUmdD?=
+ =?utf-8?B?WWgrZ3JrYzE4dnJKVXVqU01rQ2lmTFpmTlFVSGNYUEw5Mk5oRnZtTHhIMnVN?=
+ =?utf-8?B?dmwvQmVMTHNjTXMxQUwwUENDY2dNK3FRNC9VZld3dC9DaG84SHYvTFh6Q2Nm?=
+ =?utf-8?B?MWptSWN4akMzT2dNdll5WlIxYlFHcDhlVmd4WnNFRmg3WmRGS09ieW4vUFho?=
+ =?utf-8?B?dnhyRldWZUtDSXd4VE1xK3pOY2tQanl6bFZ4enpGU1FMZXlRYlJGTnd6blVn?=
+ =?utf-8?B?Vk92bzJ3NmlOM2JzUTdCWWlZSnhsYzRTWHRBRURaU3VnbmVrcnpyWElVZkZs?=
+ =?utf-8?B?UTRrdHQ5d0tNYldmdWdWSkxCaEI4SXZrQkxQMHg4c1JXYUNyNUZGZi96WTQ2?=
+ =?utf-8?B?R0dJSC9XUXhYU1ROT01IcnJodXFjb21mQUttdXdiay9LenlSeUczdFJhajN1?=
+ =?utf-8?B?YkRUR2U3WTgwODRTclVsdkpNZmNIVzBPU25DSGNjVW5yT2FER3Zyd0Noby9z?=
+ =?utf-8?B?emFDMlVoWGpJS0FndnRqazBYOGRublhaYy9aQjBoWVlRelhnZGJYbTBsNWdy?=
+ =?utf-8?B?b2JMNHpld01vdDc0dzljaWlIRjVZc2dPaGhYUnVlZmRmR2lMZEVKelRVbmE0?=
+ =?utf-8?B?bUZITUdlMGM0UVhGbE0vcFRvQkVUMEluZi9oNXpiWk05N011T3NNRTVPcHVH?=
+ =?utf-8?B?YktDRmNybDMrM2pwYktPNjIyMUVyamZ1MEg3T2Y2NGoybkpOM3dVcnJmcCtM?=
+ =?utf-8?B?WnhUSEVaaXk1T0dDdWljemJ3Z1lrekpDbE1leHVpNFozM2FnUDNIOUMvNC9I?=
+ =?utf-8?B?ME9QN2F2cGhESS9udXZUdUkxRDFKYk1Ba1M3RXFTOUdFakt4bFZ6Qlo5TlRD?=
+ =?utf-8?B?WUQyYkVSbFFPY3pYQ1l0VWJqcXJ1V1VXM0xxekwrWnB0Tk85YzNmUGZGSGEy?=
+ =?utf-8?B?aFk1Rm81ZE5SaCtFMEMwVHdVeDArcVZiQVpzYkJGcUxZOTA5WVBSQ1Noc2Y3?=
+ =?utf-8?B?ZjNhU0RycExCdzIwSlFYd29OWXJJeXBHTC9qSW50cW5jRGZSOEFzZWJmSWNn?=
+ =?utf-8?B?R3JLa0hMQit2Z2JnN1Fsc09PREJDZmJ3SU1jZSt1S2VCVXpIckNBQlZiSFln?=
+ =?utf-8?B?dldyMXMzQi9GV3hLcXRiVXZ2ekxzY3ZUaXNYcWFJTnpYY3hDV3R6SE9rZkdv?=
+ =?utf-8?Q?+69ZLcuRlrUWufC9ip5W/7DUSuVdid0ByDckCEpyuLbH?=
+X-OriginatorOrg: amd.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 2408e371-ee95-4125-1e74-08da7ea69670
+X-MS-Exchange-CrossTenant-AuthSource: BN8PR12MB3587.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 15 Aug 2022 10:11:58.3228
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: /6amPt3rAAIocRnt1ujLPZAoo+tajaLJ5xsc78Onfu748jqehN/nS3KPOnH3F7i6
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM6PR12MB4251
 X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,SPF_HELO_NONE,
-        SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no
-        version=3.4.6
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_DNSWL_NONE,
+        RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_PASS,T_SCC_BODY_TEXT_LINE
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 8/15/22 13:05, Christian König wrote:
-> Am 15.08.22 um 11:54 schrieb Dmitry Osipenko:
->> Higher order pages allocated using alloc_pages() aren't refcounted and
->> they
->> need to be refcounted, otherwise it's impossible to map them by KVM. This
->> patch sets the refcount of the tail pages and fixes the KVM memory
->> mapping
->> faults.
+Am 15.08.22 um 12:09 schrieb Dmitry Osipenko:
+> On 8/15/22 13:05, Christian König wrote:
+>> Am 15.08.22 um 11:54 schrieb Dmitry Osipenko:
+>>> Higher order pages allocated using alloc_pages() aren't refcounted and
+>>> they
+>>> need to be refcounted, otherwise it's impossible to map them by KVM. This
+>>> patch sets the refcount of the tail pages and fixes the KVM memory
+>>> mapping
+>>> faults.
+>>>
+>>> Without this change guest virgl driver can't map host buffers into guest
+>>> and can't provide OpenGL 4.5 profile support to the guest. The host
+>>> mappings are also needed for enabling the Venus driver using host GPU
+>>> drivers that are utilizing TTM.
+>>>
+>>> Based on a patch proposed by Trigger Huang.
+>> Well I can't count how often I have repeated this: This is an absolutely
+>> clear NAK!
 >>
->> Without this change guest virgl driver can't map host buffers into guest
->> and can't provide OpenGL 4.5 profile support to the guest. The host
->> mappings are also needed for enabling the Venus driver using host GPU
->> drivers that are utilizing TTM.
->>
->> Based on a patch proposed by Trigger Huang.
-> 
-> Well I can't count how often I have repeated this: This is an absolutely
-> clear NAK!
-> 
-> TTM pages are not reference counted in the first place and because of
-> this giving them to virgl is illegal.
+>> TTM pages are not reference counted in the first place and because of
+>> this giving them to virgl is illegal.
+> A? The first page is refcounted when allocated, the tail pages are not.
 
-A? The first page is refcounted when allocated, the tail pages are not.
+No they aren't. The first page is just by coincident initialized with a 
+refcount of 1. This refcount is completely ignored and not used at all.
 
-> Please immediately stop this completely broken approach. We have
-> discussed this multiple times now.
+Incrementing the reference count and by this mapping the page into some 
+other address space is illegal and corrupts the internal state tracking 
+of TTM.
 
-Could you please give me a link to these discussions?
+>> Please immediately stop this completely broken approach. We have
+>> discussed this multiple times now.
+> Could you please give me a link to these discussions?
 
--- 
-Best regards,
-Dmitry
+Not of hand, please search the dri-devel list for similar patches. This 
+was brought up multiple times now.
+
+Regards,
+Christian.
