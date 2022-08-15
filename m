@@ -2,170 +2,304 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 1903F592A05
-	for <lists+kvm@lfdr.de>; Mon, 15 Aug 2022 09:02:13 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id D30F4592A49
+	for <lists+kvm@lfdr.de>; Mon, 15 Aug 2022 09:17:07 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231448AbiHOHCK (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 15 Aug 2022 03:02:10 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35498 "EHLO
+        id S241656AbiHOHRF (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 15 Aug 2022 03:17:05 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47032 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230225AbiHOHCI (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 15 Aug 2022 03:02:08 -0400
-Received: from out4-smtp.messagingengine.com (out4-smtp.messagingengine.com [66.111.4.28])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9315ADFD9;
-        Mon, 15 Aug 2022 00:02:07 -0700 (PDT)
-Received: from compute1.internal (compute1.nyi.internal [10.202.2.41])
-        by mailout.nyi.internal (Postfix) with ESMTP id ED7175C00C5;
-        Mon, 15 Aug 2022 03:02:06 -0400 (EDT)
-Received: from mailfrontend2 ([10.202.2.163])
-  by compute1.internal (MEProxy); Mon, 15 Aug 2022 03:02:06 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=anarazel.de; h=
-        cc:cc:content-type:date:date:from:from:in-reply-to:in-reply-to
-        :message-id:mime-version:references:reply-to:sender:subject
-        :subject:to:to; s=fm1; t=1660546926; x=1660633326; bh=7XuUYChiRO
-        cmN5Xe3tNrNb0d4/N6U6GmFm8bRA2mFtk=; b=vH5e5G5tLvGDdYIwaCom93xIqK
-        /6QcVDoe1ka18/izrAzvhNMVIv423tgERZhx+sjgFaZ4S4WO1qLUATrrWdIXM6Go
-        LSJQSTwfCu6V8oee8TmU+35873gzvFWshjjfJWybrebTMTL3fPtH+5DuxEkAXNWV
-        Nv06f5tcqHcib1A/AcLoSIQbNNscKYE4b9ZNaxaVn+MbaY19BZEs5xQySS1PZmeU
-        KnqZq5PUMJA/61i5S4EWgPqYstenYf4Zxcl9d9/dv+9NwN5tr4dEj0CT0dV9nZb0
-        mcTgyG//37OJ+tFNPPZmCRx9JvZhQbwN46uJJTRQoVAklZFeJifvnHWUI76g==
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
-        messagingengine.com; h=cc:cc:content-type:date:date:feedback-id
-        :feedback-id:from:from:in-reply-to:in-reply-to:message-id
-        :mime-version:references:reply-to:sender:subject:subject:to:to
-        :x-me-proxy:x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=
-        fm1; t=1660546926; x=1660633326; bh=7XuUYChiROcmN5Xe3tNrNb0d4/N6
-        U6GmFm8bRA2mFtk=; b=0Mh9+zPWZ20UDPeP7vaHcWXp/NI8ITDyDD3QP8533ylV
-        /+cdrGP2w1N1yWTzSjfmYRgVDG8NzDgZUZmk/jEVrA/RGvuPBfVS2i54NryJAGFA
-        j2rxw4B659ne16DH99ePsDBUB/8/9r4ndTSeGfN4zzaV24S6UlcW7H5YOgC5QhJw
-        yVXvhDCMKBIquJKp6DkmrZ5nzwuHI0u5VYDXPM+A5p7viRECWYXSecpREofxQZuy
-        0wzND6APj+G6UjizDOyFcmYR/phKTG25KGjHCOF1xVb9VA2fsOaoIsByzJ62A1e+
-        giYQmOFtQ6MN4tyBoQu6fkalNpK/UyBQPuw9iuc0Jw==
-X-ME-Sender: <xms:bO_5Yt3A_yXm-xHz4fhrr0yd8O9daPYalo0o1IdTFY7xHLnzFteJeQ>
-    <xme:bO_5YkHI3a5OUndFVMzpNfllZiWLiMYSS-vmgBEUsaIpEQ9s9GtrytRjwjSn5wTCj
-    otax7oE7ZH_mRW-vw>
-X-ME-Received: <xmr:bO_5Yt4Bpac5DfOgs7Wvh-d_XGVQPVpSlt1qA2ehBEq9R9X4axVz7kFQRvxYJ4fF0I9jD4mjiJwxdfEBzEyyPPE9vFWmSYY8RUN8GW4eN-RpsuSh6ypyBCieXJt4>
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgedvfedrvdehuddguddukecutefuodetggdotefrod
-    ftvfcurfhrohhfihhlvgemucfhrghsthforghilhdpqfgfvfdpuffrtefokffrpgfnqfgh
-    necuuegrihhlohhuthemuceftddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmd
-    enucfjughrpeffhffvvefukfhfgggtuggjsehttdertddttddvnecuhfhrohhmpeetnhgu
-    rhgvshcuhfhrvghunhguuceorghnughrvghssegrnhgrrhgriigvlhdruggvqeenucggtf
-    frrghtthgvrhhnpeeuleehvdekhedvvdegveelkeethfetfeeufeehhfetiefggfdtgeek
-    keegieegueenucffohhmrghinhepkhgvrhhnvghlrdhorhhgnecuvehluhhsthgvrhfuih
-    iivgeptdenucfrrghrrghmpehmrghilhhfrhhomheprghnughrvghssegrnhgrrhgriigv
-    lhdruggv
-X-ME-Proxy: <xmx:be_5Yq2reiIsazzhUnbA6CSFyQggLT14gX8z1vPb04JEKdiOv-9ttg>
-    <xmx:be_5YgFLOGrNJVMTgjfz18VrH7gMLOrGtrImU1IOibeyhrIZjp7vMw>
-    <xmx:be_5Yr9xLVFZt0cFdLN1d3e6lP-qzPXptj7pF5fcWmmmEv8q8uXarA>
-    <xmx:bu_5YjGomEc1YBtJYX2oYkWY_i9_YqIFKCU7yeyOH5OMbCEPyRH7Kw>
-Feedback-ID: id4a34324:Fastmail
-Received: by mail.messagingengine.com (Postfix) with ESMTPA; Mon,
- 15 Aug 2022 03:02:04 -0400 (EDT)
-Date:   Mon, 15 Aug 2022 00:02:03 -0700
-From:   Andres Freund <andres@anarazel.de>
-To:     "Michael S. Tsirkin" <mst@redhat.com>
-Cc:     Xuan Zhuo <xuanzhuo@linux.alibaba.com>,
-        Linus Torvalds <torvalds@linux-foundation.org>,
-        kvm@vger.kernel.org, virtualization@lists.linux-foundation.org,
-        netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
-        alvaro.karsz@solid-run.com, colin.i.king@gmail.com,
-        colin.king@intel.com, dan.carpenter@oracle.com, david@redhat.com,
-        elic@nvidia.com, eperezma@redhat.com, gautam.dawar@xilinx.com,
-        gshan@redhat.com, hdegoede@redhat.com, hulkci@huawei.com,
-        jasowang@redhat.com, jiaming@nfschina.com,
-        kangjie.xu@linux.alibaba.com, lingshan.zhu@intel.com,
-        liubo03@inspur.com, michael.christie@oracle.com,
-        pankaj.gupta@amd.com, peng.fan@nxp.com, quic_mingxue@quicinc.com,
-        robin.murphy@arm.com, sgarzare@redhat.com, suwan.kim027@gmail.com,
-        syoshida@redhat.com, xieyongji@bytedance.com, xuqiang36@huawei.com,
-        Jens Axboe <axboe@kernel.dk>,
-        Guenter Roeck <linux@roeck-us.net>
-Subject: Re: [GIT PULL] virtio: fatures, fixes
-Message-ID: <20220815070203.plwjx7b3cyugpdt7@awork3.anarazel.de>
-References: <20220812114250-mutt-send-email-mst@kernel.org>
- <20220814004522.33ecrwkmol3uz7aq@awork3.anarazel.de>
- <1660441835.6907768-1-xuanzhuo@linux.alibaba.com>
- <20220814035239.m7rtepyum5xvtu2c@awork3.anarazel.de>
- <20220814043906.xkmhmnp23bqjzz4s@awork3.anarazel.de>
- <20220814045853-mutt-send-email-mst@kernel.org>
- <20220814194031.ciql3slc5c34ayjw@awork3.anarazel.de>
+        with ESMTP id S241761AbiHOHPt (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 15 Aug 2022 03:15:49 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 4B96C1EAE9
+        for <kvm@vger.kernel.org>; Mon, 15 Aug 2022 00:14:59 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1660547696;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=uunb/SmxieTcIyt41wPcw20H+0i6av2iZEDGKTJdPks=;
+        b=FHhkMkGhrpiMcwpV5aTlAcv38SCwBWqbCp3PUUTPUVpgFSWyY+4hw2E7rGQ5CrT1nNVn1O
+        X1SpQvpMJhLAOA7FCx6O166BcslyqjI/TrK5Ydu3/pRrqWPmAhtVKkJk+FdWd/HcT5mHBm
+        gZahYTnvCJH06DN+x4TxpHykdEqM1DA=
+Received: from mail-ed1-f72.google.com (mail-ed1-f72.google.com
+ [209.85.208.72]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_128_GCM_SHA256) id
+ us-mta-524-7KQsQE0gNi655WrPtSKsHg-1; Mon, 15 Aug 2022 03:14:54 -0400
+X-MC-Unique: 7KQsQE0gNi655WrPtSKsHg-1
+Received: by mail-ed1-f72.google.com with SMTP id v19-20020a056402349300b0043d42b7ddefso4216622edc.13
+        for <kvm@vger.kernel.org>; Mon, 15 Aug 2022 00:14:54 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc;
+        bh=uunb/SmxieTcIyt41wPcw20H+0i6av2iZEDGKTJdPks=;
+        b=leCw4S47cUdUQTmF4FJ65e1qaqyqWfultpzTnwSJGscCl333x+esthDhkGkamsvBt9
+         6gQQtZjeHMz7+m+WYY+rIaowvZ4YcnoejSqXsa96JfxodgRIWX5BWnUJb/b81p5BmTeQ
+         eLjYgyOkV4C+G8VC129KEOTu576At5rNVA1vG6S903fe95zznrVUgY9xKy/jAXJwrr98
+         gw7376HDGy/WU5CGKId1Ibuizr9LAY/to3xK8NZ0R+GIcsnvFUSAxG77MqaOaDjrcWaE
+         6Q1/xIPpIPJJU8V+mInTupnuJ2Aup4syTSuIRTevoBlTfIHeug4Qe6W5+205cAi1pn05
+         e5KQ==
+X-Gm-Message-State: ACgBeo0KrR/O38Uov7d6E79ft8tk//Up+xMKIshqPO3wErGDZr5l2N3d
+        +MjqG3W/9l/JP+XtjEev/K0HNaVxmgABOIRp4qAA2myOlDeliY5wKMJjGd15eEywdg/H41vR72A
+        nLYxkRwg7Zlgg
+X-Received: by 2002:a05:6402:a47:b0:43d:17a0:fdc9 with SMTP id bt7-20020a0564020a4700b0043d17a0fdc9mr13334564edb.41.1660547693091;
+        Mon, 15 Aug 2022 00:14:53 -0700 (PDT)
+X-Google-Smtp-Source: AA6agR4YoHheG5W/eaV8BZh8HsvP1ibrkGNG7x2cY+yPrQSEoDviob3P1rxs8nDl9bBsoZz0emD9gQ==
+X-Received: by 2002:a05:6402:a47:b0:43d:17a0:fdc9 with SMTP id bt7-20020a0564020a4700b0043d17a0fdc9mr13334553edb.41.1660547692848;
+        Mon, 15 Aug 2022 00:14:52 -0700 (PDT)
+Received: from redhat.com ([2.54.169.49])
+        by smtp.gmail.com with ESMTPSA id f1-20020a1709067f8100b007310a9a65cbsm3880906ejr.16.2022.08.15.00.14.46
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 15 Aug 2022 00:14:52 -0700 (PDT)
+Date:   Mon, 15 Aug 2022 03:14:43 -0400
+From:   "Michael S. Tsirkin" <mst@redhat.com>
+To:     Xuan Zhuo <xuanzhuo@linux.alibaba.com>
+Cc:     virtualization@lists.linux-foundation.org,
+        Richard Weinberger <richard@nod.at>,
+        Anton Ivanov <anton.ivanov@cambridgegreys.com>,
+        Johannes Berg <johannes@sipsolutions.net>,
+        Jason Wang <jasowang@redhat.com>,
+        "David S. Miller" <davem@davemloft.net>,
+        Eric Dumazet <edumazet@google.com>,
+        Jakub Kicinski <kuba@kernel.org>,
+        Paolo Abeni <pabeni@redhat.com>,
+        Hans de Goede <hdegoede@redhat.com>,
+        Mark Gross <markgross@kernel.org>,
+        Vadim Pasternak <vadimp@nvidia.com>,
+        Bjorn Andersson <bjorn.andersson@linaro.org>,
+        Mathieu Poirier <mathieu.poirier@linaro.org>,
+        Cornelia Huck <cohuck@redhat.com>,
+        Halil Pasic <pasic@linux.ibm.com>,
+        Eric Farman <farman@linux.ibm.com>,
+        Heiko Carstens <hca@linux.ibm.com>,
+        Vasily Gorbik <gor@linux.ibm.com>,
+        Alexander Gordeev <agordeev@linux.ibm.com>,
+        Christian Borntraeger <borntraeger@linux.ibm.com>,
+        Sven Schnelle <svens@linux.ibm.com>,
+        Alexei Starovoitov <ast@kernel.org>,
+        Daniel Borkmann <daniel@iogearbox.net>,
+        Jesper Dangaard Brouer <hawk@kernel.org>,
+        John Fastabend <john.fastabend@gmail.com>,
+        Vincent Whitchurch <vincent.whitchurch@axis.com>,
+        linux-um@lists.infradead.org, netdev@vger.kernel.org,
+        platform-driver-x86@vger.kernel.org,
+        linux-remoteproc@vger.kernel.org, linux-s390@vger.kernel.org,
+        kvm@vger.kernel.org, bpf@vger.kernel.org,
+        kangjie.xu@linux.alibaba.com
+Subject: Re: [PATCH v14 37/42] virtio_net: set the default max ring size by
+ find_vqs()
+Message-ID: <20220815031022-mutt-send-email-mst@kernel.org>
+References: <20220801063902.129329-1-xuanzhuo@linux.alibaba.com>
+ <20220801063902.129329-38-xuanzhuo@linux.alibaba.com>
+ <20220815015405-mutt-send-email-mst@kernel.org>
+ <1660545303.436073-9-xuanzhuo@linux.alibaba.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20220814194031.ciql3slc5c34ayjw@awork3.anarazel.de>
-X-Spam-Status: No, score=-2.8 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,
-        RCVD_IN_MSPIKE_H3,RCVD_IN_MSPIKE_WL,SPF_HELO_PASS,SPF_PASS,
-        T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
+In-Reply-To: <1660545303.436073-9-xuanzhuo@linux.alibaba.com>
+X-Spam-Status: No, score=-2.2 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=unavailable
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi,
-
-On 2022-08-14 12:40:31 -0700, Andres Freund wrote:
-> On 2022-08-14 04:59:48 -0400, Michael S. Tsirkin wrote:
-> > On Sat, Aug 13, 2022 at 09:39:06PM -0700, Andres Freund wrote:
-> > > Hi,
+On Mon, Aug 15, 2022 at 02:35:03PM +0800, Xuan Zhuo wrote:
+> On Mon, 15 Aug 2022 02:00:16 -0400, "Michael S. Tsirkin" <mst@redhat.com> wrote:
+> > On Mon, Aug 01, 2022 at 02:38:57PM +0800, Xuan Zhuo wrote:
+> > > Use virtio_find_vqs_ctx_size() to specify the maximum ring size of tx,
+> > > rx at the same time.
 > > >
-> > > On 2022-08-13 20:52:39 -0700, Andres Freund wrote:
-> > > > Is there specific information you'd like from the VM? I just recreated the
-> > > > problem and can extract.
+> > >                          | rx/tx ring size
+> > > -------------------------------------------
+> > > speed == UNKNOWN or < 10G| 1024
+> > > speed < 40G              | 4096
+> > > speed >= 40G             | 8192
 > > >
-> > > Actually, after reproducing I seem to now hit a likely different issue. I
-> > > guess I should have checked exactly the revision I had a problem with earlier,
-> > > rather than doing a git pull (up to aea23e7c464b)
+> > > Call virtnet_update_settings() once before calling init_vqs() to update
+> > > speed.
+> > >
+> > > Signed-off-by: Xuan Zhuo <xuanzhuo@linux.alibaba.com>
+> > > Acked-by: Jason Wang <jasowang@redhat.com>
 > >
-> > Looks like there's a generic memory corruption so it crashes
-> > in random places.
->
-> Either a generic memory corruption, or something wrong with IO.
->
-> > Would bisect be possible for you?
->
-> I'll give it a go.
-
-Bisect points to
-
-commit 762faee5a2678559d3dc09d95f8f2c54cd0466a7 (refs/bisect/bad)
-Author: Xuan Zhuo <xuanzhuo@linux.alibaba.com>
-Date:   Mon Aug 1 14:38:57 2022 +0800
-
-    virtio_net: set the default max ring size by find_vqs()
-
-    Use virtio_find_vqs_ctx_size() to specify the maximum ring size of tx,
-    rx at the same time.
-
-                             | rx/tx ring size
-    -------------------------------------------
-    speed == UNKNOWN or < 10G| 1024
-    speed < 40G              | 4096
-    speed >= 40G             | 8192
-
-    Call virtnet_update_settings() once before calling init_vqs() to update
-    speed.
-
-    Signed-off-by: Xuan Zhuo <xuanzhuo@linux.alibaba.com>
-    Acked-by: Jason Wang <jasowang@redhat.com>
-    Message-Id: <20220801063902.129329-38-xuanzhuo@linux.alibaba.com>
-    Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
+> > I've been looking at this patchset because of the resent
+> > reported crashes, and I'm having second thoughts about this.
+> >
+> > Do we really want to second-guess the device supplied
+> > max ring size? If yes why?
+> >
+> > Could you please share some performance data that motivated this
+> > specific set of numbers?
+> 
+> 
+> The impact of this value on performance is as follows. The larger the value, the
+> throughput can be increased, but the delay will also increase accordingly. It is
+> a maximum limit for the ring size under the corresponding speed. The purpose of
+> this limitation is not to improve performance, but more to reduce memory usage.
+> 
+> These data come from many other network cards and some network optimization
+> experience.
+> 
+> For example, in the case of speed = 20G, the impact of ring size greater
+> than 4096 on performance has no meaning. At this time, if the device supports
+> 8192, we limit it to 4096 through this, the real meaning is to reduce the memory
+> usage.
+> 
+> 
+> >
+> > Also why do we intepret UNKNOWN as "very low"?
+> > I'm thinking that should definitely be "don't change anything".
+> >
+> 
+> Generally speaking, for a network card with a high speed, it will return a
+> correct speed. But I think it is a good idea to do nothing.
 
 
-I'm not 100% confident yet, because the likelihood of encountering problems
-was not uniform across the versions, with one of them showing the problem only
-in 1/3 boots, whereas some of the others showed it 100% of the time. But I've
-rebooted enough times to be fairly confident.
-
-With 762faee5a267 I reliably see network not connecting, with
-762faee5a267^=fe3dc04e31aa I haven't seen a problem yet.
 
 
-I did see some other types of crashes in commits nearby, so this might not be
-the only problematic bit. See also the discussion around
-https://lore.kernel.org/all/CAHk-=wikzU4402P-FpJRK_QwfVOS+t-3p1Wx5awGHTvr-s_0Ew@mail.gmail.com/
 
-Greetings,
+> 
+> > Finally if all this makes sense then shouldn't we react when
+> > speed changes?
+> 
+> This is the feedback of the network card when it is started, and theoretically
+> it should not change in the future.
 
-Andres Freund
+Yes it should:
+	Both \field{speed} and \field{duplex} can change, thus the driver
+	is expected to re-read these values after receiving a
+	configuration change notification.
+
+
+Moreover, during probe link can quite reasonably be down.
+If it is, then speed and duplex might not be correct.
+
+
+
+
+> >
+> > Could you try reverting this and showing performance results
+> > before and after please? Thanks!
+> 
+> I hope the above reply can help you, if there is anything else you need me to
+> cooperate with, I am very happy.
+> 
+> If you think it's ok, I can resubmit a commit with 'UNKNOW' set to unlimited. I
+> can submit it with the issue of #30.
+> 
+> Thanks.
+> 
+> 
+> >
+> > > ---
+> > >  drivers/net/virtio_net.c | 42 ++++++++++++++++++++++++++++++++++++----
+> > >  1 file changed, 38 insertions(+), 4 deletions(-)
+> > >
+> > > diff --git a/drivers/net/virtio_net.c b/drivers/net/virtio_net.c
+> > > index 8a5810bcb839..40532ecbe7fc 100644
+> > > --- a/drivers/net/virtio_net.c
+> > > +++ b/drivers/net/virtio_net.c
+> > > @@ -3208,6 +3208,29 @@ static unsigned int mergeable_min_buf_len(struct virtnet_info *vi, struct virtqu
+> > >  		   (unsigned int)GOOD_PACKET_LEN);
+> > >  }
+> > >
+> > > +static void virtnet_config_sizes(struct virtnet_info *vi, u32 *sizes)
+> > > +{
+> > > +	u32 i, rx_size, tx_size;
+> > > +
+> > > +	if (vi->speed == SPEED_UNKNOWN || vi->speed < SPEED_10000) {
+> > > +		rx_size = 1024;
+> > > +		tx_size = 1024;
+> > > +
+> > > +	} else if (vi->speed < SPEED_40000) {
+> > > +		rx_size = 1024 * 4;
+> > > +		tx_size = 1024 * 4;
+> > > +
+> > > +	} else {
+> > > +		rx_size = 1024 * 8;
+> > > +		tx_size = 1024 * 8;
+> > > +	}
+> > > +
+> > > +	for (i = 0; i < vi->max_queue_pairs; i++) {
+> > > +		sizes[rxq2vq(i)] = rx_size;
+> > > +		sizes[txq2vq(i)] = tx_size;
+> > > +	}
+> > > +}
+> > > +
+> > >  static int virtnet_find_vqs(struct virtnet_info *vi)
+> > >  {
+> > >  	vq_callback_t **callbacks;
+> > > @@ -3215,6 +3238,7 @@ static int virtnet_find_vqs(struct virtnet_info *vi)
+> > >  	int ret = -ENOMEM;
+> > >  	int i, total_vqs;
+> > >  	const char **names;
+> > > +	u32 *sizes;
+> > >  	bool *ctx;
+> > >
+> > >  	/* We expect 1 RX virtqueue followed by 1 TX virtqueue, followed by
+> > > @@ -3242,10 +3266,15 @@ static int virtnet_find_vqs(struct virtnet_info *vi)
+> > >  		ctx = NULL;
+> > >  	}
+> > >
+> > > +	sizes = kmalloc_array(total_vqs, sizeof(*sizes), GFP_KERNEL);
+> > > +	if (!sizes)
+> > > +		goto err_sizes;
+> > > +
+> > >  	/* Parameters for control virtqueue, if any */
+> > >  	if (vi->has_cvq) {
+> > >  		callbacks[total_vqs - 1] = NULL;
+> > >  		names[total_vqs - 1] = "control";
+> > > +		sizes[total_vqs - 1] = 64;
+> > >  	}
+> > >
+> > >  	/* Allocate/initialize parameters for send/receive virtqueues */
+> > > @@ -3260,8 +3289,10 @@ static int virtnet_find_vqs(struct virtnet_info *vi)
+> > >  			ctx[rxq2vq(i)] = true;
+> > >  	}
+> > >
+> > > -	ret = virtio_find_vqs_ctx(vi->vdev, total_vqs, vqs, callbacks,
+> > > -				  names, ctx, NULL);
+> > > +	virtnet_config_sizes(vi, sizes);
+> > > +
+> > > +	ret = virtio_find_vqs_ctx_size(vi->vdev, total_vqs, vqs, callbacks,
+> > > +				       names, sizes, ctx, NULL);
+> > >  	if (ret)
+> > >  		goto err_find;
+> > >
+> > > @@ -3281,6 +3312,8 @@ static int virtnet_find_vqs(struct virtnet_info *vi)
+> > >
+> > >
+> > >  err_find:
+> > > +	kfree(sizes);
+> > > +err_sizes:
+> > >  	kfree(ctx);
+> > >  err_ctx:
+> > >  	kfree(names);
+> > > @@ -3630,6 +3663,9 @@ static int virtnet_probe(struct virtio_device *vdev)
+> > >  		vi->curr_queue_pairs = num_online_cpus();
+> > >  	vi->max_queue_pairs = max_queue_pairs;
+> > >
+> > > +	virtnet_init_settings(dev);
+> > > +	virtnet_update_settings(vi);
+> > > +
+> > >  	/* Allocate/initialize the rx/tx queues, and invoke find_vqs */
+> > >  	err = init_vqs(vi);
+> > >  	if (err)
+> > > @@ -3642,8 +3678,6 @@ static int virtnet_probe(struct virtio_device *vdev)
+> > >  	netif_set_real_num_tx_queues(dev, vi->curr_queue_pairs);
+> > >  	netif_set_real_num_rx_queues(dev, vi->curr_queue_pairs);
+> > >
+> > > -	virtnet_init_settings(dev);
+> > > -
+> > >  	if (virtio_has_feature(vdev, VIRTIO_NET_F_STANDBY)) {
+> > >  		vi->failover = net_failover_create(vi->dev);
+> > >  		if (IS_ERR(vi->failover)) {
+> > > --
+> > > 2.31.0
+> >
+
