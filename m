@@ -2,94 +2,72 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 45CCC592F6A
-	for <lists+kvm@lfdr.de>; Mon, 15 Aug 2022 15:09:19 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id C7561592F5E
+	for <lists+kvm@lfdr.de>; Mon, 15 Aug 2022 15:06:08 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S242645AbiHONJL (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 15 Aug 2022 09:09:11 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48442 "EHLO
+        id S233736AbiHONGG (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 15 Aug 2022 09:06:06 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46416 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229816AbiHONJJ (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 15 Aug 2022 09:09:09 -0400
+        with ESMTP id S231493AbiHONGE (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 15 Aug 2022 09:06:04 -0400
 Received: from mga01.intel.com (mga01.intel.com [192.55.52.88])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 57FCE1A050;
-        Mon, 15 Aug 2022 06:09:08 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 22DCF19031;
+        Mon, 15 Aug 2022 06:06:04 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1660568948; x=1692104948;
-  h=date:from:to:cc:subject:message-id:reply-to:references:
-   mime-version:in-reply-to;
-  bh=uC6wcjTIjKWZdEEUC6nc6q/QLuQ42xa9S3mFqSAWmAc=;
-  b=D7z1M7k05lfgk/4oNMiHl6lR0EEZWjiK78uYc0+ltrFjyA/mNld6zARG
-   k7ZgsdkTCNGGjsnJr9RofIHSyuCJkl7M7ioTOZqbHuDVBMdnw8Rx83D58
-   DyB1YNE9SkEX4soApUwcFZLdY4JfrN6g1kl16OIBGm5A3pD+z0ZfpBocw
-   bvXfl/EDl4g45w/YWmRLpPVQFHBTkQXlKcrJ3vNGrmXWiEYXP/YkKNGmT
-   mYMWjiCJJM0rVu5H5VPiCYJfhfK0BsqykWt6WjqS2Gh6NEEAtNb+1KpZz
-   49OTVE0IsSIQYsZgXwN3+vm3VGJwRolVvb4SzGaU7FgsLfpy9/h9mDlWX
-   A==;
-X-IronPort-AV: E=McAfee;i="6400,9594,10440"; a="317937105"
+  t=1660568764; x=1692104764;
+  h=message-id:date:mime-version:subject:to:cc:references:
+   from:in-reply-to:content-transfer-encoding;
+  bh=m2EuSMgDC5x1/7VKkKGbdxtg9/vb5ykdj4i/kmeCnAY=;
+  b=GjJ52App2hztcqVIHsAaVntmsVe8zeDm+i9B6AUYlulhDgoQbbmflKfc
+   s932u9uW90MbYQxUB030L9XLGivEb9bPLeeO9uyDTdYgiPxf+g15LQCk2
+   Fqtg9uZfcFpRjPusRhegdNWajGDoFq1hGeLwCLvSBOD/Hvx3u1kJRS6hi
+   kqYjAmKMhBbCgSAVlZeFm9eihVdQCzMMLN4ThTH7pT4bVk6eFcMnTXwNL
+   QGPv4wKhNHN3KqZ40sqtcPkQ2MqfaqFkKpxYXZJqEcm654P13UtRSjzL+
+   OqQa31B7Z7jzZ21A4iFLQxN1454qIVLKTDlQsUDMTpsA2KNsMG0zL9+Ac
+   w==;
+X-IronPort-AV: E=McAfee;i="6400,9594,10440"; a="317936435"
 X-IronPort-AV: E=Sophos;i="5.93,238,1654585200"; 
-   d="scan'208";a="317937105"
-Received: from orsmga008.jf.intel.com ([10.7.209.65])
-  by fmsmga101.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 15 Aug 2022 06:09:07 -0700
+   d="scan'208";a="317936435"
+Received: from fmsmga004.fm.intel.com ([10.253.24.48])
+  by fmsmga101.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 15 Aug 2022 06:06:03 -0700
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="5.93,238,1654585200"; 
-   d="scan'208";a="635470742"
-Received: from chaop.bj.intel.com (HELO localhost) ([10.240.193.75])
-  by orsmga008.jf.intel.com with ESMTP; 15 Aug 2022 06:08:56 -0700
-Date:   Mon, 15 Aug 2022 21:04:11 +0800
-From:   Chao Peng <chao.p.peng@linux.intel.com>
-To:     "Nikunj A. Dadhania" <nikunj@amd.com>
-Cc:     "Gupta, Pankaj" <pankaj.gupta@amd.com>,
-        Sean Christopherson <seanjc@google.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Jonathan Corbet <corbet@lwn.net>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        x86@kernel.org, "H . Peter Anvin" <hpa@zytor.com>,
-        Hugh Dickins <hughd@google.com>,
-        Jeff Layton <jlayton@kernel.org>,
-        "J . Bruce Fields" <bfields@fieldses.org>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        Shuah Khan <shuah@kernel.org>, Mike Rapoport <rppt@kernel.org>,
-        Steven Price <steven.price@arm.com>,
-        "Maciej S . Szmigiero" <mail@maciej.szmigiero.name>,
-        Vlastimil Babka <vbabka@suse.cz>,
-        Vishal Annapurve <vannapurve@google.com>,
-        Yu Zhang <yu.c.zhang@linux.intel.com>,
-        "Kirill A . Shutemov" <kirill.shutemov@linux.intel.com>,
-        luto@kernel.org, jun.nakajima@intel.com, dave.hansen@intel.com,
-        ak@linux.intel.com, david@redhat.com, aarcange@redhat.com,
-        ddutile@redhat.com, dhildenb@redhat.com,
-        Quentin Perret <qperret@google.com>,
-        Michael Roth <michael.roth@amd.com>, mhocko@suse.com,
-        Muchun Song <songmuchun@bytedance.com>, bharata@amd.com,
-        kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
-        linux-mm@kvack.org, linux-kselftest@vger.kernel.org,
-        linux-api@vger.kernel.org, linux-doc@vger.kernel.org,
-        qemu-devel@nongnu.org, linux-fsdevel@vger.kernel.org
-Subject: Re: [PATCH v7 00/14] KVM: mm: fd-based approach for supporting KVM
- guest private memory
-Message-ID: <20220815130411.GA1073443@chaop.bj.intel.com>
-Reply-To: Chao Peng <chao.p.peng@linux.intel.com>
-References: <20220706082016.2603916-1-chao.p.peng@linux.intel.com>
- <b21f41e5-0322-bbfb-b9c2-db102488592d@amd.com>
- <9e86daea-5619-a216-fe02-0562cf14c501@amd.com>
- <9dc91ce8-4cb6-37e6-4c25-27a72dc11dd0@amd.com>
- <422b9f97-fdf5-54bf-6c56-3c45eff5e174@amd.com>
- <1407c70c-0c0b-6955-10bb-d44c5928f2d9@amd.com>
- <1136925c-2e37-6af4-acac-be8bed9f6ed5@amd.com>
- <1b02db9d-f2f1-94dd-6f37-59481525abff@amd.com>
+   d="scan'208";a="674825396"
+Received: from linux.intel.com ([10.54.29.200])
+  by fmsmga004.fm.intel.com with ESMTP; 15 Aug 2022 06:06:03 -0700
+Received: from [10.252.214.254] (kliang2-mobl1.ccr.corp.intel.com [10.252.214.254])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+        (No client certificate requested)
+        by linux.intel.com (Postfix) with ESMTPS id 64857580C50;
+        Mon, 15 Aug 2022 06:06:02 -0700 (PDT)
+Message-ID: <952632db-b090-ceb9-1467-a6b598ca2b02@linux.intel.com>
+Date:   Mon, 15 Aug 2022 09:06:01 -0400
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <1b02db9d-f2f1-94dd-6f37-59481525abff@amd.com>
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
+ Thunderbird/102.1.2
+Subject: Re: [PATCH v2 1/7] perf/x86/core: Update x86_pmu.pebs_capable for
+ ICELAKE_{X,D}
+To:     Peter Zijlstra <peterz@infradead.org>,
+        Like Xu <like.xu.linux@gmail.com>
+Cc:     Paolo Bonzini <pbonzini@redhat.com>,
+        Sean Christopherson <seanjc@google.com>,
+        Jim Mattson <jmattson@google.com>,
+        linux-kernel@vger.kernel.org, kvm@vger.kernel.org
+References: <20220721103549.49543-1-likexu@tencent.com>
+ <20220721103549.49543-2-likexu@tencent.com>
+ <959fedce-aada-50e4-ce8d-a842d18439fa@redhat.com>
+ <YvoSXyy7ojZ9ird/@worktop.programming.kicks-ass.net>
+ <94e6c414-38e1-ebd7-0161-34548f0b5aae@gmail.com>
+ <YvozNSvcxet0gX6b@worktop.programming.kicks-ass.net>
+Content-Language: en-US
+From:   "Liang, Kan" <kan.liang@linux.intel.com>
+In-Reply-To: <YvozNSvcxet0gX6b@worktop.programming.kicks-ass.net>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 X-Spam-Status: No, score=-7.0 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_EF,RCVD_IN_DNSWL_HI,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_DNSWL_HI,
         RCVD_IN_MSPIKE_H3,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE,
         T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
@@ -98,50 +76,74 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Aug 12, 2022 at 02:18:43PM +0530, Nikunj A. Dadhania wrote:
-> 
-> 
-> On 12/08/22 12:48, Gupta, Pankaj wrote:
-> > 
-> >>>>>>
-> >>>>>> However, fallocate() preallocates full guest memory before starting the guest.
-> >>>>>> With this behaviour guest memory is *not* demand pinned. Is there a way to
-> >>>>>> prevent fallocate() from reserving full guest memory?
-> >>>>>
-> >>>>> Isn't the pinning being handled by the corresponding host memory backend with mmu > notifier and architecture support while doing the memory operations e.g page> migration and swapping/reclaim (not supported currently AFAIU). But yes, we need> to allocate entire guest memory with the new flags MEMFILE_F_{UNMOVABLE, UNRECLAIMABLE etc}.
-> >>>>
-> >>>> That is correct, but the question is when does the memory allocated, as these flags are set,
-> >>>> memory is neither moved nor reclaimed. In current scenario, if I start a 32GB guest, all 32GB is
-> >>>> allocated.
-> >>>
-> >>> I guess so if guest memory is private by default.
-> >>>
-> >>> Other option would be to allocate memory as shared by default and
-> >>> handle on demand allocation and RMPUPDATE with page state change event. But still that would be done at guest boot time, IIUC.
-> >>
-> >> Sorry! Don't want to hijack the other thread so replying here.
-> >>
-> >> I thought the question is for SEV SNP. For SEV, maybe the hypercall with the page state information can be used to allocate memory as we use it or something like quota based memory allocation (just thinking).
-> > 
-> > But all this would have considerable performance overhead (if by default memory is shared) and used mostly at boot time. 
-> 
-> > So, preallocating memory (default memory private) seems better approach for both SEV & SEV SNP with later page management (pinning, reclaim) taken care by host memory backend & architecture together.
-> 
-> I am not sure how will pre-allocating memory help, even if guest would not use full memory it will be pre-allocated. Which if I understand correctly is not expected.
 
-Actually the current version allows you to delay the allocation to a
-later time (e.g. page fault time) if you don't call fallocate() on the
-private fd. fallocate() is necessary in previous versions because we
-treat the existense in the fd as 'private' but in this version we track
-private/shared info in KVM so we don't rely on that fact from memory
-backstores.
 
-Definitely the page will still be pinned once it's allocated, there is
-no way to swap it out for example just with the current code. That kind
-of support, if desirable, can be extended through MOVABLE flag and some
-other callbacks to let feature-specific code to involve.
-
-Chao
+On 2022-08-15 7:51 a.m., Peter Zijlstra wrote:
+> On Mon, Aug 15, 2022 at 05:43:34PM +0800, Like Xu wrote:
 > 
-> Regards
-> Nikunj
+>>> diff --git a/arch/x86/events/intel/core.c b/arch/x86/events/intel/core.c
+>>> index 2db93498ff71..b42c1beb9924 100644
+>>> --- a/arch/x86/events/intel/core.c
+>>> +++ b/arch/x86/events/intel/core.c
+>>> @@ -5933,7 +5933,6 @@ __init int intel_pmu_init(void)
+>>>   		x86_pmu.pebs_aliases = NULL;
+>>>   		x86_pmu.pebs_prec_dist = true;
+>>>   		x86_pmu.lbr_pt_coexist = true;
+>>> -		x86_pmu.pebs_capable = ~0ULL;
+>>>   		x86_pmu.flags |= PMU_FL_HAS_RSP_1;
+>>>   		x86_pmu.flags |= PMU_FL_PEBS_ALL;
+>>>   		x86_pmu.get_event_constraints = glp_get_event_constraints;
+>>> @@ -6291,7 +6290,6 @@ __init int intel_pmu_init(void)
+>>>   		x86_pmu.pebs_aliases = NULL;
+>>>   		x86_pmu.pebs_prec_dist = true;
+>>>   		x86_pmu.pebs_block = true;
+>>> -		x86_pmu.pebs_capable = ~0ULL;
+>>>   		x86_pmu.flags |= PMU_FL_HAS_RSP_1;
+>>>   		x86_pmu.flags |= PMU_FL_NO_HT_SHARING;
+>>>   		x86_pmu.flags |= PMU_FL_PEBS_ALL;
+>>> @@ -6337,7 +6335,6 @@ __init int intel_pmu_init(void)
+>>>   		x86_pmu.pebs_aliases = NULL;
+>>>   		x86_pmu.pebs_prec_dist = true;
+>>>   		x86_pmu.pebs_block = true;
+>>> -		x86_pmu.pebs_capable = ~0ULL;
+>>>   		x86_pmu.flags |= PMU_FL_HAS_RSP_1;
+>>>   		x86_pmu.flags |= PMU_FL_NO_HT_SHARING;
+>>>   		x86_pmu.flags |= PMU_FL_PEBS_ALL;
+>>> diff --git a/arch/x86/events/intel/ds.c b/arch/x86/events/intel/ds.c
+>>> index ba60427caa6d..e2da643632b9 100644
+>>> --- a/arch/x86/events/intel/ds.c
+>>> +++ b/arch/x86/events/intel/ds.c
+>>> @@ -2258,6 +2258,7 @@ void __init intel_ds_init(void)
+>>>   			x86_pmu.drain_pebs = intel_pmu_drain_pebs_icl;
+>>>   			x86_pmu.pebs_record_size = sizeof(struct pebs_basic);
+>>>   			if (x86_pmu.intel_cap.pebs_baseline) {
+>>> +				x86_pmu.pebs_capable = ~0ULL;
+>>
+>> The two features of "Extended PEBS (about pebs_capable)" and "Adaptive PEBS
+>> (about pebs_baseline)"
+>> are orthogonal, although the two are often supported together.
+> 
+> The SDM explicitly states that PEBS Baseline implies Extended PEBS. See
+> 3-19.8 (April 22 edition).
+> 
+> The question is if there is hardware that has Extended PEBS but doesn't
+> have Baseline; and I simply don't know and was hoping Kan could find
+> out.
+
+Goldmont Plus should be the only platform which supports extended PEBS
+but doesn't have Baseline.
+
+> 
+> That said; the above patch can be further improved by also removing the
+> PMU_FL_PEBS_ALL lines, which is already set by intel_ds_init().
+
+I think we have to keep PMU_FL_PEBS_ALL for the Goldmont Plus. But we
+can remove it for SPR and ADL in intel_pmu_init(), since it's already
+set in the intel_ds_init() for the Baseline.
+
+Thanks,
+Kan
+> 
+> In general though; the point is, we shouldn't be doing the FMS table
+> thing for discoverable features. Having pebs_capable = ~0 and
+> PMU_FL_PEBS_ALL on something with BASELINE set is just wrong.
