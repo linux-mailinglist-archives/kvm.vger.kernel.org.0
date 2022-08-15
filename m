@@ -2,171 +2,146 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 20981592C3C
-	for <lists+kvm@lfdr.de>; Mon, 15 Aug 2022 12:51:35 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id BC60A592C9B
+	for <lists+kvm@lfdr.de>; Mon, 15 Aug 2022 12:52:04 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S242116AbiHOJnp (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 15 Aug 2022 05:43:45 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35396 "EHLO
+        id S242188AbiHOJz6 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 15 Aug 2022 05:55:58 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46984 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S242098AbiHOJnn (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 15 Aug 2022 05:43:43 -0400
-Received: from mail-pl1-x631.google.com (mail-pl1-x631.google.com [IPv6:2607:f8b0:4864:20::631])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7CD081EC7B;
-        Mon, 15 Aug 2022 02:43:42 -0700 (PDT)
-Received: by mail-pl1-x631.google.com with SMTP id 17so5958034pli.0;
-        Mon, 15 Aug 2022 02:43:42 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :from:to:cc;
-        bh=VGpb9yI++t5guVH3M2YI/eDKS/dhqvfqUzMOcfAxFYM=;
-        b=gpB9oB+d+adC3A2ILZHzdUTWDfix4r5IqThT5UGjkMW6MFsSFd+4Le1XvWyHHUYxNp
-         6EI715Xp4ESBJNNfwyZ0a3QvoR7P4Bv7bnV/QhFvCPS0OxUSAiPpGg2jiF2lU2no3QoO
-         hKhy4eikoePjMuvzpxyaL5hJdXPeIgVT88cYCGFCmxUR44NNLqw9WIuXldhVz60LoRgw
-         u8DhjdMPOEBx7qfIyiYqAMtVh9eCrl9FVEqbdDDmq2bwUBxhI3pfcfMvO9UhwTbZNsmW
-         mV+/IO7uA5LRJP9iSYRD3GknT0Pp4f2IClojrIT8lWM1/reOr415b4yd8v37qOjZryMH
-         sFAg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc;
-        bh=VGpb9yI++t5guVH3M2YI/eDKS/dhqvfqUzMOcfAxFYM=;
-        b=2Fdjco9dAAQmgiHvJLW9W7wDXMkppGw8HLUNud0MtOcbcSAhpTMeyeVSCBa9xu/njh
-         zFoAm0hjwJKSDcLLxOIyRSbGSEnnGVHZhpSQjyxUxA8GuMxyRvt7UOAGM64i2Rqn5KeX
-         +DUdMHwIIlVvtq9duSuUZ4jShJqr0oLDF6QfQ4IePBG9g3JpvP5+KRYJPFegbgapB5nP
-         Jty/1CtrsM1Ca34xq9WaXUUUXYNUvCoP2dSkauYouBq7n3FQQan5gKhnUR9f3PPuatfO
-         ovuvBE6m3wSIn+yIpg4GFj8bOaJ5x+8BRjS9RtzCM1cy+mh7a2pu2Bs8a7BunY/e5oU2
-         sLJA==
-X-Gm-Message-State: ACgBeo0Qibtcl5ZgKixZ6nfSpJKKNx8gR6hVucc6tpzHwADTRhg7DPPT
-        osboyBIEuc3XDIor41DyXl4=
-X-Google-Smtp-Source: AA6agR7ju0iT+Ai73DrRPx/j6EPOe56/R2gA20CwOKA5toF2Ke90gkNy/DgQ4JvhgLE7M8wGDPlUPQ==
-X-Received: by 2002:a17:90b:4a0a:b0:1f4:e4fc:91d3 with SMTP id kk10-20020a17090b4a0a00b001f4e4fc91d3mr26878322pjb.67.1660556621938;
-        Mon, 15 Aug 2022 02:43:41 -0700 (PDT)
-Received: from [192.168.255.10] ([103.7.29.32])
-        by smtp.gmail.com with ESMTPSA id z6-20020a170903018600b0016ccbc9db0fsm6740246plg.5.2022.08.15.02.43.39
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 15 Aug 2022 02:43:41 -0700 (PDT)
-Message-ID: <94e6c414-38e1-ebd7-0161-34548f0b5aae@gmail.com>
-Date:   Mon, 15 Aug 2022 17:43:34 +0800
+        with ESMTP id S241706AbiHOJzo (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 15 Aug 2022 05:55:44 -0400
+Received: from madras.collabora.co.uk (madras.collabora.co.uk [IPv6:2a00:1098:0:82:1000:25:2eeb:e5ab])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B822B13F72;
+        Mon, 15 Aug 2022 02:55:41 -0700 (PDT)
+Received: from dimapc.. (109-252-119-13.nat.spd-mgts.ru [109.252.119.13])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+        (No client certificate requested)
+        (Authenticated sender: dmitry.osipenko)
+        by madras.collabora.co.uk (Postfix) with ESMTPSA id C74E366016A1;
+        Mon, 15 Aug 2022 10:55:38 +0100 (BST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=collabora.com;
+        s=mail; t=1660557339;
+        bh=zaXcPVUZxkdbpr2itiBa39wL3eHk/P8Ka7Jms7D1Uxs=;
+        h=From:To:Cc:Subject:Date:From;
+        b=nn2FXdBGgkdyeCuzWeFNE+CZBjGphBbWrlU+pWSfPGogHI8XKwIbbh1pPgFWkq2NQ
+         H8pknAh1ogquLUmudfBHSiWMGE/VktpxBd57FZb6N74wUjXVc/IfBdgYYBjYs/xx6F
+         4GDn0sSyc5AbKiHjlc02yIVEYSFuvT6BBB1bH1h5s92RWn6fwB12xQP985eDpfUaK7
+         rvUICptj6DFpdYG2Fc+diH3rNrejGuBqTUNnCreL7X9gFPYmayFudVKigGtjzNCfYT
+         Fb1XGNGD0kFaztjuMnEM/FNtFtJv+qKAWFXXVBdsl3UxuRbNiyxvkYMY4nvPfpN0W+
+         048ukBrErzMUw==
+From:   Dmitry Osipenko <dmitry.osipenko@collabora.com>
+To:     David Airlie <airlied@linux.ie>, Huang Rui <ray.huang@amd.com>,
+        Daniel Vetter <daniel@ffwll.ch>,
+        =?UTF-8?q?Christian=20K=C3=B6nig?= <christian.koenig@amd.com>,
+        Trigger Huang <Trigger.Huang@gmail.com>,
+        Gert Wollny <gert.wollny@collabora.com>,
+        Antonio Caggiano <antonio.caggiano@collabora.com>
+Cc:     dri-devel@lists.freedesktop.org, linux-kernel@vger.kernel.org,
+        Dmitry Osipenko <digetx@gmail.com>, kvm@vger.kernel.org,
+        kernel@collabora.com, virtualization@lists.linux-foundation.org
+Subject: [PATCH v1] drm/ttm: Refcount allocated tail pages
+Date:   Mon, 15 Aug 2022 12:54:23 +0300
+Message-Id: <20220815095423.11131-1-dmitry.osipenko@collabora.com>
+X-Mailer: git-send-email 2.37.2
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:91.0)
- Gecko/20100101 Thunderbird/91.12.0
-Subject: Re: [PATCH v2 1/7] perf/x86/core: Update x86_pmu.pebs_capable for
- ICELAKE_{X,D}
-Content-Language: en-US
-To:     Peter Zijlstra <peterz@infradead.org>,
-        Paolo Bonzini <pbonzini@redhat.com>
-Cc:     Sean Christopherson <seanjc@google.com>,
-        Jim Mattson <jmattson@google.com>,
-        linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-        Kan Liang <kan.liang@linux.intel.com>
-References: <20220721103549.49543-1-likexu@tencent.com>
- <20220721103549.49543-2-likexu@tencent.com>
- <959fedce-aada-50e4-ce8d-a842d18439fa@redhat.com>
- <YvoSXyy7ojZ9ird/@worktop.programming.kicks-ass.net>
-From:   Like Xu <like.xu.linux@gmail.com>
-In-Reply-To: <YvoSXyy7ojZ9ird/@worktop.programming.kicks-ass.net>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,NICE_REPLY_A,
-        RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
-        autolearn=ham autolearn_force=no version=3.4.6
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,SPF_HELO_NONE,SPF_PASS,
+        T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 15/8/2022 5:31 pm, Peter Zijlstra wrote:
-> On Fri, Aug 12, 2022 at 09:52:13AM +0200, Paolo Bonzini wrote:
->> On 7/21/22 12:35, Like Xu wrote:
->>> From: Like Xu <likexu@tencent.com>
->>>
->>> Ice Lake microarchitecture with EPT-Friendly PEBS capability also support
->>> the Extended feature, which means that all counters (both fixed function
->>> and general purpose counters) can be used for PEBS events.
->>>
->>> Update x86_pmu.pebs_capable like SPR to apply PEBS_ALL semantics.
->>>
->>> Cc: Kan Liang <kan.liang@linux.intel.com>
->>> Fixes: fb358e0b811e ("perf/x86/intel: Add EPT-Friendly PEBS for Ice Lake Server")
->>> Signed-off-by: Like Xu <likexu@tencent.com>
->>> ---
->>>    arch/x86/events/intel/core.c | 1 +
->>>    1 file changed, 1 insertion(+)
->>>
->>> diff --git a/arch/x86/events/intel/core.c b/arch/x86/events/intel/core.c
->>> index 4e9b7af9cc45..e46fd496187b 100644
->>> --- a/arch/x86/events/intel/core.c
->>> +++ b/arch/x86/events/intel/core.c
->>> @@ -6239,6 +6239,7 @@ __init int intel_pmu_init(void)
->>>    	case INTEL_FAM6_ICELAKE_X:
->>>    	case INTEL_FAM6_ICELAKE_D:
->>>    		x86_pmu.pebs_ept = 1;
->>> +		x86_pmu.pebs_capable = ~0ULL;
->>>    		pmem = true;
->>>    		fallthrough;
->>>    	case INTEL_FAM6_ICELAKE_L:
->>
->> Peter, can you please ack this (you were not CCed on this KVM series but
->> this patch is really perf core)?
-> 
-> I would much rather see something like this; except I don't know if it
-> is fully correct. I can never find what models support what... Kan do
-> you know?
+Higher order pages allocated using alloc_pages() aren't refcounted and they
+need to be refcounted, otherwise it's impossible to map them by KVM. This
+patch sets the refcount of the tail pages and fixes the KVM memory mapping
+faults.
 
-For guest PEBS, it's a minor optimization from 0d23dc34a7ce to reduce branch 
-instructions:
-https://lore.kernel.org/kvm/YKIqbph62oclxjnt@hirez.programming.kicks-ass.net/
+Without this change guest virgl driver can't map host buffers into guest
+and can't provide OpenGL 4.5 profile support to the guest. The host
+mappings are also needed for enabling the Venus driver using host GPU
+drivers that are utilizing TTM.
 
-> 
-> 
-> diff --git a/arch/x86/events/intel/core.c b/arch/x86/events/intel/core.c
-> index 2db93498ff71..b42c1beb9924 100644
-> --- a/arch/x86/events/intel/core.c
-> +++ b/arch/x86/events/intel/core.c
-> @@ -5933,7 +5933,6 @@ __init int intel_pmu_init(void)
->   		x86_pmu.pebs_aliases = NULL;
->   		x86_pmu.pebs_prec_dist = true;
->   		x86_pmu.lbr_pt_coexist = true;
-> -		x86_pmu.pebs_capable = ~0ULL;
->   		x86_pmu.flags |= PMU_FL_HAS_RSP_1;
->   		x86_pmu.flags |= PMU_FL_PEBS_ALL;
->   		x86_pmu.get_event_constraints = glp_get_event_constraints;
-> @@ -6291,7 +6290,6 @@ __init int intel_pmu_init(void)
->   		x86_pmu.pebs_aliases = NULL;
->   		x86_pmu.pebs_prec_dist = true;
->   		x86_pmu.pebs_block = true;
-> -		x86_pmu.pebs_capable = ~0ULL;
->   		x86_pmu.flags |= PMU_FL_HAS_RSP_1;
->   		x86_pmu.flags |= PMU_FL_NO_HT_SHARING;
->   		x86_pmu.flags |= PMU_FL_PEBS_ALL;
-> @@ -6337,7 +6335,6 @@ __init int intel_pmu_init(void)
->   		x86_pmu.pebs_aliases = NULL;
->   		x86_pmu.pebs_prec_dist = true;
->   		x86_pmu.pebs_block = true;
-> -		x86_pmu.pebs_capable = ~0ULL;
->   		x86_pmu.flags |= PMU_FL_HAS_RSP_1;
->   		x86_pmu.flags |= PMU_FL_NO_HT_SHARING;
->   		x86_pmu.flags |= PMU_FL_PEBS_ALL;
-> diff --git a/arch/x86/events/intel/ds.c b/arch/x86/events/intel/ds.c
-> index ba60427caa6d..e2da643632b9 100644
-> --- a/arch/x86/events/intel/ds.c
-> +++ b/arch/x86/events/intel/ds.c
-> @@ -2258,6 +2258,7 @@ void __init intel_ds_init(void)
->   			x86_pmu.drain_pebs = intel_pmu_drain_pebs_icl;
->   			x86_pmu.pebs_record_size = sizeof(struct pebs_basic);
->   			if (x86_pmu.intel_cap.pebs_baseline) {
-> +				x86_pmu.pebs_capable = ~0ULL;
+Based on a patch proposed by Trigger Huang.
 
-The two features of "Extended PEBS (about pebs_capable)" and "Adaptive PEBS 
-(about pebs_baseline)"
-are orthogonal, although the two are often supported together.
+Cc: stable@vger.kernel.org
+Cc: Trigger Huang <Trigger.Huang@gmail.com>
+Link: https://www.collabora.com/news-and-blog/blog/2021/11/26/venus-on-qemu-enabling-new-virtual-vulkan-driver/#qcom1343
+Tested-by: Dmitry Osipenko <dmitry.osipenko@collabora.com> # AMDGPU (Qemu and crosvm)
+Signed-off-by: Dmitry Osipenko <dmitry.osipenko@collabora.com>
+---
+ drivers/gpu/drm/ttm/ttm_pool.c | 25 ++++++++++++++++++++++++-
+ 1 file changed, 24 insertions(+), 1 deletion(-)
 
->   				x86_pmu.large_pebs_flags |=
->   					PERF_SAMPLE_BRANCH_STACK |
->   					PERF_SAMPLE_TIME;
+diff --git a/drivers/gpu/drm/ttm/ttm_pool.c b/drivers/gpu/drm/ttm/ttm_pool.c
+index 21b61631f73a..11e92bb149c9 100644
+--- a/drivers/gpu/drm/ttm/ttm_pool.c
++++ b/drivers/gpu/drm/ttm/ttm_pool.c
+@@ -81,6 +81,7 @@ static struct page *ttm_pool_alloc_page(struct ttm_pool *pool, gfp_t gfp_flags,
+ 	unsigned long attr = DMA_ATTR_FORCE_CONTIGUOUS;
+ 	struct ttm_pool_dma *dma;
+ 	struct page *p;
++	unsigned int i;
+ 	void *vaddr;
+ 
+ 	/* Don't set the __GFP_COMP flag for higher order allocations.
+@@ -93,8 +94,10 @@ static struct page *ttm_pool_alloc_page(struct ttm_pool *pool, gfp_t gfp_flags,
+ 
+ 	if (!pool->use_dma_alloc) {
+ 		p = alloc_pages(gfp_flags, order);
+-		if (p)
++		if (p) {
+ 			p->private = order;
++			goto ref_tail_pages;
++		}
+ 		return p;
+ 	}
+ 
+@@ -120,6 +123,23 @@ static struct page *ttm_pool_alloc_page(struct ttm_pool *pool, gfp_t gfp_flags,
+ 
+ 	dma->vaddr = (unsigned long)vaddr | order;
+ 	p->private = (unsigned long)dma;
++
++ref_tail_pages:
++	/*
++	 * KVM requires mapped tail pages to be refcounted because put_page()
++	 * is invoked on them in the end of the page fault handling, and thus,
++	 * tail pages need to be protected from the premature releasing.
++	 * In fact, KVM page fault handler refuses to map tail pages to guest
++	 * if they aren't refcounted because hva_to_pfn_remapped() checks the
++	 * refcount specifically for this case.
++	 *
++	 * In particular, unreferenced tail pages result in a KVM "Bad address"
++	 * failure for VMMs that use VirtIO-GPU when guest's Mesa VirGL driver
++	 * accesses mapped host TTM buffer that contains tail pages.
++	 */
++	for (i = 1; i < 1 << order; i++)
++		page_ref_inc(p + i);
++
+ 	return p;
+ 
+ error_free:
+@@ -133,6 +153,7 @@ static void ttm_pool_free_page(struct ttm_pool *pool, enum ttm_caching caching,
+ {
+ 	unsigned long attr = DMA_ATTR_FORCE_CONTIGUOUS;
+ 	struct ttm_pool_dma *dma;
++	unsigned int i;
+ 	void *vaddr;
+ 
+ #ifdef CONFIG_X86
+@@ -142,6 +163,8 @@ static void ttm_pool_free_page(struct ttm_pool *pool, enum ttm_caching caching,
+ 	if (caching != ttm_cached && !PageHighMem(p))
+ 		set_pages_wb(p, 1 << order);
+ #endif
++	for (i = 1; i < 1 << order; i++)
++		page_ref_dec(p + i);
+ 
+ 	if (!pool || !pool->use_dma_alloc) {
+ 		__free_pages(p, order);
+-- 
+2.37.2
+
