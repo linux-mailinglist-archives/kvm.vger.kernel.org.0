@@ -2,132 +2,168 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id B04C3593436
-	for <lists+kvm@lfdr.de>; Mon, 15 Aug 2022 19:53:04 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 1AB2559343F
+	for <lists+kvm@lfdr.de>; Mon, 15 Aug 2022 19:56:25 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231448AbiHORxD (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 15 Aug 2022 13:53:03 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35414 "EHLO
+        id S231716AbiHOR4X (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 15 Aug 2022 13:56:23 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38214 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229785AbiHORxB (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 15 Aug 2022 13:53:01 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id A1C36286EC
-        for <kvm@vger.kernel.org>; Mon, 15 Aug 2022 10:53:00 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1660585979;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=15DarLJ2UNtljDu/NGD1MWWRNaKZ/jpeSOvRGy2XtIg=;
-        b=YuqRUBH/BEqFF5Kww4+daSIsSBvtoqPAOW9EH6UuNPK0cspB1qXzWy7e8c1sSyPYjkYI04
-        6XpFLiSk2WrXU5vVxsD2VIyao1MIj+rmNw3Cas0mr/Vvnb43awOQYE6YjTCiau0+9bwRP2
-        2Af931QoKpOeF4Al6fi85zvbQr20Mqk=
-Received: from mail-il1-f198.google.com (mail-il1-f198.google.com
- [209.85.166.198]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_128_GCM_SHA256) id
- us-mta-621-BwYB6hMmMAqJwCKOLoM0MA-1; Mon, 15 Aug 2022 13:52:58 -0400
-X-MC-Unique: BwYB6hMmMAqJwCKOLoM0MA-1
-Received: by mail-il1-f198.google.com with SMTP id q10-20020a056e020c2a00b002dedb497c7fso5516195ilg.16
-        for <kvm@vger.kernel.org>; Mon, 15 Aug 2022 10:52:58 -0700 (PDT)
+        with ESMTP id S229452AbiHOR4W (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 15 Aug 2022 13:56:22 -0400
+Received: from mail-pf1-x434.google.com (mail-pf1-x434.google.com [IPv6:2607:f8b0:4864:20::434])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4C04915FCD;
+        Mon, 15 Aug 2022 10:56:21 -0700 (PDT)
+Received: by mail-pf1-x434.google.com with SMTP id u133so7193760pfc.10;
+        Mon, 15 Aug 2022 10:56:21 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:sender:from:to:cc;
+        bh=mTDkW67VAczUKBcX25GMqVP3oIKQhzniMNz61JrBOoE=;
+        b=Yfl8cpVVMsDvl/jn3SxFLjhyNCTpZJ0L3m8+/4Fhjzgmmh4KQWnERqPQh6hMkeu6Mm
+         kNFysQUwEBNg7QFjaHy2DfcqBnFDs0+GLpfIJyIG20rPDSbTAgSLk4M6ez5I506pRIFl
+         rcBi1CnmFwqBr6LjqlmcIjRqlN5yxp1iDG+GL0fRSJu576ZYOi8mf4ODYGVr9YRWZBI9
+         4BbYMIKugmmXG0HqCGgnBJfn5cUJFzIf8qCG4fnhOno5XSilXdckffhna9gkLV53m/UW
+         1J677lSm1frZ+uAaP4av9jZ9GZYMue4PyCnXEtajUy4fA5/Bamtq/RYNrkwMwsOiiGm2
+         5CuQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=content-transfer-encoding:mime-version:organization:references
-         :in-reply-to:message-id:subject:cc:to:from:date:x-gm-message-state
-         :from:to:cc;
-        bh=15DarLJ2UNtljDu/NGD1MWWRNaKZ/jpeSOvRGy2XtIg=;
-        b=guR/T8xlHOsP2LNZyaZwiObCMwcc92/U71sSADOpk1VFcjIrTiy2b7mPXthNHq1aJh
-         zBL2RpfHfF+dH/BOMp31pfeRK76ikMCozhjR2eO9HgpN3LNOSX+Aoimk6GwrnS+1WECx
-         sLIaDW7kL7PWAzG+lPOZjTaNF072v5IK14XiENpetA25rlEQGrgwqImqQ1Ni+alIChdp
-         eHor0/P+3EM1fDvVF6j1ZQhat3/lcSXDfliA2pKKcMy4ia/qlQlMjlM/BYC8+dNFnT71
-         fLLWbjUnGigtYYjdaz2iO5awZiHTff4ukx/CrLhYHu3blDAnljbsZEQDn4ujKHRZ0Xdt
-         SfBg==
-X-Gm-Message-State: ACgBeo3dvOyvGBFgXW9WlpjgtFqfGU6r7AYYf5SueQ3xZOlR+upHRNn3
-        vP3xTPkqDbYqrDhYPoVXTc7c2oPanthc2cbQt6i1ff/YP0IRBzdWznDwvrE++XZGTSyVHtvgpYH
-        xTAb67adKr5cg
-X-Received: by 2002:a05:6638:3042:b0:341:d6bc:7bcb with SMTP id u2-20020a056638304200b00341d6bc7bcbmr7980397jak.258.1660585977760;
-        Mon, 15 Aug 2022 10:52:57 -0700 (PDT)
-X-Google-Smtp-Source: AA6agR5i405dJBqXB2wpppUqalkB8ihdyscxF3U7r8/rlm/W+0QAFhdvG9A3oewmE0CBh6DjjHAFNA==
-X-Received: by 2002:a05:6638:3042:b0:341:d6bc:7bcb with SMTP id u2-20020a056638304200b00341d6bc7bcbmr7980385jak.258.1660585977539;
-        Mon, 15 Aug 2022 10:52:57 -0700 (PDT)
-Received: from redhat.com ([38.15.36.239])
-        by smtp.gmail.com with ESMTPSA id i19-20020a02b693000000b0034340aa5ecdsm3614653jam.23.2022.08.15.10.52.56
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 15 Aug 2022 10:52:57 -0700 (PDT)
-Date:   Mon, 15 Aug 2022 11:52:55 -0600
-From:   Alex Williamson <alex.williamson@redhat.com>
-To:     Yishai Hadas <yishaih@nvidia.com>, <idok@nvidia.com>
-Cc:     <alex.sierra@amd.com>, <akpm@linux-foundation.org>,
-        jason Gunthorpe <jgg@nvidia.com>,
-        "maor Gottlieb" <maorg@nvidia.com>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>, <linux-mm@kvack.org>
-Subject: Re: Bug report: vfio over kernel 5.19 - mm area
-Message-ID: <20220815115255.60eaee8b.alex.williamson@redhat.com>
-In-Reply-To: <0e8a0d16-3c6f-a649-44b3-ab960801d90f@nvidia.com>
-References: <a99ed393-3b17-887f-a1f8-a288da9108a0@nvidia.com>
-        <3391f2e5-149a-7825-f89e-8bde3c6d555d@nvidia.com>
-        <20220615080228.7a5e7552.alex.williamson@redhat.com>
-        <0e8a0d16-3c6f-a649-44b3-ab960801d90f@nvidia.com>
-Organization: Red Hat
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:sender:x-gm-message-state:from:to:cc;
+        bh=mTDkW67VAczUKBcX25GMqVP3oIKQhzniMNz61JrBOoE=;
+        b=In3PzwSLJy/c14QUFAQ2h5YgItGKG4/YVjM9mtqV9vpr1wwgdNXtxHxXp6P8gXf8+n
+         hJgk0aSGNduhR2GA97fkHGdkfhYkjR7Tc5uZN5kqmq+OZ3CmIWIU8G6CL2XbL/6y5hos
+         B2g8pcOjp961WJBry/Rpq3evedWMbpiAZ2nXaV9BJyKgc7CdxoF363uUrwg2Fv0kjPWa
+         9eROrJKQq0DO0TbzWg4rgh0T07ZujpLMwrbC3Y0V2J9BueBtjHtKXud+ieGCTNzoK4s1
+         5bFsrVODaa27mPsgIRtBKsUWIveZI84znWQC1PvMnlECCq5Zqx1f9HwjOZI7laz37uuD
+         iPPw==
+X-Gm-Message-State: ACgBeo1yj8nQfsjBbPgTHeVJYf3fpNmoKitOkur/UbCkAGrs187xjFqn
+        9W6/evK1wna5tCgUXf3wt2UTNJidsXrAWOMdJ8U=
+X-Google-Smtp-Source: AA6agR78eY49FGkhmn23865l/0o+sM7I5JFzKGAY34SUM1+OiiMVQ43DmRxvllR8E2cxHTbucOGVSQ==
+X-Received: by 2002:a05:6a00:a82:b0:530:2f3c:ec99 with SMTP id b2-20020a056a000a8200b005302f3cec99mr17320077pfl.53.1660586180705;
+        Mon, 15 Aug 2022 10:56:20 -0700 (PDT)
+Received: from C02G8BMUMD6R.bytedance.net (c-73-164-155-12.hsd1.wa.comcast.net. [73.164.155.12])
+        by smtp.gmail.com with ESMTPSA id o5-20020a170902d4c500b0016d6963cb12sm7299935plg.304.2022.08.15.10.56.19
+        (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
+        Mon, 15 Aug 2022 10:56:20 -0700 (PDT)
+Sender: Bobby Eshleman <bobbyeshleman@gmail.com>
+From:   Bobby Eshleman <bobby.eshleman@gmail.com>
+X-Google-Original-From: Bobby Eshleman <bobby.eshleman@bytedance.com>
+Cc:     Bobby Eshleman <bobbyeshleman@gmail.com>,
+        Bobby Eshleman <bobby.eshleman@bytedance.com>,
+        Cong Wang <cong.wang@bytedance.com>,
+        Jiang Wang <jiang.wang@bytedance.com>,
+        Stefan Hajnoczi <stefanha@redhat.com>,
+        Stefano Garzarella <sgarzare@redhat.com>,
+        "Michael S. Tsirkin" <mst@redhat.com>,
+        Jason Wang <jasowang@redhat.com>,
+        "David S. Miller" <davem@davemloft.net>,
+        Eric Dumazet <edumazet@google.com>,
+        Jakub Kicinski <kuba@kernel.org>,
+        Paolo Abeni <pabeni@redhat.com>,
+        "K. Y. Srinivasan" <kys@microsoft.com>,
+        Haiyang Zhang <haiyangz@microsoft.com>,
+        Stephen Hemminger <sthemmin@microsoft.com>,
+        Wei Liu <wei.liu@kernel.org>, Dexuan Cui <decui@microsoft.com>,
+        kvm@vger.kernel.org, virtualization@lists.linux-foundation.org,
+        netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+        linux-hyperv@vger.kernel.org
+Subject: [PATCH 0/6] virtio/vsock: introduce dgrams, sk_buff, and qdisc
+Date:   Mon, 15 Aug 2022 10:56:03 -0700
+Message-Id: <cover.1660362668.git.bobby.eshleman@bytedance.com>
+X-Mailer: git-send-email 2.35.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-2.8 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,
-        SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham
-        autolearn_force=no version=3.4.6
+Content-Transfer-Encoding: 8bit
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
+        RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
+To:     unlisted-recipients:; (no To-header on input)
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, 15 Aug 2022 18:46:40 +0300
-Yishai Hadas <yishaih@nvidia.com> wrote:
+Hey everybody,
 
-> On 15/06/2022 17:02, Alex Williamson wrote:
-> > On Wed, 15 Jun 2022 13:52:10 +0300
-> > Yishai Hadas <yishaih@nvidia.com> wrote:
-> >  
-> >> Adding some extra relevant people from the MM area.
-> >>
-> >> On 15/06/2022 13:43, Yishai Hadas wrote:  
-> >>> Hi All,
-> >>>
-> >>> Any idea what could cause the below break in 5.19 ? we run QEMU and
-> >>> immediately the machine is stuck.
-> >>>
-> >>> Once I run, echo l > /proc/sysrq-trigger could see the below task
-> >>> which seems to be stuck..
-> >>>
-> >>> This basic flow worked fine in 5.18.  
-> > Spent Friday bisecting this and posted this fix:
-> >
-> > https://lore.kernel.org/all/165490039431.944052.12458624139225785964.stgit@omen/
-> >
-> > I expect you're hotting the same.  Thanks,
-> >
-> > Alex  
-> 
-> Alex,
-> 
-> It seems that we got the same bug again in V6.0 RC1 ..
-> 
-> The below code [1] from commit [2], put back the 'is_zero_pfn()' under 
-> the !(..) and seems buggy.
-> 
-> I would expect the below fix for that [3].
-> 
-> Alex Sierra,
-> 
-> Can you please review the below suggested fix for your patch and send a 
-> patch for RC2 accordingly ?
-> 
+This series introduces datagrams, packet scheduling, and sk_buff usage
+to virtio vsock.
 
-https://lore.kernel.org/all/166015037385.760108.16881097713975517242.stgit@omen/
+The usage of struct sk_buff benefits users by a) preparing vsock to use
+other related systems that require sk_buff, such as sockmap and qdisc,
+b) supporting basic congestion control via sock_alloc_send_skb, and c)
+reducing copying when delivering packets to TAP.
 
-It's in the mm tree, hopefully it'll get pushed in an early rc.  Thanks,
+The socket layer no longer forces errors to be -ENOMEM, as typically
+userspace expects -EAGAIN when the sk_sndbuf threshold is reached and
+messages are being sent with option MSG_DONTWAIT.
 
-Alex
+The datagram work is based off previous patches by Jiang Wang[1].
+
+The introduction of datagrams creates a transport layer fairness issue
+where datagrams may freely starve streams of queue access. This happens
+because, unlike streams, datagrams lack the transactions necessary for
+calculating credits and throttling.
+
+Previous proposals introduce changes to the spec to add an additional
+virtqueue pair for datagrams[1]. Although this solution works, using
+Linux's qdisc for packet scheduling leverages already existing systems,
+avoids the need to change the virtio specification, and gives additional
+capabilities. The usage of SFQ or fq_codel, for example, may solve the
+transport layer starvation problem. It is easy to imagine other use
+cases as well. For example, services of varying importance may be
+assigned different priorities, and qdisc will apply appropriate
+priority-based scheduling. By default, the system default pfifo qdisc is
+used. The qdisc may be bypassed and legacy queuing is resumed by simply
+setting the virtio-vsock%d network device to state DOWN. This technique
+still allows vsock to work with zero-configuration.
+
+In summary, this series introduces these major changes to vsock:
+
+- virtio vsock supports datagrams
+- virtio vsock uses struct sk_buff instead of virtio_vsock_pkt
+  - Because virtio vsock uses sk_buff, it also uses sock_alloc_send_skb,
+    which applies the throttling threshold sk_sndbuf.
+- The vsock socket layer supports returning errors other than -ENOMEM.
+  - This is used to return -EAGAIN when the sk_sndbuf threshold is
+    reached.
+- virtio vsock uses a net_device, through which qdisc may be used.
+ - qdisc allows scheduling policies to be applied to vsock flows.
+  - Some qdiscs, like SFQ, may allow vsock to avoid transport layer congestion. That is,
+    it may avoid datagrams from flooding out stream flows. The benefit
+    to this is that additional virtqueues are not needed for datagrams.
+  - The net_device and qdisc is bypassed by simply setting the
+    net_device state to DOWN.
+
+[1]: https://lore.kernel.org/all/20210914055440.3121004-1-jiang.wang@bytedance.com/
+
+Bobby Eshleman (5):
+  vsock: replace virtio_vsock_pkt with sk_buff
+  vsock: return errors other than -ENOMEM to socket
+  vsock: add netdev to vhost/virtio vsock
+  virtio/vsock: add VIRTIO_VSOCK_F_DGRAM feature bit
+  virtio/vsock: add support for dgram
+
+Jiang Wang (1):
+  vsock_test: add tests for vsock dgram
+
+ drivers/vhost/vsock.c                   | 238 ++++----
+ include/linux/virtio_vsock.h            |  73 ++-
+ include/net/af_vsock.h                  |   2 +
+ include/uapi/linux/virtio_vsock.h       |   2 +
+ net/vmw_vsock/af_vsock.c                |  30 +-
+ net/vmw_vsock/hyperv_transport.c        |   2 +-
+ net/vmw_vsock/virtio_transport.c        | 237 +++++---
+ net/vmw_vsock/virtio_transport_common.c | 771 ++++++++++++++++--------
+ net/vmw_vsock/vmci_transport.c          |   9 +-
+ net/vmw_vsock/vsock_loopback.c          |  51 +-
+ tools/testing/vsock/util.c              | 105 ++++
+ tools/testing/vsock/util.h              |   4 +
+ tools/testing/vsock/vsock_test.c        | 195 ++++++
+ 13 files changed, 1176 insertions(+), 543 deletions(-)
+
+-- 
+2.35.1
 
