@@ -2,58 +2,58 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 53E505951F1
-	for <lists+kvm@lfdr.de>; Tue, 16 Aug 2022 07:24:34 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 8608B595203
+	for <lists+kvm@lfdr.de>; Tue, 16 Aug 2022 07:28:22 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231218AbiHPFYc (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 16 Aug 2022 01:24:32 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43850 "EHLO
+        id S230032AbiHPF2U (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 16 Aug 2022 01:28:20 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45650 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232302AbiHPFYM (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 16 Aug 2022 01:24:12 -0400
+        with ESMTP id S233326AbiHPF1R (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 16 Aug 2022 01:27:17 -0400
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id CD206108936
-        for <kvm@vger.kernel.org>; Mon, 15 Aug 2022 14:54:08 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 397681125
+        for <kvm@vger.kernel.org>; Mon, 15 Aug 2022 15:00:54 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1660600421;
+        s=mimecast20190719; t=1660600853;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          in-reply-to:in-reply-to:references:references;
-        bh=bDCYLEy+BFzUXB2vyNCVod0ccaWSLx6QeKp/OdHtLfo=;
-        b=YNj27GS2xgnkckUCnuj4/tUL0ugvNNvLHK5C1SSgvRtkX2ExUn2MxOhifh97CO3H4lhplQ
-        yPAuWCEZJ7FObYzC2gibIJ2T2OIlPw1JNtS0Zsq7jApaUi2CXYPsJPmPQd0/Ke4S4Ce4sj
-        Rt0etFspiZktEzZuFUOc/Ohy7ig9uBI=
-Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
- [209.85.128.70]) by relay.mimecast.com with ESMTP with STARTTLS
+        bh=fg6AseMQKhGFaW1h59Li+nNVbNoTUAPXOEzU4kFeR3k=;
+        b=N6unTnZZhT/l2pDsSflGRw09cjCWg4J/gvDg1pwXk9AkzmfaQ2OA0tTfP5+JkO+NVb02g4
+        cWnvT5KqCsAB0xF/S7z+3UmtWSkobj4ydQa8rRQEkCbS8b9rT0cU5/7N4y5e2SgI0bFkFb
+        LK8rSt1Di8fARqa3xTg2WvnpWhdYdt0=
+Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
+ [209.85.128.72]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_128_GCM_SHA256) id
- us-mta-446-mxoJqPMIPQ2eYrCcbHXA9A-1; Mon, 15 Aug 2022 17:53:39 -0400
-X-MC-Unique: mxoJqPMIPQ2eYrCcbHXA9A-1
-Received: by mail-wm1-f70.google.com with SMTP id i83-20020a1c3b56000000b003a534ec2570so162731wma.7
-        for <kvm@vger.kernel.org>; Mon, 15 Aug 2022 14:53:39 -0700 (PDT)
+ us-mta-556-Yg7SylCvMhq7Tnw0FRJP2A-1; Mon, 15 Aug 2022 18:00:52 -0400
+X-MC-Unique: Yg7SylCvMhq7Tnw0FRJP2A-1
+Received: by mail-wm1-f72.google.com with SMTP id c17-20020a7bc011000000b003a2bfaf8d3dso4085564wmb.0
+        for <kvm@vger.kernel.org>; Mon, 15 Aug 2022 15:00:51 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:x-gm-message-state:from:to:cc;
-        bh=bDCYLEy+BFzUXB2vyNCVod0ccaWSLx6QeKp/OdHtLfo=;
-        b=Fc62fYxNbok3yQR4mCFquEqTGUnAONi+2U05vNMhXdB1N+A8bVI1S9TQtTznkLT0Ap
-         kF9U2736qa1ImyBlggLn47sUC5uEVF6hTOHCFjQuwOGsGa62rRkA4r4NnZOwQ8wVA2hi
-         vQwG+PV2K/yXtYUnb+NPTP32ZwTSL/MMs9Q+DD7tPHk0uU0UViH543jiPeQy7OiCjdQl
-         qmMjCm4Aa547WAHhsoW5Ba1bwmBjE7Kg6ur8ZGUi/rol9M6G80anuNMJqFeNd8sZJ3oU
-         6dTT3W49gATIMX58pfr87O5ieaFWTVjf6kT/cGDln0m2K9eWehlubU2jk7Ae31ZPf2zn
-         bcKg==
-X-Gm-Message-State: ACgBeo0vyFgcYq5YivU4VPIyYNWLcr3btF2c9Ov5UrwuP2yONXvVH9u/
-        TibvENVJ4nZuUjesIeBfCPXRQUpiybfM0tRhMZ5k57j1+G2u7P30BB1G0HPfas6/cMz7hkic62b
-        4lddxmWcaQrcc
-X-Received: by 2002:a7b:ca42:0:b0:3a6:9d:a444 with SMTP id m2-20020a7bca42000000b003a6009da444mr2231541wml.51.1660600418493;
-        Mon, 15 Aug 2022 14:53:38 -0700 (PDT)
-X-Google-Smtp-Source: AA6agR4BN8C+PGA8RpmSRZwBido/QgzW+8NIJd7WJaZE3l05LkbGN7+KhxLct1xW2rLS+iQX/I9U0w==
-X-Received: by 2002:a7b:ca42:0:b0:3a6:9d:a444 with SMTP id m2-20020a7bca42000000b003a6009da444mr2231508wml.51.1660600418216;
-        Mon, 15 Aug 2022 14:53:38 -0700 (PDT)
-Received: from redhat.com ([2.55.4.37])
-        by smtp.gmail.com with ESMTPSA id l23-20020a1c7917000000b003a541358bdbsm10115773wme.21.2022.08.15.14.53.30
+        bh=fg6AseMQKhGFaW1h59Li+nNVbNoTUAPXOEzU4kFeR3k=;
+        b=HdxxJa6ECSdE1JBxoienJjHsHZdkXzeC2pL5T3e/R/SHNrrAcoCqpfmWn9DenyZY0M
+         5DooKslyLqzBf6RLNAbtGFobsqpl0gLUxj7mSH9o9s7XzOLtVqP9olfkkQDexrFmlOQv
+         L/MthcvRo9IgBFNbg1TkJpVfOWCDyeHnAgapKPI+vJjOMQhzT9f8rxmmFi4iAMbLnsX/
+         e9uGrqp/xk9xFPcE9kgklk/77KShqSHNGJkkm38HdfFm3JhI+cHUb0UjAP6g5YRcdkK5
+         S9OdClSviv8uTGMW3PkCFtcLP8GxkhPUP64+ORW2Yb0LDjGm0qmHEfL8W+VuyY62ZVx5
+         gObg==
+X-Gm-Message-State: ACgBeo1SWAe3q3wjEWedfapNURayjk51zII2Cw+1XSzkQrm6g16mOJ6w
+        mLHuSBgZlTN6ejHzfKyFQNx3nkhwA/dZj84MigvHpq2myG8MeA+m9emY9+sfPKtDICNIIBfmtRD
+        R/x93hJAHBsuv
+X-Received: by 2002:a05:600c:2193:b0:3a5:346f:57d0 with SMTP id e19-20020a05600c219300b003a5346f57d0mr11036839wme.124.1660600850805;
+        Mon, 15 Aug 2022 15:00:50 -0700 (PDT)
+X-Google-Smtp-Source: AA6agR4PAdLc5XsHhXjTCgudQEwXQ2nfc/9Z68NwtJ4bkLWqWAnNtHc5GzFWw2XRQWHza6NtRnMdBQ==
+X-Received: by 2002:a05:600c:2193:b0:3a5:346f:57d0 with SMTP id e19-20020a05600c219300b003a5346f57d0mr11036801wme.124.1660600850490;
+        Mon, 15 Aug 2022 15:00:50 -0700 (PDT)
+Received: from redhat.com ([2.55.43.215])
+        by smtp.gmail.com with ESMTPSA id q18-20020adff952000000b00222ed7ea203sm8156397wrr.100.2022.08.15.15.00.45
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 15 Aug 2022 14:53:37 -0700 (PDT)
-Date:   Mon, 15 Aug 2022 17:53:29 -0400
+        Mon, 15 Aug 2022 15:00:49 -0700 (PDT)
+Date:   Mon, 15 Aug 2022 18:00:44 -0400
 From:   "Michael S. Tsirkin" <mst@redhat.com>
 To:     linux-kernel@vger.kernel.org
 Cc:     Xuan Zhuo <xuanzhuo@linux.alibaba.com>,
@@ -88,13 +88,13 @@ Cc:     Xuan Zhuo <xuanzhuo@linux.alibaba.com>,
         linux-um@lists.infradead.org, platform-driver-x86@vger.kernel.org,
         linux-remoteproc@vger.kernel.org, linux-s390@vger.kernel.org,
         kvm@vger.kernel.org
-Subject: [PATCH v2 1/1] virtio: Revert "virtio: find_vqs() add arg sizes"
-Message-ID: <20220815215251.154451-4-mst@redhat.com>
-References: <20220815215251.154451-1-mst@redhat.com>
+Subject: [PATCH v3 5/5] virtio: Revert "virtio: find_vqs() add arg sizes"
+Message-ID: <20220815215938.154999-6-mst@redhat.com>
+References: <20220815215938.154999-1-mst@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20220815215251.154451-1-mst@redhat.com>
+In-Reply-To: <20220815215938.154999-1-mst@redhat.com>
 X-Mailer: git-send-email 2.27.0.106.g8ac3dc51b1
 X-Mutt-Fcc: =sent
 X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
@@ -120,6 +120,18 @@ let's drop it.
 
 Fixes: a10fba037714 ("virtio: find_vqs() add arg sizes")
 Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
+---
+ arch/um/drivers/virtio_uml.c             |  2 +-
+ drivers/platform/mellanox/mlxbf-tmfifo.c |  1 -
+ drivers/remoteproc/remoteproc_virtio.c   |  1 -
+ drivers/s390/virtio/virtio_ccw.c         |  1 -
+ drivers/virtio/virtio_mmio.c             |  1 -
+ drivers/virtio/virtio_pci_common.c       |  2 +-
+ drivers/virtio/virtio_pci_common.h       |  2 +-
+ drivers/virtio/virtio_pci_modern.c       |  7 ++-----
+ drivers/virtio/virtio_vdpa.c             |  1 -
+ include/linux/virtio_config.h            | 14 +++++---------
+ 10 files changed, 10 insertions(+), 22 deletions(-)
 
 diff --git a/arch/um/drivers/virtio_uml.c b/arch/um/drivers/virtio_uml.c
 index 79e38afd4b91..e719af8bdf56 100644
