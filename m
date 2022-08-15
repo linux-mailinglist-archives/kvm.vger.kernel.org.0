@@ -2,104 +2,68 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id D76D459294C
-	for <lists+kvm@lfdr.de>; Mon, 15 Aug 2022 08:07:33 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id AC486592992
+	for <lists+kvm@lfdr.de>; Mon, 15 Aug 2022 08:26:20 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232772AbiHOGHa (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 15 Aug 2022 02:07:30 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37002 "EHLO
+        id S229758AbiHOGZm (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 15 Aug 2022 02:25:42 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57034 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232779AbiHOGHY (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 15 Aug 2022 02:07:24 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id DF76718367
-        for <kvm@vger.kernel.org>; Sun, 14 Aug 2022 23:07:21 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1660543641;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=miQ+LrhTjrCdn3JmNHg0o7+cx9B77lvSoDGipC2aLoI=;
-        b=gCRLsCmU5qBm7RYQM5TiNiCjAbT54/l672AqTMt2S/9IhZg/Uy90wHll2jhhx1dfwGZCEQ
-        0PseWTKjSQWvMtZ1szN8SAdkULaBym2yukH1k6Mr8oSDlbys4WUdfDDxa3sjAPkMDCvXD2
-        8GlpGr7Pcd+H3F2+rtTqEQhR2P7hXdY=
-Received: from mail-ed1-f70.google.com (mail-ed1-f70.google.com
- [209.85.208.70]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_128_GCM_SHA256) id
- us-mta-481-x7-5aGpmMOq-YxQK5LO2Tg-1; Mon, 15 Aug 2022 02:07:15 -0400
-X-MC-Unique: x7-5aGpmMOq-YxQK5LO2Tg-1
-Received: by mail-ed1-f70.google.com with SMTP id y16-20020a056402359000b0043db5186943so4167409edc.3
-        for <kvm@vger.kernel.org>; Sun, 14 Aug 2022 23:07:15 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc;
-        bh=miQ+LrhTjrCdn3JmNHg0o7+cx9B77lvSoDGipC2aLoI=;
-        b=i/Ii37MzRLMk/0vWgCOKd7XRIj3vSTasueihK2TzSEGAHeSG5vFQe3r/2EmB3Opc6q
-         0OkdHpObcM0cOALGjXttIxjx2/GR8SWtRM70ply6Q/zmkMwx0XAhe2wK2sbqcohcs1Lh
-         iWWz7apI0WS/9zhuBdMUhVRxHtDCIiEV3/N6ici6VnIIg3CFfChB9nKodxWDnod0M0/F
-         e2j61H4Jhkkgclt7sQHLhkGXOaOOW4iXHYMDNQFTl4wM3Eap4MZ6Jsbyy9O6+oPbHeLH
-         qSrzHKId2c/tnpQvuy+V0WLdMbGIWLdHI90/mJEX/HOYHs8crbtOLYoitcnm0OvBDx/f
-         fipQ==
-X-Gm-Message-State: ACgBeo2Hc0KgWT5G6Lr5ItY9FT3uLFAcwGJ8ly7hUPQ6jVcSvZhnPUC3
-        Q6GEBCSdimpDAEjgjWvbRozt/8VYsVknFeRc9KdCerSOPrHq3MDR+oIPP4rjo0tmUO0tnMjsqGc
-        bu/EQ42/sDiuR
-X-Received: by 2002:a05:6402:40c9:b0:43d:cc0d:e9de with SMTP id z9-20020a05640240c900b0043dcc0de9demr13192948edb.319.1660543634275;
-        Sun, 14 Aug 2022 23:07:14 -0700 (PDT)
-X-Google-Smtp-Source: AA6agR5IxHumafujgE9z2U2QiRC8adJ4lPgnG3uYrrXb/EOiabr2Dh6aNojO23Eqns8Uqq534VjGmQ==
-X-Received: by 2002:a05:6402:40c9:b0:43d:cc0d:e9de with SMTP id z9-20020a05640240c900b0043dcc0de9demr13192925edb.319.1660543634027;
-        Sun, 14 Aug 2022 23:07:14 -0700 (PDT)
-Received: from redhat.com ([2.54.169.49])
-        by smtp.gmail.com with ESMTPSA id z7-20020a170906d00700b00726c0e63b94sm3688949ejy.27.2022.08.14.23.07.07
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 14 Aug 2022 23:07:13 -0700 (PDT)
-Date:   Mon, 15 Aug 2022 02:07:05 -0400
-From:   "Michael S. Tsirkin" <mst@redhat.com>
-To:     Xuan Zhuo <xuanzhuo@linux.alibaba.com>
-Cc:     virtualization@lists.linux-foundation.org,
-        Richard Weinberger <richard@nod.at>,
-        Anton Ivanov <anton.ivanov@cambridgegreys.com>,
-        Johannes Berg <johannes@sipsolutions.net>,
-        Jason Wang <jasowang@redhat.com>,
-        "David S. Miller" <davem@davemloft.net>,
-        Eric Dumazet <edumazet@google.com>,
-        Jakub Kicinski <kuba@kernel.org>,
-        Paolo Abeni <pabeni@redhat.com>,
-        Hans de Goede <hdegoede@redhat.com>,
-        Mark Gross <markgross@kernel.org>,
-        Vadim Pasternak <vadimp@nvidia.com>,
-        Bjorn Andersson <bjorn.andersson@linaro.org>,
-        Mathieu Poirier <mathieu.poirier@linaro.org>,
-        Cornelia Huck <cohuck@redhat.com>,
-        Halil Pasic <pasic@linux.ibm.com>,
-        Eric Farman <farman@linux.ibm.com>,
-        Heiko Carstens <hca@linux.ibm.com>,
-        Vasily Gorbik <gor@linux.ibm.com>,
-        Alexander Gordeev <agordeev@linux.ibm.com>,
-        Christian Borntraeger <borntraeger@linux.ibm.com>,
-        Sven Schnelle <svens@linux.ibm.com>,
-        Alexei Starovoitov <ast@kernel.org>,
-        Daniel Borkmann <daniel@iogearbox.net>,
-        Jesper Dangaard Brouer <hawk@kernel.org>,
-        John Fastabend <john.fastabend@gmail.com>,
-        Vincent Whitchurch <vincent.whitchurch@axis.com>,
-        linux-um@lists.infradead.org, netdev@vger.kernel.org,
-        platform-driver-x86@vger.kernel.org,
-        linux-remoteproc@vger.kernel.org, linux-s390@vger.kernel.org,
-        kvm@vger.kernel.org, bpf@vger.kernel.org,
-        kangjie.xu@linux.alibaba.com
-Subject: Re: [PATCH v14 30/42] virtio_pci: introduce helper to get/set queue
- reset
-Message-ID: <20220815020548-mutt-send-email-mst@kernel.org>
-References: <20220801063902.129329-1-xuanzhuo@linux.alibaba.com>
- <20220801063902.129329-31-xuanzhuo@linux.alibaba.com>
+        with ESMTP id S229887AbiHOGZa (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 15 Aug 2022 02:25:30 -0400
+Received: from ams.source.kernel.org (ams.source.kernel.org [145.40.68.75])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A749910AE
+        for <kvm@vger.kernel.org>; Sun, 14 Aug 2022 23:25:28 -0700 (PDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by ams.source.kernel.org (Postfix) with ESMTPS id 63A2FB80D1E
+        for <kvm@vger.kernel.org>; Mon, 15 Aug 2022 06:25:27 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 230BDC433C1
+        for <kvm@vger.kernel.org>; Mon, 15 Aug 2022 06:25:26 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1660544726;
+        bh=q9wAkh0SgtR4zqFtfsRlk31cOvS3rIYi4LzGEYXvUpU=;
+        h=From:To:Subject:Date:From;
+        b=eXCH4avVOOxqc3EJ9iAM9PFBZrD2kAQs4g0TY1Rh/sXdWkMnq4JAffw5/XmIB5JMe
+         yVme8Gt+3jvse3AU9h6lfxnAqdLOfE9kV4yioACBmT9/neDg44Jkt5dwLhI4n1u+4C
+         1GfQa2GWX+sGpKXIE3VE4VzTcKdSNdRzCVg6WU3N2hCFE3H8/jVML/9o4Cv4KQ8UzC
+         yPFwjiy0A5mli0CjuUo61jaNHkV2aymR/IB/e6E6OyOHdYHYbnhJq2jgf62IpIfffZ
+         YnonxsLg5GBDSvrBNalK+e3s3EftrmFB32LXkbxd47vaKKMtcU4P7t3Jkd2tpMLZKW
+         3P0MR76reRQzg==
+Received: by aws-us-west-2-korg-bugzilla-1.web.codeaurora.org (Postfix, from userid 48)
+        id 0AEF4C433E9; Mon, 15 Aug 2022 06:25:26 +0000 (UTC)
+From:   bugzilla-daemon@kernel.org
+To:     kvm@vger.kernel.org
+Subject: [Bug 216364] New: [Kernel IBT][kvm] There was "Missing ENDBR" in kvm
+ when syzkaller tests
+Date:   Mon, 15 Aug 2022 06:25:25 +0000
+X-Bugzilla-Reason: None
+X-Bugzilla-Type: new
+X-Bugzilla-Watch-Reason: AssignedTo virtualization_kvm@kernel-bugs.osdl.org
+X-Bugzilla-Product: Virtualization
+X-Bugzilla-Component: kvm
+X-Bugzilla-Version: unspecified
+X-Bugzilla-Keywords: 
+X-Bugzilla-Severity: normal
+X-Bugzilla-Who: pengfei.xu@intel.com
+X-Bugzilla-Status: NEW
+X-Bugzilla-Resolution: 
+X-Bugzilla-Priority: P1
+X-Bugzilla-Assigned-To: virtualization_kvm@kernel-bugs.osdl.org
+X-Bugzilla-Flags: 
+X-Bugzilla-Changed-Fields: bug_id short_desc product version
+ cf_kernel_version rep_platform op_sys cf_tree bug_status bug_severity
+ priority component assigned_to reporter cf_regression attachments.created
+Message-ID: <bug-216364-28872@https.bugzilla.kernel.org/>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Bugzilla-URL: https://bugzilla.kernel.org/
+Auto-Submitted: auto-generated
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20220801063902.129329-31-xuanzhuo@linux.alibaba.com>
-X-Spam-Status: No, score=-2.9 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,
-        SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=unavailable
+X-Spam-Status: No, score=-7.2 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_HI,
+        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -107,92 +71,65 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Aug 01, 2022 at 02:38:50PM +0800, Xuan Zhuo wrote:
-> Introduce new helpers to implement queue reset and get queue reset
-> status.
-> 
->  https://github.com/oasis-tcs/virtio-spec/issues/124
->  https://github.com/oasis-tcs/virtio-spec/issues/139
-> 
-> Signed-off-by: Xuan Zhuo <xuanzhuo@linux.alibaba.com>
-> Acked-by: Jason Wang <jasowang@redhat.com>
-> ---
->  drivers/virtio/virtio_pci_modern_dev.c | 39 ++++++++++++++++++++++++++
->  include/linux/virtio_pci_modern.h      |  2 ++
->  2 files changed, 41 insertions(+)
-> 
-> diff --git a/drivers/virtio/virtio_pci_modern_dev.c b/drivers/virtio/virtio_pci_modern_dev.c
-> index fa2a9445bb18..869cb46bef96 100644
-> --- a/drivers/virtio/virtio_pci_modern_dev.c
-> +++ b/drivers/virtio/virtio_pci_modern_dev.c
-> @@ -3,6 +3,7 @@
->  #include <linux/virtio_pci_modern.h>
->  #include <linux/module.h>
->  #include <linux/pci.h>
-> +#include <linux/delay.h>
->  
->  /*
->   * vp_modern_map_capability - map a part of virtio pci capability
-> @@ -474,6 +475,44 @@ void vp_modern_set_status(struct virtio_pci_modern_device *mdev,
->  }
->  EXPORT_SYMBOL_GPL(vp_modern_set_status);
->  
-> +/*
-> + * vp_modern_get_queue_reset - get the queue reset status
-> + * @mdev: the modern virtio-pci device
-> + * @index: queue index
-> + */
-> +int vp_modern_get_queue_reset(struct virtio_pci_modern_device *mdev, u16 index)
-> +{
-> +	struct virtio_pci_modern_common_cfg __iomem *cfg;
-> +
-> +	cfg = (struct virtio_pci_modern_common_cfg __iomem *)mdev->common;
+https://bugzilla.kernel.org/show_bug.cgi?id=3D216364
 
-This should use container_of, and assignment combined with the
-declaration.
+            Bug ID: 216364
+           Summary: [Kernel IBT][kvm] There was "Missing ENDBR" in kvm
+                    when syzkaller tests
+           Product: Virtualization
+           Version: unspecified
+    Kernel Version: v5.19 mainline kernel
+          Hardware: All
+                OS: Linux
+              Tree: Mainline
+            Status: NEW
+          Severity: normal
+          Priority: P1
+         Component: kvm
+          Assignee: virtualization_kvm@kernel-bugs.osdl.org
+          Reporter: pengfei.xu@intel.com
+        Regression: No
 
-> +
-> +	vp_iowrite16(index, &cfg->cfg.queue_select);
-> +	return vp_ioread16(&cfg->queue_reset);
-> +}
-> +EXPORT_SYMBOL_GPL(vp_modern_get_queue_reset);
-> +
-> +/*
-> + * vp_modern_set_queue_reset - reset the queue
-> + * @mdev: the modern virtio-pci device
-> + * @index: queue index
-> + */
-> +void vp_modern_set_queue_reset(struct virtio_pci_modern_device *mdev, u16 index)
-> +{
-> +	struct virtio_pci_modern_common_cfg __iomem *cfg;
-> +
-> +	cfg = (struct virtio_pci_modern_common_cfg __iomem *)mdev->common;
-> +
-> +	vp_iowrite16(index, &cfg->cfg.queue_select);
-> +	vp_iowrite16(1, &cfg->queue_reset);
-> +
-> +	while (vp_ioread16(&cfg->queue_reset))
-> +		msleep(1);
-> +
-> +	while (vp_ioread16(&cfg->cfg.queue_enable))
-> +		msleep(1);
-> +}
-> +EXPORT_SYMBOL_GPL(vp_modern_set_queue_reset);
-> +
->  /*
->   * vp_modern_queue_vector - set the MSIX vector for a specific virtqueue
->   * @mdev: the modern virtio-pci device
-> diff --git a/include/linux/virtio_pci_modern.h b/include/linux/virtio_pci_modern.h
-> index 05123b9a606f..c4eeb79b0139 100644
-> --- a/include/linux/virtio_pci_modern.h
-> +++ b/include/linux/virtio_pci_modern.h
-> @@ -113,4 +113,6 @@ void __iomem * vp_modern_map_vq_notify(struct virtio_pci_modern_device *mdev,
->  				       u16 index, resource_size_t *pa);
->  int vp_modern_probe(struct virtio_pci_modern_device *mdev);
->  void vp_modern_remove(struct virtio_pci_modern_device *mdev);
-> +int vp_modern_get_queue_reset(struct virtio_pci_modern_device *mdev, u16 index);
-> +void vp_modern_set_queue_reset(struct virtio_pci_modern_device *mdev, u16 index);
->  #endif
-> -- 
-> 2.31.0
+Created attachment 301563
+  --> https://bugzilla.kernel.org/attachment.cgi?id=3D301563&action=3Dedit
+Host_kernel_missing_endbr_from_kvm
 
+I used syzkaller and found the "Missing ENDBR: andw_ax_dx+0x0/0x10 [kvm]" B=
+UG
+in the host.
+
+Platform: ADL-P/TGL-U or TGL-H
+
+Host Kernel:   v5.19 mainline kernel with kernel IBT
+Guest kernel: v5.19 mainline kernel without kernel IBT, moved kconfig
+"CONFIG_X86_KERNEL_IBT=3Dy".
+
+Host kernel enabled kernel IBT by adding the KCONFIG "CONFIG_X86_KERNEL_IBT=
+=3Dy".
+
+In syzkaller guest kernel, guest didn't enable kernel IBT and used 5.19
+mainline kernel also.
+
+After launched the syzkaller test about 2 hours.
+
+There was  "Missing ENDBR: andw_ax_dx+0x0/0x10 [kvm]" info generated in host
+kernel.
+
+[    0.000000] Linux version 5.19.0-m2 (root@xpf.sh.intel.com) (gcc (GCC) 8=
+.5.0
+20210514 (Red Hat 8.5.0-10), GNU ld version 2.36.1-2.el8) #1 SMP
+PREEMPT_DYNAMIC Mon Aug 1 14:23:55 CST 2022
+[ 5048.057266] traps: Missing ENDBR: andw_ax_dx+0x0/0x10 [kvm]
+[ 5048.057440] ------------[ cut here ]------------
+[ 5048.057457] kernel BUG at arch/x86/kernel/traps.c:253!
+
+Host dmesg was in attached.
+
+
+Thanks!
+
+--=20
+You may reply to this email to add a comment.
+
+You are receiving this mail because:
+You are watching the assignee of the bug.=
