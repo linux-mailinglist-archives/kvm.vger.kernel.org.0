@@ -2,60 +2,62 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 13AD059577F
-	for <lists+kvm@lfdr.de>; Tue, 16 Aug 2022 12:06:55 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 576C459578A
+	for <lists+kvm@lfdr.de>; Tue, 16 Aug 2022 12:08:10 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234190AbiHPKGw (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 16 Aug 2022 06:06:52 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56106 "EHLO
+        id S232831AbiHPKHo (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 16 Aug 2022 06:07:44 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56120 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234188AbiHPKGW (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 16 Aug 2022 06:06:22 -0400
-Received: from mail-pg1-x52b.google.com (mail-pg1-x52b.google.com [IPv6:2607:f8b0:4864:20::52b])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1BB7A69F4F
-        for <kvm@vger.kernel.org>; Tue, 16 Aug 2022 01:10:12 -0700 (PDT)
-Received: by mail-pg1-x52b.google.com with SMTP id r69so8629469pgr.2
-        for <kvm@vger.kernel.org>; Tue, 16 Aug 2022 01:10:12 -0700 (PDT)
+        with ESMTP id S234016AbiHPKHN (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 16 Aug 2022 06:07:13 -0400
+Received: from mail-pl1-x636.google.com (mail-pl1-x636.google.com [IPv6:2607:f8b0:4864:20::636])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A7F8C7757A
+        for <kvm@vger.kernel.org>; Tue, 16 Aug 2022 01:10:19 -0700 (PDT)
+Received: by mail-pl1-x636.google.com with SMTP id d16so8516719pll.11
+        for <kvm@vger.kernel.org>; Tue, 16 Aug 2022 01:10:19 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc;
-        bh=W6YOd56QG+w4EJ2+UVoO24f/heXOAOyLyBToQXedv28=;
-        b=kCX80BuG6wgZQ7yL3Ae+H20C18a/ZmdckROkjWRH4W65SXUgEZMDCFbtY9igVIDFel
-         lHhfDFCMMi3jzLK99tcwxDO+RJUyjYUopHiqpScJUkf6TVxjN5M+NnO9DVuvX21whoVC
-         ExHSC7FroD4QhRU/MJ9sPGXhdn8Yzvtb6NQa14pGvarfRivrGlQ/iE6SLduWhjrMaZ2j
-         SjZzn13InmsrP5DIlB902tDv035ZFlImL3uveblBcXc3JLNnC3uUjHtZChQEty+zcnNA
-         2IdwVvPo4LDFa/zMeNIdG8RIqaqMziZUVIpVanTQ0GscRkCRqHneq+/SXLUKZSqLxnF+
-         pESg==
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:from:to:cc;
+        bh=ql4Rh8J556MPf2Buydi+F1rT3HDm+TzYYIHtdS57x/8=;
+        b=QlXIPk1tnsd/zpFN6hx30gy9IddpPd972R7XiCXk/QO5HZqnL7w+WLw8PfmqEbnF7k
+         8tOHqeALgK7l4K2dZlkqB/is5fCm911IpN31elSAU4ausVzKSDJ8Ngt2R0jiXlg+7mbK
+         HAMz/mkBtxVrxvioMTaoSzTbyYt4ZgoRd3vV+HdmItFMCY4pEiG/okub0N7rGVi8YG8/
+         Zc9JUraJpbcR+uj1SBWj6osq1TTDQqW/O9jjLB9n40vWlpyaNJdc0yMLWFUj71ayjmrz
+         Vn9dMuZHzdR3gaFKST6GMZCDgLCF3w/t4yCP87ziPcXrYGpv0z5RApbI5SuRWNuU0ENm
+         jRHQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc;
-        bh=W6YOd56QG+w4EJ2+UVoO24f/heXOAOyLyBToQXedv28=;
-        b=o7VaDDV7CRmZVh9dKjurN+id7GdXooYkwURXu0aCfsOHq7i+Bttirr7RagaifKZBvh
-         U1YOOIM6STI36yhbU9LZU4duRJNXHL5Ukpm/cqfORaEiXzq2xUacaD7kvUvnv/CHDw0f
-         E5Smin/B/MZI2y14PwI0boYqGM17BMhtltaqs94Q253rLGWfZUpqb+lehz7P94VFbhsC
-         a+j7O9gR9PDZ27RZ0VLTneY9KwNTss2Gp83C9g9+cbO4VyxVtqjJ+wcNR3ux4RhR8kuv
-         +hL68xEIKzzaF6tzWCSoQyJYIkrbUS4zpZdFobj4ufVFi/Gj35rOHofba+q27xT6WhoH
-         wbGQ==
-X-Gm-Message-State: ACgBeo34+RKBvEHyPyOQoy1MKy7/zt/1y+bLO6/ivrMkklMnPqxJYuDj
-        Zw4zHaftp9cdD17kSCdj2ZY=
-X-Google-Smtp-Source: AA6agR7lbdQ0lR6a29UUzCk84wSIEfGZw+HjZk0yVND4gida650mk9Z2QY4BqSOh29yp1bJCYr0xlw==
-X-Received: by 2002:a05:6a00:1a44:b0:528:6af7:ff4a with SMTP id h4-20020a056a001a4400b005286af7ff4amr20269524pfv.78.1660637411626;
-        Tue, 16 Aug 2022 01:10:11 -0700 (PDT)
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc;
+        bh=ql4Rh8J556MPf2Buydi+F1rT3HDm+TzYYIHtdS57x/8=;
+        b=W2bSK1mD/kT16ozFc9lridm+teqZNLGQiO8Ci2KchMXhCj6nOkkBRCoZLWbfzr7y0L
+         MMX6IyiVq4eRi43GEFgkFPwrysbRL76gYGlI3Um2N1jje7uGEP/Xj5HBK0t9+/XgkvWm
+         bywzmKqByGWuaoWSDOvZa2jUkOh2xq/HzG/RnOxK1+Dmru4zVLDbtpgQeQ3G0L06TX0X
+         prnirshtHl6NLaNJ6hDMAjDALFhL9hqEv0gv4fJP+YjojVE0jl7keZPCx9yUj1z6cFIQ
+         rcnFQuOl4ZHlJHAoN6ZkhVI9k2Gdpz+mhe9GOWqxYupFEHv2tC9WrZH8UddPNxfOR1L8
+         JGZw==
+X-Gm-Message-State: ACgBeo2pbSFRp8yk2CBlI/UDHDXuRRWFVJlXwelvABoBqDIEfL9QeIDg
+        V0lY1D5Hi8nmMFPnOQvWe7c=
+X-Google-Smtp-Source: AA6agR7+pKsXuERDxAOvvLf6ypBbENtc17iJHdcIDjZC9cM6sHMog5M8OtfIf5ZukQDXfwFioSRTUg==
+X-Received: by 2002:a17:902:ebcb:b0:168:e3ba:4b5a with SMTP id p11-20020a170902ebcb00b00168e3ba4b5amr20815261plg.11.1660637419209;
+        Tue, 16 Aug 2022 01:10:19 -0700 (PDT)
 Received: from localhost.localdomain ([103.7.29.32])
-        by smtp.gmail.com with ESMTPSA id m12-20020a170902db0c00b0016d7b2352desm8400920plx.244.2022.08.16.01.10.10
+        by smtp.gmail.com with ESMTPSA id m12-20020a170902db0c00b0016d7b2352desm8400920plx.244.2022.08.16.01.10.18
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 16 Aug 2022 01:10:11 -0700 (PDT)
+        Tue, 16 Aug 2022 01:10:19 -0700 (PDT)
 From:   Like Xu <like.xu.linux@gmail.com>
 X-Google-Original-From: Like Xu <likexu@tencent.com>
 To:     Sean Christopherson <seanjc@google.com>,
         Paolo Bonzini <pbonzini@redhat.com>
 Cc:     kvm@vger.kernel.org
-Subject: [kvm-unit-tests PATCH v2 0/5] x86/pmu: Test case optimization, fix and addition
-Date:   Tue, 16 Aug 2022 16:09:04 +0800
-Message-Id: <20220816080909.90622-1-likexu@tencent.com>
+Subject: [kvm-unit-tests PATCH v2 5/5] x86: create pmu group for quick pmu-scope testing
+Date:   Tue, 16 Aug 2022 16:09:09 +0800
+Message-Id: <20220816080909.90622-6-likexu@tencent.com>
 X-Mailer: git-send-email 2.37.2
+In-Reply-To: <20220816080909.90622-1-likexu@tencent.com>
+References: <20220816080909.90622-1-likexu@tencent.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
@@ -68,28 +70,43 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-v1 -> v2 Changelog:
-- Introduce __start_event() and multiple_many() for readability; (Sean)
-  (https://lore.kernel.org/kvm/20220801131814.24364-1-likexu@tencent.com/)
-- Move PEBS testcases to this patch set for easier tracking;
-  (https://lore.kernel.org/kvm/20220728112119.58173-1-likexu@tencent.com/)
-- Create vPMU testcase group as more related tests are coming;
+From: Like Xu <likexu@tencent.com>
 
-Like Xu (5):
-  x86/pmu: Introduce __start_event() to drop all of the manual zeroing
-  x86/pmu: Introduce multiple_{one, many}() to improve readability
-  x86/pmu: Reset the expected count of the fixed counter 0 when i386
-  x86/pmu: Add tests for Intel Processor Event Based Sampling (PEBS)
-  x86: create pmu group for quick pmu-scope testing
+Any agent can run "./run_tests.sh -g pmu" for vPMU-related testcases.
 
- lib/x86/msr.h       |   1 +
- x86/Makefile.x86_64 |   1 +
- x86/pmu.c           |  49 +++--
- x86/pmu_pebs.c      | 486 ++++++++++++++++++++++++++++++++++++++++++++
- x86/unittests.cfg   |  10 +
- 5 files changed, 527 insertions(+), 20 deletions(-)
- create mode 100644 x86/pmu_pebs.c
+Signed-off-by: Like Xu <likexu@tencent.com>
+---
+ x86/unittests.cfg | 3 +++
+ 1 file changed, 3 insertions(+)
 
+diff --git a/x86/unittests.cfg b/x86/unittests.cfg
+index c5efb25..54f0437 100644
+--- a/x86/unittests.cfg
++++ b/x86/unittests.cfg
+@@ -189,6 +189,7 @@ file = pmu.flat
+ extra_params = -cpu max
+ check = /proc/sys/kernel/nmi_watchdog=0
+ accel = kvm
++groups = pmu
+ 
+ [pmu_lbr]
+ arch = x86_64
+@@ -197,6 +198,7 @@ extra_params = -cpu host,migratable=no
+ check = /sys/module/kvm/parameters/ignore_msrs=N
+ check = /proc/sys/kernel/nmi_watchdog=0
+ accel = kvm
++groups = pmu
+ 
+ [pmu_pebs]
+ arch = x86_64
+@@ -204,6 +206,7 @@ file = pmu_pebs.flat
+ extra_params = -cpu host,migratable=no
+ check = /proc/sys/kernel/nmi_watchdog=0
+ accel = kvm
++groups = pmu
+ 
+ [vmware_backdoors]
+ file = vmware_backdoors.flat
 -- 
 2.37.2
 
