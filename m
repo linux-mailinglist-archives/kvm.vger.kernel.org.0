@@ -2,216 +2,227 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 0DFEF595F3B
-	for <lists+kvm@lfdr.de>; Tue, 16 Aug 2022 17:37:35 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 376D3595F4B
+	for <lists+kvm@lfdr.de>; Tue, 16 Aug 2022 17:38:58 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236123AbiHPPh1 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 16 Aug 2022 11:37:27 -0400
+        id S230332AbiHPPir (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 16 Aug 2022 11:38:47 -0400
 Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51176 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S236104AbiHPPhH (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 16 Aug 2022 11:37:07 -0400
-Received: from mail-pj1-x1033.google.com (mail-pj1-x1033.google.com [IPv6:2607:f8b0:4864:20::1033])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4E9113F306
-        for <kvm@vger.kernel.org>; Tue, 16 Aug 2022 08:35:31 -0700 (PDT)
-Received: by mail-pj1-x1033.google.com with SMTP id pm17so10053218pjb.3
-        for <kvm@vger.kernel.org>; Tue, 16 Aug 2022 08:35:31 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc;
-        bh=IMfgxaR3aIPhLUAX0j5T+D/oB82QAPyvY6Oa11PC6KI=;
-        b=pftyEX3cEdK6hGGrEoVpQZ1IC+2Uu9Q3/0fhK7nrI94lX8rf+RiM3dErTgu9a0dhsw
-         QF9ifBXW7YCDH9H+7GA7h0xuI4S3IDnDc0EZBvzIzQuVZb3UjtDK6DRw8SBeXE8KLfST
-         +q/5wq5LiTeImc70ih8l414MPrTVtA97loUqSJjdQ7tIMN0WRSXB63L+h5eEpafhsrIT
-         RWbGYmmAl7jaUPI6kICv7MfX2GpS37ctDg8/MqxUux8cbxLdnCg3QdvfDcLCCsa75xKs
-         DS0IlQu+30VpbQHlBlRmEMf5jrrRB1bQ3JshebSKoIocxTiO5snulr4Vi0g1rhbRIuPB
-         Zn5w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc;
-        bh=IMfgxaR3aIPhLUAX0j5T+D/oB82QAPyvY6Oa11PC6KI=;
-        b=29U37gPevb/GjchEs+fZUZ/Yca9zQm3TLdTDkUyHxZBvo11t6ci1DI4xvWYy+8d7Nf
-         GwT6ndzYrtnxmGnaZJjaltZyqSbZO8RGDupWwXHRGRxI6e6os4HIa66KFOJvM7DkEilH
-         ap17EutHQmLmvoxxNwD9LV1PeU2pWw59hGFb4K4sXib/bZMp6963ftbseRgcbECMjLrq
-         Deem49zwEzZ8VvZ1fouAKGSvwK3Tl56p+w8FGlD83JKEhvtf6NSF3rp+layRulKaMFoG
-         uq+MmSVjuEK8wZJntf0+E56PKTd/KEc5s1TEMymkV5GIYs6grgMnvkHTHTwfX1nmCLVM
-         XW8g==
-X-Gm-Message-State: ACgBeo30Xte3JxdkV64klpAh/JQZcc6oKw8Izjm+Eks9hGr93rTVsYQh
-        jH1be+3ntYuiNEZ2euYuAjORGA==
-X-Google-Smtp-Source: AA6agR7CVQbEvb6O0TLi/Xd3wpoDyTZHB19s6hbbOTh/AgAbOWqP8s/m6yX3W+n+e+9mu1mFAcRuiw==
-X-Received: by 2002:a17:902:b68e:b0:172:8674:c6c1 with SMTP id c14-20020a170902b68e00b001728674c6c1mr2584320pls.62.1660664130654;
-        Tue, 16 Aug 2022 08:35:30 -0700 (PDT)
-Received: from google.com (7.104.168.34.bc.googleusercontent.com. [34.168.104.7])
-        by smtp.gmail.com with ESMTPSA id x28-20020aa7941c000000b0052d63fb109asm8605166pfo.20.2022.08.16.08.35.30
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 16 Aug 2022 08:35:30 -0700 (PDT)
-Date:   Tue, 16 Aug 2022 15:35:26 +0000
-From:   Sean Christopherson <seanjc@google.com>
-To:     isaku.yamahata@intel.com
-Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
-        isaku.yamahata@gmail.com, Paolo Bonzini <pbonzini@redhat.com>,
-        erdemaktas@google.com, Sagi Shahar <sagis@google.com>
-Subject: Re: [PATCH v8 053/103] KVM: TDX: TDP MMU TDX support
-Message-ID: <Yvu5PsAndEbWKTHc@google.com>
-References: <cover.1659854790.git.isaku.yamahata@intel.com>
- <2b51971467ab7c8e60ea1e17ba09f607db444935.1659854790.git.isaku.yamahata@intel.com>
+        with ESMTP id S235973AbiHPPiQ (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 16 Aug 2022 11:38:16 -0400
+Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D33B486715
+        for <kvm@vger.kernel.org>; Tue, 16 Aug 2022 08:37:22 -0700 (PDT)
+Received: from pps.filterd (m0098409.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.17.1.5/8.17.1.5) with ESMTP id 27GEunFL018479
+        for <kvm@vger.kernel.org>; Tue, 16 Aug 2022 15:37:22 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=date : from : to : cc :
+ subject : message-id : in-reply-to : references : mime-version :
+ content-type : content-transfer-encoding; s=pp1;
+ bh=DONKCbPH49vZ6VJZFm8OrKUz299AsPCW5Rfb/NHWeMU=;
+ b=UU1w0Q0T4wgY4mti6TJ2pLsAN2VL3PVxAmNV91EfKJdOwrWP4k1mQVJfWDHTbYRqKFHx
+ zrpBb8WGBdF9tL5zz22qVV+jZfWSK3RxhwWf7FNw+dDKHzL3UJ3ED1XxNSxYCywnNeES
+ UIQCCQl/bqhjPCXEgsXaNgBRjD9GIhNQx/qRunYhbkFK6SAygTvd6ebbQGBDb94tCpT5
+ 5hW+EnKv315zfM/MCiRUWTkrciaKAbd2hwWAaLIGGEIB+OExt5dO8FMNW3CC4WuFWEQZ
+ 8JWJtFzAr1sbR5czSbecpeoVdnUNktGKhsTjtIzbkSySXy+wwNPIIFKHfFJFDf7FKUtM 6g== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3j0c2650dj-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT)
+        for <kvm@vger.kernel.org>; Tue, 16 Aug 2022 15:37:22 +0000
+Received: from m0098409.ppops.net (m0098409.ppops.net [127.0.0.1])
+        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 27GDM6Sc020069
+        for <kvm@vger.kernel.org>; Tue, 16 Aug 2022 15:37:22 GMT
+Received: from ppma06fra.de.ibm.com (48.49.7a9f.ip4.static.sl-reverse.com [159.122.73.72])
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3j0c2650c9-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Tue, 16 Aug 2022 15:37:21 +0000
+Received: from pps.filterd (ppma06fra.de.ibm.com [127.0.0.1])
+        by ppma06fra.de.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 27GFL7Gt002538;
+        Tue, 16 Aug 2022 15:37:19 GMT
+Received: from b06cxnps3074.portsmouth.uk.ibm.com (d06relay09.portsmouth.uk.ibm.com [9.149.109.194])
+        by ppma06fra.de.ibm.com with ESMTP id 3hx37j2k16-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Tue, 16 Aug 2022 15:37:19 +0000
+Received: from d06av24.portsmouth.uk.ibm.com (d06av24.portsmouth.uk.ibm.com [9.149.105.60])
+        by b06cxnps3074.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 27GFbGeD18153946
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Tue, 16 Aug 2022 15:37:16 GMT
+Received: from d06av24.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 8071C42041;
+        Tue, 16 Aug 2022 15:37:16 +0000 (GMT)
+Received: from d06av24.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 3B30C4203F;
+        Tue, 16 Aug 2022 15:37:16 +0000 (GMT)
+Received: from p-imbrenda (unknown [9.145.13.253])
+        by d06av24.portsmouth.uk.ibm.com (Postfix) with ESMTP;
+        Tue, 16 Aug 2022 15:37:16 +0000 (GMT)
+Date:   Tue, 16 Aug 2022 17:37:07 +0200
+From:   Claudio Imbrenda <imbrenda@linux.ibm.com>
+To:     Nico Boehr <nrb@linux.ibm.com>
+Cc:     kvm@vger.kernel.org, frankja@linux.ibm.com, thuth@redhat.com
+Subject: Re: [kvm-unit-tests PATCH v4 3/3] s390x: smp: add tests for calls
+ in wait state
+Message-ID: <20220816173707.0efc67db@p-imbrenda>
+In-Reply-To: <20220810074616.1223561-4-nrb@linux.ibm.com>
+References: <20220810074616.1223561-1-nrb@linux.ibm.com>
+        <20220810074616.1223561-4-nrb@linux.ibm.com>
+Organization: IBM
+X-Mailer: Claws Mail 4.1.0 (GTK 3.24.34; x86_64-redhat-linux-gnu)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <2b51971467ab7c8e60ea1e17ba09f607db444935.1659854790.git.isaku.yamahata@intel.com>
-X-Spam-Status: No, score=-14.4 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        ENV_AND_HDR_SPF_MATCH,FSL_HELO_FAKE,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,
-        SPF_PASS,T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL
-        autolearn=no autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: --g8zhztNAif0eIXVuQlJY4-CMWoDDKB
+X-Proofpoint-ORIG-GUID: kceOmrMgNFDnUo2aSoGOVfoLnmYaQPrW
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.205,Aquarius:18.0.883,Hydra:6.0.517,FMLib:17.11.122.1
+ definitions=2022-08-16_08,2022-08-16_02,2022-06-22_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 adultscore=0 suspectscore=0
+ impostorscore=0 mlxlogscore=999 spamscore=0 priorityscore=1501 bulkscore=0
+ clxscore=1015 lowpriorityscore=0 phishscore=0 mlxscore=0 malwarescore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2207270000
+ definitions=main-2208160059
+X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_EF,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_PASS,
+        T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Sun, Aug 07, 2022, isaku.yamahata@intel.com wrote:
-> +static void tdx_unpin_pfn(struct kvm *kvm, kvm_pfn_t pfn)
+On Wed, 10 Aug 2022 09:46:16 +0200
+Nico Boehr <nrb@linux.ibm.com> wrote:
 
-Why does this helper exist?  KVM should not be pinning private pages, that should
-be the purview of the private backing fd.
+> When the SIGP interpretation facility is in use a SIGP external call to
+> a waiting CPU will result in an exit of the calling cpu. For non-pv
+> guests it's a code 56 (partial execution) exit otherwise its a code 108
+> (secure instruction notification) exit. Those exits are handled
+> differently from a normal SIGP instruction intercept that happens
+> without interpretation and hence need to be tested.
+> 
+> Signed-off-by: Nico Boehr <nrb@linux.ibm.com>
 
+Reviewed-by: Claudio Imbrenda <imbrenda@linux.ibm.com>
+
+> ---
+>  s390x/smp.c | 97 +++++++++++++++++++++++++++++++++++++++++++++++++++++
+>  1 file changed, 97 insertions(+)
+> 
+> diff --git a/s390x/smp.c b/s390x/smp.c
+> index 5a269087581f..91f3e3bcc12a 100644
+> --- a/s390x/smp.c
+> +++ b/s390x/smp.c
+> @@ -356,6 +356,102 @@ static void test_calls(void)
+>  	}
+>  }
+>  
+> +static void call_in_wait_ext_int_fixup(struct stack_frame_int *stack)
 > +{
-> +	struct page *page = pfn_to_page(pfn);
-> +
-> +	put_page(page);
-> +	WARN_ON(!page_count(page) && to_kvm_tdx(kvm)->hkid > 0);
-
-For all patches, please use the ONCE variant or KVM_BUG_ON() where appropriate.
-An unlimited WARN/WARN_ON() is all but guaranteed to spam the kernel log and bring
-the host to its knees if it fires.
-
+> +	/* Clear wait bit so we don't immediately wait again after the fixup */
+> +	lowcore.ext_old_psw.mask &= ~PSW_MASK_WAIT;
 > +}
 > +
-> +static void __tdx_sept_set_private_spte(struct kvm *kvm, gfn_t gfn,
-> +					enum pg_level level, kvm_pfn_t pfn)
+> +static void call_in_wait_setup(void)
 > +{
-> +	struct kvm_tdx *kvm_tdx = to_kvm_tdx(kvm);
-> +	hpa_t hpa = pfn_to_hpa(pfn);
-> +	gpa_t gpa = gfn_to_gpa(gfn);
-> +	struct tdx_module_output out;
-> +	u64 err;
+> +	expect_ext_int();
+> +	ctl_set_bit(0, current_sigp_call_case->cr0_bit);
+> +	register_ext_cleanup_func(call_in_wait_ext_int_fixup);
 > +
-> +	if (WARN_ON_ONCE(is_error_noslot_pfn(pfn) ||
-> +			 !kvm_pfn_to_refcounted_page(pfn)))
-
-I'm terribly confused.  The cover letter says:
-
-  - fd-based private page v7 is integrated. This is mostly same to Chao's patches.
-
-which I interpreted as meaning this series relies on UPM.  But if that's the case,
-why is KVM manually requiring private memory to be backed by "struct page" and then
-manually pinning pages?
-
-> +		return;
-> +
-> +	/* TODO: handle large pages. */
-> +	if (KVM_BUG_ON(level != PG_LEVEL_4K, kvm))
-> +		return;
-> +
-> +	/* To prevent page migration, do nothing on mmu notifier. */
-> +	get_page(pfn_to_page(pfn));
-
-Again, what's going on here?
-
-> +
-> +	if (likely(is_td_finalized(kvm_tdx))) {
-> +		err = tdh_mem_page_aug(kvm_tdx->tdr.pa, gpa, hpa, &out);
-> +		if (KVM_BUG_ON(err, kvm)) {
-> +			pr_tdx_error(TDH_MEM_PAGE_AUG, err, &out);
-> +			put_page(pfn_to_page(pfn));
-> +		}
-> +		return;
-
-This return is pointless.
-
-> +	}
+> +	set_flag(1);
 > +}
 > +
-> +static void tdx_sept_set_private_spte(struct kvm *kvm, gfn_t gfn,
-> +				      enum pg_level level, kvm_pfn_t pfn)
+> +static void call_in_wait_received(void)
 > +{
-> +	struct kvm_tdx *kvm_tdx = to_kvm_tdx(kvm);
+> +	report(lowcore.ext_int_code == current_sigp_call_case->ext_int_expected_type, "received");
 > +
-> +	spin_lock(&kvm_tdx->seamcall_lock);
-> +	__tdx_sept_set_private_spte(kvm, gfn, level, pfn);
-> +	spin_unlock(&kvm_tdx->seamcall_lock);
+> +	set_flag(1);
 > +}
 > +
-> +static void tdx_sept_drop_private_spte(
-
-Please fix this style for all patches.  And not just in function prototypes, but
-also in function calls and probably several other places as well.  The _strongly_
-preferred style is:
-
-static void tdx_sept_drop_private_spte(struct kvm *kvm, gfn_t gfn,
-				       enum pg_level level, kvm_pfn_t pfn)
-
-> +	struct kvm *kvm, gfn_t gfn, enum pg_level level, kvm_pfn_t pfn)
+> +static void call_in_wait_cleanup(void)
 > +{
-> +	int tdx_level = pg_level_to_tdx_sept_level(level);
-> +	struct kvm_tdx *kvm_tdx = to_kvm_tdx(kvm);
-> +	gpa_t gpa = gfn_to_gpa(gfn);
-> +	hpa_t hpa = pfn_to_hpa(pfn);
-> +	hpa_t hpa_with_hkid;
-> +	struct tdx_module_output out;
-> +	u64 err = 0;
+> +	ctl_clear_bit(0, current_sigp_call_case->cr0_bit);
+> +	register_ext_cleanup_func(NULL);
 > +
-> +	/* TODO: handle large pages. */
-> +	if (KVM_BUG_ON(level != PG_LEVEL_4K, kvm))
-> +		return;
+> +	set_flag(1);
+> +}
 > +
-> +	spin_lock(&kvm_tdx->seamcall_lock);
-
-Taking a spinlock completely defeats the purpose of taking mmu_lock for read.  This
-is definitely not an acceptable approach long term, and even for initial upstreaming
-I'm hesitant to punt on adding proper retry logic.
-
-> +	if (is_hkid_assigned(kvm_tdx)) {
-> +		err = tdh_mem_page_remove(kvm_tdx->tdr.pa, gpa, tdx_level, &out);
-> +		if (KVM_BUG_ON(err, kvm)) {
-> +			pr_tdx_error(TDH_MEM_PAGE_REMOVE, err, &out);
-> +			goto unlock;
+> +static void test_calls_in_wait(void)
+> +{
+> +	int i;
+> +	struct psw psw;
+> +
+> +	report_prefix_push("psw wait");
+> +	for (i = 0; i < ARRAY_SIZE(cases_sigp_call); i++) {
+> +		current_sigp_call_case = &cases_sigp_call[i];
+> +
+> +		report_prefix_push(current_sigp_call_case->name);
+> +		if (!current_sigp_call_case->supports_pv && uv_os_is_guest()) {
+> +			report_skip("Not supported under PV");
+> +			report_prefix_pop();
+> +			continue;
 > +		}
 > +
-> +		hpa_with_hkid = set_hkid_to_hpa(hpa, (u16)kvm_tdx->hkid);
-> +		err = tdh_phymem_page_wbinvd(hpa_with_hkid);
-> +		if (WARN_ON_ONCE(err)) {
-
-Why is the above a KVM_BUG_ON() but this one is not?
-
-> +			pr_tdx_error(TDH_PHYMEM_PAGE_WBINVD, err, NULL);
-> +			goto unlock;
-> +		}
-> +	} else
+> +		/* Let the secondary CPU setup the external mask and the external interrupt cleanup function */
+> +		set_flag(0);
+> +		psw.mask = extract_psw_mask();
+> +		psw.addr = (unsigned long)call_in_wait_setup;
+> +		smp_cpu_start(1, psw);
+> +
+> +		/* Wait until the receiver has finished setup */
+> +		wait_for_flag();
+> +		set_flag(0);
+> +
 > +		/*
-> +		 * The HKID assigned to this TD was already freed and cache
-> +		 * was already flushed. We don't have to flush again.
+> +		 * To avoid races, we need to know that the secondary CPU has entered wait,
+> +		 * but the architecture provides no way to check whether the secondary CPU
+> +		 * is in wait.
+> +		 *
+> +		 * But since a waiting CPU is considered operating, simply stop the CPU, set
+> +		 * up the restart new PSW mask in wait, send the restart interrupt and then
+> +		 * wait until the CPU becomes operating (done by smp_cpu_start).
 > +		 */
-> +		err = tdx_reclaim_page((unsigned long)__va(hpa), hpa, false, 0);
+> +		smp_cpu_stop(1);
+> +		psw.mask = extract_psw_mask() | PSW_MASK_EXT | PSW_MASK_WAIT;
+> +		psw.addr = (unsigned long)call_in_wait_received;
+> +		smp_cpu_start(1, psw);
 > +
-> +unlock:
-> +	spin_unlock(&kvm_tdx->seamcall_lock);
+> +		smp_sigp(1, current_sigp_call_case->call, 0, NULL);
 > +
-> +	if (!err)
-> +		tdx_unpin_pfn(kvm, pfn);
+> +		/* Wait until the receiver has handled the call */
+> +		wait_for_flag();
+> +		smp_cpu_stop(1);
+> +		set_flag(0);
+> +
+> +		/*
+> +		 * Now clean up the mess we have left behind. If the cleanup
+> +		 * were part of call_in_wait_received we would not get a chance
+> +		 * to catch an interrupt that is presented twice since we would
+> +		 * disable the external call on the first interrupt.
+> +		 */
+> +		psw.mask = extract_psw_mask();
+> +		psw.addr = (unsigned long)call_in_wait_cleanup;
+> +		smp_cpu_start(1, psw);
+> +
+> +		/* Wait until the cleanup has been completed */
+> +		wait_for_flag();
+> +		smp_cpu_stop(1);
+> +
+> +		report_prefix_pop();
+> +	}
+> +	report_prefix_pop();
 > +}
 > +
+>  static void test_sense_running(void)
+>  {
+>  	report_prefix_push("sense_running");
+> @@ -474,6 +570,7 @@ int main(void)
+>  	test_store_status();
+>  	test_set_prefix();
+>  	test_calls();
+> +	test_calls_in_wait();
+>  	test_sense_running();
+>  	test_reset();
+>  	test_reset_initial();
 
-...
-
-> +static void tdx_handle_changed_private_spte(
-> +	struct kvm *kvm, const struct kvm_spte_change *change)
-
-I haven't look at this in detail, and probably won't for a few weeks, but my initial
-reaction is that I really, really don't like funnelling both insertion and deletion
-into a single helper.  E.g. it should be trivial to pass the source_pa for PAGE.ADD
-via kvm_page_fault instead of shoving it into the struct kvm_tdx (or struct vcpu_tdx).
-But smushing the two things together makes that painfully difficult.
