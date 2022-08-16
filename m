@@ -2,64 +2,65 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 6564759660E
-	for <lists+kvm@lfdr.de>; Wed, 17 Aug 2022 01:36:53 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 66854596623
+	for <lists+kvm@lfdr.de>; Wed, 17 Aug 2022 01:47:03 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237584AbiHPXeP (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 16 Aug 2022 19:34:15 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33992 "EHLO
+        id S237696AbiHPXpQ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 16 Aug 2022 19:45:16 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42726 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S237224AbiHPXeN (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 16 Aug 2022 19:34:13 -0400
-Received: from mail-pl1-x62f.google.com (mail-pl1-x62f.google.com [IPv6:2607:f8b0:4864:20::62f])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 714BE7AC03
-        for <kvm@vger.kernel.org>; Tue, 16 Aug 2022 16:34:12 -0700 (PDT)
-Received: by mail-pl1-x62f.google.com with SMTP id p18so10571648plr.8
-        for <kvm@vger.kernel.org>; Tue, 16 Aug 2022 16:34:12 -0700 (PDT)
+        with ESMTP id S236643AbiHPXpP (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 16 Aug 2022 19:45:15 -0400
+Received: from mail-pj1-x102a.google.com (mail-pj1-x102a.google.com [IPv6:2607:f8b0:4864:20::102a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0533291D0F
+        for <kvm@vger.kernel.org>; Tue, 16 Aug 2022 16:45:15 -0700 (PDT)
+Received: by mail-pj1-x102a.google.com with SMTP id c19-20020a17090ae11300b001f2f94ed5c6so2178849pjz.1
+        for <kvm@vger.kernel.org>; Tue, 16 Aug 2022 16:45:14 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:from:to:cc;
-        bh=8ETP/Ktaqcv7tPYq7+lEOPfVoA9Z1uN0o+04/7SipRg=;
-        b=VR/y9hXheTvaQXwpdmc6aIoOBdKkd4YAuLUXMf9R4KA4vHDLjusEqQJz2jVpUe9psh
-         PCj+D1X3WyPodqWWl5JMTSBHn053EGaSqAIKVEau966Asj+QzEe5cKnpNDUadkAqgSNm
-         WBykD2Dc1ff99h5mCMZBUEPAxzCrM5YM8kz3Nx1gR4gvVXa9oCRMLeOQzU8+GJf9Mtwe
-         R48Mov/urVKjpceJa/BORjWhntwF6o0uU64rSeQFXPLPawYBeAx9mgZ8Oxwoz3twBVhz
-         zimZJXu7ZbTqfflkVB4xF/UldXd/asNmqTEJmtRbIi3kkkStjpvLwVBbqw8X/Tb5mP4v
-         8XBQ==
+        bh=T8Wd5ecB9QDTm6Zwnt9WBgEsFx0O5umnw625jWHrX/M=;
+        b=jumeSEYxVa1d9kq7i5FFS4qyMGOZkNP0043rIjIqRE3Vugi8nADSvyvpmv3f1SvV5Y
+         eIWNRT4/oHQZ8V9HHSEjEBd/Sui40yeXHtlb5JS5tB2nCSB2F6r+pVMiXXXXHulkDarn
+         Z4rsOg7u4h/dG6fFXX9RtjtI40Slm6UulsbB/8Z6IYqv2gNOez8PhJ4G10/WdyrK+7yK
+         25juHiVzZNSBYfzjdikFcVDPhGAaQs/KVum4Rco1DRXvx2x1vj09a1TQfRl6WIMNbznT
+         FrkKJpxO8r+ywD5UC4+KWiYIoqJhc8i1SaN1burCu2r/nCF0IoEq366ud58eY3AueX7l
+         3cug==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:x-gm-message-state:from:to:cc;
-        bh=8ETP/Ktaqcv7tPYq7+lEOPfVoA9Z1uN0o+04/7SipRg=;
-        b=qHplz1vJMaGi8tQhBI63TcbNKstQ4v5nDKS5KAH5nBWQ6YecxZosFJ5PJU/gaEZNIV
-         KvbfJHdt4Jxo1S0guvwK8ozPVNdCFt4bIDVC2346NA3v0iS1GdNbYmhBQ5m/zTCwk0QQ
-         27Du+ilWL6YjVUygSPf5k+/pKAMDj89MOqeoImaWMrOQCWfYNHh2fmtBbyeDOhVLU6zn
-         ErzzGXaoQZvCcNu6r3Bv+TN0dBUvWNAZGJcuW1vXUt5cnwEBQLs1U//+0c6KuvpswDSz
-         R57QIyeihS/FMqcqucOuK8XlXGrTHI9l3672HCZsvQUYcb/6M+1djcaWBaekGi+4dfPa
-         x3Xw==
-X-Gm-Message-State: ACgBeo1oE2ztmII8H0EV0YLNGKU3rSBMPHvER+C4ohzd55vPioT+17bY
-        5wD9hDDm4m2vJy18g2tMYGfR9g==
-X-Google-Smtp-Source: AA6agR7jgmxaIyY03EYy5Qn5NGC4wF6e3tDTx+MU4UQynzo3qvL9KCegq5GO7LSGHIPOIQtgRMOksA==
-X-Received: by 2002:a17:90a:c395:b0:1fa:b411:805a with SMTP id h21-20020a17090ac39500b001fab411805amr403844pjt.74.1660692851799;
-        Tue, 16 Aug 2022 16:34:11 -0700 (PDT)
+        bh=T8Wd5ecB9QDTm6Zwnt9WBgEsFx0O5umnw625jWHrX/M=;
+        b=qPpP+mHfWwSSX4vmXWBnHW5DKM/O/Gr1TDRn40F5K5FYErW2J0KM8lI+Yek/mJjtvF
+         iOm1UIpHt6tB4753c7g5ADdTg1ynUnaZcuHcTYg3y5AJuRN6nOKyFVE3ueDHDmgWWHaz
+         tk5vgBriPfiaEClPMPugqH7BsKtGhr4T3LJyfgSS6uuAXk/T9Djrpk2hOnAntmyLu2v5
+         r2+dCXQ5nlG26RttiMqqE48TaRy6frrzG+EhYdcnIvo4HW1AWrwPeYiip2Mx5g0sxlC+
+         PHJHq4KLBIHpfsxlYpJQRNW7sAwUzdgfKiEs9wxMmrp5GT9epeKn9L23F6YwWBHdyMag
+         B3Qw==
+X-Gm-Message-State: ACgBeo2b2tpaRkoqDSgaMG8n3ZI0f3MBmhaXiGWn1HeLJqdw9NiN+dnQ
+        sRCB8o8LEBm57ibZUhoX7Rod4d1tZS3WaQ==
+X-Google-Smtp-Source: AA6agR76/9iHZUvxlYJRUAl4HHUCIQebjkGRgwgIoQ3QmecE2Cr0/B8jZ0or2nfgmiWsyUzwV3wXNQ==
+X-Received: by 2002:a17:902:f68f:b0:171:55f0:9062 with SMTP id l15-20020a170902f68f00b0017155f09062mr23600649plg.18.1660693512929;
+        Tue, 16 Aug 2022 16:45:12 -0700 (PDT)
 Received: from google.com (7.104.168.34.bc.googleusercontent.com. [34.168.104.7])
-        by smtp.gmail.com with ESMTPSA id r13-20020a65498d000000b0041bb35b9e80sm8242500pgs.53.2022.08.16.16.34.11
+        by smtp.gmail.com with ESMTPSA id x29-20020aa7941d000000b00525343b5047sm8971175pfo.76.2022.08.16.16.45.12
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 16 Aug 2022 16:34:11 -0700 (PDT)
-Date:   Tue, 16 Aug 2022 23:34:07 +0000
+        Tue, 16 Aug 2022 16:45:12 -0700 (PDT)
+Date:   Tue, 16 Aug 2022 23:45:08 +0000
 From:   Sean Christopherson <seanjc@google.com>
 To:     Paolo Bonzini <pbonzini@redhat.com>
 Cc:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
         mlevitsk@redhat.com, vkuznets@redhat.com
-Subject: Re: [PATCH v2 2/9] KVM: x86: remove return value of kvm_vcpu_block
-Message-ID: <Yvwpb6ofD1S+Rqk1@google.com>
+Subject: Re: [PATCH v2 9/9] KVM: x86: never write to memory from
+ kvm_vcpu_check_block
+Message-ID: <YvwsBC2HqodxaYRJ@google.com>
 References: <20220811210605.402337-1-pbonzini@redhat.com>
- <20220811210605.402337-3-pbonzini@redhat.com>
+ <20220811210605.402337-10-pbonzini@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20220811210605.402337-3-pbonzini@redhat.com>
+In-Reply-To: <20220811210605.402337-10-pbonzini@redhat.com>
 X-Spam-Status: No, score=-14.4 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
         ENV_AND_HDR_SPF_MATCH,FSL_HELO_FAKE,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,
@@ -72,71 +73,54 @@ List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
 On Thu, Aug 11, 2022, Paolo Bonzini wrote:
-> The return value of kvm_vcpu_block will be repurposed soon to return
-
-kvm_vcpu_block()
-
-> the state of KVM_REQ_UNHALT.  In preparation for that, get rid of the
-> current return value.  It is only used by kvm_vcpu_halt to decide whether
-
-kvm_vcpu_halt()
-
-> the call resulted in a wait, but the same effect can be obtained with
-> a single round of polling.
+> kvm_vcpu_check_block() is called while not in TASK_RUNNING, and therefore
+> it cannot sleep.  Writing to guest memory is therefore forbidden, but it
+> can happen on AMD processors if kvm_check_nested_events() causes a vmexit.
 > 
-> No functional change intended, apart from practically indistinguishable
-> changes to the polling behavior.
+> Fortunately, all events that are caught by kvm_check_nested_events() are
+> also recognized by kvm_vcpu_has_events() through vendor callbacks such as
+> kvm_x86_interrupt_allowed() or kvm_x86_ops.nested_ops->has_events(), so
+> remove the call and postpone the actual processing to vcpu_block().
+> 
+> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+> ---
+>  arch/x86/kvm/x86.c | 14 +++++++++++---
+>  1 file changed, 11 insertions(+), 3 deletions(-)
+> 
+> diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+> index 5e9358ea112b..9226fd536783 100644
+> --- a/arch/x86/kvm/x86.c
+> +++ b/arch/x86/kvm/x86.c
+> @@ -10639,6 +10639,17 @@ static inline int vcpu_block(struct kvm_vcpu *vcpu)
+>  			return 1;
+>  	}
+>  
+> +	if (is_guest_mode(vcpu)) {
+> +		/*
+> +		 * Evaluate nested events before exiting the halted state.
+> +		 * This allows the halt state to be recorded properly in
+> +		 * the VMCS12's activity state field (AMD does not have
+> +		 * a similar field and a vmexit always causes a spurious
+> +		 * wakeup from HLT).
+> +		 */
+> +		kvm_check_nested_events(vcpu);
 
-This "breaks" update_halt_poll_stats().  At the very least, it breaks the comment
-that effectively says "waited" is set if and only if schedule() is called.
+Formatting nit, I'd prefer the block comment go above the if-statement, that way
+we avoiding debating whether or not the technically-unnecessary braces align with
+kernel/KVM style, and it doesn't have to wrap as aggressively.
+
+And s/vmexit/VM-Exit while I'm nitpicking.
 
 	/*
-	 * Note, halt-polling is considered successful so long as the vCPU was
-	 * never actually scheduled out, i.e. even if the wake event arrived
-	 * after of the halt-polling loop itself, but before the full wait.
+	 * Evaluate nested events before exiting the halted state.  This allows
+	 * the halt state to be recorded properly in the VMCS12's activity
+	 * state field (AMD does not have a similar field and a VM-Exit always
+	 * causes a spurious wakeup from HLT).
 	 */
-	if (do_halt_poll)
-		update_halt_poll_stats(vcpu, start, poll_end, !waited);
+	if (is_guest_mode(vcpu))
+		kvm_check_nested_events(vcpu);
 
-> @@ -3493,35 +3489,32 @@ void kvm_vcpu_halt(struct kvm_vcpu *vcpu)
->  {
->  	bool halt_poll_allowed = !kvm_arch_no_poll(vcpu);
->  	bool do_halt_poll = halt_poll_allowed && vcpu->halt_poll_ns;
-> -	ktime_t start, cur, poll_end;
-> +	ktime_t start, cur, poll_end, stop;
->  	bool waited = false;
->  	u64 halt_ns;
->  
->  	start = cur = poll_end = ktime_get();
-> -	if (do_halt_poll) {
-> -		ktime_t stop = ktime_add_ns(start, vcpu->halt_poll_ns);
-> +	stop = do_halt_poll ? start : ktime_add_ns(start, vcpu->halt_poll_ns);
-
-This is inverted, the loop should terminate after the first iteration (stop==start)
-if halt-polling is _not_ allowed, i.e. do_halt_poll is false.
-
-Overall, I don't like this patch.  I don't necessarily hate it, but I definitely
-don't like it.
-
-Isn't freeing up the return from kvm_vcpu_check_block() unnecessary?  Can't we
-just do:
-
-diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-index 9f11b505cbee..ccb9f8bdeb18 100644
---- a/arch/x86/kvm/x86.c
-+++ b/arch/x86/kvm/x86.c
-@@ -10633,7 +10633,7 @@ static inline int vcpu_block(struct kvm_vcpu *vcpu)
-                if (hv_timer)
-                        kvm_lapic_switch_to_hv_timer(vcpu);
-
--               if (!kvm_check_request(KVM_REQ_UNHALT, vcpu))
-+               if (!kvm_arch_vcpu_runnable(vcpu))
-                        return 1;
-        }
-
-
-which IMO is more intuitive and doesn't require reworking halt-polling (again).
-
-I don't see why KVM cares if a vCPU becomes runnable after detecting that something
-else caused kvm_vcpu_check_block() to bail.  E.g. a pending signal doesn't invalidate
-a pending vCPU event, and either way KVM is bailing from the run loop.
+Side topic, the AMD behavior is a bug report waiting to happen.  I know of at least
+one customer failure that was root caused to a KVM bug where KVM caused a spurious
+wakeup.  To be fair, the guest workload was being stupid (execute HLT on vCPU and
+then effectively unmap its code by doing kexec), but it's still an unpleasant gap :-(
