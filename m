@@ -2,206 +2,147 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id E16DE59643E
-	for <lists+kvm@lfdr.de>; Tue, 16 Aug 2022 23:10:17 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 7CA49596440
+	for <lists+kvm@lfdr.de>; Tue, 16 Aug 2022 23:10:18 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237196AbiHPVKE (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 16 Aug 2022 17:10:04 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47940 "EHLO
+        id S237379AbiHPVKL (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 16 Aug 2022 17:10:11 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48008 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231589AbiHPVKC (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 16 Aug 2022 17:10:02 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 323AA7E012
-        for <kvm@vger.kernel.org>; Tue, 16 Aug 2022 14:10:01 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1660684200;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=0xae14lVeh2kNhNnwg1cZQHDZVItFs4GvsbtmRqUK8w=;
-        b=Hoyd0dBWhbq7nhURAv6sFmQaDmCkcvrgGysin13/l1GnwjSyL//InFa5NeMqySmm9Kxu0K
-        iXqBUrrVVaYe61NhbJmQN0B0VwlBJSXj2V4FUaUIRPCqVCE9htaKgP8SMLZfMS04stkCWr
-        zM4I2rpeMIjyqpZGJrQNiRrjhq/BC+Y=
-Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
- [209.85.128.72]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_128_GCM_SHA256) id
- us-mta-515-b84D1GskORaK9Dfqx55JIA-1; Tue, 16 Aug 2022 17:09:59 -0400
-X-MC-Unique: b84D1GskORaK9Dfqx55JIA-1
-Received: by mail-wm1-f72.google.com with SMTP id j22-20020a05600c485600b003a5e4420552so5331618wmo.8
-        for <kvm@vger.kernel.org>; Tue, 16 Aug 2022 14:09:58 -0700 (PDT)
+        with ESMTP id S231589AbiHPVKF (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 16 Aug 2022 17:10:05 -0400
+Received: from mail-pj1-x102e.google.com (mail-pj1-x102e.google.com [IPv6:2607:f8b0:4864:20::102e])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 764927E016
+        for <kvm@vger.kernel.org>; Tue, 16 Aug 2022 14:10:03 -0700 (PDT)
+Received: by mail-pj1-x102e.google.com with SMTP id pm17so10770294pjb.3
+        for <kvm@vger.kernel.org>; Tue, 16 Aug 2022 14:10:03 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc;
+        bh=3TNHDMK6crAKiQ8dof0O0YciDkj6xbRmAwSNGdrV/YE=;
+        b=boYJM7xJiO/wnH7j6dLOPptvSyfRhEgsvkuoBvfH+tM0qFfNdkwASUWa96bH+Jrsfv
+         AovCBxjPOLDEpy/pB8PCAwjZZ2T9DSIwSML7y7kyegifKjHSiC4en3bSXqmUoj4eX9t/
+         fmMFog27hbKyimdFYrGRXmR3o/r1aCaxGOAiqtqvUnSkMeh1enqk+Ou2goi4Mb+vyWmJ
+         iQpdkyicqBZpKn+EJA6Gw+2HO/iXuzk1uKiqzQVBVS80nyd4HzMP4obsBjF8MSJgqBQL
+         Bundqoyr7xLOjF1n8+WTMc9y3zG0uv5WVM0Ipfhum1rjqhV4q7EC+NXkjWE+GgH/D++F
+         MGxg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date
-         :x-gm-message-state:from:to:cc;
-        bh=0xae14lVeh2kNhNnwg1cZQHDZVItFs4GvsbtmRqUK8w=;
-        b=wB+uEqCTXym16+Qirq3tdCoJAxZLkE7BkFqIILKdwwOSA1v6LIX1sm1pmja9ys7GK0
-         bBfZfZLk00vhPzho/Fu4R72MwEcznWxVLGBf1JwrIKF/BLPxDVA/CBkGOSKA0H9/Fo3y
-         AoI4EWfdDmLHgChB0LhMBkHwXmwrSvDT9WavaFeOrMUdOd/Rrj9+7NcS7vhsujQzF3r7
-         pgpJ1MI/w5p/a/MO8mmOnw7ppHVa7GJN+QyimjbZz6sXWr/BCVHQkthSTigpUc8MXT9e
-         ANMBdNckwF0dxryTHOUl1+1JLvvBTv3X6UxHEfdPp349j2WPhc2gWzz+D2IvT5LkhiC6
-         xskA==
-X-Gm-Message-State: ACgBeo0No43zp+HlSeBuqGOeCHemz3kiVZ+t4/1Upoq97ki1De3aCjI+
-        1rAwIJ4YaRLmslKVqq80FkC6SmgAljtjzpmrE9eNE27vXrl9mWCo4m6h4IlF9eLY74vlPcFn0cR
-        L7vJvFTK7QqyE
-X-Received: by 2002:a05:6000:178e:b0:220:635f:eb13 with SMTP id e14-20020a056000178e00b00220635feb13mr12680073wrg.634.1660684197863;
-        Tue, 16 Aug 2022 14:09:57 -0700 (PDT)
-X-Google-Smtp-Source: AA6agR61GD6vmCsdhe0o/qF+vr5ZjerDcFyH4c3E/BWOKkmWXYXsvQWoq7RyRXoltM0F4/hZDJyhVA==
-X-Received: by 2002:a05:6000:178e:b0:220:635f:eb13 with SMTP id e14-20020a056000178e00b00220635feb13mr12680061wrg.634.1660684197625;
-        Tue, 16 Aug 2022 14:09:57 -0700 (PDT)
-Received: from redhat.com ([2.55.43.215])
-        by smtp.gmail.com with ESMTPSA id m17-20020a05600c3b1100b003a319b67f64sm5902435wms.0.2022.08.16.14.09.55
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc;
+        bh=3TNHDMK6crAKiQ8dof0O0YciDkj6xbRmAwSNGdrV/YE=;
+        b=05rDImtK9R7cETXHNKR6ywLDpvX2l4tBoPv8ZZNzIg/aoNrMjTsMuSTdF5JebnLs7O
+         TVrw6oW1qNNbdpkxT36f80joIm6woJ3q4SBflMt6IeZT6uau4fy+qeSRrls8eBOkP2Ew
+         dCEaSzvJ9toIGTxNlyoILbLIolcTRTigaiTSFceoT06k6mCoTZ/W7jszFkf4dP3/+AxC
+         qGWge4f3wpI13YCTbfs88kMbKci6xlVgSjnwfZD+UzgQFdN4oWEXwNwJeaOCqoXXz+Pu
+         g+aQ09oIgEWlY5wVEvCY3m2i5zKDtDEMPQE0tq7SfUWhavLw1GKpPed6/nbRmOFIFwjc
+         mBbw==
+X-Gm-Message-State: ACgBeo3NuNbbYjUhvARkeXXWY0ojykLzvO7+rigvWxFrnseeYxWUeyCC
+        Eheuqyu+aZUqSeCQ5cSkU5D1gWKZwaNDwA==
+X-Google-Smtp-Source: AA6agR4OF22Kg1O7WqhFOFstzTRFWcNIrryo56OK9hPQ71EVjtpEzpipCt2qEIejXom6L7e8j9JGog==
+X-Received: by 2002:a17:903:11c7:b0:170:cde7:d24a with SMTP id q7-20020a17090311c700b00170cde7d24amr23966559plh.91.1660684202826;
+        Tue, 16 Aug 2022 14:10:02 -0700 (PDT)
+Received: from google.com (33.5.83.34.bc.googleusercontent.com. [34.83.5.33])
+        by smtp.gmail.com with ESMTPSA id 189-20020a6204c6000000b0052ce4074fddsm9177050pfe.145.2022.08.16.14.10.02
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 16 Aug 2022 14:09:56 -0700 (PDT)
-Date:   Tue, 16 Aug 2022 17:09:53 -0400
-From:   "Michael S. Tsirkin" <mst@redhat.com>
-To:     Parav Pandit <parav@nvidia.com>
-Cc:     "Zhu, Lingshan" <lingshan.zhu@intel.com>,
-        "jasowang@redhat.com" <jasowang@redhat.com>,
-        "virtualization@lists.linux-foundation.org" 
-        <virtualization@lists.linux-foundation.org>,
-        "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "xieyongji@bytedance.com" <xieyongji@bytedance.com>,
-        "gautam.dawar@amd.com" <gautam.dawar@amd.com>
-Subject: Re: [PATCH 2/2] vDPA: conditionally read fields in virtio-net dev
-Message-ID: <20220816170753-mutt-send-email-mst@kernel.org>
-References: <20220815092638.504528-1-lingshan.zhu@intel.com>
- <20220815092638.504528-3-lingshan.zhu@intel.com>
- <PH0PR12MB54815EF8C19F70072169FA56DC6B9@PH0PR12MB5481.namprd12.prod.outlook.com>
- <4184a943-f1c0-a57b-6411-bdd21e0bc710@intel.com>
- <PH0PR12MB5481EBA9E08963DEF0743063DC6B9@PH0PR12MB5481.namprd12.prod.outlook.com>
+        Tue, 16 Aug 2022 14:10:02 -0700 (PDT)
+Date:   Tue, 16 Aug 2022 21:09:58 +0000
+From:   Mingwei Zhang <mizhang@google.com>
+To:     Sean Christopherson <seanjc@google.com>
+Cc:     Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org, David Matlack <dmatlack@google.com>,
+        Yan Zhao <yan.y.zhao@intel.com>,
+        Ben Gardon <bgardon@google.com>
+Subject: Re: [PATCH v3 3/8] KVM: x86/mmu: Rename NX huge pages
+ fields/functions for consistency
+Message-ID: <YvwHpjxS9CCEVER7@google.com>
+References: <20220805230513.148869-1-seanjc@google.com>
+ <20220805230513.148869-4-seanjc@google.com>
+ <YvhL6jKfKCj0+74w@google.com>
+ <YvrAoyhgNzTcvzkU@google.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <PH0PR12MB5481EBA9E08963DEF0743063DC6B9@PH0PR12MB5481.namprd12.prod.outlook.com>
-X-Spam-Status: No, score=-2.8 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,
-        SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham
-        autolearn_force=no version=3.4.6
+In-Reply-To: <YvrAoyhgNzTcvzkU@google.com>
+X-Spam-Status: No, score=-14.4 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+        ENV_AND_HDR_SPF_MATCH,FSL_HELO_FAKE,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,
+        SPF_PASS,T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL
+        autolearn=no autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Aug 16, 2022 at 09:02:17PM +0000, Parav Pandit wrote:
-> 
-> > From: Zhu, Lingshan <lingshan.zhu@intel.com>
-> > Sent: Tuesday, August 16, 2022 12:19 AM
+On Mon, Aug 15, 2022, Sean Christopherson wrote:
+> On Sun, Aug 14, 2022, Mingwei Zhang wrote:
+> > On Fri, Aug 05, 2022, Sean Christopherson wrote:
+> > > Rename most of the variables/functions involved in the NX huge page
+> > > mitigation to provide consistency, e.g. lpage vs huge page, and NX huge
+> > > vs huge NX, and also to provide clarity, e.g. to make it obvious the flag
+> > > applies only to the NX huge page mitigation, not to any condition that
+> > > prevents creating a huge page.
+> > > 
+> > > Leave the nx_lpage_splits stat alone as the name is ABI and thus set in
+> > > stone.
+> > > 
+> > > Signed-off-by: Sean Christopherson <seanjc@google.com>
+> > > ---
+> > >  arch/x86/include/asm/kvm_host.h |  8 ++--
+> > >  arch/x86/kvm/mmu/mmu.c          | 70 +++++++++++++++++----------------
+> > >  arch/x86/kvm/mmu/mmu_internal.h | 22 +++++++----
+> > >  arch/x86/kvm/mmu/paging_tmpl.h  |  2 +-
+> > >  arch/x86/kvm/mmu/tdp_mmu.c      |  8 ++--
+> > >  5 files changed, 59 insertions(+), 51 deletions(-)
+> > > 
+> > > diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
+> > > index e8281d64a431..5634347e5d05 100644
+> > > --- a/arch/x86/include/asm/kvm_host.h
+> > > +++ b/arch/x86/include/asm/kvm_host.h
+> > > @@ -1143,7 +1143,7 @@ struct kvm_arch {
+> > >  	struct hlist_head mmu_page_hash[KVM_NUM_MMU_PAGES];
+> > >  	struct list_head active_mmu_pages;
+> > >  	struct list_head zapped_obsolete_pages;
+> > > -	struct list_head lpage_disallowed_mmu_pages;
+> > > +	struct list_head possible_nx_huge_pages;
 > > 
-> > 
-> > On 8/16/2022 10:32 AM, Parav Pandit wrote:
-> > >> From: Zhu Lingshan <lingshan.zhu@intel.com>
-> > >> Sent: Monday, August 15, 2022 5:27 AM
-> > >>
-> > >> Some fields of virtio-net device config space are conditional on the
-> > >> feature bits, the spec says:
-> > >>
-> > >> "The mac address field always exists
-> > >> (though is only valid if VIRTIO_NET_F_MAC is set)"
-> > >>
-> > >> "max_virtqueue_pairs only exists if VIRTIO_NET_F_MQ or
-> > >> VIRTIO_NET_F_RSS is set"
-> > >>
-> > >> "mtu only exists if VIRTIO_NET_F_MTU is set"
-> > >>
-> > >> so we should read MTU, MAC and MQ in the device config space only
-> > >> when these feature bits are offered.
-> > > Yes.
-> > >
-> > >> For MQ, if both VIRTIO_NET_F_MQ and VIRTIO_NET_F_RSS are not set,
-> > the
-> > >> virtio device should have one queue pair as default value, so when
-> > >> userspace querying queue pair numbers, it should return mq=1 than zero.
-> > > No.
-> > > No need to treat mac and max_qps differently.
-> > > It is meaningless to differentiate when field exist/not-exists vs value
-> > valid/not valid.
-> > as we discussed before, MQ has a default value 1, to be a functional virtio-
-> > net device, while MAC has no default value, if no VIRTIO_NET_F_MAC set,
-> > the driver should generate a random MAC.
-> > >
-> > >> For MTU, if VIRTIO_NET_F_MTU is not set, we should not read MTU from
-> > >> the device config sapce.
-> > >> RFC894 <A Standard for the Transmission of IP Datagrams over Ethernet
-> > >> Networks> says:"The minimum length of the data field of a packet sent
-> > >> Networks> over
-> > >> an Ethernet is 1500 octets, thus the maximum length of an IP datagram
-> > >> sent over an Ethernet is 1500 octets.  Implementations are encouraged
-> > >> to support full-length packets"
-> > > This line in the RFC 894 of 1984 is wrong.
-> > > Errata already exists for it at [1].
-> > >
-> > > [1] https://www.rfc-editor.org/errata_search.php?rfc=894&rec_status=0
-> > OK, so I think we should return nothing if _F_MTU not set, like handling the
-> > MAC
-> > >
-> > >> virtio spec says:"The virtio network device is a virtual ethernet
-> > >> card", so the default MTU value should be 1500 for virtio-net.
-> > >>
-> > > Practically I have seen 1500 and highe mtu.
-> > > And this derivation is not good of what should be the default mtu as above
-> > errata exists.
-> > >
-> > > And I see the code below why you need to work so hard to define a default
-> > value so that _MQ and _MTU can report default values.
-> > >
-> > > There is really no need for this complexity and such a long commit
-> > message.
-> > >
-> > > Can we please expose feature bits as-is and report config space field which
-> > are valid?
-> > >
-> > > User space will be querying both.
-> > I think MAC and MTU don't have default values, so return nothing if the
-> > feature bits not set, 
+> > Honestly, I am struggling to understand this one. 'possible_*' indicates
+> > that there are other possibilities. But what are those possibilities?
 > 
-> > for MQ, it is still max_vq_paris == 1 by default.
+> No, possible is being used as an adjective in this case.  possible_nx_huge_pages
+> is the list of shadow pages for which it's possible to replace the shadow page
+> with an NX huge page.
 > 
-> I have stressed enough to highlight the fact that we don’t want to start digging default/no default, valid/no-valid part of the spec.
-> I prefer kernel to reporting fields that _exists_ in the config space and are valid.
-> I will let MST to handle the maintenance nightmare that this kind of patch brings in without any visible gain to user space/orchestration apps.
-> 
-> A logic that can be easily build in user space, should be written in user space.
-> I conclude my thoughts here for this discussion.
-> 
-> I will let MST to decide how he prefers to proceed.
-> 
-> >
-> > >> +	if ((features & BIT_ULL(VIRTIO_NET_F_MTU)) == 0)
-> > >> +		val_u16 = 1500;
-> > >> +	else
-> > >> +		val_u16 = __virtio16_to_cpu(true, config->mtu);
-> > >> +
-> > > Need to work hard to find default values and that too turned out had
-> > errata.
-> > > There are more fields that doesn’t have default values.
-> > >
-> > > There is no point in kernel doing this guess work, that user space can figure
-> > out of what is valid/invalid.
-> > It's not guest work, when guest finds no feature bits set, it can decide what
-> > to do. 
-> 
-> Above code of doing 1500 was probably an honest attempt to find a legitimate default value, and we saw that it doesn’t work.
-> This is second example after _MQ that we both agree should not return default.
-> 
-> And there are more fields coming in this area.
-> Hence, I prefer to not avoid returning such defaults for MAC, MTU, MQ and rest all fields which doesn’t _exists_.
-> 
-> I will let MST to decide how he prefers to proceed for every field to come next.
-> Thanks.
-> 
+> The noun version would yield a name like nx_huge_page_possiblities.
 
+Right, but these shadow pages are not NX huge pages, right? IIUC, they
+are pages to be zapped due to NX huge pages, aren't they?
 
-If MTU does not return a value without _F_MTU, and MAC does not return
-a value without _F_MAC then IMO yes, number of queues should not return
-a value without _F_MQ.
+`nx_huge_page_disallowed` is easy to understand because it literally say
+'nx_huge_page is not allowed', which is correct.
 
+But this one, it says 'possible nx_huge_pages', but they are not
+nx huge pages at all. Instead, they are 'shadow pages that are replaced
+with nx_huge_pages'. So that's why updates to this list is done together
+with stats nx_plage_splits.
 
--- 
-MST
+Please correct me if I am wrong. I am still struggling to understand the
+meaning of these variables.
+
+>
+> > I feel this name is more confusing than the original one. Maybe just keep
+> 
+> Ignoring lpage => huge_page, the current name is terribly inaccurate.  The list
+> doesn't contain all disallowed huge pages, nor does it even contain all disallowed
+> NX huge pages, it specifically tracks shadow pages that might be able to be
+> replaced with an NX huge page.
+> 
+> I'm open to other names, but whatever we choose should be paired with
+> account_nx_huge_page()'s param that is currently named "nx_huge_page_possible".
+
+How about mmu_pages_replaced_by_nx_huge,
+mmu_pages_replaced_by_possible_nx_huge or something starting with
+possible_pages_, pages_ instead of possible_nx_huge_pages?
 
