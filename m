@@ -2,94 +2,97 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 2D8115960C4
-	for <lists+kvm@lfdr.de>; Tue, 16 Aug 2022 19:02:18 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id CA017596117
+	for <lists+kvm@lfdr.de>; Tue, 16 Aug 2022 19:28:24 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236733AbiHPRB7 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 16 Aug 2022 13:01:59 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35086 "EHLO
+        id S236058AbiHPR2T (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 16 Aug 2022 13:28:19 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57618 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S236722AbiHPRB4 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 16 Aug 2022 13:01:56 -0400
-Received: from mail-pj1-x1030.google.com (mail-pj1-x1030.google.com [IPv6:2607:f8b0:4864:20::1030])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D017C80F7B
-        for <kvm@vger.kernel.org>; Tue, 16 Aug 2022 10:01:55 -0700 (PDT)
-Received: by mail-pj1-x1030.google.com with SMTP id q7-20020a17090a7a8700b001f300db8677so10193856pjf.5
-        for <kvm@vger.kernel.org>; Tue, 16 Aug 2022 10:01:55 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc;
-        bh=8YoCzr7u46kkzaFrnJH+6WyANimt/PMkIZcuwcgga58=;
-        b=PO9LkkDARGOPOy5vNzG53oUV/SA8FqL/nj2nXpaZkNBojX1gMaZXSRj92XtootWjcD
-         OUJnbMyf+Prn6MFeClZwR0YpNrkgzoLx+vbEALy7BYGbDekI22RBKSHj5IEwG/s6nbCm
-         VVZLUrubOwez2RrTzYaGGwoF7e4xot3Iq3o+qKiAWJf5CKDPtay+JZIBas1em2tdZvWe
-         /WaChTvFi7K1yC0EQZc3RA1EyrTur+XxwUEZmfidHi/s6NScoeA0mM41BaH7zom6Tab3
-         cImJCAybh2s4yYuj3rOIRNmPPdGYWIJd1n9nPrAGPQrr8F5dQhQEY1AOpcpQjsLA64kG
-         DGXA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc;
-        bh=8YoCzr7u46kkzaFrnJH+6WyANimt/PMkIZcuwcgga58=;
-        b=5lcVAKlQQhFkAFMN74aqZ3bHZKWWXjov7oB8LUzGNbkJ1Be3RnjG9HV4wSqi5z7um2
-         9YHpTlnUrm/myefdIXPB2pVEmVNo3O66+e3ngwZEmLaiCqs6HGMqGMXWGBoHx2+jWqLw
-         pzVSgogbLYZJk1/vLnGbgs2OlVyFiY2AzyqmgweBqTvHSlcvU59kpoLohykhk54RuLAa
-         pf03tY625lWhoxkDuVPNE49zsb/wlM9yMey8KUZGBekNjgbcjF1/uX5cri2HtOm82gm0
-         bqzTMNAkaGlq/Sdv/qnXRMV2B/xbqS/rAuqiA7lYy+/qUktWgA3D56EOlMBfUxptP0PB
-         b3Gw==
-X-Gm-Message-State: ACgBeo33464sV87lX85z6azKDKa8/StK5fHrS8AeiLfdExfpsYicA6RY
-        yPjj8N6hV5+k/kEdXejuO3tduw==
-X-Google-Smtp-Source: AA6agR7nJLAB/1Q7gClFm+e7q/hNl/mq9oJ6taHg67rRwrFhFdnrFHRUjZxOGJixHpK2IjIXYU+otg==
-X-Received: by 2002:a17:90b:3142:b0:1f7:338a:1d38 with SMTP id ip2-20020a17090b314200b001f7338a1d38mr32590145pjb.223.1660669314886;
-        Tue, 16 Aug 2022 10:01:54 -0700 (PDT)
-Received: from google.com (223.103.125.34.bc.googleusercontent.com. [34.125.103.223])
-        by smtp.gmail.com with ESMTPSA id t12-20020a170902dccc00b0016c1b178628sm9232458pll.269.2022.08.16.10.01.53
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 16 Aug 2022 10:01:53 -0700 (PDT)
-Date:   Tue, 16 Aug 2022 10:01:49 -0700
-From:   David Matlack <dmatlack@google.com>
-To:     Sean Christopherson <seanjc@google.com>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org,
-        syzbot+744e173caec2e1627ee0@syzkaller.appspotmail.com,
-        Oliver Upton <oliver.upton@linux.dev>
-Subject: Re: [PATCH 2/3] KVM: Unconditionally get a ref to /dev/kvm module
- when creating a VM
-Message-ID: <YvvNfTouc22hiLwo@google.com>
-References: <20220816053937.2477106-1-seanjc@google.com>
- <20220816053937.2477106-3-seanjc@google.com>
+        with ESMTP id S233727AbiHPR2P (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 16 Aug 2022 13:28:15 -0400
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 1310D2BF2;
+        Tue, 16 Aug 2022 10:28:11 -0700 (PDT)
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id E8497106F;
+        Tue, 16 Aug 2022 10:28:11 -0700 (PDT)
+Received: from e121345-lin.cambridge.arm.com (e121345-lin.cambridge.arm.com [10.1.196.40])
+        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPA id 0C37E3F67D;
+        Tue, 16 Aug 2022 10:28:08 -0700 (PDT)
+From:   Robin Murphy <robin.murphy@arm.com>
+To:     joro@8bytes.org
+Cc:     will@kernel.org, catalin.marinas@arm.com, jean-philippe@linaro.org,
+        inki.dae@samsung.com, sw0312.kim@samsung.com,
+        kyungmin.park@samsung.com, tglx@linutronix.de, maz@kernel.org,
+        alex.williamson@redhat.com, cohuck@redhat.com,
+        iommu@lists.linux.dev, linux-arm-kernel@lists.infradead.org,
+        linux-acpi@vger.kernel.org, dri-devel@lists.freedesktop.org,
+        linux-kernel@vger.kernel.org, kvm@vger.kernel.org
+Subject: [PATCH 0/3] iommu/dma: Some housekeeping
+Date:   Tue, 16 Aug 2022 18:28:02 +0100
+Message-Id: <cover.1660668998.git.robin.murphy@arm.com>
+X-Mailer: git-send-email 2.36.1.dirty
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20220816053937.2477106-3-seanjc@google.com>
-X-Spam-Status: No, score=-14.4 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        ENV_AND_HDR_SPF_MATCH,FSL_HELO_FAKE,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,
-        SPF_PASS,T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL
-        autolearn=no autolearn_force=no version=3.4.6
+Content-Transfer-Encoding: 8bit
+X-Spam-Status: No, score=-6.9 required=5.0 tests=BAYES_00,RCVD_IN_DNSWL_HI,
+        SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Aug 16, 2022 at 05:39:36AM +0000, Sean Christopherson wrote:
-> Unconditionally get a reference to the /dev/kvm module when creating a VM
-> instead of using try_get_module(), which will fail if the module is in
-> the process of being forcefully unloaded.  The error handling when
-> try_get_module() fails doesn't properly unwind all that has been done,
-> e.g. doesn't call kvm_arch_pre_destroy_vm() and doesn't remove the VM
-> from the global list.  Not removing VMs from the global list tends to be
-> fatal, e.g. leads to use-after-free explosions.
-> 
-> The obvious alternative would be to add proper unwinding, but the
-> justification for using try_get_module(), "rmmod --wait", is completely
-> bogus as support for "rmmod --wait", i.e. delete_module() without
-> O_NONBLOCK, was removed by commit 3f2b9c9cdf38 ("module: remove rmmod
-> --wait option.") nearly a decade ago.
+Hi All,
 
-Ah! include/linux/module.h may also need a cleanup then. The comment
-above __module_get() explicitly mentions "rmmod --wait", which is what
-led me to use try_module_get() for commit 5f6de5cbebee ("KVM: Prevent
-module exit until all VMs are freed").
+It's been a while now since iommu-dma grew from a library of DMA ops
+helpers for arch code into something more abstracted and closely coupled
+to the IOMMU API core, so it seemed about time to do some housekeeping
+in the more neglected areas to reflect that.
+
+The header reorganisation does touch a range of areas (a couple of which
+seemingly had no reason to be involved anyway), but hopefully these are
+all low-impact changes that nobody minds going through the IOMMU tree.
+
+Now for the build-bots to tell me what I've missed...
+
+Thanks,
+Robin.
+
+
+Robin Murphy (3):
+  iommu/dma: Clean up Kconfig
+  iommu/dma: Move public interfaces to linux/iommu.h
+  iommu/dma: Make header private
+
+ arch/arm64/Kconfig                          |  1 -
+ arch/arm64/mm/dma-mapping.c                 |  2 +-
+ drivers/acpi/viot.c                         |  1 -
+ drivers/gpu/drm/exynos/exynos_drm_dma.c     |  1 -
+ drivers/iommu/Kconfig                       |  3 +-
+ drivers/iommu/amd/Kconfig                   |  1 -
+ drivers/iommu/amd/iommu.c                   |  2 +-
+ drivers/iommu/apple-dart.c                  |  3 +-
+ drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3.c |  2 +-
+ drivers/iommu/arm/arm-smmu/arm-smmu.c       |  2 +-
+ drivers/iommu/dma-iommu.c                   | 18 +++-
+ drivers/iommu/dma-iommu.h                   | 38 +++++++++
+ drivers/iommu/intel/Kconfig                 |  1 -
+ drivers/iommu/intel/iommu.c                 |  2 +-
+ drivers/iommu/iommu.c                       |  3 +-
+ drivers/iommu/virtio-iommu.c                |  3 +-
+ drivers/irqchip/irq-gic-v2m.c               |  2 +-
+ drivers/irqchip/irq-gic-v3-its.c            |  2 +-
+ drivers/irqchip/irq-gic-v3-mbi.c            |  2 +-
+ drivers/irqchip/irq-ls-scfg-msi.c           |  2 +-
+ drivers/vfio/vfio_iommu_type1.c             |  1 -
+ include/linux/dma-iommu.h                   | 93 ---------------------
+ include/linux/iommu.h                       | 36 ++++++++
+ 23 files changed, 105 insertions(+), 116 deletions(-)
+ create mode 100644 drivers/iommu/dma-iommu.h
+ delete mode 100644 include/linux/dma-iommu.h
+
+-- 
+2.36.1.dirty
+
