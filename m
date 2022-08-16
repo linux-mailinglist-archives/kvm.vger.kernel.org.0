@@ -2,133 +2,207 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id A1591596514
-	for <lists+kvm@lfdr.de>; Wed, 17 Aug 2022 00:02:13 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id D9FD859639A
+	for <lists+kvm@lfdr.de>; Tue, 16 Aug 2022 22:17:10 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237803AbiHPWBY (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 16 Aug 2022 18:01:24 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59844 "EHLO
+        id S236913AbiHPURJ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 16 Aug 2022 16:17:09 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51450 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S237279AbiHPWBW (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 16 Aug 2022 18:01:22 -0400
-Received: from mail-pf1-x42c.google.com (mail-pf1-x42c.google.com [IPv6:2607:f8b0:4864:20::42c])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 62F4D8F951;
-        Tue, 16 Aug 2022 15:01:20 -0700 (PDT)
-Received: by mail-pf1-x42c.google.com with SMTP id p125so10495847pfp.2;
-        Tue, 16 Aug 2022 15:01:20 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc;
-        bh=aDqAZFANkrfjbb5xBv7SEPO2DhDRbGJc0EKtkzDbDQs=;
-        b=LYF5Hh1y2onyd8W8fQSoLlPYsE5y1JK91YpRleHxvVj9hm/9MY3oF8fgabM0B9+1VM
-         fUBY+DBPccaCMWczC8J8jQHjAB6K87UAY/cVdF9A2mq3+6RbrFbrqJ1czPtqxm0K4jhi
-         YPIjc7gQMWaR2uLbcAY4Wba0RJDd5SUUVMjyNRydqIWwrxTbY2XYrdrjBICEK/QeqC15
-         djx/j8oQIxSH1RJOa1oTTeOmHFdaM+EmheVI3SIC4fA0zuzGBt1ipQi0idQ/W6oluH2M
-         7HDGN8wEbGscPO1N789oUeJLmRflzTgNepDRBayUYu0U3ycVERSSKVbNF2Cf+cn7nN4a
-         6rig==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc;
-        bh=aDqAZFANkrfjbb5xBv7SEPO2DhDRbGJc0EKtkzDbDQs=;
-        b=rjElzk0+aAcBpvKXf/MAOxLGPQEgOyJ+PLe3yQipZi2AAoGWoUjfX90OSOK534+oa/
-         HyUwX06GbrEDGVXmmJKGOgnGFjVNiAwfRASV39Zcx4uZ+oQPePXwRjzLlKWzw1nkUHmv
-         s3U+Kbg4RnDtAWoE7rwglxY4wXMrTsDVocXsJLZdbXCVkegA76hJvOE3JkRbzAS4tQZ7
-         6m/Bg9CTVFq7OqscEWUbenQqlmK3vhPKFozClU7hklEplVGLyrHVpJUdfjmzq2kodlTp
-         sSAfnMedKxH6TLYOZlJJA2kTcqe7RhHYKjphBQovcu7nY07abAWTd7EdTrP9PQ6uepWi
-         LTZg==
-X-Gm-Message-State: ACgBeo2Z5uczlfxir5OQyaoVwN8qF8tZOieU3Kynj9G7yjEYmBH4qwr0
-        GNXMLxNcVXQJVcZg/HRy7ezfBBZJjnWnVhB4WIM=
-X-Google-Smtp-Source: AA6agR6x6vy+y2PHqORcgSrXhqqwJpsTjczWMF1JON/I0nEYSqHNSw88p+Q6C+XgrH2niLMCZ7sPow==
-X-Received: by 2002:a63:e016:0:b0:427:e7f2:32b3 with SMTP id e22-20020a63e016000000b00427e7f232b3mr12469257pgh.194.1660687279851;
-        Tue, 16 Aug 2022 15:01:19 -0700 (PDT)
-Received: from localhost (c-73-164-155-12.hsd1.wa.comcast.net. [73.164.155.12])
-        by smtp.gmail.com with ESMTPSA id f12-20020aa7968c000000b0052d90521d02sm8914276pfk.126.2022.08.16.15.01.18
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 16 Aug 2022 15:01:19 -0700 (PDT)
-Date:   Tue, 16 Aug 2022 07:02:33 +0000
-From:   Bobby Eshleman <bobbyeshleman@gmail.com>
-To:     Jakub Kicinski <kuba@kernel.org>
-Cc:     Bobby Eshleman <bobby.eshleman@gmail.com>,
-        "Michael S. Tsirkin" <mst@redhat.com>,
-        Bobby Eshleman <bobby.eshleman@bytedance.com>,
-        Cong Wang <cong.wang@bytedance.com>,
-        Jiang Wang <jiang.wang@bytedance.com>,
-        Stefan Hajnoczi <stefanha@redhat.com>,
-        Stefano Garzarella <sgarzare@redhat.com>,
-        Jason Wang <jasowang@redhat.com>,
-        "David S. Miller" <davem@davemloft.net>,
-        Eric Dumazet <edumazet@google.com>,
-        Paolo Abeni <pabeni@redhat.com>, kvm@vger.kernel.org,
-        virtualization@lists.linux-foundation.org, netdev@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-Subject: Re: [PATCH 3/6] vsock: add netdev to vhost/virtio vsock
-Message-ID: <YvtAktdB09tM0Ykr@bullseye>
-References: <cover.1660362668.git.bobby.eshleman@bytedance.com>
- <5a93c5aad99d79f028d349cb7e3c128c65d5d7e2.1660362668.git.bobby.eshleman@bytedance.com>
- <20220816123701-mutt-send-email-mst@kernel.org>
- <20220816110717.5422e976@kernel.org>
+        with ESMTP id S233421AbiHPURH (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 16 Aug 2022 16:17:07 -0400
+Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1A9D386056;
+        Tue, 16 Aug 2022 13:17:06 -0700 (PDT)
+Received: from pps.filterd (m0127361.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.17.1.5/8.17.1.5) with ESMTP id 27GJiKuA026672;
+        Tue, 16 Aug 2022 20:17:01 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
+ mime-version : subject : to : cc : references : from : in-reply-to :
+ content-type : content-transfer-encoding; s=pp1;
+ bh=tp1MHkI0UUSS9oO8IOYre52rIH7aIcpzcB8WlGj2wVI=;
+ b=ZKxXe0w2g6mZWAdLSbbkt7lxXyL/HOZ7k1A1v3GMlRyJc+Hy87V+tTDkdDvADls/p68F
+ rlbmSJnLjDI+yXUPRt6b2OETx8hpvjyBg99JWLuuo/USG9dBM4+QXhCmSGxevoDpKIoZ
+ oSdbfzp+k2nn2BwV3nwcc8b36bhJBtlLB7Tnmxw+WBTni3xO+k1s07qmjjqencGuvQck
+ VEzN7BQldXiqXOUCh+MvFtupfYcWpQ3GamW4ml1DYpWjTRIe5TTSDel/trE93Ffbio3j
+ tUN5QZQ3BkpGUop5PRbpUXCkWyxO4jexsvU5MyBITK9Ztdtb5SzqmRmWma/3WwNgppV4 FQ== 
+Received: from ppma04fra.de.ibm.com (6a.4a.5195.ip4.static.sl-reverse.com [149.81.74.106])
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3j0hne0r57-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Tue, 16 Aug 2022 20:17:01 +0000
+Received: from pps.filterd (ppma04fra.de.ibm.com [127.0.0.1])
+        by ppma04fra.de.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 27GK8UE0031280;
+        Tue, 16 Aug 2022 20:16:59 GMT
+Received: from b06cxnps4074.portsmouth.uk.ibm.com (d06relay11.portsmouth.uk.ibm.com [9.149.109.196])
+        by ppma04fra.de.ibm.com with ESMTP id 3hx3k8tpc9-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Tue, 16 Aug 2022 20:16:59 +0000
+Received: from d06av21.portsmouth.uk.ibm.com (d06av21.portsmouth.uk.ibm.com [9.149.105.232])
+        by b06cxnps4074.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 27GKGurr25231648
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Tue, 16 Aug 2022 20:16:56 GMT
+Received: from d06av21.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 68EA55204F;
+        Tue, 16 Aug 2022 20:16:56 +0000 (GMT)
+Received: from [9.171.18.167] (unknown [9.171.18.167])
+        by d06av21.portsmouth.uk.ibm.com (Postfix) with ESMTP id 02DC15204E;
+        Tue, 16 Aug 2022 20:16:55 +0000 (GMT)
+Message-ID: <1f2dd65e-b79b-44df-cc6a-8b3aa8fd61af@linux.ibm.com>
+Date:   Tue, 16 Aug 2022 22:22:02 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20220816110717.5422e976@kernel.org>
-X-Spam-Status: No, score=-1.1 required=5.0 tests=BAYES_00,DATE_IN_PAST_12_24,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
-        RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
-        autolearn=no autolearn_force=no version=3.4.6
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.3.0
+Subject: Re: [PATCH] vfio-pci/zdev: require KVM to be built-in
+Content-Language: en-US
+To:     Matthew Rosato <mjrosato@linux.ibm.com>,
+        Randy Dunlap <rdunlap@infradead.org>,
+        linux-kernel@vger.kernel.org
+Cc:     kernel test robot <lkp@intel.com>,
+        Christian Borntraeger <borntraeger@linux.ibm.com>,
+        Eric Farman <farman@linux.ibm.com>, linux-s390@vger.kernel.org,
+        kvm@vger.kernel.org
+References: <20220814215154.32112-1-rdunlap@infradead.org>
+ <663c7595-1c18-043e-5f12-b0ce880b84bf@linux.ibm.com>
+ <5530ed1f-90ec-ce84-2348-80e484fa48cb@infradead.org>
+ <47cfc72d-62f6-2bd3-db91-99f91591fc30@linux.ibm.com>
+ <8809c67b-a9f6-07a6-307c-369cd391e9b5@linux.ibm.com>
+From:   Pierre Morel <pmorel@linux.ibm.com>
+In-Reply-To: <8809c67b-a9f6-07a6-307c-369cd391e9b5@linux.ibm.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: 7yvMYbJzY7dLzaGKCdDAEbNPMRYJmLrW
+X-Proofpoint-ORIG-GUID: 7yvMYbJzY7dLzaGKCdDAEbNPMRYJmLrW
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.205,Aquarius:18.0.883,Hydra:6.0.517,FMLib:17.11.122.1
+ definitions=2022-08-16_08,2022-08-16_02,2022-06-22_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 clxscore=1015 phishscore=0
+ bulkscore=0 adultscore=0 impostorscore=0 mlxscore=0 suspectscore=0
+ mlxlogscore=999 malwarescore=0 priorityscore=1501 spamscore=0
+ lowpriorityscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2207270000 definitions=main-2208160074
+X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,
+        SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no
+        version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Aug 16, 2022 at 11:07:17AM -0700, Jakub Kicinski wrote:
-> On Tue, 16 Aug 2022 12:38:52 -0400 Michael S. Tsirkin wrote:
-> > On Mon, Aug 15, 2022 at 10:56:06AM -0700, Bobby Eshleman wrote:
-> > > In order to support usage of qdisc on vsock traffic, this commit
-> > > introduces a struct net_device to vhost and virtio vsock.
-> > > 
-> > > Two new devices are created, vhost-vsock for vhost and virtio-vsock
-> > > for virtio. The devices are attached to the respective transports.
-> > > 
-> > > To bypass the usage of the device, the user may "down" the associated
-> > > network interface using common tools. For example, "ip link set dev
-> > > virtio-vsock down" lets vsock bypass the net_device and qdisc entirely,
-> > > simply using the FIFO logic of the prior implementation.  
-> > 
-> > Ugh. That's quite a hack. Mark my words, at some point we will decide to
-> > have down mean "down".  Besides, multiple net devices with link up tend
-> > to confuse userspace. So might want to keep it down at all times
-> > even short term.
+
+
+On 8/16/22 21:46, Matthew Rosato wrote:
+> On 8/16/22 3:55 AM, Pierre Morel wrote:
+>>
+>>
+>> On 8/16/22 08:04, Randy Dunlap wrote:
+>>> Hi--
+>>>
+>>> On 8/15/22 02:43, Pierre Morel wrote:
+>>>> Thank you Randy for this good catch.
+>>>> However forcing KVM to be include statically in the kernel when using VFIO_PCI extensions is not a good solution for us I think.
+>>>>
+>>>> I suggest we better do something like:
+>>>>
+>>>> ----
+>>>>
+>>>> diff --git a/arch/s390/include/asm/kvm_host.h b/arch/s390/include/asm/kvm_host.h
+>>>> index 6287a843e8bc..1733339cc4eb 100644
+>>>> --- a/arch/s390/include/asm/kvm_host.h
+>>>> +++ b/arch/s390/include/asm/kvm_host.h
+>>>> @@ -1038,7 +1038,7 @@ static inline void kvm_arch_vcpu_unblocking(struct kvm_vcpu *vcpu) {}
+>>>>    #define __KVM_HAVE_ARCH_VM_FREE
+>>>>    void kvm_arch_free_vm(struct kvm *kvm);
+>>>>
+>>>> -#ifdef CONFIG_VFIO_PCI_ZDEV_KVM
+>>>> +#if defined(CONFIG_VFIO_PCI_ZDEV_KVM) || defined(CONFIG_VFIO_PCI_ZDEV_KVM_MODULE)
+>>>
+>>> This all looks good except for the line above.
+>>> It should be:
+>>>
+>>> #if IS_ENABLED(CONFIG_VFIO_PCI_ZDEV_KVM)
+>>>
+>>> Thanks.
+>>
+>> Yes, better, thanks.
+>> How do we do? Should I repost it with reported-by you or do you want to post it?
+>>
+>> Pierre
 > 
-> Agreed!
+> Thanks for looking into this while I was away.
 > 
-> From a cursory look (and Documentation/ would be nice..) it feels
-> very wrong to me. Do you know of any uses of a netdev which would 
-> be semantically similar to what you're doing? Treating netdevs as
-> buildings blocks for arbitrary message passing solutions is something 
-> I dislike quite strongly.
-
-The big difference between vsock and "arbitrary message passing" is that
-vsock is actually constrained by the virtio device that backs it (made
-up of virtqueues and the underlying protocol). That virtqueue pair is
-acting like the queues on a physical NIC, so it actually makes sense to
-manage the queuing of vsock's device like we would manage the queueing
-of a real device.
-
-Still, I concede that ignoring the netdev state is a probably bad idea.
-
-That said, I also think that using packet scheduling in vsock is a good
-idea, and that ideally we can reuse Linux's already robust library of
-packet scheduling algorithms by introducing qdisc somehow.
-
+> I think the issue is not just CONFIG_KVM=m && CONFIG_VFIO_PCI_ZDEV_KVM=y -- it also requires CONFIG_VFIO_PCI=y && CONFIG_VFIO_PCI_CORE=y.  This combination results in building in vfio_pci (which tries to link the calls to kvm_s390_pci_register_kvm and kvm_s390_pci_unregister_kvm which is not built in).
 > 
-> Could you recommend where I can learn more about vsocks?
+> However... this tristate + IS_ENABLED(CONFIG_VFIO_PCI_ZDEV_KVM) check in kvm_host.h will not solve the issue.  Rather, due to the #ifdef CONFIG_VFIO_PCI_ZDEV_KVM in include/linux/vfio_pci_core.h, this change will just cause us to never call kvm_s390_pci_register_kvm or kvm_s390_pci_unregister_kvm when CONFIG_VFIO_PCI_ZDEV_KVM=m, effectively treating CONFIG_VFIO_PCI_ZDEV_KVM=m as a 'n' and we don't get the zdev kvm extensions, which I don't think was the intent.
+> 
+> I'm still thinking & am open to other ideas, but one solution to avoiding building in KVM would be to go back to using symbol_get for these 2 interfaces (kvm_s390_pci_register_kvm and kvm_s390_pci_unregister_kvm) as was done in a prior version of this series like virt/kvm/vfio.c does and otherwise leave CONFIG_VFIO_PCI_ZDEV_KVM as-is.
+> 
+> diff --git a/drivers/vfio/pci/vfio_pci_zdev.c b/drivers/vfio/pci/vfio_pci_zdev.c
+> index e163aa9f6144..09c2758134c7 100644
+> --- a/drivers/vfio/pci/vfio_pci_zdev.c
+> +++ b/drivers/vfio/pci/vfio_pci_zdev.c
+> @@ -144,6 +144,8 @@ int vfio_pci_info_zdev_add_caps(struct vfio_pci_core_device *vdev,
+>   int vfio_pci_zdev_open_device(struct vfio_pci_core_device *vdev)
+>   {
+>          struct zpci_dev *zdev = to_zpci(vdev->pdev);
+> +       int (*fn)(struct zpci_dev *zdev, struct kvm *kvm);
+> +       int rc;
+>   
+>          if (!zdev)
+>                  return -ENODEV;
+> @@ -151,15 +153,30 @@ int vfio_pci_zdev_open_device(struct vfio_pci_core_device *vdev)
+>          if (!vdev->vdev.kvm)
+>                  return 0;
+>   
+> -       return kvm_s390_pci_register_kvm(zdev, vdev->vdev.kvm);
+> +       fn = symbol_get(kvm_s390_pci_register_kvm);
+> +       if (!fn)
+> +               return -EPERM;
+> +
+> +       rc = fn(zdev, vdev->vdev.kvm);
+> +
+> +       symbol_put(kvm_s390_pci_register_kvm);
+> +
+> +       return rc;
+>   }
+>   
+>   void vfio_pci_zdev_close_device(struct vfio_pci_core_device *vdev)
+>   {
+>          struct zpci_dev *zdev = to_zpci(vdev->pdev);
+> +       void (*fn)(struct zpci_dev *zdev);
+>   
+>          if (!zdev || !vdev->vdev.kvm)
+>                  return;
+>   
+> -       kvm_s390_pci_unregister_kvm(zdev);
+> +       fn = symbol_get(kvm_s390_pci_unregister_kvm);
+> +       if (!fn)
+> +               return;
+> +
+> +       fn(zdev);
+> +
+> +       symbol_put(kvm_s390_pci_unregister_kvm);
+>   }
+> 
+> 
 
-I think the spec is probably the best place to start[1].
 
-[1]: https://docs.oasis-open.org/virtio/virtio/v1.2/virtio-v1.2.html
+Hello Matt,
 
-Best,
-Bobby
+In between I came to another solution that seems to satisfy the 
+dependencies.
+Still need to check that the functionality is still intact :)
+
+I send you the proposition as a reply.
+
+Regards,
+Pierre
+
+
+
+
+-- 
+Pierre Morel
+IBM Lab Boeblingen
