@@ -2,75 +2,139 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 505EA595733
-	for <lists+kvm@lfdr.de>; Tue, 16 Aug 2022 11:56:44 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 6C70D59571C
+	for <lists+kvm@lfdr.de>; Tue, 16 Aug 2022 11:52:46 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233423AbiHPJzr (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 16 Aug 2022 05:55:47 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58654 "EHLO
+        id S232800AbiHPJwk (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 16 Aug 2022 05:52:40 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49222 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234133AbiHPJzP (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 16 Aug 2022 05:55:15 -0400
-Received: from desiato.infradead.org (desiato.infradead.org [IPv6:2001:8b0:10b:1:d65d:64ff:fe57:4e05])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 557ABA46F
-        for <kvm@vger.kernel.org>; Tue, 16 Aug 2022 01:17:22 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=desiato.20200630; h=In-Reply-To:Content-Type:MIME-Version:
-        References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
-        Content-Transfer-Encoding:Content-ID:Content-Description;
-        bh=RA9err+4VBM5JcyhsLuXBY7qUbIMDNqhPfnAXwRd15k=; b=c1zM092IBza7T3THQ1xeQ4iIxx
-        XExGDvqYDbSg8U3vihDNf53ScZWjcl2y1h4b/HKAT76PH6YXtQghJb8jy+If3cCwzcfxgbHIMA30r
-        DaMp6SJNmNf5zk9x2UcRy1oIYEQu4X22lTgc79FtGnXx84uhSVda1zGbUxd3QQrErurrLllUbOQhe
-        HpjMWsy/RdOGalLDnzIUKx8zdIe7JKqqsBO1GSH00t+0IDFh40MjjY1lp09b+eXZYF+0fw/UttuUH
-        IVzVE9VpUiapcpbpql4HkH+OtSAGWnuj2KMao+TP3JgWjgSLsE/dZ4u+ZEJZ9rP49Zzxew3Y9d+0M
-        jtoknqyA==;
-Received: from j130084.upc-j.chello.nl ([24.132.130.84] helo=worktop.programming.kicks-ass.net)
-        by desiato.infradead.org with esmtpsa (Exim 4.94.2 #2 (Red Hat Linux))
-        id 1oNrkp-002u6x-HZ; Tue, 16 Aug 2022 08:16:52 +0000
-Received: by worktop.programming.kicks-ass.net (Postfix, from userid 1000)
-        id 2457A980264; Tue, 16 Aug 2022 10:16:51 +0200 (CEST)
-Date:   Tue, 16 Aug 2022 10:16:51 +0200
-From:   Peter Zijlstra <peterz@infradead.org>
-To:     David Matlack <dmatlack@google.com>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>,
-        Sean Christopherson <seanjc@google.com>,
-        Borislav Petkov <bp@suse.de>,
-        "Paul E. McKenney" <paulmck@kernel.org>,
-        Kees Cook <keescook@chromium.org>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        Randy Dunlap <rdunlap@infradead.org>,
-        Damien Le Moal <damien.lemoal@opensource.wdc.com>,
-        kvm@vger.kernel.org
-Subject: Re: [PATCH 0/9] KVM: x86/mmu: Always enable the TDP MMU when TDP is
- enabled
-Message-ID: <YvtSc9ofTg1z8tt7@worktop.programming.kicks-ass.net>
-References: <20220815230110.2266741-1-dmatlack@google.com>
+        with ESMTP id S234036AbiHPJwQ (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 16 Aug 2022 05:52:16 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 0ADBDE39A8
+        for <kvm@vger.kernel.org>; Tue, 16 Aug 2022 01:23:29 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1660638208;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=V4oG1fGIfLDR5f50kJC3AlbvxuOG5rss32LyfKjRXLI=;
+        b=Iy0F1BOq0dw7xa27osJy8lOvM13Dh/r0NnzWGjGPj1BcUzn4SqvBUOItgwvPTUv/MxSunL
+        L4NqbinKwPeavvSRUArbJ7EBeb+4AzMTAgH/0ZqGIjHDKHv9EdNdunBD7uXdGDTA2gUO/F
+        S5pwCE+u2Z7C2FPyGMGrGJcNI67dsM4=
+Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
+ [209.85.128.72]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_128_GCM_SHA256) id
+ us-mta-350-n1nOqdW-NFyeGEOKzoS9qA-1; Tue, 16 Aug 2022 04:23:27 -0400
+X-MC-Unique: n1nOqdW-NFyeGEOKzoS9qA-1
+Received: by mail-wm1-f72.google.com with SMTP id i132-20020a1c3b8a000000b003a537064611so4624549wma.4
+        for <kvm@vger.kernel.org>; Tue, 16 Aug 2022 01:23:26 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date
+         :x-gm-message-state:from:to:cc;
+        bh=V4oG1fGIfLDR5f50kJC3AlbvxuOG5rss32LyfKjRXLI=;
+        b=MIzxqPShL1GjfV7pI+Hg2GhQmfv0C4tuw9ADMaNTNn9kJjKO8oAtCSaZPJKgagvm+u
+         8XBDDkC6A43TozdPm8OzpDKNMiarAIz9zLsXJTazE0Aj0S9BwLc1odfXmS8uxv52ccBz
+         jsWVBA34ZYruRHwgUHzrnwXIiu4GxjYrBvrau6x9F4Um4uBq1qFnzmjttXkf5rL2ClEm
+         LH0BhvyGpb5RahoPQDC/Vy3btZYwHX4qGZAV5r3drtfsjZr7zGbPnkDTmquS+ygUpaJ+
+         pRW+IVqyhTbzIh68UNJUmlKtMCcy/MfZuvqEAYwZ8YAsxa0uLvXwn5tgQF8slvT90z1K
+         qdOw==
+X-Gm-Message-State: ACgBeo1QFltfmXw/zXB8jNWMOodaOEywV9h4TRMlMkouzcdRBx6BoqDC
+        I5D2FK5wfUNi2isMr1bHiPlux0EncXIU9xyWzwjdhEchtsoUUJhe8mN858ANsomR57KgAUKrkNS
+        sO8jNBwOa33tq
+X-Received: by 2002:a5d:6da8:0:b0:221:7db8:de0a with SMTP id u8-20020a5d6da8000000b002217db8de0amr10846365wrs.405.1660638205983;
+        Tue, 16 Aug 2022 01:23:25 -0700 (PDT)
+X-Google-Smtp-Source: AA6agR4Be6LbtV7yTGqbSUu3sanvO4iZ86CjPJG2SNzqsNkmuRv69b6+YtLfJuQbl54PznhWVwsbJQ==
+X-Received: by 2002:a5d:6da8:0:b0:221:7db8:de0a with SMTP id u8-20020a5d6da8000000b002217db8de0amr10846349wrs.405.1660638205760;
+        Tue, 16 Aug 2022 01:23:25 -0700 (PDT)
+Received: from redhat.com ([2.55.43.215])
+        by smtp.gmail.com with ESMTPSA id j20-20020a05600c191400b003a5c1e916c8sm2328119wmq.1.2022.08.16.01.23.23
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 16 Aug 2022 01:23:25 -0700 (PDT)
+Date:   Tue, 16 Aug 2022 04:23:21 -0400
+From:   "Michael S. Tsirkin" <mst@redhat.com>
+To:     Si-Wei Liu <si-wei.liu@oracle.com>
+Cc:     Zhu Lingshan <lingshan.zhu@intel.com>,
+        virtualization@lists.linux-foundation.org, netdev@vger.kernel.org,
+        kvm@vger.kernel.org, parav@nvidia.com, xieyongji@bytedance.com,
+        gautam.dawar@amd.com, jasowang@redhat.com
+Subject: Re: [PATCH V5 4/6] vDPA: !FEATURES_OK should not block querying
+ device config space
+Message-ID: <20220816042157-mutt-send-email-mst@kernel.org>
+References: <20220812104500.163625-1-lingshan.zhu@intel.com>
+ <20220812104500.163625-5-lingshan.zhu@intel.com>
+ <e99e6d81-d7d5-e1ff-08e0-c22581c1329a@oracle.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=iso-8859-1
 Content-Disposition: inline
-In-Reply-To: <20220815230110.2266741-1-dmatlack@google.com>
-X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,SPF_HELO_NONE,
-        SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no
-        version=3.4.6
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <e99e6d81-d7d5-e1ff-08e0-c22581c1329a@oracle.com>
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Aug 15, 2022 at 04:01:01PM -0700, David Matlack wrote:
-> Patch 1 deletes the module parameter tdp_mmu and forces KVM to always
-> use the TDP MMU when TDP hardware support is enabled.  The rest of the
-> patches are related cleanups that follow (although the kvm_faultin_pfn()
-> cleanups at the end are only tangentially related at best).
+On Tue, Aug 16, 2022 at 12:41:21AM -0700, Si-Wei Liu wrote:
+> Hi Michael,
 > 
-> The TDP MMU was introduced in 5.10 and has been enabled by default since
-> 5.15. At this point there are no known functionality gaps between the
-> TDP MMU and the shadow MMU, and the TDP MMU uses less memory and scales
-> better with the number of vCPUs. In other words, there is no good reason
-> to disable the TDP MMU.
+> I just noticed this patch got pulled to linux-next prematurely without
+> getting consensus on code review, am not sure why. Hope it was just an
+> oversight.
+> 
+> Unfortunately this introduced functionality regression to at least two cases
+> so far as I see:
+> 
+> 1. (bogus) VDPA_ATTR_DEV_NEGOTIATED_FEATURES are inadvertently exposed and
+> displayed in "vdpa dev config show" before feature negotiation is done.
+> Noted the corresponding features name shown in vdpa tool is called
+> "negotiated_features" rather than "driver_features". I see in no way the
+> intended change of the patch should break this user level expectation
+> regardless of any spec requirement. Do you agree on this point?
+> 
+> 2. There was also another implicit assumption that is broken by this patch.
+> There could be a vdpa tool query of config via
+> vdpa_dev_net_config_fill()->vdpa_get_config_unlocked() that races with the
+> first vdpa_set_features() call from VMM e.g. QEMU. Since the S_FEATURES_OK
+> blocking condition is removed, if the vdpa tool query occurs earlier than
+> the first set_driver_features() call from VMM, the following code will treat
+> the guest as legacy and then trigger an erroneous
+> vdpa_set_features_unlocked(... , 0) call to the vdpa driver:
+> 
+>  374         /*
+>  375          * Config accesses aren't supposed to trigger before features
+> are set.
+>  376          * If it does happen we assume a legacy guest.
+>  377          */
+>  378         if (!vdev->features_valid)
+>  379                 vdpa_set_features_unlocked(vdev, 0);
+>  380         ops->get_config(vdev, offset, buf, len);
+> Depending on vendor driver's implementation, L380 may either return invalid
+> config data (or invalid endianness if on BE) or only config fields that are
+> valid in legacy layout. What's more severe is that, vdpa tool query in
+> theory shouldn't affect feature negotiation at all by making confusing calls
+> to the device, but now it is possible with the patch. Fixing this would
+> require more delicate work on the other paths involving the cf_lock
+> reader/write semaphore.
+> 
+> Not sure what you plan to do next, post the fixes for both issues and get
+> the community review? Or simply revert the patch in question? Let us know.
+> 
+> Thanks,
+> -Siwei
 
-Then how are you going to test the shadow mmu code -- which I assume is
-still relevant for the platforms that don't have this hardware support
-you speak of?
+If we can get fixes that's good. If not I can apply a revert.
+I'm on vacation next week, you guys will have the time
+to figure out the best plan of action.
+
+-- 
+MST
+
