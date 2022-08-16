@@ -2,221 +2,176 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 43AEF59586C
-	for <lists+kvm@lfdr.de>; Tue, 16 Aug 2022 12:34:23 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 619CC59585F
+	for <lists+kvm@lfdr.de>; Tue, 16 Aug 2022 12:33:28 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234776AbiHPKeS (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 16 Aug 2022 06:34:18 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47262 "EHLO
+        id S234667AbiHPKdH (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 16 Aug 2022 06:33:07 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42718 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234665AbiHPKdo (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 16 Aug 2022 06:33:44 -0400
-Received: from mga02.intel.com (mga02.intel.com [134.134.136.20])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E6CC6DE87;
-        Tue, 16 Aug 2022 01:46:09 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1660639569; x=1692175569;
-  h=message-id:date:mime-version:subject:to:cc:references:
-   from:in-reply-to:content-transfer-encoding;
-  bh=Bsu56Gzf+TtQ+H67xUX2fUZWh0JRIEI4iTCwIle76sE=;
-  b=Byk0utprSfXI0aaNx5QXDmu6bwV9Ds8RQrSG0LX1RvwshKTGInRZ2rCq
-   DZYEHKYVGH4XWKVblwLuzapDrUaXF26OpmYIZnNFkUljoK176LWmbzBiV
-   656lCmbskVBGKddsFnTcbERGs42eF+HeAMSGnpR+aiUD75NHZeTsiPgKx
-   XDCTuPzLFIrl6ly3Nk91oU8EifW1dJo9atyWq3TPiWiBb5kbcB0ZdaOOa
-   ngTuveWkEShQFlFxbS71ZN8e9ZtF+AuwsS7HYbFSAaNHHdVdmUtEAcGjJ
-   VPIbq4d3w4qQ9Zj3s+vCLVGdgnx6DKOPevXwap5WC7wv4Lyj9aRDEI+Zl
-   Q==;
-X-IronPort-AV: E=McAfee;i="6400,9594,10440"; a="279125369"
-X-IronPort-AV: E=Sophos;i="5.93,240,1654585200"; 
-   d="scan'208";a="279125369"
-Received: from fmsmga008.fm.intel.com ([10.253.24.58])
-  by orsmga101.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 16 Aug 2022 01:46:09 -0700
-X-IronPort-AV: E=Sophos;i="5.93,240,1654585200"; 
-   d="scan'208";a="667018922"
-Received: from lingshan-mobl.ccr.corp.intel.com (HELO [10.255.29.22]) ([10.255.29.22])
-  by fmsmga008-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 16 Aug 2022 01:46:06 -0700
-Message-ID: <e678154f-3a51-0f0a-423d-db39ac98be5d@intel.com>
-Date:   Tue, 16 Aug 2022 16:46:04 +0800
+        with ESMTP id S234704AbiHPKcf (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 16 Aug 2022 06:32:35 -0400
+Received: from mail-io1-f71.google.com (mail-io1-f71.google.com [209.85.166.71])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 16296754B8
+        for <kvm@vger.kernel.org>; Tue, 16 Aug 2022 01:46:26 -0700 (PDT)
+Received: by mail-io1-f71.google.com with SMTP id u5-20020a6b4905000000b00681e48dbd92so5654160iob.21
+        for <kvm@vger.kernel.org>; Tue, 16 Aug 2022 01:46:26 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
+         :from:to:cc;
+        bh=ahmrjH0a3Qkxw5mdXLJa7NXy27rr3wSWL9HtgfgRopE=;
+        b=W+1houKvHEiAu/jjpTkerTIZcK0vkUjsu0LsTn2FLSUflWh2LzkCENBUd8G0tCxmbi
+         Jjmf9yTKRjnMRN7aOO+Slt3qyWWtHTpbNDKrR6jp2tR/RECtLnHNEt35GbsHwDAWVaDa
+         ANBiye9ISRDlSnhsRJQ12W/Cei/KmDWN3qYiIYWXNA/DvqDHFfsJR6zGAw5kKb0l1Dpu
+         uE0iD1icKE4loYCzM6VolAoJyv+SGhQCSllMk02BoA61FMsQi2ymXxIKFkpJBgKQbngg
+         NXq+cYAXxJjBirFeIztVByINM9M+3I7Typt7WCtqMxcB+klPnRwRRDN6mg+0dDzmlhnD
+         RatQ==
+X-Gm-Message-State: ACgBeo2/7RpJiAqkeYpWtX03fv/FYSAb9VtVJgOP9hVNGLuaTSQPAeoZ
+        9naM/9fIpkdPVwtX9RYFbAgVBejohg2SUXS/xUIukcI/XN95
+X-Google-Smtp-Source: AA6agR4acJ4apit9JKg5rRK8ILwimd0MgxU3eXNXYOdjDSkUqczW0DbRVp9bfUsRpHitcWwTa31XD7BxUqSoiVigG5luxR99Nn0Q
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:91.0) Gecko/20100101
- Firefox/91.0 Thunderbird/91.12.0
-Subject: Re: [PATCH V5 4/6] vDPA: !FEATURES_OK should not block querying
- device config space
-Content-Language: en-US
-To:     "Michael S. Tsirkin" <mst@redhat.com>
-Cc:     Si-Wei Liu <si-wei.liu@oracle.com>,
-        virtualization@lists.linux-foundation.org, netdev@vger.kernel.org,
-        kvm@vger.kernel.org, parav@nvidia.com, xieyongji@bytedance.com,
-        gautam.dawar@amd.com, jasowang@redhat.com
-References: <20220812104500.163625-1-lingshan.zhu@intel.com>
- <20220812104500.163625-5-lingshan.zhu@intel.com>
- <e99e6d81-d7d5-e1ff-08e0-c22581c1329a@oracle.com>
- <f2864c96-cddd-129e-7dd8-a3743fe7e0d0@intel.com>
- <20220816044007-mutt-send-email-mst@kernel.org>
-From:   "Zhu, Lingshan" <lingshan.zhu@intel.com>
-In-Reply-To: <20220816044007-mutt-send-email-mst@kernel.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
-        RCVD_IN_DNSWL_MED,RCVD_IN_MSPIKE_H3,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,
-        SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no
-        version=3.4.6
+X-Received: by 2002:a02:6023:0:b0:346:ac9c:5ded with SMTP id
+ i35-20020a026023000000b00346ac9c5dedmr945099jac.245.1660639585434; Tue, 16
+ Aug 2022 01:46:25 -0700 (PDT)
+Date:   Tue, 16 Aug 2022 01:46:25 -0700
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <0000000000009700a805e657c8fa@google.com>
+Subject: [syzbot] BUG: unable to handle kernel paging request in kvm_arch_hardware_enable
+From:   syzbot <syzbot+4f6eb69074ff62a1a33b@syzkaller.appspotmail.com>
+To:     bp@alien8.de, dave.hansen@linux.intel.com, hpa@zytor.com,
+        jarkko@kernel.org, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org, linux-sgx@vger.kernel.org,
+        mingo@redhat.com, pbonzini@redhat.com, seanjc@google.com,
+        syzkaller-bugs@googlegroups.com, tglx@linutronix.de, x86@kernel.org
+Content-Type: text/plain; charset="UTF-8"
+X-Spam-Status: No, score=0.8 required=5.0 tests=BAYES_00,FROM_LOCAL_HEX,
+        HEADER_FROM_DIFFERENT_DOMAINS,RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,
+        SORTED_RECIPS,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=no
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+Hello,
+
+syzbot found the following issue on:
+
+HEAD commit:    7ebfc85e2cd7 Merge tag 'net-6.0-rc1' of git://git.kernel.o..
+git tree:       upstream
+console+strace: https://syzkaller.appspot.com/x/log.txt?x=13d10985080000
+kernel config:  https://syzkaller.appspot.com/x/.config?x=20bc0b329895d963
+dashboard link: https://syzkaller.appspot.com/bug?extid=4f6eb69074ff62a1a33b
+compiler:       Debian clang version 13.0.1-++20220126092033+75e33f71c2da-1~exp1~20220126212112.63, GNU ld (GNU Binutils for Debian) 2.35.2
+syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=1538e0b5080000
+C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=112756f3080000
+
+IMPORTANT: if you fix the issue, please add the following tag to the commit:
+Reported-by: syzbot+4f6eb69074ff62a1a33b@syzkaller.appspotmail.com
+
+BUG: unable to handle page fault for address: ffffc900039aa330
+#PF: supervisor read access in kernel mode
+#PF: error_code(0x0000) - not-present page
+PGD 12000067 
+P4D 12000067 
+PUD 121c9067 
+PMD 1d46a067 
+PTE 0
+
+Oops: 0000 [#1] PREEMPT SMP KASAN
+CPU: 0 PID: 3620 Comm: syz-executor254 Not tainted 5.19.0-syzkaller-13930-g7ebfc85e2cd7 #0
+Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 07/22/2022
+RIP: 0010:arch_atomic_read arch/x86/include/asm/atomic.h:29 [inline]
+RIP: 0010:atomic_read include/linux/atomic/atomic-instrumented.h:28 [inline]
+RIP: 0010:kvm_arch_hardware_enable+0x1d1/0x6d0 arch/x86/kvm/x86.c:11847
+Code: 89 5c 24 38 4c 8d 73 f0 4c 89 f7 be 04 00 00 00 e8 a4 44 cc 00 4d 89 f5 49 c1 ed 03 43 0f b6 44 3d 00 84 c0 0f 85 08 02 00 00 <41> 8b 06 ff c8 48 63 d0 4c 89 64 24 10 4c 89 e7 48 8d 74 24 60 b9
+RSP: 0018:ffffc900038dfaa0 EFLAGS: 00010082
+
+RAX: 0000000000000000 RBX: ffffc900039aa340 RCX: ffffffff8110f0c2
+RDX: 0000000000000000 RSI: 0000000000000004 RDI: ffffc900039aa330
+RBP: ffffc900038dfb80 R08: dffffc0000000000 R09: fffff52000735466
+R10: fffff52000735467 R11: 1ffff92000735466 R12: ffffc900039aa240
+R13: 1ffff92000735466 R14: ffffc900039aa330 R15: dffffc0000000000
+FS:  0000555555610300(0000) GS:ffff8880b9a00000(0000) knlGS:0000000000000000
+CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+CR2: ffffc900039aa330 CR3: 0000000076051000 CR4: 00000000003526f0
+DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
+DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
+Call Trace:
+ <TASK>
+ hardware_enable_nolock+0xa1/0x140 arch/x86/kvm/../../../virt/kvm/kvm_main.c:5007
+ smp_call_function_many_cond+0xebc/0x16f0 kernel/smp.c:979
+ on_each_cpu_cond_mask+0x3b/0x80 kernel/smp.c:1154
+ on_each_cpu include/linux/smp.h:71 [inline]
+ hardware_enable_all+0x77/0x120 arch/x86/kvm/../../../virt/kvm/kvm_main.c:5069
+ kvm_create_vm arch/x86/kvm/../../../virt/kvm/kvm_main.c:1202 [inline]
+ kvm_dev_ioctl_create_vm arch/x86/kvm/../../../virt/kvm/kvm_main.c:4910 [inline]
+ kvm_dev_ioctl+0x1076/0x17e0 arch/x86/kvm/../../../virt/kvm/kvm_main.c:4957
+ vfs_ioctl fs/ioctl.c:51 [inline]
+ __do_sys_ioctl fs/ioctl.c:870 [inline]
+ __se_sys_ioctl+0xfb/0x170 fs/ioctl.c:856
+ do_syscall_x64 arch/x86/entry/common.c:50 [inline]
+ do_syscall_64+0x2b/0x70 arch/x86/entry/common.c:80
+ entry_SYSCALL_64_after_hwframe+0x63/0xcd
+RIP: 0033:0x7fd926d9c049
+Code: 28 00 00 00 75 05 48 83 c4 28 c3 e8 b1 14 00 00 90 48 89 f8 48 89 f7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff ff 73 01 c3 48 c7 c1 c0 ff ff ff f7 d8 64 89 01 48
+RSP: 002b:00007ffce6c2e948 EFLAGS: 00000246
+ ORIG_RAX: 0000000000000010
+RAX: ffffffffffffffda RBX: 0000000000000002 RCX: 00007fd926d9c049
+RDX: 0000000000000000 RSI: 000000000000ae01 RDI: 0000000000000003
+RBP: 00007ffce6c2e960 R08: 0000000000000002 R09: 0000000000000001
+R10: 0000000000000000 R11: 0000000000000246 R12: 0000000000000004
+R13: 431bde82d7b634db R14: 0000000000000000 R15: 0000000000000000
+ </TASK>
+Modules linked in:
+CR2: ffffc900039aa330
+---[ end trace 0000000000000000 ]---
+RIP: 0010:arch_atomic_read arch/x86/include/asm/atomic.h:29 [inline]
+RIP: 0010:atomic_read include/linux/atomic/atomic-instrumented.h:28 [inline]
+RIP: 0010:kvm_arch_hardware_enable+0x1d1/0x6d0 arch/x86/kvm/x86.c:11847
+Code: 89 5c 24 38 4c 8d 73 f0 4c 89 f7 be 04 00 00 00 e8 a4 44 cc 00 4d 89 f5 49 c1 ed 03 43 0f b6 44 3d 00 84 c0 0f 85 08 02 00 00 <41> 8b 06 ff c8 48 63 d0 4c 89 64 24 10 4c 89 e7 48 8d 74 24 60 b9
+RSP: 0018:ffffc900038dfaa0 EFLAGS: 00010082
+
+RAX: 0000000000000000 RBX: ffffc900039aa340 RCX: ffffffff8110f0c2
+RDX: 0000000000000000 RSI: 0000000000000004 RDI: ffffc900039aa330
+RBP: ffffc900038dfb80 R08: dffffc0000000000 R09: fffff52000735466
+R10: fffff52000735467 R11: 1ffff92000735466 R12: ffffc900039aa240
+R13: 1ffff92000735466 R14: ffffc900039aa330 R15: dffffc0000000000
+FS:  0000555555610300(0000) GS:ffff8880b9a00000(0000) knlGS:0000000000000000
+CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+CR2: ffffc900039aa330 CR3: 0000000076051000 CR4: 00000000003526f0
+DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
+DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
+----------------
+Code disassembly (best guess):
+   0:	89 5c 24 38          	mov    %ebx,0x38(%rsp)
+   4:	4c 8d 73 f0          	lea    -0x10(%rbx),%r14
+   8:	4c 89 f7             	mov    %r14,%rdi
+   b:	be 04 00 00 00       	mov    $0x4,%esi
+  10:	e8 a4 44 cc 00       	callq  0xcc44b9
+  15:	4d 89 f5             	mov    %r14,%r13
+  18:	49 c1 ed 03          	shr    $0x3,%r13
+  1c:	43 0f b6 44 3d 00    	movzbl 0x0(%r13,%r15,1),%eax
+  22:	84 c0                	test   %al,%al
+  24:	0f 85 08 02 00 00    	jne    0x232
+* 2a:	41 8b 06             	mov    (%r14),%eax <-- trapping instruction
+  2d:	ff c8                	dec    %eax
+  2f:	48 63 d0             	movslq %eax,%rdx
+  32:	4c 89 64 24 10       	mov    %r12,0x10(%rsp)
+  37:	4c 89 e7             	mov    %r12,%rdi
+  3a:	48 8d 74 24 60       	lea    0x60(%rsp),%rsi
+  3f:	b9                   	.byte 0xb9
 
 
-On 8/16/2022 4:41 PM, Michael S. Tsirkin wrote:
-> On Tue, Aug 16, 2022 at 04:29:04PM +0800, Zhu, Lingshan wrote:
->>
->> On 8/16/2022 3:41 PM, Si-Wei Liu wrote:
->>
->>      Hi Michael,
->>
->>      I just noticed this patch got pulled to linux-next prematurely without
->>      getting consensus on code review, am not sure why. Hope it was just an
->>      oversight.
->>
->>      Unfortunately this introduced functionality regression to at least two
->>      cases so far as I see:
->>
->>      1. (bogus) VDPA_ATTR_DEV_NEGOTIATED_FEATURES are inadvertently exposed and
->>      displayed in "vdpa dev config show" before feature negotiation is done.
->>      Noted the corresponding features name shown in vdpa tool is called
->>      "negotiated_features" rather than "driver_features". I see in no way the
->>      intended change of the patch should break this user level expectation
->>      regardless of any spec requirement. Do you agree on this point?
->>
->> I will post a patch for iptour2, doing:
->> 1) if iprout2 does not get driver_features from the kernel, then don't show
->> negotiated features in the command output
->> 2) process and decoding the device features.
->>
->>
->>      2. There was also another implicit assumption that is broken by this patch.
->>      There could be a vdpa tool query of config via vdpa_dev_net_config_fill()->
->>      vdpa_get_config_unlocked() that races with the first vdpa_set_features()
->>      call from VMM e.g. QEMU. Since the S_FEATURES_OK blocking condition is
->>      removed, if the vdpa tool query occurs earlier than the first
->>      set_driver_features() call from VMM, the following code will treat the
->>      guest as legacy and then trigger an erroneous vdpa_set_features_unlocked
->>      (... , 0) call to the vdpa driver:
->>
->>       374         /*
->>       375          * Config accesses aren't supposed to trigger before features
->>      are set.
->>       376          * If it does happen we assume a legacy guest.
->>       377          */
->>       378         if (!vdev->features_valid)
->>       379                 vdpa_set_features_unlocked(vdev, 0);
->>       380         ops->get_config(vdev, offset, buf, len);
->>
->>      Depending on vendor driver's implementation, L380 may either return invalid
->>      config data (or invalid endianness if on BE) or only config fields that are
->>      valid in legacy layout. What's more severe is that, vdpa tool query in
->>      theory shouldn't affect feature negotiation at all by making confusing
->>      calls to the device, but now it is possible with the patch. Fixing this
->>      would require more delicate work on the other paths involving the cf_lock
->>      reader/write semaphore.
->>
->>      Not sure what you plan to do next, post the fixes for both issues and get
->>      the community review? Or simply revert the patch in question? Let us know.
->>
->> The spec says:
->> The device MUST allow reading of any device-specific configuration field before
->> FEATURES_OK is set by
->> the driver. This includes fields which are conditional on feature bits, as long
->> as those feature bits are offered
->> by the device.
->>
->> so whether FEATURES_OK should not block reading the device config space.
->> vdpa_get_config_unlocked() will read the features, I don't know why it has a
->> comment:
->>          /*
->>           * Config accesses aren't supposed to trigger before features are set.
->>           * If it does happen we assume a legacy guest.
->>           */
->>
->> This conflicts with the spec.
-> Yea well. On the other hand the spec also calls for features to be
-> used to detect legacy versus modern driver.
-> This part of the spec needs work generally.
-so from what I see, there are no race conditions, if features 
-negotiation not done,
-just assume the driver features are all zero, then return the device 
-config space contents.
-It can do this even without this comment.
+---
+This report is generated by a bot. It may contain errors.
+See https://goo.gl/tpsmEJ for more information about syzbot.
+syzbot engineers can be reached at syzkaller@googlegroups.com.
 
-Please help correct me if I misunderstand these
-
-Thanks
-Zhu Lingshan
->
->
->> vdpa_get_config_unlocked() checks vdev->features_valid, if not valid, it will
->> set the drivers_features 0, I think this intends to prevent reading random
->> driver_features. This function does not hold any locks, and didn't change
->> anything.
->>
->> So what is the race?
->>
->> Thanks
->>
->>
->>
->>      Thanks,
->>      -Siwei
->>
->>
->>      On 8/12/2022 3:44 AM, Zhu Lingshan wrote:
->>
->>          Users may want to query the config space of a vDPA device,
->>          to choose a appropriate one for a certain guest. This means the
->>          users need to read the config space before FEATURES_OK, and
->>          the existence of config space contents does not depend on
->>          FEATURES_OK.
->>
->>          The spec says:
->>          The device MUST allow reading of any device-specific configuration
->>          field before FEATURES_OK is set by the driver. This includes
->>          fields which are conditional on feature bits, as long as those
->>          feature bits are offered by the device.
->>
->>          Signed-off-by: Zhu Lingshan <lingshan.zhu@intel.com>
->>          ---
->>            drivers/vdpa/vdpa.c | 8 --------
->>            1 file changed, 8 deletions(-)
->>
->>          diff --git a/drivers/vdpa/vdpa.c b/drivers/vdpa/vdpa.c
->>          index 6eb3d972d802..bf312d9c59ab 100644
->>          --- a/drivers/vdpa/vdpa.c
->>          +++ b/drivers/vdpa/vdpa.c
->>          @@ -855,17 +855,9 @@ vdpa_dev_config_fill(struct vdpa_device *vdev,
->>          struct sk_buff *msg, u32 portid,
->>            {
->>                u32 device_id;
->>                void *hdr;
->>          -    u8 status;
->>                int err;
->>                  down_read(&vdev->cf_lock);
->>          -    status = vdev->config->get_status(vdev);
->>          -    if (!(status & VIRTIO_CONFIG_S_FEATURES_OK)) {
->>          -        NL_SET_ERR_MSG_MOD(extack, "Features negotiation not
->>          completed");
->>          -        err = -EAGAIN;
->>          -        goto out;
->>          -    }
->>          -
->>                hdr = genlmsg_put(msg, portid, seq, &vdpa_nl_family, flags,
->>                          VDPA_CMD_DEV_CONFIG_GET);
->>                if (!hdr) {
->>
->>
->>
->>
-
+syzbot will keep track of this issue. See:
+https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
+syzbot can test patches for this issue, for details see:
+https://goo.gl/tpsmEJ#testing-patches
