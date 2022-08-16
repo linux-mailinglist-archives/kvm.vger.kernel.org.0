@@ -2,187 +2,179 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 7541A595CBB
-	for <lists+kvm@lfdr.de>; Tue, 16 Aug 2022 15:05:05 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 489A6595D93
+	for <lists+kvm@lfdr.de>; Tue, 16 Aug 2022 15:43:07 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235481AbiHPNE3 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 16 Aug 2022 09:04:29 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46706 "EHLO
+        id S235693AbiHPNnG (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 16 Aug 2022 09:43:06 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50426 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233934AbiHPNEK (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 16 Aug 2022 09:04:10 -0400
-Received: from NAM11-DM6-obe.outbound.protection.outlook.com (mail-dm6nam11on2062.outbound.protection.outlook.com [40.107.223.62])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D47C4422D9;
-        Tue, 16 Aug 2022 06:03:35 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=b/pklq7vSxOnOAkF71P/1VEWOU1y0BBjuu3IgodFcv0eRqj/rz4SXQ0fCwjI9t+iM+ewMMuQGf04ALTvGMRCqLnhS/DLk8IgDOiGkbFqz+f6GEYIlhNYnLt/Xt7VeduEK5BMz4afHNtq8mSAt446HPZwl/OlGPyGSkwjY2OegyjcT2FLT6OS7dTFzyJpVCKmlPQ20fUsU1XfAOUkhKrGFW8ncTTRRQ93DqQGSK0+mRC/97MHLjY4MPYOSAnYNbNVIFv0TOkpC2S4dSX8gceLablttdbH0TiURMK3WiAryvCxhEObZjh7VDpMdGdRVEJQg/j6PqjMm5kYjX8ySvSCOQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=t+8FT6JiTQcMC/ALVK6sn7OMTE0JPDM/uwycojdLWNA=;
- b=fU/GJ5HLejsFWn8vk+afk/+lTexCibOsEG+Pq7gtJntO3X0UvC5t2o+tBZ7oZ8voTlKSCQe/tSG0Arsve6PAOFaSi63HLCXCPfehW5ziIosKXugneHC608Tx73a1KLJNjrxWb716H9CEWIADQHg+3JbB7dvnN3uozXlB7h1x7YTSILlY0F9jI6zSdWb8zTwf9tnh93KGZI6pYSQvCcdLQVC8WDPSlZE0sFvFPXHrY6+BD4E+JJvtQ+pdUiJHMG49hxXiXcu6zUvs72/+FvkP7EKP1L27A/W8Ur2unGDhRL1IPYRhKSQNnmM2zmAoZB9kfnvf/dpWJIow7P+C0lPYUg==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
- header.d=amd.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=t+8FT6JiTQcMC/ALVK6sn7OMTE0JPDM/uwycojdLWNA=;
- b=ILx28ZA63mYSvq5ws9EDir64C1C3GoLjdnrcUOY27IlArZOjmL1FZ3uqk+IS3YTwlBUrto896AVfqOsxXlHYBzyOxww6SDVXrX/QnvW/r0pV6jgV19wZPtXAqknyTIudLcVPJR/YBmcEVLZMbxVocaM7bXX7N2bDUN2TYT2TD2Y=
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=amd.com;
-Received: from CY4PR1201MB0181.namprd12.prod.outlook.com
- (2603:10b6:910:1f::11) by DM4PR12MB5071.namprd12.prod.outlook.com
- (2603:10b6:5:38a::6) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5504.15; Tue, 16 Aug
- 2022 13:03:34 +0000
-Received: from CY4PR1201MB0181.namprd12.prod.outlook.com
- ([fe80::1001:3c79:9504:8d6a]) by CY4PR1201MB0181.namprd12.prod.outlook.com
- ([fe80::1001:3c79:9504:8d6a%10]) with mapi id 15.20.5504.025; Tue, 16 Aug
- 2022 13:03:33 +0000
-Message-ID: <f95f35af-4824-2a2a-7cd0-71d1fda6867a@amd.com>
-Date:   Tue, 16 Aug 2022 15:03:12 +0200
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:91.0) Gecko/20100101
- Thunderbird/91.10.0
-Subject: Re: [PATCH v7 00/14] KVM: mm: fd-based approach for supporting KVM
- guest private memory
-Content-Language: en-US
-To:     "Kirill A . Shutemov" <kirill.shutemov@linux.intel.com>
-Cc:     Chao Peng <chao.p.peng@linux.intel.com>,
-        "Nikunj A. Dadhania" <nikunj@amd.com>,
-        Sean Christopherson <seanjc@google.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Jonathan Corbet <corbet@lwn.net>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        x86@kernel.org, "H . Peter Anvin" <hpa@zytor.com>,
-        Hugh Dickins <hughd@google.com>,
-        Jeff Layton <jlayton@kernel.org>,
-        "J . Bruce Fields" <bfields@fieldses.org>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        Shuah Khan <shuah@kernel.org>, Mike Rapoport <rppt@kernel.org>,
-        Steven Price <steven.price@arm.com>,
-        "Maciej S . Szmigiero" <mail@maciej.szmigiero.name>,
-        Vlastimil Babka <vbabka@suse.cz>,
-        Vishal Annapurve <vannapurve@google.com>,
-        Yu Zhang <yu.c.zhang@linux.intel.com>, luto@kernel.org,
-        jun.nakajima@intel.com, dave.hansen@intel.com, ak@linux.intel.com,
-        david@redhat.com, aarcange@redhat.com, ddutile@redhat.com,
-        dhildenb@redhat.com, Quentin Perret <qperret@google.com>,
-        Michael Roth <michael.roth@amd.com>, mhocko@suse.com,
-        Muchun Song <songmuchun@bytedance.com>, bharata@amd.com,
-        kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
-        linux-mm@kvack.org, linux-kselftest@vger.kernel.org,
-        linux-api@vger.kernel.org, linux-doc@vger.kernel.org,
-        qemu-devel@nongnu.org, linux-fsdevel@vger.kernel.org
-References: <20220706082016.2603916-1-chao.p.peng@linux.intel.com>
- <b21f41e5-0322-bbfb-b9c2-db102488592d@amd.com>
- <9e86daea-5619-a216-fe02-0562cf14c501@amd.com>
- <9dc91ce8-4cb6-37e6-4c25-27a72dc11dd0@amd.com>
- <422b9f97-fdf5-54bf-6c56-3c45eff5e174@amd.com>
- <1407c70c-0c0b-6955-10bb-d44c5928f2d9@amd.com>
- <1136925c-2e37-6af4-acac-be8bed9f6ed5@amd.com>
- <1b02db9d-f2f1-94dd-6f37-59481525abff@amd.com>
- <20220815130411.GA1073443@chaop.bj.intel.com>
- <f0094f31-9669-47b5-eb52-6754a13ce757@amd.com>
- <20220816122457.2fjyd4uz5hp5cani@box.shutemov.name>
-From:   "Gupta, Pankaj" <pankaj.gupta@amd.com>
-In-Reply-To: <20220816122457.2fjyd4uz5hp5cani@box.shutemov.name>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: FR3P281CA0010.DEUP281.PROD.OUTLOOK.COM
- (2603:10a6:d10:1d::9) To CY4PR1201MB0181.namprd12.prod.outlook.com
- (2603:10b6:910:1f::11)
+        with ESMTP id S233563AbiHPNnE (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 16 Aug 2022 09:43:04 -0400
+Received: from mx0a-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 493E785FAF;
+        Tue, 16 Aug 2022 06:43:03 -0700 (PDT)
+Received: from pps.filterd (m0098419.ppops.net [127.0.0.1])
+        by mx0b-001b2d01.pphosted.com (8.17.1.5/8.17.1.5) with ESMTP id 27GCTXOU020589;
+        Tue, 16 Aug 2022 13:42:52 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
+ mime-version : subject : from : to : cc : references : in-reply-to :
+ content-type : content-transfer-encoding; s=pp1;
+ bh=qSmCgUkiKFSPrl9wRss/YSlSfXGLPxBQcr0ruFYm4TE=;
+ b=ER6q5huXcrTsYzUPijasmL27sSuPjshBhmQsYo+U9SmdxAVNlF6RHvB9LMAApVCZWA6R
+ HeG/YWUcvIQjOcFlzdWdIosUtnIeqyMBx6fKBSCZ8omvqjeAakE6UpvLjn9WcwzFqQo7
+ DcjXximE/aRhvoj1pWXvVKcjtJ/MqEMTReib2FU+XzByQ2MV6cJLnrWRCuIvDPBw31+7
+ jyzyMhPIlEBtUy6O+9xjw8AnkSbqRBTpHY3Sy4T6TG3xDlVdI9UKxs1ZUzwDx9q2xlOo
+ EttsI4FG3ZbotnX1TgqoEwVmyb0eOHfy1NNTfhtI2VyJC3v+14SQaYkxWPNXTULhHnsG eQ== 
+Received: from ppma06ams.nl.ibm.com (66.31.33a9.ip4.static.sl-reverse.com [169.51.49.102])
+        by mx0b-001b2d01.pphosted.com (PPS) with ESMTPS id 3j0b9t27rw-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Tue, 16 Aug 2022 13:42:52 +0000
+Received: from pps.filterd (ppma06ams.nl.ibm.com [127.0.0.1])
+        by ppma06ams.nl.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 27GDM51B005646;
+        Tue, 16 Aug 2022 13:42:50 GMT
+Received: from b06avi18878370.portsmouth.uk.ibm.com (b06avi18878370.portsmouth.uk.ibm.com [9.149.26.194])
+        by ppma06ams.nl.ibm.com with ESMTP id 3hx37jba7b-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Tue, 16 Aug 2022 13:42:50 +0000
+Received: from d06av21.portsmouth.uk.ibm.com (d06av21.portsmouth.uk.ibm.com [9.149.105.232])
+        by b06avi18878370.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 27GDh6lP27394522
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Tue, 16 Aug 2022 13:43:06 GMT
+Received: from d06av21.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 57D945204E;
+        Tue, 16 Aug 2022 13:42:47 +0000 (GMT)
+Received: from [9.171.18.167] (unknown [9.171.18.167])
+        by d06av21.portsmouth.uk.ibm.com (Postfix) with ESMTP id E43315204F;
+        Tue, 16 Aug 2022 13:42:46 +0000 (GMT)
+Message-ID: <fa1e62d7-30c3-693e-e31a-352dde8c339f@linux.ibm.com>
+Date:   Tue, 16 Aug 2022 15:47:53 +0200
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: c13efbc1-f89b-4968-0765-08da7f87b955
-X-MS-TrafficTypeDiagnostic: DM4PR12MB5071:EE_
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: 3P/R0ngget9w/tNl+YiggXMHDqv2yEBs3v6AjBXC1ld07V40vX8xNu9FXGg1CUO0C063Y3QnFGbVLFNmx9mobfozniHK6xe7i8bCgYj3Gvt5gvCKNgUnB7KKs/p/ZwlflPbz8mtqrnK0HfNHzfxJZVAqbm1sKg8LZ0clYTYo6gGMw4IaV+R81Pl2bso3Lcl7ezhmjsJAEwMsaSD8YgICN4IsC4Y4RqwrscZauRxJfMT9pFMvD7M63rEMLwC2rYE3/N+fN6cgzuaNeswvAbk67Nell6CDFNedjGi8Q0X6dIa7665lf8/ynprtj2JeGqlNHKfP6BMBUeKbRc7LGX6PbSClu9GGNkHwxZnidMOj4wWT8NGgdXRf2RaLlTyBSaFyQLcpd8eX0mRuXvX33rEjkH5tcAIyipyVOdTpDLkwxSSK/0fcHgzHC7hs0tNeVZTatGItUU/4ys+FwhMiyYFUiWz9mqJubEcbRboxw/zL/worE4Ica0tfSgt3BVRVFCqkk0DsiPxYKDoRZ2NKhEsqVTuXlwC3KuaUgp3duPQSHtVwbMPOnGKY5v0QyxwO8ml+mHOtNByVq9YJsaTnl69tZvQVVa4lnPPmQEY+VT9wO0gZg4ZGcpUElW+XVNUwYpUsb9N/Qak0x9leAMArhqGMcTXMBopj4ojw2X7r7fpXYMbodRYBOijJWzoCrYXk0oTRHSga3luf/e0WdZ9u1/TzyRe35/R2FMaLnApWojtUXkvdLzpedlOV94o475U8FwqkyP9CFMM6JFVa2KzeFEl03sJodpplodgD/8n5sEsuQefcYO+gaCXUFYfQ6TpsL0/MyhjGAujR1CvHB/MRKlVbDw==
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CY4PR1201MB0181.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230016)(4636009)(39860400002)(376002)(346002)(396003)(366004)(136003)(186003)(31686004)(41300700001)(8676002)(2616005)(6666004)(83380400001)(66556008)(2906002)(4326008)(66946007)(66476007)(54906003)(6916009)(36756003)(316002)(38100700002)(26005)(6512007)(31696002)(5660300002)(478600001)(86362001)(8936002)(6506007)(7406005)(7416002)(6486002)(43740500002)(45980500001);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?NlhMZkRKSDBjblhHZHd4a1EzOXFRUkFDOFFHaXMvcmpTUFVGNXJtUklocnB1?=
- =?utf-8?B?OTFZbG5KWUUwdllETldPc0svUEUzWm5qTjZJVjBWeGthelFSNE9YcFB4cmxl?=
- =?utf-8?B?SFlVejhMUGV4T0pXTFVpbXhIZDY5bmVvdWYyK2xEODJpa1BJQmZBQ3E1c25J?=
- =?utf-8?B?RzR3VVY4eWcxaVhjU1hyZzVYZzVEbkU5SzA0M3RncVR1aG00a3cra3F5Z2Qy?=
- =?utf-8?B?eDl3Wm1DUnhHU05acm8yUk5tVUN5a0xVSk01d1IxQlM0d2NweXN2ZElJcUNw?=
- =?utf-8?B?WWNTMFJHT0RwT1krM3I2aHlGOUdGWVlVZkdRUkl5bTRvcWNkY2kycS80WFFS?=
- =?utf-8?B?QjJWaUdjZDh2dE9wQ0dWUXdPeXVQaUdjZWJGY3BsZDd1aDdWWUtrbjh1UmU4?=
- =?utf-8?B?U0hGdms3QVZZak8rNmxPbG5vVlBpSElwU3c5QVJma0t0QlNqY1h1WG92TmVC?=
- =?utf-8?B?anBMc3pFRlBlcW8rZUFvWVdpcllHMFF6Mm1WV3A5bFBkVEU3bEwxY1c0bVlG?=
- =?utf-8?B?MFZUZVhjWWFycXc4SFhsMXNzMUNiKzZkbC9jTVZnNHNmUDNUT1RXR1Rqdm9W?=
- =?utf-8?B?STZLK0Zhaytkc3EwWjZTdjk3S3FpYUljcGpQYU5KRithcStydUV5bHBuSHd4?=
- =?utf-8?B?b05wNGFCWStLdnMraDJzRU9oQzA0UGI4VkI2Q25MSXNRSzNrUCtKdXdoYVNm?=
- =?utf-8?B?bWVMZ0xFa24rUVF3TjFSUkV1RWtyYkJHWFlENHJzSmJ2TmMvRnFjMmgwaGJr?=
- =?utf-8?B?Mlp1M3lESjVQemJJRHFnZ1RzQTVkZkd3MlU4SzlTZU55ZW1CL3ZDMzVTU0Jt?=
- =?utf-8?B?Zmk5RjVKSC9PMU1UMkZPYWFYVXRkZVo1cXpOSGFtUmdFTFZZKzRkcGs1SjZq?=
- =?utf-8?B?Z3lrZ3VjT2YvRFJCY09LUlU0VFNwdzFsdmduSlF6S0k3V21UZGU3VUxnZGpM?=
- =?utf-8?B?TnhZNE9mY1FnOG0yd0pKSjZoNHhuNi9Ec0ZHMkhZVS9RdERDNWU4Z0lPTWxv?=
- =?utf-8?B?TENBNnRqUGw2dXYraHdkL1FCOTNkYUlwMEtxSWlLS05KaEVpZXU4RE1GRXZV?=
- =?utf-8?B?eVFOK1pUcXp5Qm52QVdUenJnRExVQmFIYnFXam9rRlJhd093enpqSk03TWlJ?=
- =?utf-8?B?RDNKd09MN1A5VkQvOHFXK2RxcmlWbmFrV2pKbk13ZlIrcTM1Yk5XRTlkUHdl?=
- =?utf-8?B?WGtMdGMwdjRaZnBzN1FyWVhualp4ZjdkUmNmNzdzR1NmL0p3WG83TDliTWhU?=
- =?utf-8?B?b25iUXo1aTNSSzZNb3RwWm1SOEhQc0N2b0YvNFlvb044a2YyTXJaYkg2TmVj?=
- =?utf-8?B?Tk81SWM5K1cveWJmaE11SUV4ZDdjYlZ3N2ZaOGgrUGc2RlpZVUZHVk5oNlpN?=
- =?utf-8?B?VU9jUDRidndNTTF4UUR2Sjdld1o4azZJVmJoNG1UeGdZdlYvQldDRUtiR2Fh?=
- =?utf-8?B?MWJTcWxBZ3MvL09Sb1A5c0IrYWVFRWVlZDdLV29BQm4wQ3pRZFhXemRyZnJh?=
- =?utf-8?B?dGJZTGxFQmxpNEFYRkVxR01FekczVURuWW9nN2NSdFl2TS9YZWlQRCtnWlhi?=
- =?utf-8?B?R01rR1VQajQvb0YwVDVPMTJwUVJCUFhGMFFQYytLUkpiUzUxMXlLTHhGR0RU?=
- =?utf-8?B?M1BzTS9vRHpZUVJLWHBpSEtRdEpFRmwwbnNJdEsvYVhVWXlQYmVsNDJPTjZC?=
- =?utf-8?B?cEEvWEZzeWMvckZzYmxyUElURHppY2dFNVQ5aHJuWC9nMlFjcU1VM28xbVl2?=
- =?utf-8?B?TTVrMWZ4MlJxS0MxQWxlQ2p3cmM0UDhjU0FaaENrbWI3NDJoQ1VsUU1FMG1z?=
- =?utf-8?B?WFB4aGlsTzUzWE1kZ095aFZZVjRPa3k0eGQwK0ErakUxV3BlODd5VnYyMkts?=
- =?utf-8?B?VlR2bFpWMUJlQ0VGZnlBZ1NEbVBHMnBIeDVCYVNrdDZKcmI4cGwvSUpjYUdE?=
- =?utf-8?B?bFc2NXlaMEppTGRxbXhtblRzbVU5UWpxeC9BTlZHZnhhRnJlNi9HUStwb1lo?=
- =?utf-8?B?QisxSXdxMlhSRlFpb0t4eTl2Z1RJTmxpUkQ3RnhJK0tDMlpNbGVUQXdZZEFr?=
- =?utf-8?B?Z3hRakVyUEc0enp1UExjcVJ5OU9uRW5wdVpTdHk3MmEwWXF5K3Z2MGlyYTlw?=
- =?utf-8?Q?qQPg5tTn2CJYvlNlrpyi8bE1x?=
-X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: c13efbc1-f89b-4968-0765-08da7f87b955
-X-MS-Exchange-CrossTenant-AuthSource: CY4PR1201MB0181.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 16 Aug 2022 13:03:33.6141
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: ywbB9TW87oUD4PWsX5vZlZ2sfD81AQRYc5k7m+zcgBUF5mv/QNJUEUi/uz9OIwD1EQ10ARynuIN6Sg57JTnEWA==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM4PR12MB5071
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_DNSWL_NONE,
-        RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_PASS,T_SCC_BODY_TEXT_LINE
-        autolearn=ham autolearn_force=no version=3.4.6
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.3.0
+Subject: Re: [PATCH] vfio-pci/zdev: require KVM to be built-in
+Content-Language: en-US
+From:   Pierre Morel <pmorel@linux.ibm.com>
+To:     Randy Dunlap <rdunlap@infradead.org>, linux-kernel@vger.kernel.org
+Cc:     kernel test robot <lkp@intel.com>,
+        Matthew Rosato <mjrosato@linux.ibm.com>,
+        Christian Borntraeger <borntraeger@linux.ibm.com>,
+        Eric Farman <farman@linux.ibm.com>, linux-s390@vger.kernel.org,
+        kvm@vger.kernel.org
+References: <20220814215154.32112-1-rdunlap@infradead.org>
+ <663c7595-1c18-043e-5f12-b0ce880b84bf@linux.ibm.com>
+ <5530ed1f-90ec-ce84-2348-80e484fa48cb@infradead.org>
+ <47cfc72d-62f6-2bd3-db91-99f91591fc30@linux.ibm.com>
+In-Reply-To: <47cfc72d-62f6-2bd3-db91-99f91591fc30@linux.ibm.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-ORIG-GUID: SbCic7_lFjCT3UETxpFroWyQ5mpcuhQf
+X-Proofpoint-GUID: SbCic7_lFjCT3UETxpFroWyQ5mpcuhQf
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.205,Aquarius:18.0.883,Hydra:6.0.517,FMLib:17.11.122.1
+ definitions=2022-08-16_08,2022-08-16_02,2022-06-22_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 adultscore=0 malwarescore=0
+ priorityscore=1501 impostorscore=0 lowpriorityscore=0 clxscore=1015
+ mlxlogscore=999 bulkscore=0 spamscore=0 mlxscore=0 phishscore=0
+ suspectscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2207270000 definitions=main-2208160051
+X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,
+        SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no
+        version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+Randy,
 
->>> Actually the current version allows you to delay the allocation to a
->>> later time (e.g. page fault time) if you don't call fallocate() on the
->>> private fd. fallocate() is necessary in previous versions because we
->>> treat the existense in the fd as 'private' but in this version we track
->>> private/shared info in KVM so we don't rely on that fact from memory
->>> backstores.
->>
->> Does this also mean reservation of guest physical memory with secure
->> processor (both for SEV-SNP & TDX) will also happen at page fault time?
->>
->> Do we plan to keep it this way?
+I need to provide the correction patch rapidly.
+Without answer I will propose the patch.
+
+Regards,
+Pierre
+
+On 8/16/22 09:55, Pierre Morel wrote:
 > 
-> If you are talking about accepting memory by the guest, it is initiated by
-> the guest and has nothing to do with page fault time vs fallocate()
-> allocation of host memory. I mean acceptance happens after host memory
-> allocation but they are not in lockstep, acceptance can happen much later.
+> 
+> On 8/16/22 08:04, Randy Dunlap wrote:
+>> Hi--
+>>
+>> On 8/15/22 02:43, Pierre Morel wrote:
+>>> Thank you Randy for this good catch.
+>>> However forcing KVM to be include statically in the kernel when using 
+>>> VFIO_PCI extensions is not a good solution for us I think.
+>>>
+>>> I suggest we better do something like:
+>>>
+>>> ----
+>>>
+>>> diff --git a/arch/s390/include/asm/kvm_host.h 
+>>> b/arch/s390/include/asm/kvm_host.h
+>>> index 6287a843e8bc..1733339cc4eb 100644
+>>> --- a/arch/s390/include/asm/kvm_host.h
+>>> +++ b/arch/s390/include/asm/kvm_host.h
+>>> @@ -1038,7 +1038,7 @@ static inline void 
+>>> kvm_arch_vcpu_unblocking(struct kvm_vcpu *vcpu) {}
+>>>   #define __KVM_HAVE_ARCH_VM_FREE
+>>>   void kvm_arch_free_vm(struct kvm *kvm);
+>>>
+>>> -#ifdef CONFIG_VFIO_PCI_ZDEV_KVM
+>>> +#if defined(CONFIG_VFIO_PCI_ZDEV_KVM) || 
+>>> defined(CONFIG_VFIO_PCI_ZDEV_KVM_MODULE)
+>>
+>> This all looks good except for the line above.
+>> It should be:
+>>
+>> #if IS_ENABLED(CONFIG_VFIO_PCI_ZDEV_KVM)
+>>
+>> Thanks.
+> 
+> Yes, better, thanks.
+> How do we do? Should I repost it with reported-by you or do you want to 
+> post it?
+> 
+> Pierre
+> 
+> 
+>>
+>>
+>>>   int kvm_s390_pci_register_kvm(struct zpci_dev *zdev, struct kvm *kvm);
+>>>   void kvm_s390_pci_unregister_kvm(struct zpci_dev *zdev);
+>>>   #else
+>>> diff --git a/drivers/vfio/pci/Kconfig b/drivers/vfio/pci/Kconfig
+>>> index f9d0c908e738..bbc375b028ef 100644
+>>> --- a/drivers/vfio/pci/Kconfig
+>>> +++ b/drivers/vfio/pci/Kconfig
+>>> @@ -45,9 +45,9 @@ config VFIO_PCI_IGD
+>>>   endif
+>>>
+>>>   config VFIO_PCI_ZDEV_KVM
+>>> -       bool "VFIO PCI extensions for s390x KVM passthrough"
+>>> +       def_tristate y
+>>> +       prompt "VFIO PCI extensions for s390x KVM passthrough"
+>>>          depends on S390 && KVM
+>>> -       default y
+>>>          help
+>>>            Support s390x-specific extensions to enable support for 
+>>> enhancements
+>>>            to KVM passthrough capabilities, such as interpretive 
+>>> execution of
+>>>
+>>> ----
+>>>
+>>> What do you think? It seems to me it solves the problem, what do you 
+>>> think?
+>>>
+>>> Regards,
+>>> Pierre
+>>
+>>
+> 
 
-No, I meant reserving guest physical memory range from hypervisor e.g 
-with RMPUpdate for SEV-SNP or equivalent at TDX side (PAMTs?).
-
-Thanks,
-Pankaj
+-- 
+Pierre Morel
+IBM Lab Boeblingen
