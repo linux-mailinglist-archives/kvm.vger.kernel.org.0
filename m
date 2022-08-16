@@ -2,187 +2,119 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 073155963B0
-	for <lists+kvm@lfdr.de>; Tue, 16 Aug 2022 22:24:08 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 097D55963EE
+	for <lists+kvm@lfdr.de>; Tue, 16 Aug 2022 22:47:54 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236984AbiHPUYD (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 16 Aug 2022 16:24:03 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57142 "EHLO
+        id S237012AbiHPUrn (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 16 Aug 2022 16:47:43 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58506 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229887AbiHPUYC (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 16 Aug 2022 16:24:02 -0400
-Received: from mx0a-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 207274BD30;
-        Tue, 16 Aug 2022 13:24:01 -0700 (PDT)
-Received: from pps.filterd (m0098419.ppops.net [127.0.0.1])
-        by mx0b-001b2d01.pphosted.com (8.17.1.5/8.17.1.5) with ESMTP id 27GKH2FP004357;
-        Tue, 16 Aug 2022 20:23:56 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=from : to : cc : subject
- : date : message-id : in-reply-to : references : mime-version :
- content-transfer-encoding; s=pp1;
- bh=EvcBurXOXaiaLUlkvNdLUiPP49PF3Z+Z73Ky8mIwjVg=;
- b=I7lJVvj1sZTB7ItlNu9zCE29ABRkh/YydyM5WyN8PURfWptfh+LgS43xVWylYyV5JZq+
- WbHUcxdYtgWge7w+L8S2BSt/TkyT0w8QSEXz6ZMTN9cHHEIic5fUN5VKBJDTUFw4Pjr/
- OeZQTRefVPo0d6LMqEY0bSKhxx0sdgyAIJ6CWLnof4KT4ah06+kZzlBgMyxX8kX3wpH6
- 7klTt4zwUKDqt5eXdX4/+HIqTX0WDFfnxdMJ2SacgEq4Vu7nwO2R9zd60sUNbytmfCxR
- f8Ku/TDX807K0iV0J2Y4K0C527EnBjEZ1yhXpqtiNMDI7XsfT/K7h+0zB7uygmJDV3WA JQ== 
-Received: from ppma03ams.nl.ibm.com (62.31.33a9.ip4.static.sl-reverse.com [169.51.49.98])
-        by mx0b-001b2d01.pphosted.com (PPS) with ESMTPS id 3j0j4w841y-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 16 Aug 2022 20:23:55 +0000
-Received: from pps.filterd (ppma03ams.nl.ibm.com [127.0.0.1])
-        by ppma03ams.nl.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 27GKKNr3009498;
-        Tue, 16 Aug 2022 20:23:54 GMT
-Received: from b06cxnps4075.portsmouth.uk.ibm.com (d06relay12.portsmouth.uk.ibm.com [9.149.109.197])
-        by ppma03ams.nl.ibm.com with ESMTP id 3hx3k8umc0-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 16 Aug 2022 20:23:53 +0000
-Received: from d06av24.portsmouth.uk.ibm.com (d06av24.portsmouth.uk.ibm.com [9.149.105.60])
-        by b06cxnps4075.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 27GKNo4e33816864
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Tue, 16 Aug 2022 20:23:50 GMT
-Received: from d06av24.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 92E1B42041;
-        Tue, 16 Aug 2022 20:23:50 +0000 (GMT)
-Received: from d06av24.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 2923C4203F;
-        Tue, 16 Aug 2022 20:23:50 +0000 (GMT)
-Received: from li-c6ac47cc-293c-11b2-a85c-d421c8e4747b.ibm.com.com (unknown [9.171.18.167])
-        by d06av24.portsmouth.uk.ibm.com (Postfix) with ESMTP;
-        Tue, 16 Aug 2022 20:23:50 +0000 (GMT)
-From:   Pierre Morel <pmorel@linux.ibm.com>
-To:     mjrosato@linux.ibm.com
-Cc:     rdunlap@infradead.org, linux-kernel@vger.kernel.org, lkp@intel.com,
-        borntraeger@linux.ibm.com, farman@linux.ibm.com,
-        linux-s390@vger.kernel.org, kvm@vger.kernel.org
-Subject: [PATCH] KVM: s390: pci: VFIO_PCI ZDEV configuration fix
-Date:   Tue, 16 Aug 2022 22:28:55 +0200
-Message-Id: <20220816202855.189410-1-pmorel@linux.ibm.com>
-X-Mailer: git-send-email 2.31.1
-In-Reply-To: <1f2dd65e-b79b-44df-cc6a-8b3aa8fd61af@linux.ibm.com>
-References: <1f2dd65e-b79b-44df-cc6a-8b3aa8fd61af@linux.ibm.com>
+        with ESMTP id S232304AbiHPUrm (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 16 Aug 2022 16:47:42 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5DD9089809
+        for <kvm@vger.kernel.org>; Tue, 16 Aug 2022 13:47:41 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1660682860;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=3JoZZmMRTLKhHqlvu8uJZ3OdJLMTuykuadzU2PRUVyo=;
+        b=HfULhG6FF0CDCsfYL0BbhyoZM2GPxb6aovAEAMbfFiyRwIX9tCC60XYpfnzpBAsbLAqj5R
+        leHFy0T0fyBNNHGcEjAohXqEdlSpTyH5P7A6YOgbSpX9FFVhJzZ8Ld0P5VglkfXf6XpdRX
+        qGm2wWpm8Ahi1CNaJl5hDz5C5kMbDZc=
+Received: from mail-qv1-f71.google.com (mail-qv1-f71.google.com
+ [209.85.219.71]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_128_GCM_SHA256) id
+ us-mta-287-ViUfXMeqPRGtuWHQEV-Adw-1; Tue, 16 Aug 2022 16:47:39 -0400
+X-MC-Unique: ViUfXMeqPRGtuWHQEV-Adw-1
+Received: by mail-qv1-f71.google.com with SMTP id o6-20020ad443c6000000b00495d04028a6so1088439qvs.18
+        for <kvm@vger.kernel.org>; Tue, 16 Aug 2022 13:47:39 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc;
+        bh=3JoZZmMRTLKhHqlvu8uJZ3OdJLMTuykuadzU2PRUVyo=;
+        b=O56fUXJwzTQFf4UElUD687Z3S80kOLJZx+Jf96E/66Ag/jeknaCVwG76+dNgU1XbH1
+         vv3ajW3rFwkcbgXfGQ9aPIP9pm1WSSh+v8TMyofaeUuFEgiLyRvddm5rZlECUM843iEy
+         P/6LMlsEwHizdMl0lI+z/Lq8Pkm7C7NAtDDtlBOncLlkaSbk1lzJaiAE4TRdblhDcwOG
+         pHovNTRquFuM/seiGGvMm6NpIygs+2p7UooV9LL/QmjOzJ4K2fEuoKRWYaIkRkYwpOsg
+         GQu2SiNj5lYS2edrEH8PdPA3t8H2MQM2s0th4cyz2b9VCmrYqHSa5cCFAb2k0SLnzRFZ
+         78lw==
+X-Gm-Message-State: ACgBeo3rH4OdNd5TX30vFrrhwWqscxPGMQMJmSgprWfukYtQDHjHSp99
+        cCqYria2/EWfOFg777dD9JhTtFIGO8YWjaR/zNrp6JTdbavXrDXwzHh79s5AJDlMu7FBDzEgD84
+        CbT77GrgBBp4l
+X-Received: by 2002:ac8:4e45:0:b0:343:5faf:3af6 with SMTP id e5-20020ac84e45000000b003435faf3af6mr20160980qtw.340.1660682857448;
+        Tue, 16 Aug 2022 13:47:37 -0700 (PDT)
+X-Google-Smtp-Source: AA6agR6IwiJJXWm5YftOp/luO9AW0MDhFAjgzItfksuHh5hDaCvWVcPNx39suKAdXZ2GyDmA+23zUg==
+X-Received: by 2002:ac8:4e45:0:b0:343:5faf:3af6 with SMTP id e5-20020ac84e45000000b003435faf3af6mr20160915qtw.340.1660682855766;
+        Tue, 16 Aug 2022 13:47:35 -0700 (PDT)
+Received: from xz-m1.local (bras-base-aurron9127w-grc-35-70-27-3-10.dsl.bell.ca. [70.27.3.10])
+        by smtp.gmail.com with ESMTPSA id h5-20020a05620a400500b006b615cd8c13sm12717718qko.106.2022.08.16.13.47.34
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 16 Aug 2022 13:47:35 -0700 (PDT)
+Date:   Tue, 16 Aug 2022 16:47:34 -0400
+From:   Peter Xu <peterx@redhat.com>
+To:     Sean Christopherson <seanjc@google.com>
+Cc:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        David Hildenbrand <david@redhat.com>,
+        "Dr . David Alan Gilbert" <dgilbert@redhat.com>,
+        John Hubbard <jhubbard@nvidia.com>,
+        Linux MM Mailing List <linux-mm@kvack.org>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Andrea Arcangeli <aarcange@redhat.com>
+Subject: Re: [PATCH v2 3/3] kvm/x86: Allow to respond to generic signals
+ during slow page faults
+Message-ID: <YvwCZsHxZV9kPn6I@xz-m1.local>
+References: <20220721000318.93522-1-peterx@redhat.com>
+ <20220721000318.93522-4-peterx@redhat.com>
+ <YvVitqmmj7Y0eggY@google.com>
+ <YvVtX+rosTLxFPe3@xz-m1.local>
+ <Yvq6DSu4wmPfXO5/@google.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-ORIG-GUID: 4rhapsDdV8JAp6gwFhmUDKkeNpJFiEmQ
-X-Proofpoint-GUID: 4rhapsDdV8JAp6gwFhmUDKkeNpJFiEmQ
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.205,Aquarius:18.0.883,Hydra:6.0.517,FMLib:17.11.122.1
- definitions=2022-08-16_08,2022-08-16_02,2022-06-22_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 lowpriorityscore=0
- suspectscore=0 bulkscore=0 priorityscore=1501 adultscore=0 impostorscore=0
- mlxscore=0 mlxlogscore=890 phishscore=0 spamscore=0 clxscore=1015
- malwarescore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2207270000 definitions=main-2208160074
-X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_EF,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_PASS,
-        T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <Yvq6DSu4wmPfXO5/@google.com>
+X-Spam-Status: No, score=-2.8 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,
+        SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=unavailable
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Fixing configuration for VFIO PCI interpretation.
+On Mon, Aug 15, 2022 at 09:26:37PM +0000, Sean Christopherson wrote:
+> On Thu, Aug 11, 2022, Peter Xu wrote:
+> > On Thu, Aug 11, 2022 at 08:12:38PM +0000, Sean Christopherson wrote:
+> > > > diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
+> > > > index 17252f39bd7c..aeafe0e9cfbf 100644
+> > > > --- a/arch/x86/kvm/mmu/mmu.c
+> > > > +++ b/arch/x86/kvm/mmu/mmu.c
+> > > > @@ -3012,6 +3012,13 @@ static int kvm_handle_bad_page(struct kvm_vcpu *vcpu, gfn_t gfn, kvm_pfn_t pfn)
+> > > >  static int handle_abnormal_pfn(struct kvm_vcpu *vcpu, struct kvm_page_fault *fault,
+> > > >  			       unsigned int access)
+> > > >  {
+> > > > +	/* NOTE: not all error pfn is fatal; handle sigpending pfn first */
+> > > > +	if (unlikely(is_sigpending_pfn(fault->pfn))) {
+> > > 
+> > > Move this into kvm_handle_bad_page(), then there's no need for a comment to call
+> > > out that this needs to come before the is_error_pfn() check.  This _is_ a "bad"
+> > > PFN, it just so happens that userspace might be able to resolve the "bad" PFN.
+> > 
+> > It's a pity it needs to be in "bad pfn" category since that's the only
+> > thing we can easily use, but true it is now.
+> 
+> Would renaming that to kvm_handle_error_pfn() help?  I agree that "bad" is poor
+> terminology now that it handles a variety of errors, hence the quotes.
 
-Reported-by: Randy Dunlap <rdunlap@infradead.org>
-Reported-by: kernel test robot <lkp@intel.com>
-Signed-off-by: Pierre Morel <pmorel@linux.ibm.com>
-Fixes: 09340b2fca007 ("KVM: s390: pci: add routines to start/stop inter..")
-Fixes: c435c54639aa5 ("vfio/pci: introduce CONFIG_VFIO_PCI_ZDEV_KVM..")
-Cc: <stable@vger.kernel.org>
----
- arch/s390/include/asm/kvm_host.h | 9 ---------
- arch/s390/kvm/Makefile           | 2 +-
- arch/s390/kvm/pci.c              | 4 ++--
- drivers/vfio/pci/Kconfig         | 4 ++--
- include/linux/vfio_pci_core.h    | 2 +-
- 5 files changed, 6 insertions(+), 15 deletions(-)
+It could be slightly helpful I think, at least it starts to match with how
+we name KVM_PFN_ERR_*.  Will squash the renaming into the same patch.
 
-diff --git a/arch/s390/include/asm/kvm_host.h b/arch/s390/include/asm/kvm_host.h
-index f39092e0ceaa..f6cf961731af 100644
---- a/arch/s390/include/asm/kvm_host.h
-+++ b/arch/s390/include/asm/kvm_host.h
-@@ -1038,16 +1038,7 @@ static inline void kvm_arch_vcpu_unblocking(struct kvm_vcpu *vcpu) {}
- #define __KVM_HAVE_ARCH_VM_FREE
- void kvm_arch_free_vm(struct kvm *kvm);
- 
--#ifdef CONFIG_VFIO_PCI_ZDEV_KVM
- int kvm_s390_pci_register_kvm(struct zpci_dev *zdev, struct kvm *kvm);
- void kvm_s390_pci_unregister_kvm(struct zpci_dev *zdev);
--#else
--static inline int kvm_s390_pci_register_kvm(struct zpci_dev *dev,
--					    struct kvm *kvm)
--{
--	return -EPERM;
--}
--static inline void kvm_s390_pci_unregister_kvm(struct zpci_dev *dev) {}
--#endif
- 
- #endif
-diff --git a/arch/s390/kvm/Makefile b/arch/s390/kvm/Makefile
-index 02217fb4ae10..be36afcfd6ff 100644
---- a/arch/s390/kvm/Makefile
-+++ b/arch/s390/kvm/Makefile
-@@ -9,6 +9,6 @@ ccflags-y := -Ivirt/kvm -Iarch/s390/kvm
- 
- kvm-y += kvm-s390.o intercept.o interrupt.o priv.o sigp.o
- kvm-y += diag.o gaccess.o guestdbg.o vsie.o pv.o
-+kvm-y += pci.o
- 
--kvm-$(CONFIG_VFIO_PCI_ZDEV_KVM) += pci.o
- obj-$(CONFIG_KVM) += kvm.o
-diff --git a/arch/s390/kvm/pci.c b/arch/s390/kvm/pci.c
-index 4946fb7757d6..cf8ab72a2109 100644
---- a/arch/s390/kvm/pci.c
-+++ b/arch/s390/kvm/pci.c
-@@ -435,7 +435,7 @@ int kvm_s390_pci_register_kvm(struct zpci_dev *zdev, struct kvm *kvm)
- {
- 	int rc;
- 
--	if (!zdev)
-+	if (!IS_ENABLED(CONFIG_VFIO_PCI_ZDEV_KVM) || !zdev)
- 		return -EINVAL;
- 
- 	mutex_lock(&zdev->kzdev_lock);
-@@ -516,7 +516,7 @@ void kvm_s390_pci_unregister_kvm(struct zpci_dev *zdev)
- {
- 	struct kvm *kvm;
- 
--	if (!zdev)
-+	if (!IS_ENABLED(CONFIG_VFIO_PCI_ZDEV_KVM) || !zdev)
- 		return;
- 
- 	mutex_lock(&zdev->kzdev_lock);
-diff --git a/drivers/vfio/pci/Kconfig b/drivers/vfio/pci/Kconfig
-index f9d0c908e738..bbc375b028ef 100644
---- a/drivers/vfio/pci/Kconfig
-+++ b/drivers/vfio/pci/Kconfig
-@@ -45,9 +45,9 @@ config VFIO_PCI_IGD
- endif
- 
- config VFIO_PCI_ZDEV_KVM
--	bool "VFIO PCI extensions for s390x KVM passthrough"
-+	def_tristate y
-+	prompt "VFIO PCI extensions for s390x KVM passthrough"
- 	depends on S390 && KVM
--	default y
- 	help
- 	  Support s390x-specific extensions to enable support for enhancements
- 	  to KVM passthrough capabilities, such as interpretive execution of
-diff --git a/include/linux/vfio_pci_core.h b/include/linux/vfio_pci_core.h
-index 5579ece4347b..7db3bb8129b1 100644
---- a/include/linux/vfio_pci_core.h
-+++ b/include/linux/vfio_pci_core.h
-@@ -205,7 +205,7 @@ static inline int vfio_pci_igd_init(struct vfio_pci_core_device *vdev)
- }
- #endif
- 
--#ifdef CONFIG_VFIO_PCI_ZDEV_KVM
-+#if IS_ENABLED(CONFIG_VFIO_PCI_ZDEV_KVM)
- int vfio_pci_info_zdev_add_caps(struct vfio_pci_core_device *vdev,
- 				struct vfio_info_cap *caps);
- int vfio_pci_zdev_open_device(struct vfio_pci_core_device *vdev);
+Thanks,
+
 -- 
-2.31.1
+Peter Xu
 
