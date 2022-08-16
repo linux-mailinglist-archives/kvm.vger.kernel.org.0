@@ -2,210 +2,582 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 3923E598CDC
-	for <lists+kvm@lfdr.de>; Thu, 18 Aug 2022 21:49:36 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 1EF72598E51
+	for <lists+kvm@lfdr.de>; Thu, 18 Aug 2022 22:50:50 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1345632AbiHRTst (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 18 Aug 2022 15:48:49 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36810 "EHLO
+        id S242526AbiHRUuH (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 18 Aug 2022 16:50:07 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47654 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1345627AbiHRTsm (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 18 Aug 2022 15:48:42 -0400
-Received: from mail-yw1-x1134.google.com (mail-yw1-x1134.google.com [IPv6:2607:f8b0:4864:20::1134])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A13545B79E
-        for <kvm@vger.kernel.org>; Thu, 18 Aug 2022 12:48:39 -0700 (PDT)
-Received: by mail-yw1-x1134.google.com with SMTP id 00721157ae682-334dc616f86so69335347b3.8
-        for <kvm@vger.kernel.org>; Thu, 18 Aug 2022 12:48:39 -0700 (PDT)
+        with ESMTP id S231771AbiHRUuE (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 18 Aug 2022 16:50:04 -0400
+Received: from mail-pj1-x1029.google.com (mail-pj1-x1029.google.com [IPv6:2607:f8b0:4864:20::1029])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 59956140D6;
+        Thu, 18 Aug 2022 13:50:02 -0700 (PDT)
+Received: by mail-pj1-x1029.google.com with SMTP id e19so1597141pju.1;
+        Thu, 18 Aug 2022 13:50:02 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kylehuey.com; s=google;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc;
-        bh=pN7pqer4VDQBcNszwXCuWriKzSK5JQuQKVaTrQYaltM=;
-        b=eJZZyDCvZFocEY1mnX4gNhf3oRrBiDSGvqtESvQlFghziy9F09FK0NXWYew7+Kje/t
-         EYiUjzXF8F1SfwY5eTJn/SlOMC0eAYlX6vXlI6BBe3iss3srKpP32vCLpr1Tm1oKMUMN
-         zg87bqYehNGX06yEK48vPXzcnNUkWK0MFSTmjqiX9GT4kQYkEBsKVx36aCMAt82aWbJe
-         I3tpfUL3jqS3znRjqVz6Nais3mhbhgsyExZDigC6az9B/idmpcCqQsrbFUurVcbQ03qr
-         VBPmy9U+vgbenggQVkmWLrNUBZx6y+nko5YSj1QAgdiIO6xqEJT7OVRswPbW8u68PuP3
-         71lA==
+        d=gmail.com; s=20210112;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc;
+        bh=MjXLA+4JRCQAx4EvAWcdGXi3P1YozsivnQ52cFKDyl4=;
+        b=l1Giya2HVlkvssC0TQjTZrOdSXwXgBvCekzoDkbFjaATlNqXvwxO+YeH/GPasoaEql
+         3M8RDwpnIKoJEsa9R5k73KctC50EZ1lmsMUZWoP7nxVVIGqMM4g2JaUNG+Hh05fCHFRY
+         dIVsJidy3QwQYVmQmH5Rwc3PeitgbvTwltS++HB9UEXb9+v+SjKbD2fLxLtEVbkY4ZLw
+         hJRsCGibA2GU589aoO69SC0p+trPybrjJvNRFhy2KHyrOnTbHBV5TrZeAv18cZfVbVbD
+         nqxal2/mGdAm1MrSU0lgiIrZVX3R8FQ/CIVKP7nouvsOr2ULJsDDDFVFEUHIZL804tAL
+         79+Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc;
-        bh=pN7pqer4VDQBcNszwXCuWriKzSK5JQuQKVaTrQYaltM=;
-        b=wjlCubE4i9cDZyj8jlyuxMY3V6xYYx9F203a4O7VssFdO66nDYvZjDFMdwQXQ/pwxZ
-         FdmsJdFIOGamrWwjn8sWzc8TbVqz0xY4VTl9tkWGcCmKNbwbz+8rxlLG23obXWWBs9Oa
-         +Opzygf+VwDO7wmBNVMHOIborZImG5/44vga39M47KoLT0nsSfGh+b1G4tZahtj6vVPo
-         pmgEkG0rhZAeUo2ftxbwoAxxHq4w7cov1+VfkiOOuJ8BKmFPjwFZIm2Ts36NL2YRouaU
-         YkHLj1Tv8rLzgjSgMDKrXARAM8SQ0CQ75HLreORhPuZtC9DcFHj7rdJrEWtK+7gcOrkW
-         NtCA==
-X-Gm-Message-State: ACgBeo2p3QRc4Vt6ORMp9WG7KWIoM/+6i6SP2sL2KrWbLr7EsVpVPfrB
-        sEmUSw7o+cY1WAXOzfd6txK29UlczvWAkHFgzFUGEw==
-X-Google-Smtp-Source: AA6agR4vFLdh+IPAYOERtSDAXoJ0znqtPFPClNRqMqibtcNloaQO1xQtmwFz06X3LDoLAF00jqv2MeLkBbP6KHyle2c=
-X-Received: by 2002:a25:bd3:0:b0:691:d47a:be78 with SMTP id
- 202-20020a250bd3000000b00691d47abe78mr4145138ybl.574.1660852118761; Thu, 18
- Aug 2022 12:48:38 -0700 (PDT)
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc;
+        bh=MjXLA+4JRCQAx4EvAWcdGXi3P1YozsivnQ52cFKDyl4=;
+        b=4YEVx/Op52m8zQhxjSG+7BIb42EZ5HkHkN6LKpttXs5vshFoCxYGXIXcciaEjZjGY1
+         NMSHG2Za7lgRpwMmU9S7+l5X+QVsb5FLZy8irJwoNZ+CdVWW+UBu6WyK1NrONDRLCmjA
+         MNWgZW5LF7Q7CKcGZd556AANiWhQ88p5UCxTmI0maT6XsOaZfDKlDk+2htaUl7Vf0y7I
+         xrYDpKwj9usNrvCqFCQRAM66pS9+e73s1Lzw9Vns6T07a6omXh1eAVGWLKlbTQBYraYr
+         T5qdIBaistGqps92NeNseUOKhxUJW4glA9xI/oIS67yldDYmzdc3jtZ72uXkvW6y5S8T
+         0S/A==
+X-Gm-Message-State: ACgBeo1VFDjxpJbTjOegb5u35ciU29JbbVNhsKt9tzEegLkSLQeI8UO9
+        5Sepk4D/8YOsLtz3Bdh1hK8=
+X-Google-Smtp-Source: AA6agR6NUbmcOug9Pjwgr9JggZkFkHYzh0HXLQGwPdLMqacpB0fS1op/FMbeYba6qFGMddq4FCbC6Q==
+X-Received: by 2002:a17:902:c711:b0:171:55cf:a94b with SMTP id p17-20020a170902c71100b0017155cfa94bmr4309855plp.155.1660855801631;
+        Thu, 18 Aug 2022 13:50:01 -0700 (PDT)
+Received: from localhost (c-73-164-155-12.hsd1.wa.comcast.net. [73.164.155.12])
+        by smtp.gmail.com with ESMTPSA id b68-20020a62cf47000000b0052e0bc3ca3asm2099502pfg.173.2022.08.18.13.50.00
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 18 Aug 2022 13:50:00 -0700 (PDT)
+Date:   Tue, 16 Aug 2022 20:52:49 +0000
+From:   Bobby Eshleman <bobbyeshleman@gmail.com>
+To:     Arseniy Krasnov <AVKrasnov@sberdevices.ru>
+Cc:     "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "jasowang@redhat.com" <jasowang@redhat.com>,
+        "bobby.eshleman@gmail.com" <bobby.eshleman@gmail.com>,
+        "davem@davemloft.net" <davem@davemloft.net>,
+        "virtio-dev@lists.oasis-open.org" <virtio-dev@lists.oasis-open.org>,
+        "stefanha@redhat.com" <stefanha@redhat.com>,
+        "bobby.eshleman@bytedance.com" <bobby.eshleman@bytedance.com>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "pabeni@redhat.com" <pabeni@redhat.com>,
+        "edumazet@google.com" <edumazet@google.com>,
+        "jiang.wang@bytedance.com" <jiang.wang@bytedance.com>,
+        "sgarzare@redhat.com" <sgarzare@redhat.com>,
+        "kuba@kernel.org" <kuba@kernel.org>,
+        "cong.wang@bytedance.com" <cong.wang@bytedance.com>,
+        "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+        "virtualization@lists.linux-foundation.org" 
+        <virtualization@lists.linux-foundation.org>,
+        "mst@redhat.com" <mst@redhat.com>
+Subject: Re: [virtio-dev] Re: [PATCH 5/6] virtio/vsock: add support for dgram
+Message-ID: <YvwBT6kPudOyRBqe@bullseye>
+References: <cover.1660362668.git.bobby.eshleman@bytedance.com>
+ <3cb082f1c88f3f2ef1fc250dbc0745fb79c745c7.1660362668.git.bobby.eshleman@bytedance.com>
+ <YvsBqpEoq1tbgj8A@bullseye>
+ <9a411184-9b14-ee72-dcbf-05271139db0a@sberdevices.ru>
+ <aea0855e-a417-d475-71ab-7fdea1cc4d31@sberdevices.ru>
+ <YvtqPQhs0uQHuwID@bullseye>
+ <5419b3e9629d76f24ae5fe5e3ce35deb2ad7d6cc.camel@sberdevices.ru>
 MIME-Version: 1.0
-References: <20220808141538.102394-1-khuey@kylehuey.com> <87ilmpzunz.ffs@tglx>
-In-Reply-To: <87ilmpzunz.ffs@tglx>
-From:   Kyle Huey <me@kylehuey.com>
-Date:   Thu, 18 Aug 2022 12:48:23 -0700
-Message-ID: <CAP045Ao7hb4kXajkWnMxqawBzFGUZJtSuRRn1kbmjOF=mcTcoA@mail.gmail.com>
-Subject: Re: [PATCH v5 1/2] x86/fpu: Allow PKRU to be (once again) written by ptrace.
-To:     Thomas Gleixner <tglx@linutronix.de>
-Cc:     Dave Hansen <dave.hansen@linux.intel.com>,
-        Borislav Petkov <bp@alien8.de>, Ingo Molnar <mingo@redhat.com>,
-        x86@kernel.org, "H. Peter Anvin" <hpa@zytor.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Andy Lutomirski <luto@kernel.org>,
-        Peter Zijlstra <peterz@infradead.org>,
-        linux-kernel@vger.kernel.org, linux-kselftest@vger.kernel.org,
-        "Robert O'Callahan" <robert@ocallahan.org>,
-        David Manouchehri <david.manouchehri@riseup.net>,
-        Borislav Petkov <bp@suse.de>, kvm@vger.kernel.org,
-        stable@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED
-        autolearn=ham autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <5419b3e9629d76f24ae5fe5e3ce35deb2ad7d6cc.camel@sberdevices.ru>
+X-Spam-Status: No, score=-0.8 required=5.0 tests=BAYES_00,DATE_IN_PAST_24_48,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
+        RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
+        autolearn=no autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Aug 18, 2022 at 3:57 AM Thomas Gleixner <tglx@linutronix.de> wrote:
->
-> Kyle!
+On Thu, Aug 18, 2022 at 08:35:48AM +0000, Arseniy Krasnov wrote:
+> On Tue, 2022-08-16 at 09:58 +0000, Bobby Eshleman wrote:
+> > On Wed, Aug 17, 2022 at 05:42:08AM +0000, Arseniy Krasnov wrote:
+> > > On 17.08.2022 08:01, Arseniy Krasnov wrote:
+> > > > On 16.08.2022 05:32, Bobby Eshleman wrote:
+> > > > > CC'ing virtio-dev@lists.oasis-open.org
+> > > > > 
+> > > > > On Mon, Aug 15, 2022 at 10:56:08AM -0700, Bobby Eshleman wrote:
+> > > > > > This patch supports dgram in virtio and on the vhost side.
+> > > > Hello,
+> > > > 
+> > > > sorry, i don't understand, how this maintains message boundaries?
+> > > > Or it
+> > > > is unnecessary for SOCK_DGRAM?
+> > > > 
+> > > > Thanks
+> > > > > > Signed-off-by: Jiang Wang <jiang.wang@bytedance.com>
+> > > > > > Signed-off-by: Bobby Eshleman <bobby.eshleman@bytedance.com>
+> > > > > > ---
+> > > > > >  drivers/vhost/vsock.c                   |   2 +-
+> > > > > >  include/net/af_vsock.h                  |   2 +
+> > > > > >  include/uapi/linux/virtio_vsock.h       |   1 +
+> > > > > >  net/vmw_vsock/af_vsock.c                |  26 +++-
+> > > > > >  net/vmw_vsock/virtio_transport.c        |   2 +-
+> > > > > >  net/vmw_vsock/virtio_transport_common.c | 173
+> > > > > > ++++++++++++++++++++++--
+> > > > > >  6 files changed, 186 insertions(+), 20 deletions(-)
+> > > > > > 
+> > > > > > diff --git a/drivers/vhost/vsock.c b/drivers/vhost/vsock.c
+> > > > > > index a5d1bdb786fe..3dc72a5647ca 100644
+> > > > > > --- a/drivers/vhost/vsock.c
+> > > > > > +++ b/drivers/vhost/vsock.c
+> > > > > > @@ -925,7 +925,7 @@ static int __init vhost_vsock_init(void)
+> > > > > >  	int ret;
+> > > > > >  
+> > > > > >  	ret = vsock_core_register(&vhost_transport.transport,
+> > > > > > -				  VSOCK_TRANSPORT_F_H2G);
+> > > > > > +				  VSOCK_TRANSPORT_F_H2G |
+> > > > > > VSOCK_TRANSPORT_F_DGRAM);
+> > > > > >  	if (ret < 0)
+> > > > > >  		return ret;
+> > > > > >  
+> > > > > > diff --git a/include/net/af_vsock.h b/include/net/af_vsock.h
+> > > > > > index 1c53c4c4d88f..37e55c81e4df 100644
+> > > > > > --- a/include/net/af_vsock.h
+> > > > > > +++ b/include/net/af_vsock.h
+> > > > > > @@ -78,6 +78,8 @@ struct vsock_sock {
+> > > > > >  s64 vsock_stream_has_data(struct vsock_sock *vsk);
+> > > > > >  s64 vsock_stream_has_space(struct vsock_sock *vsk);
+> > > > > >  struct sock *vsock_create_connected(struct sock *parent);
+> > > > > > +int vsock_bind_stream(struct vsock_sock *vsk,
+> > > > > > +		      struct sockaddr_vm *addr);
+> > > > > >  
+> > > > > >  /**** TRANSPORT ****/
+> > > > > >  
+> > > > > > diff --git a/include/uapi/linux/virtio_vsock.h
+> > > > > > b/include/uapi/linux/virtio_vsock.h
+> > > > > > index 857df3a3a70d..0975b9c88292 100644
+> > > > > > --- a/include/uapi/linux/virtio_vsock.h
+> > > > > > +++ b/include/uapi/linux/virtio_vsock.h
+> > > > > > @@ -70,6 +70,7 @@ struct virtio_vsock_hdr {
+> > > > > >  enum virtio_vsock_type {
+> > > > > >  	VIRTIO_VSOCK_TYPE_STREAM = 1,
+> > > > > >  	VIRTIO_VSOCK_TYPE_SEQPACKET = 2,
+> > > > > > +	VIRTIO_VSOCK_TYPE_DGRAM = 3,
+> > > > > >  };
+> > > > > >  
+> > > > > >  enum virtio_vsock_op {
+> > > > > > diff --git a/net/vmw_vsock/af_vsock.c
+> > > > > > b/net/vmw_vsock/af_vsock.c
+> > > > > > index 1893f8aafa48..87e4ae1866d3 100644
+> > > > > > --- a/net/vmw_vsock/af_vsock.c
+> > > > > > +++ b/net/vmw_vsock/af_vsock.c
+> > > > > > @@ -675,6 +675,19 @@ static int
+> > > > > > __vsock_bind_connectible(struct vsock_sock *vsk,
+> > > > > >  	return 0;
+> > > > > >  }
+> > > > > >  
+> > > > > > +int vsock_bind_stream(struct vsock_sock *vsk,
+> > > > > > +		      struct sockaddr_vm *addr)
+> > > > > > +{
+> > > > > > +	int retval;
+> > > > > > +
+> > > > > > +	spin_lock_bh(&vsock_table_lock);
+> > > > > > +	retval = __vsock_bind_connectible(vsk, addr);
+> > > > > > +	spin_unlock_bh(&vsock_table_lock);
+> > > > > > +
+> > > > > > +	return retval;
+> > > > > > +}
+> > > > > > +EXPORT_SYMBOL(vsock_bind_stream);
+> > > > > > +
+> > > > > >  static int __vsock_bind_dgram(struct vsock_sock *vsk,
+> > > > > >  			      struct sockaddr_vm *addr)
+> > > > > >  {
+> > > > > > @@ -2363,11 +2376,16 @@ int vsock_core_register(const struct
+> > > > > > vsock_transport *t, int features)
+> > > > > >  	}
+> > > > > >  
+> > > > > >  	if (features & VSOCK_TRANSPORT_F_DGRAM) {
+> > > > > > -		if (t_dgram) {
+> > > > > > -			err = -EBUSY;
+> > > > > > -			goto err_busy;
+> > > > > > +		/* TODO: always chose the G2H variant over
+> > > > > > others, support nesting later */
+> > > > > > +		if (features & VSOCK_TRANSPORT_F_G2H) {
+> > > > > > +			if (t_dgram)
+> > > > > > +				pr_warn("virtio_vsock: t_dgram
+> > > > > > already set\n");
+> > > > > > +			t_dgram = t;
+> > > > > > +		}
+> > > > > > +
+> > > > > > +		if (!t_dgram) {
+> > > > > > +			t_dgram = t;
+> > > > > >  		}
+> > > > > > -		t_dgram = t;
+> > > > > >  	}
+> > > > > >  
+> > > > > >  	if (features & VSOCK_TRANSPORT_F_LOCAL) {
+> > > > > > diff --git a/net/vmw_vsock/virtio_transport.c
+> > > > > > b/net/vmw_vsock/virtio_transport.c
+> > > > > > index 073314312683..d4526ca462d2 100644
+> > > > > > --- a/net/vmw_vsock/virtio_transport.c
+> > > > > > +++ b/net/vmw_vsock/virtio_transport.c
+> > > > > > @@ -850,7 +850,7 @@ static int __init virtio_vsock_init(void)
+> > > > > >  		return -ENOMEM;
+> > > > > >  
+> > > > > >  	ret = vsock_core_register(&virtio_transport.transport,
+> > > > > > -				  VSOCK_TRANSPORT_F_G2H);
+> > > > > > +				  VSOCK_TRANSPORT_F_G2H |
+> > > > > > VSOCK_TRANSPORT_F_DGRAM);
+> > > > > >  	if (ret)
+> > > > > >  		goto out_wq;
+> > > > > >  
+> > > > > > diff --git a/net/vmw_vsock/virtio_transport_common.c
+> > > > > > b/net/vmw_vsock/virtio_transport_common.c
+> > > > > > index bdf16fff054f..aedb48728677 100644
+> > > > > > --- a/net/vmw_vsock/virtio_transport_common.c
+> > > > > > +++ b/net/vmw_vsock/virtio_transport_common.c
+> > > > > > @@ -229,7 +229,9 @@
+> > > > > > EXPORT_SYMBOL_GPL(virtio_transport_deliver_tap_pkt);
+> > > > > >  
+> > > > > >  static u16 virtio_transport_get_type(struct sock *sk)
+> > > > > >  {
+> > > > > > -	if (sk->sk_type == SOCK_STREAM)
+> > > > > > +	if (sk->sk_type == SOCK_DGRAM)
+> > > > > > +		return VIRTIO_VSOCK_TYPE_DGRAM;
+> > > > > > +	else if (sk->sk_type == SOCK_STREAM)
+> > > > > >  		return VIRTIO_VSOCK_TYPE_STREAM;
+> > > > > >  	else
+> > > > > >  		return VIRTIO_VSOCK_TYPE_SEQPACKET;
+> > > > > > @@ -287,22 +289,29 @@ static int
+> > > > > > virtio_transport_send_pkt_info(struct vsock_sock *vsk,
+> > > > > >  	vvs = vsk->trans;
+> > > > > >  
+> > > > > >  	/* we can send less than pkt_len bytes */
+> > > > > > -	if (pkt_len > VIRTIO_VSOCK_MAX_PKT_BUF_SIZE)
+> > > > > > -		pkt_len = VIRTIO_VSOCK_MAX_PKT_BUF_SIZE;
+> > > > > > +	if (pkt_len > VIRTIO_VSOCK_MAX_PKT_BUF_SIZE) {
+> > > > > > +		if (info->type != VIRTIO_VSOCK_TYPE_DGRAM)
+> > > > > > +			pkt_len =
+> > > > > > VIRTIO_VSOCK_MAX_PKT_BUF_SIZE;
+> > > > > > +		else
+> > > > > > +			return 0;
+> > > > > > +	}
+> > > > > >  
+> > > > > > -	/* virtio_transport_get_credit might return less than
+> > > > > > pkt_len credit */
+> > > > > > -	pkt_len = virtio_transport_get_credit(vvs, pkt_len);
+> > > > > > +	if (info->type != VIRTIO_VSOCK_TYPE_DGRAM) {
+> > > > > > +		/* virtio_transport_get_credit might return
+> > > > > > less than pkt_len credit */
+> > > > > > +		pkt_len = virtio_transport_get_credit(vvs,
+> > > > > > pkt_len);
+> > > > > >  
+> > > > > > -	/* Do not send zero length OP_RW pkt */
+> > > > > > -	if (pkt_len == 0 && info->op == VIRTIO_VSOCK_OP_RW)
+> > > > > > -		return pkt_len;
+> > > > > > +		/* Do not send zero length OP_RW pkt */
+> > > > > > +		if (pkt_len == 0 && info->op ==
+> > > > > > VIRTIO_VSOCK_OP_RW)
+> > > > > > +			return pkt_len;
+> > > > > > +	}
+> > > > > >  
+> > > > > >  	skb = virtio_transport_alloc_skb(info, pkt_len,
+> > > > > >  					 src_cid, src_port,
+> > > > > >  					 dst_cid, dst_port,
+> > > > > >  					 &err);
+> > > > > >  	if (!skb) {
+> > > > > > -		virtio_transport_put_credit(vvs, pkt_len);
+> > > > > > +		if (info->type != VIRTIO_VSOCK_TYPE_DGRAM)
+> > > > > > +			virtio_transport_put_credit(vvs,
+> > > > > > pkt_len);
+> > > > > >  		return err;
+> > > > > >  	}
+> > > > > >  
+> > > > > > @@ -586,6 +595,61 @@
+> > > > > > virtio_transport_seqpacket_dequeue(struct vsock_sock *vsk,
+> > > > > >  }
+> > > > > >  EXPORT_SYMBOL_GPL(virtio_transport_seqpacket_dequeue);
+> > > > > >  
+> > > > > > +static ssize_t
+> > > > > > +virtio_transport_dgram_do_dequeue(struct vsock_sock *vsk,
+> > > > > > +				  struct msghdr *msg, size_t
+> > > > > > len)
+> > > > > > +{
+> > > > > > +	struct virtio_vsock_sock *vvs = vsk->trans;
+> > > > > > +	struct sk_buff *skb;
+> > > > > > +	size_t total = 0;
+> > > > > > +	u32 free_space;
+> > > > > > +	int err = -EFAULT;
+> > > > > > +
+> > > > > > +	spin_lock_bh(&vvs->rx_lock);
+> > > > > > +	if (total < len && !skb_queue_empty_lockless(&vvs-
+> > > > > > >rx_queue)) {
+> > > > > > +		skb = __skb_dequeue(&vvs->rx_queue);
+> > > > > > +
+> > > > > > +		total = len;
+> > > > > > +		if (total > skb->len - vsock_metadata(skb)-
+> > > > > > >off)
+> > > > > > +			total = skb->len - vsock_metadata(skb)-
+> > > > > > >off;
+> > > > > > +		else if (total < skb->len -
+> > > > > > vsock_metadata(skb)->off)
+> > > > > > +			msg->msg_flags |= MSG_TRUNC;
+> > > > > > +
+> > > > > > +		/* sk_lock is held by caller so no one else can
+> > > > > > dequeue.
+> > > > > > +		 * Unlock rx_lock since memcpy_to_msg() may
+> > > > > > sleep.
+> > > > > > +		 */
+> > > > > > +		spin_unlock_bh(&vvs->rx_lock);
+> > > > > > +
+> > > > > > +		err = memcpy_to_msg(msg, skb->data +
+> > > > > > vsock_metadata(skb)->off, total);
+> > > > > > +		if (err)
+> > > > > > +			return err;
+> > > > > > +
+> > > > > > +		spin_lock_bh(&vvs->rx_lock);
+> > > > > > +
+> > > > > > +		virtio_transport_dec_rx_pkt(vvs, skb);
+> > > > > > +		consume_skb(skb);
+> > > > > > +	}
+> > > > > > +
+> > > > > > +	free_space = vvs->buf_alloc - (vvs->fwd_cnt - vvs-
+> > > > > > >last_fwd_cnt);
+> > > > > > +
+> > > > > > +	spin_unlock_bh(&vvs->rx_lock);
+> > > > > > +
+> > > > > > +	if (total > 0 && msg->msg_name) {
+> > > > > > +		/* Provide the address of the sender. */
+> > > > > > +		DECLARE_SOCKADDR(struct sockaddr_vm *, vm_addr,
+> > > > > > msg->msg_name);
+> > > > > > +
+> > > > > > +		vsock_addr_init(vm_addr,
+> > > > > > le64_to_cpu(vsock_hdr(skb)->src_cid),
+> > > > > > +				le32_to_cpu(vsock_hdr(skb)-
+> > > > > > >src_port));
+> > > > > > +		msg->msg_namelen = sizeof(*vm_addr);
+> > > > > > +	}
+> > > > > > +	return total;
+> > > > > > +}
+> > > > > > +
+> > > > > > +static s64 virtio_transport_dgram_has_data(struct vsock_sock
+> > > > > > *vsk)
+> > > > > > +{
+> > > > > > +	return virtio_transport_stream_has_data(vsk);
+> > > > > > +}
+> > > > > > +
+> > > > > >  int
+> > > > > >  virtio_transport_seqpacket_enqueue(struct vsock_sock *vsk,
+> > > > > >  				   struct msghdr *msg,
+> > > > > > @@ -611,7 +675,66 @@ virtio_transport_dgram_dequeue(struct
+> > > > > > vsock_sock *vsk,
+> > > > > >  			       struct msghdr *msg,
+> > > > > >  			       size_t len, int flags)
+> > > > > >  {
+> > > > > > -	return -EOPNOTSUPP;
+> > > > > > +	struct sock *sk;
+> > > > > > +	size_t err = 0;
+> > > > > > +	long timeout;
+> > > > > > +
+> > > > > > +	DEFINE_WAIT(wait);
+> > > > > > +
+> > > > > > +	sk = &vsk->sk;
+> > > > > > +	err = 0;
+> > > > > > +
+> > > > > > +	if (flags & MSG_OOB || flags & MSG_ERRQUEUE || flags &
+> > > > > > MSG_PEEK)
+> > > > > > +		return -EOPNOTSUPP;
+> > > > > > +
+> > > > > > +	lock_sock(sk);
+> > > > > > +
+> > > > > > +	if (!len)
+> > > > > > +		goto out;
+> > > > > > +
+> > > > > > +	timeout = sock_rcvtimeo(sk, flags & MSG_DONTWAIT);
+> > > > > > +
+> > > > > > +	while (1) {
+> > > > > > +		s64 ready;
+> > > > > > +
+> > > > > > +		prepare_to_wait(sk_sleep(sk), &wait,
+> > > > > > TASK_INTERRUPTIBLE);
+> > > > > > +		ready = virtio_transport_dgram_has_data(vsk);
+> > > > > > +
+> > > > > > +		if (ready == 0) {
+> > > > > > +			if (timeout == 0) {
+> > > > > > +				err = -EAGAIN;
+> > > > > > +				finish_wait(sk_sleep(sk),
+> > > > > > &wait);
+> > > > > > +				break;
+> > > > > > +			}
+> > > > > > +
+> > > > > > +			release_sock(sk);
+> > > > > > +			timeout = schedule_timeout(timeout);
+> > > > > > +			lock_sock(sk);
+> > > > > > +
+> > > > > > +			if (signal_pending(current)) {
+> > > > > > +				err = sock_intr_errno(timeout);
+> > > > > > +				finish_wait(sk_sleep(sk),
+> > > > > > &wait);
+> > > > > > +				break;
+> > > > > > +			} else if (timeout == 0) {
+> > > > > > +				err = -EAGAIN;
+> > > > > > +				finish_wait(sk_sleep(sk),
+> > > > > > &wait);
+> > > > > > +				break;
+> > > > > > +			}
+> > > > > > +		} else {
+> > > > > > +			finish_wait(sk_sleep(sk), &wait);
+> > > > > > +
+> > > > > > +			if (ready < 0) {
+> > > > > > +				err = -ENOMEM;
+> > > > > > +				goto out;
+> > > > > > +			}
+> > > > > > +
+> > > > > > +			err =
+> > > > > > virtio_transport_dgram_do_dequeue(vsk, msg, len);
+> > > > > > +			break;
+> > > > > > +		}
+> > > > > > +	}
+> > > > > > +out:
+> > > > > > +	release_sock(sk);
+> > > > > > +	return err;
+> > > > > >  }
+> > > > > >  EXPORT_SYMBOL_GPL(virtio_transport_dgram_dequeue);
+> > > ^^^
+> > > May be, this generic data waiting logic should be in af_vsock.c, as
+> > > for stream/seqpacket?
+> > > In this way, another transport which supports SOCK_DGRAM could
+> > > reuse it.
+> > 
+> > I think that is a great idea. I'll test that change for v2.
+> > 
+> > Thanks.
+> 
+> Also for v2, i tested Your patchset a little bit(write here to not
+> spread over all mails):
+> 1) seqpacket test in vsock_test.c fails(seems MSG_EOR flag issue)
 
-Hi.
+I will investigate.
 
-> On Mon, Aug 08 2022 at 07:15, Kyle Huey wrote:
-> > When management of the PKRU register was moved away from XSTATE, emulation
-> > of PKRU's existence in XSTATE was added for APIs that read XSTATE, but not
-> > for APIs that write XSTATE. This can be seen by running gdb and executing
-> > `p $pkru`, `set $pkru = 42`, and `p $pkru`. On affected kernels (5.14+) the
-> > write to the PKRU register (which gdb performs through ptrace) is ignored.
-> >
-> > There are three relevant APIs: PTRACE_SETREGSET with NT_X86_XSTATE,
-> > sigreturn, and KVM_SET_XSAVE. KVM_SET_XSAVE has its own special handling to
-> > make PKRU writes take effect (in fpu_copy_uabi_to_guest_fpstate). Push that
-> > down into copy_uabi_to_xstate and have PTRACE_SETREGSET with NT_X86_XSTATE
-> > and sigreturn pass in pointers to the appropriate PKRU value.
-> >
-> > This also adds code to initialize the PKRU value to the hardware init value
-> > (namely 0) if the PKRU bit is not set in the XSTATE header to match XRSTOR.
-> > This is a change to the current KVM_SET_XSAVE behavior.
->
-> You are stating a fact here, but provide 0 justification why this is
-> correct.
+> 2) i can't do rmmod with the following config(after testing):
+>    CONFIG_VSOCKETS=m
+>    CONFIG_VIRTIO_VSOCKETS=m
+>    CONFIG_VIRTIO_VSOCKETS_COMMON=m
+>    CONFIG_VHOST=m
+>    CONFIG_VHOST_VSOCK=m
+>    Guest is shutdown, but rmmod fails.
+> 3) virtio_transport_init + virtio_transport_exit seems must be
+>    under EXPORT_SYMBOL_GPL(), because both used in another module.
 
-Well, the justification is that this *is* the behavior we want for
-ptrace/sigreturn, and it's very likely the existing KVM_SET_XSAVE
-behavior in this edge case is an oversight rather than intentional,
-and in the absence of confirmation that KVM wants the existing
-behavior (the KVM mailing list and maintainer are CCd) one correct
-code path is better than one correct code path and one buggy code
-path.
+Definitely, will fix.
 
-> >
-> > Changelog since v4:
->
-> Can you please put the change log past the --- seperator line, so it
-> gets stripped off when the patch is applied? That spares manual fixups.
+> 4) I tried to send 5kb(or 20kb not matter) piece of data, but got      
+>    kernel panic both in guest and later in host.
+> 
 
-Ok.
+Thanks for catching that. I can reproduce it intermittently, but only
+for seqpacket. Did you happen to see this for other socket types as
+well?
 
-> >
-> > Signed-off-by: Kyle Huey <me@kylehuey.com>
-> > Cc: Dave Hansen <dave.hansen@linux.intel.com>
-> > Cc: Thomas Gleixner <tglx@linutronix.de>
-> > Cc: Borislav Petkov <bp@suse.de>
-> > Cc: kvm@vger.kernel.org # For edge case behavior of KVM_SET_XSAVE
-> > Cc: stable@vger.kernel.org # 5.14+
-> > Fixes: e84ba47e313d ("x86/fpu: Hook up PKRU into ptrace()")
->
-> Can you please use the documented tag ordering?
->
-> https://www.kernel.org/doc/html/latest/process/maintainer-tip.html#patch-submission-notes
+Thanks
 
-Ok.
-
-> > @@ -1235,6 +1235,24 @@ static int copy_uabi_to_xstate(struct fpstate *fpstate, const void *kbuf,
-> >       for (i = 0; i < XFEATURE_MAX; i++) {
-> >               mask = BIT_ULL(i);
-> >
-> > +             if (i == XFEATURE_PKRU) {
-> > +                     /*
-> > +                      * Retrieve PKRU if not in init state, otherwise
-> > +                      * initialize it.
-> > +                      */
-> > +                     if (hdr.xfeatures & mask) {
-> > +                             struct pkru_state xpkru = {0};
-> > +
-> > +                             if (copy_from_buffer(&xpkru, xstate_offsets[i],
-> > +                                                  sizeof(xpkru), kbuf, ubuf))
-> > +                                     return -EFAULT;
-> > +
-> > +                             *pkru = xpkru.pkru;
-> > +                     } else {
-> > +                             *pkru = 0;
-> > +                     }
-> > +             }
->
-> That's really horrible and there is no point in copying the stuff from
-> the buffer twice:
->
-> @@ -1246,6 +1246,15 @@ static int copy_uabi_to_xstate(struct fp
->                 }
->         }
->
-> +       /* Update the user protection key storage */
-> +       *pkru = 0;
-> +       if (hdr.xfeatures & XFEATURE_MASK_PKRU) {
-> +               struct pkru_state *xpkru;
-> +
-> +               xpkru = get_xsave_addr(xsave, XFEATURE_PKRU);
-> +               *pkru = xpkru->pkru;
-> +       }
-> +
->
-> Hmm?
-
-It took me a bit to figure out what this is actually trying to do. To
-work, it would need to come at the very end of copy_uabi_to_xstate
-after xsave->header.xfeatures is updated. If you just want to avoid
-two copies I would counter-propose this though:
-
-@@ -1235,7 +1235,19 @@ static int copy_uabi_to_xstate(struct fpstate
-*fpstate, const void *kbuf,
-        for (i = 0; i < XFEATURE_MAX; i++) {
-                mask = BIT_ULL(i);
-
--               if (hdr.xfeatures & mask) {
-+               if (i == XFEATURE_PKRU) {
-+                       /* Update the user protection key storage */
-+                       *pkru = 0;
-+                       if (hdr.xfeatures & XFEATURE_MASK_PKRU) {
-+                               struct pkru_state xpkru = {0};
-+
-+                               if (copy_from_buffer(&xpkru, xstate_offsets[i],
-+                                                    sizeof(xpkru), kbuf, ubuf))
-+                                       return -EFAULT;
-+
-+                               *pkru = xpkru.pkru;
-+                       }
-+               } else if (hdr.xfeatures & mask) {
-                        void *dst = __raw_xsave_addr(xsave, i);
-
-                        offset = xstate_offsets[i];
-
-Thoughts? This avoids a second copy and avoids having to calculate the
-offset into the (now potentially compressed) XSTATE.
-
-- Kyle
-
->
-> Thanks,
->
->         tglx
+> Thank You
+> > 
+> > > > > >  
+> > > > > > @@ -819,13 +942,13 @@
+> > > > > > EXPORT_SYMBOL_GPL(virtio_transport_stream_allow);
+> > > > > >  int virtio_transport_dgram_bind(struct vsock_sock *vsk,
+> > > > > >  				struct sockaddr_vm *addr)
+> > > > > >  {
+> > > > > > -	return -EOPNOTSUPP;
+> > > > > > +	return vsock_bind_stream(vsk, addr);
+> > > > > >  }
+> > > > > >  EXPORT_SYMBOL_GPL(virtio_transport_dgram_bind);
+> > > > > >  
+> > > > > >  bool virtio_transport_dgram_allow(u32 cid, u32 port)
+> > > > > >  {
+> > > > > > -	return false;
+> > > > > > +	return true;
+> > > > > >  }
+> > > > > >  EXPORT_SYMBOL_GPL(virtio_transport_dgram_allow);
+> > > > > >  
+> > > > > > @@ -861,7 +984,16 @@ virtio_transport_dgram_enqueue(struct
+> > > > > > vsock_sock *vsk,
+> > > > > >  			       struct msghdr *msg,
+> > > > > >  			       size_t dgram_len)
+> > > > > >  {
+> > > > > > -	return -EOPNOTSUPP;
+> > > > > > +	struct virtio_vsock_pkt_info info = {
+> > > > > > +		.op = VIRTIO_VSOCK_OP_RW,
+> > > > > > +		.msg = msg,
+> > > > > > +		.pkt_len = dgram_len,
+> > > > > > +		.vsk = vsk,
+> > > > > > +		.remote_cid = remote_addr->svm_cid,
+> > > > > > +		.remote_port = remote_addr->svm_port,
+> > > > > > +	};
+> > > > > > +
+> > > > > > +	return virtio_transport_send_pkt_info(vsk, &info);
+> > > > > >  }
+> > > > > >  EXPORT_SYMBOL_GPL(virtio_transport_dgram_enqueue);
+> > > > > >  
+> > > > > > @@ -1165,6 +1297,12 @@ virtio_transport_recv_connected(struct
+> > > > > > sock *sk,
+> > > > > >  	struct virtio_vsock_hdr *hdr = vsock_hdr(skb);
+> > > > > >  	int err = 0;
+> > > > > >  
+> > > > > > +	if (le16_to_cpu(vsock_hdr(skb)->type) ==
+> > > > > > VIRTIO_VSOCK_TYPE_DGRAM) {
+> > > > > > +		virtio_transport_recv_enqueue(vsk, skb);
+> > > > > > +		sk->sk_data_ready(sk);
+> > > > > > +		return err;
+> > > > > > +	}
+> > > > > > +
+> > > > > >  	switch (le16_to_cpu(hdr->op)) {
+> > > > > >  	case VIRTIO_VSOCK_OP_RW:
+> > > > > >  		virtio_transport_recv_enqueue(vsk, skb);
+> > > > > > @@ -1320,7 +1458,8 @@ virtio_transport_recv_listen(struct
+> > > > > > sock *sk, struct sk_buff *skb,
+> > > > > >  static bool virtio_transport_valid_type(u16 type)
+> > > > > >  {
+> > > > > >  	return (type == VIRTIO_VSOCK_TYPE_STREAM) ||
+> > > > > > -	       (type == VIRTIO_VSOCK_TYPE_SEQPACKET);
+> > > > > > +	       (type == VIRTIO_VSOCK_TYPE_SEQPACKET) ||
+> > > > > > +	       (type == VIRTIO_VSOCK_TYPE_DGRAM);
+> > > > > >  }
+> > > > > >  
+> > > > > >  /* We are under the virtio-vsock's vsock->rx_lock or vhost-
+> > > > > > vsock's vq->mutex
+> > > > > > @@ -1384,6 +1523,11 @@ void virtio_transport_recv_pkt(struct
+> > > > > > virtio_transport *t,
+> > > > > >  		goto free_pkt;
+> > > > > >  	}
+> > > > > >  
+> > > > > > +	if (sk->sk_type == SOCK_DGRAM) {
+> > > > > > +		virtio_transport_recv_connected(sk, skb);
+> > > > > > +		goto out;
+> > > > > > +	}
+> > > > > > +
+> > > > > >  	space_available = virtio_transport_space_update(sk,
+> > > > > > skb);
+> > > > > >  
+> > > > > >  	/* Update CID in case it has changed after a transport
+> > > > > > reset event */
+> > > > > > @@ -1415,6 +1559,7 @@ void virtio_transport_recv_pkt(struct
+> > > > > > virtio_transport *t,
+> > > > > >  		break;
+> > > > > >  	}
+> > > > > >  
+> > > > > > +out:
+> > > > > >  	release_sock(sk);
+> > > > > >  
+> > > > > >  	/* Release refcnt obtained when we fetched this socket
+> > > > > > out of the
+> > > > > > -- 
+> > > > > > 2.35.1
+> > > > > > 
+> > > > > 
+> > > > > -------------------------------------------------------------
+> > > > > --------
+> > > > > To unsubscribe, e-mail: 
+> > > > > virtio-dev-unsubscribe@lists.oasis-open.org
+> > > > > For additional commands, e-mail: 
+> > > > > virtio-dev-help@lists.oasis-open.org
+> > > > > 
+> > 
+> > ---------------------------------------------------------------------
+> > To unsubscribe, e-mail: virtio-dev-unsubscribe@lists.oasis-open.org
+> > For additional commands, e-mail: virtio-dev-help@lists.oasis-open.org
+> > 
