@@ -2,82 +2,148 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id ECD5B5961D9
-	for <lists+kvm@lfdr.de>; Tue, 16 Aug 2022 20:05:29 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 9E0E65961F7
+	for <lists+kvm@lfdr.de>; Tue, 16 Aug 2022 20:07:34 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235806AbiHPSEm (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 16 Aug 2022 14:04:42 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35338 "EHLO
+        id S236848AbiHPSHL (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 16 Aug 2022 14:07:11 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37512 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S236847AbiHPSE3 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 16 Aug 2022 14:04:29 -0400
-Received: from out0.migadu.com (out0.migadu.com [94.23.1.103])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D4F6983079;
-        Tue, 16 Aug 2022 11:04:25 -0700 (PDT)
-Date:   Tue, 16 Aug 2022 18:04:14 +0000
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-        t=1660673064;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=BaX6zUOOB6mOJWb9jOYpWn8KedE3Bw2epJs9deanoek=;
-        b=Rudm4t1Ftj5lHfcxKtn0ZpHzQpjwhGziX0X92kJWRbepwloG2nQgfp4iFF+RiqxsUcORT7
-        aeXdekvkMNzXnMnwJqchFZDWdqIDKCF9ODWZOFesjho2XKHKB2GDJ+LG6sMH+NrcgqGawD
-        xk5XXBb+IMM19PES1vEHmf4XPedLdLA=
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From:   Oliver Upton <oliver.upton@linux.dev>
-To:     Sean Christopherson <seanjc@google.com>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org,
-        syzbot+744e173caec2e1627ee0@syzkaller.appspotmail.com,
-        David Matlack <dmatlack@google.com>
-Subject: Re: [PATCH 3/3] KVM: Move coalesced MMIO initialization (back) into
- kvm_create_vm()
-Message-ID: <YvvcHitVaf2EDAj0@google.com>
-References: <20220816053937.2477106-1-seanjc@google.com>
- <20220816053937.2477106-4-seanjc@google.com>
+        with ESMTP id S236880AbiHPSG5 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 16 Aug 2022 14:06:57 -0400
+Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:3::133])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 681DF83BF5;
+        Tue, 16 Aug 2022 11:06:56 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=bombadil.20210309; h=Content-Transfer-Encoding:
+        Content-Type:In-Reply-To:From:References:Cc:To:Subject:MIME-Version:Date:
+        Message-ID:Sender:Reply-To:Content-ID:Content-Description;
+        bh=HYrSjDexLZuaY6KZpPQGrH8t3/nuoIDhow/JmeJOWVE=; b=3Z6z5jPiwh6pSRWHVjfxlxLvrT
+        +ESrUTpoy1MDAQgtnVLzHpNuFKGfQqGC2uBuKEMmDf4yNsd/zchOqqUJaX9j8ouW/fbUKyzBU+IUe
+        v3b8dIvDgdWK3eoTERHwN+KurAgt4xOXfS57aBToScDpErZBwmM4tx4Jp+1P3KHRZ2LVlMgNxrzZD
+        4sWlLLvUHSH6/EPrBTCA1T8UdMXCS8SMgyjLchE463Lc4Sr2WKBdnnWAJYVWnjgYm/R9rSNhs4TBa
+        CaTyLuTAOY4cMhLlAKvnrWdWCJatvfwf3jVD7CZ2ibA9tC1XlDrPcBzXf+NClR9KxBrTyRWy+Mozr
+        XRBG8+uQ==;
+Received: from [2601:1c0:6280:3f0::a6b3]
+        by bombadil.infradead.org with esmtpsa (Exim 4.94.2 #2 (Red Hat Linux))
+        id 1oO0xr-005fBW-Se; Tue, 16 Aug 2022 18:06:55 +0000
+Message-ID: <06f4a949-e105-519e-3dbf-7d8f3684ed1e@infradead.org>
+Date:   Tue, 16 Aug 2022 11:06:55 -0700
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20220816053937.2477106-4-seanjc@google.com>
-X-Migadu-Flow: FLOW_OUT
-X-Migadu-Auth-User: linux.dev
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.11.0
+Subject: Re: [PATCH] vfio-pci/zdev: require KVM to be built-in
+Content-Language: en-US
+To:     Pierre Morel <pmorel@linux.ibm.com>, linux-kernel@vger.kernel.org
+Cc:     kernel test robot <lkp@intel.com>,
+        Matthew Rosato <mjrosato@linux.ibm.com>,
+        Christian Borntraeger <borntraeger@linux.ibm.com>,
+        Eric Farman <farman@linux.ibm.com>, linux-s390@vger.kernel.org,
+        kvm@vger.kernel.org
+References: <20220814215154.32112-1-rdunlap@infradead.org>
+ <663c7595-1c18-043e-5f12-b0ce880b84bf@linux.ibm.com>
+ <5530ed1f-90ec-ce84-2348-80e484fa48cb@infradead.org>
+ <47cfc72d-62f6-2bd3-db91-99f91591fc30@linux.ibm.com>
+ <fa1e62d7-30c3-693e-e31a-352dde8c339f@linux.ibm.com>
+From:   Randy Dunlap <rdunlap@infradead.org>
+In-Reply-To: <fa1e62d7-30c3-693e-e31a-352dde8c339f@linux.ibm.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 X-Spam-Status: No, score=-2.8 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,SPF_HELO_PASS,
-        SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no
-        version=3.4.6
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_DNSWL_LOW,
+        SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Aug 16, 2022 at 05:39:37AM +0000, Sean Christopherson wrote:
-> Invoke kvm_coalesced_mmio_init() from kvm_create_vm() now that allocating
-> and initializing coalesced MMIO objects is separate from registering any
-> associated devices.  Moving coalesced MMIO cleans up the last oddity
-> where KVM does VM creation/initialization after kvm_create_vm(), and more
-> importantly after kvm_arch_post_init_vm() is called and the VM is added
-> to the global vm_list, i.e. after the VM is fully created as far as KVM
-> is concerned.
-> 
-> Originally, kvm_coalesced_mmio_init() was called by kvm_create_vm(), but
-> the original implementation was completely devoid of error handling.
-> Commit 6ce5a090a9a0 ("KVM: coalesced_mmio: fix kvm_coalesced_mmio_init()'s
-> error handling" fixed the various bugs, and in doing so rightly moved the
-> call to after kvm_create_vm() because kvm_coalesced_mmio_init() also
-> registered the coalesced MMIO device.  Commit 2b3c246a682c ("KVM: Make
-> coalesced mmio use a device per zone") cleaned up that mess by having
-> each zone register a separate device, i.e. moved device registration to
-> its logical home in kvm_vm_ioctl_register_coalesced_mmio().  As a result,
-> kvm_coalesced_mmio_init() is now a "pure" initialization helper and can
-> be safely called from kvm_create_vm().
-> 
-> Opportunstically drop the #ifdef, KVM provides stubs for
-> kvm_coalesced_mmio_{init,free}() when CONFIG_KVM_MMIO=n (arm).
-							   ^^^
-We have CONFIG_KVM_MMIO=y on arm64. Is it actually s390?
 
---
-Thanks,
-Oliver
+
+On 8/16/22 06:47, Pierre Morel wrote:
+> Randy,
+> 
+> I need to provide the correction patch rapidly.
+> Without answer I will propose the patch.
+> 
+> Regards,
+> Pierre
+
+Please go ahead with it.
+Thanks.
+
+> 
+> On 8/16/22 09:55, Pierre Morel wrote:
+>>
+>>
+>> On 8/16/22 08:04, Randy Dunlap wrote:
+>>> Hi--
+>>>
+>>> On 8/15/22 02:43, Pierre Morel wrote:
+>>>> Thank you Randy for this good catch.
+>>>> However forcing KVM to be include statically in the kernel when using VFIO_PCI extensions is not a good solution for us I think.
+>>>>
+>>>> I suggest we better do something like:
+>>>>
+>>>> ----
+>>>>
+>>>> diff --git a/arch/s390/include/asm/kvm_host.h b/arch/s390/include/asm/kvm_host.h
+>>>> index 6287a843e8bc..1733339cc4eb 100644
+>>>> --- a/arch/s390/include/asm/kvm_host.h
+>>>> +++ b/arch/s390/include/asm/kvm_host.h
+>>>> @@ -1038,7 +1038,7 @@ static inline void kvm_arch_vcpu_unblocking(struct kvm_vcpu *vcpu) {}
+>>>>   #define __KVM_HAVE_ARCH_VM_FREE
+>>>>   void kvm_arch_free_vm(struct kvm *kvm);
+>>>>
+>>>> -#ifdef CONFIG_VFIO_PCI_ZDEV_KVM
+>>>> +#if defined(CONFIG_VFIO_PCI_ZDEV_KVM) || defined(CONFIG_VFIO_PCI_ZDEV_KVM_MODULE)
+>>>
+>>> This all looks good except for the line above.
+>>> It should be:
+>>>
+>>> #if IS_ENABLED(CONFIG_VFIO_PCI_ZDEV_KVM)
+>>>
+>>> Thanks.
+>>
+>> Yes, better, thanks.
+>> How do we do? Should I repost it with reported-by you or do you want to post it?
+>>
+>> Pierre
+>>
+>>
+>>>
+>>>
+>>>>   int kvm_s390_pci_register_kvm(struct zpci_dev *zdev, struct kvm *kvm);
+>>>>   void kvm_s390_pci_unregister_kvm(struct zpci_dev *zdev);
+>>>>   #else
+>>>> diff --git a/drivers/vfio/pci/Kconfig b/drivers/vfio/pci/Kconfig
+>>>> index f9d0c908e738..bbc375b028ef 100644
+>>>> --- a/drivers/vfio/pci/Kconfig
+>>>> +++ b/drivers/vfio/pci/Kconfig
+>>>> @@ -45,9 +45,9 @@ config VFIO_PCI_IGD
+>>>>   endif
+>>>>
+>>>>   config VFIO_PCI_ZDEV_KVM
+>>>> -       bool "VFIO PCI extensions for s390x KVM passthrough"
+>>>> +       def_tristate y
+>>>> +       prompt "VFIO PCI extensions for s390x KVM passthrough"
+>>>>          depends on S390 && KVM
+>>>> -       default y
+>>>>          help
+>>>>            Support s390x-specific extensions to enable support for enhancements
+>>>>            to KVM passthrough capabilities, such as interpretive execution of
+>>>>
+>>>> ----
+>>>>
+>>>> What do you think? It seems to me it solves the problem, what do you think?
+>>>>
+>>>> Regards,
+>>>> Pierre
+>>>
+>>>
+>>
+> 
+
+-- 
+~Randy
