@@ -2,147 +2,131 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 7CA49596440
-	for <lists+kvm@lfdr.de>; Tue, 16 Aug 2022 23:10:18 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 0838A596441
+	for <lists+kvm@lfdr.de>; Tue, 16 Aug 2022 23:11:32 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237379AbiHPVKL (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 16 Aug 2022 17:10:11 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48008 "EHLO
+        id S237454AbiHPVK1 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 16 Aug 2022 17:10:27 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48380 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231589AbiHPVKF (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 16 Aug 2022 17:10:05 -0400
-Received: from mail-pj1-x102e.google.com (mail-pj1-x102e.google.com [IPv6:2607:f8b0:4864:20::102e])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 764927E016
-        for <kvm@vger.kernel.org>; Tue, 16 Aug 2022 14:10:03 -0700 (PDT)
-Received: by mail-pj1-x102e.google.com with SMTP id pm17so10770294pjb.3
-        for <kvm@vger.kernel.org>; Tue, 16 Aug 2022 14:10:03 -0700 (PDT)
+        with ESMTP id S237437AbiHPVKW (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 16 Aug 2022 17:10:22 -0400
+Received: from mail-wr1-x431.google.com (mail-wr1-x431.google.com [IPv6:2a00:1450:4864:20::431])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 031AE7E80C;
+        Tue, 16 Aug 2022 14:10:20 -0700 (PDT)
+Received: by mail-wr1-x431.google.com with SMTP id p10so14040307wru.8;
+        Tue, 16 Aug 2022 14:10:19 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc;
-        bh=3TNHDMK6crAKiQ8dof0O0YciDkj6xbRmAwSNGdrV/YE=;
-        b=boYJM7xJiO/wnH7j6dLOPptvSyfRhEgsvkuoBvfH+tM0qFfNdkwASUWa96bH+Jrsfv
-         AovCBxjPOLDEpy/pB8PCAwjZZ2T9DSIwSML7y7kyegifKjHSiC4en3bSXqmUoj4eX9t/
-         fmMFog27hbKyimdFYrGRXmR3o/r1aCaxGOAiqtqvUnSkMeh1enqk+Ou2goi4Mb+vyWmJ
-         iQpdkyicqBZpKn+EJA6Gw+2HO/iXuzk1uKiqzQVBVS80nyd4HzMP4obsBjF8MSJgqBQL
-         Bundqoyr7xLOjF1n8+WTMc9y3zG0uv5WVM0Ipfhum1rjqhV4q7EC+NXkjWE+GgH/D++F
-         MGxg==
+        d=gmail.com; s=20210112;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc;
+        bh=NvNulZm0TaP1hFN6sFnwsfQo9WSALWLxEbOFV0/Etb0=;
+        b=llH9ZkFRAetfgniIRfo626k3PmRVOGGhOmX6sWe3T6jLtLLCgL57AInAEjvDL1lRF/
+         TdhvAPFcoCaps76Pai/2DjNQpHUC4cZxNPffYiHe1hH4UGTUNHPauXloHTdUOcINnVBb
+         WekGW/pwkRmJLwkH0kRKUWsXKbYJzwaeydW8Nb4eEtUObTfQ4MHk4Yu8TzGaI45coZLn
+         eEx1JlFuv/VGkwK00fVuX77ij4ku3RTGsLunasCNJYUcBtizMYZzCw/L8gfpkegIb2XG
+         H+vz687uPAUd5TIEClEzIdxKWuK3/b+aYUAqEOYNepdJ8QqZKmlEQRMV6XoJ3WoFdAsq
+         NqoA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc;
-        bh=3TNHDMK6crAKiQ8dof0O0YciDkj6xbRmAwSNGdrV/YE=;
-        b=05rDImtK9R7cETXHNKR6ywLDpvX2l4tBoPv8ZZNzIg/aoNrMjTsMuSTdF5JebnLs7O
-         TVrw6oW1qNNbdpkxT36f80joIm6woJ3q4SBflMt6IeZT6uau4fy+qeSRrls8eBOkP2Ew
-         dCEaSzvJ9toIGTxNlyoILbLIolcTRTigaiTSFceoT06k6mCoTZ/W7jszFkf4dP3/+AxC
-         qGWge4f3wpI13YCTbfs88kMbKci6xlVgSjnwfZD+UzgQFdN4oWEXwNwJeaOCqoXXz+Pu
-         g+aQ09oIgEWlY5wVEvCY3m2i5zKDtDEMPQE0tq7SfUWhavLw1GKpPed6/nbRmOFIFwjc
-         mBbw==
-X-Gm-Message-State: ACgBeo3NuNbbYjUhvARkeXXWY0ojykLzvO7+rigvWxFrnseeYxWUeyCC
-        Eheuqyu+aZUqSeCQ5cSkU5D1gWKZwaNDwA==
-X-Google-Smtp-Source: AA6agR4OF22Kg1O7WqhFOFstzTRFWcNIrryo56OK9hPQ71EVjtpEzpipCt2qEIejXom6L7e8j9JGog==
-X-Received: by 2002:a17:903:11c7:b0:170:cde7:d24a with SMTP id q7-20020a17090311c700b00170cde7d24amr23966559plh.91.1660684202826;
-        Tue, 16 Aug 2022 14:10:02 -0700 (PDT)
-Received: from google.com (33.5.83.34.bc.googleusercontent.com. [34.83.5.33])
-        by smtp.gmail.com with ESMTPSA id 189-20020a6204c6000000b0052ce4074fddsm9177050pfe.145.2022.08.16.14.10.02
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc;
+        bh=NvNulZm0TaP1hFN6sFnwsfQo9WSALWLxEbOFV0/Etb0=;
+        b=WueYmIV8ouQrL2sflWK19r5cvFpAxeN9MBLzAc3vGpks2yzzB0vQ5gJ3eAVx99Oh3A
+         dATTCeLiYIRgGYT4hq+neXdFnYp9BP82xiPvq+LFn+3nK4m6MlrYKUfQBKEnXU62/Un8
+         ccbQvNZmtAl97V+koAni6J7v8CL5NOsV1F8xkHz6Sil9fiPl6weKNsqlY4f0MKrZR+PQ
+         d+CUfifhzNbJgggSzH9wjMBstH/SL5TXJnCT+XM19YxQhC12EBlSa4q0R0gZzPeSSW4D
+         HWsKWBbONnjWBPeZmkRlr0NmcNxEJunEPAnWou+Poza0qgyL8ajle6+Yo2SoFIcbPk8R
+         uZ1w==
+X-Gm-Message-State: ACgBeo14eCOTqGqd7B8oataMYXumRfnttjfWqBc8YHbNXyt/vVTY0lck
+        NZPXh6EyVlyDzv/gbdPGDVF3LHr1e1EouA==
+X-Google-Smtp-Source: AA6agR54R0jvZDNto8jeRWNpADovphd1WCeclyeH4A9PeiGp62sUC3gDIh2XRPDjsc4b1Af5wLMuHw==
+X-Received: by 2002:a5d:6285:0:b0:225:1fb3:5ca4 with SMTP id k5-20020a5d6285000000b002251fb35ca4mr1637056wru.332.1660684218287;
+        Tue, 16 Aug 2022 14:10:18 -0700 (PDT)
+Received: from localhost.localdomain ([46.248.82.114])
+        by smtp.gmail.com with ESMTPSA id v7-20020a05600c12c700b003a53e6c5425sm6504wmd.8.2022.08.16.14.10.17
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 16 Aug 2022 14:10:02 -0700 (PDT)
-Date:   Tue, 16 Aug 2022 21:09:58 +0000
-From:   Mingwei Zhang <mizhang@google.com>
-To:     Sean Christopherson <seanjc@google.com>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org, David Matlack <dmatlack@google.com>,
-        Yan Zhao <yan.y.zhao@intel.com>,
-        Ben Gardon <bgardon@google.com>
-Subject: Re: [PATCH v3 3/8] KVM: x86/mmu: Rename NX huge pages
- fields/functions for consistency
-Message-ID: <YvwHpjxS9CCEVER7@google.com>
-References: <20220805230513.148869-1-seanjc@google.com>
- <20220805230513.148869-4-seanjc@google.com>
- <YvhL6jKfKCj0+74w@google.com>
- <YvrAoyhgNzTcvzkU@google.com>
+        Tue, 16 Aug 2022 14:10:17 -0700 (PDT)
+From:   Uros Bizjak <ubizjak@gmail.com>
+To:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org
+Cc:     Uros Bizjak <ubizjak@gmail.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Sean Christopherson <seanjc@google.com>
+Subject: [PATCH] KVM/VMX: Avoid stack engine synchronization uop in __vmx_vcpu_run
+Date:   Tue, 16 Aug 2022 23:10:10 +0200
+Message-Id: <20220816211010.25693-1-ubizjak@gmail.com>
+X-Mailer: git-send-email 2.37.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <YvrAoyhgNzTcvzkU@google.com>
-X-Spam-Status: No, score=-14.4 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        ENV_AND_HDR_SPF_MATCH,FSL_HELO_FAKE,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,
-        SPF_PASS,T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL
-        autolearn=no autolearn_force=no version=3.4.6
+Content-Transfer-Encoding: 8bit
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
+        RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Aug 15, 2022, Sean Christopherson wrote:
-> On Sun, Aug 14, 2022, Mingwei Zhang wrote:
-> > On Fri, Aug 05, 2022, Sean Christopherson wrote:
-> > > Rename most of the variables/functions involved in the NX huge page
-> > > mitigation to provide consistency, e.g. lpage vs huge page, and NX huge
-> > > vs huge NX, and also to provide clarity, e.g. to make it obvious the flag
-> > > applies only to the NX huge page mitigation, not to any condition that
-> > > prevents creating a huge page.
-> > > 
-> > > Leave the nx_lpage_splits stat alone as the name is ABI and thus set in
-> > > stone.
-> > > 
-> > > Signed-off-by: Sean Christopherson <seanjc@google.com>
-> > > ---
-> > >  arch/x86/include/asm/kvm_host.h |  8 ++--
-> > >  arch/x86/kvm/mmu/mmu.c          | 70 +++++++++++++++++----------------
-> > >  arch/x86/kvm/mmu/mmu_internal.h | 22 +++++++----
-> > >  arch/x86/kvm/mmu/paging_tmpl.h  |  2 +-
-> > >  arch/x86/kvm/mmu/tdp_mmu.c      |  8 ++--
-> > >  5 files changed, 59 insertions(+), 51 deletions(-)
-> > > 
-> > > diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
-> > > index e8281d64a431..5634347e5d05 100644
-> > > --- a/arch/x86/include/asm/kvm_host.h
-> > > +++ b/arch/x86/include/asm/kvm_host.h
-> > > @@ -1143,7 +1143,7 @@ struct kvm_arch {
-> > >  	struct hlist_head mmu_page_hash[KVM_NUM_MMU_PAGES];
-> > >  	struct list_head active_mmu_pages;
-> > >  	struct list_head zapped_obsolete_pages;
-> > > -	struct list_head lpage_disallowed_mmu_pages;
-> > > +	struct list_head possible_nx_huge_pages;
-> > 
-> > Honestly, I am struggling to understand this one. 'possible_*' indicates
-> > that there are other possibilities. But what are those possibilities?
-> 
-> No, possible is being used as an adjective in this case.  possible_nx_huge_pages
-> is the list of shadow pages for which it's possible to replace the shadow page
-> with an NX huge page.
-> 
-> The noun version would yield a name like nx_huge_page_possiblities.
+Avoid instructions with explicit uses of the stack pointer between
+instructions that implicitly refer to it. The sequence of
+POP %reg; ADD $x, %RSP; POP %reg forces emission of synchronization
+uop to synchronize the value of the stack pointer in the stack engine
+and the out-of-order core.
 
-Right, but these shadow pages are not NX huge pages, right? IIUC, they
-are pages to be zapped due to NX huge pages, aren't they?
+Using POP with the dummy register instead of ADD $x, %RSP results in a
+smaller code size and faster code.
 
-`nx_huge_page_disallowed` is easy to understand because it literally say
-'nx_huge_page is not allowed', which is correct.
+The patch also fixes the reference to the wrong register in the
+nearby comment.
 
-But this one, it says 'possible nx_huge_pages', but they are not
-nx huge pages at all. Instead, they are 'shadow pages that are replaced
-with nx_huge_pages'. So that's why updates to this list is done together
-with stats nx_plage_splits.
+Cc: Paolo Bonzini <pbonzini@redhat.com>
+Cc: Sean Christopherson <seanjc@google.com>
+Signed-off-by: Uros Bizjak <ubizjak@gmail.com>
+---
+ arch/x86/kvm/vmx/vmenter.S | 9 ++++-----
+ 1 file changed, 4 insertions(+), 5 deletions(-)
 
-Please correct me if I am wrong. I am still struggling to understand the
-meaning of these variables.
-
->
-> > I feel this name is more confusing than the original one. Maybe just keep
-> 
-> Ignoring lpage => huge_page, the current name is terribly inaccurate.  The list
-> doesn't contain all disallowed huge pages, nor does it even contain all disallowed
-> NX huge pages, it specifically tracks shadow pages that might be able to be
-> replaced with an NX huge page.
-> 
-> I'm open to other names, but whatever we choose should be paired with
-> account_nx_huge_page()'s param that is currently named "nx_huge_page_possible".
-
-How about mmu_pages_replaced_by_nx_huge,
-mmu_pages_replaced_by_possible_nx_huge or something starting with
-possible_pages_, pages_ instead of possible_nx_huge_pages?
+diff --git a/arch/x86/kvm/vmx/vmenter.S b/arch/x86/kvm/vmx/vmenter.S
+index 6de96b943804..afcb237e1c17 100644
+--- a/arch/x86/kvm/vmx/vmenter.S
++++ b/arch/x86/kvm/vmx/vmenter.S
+@@ -189,13 +189,16 @@ SYM_INNER_LABEL(vmx_vmexit, SYM_L_GLOBAL)
+ 	xor %ebx, %ebx
+ 
+ .Lclear_regs:
++	/* "POP" @regs. */
++	pop %_ASM_AX
++
+ 	/*
+ 	 * Clear all general purpose registers except RSP and RBX to prevent
+ 	 * speculative use of the guest's values, even those that are reloaded
+ 	 * via the stack.  In theory, an L1 cache miss when restoring registers
+ 	 * could lead to speculative execution with the guest's values.
+ 	 * Zeroing XORs are dirt cheap, i.e. the extra paranoia is essentially
+-	 * free.  RSP and RAX are exempt as RSP is restored by hardware during
++	 * free.  RSP and RBX are exempt as RSP is restored by hardware during
+ 	 * VM-Exit and RBX is explicitly loaded with 0 or 1 to hold the return
+ 	 * value.
+ 	 */
+@@ -216,9 +219,6 @@ SYM_INNER_LABEL(vmx_vmexit, SYM_L_GLOBAL)
+ 	xor %r15d, %r15d
+ #endif
+ 
+-	/* "POP" @regs. */
+-	add $WORD_SIZE, %_ASM_SP
+-
+ 	/*
+ 	 * IMPORTANT: RSB filling and SPEC_CTRL handling must be done before
+ 	 * the first unbalanced RET after vmexit!
+@@ -234,7 +234,6 @@ SYM_INNER_LABEL(vmx_vmexit, SYM_L_GLOBAL)
+ 	FILL_RETURN_BUFFER %_ASM_CX, RSB_CLEAR_LOOPS, X86_FEATURE_RSB_VMEXIT,\
+ 			   X86_FEATURE_RSB_VMEXIT_LITE
+ 
+-
+ 	pop %_ASM_ARG2	/* @flags */
+ 	pop %_ASM_ARG1	/* @vmx */
+ 
+-- 
+2.37.1
 
