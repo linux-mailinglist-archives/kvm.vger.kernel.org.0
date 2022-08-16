@@ -2,187 +2,154 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 6BE96596353
-	for <lists+kvm@lfdr.de>; Tue, 16 Aug 2022 21:46:45 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 2338A59648E
+	for <lists+kvm@lfdr.de>; Tue, 16 Aug 2022 23:22:39 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237268AbiHPTqo (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 16 Aug 2022 15:46:44 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33250 "EHLO
+        id S237570AbiHPVVF (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 16 Aug 2022 17:21:05 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34268 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233049AbiHPTqm (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 16 Aug 2022 15:46:42 -0400
-Received: from mx0a-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BF4C674CC3;
-        Tue, 16 Aug 2022 12:46:41 -0700 (PDT)
-Received: from pps.filterd (m0098419.ppops.net [127.0.0.1])
-        by mx0b-001b2d01.pphosted.com (8.17.1.5/8.17.1.5) with ESMTP id 27GIpOAo029252;
-        Tue, 16 Aug 2022 19:46:28 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
- mime-version : subject : to : cc : references : from : in-reply-to :
- content-type : content-transfer-encoding; s=pp1;
- bh=FA/YZEorWGopm5U5huyhgTuqb3uMb4Ubp7IzrsXxATg=;
- b=OG9eapcr317HRe50bFJj4eSXe1E/ThbkGfb30+wl4WRxt8jJgQata5nMN5QMqH1sO4C7
- 1JTMUUxf+oUlrtBon9v0RoKqOoDKwu2rK0VNms/nT59IjFww1UIkL7s61LSQNhtzdWBj
- Z6xj2JK/pD7sDV6OOVQiTQIT1BwrXewFOUn8Wo9gjiX0vyfnOCbOMIrVAloo7wrktQ69
- CBGuPriv/I9chLMiVWqkyJiTyTA0hiBssuTNP4ttaaLYZUh+HOCuoBys40tRRJj3zRLS
- i62QK7xOvwOR0iGoO7uH9vgMo2A127BmhF+keQ3EUYHvEgpWY820p1CXaZV5Ec9rPZBC Jg== 
-Received: from ppma02wdc.us.ibm.com (aa.5b.37a9.ip4.static.sl-reverse.com [169.55.91.170])
-        by mx0b-001b2d01.pphosted.com (PPS) with ESMTPS id 3j0gvtheqf-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 16 Aug 2022 19:46:28 +0000
-Received: from pps.filterd (ppma02wdc.us.ibm.com [127.0.0.1])
-        by ppma02wdc.us.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 27GJZstr021577;
-        Tue, 16 Aug 2022 19:46:28 GMT
-Received: from b03cxnp07027.gho.boulder.ibm.com (b03cxnp07027.gho.boulder.ibm.com [9.17.130.14])
-        by ppma02wdc.us.ibm.com with ESMTP id 3hx3k9uy50-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 16 Aug 2022 19:46:28 +0000
-Received: from b03ledav003.gho.boulder.ibm.com (b03ledav003.gho.boulder.ibm.com [9.17.130.234])
-        by b03cxnp07027.gho.boulder.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 27GJkRrM63308222
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Tue, 16 Aug 2022 19:46:27 GMT
-Received: from b03ledav003.gho.boulder.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 0A46E6A04D;
-        Tue, 16 Aug 2022 19:46:27 +0000 (GMT)
-Received: from b03ledav003.gho.boulder.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 3610A6A051;
-        Tue, 16 Aug 2022 19:46:26 +0000 (GMT)
-Received: from [9.211.113.217] (unknown [9.211.113.217])
-        by b03ledav003.gho.boulder.ibm.com (Postfix) with ESMTP;
-        Tue, 16 Aug 2022 19:46:25 +0000 (GMT)
-Message-ID: <8809c67b-a9f6-07a6-307c-369cd391e9b5@linux.ibm.com>
-Date:   Tue, 16 Aug 2022 15:46:25 -0400
-MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.12.0
-Subject: Re: [PATCH] vfio-pci/zdev: require KVM to be built-in
-Content-Language: en-US
-To:     Pierre Morel <pmorel@linux.ibm.com>,
-        Randy Dunlap <rdunlap@infradead.org>,
+        with ESMTP id S232601AbiHPVVD (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 16 Aug 2022 17:21:03 -0400
+Received: from mail-pf1-x432.google.com (mail-pf1-x432.google.com [IPv6:2607:f8b0:4864:20::432])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BD54A8A1FE;
+        Tue, 16 Aug 2022 14:21:02 -0700 (PDT)
+Received: by mail-pf1-x432.google.com with SMTP id f30so10419494pfq.4;
+        Tue, 16 Aug 2022 14:21:02 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc;
+        bh=rZz8bTF2NcPtmVJ0WP5KDpOKcOl43ZBJ+1AR/XSbYLg=;
+        b=bV+k5Bi7aHC7OQ5MMSqyosvgyjzXZiK+iNX2RNdes6NMjMk7SbtPl5oivBva1PkcL8
+         rKwBzUVoOLc4QHdIN2suICc/baLJjosEkTBtp3cm11v+mqIyGwtNAiDUK0Su9i9YaSxi
+         SzTHPlzRpkPnDozzpDpTwXi0pZaxr+B2ne8tM3A6KrOkKJnYgF94ocw14WYt1gZYmJvg
+         S3i9JiB0F78nLKgq/HDabD7tBcDNDHeDrN2YllPbw/JIgJMEVYDojsAGALR1S9QtrUza
+         EfAtaXRi/oI90POA/6DJM94mGMJiqLkfqiaePIGR0tLCQI9DZFNfObPZGG4kYolPgXsa
+         Bk1w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc;
+        bh=rZz8bTF2NcPtmVJ0WP5KDpOKcOl43ZBJ+1AR/XSbYLg=;
+        b=nCfNsV8vzNEUZv1KbXePRDu1u6eMpDo1SeiPiDu5u22FXxvqykDI7moLNigAUVLFbI
+         /XPdHBJOtNBvvbiWG60w1pZF9v5+GPjc489ok2POoJNL3ti899D/5OFzDQePUKh6HB+S
+         F6PFmC8q/RgQ1zuFOBb9n2Zaa13A80TtvO6QnqqOQEIrfGXaTl9t5wpDBok77j1pV40u
+         DC9YEW3s1yativIapq1Zrm5sdqHwR9tzMQOSGnLTdd3xzYroIZRqcch3jDr347z5p0sA
+         UvO4YAaqootraofL9g5YB3sooo3iv3IlkbqBr3fdGjWux3Xrxvi8x4QCnQ1go4ZWT3mw
+         D80w==
+X-Gm-Message-State: ACgBeo1NZ4KlvpuO0BJzZZlDrw2+VqTStvfU1wqcy95JsG57FIGpKsil
+        sm3sEpend1hZGxjsrUl2820=
+X-Google-Smtp-Source: AA6agR4YLR5lA1zKDCby2mqX+HJq2T8wb9mbU/S5aW4j2gvI5lNQI5i6E+T0F3z/J2jFYlIAzGfMOw==
+X-Received: by 2002:a63:284:0:b0:41d:9b60:497c with SMTP id 126-20020a630284000000b0041d9b60497cmr18960653pgc.29.1660684862179;
+        Tue, 16 Aug 2022 14:21:02 -0700 (PDT)
+Received: from localhost (c-73-164-155-12.hsd1.wa.comcast.net. [73.164.155.12])
+        by smtp.gmail.com with ESMTPSA id h10-20020a170902680a00b00172913c0e44sm951851plk.28.2022.08.16.14.21.01
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 16 Aug 2022 14:21:01 -0700 (PDT)
+Date:   Tue, 16 Aug 2022 06:18:54 +0000
+From:   Bobby Eshleman <bobbyeshleman@gmail.com>
+To:     "Michael S. Tsirkin" <mst@redhat.com>
+Cc:     Bobby Eshleman <bobby.eshleman@gmail.com>,
+        Bobby Eshleman <bobby.eshleman@bytedance.com>,
+        Cong Wang <cong.wang@bytedance.com>,
+        Jiang Wang <jiang.wang@bytedance.com>,
+        Stefan Hajnoczi <stefanha@redhat.com>,
+        Stefano Garzarella <sgarzare@redhat.com>,
+        Jason Wang <jasowang@redhat.com>,
+        "David S. Miller" <davem@davemloft.net>,
+        Eric Dumazet <edumazet@google.com>,
+        Jakub Kicinski <kuba@kernel.org>,
+        Paolo Abeni <pabeni@redhat.com>, kvm@vger.kernel.org,
+        virtualization@lists.linux-foundation.org, netdev@vger.kernel.org,
         linux-kernel@vger.kernel.org
-Cc:     kernel test robot <lkp@intel.com>,
-        Christian Borntraeger <borntraeger@linux.ibm.com>,
-        Eric Farman <farman@linux.ibm.com>, linux-s390@vger.kernel.org,
-        kvm@vger.kernel.org
-References: <20220814215154.32112-1-rdunlap@infradead.org>
- <663c7595-1c18-043e-5f12-b0ce880b84bf@linux.ibm.com>
- <5530ed1f-90ec-ce84-2348-80e484fa48cb@infradead.org>
- <47cfc72d-62f6-2bd3-db91-99f91591fc30@linux.ibm.com>
-From:   Matthew Rosato <mjrosato@linux.ibm.com>
-In-Reply-To: <47cfc72d-62f6-2bd3-db91-99f91591fc30@linux.ibm.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: owcYnHneUBOK5UU669Xqu_RZwQwNIgOz
-X-Proofpoint-ORIG-GUID: owcYnHneUBOK5UU669Xqu_RZwQwNIgOz
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.205,Aquarius:18.0.883,Hydra:6.0.517,FMLib:17.11.122.1
- definitions=2022-08-16_08,2022-08-16_02,2022-06-22_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 lowpriorityscore=0
- mlxlogscore=999 suspectscore=0 adultscore=0 bulkscore=0 clxscore=1011
- impostorscore=0 mlxscore=0 spamscore=0 malwarescore=0 phishscore=0
- priorityscore=1501 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2207270000 definitions=main-2208160072
-X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,
-        SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no
-        version=3.4.6
+Subject: Re: [PATCH 3/6] vsock: add netdev to vhost/virtio vsock
+Message-ID: <Yvs2qqx/sG0C3zvz@bullseye>
+References: <cover.1660362668.git.bobby.eshleman@bytedance.com>
+ <5a93c5aad99d79f028d349cb7e3c128c65d5d7e2.1660362668.git.bobby.eshleman@bytedance.com>
+ <20220816123701-mutt-send-email-mst@kernel.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20220816123701-mutt-send-email-mst@kernel.org>
+X-Spam-Status: No, score=-1.1 required=5.0 tests=BAYES_00,DATE_IN_PAST_12_24,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
+        RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
+        autolearn=no autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 8/16/22 3:55 AM, Pierre Morel wrote:
+On Tue, Aug 16, 2022 at 12:38:52PM -0400, Michael S. Tsirkin wrote:
+> On Mon, Aug 15, 2022 at 10:56:06AM -0700, Bobby Eshleman wrote:
+> > In order to support usage of qdisc on vsock traffic, this commit
+> > introduces a struct net_device to vhost and virtio vsock.
+> > 
+> > Two new devices are created, vhost-vsock for vhost and virtio-vsock
+> > for virtio. The devices are attached to the respective transports.
+> > 
+> > To bypass the usage of the device, the user may "down" the associated
+> > network interface using common tools. For example, "ip link set dev
+> > virtio-vsock down" lets vsock bypass the net_device and qdisc entirely,
+> > simply using the FIFO logic of the prior implementation.
 > 
+> Ugh. That's quite a hack. Mark my words, at some point we will decide to
+> have down mean "down".  Besides, multiple net devices with link up tend
+> to confuse userspace. So might want to keep it down at all times
+> even short term.
 > 
-> On 8/16/22 08:04, Randy Dunlap wrote:
->> Hi--
->>
->> On 8/15/22 02:43, Pierre Morel wrote:
->>> Thank you Randy for this good catch.
->>> However forcing KVM to be include statically in the kernel when using VFIO_PCI extensions is not a good solution for us I think.
->>>
->>> I suggest we better do something like:
->>>
->>> ----
->>>
->>> diff --git a/arch/s390/include/asm/kvm_host.h b/arch/s390/include/asm/kvm_host.h
->>> index 6287a843e8bc..1733339cc4eb 100644
->>> --- a/arch/s390/include/asm/kvm_host.h
->>> +++ b/arch/s390/include/asm/kvm_host.h
->>> @@ -1038,7 +1038,7 @@ static inline void kvm_arch_vcpu_unblocking(struct kvm_vcpu *vcpu) {}
->>>   #define __KVM_HAVE_ARCH_VM_FREE
->>>   void kvm_arch_free_vm(struct kvm *kvm);
->>>
->>> -#ifdef CONFIG_VFIO_PCI_ZDEV_KVM
->>> +#if defined(CONFIG_VFIO_PCI_ZDEV_KVM) || defined(CONFIG_VFIO_PCI_ZDEV_KVM_MODULE)
->>
->> This all looks good except for the line above.
->> It should be:
->>
->> #if IS_ENABLED(CONFIG_VFIO_PCI_ZDEV_KVM)
->>
->> Thanks.
-> 
-> Yes, better, thanks.
-> How do we do? Should I repost it with reported-by you or do you want to post it?
-> 
-> Pierre
 
-Thanks for looking into this while I was away.
+I have to admit, this choice was born more of perceived necessity than
+of a love for the design... but I can explain the pain points that led
+to the current state, which I hope sparks some discussion.
 
-I think the issue is not just CONFIG_KVM=m && CONFIG_VFIO_PCI_ZDEV_KVM=y -- it also requires CONFIG_VFIO_PCI=y && CONFIG_VFIO_PCI_CORE=y.  This combination results in building in vfio_pci (which tries to link the calls to kvm_s390_pci_register_kvm and kvm_s390_pci_unregister_kvm which is not built in).
+When the state is down, dev_queue_xmit() will fail. To avoid this and
+preserve the "zero-configuration" guarantee of vsock, I chose to make
+transmission work regardless of device state by implementing this
+"ignore up/down state" hack.
 
-However... this tristate + IS_ENABLED(CONFIG_VFIO_PCI_ZDEV_KVM) check in kvm_host.h will not solve the issue.  Rather, due to the #ifdef CONFIG_VFIO_PCI_ZDEV_KVM in include/linux/vfio_pci_core.h, this change will just cause us to never call kvm_s390_pci_register_kvm or kvm_s390_pci_unregister_kvm when CONFIG_VFIO_PCI_ZDEV_KVM=m, effectively treating CONFIG_VFIO_PCI_ZDEV_KVM=m as a 'n' and we don't get the zdev kvm extensions, which I don't think was the intent.
+This is unfortunate because what we are really after here is just packet
+scheduling, i.e., qdisc. We don't really need the rest of the
+net_device, and I don't think up/down buys us anything of value. The
+relationship between qdisc and net_device is so tightly knit together
+though, that using qdisc without a net_device doesn't look very
+practical (and maybe impossible).
 
-I'm still thinking & am open to other ideas, but one solution to avoiding building in KVM would be to go back to using symbol_get for these 2 interfaces (kvm_s390_pci_register_kvm and kvm_s390_pci_unregister_kvm) as was done in a prior version of this series like virt/kvm/vfio.c does and otherwise leave CONFIG_VFIO_PCI_ZDEV_KVM as-is. 
+Some alternative routes might be:
 
-diff --git a/drivers/vfio/pci/vfio_pci_zdev.c b/drivers/vfio/pci/vfio_pci_zdev.c
-index e163aa9f6144..09c2758134c7 100644
---- a/drivers/vfio/pci/vfio_pci_zdev.c
-+++ b/drivers/vfio/pci/vfio_pci_zdev.c
-@@ -144,6 +144,8 @@ int vfio_pci_info_zdev_add_caps(struct vfio_pci_core_device *vdev,
- int vfio_pci_zdev_open_device(struct vfio_pci_core_device *vdev)
- {
-        struct zpci_dev *zdev = to_zpci(vdev->pdev);
-+       int (*fn)(struct zpci_dev *zdev, struct kvm *kvm);
-+       int rc;
- 
-        if (!zdev)
-                return -ENODEV;
-@@ -151,15 +153,30 @@ int vfio_pci_zdev_open_device(struct vfio_pci_core_device *vdev)
-        if (!vdev->vdev.kvm)
-                return 0;
- 
--       return kvm_s390_pci_register_kvm(zdev, vdev->vdev.kvm);
-+       fn = symbol_get(kvm_s390_pci_register_kvm);
-+       if (!fn)
-+               return -EPERM;
-+
-+       rc = fn(zdev, vdev->vdev.kvm);
-+
-+       symbol_put(kvm_s390_pci_register_kvm);
-+
-+       return rc;
- }
- 
- void vfio_pci_zdev_close_device(struct vfio_pci_core_device *vdev)
- {
-        struct zpci_dev *zdev = to_zpci(vdev->pdev);
-+       void (*fn)(struct zpci_dev *zdev);
- 
-        if (!zdev || !vdev->vdev.kvm)
-                return;
- 
--       kvm_s390_pci_unregister_kvm(zdev);
-+       fn = symbol_get(kvm_s390_pci_unregister_kvm);
-+       if (!fn)
-+               return;
-+
-+       fn(zdev);
-+
-+       symbol_put(kvm_s390_pci_unregister_kvm);
- }
+1) Default the state to up, and let users disable vsock by downing the
+   device if they'd like. It still works out-of-the-box, but if users
+   really want to disable vsock they may.
 
+2) vsock may simply turn the device to state up when a socket is first
+   used. For instance, the HCI device in net/bluetooth/hci_* uses a
+   technique where the net_device is turned to up when bind() is called on
+   any HCI socket (BTPROTO_HCI). It can also be turned up/down via
+   ioctl().
 
+3) Modify net_device registration to allow us to have an invisible
+   device that is only known by the kernel. It may default to up and remain
+   unchanged. The qdisc controls alone may be exposed to userspace,
+   hopefully via netlink to still work with tc. This is not
+   currently supported by register_netdevice(), but a series from 2007 was
+   sent to the ML, tentatively approved in concept, but was never merged[1].
+
+4) Currently NETDEV_UP/NETDEV_DOWN commands can't be vetoed.
+   NETDEV_PRE_UP, however, is used to effectively veto NETDEV_UP
+   commands[2]. We could introduce NETDEV_PRE_DOWN to support vetoing of
+   NETDEV_DOWN. This would allow us to install a hook to determine if
+   we actually want to allow the device to be downed.
+
+In an ideal world, we could simply pass a set of netdev queues, a
+packet, and maybe a blob of state to qdisc and let it work its
+scheduling magic...
+
+Any thoughts?
+
+[1]: https://lore.kernel.org/netdev/20070129140958.0cf6880f@freekitty/
+[2]: https://lore.kernel.org/all/20090529.220906.243061042.davem@davemloft.net/
+
+Thanks,
+Bobby
