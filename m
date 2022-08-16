@@ -2,268 +2,112 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 18AC45958E6
-	for <lists+kvm@lfdr.de>; Tue, 16 Aug 2022 12:49:08 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 48C69595ADD
+	for <lists+kvm@lfdr.de>; Tue, 16 Aug 2022 13:54:24 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234950AbiHPKtD (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 16 Aug 2022 06:49:03 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60572 "EHLO
+        id S234806AbiHPLyT (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 16 Aug 2022 07:54:19 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56432 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235077AbiHPKsr (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 16 Aug 2022 06:48:47 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 8F63F12AAF
-        for <kvm@vger.kernel.org>; Tue, 16 Aug 2022 03:12:59 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1660644778;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=NKA6rxMzSG9plLayOOUgu+lS1k1tefQ9X0WWKNpyvdw=;
-        b=P5hqpAPvgYfTMOymlbXpKJ2Lhe5D9M43gxS3iWLKs9/Uw+IxkLahzzM/sLbFifk0O+/JWP
-        g6L/gWI7qMlucp7kKNWs1MNKlhPhrsQzn/fFjnMHFBDuBKLCUpQMCaX17Wt07WiTwj40YO
-        /wYMmR0dJQBhXC0qGc6kqYVqVMQadZA=
-Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
- [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-455-Lryv6ImxNMy3GiCPK2AxZA-1; Tue, 16 Aug 2022 06:12:57 -0400
-X-MC-Unique: Lryv6ImxNMy3GiCPK2AxZA-1
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.rdu2.redhat.com [10.11.54.2])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id B104E85A586;
-        Tue, 16 Aug 2022 10:12:56 +0000 (UTC)
-Received: from virtlab701.virt.lab.eng.bos.redhat.com (virtlab701.virt.lab.eng.bos.redhat.com [10.19.152.228])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 6CF7640D2827;
-        Tue, 16 Aug 2022 10:12:56 +0000 (UTC)
-From:   Emanuele Giuseppe Esposito <eesposit@redhat.com>
-To:     qemu-devel@nongnu.org
-Cc:     Paolo Bonzini <pbonzini@redhat.com>,
-        "Michael S. Tsirkin" <mst@redhat.com>,
-        Cornelia Huck <cohuck@redhat.com>,
-        Peter Xu <peterx@redhat.com>,
-        David Hildenbrand <david@redhat.com>,
-        =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>,
-        Maxim Levitsky <mlevitsk@redhat.com>, kvm@vger.kernel.org,
-        Emanuele Giuseppe Esposito <eesposit@redhat.com>
-Subject: [RFC PATCH 2/2] kvm/kvm-all.c: listener should delay kvm_vm_ioctl to the commit phase
-Date:   Tue, 16 Aug 2022 06:12:50 -0400
-Message-Id: <20220816101250.1715523-3-eesposit@redhat.com>
-In-Reply-To: <20220816101250.1715523-1-eesposit@redhat.com>
-References: <20220816101250.1715523-1-eesposit@redhat.com>
+        with ESMTP id S234335AbiHPLxu (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 16 Aug 2022 07:53:50 -0400
+Received: from mx0a-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3656696FE0
+        for <kvm@vger.kernel.org>; Tue, 16 Aug 2022 04:29:57 -0700 (PDT)
+Received: from pps.filterd (m0098420.ppops.net [127.0.0.1])
+        by mx0b-001b2d01.pphosted.com (8.17.1.5/8.17.1.5) with ESMTP id 27GANRu4001268
+        for <kvm@vger.kernel.org>; Tue, 16 Aug 2022 11:29:57 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=content-type :
+ mime-version : content-transfer-encoding : in-reply-to : references : cc :
+ to : subject : from : message-id : date; s=pp1;
+ bh=GKJh5AU0vsMLXQm+lsKRbNF1sEEHMShQX8WipYzP4yk=;
+ b=nSlk691svSMTRzLOZ84Cy6jCvOH78vq0fNd4Akso3l/wMx0DgWFNw/KTvJmWTfDLelDq
+ gtCZ0vMCt2WzM3E+bYx7DqoiYcIbGw9QsA8hrluneHoPYOrW9uQwuFHr8+gQ7K69LgLf
+ d5nQ3r0hZb2yNE5H8yeASr0OExK5ioMHHYZ09wD7Q6HHWOAY0jj9KW/BjcRRqOCcp1i3
+ cyXairQqbsEzToigwhi7LHBRXr8S+roBlnmrOXa/USpTxUASaGe1s1isCB0pENq8ZTxM
+ 787zFF0zKTE8WGwz5m12pnGZ7FgtP+ewIdp8Re3URQDctDR8SchtCwJAiWFJd9nJiAH9 8Q== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0b-001b2d01.pphosted.com (PPS) with ESMTPS id 3j09eqhk34-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT)
+        for <kvm@vger.kernel.org>; Tue, 16 Aug 2022 11:29:56 +0000
+Received: from m0098420.ppops.net (m0098420.ppops.net [127.0.0.1])
+        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 27GAUKwT029919
+        for <kvm@vger.kernel.org>; Tue, 16 Aug 2022 11:29:56 GMT
+Received: from ppma04ams.nl.ibm.com (63.31.33a9.ip4.static.sl-reverse.com [169.51.49.99])
+        by mx0b-001b2d01.pphosted.com (PPS) with ESMTPS id 3j09eqhk2m-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Tue, 16 Aug 2022 11:29:56 +0000
+Received: from pps.filterd (ppma04ams.nl.ibm.com [127.0.0.1])
+        by ppma04ams.nl.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 27GBKShU020321;
+        Tue, 16 Aug 2022 11:29:54 GMT
+Received: from b06cxnps3074.portsmouth.uk.ibm.com (d06relay09.portsmouth.uk.ibm.com [9.149.109.194])
+        by ppma04ams.nl.ibm.com with ESMTP id 3hx3k9b4km-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Tue, 16 Aug 2022 11:29:54 +0000
+Received: from d06av21.portsmouth.uk.ibm.com (d06av21.portsmouth.uk.ibm.com [9.149.105.232])
+        by b06cxnps3074.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 27GBTpjN28508596
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Tue, 16 Aug 2022 11:29:51 GMT
+Received: from d06av21.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 72B815204F;
+        Tue, 16 Aug 2022 11:29:51 +0000 (GMT)
+Received: from li-ca45c2cc-336f-11b2-a85c-c6e71de567f1.ibm.com (unknown [9.171.69.74])
+        by d06av21.portsmouth.uk.ibm.com (Postfix) with ESMTP id 07E685204E;
+        Tue, 16 Aug 2022 11:29:50 +0000 (GMT)
+Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 2.84 on 10.11.54.2
-X-Spam-Status: No, score=-2.8 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,
-        SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham
-        autolearn_force=no version=3.4.6
+Content-Transfer-Encoding: quoted-printable
+In-Reply-To: <20220812112912.3cd788f0@p-imbrenda>
+References: <20220812062151.1980937-1-nrb@linux.ibm.com> <20220812062151.1980937-4-nrb@linux.ibm.com> <20220812112912.3cd788f0@p-imbrenda>
+Cc:     kvm@vger.kernel.org, frankja@linux.ibm.com, thuth@redhat.com
+To:     Claudio Imbrenda <imbrenda@linux.ibm.com>
+Subject: Re: [kvm-unit-tests PATCH v4 3/4] s390x: add extint loop test
+From:   Nico Boehr <nrb@linux.ibm.com>
+Message-ID: <166064938984.58462.5303740579121882308@localhost.localdomain>
+User-Agent: alot/0.8.1
+Date:   Tue, 16 Aug 2022 13:29:49 +0200
+X-TM-AS-GCONF: 00
+X-Proofpoint-ORIG-GUID: Par0oH9PuO6KblCbqzDWT4IQwUG50Y3Q
+X-Proofpoint-GUID: PvZTOvrMGhfYfhakQSXvNg5dY_CpjZAE
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.205,Aquarius:18.0.883,Hydra:6.0.517,FMLib:17.11.122.1
+ definitions=2022-08-16_07,2022-08-16_02,2022-06-22_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 bulkscore=0 phishscore=0
+ malwarescore=0 priorityscore=1501 lowpriorityscore=0 clxscore=1015
+ impostorscore=0 spamscore=0 suspectscore=0 mlxscore=0 mlxlogscore=947
+ adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2207270000 definitions=main-2208160041
+X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_EF,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_PASS,
+        T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Instead of sending a single ioctl every time ->region_* or ->log_*
-callbacks are called, "queue" all memory regions in a list that will
-be emptied only when committing.
+Quoting Claudio Imbrenda (2022-08-12 11:29:12)
+> On Fri, 12 Aug 2022 08:21:50 +0200
+> Nico Boehr <nrb@linux.ibm.com> wrote:
+[...]
+> > diff --git a/s390x/panic-loop-extint.c b/s390x/panic-loop-extint.c
+> > new file mode 100644
+> > index 000000000000..79d3f84a89ff
+[...]
+> > +int main(void)
+> > +{
+> > +     report_prefix_push("panic-loop-extint");
+> > +
+> > +     if (!host_is_qemu() || host_is_tcg()) {
+> > +             report_skip("QEMU-KVM-only test");
+> > +             goto out;
+> > +     }
+> > +
+> > +     expect_ext_int();
+> > +     lowcore.ext_new_psw.mask |=3D PSW_MASK_EXT;
+> > +
+> > +     load_psw_mask(extract_psw_mask() | PSW_MASK_EXT);
+>=20
+> you can use the recently introduced psw_mask_set_bits(PSW_MASK_EXT)
 
-This allow the KVM kernel API to be extended and support multiple
-memslots updates in a single call.
-
-Signed-off-by: Emanuele Giuseppe Esposito <eesposit@redhat.com>
----
- accel/kvm/kvm-all.c       | 99 ++++++++++++++++++++++++++++-----------
- include/sysemu/kvm_int.h  |  6 +++
- linux-headers/linux/kvm.h |  9 ++++
- 3 files changed, 87 insertions(+), 27 deletions(-)
-
-diff --git a/accel/kvm/kvm-all.c b/accel/kvm/kvm-all.c
-index 645f0a249a..3afa46b2ef 100644
---- a/accel/kvm/kvm-all.c
-+++ b/accel/kvm/kvm-all.c
-@@ -357,39 +357,40 @@ int kvm_physical_memory_addr_from_host(KVMState *s, void *ram,
-     return ret;
- }
- 
-+static void kvm_memory_region_node_add(KVMMemoryListener *kml,
-+                                       struct kvm_userspace_memory_region *mem)
-+{
-+    MemoryRegionNode *node;
-+
-+    node = g_malloc(sizeof(MemoryRegionNode));
-+    *node = (MemoryRegionNode) {
-+        .mem = mem,
-+    };
-+    QTAILQ_INSERT_TAIL(&kml->mem_list, node, list);
-+}
-+
- static int kvm_set_user_memory_region(KVMMemoryListener *kml, KVMSlot *slot, bool new)
- {
--    KVMState *s = kvm_state;
--    struct kvm_userspace_memory_region mem;
--    int ret;
-+    struct kvm_userspace_memory_region *mem;
- 
--    mem.slot = slot->slot | (kml->as_id << 16);
--    mem.guest_phys_addr = slot->start_addr;
--    mem.userspace_addr = (unsigned long)slot->ram;
--    mem.flags = slot->flags;
-+    mem = g_malloc(sizeof(struct kvm_userspace_memory_region));
- 
--    if (slot->memory_size && !new && (mem.flags ^ slot->old_flags) & KVM_MEM_READONLY) {
-+    mem->slot = slot->slot | (kml->as_id << 16);
-+    mem->guest_phys_addr = slot->start_addr;
-+    mem->userspace_addr = (unsigned long)slot->ram;
-+    mem->flags = slot->flags;
-+
-+    if (slot->memory_size && !new && (mem->flags ^ slot->old_flags) &
-+        KVM_MEM_READONLY) {
-         /* Set the slot size to 0 before setting the slot to the desired
-          * value. This is needed based on KVM commit 75d61fbc. */
--        mem.memory_size = 0;
--        ret = kvm_vm_ioctl(s, KVM_SET_USER_MEMORY_REGION, &mem);
--        if (ret < 0) {
--            goto err;
--        }
--    }
--    mem.memory_size = slot->memory_size;
--    ret = kvm_vm_ioctl(s, KVM_SET_USER_MEMORY_REGION, &mem);
--    slot->old_flags = mem.flags;
--err:
--    trace_kvm_set_user_memory(mem.slot, mem.flags, mem.guest_phys_addr,
--                              mem.memory_size, mem.userspace_addr, ret);
--    if (ret < 0) {
--        error_report("%s: KVM_SET_USER_MEMORY_REGION failed, slot=%d,"
--                     " start=0x%" PRIx64 ", size=0x%" PRIx64 ": %s",
--                     __func__, mem.slot, slot->start_addr,
--                     (uint64_t)mem.memory_size, strerror(errno));
-+        mem->memory_size = 0;
-+        kvm_memory_region_node_add(kml, mem);
-     }
--    return ret;
-+    mem->memory_size = slot->memory_size;
-+    kvm_memory_region_node_add(kml, mem);
-+    slot->old_flags = mem->flags;
-+    return 0;
- }
- 
- static int do_kvm_destroy_vcpu(CPUState *cpu)
-@@ -1517,12 +1518,52 @@ static void kvm_region_add(MemoryListener *listener,
- static void kvm_region_del(MemoryListener *listener,
-                            MemoryRegionSection *section)
- {
--    KVMMemoryListener *kml = container_of(listener, KVMMemoryListener, listener);
-+    KVMMemoryListener *kml = container_of(listener, KVMMemoryListener,
-+                                          listener);
- 
-     kvm_set_phys_mem(kml, section, false);
-     memory_region_unref(section->mr);
- }
- 
-+static void kvm_begin(MemoryListener *listener)
-+{
-+    KVMMemoryListener *kml = container_of(listener, KVMMemoryListener,
-+                                          listener);
-+    assert(QTAILQ_EMPTY(&kml->mem_list));
-+}
-+
-+static void kvm_commit(MemoryListener *listener)
-+{
-+    KVMMemoryListener *kml = container_of(listener, KVMMemoryListener,
-+                                          listener);
-+    MemoryRegionNode *node, *next;
-+    KVMState *s = kvm_state;
-+
-+    QTAILQ_FOREACH_SAFE(node, &kml->mem_list, list, next) {
-+        struct kvm_userspace_memory_region *mem = node->mem;
-+        int ret;
-+
-+        ret = kvm_vm_ioctl(s, KVM_SET_USER_MEMORY_REGION, mem);
-+
-+        trace_kvm_set_user_memory(mem->slot, mem->flags, mem->guest_phys_addr,
-+                                  mem->memory_size, mem->userspace_addr, 0);
-+
-+        if (ret < 0) {
-+            error_report("%s: KVM_SET_USER_MEMORY_REGION failed, slot=%d,"
-+                         " start=0x%" PRIx64 ": %s",
-+                         __func__, mem->slot,
-+                         (uint64_t)mem->memory_size, strerror(errno));
-+        }
-+
-+        QTAILQ_REMOVE(&kml->mem_list, node, list);
-+        g_free(mem);
-+        g_free(node);
-+    }
-+
-+
-+
-+}
-+
- static void kvm_log_sync(MemoryListener *listener,
-                          MemoryRegionSection *section)
- {
-@@ -1664,8 +1705,12 @@ void kvm_memory_listener_register(KVMState *s, KVMMemoryListener *kml,
-         kml->slots[i].slot = i;
-     }
- 
-+    QTAILQ_INIT(&kml->mem_list);
-+
-     kml->listener.region_add = kvm_region_add;
-     kml->listener.region_del = kvm_region_del;
-+    kml->listener.begin = kvm_begin;
-+    kml->listener.commit = kvm_commit;
-     kml->listener.log_start = kvm_log_start;
-     kml->listener.log_stop = kvm_log_stop;
-     kml->listener.priority = 10;
-diff --git a/include/sysemu/kvm_int.h b/include/sysemu/kvm_int.h
-index 1f5487d9b7..eab8598007 100644
---- a/include/sysemu/kvm_int.h
-+++ b/include/sysemu/kvm_int.h
-@@ -30,9 +30,15 @@ typedef struct KVMSlot
-     ram_addr_t ram_start_offset;
- } KVMSlot;
- 
-+typedef struct MemoryRegionNode {
-+    struct kvm_userspace_memory_region *mem;
-+    QTAILQ_ENTRY(MemoryRegionNode) list;
-+} MemoryRegionNode;
-+
- typedef struct KVMMemoryListener {
-     MemoryListener listener;
-     KVMSlot *slots;
-+    QTAILQ_HEAD(, MemoryRegionNode) mem_list;
-     int as_id;
- } KVMMemoryListener;
- 
-diff --git a/linux-headers/linux/kvm.h b/linux-headers/linux/kvm.h
-index f089349149..f215efdaa8 100644
---- a/linux-headers/linux/kvm.h
-+++ b/linux-headers/linux/kvm.h
-@@ -103,6 +103,13 @@ struct kvm_userspace_memory_region {
- 	__u64 userspace_addr; /* start of the userspace allocated memory */
- };
- 
-+/* for KVM_SET_USER_MEMORY_REGION_LIST */
-+struct kvm_userspace_memory_region_list {
-+	__u32 nent;
-+	__u32 flags;
-+	struct kvm_userspace_memory_region entries[0];
-+};
-+
- /*
-  * The bit 0 ~ bit 15 of kvm_memory_region::flags are visible for userspace,
-  * other bits are reserved for kvm internal use which are defined in
-@@ -1426,6 +1433,8 @@ struct kvm_vfio_spapr_tce {
- 					struct kvm_userspace_memory_region)
- #define KVM_SET_TSS_ADDR          _IO(KVMIO,   0x47)
- #define KVM_SET_IDENTITY_MAP_ADDR _IOW(KVMIO,  0x48, __u64)
-+#define KVM_SET_USER_MEMORY_REGION_LIST _IOW(KVMIO, 0x49, \
-+					struct kvm_userspace_memory_region_list)
- 
- /* enable ucontrol for s390 */
- struct kvm_s390_ucas_mapping {
--- 
-2.31.1
-
+Done thanks.
