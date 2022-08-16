@@ -2,24 +2,24 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id DD8D1596125
-	for <lists+kvm@lfdr.de>; Tue, 16 Aug 2022 19:29:26 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 65AEE59611E
+	for <lists+kvm@lfdr.de>; Tue, 16 Aug 2022 19:29:24 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236356AbiHPR2m (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 16 Aug 2022 13:28:42 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58006 "EHLO
+        id S236272AbiHPR2k (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 16 Aug 2022 13:28:40 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58222 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235928AbiHPR2S (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 16 Aug 2022 13:28:18 -0400
+        with ESMTP id S235770AbiHPR2U (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 16 Aug 2022 13:28:20 -0400
 Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id E642262C2;
-        Tue, 16 Aug 2022 10:28:15 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 3EB06639B;
+        Tue, 16 Aug 2022 10:28:18 -0700 (PDT)
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 819F71424;
-        Tue, 16 Aug 2022 10:28:16 -0700 (PDT)
+        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id C8EBE153B;
+        Tue, 16 Aug 2022 10:28:18 -0700 (PDT)
 Received: from e121345-lin.cambridge.arm.com (e121345-lin.cambridge.arm.com [10.1.196.40])
-        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPA id 9C2373F67D;
-        Tue, 16 Aug 2022 10:28:13 -0700 (PDT)
+        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPA id E39B33F67D;
+        Tue, 16 Aug 2022 10:28:15 -0700 (PDT)
 From:   Robin Murphy <robin.murphy@arm.com>
 To:     joro@8bytes.org
 Cc:     will@kernel.org, catalin.marinas@arm.com, jean-philippe@linaro.org,
@@ -29,9 +29,9 @@ Cc:     will@kernel.org, catalin.marinas@arm.com, jean-philippe@linaro.org,
         iommu@lists.linux.dev, linux-arm-kernel@lists.infradead.org,
         linux-acpi@vger.kernel.org, dri-devel@lists.freedesktop.org,
         linux-kernel@vger.kernel.org, kvm@vger.kernel.org
-Subject: [PATCH 2/3] iommu/dma: Move public interfaces to linux/iommu.h
-Date:   Tue, 16 Aug 2022 18:28:04 +0100
-Message-Id: <9cd99738f52094e6bed44bfee03fa4f288d20695.1660668998.git.robin.murphy@arm.com>
+Subject: [PATCH 3/3] iommu/dma: Make header private
+Date:   Tue, 16 Aug 2022 18:28:05 +0100
+Message-Id: <b237e06c56a101f77af142a54b629b27aa179d22.1660668998.git.robin.murphy@arm.com>
 X-Mailer: git-send-email 2.36.1.dirty
 In-Reply-To: <cover.1660668998.git.robin.murphy@arm.com>
 References: <cover.1660668998.git.robin.murphy@arm.com>
@@ -46,269 +46,264 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-The iommu-dma layer is now mostly encapsulated by iommu_dma_ops, with
-only a couple more public interfaces left pertaining to MSI integration.
-Since these depend on the main IOMMU API header anyway, move their
-declarations there, taking the opportunity to update the half-baked
-comments to proper kerneldoc along the way.
+Now that dma-iommu.h only contains internal interfaces, make it
+private to the IOMMU subsytem.
 
 Signed-off-by: Robin Murphy <robin.murphy@arm.com>
 ---
+ drivers/acpi/viot.c                          |  1 -
+ drivers/gpu/drm/exynos/exynos_drm_dma.c      |  1 -
+ drivers/iommu/amd/iommu.c                    |  2 +-
+ drivers/iommu/apple-dart.c                   |  3 ++-
+ drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3.c  |  2 +-
+ drivers/iommu/arm/arm-smmu/arm-smmu.c        |  2 +-
+ drivers/iommu/dma-iommu.c                    |  3 ++-
+ {include/linux => drivers/iommu}/dma-iommu.h | 17 +----------------
+ drivers/iommu/intel/iommu.c                  |  2 +-
+ drivers/iommu/iommu.c                        |  3 ++-
+ drivers/iommu/virtio-iommu.c                 |  3 ++-
+ 11 files changed, 13 insertions(+), 26 deletions(-)
+ rename {include/linux => drivers/iommu}/dma-iommu.h (67%)
 
-Note that iommu_setup_dma_ops() should also become internal in a future
-phase of the great IOMMU API upheaval - for now as the last bit of true
-arch code glue I consider it more "necessarily exposed" than "public".
-
- arch/arm64/mm/dma-mapping.c       |  2 +-
- drivers/iommu/dma-iommu.c         | 15 ++++++++++--
- drivers/irqchip/irq-gic-v2m.c     |  2 +-
- drivers/irqchip/irq-gic-v3-its.c  |  2 +-
- drivers/irqchip/irq-gic-v3-mbi.c  |  2 +-
- drivers/irqchip/irq-ls-scfg-msi.c |  2 +-
- drivers/vfio/vfio_iommu_type1.c   |  1 -
- include/linux/dma-iommu.h         | 40 -------------------------------
- include/linux/iommu.h             | 36 ++++++++++++++++++++++++++++
- 9 files changed, 54 insertions(+), 48 deletions(-)
-
-diff --git a/arch/arm64/mm/dma-mapping.c b/arch/arm64/mm/dma-mapping.c
-index 599cf81f5685..7d7e9a046305 100644
---- a/arch/arm64/mm/dma-mapping.c
-+++ b/arch/arm64/mm/dma-mapping.c
-@@ -7,7 +7,7 @@
- #include <linux/gfp.h>
- #include <linux/cache.h>
+diff --git a/drivers/acpi/viot.c b/drivers/acpi/viot.c
+index 6132092dab2a..ed752cbbe636 100644
+--- a/drivers/acpi/viot.c
++++ b/drivers/acpi/viot.c
+@@ -19,7 +19,6 @@
+ #define pr_fmt(fmt) "ACPI: VIOT: " fmt
+ 
+ #include <linux/acpi_viot.h>
+-#include <linux/dma-iommu.h>
+ #include <linux/fwnode.h>
+ #include <linux/iommu.h>
+ #include <linux/list.h>
+diff --git a/drivers/gpu/drm/exynos/exynos_drm_dma.c b/drivers/gpu/drm/exynos/exynos_drm_dma.c
+index d819ee69dfb7..7012aa8ed4c6 100644
+--- a/drivers/gpu/drm/exynos/exynos_drm_dma.c
++++ b/drivers/gpu/drm/exynos/exynos_drm_dma.c
+@@ -4,7 +4,6 @@
+ // Author: Inki Dae <inki.dae@samsung.com>
+ // Author: Andrzej Hajda <a.hajda@samsung.com>
+ 
+-#include <linux/dma-iommu.h>
  #include <linux/dma-map-ops.h>
+ #include <linux/iommu.h>
+ #include <linux/platform_device.h>
+diff --git a/drivers/iommu/amd/iommu.c b/drivers/iommu/amd/iommu.c
+index 2df1bfa884e5..b339bf13259d 100644
+--- a/drivers/iommu/amd/iommu.c
++++ b/drivers/iommu/amd/iommu.c
+@@ -18,7 +18,6 @@
+ #include <linux/scatterlist.h>
+ #include <linux/dma-map-ops.h>
+ #include <linux/dma-direct.h>
 -#include <linux/dma-iommu.h>
-+#include <linux/iommu.h>
- #include <xen/xen.h>
+ #include <linux/iommu-helper.h>
+ #include <linux/delay.h>
+ #include <linux/amd-iommu.h>
+@@ -40,6 +39,7 @@
+ #include <asm/dma.h>
  
- #include <asm/cacheflush.h>
-diff --git a/drivers/iommu/dma-iommu.c b/drivers/iommu/dma-iommu.c
-index 17dd683b2fce..6809b33ac9df 100644
---- a/drivers/iommu/dma-iommu.c
-+++ b/drivers/iommu/dma-iommu.c
-@@ -1633,6 +1633,13 @@ static struct iommu_dma_msi_page *iommu_dma_get_msi_page(struct device *dev,
- 	return NULL;
- }
+ #include "amd_iommu.h"
++#include "../dma-iommu.h"
+ #include "../irq_remapping.h"
  
-+/**
-+ * iommu_dma_prepare_msi() - Map the MSI page in the IOMMU domain
-+ * @desc: MSI descriptor, will store the MSI page
-+ * @msi_addr: MSI target address to be mapped
-+ *
-+ * Return: 0 on success or negative error code if the mapping failed.
-+ */
- int iommu_dma_prepare_msi(struct msi_desc *desc, phys_addr_t msi_addr)
- {
- 	struct device *dev = msi_desc_to_dev(desc);
-@@ -1661,8 +1668,12 @@ int iommu_dma_prepare_msi(struct msi_desc *desc, phys_addr_t msi_addr)
- 	return 0;
- }
- 
--void iommu_dma_compose_msi_msg(struct msi_desc *desc,
--			       struct msi_msg *msg)
-+/**
-+ * iommu_dma_compose_msi_msg() - Apply translation to an MSI message
-+ * @desc: MSI descriptor prepared by iommu_dma_prepare_msi()
-+ * @msg: MSI message containing target physical address
-+ */
-+void iommu_dma_compose_msi_msg(struct msi_desc *desc, struct msi_msg *msg)
- {
- 	struct device *dev = msi_desc_to_dev(desc);
- 	const struct iommu_domain *domain = iommu_get_domain_for_dev(dev);
-diff --git a/drivers/irqchip/irq-gic-v2m.c b/drivers/irqchip/irq-gic-v2m.c
-index b249d4df899e..6e1ac330d7a6 100644
---- a/drivers/irqchip/irq-gic-v2m.c
-+++ b/drivers/irqchip/irq-gic-v2m.c
-@@ -13,7 +13,7 @@
- #define pr_fmt(fmt) "GICv2m: " fmt
- 
- #include <linux/acpi.h>
+ #define CMD_SET_TYPE(cmd, t) ((cmd)->data[1] |= ((t) << 28))
+diff --git a/drivers/iommu/apple-dart.c b/drivers/iommu/apple-dart.c
+index ed6b5fa538af..716f34a768b1 100644
+--- a/drivers/iommu/apple-dart.c
++++ b/drivers/iommu/apple-dart.c
+@@ -15,7 +15,6 @@
+ #include <linux/bitfield.h>
+ #include <linux/clk.h>
+ #include <linux/dev_printk.h>
 -#include <linux/dma-iommu.h>
-+#include <linux/iommu.h>
- #include <linux/irq.h>
- #include <linux/irqdomain.h>
- #include <linux/kernel.h>
-diff --git a/drivers/irqchip/irq-gic-v3-its.c b/drivers/irqchip/irq-gic-v3-its.c
-index 5ff09de6c48f..e7d8d4208ee6 100644
---- a/drivers/irqchip/irq-gic-v3-its.c
-+++ b/drivers/irqchip/irq-gic-v3-its.c
-@@ -11,9 +11,9 @@
- #include <linux/cpu.h>
+ #include <linux/dma-mapping.h>
+ #include <linux/err.h>
+ #include <linux/interrupt.h>
+@@ -33,6 +32,8 @@
+ #include <linux/swab.h>
+ #include <linux/types.h>
+ 
++#include "dma-iommu.h"
++
+ #define DART_MAX_STREAMS 16
+ #define DART_MAX_TTBR 4
+ #define MAX_DARTS_PER_DEVICE 2
+diff --git a/drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3.c b/drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3.c
+index c13b46a15dcb..f1785e518a90 100644
+--- a/drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3.c
++++ b/drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3.c
+@@ -14,7 +14,6 @@
+ #include <linux/bitops.h>
  #include <linux/crash_dump.h>
  #include <linux/delay.h>
 -#include <linux/dma-iommu.h>
- #include <linux/efi.h>
+ #include <linux/err.h>
  #include <linux/interrupt.h>
-+#include <linux/iommu.h>
- #include <linux/iopoll.h>
- #include <linux/irqdomain.h>
- #include <linux/list.h>
-diff --git a/drivers/irqchip/irq-gic-v3-mbi.c b/drivers/irqchip/irq-gic-v3-mbi.c
-index a2163d32f17d..e1efdec9e9ac 100644
---- a/drivers/irqchip/irq-gic-v3-mbi.c
-+++ b/drivers/irqchip/irq-gic-v3-mbi.c
-@@ -6,7 +6,7 @@
+ #include <linux/io-pgtable.h>
+@@ -29,6 +28,7 @@
+ #include <linux/platform_device.h>
  
- #define pr_fmt(fmt) "GICv3: " fmt
+ #include "arm-smmu-v3.h"
++#include "../../dma-iommu.h"
+ #include "../../iommu-sva-lib.h"
  
+ static bool disable_bypass = true;
+diff --git a/drivers/iommu/arm/arm-smmu/arm-smmu.c b/drivers/iommu/arm/arm-smmu/arm-smmu.c
+index 2cece34f4824..c30f82c19240 100644
+--- a/drivers/iommu/arm/arm-smmu/arm-smmu.c
++++ b/drivers/iommu/arm/arm-smmu/arm-smmu.c
+@@ -21,7 +21,6 @@
+ #include <linux/acpi_iort.h>
+ #include <linux/bitfield.h>
+ #include <linux/delay.h>
 -#include <linux/dma-iommu.h>
-+#include <linux/iommu.h>
- #include <linux/irq.h>
- #include <linux/irqdomain.h>
- #include <linux/kernel.h>
-diff --git a/drivers/irqchip/irq-ls-scfg-msi.c b/drivers/irqchip/irq-ls-scfg-msi.c
-index b4927e425f7b..527c90e0920e 100644
---- a/drivers/irqchip/irq-ls-scfg-msi.c
-+++ b/drivers/irqchip/irq-ls-scfg-msi.c
-@@ -11,6 +11,7 @@
- #include <linux/module.h>
- #include <linux/msi.h>
+ #include <linux/dma-mapping.h>
+ #include <linux/err.h>
  #include <linux/interrupt.h>
-+#include <linux/iommu.h>
- #include <linux/irq.h>
- #include <linux/irqchip/chained_irq.h>
- #include <linux/irqdomain.h>
-@@ -18,7 +19,6 @@
- #include <linux/of_pci.h>
- #include <linux/of_platform.h>
- #include <linux/spinlock.h>
--#include <linux/dma-iommu.h>
+@@ -40,6 +39,7 @@
+ #include <linux/fsl/mc.h>
  
- #define MSI_IRQS_PER_MSIR	32
- #define MSI_MSIR_OFFSET		4
-diff --git a/drivers/vfio/vfio_iommu_type1.c b/drivers/vfio/vfio_iommu_type1.c
-index c766aa683110..e65861fdba7b 100644
---- a/drivers/vfio/vfio_iommu_type1.c
-+++ b/drivers/vfio/vfio_iommu_type1.c
-@@ -37,7 +37,6 @@
- #include <linux/vfio.h>
- #include <linux/workqueue.h>
- #include <linux/notifier.h>
--#include <linux/dma-iommu.h>
- #include <linux/irqdomain.h>
- #include "vfio.h"
+ #include "arm-smmu.h"
++#include "../../dma-iommu.h"
  
-diff --git a/include/linux/dma-iommu.h b/include/linux/dma-iommu.h
-index 24607dc3c2ac..e83de4f1f3d6 100644
+ /*
+  * Apparently, some Qualcomm arm64 platforms which appear to expose their SMMU
+diff --git a/drivers/iommu/dma-iommu.c b/drivers/iommu/dma-iommu.c
+index 6809b33ac9df..9297b741f5e8 100644
+--- a/drivers/iommu/dma-iommu.c
++++ b/drivers/iommu/dma-iommu.c
+@@ -13,7 +13,6 @@
+ #include <linux/crash_dump.h>
+ #include <linux/device.h>
+ #include <linux/dma-direct.h>
+-#include <linux/dma-iommu.h>
+ #include <linux/dma-map-ops.h>
+ #include <linux/gfp.h>
+ #include <linux/huge_mm.h>
+@@ -30,6 +29,8 @@
+ #include <linux/swiotlb.h>
+ #include <linux/vmalloc.h>
+ 
++#include "dma-iommu.h"
++
+ struct iommu_dma_msi_page {
+ 	struct list_head	list;
+ 	dma_addr_t		iova;
+diff --git a/include/linux/dma-iommu.h b/drivers/iommu/dma-iommu.h
+similarity index 67%
+rename from include/linux/dma-iommu.h
+rename to drivers/iommu/dma-iommu.h
+index e83de4f1f3d6..c6d0235feb6e 100644
 --- a/include/linux/dma-iommu.h
-+++ b/include/linux/dma-iommu.h
-@@ -15,27 +15,10 @@
++++ b/drivers/iommu/dma-iommu.h
+@@ -5,15 +5,10 @@
+ #ifndef __DMA_IOMMU_H
+ #define __DMA_IOMMU_H
  
- /* Domain management interface for IOMMU drivers */
+-#include <linux/errno.h>
+-#include <linux/types.h>
++#include <linux/iommu.h>
+ 
+ #ifdef CONFIG_IOMMU_DMA
+-#include <linux/dma-mapping.h>
+-#include <linux/iommu.h>
+-#include <linux/msi.h>
+ 
+-/* Domain management interface for IOMMU drivers */
  int iommu_get_dma_cookie(struct iommu_domain *domain);
--int iommu_get_msi_cookie(struct iommu_domain *domain, dma_addr_t base);
  void iommu_put_dma_cookie(struct iommu_domain *domain);
  
--/* Setup call for arch DMA mapping code */
--void iommu_setup_dma_ops(struct device *dev, u64 dma_base, u64 dma_limit);
- int iommu_dma_init_fq(struct iommu_domain *domain);
+@@ -21,16 +16,10 @@ int iommu_dma_init_fq(struct iommu_domain *domain);
  
--/* The DMA API isn't _quite_ the whole story, though... */
--/*
-- * iommu_dma_prepare_msi() - Map the MSI page in the IOMMU device
-- *
-- * The MSI page will be stored in @desc.
-- *
-- * Return: 0 on success otherwise an error describing the failure.
-- */
--int iommu_dma_prepare_msi(struct msi_desc *desc, phys_addr_t msi_addr);
--
--/* Update the MSI message if required. */
--void iommu_dma_compose_msi_msg(struct msi_desc *desc,
--			       struct msi_msg *msg);
--
  void iommu_dma_get_resv_regions(struct device *dev, struct list_head *list);
  
- void iommu_dma_free_cpu_cached_iovas(unsigned int cpu,
-@@ -46,15 +29,8 @@ extern bool iommu_dma_forcedac;
+-void iommu_dma_free_cpu_cached_iovas(unsigned int cpu,
+-		struct iommu_domain *domain);
+-
+ extern bool iommu_dma_forcedac;
+ 
  #else /* CONFIG_IOMMU_DMA */
  
- struct iommu_domain;
--struct msi_desc;
--struct msi_msg;
- struct device;
- 
--static inline void iommu_setup_dma_ops(struct device *dev, u64 dma_base,
--				       u64 dma_limit)
--{
--}
+-struct iommu_domain;
+-struct device;
 -
  static inline int iommu_dma_init_fq(struct iommu_domain *domain)
  {
  	return -EINVAL;
-@@ -65,26 +41,10 @@ static inline int iommu_get_dma_cookie(struct iommu_domain *domain)
- 	return -ENODEV;
- }
- 
--static inline int iommu_get_msi_cookie(struct iommu_domain *domain, dma_addr_t base)
--{
--	return -ENODEV;
--}
--
- static inline void iommu_put_dma_cookie(struct iommu_domain *domain)
+@@ -45,9 +34,5 @@ static inline void iommu_put_dma_cookie(struct iommu_domain *domain)
  {
  }
  
--static inline int iommu_dma_prepare_msi(struct msi_desc *desc,
--					phys_addr_t msi_addr)
--{
--	return 0;
--}
--
--static inline void iommu_dma_compose_msi_msg(struct msi_desc *desc,
--					     struct msi_msg *msg)
+-static inline void iommu_dma_get_resv_regions(struct device *dev, struct list_head *list)
 -{
 -}
 -
- static inline void iommu_dma_get_resv_regions(struct device *dev, struct list_head *list)
- {
- }
-diff --git a/include/linux/iommu.h b/include/linux/iommu.h
-index 70393fbb57ed..79cb6eb560a8 100644
---- a/include/linux/iommu.h
-+++ b/include/linux/iommu.h
-@@ -1059,4 +1059,40 @@ void iommu_debugfs_setup(void);
- static inline void iommu_debugfs_setup(void) {}
- #endif
+ #endif	/* CONFIG_IOMMU_DMA */
+ #endif	/* __DMA_IOMMU_H */
+diff --git a/drivers/iommu/intel/iommu.c b/drivers/iommu/intel/iommu.c
+index 9441c070c811..4375d1ee9389 100644
+--- a/drivers/iommu/intel/iommu.c
++++ b/drivers/iommu/intel/iommu.c
+@@ -15,7 +15,6 @@
  
-+#ifdef CONFIG_IOMMU_DMA
-+#include <linux/msi.h>
+ #include <linux/crash_dump.h>
+ #include <linux/dma-direct.h>
+-#include <linux/dma-iommu.h>
+ #include <linux/dmi.h>
+ #include <linux/intel-svm.h>
+ #include <linux/memory.h>
+@@ -26,6 +25,7 @@
+ #include <linux/tboot.h>
+ 
+ #include "iommu.h"
++#include "../dma-iommu.h"
+ #include "../irq_remapping.h"
+ #include "../iommu-sva-lib.h"
+ #include "pasid.h"
+diff --git a/drivers/iommu/iommu.c b/drivers/iommu/iommu.c
+index 07eda7c41aee..862d4e73efd2 100644
+--- a/drivers/iommu/iommu.c
++++ b/drivers/iommu/iommu.c
+@@ -8,7 +8,6 @@
+ 
+ #include <linux/amba/bus.h>
+ #include <linux/device.h>
+-#include <linux/dma-iommu.h>
+ #include <linux/kernel.h>
+ #include <linux/bits.h>
+ #include <linux/bug.h>
+@@ -30,6 +29,8 @@
+ #include <linux/cc_platform.h>
+ #include <trace/events/iommu.h>
+ 
++#include "dma-iommu.h"
 +
-+/* Setup call for arch DMA mapping code */
-+void iommu_setup_dma_ops(struct device *dev, u64 dma_base, u64 dma_limit);
+ static struct kset *iommu_group_kset;
+ static DEFINE_IDA(iommu_group_ida);
+ 
+diff --git a/drivers/iommu/virtio-iommu.c b/drivers/iommu/virtio-iommu.c
+index bdae3939260a..e355cb5d1e5b 100644
+--- a/drivers/iommu/virtio-iommu.c
++++ b/drivers/iommu/virtio-iommu.c
+@@ -8,7 +8,6 @@
+ #define pr_fmt(fmt) KBUILD_MODNAME ": " fmt
+ 
+ #include <linux/delay.h>
+-#include <linux/dma-iommu.h>
+ #include <linux/dma-map-ops.h>
+ #include <linux/freezer.h>
+ #include <linux/interval_tree.h>
+@@ -23,6 +22,8 @@
+ 
+ #include <uapi/linux/virtio_iommu.h>
+ 
++#include "dma-iommu.h"
 +
-+int iommu_get_msi_cookie(struct iommu_domain *domain, dma_addr_t base);
-+
-+int iommu_dma_prepare_msi(struct msi_desc *desc, phys_addr_t msi_addr);
-+void iommu_dma_compose_msi_msg(struct msi_desc *desc, struct msi_msg *msg);
-+
-+#else /* CONFIG_IOMMU_DMA */
-+
-+struct msi_desc;
-+struct msi_msg;
-+
-+static inline void iommu_setup_dma_ops(struct device *dev, u64 dma_base, u64 dma_limit)
-+{
-+}
-+
-+static inline int iommu_get_msi_cookie(struct iommu_domain *domain, dma_addr_t base)
-+{
-+	return -ENODEV;
-+}
-+
-+static inline int iommu_dma_prepare_msi(struct msi_desc *desc, phys_addr_t msi_addr)
-+{
-+	return 0;
-+}
-+
-+static inline void iommu_dma_compose_msi_msg(struct msi_desc *desc, struct msi_msg *msg)
-+{
-+}
-+
-+#endif	/* CONFIG_IOMMU_DMA */
-+
- #endif /* __LINUX_IOMMU_H */
+ #define MSI_IOVA_BASE			0x8000000
+ #define MSI_IOVA_LENGTH			0x100000
+ 
 -- 
 2.36.1.dirty
 
