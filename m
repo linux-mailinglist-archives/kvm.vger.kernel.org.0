@@ -2,168 +2,100 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 75FC6595E54
-	for <lists+kvm@lfdr.de>; Tue, 16 Aug 2022 16:26:59 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 59A79595EB4
+	for <lists+kvm@lfdr.de>; Tue, 16 Aug 2022 17:03:24 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235927AbiHPO0y (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 16 Aug 2022 10:26:54 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51302 "EHLO
+        id S236082AbiHPPCz (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 16 Aug 2022 11:02:55 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54460 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235473AbiHPO0u (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 16 Aug 2022 10:26:50 -0400
-Received: from mail-pg1-x52f.google.com (mail-pg1-x52f.google.com [IPv6:2607:f8b0:4864:20::52f])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C20B2BA9DB
-        for <kvm@vger.kernel.org>; Tue, 16 Aug 2022 07:26:49 -0700 (PDT)
-Received: by mail-pg1-x52f.google.com with SMTP id 24so9376292pgr.7
-        for <kvm@vger.kernel.org>; Tue, 16 Aug 2022 07:26:49 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc;
-        bh=xxtvqSTTGpNlBZwMQ1VxRmEf46ztEqQH/d/PUohA5hw=;
-        b=qcnquCp/HtX2Qy+eSVKR4hzJlwV+nAtJDTiYlZ83QLDsUQnZD0K9ugd5JcQVpNWUNl
-         wwkFwzGMJiwXThlWLQtyDJe417YZMTXV0YeX75lZ0ZhEqvDp39juUCkSu9/tGM++X1Mp
-         cMln65RmF7IX1iZZ6hPzvZok6qVrKtfG8PVlb+QGZMclIHuBmHdpnCTwompETQVnR7af
-         wgGNTcpR6fCpAUYPilwXuBOo1F13MC+yecaBfQzbsO0EjHBwOVfj213kvYkbf47y4WMb
-         Qsh/aKQDdf1zb/e1KXnualtWLRxEq3ZRGvLx1cuWAKQaEGDambIAaX6uzKpdKEjH6PKE
-         Pkjg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc;
-        bh=xxtvqSTTGpNlBZwMQ1VxRmEf46ztEqQH/d/PUohA5hw=;
-        b=KO5sQds2hOXz/km8lNqlMObX99O3dkIxA+zSZLEtI8fQk8lg6kiEOW0LeRAWRMRNQA
-         zC+0uatWlCdkUREuzEVUtDTOmobdtLkjXnT2HwU0TtYBUuX47U98vlNvwwBrAKFABTZ+
-         f5/0dwBgtkl7xafpZ9OF/yCWyaotNfqqeYO5fl+Lg+NBKUnumqH06vAxFI0/YGHo4UyB
-         x0xeX2+mXPb0ni+ddHAPntWRvzMqjNGfZTM1iOUxVBJisD1ArG7SYA7Wge2N/5trMHJO
-         sOABtSgQRQXihV8zu1Z1DssxA2Nmu3wUO64Tc2F3LvXngfAFt3CBxaMnA43g1MCpTDYi
-         LP8w==
-X-Gm-Message-State: ACgBeo3Lrw+PIsWyz9SfPGBKRok181RfBOYBSzLrdN/+MQYAlrP0O6RT
-        GS0c5sEmcr+FC8TlPjSIx1DR+w==
-X-Google-Smtp-Source: AA6agR4WWnbzqai8APk1Xxdaooy6RcWu8SH4QdJZ5dlsXpQEdsjZwdG73cTN4oUcJZHu2CULEo5cXg==
-X-Received: by 2002:a65:4c0e:0:b0:41b:c11a:c006 with SMTP id u14-20020a654c0e000000b0041bc11ac006mr18516615pgq.299.1660660009087;
-        Tue, 16 Aug 2022 07:26:49 -0700 (PDT)
-Received: from google.com (7.104.168.34.bc.googleusercontent.com. [34.168.104.7])
-        by smtp.gmail.com with ESMTPSA id w11-20020a1709029a8b00b00168dadc7354sm9114276plp.78.2022.08.16.07.26.48
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 16 Aug 2022 07:26:48 -0700 (PDT)
-Date:   Tue, 16 Aug 2022 14:26:44 +0000
-From:   Sean Christopherson <seanjc@google.com>
-To:     Peter Gonda <pgonda@google.com>
-Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
-        marcorr@google.com, michael.roth@amd.com, thomas.lendacky@amd.com,
-        joro@8bytes.org, mizhang@google.com, pbonzini@redhat.com,
-        andrew.jones@linux.dev, vannapurve@google.com
-Subject: Re: [V3 09/11] tools: Add atomic_test_and_set_bit()
-Message-ID: <YvupJOJ38CWUDhze@google.com>
-References: <20220810152033.946942-1-pgonda@google.com>
- <20220810152033.946942-10-pgonda@google.com>
+        with ESMTP id S236050AbiHPPCi (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 16 Aug 2022 11:02:38 -0400
+Received: from smtp.smtpout.orange.fr (smtp04.smtpout.orange.fr [80.12.242.126])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6AB0B6E2D3
+        for <kvm@vger.kernel.org>; Tue, 16 Aug 2022 08:00:56 -0700 (PDT)
+Received: from [192.168.1.18] ([90.11.190.129])
+        by smtp.orange.fr with ESMTPA
+        id Ny3mo4Dd75V1hNy3moN0rt; Tue, 16 Aug 2022 17:00:51 +0200
+X-ME-Helo: [192.168.1.18]
+X-ME-Auth: Y2hyaXN0b3BoZS5qYWlsbGV0QHdhbmFkb28uZnI=
+X-ME-Date: Tue, 16 Aug 2022 17:00:51 +0200
+X-ME-IP: 90.11.190.129
+Message-ID: <db505c50-e855-5e94-1f09-173310177bda@wanadoo.fr>
+Date:   Tue, 16 Aug 2022 17:00:50 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20220810152033.946942-10-pgonda@google.com>
-X-Spam-Status: No, score=-14.4 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        ENV_AND_HDR_SPF_MATCH,FSL_HELO_FAKE,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,
-        SPF_PASS,T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL
-        autolearn=no autolearn_force=no version=3.4.6
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.11.0
+Subject: Re: [PATCH] vfio/fsl-mc: Fix a typo in a comment
+Content-Language: en-US
+To:     Jason Gunthorpe <jgg@ziepe.ca>
+Cc:     Diana Craciun <diana.craciun@oss.nxp.com>,
+        Alex Williamson <alex.williamson@redhat.com>,
+        Cornelia Huck <cohuck@redhat.com>,
+        linux-kernel@vger.kernel.org, kernel-janitors@vger.kernel.org,
+        kvm@vger.kernel.org
+References: <2b65bf8d2b4d940cafbafcede07c23c35f042f5a.1659815764.git.christophe.jaillet@wanadoo.fr>
+ <YvKJTKYv2htxM1n/@ziepe.ca>
+From:   Christophe JAILLET <christophe.jaillet@wanadoo.fr>
+In-Reply-To: <YvKJTKYv2htxM1n/@ziepe.ca>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,NICE_REPLY_A,
+        RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_PASS,
+        T_SCC_BODY_TEXT_LINE autolearn=unavailable autolearn_force=no
+        version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Aug 10, 2022, Peter Gonda wrote:
-> atomic_test_and_set_bit() allows for atomic bitmap usage from KVM
-> selftests.
+Le 09/08/2022 à 18:20, Jason Gunthorpe a écrit :
+> On Sat, Aug 06, 2022 at 09:56:13PM +0200, Christophe JAILLET wrote:
+>> L and S are swapped/
+>> s/VFIO_FLS_MC/VFIO_FSL_MC/
+>>
+>> Signed-off-by: Christophe JAILLET <christophe.jaillet@wanadoo.fr>
+>> ---
+>> All the dev_ logging functions in the file have the "VFIO_FSL_MC: "
+>> prefix.
+>> As they are dev_ function, the driver should already be displayed.
+>>
+>> So, does it make sense or could they be all removed?
+>> ---
+>>   drivers/vfio/fsl-mc/vfio_fsl_mc.c | 2 +-
+>>   1 file changed, 1 insertion(+), 1 deletion(-)
+>>
+>> diff --git a/drivers/vfio/fsl-mc/vfio_fsl_mc.c b/drivers/vfio/fsl-mc/vfio_fsl_mc.c
+>> index 3feff729f3ce..66d01db1d240 100644
+>> --- a/drivers/vfio/fsl-mc/vfio_fsl_mc.c
+>> +++ b/drivers/vfio/fsl-mc/vfio_fsl_mc.c
+>> @@ -110,7 +110,7 @@ static void vfio_fsl_mc_close_device(struct vfio_device *core_vdev)
+>>   
+>>   	if (WARN_ON(ret))
+>>   		dev_warn(&mc_cont->dev,
+>> -			 "VFIO_FLS_MC: reset device has failed (%d)\n", ret);
+>> +			 "VFIO_FSL_MC: reset device has failed (%d)\n", ret);
 > 
-> Signed-off-by: Peter Gonda <pgonda@google.com>
-> Suggested-by: Sean Christopherson <seanjc@google.com>
-> ---
->  tools/arch/x86/include/asm/atomic.h    |  7 +++++++
->  tools/include/asm-generic/atomic-gcc.h | 15 +++++++++++++++
->  2 files changed, 22 insertions(+)
+> WARN_ON already prints, this is better written as
 > 
-> diff --git a/tools/arch/x86/include/asm/atomic.h b/tools/arch/x86/include/asm/atomic.h
-> index 1f5e26aae9fc..01cc27ec4520 100644
-> --- a/tools/arch/x86/include/asm/atomic.h
-> +++ b/tools/arch/x86/include/asm/atomic.h
-> @@ -8,6 +8,7 @@
->  
->  #define LOCK_PREFIX "\n\tlock; "
->  
-> +#include <asm/asm.h>
->  #include <asm/cmpxchg.h>
->  
->  /*
-> @@ -70,4 +71,10 @@ static __always_inline int atomic_cmpxchg(atomic_t *v, int old, int new)
->  	return cmpxchg(&v->counter, old, new);
->  }
->  
-> +static inline int atomic_test_and_set_bit(long nr, unsigned long *addr)
-> +{
-> +	GEN_BINARY_RMWcc(LOCK_PREFIX __ASM_SIZE(bts), *addr, "Ir", nr, "%0", "c");
-> +
+> WARN(ret, "VFIO_FSL_MC: reset device has failed (%d)\n", ret);
 
-Unnecessary newline.
+Or maybe, just:
+if (ret)
+	dev_warn(&mc_cont->dev,
+		 "VFIO_FSL_MC: reset device has failed (%d)\n", ret);
 
-> +}
-> +
->  #endif /* _TOOLS_LINUX_ASM_X86_ATOMIC_H */
-> diff --git a/tools/include/asm-generic/atomic-gcc.h b/tools/include/asm-generic/atomic-gcc.h
-> index 4c1966f7c77a..8d9b2d1768bf 100644
-> --- a/tools/include/asm-generic/atomic-gcc.h
-> +++ b/tools/include/asm-generic/atomic-gcc.h
-> @@ -4,6 +4,7 @@
->  
->  #include <linux/compiler.h>
->  #include <linux/types.h>
-> +#include <linux/bitops.h>
->  
->  /*
->   * Atomic operations that C can't guarantee us.  Useful for
-> @@ -69,4 +70,18 @@ static inline int atomic_cmpxchg(atomic_t *v, int oldval, int newval)
->  	return cmpxchg(&(v)->counter, oldval, newval);
->  }
-> +static inline int atomic_test_and_set_bit(long nr, unsigned long *addr)
-> +{
-> +	long old, val;
-> +	unsigned long mask = BIT_MASK(nr);
-> +
-> +	addr += BIT_WORD(nr);
-> +	val = READ_ONCE(*addr);
-> +	if (val & mask)
-> +		return 1;
+This keep information about the device, avoid the duplicate printing 
+related to WARN_ON+dev_warn and is more in line with error handling in 
+other files.
 
-Probably should drop the READ_ONCE() shortcut to stay consistent with the kernel
-proper.
+Do you agree or do you prefer a v2 as you proposed with WARN()?
 
-https://lore.kernel.org/all/CAHk-=wgSNiT5qJX53RHtWECsUiFq6d6VWYNAvu71ViOEan07yw@mail.gmail.com
+CJ
 
-> +
-> +	old = cmpxchg(addr, val, val & mask);
 
-This is wrong on two fronts: 1) cmpxchg() writes the entire new value, and 2) it
-fails if the old value is not an exact match with what's in memory.  Bug #1 means
-that setting a bit will clear all existing bits, and bug #2 means that this will
-fail to set the bit if another atomic_test_and_set_bit() sneaks in between reading
-into "val" and doing the cmpxchg.
-
-And obviously dropping the READ_ONCE() above makes cmpxchg impossible (not a
-coincidence, it's simply the wrong operation to use).
-
-I believe what we want is:
-
-	unsigned long mask = BIT_MASK(nr);
-	long old;
-
-	old = __sync_fetch_and_or(addr, mask);
-	return !!(old & mask);
-
-> +	return !!(old & mask);
-> +}
-> +
->  #endif /* __TOOLS_ASM_GENERIC_ATOMIC_H */
-> -- 
-> 2.37.1.559.g78731f0fdb-goog
 > 
+> Jason
+> 
+
