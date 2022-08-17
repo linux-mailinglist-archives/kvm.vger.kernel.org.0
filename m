@@ -2,38 +2,38 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id BAE48597946
-	for <lists+kvm@lfdr.de>; Wed, 17 Aug 2022 23:50:23 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 9A2C5597936
+	for <lists+kvm@lfdr.de>; Wed, 17 Aug 2022 23:50:17 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S242344AbiHQVtp (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 17 Aug 2022 17:49:45 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50034 "EHLO
+        id S242424AbiHQVtq (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 17 Aug 2022 17:49:46 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50088 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S242445AbiHQVtV (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 17 Aug 2022 17:49:21 -0400
+        with ESMTP id S242423AbiHQVtW (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 17 Aug 2022 17:49:22 -0400
 Received: from out2.migadu.com (out2.migadu.com [IPv6:2001:41d0:2:aacc::])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C023BAE21A
-        for <kvm@vger.kernel.org>; Wed, 17 Aug 2022 14:48:49 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C7B2EAE202
+        for <kvm@vger.kernel.org>; Wed, 17 Aug 2022 14:48:51 -0700 (PDT)
 X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-        t=1660772928;
+        t=1660772930;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=lX4RR3SMgdJnHFmA8hJ49yACdkc7owKQp5XZKos5Cog=;
-        b=EY7PmS3l2jy27tiCbgBh5+OVFevkbsmEyHryaz9pIKjixUjhp9CY8+I0bndQ5uofglDPt4
-        Qu0IFVgR3OdWfU/rk4h2LxnWY99zGzmMMVGXFmWQn6LA8ieuqtEzexU2YmyJwO1WDwva2f
-        FpGqwGCJGRy+Ji6PMk8SBuEgh+kzzDQ=
+        bh=q1+71Qk5UJPK/thzL3RcNPUm9m59yCTf3g8bdBDVdHc=;
+        b=b0jbF4Cx72G60ra41BOMQjjECbp0KzamADsantcMMjFYonBPVYIs2fctQbY2Lnt7+8+JTm
+        8cxgTOXhT+LhKpjxCm0pIurP1WYCOoRuROHIuQH7Y1qUzZSm3rnQwPLFAa9DeDx7oF3Aro
+        Se16twTQM3xoKFcDP2Mf+9mhdiIm7Fw=
 From:   Oliver Upton <oliver.upton@linux.dev>
 To:     kvmarm@lists.cs.columbia.edu
 Cc:     kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
         maz@kernel.org, james.morse@arm.com, alexandru.elisei@arm.com,
         suzuki.poulose@arm.com, will@kernel.org,
         Oliver Upton <oliver.upton@linux.dev>
-Subject: [PATCH 5/6] KVM: arm64: Treat 32bit ID registers as RAZ/WI on 64bit-only system
-Date:   Wed, 17 Aug 2022 21:48:17 +0000
-Message-Id: <20220817214818.3243383-6-oliver.upton@linux.dev>
+Subject: [PATCH 6/6] KVM: selftests: Add test for RAZ/WI AArch32 ID registers
+Date:   Wed, 17 Aug 2022 21:48:18 +0000
+Message-Id: <20220817214818.3243383-7-oliver.upton@linux.dev>
 In-Reply-To: <20220817214818.3243383-1-oliver.upton@linux.dev>
 References: <20220817214818.3243383-1-oliver.upton@linux.dev>
 MIME-Version: 1.0
@@ -50,115 +50,180 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-One of the oddities of the architecture is that the AArch64 views of the
-AArch32 ID registers are UNKNOWN if AArch32 isn't implemented at any EL.
-Nonetheless, KVM exposes these registers to userspace for the sake of
-save/restore. It is possible that the UNKNOWN value could differ between
-systems, leading to a rejected write from userspace.
-
-Avoid the issue altogether by handling the AArch32 ID registers as
-RAZ/WI when on an AArch64-only system.
+Add a test to assert that KVM handles the AArch64 views of the AArch32
+ID registers as RAZ/WI (writable only from userspace).
 
 Signed-off-by: Oliver Upton <oliver.upton@linux.dev>
 ---
- arch/arm64/kvm/sys_regs.c | 63 ++++++++++++++++++++++++++-------------
- 1 file changed, 43 insertions(+), 20 deletions(-)
+ tools/testing/selftests/kvm/.gitignore        |   1 +
+ tools/testing/selftests/kvm/Makefile          |   1 +
+ .../kvm/aarch64/aarch64_only_id_regs.c        | 135 ++++++++++++++++++
+ 3 files changed, 137 insertions(+)
+ create mode 100644 tools/testing/selftests/kvm/aarch64/aarch64_only_id_regs.c
 
-diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
-index 9f06c85f26b8..5f6a633182c8 100644
---- a/arch/arm64/kvm/sys_regs.c
-+++ b/arch/arm64/kvm/sys_regs.c
-@@ -1145,6 +1145,20 @@ static unsigned int id_visibility(const struct kvm_vcpu *vcpu,
- 	return 0;
- }
+diff --git a/tools/testing/selftests/kvm/.gitignore b/tools/testing/selftests/kvm/.gitignore
+index d625a3f83780..4331af62a982 100644
+--- a/tools/testing/selftests/kvm/.gitignore
++++ b/tools/testing/selftests/kvm/.gitignore
+@@ -1,4 +1,5 @@
+ # SPDX-License-Identifier: GPL-2.0-only
++/aarch64/aarch64_only_id_regs
+ /aarch64/arch_timer
+ /aarch64/debug-exceptions
+ /aarch64/get-reg-list
+diff --git a/tools/testing/selftests/kvm/Makefile b/tools/testing/selftests/kvm/Makefile
+index 4c122f1b1737..efe155259095 100644
+--- a/tools/testing/selftests/kvm/Makefile
++++ b/tools/testing/selftests/kvm/Makefile
+@@ -144,6 +144,7 @@ TEST_GEN_PROGS_x86_64 += system_counter_offset_test
+ # Compiled outputs used by test targets
+ TEST_GEN_PROGS_EXTENDED_x86_64 += x86_64/nx_huge_pages_test
  
-+static unsigned int aa32_id_visibility(const struct kvm_vcpu *vcpu,
-+				       const struct sys_reg_desc *r)
++TEST_GEN_PROGS_aarch64 += aarch64/aarch64_only_id_regs
+ TEST_GEN_PROGS_aarch64 += aarch64/arch_timer
+ TEST_GEN_PROGS_aarch64 += aarch64/debug-exceptions
+ TEST_GEN_PROGS_aarch64 += aarch64/get-reg-list
+diff --git a/tools/testing/selftests/kvm/aarch64/aarch64_only_id_regs.c b/tools/testing/selftests/kvm/aarch64/aarch64_only_id_regs.c
+new file mode 100644
+index 000000000000..7589eb7fbb43
+--- /dev/null
++++ b/tools/testing/selftests/kvm/aarch64/aarch64_only_id_regs.c
+@@ -0,0 +1,135 @@
++// SPDX-License-Identifier: GPL-2.0-only
++/*
++ * aarch64_only_id_regs - Test for ID register behavior on AArch64-only systems
++ *
++ * Copyright (c) 2022 Google LLC.
++ *
++ * Test that KVM handles the AArch64 views of the AArch32 ID registers as RAZ
++ * and WI from userspace.
++ */
++
++#include <stdint.h>
++
++#include "kvm_util.h"
++#include "processor.h"
++#include "test_util.h"
++
++#define BAD_ID_REG_VAL	0x1badc0deul
++
++#define GUEST_ASSERT_REG_RAZ(reg)	GUEST_ASSERT_EQ(read_sysreg_s(reg), 0)
++
++static void guest_main(void)
 +{
-+	/*
-+	 * AArch32 ID registers are UNKNOWN if AArch32 isn't implemented at any
-+	 * EL. Promote to RAZ/WI in order to guarantee consistency between
-+	 * systems.
-+	 */
-+	if (!kvm_supports_32bit_el0())
-+		return REG_RAZ | REG_USER_WI;
++	GUEST_ASSERT_REG_RAZ(SYS_ID_PFR0_EL1);
++	GUEST_ASSERT_REG_RAZ(SYS_ID_PFR1_EL1);
++	GUEST_ASSERT_REG_RAZ(SYS_ID_DFR0_EL1);
++	GUEST_ASSERT_REG_RAZ(SYS_ID_MMFR0_EL1);
++	GUEST_ASSERT_REG_RAZ(SYS_ID_MMFR1_EL1);
++	GUEST_ASSERT_REG_RAZ(SYS_ID_MMFR2_EL1);
++	GUEST_ASSERT_REG_RAZ(SYS_ID_MMFR3_EL1);
++	GUEST_ASSERT_REG_RAZ(SYS_ID_ISAR0_EL1);
++	GUEST_ASSERT_REG_RAZ(SYS_ID_ISAR1_EL1);
++	GUEST_ASSERT_REG_RAZ(SYS_ID_ISAR2_EL1);
++	GUEST_ASSERT_REG_RAZ(SYS_ID_ISAR3_EL1);
++	GUEST_ASSERT_REG_RAZ(SYS_ID_ISAR4_EL1);
++	GUEST_ASSERT_REG_RAZ(SYS_ID_ISAR5_EL1);
++	GUEST_ASSERT_REG_RAZ(SYS_ID_MMFR4_EL1);
++	GUEST_ASSERT_REG_RAZ(SYS_ID_ISAR6_EL1);
++	GUEST_ASSERT_REG_RAZ(SYS_MVFR0_EL1);
++	GUEST_ASSERT_REG_RAZ(SYS_MVFR1_EL1);
++	GUEST_ASSERT_REG_RAZ(SYS_MVFR2_EL1);
++	GUEST_ASSERT_REG_RAZ(SYS_ID_PFR2_EL1);
++	GUEST_ASSERT_REG_RAZ(SYS_ID_MMFR5_EL1);
 +
-+	return id_visibility(vcpu, r);
++	GUEST_DONE();
 +}
 +
- static unsigned int raz_visibility(const struct kvm_vcpu *vcpu,
- 				   const struct sys_reg_desc *r)
- {
-@@ -1341,6 +1355,15 @@ static unsigned int mte_visibility(const struct kvm_vcpu *vcpu,
- 	.visibility = id_visibility,		\
- }
- 
-+/* sys_reg_desc initialiser for known cpufeature ID registers */
-+#define AA32_ID_SANITISED(name) {		\
-+	SYS_DESC(SYS_##name),			\
-+	.access	= access_id_reg,		\
-+	.get_user = get_id_reg,			\
-+	.set_user = set_id_reg,			\
-+	.visibility = aa32_id_visibility,	\
++static void test_guest_raz(struct kvm_vcpu *vcpu)
++{
++	struct ucall uc;
++
++	vcpu_run(vcpu);
++
++	switch (get_ucall(vcpu, &uc)) {
++	case UCALL_ABORT:
++		REPORT_GUEST_ASSERT(uc);
++		break;
++	case UCALL_DONE:
++		break;
++	default:
++		TEST_FAIL("Unexpected ucall: %lu", uc.cmd);
++	}
 +}
 +
- /*
-  * sys_reg_desc initialiser for architecturally unallocated cpufeature ID
-  * register with encoding Op0=3, Op1=0, CRn=0, CRm=crm, Op2=op2
-@@ -1428,33 +1451,33 @@ static const struct sys_reg_desc sys_reg_descs[] = {
- 
- 	/* AArch64 mappings of the AArch32 ID registers */
- 	/* CRm=1 */
--	ID_SANITISED(ID_PFR0_EL1),
--	ID_SANITISED(ID_PFR1_EL1),
--	ID_SANITISED(ID_DFR0_EL1),
-+	AA32_ID_SANITISED(ID_PFR0_EL1),
-+	AA32_ID_SANITISED(ID_PFR1_EL1),
-+	AA32_ID_SANITISED(ID_DFR0_EL1),
- 	ID_HIDDEN(ID_AFR0_EL1),
--	ID_SANITISED(ID_MMFR0_EL1),
--	ID_SANITISED(ID_MMFR1_EL1),
--	ID_SANITISED(ID_MMFR2_EL1),
--	ID_SANITISED(ID_MMFR3_EL1),
-+	AA32_ID_SANITISED(ID_MMFR0_EL1),
-+	AA32_ID_SANITISED(ID_MMFR1_EL1),
-+	AA32_ID_SANITISED(ID_MMFR2_EL1),
-+	AA32_ID_SANITISED(ID_MMFR3_EL1),
- 
- 	/* CRm=2 */
--	ID_SANITISED(ID_ISAR0_EL1),
--	ID_SANITISED(ID_ISAR1_EL1),
--	ID_SANITISED(ID_ISAR2_EL1),
--	ID_SANITISED(ID_ISAR3_EL1),
--	ID_SANITISED(ID_ISAR4_EL1),
--	ID_SANITISED(ID_ISAR5_EL1),
--	ID_SANITISED(ID_MMFR4_EL1),
--	ID_SANITISED(ID_ISAR6_EL1),
-+	AA32_ID_SANITISED(ID_ISAR0_EL1),
-+	AA32_ID_SANITISED(ID_ISAR1_EL1),
-+	AA32_ID_SANITISED(ID_ISAR2_EL1),
-+	AA32_ID_SANITISED(ID_ISAR3_EL1),
-+	AA32_ID_SANITISED(ID_ISAR4_EL1),
-+	AA32_ID_SANITISED(ID_ISAR5_EL1),
-+	AA32_ID_SANITISED(ID_MMFR4_EL1),
-+	AA32_ID_SANITISED(ID_ISAR6_EL1),
- 
- 	/* CRm=3 */
--	ID_SANITISED(MVFR0_EL1),
--	ID_SANITISED(MVFR1_EL1),
--	ID_SANITISED(MVFR2_EL1),
-+	AA32_ID_SANITISED(MVFR0_EL1),
-+	AA32_ID_SANITISED(MVFR1_EL1),
-+	AA32_ID_SANITISED(MVFR2_EL1),
- 	ID_UNALLOCATED(3,3),
--	ID_SANITISED(ID_PFR2_EL1),
-+	AA32_ID_SANITISED(ID_PFR2_EL1),
- 	ID_HIDDEN(ID_DFR1_EL1),
--	ID_SANITISED(ID_MMFR5_EL1),
-+	AA32_ID_SANITISED(ID_MMFR5_EL1),
- 	ID_UNALLOCATED(3,7),
- 
- 	/* AArch64 ID registers */
++static uint64_t reg_ids[] = {
++	KVM_ARM64_SYS_REG(SYS_ID_PFR0_EL1),
++	KVM_ARM64_SYS_REG(SYS_ID_PFR1_EL1),
++	KVM_ARM64_SYS_REG(SYS_ID_DFR0_EL1),
++	KVM_ARM64_SYS_REG(SYS_ID_MMFR0_EL1),
++	KVM_ARM64_SYS_REG(SYS_ID_MMFR1_EL1),
++	KVM_ARM64_SYS_REG(SYS_ID_MMFR2_EL1),
++	KVM_ARM64_SYS_REG(SYS_ID_MMFR3_EL1),
++	KVM_ARM64_SYS_REG(SYS_ID_ISAR0_EL1),
++	KVM_ARM64_SYS_REG(SYS_ID_ISAR1_EL1),
++	KVM_ARM64_SYS_REG(SYS_ID_ISAR2_EL1),
++	KVM_ARM64_SYS_REG(SYS_ID_ISAR3_EL1),
++	KVM_ARM64_SYS_REG(SYS_ID_ISAR4_EL1),
++	KVM_ARM64_SYS_REG(SYS_ID_ISAR5_EL1),
++	KVM_ARM64_SYS_REG(SYS_ID_MMFR4_EL1),
++	KVM_ARM64_SYS_REG(SYS_ID_ISAR6_EL1),
++	KVM_ARM64_SYS_REG(SYS_MVFR0_EL1),
++	KVM_ARM64_SYS_REG(SYS_MVFR1_EL1),
++	KVM_ARM64_SYS_REG(SYS_MVFR2_EL1),
++	KVM_ARM64_SYS_REG(SYS_ID_PFR2_EL1),
++	KVM_ARM64_SYS_REG(SYS_ID_MMFR5_EL1),
++};
++
++static void test_user_raz_wi(struct kvm_vcpu *vcpu)
++{
++	int i;
++
++	for (i = 0; i < ARRAY_SIZE(reg_ids); i++) {
++		uint64_t reg_id = reg_ids[i];
++		uint64_t val;
++
++		vcpu_get_reg(vcpu, reg_id, &val);
++		ASSERT_EQ(val, 0);
++
++		/*
++		 * Expect the ioctl to succeed with no effect on the register
++		 * value.
++		 */
++		vcpu_set_reg(vcpu, reg_id, BAD_ID_REG_VAL);
++
++		vcpu_get_reg(vcpu, reg_id, &val);
++		ASSERT_EQ(val, 0);
++	}
++}
++
++static bool vcpu_aarch64_only(struct kvm_vcpu *vcpu)
++{
++	uint64_t val, el0;
++
++	vcpu_get_reg(vcpu, KVM_ARM64_SYS_REG(SYS_ID_AA64PFR0_EL1), &val);
++
++	el0 = (val & ARM64_FEATURE_MASK(ID_AA64PFR0_EL0)) >> ID_AA64PFR0_EL0_SHIFT;
++	return el0 == ID_AA64PFR0_ELx_64BIT_ONLY;
++}
++
++int main(void)
++{
++	struct kvm_vcpu *vcpu;
++	struct kvm_vm *vm;
++
++	vm = vm_create_with_one_vcpu(&vcpu, guest_main);
++
++	TEST_REQUIRE(vcpu_aarch64_only(vcpu));
++
++	ucall_init(vm, NULL);
++
++	test_user_raz_wi(vcpu);
++	test_guest_raz(vcpu);
++
++	ucall_uninit(vm);
++	kvm_vm_free(vm);
++}
 -- 
 2.37.1.595.g718a3a8f04-goog
 
