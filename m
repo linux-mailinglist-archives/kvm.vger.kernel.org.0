@@ -2,79 +2,50 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 8AF235970CD
-	for <lists+kvm@lfdr.de>; Wed, 17 Aug 2022 16:18:42 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 3DD3759711F
+	for <lists+kvm@lfdr.de>; Wed, 17 Aug 2022 16:31:24 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S239882AbiHQOLv (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 17 Aug 2022 10:11:51 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42646 "EHLO
+        id S240144AbiHQOae (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 17 Aug 2022 10:30:34 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54678 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S240027AbiHQOLs (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 17 Aug 2022 10:11:48 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 10A9941980
-        for <kvm@vger.kernel.org>; Wed, 17 Aug 2022 07:11:46 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1660745506;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=hhBNIOM9Y2xU0B1BDjyol1FutIC8XO8BHPDwpu5KbpE=;
-        b=YUBiAHHJ039iuThLLeZaL5XHmZ405KIMWjxuhF0cpvZMqxuZ8095CnK6ez/3vGwVOCakOq
-        NkGWK2zwCqrTaSusZKQK1ZAYpVf3neGrLbgkzBJY2JJt263+10jycGD7qHCCSnf0E1bQC7
-        /BN9sI+ksTU+RKWX0FGt4VNQnNYCRFQ=
-Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
- [209.85.221.69]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_128_GCM_SHA256) id
- us-mta-417-dbkhOYtjPIKk4048ofMEfA-1; Wed, 17 Aug 2022 10:11:44 -0400
-X-MC-Unique: dbkhOYtjPIKk4048ofMEfA-1
-Received: by mail-wr1-f69.google.com with SMTP id t12-20020adfba4c000000b0021e7440666bso2504384wrg.22
-        for <kvm@vger.kernel.org>; Wed, 17 Aug 2022 07:11:44 -0700 (PDT)
+        with ESMTP id S240170AbiHQOa2 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 17 Aug 2022 10:30:28 -0400
+Received: from mail-io1-f69.google.com (mail-io1-f69.google.com [209.85.166.69])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D1B8E201A6
+        for <kvm@vger.kernel.org>; Wed, 17 Aug 2022 07:30:27 -0700 (PDT)
+Received: by mail-io1-f69.google.com with SMTP id w7-20020a5d9607000000b0067c6030dfb8so7852045iol.10
+        for <kvm@vger.kernel.org>; Wed, 17 Aug 2022 07:30:27 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=content-transfer-encoding:mime-version:user-agent:references
-         :in-reply-to:date:cc:to:from:subject:message-id:x-gm-message-state
+        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
          :from:to:cc;
-        bh=hhBNIOM9Y2xU0B1BDjyol1FutIC8XO8BHPDwpu5KbpE=;
-        b=Z3MkQW2XyaTYil/XKblYN6RPK3fExVsIUM10FQpRs0yZmpI8SPHbGgv7HK1w/qwmy4
-         tnIk1YefdSCeheSmLVrCqBZwLaTHjwbu20TEphcuRW+A4H6JVu6LtZ9M7Wl6nB5Ztmqx
-         SujecQx9WmImupb0/i65ywLjBWLkFQAufZDWaqfLXggHk3560a6OZ+UsaYjg7aVrIPEa
-         eIB3Z/VoY96R+UiGKls/85iPS72X8Fx9zgGZYZUkSuZuLDbL6KdNRH87QuR2yx3j8P4a
-         RnhEnGftgZEGaP6mx3afl/k1SLLIIvUS60G9P+Bx+nOP27LwHo/odDY8T6g63ASxz3Ew
-         lykw==
-X-Gm-Message-State: ACgBeo2qyn1QV4Aj+VNcSr2iisDAMkPbP5jK7q6AmdEZck9dfQwom3wd
-        2itYOxJDG9JA88/vDHzlqoDfrJt9MnhnOEKEvW8fmka+GoQDPgMdwjxpSLKcjlOTwNh6c54DWOS
-        4Nvu3vUOi5dJT
-X-Received: by 2002:a5d:6789:0:b0:225:2787:d44f with SMTP id v9-20020a5d6789000000b002252787d44fmr1371307wru.343.1660745503414;
-        Wed, 17 Aug 2022 07:11:43 -0700 (PDT)
-X-Google-Smtp-Source: AA6agR7FtmPbJkVUUOIDvJkFxc1DH4AMeUJRh/F634N7Z9i4Yie8G/9NRJlhgrACBIkDvhRCWVQ75Q==
-X-Received: by 2002:a5d:6789:0:b0:225:2787:d44f with SMTP id v9-20020a5d6789000000b002252787d44fmr1371292wru.343.1660745503152;
-        Wed, 17 Aug 2022 07:11:43 -0700 (PDT)
-Received: from [10.35.4.238] (bzq-82-81-161-50.red.bezeqint.net. [82.81.161.50])
-        by smtp.gmail.com with ESMTPSA id l4-20020adffe84000000b0021eff2ecb31sm13159139wrr.95.2022.08.17.07.11.42
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 17 Aug 2022 07:11:42 -0700 (PDT)
-Message-ID: <79f46ce48d71fbe6290b621cca6c1b15727b42d0.camel@redhat.com>
-Subject: Re: [PATCH v2 9/9] KVM: x86: never write to memory from
- kvm_vcpu_check_block
-From:   Maxim Levitsky <mlevitsk@redhat.com>
-To:     Sean Christopherson <seanjc@google.com>,
-        Paolo Bonzini <pbonzini@redhat.com>
-Cc:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-        vkuznets@redhat.com
-Date:   Wed, 17 Aug 2022 17:11:41 +0300
-In-Reply-To: <YvwsBC2HqodxaYRJ@google.com>
-References: <20220811210605.402337-1-pbonzini@redhat.com>
-         <20220811210605.402337-10-pbonzini@redhat.com>
-         <YvwsBC2HqodxaYRJ@google.com>
-Content-Type: text/plain; charset="UTF-8"
-User-Agent: Evolution 3.40.4 (3.40.4-5.fc34) 
+        bh=lTgDtlo/hd6/742fSyPc108lfoTW7+XIunA920R7h9E=;
+        b=fwYEuNYx8dgtwYKOfKGp0yz1Ll5DVEychASaczKhz3Ck7AIWvBU8M/UuP5AFSTCWgk
+         tZnt+AGoPLMDLPA/iTIIT1+MnBcUq0xkdYiZGGh6MktwwGEz+6nDbxb+jbmO1WDlC6p3
+         QJN6DteX+gmkLX2GABfMuD/BHJYXgS9w/ND/2C86mBih7QWN7wKMkqUSRC9dyMbDxhsY
+         NoeLsV5jBvlUs0OV/Rn0cEzAqpRn9md8rZKPjeicifSwBN0eei/iQJyMXQNG3Pmoyf52
+         upGsM13OWuffOgwyqz+O4IlAefuH8cfR8N0m/cmNATyXs9n/Xj1WQcfbBrfGHrxJmXSz
+         ua+A==
+X-Gm-Message-State: ACgBeo2z4xTG2w5w3VnYCoICQ7vWrMcTQUZgDXhkNv4sbyRG/8K6Z+Vx
+        PpfHA70DyrXzYNA1lDaHCPKZMpC7GPhDs8yQYDjUSu8FSJWF
+X-Google-Smtp-Source: AA6agR7vJmcunTZhXCeFgsalPO/ZV0rpzXR84fZT7IV1zlQjJLodqbW9FEFgGCBoSLrREVWBWAJTYo1T8x3B6AXCzK4R/VnSJpXx
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-2.8 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,
-        SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham
+X-Received: by 2002:a02:6023:0:b0:346:ac9c:5ded with SMTP id
+ i35-20020a026023000000b00346ac9c5dedmr3746106jac.245.1660746627208; Wed, 17
+ Aug 2022 07:30:27 -0700 (PDT)
+Date:   Wed, 17 Aug 2022 07:30:27 -0700
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <000000000000c6e06605e670b459@google.com>
+Subject: [syzbot] KASAN: vmalloc-out-of-bounds Read in kvm_dev_ioctl
+From:   syzbot <syzbot+8d24abd02cd4eb911bbd@syzkaller.appspotmail.com>
+To:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+        pbonzini@redhat.com, syzkaller-bugs@googlegroups.com
+Content-Type: text/plain; charset="UTF-8"
+X-Spam-Status: No, score=-1.7 required=5.0 tests=BAYES_00,FROM_LOCAL_HEX,
+        HEADER_FROM_DIFFERENT_DOMAINS,RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,
+        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED autolearn=no
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -82,71 +53,72 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, 2022-08-16 at 23:45 +0000, Sean Christopherson wrote:
-> On Thu, Aug 11, 2022, Paolo Bonzini wrote:
-> > kvm_vcpu_check_block() is called while not in TASK_RUNNING, and therefore
-> > it cannot sleep.  Writing to guest memory is therefore forbidden, but it
-> > can happen on AMD processors if kvm_check_nested_events() causes a vmexit.
-> > 
-> > Fortunately, all events that are caught by kvm_check_nested_events() are
-> > also recognized by kvm_vcpu_has_events() through vendor callbacks such as
-> > kvm_x86_interrupt_allowed() or kvm_x86_ops.nested_ops->has_events(), so
-> > remove the call and postpone the actual processing to vcpu_block().
-> > 
-> > Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
-> > ---
-> >  arch/x86/kvm/x86.c | 14 +++++++++++---
-> >  1 file changed, 11 insertions(+), 3 deletions(-)
-> > 
-> > diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-> > index 5e9358ea112b..9226fd536783 100644
-> > --- a/arch/x86/kvm/x86.c
-> > +++ b/arch/x86/kvm/x86.c
-> > @@ -10639,6 +10639,17 @@ static inline int vcpu_block(struct kvm_vcpu *vcpu)
-> >                         return 1;
-> >         }
-> >  
-> > +       if (is_guest_mode(vcpu)) {
-> > +               /*
-> > +                * Evaluate nested events before exiting the halted state.
-> > +                * This allows the halt state to be recorded properly in
-> > +                * the VMCS12's activity state field (AMD does not have
-> > +                * a similar field and a vmexit always causes a spurious
-> > +                * wakeup from HLT).
-> > +                */
+Hello,
 
-I assume that the comment refers to the fact that nested_vmx_vmexit due to event
-on the HLT instruction, will trigger update of the 'vmcs12->guest_activity_state'
-so it should be done before we update the 'vcpu->arch.mp_state'
+syzbot found the following issue on:
 
+HEAD commit:    7ebfc85e2cd7 Merge tag 'net-6.0-rc1' of git://git.kernel.o..
+git tree:       upstream
+console output: https://syzkaller.appspot.com/x/log.txt?x=10b66b6b080000
+kernel config:  https://syzkaller.appspot.com/x/.config?x=c15de4ee7650fb42
+dashboard link: https://syzkaller.appspot.com/bug?extid=8d24abd02cd4eb911bbd
+compiler:       gcc (Debian 10.2.1-6) 10.2.1 20210110, GNU ld (GNU Binutils for Debian) 2.35.2
 
-> > +               kvm_check_nested_events(vcpu);
-> 
-> Formatting nit, I'd prefer the block comment go above the if-statement, that way
-> we avoiding debating whether or not the technically-unnecessary braces align with
-> kernel/KVM style, and it doesn't have to wrap as aggressively.
-> 
-> And s/vmexit/VM-Exit while I'm nitpicking.
-> 
->         /*
->          * Evaluate nested events before exiting the halted state.  This allows
->          * the halt state to be recorded properly in the VMCS12's activity
->          * state field (AMD does not have a similar field and a VM-Exit always
->          * causes a spurious wakeup from HLT).
->          */
->         if (is_guest_mode(vcpu))
->                 kvm_check_nested_events(vcpu);
-> 
-> Side topic, the AMD behavior is a bug report waiting to happen.  I know of at least
-> one customer failure that was root caused to a KVM bug where KVM caused a spurious
-> wakeup.  To be fair, the guest workload was being stupid (execute HLT on vCPU and
-> then effectively unmap its code by doing kexec), but it's still an unpleasant gap :-(
+Unfortunately, I don't have any reproducer for this issue yet.
 
-Reviewed-by: Maxim Levitsky <mlevitsk@redhat.com>
+IMPORTANT: if you fix the issue, please add the following tag to the commit:
+Reported-by: syzbot+8d24abd02cd4eb911bbd@syzkaller.appspotmail.com
 
-Best regards,
-	Maxim Levitsky
+==================================================================
+BUG: KASAN: vmalloc-out-of-bounds in __list_add_valid+0x93/0xb0 lib/list_debug.c:27
+Read of size 8 at addr ffffc90006b7a348 by task syz-executor.4/20901
 
-> 
+CPU: 1 PID: 20901 Comm: syz-executor.4 Not tainted 5.19.0-syzkaller-13930-g7ebfc85e2cd7 #0
+Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 07/22/2022
+Call Trace:
+ <TASK>
+ __dump_stack lib/dump_stack.c:88 [inline]
+ dump_stack_lvl+0xcd/0x134 lib/dump_stack.c:106
+ print_address_description mm/kasan/report.c:317 [inline]
+ print_report.cold+0x59/0x6e9 mm/kasan/report.c:433
+ kasan_report+0xb1/0x1e0 mm/kasan/report.c:495
+ __list_add_valid+0x93/0xb0 lib/list_debug.c:27
+ __list_add include/linux/list.h:69 [inline]
+ list_add include/linux/list.h:88 [inline]
+ kvm_create_vm arch/x86/kvm/../../../virt/kvm/kvm_main.c:1219 [inline]
+ kvm_dev_ioctl_create_vm arch/x86/kvm/../../../virt/kvm/kvm_main.c:4910 [inline]
+ kvm_dev_ioctl+0xf44/0x1ce0 arch/x86/kvm/../../../virt/kvm/kvm_main.c:4957
+ vfs_ioctl fs/ioctl.c:51 [inline]
+ __do_sys_ioctl fs/ioctl.c:870 [inline]
+ __se_sys_ioctl fs/ioctl.c:856 [inline]
+ __x64_sys_ioctl+0x193/0x200 fs/ioctl.c:856
+ do_syscall_x64 arch/x86/entry/common.c:50 [inline]
+ do_syscall_64+0x35/0xb0 arch/x86/entry/common.c:80
+ entry_SYSCALL_64_after_hwframe+0x63/0xcd
+RIP: 0033:0x7fb1fba89279
+Code: ff ff c3 66 2e 0f 1f 84 00 00 00 00 00 0f 1f 40 00 48 89 f8 48 89 f7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff ff 73 01 c3 48 c7 c1 b8 ff ff ff f7 d8 64 89 01 48
+RSP: 002b:00007fb1fcc1e168 EFLAGS: 00000246 ORIG_RAX: 0000000000000010
+RAX: ffffffffffffffda RBX: 00007fb1fbb9bf80 RCX: 00007fb1fba89279
+RDX: 0000000000000000 RSI: 000000000000ae01 RDI: 0000000000000004
+RBP: 00007fb1fbae3189 R08: 0000000000000000 R09: 0000000000000000
+R10: 0000000000000000 R11: 0000000000000246 R12: 0000000000000000
+R13: 00007ffea48aadbf R14: 00007fb1fcc1e300 R15: 0000000000022000
+ </TASK>
+
+Memory state around the buggy address:
+ ffffc90006b7a200: f8 f8 f8 f8 f8 f8 f8 f8 f8 f8 f8 f8 f8 f8 f8 f8
+ ffffc90006b7a280: f8 f8 f8 f8 f8 f8 f8 f8 f8 f8 f8 f8 f8 f8 f8 f8
+>ffffc90006b7a300: f8 f8 f8 f8 f8 f8 f8 f8 f8 f8 f8 f8 f8 f8 f8 f8
+                                              ^
+ ffffc90006b7a380: f8 f8 f8 f8 f8 f8 f8 f8 f8 f8 f8 f8 f8 f8 f8 f8
+ ffffc90006b7a400: f8 f8 f8 f8 f8 f8 f8 f8 f8 f8 f8 f8 f8 f8 f8 f8
+==================================================================
 
 
+---
+This report is generated by a bot. It may contain errors.
+See https://goo.gl/tpsmEJ for more information about syzbot.
+syzbot engineers can be reached at syzkaller@googlegroups.com.
+
+syzbot will keep track of this issue. See:
+https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
