@@ -2,60 +2,92 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id AD1035974D0
-	for <lists+kvm@lfdr.de>; Wed, 17 Aug 2022 19:12:21 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 6648F5974F3
+	for <lists+kvm@lfdr.de>; Wed, 17 Aug 2022 19:22:55 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S240735AbiHQRKP (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 17 Aug 2022 13:10:15 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55612 "EHLO
+        id S240410AbiHQRUi (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 17 Aug 2022 13:20:38 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39126 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S237342AbiHQRKL (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 17 Aug 2022 13:10:11 -0400
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D95025FF59;
-        Wed, 17 Aug 2022 10:10:10 -0700 (PDT)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id 6EDC161207;
-        Wed, 17 Aug 2022 17:10:10 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPS id D0C8FC433D6;
-        Wed, 17 Aug 2022 17:10:09 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1660756209;
-        bh=PRkPy6/BboxVIV4svm9kZjB5MPhqvOyWk7k0yChUSEg=;
-        h=Subject:From:In-Reply-To:References:Date:To:Cc:From;
-        b=lh2NLK6BXqd3jz9ktIz9fK0BvVEdSVXL/eTMZnDmDa3j4ezjftH9YXoz6VO7jC5tp
-         /rdF41HsFHgBaekQrr5/wDLIbtmJ1ZEPQxV7JQcxC0wwEvab955lPIDERfCnGJ5E4b
-         V3Sst53simH3O1dfYehQaS6cBmy7LqUVQRCc465srhSNCpE87NHO0kEpsQVPAerG1E
-         javztSvqXVHLrGjlvvLxAclEtXrVpgqIJ8YPtRpI5dIkI4UYmhjWcUc2gs6NjFfbBt
-         xECBWetJK9BPtiTxtBNQd+TyktaaQN+Fr4W2D/18ZyVdz3vxm9cZ61AIUEfotJrXyu
-         LEGh5rutQgjig==
-Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-        by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id B5F6DC43142;
-        Wed, 17 Aug 2022 17:10:09 +0000 (UTC)
-Subject: Re: [GIT PULL] virtio: fixes
-From:   pr-tracker-bot@kernel.org
-In-Reply-To: <20220817063842-mutt-send-email-mst@kernel.org>
-References: <20220817063842-mutt-send-email-mst@kernel.org>
-X-PR-Tracked-List-Id: Linux virtualization <virtualization.lists.linux-foundation.org>
-X-PR-Tracked-Message-Id: <20220817063842-mutt-send-email-mst@kernel.org>
-X-PR-Tracked-Remote: https://git.kernel.org/pub/scm/linux/kernel/git/mst/vhost.git tags/for_linus
-X-PR-Tracked-Commit-Id: 5c669c4a4c6aa0489848093c93b8029f5c5c75ec
-X-PR-Merge-Tree: torvalds/linux.git
-X-PR-Merge-Refname: refs/heads/master
-X-PR-Merge-Commit-Id: 274a2eebf80c60246f9edd6ef8e9a095ad121264
-Message-Id: <166075620968.6865.11130017018985824267.pr-tracker-bot@kernel.org>
-Date:   Wed, 17 Aug 2022 17:10:09 +0000
-To:     "Michael S. Tsirkin" <mst@redhat.com>
-Cc:     Linus Torvalds <torvalds@linux-foundation.org>,
-        kvm@vger.kernel.org, mst@redhat.com, netdev@vger.kernel.org,
+        with ESMTP id S241189AbiHQRUc (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 17 Aug 2022 13:20:32 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 622E69C53D
+        for <kvm@vger.kernel.org>; Wed, 17 Aug 2022 10:20:31 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1660756830;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=E1x5LNrRWuvWgMZzul66wIPkfRn59vrBUCTEKqLPjoU=;
+        b=EWvhlzFVu8w/arCd/O8bjhT6o+yjCcV1gxqa/5/YcsaA6YEKnA1ZFTypHM9kiSRYStdNzo
+        HKkUslQ0tXmMc/z+Zjs9OztQzEc7sFTv1WJrHATwyXT4Uub0Hx43G4g82RCZP/4FdddjzR
+        1lgEaUTUS6Xwmu04zA6sBcM/smzWE0I=
+Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
+ [209.85.221.72]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_128_GCM_SHA256) id
+ us-mta-443-Pj22J2N5NZafk5__wWukew-1; Wed, 17 Aug 2022 13:20:26 -0400
+X-MC-Unique: Pj22J2N5NZafk5__wWukew-1
+Received: by mail-wr1-f72.google.com with SMTP id j12-20020adfa54c000000b002252d39a8d4so40722wrb.23
+        for <kvm@vger.kernel.org>; Wed, 17 Aug 2022 10:20:26 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc;
+        bh=E1x5LNrRWuvWgMZzul66wIPkfRn59vrBUCTEKqLPjoU=;
+        b=6FUTKj54Ko51BTk0ZH8d5TFoRts6tRPgUT+XmSQ0k93SSi9rm5tPRIA5LTNTJPn48S
+         wn4F7U6OSgmlsB1hcH/wc/vF19xoTuH3t50OTY5JkMyWRcb5le+4hiGny1TDCUHF6lIx
+         xsJ+CwbZYQK/I2RX46GFCaBtsaLOnyj/K/gXOQlanwMG9OLWxKTZjwwBqXb/3oq3FVbe
+         /akXJUaSdJPhwsaiV7oifDOX3yXnDCB4tSpJGebtUAa/l1RizqNV7zOaKrYIrYdDkxGM
+         SOdY7GgiDZ/VdAqlTUEaq9QvMOyHG6jqqvg+PtCahXCY+fsYhGpftmM6HJFntyZvZOYm
+         R/Tg==
+X-Gm-Message-State: ACgBeo1nL9Cb5peQBhX2MY4SK0IUmQDiM2hd+7O2nkrJPzLUJAfyrt+O
+        D7lOkNz2VWZF7Rt9KURuJmvub8o/fIkzFic8e6PeAkCDGhDWQAIRHOx5hthrZDdf8g//0vHzwSy
+        amIeE8Wk8+yGB
+X-Received: by 2002:a1c:19c2:0:b0:3a5:168e:a918 with SMTP id 185-20020a1c19c2000000b003a5168ea918mr2792765wmz.31.1660756825529;
+        Wed, 17 Aug 2022 10:20:25 -0700 (PDT)
+X-Google-Smtp-Source: AA6agR4cDOhH9gb57ZgsmemV6RwBgg2yGkmkUplYW2gdzH3YejzjL5WNaW6YF8Ruh007bts4KbJ2Bw==
+X-Received: by 2002:a1c:19c2:0:b0:3a5:168e:a918 with SMTP id 185-20020a1c19c2000000b003a5168ea918mr2792746wmz.31.1660756825315;
+        Wed, 17 Aug 2022 10:20:25 -0700 (PDT)
+Received: from redhat.com ([2.55.4.37])
+        by smtp.gmail.com with ESMTPSA id h82-20020a1c2155000000b003a319bd3278sm2862407wmh.40.2022.08.17.10.20.22
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 17 Aug 2022 10:20:24 -0700 (PDT)
+Date:   Wed, 17 Aug 2022 13:20:19 -0400
+From:   "Michael S. Tsirkin" <mst@redhat.com>
+To:     Bobby Eshleman <bobbyeshleman@gmail.com>
+Cc:     Jakub Kicinski <kuba@kernel.org>,
+        Bobby Eshleman <bobby.eshleman@gmail.com>,
+        Bobby Eshleman <bobby.eshleman@bytedance.com>,
+        Cong Wang <cong.wang@bytedance.com>,
+        Jiang Wang <jiang.wang@bytedance.com>,
+        Stefan Hajnoczi <stefanha@redhat.com>,
+        Stefano Garzarella <sgarzare@redhat.com>,
+        Jason Wang <jasowang@redhat.com>,
+        "David S. Miller" <davem@davemloft.net>,
+        Eric Dumazet <edumazet@google.com>,
+        Paolo Abeni <pabeni@redhat.com>, kvm@vger.kernel.org,
+        virtualization@lists.linux-foundation.org, netdev@vger.kernel.org,
         linux-kernel@vger.kernel.org,
-        virtualization@lists.linux-foundation.org, andres@anarazel.de,
-        linux@roeck-us.net
-X-Spam-Status: No, score=-7.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_HI,
-        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
+        Toke =?iso-8859-1?Q?H=F8iland-J=F8rgensen?= <toke@toke.dk>
+Subject: Re: [PATCH 3/6] vsock: add netdev to vhost/virtio vsock
+Message-ID: <20220817131437-mutt-send-email-mst@kernel.org>
+References: <cover.1660362668.git.bobby.eshleman@bytedance.com>
+ <5a93c5aad99d79f028d349cb7e3c128c65d5d7e2.1660362668.git.bobby.eshleman@bytedance.com>
+ <20220816123701-mutt-send-email-mst@kernel.org>
+ <20220816110717.5422e976@kernel.org>
+ <YvtAktdB09tM0Ykr@bullseye>
+ <20220816160755.7eb11d2e@kernel.org>
+ <YvtVN195TS1xpEN7@bullseye>
+ <20220816181528.5128bc06@kernel.org>
+ <Yvt2f5i5R9NNNYUL@bullseye>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <Yvt2f5i5R9NNNYUL@bullseye>
+X-Spam-Status: No, score=-2.8 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,
+        SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=unavailable
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -63,15 +95,58 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-The pull request you sent on Wed, 17 Aug 2022 06:38:42 -0400:
+On Tue, Aug 16, 2022 at 10:50:55AM +0000, Bobby Eshleman wrote:
+> > > > Eh, I was hoping it was a side channel of an existing virtio_net 
+> > > > which is not the case. Given the zero-config requirement IDK if 
+> > > > we'll be able to fit this into netdev semantics :(  
+> > > 
+> > > It's certainly possible that it may not fit :/ I feel that it partially
+> > > depends on what we mean by zero-config. Is it "no config required to
+> > > have a working socket" or is it "no config required, but also no
+> > > tuning/policy/etc... supported"?
+> > 
+> > The value of tuning vs confusion of a strange netdev floating around
+> > in the system is hard to estimate upfront. 
+> 
+> I think "a strange netdev floating around" is a total
+> mischaracterization... vsock is a networking device and it supports
+> vsock networks. Sure, it is a virtual device and the routing is done in
+> host software, but the same is true for virtio-net and VM-to-VM vlan.
+> 
+> This patch actually uses netdev for its intended purpose: to support and
+> manage the transmission of packets via a network device to a network.
+> 
+> Furthermore, it actually prepares vsock to eliminate a "strange" use of
+> a netdev. The netdev in vsockmon isn't even used to transmit
+> packets, it's "floating around" for no other reason than it is needed to
+> support packet capture, which vsock couldn't support because it didn't
+> have a netdev.
+> 
+> Something smells when we are required to build workaround kernel modules
+> that use netdev for ciphoning packets off to userspace, when we could
+> instead be using netdev for its intended purpose and get the same and
+> more benefit.
 
-> https://git.kernel.org/pub/scm/linux/kernel/git/mst/vhost.git tags/for_linus
+So what happens when userspace inevitably attempts to bind a raw
+packet socket to this device? Assign it an IP? Set up some firewall
+rules?
 
-has been merged into torvalds/linux.git:
-https://git.kernel.org/torvalds/c/274a2eebf80c60246f9edd6ef8e9a095ad121264
+These things all need to be addressed before merging since they affect UAPI.
 
-Thank you!
 
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/prtracker.html
+> > 
+> > The nice thing about using a built-in fq with no user visible knobs is
+> > that there's no extra uAPI. We can always rip it out and replace later.
+> > And it shouldn't be controversial, making the path to upstream smoother.
+> 
+> The issue is that after pulling in fq for one kind of flow management,
+> then as users observe other flow issues, we will need to re-implement
+> pfifo, and then TBF, and then we need to build an interface to let users
+> select one, and to choose queue sizes... and then after awhile we've
+> needlessly re-implemented huge chunks of the tc system.
+> 
+> I don't see any good reason to restrict vsock users to using suboptimal
+> and rigid queuing.
+> 
+> Thanks.
+
