@@ -2,107 +2,68 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id BAB13596C3B
-	for <lists+kvm@lfdr.de>; Wed, 17 Aug 2022 11:47:07 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id D87D8596C47
+	for <lists+kvm@lfdr.de>; Wed, 17 Aug 2022 11:51:06 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234384AbiHQJnh (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 17 Aug 2022 05:43:37 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53532 "EHLO
+        id S234301AbiHQJst (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 17 Aug 2022 05:48:49 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60892 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233441AbiHQJnf (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 17 Aug 2022 05:43:35 -0400
-Received: from mga14.intel.com (mga14.intel.com [192.55.52.115])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5509C6390;
-        Wed, 17 Aug 2022 02:43:33 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1660729413; x=1692265413;
-  h=message-id:date:mime-version:subject:to:cc:references:
-   from:in-reply-to:content-transfer-encoding;
-  bh=UMzEsXBvLajAWw0qWAMJSiqZbYfa41i/NdTJQCTDMwQ=;
-  b=JOVMR2JGuzzxXCwk0v/bocmP3R0lXloQLvGNmoyoNRa5xgvQPVz+knD2
-   B+oMxZCVJ6/VvX+WzF0nMJmubJLRnOSqBJkFqbZKN74hfLpxh8x5+oiEP
-   zuvuiVK5xUbii182G9YejqGKGTkZGdEwtnmFo5V3swqKVmG24M/R7dgvu
-   HRnhbZ2c2npoPr7YThWYXOHpo+pNAvpi3e+RQLRFtLDd6Ivv2qDsRxiP4
-   Ng1fvBd26nPB2LgIGUJhEri2JZlUhhEgB0xYmNhtLTB4QMCivVNP5qP4K
-   8VVxIYmUHP+CR9EVNQgZTnELjLwauZRWZ7ymBjIZF5NvCeD31CjGAd3qp
-   A==;
-X-IronPort-AV: E=McAfee;i="6400,9594,10441"; a="292447810"
-X-IronPort-AV: E=Sophos;i="5.93,242,1654585200"; 
-   d="scan'208";a="292447810"
-Received: from fmsmga008.fm.intel.com ([10.253.24.58])
-  by fmsmga103.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 17 Aug 2022 02:43:27 -0700
-X-IronPort-AV: E=Sophos;i="5.93,242,1654585200"; 
-   d="scan'208";a="667539581"
-Received: from lingshan-mobl.ccr.corp.intel.com (HELO [10.255.30.246]) ([10.255.30.246])
-  by fmsmga008-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 17 Aug 2022 02:43:25 -0700
-Message-ID: <449c2fb2-3920-7bf9-8c5c-a68456dfea76@intel.com>
-Date:   Wed, 17 Aug 2022 17:43:22 +0800
+        with ESMTP id S234988AbiHQJsU (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 17 Aug 2022 05:48:20 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A0FDD18354
+        for <kvm@vger.kernel.org>; Wed, 17 Aug 2022 02:48:19 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1660729698;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=ljRyNyK2441vZHPwQLB8t8h2+qZfvGG/VWTtVtQeGE4=;
+        b=KmPL9wnZBcjgy6cTNeBtUYcApZKpqYQ/oRLZy5BQbAmue7GzNPxcSUJ+lOORrALsUBM0ZG
+        qAzVkBywWYw7Tvl7rEGgKnEtnuV2vRGcz7WcCJPBVzGMV6RnFKut6zeVuTMEM7WBc/TF4N
+        TKQyhXf1H3r44or2lrpHfFwFqKysifE=
+Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
+ [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-634-kxTvgst0POqkpBDZzOXFIg-1; Wed, 17 Aug 2022 05:48:15 -0400
+X-MC-Unique: kxTvgst0POqkpBDZzOXFIg-1
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.rdu2.redhat.com [10.11.54.7])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 15631811E80;
+        Wed, 17 Aug 2022 09:48:15 +0000 (UTC)
+Received: from virtlab701.virt.lab.eng.bos.redhat.com (virtlab701.virt.lab.eng.bos.redhat.com [10.19.152.228])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id DBF2E14582E0;
+        Wed, 17 Aug 2022 09:48:14 +0000 (UTC)
+From:   Paolo Bonzini <pbonzini@redhat.com>
+To:     Sean Christopherson <seanjc@google.com>
+Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+        syzbot+744e173caec2e1627ee0@syzkaller.appspotmail.com,
+        Oliver Upton <oliver.upton@linux.dev>,
+        David Matlack <dmatlack@google.com>
+Subject: Re: [PATCH 0/3] KVM: kvm_create_vm() bug fixes and cleanup
+Date:   Wed, 17 Aug 2022 05:47:53 -0400
+Message-Id: <20220817094752.1767823-1-pbonzini@redhat.com>
+In-Reply-To: <20220816053937.2477106-1-seanjc@google.com>
+References: 
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:91.0) Gecko/20100101
- Firefox/91.0 Thunderbird/91.12.0
-Subject: Re: [PATCH 2/2] vDPA: conditionally read fields in virtio-net dev
-Content-Language: en-US
-To:     "Michael S. Tsirkin" <mst@redhat.com>
-Cc:     Si-Wei Liu <si-wei.liu@oracle.com>, jasowang@redhat.com,
-        virtualization@lists.linux-foundation.org, netdev@vger.kernel.org,
-        kvm@vger.kernel.org, parav@nvidia.com, xieyongji@bytedance.com,
-        gautam.dawar@amd.com
-References: <20220815092638.504528-1-lingshan.zhu@intel.com>
- <20220815092638.504528-3-lingshan.zhu@intel.com>
- <c5075d3d-9d2c-2716-1cbf-cede49e2d66f@oracle.com>
- <20e92551-a639-ec13-3d9c-13bb215422e1@intel.com>
- <9b6292f3-9bd5-ecd8-5e42-cd5d12f036e7@oracle.com>
- <22e0236f-b556-c6a8-0043-b39b02928fd6@intel.com>
- <892b39d6-85f8-bff5-030d-e21288975572@oracle.com>
- <52a47bc7-bf26-b8f9-257f-7dc5cea66d23@intel.com>
- <20220817045406-mutt-send-email-mst@kernel.org>
- <a91fa479-d1cc-a2d6-0821-93386069a2c1@intel.com>
- <20220817053821-mutt-send-email-mst@kernel.org>
-From:   "Zhu, Lingshan" <lingshan.zhu@intel.com>
-In-Reply-To: <20220817053821-mutt-send-email-mst@kernel.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-7.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
-        RCVD_IN_DNSWL_HI,SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE,
-        URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.6
+Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 2.85 on 10.11.54.7
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=unavailable
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+Queued, thanks (with the arm/s390 confusion fixed in the last
+commit message).
 
+Paolo
 
-On 8/17/2022 5:39 PM, Michael S. Tsirkin wrote:
-> On Wed, Aug 17, 2022 at 05:13:59PM +0800, Zhu, Lingshan wrote:
->>
->> On 8/17/2022 4:55 PM, Michael S. Tsirkin wrote:
->>> On Wed, Aug 17, 2022 at 10:14:26AM +0800, Zhu, Lingshan wrote:
->>>> Yes it is a little messy, and we can not check _F_VERSION_1 because of
->>>> transitional devices, so maybe this is the best we can do for now
->>> I think vhost generally needs an API to declare config space endian-ness
->>> to kernel. vdpa can reuse that too then.
->> Yes, I remember you have mentioned some IOCTL to set the endian-ness,
->> for vDPA, I think only the vendor driver knows the endian,
->> so we may need a new function vdpa_ops->get_endian().
->> In the last thread, we say maybe it's better to add a comment for now.
->> But if you think we should add a vdpa_ops->get_endian(), I can work
->> on it for sure!
->>
->> Thanks
->> Zhu Lingshan
-> I think QEMU has to set endian-ness. No one else knows.
-Yes, for SW based vhost it is true. But for HW vDPA, only
-the device & driver knows the endian, I think we can not
-"set" a hardware's endian.
-
-So if you think we should add a vdpa_ops->get_endian(),
-I will drop these comments in the next version of
-series, and work on a new patch for get_endian().
-
-Thanks,
-Zhu Lingshan
->
 
