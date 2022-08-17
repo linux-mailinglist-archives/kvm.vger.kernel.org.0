@@ -2,112 +2,82 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 434AE596ED0
-	for <lists+kvm@lfdr.de>; Wed, 17 Aug 2022 14:53:31 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id B848959703B
+	for <lists+kvm@lfdr.de>; Wed, 17 Aug 2022 15:53:33 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236648AbiHQMtH (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 17 Aug 2022 08:49:07 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46322 "EHLO
+        id S236603AbiHQNsd (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 17 Aug 2022 09:48:33 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39304 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S236875AbiHQMtD (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 17 Aug 2022 08:49:03 -0400
-Received: from mail-pl1-x635.google.com (mail-pl1-x635.google.com [IPv6:2607:f8b0:4864:20::635])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EC70A7331C;
-        Wed, 17 Aug 2022 05:48:58 -0700 (PDT)
-Received: by mail-pl1-x635.google.com with SMTP id x19so839609plc.5;
-        Wed, 17 Aug 2022 05:48:58 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc;
-        bh=sDDQV3PgZqx2/9abOCF0VxB++9+m/C4n+txZ5R5CM3Y=;
-        b=l1SicTD3Sr9KN4ruqv+LLZmG8wRuU8ddgK7yNps2Uf7R1yLROjSOUGQdqj9vxI+ZiV
-         tM65n9j9Lhj/as55ucCu+jdlmHOn3AYY/qmMyM8BBXKNVtoGqkBZhBplMKXZnaruK0OD
-         ZoH/xq6XfWsOMevupbmejop+3cOz3eaRBuHTzSPat1+eY3rPDdYAJMXzydWHf5KL35mU
-         N/zUIZMRgQXWYLMFL8+2MPEbhs4ZXdIpCNoNlRDTUDTNcV1XPm84XHVuTfIBKWlyGqtY
-         pSOeTqbWQ8UYZJRbRNogkwfBIq/IVVbYlzg2Y0pWd90ecZM3PFc5OeDyU1252oiL9n3G
-         RFVA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc;
-        bh=sDDQV3PgZqx2/9abOCF0VxB++9+m/C4n+txZ5R5CM3Y=;
-        b=6FKH+SMU25yli4akxj688nyZ+jVsEX6xvL0HiZqQmPh/Ix1KgvhDF4GUUo10sX01g3
-         0xWEFw4kITKdAxq+mmeSxd60A3EQHnoX43P7EGBoIgDBcbqfam4+BzU6KCMqEqPIICkD
-         8g7Ge4qQJvkDXStbQG/k54S6FH1L7Zq5hpC/2f5lJ0qys8y251x1ZvXZI288MO/DSy4M
-         AWXd/ZgFPWI2YcIHy+XU2DWCEUWiYdPAKVHvRULsLdiQgqI19Ps5ABmcAWjP+6ik8CLr
-         415ovK7gzVFR++R6MOTebX+sOIQh0mU0XK0R/F1t0armSBHiroVtE1gTezph6d209cgY
-         opLg==
-X-Gm-Message-State: ACgBeo0Z2AaILXM3mhX9vHQib3jv6T6aceduF8whS7FOYL3Ltw44CZEq
-        BxC4aLuuGVdcE843RM+5354pIKA4fy4Clw==
-X-Google-Smtp-Source: AA6agR7FR3iL/j6v8XJIocqgdSQOAW87gCVU1em/6BeoDiRvo1J0p2clcTnEKG2Df8gbx4uvbL4B6w==
-X-Received: by 2002:a17:90a:f490:b0:1f7:6ecf:33d7 with SMTP id bx16-20020a17090af49000b001f76ecf33d7mr3663495pjb.210.1660740538330;
-        Wed, 17 Aug 2022 05:48:58 -0700 (PDT)
-Received: from debian.. (subs32-116-206-28-37.three.co.id. [116.206.28.37])
-        by smtp.gmail.com with ESMTPSA id q5-20020a170902a3c500b0016a4db13429sm1386962plb.192.2022.08.17.05.48.55
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 17 Aug 2022 05:48:58 -0700 (PDT)
-From:   Bagas Sanjaya <bagasdotme@gmail.com>
-To:     linux-doc@vger.kernel.org
-Cc:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Jonathan Corbet <corbet@lwn.net>,
-        Isaku Yamahata <isaku.yamahata@intel.com>,
-        Xiaoyao Li <xiaoyao.li@intel.com>,
-        Yu Zhang <yu.c.zhang@linux.intel.com>,
-        Chao Peng <chao.p.peng@linux.intel.com>,
-        Bagas Sanjaya <bagasdotme@gmail.com>,
-        kernel test robot <lkp@intel.com>
-Subject: [PATCH v2 3/3] Documentation: kvm: enclose the final closing brace in code block
-Date:   Wed, 17 Aug 2022 19:48:37 +0700
-Message-Id: <20220817124837.422695-4-bagasdotme@gmail.com>
-X-Mailer: git-send-email 2.37.2
-In-Reply-To: <20220817124837.422695-1-bagasdotme@gmail.com>
-References: <20220817124837.422695-1-bagasdotme@gmail.com>
+        with ESMTP id S230359AbiHQNsa (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 17 Aug 2022 09:48:30 -0400
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E448E32A96;
+        Wed, 17 Aug 2022 06:48:29 -0700 (PDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id D60C661435;
+        Wed, 17 Aug 2022 13:48:28 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id C6715C433C1;
+        Wed, 17 Aug 2022 13:48:25 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1660744108;
+        bh=oY072z80Whl/TUmfEqOyp7S4ZsatcvmMePOWmEYF/S8=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=CcDgHmLIV4tCGEyoJrzSBdurHpYWl9R6XeREsD6lPC0w71gTtjgqU1vGAl+jGsSzt
+         0KXdk07balqqyaUc7wrZ3apURgh2lqjAAi8CcfJ7Njp4HljGNcdKYBIF83KKHhq/gX
+         UD4RdhsxHsb/2YtbtEFNOttwJEb4Quor0tOTcF9Wa7/eO7nefXJE4e6pE7PalqFN8c
+         kLiErlxkEJ9lZL1a/+GzYyiasaok7R/OJRMxcRxXXjVmwJRSdD8beiETSpxCUedA54
+         DGmhZtfETu6jo6G6LzHgA1RTRltifmC0eYRMUjZxs3QPviZZPDsiXDBh+Be+kwZ8rJ
+         RThzudAdbiD6A==
+Date:   Wed, 17 Aug 2022 14:48:22 +0100
+From:   Will Deacon <will@kernel.org>
+To:     "Michael S. Tsirkin" <mst@redhat.com>
+Cc:     stefanha@redhat.com, jasowang@redhat.com,
+        torvalds@linux-foundation.org, ascull@google.com, maz@kernel.org,
+        keirf@google.com, jiyong@google.com, kernel-team@android.com,
+        linux-kernel@vger.kernel.org,
+        virtualization@lists.linux-foundation.org, kvm@vger.kernel.org,
+        crosvm-dev@chromium.org
+Subject: Re: IOTLB support for vhost/vsock breaks crosvm on Android
+Message-ID: <20220817134821.GA12615@willie-the-truck>
+References: <20220805181105.GA29848@willie-the-truck>
+ <20220807042408-mutt-send-email-mst@kernel.org>
+ <20220808101850.GA31984@willie-the-truck>
+ <20220808083958-mutt-send-email-mst@kernel.org>
 MIME-Version: 1.0
-X-Developer-Signature: v=1; a=openpgp-sha256; l=1175; i=bagasdotme@gmail.com; h=from:subject; bh=pZtYWIvpNrlcv7lJWS5yJDXQNN6EtLfOfO5biSvqfVc=; b=owGbwMvMwCH2bWenZ2ig32LG02pJDEl/Hi/Nvfpm360XZypkJVv7louyvnD/fKdp+Rz9hTP7vDRq P7tzdJSyMIhxMMiKKbJMSuRrOr3LSORC+1pHmDmsTCBDGLg4BWAiX+MY/ofulF6dvyvmiUZFcWWouH yu6r398nuOLFjoZ1z0Wm1xUgvDLybntW0fH2Zzas8KP7FZ5PAr78C1q6aveN4QWfFJ8bOmPDcA
-X-Developer-Key: i=bagasdotme@gmail.com; a=openpgp; fpr=701B806FDCA5D3A58FFB8F7D7C276C64A5E44A1D
-Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-0.6 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
-        RCVD_IN_DNSWL_NONE,RCVD_IN_SORBS_WEB,SPF_HELO_NONE,SPF_PASS,
-        T_SCC_BODY_TEXT_LINE autolearn=no autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20220808083958-mutt-send-email-mst@kernel.org>
+User-Agent: Mutt/1.10.1 (2018-07-13)
+X-Spam-Status: No, score=-7.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_HI,
+        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Sphinx reported literal block warning:
+On Mon, Aug 08, 2022 at 08:45:48AM -0400, Michael S. Tsirkin wrote:
+> > > Also yes, I think it's a good idea to change crosvm anyway.  While the
+> > > work around I describe might make sense upstream I don't think it's a
+> > > reasonable thing to do in stable kernels.
+> > > I think I'll prepare a patch documenting the legal vhost features
+> > > as a 1st step even though crosvm is rust so it's not importing
+> > > the header directly, right?
+> > 
+> > Documentation is a good idea regardless, so thanks for that. Even though
+> > crosvm has its own bindings for the vhost ioctl()s, the documentation
+> > can be reference or duplicated once it's available in the kernel headers.
+> > 
+> So for crosvm change, I will post the documentation change and
+> you guys can discuss?
 
-Documentation/virt/kvm/api.rst:1362: WARNING: Literal block ends without a blank line; unexpected unindent.
+FYI, the crosvm patch is merged here:
 
-The warning is caused by the final closing brace in KVM_SET_USER_MEMORY_REGION
-struct definition is not indented as literal code block.
+https://github.com/google/crosvm/commit/4e7d00be2e135b0a2d964320ea4276e5d896f426
 
-Indent the closing brace to fix the warning.
-
-Link: https://lore.kernel.org/linux-doc/202208171109.lCfseeP6-lkp@intel.com/
-Fixes: bb90daae9d7551 ("KVM: Extend the memslot to support fd-based private memory")
-Reported-by: kernel test robot <lkp@intel.com>
-Signed-off-by: Bagas Sanjaya <bagasdotme@gmail.com>
----
- Documentation/virt/kvm/api.rst | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
-
-diff --git a/Documentation/virt/kvm/api.rst b/Documentation/virt/kvm/api.rst
-index d9d43078080030..4acf4d1c95c099 100644
---- a/Documentation/virt/kvm/api.rst
-+++ b/Documentation/virt/kvm/api.rst
-@@ -1359,7 +1359,7 @@ yet and must be cleared on entry.
- 	__u32 private_fd;
- 	__u32 pad1;
- 	__u64 pad2[14];
--};
-+  };
- 
-   /\* for kvm_memory_region::flags \*/
-   #define KVM_MEM_LOG_DIRTY_PAGES	(1UL << 0)
--- 
-An old man doll... just what I always wanted! - Clara
-
+Will
