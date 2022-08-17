@@ -2,37 +2,37 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id DA0AF5979DD
-	for <lists+kvm@lfdr.de>; Thu, 18 Aug 2022 01:01:33 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 21E1D597A07
+	for <lists+kvm@lfdr.de>; Thu, 18 Aug 2022 01:15:06 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238495AbiHQW55 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 17 Aug 2022 18:57:57 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58070 "EHLO
+        id S242225AbiHQXNw (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 17 Aug 2022 19:13:52 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42736 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231496AbiHQW54 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 17 Aug 2022 18:57:56 -0400
+        with ESMTP id S233622AbiHQXNv (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 17 Aug 2022 19:13:51 -0400
 Received: from madras.collabora.co.uk (madras.collabora.co.uk [46.235.227.172])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 037E5A8326;
-        Wed, 17 Aug 2022 15:57:53 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C862B5E562;
+        Wed, 17 Aug 2022 16:13:50 -0700 (PDT)
 Received: from [192.168.2.145] (109-252-119-13.nat.spd-mgts.ru [109.252.119.13])
         (using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
-         key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+         key-exchange X25519 server-signature RSA-PSS (4096 bits))
         (No client certificate requested)
         (Authenticated sender: dmitry.osipenko)
-        by madras.collabora.co.uk (Postfix) with ESMTPSA id D8A3B6601A13;
-        Wed, 17 Aug 2022 23:57:50 +0100 (BST)
+        by madras.collabora.co.uk (Postfix) with ESMTPSA id 98E346601AC9;
+        Thu, 18 Aug 2022 00:13:48 +0100 (BST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=collabora.com;
-        s=mail; t=1660777071;
-        bh=TxAbi6e312VFgURSiMw/SYGlkhUqLRcFFtpaFQ+YP6c=;
+        s=mail; t=1660778029;
+        bh=BTERDkMplbg6+afpyAvBteIliO13LfIHxpLWBRSHwRc=;
         h=Date:Subject:From:To:Cc:References:In-Reply-To:From;
-        b=bVhJ/k51+xGX/7nvmFj9Ku+ALaJV+LAmu2Bewec3le1Rz852ioLPvOSQZjvUUzVDY
-         skjSNQfCe4YwezLyU+7KXqp15kUUZG1/j3RH61+VGYWSV5Kk5vQqb4yRCMuHfFD/QP
-         BrQSvwPsbb5kDx8m6EViKnJjPv6jOXGVZa6x4WlQBlLUBHX9NmtAYpAaEhZkc+YILu
-         +oOctra9txmzzu/PmRtKRMFsn/ZynZBqg09pfanq72QADeKrWPl6W8Ef8DMFPy+py3
-         lwvDrCTwzkMCz3Jh/uRc47RGL4ble5AI773heECnaAfoq+nyYfbyjx52ayk6OK2xmZ
-         Ewz1pZXJAuR5Q==
-Message-ID: <ff28e1b4-cda2-14b8-b9bf-10706ae52cac@collabora.com>
-Date:   Thu, 18 Aug 2022 01:57:48 +0300
+        b=nYKg/VedkcteBe0aJJPlonz2U7BYSYy26WkKiGh+Cu1+NWCgtCj8F71fdd0gBrBVa
+         FsrVhXk2Var8kVuo8ehUOQ5+kIyHLcRLBNznHdUsXfEUjCv6Gs8oAxvfU4SszIwhBJ
+         JTJ5XudTOYzq9FrEm5AvYcpKZPsWiGIzkLWdLCRWfcE/eOgTa3Rl9LfiEqasV7ISRO
+         jugSGlJMQniqbCNUikXXkKHzzuiWmk2ZRDiMeu3uInKYWiBWwXCHOisOJ+gwaOYT50
+         PtCZvT0yZwgzRj7bbVccXwn2aVoGWzFTPEWdrpH0f73y3L+cl7ngcGLi9N/1OiuXsl
+         QU8kSr3kFDhjQ==
+Message-ID: <48b5dd12-b0df-3cc6-a72d-f35156679844@collabora.com>
+Date:   Thu, 18 Aug 2022 02:13:45 +0300
 MIME-Version: 1.0
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
  Thunderbird/91.12.0
@@ -65,7 +65,8 @@ References: <20220815095423.11131-1-dmitry.osipenko@collabora.com>
  <73e5ed8d-0d25-7d44-8fa2-e1d61b1f5a04@amd.com>
  <c9d89644-409e-0363-69f0-a3b8f2ef0ae4@collabora.com>
  <6effcd33-8cc3-a4e0-3608-b9cef7a76da7@collabora.com>
-In-Reply-To: <6effcd33-8cc3-a4e0-3608-b9cef7a76da7@collabora.com>
+ <ff28e1b4-cda2-14b8-b9bf-10706ae52cac@collabora.com>
+In-Reply-To: <ff28e1b4-cda2-14b8-b9bf-10706ae52cac@collabora.com>
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
@@ -78,64 +79,68 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 8/15/22 18:54, Dmitry Osipenko wrote:
-> On 8/15/22 17:57, Dmitry Osipenko wrote:
->> On 8/15/22 16:53, Christian König wrote:
->>> Am 15.08.22 um 15:45 schrieb Dmitry Osipenko:
->>>> [SNIP]
->>>>> Well that comment sounds like KVM is doing the right thing, so I'm
->>>>> wondering what exactly is going on here.
->>>> KVM actually doesn't hold the page reference, it takes the temporal
->>>> reference during page fault and then drops the reference once page is
->>>> mapped, IIUC. Is it still illegal for TTM? Or there is a possibility for
->>>> a race condition here?
+On 8/18/22 01:57, Dmitry Osipenko wrote:
+> On 8/15/22 18:54, Dmitry Osipenko wrote:
+>> On 8/15/22 17:57, Dmitry Osipenko wrote:
+>>> On 8/15/22 16:53, Christian König wrote:
+>>>> Am 15.08.22 um 15:45 schrieb Dmitry Osipenko:
+>>>>> [SNIP]
+>>>>>> Well that comment sounds like KVM is doing the right thing, so I'm
+>>>>>> wondering what exactly is going on here.
+>>>>> KVM actually doesn't hold the page reference, it takes the temporal
+>>>>> reference during page fault and then drops the reference once page is
+>>>>> mapped, IIUC. Is it still illegal for TTM? Or there is a possibility for
+>>>>> a race condition here?
+>>>>>
 >>>>
+>>>> Well the question is why does KVM grab the page reference in the first
+>>>> place?
+>>>>
+>>>> If that is to prevent the mapping from changing then yes that's illegal
+>>>> and won't work. It can always happen that you grab the address, solve
+>>>> the fault and then immediately fault again because the address you just
+>>>> grabbed is invalidated.
+>>>>
+>>>> If it's for some other reason than we should probably investigate if we
+>>>> shouldn't stop doing this.
 >>>
->>> Well the question is why does KVM grab the page reference in the first
->>> place?
+>>> CC: +Paolo Bonzini who introduced this code
 >>>
->>> If that is to prevent the mapping from changing then yes that's illegal
->>> and won't work. It can always happen that you grab the address, solve
->>> the fault and then immediately fault again because the address you just
->>> grabbed is invalidated.
+>>> commit add6a0cd1c5ba51b201e1361b05a5df817083618
+>>> Author: Paolo Bonzini <pbonzini@redhat.com>
+>>> Date:   Tue Jun 7 17:51:18 2016 +0200
 >>>
->>> If it's for some other reason than we should probably investigate if we
->>> shouldn't stop doing this.
+>>>     KVM: MMU: try to fix up page faults before giving up
+>>>
+>>>     The vGPU folks would like to trap the first access to a BAR by setting
+>>>     vm_ops on the VMAs produced by mmap-ing a VFIO device.  The fault
+>>> handler
+>>>     then can use remap_pfn_range to place some non-reserved pages in the
+>>> VMA.
+>>>
+>>>     This kind of VM_PFNMAP mapping is not handled by KVM, but follow_pfn
+>>>     and fixup_user_fault together help supporting it.  The patch also
+>>> supports
+>>>     VM_MIXEDMAP vmas where the pfns are not reserved and thus subject to
+>>>     reference counting.
+>>>
+>>> @Paolo,
+>>> https://lore.kernel.org/dri-devel/73e5ed8d-0d25-7d44-8fa2-e1d61b1f5a04@amd.com/T/#m7647ce5f8c4749599d2c6bc15a2b45f8d8cf8154
+>>>
 >>
->> CC: +Paolo Bonzini who introduced this code
->>
->> commit add6a0cd1c5ba51b201e1361b05a5df817083618
->> Author: Paolo Bonzini <pbonzini@redhat.com>
->> Date:   Tue Jun 7 17:51:18 2016 +0200
->>
->>     KVM: MMU: try to fix up page faults before giving up
->>
->>     The vGPU folks would like to trap the first access to a BAR by setting
->>     vm_ops on the VMAs produced by mmap-ing a VFIO device.  The fault
->> handler
->>     then can use remap_pfn_range to place some non-reserved pages in the
->> VMA.
->>
->>     This kind of VM_PFNMAP mapping is not handled by KVM, but follow_pfn
->>     and fixup_user_fault together help supporting it.  The patch also
->> supports
->>     VM_MIXEDMAP vmas where the pfns are not reserved and thus subject to
->>     reference counting.
->>
->> @Paolo,
->> https://lore.kernel.org/dri-devel/73e5ed8d-0d25-7d44-8fa2-e1d61b1f5a04@amd.com/T/#m7647ce5f8c4749599d2c6bc15a2b45f8d8cf8154
->>
+>> If we need to bump the refcount only for VM_MIXEDMAP and not for
+>> VM_PFNMAP, then perhaps we could add a flag for that to the kvm_main
+>> code that will denote to kvm_release_page_clean whether it needs to put
+>> the page?
 > 
-> If we need to bump the refcount only for VM_MIXEDMAP and not for
-> VM_PFNMAP, then perhaps we could add a flag for that to the kvm_main
-> code that will denote to kvm_release_page_clean whether it needs to put
-> the page?
+> The other variant that kind of works is to mark TTM pages reserved using
+> SetPageReserved/ClearPageReserved, telling KVM not to mess with the page
+> struct. But the potential consequences of doing this are unclear to me.
+> 
+> Christian, do you think we can do it?
 
-The other variant that kind of works is to mark TTM pages reserved using
-SetPageReserved/ClearPageReserved, telling KVM not to mess with the page
-struct. But the potential consequences of doing this are unclear to me.
-
-Christian, do you think we can do it?
+Although, no. It also doesn't work with KVM without additional changes
+to KVM.
 
 -- 
 Best regards,
