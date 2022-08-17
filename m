@@ -2,56 +2,68 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 8ECF9596D5B
-	for <lists+kvm@lfdr.de>; Wed, 17 Aug 2022 13:15:44 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id B6ECF596E55
+	for <lists+kvm@lfdr.de>; Wed, 17 Aug 2022 14:21:33 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232132AbiHQLNU (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 17 Aug 2022 07:13:20 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58806 "EHLO
+        id S239404AbiHQMTR (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 17 Aug 2022 08:19:17 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46860 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231395AbiHQLNT (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 17 Aug 2022 07:13:19 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 902B82B637
-        for <kvm@vger.kernel.org>; Wed, 17 Aug 2022 04:13:18 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1660734797;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=cyh9GNwkSeiWX8VVWJet6cmrStrv1Y1BhHYKMAKCy08=;
-        b=DJUn5w8Jo4JszIYuv4HQd4YqOMJFxHXtEEYkmUsq7O8TN8KLI5THHfHiMi9zburIaPHKuj
-        BYoPZZCTuYmsX9bsTNa4V6ZeJQ43W23ELmVcqHBdQ8+Bxo73lHCyMVh4HGSnpVGiHKGUVP
-        AjO7HxM+Krh7AKhO0yJbBFcBnThyFXM=
-Received: from mimecast-mx02.redhat.com (mx3-rdu2.redhat.com
- [66.187.233.73]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-154-yFvDoMJANbaLo_1uqfzEaA-1; Wed, 17 Aug 2022 07:13:03 -0400
-X-MC-Unique: yFvDoMJANbaLo_1uqfzEaA-1
-Received: from smtp.corp.redhat.com (int-mx10.intmail.prod.int.rdu2.redhat.com [10.11.54.10])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        with ESMTP id S238988AbiHQMTP (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 17 Aug 2022 08:19:15 -0400
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E920369F7D;
+        Wed, 17 Aug 2022 05:19:13 -0700 (PDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id E0C3C29DD9B4;
-        Wed, 17 Aug 2022 11:13:01 +0000 (UTC)
-Received: from virtlab701.virt.lab.eng.bos.redhat.com (virtlab701.virt.lab.eng.bos.redhat.com [10.19.152.228])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id BD893403340;
-        Wed, 17 Aug 2022 11:13:01 +0000 (UTC)
-From:   Paolo Bonzini <pbonzini@redhat.com>
-To:     Chao Peng <chao.p.peng@linux.intel.com>
-Cc:     Sean Christopherson <seanjc@google.com>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-Subject: Re: [PATCH 0/2] Preparation for fd-based guest private memory
-Date:   Wed, 17 Aug 2022 07:12:58 -0400
-Message-Id: <20220817111258.1778067-1-pbonzini@redhat.com>
-In-Reply-To: <20220816125322.1110439-1-chao.p.peng@linux.intel.com>
-References: 
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 2.85 on 10.11.54.10
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham
+        by dfw.source.kernel.org (Postfix) with ESMTPS id 8F67260B82;
+        Wed, 17 Aug 2022 12:19:13 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id DFD7FC433D6;
+        Wed, 17 Aug 2022 12:19:12 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1660738752;
+        bh=BBTXORGlFEwLgbRuxkkzNMEk2vrtwEdIFHOCs3ywN/0=;
+        h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+        b=pR/Fqpc4qFciyFif+Rz7Y2QU1wPblmLNOUD0NN87Gmz8UpPn1g3rm0bAXA5dTfs33
+         AqfH02QQfopKJx5JzziZnxrQDP4xohcoSzhk5Hp8ItmrhQjEXbPV5gX2RDTRJuH1AY
+         b8Gu8UAdLP4Gj2DHWLrRICkNKd3q/C76ls5hom4lTX20h7Pt9rSFEG8gtl/3Qrb6kZ
+         xFcHDLZK/FNXRKWKYuBfTMETBatSkKQhZCjqR4g0xTQEoDWP2kRbg+uJ38bYhRWLzA
+         T/V2c978rL/8qyhb9ZGzLsBMGgNmzZhjUY9CFNjE3j2TD48GpL6XIbwc/TYAHYJcTB
+         5xvlEqfxQY6PA==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=why.misterjones.org)
+        by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+        (Exim 4.95)
+        (envelope-from <maz@kernel.org>)
+        id 1oOI0s-003j3K-Hy;
+        Wed, 17 Aug 2022 13:19:10 +0100
+Date:   Wed, 17 Aug 2022 13:19:10 +0100
+Message-ID: <87r11fvz9d.wl-maz@kernel.org>
+From:   Marc Zyngier <maz@kernel.org>
+To:     Robin Murphy <robin.murphy@arm.com>
+Cc:     joro@8bytes.org, will@kernel.org, catalin.marinas@arm.com,
+        jean-philippe@linaro.org, inki.dae@samsung.com,
+        sw0312.kim@samsung.com, kyungmin.park@samsung.com,
+        tglx@linutronix.de, alex.williamson@redhat.com, cohuck@redhat.com,
+        iommu@lists.linux.dev, linux-arm-kernel@lists.infradead.org,
+        linux-acpi@vger.kernel.org, dri-devel@lists.freedesktop.org,
+        linux-kernel@vger.kernel.org, kvm@vger.kernel.org
+Subject: Re: [PATCH 2/3] iommu/dma: Move public interfaces to linux/iommu.h
+In-Reply-To: <9cd99738f52094e6bed44bfee03fa4f288d20695.1660668998.git.robin.murphy@arm.com>
+References: <cover.1660668998.git.robin.murphy@arm.com>
+        <9cd99738f52094e6bed44bfee03fa4f288d20695.1660668998.git.robin.murphy@arm.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/27.1
+ (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: robin.murphy@arm.com, joro@8bytes.org, will@kernel.org, catalin.marinas@arm.com, jean-philippe@linaro.org, inki.dae@samsung.com, sw0312.kim@samsung.com, kyungmin.park@samsung.com, tglx@linutronix.de, alex.williamson@redhat.com, cohuck@redhat.com, iommu@lists.linux.dev, linux-arm-kernel@lists.infradead.org, linux-acpi@vger.kernel.org, dri-devel@lists.freedesktop.org, linux-kernel@vger.kernel.org, kvm@vger.kernel.org
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+X-Spam-Status: No, score=-7.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_HI,
+        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -59,8 +71,38 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Queued, thanks.
+On Tue, 16 Aug 2022 18:28:04 +0100,
+Robin Murphy <robin.murphy@arm.com> wrote:
+> 
+> The iommu-dma layer is now mostly encapsulated by iommu_dma_ops, with
+> only a couple more public interfaces left pertaining to MSI integration.
+> Since these depend on the main IOMMU API header anyway, move their
+> declarations there, taking the opportunity to update the half-baked
+> comments to proper kerneldoc along the way.
+> 
+> Signed-off-by: Robin Murphy <robin.murphy@arm.com>
+> ---
+> 
+> Note that iommu_setup_dma_ops() should also become internal in a future
+> phase of the great IOMMU API upheaval - for now as the last bit of true
+> arch code glue I consider it more "necessarily exposed" than "public".
+> 
+>  arch/arm64/mm/dma-mapping.c       |  2 +-
+>  drivers/iommu/dma-iommu.c         | 15 ++++++++++--
+>  drivers/irqchip/irq-gic-v2m.c     |  2 +-
+>  drivers/irqchip/irq-gic-v3-its.c  |  2 +-
+>  drivers/irqchip/irq-gic-v3-mbi.c  |  2 +-
+>  drivers/irqchip/irq-ls-scfg-msi.c |  2 +-
+>  drivers/vfio/vfio_iommu_type1.c   |  1 -
+>  include/linux/dma-iommu.h         | 40 -------------------------------
+>  include/linux/iommu.h             | 36 ++++++++++++++++++++++++++++
+>  9 files changed, 54 insertions(+), 48 deletions(-)
 
-Paolo
+For the irqchip side:
 
+Acked-by: Marc Zyngier <maz@kernel.org>
 
+	M.
+
+-- 
+Without deviation from the norm, progress is not possible.
