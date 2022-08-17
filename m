@@ -2,130 +2,105 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 282EC5966A1
-	for <lists+kvm@lfdr.de>; Wed, 17 Aug 2022 03:24:16 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 814EE5966D7
+	for <lists+kvm@lfdr.de>; Wed, 17 Aug 2022 03:38:49 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238001AbiHQBX2 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 16 Aug 2022 21:23:28 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44104 "EHLO
+        id S238356AbiHQBhi (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 16 Aug 2022 21:37:38 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47374 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S237643AbiHQBXX (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 16 Aug 2022 21:23:23 -0400
-Received: from mail-ua1-x929.google.com (mail-ua1-x929.google.com [IPv6:2607:f8b0:4864:20::929])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 66828103F
-        for <kvm@vger.kernel.org>; Tue, 16 Aug 2022 18:23:21 -0700 (PDT)
-Received: by mail-ua1-x929.google.com with SMTP id s18so4674853uac.10
-        for <kvm@vger.kernel.org>; Tue, 16 Aug 2022 18:23:21 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=bytedance-com.20210112.gappssmtp.com; s=20210112;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc;
-        bh=Misl/B06841rsdf51Aa+ttnbhsZR7d3YzAIKfH1afCM=;
-        b=MG0YgAX5i1o7sBUDQM1NCnFgnxkQaaQm8ZOK13l79EOrXwG3hxCVCuxw53YmF/GPmG
-         BotdAEanspQc99c8od7et+xJJfH666g+PKM2nqgz3aozMVwIaZpREipg9SXYXgriDnmG
-         gd/gkMlKOf8PYpghcO3mkXIF7SKNqJjlKBYT913vJf9YESWgf8pX2vYoNDz1IqpbTxV3
-         ey8qpYsAzqcukQgw/XSXbpnh4iqMa5QXp6N0QLpAN0eT/f7DTXgLZh1huFFG57VyQyzn
-         6HWrAgsd8srbQ2yyjWgBYeijyKZyB2lbk+DexhRKJ/HbmCuh55PZoJ2SmQL/CWZeRD8m
-         GOyg==
+        with ESMTP id S238256AbiHQBhh (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 16 Aug 2022 21:37:37 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 496FE956A2
+        for <kvm@vger.kernel.org>; Tue, 16 Aug 2022 18:37:36 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1660700255;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=kwxwoIPUtHYvH8cJiGM07yEHhTrcrM/2a4je8bRPTjY=;
+        b=Tly2uKe1Ve2Vc5L5t6itYEmtd2oiI4fP87u1YeR6uNow9tZZIX4v4mKsoNpq8UGD4Sbc8G
+        OIL0SD/WsEUM+Mqdv2AEyOiuBAw8T6vzK4xPb1890rafaL7EINj2fDG6K8OSnPUNSz0A/B
+        wCRK3TkfhK79L+2wFeGI9cDihEaKkVE=
+Received: from mail-qv1-f72.google.com (mail-qv1-f72.google.com
+ [209.85.219.72]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_128_GCM_SHA256) id
+ us-mta-668-wbN5pYM7NGi8azHGvC6s0Q-1; Tue, 16 Aug 2022 21:37:33 -0400
+X-MC-Unique: wbN5pYM7NGi8azHGvC6s0Q-1
+Received: by mail-qv1-f72.google.com with SMTP id b3-20020a0ce883000000b0047a2ae5b662so5401555qvo.15
+        for <kvm@vger.kernel.org>; Tue, 16 Aug 2022 18:37:33 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc;
-        bh=Misl/B06841rsdf51Aa+ttnbhsZR7d3YzAIKfH1afCM=;
-        b=RZgeJv3tol7sXcHB6CKyrbWTZhQWbJrUfxx73GsSe78Q3T6gkkB0azJAlqhhqgv1W3
-         moXGg3zZFDFd9db6hbVv3HEoB0pR1Cf34HGeSlRr2/+Ssa1gdIZ9qCLiq7JSUnG4VHhV
-         cLWXnX3yVldGU1bEQEJPGMYszTMZd3AFZ4YGuuUn7VipzkJXVBlXpMrtHOw1X8iR5OnE
-         GNNUiVI2UhO/2AzQZtEeuFWxX4Cfu5kjH77vbh7D6dd4O5RucRUcp8gveF3I9blCAhEG
-         obDGa8NpuiDW0Ir0Go27v9bKRq/5ZnPyB1raOTAwPzqR2HfvChYjheU2JQ7Kme4t6RNS
-         dDsw==
-X-Gm-Message-State: ACgBeo0EVEAmlMMSnCMytEoEBVEVmexqW4AiZlo2hmRGPObun88SS9Ah
-        r5FH8Uyp91xBg2wx9kdN4jvGILOk9sjlBM5EYSrC+g==
-X-Google-Smtp-Source: AA6agR5ITNWjhKzMRt/O1Pao4VfpXIG2uEaU2CaLxbF3VzOqtgaIZ/UWesq0hyAy6dBXihAeRHYyLPGpOXaXwPHw0oU=
-X-Received: by 2002:ab0:785a:0:b0:386:d33c:d636 with SMTP id
- y26-20020ab0785a000000b00386d33cd636mr10128457uaq.87.1660699400464; Tue, 16
- Aug 2022 18:23:20 -0700 (PDT)
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc;
+        bh=kwxwoIPUtHYvH8cJiGM07yEHhTrcrM/2a4je8bRPTjY=;
+        b=T8b3tP+ZrcQxZo0HkI5IywlbJwPHOVeE7ngy8Sodogd7Mrh1HLaB70yZJTGELqw9Ie
+         693lY+Ot7pkT6ZnWmg5AZVpY2Da6BbVAk3AzLm5OKpHZSis5Pj+BTtE/ifM9Hb2ihnQi
+         36r6YEcAvq44X8JimJYRIu25ipS6CGhadeS2nKBUmt4Pp/r5cDKNv5c+qb5bXnDJmcxd
+         HbVB0C0p/lZcUeSBJgP2qhm5hLUspOjB0NWF7mB2+Pb/GtB8M82VXG6ew93AsS4ewD+u
+         ynTiBIl1o49iE/vasWJOaDpUFXjGf+R/qJ9qSr4mZ8ICK71AfAlFWXFFWKG8fNt8lEze
+         OqTQ==
+X-Gm-Message-State: ACgBeo1rX6eyeGtl+v/49xEP2hvOH1w+AmJdGj0EHP0FVTuxDLCDcIwr
+        QBiXsRblFmice7yvIIavzSJq6FQkzuvW3qmiPSUb8NW1IULMrOefVWpAB/wlP6KxJq1ZcpuDxmd
+        h9AeI5CEsWIlg
+X-Received: by 2002:a05:622a:1107:b0:341:87c3:152b with SMTP id e7-20020a05622a110700b0034187c3152bmr21072705qty.621.1660700253262;
+        Tue, 16 Aug 2022 18:37:33 -0700 (PDT)
+X-Google-Smtp-Source: AA6agR78jn8XTvWMZrpe7oBTKwz8+yxUf3MhZKB3MfbNWTkSmTmr8nu7P26aUvbJWIaTrf78wnLnWg==
+X-Received: by 2002:a05:622a:1107:b0:341:87c3:152b with SMTP id e7-20020a05622a110700b0034187c3152bmr21072691qty.621.1660700253065;
+        Tue, 16 Aug 2022 18:37:33 -0700 (PDT)
+Received: from xz-m1.local (bras-base-aurron9127w-grc-35-70-27-3-10.dsl.bell.ca. [70.27.3.10])
+        by smtp.gmail.com with ESMTPSA id d135-20020ae9ef8d000000b006bb0f9b89cfsm8310215qkg.87.2022.08.16.18.37.31
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 16 Aug 2022 18:37:32 -0700 (PDT)
+Date:   Tue, 16 Aug 2022 21:37:31 -0400
+From:   Peter Xu <peterx@redhat.com>
+To:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org
+Cc:     Sean Christopherson <seanjc@google.com>,
+        David Hildenbrand <david@redhat.com>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        Andrea Arcangeli <aarcange@redhat.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        "Dr . David Alan Gilbert" <dgilbert@redhat.com>,
+        Linux MM Mailing List <linux-mm@kvack.org>,
+        John Hubbard <jhubbard@nvidia.com>,
+        David Matlack <dmatlack@google.com>,
+        Mike Kravetz <mike.kravetz@oracle.com>
+Subject: Re: [PATCH v3 0/3] kvm/mm: Allow GUP to respond to non fatal signals
+Message-ID: <YvxGW9IujFpTX668@xz-m1.local>
+References: <20220817003614.58900-1-peterx@redhat.com>
 MIME-Version: 1.0
-References: <cover.1660362668.git.bobby.eshleman@bytedance.com>
- <5a93c5aad99d79f028d349cb7e3c128c65d5d7e2.1660362668.git.bobby.eshleman@bytedance.com>
- <20220816123701-mutt-send-email-mst@kernel.org> <20220816110717.5422e976@kernel.org>
- <YvtAktdB09tM0Ykr@bullseye> <20220816160755.7eb11d2e@kernel.org>
-In-Reply-To: <20220816160755.7eb11d2e@kernel.org>
-From:   "Cong Wang ." <cong.wang@bytedance.com>
-Date:   Tue, 16 Aug 2022 18:23:09 -0700
-Message-ID: <CAA68J_Z4voVS=UnY9Rg_dj2oUnEueWn82Q_qT328avdTtaASjA@mail.gmail.com>
-Subject: Re: [External] Re: [PATCH 3/6] vsock: add netdev to vhost/virtio vsock
-To:     Jakub Kicinski <kuba@kernel.org>
-Cc:     Bobby Eshleman <bobbyeshleman@gmail.com>,
-        Bobby Eshleman <bobby.eshleman@gmail.com>,
-        "Michael S. Tsirkin" <mst@redhat.com>,
-        Bobby Eshleman <bobby.eshleman@bytedance.com>,
-        Jiang Wang <jiang.wang@bytedance.com>,
-        Stefan Hajnoczi <stefanha@redhat.com>,
-        Stefano Garzarella <sgarzare@redhat.com>,
-        Jason Wang <jasowang@redhat.com>,
-        "David S. Miller" <davem@davemloft.net>,
-        Eric Dumazet <edumazet@google.com>,
-        Paolo Abeni <pabeni@redhat.com>, kvm@vger.kernel.org,
-        virtualization@lists.linux-foundation.org, netdev@vger.kernel.org,
-        linux-kernel@vger.kernel.org,
-        =?UTF-8?B?VG9rZSBIw7hpbGFuZC1Kw7hyZ2Vuc2Vu?= <toke@toke.dk>
-Content-Type: text/plain; charset="UTF-8"
-X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-        T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20220817003614.58900-1-peterx@redhat.com>
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=unavailable
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Aug 16, 2022 at 4:07 PM Jakub Kicinski <kuba@kernel.org> wrote:
->
-> On Tue, 16 Aug 2022 07:02:33 +0000 Bobby Eshleman wrote:
-> > > From a cursory look (and Documentation/ would be nice..) it feels
-> > > very wrong to me. Do you know of any uses of a netdev which would
-> > > be semantically similar to what you're doing? Treating netdevs as
-> > > buildings blocks for arbitrary message passing solutions is something
-> > > I dislike quite strongly.
-> >
-> > The big difference between vsock and "arbitrary message passing" is that
-> > vsock is actually constrained by the virtio device that backs it (made
-> > up of virtqueues and the underlying protocol). That virtqueue pair is
-> > acting like the queues on a physical NIC, so it actually makes sense to
-> > manage the queuing of vsock's device like we would manage the queueing
-> > of a real device.
-> >
-> > Still, I concede that ignoring the netdev state is a probably bad idea.
-> >
-> > That said, I also think that using packet scheduling in vsock is a good
-> > idea, and that ideally we can reuse Linux's already robust library of
-> > packet scheduling algorithms by introducing qdisc somehow.
->
-> We've been burnt in the past by people doing the "let me just pick
-> these useful pieces out of netdev" thing. Makes life hard both for
-> maintainers and users trying to make sense of the interfaces.
+On Tue, Aug 16, 2022 at 08:36:11PM -0400, Peter Xu wrote:
+> v3:
+> - Patch 1
+>   - Added r-b for DavidH
+>   - Added support for hugetlbfs
+> - Patch 2 & 3
+>   - Comment fixes [Sean]
+>   - Move introduction of "interruptible" parameter into patch 2 [Sean]
+>   - Move sigpending handling into kvm_handle_bad_page [Sean]
+>   - Renamed kvm_handle_bad_page() to kvm_handle_error_pfn() [Sean, DavidM]
+>   - Use kvm_handle_signal_exit() [Sean]
+> 
+> rfc: https://lore.kernel.org/kvm/20220617014147.7299-1-peterx@redhat.com
+> v1:  https://lore.kernel.org/kvm/20220622213656.81546-1-peterx@redhat.com
+> v2:  https://lore.kernel.org/kvm/20220721000318.93522-1-peterx@redhat.com
 
-I interpret this in a different way: we just believe "one size does
-not fit all",
-as most Linux kernel developers do. I am very surprised you don't.
+Sorry, forgot to copy DavidM and Mike.
 
-Feel free to suggest any other ways, eventually you will need to
-reimplement TC one way or the other.
+-- 
+Peter Xu
 
-If you think about it in another way, vsock is networking too, its name
-contains a "sock", do I need to say more? :)
-
->
-> What comes to mind if you're just after queuing is that we already
-> bastardized the CoDel implementation (include/net/codel_impl.h).
-> If CoDel is good enough for you maybe that's the easiest way?
-> Although I suspect that you're after fairness not early drops.
-> Wireless folks use CoDel as a second layer queuing. (CC: Toke)
-
-What makes you believe CoDel fits all cases? If it really does, you
-probably have to convince Toke to give up his idea on XDP map
-as it would no longer make any sense. I don't see you raise such
-an argument there... What makes you treat this differently with XDP
-map? I am very curious about your thought process here. ;-)
-
-Thanks.
