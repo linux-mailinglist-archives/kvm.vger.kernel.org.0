@@ -2,183 +2,134 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 928B859672F
-	for <lists+kvm@lfdr.de>; Wed, 17 Aug 2022 04:04:57 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id E58CA596734
+	for <lists+kvm@lfdr.de>; Wed, 17 Aug 2022 04:04:59 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238503AbiHQCDy (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 16 Aug 2022 22:03:54 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38132 "EHLO
+        id S238118AbiHQCCn (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 16 Aug 2022 22:02:43 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35610 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S238457AbiHQCDk (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 16 Aug 2022 22:03:40 -0400
-Received: from mga11.intel.com (mga11.intel.com [192.55.52.93])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5A9AE95AC7;
-        Tue, 16 Aug 2022 19:03:32 -0700 (PDT)
+        with ESMTP id S235324AbiHQCCm (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 16 Aug 2022 22:02:42 -0400
+Received: from mga04.intel.com (mga04.intel.com [192.55.52.120])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 943A87FE77
+        for <kvm@vger.kernel.org>; Tue, 16 Aug 2022 19:02:40 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1660701812; x=1692237812;
-  h=message-id:date:mime-version:subject:to:cc:references:
-   from:in-reply-to:content-transfer-encoding;
-  bh=dl7DZK7xwAHmVqPwuvCPEvVjDWc0EuOKC0VSZ2rqSM4=;
-  b=eBxFQ9vsONEo99TlYsvZrkE9k5vK03TuSdoh+WwMhcLR9eIup1ffc+yV
-   f7tIZJGQJNRLxbz6pkpdjWKF1CPTJPSNRXnm7h8rP8J2IIAd8RGaLShTU
-   41IegKLro/aPih1mIpKXXhZ2w0XUXQvXKGG/JPH3c2BNQqkXAHoyzrdpf
-   eWLs/m7WNKtPjwUbri9LkdfDkqZ6gJBjSJ81UWLck+/4tXPvRk7e9LmK+
-   g30XTJjEMSZ2C7fqOWvG7vSdzXicLVGkDZHraVmt9P0eyII1KsfzV/Mca
-   5LRrhnO8OVeB2KNjhcJHHj7xXhlwjlGKP2zBi+8JTQ7r3sAoLx+1UubCI
-   Q==;
-X-IronPort-AV: E=McAfee;i="6400,9594,10441"; a="289949021"
+  t=1660701760; x=1692237760;
+  h=from:to:cc:subject:date:message-id;
+  bh=Sl693IxK0Tv2IMegSNQ5h3hCL9MM2a2gImQ/QH6/NK0=;
+  b=iU0h9LlUJZM/nTcxFFnPaogF+1JYehdhKta15YIk5K63HdJWH1JAwkeM
+   mNc5i7R5KlQNoJxeRK33oeJbMoi16dbOuGmaypOQGAsH1Zaz06XXNM6mK
+   2cn4xVyA0S+RUR2nCUUHH5gyNkDDM5aTdckmaW1OsD5UKLohcwJ5IBlU3
+   0gD4phbJg9JhH3/uvQaACu40WqtWK0fpblI0FFrWW/jyg2yw5ZXNnjBbM
+   ULM/WZgatzO3trB3UGs0p5JHRLOYHyDa6eFvHnmKMAHfDq9EOb0Eg7E7w
+   Mm5F8LeZBrqGAJPYxM3ixPaFABwZimlmJX5W5iAarCiIzJ5V5IMTNTyuN
+   w==;
+X-IronPort-AV: E=McAfee;i="6400,9594,10441"; a="291131189"
 X-IronPort-AV: E=Sophos;i="5.93,242,1654585200"; 
-   d="scan'208";a="289949021"
-Received: from fmsmga008.fm.intel.com ([10.253.24.58])
-  by fmsmga102.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 16 Aug 2022 19:03:24 -0700
+   d="scan'208";a="291131189"
+Received: from fmsmga004.fm.intel.com ([10.253.24.48])
+  by fmsmga104.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 16 Aug 2022 19:02:40 -0700
 X-IronPort-AV: E=Sophos;i="5.93,242,1654585200"; 
-   d="scan'208";a="667392119"
-Received: from pregnie-mobl1.ccr.corp.intel.com (HELO [10.255.30.246]) ([10.255.30.246])
-  by fmsmga008-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 16 Aug 2022 19:03:21 -0700
-Message-ID: <352e9533-8ab1-cec0-0141-ce0735ee39f5@intel.com>
-Date:   Wed, 17 Aug 2022 10:03:19 +0800
-MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:91.0) Gecko/20100101
- Firefox/91.0 Thunderbird/91.12.0
-Subject: Re: [PATCH 2/2] vDPA: conditionally read fields in virtio-net dev
-Content-Language: en-US
-To:     "Michael S. Tsirkin" <mst@redhat.com>,
-        Parav Pandit <parav@nvidia.com>
-Cc:     "jasowang@redhat.com" <jasowang@redhat.com>,
-        "virtualization@lists.linux-foundation.org" 
-        <virtualization@lists.linux-foundation.org>,
-        "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "xieyongji@bytedance.com" <xieyongji@bytedance.com>,
-        "gautam.dawar@amd.com" <gautam.dawar@amd.com>
-References: <20220815092638.504528-1-lingshan.zhu@intel.com>
- <20220815092638.504528-3-lingshan.zhu@intel.com>
- <PH0PR12MB54815EF8C19F70072169FA56DC6B9@PH0PR12MB5481.namprd12.prod.outlook.com>
- <4184a943-f1c0-a57b-6411-bdd21e0bc710@intel.com>
- <PH0PR12MB5481EBA9E08963DEF0743063DC6B9@PH0PR12MB5481.namprd12.prod.outlook.com>
- <20220816170753-mutt-send-email-mst@kernel.org>
-From:   "Zhu, Lingshan" <lingshan.zhu@intel.com>
-In-Reply-To: <20220816170753-mutt-send-email-mst@kernel.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-7.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
-        RCVD_IN_DNSWL_HI,SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE,
-        URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.6
+   d="scan'208";a="675456968"
+Received: from chenyi-pc.sh.intel.com ([10.239.159.73])
+  by fmsmga004-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 16 Aug 2022 19:02:38 -0700
+From:   Chenyi Qiang <chenyi.qiang@intel.com>
+To:     Paolo Bonzini <pbonzini@redhat.com>,
+        Marcelo Tosatti <mtosatti@redhat.com>,
+        Richard Henderson <richard.henderson@linaro.org>,
+        Eduardo Habkost <eduardo@habkost.net>,
+        Xiaoyao Li <xiaoyao.li@intel.com>
+Cc:     Chenyi Qiang <chenyi.qiang@intel.com>, qemu-devel@nongnu.org,
+        kvm@vger.kernel.org
+Subject: [PATCH v5 0/3] Enable notify VM exit
+Date:   Wed, 17 Aug 2022 10:08:42 +0800
+Message-Id: <20220817020845.21855-1-chenyi.qiang@intel.com>
+X-Mailer: git-send-email 2.17.1
+X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
+        SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+Notify VM exit is introduced to mitigate the potential DOS attach from
+malicious VM. This series is the userspace part to enable this feature
+through a new KVM capability KVM_CAP_X86_NOTIFY_VMEXIT. The detailed
+info can be seen in Patch 3.
 
+The corresponding KVM support can be found in linux 6.0-rc1:
+(2f4073e08f4c KVM: VMX: Enable Notify VM exit)
 
-On 8/17/2022 5:09 AM, Michael S. Tsirkin wrote:
-> On Tue, Aug 16, 2022 at 09:02:17PM +0000, Parav Pandit wrote:
->>> From: Zhu, Lingshan <lingshan.zhu@intel.com>
->>> Sent: Tuesday, August 16, 2022 12:19 AM
->>>
->>>
->>> On 8/16/2022 10:32 AM, Parav Pandit wrote:
->>>>> From: Zhu Lingshan <lingshan.zhu@intel.com>
->>>>> Sent: Monday, August 15, 2022 5:27 AM
->>>>>
->>>>> Some fields of virtio-net device config space are conditional on the
->>>>> feature bits, the spec says:
->>>>>
->>>>> "The mac address field always exists
->>>>> (though is only valid if VIRTIO_NET_F_MAC is set)"
->>>>>
->>>>> "max_virtqueue_pairs only exists if VIRTIO_NET_F_MQ or
->>>>> VIRTIO_NET_F_RSS is set"
->>>>>
->>>>> "mtu only exists if VIRTIO_NET_F_MTU is set"
->>>>>
->>>>> so we should read MTU, MAC and MQ in the device config space only
->>>>> when these feature bits are offered.
->>>> Yes.
->>>>
->>>>> For MQ, if both VIRTIO_NET_F_MQ and VIRTIO_NET_F_RSS are not set,
->>> the
->>>>> virtio device should have one queue pair as default value, so when
->>>>> userspace querying queue pair numbers, it should return mq=1 than zero.
->>>> No.
->>>> No need to treat mac and max_qps differently.
->>>> It is meaningless to differentiate when field exist/not-exists vs value
->>> valid/not valid.
->>> as we discussed before, MQ has a default value 1, to be a functional virtio-
->>> net device, while MAC has no default value, if no VIRTIO_NET_F_MAC set,
->>> the driver should generate a random MAC.
->>>>> For MTU, if VIRTIO_NET_F_MTU is not set, we should not read MTU from
->>>>> the device config sapce.
->>>>> RFC894 <A Standard for the Transmission of IP Datagrams over Ethernet
->>>>> Networks> says:"The minimum length of the data field of a packet sent
->>>>> Networks> over
->>>>> an Ethernet is 1500 octets, thus the maximum length of an IP datagram
->>>>> sent over an Ethernet is 1500 octets.  Implementations are encouraged
->>>>> to support full-length packets"
->>>> This line in the RFC 894 of 1984 is wrong.
->>>> Errata already exists for it at [1].
->>>>
->>>> [1] https://www.rfc-editor.org/errata_search.php?rfc=894&rec_status=0
->>> OK, so I think we should return nothing if _F_MTU not set, like handling the
->>> MAC
->>>>> virtio spec says:"The virtio network device is a virtual ethernet
->>>>> card", so the default MTU value should be 1500 for virtio-net.
->>>>>
->>>> Practically I have seen 1500 and highe mtu.
->>>> And this derivation is not good of what should be the default mtu as above
->>> errata exists.
->>>> And I see the code below why you need to work so hard to define a default
->>> value so that _MQ and _MTU can report default values.
->>>> There is really no need for this complexity and such a long commit
->>> message.
->>>> Can we please expose feature bits as-is and report config space field which
->>> are valid?
->>>> User space will be querying both.
->>> I think MAC and MTU don't have default values, so return nothing if the
->>> feature bits not set,
->>> for MQ, it is still max_vq_paris == 1 by default.
->> I have stressed enough to highlight the fact that we don’t want to start digging default/no default, valid/no-valid part of the spec.
->> I prefer kernel to reporting fields that _exists_ in the config space and are valid.
->> I will let MST to handle the maintenance nightmare that this kind of patch brings in without any visible gain to user space/orchestration apps.
->>
->> A logic that can be easily build in user space, should be written in user space.
->> I conclude my thoughts here for this discussion.
->>
->> I will let MST to decide how he prefers to proceed.
->>
->>>>> +	if ((features & BIT_ULL(VIRTIO_NET_F_MTU)) == 0)
->>>>> +		val_u16 = 1500;
->>>>> +	else
->>>>> +		val_u16 = __virtio16_to_cpu(true, config->mtu);
->>>>> +
->>>> Need to work hard to find default values and that too turned out had
->>> errata.
->>>> There are more fields that doesn’t have default values.
->>>>
->>>> There is no point in kernel doing this guess work, that user space can figure
->>> out of what is valid/invalid.
->>> It's not guest work, when guest finds no feature bits set, it can decide what
->>> to do.
->> Above code of doing 1500 was probably an honest attempt to find a legitimate default value, and we saw that it doesn’t work.
->> This is second example after _MQ that we both agree should not return default.
->>
->> And there are more fields coming in this area.
->> Hence, I prefer to not avoid returning such defaults for MAC, MTU, MQ and rest all fields which doesn’t _exists_.
->>
->> I will let MST to decide how he prefers to proceed for every field to come next.
->> Thanks.
->>
->
-> If MTU does not return a value without _F_MTU, and MAC does not return
-> a value without _F_MAC then IMO yes, number of queues should not return
-> a value without _F_MQ.
-sure I can do this, but may I ask whether it is a final decision, I 
-remember you supported max_queue_paris = 1 without _F_MQ before
+---
+Change logs:
+v4 -> v5
+- Remove the assert check to avoid the nop in NDEBUG case. (Yuan)
+- v4: https://lore.kernel.org/qemu-devel/20220524140302.23272-1-chenyi.qiang@intel.com/
 
-Thanks
->
->
+v3 -> v4
+- Add a new KVM cap KVM_CAP_TRIPLE_FAULT_EVENT to guard the extension of triple fault
+  event save&restore.
+- v3: https://lore.kernel.org/qemu-devel/20220421074028.18196-1-chenyi.qiang@intel.com/
+
+v2 -> v3
+- Extend the argument to include both the notify window and some flags
+  when enabling KVM_CAP_X86_BUS_LOCK_EXIT CAP.
+- Change to use KVM_VCPUEVENTS_VALID_TRIPLE_FAULT in flags field and add
+  pending_triple_fault field in struct kvm_vcpu_events.
+- v2: https://lore.kernel.org/qemu-devel/20220318082934.25030-1-chenyi.qiang@intel.com/
+
+v1 -> v2
+- Add some commit message to explain why we disable Notify VM exit by default.
+- Rename KVM_VCPUEVENT_SHUTDOWN to KVM_VCPUEVENT_TRIPLE_FAULT.
+- Do the corresponding change to use the KVM_VCPUEVENTS_TRIPLE_FAULT
+  to save/restore the triple fault event to avoid lose some synthesized
+  triple fault from KVM.
+- v1: https://lore.kernel.org/qemu-devel/20220310090205.10645-1-chenyi.qiang@intel.com/
+
+---
+
+Chenyi Qiang (3):
+  Update linux headers to 6.0-rc1
+  i386: kvm: extend kvm_{get, put}_vcpu_events to support pending triple
+    fault
+  i386: Add notify VM exit support
+
+ hw/i386/x86.c                                 |  45 +++++
+ include/hw/i386/x86.h                         |   5 +
+ include/standard-headers/asm-x86/bootparam.h  |   7 +-
+ include/standard-headers/drm/drm_fourcc.h     |  73 +++++++-
+ include/standard-headers/linux/ethtool.h      |  29 +--
+ include/standard-headers/linux/input.h        |  12 +-
+ include/standard-headers/linux/pci_regs.h     |  30 ++-
+ include/standard-headers/linux/vhost_types.h  |  17 +-
+ include/standard-headers/linux/virtio_9p.h    |   2 +-
+ .../standard-headers/linux/virtio_config.h    |   7 +-
+ include/standard-headers/linux/virtio_ids.h   |  14 +-
+ include/standard-headers/linux/virtio_net.h   |  34 +++-
+ include/standard-headers/linux/virtio_pci.h   |   2 +
+ linux-headers/asm-arm64/kvm.h                 |  27 +++
+ linux-headers/asm-generic/unistd.h            |   4 +-
+ linux-headers/asm-riscv/kvm.h                 |  22 +++
+ linux-headers/asm-riscv/unistd.h              |   3 +-
+ linux-headers/asm-s390/kvm.h                  |   1 +
+ linux-headers/asm-x86/kvm.h                   |  33 ++--
+ linux-headers/asm-x86/mman.h                  |  14 --
+ linux-headers/linux/kvm.h                     | 172 +++++++++++++++++-
+ linux-headers/linux/userfaultfd.h             |  10 +-
+ linux-headers/linux/vduse.h                   |  47 +++++
+ linux-headers/linux/vfio.h                    |   4 +-
+ linux-headers/linux/vfio_zdev.h               |   7 +
+ linux-headers/linux/vhost.h                   |  35 +++-
+ target/i386/cpu.c                             |   1 +
+ target/i386/cpu.h                             |   1 +
+ target/i386/kvm/kvm.c                         |  48 +++++
+ 29 files changed, 623 insertions(+), 83 deletions(-)
+
+-- 
+2.17.1
 
