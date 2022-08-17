@@ -2,51 +2,51 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id CCD93596EB8
-	for <lists+kvm@lfdr.de>; Wed, 17 Aug 2022 14:53:22 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 434AE596ED0
+	for <lists+kvm@lfdr.de>; Wed, 17 Aug 2022 14:53:31 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S239110AbiHQMtF (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 17 Aug 2022 08:49:05 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46210 "EHLO
+        id S236648AbiHQMtH (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 17 Aug 2022 08:49:07 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46322 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S236537AbiHQMs4 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 17 Aug 2022 08:48:56 -0400
-Received: from mail-pj1-x102c.google.com (mail-pj1-x102c.google.com [IPv6:2607:f8b0:4864:20::102c])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 794264DF07;
-        Wed, 17 Aug 2022 05:48:55 -0700 (PDT)
-Received: by mail-pj1-x102c.google.com with SMTP id m10-20020a17090a730a00b001fa986fd8eeso1763131pjk.0;
-        Wed, 17 Aug 2022 05:48:55 -0700 (PDT)
+        with ESMTP id S236875AbiHQMtD (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 17 Aug 2022 08:49:03 -0400
+Received: from mail-pl1-x635.google.com (mail-pl1-x635.google.com [IPv6:2607:f8b0:4864:20::635])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EC70A7331C;
+        Wed, 17 Aug 2022 05:48:58 -0700 (PDT)
+Received: by mail-pl1-x635.google.com with SMTP id x19so839609plc.5;
+        Wed, 17 Aug 2022 05:48:58 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc;
-        bh=VzLMj8LvRGxRre2xCtIqyaPFtJOI/wcJ1ym0fs0/Ve4=;
-        b=Voqf4eE44lswVvEaaAJ8ViBVQhTTiMbP+lyup13sJrmnuuWN6ozA4Q9pOXxF05k9y8
-         LzgQG+Hi3d/33q7GPmshZIh8cmFDL/fYdLce/CPjRDNOWyy3a9VnQZ8Q3tyP9+GSjlAU
-         tA4oYMxLRq+wL2cJY9B7sOontW5CIsUJxL4tZZCbV4Zr8iVoKjmKNSN0XzliTD7XUIvI
-         Mlgimrd1mGhVUN4Y+ONYI8B2Y0ea2KtyOpAN1cf+FmlvDWVCkp5V2ddcwnhCt1Ui2N86
-         wKNttnqdkWL8rFxNhE3/9Noq0q4hCJE/nxa7Fx5STYnzFj+dn8lS4M1rTYK+1+IRD15u
-         PsEA==
+        bh=sDDQV3PgZqx2/9abOCF0VxB++9+m/C4n+txZ5R5CM3Y=;
+        b=l1SicTD3Sr9KN4ruqv+LLZmG8wRuU8ddgK7yNps2Uf7R1yLROjSOUGQdqj9vxI+ZiV
+         tM65n9j9Lhj/as55ucCu+jdlmHOn3AYY/qmMyM8BBXKNVtoGqkBZhBplMKXZnaruK0OD
+         ZoH/xq6XfWsOMevupbmejop+3cOz3eaRBuHTzSPat1+eY3rPDdYAJMXzydWHf5KL35mU
+         N/zUIZMRgQXWYLMFL8+2MPEbhs4ZXdIpCNoNlRDTUDTNcV1XPm84XHVuTfIBKWlyGqtY
+         pSOeTqbWQ8UYZJRbRNogkwfBIq/IVVbYlzg2Y0pWd90ecZM3PFc5OeDyU1252oiL9n3G
+         RFVA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc;
-        bh=VzLMj8LvRGxRre2xCtIqyaPFtJOI/wcJ1ym0fs0/Ve4=;
-        b=3Umiat0rGwXaqqvHpEiDN+3hDDd4eeVb400+SUozvCOCDSzeFzhoxpGVI4c10GpjsK
-         XBTVhDWU+4d1HTzdTf/waqShCdStUgg81uN+pa6RuPimP2kGSpfk8IxqloO1Z3mQTxT+
-         EfvRHCARcgibLcLMe1KWn8w+F/cqKWf+qHWVieexbz5FWOzTkycfwjuocNxWM5zTHP9H
-         4WxqLiC3edSz5TXW1t1kLOUz0192Xyn+SIkljLtT5OqGEccW0jVkgPnJyvr0n8uioFP3
-         QpSKUiWQs2L8iBeQ5cb2erYH/bdQU9AFUSNVtSOMUp9Gc3ZIehJWtNVivwexuftJDpKD
-         1m0A==
-X-Gm-Message-State: ACgBeo3Ln8M+iHf5tyQbWvvCt1B3b9836Itafu/rUA3e467nEoijbr16
-        xGFyFYRTANgQ5cJB51aPhVA2OYE8UdxhiQ==
-X-Google-Smtp-Source: AA6agR6ddNFswp3UDS5Ffs2XLojY9UoozV9sFUcAzV30XqRDZISCewVwqK8vesaTNL5+cNyHHazi4g==
-X-Received: by 2002:a17:902:d509:b0:16f:1e1:2067 with SMTP id b9-20020a170902d50900b0016f01e12067mr25932253plg.140.1660740534751;
-        Wed, 17 Aug 2022 05:48:54 -0700 (PDT)
+        bh=sDDQV3PgZqx2/9abOCF0VxB++9+m/C4n+txZ5R5CM3Y=;
+        b=6FKH+SMU25yli4akxj688nyZ+jVsEX6xvL0HiZqQmPh/Ix1KgvhDF4GUUo10sX01g3
+         0xWEFw4kITKdAxq+mmeSxd60A3EQHnoX43P7EGBoIgDBcbqfam4+BzU6KCMqEqPIICkD
+         8g7Ge4qQJvkDXStbQG/k54S6FH1L7Zq5hpC/2f5lJ0qys8y251x1ZvXZI288MO/DSy4M
+         AWXd/ZgFPWI2YcIHy+XU2DWCEUWiYdPAKVHvRULsLdiQgqI19Ps5ABmcAWjP+6ik8CLr
+         415ovK7gzVFR++R6MOTebX+sOIQh0mU0XK0R/F1t0armSBHiroVtE1gTezph6d209cgY
+         opLg==
+X-Gm-Message-State: ACgBeo0Z2AaILXM3mhX9vHQib3jv6T6aceduF8whS7FOYL3Ltw44CZEq
+        BxC4aLuuGVdcE843RM+5354pIKA4fy4Clw==
+X-Google-Smtp-Source: AA6agR7FR3iL/j6v8XJIocqgdSQOAW87gCVU1em/6BeoDiRvo1J0p2clcTnEKG2Df8gbx4uvbL4B6w==
+X-Received: by 2002:a17:90a:f490:b0:1f7:6ecf:33d7 with SMTP id bx16-20020a17090af49000b001f76ecf33d7mr3663495pjb.210.1660740538330;
+        Wed, 17 Aug 2022 05:48:58 -0700 (PDT)
 Received: from debian.. (subs32-116-206-28-37.three.co.id. [116.206.28.37])
-        by smtp.gmail.com with ESMTPSA id q5-20020a170902a3c500b0016a4db13429sm1386962plb.192.2022.08.17.05.48.51
+        by smtp.gmail.com with ESMTPSA id q5-20020a170902a3c500b0016a4db13429sm1386962plb.192.2022.08.17.05.48.55
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 17 Aug 2022 05:48:54 -0700 (PDT)
+        Wed, 17 Aug 2022 05:48:58 -0700 (PDT)
 From:   Bagas Sanjaya <bagasdotme@gmail.com>
 To:     linux-doc@vger.kernel.org
 Cc:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
@@ -56,15 +56,16 @@ Cc:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
         Xiaoyao Li <xiaoyao.li@intel.com>,
         Yu Zhang <yu.c.zhang@linux.intel.com>,
         Chao Peng <chao.p.peng@linux.intel.com>,
-        Bagas Sanjaya <bagasdotme@gmail.com>
-Subject: [PATCH v2 2/3] Documentation: ABI: tdx: grammar improv
-Date:   Wed, 17 Aug 2022 19:48:36 +0700
-Message-Id: <20220817124837.422695-3-bagasdotme@gmail.com>
+        Bagas Sanjaya <bagasdotme@gmail.com>,
+        kernel test robot <lkp@intel.com>
+Subject: [PATCH v2 3/3] Documentation: kvm: enclose the final closing brace in code block
+Date:   Wed, 17 Aug 2022 19:48:37 +0700
+Message-Id: <20220817124837.422695-4-bagasdotme@gmail.com>
 X-Mailer: git-send-email 2.37.2
 In-Reply-To: <20220817124837.422695-1-bagasdotme@gmail.com>
 References: <20220817124837.422695-1-bagasdotme@gmail.com>
 MIME-Version: 1.0
-X-Developer-Signature: v=1; a=openpgp-sha256; l=4632; i=bagasdotme@gmail.com; h=from:subject; bh=zGFOYDCzO+g93HctfClyZBRrkh/4uGk0QNMepAYSg/4=; b=owGbwMvMwCH2bWenZ2ig32LG02pJDEl/Hi89LaqS3bBXSeLm7V/3BFoKdOpf9Eu/8jMJ3+RQKM7d xt7QUcrCIMbBICumyDIpka/p9C4jkQvtax1h5rAygQxh4OIUgIlsW8vIsGd1/YfEq6rOJeVFz3bt5e 4KPOwx++/GzO74TzEf/T+wz2NkmJqkyVY8e82qOVzMp494XEswXzGvY0Zk8SS5T8tTt/Qs4gIA
+X-Developer-Signature: v=1; a=openpgp-sha256; l=1175; i=bagasdotme@gmail.com; h=from:subject; bh=pZtYWIvpNrlcv7lJWS5yJDXQNN6EtLfOfO5biSvqfVc=; b=owGbwMvMwCH2bWenZ2ig32LG02pJDEl/Hi/Nvfpm360XZypkJVv7louyvnD/fKdp+Rz9hTP7vDRq P7tzdJSyMIhxMMiKKbJMSuRrOr3LSORC+1pHmDmsTCBDGLg4BWAiX+MY/ofulF6dvyvmiUZFcWWouH yu6r398nuOLFjoZ1z0Wm1xUgvDLybntW0fH2Zzas8KP7FZ5PAr78C1q6aveN4QWfFJ8bOmPDcA
 X-Developer-Key: i=bagasdotme@gmail.com; a=openpgp; fpr=701B806FDCA5D3A58FFB8F7D7C276C64A5E44A1D
 Content-Transfer-Encoding: 8bit
 X-Spam-Status: No, score=-0.6 required=5.0 tests=BAYES_00,DKIM_SIGNED,
@@ -77,84 +78,36 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Improve the grammar used in TDX ABI documentation.
+Sphinx reported literal block warning:
 
-Fixes: 12cafff9983dad ("x86/virt/tdx: Export TDX keyid number and status of TDX module via sysfs")
-Fixes: 5318e72c20e45a ("x86/virt/tdx: Export information about the TDX
-module via sysfs")
+Documentation/virt/kvm/api.rst:1362: WARNING: Literal block ends without a blank line; unexpected unindent.
+
+The warning is caused by the final closing brace in KVM_SET_USER_MEMORY_REGION
+struct definition is not indented as literal code block.
+
+Indent the closing brace to fix the warning.
+
+Link: https://lore.kernel.org/linux-doc/202208171109.lCfseeP6-lkp@intel.com/
+Fixes: bb90daae9d7551 ("KVM: Extend the memslot to support fd-based private memory")
+Reported-by: kernel test robot <lkp@intel.com>
 Signed-off-by: Bagas Sanjaya <bagasdotme@gmail.com>
 ---
- Documentation/ABI/testing/sysfs-firmware-tdx | 32 +++++++++-----------
- 1 file changed, 14 insertions(+), 18 deletions(-)
+ Documentation/virt/kvm/api.rst | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/Documentation/ABI/testing/sysfs-firmware-tdx b/Documentation/ABI/testing/sysfs-firmware-tdx
-index bd743d758d7d49..0f2feff311f047 100644
---- a/Documentation/ABI/testing/sysfs-firmware-tdx
-+++ b/Documentation/ABI/testing/sysfs-firmware-tdx
-@@ -8,11 +8,11 @@ Description:
-                 malicious hosts and some physical attacks.  This directory
-                 represents the entry point directory for the TDX.
+diff --git a/Documentation/virt/kvm/api.rst b/Documentation/virt/kvm/api.rst
+index d9d43078080030..4acf4d1c95c099 100644
+--- a/Documentation/virt/kvm/api.rst
++++ b/Documentation/virt/kvm/api.rst
+@@ -1359,7 +1359,7 @@ yet and must be cleared on entry.
+ 	__u32 private_fd;
+ 	__u32 pad1;
+ 	__u64 pad2[14];
+-};
++  };
  
--                the TDX requires the TDX firmware to load into an isolated
--                memory region.  It requires a two-step loading process.  It uses
--                the first phase firmware loader (a.k.a NP-SEAMLDR) that loads
--                the next loader and the second phase firmware loader(a.k.a
--                P-SEAMLDR) that loads the TDX firmware(a.k.a the "TDX module").
-+                This feature requires the TDX firmware to load into an isolated
-+                memory region.  It uses two-step loading process; the first
-+                phase is NP-SEAMLDR loader that loads the next one and the
-+                second phase is P-SEAMLDR loader that loads the TDX firmware
-+                (a.k.a the "TDX module").
- 
-                 =============== ================================================
-                 keyid_num       the number of SEAM keyid as an hexadecimal
-@@ -25,16 +25,12 @@ KernelVersion:  5.17
- Contact:        Isaku Yamahata <isaku.yamahata@intel.com>, kvm@vger.kernel.org
- Users:          libvirt
- Description:
--                The TDX requires a firmware as known as the TDX module.  It comes
--                with its attributes, vendor_id, build_data, build_num,
--                minor_version, major_version, etc.
--
--                Provides the information about the TDX module loaded on the
--                platform.  It contains the following read-only files.  The
--                information corresponds to the data structure, TDSYSINFO_STRUCT.
--                The admins or VMM management software like libvirt can refer to
--                that information, determine if TDX is supported, and identify
--                the loaded the TDX module.
-+                The TDX feature requires a firmware that is known as the TDX
-+                module. The module exposes its information in the following
-+                read-only files. The information corresponds to the data
-+                structure named TDSYSINFO_STRUCT. Administrators or VMM
-+                managers like libvirt can refer to it to determine if TDX is
-+                supported and identify the loaded module.
- 
-                 ================== ============================================
-                 status             string of the TDX module status.
-@@ -48,12 +44,12 @@ Description:
-                                    * "shutdown": the TDX module is shutdown due
-                                      to error during initialization.
- 
--                attributes         32bit flags of the TDX module attributes as
-+                attributes         32-bit flags of the TDX module attributes as
-                                    a hexadecimal number with the "0x" prefix.
- 
-                                    * Bits 31 - a production module(0) or
-                                      a debug module(1).
--                                   * Bits 30:0 Reserved - set to 0.
-+                                   * Bits 0-30 - Reserved - set to 0.
- 
-                 vendor_id          vendor ID as a hexadecimal number with the
-                                    "0x" prefix.
-@@ -62,7 +58,7 @@ Description:
-                                    the "0x" prefix.
-                 minor_version      minor version as a hexadecimal number with
-                                    the "0x" prefix.
--                major_version      major versionas a hexadecimal number with
-+                major_version      major version as a hexadecimal number with
-                                    the "0x" prefix.
-                 ================== ============================================
- 
+   /\* for kvm_memory_region::flags \*/
+   #define KVM_MEM_LOG_DIRTY_PAGES	(1UL << 0)
 -- 
 An old man doll... just what I always wanted! - Clara
 
