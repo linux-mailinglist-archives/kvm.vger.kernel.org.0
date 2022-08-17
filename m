@@ -2,194 +2,401 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id D8BED5972F6
-	for <lists+kvm@lfdr.de>; Wed, 17 Aug 2022 17:31:07 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 2CC695972F7
+	for <lists+kvm@lfdr.de>; Wed, 17 Aug 2022 17:31:08 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S240253AbiHQP37 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 17 Aug 2022 11:29:59 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41422 "EHLO
+        id S237478AbiHQPaL (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 17 Aug 2022 11:30:11 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41638 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235568AbiHQP34 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 17 Aug 2022 11:29:56 -0400
-Received: from NAM04-DM6-obe.outbound.protection.outlook.com (mail-dm6nam04on2085.outbound.protection.outlook.com [40.107.102.85])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E3D50844D0;
-        Wed, 17 Aug 2022 08:29:55 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=ocxhO0xO3FeGAI14sB6l90r9FTdxwqmIykKxQGZt2U1v1NmXbTeJMU9VN6zU9fWUKttiQCvU/XDehp4adEnP6virwdpUMBAj9rQpTeUaXwwM7bg978loEMbU/LrWCQCXKfy6gM3zm5qfipWkrsxkm507RcflzGCLsYCeduKxy9hJHEeOlukVFSHs5tu8TQyiPKxtLUpH6OZgvgE4zMVOdjwYnssiU7vYHR7V3jyZp5kQJUYY3WzbXL+1CpNRWHUL6as2lL+RyO4d+OIu6efhuVfUN4WqbiKB2VbkIA10OqdYE3JZ1lgtod1JuWKHxOwmYhPXVBh1jwA9QTn4oHji+Q==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=Y548jWcaZcM5VmVQm9rocu7vRYhItXzCx/f6JWMcheM=;
- b=DPH0DugXMgGvCDBZeZJZQuQxIhODfWztGa1cc5cM/aki7XyszNYSi/tB+Bm/sb8+xgIUMh4upF8zrGgZqlwRjiGjFllVH5+3D0n6Mh7Fp8SAvlJ0+DAEey/2GlzWf1DSTuULZDAz4untceUY4T+9/HHqxdo8PMnOc1VOLuavw0/VXxrGqxDOr5BFl2eMwucZlsw/9zcLYcHvyXY5EC43ViErA6JgBfOoJKaiLgUQRIa8XOZmYInwsiAdnWOrpHPRoCXUKy/s43XeGn6tE14gOq4s1ukkbX5XO5JTYL99fvnRjSecJRGMMSjViKIyUcFSYzS/MuQ56QF82ei99v3yNA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
- dkim=pass header.d=nvidia.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=Y548jWcaZcM5VmVQm9rocu7vRYhItXzCx/f6JWMcheM=;
- b=clCciC1P9ouh8DR0+HiOp+LQxQhdWKK0radLhhKUg6Sg1SFrHyVXZK28vCSa/CYjPmYXoVg8lpCXTHczaRZ8/qdkOOnsim1Oi72D/+DWA2Tdl7ffWOjA3QQo0yf/6JHHco3sYqiXH7EU6LMAal62xvmvge2K4Fbyv4C+x7KxG7D4tDOXC8U5kXvztm3fMPvrOBpPaA3kUEVs2Kq9NLcbJU/NbMQxq0857KWT7O70XOe3u0jbf52EMDqAoqi19oiIfz6Jyp2AKXtOU5xMegLZtNs67kwtvAug1oIDsig/aTyoMZmLOiCh/SpcylVA6VDXo7Bx9+sYYPo3AKj0E78b7w==
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nvidia.com;
-Received: from MN2PR12MB4192.namprd12.prod.outlook.com (2603:10b6:208:1d5::15)
- by DM6PR12MB3689.namprd12.prod.outlook.com (2603:10b6:5:1c7::32) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5504.14; Wed, 17 Aug
- 2022 15:29:53 +0000
-Received: from MN2PR12MB4192.namprd12.prod.outlook.com
- ([fe80::462:7fe:f04f:d0d5]) by MN2PR12MB4192.namprd12.prod.outlook.com
- ([fe80::462:7fe:f04f:d0d5%6]) with mapi id 15.20.5525.019; Wed, 17 Aug 2022
- 15:29:53 +0000
-From:   Jason Gunthorpe <jgg@nvidia.com>
-To:     Alex Williamson <alex.williamson@redhat.com>,
-        Cornelia Huck <cohuck@redhat.com>,
-        Eric Farman <farman@linux.ibm.com>, kvm@vger.kernel.org,
-        linux-s390@vger.kernel.org, Matthew Rosato <mjrosato@linux.ibm.com>
-Subject: [PATCH 2/2] vfio/pci: Simplify the is_intx/msi/msix/etc defines
-Date:   Wed, 17 Aug 2022 12:29:51 -0300
-Message-Id: <2-v1-da6fc51ee22e+562-vfio_pci_priv_jgg@nvidia.com>
-In-Reply-To: <0-v1-da6fc51ee22e+562-vfio_pci_priv_jgg@nvidia.com>
-References: 
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: BL1PR13CA0373.namprd13.prod.outlook.com
- (2603:10b6:208:2c0::18) To MN2PR12MB4192.namprd12.prod.outlook.com
- (2603:10b6:208:1d5::15)
-MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: dbe7fe88-9d31-44f7-9d29-08da8065547c
-X-MS-TrafficTypeDiagnostic: DM6PR12MB3689:EE_
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: RKcvv6HfO74Y3oxcEeWvfz8jD8OElkIIIvEm/TupUDo/ysd97zrjiyrZE4rsWxZzSCK9620DVCmuXiTieparKDcRxnqc38da8qpAnzXZP2rimVNHPQByPLu7BNMHd34RgHK2DYlxnt4VhxhktnnpSBWKN8RT4pR/2egBUYn0bcTvx5i4pIsj4ssjRCK4VBINTBaBm4/Q0xLINZ5DNBXF2cOHbQIozg80fOdpevOVT+PqVexHwsXWOUOL2/6NRk60O9r7KeF5e/irrTgteB3CIHN+F3B/h8fg74HGgNNpie177EiYQRuzTFPspG98m2GTeWfC0rzDK2uY+d92xPdX+wbMHpXJRetR5W8XhxmOHl/K4HCkHUOO7zbMe2W4Jsrn+aYX0wZG2v5Nle7Z6VuFwYTj/AkL7schz4uXxukdC5HV3wBCeonMB6lI9FkNw+yBn7hcno6zAZYI66kPF2J+gFG3jecCUNakcIjNA1XXHsc4OxXO2THe+OaDgQrKtkGEIDyJ4/ovybZXb/CDCJVdeLsRtva+QsKBYXToUGDpgQMyurA9LVkz7Ax6ZMS23uKdY4Mz0CRtJEdV+U0Px11dMfCk4CyAQlTKttfxb6BilskTHg08sVu4ILsh6BqadQuk5BjjEV8g0vegRcQ0vxkmoYJgieTXutDcwGYz4rqtV0CC/qwjK7Ne553Z7CK4AHwnUjh9WofHz0CSCJF00PR+/QSelgO9O3FDPPV9mvjHeRIeUGF7JiAsAs83lph2/AHSo4yyPxg5sh6MgP4zNU9NeeObta8nfEz8CEnGOnqZRfs=
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:MN2PR12MB4192.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230016)(4636009)(39860400002)(366004)(396003)(376002)(346002)(136003)(2616005)(66556008)(26005)(8676002)(66476007)(316002)(83380400001)(36756003)(186003)(6512007)(66946007)(86362001)(5660300002)(2906002)(8936002)(478600001)(110136005)(6486002)(6506007)(41300700001)(38100700002)(4216001);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?45CZshk/MXsAvMtEOyKmQUvFJmTQLFTSMoMu7aI0kTgWZVCdVyjdXzv6SRON?=
- =?us-ascii?Q?krfXerHwLSwpybaTn+Av7dolCRrKJiLhCPEb7SYUEAoCppxNs/Mb09KeQ7+n?=
- =?us-ascii?Q?zsRG8P50i9i+a/QnYoHjFt6VLfhpA8ir4r9oudL0+cJEyrMmB0jVEgUh45GV?=
- =?us-ascii?Q?f3RkroJ7ptUPiyk/SgXfAqZ/wwJ3psf0+v5DAu+6xru2BTgC7NtX7j5/N1Pl?=
- =?us-ascii?Q?iYBNGTd/tQE1frxB0bMShtsSJuNjinsKpB8AdvZ4aKANEWHK0veoh9QMlEP6?=
- =?us-ascii?Q?obdYN0bT2sHvU4fiARLn20KwSostmQC8c4x4Mn4ow1buyQVguuR+aPdIFM5d?=
- =?us-ascii?Q?w/WYr5EOkCy9W3CpFAK9VK4bLYQudfJwwV3xx53YFbwg6C/YB/cfgjVCN/U8?=
- =?us-ascii?Q?CDzwUONIUXw4loiN5bClGvZ41QE1NZZMNn/0QYj5r9dbc7tAYboFruuqWgam?=
- =?us-ascii?Q?FQcHZgtu8BCzx+ait1BTg0lW0LDyMDitBuzOZMErPiuvK9S61LQvwA5jNScl?=
- =?us-ascii?Q?kcN3w5UEMrzVX5IAW0qudN/7OF63k/FOsD4zGIjfvZXt+wELNm3ry1NiXDEU?=
- =?us-ascii?Q?9qR8JWW3/2FrE8/eEX5+zdJf9BiEw0oC9dLHpAjMKJcZUrQnTwJLiapFksFe?=
- =?us-ascii?Q?04eCA+vax2lJBwMkSwyJC54woIG0QRRYfghMnjqEfXav4Q+sdRfqN4MPZxKa?=
- =?us-ascii?Q?pNghHzuI7S6TXn5JcDLHdfe0qpVg81wUsIuwDIM9zf687bW1+mkNw0sxTLRP?=
- =?us-ascii?Q?UHiIqtA5aDuUEV76Y/6+hMygA++72wjnF7P5CaUGqHwps+tpsDLxj0LNXbxg?=
- =?us-ascii?Q?NEwSJNMZSROOHKjA8Gib/TFQ9UsvrbEc91usyAcVRnFTFhgTs+7gNwjhUVGR?=
- =?us-ascii?Q?1oOGYJweGzUGzwmAsxPzGIffR/6MLyj/pGGPYX20udx6XCIWfd2O2o90dpp5?=
- =?us-ascii?Q?loGoUIHO+dOWNtlX64L6zptshaTyfK4Gh+NE93AbSAJyGuLOABSAGKntYyRu?=
- =?us-ascii?Q?Nbi6WnXjPmuZoFv6Ll/QhXSt8ASqP/b7QvWlnx1ud5XUGqpsY5dvVSoL/gxJ?=
- =?us-ascii?Q?kaeoFsTBM7EIuthfZXPuFlgfTTSthwv+3kq/d3WxB9+2iT60kxVLpyL4/F4f?=
- =?us-ascii?Q?jVPNtHLOZRpQp26zmLGLaO1/uQCIzmnkKQPepOOgkpeJL+Z9qcX5qTDmYpZ+?=
- =?us-ascii?Q?jns42RAOA3tRJYJqtoIQYeRmOxLp4QL8RxMRBcQ5ZEK7R9rGr/iVojaMvcoY?=
- =?us-ascii?Q?lxLQB3pjuLEM8ej76B9pyhF4ttF5y+/Hw4wyruYunGrkQsAZkounjBC18kOu?=
- =?us-ascii?Q?sUyCNuLDmPLFqHbCUgXQAW0Phg47LO7XjKitzAHu78xIESTyvafx896Q50UX?=
- =?us-ascii?Q?w1YZH5lCzbHDo7s3MYqHRAlMxtDEAQaJ9+Eh/1tvTmHivL7NJt7+ZTvjngGP?=
- =?us-ascii?Q?xycI19I14HJo/SML3Uersr1ONvekatgweIy6xK9hvLyEA+mkTnwdg0QKlPn3?=
- =?us-ascii?Q?35zLByBtXkIDhNWQAoKcLZfKhq2nLaEEq3y5l4iWaQ4s1nONJTlo13xHSfpy?=
- =?us-ascii?Q?NJzlV766ONJjp5msIRgLBIJq0CIuvlgPndg6+yR+?=
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: dbe7fe88-9d31-44f7-9d29-08da8065547c
-X-MS-Exchange-CrossTenant-AuthSource: MN2PR12MB4192.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 17 Aug 2022 15:29:52.6663
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: bfW+6x/SVJMzglXl+YolE588Dh8fV+AELmWI4U7u85XygaSFs/MEMfWIqo0+N6ez
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM6PR12MB3689
-X-Spam-Status: No, score=-1.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FORGED_SPF_HELO,
-        RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_NONE,
-        T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED autolearn=no autolearn_force=no
-        version=3.4.6
+        with ESMTP id S240097AbiHQPaJ (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 17 Aug 2022 11:30:09 -0400
+Received: from mail-pl1-x649.google.com (mail-pl1-x649.google.com [IPv6:2607:f8b0:4864:20::649])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 502B58E0CC
+        for <kvm@vger.kernel.org>; Wed, 17 Aug 2022 08:30:07 -0700 (PDT)
+Received: by mail-pl1-x649.google.com with SMTP id y9-20020a17090322c900b0016f8fdcc3b1so8393271plg.6
+        for <kvm@vger.kernel.org>; Wed, 17 Aug 2022 08:30:07 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112;
+        h=cc:to:from:subject:mime-version:message-id:date:from:to:cc;
+        bh=Qkmccm/z1P8KkL3+STm3aMUEd1Pe32aPYrZdxb0HPrk=;
+        b=Pxvb+ZGChsqiwkr49DHWgMfeYtE2fVHPO36oj7Mj0yUC8eUwQdp7IjUqkfT1BNZ1UB
+         M4sIWk9NkTVEvEOiC0iKLTNnbm3rzh2hMATrXGt7PwnFFbsK8+8ZGq4jj/wi8I0KMbQD
+         sjncZTQ/G6xgxuv+qHsD++IiDXwEVPNHcCLy1VmWSZZHaBKO27XELIirIAl/V1Mq1L8L
+         b0fNNUJ2Jfb7bl6m13muowxadQcJh3BUKLCzYOgRFn93RajEKKsnSpX1t4MXm16EGfIf
+         2kg6bEX843eHdN+bkC5AXPBYt4l6iBCCtJ7Is/ZvSBgj+CijmVAqDgINAPFNNRSD5Bq3
+         cASg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=cc:to:from:subject:mime-version:message-id:date:x-gm-message-state
+         :from:to:cc;
+        bh=Qkmccm/z1P8KkL3+STm3aMUEd1Pe32aPYrZdxb0HPrk=;
+        b=xL+SXxXSIadzHiNyKlqXh8fLY+y1nML/XMpJelYbJlMsgcSH/GnppILdpyf8+Yppk+
+         OZ28l9eDE5v67PiLHOElcznARDTzUU1VfJL3SVYEVLqnzG8ligqKBlPdFjCAAz9diZ3r
+         BTdSpST5/Qfb/uT0h7mxe8kkt4oWUnCajrvYE9m6TZ34yWla4mczFuqlGwqUUMEWBnl7
+         3gPKRku6wxTipArjJdgZogDyB4op8yJpUZCmAjS6lywXhSJ1eoNp/1WuT0p7nWjARg/H
+         AqGBdUITob0bR9OeEXzt3qVzamEaYgjMSZA8njIZZp2JD/Z5r6h1kNKrG9jfLbTTGq9u
+         H5ag==
+X-Gm-Message-State: ACgBeo17XVPK5L0uvvH92SkZXz+CP7daZ/bY6jSlcGH96xdXAyE1sRwG
+        ikzKIk1zAoDVXa6zfqW3joJGcRe2cP5X
+X-Google-Smtp-Source: AA6agR4Vl9pQRf7lXoJiti0d08utPaH3IyHkVgCjs20FK59QowdbfkNojkBF45P/JBKh88yoYDfDR9Q2WAB9
+X-Received: from vipin.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:479f])
+ (user=vipinsh job=sendgmr) by 2002:a17:902:788f:b0:170:8b18:8812 with SMTP id
+ q15-20020a170902788f00b001708b188812mr26741589pll.1.1660750206813; Wed, 17
+ Aug 2022 08:30:06 -0700 (PDT)
+Date:   Wed, 17 Aug 2022 08:29:56 -0700
+Message-Id: <20220817152956.4056410-1-vipinsh@google.com>
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.37.1.595.g718a3a8f04-goog
+Subject: [PATCH] KVM: selftests: Run dirty_log_perf_test on specific cpus
+From:   Vipin Sharma <vipinsh@google.com>
+To:     seanjc@google.com, dmatlack@google.com, pbonzini@redhat.com
+Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Vipin Sharma <vipinsh@google.com>
+Content-Type: text/plain; charset="UTF-8"
+X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL
+        autolearn=unavailable autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Only three of these are actually used, simplify to three inline functions,
-and open code the if statement in vfio_pci_config.c.
+Add command line options to run the vcpus and the main process on the
+specific cpus on a host machine. This is useful as it provides
+options to analyze performance based on the vcpus and dirty log worker
+locations, like on the different numa nodes or on the same numa nodes.
 
-Signed-off-by: Jason Gunthorpe <jgg@nvidia.com>
+Signed-off-by: Vipin Sharma <vipinsh@google.com>
+Suggested-by: David Matlack <dmatlack@google.com>
+Suggested-by: Sean Christopherson <seanjc@google.com>
+Suggested-by: Paolo Bonzini <pbonzini@redhat.com>
 ---
- drivers/vfio/pci/vfio_pci_config.c |  2 +-
- drivers/vfio/pci/vfio_pci_intrs.c  | 22 +++++++++++++++++-----
- drivers/vfio/pci/vfio_pci_priv.h   |  2 --
- 3 files changed, 18 insertions(+), 8 deletions(-)
 
-diff --git a/drivers/vfio/pci/vfio_pci_config.c b/drivers/vfio/pci/vfio_pci_config.c
-index 5f43b28075eecd..4a350421c5f62a 100644
---- a/drivers/vfio/pci/vfio_pci_config.c
-+++ b/drivers/vfio/pci/vfio_pci_config.c
-@@ -1166,7 +1166,7 @@ static int vfio_msi_config_write(struct vfio_pci_core_device *vdev, int pos,
- 		flags = le16_to_cpu(*pflags);
+This is based on the discussion at
+https://lore.kernel.org/lkml/20220801151928.270380-1-vipinsh@google.com/
+
+ .../selftests/kvm/access_tracking_perf_test.c |   2 +-
+ .../selftests/kvm/demand_paging_test.c        |   2 +-
+ .../selftests/kvm/dirty_log_perf_test.c       | 108 +++++++++++++++++-
+ .../selftests/kvm/include/perf_test_util.h    |   3 +-
+ .../selftests/kvm/lib/perf_test_util.c        |  32 +++++-
+ .../kvm/memslot_modification_stress_test.c    |   2 +-
+ 6 files changed, 139 insertions(+), 10 deletions(-)
+
+diff --git a/tools/testing/selftests/kvm/access_tracking_perf_test.c b/tools/testing/selftests/kvm/access_tracking_perf_test.c
+index 1c2749b1481ac..9659462f47478 100644
+--- a/tools/testing/selftests/kvm/access_tracking_perf_test.c
++++ b/tools/testing/selftests/kvm/access_tracking_perf_test.c
+@@ -299,7 +299,7 @@ static void run_test(enum vm_guest_mode mode, void *arg)
+ 	vm = perf_test_create_vm(mode, nr_vcpus, params->vcpu_memory_bytes, 1,
+ 				 params->backing_src, !overlap_memory_access);
  
- 		/* MSI is enabled via ioctl */
--		if  (!is_msi(vdev))
-+		if  (vdev->irq_type != VFIO_PCI_MSI_IRQ_INDEX)
- 			flags &= ~PCI_MSI_FLAGS_ENABLE;
+-	perf_test_start_vcpu_threads(nr_vcpus, vcpu_thread_main);
++	perf_test_start_vcpu_threads(nr_vcpus, NULL, vcpu_thread_main);
  
- 		/* Check queue size */
-diff --git a/drivers/vfio/pci/vfio_pci_intrs.c b/drivers/vfio/pci/vfio_pci_intrs.c
-index 32d014421c1f61..8cb987ef3c4763 100644
---- a/drivers/vfio/pci/vfio_pci_intrs.c
-+++ b/drivers/vfio/pci/vfio_pci_intrs.c
-@@ -22,11 +22,6 @@
+ 	pr_info("\n");
+ 	access_memory(vm, nr_vcpus, ACCESS_WRITE, "Populating memory");
+diff --git a/tools/testing/selftests/kvm/demand_paging_test.c b/tools/testing/selftests/kvm/demand_paging_test.c
+index 779ae54f89c40..b9848174d6e7c 100644
+--- a/tools/testing/selftests/kvm/demand_paging_test.c
++++ b/tools/testing/selftests/kvm/demand_paging_test.c
+@@ -336,7 +336,7 @@ static void run_test(enum vm_guest_mode mode, void *arg)
+ 	pr_info("Finished creating vCPUs and starting uffd threads\n");
  
- #include "vfio_pci_priv.h"
+ 	clock_gettime(CLOCK_MONOTONIC, &start);
+-	perf_test_start_vcpu_threads(nr_vcpus, vcpu_worker);
++	perf_test_start_vcpu_threads(nr_vcpus, NULL, vcpu_worker);
+ 	pr_info("Started all vCPUs\n");
  
--#define is_intx(vdev) (vdev->irq_type == VFIO_PCI_INTX_IRQ_INDEX)
--#define is_msix(vdev) (vdev->irq_type == VFIO_PCI_MSIX_IRQ_INDEX)
--#define is_irq_none(vdev) (!(is_intx(vdev) || is_msi(vdev) || is_msix(vdev)))
--#define irq_is(vdev, type) (vdev->irq_type == type)
--
- struct vfio_pci_irq_ctx {
- 	struct eventfd_ctx	*trigger;
- 	struct virqfd		*unmask;
-@@ -36,6 +31,23 @@ struct vfio_pci_irq_ctx {
- 	struct irq_bypass_producer	producer;
- };
- 
-+static bool irq_is(struct vfio_pci_core_device *vdev, int type)
-+{
-+	return vdev->irq_type == type;
-+}
-+
-+static bool is_intx(struct vfio_pci_core_device *vdev)
-+{
-+	return vdev->irq_type == VFIO_PCI_INTX_IRQ_INDEX;
-+}
-+
-+static bool is_irq_none(struct vfio_pci_core_device *vdev)
-+{
-+	return !(vdev->irq_type == VFIO_PCI_INTX_IRQ_INDEX ||
-+		 vdev->irq_type == VFIO_PCI_MSI_IRQ_INDEX ||
-+		 vdev->irq_type == VFIO_PCI_MSIX_IRQ_INDEX);
-+}
-+
- /*
-  * INTx
+ 	perf_test_join_vcpu_threads(nr_vcpus);
+diff --git a/tools/testing/selftests/kvm/dirty_log_perf_test.c b/tools/testing/selftests/kvm/dirty_log_perf_test.c
+index f99e39a672d3f..68a1d7262f21b 100644
+--- a/tools/testing/selftests/kvm/dirty_log_perf_test.c
++++ b/tools/testing/selftests/kvm/dirty_log_perf_test.c
+@@ -8,10 +8,12 @@
+  * Copyright (C) 2020, Google, Inc.
   */
-diff --git a/drivers/vfio/pci/vfio_pci_priv.h b/drivers/vfio/pci/vfio_pci_priv.h
-index ac701f05bef022..4830fb01a1caa2 100644
---- a/drivers/vfio/pci/vfio_pci_priv.h
-+++ b/drivers/vfio/pci/vfio_pci_priv.h
-@@ -23,8 +23,6 @@ struct vfio_pci_ioeventfd {
- 	bool			test_mem;
+ 
++#define _GNU_SOURCE
+ #include <stdio.h>
+ #include <stdlib.h>
+ #include <time.h>
+ #include <pthread.h>
++#include <sched.h>
+ #include <linux/bitmap.h>
+ 
+ #include "kvm_util.h"
+@@ -66,6 +68,8 @@ static u64 dirty_log_manual_caps;
+ static bool host_quit;
+ static int iteration;
+ static int vcpu_last_completed_iteration[KVM_MAX_VCPUS];
++/* Map vcpus to logical cpus on host. */
++static int vcpu_to_lcpu_map[KVM_MAX_VCPUS];
+ 
+ static void vcpu_worker(struct perf_test_vcpu_args *vcpu_args)
+ {
+@@ -132,6 +136,7 @@ struct test_params {
+ 	bool partition_vcpu_memory_access;
+ 	enum vm_mem_backing_src_type backing_src;
+ 	int slots;
++	int *vcpu_to_lcpu;
  };
  
--#define is_msi(vdev) (vdev->irq_type == VFIO_PCI_MSI_IRQ_INDEX)
--
- void vfio_pci_intx_mask(struct vfio_pci_core_device *vdev);
- void vfio_pci_intx_unmask(struct vfio_pci_core_device *vdev);
+ static void toggle_dirty_logging(struct kvm_vm *vm, int slots, bool enable)
+@@ -248,7 +253,7 @@ static void run_test(enum vm_guest_mode mode, void *arg)
+ 	for (i = 0; i < nr_vcpus; i++)
+ 		vcpu_last_completed_iteration[i] = -1;
+ 
+-	perf_test_start_vcpu_threads(nr_vcpus, vcpu_worker);
++	perf_test_start_vcpu_threads(nr_vcpus, p->vcpu_to_lcpu, vcpu_worker);
+ 
+ 	/* Allow the vCPUs to populate memory */
+ 	pr_debug("Starting iteration %d - Populating\n", iteration);
+@@ -348,12 +353,74 @@ static void run_test(enum vm_guest_mode mode, void *arg)
+ 	perf_test_destroy_vm(vm);
+ }
+ 
++static int parse_num(const char *num_str)
++{
++	int num;
++	char *end_ptr;
++
++	errno = 0;
++	num = (int)strtol(num_str, &end_ptr, 10);
++	TEST_ASSERT(num_str != end_ptr && *end_ptr == '\0',
++		    "Invalid number string.\n");
++	TEST_ASSERT(errno == 0, "Conversion error: %d\n", errno);
++
++	return num;
++}
++
++static int parse_cpu_list(const char *arg)
++{
++	char delim[2] = ",";
++	char *cpu, *cpu_list;
++	int i = 0, cpu_num;
++
++	cpu_list = strdup(arg);
++	TEST_ASSERT(cpu_list, "Low memory\n");
++
++	cpu = strtok(cpu_list, delim);
++	while (cpu) {
++		cpu_num = parse_num(cpu);
++		TEST_ASSERT(cpu_num >= 0, "Invalid cpu number: %d\n", cpu_num);
++		vcpu_to_lcpu_map[i++] = cpu_num;
++		cpu = strtok(NULL, delim);
++	}
++
++	free(cpu_list);
++
++	return i;
++}
++
++static void assign_dirty_log_perf_test_cpu(const char *arg)
++{
++	char delim[2] = ",";
++	char *cpu, *cpu_list;
++	cpu_set_t cpuset;
++	int cpu_num, err;
++
++	cpu_list = strdup(arg);
++	TEST_ASSERT(cpu_list, "Low memory\n");
++
++	CPU_ZERO(&cpuset);
++	cpu = strtok(cpu_list, delim);
++	while (cpu) {
++		cpu_num = parse_num(cpu);
++		TEST_ASSERT(cpu_num >= 0, "Invalid cpu number: %d\n", cpu_num);
++		CPU_SET(cpu_num, &cpuset);
++		cpu = strtok(NULL, delim);
++	}
++
++	err = sched_setaffinity(0, sizeof(cpu_set_t), &cpuset);
++	TEST_ASSERT(err == 0, "Error in setting dirty log perf test cpu\n");
++
++	free(cpu_list);
++}
++
+ static void help(char *name)
+ {
+ 	puts("");
+ 	printf("usage: %s [-h] [-i iterations] [-p offset] [-g] "
+ 	       "[-m mode] [-n] [-b vcpu bytes] [-v vcpus] [-o] [-s mem type]"
+-	       "[-x memslots]\n", name);
++	       "[-x memslots] [-c logical cpus for vcpus]"
++	       "[-d cpus to run dirty_log_perf_test]\n", name);
+ 	puts("");
+ 	printf(" -i: specify iteration counts (default: %"PRIu64")\n",
+ 	       TEST_HOST_LOOP_N);
+@@ -383,6 +450,26 @@ static void help(char *name)
+ 	backing_src_help("-s");
+ 	printf(" -x: Split the memory region into this number of memslots.\n"
+ 	       "     (default: 1)\n");
++	printf(" -c: Comma separated values of the logical CPUs which will run\n"
++	       "     the vCPUs. Number of values should be equal to the number\n"
++	       "     of vCPUs.\n\n"
++	       "     Example: ./dirty_log_perf_test -v 3 -c 22,43,1\n"
++	       "     This means that the vcpu 0 will run on the logical cpu 22,\n"
++	       "     vcpu 1 on the logical cpu 43 and vcpu 2 on the logical cpu 1.\n"
++	       "     (default: No cpu mapping)\n\n");
++	printf(" -d: Comma separated values of the logical CPUs on which\n"
++	       "     dirty_log_perf_test will run. Without -c option, all of\n"
++	       "     the vcpus and main process will run on the cpus provided here.\n"
++	       "     This option also accepts a single cpu. (default: No cpu mapping)\n\n"
++	       "     Example 1: ./dirty_log_perf_test -v 3 -c 22,43,1 -d 101\n"
++	       "     Main application thread will run on logical cpu 101 and\n"
++	       "     vcpus will run on the logical cpus 22, 43 and 1\n\n"
++	       "     Example 2: ./dirty_log_perf_test -v 3 -d 101\n"
++	       "     Main application thread and vcpus will run on the logical\n"
++	       "     cpu 101\n\n"
++	       "     Example 3: ./dirty_log_perf_test -v 3 -d 101,23,53\n"
++	       "     Main application thread and vcpus will run on logical cpus\n"
++	       "     101, 23 and 53.\n");
+ 	puts("");
+ 	exit(0);
+ }
+@@ -396,8 +483,10 @@ int main(int argc, char *argv[])
+ 		.partition_vcpu_memory_access = true,
+ 		.backing_src = DEFAULT_VM_MEM_SRC,
+ 		.slots = 1,
++		.vcpu_to_lcpu = NULL,
+ 	};
+ 	int opt;
++	int nr_lcpus = -1;
+ 
+ 	dirty_log_manual_caps =
+ 		kvm_check_cap(KVM_CAP_MANUAL_DIRTY_LOG_PROTECT2);
+@@ -406,8 +495,14 @@ int main(int argc, char *argv[])
+ 
+ 	guest_modes_append_default();
+ 
+-	while ((opt = getopt(argc, argv, "eghi:p:m:nb:f:v:os:x:")) != -1) {
++	while ((opt = getopt(argc, argv, "c:d:eghi:p:m:nb:f:v:os:x:")) != -1) {
+ 		switch (opt) {
++		case 'c':
++			nr_lcpus = parse_cpu_list(optarg);
++			break;
++		case 'd':
++			assign_dirty_log_perf_test_cpu(optarg);
++			break;
+ 		case 'e':
+ 			/* 'e' is for evil. */
+ 			run_vcpus_while_disabling_dirty_logging = true;
+@@ -455,6 +550,13 @@ int main(int argc, char *argv[])
+ 		}
+ 	}
+ 
++	if (nr_lcpus != -1) {
++		TEST_ASSERT(nr_lcpus == nr_vcpus,
++			    "Number of vCPUs (%d) are not equal to number of logical cpus provided (%d).",
++			    nr_vcpus, nr_lcpus);
++		p.vcpu_to_lcpu = vcpu_to_lcpu_map;
++	}
++
+ 	TEST_ASSERT(p.iterations >= 2, "The test should have at least two iterations");
+ 
+ 	pr_info("Test iterations: %"PRIu64"\n",	p.iterations);
+diff --git a/tools/testing/selftests/kvm/include/perf_test_util.h b/tools/testing/selftests/kvm/include/perf_test_util.h
+index eaa88df0555a8..bd6c566cfc92e 100644
+--- a/tools/testing/selftests/kvm/include/perf_test_util.h
++++ b/tools/testing/selftests/kvm/include/perf_test_util.h
+@@ -53,7 +53,8 @@ void perf_test_destroy_vm(struct kvm_vm *vm);
+ 
+ void perf_test_set_wr_fract(struct kvm_vm *vm, int wr_fract);
+ 
+-void perf_test_start_vcpu_threads(int vcpus, void (*vcpu_fn)(struct perf_test_vcpu_args *));
++void perf_test_start_vcpu_threads(int vcpus, int *vcpus_to_lcpu,
++				  void (*vcpu_fn)(struct perf_test_vcpu_args *));
+ void perf_test_join_vcpu_threads(int vcpus);
+ void perf_test_guest_code(uint32_t vcpu_id);
+ 
+diff --git a/tools/testing/selftests/kvm/lib/perf_test_util.c b/tools/testing/selftests/kvm/lib/perf_test_util.c
+index 9618b37c66f7e..771fbdf3d2c22 100644
+--- a/tools/testing/selftests/kvm/lib/perf_test_util.c
++++ b/tools/testing/selftests/kvm/lib/perf_test_util.c
+@@ -2,11 +2,14 @@
+ /*
+  * Copyright (C) 2020, Google LLC.
+  */
++#define _GNU_SOURCE
+ #include <inttypes.h>
+ 
+ #include "kvm_util.h"
+ #include "perf_test_util.h"
+ #include "processor.h"
++#include <pthread.h>
++#include <sched.h>
+ 
+ struct perf_test_args perf_test_args;
+ 
+@@ -260,10 +263,15 @@ static void *vcpu_thread_main(void *data)
+ 	return NULL;
+ }
+ 
+-void perf_test_start_vcpu_threads(int nr_vcpus,
++void perf_test_start_vcpu_threads(int nr_vcpus, int *vcpu_to_lcpu,
+ 				  void (*vcpu_fn)(struct perf_test_vcpu_args *))
+ {
+-	int i;
++	int i, err = 0;
++	pthread_attr_t attr;
++	cpu_set_t cpuset;
++
++	pthread_attr_init(&attr);
++	CPU_ZERO(&cpuset);
+ 
+ 	vcpu_thread_fn = vcpu_fn;
+ 	WRITE_ONCE(all_vcpu_threads_running, false);
+@@ -274,7 +282,24 @@ void perf_test_start_vcpu_threads(int nr_vcpus,
+ 		vcpu->vcpu_idx = i;
+ 		WRITE_ONCE(vcpu->running, false);
+ 
+-		pthread_create(&vcpu->thread, NULL, vcpu_thread_main, vcpu);
++		if (vcpu_to_lcpu) {
++			CPU_SET(vcpu_to_lcpu[i], &cpuset);
++
++			err = pthread_attr_setaffinity_np(&attr,
++							  sizeof(cpu_set_t),
++							  &cpuset);
++			TEST_ASSERT(err == 0,
++				    "vCPU %d could not be mapped to logical cpu %d, error returned: %d\n",
++				    i, vcpu_to_lcpu[i], err);
++
++			CPU_CLR(vcpu_to_lcpu[i], &cpuset);
++		}
++
++		err = pthread_create(&vcpu->thread, &attr, vcpu_thread_main,
++				     vcpu);
++		TEST_ASSERT(err == 0,
++			    "error in creating vcpu %d thread, error returned: %d\n",
++			    i, err);
+ 	}
+ 
+ 	for (i = 0; i < nr_vcpus; i++) {
+@@ -283,6 +308,7 @@ void perf_test_start_vcpu_threads(int nr_vcpus,
+ 	}
+ 
+ 	WRITE_ONCE(all_vcpu_threads_running, true);
++	pthread_attr_destroy(&attr);
+ }
+ 
+ void perf_test_join_vcpu_threads(int nr_vcpus)
+diff --git a/tools/testing/selftests/kvm/memslot_modification_stress_test.c b/tools/testing/selftests/kvm/memslot_modification_stress_test.c
+index 6ee7e1dde4043..246f8cc7bb2b1 100644
+--- a/tools/testing/selftests/kvm/memslot_modification_stress_test.c
++++ b/tools/testing/selftests/kvm/memslot_modification_stress_test.c
+@@ -103,7 +103,7 @@ static void run_test(enum vm_guest_mode mode, void *arg)
+ 
+ 	pr_info("Finished creating vCPUs\n");
+ 
+-	perf_test_start_vcpu_threads(nr_vcpus, vcpu_worker);
++	perf_test_start_vcpu_threads(nr_vcpus, NULL, vcpu_worker);
+ 
+ 	pr_info("Started all vCPUs\n");
  
 -- 
-2.37.2
+2.37.1.595.g718a3a8f04-goog
 
