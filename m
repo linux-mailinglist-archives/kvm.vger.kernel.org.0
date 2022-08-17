@@ -2,198 +2,151 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 6DA5A596637
-	for <lists+kvm@lfdr.de>; Wed, 17 Aug 2022 02:07:05 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id CE06559663B
+	for <lists+kvm@lfdr.de>; Wed, 17 Aug 2022 02:09:09 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237881AbiHQAG6 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 16 Aug 2022 20:06:58 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55870 "EHLO
+        id S237929AbiHQAHN (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 16 Aug 2022 20:07:13 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56092 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232173AbiHQAG5 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 16 Aug 2022 20:06:57 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4A54E5D0F2
-        for <kvm@vger.kernel.org>; Tue, 16 Aug 2022 17:06:53 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1660694812;
-        h=from:from:reply-to:reply-to:subject:subject:date:date:
-         message-id:message-id:to:to:cc:cc:mime-version:mime-version:
-         content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=p4aPAnVSr6FBk5QXVZnMKCLLXwxKwvTNDlLlqNRSqJg=;
-        b=AHAlDQ3gOb8MuxsvbY+3zLCHMLV+CzSJ2WSCWh8flPHGkO1oZAU/zncwXje5AUTV8htW7u
-        zbs0E7cDYL0UKhh3xbX0zctMDsAUscpb3nPMRuymjBOeJ6TXott07O6hejrCRPFz4J3QRH
-        T8n1POYGtArTPcOfycQnif2zwX4YIto=
-Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
- [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-42-8Y_WoPEjP3KCyIOPNMhIEg-1; Tue, 16 Aug 2022 20:06:49 -0400
-X-MC-Unique: 8Y_WoPEjP3KCyIOPNMhIEg-1
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.rdu2.redhat.com [10.11.54.6])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id C9862185A79C;
-        Wed, 17 Aug 2022 00:06:48 +0000 (UTC)
-Received: from [10.64.54.16] (vpn2-54-16.bne.redhat.com [10.64.54.16])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id 504862166B26;
-        Wed, 17 Aug 2022 00:06:43 +0000 (UTC)
-Reply-To: Gavin Shan <gshan@redhat.com>
-Subject: Re: [KVM] e923b0537d: kernel-selftests.kvm.rseq_test.fail
-To:     Sean Christopherson <seanjc@google.com>
-Cc:     kernel test robot <oliver.sang@intel.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Oliver Upton <oliver.upton@linux.dev>,
-        Andrew Jones <andrew.jones@linux.dev>,
-        LKML <linux-kernel@vger.kernel.org>, kvm@vger.kernel.org,
-        lkp@lists.01.org, lkp@intel.com, xudong.hao@intel.com,
-        regressions@lists.linux.dev
-References: <Yvn60W/JpPO8URLY@xsang-OptiPlex-9020>
- <Yvq9wzXNF4ZnlCdk@google.com>
- <5034abb9-e176-d480-c577-1ec5dd47182b@redhat.com>
- <9bfeae26-b4b1-eedb-6cbd-b4f9f1e1cc55@redhat.com>
- <YvwYxeE4vc/Srbil@google.com>
-From:   Gavin Shan <gshan@redhat.com>
-Message-ID: <d8290cbe-5d87-137a-0633-0ff5c69d57b0@redhat.com>
-Date:   Wed, 17 Aug 2022 10:06:41 +1000
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.2.0
+        with ESMTP id S237930AbiHQAHK (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 16 Aug 2022 20:07:10 -0400
+Received: from mail-pf1-x429.google.com (mail-pf1-x429.google.com [IPv6:2607:f8b0:4864:20::429])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6775F5E66C
+        for <kvm@vger.kernel.org>; Tue, 16 Aug 2022 17:07:08 -0700 (PDT)
+Received: by mail-pf1-x429.google.com with SMTP id p125so10730696pfp.2
+        for <kvm@vger.kernel.org>; Tue, 16 Aug 2022 17:07:08 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc;
+        bh=DnaRmL+U+YfuPBRbML9hLskPCbcaMs+gfoPDre5bUhM=;
+        b=UDjqHvY5V3lgNcChRgEXtBr8rGjAib3ZD98iy0ySLgzjY4lZN2dkLPvH1EUcXg79+1
+         xyLQeV8OiF6H4AzZbXCRSoTJaifNPVOHu9mTFS+XEyzmj9UsYg13wgoC67/t/s3nOyHu
+         YOQVTKl+FhSHM+dIl2jbyrHHWGIImApnWL5aAQ+OO7nkw3d1Dexx1MoQrp5Sih9wjIXt
+         tm2eAuJ5+N0dM/e8hXtTOcfJyNrxKjmQcoQTqc7EJRVWf9NKn4wPI00n0lgnYVkfjpbP
+         lzVLPM70iW0MzJxmrlfwPQ+IDMw7XdwnbFCj6jirb4+mTgESuC7TwMpA/6kJsKYIiyf0
+         JOQA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc;
+        bh=DnaRmL+U+YfuPBRbML9hLskPCbcaMs+gfoPDre5bUhM=;
+        b=dOeSfXFZ6IyoTGwzAv9npTTtDy5tr975ryyrQj81QBkN1h38uc/Y2+gQKNTobYRjoZ
+         RDMwvW0jbbifZ6N+RPkH3OKNFmz2xQSy4QVqDoUK7+jif6wGqLZEAcvuHe58AWdSX1JX
+         u8aLANRniCMd30RSsBMvOA9b8tI2d9WtLT6gfQuGb7Zu52K4gY2S6GexMaOCCtzIaNek
+         i34U3ongy5TnQ8qYKdasilXFoFRSC9ltjWGG2hn+J9NsdGuwUaEXkSocoEPLgRP77bB8
+         3ZOBsiDDt+Ry0BBpzoLO9/2g4FqmxZSnv3n/wAHV6p/zk/Fkcl38+uG5Y/2ryz16mZ1Y
+         401g==
+X-Gm-Message-State: ACgBeo0BiursBU6oKy4YYbRbNsRF/Ayw/1HJnH7NOcd/JKhPozlZdPLA
+        vbj3KTPBpR68BVVM4brLsLtf+zjaFjEmhA==
+X-Google-Smtp-Source: AA6agR7GxRSAFz0PCpFM8GtA24cRoZ34N2x1WIOZ9aAo/rP+sai0986WsVkMk5ITzti52Gm/xnY72g==
+X-Received: by 2002:a63:cf0b:0:b0:419:f140:2876 with SMTP id j11-20020a63cf0b000000b00419f1402876mr19553366pgg.303.1660694827780;
+        Tue, 16 Aug 2022 17:07:07 -0700 (PDT)
+Received: from google.com (7.104.168.34.bc.googleusercontent.com. [34.168.104.7])
+        by smtp.gmail.com with ESMTPSA id a5-20020aa78e85000000b00518e1251197sm9286836pfr.148.2022.08.16.17.07.07
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 16 Aug 2022 17:07:07 -0700 (PDT)
+Date:   Wed, 17 Aug 2022 00:07:03 +0000
+From:   Sean Christopherson <seanjc@google.com>
+To:     Paolo Bonzini <pbonzini@redhat.com>
+Cc:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        mlevitsk@redhat.com, vkuznets@redhat.com
+Subject: Re: [PATCH v2 8/9] KVM: x86: lapic does not have to process INIT if
+ it is blocked
+Message-ID: <YvwxJzHC5xYnc7CJ@google.com>
+References: <20220811210605.402337-1-pbonzini@redhat.com>
+ <20220811210605.402337-9-pbonzini@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <YvwYxeE4vc/Srbil@google.com>
-Content-Type: text/plain; charset=windows-1252; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 2.78 on 10.11.54.6
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
-        RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE
-        autolearn=ham autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20220811210605.402337-9-pbonzini@redhat.com>
+X-Spam-Status: No, score=-14.4 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+        ENV_AND_HDR_SPF_MATCH,FSL_HELO_FAKE,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,
+        SPF_PASS,T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL
+        autolearn=no autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi Sean,
-
-On 8/17/22 8:23 AM, Sean Christopherson wrote:
-> On Tue, Aug 16, 2022, Gavin Shan wrote:
->> On 8/16/22 3:02 PM, Gavin Shan wrote:
->>> On 8/16/22 7:42 AM, Sean Christopherson wrote:
->>>> On Mon, Aug 15, 2022, kernel test robot wrote:
->>>>> commit: e923b0537d28e15c9d31ce8b38f810b325816903 ("KVM: selftests: Fix target thread to be migrated in rseq_test")
->>>>> https://git.kernel.org/cgit/linux/kernel/git/torvalds/linux.git master
->>>>
->>>> ...
->>>>
->>>>> # selftests: kvm: rseq_test
->>>>> # ==== Test Assertion Failure ====
->>>>> #   rseq_test.c:278: i > (NR_TASK_MIGRATIONS / 2)
->>>>> #   pid=49599 tid=49599 errno=4 - Interrupted system call
->>>>> #      1    0x000000000040265d: main at rseq_test.c:278
->>>>> #      2    0x00007fe44eed07fc: ?? ??:0
->>>>> #      3    0x00000000004026d9: _start at ??:?
->>>>> #   Only performed 23174 KVM_RUNs, task stalled too much?
->>>>> #
->>>>> not ok 56 selftests: kvm: rseq_test # exit=254
->>>>
->>>> ...
->>>>
->>>>> # Automatically generated file; DO NOT EDIT.
->>>>> # Linux/x86_64 5.19.0-rc6 Kernel Configuration
->>>>> #
->>>>> CONFIG_CC_VERSION_TEXT="gcc-11 (Debian 11.3.0-3) 11.3.0"
->>>>> CONFIG_CC_IS_GCC=y
->>>>> CONFIG_GCC_VERSION=110300
->>>>> CONFIG_CLANG_VERSION=0
->>>>> CONFIG_AS_IS_GNU=y
->>>>> CONFIG_AS_VERSION=23800
->>>>> CONFIG_LD_IS_BFD=y
->>>>> CONFIG_LD_VERSION=23800
->>>>> CONFIG_LLD_VERSION=0
->>>>
->>>> Assuming 23800 == 2.38, this is a known issue.
->>>>
->>>> https://lore.kernel.org/all/20220810104114.6838-1-gshan@redhat.com
->>>>
->>>
->>> It's probably different story this time.
+On Thu, Aug 11, 2022, Paolo Bonzini wrote:
+> Do not return true from kvm_apic_has_events, and consequently from
+> kvm_vcpu_has_events, if the vCPU is not going to process an INIT.
 > 
-> Doh, if I had bothered to actually look at the error message...
+> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+> ---
+>  arch/x86/include/asm/kvm_host.h | 1 +
+>  arch/x86/kvm/i8259.c            | 2 +-
+>  arch/x86/kvm/lapic.h            | 2 +-
+>  arch/x86/kvm/x86.c              | 5 +++++
+>  arch/x86/kvm/x86.h              | 5 -----
+>  5 files changed, 8 insertions(+), 7 deletions(-)
 > 
+> diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
+> index 293ff678fff5..1ce4ebc41118 100644
+> --- a/arch/x86/include/asm/kvm_host.h
+> +++ b/arch/x86/include/asm/kvm_host.h
+> @@ -2042,6 +2042,7 @@ void __user *__x86_set_memory_region(struct kvm *kvm, int id, gpa_t gpa,
+>  				     u32 size);
+>  bool kvm_vcpu_is_reset_bsp(struct kvm_vcpu *vcpu);
+>  bool kvm_vcpu_is_bsp(struct kvm_vcpu *vcpu);
+> +bool kvm_vcpu_latch_init(struct kvm_vcpu *vcpu);
+>  
+>  bool kvm_intr_is_single_vcpu(struct kvm *kvm, struct kvm_lapic_irq *irq,
+>  			     struct kvm_vcpu **dest_vcpu);
+> diff --git a/arch/x86/kvm/i8259.c b/arch/x86/kvm/i8259.c
+> index e1bb6218bb96..177555eea54e 100644
+> --- a/arch/x86/kvm/i8259.c
+> +++ b/arch/x86/kvm/i8259.c
+> @@ -29,9 +29,9 @@
+>  #include <linux/mm.h>
+>  #include <linux/slab.h>
+>  #include <linux/bitops.h>
+> -#include "irq.h"
+> +#include <linux/kvm_host.h>
+>  
+> -#include <linux/kvm_host.h>
+> +#include "irq.h"
+>  #include "trace.h"
+>  
+>  #define pr_pic_unimpl(fmt, ...)	\
+> diff --git a/arch/x86/kvm/lapic.h b/arch/x86/kvm/lapic.h
+> index 117a46df5cc1..12577ddccdfc 100644
+> --- a/arch/x86/kvm/lapic.h
+> +++ b/arch/x86/kvm/lapic.h
+> @@ -225,7 +225,7 @@ static inline bool kvm_vcpu_apicv_active(struct kvm_vcpu *vcpu)
+>  
+>  static inline bool kvm_apic_has_events(struct kvm_vcpu *vcpu)
+>  {
+> -	return lapic_in_kernel(vcpu) && vcpu->arch.apic->pending_events;
+> +	return lapic_in_kernel(vcpu) && vcpu->arch.apic->pending_events && !kvm_vcpu_latch_init(vcpu);
 
-Ok :)
+Blech, the kvm_apic_has_events() name is awful (as is pending_events), e.g. it
+really should be kvm_apic_has_pending_sipi_or_init().
 
->>> The assert is triggered because of the following instructions. I would
->>> guess the reason is vcpu thread has been running on CPU where we has high
->>> CPU load. In this case, the vcpu thread can't be run in time. More
->>> specific, the vcpu thread can't be run in the 1 - 10us time window, which
->>> is specified by the migration worker (thread).
->>>
->>>       TEST_ASSERT(i > (NR_TASK_MIGRATIONS / 2),
->>>                   "Only performed %d KVM_RUNs, task stalled too much?\n", i);
->>>
->>> I think we need to improve the handshake mechanism between the vcpu thread
->>> and migration worker. In current implementation, the handshake is done through
->>> the atomic counter. The mechanism is simple enough, but vcpu thread can miss
->>> the aforementioned time window. Another issue is the test case much more time
->>> than expected to finish.
-> 
-> There's not really an expected time to finish.  The original purpose of the test
-> is to trigger a kernel race condition, so it's a balance between letting the test
-> run long enough to have some confidence that the kernel is bug free, and not running
-> so long that it wastes time.
-> 
+To avoid the odd kvm_vcpu_latch_init() declaration and the long line above, what
+if we open code this in kvm_vcpu_has_events() like we do for NMI, SMI, etc...?
 
-Yeah, I was thinking of it. It's why I'm not 100% sure for my proposal, to have
-full synchronization.
+And as follow-up, I would love to rename kvm_vcpu_latch_init() => kvm_vcpu_init_blocked(),
+kvm_apic_has_events(), and pending_events.
 
->>> Sean, if you think it's reasonable, I can figure out something to do:
->>>
->>> - Reuse the atomic counter for a full synchronization between these two
->>>     threads. Something like below:
->>>
->>>     #define RSEQ_TEST_STATE_RUN_VCPU       0     // vcpu_run()
->>>     #define RSEQ_TEST_STATE_MIGRATE        1     // sched_setaffinity()
->>>     #define RSEQ_TEST_STATE_CHECK          2     // Check rseq.cpu_id and get_cpu()
->>>
->>>     The atomic counter is reset to RSEQ_TEST_STATE_RUN_VCPU after RSEQ_TEST_STATE_RUN_VCPU
-> 
-> Again, because one of the primary goals is to ensure the kernel is race free, the
-> test should avoid full synchronization.
-> 
+E.g. for this patch just do:
 
-Ok.
+diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+index 9f11b505cbee..559900736a71 100644
+--- a/arch/x86/kvm/x86.c
++++ b/arch/x86/kvm/x86.c
+@@ -12533,7 +12533,8 @@ static inline bool kvm_vcpu_has_events(struct kvm_vcpu *vcpu)
+        if (!list_empty_careful(&vcpu->async_pf.done))
+                return true;
 
->>>
->>> - Reduce NR_TASK_MIGRATIONS from 100000 to num_of_online_cpus(). With this,
->>>     less time is needed to finish the test case.
->>>
->>
->> I'm able to recreate the issue on my local arm64 system.
->>
->> - From the source code, the iteration count is changed from 100000 to 1000
->> - Only CPU#0 and CPU#1 are exposed in calc_min_max_cpu, meaning other CPUs
->>    are cleared from @possible_mask
->> - Run some CPU bound task on CPU#0 and CPU#1
->>    # while true; do taskset -c 0 ./a; done
->>    # while true; do taskset -c 1 ./a; done
->> - Run 'rseq_test' and hit the issue
-> 
-> At this point, this isn't a test bug.  The test is right to complain that it didn't
-> provide the coverage it's supposed to provide.
-> 
-> If the bot failure is a one-off, my preference is to leave things as-is for now.
-> If the failure is an ongoing issue, then we probably need to understand why the
-> bot is failing.
-> 
+-       if (kvm_apic_has_events(vcpu))
++       /* comment explaning that SIPIs are dropped in this case. */
++       if (kvm_apic_has_events(vcpu) && !kvm_vcpu_latch_init(vcpu))
+                return true;
 
-Yeah, the system for the coverage was likely having high CPU loads, which is similar
-to my (simulated) environment. I usually have my system being idle when running the
-coverage test cases. I didn't hit this specific failure before.
-
-Lets leave it as of being. We can improve if needed in future :)
-
-Thanks,
-Gavin
+        if (vcpu->arch.pv.pv_unhalted)
 
