@@ -2,296 +2,222 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 40369597C7E
-	for <lists+kvm@lfdr.de>; Thu, 18 Aug 2022 05:56:35 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id F3771597E2E
+	for <lists+kvm@lfdr.de>; Thu, 18 Aug 2022 07:44:01 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S243130AbiHRDs4 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 17 Aug 2022 23:48:56 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40934 "EHLO
+        id S241509AbiHRFnu (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 18 Aug 2022 01:43:50 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52528 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S243160AbiHRDsE (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 17 Aug 2022 23:48:04 -0400
-Received: from mail-il1-x12d.google.com (mail-il1-x12d.google.com [IPv6:2607:f8b0:4864:20::12d])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B2001A98EC
-        for <kvm@vger.kernel.org>; Wed, 17 Aug 2022 20:47:44 -0700 (PDT)
-Received: by mail-il1-x12d.google.com with SMTP id k3so251590ilv.11
-        for <kvm@vger.kernel.org>; Wed, 17 Aug 2022 20:47:44 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc;
-        bh=awFGwwSRocOeifmjAPEDB1aSCbnwQlgCGRRbkk5b0mw=;
-        b=HuuwBZomHQD9jDKeuTr2VNO9olgvvd8D0ZYsRVU+dLL2RPb2ssLOWCDp2onOIcQ1PZ
-         kfoCj9T0R0Xfbfx7lF24moS/6w5INxaWGwptve9xDhrNP2Adv4KzaBkwltgUq1z21AWm
-         uHVDVvnl6LcFUbGVTqMFFxCD/aL6FhbjXqH7OMB/7kfR1fPv0czzY1fd//fIMposD07f
-         b9aTXeoPVIk/RWKntVLDYbMIHvqFhziJDS0KKv60RjWzmPM4vTWW81Fe2uEsoEo0KPwq
-         5EJFihNKM43HercJ872rCFaYNpPZ/exlMZgcpbYowu087PnQKgRbawlj5pxDv6RAdF1V
-         bqaA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc;
-        bh=awFGwwSRocOeifmjAPEDB1aSCbnwQlgCGRRbkk5b0mw=;
-        b=5f9jnXta4f3UWgKo9gSDE6HUnGa9V/VaTgZL4mTvwQzpiJ4N1RFRpGIu+Xf7/lzb91
-         siK9kYuUQge3/XIloYDDng1Y7ixWdO2NQH4EhBwRg1m65CASLpSjO/pEHiV5yLPQkJcr
-         NWu1gy+vdrNHLv9Bg7cPM6JeUmAmx2klPmK441O7TbnZB/iuXJTABGASVgmGV5P2PkgP
-         uc97fiko2G36RlE4BPKdJ0kXJKi4TSpDKRUxawq6hTpKVROoOsQsrM1YvjfLx6/j5NGN
-         QhSmohtf6vsMsF+wVLv75Zw0QLP68ZfWoNUQLihiAS4w0o8iyPLR3RXTJUvXflFl4P/0
-         MI7g==
-X-Gm-Message-State: ACgBeo2XXYnUOR28PkzFLg1w28LGzSBwS9ol+tcUhCGqTZSxANgjjBW1
-        TCdm6l9mpZi4+m1HiIyXJFbDyuAb5ovFJWF7rC9b4A==
-X-Google-Smtp-Source: AA6agR4qMa4OQ91sIzkDhZ6sJxq3ep4yI+PyN9yclK8K6pKbEhOC904SXmSnOpmJe9LJ12apxNw4HTohCoA9TKmMWt0=
-X-Received: by 2002:a92:3652:0:b0:2df:4133:787 with SMTP id
- d18-20020a923652000000b002df41330787mr590419ilf.39.1660794463902; Wed, 17 Aug
- 2022 20:47:43 -0700 (PDT)
+        with ESMTP id S232420AbiHRFnr (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 18 Aug 2022 01:43:47 -0400
+Received: from NAM02-BN1-obe.outbound.protection.outlook.com (mail-bn1nam07on2044.outbound.protection.outlook.com [40.107.212.44])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D84133CBCA;
+        Wed, 17 Aug 2022 22:43:44 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=nOLLeScLpdSfKP/4veWN6Jy32Nnpih8QSiB7pSb+HsW9XcRX3mAJEA/l1UtaSfcBmfElxaTxR/q6q2bM9gc+rchVAZpPdsSc0egRTxlF7gr5u4iaV5r2G9XebqK9FSTfYH7xDnmLWz4pXH3Kl08jwu2uZQu1rkmbA5bbeAOSCB8ZrspzHWNR9udplXGFQK3cVMWEBAQaeya5mOt8KilhrbzHaP5FOwEOMm7ZYbR4tHF0ijIfc+LbMB3ycK8tmKidaIjxqoj9VJ5aHgIuV0BjQCrJhBCfzsWyYD7908yYVPmN+1oT0oKrtyo/hKO9vble9XwwjL+HgMrsxIL/WhK9nw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=7BAcH77xCiHqHCWEZcjJjkDD06tsPwWpa3U8OX//Q1Y=;
+ b=KrcVB//tMcd8LchTZzKOqvMryh3+Anxyrp1rtczKZveWR31/7/htSz9RaYwb/Nz3t2GQHwcQAE7rEedgNXo5ymPW9Bslj8Cnppk3hFOjy5Zd/7m8F3nmlihgdi29DOm1XIp4vAAeVkiTubrc+i0a4lYyyZlWVwPCRTUB9+f2HDqfMZE/SbXw8scUoWHp5nFznSaKdFJQX8Y0jR5COIKeLrHu9Bx7Kij9pER7Uav9518FlIgrABLNfCp2SG+18eGh+MUhWNg9lT05Ceq6uZDJbU7LT8wFBxnddrQfRZek0gfVefWyMBzTyHBv4mAOCdnVRvxM0ngp9q/e/WUDEfiARg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
+ 165.204.84.17) smtp.rcpttodomain=google.com smtp.mailfrom=amd.com; dmarc=pass
+ (p=quarantine sp=quarantine pct=100) action=none header.from=amd.com;
+ dkim=none (message not signed); arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=7BAcH77xCiHqHCWEZcjJjkDD06tsPwWpa3U8OX//Q1Y=;
+ b=G3LHuWzOiRL3z9T60cIgzHk1QKYn8aJydVD2WioxkOPdRXIgVBm2p7gvNdchvAbUJsEHfY3MzDgJcIR8b9dV9LamCae66XrvMcbcZFEFBz+kLL4ADStnhVwtvDunD6hfkQgCBYEYeQ4dTs1L+GCqYQAVI2LAQADwI72a/zvzS3o=
+Received: from MW2PR16CA0069.namprd16.prod.outlook.com (2603:10b6:907:1::46)
+ by MWHPR1201MB0269.namprd12.prod.outlook.com (2603:10b6:301:5b::21) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5525.11; Thu, 18 Aug
+ 2022 05:43:41 +0000
+Received: from CO1NAM11FT026.eop-nam11.prod.protection.outlook.com
+ (2603:10b6:907:1:cafe::bb) by MW2PR16CA0069.outlook.office365.com
+ (2603:10b6:907:1::46) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5546.16 via Frontend
+ Transport; Thu, 18 Aug 2022 05:43:41 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 165.204.84.17)
+ smtp.mailfrom=amd.com; dkim=none (message not signed)
+ header.d=none;dmarc=pass action=none header.from=amd.com;
+Received-SPF: Pass (protection.outlook.com: domain of amd.com designates
+ 165.204.84.17 as permitted sender) receiver=protection.outlook.com;
+ client-ip=165.204.84.17; helo=SATLEXMB04.amd.com; pr=C
+Received: from SATLEXMB04.amd.com (165.204.84.17) by
+ CO1NAM11FT026.mail.protection.outlook.com (10.13.175.67) with Microsoft SMTP
+ Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.20.5546.15 via Frontend Transport; Thu, 18 Aug 2022 05:43:41 +0000
+Received: from localhost (10.180.168.240) by SATLEXMB04.amd.com
+ (10.181.40.145) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2375.28; Thu, 18 Aug
+ 2022 00:43:40 -0500
+Date:   Wed, 17 Aug 2022 10:27:19 -0500
+From:   Michael Roth <michael.roth@amd.com>
+To:     Sean Christopherson <seanjc@google.com>
+CC:     "Gupta, Pankaj" <pankaj.gupta@amd.com>,
+        "Kirill A . Shutemov" <kirill.shutemov@linux.intel.com>,
+        Chao Peng <chao.p.peng@linux.intel.com>,
+        "Nikunj A. Dadhania" <nikunj@amd.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Jonathan Corbet <corbet@lwn.net>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        "Joerg Roedel" <joro@8bytes.org>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+        <x86@kernel.org>, "H . Peter Anvin" <hpa@zytor.com>,
+        Hugh Dickins <hughd@google.com>,
+        Jeff Layton <jlayton@kernel.org>,
+        "J . Bruce Fields" <bfields@fieldses.org>,
+        "Andrew Morton" <akpm@linux-foundation.org>,
+        Shuah Khan <shuah@kernel.org>,
+        "Mike Rapoport" <rppt@kernel.org>,
+        Steven Price <steven.price@arm.com>,
+        "Maciej S . Szmigiero" <mail@maciej.szmigiero.name>,
+        Vlastimil Babka <vbabka@suse.cz>,
+        Vishal Annapurve <vannapurve@google.com>,
+        Yu Zhang <yu.c.zhang@linux.intel.com>, <luto@kernel.org>,
+        <jun.nakajima@intel.com>, <dave.hansen@intel.com>,
+        <ak@linux.intel.com>, <david@redhat.com>, <aarcange@redhat.com>,
+        <ddutile@redhat.com>, <dhildenb@redhat.com>,
+        "Quentin Perret" <qperret@google.com>, <mhocko@suse.com>,
+        Muchun Song <songmuchun@bytedance.com>, <bharata@amd.com>,
+        <kvm@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+        <linux-mm@kvack.org>, <linux-kselftest@vger.kernel.org>,
+        <linux-api@vger.kernel.org>, <linux-doc@vger.kernel.org>,
+        <qemu-devel@nongnu.org>, <linux-fsdevel@vger.kernel.org>
+Subject: Re: [PATCH v7 00/14] KVM: mm: fd-based approach for supporting KVM
+ guest private memory
+Message-ID: <20220817152719.g7pgu34syekzkha5@amd.com>
+References: <9dc91ce8-4cb6-37e6-4c25-27a72dc11dd0@amd.com>
+ <422b9f97-fdf5-54bf-6c56-3c45eff5e174@amd.com>
+ <1407c70c-0c0b-6955-10bb-d44c5928f2d9@amd.com>
+ <1136925c-2e37-6af4-acac-be8bed9f6ed5@amd.com>
+ <1b02db9d-f2f1-94dd-6f37-59481525abff@amd.com>
+ <20220815130411.GA1073443@chaop.bj.intel.com>
+ <f0094f31-9669-47b5-eb52-6754a13ce757@amd.com>
+ <20220816122457.2fjyd4uz5hp5cani@box.shutemov.name>
+ <f95f35af-4824-2a2a-7cd0-71d1fda6867a@amd.com>
+ <Yvu54I7Y+/ybVyec@google.com>
 MIME-Version: 1.0
-References: <cover.1655761627.git.ashish.kalra@amd.com> <34246866043db7bab34a92fe22f359667ab155a0.1655761627.git.ashish.kalra@amd.com>
-In-Reply-To: <34246866043db7bab34a92fe22f359667ab155a0.1655761627.git.ashish.kalra@amd.com>
-From:   Alper Gun <alpergun@google.com>
-Date:   Wed, 17 Aug 2022 20:47:33 -0700
-Message-ID: <CABpDEukAEGwb9w12enO=fhSbHbchypsOdO2dkR4Jei3wDW6NWg@mail.gmail.com>
-Subject: Re: [PATCH Part2 v6 39/49] KVM: SVM: Introduce ops for the post gfn
- map and unmap
-To:     Ashish Kalra <Ashish.Kalra@amd.com>
-Cc:     x86@kernel.org, linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-        linux-coco@lists.linux.dev, linux-mm@kvack.org,
-        linux-crypto@vger.kernel.org, tglx@linutronix.de, mingo@redhat.com,
-        jroedel@suse.de, thomas.lendacky@amd.com, hpa@zytor.com,
-        ardb@kernel.org, pbonzini@redhat.com, seanjc@google.com,
-        vkuznets@redhat.com, jmattson@google.com, luto@kernel.org,
-        dave.hansen@linux.intel.com, slp@redhat.com, pgonda@google.com,
-        peterz@infradead.org, srinivas.pandruvada@linux.intel.com,
-        rientjes@google.com, dovmurik@linux.ibm.com, tobin@ibm.com,
-        bp@alien8.de, michael.roth@amd.com, vbabka@suse.cz,
-        kirill@shutemov.name, ak@linux.intel.com, tony.luck@intel.com,
-        marcorr@google.com, sathyanarayanan.kuppuswamy@linux.intel.com,
-        dgilbert@redhat.com, jarkko@kernel.org
-Content-Type: text/plain; charset="UTF-8"
-X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-        T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL
-        autolearn=unavailable autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset="us-ascii"
+Content-Disposition: inline
+In-Reply-To: <Yvu54I7Y+/ybVyec@google.com>
+X-Originating-IP: [10.180.168.240]
+X-ClientProxiedBy: SATLEXMB03.amd.com (10.181.40.144) To SATLEXMB04.amd.com
+ (10.181.40.145)
+X-EOPAttributedMessage: 0
+X-MS-PublicTrafficType: Email
+X-MS-Office365-Filtering-Correlation-Id: 84ecb84f-bf0a-4229-edd6-08da80dc9b70
+X-MS-TrafficTypeDiagnostic: MWHPR1201MB0269:EE_
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: WQOI2YOpuashsx9RSf9wneuMiTux2IfR+WCNPn3fGQIDY+lQJdDRe8M0iHNoEXRmtDk/hQIJlFhdB12qyb5ECiWpLsdxS0fUHZmYeeqJGgfwluiS35kRtkvOl+Z1kx3lDnKw+w6rc5Mqv0q2IIQWZg7+KpduUq0CtNlHa7FLFWPZUgpqLqdYeA6/Ef/0D5ogD5Vxnwz2yQxQu1D4ZxZVqNv8H63hHoqz6WxnGCPjuFqcH5PbJoC49ZoFQgx/K0hF1i9GRtaoasdnN5m8GTUT72m8CwLpLwEikzFaVOT3WH77RjKPUcE6U0cArIZdsAb9pcutTtuOhn/tOZM9glyU9shac27xL2cuBj90Zn/FODHrUKzyZ7tpcIiv6ZVI0RmcPt9xl9dx2YlVPWnTViTBsVnw2WuryH6icVufElhTG+EAP1T2JoD2nZOfNop2U0J0uT1AwKCIJq31dJq2aO8ZdMC7TeeboHZLimD4PYWSOnkn16dsfYAMG/kGafGq3hjlVIWCYhkLIh4P8W7ufNoX+tm2VKrxMdH/yVdArfch4ojOwyJFC2uf3i/HIiG0+pj/+lkm0GElBhz4jbWA2Fi76y/8harrRXug9o/bljJHSvN5V+hGepYSxkFKwYzIJ5EeYa6ClAULOvq8G4R4yIxRQ3Aoyy2+rLfPz0jEo9WE9TBWfeinF5/QThmkJlQiLMzaMq1CExmEn2XJDCL09qhx8xGtU+7LPmVRAeXkQCR/Jbus0BnUj8xK15ZiiXpkinD7UhMeEmJpIdct/91a4TzzHw2uqjSj202klCRb0OmyXxl8hCXdc1giPrkfaHLkk1M/
+X-Forefront-Antispam-Report: CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:SATLEXMB04.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230016)(4636009)(136003)(376002)(346002)(396003)(39860400002)(40470700004)(36840700001)(46966006)(40480700001)(2616005)(6666004)(6916009)(36860700001)(5660300002)(2906002)(426003)(7406005)(7416002)(336012)(36756003)(44832011)(54906003)(41300700001)(316002)(4326008)(47076005)(70586007)(1076003)(8936002)(86362001)(70206006)(16526019)(83380400001)(82310400005)(356005)(8676002)(82740400003)(186003)(26005)(478600001)(81166007)(40460700003)(36900700001);DIR:OUT;SFP:1101;
+X-OriginatorOrg: amd.com
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 18 Aug 2022 05:43:41.3501
+ (UTC)
+X-MS-Exchange-CrossTenant-Network-Message-Id: 84ecb84f-bf0a-4229-edd6-08da80dc9b70
+X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=3dd8961f-e488-4e60-8e11-a82d994e183d;Ip=[165.204.84.17];Helo=[SATLEXMB04.amd.com]
+X-MS-Exchange-CrossTenant-AuthSource: CO1NAM11FT026.eop-nam11.prod.protection.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Anonymous
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: MWHPR1201MB0269
+X-Spam-Status: No, score=-1.1 required=5.0 tests=BAYES_00,DATE_IN_PAST_12_24,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_PASS,T_SCC_BODY_TEXT_LINE,
+        URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Jun 20, 2022 at 4:12 PM Ashish Kalra <Ashish.Kalra@amd.com> wrote:
->
-> From: Brijesh Singh <brijesh.singh@amd.com>
->
-> When SEV-SNP is enabled in the guest VM, the guest memory pages can
-> either be a private or shared. A write from the hypervisor goes through
-> the RMP checks. If hardware sees that hypervisor is attempting to write
-> to a guest private page, then it triggers an RMP violation #PF.
->
-> To avoid the RMP violation with GHCB pages, added new post_{map,unmap}_gfn
-> functions to verify if its safe to map GHCB pages.  Uses a spinlock to
-> protect against the page state change for existing mapped pages.
->
-> Need to add generic post_{map,unmap}_gfn() ops that can be used to verify
-> that its safe to map a given guest page in the hypervisor.
->
-> This patch will need to be revisited later after consensus is reached on
-> how to manage guest private memory as probably UPM private memslots will
-> be able to handle this page state change more gracefully.
->
-> Signed-off-by: Brijesh Singh <brijesh.singh@amd.com>
-> Signed-off by: Ashish Kalra <ashish.kalra@amd.com>
-> ---
->  arch/x86/include/asm/kvm-x86-ops.h |  1 +
->  arch/x86/include/asm/kvm_host.h    |  3 ++
->  arch/x86/kvm/svm/sev.c             | 48 ++++++++++++++++++++++++++++--
->  arch/x86/kvm/svm/svm.c             |  3 ++
->  arch/x86/kvm/svm/svm.h             | 11 +++++++
->  5 files changed, 64 insertions(+), 2 deletions(-)
->
-> diff --git a/arch/x86/include/asm/kvm-x86-ops.h b/arch/x86/include/asm/kvm-x86-ops.h
-> index e0068e702692..2dd2bc0cf4c3 100644
-> --- a/arch/x86/include/asm/kvm-x86-ops.h
-> +++ b/arch/x86/include/asm/kvm-x86-ops.h
-> @@ -130,6 +130,7 @@ KVM_X86_OP(vcpu_deliver_sipi_vector)
->  KVM_X86_OP_OPTIONAL_RET0(vcpu_get_apicv_inhibit_reasons);
->  KVM_X86_OP(alloc_apic_backing_page)
->  KVM_X86_OP_OPTIONAL(rmp_page_level_adjust)
-> +KVM_X86_OP(update_protected_guest_state)
->
->  #undef KVM_X86_OP
->  #undef KVM_X86_OP_OPTIONAL
-> diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
-> index 49b217dc8d7e..8abc0e724f5c 100644
-> --- a/arch/x86/include/asm/kvm_host.h
-> +++ b/arch/x86/include/asm/kvm_host.h
-> @@ -1522,7 +1522,10 @@ struct kvm_x86_ops {
->         unsigned long (*vcpu_get_apicv_inhibit_reasons)(struct kvm_vcpu *vcpu);
->
->         void *(*alloc_apic_backing_page)(struct kvm_vcpu *vcpu);
-> +
->         void (*rmp_page_level_adjust)(struct kvm *kvm, kvm_pfn_t pfn, int *level);
-> +
-> +       int (*update_protected_guest_state)(struct kvm_vcpu *vcpu);
->  };
->
->  struct kvm_x86_nested_ops {
-> diff --git a/arch/x86/kvm/svm/sev.c b/arch/x86/kvm/svm/sev.c
-> index cb2d1bbb862b..4ed90331bca0 100644
-> --- a/arch/x86/kvm/svm/sev.c
-> +++ b/arch/x86/kvm/svm/sev.c
-> @@ -341,6 +341,7 @@ static int sev_guest_init(struct kvm *kvm, struct kvm_sev_cmd *argp)
->                 if (ret)
->                         goto e_free;
->
-> +               spin_lock_init(&sev->psc_lock);
->                 ret = sev_snp_init(&argp->error);
->         } else {
->                 ret = sev_platform_init(&argp->error);
-> @@ -2828,19 +2829,28 @@ static inline int svm_map_ghcb(struct vcpu_svm *svm, struct kvm_host_map *map)
->  {
->         struct vmcb_control_area *control = &svm->vmcb->control;
->         u64 gfn = gpa_to_gfn(control->ghcb_gpa);
-> +       struct kvm_vcpu *vcpu = &svm->vcpu;
->
-> -       if (kvm_vcpu_map(&svm->vcpu, gfn, map)) {
-> +       if (kvm_vcpu_map(vcpu, gfn, map)) {
->                 /* Unable to map GHCB from guest */
->                 pr_err("error mapping GHCB GFN [%#llx] from guest\n", gfn);
->                 return -EFAULT;
->         }
->
-> +       if (sev_post_map_gfn(vcpu->kvm, map->gfn, map->pfn)) {
-> +               kvm_vcpu_unmap(vcpu, map, false);
-> +               return -EBUSY;
-> +       }
-> +
->         return 0;
->  }
->
->  static inline void svm_unmap_ghcb(struct vcpu_svm *svm, struct kvm_host_map *map)
->  {
-> -       kvm_vcpu_unmap(&svm->vcpu, map, true);
-> +       struct kvm_vcpu *vcpu = &svm->vcpu;
-> +
-> +       kvm_vcpu_unmap(vcpu, map, true);
-> +       sev_post_unmap_gfn(vcpu->kvm, map->gfn, map->pfn);
->  }
->
->  static void dump_ghcb(struct vcpu_svm *svm)
-> @@ -3383,6 +3393,8 @@ static int __snp_handle_page_state_change(struct kvm_vcpu *vcpu, enum psc_op op,
->                                 return PSC_UNDEF_ERR;
->                 }
->
-> +               spin_lock(&sev->psc_lock);
-> +
->                 write_lock(&kvm->mmu_lock);
->
->                 rc = kvm_mmu_get_tdp_walk(vcpu, gpa, &pfn, &npt_level);
-> @@ -3417,6 +3429,8 @@ static int __snp_handle_page_state_change(struct kvm_vcpu *vcpu, enum psc_op op,
->
->                 write_unlock(&kvm->mmu_lock);
->
-> +               spin_unlock(&sev->psc_lock);
+On Tue, Aug 16, 2022 at 03:38:08PM +0000, Sean Christopherson wrote:
+> On Tue, Aug 16, 2022, Gupta, Pankaj wrote:
+> > 
+> > > > > Actually the current version allows you to delay the allocation to a
+> > > > > later time (e.g. page fault time) if you don't call fallocate() on the
+> > > > > private fd. fallocate() is necessary in previous versions because we
+> > > > > treat the existense in the fd as 'private' but in this version we track
+> > > > > private/shared info in KVM so we don't rely on that fact from memory
+> > > > > backstores.
+> > > > 
+> > > > Does this also mean reservation of guest physical memory with secure
+> > > > processor (both for SEV-SNP & TDX) will also happen at page fault time?
+> > > > 
+> > > > Do we plan to keep it this way?
+> > > 
+> > > If you are talking about accepting memory by the guest, it is initiated by
+> > > the guest and has nothing to do with page fault time vs fallocate()
+> > > allocation of host memory. I mean acceptance happens after host memory
+> > > allocation but they are not in lockstep, acceptance can happen much later.
+> > 
+> > No, I meant reserving guest physical memory range from hypervisor e.g with
+> > RMPUpdate for SEV-SNP or equivalent at TDX side (PAMTs?).
+> 
+> As proposed, RMP/PAMT updates will occur in the fault path, i.e. there is no way
+> for userspace to pre-map guest memory.
 
-There is a corner case where the psc_lock is not released. If
-kvm_mmu_get_tdp_walk fails, the lock will be kept and will cause soft
-lockup.
+Hi Sean,
 
-> +
->                 if (rc) {
->                         pr_err_ratelimited("Error op %d gpa %llx pfn %llx level %d rc %d\n",
->                                            op, gpa, pfn, level, rc);
-> @@ -3965,3 +3979,33 @@ void sev_rmp_page_level_adjust(struct kvm *kvm, kvm_pfn_t pfn, int *level)
->         /* Adjust the level to keep the NPT and RMP in sync */
->         *level = min_t(size_t, *level, rmp_level);
->  }
-> +
-> +int sev_post_map_gfn(struct kvm *kvm, gfn_t gfn, kvm_pfn_t pfn)
-> +{
-> +       struct kvm_sev_info *sev = &to_kvm_svm(kvm)->sev_info;
-> +       int level;
-> +
-> +       if (!sev_snp_guest(kvm))
-> +               return 0;
-> +
-> +       spin_lock(&sev->psc_lock);
-> +
-> +       /* If pfn is not added as private then fail */
-> +       if (snp_lookup_rmpentry(pfn, &level) == 1) {
-> +               spin_unlock(&sev->psc_lock);
-> +               pr_err_ratelimited("failed to map private gfn 0x%llx pfn 0x%llx\n", gfn, pfn);
-> +               return -EBUSY;
-> +       }
-> +
-> +       return 0;
-> +}
-> +
-> +void sev_post_unmap_gfn(struct kvm *kvm, gfn_t gfn, kvm_pfn_t pfn)
-> +{
-> +       struct kvm_sev_info *sev = &to_kvm_svm(kvm)->sev_info;
-> +
-> +       if (!sev_snp_guest(kvm))
-> +               return;
-> +
-> +       spin_unlock(&sev->psc_lock);
-> +}
-> diff --git a/arch/x86/kvm/svm/svm.c b/arch/x86/kvm/svm/svm.c
-> index b24e0171cbf2..1c8e035ba011 100644
-> --- a/arch/x86/kvm/svm/svm.c
-> +++ b/arch/x86/kvm/svm/svm.c
-> @@ -4734,7 +4734,10 @@ static struct kvm_x86_ops svm_x86_ops __initdata = {
->         .vcpu_get_apicv_inhibit_reasons = avic_vcpu_get_apicv_inhibit_reasons,
->
->         .alloc_apic_backing_page = svm_alloc_apic_backing_page,
-> +
->         .rmp_page_level_adjust = sev_rmp_page_level_adjust,
-> +
-> +       .update_protected_guest_state = sev_snp_update_protected_guest_state,
->  };
->
->  /*
-> diff --git a/arch/x86/kvm/svm/svm.h b/arch/x86/kvm/svm/svm.h
-> index 54ff56cb6125..3fd95193ed8d 100644
-> --- a/arch/x86/kvm/svm/svm.h
-> +++ b/arch/x86/kvm/svm/svm.h
-> @@ -79,19 +79,25 @@ struct kvm_sev_info {
->         bool active;            /* SEV enabled guest */
->         bool es_active;         /* SEV-ES enabled guest */
->         bool snp_active;        /* SEV-SNP enabled guest */
-> +
->         unsigned int asid;      /* ASID used for this guest */
->         unsigned int handle;    /* SEV firmware handle */
->         int fd;                 /* SEV device fd */
-> +
->         unsigned long pages_locked; /* Number of pages locked */
->         struct list_head regions_list;  /* List of registered regions */
-> +
->         u64 ap_jump_table;      /* SEV-ES AP Jump Table address */
-> +
->         struct kvm *enc_context_owner; /* Owner of copied encryption context */
->         struct list_head mirror_vms; /* List of VMs mirroring */
->         struct list_head mirror_entry; /* Use as a list entry of mirrors */
->         struct misc_cg *misc_cg; /* For misc cgroup accounting */
->         atomic_t migration_in_progress;
-> +
->         u64 snp_init_flags;
->         void *snp_context;      /* SNP guest context page */
-> +       spinlock_t psc_lock;
->  };
->
->  struct kvm_svm {
-> @@ -702,6 +708,11 @@ void sev_es_prepare_switch_to_guest(struct sev_es_save_area *hostsa);
->  void sev_es_unmap_ghcb(struct vcpu_svm *svm);
->  struct page *snp_safe_alloc_page(struct kvm_vcpu *vcpu);
->  void sev_rmp_page_level_adjust(struct kvm *kvm, kvm_pfn_t pfn, int *level);
-> +int sev_post_map_gfn(struct kvm *kvm, gfn_t gfn, kvm_pfn_t pfn);
-> +void sev_post_unmap_gfn(struct kvm *kvm, gfn_t gfn, kvm_pfn_t pfn);
-> +void handle_rmp_page_fault(struct kvm_vcpu *vcpu, gpa_t gpa, u64 error_code);
-> +void sev_snp_init_protected_guest_state(struct kvm_vcpu *vcpu);
-> +int sev_snp_update_protected_guest_state(struct kvm_vcpu *vcpu);
->
->  /* vmenter.S */
->
-> --
-> 2.25.1
->
+Currently I have the rmpupdate hook in KVM_MEMORY_ENCRYPT_{REG,UNREG}_REGION
+ioctls, so that when the pages actually get faulted in they are already
+in the expected state. I have userspace set up to call
+KVM_MEMORY_ENCRYPT_* in response to explicit page state changes issued by
+the guest, as well as in response to MEMORY_FAULT exits for implicit page
+state changes.
+
+Initially the private backing store may or may not be pre-fallocate()'d
+depending on how userspace wants to handle it. If it's not
+pre-fallocate()'d, then the pages don't get faulted in until the guest
+does explicit page state changes (currently SNP guests will do this for all
+memory at boot time, but with unaccepted memory patches for guest/ovmf
+this will happen during guest run-time, would still allow us to make
+efficient use of lazy-pinning support for shorter boot times).
+
+If userspaces wants to pre-allocate, it can issue the fallocate() for
+all the ranges up-front so it doesn't incur the cost during run-time.
+
+Is that compatible with the proposed design?
+
+Of course, for the initial encrypted payload, we would need to to issue
+the KVM_MEMORY_ENCRYPT_{REG,UNREG}_REGION up-front. I'm doing that in
+conjunction with the hack to allow pwrite() to memfd to pre-populate the
+private pages before the in-place encryption that occurs when
+SNP_LAUNCH_UPDATE is issued...
+
+In the past you and Vishal suggested doing the copy from within
+SNP_LAUNCH_UPDATE, which seems like a workable solution and something
+we've been meaning to implement...
+
+> 
+> I think the best approach is to turn KVM_TDX_INIT_MEM_REGION into a generic
+> vCPU-scoped ioctl() that allows userspace to pre-map guest memory.  Supporting
+> initializing guest private memory with a source page can be implemented via a
+> flag.  That also gives KVM line of sight to in-place "conversion", e.g. another
+> flag could be added to say that the dest is also the source.
+
+So is this proposed ioctl only intended to handle the initial encrypted
+payload, and the KVM_MEMORY_ENCRYPT_{REG,UNREG}_REGION ioctls would
+still be used for conversions post-boot?
+
+If so, that seems reasonable, but I thought there was some consensus that
+just handling it per-platform in, e.g., SNP_LAUNCH_UPDATE, was
+sufficient for now until some additional need arose for a new interface.
+Has something changed in the regard? Just want to understand the
+motivations so we can plan accordingly.
+
+Thanks!
+
+-Mike
+
+> 
+> The TDX and SNP restrictions would then become addition restrictions on when
+> initializing with a source is allowed (and VMs that don't have guest private
+> memory wouldn't allow the flag at all).
