@@ -2,286 +2,178 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 2002B596984
-	for <lists+kvm@lfdr.de>; Wed, 17 Aug 2022 08:26:30 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 56C0F5969E0
+	for <lists+kvm@lfdr.de>; Wed, 17 Aug 2022 08:56:33 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232883AbiHQGXx (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 17 Aug 2022 02:23:53 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53804 "EHLO
+        id S238655AbiHQGyr (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 17 Aug 2022 02:54:47 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34366 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232113AbiHQGXu (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 17 Aug 2022 02:23:50 -0400
-Received: from mga14.intel.com (mga14.intel.com [192.55.52.115])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 44F2FE01D;
-        Tue, 16 Aug 2022 23:23:48 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1660717428; x=1692253428;
-  h=message-id:date:mime-version:subject:to:cc:references:
-   from:in-reply-to:content-transfer-encoding;
-  bh=yVbG+n0uGEK9+bGx/SxNj01c0Z0Jil+zP8BYLGKVpck=;
-  b=lnWq++7t1A4acphsViqa3uY4qtum5bvGC8GCkEsqlYpMWpyUq1+5VIzp
-   NENAU/D4qT3+aooKlY++LPcieKq6LW1xyWSG90hfmQ5m6V+OnIJbewr4e
-   8r9UjCo958XOHqDqA7JE7GGEC47LquFzUnIN8w+kLjWzEPPbasldSrcZB
-   l5/N2kX36yL42wToZ9IEll3dYzW0TmjQ9uKKIacldpORCfbvGJZS7PlMt
-   kVmyZea3CFHL+4YhcSjUd5jAPhBR96iLGKH+0hm7yAi6vXANvZJyVY3uF
-   Op4znhaMLmz1ZQF9sZcZa1acXvGKd+cRPEIeRAqjxFGJEugNmDy3RkQz0
-   w==;
-X-IronPort-AV: E=McAfee;i="6400,9594,10441"; a="292411360"
-X-IronPort-AV: E=Sophos;i="5.93,242,1654585200"; 
-   d="scan'208";a="292411360"
-Received: from fmsmga008.fm.intel.com ([10.253.24.58])
-  by fmsmga103.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 16 Aug 2022 23:23:47 -0700
-X-IronPort-AV: E=Sophos;i="5.93,242,1654585200"; 
-   d="scan'208";a="667465777"
-Received: from lingshan-mobl.ccr.corp.intel.com (HELO [10.255.30.246]) ([10.255.30.246])
-  by fmsmga008-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 16 Aug 2022 23:23:44 -0700
-Message-ID: <b489413e-e933-e9b6-a719-45090a4e922c@intel.com>
-Date:   Wed, 17 Aug 2022 14:23:42 +0800
+        with ESMTP id S231771AbiHQGyp (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 17 Aug 2022 02:54:45 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 381146051A
+        for <kvm@vger.kernel.org>; Tue, 16 Aug 2022 23:54:43 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1660719282;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=zcPD4jBG73lQXOoH43Q6tPWaFdDfYRto/2dXXxDgwek=;
+        b=Zj2pAXsd4q69s+qQo6qi6ije2FgY75UDnmqKiMWMoFDh599/FBQeWmT/UAMK04B9pZnFxy
+        i1L0GSP25ua2Qtuua4vq6+hcurd146GFHJnq5NGsYuziLH5/uq32SEHy0kEYLG2hAclIBh
+        OaAXxEUqosw7AGgRjVQgSRllOBzaygo=
+Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
+ [209.85.221.70]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_128_GCM_SHA256) id
+ us-mta-622-lHaHtKIfPC-mV_eCKNSIXg-1; Wed, 17 Aug 2022 02:54:40 -0400
+X-MC-Unique: lHaHtKIfPC-mV_eCKNSIXg-1
+Received: by mail-wr1-f70.google.com with SMTP id i29-20020adfa51d000000b002251fd0ff14so442631wrb.16
+        for <kvm@vger.kernel.org>; Tue, 16 Aug 2022 23:54:40 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc;
+        bh=zcPD4jBG73lQXOoH43Q6tPWaFdDfYRto/2dXXxDgwek=;
+        b=PGR88tWDl7DOiqDCsXnzaYz6B5gBDmBZOj5put+nP/PsmZkZOP8HQnQP49JSotBq5q
+         /ADMYKBE3+TSK1dRZI6tP3pfP11xuaqVplKaF2+GD79zQjbvn8b8MPwLYazzZ3tFUGi9
+         0+rKloDkgwAstpuwC7v46ZgOYYfU7ugMT1wJ9pZsE96nKN1leIGj1LNAj5JXcFzl8eMq
+         V55xsnDuHqFuMS4oic6kVgDUhz4DdFHmclYnPbZHlPG0OZOXWkUJvHkdw4LBx+EAWtN/
+         RIc7fnZEiCVRBkTwOd5sIaIaQqTav6ER+0IhIPC0+jIFM+Kspwm9rXPXLKRRtpAVBi0g
+         6T6g==
+X-Gm-Message-State: ACgBeo2MF01kuhlQrQUQhsks6PVIJYPYHNazCyZxVlbe9tZMndFJQPPB
+        ouuIiePOK8g1scjqxqnfn3rusOBmui562VgPOu8NKNkUXbqEuCuadfoZRDfW5s+B7xbQWfhvBHG
+        4m1hin4gmPSNE
+X-Received: by 2002:adf:d1c9:0:b0:225:f98:d602 with SMTP id b9-20020adfd1c9000000b002250f98d602mr5595058wrd.419.1660719279680;
+        Tue, 16 Aug 2022 23:54:39 -0700 (PDT)
+X-Google-Smtp-Source: AA6agR71mbO/1JAgp957U1l5Y2ejH9W2IMsrKo6NRUtwq9BrlZgJpVzkNJv+ewui/k38InlrBVqC/w==
+X-Received: by 2002:adf:d1c9:0:b0:225:f98:d602 with SMTP id b9-20020adfd1c9000000b002250f98d602mr5595029wrd.419.1660719279393;
+        Tue, 16 Aug 2022 23:54:39 -0700 (PDT)
+Received: from redhat.com ([2.55.43.215])
+        by smtp.gmail.com with ESMTPSA id f14-20020a05600c154e00b003a32251c3f9sm1288244wmg.5.2022.08.16.23.54.35
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 16 Aug 2022 23:54:38 -0700 (PDT)
+Date:   Wed, 17 Aug 2022 02:54:33 -0400
+From:   "Michael S. Tsirkin" <mst@redhat.com>
+To:     Bobby Eshleman <bobby.eshleman@gmail.com>
+Cc:     Bobby Eshleman <bobbyeshleman@gmail.com>,
+        Bobby Eshleman <bobby.eshleman@bytedance.com>,
+        Cong Wang <cong.wang@bytedance.com>,
+        Jiang Wang <jiang.wang@bytedance.com>,
+        Stefan Hajnoczi <stefanha@redhat.com>,
+        Stefano Garzarella <sgarzare@redhat.com>,
+        Jason Wang <jasowang@redhat.com>,
+        "David S. Miller" <davem@davemloft.net>,
+        Eric Dumazet <edumazet@google.com>,
+        Jakub Kicinski <kuba@kernel.org>,
+        Paolo Abeni <pabeni@redhat.com>,
+        "K. Y. Srinivasan" <kys@microsoft.com>,
+        Haiyang Zhang <haiyangz@microsoft.com>,
+        Stephen Hemminger <sthemmin@microsoft.com>,
+        Wei Liu <wei.liu@kernel.org>, Dexuan Cui <decui@microsoft.com>,
+        kvm@vger.kernel.org, virtualization@lists.linux-foundation.org,
+        netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+        linux-hyperv@vger.kernel.org
+Subject: Re: [PATCH 0/6] virtio/vsock: introduce dgrams, sk_buff, and qdisc
+Message-ID: <20220817025250-mutt-send-email-mst@kernel.org>
+References: <cover.1660362668.git.bobby.eshleman@bytedance.com>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:91.0) Gecko/20100101
- Firefox/91.0 Thunderbird/91.12.0
-Subject: Re: [PATCH V5 4/6] vDPA: !FEATURES_OK should not block querying
- device config space
-Content-Language: en-US
-To:     "Michael S. Tsirkin" <mst@redhat.com>
-Cc:     Si-Wei Liu <si-wei.liu@oracle.com>,
-        virtualization@lists.linux-foundation.org, netdev@vger.kernel.org,
-        kvm@vger.kernel.org, parav@nvidia.com, xieyongji@bytedance.com,
-        gautam.dawar@amd.com, jasowang@redhat.com
-References: <20220812104500.163625-1-lingshan.zhu@intel.com>
- <20220812104500.163625-5-lingshan.zhu@intel.com>
- <e99e6d81-d7d5-e1ff-08e0-c22581c1329a@oracle.com>
- <f2864c96-cddd-129e-7dd8-a3743fe7e0d0@intel.com>
- <2cbec85b-58f6-626f-df4a-cb1bb418fec1@oracle.com>
- <a488a17a-b716-52aa-cc31-2e51f8f972d2@intel.com>
- <20220817021324-mutt-send-email-mst@kernel.org>
-From:   "Zhu, Lingshan" <lingshan.zhu@intel.com>
-In-Reply-To: <20220817021324-mutt-send-email-mst@kernel.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-7.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
-        RCVD_IN_DNSWL_HI,SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE,
-        URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <cover.1660362668.git.bobby.eshleman@bytedance.com>
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=unavailable
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+On Mon, Aug 15, 2022 at 10:56:03AM -0700, Bobby Eshleman wrote:
+> Hey everybody,
+> 
+> This series introduces datagrams, packet scheduling, and sk_buff usage
+> to virtio vsock.
+> 
+> The usage of struct sk_buff benefits users by a) preparing vsock to use
+> other related systems that require sk_buff, such as sockmap and qdisc,
+> b) supporting basic congestion control via sock_alloc_send_skb, and c)
+> reducing copying when delivering packets to TAP.
+> 
+> The socket layer no longer forces errors to be -ENOMEM, as typically
+> userspace expects -EAGAIN when the sk_sndbuf threshold is reached and
+> messages are being sent with option MSG_DONTWAIT.
+> 
+> The datagram work is based off previous patches by Jiang Wang[1].
+> 
+> The introduction of datagrams creates a transport layer fairness issue
+> where datagrams may freely starve streams of queue access. This happens
+> because, unlike streams, datagrams lack the transactions necessary for
+> calculating credits and throttling.
+> 
+> Previous proposals introduce changes to the spec to add an additional
+> virtqueue pair for datagrams[1]. Although this solution works, using
+> Linux's qdisc for packet scheduling leverages already existing systems,
+> avoids the need to change the virtio specification, and gives additional
+> capabilities. The usage of SFQ or fq_codel, for example, may solve the
+> transport layer starvation problem. It is easy to imagine other use
+> cases as well. For example, services of varying importance may be
+> assigned different priorities, and qdisc will apply appropriate
+> priority-based scheduling. By default, the system default pfifo qdisc is
+> used. The qdisc may be bypassed and legacy queuing is resumed by simply
+> setting the virtio-vsock%d network device to state DOWN. This technique
+> still allows vsock to work with zero-configuration.
 
+The basic question to answer then is this: with a net device qdisc
+etc in the picture, how is this different from virtio net then?
+Why do you still want to use vsock?
 
-On 8/17/2022 2:14 PM, Michael S. Tsirkin wrote:
-> On Wed, Aug 17, 2022 at 10:11:36AM +0800, Zhu, Lingshan wrote:
->>
->> On 8/17/2022 6:48 AM, Si-Wei Liu wrote:
->>
->>
->>
->>      On 8/16/2022 1:29 AM, Zhu, Lingshan wrote:
->>
->>
->>
->>          On 8/16/2022 3:41 PM, Si-Wei Liu wrote:
->>
->>              Hi Michael,
->>
->>              I just noticed this patch got pulled to linux-next prematurely
->>              without getting consensus on code review, am not sure why. Hope it
->>              was just an oversight.
->>
->>              Unfortunately this introduced functionality regression to at least
->>              two cases so far as I see:
->>
->>              1. (bogus) VDPA_ATTR_DEV_NEGOTIATED_FEATURES are inadvertently
->>              exposed and displayed in "vdpa dev config show" before feature
->>              negotiation is done. Noted the corresponding features name shown in
->>              vdpa tool is called "negotiated_features" rather than
->>              "driver_features". I see in no way the intended change of the patch
->>              should break this user level expectation regardless of any spec
->>              requirement. Do you agree on this point?
->>
->>          I will post a patch for iptour2, doing:
->>          1) if iprout2 does not get driver_features from the kernel, then don't
->>          show negotiated features in the command output
->>
->>      This won't work as the vdpa userspace tool won't know *when* features are
->>      negotiated. There's no guarantee in the kernel to assume 0 will be returned
->>      from vendor driver during negotiation. On the other hand, with the supposed
->>      change, userspace can't tell if there's really none of features negotiated,
->>      or the feature negotiation is over. Before the change the userspace either
->>      gets all the attributes when feature negotiation is over, or it gets
->>      nothing when it's ongoing, so there was a distinction.This expectation of
->>      what "negotiated_features" represents is established from day one, I see no
->>      reason the intended kernel change to show other attributes should break
->>      userspace behavior and user's expectation.
->>
->> User space can only read valid *driver_features* after the features negotiation
->> is done, *device_features* does not require the negotiation.
->>
->> If you want to prevent random values read from driver_features, here I propose
->> a fix: only read driver_features when the negotiation is done, this means to
->> check (status & VIRTIO_CONFIG_S_FEATURES_OK) before reading the
->> driver_features.
->> Sounds good?
->>
->> @MST, if this is OK, I can include this change in my next version patch series.
->>
->> Thanks,
->> Zhu Lingshan
-> Sorry I don't get it. Is there going to be a new version? Do you want me
-> to revert this one and then apply a new one? It's ok if yes.
-Not a new version, it is a new patch, though I still didn't get the race 
-condition, but I believe it
-is reasonable to block reading the *driver_features* before FEATURES_OK.
-
-So, I added code to check whether _FEATURES_OK is set:
-
-  861         /* only read driver features after the feature negotiation 
-is done */
-  862         status = vdev->config->get_status(vdev);
-  863         if (status & VIRTIO_CONFIG_S_FEATURES_OK) {
-  864                 features_driver = 
-vdev->config->get_driver_features(vdev);
-  865                 if (nla_put_u64_64bit(msg, 
-VDPA_ATTR_DEV_NEGOTIATED_FEATURES, features_driver,
-  866                                       VDPA_ATTR_PAD))
-  867                 return -EMSGSIZE;
-  868         }
-
-If this solution looks good, I will add this patch in my V2 series.
-
-Thanks
-Zhu Lingshan
-
->
->
->>          2) process and decoding the device features.
->>
->>
->>              2. There was also another implicit assumption that is broken by
->>              this patch. There could be a vdpa tool query of config via
->>              vdpa_dev_net_config_fill()->vdpa_get_config_unlocked() that races
->>              with the first vdpa_set_features() call from VMM e.g. QEMU. Since
->>              the S_FEATURES_OK blocking condition is removed, if the vdpa tool
->>              query occurs earlier than the first set_driver_features() call from
->>              VMM, the following code will treat the guest as legacy and then
->>              trigger an erroneous vdpa_set_features_unlocked(... , 0) call to
->>              the vdpa driver:
->>
->>               374         /*
->>               375          * Config accesses aren't supposed to trigger before
->>              features are set.
->>               376          * If it does happen we assume a legacy guest.
->>               377          */
->>               378         if (!vdev->features_valid)
->>               379                 vdpa_set_features_unlocked(vdev, 0);
->>               380         ops->get_config(vdev, offset, buf, len);
->>
->>              Depending on vendor driver's implementation, L380 may either return
->>              invalid config data (or invalid endianness if on BE) or only config
->>              fields that are valid in legacy layout. What's more severe is that,
->>              vdpa tool query in theory shouldn't affect feature negotiation at
->>              all by making confusing calls to the device, but now it is possible
->>              with the patch. Fixing this would require more delicate work on the
->>              other paths involving the cf_lock reader/write semaphore.
->>
->>              Not sure what you plan to do next, post the fixes for both issues
->>              and get the community review? Or simply revert the patch in
->>              question? Let us know.
->>
->>          The spec says:
->>          The device MUST allow reading of any device-specific configuration
->>          field before FEATURES_OK is set by
->>          the driver. This includes fields which are conditional on feature bits,
->>          as long as those feature bits are offered
->>          by the device.
->>
->>          so whether FEATURES_OK should not block reading the device config
->>          space. vdpa_get_config_unlocked() will read the features, I don't know
->>          why it has a comment:
->>                  /*
->>                   * Config accesses aren't supposed to trigger before features
->>          are set.
->>                   * If it does happen we assume a legacy guest.
->>                   */
->>
->>          This conflicts with the spec.
->>
->>          vdpa_get_config_unlocked() checks vdev->features_valid, if not valid,
->>          it will set the drivers_features 0, I think this intends to prevent
->>          reading random driver_features. This function does not hold any locks,
->>          and didn't change anything.
->>
->>          So what is the race?
->>     
->>      You'll see the race if you keep 'vdpa dev config show ...' running in a
->>      tight loop while launching a VM with the vDPA device under query.
->>
->>      -Siwei
->>
->>
->>
->>         
->>          Thanks
->>
->>         
->>
->>              Thanks,
->>              -Siwei
->>
->>
->>              On 8/12/2022 3:44 AM, Zhu Lingshan wrote:
->>
->>                  Users may want to query the config space of a vDPA device,
->>                  to choose a appropriate one for a certain guest. This means the
->>                  users need to read the config space before FEATURES_OK, and
->>                  the existence of config space contents does not depend on
->>                  FEATURES_OK.
->>
->>                  The spec says:
->>                  The device MUST allow reading of any device-specific
->>                  configuration
->>                  field before FEATURES_OK is set by the driver. This includes
->>                  fields which are conditional on feature bits, as long as those
->>                  feature bits are offered by the device.
->>
->>                  Signed-off-by: Zhu Lingshan <lingshan.zhu@intel.com>
->>                  ---
->>                    drivers/vdpa/vdpa.c | 8 --------
->>                    1 file changed, 8 deletions(-)
->>
->>                  diff --git a/drivers/vdpa/vdpa.c b/drivers/vdpa/vdpa.c
->>                  index 6eb3d972d802..bf312d9c59ab 100644
->>                  --- a/drivers/vdpa/vdpa.c
->>                  +++ b/drivers/vdpa/vdpa.c
->>                  @@ -855,17 +855,9 @@ vdpa_dev_config_fill(struct vdpa_device
->>                  *vdev, struct sk_buff *msg, u32 portid,
->>                    {
->>                        u32 device_id;
->>                        void *hdr;
->>                  -    u8 status;
->>                        int err;
->>                          down_read(&vdev->cf_lock);
->>                  -    status = vdev->config->get_status(vdev);
->>                  -    if (!(status & VIRTIO_CONFIG_S_FEATURES_OK)) {
->>                  -        NL_SET_ERR_MSG_MOD(extack, "Features negotiation not
->>                  completed");
->>                  -        err = -EAGAIN;
->>                  -        goto out;
->>                  -    }
->>                  -
->>                        hdr = genlmsg_put(msg, portid, seq, &vdpa_nl_family,
->>                  flags,
->>                                  VDPA_CMD_DEV_CONFIG_GET);
->>                        if (!hdr) {
->>
->>
->>
->>
->>
->>
->>
->>
+> In summary, this series introduces these major changes to vsock:
+> 
+> - virtio vsock supports datagrams
+> - virtio vsock uses struct sk_buff instead of virtio_vsock_pkt
+>   - Because virtio vsock uses sk_buff, it also uses sock_alloc_send_skb,
+>     which applies the throttling threshold sk_sndbuf.
+> - The vsock socket layer supports returning errors other than -ENOMEM.
+>   - This is used to return -EAGAIN when the sk_sndbuf threshold is
+>     reached.
+> - virtio vsock uses a net_device, through which qdisc may be used.
+>  - qdisc allows scheduling policies to be applied to vsock flows.
+>   - Some qdiscs, like SFQ, may allow vsock to avoid transport layer congestion. That is,
+>     it may avoid datagrams from flooding out stream flows. The benefit
+>     to this is that additional virtqueues are not needed for datagrams.
+>   - The net_device and qdisc is bypassed by simply setting the
+>     net_device state to DOWN.
+> 
+> [1]: https://lore.kernel.org/all/20210914055440.3121004-1-jiang.wang@bytedance.com/
+> 
+> Bobby Eshleman (5):
+>   vsock: replace virtio_vsock_pkt with sk_buff
+>   vsock: return errors other than -ENOMEM to socket
+>   vsock: add netdev to vhost/virtio vsock
+>   virtio/vsock: add VIRTIO_VSOCK_F_DGRAM feature bit
+>   virtio/vsock: add support for dgram
+> 
+> Jiang Wang (1):
+>   vsock_test: add tests for vsock dgram
+> 
+>  drivers/vhost/vsock.c                   | 238 ++++----
+>  include/linux/virtio_vsock.h            |  73 ++-
+>  include/net/af_vsock.h                  |   2 +
+>  include/uapi/linux/virtio_vsock.h       |   2 +
+>  net/vmw_vsock/af_vsock.c                |  30 +-
+>  net/vmw_vsock/hyperv_transport.c        |   2 +-
+>  net/vmw_vsock/virtio_transport.c        | 237 +++++---
+>  net/vmw_vsock/virtio_transport_common.c | 771 ++++++++++++++++--------
+>  net/vmw_vsock/vmci_transport.c          |   9 +-
+>  net/vmw_vsock/vsock_loopback.c          |  51 +-
+>  tools/testing/vsock/util.c              | 105 ++++
+>  tools/testing/vsock/util.h              |   4 +
+>  tools/testing/vsock/vsock_test.c        | 195 ++++++
+>  13 files changed, 1176 insertions(+), 543 deletions(-)
+> 
+> -- 
+> 2.35.1
 
