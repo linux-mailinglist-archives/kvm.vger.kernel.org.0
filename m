@@ -2,64 +2,72 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 8D3E8597315
-	for <lists+kvm@lfdr.de>; Wed, 17 Aug 2022 17:38:09 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 92CC4597349
+	for <lists+kvm@lfdr.de>; Wed, 17 Aug 2022 17:50:42 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237862AbiHQPhp (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 17 Aug 2022 11:37:45 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55438 "EHLO
+        id S237956AbiHQPqb (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 17 Aug 2022 11:46:31 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50368 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S237637AbiHQPhn (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 17 Aug 2022 11:37:43 -0400
-Received: from ams.source.kernel.org (ams.source.kernel.org [145.40.68.75])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D971198D01
-        for <kvm@vger.kernel.org>; Wed, 17 Aug 2022 08:37:42 -0700 (PDT)
+        with ESMTP id S237405AbiHQPq2 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 17 Aug 2022 11:46:28 -0400
+Received: from ams.source.kernel.org (ams.source.kernel.org [IPv6:2604:1380:4601:e00::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 29CDD7F27A;
+        Wed, 17 Aug 2022 08:46:26 -0700 (PDT)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by ams.source.kernel.org (Postfix) with ESMTPS id 74AF3B81E0D
-        for <kvm@vger.kernel.org>; Wed, 17 Aug 2022 15:37:41 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 125ABC4347C
-        for <kvm@vger.kernel.org>; Wed, 17 Aug 2022 15:37:40 +0000 (UTC)
+        by ams.source.kernel.org (Postfix) with ESMTPS id D72F9B81E10;
+        Wed, 17 Aug 2022 15:46:24 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6934FC433C1;
+        Wed, 17 Aug 2022 15:46:23 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1660750660;
-        bh=xy0JgFQSxiVgiAVvPjPv2xFEDRs2fCiNXZnbBQni6UE=;
-        h=From:To:Subject:Date:In-Reply-To:References:From;
-        b=Cazpsh9PhNrkd4n152XQ4nThtI1fGk3lXrsTd8TjGJ93A7aCL2DDK1I+a9p3Ic8E1
-         Kexgszzomz0sqaD0opmRwe3YdEJ7wakUuPGhW4fJ1STEZ9OulCoKAfmf47i0/yk2lS
-         SNNVVpXYT0mikXkvpGx3pfahiKIfA9a+bdHRPmoVGhrqPD/kbs1obY/+or9pUt2Cis
-         UhW/5tiETJovmjiBmkSPdcMr3twAg/3Qg29Rg7S+KH0TpRvsxmBKWS+kFTPEpm75VT
-         233zZe33yK8DZYzFw5HAB1UuHqYOwYMbjQSz4c9UaaQSOX8+7+NRTwIJ5yK5RKvLno
-         qHKRodjJFCcpQ==
-Received: by aws-us-west-2-korg-bugzilla-1.web.codeaurora.org (Postfix, from userid 48)
-        id E830CC433E4; Wed, 17 Aug 2022 15:37:39 +0000 (UTC)
-From:   bugzilla-daemon@kernel.org
-To:     kvm@vger.kernel.org
-Subject: [Bug 216349] Kernel panic in a Ubuntu VM running on Proxmox
-Date:   Wed, 17 Aug 2022 15:37:39 +0000
-X-Bugzilla-Reason: None
-X-Bugzilla-Type: changed
-X-Bugzilla-Watch-Reason: AssignedTo virtualization_kvm@kernel-bugs.osdl.org
-X-Bugzilla-Product: Virtualization
-X-Bugzilla-Component: kvm
-X-Bugzilla-Version: unspecified
-X-Bugzilla-Keywords: 
-X-Bugzilla-Severity: normal
-X-Bugzilla-Who: jdpark.au@gmail.com
-X-Bugzilla-Status: NEW
-X-Bugzilla-Resolution: 
-X-Bugzilla-Priority: P1
-X-Bugzilla-Assigned-To: virtualization_kvm@kernel-bugs.osdl.org
-X-Bugzilla-Flags: 
-X-Bugzilla-Changed-Fields: 
-Message-ID: <bug-216349-28872-Ktdwirz4JD@https.bugzilla.kernel.org/>
-In-Reply-To: <bug-216349-28872@https.bugzilla.kernel.org/>
-References: <bug-216349-28872@https.bugzilla.kernel.org/>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Bugzilla-URL: https://bugzilla.kernel.org/
-Auto-Submitted: auto-generated
-MIME-Version: 1.0
+        s=k20201202; t=1660751183;
+        bh=mIw1ToA3oltPBVk97Rnc+Pibf1c2qccm6jANqoNBMXg=;
+        h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+        b=N09yOdYUi9n/UbS1b+0w7fC9rEASAJpy4oYYsVXcc3CtK1jLn8uXQF+H3WqrjTQpo
+         mSZwhS9qeowEjRnvnPD0xtbvqZsrZyWB5yW91Fk4MQVaN48e9xayUuqFBgRwWbCTqf
+         LX/0L3ZIyVaIURElMLCRQXRNqJ659etqHPbWYRfYD6thAaXNlJmXliMADJdoafrF/0
+         GrUWSvKvLor8ZfF0pG3DmoZ5aotrsMMEhSUbQXgT2oHF/NKGLc6jvBwcA77WrtzNQW
+         Q79AEPMZhbsBCjQGKRUYC0sR4Zokcb4LTbVVgHfusggfxhd+Raywg900sjATCq/vd0
+         qMP8r0dBAh/Hw==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=why.misterjones.org)
+        by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+        (Exim 4.95)
+        (envelope-from <maz@kernel.org>)
+        id 1oOLFN-003m7J-6w;
+        Wed, 17 Aug 2022 16:46:21 +0100
+Date:   Wed, 17 Aug 2022 16:46:20 +0100
+Message-ID: <87pmgyx48j.wl-maz@kernel.org>
+From:   Marc Zyngier <maz@kernel.org>
+To:     Nipun Gupta <nipun.gupta@amd.com>,
+        Greg KH <gregkh@linuxfoundation.org>
+Cc:     robh+dt@kernel.org, krzysztof.kozlowski+dt@linaro.org,
+        rafael@kernel.org, eric.auger@redhat.com,
+        alex.williamson@redhat.com, cohuck@redhat.com,
+        puneet.gupta@amd.com, song.bao.hua@hisilicon.com,
+        mchehab+huawei@kernel.org, f.fainelli@gmail.com,
+        jeffrey.l.hugo@gmail.com, saravanak@google.com,
+        Michael.Srba@seznam.cz, mani@kernel.org, yishaih@nvidia.com,
+        jgg@ziepe.ca, linux-kernel@vger.kernel.org,
+        devicetree@vger.kernel.org, kvm@vger.kernel.org, okaya@kernel.org,
+        harpreet.anand@amd.com, nikhil.agarwal@amd.com,
+        michal.simek@amd.com, git@amd.com
+Subject: Re: [RFC PATCH v2 2/6] bus/cdx: add the cdx bus driver
+In-Reply-To: <Yv0KHROjESUI59Pd@kroah.com>
+References: <20220803122655.100254-1-nipun.gupta@amd.com>
+        <20220817150542.483291-1-nipun.gupta@amd.com>
+        <20220817150542.483291-3-nipun.gupta@amd.com>
+        <Yv0KHROjESUI59Pd@kroah.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/27.1
+ (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: nipun.gupta@amd.com, gregkh@linuxfoundation.org, robh+dt@kernel.org, krzysztof.kozlowski+dt@linaro.org, rafael@kernel.org, eric.auger@redhat.com, alex.williamson@redhat.com, cohuck@redhat.com, puneet.gupta@amd.com, song.bao.hua@hisilicon.com, mchehab+huawei@kernel.org, f.fainelli@gmail.com, jeffrey.l.hugo@gmail.com, saravanak@google.com, Michael.Srba@seznam.cz, mani@kernel.org, yishaih@nvidia.com, jgg@ziepe.ca, linux-kernel@vger.kernel.org, devicetree@vger.kernel.org, kvm@vger.kernel.org, okaya@kernel.org, harpreet.anand@amd.com, nikhil.agarwal@amd.com, michal.simek@amd.com, git@amd.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 X-Spam-Status: No, score=-7.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_HI,
         SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
@@ -70,18 +78,34 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-https://bugzilla.kernel.org/show_bug.cgi?id=3D216349
+On Wed, 17 Aug 2022 16:32:45 +0100,
+Greg KH <gregkh@linuxfoundation.org> wrote:
+> 
+> On Wed, Aug 17, 2022 at 08:35:38PM +0530, Nipun Gupta wrote:
+> > CDX bus driver manages the scanning and populating FPGA
+> > based devices present on the CDX bus.
+> > 
+> > The bus driver sets up the basic infrastructure and fetches
+> > the device related information from the firmware. These
+> > devices are registered as platform devices.
+> 
+> Ick, why?  These aren't platform devices, they are CDX devices.  Make
+> them real devices here, don't abuse the platform device interface for
+> things that are not actually on the platform bus.
+> 
+> > CDX bus is capable of scanning devices dynamically,
+> > supporting rescanning of dynamically added, removed or
+> > updated devices.
+> 
+> Wonderful, that's a real bus, so be a real bus please.
 
---- Comment #12 from John Park (jdpark.au@gmail.com) ---
-(In reply to mlevitsk from comment #11)
-> Could you try a new (5.19 for example) kernel and also try an older kernel
-> to try and see if this is a regression.
++1.
 
-We're attempting to move to the mainline kernel at the moment and we'll test
-older and newer kernels and see what the results are.
+This should follow something like PCI, which has semi-sane semantics.
 
---=20
-You may reply to this email to add a comment.
+Thanks,
 
-You are receiving this mail because:
-You are watching the assignee of the bug.=
+	M.
+
+-- 
+Without deviation from the norm, progress is not possible.
