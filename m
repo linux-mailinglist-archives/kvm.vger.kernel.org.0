@@ -2,38 +2,82 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 10190596CB7
-	for <lists+kvm@lfdr.de>; Wed, 17 Aug 2022 12:19:48 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id A38B4596CDD
+	for <lists+kvm@lfdr.de>; Wed, 17 Aug 2022 12:38:37 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235148AbiHQKRq (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 17 Aug 2022 06:17:46 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51478 "EHLO
+        id S235424AbiHQKhY (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 17 Aug 2022 06:37:24 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42032 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229752AbiHQKRo (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 17 Aug 2022 06:17:44 -0400
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 2B7B958DCE
-        for <kvm@vger.kernel.org>; Wed, 17 Aug 2022 03:17:43 -0700 (PDT)
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 6BB7D113E;
-        Wed, 17 Aug 2022 03:17:43 -0700 (PDT)
-Received: from monolith.localdoman (unknown [172.31.20.19])
-        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id A79263F67D;
-        Wed, 17 Aug 2022 03:17:41 -0700 (PDT)
-Date:   Wed, 17 Aug 2022 11:18:25 +0100
-From:   Alexandru Elisei <alexandru.elisei@arm.com>
-To:     Suzuki K Poulose <suzuki.poulose@arm.com>
-Cc:     will@kernel.org, kvm@vger.kernel.org, jean-philippe@linaro.org,
-        maz@kernel.org
-Subject: Re: [kvmtool PATCH] net: Use vfork() instead of fork() for script
- execution
-Message-ID: <YvzAcQCJrbw43m5c@monolith.localdoman>
-References: <20220809124816.2880990-1-suzuki.poulose@arm.com>
+        with ESMTP id S229705AbiHQKhX (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 17 Aug 2022 06:37:23 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 65FE85283B
+        for <kvm@vger.kernel.org>; Wed, 17 Aug 2022 03:37:22 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1660732641;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=/bZCOzsQWglaIEflXVaKuMeO6kIO1iJlwntv9G+IQcI=;
+        b=Dh+pCUigIb6qiHyyPaWg1MhEnNo2E9UKXecLR25/lDlDd7r+Iu7OvsjCw/7s/aPs/3xSfd
+        jlfmd1QBnBWgQshwiK3b1Cl6B3XCQRvK6d5NnherRe8TtJTizNKx8BeS+cTnacyC/5CMjY
+        7u9a2a5d0mQQxprpFDJEp5taO+DESjo=
+Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
+ [209.85.128.72]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_128_GCM_SHA256) id
+ us-mta-455-izs1kGUGMPabMVDqBVYIsg-1; Wed, 17 Aug 2022 06:37:19 -0400
+X-MC-Unique: izs1kGUGMPabMVDqBVYIsg-1
+Received: by mail-wm1-f72.google.com with SMTP id p19-20020a05600c1d9300b003a5c3141365so872652wms.9
+        for <kvm@vger.kernel.org>; Wed, 17 Aug 2022 03:37:19 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc;
+        bh=/bZCOzsQWglaIEflXVaKuMeO6kIO1iJlwntv9G+IQcI=;
+        b=5h43BLmVTd2heeWWGIcRXXSkCSyYOJXV1OUY6qDxHynV6cD2TaGTHceOJOADS3qnju
+         ApzOjzgZ/uKesPb54lM1oyVLRL/JY6HfMoXONQ3C673pXKys/wIlIqFTTPATDvtHCQ8I
+         4KS4FznzPD3AWFNDbCKfohJUExfR18Rb3dLbP13135pyKGQN2qrSpGFl9uGr22edsnZp
+         k/su+pDptRpN39teDzRqJoMjQb6Mtw0bct6/rx5wfzfaO+7RNV8KJCWmIz4kYj4Lp9yE
+         RYkQqN82sVwNOtf+aaYR/mqfLa7vt7jwDlof9Hui+Ezhje/W4F/mLyfAt+U/iQOIthLr
+         NPVw==
+X-Gm-Message-State: ACgBeo2TAfq5VvEPKZGrUMniL1e9u+FMTqB7UmCGU3ObGUfoVeVTOrdC
+        IV+ZHfjBuqj2EfS89/kJFYWBQesnH1pm0H77Yk4umMqGaByjMyBwdScepgO0RW/1GoI7XWPnlDL
+        e2zpLE6ThdhtQ
+X-Received: by 2002:adf:d1e8:0:b0:223:bca:8019 with SMTP id g8-20020adfd1e8000000b002230bca8019mr13769496wrd.562.1660732638732;
+        Wed, 17 Aug 2022 03:37:18 -0700 (PDT)
+X-Google-Smtp-Source: AA6agR78CQkZt1eehkXm5izHSD8H9NgPlq3Iq0IOh8rkYepCNOJ0f1/e81lieEPl5cN6j8AAmLR9Cw==
+X-Received: by 2002:adf:d1e8:0:b0:223:bca:8019 with SMTP id g8-20020adfd1e8000000b002230bca8019mr13769482wrd.562.1660732638486;
+        Wed, 17 Aug 2022 03:37:18 -0700 (PDT)
+Received: from redhat.com ([2.55.4.37])
+        by smtp.gmail.com with ESMTPSA id j18-20020a05600c191200b003a5f54e3bbbsm2012695wmq.38.2022.08.17.03.37.16
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 17 Aug 2022 03:37:17 -0700 (PDT)
+Date:   Wed, 17 Aug 2022 06:37:13 -0400
+From:   "Michael S. Tsirkin" <mst@redhat.com>
+To:     "Zhu, Lingshan" <lingshan.zhu@intel.com>
+Cc:     Si-Wei Liu <si-wei.liu@oracle.com>, jasowang@redhat.com,
+        virtualization@lists.linux-foundation.org, netdev@vger.kernel.org,
+        kvm@vger.kernel.org, parav@nvidia.com, xieyongji@bytedance.com,
+        gautam.dawar@amd.com
+Subject: Re: [PATCH 2/2] vDPA: conditionally read fields in virtio-net dev
+Message-ID: <20220817063450-mutt-send-email-mst@kernel.org>
+References: <c5075d3d-9d2c-2716-1cbf-cede49e2d66f@oracle.com>
+ <20e92551-a639-ec13-3d9c-13bb215422e1@intel.com>
+ <9b6292f3-9bd5-ecd8-5e42-cd5d12f036e7@oracle.com>
+ <22e0236f-b556-c6a8-0043-b39b02928fd6@intel.com>
+ <892b39d6-85f8-bff5-030d-e21288975572@oracle.com>
+ <52a47bc7-bf26-b8f9-257f-7dc5cea66d23@intel.com>
+ <20220817045406-mutt-send-email-mst@kernel.org>
+ <a91fa479-d1cc-a2d6-0821-93386069a2c1@intel.com>
+ <20220817053821-mutt-send-email-mst@kernel.org>
+ <449c2fb2-3920-7bf9-8c5c-a68456dfea76@intel.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20220809124816.2880990-1-suzuki.poulose@arm.com>
-X-Spam-Status: No, score=-6.9 required=5.0 tests=BAYES_00,RCVD_IN_DNSWL_HI,
+In-Reply-To: <449c2fb2-3920-7bf9-8c5c-a68456dfea76@intel.com>
+X-Spam-Status: No, score=-2.8 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,
         SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
@@ -42,71 +86,46 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi Suzuki,
-
-On Tue, Aug 09, 2022 at 01:48:16PM +0100, Suzuki K Poulose wrote:
-> When a script is specified for a guest nic setup, we fork() and execl()s
-> the script when it is time to execute the script. However this is not
-> optimal, given we are running a VM. The fork() will trigger marking the
-> entire page-table of the current process as CoW, which will trigger
-> unmapping the entire stage2 page tables from the guest. Anyway, the
-
-This looks correct to me, virtio_notify_status() is called when the guest
-writes to the status register, which in turn can end up calling
-virtio_net_exec_script(). This happens when the guest is up and running,
-when stage 2 has been created and populated.
-
-> child process will exec the script as soon as we fork(), making all
-> these mm operations moot. Also, this operation could be problematic
-> for confidential compute VMs, where it may be expensive (and sometimes
-> destructive) to make changes to the stage2 page tables.
+On Wed, Aug 17, 2022 at 05:43:22PM +0800, Zhu, Lingshan wrote:
 > 
-> So, instead we could use vfork() and avoid the CoW and unmap of the stage2.
 > 
-> Signed-off-by: Suzuki K Poulose <suzuki.poulose@arm.com>
-> ---
->  virtio/net.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
+> On 8/17/2022 5:39 PM, Michael S. Tsirkin wrote:
+> > On Wed, Aug 17, 2022 at 05:13:59PM +0800, Zhu, Lingshan wrote:
+> > > 
+> > > On 8/17/2022 4:55 PM, Michael S. Tsirkin wrote:
+> > > > On Wed, Aug 17, 2022 at 10:14:26AM +0800, Zhu, Lingshan wrote:
+> > > > > Yes it is a little messy, and we can not check _F_VERSION_1 because of
+> > > > > transitional devices, so maybe this is the best we can do for now
+> > > > I think vhost generally needs an API to declare config space endian-ness
+> > > > to kernel. vdpa can reuse that too then.
+> > > Yes, I remember you have mentioned some IOCTL to set the endian-ness,
+> > > for vDPA, I think only the vendor driver knows the endian,
+> > > so we may need a new function vdpa_ops->get_endian().
+> > > In the last thread, we say maybe it's better to add a comment for now.
+> > > But if you think we should add a vdpa_ops->get_endian(), I can work
+> > > on it for sure!
+> > > 
+> > > Thanks
+> > > Zhu Lingshan
+> > I think QEMU has to set endian-ness. No one else knows.
+> Yes, for SW based vhost it is true. But for HW vDPA, only
+> the device & driver knows the endian, I think we can not
+> "set" a hardware's endian.
+
+QEMU knows the guest endian-ness and it knows that
+device is accessed through the legacy interface.
+It can accordingly send endian-ness to the kernel and
+kernel can propagate it to the driver.
+
+> So if you think we should add a vdpa_ops->get_endian(),
+> I will drop these comments in the next version of
+> series, and work on a new patch for get_endian().
 > 
-> diff --git a/virtio/net.c b/virtio/net.c
-> index c4e302bd..a5e0cea5 100644
-> --- a/virtio/net.c
-> +++ b/virtio/net.c
-> @@ -295,7 +295,7 @@ static int virtio_net_exec_script(const char* script, const char *tap_name)
->  	pid_t pid;
->  	int status;
->  
-> -	pid = fork();
-> +	pid = vfork();
->  	if (pid == 0) {
->  		execl(script, script, tap_name, NULL);
+> Thanks,
+> Zhu Lingshan
 
-This matches the man 2 page for vfork, which basically says that vfork can
-be used only if the child immediately issues one of the exec family of
-functions. Which is what is happening here.
+Guests don't get endian-ness from devices so this seems pointless.
 
-The man page for vfork also says this:
+-- 
+MST
 
-"vfork() differs from fork(2) in that the calling thread is suspended until
-the child terminates (either normally, by calling _exit(2), or abnormally,
-after delivery  of a  fatal  signal), or it makes a call to execve(2)".
-
-waitpid (which is invoked in the parent in the else branch) waits until the
-child has changed state, which is defined in man 2 waitpid as:
-
-"A state change is considered to be: the child terminated; the child was
-stopped by a signal; or the child was resumed by a signal."
-
-It doesn't mention anything about waitpid returning after the child make a
-call to execve, so I guess it's correct to keep the call to waitpid in the
-parent:
-
-Reviewed-by: Alexandru Elisei <alexandru.elisei@arm.com>
-
-Thanks,
-Alex
-
->  		_exit(1);
-> -- 
-> 2.37.1
-> 
