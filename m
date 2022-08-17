@@ -2,51 +2,51 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id E4BF2596EBB
-	for <lists+kvm@lfdr.de>; Wed, 17 Aug 2022 14:53:23 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id B26EF596EC3
+	for <lists+kvm@lfdr.de>; Wed, 17 Aug 2022 14:53:26 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236316AbiHQMsv (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 17 Aug 2022 08:48:51 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46156 "EHLO
+        id S238968AbiHQMtE (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 17 Aug 2022 08:49:04 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46196 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S236069AbiHQMst (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 17 Aug 2022 08:48:49 -0400
-Received: from mail-pl1-x62b.google.com (mail-pl1-x62b.google.com [IPv6:2607:f8b0:4864:20::62b])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 76650275F6;
-        Wed, 17 Aug 2022 05:48:48 -0700 (PDT)
-Received: by mail-pl1-x62b.google.com with SMTP id 2so719011pll.0;
-        Wed, 17 Aug 2022 05:48:48 -0700 (PDT)
+        with ESMTP id S236375AbiHQMsw (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 17 Aug 2022 08:48:52 -0400
+Received: from mail-pf1-x42e.google.com (mail-pf1-x42e.google.com [IPv6:2607:f8b0:4864:20::42e])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1CA504598D;
+        Wed, 17 Aug 2022 05:48:52 -0700 (PDT)
+Received: by mail-pf1-x42e.google.com with SMTP id f30so11981386pfq.4;
+        Wed, 17 Aug 2022 05:48:52 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc;
-        bh=Pw2ziCBFjdMNwfRTVesA2FVzIM/meYRxXgqNG8+h8SQ=;
-        b=UdLeytDilvtK7TE7wnHoUDKLLRMT7ZiDF+8QX8ffknaPuUN0gzXB+je8GTgR70gmLm
-         3YE77vveQSVP07fbRlkx6Oyp4ZWUvWeW2wccqmiSammcZfieOIN9mDBggm12dUGO4vuq
-         M/3ePBd0xV894up0sEkHYtAR0qqnd6hGK6/iboNn5HRp6f0PbjJGuuBs+CrCCPAoy2UZ
-         C/pkdy/gz3/8lQUJqpsFj+JbFpoOQS3ypdpDeBCADSP0HbQcxUy4WrMyeAvjwhv0Z0Ja
-         ucsMKfMeVep9jzxKxgAsHgm4EO96Xbp94C/7EFsCB1TiSdsM7NuCJe8wKvGwW0qhGlu8
-         0UGw==
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:from:to:cc;
+        bh=ILb0urCCzGUfPS1xQtlB5QcmwtGAe53OxwODPA6Tu70=;
+        b=VM8giC6aRYYb7P+k+OxkxH7IyP/gYux/9xmb7M2wQQmRzAjwYFXnbfuwCt0Jk3crF5
+         GGh51wvjfYW2TgsQ/E9RrisS16or1ZozhMeeXUJglNgAHUCwmaLP2rgkrHb3/oD4lB37
+         ZwZJptJuc3QkksM7PlXAlbbEoCHXUGJNAcfrOHw1NOAJdWu79kl0okAxPWgrB3UfnnB0
+         tCA19yh6DlNl0UdAubwrWlrzoBFc7KqB+rafLv8JYljbVcoOiZQnLPIO/ayjFu/3L+gI
+         7uNV7GfI08N7P5LZB6uopYNljmk3PVjnMp0z+S84Fvy5gP6xi33G5XPGMP1C/0l58pZU
+         /Dig==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc;
-        bh=Pw2ziCBFjdMNwfRTVesA2FVzIM/meYRxXgqNG8+h8SQ=;
-        b=i4RAYLF48UUGIfICDrnHC5BL2kvNPhRljMNP1+/Tx1NdO7ArGginwwxJosyvwJ0e+S
-         pt+Rmt17uNmBXzLQZmHrenhm5XWqP+HYCSyHuxWca3E4C9kYJyMGuI8uTEaCPtuTeGEP
-         HXHKYL3CGQJRcCf7W37ylQeaDFXxvcttl5NJSP9KO0P3xx+cg2nQ3VaTpIZ9a0e5GwdQ
-         9VMTJzhBY/AENjshtZstINFWMgtsF2x/T6ryZSe7nA6ovrOTYEz4j0gpZxsLz9SLQzS1
-         7n0ZcW2DYknzqRyWOcEfFBLH+n7IsBHYjIUTjkuE03UWtsHYeuOVsXV2sCB12AzOXfgX
-         alOQ==
-X-Gm-Message-State: ACgBeo1XAPtDps6WKcPzcF643rgisrdPkr/fetcR4ENO/m4SA33+SLCQ
-        7oM/P1/Lnzzpm6H5JXqTS70+CDx2oqwSdQ==
-X-Google-Smtp-Source: AA6agR45UKDdWzy5UCX7iUJcxqu1XUyLmfy2IvukBqEKWZHd6RCGTpfdyNcapyAyNw28ZwBeTS1cHQ==
-X-Received: by 2002:a17:902:ce84:b0:16f:81d2:60c with SMTP id f4-20020a170902ce8400b0016f81d2060cmr26025594plg.57.1660740527758;
-        Wed, 17 Aug 2022 05:48:47 -0700 (PDT)
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc;
+        bh=ILb0urCCzGUfPS1xQtlB5QcmwtGAe53OxwODPA6Tu70=;
+        b=DJ/NGDAu5O37vmAmvdish/TgBmUrIpCqknNOf1rToXofMEj2OebKjTezOPlfPsYXCW
+         0NK4+psOofIvTJQJH847S9BHRqs4CvTYwlA9JIwRWEpcbYE8IHD+R8SIiX50rKwX+oik
+         W3gQE0bwCVeOGQjFONXgNKQF49Qz32lL0g4Bu2nGWyuanMKMA7Qwv3Euj7N/XfqjhxjV
+         pkXLztNdpjwNZT3QqTVRBtwSKAltnRHDeF/0N26Bcmw2hYd11d7dh5ieZR4wz1snKI/l
+         dTlBU2B8ovjMTTndc80mvTOdiLkMXw5SWBUGIa7DDaZRzoeWW9T9nluoBfoinaxLBexR
+         NISg==
+X-Gm-Message-State: ACgBeo28gQUdp4zcqTY2DvPq9zU/xS/iZX4Alk6oplqg1u45Uvt0Hr0H
+        6usilei7mEx/54d9RR66znbk+jtxC7HSnw==
+X-Google-Smtp-Source: AA6agR7t+EIy8PVMoyftxa2KEfJ9wXtqB9q7bZ1H31irnuBK46TuTZMAcVfvcrY9kYrot38AoYQVZg==
+X-Received: by 2002:a05:6a02:30b:b0:41d:ad3b:2733 with SMTP id bn11-20020a056a02030b00b0041dad3b2733mr21836582pgb.8.1660740531386;
+        Wed, 17 Aug 2022 05:48:51 -0700 (PDT)
 Received: from debian.. (subs32-116-206-28-37.three.co.id. [116.206.28.37])
-        by smtp.gmail.com with ESMTPSA id q5-20020a170902a3c500b0016a4db13429sm1386962plb.192.2022.08.17.05.48.44
+        by smtp.gmail.com with ESMTPSA id q5-20020a170902a3c500b0016a4db13429sm1386962plb.192.2022.08.17.05.48.48
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 17 Aug 2022 05:48:47 -0700 (PDT)
+        Wed, 17 Aug 2022 05:48:51 -0700 (PDT)
 From:   Bagas Sanjaya <bagasdotme@gmail.com>
 To:     linux-doc@vger.kernel.org
 Cc:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
@@ -56,13 +56,16 @@ Cc:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
         Xiaoyao Li <xiaoyao.li@intel.com>,
         Yu Zhang <yu.c.zhang@linux.intel.com>,
         Chao Peng <chao.p.peng@linux.intel.com>,
-        Bagas Sanjaya <bagasdotme@gmail.com>
-Subject: [PATCH v2 0/3] Documentation fixes for kvm-upstream-workaround
-Date:   Wed, 17 Aug 2022 19:48:34 +0700
-Message-Id: <20220817124837.422695-1-bagasdotme@gmail.com>
+        Bagas Sanjaya <bagasdotme@gmail.com>,
+        kernel test robot <lkp@intel.com>
+Subject: [PATCH v2 1/3] Documentation: ABI: tdx: fix formatting in ABI documentation
+Date:   Wed, 17 Aug 2022 19:48:35 +0700
+Message-Id: <20220817124837.422695-2-bagasdotme@gmail.com>
 X-Mailer: git-send-email 2.37.2
+In-Reply-To: <20220817124837.422695-1-bagasdotme@gmail.com>
+References: <20220817124837.422695-1-bagasdotme@gmail.com>
 MIME-Version: 1.0
-X-Developer-Signature: v=1; a=openpgp-sha256; l=882; i=bagasdotme@gmail.com; h=from:subject; bh=7mMszb66lOIr4IPwkedLbsrMRPhp6frLMXsPoXcvrPU=; b=owGbwMvMwCH2bWenZ2ig32LG02pJDEl/Hi/RyY7I3uK58/ph11D/Lcob+I72KzP0H9ScsU9hluKN 45GJHaUsDGIcDLJiiiyTEvmaTu8yErnQvtYRZg4rE8gQBi5OAZiIkhHD/9grGS3RTzWy3cXn/drCf9 ioexn/lZcTFqhfXvEpTMhm3weGPzz3Pv9kfcMTfd5zFaeqW+sGkyoL5pm+Nk8eWHwX4d7NwwQA
+X-Developer-Signature: v=1; a=openpgp-sha256; l=6192; i=bagasdotme@gmail.com; h=from:subject; bh=4yhdDPmAg0byhHz5y6rd3XaMpJQUXrl9ZVfPAVugTpE=; b=owGbwMvMwCH2bWenZ2ig32LG02pJDEl/Hi+ZeHTHBFmpOxkl0fF8C2WezVF8fC7tVWm0o5azZOcU 6+APHaUsDGIcDLJiiiyTEvmaTu8yErnQvtYRZg4rE8gQBi5OAZjINx1GhrOJ/Q8L2m7P+6I5tcO++N 8sOalVlzj4grmO7axPvG3qwMLI8K+0SMFtgUJP8YNMv1YjJ+evEs93KumwZjGobJITlZ3EBgA=
 X-Developer-Key: i=bagasdotme@gmail.com; a=openpgp; fpr=701B806FDCA5D3A58FFB8F7D7C276C64A5E44A1D
 Content-Transfer-Encoding: 8bit
 X-Spam-Status: No, score=-0.6 required=5.0 tests=BAYES_00,DKIM_SIGNED,
@@ -75,27 +78,114 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Here is documentation fixes for kvm-upstream-workaround branch of TDX
-tree [1]. The fixes below should be self-explanatory.
+Sphinx reported many warnings on ABI testing symbols doc entry:
 
-Changes since v1 [2]:
-  - Wrap description of "shutdown" status to fit the table
-  - Add Reported-by from kernel test robot
+Documentation/ABI/testing/sysfs-firmware-tdx:2: WARNING: Unexpected indentation.
+Documentation/ABI/testing/sysfs-firmware-tdx:2: WARNING: Block quote ends without a blank line; unexpected unindent.
+Documentation/ABI/testing/sysfs-firmware-tdx:2: WARNING: Malformed table.
+Bottom/header table border does not match top border.
 
-[1]: https://github.com/intel/tdx.git
-[2]: https://lore.kernel.org/linux-doc/20220817095405.199662-1-bagasdotme@gmail.com/
+=============== ================================================
+<snipped>
+================== ============================================
+Documentation/ABI/testing/sysfs-firmware-tdx:22: WARNING: Blank line required after table.
+Documentation/ABI/testing/sysfs-firmware-tdx:22: WARNING: Unexpected indentation.
+Documentation/ABI/testing/sysfs-firmware-tdx:22: WARNING: Block quote ends without a blank line; unexpected unindent.
+Documentation/ABI/testing/sysfs-firmware-tdx:22: WARNING: Unexpected indentation.
+Documentation/ABI/testing/sysfs-firmware-tdx:22: WARNING: Block quote ends without a blank line; unexpected unindent.
+Documentation/ABI/testing/sysfs-firmware-tdx:22: WARNING: Definition list ends without a blank line; unexpected unindent.
+Documentation/ABI/testing/sysfs-firmware-tdx:22: WARNING: Unexpected indentation.
+Documentation/ABI/testing/sysfs-firmware-tdx:22: WARNING: Block quote ends without a blank line; unexpected unindent.
+Documentation/ABI/testing/sysfs-firmware-tdx:22: WARNING: Definition list ends without a blank line; unexpected unindent.
+Documentation/ABI/testing/sysfs-firmware-tdx:22: WARNING: Malformed table.
+No bottom table border found.
 
-Bagas Sanjaya (3):
-  Documentation: ABI: tdx: fix formatting in ABI documentation
-  Documentation: ABI: tdx: grammar improv
-  Documentation: kvm: enclose the final closing brace in code block
+================== ============================================
+<snipped>
 
- Documentation/ABI/testing/sysfs-firmware-tdx | 62 ++++++++++----------
- Documentation/virt/kvm/api.rst               |  2 +-
- 2 files changed, 33 insertions(+), 31 deletions(-)
+Fix the table and lists formatting.
 
+Link: https://lore.kernel.org/linux-doc/202208171918.9a38xuei-lkp@intel.com/
+Fixes: 12cafff9983dad ("x86/virt/tdx: Export TDX keyid number and status of TDX module via sysfs")
+Reported-by: kernel test robot <lkp@intel.com>
+Signed-off-by: Bagas Sanjaya <bagasdotme@gmail.com>
+---
+ Documentation/ABI/testing/sysfs-firmware-tdx | 32 ++++++++++++--------
+ 1 file changed, 19 insertions(+), 13 deletions(-)
 
-base-commit: 85c097fdd1667a842a9e75d8f658fc16bd72981a
+diff --git a/Documentation/ABI/testing/sysfs-firmware-tdx b/Documentation/ABI/testing/sysfs-firmware-tdx
+index eba50870ba0e95..bd743d758d7d49 100644
+--- a/Documentation/ABI/testing/sysfs-firmware-tdx
++++ b/Documentation/ABI/testing/sysfs-firmware-tdx
+@@ -2,6 +2,7 @@ What:           /sys/firmware/tdx/
+ Date:           March 2022
+ KernelVersion:  5.17
+ Contact:        Isaku Yamahata <isaku.yamahata@intel.com>, kvm@vger.kernel.org
++Users:          libvirt
+ Description:
+                 Intel's Trust Domain Extensions (TDX) protect guest VMs from
+                 malicious hosts and some physical attacks.  This directory
+@@ -12,16 +13,17 @@ Description:
+                 the first phase firmware loader (a.k.a NP-SEAMLDR) that loads
+                 the next loader and the second phase firmware loader(a.k.a
+                 P-SEAMLDR) that loads the TDX firmware(a.k.a the "TDX module").
++
+                 =============== ================================================
+                 keyid_num       the number of SEAM keyid as an hexadecimal
+                                 number with the "0x" prefix.
+                 =============== ================================================
+-Users:          libvirt
+ 
+ What:           /sys/firmware/tdx/tdx_module/
+ Date:           March 2022
+ KernelVersion:  5.17
+ Contact:        Isaku Yamahata <isaku.yamahata@intel.com>, kvm@vger.kernel.org
++Users:          libvirt
+ Description:
+                 The TDX requires a firmware as known as the TDX module.  It comes
+                 with its attributes, vendor_id, build_data, build_num,
+@@ -36,19 +38,23 @@ Description:
+ 
+                 ================== ============================================
+                 status             string of the TDX module status.
+-                                   "unknown"
+-                                   "none": the TDX module is not loaded
+-                                   "loaded": The TDX module is loaded, but not
+-                                             initialized
+-                                   "initialized": the TDX module is fully
+-                                                  initialized
+-                                   "shutdown": the TDX module is shutdown due to
+-                                               error during initialization.
++
++                                   * "unknown", "none": the TDX module is not
++                                     loaded
++                                   * "loaded": The TDX module is loaded, but
++                                     not initialized
++                                   * "initialized": the TDX module is fully
++                                     initialized
++                                   * "shutdown": the TDX module is shutdown due
++                                     to error during initialization.
++
+                 attributes         32bit flags of the TDX module attributes as
+                                    a hexadecimal number with the "0x" prefix.
+-                                   Bits 31 - a production module(0) or
+-                                             a debug module(1).
+-                                   Bits 30:0 Reserved - set to 0.
++
++                                   * Bits 31 - a production module(0) or
++                                     a debug module(1).
++                                   * Bits 30:0 Reserved - set to 0.
++
+                 vendor_id          vendor ID as a hexadecimal number with the
+                                    "0x" prefix.
+                 build_date         build date in yyyymmdd BCD format.
+@@ -59,4 +65,4 @@ Description:
+                 major_version      major versionas a hexadecimal number with
+                                    the "0x" prefix.
+                 ================== ============================================
+-Users:          libvirt
+\ No newline at end of file
++
 -- 
 An old man doll... just what I always wanted! - Clara
 
