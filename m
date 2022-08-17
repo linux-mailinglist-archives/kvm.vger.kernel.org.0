@@ -2,247 +2,367 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id BEB04596726
-	for <lists+kvm@lfdr.de>; Wed, 17 Aug 2022 04:04:53 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 2283E59674D
+	for <lists+kvm@lfdr.de>; Wed, 17 Aug 2022 04:14:53 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238416AbiHQCCw (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 16 Aug 2022 22:02:52 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35648 "EHLO
+        id S238474AbiHQCOf (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 16 Aug 2022 22:14:35 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48182 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S238414AbiHQCCs (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 16 Aug 2022 22:02:48 -0400
+        with ESMTP id S235578AbiHQCOd (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 16 Aug 2022 22:14:33 -0400
 Received: from mga04.intel.com (mga04.intel.com [192.55.52.120])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6FBD77FE77
-        for <kvm@vger.kernel.org>; Tue, 16 Aug 2022 19:02:47 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 49D9698C96;
+        Tue, 16 Aug 2022 19:14:31 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1660701767; x=1692237767;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references;
-  bh=TBdOPitsnPLxSWtKB89/2rfBgbhufRafl/PkkuOQhoo=;
-  b=hHXkikiKPThCWxGe5cMfaEWrKAV0a4jsF+eIOWG/FxF64OBrCfVqWxi0
-   8Hl6lnzx1roZSVMapLy9LM0mEUMRkvlxpWq44n0KDvKrZoOLK5G2jDo6H
-   j4RL9LJDTgrxsylA4Xj85VYeLxprIJBajf3l52eW36Nu6WqyMG8XYYNpP
-   ci91DlQ0o9itg4zja7VWjdrPD6zN6qpn8rz3Hk1a+KjhtrFZ9pgH93XKy
-   87r9E/fIEFpt6LMW13hjW1YiTpvgWmnis7b9Dle+l0HXlgFUnaZmQHpCP
-   PUKNU8NLRW6ekGukB0J+xKjV1Twb2hYsuGWQRygx9GfR7rogmkOtG5eVG
-   w==;
-X-IronPort-AV: E=McAfee;i="6400,9594,10441"; a="291131210"
+  t=1660702471; x=1692238471;
+  h=message-id:date:mime-version:subject:to:cc:references:
+   from:in-reply-to:content-transfer-encoding;
+  bh=0DeoIIzv9WJmJ1GTi9HjjtUrzPh0pXidbiDY3Az4408=;
+  b=N4nZYH7t1/kn0LJrO6o+0G06sxzhMxROJxO9tBHCBx2rlnxRYl6eHoyN
+   uIVdBRvM/5+uD/O874Sxh6WmwkkMN4NiRczzgmYFu/F9FdCupYpjdqnf8
+   W0ineQeYVfCxwR7sb7NRRxGiVSbg1mKFjdn/qhjQ7Ngamp3SW0QTLQ3bG
+   EwxEjMoyqtThjc0pEPjQlWW+asNVPNHGTdNmlow7ve+sar1OprqWAN4/l
+   /Kb6hwB1ETs3+UVTFYT+kDH4zhUsgu12ie+rATb2vwbqSiDyANkQOR1bt
+   YNtNHPDmONZas01Y0Hoi9PerMTacMhWSDPOqAvpZdi9FuEQG4AiI59BT8
+   Q==;
+X-IronPort-AV: E=McAfee;i="6400,9594,10441"; a="291132858"
 X-IronPort-AV: E=Sophos;i="5.93,242,1654585200"; 
-   d="scan'208";a="291131210"
-Received: from fmsmga004.fm.intel.com ([10.253.24.48])
-  by fmsmga104.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 16 Aug 2022 19:02:47 -0700
+   d="scan'208";a="291132858"
+Received: from fmsmga008.fm.intel.com ([10.253.24.58])
+  by fmsmga104.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 16 Aug 2022 19:14:31 -0700
 X-IronPort-AV: E=Sophos;i="5.93,242,1654585200"; 
-   d="scan'208";a="675456991"
-Received: from chenyi-pc.sh.intel.com ([10.239.159.73])
-  by fmsmga004-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 16 Aug 2022 19:02:45 -0700
-From:   Chenyi Qiang <chenyi.qiang@intel.com>
-To:     Paolo Bonzini <pbonzini@redhat.com>,
-        Marcelo Tosatti <mtosatti@redhat.com>,
-        Richard Henderson <richard.henderson@linaro.org>,
-        Eduardo Habkost <eduardo@habkost.net>,
-        Xiaoyao Li <xiaoyao.li@intel.com>
-Cc:     Chenyi Qiang <chenyi.qiang@intel.com>, qemu-devel@nongnu.org,
-        kvm@vger.kernel.org
-Subject: [PATCH v5 3/3] i386: Add notify VM exit support
-Date:   Wed, 17 Aug 2022 10:08:45 +0800
-Message-Id: <20220817020845.21855-4-chenyi.qiang@intel.com>
-X-Mailer: git-send-email 2.17.1
-In-Reply-To: <20220817020845.21855-1-chenyi.qiang@intel.com>
-References: <20220817020845.21855-1-chenyi.qiang@intel.com>
+   d="scan'208";a="667395570"
+Received: from pregnie-mobl1.ccr.corp.intel.com (HELO [10.255.30.246]) ([10.255.30.246])
+  by fmsmga008-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 16 Aug 2022 19:14:28 -0700
+Message-ID: <52a47bc7-bf26-b8f9-257f-7dc5cea66d23@intel.com>
+Date:   Wed, 17 Aug 2022 10:14:26 +0800
+MIME-Version: 1.0
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:91.0) Gecko/20100101
+ Firefox/91.0 Thunderbird/91.12.0
+Subject: Re: [PATCH 2/2] vDPA: conditionally read fields in virtio-net dev
+Content-Language: en-US
+To:     Si-Wei Liu <si-wei.liu@oracle.com>, jasowang@redhat.com,
+        mst@redhat.com
+Cc:     virtualization@lists.linux-foundation.org, netdev@vger.kernel.org,
+        kvm@vger.kernel.org, parav@nvidia.com, xieyongji@bytedance.com,
+        gautam.dawar@amd.com
+References: <20220815092638.504528-1-lingshan.zhu@intel.com>
+ <20220815092638.504528-3-lingshan.zhu@intel.com>
+ <c5075d3d-9d2c-2716-1cbf-cede49e2d66f@oracle.com>
+ <20e92551-a639-ec13-3d9c-13bb215422e1@intel.com>
+ <9b6292f3-9bd5-ecd8-5e42-cd5d12f036e7@oracle.com>
+ <22e0236f-b556-c6a8-0043-b39b02928fd6@intel.com>
+ <892b39d6-85f8-bff5-030d-e21288975572@oracle.com>
+From:   "Zhu, Lingshan" <lingshan.zhu@intel.com>
+In-Reply-To: <892b39d6-85f8-bff5-030d-e21288975572@oracle.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
 X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
-        SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED
-        autolearn=ham autolearn_force=no version=3.4.6
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
+        RCVD_IN_DNSWL_MED,SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE,
+        URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-There are cases that malicious virtual machine can cause CPU stuck (due
-to event windows don't open up), e.g., infinite loop in microcode when
-nested #AC (CVE-2015-5307). No event window means no event (NMI, SMI and
-IRQ) can be delivered. It leads the CPU to be unavailable to host or
-other VMs. Notify VM exit is introduced to mitigate such kind of
-attacks, which will generate a VM exit if no event window occurs in VM
-non-root mode for a specified amount of time (notify window).
 
-A new KVM capability KVM_CAP_X86_NOTIFY_VMEXIT is exposed to user space
-so that the user can query the capability and set the expected notify
-window when creating VMs. The format of the argument when enabling this
-capability is as follows:
-  Bit 63:32 - notify window specified in qemu command
-  Bit 31:0  - some flags (e.g. KVM_X86_NOTIFY_VMEXIT_ENABLED is set to
-              enable the feature.)
 
-Because there are some concerns, e.g. a notify VM exit may happen with
-VM_CONTEXT_INVALID set in exit qualification (no cases are anticipated
-that would set this bit), which means VM context is corrupted. To avoid
-the false positive and a well-behaved guest gets killed, make this
-feature disabled by default. Users can enable the feature by a new
-machine property:
-    qemu -machine notify_vmexit=on,notify_window=0 ...
-
-A new KVM exit reason KVM_EXIT_NOTIFY is defined for notify VM exit. If
-it happens with VM_INVALID_CONTEXT, hypervisor exits to user space to
-inform the fatal case. Then user space can inject a SHUTDOWN event to
-the target vcpu. This is implemented by injecting a sythesized triple
-fault event.
-
-Signed-off-by: Chenyi Qiang <chenyi.qiang@intel.com>
----
- hw/i386/x86.c         | 45 +++++++++++++++++++++++++++++++++++++++++++
- include/hw/i386/x86.h |  5 +++++
- target/i386/kvm/kvm.c | 28 +++++++++++++++++++++++++++
- 3 files changed, 78 insertions(+)
-
-diff --git a/hw/i386/x86.c b/hw/i386/x86.c
-index 050eedc0c8..1eccbd3deb 100644
---- a/hw/i386/x86.c
-+++ b/hw/i386/x86.c
-@@ -1379,6 +1379,37 @@ static void machine_set_sgx_epc(Object *obj, Visitor *v, const char *name,
-     qapi_free_SgxEPCList(list);
- }
- 
-+static bool x86_machine_get_notify_vmexit(Object *obj, Error **errp)
-+{
-+    X86MachineState *x86ms = X86_MACHINE(obj);
-+
-+    return x86ms->notify_vmexit;
-+}
-+
-+static void x86_machine_set_notify_vmexit(Object *obj, bool value, Error **errp)
-+{
-+    X86MachineState *x86ms = X86_MACHINE(obj);
-+
-+    x86ms->notify_vmexit = value;
-+}
-+
-+static void x86_machine_get_notify_window(Object *obj, Visitor *v,
-+                                const char *name, void *opaque, Error **errp)
-+{
-+    X86MachineState *x86ms = X86_MACHINE(obj);
-+    uint32_t notify_window = x86ms->notify_window;
-+
-+    visit_type_uint32(v, name, &notify_window, errp);
-+}
-+
-+static void x86_machine_set_notify_window(Object *obj, Visitor *v,
-+                               const char *name, void *opaque, Error **errp)
-+{
-+    X86MachineState *x86ms = X86_MACHINE(obj);
-+
-+    visit_type_uint32(v, name, &x86ms->notify_window, errp);
-+}
-+
- static void x86_machine_initfn(Object *obj)
- {
-     X86MachineState *x86ms = X86_MACHINE(obj);
-@@ -1392,6 +1423,8 @@ static void x86_machine_initfn(Object *obj)
-     x86ms->oem_table_id = g_strndup(ACPI_BUILD_APPNAME8, 8);
-     x86ms->bus_lock_ratelimit = 0;
-     x86ms->above_4g_mem_start = 4 * GiB;
-+    x86ms->notify_vmexit = false;
-+    x86ms->notify_window = 0;
- }
- 
- static void x86_machine_class_init(ObjectClass *oc, void *data)
-@@ -1461,6 +1494,18 @@ static void x86_machine_class_init(ObjectClass *oc, void *data)
-         NULL, NULL);
-     object_class_property_set_description(oc, "sgx-epc",
-         "SGX EPC device");
-+
-+    object_class_property_add(oc, X86_MACHINE_NOTIFY_WINDOW, "uint32_t",
-+                              x86_machine_get_notify_window,
-+                              x86_machine_set_notify_window, NULL, NULL);
-+    object_class_property_set_description(oc, X86_MACHINE_NOTIFY_WINDOW,
-+            "Set the notify window required by notify VM exit");
-+
-+    object_class_property_add_bool(oc, X86_MACHINE_NOTIFY_VMEXIT,
-+                                   x86_machine_get_notify_vmexit,
-+                                   x86_machine_set_notify_vmexit);
-+    object_class_property_set_description(oc, X86_MACHINE_NOTIFY_VMEXIT,
-+            "Enable notify VM exit");
- }
- 
- static const TypeInfo x86_machine_info = {
-diff --git a/include/hw/i386/x86.h b/include/hw/i386/x86.h
-index 62fa5774f8..5707329fa7 100644
---- a/include/hw/i386/x86.h
-+++ b/include/hw/i386/x86.h
-@@ -85,6 +85,9 @@ struct X86MachineState {
-      * which means no limitation on the guest's bus locks.
-      */
-     uint64_t bus_lock_ratelimit;
-+
-+    bool notify_vmexit;
-+    uint32_t notify_window;
- };
- 
- #define X86_MACHINE_SMM              "smm"
-@@ -94,6 +97,8 @@ struct X86MachineState {
- #define X86_MACHINE_OEM_ID           "x-oem-id"
- #define X86_MACHINE_OEM_TABLE_ID     "x-oem-table-id"
- #define X86_MACHINE_BUS_LOCK_RATELIMIT  "bus-lock-ratelimit"
-+#define X86_MACHINE_NOTIFY_VMEXIT     "notify-vmexit"
-+#define X86_MACHINE_NOTIFY_WINDOW     "notify-window"
- 
- #define TYPE_X86_MACHINE   MACHINE_TYPE_NAME("x86")
- OBJECT_DECLARE_TYPE(X86MachineState, X86MachineClass, X86_MACHINE)
-diff --git a/target/i386/kvm/kvm.c b/target/i386/kvm/kvm.c
-index cb88ba4a00..85f11dd8d6 100644
---- a/target/i386/kvm/kvm.c
-+++ b/target/i386/kvm/kvm.c
-@@ -2580,6 +2580,20 @@ int kvm_arch_init(MachineState *ms, KVMState *s)
-             ratelimit_set_speed(&bus_lock_ratelimit_ctrl,
-                                 x86ms->bus_lock_ratelimit, BUS_LOCK_SLICE_TIME);
-         }
-+
-+        if (x86ms->notify_vmexit &&
-+            kvm_check_extension(s, KVM_CAP_X86_NOTIFY_VMEXIT)) {
-+            uint64_t notify_window_flags = ((uint64_t)x86ms->notify_window << 32) |
-+                                           KVM_X86_NOTIFY_VMEXIT_ENABLED |
-+                                           KVM_X86_NOTIFY_VMEXIT_USER;
-+            ret = kvm_vm_enable_cap(s, KVM_CAP_X86_NOTIFY_VMEXIT, 0,
-+                                    notify_window_flags);
-+            if (ret < 0) {
-+                error_report("kvm: Failed to enable notify vmexit cap: %s",
-+                             strerror(-ret));
-+                return ret;
-+            }
-+        }
-     }
- 
-     return 0;
-@@ -5117,6 +5131,7 @@ int kvm_arch_handle_exit(CPUState *cs, struct kvm_run *run)
-     X86CPU *cpu = X86_CPU(cs);
-     uint64_t code;
-     int ret;
-+    struct kvm_vcpu_events events = {};
- 
-     switch (run->exit_reason) {
-     case KVM_EXIT_HLT:
-@@ -5172,6 +5187,19 @@ int kvm_arch_handle_exit(CPUState *cs, struct kvm_run *run)
-         /* already handled in kvm_arch_post_run */
-         ret = 0;
-         break;
-+    case KVM_EXIT_NOTIFY:
-+        ret = 0;
-+        if (run->notify.flags & KVM_NOTIFY_CONTEXT_INVALID) {
-+            warn_report("KVM: invalid context due to notify vmexit");
-+            if (has_triple_fault_event) {
-+                events.flags |= KVM_VCPUEVENT_VALID_TRIPLE_FAULT;
-+                events.triple_fault.pending = true;
-+                ret = kvm_vcpu_ioctl(cs, KVM_SET_VCPU_EVENTS, &events);
-+            } else {
-+                ret = -1;
-+            }
-+        }
-+        break;
-     default:
-         fprintf(stderr, "KVM: unknown exit reason %d\n", run->exit_reason);
-         ret = -1;
--- 
-2.17.1
+On 8/17/2022 7:14 AM, Si-Wei Liu wrote:
+>
+>
+> On 8/16/2022 2:08 AM, Zhu, Lingshan wrote:
+>>
+>>
+>> On 8/16/2022 3:58 PM, Si-Wei Liu wrote:
+>>>
+>>>
+>>> On 8/15/2022 6:58 PM, Zhu, Lingshan wrote:
+>>>>
+>>>>
+>>>> On 8/16/2022 7:32 AM, Si-Wei Liu wrote:
+>>>>>
+>>>>>
+>>>>> On 8/15/2022 2:26 AM, Zhu Lingshan wrote:
+>>>>>> Some fields of virtio-net device config space are
+>>>>>> conditional on the feature bits, the spec says:
+>>>>>>
+>>>>>> "The mac address field always exists
+>>>>>> (though is only valid if VIRTIO_NET_F_MAC is set)"
+>>>>>>
+>>>>>> "max_virtqueue_pairs only exists if VIRTIO_NET_F_MQ
+>>>>>> or VIRTIO_NET_F_RSS is set"
+>>>>>>
+>>>>>> "mtu only exists if VIRTIO_NET_F_MTU is set"
+>>>>>>
+>>>>>> so we should read MTU, MAC and MQ in the device config
+>>>>>> space only when these feature bits are offered.
+>>>>>>
+>>>>>> For MQ, if both VIRTIO_NET_F_MQ and VIRTIO_NET_F_RSS are
+>>>>>> not set, the virtio device should have
+>>>>>> one queue pair as default value, so when userspace querying queue 
+>>>>>> pair numbers,
+>>>>>> it should return mq=1 than zero.
+>>>>>>
+>>>>>> For MTU, if VIRTIO_NET_F_MTU is not set, we should not read
+>>>>>> MTU from the device config sapce.
+>>>>>> RFC894 <A Standard for the Transmission of IP Datagrams over 
+>>>>>> Ethernet Networks>
+>>>>>> says:"The minimum length of the data field of a packet sent over an
+>>>>>> Ethernet is 1500 octets, thus the maximum length of an IP datagram
+>>>>>> sent over an Ethernet is 1500 octets.  Implementations are 
+>>>>>> encouraged
+>>>>>> to support full-length packets"
+>>>>> Noted there's a typo in the above "The *maximum* length of the 
+>>>>> data field of a packet sent over an Ethernet is 1500 octets ..." 
+>>>>> and the RFC was written 1984.
+>>>> the spec RFC894 says it is 1500, see <a 
+>>>> href="https://urldefense.com/v3/__https://www.rfc-editor.org/rfc/rfc894.txt__;!!ACWV5N9M2RV99hQ!MdgxZjw5sp5Qz-GKfwT1IWcw_L4Jo1-UekuJPFz1UrG3YuqirKz7P9ksdJFh1vB6zHJ7z8Q04fpT0-9jWXCtlWM$">https://urldefense.com/v3/__https://www.rfc-editor.org/rfc/rfc894.txt__;!!ACWV5N9M2RV99hQ!KVwfun0b1Q59Ajp6O7JrB-BuEBSLyQ9e95oGq1cVG_sQIPDL0whI5frx1EGoQFznmm67RsEeJTrUdfYrmZPRFaM$ 
+>>>> </a>
+>>>>>
+>>>>> Apparently that is no longer true with the introduction of Jumbo 
+>>>>> size frame later in the 2000s. I'm not sure what is the point of 
+>>>>> mention this ancient RFC. It doesn't say default MTU of any 
+>>>>> Ethernet NIC/switch should be 1500 in either  case.
+>>>> This could be a larger number for sure, we are trying to find out 
+>>>> the min value for Ethernet here, to support 1500 octets, MTU should 
+>>>> be 1500 at least, so I assume 1500 should be the default value for MTU
+>>>>>
+>>>>>>
+>>>>>> virtio spec says:"The virtio network device is a virtual ethernet 
+>>>>>> card",
+>>>>> Right,
+>>>>>> so the default MTU value should be 1500 for virtio-net.
+>>>>> ... but it doesn't say the default is 1500. At least, not in 
+>>>>> explicit way. Why it can't be 1492 or even lower? In practice, if 
+>>>>> the network backend has a MTU higher than 1500, there's nothing 
+>>>>> wrong for guest to configure default MTU more than 1500.
+>>>> same as above
+>>>>>
+>>>>>>
+>>>>>> For MAC, the spec says:"If the VIRTIO_NET_F_MAC feature bit is set,
+>>>>>> the configuration space mac entry indicates the “physical” address
+>>>>>> of the network card, otherwise the driver would typically
+>>>>>> generate a random local MAC address." So there is no
+>>>>>> default MAC address if VIRTIO_NET_F_MAC not set.
+>>>>>>
+>>>>>> This commits introduces functions vdpa_dev_net_mtu_config_fill()
+>>>>>> and vdpa_dev_net_mac_config_fill() to fill MTU and MAC.
+>>>>>> It also fixes vdpa_dev_net_mq_config_fill() to report correct
+>>>>>> MQ when _F_MQ is not present.
+>>>>>>
+>>>>>> These functions should check devices features than driver
+>>>>>> features, and struct vdpa_device is not needed as a parameter
+>>>>>>
+>>>>>> The test & userspace tool output:
+>>>>>>
+>>>>>> Feature bit VIRTIO_NET_F_MTU, VIRTIO_NET_F_RSS, VIRTIO_NET_F_MQ
+>>>>>> and VIRTIO_NET_F_MAC can be mask out by hardcode.
+>>>>>>
+>>>>>> However, it is challenging to "disable" the related fields
+>>>>>> in the HW device config space, so let's just assume the values
+>>>>>> are meaningless if the feature bits are not set.
+>>>>>>
+>>>>>> Before this change, when feature bits for RSS, MQ, MTU and MAC
+>>>>>> are not set, iproute2 output:
+>>>>>> $vdpa vdpa0: mac 00:e8:ca:11:be:05 link up link_announce false 
+>>>>>> mtu 1500
+>>>>>>    negotiated_features
+>>>>>>
+>>>>>> without this commit, function vdpa_dev_net_config_fill()
+>>>>>> reads all config space fields unconditionally, so let's
+>>>>>> assume the MAC and MTU are meaningless, and it checks
+>>>>>> MQ with driver_features, so we don't see max_vq_pairs.
+>>>>>>
+>>>>>> After applying this commit, when feature bits for
+>>>>>> MQ, RSS, MAC and MTU are not set,iproute2 output:
+>>>>>> $vdpa dev config show vdpa0
+>>>>>> vdpa0: link up link_announce false max_vq_pairs 1 mtu 1500
+>>>>>>    negotiated_features
+>>>>>>
+>>>>>> As explained above:
+>>>>>> Here is no MAC, because VIRTIO_NET_F_MAC is not set,
+>>>>>> and there is no default value for MAC. It shows
+>>>>>> max_vq_paris = 1 because even without MQ feature,
+>>>>>> a functional virtio-net must have one queue pair.
+>>>>>> mtu = 1500 is the default value as ethernet
+>>>>>> required.
+>>>>>>
+>>>>>> This commit also add supplementary comments for
+>>>>>> __virtio16_to_cpu(true, xxx) operations in
+>>>>>> vdpa_dev_net_config_fill() and vdpa_fill_stats_rec()
+>>>>>>
+>>>>>> Signed-off-by: Zhu Lingshan <lingshan.zhu@intel.com>
+>>>>>> ---
+>>>>>>   drivers/vdpa/vdpa.c | 60 
+>>>>>> +++++++++++++++++++++++++++++++++++----------
+>>>>>>   1 file changed, 47 insertions(+), 13 deletions(-)
+>>>>>>
+>>>>>> diff --git a/drivers/vdpa/vdpa.c b/drivers/vdpa/vdpa.c
+>>>>>> index efb55a06e961..a74660b98979 100644
+>>>>>> --- a/drivers/vdpa/vdpa.c
+>>>>>> +++ b/drivers/vdpa/vdpa.c
+>>>>>> @@ -801,19 +801,44 @@ static int 
+>>>>>> vdpa_nl_cmd_dev_get_dumpit(struct sk_buff *msg, struct 
+>>>>>> netlink_callba
+>>>>>>       return msg->len;
+>>>>>>   }
+>>>>>>   -static int vdpa_dev_net_mq_config_fill(struct vdpa_device *vdev,
+>>>>>> -                       struct sk_buff *msg, u64 features,
+>>>>>> +static int vdpa_dev_net_mq_config_fill(struct sk_buff *msg, u64 
+>>>>>> features,
+>>>>>>                          const struct virtio_net_config *config)
+>>>>>>   {
+>>>>>>       u16 val_u16;
+>>>>>>   -    if ((features & BIT_ULL(VIRTIO_NET_F_MQ)) == 0)
+>>>>>> -        return 0;
+>>>>>> +    if ((features & BIT_ULL(VIRTIO_NET_F_MQ)) == 0 &&
+>>>>>> +        (features & BIT_ULL(VIRTIO_NET_F_RSS)) == 0)
+>>>>>> +        val_u16 = 1;
+>>>>>> +    else
+>>>>>> +        val_u16 = __virtio16_to_cpu(true, 
+>>>>>> config->max_virtqueue_pairs);
+>>>>>>   -    val_u16 = le16_to_cpu(config->max_virtqueue_pairs);
+>>>>>>       return nla_put_u16(msg, VDPA_ATTR_DEV_NET_CFG_MAX_VQP, 
+>>>>>> val_u16);
+>>>>>>   }
+>>>>>>   +static int vdpa_dev_net_mtu_config_fill(struct sk_buff *msg, 
+>>>>>> u64 features,
+>>>>>> +                    const struct virtio_net_config *config)
+>>>>>> +{
+>>>>>> +    u16 val_u16;
+>>>>>> +
+>>>>>> +    if ((features & BIT_ULL(VIRTIO_NET_F_MTU)) == 0)
+>>>>>> +        val_u16 = 1500;
+>>>>> As said, there's no virtio spec defined value for MTU. Please 
+>>>>> leave this field out if feature VIRTIO_NET_F_MTU is not negotiated.
+>>>> same as above
+>>>>>> +    else
+>>>>>> +        val_u16 = __virtio16_to_cpu(true, config->mtu);
+>>>>>> +
+>>>>>> +    return nla_put_u16(msg, VDPA_ATTR_DEV_NET_CFG_MTU, val_u16);
+>>>>>> +}
+>>>>>> +
+>>>>>> +static int vdpa_dev_net_mac_config_fill(struct sk_buff *msg, u64 
+>>>>>> features,
+>>>>>> +                    const struct virtio_net_config *config)
+>>>>>> +{
+>>>>>> +    if ((features & BIT_ULL(VIRTIO_NET_F_MAC)) == 0)
+>>>>>> +        return 0;
+>>>>>> +    else
+>>>>>> +        return  nla_put(msg, VDPA_ATTR_DEV_NET_CFG_MACADDR,
+>>>>>> +                sizeof(config->mac), config->mac);
+>>>>>> +}
+>>>>>> +
+>>>>>> +
+>>>>>>   static int vdpa_dev_net_config_fill(struct vdpa_device *vdev, 
+>>>>>> struct sk_buff *msg)
+>>>>>>   {
+>>>>>>       struct virtio_net_config config = {};
+>>>>>> @@ -822,18 +847,16 @@ static int vdpa_dev_net_config_fill(struct 
+>>>>>> vdpa_device *vdev, struct sk_buff *ms
+>>>>>>         vdpa_get_config_unlocked(vdev, 0, &config, sizeof(config));
+>>>>>>   -    if (nla_put(msg, VDPA_ATTR_DEV_NET_CFG_MACADDR, 
+>>>>>> sizeof(config.mac),
+>>>>>> -            config.mac))
+>>>>>> -        return -EMSGSIZE;
+>>>>>> +    /*
+>>>>>> +     * Assume little endian for now, userspace can tweak this for
+>>>>>> +     * legacy guest support.
+>>>>> You can leave it as a TODO for kernel (vdpa core limitation), but 
+>>>>> AFAIK there's nothing userspace needs to do to infer the 
+>>>>> endianness. IMHO it's the kernel's job to provide an abstraction 
+>>>>> rather than rely on userspace guessing it.
+>>>> we have discussed it in another thread, and this comment is 
+>>>> suggested by MST.
+>>> Can you provide the context or link? It shouldn't work like this, 
+>>> otherwise it is breaking uABI. E.g. how will a legacy/BE supporting 
+>>> kernel/device be backward compatible with older vdpa tool (which has 
+>>> knowledge of this endianness implication/assumption from day one)?
+>> https://urldefense.com/v3/__https://www.spinics.net/lists/netdev/msg837114.html__;!!ACWV5N9M2RV99hQ!KVwfun0b1Q59Ajp6O7JrB-BuEBSLyQ9e95oGq1cVG_sQIPDL0whI5frx1EGoQFznmm67RsEeJTrUdfYrGq7Vwjk$ 
+>>
+>> The challenge is that the status filed is virtio16, not le16, so 
+>> le16_to_cpu(xxx) is wrong anyway. However we can not tell whether it 
+>> is a LE or BE device from struct vdpa_device, so for most cases, we 
+>> assume it is LE, and leave this comment.
+> While the fix is fine, the comment is misleading in giving readers 
+> false hope. This is in vdpa_dev_net_config_fill() the vdpa tool query 
+> path, instead of calls from the VMM dealing with vhost/virtio plumbing 
+> specifics. I think what's missing today in vdpa core is the detection 
+> of guest type (legacy, transitional, or modern) regarding endianness 
+> through F_VERSION_1 and legacy interface access, the latter of which 
+> would need some assistance from VMM for sure. However, the presence of 
+> information via the vdpa tool query is totally orthogonal. I don't get 
+> a good reason for why it has to couple with endianness. How vdpa tool 
+> users space is supposed to tweak it? I don't get it...
+Yes it is a little messy, and we can not check _F_VERSION_1 because of 
+transitional devices, so maybe this is the best we can do for now
+>
+> -Siwei
+>
+>
+>>
+>> Thanks
+>>>
+>>> -Siwei
+>>>
+>>>>>
+>>>>>> +     */
+>>>>>> +    val_u16 = __virtio16_to_cpu(true, config.status);
+>>>>>>         val_u16 = __virtio16_to_cpu(true, config.status);
+>>>>>>       if (nla_put_u16(msg, VDPA_ATTR_DEV_NET_STATUS, val_u16))
+>>>>>>           return -EMSGSIZE;
+>>>>>>   -    val_u16 = __virtio16_to_cpu(true, config.mtu);
+>>>>>> -    if (nla_put_u16(msg, VDPA_ATTR_DEV_NET_CFG_MTU, val_u16))
+>>>>>> -        return -EMSGSIZE;
+>>>>>> -
+>>>>>>       features_driver = vdev->config->get_driver_features(vdev);
+>>>>>>       if (nla_put_u64_64bit(msg, 
+>>>>>> VDPA_ATTR_DEV_NEGOTIATED_FEATURES, features_driver,
+>>>>>>                     VDPA_ATTR_PAD))
+>>>>>> @@ -846,7 +869,13 @@ static int vdpa_dev_net_config_fill(struct 
+>>>>>> vdpa_device *vdev, struct sk_buff *ms
+>>>>>>                     VDPA_ATTR_PAD))
+>>>>>>           return -EMSGSIZE;
+>>>>>>   -    return vdpa_dev_net_mq_config_fill(vdev, msg, 
+>>>>>> features_driver, &config);
+>>>>>> +    if (vdpa_dev_net_mac_config_fill(msg, features_device, 
+>>>>>> &config))
+>>>>>> +        return -EMSGSIZE;
+>>>>>> +
+>>>>>> +    if (vdpa_dev_net_mtu_config_fill(msg, features_device, 
+>>>>>> &config))
+>>>>>> +        return -EMSGSIZE;
+>>>>>> +
+>>>>>> +    return vdpa_dev_net_mq_config_fill(msg, features_device, 
+>>>>>> &config);
+>>>>>>   }
+>>>>>>     static int
+>>>>>> @@ -914,6 +943,11 @@ static int vdpa_fill_stats_rec(struct 
+>>>>>> vdpa_device *vdev, struct sk_buff *msg,
+>>>>>>       }
+>>>>>>       vdpa_get_config_unlocked(vdev, 0, &config, sizeof(config));
+>>>>>>   +    /*
+>>>>>> +     * Assume little endian for now, userspace can tweak this for
+>>>>>> +     * legacy guest support.
+>>>>>> +     */
+>>>>>> +
+>>>>> Ditto.
+>>>> same as above
+>>>>
+>>>> Thanks
+>>>>>
+>>>>> Thanks,
+>>>>> -Siwei
+>>>>>> max_vqp = __virtio16_to_cpu(true, config.max_virtqueue_pairs);
+>>>>>>       if (nla_put_u16(msg, VDPA_ATTR_DEV_NET_CFG_MAX_VQP, max_vqp))
+>>>>>>           return -EMSGSIZE;
+>>>>>
+>>>>
+>>>
+>>
+>
 
