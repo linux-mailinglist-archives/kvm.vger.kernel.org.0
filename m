@@ -2,168 +2,177 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 1EC1159840A
-	for <lists+kvm@lfdr.de>; Thu, 18 Aug 2022 15:26:32 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 82BC1598419
+	for <lists+kvm@lfdr.de>; Thu, 18 Aug 2022 15:26:37 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S245045AbiHRNYs (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 18 Aug 2022 09:24:48 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51240 "EHLO
+        id S245050AbiHRNYy (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 18 Aug 2022 09:24:54 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51310 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S245042AbiHRNYi (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 18 Aug 2022 09:24:38 -0400
-Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 564D64D830;
-        Thu, 18 Aug 2022 06:24:33 -0700 (PDT)
-Received: from pps.filterd (m0098404.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.17.1.5/8.17.1.5) with ESMTP id 27IDElxQ021635;
-        Thu, 18 Aug 2022 13:24:26 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : subject :
- from : to : cc : date : in-reply-to : references : content-type :
- content-transfer-encoding : mime-version; s=pp1;
- bh=oEnoQKatwS/weaS8nuKh/mzNFVQUm91B3qmODlsm3Lc=;
- b=ePnS7ppWBHr3yz/wRP2XLBFCLcB5mDxonQmgS3tk4NVMPGXaTeVXTkp0pA7R6lk/J1RW
- 5az61erR79dUsyiJzD3WmviwjM74lEHpBQAqDHhkEsVKg9r0I43IhfZg19MkeYpaMeGP
- lMXj7ld/qCdDO0QghdLX4GN6SPE5iKy3er7n6yJXgisZaOMYvJ0YKlHn+DqJRvN96KEh
- tzWv5PByls1A6ES9mSuaJ1Lofa0A1nIjFA7GL/GXHPJuFYMk/AmoW9+VB2fca+9PGBiW
- G9i37YbbHHQEu1EBE+4JS8WQuN2QBHbseM5hMT7bBcrWDPiCk58GzqPxe7GNWz5C2Vq1 Dw== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3j1p50r7hr-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 18 Aug 2022 13:24:26 +0000
-Received: from m0098404.ppops.net (m0098404.ppops.net [127.0.0.1])
-        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 27IDGi8Q001691;
-        Thu, 18 Aug 2022 13:24:25 GMT
-Received: from ppma02wdc.us.ibm.com (aa.5b.37a9.ip4.static.sl-reverse.com [169.55.91.170])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3j1p50r7gw-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 18 Aug 2022 13:24:25 +0000
-Received: from pps.filterd (ppma02wdc.us.ibm.com [127.0.0.1])
-        by ppma02wdc.us.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 27IDK1cT000487;
-        Thu, 18 Aug 2022 13:24:23 GMT
-Received: from b03cxnp08028.gho.boulder.ibm.com (b03cxnp08028.gho.boulder.ibm.com [9.17.130.20])
-        by ppma02wdc.us.ibm.com with ESMTP id 3hx3ka6ywx-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 18 Aug 2022 13:24:23 +0000
-Received: from b03ledav006.gho.boulder.ibm.com (b03ledav006.gho.boulder.ibm.com [9.17.130.237])
-        by b03cxnp08028.gho.boulder.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 27IDOMmW5243422
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Thu, 18 Aug 2022 13:24:22 GMT
-Received: from b03ledav006.gho.boulder.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id C92D3C6055;
-        Thu, 18 Aug 2022 13:24:22 +0000 (GMT)
-Received: from b03ledav006.gho.boulder.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 6ED94C6057;
-        Thu, 18 Aug 2022 13:24:21 +0000 (GMT)
-Received: from li-479af74c-31f9-11b2-a85c-e4ddee11713b.ibm.com (unknown [9.160.42.126])
-        by b03ledav006.gho.boulder.ibm.com (Postfix) with ESMTP;
-        Thu, 18 Aug 2022 13:24:21 +0000 (GMT)
-Message-ID: <0ee29bd6583f17f0ee4ec0769fa50e8ea6703623.camel@linux.ibm.com>
-Subject: Re: [RFC PATCH] vfio/ccw: Move mdev stuff out of struct subchannel
-From:   Eric Farman <farman@linux.ibm.com>
-To:     "Tian, Kevin" <kevin.tian@intel.com>, "hch@lst.de" <hch@lst.de>
-Cc:     "akrowiak@linux.ibm.com" <akrowiak@linux.ibm.com>,
-        "jjherne@linux.ibm.com" <jjherne@linux.ibm.com>,
-        "mjrosato@linux.ibm.com" <mjrosato@linux.ibm.com>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "linux-s390@vger.kernel.org" <linux-s390@vger.kernel.org>,
-        "kwankhede@nvidia.com" <kwankhede@nvidia.com>,
-        "vneethv@linux.ibm.com" <vneethv@linux.ibm.com>,
-        "pasic@linux.ibm.com" <pasic@linux.ibm.com>,
-        "alex.williamson@redhat.com" <alex.williamson@redhat.com>,
-        "zhenyuw@linux.intel.com" <zhenyuw@linux.intel.com>,
-        "jgg@nvidia.com" <jgg@nvidia.com>,
-        "intel-gvt-dev@lists.freedesktop.org" 
-        <intel-gvt-dev@lists.freedesktop.org>,
-        "Wang, Zhi A" <zhi.a.wang@intel.com>,
-        "Liu, Yi L" <yi.l.liu@intel.com>
-Date:   Thu, 18 Aug 2022 09:24:20 -0400
-In-Reply-To: <BN9PR11MB5276B1A7E2901A2A553D13938C6D9@BN9PR11MB5276.namprd11.prod.outlook.com>
-References: <20220720050629.GA6076@lst.de>
-         <20220726153725.2573294-1-farman@linux.ibm.com>
-         <BN9PR11MB5276B1A7E2901A2A553D13938C6D9@BN9PR11MB5276.namprd11.prod.outlook.com>
-Content-Type: text/plain; charset="UTF-8"
-User-Agent: Evolution 3.44.4 (3.44.4-1.fc36) 
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: RDDEByaWTuHCy0dIjWxVZQ7UTQDOHl5m
-X-Proofpoint-ORIG-GUID: DnT4ZBTcLnp8TPbN_TxsYZhh2cl800fk
-Content-Transfer-Encoding: quoted-printable
-X-Proofpoint-UnRewURL: 0 URL was un-rewritten
+        with ESMTP id S245047AbiHRNYp (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 18 Aug 2022 09:24:45 -0400
+Received: from mga02.intel.com (mga02.intel.com [134.134.136.20])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9A00D5722E;
+        Thu, 18 Aug 2022 06:24:34 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1660829074; x=1692365074;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=5TUL0pMN1Ch62fh0N5bHXldv3b4lhkGVjVf4Q20K7N8=;
+  b=af/BoiSPNPjYdKoxzwvWQjR04f450FFqdvSqTtbYlKSF+bXLbM7dBxul
+   8PnI3RY2FleRWHpdaa3hTAJMMBHjSDf7/9peNbvrJGfy4K98ikKV2nqhY
+   W1IXett9S+pL5UysC8cCbVRgd5YTJnUTn9RxH6B1a+GuhB6LPqEZZZDkU
+   +mAA9ZIKN37uYxkTmO0Ckumj2itTgIfFAQGQ5UBlmPVkgJaMypGNwVk14
+   5oWbjszXN5VwxNqm6fiWWLJmEX2pbW+QtfEH0D0+yQLAITSCaTjQmx42E
+   tU8kRPN80gMfuHYVsH/A2TRkgUGO+jS4S4P+Od9qsl7CJDmvhk4oVqqk6
+   g==;
+X-IronPort-AV: E=McAfee;i="6500,9779,10442"; a="279720468"
+X-IronPort-AV: E=Sophos;i="5.93,246,1654585200"; 
+   d="scan'208";a="279720468"
+Received: from orsmga007.jf.intel.com ([10.7.209.58])
+  by orsmga101.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 18 Aug 2022 06:24:33 -0700
+X-IronPort-AV: E=Sophos;i="5.93,246,1654585200"; 
+   d="scan'208";a="604253471"
+Received: from geigerri-mobl1.ger.corp.intel.com (HELO box.shutemov.name) ([10.251.215.246])
+  by orsmga007-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 18 Aug 2022 06:24:24 -0700
+Received: by box.shutemov.name (Postfix, from userid 1000)
+        id 68132104AA0; Thu, 18 Aug 2022 16:24:21 +0300 (+03)
+Date:   Thu, 18 Aug 2022 16:24:21 +0300
+From:   "Kirill A . Shutemov" <kirill.shutemov@linux.intel.com>
+To:     Hugh Dickins <hughd@google.com>
+Cc:     Chao Peng <chao.p.peng@linux.intel.com>, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org, linux-mm@kvack.org,
+        linux-fsdevel@vger.kernel.org, linux-api@vger.kernel.org,
+        linux-doc@vger.kernel.org, qemu-devel@nongnu.org,
+        linux-kselftest@vger.kernel.org,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Jonathan Corbet <corbet@lwn.net>,
+        Sean Christopherson <seanjc@google.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+        x86@kernel.org, "H . Peter Anvin" <hpa@zytor.com>,
+        Jeff Layton <jlayton@kernel.org>,
+        "J . Bruce Fields" <bfields@fieldses.org>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        Shuah Khan <shuah@kernel.org>, Mike Rapoport <rppt@kernel.org>,
+        Steven Price <steven.price@arm.com>,
+        "Maciej S . Szmigiero" <mail@maciej.szmigiero.name>,
+        Vlastimil Babka <vbabka@suse.cz>,
+        Vishal Annapurve <vannapurve@google.com>,
+        Yu Zhang <yu.c.zhang@linux.intel.com>, luto@kernel.org,
+        jun.nakajima@intel.com, dave.hansen@intel.com, ak@linux.intel.com,
+        david@redhat.com, aarcange@redhat.com, ddutile@redhat.com,
+        dhildenb@redhat.com, Quentin Perret <qperret@google.com>,
+        Michael Roth <michael.roth@amd.com>, mhocko@suse.com,
+        Muchun Song <songmuchun@bytedance.com>,
+        "Gupta, Pankaj" <pankaj.gupta@amd.com>
+Subject: Re: [PATCH v7 00/14] KVM: mm: fd-based approach for supporting KVM
+ guest private memory
+Message-ID: <20220818132421.6xmjqduempmxnnu2@box>
+References: <20220706082016.2603916-1-chao.p.peng@linux.intel.com>
+ <ff5c5b97-acdf-9745-ebe5-c6609dd6322e@google.com>
 MIME-Version: 1.0
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.205,Aquarius:18.0.895,Hydra:6.0.517,FMLib:17.11.122.1
- definitions=2022-08-18_12,2022-08-18_01,2022-06-22_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 impostorscore=0 clxscore=1011
- malwarescore=0 spamscore=0 priorityscore=1501 mlxscore=0 mlxlogscore=859
- phishscore=0 suspectscore=0 lowpriorityscore=0 bulkscore=0 adultscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2207270000
- definitions=main-2208180045
-X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_EF,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_PASS,
-        T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <ff5c5b97-acdf-9745-ebe5-c6609dd6322e@google.com>
+X-Spam-Status: No, score=-4.3 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
+        RCVD_IN_MSPIKE_H3,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE,
+        T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED autolearn=ham autolearn_force=no
+        version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, 2022-08-18 at 06:53 +0000, Tian, Kevin wrote:
-> Hi, Eric,
->=20
-> > From: Eric Farman
-> > Sent: Tuesday, July 26, 2022 11:37 PM
-> >=20
-> > --- a/drivers/s390/cio/vfio_ccw_private.h
-> > +++ b/drivers/s390/cio/vfio_ccw_private.h
-> > @@ -111,6 +111,10 @@ struct vfio_ccw_private {
-> > =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0struct eventfd_ctx=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0*req_trigger;
-> > =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0struct work_struct=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0io_work;
-> > =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0struct work_struct=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0crw_work;
-> > +
-> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0struct mdev_parent=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0parent;
-> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0struct mdev_type=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0mdev_type;
-> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0struct mdev_type=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0*mdev_types[1];
-> > =C2=A0} __aligned(8);
-> >=20
->=20
-> IMHO creating a separate structure to encapsulate parent related
-> information is far cleaner than mixing both mdev and parent into
-> one structure.
->=20
-> mdev and parent have different life cycles. mdev is between
-> mdev probe/remove while parent is between css probe/remove.
+On Wed, Aug 17, 2022 at 10:40:12PM -0700, Hugh Dickins wrote:
+> On Wed, 6 Jul 2022, Chao Peng wrote:
+> > This is the v7 of this series which tries to implement the fd-based KVM
+> > guest private memory.
+> 
+> Here at last are my reluctant thoughts on this patchset.
+> 
+> fd-based approach for supporting KVM guest private memory: fine.
+> 
+> Use or abuse of memfd and shmem.c: mistaken.
+> 
+> memfd_create() was an excellent way to put together the initial prototype.
+> 
+> But since then, TDX in particular has forced an effort into preventing
+> (by flags, seals, notifiers) almost everything that makes it shmem/tmpfs.
+> 
+> Are any of the shmem.c mods useful to existing users of shmem.c? No.
+> Is MFD_INACCESSIBLE useful or comprehensible to memfd_create() users? No.
+> 
+> What use do you have for a filesystem here?  Almost none.
+> IIUC, what you want is an fd through which QEMU can allocate kernel
+> memory, selectively free that memory, and communicate fd+offset+length
+> to KVM.  And perhaps an interface to initialize a little of that memory
+> from a template (presumably copied from a real file on disk somewhere).
+> 
+> You don't need shmem.c or a filesystem for that!
+> 
+> If your memory could be swapped, that would be enough of a good reason
+> to make use of shmem.c: but it cannot be swapped; and although there
+> are some references in the mailthreads to it perhaps being swappable
+> in future, I get the impression that will not happen soon if ever.
+> 
+> If your memory could be migrated, that would be some reason to use
+> filesystem page cache (because page migration happens to understand
+> that type of memory): but it cannot be migrated.
 
-I don't disagree with any of that. My point with the suggested patch
-was a way to get this working without disrupting the cio's subchannel
-(which is used for many non-mdev things).
+Migration support is in pipeline. It is part of TDX 1.5 [1]. And swapping
+theoretically possible, but I'm not aware of any plans as of now.
 
-Un-mixing the mdev from the parent stuff wouldn't be impossible, but
-requires consideration I haven't had the bandwidth to do (which is why
-the cleanup you reference below was dropped from later versions of that
-series [3]).
+[1] https://www.intel.com/content/www/us/en/developer/articles/technical/intel-trust-domain-extensions.html
 
-Thanks,
-Eric
+> Some of these impressions may come from earlier iterations of the
+> patchset (v7 looks better in several ways than v5).  I am probably
+> underestimating the extent to which you have taken on board other
+> usages beyond TDX and SEV private memory, and rightly want to serve
+> them all with similar interfaces: perhaps there is enough justification
+> for shmem there, but I don't see it.  There was mention of userfaultfd
+> in one link: does that provide the justification for using shmem?
+> 
+> I'm afraid of the special demands you may make of memory allocation
+> later on - surprised that huge pages are not mentioned already;
+> gigantic contiguous extents? secretmem removed from direct map?
 
-[3]
-https://lore.kernel.org/all/20220615203318.3830778-1-farman@linux.ibm.com/
+The design allows for extension to hugetlbfs if needed. Combination of
+MFD_INACCESSIBLE | MFD_HUGETLB should route this way. There should be zero
+implications for shmem. It is going to be separate struct memfile_backing_store.
 
->=20
-> Mixing them together prevents further cleanup in vfio core [1]
-> which you posted in earlier series and also other upcoming
-> improvements [2].
->=20
-> Thanks
-> Kevin
->=20
-> [1]
-> https://lore.kernel.org/all/20220602171948.2790690-16-farman@linux.ibm.co=
-m/
-> [2]
-> https://listman.redhat.com/archives/libvir-list/2022-August/233482.html
+I'm not sure secretmem is a fit here as we want to extend MFD_INACCESSIBLE
+to be movable if platform supports it and secretmem is not migratable by
+design (without direct mapping fragmentations).
 
+> Here's what I would prefer, and imagine much easier for you to maintain;
+> but I'm no system designer, and may be misunderstanding throughout.
+> 
+> QEMU gets fd from opening /dev/kvm_something, uses ioctls (or perhaps
+> the fallocate syscall interface itself) to allocate and free the memory,
+> ioctl for initializing some of it too.  KVM in control of whether that
+> fd can be read or written or mmap'ed or whatever, no need to prevent it
+> in shmem.c, no need for flags, seals, notifications to and fro because
+> KVM is already in control and knows the history.  If shmem actually has
+> value, call into it underneath - somewhat like SysV SHM, and /dev/zero
+> mmap, and i915/gem make use of it underneath.  If shmem has nothing to
+> add, just allocate and free kernel memory directly, recorded in your
+> own xarray.
+
+I guess shim layer on top of shmem *can* work. I don't see immediately why
+it would not. But I'm not sure it is right direction. We risk creating yet
+another parallel VM with own rules/locking/accounting that opaque to
+core-mm.
+
+Note that on machines that run TDX guests such memory would likely be the
+bulk of memory use. Treating it as a fringe case may bite us one day.
+
+-- 
+  Kiryl Shutsemau / Kirill A. Shutemov
