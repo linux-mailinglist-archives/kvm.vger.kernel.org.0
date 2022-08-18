@@ -2,76 +2,64 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id BA45F598F85
-	for <lists+kvm@lfdr.de>; Thu, 18 Aug 2022 23:30:18 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 73D5D598FBB
+	for <lists+kvm@lfdr.de>; Thu, 18 Aug 2022 23:42:46 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1347141AbiHRV1S (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 18 Aug 2022 17:27:18 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40224 "EHLO
+        id S243342AbiHRVl5 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 18 Aug 2022 17:41:57 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60178 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1347126AbiHRV07 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 18 Aug 2022 17:26:59 -0400
-Received: from mail-pj1-x102e.google.com (mail-pj1-x102e.google.com [IPv6:2607:f8b0:4864:20::102e])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1EFE2EA89E
-        for <kvm@vger.kernel.org>; Thu, 18 Aug 2022 14:19:14 -0700 (PDT)
-Received: by mail-pj1-x102e.google.com with SMTP id pm17so2850449pjb.3
-        for <kvm@vger.kernel.org>; Thu, 18 Aug 2022 14:19:14 -0700 (PDT)
+        with ESMTP id S1345474AbiHRVl4 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 18 Aug 2022 17:41:56 -0400
+Received: from mail-io1-xd2e.google.com (mail-io1-xd2e.google.com [IPv6:2607:f8b0:4864:20::d2e])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1A929C0B5C
+        for <kvm@vger.kernel.org>; Thu, 18 Aug 2022 14:41:54 -0700 (PDT)
+Received: by mail-io1-xd2e.google.com with SMTP id x64so2082628iof.1
+        for <kvm@vger.kernel.org>; Thu, 18 Aug 2022 14:41:54 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:from:to:cc;
-        bh=tTJTjqw4MggpWtxGKCzfbFeqFxFbwJEwUmHLuAFNlC4=;
-        b=KLY0b+bh0hfzUpqKcJhe/wX0zYM3DwWqLn+1EFPX/z/mvu9FX8S6481IG9EwIwKlr0
-         sksbXHJQ4Kh7CSdeJ54/AGd442l6xfwUSwbgjuIY7cPkTmb/P8QcpBZsFw1/AEgW7BxO
-         Z7vFc1cM6wHyTLrXmXs4BpPTKJqKJm4CDzUsmuDRJO5YqQ2oTdhgmDQfcISIZdvLXi+a
-         iIdIuaNiTdK6EZBOyO8Sqr7BsD7W8hLLdMZHw8f/Q35ywyTfALa1cNGq5gHNhppDaPfZ
-         O+kBBnOCDICeLF6quWO+kUt7vyDNo8jD0dQqib2ZIPNPKJ57Uq0YHy8r7Fi2W5SNMe/A
-         HD3w==
+        bh=12trcFRxDuHrpJDyiPsv28L/LnqZ2qb9yEz4s6vZWvE=;
+        b=XeM6jeX+CrtxFwgUSYb6nmX2DC8Tzwd/6PUwSacv3azNVXYuYkZFuHgU/RAo8sTD79
+         5yhRghlAn+wSnrhhXnJW+4Tzahvv5TqKHttI4ebQcDlKlYsUnKb1FldzG+nbI+9Xg4h/
+         JFMukpRHqMpX6htETtWBPhLRj/HXyPS/JMEb9YqDnF7k5cBrNjQo7c2c3GnNPeiYzeJ7
+         4v5K9SwYdnezrJdnSLdu1FFEeUhQGpT9y0VSdTiV8AABvFEbFUAXheQgPOVGG8R3KQQ1
+         r09CE7mpqDLC7Gz9GaahcxbdTIV8qvcG9I0WXGXp0sPzwUOefEdCI11QIsCx3eqVgtK9
+         nEZQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:x-gm-message-state:from:to:cc;
-        bh=tTJTjqw4MggpWtxGKCzfbFeqFxFbwJEwUmHLuAFNlC4=;
-        b=TEQgfsN0RXEgbZ6mG1T6LVy08pOhvwldL/qewbS31I1P3wKWeHzRRVscw7c0DS9D75
-         FgT/XiGfTgr9jvSsOa0ZKjcHGbFqlVL2qdNhTKwjQ0S63Uje0LaqlSTCrii/08v95gSd
-         HS4u28uG3/u/n48M6nWSLwush13DVaNJQGiHSRXH6JXE0jxtPEH/QR+XR3d1kF2L2yng
-         vosUuzz0mJEjfOqx4cOTLRKHuyJCNyHeKula9iwnMBg6UPKXopgOaZ58gAUWE+9Cpmpi
-         L6s3r9IjH49ewnOPkKITZwxrVWl2DI3LmGf9RJhVpLT4nE3b8ZQURqFbxNLJjuHl/7CL
-         mnLA==
-X-Gm-Message-State: ACgBeo0PRi29n4x6vVheOjA+abIAKnJp1UyJJi1f1JIY43LqhIyrC8zy
-        kw8LGphsK9sx4jzr5XcqRSmJQQ==
-X-Google-Smtp-Source: AA6agR6y0AhMETJyQ+vXl0SNQkEBxWGMTcxU9uSEZQLV6JUuiIN57zfeFgll2QLSPF2S39iiIToTNg==
-X-Received: by 2002:a17:90b:4c4b:b0:1f4:d176:aa5a with SMTP id np11-20020a17090b4c4b00b001f4d176aa5amr4899401pjb.233.1660857553755;
-        Thu, 18 Aug 2022 14:19:13 -0700 (PDT)
-Received: from google.com (7.104.168.34.bc.googleusercontent.com. [34.168.104.7])
-        by smtp.gmail.com with ESMTPSA id h8-20020a170902f54800b0016ee328fd61sm1819751plf.198.2022.08.18.14.19.13
+        bh=12trcFRxDuHrpJDyiPsv28L/LnqZ2qb9yEz4s6vZWvE=;
+        b=PN1ndoPxcqb+d8jBqYuSID2PgxTtFoOIHr1gIOX30QaQRnKGk1441LxZ2Lc+qzdCBb
+         PjD93ednzuvtt+M2C5VDZkjDnSHapFGsVWDD1ZvyCYFKRArcPyOU0rQ3PU1XNtPZld5A
+         EVXpwkFyba46lPkCyCyHsSQbPkdWPeeIiIdKsZISb0lBxRWig10AcNiW9bViOJ4BxDvv
+         8x9/vSaIQa4vbqvg14ew5Xvhj800rDudiRfgyRGwIbUcKx9tatU86nDsaaMgPwIvtTX2
+         8n9Po4KEx8hs6QSZqfb+RvQ8zO6R3FDqQvYsR8drGCyVhSwJnEOa3SLfIBFBbyis1+QN
+         kK8w==
+X-Gm-Message-State: ACgBeo1If2JUo/+lOuCGTsfw3jDZV76WXVSwP9P62ubVeoipMVEVtmNM
+        LGq++BYPrvBuHjecyc49xulMoSNYCgZ0Y5Tr
+X-Google-Smtp-Source: AA6agR75pBbU7S1QxEfB698K/586faQBXuHYenL56qfENNqtPSmnn7rmwZhzWJsOWdQC4NVKgEpSZQ==
+X-Received: by 2002:a05:6638:300b:b0:341:d28e:871 with SMTP id r11-20020a056638300b00b00341d28e0871mr2266631jak.140.1660858912928;
+        Thu, 18 Aug 2022 14:41:52 -0700 (PDT)
+Received: from google.com (30.64.135.34.bc.googleusercontent.com. [34.135.64.30])
+        by smtp.gmail.com with ESMTPSA id bv10-20020a056638448a00b003428c21ed12sm996638jab.167.2022.08.18.14.41.52
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 18 Aug 2022 14:19:13 -0700 (PDT)
-Date:   Thu, 18 Aug 2022 21:19:09 +0000
-From:   Sean Christopherson <seanjc@google.com>
-To:     Kyle Huey <me@kylehuey.com>
-Cc:     Thomas Gleixner <tglx@linutronix.de>,
-        Dave Hansen <dave.hansen@linux.intel.com>,
-        Borislav Petkov <bp@alien8.de>, Ingo Molnar <mingo@redhat.com>,
-        x86@kernel.org, "H. Peter Anvin" <hpa@zytor.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Andy Lutomirski <luto@kernel.org>,
-        Peter Zijlstra <peterz@infradead.org>,
-        linux-kernel@vger.kernel.org, linux-kselftest@vger.kernel.org,
-        Robert O'Callahan <robert@ocallahan.org>,
-        David Manouchehri <david.manouchehri@riseup.net>,
-        Borislav Petkov <bp@suse.de>, kvm@vger.kernel.org,
-        stable@vger.kernel.org
-Subject: Re: [PATCH v5 1/2] x86/fpu: Allow PKRU to be (once again) written by
- ptrace.
-Message-ID: <Yv6szXuKGv75wWmm@google.com>
-References: <20220808141538.102394-1-khuey@kylehuey.com>
- <87ilmpzunz.ffs@tglx>
- <CAP045Ao7hb4kXajkWnMxqawBzFGUZJtSuRRn1kbmjOF=mcTcoA@mail.gmail.com>
+        Thu, 18 Aug 2022 14:41:52 -0700 (PDT)
+Date:   Thu, 18 Aug 2022 21:41:48 +0000
+From:   Colton Lewis <coltonlewis@google.com>
+To:     kvm@vger.kernel.org
+Cc:     pbonzini@redhat.com, maz@kernel.org, dmatlack@google.com,
+        seanjc@google.com, oupton@google.com, ricarkol@google.com
+Subject: Re: [PATCH v2 3/3] KVM: selftests: Randomize page access order.
+Message-ID: <Yv6yHCmtdJCOpZZM@google.com>
+References: <20220817214146.3285106-1-coltonlewis@google.com>
+ <20220817214146.3285106-4-coltonlewis@google.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <CAP045Ao7hb4kXajkWnMxqawBzFGUZJtSuRRn1kbmjOF=mcTcoA@mail.gmail.com>
+In-Reply-To: <20220817214146.3285106-4-coltonlewis@google.com>
 X-Spam-Status: No, score=-14.4 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
         ENV_AND_HDR_SPF_MATCH,FSL_HELO_FAKE,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,
@@ -83,57 +71,20 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Aug 18, 2022, Kyle Huey wrote:
-> On Thu, Aug 18, 2022 at 3:57 AM Thomas Gleixner <tglx@linutronix.de> wrote:
-> > On Mon, Aug 08 2022 at 07:15, Kyle Huey wrote:
-> > > When management of the PKRU register was moved away from XSTATE, emulation
-> > > of PKRU's existence in XSTATE was added for APIs that read XSTATE, but not
-> > > for APIs that write XSTATE. This can be seen by running gdb and executing
-> > > `p $pkru`, `set $pkru = 42`, and `p $pkru`. On affected kernels (5.14+) the
-> > > write to the PKRU register (which gdb performs through ptrace) is ignored.
-> > >
-> > > There are three relevant APIs: PTRACE_SETREGSET with NT_X86_XSTATE,
-> > > sigreturn, and KVM_SET_XSAVE. KVM_SET_XSAVE has its own special handling to
-> > > make PKRU writes take effect (in fpu_copy_uabi_to_guest_fpstate). Push that
-> > > down into copy_uabi_to_xstate and have PTRACE_SETREGSET with NT_X86_XSTATE
-> > > and sigreturn pass in pointers to the appropriate PKRU value.
-> > >
-> > > This also adds code to initialize the PKRU value to the hardware init value
-> > > (namely 0) if the PKRU bit is not set in the XSTATE header to match XRSTOR.
-> > > This is a change to the current KVM_SET_XSAVE behavior.
-> >
-> > You are stating a fact here, but provide 0 justification why this is
-> > correct.
-> 
-> Well, the justification is that this *is* the behavior we want for
-> ptrace/sigreturn, and it's very likely the existing KVM_SET_XSAVE
-> behavior in this edge case is an oversight rather than intentional,
-> and in the absence of confirmation that KVM wants the existing
-> behavior (the KVM mailing list and maintainer are CCd) one correct
-> code path is better than one correct code path and one buggy code
-> path.
+On Wed, Aug 17, 2022 at 09:41:46PM +0000, Colton Lewis wrote:
+> diff --git a/tools/testing/selftests/kvm/dirty_log_perf_test.c b/tools/testing/selftests/kvm/dirty_log_perf_test.c
+> index 9226eeea79bc..af9754bda0a4 100644
+> --- a/tools/testing/selftests/kvm/dirty_log_perf_test.c
+> +++ b/tools/testing/selftests/kvm/dirty_log_perf_test.c
+>  	while ((opt = getopt(argc, argv, "eghi:p:m:nb:v:or:s:x:w:")) != -1) {
+>  		switch (opt) {
+> +		case 'a':
+> +			p.random_access = true;
+> +			break;
+>  		case 'e':
+>  			/* 'e' is for evil. */
+>  			run_vcpus_while_disabling_dirty_logging = true;
 
-Sorry, I missed the KVM-relevant flags.
-
-Hrm, the current behavior has been KVM ABI for a very long time.
-
-It's definitely odd because all other components will be initialized due to their
-bits being cleared in the header during kvm_load_guest_fpu(), and it probably
-wouldn't cause problems in practice as most VMMs likely do "all or nothing" loads.
-But, in theory, userspace could save/restore a subset of guest XSTATE and rely on
-the kernel not overwriting guest PKRU when its bit is cleared in the header.
-
-All that said, I don't see any reason to force KVM to change at this time, it's
-trivial enough to handle KVM's oddities while providing sane behavior for others.
-Nullify the pointer in the guest path and then update copy_uabi_to_xstate() to
-play nice with a NULL pointer, e.g. 
-
-	/*
-	 * Nullify @vpkru to preserve its current value if PKRU's bit isn't set
-	 * in the header.  KVM's odd ABI is to leave PKRU untouched in this
-	 * case (all other components are eventually re-initialized).
-	 */
-	if (!(kstate->regs.xsave.header.xfeatures & XFEATURE_MASK_PKRU))
-		vpkru = NULL;
-
-	return copy_uabi_from_kernel_to_xstate(kstate, ustate, vpkru);
+Was double checking this and forgot to add an "a" to the getopt
+string. This is small enough that I will wait for the rest to get more
+eyes before rerolling the patch.
