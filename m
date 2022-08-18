@@ -2,139 +2,102 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 7BD3F597FAD
-	for <lists+kvm@lfdr.de>; Thu, 18 Aug 2022 10:02:22 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 19AE4597FC1
+	for <lists+kvm@lfdr.de>; Thu, 18 Aug 2022 10:06:57 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S243930AbiHRH6j (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 18 Aug 2022 03:58:39 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49012 "EHLO
+        id S244010AbiHRIE7 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 18 Aug 2022 04:04:59 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33598 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S236334AbiHRH6i (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 18 Aug 2022 03:58:38 -0400
-Received: from mga01.intel.com (mga01.intel.com [192.55.52.88])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 87FAA2DD1;
-        Thu, 18 Aug 2022 00:58:34 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1660809514; x=1692345514;
-  h=message-id:date:mime-version:subject:to:cc:references:
-   from:in-reply-to:content-transfer-encoding;
-  bh=Twxx38m/B6MP00GziwC+0h9SZWmuKEGBvpIWsVx0Ifk=;
-  b=iUlo7hkwADea3wP1BhGqlTX81dSsvZMiHzt7g9LDsmPWcjvYftZiKcoT
-   99x7vmhGHXHaBH892dwmhREXD1MQSRPtNgV6TBnXkjVF51N0eGMA1UlUk
-   NrsAKlKgNAx+bX9PBlcQAF6J6IPphO7kwrH3i4PBpI0UDKYYxUHdWVFpa
-   j7O+IvasYJxL9KS/466lkNSLm6f4iFp8ZJxKheIP4Ta6cJWaVDorBzqJQ
-   /uVyUlXwpZ1oXDfBaGZtLv6T2xMqLB3j70iAqu/ABVysQdyKst6b1SwI/
-   4umMznPHTEmkhbKYp5sOz1C56uGZrxPa4M8YJq5eZKb5sMdbXtpDcpxOW
-   w==;
-X-IronPort-AV: E=McAfee;i="6500,9779,10442"; a="318711961"
-X-IronPort-AV: E=Sophos;i="5.93,245,1654585200"; 
-   d="scan'208";a="318711961"
-Received: from orsmga008.jf.intel.com ([10.7.209.65])
-  by fmsmga101.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 18 Aug 2022 00:58:18 -0700
-X-IronPort-AV: E=Sophos;i="5.93,245,1654585200"; 
-   d="scan'208";a="636720178"
-Received: from lingshan-mobl.ccr.corp.intel.com (HELO [10.255.28.224]) ([10.255.28.224])
-  by orsmga008-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 18 Aug 2022 00:58:16 -0700
-Message-ID: <4f11f53f-c6d4-c7eb-de7b-0260942464fe@intel.com>
-Date:   Thu, 18 Aug 2022 15:58:13 +0800
+        with ESMTP id S240356AbiHRIE6 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 18 Aug 2022 04:04:58 -0400
+Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2FB8B6B8FA;
+        Thu, 18 Aug 2022 01:04:56 -0700 (PDT)
+Received: from pps.filterd (m0187473.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.17.1.5/8.17.1.5) with ESMTP id 27I7qSC8004059;
+        Thu, 18 Aug 2022 08:04:54 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=date : from : to : cc :
+ subject : message-id : references : mime-version : content-type :
+ in-reply-to; s=pp1; bh=d9/IoJLc0k+bSkJU+0AY+sj4CSQp3FbnOb1W0cKbLhU=;
+ b=mt1/f/jim1XscfPoRTnECBp6YObFTg6Et9t51fryFByIhu2FLPHuH1zvuVDBQEWjPqEI
+ 0NSOagKErprQQEgmXUeOzQ/OhsFqb9x6f6Tb0VIn7NKdxK4qt4aJkssowmnd9EHUzyOA
+ BltqIkirDVrmwo9F3nQOP14hgLu5roDQB8lZj4CQKso79DyNvTGdtwe9NLWOBbYYjSV1
+ qtjjB52OU/0HCUyvvudq1uRO2Zoo8kTqPaOVZEEoxdZpcFRCEO3n2lsyPERQvRYf4MBk
+ t25wteHWFwu/Ka9rnX/jjVa2+ZspfUfQRyDIP/TrQBJzeIjbx+0pCJXkorwKPYbysetz AQ== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3j1hdp8ba3-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Thu, 18 Aug 2022 08:04:54 +0000
+Received: from m0187473.ppops.net (m0187473.ppops.net [127.0.0.1])
+        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 27I7vxUg020795;
+        Thu, 18 Aug 2022 08:04:54 GMT
+Received: from ppma03ams.nl.ibm.com (62.31.33a9.ip4.static.sl-reverse.com [169.51.49.98])
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3j1hdp8b97-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Thu, 18 Aug 2022 08:04:53 +0000
+Received: from pps.filterd (ppma03ams.nl.ibm.com [127.0.0.1])
+        by ppma03ams.nl.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 27I7oH6u019867;
+        Thu, 18 Aug 2022 08:04:51 GMT
+Received: from b06avi18626390.portsmouth.uk.ibm.com (b06avi18626390.portsmouth.uk.ibm.com [9.149.26.192])
+        by ppma03ams.nl.ibm.com with ESMTP id 3hx3k8whyp-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Thu, 18 Aug 2022 08:04:51 +0000
+Received: from d06av26.portsmouth.uk.ibm.com (d06av26.portsmouth.uk.ibm.com [9.149.105.62])
+        by b06avi18626390.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 27I821xo25035086
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Thu, 18 Aug 2022 08:02:01 GMT
+Received: from d06av26.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 416B2AE053;
+        Thu, 18 Aug 2022 08:04:48 +0000 (GMT)
+Received: from d06av26.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id A5B71AE045;
+        Thu, 18 Aug 2022 08:04:47 +0000 (GMT)
+Received: from li-4a3a4a4c-28e5-11b2-a85c-a8d192c6f089.ibm.com (unknown [9.145.17.18])
+        by d06av26.portsmouth.uk.ibm.com (Postfix) with ESMTPS;
+        Thu, 18 Aug 2022 08:04:47 +0000 (GMT)
+Date:   Thu, 18 Aug 2022 10:04:46 +0200
+From:   Alexander Gordeev <agordeev@linux.ibm.com>
+To:     Tony Krowiak <akrowiak@linux.ibm.com>
+Cc:     linux-s390@vger.kernel.org, linux-kernel@vger.kernel.org,
+        kvm@vger.kernel.org, jjherne@linux.ibm.com, borntraeger@de.ibm.com,
+        cohuck@redhat.com, mjrosato@linux.ibm.com, pasic@linux.ibm.com,
+        alex.williamson@redhat.com, kwankhede@nvidia.com,
+        fiuczy@linux.ibm.com
+Subject: Re: [PATCH 0/2] s390/vfio-ap: fix two problems discovered in the
+ vfio_ap driver
+Message-ID: <Yv3ynhVYegld5MsO@li-4a3a4a4c-28e5-11b2-a85c-a8d192c6f089.ibm.com>
+References: <20220817225242.188805-1-akrowiak@linux.ibm.com>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:91.0) Gecko/20100101
- Firefox/91.0 Thunderbird/91.12.0
-Subject: Re: [PATCH 2/2] vDPA: conditionally read fields in virtio-net dev
-Content-Language: en-US
-To:     Jason Wang <jasowang@redhat.com>,
-        "Michael S. Tsirkin" <mst@redhat.com>
-Cc:     Si-Wei Liu <si-wei.liu@oracle.com>,
-        virtualization@lists.linux-foundation.org, netdev@vger.kernel.org,
-        kvm@vger.kernel.org, parav@nvidia.com, xieyongji@bytedance.com,
-        gautam.dawar@amd.com
-References: <c5075d3d-9d2c-2716-1cbf-cede49e2d66f@oracle.com>
- <20e92551-a639-ec13-3d9c-13bb215422e1@intel.com>
- <9b6292f3-9bd5-ecd8-5e42-cd5d12f036e7@oracle.com>
- <22e0236f-b556-c6a8-0043-b39b02928fd6@intel.com>
- <892b39d6-85f8-bff5-030d-e21288975572@oracle.com>
- <52a47bc7-bf26-b8f9-257f-7dc5cea66d23@intel.com>
- <20220817045406-mutt-send-email-mst@kernel.org>
- <a91fa479-d1cc-a2d6-0821-93386069a2c1@intel.com>
- <20220817053821-mutt-send-email-mst@kernel.org>
- <449c2fb2-3920-7bf9-8c5c-a68456dfea76@intel.com>
- <20220817063450-mutt-send-email-mst@kernel.org>
- <54aa5a5c-69e2-d372-3e0c-b87f595d213c@redhat.com>
-From:   "Zhu, Lingshan" <lingshan.zhu@intel.com>
-In-Reply-To: <54aa5a5c-69e2-d372-3e0c-b87f595d213c@redhat.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-7.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
-        RCVD_IN_DNSWL_HI,RCVD_IN_MSPIKE_H3,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,
-        SPF_NONE,T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED autolearn=ham
-        autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20220817225242.188805-1-akrowiak@linux.ibm.com>
+X-TM-AS-GCONF: 00
+X-Proofpoint-ORIG-GUID: Z3PFzFEDMlgNzjNt9aMokVoMQc4ZMlzO
+X-Proofpoint-GUID: HxUaGertC9txwSh598lezo0-xotfAzUI
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.205,Aquarius:18.0.883,Hydra:6.0.517,FMLib:17.11.122.1
+ definitions=2022-08-18_02,2022-08-16_02,2022-06-22_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 lowpriorityscore=0
+ mlxlogscore=777 malwarescore=0 spamscore=0 priorityscore=1501 bulkscore=0
+ clxscore=1011 impostorscore=0 suspectscore=0 adultscore=0 phishscore=0
+ mlxscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2207270000 definitions=main-2208180025
+X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_EF,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_PASS,
+        T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+On Wed, Aug 17, 2022 at 06:52:40PM -0400, Tony Krowiak wrote:
+> Two problems have been discovered with the vfio_ap device driver since the
+> hot plug support was recently introduced:
 
+Hi Tony,
 
-On 8/18/2022 12:15 PM, Jason Wang wrote:
->
-> 在 2022/8/17 18:37, Michael S. Tsirkin 写道:
->> On Wed, Aug 17, 2022 at 05:43:22PM +0800, Zhu, Lingshan wrote:
->>>
->>> On 8/17/2022 5:39 PM, Michael S. Tsirkin wrote:
->>>> On Wed, Aug 17, 2022 at 05:13:59PM +0800, Zhu, Lingshan wrote:
->>>>> On 8/17/2022 4:55 PM, Michael S. Tsirkin wrote:
->>>>>> On Wed, Aug 17, 2022 at 10:14:26AM +0800, Zhu, Lingshan wrote:
->>>>>>> Yes it is a little messy, and we can not check _F_VERSION_1 
->>>>>>> because of
->>>>>>> transitional devices, so maybe this is the best we can do for now
->>>>>> I think vhost generally needs an API to declare config space 
->>>>>> endian-ness
->>>>>> to kernel. vdpa can reuse that too then.
->>>>> Yes, I remember you have mentioned some IOCTL to set the endian-ness,
->>>>> for vDPA, I think only the vendor driver knows the endian,
->>>>> so we may need a new function vdpa_ops->get_endian().
->>>>> In the last thread, we say maybe it's better to add a comment for 
->>>>> now.
->>>>> But if you think we should add a vdpa_ops->get_endian(), I can work
->>>>> on it for sure!
->>>>>
->>>>> Thanks
->>>>> Zhu Lingshan
->>>> I think QEMU has to set endian-ness. No one else knows.
->>> Yes, for SW based vhost it is true. But for HW vDPA, only
->>> the device & driver knows the endian, I think we can not
->>> "set" a hardware's endian.
->> QEMU knows the guest endian-ness and it knows that
->> device is accessed through the legacy interface.
->> It can accordingly send endian-ness to the kernel and
->> kernel can propagate it to the driver.
->
->
-> I wonder if we can simply force LE and then Qemu can do the endian 
-> conversion?
-I think this is what we are doing now, force it to be LE, leave a comment.
+Could you please add Fixes tags to the patches?
 
-QEMU will not set ENDIAN for vDPA devices, vhost_kernel_call() verifies
-whether the backend is TYPE_KERNEL (we have TYPE_VDPA here),
-so we can not rely on this code path.
-
-Thanks
-Zhu Lingshan
->
-> Thanks
->
->
->>
->>> So if you think we should add a vdpa_ops->get_endian(),
->>> I will drop these comments in the next version of
->>> series, and work on a new patch for get_endian().
->>>
->>> Thanks,
->>> Zhu Lingshan
->> Guests don't get endian-ness from devices so this seems pointless.
->>
->
-
+Thanks!
