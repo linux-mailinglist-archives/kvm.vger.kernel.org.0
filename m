@@ -2,117 +2,125 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 0E800598C50
-	for <lists+kvm@lfdr.de>; Thu, 18 Aug 2022 21:06:02 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 57D2C598CA7
+	for <lists+kvm@lfdr.de>; Thu, 18 Aug 2022 21:36:09 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1344883AbiHRTFU (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 18 Aug 2022 15:05:20 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35892 "EHLO
+        id S240700AbiHRTey (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 18 Aug 2022 15:34:54 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44456 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233465AbiHRTFT (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 18 Aug 2022 15:05:19 -0400
-Received: from out1.migadu.com (out1.migadu.com [IPv6:2001:41d0:2:863f::])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A5D07B959D;
-        Thu, 18 Aug 2022 12:05:17 -0700 (PDT)
-Date:   Thu, 18 Aug 2022 21:05:14 +0200
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-        t=1660849515;
+        with ESMTP id S232055AbiHRTex (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 18 Aug 2022 15:34:53 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B9F60CE300
+        for <kvm@vger.kernel.org>; Thu, 18 Aug 2022 12:34:51 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1660851290;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          in-reply-to:in-reply-to:references:references;
-        bh=NLXxzLfpertkCh7pqMuyBZ0dtciDt6C/zyyyhRKQC5k=;
-        b=QbDRhjd3503yNjCD2mOOhYXLkQ2FBbucLznvFoZTl5FUXbmKCok/YevU8XVEOKaMib5vTU
-        3ElBIrnxbnHrsmPs8ejqKTk124Phc1ETIGOKc/2b30+8XKh9/QAfMuOOl6b7toR4o8vd0h
-        ebKKD+PNN1PJv8geoltKMbA6iN1Jh8c=
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From:   Andrew Jones <andrew.jones@linux.dev>
-To:     Sean Christopherson <seanjc@google.com>
-Cc:     Peter Gonda <pgonda@google.com>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org, marcorr@google.com,
-        michael.roth@amd.com, thomas.lendacky@amd.com, joro@8bytes.org,
-        mizhang@google.com, pbonzini@redhat.com, vannapurve@google.com
-Subject: Re: [V3 10/11] KVM: selftests: Add ucall pool based implementation
-Message-ID: <20220818190514.ny77xpfwiruah6m5@kamzik>
-References: <20220810152033.946942-1-pgonda@google.com>
- <20220810152033.946942-11-pgonda@google.com>
- <20220816161350.b7x5brnyz5pyi7te@kamzik>
- <Yv5iKJbjW5VseagS@google.com>
+        bh=t27VGD5bDfERJC+pXOu8wApRHc2zsJd/CGr71ZZBapU=;
+        b=hc3+k6UpDNMezdmG0CjFG/+7BJZBroiBdDmN4e615MG3prYMKeQEhdUjgrfXNI/rjgndOd
+        l0R4s6KXiHe/uHMihi1ikAPVOvLUobuJwfxDh3NgOfsGCGRwAEl3JuQuCO6mtiM9C77ruH
+        L4lOM/1iCwi1CTZ2bb//l1BM8L1HAdI=
+Received: from mail-qt1-f197.google.com (mail-qt1-f197.google.com
+ [209.85.160.197]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_128_GCM_SHA256) id
+ us-mta-20-Z2tQuJX7P_yzTshxWECfVA-1; Thu, 18 Aug 2022 15:34:47 -0400
+X-MC-Unique: Z2tQuJX7P_yzTshxWECfVA-1
+Received: by mail-qt1-f197.google.com with SMTP id ci6-20020a05622a260600b0034370b6f5d6so1877683qtb.14
+        for <kvm@vger.kernel.org>; Thu, 18 Aug 2022 12:34:47 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc;
+        bh=t27VGD5bDfERJC+pXOu8wApRHc2zsJd/CGr71ZZBapU=;
+        b=jzO+QcGJtFvaZJECcupjtyGR/qCdlHpNVfPJivHgOB3ym+FkLpVmfVZZpKQzuf+cGM
+         1X53V3Mpkda23DIYf1tCpomWBvg5CssqaKpVN9meLXGQKSSq4Imihh+BFDBalor/tmRS
+         SOlcx/sCEtVqK05lDXH8G500b97k3SYWXljSVTTbghEeqKgJ1t+e/hMhC4R1bZIVW15v
+         xjkD6S0X7BOZTW49LFAkWLBnGcNAlXEitKdwhPEuK5PQS662XZyj2xn4WywWncqGgfKs
+         aNWw4TrnNDiAQwUIxcvzGcVokm12tHCzPw/AYs+m5KdMpJuz5sO4OObgVEP3EAU3odkQ
+         b3ug==
+X-Gm-Message-State: ACgBeo3+AbOMo9CRM6PClJHxk2ibe7oI/R6dFuDtChNW6eLnO359kVOH
+        beMeOsRmuYwmnD93XLUlyhhzVARXhknSpdz6B3Tk/WWektRRH7BJXEkcsiqdgfUNcZkVp94eZ2z
+        i3u1uLk3lN/qN
+X-Received: by 2002:a05:622a:1009:b0:343:568f:fee4 with SMTP id d9-20020a05622a100900b00343568ffee4mr4229055qte.178.1660851286569;
+        Thu, 18 Aug 2022 12:34:46 -0700 (PDT)
+X-Google-Smtp-Source: AA6agR4rh0XfDF2nyUyvht8cKX6rp+fnTerdC2qC+Y809jfEDSiDwN9OY5lwp+zPLhZJ5ic8/HYtdQ==
+X-Received: by 2002:a05:622a:1009:b0:343:568f:fee4 with SMTP id d9-20020a05622a100900b00343568ffee4mr4229045qte.178.1660851286340;
+        Thu, 18 Aug 2022 12:34:46 -0700 (PDT)
+Received: from xz-m1.local (bras-base-aurron9127w-grc-35-70-27-3-10.dsl.bell.ca. [70.27.3.10])
+        by smtp.gmail.com with ESMTPSA id z15-20020ac8100f000000b003435f947d9fsm1478583qti.74.2022.08.18.12.34.45
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 18 Aug 2022 12:34:45 -0700 (PDT)
+Date:   Thu, 18 Aug 2022 15:34:44 -0400
+From:   Peter Xu <peterx@redhat.com>
+To:     Emanuele Giuseppe Esposito <eesposit@redhat.com>
+Cc:     qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>,
+        "Michael S. Tsirkin" <mst@redhat.com>,
+        Cornelia Huck <cohuck@redhat.com>,
+        David Hildenbrand <david@redhat.com>,
+        Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <f4bug@amsat.org>,
+        Maxim Levitsky <mlevitsk@redhat.com>, kvm@vger.kernel.org
+Subject: Re: [RFC PATCH 1/2] softmmu/memory: add missing begin/commit
+ callback calls
+Message-ID: <Yv6UVMMX/hHFkGoM@xz-m1.local>
+References: <20220816101250.1715523-1-eesposit@redhat.com>
+ <20220816101250.1715523-2-eesposit@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <Yv5iKJbjW5VseagS@google.com>
-X-Migadu-Flow: FLOW_OUT
-X-Migadu-Auth-User: linux.dev
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        SPF_HELO_PASS,SPF_PASS,T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED
-        autolearn=ham autolearn_force=no version=3.4.6
+In-Reply-To: <20220816101250.1715523-2-eesposit@redhat.com>
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Aug 18, 2022 at 04:00:40PM +0000, Sean Christopherson wrote:
-> On Tue, Aug 16, 2022, Andrew Jones wrote:
-> > On Wed, Aug 10, 2022 at 08:20:32AM -0700, Peter Gonda wrote:
-> > > diff --git a/tools/testing/selftests/kvm/lib/aarch64/ucall.c b/tools/testing/selftests/kvm/lib/aarch64/ucall.c
-> > > index 132c0e98bf49..ee70531e8e51 100644
-> > > --- a/tools/testing/selftests/kvm/lib/aarch64/ucall.c
-> > > +++ b/tools/testing/selftests/kvm/lib/aarch64/ucall.c
-> > > @@ -81,12 +81,16 @@ void *ucall_arch_get_ucall(struct kvm_vcpu *vcpu)
-> > >  
-> > >  	if (run->exit_reason == KVM_EXIT_MMIO &&
-> > >  	    run->mmio.phys_addr == (uint64_t)ucall_exit_mmio_addr) {
-> > > -		vm_vaddr_t gva;
-> > > +		uint64_t ucall_addr;
-> > 
-> > Why change this vm_vaddr_t to a uint64_t? We shouldn't, because...
-> > 
-> > >  
-> > >  		TEST_ASSERT(run->mmio.is_write && run->mmio.len == 8,
-> > >  			    "Unexpected ucall exit mmio address access");
-> > > -		memcpy(&gva, run->mmio.data, sizeof(gva));
-> > > -		return addr_gva2hva(vcpu->vm, gva);
-> > > +		memcpy(&ucall_addr, run->mmio.data, sizeof(ucall_addr));
-> > 
-> > ...here we assume it's a vm_vaddr_t and only...
-> > 
-> > > +
-> > > +		if (vcpu->vm->use_ucall_pool)
-> > > +			return (void *)ucall_addr;
-> > 
-> > ...here do we know otherwise. So only here should be any casting.
+On Tue, Aug 16, 2022 at 06:12:49AM -0400, Emanuele Giuseppe Esposito wrote:
+> kvm listeners now need ->commit callback in order to actually send
+> the ioctl to the hypervisor. Therefore, add missing callers around
+> address_space_set_flatview(), which in turn calls
+> address_space_update_topology_pass() which calls ->region_* and
+> ->log_* callbacks.
 > 
-> It technically should be a union, because if sizeof(vm_vaddr_t) < sizeof(void *)
-> then declaring it as a vm_addr_t will do the wrong thing.  But then it's possible
-> that this could read too many bytes and inducs failure.  So I guess what we really
-> need is a "static_assert(sizeof(vm_vaddr_t) == sizeof(void *))".
-
-ack
-
+> Using MEMORY_LISTENER_CALL_GLOBAL is a little bit an overkill,
+> but it is harmless, considering that other listeners that are not
+> invoked in address_space_update_topology_pass() won't do anything,
+> since they won't have anything to commit.
 > 
-> But why is "use_ucall_pool" optional?  Unless there's a use case that fundamentally
-> conflicts with the pool approach, let's make the pool approach the _only_ approach.
-> IIRC, ARM's implementation isn't thread safe, i.e. there's at least one other use
-> case that _needs_ the pool implementation.
-
-Really? The ucall structure is on the vcpu's stack like the other
-architectures. Ah, you're probably thinking about the shared address used
-to exit to userspace. The address doesn't matter as long as no VM maps
-it, but, yes, a multi-VM test where the VMs have different maps could end
-up breaking ucalls for one or more VMs. It wouldn't be hard to make that
-address per-VM, though, if ever necessary.
-
+> Signed-off-by: Emanuele Giuseppe Esposito <eesposit@redhat.com>
+> ---
+>  softmmu/memory.c | 2 ++
+>  1 file changed, 2 insertions(+)
 > 
-> By supporting both, we are signing ourselves up for extra maintenance and pain,
-> e.g. inevitably we'll break whichever option isn't the default and not notice for
-> quite some time.
+> diff --git a/softmmu/memory.c b/softmmu/memory.c
+> index 7ba2048836..1afd3f9703 100644
+> --- a/softmmu/memory.c
+> +++ b/softmmu/memory.c
+> @@ -1076,7 +1076,9 @@ static void address_space_update_topology(AddressSpace *as)
+>      if (!g_hash_table_lookup(flat_views, physmr)) {
+>          generate_memory_topology(physmr);
+>      }
+> +    MEMORY_LISTENER_CALL_GLOBAL(begin, Forward);
+>      address_space_set_flatview(as);
+> +    MEMORY_LISTENER_CALL_GLOBAL(commit, Forward);
 
-uc pools are currently limited to a single VM. That could be changed, but
-at the expense of even more code to maintain. The simple uc implementation
-is, well, simple, and also supports multiple VMs. I'd prefer we keep that
-one and keep it as the default.
+Should the pair be with MEMORY_LISTENER_CALL() rather than the global
+version?  Since it's only updating one address space.
+
+Besides the perf implication (walking per-as list should be faster than
+walking global memory listener list?), I think it feels broken too since
+we'll call begin() then commit() (with no region_add()/region_del()/..) for
+all the listeners that are not registered against this AS.  IIUC it will
+empty all regions with those listeners?
 
 Thanks,
-drew
+
+-- 
+Peter Xu
+
