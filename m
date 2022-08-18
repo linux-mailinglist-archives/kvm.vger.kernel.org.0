@@ -2,125 +2,210 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 57D2C598CA7
-	for <lists+kvm@lfdr.de>; Thu, 18 Aug 2022 21:36:09 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 3923E598CDC
+	for <lists+kvm@lfdr.de>; Thu, 18 Aug 2022 21:49:36 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S240700AbiHRTey (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 18 Aug 2022 15:34:54 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44456 "EHLO
+        id S1345632AbiHRTst (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 18 Aug 2022 15:48:49 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36810 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232055AbiHRTex (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 18 Aug 2022 15:34:53 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B9F60CE300
-        for <kvm@vger.kernel.org>; Thu, 18 Aug 2022 12:34:51 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1660851290;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=t27VGD5bDfERJC+pXOu8wApRHc2zsJd/CGr71ZZBapU=;
-        b=hc3+k6UpDNMezdmG0CjFG/+7BJZBroiBdDmN4e615MG3prYMKeQEhdUjgrfXNI/rjgndOd
-        l0R4s6KXiHe/uHMihi1ikAPVOvLUobuJwfxDh3NgOfsGCGRwAEl3JuQuCO6mtiM9C77ruH
-        L4lOM/1iCwi1CTZ2bb//l1BM8L1HAdI=
-Received: from mail-qt1-f197.google.com (mail-qt1-f197.google.com
- [209.85.160.197]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_128_GCM_SHA256) id
- us-mta-20-Z2tQuJX7P_yzTshxWECfVA-1; Thu, 18 Aug 2022 15:34:47 -0400
-X-MC-Unique: Z2tQuJX7P_yzTshxWECfVA-1
-Received: by mail-qt1-f197.google.com with SMTP id ci6-20020a05622a260600b0034370b6f5d6so1877683qtb.14
-        for <kvm@vger.kernel.org>; Thu, 18 Aug 2022 12:34:47 -0700 (PDT)
+        with ESMTP id S1345627AbiHRTsm (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 18 Aug 2022 15:48:42 -0400
+Received: from mail-yw1-x1134.google.com (mail-yw1-x1134.google.com [IPv6:2607:f8b0:4864:20::1134])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A13545B79E
+        for <kvm@vger.kernel.org>; Thu, 18 Aug 2022 12:48:39 -0700 (PDT)
+Received: by mail-yw1-x1134.google.com with SMTP id 00721157ae682-334dc616f86so69335347b3.8
+        for <kvm@vger.kernel.org>; Thu, 18 Aug 2022 12:48:39 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=kylehuey.com; s=google;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc;
+        bh=pN7pqer4VDQBcNszwXCuWriKzSK5JQuQKVaTrQYaltM=;
+        b=eJZZyDCvZFocEY1mnX4gNhf3oRrBiDSGvqtESvQlFghziy9F09FK0NXWYew7+Kje/t
+         EYiUjzXF8F1SfwY5eTJn/SlOMC0eAYlX6vXlI6BBe3iss3srKpP32vCLpr1Tm1oKMUMN
+         zg87bqYehNGX06yEK48vPXzcnNUkWK0MFSTmjqiX9GT4kQYkEBsKVx36aCMAt82aWbJe
+         I3tpfUL3jqS3znRjqVz6Nais3mhbhgsyExZDigC6az9B/idmpcCqQsrbFUurVcbQ03qr
+         VBPmy9U+vgbenggQVkmWLrNUBZx6y+nko5YSj1QAgdiIO6xqEJT7OVRswPbW8u68PuP3
+         71lA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc;
-        bh=t27VGD5bDfERJC+pXOu8wApRHc2zsJd/CGr71ZZBapU=;
-        b=jzO+QcGJtFvaZJECcupjtyGR/qCdlHpNVfPJivHgOB3ym+FkLpVmfVZZpKQzuf+cGM
-         1X53V3Mpkda23DIYf1tCpomWBvg5CssqaKpVN9meLXGQKSSq4Imihh+BFDBalor/tmRS
-         SOlcx/sCEtVqK05lDXH8G500b97k3SYWXljSVTTbghEeqKgJ1t+e/hMhC4R1bZIVW15v
-         xjkD6S0X7BOZTW49LFAkWLBnGcNAlXEitKdwhPEuK5PQS662XZyj2xn4WywWncqGgfKs
-         aNWw4TrnNDiAQwUIxcvzGcVokm12tHCzPw/AYs+m5KdMpJuz5sO4OObgVEP3EAU3odkQ
-         b3ug==
-X-Gm-Message-State: ACgBeo3+AbOMo9CRM6PClJHxk2ibe7oI/R6dFuDtChNW6eLnO359kVOH
-        beMeOsRmuYwmnD93XLUlyhhzVARXhknSpdz6B3Tk/WWektRRH7BJXEkcsiqdgfUNcZkVp94eZ2z
-        i3u1uLk3lN/qN
-X-Received: by 2002:a05:622a:1009:b0:343:568f:fee4 with SMTP id d9-20020a05622a100900b00343568ffee4mr4229055qte.178.1660851286569;
-        Thu, 18 Aug 2022 12:34:46 -0700 (PDT)
-X-Google-Smtp-Source: AA6agR4rh0XfDF2nyUyvht8cKX6rp+fnTerdC2qC+Y809jfEDSiDwN9OY5lwp+zPLhZJ5ic8/HYtdQ==
-X-Received: by 2002:a05:622a:1009:b0:343:568f:fee4 with SMTP id d9-20020a05622a100900b00343568ffee4mr4229045qte.178.1660851286340;
-        Thu, 18 Aug 2022 12:34:46 -0700 (PDT)
-Received: from xz-m1.local (bras-base-aurron9127w-grc-35-70-27-3-10.dsl.bell.ca. [70.27.3.10])
-        by smtp.gmail.com with ESMTPSA id z15-20020ac8100f000000b003435f947d9fsm1478583qti.74.2022.08.18.12.34.45
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 18 Aug 2022 12:34:45 -0700 (PDT)
-Date:   Thu, 18 Aug 2022 15:34:44 -0400
-From:   Peter Xu <peterx@redhat.com>
-To:     Emanuele Giuseppe Esposito <eesposit@redhat.com>
-Cc:     qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>,
-        "Michael S. Tsirkin" <mst@redhat.com>,
-        Cornelia Huck <cohuck@redhat.com>,
-        David Hildenbrand <david@redhat.com>,
-        Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <f4bug@amsat.org>,
-        Maxim Levitsky <mlevitsk@redhat.com>, kvm@vger.kernel.org
-Subject: Re: [RFC PATCH 1/2] softmmu/memory: add missing begin/commit
- callback calls
-Message-ID: <Yv6UVMMX/hHFkGoM@xz-m1.local>
-References: <20220816101250.1715523-1-eesposit@redhat.com>
- <20220816101250.1715523-2-eesposit@redhat.com>
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc;
+        bh=pN7pqer4VDQBcNszwXCuWriKzSK5JQuQKVaTrQYaltM=;
+        b=wjlCubE4i9cDZyj8jlyuxMY3V6xYYx9F203a4O7VssFdO66nDYvZjDFMdwQXQ/pwxZ
+         FdmsJdFIOGamrWwjn8sWzc8TbVqz0xY4VTl9tkWGcCmKNbwbz+8rxlLG23obXWWBs9Oa
+         +Opzygf+VwDO7wmBNVMHOIborZImG5/44vga39M47KoLT0nsSfGh+b1G4tZahtj6vVPo
+         pmgEkG0rhZAeUo2ftxbwoAxxHq4w7cov1+VfkiOOuJ8BKmFPjwFZIm2Ts36NL2YRouaU
+         YkHLj1Tv8rLzgjSgMDKrXARAM8SQ0CQ75HLreORhPuZtC9DcFHj7rdJrEWtK+7gcOrkW
+         NtCA==
+X-Gm-Message-State: ACgBeo2p3QRc4Vt6ORMp9WG7KWIoM/+6i6SP2sL2KrWbLr7EsVpVPfrB
+        sEmUSw7o+cY1WAXOzfd6txK29UlczvWAkHFgzFUGEw==
+X-Google-Smtp-Source: AA6agR4vFLdh+IPAYOERtSDAXoJ0znqtPFPClNRqMqibtcNloaQO1xQtmwFz06X3LDoLAF00jqv2MeLkBbP6KHyle2c=
+X-Received: by 2002:a25:bd3:0:b0:691:d47a:be78 with SMTP id
+ 202-20020a250bd3000000b00691d47abe78mr4145138ybl.574.1660852118761; Thu, 18
+ Aug 2022 12:48:38 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20220816101250.1715523-2-eesposit@redhat.com>
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham
-        autolearn_force=no version=3.4.6
+References: <20220808141538.102394-1-khuey@kylehuey.com> <87ilmpzunz.ffs@tglx>
+In-Reply-To: <87ilmpzunz.ffs@tglx>
+From:   Kyle Huey <me@kylehuey.com>
+Date:   Thu, 18 Aug 2022 12:48:23 -0700
+Message-ID: <CAP045Ao7hb4kXajkWnMxqawBzFGUZJtSuRRn1kbmjOF=mcTcoA@mail.gmail.com>
+Subject: Re: [PATCH v5 1/2] x86/fpu: Allow PKRU to be (once again) written by ptrace.
+To:     Thomas Gleixner <tglx@linutronix.de>
+Cc:     Dave Hansen <dave.hansen@linux.intel.com>,
+        Borislav Petkov <bp@alien8.de>, Ingo Molnar <mingo@redhat.com>,
+        x86@kernel.org, "H. Peter Anvin" <hpa@zytor.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Andy Lutomirski <luto@kernel.org>,
+        Peter Zijlstra <peterz@infradead.org>,
+        linux-kernel@vger.kernel.org, linux-kselftest@vger.kernel.org,
+        "Robert O'Callahan" <robert@ocallahan.org>,
+        David Manouchehri <david.manouchehri@riseup.net>,
+        Borislav Petkov <bp@suse.de>, kvm@vger.kernel.org,
+        stable@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Aug 16, 2022 at 06:12:49AM -0400, Emanuele Giuseppe Esposito wrote:
-> kvm listeners now need ->commit callback in order to actually send
-> the ioctl to the hypervisor. Therefore, add missing callers around
-> address_space_set_flatview(), which in turn calls
-> address_space_update_topology_pass() which calls ->region_* and
-> ->log_* callbacks.
-> 
-> Using MEMORY_LISTENER_CALL_GLOBAL is a little bit an overkill,
-> but it is harmless, considering that other listeners that are not
-> invoked in address_space_update_topology_pass() won't do anything,
-> since they won't have anything to commit.
-> 
-> Signed-off-by: Emanuele Giuseppe Esposito <eesposit@redhat.com>
-> ---
->  softmmu/memory.c | 2 ++
->  1 file changed, 2 insertions(+)
-> 
-> diff --git a/softmmu/memory.c b/softmmu/memory.c
-> index 7ba2048836..1afd3f9703 100644
-> --- a/softmmu/memory.c
-> +++ b/softmmu/memory.c
-> @@ -1076,7 +1076,9 @@ static void address_space_update_topology(AddressSpace *as)
->      if (!g_hash_table_lookup(flat_views, physmr)) {
->          generate_memory_topology(physmr);
->      }
-> +    MEMORY_LISTENER_CALL_GLOBAL(begin, Forward);
->      address_space_set_flatview(as);
-> +    MEMORY_LISTENER_CALL_GLOBAL(commit, Forward);
+On Thu, Aug 18, 2022 at 3:57 AM Thomas Gleixner <tglx@linutronix.de> wrote:
+>
+> Kyle!
 
-Should the pair be with MEMORY_LISTENER_CALL() rather than the global
-version?  Since it's only updating one address space.
+Hi.
 
-Besides the perf implication (walking per-as list should be faster than
-walking global memory listener list?), I think it feels broken too since
-we'll call begin() then commit() (with no region_add()/region_del()/..) for
-all the listeners that are not registered against this AS.  IIUC it will
-empty all regions with those listeners?
+> On Mon, Aug 08 2022 at 07:15, Kyle Huey wrote:
+> > When management of the PKRU register was moved away from XSTATE, emulation
+> > of PKRU's existence in XSTATE was added for APIs that read XSTATE, but not
+> > for APIs that write XSTATE. This can be seen by running gdb and executing
+> > `p $pkru`, `set $pkru = 42`, and `p $pkru`. On affected kernels (5.14+) the
+> > write to the PKRU register (which gdb performs through ptrace) is ignored.
+> >
+> > There are three relevant APIs: PTRACE_SETREGSET with NT_X86_XSTATE,
+> > sigreturn, and KVM_SET_XSAVE. KVM_SET_XSAVE has its own special handling to
+> > make PKRU writes take effect (in fpu_copy_uabi_to_guest_fpstate). Push that
+> > down into copy_uabi_to_xstate and have PTRACE_SETREGSET with NT_X86_XSTATE
+> > and sigreturn pass in pointers to the appropriate PKRU value.
+> >
+> > This also adds code to initialize the PKRU value to the hardware init value
+> > (namely 0) if the PKRU bit is not set in the XSTATE header to match XRSTOR.
+> > This is a change to the current KVM_SET_XSAVE behavior.
+>
+> You are stating a fact here, but provide 0 justification why this is
+> correct.
 
-Thanks,
+Well, the justification is that this *is* the behavior we want for
+ptrace/sigreturn, and it's very likely the existing KVM_SET_XSAVE
+behavior in this edge case is an oversight rather than intentional,
+and in the absence of confirmation that KVM wants the existing
+behavior (the KVM mailing list and maintainer are CCd) one correct
+code path is better than one correct code path and one buggy code
+path.
 
--- 
-Peter Xu
+> >
+> > Changelog since v4:
+>
+> Can you please put the change log past the --- seperator line, so it
+> gets stripped off when the patch is applied? That spares manual fixups.
 
+Ok.
+
+> >
+> > Signed-off-by: Kyle Huey <me@kylehuey.com>
+> > Cc: Dave Hansen <dave.hansen@linux.intel.com>
+> > Cc: Thomas Gleixner <tglx@linutronix.de>
+> > Cc: Borislav Petkov <bp@suse.de>
+> > Cc: kvm@vger.kernel.org # For edge case behavior of KVM_SET_XSAVE
+> > Cc: stable@vger.kernel.org # 5.14+
+> > Fixes: e84ba47e313d ("x86/fpu: Hook up PKRU into ptrace()")
+>
+> Can you please use the documented tag ordering?
+>
+> https://www.kernel.org/doc/html/latest/process/maintainer-tip.html#patch-submission-notes
+
+Ok.
+
+> > @@ -1235,6 +1235,24 @@ static int copy_uabi_to_xstate(struct fpstate *fpstate, const void *kbuf,
+> >       for (i = 0; i < XFEATURE_MAX; i++) {
+> >               mask = BIT_ULL(i);
+> >
+> > +             if (i == XFEATURE_PKRU) {
+> > +                     /*
+> > +                      * Retrieve PKRU if not in init state, otherwise
+> > +                      * initialize it.
+> > +                      */
+> > +                     if (hdr.xfeatures & mask) {
+> > +                             struct pkru_state xpkru = {0};
+> > +
+> > +                             if (copy_from_buffer(&xpkru, xstate_offsets[i],
+> > +                                                  sizeof(xpkru), kbuf, ubuf))
+> > +                                     return -EFAULT;
+> > +
+> > +                             *pkru = xpkru.pkru;
+> > +                     } else {
+> > +                             *pkru = 0;
+> > +                     }
+> > +             }
+>
+> That's really horrible and there is no point in copying the stuff from
+> the buffer twice:
+>
+> @@ -1246,6 +1246,15 @@ static int copy_uabi_to_xstate(struct fp
+>                 }
+>         }
+>
+> +       /* Update the user protection key storage */
+> +       *pkru = 0;
+> +       if (hdr.xfeatures & XFEATURE_MASK_PKRU) {
+> +               struct pkru_state *xpkru;
+> +
+> +               xpkru = get_xsave_addr(xsave, XFEATURE_PKRU);
+> +               *pkru = xpkru->pkru;
+> +       }
+> +
+>
+> Hmm?
+
+It took me a bit to figure out what this is actually trying to do. To
+work, it would need to come at the very end of copy_uabi_to_xstate
+after xsave->header.xfeatures is updated. If you just want to avoid
+two copies I would counter-propose this though:
+
+@@ -1235,7 +1235,19 @@ static int copy_uabi_to_xstate(struct fpstate
+*fpstate, const void *kbuf,
+        for (i = 0; i < XFEATURE_MAX; i++) {
+                mask = BIT_ULL(i);
+
+-               if (hdr.xfeatures & mask) {
++               if (i == XFEATURE_PKRU) {
++                       /* Update the user protection key storage */
++                       *pkru = 0;
++                       if (hdr.xfeatures & XFEATURE_MASK_PKRU) {
++                               struct pkru_state xpkru = {0};
++
++                               if (copy_from_buffer(&xpkru, xstate_offsets[i],
++                                                    sizeof(xpkru), kbuf, ubuf))
++                                       return -EFAULT;
++
++                               *pkru = xpkru.pkru;
++                       }
++               } else if (hdr.xfeatures & mask) {
+                        void *dst = __raw_xsave_addr(xsave, i);
+
+                        offset = xstate_offsets[i];
+
+Thoughts? This avoids a second copy and avoids having to calculate the
+offset into the (now potentially compressed) XSTATE.
+
+- Kyle
+
+>
+> Thanks,
+>
+>         tglx
