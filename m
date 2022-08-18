@@ -2,78 +2,91 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 28856597CB8
-	for <lists+kvm@lfdr.de>; Thu, 18 Aug 2022 06:11:35 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 83EFD597D06
+	for <lists+kvm@lfdr.de>; Thu, 18 Aug 2022 06:18:33 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S240744AbiHREHU (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 18 Aug 2022 00:07:20 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59508 "EHLO
+        id S240956AbiHREP4 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 18 Aug 2022 00:15:56 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45260 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231490AbiHREHS (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 18 Aug 2022 00:07:18 -0400
-Received: from mail-pj1-x1030.google.com (mail-pj1-x1030.google.com [IPv6:2607:f8b0:4864:20::1030])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A499BADCCB;
-        Wed, 17 Aug 2022 21:07:17 -0700 (PDT)
-Received: by mail-pj1-x1030.google.com with SMTP id s4-20020a17090a5d0400b001fabc6bb0baso1883463pji.1;
-        Wed, 17 Aug 2022 21:07:17 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc;
-        bh=AnPSl2fv4YbAZeiwPXo9GgV/ehsBxgGdylPQL3o6spM=;
-        b=ptP4Ji8viXhGPjcOy/fbF85TK2SNGt84RoM9E2TFEclO1YX8mbAUVonYhmRU6BtHw+
-         5GqYH2phWi1AEkCQbqRaUi1lQnoVb4XWq/hMig/WcWRtuksHhNJ2Yo3q+e39oYFiicUY
-         mzRbIqKedFQkKtKzyfVXSRXOcLU7bPO26OKFjpkYH1X8oMnFEbnLAp+9AFJtTeWzxtpY
-         qIQKHIOHmPo0PWDJbQLqdH1U4YSLA7vKI/QARIFFcpkETwK96m6VfSeGqpbnSeTEJKyM
-         R6HuYgnvA36S9gRNLMHqFmX9oWFT4eqAYJNbgPF9KuPyTYNduVkJEAQlQgXzuR3AR6Ik
-         gkRQ==
+        with ESMTP id S231547AbiHREPy (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 18 Aug 2022 00:15:54 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 29B874E639
+        for <kvm@vger.kernel.org>; Wed, 17 Aug 2022 21:15:53 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1660796152;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=90ff8sjY+m9HsEs6i8v1jPNF4u6ADKMljn/DWnOc7tg=;
+        b=LKGSUtnbvaUkUh+WaBMKzrrtp0xuqT+4WZ8az09iMzrtboJ0vDzDQIS7zf6lbh+AB44A3K
+        yvlVVd9czWwFoFJpsK6+sGvKzwjGDrniW4Ma430kEmbzKXpdR7f53TPcvHz103sS2plBOz
+        kLjCT76AC2PgEWvJLns0RjNk5alWGB4=
+Received: from mail-pl1-f200.google.com (mail-pl1-f200.google.com
+ [209.85.214.200]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_128_GCM_SHA256) id
+ us-mta-194-rB-NbeLmNB2LvtkckYvLZQ-1; Thu, 18 Aug 2022 00:15:50 -0400
+X-MC-Unique: rB-NbeLmNB2LvtkckYvLZQ-1
+Received: by mail-pl1-f200.google.com with SMTP id f13-20020a170902ce8d00b0016eebfe70fcso415537plg.7
+        for <kvm@vger.kernel.org>; Wed, 17 Aug 2022 21:15:50 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc;
-        bh=AnPSl2fv4YbAZeiwPXo9GgV/ehsBxgGdylPQL3o6spM=;
-        b=Us2EImYP5agHcx9w7ZHesiz74XXmc7zctZU5RG+xJdCpz6vEQ/o2VYsScKI7w68t4N
-         vGcRWOimyMXiccDfyAzELILk4me/X98uBYmHC8++KfvYe8UoJvo5/vGK2mCuo2GFKz6X
-         AY5DOo9+BZUgBDAXAyiSzz1K4ltO3HQ3xUPYs/jfoBBX0V2QDG7Pcp0f04uxDvhDOUVY
-         EmindKs2MyMIybZFf0cH1RE7bMIPcNdyXWY3RCk6u6ntOGbJyjRsFHYvJHB7t/1lbcQH
-         PxsgvnGNj8oFJ6INvR6t3yiuIwWvC+oSC6eXYpfnxWi3EeIe9MaPahMjG/LpzIDDvFo/
-         ok7A==
-X-Gm-Message-State: ACgBeo2j0S7YQqRnFaabR9X3gmf76TjGoX9mBUw+fWbiejk7KNrhz14i
-        hze+S5DPOXGsTPu1QUnLkCk=
-X-Google-Smtp-Source: AA6agR7RbEswr8TlmgOgVJ5hVBPXC7kT3XKkzbljcTfqyQdLIIUjyNgP3g30gvDtmk2IMAUI1RWbmQ==
-X-Received: by 2002:a17:902:ea04:b0:172:a8e1:d076 with SMTP id s4-20020a170902ea0400b00172a8e1d076mr1299368plg.133.1660795637070;
-        Wed, 17 Aug 2022 21:07:17 -0700 (PDT)
-Received: from debian.me (subs03-180-214-233-86.three.co.id. [180.214.233.86])
-        by smtp.gmail.com with ESMTPSA id b2-20020a170902d50200b0016a0bf0ce32sm253726plg.70.2022.08.17.21.07.16
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 17 Aug 2022 21:07:16 -0700 (PDT)
-Received: by debian.me (Postfix, from userid 1000)
-        id 587B1101BD7; Thu, 18 Aug 2022 11:07:13 +0700 (WIB)
-Date:   Thu, 18 Aug 2022 11:07:13 +0700
-From:   Bagas Sanjaya <bagasdotme@gmail.com>
-To:     Kai Huang <kai.huang@intel.com>
-Cc:     linux-kernel@vger.kernel.org, linux-doc@vger.kernel.org,
-        kvm@vger.kernel.org, seanjc@google.com, pbonzini@redhat.com,
-        dave.hansen@intel.com, len.brown@intel.com, tony.luck@intel.com,
-        rafael.j.wysocki@intel.com, reinette.chatre@intel.com,
-        dan.j.williams@intel.com, peterz@infradead.org, ak@linux.intel.com,
-        kirill.shutemov@linux.intel.com,
-        sathyanarayanan.kuppuswamy@linux.intel.com,
-        isaku.yamahata@intel.com
-Subject: Re: [PATCH v5 22/22] Documentation/x86: Add documentation for TDX
- host support
-Message-ID: <Yv268Z0i+rq7r/oR@debian.me>
-References: <cover.1655894131.git.kai.huang@intel.com>
- <0712bc0b05a0c6c42437fba68f82d9268ab3113e.1655894131.git.kai.huang@intel.com>
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc;
+        bh=90ff8sjY+m9HsEs6i8v1jPNF4u6ADKMljn/DWnOc7tg=;
+        b=BgM9cjSYGtwExDr0vQXVXv8hqiYX2gfvhnjfzh4kwK/Gi2om6fxsoo4YM8HhPiEQBr
+         7XXwfeTTfomOG8uvd7Ekp8r/aME8myeycyKYi494W9vmy6jg4WKyyPIXCIlwtHrnT+Pt
+         PaNi6XptRFv8yuKAcQdxtkxN0pM/MKaGdqK5ijWJ+W11/VwY+kpK0nYPTE0BpLTde2JV
+         iLzWkieJZy5EXoXJHYAQMRa7dX9AgZWO8/cP59de4we3EOvsr0SkzKRm7hb6LgOIkaEJ
+         OzP8v0AnDNbdXcBgpsUYyBXN+pgpSnDa7JEIFAzJaSBQNYmJb08NBLPBdcCWuASA5GHc
+         rUQA==
+X-Gm-Message-State: ACgBeo2rYZ9/pnJHVeaFEAMs3BjKAVpAoQ4byh9p3ol7ZbZdw1+kIvlF
+        t0baLxinw/i22yMMYcay35XM4Vsj4IQCK77nUsQokMZpSAw7iOPTOmwKDFH/1/2/T97ZxyuWs9d
+        3Ov9kOduxTRgK
+X-Received: by 2002:a62:4c2:0:b0:52e:bd4d:50e1 with SMTP id 185-20020a6204c2000000b0052ebd4d50e1mr1296683pfe.8.1660796149648;
+        Wed, 17 Aug 2022 21:15:49 -0700 (PDT)
+X-Google-Smtp-Source: AA6agR7t4FbXeSRyLqR6Fb1Pn3xF/TW5GpOgcSkBjfKmVbsWkrQCgDysCjqSzTKPrOnCKYR30QQCMQ==
+X-Received: by 2002:a62:4c2:0:b0:52e:bd4d:50e1 with SMTP id 185-20020a6204c2000000b0052ebd4d50e1mr1296667pfe.8.1660796149336;
+        Wed, 17 Aug 2022 21:15:49 -0700 (PDT)
+Received: from [10.72.13.223] ([209.132.188.80])
+        by smtp.gmail.com with ESMTPSA id c127-20020a621c85000000b005289ef6db79sm376729pfc.32.2022.08.17.21.15.44
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 17 Aug 2022 21:15:48 -0700 (PDT)
+Message-ID: <54aa5a5c-69e2-d372-3e0c-b87f595d213c@redhat.com>
+Date:   Thu, 18 Aug 2022 12:15:37 +0800
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
-        protocol="application/pgp-signature"; boundary="7MH2uFN9Wf7hT8bf"
-Content-Disposition: inline
-In-Reply-To: <0712bc0b05a0c6c42437fba68f82d9268ab3113e.1655894131.git.kai.huang@intel.com>
-X-Spam-Status: No, score=-0.6 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
-        RCVD_IN_DNSWL_NONE,RCVD_IN_SORBS_WEB,SPF_HELO_NONE,SPF_PASS,
-        T_SCC_BODY_TEXT_LINE autolearn=no autolearn_force=no version=3.4.6
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:91.0)
+ Gecko/20100101 Thunderbird/91.12.0
+Subject: Re: [PATCH 2/2] vDPA: conditionally read fields in virtio-net dev
+Content-Language: en-US
+To:     "Michael S. Tsirkin" <mst@redhat.com>,
+        "Zhu, Lingshan" <lingshan.zhu@intel.com>
+Cc:     Si-Wei Liu <si-wei.liu@oracle.com>,
+        virtualization@lists.linux-foundation.org, netdev@vger.kernel.org,
+        kvm@vger.kernel.org, parav@nvidia.com, xieyongji@bytedance.com,
+        gautam.dawar@amd.com
+References: <c5075d3d-9d2c-2716-1cbf-cede49e2d66f@oracle.com>
+ <20e92551-a639-ec13-3d9c-13bb215422e1@intel.com>
+ <9b6292f3-9bd5-ecd8-5e42-cd5d12f036e7@oracle.com>
+ <22e0236f-b556-c6a8-0043-b39b02928fd6@intel.com>
+ <892b39d6-85f8-bff5-030d-e21288975572@oracle.com>
+ <52a47bc7-bf26-b8f9-257f-7dc5cea66d23@intel.com>
+ <20220817045406-mutt-send-email-mst@kernel.org>
+ <a91fa479-d1cc-a2d6-0821-93386069a2c1@intel.com>
+ <20220817053821-mutt-send-email-mst@kernel.org>
+ <449c2fb2-3920-7bf9-8c5c-a68456dfea76@intel.com>
+ <20220817063450-mutt-send-email-mst@kernel.org>
+From:   Jason Wang <jasowang@redhat.com>
+In-Reply-To: <20220817063450-mutt-send-email-mst@kernel.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
+        RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
@@ -81,174 +94,49 @@ List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
 
---7MH2uFN9Wf7hT8bf
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+在 2022/8/17 18:37, Michael S. Tsirkin 写道:
+> On Wed, Aug 17, 2022 at 05:43:22PM +0800, Zhu, Lingshan wrote:
+>>
+>> On 8/17/2022 5:39 PM, Michael S. Tsirkin wrote:
+>>> On Wed, Aug 17, 2022 at 05:13:59PM +0800, Zhu, Lingshan wrote:
+>>>> On 8/17/2022 4:55 PM, Michael S. Tsirkin wrote:
+>>>>> On Wed, Aug 17, 2022 at 10:14:26AM +0800, Zhu, Lingshan wrote:
+>>>>>> Yes it is a little messy, and we can not check _F_VERSION_1 because of
+>>>>>> transitional devices, so maybe this is the best we can do for now
+>>>>> I think vhost generally needs an API to declare config space endian-ness
+>>>>> to kernel. vdpa can reuse that too then.
+>>>> Yes, I remember you have mentioned some IOCTL to set the endian-ness,
+>>>> for vDPA, I think only the vendor driver knows the endian,
+>>>> so we may need a new function vdpa_ops->get_endian().
+>>>> In the last thread, we say maybe it's better to add a comment for now.
+>>>> But if you think we should add a vdpa_ops->get_endian(), I can work
+>>>> on it for sure!
+>>>>
+>>>> Thanks
+>>>> Zhu Lingshan
+>>> I think QEMU has to set endian-ness. No one else knows.
+>> Yes, for SW based vhost it is true. But for HW vDPA, only
+>> the device & driver knows the endian, I think we can not
+>> "set" a hardware's endian.
+> QEMU knows the guest endian-ness and it knows that
+> device is accessed through the legacy interface.
+> It can accordingly send endian-ness to the kernel and
+> kernel can propagate it to the driver.
 
-On Wed, Jun 22, 2022 at 11:17:50PM +1200, Kai Huang wrote:
-> +Kernel detects TDX and the TDX private KeyIDs during kernel boot.  User
-> +can see below dmesg if TDX is enabled by BIOS:
-> +
-> +|  [..] tdx: SEAMRR enabled.
-> +|  [..] tdx: TDX private KeyID range: [16, 64).
-> +|  [..] tdx: TDX enabled by BIOS.
-> +
-<snipped>
-> +Initializing the TDX module consumes roughly ~1/256th system RAM size to
-> +use it as 'metadata' for the TDX memory.  It also takes additional CPU
-> +time to initialize those metadata along with the TDX module itself.  Both
-> +are not trivial.  Current kernel doesn't choose to always initialize the
-> +TDX module during kernel boot, but provides a function tdx_init() to
-> +allow the caller to initialize TDX when it truly wants to use TDX:
-> +
-> +        ret =3D tdx_init();
-> +        if (ret)
-> +                goto no_tdx;
-> +        // TDX is ready to use
-> +
 
-Hi,
+I wonder if we can simply force LE and then Qemu can do the endian 
+conversion?
 
-The code block above produces Sphinx warnings:
+Thanks
 
-Documentation/x86/tdx.rst:69: WARNING: Unexpected indentation.
-Documentation/x86/tdx.rst:70: WARNING: Block quote ends without a blank lin=
-e; unexpected unindent.
 
-I have applied the fixup:
+>
+>> So if you think we should add a vdpa_ops->get_endian(),
+>> I will drop these comments in the next version of
+>> series, and work on a new patch for get_endian().
+>>
+>> Thanks,
+>> Zhu Lingshan
+> Guests don't get endian-ness from devices so this seems pointless.
+>
 
----- >8 ----
-
-diff --git a/Documentation/x86/tdx.rst b/Documentation/x86/tdx.rst
-index 6c6b09ca6ba407..4430912a2e4f05 100644
---- a/Documentation/x86/tdx.rst
-+++ b/Documentation/x86/tdx.rst
-@@ -62,7 +62,7 @@ use it as 'metadata' for the TDX memory.  It also takes a=
-dditional CPU
- time to initialize those metadata along with the TDX module itself.  Both
- are not trivial.  Current kernel doesn't choose to always initialize the
- TDX module during kernel boot, but provides a function tdx_init() to
--allow the caller to initialize TDX when it truly wants to use TDX:
-+allow the caller to initialize TDX when it truly wants to use TDX::
-=20
-         ret =3D tdx_init();
-         if (ret)
-
-> +If the TDX module is not loaded, dmesg shows below:
-> +
-> +|  [..] tdx: TDX module is not loaded.
-> +
-> +If the TDX module is initialized successfully, dmesg shows something
-> +like below:
-> +
-> +|  [..] tdx: TDX module: vendor_id 0x8086, major_version 1, minor_versio=
-n 0, build_date 20211209, build_num 160
-> +|  [..] tdx: 65667 pages allocated for PAMT.
-> +|  [..] tdx: TDX module initialized.
-> +
-> +If the TDX module failed to initialize, dmesg shows below:
-> +
-> +|  [..] tdx: Failed to initialize TDX module.  Shut it down.
-<snipped>
-> +There are basically two memory hot-add cases that need to be prevented:
-> +ACPI memory hot-add and driver managed memory hot-add.  The kernel
-> +rejectes the driver managed memory hot-add too when TDX is enabled by
-> +BIOS.  For instance, dmesg shows below error when using kmem driver to
-> +add a legacy PMEM as system RAM:
-> +
-> +|  [..] tdx: Unable to add memory [0x580000000, 0x600000000) on TDX enab=
-led platform.
-> +|  [..] kmem dax0.0: mapping0: 0x580000000-0x5ffffffff memory add failed
-> +
-
-For dmesg ouput, use literal code block instead of line blocks, like:
-
----- >8 ----
-
-diff --git a/Documentation/x86/tdx.rst b/Documentation/x86/tdx.rst
-index 4430912a2e4f05..1eaeb7cd14d76f 100644
---- a/Documentation/x86/tdx.rst
-+++ b/Documentation/x86/tdx.rst
-@@ -41,11 +41,11 @@ TDX boot-time detection
- -----------------------
-=20
- Kernel detects TDX and the TDX private KeyIDs during kernel boot.  User
--can see below dmesg if TDX is enabled by BIOS:
-+can see below dmesg if TDX is enabled by BIOS::
-=20
--|  [..] tdx: SEAMRR enabled.
--|  [..] tdx: TDX private KeyID range: [16, 64).
--|  [..] tdx: TDX enabled by BIOS.
-+  [..] tdx: SEAMRR enabled.
-+  [..] tdx: TDX private KeyID range: [16, 64).
-+  [..] tdx: TDX enabled by BIOS.
-=20
- TDX module detection and initialization
- ---------------------------------------
-@@ -79,20 +79,20 @@ caller.
- User can consult dmesg to see the presence of the TDX module, and whether
- it has been initialized.
-=20
--If the TDX module is not loaded, dmesg shows below:
-+If the TDX module is not loaded, dmesg shows below::
-=20
--|  [..] tdx: TDX module is not loaded.
-+  [..] tdx: TDX module is not loaded.
-=20
- If the TDX module is initialized successfully, dmesg shows something
--like below:
-+like below::
-=20
--|  [..] tdx: TDX module: vendor_id 0x8086, major_version 1, minor_version =
-0, build_date 20211209, build_num 160
--|  [..] tdx: 65667 pages allocated for PAMT.
--|  [..] tdx: TDX module initialized.
-+  [..] tdx: TDX module: vendor_id 0x8086, major_version 1, minor_version 0=
-, build_date 20211209, build_num 160
-+  [..] tdx: 65667 pages allocated for PAMT.
-+  [..] tdx: TDX module initialized.
-=20
--If the TDX module failed to initialize, dmesg shows below:
-+If the TDX module failed to initialize, dmesg shows below::
-=20
--|  [..] tdx: Failed to initialize TDX module.  Shut it down.
-+  [..] tdx: Failed to initialize TDX module.  Shut it down.
-=20
- TDX Interaction to Other Kernel Components
- ------------------------------------------
-@@ -143,10 +143,10 @@ There are basically two memory hot-add cases that nee=
-d to be prevented:
- ACPI memory hot-add and driver managed memory hot-add.  The kernel
- rejectes the driver managed memory hot-add too when TDX is enabled by
- BIOS.  For instance, dmesg shows below error when using kmem driver to
--add a legacy PMEM as system RAM:
-+add a legacy PMEM as system RAM::
-=20
--|  [..] tdx: Unable to add memory [0x580000000, 0x600000000) on TDX enable=
-d platform.
--|  [..] kmem dax0.0: mapping0: 0x580000000-0x5ffffffff memory add failed
-+  [..] tdx: Unable to add memory [0x580000000, 0x600000000) on TDX enabled=
- platform.
-+  [..] kmem dax0.0: mapping0: 0x580000000-0x5ffffffff memory add failed
-=20
- However, adding new memory to ZONE_DEVICE should not be prevented as
- those pages are not managed by the page allocator.  Therefore,
-
-Thanks.
-
---=20
-An old man doll... just what I always wanted! - Clara
-
---7MH2uFN9Wf7hT8bf
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iHUEABYIAB0WIQSSYQ6Cy7oyFNCHrUH2uYlJVVFOowUCYv266wAKCRD2uYlJVVFO
-oyx0AP0YyAWyVtjuQQqW4JTzVnNEYTyqobjaY+aeJY4Vn+CWxQEAzzi4fFqlZR3c
-pjH6M71UkIpsnblFe05YyFOFN7r6aAA=
-=J01X
------END PGP SIGNATURE-----
-
---7MH2uFN9Wf7hT8bf--
