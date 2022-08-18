@@ -2,130 +2,95 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id EF4245983F1
-	for <lists+kvm@lfdr.de>; Thu, 18 Aug 2022 15:17:26 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 005C25983F9
+	for <lists+kvm@lfdr.de>; Thu, 18 Aug 2022 15:21:06 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S244990AbiHRNQ1 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 18 Aug 2022 09:16:27 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42492 "EHLO
+        id S244988AbiHRNSo (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 18 Aug 2022 09:18:44 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45682 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S244994AbiHRNQS (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 18 Aug 2022 09:16:18 -0400
-Received: from NAM10-DM6-obe.outbound.protection.outlook.com (mail-dm6nam10on2062.outbound.protection.outlook.com [40.107.93.62])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1DD4EB5149;
-        Thu, 18 Aug 2022 06:16:11 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=OfYGyJ4WEz9+xNtqyt88gthUhG8FF38LHg7N1bQhGXs2fx8FWFG326FUfVzppP2/9rjeBaIgHf3SwGYMWmP3qLQG5QNPkJH76vG7exdyr6NVT9x6FqKmWdshxrURXILpEA7Pm27mq3zODhO8BETb4AXFb7oz+Mz4HgWrFPMHSKNFUfyglXL5a/Ul6xlW3e13kJPuaR6zEv6uBu5A8WbWY35/Xh2CWBEAVNeKsPlfc8HLjFbsqE39DREccBXWKUt7Gop1tWh4A120ZKpF2MNA91RufsxQM5057P7zSpXsNEWKdrhGnlsDbB0G/BwEDNM//j09ngsUhRYZUVBvd2o76Q==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=28VhYa5QunRXQkBBnMZMo/T9V3EeOeRmCT+Y7T+enls=;
- b=MCDNSCSWznYsLBFVRaTqFIBNkcu9yGBnmfJ2l7TKC3ZL6vJRhp8NR4Mf1nVTPJrOd26Xs9DK3D+LdvUWwp7Kl7JN23vEyvdZDkcvFVV7/VUv0LevL0WGi3MPfZAU5APBdK2M19kUM38Qky++VCNCmUu7q6A6ipSEulRfx+xu0EKq/e7ARAe1PmQiSII5pnOwy6DNay7V8e26Yd89NNw02tjAdUev5ovHtGo+TkODeQ2g9umLVNOsjgC05QYrDgNyQhmypW8e4q+yTGfnqZLrHWRwHqkba4VCrF/88Q+bHi3QQHQbNpo+dQuFKIEvE0Aepc81OfsZ29vMGLB6agTH2w==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
- dkim=pass header.d=nvidia.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=28VhYa5QunRXQkBBnMZMo/T9V3EeOeRmCT+Y7T+enls=;
- b=V12GjMOkQ2PLCZWC2LJGL1lI2ARwuWUC3MGfcmfLh123IioyLjvh8AKcTb9Csea58QCGfl1T+JPOd/zMphn943yUDWtdVZwZP7MH/y5KMW0rLjPElHkhIGdSRizwed91z96JGeGkCIrs0vnRPuWDoJ4kp0/6a+jiXwd8nHa1E+LPakYVGIIRwNGgaDbwCTyACPqFCqnyp/NNIpI1GypIhcb/wHVWU9hmJ09KR6OP0gOz3+xLSGvcOoalJSmPxMDeSXT/6UhmqEIEk8QBcZk6v0mXQPNAJEXp3aYVtGHeK5ClOUW8AJBgTvPNCN36l5lSq+MGKFjzQjDaOaFzS1l8Fw==
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nvidia.com;
-Received: from MN2PR12MB4192.namprd12.prod.outlook.com (2603:10b6:208:1d5::15)
- by PH8PR12MB7025.namprd12.prod.outlook.com (2603:10b6:510:1bc::22) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5525.19; Thu, 18 Aug
- 2022 13:16:08 +0000
-Received: from MN2PR12MB4192.namprd12.prod.outlook.com
- ([fe80::462:7fe:f04f:d0d5]) by MN2PR12MB4192.namprd12.prod.outlook.com
- ([fe80::462:7fe:f04f:d0d5%6]) with mapi id 15.20.5525.019; Thu, 18 Aug 2022
- 13:16:08 +0000
-Date:   Thu, 18 Aug 2022 10:16:06 -0300
-From:   Jason Gunthorpe <jgg@nvidia.com>
-To:     Christian =?utf-8?B?S8O2bmln?= <christian.koenig@amd.com>
-Cc:     Alex Williamson <alex.williamson@redhat.com>,
-        Cornelia Huck <cohuck@redhat.com>,
-        dri-devel@lists.freedesktop.org, kvm@vger.kernel.org,
-        linaro-mm-sig@lists.linaro.org, linux-media@vger.kernel.org,
-        Sumit Semwal <sumit.semwal@linaro.org>,
-        Daniel Vetter <daniel.vetter@ffwll.ch>,
-        Leon Romanovsky <leon@kernel.org>, linux-rdma@vger.kernel.org,
-        Maor Gottlieb <maorg@nvidia.com>,
-        Oded Gabbay <ogabbay@kernel.org>
-Subject: Re: [PATCH 0/4] Allow MMIO regions to be exported through dma-buf
-Message-ID: <Yv47lkz7FG8vhqA5@nvidia.com>
-References: <0-v1-9e6e1739ed95+5fa-vfio_dma_buf_jgg@nvidia.com>
- <921de79a-9cb3-4217-f079-4b23958a16aa@amd.com>
- <Yv4qlOp9n78B8TFb@nvidia.com>
- <d12fdf94-fbef-b981-2eff-660470ceca22@amd.com>
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <d12fdf94-fbef-b981-2eff-660470ceca22@amd.com>
-X-ClientProxiedBy: MN2PR12CA0027.namprd12.prod.outlook.com
- (2603:10b6:208:a8::40) To MN2PR12MB4192.namprd12.prod.outlook.com
- (2603:10b6:208:1d5::15)
+        with ESMTP id S244978AbiHRNSl (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 18 Aug 2022 09:18:41 -0400
+Received: from mx0a-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8A92A89900;
+        Thu, 18 Aug 2022 06:18:39 -0700 (PDT)
+Received: from pps.filterd (m0098420.ppops.net [127.0.0.1])
+        by mx0b-001b2d01.pphosted.com (8.17.1.5/8.17.1.5) with ESMTP id 27ID0jY2004791;
+        Thu, 18 Aug 2022 13:18:37 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
+ mime-version : subject : to : cc : references : from : in-reply-to :
+ content-type : content-transfer-encoding; s=pp1;
+ bh=ssj/yDLBypS6mx8/sQN/396WrOf9FQBZQ6GN+dBtpC8=;
+ b=j989wUjvd/fkkatCFKJu5cnpyzolQOtNLf8AD42t1QlBX0Z+Xb2Wh5no3noQPSvInNsG
+ f4ULduI67PUp0oj4TqfOWAG4m96kaXxDYASkbvDZ6rAfJJAYhTuO5V7vRbc3YZtjQTsb
+ 9HKQIawvf8Uyeph0Zs9UaT6vUdIZLDl4p0adIoDdCNsqDB6ZgYiHwfMn3P30BCZshnqC
+ W9tVQ+lbFfosSGccqhqdHDr3fpZQh2Co1QWXH3NrIRvxAF7eAJj2AFWqO15bfrEs6aan
+ k5DGQB8du41wBQOMXoY1mBNULIAQcKkeO918F82b1EKt0OUCSfczJDcnBseiqIN08SJ2 7g== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0b-001b2d01.pphosted.com (PPS) with ESMTPS id 3j1nxerp73-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Thu, 18 Aug 2022 13:18:37 +0000
+Received: from m0098420.ppops.net (m0098420.ppops.net [127.0.0.1])
+        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 27ID34vq017629;
+        Thu, 18 Aug 2022 13:18:36 GMT
+Received: from ppma02wdc.us.ibm.com (aa.5b.37a9.ip4.static.sl-reverse.com [169.55.91.170])
+        by mx0b-001b2d01.pphosted.com (PPS) with ESMTPS id 3j1nxerp6n-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Thu, 18 Aug 2022 13:18:36 +0000
+Received: from pps.filterd (ppma02wdc.us.ibm.com [127.0.0.1])
+        by ppma02wdc.us.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 27ID63o6017162;
+        Thu, 18 Aug 2022 13:18:36 GMT
+Received: from b03cxnp08026.gho.boulder.ibm.com (b03cxnp08026.gho.boulder.ibm.com [9.17.130.18])
+        by ppma02wdc.us.ibm.com with ESMTP id 3hx3ka6y7t-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Thu, 18 Aug 2022 13:18:36 +0000
+Received: from b03ledav005.gho.boulder.ibm.com (b03ledav005.gho.boulder.ibm.com [9.17.130.236])
+        by b03cxnp08026.gho.boulder.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 27IDIYnX9241150
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Thu, 18 Aug 2022 13:18:34 GMT
+Received: from b03ledav005.gho.boulder.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id D4B0FBE051;
+        Thu, 18 Aug 2022 13:18:34 +0000 (GMT)
+Received: from b03ledav005.gho.boulder.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id C22EABE053;
+        Thu, 18 Aug 2022 13:18:33 +0000 (GMT)
+Received: from [9.160.64.167] (unknown [9.160.64.167])
+        by b03ledav005.gho.boulder.ibm.com (Postfix) with ESMTP;
+        Thu, 18 Aug 2022 13:18:33 +0000 (GMT)
+Message-ID: <05640a9f-ef84-8ab6-48ee-8a7906ea477f@linux.ibm.com>
+Date:   Thu, 18 Aug 2022 09:18:33 -0400
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: 13ede1b0-315f-4770-3a56-08da811bcfd4
-X-MS-TrafficTypeDiagnostic: PH8PR12MB7025:EE_
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: cMQEts3JrozPyuFh0j56SLEd9XYjUaT8imCp7+51eT9hQ9Eemk1HsJIgO2N+zXm0kTHHjrBGRFDrK0V4v2vsJA5KM5jlRHqdT1UiZLqToUxVPE8zPirvSEV5a/OqgOHR5qu535VLOMh+gI3JEm/EhtTb1kL7N1gX6/nf9OdSwiAeiSHdHgI0gZZTANwzNFaeLjxR0GaN5ZrtrK6KwtHy4i0QLrenryXSEvdxdpxmZSb8nreqL/Pn+5Lm2YwqTpZyODjBlai6+Il7rb0LWhabciwB6Zb746jLpu0UnKlGNzrPT1R+8E0qg4yV+yCTRcVDYVOhXHwNThO36tZnKBMAm6x0rki+GsBcnwnAjJbPBH92bCbnoJB6WTW+spN3r17Y8wvqih1eNfbh1waMSxJ2cimYOw32xUlIzE2TFfQ0mY8+M88WjvaYXa8pXD/ErureSbi5kktGyzu7Dus9BVpsViZc3f9YOEJLw0KFYn43tntLfyY4R0hxywgQve44Pp4dp80ngDxnhHGMfpblNHkMfAuHRfLvGk2uhOmktds9vabUrVKgWO6Dkq/bChPuY/Pd31dTBRGuYSZju+RR4nW/FDvsixi0qQIKavr1/yQ/TT2uXhEAueRLrT1rKn6ctuAoqzw7SOZKtkAli+XZUN5xAaSMBYuGUPgXg4gXSp3dB5h/RNKiK/WfJl8VbIdkGIkxWir+9tv8UoPfhfGC2uVNug==
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:MN2PR12MB4192.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230016)(4636009)(136003)(396003)(366004)(376002)(39860400002)(346002)(66574015)(86362001)(2616005)(186003)(4326008)(83380400001)(38100700002)(66556008)(8676002)(66946007)(66476007)(36756003)(316002)(54906003)(8936002)(5660300002)(7416002)(2906002)(6486002)(41300700001)(6506007)(478600001)(6512007)(26005)(6916009);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?QythYndwUS94eGplN2l4Z3hFdmxQbkJ1c0hqUWFvVExwbWQ0L0FuNGRpWklj?=
- =?utf-8?B?UmxWRUd1NVU3cnVZUEFhdDdlc2xFdUNDZGU0bzVZN3h6QkdxT2Y0U3VqdTEv?=
- =?utf-8?B?aGFLNlZvanFDQXpnai9EV0lEUTQyK3VOMmxUZS80ZCtqRkNZeU5QS2VXUHFG?=
- =?utf-8?B?V1FWQTN1SmFsY0pJbU15SlRwaEpHRUVyZG1RSkpWby9rVnV1UGI5Mm9XWjNN?=
- =?utf-8?B?N2pMeHkzU1BkaHo4VDVFQzBNQUhldDFQbkhsYnlXdWRTY0V5QXpJYy9OeHlv?=
- =?utf-8?B?RG95UDU1OU85b0lHWnpRSU9JQUo3QWNQeUMzNFZkUWxwd1dadEdlQ2hjaGFV?=
- =?utf-8?B?QmVhY2NRMGlYOE5admxnQnZ5ZEsybEYxQ2p4QVVkMnBsVTVLN1NHNjhYUlF6?=
- =?utf-8?B?WWplajR3a1RtSm0yTjVvUlZ4YXUzR0lMdmZVLzl0UUQ2anBaemJpTXFpbnhI?=
- =?utf-8?B?OTV6eEJwWGdocHR5SFJZcDlMMGl4NUh1ZTg3UWF1T3R2U0dBdEtaU3QvRHkr?=
- =?utf-8?B?czYyaEdwcGtQY2NLU2NKeDRhQVpFY2FQc0VCQ0praG4yOXRETi81ZStTUUFu?=
- =?utf-8?B?R0REcE43YXdvVFN5VGVjZndWU3dENTBsaFVTQ1FXalBNbm9hWkZlUUpXWCs3?=
- =?utf-8?B?dnl3UTFWOHFYR2syYXBLUlcvOFJSby9kZEhmbUFBSmVreVIraTNBekUyNkwx?=
- =?utf-8?B?STBrU2x6RHJjVjdPa0JNWUhOTW5NUmhVbTF0SWRhTk84NC9GZWJnVm1jT3h6?=
- =?utf-8?B?RjlIMHY1UW9Fby9sQlQ4b1NzMVhXdSswQ3ZzT3Y5QzdtSitrd3JhQXFpYk5U?=
- =?utf-8?B?Qm43cy9XdWpPZG8xaWlFcjkzNnRrb0dYcVV3Z0pxd3dPZHlHK0JibWN1dUN3?=
- =?utf-8?B?MzZDd1diQnZMdk1UaGVXOXlhL0hCYTNSc0ZLOG1nalJLWWtYM0NHMURtTkY0?=
- =?utf-8?B?M0l2YjdyQUIxNlJpSWFlWXdjYWgxSm10WGE5YmttQklVRzhneE9UMWpPTkRW?=
- =?utf-8?B?WkVwVWN4b2VoNG1DZHYyUkZQeUJ5dTl1RlZETGwzNG1rY3FVbUd4NDFzQ2pF?=
- =?utf-8?B?eTk4clBoREVvcnVrWkRoN3Z0S0U5bzFRbUtSUzJtWmVReXYwTWpqd1NFYVBL?=
- =?utf-8?B?ZXNuT1JzOW92SDdkd2hSa0NpY2kvWjdqcE4wOXBCRnBpNTRCOHlmalhnQ0o1?=
- =?utf-8?B?RVZBUlBNM0laQnR1TmRuK0tkQ2c2bUpTQmozUHdSRWlRU3RQSnJ5REs5SkJX?=
- =?utf-8?B?WDJsMGxHNFg5c1hBYzZBTXpSSWlld2hjQUw1aU5pVmNTNWNPRkJjRm1hOGdk?=
- =?utf-8?B?dHFuUXM1R1JUSTEzbFlERUZkM0Z4L3VLaWFxZlk1ald3c0FHSzVWb0xWZlRR?=
- =?utf-8?B?dkozM2hUc1lZSHVRQWtqaUQ1Q2xKYWFiQlluWm8wYVR6b2pONkhMYUxXOEZu?=
- =?utf-8?B?ZjFnb04ycXdWR3A3MGd3QW5WY2QvQ3ZUNGJuZFlqaGkrRmJad0RJOWtUQjI2?=
- =?utf-8?B?b2laS2pzbVJiY3Z4S3pUalZnUE93L0VzdmU3dk96S2YvRDEzT0UvRFg4d0d4?=
- =?utf-8?B?SjNGMUlwR3I2Qm91SnNiTktzTVNycWRSS1g1QlRnZ1YzakwxMU5WK2dsMDRF?=
- =?utf-8?B?MjZkOWRncmI1cUJQVjhvUWZPejN0blh6R1FveU5lSzRUaVdsVWZIajBNcUlj?=
- =?utf-8?B?Nit0NzlNSWp0aHhkYzJXUklLOEFmSkdjT0lyYTcwZDVVSzdleUZDSDdWZStk?=
- =?utf-8?B?RDR6WmlJQytMY245eGpyNEpMeW1NVDJNVU1yNmwybDdoNE9TWlUzcWJyMHdL?=
- =?utf-8?B?WTNqVlRObnNTUlMyZW5SMzNRVXZrYnV0NG9lOHh0M0NRbkJHVk9ZUzF1bHpT?=
- =?utf-8?B?OXo2UytCUHJML012RldXalRUZERVYlVvMk9ERDYyTVF0UUVjM29YOW4rcXdX?=
- =?utf-8?B?M1Bidm1uazZnMzBaVFg3eTU5MHllYXFtc1d0dzNaV29RN1BWWjQwT3YydFA4?=
- =?utf-8?B?TXZiSUc3U0IwQXllTkxKU1NaQS9KaHY1S3NwL042V3BjenhnNDRBVkQrVkVl?=
- =?utf-8?B?MFpMYkxsY2F5eUlnTGUrNVFnVU5tam5HbEpoMkhNM082cytzU0UrUVdVUjBj?=
- =?utf-8?Q?NugEBAhd4IK/5ITfEliaVM1Eh?=
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 13ede1b0-315f-4770-3a56-08da811bcfd4
-X-MS-Exchange-CrossTenant-AuthSource: MN2PR12MB4192.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 18 Aug 2022 13:16:07.9269
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: OWhRUz29UZTAaBRZAED1EBbE7uXXTxyKKIP/ImLlvZTEAO09oQnEd6BkLzRfHvdL
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH8PR12MB7025
-X-Spam-Status: No, score=-1.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FORGED_SPF_HELO,
-        RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_NONE,
-        T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED autolearn=no autolearn_force=no
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.11.0
+Subject: Re: [PATCH 0/2] s390/vfio-ap: fix two problems discovered in the
+ vfio_ap driver
+Content-Language: en-US
+To:     Alexander Gordeev <agordeev@linux.ibm.com>
+Cc:     linux-s390@vger.kernel.org, linux-kernel@vger.kernel.org,
+        kvm@vger.kernel.org, jjherne@linux.ibm.com, borntraeger@de.ibm.com,
+        cohuck@redhat.com, mjrosato@linux.ibm.com, pasic@linux.ibm.com,
+        alex.williamson@redhat.com, kwankhede@nvidia.com,
+        fiuczy@linux.ibm.com
+References: <20220817225242.188805-1-akrowiak@linux.ibm.com>
+ <Yv3ynhVYegld5MsO@li-4a3a4a4c-28e5-11b2-a85c-a8d192c6f089.ibm.com>
+From:   Anthony Krowiak <akrowiak@linux.ibm.com>
+In-Reply-To: <Yv3ynhVYegld5MsO@li-4a3a4a4c-28e5-11b2-a85c-a8d192c6f089.ibm.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: 85-_5jbEEr4eZczMr6qQZSV9GB3ZbUxH
+X-Proofpoint-ORIG-GUID: aEi3v0sf_JBrPZBrZ5bgRDu9nHMNAStu
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.205,Aquarius:18.0.895,Hydra:6.0.517,FMLib:17.11.122.1
+ definitions=2022-08-18_12,2022-08-18_01,2022-06-22_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxscore=0 priorityscore=1501
+ mlxlogscore=890 malwarescore=0 lowpriorityscore=0 impostorscore=0
+ suspectscore=0 phishscore=0 bulkscore=0 spamscore=0 clxscore=1015
+ adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2207270000 definitions=main-2208180045
+X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,
+        SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no
         version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -133,55 +98,18 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Aug 18, 2022 at 02:58:10PM +0200, Christian König wrote:
 
-> > > The only thing I'm not 100% convinced of is dma_buf_try_get(), I've seen
-> > > this incorrectly used so many times that I can't count them any more.
-> > > 
-> > > Would that be somehow avoidable? Or could you at least explain the use case
-> > > a bit better.
-> > I didn't see a way, maybe you know of one
-> 
-> For GEM objects we usually don't use the reference count of the DMA-buf, but
-> rather that of the GEM object for this. But that's not an ideal solution
-> either.
+On 8/18/22 4:04 AM, Alexander Gordeev wrote:
+> On Wed, Aug 17, 2022 at 06:52:40PM -0400, Tony Krowiak wrote:
+>> Two problems have been discovered with the vfio_ap device driver since the
+>> hot plug support was recently introduced:
+> Hi Tony,
+>
+> Could you please add Fixes tags to the patches?
 
-You can't really ignore the dmabuf refcount. At some point you have to
-deal with the dmabuf being asynchronously released by userspace.
 
-> > 	down_write(&vdev->memory_lock);
-> > 	list_for_each_entry_safe(priv, tmp, &vdev->dmabufs, dmabufs_elm) {
-> > 		if (!dma_buf_try_get(priv->dmabuf))
-> > 			continue;
-> 
-> What would happen if you don't skip destroyed dma-bufs here? In other words
-> why do you maintain that list in the first place?
+Will do.
 
-The list is to keep track of the dmabufs that were created, it is not
-optional.
 
-The only question is what do you do about invoking
-dma_buf_move_notify() on a dmabuf that is already undergoing
-destruction.
-
-For instance undergoing destruction means the dmabuf core has already
-done this:
-
-	mutex_lock(&db_list.lock);
-	list_del(&dmabuf->list_node);
-	mutex_unlock(&db_list.lock);
-	dma_buf_stats_teardown(dmabuf);
-
-So it seems non-ideal to continue to use it.
-
-However, dma_buf_move_notify() specifically has no issue with that level of
-destruction since it only does
-
-	list_for_each_entry(attach, &dmabuf->attachments, node)
-
-And attachments must be empty if the file refcount is zero.
-
-So we could delete the try_buf and just rely on move being safe on
-partially destroyed dma_buf's as part of the API design.
-
-Jason
+>
+> Thanks!
