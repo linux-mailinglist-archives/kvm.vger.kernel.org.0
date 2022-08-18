@@ -2,308 +2,136 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id EBFA45AF8B3
-	for <lists+kvm@lfdr.de>; Wed,  7 Sep 2022 02:01:15 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id E214A5AF96E
+	for <lists+kvm@lfdr.de>; Wed,  7 Sep 2022 03:44:57 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229609AbiIGABN (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 6 Sep 2022 20:01:13 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46208 "EHLO
+        id S229748AbiIGBoU (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 6 Sep 2022 21:44:20 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33886 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229469AbiIGABL (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 6 Sep 2022 20:01:11 -0400
-Received: from mail-pl1-x62d.google.com (mail-pl1-x62d.google.com [IPv6:2607:f8b0:4864:20::62d])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4672580504
-        for <kvm@vger.kernel.org>; Tue,  6 Sep 2022 17:01:07 -0700 (PDT)
-Received: by mail-pl1-x62d.google.com with SMTP id d12so12841526plr.6
-        for <kvm@vger.kernel.org>; Tue, 06 Sep 2022 17:01:07 -0700 (PDT)
+        with ESMTP id S229480AbiIGBoT (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 6 Sep 2022 21:44:19 -0400
+Received: from mail-pj1-x1029.google.com (mail-pj1-x1029.google.com [IPv6:2607:f8b0:4864:20::1029])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DD21A7FFAC;
+        Tue,  6 Sep 2022 18:44:17 -0700 (PDT)
+Received: by mail-pj1-x1029.google.com with SMTP id q15-20020a17090a304f00b002002ac83485so9323758pjl.0;
+        Tue, 06 Sep 2022 18:44:17 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
+        d=gmail.com; s=20210112;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:from:to:cc:subject:date;
-        bh=4KINN8bQgG3g7plZZyglj9ca0mVzdejq7Tl2ZlMN9nw=;
-        b=Bvmbtp+bk3v0e1YdhwJSLEIJzFzKskTr2LzWuiq95DX1AuV968ibzz9vDb/Xmawl34
-         gx3fqQ2xtAZ5Ruek8JJf6xgh5ceQqR892thpAfFQfsMrJMsAukkL4fXuVAXihwdrmML9
-         Kg8b8IfE+VWEChMmgqQ4YnzeCSBZ4hj8FYkmPyC410qI9Seacqhk10Q1Kl5DQzEqsCnR
-         2chBmO0EnZc3BkbO4G/wsZ8UQnXBoj271P2qTSwF3RL6reTIWn0Az+6SoEwiOqGm9S2u
-         Vc9SdxwXdw2uTNuy8MEWzEEhxuXPpgtwIneZjNfucDNzyE131qTBqPEKvOHYjLcNkrkE
-         ZTRg==
+        bh=BvyWfUoKFedS2O3cuEWewtWgL/+UsS4AV/bMppR9YBY=;
+        b=QwssDy6i5gOjaJYF0wf9BVXVDSjLOzIQRMaSA5lTCd+pQJypukFNAATJgcu4+qBveH
+         Rmv1dnZbUFRwg9hfKk9T0q1WMSfFbDqn+zjplt7l/MRVTV6cv7nKW+SH/0Xaa+PRxrex
+         zs621Zjtz6jvPJFV7hOGyTlEFgaTLgqw6KEjyrXGVtUnue/nciEOcnEFkFmcpKLzxHuw
+         E7VMXGHWPkth38v+npm+H2yxT5dsEfkh4HdsVgS2I3VGeS9xvDLTBDcJltVVAU2ld3XU
+         yrjMpsk7wTzF5lrR03LJZpGScJvuV/DxMXck1+MY0J5+BrNTvT+KLudtwevmDOWGu0S7
+         F/Pw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date;
-        bh=4KINN8bQgG3g7plZZyglj9ca0mVzdejq7Tl2ZlMN9nw=;
-        b=ftj/osmPPcfgwXAwa7cuycS9uxbJGsWl1agHM8qemOwJfR7NVUORxmz4KVFc0y5qUS
-         elswUoHRIvNGtIJt8ZUvDCdGjbj+AsqEUwN3JOZeRq+elDqfRu/kAg1n7TvSx8unh9i2
-         p1lz3XTKmEkX5Ek+UbZJ/0iVKzwpbD0TwETHBmAhddjRIRNgcunrg84PcXZp1+3y9swY
-         PkkaJwQKBh9N0yksVzdxxFBIQYfWCyUmdPzmgFjjMxtafycWkm0N9i5RTkSH4iJrhqKV
-         7bnd/eerjGQj+JxlIrsB6btn21hQ42UJHVhVtmeHfQsVkpaBkk3blWJPvNvhO+K4W3M5
-         /jkA==
-X-Gm-Message-State: ACgBeo1FrsobSPPf99KYMkmPiHbX1yYWRePsJ1jrk49kzw66q6OCAti5
-        R0Ee4lGd3jj/2B0vom0v6g2A3A==
-X-Google-Smtp-Source: AA6agR5Vrv7OUut/ywWDgmtQ9W1drvYInJh+XUP/YLRziq1/SAXk9IzBOJOes1Cpg6b0+YgYP6Vmmw==
-X-Received: by 2002:a17:902:f712:b0:171:29d0:6f9f with SMTP id h18-20020a170902f71200b0017129d06f9fmr1177720plo.84.1662508866560;
-        Tue, 06 Sep 2022 17:01:06 -0700 (PDT)
-Received: from google.com (33.5.83.34.bc.googleusercontent.com. [34.83.5.33])
-        by smtp.gmail.com with ESMTPSA id e6-20020a656886000000b00434e2e1a82bsm232612pgt.66.2022.09.06.17.01.06
+        bh=BvyWfUoKFedS2O3cuEWewtWgL/+UsS4AV/bMppR9YBY=;
+        b=pi6vAt1lvTMyMeZGVpQebvwrd5+f5jKtP0MSKpuGMdH4zqGyxgO+EUTXU/PRdAR3bv
+         ZOonnQAvZMMNoy1TZtm/6UU5jCr6j5kzB8OJr68JhLNo+E4roEhKnG7OsR7IfUyUHfEf
+         lT/20Gu34NoVSVKDfqIrX1KyB9LhdFqsZr+VmZwJdV5jIGuIyWSmtqzefMb7mS0mXdub
+         Uin0zY9a+PJ5/gsTjrdPn6JOnEpICcp/w9NcSTUCsIPGKTCpFjb6FRo+ula+HUD4P76h
+         tWM29lPYzcVDPHKHMXeH4nW9RgezPN4jnD5vTE3CVO0auaTfs6e11SAgipM4t/AQTgFi
+         wLGQ==
+X-Gm-Message-State: ACgBeo2Fk54g9IVEMN8Xw5ooHzge5Hb/jbuaO8x/yTZMB99PSW8kQYsw
+        uQDXdL7c8BGJiJU8Yv1ox6A=
+X-Google-Smtp-Source: AA6agR7iTgTbHnCw9ar66lt9Q7u+yBE+eq3kHUld5PUljWZFXkSpFPVy2E7fHubXuGcSxTspNf7Xjg==
+X-Received: by 2002:a17:90b:4a02:b0:1fe:1391:314d with SMTP id kk2-20020a17090b4a0200b001fe1391314dmr28380891pjb.216.1662515057196;
+        Tue, 06 Sep 2022 18:44:17 -0700 (PDT)
+Received: from localhost (ec2-13-57-97-131.us-west-1.compute.amazonaws.com. [13.57.97.131])
+        by smtp.gmail.com with ESMTPSA id i11-20020a056a00004b00b0053ba52b49a3sm7275713pfk.25.2022.09.06.18.44.16
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 06 Sep 2022 17:01:06 -0700 (PDT)
-Date:   Wed, 7 Sep 2022 00:01:02 +0000
-From:   Mingwei Zhang <mizhang@google.com>
-To:     Sean Christopherson <seanjc@google.com>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org, Maxim Levitsky <mlevitsk@redhat.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Oliver Upton <oupton@google.com>,
-        Jim Mattson <jmattson@google.com>
-Subject: Re: [PATCH v2 1/4] KVM: x86: move the event handling of
- KVM_REQ_GET_VMCS12_PAGES into a common function
-Message-ID: <YxffPlIL/17kZY0k@google.com>
-References: <20220828222544.1964917-1-mizhang@google.com>
- <20220828222544.1964917-2-mizhang@google.com>
- <YwzkvfT0AiwaojTx@google.com>
+        Tue, 06 Sep 2022 18:44:16 -0700 (PDT)
+Date:   Thu, 18 Aug 2022 14:20:06 +0000
+From:   Bobby Eshleman <bobbyeshleman@gmail.com>
+To:     "Michael S. Tsirkin" <mst@redhat.com>
+Cc:     Bobby Eshleman <bobby.eshleman@gmail.com>,
+        Bobby Eshleman <bobby.eshleman@bytedance.com>,
+        Cong Wang <cong.wang@bytedance.com>,
+        Jiang Wang <jiang.wang@bytedance.com>,
+        Stefan Hajnoczi <stefanha@redhat.com>,
+        Stefano Garzarella <sgarzare@redhat.com>,
+        Jason Wang <jasowang@redhat.com>,
+        "David S. Miller" <davem@davemloft.net>,
+        Eric Dumazet <edumazet@google.com>,
+        Jakub Kicinski <kuba@kernel.org>,
+        Paolo Abeni <pabeni@redhat.com>, kvm@vger.kernel.org,
+        virtualization@lists.linux-foundation.org, netdev@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+Subject: Re: [PATCH 3/6] vsock: add netdev to vhost/virtio vsock
+Message-ID: <Yv5KVHgUtcpHgWML@bullseye>
+References: <cover.1660362668.git.bobby.eshleman@bytedance.com>
+ <5a93c5aad99d79f028d349cb7e3c128c65d5d7e2.1660362668.git.bobby.eshleman@bytedance.com>
+ <20220906065523-mutt-send-email-mst@kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <YwzkvfT0AiwaojTx@google.com>
-X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-        T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL
-        autolearn=ham autolearn_force=no version=3.4.6
+In-Reply-To: <20220906065523-mutt-send-email-mst@kernel.org>
+X-Spam-Status: No, score=1.3 required=5.0 tests=BAYES_00,DATE_IN_PAST_96_XX,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
+        RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
+        autolearn=no autolearn_force=no version=3.4.6
+X-Spam-Level: *
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Aug 29, 2022, Sean Christopherson wrote:
-> On Sun, Aug 28, 2022, Mingwei Zhang wrote:
-> > Create a common function to handle kvm request in the vcpu_run loop. KVM
-> > implicitly assumes the virtual APIC page being present + mapped into the
-> > kernel address space when executing vmx_guest_apic_has_interrupts().
-> > However, with demand paging KVM breaks the assumption, as the
-> > KVM_REQ_GET_VMCS12_PAGES event isn't assessed before entering vcpu_block.
-> 
-> KVM_REQ_GET_VMCS12_PAGES doesn't exist upstream.
-
-ack.
-> 
-> > Fix this by getting vmcs12 pages before inspecting the guest's APIC page.
-> > Because of this fix, the event handling code of
-> > KVM_REQ_GET_NESTED_STATE_PAGES becomes a common code path for both
-> > vcpu_enter_guest() and vcpu_block(). Thus, put this code snippet into a
-> > common helper function to avoid code duplication.
+On Tue, Sep 06, 2022 at 06:58:32AM -0400, Michael S. Tsirkin wrote:
+> On Mon, Aug 15, 2022 at 10:56:06AM -0700, Bobby Eshleman wrote:
+> > In order to support usage of qdisc on vsock traffic, this commit
+> > introduces a struct net_device to vhost and virtio vsock.
 > > 
-> > Cc: Maxim Levitsky <mlevitsk@redhat.com>
-> > Cc: Vitaly Kuznetsov <vkuznets@redhat.com>
-> > Originally-by: Oliver Upton <oupton@google.com>
-> > Signed-off-by: Oliver Upton <oupton@google.com>
-> 
-> If you drop someone as author, then their SOB also needs to be jettisoned.
-> 
-
-ack.
-
-> > Signed-off-by: Mingwei Zhang <mizhang@google.com>
-> > ---
-> >  arch/x86/kvm/x86.c | 29 +++++++++++++++++++++++------
-> >  1 file changed, 23 insertions(+), 6 deletions(-)
+> > Two new devices are created, vhost-vsock for vhost and virtio-vsock
+> > for virtio. The devices are attached to the respective transports.
 > > 
-> > diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-> > index d7374d768296..3dcaac8f0584 100644
-> > --- a/arch/x86/kvm/x86.c
-> > +++ b/arch/x86/kvm/x86.c
-> > @@ -10261,12 +10261,6 @@ static int vcpu_enter_guest(struct kvm_vcpu *vcpu)
-> >  			r = -EIO;
-> >  			goto out;
-> >  		}
-> > -		if (kvm_check_request(KVM_REQ_GET_NESTED_STATE_PAGES, vcpu)) {
-> > -			if (unlikely(!kvm_x86_ops.nested_ops->get_nested_state_pages(vcpu))) {
-> > -				r = 0;
-> > -				goto out;
-> > -			}
-> > -		}
-> >  		if (kvm_check_request(KVM_REQ_MMU_FREE_OBSOLETE_ROOTS, vcpu))
-> >  			kvm_mmu_free_obsolete_roots(vcpu);
-> >  		if (kvm_check_request(KVM_REQ_MIGRATE_TIMER, vcpu))
-> > @@ -10666,6 +10660,23 @@ static inline bool kvm_vcpu_running(struct kvm_vcpu *vcpu)
-> >  		!vcpu->arch.apf.halted);
-> >  }
-> >  
-> > +static int kvm_vcpu_handle_common_requests(struct kvm_vcpu *vcpu)
-> > +{
-> > +	if (kvm_request_pending(vcpu)) {
+> > To bypass the usage of the device, the user may "down" the associated
+> > network interface using common tools. For example, "ip link set dev
+> > virtio-vsock down" lets vsock bypass the net_device and qdisc entirely,
+> > simply using the FIFO logic of the prior implementation.
+> > 
+> > For both hosts and guests, there is one device for all G2H vsock sockets
+> > and one device for all H2G vsock sockets. This makes sense for guests
+> > because the driver only supports a single vsock channel (one pair of
+> > TX/RX virtqueues), so one device and qdisc fits. For hosts, this may not
+> > seem ideal for some workloads. However, it is possible to use a
+> > multi-queue qdisc, where a given queue is responsible for a range of
+> > sockets. This seems to be a better solution than having one device per
+> > socket, which may yield a very large number of devices and qdiscs, all
+> > of which are dynamically being created and destroyed. Because of this
+> > dynamism, it would also require a complex policy management daemon, as
+> > devices would constantly be spun up and down as sockets were created and
+> > destroyed. To avoid this, one device and qdisc also applies to all H2G
+> > sockets.
+> > 
+> > Signed-off-by: Bobby Eshleman <bobby.eshleman@bytedance.com>
 > 
-> Probably going to be a moot point, but write this as
 > 
-> 	if (!kvm_request_pending(vcpu))
-> 		return 1;
+> I've been thinking about this generally. vsock currently
+> assumes reliability, but with qdisc can't we get
+> packet drops e.g. depending on the queueing?
 > 
-> to reduce indentation.
-> 
-> > +		/*
-> > +		 * Get the vmcs12 pages before checking for interrupts that
-> > +		 * might unblock the guest if L1 is using virtual-interrupt
-> > +		 * delivery.
-> > +		 */
-> > +		if (kvm_check_request(KVM_REQ_GET_NESTED_STATE_PAGES, vcpu)) {
-> > +			if (unlikely(!kvm_x86_ops.nested_ops->get_nested_state_pages(vcpu)))
-> 
-> Similarly
-> 
-> 	if (kvm_check_request(KVM_REQ_GET_NESTED_STATE_PAGES, vcpu) &&
-> 	    unlikely(!kvm_x86_ops.nested_ops->get_nested_state_pages(vcpu)))
-> 		return 0;
-> 
-> though I can see the argument for fully isolating each request.  But again, likely
-> a moot point.
-> 
-> > +				return 0;
-> > +		}
-> > +	}
-> > +
-> > +	return 1;
-> > +}
-> > +
-> >  /* Called within kvm->srcu read side.  */
-> >  static int vcpu_run(struct kvm_vcpu *vcpu)
-> >  {
-> > @@ -10681,6 +10692,12 @@ static int vcpu_run(struct kvm_vcpu *vcpu)
-> >  		 * this point can start executing an instruction.
-> >  		 */
-> >  		vcpu->arch.at_instruction_boundary = false;
-> > +
-> > +		/* Process common request regardless of vcpu state. */
-> > +		r = kvm_vcpu_handle_common_requests(vcpu);
-> 
-> IMO this is subtly a dangerous hook.  It implies that both vcpu_enter_guest()
-> and vcpu_block() correctly handle requests becoming pending after the "common"
-> check, but that's not actually the case.  If a request _needs_ to be handled
-> before vcpu_block(), then ideally it should be explicitly queried in
-> kvm_vcpu_check_block().  KVM_REQ_GET_NESTED_STATE_PAGES doesn't have issues because
-> it's only ever set from the vCPU itself.
-> 
-> Following that train of thought, KVM_REQ_GET_NESTED_STATE_PAGES really shouldn't
-> even be a request.  Aha!  And we can do that in a way that would magically fix this
-> bug, and would ensure we don't leave a trap for future us.
-> 
-> KVM already provides KVM_REQ_UNBLOCK to prevent blocking the vCPU without actaully
-> waking the vCPU, i.e. to kick the vCPU back into the vcpu_run() loop.  The request
-> is provided specifically for scenarios like this where KVM needs to do work before
-> blocking.
+> What prevents user from configuring such a discipline?
+> One thing people like about vsock is that it's very hard
+> to break H2G communication even with misconfigured
+> networking.
 > 
 
-hmm. I think this won't work. The warning is happening at this trace
-(although the dynamic trace does not show the full stack trace in source
-code):
+If qdisc decides to discard a packet, it returns NET_XMIT_CN via
+dev_queue_xmit(). This v1 allows this quietly, but v2 could return
+an error to the user (-ENOMEM or maybe -ENOBUFS) when this happens, similar
+to when vsock is unable to enqueue a packet currently.
 
-WARN_ON_ONCE(!vmx->nested.virtual_apic_map.gfn))
-vmx_guest_apic_has_interrupt()
-kvm_guest_apic_has_interrupt()
-kvm_vcpu_has_events()
-kvm_arch_vcpu_runnablea()
-kvm_vcpu_check_block()
+The user could still, for example, choose the noop qdisc. Assuming the
+v2 change mentioned above, their sendmsg() calls will return errors.
+Similar to how if they choose the wrong CID they will get an error when
+connecting a socket.
 
-If you go to kvm_vcpu_check_block(), the check of KVM_REQ_UNBLOCK is
-behind check of kvm_arch_vcpu_runnable(). So, with the diff you pointed
-out, we will still see the warning.
-
-Maybe what we can do is to re-order the
-kvm_check_request(KVM_REQ_UNBLOCK, vcpu) to the beginning of the
-kvm_vcpu_check_block()? But I am not sure.
-
-Thanks.
--Mingwei
-> Normally I'd say we should do this over multiple patches so that the "blocking"
-> bug is fixed before doing the rework/cleanup, but I'm ok if we want to skip straight
-> to the rework since we're obviously carrying an internal patch and no one else is
-> likely to need the fix.  But I also wouldn't object to including an intermediate
-> patch to fix the bug so that there's a better paper trail.
-> 
-> E.g. as a very partial conversion:
-> 
-> ---
->  arch/x86/include/asm/kvm_host.h |  2 ++
->  arch/x86/kvm/vmx/nested.c       |  2 +-
->  arch/x86/kvm/x86.c              | 12 ++++++++++++
->  arch/x86/kvm/x86.h              | 10 ++++++++++
->  4 files changed, 25 insertions(+), 1 deletion(-)
-> 
-> diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
-> index 9345303c8c6d..bfca37419783 100644
-> --- a/arch/x86/include/asm/kvm_host.h
-> +++ b/arch/x86/include/asm/kvm_host.h
-> @@ -939,6 +939,8 @@ struct kvm_vcpu_arch {
->  	 */
->  	bool pdptrs_from_userspace;
-> 
-> +	bool nested_get_pages_pending;
-> +
->  #if IS_ENABLED(CONFIG_HYPERV)
->  	hpa_t hv_root_tdp;
->  #endif
-> diff --git a/arch/x86/kvm/vmx/nested.c b/arch/x86/kvm/vmx/nested.c
-> index ddd4367d4826..e83b145c3a35 100644
-> --- a/arch/x86/kvm/vmx/nested.c
-> +++ b/arch/x86/kvm/vmx/nested.c
-> @@ -3446,7 +3446,7 @@ enum nvmx_vmentry_status nested_vmx_enter_non_root_mode(struct kvm_vcpu *vcpu,
->  		 * to nested_get_vmcs12_pages before the next VM-entry.  The MSRs
->  		 * have already been set at vmentry time and should not be reset.
->  		 */
-> -		kvm_make_request(KVM_REQ_GET_NESTED_STATE_PAGES, vcpu);
-> +		kvm_nested_get_pages_set_pending(vcpu);
->  	}
-> 
->  	/*
-> diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-> index c0e3e7915a3a..0a7601ebffc6 100644
-> --- a/arch/x86/kvm/x86.c
-> +++ b/arch/x86/kvm/x86.c
-> @@ -9650,6 +9650,12 @@ int kvm_check_nested_events(struct kvm_vcpu *vcpu)
->  	return kvm_x86_ops.nested_ops->check_events(vcpu);
->  }
-> 
-> +static int kvm_get_nested_state_pages(struct kvm_vcpu *vcpu)
-> +{
-> +	vcpu->arch.nested_get_pages_pending = false;
-> +	return kvm_x86_ops.nested_ops->get_nested_state_pages(vcpu);
-> +}
-> +
->  static void kvm_inject_exception(struct kvm_vcpu *vcpu)
->  {
->  	trace_kvm_inj_exception(vcpu->arch.exception.nr,
-> @@ -10700,6 +10706,12 @@ static int vcpu_run(struct kvm_vcpu *vcpu)
->  		if (kvm_cpu_has_pending_timer(vcpu))
->  			kvm_inject_pending_timer_irqs(vcpu);
-> 
-> +		if (vcpu->arch.nested_get_pages_pending) {
-> +			r = kvm_get_nested_state_pages(vcpu);
-> +			if (r <= 0)
-> +				break;
-> +		}
-> +
->  		if (dm_request_for_irq_injection(vcpu) &&
->  			kvm_vcpu_ready_for_interrupt_injection(vcpu)) {
->  			r = 0;
-> diff --git a/arch/x86/kvm/x86.h b/arch/x86/kvm/x86.h
-> index 1926d2cb8e79..e35aac39dc73 100644
-> --- a/arch/x86/kvm/x86.h
-> +++ b/arch/x86/kvm/x86.h
-> @@ -481,4 +481,14 @@ int kvm_sev_es_string_io(struct kvm_vcpu *vcpu, unsigned int size,
->  			 unsigned int port, void *data,  unsigned int count,
->  			 int in);
-> 
-> +static inline void kvm_nested_get_pages_set_pending(struct kvm_vcpu *vcpu)
-> +{
-> +	/*
-> +	 * Here is a comment explaining why KVM needs to prevent the vCPU from
-> +	 * blocking until the vCPU's nested pages have been loaded.
-> +	 */
-> +	vcpu->arch.nested_get_pages_pending = true;
-> +	kvm_make_request(KVM_REQ_UNBLOCK, vcpu);
-> +}
-> +
->  #endif
-> 
-> base-commit: 14a47a98151834c5bd2f6d8d592b01108a3f882a
-> --
+Best,
+Bobby
