@@ -2,164 +2,169 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 6F870597D9B
-	for <lists+kvm@lfdr.de>; Thu, 18 Aug 2022 06:41:38 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 76CA4597E26
+	for <lists+kvm@lfdr.de>; Thu, 18 Aug 2022 07:41:04 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S243389AbiHREee (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 18 Aug 2022 00:34:34 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54950 "EHLO
+        id S243314AbiHRFki (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 18 Aug 2022 01:40:38 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47822 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S240330AbiHREec (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 18 Aug 2022 00:34:32 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1AC68558E5
-        for <kvm@vger.kernel.org>; Wed, 17 Aug 2022 21:34:31 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1660797270;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=TTFivvm9yHWKcVUkneavFwNxYuu+2L1pR/LF0ZMw4pU=;
-        b=ZD6T9/If3ts/7NjFEKI8O36CiSuvqNQjKDMNmC/IefFnhpI1I7L+PulivbErvj8ID6wrEm
-        62jUQPBAH7ACKu2hx+f1qnTTjYlR2XWzwdjfU2kW6W49XwGYA+o/jImQQNuCLZRTHPnY2m
-        XtZAumlg6OrohSr7KSP+GtzIsRxyP/c=
-Received: from mail-pg1-f197.google.com (mail-pg1-f197.google.com
- [209.85.215.197]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_128_GCM_SHA256) id
- us-mta-172-NkhAOTa4NMO5eYx9XN918Q-1; Thu, 18 Aug 2022 00:34:28 -0400
-X-MC-Unique: NkhAOTa4NMO5eYx9XN918Q-1
-Received: by mail-pg1-f197.google.com with SMTP id c34-20020a634e22000000b00429983d22f0so272456pgb.17
-        for <kvm@vger.kernel.org>; Wed, 17 Aug 2022 21:34:28 -0700 (PDT)
+        with ESMTP id S242734AbiHRFkf (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 18 Aug 2022 01:40:35 -0400
+Received: from mail-qt1-x836.google.com (mail-qt1-x836.google.com [IPv6:2607:f8b0:4864:20::836])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 98EC771725
+        for <kvm@vger.kernel.org>; Wed, 17 Aug 2022 22:40:34 -0700 (PDT)
+Received: by mail-qt1-x836.google.com with SMTP id j17so416951qtp.12
+        for <kvm@vger.kernel.org>; Wed, 17 Aug 2022 22:40:34 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112;
+        h=mime-version:references:message-id:in-reply-to:subject:cc:to:from
+         :date:from:to:cc;
+        bh=c4YN6O08AaYBNToE2Um1itfC+MNp00Kd+ydM+T0W7ko=;
+        b=IZg9hsqi4ssQ7fuSUIn7+iozROcN5MvemR4pWibTfFN+hfgd52YevwqpQv+32PXVtk
+         tMKwa30Shd3IsjRcMLHYaAnJfl/UHy6ihTpMO5jxCGTVmCK8t9Q/fI2uh+GiuGiPBmQT
+         hK2VF/OtxMLDbC/ytFlCkss/tfpwYlp5+ZwaMpzIEC+P6HlTmxeljMnHhkBQPeC4di9d
+         T2u0GkCtVLOLm6jsVJ/3uxGfDAAj5JLx6gR6GsoWNUhw61Zp1rHlGIeQeHfYiVPTdajB
+         O6i+/DSqdHmANKvtofbV85bdjkpgDV6mKg5DiLTieyv2rXLbetaIRb7kxG6T1BLHQnBp
+         SkEQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc;
-        bh=TTFivvm9yHWKcVUkneavFwNxYuu+2L1pR/LF0ZMw4pU=;
-        b=AgE9gCib10qe+495DB0xxgBSNuC9RAGlzejSYlkZs3Uc3OpwQxwQo2aojbBo2meWgH
-         KEepGznyLWCnmIZpXmJ3HNxcXCK24shg0iDJ+w7+7BwvPzX59xI23mZGE+6eY2aUMGkk
-         oaa8K+oOwxOXvdCBHt5c6zbD79DCtc1oLReI48RpCQ9ONSHPn/ModOoSmuGkObN5NVYl
-         8OsSgtAY1F33Pufl6BHT3s82EbTFyeICWSZLg1KLQfDhdtFGiYbbyGtNWqyQ1bJeet8C
-         3Y+JFjn4uRbgAF09uOVPzXaNUgJ9mld/2m+cIZGJalTRe8CNKFWiD7R3QPDupB6zPGj7
-         Y2lQ==
-X-Gm-Message-State: ACgBeo1phfELOpt6/pq4A1G+5OzW44acnIB/xm+6t2aZMzezx+cx/XD/
-        9/NfpGjAnYCYUbF6+6tzOrhsIgtOjum16ZND+cse5fb1tvdk46domCTUb8MY1g34NsyR05yIAD1
-        F1QpBDpoWRT+f
-X-Received: by 2002:a63:8848:0:b0:41c:45da:2db9 with SMTP id l69-20020a638848000000b0041c45da2db9mr1153068pgd.206.1660797267584;
-        Wed, 17 Aug 2022 21:34:27 -0700 (PDT)
-X-Google-Smtp-Source: AA6agR7J3KtemYhLGoQErkrW2ImQSRRyS97OCrKf8dXjnhmz4oWC74Pc+PzZXQUPK8eeQKBWL8Ujlw==
-X-Received: by 2002:a63:8848:0:b0:41c:45da:2db9 with SMTP id l69-20020a638848000000b0041c45da2db9mr1153060pgd.206.1660797267343;
-        Wed, 17 Aug 2022 21:34:27 -0700 (PDT)
-Received: from [10.72.13.223] ([209.132.188.80])
-        by smtp.gmail.com with ESMTPSA id m11-20020a170902db0b00b001637529493esm299625plx.66.2022.08.17.21.34.20
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 17 Aug 2022 21:34:26 -0700 (PDT)
-Message-ID: <2747ac1f-390e-99f9-b24e-f179af79a9da@redhat.com>
-Date:   Thu, 18 Aug 2022 12:34:19 +0800
+        h=mime-version:references:message-id:in-reply-to:subject:cc:to:from
+         :date:x-gm-message-state:from:to:cc;
+        bh=c4YN6O08AaYBNToE2Um1itfC+MNp00Kd+ydM+T0W7ko=;
+        b=bw3xhHisi7fe1nMekYksJRpQa/ZOG4ZPc2Ll+aVW0veho16wkz5yXGfZpCjUG10kj+
+         rCxWEVfDieC5orlZuwYCkzl7JjZHaEHSOBPL36MgO4a2QGF6bUzkpmY8yNcuJmA+/Q6G
+         rj8OXDLyy84LNegIL4FlkvuSLRq44VsPwxmsOrcjnekJ9G5YKuHh3eQ8YTqHJUVXsBFS
+         y9XXXGgm063LZGf1U/2YrHOBvhnoH4itW6AvhfvRcxggnSyFH6JTe3OX56aHgZsf+6V1
+         D2iPRdXXTYh1AxWF7aZeVjN66+eY4Cvdh6OqcBfkOMkz1ctqOVDEYPbn2U0WIj3lTRFH
+         rtHw==
+X-Gm-Message-State: ACgBeo35ykN1JCTSBwWrPgP8H7rapuC5wiBI6UXrCrLjJKQw2XDWhSFg
+        ehV0RYBKdpEREMzlghqP8iRfZw==
+X-Google-Smtp-Source: AA6agR4Fw98jiMqwiSkyP6cz6JD/D6jUG7NFWUxowXwEedXtNOOsMzX1sD0rCuxeyRSGmm1fcXkVkw==
+X-Received: by 2002:a05:622a:1745:b0:343:5e40:47b1 with SMTP id l5-20020a05622a174500b003435e4047b1mr1310585qtk.120.1660801233516;
+        Wed, 17 Aug 2022 22:40:33 -0700 (PDT)
+Received: from ripple.attlocal.net (172-10-233-147.lightspeed.sntcca.sbcglobal.net. [172.10.233.147])
+        by smtp.gmail.com with ESMTPSA id m1-20020a05620a290100b006b95f832aebsm787055qkp.96.2022.08.17.22.40.29
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 17 Aug 2022 22:40:33 -0700 (PDT)
+Date:   Wed, 17 Aug 2022 22:40:12 -0700 (PDT)
+From:   Hugh Dickins <hughd@google.com>
+X-X-Sender: hugh@ripple.anvils
+To:     Chao Peng <chao.p.peng@linux.intel.com>
+cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+        linux-mm@kvack.org, linux-fsdevel@vger.kernel.org,
+        linux-api@vger.kernel.org, linux-doc@vger.kernel.org,
+        qemu-devel@nongnu.org, linux-kselftest@vger.kernel.org,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Jonathan Corbet <corbet@lwn.net>,
+        Sean Christopherson <seanjc@google.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+        x86@kernel.org, "H . Peter Anvin" <hpa@zytor.com>,
+        Hugh Dickins <hughd@google.com>,
+        Jeff Layton <jlayton@kernel.org>,
+        "J . Bruce Fields" <bfields@fieldses.org>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        Shuah Khan <shuah@kernel.org>, Mike Rapoport <rppt@kernel.org>,
+        Steven Price <steven.price@arm.com>,
+        "Maciej S . Szmigiero" <mail@maciej.szmigiero.name>,
+        Vlastimil Babka <vbabka@suse.cz>,
+        Vishal Annapurve <vannapurve@google.com>,
+        Yu Zhang <yu.c.zhang@linux.intel.com>,
+        "Kirill A . Shutemov" <kirill.shutemov@linux.intel.com>,
+        luto@kernel.org, jun.nakajima@intel.com, dave.hansen@intel.com,
+        ak@linux.intel.com, david@redhat.com, aarcange@redhat.com,
+        ddutile@redhat.com, dhildenb@redhat.com,
+        Quentin Perret <qperret@google.com>,
+        Michael Roth <michael.roth@amd.com>, mhocko@suse.com,
+        Muchun Song <songmuchun@bytedance.com>,
+        "Gupta, Pankaj" <pankaj.gupta@amd.com>
+Subject: Re: [PATCH v7 00/14] KVM: mm: fd-based approach for supporting KVM
+ guest private memory
+In-Reply-To: <20220706082016.2603916-1-chao.p.peng@linux.intel.com>
+Message-ID: <ff5c5b97-acdf-9745-ebe5-c6609dd6322e@google.com>
+References: <20220706082016.2603916-1-chao.p.peng@linux.intel.com>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:91.0)
- Gecko/20100101 Thunderbird/91.12.0
-Subject: Re: [PATCH 3/6] vsock: add netdev to vhost/virtio vsock
-Content-Language: en-US
-To:     "Michael S. Tsirkin" <mst@redhat.com>,
-        Bobby Eshleman <bobbyeshleman@gmail.com>
-Cc:     Jakub Kicinski <kuba@kernel.org>,
-        Bobby Eshleman <bobby.eshleman@gmail.com>,
-        Bobby Eshleman <bobby.eshleman@bytedance.com>,
-        Cong Wang <cong.wang@bytedance.com>,
-        Jiang Wang <jiang.wang@bytedance.com>,
-        Stefan Hajnoczi <stefanha@redhat.com>,
-        Stefano Garzarella <sgarzare@redhat.com>,
-        "David S. Miller" <davem@davemloft.net>,
-        Eric Dumazet <edumazet@google.com>,
-        Paolo Abeni <pabeni@redhat.com>, kvm@vger.kernel.org,
-        virtualization@lists.linux-foundation.org, netdev@vger.kernel.org,
-        linux-kernel@vger.kernel.org,
-        =?UTF-8?Q?Toke_H=c3=b8iland-J=c3=b8rgensen?= <toke@toke.dk>
-References: <cover.1660362668.git.bobby.eshleman@bytedance.com>
- <5a93c5aad99d79f028d349cb7e3c128c65d5d7e2.1660362668.git.bobby.eshleman@bytedance.com>
- <20220816123701-mutt-send-email-mst@kernel.org>
- <20220816110717.5422e976@kernel.org> <YvtAktdB09tM0Ykr@bullseye>
- <20220816160755.7eb11d2e@kernel.org> <YvtVN195TS1xpEN7@bullseye>
- <20220816181528.5128bc06@kernel.org> <Yvt2f5i5R9NNNYUL@bullseye>
- <20220817131437-mutt-send-email-mst@kernel.org>
-From:   Jason Wang <jasowang@redhat.com>
-In-Reply-To: <20220817131437-mutt-send-email-mst@kernel.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
-        RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE
-        autolearn=ham autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=US-ASCII
+X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
+        T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL
+        autolearn=unavailable autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+On Wed, 6 Jul 2022, Chao Peng wrote:
+> This is the v7 of this series which tries to implement the fd-based KVM
+> guest private memory.
 
-在 2022/8/18 01:20, Michael S. Tsirkin 写道:
-> On Tue, Aug 16, 2022 at 10:50:55AM +0000, Bobby Eshleman wrote:
->>>>> Eh, I was hoping it was a side channel of an existing virtio_net
->>>>> which is not the case. Given the zero-config requirement IDK if
->>>>> we'll be able to fit this into netdev semantics :(
->>>> It's certainly possible that it may not fit :/ I feel that it partially
->>>> depends on what we mean by zero-config. Is it "no config required to
->>>> have a working socket" or is it "no config required, but also no
->>>> tuning/policy/etc... supported"?
->>> The value of tuning vs confusion of a strange netdev floating around
->>> in the system is hard to estimate upfront.
->> I think "a strange netdev floating around" is a total
->> mischaracterization... vsock is a networking device and it supports
->> vsock networks. Sure, it is a virtual device and the routing is done in
->> host software, but the same is true for virtio-net and VM-to-VM vlan.
->>
->> This patch actually uses netdev for its intended purpose: to support and
->> manage the transmission of packets via a network device to a network.
->>
->> Furthermore, it actually prepares vsock to eliminate a "strange" use of
->> a netdev. The netdev in vsockmon isn't even used to transmit
->> packets, it's "floating around" for no other reason than it is needed to
->> support packet capture, which vsock couldn't support because it didn't
->> have a netdev.
->>
->> Something smells when we are required to build workaround kernel modules
->> that use netdev for ciphoning packets off to userspace, when we could
->> instead be using netdev for its intended purpose and get the same and
->> more benefit.
-> So what happens when userspace inevitably attempts to bind a raw
-> packet socket to this device? Assign it an IP? Set up some firewall
-> rules?
->
-> These things all need to be addressed before merging since they affect UAPI.
+Here at last are my reluctant thoughts on this patchset.
 
+fd-based approach for supporting KVM guest private memory: fine.
 
-It's possible if
+Use or abuse of memfd and shmem.c: mistaken.
 
-1) extend virtio-net to have vsock queues
+memfd_create() was an excellent way to put together the initial prototype.
 
-2) present vsock device on top of virtio-net via e.g auxiliary bus
+But since then, TDX in particular has forced an effort into preventing
+(by flags, seals, notifiers) almost everything that makes it shmem/tmpfs.
 
-Then raw socket still work at ethernet level while vsock works too.
+Are any of the shmem.c mods useful to existing users of shmem.c? No.
+Is MFD_INACCESSIBLE useful or comprehensible to memfd_create() users? No.
 
-The value is to share codes between the two type of devices (queues).
+What use do you have for a filesystem here?  Almost none.
+IIUC, what you want is an fd through which QEMU can allocate kernel
+memory, selectively free that memory, and communicate fd+offset+length
+to KVM.  And perhaps an interface to initialize a little of that memory
+from a template (presumably copied from a real file on disk somewhere).
 
-Thanks
+You don't need shmem.c or a filesystem for that!
 
+If your memory could be swapped, that would be enough of a good reason
+to make use of shmem.c: but it cannot be swapped; and although there
+are some references in the mailthreads to it perhaps being swappable
+in future, I get the impression that will not happen soon if ever.
 
->
->>> The nice thing about using a built-in fq with no user visible knobs is
->>> that there's no extra uAPI. We can always rip it out and replace later.
->>> And it shouldn't be controversial, making the path to upstream smoother.
->> The issue is that after pulling in fq for one kind of flow management,
->> then as users observe other flow issues, we will need to re-implement
->> pfifo, and then TBF, and then we need to build an interface to let users
->> select one, and to choose queue sizes... and then after awhile we've
->> needlessly re-implemented huge chunks of the tc system.
->>
->> I don't see any good reason to restrict vsock users to using suboptimal
->> and rigid queuing.
->>
->> Thanks.
+If your memory could be migrated, that would be some reason to use
+filesystem page cache (because page migration happens to understand
+that type of memory): but it cannot be migrated.
 
+Some of these impressions may come from earlier iterations of the
+patchset (v7 looks better in several ways than v5).  I am probably
+underestimating the extent to which you have taken on board other
+usages beyond TDX and SEV private memory, and rightly want to serve
+them all with similar interfaces: perhaps there is enough justification
+for shmem there, but I don't see it.  There was mention of userfaultfd
+in one link: does that provide the justification for using shmem?
+
+I'm afraid of the special demands you may make of memory allocation
+later on - surprised that huge pages are not mentioned already;
+gigantic contiguous extents? secretmem removed from direct map?
+
+Here's what I would prefer, and imagine much easier for you to maintain;
+but I'm no system designer, and may be misunderstanding throughout.
+
+QEMU gets fd from opening /dev/kvm_something, uses ioctls (or perhaps
+the fallocate syscall interface itself) to allocate and free the memory,
+ioctl for initializing some of it too.  KVM in control of whether that
+fd can be read or written or mmap'ed or whatever, no need to prevent it
+in shmem.c, no need for flags, seals, notifications to and fro because
+KVM is already in control and knows the history.  If shmem actually has
+value, call into it underneath - somewhat like SysV SHM, and /dev/zero
+mmap, and i915/gem make use of it underneath.  If shmem has nothing to
+add, just allocate and free kernel memory directly, recorded in your
+own xarray.
+
+With that /dev/kvm_something subject to access controls and LSMs -
+which I cannot find for memfd_create().  Full marks for including the
+MFD_INACCESSIBLE manpage update, and for Cc'ing linux-api: but I'd
+have expected some doubts from that direction already.
+
+Hugh
