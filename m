@@ -2,144 +2,164 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id A672259875D
+	by mail.lfdr.de (Postfix) with ESMTP id EEE9159875E
 	for <lists+kvm@lfdr.de>; Thu, 18 Aug 2022 17:25:30 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1344245AbiHRPV1 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 18 Aug 2022 11:21:27 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36648 "EHLO
+        id S1344286AbiHRPWW (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 18 Aug 2022 11:22:22 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38132 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S245599AbiHRPVX (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 18 Aug 2022 11:21:23 -0400
-Received: from mx0a-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 70A5F6A4A2
-        for <kvm@vger.kernel.org>; Thu, 18 Aug 2022 08:21:22 -0700 (PDT)
-Received: from pps.filterd (m0098420.ppops.net [127.0.0.1])
-        by mx0b-001b2d01.pphosted.com (8.17.1.5/8.17.1.5) with ESMTP id 27IFE3vL014437
-        for <kvm@vger.kernel.org>; Thu, 18 Aug 2022 15:21:21 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=from : to : cc : subject
- : date : message-id : mime-version : content-transfer-encoding; s=pp1;
- bh=F8dHGOivibUCNcx1oYtENQ1Aa7I91iE6Tn+cxUG3WNs=;
- b=UfQ2AYTqIbea1hqDqxjKyHxE1vtmVUkJs6IZVkI9hGiep1rltNru4AuHpu4MW4nlYBG2
- wf6nUgHB7jPyCuTflUp9ANJkErdc06a3fZ6hI2IiIdkzCP5zrcC2ewOtLJRUlPJhywh1
- VNBk1iFr8slW1RvXL7e2KoW5uSEKzmo4I3V6/cL47gifOntKDkLo45gzyqqqKKxfHweb
- un4H0irRshilrG0xm9hltfiBiEtgPxIqmaIzxCZUG54WHNnNl7L3XDNRKLajdGgzw9m3
- 3rVpVsCFZMawF1BOP5tdP1gtgaNhK7Gu0ulzV3jstxqD1Hm+DoRYpTe31pMlXY5znq0U OQ== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0b-001b2d01.pphosted.com (PPS) with ESMTPS id 3j1qvr8827-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT)
-        for <kvm@vger.kernel.org>; Thu, 18 Aug 2022 15:21:21 +0000
-Received: from m0098420.ppops.net (m0098420.ppops.net [127.0.0.1])
-        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 27IFEutR017495
-        for <kvm@vger.kernel.org>; Thu, 18 Aug 2022 15:21:20 GMT
-Received: from ppma06fra.de.ibm.com (48.49.7a9f.ip4.static.sl-reverse.com [159.122.73.72])
-        by mx0b-001b2d01.pphosted.com (PPS) with ESMTPS id 3j1qvr881a-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 18 Aug 2022 15:21:20 +0000
-Received: from pps.filterd (ppma06fra.de.ibm.com [127.0.0.1])
-        by ppma06fra.de.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 27IFLIxQ003157;
-        Thu, 18 Aug 2022 15:21:18 GMT
-Received: from b06avi18626390.portsmouth.uk.ibm.com (b06avi18626390.portsmouth.uk.ibm.com [9.149.26.192])
-        by ppma06fra.de.ibm.com with ESMTP id 3hx37j4knk-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 18 Aug 2022 15:21:18 +0000
-Received: from d06av26.portsmouth.uk.ibm.com (d06av26.portsmouth.uk.ibm.com [9.149.105.62])
-        by b06avi18626390.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 27IFIRhY32571688
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Thu, 18 Aug 2022 15:18:27 GMT
-Received: from d06av26.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 62799AE04D;
-        Thu, 18 Aug 2022 15:21:15 +0000 (GMT)
-Received: from d06av26.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 118A7AE045;
-        Thu, 18 Aug 2022 15:21:15 +0000 (GMT)
-Received: from p-imbrenda.ibmuc.com (unknown [9.145.5.166])
-        by d06av26.portsmouth.uk.ibm.com (Postfix) with ESMTP;
-        Thu, 18 Aug 2022 15:21:14 +0000 (GMT)
-From:   Claudio Imbrenda <imbrenda@linux.ibm.com>
-To:     kvm@vger.kernel.org
-Cc:     frankja@linux.ibm.com, thuth@redhat.com, nrb@linux.ibm.com,
-        scgl@linux.ibm.com, seiden@linux.ibm.com
-Subject: [kvm-unit-tests PATCH v1 1/1] lib/s390x: fix SMP setup bug
-Date:   Thu, 18 Aug 2022 17:21:14 +0200
-Message-Id: <20220818152114.213135-1-imbrenda@linux.ibm.com>
-X-Mailer: git-send-email 2.37.2
+        with ESMTP id S1343621AbiHRPWT (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 18 Aug 2022 11:22:19 -0400
+Received: from mail-pf1-x42a.google.com (mail-pf1-x42a.google.com [IPv6:2607:f8b0:4864:20::42a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3B22476770
+        for <kvm@vger.kernel.org>; Thu, 18 Aug 2022 08:22:04 -0700 (PDT)
+Received: by mail-pf1-x42a.google.com with SMTP id h28so1819390pfq.11
+        for <kvm@vger.kernel.org>; Thu, 18 Aug 2022 08:22:04 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc;
+        bh=rhQW8wtozjWF3HGibH/hmWhRxd+6MVNHu/SAHJnuLEc=;
+        b=f6//pOErDLPHd1qSNJ6w7EtZZP4/zk0eXgK/NqZ4rp9ZIZ9+nXwDrJL8Yw2ms9c4V+
+         q5IpxVxScLGFYwKqNz+zjrAkdGx86VokP+XBDEn3iZMSTHDeWgpPDWnatT0RQafS0goZ
+         OkVfnHhwCLHp4BN/vYZMDsL/sIn3BIWsrhlQIyf8K0FcVZt0oMlX02n6UqFB5UchDYLt
+         6mcNkn95UkGiGa2/3E8bNMO4mRpXGtk2zDC6ptlHJ6PUyZhWvOS0tz7ekEljcsa0gkBu
+         2dupBQln9wtns+ZxbM8UNXKtUBprK8Zla5FoFoCNBUJT2XL2sBXHcsYKq2Yr541a+TD6
+         HxuQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc;
+        bh=rhQW8wtozjWF3HGibH/hmWhRxd+6MVNHu/SAHJnuLEc=;
+        b=E2gfIp6Ff2nua8VibMpftetpEYdEK98krzhpNOzdlZ2qF/pBd/eDM5AnjjRPRV1pRP
+         /vy1fVutxBPiN2xOyShBD721lfRsoegIP7u8nq2+3T2boCzNTaoB88/PQvHN2+2WK7Z3
+         tCKirjOE15cntjMnU+C+n8m579vKeviWEkP59zLVbJZ1M/VcQle3VPpBSJYX8tgcnoBe
+         6RdDIv3YMH1neW+zLlo3+1iVJ4qCDSuQ8EDfjmsqgM6gURcv7zVWdXSBayBFcM1y09dF
+         Asa6mntAF3U6R4mPvgKbebmHxOnZYOxw+HUJGOHCXlmXJWUhKbTyu71meHJR0wK9yigB
+         pxZQ==
+X-Gm-Message-State: ACgBeo3MnJ1jJ+3LiiaeYCAFroQULw5ZhKR4SULYZ6GpWRkNjU7Q/3pq
+        EojO7q4SmbCrehppfCXCNeoUYg==
+X-Google-Smtp-Source: AA6agR5vNg4AZiDCWVBlsHoSfs5B2gPrwRDzidwiEq69ooGPNnoP7C38ZuFXqwZu2MlDx6G13n/pJw==
+X-Received: by 2002:a63:f003:0:b0:429:fde8:4992 with SMTP id k3-20020a63f003000000b00429fde84992mr2676470pgh.134.1660836122834;
+        Thu, 18 Aug 2022 08:22:02 -0700 (PDT)
+Received: from google.com (7.104.168.34.bc.googleusercontent.com. [34.168.104.7])
+        by smtp.gmail.com with ESMTPSA id n11-20020a63a50b000000b0041c8e489cc2sm1423692pgf.19.2022.08.18.08.22.01
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 18 Aug 2022 08:22:02 -0700 (PDT)
+Date:   Thu, 18 Aug 2022 15:21:58 +0000
+From:   Sean Christopherson <seanjc@google.com>
+To:     Vitaly Kuznetsov <vkuznets@redhat.com>
+Cc:     kvm@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>,
+        Anirudh Rayabharam <anrayabh@linux.microsoft.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Maxim Levitsky <mlevitsk@redhat.com>,
+        Nathan Chancellor <nathan@kernel.org>,
+        Michael Kelley <mikelley@microsoft.com>,
+        linux-hyperv@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v5 03/26] x86/hyperv: Update 'struct hv_enlightened_vmcs'
+ definition
+Message-ID: <Yv5ZFgztDHzzIQJ+@google.com>
+References: <20220802160756.339464-1-vkuznets@redhat.com>
+ <20220802160756.339464-4-vkuznets@redhat.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-ORIG-GUID: OUXS0wGuC9sMDSv_B9hpFvywshSCItZh
-X-Proofpoint-GUID: ZNXy-ufCf5qVWG_bGo4CYjDaHHpLuW9B
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.205,Aquarius:18.0.895,Hydra:6.0.517,FMLib:17.11.122.1
- definitions=2022-08-18_12,2022-08-18_01,2022-06-22_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 phishscore=0 adultscore=0
- mlxscore=0 bulkscore=0 clxscore=1015 priorityscore=1501 impostorscore=0
- spamscore=0 mlxlogscore=636 lowpriorityscore=0 suspectscore=0
- malwarescore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2207270000 definitions=main-2208180055
-X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_EF,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_PASS,
-        T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20220802160756.339464-4-vkuznets@redhat.com>
+X-Spam-Status: No, score=-14.4 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+        ENV_AND_HDR_SPF_MATCH,FSL_HELO_FAKE,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,
+        SPF_PASS,T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL
+        autolearn=no autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-The lowcore pointer pointing to the current CPU (THIS_CPU) was not
-initialized for the boot CPU. The pointer is needed for correct
-interrupt handling, which is needed in the setup process before the
-struct cpu array is allocated.
+On Tue, Aug 02, 2022, Vitaly Kuznetsov wrote:
+> Updated Hyper-V Enlightened VMCS specification lists several new
+> fields for the following features:
+> 
+> - PerfGlobalCtrl
+> - EnclsExitingBitmap
+> - Tsc Scaling
+> - GuestLbrCtl
+> - CET
+> - SSP
+> 
+> Update the definition. The updated definition is available only when
+> CPUID.0x4000000A.EBX BIT(0) is '1'. Add a define for it as well.
+> 
+> Note: The latest TLFS is available at
+> https://docs.microsoft.com/en-us/virtualization/hyper-v-on-windows/tlfs/tlfs
+> 
+> Reviewed-by: Maxim Levitsky <mlevitsk@redhat.com>
+> Signed-off-by: Vitaly Kuznetsov <vkuznets@redhat.com>
+> ---
+>  arch/x86/include/asm/hyperv-tlfs.h | 26 ++++++++++++++++++++++++--
+>  1 file changed, 24 insertions(+), 2 deletions(-)
+> 
+> diff --git a/arch/x86/include/asm/hyperv-tlfs.h b/arch/x86/include/asm/hyperv-tlfs.h
+> index 6f0acc45e67a..ebc27017fa48 100644
+> --- a/arch/x86/include/asm/hyperv-tlfs.h
+> +++ b/arch/x86/include/asm/hyperv-tlfs.h
+> @@ -138,6 +138,17 @@
+>  #define HV_X64_NESTED_GUEST_MAPPING_FLUSH		BIT(18)
+>  #define HV_X64_NESTED_MSR_BITMAP			BIT(19)
+>  
+> +/*
+> + * Nested quirks. These are HYPERV_CPUID_NESTED_FEATURES.EBX bits.
 
-The bug went unnoticed because some environments (like qemu/KVM) clear
-all memory and don't write anything in the lowcore area before starting
-the payload. The pointer thus pointed to 0, an area of memory also not
-used. Other environments will write to memory before starting the
-payload, causing the unit tests to crash at the first interrupt.
+The "quirks" part is very confusing, largely because KVM has a well-established
+quirks mechanism.  I also don't see "quirks" anywhere in the TLFS documentation.
+Can the "Nested quirks" part simply be dropped?
 
-Fix by assigning a temporary struct cpu before the rest of the setup
-process, and assigning the pointer to the correct allocated struct
-during smp initialization.
+> + *
+> + * Note: HV_X64_NESTED_EVMCS1_2022_UPDATE is not currently documented in any
+> + * published TLFS version. When the bit is set, nested hypervisor can use
+> + * 'updated' eVMCSv1 specification (perf_global_ctrl, s_cet, ssp, lbr_ctl,
+> + * encls_exiting_bitmap, tsc_multiplier fields which were missing in 2016
+> + * specification).
+> + */
+> +#define HV_X64_NESTED_EVMCS1_2022_UPDATE		BIT(0)
 
-Fixes: 4e5dd758 ("lib: s390x: better smp interrupt checks")
-Signed-off-by: Claudio Imbrenda <imbrenda@linux.ibm.com>
----
- lib/s390x/io.c  | 9 +++++++++
- lib/s390x/smp.c | 1 +
- 2 files changed, 10 insertions(+)
+This bit is now defined[*], but the docs says it's only for perf_global_ctrl.  Are
+we expecting an update to the TLFS?
 
-diff --git a/lib/s390x/io.c b/lib/s390x/io.c
-index a4f1b113..fb7b7dda 100644
---- a/lib/s390x/io.c
-+++ b/lib/s390x/io.c
-@@ -33,6 +33,15 @@ void puts(const char *s)
- 
- void setup(void)
- {
-+	struct cpu this_cpu_tmp = { 0 };
-+
-+	/*
-+	 * Set a temporary empty struct cpu for the boot CPU, needed for
-+	 * correct interrupt handling in the setup process.
-+	 * smp_setup will allocate and set the permanent one.
-+	 */
-+	THIS_CPU = &this_cpu_tmp;
-+
- 	setup_args_progname(ipl_args);
- 	setup_facilities();
- 	sclp_read_info();
-diff --git a/lib/s390x/smp.c b/lib/s390x/smp.c
-index 0d98c17d..03d6d2a4 100644
---- a/lib/s390x/smp.c
-+++ b/lib/s390x/smp.c
-@@ -353,6 +353,7 @@ void smp_setup(void)
- 			cpus[0].stack = stackptr;
- 			cpus[0].lowcore = (void *)0;
- 			cpus[0].active = true;
-+			THIS_CPU = &cpus[0];
- 		}
- 	}
- 	spin_unlock(&lock);
--- 
-2.37.2
+	Indicates support for the GuestPerfGlobalCtrl and HostPerfGlobalCtrl fields
+	in the enlightened VMCS.
 
+[*] https://docs.microsoft.com/en-us/virtualization/hyper-v-on-windows/tlfs/feature-discovery#hypervisor-nested-virtualization-features---0x4000000a
+
+> +
+>  /*
+>   * This is specific to AMD and specifies that enlightened TLB flush is
+>   * supported. If guest opts in to this feature, ASID invalidations only
+> @@ -559,9 +570,20 @@ struct hv_enlightened_vmcs {
+>  	u64 partition_assist_page;
+>  	u64 padding64_4[4];
+>  	u64 guest_bndcfgs;
+> -	u64 padding64_5[7];
+> +	u64 guest_ia32_perf_global_ctrl;
+> +	u64 guest_ia32_s_cet;
+> +	u64 guest_ssp;
+> +	u64 guest_ia32_int_ssp_table_addr;
+> +	u64 guest_ia32_lbr_ctl;
+> +	u64 padding64_5[2];
+>  	u64 xss_exit_bitmap;
+> -	u64 padding64_6[7];
+> +	u64 encls_exiting_bitmap;
+> +	u64 host_ia32_perf_global_ctrl;
+> +	u64 tsc_multiplier;
+> +	u64 host_ia32_s_cet;
+> +	u64 host_ssp;
+> +	u64 host_ia32_int_ssp_table_addr;
+> +	u64 padding64_6;
+>  } __packed;
+>  
+>  #define HV_VMX_ENLIGHTENED_CLEAN_FIELD_NONE			0
+> -- 
+> 2.35.3
+> 
