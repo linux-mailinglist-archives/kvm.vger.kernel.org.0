@@ -2,118 +2,144 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 6F647598739
-	for <lists+kvm@lfdr.de>; Thu, 18 Aug 2022 17:21:12 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id A672259875D
+	for <lists+kvm@lfdr.de>; Thu, 18 Aug 2022 17:25:30 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1344316AbiHRPU7 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 18 Aug 2022 11:20:59 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36144 "EHLO
+        id S1344245AbiHRPV1 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 18 Aug 2022 11:21:27 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36648 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1344238AbiHRPUj (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 18 Aug 2022 11:20:39 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 109485B7AB
-        for <kvm@vger.kernel.org>; Thu, 18 Aug 2022 08:20:37 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1660836037;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=3GQGhpbZE8ROB+knhR1egNzmPjUJp4WnI2UO3qznnGI=;
-        b=fwU4GwrSSQ5YSnXi1/XuMZ+yPBjnjlPSDxSvlXsMn73P4rZSNjO2EIZUGk2J2UDdzRP9gK
-        UoP1wAZIQpO7jPTKLzwQcSa2Z/M9ZpHLVHpJKdCrcYFP9t7l2FazfzeObjJY0kdb2lpQVp
-        S8JzzPEt4aGyJLe/iH+Bnso6VhpWP0k=
-Received: from mail-ed1-f70.google.com (mail-ed1-f70.google.com
- [209.85.208.70]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_128_GCM_SHA256) id
- us-mta-168-BWTL_4ZHOje9BxwW7tX1JQ-1; Thu, 18 Aug 2022 11:20:28 -0400
-X-MC-Unique: BWTL_4ZHOje9BxwW7tX1JQ-1
-Received: by mail-ed1-f70.google.com with SMTP id b13-20020a056402350d00b0043dfc84c533so1128103edd.5
-        for <kvm@vger.kernel.org>; Thu, 18 Aug 2022 08:20:26 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=mime-version:message-id:date:references:in-reply-to:subject:cc:to
-         :from:x-gm-message-state:from:to:cc;
-        bh=3GQGhpbZE8ROB+knhR1egNzmPjUJp4WnI2UO3qznnGI=;
-        b=hJS3Z0M2xTTKnvEFwKoKHmMa1HX/8hkm3wmqHJu8Q6mHJgLoQrpjstEmdRh+/rgmAI
-         V/7zY2lY0GPOUKf0vHLuucxedvZ4e5hSBRCOjw6dIGqZMpk2KZ7IeTgK66rqOcfzoxKI
-         DiKFfUJMeN5gXjWVmLDx1kaztolhII/6Qic0+8NBRwrPpfEPMws80wxYJEqNy8kGJSrr
-         gU3RYw6kE7ujWshNXNaN2tpUs9bJ1N8zjyoAz40bZ0esenrjHYfHAdVte/S3RCn/TEhj
-         6q2Rp34sB0DB1AEJ98fECdYb3o18zg/cPUecJKQW4C2S6PQ6W9ytRZW8sVxx6Qwzy5+j
-         gebQ==
-X-Gm-Message-State: ACgBeo10XTltTTSIxiAguTFbjwQnyfggbYOx6CtdfFBGNaLx/fo553Z6
-        hDLc3M0Z6pUtYz9hTMWaCRU8sXq22V1MODekTgh3yzkOqsBBM68PemCG9hSBlh3LEOFgpTSkTCu
-        L8KBsVXYz4v0G
-X-Received: by 2002:a17:906:9b09:b0:730:9480:9729 with SMTP id eo9-20020a1709069b0900b0073094809729mr2228162ejc.588.1660836025927;
-        Thu, 18 Aug 2022 08:20:25 -0700 (PDT)
-X-Google-Smtp-Source: AA6agR7bh4JrZAPWDBf+wZbX/JS8gz/ZAVA15O/nNLBF7TBz5gRTyDxEDV3jKJnQao0yfUYyQPmZUg==
-X-Received: by 2002:a17:906:9b09:b0:730:9480:9729 with SMTP id eo9-20020a1709069b0900b0073094809729mr2228146ejc.588.1660836025686;
-        Thu, 18 Aug 2022 08:20:25 -0700 (PDT)
-Received: from fedora (nat-2.ign.cz. [91.219.240.2])
-        by smtp.gmail.com with ESMTPSA id p6-20020a05640210c600b0043df40e4cfdsm1308866edu.35.2022.08.18.08.20.24
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 18 Aug 2022 08:20:25 -0700 (PDT)
-From:   Vitaly Kuznetsov <vkuznets@redhat.com>
-To:     Sean Christopherson <seanjc@google.com>
-Cc:     kvm@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>,
-        Anirudh Rayabharam <anrayabh@linux.microsoft.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Maxim Levitsky <mlevitsk@redhat.com>,
-        Nathan Chancellor <nathan@kernel.org>,
-        Michael Kelley <mikelley@microsoft.com>,
-        linux-hyperv@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v5 01/26] KVM: x86: hyper-v: Expose access to debug MSRs
- in the partition privilege flags
-In-Reply-To: <Yv5XPnSRwKduznWI@google.com>
-References: <20220802160756.339464-1-vkuznets@redhat.com>
- <20220802160756.339464-2-vkuznets@redhat.com>
- <Yv5XPnSRwKduznWI@google.com>
-Date:   Thu, 18 Aug 2022 17:20:24 +0200
-Message-ID: <878rnltw7b.fsf@redhat.com>
+        with ESMTP id S245599AbiHRPVX (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 18 Aug 2022 11:21:23 -0400
+Received: from mx0a-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 70A5F6A4A2
+        for <kvm@vger.kernel.org>; Thu, 18 Aug 2022 08:21:22 -0700 (PDT)
+Received: from pps.filterd (m0098420.ppops.net [127.0.0.1])
+        by mx0b-001b2d01.pphosted.com (8.17.1.5/8.17.1.5) with ESMTP id 27IFE3vL014437
+        for <kvm@vger.kernel.org>; Thu, 18 Aug 2022 15:21:21 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=from : to : cc : subject
+ : date : message-id : mime-version : content-transfer-encoding; s=pp1;
+ bh=F8dHGOivibUCNcx1oYtENQ1Aa7I91iE6Tn+cxUG3WNs=;
+ b=UfQ2AYTqIbea1hqDqxjKyHxE1vtmVUkJs6IZVkI9hGiep1rltNru4AuHpu4MW4nlYBG2
+ wf6nUgHB7jPyCuTflUp9ANJkErdc06a3fZ6hI2IiIdkzCP5zrcC2ewOtLJRUlPJhywh1
+ VNBk1iFr8slW1RvXL7e2KoW5uSEKzmo4I3V6/cL47gifOntKDkLo45gzyqqqKKxfHweb
+ un4H0irRshilrG0xm9hltfiBiEtgPxIqmaIzxCZUG54WHNnNl7L3XDNRKLajdGgzw9m3
+ 3rVpVsCFZMawF1BOP5tdP1gtgaNhK7Gu0ulzV3jstxqD1Hm+DoRYpTe31pMlXY5znq0U OQ== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0b-001b2d01.pphosted.com (PPS) with ESMTPS id 3j1qvr8827-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT)
+        for <kvm@vger.kernel.org>; Thu, 18 Aug 2022 15:21:21 +0000
+Received: from m0098420.ppops.net (m0098420.ppops.net [127.0.0.1])
+        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 27IFEutR017495
+        for <kvm@vger.kernel.org>; Thu, 18 Aug 2022 15:21:20 GMT
+Received: from ppma06fra.de.ibm.com (48.49.7a9f.ip4.static.sl-reverse.com [159.122.73.72])
+        by mx0b-001b2d01.pphosted.com (PPS) with ESMTPS id 3j1qvr881a-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Thu, 18 Aug 2022 15:21:20 +0000
+Received: from pps.filterd (ppma06fra.de.ibm.com [127.0.0.1])
+        by ppma06fra.de.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 27IFLIxQ003157;
+        Thu, 18 Aug 2022 15:21:18 GMT
+Received: from b06avi18626390.portsmouth.uk.ibm.com (b06avi18626390.portsmouth.uk.ibm.com [9.149.26.192])
+        by ppma06fra.de.ibm.com with ESMTP id 3hx37j4knk-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Thu, 18 Aug 2022 15:21:18 +0000
+Received: from d06av26.portsmouth.uk.ibm.com (d06av26.portsmouth.uk.ibm.com [9.149.105.62])
+        by b06avi18626390.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 27IFIRhY32571688
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Thu, 18 Aug 2022 15:18:27 GMT
+Received: from d06av26.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 62799AE04D;
+        Thu, 18 Aug 2022 15:21:15 +0000 (GMT)
+Received: from d06av26.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 118A7AE045;
+        Thu, 18 Aug 2022 15:21:15 +0000 (GMT)
+Received: from p-imbrenda.ibmuc.com (unknown [9.145.5.166])
+        by d06av26.portsmouth.uk.ibm.com (Postfix) with ESMTP;
+        Thu, 18 Aug 2022 15:21:14 +0000 (GMT)
+From:   Claudio Imbrenda <imbrenda@linux.ibm.com>
+To:     kvm@vger.kernel.org
+Cc:     frankja@linux.ibm.com, thuth@redhat.com, nrb@linux.ibm.com,
+        scgl@linux.ibm.com, seiden@linux.ibm.com
+Subject: [kvm-unit-tests PATCH v1 1/1] lib/s390x: fix SMP setup bug
+Date:   Thu, 18 Aug 2022 17:21:14 +0200
+Message-Id: <20220818152114.213135-1-imbrenda@linux.ibm.com>
+X-Mailer: git-send-email 2.37.2
 MIME-Version: 1.0
-Content-Type: text/plain
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=unavailable
-        autolearn_force=no version=3.4.6
+Content-Transfer-Encoding: 8bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-ORIG-GUID: OUXS0wGuC9sMDSv_B9hpFvywshSCItZh
+X-Proofpoint-GUID: ZNXy-ufCf5qVWG_bGo4CYjDaHHpLuW9B
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.205,Aquarius:18.0.895,Hydra:6.0.517,FMLib:17.11.122.1
+ definitions=2022-08-18_12,2022-08-18_01,2022-06-22_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 phishscore=0 adultscore=0
+ mlxscore=0 bulkscore=0 clxscore=1015 priorityscore=1501 impostorscore=0
+ spamscore=0 mlxlogscore=636 lowpriorityscore=0 suspectscore=0
+ malwarescore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2207270000 definitions=main-2208180055
+X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_EF,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_PASS,
+        T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Sean Christopherson <seanjc@google.com> writes:
+The lowcore pointer pointing to the current CPU (THIS_CPU) was not
+initialized for the boot CPU. The pointer is needed for correct
+interrupt handling, which is needed in the setup process before the
+struct cpu array is allocated.
 
-> On Tue, Aug 02, 2022, Vitaly Kuznetsov wrote:
->> For some features, Hyper-V spec defines two separate CPUID bits: one
->> listing whether the feature is supported or not and another one showing
->> whether guest partition was granted access to the feature ("partition
->> privilege mask"). 'Debug MSRs available' is one of such features. Add
->> the missing 'access' bit.
->> 
->> Note: hv_check_msr_access() deliberately keeps checking
->> HV_FEATURE_DEBUG_MSRS_AVAILABLE bit instead of the new HV_ACCESS_DEBUG_MSRS
->> to not break existing VMMs (QEMU) which only expose one bit. Normally, VMMs
->> should set either both these bits or none.
->
-> This is not the right approach long term.  If KVM absolutely cannot unconditionally
-> switch to checking HV_ACCESS_DEBUG_MSRS because it would break QEMU users, then we
-> should add a quirk, but sweeping the whole thing under the rug is wrong.
->
+The bug went unnoticed because some environments (like qemu/KVM) clear
+all memory and don't write anything in the lowcore area before starting
+the payload. The pointer thus pointed to 0, an area of memory also not
+used. Other environments will write to memory before starting the
+payload, causing the unit tests to crash at the first interrupt.
 
-First, this patch is kind of unrelated to the series so in case it's the
-only thing which blocks it from being merged -- let's just pull it out
-and discuss separately.
+Fix by assigning a temporary struct cpu before the rest of the setup
+process, and assigning the pointer to the correct allocated struct
+during smp initialization.
 
-My personal opinion is that in this particular case we actually can
-switch to checking HV_ACCESS_DEBUG_MSRS and possibly backport this patch
-to stable@ and be done with it as SynDBG is a debug feature which is not
-supposed to be used much in the wild. This, however, will not give us
-much besides 'purity' in KVM as no sane VMM is supposed to set just one
-of the HV_FEATURE_DEBUG_MSRS_AVAILABLE/HV_ACCESS_DEBUG_MSRS bits. TL;DR:
-I'm not against the change.
+Fixes: 4e5dd758 ("lib: s390x: better smp interrupt checks")
+Signed-off-by: Claudio Imbrenda <imbrenda@linux.ibm.com>
+---
+ lib/s390x/io.c  | 9 +++++++++
+ lib/s390x/smp.c | 1 +
+ 2 files changed, 10 insertions(+)
 
+diff --git a/lib/s390x/io.c b/lib/s390x/io.c
+index a4f1b113..fb7b7dda 100644
+--- a/lib/s390x/io.c
++++ b/lib/s390x/io.c
+@@ -33,6 +33,15 @@ void puts(const char *s)
+ 
+ void setup(void)
+ {
++	struct cpu this_cpu_tmp = { 0 };
++
++	/*
++	 * Set a temporary empty struct cpu for the boot CPU, needed for
++	 * correct interrupt handling in the setup process.
++	 * smp_setup will allocate and set the permanent one.
++	 */
++	THIS_CPU = &this_cpu_tmp;
++
+ 	setup_args_progname(ipl_args);
+ 	setup_facilities();
+ 	sclp_read_info();
+diff --git a/lib/s390x/smp.c b/lib/s390x/smp.c
+index 0d98c17d..03d6d2a4 100644
+--- a/lib/s390x/smp.c
++++ b/lib/s390x/smp.c
+@@ -353,6 +353,7 @@ void smp_setup(void)
+ 			cpus[0].stack = stackptr;
+ 			cpus[0].lowcore = (void *)0;
+ 			cpus[0].active = true;
++			THIS_CPU = &cpus[0];
+ 		}
+ 	}
+ 	spin_unlock(&lock);
 -- 
-Vitaly
+2.37.2
 
