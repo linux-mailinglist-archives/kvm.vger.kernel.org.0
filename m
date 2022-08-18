@@ -2,204 +2,138 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 14099598E5E
-	for <lists+kvm@lfdr.de>; Thu, 18 Aug 2022 22:55:48 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id BA45F598F85
+	for <lists+kvm@lfdr.de>; Thu, 18 Aug 2022 23:30:18 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1343997AbiHRUzT (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 18 Aug 2022 16:55:19 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56758 "EHLO
+        id S1347141AbiHRV1S (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 18 Aug 2022 17:27:18 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40224 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231771AbiHRUzS (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 18 Aug 2022 16:55:18 -0400
-Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D77254A13F;
-        Thu, 18 Aug 2022 13:55:16 -0700 (PDT)
-Received: from pps.filterd (m0098399.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.17.1.5/8.17.1.5) with ESMTP id 27IKTjpj008178;
-        Thu, 18 Aug 2022 20:55:04 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
- mime-version : subject : to : cc : references : from : in-reply-to :
- content-type : content-transfer-encoding; s=pp1;
- bh=A+75QMBabbdaQL0e0RfBhJS7XNq73AIqB/DFLm62j2c=;
- b=Y50ZKXGatW5yRklNcpw8jiRg/Gi4nkN5+pvFCXgUJe14ArFSlJ018t5hcfAyp6iEBPV7
- o6m511c9DtSnIazdycTV7hBH6kQkhNtsN3NZtGW7c8cBhfMz2ooieY908zmvHyijceyv
- NwekdVaJ14a264XKJejMaCcAlEgYb+c60/SF6jiWda0wK08TGVDSmHBN5X4wHmRuRKLX
- bZJXTKfiGqLHwCLQ2YM/pGUyYcXM1MlYfNIBBn2NUMmgdRnHU+Iy5fpb/Aey7jB9HKgI
- XSN8IWPJZzr290YAhxF5OVnr/K4PMTeDlIX99Dy9IERu85gpbASki7CxOD1jL+TowNQH 1g== 
-Received: from ppma01fra.de.ibm.com (46.49.7a9f.ip4.static.sl-reverse.com [159.122.73.70])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3j1vgg0ksc-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 18 Aug 2022 20:55:03 +0000
-Received: from pps.filterd (ppma01fra.de.ibm.com [127.0.0.1])
-        by ppma01fra.de.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 27IKh9mg000643;
-        Thu, 18 Aug 2022 20:55:01 GMT
-Received: from b06avi18626390.portsmouth.uk.ibm.com (b06avi18626390.portsmouth.uk.ibm.com [9.149.26.192])
-        by ppma01fra.de.ibm.com with ESMTP id 3hx3k94sfm-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 18 Aug 2022 20:55:01 +0000
-Received: from d06av24.portsmouth.uk.ibm.com (d06av24.portsmouth.uk.ibm.com [9.149.105.60])
-        by b06avi18626390.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 27IKq9bC33161630
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Thu, 18 Aug 2022 20:52:09 GMT
-Received: from d06av24.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id A4AF842047;
-        Thu, 18 Aug 2022 20:54:57 +0000 (GMT)
-Received: from d06av24.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id EF79C4203F;
-        Thu, 18 Aug 2022 20:54:56 +0000 (GMT)
-Received: from [9.171.73.125] (unknown [9.171.73.125])
-        by d06av24.portsmouth.uk.ibm.com (Postfix) with ESMTP;
-        Thu, 18 Aug 2022 20:54:56 +0000 (GMT)
-Message-ID: <0aa937e7-c1bd-b0c7-8a23-b32779d1f477@linux.ibm.com>
-Date:   Thu, 18 Aug 2022 22:54:56 +0200
+        with ESMTP id S1347126AbiHRV07 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 18 Aug 2022 17:26:59 -0400
+Received: from mail-pj1-x102e.google.com (mail-pj1-x102e.google.com [IPv6:2607:f8b0:4864:20::102e])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1EFE2EA89E
+        for <kvm@vger.kernel.org>; Thu, 18 Aug 2022 14:19:14 -0700 (PDT)
+Received: by mail-pj1-x102e.google.com with SMTP id pm17so2850449pjb.3
+        for <kvm@vger.kernel.org>; Thu, 18 Aug 2022 14:19:14 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc;
+        bh=tTJTjqw4MggpWtxGKCzfbFeqFxFbwJEwUmHLuAFNlC4=;
+        b=KLY0b+bh0hfzUpqKcJhe/wX0zYM3DwWqLn+1EFPX/z/mvu9FX8S6481IG9EwIwKlr0
+         sksbXHJQ4Kh7CSdeJ54/AGd442l6xfwUSwbgjuIY7cPkTmb/P8QcpBZsFw1/AEgW7BxO
+         Z7vFc1cM6wHyTLrXmXs4BpPTKJqKJm4CDzUsmuDRJO5YqQ2oTdhgmDQfcISIZdvLXi+a
+         iIdIuaNiTdK6EZBOyO8Sqr7BsD7W8hLLdMZHw8f/Q35ywyTfALa1cNGq5gHNhppDaPfZ
+         O+kBBnOCDICeLF6quWO+kUt7vyDNo8jD0dQqib2ZIPNPKJ57Uq0YHy8r7Fi2W5SNMe/A
+         HD3w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc;
+        bh=tTJTjqw4MggpWtxGKCzfbFeqFxFbwJEwUmHLuAFNlC4=;
+        b=TEQgfsN0RXEgbZ6mG1T6LVy08pOhvwldL/qewbS31I1P3wKWeHzRRVscw7c0DS9D75
+         FgT/XiGfTgr9jvSsOa0ZKjcHGbFqlVL2qdNhTKwjQ0S63Uje0LaqlSTCrii/08v95gSd
+         HS4u28uG3/u/n48M6nWSLwush13DVaNJQGiHSRXH6JXE0jxtPEH/QR+XR3d1kF2L2yng
+         vosUuzz0mJEjfOqx4cOTLRKHuyJCNyHeKula9iwnMBg6UPKXopgOaZ58gAUWE+9Cpmpi
+         L6s3r9IjH49ewnOPkKITZwxrVWl2DI3LmGf9RJhVpLT4nE3b8ZQURqFbxNLJjuHl/7CL
+         mnLA==
+X-Gm-Message-State: ACgBeo0PRi29n4x6vVheOjA+abIAKnJp1UyJJi1f1JIY43LqhIyrC8zy
+        kw8LGphsK9sx4jzr5XcqRSmJQQ==
+X-Google-Smtp-Source: AA6agR6y0AhMETJyQ+vXl0SNQkEBxWGMTcxU9uSEZQLV6JUuiIN57zfeFgll2QLSPF2S39iiIToTNg==
+X-Received: by 2002:a17:90b:4c4b:b0:1f4:d176:aa5a with SMTP id np11-20020a17090b4c4b00b001f4d176aa5amr4899401pjb.233.1660857553755;
+        Thu, 18 Aug 2022 14:19:13 -0700 (PDT)
+Received: from google.com (7.104.168.34.bc.googleusercontent.com. [34.168.104.7])
+        by smtp.gmail.com with ESMTPSA id h8-20020a170902f54800b0016ee328fd61sm1819751plf.198.2022.08.18.14.19.13
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 18 Aug 2022 14:19:13 -0700 (PDT)
+Date:   Thu, 18 Aug 2022 21:19:09 +0000
+From:   Sean Christopherson <seanjc@google.com>
+To:     Kyle Huey <me@kylehuey.com>
+Cc:     Thomas Gleixner <tglx@linutronix.de>,
+        Dave Hansen <dave.hansen@linux.intel.com>,
+        Borislav Petkov <bp@alien8.de>, Ingo Molnar <mingo@redhat.com>,
+        x86@kernel.org, "H. Peter Anvin" <hpa@zytor.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Andy Lutomirski <luto@kernel.org>,
+        Peter Zijlstra <peterz@infradead.org>,
+        linux-kernel@vger.kernel.org, linux-kselftest@vger.kernel.org,
+        Robert O'Callahan <robert@ocallahan.org>,
+        David Manouchehri <david.manouchehri@riseup.net>,
+        Borislav Petkov <bp@suse.de>, kvm@vger.kernel.org,
+        stable@vger.kernel.org
+Subject: Re: [PATCH v5 1/2] x86/fpu: Allow PKRU to be (once again) written by
+ ptrace.
+Message-ID: <Yv6szXuKGv75wWmm@google.com>
+References: <20220808141538.102394-1-khuey@kylehuey.com>
+ <87ilmpzunz.ffs@tglx>
+ <CAP045Ao7hb4kXajkWnMxqawBzFGUZJtSuRRn1kbmjOF=mcTcoA@mail.gmail.com>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.3.0
-Subject: Re: [PATCH] KVM: s390: pci: Hook to access KVM lowlevel from VFIO
-Content-Language: en-US
-To:     Matthew Rosato <mjrosato@linux.ibm.com>
-Cc:     rdunlap@infradead.org, linux-kernel@vger.kernel.org, lkp@intel.com,
-        borntraeger@linux.ibm.com, farman@linux.ibm.com,
-        linux-s390@vger.kernel.org, kvm@vger.kernel.org, gor@linux.ibm.com,
-        hca@linux.ibm.com, schnelle@linux.ibm.com, frankja@linux.ibm.com
-References: <20220818164652.269336-1-pmorel@linux.ibm.com>
- <3450ba5f-d6f4-d04c-3501-8cf375389347@linux.ibm.com>
-From:   Pierre Morel <pmorel@linux.ibm.com>
-In-Reply-To: <3450ba5f-d6f4-d04c-3501-8cf375389347@linux.ibm.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-ORIG-GUID: Ig4n4nQSnE0N03FIq4xzu-hBso9K1Gj3
-X-Proofpoint-GUID: Ig4n4nQSnE0N03FIq4xzu-hBso9K1Gj3
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.205,Aquarius:18.0.895,Hydra:6.0.517,FMLib:17.11.122.1
- definitions=2022-08-18_14,2022-08-18_01,2022-06-22_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxscore=0 spamscore=0
- malwarescore=0 bulkscore=0 phishscore=0 mlxlogscore=999 impostorscore=0
- lowpriorityscore=0 suspectscore=0 clxscore=1015 adultscore=0
- priorityscore=1501 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2207270000 definitions=main-2208180075
-X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,
-        SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no
-        version=3.4.6
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CAP045Ao7hb4kXajkWnMxqawBzFGUZJtSuRRn1kbmjOF=mcTcoA@mail.gmail.com>
+X-Spam-Status: No, score=-14.4 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+        ENV_AND_HDR_SPF_MATCH,FSL_HELO_FAKE,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,
+        SPF_PASS,T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL
+        autolearn=no autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-
-
-On 8/18/22 22:38, Matthew Rosato wrote:
-> On 8/18/22 12:46 PM, Pierre Morel wrote:
->> We have a cross dependency between KVM and VFIO when using
->> s390 vfio_pci_zdev extensions for PCI passthrough
->> To be able to keep both subsystem modular we add a registering
->> hook inside the S390 core code.
->>
->> This fixes a build problem when VFIO is built-in and KVM is built
->> as a module.
->>
->> Reported-by: Randy Dunlap <rdunlap@infradead.org>
->> Reported-by: kernel test robot <lkp@intel.com>
->> Signed-off-by: Pierre Morel <pmorel@linux.ibm.com>
->> Fixes: 09340b2fca007 ("KVM: s390: pci: add routines to start/stop inter..")
->> Cc: <stable@vger.kernel.org>
->> ---
->>   arch/s390/include/asm/kvm_host.h | 17 ++++++-----------
->>   arch/s390/kvm/pci.c              | 10 ++++++----
->>   arch/s390/pci/Makefile           |  2 ++
->>   arch/s390/pci/pci_kvm_hook.c     | 11 +++++++++++
->>   drivers/vfio/pci/vfio_pci_zdev.c |  8 ++++++--
->>   5 files changed, 31 insertions(+), 17 deletions(-)
->>   create mode 100644 arch/s390/pci/pci_kvm_hook.c
->>
->> diff --git a/arch/s390/include/asm/kvm_host.h b/arch/s390/include/asm/kvm_host.h
->> index f39092e0ceaa..b1e98a9ed152 100644
->> --- a/arch/s390/include/asm/kvm_host.h
->> +++ b/arch/s390/include/asm/kvm_host.h
->> @@ -1038,16 +1038,11 @@ static inline void kvm_arch_vcpu_unblocking(struct kvm_vcpu *vcpu) {}
->>   #define __KVM_HAVE_ARCH_VM_FREE
->>   void kvm_arch_free_vm(struct kvm *kvm);
->>   
->> -#ifdef CONFIG_VFIO_PCI_ZDEV_KVM
->> -int kvm_s390_pci_register_kvm(struct zpci_dev *zdev, struct kvm *kvm);
->> -void kvm_s390_pci_unregister_kvm(struct zpci_dev *zdev);
->> -#else
->> -static inline int kvm_s390_pci_register_kvm(struct zpci_dev *dev,
->> -					    struct kvm *kvm)
->> -{
->> -	return -EPERM;
->> -}
->> -static inline void kvm_s390_pci_unregister_kvm(struct zpci_dev *dev) {}
->> -#endif
->> +struct zpci_kvm_hook {
->> +	int (*kvm_register)(void *opaque, struct kvm *kvm);
->> +	void (*kvm_unregister)(void *opaque);
->> +};
->> +
->> +extern struct zpci_kvm_hook zpci_kvm_hook;
->>   
->>   #endif
->> diff --git a/arch/s390/kvm/pci.c b/arch/s390/kvm/pci.c
->> index 4946fb7757d6..22c025538323 100644
->> --- a/arch/s390/kvm/pci.c
->> +++ b/arch/s390/kvm/pci.c
->> @@ -431,8 +431,9 @@ static void kvm_s390_pci_dev_release(struct zpci_dev *zdev)
->>    * available, enable them and let userspace indicate whether or not they will
->>    * be used (specify SHM bit to disable).
->>    */
->> -int kvm_s390_pci_register_kvm(struct zpci_dev *zdev, struct kvm *kvm)
->> +static int kvm_s390_pci_register_kvm(void *opaque, struct kvm *kvm)
->>   {
->> +	struct zpci_dev *zdev = opaque;
->>   	int rc;
->>   
->>   	if (!zdev)
->> @@ -510,10 +511,10 @@ int kvm_s390_pci_register_kvm(struct zpci_dev *zdev, struct kvm *kvm)
->>   	kvm_put_kvm(kvm);
->>   	return rc;
->>   }
->> -EXPORT_SYMBOL_GPL(kvm_s390_pci_register_kvm);
->>   
->> -void kvm_s390_pci_unregister_kvm(struct zpci_dev *zdev)
->> +static void kvm_s390_pci_unregister_kvm(void *opaque)
->>   {
->> +	struct zpci_dev *zdev = opaque;
->>   	struct kvm *kvm;
->>   
->>   	if (!zdev)
->> @@ -566,7 +567,6 @@ void kvm_s390_pci_unregister_kvm(struct zpci_dev *zdev)
->>   
->>   	kvm_put_kvm(kvm);
->>   }
->> -EXPORT_SYMBOL_GPL(kvm_s390_pci_unregister_kvm);
->>   
->>   void kvm_s390_pci_init_list(struct kvm *kvm)
->>   {
->> @@ -678,6 +678,8 @@ int kvm_s390_pci_init(void)
->>   
->>   	spin_lock_init(&aift->gait_lock);
->>   	mutex_init(&aift->aift_lock);
->> +	zpci_kvm_hook.kvm_register = kvm_s390_pci_register_kvm;
->> +	zpci_kvm_hook.kvm_unregister = kvm_s390_pci_unregister_kvm;
->>   
->>   	return 0;
->>   }
+On Thu, Aug 18, 2022, Kyle Huey wrote:
+> On Thu, Aug 18, 2022 at 3:57 AM Thomas Gleixner <tglx@linutronix.de> wrote:
+> > On Mon, Aug 08 2022 at 07:15, Kyle Huey wrote:
+> > > When management of the PKRU register was moved away from XSTATE, emulation
+> > > of PKRU's existence in XSTATE was added for APIs that read XSTATE, but not
+> > > for APIs that write XSTATE. This can be seen by running gdb and executing
+> > > `p $pkru`, `set $pkru = 42`, and `p $pkru`. On affected kernels (5.14+) the
+> > > write to the PKRU register (which gdb performs through ptrace) is ignored.
+> > >
+> > > There are three relevant APIs: PTRACE_SETREGSET with NT_X86_XSTATE,
+> > > sigreturn, and KVM_SET_XSAVE. KVM_SET_XSAVE has its own special handling to
+> > > make PKRU writes take effect (in fpu_copy_uabi_to_guest_fpstate). Push that
+> > > down into copy_uabi_to_xstate and have PTRACE_SETREGSET with NT_X86_XSTATE
+> > > and sigreturn pass in pointers to the appropriate PKRU value.
+> > >
+> > > This also adds code to initialize the PKRU value to the hardware init value
+> > > (namely 0) if the PKRU bit is not set in the XSTATE header to match XRSTOR.
+> > > This is a change to the current KVM_SET_XSAVE behavior.
+> >
+> > You are stating a fact here, but provide 0 justification why this is
+> > correct.
 > 
-> You should also set these to NULL in kvm_s390_pci_exit (which is called from kvm_arch_exit).  In practice, the kvm module would need to be loaded again before we have a nonzero vdev->vdev.kvm so it should never be an issue - but we should clean up anyway when the module is removed.
-> 
-> With that change:
-> 
-> Reviewed-by: Matthew Rosato <mjrosato@linux.ibm.com>
-> 
+> Well, the justification is that this *is* the behavior we want for
+> ptrace/sigreturn, and it's very likely the existing KVM_SET_XSAVE
+> behavior in this edge case is an oversight rather than intentional,
+> and in the absence of confirmation that KVM wants the existing
+> behavior (the KVM mailing list and maintainer are CCd) one correct
+> code path is better than one correct code path and one buggy code
+> path.
 
-Yes indeed, will do.
-Thanks
+Sorry, I missed the KVM-relevant flags.
 
-Pierre
+Hrm, the current behavior has been KVM ABI for a very long time.
 
--- 
-Pierre Morel
-IBM Lab Boeblingen
+It's definitely odd because all other components will be initialized due to their
+bits being cleared in the header during kvm_load_guest_fpu(), and it probably
+wouldn't cause problems in practice as most VMMs likely do "all or nothing" loads.
+But, in theory, userspace could save/restore a subset of guest XSTATE and rely on
+the kernel not overwriting guest PKRU when its bit is cleared in the header.
+
+All that said, I don't see any reason to force KVM to change at this time, it's
+trivial enough to handle KVM's oddities while providing sane behavior for others.
+Nullify the pointer in the guest path and then update copy_uabi_to_xstate() to
+play nice with a NULL pointer, e.g. 
+
+	/*
+	 * Nullify @vpkru to preserve its current value if PKRU's bit isn't set
+	 * in the header.  KVM's odd ABI is to leave PKRU untouched in this
+	 * case (all other components are eventually re-initialized).
+	 */
+	if (!(kstate->regs.xsave.header.xfeatures & XFEATURE_MASK_PKRU))
+		vpkru = NULL;
+
+	return copy_uabi_from_kernel_to_xstate(kstate, ustate, vpkru);
