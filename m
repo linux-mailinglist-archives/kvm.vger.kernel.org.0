@@ -2,110 +2,217 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id CB79459856A
-	for <lists+kvm@lfdr.de>; Thu, 18 Aug 2022 16:11:37 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 2E63B59857D
+	for <lists+kvm@lfdr.de>; Thu, 18 Aug 2022 16:15:57 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S245660AbiHROJM (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 18 Aug 2022 10:09:12 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52486 "EHLO
+        id S245698AbiHRONH (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 18 Aug 2022 10:13:07 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33698 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S245665AbiHROJA (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 18 Aug 2022 10:09:00 -0400
-Received: from ams.source.kernel.org (ams.source.kernel.org [145.40.68.75])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 405306E893
-        for <kvm@vger.kernel.org>; Thu, 18 Aug 2022 07:08:58 -0700 (PDT)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by ams.source.kernel.org (Postfix) with ESMTPS id EB731B821BC
-        for <kvm@vger.kernel.org>; Thu, 18 Aug 2022 14:08:56 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 886A8C433D6;
-        Thu, 18 Aug 2022 14:08:55 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1660831735;
-        bh=X1Q1sXj76atg/ztMAloIPiEyVV7Q9AK3llXhBBs0MmA=;
-        h=From:To:Cc:Subject:Date:From;
-        b=bo6wLDFENY/dx4DUWVormN+6hJ5A9pYQFMzpjuywKvF4lhCF+9O4x3tMACBV/BR3m
-         e5TiY1hNZgAXb0IE1gePs0l4oShBGznPAUEDn/47qxNSqBAGSnbQ4LApjarbeeCC+4
-         UuzzNcQAeNuJdPt5EV+Q+ztevu97V6mtbz6PlBfjaoT+3uxr5htsyLqoFRX9iyb7oe
-         LfKQwU47K+rMc5ZHoN/GSKYZpcZqsO++RO34SjYhRaupsqeu5J5tJwA3aRS3kZvsWa
-         VU2npwUtwjPxFtW+KFfVL3Z+HZrWQFuHisn+pCtqx27bmugcKoY9kS1B1kr8jzEGo+
-         z7rAGjyS04eRA==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=why.lan)
-        by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-        (Exim 4.95)
-        (envelope-from <maz@kernel.org>)
-        id 1oOgCb-0040U4-HY;
-        Thu, 18 Aug 2022 15:08:53 +0100
-From:   Marc Zyngier <maz@kernel.org>
-To:     Paolo Bonzini <pbonzini@redhat.com>
-Cc:     Oliver Upton <oliver.upton@linux.dev>,
-        Yang Yingliang <yangyingliang@huawei.com>,
-        James Morse <james.morse@arm.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
-        Alexandru Elisei <alexandru.elisei@arm.com>,
-        kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org,
-        linux-arm-kernel@lists.infradead.org, kernel-team@android.com
-Subject: [GIT PULL] KVM/arm64 fixes for 6.0, take #1
-Date:   Thu, 18 Aug 2022 15:08:44 +0100
-Message-Id: <20220818140844.2312534-1-maz@kernel.org>
-X-Mailer: git-send-email 2.34.1
+        with ESMTP id S245133AbiHRONG (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 18 Aug 2022 10:13:06 -0400
+Received: from mx0a-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2EC219F0D4;
+        Thu, 18 Aug 2022 07:13:05 -0700 (PDT)
+Received: from pps.filterd (m0098419.ppops.net [127.0.0.1])
+        by mx0b-001b2d01.pphosted.com (8.17.1.5/8.17.1.5) with ESMTP id 27ID14CC016237;
+        Thu, 18 Aug 2022 14:13:03 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=date : from : to : cc :
+ subject : message-id : in-reply-to : references : mime-version :
+ content-type : content-transfer-encoding; s=pp1;
+ bh=ocFXUaee3DFtT/I/MOOiB+O6mmtuhQXu7Wa1ZFJfjb4=;
+ b=i/RSsSWj7Nrl/X+cZUafu55WsWEUCooWKDji3mXKrhXAHSRaSR/vsU0zU5gMBGQVnrHg
+ x5K6oAoFR58SjUVP/HL3HlYmTMzQxrKR2jKVqyh7knW0K/StdKeU48y8nWxkTyeJ9nyy
+ eL5fmOTQo7K8Iy0yaX8TpyGUG6lTnd23DtK2dXdgmnFzsYjhi+aH9rJ0m5sDgHvSRuq4
+ zAMfJrV9LHQn7gjo6cuKyQSDx2ba+5ptIW+t7M+v3ZWyuXE45Lzm3miGtTjiukfJJA5f
+ sEszsPE7Mo7otWh/dv+6HlCkSMJiTR6wKaDu80uJAif0NFP3mt+SW8fQAIsOoVYETdtC wA== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0b-001b2d01.pphosted.com (PPS) with ESMTPS id 3j1nxkjkcu-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Thu, 18 Aug 2022 14:13:03 +0000
+Received: from m0098419.ppops.net (m0098419.ppops.net [127.0.0.1])
+        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 27ID1MlT018212;
+        Thu, 18 Aug 2022 14:13:02 GMT
+Received: from ppma05fra.de.ibm.com (6c.4a.5195.ip4.static.sl-reverse.com [149.81.74.108])
+        by mx0b-001b2d01.pphosted.com (PPS) with ESMTPS id 3j1nxkjkbj-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Thu, 18 Aug 2022 14:13:02 +0000
+Received: from pps.filterd (ppma05fra.de.ibm.com [127.0.0.1])
+        by ppma05fra.de.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 27IE5HVt019754;
+        Thu, 18 Aug 2022 14:13:00 GMT
+Received: from b06cxnps4074.portsmouth.uk.ibm.com (d06relay11.portsmouth.uk.ibm.com [9.149.109.196])
+        by ppma05fra.de.ibm.com with ESMTP id 3hyp8sjywx-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Thu, 18 Aug 2022 14:13:00 +0000
+Received: from d06av21.portsmouth.uk.ibm.com (d06av21.portsmouth.uk.ibm.com [9.149.105.232])
+        by b06cxnps4074.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 27IECv3K36045140
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Thu, 18 Aug 2022 14:12:57 GMT
+Received: from d06av21.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 8787452059;
+        Thu, 18 Aug 2022 14:12:57 +0000 (GMT)
+Received: from li-e979b1cc-23ba-11b2-a85c-dfd230f6cf82 (unknown [9.152.224.212])
+        by d06av21.portsmouth.uk.ibm.com (Postfix) with ESMTP id 25A3352052;
+        Thu, 18 Aug 2022 14:12:57 +0000 (GMT)
+Date:   Thu, 18 Aug 2022 16:12:55 +0200
+From:   Halil Pasic <pasic@linux.ibm.com>
+To:     Tony Krowiak <akrowiak@linux.ibm.com>
+Cc:     linux-s390@vger.kernel.org, linux-kernel@vger.kernel.org,
+        kvm@vger.kernel.org, jjherne@linux.ibm.com, borntraeger@de.ibm.com,
+        cohuck@redhat.com, mjrosato@linux.ibm.com,
+        alex.williamson@redhat.com, kwankhede@nvidia.com,
+        fiuczy@linux.ibm.com, stable@vger.kernel.org,
+        Halil Pasic <pasic@linux.ibm.com>
+Subject: Re: [PATCH v2 1/2] s390/vfio-ap: fix hang during removal of mdev
+ after duplicate assignment
+Message-ID: <20220818161255.2fe5a542.pasic@linux.ibm.com>
+In-Reply-To: <20220818132606.13321-2-akrowiak@linux.ibm.com>
+References: <20220818132606.13321-1-akrowiak@linux.ibm.com>
+        <20220818132606.13321-2-akrowiak@linux.ibm.com>
+Organization: IBM
+X-Mailer: Claws Mail 3.17.8 (GTK+ 2.24.32; x86_64-redhat-linux-gnu)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 8bit
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: pbonzini@redhat.com, oliver.upton@linux.dev, yangyingliang@huawei.com, james.morse@arm.com, suzuki.poulose@arm.com, alexandru.elisei@arm.com, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, kernel-team@android.com
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
-X-Spam-Status: No, score=-7.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_HI,
-        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
-        autolearn_force=no version=3.4.6
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: yQGkJllg8VbH4YSAFG7H5vIqdf6p324-
+X-Proofpoint-ORIG-GUID: AIaqSj65wGiNtqt3GIDHwqrWcuFSbVwd
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.205,Aquarius:18.0.895,Hydra:6.0.517,FMLib:17.11.122.1
+ definitions=2022-08-18_12,2022-08-18_01,2022-06-22_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 lowpriorityscore=0
+ mlxlogscore=999 impostorscore=0 bulkscore=0 suspectscore=0 adultscore=0
+ phishscore=0 priorityscore=1501 clxscore=1011 malwarescore=0 mlxscore=0
+ spamscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2207270000 definitions=main-2208180050
+X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_EF,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_PASS,
+        T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Paolo,
+On Thu, 18 Aug 2022 09:26:05 -0400
+Tony Krowiak <akrowiak@linux.ibm.com> wrote:
 
-Here's a small set of KVM/arm64 fixes for 6.0, the most visible thing
-being a better handling of systems with asymmetric AArch32 support.
+Subject: s390/vfio-ap: fix hang during removal of mdev after duplicate
+assignment
 
-Please pull,
+It would have made sense to do it this way in the first place, even
+if the link code were to take care of the duplicates. It did not really
+make sense to do the whole filtering biz and everything else. Maybe we
+should spin the short description and the rest of the commit message so
+it reflects the code more. 
 
-	M.
+> When the same adapter or domain is assigned more than one time prior to
+> removing the matrix mdev to which it is assigned, the remove operation
+> will hang. The reason is because the same vfio_ap_queue objects with an
+> APQN containing the APID of the adapter or APQI of the domain being
+> assigned will get added to the hashtable that holds them multiple times.
+> This results in the pprev and next pointers of the hlist_node (mdev_qnode
+> field in the vfio_ap_queue object) pointing to the queue object itself.
+> This causes an interminable loop when the mdev is removed and the queue
+> table is iterated to reset the queues.
+> 
+> To fix this problem, the assignment operation is bypassed when assigning
+> an adapter or domain if it is already assigned to the matrix mdev.
+> 
+> Since it is not necessary to assign a resource already assigned or to
+> unassign a resource that has not been assigned, this patch will bypass
+> all assignment/unassignment operations for an adapter, domain or
+> control domain under these circumstances.
+> 
+> Cc: stable@vger.kernel.org
+> Fixes: 771e387d5e79 ("s390/vfio-ap: manage link between queue struct and matrix mdev")
 
-The following changes since commit 0982c8d859f8f7022b9fd44d421c7ec721bb41f9:
+Not 11cb2419fafe ("s390/vfio-ap: manage link between queue struct and
+matrix mdev")
 
-  Merge branch kvm-arm64/nvhe-stacktrace into kvmarm-master/next (2022-07-27 18:33:27 +0100)
+Is my repo borked?
 
-are available in the Git repository at:
 
-  git://git.kernel.org/pub/scm/linux/kernel/git/kvmarm/kvmarm.git tags/kvmarm-fixes-6.0-1
+> Reported-by: Matthew Rosato <mjrosato@linux.ibm.com>
+> Signed-off-by: Tony Krowiak <akrowiak@linux.ibm.com>
+> ---
+>  drivers/s390/crypto/vfio_ap_ops.c | 30 ++++++++++++++++++++++++++++++
+>  1 file changed, 30 insertions(+)
+> 
+> diff --git a/drivers/s390/crypto/vfio_ap_ops.c b/drivers/s390/crypto/vfio_ap_ops.c
+> index 6c8c41fac4e1..ee82207b4e60 100644
+> --- a/drivers/s390/crypto/vfio_ap_ops.c
+> +++ b/drivers/s390/crypto/vfio_ap_ops.c
+> @@ -984,6 +984,11 @@ static ssize_t assign_adapter_store(struct device *dev,
+>  		goto done;
+>  	}
+>  
+> +	if (test_bit_inv(apid, matrix_mdev->matrix.apm)) {
+> +		ret = count;
+> +		goto done;
+> +	}
+> +
+>  	set_bit_inv(apid, matrix_mdev->matrix.apm);
+>  
+>  	ret = vfio_ap_mdev_validate_masks(matrix_mdev);
+> @@ -1109,6 +1114,11 @@ static ssize_t unassign_adapter_store(struct device *dev,
+>  		goto done;
+>  	}
+>  
+> +	if (!test_bit_inv(apid, matrix_mdev->matrix.apm)) {
+> +		ret = count;
+> +		goto done;
+> +	}
+> +
+>  	clear_bit_inv((unsigned long)apid, matrix_mdev->matrix.apm);
+>  	vfio_ap_mdev_hot_unplug_adapter(matrix_mdev, apid);
+>  	ret = count;
+> @@ -1183,6 +1193,11 @@ static ssize_t assign_domain_store(struct device *dev,
+>  		goto done;
+>  	}
+>  
+> +	if (test_bit_inv(apqi, matrix_mdev->matrix.aqm)) {
+> +		ret = count;
+> +		goto done;
+> +	}
+> +
+>  	set_bit_inv(apqi, matrix_mdev->matrix.aqm);
+>  
+>  	ret = vfio_ap_mdev_validate_masks(matrix_mdev);
+> @@ -1286,6 +1301,11 @@ static ssize_t unassign_domain_store(struct device *dev,
+>  		goto done;
+>  	}
+>  
+> +	if (!test_bit_inv(apqi, matrix_mdev->matrix.aqm)) {
+> +		ret = count;
+> +		goto done;
+> +	}
+> +
+>  	clear_bit_inv((unsigned long)apqi, matrix_mdev->matrix.aqm);
+>  	vfio_ap_mdev_hot_unplug_domain(matrix_mdev, apqi);
+>  	ret = count;
+> @@ -1329,6 +1349,11 @@ static ssize_t assign_control_domain_store(struct device *dev,
+>  		goto done;
+>  	}
+>  
+> +	if (test_bit_inv(id, matrix_mdev->matrix.adm)) {
+> +		ret = count;
+> +		goto done;
+> +	}
+> +
+>  	/* Set the bit in the ADM (bitmask) corresponding to the AP control
+>  	 * domain number (id). The bits in the mask, from most significant to
+>  	 * least significant, correspond to IDs 0 up to the one less than the
+> @@ -1378,6 +1403,11 @@ static ssize_t unassign_control_domain_store(struct device *dev,
+>  		goto done;
+>  	}
+>  
+> +	if (!test_bit_inv(domid, matrix_mdev->matrix.adm)) {
+> +		ret = count;
+> +		goto done;
+> +	}
+> +
+>  	clear_bit_inv(domid, matrix_mdev->matrix.adm);
+>  
+>  	if (test_bit_inv(domid, matrix_mdev->shadow_apcb.adm)) {
 
-for you to fetch changes up to b10d86fb8e46cc812171728bcd326df2f34e9ed5:
-
-  KVM: arm64: Reject 32bit user PSTATE on asymmetric systems (2022-08-17 10:29:07 +0100)
-
-----------------------------------------------------------------
-KVM/arm64 fixes for 6.0, take #1
-
-- Fix unexpected sign extension of KVM_ARM_DEVICE_ID_MASK
-
-- Tidy-up handling of AArch32 on asymmetric systems
-
-----------------------------------------------------------------
-Oliver Upton (2):
-      KVM: arm64: Treat PMCR_EL1.LC as RES1 on asymmetric systems
-      KVM: arm64: Reject 32bit user PSTATE on asymmetric systems
-
-Yang Yingliang (1):
-      KVM: arm64: Fix compile error due to sign extension
-
- arch/arm64/include/asm/kvm_host.h | 4 ++++
- arch/arm64/include/uapi/asm/kvm.h | 6 ++++--
- arch/arm64/kvm/arm.c              | 3 +--
- arch/arm64/kvm/guest.c            | 2 +-
- arch/arm64/kvm/sys_regs.c         | 4 ++--
- 5 files changed, 12 insertions(+), 7 deletions(-)
