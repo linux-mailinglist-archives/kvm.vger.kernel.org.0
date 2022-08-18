@@ -2,177 +2,117 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 82BC1598419
+	by mail.lfdr.de (Postfix) with ESMTP id 3A545598418
 	for <lists+kvm@lfdr.de>; Thu, 18 Aug 2022 15:26:37 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S245050AbiHRNYy (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 18 Aug 2022 09:24:54 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51310 "EHLO
+        id S242906AbiHRN0X (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 18 Aug 2022 09:26:23 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53456 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S245047AbiHRNYp (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 18 Aug 2022 09:24:45 -0400
-Received: from mga02.intel.com (mga02.intel.com [134.134.136.20])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9A00D5722E;
-        Thu, 18 Aug 2022 06:24:34 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1660829074; x=1692365074;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=5TUL0pMN1Ch62fh0N5bHXldv3b4lhkGVjVf4Q20K7N8=;
-  b=af/BoiSPNPjYdKoxzwvWQjR04f450FFqdvSqTtbYlKSF+bXLbM7dBxul
-   8PnI3RY2FleRWHpdaa3hTAJMMBHjSDf7/9peNbvrJGfy4K98ikKV2nqhY
-   W1IXett9S+pL5UysC8cCbVRgd5YTJnUTn9RxH6B1a+GuhB6LPqEZZZDkU
-   +mAA9ZIKN37uYxkTmO0Ckumj2itTgIfFAQGQ5UBlmPVkgJaMypGNwVk14
-   5oWbjszXN5VwxNqm6fiWWLJmEX2pbW+QtfEH0D0+yQLAITSCaTjQmx42E
-   tU8kRPN80gMfuHYVsH/A2TRkgUGO+jS4S4P+Od9qsl7CJDmvhk4oVqqk6
-   g==;
-X-IronPort-AV: E=McAfee;i="6500,9779,10442"; a="279720468"
-X-IronPort-AV: E=Sophos;i="5.93,246,1654585200"; 
-   d="scan'208";a="279720468"
-Received: from orsmga007.jf.intel.com ([10.7.209.58])
-  by orsmga101.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 18 Aug 2022 06:24:33 -0700
-X-IronPort-AV: E=Sophos;i="5.93,246,1654585200"; 
-   d="scan'208";a="604253471"
-Received: from geigerri-mobl1.ger.corp.intel.com (HELO box.shutemov.name) ([10.251.215.246])
-  by orsmga007-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 18 Aug 2022 06:24:24 -0700
-Received: by box.shutemov.name (Postfix, from userid 1000)
-        id 68132104AA0; Thu, 18 Aug 2022 16:24:21 +0300 (+03)
-Date:   Thu, 18 Aug 2022 16:24:21 +0300
-From:   "Kirill A . Shutemov" <kirill.shutemov@linux.intel.com>
-To:     Hugh Dickins <hughd@google.com>
-Cc:     Chao Peng <chao.p.peng@linux.intel.com>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org, linux-mm@kvack.org,
-        linux-fsdevel@vger.kernel.org, linux-api@vger.kernel.org,
-        linux-doc@vger.kernel.org, qemu-devel@nongnu.org,
-        linux-kselftest@vger.kernel.org,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Jonathan Corbet <corbet@lwn.net>,
-        Sean Christopherson <seanjc@google.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        x86@kernel.org, "H . Peter Anvin" <hpa@zytor.com>,
-        Jeff Layton <jlayton@kernel.org>,
-        "J . Bruce Fields" <bfields@fieldses.org>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        Shuah Khan <shuah@kernel.org>, Mike Rapoport <rppt@kernel.org>,
-        Steven Price <steven.price@arm.com>,
-        "Maciej S . Szmigiero" <mail@maciej.szmigiero.name>,
-        Vlastimil Babka <vbabka@suse.cz>,
-        Vishal Annapurve <vannapurve@google.com>,
-        Yu Zhang <yu.c.zhang@linux.intel.com>, luto@kernel.org,
-        jun.nakajima@intel.com, dave.hansen@intel.com, ak@linux.intel.com,
-        david@redhat.com, aarcange@redhat.com, ddutile@redhat.com,
-        dhildenb@redhat.com, Quentin Perret <qperret@google.com>,
-        Michael Roth <michael.roth@amd.com>, mhocko@suse.com,
-        Muchun Song <songmuchun@bytedance.com>,
-        "Gupta, Pankaj" <pankaj.gupta@amd.com>
-Subject: Re: [PATCH v7 00/14] KVM: mm: fd-based approach for supporting KVM
- guest private memory
-Message-ID: <20220818132421.6xmjqduempmxnnu2@box>
-References: <20220706082016.2603916-1-chao.p.peng@linux.intel.com>
- <ff5c5b97-acdf-9745-ebe5-c6609dd6322e@google.com>
+        with ESMTP id S245107AbiHRN0O (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 18 Aug 2022 09:26:14 -0400
+Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D83BAB5152;
+        Thu, 18 Aug 2022 06:26:13 -0700 (PDT)
+Received: from pps.filterd (m0098409.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.17.1.5/8.17.1.5) with ESMTP id 27ICBuk8006519;
+        Thu, 18 Aug 2022 13:26:12 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=from : to : cc : subject
+ : date : message-id : mime-version : content-transfer-encoding; s=pp1;
+ bh=cy7TOBkBTUsUGXp1HFb/zjQD2mtz9+NBBqSnwdv4rL8=;
+ b=MVsMdVEI+lij3D2MXCJ6HW4dbkUMfC+++eKMzhYPJoAnH2G4I0SiSkTxdsG7ueL09OuE
+ KKVWM63ErEPApgEXKcG/+DnIveOidTDrhyLRjFFSfUztHodjVPumxnHjHir2Z8413Ujh
+ t6S9nbLbcLzcL1rg7FAD2u8twkwOdGWUX1/pSyHIqe0kc8X48rFLQsJAHG8dW1BGbVxY
+ AgwFkw8S2ZQ+8xnVN8ir18fzXiu3YGBNrZotIirgdy3uEA5NnxtdTzUUc7M8Sn0FijrL
+ OnTEbSy/cjLkRAQphKK397HtbnsOwgNojVtrQkMwVCnrqOfCTgeN4i4Gha+4aG90t7WK 5w== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3j1n7cjkt6-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Thu, 18 Aug 2022 13:26:12 +0000
+Received: from m0098409.ppops.net (m0098409.ppops.net [127.0.0.1])
+        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 27ICh08O032161;
+        Thu, 18 Aug 2022 13:26:11 GMT
+Received: from ppma02wdc.us.ibm.com (aa.5b.37a9.ip4.static.sl-reverse.com [169.55.91.170])
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3j1n7cjkse-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Thu, 18 Aug 2022 13:26:11 +0000
+Received: from pps.filterd (ppma02wdc.us.ibm.com [127.0.0.1])
+        by ppma02wdc.us.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 27IDJvau000471;
+        Thu, 18 Aug 2022 13:26:09 GMT
+Received: from b03cxnp07028.gho.boulder.ibm.com (b03cxnp07028.gho.boulder.ibm.com [9.17.130.15])
+        by ppma02wdc.us.ibm.com with ESMTP id 3hx3ka704e-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Thu, 18 Aug 2022 13:26:09 +0000
+Received: from b03ledav001.gho.boulder.ibm.com (b03ledav001.gho.boulder.ibm.com [9.17.130.232])
+        by b03cxnp07028.gho.boulder.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 27IDQ8Tf6029914
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Thu, 18 Aug 2022 13:26:08 GMT
+Received: from b03ledav001.gho.boulder.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id BCD406E050;
+        Thu, 18 Aug 2022 13:26:08 +0000 (GMT)
+Received: from b03ledav001.gho.boulder.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id B01226E052;
+        Thu, 18 Aug 2022 13:26:07 +0000 (GMT)
+Received: from li-2c1e724c-2c76-11b2-a85c-ae42eaf3cb3d.ibm.com.com (unknown [9.160.64.167])
+        by b03ledav001.gho.boulder.ibm.com (Postfix) with ESMTP;
+        Thu, 18 Aug 2022 13:26:07 +0000 (GMT)
+From:   Tony Krowiak <akrowiak@linux.ibm.com>
+To:     linux-s390@vger.kernel.org, linux-kernel@vger.kernel.org,
+        kvm@vger.kernel.org
+Cc:     jjherne@linux.ibm.com, borntraeger@de.ibm.com, cohuck@redhat.com,
+        mjrosato@linux.ibm.com, pasic@linux.ibm.com,
+        alex.williamson@redhat.com, kwankhede@nvidia.com,
+        fiuczy@linux.ibm.com
+Subject: [PATCH v2 0/2] s390/vfio-ap: fix two problems discovered in the vfio_ap driver
+Date:   Thu, 18 Aug 2022 09:26:04 -0400
+Message-Id: <20220818132606.13321-1-akrowiak@linux.ibm.com>
+X-Mailer: git-send-email 2.31.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <ff5c5b97-acdf-9745-ebe5-c6609dd6322e@google.com>
-X-Spam-Status: No, score=-4.3 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
-        RCVD_IN_MSPIKE_H3,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE,
-        T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED autolearn=ham autolearn_force=no
-        version=3.4.6
+Content-Transfer-Encoding: 8bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: naYnCpwq83TT-adBpbmKSPS_COtxlT9t
+X-Proofpoint-ORIG-GUID: J2i-395Jiy_ONmAD2n-vqoYMwjplYzOy
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.205,Aquarius:18.0.895,Hydra:6.0.517,FMLib:17.11.122.1
+ definitions=2022-08-18_12,2022-08-18_01,2022-06-22_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 adultscore=0 malwarescore=0
+ bulkscore=0 impostorscore=0 phishscore=0 priorityscore=1501 spamscore=0
+ clxscore=1015 lowpriorityscore=0 mlxlogscore=999 suspectscore=0 mlxscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2207270000
+ definitions=main-2208180045
+X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_EF,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_PASS,
+        T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Aug 17, 2022 at 10:40:12PM -0700, Hugh Dickins wrote:
-> On Wed, 6 Jul 2022, Chao Peng wrote:
-> > This is the v7 of this series which tries to implement the fd-based KVM
-> > guest private memory.
-> 
-> Here at last are my reluctant thoughts on this patchset.
-> 
-> fd-based approach for supporting KVM guest private memory: fine.
-> 
-> Use or abuse of memfd and shmem.c: mistaken.
-> 
-> memfd_create() was an excellent way to put together the initial prototype.
-> 
-> But since then, TDX in particular has forced an effort into preventing
-> (by flags, seals, notifiers) almost everything that makes it shmem/tmpfs.
-> 
-> Are any of the shmem.c mods useful to existing users of shmem.c? No.
-> Is MFD_INACCESSIBLE useful or comprehensible to memfd_create() users? No.
-> 
-> What use do you have for a filesystem here?  Almost none.
-> IIUC, what you want is an fd through which QEMU can allocate kernel
-> memory, selectively free that memory, and communicate fd+offset+length
-> to KVM.  And perhaps an interface to initialize a little of that memory
-> from a template (presumably copied from a real file on disk somewhere).
-> 
-> You don't need shmem.c or a filesystem for that!
-> 
-> If your memory could be swapped, that would be enough of a good reason
-> to make use of shmem.c: but it cannot be swapped; and although there
-> are some references in the mailthreads to it perhaps being swappable
-> in future, I get the impression that will not happen soon if ever.
-> 
-> If your memory could be migrated, that would be some reason to use
-> filesystem page cache (because page migration happens to understand
-> that type of memory): but it cannot be migrated.
+Two problems have been discovered with the vfio_ap device driver since the
+hot plug support was recently introduced:
 
-Migration support is in pipeline. It is part of TDX 1.5 [1]. And swapping
-theoretically possible, but I'm not aware of any plans as of now.
+1. Attempting to remove a matrix mdev after assigning a duplicate adapter
+   or duplicate domain results in a hang.
 
-[1] https://www.intel.com/content/www/us/en/developer/articles/technical/intel-trust-domain-extensions.html
+2. The queues associated with an adapter or domain being unassigned from
+   the matrix mdev do not get unlinked from it.
 
-> Some of these impressions may come from earlier iterations of the
-> patchset (v7 looks better in several ways than v5).  I am probably
-> underestimating the extent to which you have taken on board other
-> usages beyond TDX and SEV private memory, and rightly want to serve
-> them all with similar interfaces: perhaps there is enough justification
-> for shmem there, but I don't see it.  There was mention of userfaultfd
-> in one link: does that provide the justification for using shmem?
-> 
-> I'm afraid of the special demands you may make of memory allocation
-> later on - surprised that huge pages are not mentioned already;
-> gigantic contiguous extents? secretmem removed from direct map?
+Two patches are provided to resolve these problems.
 
-The design allows for extension to hugetlbfs if needed. Combination of
-MFD_INACCESSIBLE | MFD_HUGETLB should route this way. There should be zero
-implications for shmem. It is going to be separate struct memfile_backing_store.
+Change log v1 => v2:
+====================
+* Added Fixes: tags to both patches
+* Copying stable@vger.kernel.org
 
-I'm not sure secretmem is a fit here as we want to extend MFD_INACCESSIBLE
-to be movable if platform supports it and secretmem is not migratable by
-design (without direct mapping fragmentations).
+Tony Krowiak (2):
+  s390/vfio-ap: fix hang during removal of mdev after duplicate
+    assignment
+  s390/vfio-ap: fix unlinking of queues from the mdev
 
-> Here's what I would prefer, and imagine much easier for you to maintain;
-> but I'm no system designer, and may be misunderstanding throughout.
-> 
-> QEMU gets fd from opening /dev/kvm_something, uses ioctls (or perhaps
-> the fallocate syscall interface itself) to allocate and free the memory,
-> ioctl for initializing some of it too.  KVM in control of whether that
-> fd can be read or written or mmap'ed or whatever, no need to prevent it
-> in shmem.c, no need for flags, seals, notifications to and fro because
-> KVM is already in control and knows the history.  If shmem actually has
-> value, call into it underneath - somewhat like SysV SHM, and /dev/zero
-> mmap, and i915/gem make use of it underneath.  If shmem has nothing to
-> add, just allocate and free kernel memory directly, recorded in your
-> own xarray.
-
-I guess shim layer on top of shmem *can* work. I don't see immediately why
-it would not. But I'm not sure it is right direction. We risk creating yet
-another parallel VM with own rules/locking/accounting that opaque to
-core-mm.
-
-Note that on machines that run TDX guests such memory would likely be the
-bulk of memory use. Treating it as a fringe case may bite us one day.
+ drivers/s390/crypto/vfio_ap_ops.c | 36 +++++++++++++++++++++++++++----
+ 1 file changed, 32 insertions(+), 4 deletions(-)
 
 -- 
-  Kiryl Shutsemau / Kirill A. Shutemov
+2.31.1
+
