@@ -2,207 +2,299 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id ECF04598446
-	for <lists+kvm@lfdr.de>; Thu, 18 Aug 2022 15:38:46 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 00AD8598562
+	for <lists+kvm@lfdr.de>; Thu, 18 Aug 2022 16:11:35 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S245110AbiHRNhO (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 18 Aug 2022 09:37:14 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42734 "EHLO
+        id S245114AbiHROGz (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 18 Aug 2022 10:06:55 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51200 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S244787AbiHRNhM (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 18 Aug 2022 09:37:12 -0400
-Received: from NAM04-BN8-obe.outbound.protection.outlook.com (mail-bn8nam04on2058.outbound.protection.outlook.com [40.107.100.58])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B320CB5169;
-        Thu, 18 Aug 2022 06:37:10 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=jCAMi5kWF23wPi/YtH7pNRSw3+nh7U6MAy/6E9sMiwohChVOWfRMKIDfJ8kTFjK3I5d68fbP4IXrZP35e6dFdfKdl8QU+fSRpKFnHouO7j/lLXsUXgg+PWuS6PcWaNCleXDbytb/cNaQuRwkHcbkLBU40XJMzs+UQ4aMYpA9UqdYSIA8CcqrV7tyj0ri/kUmIt5vkm+PQhBN/abqvw5RwaRRAUeDrK/SwmnY6QE5lQZTd8f0oPWCssimm4KpGFsY4h92nku6TyI10MIGSJBF6DzE8RX8XflIHKAUoZ/ivFCUYIRHUMn/2WZ65eekxopBR9tDm0ZZKjvNdopGOomRew==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=bVx+8gWum9/gbqU9l4Z5rJctQuHHWlWUDFQPeHmXY0k=;
- b=nDS/WJZjb/oAvkAypnb2NRSnoNbdKYkVxf3TwXiiEHy5xddROkANjrLxM/DxY+4smOThx9uAJC+7H9tZU0PDCwywRL1oNjGGJLBHYJw4x4ibTRxbv4pIUFCm7Dw+fZ9HH32BdyFizqoblzeSkJ/rkIYcs1hmuFpYWqgPeJ/7W69twMjhIDt/3dGsYxXRBlWeugsbgI0K3fjzfA8D7LS5zGIHDjEHMzzQHq767rFtGQ7EG4fRl9EOFdIMDIrNO56LyeBvJmy++LVD4O49OFua9u77a1qCi9ksyGGmEoFQplOBaXBS61wSOKOQhED7LxcRxXWerkdUhe2BokGOIOBgGg==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
- header.d=amd.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=bVx+8gWum9/gbqU9l4Z5rJctQuHHWlWUDFQPeHmXY0k=;
- b=ku0tw9yabZelts1tfTEnzHToV3KKLr6sPj2kI944Ox0UJynGGEB/t+STRTz3qYa1RyNj4PeQe4/iZj+XD/wyCmwKM8aWCcF0AcxmXg1tibmh4S8HsTDHXYPv0baKOkU3Gigj0h2dqSo4rarmpQdCuAADHflSQrbR3sM5gx5tJkc=
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=amd.com;
-Received: from BN8PR12MB3587.namprd12.prod.outlook.com (2603:10b6:408:43::13)
- by DM6PR12MB4420.namprd12.prod.outlook.com (2603:10b6:5:2a7::8) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5546.16; Thu, 18 Aug
- 2022 13:37:07 +0000
-Received: from BN8PR12MB3587.namprd12.prod.outlook.com
- ([fe80::905:1701:3b51:7e39]) by BN8PR12MB3587.namprd12.prod.outlook.com
- ([fe80::905:1701:3b51:7e39%2]) with mapi id 15.20.5504.020; Thu, 18 Aug 2022
- 13:37:07 +0000
-Message-ID: <23cb08e4-6de8-8ff4-b569-c93533bf0e19@amd.com>
-Date:   Thu, 18 Aug 2022 15:37:01 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.11.0
-Subject: Re: [PATCH 0/4] Allow MMIO regions to be exported through dma-buf
-Content-Language: en-US
-To:     Jason Gunthorpe <jgg@nvidia.com>
-Cc:     Alex Williamson <alex.williamson@redhat.com>,
-        Cornelia Huck <cohuck@redhat.com>,
-        dri-devel@lists.freedesktop.org, kvm@vger.kernel.org,
-        linaro-mm-sig@lists.linaro.org, linux-media@vger.kernel.org,
-        Sumit Semwal <sumit.semwal@linaro.org>,
-        Daniel Vetter <daniel.vetter@ffwll.ch>,
-        Leon Romanovsky <leon@kernel.org>, linux-rdma@vger.kernel.org,
-        Maor Gottlieb <maorg@nvidia.com>,
-        Oded Gabbay <ogabbay@kernel.org>
-References: <0-v1-9e6e1739ed95+5fa-vfio_dma_buf_jgg@nvidia.com>
- <921de79a-9cb3-4217-f079-4b23958a16aa@amd.com> <Yv4qlOp9n78B8TFb@nvidia.com>
- <d12fdf94-fbef-b981-2eff-660470ceca22@amd.com> <Yv47lkz7FG8vhqA5@nvidia.com>
-From:   =?UTF-8?Q?Christian_K=c3=b6nig?= <christian.koenig@amd.com>
-In-Reply-To: <Yv47lkz7FG8vhqA5@nvidia.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-ClientProxiedBy: FR0P281CA0142.DEUP281.PROD.OUTLOOK.COM
- (2603:10a6:d10:96::15) To BN8PR12MB3587.namprd12.prod.outlook.com
- (2603:10b6:408:43::13)
+        with ESMTP id S245661AbiHROGh (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 18 Aug 2022 10:06:37 -0400
+Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 11F8075CFE;
+        Thu, 18 Aug 2022 07:06:14 -0700 (PDT)
+Received: from pps.filterd (m0098409.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.17.1.5/8.17.1.5) with ESMTP id 27IE0gkG016987;
+        Thu, 18 Aug 2022 14:06:11 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
+ mime-version : subject : to : cc : references : from : in-reply-to :
+ content-type : content-transfer-encoding; s=pp1;
+ bh=gR1gaCzyh6v5gEqbl50ozpVo3lmNtojm4C+1Oao88Vo=;
+ b=tq5f/rkqaIM1RSf3YUAplqtJqzjZ8zxuj0HFMuI5db2ZYrDUDclx+J5A4f98kz975v5/
+ MEU6TmNrsr2CNc1RaRbuKC8aJnN9vgYhaYyB72OP2GbHCq6HYUPcmS2TsZGWtrz/NbrB
+ 7mkrp//pWKDDujsM7ZMBp+1mT5jfnd/QyXgybQ4i8DAGKsQyS4bppYkPbMMSumETGGXQ
+ t4ZvKI5QBaFIORD5X4Pq9eB7Fprbyg2ak6TUXuXlcIDI4zbCHggSXLeU1M6r6CYECNyE
+ xdxYxqE3s4AB1cj7P8yWlDPwcu7sQcxcjw+bFl+CzmdOYtf9KG1TR2guIbhwpcQrn94Q Bw== 
+Received: from ppma06fra.de.ibm.com (48.49.7a9f.ip4.static.sl-reverse.com [159.122.73.72])
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3j1pthr57d-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Thu, 18 Aug 2022 14:06:11 +0000
+Received: from pps.filterd (ppma06fra.de.ibm.com [127.0.0.1])
+        by ppma06fra.de.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 27IE5CEG008471;
+        Thu, 18 Aug 2022 14:06:09 GMT
+Received: from b06cxnps4074.portsmouth.uk.ibm.com (d06relay11.portsmouth.uk.ibm.com [9.149.109.196])
+        by ppma06fra.de.ibm.com with ESMTP id 3hx37j4hcb-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Thu, 18 Aug 2022 14:06:08 +0000
+Received: from d06av24.portsmouth.uk.ibm.com (mk.ibm.com [9.149.105.60])
+        by b06cxnps4074.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 27IE65Vk30540214
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Thu, 18 Aug 2022 14:06:05 GMT
+Received: from d06av24.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id AAE844203F;
+        Thu, 18 Aug 2022 14:06:05 +0000 (GMT)
+Received: from d06av24.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 9BB6F42042;
+        Thu, 18 Aug 2022 14:06:04 +0000 (GMT)
+Received: from [9.171.73.125] (unknown [9.171.73.125])
+        by d06av24.portsmouth.uk.ibm.com (Postfix) with ESMTP;
+        Thu, 18 Aug 2022 14:06:04 +0000 (GMT)
+Message-ID: <955ef95a-df7c-9e66-43ec-4495a79f51d3@linux.ibm.com>
+Date:   Thu, 18 Aug 2022 16:06:04 +0200
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: 64824f27-6dd7-4779-ee89-08da811ebe92
-X-MS-TrafficTypeDiagnostic: DM6PR12MB4420:EE_
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: ALp61X/c9c/YpADkEsexlgHxu/j8U5PgGhJC5+fON4g3vRMopazdpJ18mDu2/TCNvRIhlyPQLb/cmwlnKs6OZnuRMPiSOEfmnlhESO2G/lYWnX4Zi8bPOcLBX67cBkVeHNiGAAh1I7yNedmcNd++1fM3QEd8arA96ggEwU8KEj8rRKcWbxa021XpPAgXoDrMS+JPx4a0rSMbSWoeO01NqJu9hi73fh+Kiep6xhLMGzcFUjUAxaZ34ZIAv12tnOngHrRAhKoVMgZS1rHDfkknuz/tJUh6zm2+ntLp/gXJaFcHIB2skFado8P7k9JkYivre0VOZmSRIIg2dxXLb/iGV+FLFjlor2jwFno8GhnF7yU6Ta64GP+qR9uciWaWS0qw/T255I/2BIqYsOr+nQlP+A81k3eiJMcNSQB16BbW3QlEJKZZQbws0GvUFwCtoE9SOPBtYatP28K+qEyqWgVsHp/k6xxHaRh9YZYGbkWW49DQwuiz5ss1bHwbx+Vxd18l9XBuOLMiqKOd+8pUXnvq42ujTimhtL3h1S799mf6ipnAmtKFrw4UvUlWAPuJe+UgiI1ZbkPAvLZ6mGl5H/kpb9uJzWHs1rzi6GicRUi7CkrTsWE915ZKkdcoEkjbVuP6cg0CA0DUkWy2JUaU91ztfLLTEULfC+IHUDb96Omiyb4XyEbzpH4nKk64Je6hkNM1r9/q4w5u/4oY1OeBkzTz0KagUXULBcCP6taP6IGqCpFRgaqut3g7/oD5WJ5sl09QtBHyGzEoXRHQpeU5+l5PA035gjOxexrSYCDwnTZYyu8=
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BN8PR12MB3587.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230016)(4636009)(346002)(136003)(396003)(376002)(39860400002)(366004)(31696002)(478600001)(66476007)(66946007)(66556008)(66574015)(6486002)(8676002)(2906002)(41300700001)(6512007)(86362001)(26005)(4326008)(6666004)(186003)(2616005)(7416002)(5660300002)(8936002)(36756003)(54906003)(6916009)(6506007)(31686004)(38100700002)(316002)(83380400001)(45980500001)(43740500002);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?eEp2UDZmdXlNeTFYTFlZKy9vblN0OFRIblZ6WWxZK2RHL1pZdWxCd0p4R1F4?=
- =?utf-8?B?Y1c5RTBMSHprcWpPczFEWGFrQ1Y5WFk3US8yQ3hZVDRwWXRKbXRrQUdTbEx2?=
- =?utf-8?B?aGd2b01zL01wRkMvdFhSajdLSTNMNXluR3ZCaGhpSG0xcFErbHdGYXVnbnVM?=
- =?utf-8?B?QW5KMFFzcWRpQ3NQMTdsL0xTSU5CaXBxU3VwenF0UEFrVjVSNmt0eXJHN2NO?=
- =?utf-8?B?U3ZjdW5GOTcwbWltcTNuYWp3UGl5SXJVNE5ONEt0ZGM4ZytqQ01MOWx1SGhu?=
- =?utf-8?B?aTIyaG1ha0hiMFcvZmNXUUh2dmxUaXluN05FbGRqSERkV3I5NHZhVDZwempH?=
- =?utf-8?B?WkE0WnllN2RkaFVYVzhwS0w4dGI3WGpyU0E4WjNhR1JuWlkzZzAzZkR3R1Qy?=
- =?utf-8?B?MmNKcjBDazhJbnE2bzhuN3NZeU9IR0hCMkExUkxtSTVMbE9DTnlZQXlXQmdW?=
- =?utf-8?B?MENEdHNsUCtYZ1hpM0pSM2s4cXV1Mmd6MG9sVTg0VUxqdG56SW9aOGl5RE9z?=
- =?utf-8?B?aDdodTFiT1BOTFBSWDBNN051QzJIQ25BUmpublRicHdwZlR1MENMZ0wyUFh1?=
- =?utf-8?B?M0Z4TC92cThWYXppRStLeWF1Q1NndXBOa0RYNE1jeHE1S2QvdlVSdyttdzFa?=
- =?utf-8?B?aVc0MTliOTBZY2trRTJqU2ZoTDkyWTlFWHV1TFVnV3luR3h5Yk1hVzg0Uy9I?=
- =?utf-8?B?MGhnYVI0d0pUZXFrMGYvYjJKRHlySUJ2MktFY0RPVUQ0cVJ3M0pIRVQxbnJX?=
- =?utf-8?B?MHhGTzVXekh3elpUTXFXS2l1UmxXR1JsTWoybVRNaGI4ZTdBRFlxaU5zWndL?=
- =?utf-8?B?bGZtYzlqazZYK09WUmNJc2NFVFdMLy95SFo2WXhpY3QrMmZJUWZSbWFySFZo?=
- =?utf-8?B?OE1UaGVPWEZTVktDNnBmQVhxa0FmbytON1JWRit1TEMvTW9JaXVOaTNFTm9D?=
- =?utf-8?B?bnBLeEtORWJlV1N3c1RPQnkvbW5tZCt3Q1p4b1p5REdTNmVaVXJLdk8reUti?=
- =?utf-8?B?bUl5V0F4NHJsZGxjTS9BOS9US1A4VWFGaDkvVHNaeS9rVmNlWXJHOG5mdDRp?=
- =?utf-8?B?SXpTR2swZFJVcGxkNTlTQzh2YzZxY0dMWnNweTA4TlI2T0tsTzdUVnkyWWdq?=
- =?utf-8?B?QzJTUzdjTmVKSTRQeDNMM1NOME9UK0ZvNEd0WDRoV1Y5eVA3Q3hLOUhUNGZi?=
- =?utf-8?B?YmJZOVdScWxzUThYR2JnVm9iMjREMGVETGV2YXY1YVZ2a3NaVFVGYXZVMzBx?=
- =?utf-8?B?ODgxTjgzSHFnbmM0YTFkeGhadjZ1cTRkdEdsSFE0b251aDlIbkVwZDgvZkpj?=
- =?utf-8?B?QkRQbjZjcHBUQ29jWWFJM0plR3NnNk9vZ0FSUyttNTBqZ2VOSk5iTm5iUW1V?=
- =?utf-8?B?NXRaWjhXWVpDWHlKcnZzS0VQTGdDQWMvK2Vocm9PN1hZZy9hdDlhM1ZCQUoz?=
- =?utf-8?B?VnI5S2ZENWZKRHZ5NnhRUmQrODI1VkRvdCtzOEJNekVrWTBqcHVlMUh2MVl6?=
- =?utf-8?B?RDFlZ3ZTOFBLbG0vRWxJQ0R0YkxkVkQyVlRVejZ6ZGxyR3laMnVwVUs2YlFN?=
- =?utf-8?B?WXYrTjRUZ0FjRkw1R0JBUzAzdGlLVWhEdlJLUlF3OE5UZk84aUwveUhyQS84?=
- =?utf-8?B?c2J0T20xcFZ6UHhmdzBZRUgrdHlhdnNZRXlVeTI5dTBpUkdpNm43M1NxbGNY?=
- =?utf-8?B?YUhGOURMRTVYS2llSngvQU5hUmZmRnlJU3lHcW1vV0d3cWlQWDVnTkNOMnBO?=
- =?utf-8?B?SEsxNmhGTEQ1ZUUwOFcxL1JPdUJ1WHJtZnFvZXA0R2VkdjRPdE44QlpIR01u?=
- =?utf-8?B?aHpveGZQYnQ2MUM4WjBkVWxpWjJxUU81NE13LzRhOElGV1ZoVGJSdkpGY3NE?=
- =?utf-8?B?ZVRoQVhpUldqcW5tTjcvMXZOa05xbWlCTnEzVFArUGEvS2FZbVpWNkh1Rk04?=
- =?utf-8?B?QU1Hc296bzZLa2o0cSt4ODkrQ0R5ZFFMbW1TN1d0UWpIdUNJTHBkdVJXQWNR?=
- =?utf-8?B?aW9LQWRvcE11T29QREVBVWkvSDJ1UDlYdTR0Z29zSElXVmMwNWhpY05hSU52?=
- =?utf-8?B?NzVMTUZkZ0R6WHlBak80T0Fhdm8zNmdIc1JCcDlKUGovaDhxbDRLQ002dk9B?=
- =?utf-8?Q?m3+ohE6Hl3Z2S0gmiNbjEgcak?=
-X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 64824f27-6dd7-4779-ee89-08da811ebe92
-X-MS-Exchange-CrossTenant-AuthSource: BN8PR12MB3587.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 18 Aug 2022 13:37:07.4992
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: BmRrSF0Lj/2hxPw8oaAogwBW2Zo4zc6r66ZYPxC2jLFCj2mZ6foMeJCsX/n2MTCr
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM6PR12MB4420
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_DNSWL_NONE,
-        RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_PASS,T_SCC_BODY_TEXT_LINE,
-        URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.6
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.3.0
+Subject: Re: [PATCH] KVM: s390: pci: Hook to access KVM lowlevel from VFIO
+Content-Language: en-US
+To:     Matthew Rosato <mjrosato@linux.ibm.com>
+Cc:     rdunlap@infradead.org, linux-kernel@vger.kernel.org, lkp@intel.com,
+        borntraeger@linux.ibm.com, farman@linux.ibm.com,
+        linux-s390@vger.kernel.org, kvm@vger.kernel.org, gor@linux.ibm.com,
+        hca@linux.ibm.com, schnelle@linux.ibm.com
+References: <1f2dd65e-b79b-44df-cc6a-8b3aa8fd61af@linux.ibm.com>
+ <20220818102305.250702-1-pmorel@linux.ibm.com>
+ <f797373e-c420-718a-443d-ae98ea0368c7@linux.ibm.com>
+From:   Pierre Morel <pmorel@linux.ibm.com>
+In-Reply-To: <f797373e-c420-718a-443d-ae98ea0368c7@linux.ibm.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-ORIG-GUID: M747w6OvZAK9jK8uOMuW11tNYc0Fq5au
+X-Proofpoint-GUID: M747w6OvZAK9jK8uOMuW11tNYc0Fq5au
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.205,Aquarius:18.0.895,Hydra:6.0.517,FMLib:17.11.122.1
+ definitions=2022-08-18_12,2022-08-18_01,2022-06-22_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 clxscore=1015 adultscore=0
+ lowpriorityscore=0 mlxscore=0 malwarescore=0 suspectscore=0 spamscore=0
+ phishscore=0 bulkscore=0 mlxlogscore=999 impostorscore=0
+ priorityscore=1501 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2207270000 definitions=main-2208180050
+X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,
+        SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no
+        version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Am 18.08.22 um 15:16 schrieb Jason Gunthorpe:
-> On Thu, Aug 18, 2022 at 02:58:10PM +0200, Christian König wrote:
->
->>>> The only thing I'm not 100% convinced of is dma_buf_try_get(), I've seen
->>>> this incorrectly used so many times that I can't count them any more.
->>>>
->>>> Would that be somehow avoidable? Or could you at least explain the use case
->>>> a bit better.
->>> I didn't see a way, maybe you know of one
->> For GEM objects we usually don't use the reference count of the DMA-buf, but
->> rather that of the GEM object for this. But that's not an ideal solution
->> either.
-> You can't really ignore the dmabuf refcount. At some point you have to
-> deal with the dmabuf being asynchronously released by userspace.
 
-Yeah, but in this case the dma-buf is just a reference to the 
-real/private object which holds the backing store.
 
-When the dma-buf is released you drop the real object reference and from 
-your driver internals you only try_get only the real object.
+On 8/18/22 15:33, Matthew Rosato wrote:
+> On 8/18/22 6:23 AM, Pierre Morel wrote:
+>> We have a cross dependency between KVM and VFIO.
+> 
+> maybe add something like 'when using s390 vfio_pci_zdev extensions for PCI passthrough'
+> 
+>> To be able to keep both subsystem modular we add a registering
+>> hook inside the S390 core code.
+>>
+>> This fixes a build problem when VFIO is built-in and KVM is built
+>> as a module or excluded.
+> 
+> s/or excluded//
+> 
+> There's no problem when KVM is excluded, that forces CONFIG_VFIO_PCI_ZDEV_KVM=n because of the 'depends on S390 && KVM'.
 
-The advantage is that only your driver can use the try_get function and 
-not some importing driver which doesn't know about the internals of the 
-exporter.
+OK
 
-We just had to many cases where developers weren't sure if a pointer is 
-still valid and by using try_get it just "magically" got working (well I 
-have to admit it made the crashing less likely....).
+> 
+>>
+>> Reported-by: Randy Dunlap <rdunlap@infradead.org>
+>> Reported-by: kernel test robot <lkp@intel.com>
+>> Signed-off-by: Pierre Morel <pmorel@linux.ibm.com>
+>> Fixes: 09340b2fca007 ("KVM: s390: pci: add routines to start/stop inter..")
+>> Cc: <stable@vger.kernel.org>
+>> ---
+>>   arch/s390/include/asm/kvm_host.h | 17 ++++++-----------
+>>   arch/s390/kvm/pci.c              | 10 ++++++----
+>>   arch/s390/pci/Makefile           |  2 ++
+>>   arch/s390/pci/pci_kvm_hook.c     | 11 +++++++++++
+>>   drivers/vfio/pci/vfio_pci_zdev.c |  8 ++++++--
+>>   5 files changed, 31 insertions(+), 17 deletions(-)
+>>   create mode 100644 arch/s390/pci/pci_kvm_hook.c
+>>
+>> diff --git a/arch/s390/include/asm/kvm_host.h b/arch/s390/include/asm/kvm_host.h
+>> index f39092e0ceaa..8312ed9d1937 100644
+>> --- a/arch/s390/include/asm/kvm_host.h
+>> +++ b/arch/s390/include/asm/kvm_host.h
+>> @@ -1038,16 +1038,11 @@ static inline void kvm_arch_vcpu_unblocking(struct kvm_vcpu *vcpu) {}
+>>   #define __KVM_HAVE_ARCH_VM_FREE
+>>   void kvm_arch_free_vm(struct kvm *kvm);
+>>   
+>> -#ifdef CONFIG_VFIO_PCI_ZDEV_KVM
+>> -int kvm_s390_pci_register_kvm(struct zpci_dev *zdev, struct kvm *kvm);
+>> -void kvm_s390_pci_unregister_kvm(struct zpci_dev *zdev);
+>> -#else
+>> -static inline int kvm_s390_pci_register_kvm(struct zpci_dev *dev,
+>> -					    struct kvm *kvm)
+>> -{
+>> -	return -EPERM;
+>> -}
+>> -static inline void kvm_s390_pci_unregister_kvm(struct zpci_dev *dev) {}
+>> -#endif
+>> +struct kvm_register_hook {
+> 
+> Nit: zpci_kvm_register_hook ?  Just to make it clear it's for zpci.
 
->>> 	down_write(&vdev->memory_lock);
->>> 	list_for_each_entry_safe(priv, tmp, &vdev->dmabufs, dmabufs_elm) {
->>> 		if (!dma_buf_try_get(priv->dmabuf))
->>> 			continue;
->> What would happen if you don't skip destroyed dma-bufs here? In other words
->> why do you maintain that list in the first place?
-> The list is to keep track of the dmabufs that were created, it is not
-> optional.
->
-> The only question is what do you do about invoking
-> dma_buf_move_notify() on a dmabuf that is already undergoing
-> destruction.
+OK
 
-Ah, yes. Really good point.
 
->
-> For instance undergoing destruction means the dmabuf core has already
-> done this:
->
-> 	mutex_lock(&db_list.lock);
-> 	list_del(&dmabuf->list_node);
-> 	mutex_unlock(&db_list.lock);
-> 	dma_buf_stats_teardown(dmabuf);
->
-> So it seems non-ideal to continue to use it.
->
-> However, dma_buf_move_notify() specifically has no issue with that level of
-> destruction since it only does
->
-> 	list_for_each_entry(attach, &dmabuf->attachments, node)
->
-> And attachments must be empty if the file refcount is zero.
->
-> So we could delete the try_buf and just rely on move being safe on
-> partially destroyed dma_buf's as part of the API design.
+> 
+>> +	int (*kvm_register)(void *opaque, struct kvm *kvm);
+>> +	void (*kvm_unregister)(void *opaque);
+>> +};
+>> +
+>> +extern struct kvm_register_hook kvm_pci_hook;
+> 
+> Nit: kvm_zpci_hook ?
 
-I think that might be the more defensive approach. A comment on the 
-dma_buf_move_notify() function should probably be a good idea.
+OK too,
+
+> 
+>>   
+>>   #endif
+>> diff --git a/arch/s390/kvm/pci.c b/arch/s390/kvm/pci.c
+>> index 4946fb7757d6..e173fce64c4f 100644
+>> --- a/arch/s390/kvm/pci.c
+>> +++ b/arch/s390/kvm/pci.c
+>> @@ -431,8 +431,9 @@ static void kvm_s390_pci_dev_release(struct zpci_dev *zdev)
+>>    * available, enable them and let userspace indicate whether or not they will
+>>    * be used (specify SHM bit to disable).
+>>    */
+>> -int kvm_s390_pci_register_kvm(struct zpci_dev *zdev, struct kvm *kvm)
+>> +static int kvm_s390_pci_register_kvm(void *opaque, struct kvm *kvm)
+>>   {
+>> +	struct zpci_dev *zdev = opaque;
+>>   	int rc;
+>>   
+>>   	if (!zdev)
+>> @@ -510,10 +511,10 @@ int kvm_s390_pci_register_kvm(struct zpci_dev *zdev, struct kvm *kvm)
+>>   	kvm_put_kvm(kvm);
+>>   	return rc;
+>>   }
+>> -EXPORT_SYMBOL_GPL(kvm_s390_pci_register_kvm);
+>>   
+>> -void kvm_s390_pci_unregister_kvm(struct zpci_dev *zdev)
+>> +static void kvm_s390_pci_unregister_kvm(void *opaque)
+>>   {
+>> +	struct zpci_dev *zdev = opaque;
+>>   	struct kvm *kvm;
+>>   
+>>   	if (!zdev)
+>> @@ -566,7 +567,6 @@ void kvm_s390_pci_unregister_kvm(struct zpci_dev *zdev)
+>>   
+>>   	kvm_put_kvm(kvm);
+>>   }
+>> -EXPORT_SYMBOL_GPL(kvm_s390_pci_unregister_kvm);
+>>   
+>>   void kvm_s390_pci_init_list(struct kvm *kvm)
+>>   {
+>> @@ -678,6 +678,8 @@ int kvm_s390_pci_init(void)
+>>   
+>>   	spin_lock_init(&aift->gait_lock);
+>>   	mutex_init(&aift->aift_lock);
+>> +	kvm_pci_hook.kvm_register = kvm_s390_pci_register_kvm;
+>> +	kvm_pci_hook.kvm_unregister = kvm_s390_pci_unregister_kvm;
+>>   
+>>   	return 0;
+>>   }
+>> diff --git a/arch/s390/pci/Makefile b/arch/s390/pci/Makefile
+>> index bf557a1b789c..c02dbfb415d9 100644
+>> --- a/arch/s390/pci/Makefile
+>> +++ b/arch/s390/pci/Makefile
+>> @@ -7,3 +7,5 @@ obj-$(CONFIG_PCI)	+= pci.o pci_irq.o pci_dma.o pci_clp.o pci_sysfs.o \
+>>   			   pci_event.o pci_debug.o pci_insn.o pci_mmio.o \
+>>   			   pci_bus.o
+>>   obj-$(CONFIG_PCI_IOV)	+= pci_iov.o
+>> +
+>> +obj-y += pci_kvm_hook.o
+> 
+> I guess it doesn't harm anything to add this unconditionally, but I think it would also be OK to just include this in the CONFIG_PCI list - vfio_pci_zdev and arch/s390/kvm/pci all rely on CONFIG_PCI via CONFIG_VFIO_PCI_ZDEV_KVM which implies PCI via VFIO_PCI.
+
+Right,CONFIG_PCI is a bool so we can put the hook in arch/s390/pci/pci.c 
+and use a defined(CONFIG_PCI) to protect the initialization inside KVM.
+
+
+
+> 
+>> diff --git a/arch/s390/pci/pci_kvm_hook.c b/arch/s390/pci/pci_kvm_hook.c
+>> new file mode 100644
+>> index 000000000000..9d8799b72dbf
+>> --- /dev/null
+>> +++ b/arch/s390/pci/pci_kvm_hook.c
+>> @@ -0,0 +1,11 @@
+>> +// SPDX-License-Identifier: GPL-2.0-only
+>> +/*
+>> + * VFIO ZPCI devices support
+>> + *
+>> + * Copyright (C) IBM Corp. 2022.  All rights reserved.
+>> + *	Author(s): Pierre Morel <pmorel@linux.ibm.com>
+>> + */
+>> +#include <linux/kvm_host.h>
+>> +
+>> +struct kvm_register_hook kvm_pci_hook;
+>> +EXPORT_SYMBOL_GPL(kvm_pci_hook);
+> 
+> Following the comments above, zpci_kvm_register_hook, kvm_zpci_hook ?
+
+OK
+
+> 
+> I'm not sure if this really needs to be in a separate file or if it could just go into arch/s390/pci.c with the zpci_aipb -- If going the route of a separate file, up to Niklas whether he wants this under the S390 PCI maintainership or added to the list for s390 vfio-pci like arch/kvm/pci* and vfio_pci_zdev.
+
+agreed no need for a separate file, it is much better.
+
+> 
+>> diff --git a/drivers/vfio/pci/vfio_pci_zdev.c b/drivers/vfio/pci/vfio_pci_zdev.c
+>> index e163aa9f6144..3b7a707e2fe5 100644
+>> --- a/drivers/vfio/pci/vfio_pci_zdev.c
+>> +++ b/drivers/vfio/pci/vfio_pci_zdev.c
+>> @@ -151,7 +151,10 @@ int vfio_pci_zdev_open_device(struct vfio_pci_core_device *vdev)
+>>   	if (!vdev->vdev.kvm)
+>>   		return 0;
+>>   
+>> -	return kvm_s390_pci_register_kvm(zdev, vdev->vdev.kvm);
+>> +	if (kvm_pci_hook.kvm_register)
+>> +		return kvm_pci_hook.kvm_register(zdev, vdev->vdev.kvm);
+>> +
+>> +	return -ENOENT;
+>>   }
+>>   
+>>   void vfio_pci_zdev_close_device(struct vfio_pci_core_device *vdev)
+>> @@ -161,5 +164,6 @@ void vfio_pci_zdev_close_device(struct vfio_pci_core_device *vdev)
+>>   	if (!zdev || !vdev->vdev.kvm)
+>>   		return;
+>>   
+>> -	kvm_s390_pci_unregister_kvm(zdev);
+>> +	if (kvm_pci_hook.kvm_unregister)
+>> +		return kvm_pci_hook.kvm_unregister(zdev);
+> 
+> No need for the return here, this is a void function calling a void function.
+
+right.
+
+> 
+> 
+> Overall, this looks good to me and survives a series of compile and device passthrough tests on my end, just a matter of a few of these minor comments above.  Thanks for tackling this Pierre!
+> 
 
 Thanks,
-Christian.
+Pierre
 
->
-> Jason
 
+-- 
+Pierre Morel
+IBM Lab Boeblingen
