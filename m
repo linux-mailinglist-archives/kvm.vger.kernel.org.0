@@ -2,232 +2,151 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 9085B59816B
-	for <lists+kvm@lfdr.de>; Thu, 18 Aug 2022 12:24:12 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id CF8795981CC
+	for <lists+kvm@lfdr.de>; Thu, 18 Aug 2022 12:58:42 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S239739AbiHRKX0 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 18 Aug 2022 06:23:26 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38592 "EHLO
+        id S244194AbiHRK5N (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 18 Aug 2022 06:57:13 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50008 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S243865AbiHRKXX (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 18 Aug 2022 06:23:23 -0400
-Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2A9F2E0C8;
-        Thu, 18 Aug 2022 03:23:19 -0700 (PDT)
-Received: from pps.filterd (m0098404.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.17.1.5/8.17.1.5) with ESMTP id 27IAGUOb017201;
-        Thu, 18 Aug 2022 10:23:13 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=from : to : cc : subject
- : date : message-id : in-reply-to : references : mime-version :
- content-transfer-encoding; s=pp1;
- bh=8ODRvNZtFBIAsWU7CbkW/ligV2LUPySnNnLyoB7aL3Q=;
- b=nsEbxFIawsS0mlDPH6Vd9V3Sdqi8ntUQQRLKb5wUo9qMAGOjHqUo80zJ7d9jWu62MTH2
- YidGDs1rCAgvBUxscO9kCgxX0j8hcju3hNSzyhu9MQllu0QgIrJ1elmwj8oVdnKQr7ZY
- yBHrlNuosbxzP/lxopQ9RqLjBiDmYqQeHg/z2jBhC1qDELRQYjye+I7dYe2Vn96EBK64
- DLEGYL+eGNpkhu/NlfrBKVV/tmwDvDzjT12TvklZKRG8KEa13+TPwxdqO0s+9f8pZnbt
- Rf8YmgPd+FW6S6YRF+1iGaXRyfp9B7csuvKyeXI/ANB9M5vFBqCztiAaoB1w9YJ8EuSH qw== 
-Received: from ppma03ams.nl.ibm.com (62.31.33a9.ip4.static.sl-reverse.com [169.51.49.98])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3j1khe84f8-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 18 Aug 2022 10:23:12 +0000
-Received: from pps.filterd (ppma03ams.nl.ibm.com [127.0.0.1])
-        by ppma03ams.nl.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 27IAKKtD009783;
-        Thu, 18 Aug 2022 10:23:10 GMT
-Received: from b06cxnps4074.portsmouth.uk.ibm.com (d06relay11.portsmouth.uk.ibm.com [9.149.109.196])
-        by ppma03ams.nl.ibm.com with ESMTP id 3hx3k8wq55-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 18 Aug 2022 10:23:10 +0000
-Received: from d06av23.portsmouth.uk.ibm.com (d06av23.portsmouth.uk.ibm.com [9.149.105.59])
-        by b06cxnps4074.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 27IAN7h034603286
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Thu, 18 Aug 2022 10:23:07 GMT
-Received: from d06av23.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 44AF0A4057;
-        Thu, 18 Aug 2022 10:23:07 +0000 (GMT)
-Received: from d06av23.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id AB599A4051;
-        Thu, 18 Aug 2022 10:23:06 +0000 (GMT)
-Received: from li-c6ac47cc-293c-11b2-a85c-d421c8e4747b.ibm.com.com (unknown [9.171.73.125])
-        by d06av23.portsmouth.uk.ibm.com (Postfix) with ESMTP;
-        Thu, 18 Aug 2022 10:23:06 +0000 (GMT)
-From:   Pierre Morel <pmorel@linux.ibm.com>
-To:     mjrosato@linux.ibm.com
-Cc:     rdunlap@infradead.org, linux-kernel@vger.kernel.org, lkp@intel.com,
-        borntraeger@linux.ibm.com, farman@linux.ibm.com,
-        linux-s390@vger.kernel.org, kvm@vger.kernel.org, gor@linux.ibm.com,
-        hca@linux.ibm.com, schnelle@linux.ibm.com
-Subject: [PATCH] KVM: s390: pci: Hook to access KVM lowlevel from VFIO
-Date:   Thu, 18 Aug 2022 12:23:05 +0200
-Message-Id: <20220818102305.250702-1-pmorel@linux.ibm.com>
-X-Mailer: git-send-email 2.31.1
-In-Reply-To: <1f2dd65e-b79b-44df-cc6a-8b3aa8fd61af@linux.ibm.com>
-References: <1f2dd65e-b79b-44df-cc6a-8b3aa8fd61af@linux.ibm.com>
+        with ESMTP id S242917AbiHRK5M (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 18 Aug 2022 06:57:12 -0400
+Received: from galois.linutronix.de (Galois.linutronix.de [IPv6:2a0a:51c0:0:12e:550::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3A75E8F96E;
+        Thu, 18 Aug 2022 03:57:11 -0700 (PDT)
+From:   Thomas Gleixner <tglx@linutronix.de>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
+        s=2020; t=1660820224;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=QwcESLCmW8ulJw28LxzClSHwzOuNQQyl6cJVugvBlps=;
+        b=PvT/spCWBQOdm3augbdnEd1SsHd2Cq8bLGAFh+lRxf5dNDv4nC3W0+C4AionWanAuCyLZo
+        ZFVGBAxx0/G8H6vuenX5a/CA8+OMJoUHLTSFsq7wl9fzBbUasvh4fU4EF/JKc5ERMKjHnN
+        ICSk+i7vmA9fHnaTmb6kI9a13Rv6ZXY86IONlsnoLPeSdSH2Di1nhIKtnE5n5KVlVpfGuY
+        wrC5KOyd1VHob6rjM6Ewx3IzCKtctan9cRt7klfSM8V3tSyeZa6Cl3aMAsfLmdFz2LXYYS
+        M/Wn0oAKDclgPfDLdUZ2KvM6oE7RmBWn+DmtpPzU3xOBi+mgGDVcjjfzMCS3VQ==
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
+        s=2020e; t=1660820224;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=QwcESLCmW8ulJw28LxzClSHwzOuNQQyl6cJVugvBlps=;
+        b=HKzI6hTHmw6EN0x7oU06xuzrV/0EqzveJFcwGkkIlcqOaCZG12gPEsy922Z4MyvcyjrWPo
+        ka6x/zC7WO5xAvCw==
+To:     Kyle Huey <me@kylehuey.com>,
+        Dave Hansen <dave.hansen@linux.intel.com>,
+        Borislav Petkov <bp@alien8.de>
+Cc:     Ingo Molnar <mingo@redhat.com>, x86@kernel.org,
+        "H. Peter Anvin" <hpa@zytor.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Andy Lutomirski <luto@kernel.org>,
+        Peter Zijlstra <peterz@infradead.org>,
+        linux-kernel@vger.kernel.org, linux-kselftest@vger.kernel.org,
+        Robert O'Callahan <robert@ocallahan.org>,
+        David Manouchehri <david.manouchehri@riseup.net>,
+        Kyle Huey <me@kylehuey.com>, Borislav Petkov <bp@suse.de>,
+        kvm@vger.kernel.org, stable@vger.kernel.org
+Subject: Re: [PATCH v5 1/2] x86/fpu: Allow PKRU to be (once again) written
+ by ptrace.
+In-Reply-To: <20220808141538.102394-1-khuey@kylehuey.com>
+References: <20220808141538.102394-1-khuey@kylehuey.com>
+Date:   Thu, 18 Aug 2022 12:57:04 +0200
+Message-ID: <87ilmpzunz.ffs@tglx>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-ORIG-GUID: ehDJJSKw4y7VBkSyfqCqIQQT_gmCwwdu
-X-Proofpoint-GUID: ehDJJSKw4y7VBkSyfqCqIQQT_gmCwwdu
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.205,Aquarius:18.0.883,Hydra:6.0.517,FMLib:17.11.122.1
- definitions=2022-08-18_02,2022-08-18_01,2022-06-22_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 malwarescore=0 bulkscore=0
- clxscore=1015 mlxlogscore=872 phishscore=0 lowpriorityscore=0
- priorityscore=1501 suspectscore=0 spamscore=0 impostorscore=0 adultscore=0
- mlxscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2207270000 definitions=main-2208180033
-X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_EF,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_PASS,
-        T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
+Content-Type: text/plain
+X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,SPF_HELO_NONE,
+        SPF_PASS,T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-We have a cross dependency between KVM and VFIO.
-To be able to keep both subsystem modular we add a registering
-hook inside the S390 core code.
+Kyle!
 
-This fixes a build problem when VFIO is built-in and KVM is built
-as a module or excluded.
+On Mon, Aug 08 2022 at 07:15, Kyle Huey wrote:
+> When management of the PKRU register was moved away from XSTATE, emulation
+> of PKRU's existence in XSTATE was added for APIs that read XSTATE, but not
+> for APIs that write XSTATE. This can be seen by running gdb and executing
+> `p $pkru`, `set $pkru = 42`, and `p $pkru`. On affected kernels (5.14+) the
+> write to the PKRU register (which gdb performs through ptrace) is ignored.
+>
+> There are three relevant APIs: PTRACE_SETREGSET with NT_X86_XSTATE,
+> sigreturn, and KVM_SET_XSAVE. KVM_SET_XSAVE has its own special handling to
+> make PKRU writes take effect (in fpu_copy_uabi_to_guest_fpstate). Push that
+> down into copy_uabi_to_xstate and have PTRACE_SETREGSET with NT_X86_XSTATE
+> and sigreturn pass in pointers to the appropriate PKRU value.
+>
+> This also adds code to initialize the PKRU value to the hardware init value
+> (namely 0) if the PKRU bit is not set in the XSTATE header to match XRSTOR.
+> This is a change to the current KVM_SET_XSAVE behavior.
 
-Reported-by: Randy Dunlap <rdunlap@infradead.org>
-Reported-by: kernel test robot <lkp@intel.com>
-Signed-off-by: Pierre Morel <pmorel@linux.ibm.com>
-Fixes: 09340b2fca007 ("KVM: s390: pci: add routines to start/stop inter..")
-Cc: <stable@vger.kernel.org>
----
- arch/s390/include/asm/kvm_host.h | 17 ++++++-----------
- arch/s390/kvm/pci.c              | 10 ++++++----
- arch/s390/pci/Makefile           |  2 ++
- arch/s390/pci/pci_kvm_hook.c     | 11 +++++++++++
- drivers/vfio/pci/vfio_pci_zdev.c |  8 ++++++--
- 5 files changed, 31 insertions(+), 17 deletions(-)
- create mode 100644 arch/s390/pci/pci_kvm_hook.c
+You are stating a fact here, but provide 0 justification why this is
+correct.
 
-diff --git a/arch/s390/include/asm/kvm_host.h b/arch/s390/include/asm/kvm_host.h
-index f39092e0ceaa..8312ed9d1937 100644
---- a/arch/s390/include/asm/kvm_host.h
-+++ b/arch/s390/include/asm/kvm_host.h
-@@ -1038,16 +1038,11 @@ static inline void kvm_arch_vcpu_unblocking(struct kvm_vcpu *vcpu) {}
- #define __KVM_HAVE_ARCH_VM_FREE
- void kvm_arch_free_vm(struct kvm *kvm);
- 
--#ifdef CONFIG_VFIO_PCI_ZDEV_KVM
--int kvm_s390_pci_register_kvm(struct zpci_dev *zdev, struct kvm *kvm);
--void kvm_s390_pci_unregister_kvm(struct zpci_dev *zdev);
--#else
--static inline int kvm_s390_pci_register_kvm(struct zpci_dev *dev,
--					    struct kvm *kvm)
--{
--	return -EPERM;
--}
--static inline void kvm_s390_pci_unregister_kvm(struct zpci_dev *dev) {}
--#endif
-+struct kvm_register_hook {
-+	int (*kvm_register)(void *opaque, struct kvm *kvm);
-+	void (*kvm_unregister)(void *opaque);
-+};
-+
-+extern struct kvm_register_hook kvm_pci_hook;
- 
- #endif
-diff --git a/arch/s390/kvm/pci.c b/arch/s390/kvm/pci.c
-index 4946fb7757d6..e173fce64c4f 100644
---- a/arch/s390/kvm/pci.c
-+++ b/arch/s390/kvm/pci.c
-@@ -431,8 +431,9 @@ static void kvm_s390_pci_dev_release(struct zpci_dev *zdev)
-  * available, enable them and let userspace indicate whether or not they will
-  * be used (specify SHM bit to disable).
-  */
--int kvm_s390_pci_register_kvm(struct zpci_dev *zdev, struct kvm *kvm)
-+static int kvm_s390_pci_register_kvm(void *opaque, struct kvm *kvm)
- {
-+	struct zpci_dev *zdev = opaque;
- 	int rc;
- 
- 	if (!zdev)
-@@ -510,10 +511,10 @@ int kvm_s390_pci_register_kvm(struct zpci_dev *zdev, struct kvm *kvm)
- 	kvm_put_kvm(kvm);
- 	return rc;
- }
--EXPORT_SYMBOL_GPL(kvm_s390_pci_register_kvm);
- 
--void kvm_s390_pci_unregister_kvm(struct zpci_dev *zdev)
-+static void kvm_s390_pci_unregister_kvm(void *opaque)
- {
-+	struct zpci_dev *zdev = opaque;
- 	struct kvm *kvm;
- 
- 	if (!zdev)
-@@ -566,7 +567,6 @@ void kvm_s390_pci_unregister_kvm(struct zpci_dev *zdev)
- 
- 	kvm_put_kvm(kvm);
- }
--EXPORT_SYMBOL_GPL(kvm_s390_pci_unregister_kvm);
- 
- void kvm_s390_pci_init_list(struct kvm *kvm)
- {
-@@ -678,6 +678,8 @@ int kvm_s390_pci_init(void)
- 
- 	spin_lock_init(&aift->gait_lock);
- 	mutex_init(&aift->aift_lock);
-+	kvm_pci_hook.kvm_register = kvm_s390_pci_register_kvm;
-+	kvm_pci_hook.kvm_unregister = kvm_s390_pci_unregister_kvm;
- 
- 	return 0;
- }
-diff --git a/arch/s390/pci/Makefile b/arch/s390/pci/Makefile
-index bf557a1b789c..c02dbfb415d9 100644
---- a/arch/s390/pci/Makefile
-+++ b/arch/s390/pci/Makefile
-@@ -7,3 +7,5 @@ obj-$(CONFIG_PCI)	+= pci.o pci_irq.o pci_dma.o pci_clp.o pci_sysfs.o \
- 			   pci_event.o pci_debug.o pci_insn.o pci_mmio.o \
- 			   pci_bus.o
- obj-$(CONFIG_PCI_IOV)	+= pci_iov.o
-+
-+obj-y += pci_kvm_hook.o
-diff --git a/arch/s390/pci/pci_kvm_hook.c b/arch/s390/pci/pci_kvm_hook.c
-new file mode 100644
-index 000000000000..9d8799b72dbf
---- /dev/null
-+++ b/arch/s390/pci/pci_kvm_hook.c
-@@ -0,0 +1,11 @@
-+// SPDX-License-Identifier: GPL-2.0-only
-+/*
-+ * VFIO ZPCI devices support
-+ *
-+ * Copyright (C) IBM Corp. 2022.  All rights reserved.
-+ *	Author(s): Pierre Morel <pmorel@linux.ibm.com>
-+ */
-+#include <linux/kvm_host.h>
-+
-+struct kvm_register_hook kvm_pci_hook;
-+EXPORT_SYMBOL_GPL(kvm_pci_hook);
-diff --git a/drivers/vfio/pci/vfio_pci_zdev.c b/drivers/vfio/pci/vfio_pci_zdev.c
-index e163aa9f6144..3b7a707e2fe5 100644
---- a/drivers/vfio/pci/vfio_pci_zdev.c
-+++ b/drivers/vfio/pci/vfio_pci_zdev.c
-@@ -151,7 +151,10 @@ int vfio_pci_zdev_open_device(struct vfio_pci_core_device *vdev)
- 	if (!vdev->vdev.kvm)
- 		return 0;
- 
--	return kvm_s390_pci_register_kvm(zdev, vdev->vdev.kvm);
-+	if (kvm_pci_hook.kvm_register)
-+		return kvm_pci_hook.kvm_register(zdev, vdev->vdev.kvm);
-+
-+	return -ENOENT;
- }
- 
- void vfio_pci_zdev_close_device(struct vfio_pci_core_device *vdev)
-@@ -161,5 +164,6 @@ void vfio_pci_zdev_close_device(struct vfio_pci_core_device *vdev)
- 	if (!zdev || !vdev->vdev.kvm)
- 		return;
- 
--	kvm_s390_pci_unregister_kvm(zdev);
-+	if (kvm_pci_hook.kvm_unregister)
-+		return kvm_pci_hook.kvm_unregister(zdev);
- }
--- 
-2.31.1
+>
+> Changelog since v4:
 
+Can you please put the change log past the --- seperator line, so it
+gets stripped off when the patch is applied? That spares manual fixups.
+
+>
+> Signed-off-by: Kyle Huey <me@kylehuey.com>
+> Cc: Dave Hansen <dave.hansen@linux.intel.com>
+> Cc: Thomas Gleixner <tglx@linutronix.de>
+> Cc: Borislav Petkov <bp@suse.de>
+> Cc: kvm@vger.kernel.org # For edge case behavior of KVM_SET_XSAVE
+> Cc: stable@vger.kernel.org # 5.14+
+> Fixes: e84ba47e313d ("x86/fpu: Hook up PKRU into ptrace()")
+
+Can you please use the documented tag ordering?
+
+https://www.kernel.org/doc/html/latest/process/maintainer-tip.html#patch-submission-notes
+
+> @@ -1235,6 +1235,24 @@ static int copy_uabi_to_xstate(struct fpstate *fpstate, const void *kbuf,
+>  	for (i = 0; i < XFEATURE_MAX; i++) {
+>  		mask = BIT_ULL(i);
+>  
+> +		if (i == XFEATURE_PKRU) {
+> +			/*
+> +			 * Retrieve PKRU if not in init state, otherwise
+> +			 * initialize it.
+> +			 */
+> +			if (hdr.xfeatures & mask) {
+> +				struct pkru_state xpkru = {0};
+> +
+> +				if (copy_from_buffer(&xpkru, xstate_offsets[i],
+> +						     sizeof(xpkru), kbuf, ubuf))
+> +					return -EFAULT;
+> +
+> +				*pkru = xpkru.pkru;
+> +			} else {
+> +				*pkru = 0;
+> +			}
+> +		}
+
+That's really horrible and there is no point in copying the stuff from
+the buffer twice:
+
+@@ -1246,6 +1246,15 @@ static int copy_uabi_to_xstate(struct fp
+ 		}
+ 	}
+ 
++	/* Update the user protection key storage */
++	*pkru = 0;
++	if (hdr.xfeatures & XFEATURE_MASK_PKRU) {
++		struct pkru_state *xpkru;
++
++		xpkru = get_xsave_addr(xsave, XFEATURE_PKRU);
++		*pkru = xpkru->pkru;
++	}
++
+
+Hmm?
+
+Thanks,
+
+        tglx
