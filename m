@@ -2,111 +2,170 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id E3C005996FE
-	for <lists+kvm@lfdr.de>; Fri, 19 Aug 2022 10:18:54 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id D72075997B7
+	for <lists+kvm@lfdr.de>; Fri, 19 Aug 2022 10:49:56 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1347531AbiHSIOL (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 19 Aug 2022 04:14:11 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46238 "EHLO
+        id S1347678AbiHSIob (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 19 Aug 2022 04:44:31 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55628 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1347527AbiHSIOK (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 19 Aug 2022 04:14:10 -0400
-Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2E6E739BB5
-        for <kvm@vger.kernel.org>; Fri, 19 Aug 2022 01:14:05 -0700 (PDT)
-Received: from pps.filterd (m0127361.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.17.1.5/8.17.1.5) with ESMTP id 27J82YRb037507
-        for <kvm@vger.kernel.org>; Fri, 19 Aug 2022 08:14:04 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=content-type :
- mime-version : content-transfer-encoding : in-reply-to : references : to :
- from : cc : subject : message-id : date; s=pp1;
- bh=RAK12W6oAmWnzmbz62YsI8uhjsgzJn0eWriwuh0tsW4=;
- b=Kt/Sc8LvYhC3Q+dhKhlxJCMtA1MWU7MAU7Et0/DZ7tbtdvwPeR+YhNeIiwclfjRfzejy
- K9d7FzAgoFEHLOvTOetmZT7+lsVOGN+94XRWb11dZBocfaCAimxQgFdSXPpVNM6Krnes
- uZtjWkmgW8bG/1NrasPA/XX+aU+DrAPU/dGN3SFjN9ASEmFurtQLKw7Mz9dCEsLWEJ/J
- PavnJZheueASoxFPKHlFzmgnvT92LzfhjKalONvUrRkdtELoIRCLxLlTegX/54AMsdDc
- ZrNwm6kN7pBPaoH5yj7ZzTTCRZ+czV+XHp2iCCF0+TvcOpOvoO1uL6vHnI5NbmTUSc4g 9Q== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3j26nnrbcq-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT)
-        for <kvm@vger.kernel.org>; Fri, 19 Aug 2022 08:14:03 +0000
-Received: from m0127361.ppops.net (m0127361.ppops.net [127.0.0.1])
-        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 27J83mvp003410
-        for <kvm@vger.kernel.org>; Fri, 19 Aug 2022 08:14:03 GMT
-Received: from ppma06ams.nl.ibm.com (66.31.33a9.ip4.static.sl-reverse.com [169.51.49.102])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3j26nnrbcc-1
+        with ESMTP id S1347626AbiHSIo1 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 19 Aug 2022 04:44:27 -0400
+Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 21007B7EEC;
+        Fri, 19 Aug 2022 01:44:25 -0700 (PDT)
+Received: from pps.filterd (m0098399.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.17.1.5/8.17.1.5) with ESMTP id 27J8Gu3L022264;
+        Fri, 19 Aug 2022 08:44:17 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
+ mime-version : subject : to : cc : references : from : in-reply-to :
+ content-type : content-transfer-encoding; s=pp1;
+ bh=+v9nT8ZKH5nQZXkGNwDvqukouuQUqGry8Hdy6T8DPAY=;
+ b=kB/tv/IzObAQjKJ5pJkzJHnejJaIoaO9+UqvSRi1IDf/wQ/9k2ye6IjbDqFPTbYvwEh2
+ N4HgycFDsUSWUT1eMrMi/8YIly4nO87AYmSEX5/h5eIitLo5s70RuprbvumxKzcoGVdK
+ KCNkIrgRYZevIBSD/QLzGZoUHDmmpUZovLT04kY6EIoe/G5uLv9VZcES4NJnADVCI+js
+ +C4sWTLIs+CNY1l/HmPtwfqB64n9laRDA7tKT3Wux0vLUtchsiRl22oiJvcL2hv90dDF
+ tTJKvIDifu3u1pYZVuDfkaR3ykLX6PfZUU/QMtkxpqV99FKBAY2eKfhUpvnKwxxVyg5Z Gg== 
+Received: from ppma01fra.de.ibm.com (46.49.7a9f.ip4.static.sl-reverse.com [159.122.73.70])
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3j26vd8m93-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Fri, 19 Aug 2022 08:14:03 +0000
-Received: from pps.filterd (ppma06ams.nl.ibm.com [127.0.0.1])
-        by ppma06ams.nl.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 27J86nYM014885;
-        Fri, 19 Aug 2022 08:14:01 GMT
+        Fri, 19 Aug 2022 08:44:17 +0000
+Received: from pps.filterd (ppma01fra.de.ibm.com [127.0.0.1])
+        by ppma01fra.de.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 27J8KwLh024220;
+        Fri, 19 Aug 2022 08:44:15 GMT
 Received: from b06avi18878370.portsmouth.uk.ibm.com (b06avi18878370.portsmouth.uk.ibm.com [9.149.26.194])
-        by ppma06ams.nl.ibm.com with ESMTP id 3hx37jf03w-1
+        by ppma01fra.de.ibm.com with ESMTP id 3hx3k957kt-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Fri, 19 Aug 2022 08:14:01 +0000
+        Fri, 19 Aug 2022 08:44:15 +0000
 Received: from d06av26.portsmouth.uk.ibm.com (d06av26.portsmouth.uk.ibm.com [9.149.105.62])
-        by b06avi18878370.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 27J8EHvn32178608
+        by b06avi18878370.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 27J8iVWo25297284
         (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Fri, 19 Aug 2022 08:14:17 GMT
+        Fri, 19 Aug 2022 08:44:31 GMT
 Received: from d06av26.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 4CFABAE053;
-        Fri, 19 Aug 2022 08:13:58 +0000 (GMT)
+        by IMSVA (Postfix) with ESMTP id D68B7AE045;
+        Fri, 19 Aug 2022 08:44:11 +0000 (GMT)
 Received: from d06av26.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 34B56AE04D;
-        Fri, 19 Aug 2022 08:13:58 +0000 (GMT)
-Received: from li-ca45c2cc-336f-11b2-a85c-c6e71de567f1.ibm.com (unknown [9.155.203.253])
+        by IMSVA (Postfix) with ESMTP id B7073AE053;
+        Fri, 19 Aug 2022 08:44:10 +0000 (GMT)
+Received: from [9.171.49.238] (unknown [9.171.49.238])
         by d06av26.portsmouth.uk.ibm.com (Postfix) with ESMTP;
-        Fri, 19 Aug 2022 08:13:58 +0000 (GMT)
-Content-Type: text/plain; charset="utf-8"
+        Fri, 19 Aug 2022 08:44:10 +0000 (GMT)
+Message-ID: <0d7d055d-f323-acba-cb79-f859b5e182b4@linux.ibm.com>
+Date:   Fri, 19 Aug 2022 10:44:10 +0200
 MIME-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
-In-Reply-To: <20220818152114.213135-1-imbrenda@linux.ibm.com>
-References: <20220818152114.213135-1-imbrenda@linux.ibm.com>
-To:     Claudio Imbrenda <imbrenda@linux.ibm.com>, kvm@vger.kernel.org
-From:   Nico Boehr <nrb@linux.ibm.com>
-Cc:     frankja@linux.ibm.com, thuth@redhat.com, scgl@linux.ibm.com,
-        seiden@linux.ibm.com
-Subject: Re: [kvm-unit-tests PATCH v1 1/1] lib/s390x: fix SMP setup bug
-Message-ID: <166089683797.9487.15356625692841421235@localhost.localdomain>
-User-Agent: alot/0.8.1
-Date:   Fri, 19 Aug 2022 10:13:57 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.3.0
+Subject: Re: [PATCH] KVM: s390: pci: Hook to access KVM lowlevel from VFIO
+Content-Language: en-US
+To:     Niklas Schnelle <schnelle@linux.ibm.com>, mjrosato@linux.ibm.com
+Cc:     rdunlap@infradead.org, linux-kernel@vger.kernel.org, lkp@intel.com,
+        borntraeger@linux.ibm.com, farman@linux.ibm.com,
+        linux-s390@vger.kernel.org, kvm@vger.kernel.org, gor@linux.ibm.com,
+        hca@linux.ibm.com, frankja@linux.ibm.com
+References: <20220818164652.269336-1-pmorel@linux.ibm.com>
+ <2ae0bf9abffe2eb3eb2fb3f84873720d39f73d4d.camel@linux.ibm.com>
+From:   Pierre Morel <pmorel@linux.ibm.com>
+In-Reply-To: <2ae0bf9abffe2eb3eb2fb3f84873720d39f73d4d.camel@linux.ibm.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: wVH0ZvGcxw1IkJ8bsdLmZZD1QA8Rce3G
-X-Proofpoint-ORIG-GUID: aSEmAol1-s5wb6cKDxDw2fnxV1GiABxH
+X-Proofpoint-ORIG-GUID: aPDdiq_Kpt3i5btmzuGdKT24gvc8NZin
+X-Proofpoint-GUID: aPDdiq_Kpt3i5btmzuGdKT24gvc8NZin
 X-Proofpoint-Virus-Version: vendor=baseguard
  engine=ICAP:2.0.205,Aquarius:18.0.895,Hydra:6.0.517,FMLib:17.11.122.1
  definitions=2022-08-19_04,2022-08-18_01,2022-06-22_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 clxscore=1015 mlxlogscore=401
- lowpriorityscore=0 bulkscore=0 phishscore=0 malwarescore=0 impostorscore=0
- spamscore=0 priorityscore=1501 adultscore=0 suspectscore=0 mlxscore=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxlogscore=999 phishscore=0
+ suspectscore=0 impostorscore=0 malwarescore=0 adultscore=0 spamscore=0
+ lowpriorityscore=0 mlxscore=0 bulkscore=0 clxscore=1015 priorityscore=1501
  classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2207270000
- definitions=main-2208190032
+ definitions=main-2208190033
 X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_EF,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_PASS,
-        T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
+        DKIM_VALID,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,
+        SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no
+        version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Quoting Claudio Imbrenda (2022-08-18 17:21:14)
-> The lowcore pointer pointing to the current CPU (THIS_CPU) was not
-> initialized for the boot CPU. The pointer is needed for correct
-> interrupt handling, which is needed in the setup process before the
-> struct cpu array is allocated.
->=20
-> The bug went unnoticed because some environments (like qemu/KVM) clear
-> all memory and don't write anything in the lowcore area before starting
-> the payload. The pointer thus pointed to 0, an area of memory also not
-> used. Other environments will write to memory before starting the
-> payload, causing the unit tests to crash at the first interrupt.
->=20
-> Fix by assigning a temporary struct cpu before the rest of the setup
-> process, and assigning the pointer to the correct allocated struct
-> during smp initialization.
->=20
-> Fixes: 4e5dd758 ("lib: s390x: better smp interrupt checks")
-> Signed-off-by: Claudio Imbrenda <imbrenda@linux.ibm.com>
 
-Reviewed-and-tested-by: Nico Boehr <nrb@linux.ibm.com>
+
+On 8/19/22 09:14, Niklas Schnelle wrote:
+> On Thu, 2022-08-18 at 18:46 +0200, Pierre Morel wrote:
+>> We have a cross dependency between KVM and VFIO when using
+>> s390 vfio_pci_zdev extensions for PCI passthrough
+>> To be able to keep both subsystem modular we add a registering
+>> hook inside the S390 core code.
+>>
+>> This fixes a build problem when VFIO is built-in and KVM is built
+>> as a module.
+>>
+>> Reported-by: Randy Dunlap <rdunlap@infradead.org>
+>> Reported-by: kernel test robot <lkp@intel.com>
+>> Signed-off-by: Pierre Morel <pmorel@linux.ibm.com>
+>> Fixes: 09340b2fca007 ("KVM: s390: pci: add routines to start/stop inter..")
+> 
+> Please don't shorten the Fixes tag, the subject line is likely also
+> checked by some automated tools. It's okay for this line to be over the
+> column limit and checkpatch.pl --strict also accepts it.
+> 
+
+OK
+
+>> Cc: <stable@vger.kernel.org>
+>> ---
+>>   arch/s390/include/asm/kvm_host.h | 17 ++++++-----------
+>>   arch/s390/kvm/pci.c              | 10 ++++++----
+>>   arch/s390/pci/Makefile           |  2 ++
+>>   arch/s390/pci/pci_kvm_hook.c     | 11 +++++++++++
+>>   drivers/vfio/pci/vfio_pci_zdev.c |  8 ++++++--
+>>   5 files changed, 31 insertions(+), 17 deletions(-)
+>>   create mode 100644 arch/s390/pci/pci_kvm_hook.c
+>>
+>>
+> ---8<---
+>>   
+>>   	kvm_put_kvm(kvm);
+>>   }
+>> -EXPORT_SYMBOL_GPL(kvm_s390_pci_unregister_kvm);
+>>   
+>>   void kvm_s390_pci_init_list(struct kvm *kvm)
+>>   {
+>> @@ -678,6 +678,8 @@ int kvm_s390_pci_init(void)
+>>   
+>>   	spin_lock_init(&aift->gait_lock);
+>>   	mutex_init(&aift->aift_lock);
+>> +	zpci_kvm_hook.kvm_register = kvm_s390_pci_register_kvm;
+>> +	zpci_kvm_hook.kvm_unregister = kvm_s390_pci_unregister_kvm;
+>>   
+>>   	return 0;
+>>   }
+>> diff --git a/arch/s390/pci/Makefile b/arch/s390/pci/Makefile
+>> index bf557a1b789c..c02dbfb415d9 100644
+>> --- a/arch/s390/pci/Makefile
+>> +++ b/arch/s390/pci/Makefile
+>> @@ -7,3 +7,5 @@ obj-$(CONFIG_PCI)	+= pci.o pci_irq.o pci_dma.o pci_clp.o pci_sysfs.o \
+>>   			   pci_event.o pci_debug.o pci_insn.o pci_mmio.o \
+>>   			   pci_bus.o
+>>   obj-$(CONFIG_PCI_IOV)	+= pci_iov.o
+>> +
+>> +obj-y += pci_kvm_hook.o
+> 
+> I thought we wanted to compile this only for CONFIG_PCI?
+
+Ah sorry, that is indeed what I understood with Matt but then I 
+misunderstood your own answer from yesterday.
+I change to
+obj-$(CONFIG_PCI) += pci_kvm_hook.o
+
+> 
+>> diff --git a/arch/s390/pci/pci_kvm_hook.c b/arch/s390/pci/pci_kvm_hook.c
+>> new file mode 100644
+>> index 000000000000..ff34baf50a3e
+> ---8<---
+> 
+
+-- 
+Pierre Morel
+IBM Lab Boeblingen
