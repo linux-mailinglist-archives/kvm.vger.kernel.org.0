@@ -2,180 +2,155 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 03B5A59945F
-	for <lists+kvm@lfdr.de>; Fri, 19 Aug 2022 07:22:03 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id DB43859947D
+	for <lists+kvm@lfdr.de>; Fri, 19 Aug 2022 07:32:41 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1344942AbiHSFRe (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 19 Aug 2022 01:17:34 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57576 "EHLO
+        id S238595AbiHSFWb (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 19 Aug 2022 01:22:31 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35276 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1343577AbiHSFRa (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 19 Aug 2022 01:17:30 -0400
-Received: from out2.migadu.com (out2.migadu.com [IPv6:2001:41d0:2:aacc::])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C0345D3ED3;
-        Thu, 18 Aug 2022 22:17:28 -0700 (PDT)
-Date:   Fri, 19 Aug 2022 07:17:25 +0200
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-        t=1660886247;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=HwGoynLkBCbr1HZnCZPCiFh9mHZZ5rs7ctpm3KuMn3w=;
-        b=j6FTiU9S5r0+BvAMCX0XQXFh3z+nCsfNZCtvahzguQwuXcJTRcdDw0wXtiYacx4i3Owzqb
-        rjtFguN+IAFTxrC0ix03qK53GuM8qgBOHtpT7Mbjkcv/1aLxWlS9rOHydVjF374KoY3MhC
-        2FaYOkOPJ2Xylq3qQOP8TZt333eud68=
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From:   Andrew Jones <andrew.jones@linux.dev>
-To:     Sean Christopherson <seanjc@google.com>
-Cc:     Peter Gonda <pgonda@google.com>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org, marcorr@google.com,
-        michael.roth@amd.com, thomas.lendacky@amd.com, joro@8bytes.org,
-        mizhang@google.com, pbonzini@redhat.com, vannapurve@google.com
-Subject: Re: [V3 10/11] KVM: selftests: Add ucall pool based implementation
-Message-ID: <20220819051725.6lgggz2ktbd35pqj@kamzik>
-References: <20220810152033.946942-1-pgonda@google.com>
- <20220810152033.946942-11-pgonda@google.com>
- <20220816161350.b7x5brnyz5pyi7te@kamzik>
- <Yv5iKJbjW5VseagS@google.com>
- <20220818190514.ny77xpfwiruah6m5@kamzik>
- <Yv7LR8NMBMKVzS3Z@google.com>
+        with ESMTP id S241654AbiHSFWa (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 19 Aug 2022 01:22:30 -0400
+Received: from mail.sberdevices.ru (mail.sberdevices.ru [45.89.227.171])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B48A5E01C2;
+        Thu, 18 Aug 2022 22:22:27 -0700 (PDT)
+Received: from s-lin-edge02.sberdevices.ru (localhost [127.0.0.1])
+        by mail.sberdevices.ru (Postfix) with ESMTP id 0860D5FD07;
+        Fri, 19 Aug 2022 08:22:26 +0300 (MSK)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=sberdevices.ru;
+        s=mail; t=1660886546;
+        bh=GooZAVHnzepBYKSNfdd8aQsvtHUU6TX2S4d+v+I+b5A=;
+        h=From:To:Subject:Date:Message-ID:Content-Type:MIME-Version;
+        b=gWXX37n6OWek1Tn13sSWrePrmJlZWkOMfAwk1K9RHcopEiyS5ph67ICXSOjz+whrB
+         d8ItdpjOFRvIphMxg1rlNxIifJEFH3BywI9FcuqpqKDR0dB8BVIPJk7T8H6i8TxOCO
+         gpwQ6DeFaSDoC3zR/UEozuHx2sZc7Uah8bdKd6QElN4oTO7YAy9j4XZFGVi2QyTr7z
+         rTVojXRzVW3U4zeMFs1L9HfGI/VeTWskm+/2zAhAdDZGrUxMzKNr0C6/dmDC6aZ5g0
+         DJkTu2ghabQx2IZiddvWHWQlG82MjWlIwa+jbjXt4Qk+FsGgPYEGW/h2HG7WejpI19
+         jirpVG+AZS2/g==
+Received: from S-MS-EXCH02.sberdevices.ru (S-MS-EXCH02.sberdevices.ru [172.16.1.5])
+        by mail.sberdevices.ru (Postfix) with ESMTP;
+        Fri, 19 Aug 2022 08:22:24 +0300 (MSK)
+From:   Arseniy Krasnov <AVKrasnov@sberdevices.ru>
+To:     Stefano Garzarella <sgarzare@redhat.com>,
+        "David S. Miller" <davem@davemloft.net>,
+        "edumazet@google.com" <edumazet@google.com>,
+        "Jakub Kicinski" <kuba@kernel.org>,
+        Paolo Abeni <pabeni@redhat.com>,
+        "kys@microsoft.com" <kys@microsoft.com>,
+        "haiyangz@microsoft.com" <haiyangz@microsoft.com>,
+        "sthemmin@microsoft.com" <sthemmin@microsoft.com>,
+        "wei.liu@kernel.org" <wei.liu@kernel.org>,
+        Dexuan Cui <decui@microsoft.com>,
+        Stefan Hajnoczi <stefanha@redhat.com>,
+        Bryan Tan <bryantan@vmware.com>,
+        Vishnu Dasa <vdasa@vmware.com>,
+        Krasnov Arseniy <oxffffaa@gmail.com>,
+        "Michael S. Tsirkin" <mst@redhat.com>
+CC:     "virtualization@lists.linux-foundation.org" 
+        <virtualization@lists.linux-foundation.org>,
+        "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "linux-hyperv@vger.kernel.org" <linux-hyperv@vger.kernel.org>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        kernel <kernel@sberdevices.ru>,
+        VMware PV-Drivers Reviewers <pv-drivers@vmware.com>
+Subject: [PATCH net-next v4 0/9] vsock: updates for SO_RCVLOWAT handling
+Thread-Topic: [PATCH net-next v4 0/9] vsock: updates for SO_RCVLOWAT handling
+Thread-Index: AQHYs4uayjgwUp42sUeXUj6ZEfA4aQ==
+Date:   Fri, 19 Aug 2022 05:21:58 +0000
+Message-ID: <de41de4c-0345-34d7-7c36-4345258b7ba8@sberdevices.ru>
+Accept-Language: en-US, ru-RU
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+x-originating-ip: [172.16.1.12]
+Content-Type: text/plain; charset="utf-8"
+Content-ID: <A9355D7A3C795643AE6D4E91DD6FD380@sberdevices.ru>
+Content-Transfer-Encoding: base64
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <Yv7LR8NMBMKVzS3Z@google.com>
-X-Migadu-Flow: FLOW_OUT
-X-Migadu-Auth-User: linux.dev
-X-Spam-Status: No, score=-2.8 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,SPF_HELO_PASS,
-        SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no
-        version=3.4.6
+X-KSMG-Rule-ID: 4
+X-KSMG-Message-Action: clean
+X-KSMG-AntiSpam-Status: not scanned, disabled by settings
+X-KSMG-AntiSpam-Interceptor-Info: not scanned
+X-KSMG-AntiPhishing: not scanned, disabled by settings
+X-KSMG-AntiVirus: Kaspersky Secure Mail Gateway, version 1.1.2.30, bases: 2022/08/19 00:26:00 #20118704
+X-KSMG-AntiVirus-Status: Clean, skipped
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,SPF_HELO_NONE,SPF_PASS,
+        T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Aug 18, 2022 at 11:29:11PM +0000, Sean Christopherson wrote:
-> On Thu, Aug 18, 2022, Andrew Jones wrote:
-> > On Thu, Aug 18, 2022 at 04:00:40PM +0000, Sean Christopherson wrote:
-> > > But why is "use_ucall_pool" optional?  Unless there's a use case that fundamentally
-> > > conflicts with the pool approach, let's make the pool approach the _only_ approach.
-> > > IIRC, ARM's implementation isn't thread safe, i.e. there's at least one other use
-> > > case that _needs_ the pool implementation.
-> > 
-> > Really? The ucall structure is on the vcpu's stack like the other
-> > architectures. Ah, you're probably thinking about the shared address used
-> > to exit to userspace. The address doesn't matter as long as no VM maps
-> > it, but, yes, a multi-VM test where the VMs have different maps could end
-> > up breaking ucalls for one or more VMs.
-> 
-> Yah, that's what I was thinking of.
-> 
-> > It wouldn't be hard to make that address per-VM, though, if ever necessary.
-> > 
-> > > 
-> > > By supporting both, we are signing ourselves up for extra maintenance and pain,
-> > > e.g. inevitably we'll break whichever option isn't the default and not notice for
-> > > quite some time.
-> > 
-> > uc pools are currently limited to a single VM. That could be changed, but
-> > at the expense of even more code to maintain.
-> 
-> Unless I'm missing something, it's actually less code.  "globals" that are sync'd
-> to the guest aren't truly global, each VM has a separate physical page that is a
-> copy of the global, hence the need for sync_global_to_guest().
-> 
-> And FWIW, the code is actually "safe" in practice because I doubt any test spawns
-> multiple VMs in parallel, i.e. the host might get confused over the value of
-> ucall_pool, but guests won't stomp on each other so long as they're created
-> serially.  Ditto for ARM's ucall_exit_mmio_addr.
-> 
-> To make this truly thread safe, we just need a way to atomically sync the pointer
-> to the guest, and that's easy enough to add.
-
-I like that.
-
-> 
-> With that out of the way, all of the conditional "use pool" code goes away, which
-> IMO simplifies things overall.  Using a pool versus stack memory isn't _that_ much
-> more complicated, and we _know_ the stack approach doesn't work for all VM types.
-> 
-> Indeed, this partial conversion is:
-> 
->   7 files changed, 131 insertions(+), 18 deletions(-)
-> 
-> versus a full conversion:
-> 
->   6 files changed, 89 insertions(+), 20 deletions(-)
-> 
-> And simplification is only a secondary concern, what I'm really worried about is
-> things bitrotting and then some poor sod having to wade through unrelated issues
-> because somebody else broke the pool implementation and didn't notice.
-> 
-> Argh, case in point, none of the x86 (or s390 or RISC-V) tests do ucall_init(),
-> which would have been a lurking bug if any of them tried to switch to the pool.
-> 
-> Argh + case in point #2, this code is broken, and that bug may have sat unnoticed
-> due to only the esoteric SEV test using the pool.
-> 
-> -static inline size_t uc_pool_idx(struct ucall *uc)
-> +static noinline void ucall_free(struct ucall *uc)
->  {
-> -       return uc->hva - ucall_pool->ucalls;
-> -}
-> -
-> -static void ucall_free(struct ucall *uc)
-> -{
-> -       clear_bit(uc_pool_idx(uc), ucall_pool->in_use);
-> +       /* Beware, here be pointer arithmetic.  */
-> +       clear_bit(uc - ucall_pool->ucalls, ucall_pool->in_use);
->  }
-
-Dropping the only once-used uc_pool_idx() and adding the comment looks
-better, but I don't think there was a bug because uc == uc->hva.
-
-> 
-> 
-> So my very strong vote is to fully switch to a single implementation.  That way
-> our code either works or it doesn't, i.e. we notice very quickly if it breaks.
-> 
-> Peter, if I can convince Drew of One Pool To Rule Them All, can you slot in the
-
-There are other hills for me to stand on, so I won't insist on this one.
-
-> attached patches and slightly rework the ordering so that all SEV patches are at
-> the end?  E.g. something like:
-> 
->   KVM: selftests: Automatically do init_ucall() for non-barebones VMs
->   KVM: selftests: move vm_phy_pages_alloc() earlier in file
->   KVM: selftests: sparsebit: add const where appropriate
->   KVM: selftests: add hooks for managing encrypted guest memory
->   KVM: selftests: handle encryption bits in page tables
->   KVM: selftests: add support for encrypted vm_vaddr_* allocations
->   KVM: selftests: Consolidate common code for popuplating
->   KVM: selftests: Consolidate boilerplate code in get_ucall()
->   tools: Add atomic_test_and_set_bit()
->   KVM: selftests: Add macro to atomically sync per-VM "global" pointers
->   KVM: selftests: Add ucall pool based implementation
->   KVM: selftests: add library for creating/interacting with SEV guests
->   KVM: selftests: Add simple sev vm testing
-> 
-> The patches are tested on x86 and compile tested on arm.  I can provide more testing
-> if/when necessary.  I also haven't addressed any other feedback in the "ucall pool"
-> patch, though I'm guessing much of it no longer applies.
-
-I skimmed the patches but don't know how to comment on attachments, so
-I'll add the two things that popped to mind here.
-
-1) Doing ucall_init() at VM create time may be too early for Arm. Arm
-probes for an unmapped address for the MMIO address it needs, so it's
-best to do that after all mapping.
-
-2) We'll need to change the sanity checks in Arm's get_ucall() to not
-check that the MMIO address == ucall_exit_mmio_addr since there's no
-guarantee that the exiting guest's address matches whatever is lingering
-in the host's version. We can either drop the sanity check altogether
-or try to come up with something else.
-
-Thanks,
-drew
+SGVsbG8sDQoNClRoaXMgcGF0Y2hzZXQgaW5jbHVkZXMgc29tZSB1cGRhdGVzIGZvciBTT19SQ1ZM
+T1dBVDoNCg0KMSkgYWZfdnNvY2s6DQogICBEdXJpbmcgbXkgZXhwZXJpbWVudHMgd2l0aCB6ZXJv
+Y29weSByZWNlaXZlLCBpIGZvdW5kLCB0aGF0IGluIHNvbWUNCiAgIGNhc2VzLCBwb2xsKCkgaW1w
+bGVtZW50YXRpb24gdmlvbGF0ZXMgUE9TSVg6IHdoZW4gc29ja2V0IGhhcyBub24tDQogICBkZWZh
+dWx0IFNPX1JDVkxPV0FUKGUuZy4gbm90IDEpLCBwb2xsKCkgd2lsbCBhbHdheXMgc2V0IFBPTExJ
+TiBhbmQNCiAgIFBPTExSRE5PUk0gYml0cyBpbiAncmV2ZW50cycgZXZlbiBudW1iZXIgb2YgYnl0
+ZXMgYXZhaWxhYmxlIHRvIHJlYWQNCiAgIG9uIHNvY2tldCBpcyBzbWFsbGVyIHRoYW4gU09fUkNW
+TE9XQVQgdmFsdWUuIEluIHRoaXMgY2FzZSx1c2VyIHNlZXMNCiAgIFBPTExJTiBmbGFnIGFuZCB0
+aGVuIHRyaWVzIHRvIHJlYWQgZGF0YShmb3IgZXhhbXBsZSB1c2luZyAgJ3JlYWQoKScNCiAgIGNh
+bGwpLCBidXQgcmVhZCBjYWxsIHdpbGwgYmUgYmxvY2tlZCwgYmVjYXVzZSAgU09fUkNWTE9XQVQg
+bG9naWMgaXMNCiAgIHN1cHBvcnRlZCBpbiBkZXF1ZXVlIGxvb3AgaW4gYWZfdnNvY2suYy4gQnV0
+IHRoZSBzYW1lIHRpbWUsICBQT1NJWA0KICAgcmVxdWlyZXMgdGhhdDoNCg0KICAgIlBPTExJTiAg
+ICAgRGF0YSBvdGhlciB0aGFuIGhpZ2gtcHJpb3JpdHkgZGF0YSBtYXkgYmUgcmVhZCB3aXRob3V0
+DQogICAgICAgICAgICAgICBibG9ja2luZy4NCiAgICBQT0xMUkROT1JNIE5vcm1hbCBkYXRhIG1h
+eSBiZSByZWFkIHdpdGhvdXQgYmxvY2tpbmcuIg0KDQogICBTZWUgaHR0cHM6Ly93d3cub3Blbi1z
+dGQub3JnL2p0YzEvc2MyMi9vcGVuL240MjE3LnBkZiwgcGFnZSAyOTMuDQoNCiAgIFNvLCB3ZSBo
+YXZlLCB0aGF0IHBvbGwoKSBzeXNjYWxsIHJldHVybnMgUE9MTElOLCBidXQgcmVhZCBjYWxsIHdp
+bGwNCiAgIGJlIGJsb2NrZWQuDQoNCiAgIEFsc28gaW4gbWFuIHBhZ2Ugc29ja2V0KDcpIGkgZm91
+bmQgdGhhdDoNCg0KICAgIlNpbmNlIExpbnV4IDIuNi4yOCwgc2VsZWN0KDIpLCBwb2xsKDIpLCBh
+bmQgZXBvbGwoNykgaW5kaWNhdGUgYQ0KICAgc29ja2V0IGFzIHJlYWRhYmxlIG9ubHkgaWYgYXQg
+bGVhc3QgU09fUkNWTE9XQVQgYnl0ZXMgYXJlIGF2YWlsYWJsZS4iDQoNCiAgIEkgY2hlY2tlZCBU
+Q1AgY2FsbGJhY2sgZm9yIHBvbGwoKShuZXQvaXB2NC90Y3AuYywgdGNwX3BvbGwoKSksIGl0DQog
+ICB1c2VzIFNPX1JDVkxPV0FUIHZhbHVlIHRvIHNldCBQT0xMSU4gYml0LCBhbHNvIGkndmUgdGVz
+dGVkIFRDUCB3aXRoDQogICB0aGlzIGNhc2UgZm9yIFRDUCBzb2NrZXQsIGl0IHdvcmtzIGFzIFBP
+U0lYIHJlcXVpcmVkLg0KDQogICBJJ3ZlIGFkZGVkIHNvbWUgZml4ZXMgdG8gYWZfdnNvY2suYyBh
+bmQgdmlydGlvX3RyYW5zcG9ydF9jb21tb24uYywNCiAgIHRlc3QgaXMgYWxzbyBpbXBsZW1lbnRl
+ZC4NCg0KMikgdmlydGlvL3Zzb2NrOg0KICAgSXQgYWRkcyBzb21lIG9wdGltaXphdGlvbiB0byB3
+YWtlIHVwcywgd2hlbiBuZXcgZGF0YSBhcnJpdmVkLiBOb3csDQogICBTT19SQ1ZMT1dBVCBpcyBj
+b25zaWRlcmVkIGJlZm9yZSB3YWtlIHVwIHNsZWVwZXJzIHdobyB3YWl0IG5ldyBkYXRhLg0KICAg
+VGhlcmUgaXMgbm8gc2Vuc2UsIHRvIGtpY2sgd2FpdGVyLCB3aGVuIG51bWJlciBvZiBhdmFpbGFi
+bGUgYnl0ZXMNCiAgIGluIHNvY2tldCdzIHF1ZXVlIDwgU09fUkNWTE9XQVQsIGJlY2F1c2UgaWYg
+d2Ugd2FrZSB1cCByZWFkZXIgaW4NCiAgIHRoaXMgY2FzZSwgaXQgd2lsbCB3YWl0IGZvciBTT19S
+Q1ZMT1dBVCBkYXRhIGFueXdheSBkdXJpbmcgZGVxdWV1ZSwNCiAgIG9yIGluIHBvbGwoKSBjYXNl
+LCBQT0xMSU4vUE9MTFJETk9STSBiaXRzIHdvbid0IGJlIHNldCwgc28gc3VjaA0KICAgZXhpdCBm
+cm9tIHBvbGwoKSB3aWxsIGJlICJzcHVyaW91cyIuIFRoaXMgbG9naWMgaXMgYWxzbyB1c2VkIGlu
+IFRDUA0KICAgc29ja2V0cy4NCg0KMykgdm1jaS92c29jazoNCiAgIFNhbWUgYXMgMiksIGJ1dCBp
+J20gbm90IHN1cmUgYWJvdXQgdGhpcyBjaGFuZ2VzLiBXaWxsIGJlIHZlcnkgZ29vZCwNCiAgIHRv
+IGdldCBjb21tZW50cyBmcm9tIHNvbWVvbmUgd2hvIGtub3dzIHRoaXMgY29kZS4NCg0KNCkgSHlw
+ZXItVjoNCiAgIEFzIERleHVhbiBDdWkgbWVudGlvbmVkLCBmb3IgSHlwZXItViB0cmFuc3BvcnQg
+aXQgaXMgZGlmZmljdWx0IHRvDQogICBzdXBwb3J0IFNPX1JDVkxPV0FULCBzbyBoZSBzdWdnZXN0
+ZWQgdG8gZGlzYWJsZSB0aGlzIGZlYXR1cmUgZm9yDQogICBIeXBlci1WLg0KDQpUaGFuayBZb3UN
+Cg0KQXJzZW5peSBLcmFzbm92KDkpOg0KIHZzb2NrOiBTT19SQ1ZMT1dBVCB0cmFuc3BvcnQgc2V0
+IGNhbGxiYWNrDQogaHZfc29jazogZGlzYWJsZSBTT19SQ1ZMT1dBVCBzdXBwb3J0DQogdmlydGlv
+L3Zzb2NrOiB1c2UgJ3RhcmdldCcgaW4gbm90aWZ5X3BvbGxfaW4gY2FsbGJhY2sNCiB2bWNpL3Zz
+b2NrOiB1c2UgJ3RhcmdldCcgaW4gbm90aWZ5X3BvbGxfaW4gY2FsbGJhY2sNCiB2c29jazogcGFz
+cyBzb2NrX3Jjdmxvd2F0IHRvIG5vdGlmeV9wb2xsX2luIGFzIHRhcmdldA0KIHZzb2NrOiBhZGQg
+QVBJIGNhbGwgZm9yIGRhdGEgcmVhZHkNCiB2aXJ0aW8vdnNvY2s6IGNoZWNrIFNPX1JDVkxPV0FU
+IGJlZm9yZSB3YWtlIHVwIHJlYWRlcg0KIHZtY2kvdnNvY2s6IGNoZWNrIFNPX1JDVkxPV0FUIGJl
+Zm9yZSB3YWtlIHVwIHJlYWRlcg0KIHZzb2NrX3Rlc3Q6IFBPTExJTiArIFNPX1JDVkxPV0FUIHRl
+c3QNCg0KIGluY2x1ZGUvbmV0L2FmX3Zzb2NrLmggICAgICAgICAgICAgICAgICAgICAgIHwgICAy
+ICsNCiBuZXQvdm13X3Zzb2NrL2FmX3Zzb2NrLmMgICAgICAgICAgICAgICAgICAgICB8ICAzMyAr
+KysrKysrLQ0KIG5ldC92bXdfdnNvY2svaHlwZXJ2X3RyYW5zcG9ydC5jICAgICAgICAgICAgIHwg
+ICA3ICsrDQogbmV0L3Ztd192c29jay92aXJ0aW9fdHJhbnNwb3J0X2NvbW1vbi5jICAgICAgfCAg
+IDcgKy0NCiBuZXQvdm13X3Zzb2NrL3ZtY2lfdHJhbnNwb3J0X25vdGlmeS5jICAgICAgICB8ICAx
+MCArLS0NCiBuZXQvdm13X3Zzb2NrL3ZtY2lfdHJhbnNwb3J0X25vdGlmeV9xc3RhdGUuYyB8ICAx
+MiArLS0NCiB0b29scy90ZXN0aW5nL3Zzb2NrL3Zzb2NrX3Rlc3QuYyAgICAgICAgICAgICB8IDEw
+OCArKysrKysrKysrKysrKysrKysrKysrKysrKysNCiA3IGZpbGVzIGNoYW5nZWQsIDE2MiBpbnNl
+cnRpb25zKCspLCAxNyBkZWxldGlvbnMoLSkNCg0KIENoYW5nZWxvZzoNCg0KIHYxIC0+IHYyOg0K
+IDEpIFBhdGNoZXMgZm9yIFZNQ0kgdHJhbnNwb3J0KHNhbWUgYXMgZm9yIHZpcnRpby12c29jayku
+DQogMikgUGF0Y2hlcyBmb3IgSHlwZXItViB0cmFuc3BvcnQoZGlzYWJsaW5nIFNPX1JDVkxPV0FU
+IHNldHRpbmcpLg0KIDMpIFdhaXRpbmcgbG9naWMgaW4gdGVzdCB3YXMgdXBkYXRlZChzbGVlcCgp
+IC0+IHBvbGwoKSkuDQoNCiB2MiAtPiB2MzoNCiAxKSBQYXRjaGVzIHdlcmUgcmVvcmRlcmVkLg0K
+IDIpIENvbW1pdCBtZXNzYWdlIHVwZGF0ZWQgaW4gMDAwNS4NCiAzKSBDaGVjayAndHJhbnNwb3J0
+JyBwb2ludGVyIGluIDAwMDEgZm9yIE5VTEwuDQoNCiB2MyAtPiB2NDoNCiAxKSB2c29ja19zZXRf
+cmN2bG93YXQoKSBsb2dpYyBjaGFuZ2VkLiBQcmV2aW91cyB2ZXJzaW9uIHJlcXVpcmVkDQogICAg
+YXNzaWduZWQgdHJhbnNwb3J0IGFuZCBhbHdheXMgY2FsbGVkIGl0cyAnc2V0X3Jjdmxvd2F0JyBj
+YWxsYmFjaw0KICAgIChpZiBwcmVzZW50KS4gTm93LCBhc3NpZ25tZW50IGlzIG5vdCBuZWVkZWQu
+DQogMikgMDAwMywwMDA0LDAwMDUsMDAwNiwwMDA3LDAwMDggLSBjb21taXQgbWVzc2FnZXMgdXBk
+YXRlZC4NCiAzKSAwMDA5IC0gc21hbGwgcmVmYWN0b3JpbmcgYW5kIHN0eWxlIGZpeGVzLg0KIDQp
+IFJGQyB0YWcgd2FzIHJlbW92ZWQuDQoNCi0tIA0KMi4yNS4xDQo=
