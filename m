@@ -2,59 +2,59 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 5F89D599A9C
-	for <lists+kvm@lfdr.de>; Fri, 19 Aug 2022 13:18:46 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 957BB599AB5
+	for <lists+kvm@lfdr.de>; Fri, 19 Aug 2022 13:18:54 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1348693AbiHSLKF (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 19 Aug 2022 07:10:05 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33726 "EHLO
+        id S1348697AbiHSLKH (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 19 Aug 2022 07:10:07 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33768 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1348690AbiHSLKE (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 19 Aug 2022 07:10:04 -0400
-Received: from mail-pl1-x630.google.com (mail-pl1-x630.google.com [IPv6:2607:f8b0:4864:20::630])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EBF28F6196
-        for <kvm@vger.kernel.org>; Fri, 19 Aug 2022 04:10:02 -0700 (PDT)
-Received: by mail-pl1-x630.google.com with SMTP id x23so3849928pll.7
-        for <kvm@vger.kernel.org>; Fri, 19 Aug 2022 04:10:02 -0700 (PDT)
+        with ESMTP id S1348690AbiHSLKF (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 19 Aug 2022 07:10:05 -0400
+Received: from mail-pl1-x62e.google.com (mail-pl1-x62e.google.com [IPv6:2607:f8b0:4864:20::62e])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 23237F4936
+        for <kvm@vger.kernel.org>; Fri, 19 Aug 2022 04:10:05 -0700 (PDT)
+Received: by mail-pl1-x62e.google.com with SMTP id w14so3845626plp.9
+        for <kvm@vger.kernel.org>; Fri, 19 Aug 2022 04:10:05 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc;
-        bh=Y8bupUhiF48s2pTjppCuB8jZfYQ8o5CSEyoPhtiNoQw=;
-        b=L41EwR29pTqBq8vANXqLw53klPpXyhHKgdvX5XfkDZfGH89bS5fuin0MDTLKE34qyP
-         B+TNCrrpB2czfs/IcX7+BjHZEnrikQcbJat58NXKVFKGm8rESD8eQqPu5Az/OfbxL7q4
-         6L8dDyzGWoso+RyteaTIsZcjAMN2e4xIA0UGiN2bG6xXQU0IHT/0N1lkvhEzA9yfCJJ6
-         TrVWDSsnCDeCNGMRioNfK3r9gPc5VqJSQaqGxRq7qN+x2hW35G5tZNFA8N/IT4TolT7l
-         sXZgFl8bDoMpXIhRV3WjRQmlv4X5qGoK2dgycNDHezqexJ0VuOFTjdbmVXfcTgd9ZW3p
-         iNvw==
+        bh=aL8+SDZqeWF3T/aB/Kb64Lwk2O30Tk1xfGSb8fxuAVE=;
+        b=G+sno3vnow+YodYZroFF2qqOvm1JCKl5i/iKDUJ4ydQS8KFDncTfRA5KtkZkvoVXAo
+         MVhBx129Wo3dK6tvhq0nxaD95fz1EH6PoUtl13WaSXM4P3g+dDZs9fo4G2n/75flvTfx
+         7h7qezo1woREySsybT0PwXcI2OH/khIKi8ycu816MumKKruxuGijLwSRDEamQzXLwafs
+         JRTd29MEygOpTmlUoMtKYCpz4/C1/zBJk/E4gn/VhaLiB1XOASNcTBr5mgHUowvTXMCC
+         JFd0KNLeeH3EXI1iUqNCVW7cIeA9wcgUwfjrLkD75j7Ijzrz8hWQ4x//VuxAW0VhF7CR
+         tQNw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc;
-        bh=Y8bupUhiF48s2pTjppCuB8jZfYQ8o5CSEyoPhtiNoQw=;
-        b=Pj+Jwi0emcVduh8pFnsGkcsnZbnx3TJKJMZVrqlvjxjZhxQZSwwgqRmZngzojshcni
-         ZlU5tiKGgaKOI+m7bFTddLlHKK4E+zhtrz5dRIfppRuTl6IzZwwPnNDhcpNcnaSSRYBn
-         Ghpd991gndP4w5JVrt4FuuTZDArWqAf1LTf027f4SLF6hurxGp/4Kn6Lz/p7rMfFEqlB
-         vMuT26BNqUicEcx2jOaM+/JlLwCVUBzMsnDSnU8M52cKAwC4g0Zfy4oIUT/5rz9e9P1U
-         ebVWNXN2pQHfghYzLWpkywUuTV6tswg4h1/fQZEPnN2VuRT8KaeX4M9kVobNn1rM4qDF
-         L6uQ==
-X-Gm-Message-State: ACgBeo3QV+n/28j1CNl1JVoLwRjNy32RBoTA1vNtq2h3Th3rtd4ihCTP
-        xdLzCJFbNNcn4/d0KaAFAy9pKQwnjNPC7w==
-X-Google-Smtp-Source: AA6agR6w/jJEYMrmemS0KfexrbaUIA/5VptL+HLVZeVHZwCvgK8iP0WkC/nErriIcCAh+0aA+t9ayg==
-X-Received: by 2002:a17:90a:17e1:b0:1f2:2ff2:6cae with SMTP id q88-20020a17090a17e100b001f22ff26caemr13520867pja.196.1660907402423;
-        Fri, 19 Aug 2022 04:10:02 -0700 (PDT)
+        bh=aL8+SDZqeWF3T/aB/Kb64Lwk2O30Tk1xfGSb8fxuAVE=;
+        b=iPx+qrxMafiRbpjVDI4Bdlk+wW/skw2Dw4VIBy1X9kdemANqfRQVi6Rh+upq0tLUFa
+         YISIudk7v64b+O+zbcp9k7flomYz+7MFJRKIyTBh4RS/DBYanzEg2WM2Kn0xft1oYQFD
+         QSMA6dD2A7O+Wx9p882uQlmrr3DwOUmaNM9dQdo96gEQsL5yFSK5NKnlKe/qwH+ugoE8
+         wCk8Xj/Nn0QFz49Ou+HA4aCTvXbaehaSZst98252uC0GshjUNk+uKzYcMLaSovvjnnXF
+         KRKz+1wvd6AdBpLrig8pFMGVA3D17QPQ09o0ZbfxLnONffvFjAWBgLA0+44BjzJFC6TY
+         iyLA==
+X-Gm-Message-State: ACgBeo3UKo3ILLzZNxHYn0dJXWh2dvWFI/TmIcLpBz2kugTSGWmgM3C6
+        hHESBvwZJp+RAJVeA1zSsq4=
+X-Google-Smtp-Source: AA6agR4E/PpX1YcAHi8iRo/aAs4LCNj5CTm2iIuKLB4ggu721jmEJPnvVQoSMNJOzyn+d3E4EjCSbg==
+X-Received: by 2002:a17:90b:3803:b0:1fa:ebea:e90e with SMTP id mq3-20020a17090b380300b001faebeae90emr1448936pjb.111.1660907404075;
+        Fri, 19 Aug 2022 04:10:04 -0700 (PDT)
 Received: from localhost.localdomain ([103.7.29.32])
-        by smtp.gmail.com with ESMTPSA id jd7-20020a170903260700b0016bfbd99f64sm2957778plb.118.2022.08.19.04.10.01
+        by smtp.gmail.com with ESMTPSA id jd7-20020a170903260700b0016bfbd99f64sm2957778plb.118.2022.08.19.04.10.02
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 19 Aug 2022 04:10:02 -0700 (PDT)
+        Fri, 19 Aug 2022 04:10:03 -0700 (PDT)
 From:   Like Xu <like.xu.linux@gmail.com>
 X-Google-Original-From: Like Xu <likexu@tencent.com>
 To:     Sean Christopherson <seanjc@google.com>,
         Paolo Bonzini <pbonzini@redhat.com>
 Cc:     kvm@vger.kernel.org
-Subject: [kvm-unit-tests PATCH v3 02/13] x86/pmu: Introduce multiple_{one, many}() to improve readability
-Date:   Fri, 19 Aug 2022 19:09:28 +0800
-Message-Id: <20220819110939.78013-3-likexu@tencent.com>
+Subject: [kvm-unit-tests PATCH v3 03/13] x86/pmu: Reset the expected count of the fixed counter 0 when i386
+Date:   Fri, 19 Aug 2022 19:09:29 +0800
+Message-Id: <20220819110939.78013-4-likexu@tencent.com>
 X-Mailer: git-send-email 2.37.2
 In-Reply-To: <20220819110939.78013-1-likexu@tencent.com>
 References: <20220819110939.78013-1-likexu@tencent.com>
@@ -72,78 +72,38 @@ X-Mailing-List: kvm@vger.kernel.org
 
 From: Like Xu <likexu@tencent.com>
 
-The current measure_one() forces the common case to pass in unnecessary
-information in order to give flexibility to a single use case. It's just
-syntatic sugar, but it really does help readers as it's not obvious that
-the "1" specifies the number of events, whereas multiple_many() and
-measure_one() are relatively self-explanatory.
+The pmu test check_counter_overflow() always fails with the "./configure
+--arch=i386". The cnt.count obtained from the latter run of measure()
+(based on fixed counter 0) is not equal to the expected value (based
+on gp counter 0) and there is a positive error with a value of 2.
 
-Suggested-by: Sean Christopherson <seanjc@google.com>
+The two extra instructions come from inline wrmsr() and inline rdmsr()
+inside the global_disable() binary code block. Specifically, for each msr
+access, the i386 code will have two assembly mov instructions before
+rdmsr/wrmsr (mark it for fixed counter 0, bit 32), but only one assembly
+mov is needed for x86_64 and gp counter 0 on i386.
+
+Fix the expected init cnt.count for fixed counter 0 overflow based on
+the same fixed counter 0, not always using gp counter 0.
+
 Signed-off-by: Like Xu <likexu@tencent.com>
 ---
- x86/pmu.c | 15 ++++++++++-----
- 1 file changed, 10 insertions(+), 5 deletions(-)
+ x86/pmu.c | 3 +++
+ 1 file changed, 3 insertions(+)
 
 diff --git a/x86/pmu.c b/x86/pmu.c
-index 817b4d0..45ca2c6 100644
+index 45ca2c6..057fd4a 100644
 --- a/x86/pmu.c
 +++ b/x86/pmu.c
-@@ -181,7 +181,7 @@ static void stop_event(pmu_counter_t *evt)
- 	evt->count = rdmsr(evt->ctr);
- }
+@@ -315,6 +315,9 @@ static void check_counter_overflow(void)
  
--static void measure(pmu_counter_t *evt, int count)
-+static void measure_many(pmu_counter_t *evt, int count)
- {
- 	int i;
- 	for (i = 0; i < count; i++)
-@@ -191,6 +191,11 @@ static void measure(pmu_counter_t *evt, int count)
- 		stop_event(&evt[i]);
- }
- 
-+static void measure_one(pmu_counter_t *evt)
-+{
-+	measure_many(evt, 1);
-+}
-+
- static void __measure(pmu_counter_t *evt, uint64_t count)
- {
- 	__start_event(evt, count);
-@@ -220,7 +225,7 @@ static void check_gp_counter(struct pmu_event *evt)
- 	int i;
- 
- 	for (i = 0; i < nr_gp_counters; i++, cnt.ctr++) {
--		measure(&cnt, 1);
-+		measure_one(&cnt);
- 		report(verify_event(cnt.count, evt), "%s-%d", evt->name, i);
- 	}
- }
-@@ -247,7 +252,7 @@ static void check_fixed_counters(void)
- 
- 	for (i = 0; i < nr_fixed_counters; i++) {
- 		cnt.ctr = fixed_events[i].unit_sel;
--		measure(&cnt, 1);
-+		measure_one(&cnt);
- 		report(verify_event(cnt.count, &fixed_events[i]), "fixed-%d", i);
- 	}
- }
-@@ -274,7 +279,7 @@ static void check_counters_many(void)
- 		n++;
- 	}
- 
--	measure(cnt, n);
-+	measure_many(cnt, n);
- 
- 	for (i = 0; i < n; i++)
- 		if (!verify_counter(&cnt[i]))
-@@ -338,7 +343,7 @@ static void check_gp_counter_cmask(void)
- 		.config = EVNTSEL_OS | EVNTSEL_USR | gp_events[1].unit_sel /* instructions */,
- 	};
- 	cnt.config |= (0x2 << EVNTSEL_CMASK_SHIFT);
--	measure(&cnt, 1);
-+	measure_one(&cnt);
- 	report(cnt.count < gp_events[1].min, "cmask");
- }
+ 		if (i == nr_gp_counters) {
+ 			cnt.ctr = fixed_events[0].unit_sel;
++			__measure(&cnt, 0);
++			count = cnt.count;
++			cnt.count = 1 - count;
+ 			cnt.count &= (1ull << pmu_fixed_counter_width()) - 1;
+ 		}
  
 -- 
 2.37.2
