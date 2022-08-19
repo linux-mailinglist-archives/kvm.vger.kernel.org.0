@@ -2,146 +2,186 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 1D8D95991D6
-	for <lists+kvm@lfdr.de>; Fri, 19 Aug 2022 02:41:14 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 9F0155991E0
+	for <lists+kvm@lfdr.de>; Fri, 19 Aug 2022 02:43:44 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S245272AbiHSAka (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 18 Aug 2022 20:40:30 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42064 "EHLO
+        id S244800AbiHSAmt (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 18 Aug 2022 20:42:49 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42990 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S241426AbiHSAk2 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 18 Aug 2022 20:40:28 -0400
-Received: from new4-smtp.messagingengine.com (new4-smtp.messagingengine.com [66.111.4.230])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9E810D7D3C;
-        Thu, 18 Aug 2022 17:40:27 -0700 (PDT)
-Received: from compute5.internal (compute5.nyi.internal [10.202.2.45])
-        by mailnew.nyi.internal (Postfix) with ESMTP id 2A636580E5D;
-        Thu, 18 Aug 2022 20:40:25 -0400 (EDT)
-Received: from mailfrontend1 ([10.202.2.162])
-  by compute5.internal (MEProxy); Thu, 18 Aug 2022 20:40:25 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=shutemov.name;
-         h=cc:cc:content-type:date:date:from:from:in-reply-to
-        :in-reply-to:message-id:mime-version:references:reply-to:sender
-        :subject:subject:to:to; s=fm2; t=1660869625; x=1660876825; bh=p4
-        mrdAhfuXrXkbUMCbpYFq9iim/KI6Q1KeIWNni0Pu8=; b=NmfuW1+kY6jqCU+SOB
-        OECgLcjgfa/gkmj9WAQWHrJD2/c3qc7nnUazVUk975wdVftGPDZXi2dYd4VJlXps
-        pRzBpT25IAYRcsHhb7UXxtcuflc66clE4gkYqkYMfuIGsxGOO4Mo6n9vy4TbbePv
-        yBvxD+OcV+nUrqJdK4J4VrhHOn6Dh4g3iWomVQfeY1QK/C5oo0Oh6tr+ERqPQMm/
-        i7WrGOmMzO20ibGuUivoDpDcehqVDc1tMFLXwnSCECRO27CUzxCo+ikHKB84LSj0
-        2YqTH1XDybKxylJkysD/9Vw2GqO6En0Zr+bxEgi2mulkmu4V1uTFB42pTofZ42y7
-        pOBQ==
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
-        messagingengine.com; h=cc:cc:content-type:date:date:feedback-id
-        :feedback-id:from:from:in-reply-to:in-reply-to:message-id
-        :mime-version:references:reply-to:sender:subject:subject:to:to
-        :x-me-proxy:x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=
-        fm1; t=1660869625; x=1660876825; bh=p4mrdAhfuXrXkbUMCbpYFq9iim/K
-        I6Q1KeIWNni0Pu8=; b=zxN4ID6gqcZMZFi8RRRCqCJJz67/hlDBmIXr5jMDNL7J
-        Vwlbb+o3pWLxQLrkZKs73qUn9/G22KzobJM2Jl9O3KX7JfWy8k8c1xkZpCxVN9WN
-        c00bSD4/geEGawIMVcoMPAkKeghrFaVGsJA3qfQJ+oRqw2xSLwBMFIZpRH3IVJG8
-        Zt86YzEpUzOJMNgH0PLfyvpiIbmSH7yVHevlA/KJ6yD2K4mMagqIDeKaIPrcMCR+
-        M/ji5zqZU/m+yB8GLeVVmDfdSJ/wcNIGTd6h+ZgRK3B2Zu9Bup7h2qXawrZCQQyC
-        fjNPXMtQFfPMWzHkfo+l1ZWfQYMTSh0d9NDp8BLonQ==
-X-ME-Sender: <xms:99v-Yguo4sXKdcYloGScFZLpjFVcdsWZEue-M1d_aSugtfVgFE0PgQ>
-    <xme:99v-YteKlaDAXzZrY5Q7ajRii4Spnlk3QnOkHFRj7meDmdCXaXBQ3dL9-ckV7WqnB
-    xnWlyo3ThZy_C2RBU0>
-X-ME-Received: <xmr:99v-Yryf_SG4XVAtEfsYgZcJ3dxZwV8_ZLtSRV-uOvVorPrG9mI1zqhG9KlR3myN6ZGf_A>
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgedvfedrvdeitddgfeekucetufdoteggodetrfdotf
-    fvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdfqfgfvpdfurfetoffkrfgpnffqhgen
-    uceurghilhhouhhtmecufedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmne
-    cujfgurhepfffhvfevuffkfhggtggujgesthdttddttddtvdenucfhrhhomhepfdfmihhr
-    ihhllhcutedrucfuhhhuthgvmhhovhdfuceokhhirhhilhhlsehshhhuthgvmhhovhdrnh
-    grmhgvqeenucggtffrrghtthgvrhhnpefhieeghfdtfeehtdeftdehgfehuddtvdeuheet
-    tddtheejueekjeegueeivdektdenucevlhhushhtvghrufhiiigvpedtnecurfgrrhgrmh
-    epmhgrihhlfhhrohhmpehkihhrihhllhesshhhuhhtvghmohhvrdhnrghmvg
-X-ME-Proxy: <xmx:99v-YjNXs-TyttYJAcbSZqpXqruhIjPf74NygKPH72sFr0vzEnXA_Q>
-    <xmx:99v-Yg-3-1lIdhYqJkEpnHGqR3EY0j38u01Fr5ghV6lowELnpxWTIw>
-    <xmx:99v-YrUHX7v-hUiBnmBx_peHkRqQJLNybs1S_IxmlhX7GebIRTLP2Q>
-    <xmx:-dv-YszGL-rTfN2_TUO-BqTH0iFUn_7vbveOClqgPpv1wXSMp-azIw>
-Feedback-ID: ie3994620:Fastmail
-Received: by mail.messagingengine.com (Postfix) with ESMTPA; Thu,
- 18 Aug 2022 20:40:22 -0400 (EDT)
-Received: by box.shutemov.name (Postfix, from userid 1000)
-        id CB4DD104AA5; Fri, 19 Aug 2022 03:40:18 +0300 (+03)
-Date:   Fri, 19 Aug 2022 03:40:18 +0300
-From:   "Kirill A. Shutemov" <kirill@shutemov.name>
-To:     Sean Christopherson <seanjc@google.com>
-Cc:     Chao Peng <chao.p.peng@linux.intel.com>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org, linux-mm@kvack.org,
-        linux-fsdevel@vger.kernel.org, linux-api@vger.kernel.org,
-        linux-doc@vger.kernel.org, qemu-devel@nongnu.org,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Jonathan Corbet <corbet@lwn.net>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        x86@kernel.org, "H . Peter Anvin" <hpa@zytor.com>,
-        Hugh Dickins <hughd@google.com>,
-        Jeff Layton <jlayton@kernel.org>,
-        "J . Bruce Fields" <bfields@fieldses.org>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        Mike Rapoport <rppt@kernel.org>,
-        Steven Price <steven.price@arm.com>,
-        "Maciej S . Szmigiero" <mail@maciej.szmigiero.name>,
-        Vlastimil Babka <vbabka@suse.cz>,
-        Vishal Annapurve <vannapurve@google.com>,
-        Yu Zhang <yu.c.zhang@linux.intel.com>,
-        "Kirill A . Shutemov" <kirill.shutemov@linux.intel.com>,
-        luto@kernel.org, jun.nakajima@intel.com, dave.hansen@intel.com,
-        ak@linux.intel.com, david@redhat.com, aarcange@redhat.com,
-        ddutile@redhat.com, dhildenb@redhat.com,
-        Quentin Perret <qperret@google.com>,
-        Michael Roth <michael.roth@amd.com>, mhocko@suse.com
-Subject: Re: [PATCH v6 6/8] KVM: Handle page fault for private memory
-Message-ID: <20220819004018.mgdvxhl6dj3ujl3f@box.shutemov.name>
-References: <20220519153713.819591-1-chao.p.peng@linux.intel.com>
- <20220519153713.819591-7-chao.p.peng@linux.intel.com>
- <YqzyjZnflCMPo8b/@google.com>
+        with ESMTP id S229703AbiHSAms (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 18 Aug 2022 20:42:48 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2A6D5DEB50
+        for <kvm@vger.kernel.org>; Thu, 18 Aug 2022 17:42:47 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1660869766;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=F+mwOXxAkoNOjKTh4pynirHUBFBiL6gHoAL0lptq2/s=;
+        b=iWkaEi+xJrK09jcMTswrRVdKx19ipgjMXlR3FuRBj5/XMsarKrSFiLqcO7cIDDbQIIvNxq
+        r1ovwgaGc8AY+P7XR/mP6eT/HKM6iZWe738RzbqD2YU5gBDAZHP3w8LHsxi/aFSS42AAnQ
+        ziH8BcNjolW7dtyQhXHoCauLduL1Gts=
+Received: from mail-lf1-f71.google.com (mail-lf1-f71.google.com
+ [209.85.167.71]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_128_GCM_SHA256) id
+ us-mta-163-vVre3KuNOhixfnB8a28o-A-1; Thu, 18 Aug 2022 20:42:45 -0400
+X-MC-Unique: vVre3KuNOhixfnB8a28o-A-1
+Received: by mail-lf1-f71.google.com with SMTP id v21-20020a197415000000b00492c4d45175so598368lfe.4
+        for <kvm@vger.kernel.org>; Thu, 18 Aug 2022 17:42:44 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc;
+        bh=F+mwOXxAkoNOjKTh4pynirHUBFBiL6gHoAL0lptq2/s=;
+        b=U3ys9nc4WaeOub1zT2Cmqn8pXzUN6zVg/4WJgnymmQMhvNSWGZOG1H42QO3beHQk25
+         p5DKUUxJYle5m1iYhW5ppXjERaW+bLtmBdYGBQE8AwrRc3vsgKG+21N1z8HMylc6Nvgv
+         ORpjn5gB1/0ptziTAzPn7OkzXBa5Hhn0mvUhCIpwTRnRd3KnAN6H2zRVMr4AKU0FDjSR
+         7pyRupewYzpaXy60J9h9nfCpwtHaCnaHfoC50P1YmPkPhIzeW+vdn4KawCGuJMbvurcV
+         2kL9rk4AGZAmKkXYrZOAK+nhMdudNEiLQvuPACtw4ks4ulSRAWcKsy+21WnHXvnlsKZ9
+         cMTA==
+X-Gm-Message-State: ACgBeo2apmK/LyD/WyCoebYckUBRh38WBjjEa8m2ljAZAzh2ZiEidz4x
+        6W26QabGWSmtUJl0eXK7bKXZyqv32NYBcTouVLANg4tT7G5t3CRmFRr4zcOY2LfKT9+F0a+Zrl7
+        uoqh5Jy1A9NqW7c13ZC+n6HJvHnTm
+X-Received: by 2002:a2e:a5c3:0:b0:261:ac2d:2820 with SMTP id n3-20020a2ea5c3000000b00261ac2d2820mr1566620ljp.243.1660869763610;
+        Thu, 18 Aug 2022 17:42:43 -0700 (PDT)
+X-Google-Smtp-Source: AA6agR6DovrTZ8skbUJhveovXiAocl2YhXuq8pzuh+lrxGHEPrz2c5hrrGAnX9Fj0f/C41UKEX10jssdqlgV7yfRDzY=
+X-Received: by 2002:a2e:a5c3:0:b0:261:ac2d:2820 with SMTP id
+ n3-20020a2ea5c3000000b00261ac2d2820mr1566611ljp.243.1660869763375; Thu, 18
+ Aug 2022 17:42:43 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <YqzyjZnflCMPo8b/@google.com>
-X-Spam-Status: No, score=-2.8 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,SPF_HELO_PASS,
-        SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no
-        version=3.4.6
+References: <c5075d3d-9d2c-2716-1cbf-cede49e2d66f@oracle.com>
+ <20e92551-a639-ec13-3d9c-13bb215422e1@intel.com> <9b6292f3-9bd5-ecd8-5e42-cd5d12f036e7@oracle.com>
+ <22e0236f-b556-c6a8-0043-b39b02928fd6@intel.com> <892b39d6-85f8-bff5-030d-e21288975572@oracle.com>
+ <52a47bc7-bf26-b8f9-257f-7dc5cea66d23@intel.com> <20220817045406-mutt-send-email-mst@kernel.org>
+ <a91fa479-d1cc-a2d6-0821-93386069a2c1@intel.com> <20220817053821-mutt-send-email-mst@kernel.org>
+ <449c2fb2-3920-7bf9-8c5c-a68456dfea76@intel.com> <20220817063450-mutt-send-email-mst@kernel.org>
+ <54aa5a5c-69e2-d372-3e0c-b87f595d213c@redhat.com> <f0b6ea5c-1783-96d2-2d9f-e5cf726b0fc0@oracle.com>
+In-Reply-To: <f0b6ea5c-1783-96d2-2d9f-e5cf726b0fc0@oracle.com>
+From:   Jason Wang <jasowang@redhat.com>
+Date:   Fri, 19 Aug 2022 08:42:32 +0800
+Message-ID: <CACGkMEumKfktMUJOTUYL_JYkFbw8qH331gGARPB2bTH=7wKWPg@mail.gmail.com>
+Subject: Re: [PATCH 2/2] vDPA: conditionally read fields in virtio-net dev
+To:     Si-Wei Liu <si-wei.liu@oracle.com>
+Cc:     "Michael S. Tsirkin" <mst@redhat.com>,
+        "Zhu, Lingshan" <lingshan.zhu@intel.com>,
+        virtualization <virtualization@lists.linux-foundation.org>,
+        netdev <netdev@vger.kernel.org>, kvm <kvm@vger.kernel.org>,
+        Parav Pandit <parav@nvidia.com>,
+        Yongji Xie <xieyongji@bytedance.com>,
+        "Dawar, Gautam" <gautam.dawar@amd.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Spam-Status: No, score=-2.8 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,
+        SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Jun 17, 2022 at 09:30:53PM +0000, Sean Christopherson wrote:
-> > @@ -4088,7 +4144,12 @@ static int direct_page_fault(struct kvm_vcpu *vcpu, struct kvm_page_fault *fault
-> >  		read_unlock(&vcpu->kvm->mmu_lock);
-> >  	else
-> >  		write_unlock(&vcpu->kvm->mmu_lock);
-> > -	kvm_release_pfn_clean(fault->pfn);
-> > +
-> > +	if (fault->is_private)
-> > +		kvm_private_mem_put_pfn(fault->slot, fault->pfn);
-> 
-> Why does the shmem path lock the page, and then unlock it here?
+On Fri, Aug 19, 2022 at 7:20 AM Si-Wei Liu <si-wei.liu@oracle.com> wrote:
+>
+>
+>
+> On 8/17/2022 9:15 PM, Jason Wang wrote:
+> >
+> > =E5=9C=A8 2022/8/17 18:37, Michael S. Tsirkin =E5=86=99=E9=81=93:
+> >> On Wed, Aug 17, 2022 at 05:43:22PM +0800, Zhu, Lingshan wrote:
+> >>>
+> >>> On 8/17/2022 5:39 PM, Michael S. Tsirkin wrote:
+> >>>> On Wed, Aug 17, 2022 at 05:13:59PM +0800, Zhu, Lingshan wrote:
+> >>>>> On 8/17/2022 4:55 PM, Michael S. Tsirkin wrote:
+> >>>>>> On Wed, Aug 17, 2022 at 10:14:26AM +0800, Zhu, Lingshan wrote:
+> >>>>>>> Yes it is a little messy, and we can not check _F_VERSION_1
+> >>>>>>> because of
+> >>>>>>> transitional devices, so maybe this is the best we can do for now
+> >>>>>> I think vhost generally needs an API to declare config space
+> >>>>>> endian-ness
+> >>>>>> to kernel. vdpa can reuse that too then.
+> >>>>> Yes, I remember you have mentioned some IOCTL to set the endian-nes=
+s,
+> >>>>> for vDPA, I think only the vendor driver knows the endian,
+> >>>>> so we may need a new function vdpa_ops->get_endian().
+> >>>>> In the last thread, we say maybe it's better to add a comment for
+> >>>>> now.
+> >>>>> But if you think we should add a vdpa_ops->get_endian(), I can work
+> >>>>> on it for sure!
+> >>>>>
+> >>>>> Thanks
+> >>>>> Zhu Lingshan
+> >>>> I think QEMU has to set endian-ness. No one else knows.
+> >>> Yes, for SW based vhost it is true. But for HW vDPA, only
+> >>> the device & driver knows the endian, I think we can not
+> >>> "set" a hardware's endian.
+> >> QEMU knows the guest endian-ness and it knows that
+> >> device is accessed through the legacy interface.
+> >> It can accordingly send endian-ness to the kernel and
+> >> kernel can propagate it to the driver.
+> >
+> >
+> > I wonder if we can simply force LE and then Qemu can do the endian
+> > conversion?
+> convert from LE for config space fields only, or QEMU has to forcefully
+> mediate and covert endianness for all device memory access including
+> even the datapath (fields in descriptor and avail/used rings)?
 
-Lock is require to avoid race with truncate / punch hole. Like if truncate
-happens after get_pfn(), but before it gets into SEPT we are screwed.
+Former. Actually, I want to force modern devices for vDPA when
+developing the vDPA framework. But then we see requirements for
+transitional or even legacy (e.g the Ali ENI parent). So it
+complicates things a lot.
 
-> Same question for why this path marks it dirty?  The guest has the page mapped
-> so the dirty flag is immediately stale.
+I think several ideas has been proposed:
 
-If page is clean and refcount is not elevated, vmscan is free to drop the
-page from page cache. I don't think we want this.
+1) Your proposal of having a vDPA specific way for
+modern/transitional/legacy awareness. This seems very clean since each
+transport should have the ability to do that but it still requires
+some kind of mediation for the case e.g running BE legacy guest on LE
+host.
 
-> In other words, why does KVM need to do something different for private pfns?
+2) Michael suggests using VHOST_SET_VRING_ENDIAN where it means we
+need a new config ops for vDPA bus, but it doesn't solve the issue for
+config space (at least from its name). We probably need a new ioctl
+for both vring and config space.
 
-Because in the traditional KVM memslot scheme, core mm takes care about
-this.
+or
 
-The changes in v7 is wrong. Page has be locked until it lends into SEPT and
-must make it dirty before unlocking.
+3) revisit the idea of forcing modern only device which may simplify
+things a lot
 
--- 
-  Kiryl Shutsemau / Kirill A. Shutemov
+which way should we go?
+
+> I hope
+> it's not the latter, otherwise it loses the point to use vDPA for
+> datapath acceleration.
+>
+> Even if its the former, it's a little weird for vendor device to
+> implement a LE config space with BE ring layout, although still possible.=
+..
+
+Right.
+
+Thanks
+
+>
+> -Siwei
+> >
+> > Thanks
+> >
+> >
+> >>
+> >>> So if you think we should add a vdpa_ops->get_endian(),
+> >>> I will drop these comments in the next version of
+> >>> series, and work on a new patch for get_endian().
+> >>>
+> >>> Thanks,
+> >>> Zhu Lingshan
+> >> Guests don't get endian-ness from devices so this seems pointless.
+> >>
+> >
+>
+
