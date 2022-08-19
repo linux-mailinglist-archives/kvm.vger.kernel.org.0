@@ -2,80 +2,71 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id B3AD8599670
-	for <lists+kvm@lfdr.de>; Fri, 19 Aug 2022 09:56:10 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 1ED535996A0
+	for <lists+kvm@lfdr.de>; Fri, 19 Aug 2022 10:06:23 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1347236AbiHSHsz (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 19 Aug 2022 03:48:55 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39484 "EHLO
+        id S1347344AbiHSIAb (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 19 Aug 2022 04:00:31 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56018 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1347248AbiHSHso (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 19 Aug 2022 03:48:44 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7A596B2DAC
-        for <kvm@vger.kernel.org>; Fri, 19 Aug 2022 00:48:41 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1660895320;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=09vMTP9vJHiw/P02q27iNIqPqja/VvpetizcVgPzsMo=;
-        b=Iyt2hBsDXCKhLVCZo56SEumIzucA5s74DvIR8pznr8aNuzuztxNi4eaZ3gkpsl6CyM5h0D
-        o8hWS7AJjT+NW59h9kINYxCvF1aK7VuhnWBLUzRJbWpz349escmppoQY+iDSm26DUvf80u
-        SFWXO1Pnj4xN68Jb7aQKYrUI8zEx6aQ=
-Received: from mail-ed1-f72.google.com (mail-ed1-f72.google.com
- [209.85.208.72]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_128_GCM_SHA256) id
- us-mta-178-PEzCSqPfNIGqM59XFo7M-g-1; Fri, 19 Aug 2022 03:48:39 -0400
-X-MC-Unique: PEzCSqPfNIGqM59XFo7M-g-1
-Received: by mail-ed1-f72.google.com with SMTP id q32-20020a05640224a000b004462f105fa9so1290664eda.4
-        for <kvm@vger.kernel.org>; Fri, 19 Aug 2022 00:48:39 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=mime-version:message-id:date:references:in-reply-to:subject:cc:to
-         :from:x-gm-message-state:from:to:cc;
-        bh=09vMTP9vJHiw/P02q27iNIqPqja/VvpetizcVgPzsMo=;
-        b=kPHL9VrKoUpIbTF1oNhLghr3H48mw/tLQb/1Gv0t5kAGNqUVK7p/ahdrLXZ+89U/xT
-         g5ZylaQdNrXEMlyqTdEkEVe1hc7KidRrzNq8wSv5yhGwWVt+ZvyPrbpDB48fo3iUEtAE
-         VGysbraHBVu5bc8aCLXow7LSjhIhQokofCjON9O/DbS8Shy/ieNHLMy2AQpLL/ZdGblW
-         nu4BOKk7FRzEMIX0CRE8vMoRrJGUYUSga6FHowMJ3jE5PI/H1yMV7riI29CYgN3y0KQW
-         GDy32Wot/LYXYapOH8UgfKIFMZOKTxU7hvSWMvo7O6sORa/y50WZEmw8ndtqPxbElW+9
-         IKUQ==
-X-Gm-Message-State: ACgBeo2E+bucSHtwdTmvIyJeQepQ7ERsJtb7+5njxZ77mDH4Y4fD5msp
-        Ks16RUfcORprIiNkMRXQ0e5b+u/jURkInRNdIPUULDrgdyjZT6lgoi+uoqQ/kBs6RSXy+vU3sTM
-        TP4Od6F1oCP8g
-X-Received: by 2002:a17:907:2e0b:b0:730:8aee:d674 with SMTP id ig11-20020a1709072e0b00b007308aeed674mr4197336ejc.104.1660895318300;
-        Fri, 19 Aug 2022 00:48:38 -0700 (PDT)
-X-Google-Smtp-Source: AA6agR6AiRRPeV4IlrR5u7EYBCj7ZdHNSnHfKfXiJC2KfWg2Lb5NypwN0HfG80UyVo8Ikdgj70Ah8Q==
-X-Received: by 2002:a17:907:2e0b:b0:730:8aee:d674 with SMTP id ig11-20020a1709072e0b00b007308aeed674mr4197316ejc.104.1660895318122;
-        Fri, 19 Aug 2022 00:48:38 -0700 (PDT)
-Received: from fedora (nat-2.ign.cz. [91.219.240.2])
-        by smtp.gmail.com with ESMTPSA id ss28-20020a170907c01c00b00730a18a8b68sm1929373ejc.130.2022.08.19.00.48.37
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 19 Aug 2022 00:48:37 -0700 (PDT)
-From:   Vitaly Kuznetsov <vkuznets@redhat.com>
-To:     Sean Christopherson <seanjc@google.com>
-Cc:     kvm@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>,
-        Anirudh Rayabharam <anrayabh@linux.microsoft.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Maxim Levitsky <mlevitsk@redhat.com>,
-        Nathan Chancellor <nathan@kernel.org>,
-        Michael Kelley <mikelley@microsoft.com>,
-        linux-hyperv@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v5 22/26] KVM: VMX: Move LOAD_IA32_PERF_GLOBAL_CTRL
- errata handling out of setup_vmcs_config()
-In-Reply-To: <Yv57tmu09nOQcFrf@google.com>
-References: <20220802160756.339464-1-vkuznets@redhat.com>
- <20220802160756.339464-23-vkuznets@redhat.com>
- <Yv57tmu09nOQcFrf@google.com>
-Date:   Fri, 19 Aug 2022 09:48:36 +0200
-Message-ID: <87wnb4smgb.fsf@redhat.com>
-MIME-Version: 1.0
-Content-Type: text/plain
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=unavailable
+        with ESMTP id S1347320AbiHSIAY (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 19 Aug 2022 04:00:24 -0400
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0A1E71F618;
+        Fri, 19 Aug 2022 01:00:22 -0700 (PDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id 65240616D4;
+        Fri, 19 Aug 2022 08:00:22 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id B6791C433B5;
+        Fri, 19 Aug 2022 08:00:21 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1660896021;
+        bh=dXB7Dmr6Olnqm8i/ag5x25/j/xOuKOYp7Zqy3xYbF1k=;
+        h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+        b=bPzGRNloxET7jCjbmwuPekfurJU+YIanGSes6+FQxRyOaXDN7NleDvVk0kCSGm+mj
+         Nvy+u3VuCbER8OL+RbU4KnLqA6HRIfjiQ7u8R5gsfEHDNpnzogYoaC5TjC7KhI9nGl
+         3u6j0LMPpZx/z/OYomSHy1cBWXgHYDxR1vDcP0ZfPUIOgSJjWLT9uKP94QaW4rEyq0
+         Uw510IEA5cxLKQKuP025ixhomp3R0zWPbgu8jqG/fWOoVRppxVNpkOQSMy+fdBPeIl
+         fYw4MU6pTlU+kolvweUV5rWvIr/LtPt8krly8NS3/oMs0OxtW71SdawKlOlX4geM01
+         EzczQKfP6wZiA==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=why.misterjones.org)
+        by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+        (Exim 4.95)
+        (envelope-from <maz@kernel.org>)
+        id 1oOwvT-004D7a-Dh;
+        Fri, 19 Aug 2022 09:00:19 +0100
+Date:   Fri, 19 Aug 2022 09:00:18 +0100
+Message-ID: <87lerkwtm5.wl-maz@kernel.org>
+From:   Marc Zyngier <maz@kernel.org>
+To:     Gavin Shan <gshan@redhat.com>
+Cc:     kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org,
+        kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+        linux-doc@vger.kernel.org, linux-kselftest@vger.kernel.org,
+        peterx@redhat.com, pbonzini@redhat.com, corbet@lwn.net,
+        james.morse@arm.com, alexandru.elisei@arm.com,
+        suzuki.poulose@arm.com, oliver.upton@linux.dev,
+        catalin.marinas@arm.com, will@kernel.org, shuah@kernel.org,
+        seanjc@google.com, drjones@redhat.com, dmatlack@google.com,
+        bgardon@google.com, ricarkol@google.com, zhenyzha@redhat.com,
+        shan.gavin@gmail.com
+Subject: Re: [PATCH v1 1/5] KVM: arm64: Enable ring-based dirty memory tracking
+In-Reply-To: <20220819005601.198436-2-gshan@redhat.com>
+References: <20220819005601.198436-1-gshan@redhat.com>
+        <20220819005601.198436-2-gshan@redhat.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/27.1
+ (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: gshan@redhat.com, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org, linux-kernel@vger.kernel.org, linux-doc@vger.kernel.org, linux-kselftest@vger.kernel.org, peterx@redhat.com, pbonzini@redhat.com, corbet@lwn.net, james.morse@arm.com, alexandru.elisei@arm.com, suzuki.poulose@arm.com, oliver.upton@linux.dev, catalin.marinas@arm.com, will@kernel.org, shuah@kernel.org, seanjc@google.com, drjones@redhat.com, dmatlack@google.com, bgardon@google.com, ricarkol@google.com, zhenyzha@redhat.com, shan.gavin@gmail.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+X-Spam-Status: No, score=-7.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_HI,
+        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -83,66 +74,108 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Sean Christopherson <seanjc@google.com> writes:
+On Fri, 19 Aug 2022 01:55:57 +0100,
+Gavin Shan <gshan@redhat.com> wrote:
+> 
+> The ring-based dirty memory tracking has been available and enabled
+> on x86 for a while. The feature is beneficial when the number of
+> dirty pages is small in a checkpointing system or live migration
+> scenario. More details can be found from fb04a1eddb1a ("KVM: X86:
+> Implement ring-based dirty memory tracking").
+> 
+> This enables the ring-based dirty memory tracking on ARM64. It's
+> notable that no extra reserved ring entries are needed on ARM64
+> because the huge pages are always split into base pages when page
+> dirty tracking is enabled.
 
-> On Tue, Aug 02, 2022, Vitaly Kuznetsov wrote:
->> While it seems reasonable to not expose LOAD_IA32_PERF_GLOBAL_CTRL controls
->> to L1 hypervisor on buggy CPUs, such change would inevitably break live
->> migration from older KVMs where the controls are exposed. Keep the status quo
->> for now, L1 hypervisor itself is supposed to take care of the errata.
->
-> As noted before, this statement is wrong as it requires guest FMS == host FMS,
-> but it's irrelevant because KVM can emulate the control unconditionally.  I'll
-> test and fold in my suggested patch[*] (assuming it works) and reword this part
-> of the changelog.  Ah, and I'll also need to fold in a patch to actually emulate
-> the controls without hardware support.
->
-> [*] https://lore.kernel.org/all/YtnZmCutdd5tpUmz@google.com
+Can you please elaborate on this? Adding a per-CPU ring of course
+results in extra memory allocation, so there must be a subtle
+x86-specific detail that I'm not aware of...
 
-Oh, I missed the part that my changelog is actually wrong when Paolo
-said "Can you send this as a separate patch", no objections to re-wording!
+> 
+> Signed-off-by: Gavin Shan <gshan@redhat.com>
+> ---
+>  Documentation/virt/kvm/api.rst    | 2 +-
+>  arch/arm64/include/uapi/asm/kvm.h | 1 +
+>  arch/arm64/kvm/Kconfig            | 1 +
+>  arch/arm64/kvm/arm.c              | 8 ++++++++
+>  4 files changed, 11 insertions(+), 1 deletion(-)
+> 
+> diff --git a/Documentation/virt/kvm/api.rst b/Documentation/virt/kvm/api.rst
+> index abd7c32126ce..19fa1ac017ed 100644
+> --- a/Documentation/virt/kvm/api.rst
+> +++ b/Documentation/virt/kvm/api.rst
+> @@ -8022,7 +8022,7 @@ regardless of what has actually been exposed through the CPUID leaf.
+>  8.29 KVM_CAP_DIRTY_LOG_RING
+>  ---------------------------
+>  
+> -:Architectures: x86
+> +:Architectures: x86, arm64
+>  :Parameters: args[0] - size of the dirty log ring
+>  
+>  KVM is capable of tracking dirty memory using ring buffers that are
+> diff --git a/arch/arm64/include/uapi/asm/kvm.h b/arch/arm64/include/uapi/asm/kvm.h
+> index 3bb134355874..7e04b0b8d2b2 100644
+> --- a/arch/arm64/include/uapi/asm/kvm.h
+> +++ b/arch/arm64/include/uapi/asm/kvm.h
+> @@ -43,6 +43,7 @@
+>  #define __KVM_HAVE_VCPU_EVENTS
+>  
+>  #define KVM_COALESCED_MMIO_PAGE_OFFSET 1
+> +#define KVM_DIRTY_LOG_PAGE_OFFSET 64
 
->
->> Reviewed-by: Maxim Levitsky <mlevitsk@redhat.com>
->> Signed-off-by: Vitaly Kuznetsov <vkuznets@redhat.com>
->> ---
->>  arch/x86/kvm/vmx/vmx.c | 59 +++++++++++++++++++++++++-----------------
->>  1 file changed, 35 insertions(+), 24 deletions(-)
->> 
->
-> ...
->
->> @@ -8192,6 +8199,10 @@ static __init int hardware_setup(void)
->>  	if (setup_vmcs_config(&vmcs_config, &vmx_capability) < 0)
->>  		return -EIO;
->>  
->> +	if (cpu_has_perf_global_ctrl_bug())
->> +		pr_warn_once("kvm: VM_EXIT_LOAD_IA32_PERF_GLOBAL_CTRL "
->> +			     "does not work properly. Using workaround\n");
->
-> Any objections to opportunistically tweaking this?
->
-> 		pr_warn_once("kvm: CPU has VM_EXIT_LOAD_IA32_PERF_GLOBAL_CTRL erratum,"
-> 			     "using MSR load/store lists for PERF_GLOBAL_CTRL\n");
->
+For context, the documentation says:
 
-Personally I'd say just 
+<quote>
+- if KVM_CAP_DIRTY_LOG_RING is available, a number of pages at
+  KVM_DIRTY_LOG_PAGE_OFFSET * PAGE_SIZE. [...]
+</quote>
 
- 		pr_warn_once("kvm: CPU has VM_EXIT_LOAD_IA32_PERF_GLOBAL_CTRL erratum\n");
+What is the reason for picking this particular value?
 
-leaving aside the workaround KVM uses. This is merely an implementation
-detail which KVM users most likely don't really need. I have no strong
-opinion though, feel free to adjust.
 
->> +
->>  	if (boot_cpu_has(X86_FEATURE_NX))
->>  		kvm_enable_efer_bits(EFER_NX);
->>  
->> -- 
->> 2.35.3
->> 
->
+>  
+>  #define KVM_REG_SIZE(id)						\
+>  	(1U << (((id) & KVM_REG_SIZE_MASK) >> KVM_REG_SIZE_SHIFT))
+> diff --git a/arch/arm64/kvm/Kconfig b/arch/arm64/kvm/Kconfig
+> index 815cc118c675..0309b2d0f2da 100644
+> --- a/arch/arm64/kvm/Kconfig
+> +++ b/arch/arm64/kvm/Kconfig
+> @@ -32,6 +32,7 @@ menuconfig KVM
+>  	select KVM_VFIO
+>  	select HAVE_KVM_EVENTFD
+>  	select HAVE_KVM_IRQFD
+> +	select HAVE_KVM_DIRTY_RING
+>  	select HAVE_KVM_MSI
+>  	select HAVE_KVM_IRQCHIP
+>  	select HAVE_KVM_IRQ_ROUTING
+> diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
+> index 986cee6fbc7f..3de6b9b39db7 100644
+> --- a/arch/arm64/kvm/arm.c
+> +++ b/arch/arm64/kvm/arm.c
+> @@ -866,6 +866,14 @@ int kvm_arch_vcpu_ioctl_run(struct kvm_vcpu *vcpu)
+>  		if (!ret)
+>  			ret = 1;
+>  
+> +		/* Force vcpu exit if its dirty ring is soft-full */
+> +		if (unlikely(vcpu->kvm->dirty_ring_size &&
+> +			     kvm_dirty_ring_soft_full(&vcpu->dirty_ring))) {
+> +			vcpu->run->exit_reason = KVM_EXIT_DIRTY_RING_FULL;
+> +			trace_kvm_dirty_ring_exit(vcpu);
+> +			ret = 0;
+> +		}
+> +
+
+Why can't this be moved to kvm_vcpu_exit_request() instead? I would
+also very much like the check to be made a common helper with x86.
+
+A seemingly approach would be to make this a request on dirty log
+insertion, and avoid the whole "check the log size" on every run,
+which adds pointless overhead to unsuspecting users (aka everyone).
+
+Thanks,
+
+	M.
 
 -- 
-Vitaly
-
+Without deviation from the norm, progress is not possible.
