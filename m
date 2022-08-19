@@ -2,196 +2,91 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 928B859A31D
-	for <lists+kvm@lfdr.de>; Fri, 19 Aug 2022 20:03:24 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 70F7659A43B
+	for <lists+kvm@lfdr.de>; Fri, 19 Aug 2022 20:05:21 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1354725AbiHSRgw (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 19 Aug 2022 13:36:52 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36356 "EHLO
+        id S1354780AbiHSRjF (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 19 Aug 2022 13:39:05 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40578 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1354721AbiHSRgc (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 19 Aug 2022 13:36:32 -0400
-Received: from mail-lj1-x22d.google.com (mail-lj1-x22d.google.com [IPv6:2a00:1450:4864:20::22d])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9285A1631F6
-        for <kvm@vger.kernel.org>; Fri, 19 Aug 2022 09:55:11 -0700 (PDT)
-Received: by mail-lj1-x22d.google.com with SMTP id l21so5055369ljj.2
-        for <kvm@vger.kernel.org>; Fri, 19 Aug 2022 09:55:11 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc;
-        bh=AhTWQcbRqLOHVkblJK8G++davTd8BoOGzTOxaJ8TciQ=;
-        b=rev22bDg/B6huypKjaBYCvhEdROPXhJKo6JY54CN/6HsfbGiAmHcmqz0iheKnDiDLv
-         60YvV6ZgPfqwgXaYULb+bIH7ZUt/NgGkDRQU23y78EYAPdOVenEvDyqxPyto7nYBPA5Z
-         XlpbPeRjdVjAuHZy974y8RZepwILZP8uJ4UkB1YMCBrCslXjf4MRg873773Fs2FkUMHK
-         QsqKpT37JjGP63hwvjmwKtKwirueKtOXcEQSrq4+c6X+2pNdYciqCszqJ9gyzTHHe95s
-         UwY4K0fEdTOLITGsLhKh/abM38uMi95xw1SFJtkj7Ko+Jzi2+qbqPO7SOVvFC9NsTxRy
-         n2IQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc;
-        bh=AhTWQcbRqLOHVkblJK8G++davTd8BoOGzTOxaJ8TciQ=;
-        b=dMwHPxs9GUqXygeEkXdPlhXcddTPhAFiSoQlQnKYIJPOXiOsO2g4CcEledwd6OiWW0
-         oKgkvvNm41lSeVrreIBlJWanOFMpO9gmlQr/Hfm3gRQe6n5gNO8j6599ClHq/PRrWX+p
-         +occf3oCBPNDx6+P7biO4Ng2qkZPggPjN1bnYgoDnxMD4V+qlJ6jgtDqDkFEnkj4L5RT
-         wAeF5vW6bxHEjKSuQNV20biVuHduF2mejs+iNZ3k+w3RmDxxPYUgxQCyqfU31Ty05CFq
-         jMgNe2fp6ums3Ie1uGrsNxXDeKynLMTSPIQmIEqgvRsWOyOiJBHRuH6pwAGYigN287y3
-         FE9g==
-X-Gm-Message-State: ACgBeo2BkI9F7IwVzu0lSVHlekyuVvPi0iS7uqB5kxa4GfhmZAeOIQ6X
-        3dpDATYB9GOGjoCn0jZtyLM3TN1WNL/5lJl31G+rDKw6nFi2VA==
-X-Google-Smtp-Source: AA6agR58K2GJzQfDZi+FO4kcRkjUmKJQPNXIQiTuu2Go1eedCUceiwNYBAb48mJhSiTtK1OeQXqSY4hu6BiWgBiZhe4=
-X-Received: by 2002:a05:651c:1787:b0:261:c1ff:4407 with SMTP id
- bn7-20020a05651c178700b00261c1ff4407mr340249ljb.257.1660928058082; Fri, 19
- Aug 2022 09:54:18 -0700 (PDT)
+        with ESMTP id S1354696AbiHSRii (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 19 Aug 2022 13:38:38 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A391A2AE
+        for <kvm@vger.kernel.org>; Fri, 19 Aug 2022 09:56:52 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1660928211;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding;
+        bh=CN6W9SC8T0+Gz699A5aiqgYNky4W4GX4nc9X+Iadk4Q=;
+        b=jLRoOcQtmUT4fBE6jxPKJ3ZO18afkehWgzeWRny9HdlNuFUHhxpbNM9IJ3SINLRsKc1Li9
+        ngJjDKhDD4MfMJy8ZqY0F8e72UpnmMZ0yBtDUk+qs9G1Gv1Py2XBcLLMRHyOOvk9xLdxPt
+        93IptsvxsDGrmr6q449v31gtKiRYcA0=
+Received: from mimecast-mx02.redhat.com (mx3-rdu2.redhat.com
+ [66.187.233.73]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-593-dKdzcjIjMUmdESMU2YaNyQ-1; Fri, 19 Aug 2022 12:56:44 -0400
+X-MC-Unique: dKdzcjIjMUmdESMU2YaNyQ-1
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.rdu2.redhat.com [10.11.54.7])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id D72E13801140;
+        Fri, 19 Aug 2022 16:56:43 +0000 (UTC)
+Received: from virtlab511.virt.lab.eng.bos.redhat.com (virtlab511.virt.lab.eng.bos.redhat.com [10.19.152.198])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id BB5BD14152E1;
+        Fri, 19 Aug 2022 16:56:43 +0000 (UTC)
+From:   Paolo Bonzini <pbonzini@redhat.com>
+To:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org
+Cc:     Maxim Levitsky <mlevitsk@redhat.com>
+Subject: [PATCH] KVM: SVM: remove unnecessary check on INIT intercept
+Date:   Fri, 19 Aug 2022 12:56:43 -0400
+Message-Id: <20220819165643.83692-1-pbonzini@redhat.com>
 MIME-Version: 1.0
-References: <cover.1655761627.git.ashish.kalra@amd.com> <78e30b5a25c926fcfdcaafea3d484f1bb25f20b9.1655761627.git.ashish.kalra@amd.com>
-In-Reply-To: <78e30b5a25c926fcfdcaafea3d484f1bb25f20b9.1655761627.git.ashish.kalra@amd.com>
-From:   Peter Gonda <pgonda@google.com>
-Date:   Fri, 19 Aug 2022 10:54:06 -0600
-Message-ID: <CAMkAt6rrGJ5DYTAJKFUTagN9i_opS8u5HPw5c_8NoyEjK7rYzA@mail.gmail.com>
-Subject: Re: [PATCH Part2 v6 37/49] KVM: SVM: Add support to handle MSR based
- Page State Change VMGEXIT
-To:     Ashish Kalra <Ashish.Kalra@amd.com>
-Cc:     "the arch/x86 maintainers" <x86@kernel.org>,
-        LKML <linux-kernel@vger.kernel.org>,
-        kvm list <kvm@vger.kernel.org>, linux-coco@lists.linux.dev,
-        Linux Memory Management List <linux-mm@kvack.org>,
-        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Joerg Roedel <jroedel@suse.de>,
-        "Lendacky, Thomas" <thomas.lendacky@amd.com>,
-        "H. Peter Anvin" <hpa@zytor.com>, Ard Biesheuvel <ardb@kernel.org>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Sean Christopherson <seanjc@google.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Jim Mattson <jmattson@google.com>,
-        Andy Lutomirski <luto@kernel.org>,
-        Dave Hansen <dave.hansen@linux.intel.com>,
-        Sergio Lopez <slp@redhat.com>,
-        Peter Zijlstra <peterz@infradead.org>,
-        Srinivas Pandruvada <srinivas.pandruvada@linux.intel.com>,
-        David Rientjes <rientjes@google.com>,
-        Dov Murik <dovmurik@linux.ibm.com>,
-        Tobin Feldman-Fitzthum <tobin@ibm.com>,
-        Borislav Petkov <bp@alien8.de>,
-        Michael Roth <michael.roth@amd.com>,
-        Vlastimil Babka <vbabka@suse.cz>,
-        "Kirill A . Shutemov" <kirill@shutemov.name>,
-        Andi Kleen <ak@linux.intel.com>,
-        Tony Luck <tony.luck@intel.com>, Marc Orr <marcorr@google.com>,
-        Sathyanarayanan Kuppuswamy 
-        <sathyanarayanan.kuppuswamy@linux.intel.com>,
-        Alper Gun <alpergun@google.com>,
-        "Dr. David Alan Gilbert" <dgilbert@redhat.com>, jarkko@kernel.org
-Content-Type: text/plain; charset="UTF-8"
-X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-        T_FILL_THIS_FORM_SHORT,T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL,
-        USER_IN_DEF_SPF_WL autolearn=ham autolearn_force=no version=3.4.6
+Content-Type: text/plain
+Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 2.85 on 10.11.54.7
+X-Spam-Status: No, score=-2.8 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,
+        SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=unavailable
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-> +
-> +static int __snp_handle_page_state_change(struct kvm_vcpu *vcpu, enum psc_op op, gpa_t gpa,
-> +                                         int level)
-> +{
-> +       struct kvm_sev_info *sev = &to_kvm_svm(vcpu->kvm)->sev_info;
-> +       struct kvm *kvm = vcpu->kvm;
-> +       int rc, npt_level;
-> +       kvm_pfn_t pfn;
-> +       gpa_t gpa_end;
-> +
-> +       gpa_end = gpa + page_level_size(level);
-> +
-> +       while (gpa < gpa_end) {
-> +               /*
-> +                * If the gpa is not present in the NPT then build the NPT.
-> +                */
-> +               rc = snp_check_and_build_npt(vcpu, gpa, level);
-> +               if (rc)
-> +                       return -EINVAL;
-> +
-> +               if (op == SNP_PAGE_STATE_PRIVATE) {
-> +                       hva_t hva;
-> +
-> +                       if (snp_gpa_to_hva(kvm, gpa, &hva))
-> +                               return -EINVAL;
-> +
-> +                       /*
-> +                        * Verify that the hva range is registered. This enforcement is
-> +                        * required to avoid the cases where a page is marked private
-> +                        * in the RMP table but never gets cleanup during the VM
-> +                        * termination path.
-> +                        */
-> +                       mutex_lock(&kvm->lock);
-> +                       rc = is_hva_registered(kvm, hva, page_level_size(level));
-> +                       mutex_unlock(&kvm->lock);
-> +                       if (!rc)
-> +                               return -EINVAL;
-> +
-> +                       /*
-> +                        * Mark the userspace range unmerable before adding the pages
-> +                        * in the RMP table.
-> +                        */
-> +                       mmap_write_lock(kvm->mm);
-> +                       rc = snp_mark_unmergable(kvm, hva, page_level_size(level));
-> +                       mmap_write_unlock(kvm->mm);
-> +                       if (rc)
-> +                               return -EINVAL;
-> +               }
-> +
-> +               write_lock(&kvm->mmu_lock);
-> +
-> +               rc = kvm_mmu_get_tdp_walk(vcpu, gpa, &pfn, &npt_level);
-> +               if (!rc) {
-> +                       /*
-> +                        * This may happen if another vCPU unmapped the page
-> +                        * before we acquire the lock. Retry the PSC.
-> +                        */
-> +                       write_unlock(&kvm->mmu_lock);
-> +                       return 0;
-> +               }
+Since svm_check_nested_events() is now handling INIT signals, there is
+no need to latch it until the VMEXIT is injected.  The only condition
+under which INIT signals are latched is GIF=0.
 
-I think we want to return -EAGAIN or similar if we want the caller to
-retry, right? I think returning 0 here hides the error.
+Suggested-by: Maxim Levitsky <mlevitsk@redhat.com>
+Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+---
+ arch/x86/kvm/svm/svm.c | 10 +---------
+ 1 file changed, 1 insertion(+), 9 deletions(-)
 
-> +
-> +               /*
-> +                * Adjust the level so that we don't go higher than the backing
-> +                * page level.
-> +                */
-> +               level = min_t(size_t, level, npt_level);
-> +
-> +               trace_kvm_snp_psc(vcpu->vcpu_id, pfn, gpa, op, level);
-> +
-> +               switch (op) {
-> +               case SNP_PAGE_STATE_SHARED:
-> +                       rc = snp_make_page_shared(kvm, gpa, pfn, level);
-> +                       break;
-> +               case SNP_PAGE_STATE_PRIVATE:
-> +                       rc = rmp_make_private(pfn, gpa, level, sev->asid, false);
-> +                       break;
-> +               default:
-> +                       rc = -EINVAL;
-> +                       break;
-> +               }
-> +
-> +               write_unlock(&kvm->mmu_lock);
-> +
-> +               if (rc) {
-> +                       pr_err_ratelimited("Error op %d gpa %llx pfn %llx level %d rc %d\n",
-> +                                          op, gpa, pfn, level, rc);
-> +                       return rc;
-> +               }
-> +
-> +               gpa = gpa + page_level_size(level);
-> +       }
-> +
-> +       return 0;
-> +}
-> +
+diff --git a/arch/x86/kvm/svm/svm.c b/arch/x86/kvm/svm/svm.c
+index f3813dbacb9f..26a348389ece 100644
+--- a/arch/x86/kvm/svm/svm.c
++++ b/arch/x86/kvm/svm/svm.c
+@@ -4697,15 +4697,7 @@ static bool svm_apic_init_signal_blocked(struct kvm_vcpu *vcpu)
+ {
+ 	struct vcpu_svm *svm = to_svm(vcpu);
+ 
+-	/*
+-	 * TODO: Last condition latch INIT signals on vCPU when
+-	 * vCPU is in guest-mode and vmcb12 defines intercept on INIT.
+-	 * To properly emulate the INIT intercept,
+-	 * svm_check_nested_events() should call nested_svm_vmexit()
+-	 * if an INIT signal is pending.
+-	 */
+-	return !gif_set(svm) ||
+-		   (vmcb_is_intercept(&svm->vmcb->control, INTERCEPT_INIT));
++	return !gif_set(svm);
+ }
+ 
+ static void svm_vcpu_deliver_sipi_vector(struct kvm_vcpu *vcpu, u8 vector)
+-- 
+2.31.1
+
