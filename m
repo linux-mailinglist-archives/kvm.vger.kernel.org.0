@@ -2,327 +2,215 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id D64B6599A87
-	for <lists+kvm@lfdr.de>; Fri, 19 Aug 2022 13:18:38 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 84814599B27
+	for <lists+kvm@lfdr.de>; Fri, 19 Aug 2022 13:44:06 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1348743AbiHSLKX (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 19 Aug 2022 07:10:23 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34018 "EHLO
+        id S1348044AbiHSLe2 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 19 Aug 2022 07:34:28 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40464 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1348739AbiHSLKW (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 19 Aug 2022 07:10:22 -0400
-Received: from mail-pj1-x102f.google.com (mail-pj1-x102f.google.com [IPv6:2607:f8b0:4864:20::102f])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8596CFBA7C
-        for <kvm@vger.kernel.org>; Fri, 19 Aug 2022 04:10:21 -0700 (PDT)
-Received: by mail-pj1-x102f.google.com with SMTP id t11-20020a17090a510b00b001fac77e9d1fso4531229pjh.5
-        for <kvm@vger.kernel.org>; Fri, 19 Aug 2022 04:10:21 -0700 (PDT)
+        with ESMTP id S229601AbiHSLe0 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 19 Aug 2022 07:34:26 -0400
+Received: from esa.microchip.iphmx.com (esa.microchip.iphmx.com [68.232.153.233])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2F6F06E2CA;
+        Fri, 19 Aug 2022 04:34:24 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=microchip.com; i=@microchip.com; q=dns/txt; s=mchp;
+  t=1660908865; x=1692444865;
+  h=from:to:cc:subject:date:message-id:references:
+   in-reply-to:content-id:content-transfer-encoding:
+   mime-version;
+  bh=o6iZsSYwjtDb6vlM0NzMcuUjEyONMMc1JO29rXE3mJY=;
+  b=ydwK09gZpP9VlYj8k9POJ7caGm1zRL30yJEttJAKlyf2lkGptDRxEL0f
+   AIDMMJ/sinAEsjFztM25pYTUxiIJKLi4qrgCL7Li60VW0I4/HW8ETjDCD
+   +R3REPXeyTY6Lei6z6rHx1vT8zVUniWTwqJ3cHqfmXj3wDDUW8FiL0dFJ
+   Z7J5NkpxmzEXAtYVKmdPpIoZbDEMha7lzrQTEaa5VMG0pr20jjyV/CwwD
+   YDbOCfb7DOoOIs4jqjQHnbyVMnWkrtVecco36iYoZkDsfrrPj+NDpL4N1
+   Ek86V43o3Oed+w3T00/Nsb5SEKcLijebULz/OpSvPcinPlvIJb642nFvZ
+   A==;
+X-IronPort-AV: E=Sophos;i="5.93,247,1654585200"; 
+   d="scan'208";a="187184228"
+Received: from unknown (HELO email.microchip.com) ([170.129.1.10])
+  by esa1.microchip.iphmx.com with ESMTP/TLS/AES256-SHA256; 19 Aug 2022 04:34:23 -0700
+Received: from chn-vm-ex02.mchp-main.com (10.10.87.72) by
+ chn-vm-ex02.mchp-main.com (10.10.87.72) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.12; Fri, 19 Aug 2022 04:34:22 -0700
+Received: from NAM02-DM3-obe.outbound.protection.outlook.com (10.10.215.89) by
+ email.microchip.com (10.10.87.72) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.12 via Frontend
+ Transport; Fri, 19 Aug 2022 04:34:22 -0700
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=c9ziilDOBWAHpYzqXJBkdomfUY7+TH5cafBCzAsuL66wS5Owpk4/LpW0f4oxLv4loL0I7jRbka6gTftNYWrV+8OFvjE9TkHRmxx+RDNG7IdxT3ycRMLeAgos6RUl1AJ1z5Ss4RFN4ZyFi+n/ztowmeJalVYxcxIkSarSWVyTEXl9NY2R6k0S7C8iBAfpBzFLj+UvEY+Os5YHCnobnDRhmomEYG5qZ5BCW+w0m4ENnb0q/yo8P94gVLhh7L40iKXuLDM0eJQM+6WYT2l2lA606q/lVkyXGnLxNBafSgS3ffbeE4wHjYQjwaQdOJGnYzABIPU5UGTxJsGPP2iCyeBSWw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=o6iZsSYwjtDb6vlM0NzMcuUjEyONMMc1JO29rXE3mJY=;
+ b=CqhwU7PqPa9DbU7coin7yvfv6k6p7vvsH2yd7q9ZhSWviBwlfqpGpQDdhKw8l5hdBcVPxBuRGpTeOgSe6qoMNGqVcuSNUKAsTCzFRnVytZrIoJco0sQb6mZQJ5BZ2HJkiqMOpG73cCx8vI/kG2+qCyiC+B5wHZovmD/x3jFWKzOj/cE/dxADMc0GhufVNwCXmGJQMUPbUISWMYWAQiKW+On5UmnTMk0FcfrdJ1ti5s4yqoJavAB6AETlmXf1sItgiszYb+Sgbd76BJYdh4jr09PnNcvtI+lCi53UhStpE7uvChr5+BzCg7VjtBm31anH3QQPB+vtatwhlapj2JzZNg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=microchip.com; dmarc=pass action=none
+ header.from=microchip.com; dkim=pass header.d=microchip.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc;
-        bh=0MZlk0Zl6DlrLN5tLUqz8/7rurpIDa5GeSRgHPEqdmk=;
-        b=FI3HHuBX4/sOQQGF2vBCG3QWvVUPTB21jpl+7+QjpG8aRzx57hFhXkjWM+hfa3ubMr
-         SacFwO3fTy0TmKkF9hXedc+QwLV3EXomzpKM7tSp8bSYSu0H/K85Myo/c/CR4EVz3yi5
-         zUGyD5Ok+a9iQ9tzFb6XXoEHZXt6YyfTPqiLY8Gh9apxrfL4dyjUiz8Kpn1/dFdFUskb
-         wBKBCRxsMxk0h4QtYnL5ri/ltiwH0qW36xCCUAiPVyyv39Z1TsH69UB4orp+HNm775sD
-         up5P38I2rHkSzJBJZ1+YDlaUV6M6GR2LCe9KYE1sP1qI0xbQURF6NLMeUs6i9QTugdqR
-         +LUA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc;
-        bh=0MZlk0Zl6DlrLN5tLUqz8/7rurpIDa5GeSRgHPEqdmk=;
-        b=qY63RPbyq8CSaEB4Uwhj+OjtudVg0GaRzI67iKecEB5uJcYfXIWSQH4wxqq7F4X8I7
-         SZN+Y2SwoPcs1uY19kbj4SewVPfhC5bqR2vgCHELPujrE73mU3b+bpGSYKjCRLrEMN5R
-         RirtFGQhRheQFbPUg7swrfEhN6EKocafUqOx1XXSThONnyP/3BxW4gIN4+fUgTe18kjr
-         WW44RXUdUhmZe4iYVBExj8V7CkLyW4ttIL1b+U21HDp+fS2lLRe/fKWNu8M8N0slYgUZ
-         AKUQY61rzfxJ8wue6U2o6kWMP4OvlYS7nJW2nac38rDkhZ/BlzW56jo2slfE5JPFY7Y6
-         Fy5g==
-X-Gm-Message-State: ACgBeo0aoZEHVDvzeJlMRyQduGE32lDCHx1l/O9XYfk6k8bYBe92iiFV
-        vf9z1W8jKblOfAjXFXbac/I=
-X-Google-Smtp-Source: AA6agR4a7lH29xNqzAHUjCwfAI/STHfyNaw+OGCcMswGZOpy9d4Tt5lqV8R9avXm0bo+uli/urWqJQ==
-X-Received: by 2002:a17:903:22c1:b0:16e:fbcc:f298 with SMTP id y1-20020a17090322c100b0016efbccf298mr7241943plg.2.1660907420993;
-        Fri, 19 Aug 2022 04:10:20 -0700 (PDT)
-Received: from localhost.localdomain ([103.7.29.32])
-        by smtp.gmail.com with ESMTPSA id jd7-20020a170903260700b0016bfbd99f64sm2957778plb.118.2022.08.19.04.10.19
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 19 Aug 2022 04:10:20 -0700 (PDT)
-From:   Like Xu <like.xu.linux@gmail.com>
-X-Google-Original-From: Like Xu <likexu@tencent.com>
-To:     Sean Christopherson <seanjc@google.com>,
-        Paolo Bonzini <pbonzini@redhat.com>
-Cc:     kvm@vger.kernel.org
-Subject: [kvm-unit-tests PATCH v3 13/13] x86/pmu: Update testcases to cover AMD PMU
-Date:   Fri, 19 Aug 2022 19:09:39 +0800
-Message-Id: <20220819110939.78013-14-likexu@tencent.com>
-X-Mailer: git-send-email 2.37.2
-In-Reply-To: <20220819110939.78013-1-likexu@tencent.com>
-References: <20220819110939.78013-1-likexu@tencent.com>
+ d=microchiptechnology.onmicrosoft.com;
+ s=selector2-microchiptechnology-onmicrosoft-com;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=o6iZsSYwjtDb6vlM0NzMcuUjEyONMMc1JO29rXE3mJY=;
+ b=H+qhtKHaxWnse4kqYOTaCS3uJCyH5xFeJUG4e5AbJR4SQPDY8lDbCHY6Q2cEEVrIS1lM/IsQnoYU5+1pXj4wDVemfN7zb+49x5P2XOMmiy7+LgrdshJU5FBqjFe/+wzx57b65dYDslV/gGP48OQioQiONZgFFimQ6gOYMscdfAU=
+Received: from CO1PR11MB5154.namprd11.prod.outlook.com (2603:10b6:303:99::15)
+ by SJ0PR11MB5648.namprd11.prod.outlook.com (2603:10b6:a03:302::11) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5546.18; Fri, 19 Aug
+ 2022 11:34:16 +0000
+Received: from CO1PR11MB5154.namprd11.prod.outlook.com
+ ([fe80::ac89:75cd:26e0:51c3]) by CO1PR11MB5154.namprd11.prod.outlook.com
+ ([fe80::ac89:75cd:26e0:51c3%9]) with mapi id 15.20.5546.018; Fri, 19 Aug 2022
+ 11:34:16 +0000
+From:   <Conor.Dooley@microchip.com>
+To:     <palmer@dabbelt.com>, <mail@conchuod.ie>
+CC:     <anup@brainfault.org>, <atishp@atishpatra.org>,
+        <paul.walmsley@sifive.com>, <aou@eecs.berkeley.edu>,
+        <guoren@kernel.org>, <vincent.chen@sifive.com>,
+        <xianting.tian@linux.alibaba.com>, <heiko@sntech.de>,
+        <wangkefeng.wang@huawei.com>, <tongtiangen@huawei.com>,
+        <kvm@vger.kernel.org>, <kvm-riscv@lists.infradead.org>,
+        <linux-riscv@lists.infradead.org>, <linux-kernel@vger.kernel.org>
+Subject: Re: [PATCH 0/4] misc warning cleanup in arch/risc-v
+Thread-Topic: [PATCH 0/4] misc warning cleanup in arch/risc-v
+Thread-Index: AQHYr+f3LFXRGLTAQ0OYmYMgYcbgpK21TTCAgADSJgA=
+Date:   Fri, 19 Aug 2022 11:34:16 +0000
+Message-ID: <7f10ff80-98ee-bb2e-795c-f298324b873e@microchip.com>
+References: <mhng-49e49c17-7241-45f8-bea3-17188bd1d0fa@palmer-ri-x1c9>
+In-Reply-To: <mhng-49e49c17-7241-45f8-bea3-17188bd1d0fa@palmer-ri-x1c9>
+Accept-Language: en-IE, en-US
+Content-Language: en-IE
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+user-agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.12.0
+authentication-results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=microchip.com;
+x-ms-publictraffictype: Email
+x-ms-office365-filtering-correlation-id: df62e8da-617e-413c-7ec1-08da81d6bfb3
+x-ms-traffictypediagnostic: SJ0PR11MB5648:EE_
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam: BCL:0;
+x-microsoft-antispam-message-info: mPwg2033CBhYxK0LjoNQ9hbFbnL6ZtWJ/yW4C2zWk5N+6RFuMrXoR0JlQJkbFXPX1cKgx+Qbz+1KjMz0+0142/ET/tyklLLqc9sgZKSAqrzUaTCUX5GVl2yq9En6V+w64DvM0/mx4MpI8+SMHG2suoeyDdYF29dvJaC2HK6P81km9DeMJLa9SyW2Ca0NeiO5HijqtRufrK3OhdmVwxaRcJqV+NSLmHbQyjW8o/cOXJy3c+XstrqK7ACjSeiROB0knqgEMPz6HvUpsn/HkEhPIvZfCL48YcuLxviRVZE69pLa1IdmZCRNJdCntZAGN2KTfwls+nXo0tD3Ldb3o44AdcNU0tbJfwgrmNTcIXpnL41QLGnZaV5N24f4ROwa4UnCO3IIahA4Tn9nbuuTg3OgO4tGAb9HXEAlTbfPtM8b8dbbViKsvbGLpN0cRidJS++7G8dfVOY0YN7AL2klx0gar5lvtdmLinZ/Tr5iywpjIchPZmSPrnzAKQTD2CIwJ4TgoYna7FDby3CX8YdrsTNhtKRddj3Tt9aP7m0FTfYeg61VFNNI1JfWFDrvo5gBREJp2ELZIyag6gQ3veK6KJNvdXOwIKZN/u3qKtKv0iolFFePRlXEpADYBUGRon0/7BmehXDrgDfbTT2yfdeKxLUtA78Hx0I5G6lAaEQLgTGYvifyW8wYV25HyXxPVDo2nwsFoyl1+blajSVUybpmGmYsG7J86nfshRRQO1ytnQknYxMio0sw2J8ju9bqxTR89cxzEcqPj8G2rLaLbvnTQiCuqa6/S40MSJpKD/kUiPMW6IHQRcDMA0Vjgh3qCguhCDOM6c6PAZuXpnKmqrgZuRyThw==
+x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CO1PR11MB5154.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230016)(136003)(39860400002)(376002)(366004)(346002)(396003)(71200400001)(38100700002)(91956017)(76116006)(122000001)(110136005)(316002)(54906003)(38070700005)(8936002)(6512007)(26005)(31696002)(2616005)(36756003)(31686004)(41300700001)(5660300002)(7416002)(86362001)(53546011)(2906002)(6506007)(83380400001)(478600001)(4326008)(8676002)(66946007)(66556008)(66476007)(66446008)(64756008)(6486002)(966005)(186003)(45980500001)(43740500002);DIR:OUT;SFP:1101;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0: =?utf-8?B?UmdIWkNKeldQYlY3UGE3OG1aM0pSdkZwQ3Z3aGxiaWhyQy90SWpWcklwNFcy?=
+ =?utf-8?B?cklIaGJmZ2pXU1BWODFQUHVhYUlObkZLYWFNSlQ1TGhUSXcvZm14MWRvSzg1?=
+ =?utf-8?B?QVUvQ29oZXVQUWdTWVYzcTl5eW45bFhSa2JscWdheHlKVUI3bmRNTWJWbXhI?=
+ =?utf-8?B?QlJQeHhyVEQzcWtFbmRyZHVYeTQ0cTQ0SFBFRDd5aXQ1MkZxUzZVQ00rcDk0?=
+ =?utf-8?B?L1ZEQVhNbUlUWERob3V2S1FvZTdUNXByclQ5MFBjU0VqSDNWRDl4ZnFHOHpo?=
+ =?utf-8?B?MjJWM3l0NTN4b2c2YVZybVp2WENVUTMxeHNWYVlkZkliMmg4eEFsSnZVY1dV?=
+ =?utf-8?B?UERJc3Y0RHB6YXlJS1ZseW16VnlyUUVTTWwyd0xTM2hyaEM2QTZ5QzJiMzlQ?=
+ =?utf-8?B?dm91Ym1vNFlZY3hFbjZUNkl3bm54ZlJpZDI0Ti94aG1RVXdUZVZaU1ZGQ1JJ?=
+ =?utf-8?B?R3k4Tm1GOVNaUnBkdms5ek1QU0hneTJ5RG5EVlRvOTVBR1l1YmNlREgxbCtI?=
+ =?utf-8?B?bkVhWERtTXc0VDZrZDZxNFNqQVJmN1RQRjhJRWxDeVJ1S2tWWHBOU1JmWVBW?=
+ =?utf-8?B?TVc2R0lCbEhWWklLc2hRTEk5SE85NFlKUVJyOXVodmZSV1JnN0NmeWpoK2tx?=
+ =?utf-8?B?WGVzc09tOXRIL3pPdFU0enRlRGdibjlSbVBWcUNwbGRscXkyTSsvMGVHdlVz?=
+ =?utf-8?B?eVpPc0FaNGpMQ3lKSC96MzZtN3d0bUZDTEMwVlpKU2VnSnVKYS9EZlhUalRs?=
+ =?utf-8?B?bmR2NE9vRWRDTExCdjJKeDZCTHpjOG9MdzBlOFRrMnZYb2lUM3JxUDFycjB6?=
+ =?utf-8?B?T2VVNEVjeGVOcE84NUV6ZGtQaXZ2Um9NMW5waG1Sck1Lc3pMcmE3WFVLUFJw?=
+ =?utf-8?B?VlkxWDhRTTJXblY0TFRsWmQ2MjJCTVlIaW9Qb1F0WUdVenJKQU9IUUtpM2Rh?=
+ =?utf-8?B?dVpEUEFLSEpHTGRuTGhuWHN0U1plU3U5RHBmZTErNzVCQkE5WElRRHJhcU1i?=
+ =?utf-8?B?VlREcXp3Y0g5M1ZjT2pPQ2Y0clI2eXlla015WjhtNmpYMG1NbkRLZDR0SDRy?=
+ =?utf-8?B?YmVoRmdBam1HOW5DalBNUStYNFNHVlY1MnVaZ3BHaHcweGNhWUJBNDdqa2d6?=
+ =?utf-8?B?ZlJvRnZqQkVGZ28wcEpvL2xmVmxFWDdTNkRvU0hvMlltbWxpMVYzVFpHK1hu?=
+ =?utf-8?B?dmNneDBhTmtyODRzNVBLQlpDYWMzOGd1WTYwN0x2QVE1MDBzaVkrTHZIbzBx?=
+ =?utf-8?B?eC9MVzcrQUc1TDArRkVJYVM0NzROQ2lMSi8rSXRWSnJkT1dRVDJpSVBxTEdG?=
+ =?utf-8?B?M3I3dWMyNG93eFpIaUZ3OVQ1NXVsOHJXeWZ2cVp1b3pEVnlNWE1nK0p5SmpM?=
+ =?utf-8?B?bVJBaEwzclBRQlNlbDB1aFhhYWl0R1ZuN1dhNWxGcGs0SlZyTndCbXEvSVNB?=
+ =?utf-8?B?dkxSMmZhYTRlOVNselZiT0JQemV0bEsyL0podEpmc3ZHeWxmWlNucTNlbmI3?=
+ =?utf-8?B?QmdwbFFaRWNqSWc5bFA2WWpUaGZPdGZRMy9rbmdRNGNOMG9zU3liK1hvTHdZ?=
+ =?utf-8?B?TzRXUXJCWnc4a1NHYUtKSlBhYkNVejc5WjAxL0dzRXkvWnpKT1NWWERsRGNN?=
+ =?utf-8?B?UldNMVZKVWRNdWZDWGN3aGJpTXU0M0ExeVNzYlRqMEhobzVTOW5iamphcjl5?=
+ =?utf-8?B?SUdxZ0FmK3U0UE96OEpPQ2xRMEdnY05EbXFZMVhlWUZ3eWpDNGxMZ2oyY2pZ?=
+ =?utf-8?B?Sm5GcFpoVktqeDkwWForNitMc21TK1JGV0JWZERjYXNhSlNlazJBR1l4NGRu?=
+ =?utf-8?B?dnR6Z0U1TU5sWThJSnliZkVEWFFBUitVQUhxbnVRVDBIOCs3TU4yTmQ1QUVn?=
+ =?utf-8?B?d0w5Nk96UklCUXRmUnFFNjVGRXdNRUtGKzBqTldKY0ZHZkFiSEhOa2RTWHJx?=
+ =?utf-8?B?WGg5YUxMMFVUcWtWMlVPUnk3VTYrR3JOeDFkZHFlUUJhNDZTMVFPY1IxcmhP?=
+ =?utf-8?B?R2RFSitpbCtQeU5nUTdiOXF6eXhKTC9UcFF4eFZzUVYrRHN6RVNtempNaDdj?=
+ =?utf-8?B?VzM3ZkJTei84b0pKNXlkWHJKZmFPL2MyQ0dUdTg4ZjA3MmV3ZkJvcXAwM011?=
+ =?utf-8?Q?hCFJsDZ1G2qtinhQg82CMyGIi?=
+Content-Type: text/plain; charset="utf-8"
+Content-ID: <39E35C6DD1E5F5439372EBC3F5CF6BBA@namprd11.prod.outlook.com>
+Content-Transfer-Encoding: base64
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
-        RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
-        autolearn=ham autolearn_force=no version=3.4.6
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: CO1PR11MB5154.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: df62e8da-617e-413c-7ec1-08da81d6bfb3
+X-MS-Exchange-CrossTenant-originalarrivaltime: 19 Aug 2022 11:34:16.5073
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 3f4057f3-b418-4d4e-ba84-d55b4e897d88
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: PS7OxRbf0DXVELTcecoPoypV8YOlpToor+h0pwcg3mz5eLROw1dGMi8SX1XG2c4spZl0aFJsmZw10d+ZgvXurzzdCxPPIK0IIDRfsennRzk=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SJ0PR11MB5648
+X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_DNSWL_MED,
+        SPF_HELO_PASS,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-From: Like Xu <likexu@tencent.com>
-
-AMD core PMU before Zen4 did not have version numbers, there were
-no fixed counters, it had a hard-coded number of generic counters,
-bit-width, and only hardware events common across amd generations
-(starting with K7) were added to amd_gp_events[] table.
-
-All above differences are instantiated at the detection step, and it
-also covers the K7 PMU registers, which is consistent with bare-metal.
-
-Signed-off-by: Like Xu <likexu@tencent.com>
----
- lib/x86/msr.h       | 17 ++++++++++++
- lib/x86/processor.h | 32 ++++++++++++++++++++--
- x86/pmu.c           | 67 ++++++++++++++++++++++++++++++++++++++++-----
- 3 files changed, 106 insertions(+), 10 deletions(-)
-
-diff --git a/lib/x86/msr.h b/lib/x86/msr.h
-index 252e041..5f16a58 100644
---- a/lib/x86/msr.h
-+++ b/lib/x86/msr.h
-@@ -130,6 +130,23 @@
- #define MSR_AMD64_IBSDCPHYSAD		0xc0011039
- #define MSR_AMD64_IBSCTL		0xc001103a
- 
-+/* Fam 15h MSRs */
-+#define MSR_F15H_PERF_CTL              0xc0010200
-+#define MSR_F15H_PERF_CTL0             MSR_F15H_PERF_CTL
-+#define MSR_F15H_PERF_CTL1             (MSR_F15H_PERF_CTL + 2)
-+#define MSR_F15H_PERF_CTL2             (MSR_F15H_PERF_CTL + 4)
-+#define MSR_F15H_PERF_CTL3             (MSR_F15H_PERF_CTL + 6)
-+#define MSR_F15H_PERF_CTL4             (MSR_F15H_PERF_CTL + 8)
-+#define MSR_F15H_PERF_CTL5             (MSR_F15H_PERF_CTL + 10)
-+
-+#define MSR_F15H_PERF_CTR              0xc0010201
-+#define MSR_F15H_PERF_CTR0             MSR_F15H_PERF_CTR
-+#define MSR_F15H_PERF_CTR1             (MSR_F15H_PERF_CTR + 2)
-+#define MSR_F15H_PERF_CTR2             (MSR_F15H_PERF_CTR + 4)
-+#define MSR_F15H_PERF_CTR3             (MSR_F15H_PERF_CTR + 6)
-+#define MSR_F15H_PERF_CTR4             (MSR_F15H_PERF_CTR + 8)
-+#define MSR_F15H_PERF_CTR5             (MSR_F15H_PERF_CTR + 10)
-+
- /* Fam 10h MSRs */
- #define MSR_FAM10H_MMIO_CONF_BASE	0xc0010058
- #define FAM10H_MMIO_CONF_ENABLE		(1<<0)
-diff --git a/lib/x86/processor.h b/lib/x86/processor.h
-index 0324220..10bca27 100644
---- a/lib/x86/processor.h
-+++ b/lib/x86/processor.h
-@@ -793,6 +793,9 @@ static inline void flush_tlb(void)
- 
- static inline u8 pmu_version(void)
- {
-+	if (!is_intel())
-+		return 0;
-+
- 	return cpuid(10).a & 0xff;
- }
- 
-@@ -806,19 +809,39 @@ static inline bool this_cpu_has_perf_global_ctrl(void)
- 	return pmu_version() > 1;
- }
- 
-+#define AMD64_NUM_COUNTERS                             4
-+#define AMD64_NUM_COUNTERS_CORE                                6
-+
-+static inline bool has_amd_perfctr_core(void)
-+{
-+	return cpuid(0x80000001).c & BIT_ULL(23);
-+}
-+
- static inline u8 pmu_nr_gp_counters(void)
- {
--	return (cpuid(10).a >> 8) & 0xff;
-+	if (is_intel()) {
-+		return (cpuid(10).a >> 8) & 0xff;
-+	} else if (!has_amd_perfctr_core()) {
-+		return AMD64_NUM_COUNTERS;
-+	}
-+
-+	return AMD64_NUM_COUNTERS_CORE;
- }
- 
- static inline u8 pmu_gp_counter_width(void)
- {
--	return (cpuid(10).a >> 16) & 0xff;
-+	if (is_intel())
-+		return (cpuid(10).a >> 16) & 0xff;
-+	else
-+		return 48;
- }
- 
- static inline u8 pmu_gp_counter_mask_length(void)
- {
--	return (cpuid(10).a >> 24) & 0xff;
-+	if (is_intel())
-+		return (cpuid(10).a >> 24) & 0xff;
-+	else
-+		return pmu_nr_gp_counters();
- }
- 
- static inline u8 pmu_nr_fixed_counters(void)
-@@ -843,6 +866,9 @@ static inline u8 pmu_fixed_counter_width(void)
- 
- static inline bool pmu_gp_counter_is_available(int i)
- {
-+	if (!is_intel())
-+		return i < pmu_nr_gp_counters();
-+
- 	/* CPUID.0xA.EBX bit is '1 if they counter is NOT available. */
- 	return !(cpuid(10).b & BIT(i));
- }
-diff --git a/x86/pmu.c b/x86/pmu.c
-index 0706cb1..b6ab10c 100644
---- a/x86/pmu.c
-+++ b/x86/pmu.c
-@@ -62,6 +62,11 @@ struct pmu_event {
- 	{"fixed 1", MSR_CORE_PERF_FIXED_CTR0, 10*N, 10.2*N},
- 	{"fixed 2", MSR_CORE_PERF_FIXED_CTR0 + 1, 1*N, 30*N},
- 	{"fixed 3", MSR_CORE_PERF_FIXED_CTR0 + 2, 0.1*N, 30*N}
-+}, amd_gp_events[] = {
-+	{"core cycles", 0x0076, 1*N, 50*N},
-+	{"instructions", 0x00c0, 10*N, 10.2*N},
-+	{"branches", 0x00c2, 1*N, 1.1*N},
-+	{"branch misses", 0x00c3, 0, 0.1*N},
- };
- 
- #define PMU_CAP_FW_WRITES	(1ULL << 13)
-@@ -105,14 +110,24 @@ static bool check_irq(void)
- 
- static bool is_gp(pmu_counter_t *evt)
- {
-+	if (!is_intel())
-+		return true;
-+
- 	return evt->ctr < MSR_CORE_PERF_FIXED_CTR0 ||
- 		evt->ctr >= MSR_IA32_PMC0;
- }
- 
- static int event_to_global_idx(pmu_counter_t *cnt)
- {
--	return cnt->ctr - (is_gp(cnt) ? gp_counter_base :
--		(MSR_CORE_PERF_FIXED_CTR0 - FIXED_CNT_INDEX));
-+	if (is_intel())
-+		return cnt->ctr - (is_gp(cnt) ? gp_counter_base :
-+			(MSR_CORE_PERF_FIXED_CTR0 - FIXED_CNT_INDEX));
-+
-+	if (gp_counter_base == MSR_F15H_PERF_CTR0) {
-+		return (cnt->ctr - gp_counter_base) / 2;
-+	} else {
-+		return cnt->ctr - gp_counter_base;
-+	}
- }
- 
- static struct pmu_event* get_counter_event(pmu_counter_t *cnt)
-@@ -150,11 +165,17 @@ static void global_disable(pmu_counter_t *cnt)
- 
- static inline uint32_t get_gp_counter_msr(unsigned int i)
- {
-+	if (gp_counter_base == MSR_F15H_PERF_CTR0)
-+		return gp_counter_base + 2 * i;
-+
- 	return gp_counter_base + i;
- }
- 
- static inline uint32_t get_gp_select_msr(unsigned int i)
- {
-+	if (gp_select_base == MSR_F15H_PERF_CTL0)
-+		return gp_select_base + 2 * i;
-+
- 	return gp_select_base + i;
- }
- 
-@@ -334,6 +355,9 @@ static void check_counter_overflow(void)
- 			cnt.count &= (1ull << pmu_gp_counter_width()) - 1;
- 
- 		if (i == nr_gp_counters) {
-+			if (!is_intel())
-+				break;
-+
- 			cnt.ctr = fixed_events[0].unit_sel;
- 			__measure(&cnt, 0);
- 			count = cnt.count;
-@@ -494,7 +518,7 @@ static void check_running_counter_wrmsr(void)
- static void check_emulated_instr(void)
- {
- 	uint64_t status, instr_start, brnch_start;
--	unsigned int branch_idx = 5;
-+	unsigned int branch_idx = is_intel() ? 5 : 2;
- 	pmu_counter_t brnch_cnt = {
- 		.ctr = get_gp_counter_msr(0),
- 		/* branch instructions */
-@@ -695,13 +719,35 @@ static bool detect_intel_pmu(void)
- 	return true;
- }
- 
--static bool pmu_is_detected(void)
-+static void amd_switch_to_non_perfctr_core(void)
- {
--	if (!is_intel()) {
--		report_skip("AMD PMU is not supported.");
-+	gp_counter_base = MSR_K7_PERFCTR0;
-+	gp_select_base = MSR_K7_EVNTSEL0;
-+	nr_gp_counters = AMD64_NUM_COUNTERS;
-+}
-+
-+static bool detect_amd_pmu(void)
-+{
-+	if (!has_amd_perfctr_core()) {
-+		report_skip("Missing perfctr_core, unsupported AMD PMU.");
- 		return false;
- 	}
- 
-+	nr_gp_counters = pmu_nr_gp_counters();
-+	gp_events_size = sizeof(amd_gp_events)/sizeof(amd_gp_events[0]);
-+	gp_events = (PMU_EVENTS_ARRAY_t *)amd_gp_events;
-+	gp_counter_base = MSR_F15H_PERF_CTR0;
-+	gp_select_base = MSR_F15H_PERF_CTL0;
-+
-+	report_prefix_push("AMD");
-+	return true;
-+}
-+
-+static bool pmu_is_detected(void)
-+{
-+	if (!is_intel())
-+		return detect_amd_pmu();
-+
- 	return detect_intel_pmu();
- }
- 
-@@ -714,7 +760,8 @@ int main(int ac, char **av)
- 	if (!pmu_is_detected())
- 		return report_summary();
- 
--	set_ref_cycle_expectations();
-+	if (is_intel())
-+		set_ref_cycle_expectations();
- 
- 	printf("PMU version:         %d\n", pmu_version());
- 	printf("GP counters:         %d\n", nr_gp_counters);
-@@ -736,5 +783,11 @@ int main(int ac, char **av)
- 		report_prefix_pop();
- 	}
- 
-+	if (!is_intel()) {
-+		report_prefix_push("K7");
-+		amd_switch_to_non_perfctr_core();
-+		check_counters();
-+	}
-+
- 	return report_summary();
- }
--- 
-2.37.2
-
+T24gMTkvMDgvMjAyMiAwMDowMSwgUGFsbWVyIERhYmJlbHQgd3JvdGU6DQo+IEVYVEVSTkFMIEVN
+QUlMOiBEbyBub3QgY2xpY2sgbGlua3Mgb3Igb3BlbiBhdHRhY2htZW50cyB1bmxlc3MgeW91IGtu
+b3cgdGhlIGNvbnRlbnQgaXMgc2FmZQ0KPiANCj4gT24gU3VuLCAxNCBBdWcgMjAyMiAwNzoxMjoz
+NCBQRFQgKC0wNzAwKSwgbWFpbEBjb25jaHVvZC5pZSB3cm90ZToNCj4+IEZyb206IENvbm9yIERv
+b2xleSA8Y29ub3IuZG9vbGV5QG1pY3JvY2hpcC5jb20+DQo+Pg0KPj4gSGV5IGFsbCwNCj4+IENv
+dXBsZSBmaXhlcyBoZXJlIGZvciBtb3N0IG9mIHdoYXQncyBsZWZ0IG9mIHRoZSB7c3BhcnNlLH0g
+d2FybmluZ3MgaW4NCj4+IGFyY2gvcmlzY3YgdGhhdCBhcmUgc3RpbGwgaW4gbmVlZCBvZiBwYXRj
+aGVzLiBCZW4gaGFzIHNlbnQgcGF0Y2hlcw0KPj4gZm9yIHRoZSBWRFNPIGlzc3VlIGFscmVhZHkg
+KGFsdGhvdWdoIHRoZXkgc2VlbSB0byBuZWVkIHJld29yaykuDQo+Pg0KPj4gVkRTTyBhc2lkZSwg
+V2l0aCB0aGlzIHBhdGNoc2V0IGFwcGxpZWQsIHdlIGFyZSBsZWZ0IHdpdGg6DQo+PiAtIGNwdWlu
+Zm9fb3BzIG1pc3NpbmcgcHJvdG90eXBlOiB0aGlzIGxpa2VseSBuZWVkcyB0byBnbyBpbnRvIGFu
+DQo+PiDCoCBhc20tZ2VuZXJpYyBoZWFkZXIgJiBJJ2xsIHNlbmQgYSBzZXBhcmF0ZSBwYXRjaCBm
+b3IgdGhhdC4NCj4+IC0gQ29tcGxhaW50cyBhYm91dCBhbiBlcnJvciBpbiBtbS9pbml0LmM6DQo+
+PiDCoCAiZXJyb3IgaW5hcmNoL3Jpc2N2L21tL2luaXQuYzo4MTk6MjogZXJyb3I6ICJzZXR1cF92
+bSgpIGlzIDx0cnVuYz4NCj4+IMKgIEkgdGhpbmsgdGhpcyBjYW4gYmUgaWdub3JlZC4NCj4+IC0g
+NjAwKyAtV292ZXJyaWRlLWluaXQgd2FybmluZ3MgZm9yIHN5c2NhbGwgdGFibGUgc2V0dXAgd2hl
+cmUNCj4+IMKgIG92ZXJyaWRpbmcgc2VlbXMgdG8gYmUgdGhlIHdob2xlIHBvaW50IG9mIHRoZSBt
+YWNyby4NCj4+IC0gV2FybmluZ3MgYWJvdXQgaW1wb3J0ZWQga3ZtIGNvcmUgY29kZS4NCj4+IC0g
+RmxleGlibGUgYXJyYXkgbWVtYmVyIHdhcm5pbmdzIHRoYXQgbG9vayBsaWtlIGNvbW1vbiBLVk0g
+Y29kZQ0KPj4gwqAgcGF0dGVybnMNCj4+IC0gQW4gdW5leHBlY3RlZCB1bmxvY2sgaW4ga3ZtX3Jp
+c2N2X2NoZWNrX3ZjcHVfcmVxdWVzdHMgdGhhdCB3YXMgYWRkZWQNCj4+IMKgIGludGVudGlvbmFs
+bHk6DQo+PiDCoCBodHRwczovL2xvcmUua2VybmVsLm9yZy9hbGwvMjAyMjA3MTAxNTExMDUuNjg3
+MTkzLTEtYXBhdGVsQHZlbnRhbmFtaWNyby5jb20vDQo+PiDCoCBJcyBpdCB3b3J0aCBsb29raW5n
+IGludG8gd2hldGhlciB0aGF0J3MgYSBmYWxzZSBwb3NpdGl2ZSBvciBub3Q/DQo+Pg0KPj4gVGhh
+bmtzLA0KPj4gQ29ub3IuDQo+Pg0KPj4gQ29ub3IgRG9vbGV5ICg0KToNCj4+IMKgIHJpc2N2OiBr
+dm06IHZjcHVfdGltZXI6IGZpeCB1bnVzZWQgdmFyaWFibGUgd2FybmluZ3MNCj4+IMKgIHJpc2N2
+OiBrdm06IG1vdmUgZXh0ZXJuIHNiaV9leHQgZGVjbGFyYXRpb25zIHRvIGEgaGVhZGVyDQo+PiDC
+oCByaXNjdjogc2lnbmFsOiBmaXggbWlzc2luZyBwcm90b3R5cGUgd2FybmluZw0KPj4gwqAgcmlz
+Y3Y6IHRyYXBzOiBhZGQgbWlzc2luZyBwcm90b3R5cGUNCj4+DQo+PiDCoGFyY2gvcmlzY3YvaW5j
+bHVkZS9hc20va3ZtX3ZjcHVfc2JpLmggfCAxMiArKysrKysrKysrKysNCj4+IMKgYXJjaC9yaXNj
+di9pbmNsdWRlL2FzbS9zaWduYWwuaMKgwqDCoMKgwqDCoCB8IDEyICsrKysrKysrKysrKw0KPj4g
+wqBhcmNoL3Jpc2N2L2luY2x1ZGUvYXNtL3RocmVhZF9pbmZvLmjCoCB8wqAgMiArKw0KPj4gwqBh
+cmNoL3Jpc2N2L2tlcm5lbC9zaWduYWwuY8KgwqDCoMKgwqDCoMKgwqDCoMKgwqAgfMKgIDEgKw0K
+Pj4gwqBhcmNoL3Jpc2N2L2tlcm5lbC90cmFwcy5jwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgIHzC
+oCAzICsrLQ0KPj4gwqBhcmNoL3Jpc2N2L2t2bS92Y3B1X3NiaS5jwqDCoMKgwqDCoMKgwqDCoMKg
+wqDCoMKgIHwgMTIgKy0tLS0tLS0tLS0tDQo+PiDCoGFyY2gvcmlzY3Yva3ZtL3ZjcHVfdGltZXIu
+Y8KgwqDCoMKgwqDCoMKgwqDCoMKgIHzCoCA0IC0tLS0NCj4+IMKgNyBmaWxlcyBjaGFuZ2VkLCAz
+MCBpbnNlcnRpb25zKCspLCAxNiBkZWxldGlvbnMoLSkNCj4+IMKgY3JlYXRlIG1vZGUgMTAwNjQ0
+IGFyY2gvcmlzY3YvaW5jbHVkZS9hc20vc2lnbmFsLmgNCj4gDQo+IFRoZXNlIGdlbmVyYWxseSBs
+b29rIGdvb2QgdG8gbWUuwqAgQW51cCBoYW5kbGVzIHRoZSBLVk0gYml0cyBzbyBJJ2xsIGxldA0K
+PiBoaW0gY2hpbWUgaW4gdGhlcmUsIGJ1dA0KPiANCj4gUmV2aWV3ZWQtYnk6IFBhbG1lciBEYWJi
+ZWx0IDxwYWxtZXJAcml2b3NpbmMuY29tPg0KPiBBY2tlZC1ieTogUGFsbWVyIERhYmJlbHQgPHBh
+bG1lckByaXZvc2luYy5jb20+DQo+IA0KPiBvbiBhbGwgb2YgdGhlbS4NCj4gDQo+IEhhcHB5IHRv
+IGRvIHNvbWUgc29ydCBvZiBzaGFyZWQgdGFnIHRoaW5nLCBidXQgaXQgbG9va3MgbGlrZSB0aGVz
+ZSBhcmUNCj4gYWxsIGluZGVwZW5kZW50IGVub3VnaCB0aGF0IGl0J2QgYmUgZWFzaWVyIHRvIGp1
+c3Qgc3BsaXQgdGhlbSB1cC7CoCBJJ3ZlDQo+IHB1dCB0aGUgbm9uLUtWTSBiaXRzIG92ZXIgYXQg
+cGFsbWVyL3Jpc2N2LXZhcmlhYmxlX2ZpeGVzX3dpdGhvdXRfa3ZtLCBpZg0KPiB5b3UgZ3V5cyBh
+cmUgYWxsIE9LIHNwbGl0dGluZyB0aGlzIHVwIHRoZW4gSSdsbCBnbyB0YWtlIHRob3NlIG9udG8N
+Cj4gcmlzY3YvZml4ZXMuDQoNClllYWgsIEkgc2VlIG5vIHJlYXNvbiB0aGF0IHRoZSBrdm0gcGF0
+Y2hlcyBjYW4ndCBqdXN0IGdvIHZpYSB0aGUgcmlzY3YNCmt2bSB0cmVlLiBJIHNlbnQgdGhlIHBh
+dGNoZXMgYXMgYSBzaW5nbGUgc2VyaWVzIG1vc3RseSBiZWNhdXNlIEkgd2FudGVkDQp0byBtZW50
+aW9uIHdoYXQgd2FzIGxlZnQgd2FybmluZyB3aXNlIGluIHRoZSBjb3Zlci4NCg0KPiBJJ2xsIHdh
+aXQgYSBiaXQgZm9yIGZvbGtzIHRvIGdldCBhIGNoYW5jZSB0byBsb29rLCBzbyBpdA0KPiB3b24n
+dCBiZSBmb3IgdG9tb3Jyb3cgbW9ybmluZy4NCg0KVGhleSd2ZSBiZWVuIHRoZXJlIGEgd2hpbGUg
+YW5kIG5vdGhpbmcgaGFzIGdvbmUgdXAgaW4gZmxhbWVzLCBJIGFtIHN1cmUNCndlIHdpbGwgc3Vy
+dml2ZSBhIGZldyB3ZWVrcyBtb3JlIDopDQoNClRoYW5rcywNCkNvbm9yLg0KDQoNCg==
