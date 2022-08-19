@@ -2,78 +2,73 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 9F0155991E0
-	for <lists+kvm@lfdr.de>; Fri, 19 Aug 2022 02:43:44 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 114DD5991F4
+	for <lists+kvm@lfdr.de>; Fri, 19 Aug 2022 02:55:42 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S244800AbiHSAmt (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 18 Aug 2022 20:42:49 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42990 "EHLO
+        id S235113AbiHSAzh (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 18 Aug 2022 20:55:37 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57158 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229703AbiHSAms (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 18 Aug 2022 20:42:48 -0400
+        with ESMTP id S229703AbiHSAzf (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 18 Aug 2022 20:55:35 -0400
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2A6D5DEB50
-        for <kvm@vger.kernel.org>; Thu, 18 Aug 2022 17:42:47 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2247E79689
+        for <kvm@vger.kernel.org>; Thu, 18 Aug 2022 17:55:35 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1660869766;
+        s=mimecast20190719; t=1660870534;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=F+mwOXxAkoNOjKTh4pynirHUBFBiL6gHoAL0lptq2/s=;
-        b=iWkaEi+xJrK09jcMTswrRVdKx19ipgjMXlR3FuRBj5/XMsarKrSFiLqcO7cIDDbQIIvNxq
-        r1ovwgaGc8AY+P7XR/mP6eT/HKM6iZWe738RzbqD2YU5gBDAZHP3w8LHsxi/aFSS42AAnQ
-        ziH8BcNjolW7dtyQhXHoCauLduL1Gts=
-Received: from mail-lf1-f71.google.com (mail-lf1-f71.google.com
- [209.85.167.71]) by relay.mimecast.com with ESMTP with STARTTLS
+        bh=svEZUb0W6ofFXmxHBz1/6O4cvTPqTFhg8WCC5CoH9PI=;
+        b=eW5NIPD0lc9GGF70GTgsisHUdqU+GPeyhNvtO5r07n/0o9XN9bokh1GqgDYXf2J4wA1lzC
+        U0EW32KZMMeQAvnHUo6mAJJ10q7YgVzBV16SInuD5UcBuRcsEnPkuvtDpxLvi51O+C6k1N
+        I4Bv+McgHUh9v5JgZ4P/GLbo7gOVz1E=
+Received: from mail-ed1-f69.google.com (mail-ed1-f69.google.com
+ [209.85.208.69]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_128_GCM_SHA256) id
- us-mta-163-vVre3KuNOhixfnB8a28o-A-1; Thu, 18 Aug 2022 20:42:45 -0400
-X-MC-Unique: vVre3KuNOhixfnB8a28o-A-1
-Received: by mail-lf1-f71.google.com with SMTP id v21-20020a197415000000b00492c4d45175so598368lfe.4
-        for <kvm@vger.kernel.org>; Thu, 18 Aug 2022 17:42:44 -0700 (PDT)
+ us-mta-601-wrmHbbipM1-wpKXIGSkGDQ-1; Thu, 18 Aug 2022 20:55:32 -0400
+X-MC-Unique: wrmHbbipM1-wpKXIGSkGDQ-1
+Received: by mail-ed1-f69.google.com with SMTP id b13-20020a056402350d00b0043dfc84c533so1864543edd.5
+        for <kvm@vger.kernel.org>; Thu, 18 Aug 2022 17:55:32 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc;
-        bh=F+mwOXxAkoNOjKTh4pynirHUBFBiL6gHoAL0lptq2/s=;
-        b=U3ys9nc4WaeOub1zT2Cmqn8pXzUN6zVg/4WJgnymmQMhvNSWGZOG1H42QO3beHQk25
-         p5DKUUxJYle5m1iYhW5ppXjERaW+bLtmBdYGBQE8AwrRc3vsgKG+21N1z8HMylc6Nvgv
-         ORpjn5gB1/0ptziTAzPn7OkzXBa5Hhn0mvUhCIpwTRnRd3KnAN6H2zRVMr4AKU0FDjSR
-         7pyRupewYzpaXy60J9h9nfCpwtHaCnaHfoC50P1YmPkPhIzeW+vdn4KawCGuJMbvurcV
-         2kL9rk4AGZAmKkXYrZOAK+nhMdudNEiLQvuPACtw4ks4ulSRAWcKsy+21WnHXvnlsKZ9
-         cMTA==
-X-Gm-Message-State: ACgBeo2apmK/LyD/WyCoebYckUBRh38WBjjEa8m2ljAZAzh2ZiEidz4x
-        6W26QabGWSmtUJl0eXK7bKXZyqv32NYBcTouVLANg4tT7G5t3CRmFRr4zcOY2LfKT9+F0a+Zrl7
-        uoqh5Jy1A9NqW7c13ZC+n6HJvHnTm
-X-Received: by 2002:a2e:a5c3:0:b0:261:ac2d:2820 with SMTP id n3-20020a2ea5c3000000b00261ac2d2820mr1566620ljp.243.1660869763610;
-        Thu, 18 Aug 2022 17:42:43 -0700 (PDT)
-X-Google-Smtp-Source: AA6agR6DovrTZ8skbUJhveovXiAocl2YhXuq8pzuh+lrxGHEPrz2c5hrrGAnX9Fj0f/C41UKEX10jssdqlgV7yfRDzY=
-X-Received: by 2002:a2e:a5c3:0:b0:261:ac2d:2820 with SMTP id
- n3-20020a2ea5c3000000b00261ac2d2820mr1566611ljp.243.1660869763375; Thu, 18
- Aug 2022 17:42:43 -0700 (PDT)
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc;
+        bh=svEZUb0W6ofFXmxHBz1/6O4cvTPqTFhg8WCC5CoH9PI=;
+        b=aa3b9ZynGXiFkCJeBeJQYJvr6KNGdliBj/rVNlY8ZwdgKnY6oEPRIwKs+O1gb/gyUG
+         3Yl4lsrbnlUS4bUkQwtFHntLJHYhCBc6a4rzgceBhDHWZ6fRGxRktCKNdaGdhO0ZOwb2
+         DAbDjtAUy5kXh3GXzx71IM2zi7Eg+TUu2AObRwTCuRlZvB7hiGZKCnIWl1pIbRt9KwaC
+         zlAZ0Qi7ymc4Y4AgnRTVuTJLO98MGgA7SKZMq+XaotoSMoDvUFcC1pz63TFlvI2gvNhU
+         tPpKRWMpTa73cODiR96iYB5gp6RsScgPFU+Io8ZhFOQCGQM2J2mj9wlGaPma5CMw0OS/
+         gcYQ==
+X-Gm-Message-State: ACgBeo0Kn8ja3Ctn6m7SsTDuw1tg6WE66UMJO5RoVKjd/NX+kmQ0hRk8
+        9A7Qc6K3N/8OnAXhnC9dAKvZoymdX6EXH197+cfQ+FrcJFFxWefgbLm6lJqK5jp2yqMKNqIczTt
+        waz+FKcek8Oz+VpvQ/MnIFpa5l0y7
+X-Received: by 2002:a17:907:9694:b0:73c:4e5c:fd33 with SMTP id hd20-20020a170907969400b0073c4e5cfd33mr1974331ejc.331.1660870531851;
+        Thu, 18 Aug 2022 17:55:31 -0700 (PDT)
+X-Google-Smtp-Source: AA6agR4bGNcudIZG6qdpNfy9F3eBbsF7v0MBkJmARGJGFmolh9yscbbXTAfJ8eIFawe6ywJDIAfr95Tm6QiDFUmbjJc=
+X-Received: by 2002:a17:907:9694:b0:73c:4e5c:fd33 with SMTP id
+ hd20-20020a170907969400b0073c4e5cfd33mr1974323ejc.331.1660870531595; Thu, 18
+ Aug 2022 17:55:31 -0700 (PDT)
 MIME-Version: 1.0
-References: <c5075d3d-9d2c-2716-1cbf-cede49e2d66f@oracle.com>
- <20e92551-a639-ec13-3d9c-13bb215422e1@intel.com> <9b6292f3-9bd5-ecd8-5e42-cd5d12f036e7@oracle.com>
- <22e0236f-b556-c6a8-0043-b39b02928fd6@intel.com> <892b39d6-85f8-bff5-030d-e21288975572@oracle.com>
- <52a47bc7-bf26-b8f9-257f-7dc5cea66d23@intel.com> <20220817045406-mutt-send-email-mst@kernel.org>
- <a91fa479-d1cc-a2d6-0821-93386069a2c1@intel.com> <20220817053821-mutt-send-email-mst@kernel.org>
- <449c2fb2-3920-7bf9-8c5c-a68456dfea76@intel.com> <20220817063450-mutt-send-email-mst@kernel.org>
- <54aa5a5c-69e2-d372-3e0c-b87f595d213c@redhat.com> <f0b6ea5c-1783-96d2-2d9f-e5cf726b0fc0@oracle.com>
-In-Reply-To: <f0b6ea5c-1783-96d2-2d9f-e5cf726b0fc0@oracle.com>
-From:   Jason Wang <jasowang@redhat.com>
-Date:   Fri, 19 Aug 2022 08:42:32 +0800
-Message-ID: <CACGkMEumKfktMUJOTUYL_JYkFbw8qH331gGARPB2bTH=7wKWPg@mail.gmail.com>
-Subject: Re: [PATCH 2/2] vDPA: conditionally read fields in virtio-net dev
-To:     Si-Wei Liu <si-wei.liu@oracle.com>
-Cc:     "Michael S. Tsirkin" <mst@redhat.com>,
-        "Zhu, Lingshan" <lingshan.zhu@intel.com>,
-        virtualization <virtualization@lists.linux-foundation.org>,
-        netdev <netdev@vger.kernel.org>, kvm <kvm@vger.kernel.org>,
-        Parav Pandit <parav@nvidia.com>,
-        Yongji Xie <xieyongji@bytedance.com>,
-        "Dawar, Gautam" <gautam.dawar@amd.com>
+References: <20220816101250.1715523-1-eesposit@redhat.com> <20220816101250.1715523-3-eesposit@redhat.com>
+ <Yv6baJoNikyuZ38R@xz-m1.local>
+In-Reply-To: <Yv6baJoNikyuZ38R@xz-m1.local>
+From:   Leonardo Bras Soares Passos <lsoaresp@redhat.com>
+Date:   Thu, 18 Aug 2022 21:55:20 -0300
+Message-ID: <CAJ6HWG6maoPjbP8T5qo=iXCbNeHu4dq3wHLKtRLahYKuJmMY-g@mail.gmail.com>
+Subject: Re: [RFC PATCH 2/2] kvm/kvm-all.c: listener should delay kvm_vm_ioctl
+ to the commit phase
+To:     Peter Xu <peterx@redhat.com>
+Cc:     Emanuele Giuseppe Esposito <eesposit@redhat.com>,
+        qemu-devel <qemu-devel@nongnu.org>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        "Michael S. Tsirkin" <mst@redhat.com>,
+        Cornelia Huck <cohuck@redhat.com>,
+        David Hildenbrand <david@redhat.com>,
+        =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>,
+        Maxim Levitsky <mlevitsk@redhat.com>, kvm@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
 X-Spam-Status: No, score=-2.8 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,
         SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham
@@ -84,104 +79,127 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Aug 19, 2022 at 7:20 AM Si-Wei Liu <si-wei.liu@oracle.com> wrote:
+On Thu, Aug 18, 2022 at 5:05 PM Peter Xu <peterx@redhat.com> wrote:
 >
+> On Tue, Aug 16, 2022 at 06:12:50AM -0400, Emanuele Giuseppe Esposito wrote:
+> > +static void kvm_memory_region_node_add(KVMMemoryListener *kml,
+> > +                                       struct kvm_userspace_memory_region *mem)
+> > +{
+> > +    MemoryRegionNode *node;
+> > +
+> > +    node = g_malloc(sizeof(MemoryRegionNode));
+> > +    *node = (MemoryRegionNode) {
+> > +        .mem = mem,
+> > +    };
 >
+> Nit: direct assignment of struct looks okay, but maybe pointer assignment
+> is clearer (with g_malloc0?  Or iirc we're suggested to always use g_new0):
 >
-> On 8/17/2022 9:15 PM, Jason Wang wrote:
-> >
-> > =E5=9C=A8 2022/8/17 18:37, Michael S. Tsirkin =E5=86=99=E9=81=93:
-> >> On Wed, Aug 17, 2022 at 05:43:22PM +0800, Zhu, Lingshan wrote:
-> >>>
-> >>> On 8/17/2022 5:39 PM, Michael S. Tsirkin wrote:
-> >>>> On Wed, Aug 17, 2022 at 05:13:59PM +0800, Zhu, Lingshan wrote:
-> >>>>> On 8/17/2022 4:55 PM, Michael S. Tsirkin wrote:
-> >>>>>> On Wed, Aug 17, 2022 at 10:14:26AM +0800, Zhu, Lingshan wrote:
-> >>>>>>> Yes it is a little messy, and we can not check _F_VERSION_1
-> >>>>>>> because of
-> >>>>>>> transitional devices, so maybe this is the best we can do for now
-> >>>>>> I think vhost generally needs an API to declare config space
-> >>>>>> endian-ness
-> >>>>>> to kernel. vdpa can reuse that too then.
-> >>>>> Yes, I remember you have mentioned some IOCTL to set the endian-nes=
-s,
-> >>>>> for vDPA, I think only the vendor driver knows the endian,
-> >>>>> so we may need a new function vdpa_ops->get_endian().
-> >>>>> In the last thread, we say maybe it's better to add a comment for
-> >>>>> now.
-> >>>>> But if you think we should add a vdpa_ops->get_endian(), I can work
-> >>>>> on it for sure!
-> >>>>>
-> >>>>> Thanks
-> >>>>> Zhu Lingshan
-> >>>> I think QEMU has to set endian-ness. No one else knows.
-> >>> Yes, for SW based vhost it is true. But for HW vDPA, only
-> >>> the device & driver knows the endian, I think we can not
-> >>> "set" a hardware's endian.
-> >> QEMU knows the guest endian-ness and it knows that
-> >> device is accessed through the legacy interface.
-> >> It can accordingly send endian-ness to the kernel and
-> >> kernel can propagate it to the driver.
-> >
-> >
-> > I wonder if we can simply force LE and then Qemu can do the endian
-> > conversion?
-> convert from LE for config space fields only, or QEMU has to forcefully
-> mediate and covert endianness for all device memory access including
-> even the datapath (fields in descriptor and avail/used rings)?
-
-Former. Actually, I want to force modern devices for vDPA when
-developing the vDPA framework. But then we see requirements for
-transitional or even legacy (e.g the Ali ENI parent). So it
-complicates things a lot.
-
-I think several ideas has been proposed:
-
-1) Your proposal of having a vDPA specific way for
-modern/transitional/legacy awareness. This seems very clean since each
-transport should have the ability to do that but it still requires
-some kind of mediation for the case e.g running BE legacy guest on LE
-host.
-
-2) Michael suggests using VHOST_SET_VRING_ENDIAN where it means we
-need a new config ops for vDPA bus, but it doesn't solve the issue for
-config space (at least from its name). We probably need a new ioctl
-for both vring and config space.
-
-or
-
-3) revisit the idea of forcing modern only device which may simplify
-things a lot
-
-which way should we go?
-
-> I hope
-> it's not the latter, otherwise it loses the point to use vDPA for
-> datapath acceleration.
+>   node = g_new0(MemoryRegionNode, 1);
+>   node->mem = mem;
 >
-> Even if its the former, it's a little weird for vendor device to
-> implement a LE config space with BE ring layout, although still possible.=
-..
-
-Right.
-
-Thanks
-
+> [...]
 >
-> -Siwei
-> >
-> > Thanks
-> >
-> >
-> >>
-> >>> So if you think we should add a vdpa_ops->get_endian(),
-> >>> I will drop these comments in the next version of
-> >>> series, and work on a new patch for get_endian().
-> >>>
-> >>> Thanks,
-> >>> Zhu Lingshan
-> >> Guests don't get endian-ness from devices so this seems pointless.
-> >>
-> >
+> > +/* for KVM_SET_USER_MEMORY_REGION_LIST */
+> > +struct kvm_userspace_memory_region_list {
+> > +     __u32 nent;
+> > +     __u32 flags;
+> > +     struct kvm_userspace_memory_region entries[0];
+> > +};
+> > +
+> >  /*
+> >   * The bit 0 ~ bit 15 of kvm_memory_region::flags are visible for userspace,
+> >   * other bits are reserved for kvm internal use which are defined in
+> > @@ -1426,6 +1433,8 @@ struct kvm_vfio_spapr_tce {
+> >                                       struct kvm_userspace_memory_region)
+> >  #define KVM_SET_TSS_ADDR          _IO(KVMIO,   0x47)
+> >  #define KVM_SET_IDENTITY_MAP_ADDR _IOW(KVMIO,  0x48, __u64)
+> > +#define KVM_SET_USER_MEMORY_REGION_LIST _IOW(KVMIO, 0x49, \
+> > +                                     struct kvm_userspace_memory_region_list)
+>
+> I think this is probably good enough, but just to provide the other small
+> (but may not be important) piece of puzzle here.  I wanted to think through
+> to understand better but I never did..
+>
+> For a quick look, please read the comment in kvm_set_phys_mem().
+>
+>                 /*
+>                  * NOTE: We should be aware of the fact that here we're only
+>                  * doing a best effort to sync dirty bits.  No matter whether
+>                  * we're using dirty log or dirty ring, we ignored two facts:
+>                  *
+>                  * (1) dirty bits can reside in hardware buffers (PML)
+>                  *
+>                  * (2) after we collected dirty bits here, pages can be dirtied
+>                  * again before we do the final KVM_SET_USER_MEMORY_REGION to
+>                  * remove the slot.
+>                  *
+>                  * Not easy.  Let's cross the fingers until it's fixed.
+>                  */
+>
+> One example is if we have 16G mem, we enable dirty tracking and we punch a
+> hole of 1G at offset 1G, it'll change from this:
+>
+>                      (a)
+>   |----------------- 16G -------------------|
+>
+> To this:
+>
+>      (b)    (c)              (d)
+>   |--1G--|XXXXXX|------------14G------------|
+>
+> Here (c) will be a 1G hole.
+>
+> With current code, the hole punching will del region (a) and add back
+> region (b) and (d).  After the new _LIST ioctl it'll be atomic and nicer.
+>
+> Here the question is if we're with dirty tracking it means for each region
+> we have a dirty bitmap.  Currently we do the best effort of doing below
+> sequence:
+>
+>   (1) fetching dirty bmap of (a)
+>   (2) delete region (a)
+>   (3) add region (b) (d)
+>
+> Here (a)'s dirty bmap is mostly kept as best effort, but still we'll lose
+> dirty pages written between step (1) and (2) (and actually if the write
+> comes within (2) and (3) I think it'll crash qemu, and iiuc that's what
+> we're going to fix..).
+>
+> So ideally the atomic op can be:
+>
+>   "atomically fetch dirty bmap for removed regions, remove regions, and add
+>    new regions"
+>
+> Rather than only:
+>
+>   "atomically remove regions, and add new regions"
+>
+> as what the new _LIST ioctl do.
+>
+> But... maybe that's not a real problem, at least I didn't know any report
+> showing issue with current code yet caused by losing of dirty bits during
+> step (1) and (2).  Neither do I know how to trigger an issue with it.
+>
+> I'm just trying to still provide this information so that you should be
+> aware of this problem too, at the meantime when proposing the new ioctl
+> change for qemu we should also keep in mind that we won't easily lose the
+> dirty bmap of (a) here, which I think this patch does the right thing.
+>
+
+Thanks for bringing these details Peter!
+
+What do you think of adding?
+(4) Copy the corresponding part of (a)'s dirty bitmap to (b) and (d)'s
+dirty bitmaps.
+
+
+Best regards,
+Leo
+
+> Thanks!
+>
+> --
+> Peter Xu
 >
 
