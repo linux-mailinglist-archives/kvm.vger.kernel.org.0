@@ -2,56 +2,56 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 2E85A59A42B
-	for <lists+kvm@lfdr.de>; Fri, 19 Aug 2022 20:05:14 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id B819D59A4EA
+	for <lists+kvm@lfdr.de>; Fri, 19 Aug 2022 20:06:29 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1350354AbiHSSBM (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 19 Aug 2022 14:01:12 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51226 "EHLO
+        id S1349916AbiHSSBU (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 19 Aug 2022 14:01:20 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54672 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1351410AbiHSSAk (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 19 Aug 2022 14:00:40 -0400
-Received: from mail-pf1-x44a.google.com (mail-pf1-x44a.google.com [IPv6:2607:f8b0:4864:20::44a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 53630109766
-        for <kvm@vger.kernel.org>; Fri, 19 Aug 2022 10:47:49 -0700 (PDT)
-Received: by mail-pf1-x44a.google.com with SMTP id by13-20020a056a00400d00b0052ec5a1cd4dso2623733pfb.21
-        for <kvm@vger.kernel.org>; Fri, 19 Aug 2022 10:47:49 -0700 (PDT)
+        with ESMTP id S1351480AbiHSSAo (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 19 Aug 2022 14:00:44 -0400
+Received: from mail-pl1-x649.google.com (mail-pl1-x649.google.com [IPv6:2607:f8b0:4864:20::649])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 039CE10AE0E
+        for <kvm@vger.kernel.org>; Fri, 19 Aug 2022 10:47:51 -0700 (PDT)
+Received: by mail-pl1-x649.google.com with SMTP id u3-20020a170902e5c300b00172ba9301ceso2383531plf.10
+        for <kvm@vger.kernel.org>; Fri, 19 Aug 2022 10:47:51 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
         h=cc:to:from:subject:references:mime-version:message-id:in-reply-to
          :date:from:to:cc;
-        bh=dv/VsCKISe4XLQ/adqAzQumoi9iqOUxkYS0i2UxBP3I=;
-        b=A4agjpKcSu6/kPWlIthpUoZueo3UcltCGmBNFoj9HUB7vMKlXZnphdejH4rh+uwECS
-         0eeIWtQyrFG/6KKguA5+dKENb41p+bncSzVLGdMO5NqhlFTaLzpVJuIO0VSvbinCxiH2
-         jZV6KiJLRXBYXV1jcNGGQx2iwgCN+dKiPrZHt0iAyRm/8hn+mGmOFFR+hZu8G48nhsP5
-         Aj2WOGR01iteAHL6RhXfErkxEtxSINRZvFAkHlM6ucQxyESYgGR/+ZnR8R0OUpHMP+CM
-         xjrL8Z8v5iMh5T6gek18hvdn1jph4V3kmvJGii1Kqht+V2YKpTxMMS7lktVvEaA5pZbL
-         Mdiw==
+        bh=PxVtU6+p3kWLeEs1td/aqyfvaiMfUwekByaLOvsmjdI=;
+        b=GxcY96k0edncpxD8CK+MfHYucHXbsAzy04n7ijQ8wdUVduEybdkgYmfnbO+bQKAcfl
+         15prnpY+ZH3MZA6XtCPnYZPe13bnZu+tYJMbJehrU7vFM1hyQpEO92FJ4AGj1UaubffN
+         ZHnCoWh0Y06a1rj9Cbf8NEy2qrAtUeyRrdLGTn4qOK2iu7WN/Zel9xhksgFk5J9gJE+B
+         ztygQInAJYZBLl2zbHnTYzW2cZtdTuyslAAz2yD0Pxkxo3SsuBkmSDeIceAKZARgNIde
+         HNJ3dxT4MgsAdiVu96A6DaGxHxSqATa7KMkugo78Xl0FDxRDwI/OCiXWEJIvia4Y5LHI
+         7kYw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=cc:to:from:subject:references:mime-version:message-id:in-reply-to
          :date:x-gm-message-state:from:to:cc;
-        bh=dv/VsCKISe4XLQ/adqAzQumoi9iqOUxkYS0i2UxBP3I=;
-        b=SCbWx3JpHm0plqK331PTMw0vTTy/Yad8oypzMIO2GiMrPY/zKOQSRyc+laCcQ6Y/U8
-         Xn4FmQAc4v/uIGOJoHS0j/0MEK4VX1sEw9Z389HD17qQiY5wt5SEOTwPhLvqB2Ix0KmD
-         euw+b8RHN++h6fArVvfmD6EZlNklzs9bp7wQs56p5pDfpoialLvYDi4+w56tKCGcYbQl
-         hl/zS5Cy7MaX/rqfJnFPB2uNKPUDaUb9/foFyVqPShpvNiFOqbl9AVjp4PlZwMMsoYOm
-         eSyRHQbc+EjmB5p82fxHtN3hQD+16BWBTB5H/lGqt8HwHEDL1II8ZIIEgbZcahBLbMKa
-         HStw==
-X-Gm-Message-State: ACgBeo3dXYqtCWlPOL83RxKOz/ROuP0WWhheF/AHGV4zEyV9BTw3jYSR
-        s/bkkn56DW/sTXrRsSl8wyjKaXbR5rdtpwfX
-X-Google-Smtp-Source: AA6agR45WcPgNXju/DqeyAETJOUtsihagTn67GcHVksMPZA4f6EE62Wig/51CgBefg7030k9YmlAa8WXjoi1a5wc
+        bh=PxVtU6+p3kWLeEs1td/aqyfvaiMfUwekByaLOvsmjdI=;
+        b=hWfsTxN9GJ1wNGZ++Qbi8VIOhHoFkkckzR/2Ak2YVP1DuWz0t0Rbh7YQd29r+e0qW+
+         RVZ8cLwlSYrG/18FmY+QTXDlyNN4XopNdWUneLrHdwsCRAILa/djwSC6mzYkrMwHz9iA
+         LK1/n+aEEa2nytj1b9t7OjS/RXaQ5H6eWpWY27YRKWXIynslvA41PdVoic3QmcHRcC5A
+         AFfilKn1CGTkHjbznm4ri/HqzaOAm6DsE9bAcKbuaqicWjFAIjXg3UIdwKuEZbpGuD4P
+         Tv+mtprob7o3/GkpgNsa1d3Qxlvme5uZvpOQ0m6F2Kps405r5vqZL6Bc7Gz8Kl8rvAV5
+         3Zsw==
+X-Gm-Message-State: ACgBeo0nvJFVUandTg/LZYwgRsXjCp0fguiwKMd+H5Kw7CIw4uJPJ/qo
+        RfWkat4zz0gtHRaEFflal6xZItsigodHU/9t
+X-Google-Smtp-Source: AA6agR4HGS4N/yFbtWqVnVgo8ZXDiZjUD94j+FDzDmfN+hdPI0Lqgg3Jg+CN+fENgQXPBR9kyG4d1DjWSAuEJRME
 X-Received: from vannapurve2.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:41f8])
- (user=vannapurve job=sendgmr) by 2002:a05:6a00:1145:b0:52b:78c:fa26 with SMTP
- id b5-20020a056a00114500b0052b078cfa26mr8897082pfm.27.1660931268817; Fri, 19
- Aug 2022 10:47:48 -0700 (PDT)
-Date:   Fri, 19 Aug 2022 17:46:58 +0000
+ (user=vannapurve job=sendgmr) by 2002:a05:6a00:1aca:b0:52f:55f8:c3ec with
+ SMTP id f10-20020a056a001aca00b0052f55f8c3ecmr8885306pfv.25.1660931271154;
+ Fri, 19 Aug 2022 10:47:51 -0700 (PDT)
+Date:   Fri, 19 Aug 2022 17:46:59 +0000
 In-Reply-To: <20220819174659.2427983-1-vannapurve@google.com>
-Message-Id: <20220819174659.2427983-6-vannapurve@google.com>
+Message-Id: <20220819174659.2427983-7-vannapurve@google.com>
 Mime-Version: 1.0
 References: <20220819174659.2427983-1-vannapurve@google.com>
 X-Mailer: git-send-email 2.37.1.595.g718a3a8f04-goog
-Subject: [RFC V3 PATCH 5/6] selftests: kvm: x86: Execute VMs with private memory
+Subject: [RFC V3 PATCH 6/6] sefltests: kvm: x86: Add selftest for private memory
 From:   Vishal Annapurve <vannapurve@google.com>
 To:     x86@kernel.org, kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
         linux-kselftest@vger.kernel.org
@@ -77,114 +77,64 @@ Content-Type: text/plain; charset="UTF-8"
 X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
         SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL
-        autolearn=unavailable autolearn_force=no version=3.4.6
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Introduce a set of APIs to execute VM with private memslots.
-
-Host userspace APIs for:
-1) Setting up and executing VM having private memslots
-2) Backing/unbacking guest private memory
-
-Guest APIs for:
-1) Changing memory access type and memory type
-2) Setting ucall page access type as shared
+Add a selftest to exercise implicit/explicit conversion functionality
+within KVM and verify:
+1) Shared memory is visible to host userspace after conversion
+2) Private memory is not visible to host userspace before/after conversion
+3) Host userspace and guest can communicate over shared memory
 
 Signed-off-by: Vishal Annapurve <vannapurve@google.com>
 ---
+ tools/testing/selftests/kvm/.gitignore        |   1 +
  tools/testing/selftests/kvm/Makefile          |   1 +
- .../kvm/include/x86_64/private_mem.h          |  51 +++
- .../selftests/kvm/lib/x86_64/private_mem.c    | 297 ++++++++++++++++++
- 3 files changed, 349 insertions(+)
- create mode 100644 tools/testing/selftests/kvm/include/x86_64/private_mem.h
- create mode 100644 tools/testing/selftests/kvm/lib/x86_64/private_mem.c
+ .../selftests/kvm/x86_64/private_mem_test.c   | 262 ++++++++++++++++++
+ 3 files changed, 264 insertions(+)
+ create mode 100644 tools/testing/selftests/kvm/x86_64/private_mem_test.c
 
+diff --git a/tools/testing/selftests/kvm/.gitignore b/tools/testing/selftests/kvm/.gitignore
+index ec084a61a819..095b67dc632e 100644
+--- a/tools/testing/selftests/kvm/.gitignore
++++ b/tools/testing/selftests/kvm/.gitignore
+@@ -31,6 +31,7 @@
+ /x86_64/monitor_mwait_test
+ /x86_64/nx_huge_pages_test
+ /x86_64/platform_info_test
++/x86_64/private_mem_test
+ /x86_64/pmu_event_filter_test
+ /x86_64/set_boot_cpu_id
+ /x86_64/set_sregs_test
 diff --git a/tools/testing/selftests/kvm/Makefile b/tools/testing/selftests/kvm/Makefile
-index 41fd1171fbd8..8fe72a60aef0 100644
+index 8fe72a60aef0..c5fc8ea2c843 100644
 --- a/tools/testing/selftests/kvm/Makefile
 +++ b/tools/testing/selftests/kvm/Makefile
-@@ -51,6 +51,7 @@ LIBKVM += lib/ucall_common.c
- LIBKVM_x86_64 += lib/x86_64/apic.c
- LIBKVM_x86_64 += lib/x86_64/handlers.S
- LIBKVM_x86_64 += lib/x86_64/perf_test_util.c
-+LIBKVM_x86_64 += lib/x86_64/private_mem.c
- LIBKVM_x86_64 += lib/x86_64/processor.c
- LIBKVM_x86_64 += lib/x86_64/svm.c
- LIBKVM_x86_64 += lib/x86_64/ucall.c
-diff --git a/tools/testing/selftests/kvm/include/x86_64/private_mem.h b/tools/testing/selftests/kvm/include/x86_64/private_mem.h
+@@ -94,6 +94,7 @@ TEST_GEN_PROGS_x86_64 += x86_64/mmu_role_test
+ TEST_GEN_PROGS_x86_64 += x86_64/monitor_mwait_test
+ TEST_GEN_PROGS_x86_64 += x86_64/platform_info_test
+ TEST_GEN_PROGS_x86_64 += x86_64/pmu_event_filter_test
++TEST_GEN_PROGS_x86_64 += x86_64/private_mem_test
+ TEST_GEN_PROGS_x86_64 += x86_64/set_boot_cpu_id
+ TEST_GEN_PROGS_x86_64 += x86_64/set_sregs_test
+ TEST_GEN_PROGS_x86_64 += x86_64/smm_test
+diff --git a/tools/testing/selftests/kvm/x86_64/private_mem_test.c b/tools/testing/selftests/kvm/x86_64/private_mem_test.c
 new file mode 100644
-index 000000000000..00cab7b84f2c
+index 000000000000..9f491e2a16bb
 --- /dev/null
-+++ b/tools/testing/selftests/kvm/include/x86_64/private_mem.h
-@@ -0,0 +1,51 @@
-+/* SPDX-License-Identifier: GPL-2.0-only */
-+/*
-+ * Copyright (C) 2022, Google LLC.
-+ */
-+
-+#ifndef SELFTEST_KVM_PRIVATE_MEM_H
-+#define SELFTEST_KVM_PRIVATE_MEM_H
-+
-+#include <stdint.h>
-+#include <kvm_util.h>
-+
-+enum mem_conversion_type {
-+	TO_PRIVATE,
-+	TO_SHARED
-+};
-+
-+void guest_update_mem_access(enum mem_conversion_type type, uint64_t gpa,
-+	uint64_t size);
-+void guest_update_mem_map(enum mem_conversion_type type, uint64_t gpa,
-+	uint64_t size);
-+
-+void guest_map_ucall_page_shared(void);
-+
-+enum mem_op {
-+	ALLOCATE_MEM,
-+	UNBACK_MEM
-+};
-+
-+void vm_update_private_mem(struct kvm_vm *vm, uint64_t gpa, uint64_t size,
-+	enum mem_op op);
-+
-+typedef void (*guest_code_fn)(void);
-+typedef void (*io_exit_handler)(struct kvm_vm *vm, uint32_t uc_arg1);
-+
-+struct test_setup_info {
-+	uint64_t test_area_gpa;
-+	uint64_t test_area_size;
-+	uint32_t test_area_slot;
-+};
-+
-+struct vm_setup_info {
-+	enum vm_mem_backing_src_type vm_mem_src;
-+	uint32_t memslot0_pages;
-+	struct test_setup_info test_info;
-+	guest_code_fn guest_fn;
-+	io_exit_handler ioexit_cb;
-+};
-+
-+void execute_vm_with_private_mem(struct vm_setup_info *info);
-+
-+#endif /* SELFTEST_KVM_PRIVATE_MEM_H */
-diff --git a/tools/testing/selftests/kvm/lib/x86_64/private_mem.c b/tools/testing/selftests/kvm/lib/x86_64/private_mem.c
-new file mode 100644
-index 000000000000..000584219045
---- /dev/null
-+++ b/tools/testing/selftests/kvm/lib/x86_64/private_mem.c
-@@ -0,0 +1,297 @@
++++ b/tools/testing/selftests/kvm/x86_64/private_mem_test.c
+@@ -0,0 +1,262 @@
 +// SPDX-License-Identifier: GPL-2.0
 +/*
 + * tools/testing/selftests/kvm/lib/kvm_util.c
 + *
 + * Copyright (C) 2022, Google LLC.
 + */
-+#define _GNU_SOURCE /* for program_invocation_name */
++#define _GNU_SOURCE /* for program_invocation_short_name */
 +#include <fcntl.h>
 +#include <limits.h>
 +#include <sched.h>
@@ -197,283 +147,248 @@ index 000000000000..000584219045
 +#include <linux/compiler.h>
 +#include <linux/kernel.h>
 +#include <linux/kvm_para.h>
++#include <linux/memfd.h>
 +
 +#include <test_util.h>
 +#include <kvm_util.h>
 +#include <private_mem.h>
 +#include <processor.h>
 +
-+/*
-+ * Execute KVM hypercall to change memory access type for a given gpa range.
-+ *
-+ * Input Args:
-+ *   type - memory conversion type TO_SHARED/TO_PRIVATE
-+ *   gpa - starting gpa address
-+ *   size - size of the range starting from gpa for which memory access needs
-+ *     to be changed
-+ *
-+ * Output Args: None
-+ *
-+ * Return: None
-+ *
-+ * Function called by guest logic in selftests to update the memory access type
-+ * for a given gpa range. This API is useful in exercising implicit conversion
-+ * path.
-+ */
-+void guest_update_mem_access(enum mem_conversion_type type, uint64_t gpa,
-+	uint64_t size)
++#define VM_MEMSLOT0_PAGES	(512 * 10)
++
++#define TEST_AREA_SLOT		10
++#define TEST_AREA_GPA		0xC0000000
++#define TEST_AREA_SIZE		(2 * 1024 * 1024)
++#define GUEST_TEST_MEM_OFFSET	(1 * 1024 * 1024)
++#define GUEST_TEST_MEM_SIZE	(10 * 4096)
++
++#define VM_STAGE_PROCESSED(x)	pr_info("Processed stage %s\n", #x)
++
++#define TEST_MEM_DATA_PAT1	0x66
++#define TEST_MEM_DATA_PAT2	0x99
++#define TEST_MEM_DATA_PAT3	0x33
++#define TEST_MEM_DATA_PAT4	0xaa
++#define TEST_MEM_DATA_PAT5	0x12
++
++static bool verify_mem_contents(void *mem, uint32_t size, uint8_t pat)
 +{
-+	int ret = kvm_hypercall(KVM_HC_MAP_GPA_RANGE, gpa, size >> MIN_PAGE_SHIFT,
-+		type == TO_PRIVATE ? KVM_MARK_GPA_RANGE_ENC_ACCESS :
-+			KVM_CLR_GPA_RANGE_ENC_ACCESS, 0);
-+	GUEST_ASSERT_1(!ret, ret);
-+}
++	uint8_t *buf = (uint8_t *)mem;
 +
-+/*
-+ * Execute KVM hypercall to change memory type for a given gpa range.
-+ *
-+ * Input Args:
-+ *   type - memory conversion type TO_SHARED/TO_PRIVATE
-+ *   gpa - starting gpa address
-+ *   size - size of the range starting from gpa for which memory type needs
-+ *     to be changed
-+ *
-+ * Output Args: None
-+ *
-+ * Return: None
-+ *
-+ * Function called by guest logic in selftests to update the memory type for a
-+ * given gpa range. This API is useful in exercising explicit conversion path.
-+ */
-+void guest_update_mem_map(enum mem_conversion_type type, uint64_t gpa,
-+	uint64_t size)
-+{
-+	int ret = kvm_hypercall(KVM_HC_MAP_GPA_RANGE, gpa, size >> MIN_PAGE_SHIFT,
-+		type == TO_PRIVATE ? KVM_MAP_GPA_RANGE_ENCRYPTED :
-+			KVM_MAP_GPA_RANGE_DECRYPTED, 0);
-+	GUEST_ASSERT_1(!ret, ret);
-+}
-+
-+/*
-+ * Execute KVM hypercall to change memory access type for ucall page.
-+ *
-+ * Input Args: None
-+ *
-+ * Output Args: None
-+ *
-+ * Return: None
-+ *
-+ * Function called by guest logic in selftests to update the memory access type
-+ * for ucall page since by default all the accesses from guest to private
-+ * memslot are treated as private accesses.
-+ */
-+void guest_map_ucall_page_shared(void)
-+{
-+	vm_paddr_t ucall_paddr = get_ucall_pool_paddr();
-+
-+	guest_update_mem_access(TO_SHARED, ucall_paddr, 1 << MIN_PAGE_SHIFT);
-+}
-+
-+/*
-+ * Execute KVM ioctl to back/unback private memory for given gpa range.
-+ *
-+ * Input Args:
-+ *   vm - kvm_vm handle
-+ *   gpa - starting gpa address
-+ *   size - size of the gpa range
-+ *   op - mem_op indicating whether private memory needs to be allocated or
-+ *     unbacked
-+ *
-+ * Output Args: None
-+ *
-+ * Return: None
-+ *
-+ * Function called by host userspace logic in selftests to back/unback private
-+ * memory for gpa ranges. This function is useful to setup initial boot private
-+ * memory and then convert memory during runtime.
-+ */
-+void vm_update_private_mem(struct kvm_vm *vm, uint64_t gpa, uint64_t size,
-+	enum mem_op op)
-+{
-+	int priv_memfd;
-+	uint64_t priv_offset, guest_phys_base, fd_offset;
-+	struct kvm_enc_region enc_region;
-+	struct kvm_userspace_memory_region_ext *region_ext;
-+	struct kvm_userspace_memory_region *region;
-+	int fallocate_mode = 0;
-+	int ret;
-+
-+	region_ext = kvm_userspace_memory_region_ext_find(vm, gpa, gpa + size);
-+	TEST_ASSERT(region_ext != NULL, "Region not found");
-+	region = &region_ext->region;
-+	TEST_ASSERT(region->flags & KVM_MEM_PRIVATE,
-+		"Can not update private memfd for non-private memslot\n");
-+	priv_memfd = region_ext->private_fd;
-+	priv_offset = region_ext->private_offset;
-+	guest_phys_base = region->guest_phys_addr;
-+	fd_offset = priv_offset + (gpa - guest_phys_base);
-+
-+	if (op == UNBACK_MEM)
-+		fallocate_mode = (FALLOC_FL_PUNCH_HOLE | FALLOC_FL_KEEP_SIZE);
-+
-+	printf("priv_memfd %d fallocate_mode 0x%x for offset 0x%lx size 0x%lx\n",
-+		priv_memfd, fallocate_mode, fd_offset, size);
-+	ret = fallocate(priv_memfd, fallocate_mode, fd_offset, size);
-+	TEST_ASSERT(ret == 0, "fallocate failed\n");
-+	enc_region.addr = gpa;
-+	enc_region.size = size;
-+	if (op == ALLOCATE_MEM) {
-+		printf("doing encryption for gpa 0x%lx size 0x%lx\n", gpa, size);
-+		vm_ioctl(vm, KVM_MEMORY_ENCRYPT_REG_REGION, &enc_region);
-+	} else {
-+		printf("undoing encryption for gpa 0x%lx size 0x%lx\n", gpa, size);
-+		vm_ioctl(vm, KVM_MEMORY_ENCRYPT_UNREG_REGION, &enc_region);
++	for (uint32_t i = 0; i < size; i++) {
++		if (buf[i] != pat)
++			return false;
 +	}
++
++	return true;
 +}
 +
-+static void handle_vm_exit_map_gpa_hypercall(struct kvm_vm *vm,
-+				volatile struct kvm_run *run)
++/*
++ * Add custom implementation for memset to avoid using standard/builtin memset
++ * which may use features like SSE/GOT that don't work with guest vm execution
++ * within selftests.
++ */
++void *memset(void *mem, int byte, size_t size)
 +{
-+	uint64_t gpa, npages, attrs, size;
++	uint8_t *buf = (uint8_t *)mem;
 +
-+	TEST_ASSERT(run->hypercall.nr == KVM_HC_MAP_GPA_RANGE,
-+		"Unhandled Hypercall %lld\n", run->hypercall.nr);
-+	gpa = run->hypercall.args[0];
-+	npages = run->hypercall.args[1];
-+	size = npages << MIN_PAGE_SHIFT;
-+	attrs = run->hypercall.args[2];
-+	pr_info("Explicit conversion off 0x%lx size 0x%lx to %s\n", gpa, size,
-+		(attrs & KVM_MAP_GPA_RANGE_ENCRYPTED) ? "private" : "shared");
++	for (uint32_t i = 0; i < size; i++)
++		buf[i] = byte;
 +
-+	if (attrs & KVM_MAP_GPA_RANGE_ENCRYPTED)
-+		vm_update_private_mem(vm, gpa, size, ALLOCATE_MEM);
-+	else
-+		vm_update_private_mem(vm, gpa, size, UNBACK_MEM);
-+
-+	run->hypercall.ret = 0;
++	return buf;
 +}
 +
-+static void handle_vm_exit_memory_error(struct kvm_vm *vm, volatile struct kvm_run *run)
++static void populate_test_area(void *test_area_base, uint64_t pat)
 +{
-+	uint64_t gpa, size, flags;
-+
-+	gpa = run->memory.gpa;
-+	size = run->memory.size;
-+	flags = run->memory.flags;
-+	pr_info("Implicit conversion off 0x%lx size 0x%lx to %s\n", gpa, size,
-+		(flags & KVM_MEMORY_EXIT_FLAG_PRIVATE) ? "private" : "shared");
-+	if (flags & KVM_MEMORY_EXIT_FLAG_PRIVATE)
-+		vm_update_private_mem(vm, gpa, size, ALLOCATE_MEM);
-+	else
-+		vm_update_private_mem(vm, gpa, size, UNBACK_MEM);
++	memset(test_area_base, pat, TEST_AREA_SIZE);
 +}
 +
-+static void vcpu_work(struct kvm_vm *vm, struct kvm_vcpu *vcpu,
-+	struct vm_setup_info *info)
++static void populate_guest_test_mem(void *guest_test_mem, uint64_t pat)
 +{
-+	volatile struct kvm_run *run;
-+	struct ucall uc;
-+	uint64_t cmd;
++	memset(guest_test_mem, pat, GUEST_TEST_MEM_SIZE);
++}
 +
-+	/*
-+	 * Loop until the guest is done.
-+	 */
-+	run = vcpu->run;
++static bool verify_test_area(void *test_area_base, uint64_t area_pat,
++	uint64_t guest_pat)
++{
++	void *test_area1_base = test_area_base;
++	uint64_t test_area1_size = GUEST_TEST_MEM_OFFSET;
++	void *guest_test_mem = test_area_base + test_area1_size;
++	uint64_t guest_test_size = GUEST_TEST_MEM_SIZE;
++	void *test_area2_base = guest_test_mem + guest_test_size;
++	uint64_t test_area2_size = (TEST_AREA_SIZE - (GUEST_TEST_MEM_OFFSET +
++			GUEST_TEST_MEM_SIZE));
 +
-+	while (true) {
-+		vcpu_run(vcpu);
++	return (verify_mem_contents(test_area1_base, test_area1_size, area_pat) &&
++		verify_mem_contents(guest_test_mem, guest_test_size, guest_pat) &&
++		verify_mem_contents(test_area2_base, test_area2_size, area_pat));
++}
 +
-+		if (run->exit_reason == KVM_EXIT_IO) {
-+			cmd = get_ucall(vcpu, &uc);
-+			if (cmd != UCALL_SYNC)
-+				break;
++#define GUEST_STARTED			0
++#define GUEST_PRIVATE_MEM_POPULATED	1
++#define GUEST_SHARED_MEM_POPULATED	2
++#define GUEST_PRIVATE_MEM_POPULATED2	3
++#define GUEST_IMPLICIT_MEM_CONV1	4
++#define GUEST_IMPLICIT_MEM_CONV2	5
 +
-+			TEST_ASSERT(info->ioexit_cb, "ioexit cb not present");
-+			info->ioexit_cb(vm, uc.args[1]);
-+			continue;
-+		}
++/*
++ * Run memory conversion tests supporting two types of conversion:
++ * 1) Explicit: Execute KVM hypercall to map/unmap gpa range which will cause
++ *   userspace exit to back/unback private memory. Subsequent accesses by guest
++ *   to the gpa range will not cause exit to userspace.
++ * 2) Implicit: Execute KVM hypercall to update memory access to a gpa range as
++ *   private/shared without exiting to userspace. Subsequent accesses by guest
++ *   to the gpa range will result in KVM EPT/NPT faults and then exit to
++ *   userspace for each page.
++ *
++ * Test memory conversion scenarios with following steps:
++ * 1) Access private memory using private access and verify that memory contents
++ *   are not visible to userspace.
++ * 2) Convert memory to shared using explicit/implicit conversions and ensure
++ *   that userspace is able to access the shared regions.
++ * 3) Convert memory back to private using explicit/implicit conversions and
++ *   ensure that userspace is again not able to access converted private
++ *   regions.
++ */
++static void guest_conv_test_fn(bool test_explicit_conv)
++{
++	void *test_area_base = (void *)TEST_AREA_GPA;
++	void *guest_test_mem = (void *)(TEST_AREA_GPA + GUEST_TEST_MEM_OFFSET);
++	uint64_t guest_test_size = GUEST_TEST_MEM_SIZE;
 +
-+		if (run->exit_reason == KVM_EXIT_HYPERCALL) {
-+			handle_vm_exit_map_gpa_hypercall(vm, run);
-+			continue;
-+		}
++	guest_map_ucall_page_shared();
++	GUEST_SYNC(GUEST_STARTED);
 +
-+		if (run->exit_reason == KVM_EXIT_MEMORY_FAULT) {
-+			handle_vm_exit_memory_error(vm, run);
-+			continue;
-+		}
++	populate_test_area(test_area_base, TEST_MEM_DATA_PAT1);
++	GUEST_SYNC(GUEST_PRIVATE_MEM_POPULATED);
++	GUEST_ASSERT(verify_test_area(test_area_base, TEST_MEM_DATA_PAT1,
++		TEST_MEM_DATA_PAT1));
 +
-+		TEST_FAIL("Unhandled VCPU exit reason %d\n", run->exit_reason);
++	if (test_explicit_conv)
++		guest_update_mem_map(TO_SHARED, (uint64_t)guest_test_mem,
++			guest_test_size);
++	else {
++		guest_update_mem_access(TO_SHARED, (uint64_t)guest_test_mem,
++			guest_test_size);
++		GUEST_SYNC(GUEST_IMPLICIT_MEM_CONV1);
++	}
++
++	populate_guest_test_mem(guest_test_mem, TEST_MEM_DATA_PAT2);
++
++	GUEST_SYNC(GUEST_SHARED_MEM_POPULATED);
++	GUEST_ASSERT(verify_test_area(test_area_base, TEST_MEM_DATA_PAT1,
++		TEST_MEM_DATA_PAT5));
++
++	if (test_explicit_conv)
++		guest_update_mem_map(TO_PRIVATE, (uint64_t)guest_test_mem,
++			guest_test_size);
++	else {
++		guest_update_mem_access(TO_PRIVATE, (uint64_t)guest_test_mem,
++			guest_test_size);
++		GUEST_SYNC(GUEST_IMPLICIT_MEM_CONV2);
++	}
++
++	populate_guest_test_mem(guest_test_mem, TEST_MEM_DATA_PAT3);
++	GUEST_SYNC(GUEST_PRIVATE_MEM_POPULATED2);
++
++	GUEST_ASSERT(verify_test_area(test_area_base, TEST_MEM_DATA_PAT1,
++		TEST_MEM_DATA_PAT3));
++	GUEST_DONE();
++}
++
++static void conv_test_ioexit_fn(struct kvm_vm *vm, uint32_t uc_arg1)
++{
++	void *test_area_hva = addr_gpa2hva(vm, TEST_AREA_GPA);
++	void *guest_test_mem_hva = (test_area_hva + GUEST_TEST_MEM_OFFSET);
++	uint64_t guest_mem_gpa = (TEST_AREA_GPA + GUEST_TEST_MEM_OFFSET);
++	uint64_t guest_test_size = GUEST_TEST_MEM_SIZE;
++
++	switch (uc_arg1) {
++	case GUEST_STARTED:
++		populate_test_area(test_area_hva, TEST_MEM_DATA_PAT4);
++		VM_STAGE_PROCESSED(GUEST_STARTED);
++		break;
++	case GUEST_PRIVATE_MEM_POPULATED:
++		TEST_ASSERT(verify_test_area(test_area_hva, TEST_MEM_DATA_PAT4,
++				TEST_MEM_DATA_PAT4), "failed");
++		VM_STAGE_PROCESSED(GUEST_PRIVATE_MEM_POPULATED);
++		break;
++	case GUEST_SHARED_MEM_POPULATED:
++		TEST_ASSERT(verify_test_area(test_area_hva, TEST_MEM_DATA_PAT4,
++				TEST_MEM_DATA_PAT2), "failed");
++		populate_guest_test_mem(guest_test_mem_hva, TEST_MEM_DATA_PAT5);
++		VM_STAGE_PROCESSED(GUEST_SHARED_MEM_POPULATED);
++		break;
++	case GUEST_PRIVATE_MEM_POPULATED2:
++		TEST_ASSERT(verify_test_area(test_area_hva, TEST_MEM_DATA_PAT4,
++				TEST_MEM_DATA_PAT5), "failed");
++		VM_STAGE_PROCESSED(GUEST_PRIVATE_MEM_POPULATED2);
++		break;
++	case GUEST_IMPLICIT_MEM_CONV1:
++		/*
++		 * For first implicit conversion, memory is already private so
++		 * mark it private again just to zap the pte entries for the gpa
++		 * range, so that subsequent accesses from the guest will
++		 * generate ept/npt fault and memory conversion path will be
++		 * exercised by KVM.
++		 */
++		vm_update_private_mem(vm, guest_mem_gpa, guest_test_size,
++				ALLOCATE_MEM);
++		VM_STAGE_PROCESSED(GUEST_IMPLICIT_MEM_CONV1);
++		break;
++	case GUEST_IMPLICIT_MEM_CONV2:
++		/*
++		 * For second implicit conversion, memory is already shared so
++		 * mark it shared again just to zap the pte entries for the gpa
++		 * range, so that subsequent accesses from the guest will
++		 * generate ept/npt fault and memory conversion path will be
++		 * exercised by KVM.
++		 */
++		vm_update_private_mem(vm, guest_mem_gpa, guest_test_size,
++				UNBACK_MEM);
++		VM_STAGE_PROCESSED(GUEST_IMPLICIT_MEM_CONV2);
++		break;
++	default:
++		TEST_FAIL("Unknown stage %d\n", uc_arg1);
 +		break;
 +	}
-+
-+	if (run->exit_reason == KVM_EXIT_IO && cmd == UCALL_ABORT)
-+		TEST_FAIL("%s at %s:%ld, val = %lu", (const char *)uc.args[0],
-+			  __FILE__, uc.args[1], uc.args[2]);
 +}
 +
-+/*
-+ * Execute guest vm with private memory memslots.
-+ *
-+ * Input Args:
-+ *   info - pointer to a structure containing information about setting up a VM
-+ *     with private memslots
-+ *
-+ * Output Args: None
-+ *
-+ * Return: None
-+ *
-+ * Function called by host userspace logic in selftests to execute guest vm
-+ * logic. It will install two memslots:
-+ * 1) memslot 0 : containing all the boot code/stack pages
-+ * 2) test_mem_slot : containing the region of memory that would be used to test
-+ *   private/shared memory accesses to a memory backed by private memslots
-+ */
-+void execute_vm_with_private_mem(struct vm_setup_info *info)
++static void guest_explicit_conv_test_fn(void)
 +{
-+	struct kvm_vm *vm;
-+	struct kvm_enable_cap cap;
-+	struct kvm_vcpu *vcpu;
-+	uint32_t memslot0_pages = info->memslot0_pages;
-+	uint64_t test_area_gpa, test_area_size;
-+	struct test_setup_info *test_info = &info->test_info;
++	guest_conv_test_fn(true);
++}
 +
-+	vm = vm_create_barebones();
-+	vm_set_memory_encryption(vm, true, false, 0);
-+	vm->use_ucall_pool = true;
-+	vm_userspace_mem_region_add(vm, info->vm_mem_src, 0, 0,
-+		memslot0_pages, KVM_MEM_PRIVATE);
-+	kvm_vm_elf_load(vm, program_invocation_name);
-+	vm_create_irqchip(vm);
-+	TEST_ASSERT(info->guest_fn, "guest_fn not present");
-+	vcpu = vm_vcpu_add(vm, 0, info->guest_fn);
++static void guest_implicit_conv_test_fn(void)
++{
++	guest_conv_test_fn(false);
++}
 +
-+	vm_check_cap(vm, KVM_CAP_EXIT_HYPERCALL);
-+	cap.cap = KVM_CAP_EXIT_HYPERCALL;
-+	cap.flags = 0;
-+	cap.args[0] = (1 << KVM_HC_MAP_GPA_RANGE);
-+	vm_ioctl(vm, KVM_ENABLE_CAP, &cap);
++static void execute_memory_conversion_test(void)
++{
++	struct vm_setup_info info;
++	struct test_setup_info *test_info = &info.test_info;
 +
-+	TEST_ASSERT(test_info->test_area_size, "Test mem size not present");
++	info.vm_mem_src = VM_MEM_SRC_ANONYMOUS;
++	info.memslot0_pages = VM_MEMSLOT0_PAGES;
++	test_info->test_area_gpa = TEST_AREA_GPA;
++	test_info->test_area_size = TEST_AREA_SIZE;
++	test_info->test_area_slot = TEST_AREA_SLOT;
++	info.ioexit_cb = conv_test_ioexit_fn;
 +
-+	test_area_size = test_info->test_area_size;
-+	test_area_gpa = test_info->test_area_gpa;
-+	vm_userspace_mem_region_add(vm, info->vm_mem_src, test_area_gpa,
-+		test_info->test_area_slot, test_area_size / vm->page_size,
-+		KVM_MEM_PRIVATE);
-+	vm_update_private_mem(vm, test_area_gpa, test_area_size, ALLOCATE_MEM);
++	info.guest_fn = guest_explicit_conv_test_fn;
++	execute_vm_with_private_mem(&info);
 +
-+	pr_info("Mapping test memory pages 0x%zx page_size 0x%x\n",
-+		test_area_size/vm->page_size, vm->page_size);
-+	virt_map(vm, test_area_gpa, test_area_gpa, test_area_size/vm->page_size);
++	info.guest_fn = guest_implicit_conv_test_fn;
++	execute_vm_with_private_mem(&info);
++}
 +
-+	ucall_init(vm, NULL);
-+	vm_update_private_mem(vm, 0, (memslot0_pages << MIN_PAGE_SHIFT), ALLOCATE_MEM);
++int main(int argc, char *argv[])
++{
++	/* Tell stdout not to buffer its content */
++	setbuf(stdout, NULL);
 +
-+	vcpu_work(vm, vcpu, info);
-+
-+	ucall_uninit(vm);
-+	kvm_vm_free(vm);
++	execute_memory_conversion_test();
++	return 0;
 +}
 -- 
 2.37.1.595.g718a3a8f04-goog
