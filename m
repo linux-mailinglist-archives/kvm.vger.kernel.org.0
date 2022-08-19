@@ -2,59 +2,59 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 8C308599AC3
-	for <lists+kvm@lfdr.de>; Fri, 19 Aug 2022 13:18:59 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 8D68B599A85
+	for <lists+kvm@lfdr.de>; Fri, 19 Aug 2022 13:18:38 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1348705AbiHSLKK (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 19 Aug 2022 07:10:10 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33864 "EHLO
+        id S1348709AbiHSLKM (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 19 Aug 2022 07:10:12 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33888 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1348702AbiHSLKJ (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 19 Aug 2022 07:10:09 -0400
-Received: from mail-pf1-x430.google.com (mail-pf1-x430.google.com [IPv6:2607:f8b0:4864:20::430])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CFA9FF6196
-        for <kvm@vger.kernel.org>; Fri, 19 Aug 2022 04:10:08 -0700 (PDT)
-Received: by mail-pf1-x430.google.com with SMTP id y141so4027612pfb.7
-        for <kvm@vger.kernel.org>; Fri, 19 Aug 2022 04:10:08 -0700 (PDT)
+        with ESMTP id S1348704AbiHSLKK (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 19 Aug 2022 07:10:10 -0400
+Received: from mail-pj1-x102c.google.com (mail-pj1-x102c.google.com [IPv6:2607:f8b0:4864:20::102c])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 90A1CFBA6A
+        for <kvm@vger.kernel.org>; Fri, 19 Aug 2022 04:10:09 -0700 (PDT)
+Received: by mail-pj1-x102c.google.com with SMTP id a8so4295471pjg.5
+        for <kvm@vger.kernel.org>; Fri, 19 Aug 2022 04:10:09 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc;
-        bh=ql4Rh8J556MPf2Buydi+F1rT3HDm+TzYYIHtdS57x/8=;
-        b=hWiHFMXb6+MFVTZZmTw1b9P4JoH/CDLCxcyA1O8o6MnJUQ3hweHY87uCtMDs0UGVw8
-         D2wba4Vd7I85zoki8pPHyybY8iUjl8fCNCPlloWyi0DrPwEL2eUahYzZnVCSxq60GeWI
-         O7D/PtUqo0fa99QxfbOx6UR0oSfZEeGg9hqh/yRiJYgSknOC8QQa2ISSQVUDcBQYAFds
-         SZcvP2sWcJAw0VfKbx9HBe18qSOiBA7IRo4T9am9ExVVOEuEDDlSAwNmCeHTUq9cYT5/
-         CCMIEiqwXB1zVNnvEmd5XppXaho0JN2nDWZt84h5/pc7Amvi8j0vYPgXPby9o97C7U07
-         ARng==
+        bh=2rwDhftcDKKq4CQuzXLKUT9Zt9Zd73y4NeTayZ73PF4=;
+        b=KV7LJq3BR+TBx8fVhLx0SrEQegdcWhcZcvr08Gv3fB8Nq5GcowE2HRZAAfwvS90H4U
+         /qluVKnYhetGxbYpfzDaVmJp1VYXN64WfDxtZcWl89BYH8UF4ApC930PPn9eq+YMnnfr
+         O1K4FjV+Hsj6EqsX1NLEaAzlUk4PTpITHyhjkD6F2uMc9u4EpOIvXT3R7xBtsWFAX0Ge
+         53lmHDQRozFMn892xG3mJMmx7SI52ta2S+kMr2eCnjVwlB9UdZW1nV5o4xFIOhAxauJZ
+         87vkiPTkpbtq8/xvqBVYLU2pdqJSjqne+BxBS0Dsm/O/pvtWwGKHEfCcvUi7ry+nPYQS
+         rXYg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc;
-        bh=ql4Rh8J556MPf2Buydi+F1rT3HDm+TzYYIHtdS57x/8=;
-        b=BuYrAEw3JC59sP4n4jTjq9qDRS9h+XEWMaz3cllqqvGXMrnRqRl1oB03KAD79p0JWQ
-         Qhz0mruWWmr4etJZpSVW/zzCteoQcbpoPR8knXQNfWhqLlfaLXMc4qNVhuLN8vNbS7Gn
-         RsiNkKD9E9waAGe7mPwY3cwLZfMCjbPd+PAaQ1DgL/cl+qO2EdUkMfPYkJoV23uOLaEk
-         5FOtBTwXJyUssBN4SsQcKg7zNsCO84A/8jOhW3QkgH+wr5JAn2zkZRruqrNmi5iIMMck
-         LAiEysUHdHEi5d9J8sEKM29PFUKK3y9XMr8e/65sOcWtwvhQMDg8A7p69WkXSpXIP/gH
-         Yh0A==
-X-Gm-Message-State: ACgBeo02TjbJRezxaTvCnK5b/PjwJDmiy8ak8A83A77pw9Xt8GJSW3ch
-        T9vzqE0ibx1StHRYIaSKqQ8=
-X-Google-Smtp-Source: AA6agR6GHDYB2k/X8SDCiZT+zsVh22Jp3c/OSBri0Tw6naniRZ90C1BDGcFO9VG/6/+RUEcYFOSipw==
-X-Received: by 2002:a05:6a00:1813:b0:52d:cccf:e443 with SMTP id y19-20020a056a00181300b0052dcccfe443mr7332139pfa.81.1660907407360;
-        Fri, 19 Aug 2022 04:10:07 -0700 (PDT)
+        bh=2rwDhftcDKKq4CQuzXLKUT9Zt9Zd73y4NeTayZ73PF4=;
+        b=EEgWeowlzWL/zdV83OLaXiBUzKVmbLp8g+e/f/YNI8Oc54HRyKqO+7FR9akk9CiMcj
+         RVc2aaIcJWcEQcu2xMN5JZwC7vOrX2OEaKObPsmTxP9ti/Simd2qkeR4fQOGpMBbREpU
+         Jm5rrEQcEYafzHSCIAjBc+Z/qZcweymMubF9xF8Si9wHogH2mjnQD6KktN58O3Q+yDVj
+         hBFB0NM7jl8u6IBxWKLkQbbizJdHByM+Ruz0hM34HP3BltpY/vZt7cLZG2OWqD4o6DeV
+         3IzaVIGZUC3eMPw1dM8CGkp+5P6HKRNEgvS4f+ZBd0NBqjq5EY7bPDqaK2XSzB0guhim
+         sx5w==
+X-Gm-Message-State: ACgBeo1vSjVB1KBbKFIbWibc++epZguORYfOi7aKu7vBTHUV7RSsbcJL
+        BYGJXxJteK1PwECVmYeRRo0=
+X-Google-Smtp-Source: AA6agR74QeVAbSs2O61j1YbI80hZ0Xyp8BtBGGpjZgm0zVkvFEjnDmGPS3uEgT30thW4MQzNM65Rrg==
+X-Received: by 2002:a17:902:ce84:b0:16f:81d2:60c with SMTP id f4-20020a170902ce8400b0016f81d2060cmr6877132plg.57.1660907409094;
+        Fri, 19 Aug 2022 04:10:09 -0700 (PDT)
 Received: from localhost.localdomain ([103.7.29.32])
-        by smtp.gmail.com with ESMTPSA id jd7-20020a170903260700b0016bfbd99f64sm2957778plb.118.2022.08.19.04.10.06
+        by smtp.gmail.com with ESMTPSA id jd7-20020a170903260700b0016bfbd99f64sm2957778plb.118.2022.08.19.04.10.07
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 19 Aug 2022 04:10:07 -0700 (PDT)
+        Fri, 19 Aug 2022 04:10:08 -0700 (PDT)
 From:   Like Xu <like.xu.linux@gmail.com>
 X-Google-Original-From: Like Xu <likexu@tencent.com>
 To:     Sean Christopherson <seanjc@google.com>,
         Paolo Bonzini <pbonzini@redhat.com>
 Cc:     kvm@vger.kernel.org
-Subject: [kvm-unit-tests PATCH v3 05/13] x86: create pmu group for quick pmu-scope testing
-Date:   Fri, 19 Aug 2022 19:09:31 +0800
-Message-Id: <20220819110939.78013-6-likexu@tencent.com>
+Subject: [kvm-unit-tests PATCH v3 06/13] x86/pmu: Test emulation instructions on full-width counters
+Date:   Fri, 19 Aug 2022 19:09:32 +0800
+Message-Id: <20220819110939.78013-7-likexu@tencent.com>
 X-Mailer: git-send-email 2.37.2
 In-Reply-To: <20220819110939.78013-1-likexu@tencent.com>
 References: <20220819110939.78013-1-likexu@tencent.com>
@@ -72,41 +72,38 @@ X-Mailing-List: kvm@vger.kernel.org
 
 From: Like Xu <likexu@tencent.com>
 
-Any agent can run "./run_tests.sh -g pmu" for vPMU-related testcases.
+Move check_emulated_instr() into check_counters() so that full-width
+counters could be tested with ease by the same test case.
 
 Signed-off-by: Like Xu <likexu@tencent.com>
 ---
- x86/unittests.cfg | 3 +++
- 1 file changed, 3 insertions(+)
+ x86/pmu.c | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
 
-diff --git a/x86/unittests.cfg b/x86/unittests.cfg
-index c5efb25..54f0437 100644
---- a/x86/unittests.cfg
-+++ b/x86/unittests.cfg
-@@ -189,6 +189,7 @@ file = pmu.flat
- extra_params = -cpu max
- check = /proc/sys/kernel/nmi_watchdog=0
- accel = kvm
-+groups = pmu
+diff --git a/x86/pmu.c b/x86/pmu.c
+index 057fd4a..9262f3c 100644
+--- a/x86/pmu.c
++++ b/x86/pmu.c
+@@ -530,6 +530,9 @@ static void check_emulated_instr(void)
  
- [pmu_lbr]
- arch = x86_64
-@@ -197,6 +198,7 @@ extra_params = -cpu host,migratable=no
- check = /sys/module/kvm/parameters/ignore_msrs=N
- check = /proc/sys/kernel/nmi_watchdog=0
- accel = kvm
-+groups = pmu
+ static void check_counters(void)
+ {
++	if (is_fep_available())
++		check_emulated_instr();
++
+ 	check_gp_counters();
+ 	check_fixed_counters();
+ 	check_rdpmc();
+@@ -664,9 +667,6 @@ int main(int ac, char **av)
  
- [pmu_pebs]
- arch = x86_64
-@@ -204,6 +206,7 @@ file = pmu_pebs.flat
- extra_params = -cpu host,migratable=no
- check = /proc/sys/kernel/nmi_watchdog=0
- accel = kvm
-+groups = pmu
+ 	apic_write(APIC_LVTPC, PC_VECTOR);
  
- [vmware_backdoors]
- file = vmware_backdoors.flat
+-	if (is_fep_available())
+-		check_emulated_instr();
+-
+ 	check_counters();
+ 
+ 	if (rdmsr(MSR_IA32_PERF_CAPABILITIES) & PMU_CAP_FW_WRITES) {
 -- 
 2.37.2
 
