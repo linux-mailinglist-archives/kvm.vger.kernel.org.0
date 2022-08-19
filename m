@@ -2,65 +2,94 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 7D9BA599184
-	for <lists+kvm@lfdr.de>; Fri, 19 Aug 2022 01:56:25 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id BA1905991AA
+	for <lists+kvm@lfdr.de>; Fri, 19 Aug 2022 02:21:38 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S242629AbiHRXz0 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 18 Aug 2022 19:55:26 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40292 "EHLO
+        id S241078AbiHSAUm (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 18 Aug 2022 20:20:42 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43554 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S242066AbiHRXzV (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 18 Aug 2022 19:55:21 -0400
-Received: from mail-pj1-x102c.google.com (mail-pj1-x102c.google.com [IPv6:2607:f8b0:4864:20::102c])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 71069DEA49
-        for <kvm@vger.kernel.org>; Thu, 18 Aug 2022 16:55:21 -0700 (PDT)
-Received: by mail-pj1-x102c.google.com with SMTP id r14-20020a17090a4dce00b001faa76931beso6108912pjl.1
-        for <kvm@vger.kernel.org>; Thu, 18 Aug 2022 16:55:21 -0700 (PDT)
+        with ESMTP id S240235AbiHSAUg (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 18 Aug 2022 20:20:36 -0400
+Received: from mail-pj1-x102b.google.com (mail-pj1-x102b.google.com [IPv6:2607:f8b0:4864:20::102b])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8E2F6CE304
+        for <kvm@vger.kernel.org>; Thu, 18 Aug 2022 17:20:33 -0700 (PDT)
+Received: by mail-pj1-x102b.google.com with SMTP id f21so3181030pjt.2
+        for <kvm@vger.kernel.org>; Thu, 18 Aug 2022 17:20:33 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:from:to:cc;
-        bh=AWtP0u7P1drADzE77AVG8rLD5+HSSz5SKdXunXRuFM8=;
-        b=cL8NG/whB9v3KVq2a2XlcCENrHgOx7fp8FcQoQXELCl1Ecm1PAKrhHIx5o6KHRuRWk
-         SK9cDMSnsKmsmDp7IbS+0WEwf6FSbGfmSSCJEo1xk1LMQWX7re4Pdmzw0HpZWL4DFpIL
-         skFN1YDlrJJF2vYtGj/rjSx0XA7IYA8vvi1eFyaIPPi7CoFurNkHCnLL+7P/s1qDNtwY
-         raGIfjd3G+Gmq3tBzrcet1lMOEGk8qd5+7ENYt557Yi0iLYB0SZWdmhq+RxwvTTPPgqN
-         EsFlEIYFMSH/fgMg4SoPGj/B+LqNVLJMKt7GYB29NF7zNw887SkK/lelBUzG8xgGcVG3
-         YFjw==
+        bh=pEgXnTJKFJrTL3CTka16XSJbg6kxwB4cnfOI/Ofjlz4=;
+        b=jQOCWpbvee03T0P8xijjOYN3zJfdX6BqWq3GiUDY54GeiB2kYOpPOdypH/gNOYaODr
+         ix4Q5zM5HRdkrH8VNhhYaqC4bGm3TWrsr3zotxk6UhP/oyxM/RNGcU3wIqmpKytWvU4a
+         BTREDH/HNF59rmTBvSdbCesgF6GRyz5K9//B1DM9fRziLLn/FELyxzGGJ6BTGO4HJJrl
+         o0UAtZhP3o05JqW/WffSD/W7KBey1RzgtF0ZEqIKFPy09PHnweIeH6czpkeJBsdR0KF6
+         StCY9jf29Uto9xBg0n+/eHlcuPQ9Rk2xvxAOK7+9vgIk182YafaVSJIp8WTK07eIFh8d
+         mv/g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:x-gm-message-state:from:to:cc;
-        bh=AWtP0u7P1drADzE77AVG8rLD5+HSSz5SKdXunXRuFM8=;
-        b=WWcG+768eJ83Vl8XIUeuG5gn/u4G//sSJlmOtsJUl7MlhEg+7jqYPM/DIimsgdINXr
-         ALmNVD7KsBGnQvPqrdNiy6dqtF25BRsgIftQ7All+5tuTA+2sgaTCFsfb7IkKeP3+Lc4
-         AUWjR7hs5a/LzRfLDMPEXePIOOIE3EyCcnRc7ubaRLlrLLUfilknu1AqQTXQDL5OVdY7
-         rslo6qo3oKCa6P1KMmnKxTkibEpsJJ0IsE+hb5Mk0xjccR0pW5VXS3qL81U7LUoGTsKK
-         9Lu5PftTZCh+C1x7a2e5eqajBQehykDULvXT4YwYX+1UIf5zNkOXczeWzs5HOGVWpKX6
-         5b3Q==
-X-Gm-Message-State: ACgBeo2tfgozlQ7uLW2CyJaKE9j49gP4suE8mOaMfudvgybF/RAFbjmT
-        YcMlJRY5HjPYIFhmHJfEI54GlA==
-X-Google-Smtp-Source: AA6agR5Yw8n5fdZV52VOokey3SXceQC19cYCEpGxL4uItmG9H6OsO7aqEAYaHLjY6Pl9CTsm2We7yQ==
-X-Received: by 2002:a17:90a:9f0a:b0:1fa:ae10:c468 with SMTP id n10-20020a17090a9f0a00b001faae10c468mr5539774pjp.155.1660866920831;
-        Thu, 18 Aug 2022 16:55:20 -0700 (PDT)
+        bh=pEgXnTJKFJrTL3CTka16XSJbg6kxwB4cnfOI/Ofjlz4=;
+        b=MFzkG+KmU3p8bX4I0eN2qo3tEhXgvM6+9SWMX5U/F9RbmOQvkJQ4vkytA06wc2P7zU
+         h79xI9xjLGxJTHCcnPjtYvserHnaWqRPakvBd7fucO3P9pOVYj76jCeJNKHrJs39WWVc
+         wrp7yy3y1tGan9NEb6J4Cnq+yG2ch4Mg33sfPd+ZIih2jMdXQP/jxV/Ra+BYzGAXFA9M
+         cuGPOo8tMe49xsSFcdWyfT7YwAX2X+BZ7rmU8Pmf9x0zMcaEE6A0TRkI5yTbWi1ZC49S
+         Fr5ba7MOdrSQUnVkvSfoNkNjMdqtUc/fPqUN5HtcxxYBnH3Z71EgaAdkRWM19h0mc0oF
+         3gZg==
+X-Gm-Message-State: ACgBeo3Fi/MuhbZMC0yDvHMcQOclsb+FgAGVqchtHO2x42RpBqBQGNrV
+        2noCm3vMmvTN8W5QZS36dBgZyw==
+X-Google-Smtp-Source: AA6agR7cPKIHabvzPHesQ7mysYM4f98Not26hLuTLYt6okFI7nMH1sNNM2K+QGI7RxRYoX8JypicJA==
+X-Received: by 2002:a17:902:7208:b0:172:a9d6:527 with SMTP id ba8-20020a170902720800b00172a9d60527mr4900702plb.32.1660868432853;
+        Thu, 18 Aug 2022 17:20:32 -0700 (PDT)
 Received: from google.com (7.104.168.34.bc.googleusercontent.com. [34.168.104.7])
-        by smtp.gmail.com with ESMTPSA id y4-20020a17090322c400b0016c0c82e85csm1934038plg.75.2022.08.18.16.55.20
+        by smtp.gmail.com with ESMTPSA id l4-20020a170903244400b0016bedcced2fsm1984501pls.35.2022.08.18.17.20.32
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 18 Aug 2022 16:55:20 -0700 (PDT)
-Date:   Thu, 18 Aug 2022 23:55:16 +0000
+        Thu, 18 Aug 2022 17:20:32 -0700 (PDT)
+Date:   Fri, 19 Aug 2022 00:20:28 +0000
 From:   Sean Christopherson <seanjc@google.com>
-To:     Li kunyu <kunyu@nfschina.com>
-Cc:     pbonzini@redhat.com, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-Subject: Re: [PATCH 3/5] kvm/kvm_main: The ops pointer variable does not need
- to be initialized and assigned, it is first allocated a memory address
-Message-ID: <Yv7RZCXtatEnvTPf@google.com>
-References: <20220812101523.8066-1-kunyu@nfschina.com>
- <20220812102455.8290-1-kunyu@nfschina.com>
+To:     "Kirill A . Shutemov" <kirill.shutemov@linux.intel.com>
+Cc:     Hugh Dickins <hughd@google.com>,
+        Chao Peng <chao.p.peng@linux.intel.com>, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org, linux-mm@kvack.org,
+        linux-fsdevel@vger.kernel.org, linux-api@vger.kernel.org,
+        linux-doc@vger.kernel.org, qemu-devel@nongnu.org,
+        linux-kselftest@vger.kernel.org,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Jonathan Corbet <corbet@lwn.net>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+        x86@kernel.org, "H . Peter Anvin" <hpa@zytor.com>,
+        Jeff Layton <jlayton@kernel.org>,
+        "J . Bruce Fields" <bfields@fieldses.org>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        Shuah Khan <shuah@kernel.org>, Mike Rapoport <rppt@kernel.org>,
+        Steven Price <steven.price@arm.com>,
+        "Maciej S . Szmigiero" <mail@maciej.szmigiero.name>,
+        Vlastimil Babka <vbabka@suse.cz>,
+        Vishal Annapurve <vannapurve@google.com>,
+        Yu Zhang <yu.c.zhang@linux.intel.com>, luto@kernel.org,
+        jun.nakajima@intel.com, dave.hansen@intel.com, ak@linux.intel.com,
+        david@redhat.com, aarcange@redhat.com, ddutile@redhat.com,
+        dhildenb@redhat.com, Quentin Perret <qperret@google.com>,
+        Michael Roth <michael.roth@amd.com>, mhocko@suse.com,
+        Muchun Song <songmuchun@bytedance.com>,
+        "Gupta, Pankaj" <pankaj.gupta@amd.com>
+Subject: Re: [PATCH v7 00/14] KVM: mm: fd-based approach for supporting KVM
+ guest private memory
+Message-ID: <Yv7XTON3MwuC1Q3U@google.com>
+References: <20220706082016.2603916-1-chao.p.peng@linux.intel.com>
+ <ff5c5b97-acdf-9745-ebe5-c6609dd6322e@google.com>
+ <20220818132421.6xmjqduempmxnnu2@box>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20220812102455.8290-1-kunyu@nfschina.com>
+In-Reply-To: <20220818132421.6xmjqduempmxnnu2@box>
 X-Spam-Status: No, score=-14.4 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
         ENV_AND_HDR_SPF_MATCH,FSL_HELO_FAKE,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,
@@ -72,15 +101,66 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Needs a proper shortlog.
+On Thu, Aug 18, 2022, Kirill A . Shutemov wrote:
+> On Wed, Aug 17, 2022 at 10:40:12PM -0700, Hugh Dickins wrote:
+> > On Wed, 6 Jul 2022, Chao Peng wrote:
+> > But since then, TDX in particular has forced an effort into preventing
+> > (by flags, seals, notifiers) almost everything that makes it shmem/tmpfs.
+> > 
+> > Are any of the shmem.c mods useful to existing users of shmem.c? No.
+> > Is MFD_INACCESSIBLE useful or comprehensible to memfd_create() users? No.
 
-On Fri, Aug 12, 2022, Li kunyu wrote:
-> The ops pointer variable does not need to be initialized, because it
-> first allocates a memory address before it is used.
+But QEMU and other VMMs are users of shmem and memfd.  The new features certainly
+aren't useful for _all_ existing users, but I don't think it's fair to say that
+they're not useful for _any_ existing users.
+
+> > What use do you have for a filesystem here?  Almost none.
+> > IIUC, what you want is an fd through which QEMU can allocate kernel
+> > memory, selectively free that memory, and communicate fd+offset+length
+> > to KVM.  And perhaps an interface to initialize a little of that memory
+> > from a template (presumably copied from a real file on disk somewhere).
+> > 
+> > You don't need shmem.c or a filesystem for that!
+> > 
+> > If your memory could be swapped, that would be enough of a good reason
+> > to make use of shmem.c: but it cannot be swapped; and although there
+> > are some references in the mailthreads to it perhaps being swappable
+> > in future, I get the impression that will not happen soon if ever.
+> > 
+> > If your memory could be migrated, that would be some reason to use
+> > filesystem page cache (because page migration happens to understand
+> > that type of memory): but it cannot be migrated.
 > 
-> Signed-off-by: Li kunyu <kunyu@nfschina.com>
-> ---
+> Migration support is in pipeline. It is part of TDX 1.5 [1]. 
 
-Again, with a fixed shortlog,
+And this isn't intended for just TDX (or SNP, or pKVM).  We're not _that_ far off
+from being able to use UPM for "regular" VMs as a way to provide defense-in-depth
+without having to take on the overhead of confidential VMs.  At that point,
+migration and probably even swap are on the table.
 
-Reviewed-by: Sean Christopherson <seanjc@google.com>
+> And swapping theoretically possible, but I'm not aware of any plans as of
+> now.
+
+Ya, I highly doubt confidential VMs will ever bother with swap.
+
+> > I'm afraid of the special demands you may make of memory allocation
+> > later on - surprised that huge pages are not mentioned already;
+> > gigantic contiguous extents? secretmem removed from direct map?
+> 
+> The design allows for extension to hugetlbfs if needed. Combination of
+> MFD_INACCESSIBLE | MFD_HUGETLB should route this way. There should be zero
+> implications for shmem. It is going to be separate struct memfile_backing_store.
+> 
+> I'm not sure secretmem is a fit here as we want to extend MFD_INACCESSIBLE
+> to be movable if platform supports it and secretmem is not migratable by
+> design (without direct mapping fragmentations).
+
+But secretmem _could_ be a fit.  If a use case wants to unmap guest private memory
+from both userspace and the kernel then KVM should absolutely be able to support
+that, but at the same time I don't want to have to update KVM to enable secretmem
+(and I definitely don't want KVM poking into the directmap itself).
+
+MFD_INACCESSIBLE should only say "this memory can't be mapped into userspace",
+any other properties should be completely separate, e.g. the inability to migrate
+pages is effective a restriction from KVM (acting on behalf of TDX/SNP), it's not
+a fundamental property of MFD_INACCESSIBLE.
