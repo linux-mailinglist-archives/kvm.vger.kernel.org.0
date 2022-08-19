@@ -2,150 +2,136 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id D01665995D4
-	for <lists+kvm@lfdr.de>; Fri, 19 Aug 2022 09:21:10 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 97280599638
+	for <lists+kvm@lfdr.de>; Fri, 19 Aug 2022 09:43:34 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1346737AbiHSHO3 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 19 Aug 2022 03:14:29 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46122 "EHLO
+        id S1347153AbiHSHm3 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 19 Aug 2022 03:42:29 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57592 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1344799AbiHSHO1 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 19 Aug 2022 03:14:27 -0400
-Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 114AC5A834;
-        Fri, 19 Aug 2022 00:14:26 -0700 (PDT)
-Received: from pps.filterd (m0098410.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.17.1.5/8.17.1.5) with ESMTP id 27J6vJDF019555;
-        Fri, 19 Aug 2022 07:14:07 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : subject :
- from : to : cc : date : in-reply-to : references : content-type :
- mime-version : content-transfer-encoding; s=pp1;
- bh=NDqSL7LiGCY8B2iIgXomfKnfWzDtxGdDzF5js3ZXHMA=;
- b=ltGcLmgV+N0fy9GpjjEFtHUDLtpwU/ngK2jU4/d8OxLx5IXw4XZR1Sfy+8BH4t3py04Z
- vEPTSJp5QPBfbRMbOjiRe65P4g9/KG27g0k32LZWM2SQHG2sY08Wbe1jkyABjA9GpSLK
- dnbzDCEZfW1r1bviRNMSzM2ExsYwQyi7DO17j/oh3VTijBySoC/EE4ltXg/24fPlUM1s
- M6i17cQ1glZYcoyXAEi4sBnXL7jiIfMWPFsOeQC2YT6BoP40RrD/aCY49xUOIUtCZvOI
- XU/Y/5w/y8lT/cOxd0gaVO85x5PC9ATrb4HeoNf9mevDDoSqZRjcc9Ovthy8j7fkZBYU 2w== 
-Received: from ppma06fra.de.ibm.com (48.49.7a9f.ip4.static.sl-reverse.com [159.122.73.72])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3j25q38j8a-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Fri, 19 Aug 2022 07:14:06 +0000
-Received: from pps.filterd (ppma06fra.de.ibm.com [127.0.0.1])
-        by ppma06fra.de.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 27J75cOn009081;
-        Fri, 19 Aug 2022 07:14:04 GMT
-Received: from b06cxnps3075.portsmouth.uk.ibm.com (d06relay10.portsmouth.uk.ibm.com [9.149.109.195])
-        by ppma06fra.de.ibm.com with ESMTP id 3hx37j56be-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Fri, 19 Aug 2022 07:14:04 +0000
-Received: from d06av23.portsmouth.uk.ibm.com (d06av23.portsmouth.uk.ibm.com [9.149.105.59])
-        by b06cxnps3075.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 27J7E1YK27001194
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Fri, 19 Aug 2022 07:14:01 GMT
-Received: from d06av23.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 42D89A4051;
-        Fri, 19 Aug 2022 07:14:01 +0000 (GMT)
-Received: from d06av23.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 94986A4040;
-        Fri, 19 Aug 2022 07:14:00 +0000 (GMT)
-Received: from sig-9-145-84-131.uk.ibm.com (unknown [9.145.84.131])
-        by d06av23.portsmouth.uk.ibm.com (Postfix) with ESMTP;
-        Fri, 19 Aug 2022 07:14:00 +0000 (GMT)
-Message-ID: <2ae0bf9abffe2eb3eb2fb3f84873720d39f73d4d.camel@linux.ibm.com>
-Subject: Re: [PATCH] KVM: s390: pci: Hook to access KVM lowlevel from VFIO
-From:   Niklas Schnelle <schnelle@linux.ibm.com>
-To:     Pierre Morel <pmorel@linux.ibm.com>, mjrosato@linux.ibm.com
-Cc:     rdunlap@infradead.org, linux-kernel@vger.kernel.org, lkp@intel.com,
-        borntraeger@linux.ibm.com, farman@linux.ibm.com,
-        linux-s390@vger.kernel.org, kvm@vger.kernel.org, gor@linux.ibm.com,
-        hca@linux.ibm.com, frankja@linux.ibm.com
-Date:   Fri, 19 Aug 2022 09:14:00 +0200
-In-Reply-To: <20220818164652.269336-1-pmorel@linux.ibm.com>
-References: <20220818164652.269336-1-pmorel@linux.ibm.com>
-Content-Type: text/plain; charset="UTF-8"
-X-Mailer: Evolution 3.28.5 (3.28.5-18.el8) 
-Mime-Version: 1.0
-Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: oKmNbx1-bCpE1do3mObam7uNZX17Mf3H
-X-Proofpoint-ORIG-GUID: oKmNbx1-bCpE1do3mObam7uNZX17Mf3H
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.205,Aquarius:18.0.895,Hydra:6.0.517,FMLib:17.11.122.1
- definitions=2022-08-19_03,2022-08-18_01,2022-06-22_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 malwarescore=0
- priorityscore=1501 bulkscore=0 mlxscore=0 spamscore=0 adultscore=0
- clxscore=1015 phishscore=0 impostorscore=0 lowpriorityscore=0
- suspectscore=0 mlxlogscore=999 classifier=spam adjust=0 reason=mlx
- scancount=1 engine=8.12.0-2207270000 definitions=main-2208190025
-X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_EF,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_PASS,
-        T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
+        with ESMTP id S1347105AbiHSHm2 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 19 Aug 2022 03:42:28 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5AF70CD500
+        for <kvm@vger.kernel.org>; Fri, 19 Aug 2022 00:42:27 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1660894946;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=7BU0NBgcPwvMpt86ttJZWI4g3XAVpmUhw+WmsruDrgM=;
+        b=M4+AsEIXJ3g8YdG28lrIZdwjPoBUzD+WWxRvModwUOc+8ut1Wx64iCNAww9SSb15hQzrbo
+        eWNfw/D0oo4uxzd70FzEEVOldjsFH58DRIQ/vnuhkUqIOffDmkY1ALJONLIBNfqR/BEBl3
+        HhxapyeUAV0jL5efOq3IgIJ7iOFeB1E=
+Received: from mail-ed1-f72.google.com (mail-ed1-f72.google.com
+ [209.85.208.72]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_128_GCM_SHA256) id
+ us-mta-626-1WwnBFI9Pv2fcNmc7qXXpQ-1; Fri, 19 Aug 2022 03:42:23 -0400
+X-MC-Unique: 1WwnBFI9Pv2fcNmc7qXXpQ-1
+Received: by mail-ed1-f72.google.com with SMTP id y14-20020a056402440e00b0044301c7ccd9so2378476eda.19
+        for <kvm@vger.kernel.org>; Fri, 19 Aug 2022 00:42:23 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=mime-version:message-id:date:references:in-reply-to:subject:cc:to
+         :from:x-gm-message-state:from:to:cc;
+        bh=7BU0NBgcPwvMpt86ttJZWI4g3XAVpmUhw+WmsruDrgM=;
+        b=gYUMZuaCWkxM/kIsgZkglYTZ7CSodBUWW+BmY68g6LmPmNNQ+sGK5QoQ3YrRTZoDC+
+         BYRAxW5U67SDBmbRAmcjCJSbcLMZqkshaYvFmDUw53GIbiUFlvS4BKls1K8Ij7RqOh3v
+         5/9QM73sFBoPlhS38AAZ36O1Jd8yPvTBwUw+kxAzB8LPziJLW695T0tFvePncLWevBgn
+         WcMq9e5hOpYPUil2VS1glE1NLaZFSe1ZjH5VVTH6cN+dzxMujLF40/mSOUcwCZ0c4y5f
+         trCsadO9uPNcnt/SGV725JK0hYIiAEuXIFwFLBjYjpeevPuXfP4yi0KzL4XqaUpLsWcR
+         j4EA==
+X-Gm-Message-State: ACgBeo1DBOEvA2HuptnlZGsRu3zOaNrxbpSsTBR4OWiwBPBguP8K6VEJ
+        g8EacsknV/nRXx5GRGO/DwsV+2Tq0IstuYOjPiIXDZdSpPAHPVaE+c3P8BHDSOR78qR+SaxVke9
+        BRguX1i4yZ6Av
+X-Received: by 2002:a05:6402:510a:b0:43d:ab25:7d68 with SMTP id m10-20020a056402510a00b0043dab257d68mr5038494edd.102.1660894942485;
+        Fri, 19 Aug 2022 00:42:22 -0700 (PDT)
+X-Google-Smtp-Source: AA6agR67XQIhNJjNTGL7G9Zsj1eHRrSxDAKaWyqDLtY6JVbFAVDwTNGYQgZ5YsaDFAM5m6i3SREV8A==
+X-Received: by 2002:a05:6402:510a:b0:43d:ab25:7d68 with SMTP id m10-20020a056402510a00b0043dab257d68mr5038482edd.102.1660894942290;
+        Fri, 19 Aug 2022 00:42:22 -0700 (PDT)
+Received: from fedora (nat-2.ign.cz. [91.219.240.2])
+        by smtp.gmail.com with ESMTPSA id w8-20020a50fa88000000b0043a7134b381sm2564438edr.11.2022.08.19.00.42.21
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 19 Aug 2022 00:42:21 -0700 (PDT)
+From:   Vitaly Kuznetsov <vkuznets@redhat.com>
+To:     Sean Christopherson <seanjc@google.com>
+Cc:     kvm@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>,
+        Anirudh Rayabharam <anrayabh@linux.microsoft.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Maxim Levitsky <mlevitsk@redhat.com>,
+        Nathan Chancellor <nathan@kernel.org>,
+        Michael Kelley <mikelley@microsoft.com>,
+        linux-hyperv@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v5 09/26] KVM: VMX: nVMX: Support TSC scaling and
+ PERF_GLOBAL_CTRL with enlightened VMCS
+In-Reply-To: <Yv50vWGoLQ9n+6MO@google.com>
+References: <20220802160756.339464-1-vkuznets@redhat.com>
+ <20220802160756.339464-10-vkuznets@redhat.com>
+ <Yv50vWGoLQ9n+6MO@google.com>
+Date:   Fri, 19 Aug 2022 09:42:20 +0200
+Message-ID: <87zgg0smqr.fsf@redhat.com>
+MIME-Version: 1.0
+Content-Type: text/plain
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=unavailable
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, 2022-08-18 at 18:46 +0200, Pierre Morel wrote:
-> We have a cross dependency between KVM and VFIO when using
-> s390 vfio_pci_zdev extensions for PCI passthrough
-> To be able to keep both subsystem modular we add a registering
-> hook inside the S390 core code.
-> 
-> This fixes a build problem when VFIO is built-in and KVM is built
-> as a module.
-> 
-> Reported-by: Randy Dunlap <rdunlap@infradead.org>
-> Reported-by: kernel test robot <lkp@intel.com>
-> Signed-off-by: Pierre Morel <pmorel@linux.ibm.com>
-> Fixes: 09340b2fca007 ("KVM: s390: pci: add routines to start/stop inter..")
+Sean Christopherson <seanjc@google.com> writes:
 
-Please don't shorten the Fixes tag, the subject line is likely also
-checked by some automated tools. It's okay for this line to be over the
-column limit and checkpatch.pl --strict also accepts it.
+> On Tue, Aug 02, 2022, Vitaly Kuznetsov wrote:
+>> diff --git a/arch/x86/kvm/vmx/evmcs.h b/arch/x86/kvm/vmx/evmcs.h
+>> index f886a8ff0342..4b809c79ae63 100644
+>> --- a/arch/x86/kvm/vmx/evmcs.h
+>> +++ b/arch/x86/kvm/vmx/evmcs.h
+>> @@ -37,16 +37,9 @@ DECLARE_STATIC_KEY_FALSE(enable_evmcs);
+>>   *	EPTP_LIST_ADDRESS               = 0x00002024,
+>>   *	VMREAD_BITMAP                   = 0x00002026,
+>>   *	VMWRITE_BITMAP                  = 0x00002028,
+>> - *
+>> - *	TSC_MULTIPLIER                  = 0x00002032,
+>>   *	PLE_GAP                         = 0x00004020,
+>>   *	PLE_WINDOW                      = 0x00004022,
+>>   *	VMX_PREEMPTION_TIMER_VALUE      = 0x0000482E,
+>> - *      GUEST_IA32_PERF_GLOBAL_CTRL     = 0x00002808,
+>> - *      HOST_IA32_PERF_GLOBAL_CTRL      = 0x00002c04,
+>> - *
+>> - * Currently unsupported in KVM:
+>> - *	GUEST_IA32_RTIT_CTL		= 0x00002814,
+>
+> Almost forgot: is deleting this chunk of the comment intentional?
+>
 
-> Cc: <stable@vger.kernel.org>
-> ---
->  arch/s390/include/asm/kvm_host.h | 17 ++++++-----------
->  arch/s390/kvm/pci.c              | 10 ++++++----
->  arch/s390/pci/Makefile           |  2 ++
->  arch/s390/pci/pci_kvm_hook.c     | 11 +++++++++++
->  drivers/vfio/pci/vfio_pci_zdev.c |  8 ++++++--
->  5 files changed, 31 insertions(+), 17 deletions(-)
->  create mode 100644 arch/s390/pci/pci_kvm_hook.c
-> 
-> 
----8<---
->  
->  	kvm_put_kvm(kvm);
->  }
-> -EXPORT_SYMBOL_GPL(kvm_s390_pci_unregister_kvm);
->  
->  void kvm_s390_pci_init_list(struct kvm *kvm)
->  {
-> @@ -678,6 +678,8 @@ int kvm_s390_pci_init(void)
->  
->  	spin_lock_init(&aift->gait_lock);
->  	mutex_init(&aift->aift_lock);
-> +	zpci_kvm_hook.kvm_register = kvm_s390_pci_register_kvm;
-> +	zpci_kvm_hook.kvm_unregister = kvm_s390_pci_unregister_kvm;
->  
->  	return 0;
->  }
-> diff --git a/arch/s390/pci/Makefile b/arch/s390/pci/Makefile
-> index bf557a1b789c..c02dbfb415d9 100644
-> --- a/arch/s390/pci/Makefile
-> +++ b/arch/s390/pci/Makefile
-> @@ -7,3 +7,5 @@ obj-$(CONFIG_PCI)	+= pci.o pci_irq.o pci_dma.o pci_clp.o pci_sysfs.o \
->  			   pci_event.o pci_debug.o pci_insn.o pci_mmio.o \
->  			   pci_bus.o
->  obj-$(CONFIG_PCI_IOV)	+= pci_iov.o
-> +
-> +obj-y += pci_kvm_hook.o
+Intentional or not (I forgot :-), GUEST_IA32_RTIT_CTL is supported/used
+by KVM since
 
-I thought we wanted to compile this only for CONFIG_PCI?
+commit f99e3daf94ff35dd4a878d32ff66e1fd35223ad6
+Author: Chao Peng <chao.p.peng@linux.intel.com>
+Date:   Wed Oct 24 16:05:10 2018 +0800
 
-> diff --git a/arch/s390/pci/pci_kvm_hook.c b/arch/s390/pci/pci_kvm_hook.c
-> new file mode 100644
-> index 000000000000..ff34baf50a3e
----8<---
+    KVM: x86: Add Intel PT virtualization work mode
+
+...
+ 
+commit bf8c55d8dc094c85a3f98cd302a4dddb720dd63f
+Author: Chao Peng <chao.p.peng@linux.intel.com>
+Date:   Wed Oct 24 16:05:14 2018 +0800
+
+    KVM: x86: Implement Intel PT MSRs read/write emulation
+
+but there's no corresponding field in eVMCS. It would probably be better
+to remove "Currently unsupported in KVM:" line leaving
+
+"GUEST_IA32_RTIT_CTL             = 0x00002814" 
+
+in place. 
+
+-- 
+Vitaly
 
