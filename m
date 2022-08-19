@@ -2,59 +2,59 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id DE7BE599ACD
-	for <lists+kvm@lfdr.de>; Fri, 19 Aug 2022 13:19:02 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id ACF37599A9D
+	for <lists+kvm@lfdr.de>; Fri, 19 Aug 2022 13:18:46 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1348719AbiHSLKS (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 19 Aug 2022 07:10:18 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33964 "EHLO
+        id S1348723AbiHSLKT (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 19 Aug 2022 07:10:19 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33974 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1348704AbiHSLKR (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 19 Aug 2022 07:10:17 -0400
-Received: from mail-pl1-x62a.google.com (mail-pl1-x62a.google.com [IPv6:2607:f8b0:4864:20::62a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0BAB7FBA6A
-        for <kvm@vger.kernel.org>; Fri, 19 Aug 2022 04:10:16 -0700 (PDT)
-Received: by mail-pl1-x62a.google.com with SMTP id w14so3845967plp.9
-        for <kvm@vger.kernel.org>; Fri, 19 Aug 2022 04:10:16 -0700 (PDT)
+        with ESMTP id S1348720AbiHSLKS (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 19 Aug 2022 07:10:18 -0400
+Received: from mail-pl1-x636.google.com (mail-pl1-x636.google.com [IPv6:2607:f8b0:4864:20::636])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A0F31FBA6A
+        for <kvm@vger.kernel.org>; Fri, 19 Aug 2022 04:10:17 -0700 (PDT)
+Received: by mail-pl1-x636.google.com with SMTP id y4so3868687plb.2
+        for <kvm@vger.kernel.org>; Fri, 19 Aug 2022 04:10:17 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc;
-        bh=z6evWdl7qRpX717ycIDK2BtR5ifsL2gP87zXn8UQIMk=;
-        b=J+XUAOeTv4KVFy0O5O6g70qCT4WkhMpYcqqI9RXS+Qe3vLZ5Qkp/eSH1z2s0TUNffl
-         nQt7sRy2ReCywvyxYR4qiWfg8f6006Hzk0pg+ix1J1Ez8WPRVWExGSqEU1kZWZTQvo+H
-         hHgA8OeyFUTAEpnkbcgAjEPhf+z0Iizn+nqxO+9rdFIc9efFoUMj9ceoX23MWoMhNe7Z
-         va13J59UEvLTrogYbyTS6nHvBHbfwgbP5KfF6O36cGIkgZrRoURFczaQUlXm/oJoKLGs
-         I/qAHYn1ys+w0U09MBltgBkEwL2WpKOQ4yOIihMiDa4W9GTN+XypwtGDo4zy9RnjMpyv
-         cDSA==
+        bh=SFchpJ/MrC0RrbbSYDRFOHMYqa5I2Slu1pvtjw0DGY4=;
+        b=O9D5eAOhM5vBEORGzKVH4FPfHKsUd3QWp+8qxYT3svu4l3ma6cmLR8Y0zgsulumBw/
+         NJqvtn/W9/Tl7TzGyuR46LnXTqiMSZXm8aKTZoS6J++YEI0kXf2uTZi04g0qaoJdoXkk
+         4NIBvFMvtyCsIhL2U1IONZpKO64PBGe0auC7If/O11q5gVfYprxvo0lXMTprREFLMLyx
+         C34lnbqogvvxPqY/vxOWCahHmyaYPYw5pfeCmGGjgZnhSN0S9EWwyJQ2441urJIDj77f
+         SHoAxfNgw83OzMQc1h+ix+Vin+b05zAxxCOuiB6u41PkVNWrufZ25jTD8H22n7wGil0B
+         MqXA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc;
-        bh=z6evWdl7qRpX717ycIDK2BtR5ifsL2gP87zXn8UQIMk=;
-        b=7yOUWBLPR6ViT4HE/7FKE3mgWFPrwOBDNk2+8DxJYQOOiWuVkfnUxVwqcdb2z3+Cg5
-         kFYLPgiV8D4IX4g23pnQx80n49Xmg+X/Jy+TXbbbios0xUGRcxdyy6ZmLx+P42G/AsUr
-         KyIuNMRNIMzGa5NLqKfWo2ClnpmUIv7RRNEtplRBedTF/MLF6E5gQEMoCFiE/kb/Mmtq
-         HhHItlIsEKZBoxejtz2rFKpTBPSZRdN+/stccLVeRsrVZkW+qbPRMHkdqC4JdUykiFA1
-         Nu10SSD0NXHVAaOrdHPZjkBgZhM+st8FofN8Vw+fcXV8d567yaQNSuQLKDDAacYpOrDz
-         BhLw==
-X-Gm-Message-State: ACgBeo2rePcpbAq3jG2kAG+r6mBGmXJ2Vyb67SdvFvbpOLhibNMRrH8a
-        /hrHeJTH2zsoN7NbcEHrHuQ=
-X-Google-Smtp-Source: AA6agR7wAnLOGEGU2fMgNFFSibTKkGzmPbCDFhT9yiYtoWt3IKi8sOULrUTNZwGEUQxmWKaOWJcl3A==
-X-Received: by 2002:a17:90b:3511:b0:1f4:e0cd:1e04 with SMTP id ls17-20020a17090b351100b001f4e0cd1e04mr13839797pjb.154.1660907415600;
-        Fri, 19 Aug 2022 04:10:15 -0700 (PDT)
+        bh=SFchpJ/MrC0RrbbSYDRFOHMYqa5I2Slu1pvtjw0DGY4=;
+        b=nxE9aLPXqosZ2/e3xx8ErnKdDyCOoBqwckx0dbA0ChAo2Yq1WZiK3/287BeMP+66NH
+         3G5NuVjA27NKzoduVnof5yUVGtfL0K2j2jPO9Tf74d4Uh2zTArbOWwjVdrA0magFHukJ
+         eA1ZwnCDgYB8hvUa59QGQ1NfIdRcoDFkjr0MmtvcFyHZlOYXM7Oy3DiUn+J7XUhjD9+d
+         wicQM26X30YxeY7tziDuBqiqYoMivZm2wf4S9T226tEtu4VOTHrig9Zjyk/wV/WjTJjv
+         t8ojuYq1+n/ZrnfPkh9tX8f895ASZ9c5JqubfaA+PTA6IAqkXDBTkTEZ2hW/CjqqGoe4
+         JiRw==
+X-Gm-Message-State: ACgBeo0uvQvFl6eWFIVadVP6MHUbLeFAy7OmPauxSPuJuCTh0E3EI85Y
+        WIu0UCl0Rr+UqRzb1A1L+tjIIBelxfMWYg==
+X-Google-Smtp-Source: AA6agR6e9qmYmlRIhl8UAUA3utDTRm7PpjdNTEBr5Yip+XsWhp2Y9R8aY/DvhLKdIk0iBFc4w/NbOg==
+X-Received: by 2002:a17:903:28f:b0:16e:e00e:31ba with SMTP id j15-20020a170903028f00b0016ee00e31bamr7116559plr.154.1660907417162;
+        Fri, 19 Aug 2022 04:10:17 -0700 (PDT)
 Received: from localhost.localdomain ([103.7.29.32])
-        by smtp.gmail.com with ESMTPSA id jd7-20020a170903260700b0016bfbd99f64sm2957778plb.118.2022.08.19.04.10.14
+        by smtp.gmail.com with ESMTPSA id jd7-20020a170903260700b0016bfbd99f64sm2957778plb.118.2022.08.19.04.10.15
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 19 Aug 2022 04:10:15 -0700 (PDT)
+        Fri, 19 Aug 2022 04:10:16 -0700 (PDT)
 From:   Like Xu <like.xu.linux@gmail.com>
 X-Google-Original-From: Like Xu <likexu@tencent.com>
 To:     Sean Christopherson <seanjc@google.com>,
         Paolo Bonzini <pbonzini@redhat.com>
 Cc:     kvm@vger.kernel.org
-Subject: [kvm-unit-tests PATCH v3 10/13] x86/pmu: Update testcases to cover Intel Arch PMU Version 1
-Date:   Fri, 19 Aug 2022 19:09:36 +0800
-Message-Id: <20220819110939.78013-11-likexu@tencent.com>
+Subject: [kvm-unit-tests PATCH v3 11/13] x86/pmu: Refine message when testing PMU on AMD platforms
+Date:   Fri, 19 Aug 2022 19:09:37 +0800
+Message-Id: <20220819110939.78013-12-likexu@tencent.com>
 X-Mailer: git-send-email 2.37.2
 In-Reply-To: <20220819110939.78013-1-likexu@tencent.com>
 References: <20220819110939.78013-1-likexu@tencent.com>
@@ -72,163 +72,56 @@ X-Mailing-List: kvm@vger.kernel.org
 
 From: Like Xu <likexu@tencent.com>
 
-For most unit tests, the basic framework and use cases which test
-any PMU counter do not require any changes, except for two things:
-
-- No access to registers introduced only in PMU version 2 and above;
-- Expanded tolerance for testing counter overflows
-  due to the loss of uniform control of the gloabl_ctrl register
-
-Adding some pmu_version() return value checks can seamlessly support
-Intel Arch PMU Version 1, while opening the door for AMD PMUs tests.
+Add an Intel PMU detection step with a vendor prefix,
+and report SKIP naturally on unsupported AMD platforms.
 
 Signed-off-by: Like Xu <likexu@tencent.com>
 ---
- x86/pmu.c | 64 +++++++++++++++++++++++++++++++++++++------------------
- 1 file changed, 43 insertions(+), 21 deletions(-)
+ x86/pmu.c | 25 ++++++++++++++++++++++---
+ 1 file changed, 22 insertions(+), 3 deletions(-)
 
 diff --git a/x86/pmu.c b/x86/pmu.c
-index 25fafbe..826472c 100644
+index 826472c..b22f255 100644
 --- a/x86/pmu.c
 +++ b/x86/pmu.c
-@@ -125,14 +125,19 @@ static struct pmu_event* get_counter_event(pmu_counter_t *cnt)
+@@ -667,16 +667,35 @@ static void set_ref_cycle_expectations(void)
+ 	gp_events[2].max = (gp_events[2].max * cnt.count) / tsc_delta;
+ }
  
- static void global_enable(pmu_counter_t *cnt)
++static bool detect_intel_pmu(void)
++{
++	if (!pmu_version()) {
++		report_skip("No Intel Arch PMU is detected!");
++		return false;
++	}
++
++	report_prefix_push("Intel");
++	return true;
++}
++
++static bool pmu_is_detected(void)
++{
++	if (!is_intel()) {
++		report_skip("AMD PMU is not supported.");
++		return false;
++	}
++
++	return detect_intel_pmu();
++}
++
+ int main(int ac, char **av)
  {
--	cnt->idx = event_to_global_idx(cnt);
-+	if (pmu_version() < 2)
-+		return;
- 
-+	cnt->idx = event_to_global_idx(cnt);
- 	wrmsr(MSR_CORE_PERF_GLOBAL_CTRL, rdmsr(MSR_CORE_PERF_GLOBAL_CTRL) |
- 			(1ull << cnt->idx));
- }
- 
- static void global_disable(pmu_counter_t *cnt)
- {
-+	if (pmu_version() < 2)
-+		return;
-+
- 	wrmsr(MSR_CORE_PERF_GLOBAL_CTRL, rdmsr(MSR_CORE_PERF_GLOBAL_CTRL) &
- 			~(1ull << cnt->idx));
- }
-@@ -301,7 +306,10 @@ static void check_counter_overflow(void)
- 	count = cnt.count;
- 
- 	/* clear status before test */
--	wrmsr(MSR_CORE_PERF_GLOBAL_OVF_CTRL, rdmsr(MSR_CORE_PERF_GLOBAL_STATUS));
-+	if (pmu_version() > 1) {
-+		wrmsr(MSR_CORE_PERF_GLOBAL_OVF_CTRL,
-+		      rdmsr(MSR_CORE_PERF_GLOBAL_STATUS));
-+	}
- 
- 	report_prefix_push("overflow");
- 
-@@ -327,13 +335,21 @@ static void check_counter_overflow(void)
- 			cnt.config &= ~EVNTSEL_INT;
- 		idx = event_to_global_idx(&cnt);
- 		__measure(&cnt, cnt.count);
--		report(cnt.count == 1, "cntr-%d", i);
-+
-+		report(check_irq() == (i % 2), "irq-%d", i);
-+		if (pmu_version() > 1)
-+			report(cnt.count == 1, "cntr-%d", i);
-+		else
-+			report(cnt.count < 4, "cntr-%d", i);
-+
-+		if (pmu_version() < 2)
-+			continue;
-+
- 		status = rdmsr(MSR_CORE_PERF_GLOBAL_STATUS);
- 		report(status & (1ull << idx), "status-%d", i);
- 		wrmsr(MSR_CORE_PERF_GLOBAL_OVF_CTRL, status);
- 		status = rdmsr(MSR_CORE_PERF_GLOBAL_STATUS);
- 		report(!(status & (1ull << idx)), "status clear-%d", i);
--		report(check_irq() == (i % 2), "irq-%d", i);
- 	}
- 
- 	report_prefix_pop();
-@@ -440,8 +456,10 @@ static void check_running_counter_wrmsr(void)
- 	report(evt.count < gp_events[1].min, "cntr");
- 
- 	/* clear status before overflow test */
--	wrmsr(MSR_CORE_PERF_GLOBAL_OVF_CTRL,
--	      rdmsr(MSR_CORE_PERF_GLOBAL_STATUS));
-+	if (pmu_version() > 1) {
-+		wrmsr(MSR_CORE_PERF_GLOBAL_OVF_CTRL,
-+			rdmsr(MSR_CORE_PERF_GLOBAL_STATUS));
-+	}
- 
- 	start_event(&evt);
- 
-@@ -453,8 +471,11 @@ static void check_running_counter_wrmsr(void)
- 
- 	loop();
- 	stop_event(&evt);
--	status = rdmsr(MSR_CORE_PERF_GLOBAL_STATUS);
--	report(status & 1, "status");
-+
-+	if (pmu_version() > 1) {
-+		status = rdmsr(MSR_CORE_PERF_GLOBAL_STATUS);
-+		report(status & 1, "status");
-+	}
- 
- 	report_prefix_pop();
- }
-@@ -474,8 +495,10 @@ static void check_emulated_instr(void)
- 	};
- 	report_prefix_push("emulated instruction");
- 
--	wrmsr(MSR_CORE_PERF_GLOBAL_OVF_CTRL,
--	      rdmsr(MSR_CORE_PERF_GLOBAL_STATUS));
-+	if (pmu_version() > 1) {
-+		wrmsr(MSR_CORE_PERF_GLOBAL_OVF_CTRL,
-+			rdmsr(MSR_CORE_PERF_GLOBAL_STATUS));
-+	}
- 
- 	start_event(&brnch_cnt);
- 	start_event(&instr_cnt);
-@@ -509,7 +532,8 @@ static void check_emulated_instr(void)
- 		:
- 		: "eax", "ebx", "ecx", "edx");
- 
--	wrmsr(MSR_CORE_PERF_GLOBAL_CTRL, 0);
-+	if (pmu_version() > 1)
-+		wrmsr(MSR_CORE_PERF_GLOBAL_CTRL, 0);
- 
- 	stop_event(&brnch_cnt);
- 	stop_event(&instr_cnt);
-@@ -520,10 +544,13 @@ static void check_emulated_instr(void)
- 	       "instruction count");
- 	report(brnch_cnt.count - brnch_start >= EXPECTED_BRNCH,
- 	       "branch count");
--	// Additionally check that those counters overflowed properly.
--	status = rdmsr(MSR_CORE_PERF_GLOBAL_STATUS);
--	report(status & 1, "instruction counter overflow");
--	report(status & 2, "branch counter overflow");
-+
-+	if (pmu_version() > 1) {
-+		// Additionally check that those counters overflowed properly.
-+		status = rdmsr(MSR_CORE_PERF_GLOBAL_STATUS);
-+		report(status & 1, "instruction counter overflow");
-+		report(status & 2, "branch counter overflow");
-+	}
- 
- 	report_prefix_pop();
- }
-@@ -647,12 +674,7 @@ int main(int ac, char **av)
+ 	setup_vm();
+ 	handle_irq(PC_VECTOR, cnt_overflow);
  	buf = malloc(N*64);
  
- 	if (!pmu_version()) {
--		report_skip("No pmu is detected!");
--		return report_summary();
--	}
--
--	if (pmu_version() == 1) {
--		report_skip("PMU version 1 is not supported.");
-+		report_skip("No Intel Arch PMU is detected!");
+-	if (!pmu_version()) {
+-		report_skip("No Intel Arch PMU is detected!");
++	if (!pmu_is_detected())
  		return report_summary();
- 	}
+-	}
+ 
+ 	set_ref_cycle_expectations();
  
 -- 
 2.37.2
