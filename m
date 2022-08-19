@@ -2,433 +2,150 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id A638E599541
-	for <lists+kvm@lfdr.de>; Fri, 19 Aug 2022 08:22:53 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id D01665995D4
+	for <lists+kvm@lfdr.de>; Fri, 19 Aug 2022 09:21:10 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1344159AbiHSGSa (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 19 Aug 2022 02:18:30 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33090 "EHLO
+        id S1346737AbiHSHO3 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 19 Aug 2022 03:14:29 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46122 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S239390AbiHSGS2 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 19 Aug 2022 02:18:28 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A2ED525E81
-        for <kvm@vger.kernel.org>; Thu, 18 Aug 2022 23:18:21 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1660889900;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=0pgjEoL4Ix1j6h8R5TCk6lNImyXtXHknncSlwzEHJZs=;
-        b=DZnw+l9tGliASZ5vXMURLxVHsB+71XCDxw8jaquFISbwAOyoW0M7h3MlipxZz8Fj3wUSRR
-        0/LZ0xttllyZs0nrB5AtaayEOZ9ByI6hX1Cn9mJtGyiew6KRJk5DgkwAJ8rMdJlGngdHOC
-        Xi1Fezsmp6llZzE8/2/ePb2AKrtAGEA=
-Received: from mail-lj1-f197.google.com (mail-lj1-f197.google.com
- [209.85.208.197]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_128_GCM_SHA256) id
- us-mta-1-sxMLMIqsNdS-Sm9d-zN7sQ-1; Fri, 19 Aug 2022 02:18:19 -0400
-X-MC-Unique: sxMLMIqsNdS-Sm9d-zN7sQ-1
-Received: by mail-lj1-f197.google.com with SMTP id q5-20020a2e84c5000000b0025ec9ff93c8so748020ljh.15
-        for <kvm@vger.kernel.org>; Thu, 18 Aug 2022 23:18:18 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc;
-        bh=0pgjEoL4Ix1j6h8R5TCk6lNImyXtXHknncSlwzEHJZs=;
-        b=Vq82TSnOHhlLyEM/UH8FBVs9Hgc818a7ozdnGV1dV8n7M2p1d4l329EVpzDdDYbGT4
-         g2EMy9OGBL945DRVPPxWBd/mWP64LjFC1GaBktHtc300pbdpAJvc8rTkSmXoOayQXygF
-         n7Ns8trN3PILASlvMWPlK75F34j2JTx+PaG23CvlQdFustViUT1w0ZSnuhBLmWw894pU
-         3er/wcLRLqcgZbLdVf+6faN4DATDHBtD8ZDAIc/Nw9+0qps0uz3rZgsmcavb55rHfMjj
-         1hPEbtjMTujqc6kul02Up6Xxrz62xHt2zbiCfRjl6sQLKey6muF7QN5BIsgPddQXjSY3
-         0UhQ==
-X-Gm-Message-State: ACgBeo3xSt+Kib20RsvIZQHT+Wm3eer/OP+rhJj6PZhq/j5U2YzpiJlI
-        83zOgmSMa4oBm7R05t9h8ZTvn0cxom7hsaRgyq2GAO/y47WQ8eJwn3dG8PQ+I3g5FxjKHs5RGf5
-        NKSJvjAMWQ530fkNe10ucsGbuKBp7
-X-Received: by 2002:a05:6512:3da1:b0:48f:cad0:195a with SMTP id k33-20020a0565123da100b0048fcad0195amr2024358lfv.397.1660889897713;
-        Thu, 18 Aug 2022 23:18:17 -0700 (PDT)
-X-Google-Smtp-Source: AA6agR6Y44dktn926PPqLldGFhb4gwG4PfmSj09PfUV9/GGzyXux8X1NnRcoBSuj7gVWNR33cLUBRJ2KzNfQ6ie0quI=
-X-Received: by 2002:a05:6512:3da1:b0:48f:cad0:195a with SMTP id
- k33-20020a0565123da100b0048fcad0195amr2024346lfv.397.1660889897376; Thu, 18
- Aug 2022 23:18:17 -0700 (PDT)
-MIME-Version: 1.0
-References: <20220805163909.872646-1-eperezma@redhat.com> <20220805163909.872646-7-eperezma@redhat.com>
- <CACGkMEtOr7JOsOTHiwcrk8FoRWhwHTzBWX30iaKCuHz26UOzNQ@mail.gmail.com> <CAJaqyWfY9py+K3KOww+2BcVJcyqC+GAt271hgVz5PzHsDP34BQ@mail.gmail.com>
-In-Reply-To: <CAJaqyWfY9py+K3KOww+2BcVJcyqC+GAt271hgVz5PzHsDP34BQ@mail.gmail.com>
-From:   Jason Wang <jasowang@redhat.com>
-Date:   Fri, 19 Aug 2022 14:18:06 +0800
-Message-ID: <CACGkMEuJ_dwsh26N-EuriyC42Uy_Fu_Bifnh6=Fwz_vLDf_X6w@mail.gmail.com>
-Subject: Re: [PATCH v4 6/6] vdpa: Always start CVQ in SVQ mode
-To:     Eugenio Perez Martin <eperezma@redhat.com>
-Cc:     qemu-devel <qemu-devel@nongnu.org>,
-        Stefan Hajnoczi <stefanha@redhat.com>,
-        Eli Cohen <eli@mellanox.com>,
-        Zhu Lingshan <lingshan.zhu@intel.com>,
-        "Michael S. Tsirkin" <mst@redhat.com>,
-        Gautam Dawar <gdawar@xilinx.com>,
-        Stefano Garzarella <sgarzare@redhat.com>,
-        Parav Pandit <parav@mellanox.com>, Cindy Lu <lulu@redhat.com>,
-        "Gonglei (Arei)" <arei.gonglei@huawei.com>,
-        Cornelia Huck <cohuck@redhat.com>, kvm <kvm@vger.kernel.org>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Liuxiangdong <liuxiangdong5@huawei.com>,
-        Laurent Vivier <lvivier@redhat.com>,
-        Harpreet Singh Anand <hanand@xilinx.com>
+        with ESMTP id S1344799AbiHSHO1 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 19 Aug 2022 03:14:27 -0400
+Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 114AC5A834;
+        Fri, 19 Aug 2022 00:14:26 -0700 (PDT)
+Received: from pps.filterd (m0098410.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.17.1.5/8.17.1.5) with ESMTP id 27J6vJDF019555;
+        Fri, 19 Aug 2022 07:14:07 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : subject :
+ from : to : cc : date : in-reply-to : references : content-type :
+ mime-version : content-transfer-encoding; s=pp1;
+ bh=NDqSL7LiGCY8B2iIgXomfKnfWzDtxGdDzF5js3ZXHMA=;
+ b=ltGcLmgV+N0fy9GpjjEFtHUDLtpwU/ngK2jU4/d8OxLx5IXw4XZR1Sfy+8BH4t3py04Z
+ vEPTSJp5QPBfbRMbOjiRe65P4g9/KG27g0k32LZWM2SQHG2sY08Wbe1jkyABjA9GpSLK
+ dnbzDCEZfW1r1bviRNMSzM2ExsYwQyi7DO17j/oh3VTijBySoC/EE4ltXg/24fPlUM1s
+ M6i17cQ1glZYcoyXAEi4sBnXL7jiIfMWPFsOeQC2YT6BoP40RrD/aCY49xUOIUtCZvOI
+ XU/Y/5w/y8lT/cOxd0gaVO85x5PC9ATrb4HeoNf9mevDDoSqZRjcc9Ovthy8j7fkZBYU 2w== 
+Received: from ppma06fra.de.ibm.com (48.49.7a9f.ip4.static.sl-reverse.com [159.122.73.72])
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3j25q38j8a-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Fri, 19 Aug 2022 07:14:06 +0000
+Received: from pps.filterd (ppma06fra.de.ibm.com [127.0.0.1])
+        by ppma06fra.de.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 27J75cOn009081;
+        Fri, 19 Aug 2022 07:14:04 GMT
+Received: from b06cxnps3075.portsmouth.uk.ibm.com (d06relay10.portsmouth.uk.ibm.com [9.149.109.195])
+        by ppma06fra.de.ibm.com with ESMTP id 3hx37j56be-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Fri, 19 Aug 2022 07:14:04 +0000
+Received: from d06av23.portsmouth.uk.ibm.com (d06av23.portsmouth.uk.ibm.com [9.149.105.59])
+        by b06cxnps3075.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 27J7E1YK27001194
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Fri, 19 Aug 2022 07:14:01 GMT
+Received: from d06av23.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 42D89A4051;
+        Fri, 19 Aug 2022 07:14:01 +0000 (GMT)
+Received: from d06av23.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 94986A4040;
+        Fri, 19 Aug 2022 07:14:00 +0000 (GMT)
+Received: from sig-9-145-84-131.uk.ibm.com (unknown [9.145.84.131])
+        by d06av23.portsmouth.uk.ibm.com (Postfix) with ESMTP;
+        Fri, 19 Aug 2022 07:14:00 +0000 (GMT)
+Message-ID: <2ae0bf9abffe2eb3eb2fb3f84873720d39f73d4d.camel@linux.ibm.com>
+Subject: Re: [PATCH] KVM: s390: pci: Hook to access KVM lowlevel from VFIO
+From:   Niklas Schnelle <schnelle@linux.ibm.com>
+To:     Pierre Morel <pmorel@linux.ibm.com>, mjrosato@linux.ibm.com
+Cc:     rdunlap@infradead.org, linux-kernel@vger.kernel.org, lkp@intel.com,
+        borntraeger@linux.ibm.com, farman@linux.ibm.com,
+        linux-s390@vger.kernel.org, kvm@vger.kernel.org, gor@linux.ibm.com,
+        hca@linux.ibm.com, frankja@linux.ibm.com
+Date:   Fri, 19 Aug 2022 09:14:00 +0200
+In-Reply-To: <20220818164652.269336-1-pmorel@linux.ibm.com>
+References: <20220818164652.269336-1-pmorel@linux.ibm.com>
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Spam-Status: No, score=-2.8 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,
-        SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham
-        autolearn_force=no version=3.4.6
+X-Mailer: Evolution 3.28.5 (3.28.5-18.el8) 
+Mime-Version: 1.0
+Content-Transfer-Encoding: 7bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: oKmNbx1-bCpE1do3mObam7uNZX17Mf3H
+X-Proofpoint-ORIG-GUID: oKmNbx1-bCpE1do3mObam7uNZX17Mf3H
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.205,Aquarius:18.0.895,Hydra:6.0.517,FMLib:17.11.122.1
+ definitions=2022-08-19_03,2022-08-18_01,2022-06-22_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 malwarescore=0
+ priorityscore=1501 bulkscore=0 mlxscore=0 spamscore=0 adultscore=0
+ clxscore=1015 phishscore=0 impostorscore=0 lowpriorityscore=0
+ suspectscore=0 mlxlogscore=999 classifier=spam adjust=0 reason=mlx
+ scancount=1 engine=8.12.0-2207270000 definitions=main-2208190025
+X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_EF,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_PASS,
+        T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Aug 9, 2022 at 3:54 PM Eugenio Perez Martin <eperezma@redhat.com> w=
-rote:
->
-> On Tue, Aug 9, 2022 at 9:36 AM Jason Wang <jasowang@redhat.com> wrote:
-> >
-> > On Sat, Aug 6, 2022 at 12:39 AM Eugenio P=C3=A9rez <eperezma@redhat.com=
-> wrote:
-> > >
-> > > Isolate control virtqueue in its own group, allowing to intercept con=
-trol
-> > > commands but letting dataplane run totally passthrough to the guest.
-> > >
-> > > Signed-off-by: Eugenio P=C3=A9rez <eperezma@redhat.com>
-> > > ---
-> > > v4:
-> > > * Squash vhost_vdpa_cvq_group_is_independent.
-> > > * Rebased on last CVQ start series, that allocated CVQ cmd bufs at lo=
-ad
-> > > * Do not check for cvq index on vhost_vdpa_net_prepare, we only have =
-one
-> > >   that callback registered in that NetClientInfo.
-> > >
-> > > v3:
-> > > * Make asid related queries print a warning instead of returning an
-> > >   error and stop the start of qemu.
-> > > ---
-> > >  hw/virtio/vhost-vdpa.c |   3 +-
-> > >  net/vhost-vdpa.c       | 124 +++++++++++++++++++++++++++++++++++++++=
---
-> > >  2 files changed, 122 insertions(+), 5 deletions(-)
-> > >
-> > > diff --git a/hw/virtio/vhost-vdpa.c b/hw/virtio/vhost-vdpa.c
-> > > index 3eb67b27b7..69f34f4cc5 100644
-> > > --- a/hw/virtio/vhost-vdpa.c
-> > > +++ b/hw/virtio/vhost-vdpa.c
-> > > @@ -678,7 +678,8 @@ static int vhost_vdpa_set_backend_cap(struct vhos=
-t_dev *dev)
-> > >  {
-> > >      uint64_t features;
-> > >      uint64_t f =3D 0x1ULL << VHOST_BACKEND_F_IOTLB_MSG_V2 |
-> > > -        0x1ULL << VHOST_BACKEND_F_IOTLB_BATCH;
-> > > +        0x1ULL << VHOST_BACKEND_F_IOTLB_BATCH |
-> > > +        0x1ULL << VHOST_BACKEND_F_IOTLB_ASID;
-> > >      int r;
-> > >
-> > >      if (vhost_vdpa_call(dev, VHOST_GET_BACKEND_FEATURES, &features))=
- {
-> > > diff --git a/net/vhost-vdpa.c b/net/vhost-vdpa.c
-> > > index bf78b1332f..c820a5fd9f 100644
-> > > --- a/net/vhost-vdpa.c
-> > > +++ b/net/vhost-vdpa.c
-> > > @@ -37,6 +37,9 @@ typedef struct VhostVDPAState {
-> > >      /* Control commands shadow buffers */
-> > >      void *cvq_cmd_out_buffer, *cvq_cmd_in_buffer;
-> > >
-> > > +    /* Number of address spaces supported by the device */
-> > > +    unsigned address_space_num;
-> > > +
-> > >      /* The device always have SVQ enabled */
-> > >      bool always_svq;
-> > >      bool started;
-> > > @@ -100,6 +103,9 @@ static const uint64_t vdpa_svq_device_features =
-=3D
-> > >      BIT_ULL(VIRTIO_NET_F_RSC_EXT) |
-> > >      BIT_ULL(VIRTIO_NET_F_STANDBY);
-> > >
-> > > +#define VHOST_VDPA_NET_CVQ_PASSTHROUGH 0
-> >
-> > We need a better name for the macro since it's not easy to see it's an =
-asid.
-> >
->
-> VHOST_VDPA_NET_DATA_ASID?
+On Thu, 2022-08-18 at 18:46 +0200, Pierre Morel wrote:
+> We have a cross dependency between KVM and VFIO when using
+> s390 vfio_pci_zdev extensions for PCI passthrough
+> To be able to keep both subsystem modular we add a registering
+> hook inside the S390 core code.
+> 
+> This fixes a build problem when VFIO is built-in and KVM is built
+> as a module.
+> 
+> Reported-by: Randy Dunlap <rdunlap@infradead.org>
+> Reported-by: kernel test robot <lkp@intel.com>
+> Signed-off-by: Pierre Morel <pmorel@linux.ibm.com>
+> Fixes: 09340b2fca007 ("KVM: s390: pci: add routines to start/stop inter..")
 
-Looks fine.
+Please don't shorten the Fixes tag, the subject line is likely also
+checked by some automated tools. It's okay for this line to be over the
+column limit and checkpatch.pl --strict also accepts it.
 
->
-> > > +#define VHOST_VDPA_NET_CVQ_ASID 1
-> > > +
-> > >  VHostNetState *vhost_vdpa_get_vhost_net(NetClientState *nc)
-> > >  {
-> > >      VhostVDPAState *s =3D DO_UPCAST(VhostVDPAState, nc, nc);
-> > > @@ -224,6 +230,37 @@ static NetClientInfo net_vhost_vdpa_info =3D {
-> > >          .check_peer_type =3D vhost_vdpa_check_peer_type,
-> > >  };
-> > >
-> > > +static void vhost_vdpa_get_vring_group(int device_fd,
-> > > +                                       struct vhost_vring_state *sta=
-te)
-> > > +{
-> > > +    int r =3D ioctl(device_fd, VHOST_VDPA_GET_VRING_GROUP, state);
-> >
-> > Let's hide vhost_vring_state from the caller and simply accept a vq
-> > index parameter (as the below function did) then we can return the
-> > group id.
-> >
-> > The hides low level ABI and simplify the caller's code.
-> >
->
-> We need to return an error.
->
-> The example is a little bit pathological, but if we get that CVQ is on
-> vq group !=3D 0, and all data vqs returns an error reading the vq group,
-> I think we shouldn't assume they belong to the asid 0. Some of them
-> could be on the same vq group as cvq, making all of this fail.
->
-> Can we assume the vq group is an uint32_t? Would it work to return an
-> int64_t with the possibility of errors?
+> Cc: <stable@vger.kernel.org>
+> ---
+>  arch/s390/include/asm/kvm_host.h | 17 ++++++-----------
+>  arch/s390/kvm/pci.c              | 10 ++++++----
+>  arch/s390/pci/Makefile           |  2 ++
+>  arch/s390/pci/pci_kvm_hook.c     | 11 +++++++++++
+>  drivers/vfio/pci/vfio_pci_zdev.c |  8 ++++++--
+>  5 files changed, 31 insertions(+), 17 deletions(-)
+>  create mode 100644 arch/s390/pci/pci_kvm_hook.c
+> 
+> 
+---8<---
+>  
+>  	kvm_put_kvm(kvm);
+>  }
+> -EXPORT_SYMBOL_GPL(kvm_s390_pci_unregister_kvm);
+>  
+>  void kvm_s390_pci_init_list(struct kvm *kvm)
+>  {
+> @@ -678,6 +678,8 @@ int kvm_s390_pci_init(void)
+>  
+>  	spin_lock_init(&aift->gait_lock);
+>  	mutex_init(&aift->aift_lock);
+> +	zpci_kvm_hook.kvm_register = kvm_s390_pci_register_kvm;
+> +	zpci_kvm_hook.kvm_unregister = kvm_s390_pci_unregister_kvm;
+>  
+>  	return 0;
+>  }
+> diff --git a/arch/s390/pci/Makefile b/arch/s390/pci/Makefile
+> index bf557a1b789c..c02dbfb415d9 100644
+> --- a/arch/s390/pci/Makefile
+> +++ b/arch/s390/pci/Makefile
+> @@ -7,3 +7,5 @@ obj-$(CONFIG_PCI)	+= pci.o pci_irq.o pci_dma.o pci_clp.o pci_sysfs.o \
+>  			   pci_event.o pci_debug.o pci_insn.o pci_mmio.o \
+>  			   pci_bus.o
+>  obj-$(CONFIG_PCI_IOV)	+= pci_iov.o
+> +
+> +obj-y += pci_kvm_hook.o
 
-Yes, or I think a simple int should be fine, I can't image we will
-make use of the full 32 bit in near future.
+I thought we wanted to compile this only for CONFIG_PCI?
 
->
-> > > +    if (unlikely(r < 0)) {
-> > > +        /*
-> > > +         * Assume all groups are 0, the consequences are the same an=
-d we will
-> > > +         * not abort device creation
-> > > +         */
-> > > +        state->num =3D 0;
-> > > +    }
-> > > +}
-> > > +
-> > > +static int vhost_vdpa_set_address_space_id(struct vhost_vdpa *v,
-> > > +                                           unsigned vq_group,
-> > > +                                           unsigned asid_num)
-> > > +{
-> > > +    struct vhost_vring_state asid =3D {
-> > > +        .index =3D vq_group,
-> > > +        .num =3D asid_num,
-> > > +    };
-> > > +    int ret;
-> > > +
-> > > +    ret =3D ioctl(v->device_fd, VHOST_VDPA_SET_GROUP_ASID, &asid);
-> > > +    if (unlikely(ret < 0)) {
-> > > +        warn_report("Can't set vq group %u asid %u, errno=3D%d (%s)"=
-,
-> > > +            asid.index, asid.num, errno, g_strerror(errno));
-> > > +    }
-> > > +    return ret;
-> > > +}
-> > > +
-> > >  static void vhost_vdpa_cvq_unmap_buf(struct vhost_vdpa *v, void *add=
-r)
-> > >  {
-> > >      VhostIOVATree *tree =3D v->iova_tree;
-> > > @@ -298,11 +335,55 @@ dma_map_err:
-> > >  static int vhost_vdpa_net_cvq_prepare(NetClientState *nc)
-> > >  {
-> > >      VhostVDPAState *s;
-> > > +    struct vhost_vdpa *v;
-> > > +    struct vhost_vring_state cvq_group =3D {};
-> > >      int r;
-> > >
-> > >      assert(nc->info->type =3D=3D NET_CLIENT_DRIVER_VHOST_VDPA);
-> > >
-> > >      s =3D DO_UPCAST(VhostVDPAState, nc, nc);
-> > > +    v =3D &s->vhost_vdpa;
-> > > +    cvq_group.index =3D v->dev->vq_index_end - 1;
-> > > +
-> > > +    /* Default values */
-> >
-> > Code can explain itself so this comment is probably useless.
-> >
->
-> I'll delete.
->
-> > > +    v->shadow_vqs_enabled =3D false;
-> > > +    s->vhost_vdpa.address_space_id =3D VHOST_VDPA_NET_CVQ_PASSTHROUG=
-H;
-> > > +
-> > > +    if (s->always_svq) {
-> > > +        v->shadow_vqs_enabled =3D true;
-> >
-> > The name of the variable is suboptimal.
-> >
-> > I think we need to differ:
-> >
-> > 1) shadow all virtqueues
-> >
-> > from
-> >
-> > 2) shadow cvq only
-> >
->
-> Note that shadow_vqs_enabled is per vhost_vdpa, so
-> v->shadow_vqs_enabled means that vqs of *v* are shadowed.
->
-> Data vhost_vdpa can have a different value than CVQ vhost_vdpa.
->
-> Having said that, I'm ok with changing the name of the variable, but I
-> cannot come with a better one.
-
-Ok, let's leave it as is.
-
-Thanks
-
->
-> Thanks!
->
-> > Thanks
-> >
-> > > +        goto out;
-> > > +    }
-> > > +
-> > > +    if (s->address_space_num < 2) {
-> > > +        return 0;
-> > > +    }
-> > > +
-> > > +    /**
-> > > +     * Check if all the virtqueues of the virtio device are in a dif=
-ferent vq
-> > > +     * than the last vq. VQ group of last group passed in cvq_group.
-> > > +     */
-> > > +    vhost_vdpa_get_vring_group(v->device_fd, &cvq_group);
-> > > +    for (int i =3D 0; i < (v->dev->vq_index_end - 1); ++i) {
-> > > +        struct vhost_vring_state vq_group =3D {
-> > > +            .index =3D i,
-> > > +        };
-> > > +
-> > > +        vhost_vdpa_get_vring_group(v->device_fd, &vq_group);
-> > > +        if (unlikely(vq_group.num =3D=3D cvq_group.num)) {
-> > > +            warn_report("CVQ %u group is the same as VQ %u one (%u)"=
-,
-> > > +                         cvq_group.index, vq_group.index, cvq_group.=
-num);
-> > > +            return 0;
-> > > +        }
-> > > +    }
-> > > +
-> > > +    r =3D vhost_vdpa_set_address_space_id(v, cvq_group.num,
-> > > +                                        VHOST_VDPA_NET_CVQ_ASID);
-> > > +    if (r =3D=3D 0) {
-> > > +        v->shadow_vqs_enabled =3D true;
-> > > +        s->vhost_vdpa.address_space_id =3D VHOST_VDPA_NET_CVQ_ASID;
-> > > +    }
-> > > +
-> > > +out:
-> > >      if (!s->vhost_vdpa.shadow_vqs_enabled) {
-> > >          return 0;
-> > >      }
-> > > @@ -523,12 +604,38 @@ static const VhostShadowVirtqueueOps vhost_vdpa=
-_net_svq_ops =3D {
-> > >      .avail_handler =3D vhost_vdpa_net_handle_ctrl_avail,
-> > >  };
-> > >
-> > > +static uint32_t vhost_vdpa_get_as_num(int vdpa_device_fd)
-> > > +{
-> > > +    uint64_t features;
-> > > +    unsigned num_as;
-> > > +    int r;
-> > > +
-> > > +    r =3D ioctl(vdpa_device_fd, VHOST_GET_BACKEND_FEATURES, &feature=
-s);
-> > > +    if (unlikely(r < 0)) {
-> > > +        warn_report("Cannot get backend features");
-> > > +        return 1;
-> > > +    }
-> > > +
-> > > +    if (!(features & BIT_ULL(VHOST_BACKEND_F_IOTLB_ASID))) {
-> > > +        return 1;
-> > > +    }
-> > > +
-> > > +    r =3D ioctl(vdpa_device_fd, VHOST_VDPA_GET_AS_NUM, &num_as);
-> > > +    if (unlikely(r < 0)) {
-> > > +        warn_report("Cannot retrieve number of supported ASs");
-> > > +        return 1;
-> > > +    }
-> > > +
-> > > +    return num_as;
-> > > +}
-> > > +
-> > >  static NetClientState *net_vhost_vdpa_init(NetClientState *peer,
-> > >                                             const char *device,
-> > >                                             const char *name,
-> > >                                             int vdpa_device_fd,
-> > >                                             int queue_pair_index,
-> > >                                             int nvqs,
-> > > +                                           unsigned nas,
-> > >                                             bool is_datapath,
-> > >                                             bool svq,
-> > >                                             VhostIOVATree *iova_tree)
-> > > @@ -547,6 +654,7 @@ static NetClientState *net_vhost_vdpa_init(NetCli=
-entState *peer,
-> > >      snprintf(nc->info_str, sizeof(nc->info_str), TYPE_VHOST_VDPA);
-> > >      s =3D DO_UPCAST(VhostVDPAState, nc, nc);
-> > >
-> > > +    s->address_space_num =3D nas;
-> > >      s->vhost_vdpa.device_fd =3D vdpa_device_fd;
-> > >      s->vhost_vdpa.index =3D queue_pair_index;
-> > >      s->always_svq =3D svq;
-> > > @@ -632,6 +740,8 @@ int net_init_vhost_vdpa(const Netdev *netdev, con=
-st char *name,
-> > >      g_autoptr(VhostIOVATree) iova_tree =3D NULL;
-> > >      NetClientState *nc;
-> > >      int queue_pairs, r, i =3D 0, has_cvq =3D 0;
-> > > +    unsigned num_as =3D 1;
-> > > +    bool svq_cvq;
-> > >
-> > >      assert(netdev->type =3D=3D NET_CLIENT_DRIVER_VHOST_VDPA);
-> > >      opts =3D &netdev->u.vhost_vdpa;
-> > > @@ -656,7 +766,13 @@ int net_init_vhost_vdpa(const Netdev *netdev, co=
-nst char *name,
-> > >          goto err;
-> > >      }
-> > >
-> > > -    if (opts->x_svq) {
-> > > +    svq_cvq =3D opts->x_svq;
-> > > +    if (has_cvq && !opts->x_svq) {
-> > > +        num_as =3D vhost_vdpa_get_as_num(vdpa_device_fd);
-> > > +        svq_cvq =3D num_as > 1;
-> > > +    }
-> > > +
-> > > +    if (opts->x_svq || svq_cvq) {
-> > >          struct vhost_vdpa_iova_range iova_range;
-> > >
-> > >          uint64_t invalid_dev_features =3D
-> > > @@ -679,15 +795,15 @@ int net_init_vhost_vdpa(const Netdev *netdev, c=
-onst char *name,
-> > >
-> > >      for (i =3D 0; i < queue_pairs; i++) {
-> > >          ncs[i] =3D net_vhost_vdpa_init(peer, TYPE_VHOST_VDPA, name,
-> > > -                                     vdpa_device_fd, i, 2, true, opt=
-s->x_svq,
-> > > -                                     iova_tree);
-> > > +                                     vdpa_device_fd, i, 2, num_as, t=
-rue,
-> > > +                                     opts->x_svq, iova_tree);
-> > >          if (!ncs[i])
-> > >              goto err;
-> > >      }
-> > >
-> > >      if (has_cvq) {
-> > >          nc =3D net_vhost_vdpa_init(peer, TYPE_VHOST_VDPA, name,
-> > > -                                 vdpa_device_fd, i, 1, false,
-> > > +                                 vdpa_device_fd, i, 1, num_as, false=
-,
-> > >                                   opts->x_svq, iova_tree);
-> > >          if (!nc)
-> > >              goto err;
-> > > --
-> > > 2.31.1
-> > >
-> >
->
+> diff --git a/arch/s390/pci/pci_kvm_hook.c b/arch/s390/pci/pci_kvm_hook.c
+> new file mode 100644
+> index 000000000000..ff34baf50a3e
+---8<---
 
