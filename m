@@ -2,56 +2,56 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 45CB459A40A
-	for <lists+kvm@lfdr.de>; Fri, 19 Aug 2022 20:05:00 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 6F59B59A405
+	for <lists+kvm@lfdr.de>; Fri, 19 Aug 2022 20:04:58 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1350290AbiHSSBH (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 19 Aug 2022 14:01:07 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54954 "EHLO
+        id S1349901AbiHSSBC (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 19 Aug 2022 14:01:02 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54956 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1351296AbiHSSAf (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 19 Aug 2022 14:00:35 -0400
-Received: from mail-pj1-x104a.google.com (mail-pj1-x104a.google.com [IPv6:2607:f8b0:4864:20::104a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A606C4DB7B
-        for <kvm@vger.kernel.org>; Fri, 19 Aug 2022 10:47:41 -0700 (PDT)
-Received: by mail-pj1-x104a.google.com with SMTP id m11-20020a17090a3f8b00b001fabfce6a26so2900853pjc.4
-        for <kvm@vger.kernel.org>; Fri, 19 Aug 2022 10:47:41 -0700 (PDT)
+        with ESMTP id S1351320AbiHSSAh (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 19 Aug 2022 14:00:37 -0400
+Received: from mail-yw1-x114a.google.com (mail-yw1-x114a.google.com [IPv6:2607:f8b0:4864:20::114a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B8186107AC5
+        for <kvm@vger.kernel.org>; Fri, 19 Aug 2022 10:47:44 -0700 (PDT)
+Received: by mail-yw1-x114a.google.com with SMTP id 00721157ae682-32a115757b6so88380197b3.13
+        for <kvm@vger.kernel.org>; Fri, 19 Aug 2022 10:47:44 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
         h=cc:to:from:subject:references:mime-version:message-id:in-reply-to
          :date:from:to:cc;
-        bh=LIUZkMGvJXcpbhNGmft6GGfIK9I8bm9L0jfGUffk13c=;
-        b=pmlvaUHfcF+wVO68CerVhstzSi3CVnWjbp+gMTXQu0l84Wt+2u2oUzVK3BmNftGaGy
-         GGpXVCc6+D3MKSACJA2PQVYerbIIezKmekA9B2YvDRShnOKiEElGzMG8v4DxoQHOhABK
-         HweEyOo4EvgA7V8ak8DJaDLAmWol6w+mYSfN9HRk14EFe+YFuE2loXeJNPVTk3yWPrTD
-         8VHpJBLpndjnsDMVDERfw4XqucQJOyYPEZEzW9F2ZLWcosWIIeOzuSuxCfKLDMLvjgSJ
-         IkmOy93ixKWhH8IJU9b7w73iIomz6HzL7w3V64W2f94zV3bIIKWKYIk2A4mUT6KakL6o
-         OEeQ==
+        bh=AuVkheI7zf2HhufotQWCVsTEadgVfoRpum2lNpLuQgY=;
+        b=oNfW/4Vm265qJrd7LBgFAyipxhEsSAOYU5rMBq91J3s0LGLmwRyUvf2zobD+iocvGC
+         rLmPshSjGeT0g6SHJPTjY6bzeGEZukNgPVySpZWZJpfpTLjOOoofeCbjE4wVpCbw1U+j
+         EkJBaRsfFlCUdZpPerVytTQfdhnWQStfFmO7kpeu5jLDpn+JPjv76skvPhlgvQTXfqqd
+         qmtSwwVYkomcvTIcevsLzUBDxHN2ZwIXaSb2HUrgFgcnRKsdubuMqFRTXkGKJ5xBFxue
+         InSW5McVJClaekJz+JJaVASvtdAFTT6dsAldrB/2HLKN31lg84RCExNfAgiGJESuAmTK
+         9iaQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=cc:to:from:subject:references:mime-version:message-id:in-reply-to
          :date:x-gm-message-state:from:to:cc;
-        bh=LIUZkMGvJXcpbhNGmft6GGfIK9I8bm9L0jfGUffk13c=;
-        b=KVs/ccZwDNfSo4jKr7HaWLy+kimeSGAK6eWEHzBnrSFPleGNIltIg9nKFRxeRHxJjg
-         xoZShbhZHXFI+ZmH3jqs9ILfKhh0DKzK92ydqEA96o/11zUj/s8fAIw0RKnAaf+F7r3b
-         B76bnarFYdlUHm1o2kfaKbwaaEOfbA6Vl6RDcacF1viU9aCttJzqhNVijB1oTAxL5rQR
-         3oeJUQoItqQ/yHiHtPXKW/5UPT6LfTeIRiJsZew1MXTLwuuZVFfFi5u6ykImdIeSJj4Q
-         +i3JNjxKWPjHVp2zBhj+7tFZo3X0wQnE/4JQ7Kx5T9al2lEE35QXwbnphLlFH7uqWRIW
-         TeLA==
-X-Gm-Message-State: ACgBeo3imACMhVLXOk2GwsprejFuIUqslG2tfeUNL2sd9VdSDUo1NtWY
-        HzD/wJsDlMEerzdBfdmx0KYvtx9VTlAF1Ir8
-X-Google-Smtp-Source: AA6agR7+aPOAfBVTAgSiy0DQ+nj1se+5Ibd8vZgJ3AwtFXKOvN/xwr/424n5dK411hPKuJHKjJRV/84SpeDaBz07
+        bh=AuVkheI7zf2HhufotQWCVsTEadgVfoRpum2lNpLuQgY=;
+        b=kDTHcCPqVY5nXyfrjJBEynGOYZkGDODRCKa5rRH2VUnj378N7yUEqzfL0aZK9JTF4S
+         pnNNzlSlLKSTRQgtQS37z1wnTipwLUoxyEiW46Rwz4JnoQNIPkQBzX/WxonVDeScae/M
+         aTATxzHxbD62TKapDgW+EiMkxDgTSEyTq7C9lAMW5DUn7/hMVqlviImjPlAGU878+pOG
+         ClbSmYS+m5GQ1R6BXg0e2gh06TSRTEamqb2184J34N2yXeGQ0OqEh4eNsi3HtpCvZf1U
+         fRleQP+Ub/g5bEEZ1Z6zSQoGHh5hgnf4YD+fk+p4bMxyBHJ7jFB9ESIyzQsJo5hPViE6
+         dFdA==
+X-Gm-Message-State: ACgBeo0Ham+hFnHckylxZ1twhD4OEeFnaarbk5h9dgS2tvxAt8Gg5R7a
+        ylrnVhNyQ8O80W0URKKz93t1a51jApzuTtvK
+X-Google-Smtp-Source: AA6agR4gbDQtGeQ1LZYbf3EfqgoCjGcFHk/HfWY3dMdFk8KnVzrhbHImvTXkhqgRq8jomz/vDv6134KXUwVifgsT
 X-Received: from vannapurve2.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:41f8])
- (user=vannapurve job=sendgmr) by 2002:a17:902:ab41:b0:171:54ae:624c with SMTP
- id ij1-20020a170902ab4100b0017154ae624cmr8313760plb.157.1660931261144; Fri,
- 19 Aug 2022 10:47:41 -0700 (PDT)
-Date:   Fri, 19 Aug 2022 17:46:55 +0000
+ (user=vannapurve job=sendgmr) by 2002:a0d:ee01:0:b0:324:d943:19dc with SMTP
+ id x1-20020a0dee01000000b00324d94319dcmr8282915ywe.325.1660931263972; Fri, 19
+ Aug 2022 10:47:43 -0700 (PDT)
+Date:   Fri, 19 Aug 2022 17:46:56 +0000
 In-Reply-To: <20220819174659.2427983-1-vannapurve@google.com>
-Message-Id: <20220819174659.2427983-3-vannapurve@google.com>
+Message-Id: <20220819174659.2427983-4-vannapurve@google.com>
 Mime-Version: 1.0
 References: <20220819174659.2427983-1-vannapurve@google.com>
 X-Mailer: git-send-email 2.37.1.595.g718a3a8f04-goog
-Subject: [RFC V3 PATCH 2/6] selftests: kvm: Add support for private memory
+Subject: [RFC V3 PATCH 3/6] selftests: kvm: ucall: Allow querying ucall pool gpa
 From:   Vishal Annapurve <vannapurve@google.com>
 To:     x86@kernel.org, kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
         linux-kselftest@vger.kernel.org
@@ -84,141 +84,66 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Add support for registering private memory with kvm using
-KVM_SET_USER_MEMORY_REGION ioctl.
-
-Helper function to query extended userspace mem region is introduced to
-allow memory conversion.
+Add a helper to query guest physical address for ucall pool
+so that guest can mark the page as accessed shared or private.
 
 Signed-off-by: Vishal Annapurve <vannapurve@google.com>
 ---
- .../selftests/kvm/include/kvm_util_base.h     | 12 +++++-
- tools/testing/selftests/kvm/lib/kvm_util.c    | 40 ++++++++++++++++++-
- 2 files changed, 49 insertions(+), 3 deletions(-)
+ tools/testing/selftests/kvm/include/ucall_common.h |  2 ++
+ tools/testing/selftests/kvm/lib/ucall_common.c     | 12 ++++++++++++
+ 2 files changed, 14 insertions(+)
 
-diff --git a/tools/testing/selftests/kvm/include/kvm_util_base.h b/tools/testing/selftests/kvm/include/kvm_util_base.h
-index ff2533a32af9..dfe454f228e7 100644
---- a/tools/testing/selftests/kvm/include/kvm_util_base.h
-+++ b/tools/testing/selftests/kvm/include/kvm_util_base.h
-@@ -30,7 +30,10 @@ typedef uint64_t vm_paddr_t; /* Virtual Machine (Guest) physical address */
- typedef uint64_t vm_vaddr_t; /* Virtual Machine (Guest) virtual address */
+diff --git a/tools/testing/selftests/kvm/include/ucall_common.h b/tools/testing/selftests/kvm/include/ucall_common.h
+index 279bbab011c7..2c6e5c4df012 100644
+--- a/tools/testing/selftests/kvm/include/ucall_common.h
++++ b/tools/testing/selftests/kvm/include/ucall_common.h
+@@ -31,6 +31,8 @@ void ucall_arch_uninit(struct kvm_vm *vm);
+ void ucall_arch_do_ucall(vm_vaddr_t uc);
+ void *ucall_arch_get_ucall(struct kvm_vcpu *vcpu);
  
- struct userspace_mem_region {
--	struct kvm_userspace_memory_region region;
-+	union {
-+		struct kvm_userspace_memory_region region;
-+		struct kvm_userspace_memory_region_ext region_ext;
-+	};
- 	struct sparsebit *unused_phy_pages;
- 	struct sparsebit *encrypted_phy_pages;
- 	int fd;
-@@ -200,7 +203,7 @@ static inline bool kvm_has_cap(long cap)
- 
- #define kvm_do_ioctl(fd, cmd, arg)						\
- ({										\
--	static_assert(!_IOC_SIZE(cmd) || sizeof(*arg) == _IOC_SIZE(cmd), "");	\
-+	static_assert(!_IOC_SIZE(cmd) || sizeof(*arg) >= _IOC_SIZE(cmd), "");	\
- 	ioctl(fd, cmd, arg);							\
- })
- 
-@@ -388,6 +391,7 @@ void vm_userspace_mem_region_add(struct kvm_vm *vm,
- void vm_mem_region_set_flags(struct kvm_vm *vm, uint32_t slot, uint32_t flags);
- void vm_mem_region_move(struct kvm_vm *vm, uint32_t slot, uint64_t new_gpa);
- void vm_mem_region_delete(struct kvm_vm *vm, uint32_t slot);
++vm_paddr_t get_ucall_pool_paddr(void);
 +
- struct kvm_vcpu *__vm_vcpu_add(struct kvm_vm *vm, uint32_t vcpu_id);
- vm_vaddr_t vm_vaddr_alloc(struct kvm_vm *vm, size_t sz, vm_vaddr_t vaddr_min);
- vm_vaddr_t vm_vaddr_alloc_shared(struct kvm_vm *vm, size_t sz, vm_vaddr_t vaddr_min);
-@@ -717,6 +721,10 @@ struct kvm_userspace_memory_region *
- kvm_userspace_memory_region_find(struct kvm_vm *vm, uint64_t start,
- 				 uint64_t end);
+ void ucall(uint64_t cmd, int nargs, ...);
+ uint64_t get_ucall(struct kvm_vcpu *vcpu, struct ucall *uc);
  
-+struct kvm_userspace_memory_region_ext *
-+kvm_userspace_memory_region_ext_find(struct kvm_vm *vm, uint64_t start,
-+				 uint64_t end);
-+
- #define sync_global_to_guest(vm, g) ({				\
- 	typeof(g) *_p = addr_gva2hva(vm, (vm_vaddr_t)&(g));	\
- 	memcpy(_p, &(g), sizeof(g));				\
-diff --git a/tools/testing/selftests/kvm/lib/kvm_util.c b/tools/testing/selftests/kvm/lib/kvm_util.c
-index 171bc20a097a..f153c71d6988 100644
---- a/tools/testing/selftests/kvm/lib/kvm_util.c
-+++ b/tools/testing/selftests/kvm/lib/kvm_util.c
-@@ -17,6 +17,7 @@
- #include <unistd.h>
- #include <linux/kernel.h>
+diff --git a/tools/testing/selftests/kvm/lib/ucall_common.c b/tools/testing/selftests/kvm/lib/ucall_common.c
+index 5a15fa39cd51..4d2abef8ee77 100644
+--- a/tools/testing/selftests/kvm/lib/ucall_common.c
++++ b/tools/testing/selftests/kvm/lib/ucall_common.c
+@@ -11,6 +11,7 @@ struct ucall_header {
  
-+#define MFD_INACCESSIBLE  0x0008U
- #define KVM_UTIL_MIN_PFN	2
+ static bool use_ucall_pool;
+ static struct ucall_header *ucall_pool;
++static vm_paddr_t ucall_page_paddr;
  
- static int vcpu_mmap_sz(void);
-@@ -466,6 +467,35 @@ kvm_userspace_memory_region_find(struct kvm_vm *vm, uint64_t start,
- 	return &region->region;
- }
- 
-+/*
-+ * KVM Userspace Memory Region Ext Find
-+ *
-+ * Input Args:
-+ *   vm - Virtual Machine
-+ *   start - Starting VM physical address
-+ *   end - Ending VM physical address, inclusive.
-+ *
-+ * Output Args: None
-+ *
-+ * Return:
-+ *   Pointer to overlapping ext region, NULL if no such region.
-+ *
-+ * Public interface to userspace_mem_region_find. Allows tests to look up
-+ * the memslot datastructure for a given range of guest physical memory.
-+ */
-+struct kvm_userspace_memory_region_ext *
-+kvm_userspace_memory_region_ext_find(struct kvm_vm *vm, uint64_t start,
-+				 uint64_t end)
-+{
-+	struct userspace_mem_region *region;
-+
-+	region = userspace_mem_region_find(vm, start, end);
-+	if (!region)
-+		return NULL;
-+
-+	return &region->region_ext;
-+}
-+
- /*
-  * VM VCPU Remove
-  *
-@@ -764,6 +794,7 @@ void vm_userspace_mem_region_add(struct kvm_vm *vm,
- 	struct userspace_mem_region *region;
- 	size_t backing_src_pagesz = get_backing_src_pagesz(src_type);
- 	size_t alignment;
-+	int priv_memfd = -1;
- 
- 	TEST_ASSERT(vm_adjust_num_guest_pages(vm->mode, npages) == npages,
- 		"Number of guest pages is not compatible with the host. "
-@@ -869,6 +900,11 @@ void vm_userspace_mem_region_add(struct kvm_vm *vm,
- 			    vm_mem_backing_src_alias(src_type)->name);
+ void ucall_init(struct kvm_vm *vm, void *arg)
+ {
+@@ -35,7 +36,10 @@ void ucall_init(struct kvm_vm *vm, void *arg)
  	}
  
-+	if (flags & KVM_MEM_PRIVATE) {
-+		priv_memfd = memfd_create("vm_private_mem_", MFD_INACCESSIBLE);
-+		TEST_ASSERT(priv_memfd != -1, "Failed to create private memfd");
-+	}
+ 	ucall_pool = (struct ucall_header *)vaddr;
++	ucall_page_paddr = addr_gva2gpa(vm, vaddr);
+ 	sync_global_to_guest(vm, ucall_pool);
++	sync_global_to_guest(vm, ucall_page_paddr);
++	printf("ucall_page_paddr 0x%lx\n", ucall_page_paddr);
+ 
+ out:
+ 	ucall_arch_init(vm, arg);
+@@ -54,6 +58,14 @@ void ucall_uninit(struct kvm_vm *vm)
+ 	ucall_arch_uninit(vm);
+ }
+ 
++vm_paddr_t get_ucall_pool_paddr(void)
++{
++	if (!use_ucall_pool)
++		return 0;
 +
- 	region->unused_phy_pages = sparsebit_alloc();
- 	region->encrypted_phy_pages = sparsebit_alloc();
- 	sparsebit_set_num(region->unused_phy_pages,
-@@ -878,7 +914,9 @@ void vm_userspace_mem_region_add(struct kvm_vm *vm,
- 	region->region.guest_phys_addr = guest_paddr;
- 	region->region.memory_size = npages * vm->page_size;
- 	region->region.userspace_addr = (uintptr_t) region->host_mem;
--	ret = __vm_ioctl(vm, KVM_SET_USER_MEMORY_REGION, &region->region);
-+	region->region_ext.private_fd = priv_memfd;
-+	region->region_ext.private_offset = 0;
-+	ret = ioctl(vm->fd, KVM_SET_USER_MEMORY_REGION, &region->region_ext);
- 	TEST_ASSERT(ret == 0, "KVM_SET_USER_MEMORY_REGION IOCTL failed,\n"
- 		"  rc: %i errno: %i\n"
- 		"  slot: %u flags: 0x%x\n"
++	return ucall_page_paddr;
++}
++
+ static struct ucall *ucall_alloc(void)
+ {
+ 	struct ucall *uc = NULL;
 -- 
 2.37.1.595.g718a3a8f04-goog
 
