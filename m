@@ -2,96 +2,67 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id E050C59A8F3
-	for <lists+kvm@lfdr.de>; Sat, 20 Aug 2022 00:59:28 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 8895759A907
+	for <lists+kvm@lfdr.de>; Sat, 20 Aug 2022 01:06:39 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S243234AbiHSWxL (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 19 Aug 2022 18:53:11 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38582 "EHLO
+        id S241522AbiHSW7e (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 19 Aug 2022 18:59:34 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50156 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S243173AbiHSWxJ (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 19 Aug 2022 18:53:09 -0400
-Received: from mail-pl1-x62b.google.com (mail-pl1-x62b.google.com [IPv6:2607:f8b0:4864:20::62b])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 97F5810E788
-        for <kvm@vger.kernel.org>; Fri, 19 Aug 2022 15:53:07 -0700 (PDT)
-Received: by mail-pl1-x62b.google.com with SMTP id y4so5268591plb.2
-        for <kvm@vger.kernel.org>; Fri, 19 Aug 2022 15:53:07 -0700 (PDT)
+        with ESMTP id S230316AbiHSW7c (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 19 Aug 2022 18:59:32 -0400
+Received: from mail-pj1-x1033.google.com (mail-pj1-x1033.google.com [IPv6:2607:f8b0:4864:20::1033])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 18B3713CC7
+        for <kvm@vger.kernel.org>; Fri, 19 Aug 2022 15:59:32 -0700 (PDT)
+Received: by mail-pj1-x1033.google.com with SMTP id r15-20020a17090a1bcf00b001fabf42a11cso6141417pjr.3
+        for <kvm@vger.kernel.org>; Fri, 19 Aug 2022 15:59:32 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:from:to:cc;
-        bh=bxsKzsoodl9uJzFJZZrQwWPMoj9Im81AmgcsZB9Gfmw=;
-        b=qt/sbuA4OKmJaHmOuxnwa2lGGy6KF/9YxtJ8CEBc62ECZi8/Xq0wY0tron+FkYYdUs
-         X9/M4egtRP0lG6q4e8/IWltnCwwAIXqgqPcmV59AnmXMmxflSpitxJaAXuVmi8jeOb7u
-         ZYWkCe4cfUOnwv+GJ6FAghcaXtVFWtU/VjFn+HZAKAe7LVuzmplI1YXQYgelBcp8xph3
-         XxuS2HQx3IoH2+jqfCiCLhnkIeS5J/e3C/uJb7oa4kLmq1AEXHLKDQEqspeDUi54j69u
-         rkCsWutnedC/95sn0+Cf9uinQ+8ih+35v91Myr1oidh4MK/5DNYfVzYMeF+QXp50vSUG
-         yQZw==
+        bh=QKWjYXFerma2OlVk5dsGDZjSEP28S8+hN7GuH8FnvhQ=;
+        b=d1jJCRYGOv1yf1Eu0czHJiIo2g8CpEQ/7DQVIywWMD0fpQ2pZPznVBPILhtzVdNfol
+         jlEz8U3FaF4njxzFl6Km4vxqwIkGEUrS5hBbzljafkSVB1zSBgsmnwnHb/n7x8MDsr7F
+         9dUqKa3X9kUKFM5J57HAD78RD0Ae3uhnbGQLwQ69UglWEGDzigxtE9MXZi+aA9KUWHIH
+         YlotjzQoF89T4F7BYt2ND5zdlWmRf7+qUsEaruTn2GvvspnCOZNM9nbgMcpm+2fn8uB6
+         o48x13Q/fEZoA5NbT58rmShHkQbjcyRft2D/RgqwHd3drOlBO2Oom3DT8qiw4fzMZNVu
+         7Y2w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:x-gm-message-state:from:to:cc;
-        bh=bxsKzsoodl9uJzFJZZrQwWPMoj9Im81AmgcsZB9Gfmw=;
-        b=NfmDaGiAQ3HnBCv3R8cvpzlw4NaSTptrqCJQN7ZVzaw3o/0AN1hGXXf2FsJoPGAq43
-         feU3uvoX+/rQM8PwBASGj99mKxpBZ+TAp1J8Iy9bKr8/+Q6fpLiuRVC1K8hmI7f05AQe
-         lx3QiauPtih/8aFoReACscnH3KEpc2Nfvu8427Uwf7lTbe0gGFOz1ByGo8VK5BA4GvTx
-         v7EXnzYI4Rgvm4aPWYqqoSJGxmGx7VFGF0t066pcbo9CaOcr9GRg/Vs6cEUQXxjr46OR
-         p8R71poIl1VPSFEXfFvJ4MKxD9Pera1CStQDmVPHzMYTbSiF5pZGdhJSoENVVh2x47mp
-         WGEw==
-X-Gm-Message-State: ACgBeo1V+OM6HppLGoxERhIXBBcLW7zGy/YYIX0b5I0kTEv4LdSGKLSe
-        fgSIxZVsyCfELAGJLZ9R70IO1A==
-X-Google-Smtp-Source: AA6agR5KPMZr3qT4HevDmGgIVF/eFJY3pV4hPcGRLPDFcNa+kb45vL5UZGGsRX6sXCEs8crjgoKfEw==
-X-Received: by 2002:a17:90b:1b4a:b0:1f5:5578:6398 with SMTP id nv10-20020a17090b1b4a00b001f555786398mr10621956pjb.122.1660949586764;
-        Fri, 19 Aug 2022 15:53:06 -0700 (PDT)
+        bh=QKWjYXFerma2OlVk5dsGDZjSEP28S8+hN7GuH8FnvhQ=;
+        b=rT7TBTrqdYVueKhOD6GXHLQ+iq2vNLXxAaR2xhznUwXEhZEWpEqw5pJkr9+rtwtNSB
+         Np7YLx5xmArih0+2zW64pMdC1YD6WLfm+P9/is0cGIRdRClmkNWVt3DmcfwXTs4kPihL
+         jPCg/OUh56rdU8JdbNZ9HJZnNYvmU1EB0pcbqOP9VgylmJj8gqdOfht8IAMwEbYKtdkP
+         9n6YOgry31+yT1LLbaokgwYAlsTO816x/4H1KDcef8D1ip4MyhEHaQnBYuPafO6/RMuB
+         P7wMi9g3C4norB2hJvoIX0J5g0bitS5nXIXFCcHIu5QHGVwRWc3uhf6VzYr17M7QwGkd
+         AAUw==
+X-Gm-Message-State: ACgBeo0Q4pefjbTMAPiBunKA/wi/JCpNCEN/w1N2uqwu24wjp/dhVGK2
+        l67Wko/Fj9RinNLSjD5eDP9VZA==
+X-Google-Smtp-Source: AA6agR5imnWtDnH5pfSCBTLZjvuN+2i90LICw8y9XU8+0RpdU9Pjk8egWeQerk2OPCbALnVOtY7qfw==
+X-Received: by 2002:a17:903:2452:b0:172:cf0a:d137 with SMTP id l18-20020a170903245200b00172cf0ad137mr1119670pls.95.1660949971336;
+        Fri, 19 Aug 2022 15:59:31 -0700 (PDT)
 Received: from google.com (7.104.168.34.bc.googleusercontent.com. [34.168.104.7])
-        by smtp.gmail.com with ESMTPSA id h2-20020a63c002000000b0040cb1f55391sm3280975pgg.2.2022.08.19.15.53.06
+        by smtp.gmail.com with ESMTPSA id a4-20020a1709027e4400b0016d6420691asm3614985pln.207.2022.08.19.15.59.30
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 19 Aug 2022 15:53:06 -0700 (PDT)
-Date:   Fri, 19 Aug 2022 22:53:02 +0000
+        Fri, 19 Aug 2022 15:59:30 -0700 (PDT)
+Date:   Fri, 19 Aug 2022 22:59:27 +0000
 From:   Sean Christopherson <seanjc@google.com>
-To:     Hugh Dickins <hughd@google.com>
-Cc:     "Kirill A . Shutemov" <kirill.shutemov@linux.intel.com>,
-        Chao Peng <chao.p.peng@linux.intel.com>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org, linux-mm@kvack.org,
-        linux-fsdevel@vger.kernel.org, linux-api@vger.kernel.org,
-        linux-doc@vger.kernel.org, qemu-devel@nongnu.org,
-        linux-kselftest@vger.kernel.org,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Jonathan Corbet <corbet@lwn.net>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        x86@kernel.org, "H . Peter Anvin" <hpa@zytor.com>,
-        Jeff Layton <jlayton@kernel.org>,
-        "J . Bruce Fields" <bfields@fieldses.org>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        Shuah Khan <shuah@kernel.org>, Mike Rapoport <rppt@kernel.org>,
-        Steven Price <steven.price@arm.com>,
-        "Maciej S . Szmigiero" <mail@maciej.szmigiero.name>,
-        Vlastimil Babka <vbabka@suse.cz>,
-        Vishal Annapurve <vannapurve@google.com>,
-        Yu Zhang <yu.c.zhang@linux.intel.com>, luto@kernel.org,
-        jun.nakajima@intel.com, dave.hansen@intel.com, ak@linux.intel.com,
-        david@redhat.com, aarcange@redhat.com, ddutile@redhat.com,
-        dhildenb@redhat.com, Quentin Perret <qperret@google.com>,
-        Michael Roth <michael.roth@amd.com>, mhocko@suse.com,
-        Muchun Song <songmuchun@bytedance.com>,
-        "Gupta, Pankaj" <pankaj.gupta@amd.com>
-Subject: Re: [PATCH v7 00/14] KVM: mm: fd-based approach for supporting KVM
- guest private memory
-Message-ID: <YwAUTk5BOkUQSF3B@google.com>
-References: <20220706082016.2603916-1-chao.p.peng@linux.intel.com>
- <ff5c5b97-acdf-9745-ebe5-c6609dd6322e@google.com>
- <20220818132421.6xmjqduempmxnnu2@box>
- <Yv7XTON3MwuC1Q3U@google.com>
- <226ab26d-9aa8-dce2-c7f0-9e3f5b65b63@google.com>
+To:     David Matlack <dmatlack@google.com>
+Cc:     Vipin Sharma <vipinsh@google.com>, pbonzini@redhat.com,
+        kvm@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v2] KVM: selftests: Run dirty_log_perf_test on specific
+ cpus
+Message-ID: <YwAVzzF2dZ2tKOUh@google.com>
+References: <20220819210737.763135-1-vipinsh@google.com>
+ <YwAC1f5wTYpTdeh+@google.com>
+ <CAHVum0ecr7S9QS4+3kS3Yd-eQJ5ZY_GicQWurVFnAif6oOYhOg@mail.gmail.com>
+ <YwAP2dM/9vfjlAMb@google.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <226ab26d-9aa8-dce2-c7f0-9e3f5b65b63@google.com>
+In-Reply-To: <YwAP2dM/9vfjlAMb@google.com>
 X-Spam-Status: No, score=-14.4 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
         ENV_AND_HDR_SPF_MATCH,FSL_HELO_FAKE,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,
@@ -103,50 +74,52 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Aug 18, 2022, Hugh Dickins wrote:
-> On Fri, 19 Aug 2022, Sean Christopherson wrote:
-> > On Thu, Aug 18, 2022, Kirill A . Shutemov wrote:
-> > > On Wed, Aug 17, 2022 at 10:40:12PM -0700, Hugh Dickins wrote:
-> > > > If your memory could be migrated, that would be some reason to use
-> > > > filesystem page cache (because page migration happens to understand
-> > > > that type of memory): but it cannot be migrated.
-> > > 
-> > > Migration support is in pipeline. It is part of TDX 1.5 [1]. 
+On Fri, Aug 19, 2022, David Matlack wrote:
+> On Fri, Aug 19, 2022 at 03:20:06PM -0700, Vipin Sharma wrote:
+> > On Fri, Aug 19, 2022 at 2:38 PM David Matlack <dmatlack@google.com> wrote:
+> > > I think we should move all the logic to pin threads to perf_test_util.c.
+> > > The only thing dirty_log_perf_test.c should do is pass optarg into
+> > > perf_test_util.c. This will make it trivial for any other test based on
+> > > pef_test_util.c to also use pinning.
+> > >
+> > > e.g. All a test needs to do to use pinning is add a flag to the optlist
+> > > and add a case statement like:
+> > >
+> > >         case 'c':
+> > >                 perf_test_setup_pinning(optarg);
+> > >                 break;
+> > >
+> > > perf_test_setup_pinning() would:
+> > >  - Parse the list and populate perf_test_vcpu_args with each vCPU's
+> > >    assigned pCPU.
+> > >  - Pin the current thread to it's assigned pCPU if one is provided.
+> > >
 > > 
-> > And this isn't intended for just TDX (or SNP, or pKVM).  We're not _that_ far off
-> > from being able to use UPM for "regular" VMs as a way to provide defense-in-depth
+> > This will assume all tests have the same pinning requirement and
+> > format. What if some tests have more than one worker threads after the
+> > vcpus?
 > 
-> UPM? That's an acronym from your side of the fence, I spy references to
-> it in the mail threads, but haven't tracked down a definition.  I'll
-> just take it to mean the fd-based memory we're discussing.
+> Even if a test has other worker threads, this proposal would still be
+> logically consistent. The flag is defined to only control the vCPU
+> threads and the main threads. If some test has some other threads
+> besides that, this flag will not affect them (which is exactly how it's
+> defined to behave). If such a test wants to pin those other threads, it
+> would make sense to have a test-specific flag for that pinning (and we
+> can figure out the right way to do that if/when we encounter that
+> situation).
 
-Ya, sorry, UPM is what we came up with as shorthand for "Unmapping guest Private
-Memory".  Your assumption is spot on, it's just a fancy way of saying "guest is
-backed with inaccessible fd-based memory".
+...
 
-> > without having to take on the overhead of confidential VMs.  At that point,
-> > migration and probably even swap are on the table.
-> 
-> Good, the more "flexible" that memory is, the better for competing users
-> of memory.  But an fd supplied by KVM gives you freedom to change to a
-> better implementation of allocation underneath, whenever it suits you.
-> Maybe shmem beneath is good from the start, maybe not.
+> Yeah and I also realized perf_test_setup_pinning() will need to know how
+> many vCPUs there are so it can determine which element is the main
+> thread's pCPU assignment.
 
-The main flaw with KVM providing the fd is that it forces KVM to get into the
-memory management business, which us KVM folks really, really do not want to do.
-And based on the types of bugs KVM has had in the past related to memory management,
-it's a safe bet to say the mm folks don't want us getting involved either :-)
+The "how many workers you got?" conundrum can be solved in the same way, e.g. just
+have the caller pass in the number of workers it will create.
 
-The combination of gup()/follow_pte() and mmu_notifiers has worked very well.
-KVM gets a set of (relatively) simple rules to follow and doesn't have to be taught
-new things every time a new backing type comes along.  And from the other side, KVM
-has very rarely had to go poke into other subsystems' code to support exposing a
-new type of memory to guests.
+	perf_test_setup_pinning(pin_string, nr_vcpus, NR_WORKERS);
 
-What we're trying to do with UPM/fd-based memory is establish a similar contract
-between mm and KVM, but without requiring mm to also map memory into host userspace.
-
-The only way having KVM provide the fd works out in the long run is if KVM is the
-only subsystem that ever wants to make use of memory that isn't accessible from
-userspace and isn't tied to a specific backing type, _and_ if the set of backing
-types that KVM ever supports is kept to an absolute minimum.
+The only question is what semantics we should support for workers, e.g. do we
+want to force an all-or-none approach or can the user pin a subset.  All-or-none
+seems like it'd be the simplest to maintain and understand.  I.e. if -c is used,
+then all vCPUs must be pinned, and either all workers or no workers are pinned.
