@@ -2,40 +2,40 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 1754A59AB9B
-	for <lists+kvm@lfdr.de>; Sat, 20 Aug 2022 08:04:22 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 274D559ABAD
+	for <lists+kvm@lfdr.de>; Sat, 20 Aug 2022 08:04:28 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S243748AbiHTGAo (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sat, 20 Aug 2022 02:00:44 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47352 "EHLO
+        id S244361AbiHTGAv (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sat, 20 Aug 2022 02:00:51 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47452 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229458AbiHTGAn (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sat, 20 Aug 2022 02:00:43 -0400
-Received: from mga09.intel.com (mga09.intel.com [134.134.136.24])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9B2AF10D2;
-        Fri, 19 Aug 2022 23:00:42 -0700 (PDT)
+        with ESMTP id S229458AbiHTGAt (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sat, 20 Aug 2022 02:00:49 -0400
+Received: from mga05.intel.com (mga05.intel.com [192.55.52.43])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id ED3A2A2237;
+        Fri, 19 Aug 2022 23:00:48 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1660975242; x=1692511242;
-  h=from:to:cc:subject:date:message-id:mime-version:
-   content-transfer-encoding;
-  bh=xXtcwx3sLV5OqWzlJYDMpDLFYxKeoWVyzZmhoNvxUmg=;
-  b=alDHKbQp6pXlKNjARH57pHlU0otFblWgs425u4V2DhiVdHz7ZWwEZqGO
-   ljUx0MamaD0o/cCLQT+PI9pFu+C9jQ49OvzGbMJlS61pUzy2yVrDuH1Jq
-   UWBKPSivIgEj6JzcceekPZySDtcc6lBUX+zoWfY77MWTkztFWAn0Ya1DN
-   Q14R1z2b270mOWNZu64pxJKlsNs63XbRNjYVKG20YrKOzcHGph8y4Zyiw
-   WkI6k4C2Wx8PtBXsaVDGA1vCHmg5bj4pLnIbGUH1p42rstjaB20IPhAW9
-   wY3G02vvpcnyLN/kcS4CY2uX4yawz2JLxo0UiGe7OqZtjdlpnjRqGUhxY
+  t=1660975248; x=1692511248;
+  h=from:to:cc:subject:date:message-id:in-reply-to:
+   references:mime-version:content-transfer-encoding;
+  bh=8uxTMc931N62LSyYSZec4Q6h4MH1p09mPLFpxJiMDMs=;
+  b=CewhIl6ghhuIdaGvkrFc4OZFbfbIEDYwG4QF6MlW8onpRE+uQEiqXNLf
+   g206XtIrrsdHcVnR94dGVJ4pGFKKdBneQwc1SFt89R6kEo6awZ6usb8m+
+   g2aXbzOfmvqENu/N6NZC+6Rq3YkDgEeav5Wf+iRf8FaJzYKBlfGUjBQZw
+   M5jY12bnFW8kU58OSY6RFtyi54JDHJYO8zQTD/i3PwADUKg67nbMTgwmf
+   RDO0nJBU2bUfWtlBAffuZc3ZMQgAf3OAiA42j/Sm8YcsL0H0TB+HA5Q5a
+   WESY5/aLZqFdJnAUWAWYm5ylQ+54l4EbFhL7Aeg5zzYw0k3cG5mxIvLo4
    w==;
-X-IronPort-AV: E=McAfee;i="6500,9779,10444"; a="293940203"
+X-IronPort-AV: E=McAfee;i="6500,9779,10444"; a="379448966"
 X-IronPort-AV: E=Sophos;i="5.93,250,1654585200"; 
-   d="scan'208";a="293940203"
-Received: from orsmga008.jf.intel.com ([10.7.209.65])
-  by orsmga102.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 19 Aug 2022 23:00:41 -0700
+   d="scan'208";a="379448966"
+Received: from fmsmga008.fm.intel.com ([10.253.24.58])
+  by fmsmga105.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 19 Aug 2022 23:00:48 -0700
 X-IronPort-AV: E=Sophos;i="5.93,250,1654585200"; 
-   d="scan'208";a="637528412"
+   d="scan'208";a="668857511"
 Received: from ls.sc.intel.com (HELO localhost) ([143.183.96.54])
-  by orsmga008-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 19 Aug 2022 23:00:41 -0700
+  by fmsmga008-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 19 Aug 2022 23:00:48 -0700
 From:   isaku.yamahata@intel.com
 To:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org
 Cc:     isaku.yamahata@intel.com, isaku.yamahata@gmail.com,
@@ -43,16 +43,18 @@ Cc:     isaku.yamahata@intel.com, isaku.yamahata@gmail.com,
         Sean Christopherson <seanjc@google.com>,
         Kai Huang <kai.huang@intel.com>, Chao Gao <chao.gao@intel.com>,
         Will Deacon <will@kernel.org>
-Subject: [RFC PATCH 00/18] KVM hardware enable/disable reorganize
-Date:   Fri, 19 Aug 2022 23:00:06 -0700
-Message-Id: <cover.1660974106.git.isaku.yamahata@intel.com>
+Subject: [RFC PATCH 01/18] KVM: x86: Drop kvm_user_return_msr_cpu_online()
+Date:   Fri, 19 Aug 2022 23:00:07 -0700
+Message-Id: <9e0f84ece483bfeffe7e0b254363845af910ea84.1660974106.git.isaku.yamahata@intel.com>
 X-Mailer: git-send-email 2.25.1
+In-Reply-To: <cover.1660974106.git.isaku.yamahata@intel.com>
+References: <cover.1660974106.git.isaku.yamahata@intel.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
-        RCVD_IN_MSPIKE_H3,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE,
-        T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
+        SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
@@ -61,72 +63,115 @@ X-Mailing-List: kvm@vger.kernel.org
 
 From: Isaku Yamahata <isaku.yamahata@intel.com>
 
-The purpose of this patch series is to get feedback before going further.
-e.g. rebasing TDX KVM series, etc.
+KVM/X86 uses user return notifier to switch MSR for guest or user space.
+Snapshot host values on CPU online, change MSR values for guest, and
+restore them on returning to user space.  The current code abuses
+kvm_arch_hardware_enable() which is called on kvm module initialization or
+CPU online.
 
-This patch series is to implement the suggestion by Sean Christopherson [1]
-to reorganize enable/disable cpu virtualization feature by replacing
-the arch-generic current enable/disable logic with PM related hooks. And
-convert kvm/x86 to use new hooks.
+Remove such the abuse of kvm_arch_hardware_enable by capturing the host
+value on the first change of the MSR value to guest VM instead of CPU
+online.
 
-- Untable x86 hardware enable logic, snapshot MSRs for user return notifier,
-  enabling cpu virtualization on cpu online and platform resume. and real
-  enabling of CPU virtualization feature
-- Introduce hooks related to PM.
-- Convert kvm/x86 code to user those hooks.
-- Split out hardware enabling/disabling logic into a separate file.  Compile
-  it for non-x86 code.  Once conversion of other KVM archs is done, this file
-  can be dropped.
-- Delete cpus_hardware_enabled. 17/18 and 18/18
+Suggested-by: Sean Christopherson <seanjc@google.com>
+Signed-off-by: Isaku Yamahata <isaku.yamahata@intel.com>
+---
+ arch/x86/kvm/x86.c | 43 ++++++++++++++++++++++++-------------------
+ 1 file changed, 24 insertions(+), 19 deletions(-)
 
-[1] https://lore.kernel.org/kvm/YvU+6fdkHaqQiKxp@google.com/
-
-Chao Gao (2):
-  KVM: x86: Move check_processor_compatibility from init ops to runtime
-    ops
-  Partially revert "KVM: Pass kvm_init()'s opaque param to additional
-    arch funcs"
-
-Isaku Yamahata (16):
-  KVM: x86: Drop kvm_user_return_msr_cpu_online()
-  KVM: x86: Use this_cpu_ptr() instead of
-    per_cpu_ptr(smp_processor_id())
-  KVM: Drop kvm_count_lock and instead protect kvm_usage_count with
-    kvm_lock
-  KVM: Add arch hooks for PM events with empty stub
-  KVM: x86: Move TSC fixup logic to KVM arch resume callback
-  KVM: Add arch hook when VM is added/deleted
-  KVM: Move out KVM arch PM hooks and hardware enable/disable logic
-  KVM: kvm_arch.c: Remove _nolock post fix
-  KVM: kvm_arch.c: Remove a global variable, hardware_enable_failed
-  KVM: Do processor compatibility check on cpu online and resume
-  KVM: x86: Duplicate arch callbacks related to pm events
-  KVM: Eliminate kvm_arch_post_init_vm()
-  KVM: x86: Delete kvm_arch_hardware_enable/disable()
-  KVM: Add config to not compile kvm_arch.c
-  KVM: x86: Remove cpus_hardware_enabled and related sanity check
-  KVM: Remove cpus_hardware_enabled and related sanity check
-
- Documentation/virt/kvm/locking.rst |  14 +--
- arch/arm64/kvm/arm.c               |   2 +-
- arch/mips/kvm/mips.c               |   2 +-
- arch/powerpc/kvm/powerpc.c         |   2 +-
- arch/riscv/kvm/main.c              |   2 +-
- arch/s390/kvm/kvm-s390.c           |   2 +-
- arch/x86/include/asm/kvm-x86-ops.h |   1 +
- arch/x86/include/asm/kvm_host.h    |   2 +-
- arch/x86/kvm/Kconfig               |   1 +
- arch/x86/kvm/svm/svm.c             |   4 +-
- arch/x86/kvm/vmx/vmx.c             |  14 +--
- arch/x86/kvm/x86.c                 | 184 ++++++++++++++++++++++-------
- include/linux/kvm_host.h           |  14 ++-
- virt/kvm/Kconfig                   |   3 +
- virt/kvm/Makefile.kvm              |   3 +
- virt/kvm/kvm_arch.c                | 119 +++++++++++++++++++
- virt/kvm/kvm_main.c                | 177 ++++++++-------------------
- 17 files changed, 349 insertions(+), 197 deletions(-)
- create mode 100644 virt/kvm/kvm_arch.c
-
+diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+index 205ebdc2b11b..16104a2f7d8e 100644
+--- a/arch/x86/kvm/x86.c
++++ b/arch/x86/kvm/x86.c
+@@ -200,6 +200,7 @@ struct kvm_user_return_msrs {
+ 	struct kvm_user_return_msr_values {
+ 		u64 host;
+ 		u64 curr;
++		bool initialized;
+ 	} values[KVM_MAX_NR_USER_RETURN_MSRS];
+ };
+ 
+@@ -363,6 +364,10 @@ static void kvm_on_user_return(struct user_return_notifier *urn)
+ 	local_irq_restore(flags);
+ 	for (slot = 0; slot < kvm_nr_uret_msrs; ++slot) {
+ 		values = &msrs->values[slot];
++		/*
++		 * No need to check values->initialized because host = curr = 0
++		 * by __GFP_ZERO when !values->initialized.
++		 */
+ 		if (values->host != values->curr) {
+ 			wrmsrl(kvm_uret_msrs_list[slot], values->host);
+ 			values->curr = values->host;
+@@ -409,34 +414,30 @@ int kvm_find_user_return_msr(u32 msr)
+ }
+ EXPORT_SYMBOL_GPL(kvm_find_user_return_msr);
+ 
+-static void kvm_user_return_msr_cpu_online(void)
+-{
+-	unsigned int cpu = smp_processor_id();
+-	struct kvm_user_return_msrs *msrs = per_cpu_ptr(user_return_msrs, cpu);
+-	u64 value;
+-	int i;
+-
+-	for (i = 0; i < kvm_nr_uret_msrs; ++i) {
+-		rdmsrl_safe(kvm_uret_msrs_list[i], &value);
+-		msrs->values[i].host = value;
+-		msrs->values[i].curr = value;
+-	}
+-}
+-
+ int kvm_set_user_return_msr(unsigned slot, u64 value, u64 mask)
+ {
+ 	unsigned int cpu = smp_processor_id();
+ 	struct kvm_user_return_msrs *msrs = per_cpu_ptr(user_return_msrs, cpu);
++	struct kvm_user_return_msr_values *values = &msrs->values[slot];
+ 	int err;
+ 
+-	value = (value & mask) | (msrs->values[slot].host & ~mask);
+-	if (value == msrs->values[slot].curr)
++	if (unlikely(!values->initialized)) {
++		u64 host_value;
++
++		rdmsrl_safe(kvm_uret_msrs_list[slot], &host_value);
++		values->host = host_value;
++		values->curr = host_value;
++		values->initialized = true;
++	}
++
++	value = (value & mask) | (values->host & ~mask);
++	if (value == values->curr)
+ 		return 0;
+ 	err = wrmsrl_safe(kvm_uret_msrs_list[slot], value);
+ 	if (err)
+ 		return 1;
+ 
+-	msrs->values[slot].curr = value;
++	values->curr = value;
+ 	if (!msrs->registered) {
+ 		msrs->urn.on_user_return = kvm_on_user_return;
+ 		user_return_notifier_register(&msrs->urn);
+@@ -9212,7 +9213,12 @@ int kvm_arch_init(void *opaque)
+ 		return -ENOMEM;
+ 	}
+ 
+-	user_return_msrs = alloc_percpu(struct kvm_user_return_msrs);
++	/*
++	 * __GFP_ZERO to ensure user_return_msrs.values[].{host, curr} match.
++	 * See kvm_on_user_return()
++	 */
++	user_return_msrs = alloc_percpu_gfp(struct kvm_user_return_msrs,
++					    GFP_KERNEL | __GFP_ZERO);
+ 	if (!user_return_msrs) {
+ 		printk(KERN_ERR "kvm: failed to allocate percpu kvm_user_return_msrs\n");
+ 		r = -ENOMEM;
+@@ -11836,7 +11842,6 @@ int kvm_arch_hardware_enable(void)
+ 	u64 max_tsc = 0;
+ 	bool stable, backwards_tsc = false;
+ 
+-	kvm_user_return_msr_cpu_online();
+ 	ret = static_call(kvm_x86_hardware_enable)();
+ 	if (ret != 0)
+ 		return ret;
 -- 
 2.25.1
 
