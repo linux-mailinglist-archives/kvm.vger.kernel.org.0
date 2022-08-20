@@ -2,140 +2,268 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 6EAD759A9F1
-	for <lists+kvm@lfdr.de>; Sat, 20 Aug 2022 02:21:52 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 1C37D59AA2A
+	for <lists+kvm@lfdr.de>; Sat, 20 Aug 2022 02:37:10 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S245042AbiHTASC (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 19 Aug 2022 20:18:02 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47768 "EHLO
+        id S244416AbiHTAbZ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 19 Aug 2022 20:31:25 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36828 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233206AbiHTASB (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 19 Aug 2022 20:18:01 -0400
-Received: from mail-lj1-x22b.google.com (mail-lj1-x22b.google.com [IPv6:2a00:1450:4864:20::22b])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 33962C579D
-        for <kvm@vger.kernel.org>; Fri, 19 Aug 2022 17:17:59 -0700 (PDT)
-Received: by mail-lj1-x22b.google.com with SMTP id l19so2711520ljg.8
-        for <kvm@vger.kernel.org>; Fri, 19 Aug 2022 17:17:59 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc;
-        bh=CNep9ry1VvhvpUTMySVEmMbXzxdlarH1IuCZVDew7EY=;
-        b=STdhnd7FenS1b/9kx+ca0KEU2L2sOkn+b8mag93WCl0qPu+9sR9XYsxscrOUHLFIXW
-         GKJ5YreWlZJNDH/GvF0kNzSLpKrGAgDGa3yeNCHlgddsdT12mr4MTuWH4aMH0LNKyvyo
-         T8YLdvUt+8pTVs4RzpUBpPNCbiulxOuR/0E7pZ1WWnIqfwHNVtEh2OsQNHQb7/xVLf9V
-         g4LmhTHvSXx9LTNeXZZYNYJnHdZLZqfkkQqePE29BoKzdNONUG62mQRE/fO53EwXs06V
-         /VoRUErLHTspzFL6Ilp0d76nDYnZwMshMeztaiSPzoKN2oujvwDqeAKwg7LdE+Mh755G
-         +DPw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc;
-        bh=CNep9ry1VvhvpUTMySVEmMbXzxdlarH1IuCZVDew7EY=;
-        b=jpLOwrwgy/X7MSfhh/nOBZ7ow1mO/EMs00CGQH06/gl1yQnR0l6397gGagUc1pq3ns
-         iiVfm5ndJ3jrXXkFH8rvFP+eCxvwJ1VNuXlwAe01o3j2aINh0Dm/fmJoF31WfqCh7BHp
-         oTDGxhJph/3CXo+gLLMtuDjTDR5xHr+ET5l5HkQh6CJpDM4vkQeotXcB0zfQjJKl5d9u
-         vq1IZ8rLlxvXQ1y6R5+bMpk0tCRgtRRQdwEkWYVAUCbXcP+QusY2vL/vTdZ6dHqg6z+Q
-         BS69H7OXZr9inNjI2aMSQjMpHZwC8q7KuKU9A+CzA5UmUv/n+i7HXphH0EIaasWDurcK
-         ik1g==
-X-Gm-Message-State: ACgBeo0Hf0pJGWIGl4O2eoLbVQ/xfXgPqHBRBHHWjmpsX/KTRd+dAneb
-        GjN4Wpl336qTNTs0nCp8n5/XMxvblzKhQcZhqKeSOA==
-X-Google-Smtp-Source: AA6agR5vCpHra8bkWNKsBarpRm/oSNVSjlDC+Zg1UudxOWjm0l3lqikFaBMsBhmkIXCM5+ltokH4zlNOfJo4A1apOxc=
-X-Received: by 2002:a2e:84ca:0:b0:25d:77e0:2566 with SMTP id
- q10-20020a2e84ca000000b0025d77e02566mr2983018ljh.78.1660954677321; Fri, 19
- Aug 2022 17:17:57 -0700 (PDT)
+        with ESMTP id S243430AbiHTAbW (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 19 Aug 2022 20:31:22 -0400
+Received: from wnew3-smtp.messagingengine.com (wnew3-smtp.messagingengine.com [64.147.123.17])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5B53CD75A7;
+        Fri, 19 Aug 2022 17:31:21 -0700 (PDT)
+Received: from compute5.internal (compute5.nyi.internal [10.202.2.45])
+        by mailnew.west.internal (Postfix) with ESMTP id B568F2B06109;
+        Fri, 19 Aug 2022 20:27:06 -0400 (EDT)
+Received: from mailfrontend1 ([10.202.2.162])
+  by compute5.internal (MEProxy); Fri, 19 Aug 2022 20:27:10 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=shutemov.name;
+         h=cc:cc:content-type:date:date:from:from:in-reply-to
+        :in-reply-to:message-id:mime-version:references:reply-to:sender
+        :subject:subject:to:to; s=fm2; t=1660955226; x=1660962426; bh=Ez
+        /o4Y2tKPtSFWobOA9rtOb1803iS6GsFqfxsG8DlJY=; b=J1sLkmgnpr1IHCnks/
+        TncIKoSB2iyU0SQevspoXfStE4ASIgQdckNGUnnM/awsZSGl4C1OntcVqK7/k6GN
+        7MSjjDs4ekjAcVE+UiN4FV8UYvaOTuNRtiiNc8A7Gdofv7Wcl8WW4OdSu7hQ5H6u
+        87XLbJBCU8T4KH2G+fsweFV8DvsgD+iciohXgKhjcDHX8ltZp+zNkLq27kM76xWJ
+        huGQLOI4IkShGKA8o9tEYXYWPU+T3SRdig6WezhCpy2YrI/VHxs3O3U1mctqpx5Y
+        oXy/xII3UEv87xctnWoObigXtWZRkBZiSZdc0Zino9Vx5QVaJSszorGVbLYaInZr
+        /HbA==
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
+        messagingengine.com; h=cc:cc:content-type:date:date:feedback-id
+        :feedback-id:from:from:in-reply-to:in-reply-to:message-id
+        :mime-version:references:reply-to:sender:subject:subject:to:to
+        :x-me-proxy:x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=
+        fm1; t=1660955226; x=1660962426; bh=Ez/o4Y2tKPtSFWobOA9rtOb1803i
+        S6GsFqfxsG8DlJY=; b=LNehmM1meXB0YoTHnShkMvfy937G8WXxFT7hfxmGyt++
+        PDxFoAQ4iSTNBXCIJTcEmSBLxdeOSCW6p0H0vv+vTvpBjtW+faYjtIayEEzIBR3q
+        yYLDKoID5MvfhaJ99WM0jq7rE6i1By1VkqeU5vNyspT2RJoU3nHDD8+vrjOfipYX
+        HEj9FsycHMbsdze6a489AhRV5IN26Y7/u61+q00CGOH6sPXrBaXEqFp39J3+rO2I
+        O2v1SptYfuDPPfsBnsgZHBvq3fAYD/zBtbjWfsUHdmFXZSHFPVmW7kvXBcAGKa6P
+        6lnIVgRpdUm1uoSVVSvnGPmE88yqpjg89yYpLqGYaA==
+X-ME-Sender: <xms:WCoAYzYYyJ1_A8aO3bPjr6duCBycn0g3AcBLPTdfc6L9WTzaxQUFSQ>
+    <xme:WCoAYybvsGHzNSyTiRvcRJbGrj4BvBDntAUHY8KLu7GIdlV1fqIZFpvqAcd3hvxOK
+    r8ehKJS_dTdFokEjTk>
+X-ME-Received: <xmr:WCoAY19PmvEJ89tphPfNdcXzfc0He-WP8ErI_IqcwrwkS98oDdOBEigKokMjo7oeLURCng>
+X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgedvfedrvdeivddgfeefucetufdoteggodetrfdotf
+    fvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdfqfgfvpdfurfetoffkrfgpnffqhgen
+    uceurghilhhouhhtmecufedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmne
+    cujfgurhepfffhvfevuffkfhggtggujgesthdttddttddtvdenucfhrhhomhepfdfmihhr
+    ihhllhcutedrucfuhhhuthgvmhhovhdfuceokhhirhhilhhlsehshhhuthgvmhhovhdrnh
+    grmhgvqeenucggtffrrghtthgvrhhnpeethffguefftdejudekgfehuefhjefhhfdthfeg
+    ieeuffelieffffeiteejjeekudenucffohhmrghinhepihhnthgvlhdrtghomhdpmhgvmh
+    drphgrghgvnecuvehluhhsthgvrhfuihiivgeptdenucfrrghrrghmpehmrghilhhfrhho
+    mhepkhhirhhilhhlsehshhhuthgvmhhovhdrnhgrmhgv
+X-ME-Proxy: <xmx:WCoAY5qRelQbeh57Ik8xZ-drGYmnFqmHk8OznvzoIQwedvfRbcEp8A>
+    <xmx:WCoAY-oePBlhJPU7QZD9W5q0eF-6ETuoGJzR7DfDVZTNXeLPYMHeQA>
+    <xmx:WCoAY_QB_q4ec1TDL0nSLZHaOMCqsMbqI0X-evTJ4FLEWFkbLwvGug>
+    <xmx:WioAY5FLZ70rhK9mBhIZFrgqiW3vNsh_ksUFobn7XxJ6IQC0IchE01xMYbE>
+Feedback-ID: ie3994620:Fastmail
+Received: by mail.messagingengine.com (Postfix) with ESMTPA; Fri,
+ 19 Aug 2022 20:27:03 -0400 (EDT)
+Received: by box.shutemov.name (Postfix, from userid 1000)
+        id 3F27B10418C; Sat, 20 Aug 2022 03:27:00 +0300 (+03)
+Date:   Sat, 20 Aug 2022 03:27:00 +0300
+From:   "Kirill A. Shutemov" <kirill@shutemov.name>
+To:     Hugh Dickins <hughd@google.com>
+Cc:     "Kirill A . Shutemov" <kirill.shutemov@linux.intel.com>,
+        Chao Peng <chao.p.peng@linux.intel.com>, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org, linux-mm@kvack.org,
+        linux-fsdevel@vger.kernel.org, linux-api@vger.kernel.org,
+        linux-doc@vger.kernel.org, qemu-devel@nongnu.org,
+        linux-kselftest@vger.kernel.org,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Jonathan Corbet <corbet@lwn.net>,
+        Sean Christopherson <seanjc@google.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+        x86@kernel.org, "H . Peter Anvin" <hpa@zytor.com>,
+        Jeff Layton <jlayton@kernel.org>,
+        "J . Bruce Fields" <bfields@fieldses.org>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        Shuah Khan <shuah@kernel.org>, Mike Rapoport <rppt@kernel.org>,
+        Steven Price <steven.price@arm.com>,
+        "Maciej S . Szmigiero" <mail@maciej.szmigiero.name>,
+        Vlastimil Babka <vbabka@suse.cz>,
+        Vishal Annapurve <vannapurve@google.com>,
+        Yu Zhang <yu.c.zhang@linux.intel.com>, luto@kernel.org,
+        jun.nakajima@intel.com, dave.hansen@intel.com, ak@linux.intel.com,
+        david@redhat.com, aarcange@redhat.com, ddutile@redhat.com,
+        dhildenb@redhat.com, Quentin Perret <qperret@google.com>,
+        Michael Roth <michael.roth@amd.com>, mhocko@suse.com,
+        Muchun Song <songmuchun@bytedance.com>,
+        "Gupta, Pankaj" <pankaj.gupta@amd.com>
+Subject: Re: [PATCH v7 00/14] KVM: mm: fd-based approach for supporting KVM
+ guest private memory
+Message-ID: <20220820002700.6yflrxklmpsavdzi@box.shutemov.name>
+References: <20220706082016.2603916-1-chao.p.peng@linux.intel.com>
+ <ff5c5b97-acdf-9745-ebe5-c6609dd6322e@google.com>
+ <20220818132421.6xmjqduempmxnnu2@box>
+ <c6ccbb96-5849-2e2f-3b49-4ea711af525d@google.com>
 MIME-Version: 1.0
-References: <20220819210737.763135-1-vipinsh@google.com> <YwAC1f5wTYpTdeh+@google.com>
- <CAHVum0ecr7S9QS4+3kS3Yd-eQJ5ZY_GicQWurVFnAif6oOYhOg@mail.gmail.com>
- <YwAP2dM/9vfjlAMb@google.com> <YwAVzzF2dZ2tKOUh@google.com>
-In-Reply-To: <YwAVzzF2dZ2tKOUh@google.com>
-From:   Vipin Sharma <vipinsh@google.com>
-Date:   Fri, 19 Aug 2022 17:17:20 -0700
-Message-ID: <CAHVum0cLUH0j1ZKEG-fPrh52xand4fQqR2heF0j5c4LncTFWOQ@mail.gmail.com>
-Subject: Re: [PATCH v2] KVM: selftests: Run dirty_log_perf_test on specific cpus
-To:     Sean Christopherson <seanjc@google.com>
-Cc:     David Matlack <dmatlack@google.com>, pbonzini@redhat.com,
-        kvm@vger.kernel.org, linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-        T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL
-        autolearn=unavailable autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <c6ccbb96-5849-2e2f-3b49-4ea711af525d@google.com>
+X-Spam-Status: No, score=-2.8 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,SPF_HELO_PASS,
+        SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no
+        version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Aug 19, 2022 at 3:59 PM Sean Christopherson <seanjc@google.com> wrote:
->
-> On Fri, Aug 19, 2022, David Matlack wrote:
-> > On Fri, Aug 19, 2022 at 03:20:06PM -0700, Vipin Sharma wrote:
-> > > On Fri, Aug 19, 2022 at 2:38 PM David Matlack <dmatlack@google.com> wrote:
-> > > > I think we should move all the logic to pin threads to perf_test_util.c.
-> > > > The only thing dirty_log_perf_test.c should do is pass optarg into
-> > > > perf_test_util.c. This will make it trivial for any other test based on
-> > > > pef_test_util.c to also use pinning.
-> > > >
-> > > > e.g. All a test needs to do to use pinning is add a flag to the optlist
-> > > > and add a case statement like:
-> > > >
-> > > >         case 'c':
-> > > >                 perf_test_setup_pinning(optarg);
-> > > >                 break;
-> > > >
-> > > > perf_test_setup_pinning() would:
-> > > >  - Parse the list and populate perf_test_vcpu_args with each vCPU's
-> > > >    assigned pCPU.
-> > > >  - Pin the current thread to it's assigned pCPU if one is provided.
-> > > >
-> > >
-> > > This will assume all tests have the same pinning requirement and
-> > > format. What if some tests have more than one worker threads after the
-> > > vcpus?
-> >
-> > Even if a test has other worker threads, this proposal would still be
-> > logically consistent. The flag is defined to only control the vCPU
-> > threads and the main threads. If some test has some other threads
-> > besides that, this flag will not affect them (which is exactly how it's
-> > defined to behave). If such a test wants to pin those other threads, it
-> > would make sense to have a test-specific flag for that pinning (and we
-> > can figure out the right way to do that if/when we encounter that
-> > situation).
->
-> ...
->
-> > Yeah and I also realized perf_test_setup_pinning() will need to know how
-> > many vCPUs there are so it can determine which element is the main
-> > thread's pCPU assignment.
->
-> The "how many workers you got?" conundrum can be solved in the same way, e.g. just
-> have the caller pass in the number of workers it will create.
->
->         perf_test_setup_pinning(pin_string, nr_vcpus, NR_WORKERS);
->
-> The only question is what semantics we should support for workers, e.g. do we
-> want to force an all-or-none approach or can the user pin a subset.  All-or-none
-> seems like it'd be the simplest to maintain and understand.  I.e. if -c is used,
-> then all vCPUs must be pinned, and either all workers or no workers are pinned.
+On Thu, Aug 18, 2022 at 08:00:41PM -0700, Hugh Dickins wrote:
+> On Thu, 18 Aug 2022, Kirill A . Shutemov wrote:
+> > On Wed, Aug 17, 2022 at 10:40:12PM -0700, Hugh Dickins wrote:
+> > > 
+> > > If your memory could be swapped, that would be enough of a good reason
+> > > to make use of shmem.c: but it cannot be swapped; and although there
+> > > are some references in the mailthreads to it perhaps being swappable
+> > > in future, I get the impression that will not happen soon if ever.
+> > > 
+> > > If your memory could be migrated, that would be some reason to use
+> > > filesystem page cache (because page migration happens to understand
+> > > that type of memory): but it cannot be migrated.
+> > 
+> > Migration support is in pipeline. It is part of TDX 1.5 [1]. And swapping
+> > theoretically possible, but I'm not aware of any plans as of now.
+> > 
+> > [1] https://www.intel.com/content/www/us/en/developer/articles/technical/intel-trust-domain-extensions.html
+> 
+> I always forget, migration means different things to different audiences.
+> As an mm person, I was meaning page migration, whereas a virtualization
+> person thinks VM live migration (which that reference appears to be about),
+> a scheduler person task migration, an ornithologist bird migration, etc.
+> 
+> But you're an mm person too: you may have cited that reference in the
+> knowledge that TDX 1.5 Live Migration will entail page migration of the
+> kind I'm thinking of.  (Anyway, it's not important to clarify that here.)
 
-Combining both of your suggestions to make sure everyone is on the same page:
-perf_test_setup_pinning(pin_string, nr_vcpus) API expects (nr_vcpus +
-1) entries in "pin_string", where it will use first nr_vcpus entries
-for vcpus and the one after that for caller thread cpu.
+TDX 1.5 brings both.
 
-In future if there is a need for common workers, then after nr_vcpus+1
-entries there will be entries for workers, having a predefined order
-as workers get added to the code.
+In TDX speak, mm migration called relocation. See TDH.MEM.PAGE.RELOCATE.
 
-"pin_string" must always have AT LEAST (nr_vcpus + 1) entries. After
-that if there are more entries, then those will be used to assign cpus
-to common worker threads based on predefined order. perf_test_util
-should have a  way to know how many common workers there are. There
-can be more workers than entries, this is fine, those extra workers
-will not be pinned.
+> > > Some of these impressions may come from earlier iterations of the
+> > > patchset (v7 looks better in several ways than v5).  I am probably
+> > > underestimating the extent to which you have taken on board other
+> > > usages beyond TDX and SEV private memory, and rightly want to serve
+> > > them all with similar interfaces: perhaps there is enough justification
+> > > for shmem there, but I don't see it.  There was mention of userfaultfd
+> > > in one link: does that provide the justification for using shmem?
+> > > 
+> > > I'm afraid of the special demands you may make of memory allocation
+> > > later on - surprised that huge pages are not mentioned already;
+> > > gigantic contiguous extents? secretmem removed from direct map?
+> > 
+> > The design allows for extension to hugetlbfs if needed. Combination of
+> > MFD_INACCESSIBLE | MFD_HUGETLB should route this way. There should be zero
+> > implications for shmem. It is going to be separate struct memfile_backing_store.
+> 
+> Last year's MFD_HUGEPAGE proposal would have allowed you to do it with
+> memfd via tmpfs without needing to involve hugetlbfs; but you may prefer
+> the determinism of hugetlbfs, relying on /proc/sys/vm/nr_hugepages etc.
+> 
+> But I've yet to see why you want to involve this or that filesystem
+> (with all its filesystem-icity suppressed) at all.  The backing store
+> is host memory, and tmpfs and hugetlbfs just impose their own
+> idiosyncrasies on how that memory is allocated; but I think you would
+> do better to choose your own idiosyncrasies in allocation directly -
+> you don't need a different "backing store" to choose between 4k or 2M
+> or 1G or whatever allocations.
 
-If this is not desirable, let us hold on discussion when we actually
-get common workers, meanwhile, just keep nr_vcpus + 1 entries and work
-accordingly.
+These idiosyncrasies are well known: user who used hugetlbfs may want to
+get direct replacement that would tap into the same hugetlb reserves and
+get the same allocation guarantees. Admins know where to look if ENOMEM
+happens.
+
+For THP, admin may know how to tweak allocation/defrag policy for his
+liking and how to track if they are allocated.
+
+> tmpfs and hugetlbfs and page cache are designed around sharing memory:
+> TDX is designed around absolutely not sharing memory; and the further
+> uses which Sean foresees appear not to need it as page cache either.
+> 
+> Except perhaps for page migration reasons.  It's somewhat incidental,  
+> but of course page migration knows how to migrate page cache, so
+> masquerading as page cache will give a short cut to page migration,
+> when page migration becomes at all possible.
+> 
+> > 
+> > I'm not sure secretmem is a fit here as we want to extend MFD_INACCESSIBLE
+> > to be movable if platform supports it and secretmem is not migratable by
+> > design (without direct mapping fragmentations).
+> > 
+> > > Here's what I would prefer, and imagine much easier for you to maintain;
+> > > but I'm no system designer, and may be misunderstanding throughout.
+> > > 
+> > > QEMU gets fd from opening /dev/kvm_something, uses ioctls (or perhaps
+> > > the fallocate syscall interface itself) to allocate and free the memory,
+> > > ioctl for initializing some of it too.  KVM in control of whether that
+> > > fd can be read or written or mmap'ed or whatever, no need to prevent it
+> > > in shmem.c, no need for flags, seals, notifications to and fro because
+> > > KVM is already in control and knows the history.  If shmem actually has
+> > > value, call into it underneath - somewhat like SysV SHM, and /dev/zero
+> > > mmap, and i915/gem make use of it underneath.  If shmem has nothing to
+> > > add, just allocate and free kernel memory directly, recorded in your
+> > > own xarray.
+> > 
+> > I guess shim layer on top of shmem *can* work. I don't see immediately why
+> > it would not. But I'm not sure it is right direction. We risk creating yet
+> > another parallel VM with own rules/locking/accounting that opaque to
+> > core-mm.
+> 
+> You are already proposing a new set of rules, foreign to how tmpfs works
+> for others.  You're right that KVM allocating large amounts of memory,
+> opaque to core-mm, carries risk: and you'd be right to say that shmem.c
+> provides some clues (security_vm_enough_memory checks, memcg charging,
+> user_shm_lock accounting) on what to remember.
+
+That's a nice list of clues that would need to be re-implemented somewhere
+else to get competent solution.
+
+> But I'm not up to the job of being the one to police you there,
+> and you don't want to be waiting on me either.
+
+> To take a rather silly example: Ted just added chattr support to tmpfs,
+> and it fits in well.  But I don't now want to have to decide whether
+> "chattr +i" FS_IMMUTABLE_FL is or is not compatible with
+> MEMFILE_F_USER_INACCESSIBLE.  They are from different worlds,
+> and I'd prefer KVM to carry the weight of imposing INACCESSIBLE:
+> which seems easily done if it manages the fd, without making the
+> memory allocated to that fd accessible to those who hold the fd.
+
+From a quick look, these are orthogonal. But it is not your point.
+
+Yes, INACCESSIBLE is increase of complexity which you do not want to deal
+with in shmem.c. It get it.
+
+I will try next week to rework it as shim to top of shmem. Does it work
+for you?
+
+But I think it is wrong to throw it over the fence to KVM folks and say it
+is your problem. Core MM has to manage it.
+
+> > Note that on machines that run TDX guests such memory would likely be the
+> > bulk of memory use. Treating it as a fringe case may bite us one day.
+> 
+> Yes, I suspected that machines running TDX guests might well consume
+> most of the memory that way, but glad(?) to hear it confirmed.
+> 
+> I am not suggesting that this memory be treated as a fringe case, rather
+> the reverse: a different case, not something to hide away inside shmem.c.
+> 
+> Is there a notion that /proc/meminfo "Shmem:" is going to be a good hint
+> of this usage?  Whether or not it's also included in "Shmem:", I expect
+> that its different characteristics will deserve its own display.
+
+That's the hint users know about from previous experience.
+
+-- 
+  Kiryl Shutsemau / Kirill A. Shutemov
