@@ -2,38 +2,38 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 0E16759AB9E
-	for <lists+kvm@lfdr.de>; Sat, 20 Aug 2022 08:04:23 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id B422F59AB9D
+	for <lists+kvm@lfdr.de>; Sat, 20 Aug 2022 08:04:22 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S244591AbiHTGAy (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sat, 20 Aug 2022 02:00:54 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47466 "EHLO
+        id S244674AbiHTGA4 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sat, 20 Aug 2022 02:00:56 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47478 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S244041AbiHTGAu (ORCPT <rfc822;kvm@vger.kernel.org>);
+        with ESMTP id S244217AbiHTGAu (ORCPT <rfc822;kvm@vger.kernel.org>);
         Sat, 20 Aug 2022 02:00:50 -0400
 Received: from mga05.intel.com (mga05.intel.com [192.55.52.43])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B4200A223E;
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D8DBBA260A;
         Fri, 19 Aug 2022 23:00:49 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
   t=1660975249; x=1692511249;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=uz16PyoQFhukf/H8M5ipcGMQZYTZukV44jdncTSqdg4=;
-  b=i7DsDSbDCAsU0x5fuUJQk69h6mWNHdaGSXf/n7hbUcs1Kmsx9317UaQA
-   Y3iv0IprKBxl/bcQ1GcKEsSGtB4PU5me+NGh5ULN3+mOBePcq3G1Sjaut
-   3O5c2Jb1RItq8eAGWhPt9EXagWJ4tEwj7a9I4P7Srbx+9yQhMeRGpqV/B
-   gJw6ebRt3cvLWcUjrAyN8z9eWKONawJfvRu8PhHXRspD5NOovdECQKUfq
-   P0XiMCSefijY4ZGlasH6Gr7BalcU4rmwPvhTIboooxr8gmy52S4frX5Wd
-   RV2Mu9dl6wgUCZ78rKR0zOYIrKbXtJ/yiHZfrAvJjqsaTTk1d7H5oqnSO
+  bh=0AYhMY6fJqrli/t5ys1IPzbYaiXeLEr/7lceDSDM3tw=;
+  b=FMFKAOJX+8eiMsYlL5ED4+LvG1wf1iZI2/QkTFtYsejdBIaXlefKTAO/
+   CCfhIpRM7PkLChoOzdQ75avpV4PBHi4jplpPP17W1VNHINkfJciBw36DJ
+   gPa56ruf2mHwTvEhQ66eRvJdglJWtz6lqpQjNng3n0ichMrcnHdSNtRYT
+   qvcWnn3cxb6FQ+RK9HE3Cvd7K9JrGVBMArmIyxJKo4B86WvaZLq8SzW7C
+   Bt2shy0JQ/lHlpjrROsb04GliTklxbDR+7nFhfsKRZFi7h8skHWp56E7f
+   vNXGCznFsShm3ZBYkU0Z1XaP+UAYmgb4ANzUrTasmpehAZ4VC+6DevXIT
    A==;
-X-IronPort-AV: E=McAfee;i="6500,9779,10444"; a="379448967"
+X-IronPort-AV: E=McAfee;i="6500,9779,10444"; a="379448969"
 X-IronPort-AV: E=Sophos;i="5.93,250,1654585200"; 
-   d="scan'208";a="379448967"
+   d="scan'208";a="379448969"
 Received: from fmsmga008.fm.intel.com ([10.253.24.58])
   by fmsmga105.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 19 Aug 2022 23:00:48 -0700
 X-IronPort-AV: E=Sophos;i="5.93,250,1654585200"; 
-   d="scan'208";a="668857514"
+   d="scan'208";a="668857517"
 Received: from ls.sc.intel.com (HELO localhost) ([143.183.96.54])
   by fmsmga008-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 19 Aug 2022 23:00:48 -0700
 From:   isaku.yamahata@intel.com
@@ -43,9 +43,9 @@ Cc:     isaku.yamahata@intel.com, isaku.yamahata@gmail.com,
         Sean Christopherson <seanjc@google.com>,
         Kai Huang <kai.huang@intel.com>, Chao Gao <chao.gao@intel.com>,
         Will Deacon <will@kernel.org>
-Subject: [RFC PATCH 02/18] KVM: x86: Use this_cpu_ptr() instead of per_cpu_ptr(smp_processor_id())
-Date:   Fri, 19 Aug 2022 23:00:08 -0700
-Message-Id: <e072c819dfae617b4980be9a7baf706867ca602b.1660974106.git.isaku.yamahata@intel.com>
+Subject: [RFC PATCH 03/18] KVM: Drop kvm_count_lock and instead protect kvm_usage_count with kvm_lock
+Date:   Fri, 19 Aug 2022 23:00:09 -0700
+Message-Id: <6b07c02dd361f834fea442eb8dae53f23618f983.1660974106.git.isaku.yamahata@intel.com>
 X-Mailer: git-send-email 2.25.1
 In-Reply-To: <cover.1660974106.git.isaku.yamahata@intel.com>
 References: <cover.1660974106.git.isaku.yamahata@intel.com>
@@ -63,38 +63,158 @@ X-Mailing-List: kvm@vger.kernel.org
 
 From: Isaku Yamahata <isaku.yamahata@intel.com>
 
-convert per_cpu_ptr(smp_processor_id()) to this_cpu_ptr() as trivial
-cleanup.
+Because kvm_count_lock unnecessarily complicates the KVM locking convention
+Drop kvm_count_lock and instead protect kvm_usage_count with kvm_lock for
+simplicity.
 
+Opportunistically add some comments on locking.
+
+Suggested-by: Sean Christopherson <seanjc@google.com>
 Signed-off-by: Isaku Yamahata <isaku.yamahata@intel.com>
 ---
- arch/x86/kvm/x86.c | 6 ++----
- 1 file changed, 2 insertions(+), 4 deletions(-)
+ Documentation/virt/kvm/locking.rst | 14 +++++-------
+ virt/kvm/kvm_main.c                | 36 +++++++++++++++++++++---------
+ 2 files changed, 30 insertions(+), 20 deletions(-)
 
-diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-index 16104a2f7d8e..7d5fff68befe 100644
---- a/arch/x86/kvm/x86.c
-+++ b/arch/x86/kvm/x86.c
-@@ -416,8 +416,7 @@ EXPORT_SYMBOL_GPL(kvm_find_user_return_msr);
+diff --git a/Documentation/virt/kvm/locking.rst b/Documentation/virt/kvm/locking.rst
+index 845a561629f1..8957e32aa724 100644
+--- a/Documentation/virt/kvm/locking.rst
++++ b/Documentation/virt/kvm/locking.rst
+@@ -216,15 +216,11 @@ time it will be set using the Dirty tracking mechanism described above.
+ :Type:		mutex
+ :Arch:		any
+ :Protects:	- vm_list
+-
+-``kvm_count_lock``
+-^^^^^^^^^^^^^^^^^^
+-
+-:Type:		raw_spinlock_t
+-:Arch:		any
+-:Protects:	- hardware virtualization enable/disable
+-:Comment:	'raw' because hardware enabling/disabling must be atomic /wrt
+-		migration.
++                - kvm_usage_count
++                - hardware virtualization enable/disable
++:Comment:	Use cpus_read_lock() for hardware virtualization enable/disable
++                because hardware enabling/disabling must be atomic /wrt
++                migration.  The lock order is cpus lock => kvm_lock.
  
- int kvm_set_user_return_msr(unsigned slot, u64 value, u64 mask)
+ ``kvm->mn_invalidate_lock``
+ ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
+index 515dfe9d3bcf..c6781fa30461 100644
+--- a/virt/kvm/kvm_main.c
++++ b/virt/kvm/kvm_main.c
+@@ -100,7 +100,6 @@ EXPORT_SYMBOL_GPL(halt_poll_ns_shrink);
+  */
+ 
+ DEFINE_MUTEX(kvm_lock);
+-static DEFINE_RAW_SPINLOCK(kvm_count_lock);
+ LIST_HEAD(vm_list);
+ 
+ static cpumask_var_t cpus_hardware_enabled;
+@@ -4999,6 +4998,8 @@ static void hardware_enable_nolock(void *junk)
+ 	int cpu = raw_smp_processor_id();
+ 	int r;
+ 
++	WARN_ON_ONCE(preemptible());
++
+ 	if (cpumask_test_cpu(cpu, cpus_hardware_enabled))
+ 		return;
+ 
+@@ -5015,10 +5016,10 @@ static void hardware_enable_nolock(void *junk)
+ 
+ static int kvm_starting_cpu(unsigned int cpu)
  {
--	unsigned int cpu = smp_processor_id();
--	struct kvm_user_return_msrs *msrs = per_cpu_ptr(user_return_msrs, cpu);
-+	struct kvm_user_return_msrs *msrs = this_cpu_ptr(user_return_msrs);
- 	struct kvm_user_return_msr_values *values = &msrs->values[slot];
- 	int err;
+-	raw_spin_lock(&kvm_count_lock);
++	mutex_lock(&kvm_lock);
+ 	if (kvm_usage_count)
+ 		hardware_enable_nolock(NULL);
+-	raw_spin_unlock(&kvm_count_lock);
++	mutex_unlock(&kvm_lock);
+ 	return 0;
+ }
  
-@@ -449,8 +448,7 @@ EXPORT_SYMBOL_GPL(kvm_set_user_return_msr);
- 
- static void drop_user_return_notifiers(void)
+@@ -5026,6 +5027,8 @@ static void hardware_disable_nolock(void *junk)
  {
--	unsigned int cpu = smp_processor_id();
--	struct kvm_user_return_msrs *msrs = per_cpu_ptr(user_return_msrs, cpu);
-+	struct kvm_user_return_msrs *msrs = this_cpu_ptr(user_return_msrs);
+ 	int cpu = raw_smp_processor_id();
  
- 	if (msrs->registered)
- 		kvm_on_user_return(&msrs->urn);
++	WARN_ON_ONCE(preemptible());
++
+ 	if (!cpumask_test_cpu(cpu, cpus_hardware_enabled))
+ 		return;
+ 	cpumask_clear_cpu(cpu, cpus_hardware_enabled);
+@@ -5034,10 +5037,10 @@ static void hardware_disable_nolock(void *junk)
+ 
+ static int kvm_dying_cpu(unsigned int cpu)
+ {
+-	raw_spin_lock(&kvm_count_lock);
++	mutex_lock(&kvm_lock);
+ 	if (kvm_usage_count)
+ 		hardware_disable_nolock(NULL);
+-	raw_spin_unlock(&kvm_count_lock);
++	mutex_unlock(&kvm_lock);
+ 	return 0;
+ }
+ 
+@@ -5052,16 +5055,19 @@ static void hardware_disable_all_nolock(void)
+ 
+ static void hardware_disable_all(void)
+ {
+-	raw_spin_lock(&kvm_count_lock);
++	cpus_read_lock();
++	mutex_lock(&kvm_lock);
+ 	hardware_disable_all_nolock();
+-	raw_spin_unlock(&kvm_count_lock);
++	mutex_unlock(&kvm_lock);
++	cpus_read_unlock();
+ }
+ 
+ static int hardware_enable_all(void)
+ {
+ 	int r = 0;
+ 
+-	raw_spin_lock(&kvm_count_lock);
++	cpus_read_lock();
++	mutex_lock(&kvm_lock);
+ 
+ 	kvm_usage_count++;
+ 	if (kvm_usage_count == 1) {
+@@ -5074,7 +5080,8 @@ static int hardware_enable_all(void)
+ 		}
+ 	}
+ 
+-	raw_spin_unlock(&kvm_count_lock);
++	mutex_unlock(&kvm_lock);
++	cpus_read_unlock();
+ 
+ 	return r;
+ }
+@@ -5680,15 +5687,22 @@ static void kvm_init_debug(void)
+ 
+ static int kvm_suspend(void)
+ {
+-	if (kvm_usage_count)
++	/*
++	 * The caller ensures that CPU hotlug is disabled by
++	 * cpu_hotplug_disable() and other CPUs are offlined.  No need for
++	 * locking.
++	 */
++	if (kvm_usage_count) {
++		lockdep_assert_not_held(&kvm_lock);
+ 		hardware_disable_nolock(NULL);
++	}
+ 	return 0;
+ }
+ 
+ static void kvm_resume(void)
+ {
+ 	if (kvm_usage_count) {
+-		lockdep_assert_not_held(&kvm_count_lock);
++		lockdep_assert_not_held(&kvm_lock);
+ 		hardware_enable_nolock(NULL);
+ 	}
+ }
 -- 
 2.25.1
 
