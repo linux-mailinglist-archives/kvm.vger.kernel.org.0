@@ -2,83 +2,82 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 659A859B593
-	for <lists+kvm@lfdr.de>; Sun, 21 Aug 2022 19:12:55 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 2CFBF59B68E
+	for <lists+kvm@lfdr.de>; Sun, 21 Aug 2022 23:59:34 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230468AbiHURMJ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sun, 21 Aug 2022 13:12:09 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45204 "EHLO
+        id S231842AbiHUV7a (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sun, 21 Aug 2022 17:59:30 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46264 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230293AbiHURMH (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sun, 21 Aug 2022 13:12:07 -0400
-Received: from mail-ed1-x531.google.com (mail-ed1-x531.google.com [IPv6:2a00:1450:4864:20::531])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B9FC721E0F
-        for <kvm@vger.kernel.org>; Sun, 21 Aug 2022 10:12:06 -0700 (PDT)
-Received: by mail-ed1-x531.google.com with SMTP id s11so11158856edd.13
-        for <kvm@vger.kernel.org>; Sun, 21 Aug 2022 10:12:06 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linux-foundation.org; s=google;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc;
-        bh=2IG7yxCXKhrrmlYS5yO7XY8+9kSj2TtQKMSIeXBcBeM=;
-        b=KzixGCuDnswaMadZqR4ynhhwNXnoXEVyUxEjeuDGHd5tL+ljlGzsi+LE8LF7F5lwRn
-         v9mjz4V1ufMkIAeKimYo9EAgIy0HyOy9AOd/PAq3eqylpiDSkisiUMxEQp1Y8V7AtTGo
-         NbrWgFjyqJ/5NmxocTy3bgtBX7ufagCwkWDhA=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc;
-        bh=2IG7yxCXKhrrmlYS5yO7XY8+9kSj2TtQKMSIeXBcBeM=;
-        b=7qb/nVdh3e/XmFB5CyEOm/UYZF2rhflqYhHwEDczINjrnQD4ZOrDTig89koGKCupsm
-         ULZh57bCe7hQ0tUP5+ZpC6gGcUUU0oFzE+a5OYFM8jZ+6Si48Dmmus63/gKNUC/xLoGB
-         nAv1lSa7x2CR14HazAo1LARpu55O+ct/f0VxxC1lClvkgy2MeuY5DjoS2lRn7ChwxjDs
-         gwiAXaIHfdHyrV2ZWi3Beylfb4tqzMtZwaA4gMnWSFLliSVJT6KqoyhtpVhULhb7swuU
-         7w0AyvZb1swf/rmpihcHwKu3Y3N4IKUelfVSBf9O5QVbxY0XGFnIS096CKrWAOOEZmg2
-         WJFw==
-X-Gm-Message-State: ACgBeo3DY04svyuMrTQt3xPoputO98aPolQM5oRJL9Qcdoc07Tq7Hb2U
-        Q8jbnDEMnTumuJ22sgOj+cAX+TsvyYK12uTe
-X-Google-Smtp-Source: AA6agR56dm72MeEV+T9KUcLW3q/sCHkoZHewR5Cr5fyPhwU0UA6R7xRUmo7kzkC4vZJAkdCaLskfJA==
-X-Received: by 2002:a05:6402:2751:b0:443:d90a:43d4 with SMTP id z17-20020a056402275100b00443d90a43d4mr13548903edd.368.1661101925066;
-        Sun, 21 Aug 2022 10:12:05 -0700 (PDT)
-Received: from mail-wm1-f41.google.com (mail-wm1-f41.google.com. [209.85.128.41])
-        by smtp.gmail.com with ESMTPSA id b9-20020a17090630c900b0073c9d68ca0dsm4119467ejb.133.2022.08.21.10.12.03
-        for <kvm@vger.kernel.org>
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Sun, 21 Aug 2022 10:12:03 -0700 (PDT)
-Received: by mail-wm1-f41.google.com with SMTP id r83-20020a1c4456000000b003a5cb389944so6574037wma.4
-        for <kvm@vger.kernel.org>; Sun, 21 Aug 2022 10:12:03 -0700 (PDT)
-X-Received: by 2002:a7b:c399:0:b0:3a5:f3fb:85e0 with SMTP id
- s25-20020a7bc399000000b003a5f3fb85e0mr10127541wmj.38.1661101922857; Sun, 21
- Aug 2022 10:12:02 -0700 (PDT)
+        with ESMTP id S231788AbiHUV73 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sun, 21 Aug 2022 17:59:29 -0400
+Received: from mailtransmit05.runbox.com (mailtransmit05.runbox.com [IPv6:2a0c:5a00:149::26])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8523615A10
+        for <kvm@vger.kernel.org>; Sun, 21 Aug 2022 14:59:21 -0700 (PDT)
+Received: from mailtransmit02.runbox ([10.9.9.162] helo=aibo.runbox.com)
+        by mailtransmit05.runbox.com with esmtps  (TLS1.2) tls TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256
+        (Exim 4.93)
+        (envelope-from <mhal@rbox.co>)
+        id 1oPsyU-008sg9-OQ
+        for kvm@vger.kernel.org; Sun, 21 Aug 2022 23:59:18 +0200
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=rbox.co;
+        s=selector2; h=Content-Transfer-Encoding:MIME-Version:Message-Id:Date:Subject
+        :Cc:To:From; bh=Y8xlPINiAr82q0yWzCQ+duX31yqFp04n0IHEjKYdbm4=; b=YdgFBCwt14Eam
+        Z/NSQkYr30PSp/Jh8kScyScV2LLn/lqYJdwOgnHis4Y8bT+wH+Qz8Njqs9FsbN8Aae9Nb3qK4eGo1
+        U/KDvyUhb8jYiFsLvZ/zRHcW7ggmt3HVCdl81/DLhbfcbLJZk4vTzMQm8RQGSBiaHpVaaVRQuf1rS
+        3tXC9MGy7sU7e3Rm+FDj1hzSNtk/C2fD5X7Vfw0dMR+1F7pDZfICVYFPEvoC8T1VeHXCm/pznH6+Z
+        0LdRP7DtPPS3PiY2oyXqfxDHREHtOY049btvroEFen81COFtXX7L5BPVuawGgGPbhk7BnJ3r1gioj
+        ZZz0stiFrzOHpfcO9nNNQ==;
+Received: from [10.9.9.74] (helo=submission03.runbox)
+        by mailtransmit02.runbox with esmtp (Exim 4.86_2)
+        (envelope-from <mhal@rbox.co>)
+        id 1oPsyU-00047X-6L; Sun, 21 Aug 2022 23:59:18 +0200
+Received: by submission03.runbox with esmtpsa  [Authenticated ID (604044)]  (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+        (Exim 4.90_1)
+        id 1oPsyT-0002Ny-7Z; Sun, 21 Aug 2022 23:59:17 +0200
+From:   Michal Luczaj <mhal@rbox.co>
+To:     kvm@vger.kernel.org
+Cc:     seanjc@google.com, pbonzini@redhat.com,
+        Michal Luczaj <mhal@rbox.co>
+Subject: [PATCH] KVM: x86/emulator: Fix handing of POP SS to correctly set interruptibility
+Date:   Sun, 21 Aug 2022 23:59:00 +0200
+Message-Id: <20220821215900.1419215-1-mhal@rbox.co>
+X-Mailer: git-send-email 2.37.2
 MIME-Version: 1.0
-References: <CAADnVQJFc9AnH_9CW+bSRotkKvOmkO9jq-RF6dmyPYOpq691Yg@mail.gmail.com>
- <20220819190640.2763586-1-ndesaulniers@google.com>
-In-Reply-To: <20220819190640.2763586-1-ndesaulniers@google.com>
-From:   Linus Torvalds <torvalds@linux-foundation.org>
-Date:   Sun, 21 Aug 2022 10:11:46 -0700
-X-Gmail-Original-Message-ID: <CAHk-=whLcuvDDS3rZfEgDrwbdJrTx8HCRNiZ5cDc80-_gzHCxw@mail.gmail.com>
-Message-ID: <CAHk-=whLcuvDDS3rZfEgDrwbdJrTx8HCRNiZ5cDc80-_gzHCxw@mail.gmail.com>
-Subject: Re: [PATCH v2] asm goto: eradicate CC_HAS_ASM_GOTO
-To:     Nick Desaulniers <ndesaulniers@google.com>
-Cc:     Masahiro Yamada <masahiroy@kernel.org>,
-        Peter Zijlstra <peterz@infradead.org>, x86@kernel.org,
-        linux-kbuild@vger.kernel.org, linux-doc@vger.kernel.org,
-        linux-kernel@vger.kernel.org, linux-um@lists.infradead.org,
-        kvm@vger.kernel.org, llvm@lists.linux.dev,
-        Alexandre Belloni <alexandre.belloni@bootlin.com>,
-        Borislav Petkov <bp@suse.de>,
-        Alexei Starovoitov <alexei.starovoitov@gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-X-Spam-Status: No, score=-1.8 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-        RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
-        autolearn=no autolearn_force=no version=3.4.6
+Content-Transfer-Encoding: 8bit
+X-Spam-Status: No, score=-2.8 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,RCVD_IN_DNSWL_LOW,
+        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Applied directly, just because I love seeing old nasty stuff like this go away.
+The emulator checks the wrong variable while setting the CPU
+interruptibility state.  Fix the condition.
 
-             Linus
+Signed-off-by: Michal Luczaj <mhal@rbox.co>
+---
+I'll follow up with a testcase.
+
+ arch/x86/kvm/emulate.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/arch/x86/kvm/emulate.c b/arch/x86/kvm/emulate.c
+index b4eeb7c75dfa..5cfd07f483b3 100644
+--- a/arch/x86/kvm/emulate.c
++++ b/arch/x86/kvm/emulate.c
+@@ -1967,7 +1967,7 @@ static int em_pop_sreg(struct x86_emulate_ctxt *ctxt)
+ 	if (rc != X86EMUL_CONTINUE)
+ 		return rc;
+ 
+-	if (ctxt->modrm_reg == VCPU_SREG_SS)
++	if (seg == VCPU_SREG_SS)
+ 		ctxt->interruptibility = KVM_X86_SHADOW_INT_MOV_SS;
+ 	if (ctxt->op_bytes > 2)
+ 		rsp_increment(ctxt, ctxt->op_bytes - 2);
+-- 
+2.37.2
+
