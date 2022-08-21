@@ -2,137 +2,191 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 4BD4B59B205
-	for <lists+kvm@lfdr.de>; Sun, 21 Aug 2022 07:18:56 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id C160259B29B
+	for <lists+kvm@lfdr.de>; Sun, 21 Aug 2022 09:39:23 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230005AbiHUFQD (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sun, 21 Aug 2022 01:16:03 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52942 "EHLO
+        id S229535AbiHUHhN (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sun, 21 Aug 2022 03:37:13 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51000 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230135AbiHUFP7 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sun, 21 Aug 2022 01:15:59 -0400
-Received: from mail-qk1-x72d.google.com (mail-qk1-x72d.google.com [IPv6:2607:f8b0:4864:20::72d])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9FDF624BE5
-        for <kvm@vger.kernel.org>; Sat, 20 Aug 2022 22:15:55 -0700 (PDT)
-Received: by mail-qk1-x72d.google.com with SMTP id c9so4743447qkk.6
-        for <kvm@vger.kernel.org>; Sat, 20 Aug 2022 22:15:55 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=mime-version:references:message-id:in-reply-to:subject:cc:to:from
-         :date:from:to:cc;
-        bh=ICbJbu994zVr5Xs1z95aw5HWEa26kaUMyLqHNb1JBhY=;
-        b=PN7QnVx2jBrgPHqyqwc/bGpaE8KQadBOlUYLB6T+dOoTpwUJFZfkh7+JVXHp8AIDdn
-         aHVqAoV2ZwSdEszZ8lrHjiDGK+3Uii266yrUQ3R+HEjiDpKwO+93234VMS0VxIslm3a2
-         GnKw+ulrN3ttL/lmXtLFPyG1MFfOBD03JI5VIL8VtHlzN+J13QiCn0MqBcDQjVUJ2yxu
-         YXyfDyjsbE5tLakbt0uihPXt6VtlTnTU8qek0GTcV92IjJUEcnKUo2hYjjstnq3Z/sjr
-         QdiFfxuMoiaHkH94kHcVhCTjcWUnNDlAi3dffLlojPKp6NroKfJZsJrztnzru2HRTkKk
-         WHgQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=mime-version:references:message-id:in-reply-to:subject:cc:to:from
-         :date:x-gm-message-state:from:to:cc;
-        bh=ICbJbu994zVr5Xs1z95aw5HWEa26kaUMyLqHNb1JBhY=;
-        b=n0VfCa9iqlDkavcZZJApz+kynEjfpCL0tfxW6WRpyYCAWOzyOS0AvcBR8re+n49VQC
-         +CnKvpwHKVI1sTp1KELpqGody/l9+MSZ6H0cavlsL9688dGdhAK/3X61MiX5JBKaVdZ8
-         KuPNlt/hSAa1ww+BMsJ87pCgSDm4aB0Y8ELxoLTnSQq++xRJQXFvsEoqNwWT7SmHw4GS
-         ADAQ2fiTWMngLj9nrCG3cd2cbHOOlp83Xyr7uYwr5kejME/j+IB7j5Dmn932r9xtWLiM
-         Bgyq/64l6Y1zGTX/kQz7XrlEvgK2WvFyg2YKsloYmylColXrUgqtPjecvEgB/ysDsuYC
-         mYHQ==
-X-Gm-Message-State: ACgBeo0P8wknHPNyT/iR7SFwLNyzjNgHg2I2QlZMz5BcaIXvD8O3Og1k
-        F2nWoqQREOuKu+gt17Haq5XsaGzsPqWDsZnS
-X-Google-Smtp-Source: AA6agR68yl2fr8PEnDujhC7M2MHll9zueDCXCVVuM/SRsb8w23zlYBdOQcq71uTGZEOLB6PPe+MzJQ==
-X-Received: by 2002:a05:620a:70a:b0:6b6:1997:b7f2 with SMTP id 10-20020a05620a070a00b006b61997b7f2mr9605948qkc.417.1661058954697;
-        Sat, 20 Aug 2022 22:15:54 -0700 (PDT)
-Received: from ripple.attlocal.net (172-10-233-147.lightspeed.sntcca.sbcglobal.net. [172.10.233.147])
-        by smtp.gmail.com with ESMTPSA id s11-20020a05620a0bcb00b006bb9125363fsm7972537qki.121.2022.08.20.22.15.49
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sat, 20 Aug 2022 22:15:53 -0700 (PDT)
-Date:   Sat, 20 Aug 2022 22:15:32 -0700 (PDT)
-From:   Hugh Dickins <hughd@google.com>
-X-X-Sender: hugh@ripple.anvils
-To:     "Kirill A. Shutemov" <kirill@shutemov.name>
-cc:     Hugh Dickins <hughd@google.com>,
-        "Kirill A . Shutemov" <kirill.shutemov@linux.intel.com>,
-        Chao Peng <chao.p.peng@linux.intel.com>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org, linux-mm@kvack.org,
-        linux-fsdevel@vger.kernel.org, linux-api@vger.kernel.org,
-        linux-doc@vger.kernel.org, qemu-devel@nongnu.org,
-        linux-kselftest@vger.kernel.org,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Jonathan Corbet <corbet@lwn.net>,
-        Sean Christopherson <seanjc@google.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        x86@kernel.org, "H . Peter Anvin" <hpa@zytor.com>,
-        Jeff Layton <jlayton@kernel.org>,
-        "J . Bruce Fields" <bfields@fieldses.org>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        Shuah Khan <shuah@kernel.org>, Mike Rapoport <rppt@kernel.org>,
-        Steven Price <steven.price@arm.com>,
-        "Maciej S . Szmigiero" <mail@maciej.szmigiero.name>,
-        Vlastimil Babka <vbabka@suse.cz>,
-        Vishal Annapurve <vannapurve@google.com>,
-        Yu Zhang <yu.c.zhang@linux.intel.com>, luto@kernel.org,
-        jun.nakajima@intel.com, dave.hansen@intel.com, ak@linux.intel.com,
-        david@redhat.com, aarcange@redhat.com, ddutile@redhat.com,
-        dhildenb@redhat.com, Quentin Perret <qperret@google.com>,
-        Michael Roth <michael.roth@amd.com>, mhocko@suse.com,
-        Muchun Song <songmuchun@bytedance.com>,
-        "Gupta, Pankaj" <pankaj.gupta@amd.com>
-Subject: Re: [PATCH v7 00/14] KVM: mm: fd-based approach for supporting KVM
- guest private memory
-In-Reply-To: <20220820002700.6yflrxklmpsavdzi@box.shutemov.name>
-Message-ID: <c194262b-b634-4baf-abf0-dc727e8f1d7@google.com>
-References: <20220706082016.2603916-1-chao.p.peng@linux.intel.com> <ff5c5b97-acdf-9745-ebe5-c6609dd6322e@google.com> <20220818132421.6xmjqduempmxnnu2@box> <c6ccbb96-5849-2e2f-3b49-4ea711af525d@google.com> <20220820002700.6yflrxklmpsavdzi@box.shutemov.name>
+        with ESMTP id S229604AbiHUHhL (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sun, 21 Aug 2022 03:37:11 -0400
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 06C9D23BD0
+        for <kvm@vger.kernel.org>; Sun, 21 Aug 2022 00:37:11 -0700 (PDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id 95C0360BFE
+        for <kvm@vger.kernel.org>; Sun, 21 Aug 2022 07:37:10 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPS id E88F1C433D7
+        for <kvm@vger.kernel.org>; Sun, 21 Aug 2022 07:37:09 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1661067429;
+        bh=AOEWVvNh0IyLD1RVJIQzaTC1Z348j9A8XtfoM5krQKw=;
+        h=From:To:Subject:Date:From;
+        b=S/BZKse1iMg3OhBOFC9sv3XPZ9xFx+GqyPBPVQFkCw6Y5aTt76w3SDiF0z+0R32jc
+         +x2+vhEbRVx8e9DNQ93wephFuQ2tFO1je+RpKDpkT0xz/xYwZtzM1ORGv8MxMdtPph
+         SHVuhmpcXKTDWWyMg/eOM6aFYg+hoa3UndKMJ2ZSuA/rUlsq4XE5o3bbEHwY3nhIG9
+         qG4gpyM7o2nycIzDriN/oQGyjImMy3s0noCSTN/4+gXF6BQIX8Y5hUSHSqe6Q+tbp3
+         N6+Eqo/x8atgo76QVs1mUo1rJ5sAin44bLG/7lp7EWdq3TfEdQvdiwVMxqgaATQdt/
+         GMCDW/oo14foQ==
+Received: by aws-us-west-2-korg-bugzilla-1.web.codeaurora.org (Postfix, from userid 48)
+        id CCBCAC433E9; Sun, 21 Aug 2022 07:37:09 +0000 (UTC)
+From:   bugzilla-daemon@kernel.org
+To:     kvm@vger.kernel.org
+Subject: [Bug 216388] New: On Host, kernel errors in KVM, on guests, it shows
+ CPU stalls
+Date:   Sun, 21 Aug 2022 07:37:09 +0000
+X-Bugzilla-Reason: None
+X-Bugzilla-Type: new
+X-Bugzilla-Watch-Reason: AssignedTo virtualization_kvm@kernel-bugs.osdl.org
+X-Bugzilla-Product: Virtualization
+X-Bugzilla-Component: kvm
+X-Bugzilla-Version: unspecified
+X-Bugzilla-Keywords: 
+X-Bugzilla-Severity: high
+X-Bugzilla-Who: nanook@eskimo.com
+X-Bugzilla-Status: NEW
+X-Bugzilla-Resolution: 
+X-Bugzilla-Priority: P1
+X-Bugzilla-Assigned-To: virtualization_kvm@kernel-bugs.osdl.org
+X-Bugzilla-Flags: 
+X-Bugzilla-Changed-Fields: bug_id short_desc product version
+ cf_kernel_version rep_platform op_sys cf_tree bug_status bug_severity
+ priority component assigned_to reporter cf_regression attachments.created
+Message-ID: <bug-216388-28872@https.bugzilla.kernel.org/>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Bugzilla-URL: https://bugzilla.kernel.org/
+Auto-Submitted: auto-generated
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-        T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL
-        autolearn=unavailable autolearn_force=no version=3.4.6
+X-Spam-Status: No, score=-7.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_HI,
+        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Sat, 20 Aug 2022, Kirill A. Shutemov wrote:
-> 
-> Yes, INACCESSIBLE is increase of complexity which you do not want to deal
-> with in shmem.c. It get it.
+https://bugzilla.kernel.org/show_bug.cgi?id=3D216388
 
-It's not so much that INACCESSIBLE increases the complexity of
-memfd/shmem/tmpfs, as that it is completely foreign to it.
+            Bug ID: 216388
+           Summary: On Host, kernel errors in KVM, on guests, it shows CPU
+                    stalls
+           Product: Virtualization
+           Version: unspecified
+    Kernel Version: 5.19.0 / 5.19.1 / 5.19.2
+          Hardware: All
+                OS: Linux
+              Tree: Mainline
+            Status: NEW
+          Severity: high
+          Priority: P1
+         Component: kvm
+          Assignee: virtualization_kvm@kernel-bugs.osdl.org
+          Reporter: nanook@eskimo.com
+        Regression: No
 
-And by handling all those foreign needs at the KVM end (where you
-can be sure that the mem attached to the fd is INACCESSIBLE because
-you have given nobody access to it - no handshaking with 3rd party
-required).
+Created attachment 301614
+  --> https://bugzilla.kernel.org/attachment.cgi?id=3D301614&action=3Dedit
+The configuration file used to Comile this kernel.
 
-> 
-> I will try next week to rework it as shim to top of shmem. Does it work
-> for you?
+This behavior has persisted across 5.19.0, 5.19.1, and 5.19.2.  While the
+kernel I am taking this example from is tainted (owing to using Intel
+development drivers for GPU virtualization), it is also occurring on
+non-tainted kernels on servers with no development or third party modules
+installed.
 
-Yes, please do, thanks.  It's a compromise between us: the initial TDX
-case has no justification to use shmem at all, but doing it that way
-will help you with some of the infrastructure, and will probably be
-easiest for KVM to extend to other more relaxed fd cases later.
+INFO: task CPU 2/KVM:2343 blocked for more than 1228 seconds.
+[207177.050049]       Tainted: G     U    I       5.19.2 #1
+[207177.050050] "echo 0 > /proc/sys/kernel/hung_task_timeout_secs" disables
+this message.
+[207177.050051] task:CPU 2/KVM       state:D stack:    0 pid: 2343 ppid:   =
+  1
+flags:0x00000002
+[207177.050054] Call Trace:
+[207177.050055]  <TASK>
+[207177.050056]  __schedule+0x359/0x1400
+[207177.050060]  ? kvm_mmu_page_fault+0x1ee/0x980
+[207177.050062]  ? kvm_set_msr_common+0x31f/0x1060
+[207177.050065]  schedule+0x5f/0x100
+[207177.050066]  schedule_preempt_disabled+0x15/0x30
+[207177.050068]  __mutex_lock.constprop.0+0x4e2/0x750
+[207177.050070]  ? aa_file_perm+0x124/0x4f0
+[207177.050071]  __mutex_lock_slowpath+0x13/0x20
+[207177.050072]  mutex_lock+0x25/0x30
+[207177.050075]  intel_vgpu_emulate_mmio_read+0x5d/0x3b0 [kvmgt]
+[207177.050084]  intel_vgpu_rw+0xb8/0x1c0 [kvmgt]
+[207177.050091]  intel_vgpu_read+0x20d/0x250 [kvmgt]
+[207177.050097]  vfio_device_fops_read+0x1f/0x40
+[207177.050100]  vfs_read+0x9b/0x160
+[207177.050102]  __x64_sys_pread64+0x93/0xd0
+[207177.050104]  do_syscall_64+0x58/0x80
+[207177.050106]  ? kvm_on_user_return+0x84/0xe0
+[207177.050107]  ? fire_user_return_notifiers+0x37/0x70
+[207177.050109]  ? exit_to_user_mode_prepare+0x41/0x200
+[207177.050111]  ? syscall_exit_to_user_mode+0x1b/0x40
+[207177.050112]  ? do_syscall_64+0x67/0x80
+[207177.050114]  ? irqentry_exit+0x54/0x70
+[207177.050115]  ? sysvec_call_function_single+0x4b/0xa0
+[207177.050116]  entry_SYSCALL_64_after_hwframe+0x63/0xcd
+[207177.050118] RIP: 0033:0x7ff51131293f
+[207177.050119] RSP: 002b:00007ff4ddffa260 EFLAGS: 00000293 ORIG_RAX:
+0000000000000011
+[207177.050121] RAX: ffffffffffffffda RBX: 00005599a6835420 RCX:
+00007ff51131293f
+[207177.050122] RDX: 0000000000000004 RSI: 00007ff4ddffa2a8 RDI:
+0000000000000027
+[207177.050123] RBP: 0000000000000004 R08: 0000000000000000 R09:
+00000000ffffffff
+[207177.050124] R10: 0000000000065f10 R11: 0000000000000293 R12:
+0000000000065f10
+[207177.050124] R13: 00005599a6835330 R14: 0000000000000004 R15:
+0000000000065f10
+[207177.050126]  </TASK>
 
-> 
-> But I think it is wrong to throw it over the fence to KVM folks and say it
-> is your problem. Core MM has to manage it.
+     I am seeing this on Intel i7-6700k, i7-6850k, and i7-9700k platforms.
 
-We disagree on who is throwing over the fence to whom :)
+     This did not happen on 5.17 kernels, and 5.18 kernels never ran stable
+enough on my platforms to actually run them for more than a few minutes.
 
-Core MM should manage the core MM parts and KVM should manage the KVM
-parts.  What makes this rather different from most driver usage of MM,
-is that KVM seems likely to use a great proportion of memory this way.
-With great memory usage comes great responsibility: I don't think
-all those flags and seals and notifiers let KVM escape from that.
+     Likewise 6.0-rc1 has not been stable enough to run in production.  Aft=
+er
+less than three hours running on my workstation it locked hard with even the
+magic sys-request key being unresponsive and only power cycling the machine=
+ got
+it back.
 
-Hugh
+     The operating system in use for the host on all machines is Ubuntu 22.=
+04.
+
+     Guests vary with Ubuntu 22.04 being the most common but also Mint, Deb=
+ian,
+Manjaro, Centos, Fedora, ScientificLinux, Zorin, and Windows being in use.
+
+     I see the same issue manifest on platforms running only Ubuntu guests =
+as
+with guests of varying operating systems.=20=20
+
+     The configuration file I used to compile this kernel is attached.  I
+compiled it with gcc 12.1.0.
+
+     This behavior does not manifest itself instantly, typically the machine
+needs to be running 3-7 days before it does.  Once it does guests keep stal=
+ling
+and restarting libvirtd does not help.  Only thing that seems to is a hard
+reboot of the physical host.  For this reason I believe the issue lies stri=
+ctly
+with the host and not the guests.
+
+     I have listed it as a severity of high since it is completely service
+interrupting.
+
+--=20
+You may reply to this email to add a comment.
+
+You are receiving this mail because:
+You are watching the assignee of the bug.=
