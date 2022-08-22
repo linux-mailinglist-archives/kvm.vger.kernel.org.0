@@ -2,196 +2,138 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id B1E8C59C486
-	for <lists+kvm@lfdr.de>; Mon, 22 Aug 2022 19:02:03 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 6E47A59C4A8
+	for <lists+kvm@lfdr.de>; Mon, 22 Aug 2022 19:07:29 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235725AbiHVRB5 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 22 Aug 2022 13:01:57 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48946 "EHLO
+        id S237171AbiHVRHQ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 22 Aug 2022 13:07:16 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55784 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235306AbiHVRBz (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 22 Aug 2022 13:01:55 -0400
-Received: from mail-pl1-x632.google.com (mail-pl1-x632.google.com [IPv6:2607:f8b0:4864:20::632])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EFA0B3CBE4
-        for <kvm@vger.kernel.org>; Mon, 22 Aug 2022 10:01:53 -0700 (PDT)
-Received: by mail-pl1-x632.google.com with SMTP id m2so10492733pls.4
-        for <kvm@vger.kernel.org>; Mon, 22 Aug 2022 10:01:53 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc;
-        bh=hISs2+Lj2zz9ocjh89OwJmc05bBvn26H1BdqKuz/c9o=;
-        b=NOz0ftgWBUONI4K6xRlOuRT36flqRPmzJBevhTDG7H5UWwyKFRMINFxIpdmfd4u4QI
-         CaJiP6wqGLU2LDVGRVz1EwRbz+Ba9rpv5JXI5fZr7VxxA2CBqyD3scB9K9jOID9Ph3Rx
-         0dV6+sZUwQjuybtiPFUZh66o+aKLGY9PHr0Ya/h/TmboC0deyk2mkIs1yLguUKQEOka3
-         tKvfKKO2cQJT/3OfS9J5fMXMPj8ECZ7c/kr7ZX1ETDKk15j//qPrPcpp2bnY+mEpeSL4
-         gjiNC6awGs/OnLdVUJ9f7qkRCUxqCvP8e5uKPOiM4Mz3EEeqKlzHQf8A8eNvGatJHh74
-         1G7A==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc;
-        bh=hISs2+Lj2zz9ocjh89OwJmc05bBvn26H1BdqKuz/c9o=;
-        b=nVf0pYyuV1qA0i7Hs/Hc35eH874vgkRa7QKamxo3kGcAFp84F95KwPqoHiHUuGZMg4
-         lHmTVA2wBQqqHXc3aKaGDbx0GqLWh6xmCPprEMjQE7vBmYzq7QUflyPxCfkdOfSLwrlh
-         vxIYMZdyCA3T+vDRt1/KfnhkGb0xT3rw8D0ZwIdlL48RvABCJXxoREBYQZ3CFUDE2N4Z
-         uZORZJ37gxgrKXzVFyl0Ue6JW+D0HvFAbA183Avv/AouK0MqRyCOBNIMzGhcD2KmXOLa
-         CBkcZAmw87lIanmHdJov0+LYlrBBzYzjq79ZpbMS5PXyggxorjcQyVxJb/r3alw6X+E/
-         Gqtw==
-X-Gm-Message-State: ACgBeo3gYE/y4LM1kAEq9nS+mfG5bTXOZjSplIDj7dcKtu+axzhC7Rdn
-        obmGfL1DlTqRQQWaTukqBtmU7A==
-X-Google-Smtp-Source: AA6agR6y6MvImrDfOKpRHaP76KrDOZE2lPG3W4xYzVQy6r86lB96UyXhh1HAfgfxABjIE9OT1hMoCg==
-X-Received: by 2002:a17:90b:1c82:b0:1ee:eb41:b141 with SMTP id oo2-20020a17090b1c8200b001eeeb41b141mr24430852pjb.143.1661187713337;
-        Mon, 22 Aug 2022 10:01:53 -0700 (PDT)
-Received: from google.com (7.104.168.34.bc.googleusercontent.com. [34.168.104.7])
-        by smtp.gmail.com with ESMTPSA id u64-20020a627943000000b0052c7ff2ac74sm9191026pfc.17.2022.08.22.10.01.52
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 22 Aug 2022 10:01:52 -0700 (PDT)
-Date:   Mon, 22 Aug 2022 17:01:49 +0000
-From:   Sean Christopherson <seanjc@google.com>
-To:     Vitaly Kuznetsov <vkuznets@redhat.com>
-Cc:     kvm@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>,
-        Anirudh Rayabharam <anrayabh@linux.microsoft.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Maxim Levitsky <mlevitsk@redhat.com>,
-        Nathan Chancellor <nathan@kernel.org>,
-        Michael Kelley <mikelley@microsoft.com>,
-        linux-hyperv@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v5 03/26] x86/hyperv: Update 'struct hv_enlightened_vmcs'
- definition
-Message-ID: <YwO2fSCGXnE/9mc2@google.com>
-References: <20220802160756.339464-1-vkuznets@redhat.com>
- <20220802160756.339464-4-vkuznets@redhat.com>
- <Yv5ZFgztDHzzIQJ+@google.com>
- <875yiptvsc.fsf@redhat.com>
- <Yv59dZwP6rNUtsrn@google.com>
- <87czcsskkj.fsf@redhat.com>
- <YwOm7Ph54vIYAllm@google.com>
- <87edx8xn8h.fsf@redhat.com>
+        with ESMTP id S235876AbiHVRHK (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 22 Aug 2022 13:07:10 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E707242AC9
+        for <kvm@vger.kernel.org>; Mon, 22 Aug 2022 10:07:04 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1661188023;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding;
+        bh=OZupmRZtcUtlH4659i6zFhdu2zNlFDA9+3SfaNsY/Ro=;
+        b=e/7NtnVV0FM0u6EUyWMIhXw/I+35v+LseFcqxyZj7AAzlPiKJ/9VE/XDdlNv1jx4Yy6jTI
+        MqdaP4ArErfYFWqf0a9481vZvLp+IIITzSpsVxvzi0hxJqA2g1V5CMNt2dZjiJpRWznxfH
+        GNtSBVVwd6c0xAiEClxFEfPe8dOl5kc=
+Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
+ [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-261-NqFD413gOXqFk3OTVAUTbA-1; Mon, 22 Aug 2022 13:06:59 -0400
+X-MC-Unique: NqFD413gOXqFk3OTVAUTbA-1
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.rdu2.redhat.com [10.11.54.5])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 6671485A585;
+        Mon, 22 Aug 2022 17:06:59 +0000 (UTC)
+Received: from virtlab701.virt.lab.eng.bos.redhat.com (virtlab701.virt.lab.eng.bos.redhat.com [10.19.152.228])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 44529945D0;
+        Mon, 22 Aug 2022 17:06:59 +0000 (UTC)
+From:   Paolo Bonzini <pbonzini@redhat.com>
+To:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org
+Cc:     mlevitsk@redhat.com, seanjc@google.com
+Subject: [PATCH v3 0/7] KVM: x86: never write to memory from kvm_vcpu_check_block
+Date:   Mon, 22 Aug 2022 13:06:52 -0400
+Message-Id: <20220822170659.2527086-1-pbonzini@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <87edx8xn8h.fsf@redhat.com>
-X-Spam-Status: No, score=-14.5 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        ENV_AND_HDR_SPF_MATCH,FSL_HELO_FAKE,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,
-        SPF_PASS,T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL
-        autolearn=no autolearn_force=no version=3.4.6
+Content-Type: text/plain
+Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 2.79 on 10.11.54.5
+X-Spam-Status: No, score=-2.8 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,
+        SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Aug 22, 2022, Vitaly Kuznetsov wrote:
-> Sean Christopherson <seanjc@google.com> writes:
-> 
-> > On Mon, Aug 22, 2022, Vitaly Kuznetsov wrote:
-> >> So I reached out to Microsoft and their answer was that for all these new
-> >> eVMCS fields (including *PerfGlobalCtrl) observing architectural VMX
-> >> MSRs should be enough. *PerfGlobalCtrl case is special because of Win11
-> >> bug (if we expose the feature in VMX feature MSRs but don't set
-> >> CPUID.0x4000000A.EBX BIT(0) it just doesn't boot).
-> >
-> > I.e. TSC_SCALING shouldn't be gated on the flag?  If so, then the 2-D array approach
-> > is overkill since (a) the CPUID flag only controls PERF_GLOBAL_CTRL and (b) we aren't
-> > expecting any more flags in the future.
-> >
-> 
-> Unfortunately, we have to gate the presence of these new features on
-> something, otherwise VMM has no way to specify which particular eVMCS
-> "revision" it wants (TL;DR: we will break migration).
-> 
-> My initial implementation was inventing 'eVMCS revision' concept:
-> https://lore.kernel.org/kvm/20220629150625.238286-7-vkuznets@redhat.com/
-> 
-> which is needed if we don't gate all these new fields on CPUID.0x4000000A.EBX BIT(0).
-> 
-> Going forward, we will still (likely) need something when new fields show up.
+The following backtrace:
 
-My comments from that thread still apply.  Adding "revisions" or feature flags
-isn't maintanable, e.g. at best KVM will end up with a ridiculous number of flags.
+[ 1355.807187]  kvm_vcpu_map+0x159/0x190 [kvm]
+[ 1355.807628]  nested_svm_vmexit+0x4c/0x7f0 [kvm_amd]
+[ 1355.808036]  ? kvm_vcpu_block+0x54/0xa0 [kvm]
+[ 1355.808450]  svm_check_nested_events+0x97/0x390 [kvm_amd]
+[ 1355.808920]  kvm_check_nested_events+0x1c/0x40 [kvm] 
+[ 1355.809396]  kvm_arch_vcpu_runnable+0x4e/0x190 [kvm]
+[ 1355.809892]  kvm_vcpu_check_block+0x4f/0x100 [kvm]
+[ 1355.811259]  kvm_vcpu_block+0x6b/0xa0 [kvm] 
 
-Looking at QEMU, which I strongly suspect is the only VMM that enables
-KVM_CAP_HYPERV_ENLIGHTENED_VMCS, it does the sane thing of enabling the capability
-before grabbing the VMX MSRs.
+can occur due to kmap being called in non-sleepable (!TASK_RUNNING) context.
+The fix is to extend kvm_x86_ops->nested_ops.hv_timer_pending() to cover
+all events not already checked in kvm_arch_vcpu_is_runnable(), and then
+get rid of the annoying (and wrong) call to kvm_check_nested_events()
+from kvm_vcpu_check_block().
 
-So, why not simply apply filtering for host accesses as well?  E.g.
+Beware, this is not a complete fix, because kvm_guest_apic_has_interrupt()
+might still _read_ memory from non-sleepable context.  The fix here is
+probably to make kvm_arch_vcpu_is_runnable() return -EAGAIN, and in that
+case do a round of kvm_vcpu_check_block() polling in sleepable context.
+Nevertheless, it is a good start as it pushes the vmexit into vcpu_block().
 
-		/*
-		 * New Enlightened VMCS fields always lag behind their hardware
-		 * counterparts, filter out fields that are not yet defined.
-		 */
-		if (vmx->nested.enlightened_vmcs_enabled)
-			nested_evmcs_filter_control_msr(vcpu, msr_info);
+The series also does a small cleanup pass on kvm_vcpu_check_block(),
+removing KVM_REQ_UNHALT in favor of simply calling kvm_arch_vcpu_runnable()
+again.  Now that kvm_check_nested_events() is not called anymore by
+kvm_arch_vcpu_runnable(), it is much easier to see that KVM will never
+consume the event that caused kvm_vcpu_has_events() to return true,
+and therefore it is safe to evaluate it again.
 
-and then the eVMCS can end up being:
+The alternative of propagating the return value of
+kvm_arch_vcpu_runnable() up to kvm_vcpu_{block,halt}() is inferior
+because it does not quite get right the edge cases where the vCPU becomes
+runnable right before schedule() or right after kvm_vcpu_check_block().
+While these edge cases are unlikely to truly matter in practice, it is
+also pointless to get them "wrong".
 
-static bool evmcs_has_perf_global_ctrl(struct kvm_vcpu *vcpu)
-{
-	struct kvm_vcpu_hv *hv_vcpu = to_hv_vcpu(vcpu);
+Paolo
 
-	/*
-	 * PERF_GLOBAL_CTRL is filtered only for guest accesses, and all guest
-	 * accesses should be gated on Hyper-V being enabled and initialized.
-	 */
-	if (WARN_ON_ONCE(!hv_vcpu))
-		return false;
+v2->v3: do not propagate the return value of
+	kvm_arch_vcpu_runnable() up to kvm_vcpu_{block,halt}()
 
-	return hv_vcpu->cpuid_cache.nested_ebx & HV_X64_NESTED_EVMCS1_PERF_GLOBAL_CTRL;
-}
+	move and reformat the comment in vcpu_block()
 
-static u32 evmcs_get_unsupported_ctls(struct kvm_vcpu *vcpu, u32 msr_index,
-				      bool host_initiated)
-{
-	u32 unsupported_ctrls;
+	move KVM_REQ_UNHALT removal last
 
-	switch (msr_index) {
-	case MSR_IA32_VMX_EXIT_CTLS:
-	case MSR_IA32_VMX_TRUE_EXIT_CTLS:
-		unsupported_ctrls = EVMCS1_UNSUPPORTED_VMEXIT_CTRL;
-		if (!host_initiated && !evmcs_has_perf_global_ctrl(vcpu))
-			unsupported_ctrls |= VM_EXIT_LOAD_IA32_PERF_GLOBAL_CTRL;
-		return unsupported_ctrls;
-	case MSR_IA32_VMX_ENTRY_CTLS:
-	case MSR_IA32_VMX_TRUE_ENTRY_CTLS:
-		unsupported_ctrls = EVMCS1_UNSUPPORTED_VMENTRY_CTRL;
-		if (!host_initiated && !evmcs_has_perf_global_ctrl(vcpu))
-			unsupported_ctrls |= VM_ENTRY_LOAD_IA32_PERF_GLOBAL_CTRL;
-		return unsupported_ctrls;
-	case MSR_IA32_VMX_PROCBASED_CTLS2:
-		return EVMCS1_UNSUPPORTED_2NDEXEC;
-	case MSR_IA32_VMX_TRUE_PINBASED_CTLS:
-	case MSR_IA32_VMX_PINBASED_CTLS:
-		return EVMCS1_UNSUPPORTED_PINCTRL;
-	case MSR_IA32_VMX_VMFUNC:
-		return EVMCS1_UNSUPPORTED_VMFUNC;
-	default:
-		KVM_BUG_ON(1, vcpu->kvm);
-		return 0;
-	}
-}
+Paolo Bonzini (6):
+  KVM: x86: check validity of argument to KVM_SET_MP_STATE
+  KVM: x86: make vendor code check for all nested events
+  KVM: x86: lapic does not have to process INIT if it is blocked
+  KVM: x86: never write to memory from kvm_vcpu_check_block
+  KVM: mips, x86: do not rely on KVM_REQ_UNHALT
+  KVM: remove KVM_REQ_UNHALT
 
-void nested_evmcs_filter_control_msr(struct kvm_vcpu *vcpu,
-				     struct msr_data *msr_info)
-{
-	u64 unsupported_ctrls;
-	
-	if (!msr_info->host_initiated && !vcpu->arch.hyperv_enabled)
-		return;
+Sean Christopherson (1):
+  KVM: nVMX: Make an event request when pending an MTF nested VM-Exit
 
-	unsupported_ctrls = evmcs_get_unsupported_ctls(vcpu, msr_info->index,
-						       msr_info->host_initiated);
-	if (msr_info->index == MSR_IA32_VMX_VMFUNC)
-		msr_info->data &= ~unsupported_ctrls;
-	else
-		msr_info->data &= ~(unsupported_ctrls << 32);
-}
+ Documentation/virt/kvm/vcpu-requests.rst | 28 +------------
+ arch/arm64/kvm/arm.c                     |  1 -
+ arch/mips/kvm/emulate.c                  |  6 +--
+ arch/powerpc/kvm/book3s_pr.c             |  1 -
+ arch/powerpc/kvm/book3s_pr_papr.c        |  1 -
+ arch/powerpc/kvm/booke.c                 |  1 -
+ arch/powerpc/kvm/powerpc.c               |  1 -
+ arch/riscv/kvm/vcpu_insn.c               |  1 -
+ arch/s390/kvm/kvm-s390.c                 |  2 -
+ arch/x86/include/asm/kvm_host.h          |  3 +-
+ arch/x86/kvm/i8259.c                     |  4 +-
+ arch/x86/kvm/lapic.h                     |  2 +-
+ arch/x86/kvm/vmx/nested.c                |  9 +++-
+ arch/x86/kvm/vmx/vmx.c                   |  6 ++-
+ arch/x86/kvm/x86.c                       | 53 ++++++++++++++++++------
+ arch/x86/kvm/x86.h                       |  5 ---
+ arch/x86/kvm/xen.c                       |  1 -
+ include/linux/kvm_host.h                 |  3 +-
+ virt/kvm/kvm_main.c                      |  4 +-
+ 19 files changed, 63 insertions(+), 69 deletions(-)
 
-static bool nested_evmcs_is_valid_controls(struct kvm_vcpu *vcpu,
-					   u32 msr_index, u32 val)
-{
-	return val & evmcs_get_unsupported_ctls(vcpu, msr_index, false);
-}
+-- 
+2.31.1
 
