@@ -2,211 +2,179 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id F346C59C16A
-	for <lists+kvm@lfdr.de>; Mon, 22 Aug 2022 16:11:51 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 643F159C1FE
+	for <lists+kvm@lfdr.de>; Mon, 22 Aug 2022 17:00:25 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235669AbiHVOLE (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 22 Aug 2022 10:11:04 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60476 "EHLO
+        id S235713AbiHVPAO (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 22 Aug 2022 11:00:14 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48982 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235637AbiHVOLD (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 22 Aug 2022 10:11:03 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4FCA12627
-        for <kvm@vger.kernel.org>; Mon, 22 Aug 2022 07:11:02 -0700 (PDT)
+        with ESMTP id S235560AbiHVPAM (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 22 Aug 2022 11:00:12 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E54292872D
+        for <kvm@vger.kernel.org>; Mon, 22 Aug 2022 08:00:09 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1661177461;
+        s=mimecast20190719; t=1661180409;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=X2uShgSizptZrajnSXWdWy/DzzK5uu1vpmTZwlLsqw8=;
-        b=UdIxlLm+fhRSc4yeA+By5cDUwri+Ex8PcfAe3x0/CL2FzBxyOPFekljVf7lVZ74bpqiusT
-        luyuQ3HlDFJETTSwajZt3wNHjNye+LEkAkd/FjZrZLfmoZzpGxqJrr7XlPbTaytyy2L4DS
-        ACw1uI2U/4bVtmdQpm80Kq5AUvFBZZY=
-Received: from mail-qk1-f200.google.com (mail-qk1-f200.google.com
- [209.85.222.200]) by relay.mimecast.com with ESMTP with STARTTLS
+        bh=ztKOeB8BytpGS9oJ4KOu449CuGX9ihFu6jNtz6UJJoA=;
+        b=c/7ZVxzgNkVhmRGRntVIWZMyqxbWMd25qE+927vPk42qRm5TM6BSCp9dVrXwYAEbwnBxTY
+        YmMSIEAC+yNP3lxA25/dU9aR2/vtVSU738GuwTG36JSF+WlSj21tUHilwFM+ngcz9NAKIX
+        xxapnLSh0XzBd4QO7ZeyYS63FWu2qqI=
+Received: from mail-ed1-f69.google.com (mail-ed1-f69.google.com
+ [209.85.208.69]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_128_GCM_SHA256) id
- us-mta-645-SitTk1waMhiN8fMSWyRiXA-1; Mon, 22 Aug 2022 10:11:00 -0400
-X-MC-Unique: SitTk1waMhiN8fMSWyRiXA-1
-Received: by mail-qk1-f200.google.com with SMTP id bi16-20020a05620a319000b006bc2334be53so1713988qkb.14
-        for <kvm@vger.kernel.org>; Mon, 22 Aug 2022 07:11:00 -0700 (PDT)
+ us-mta-126-x1-2azh_OhyX7yfcIM4agg-1; Mon, 22 Aug 2022 11:00:07 -0400
+X-MC-Unique: x1-2azh_OhyX7yfcIM4agg-1
+Received: by mail-ed1-f69.google.com with SMTP id b13-20020a056402350d00b0043dfc84c533so7045609edd.5
+        for <kvm@vger.kernel.org>; Mon, 22 Aug 2022 08:00:07 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc;
-        bh=X2uShgSizptZrajnSXWdWy/DzzK5uu1vpmTZwlLsqw8=;
-        b=nZbUEmYZ2LJYfNr426eYtsg2zgy3jxWjd/uh1m7Oubm3abejK06bptXsQkXR5rS4yu
-         tH/Y65gfvDQGVly36e7toE+7AuoVvoP+MyxDHhOJ2q0O9nLnjBWwX+Y3FW4pLM6CE2Hz
-         mPJmKwJc0lpB0Yv11x9C5N+QLSEzNbE2m73/nWSZ5yzJ8V3Zf3UijyWwLYuHRnbf+bOh
-         xk4ZSr3mqdsPEXCtX0tEMyVRq5PHDJZb38Z/hlCI3CI9ROF1KaBDsGWOwab2gW7Mj5Ly
-         EYTDlEUrQjmDo6oLQOc31v4FUERRhCqSpZdkjay+/UWJo+hsm0ubv/pwoWTM/joy5GK2
-         SwEg==
-X-Gm-Message-State: ACgBeo2GePJ8yIsW4GW+YPm71XjjJwVQSRXMwWSCGuIrcCQ8n13yvtBr
-        7zBnNipOgMPLA0zyEtBrtWZE3DDGgPDO1ZCIjRuESEmqITVOcQqKro1wgoBQVVYJXkeppRxg56o
-        rJAoZKZdR/y2N
-X-Received: by 2002:a05:620a:bc3:b0:6a7:9e01:95ac with SMTP id s3-20020a05620a0bc300b006a79e0195acmr12771032qki.91.1661177459519;
-        Mon, 22 Aug 2022 07:10:59 -0700 (PDT)
-X-Google-Smtp-Source: AA6agR6Q81+6KZjfmeiklX8+2y5Q7aXdyjYPcNKEVMQ/86HJlDYbRQBSpa49qa01I9iy9t47K7UYiw==
-X-Received: by 2002:a05:620a:bc3:b0:6a7:9e01:95ac with SMTP id s3-20020a05620a0bc300b006a79e0195acmr12770993qki.91.1661177458994;
-        Mon, 22 Aug 2022 07:10:58 -0700 (PDT)
-Received: from xz-m1.local (bras-base-aurron9127w-grc-35-70-27-3-10.dsl.bell.ca. [70.27.3.10])
-        by smtp.gmail.com with ESMTPSA id i7-20020a05620a248700b006bb0f9b89cfsm11573580qkn.87.2022.08.22.07.10.57
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 22 Aug 2022 07:10:58 -0700 (PDT)
-Date:   Mon, 22 Aug 2022 10:10:56 -0400
-From:   Peter Xu <peterx@redhat.com>
-To:     Leonardo Bras Soares Passos <lsoaresp@redhat.com>
-Cc:     Emanuele Giuseppe Esposito <eesposit@redhat.com>,
-        qemu-devel <qemu-devel@nongnu.org>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        "Michael S. Tsirkin" <mst@redhat.com>,
-        Cornelia Huck <cohuck@redhat.com>,
-        David Hildenbrand <david@redhat.com>,
-        Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <f4bug@amsat.org>,
-        Maxim Levitsky <mlevitsk@redhat.com>, kvm@vger.kernel.org
-Subject: Re: [RFC PATCH 2/2] kvm/kvm-all.c: listener should delay
- kvm_vm_ioctl to the commit phase
-Message-ID: <YwOOcC72KKABKgU+@xz-m1.local>
-References: <20220816101250.1715523-1-eesposit@redhat.com>
- <20220816101250.1715523-3-eesposit@redhat.com>
- <Yv6baJoNikyuZ38R@xz-m1.local>
- <CAJ6HWG6maoPjbP8T5qo=iXCbNeHu4dq3wHLKtRLahYKuJmMY-g@mail.gmail.com>
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc;
+        bh=ztKOeB8BytpGS9oJ4KOu449CuGX9ihFu6jNtz6UJJoA=;
+        b=5lneV5O11aAcXdujgRmMuLrTX76sJPkqPzZQ2977Vf+kwrouGaYzEGajhTCwbIaZED
+         /wcJpbMz7zhC/m9sryOnAgpXO7XTDZqAn27NBnJgm96b9QGWma3fKGwxtJOKE8EW/CKr
+         VVOA3twuwfTjkCSJU5e879eqnpOtG1t1OY+wWOhdKdaE1WERGRsmDn3sClUkfoPocT8Y
+         heDygcyfQeOwpjtFAgqEzGm+KBBVguJ5ISfSahTJaNa05tA27Ej13zpG7DWN/2nuyrkG
+         djBEtZQHGJXhSlEPTs2Bf433mwgSXbyLHxg4c0Y6dQm3c4EjmKOx1KAKtwwc+q3frEdH
+         pP5g==
+X-Gm-Message-State: ACgBeo3QfDT+18nkDhiZOeTSkbNVGzUBQnxG6jj086+zVNSGNeGbfzIC
+        iurcsY+ejLnTsDPcIF/Up4fu2oBnVkvO9jhbP0R6wt74zXZBlbNXPymhK5hf1cl5NKSeTOJweD0
+        g8yhgoniVtIqq
+X-Received: by 2002:a05:6402:2755:b0:43d:7568:c78e with SMTP id z21-20020a056402275500b0043d7568c78emr16839836edd.104.1661180406405;
+        Mon, 22 Aug 2022 08:00:06 -0700 (PDT)
+X-Google-Smtp-Source: AA6agR5Px/A3k/BhgO3tcIds2Ce5YHxwTCTCoZ5Kl0BNrakOcDOMdhCTB5Ff2bXe4/Mdn29r6hJ22g==
+X-Received: by 2002:a05:6402:2755:b0:43d:7568:c78e with SMTP id z21-20020a056402275500b0043d7568c78emr16839821edd.104.1661180406202;
+        Mon, 22 Aug 2022 08:00:06 -0700 (PDT)
+Received: from [10.43.2.39] (nat-pool-brq-t.redhat.com. [213.175.37.10])
+        by smtp.gmail.com with ESMTPSA id j7-20020aa7c407000000b004465d1db765sm5516295edq.89.2022.08.22.08.00.04
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 22 Aug 2022 08:00:05 -0700 (PDT)
+Message-ID: <f3bc61c8-d491-f79c-15d7-191208c57224@redhat.com>
+Date:   Mon, 22 Aug 2022 17:00:03 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <CAJ6HWG6maoPjbP8T5qo=iXCbNeHu4dq3wHLKtRLahYKuJmMY-g@mail.gmail.com>
-X-Spam-Status: No, score=-2.8 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,
-        SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham
-        autolearn_force=no version=3.4.6
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.12.0
+Subject: Re: [PATCH v5 1/3] Update linux headers to 6.0-rc1
+Content-Language: en-US
+To:     Chenyi Qiang <chenyi.qiang@intel.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Marcelo Tosatti <mtosatti@redhat.com>,
+        Richard Henderson <richard.henderson@linaro.org>,
+        Eduardo Habkost <eduardo@habkost.net>,
+        Xiaoyao Li <xiaoyao.li@intel.com>
+Cc:     qemu-devel@nongnu.org, kvm@vger.kernel.org
+References: <20220817020845.21855-1-chenyi.qiang@intel.com>
+ <20220817020845.21855-2-chenyi.qiang@intel.com>
+From:   =?UTF-8?B?TWljaGFsIFByw612b3puw61r?= <mprivozn@redhat.com>
+In-Reply-To: <20220817020845.21855-2-chenyi.qiang@intel.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
+        RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Aug 18, 2022 at 09:55:20PM -0300, Leonardo Bras Soares Passos wrote:
-> On Thu, Aug 18, 2022 at 5:05 PM Peter Xu <peterx@redhat.com> wrote:
-> >
-> > On Tue, Aug 16, 2022 at 06:12:50AM -0400, Emanuele Giuseppe Esposito wrote:
-> > > +static void kvm_memory_region_node_add(KVMMemoryListener *kml,
-> > > +                                       struct kvm_userspace_memory_region *mem)
-> > > +{
-> > > +    MemoryRegionNode *node;
-> > > +
-> > > +    node = g_malloc(sizeof(MemoryRegionNode));
-> > > +    *node = (MemoryRegionNode) {
-> > > +        .mem = mem,
-> > > +    };
-> >
-> > Nit: direct assignment of struct looks okay, but maybe pointer assignment
-> > is clearer (with g_malloc0?  Or iirc we're suggested to always use g_new0):
-> >
-> >   node = g_new0(MemoryRegionNode, 1);
-> >   node->mem = mem;
-> >
-> > [...]
-> >
-> > > +/* for KVM_SET_USER_MEMORY_REGION_LIST */
-> > > +struct kvm_userspace_memory_region_list {
-> > > +     __u32 nent;
-> > > +     __u32 flags;
-> > > +     struct kvm_userspace_memory_region entries[0];
-> > > +};
-> > > +
-> > >  /*
-> > >   * The bit 0 ~ bit 15 of kvm_memory_region::flags are visible for userspace,
-> > >   * other bits are reserved for kvm internal use which are defined in
-> > > @@ -1426,6 +1433,8 @@ struct kvm_vfio_spapr_tce {
-> > >                                       struct kvm_userspace_memory_region)
-> > >  #define KVM_SET_TSS_ADDR          _IO(KVMIO,   0x47)
-> > >  #define KVM_SET_IDENTITY_MAP_ADDR _IOW(KVMIO,  0x48, __u64)
-> > > +#define KVM_SET_USER_MEMORY_REGION_LIST _IOW(KVMIO, 0x49, \
-> > > +                                     struct kvm_userspace_memory_region_list)
-> >
-> > I think this is probably good enough, but just to provide the other small
-> > (but may not be important) piece of puzzle here.  I wanted to think through
-> > to understand better but I never did..
-> >
-> > For a quick look, please read the comment in kvm_set_phys_mem().
-> >
-> >                 /*
-> >                  * NOTE: We should be aware of the fact that here we're only
-> >                  * doing a best effort to sync dirty bits.  No matter whether
-> >                  * we're using dirty log or dirty ring, we ignored two facts:
-> >                  *
-> >                  * (1) dirty bits can reside in hardware buffers (PML)
-> >                  *
-> >                  * (2) after we collected dirty bits here, pages can be dirtied
-> >                  * again before we do the final KVM_SET_USER_MEMORY_REGION to
-> >                  * remove the slot.
-> >                  *
-> >                  * Not easy.  Let's cross the fingers until it's fixed.
-> >                  */
-> >
-> > One example is if we have 16G mem, we enable dirty tracking and we punch a
-> > hole of 1G at offset 1G, it'll change from this:
-> >
-> >                      (a)
-> >   |----------------- 16G -------------------|
-> >
-> > To this:
-> >
-> >      (b)    (c)              (d)
-> >   |--1G--|XXXXXX|------------14G------------|
-> >
-> > Here (c) will be a 1G hole.
-> >
-> > With current code, the hole punching will del region (a) and add back
-> > region (b) and (d).  After the new _LIST ioctl it'll be atomic and nicer.
-> >
-> > Here the question is if we're with dirty tracking it means for each region
-> > we have a dirty bitmap.  Currently we do the best effort of doing below
-> > sequence:
-> >
-> >   (1) fetching dirty bmap of (a)
-> >   (2) delete region (a)
-> >   (3) add region (b) (d)
-> >
-> > Here (a)'s dirty bmap is mostly kept as best effort, but still we'll lose
-> > dirty pages written between step (1) and (2) (and actually if the write
-> > comes within (2) and (3) I think it'll crash qemu, and iiuc that's what
-> > we're going to fix..).
-> >
-> > So ideally the atomic op can be:
-> >
-> >   "atomically fetch dirty bmap for removed regions, remove regions, and add
-> >    new regions"
-> >
-> > Rather than only:
-> >
-> >   "atomically remove regions, and add new regions"
-> >
-> > as what the new _LIST ioctl do.
-> >
-> > But... maybe that's not a real problem, at least I didn't know any report
-> > showing issue with current code yet caused by losing of dirty bits during
-> > step (1) and (2).  Neither do I know how to trigger an issue with it.
-> >
-> > I'm just trying to still provide this information so that you should be
-> > aware of this problem too, at the meantime when proposing the new ioctl
-> > change for qemu we should also keep in mind that we won't easily lose the
-> > dirty bmap of (a) here, which I think this patch does the right thing.
-> >
-> 
-> Thanks for bringing these details Peter!
-> 
-> What do you think of adding?
-> (4) Copy the corresponding part of (a)'s dirty bitmap to (b) and (d)'s
-> dirty bitmaps.
+On 8/17/22 04:08, Chenyi Qiang wrote:
+> commit 568035b01cfb107af8d2e4bd2fb9aea22cf5b868
+>=20
+> Signed-off-by: Chenyi Qiang <chenyi.qiang@intel.com>
+> ---
+>  include/standard-headers/asm-x86/bootparam.h  |   7 +-
+>  include/standard-headers/drm/drm_fourcc.h     |  73 +++++++-
+>  include/standard-headers/linux/ethtool.h      |  29 +--
+>  include/standard-headers/linux/input.h        |  12 +-
+>  include/standard-headers/linux/pci_regs.h     |  30 ++-
+>  include/standard-headers/linux/vhost_types.h  |  17 +-
+>  include/standard-headers/linux/virtio_9p.h    |   2 +-
+>  .../standard-headers/linux/virtio_config.h    |   7 +-
+>  include/standard-headers/linux/virtio_ids.h   |  14 +-
+>  include/standard-headers/linux/virtio_net.h   |  34 +++-
+>  include/standard-headers/linux/virtio_pci.h   |   2 +
+>  linux-headers/asm-arm64/kvm.h                 |  27 +++
+>  linux-headers/asm-generic/unistd.h            |   4 +-
+>  linux-headers/asm-riscv/kvm.h                 |  22 +++
+>  linux-headers/asm-riscv/unistd.h              |   3 +-
+>  linux-headers/asm-s390/kvm.h                  |   1 +
+>  linux-headers/asm-x86/kvm.h                   |  33 ++--
+>  linux-headers/asm-x86/mman.h                  |  14 --
+>  linux-headers/linux/kvm.h                     | 172 +++++++++++++++++-=
 
-Sounds good to me, but may not cover dirty ring?  Maybe we could move on
-with the simple but clean scheme first and think about a comprehensive
-option only if very necessary.  The worst case is we need one more kvm cap
-but we should still have enough.
+>  linux-headers/linux/userfaultfd.h             |  10 +-
+>  linux-headers/linux/vduse.h                   |  47 +++++
+>  linux-headers/linux/vfio.h                    |   4 +-
+>  linux-headers/linux/vfio_zdev.h               |   7 +
+>  linux-headers/linux/vhost.h                   |  35 +++-
+>  24 files changed, 523 insertions(+), 83 deletions(-)
+>=20
 
-Thanks,
 
--- 
-Peter Xu
+> diff --git a/linux-headers/asm-x86/kvm.h b/linux-headers/asm-x86/kvm.h
+> index bf6e96011d..46de10a809 100644
+> --- a/linux-headers/asm-x86/kvm.h
+> +++ b/linux-headers/asm-x86/kvm.h
+> @@ -198,13 +198,13 @@ struct kvm_msrs {
+>  	__u32 nmsrs; /* number of msrs in entries */
+>  	__u32 pad;
+> =20
+> -	struct kvm_msr_entry entries[0];
+> +	struct kvm_msr_entry entries[];
+>  };
+> =20
+
+I don't think it's this simple. I think this needs to go hand in hand wit=
+h kvm_arch_get_supported_msr_feature().
+
+Also, this breaks clang build:
+
+clang -m64 -mcx16 -Ilibqemu-x86_64-softmmu.fa.p -I. -I.. -Itarget/i386 -I=
+=2E./target/i386 -Iqapi -Itrace -Iui -Iui/shader -I/usr/include/pixman-1 =
+-I/usr/include/spice-server -I/usr/include/spice-1 -I/usr/include/glib-2.=
+0 -I/usr/lib64/glib-2.0/include -fcolor-diagnostics -Wall -Winvalid-pch -=
+Werror -std=3Dgnu11 -O0 -g -isystem /home/zippy/work/qemu/qemu.git/linux-=
+headers -isystem linux-headers -iquote . -iquote /home/zippy/work/qemu/qe=
+mu.git -iquote /home/zippy/work/qemu/qemu.git/include -iquote /home/zippy=
+/work/qemu/qemu.git/tcg/i386 -pthread -D_GNU_SOURCE -D_FILE_OFFSET_BITS=3D=
+64 -D_LARGEFILE_SOURCE -Wstrict-prototypes -Wredundant-decls -Wundef -Wwr=
+ite-strings -Wmissing-prototypes -fno-strict-aliasing -fno-common -fwrapv=
+ -Wold-style-definition -Wtype-limits -Wformat-security -Wformat-y2k -Win=
+it-self -Wignored-qualifiers -Wempty-body -Wnested-externs -Wendif-labels=
+ -Wexpansion-to-defined -Wno-initializer-overrides -Wno-missing-include-d=
+irs -Wno-shift-negative-value -Wno-string-plus-int -Wno-typedef-redefinit=
+ion -Wno-tautological-type-limit-compare -Wno-psabi -fstack-protector-str=
+ong -O0 -ggdb -fPIE -isystem../linux-headers -isystemlinux-headers -DNEED=
+_CPU_H '-DCONFIG_TARGET=3D"x86_64-softmmu-config-target.h"' '-DCONFIG_DEV=
+ICES=3D"x86_64-softmmu-config-devices.h"' -MD -MQ libqemu-x86_64-softmmu.=
+fa.p/target_i386_kvm_kvm.c.o -MF libqemu-x86_64-softmmu.fa.p/target_i386_=
+kvm_kvm.c.o.d -o libqemu-x86_64-softmmu.fa.p/target_i386_kvm_kvm.c.o -c .=
+=2E/target/i386/kvm/kvm.c
+=2E./target/i386/kvm/kvm.c:470:25: error: field 'info' with variable size=
+d type 'struct kvm_msrs' not at the end of a struct or class is a GNU ext=
+ension [-Werror,-Wgnu-variable-sized-type-not-at-end]
+        struct kvm_msrs info;
+                        ^
+=2E./target/i386/kvm/kvm.c:1701:27: error: field 'cpuid' with variable si=
+zed type 'struct kvm_cpuid2' not at the end of a struct or class is a GNU=
+ extension [-Werror,-Wgnu-variable-sized-type-not-at-end]
+        struct kvm_cpuid2 cpuid;
+                          ^
+=2E./target/i386/kvm/kvm.c:2868:25: error: field 'info' with variable siz=
+ed type 'struct kvm_msrs' not at the end of a struct or class is a GNU ex=
+tension [-Werror,-Wgnu-variable-sized-type-not-at-end]
+        struct kvm_msrs info;
+                        ^
+3 errors generated.
+
+
+Michal
 
