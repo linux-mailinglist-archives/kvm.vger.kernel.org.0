@@ -2,63 +2,63 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 5D2D559C037
-	for <lists+kvm@lfdr.de>; Mon, 22 Aug 2022 15:09:58 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 0354359C05E
+	for <lists+kvm@lfdr.de>; Mon, 22 Aug 2022 15:20:00 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234559AbiHVNJ4 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 22 Aug 2022 09:09:56 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50396 "EHLO
+        id S233090AbiHVNT7 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 22 Aug 2022 09:19:59 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60768 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231960AbiHVNJz (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 22 Aug 2022 09:09:55 -0400
+        with ESMTP id S232132AbiHVNTy (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 22 Aug 2022 09:19:54 -0400
 Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 919D522BEB;
-        Mon, 22 Aug 2022 06:09:54 -0700 (PDT)
-Received: from pps.filterd (m0098409.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.17.1.5/8.17.1.5) with ESMTP id 27MCgLC7012584;
-        Mon, 22 Aug 2022 13:09:53 GMT
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D7A0F1EED6;
+        Mon, 22 Aug 2022 06:19:51 -0700 (PDT)
+Received: from pps.filterd (m0187473.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.17.1.5/8.17.1.5) with ESMTP id 27MCx7LE021859;
+        Mon, 22 Aug 2022 13:19:50 GMT
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
  mime-version : subject : to : cc : references : from : in-reply-to :
  content-type : content-transfer-encoding; s=pp1;
- bh=uShwbj8z0B9jc8QUjlmHqLKeAQLeesHn9hFZgQfVthY=;
- b=Dyn+uxB+Kc4A2oxZEuTfucnSos77o6BtRSFGU7mE5BhvBQMfSOUFRnirfvcAOZnCXA7O
- TTDOyYALyV1B03artaJOjFWK1i9U1sh6vId6KD1rPPflyNjgrCKwst6tSuGyKCB6Uf1b
- Nwngte+8/nOxLl4gCXATeIztMl2JDq2OMjYcRjlxAMVAcKlIMYtEvVMwBnRLUue64Ix+
- jTt8FovXWw1/gUml0+jHFHSZjJ6l79PUpeG5cQA1hE3+EpQC+4RGBkD8hm/B5POQP2Jd
- 2wke9DeSNw/SbtZ4Khp2F605cmj2HlvvmkvGlBleMjgwEVHlCdGeMB+CCtVzeqiRFKkw Dg== 
+ bh=DUy6WpKBD/HZXMpkW2hYHLC19nboD4oStIAvTCEz6zs=;
+ b=UYSvKXFR2amRUAYUXFprSl/9K7mKG3yFDxZ5gT3DnwLX0dfiMiVteizPvTLtH7b910zN
+ weMrzvFbX40WczdQkWXvI98YASJjvHqQi4s68rHCnSktbNJyRA/LyH4pHBd8PgzQeJu6
+ yhquALRmub4PTI77rqw8CMvIX7wrfrxY1vKzp7nwTUZQpbX5Kg7cWQzVSlvuaXI9JTc6
+ ubmUbaiZ2IDcO3ixtyzcQ4tsmrsU65BsgyQMW7nfBFw8gCHjmgpH+HTa1qu6+S7S5yFS
+ KVHPPr89W2fCO/eBlkNdwtmqz5pmENwOUr5Afg5PytCnJYhxAK9duELy1bXRDIb47Qp1 Ng== 
 Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3j4a1h0xj4-1
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3j4a9p8q0r-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Mon, 22 Aug 2022 13:09:52 +0000
-Received: from m0098409.ppops.net (m0098409.ppops.net [127.0.0.1])
-        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 27MChU91016344;
-        Mon, 22 Aug 2022 13:09:52 GMT
+        Mon, 22 Aug 2022 13:19:50 +0000
+Received: from m0187473.ppops.net (m0187473.ppops.net [127.0.0.1])
+        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 27MCxCTC022188;
+        Mon, 22 Aug 2022 13:19:49 GMT
 Received: from ppma04dal.us.ibm.com (7a.29.35a9.ip4.static.sl-reverse.com [169.53.41.122])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3j4a1h0xhq-1
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3j4a9p8q0f-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Mon, 22 Aug 2022 13:09:52 +0000
+        Mon, 22 Aug 2022 13:19:49 +0000
 Received: from pps.filterd (ppma04dal.us.ibm.com [127.0.0.1])
-        by ppma04dal.us.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 27MD4rem009602;
-        Mon, 22 Aug 2022 13:09:51 GMT
-Received: from b03cxnp07028.gho.boulder.ibm.com (b03cxnp07028.gho.boulder.ibm.com [9.17.130.15])
-        by ppma04dal.us.ibm.com with ESMTP id 3j2q89qyf3-1
+        by ppma04dal.us.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 27MD4sOB009618;
+        Mon, 22 Aug 2022 13:19:48 GMT
+Received: from b03cxnp08026.gho.boulder.ibm.com (b03cxnp08026.gho.boulder.ibm.com [9.17.130.18])
+        by ppma04dal.us.ibm.com with ESMTP id 3j2q89r1fd-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Mon, 22 Aug 2022 13:09:51 +0000
+        Mon, 22 Aug 2022 13:19:48 +0000
 Received: from b03ledav005.gho.boulder.ibm.com (b03ledav005.gho.boulder.ibm.com [9.17.130.236])
-        by b03cxnp07028.gho.boulder.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 27MD9o3H11469410
+        by b03cxnp08026.gho.boulder.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 27MDJlKo51773782
         (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Mon, 22 Aug 2022 13:09:50 GMT
+        Mon, 22 Aug 2022 13:19:47 GMT
 Received: from b03ledav005.gho.boulder.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id D6D0BBE04F;
-        Mon, 22 Aug 2022 13:09:49 +0000 (GMT)
+        by IMSVA (Postfix) with ESMTP id 3102BBE051;
+        Mon, 22 Aug 2022 13:19:47 +0000 (GMT)
 Received: from b03ledav005.gho.boulder.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id C3EFBBE051;
-        Mon, 22 Aug 2022 13:09:48 +0000 (GMT)
+        by IMSVA (Postfix) with ESMTP id 32D5EBE056;
+        Mon, 22 Aug 2022 13:19:46 +0000 (GMT)
 Received: from [9.160.64.167] (unknown [9.160.64.167])
         by b03ledav005.gho.boulder.ibm.com (Postfix) with ESMTP;
-        Mon, 22 Aug 2022 13:09:48 +0000 (GMT)
-Message-ID: <9f1ff085-5dba-3509-ba5f-28c8adb0856b@linux.ibm.com>
-Date:   Mon, 22 Aug 2022 09:09:48 -0400
+        Mon, 22 Aug 2022 13:19:45 +0000 (GMT)
+Message-ID: <dddc0440-508e-2808-b3c0-4475275cab34@linux.ibm.com>
+Date:   Mon, 22 Aug 2022 09:19:45 -0400
 MIME-Version: 1.0
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
  Thunderbird/91.11.0
@@ -79,16 +79,16 @@ In-Reply-To: <20220818161255.2fe5a542.pasic@linux.ibm.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: o7WNd85i0YXCzMET-KwrkdsS67ALENDO
-X-Proofpoint-ORIG-GUID: FR1LUKFkZrg3V3LZ3guEsllqBaT0bptm
+X-Proofpoint-GUID: zDsRupeV6DjukOLBQ-otXZQmp2IrJMq7
+X-Proofpoint-ORIG-GUID: CyZIW69O9tutEMaeVh54PHwRGTJUF1oQ
 X-Proofpoint-Virus-Version: vendor=baseguard
  engine=ICAP:2.0.205,Aquarius:18.0.895,Hydra:6.0.517,FMLib:17.11.122.1
  definitions=2022-08-22_08,2022-08-22_02,2022-06-22_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxlogscore=999
- lowpriorityscore=0 malwarescore=0 adultscore=0 bulkscore=0 mlxscore=0
- impostorscore=0 phishscore=0 clxscore=1015 suspectscore=0
- priorityscore=1501 spamscore=0 classifier=spam adjust=0 reason=mlx
- scancount=1 engine=8.12.0-2207270000 definitions=main-2208220055
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 spamscore=0 mlxscore=0
+ bulkscore=0 mlxlogscore=999 priorityscore=1501 malwarescore=0
+ impostorscore=0 phishscore=0 clxscore=1015 adultscore=0 suspectscore=0
+ lowpriorityscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2207270000 definitions=main-2208220055
 X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
         DKIM_VALID,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,
         SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no
@@ -112,6 +112,15 @@ On 8/18/22 10:12 AM, Halil Pasic wrote:
 > make sense to do the whole filtering biz and everything else. Maybe we
 > should spin the short description and the rest of the commit message so
 > it reflects the code more.
+
+
+Okay, I think I'm picking up what you're laying down here. I believe you 
+are suggesting I change the subject to indicate that the unnecessary 
+processing of AP resources should be bypassed and the rest of the 
+description should expound on that.
+
+
+>   
 >
 >> When the same adapter or domain is assigned more than one time prior to
 >> removing the matrix mdev to which it is assigned, the remove operation
@@ -137,11 +146,6 @@ On 8/18/22 10:12 AM, Halil Pasic wrote:
 > matrix mdev")
 >
 > Is my repo borked?
-
-
-Alexander pointed out my mistake, your repo is not borked.
-
-
 >
 >
 >> Reported-by: Matthew Rosato <mjrosato@linux.ibm.com>
