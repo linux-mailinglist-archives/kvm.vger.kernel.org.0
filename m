@@ -2,56 +2,56 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 37B5459C499
-	for <lists+kvm@lfdr.de>; Mon, 22 Aug 2022 19:07:24 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 1AE8E59C4A4
+	for <lists+kvm@lfdr.de>; Mon, 22 Aug 2022 19:07:28 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236737AbiHVRHP (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 22 Aug 2022 13:07:15 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55686 "EHLO
+        id S236614AbiHVRHU (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 22 Aug 2022 13:07:20 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55846 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S236601AbiHVRHI (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 22 Aug 2022 13:07:08 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2841F422E8
-        for <kvm@vger.kernel.org>; Mon, 22 Aug 2022 10:07:03 -0700 (PDT)
+        with ESMTP id S237129AbiHVRHL (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 22 Aug 2022 13:07:11 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 82F1742AD3
+        for <kvm@vger.kernel.org>; Mon, 22 Aug 2022 10:07:05 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1661188022;
+        s=mimecast20190719; t=1661188024;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=KP6pI47BC4VWa8Qp+r5UROKIH7Ig9sTAdI9X/GMJfxs=;
-        b=Rj8TovLfex6vJQmeUhqzI3W3KkQneP6oxSkbPCW6QYNw17hGpqkDSCbW0zHkIdDzQ6bEt8
-        iNnM47q2qjp5tH7/eFNevGFJzpcigmpQMXNVUYWFPE55FMQVf8mMqapvECmm4ydBCnb+19
-        r108odGnCNHMSIZXNilJmq1zZ7RVGUA=
+        bh=toOdKmcdREooPLuAWBcpE8QdI77Shqa4ydpo0K4KBn8=;
+        b=FG3f6VDspMHW/nPn9t6tti73XyDiqwMKD84uohv2m7hN1n9QEQnH7FzwifJrwyffnxAjgQ
+        XVZ9FmwIP/RHyY+ieFuWXXrejSBnRa7BSSZmdNPrwwkrvRdzIOzd4n7oUW73Q3oQ/Ou5uL
+        wxU9Zz6L4/uo7/icYf/PWHcN3GN0xyQ=
 Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
  [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-524-VTfe2kYNM5-IGeFm6xDrvg-1; Mon, 22 Aug 2022 13:07:01 -0400
-X-MC-Unique: VTfe2kYNM5-IGeFm6xDrvg-1
+ us-mta-443-_gVzf2rvMLWiAAGpvaKrYw-1; Mon, 22 Aug 2022 13:07:01 -0400
+X-MC-Unique: _gVzf2rvMLWiAAGpvaKrYw-1
 Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.rdu2.redhat.com [10.11.54.5])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id A6A2B185A7A4;
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id D070D811E76;
         Mon, 22 Aug 2022 17:07:00 +0000 (UTC)
 Received: from virtlab701.virt.lab.eng.bos.redhat.com (virtlab701.virt.lab.eng.bos.redhat.com [10.19.152.228])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 848BB9458A;
+        by smtp.corp.redhat.com (Postfix) with ESMTP id AEDE4945D0;
         Mon, 22 Aug 2022 17:07:00 +0000 (UTC)
 From:   Paolo Bonzini <pbonzini@redhat.com>
 To:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org
 Cc:     mlevitsk@redhat.com, seanjc@google.com
-Subject: [PATCH v3 6/7] KVM: mips, x86: do not rely on KVM_REQ_UNHALT
-Date:   Mon, 22 Aug 2022 13:06:58 -0400
-Message-Id: <20220822170659.2527086-7-pbonzini@redhat.com>
+Subject: [PATCH v3 7/7] KVM: remove KVM_REQ_UNHALT
+Date:   Mon, 22 Aug 2022 13:06:59 -0400
+Message-Id: <20220822170659.2527086-8-pbonzini@redhat.com>
 In-Reply-To: <20220822170659.2527086-1-pbonzini@redhat.com>
 References: <20220822170659.2527086-1-pbonzini@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain
 Content-Transfer-Encoding: 8bit
 X-Scanned-By: MIMEDefang 2.79 on 10.11.54.5
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham
+X-Spam-Status: No, score=-2.8 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,
+        SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=unavailable
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -59,64 +59,245 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-KVM_REQ_UNHALT is a weird request that simply reports the value of
-kvm_arch_vcpu_runnable() on exit from kvm_vcpu_halt().  Only
-MIPS and x86 are looking at it, the others just clear it.  Check
-the state of the vCPU directly so that the request is handled
-as a nop on all architectures.
+KVM_REQ_UNHALT is now unnecessary because it is replaced by the return
+value of kvm_vcpu_block/kvm_vcpu_halt.  Remove it.
 
-No functional change intended, except for corner cases where an
-event arrive immediately after a signal become pending or after
-another similar host-side event.
+No functional change intended.
 
 Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 ---
- arch/mips/kvm/emulate.c | 7 +++----
- arch/x86/kvm/x86.c      | 9 ++++++++-
- 2 files changed, 11 insertions(+), 5 deletions(-)
+ Documentation/virt/kvm/vcpu-requests.rst | 28 +-----------------------
+ arch/arm64/kvm/arm.c                     |  1 -
+ arch/mips/kvm/emulate.c                  |  1 -
+ arch/powerpc/kvm/book3s_pr.c             |  1 -
+ arch/powerpc/kvm/book3s_pr_papr.c        |  1 -
+ arch/powerpc/kvm/booke.c                 |  1 -
+ arch/powerpc/kvm/powerpc.c               |  1 -
+ arch/riscv/kvm/vcpu_insn.c               |  1 -
+ arch/s390/kvm/kvm-s390.c                 |  2 --
+ arch/x86/kvm/x86.c                       |  3 ---
+ arch/x86/kvm/xen.c                       |  1 -
+ include/linux/kvm_host.h                 |  3 +--
+ virt/kvm/kvm_main.c                      |  4 +---
+ 13 files changed, 3 insertions(+), 45 deletions(-)
 
+diff --git a/Documentation/virt/kvm/vcpu-requests.rst b/Documentation/virt/kvm/vcpu-requests.rst
+index 31f62b64e07b..87f04c1fa53d 100644
+--- a/Documentation/virt/kvm/vcpu-requests.rst
++++ b/Documentation/virt/kvm/vcpu-requests.rst
+@@ -97,7 +97,7 @@ VCPU requests are simply bit indices of the ``vcpu->requests`` bitmap.
+ This means general bitops, like those documented in [atomic-ops]_ could
+ also be used, e.g. ::
+ 
+-  clear_bit(KVM_REQ_UNHALT & KVM_REQUEST_MASK, &vcpu->requests);
++  clear_bit(KVM_REQ_UNBLOCK & KVM_REQUEST_MASK, &vcpu->requests);
+ 
+ However, VCPU request users should refrain from doing so, as it would
+ break the abstraction.  The first 8 bits are reserved for architecture
+@@ -126,17 +126,6 @@ KVM_REQ_UNBLOCK
+   or in order to update the interrupt routing and ensure that assigned
+   devices will wake up the vCPU.
+ 
+-KVM_REQ_UNHALT
+-
+-  This request may be made from the KVM common function kvm_vcpu_block(),
+-  which is used to emulate an instruction that causes a CPU to halt until
+-  one of an architectural specific set of events and/or interrupts is
+-  received (determined by checking kvm_arch_vcpu_runnable()).  When that
+-  event or interrupt arrives kvm_vcpu_block() makes the request.  This is
+-  in contrast to when kvm_vcpu_block() returns due to any other reason,
+-  such as a pending signal, which does not indicate the VCPU's halt
+-  emulation should stop, and therefore does not make the request.
+-
+ KVM_REQ_OUTSIDE_GUEST_MODE
+ 
+   This "request" ensures the target vCPU has exited guest mode prior to the
+@@ -297,21 +286,6 @@ architecture dependent.  kvm_vcpu_block() calls kvm_arch_vcpu_runnable()
+ to check if it should awaken.  One reason to do so is to provide
+ architectures a function where requests may be checked if necessary.
+ 
+-Clearing Requests
+------------------
+-
+-Generally it only makes sense for the receiving VCPU thread to clear a
+-request.  However, in some circumstances, such as when the requesting
+-thread and the receiving VCPU thread are executed serially, such as when
+-they are the same thread, or when they are using some form of concurrency
+-control to temporarily execute synchronously, then it's possible to know
+-that the request may be cleared immediately, rather than waiting for the
+-receiving VCPU thread to handle the request in VCPU RUN.  The only current
+-examples of this are kvm_vcpu_block() calls made by VCPUs to block
+-themselves.  A possible side-effect of that call is to make the
+-KVM_REQ_UNHALT request, which may then be cleared immediately when the
+-VCPU returns from the call.
+-
+ References
+ ==========
+ 
+diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
+index 2ff0ef62abad..4f949b64fdc9 100644
+--- a/arch/arm64/kvm/arm.c
++++ b/arch/arm64/kvm/arm.c
+@@ -666,7 +666,6 @@ void kvm_vcpu_wfi(struct kvm_vcpu *vcpu)
+ 
+ 	kvm_vcpu_halt(vcpu);
+ 	vcpu_clear_flag(vcpu, IN_WFIT);
+-	kvm_clear_request(KVM_REQ_UNHALT, vcpu);
+ 
+ 	preempt_disable();
+ 	vgic_v4_load(vcpu);
 diff --git a/arch/mips/kvm/emulate.c b/arch/mips/kvm/emulate.c
-index b494d8d39290..1d7c56defe93 100644
+index 1d7c56defe93..edaec93a1a1f 100644
 --- a/arch/mips/kvm/emulate.c
 +++ b/arch/mips/kvm/emulate.c
-@@ -955,13 +955,12 @@ enum emulation_result kvm_mips_emul_wait(struct kvm_vcpu *vcpu)
- 		kvm_vcpu_halt(vcpu);
- 
- 		/*
--		 * We we are runnable, then definitely go off to user space to
-+		 * We are runnable, then definitely go off to user space to
+@@ -958,7 +958,6 @@ enum emulation_result kvm_mips_emul_wait(struct kvm_vcpu *vcpu)
+ 		 * We are runnable, then definitely go off to user space to
  		 * check if any I/O interrupts are pending.
  		 */
--		if (kvm_check_request(KVM_REQ_UNHALT, vcpu)) {
--			kvm_clear_request(KVM_REQ_UNHALT, vcpu);
-+		kvm_clear_request(KVM_REQ_UNHALT, vcpu);
-+		if (kvm_arch_vcpu_runnable(vcpu))
+-		kvm_clear_request(KVM_REQ_UNHALT, vcpu);
+ 		if (kvm_arch_vcpu_runnable(vcpu))
  			vcpu->run->exit_reason = KVM_EXIT_IRQ_WINDOW_OPEN;
--		}
+ 	}
+diff --git a/arch/powerpc/kvm/book3s_pr.c b/arch/powerpc/kvm/book3s_pr.c
+index d6abed6e51e6..9fc4dd8f66eb 100644
+--- a/arch/powerpc/kvm/book3s_pr.c
++++ b/arch/powerpc/kvm/book3s_pr.c
+@@ -499,7 +499,6 @@ static void kvmppc_set_msr_pr(struct kvm_vcpu *vcpu, u64 msr)
+ 	if (msr & MSR_POW) {
+ 		if (!vcpu->arch.pending_exceptions) {
+ 			kvm_vcpu_halt(vcpu);
+-			kvm_clear_request(KVM_REQ_UNHALT, vcpu);
+ 			vcpu->stat.generic.halt_wakeup++;
+ 
+ 			/* Unset POW bit after we woke up */
+diff --git a/arch/powerpc/kvm/book3s_pr_papr.c b/arch/powerpc/kvm/book3s_pr_papr.c
+index a1f2978b2a86..b2c89e850d7a 100644
+--- a/arch/powerpc/kvm/book3s_pr_papr.c
++++ b/arch/powerpc/kvm/book3s_pr_papr.c
+@@ -393,7 +393,6 @@ int kvmppc_h_pr(struct kvm_vcpu *vcpu, unsigned long cmd)
+ 	case H_CEDE:
+ 		kvmppc_set_msr_fast(vcpu, kvmppc_get_msr(vcpu) | MSR_EE);
+ 		kvm_vcpu_halt(vcpu);
+-		kvm_clear_request(KVM_REQ_UNHALT, vcpu);
+ 		vcpu->stat.generic.halt_wakeup++;
+ 		return EMULATE_DONE;
+ 	case H_LOGICAL_CI_LOAD:
+diff --git a/arch/powerpc/kvm/booke.c b/arch/powerpc/kvm/booke.c
+index 06c5830a93f9..7b4920e9fd26 100644
+--- a/arch/powerpc/kvm/booke.c
++++ b/arch/powerpc/kvm/booke.c
+@@ -719,7 +719,6 @@ int kvmppc_core_prepare_to_enter(struct kvm_vcpu *vcpu)
+ 	if (vcpu->arch.shared->msr & MSR_WE) {
+ 		local_irq_enable();
+ 		kvm_vcpu_halt(vcpu);
+-		kvm_clear_request(KVM_REQ_UNHALT, vcpu);
+ 		hard_irq_disable();
+ 
+ 		kvmppc_set_exit_type(vcpu, EMULATED_MTMSRWE_EXITS);
+diff --git a/arch/powerpc/kvm/powerpc.c b/arch/powerpc/kvm/powerpc.c
+index fb1490761c87..ec9c1e3c2ff4 100644
+--- a/arch/powerpc/kvm/powerpc.c
++++ b/arch/powerpc/kvm/powerpc.c
+@@ -239,7 +239,6 @@ int kvmppc_kvm_pv(struct kvm_vcpu *vcpu)
+ 	case EV_HCALL_TOKEN(EV_IDLE):
+ 		r = EV_SUCCESS;
+ 		kvm_vcpu_halt(vcpu);
+-		kvm_clear_request(KVM_REQ_UNHALT, vcpu);
+ 		break;
+ 	default:
+ 		r = EV_UNIMPLEMENTED;
+diff --git a/arch/riscv/kvm/vcpu_insn.c b/arch/riscv/kvm/vcpu_insn.c
+index 7eb90a47b571..0bb52761a3f7 100644
+--- a/arch/riscv/kvm/vcpu_insn.c
++++ b/arch/riscv/kvm/vcpu_insn.c
+@@ -191,7 +191,6 @@ void kvm_riscv_vcpu_wfi(struct kvm_vcpu *vcpu)
+ 		kvm_vcpu_srcu_read_unlock(vcpu);
+ 		kvm_vcpu_halt(vcpu);
+ 		kvm_vcpu_srcu_read_lock(vcpu);
+-		kvm_clear_request(KVM_REQ_UNHALT, vcpu);
+ 	}
+ }
+ 
+diff --git a/arch/s390/kvm/kvm-s390.c b/arch/s390/kvm/kvm-s390.c
+index edfd4bbd0cba..aa39ea4582bd 100644
+--- a/arch/s390/kvm/kvm-s390.c
++++ b/arch/s390/kvm/kvm-s390.c
+@@ -4343,8 +4343,6 @@ static int kvm_s390_handle_requests(struct kvm_vcpu *vcpu)
+ 		goto retry;
  	}
  
- 	return EMULATE_DONE;
+-	/* nothing to do, just clear the request */
+-	kvm_clear_request(KVM_REQ_UNHALT, vcpu);
+ 	/* we left the vsie handler, nothing to do, just clear the request */
+ 	kvm_clear_request(KVM_REQ_VSIE_RESTART, vcpu);
+ 
 diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-index f901cd872b6d..66ae2f2cb618 100644
+index 66ae2f2cb618..762cdd08018a 100644
 --- a/arch/x86/kvm/x86.c
 +++ b/arch/x86/kvm/x86.c
-@@ -10633,7 +10633,14 @@ static inline int vcpu_block(struct kvm_vcpu *vcpu)
+@@ -10633,8 +10633,6 @@ static inline int vcpu_block(struct kvm_vcpu *vcpu)
  		if (hv_timer)
  			kvm_lapic_switch_to_hv_timer(vcpu);
  
--		if (!kvm_check_request(KVM_REQ_UNHALT, vcpu))
-+		kvm_clear_request(KVM_REQ_UNHALT, vcpu);
-+
-+		/*
-+		 * If the vCPU is not runnable, a signal or another host event
-+		 * of some kind is pending; service it without changing the
-+		 * the vCPU's activity state.
-+		 */
-+		if (!kvm_arch_vcpu_runnable(vcpu))
- 			return 1;
+-		kvm_clear_request(KVM_REQ_UNHALT, vcpu);
+-
+ 		/*
+ 		 * If the vCPU is not runnable, a signal or another host event
+ 		 * of some kind is pending; service it without changing the
+@@ -10852,7 +10850,6 @@ int kvm_arch_vcpu_ioctl_run(struct kvm_vcpu *vcpu)
+ 			r = 0;
+ 			goto out;
+ 		}
+-		kvm_clear_request(KVM_REQ_UNHALT, vcpu);
+ 		r = -EAGAIN;
+ 		if (signal_pending(current)) {
+ 			r = -EINTR;
+diff --git a/arch/x86/kvm/xen.c b/arch/x86/kvm/xen.c
+index 280cb5dc7341..93c628d3e3a9 100644
+--- a/arch/x86/kvm/xen.c
++++ b/arch/x86/kvm/xen.c
+@@ -1065,7 +1065,6 @@ static bool kvm_xen_schedop_poll(struct kvm_vcpu *vcpu, bool longmode,
+ 			del_timer(&vcpu->arch.xen.poll_timer);
+ 
+ 		vcpu->arch.mp_state = KVM_MP_STATE_RUNNABLE;
+-		kvm_clear_request(KVM_REQ_UNHALT, vcpu);
  	}
  
+ 	vcpu->arch.xen.poll_evtchn = 0;
+diff --git a/include/linux/kvm_host.h b/include/linux/kvm_host.h
+index f4519d3689e1..4d35d2e3e440 100644
+--- a/include/linux/kvm_host.h
++++ b/include/linux/kvm_host.h
+@@ -151,12 +151,11 @@ static inline bool is_error_page(struct page *page)
+ #define KVM_REQUEST_NO_ACTION      BIT(10)
+ /*
+  * Architecture-independent vcpu->requests bit members
+- * Bits 4-7 are reserved for more arch-independent bits.
++ * Bits 3-7 are reserved for more arch-independent bits.
+  */
+ #define KVM_REQ_TLB_FLUSH         (0 | KVM_REQUEST_WAIT | KVM_REQUEST_NO_WAKEUP)
+ #define KVM_REQ_VM_DEAD           (1 | KVM_REQUEST_WAIT | KVM_REQUEST_NO_WAKEUP)
+ #define KVM_REQ_UNBLOCK           2
+-#define KVM_REQ_UNHALT            3
+ #define KVM_REQUEST_ARCH_BASE     8
+ 
+ /*
+diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
+index 584a5bab3af3..dc326e4961d9 100644
+--- a/virt/kvm/kvm_main.c
++++ b/virt/kvm/kvm_main.c
+@@ -3409,10 +3409,8 @@ static int kvm_vcpu_check_block(struct kvm_vcpu *vcpu)
+ 	int ret = -EINTR;
+ 	int idx = srcu_read_lock(&vcpu->kvm->srcu);
+ 
+-	if (kvm_arch_vcpu_runnable(vcpu)) {
+-		kvm_make_request(KVM_REQ_UNHALT, vcpu);
++	if (kvm_arch_vcpu_runnable(vcpu))
+ 		goto out;
+-	}
+ 	if (kvm_cpu_has_pending_timer(vcpu))
+ 		goto out;
+ 	if (signal_pending(current))
 -- 
 2.31.1
-
 
