@@ -2,66 +2,75 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 8DEA859C398
-	for <lists+kvm@lfdr.de>; Mon, 22 Aug 2022 18:01:11 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 70E9359C3D1
+	for <lists+kvm@lfdr.de>; Mon, 22 Aug 2022 18:13:57 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236920AbiHVQBD (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 22 Aug 2022 12:01:03 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43566 "EHLO
+        id S235485AbiHVQNe (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 22 Aug 2022 12:13:34 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57220 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S236973AbiHVQAs (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 22 Aug 2022 12:00:48 -0400
-Received: from mail-pl1-x630.google.com (mail-pl1-x630.google.com [IPv6:2607:f8b0:4864:20::630])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5095F15A38
-        for <kvm@vger.kernel.org>; Mon, 22 Aug 2022 09:00:48 -0700 (PDT)
-Received: by mail-pl1-x630.google.com with SMTP id 2so10355950pll.0
-        for <kvm@vger.kernel.org>; Mon, 22 Aug 2022 09:00:48 -0700 (PDT)
+        with ESMTP id S236695AbiHVQNX (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 22 Aug 2022 12:13:23 -0400
+Received: from mail-pj1-x1030.google.com (mail-pj1-x1030.google.com [IPv6:2607:f8b0:4864:20::1030])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DADA1DB3
+        for <kvm@vger.kernel.org>; Mon, 22 Aug 2022 09:13:20 -0700 (PDT)
+Received: by mail-pj1-x1030.google.com with SMTP id x63-20020a17090a6c4500b001fabbf8debfso11799352pjj.4
+        for <kvm@vger.kernel.org>; Mon, 22 Aug 2022 09:13:20 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:from:to:cc;
-        bh=Eusj5tRM9kHkp0fXxuOOeVVvjzsgsdMohVFpv8zrLO4=;
-        b=cQyu75g/cav4GQAjP/WFxwtJxNW8VZmv3fp1w4YDEmZ4de270lSdk7jaTICAtxFBT0
-         bspKfS7XijoVt3aiWe0v6mUfwrTsQZ9q4SnlJ4qABDAY+DLiLCnGUmescm0Lis5SwU3f
-         R6mrpB5h/jTR0+8+JRmONZQxGjNbmFK4+EqW3as2dks6zno7VUy/b0AA5cb18YpbrZTr
-         ZV7SySP1+LT9ZLkpM/bjJhczWSsGEJQxPw9/FgetzMOKsuRK6e3MOuNmjipZFcjKlsHf
-         6TkxQlC/55P89aJwRmFAOiW8beu0W4n6zHTXnbr//GyndxAki9BoBpqk2oN965pV5K8u
-         DuLw==
+        bh=UvJx9+FEYI5OIrLAKKjR26v13dLPxbliBeR/lXbsskg=;
+        b=DNpb3tFZCML7MqYbpRmaxEdD+a52S8g/qpeXjiKWkZLUrtrh4A6rseWJ0IIDGmbl2a
+         sFdNSXz4liV6aRpQP2daQXAoZG3fHTHJWJ86CcWSanH/lD28ibkbSJTJ/85BfeKVh9wa
+         /iWoYBBtT/X/Q6awAfhOldx8FwIsFEhJJroD0rjdScBX+C1SA+jubGHvoVY5F17KINRK
+         urXSFuDh6YKiFbAq4R7u0gPBVVtAFygkaM4ouIOyIjdBIHfntIbbEeZdVahUd2l/1oyK
+         D3L5DKjSpdhUbV5R8Qacb7bX4enX/2gMlyPM9N7CJx1MyDkpRJLBXryHCHc+kCDzPUqd
+         3jfQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:x-gm-message-state:from:to:cc;
-        bh=Eusj5tRM9kHkp0fXxuOOeVVvjzsgsdMohVFpv8zrLO4=;
-        b=dfQFxfyq+Ok9Hc+5wSv98R3cVahGhFyy8Pi1RrxvnFHf2ZQniTi1pYDrgh3kNSMtsK
-         SuA87YdGqy7UEEhjHmKcqApVM7YimJr3ypR5SnFu+DRKL0tfKjGqvd8B8a7RZKEsdjfu
-         6uanOq66NSZ555HsTLViYBBNixlrKyjICOPKC4oKSOCGQg3zlhCI0FAmE2wgic47Jkpk
-         Mi+F1eA4KKEF1TSlF8WulnoCGoxcoGO1/NEctsWP8k+06LFD2ICKeI0CNZOIZXUdj266
-         H7kx6v+BaeB62UsyMN26YCq/Opg88TTFgaIFR2l6abmKcPRyzPIaEFYR1/PwaWV6VyM2
-         uq7Q==
-X-Gm-Message-State: ACgBeo1vgTUxSqod3nyAc3h500DH5P2GF5+3x97H/8NPcMLlvbeAeluy
-        vNL3HVUXUJ0r4qptlA8jmU0P0A==
-X-Google-Smtp-Source: AA6agR6fCF0L6EVpaGRYH0oYC7Z/nnw1ZkOquqr0XVyEDXvA/D2z9UwNWnUew/rZ57W3EBNWQSBhhw==
-X-Received: by 2002:a17:903:187:b0:172:dc6b:5ec6 with SMTP id z7-20020a170903018700b00172dc6b5ec6mr9390423plg.95.1661184046711;
-        Mon, 22 Aug 2022 09:00:46 -0700 (PDT)
+        bh=UvJx9+FEYI5OIrLAKKjR26v13dLPxbliBeR/lXbsskg=;
+        b=FGEZ8tzg1IadrzRYwtJy2YYKPx99C7eT6A281IWeOe76D1mdmsxOnJ5Fq6I0wEFRsw
+         n5ERsJ33WPWrouuEuCO//YxwMLBSH0kM4uNuWRvWExhHiE3cgYX4VYi6sh4WZ+ZXzmSh
+         Tq6CX1omq8VbgSdbQ9TyuXGmfWuwlDVxAInz+lVNNbI8j+Aq+18ktFa6MoF4Uzon+k+a
+         N7aV+U48Fq3NUu7JT/bXgBzeLI16jQiU8o7Q2apUy0ApOwkvBO20WsddNpdrCAOTFxgF
+         8YIHUKGAg7k3eO9g2ZKg0Ch4PHS0FrEScs13Z9LEK5HcQOuxMtOF5TocAhJPjekbx2+k
+         tcvg==
+X-Gm-Message-State: ACgBeo2ijrIAxkkFqSE93/Jc3x2lfuAI8U2yCGEn1esODYIfUEnAeBRT
+        Fpepnn6Ru3Fr7vv9K+0xZyU2+g==
+X-Google-Smtp-Source: AA6agR5O3f2KBXdwaPcI9TqoK/2TMHHcLKZEqJUKozItOTNCtDb1pJs78mwUAlxyD8P7U4366S1lPw==
+X-Received: by 2002:a17:90a:ab14:b0:1fa:b97f:c28b with SMTP id m20-20020a17090aab1400b001fab97fc28bmr23897669pjq.71.1661184800329;
+        Mon, 22 Aug 2022 09:13:20 -0700 (PDT)
 Received: from google.com (7.104.168.34.bc.googleusercontent.com. [34.168.104.7])
-        by smtp.gmail.com with ESMTPSA id nk24-20020a17090b195800b001fb3522d53asm1837027pjb.34.2022.08.22.09.00.46
+        by smtp.gmail.com with ESMTPSA id o12-20020a170902bccc00b0016db7f49cc2sm8540708pls.115.2022.08.22.09.13.19
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 22 Aug 2022 09:00:46 -0700 (PDT)
-Date:   Mon, 22 Aug 2022 16:00:42 +0000
+        Mon, 22 Aug 2022 09:13:19 -0700 (PDT)
+Date:   Mon, 22 Aug 2022 16:13:15 +0000
 From:   Sean Christopherson <seanjc@google.com>
-To:     cgel.zte@gmail.com
-Cc:     pbonzini@redhat.com, tglx@linutronix.de, mingo@redhat.com,
-        bp@alien8.de, dave.hansen@linux.intel.com, x86@kernel.org,
-        hpa@zytor.com, kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
-        ye xingchen <ye.xingchen@zte.com.cn>
-Subject: Re: [PATCH linux-next v2] KVM: SVM: Remove the unneeded result
- variable
-Message-ID: <YwOoKk5PLnEDGI2A@google.com>
-References: <20220822013720.199757-1-ye.xingchen@zte.com.cn>
+To:     Vitaly Kuznetsov <vkuznets@redhat.com>
+Cc:     kvm@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>,
+        Anirudh Rayabharam <anrayabh@linux.microsoft.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Maxim Levitsky <mlevitsk@redhat.com>,
+        Nathan Chancellor <nathan@kernel.org>,
+        Michael Kelley <mikelley@microsoft.com>,
+        linux-hyperv@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v5 03/26] x86/hyperv: Update 'struct hv_enlightened_vmcs'
+ definition
+Message-ID: <YwOrG3W3zAZ7VNJu@google.com>
+References: <20220802160756.339464-1-vkuznets@redhat.com>
+ <20220802160756.339464-4-vkuznets@redhat.com>
+ <Yv5ZFgztDHzzIQJ+@google.com>
+ <875yiptvsc.fsf@redhat.com>
+ <Yv59dZwP6rNUtsrn@google.com>
+ <87czcsskkj.fsf@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20220822013720.199757-1-ye.xingchen@zte.com.cn>
+In-Reply-To: <87czcsskkj.fsf@redhat.com>
 X-Spam-Status: No, score=-14.5 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
         ENV_AND_HDR_SPF_MATCH,FSL_HELO_FAKE,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,
@@ -73,70 +82,12 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Aug 22, 2022, cgel.zte@gmail.com wrote:
-> From: ye xingchen <ye.xingchen@zte.com.cn>
-> 
-> Return the value from sev_guest_activate(&activate, error) and
-> sev_issue_cmd_external_user(f.file, id, data, error) directly
-> instead of storing it in another redundant variable.And also change
-> the position of handle and asid to simplify the code.
-> 
-> Signed-off-by: ye xingchen <ye.xingchen@zte.com.cn>
-> ---
-> v1 -> v2
-> Suggested-by: SeanChristopherson <seanjc@google.com>
-> 
-> Change the position of handle and asid.
-> Change the explain about this patch.
-> Dropping the comment about asid + handle.
->  arch/x86/kvm/svm/sev.c | 19 ++++++-------------
->  1 file changed, 6 insertions(+), 13 deletions(-)
-> 
-> diff --git a/arch/x86/kvm/svm/sev.c b/arch/x86/kvm/svm/sev.c
-> index 28064060413a..4448f2e512b9 100644
-> --- a/arch/x86/kvm/svm/sev.c
-> +++ b/arch/x86/kvm/svm/sev.c
-> @@ -276,31 +276,24 @@ static int sev_guest_init(struct kvm *kvm, struct kvm_sev_cmd *argp)
->  
->  static int sev_bind_asid(struct kvm *kvm, unsigned int handle, int *error)
->  {
-> -	struct sev_data_activate activate;
-> -	int asid = sev_get_asid(kvm);
-> -	int ret;
-> -
-> -	/* activate ASID on the given handle */
-> -	activate.handle = handle;
-> -	activate.asid   = asid;
-> -	ret = sev_guest_activate(&activate, error);
-> +	struct sev_data_activate activate = {
-> +		.handle = handle,
-> +		.asid = sev_get_asid(kvm),
-> +	};
->  
-> -	return ret;
-> +	return sev_guest_activate(&activate, error);
->  }
->  
->  static int __sev_issue_cmd(int fd, int id, void *data, int *error)
->  {
->  	struct fd f;
-> -	int ret;
->  
->  	f = fdget(fd);
->  	if (!f.file)
->  		return -EBADF;
->  
-> -	ret = sev_issue_cmd_external_user(f.file, id, data, error);
-> -
->  	fdput(f);
-> -	return ret;
-> +	return sev_issue_cmd_external_user(f.file, id, data, error);
+On Mon, Aug 22, 2022, Vitaly Kuznetsov wrote:
+> So I reached out to Microsoft and their answer was that for all these new
+> eVMCS fields (including *PerfGlobalCtrl) observing architectural VMX
+> MSRs should be enough. *PerfGlobalCtrl case is special because of Win11
+> bug (if we expose the feature in VMX feature MSRs but don't set
+> CPUID.0x4000000A.EBX BIT(0) it just doesn't boot).
 
-Again, this is broken, the fdput() needs to stay after f.file is consumed, i.e.
-eliminating "ret" is wrong.
-
->  }
->  
->  static int sev_issue_cmd(struct kvm *kvm, int id, void *data, int *error)
-> -- 
-> 2.25.1
+Does this mean that KVM-on-HyperV needs to avoid using the PERF_GLOBAL_CTRL fields
+when the bit is not set?
