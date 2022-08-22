@@ -2,126 +2,117 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 22EFA59C2FA
-	for <lists+kvm@lfdr.de>; Mon, 22 Aug 2022 17:39:12 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id D40F459C32E
+	for <lists+kvm@lfdr.de>; Mon, 22 Aug 2022 17:43:58 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235719AbiHVPiv (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 22 Aug 2022 11:38:51 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48358 "EHLO
+        id S236788AbiHVPnO (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 22 Aug 2022 11:43:14 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51274 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233360AbiHVPiu (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 22 Aug 2022 11:38:50 -0400
-Received: from mail-pg1-x542.google.com (mail-pg1-x542.google.com [IPv6:2607:f8b0:4864:20::542])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 967A8E006
-        for <kvm@vger.kernel.org>; Mon, 22 Aug 2022 08:38:49 -0700 (PDT)
-Received: by mail-pg1-x542.google.com with SMTP id l64so9735811pge.0
-        for <kvm@vger.kernel.org>; Mon, 22 Aug 2022 08:38:49 -0700 (PDT)
+        with ESMTP id S236842AbiHVPmk (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 22 Aug 2022 11:42:40 -0400
+Received: from mail-pj1-x1031.google.com (mail-pj1-x1031.google.com [IPv6:2607:f8b0:4864:20::1031])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2867B1D0CB
+        for <kvm@vger.kernel.org>; Mon, 22 Aug 2022 08:42:39 -0700 (PDT)
+Received: by mail-pj1-x1031.google.com with SMTP id m15so3329367pjj.3
+        for <kvm@vger.kernel.org>; Mon, 22 Aug 2022 08:42:39 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=to:subject:message-id:date:from:sender:mime-version:from:to:cc;
-        bh=Bt5OnuHoLWMmd8kWNIJ/R5jWGGMn2gQUophJ4PVrMCg=;
-        b=fvF+gFPMHXSzZ2rxnbVbmlqbZzCjGLs8sY5IGMml5u19eXbT4Fe2OtznxVD33u5aNG
-         vOWMOpFYCTJ+/vCFKo7KJhdaDy5CplJb0XV/dC654VlS4WSBviGxreR8iGAkNe7Mbumo
-         w6X2GHo9ZJ2gXg1UOJHCmoJI5Zfyl0odRlyqWPzYaa35KZ/bPfaYEGzOVxmb8G79jdEf
-         md0mVD//Mtmg/un9R31DFlIYQnLdF4OeR935mGNMXn9t4XvLwAu+EJ0NQWhG01lH/IJ8
-         ZZXE42Q3SqTCLk37/3zBnzpvVhyVRLyZofcpqaDPSFboH7+WCaK4hT6Mg43wJ+18MJIR
-         9BnA==
+        d=google.com; s=20210112;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc;
+        bh=m+XUoMI2UgV3bZeLoWMp4YUYplyHQDspsygE7stPO7Y=;
+        b=mQIMHFyEw5q/aRnbp8qCFPZFgcHf0+Q5/fLNswDgxCw00bvU2YMe2szWZGH6ByHrHU
+         TRZf5rCYIimZg3PN3wx1BMJ3gPE62P57Nvvos1WJl98iLexQHfIcowy0OP8kdOglG/PX
+         6sU6tyUbspLRwaX9diRVbqwJj1W5gGFIF+p7ZUF+4QBGstqX+M57gFJw1egbI1ysZ1MR
+         2r86vLzMzw3gmkMBn70ORykqGjT0YdirNiDLE3zWsUIFEMrRhwgtU0xcQWLrKcV8+SJp
+         esLLzfhNssdVIoNKO9/Ib7eG/9xTmgjusGqx2/hmnNuK8v1D90954/uwzaighaZ5nCx7
+         kFfg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=to:subject:message-id:date:from:sender:mime-version
-         :x-gm-message-state:from:to:cc;
-        bh=Bt5OnuHoLWMmd8kWNIJ/R5jWGGMn2gQUophJ4PVrMCg=;
-        b=EEVMR4nHVZfzUvHcWll450MEth0W6H6VwhlkYNGO0b970fSsBzBy9aBiDey/Ymx4Du
-         bKUR2aM8yyKTaykfgVQ6bWDRVfI13avLFJnGDl5BSUTxHzOOsdbKtBDaSbYV794h+uPY
-         bvNeKqT4CtnaIz41GdtcEbgE4Kj7JQoRlJiCOA7ZuYabyf8u863wlTnixDC3aM6h/5/2
-         E4DqDwUmn8Lk75bVrAQZgW4tfFuvEcThYXYx2dDz46zHYOa2aOnDh4tJ7tf9Qubwbti0
-         UQDD5D5SvX8Q9AFR0y71YLEiShmo5ceLgwyZTcu22w6/hdBdAovJzxKSj77ikjodoof4
-         KRZw==
-X-Gm-Message-State: ACgBeo1G6E9yAa9dlSvWuzUAIKpD+D53qi//KD+Bzl93zCL4+rNcd2/R
-        u82TntXozMlFRLpsuDWaA6YOCP+ysxTaSzCpNGc=
-X-Google-Smtp-Source: AA6agR7P+/+DTJ2t/xTSng5iSWdhzJnnvRzAvh3/gCoNoxTkHljaJlQ1uvOjBg5eOXKBRt85rrfzvOpoO9YFtCrERlQ=
-X-Received: by 2002:a63:1f1b:0:b0:429:b4be:72f0 with SMTP id
- f27-20020a631f1b000000b00429b4be72f0mr17095559pgf.622.1661182728989; Mon, 22
- Aug 2022 08:38:48 -0700 (PDT)
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc;
+        bh=m+XUoMI2UgV3bZeLoWMp4YUYplyHQDspsygE7stPO7Y=;
+        b=BmI1a+kPnnDVZyV6OdG5CNqGzWNAUQ7IOd8TUx5WmD0a6YoLSbm42qyloZ+fsk3UE6
+         Vq+J81m30Sz73c566f+IqCdeb37SM1xt97p2twI28pxQfMYR0vVwXbYRK1nkXxMQlSSo
+         EHvlIcCXj/i/EwHCofWHF4b28HKZC1pczOjrH2BRFXTlhRhCsFYJNXMN4R/nLasFJGi1
+         j+HPPOwDNvI2VL9KpqCjS4zbEW1lstJHaaz/xNnvqAHwjoryFbqJF8a//PcPpUwMncK2
+         g0I1PMrQjJt4k3+2Eu/6Yp2xKoollXvlnaWptfHyp+JLVfVk0wt/iyORPH5bdSQm3EN1
+         uMfg==
+X-Gm-Message-State: ACgBeo24cBt3Vg9QsMfRdWvyZy3JBwFdOuTuOZsZZpHoXXmt0vSrZT32
+        ZSiQFHKw1opvpXUOiwQ189wdSfE1q1tuWQ==
+X-Google-Smtp-Source: AA6agR5yci+nO0OS3SEUskMQ7XF/VcfmX1jeZ5r3wKM0ui8q3gHwgOcODqa30BnK5Qo/7EAZszN/pg==
+X-Received: by 2002:a17:902:d4ca:b0:16f:8311:54b0 with SMTP id o10-20020a170902d4ca00b0016f831154b0mr21067887plg.108.1661182958536;
+        Mon, 22 Aug 2022 08:42:38 -0700 (PDT)
+Received: from google.com (7.104.168.34.bc.googleusercontent.com. [34.168.104.7])
+        by smtp.gmail.com with ESMTPSA id c17-20020a63ef51000000b0041d95d805d6sm4524929pgk.57.2022.08.22.08.42.37
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 22 Aug 2022 08:42:37 -0700 (PDT)
+Date:   Mon, 22 Aug 2022 15:42:34 +0000
+From:   Sean Christopherson <seanjc@google.com>
+To:     Michal Luczaj <mhal@rbox.co>
+Cc:     kvm@vger.kernel.org, pbonzini@redhat.com
+Subject: Re: [kvm-unit-tests PATCH] x86/emulator: Test POP-SS blocking
+Message-ID: <YwOj6tzvIoG34/sF@google.com>
+References: <20220821215900.1419215-1-mhal@rbox.co>
+ <20220821220647.1420411-1-mhal@rbox.co>
+ <9b853239-a3df-f124-e793-44cbadfbbd8f@rbox.co>
 MIME-Version: 1.0
-Sender: dvavsvsvsvs@gmail.com
-Received: by 2002:a05:6a10:d142:b0:2d6:7875:e094 with HTTP; Mon, 22 Aug 2022
- 08:38:48 -0700 (PDT)
-From:   "carlsen.monika" <carlsen.monika@gmail.com>
-Date:   Mon, 22 Aug 2022 16:38:48 +0100
-X-Google-Sender-Auth: X5c8H_gKQNi1WVqi3w8dIxIyBZU
-Message-ID: <CA+hPWRNaxb9zJUQtF78H1MtJG0QkQs1-0rQzchxa5zGTBfHXDw@mail.gmail.com>
-Subject: Dearest One,
-To:     undisclosed-recipients:;
-Content-Type: text/plain; charset="UTF-8"
-X-Spam-Status: Yes, score=7.2 required=5.0 tests=ADVANCE_FEE_5_NEW_MONEY,
-        BAYES_50,DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        FREEMAIL_FROM,HK_RANDOM_ENVFROM,LOTS_OF_MONEY,MONEY_FRAUD_8,
-        RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,
-        UNDISC_MONEY autolearn=no autolearn_force=no version=3.4.6
-X-Spam-Report: * -0.0 RCVD_IN_DNSWL_NONE RBL: Sender listed at
-        *      https://www.dnswl.org/, no trust
-        *      [2607:f8b0:4864:20:0:0:0:542 listed in]
-        [list.dnswl.org]
-        *  0.8 BAYES_50 BODY: Bayes spam probability is 40 to 60%
-        *      [score: 0.5000]
-        *  1.0 HK_RANDOM_ENVFROM Envelope sender username looks random
-        *  0.0 FREEMAIL_FROM Sender email is commonly abused enduser mail
-        *      provider
-        *      [carlsen.monika[at]gmail.com]
-        *  0.0 SPF_HELO_NONE SPF: HELO does not publish an SPF Record
-        * -0.0 SPF_PASS SPF: sender matches SPF record
-        * -0.1 DKIM_VALID_EF Message has a valid DKIM or DK signature from
-        *      envelope-from domain
-        *  0.1 DKIM_SIGNED Message has a DKIM or DK signature, not necessarily
-        *       valid
-        * -0.1 DKIM_VALID Message has at least one valid DKIM or DK signature
-        * -0.1 DKIM_VALID_AU Message has a valid DKIM or DK signature from
-        *      author's domain
-        * -0.0 T_SCC_BODY_TEXT_LINE No description available.
-        *  0.0 LOTS_OF_MONEY Huge... sums of money
-        *  0.0 MONEY_FRAUD_8 Lots of money and very many fraud phrases
-        *  3.0 ADVANCE_FEE_5_NEW_MONEY Advance Fee fraud and lots of money
-        *  2.6 UNDISC_MONEY Undisclosed recipients + money/fraud signs
-X-Spam-Level: *******
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <9b853239-a3df-f124-e793-44cbadfbbd8f@rbox.co>
+X-Spam-Status: No, score=-14.5 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+        ENV_AND_HDR_SPF_MATCH,FSL_HELO_FAKE,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,
+        SPF_PASS,T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL
+        autolearn=no autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Dearest One,
+On Mon, Aug 22, 2022, Michal Luczaj wrote:
+> On 8/22/22 00:06, Michal Luczaj wrote:
+> > Note that doing this the ASM_TRY() way would require extending
+> > setup_idt() (to handle #DB) and introducing another ASM_TRY() variant
+> > (one without the initial `movl $0, %%gs:4`).
+> 
+> Replying to self as I was wrong regarding the need for another ASM_TRY() variant.
+> Once setup_idt() is told to handle #DB,
 
-    CHARITY DONATION Please read carefully, I know it is true that
-this letter may come to you as a surprise. I came across your e-mail
-contact through a private search while in need of your assistance. am
-writing this mail to you with heavy sorrow in my heart, I have chose
-to reach out to you through internet because it still remains the
-fastest medium of communication. I sent this mail praying it will
-found you in a good condition of health, since I myself are in a very
-critical health condition in which I sleep every night without knowing
-if I may be alive to see the next day.
+Hmm, it might be a moot point for this patch (see below), but my vote is to have
+setup_idt() wire up all known handlers to check_exception_table().  I don't see
+any reason to skip some vectors.  Code with __ASM_TRY() will explode no matter what,
+so it's not like it risks suppressing completely unexpected faults.
 
-aM Mrs.Monika John Carlsen, wife of late Mr John Carlsen, a widow
-suffering from long time illness. I have some funds I inherited from
-my late husband, the sum of ($11.000.000,eleven million dollars) my
-Doctor told me recently that I have serious sickness which is cancer
-problem. What disturbs me most is my stroke sickness. Having known my
-condition, I decided to donate this fund to a good person that will
-utilize it the way am going to instruct herein. I need a very honest
-and God fearing person who can claim this money and use it for Charity
-works, for orphanages, widows and also build schools for less
-privileges that will be named after my late husband if possible and to
-promote the word of God and the effort that the house of God is
-maintained.
+	for (i = 0; i < 32; i++) {
+		if (!idt_handlers[i])
+			continue;
 
-I do not want a situation where this money will be used in an ungodly
-manners. That's why am taking this decision. am not afraid of death so
-I know where am going. I accept this decision because I do not have
-any child who will inherit this money after I die. Please I want your
-sincerely and urgent answer to know if you will be able to execute
-this project, and I will give you more information on how the fund
-will be transferred to your bank account. am waiting for your reply,
+		set_idt_entry(i, idt_handlers[i], 0);
+		handle_exception(i, check_exception_table);
+	}
 
-Best Regards
-Mrs.Monika John Carlsen,
+> test can be simplified to something like
+> 
+> 	asm volatile("push %[ss]\n\t"
+> 		     __ASM_TRY(KVM_FEP "pop %%ss", "1f")
+> 		     "ex_blocked: mov $1, %[success]\n\t"
+
+So I'm 99% certain this only passes because KVM doesn't emulate the `mov $1, %[success]`.
+kvm_vcpu_check_code_breakpoint() honors EFLAGS.RF, but not MOV/POP_SS blocking.
+I.e. I would expect this to fail if the `mov` were also tagged KVM_FEP.
+
+Single-step and data #DBs appear to be broken as well, I don't see anything that
+will suppress them for MOV/POP_SS.  Of course, KVM doesn't emulate data #DBs at
+all, so testing that case is probably not worthwhile at this time.
+
+The reason I say the setup_idt() change is a moot point is because I think it
+would be better to put this testcase into debug.c (where "this" testcase is really
+going to be multiple testcases).  With macro shenanigans (or code patching), it
+should be fairly easy to run all testcases with both FEP=0 and FEP=1.
+
+Then it's "just" a matter of adding a code #DB testcase.  __run_single_step_db_test()
+and run_ss_db_test() aren't fundamentally tied to single-step, i.e. can simply be
+renamed.  For simplicity, I'd say just skip the usermode test for code #DBs, IMO
+it's not worth the extra coverage.
