@@ -2,71 +2,53 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 0326D59B90D
-	for <lists+kvm@lfdr.de>; Mon, 22 Aug 2022 08:12:54 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id F367559B92F
+	for <lists+kvm@lfdr.de>; Mon, 22 Aug 2022 08:22:36 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232784AbiHVGMX (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 22 Aug 2022 02:12:23 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60430 "EHLO
+        id S230519AbiHVGW1 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 22 Aug 2022 02:22:27 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39592 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229727AbiHVGMV (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 22 Aug 2022 02:12:21 -0400
-Received: from mail-ot1-x32f.google.com (mail-ot1-x32f.google.com [IPv6:2607:f8b0:4864:20::32f])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6A92A26AD2;
-        Sun, 21 Aug 2022 23:12:21 -0700 (PDT)
-Received: by mail-ot1-x32f.google.com with SMTP id h20-20020a056830165400b00638ac7ddba5so7064090otr.4;
-        Sun, 21 Aug 2022 23:12:21 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=cc:to:subject:message-id:date:from:reply-to:in-reply-to:references
-         :mime-version:from:to:cc;
-        bh=xRBPID2afPJAp96OqaGvBdjqx78UAxNzgaJTyGjabr8=;
-        b=fAsoPJBfZm1Q3Pe+7+Kgk49YdcBBzb5wbtHRNl3NBQ8lbJi6wNFGOyGP+hoP0LKlyB
-         VYzze1ue1TiTDDgBtSEp6kziMzbSiH5Fii+zpt7cBoV90iAQvRLmQHESUpqo3Y2Wp0tT
-         txhLSz77VhTqtxhPw3vHrTEWUE1Rg3dXr9mmw80FeRscTk39kroT1YD6ySvLqCPXYB/M
-         jKGtS5Jkl9M0Xr8BvbyheUI4MSQ3LYilhkgfoy9UPRCTcOE8FZLGdRPd5ma1WAVAWUHJ
-         rX8xGUAGM5/iqMLz3tWKZo8+A29cJCX4/zNpzemWmun70fPvCnhrk/oSR+OdcQSW3niU
-         7edw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=cc:to:subject:message-id:date:from:reply-to:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc;
-        bh=xRBPID2afPJAp96OqaGvBdjqx78UAxNzgaJTyGjabr8=;
-        b=GDmbLoeM4H5ljqQY3FvjqMmqus7MvH38CTOUOPYK/hVR0rHUS/gPlm7r4CyiGTrqQ5
-         /ZTKHs+8YZ36SCBnWFwSqhDkxLG1crLaZYt0aEK970mw0INpvChvkJ70dZcH5FJmWz+H
-         C5Uk3n2VoNABbWQH9F+lYrNjVErQIw6cdBwHfCTEc77oF+wqzeMWAFrUEvyQVMDSE2eO
-         6lRCrhKS665f71bmOyW2TskDwbxTJ+2ZIBMyO3kd6hNu1Q8OsVfpyYEu1/quV0m+Njed
-         WdSOOW8K0BZrS+Qtot7+8glD2hdO5s0btaY/owzzjLuwfZCuztxN8MgDfiDh6QXIddyi
-         gR3A==
-X-Gm-Message-State: ACgBeo33geumml56BpLk6OmlwwStbg+amnqz+fn3iAGnHDoD0GG6ZkU9
-        se3DDVr3YyHYjyEvA0jfVJJVuV2m6h2kgYHrKR4=
-X-Google-Smtp-Source: AA6agR5/3lpDfPcI8hjqmqqJiTVbPVyi0UuVROvgrbHtJM/EtFwkEW7IgrfmM3wwNBrbhTG/o1jOsrLr57VaSHZoKMc=
-X-Received: by 2002:a05:6830:2a8e:b0:638:c41c:d5a1 with SMTP id
- s14-20020a0568302a8e00b00638c41cd5a1mr7455068otu.367.1661148740694; Sun, 21
- Aug 2022 23:12:20 -0700 (PDT)
+        with ESMTP id S232223AbiHVGWY (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 22 Aug 2022 02:22:24 -0400
+Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:3::133])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 02BF3275D2;
+        Sun, 21 Aug 2022 23:22:23 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=bombadil.20210309; h=Content-Transfer-Encoding:
+        MIME-Version:Message-Id:Date:Subject:Cc:To:From:Sender:Reply-To:Content-Type:
+        Content-ID:Content-Description:In-Reply-To:References;
+        bh=UJklhtPf7Vvs80l7or/jdQ9kJpFAr1l+m9e6LvJrRyY=; b=a+XVNZ5qTAMy/biXUPYxzJcEQT
+        yOPuvNL9tHS/wLEsfMQKPaON+kLRkUYYIcw+qrI4aj8bC5gxLB+LVaXrgcmvUTeD/Hg+8xAaWezGm
+        gLKkVlDbgMMSwRVv9cHmr6viTVw6n/giAcV+ckQpkDqR8FG7f0haVYITsIeRhuLTIvwm7QjpQQ7xo
+        UzkBhKTkGTHEbF4P1s4bYHmZ5w0wWyEh7c2UaydAXjDDPldVo72z6QfxUOJ7ITSwGinBKQoDyRSbd
+        K/XaZ1g9jbQhU6xtbYNibs7fz+xL36mrgbXpX/gAGlt3Swm++orCI2nAVMGvWuKKXz0vB6IWZVctm
+        p4fKGXFw==;
+Received: from [2001:4bb8:198:6528:7eb3:3a42:932d:eeba] (helo=localhost)
+        by bombadil.infradead.org with esmtpsa (Exim 4.94.2 #2 (Red Hat Linux))
+        id 1oQ0p8-005NO9-CH; Mon, 22 Aug 2022 06:22:10 +0000
+From:   Christoph Hellwig <hch@lst.de>
+To:     Kirti Wankhede <kwankhede@nvidia.com>,
+        Tony Krowiak <akrowiak@linux.ibm.com>,
+        Halil Pasic <pasic@linux.ibm.com>,
+        Jason Herne <jjherne@linux.ibm.com>,
+        Eric Farman <farman@linux.ibm.com>,
+        Matthew Rosato <mjrosato@linux.ibm.com>,
+        Zhenyu Wang <zhenyuw@linux.intel.com>,
+        Zhi Wang <zhi.a.wang@intel.com>,
+        Alex Williamson <alex.williamson@redhat.com>
+Cc:     Jason Gunthorpe <jgg@nvidia.com>, kvm@vger.kernel.org,
+        linux-s390@vger.kernel.org, intel-gvt-dev@lists.freedesktop.org
+Subject: simplify the mdev interface v7
+Date:   Mon, 22 Aug 2022 08:21:54 +0200
+Message-Id: <20220822062208.152745-1-hch@lst.de>
+X-Mailer: git-send-email 2.30.2
 MIME-Version: 1.0
-References: <CAADnVQJFc9AnH_9CW+bSRotkKvOmkO9jq-RF6dmyPYOpq691Yg@mail.gmail.com>
- <20220819190640.2763586-1-ndesaulniers@google.com> <CAHk-=whLcuvDDS3rZfEgDrwbdJrTx8HCRNiZ5cDc80-_gzHCxw@mail.gmail.com>
-In-Reply-To: <CAHk-=whLcuvDDS3rZfEgDrwbdJrTx8HCRNiZ5cDc80-_gzHCxw@mail.gmail.com>
-Reply-To: sedat.dilek@gmail.com
-From:   Sedat Dilek <sedat.dilek@gmail.com>
-Date:   Mon, 22 Aug 2022 08:11:44 +0200
-Message-ID: <CA+icZUUX1gPvnExa=zyVqB8xYOTai+nfHp6E7+qRE2mXXa2M=A@mail.gmail.com>
-Subject: Re: [PATCH v2] asm goto: eradicate CC_HAS_ASM_GOTO
-To:     Linus Torvalds <torvalds@linux-foundation.org>
-Cc:     Nick Desaulniers <ndesaulniers@google.com>,
-        Masahiro Yamada <masahiroy@kernel.org>,
-        Peter Zijlstra <peterz@infradead.org>, x86@kernel.org,
-        linux-kbuild@vger.kernel.org, linux-doc@vger.kernel.org,
-        linux-kernel@vger.kernel.org, linux-um@lists.infradead.org,
-        kvm@vger.kernel.org, llvm@lists.linux.dev,
-        Alexandre Belloni <alexandre.belloni@bootlin.com>,
-        Borislav Petkov <bp@suse.de>,
-        Alexei Starovoitov <alexei.starovoitov@gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
-        RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
+Content-Transfer-Encoding: 8bit
+X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
+X-Spam-Status: No, score=-2.5 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_EF,HEADER_FROM_DIFFERENT_DOMAINS,
+        RCVD_IN_DNSWL_LOW,SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE
         autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -74,36 +56,68 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Sun, Aug 21, 2022 at 7:13 PM Linus Torvalds
-<torvalds@linux-foundation.org> wrote:
->
-> Applied directly, just because I love seeing old nasty stuff like this go away.
->
->              Linus
+Hi all,
 
-Hi,
+this series signigicantly simplies the mdev driver interface by following
+the patterns for device model interaction used elsewhere in the kernel.
 
-Small nitpick:
+Changes since v6:
+ - rebased to Linux 6.0-rc2
+ - folded in a patch from Eric Farman to fix the placement of the new
+   embedded mdev structured in the s390 cio driver
 
---- a/arch/x86/include/asm/rmwcc.h
-+++ b/arch/x86/include/asm/rmwcc.h
-...
--#if !defined(__GCC_ASM_FLAG_OUTPUTS__) && defined(CONFIG_CC_HAS_ASM_GOTO)
-+#ifndef __GCC_ASM_FLAG_OUTPUTS__
-...
--#else /* defined(__GCC_ASM_FLAG_OUTPUTS__) ||
-!defined(CONFIG_CC_HAS_ASM_GOTO) */
-+#else /* defined(__GCC_ASM_FLAG_OUTPUTS__) */
-...
--#endif /* defined(__GCC_ASM_FLAG_OUTPUTS__) ||
-!defined(CONFIG_CC_HAS_ASM_GOTO) */
-+#endif /* defined(__GCC_ASM_FLAG_OUTPUTS__) */
+Changes since v5:
+ - rebased to the latest vfio/next branch
+ - drop the last patch again
+ - make sure show_available_instances works properly for the internallly
+   tracked case
 
-Shouldn't that be...
+Changes since v4:
+ - move the kobject_put later in mdev_device_release 
+ - add a Fixes tag for the first patch
+ - add another patch to remove an extra kobject_get/put
 
-#if !defined(__GCC_ASM_FLAG_OUTPUTS__)
+Changes since v3:
+ - make the sysfs_name and pretty_name fields pointers instead of arrays
+ - add an i915 cleanup to prepare for the above
 
-...to fit the 2 comments?
+Changes since v2:
+ - rebased to vfio/next
+ - fix a pre-existing memory leak in i915 instead of making it worse
+ - never manipulate if ->available_instances if drv->get_available is
+   provided
+ - keep a parent reference for the mdev_type
+ - keep a few of the sysfs.c helper function around
+ - improve the documentation for the parent device lifetime
+ - minor spellig / formatting fixes
 
-Best regards,
--Sedat-
+Changes since v1:
+ - embedd the mdev_parent into a different sub-structure in i916
+ - remove headers now inclued by mdev.h from individual source files
+ - pass an array of mdev_types to mdev_register_parent
+ - add additional patches to implement all attributes on the
+   mdev_type in the core code
+
+Diffstat:
+ Documentation/driver-api/vfio-mediated-device.rst |   26 +-
+ Documentation/s390/vfio-ap.rst                    |    2 
+ Documentation/s390/vfio-ccw.rst                   |    2 
+ drivers/gpu/drm/i915/gvt/aperture_gm.c            |   20 +-
+ drivers/gpu/drm/i915/gvt/gvt.h                    |   42 ++--
+ drivers/gpu/drm/i915/gvt/kvmgt.c                  |  168 ++++-------------
+ drivers/gpu/drm/i915/gvt/vgpu.c                   |  210 +++++++---------------
+ drivers/s390/cio/cio.h                            |    1 
+ drivers/s390/cio/vfio_ccw_drv.c                   |   12 -
+ drivers/s390/cio/vfio_ccw_ops.c                   |   51 -----
+ drivers/s390/cio/vfio_ccw_private.h               |    6 
+ drivers/s390/crypto/vfio_ap_ops.c                 |   68 +------
+ drivers/s390/crypto/vfio_ap_private.h             |    6 
+ drivers/vfio/mdev/mdev_core.c                     |  190 ++++---------------
+ drivers/vfio/mdev/mdev_driver.c                   |    7 
+ drivers/vfio/mdev/mdev_private.h                  |   32 ---
+ drivers/vfio/mdev/mdev_sysfs.c                    |  189 ++++++++++---------
+ include/linux/mdev.h                              |   77 ++++----
+ samples/vfio-mdev/mbochs.c                        |  103 +++-------
+ samples/vfio-mdev/mdpy.c                          |  115 +++---------
+ samples/vfio-mdev/mtty.c                          |   94 +++------
+ 21 files changed, 464 insertions(+), 957 deletions(-)
