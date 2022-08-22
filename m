@@ -2,77 +2,71 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id AA0D559B8A0
-	for <lists+kvm@lfdr.de>; Mon, 22 Aug 2022 07:08:15 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 0326D59B90D
+	for <lists+kvm@lfdr.de>; Mon, 22 Aug 2022 08:12:54 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232660AbiHVFIM (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 22 Aug 2022 01:08:12 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46430 "EHLO
+        id S232784AbiHVGMX (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 22 Aug 2022 02:12:23 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60430 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229573AbiHVFIK (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 22 Aug 2022 01:08:10 -0400
-Received: from mga04.intel.com (mga04.intel.com [192.55.52.120])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 758F01262A;
-        Sun, 21 Aug 2022 22:08:09 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1661144889; x=1692680889;
-  h=message-id:date:mime-version:subject:to:cc:references:
-   from:in-reply-to:content-transfer-encoding;
-  bh=aJuO00bHFTFMl8KnIYlHE0QVGOXlS9O7zR3snvIDSO8=;
-  b=Q3hBSgW5nyzQ2ZXzuwqoiCA2IVsRLCWRlPftWDV9LX3Z6YM+mSlzfz+z
-   YF7wTEG9H0AH/UDpOad4gLnZcgUaMKhR/7xX62Ld6AROsHoNNPZ8flQ3I
-   8j07PjUJSRNvxL9Fqsr1MzfLg9f8DRRrFfHYGOZB7p0ul3OwvW5n5Nq+y
-   wkl0j2yyeVkoGRDgfv9nCnvktW6IusiaYhlqOFk9oCNZHjT2QMvNl2Prk
-   YvcDqcfQYwA9o/sGYZmkfT8To8sctcPajW/uxvFya9WSsj/Yz1F4fRHu4
-   LAt9XxjNIlx2knSKZURQYnOpOa+jt65IeBzNslvK1rnDwF6HjAdJL4iQq
-   Q==;
-X-IronPort-AV: E=McAfee;i="6500,9779,10446"; a="292063544"
-X-IronPort-AV: E=Sophos;i="5.93,254,1654585200"; 
-   d="scan'208";a="292063544"
-Received: from orsmga006.jf.intel.com ([10.7.209.51])
-  by fmsmga104.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 21 Aug 2022 22:08:00 -0700
-X-IronPort-AV: E=Sophos;i="5.93,254,1654585200"; 
-   d="scan'208";a="585360860"
-Received: from lingshan-mobl.ccr.corp.intel.com (HELO [10.255.28.92]) ([10.255.28.92])
-  by orsmga006-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 21 Aug 2022 22:07:57 -0700
-Message-ID: <e06d1f6d-3199-1b75-d369-2e5d69040271@intel.com>
-Date:   Mon, 22 Aug 2022 13:07:55 +0800
+        with ESMTP id S229727AbiHVGMV (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 22 Aug 2022 02:12:21 -0400
+Received: from mail-ot1-x32f.google.com (mail-ot1-x32f.google.com [IPv6:2607:f8b0:4864:20::32f])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6A92A26AD2;
+        Sun, 21 Aug 2022 23:12:21 -0700 (PDT)
+Received: by mail-ot1-x32f.google.com with SMTP id h20-20020a056830165400b00638ac7ddba5so7064090otr.4;
+        Sun, 21 Aug 2022 23:12:21 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=cc:to:subject:message-id:date:from:reply-to:in-reply-to:references
+         :mime-version:from:to:cc;
+        bh=xRBPID2afPJAp96OqaGvBdjqx78UAxNzgaJTyGjabr8=;
+        b=fAsoPJBfZm1Q3Pe+7+Kgk49YdcBBzb5wbtHRNl3NBQ8lbJi6wNFGOyGP+hoP0LKlyB
+         VYzze1ue1TiTDDgBtSEp6kziMzbSiH5Fii+zpt7cBoV90iAQvRLmQHESUpqo3Y2Wp0tT
+         txhLSz77VhTqtxhPw3vHrTEWUE1Rg3dXr9mmw80FeRscTk39kroT1YD6ySvLqCPXYB/M
+         jKGtS5Jkl9M0Xr8BvbyheUI4MSQ3LYilhkgfoy9UPRCTcOE8FZLGdRPd5ma1WAVAWUHJ
+         rX8xGUAGM5/iqMLz3tWKZo8+A29cJCX4/zNpzemWmun70fPvCnhrk/oSR+OdcQSW3niU
+         7edw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=cc:to:subject:message-id:date:from:reply-to:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc;
+        bh=xRBPID2afPJAp96OqaGvBdjqx78UAxNzgaJTyGjabr8=;
+        b=GDmbLoeM4H5ljqQY3FvjqMmqus7MvH38CTOUOPYK/hVR0rHUS/gPlm7r4CyiGTrqQ5
+         /ZTKHs+8YZ36SCBnWFwSqhDkxLG1crLaZYt0aEK970mw0INpvChvkJ70dZcH5FJmWz+H
+         C5Uk3n2VoNABbWQH9F+lYrNjVErQIw6cdBwHfCTEc77oF+wqzeMWAFrUEvyQVMDSE2eO
+         6lRCrhKS665f71bmOyW2TskDwbxTJ+2ZIBMyO3kd6hNu1Q8OsVfpyYEu1/quV0m+Njed
+         WdSOOW8K0BZrS+Qtot7+8glD2hdO5s0btaY/owzzjLuwfZCuztxN8MgDfiDh6QXIddyi
+         gR3A==
+X-Gm-Message-State: ACgBeo33geumml56BpLk6OmlwwStbg+amnqz+fn3iAGnHDoD0GG6ZkU9
+        se3DDVr3YyHYjyEvA0jfVJJVuV2m6h2kgYHrKR4=
+X-Google-Smtp-Source: AA6agR5/3lpDfPcI8hjqmqqJiTVbPVyi0UuVROvgrbHtJM/EtFwkEW7IgrfmM3wwNBrbhTG/o1jOsrLr57VaSHZoKMc=
+X-Received: by 2002:a05:6830:2a8e:b0:638:c41c:d5a1 with SMTP id
+ s14-20020a0568302a8e00b00638c41cd5a1mr7455068otu.367.1661148740694; Sun, 21
+ Aug 2022 23:12:20 -0700 (PDT)
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
- Firefox/102.0 Thunderbird/102.1.2
-Subject: Re: [PATCH 2/2] vDPA: conditionally read fields in virtio-net dev
-Content-Language: en-US
-To:     Si-Wei Liu <si-wei.liu@oracle.com>,
-        Jason Wang <jasowang@redhat.com>
-Cc:     "Michael S. Tsirkin" <mst@redhat.com>,
-        virtualization <virtualization@lists.linux-foundation.org>,
-        netdev <netdev@vger.kernel.org>, kvm <kvm@vger.kernel.org>,
-        Parav Pandit <parav@nvidia.com>,
-        Yongji Xie <xieyongji@bytedance.com>,
-        "Dawar, Gautam" <gautam.dawar@amd.com>
-References: <c5075d3d-9d2c-2716-1cbf-cede49e2d66f@oracle.com>
- <20e92551-a639-ec13-3d9c-13bb215422e1@intel.com>
- <9b6292f3-9bd5-ecd8-5e42-cd5d12f036e7@oracle.com>
- <22e0236f-b556-c6a8-0043-b39b02928fd6@intel.com>
- <892b39d6-85f8-bff5-030d-e21288975572@oracle.com>
- <52a47bc7-bf26-b8f9-257f-7dc5cea66d23@intel.com>
- <20220817045406-mutt-send-email-mst@kernel.org>
- <a91fa479-d1cc-a2d6-0821-93386069a2c1@intel.com>
- <20220817053821-mutt-send-email-mst@kernel.org>
- <449c2fb2-3920-7bf9-8c5c-a68456dfea76@intel.com>
- <20220817063450-mutt-send-email-mst@kernel.org>
- <54aa5a5c-69e2-d372-3e0c-b87f595d213c@redhat.com>
- <f0b6ea5c-1783-96d2-2d9f-e5cf726b0fc0@oracle.com>
- <CACGkMEumKfktMUJOTUYL_JYkFbw8qH331gGARPB2bTH=7wKWPg@mail.gmail.com>
- <4678fc51-a402-d3ea-e875-6eba175933ba@oracle.com>
-From:   "Zhu, Lingshan" <lingshan.zhu@intel.com>
-In-Reply-To: <4678fc51-a402-d3ea-e875-6eba175933ba@oracle.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
-        RCVD_IN_DNSWL_MED,SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE
+References: <CAADnVQJFc9AnH_9CW+bSRotkKvOmkO9jq-RF6dmyPYOpq691Yg@mail.gmail.com>
+ <20220819190640.2763586-1-ndesaulniers@google.com> <CAHk-=whLcuvDDS3rZfEgDrwbdJrTx8HCRNiZ5cDc80-_gzHCxw@mail.gmail.com>
+In-Reply-To: <CAHk-=whLcuvDDS3rZfEgDrwbdJrTx8HCRNiZ5cDc80-_gzHCxw@mail.gmail.com>
+Reply-To: sedat.dilek@gmail.com
+From:   Sedat Dilek <sedat.dilek@gmail.com>
+Date:   Mon, 22 Aug 2022 08:11:44 +0200
+Message-ID: <CA+icZUUX1gPvnExa=zyVqB8xYOTai+nfHp6E7+qRE2mXXa2M=A@mail.gmail.com>
+Subject: Re: [PATCH v2] asm goto: eradicate CC_HAS_ASM_GOTO
+To:     Linus Torvalds <torvalds@linux-foundation.org>
+Cc:     Nick Desaulniers <ndesaulniers@google.com>,
+        Masahiro Yamada <masahiroy@kernel.org>,
+        Peter Zijlstra <peterz@infradead.org>, x86@kernel.org,
+        linux-kbuild@vger.kernel.org, linux-doc@vger.kernel.org,
+        linux-kernel@vger.kernel.org, linux-um@lists.infradead.org,
+        kvm@vger.kernel.org, llvm@lists.linux.dev,
+        Alexandre Belloni <alexandre.belloni@bootlin.com>,
+        Borislav Petkov <bp@suse.de>,
+        Alexei Starovoitov <alexei.starovoitov@gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
+        RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
         autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -80,179 +74,36 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+On Sun, Aug 21, 2022 at 7:13 PM Linus Torvalds
+<torvalds@linux-foundation.org> wrote:
+>
+> Applied directly, just because I love seeing old nasty stuff like this go away.
+>
+>              Linus
 
+Hi,
 
-On 8/20/2022 4:55 PM, Si-Wei Liu wrote:
->
->
-> On 8/18/2022 5:42 PM, Jason Wang wrote:
->> On Fri, Aug 19, 2022 at 7:20 AM Si-Wei Liu <si-wei.liu@oracle.com> 
->> wrote:
->>>
->>>
->>> On 8/17/2022 9:15 PM, Jason Wang wrote:
->>>> 在 2022/8/17 18:37, Michael S. Tsirkin 写道:
->>>>> On Wed, Aug 17, 2022 at 05:43:22PM +0800, Zhu, Lingshan wrote:
->>>>>> On 8/17/2022 5:39 PM, Michael S. Tsirkin wrote:
->>>>>>> On Wed, Aug 17, 2022 at 05:13:59PM +0800, Zhu, Lingshan wrote:
->>>>>>>> On 8/17/2022 4:55 PM, Michael S. Tsirkin wrote:
->>>>>>>>> On Wed, Aug 17, 2022 at 10:14:26AM +0800, Zhu, Lingshan wrote:
->>>>>>>>>> Yes it is a little messy, and we can not check _F_VERSION_1
->>>>>>>>>> because of
->>>>>>>>>> transitional devices, so maybe this is the best we can do for 
->>>>>>>>>> now
->>>>>>>>> I think vhost generally needs an API to declare config space
->>>>>>>>> endian-ness
->>>>>>>>> to kernel. vdpa can reuse that too then.
->>>>>>>> Yes, I remember you have mentioned some IOCTL to set the 
->>>>>>>> endian-ness,
->>>>>>>> for vDPA, I think only the vendor driver knows the endian,
->>>>>>>> so we may need a new function vdpa_ops->get_endian().
->>>>>>>> In the last thread, we say maybe it's better to add a comment for
->>>>>>>> now.
->>>>>>>> But if you think we should add a vdpa_ops->get_endian(), I can 
->>>>>>>> work
->>>>>>>> on it for sure!
->>>>>>>>
->>>>>>>> Thanks
->>>>>>>> Zhu Lingshan
->>>>>>> I think QEMU has to set endian-ness. No one else knows.
->>>>>> Yes, for SW based vhost it is true. But for HW vDPA, only
->>>>>> the device & driver knows the endian, I think we can not
->>>>>> "set" a hardware's endian.
->>>>> QEMU knows the guest endian-ness and it knows that
->>>>> device is accessed through the legacy interface.
->>>>> It can accordingly send endian-ness to the kernel and
->>>>> kernel can propagate it to the driver.
->>>>
->>>> I wonder if we can simply force LE and then Qemu can do the endian
->>>> conversion?
->>> convert from LE for config space fields only, or QEMU has to forcefully
->>> mediate and covert endianness for all device memory access including
->>> even the datapath (fields in descriptor and avail/used rings)?
->> Former. Actually, I want to force modern devices for vDPA when
->> developing the vDPA framework. But then we see requirements for
->> transitional or even legacy (e.g the Ali ENI parent). So it
->> complicates things a lot.
->>
->> I think several ideas has been proposed:
->>
->> 1) Your proposal of having a vDPA specific way for
->> modern/transitional/legacy awareness. This seems very clean since each
->> transport should have the ability to do that but it still requires
->> some kind of mediation for the case e.g running BE legacy guest on LE
->> host.
-> In theory it seems like so, though practically I wonder if we can just 
-> forbid BE legacy driver from running on modern LE host. For those who 
-> care about legacy BE guest, they mostly like could and should talk to 
-> vendor to get native BE support to achieve hardware acceleration, few 
-> of them would count on QEMU in mediating or emulating the datapath 
-> (otherwise I don't see the benefit of adopting vDPA?). I still feel 
-> that not every hardware vendor has to offer backward compatibility 
-> (transitional device) with legacy interface/behavior (BE being just 
-> one), this is unlike the situation on software virtio device, which 
-> has legacy support since day one. I think we ever discussed it before: 
-> for those vDPA vendors who don't offer legacy guest support, maybe we 
-> should mandate some feature for e.g. VERSION_1, as these devices 
-> really don't offer functionality of the opposite side (!VERSION_1) 
-> during negotiation.
->
-> Having it said, perhaps we should also allow vendor device to 
-> implement only partial support for legacy. We can define "reversed" 
-> backend feature to denote some part of the legacy 
-> interface/functionality not getting implemented by device. For 
-> instance, VHOST_BACKEND_F_NO_BE_VRING, VHOST_BACKEND_F_NO_BE_CONFIG, 
-> VHOST_BACKEND_F_NO_ALIGNED_VRING, 
-> VHOST_BACKEND_NET_F_NO_WRITEABLE_MAC, and et al. Not all of these 
-> missing features for legacy would be easy for QEMU to make up for, so 
-> QEMU can selectively emulate those at its best when necessary and 
-> applicable. In other word, this design shouldn't prevent QEMU from 
-> making up for vendor device's partial legacy support.
->
->>
->> 2) Michael suggests using VHOST_SET_VRING_ENDIAN where it means we
->> need a new config ops for vDPA bus, but it doesn't solve the issue for
->> config space (at least from its name). We probably need a new ioctl
->> for both vring and config space.
-> Yep adding a new ioctl makes things better, but I think the key is not 
-> the new ioctl. It's whether or not we should enforce every vDPA vendor 
-> driver to implement all transitional interfaces to be spec compliant. 
-> If we allow them to reject the VHOST_SET_VRING_ENDIAN  or 
-> VHOST_SET_CONFIG_ENDIAN call, what could we do? We would still end up 
-> with same situation of either fail the guest, or trying to 
-> mediate/emulate, right?
->
-> Not to mention VHOST_SET_VRING_ENDIAN is rarely supported by vhost 
-> today - few distro kernel has CONFIG_VHOST_CROSS_ENDIAN_LEGACY enabled 
-> and QEMU just ignores the result. vhost doesn't necessarily depend on 
-> it to determine endianness it looks.
-I would like to suggest to add two new config ops get/set_vq_endian() 
-and get/set_config_endian() for vDPA. This is used to:
-a) support VHOST_GET/SET_VRING_ENDIAN as MST suggested, and add 
-VHOST_SET/GET_CONFIG_ENDIAN for vhost_vdpa.
-If the device has not implemented interface to set its endianess, then 
-no matter success or failure of SET_ENDIAN, QEMU knows the endian-ness 
-anyway. In this case, if the device endianess does not match the guest, 
-there needs a mediation layer or fail.
-b) ops->get_config_endian() can always tell the endian-ness of the 
-device config space after the vendor driver probing the device. So we 
-can use this ops->get_config_endian() for
-MTU, MAC and other fields handling in vdpa_dev_net_config_fill() and we 
-don't need to set_features in vdpa_get_config_unlocked(), so no race 
-conditions.
-Every time ops->get_config() returned, we can tell the endian by 
-ops-config_>get_endian(), we don't need set_features(xxx, 0) if features 
-negotiation not done.
+Small nitpick:
 
-The question is: Do we need two pairs of ioctls for both vq and config 
-space? Can config space endian-ness differ from the vqs?
-c) do we need a new netlink attr telling the endian-ness to user space?
+--- a/arch/x86/include/asm/rmwcc.h
++++ b/arch/x86/include/asm/rmwcc.h
+...
+-#if !defined(__GCC_ASM_FLAG_OUTPUTS__) && defined(CONFIG_CC_HAS_ASM_GOTO)
++#ifndef __GCC_ASM_FLAG_OUTPUTS__
+...
+-#else /* defined(__GCC_ASM_FLAG_OUTPUTS__) ||
+!defined(CONFIG_CC_HAS_ASM_GOTO) */
++#else /* defined(__GCC_ASM_FLAG_OUTPUTS__) */
+...
+-#endif /* defined(__GCC_ASM_FLAG_OUTPUTS__) ||
+!defined(CONFIG_CC_HAS_ASM_GOTO) */
++#endif /* defined(__GCC_ASM_FLAG_OUTPUTS__) */
 
-Thanks,
-Zhu Lingshan
->
->>
->> or
->>
->> 3) revisit the idea of forcing modern only device which may simplify
->> things a lot
-> I am not actually against forcing modern only config space, given that 
-> it's not hard for either QEMU or individual driver to mediate or 
-> emulate, and for the most part it's not conflict with the goal of 
-> offload or acceleration with vDPA. But forcing LE ring layout IMO 
-> would just kill off the potential of a very good use case. Currently 
-> for our use case the priority for supporting 0.9.5 guest with vDPA is 
-> slightly lower compared to live migration, but it is still in our TODO 
-> list.
->
-> Thanks,
-> -Siwei
->
->>
->> which way should we go?
->>
->>> I hope
->>> it's not the latter, otherwise it loses the point to use vDPA for
->>> datapath acceleration.
->>>
->>> Even if its the former, it's a little weird for vendor device to
->>> implement a LE config space with BE ring layout, although still 
->>> possible...
->> Right.
->>
->> Thanks
->>
->>> -Siwei
->>>> Thanks
->>>>
->>>>
->>>>>> So if you think we should add a vdpa_ops->get_endian(),
->>>>>> I will drop these comments in the next version of
->>>>>> series, and work on a new patch for get_endian().
->>>>>>
->>>>>> Thanks,
->>>>>> Zhu Lingshan
->>>>> Guests don't get endian-ness from devices so this seems pointless.
->>>>>
->
+Shouldn't that be...
 
+#if !defined(__GCC_ASM_FLAG_OUTPUTS__)
+
+...to fit the 2 comments?
+
+Best regards,
+-Sedat-
