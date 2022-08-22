@@ -2,155 +2,131 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id C549C59C674
-	for <lists+kvm@lfdr.de>; Mon, 22 Aug 2022 20:35:10 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 1517F59C678
+	for <lists+kvm@lfdr.de>; Mon, 22 Aug 2022 20:36:59 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229524AbiHVSdq (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 22 Aug 2022 14:33:46 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60468 "EHLO
+        id S236805AbiHVSfv (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 22 Aug 2022 14:35:51 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38784 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S237588AbiHVSc4 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 22 Aug 2022 14:32:56 -0400
-Received: from mail-pj1-x1033.google.com (mail-pj1-x1033.google.com [IPv6:2607:f8b0:4864:20::1033])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8283F4BA64
-        for <kvm@vger.kernel.org>; Mon, 22 Aug 2022 11:32:30 -0700 (PDT)
-Received: by mail-pj1-x1033.google.com with SMTP id m10-20020a17090a730a00b001fa986fd8eeso14861674pjk.0
-        for <kvm@vger.kernel.org>; Mon, 22 Aug 2022 11:32:30 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc;
-        bh=3pKOuS9bPCfHx4b2cjVQc088kaA5gmugVVhXnoWl0R4=;
-        b=sU5v9o7Maz94cphiUk0iGtYwZ8KgUY4HSf9XbHNsFwxHC8SpRbMTv/X+qxPZGvDsDE
-         K6BFujPXC48leKW1lCzKWMK+si2TFy9/Cm/Lhx6r1OtvxzaT5ARQwxfsmb8hIMSHRW7b
-         lSpNszsvnbTDk+8nNGK3gV8uA1jALtymYVTInzRaSsPvbJTIHoEe9nmrC9RgnPGlFzj9
-         MialtQ15T2tbbFUtllvwY/gsgSHxGNjnOkCiAh8R3zeW4NdgxCcoWnTKH5OczqsWzre6
-         wM2h9jqXOzm3GSSsJDB0FpIIKqpd1SxhjC/+H5D3VCtROl1xDQI/8rDkC/BS2kkANKEz
-         cd7A==
+        with ESMTP id S237585AbiHVSfj (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 22 Aug 2022 14:35:39 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 861B718E24
+        for <kvm@vger.kernel.org>; Mon, 22 Aug 2022 11:35:38 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1661193337;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=oul0rlXeVckRoIaE/5tvHqkKjZyojO8sXzYxt2BvGKM=;
+        b=b9C0csP8rMPCa3qi0HRnjhIQoss8DoAh2CYcMA+izhdyBI0DV4B5G8OG3+7yDrbKdLn2Sb
+        CsjR7c+Yr1CK3c3+3Zoxeo7pmArN5vN5iEh5tviyoSnjDnk4IejX39/+c5yRJRBnx59URS
+        PrawIJ6ddoQX/Zl+TLtlGLUbkcKWvbw=
+Received: from mail-il1-f199.google.com (mail-il1-f199.google.com
+ [209.85.166.199]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_128_GCM_SHA256) id
+ us-mta-412-TREX2xY9NjK2VOJHUKjDQQ-1; Mon, 22 Aug 2022 14:35:36 -0400
+X-MC-Unique: TREX2xY9NjK2VOJHUKjDQQ-1
+Received: by mail-il1-f199.google.com with SMTP id x7-20020a056e021ca700b002ea01be6018so142567ill.18
+        for <kvm@vger.kernel.org>; Mon, 22 Aug 2022 11:35:36 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc;
-        bh=3pKOuS9bPCfHx4b2cjVQc088kaA5gmugVVhXnoWl0R4=;
-        b=diFSTSfomkGQYobrXhZweElwM4IM4ylIfG+nkPmhpAfd4Uoz9IsVfg6GosJ/N+HN4N
-         8TgYdEcoTbXLjAjfniJ0corwNsTkJbjMpm8R9MwhRZdZaLlxECVkVaapYAUXjqwlzArG
-         Jy/LC+TKVlTZKI8xr7wSBZZ5OEAaElbGmQ/vMrTaZKgMSBpt9DZP/C7+0xArRXWVjqjs
-         m6gAWoJIx/gxBKLVlAkGx8snPS8bpvPv+tlXj/QpF+7gXp4BQUo+52kwJtb3vVsoU2nj
-         N2Ra9k4lydwi28kYmpvUR5fJx9ePPYXeWUpS+uu/kKtH+MuGJ6sEhwIPls4fZ4zdp+ZQ
-         ojbA==
-X-Gm-Message-State: ACgBeo20DGycMDi6v0tC0TlJ41UGGbgrxq1F5aNIMxwJ8OS13e8Okf6w
-        ejoDaFa5WYkVTdrlxIvmRIf94w==
-X-Google-Smtp-Source: AA6agR5t8vY6wHth/oFQzUUROc10MQ6sPeWK+Nlnqjg1jl3To2ype6CO7nYnon+0rfKqNYo16+sJHQ==
-X-Received: by 2002:a17:90b:3b85:b0:1fb:18f6:c65f with SMTP id pc5-20020a17090b3b8500b001fb18f6c65fmr9748839pjb.217.1661193147720;
-        Mon, 22 Aug 2022 11:32:27 -0700 (PDT)
-Received: from google.com (7.104.168.34.bc.googleusercontent.com. [34.168.104.7])
-        by smtp.gmail.com with ESMTPSA id x15-20020a170902ec8f00b0016be527753bsm787162plg.264.2022.08.22.11.32.26
+        h=content-transfer-encoding:mime-version:organization:references
+         :in-reply-to:message-id:subject:cc:to:from:date:x-gm-message-state
+         :from:to:cc;
+        bh=oul0rlXeVckRoIaE/5tvHqkKjZyojO8sXzYxt2BvGKM=;
+        b=BBkxrJX+QAhw7rCV4Xh8v+kZ66ik54xq634VAzGfPevYvkGG+sln09a2YRHJpkQIGq
+         /ISrAxQv/FdANnhW+zU9EVX/FbAWrX8Wu8cSfOACVR6DMiYJrRKV6gt0FQWE3LPVCHIY
+         YuOoRcLvdoQ1HlQ4AsuyExYuh6QLXr2kT6jISBjnH8AgoOpQdh3jzZ8mBj3NH+4nKzc7
+         EezpApDVMpZP3XwAaAutNJreCT+6rMWDIs0Y/wKdb8xjVafpxh0NEcvhk+g9KQEmHD1L
+         ZvELX4wgvZd55jRALA6OCcYYfOp5wSf6ibKYig+h7C3HEpg4IiaEY8kLGMMg5b5exOuQ
+         c+NQ==
+X-Gm-Message-State: ACgBeo15cgtCbu2tcsp23iIFVc54fYu170zd2hcNmtYYZGsqBTMP3f0t
+        eNIWamN6sfioJhfVgPhKFMPS2Bq6EpWa6cygcTz22VAQJ9YEdiUoK0hF8D06XzpZJoH6hMo6sWn
+        le3Yt95160CIS
+X-Received: by 2002:a05:6638:2652:b0:343:d46:58e7 with SMTP id n18-20020a056638265200b003430d4658e7mr10135518jat.134.1661193335642;
+        Mon, 22 Aug 2022 11:35:35 -0700 (PDT)
+X-Google-Smtp-Source: AA6agR4wT/BfQls06SdjOiihytLqHWnxuXH+bpmjtY0h2K0Tb4O0L6xOZdO7CH2xdFyp+emMwBRShg==
+X-Received: by 2002:a05:6638:2652:b0:343:d46:58e7 with SMTP id n18-20020a056638265200b003430d4658e7mr10135510jat.134.1661193335441;
+        Mon, 22 Aug 2022 11:35:35 -0700 (PDT)
+Received: from redhat.com ([38.15.36.239])
+        by smtp.gmail.com with ESMTPSA id c1-20020a92bd01000000b002e93dc753c0sm4158539ile.66.2022.08.22.11.35.34
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 22 Aug 2022 11:32:27 -0700 (PDT)
-Date:   Mon, 22 Aug 2022 18:32:23 +0000
-From:   Sean Christopherson <seanjc@google.com>
-To:     Vitaly Kuznetsov <vkuznets@redhat.com>
-Cc:     kvm@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>,
-        Anirudh Rayabharam <anrayabh@linux.microsoft.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Maxim Levitsky <mlevitsk@redhat.com>,
-        Nathan Chancellor <nathan@kernel.org>,
-        Michael Kelley <mikelley@microsoft.com>,
-        linux-hyperv@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v5 03/26] x86/hyperv: Update 'struct hv_enlightened_vmcs'
- definition
-Message-ID: <YwPLt2e7CuqMzjt1@google.com>
-References: <20220802160756.339464-1-vkuznets@redhat.com>
- <20220802160756.339464-4-vkuznets@redhat.com>
- <Yv5ZFgztDHzzIQJ+@google.com>
- <875yiptvsc.fsf@redhat.com>
- <Yv59dZwP6rNUtsrn@google.com>
- <87czcsskkj.fsf@redhat.com>
- <YwOm7Ph54vIYAllm@google.com>
- <87edx8xn8h.fsf@redhat.com>
- <YwO2fSCGXnE/9mc2@google.com>
- <878rngxjb7.fsf@redhat.com>
+        Mon, 22 Aug 2022 11:35:35 -0700 (PDT)
+Date:   Mon, 22 Aug 2022 12:35:32 -0600
+From:   Alex Williamson <alex.williamson@redhat.com>
+To:     "Tian, Kevin" <kevin.tian@intel.com>
+Cc:     Jason Gunthorpe <jgg@nvidia.com>,
+        Cornelia Huck <cohuck@redhat.com>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "Liu, Yi L" <yi.l.liu@intel.com>
+Subject: Re: [PATCH v2] vfio: Remove vfio_group dev_counter
+Message-ID: <20220822123532.49dd0e0e.alex.williamson@redhat.com>
+In-Reply-To: <BN9PR11MB5276281FEDA2BC42DF67885E8C719@BN9PR11MB5276.namprd11.prod.outlook.com>
+References: <0-v2-d4374a7bf0c9+c4-vfio_dev_counter_jgg@nvidia.com>
+        <BN9PR11MB5276281FEDA2BC42DF67885E8C719@BN9PR11MB5276.namprd11.prod.outlook.com>
+Organization: Red Hat
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <878rngxjb7.fsf@redhat.com>
-X-Spam-Status: No, score=-14.5 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        ENV_AND_HDR_SPF_MATCH,FSL_HELO_FAKE,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,
-        SPF_PASS,T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL
-        autolearn=no autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Aug 22, 2022, Vitaly Kuznetsov wrote:
-> Sean Christopherson <seanjc@google.com> writes:
-> 
-> > On Mon, Aug 22, 2022, Vitaly Kuznetsov wrote:
-> >> My initial implementation was inventing 'eVMCS revision' concept:
-> >> https://lore.kernel.org/kvm/20220629150625.238286-7-vkuznets@redhat.com/
-> >> 
-> >> which is needed if we don't gate all these new fields on CPUID.0x4000000A.EBX BIT(0).
-> >> 
-> >> Going forward, we will still (likely) need something when new fields show up.
-> >
-> > My comments from that thread still apply.  Adding "revisions" or feature flags
-> > isn't maintanable, e.g. at best KVM will end up with a ridiculous number of flags.
-> >
-> > Looking at QEMU, which I strongly suspect is the only VMM that enables
-> > KVM_CAP_HYPERV_ENLIGHTENED_VMCS, it does the sane thing of enabling the capability
-> > before grabbing the VMX MSRs.
-> >
-> > So, why not simply apply filtering for host accesses as well?
-> 
-> (I understand that using QEMU to justify KVM's behavior is flawed but...)
-> 
-> QEMU's migration depends on the assumption that identical QEMU's command
-> lines create identical (from guest PoV) configurations. Assume we have
-> (simplified)
-> 
-> "-cpu CascadeLake-Sever,hv-evmcs"
-> 
-> on both source and destination but source host is newer, i.e. its KVM
-> knows about TSC Scaling in eVMCS and destination host has no idea about
-> it. If we just apply filtering upon vCPU creation, guest visible MSR
-> values are going to be different, right? Ok, assuming QEMU also migrates
-> VMX feature MSRs (TODO: check if that's true), we will be able to fail
-> mirgration late (which is already much worse than not being able to
-> create the desired configuration on destination, 'fail early') if we use
-> in-KVM filtering to throw an error to userspace. But if we blindly
-> filter control MSRs on the destination, 'TscScaling' will just disapper
-> undreneath the guest. This is unlikely to work.
+On Mon, 22 Aug 2022 04:39:45 +0000
+"Tian, Kevin" <kevin.tian@intel.com> wrote:
 
-But all of that holds true irrespetive of eVMCS.  If QEMU attempts to migrate a
-nested guest from a KVM that supports TSC_SCALING to a KVM that doesn't support
-TSC_SCALING, then TSC_SCALING is going to disappear and VM-Entry on the dest will
-fail.  I.e. QEMU _must_ be able to detect the incompatibility and not attempt
-the migration.  And with that code in place, QEMU doesn't need to do anything new
-for eVMCS, it Just Works.
-
-> In any case, what we need, is an option for VMM (read: QEMU) to create
-> the configuration with 'TscScaling' filtered out even KVM supports the
-> bit in eVMCS. This way the guest will be able to migrate backwards to an
-> older KVM which doesn't support it, i.e.
+> > From: Jason Gunthorpe <jgg@nvidia.com>
+> > Sent: Wednesday, August 17, 2022 3:13 AM
+> > 
+> > + *
+> > + * A driver may only call this function if the vfio_device was created
+> > + * by vfio_register_emulated_iommu_dev().
+> >   */
+> >  int vfio_pin_pages(struct vfio_device *device, dma_addr_t iova,
+> >  		   int npage, int prot, struct page **pages)  
 > 
-> '-cpu CascadeLake-Sever,hv-evmcs'
->  creates the 'origin' eVMCS configuration, no TscScaling
+> Though I agree with the code change, I'm still unclear about this
+> comment.
 > 
-> '-cpu CascadeLake-Sever,hv-evmcs,hv-evmcs-2022' creates the updated one.
+> First this comment is not equivalent to the old code which only
+> checks dev_counter (implying a physical device in a singleton
+> group can use this API too). though I didn't get why the singleton
+> restriction was imposed in the first place...
 
-Again, this conundrum exists irrespective of eVMCS.  Properly solve the problem
-for regular nVMX and eVMCS should naturally work.
+It's related to the dirty page scope.  Use of the pinned page interface
+is essentially a contract with the IOMMU back-end that only pinned pages
+will be considered for the dirty page scope.  However, type1 operates
+on groups, therefore we needed to create a restriction that only
+singleton groups could make use of page pinning such that the dirty
+page scope could be attached to the group.
 
-> KVM_CAP_HYPERV_ENLIGHTENED_VMCS is bad as it only takes 'eVMCS' version
-> as a parameter (as we assumed it will always change when new fields are
-> added, but that turned out to be false). That's why I suggested
-> KVM_CAP_HYPERV_ENLIGHTENED_VMCS2.
+> Second I also didn't get why such a pinning API is tied to emulated
+> iommu now. Though not required for any physical device today, what
+> would be the actual problem of allowing a variant driver to make 
+> such call? 
 
-Enumerating features via versions is such a bad API though, e.g. if there's a
-bug with nested TSC_SCALING, userspace can't disable just nested TSC_SCALING
-without everything else under the inscrutable "hv-evmcs-2022" being collateral
-damage.
+In fact I do recall such discussions.  An IOMMU backed mdev (defunct)
+or vfio-pci variant driver could gratuitously pin pages in order to
+limit the dirty page scope.  We don't have anything in-tree that relies
+on this.  It also seems we're heading more in the direction of device
+level DMA dirty tracking as Yishai proposes in the series for mlx5.
+These interfaces are far more efficient for this use case, but perhaps
+you have another use case in mind where we couldn't use the dma_rw
+interface?
+
+I think the assumption is that devices that can perform DMA through an
+IOMMU generally wouldn't need to twiddle guest DMA targets on a regular
+basis otherwise, therefore limiting this to emulated IOMMU devices is
+reasonable.  Thanks,
+
+Alex
+
