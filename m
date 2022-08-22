@@ -2,121 +2,126 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 62C5B59C2A9
-	for <lists+kvm@lfdr.de>; Mon, 22 Aug 2022 17:27:02 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 22EFA59C2FA
+	for <lists+kvm@lfdr.de>; Mon, 22 Aug 2022 17:39:12 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236656AbiHVPZN (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 22 Aug 2022 11:25:13 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57022 "EHLO
+        id S235719AbiHVPiv (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 22 Aug 2022 11:38:51 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48358 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S236664AbiHVPYk (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 22 Aug 2022 11:24:40 -0400
-Received: from smtp-out1.suse.de (smtp-out1.suse.de [IPv6:2001:67c:2178:6::1c])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 224339FC3
-        for <kvm@vger.kernel.org>; Mon, 22 Aug 2022 08:21:36 -0700 (PDT)
-Received: from relay2.suse.de (relay2.suse.de [149.44.160.134])
-        by smtp-out1.suse.de (Postfix) with ESMTP id D038034818;
-        Mon, 22 Aug 2022 15:21:34 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-        t=1661181694; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-         mime-version:mime-version:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=yBoi86THM9qPj5mrwQMgbIIxpyxVQj7rA0y6fRm2D14=;
-        b=sSkPUOHpP5xBtFKel8lMMXkK51aSTJGNEDPgrfScvxtLwrqV9TFnBSpA4YEf6ttx6yrgJu
-        +DZhn0+sdguW2PGbiu9bwz096/+BktEkhQiIGF+/ebMSbsheOVrVK1y+Nj43vd3h+6YYcE
-        trUB2HIhTXOR5Vnwa2yaTpSDTpRIPMQ=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-        s=susede2_ed25519; t=1661181694;
-        h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-         mime-version:mime-version:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=yBoi86THM9qPj5mrwQMgbIIxpyxVQj7rA0y6fRm2D14=;
-        b=SeXoOkKZRioDyqj/0TxtIMHUmREpfyrAsp1PXFGGNYppZMvqRsl2C30wJeMZY2CMvG7Bsv
-        /EZP+hSUcUeF2+DA==
-Received: from vasant-suse.suse.de (unknown [10.163.24.178])
-        by relay2.suse.de (Postfix) with ESMTP id 794D52C141;
-        Mon, 22 Aug 2022 15:21:34 +0000 (UTC)
-From:   Vasant Karasulli <vkarasulli@suse.de>
-To:     seanjc@google.com
-Cc:     Thomas.Lendacky@amd.com, bp@alien8.de, drjones@redhat.com,
-        erdemaktas@google.com, jroedel@suse.de, kvm@vger.kernel.org,
-        marcorr@google.com, pbonzini@redhat.com, rientjes@google.com,
-        zxwang42@gmail.com, Vasant Karasulli <vkarasulli@suse.de>
-Subject: Re: [kvm-unit-tests PATCH v4 08/13] x86: efi: Provide percpu storage
-Date:   Mon, 22 Aug 2022 17:21:23 +0200
-Message-Id: <20220822152123.18983-1-vkarasulli@suse.de>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <20220615232943.1465490-9-seanjc@google.com>
-References: <20220615232943.1465490-9-seanjc@google.com>
+        with ESMTP id S233360AbiHVPiu (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 22 Aug 2022 11:38:50 -0400
+Received: from mail-pg1-x542.google.com (mail-pg1-x542.google.com [IPv6:2607:f8b0:4864:20::542])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 967A8E006
+        for <kvm@vger.kernel.org>; Mon, 22 Aug 2022 08:38:49 -0700 (PDT)
+Received: by mail-pg1-x542.google.com with SMTP id l64so9735811pge.0
+        for <kvm@vger.kernel.org>; Mon, 22 Aug 2022 08:38:49 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=to:subject:message-id:date:from:sender:mime-version:from:to:cc;
+        bh=Bt5OnuHoLWMmd8kWNIJ/R5jWGGMn2gQUophJ4PVrMCg=;
+        b=fvF+gFPMHXSzZ2rxnbVbmlqbZzCjGLs8sY5IGMml5u19eXbT4Fe2OtznxVD33u5aNG
+         vOWMOpFYCTJ+/vCFKo7KJhdaDy5CplJb0XV/dC654VlS4WSBviGxreR8iGAkNe7Mbumo
+         w6X2GHo9ZJ2gXg1UOJHCmoJI5Zfyl0odRlyqWPzYaa35KZ/bPfaYEGzOVxmb8G79jdEf
+         md0mVD//Mtmg/un9R31DFlIYQnLdF4OeR935mGNMXn9t4XvLwAu+EJ0NQWhG01lH/IJ8
+         ZZXE42Q3SqTCLk37/3zBnzpvVhyVRLyZofcpqaDPSFboH7+WCaK4hT6Mg43wJ+18MJIR
+         9BnA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=to:subject:message-id:date:from:sender:mime-version
+         :x-gm-message-state:from:to:cc;
+        bh=Bt5OnuHoLWMmd8kWNIJ/R5jWGGMn2gQUophJ4PVrMCg=;
+        b=EEVMR4nHVZfzUvHcWll450MEth0W6H6VwhlkYNGO0b970fSsBzBy9aBiDey/Ymx4Du
+         bKUR2aM8yyKTaykfgVQ6bWDRVfI13avLFJnGDl5BSUTxHzOOsdbKtBDaSbYV794h+uPY
+         bvNeKqT4CtnaIz41GdtcEbgE4Kj7JQoRlJiCOA7ZuYabyf8u863wlTnixDC3aM6h/5/2
+         E4DqDwUmn8Lk75bVrAQZgW4tfFuvEcThYXYx2dDz46zHYOa2aOnDh4tJ7tf9Qubwbti0
+         UQDD5D5SvX8Q9AFR0y71YLEiShmo5ceLgwyZTcu22w6/hdBdAovJzxKSj77ikjodoof4
+         KRZw==
+X-Gm-Message-State: ACgBeo1G6E9yAa9dlSvWuzUAIKpD+D53qi//KD+Bzl93zCL4+rNcd2/R
+        u82TntXozMlFRLpsuDWaA6YOCP+ysxTaSzCpNGc=
+X-Google-Smtp-Source: AA6agR7P+/+DTJ2t/xTSng5iSWdhzJnnvRzAvh3/gCoNoxTkHljaJlQ1uvOjBg5eOXKBRt85rrfzvOpoO9YFtCrERlQ=
+X-Received: by 2002:a63:1f1b:0:b0:429:b4be:72f0 with SMTP id
+ f27-20020a631f1b000000b00429b4be72f0mr17095559pgf.622.1661182728989; Mon, 22
+ Aug 2022 08:38:48 -0700 (PDT)
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,SPF_HELO_NONE,SPF_PASS,
-        T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
+Sender: dvavsvsvsvs@gmail.com
+Received: by 2002:a05:6a10:d142:b0:2d6:7875:e094 with HTTP; Mon, 22 Aug 2022
+ 08:38:48 -0700 (PDT)
+From:   "carlsen.monika" <carlsen.monika@gmail.com>
+Date:   Mon, 22 Aug 2022 16:38:48 +0100
+X-Google-Sender-Auth: X5c8H_gKQNi1WVqi3w8dIxIyBZU
+Message-ID: <CA+hPWRNaxb9zJUQtF78H1MtJG0QkQs1-0rQzchxa5zGTBfHXDw@mail.gmail.com>
+Subject: Dearest One,
+To:     undisclosed-recipients:;
+Content-Type: text/plain; charset="UTF-8"
+X-Spam-Status: Yes, score=7.2 required=5.0 tests=ADVANCE_FEE_5_NEW_MONEY,
+        BAYES_50,DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+        FREEMAIL_FROM,HK_RANDOM_ENVFROM,LOTS_OF_MONEY,MONEY_FRAUD_8,
+        RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,
+        UNDISC_MONEY autolearn=no autolearn_force=no version=3.4.6
+X-Spam-Report: * -0.0 RCVD_IN_DNSWL_NONE RBL: Sender listed at
+        *      https://www.dnswl.org/, no trust
+        *      [2607:f8b0:4864:20:0:0:0:542 listed in]
+        [list.dnswl.org]
+        *  0.8 BAYES_50 BODY: Bayes spam probability is 40 to 60%
+        *      [score: 0.5000]
+        *  1.0 HK_RANDOM_ENVFROM Envelope sender username looks random
+        *  0.0 FREEMAIL_FROM Sender email is commonly abused enduser mail
+        *      provider
+        *      [carlsen.monika[at]gmail.com]
+        *  0.0 SPF_HELO_NONE SPF: HELO does not publish an SPF Record
+        * -0.0 SPF_PASS SPF: sender matches SPF record
+        * -0.1 DKIM_VALID_EF Message has a valid DKIM or DK signature from
+        *      envelope-from domain
+        *  0.1 DKIM_SIGNED Message has a DKIM or DK signature, not necessarily
+        *       valid
+        * -0.1 DKIM_VALID Message has at least one valid DKIM or DK signature
+        * -0.1 DKIM_VALID_AU Message has a valid DKIM or DK signature from
+        *      author's domain
+        * -0.0 T_SCC_BODY_TEXT_LINE No description available.
+        *  0.0 LOTS_OF_MONEY Huge... sums of money
+        *  0.0 MONEY_FRAUD_8 Lots of money and very many fraud phrases
+        *  3.0 ADVANCE_FEE_5_NEW_MONEY Advance Fee fraud and lots of money
+        *  2.6 UNDISC_MONEY Undisclosed recipients + money/fraud signs
+X-Spam-Level: *******
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Writing to MSR_IA32_APICBASE in reset_apic() is an
-intercepted operation and causes #VC exception when the test is launched as
-an SEV-ES guest.
+Dearest One,
 
-So calling reset_apic() before IDT is set up in setup_idt() and
-load_idt() might cause problems. Similarly if accessing _percpu_data
-array element in setup_segments64() results in a page fault,
-this will lead to a double fault.
+    CHARITY DONATION Please read carefully, I know it is true that
+this letter may come to you as a surprise. I came across your e-mail
+contact through a private search while in need of your assistance. am
+writing this mail to you with heavy sorrow in my heart, I have chose
+to reach out to you through internet because it still remains the
+fastest medium of communication. I sent this mail praying it will
+found you in a good condition of health, since I myself are in a very
+critical health condition in which I sleep every night without knowing
+if I may be alive to see the next day.
 
-Hence move reset_apic() call and percpu data setup after
-setup_idt() and load_idt().
----
- lib/x86/setup.c | 11 +++++------
- 1 file changed, 5 insertions(+), 6 deletions(-)
+aM Mrs.Monika John Carlsen, wife of late Mr John Carlsen, a widow
+suffering from long time illness. I have some funds I inherited from
+my late husband, the sum of ($11.000.000,eleven million dollars) my
+Doctor told me recently that I have serious sickness which is cancer
+problem. What disturbs me most is my stroke sickness. Having known my
+condition, I decided to donate this fund to a good person that will
+utilize it the way am going to instruct herein. I need a very honest
+and God fearing person who can claim this money and use it for Charity
+works, for orphanages, widows and also build schools for less
+privileges that will be named after my late husband if possible and to
+promote the word of God and the effort that the house of God is
+maintained.
 
-diff --git a/lib/x86/setup.c b/lib/x86/setup.c
-index 7df0256..b14e692 100644
---- a/lib/x86/setup.c
-+++ b/lib/x86/setup.c
-@@ -192,8 +192,6 @@ static void setup_segments64(void)
- 	write_gs(KERNEL_DS);
- 	write_ss(KERNEL_DS);
+I do not want a situation where this money will be used in an ungodly
+manners. That's why am taking this decision. am not afraid of death so
+I know where am going. I accept this decision because I do not have
+any child who will inherit this money after I die. Please I want your
+sincerely and urgent answer to know if you will be able to execute
+this project, and I will give you more information on how the fund
+will be transferred to your bank account. am waiting for your reply,
 
--	/* Setup percpu base */
--	wrmsr(MSR_GS_BASE, (u64)&__percpu_data[pre_boot_apic_id()]);
-
- 	/*
- 	 * Update the code segment by putting it on the stack before the return
-@@ -322,7 +320,7 @@ efi_status_t setup_efi(efi_bootinfo_t *efi_bootinfo)
- 		}
- 		return status;
- 	}
--
-+
- 	status = setup_rsdp(efi_bootinfo);
- 	if (status != EFI_SUCCESS) {
- 		printf("Cannot find RSDP in EFI system table\n");
-@@ -344,14 +342,15 @@ efi_status_t setup_efi(efi_bootinfo_t *efi_bootinfo)
- 	}
-
- 	setup_gdt_tss();
-+	setup_segments64();
-+	setup_idt();
-+	load_idt();
- 	/*
- 	 * GS.base, which points at the per-vCPU data, must be configured prior
- 	 * to resetting the APIC, which sets the per-vCPU APIC ops.
- 	 */
--	setup_segments64();
-+	wrmsr(MSR_GS_BASE, (u64)&__percpu_data[pre_boot_apic_id()]);
- 	reset_apic();
--	setup_idt();
--	load_idt();
- 	mask_pic_interrupts();
- 	setup_page_table();
- 	enable_apic();
---
-2.34.1
-
+Best Regards
+Mrs.Monika John Carlsen,
