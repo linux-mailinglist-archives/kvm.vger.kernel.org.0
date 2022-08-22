@@ -2,131 +2,107 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 1517F59C678
-	for <lists+kvm@lfdr.de>; Mon, 22 Aug 2022 20:36:59 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 8A68B59C69E
+	for <lists+kvm@lfdr.de>; Mon, 22 Aug 2022 20:39:37 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236805AbiHVSfv (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 22 Aug 2022 14:35:51 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38784 "EHLO
+        id S237448AbiHVShX (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 22 Aug 2022 14:37:23 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39380 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S237585AbiHVSfj (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 22 Aug 2022 14:35:39 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 861B718E24
-        for <kvm@vger.kernel.org>; Mon, 22 Aug 2022 11:35:38 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1661193337;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=oul0rlXeVckRoIaE/5tvHqkKjZyojO8sXzYxt2BvGKM=;
-        b=b9C0csP8rMPCa3qi0HRnjhIQoss8DoAh2CYcMA+izhdyBI0DV4B5G8OG3+7yDrbKdLn2Sb
-        CsjR7c+Yr1CK3c3+3Zoxeo7pmArN5vN5iEh5tviyoSnjDnk4IejX39/+c5yRJRBnx59URS
-        PrawIJ6ddoQX/Zl+TLtlGLUbkcKWvbw=
-Received: from mail-il1-f199.google.com (mail-il1-f199.google.com
- [209.85.166.199]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_128_GCM_SHA256) id
- us-mta-412-TREX2xY9NjK2VOJHUKjDQQ-1; Mon, 22 Aug 2022 14:35:36 -0400
-X-MC-Unique: TREX2xY9NjK2VOJHUKjDQQ-1
-Received: by mail-il1-f199.google.com with SMTP id x7-20020a056e021ca700b002ea01be6018so142567ill.18
-        for <kvm@vger.kernel.org>; Mon, 22 Aug 2022 11:35:36 -0700 (PDT)
+        with ESMTP id S237328AbiHVShV (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 22 Aug 2022 14:37:21 -0400
+Received: from mail-pl1-x629.google.com (mail-pl1-x629.google.com [IPv6:2607:f8b0:4864:20::629])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 45EE848EA0
+        for <kvm@vger.kernel.org>; Mon, 22 Aug 2022 11:37:21 -0700 (PDT)
+Received: by mail-pl1-x629.google.com with SMTP id x19so10708357plc.5
+        for <kvm@vger.kernel.org>; Mon, 22 Aug 2022 11:37:21 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc;
+        bh=knw0FhqPih0DMLQi3BX8S3tOWcFg9GCWwB+b3MoqYXM=;
+        b=REqXIggLvhB59vEgTEnA3tSAocAPV1PsPXetgM7cbJHrykaXQ2Mn44ulz0jJicBYV+
+         XBB9RaIP6cdAJpgzBqXps+rOe9Ch9TZXd9Odisw7QPVeMMj0jEQmYkXAxHDqRboiCS/u
+         zK1GpcceMxRrYDga6+2kNTLgCcxu8Kmd1YArHokPS1W0JN1IuY4Aie+ppmjs40dhU1qm
+         3n0k+UHEsicWiDMhDO7Q9HWsvVynvbCuZPxJJJnn45u7M5oprvHSRJpQu4eaU6GZYpG+
+         FAAVFucTkiRGO9GyI/4UGjMoJwJkH48AQxW8SB97c81d8hCIUnD0047ACO41zcl+Bjun
+         iN3w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=content-transfer-encoding:mime-version:organization:references
-         :in-reply-to:message-id:subject:cc:to:from:date:x-gm-message-state
-         :from:to:cc;
-        bh=oul0rlXeVckRoIaE/5tvHqkKjZyojO8sXzYxt2BvGKM=;
-        b=BBkxrJX+QAhw7rCV4Xh8v+kZ66ik54xq634VAzGfPevYvkGG+sln09a2YRHJpkQIGq
-         /ISrAxQv/FdANnhW+zU9EVX/FbAWrX8Wu8cSfOACVR6DMiYJrRKV6gt0FQWE3LPVCHIY
-         YuOoRcLvdoQ1HlQ4AsuyExYuh6QLXr2kT6jISBjnH8AgoOpQdh3jzZ8mBj3NH+4nKzc7
-         EezpApDVMpZP3XwAaAutNJreCT+6rMWDIs0Y/wKdb8xjVafpxh0NEcvhk+g9KQEmHD1L
-         ZvELX4wgvZd55jRALA6OCcYYfOp5wSf6ibKYig+h7C3HEpg4IiaEY8kLGMMg5b5exOuQ
-         c+NQ==
-X-Gm-Message-State: ACgBeo15cgtCbu2tcsp23iIFVc54fYu170zd2hcNmtYYZGsqBTMP3f0t
-        eNIWamN6sfioJhfVgPhKFMPS2Bq6EpWa6cygcTz22VAQJ9YEdiUoK0hF8D06XzpZJoH6hMo6sWn
-        le3Yt95160CIS
-X-Received: by 2002:a05:6638:2652:b0:343:d46:58e7 with SMTP id n18-20020a056638265200b003430d4658e7mr10135518jat.134.1661193335642;
-        Mon, 22 Aug 2022 11:35:35 -0700 (PDT)
-X-Google-Smtp-Source: AA6agR4wT/BfQls06SdjOiihytLqHWnxuXH+bpmjtY0h2K0Tb4O0L6xOZdO7CH2xdFyp+emMwBRShg==
-X-Received: by 2002:a05:6638:2652:b0:343:d46:58e7 with SMTP id n18-20020a056638265200b003430d4658e7mr10135510jat.134.1661193335441;
-        Mon, 22 Aug 2022 11:35:35 -0700 (PDT)
-Received: from redhat.com ([38.15.36.239])
-        by smtp.gmail.com with ESMTPSA id c1-20020a92bd01000000b002e93dc753c0sm4158539ile.66.2022.08.22.11.35.34
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc;
+        bh=knw0FhqPih0DMLQi3BX8S3tOWcFg9GCWwB+b3MoqYXM=;
+        b=PJ8DBmDvKXQS3BJT2j2B45aWvyCc3tPYhiQ9U+TIIgUyBWDM9eIcAH81WQm1AbEp1E
+         TlhMIsiIA5BbARtDkRIRs4oTeUm/3HZegYOVV/rLqq0rmkhjeHQ9Dv9e9DjIkqwG/nA7
+         c/fLXY1si51C8XbgTClgL8eDAr/qmTZve+Xk9kEbh3UQ1KhrHv+NJ1+1j8oojEcJJiNA
+         GqlWS2/vLmfIiVnX7Xu+YfRFfI6gshxXPzgw/HG2fRB5lBhSHTl0qIDtSDzXgmsDmS8M
+         3npQmJ+GE8aAQA35WSA2ltgdt3+lRMkTqllJETbbo5j9OOjWVPWv7l1bELUCqD4fxMb1
+         +ajA==
+X-Gm-Message-State: ACgBeo1UOMzPRA1AO7j5EMFxig7UdMX5CGZ/M/izbxrmNLf399drtMrq
+        OOd98YPdwipq+4AOygo2507PCw==
+X-Google-Smtp-Source: AA6agR75BsxAr+f48ou5etkJKD7TD/Tyv0Zh+pkrSWvDMwdGqg074hjobXmSQJwxY6+bFuET8vrBAw==
+X-Received: by 2002:a17:902:f68f:b0:172:ff8a:90d4 with SMTP id l15-20020a170902f68f00b00172ff8a90d4mr165945plg.2.1661193440698;
+        Mon, 22 Aug 2022 11:37:20 -0700 (PDT)
+Received: from google.com (7.104.168.34.bc.googleusercontent.com. [34.168.104.7])
+        by smtp.gmail.com with ESMTPSA id d2-20020a170902cec200b0016c5306917fsm8875565plg.53.2022.08.22.11.37.20
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 22 Aug 2022 11:35:35 -0700 (PDT)
-Date:   Mon, 22 Aug 2022 12:35:32 -0600
-From:   Alex Williamson <alex.williamson@redhat.com>
-To:     "Tian, Kevin" <kevin.tian@intel.com>
-Cc:     Jason Gunthorpe <jgg@nvidia.com>,
-        Cornelia Huck <cohuck@redhat.com>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "Liu, Yi L" <yi.l.liu@intel.com>
-Subject: Re: [PATCH v2] vfio: Remove vfio_group dev_counter
-Message-ID: <20220822123532.49dd0e0e.alex.williamson@redhat.com>
-In-Reply-To: <BN9PR11MB5276281FEDA2BC42DF67885E8C719@BN9PR11MB5276.namprd11.prod.outlook.com>
-References: <0-v2-d4374a7bf0c9+c4-vfio_dev_counter_jgg@nvidia.com>
-        <BN9PR11MB5276281FEDA2BC42DF67885E8C719@BN9PR11MB5276.namprd11.prod.outlook.com>
-Organization: Red Hat
+        Mon, 22 Aug 2022 11:37:20 -0700 (PDT)
+Date:   Mon, 22 Aug 2022 18:37:16 +0000
+From:   Sean Christopherson <seanjc@google.com>
+To:     Nadav Amit <nadav.amit@gmail.com>
+Cc:     Michal Luczaj <mhal@rbox.co>, kvm <kvm@vger.kernel.org>,
+        pbonzini@redhat.com
+Subject: Re: [kvm-unit-tests PATCH] x86/emulator: Test POP-SS blocking
+Message-ID: <YwPM3AkUS7IT+yWJ@google.com>
+References: <20220821215900.1419215-1-mhal@rbox.co>
+ <20220821220647.1420411-1-mhal@rbox.co>
+ <9b853239-a3df-f124-e793-44cbadfbbd8f@rbox.co>
+ <YwOj6tzvIoG34/sF@google.com>
+ <87756239-CB76-4D9B-AB63-49B70C8CAFD3@gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham
-        autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <87756239-CB76-4D9B-AB63-49B70C8CAFD3@gmail.com>
+X-Spam-Status: No, score=-14.5 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+        ENV_AND_HDR_SPF_MATCH,FSL_HELO_FAKE,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,
+        SPF_PASS,T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL
+        autolearn=no autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, 22 Aug 2022 04:39:45 +0000
-"Tian, Kevin" <kevin.tian@intel.com> wrote:
-
-> > From: Jason Gunthorpe <jgg@nvidia.com>
-> > Sent: Wednesday, August 17, 2022 3:13 AM
+On Mon, Aug 22, 2022, Nadav Amit wrote:
+> On Aug 22, 2022, at 8:42 AM, Sean Christopherson <seanjc@google.com> wrote:
+> 
+> > On Mon, Aug 22, 2022, Michal Luczaj wrote:
+> >> On 8/22/22 00:06, Michal Luczaj wrote:
+> >>> Note that doing this the ASM_TRY() way would require extending
+> >>> setup_idt() (to handle #DB) and introducing another ASM_TRY() variant
+> >>> (one without the initial `movl $0, %%gs:4`).
+> >> 
+> >> Replying to self as I was wrong regarding the need for another ASM_TRY() variant.
+> >> Once setup_idt() is told to handle #DB,
 > > 
-> > + *
-> > + * A driver may only call this function if the vfio_device was created
-> > + * by vfio_register_emulated_iommu_dev().
-> >   */
-> >  int vfio_pin_pages(struct vfio_device *device, dma_addr_t iova,
-> >  		   int npage, int prot, struct page **pages)  
+> > Hmm, it might be a moot point for this patch (see below), but my vote is to have
+> > setup_idt() wire up all known handlers to check_exception_table().  I don't see
+> > any reason to skip some vectors.  Code with __ASM_TRY() will explode no matter what,
+> > so it's not like it risks suppressing completely unexpected faults.
 > 
-> Though I agree with the code change, I'm still unclear about this
-> comment.
-> 
-> First this comment is not equivalent to the old code which only
-> checks dev_counter (implying a physical device in a singleton
-> group can use this API too). though I didn't get why the singleton
-> restriction was imposed in the first place...
+> I would just like to point out that this whole FEP approach is not friendly
+> for other hypervisors or bare-metal testings. While people might have mixed
+> feelings about other hypervisors, the benefit of running the tests on
+> bare-metal should be clear.
 
-It's related to the dirty page scope.  Use of the pinned page interface
-is essentially a contract with the IOMMU back-end that only pinned pages
-will be considered for the dirty page scope.  However, type1 operates
-on groups, therefore we needed to create a restriction that only
-singleton groups could make use of page pinning such that the dirty
-page scope could be attached to the group.
+If people want to run KUT on other hypervisors that support a different FEP (KVM
+stole it from Xen after all), then I have no objection to genericizing KVM_FEP
+and making it a config option.
 
-> Second I also didn't get why such a pinning API is tied to emulated
-> iommu now. Though not required for any physical device today, what
-> would be the actual problem of allowing a variant driver to make 
-> such call? 
+> Specifically in this test, it is rather simple to avoid using FEP.
 
-In fact I do recall such discussions.  An IOMMU backed mdev (defunct)
-or vfio-pci variant driver could gratuitously pin pages in order to
-limit the dirty page scope.  We don't have anything in-tree that relies
-on this.  It also seems we're heading more in the direction of device
-level DMA dirty tracking as Yishai proposes in the series for mlx5.
-These interfaces are far more efficient for this use case, but perhaps
-you have another use case in mind where we couldn't use the dma_rw
-interface?
-
-I think the assumption is that devices that can perform DMA through an
-IOMMU generally wouldn't need to twiddle guest DMA targets on a regular
-basis otherwise, therefore limiting this to emulated IOMMU devices is
-reasonable.  Thanks,
-
-Alex
-
+I'm saying KUT should do both, i.e. run the same sequences with and without
+forced emulation on the "critical" instructions.  That provides full coverage for
+bare metal, and also provides coverage for both "fast" and "slow" emulation in
+KVM (and other future hypervisors if other prefixes are ever supported).
