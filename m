@@ -2,79 +2,75 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 33D5359ED86
-	for <lists+kvm@lfdr.de>; Tue, 23 Aug 2022 22:41:11 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id A83B659EDA8
+	for <lists+kvm@lfdr.de>; Tue, 23 Aug 2022 22:44:17 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233434AbiHWUlF (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 23 Aug 2022 16:41:05 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48846 "EHLO
+        id S233139AbiHWUnb (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 23 Aug 2022 16:43:31 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51244 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230059AbiHWUkr (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 23 Aug 2022 16:40:47 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7A37E57898
-        for <kvm@vger.kernel.org>; Tue, 23 Aug 2022 13:30:35 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1661286634;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=fsXMj/6hNU0e5tAGMLQtNIyftNI4ROUnRCyckBUdrAw=;
-        b=gtP14pOGDXH/9p9URZ7TCoRH9QTdcG7uPiBzWKMGqIPLNcK+G4WnLlnqSRxB7HjU1I8+B7
-        3oRb7AIcK57F5KakjN5xNpr03hOMHPQjB1pGr1wcNe/VBpM6ft/i7rt+/ANce9JxnxfzuW
-        P0RiDyDvOcVIQ9oW6dZjJiWVE36bSNs=
-Received: from mimecast-mx02.redhat.com (mx3-rdu2.redhat.com
- [66.187.233.73]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-447-KV7nwgpXNDq20QYFR3O9MQ-1; Tue, 23 Aug 2022 16:30:31 -0400
-X-MC-Unique: KV7nwgpXNDq20QYFR3O9MQ-1
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.rdu2.redhat.com [10.11.54.3])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        with ESMTP id S234036AbiHWUnH (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 23 Aug 2022 16:43:07 -0400
+Received: from ams.source.kernel.org (ams.source.kernel.org [145.40.68.75])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BDE6B64C5;
+        Tue, 23 Aug 2022 13:35:33 -0700 (PDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 26964296A603;
-        Tue, 23 Aug 2022 20:30:30 +0000 (UTC)
-Received: from localhost (unknown [10.39.192.115])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 665021121315;
-        Tue, 23 Aug 2022 20:30:29 +0000 (UTC)
-Date:   Tue, 23 Aug 2022 16:30:27 -0400
-From:   Stefan Hajnoczi <stefanha@redhat.com>
-To:     Jakub Kicinski <kuba@kernel.org>
-Cc:     Arseniy Krasnov <AVKrasnov@sberdevices.ru>,
-        Stefano Garzarella <sgarzare@redhat.com>,
-        "David S. Miller" <davem@davemloft.net>,
-        "edumazet@google.com" <edumazet@google.com>,
-        Paolo Abeni <pabeni@redhat.com>,
-        "kys@microsoft.com" <kys@microsoft.com>,
-        "haiyangz@microsoft.com" <haiyangz@microsoft.com>,
-        "sthemmin@microsoft.com" <sthemmin@microsoft.com>,
-        "wei.liu@kernel.org" <wei.liu@kernel.org>,
-        Dexuan Cui <decui@microsoft.com>,
-        Bryan Tan <bryantan@vmware.com>,
-        Vishnu Dasa <vdasa@vmware.com>,
-        Krasnov Arseniy <oxffffaa@gmail.com>,
-        "Michael S. Tsirkin" <mst@redhat.com>,
-        "virtualization@lists.linux-foundation.org" 
-        <virtualization@lists.linux-foundation.org>,
-        "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "linux-hyperv@vger.kernel.org" <linux-hyperv@vger.kernel.org>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        kernel <kernel@sberdevices.ru>,
-        VMware PV-Drivers Reviewers <pv-drivers@vmware.com>
-Subject: Re: [PATCH net-next v4 0/9] vsock: updates for SO_RCVLOWAT handling
-Message-ID: <YwU443jzc/N4fV3A@fedora>
-References: <de41de4c-0345-34d7-7c36-4345258b7ba8@sberdevices.ru>
- <YwUnAhWauSFSJX+g@fedora>
- <20220823121852.1fde7917@kernel.org>
-MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
-        protocol="application/pgp-signature"; boundary="tW4PvRQqQXgDRL/h"
-Content-Disposition: inline
-In-Reply-To: <20220823121852.1fde7917@kernel.org>
-X-Scanned-By: MIMEDefang 2.78 on 10.11.54.3
-X-Spam-Status: No, score=-2.8 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,
-        SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=unavailable
+        by ams.source.kernel.org (Postfix) with ESMTPS id 3CADCB81F3B;
+        Tue, 23 Aug 2022 20:35:32 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id E1F85C433D7;
+        Tue, 23 Aug 2022 20:35:30 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1661286931;
+        bh=0JNK622xWgO/a9K2BWJzsLD+0hXBjzLzKVy98NParO4=;
+        h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+        b=H6sJwrSDAGGP51crSveoiDT/qRVGGPOt/wIzeSIv0HjAmTS88tXrmCfkeFkG1Jekk
+         t9klrKPWCizqfa3R1G+i5fVMKc65sMDQL4Vavg2QHzN4WCUoxMAyOCAsGMXFdfancV
+         u0fQK06VgJaHtzinJ0QcUQucPds/aLc5zvNHBYdTqziY8YL6dxLOB1UBDOa8iEwVFe
+         peZI1qOoU/LPxWonuZ7bclgwVgXf+azagqSkQ1ZX7OY1SAlYUjeuohe2ILhCmv2olG
+         K9ScYIc9GY38dAIni7CybxbgfdXtj7MsxVX9ntIelXPPPMJwVqzAQ6bBeIB8ma44Al
+         NMSVwhtwoHzVw==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=why.misterjones.org)
+        by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+        (Exim 4.95)
+        (envelope-from <maz@kernel.org>)
+        id 1oQacS-005I5Q-K9;
+        Tue, 23 Aug 2022 21:35:28 +0100
+Date:   Tue, 23 Aug 2022 21:35:27 +0100
+Message-ID: <87a67uwve8.wl-maz@kernel.org>
+From:   Marc Zyngier <maz@kernel.org>
+To:     Oliver Upton <oliver.upton@linux.dev>
+Cc:     Gavin Shan <gshan@redhat.com>, kvmarm@lists.cs.columbia.edu,
+        linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org, linux-doc@vger.kernel.org,
+        linux-kselftest@vger.kernel.org, peterx@redhat.com,
+        pbonzini@redhat.com, corbet@lwn.net, james.morse@arm.com,
+        alexandru.elisei@arm.com, suzuki.poulose@arm.com,
+        catalin.marinas@arm.com, will@kernel.org, shuah@kernel.org,
+        seanjc@google.com, drjones@redhat.com, dmatlack@google.com,
+        bgardon@google.com, ricarkol@google.com, zhenyzha@redhat.com,
+        shan.gavin@gmail.com
+Subject: Re: [PATCH v1 1/5] KVM: arm64: Enable ring-based dirty memory tracking
+In-Reply-To: <YwTn2r6FLCx9mAU7@google.com>
+References: <20220819005601.198436-1-gshan@redhat.com>
+        <20220819005601.198436-2-gshan@redhat.com>
+        <87lerkwtm5.wl-maz@kernel.org>
+        <41fb5a1f-29a9-e6bb-9fab-4c83a2a8fce5@redhat.com>
+        <87fshovtu0.wl-maz@kernel.org>
+        <YwTn2r6FLCx9mAU7@google.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/27.1
+ (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: oliver.upton@linux.dev, gshan@redhat.com, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org, linux-kernel@vger.kernel.org, linux-doc@vger.kernel.org, linux-kselftest@vger.kernel.org, peterx@redhat.com, pbonzini@redhat.com, corbet@lwn.net, james.morse@arm.com, alexandru.elisei@arm.com, suzuki.poulose@arm.com, catalin.marinas@arm.com, will@kernel.org, shuah@kernel.org, seanjc@google.com, drjones@redhat.com, dmatlack@google.com, bgardon@google.com, ricarkol@google.com, zhenyzha@redhat.com, shan.gavin@gmail.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+X-Spam-Status: No, score=-7.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_HI,
+        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -82,40 +78,69 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+On Tue, 23 Aug 2022 15:44:42 +0100,
+Oliver Upton <oliver.upton@linux.dev> wrote:
+> 
+> On Mon, Aug 22, 2022 at 10:42:15PM +0100, Marc Zyngier wrote:
+> > Hi Gavin,
+> > 
+> > On Mon, 22 Aug 2022 02:58:20 +0100,
+> > Gavin Shan <gshan@redhat.com> wrote:
+> > > 
+> > > Hi Marc,
+> > > 
+> > > On 8/19/22 6:00 PM, Marc Zyngier wrote:
+> > > > On Fri, 19 Aug 2022 01:55:57 +0100,
+> > > > Gavin Shan <gshan@redhat.com> wrote:
+> > > >> 
+> > > >> The ring-based dirty memory tracking has been available and enabled
+> > > >> on x86 for a while. The feature is beneficial when the number of
+> > > >> dirty pages is small in a checkpointing system or live migration
+> > > >> scenario. More details can be found from fb04a1eddb1a ("KVM: X86:
+> > > >> Implement ring-based dirty memory tracking").
+> > > >> 
+> > > >> This enables the ring-based dirty memory tracking on ARM64. It's
+> > > >> notable that no extra reserved ring entries are needed on ARM64
+> > > >> because the huge pages are always split into base pages when page
+> > > >> dirty tracking is enabled.
+> > > > 
+> > > > Can you please elaborate on this? Adding a per-CPU ring of course
+> > > > results in extra memory allocation, so there must be a subtle
+> > > > x86-specific detail that I'm not aware of...
+> > > > 
+> > > 
+> > > Sure. I guess it's helpful to explain how it works in next revision.
+> > > Something like below:
+> > > 
+> > > This enables the ring-based dirty memory tracking on ARM64. The feature
+> > > is enabled by CONFIG_HAVE_KVM_DIRTY_RING, detected and enabled by
+> > > CONFIG_HAVE_KVM_DIRTY_RING. A ring buffer is created on every vcpu and
+> > > each entry is described by 'struct kvm_dirty_gfn'. The ring buffer is
+> > > pushed by host when page becomes dirty and pulled by userspace. A vcpu
+> > > exit is forced when the ring buffer becomes full. The ring buffers on
+> > > all vcpus can be reset by ioctl command KVM_RESET_DIRTY_RINGS.
+> > > 
+> > > Yes, I think so. Adding a per-CPU ring results in extra memory allocation.
+> > > However, it's avoiding synchronization among multiple vcpus when dirty
+> > > pages happen on multiple vcpus. More discussion can be found from [1]
+> > 
+> > Oh, I totally buy the relaxation of the synchronisation (though I
+> > doubt this will have any visible effect until we have something like
+> > Oliver's patches to allow parallel faulting).
+> > 
+> 
+> Heh, yeah I need to get that out the door. I'll also note that Gavin's
+> changes are still relevant without that series, as we do write unprotect
+> in parallel at PTE granularity after commit f783ef1c0e82 ("KVM: arm64:
+> Add fast path to handle permission relaxation during dirty logging").
 
---tW4PvRQqQXgDRL/h
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+Ah, true. Now if only someone could explain how the whole
+producer-consumer thing works without a trace of a barrier, that'd be
+great...
 
-On Tue, Aug 23, 2022 at 12:18:52PM -0700, Jakub Kicinski wrote:
-> On Tue, 23 Aug 2022 15:14:10 -0400 Stefan Hajnoczi wrote:
-> > Stefano will be online again on Monday. I suggest we wait for him to
-> > review this series. If it's urgent, please let me know and I'll take a
-> > look.
->=20
-> It was already applied, sorry about that. But please continue with
-> review as if it wasn't. We'll just revert based on Stefano's feedback
-> as needed.
+Thanks,
 
-Okay, no problem.
+	M.
 
-Stefan
-
---tW4PvRQqQXgDRL/h
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEEhpWov9P5fNqsNXdanKSrs4Grc8gFAmMFOOMACgkQnKSrs4Gr
-c8hvlQgAo4gB0BkrZtfmmojZpiKE6Xq15IttUNkmuyZgxF8sLW3iBu9LtCiQDZU2
-6sXR4GxAoAhr3tzo1KsUrMoc/hx2+Io9fLHLVLFZfFgnY52O3ipxSoKB3gE/DTfk
-hCpzD4jW7BSIC1WImlqYOZ3kRdhxBxawrEF2hMRSnNS2ewSJJTNsJjrfmb/+te9e
-kVb8naCagmAeznr1rOTXC+6xJlCQo9c5swxpxPGOpcFHGv71hxGDvxbvTB6omKXA
-Z1sbgS37LGQ8J+gBXFZ8SMDKGC1bnRVVOFsioohZ43oFO0yzjjqqx/2s6+qZUcGH
-CPYyhqwKD/oFfY/saOMIHCNnQkNV5w==
-=Vfeh
------END PGP SIGNATURE-----
-
---tW4PvRQqQXgDRL/h--
-
+-- 
+Without deviation from the norm, progress is not possible.
