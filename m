@@ -2,39 +2,38 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 5CC0C59D15B
+	by mail.lfdr.de (Postfix) with ESMTP id 1414C59D15A
 	for <lists+kvm@lfdr.de>; Tue, 23 Aug 2022 08:37:21 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S240686AbiHWGdU (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 23 Aug 2022 02:33:20 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37520 "EHLO
+        id S240397AbiHWGep (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 23 Aug 2022 02:34:45 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40324 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233179AbiHWGdR (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 23 Aug 2022 02:33:17 -0400
-Received: from szxga03-in.huawei.com (szxga03-in.huawei.com [45.249.212.189])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F27BA218D;
-        Mon, 22 Aug 2022 23:33:15 -0700 (PDT)
-Received: from canpemm500002.china.huawei.com (unknown [172.30.72.55])
-        by szxga03-in.huawei.com (SkyGuard) with ESMTP id 4MBfWp43NjzGpnk;
-        Tue, 23 Aug 2022 14:31:34 +0800 (CST)
+        with ESMTP id S233179AbiHWGeo (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 23 Aug 2022 02:34:44 -0400
+Received: from szxga01-in.huawei.com (szxga01-in.huawei.com [45.249.212.187])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9F2F46110D;
+        Mon, 22 Aug 2022 23:34:43 -0700 (PDT)
+Received: from canpemm500002.china.huawei.com (unknown [172.30.72.57])
+        by szxga01-in.huawei.com (SkyGuard) with ESMTP id 4MBfWM6KB8zkWZd;
+        Tue, 23 Aug 2022 14:31:11 +0800 (CST)
 Received: from huawei.com (10.175.124.27) by canpemm500002.china.huawei.com
  (7.192.104.244) with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2375.24; Tue, 23 Aug
- 2022 14:33:12 +0800
+ 2022 14:34:40 +0800
 From:   Miaohe Lin <linmiaohe@huawei.com>
-To:     <seanjc@google.com>, <pbonzini@redhat.com>, <tglx@linutronix.de>,
-        <mingo@redhat.com>, <bp@alien8.de>, <dave.hansen@linux.intel.com>
-CC:     <x86@kernel.org>, <hpa@zytor.com>, <kvm@vger.kernel.org>,
+To:     <pbonzini@redhat.com>
+CC:     <vkuznets@redhat.com>, <seanjc@google.com>, <kvm@vger.kernel.org>,
         <linux-kernel@vger.kernel.org>, <linmiaohe@huawei.com>
-Subject: [PATCH] kvm: x86: mmu: fix memoryleak in kvm_mmu_vendor_module_init()
-Date:   Tue, 23 Aug 2022 14:32:37 +0800
-Message-ID: <20220823063237.47299-1-linmiaohe@huawei.com>
+Subject: [PATCH] KVM: fix memoryleak in kvm_init()
+Date:   Tue, 23 Aug 2022 14:34:14 +0800
+Message-ID: <20220823063414.59778-1-linmiaohe@huawei.com>
 X-Mailer: git-send-email 2.23.0
 MIME-Version: 1.0
 Content-Transfer-Encoding: 7BIT
 Content-Type:   text/plain; charset=US-ASCII
 X-Originating-IP: [10.175.124.27]
-X-ClientProxiedBy: dggems705-chm.china.huawei.com (10.3.19.182) To
+X-ClientProxiedBy: dggems704-chm.china.huawei.com (10.3.19.181) To
  canpemm500002.china.huawei.com (7.192.104.244)
 X-CFilter-Loop: Reflected
 X-Spam-Status: No, score=-4.2 required=5.0 tests=BAYES_00,RCVD_IN_DNSWL_MED,
@@ -46,34 +45,41 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-When register_shrinker() fails, we forgot to release the percpu counter
-kvm_total_used_mmu_pages leading to memoryleak. Fix this issue by calling
-percpu_counter_destroy() when register_shrinker() fails.
+When alloc_cpumask_var_node() fails for a certain cpu, there might be some
+allocated cpumasks for percpu cpu_kick_mask. We should free these cpumasks
+or memoryleak will occur.
 
-Fixes: ab271bd4dfd5 ("x86: kvm: propagate register_shrinker return code")
+Fixes: baff59ccdc65 ("KVM: Pre-allocate cpumasks for kvm_make_all_cpus_request_except()")
 Signed-off-by: Miaohe Lin <linmiaohe@huawei.com>
 ---
- arch/x86/kvm/mmu/mmu.c | 4 +++-
- 1 file changed, 3 insertions(+), 1 deletion(-)
+ virt/kvm/kvm_main.c | 5 ++---
+ 1 file changed, 2 insertions(+), 3 deletions(-)
 
-diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
-index e418ef3ecfcb..d25d55b1f0b5 100644
---- a/arch/x86/kvm/mmu/mmu.c
-+++ b/arch/x86/kvm/mmu/mmu.c
-@@ -6702,10 +6702,12 @@ int kvm_mmu_vendor_module_init(void)
+diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
+index 584a5bab3af3..dcf47da44844 100644
+--- a/virt/kvm/kvm_main.c
++++ b/virt/kvm/kvm_main.c
+@@ -5881,7 +5881,7 @@ int kvm_init(void *opaque, unsigned vcpu_size, unsigned vcpu_align,
  
- 	ret = register_shrinker(&mmu_shrinker, "x86-mmu");
- 	if (ret)
--		goto out;
-+		goto out_shrinker;
+ 	r = kvm_async_pf_init();
+ 	if (r)
+-		goto out_free_5;
++		goto out_free_4;
  
- 	return 0;
+ 	kvm_chardev_ops.owner = module;
  
-+out_shrinker:
-+	percpu_counter_destroy(&kvm_total_used_mmu_pages);
- out:
- 	mmu_destroy_caches();
- 	return ret;
+@@ -5905,10 +5905,9 @@ int kvm_init(void *opaque, unsigned vcpu_size, unsigned vcpu_align,
+ 
+ out_unreg:
+ 	kvm_async_pf_deinit();
+-out_free_5:
++out_free_4:
+ 	for_each_possible_cpu(cpu)
+ 		free_cpumask_var(per_cpu(cpu_kick_mask, cpu));
+-out_free_4:
+ 	kmem_cache_destroy(kvm_vcpu_cache);
+ out_free_3:
+ 	unregister_reboot_notifier(&kvm_reboot_notifier);
 -- 
 2.23.0
 
