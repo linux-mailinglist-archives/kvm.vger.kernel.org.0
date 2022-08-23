@@ -2,209 +2,210 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 5824559E825
-	for <lists+kvm@lfdr.de>; Tue, 23 Aug 2022 18:56:48 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 35E4C59E83B
+	for <lists+kvm@lfdr.de>; Tue, 23 Aug 2022 19:07:08 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S245598AbiHWQxp (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 23 Aug 2022 12:53:45 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44942 "EHLO
+        id S1343688AbiHWRBy (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 23 Aug 2022 13:01:54 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54908 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S242879AbiHWQxY (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 23 Aug 2022 12:53:24 -0400
-Received: from mail.skyhub.de (mail.skyhub.de [5.9.137.197])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E7A38131A02;
-        Tue, 23 Aug 2022 06:21:39 -0700 (PDT)
-Received: from zn.tnic (p200300ea971b9893329c23fffea6a903.dip0.t-ipconnect.de [IPv6:2003:ea:971b:9893:329c:23ff:fea6:a903])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by mail.skyhub.de (SuperMail on ZX Spectrum 128k) with ESMTPSA id CA7901EC059D;
-        Tue, 23 Aug 2022 15:21:33 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alien8.de; s=dkim;
-        t=1661260893;
+        with ESMTP id S245654AbiHWQ7D (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 23 Aug 2022 12:59:03 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A1A70A4B2F
+        for <kvm@vger.kernel.org>; Tue, 23 Aug 2022 06:30:16 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1661261415;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:in-reply-to:in-reply-to:  references:references;
-        bh=88b9dtw5SGZz9ByR4SVq5jtelPnssUL5tht/iXbNMr0=;
-        b=pdIFFaLF2Q5y9bCJ1IXNDS6T4Wx4YgPc/b9z/mTBbXwTqFdUzRZMyThTsuC8nQblA+NIw+
-        yLDo4nIEPl/nfBvIJrqm5PSxkopiA4U0cqHMfliR6HYmWQcLLLGLR9WlAvXHJ9LuGWac95
-        qZyJxJ6DZFrPdZlQdErBqscKg5MLx5I=
-Date:   Tue, 23 Aug 2022 15:21:29 +0200
-From:   Borislav Petkov <bp@alien8.de>
-To:     Ashish Kalra <Ashish.Kalra@amd.com>
-Cc:     x86@kernel.org, linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-        linux-coco@lists.linux.dev, linux-mm@kvack.org,
-        linux-crypto@vger.kernel.org, tglx@linutronix.de, mingo@redhat.com,
-        jroedel@suse.de, thomas.lendacky@amd.com, hpa@zytor.com,
-        ardb@kernel.org, pbonzini@redhat.com, seanjc@google.com,
-        vkuznets@redhat.com, jmattson@google.com, luto@kernel.org,
-        dave.hansen@linux.intel.com, slp@redhat.com, pgonda@google.com,
-        peterz@infradead.org, srinivas.pandruvada@linux.intel.com,
-        rientjes@google.com, dovmurik@linux.ibm.com, tobin@ibm.com,
-        michael.roth@amd.com, vbabka@suse.cz, kirill@shutemov.name,
-        ak@linux.intel.com, tony.luck@intel.com, marcorr@google.com,
-        sathyanarayanan.kuppuswamy@linux.intel.com, alpergun@google.com,
-        dgilbert@redhat.com, jarkko@kernel.org
-Subject: Re: [PATCH Part2 v6 10/49] x86/fault: Add support to dump RMP entry
- on fault
-Message-ID: <YwTUWUkDVW+936VR@zn.tnic>
-References: <cover.1655761627.git.ashish.kalra@amd.com>
- <af381cc88410c0e2c48fda5732741edd0d7609ac.1655761627.git.ashish.kalra@amd.com>
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=QZDMxaEuIdQKSuQqZQtMIgaw5oE1Md/xws3HZ974gr8=;
+        b=ZxZVDYSnuW1vYvEbwXR1D6XyFObT0+Nvd2fwJLd26BGEXNOenbmKjDKls6gn8js5d5TeJn
+        AqXxv6dPRPbn4bHlcIcBvVL8Y+ANyP7s5AKMjBMHpsG0O6tyhxPX+9/4YwQlLSBimTLyKv
+        dxYyUdIiqJ+yRAc/uT77B8QOG0XZtv8=
+Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
+ [209.85.128.71]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_128_GCM_SHA256) id
+ us-mta-437-c9FJaDohNnu4Q9rlzIjsxQ-1; Tue, 23 Aug 2022 09:30:13 -0400
+X-MC-Unique: c9FJaDohNnu4Q9rlzIjsxQ-1
+Received: by mail-wm1-f71.google.com with SMTP id a17-20020a05600c349100b003a545125f6eso10269558wmq.4
+        for <kvm@vger.kernel.org>; Tue, 23 Aug 2022 06:30:13 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=content-transfer-encoding:in-reply-to:subject:from:references:cc:to
+         :content-language:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc;
+        bh=QZDMxaEuIdQKSuQqZQtMIgaw5oE1Md/xws3HZ974gr8=;
+        b=PChLA7BekfHKSQUZIwdIWnPGMknU3eE3KhRPXXNopRfXl7NDY8iJDj3pUQsfEUVY9Z
+         4VHqsahF+Pfz+rN6nAsevmTOYmUzVO2uXRmDbDIx4QAOY2ueAcTOZEGilpvclNkejzl/
+         bdrn4gRDi3NnZWjf+dk9t3B2uoNFHWFh0yyb7k6eWkvRX3Ykf6gBwkkCto3OzVynpiNa
+         0sUpdxtgfScKeXW81GFWAMxM7JX1vkgY2z6qDByu2+UoyRakCNtKaSWf6lcfdPq5b9n5
+         ctoRMFQ2zH2L0WgFzJpsEtAWXE7P+pLJr7HQEzjEd/CKmn+Ax0uDF8+DClen+j49Ey7s
+         3sjA==
+X-Gm-Message-State: ACgBeo0iLZm/wEcZog38Y4fTzzDPJGKhNeU2IT7VNMYKLRIkU1mRCqwc
+        ke/D3NHl3QCO/Oia5Uz75aDYY+JtH3d5nXOy0+YDLUNeXcVLfmSpXz2LZlasxsRN/Rd9g3c/1U7
+        9tGKMXO9dw0kI
+X-Received: by 2002:a5d:4a11:0:b0:225:2f5e:c704 with SMTP id m17-20020a5d4a11000000b002252f5ec704mr13245445wrq.703.1661261412712;
+        Tue, 23 Aug 2022 06:30:12 -0700 (PDT)
+X-Google-Smtp-Source: AA6agR4VPkqgtQASFvl0VXnyU15NJEWveqermBmzG/wRBBcecNvhy3MAC1nD76g/an01GGNmmOFi7Q==
+X-Received: by 2002:a5d:4a11:0:b0:225:2f5e:c704 with SMTP id m17-20020a5d4a11000000b002252f5ec704mr13245419wrq.703.1661261412440;
+        Tue, 23 Aug 2022 06:30:12 -0700 (PDT)
+Received: from [192.168.0.5] (ip-109-43-178-217.web.vodafone.de. [109.43.178.217])
+        by smtp.gmail.com with ESMTPSA id g1-20020adffc81000000b0022520aba90asm14595051wrr.107.2022.08.23.06.30.10
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 23 Aug 2022 06:30:11 -0700 (PDT)
+Message-ID: <b6c981e0-56f5-25c3-3422-ed72c8561712@redhat.com>
+Date:   Tue, 23 Aug 2022 15:30:08 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <af381cc88410c0e2c48fda5732741edd0d7609ac.1655761627.git.ashish.kalra@amd.com>
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,SPF_HELO_NONE,SPF_PASS,
-        T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.12.0
+Content-Language: en-US
+To:     Pierre Morel <pmorel@linux.ibm.com>, qemu-s390x@nongnu.org
+Cc:     qemu-devel@nongnu.org, borntraeger@de.ibm.com, pasic@linux.ibm.com,
+        richard.henderson@linaro.org, david@redhat.com, cohuck@redhat.com,
+        mst@redhat.com, pbonzini@redhat.com, kvm@vger.kernel.org,
+        ehabkost@redhat.com, marcel.apfelbaum@gmail.com, eblake@redhat.com,
+        armbru@redhat.com, seiden@linux.ibm.com, nrb@linux.ibm.com,
+        frankja@linux.ibm.com
+References: <20220620140352.39398-1-pmorel@linux.ibm.com>
+ <20220620140352.39398-3-pmorel@linux.ibm.com>
+From:   Thomas Huth <thuth@redhat.com>
+Subject: Re: [PATCH v8 02/12] s390x/cpu_topology: CPU topology objects and
+ structures
+In-Reply-To: <20220620140352.39398-3-pmorel@linux.ibm.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Spam-Status: No, score=-2.8 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
+        RCVD_IN_DNSWL_LOW,SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Jun 20, 2022 at 11:03:58PM +0000, Ashish Kalra wrote:
-> From: Brijesh Singh <brijesh.singh@amd.com>
+On 20/06/2022 16.03, Pierre Morel wrote:
+> We use new objects to have a dynamic administration of the CPU topology.
+> The highest level object in this implementation is the s390 book and
+> in this first implementation of CPU topology for S390 we have a single
+> book.
+> The book is built as a SYSBUS bridge during the CPU initialization.
+> Other objects, sockets and core will be built after the parsing
+> of the QEMU -smp argument.
 > 
-> When SEV-SNP is enabled globally, a write from the host goes through the
-> RMP check. If the hardware encounters the check failure, then it raises
-> the #PF (with RMP set). Dump the RMP entry at the faulting pfn to help
-> the debug.
+> Every object under this single book will be build dynamically
+> immediately after a CPU has be realized if it is needed.
+> The CPU will fill the sockets once after the other, according to the
+> number of core per socket defined during the smp parsing.
 > 
-> Signed-off-by: Brijesh Singh <brijesh.singh@amd.com>
+> Each CPU inside a socket will be represented by a bit in a 64bit
+> unsigned long. Set on plug and clear on unplug of a CPU.
+> 
+> For the S390 CPU topology, thread and cores are merged into
+> topology cores and the number of topology cores is the multiplication
+> of cores by the numbers of threads.
+> 
+> Signed-off-by: Pierre Morel <pmorel@linux.ibm.com>
 > ---
->  arch/x86/include/asm/sev.h |  7 +++++++
->  arch/x86/kernel/sev.c      | 43 ++++++++++++++++++++++++++++++++++++++
->  arch/x86/mm/fault.c        | 17 +++++++++++----
->  include/linux/sev.h        |  2 ++
->  4 files changed, 65 insertions(+), 4 deletions(-)
-> 
-> diff --git a/arch/x86/include/asm/sev.h b/arch/x86/include/asm/sev.h
-> index 6ab872311544..c0c4df817159 100644
-> --- a/arch/x86/include/asm/sev.h
-> +++ b/arch/x86/include/asm/sev.h
-> @@ -113,6 +113,11 @@ struct __packed rmpentry {
->  
->  #define rmpentry_assigned(x)	((x)->info.assigned)
->  #define rmpentry_pagesize(x)	((x)->info.pagesize)
-> +#define rmpentry_vmsa(x)	((x)->info.vmsa)
-> +#define rmpentry_asid(x)	((x)->info.asid)
-> +#define rmpentry_validated(x)	((x)->info.validated)
-> +#define rmpentry_gpa(x)		((unsigned long)(x)->info.gpa)
-> +#define rmpentry_immutable(x)	((x)->info.immutable)
-
-If you're going to do that, use inline functions pls so that it checks
-the argument at least.
-
-Also, add such functions only when they're called multiple times - no
-need to add one for every field if you're going to access that field
-only once in the whole kernel.
-
->  
->  #define RMPADJUST_VMSA_PAGE_BIT		BIT(16)
->  
-> @@ -205,6 +210,7 @@ void snp_set_wakeup_secondary_cpu(void);
->  bool snp_init(struct boot_params *bp);
->  void snp_abort(void);
->  int snp_issue_guest_request(u64 exit_code, struct snp_req_data *input, unsigned long *fw_err);
-> +void dump_rmpentry(u64 pfn);
->  #else
->  static inline void sev_es_ist_enter(struct pt_regs *regs) { }
->  static inline void sev_es_ist_exit(void) { }
-> @@ -229,6 +235,7 @@ static inline int snp_issue_guest_request(u64 exit_code, struct snp_req_data *in
->  {
->  	return -ENOTTY;
->  }
-> +static inline void dump_rmpentry(u64 pfn) {}
->  #endif
->  
->  #endif
-> diff --git a/arch/x86/kernel/sev.c b/arch/x86/kernel/sev.c
-> index 734cddd837f5..6640a639fffc 100644
-> --- a/arch/x86/kernel/sev.c
-> +++ b/arch/x86/kernel/sev.c
-> @@ -2414,6 +2414,49 @@ static struct rmpentry *__snp_lookup_rmpentry(u64 pfn, int *level)
->  	return entry;
->  }
->  
-> +void dump_rmpentry(u64 pfn)
-
-External function - it better belong to a namespace:
-
-sev_dump_rmpentry()
-
-> +{
-> +	unsigned long pfn_end;
-> +	struct rmpentry *e;
-> +	int level;
-> +
-> +	e = __snp_lookup_rmpentry(pfn, &level);
-> +	if (!e) {
-> +		pr_alert("failed to read RMP entry pfn 0x%llx\n", pfn);
-
-Why alert?
-
-Dumping stuff is either pr_debug or pr_info...
-
-> +		return;
-> +	}
-> +
-> +	if (rmpentry_assigned(e)) {
-> +		pr_alert("RMPEntry paddr 0x%llx [assigned=%d immutable=%d pagesize=%d gpa=0x%lx"
-> +			" asid=%d vmsa=%d validated=%d]\n", pfn << PAGE_SHIFT,
-> +			rmpentry_assigned(e), rmpentry_immutable(e), rmpentry_pagesize(e),
-> +			rmpentry_gpa(e), rmpentry_asid(e), rmpentry_vmsa(e),
-> +			rmpentry_validated(e));
-> +		return;
-> +	}
-> +
-> +	/*
-> +	 * If the RMP entry at the faulting pfn was not assigned, then we do not
-
-Who's "we"?
-
-> +	 * know what caused the RMP violation. To get some useful debug information,
-> +	 * let iterate through the entire 2MB region, and dump the RMP entries if
-> +	 * one of the bit in the RMP entry is set.
-> +	 */
-> +	pfn = pfn & ~(PTRS_PER_PMD - 1);
-> +	pfn_end = pfn + PTRS_PER_PMD;
-> +
-> +	while (pfn < pfn_end) {
-> +		e = __snp_lookup_rmpentry(pfn, &level);
-> +		if (!e)
-> +			return;
-> +
-> +		if (e->low || e->high)
-
-This is going to confuse people because they're going to miss a zero
-entry. Just dump the whole thing.
-
+>   hw/s390x/cpu-topology.c         | 391 ++++++++++++++++++++++++++++++++
+>   hw/s390x/meson.build            |   1 +
+>   hw/s390x/s390-virtio-ccw.c      |   6 +
+>   include/hw/s390x/cpu-topology.h |  74 ++++++
+>   target/s390x/cpu.h              |  47 ++++
+>   5 files changed, 519 insertions(+)
+>   create mode 100644 hw/s390x/cpu-topology.c
+>   create mode 100644 include/hw/s390x/cpu-topology.h
 ...
+> +bool s390_topology_new_cpu(MachineState *ms, int core_id, Error **errp)
+> +{
+> +    S390TopologyBook *book;
+> +    S390TopologySocket *socket;
+> +    S390TopologyCores *cores;
+> +    int nb_cores_per_socket;
+> +    int origin, bit;
+> +
+> +    book = s390_get_topology();
+> +
+> +    nb_cores_per_socket = ms->smp.cores * ms->smp.threads;
+> +
+> +    socket = s390_get_socket(ms, book, core_id / nb_cores_per_socket, errp);
+> +    if (!socket) {
+> +        return false;
+> +    }
+> +
+> +    /*
+> +     * At the core level, each CPU is represented by a bit in a 64bit
+> +     * unsigned long. Set on plug and clear on unplug of a CPU.
+> +     * The firmware assume that all CPU in the core description have the same
+> +     * type, polarization and are all dedicated or shared.
+> +     * In the case a socket contains CPU with different type, polarization
+> +     * or dedication then they will be defined in different CPU containers.
+> +     * Currently we assume all CPU are identical and the only reason to have
+> +     * several S390TopologyCores inside a socket is to have more than 64 CPUs
+> +     * in that case the origin field, representing the offset of the first CPU
+> +     * in the CPU container allows to represent up to the maximal number of
+> +     * CPU inside several CPU containers inside the socket container.
+> +     */
+> +    origin = 64 * (core_id / 64);
 
-> @@ -579,7 +588,7 @@ show_fault_oops(struct pt_regs *regs, unsigned long error_code, unsigned long ad
->  		show_ldttss(&gdt, "TR", tr);
->  	}
->  
-> -	dump_pagetable(address);
-> +	dump_pagetable(address, error_code & X86_PF_RMP);
+Maybe faster:
 
-Eww.
+	origin = core_id & ~63;
 
-I'd prefer to see
+By the way, where is this limitation to 64 coming from? Just because we're 
+using a "unsigned long" for now? Or is this a limitation from the architecture?
 
-	pfn = dump_pagetable(address);
+> +    cores = s390_get_cores(ms, socket, origin, errp);
+> +    if (!cores) {
+> +        return false;
+> +    }
+> +
+> +    bit = 63 - (core_id - origin);
+> +    set_bit(bit, &cores->mask);
+> +    cores->origin = origin;
+> +
+> +    return true;
+> +}
+...
+> diff --git a/hw/s390x/s390-virtio-ccw.c b/hw/s390x/s390-virtio-ccw.c
+> index cc3097bfee..a586875b24 100644
+> --- a/hw/s390x/s390-virtio-ccw.c
+> +++ b/hw/s390x/s390-virtio-ccw.c
+> @@ -43,6 +43,7 @@
+>   #include "sysemu/sysemu.h"
+>   #include "hw/s390x/pv.h"
+>   #include "migration/blocker.h"
+> +#include "hw/s390x/cpu-topology.h"
+>   
+>   static Error *pv_mig_blocker;
+>   
+> @@ -89,6 +90,7 @@ static void s390_init_cpus(MachineState *machine)
+>       /* initialize possible_cpus */
+>       mc->possible_cpu_arch_ids(machine);
+>   
+> +    s390_topology_setup(machine);
 
-	if (error_code & X86_PF_RMP)
-		sev_dump_rmpentry(pfn);
+Is this safe with regards to migration? Did you tried a ping-pong migration 
+from an older QEMU to a QEMU with your modifications and back to the older 
+one? If it does not work, we might need to wire this setup to the machine 
+types...
 
-instead of passing around this SEV-specific arg in generic x86 fault code.
+>       for (i = 0; i < machine->smp.cpus; i++) {
+>           s390x_new_cpu(machine->cpu_type, i, &error_fatal);
+>       }
+> @@ -306,6 +308,10 @@ static void s390_cpu_plug(HotplugHandler *hotplug_dev,
+>       g_assert(!ms->possible_cpus->cpus[cpu->env.core_id].cpu);
+>       ms->possible_cpus->cpus[cpu->env.core_id].cpu = OBJECT(dev);
+>   
+> +    if (!s390_topology_new_cpu(ms, cpu->env.core_id, errp)) {
+> +        return;
+> +    }
+> +
+>       if (dev->hotplugged) {
+>           raise_irq_cpu_hotplug();
+>       }
 
-The change to return the pfn from dump_pagetable() should be a pre-patch ofc.
+  Thomas
 
-Thx.
-
--- 
-Regards/Gruss,
-    Boris.
-
-https://people.kernel.org/tglx/notes-about-netiquette
