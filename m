@@ -2,155 +2,214 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 11D9159EC34
-	for <lists+kvm@lfdr.de>; Tue, 23 Aug 2022 21:25:14 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id D381F59ECF9
+	for <lists+kvm@lfdr.de>; Tue, 23 Aug 2022 22:01:59 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233192AbiHWTYn (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 23 Aug 2022 15:24:43 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37978 "EHLO
+        id S233149AbiHWUBv (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 23 Aug 2022 16:01:51 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54980 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232220AbiHWTYX (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 23 Aug 2022 15:24:23 -0400
-Received: from mx0a-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CC30462AA3;
-        Tue, 23 Aug 2022 11:07:26 -0700 (PDT)
-Received: from pps.filterd (m0098420.ppops.net [127.0.0.1])
-        by mx0b-001b2d01.pphosted.com (8.17.1.5/8.17.1.5) with ESMTP id 27NHovJG022370;
-        Tue, 23 Aug 2022 18:07:18 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : subject :
- from : to : cc : date : in-reply-to : references : content-type :
- content-transfer-encoding : mime-version; s=pp1;
- bh=DqHJa0JLDsCNjice0GhHujd3tZhBg6TouDqEsH4XWHc=;
- b=SH7Dij43VAhxnw8x5uW4KxsIsQdbuuuyWBKZ1sejnWMM4Z/uGlKlSx1BS76HSUBY/Zqx
- wKDyxbwLH8TZHA7Ol/8cCAtwhN2tYixUzEYcAEdQw5TxJOPc+9TvFbXa49SmUYtIdJmA
- HDtltimhAZErthcQbSVpNjovIiWI9ukDg2fDl35lq3x5dYPQIwJimF37GeoLIi88zbH7
- q+BHrsNALd+jdp0Ljnuqnh7XBP9EoBal2QQZrUEHu+i4Garxylay0zp1x+HlYTD6Wua/
- lishv4dyOlEoZ5bed8c6HODyzKyuxRelDMoDtQSriNUqC46NJ2J8C1hAnQ4TknRBjyIl Xw== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0b-001b2d01.pphosted.com (PPS) with ESMTPS id 3j53nf8g0u-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 23 Aug 2022 18:07:18 +0000
-Received: from m0098420.ppops.net (m0098420.ppops.net [127.0.0.1])
-        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 27NHpQjl024009;
-        Tue, 23 Aug 2022 18:07:17 GMT
-Received: from ppma04dal.us.ibm.com (7a.29.35a9.ip4.static.sl-reverse.com [169.53.41.122])
-        by mx0b-001b2d01.pphosted.com (PPS) with ESMTPS id 3j53nf8g05-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 23 Aug 2022 18:07:17 +0000
-Received: from pps.filterd (ppma04dal.us.ibm.com [127.0.0.1])
-        by ppma04dal.us.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 27NHove8006478;
-        Tue, 23 Aug 2022 18:07:16 GMT
-Received: from b01cxnp23034.gho.pok.ibm.com (b01cxnp23034.gho.pok.ibm.com [9.57.198.29])
-        by ppma04dal.us.ibm.com with ESMTP id 3j2q8a1mjg-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 23 Aug 2022 18:07:16 +0000
-Received: from b01ledav006.gho.pok.ibm.com (b01ledav006.gho.pok.ibm.com [9.57.199.111])
-        by b01cxnp23034.gho.pok.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 27NI7FgM46006578
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Tue, 23 Aug 2022 18:07:15 GMT
-Received: from b01ledav006.gho.pok.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id C2EA5AC05B;
-        Tue, 23 Aug 2022 18:07:15 +0000 (GMT)
-Received: from b01ledav006.gho.pok.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 0BD9DAC059;
-        Tue, 23 Aug 2022 18:07:15 +0000 (GMT)
-Received: from li-479af74c-31f9-11b2-a85c-e4ddee11713b.ibm.com (unknown [9.160.161.42])
-        by b01ledav006.gho.pok.ibm.com (Postfix) with ESMTP;
-        Tue, 23 Aug 2022 18:07:14 +0000 (GMT)
-Message-ID: <9d3c715ee2d521dbd25d2f9691a88636304ead32.camel@linux.ibm.com>
-Subject: Re: [PATCH 14/14] vfio/mdev: add mdev available instance checking
- to the core
-From:   Eric Farman <farman@linux.ibm.com>
-To:     Christoph Hellwig <hch@lst.de>,
-        Kirti Wankhede <kwankhede@nvidia.com>,
-        Tony Krowiak <akrowiak@linux.ibm.com>,
-        Halil Pasic <pasic@linux.ibm.com>,
-        Jason Herne <jjherne@linux.ibm.com>,
-        Matthew Rosato <mjrosato@linux.ibm.com>,
-        Zhenyu Wang <zhenyuw@linux.intel.com>,
-        Zhi Wang <zhi.a.wang@intel.com>,
-        Alex Williamson <alex.williamson@redhat.com>
-Cc:     Jason Gunthorpe <jgg@nvidia.com>, kvm@vger.kernel.org,
-        linux-s390@vger.kernel.org, intel-gvt-dev@lists.freedesktop.org,
-        Kevin Tian <kevin.tian@intel.com>
-Date:   Tue, 23 Aug 2022 14:07:14 -0400
-In-Reply-To: <20220822062208.152745-15-hch@lst.de>
-References: <20220822062208.152745-1-hch@lst.de>
-         <20220822062208.152745-15-hch@lst.de>
-Content-Type: text/plain; charset="UTF-8"
-User-Agent: Evolution 3.44.4 (3.44.4-1.fc36) 
-X-TM-AS-GCONF: 00
-X-Proofpoint-ORIG-GUID: pECMpVzkAjUlbyfQrKH-mP9lCgtXdwqm
-X-Proofpoint-GUID: cLPEAf22fnWboPSMYM1YjcZyim1virdg
-Content-Transfer-Encoding: base64
-X-Proofpoint-UnRewURL: 0 URL was un-rewritten
+        with ESMTP id S232882AbiHWUB3 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 23 Aug 2022 16:01:29 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DF810760DF
+        for <kvm@vger.kernel.org>; Tue, 23 Aug 2022 12:14:17 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1661282056;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=Lf4lftfoYaSkjrGheHP3w/cy0mbiwD/FcUC/oTLQSG8=;
+        b=WHW1FD1B9hV+QKXJGXqjw/oGx7+zJG549LwnBXKInX/KmapehPpvpkVlKIOAttGMV+vhFk
+        Uiyo+orv7EPqGH/SJuY0TV/LpW5Qelr+tTzu3Efia+bsJmnu2Ap8MNkgEKetScKN4AcAwD
+        0kIqbRt2f97uXkhGPfAMBjuNDMxUqzg=
+Received: from mimecast-mx02.redhat.com (mx3-rdu2.redhat.com
+ [66.187.233.73]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-62-4g7CuzW_Mrue8FfFDcjs-g-1; Tue, 23 Aug 2022 15:14:13 -0400
+X-MC-Unique: 4g7CuzW_Mrue8FfFDcjs-g-1
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.rdu2.redhat.com [10.11.54.6])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 700411C13941;
+        Tue, 23 Aug 2022 19:14:12 +0000 (UTC)
+Received: from localhost (unknown [10.39.192.115])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id B2A032166B26;
+        Tue, 23 Aug 2022 19:14:11 +0000 (UTC)
+Date:   Tue, 23 Aug 2022 15:14:10 -0400
+From:   Stefan Hajnoczi <stefanha@redhat.com>
+To:     Arseniy Krasnov <AVKrasnov@sberdevices.ru>
+Cc:     Stefano Garzarella <sgarzare@redhat.com>,
+        "David S. Miller" <davem@davemloft.net>,
+        "edumazet@google.com" <edumazet@google.com>,
+        Jakub Kicinski <kuba@kernel.org>,
+        Paolo Abeni <pabeni@redhat.com>,
+        "kys@microsoft.com" <kys@microsoft.com>,
+        "haiyangz@microsoft.com" <haiyangz@microsoft.com>,
+        "sthemmin@microsoft.com" <sthemmin@microsoft.com>,
+        "wei.liu@kernel.org" <wei.liu@kernel.org>,
+        Dexuan Cui <decui@microsoft.com>,
+        Bryan Tan <bryantan@vmware.com>,
+        Vishnu Dasa <vdasa@vmware.com>,
+        Krasnov Arseniy <oxffffaa@gmail.com>,
+        "Michael S. Tsirkin" <mst@redhat.com>,
+        "virtualization@lists.linux-foundation.org" 
+        <virtualization@lists.linux-foundation.org>,
+        "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "linux-hyperv@vger.kernel.org" <linux-hyperv@vger.kernel.org>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        kernel <kernel@sberdevices.ru>,
+        VMware PV-Drivers Reviewers <pv-drivers@vmware.com>
+Subject: Re: [PATCH net-next v4 0/9] vsock: updates for SO_RCVLOWAT handling
+Message-ID: <YwUnAhWauSFSJX+g@fedora>
+References: <de41de4c-0345-34d7-7c36-4345258b7ba8@sberdevices.ru>
 MIME-Version: 1.0
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.205,Aquarius:18.0.895,Hydra:6.0.517,FMLib:17.11.122.1
- definitions=2022-08-23_07,2022-08-22_02,2022-06-22_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 suspectscore=0 mlxscore=0
- clxscore=1015 priorityscore=1501 bulkscore=0 malwarescore=0 adultscore=0
- mlxlogscore=999 lowpriorityscore=0 impostorscore=0 phishscore=0
- spamscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2207270000 definitions=main-2208230070
-X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_EF,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_PASS,
-        T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
+Content-Type: multipart/signed; micalg=pgp-sha256;
+        protocol="application/pgp-signature"; boundary="MY0QU7bnoDA4DEoQ"
+Content-Disposition: inline
+In-Reply-To: <de41de4c-0345-34d7-7c36-4345258b7ba8@sberdevices.ru>
+X-Scanned-By: MIMEDefang 2.78 on 10.11.54.6
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-T24gTW9uLCAyMDIyLTA4LTIyIGF0IDA4OjIyICswMjAwLCBDaHJpc3RvcGggSGVsbHdpZyB3cm90
-ZToKPiBNYW55IG9mIHRoZSBtZGV2IGRyaXZlcnMgdXNlIGEgc2ltcGxlIGNvdW50ZXIgZm9yIGtl
-ZXBpbmcgdHJhY2sgb2YKPiB0aGUKPiBhdmFpbGFibGUgaW5zdGFuY2VzLiBNb3ZlIHRoaXMgY29k
-ZSB0byB0aGUgY29yZSBjb2RlIGFuZCBzdG9yZSB0aGUKPiBjb3VudGVyCj4gaW4gdGhlIG1kZXZf
-cGFyZW50LiBJbXBsZW1lbnQgaXQgdXNpbmcgY29ycmVjdCBsb2NraW5nLCBmaXhpbmcgbWRweS4K
-PiAKPiBEcml2ZXJzIGp1c3QgcHJvdmlkZSB0aGUgdmFsdWUgaW4gdGhlIG1kZXZfZHJpdmVyIGF0
-IHJlZ2lzdHJhdGlvbgo+IHRpbWUKPiBhbmQgdGhlIGNvcmUgY29kZSB0YWtlcyBjYXJlIG9mIG1h
-aW50YWluaW5nIGl0IGFuZCBleHBvc2luZyB0aGUgdmFsdWUKPiBpbgo+IHN5c2ZzLgo+IAo+IFNp
-Z25lZC1vZmYtYnk6IEphc29uIEd1bnRob3JwZSA8amdnQG52aWRpYS5jb20+Cj4gW2hjaDogY291
-bnQgaW5zdGFuY2VzIHBlci1wYXJlbnQgaW5zdGVhZCBvZiBwZXItdHlwZSwgdXNlIGFuIGF0b21p
-Y190Cj4gwqB0byBhdm9pZCB0YWtpbmcgbWRldl9saXN0X2xvY2sgaW4gdGhlIHNob3cgbWV0aG9k
-XQo+IFNpZ25lZC1vZmYtYnk6IENocmlzdG9waCBIZWxsd2lnIDxoY2hAbHN0LmRlPgo+IFJldmll
-d2VkLWJ5OiBLZXZpbiBUaWFuIDxrZXZpbi50aWFuQGludGVsLmNvbT4KPiBSZXZpZXdlZC1ieTog
-S2lydGkgV2Fua2hlZGUgPGt3YW5raGVkZUBudmlkaWEuY29tPgoKLi4uc25pcC4uLgoKPiBkaWZm
-IC0tZ2l0IGEvZHJpdmVycy92ZmlvL21kZXYvbWRldl9jb3JlLmMKPiBiL2RyaXZlcnMvdmZpby9t
-ZGV2L21kZXZfY29yZS5jCj4gaW5kZXggOTNmOGNhZjJlNWY3Ny4uMmQwMzAyOTk1ZDdiNyAxMDA2
-NDQKPiAtLS0gYS9kcml2ZXJzL3ZmaW8vbWRldi9tZGV2X2NvcmUuYwo+ICsrKyBiL2RyaXZlcnMv
-dmZpby9tZGV2L21kZXZfY29yZS5jCj4gQEAgLTcwLDYgKzcwLDcgQEAgaW50IG1kZXZfcmVnaXN0
-ZXJfcGFyZW50KHN0cnVjdCBtZGV2X3BhcmVudAo+ICpwYXJlbnQsIHN0cnVjdCBkZXZpY2UgKmRl
-diwKPiDCoMKgwqDCoMKgwqDCoMKgcGFyZW50LT5tZGV2X2RyaXZlciA9IG1kZXZfZHJpdmVyOwo+
-IMKgwqDCoMKgwqDCoMKgwqBwYXJlbnQtPnR5cGVzID0gdHlwZXM7Cj4gwqDCoMKgwqDCoMKgwqDC
-oHBhcmVudC0+bnJfdHlwZXMgPSBucl90eXBlczsKPiArwqDCoMKgwqDCoMKgwqBhdG9taWNfc2V0
-KCZwYXJlbnQtPmF2YWlsYWJsZV9pbnN0YW5jZXMsIG1kZXZfZHJpdmVyLQo+ID5tYXhfaW5zdGFu
-Y2VzKTsKPiDCoAo+IMKgwqDCoMKgwqDCoMKgwqBpZiAoIW1kZXZfYnVzX2NvbXBhdF9jbGFzcykg
-ewo+IMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgbWRldl9idXNfY29tcGF0X2NsYXNz
-ID0KPiBjbGFzc19jb21wYXRfcmVnaXN0ZXIoIm1kZXZfYnVzIik7Cj4gQEAgLTExNSwxNCArMTE2
-LDE3IEBAIEVYUE9SVF9TWU1CT0wobWRldl91bnJlZ2lzdGVyX3BhcmVudCk7Cj4gwqBzdGF0aWMg
-dm9pZCBtZGV2X2RldmljZV9yZWxlYXNlKHN0cnVjdCBkZXZpY2UgKmRldikKPiDCoHsKPiDCoMKg
-wqDCoMKgwqDCoMKgc3RydWN0IG1kZXZfZGV2aWNlICptZGV2ID0gdG9fbWRldl9kZXZpY2UoZGV2
-KTsKPiAtCj4gLcKgwqDCoMKgwqDCoMKgLyogUGFpcnMgd2l0aCB0aGUgZ2V0IGluIG1kZXZfZGV2
-aWNlX2NyZWF0ZSgpICovCj4gLcKgwqDCoMKgwqDCoMKga29iamVjdF9wdXQoJm1kZXYtPnR5cGUt
-PmtvYmopOwo+ICvCoMKgwqDCoMKgwqDCoHN0cnVjdCBtZGV2X3BhcmVudCAqcGFyZW50ID0gbWRl
-di0+dHlwZS0+cGFyZW50Owo+IMKgCj4gwqDCoMKgwqDCoMKgwqDCoG11dGV4X2xvY2soJm1kZXZf
-bGlzdF9sb2NrKTsKPiDCoMKgwqDCoMKgwqDCoMKgbGlzdF9kZWwoJm1kZXYtPm5leHQpOwo+ICvC
-oMKgwqDCoMKgwqDCoGlmICghcGFyZW50LT5tZGV2X2RyaXZlci0+Z2V0X2F2YWlsYWJsZSkKPiAr
-wqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgYXRvbWljX2luYygmcGFyZW50LT5hdmFpbGFi
-bGVfaW5zdGFuY2VzKTsKPiDCoMKgwqDCoMKgwqDCoMKgbXV0ZXhfdW5sb2NrKCZtZGV2X2xpc3Rf
-bG9jayk7Cj4gwqAKPiArwqDCoMKgwqDCoMKgwqAvKiBQYWlycyB3aXRoIHRoZSBnZXQgaW4gbWRl
-dl9kZXZpY2VfY3JlYXRlKCkgKi8KPiArwqDCoMKgwqDCoMKgwqBrb2JqZWN0X3B1dCgmbWRldi0+
-dHlwZS0+a29iaik7Cj4gKwo+IMKgwqDCoMKgwqDCoMKgwqBkZXZfZGJnKCZtZGV2LT5kZXYsICJN
-REVWOiBkZXN0cm95aW5nXG4iKTsKPiDCoMKgwqDCoMKgwqDCoMKga2ZyZWUobWRldik7Cj4gwqB9
-Cj4gQEAgLTE0NCw2ICsxNDgsMTMgQEAgaW50IG1kZXZfZGV2aWNlX2NyZWF0ZShzdHJ1Y3QgbWRl
-dl90eXBlICp0eXBlLAo+IGNvbnN0IGd1aWRfdCAqdXVpZCkKPiDCoMKgwqDCoMKgwqDCoMKgwqDC
-oMKgwqDCoMKgwqDCoH0KPiDCoMKgwqDCoMKgwqDCoMKgfQo+IMKgCj4gK8KgwqDCoMKgwqDCoMKg
-aWYgKCFkcnYtPmdldF9hdmFpbGFibGUpIHsKPiArwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDC
-oMKgaWYgKGF0b21pY19kZWNfYW5kX3Rlc3QoJnBhcmVudC0KPiA+YXZhaWxhYmxlX2luc3RhbmNl
-cykpIHsKClRoaXMgaXMgc3RpbGwgYnJva2VuLgoKaHR0cHM6Ly9sb3JlLmtlcm5lbC5vcmcvci8y
-MDIyMDcxOTE0NDgwOC5HQTIxNDMxQGxzdC5kZS8KClRoYW5rcywKRXJpYwoKPiArwqDCoMKgwqDC
-oMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoG11dGV4X3VubG9jaygmbWRldl9s
-aXN0X2xvY2spOwo+ICvCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDC
-oMKgcmV0dXJuIC1FVVNFUlM7Cj4gK8KgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoH0KPiAr
-wqDCoMKgwqDCoMKgwqB9Cj4gKwoK
+
+--MY0QU7bnoDA4DEoQ
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
+
+On Fri, Aug 19, 2022 at 05:21:58AM +0000, Arseniy Krasnov wrote:
+> Hello,
+>=20
+> This patchset includes some updates for SO_RCVLOWAT:
+>=20
+> 1) af_vsock:
+>    During my experiments with zerocopy receive, i found, that in some
+>    cases, poll() implementation violates POSIX: when socket has non-
+>    default SO_RCVLOWAT(e.g. not 1), poll() will always set POLLIN and
+>    POLLRDNORM bits in 'revents' even number of bytes available to read
+>    on socket is smaller than SO_RCVLOWAT value. In this case,user sees
+>    POLLIN flag and then tries to read data(for example using  'read()'
+>    call), but read call will be blocked, because  SO_RCVLOWAT logic is
+>    supported in dequeue loop in af_vsock.c. But the same time,  POSIX
+>    requires that:
+>=20
+>    "POLLIN     Data other than high-priority data may be read without
+>                blocking.
+>     POLLRDNORM Normal data may be read without blocking."
+>=20
+>    See https://www.open-std.org/jtc1/sc22/open/n4217.pdf, page 293.
+>=20
+>    So, we have, that poll() syscall returns POLLIN, but read call will
+>    be blocked.
+>=20
+>    Also in man page socket(7) i found that:
+>=20
+>    "Since Linux 2.6.28, select(2), poll(2), and epoll(7) indicate a
+>    socket as readable only if at least SO_RCVLOWAT bytes are available."
+>=20
+>    I checked TCP callback for poll()(net/ipv4/tcp.c, tcp_poll()), it
+>    uses SO_RCVLOWAT value to set POLLIN bit, also i've tested TCP with
+>    this case for TCP socket, it works as POSIX required.
+>=20
+>    I've added some fixes to af_vsock.c and virtio_transport_common.c,
+>    test is also implemented.
+>=20
+> 2) virtio/vsock:
+>    It adds some optimization to wake ups, when new data arrived. Now,
+>    SO_RCVLOWAT is considered before wake up sleepers who wait new data.
+>    There is no sense, to kick waiter, when number of available bytes
+>    in socket's queue < SO_RCVLOWAT, because if we wake up reader in
+>    this case, it will wait for SO_RCVLOWAT data anyway during dequeue,
+>    or in poll() case, POLLIN/POLLRDNORM bits won't be set, so such
+>    exit from poll() will be "spurious". This logic is also used in TCP
+>    sockets.
+>=20
+> 3) vmci/vsock:
+>    Same as 2), but i'm not sure about this changes. Will be very good,
+>    to get comments from someone who knows this code.
+>=20
+> 4) Hyper-V:
+>    As Dexuan Cui mentioned, for Hyper-V transport it is difficult to
+>    support SO_RCVLOWAT, so he suggested to disable this feature for
+>    Hyper-V.
+>=20
+> Thank You
+
+Hi Arseniy,
+Stefano will be online again on Monday. I suggest we wait for him to
+review this series. If it's urgent, please let me know and I'll take a
+look.
+
+Thanks,
+Stefan
+
+> Arseniy Krasnov(9):
+>  vsock: SO_RCVLOWAT transport set callback
+>  hv_sock: disable SO_RCVLOWAT support
+>  virtio/vsock: use 'target' in notify_poll_in callback
+>  vmci/vsock: use 'target' in notify_poll_in callback
+>  vsock: pass sock_rcvlowat to notify_poll_in as target
+>  vsock: add API call for data ready
+>  virtio/vsock: check SO_RCVLOWAT before wake up reader
+>  vmci/vsock: check SO_RCVLOWAT before wake up reader
+>  vsock_test: POLLIN + SO_RCVLOWAT test
+>=20
+>  include/net/af_vsock.h                       |   2 +
+>  net/vmw_vsock/af_vsock.c                     |  33 +++++++-
+>  net/vmw_vsock/hyperv_transport.c             |   7 ++
+>  net/vmw_vsock/virtio_transport_common.c      |   7 +-
+>  net/vmw_vsock/vmci_transport_notify.c        |  10 +--
+>  net/vmw_vsock/vmci_transport_notify_qstate.c |  12 +--
+>  tools/testing/vsock/vsock_test.c             | 108 +++++++++++++++++++++=
+++++++
+>  7 files changed, 162 insertions(+), 17 deletions(-)
+>=20
+>  Changelog:
+>=20
+>  v1 -> v2:
+>  1) Patches for VMCI transport(same as for virtio-vsock).
+>  2) Patches for Hyper-V transport(disabling SO_RCVLOWAT setting).
+>  3) Waiting logic in test was updated(sleep() -> poll()).
+>=20
+>  v2 -> v3:
+>  1) Patches were reordered.
+>  2) Commit message updated in 0005.
+>  3) Check 'transport' pointer in 0001 for NULL.
+>=20
+>  v3 -> v4:
+>  1) vsock_set_rcvlowat() logic changed. Previous version required
+>     assigned transport and always called its 'set_rcvlowat' callback
+>     (if present). Now, assignment is not needed.
+>  2) 0003,0004,0005,0006,0007,0008 - commit messages updated.
+>  3) 0009 - small refactoring and style fixes.
+>  4) RFC tag was removed.
+>=20
+> --=20
+> 2.25.1
+
+--MY0QU7bnoDA4DEoQ
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEEhpWov9P5fNqsNXdanKSrs4Grc8gFAmMFJwIACgkQnKSrs4Gr
+c8hfpwgAq+JCoPsR72mnMAiJ64hEeR7VU4PB29fifgVsNdmttit01L8f3u3rwcJg
+aOcR8aXEJUbQJAcQxrN9nslgW+L9L6UzDUaKGNzWXK4f3a+CBXFA0zMRnJY6/n0l
+vyYbjXb2DqlDhpC/PwjcmQ9QSrcMA35wXqYcIH1AXrk7i1poAM0IzjsTnVr7i8TQ
+C8D8wkDEzHrQRLjdBN0zrQsIvbVByhkFYF/QhQJBr/rNJokjX9JdkOb5fmAWuedB
+GxktTsPfLFov5AIdgtcBhRD5iNeJyLsNh5YIULcweMdbpV3DWRr1umpPk/yzjcD5
+77HdnXIblY58tqlO1bC9+eMpMTVhRw==
+=OvOp
+-----END PGP SIGNATURE-----
+
+--MY0QU7bnoDA4DEoQ--
+
