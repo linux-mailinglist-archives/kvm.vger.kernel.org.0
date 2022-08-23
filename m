@@ -2,194 +2,177 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id EC65759EE2F
-	for <lists+kvm@lfdr.de>; Tue, 23 Aug 2022 23:26:50 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 2E1DD59EF66
+	for <lists+kvm@lfdr.de>; Wed, 24 Aug 2022 00:47:11 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231421AbiHWV0l (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 23 Aug 2022 17:26:41 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41694 "EHLO
+        id S232427AbiHWWrJ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 23 Aug 2022 18:47:09 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44386 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230328AbiHWV0j (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 23 Aug 2022 17:26:39 -0400
-Received: from mail-oa1-x35.google.com (mail-oa1-x35.google.com [IPv6:2001:4860:4864:20::35])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D9A4A89824
-        for <kvm@vger.kernel.org>; Tue, 23 Aug 2022 14:26:37 -0700 (PDT)
-Received: by mail-oa1-x35.google.com with SMTP id 586e51a60fabf-11c5ee9bf43so18367393fac.5
-        for <kvm@vger.kernel.org>; Tue, 23 Aug 2022 14:26:37 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc;
-        bh=88XJiOmSnVqt34ABSh9LJkvlPL2wXTdT9a7x84FgDcA=;
-        b=ajkrkOb9lVgwoqRtIl5yDF1gQr9nA8i+nVQFmuB/HGS6CNUYkxAQAqFePDK7M7oUJG
-         8DxAvm1Jk7hK0Z2tlfw3zE39l+ikoJULVRO6c0JuB4gr53mFI/HOcCcM63guZgl4C2NJ
-         rjIHhsvY8y5+72ivZr26eHrAyZ/Lc+E/MU6efJO0d+D9eDhev2E5C8x750KvkIUc2nHS
-         5yLA8QU4rgU0esf3qz6Pr7iv9v1HobN4VAIyOpu4BBthxVYfwCwv+PfsnqiH2myy+XHR
-         zOQ124DAPj+DOLpphYamwbe4WxoLEH+R3b2C8t67cclrTAn12BRNRgSccxYNIruEdTYP
-         cYJA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc;
-        bh=88XJiOmSnVqt34ABSh9LJkvlPL2wXTdT9a7x84FgDcA=;
-        b=6vvjOr5KJTlGjMgO3esiOrDejaBFEGVykZPHiSlTB4CZsd6//TQFiW3nVKY813qKWW
-         d02Vg+PwhqPOP2GNdBkiEltiDJ+HYXDp7yaxpGmql1wRCrkae7P4QuUS2QXk17qJOjlH
-         tDXVwgzs+XORd2qhIgPPlQ+/AIf1RfpCw71hOnEreb6a/4w0lnEe1PbRQF5+YtGDpv4P
-         OIPeApn/AndwpEYirhWph+wuvL0oGHWlx32R/UxLkE3u+Re/Q4YNwfiHF/RDzQELKOk1
-         kz5bLCAYm+iSM0HT17HzCSHbcpXRwgfkXz/T7KxzGtOsORf21Sx+MryZFgJTbcoj1MeV
-         +FGA==
-X-Gm-Message-State: ACgBeo09yeH6tRzAgivOqlkXjqpAChbhOCgFvuTblY1q5rWWLIlsItGA
-        muf+3PSIjppBiR7iW3RfI3o1vgmMuOamaL3Gy+taxQ==
-X-Google-Smtp-Source: AA6agR67bw1dvH8TFlRIswHkLor4hFRO/RnxVuSxSSMkGuDIVg3Gz6z0M+esF8pmvvVJjhiPMu5rt5pxf8JVsmk1Pww=
-X-Received: by 2002:a05:6870:3282:b0:11d:10ad:a85d with SMTP id
- q2-20020a056870328200b0011d10ada85dmr2261194oac.181.1661289996780; Tue, 23
- Aug 2022 14:26:36 -0700 (PDT)
-MIME-Version: 1.0
-References: <163244601049.30292.5855870305350227855.stgit@bmoger-ubuntu>
-In-Reply-To: <163244601049.30292.5855870305350227855.stgit@bmoger-ubuntu>
-From:   Jim Mattson <jmattson@google.com>
-Date:   Tue, 23 Aug 2022 14:26:24 -0700
-Message-ID: <CALMp9eSKcwChbc=cgYpdrTCtt49S1uuRdYoe83yph3tXGN6a2Q@mail.gmail.com>
-Subject: Re: [PATCH] KVM: x86: Expose Predictive Store Forwarding Disable
-To:     Babu Moger <babu.moger@amd.com>
-Cc:     tglx@linutronix.de, mingo@redhat.com, bp@alien8.de, x86@kernel.org,
-        pbonzini@redhat.com, hpa@zytor.com, seanjc@google.com,
-        vkuznets@redhat.com, wanpengli@tencent.com, joro@8bytes.org,
-        tony.luck@intel.com, peterz@infradead.org,
-        kyung.min.park@intel.com, wei.huang2@amd.com, jgross@suse.com,
-        andrew.cooper3@citrix.com, linux-kernel@vger.kernel.org,
-        kvm@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-        T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL
-        autolearn=ham autolearn_force=no version=3.4.6
+        with ESMTP id S229825AbiHWWrH (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 23 Aug 2022 18:47:07 -0400
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C5E8C883F4;
+        Tue, 23 Aug 2022 15:47:06 -0700 (PDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id 5F02E61701;
+        Tue, 23 Aug 2022 22:47:06 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id AFC92C433D6;
+        Tue, 23 Aug 2022 22:47:05 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1661294825;
+        bh=mIdkXaJU12XPc/v1eI1SmEBn2eXK40Tc2GKZ2bh56IQ=;
+        h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+        b=PvKWuYH7LzURRWG2uBfTZoqdR2VuQQqVwYk91ZT4xs+pNAX8p0ZPGebqwKGcGvWsw
+         GoUsisFbfXbphw/ArYdEGhpuApqBSfKBE1hCpdK0MtV5idNvsmpHu4izogGKT4agwJ
+         didDFhjjvxPLmLCTKMkhCG7QeQTsf7RLoFgcC6e5tFw4gcSQJDZ6CVaAGQOa6SApau
+         zFP5jzetWE1fQW5n6Ts6y7cE8gcK3rMH6LJsw1t4kBC1LzIOyRQ1weWVya8eBlE6j8
+         sGSESGojwA+XkGsawcc45JFYMZnl9aP7YRxwddrD68qtzwFb8Eq2/hEwVZR9SjbKfY
+         nxiP9lu/ioTug==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=why.misterjones.org)
+        by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+        (Exim 4.95)
+        (envelope-from <maz@kernel.org>)
+        id 1oQcfn-005JQ9-Di;
+        Tue, 23 Aug 2022 23:47:03 +0100
+Date:   Tue, 23 Aug 2022 23:47:03 +0100
+Message-ID: <878rnewpaw.wl-maz@kernel.org>
+From:   Marc Zyngier <maz@kernel.org>
+To:     Peter Xu <peterx@redhat.com>
+Cc:     Gavin Shan <gshan@redhat.com>, kvmarm@lists.cs.columbia.edu,
+        linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org, linux-doc@vger.kernel.org,
+        linux-kselftest@vger.kernel.org, pbonzini@redhat.com,
+        corbet@lwn.net, james.morse@arm.com, alexandru.elisei@arm.com,
+        suzuki.poulose@arm.com, oliver.upton@linux.dev,
+        catalin.marinas@arm.com, will@kernel.org, shuah@kernel.org,
+        seanjc@google.com, dmatlack@google.com, bgardon@google.com,
+        ricarkol@google.com, zhenyzha@redhat.com, shan.gavin@gmail.com
+Subject: Re: [PATCH v1 1/5] KVM: arm64: Enable ring-based dirty memory tracking
+In-Reply-To: <YwVEoM1pj2MPCELp@xz-m1.local>
+References: <20220819005601.198436-1-gshan@redhat.com>
+        <20220819005601.198436-2-gshan@redhat.com>
+        <87lerkwtm5.wl-maz@kernel.org>
+        <41fb5a1f-29a9-e6bb-9fab-4c83a2a8fce5@redhat.com>
+        <87fshovtu0.wl-maz@kernel.org>
+        <171d0159-4698-354b-8b2f-49d920d03b1b@redhat.com>
+        <YwTc++Lz6lh3aR4F@xz-m1.local>
+        <87bksawz0w.wl-maz@kernel.org>
+        <YwVEoM1pj2MPCELp@xz-m1.local>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/27.1
+ (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: peterx@redhat.com, gshan@redhat.com, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org, linux-kernel@vger.kernel.org, linux-doc@vger.kernel.org, linux-kselftest@vger.kernel.org, pbonzini@redhat.com, corbet@lwn.net, james.morse@arm.com, alexandru.elisei@arm.com, suzuki.poulose@arm.com, oliver.upton@linux.dev, catalin.marinas@arm.com, will@kernel.org, shuah@kernel.org, seanjc@google.com, dmatlack@google.com, bgardon@google.com, ricarkol@google.com, zhenyzha@redhat.com, shan.gavin@gmail.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+X-Spam-Status: No, score=-7.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_HI,
+        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Sep 23, 2021 at 6:15 PM Babu Moger <babu.moger@amd.com> wrote:
->
-> From: Babu Moger <Babu.Moger@amd.com>
->
-> Predictive Store Forwarding: AMD Zen3 processors feature a new
-> technology called Predictive Store Forwarding (PSF).
->
-> PSF is a hardware-based micro-architectural optimization designed
-> to improve the performance of code execution by predicting address
-> dependencies between loads and stores.
->
-> How PSF works:
->
-> It is very common for a CPU to execute a load instruction to an address
-> that was recently written by a store. Modern CPUs implement a technique
-> known as Store-To-Load-Forwarding (STLF) to improve performance in such
-> cases. With STLF, data from the store is forwarded directly to the load
-> without having to wait for it to be written to memory. In a typical CPU,
-> STLF occurs after the address of both the load and store are calculated
-> and determined to match.
->
-> PSF expands on this by speculating on the relationship between loads and
-> stores without waiting for the address calculation to complete. With PSF,
-> the CPU learns over time the relationship between loads and stores. If
-> STLF typically occurs between a particular store and load, the CPU will
-> remember this.
->
-> In typical code, PSF provides a performance benefit by speculating on
-> the load result and allowing later instructions to begin execution
-> sooner than they otherwise would be able to.
->
-> The details of security analysis of AMD predictive store forwarding is
-> documented here.
-> https://www.amd.com/system/files/documents/security-analysis-predictive-s=
-tore-forwarding.pdf
->
-> Predictive Store Forwarding controls:
-> There are two hardware control bits which influence the PSF feature:
-> - MSR 48h bit 2 =E2=80=93 Speculative Store Bypass (SSBD)
-> - MSR 48h bit 7 =E2=80=93 Predictive Store Forwarding Disable (PSFD)
->
-> The PSF feature is disabled if either of these bits are set.  These bits
-> are controllable on a per-thread basis in an SMT system. By default, both
-> SSBD and PSFD are 0 meaning that the speculation features are enabled.
->
-> While the SSBD bit disables PSF and speculative store bypass, PSFD only
-> disables PSF.
->
-> PSFD may be desirable for software which is concerned with the
-> speculative behavior of PSF but desires a smaller performance impact than
-> setting SSBD.
->
-> Support for PSFD is indicated in CPUID Fn8000_0008 EBX[28].
-> All processors that support PSF will also support PSFD.
->
-> Linux kernel does not have the interface to enable/disable PSFD yet. Plan
-> here is to expose the PSFD technology to KVM so that the guest kernel can
-> make use of it if they wish to.
->
-> Signed-off-by: Babu Moger <Babu.Moger@amd.com>
-> ---
-> NOTE: Per earlier discussions, Linux kernel interface for PSF mitigation
-> is not included in this series. This series only exposes the PSFD technol=
-ogy
-> to KVM guests. Here is the link for earlier discussion.
-> https://lore.kernel.org/lkml/20210517220059.6452-1-rsaripal@amd.com/
-> https://lore.kernel.org/lkml/20210505190923.276051-1-rsaripal@amd.com/
-> https://lore.kernel.org/lkml/20210430131733.192414-1-rsaripal@amd.com/
-> https://lore.kernel.org/lkml/20210428160349.158774-1-rsaripal@amd.com/
-> https://lore.kernel.org/lkml/20210422171013.50207-1-rsaripal@amd.com/
-> https://lore.kernel.org/lkml/20210421090117.22315-1-rsaripal@amd.com/
->
->  arch/x86/include/asm/cpufeatures.h |    1 +
->  arch/x86/kvm/cpuid.c               |    2 +-
->  2 files changed, 2 insertions(+), 1 deletion(-)
->
-> diff --git a/arch/x86/include/asm/cpufeatures.h b/arch/x86/include/asm/cp=
-ufeatures.h
-> index d0ce5cfd3ac1..7d6268ede35a 100644
-> --- a/arch/x86/include/asm/cpufeatures.h
-> +++ b/arch/x86/include/asm/cpufeatures.h
-> @@ -313,6 +313,7 @@
->  #define X86_FEATURE_AMD_SSBD           (13*32+24) /* "" Speculative Stor=
-e Bypass Disable */
->  #define X86_FEATURE_VIRT_SSBD          (13*32+25) /* Virtualized Specula=
-tive Store Bypass Disable */
->  #define X86_FEATURE_AMD_SSB_NO         (13*32+26) /* "" Speculative Stor=
-e Bypass is fixed in hardware. */
-> +#define X86_FEATURE_PSFD               (13*32+28) /* Predictive Store Fo=
-rwarding Disable */
->
->  /* Thermal and Power Management Leaf, CPUID level 0x00000006 (EAX), word=
- 14 */
->  #define X86_FEATURE_DTHERM             (14*32+ 0) /* Digital Thermal Sen=
-sor */
-> diff --git a/arch/x86/kvm/cpuid.c b/arch/x86/kvm/cpuid.c
-> index fe03bd978761..ba773919f21d 100644
-> --- a/arch/x86/kvm/cpuid.c
-> +++ b/arch/x86/kvm/cpuid.c
-> @@ -500,7 +500,7 @@ void kvm_set_cpu_caps(void)
->         kvm_cpu_cap_mask(CPUID_8000_0008_EBX,
->                 F(CLZERO) | F(XSAVEERPTR) |
->                 F(WBNOINVD) | F(AMD_IBPB) | F(AMD_IBRS) | F(AMD_SSBD) | F=
-(VIRT_SSBD) |
-> -               F(AMD_SSB_NO) | F(AMD_STIBP) | F(AMD_STIBP_ALWAYS_ON)
-> +               F(AMD_SSB_NO) | F(AMD_STIBP) | F(AMD_STIBP_ALWAYS_ON) | F=
-(PSFD)
->         );
->
->         /*
->
->
+On Tue, 23 Aug 2022 22:20:32 +0100,
+Peter Xu <peterx@redhat.com> wrote:
+> 
+> On Tue, Aug 23, 2022 at 08:17:03PM +0100, Marc Zyngier wrote:
+> > I don't think we really need this check on the hot path. All we need
+> > is to make the request sticky until userspace gets their act together
+> > and consumes elements in the ring. Something like:
+> > 
+> > diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
+> > index 986cee6fbc7f..e8ed5e1af159 100644
+> > --- a/arch/arm64/kvm/arm.c
+> > +++ b/arch/arm64/kvm/arm.c
+> > @@ -747,6 +747,14 @@ static int check_vcpu_requests(struct kvm_vcpu *vcpu)
+> >  
+> >  		if (kvm_check_request(KVM_REQ_SUSPEND, vcpu))
+> >  			return kvm_vcpu_suspend(vcpu);
+> > +
+> > +		if (kvm_check_request(KVM_REQ_RING_SOFT_FULL, vcpu) &&
+> > +		    kvm_dirty_ring_soft_full(vcpu)) {
+> > +			kvm_make_request(KVM_REQ_RING_SOFT_FULL, vcpu);
+> > +			vcpu->run->exit_reason = KVM_EXIT_DIRTY_RING_FULL;
+> > +			trace_kvm_dirty_ring_exit(vcpu);
+> > +			return 0;
+> > +		}
+> >  	}
+> >  
+> >  	return 1;
+> 
+> Right, this seems working.  We can also use kvm_test_request() here.
+> 
+> > 
+> > 
+> > However, I'm a bit concerned by the reset side of things. It iterates
+> > over the vcpus and expects the view of each ring to be consistent,
+> > even if userspace is hacking at it from another CPU. For example, I
+> > can't see what guarantees that the kernel observes the writes from
+> > userspace in the order they are being performed (the documentation
+> > provides no requirements other than "it must collect the dirty GFNs in
+> > sequence", which doesn't mean much from an ordering perspective).
+> > 
+> > I can see that working on a strongly ordered architecture, but on
+> > something as relaxed as ARM, the CPUs may^Wwill aggressively reorder
+> > stuff that isn't explicitly ordered. I have the feeling that a CAS
+> > operation on both sides would be enough, but someone who actually
+> > understands how this works should have a look...
+> 
+> I definitely don't think I 100% understand all the ordering things since
+> they're complicated.. but my understanding is that the reset procedure
+> didn't need memory barrier (unlike pushing, where we have explicit wmb),
+> because we assumed the userapp is not hostile so logically it should only
+> modify the flags which is a 32bit field, assuming atomicity guaranteed.
 
-For consistency, should this feature be renamed AMD_PSFD, now that
-Intel is enumerating PSFD with CPUID.(EAX=3D7,ECX=3D2):EDX.PSFD[bit 0]?
-See https://www.intel.com/content/www/us/en/developer/articles/technical/so=
-ftware-security-guidance/technical-documentation/cpuid-enumeration-and-arch=
-itectural-msrs.html.
+Atomicity doesn't guarantee ordering, unfortunately. Take the
+following example: CPU0 is changing a bunch of flags for GFNs A, B, C,
+D that exist in the ring in that order, and CPU1 performs an ioctl to
+reset the page state.
 
-And, Paolo, why are we carrying X86_FEATURE_PSFD as a private #define
-in KVM rather than putting it where it belongs in cpufeatures.h?
+CPU0:
+    write_flag(A, KVM_DIRTY_GFN_F_RESET)
+    write_flag(B, KVM_DIRTY_GFN_F_RESET)
+    write_flag(C, KVM_DIRTY_GFN_F_RESET)
+    write_flag(D, KVM_DIRTY_GFN_F_RESET)
+    [...]
+
+CPU1:
+   ioctl(KVM_RESET_DIRTY_RINGS)
+
+Since CPU0 writes do not have any ordering, CPU1 can observe the
+writes in a sequence that have nothing to do with program order, and
+could for example observe that GFN A and D have been reset, but not B
+and C. This in turn breaks the logic in the reset code (B, C, and D
+don't get reset), despite userspace having followed the spec to the
+letter. If each was a store-release (which is the case on x86), it
+wouldn't be a problem, but nothing calls it in the documentation.
+
+Maybe that's not a big deal if it is expected that each CPU will issue
+a KVM_RESET_DIRTY_RINGS itself, ensuring that it observe its own
+writes. But expecting this to work across CPUs without any barrier is
+wishful thinking.
+
+> IIRC we used to discuss similar questions on "what if the user is hostile
+> and wants to hack the process by messing up with the ring", and our
+> conclusion was as long as the process wouldn't mess up anything outside
+> itself it should be okay. E.g. It should not be able to either cause the
+> host to misfunction, or trigger kernel warnings in dmesg, etc..
+
+I'm not even discussing safety here. I'm purely discussing the
+interactions between userspace and kernel based on the documentation
+and the existing kernel code.
+
+Thanks,
+
+	M.
+
+-- 
+Without deviation from the norm, progress is not possible.
