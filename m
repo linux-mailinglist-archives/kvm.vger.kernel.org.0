@@ -2,177 +2,186 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 799E359EFC2
-	for <lists+kvm@lfdr.de>; Wed, 24 Aug 2022 01:38:23 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 72C6259EFF4
+	for <lists+kvm@lfdr.de>; Wed, 24 Aug 2022 01:48:26 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231142AbiHWXiB (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 23 Aug 2022 19:38:01 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40822 "EHLO
+        id S230329AbiHWXre (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 23 Aug 2022 19:47:34 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46836 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229445AbiHWXiA (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 23 Aug 2022 19:38:00 -0400
-Received: from mail-pl1-x62b.google.com (mail-pl1-x62b.google.com [IPv6:2607:f8b0:4864:20::62b])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2A7087FE67
-        for <kvm@vger.kernel.org>; Tue, 23 Aug 2022 16:37:59 -0700 (PDT)
-Received: by mail-pl1-x62b.google.com with SMTP id y4so14189519plb.2
-        for <kvm@vger.kernel.org>; Tue, 23 Aug 2022 16:37:59 -0700 (PDT)
+        with ESMTP id S229590AbiHWXrc (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 23 Aug 2022 19:47:32 -0400
+Received: from mail-yw1-x1149.google.com (mail-yw1-x1149.google.com [IPv6:2607:f8b0:4864:20::1149])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5B0C08A7C7
+        for <kvm@vger.kernel.org>; Tue, 23 Aug 2022 16:47:31 -0700 (PDT)
+Received: by mail-yw1-x1149.google.com with SMTP id 00721157ae682-33580e26058so263444657b3.4
+        for <kvm@vger.kernel.org>; Tue, 23 Aug 2022 16:47:31 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc;
-        bh=IaZ4H3tMkMrOvE5Cs902sGYZoIVCWhohAIktvLaNyXo=;
-        b=iRiolzYbbyCama5Mgm7/cxmWWehq0CPsDYqHF+QXaUgJhsjIPZT7vp9PzHV1ivY/JC
-         uP8VjwHsXwE+aYPYP91/h8/UwnVz28L3bWrC4F7PHQSlmkkQ5nlfsqkJhrGjPyNTLLkr
-         V5Ir2PPSZ0jL6SBPHYAQyicQyKk05cuSoOvcrPNyvc8mM8xDwDLu9KFDj9r5sQ1h7pRI
-         f0hXzf8qA0Jk4A+qrHl8LRKkBwWPce8Gge90xuTSY17965Xi31/m4pvCWy4Q0MY7zKZw
-         BVLB4imHbmRcvB+AEP+QyIkqN0onjSPXiUzOR8gUWcAmj4DF5NvinzMwx1KADdyEYUkz
-         H4MQ==
+        h=cc:to:from:subject:mime-version:message-id:date:from:to:cc;
+        bh=lI8RVWeGiy/V5ixpWNIycXsB5AxR7O8H8gTuNCP1X3Y=;
+        b=Z/MYPuRIYLWOvU+H5Y/4TJkXS3p4QothM/xmo7VtKPYYs4Ah+erSdsyShoPZlJyfJN
+         toHS+uotvqskkWRJ2OcNF2p/gkUx79zmGf1LZ+1E7RVLE061+4NJmCDVFLHmZix4j6t4
+         /7odh6OD7df9R4lo355CzWgtijXfaNiX9b8/EO16by1LXTYbR936gkJPsqaI+40t/qM8
+         oVfIOHdf0JLU9K1PZaH8IwxVHlYG6+emhRIjOjHTYKZQ04WfVquri/v+JoJGzDl7j5MJ
+         xZPUDO+afV1cFOB6z6DHOTm/p77wBkzXQPW+8kK5Hlotqi1/RKXoMzxV2g+10tQUoYxS
+         dJ4g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc;
-        bh=IaZ4H3tMkMrOvE5Cs902sGYZoIVCWhohAIktvLaNyXo=;
-        b=p+BNiwNb32cvTapKhhrGWsfPb+Smmm2hfA3vyrxI5O5DciWYom1yFWt3x2zvqXVnb1
-         WQJ+XTg72d9rQYV6Bn8exae2Mmg8mAoRfL89+8sj4o0bpWLC5OxO8mP9f/6ktSRrKn/5
-         pPvjC7ZPBCKKqrpIK315nrZ90GvmKBEfxQKKBdFocBZM7xgrYFqorlqUK43EMHh1vuyS
-         JyC/XeW5w0LiMX4v7Z/5a83LNacq/mFJrgOvAm2BnLWmp68yuzsc5t1+UuGXzu0PpotY
-         eeQuFCx32jUAW19xFg/OUXlJIqwJ/dD1OXxPQSsGwx5hi+Z/GP1HW6OY0Q8IxV384hKo
-         iCeQ==
-X-Gm-Message-State: ACgBeo2AKr7aBGAYzbqaIRrxcl1poNlfDPxs4W+tQ5um2eCxF1hKIxmc
-        zzrpbYrUjA7M9IPSUA1nxKu8cw==
-X-Google-Smtp-Source: AA6agR5dtwFt87kPaOsLnvwsR27B8RnElI2bmBpqeYbCUDJ5aoQeIUf33cxZIJ+bDePMRUT00Yfmew==
-X-Received: by 2002:a17:903:120d:b0:171:4fa0:7b4a with SMTP id l13-20020a170903120d00b001714fa07b4amr26013097plh.45.1661297878488;
-        Tue, 23 Aug 2022 16:37:58 -0700 (PDT)
-Received: from google.com (220.181.82.34.bc.googleusercontent.com. [34.82.181.220])
-        by smtp.gmail.com with ESMTPSA id j7-20020a170903024700b00172ea8ff334sm5219402plh.7.2022.08.23.16.37.57
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 23 Aug 2022 16:37:57 -0700 (PDT)
-Date:   Tue, 23 Aug 2022 16:37:53 -0700
+        h=cc:to:from:subject:mime-version:message-id:date:x-gm-message-state
+         :from:to:cc;
+        bh=lI8RVWeGiy/V5ixpWNIycXsB5AxR7O8H8gTuNCP1X3Y=;
+        b=XV4rnMmdjwFkP5WeKdRypoZSj3YIcKImwYaRG3/8Dhc0vKE5kjsXwMiqb7FCM0cGPI
+         itDyRZxOSpPu8343iHoX4E27g9r051cTAH42SZW1v8mScSiHuJFb81r5ZJYXbEQNY1Iq
+         H6+3uTONliB07i4yvuceQArVP6Re+MhZqPYWYYxw8X2tfNfoUdYn5dl7hatU4lbNJ1IN
+         h5zsDBsGK5JeSPntHXLvdx8vKZsMQ6ym2oo2edkaADuFWc8o2wkfW74n95Qgf17r0FRd
+         YRNeh/9/5hwH1t4hbl67K/wNhh0Mv444smvd857Z5ZPdfU2MX9oBhcj8sURJ05o9Pq8K
+         WMmg==
+X-Gm-Message-State: ACgBeo3ZCBog1ZnJN4z6A0zoFrb9/NYarySpmAx2P0+i9ery6wlBh1iw
+        UkF83Uo1bMY9cpAoE6v63RpOVfNO0iNOjcTPr7/mNL7xTHJJpKpqo4CDgUqNgGUYPOoPh04fbG0
+        yAbVQ4aem2fnIDEQ7Bf0ZytX0MbH+4bAEFE6lurp3zSln0wBgjp+wrOBOxjTc+4E=
+X-Google-Smtp-Source: AA6agR7FEUM+UiCqKmbZaKSVuJLapiaSgSGc2xyg1kI5PP9P/z6BPcYx3aCDwK5KuIg5SonqG5GdhaofPEYMIg==
+X-Received: from ricarkol4.c.googlers.com ([fda3:e722:ac3:cc00:20:ed76:c0a8:1248])
+ (user=ricarkol job=sendgmr) by 2002:a81:7183:0:b0:31f:63f4:1743 with SMTP id
+ m125-20020a817183000000b0031f63f41743mr28768685ywc.176.1661298450536; Tue, 23
+ Aug 2022 16:47:30 -0700 (PDT)
+Date:   Tue, 23 Aug 2022 23:47:14 +0000
+Message-Id: <20220823234727.621535-1-ricarkol@google.com>
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.37.1.595.g718a3a8f04-goog
+Subject: [PATCH v5 00/13] KVM: selftests: Add aarch64/page_fault_test
 From:   Ricardo Koller <ricarkol@google.com>
-To:     Sean Christopherson <seanjc@google.com>
-Cc:     Andrew Jones <andrew.jones@linux.dev>, kvm@vger.kernel.org,
-        kvmarm@lists.cs.columbia.edu, drjones@redhat.com, maz@kernel.org,
-        bgardon@google.com, dmatlack@google.com, pbonzini@redhat.com,
-        axelrasmussen@google.com
-Subject: Re: [PATCH v4 09/13] KVM: selftests: aarch64: Add
- aarch64/page_fault_test
-Message-ID: <YwVk0a/FTfYS1nNf@google.com>
-References: <20220624213257.1504783-1-ricarkol@google.com>
- <20220624213257.1504783-10-ricarkol@google.com>
- <Ytir/hbU9neBaYqb@google.com>
- <YtrcCeHqBcwy+Mf6@google.com>
- <YtrqVwSK42KbKckf@google.com>
- <20220723082201.ifme5dipygt5r2wx@kamzik>
- <YuAvQ0C8ZprtJ4US@google.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <YuAvQ0C8ZprtJ4US@google.com>
-X-Spam-Status: No, score=-14.5 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        ENV_AND_HDR_SPF_MATCH,FSL_HELO_FAKE,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,
-        SPF_PASS,T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL
-        autolearn=no autolearn_force=no version=3.4.6
+To:     kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu,
+        andrew.jones@linux.dev
+Cc:     pbonzini@redhat.com, maz@kernel.org, seanjc@google.com,
+        alexandru.elisei@arm.com, eric.auger@redhat.com, oupton@google.com,
+        reijiw@google.com, rananta@google.com, bgardon@google.com,
+        dmatclack@google.com, axelrasmussen@google.com,
+        Ricardo Koller <ricarkol@google.com>
+Content-Type: text/plain; charset="UTF-8"
+X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Jul 26, 2022 at 06:15:31PM +0000, Sean Christopherson wrote:
-> On Sat, Jul 23, 2022, Andrew Jones wrote:
-> > On Fri, Jul 22, 2022 at 06:20:07PM +0000, Sean Christopherson wrote:
-> > > On Fri, Jul 22, 2022, Ricardo Koller wrote:
-> > > > What about dividing the changes in two.
-> > > > 
-> > > > 	1. Will add the struct to "__vm_create()" as part of this
-> > > > 	series, and then use it in this commit. There's only one user
-> > > > 
-> > > > 		dirty_log_test.c:   vm = __vm_create(mode, 1, extra_mem_pages);
-> > > > 
-> > > > 	so that would avoid having to touch every test as part of this patchset.
-> > > > 
-> > > > 	2. I can then send another series to add support for all the other
-> > > > 	vm_create() functions.
-> > > > 
-> > > > Alternatively, I can send a new series that does 1 and 2 afterwards.
-> > > > WDYT?
-> > > 
-> > > Don't do #2, ever. :-)  The intent of having vm_create() versus is __vm_create()
-> > > is so that tests that don't care about things like backing pages don't have to
-> > > pass in extra params.  I very much want to keep that behavior, i.e. I don't want
-> > > to extend vm_create() at all.  IMO, adding _anything_ is a slippery slope, e.g.
-> > > why are the backing types special enough to get a param, but thing XYZ isn't?
-> > > 
-> > > Thinking more, the struct idea probably isn't going to work all that well.  It
-> > > again puts the selftests into a state where it becomes difficult to control one
-> > > setting and ignore the rest, e.g. the dirty_log_test and anything else with extra
-> > > pages suddenly has to care about the backing type for page tables and code.
-> > > 
-> > > Rather than adding a struct, what about extending the @mode param?  We already
-> > > have vm_mem_backing_src_type, we just need a way to splice things together.  There
-> > > are a total of four things we can control: primary mode, and then code, data, and
-> > > page tables backing types.
-> > > 
-> > > So, turn @mode into a uint32_t and carve out 8 bits for each of those four "modes".
-> > > The defaults Just Work because VM_MEM_SRC_ANONYMOUS==0.
-> > 
-> > Hi Sean,
-> > 
-> > How about merging both proposals and turn @mode into a struct and pass
-> > around a pointer to it? Then, when calling something that requires @mode,
-> > if @mode is NULL, the called function would use vm_arch_default_mode()
-> > to get a pointer to the arch-specific default mode struct.
-> 
-> One tweak: rather that use @NULL as a magic param, #define VM_MODE_DEFAULT to
-> point at a global struct, similar to what is already done for __aarch64__.
-> 
-> E.g.
-> 
-> 	__vm_create(VM_MODE_DEFAULT, nr_runnable_vcpus, 0);
-> 
-> does a much better job of self-documenting its behavior than this:
-> 
-> 	__vm_create(NULL, nr_runnable_vcpus, 0);
-> 
-> > If a test needs to modify the parameters then it can construct a mode struct
-> > from scratch or start with a copy of the default. As long as all members of
-> > the struct representing parameters, such as backing type, have defaults
-> > mapped to zero for the struct members, then we shouldn't be adding any burden
-> > to users that don't care about other parameters (other than ensuring their
-> > @mode struct was zero initialized).
-> 
-> I was hoping to avoid forcing tests to build a struct, but looking at all the
-> existing users, they either use for_each_guest_mode() or just pass VM_MODE_DEFAULT,
-> so in practice it's a complete non-issue.
-> 
-> The page fault usage will likely be similar, e.g. programatically generate the set
-> of combinations to test.
-> 
-> So yeah, let's try the struct approach.
+This series adds a new aarch64 selftest for testing stage 2 fault handling for
+various combinations of guest accesses (e.g., write, S1PTW), backing sources
+(e.g., anon), and types of faults (e.g., read on hugetlbfs with a hole, write
+on a readonly memslot). Each test tries a different combination and then checks
+that the access results in the right behavior (e.g., uffd faults with the right
+address and write/read flag). Some interesting combinations are:
 
-Thank you both for the suggestions.
+- loading an instruction leads to a stage 1 page-table-walk that misses on
+  stage 2 because the backing memslot for the page table it not in host memory
+  (a hole was punched right there) and the fault is handled using userfaultfd.
+  The expected behavior is that this leads to a userfaultfd fault marked as a
+  write. See commit c4ad98e4b72c ("KVM: arm64: Assume write fault on S1PTW
+  permission fault on instruction fetch") for why that's a write.
+- a cas (compare-and-swap) on a readonly memslot leads to a failed vcpu run.
+- write-faulting on a memslot that's marked for userfaultfd handling and dirty
+  logging should result in a uffd fault and having the respective bit set in
+  the dirty log.
 
-About to send v5 with the suggested changes, with a slight modification.
-V5 adds "struct kvm_vm_mem_params" which includes a "guest mode" field.
-The suggestion was to overload "guest mode". What I have doesn't change
-the meaning of "guest mode", and just keeps everything dealing with
-"guest mode" the same (like guest_mode.c).
+The first 8 commits of this series add library support. The first one adds a
+new userfaultfd library (out of demand_paging_test.c). The next 3 add some
+library functions to get the GPA of a PTE, and to get the fd of a backing
+source. Commit 6 fixes a leaked fd when using shared backing stores. The last 5
+commits add the new selftest, one type of test at a time. It first adds core
+tests, then uffd, then dirty logging, then readonly memslots tests, and finally
+combinations of the previous ones (like uffd and dirty logging at the same
+time).
 
-The main changes are:
+v4 -> v5: https://lore.kernel.org/kvmarm/20220624213257.1504783-1-ricarkol@google.com/
+- biggest change: followed suggestion from Sean and Andrew regarding a new
+  arg for vm_create() to specify the guest memory layout. That's taken care
+  of with these two new commits:
+	KVM: selftests: Use the right memslot for code, page-tables, and data allocations
+	KVM: selftests: Change ____vm_create() to take struct kvm_vm_mem_params
+  plus the respective changes in the page_fault_test itself (mostly code reduction).
+- dropped some commits that are not needed after the above change:
+	KVM: selftests: aarch64: Export _virt_pg_map with a pt_memslot arg
+	KVM: selftests: Add vm_alloc_page_table_in_memslot library function
+	KVM: selftests: Add vm_mem_region_get_src_fd library function
+- addressed Oliver comments in commit "KVM: selftests: aarch64: Add
+  aarch64/page_fault_test"
+- collect r-b's from Andrew
 
-1. adding a struct kvm_vm_mem_params that defines the memory layout:
+v3 -> v4: https://lore.kernel.org/kvmarm/20220408004120.1969099-1-ricarkol@google.com/
+- rebased on top of latest kvm/queue.
+- addressed Oliver comments: vm_get_pte_gpa rename, page_fault_test and
+  other nits.
+- adding MAIR entry for MT_DEVICE_nGnRnE. The value and indices are both
+  0, so the change is really esthetic.
+- allocating less memory for the test (smaller memslots).
+- better comments, including an ascii diagram about how memory is laid out
+  for the test.
 
-	-struct kvm_vm *____vm_create(enum vm_guest_mode mode, uint64_t nr_pages);
-	+struct kvm_vm *____vm_create(struct kvm_vm_mem_params *mem_params);
+v2 -> v3:
+Thank you very much Oliver and Ben
+- collected r-b's from Ben. [Ben]
+- moved some defitions (like TCR_EL1_HA) to common headers. [Oliver]
+- use FIELD_GET and ARM64_FEATURE_MASK. [Oliver]
+- put test data in a macro. [Oliver]
+- check for DCZID_EL1.DZP=0b0 before using "dc zva". [Oliver]
+- various new comments. [Oliver]
+- use 'asm' instead of hand assembly. [Oliver]
+- don't copy test descriptors into the guest. [Oliver]
+- rename large_page_size into backing_page_size. [Oliver]
+- add enumeration for memory types (4 is MT_NORMAL). [Oliver]
+- refactored the test macro definitions.
 
-2. adding memslot vm->memslot.[code|pt|data] and change all allocators
-to use the right memslot, e.g.,: lib/elf should use the code memslot.
+v1 -> v2: https://lore.kernel.org/kvmarm/20220323225405.267155-1-ricarkol@google.com/
+- collect r-b from Ben for the memslot lib commit. [Ben]
+- move userfaultfd desc struct to header. [Ben]
+- move commit "KVM: selftests: Add vm_mem_region_get_src_fd library function"
+  to right before it's used. [Ben]
+- nit: wrong indentation in patch 6. [Ben]
 
-3. change the new page_fault_test.c setup_memslot() accordingly (much
-nicer).
+Ricardo Koller (13):
+  KVM: selftests: Add a userfaultfd library
+  KVM: selftests: aarch64: Add virt_get_pte_hva() library function
+  KVM: selftests: Add missing close and munmap in
+    __vm_mem_region_delete()
+  KVM: selftests: aarch64: Construct DEFAULT_MAIR_EL1 using sysreg.h
+    macros
+  tools: Copy bitfield.h from the kernel sources
+  KVM: selftests: Stash backing_src_type in struct userspace_mem_region
+  KVM: selftests: Change ____vm_create() to take struct
+    kvm_vm_mem_params
+  KVM: selftests: Use the right memslot for code, page-tables, and data
+    allocations
+  KVM: selftests: aarch64: Add aarch64/page_fault_test
+  KVM: selftests: aarch64: Add userfaultfd tests into page_fault_test
+  KVM: selftests: aarch64: Add dirty logging tests into page_fault_test
+  KVM: selftests: aarch64: Add readonly memslot tests into
+    page_fault_test
+  KVM: selftests: aarch64: Add mix of tests into page_fault_test
 
-Let me know what you think.
+ tools/include/linux/bitfield.h                |  176 +++
+ tools/testing/selftests/kvm/Makefile          |    2 +
+ .../selftests/kvm/aarch64/page_fault_test.c   | 1132 +++++++++++++++++
+ .../selftests/kvm/demand_paging_test.c        |  228 +---
+ .../selftests/kvm/include/aarch64/processor.h |   35 +-
+ .../selftests/kvm/include/kvm_util_base.h     |   65 +-
+ .../selftests/kvm/include/userfaultfd_util.h  |   46 +
+ .../selftests/kvm/lib/aarch64/processor.c     |   29 +-
+ tools/testing/selftests/kvm/lib/elf.c         |    3 +-
+ tools/testing/selftests/kvm/lib/kvm_util.c    |  129 +-
+ .../selftests/kvm/lib/riscv/processor.c       |    7 +-
+ .../selftests/kvm/lib/s390x/processor.c       |    7 +-
+ .../selftests/kvm/lib/userfaultfd_util.c      |  187 +++
+ .../selftests/kvm/lib/x86_64/processor.c      |   13 +-
+ 14 files changed, 1801 insertions(+), 258 deletions(-)
+ create mode 100644 tools/include/linux/bitfield.h
+ create mode 100644 tools/testing/selftests/kvm/aarch64/page_fault_test.c
+ create mode 100644 tools/testing/selftests/kvm/include/userfaultfd_util.h
+ create mode 100644 tools/testing/selftests/kvm/lib/userfaultfd_util.c
 
-Thanks!
-Ricardo
+-- 
+2.37.1.595.g718a3a8f04-goog
+
