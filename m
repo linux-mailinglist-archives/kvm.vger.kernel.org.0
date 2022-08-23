@@ -2,258 +2,193 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id CB52259EAC2
-	for <lists+kvm@lfdr.de>; Tue, 23 Aug 2022 20:19:07 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 3FE5C59EB14
+	for <lists+kvm@lfdr.de>; Tue, 23 Aug 2022 20:33:53 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233858AbiHWSQ2 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 23 Aug 2022 14:16:28 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57600 "EHLO
+        id S232499AbiHWScx (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 23 Aug 2022 14:32:53 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39520 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231625AbiHWSPs (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 23 Aug 2022 14:15:48 -0400
-Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 509CE5A3F0
-        for <kvm@vger.kernel.org>; Tue, 23 Aug 2022 09:30:45 -0700 (PDT)
-Received: from pps.filterd (m0098404.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.17.1.5/8.17.1.5) with ESMTP id 27NGK9K4029405;
-        Tue, 23 Aug 2022 16:30:39 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
- mime-version : subject : to : cc : references : from : in-reply-to :
- content-type : content-transfer-encoding; s=pp1;
- bh=qXljrg6/IFBhzTuxVsk4Ecjx+sf0yAItsDw2fiI4Zqs=;
- b=MX1E21kgpXWXr5D1ttb2vaJj2HNg++Vy4JAsZUxFZyP4e1Qq7ePulsrZwWE9DbvxahUZ
- PJZtXVGBFf0k5ecL2VpzBliU5RzT+9wpDQmM/Wjjb4VZlSuqOUnKlLPye4cZPBm3Q/gC
- BoctB+SY8NgiGtw+u61TSt4unfgJi9ajuL4mWE3+xiwQ62+9tyTYFpKyQfrAICJV1dmp
- 3mSvWnrSey4BOVW8Di9jF8fPhl7UHOXuinZkqlu8yG3bxzn6GLinRUUbp2PSXa346ECA
- k/nrIjTmwob8z5Ue/0lu2Fdt7Rf3drIH89vA+rrYeEtY1xXTBnwhLdRdwP+iu1/9vxNn oA== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3j5159k9jj-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 23 Aug 2022 16:30:39 +0000
-Received: from m0098404.ppops.net (m0098404.ppops.net [127.0.0.1])
-        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 27NF0X35029392;
-        Tue, 23 Aug 2022 16:30:38 GMT
-Received: from ppma04ams.nl.ibm.com (63.31.33a9.ip4.static.sl-reverse.com [169.51.49.99])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3j5159k9gu-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 23 Aug 2022 16:30:38 +0000
-Received: from pps.filterd (ppma04ams.nl.ibm.com [127.0.0.1])
-        by ppma04ams.nl.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 27NG73Fb024966;
-        Tue, 23 Aug 2022 16:30:36 GMT
-Received: from b06cxnps4074.portsmouth.uk.ibm.com (d06relay11.portsmouth.uk.ibm.com [9.149.109.196])
-        by ppma04ams.nl.ibm.com with ESMTP id 3j2q88v2gn-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 23 Aug 2022 16:30:35 +0000
-Received: from b06wcsmtp001.portsmouth.uk.ibm.com (b06wcsmtp001.portsmouth.uk.ibm.com [9.149.105.160])
-        by b06cxnps4074.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 27NGUWKx35258676
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Tue, 23 Aug 2022 16:30:32 GMT
-Received: from b06wcsmtp001.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id B3283A405C;
-        Tue, 23 Aug 2022 16:30:32 +0000 (GMT)
-Received: from b06wcsmtp001.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id D0495A405B;
-        Tue, 23 Aug 2022 16:30:31 +0000 (GMT)
-Received: from [9.171.74.130] (unknown [9.171.74.130])
-        by b06wcsmtp001.portsmouth.uk.ibm.com (Postfix) with ESMTP;
-        Tue, 23 Aug 2022 16:30:31 +0000 (GMT)
-Message-ID: <c4b9bae1-3a49-abcc-d914-538567d09ef5@linux.ibm.com>
-Date:   Tue, 23 Aug 2022 18:30:31 +0200
+        with ESMTP id S231446AbiHWSca (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 23 Aug 2022 14:32:30 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2917310AE14
+        for <kvm@vger.kernel.org>; Tue, 23 Aug 2022 09:54:11 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1661273650;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=rBISzaqA5voDQtlEaBBypMPzwNKF8QJeBCupWxK8JYE=;
+        b=LmTlIQxr085CX98GPgDITuPtn9Za2Wz/iluWZg16sX+kPKtMs9goHI6MoOdhHS5ThxXgk0
+        c87pDglyU4dQscXvsHXBlWuvTfri+TTLidEd5lFFHnoJi4DNGpObDYWJqfM7VABTOQMZ4s
+        KnETmpbmVtHVnId4JxuoEppj/UFNFno=
+Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
+ [209.85.128.70]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_128_GCM_SHA256) id
+ us-mta-26-J3FVvx_TM5CtoqoKfukVCA-1; Tue, 23 Aug 2022 12:54:09 -0400
+X-MC-Unique: J3FVvx_TM5CtoqoKfukVCA-1
+Received: by mail-wm1-f70.google.com with SMTP id i7-20020a1c3b07000000b003a534ec2570so9020340wma.7
+        for <kvm@vger.kernel.org>; Tue, 23 Aug 2022 09:54:08 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=mime-version:message-id:date:references:in-reply-to:subject:cc:to
+         :from:x-gm-message-state:from:to:cc;
+        bh=rBISzaqA5voDQtlEaBBypMPzwNKF8QJeBCupWxK8JYE=;
+        b=LM6B6MUJUbrLmo9w7UEyR4gtlB2TtqmaYs3sMyjrZe+zRhmBaZHvDuTDMJaY+fv6mr
+         3kwgawD+01FHMlhVpmM0mJ9Lx/Fe8h050FHQ/xbyR5gRORPViF7hExtCOkQ5gAckSSdc
+         YF5uSuwwWIeKz9XbFxQNO5dhnOOoDJ2D+nfNungp0TnBs2INfDShBsVYVolO8LzLcABQ
+         ajQ0udVDbSVTFFGGUxyyhAxOjM0c9Cl+OrW4W9hAsPGRv+Q2CpfT0OK3abSe7FKsBDvu
+         D5U9HtMa0L0/FKG9gH8/IMfdm05puPy+DFhiVR+la3Bklxev6CQBdsYeR0lqv9+gXhym
+         9RJQ==
+X-Gm-Message-State: ACgBeo3KO8DHYkIlnaebd2VhWx4X0kCSImT0rB0tnkqOjFjLSJkBgfOS
+        dM/8Ofi/mWVbg1n0xfZ0NPHjS/xGIt9kbrU13IaHGQm5MgWznFKbHlWxAAG60ZgFH0FBbTARQqo
+        NbA+H381oQ3B/
+X-Received: by 2002:a1c:2705:0:b0:3a6:78b0:9545 with SMTP id n5-20020a1c2705000000b003a678b09545mr2765996wmn.165.1661273647902;
+        Tue, 23 Aug 2022 09:54:07 -0700 (PDT)
+X-Google-Smtp-Source: AA6agR5i4rR8VfhxDzm3LXEYycUqzB3MoaNJuulY2oZ5K80WH2C/qzTPBmLtGq/9ChNastgQFt7IfA==
+X-Received: by 2002:a1c:2705:0:b0:3a6:78b0:9545 with SMTP id n5-20020a1c2705000000b003a678b09545mr2765979wmn.165.1661273647579;
+        Tue, 23 Aug 2022 09:54:07 -0700 (PDT)
+Received: from fedora (nat-2.ign.cz. [91.219.240.2])
+        by smtp.gmail.com with ESMTPSA id a17-20020adffb91000000b002207a0b93b4sm14648252wrr.49.2022.08.23.09.54.06
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 23 Aug 2022 09:54:06 -0700 (PDT)
+From:   Vitaly Kuznetsov <vkuznets@redhat.com>
+To:     Sean Christopherson <seanjc@google.com>
+Cc:     kvm@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>,
+        Anirudh Rayabharam <anrayabh@linux.microsoft.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Maxim Levitsky <mlevitsk@redhat.com>,
+        Nathan Chancellor <nathan@kernel.org>,
+        Michael Kelley <mikelley@microsoft.com>,
+        linux-hyperv@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v5 03/26] x86/hyperv: Update 'struct
+ hv_enlightened_vmcs' definition
+In-Reply-To: <YwTrlgeqoAqyH0KF@google.com>
+References: <Yv5ZFgztDHzzIQJ+@google.com> <875yiptvsc.fsf@redhat.com>
+ <Yv59dZwP6rNUtsrn@google.com> <87czcsskkj.fsf@redhat.com>
+ <YwOm7Ph54vIYAllm@google.com> <87edx8xn8h.fsf@redhat.com>
+ <YwO2fSCGXnE/9mc2@google.com> <878rngxjb7.fsf@redhat.com>
+ <YwPLt2e7CuqMzjt1@google.com> <87wnazwh1r.fsf@redhat.com>
+ <YwTrlgeqoAqyH0KF@google.com>
+Date:   Tue, 23 Aug 2022 18:54:05 +0200
+Message-ID: <87tu62x5n6.fsf@redhat.com>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.3.0
-Subject: Re: [PATCH v8 02/12] s390x/cpu_topology: CPU topology objects and
- structures
-Content-Language: en-US
-To:     Thomas Huth <thuth@redhat.com>, qemu-s390x@nongnu.org
-Cc:     qemu-devel@nongnu.org, borntraeger@de.ibm.com, pasic@linux.ibm.com,
-        richard.henderson@linaro.org, david@redhat.com, cohuck@redhat.com,
-        mst@redhat.com, pbonzini@redhat.com, kvm@vger.kernel.org,
-        ehabkost@redhat.com, marcel.apfelbaum@gmail.com, eblake@redhat.com,
-        armbru@redhat.com, seiden@linux.ibm.com, nrb@linux.ibm.com,
-        frankja@linux.ibm.com
-References: <20220620140352.39398-1-pmorel@linux.ibm.com>
- <20220620140352.39398-3-pmorel@linux.ibm.com>
- <b6c981e0-56f5-25c3-3422-ed72c8561712@redhat.com>
-From:   Pierre Morel <pmorel@linux.ibm.com>
-In-Reply-To: <b6c981e0-56f5-25c3-3422-ed72c8561712@redhat.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: jJ2G0bqOSaQI5C5cSDgK_geuwxyn3d8Z
-X-Proofpoint-ORIG-GUID: y_o3xKfolGCAKHnbGZgf5DNIucwhDyV0
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.205,Aquarius:18.0.895,Hydra:6.0.517,FMLib:17.11.122.1
- definitions=2022-08-23_07,2022-08-22_02,2022-06-22_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 lowpriorityscore=0
- adultscore=0 priorityscore=1501 mlxscore=0 mlxlogscore=999 spamscore=0
- impostorscore=0 suspectscore=0 phishscore=0 bulkscore=0 malwarescore=0
- clxscore=1015 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2207270000 definitions=main-2208230065
-X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,
-        SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no
-        version=3.4.6
+Content-Type: text/plain
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+Sean Christopherson <seanjc@google.com> writes:
 
+> We're talking about nested VMX, i.e. exposing TSC_SCALING to L1.  QEMU's CLX
+> definition doesn't include TSC_SCALING.  In fact, none of QEMU's predefined CPU
+> models supports TSC_SCALING, precisely because KVM didn't support exposing the
+> feature to L1 until relatively recently.
+>
+> $ git grep VMX_SECONDARY_EXEC_TSC_SCALING
+> target/i386/cpu.h:#define VMX_SECONDARY_EXEC_TSC_SCALING              0x02000000
+> target/i386/kvm/kvm.c:    if (f[FEAT_VMX_SECONDARY_CTLS] &  VMX_SECONDARY_EXEC_TSC_SCALING) {
 
-On 8/23/22 15:30, Thomas Huth wrote:
-> On 20/06/2022 16.03, Pierre Morel wrote:
->> We use new objects to have a dynamic administration of the CPU topology.
->> The highest level object in this implementation is the s390 book and
->> in this first implementation of CPU topology for S390 we have a single
->> book.
->> The book is built as a SYSBUS bridge during the CPU initialization.
->> Other objects, sockets and core will be built after the parsing
->> of the QEMU -smp argument.
->>
->> Every object under this single book will be build dynamically
->> immediately after a CPU has be realized if it is needed.
->> The CPU will fill the sockets once after the other, according to the
->> number of core per socket defined during the smp parsing.
->>
->> Each CPU inside a socket will be represented by a bit in a 64bit
->> unsigned long. Set on plug and clear on unplug of a CPU.
->>
->> For the S390 CPU topology, thread and cores are merged into
->> topology cores and the number of topology cores is the multiplication
->> of cores by the numbers of threads.
->>
->> Signed-off-by: Pierre Morel <pmorel@linux.ibm.com>
->> ---
->>   hw/s390x/cpu-topology.c         | 391 ++++++++++++++++++++++++++++++++
->>   hw/s390x/meson.build            |   1 +
->>   hw/s390x/s390-virtio-ccw.c      |   6 +
->>   include/hw/s390x/cpu-topology.h |  74 ++++++
->>   target/s390x/cpu.h              |  47 ++++
->>   5 files changed, 519 insertions(+)
->>   create mode 100644 hw/s390x/cpu-topology.c
->>   create mode 100644 include/hw/s390x/cpu-topology.h
-> ...
->> +bool s390_topology_new_cpu(MachineState *ms, int core_id, Error **errp)
->> +{
->> +    S390TopologyBook *book;
->> +    S390TopologySocket *socket;
->> +    S390TopologyCores *cores;
->> +    int nb_cores_per_socket;
->> +    int origin, bit;
->> +
->> +    book = s390_get_topology();
->> +
->> +    nb_cores_per_socket = ms->smp.cores * ms->smp.threads;
->> +
->> +    socket = s390_get_socket(ms, book, core_id / nb_cores_per_socket, 
->> errp);
->> +    if (!socket) {
->> +        return false;
->> +    }
->> +
->> +    /*
->> +     * At the core level, each CPU is represented by a bit in a 64bit
->> +     * unsigned long. Set on plug and clear on unplug of a CPU.
->> +     * The firmware assume that all CPU in the core description have 
->> the same
->> +     * type, polarization and are all dedicated or shared.
->> +     * In the case a socket contains CPU with different type, 
->> polarization
->> +     * or dedication then they will be defined in different CPU 
->> containers.
->> +     * Currently we assume all CPU are identical and the only reason 
->> to have
->> +     * several S390TopologyCores inside a socket is to have more than 
->> 64 CPUs
->> +     * in that case the origin field, representing the offset of the 
->> first CPU
->> +     * in the CPU container allows to represent up to the maximal 
->> number of
->> +     * CPU inside several CPU containers inside the socket container.
->> +     */
->> +    origin = 64 * (core_id / 64);
-> 
-> Maybe faster:
-> 
->      origin = core_id & ~63;
+(sorry for my persistence but I still believe there are issues which we
+won't be able to solve if we take the suggested approach).
 
-yes thanks
+You got me. Indeed, "vmx-tsc-scaling" feature is indeed not set for
+named CPU models so my example was flawed. Let's swap it with
+VMX_VM_ENTRY_LOAD_IA32_PERF_GLOBAL_CTRL /
+VMX_VM_EXIT_LOAD_IA32_PERF_GLOBAL_CTRL which a bunch of named models
+have. So I do the same,
 
-> 
-> By the way, where is this limitation to 64 coming from? Just because 
-> we're using a "unsigned long" for now? Or is this a limitation from the 
-> architecture?
-> 
+'-cpu CascadeLake-Sever,hv-evmcs'
 
-It is a limitation from the architecture who use a 64bit field to 
-represent the CPUs in a CPU TLE mask.
+on both the source host which knows about these eVMCS fields and the
+destination host which doesn't.
 
-but this patch serie is quite old now and I changed some things 
-according to the comments I received
-I plan to send the new version before the end of the week.
+First problem: CPUID. On the source host, we will have
+CPUID.0x4000000A.EBX BIT(0) = 1, and "=0" on the destination. I don't
+think we migrate CPUID data (can be wrong, though).
 
+Second, assuming VMX feature MSRs are actually migrated, we must fail on
+the destnation because VMX_VM_{ENTRY,EXIT}_LOAD_IA32_PERF_GLOBAL_CTRL is
+trying to get set. We can do this in KVM but note: currently, KVM
+filters guest reads but not host's so when you're trying to migrate from
+a non-fixed KVM, VMX_VM_{ENTRY,EXIT}_LOAD_IA32_PERF_GLOBAL_CTRL are
+actually present! So how do we distinguinsh in KVM between these two
+cases, i.e. how do we know if
+VMX_VM_{ENTRY,EXIT}_LOAD_IA32_PERF_GLOBAL_CTRL were filtered out on the
+source (old kvm) or not (new KVM)?
 
->> +    cores = s390_get_cores(ms, socket, origin, errp);
->> +    if (!cores) {
->> +        return false;
->> +    }
->> +
->> +    bit = 63 - (core_id - origin);
->> +    set_bit(bit, &cores->mask);
->> +    cores->origin = origin;
->> +
->> +    return true;
->> +}
-> ...
->> diff --git a/hw/s390x/s390-virtio-ccw.c b/hw/s390x/s390-virtio-ccw.c
->> index cc3097bfee..a586875b24 100644
->> --- a/hw/s390x/s390-virtio-ccw.c
->> +++ b/hw/s390x/s390-virtio-ccw.c
->> @@ -43,6 +43,7 @@
->>   #include "sysemu/sysemu.h"
->>   #include "hw/s390x/pv.h"
->>   #include "migration/blocker.h"
->> +#include "hw/s390x/cpu-topology.h"
->>   static Error *pv_mig_blocker;
->> @@ -89,6 +90,7 @@ static void s390_init_cpus(MachineState *machine)
->>       /* initialize possible_cpus */
->>       mc->possible_cpu_arch_ids(machine);
->> +    s390_topology_setup(machine);
-> 
-> Is this safe with regards to migration? Did you tried a ping-pong 
-> migration from an older QEMU to a QEMU with your modifications and back 
-> to the older one? If it does not work, we might need to wire this setup 
-> to the machine types...
+...
+>
+> Because it's completely unnecessary, adds non-trivial maintenance burden to KVM,
+> and requires explicit documentation to explain to userspace what "hv-evmcs-2022"
+> means.
+>
+> It's unnecessary because if the user is concerned about eVMCS features showing up
+> in the future, then they should do:
+>
+>   -cpu CascadeLake-Server,hv-evmcs,-vmx-tsc-scaling,-<any other VMX features not eVMCS-friendly>
+>
+> If QEMU wants to make that more user friendly, then define CascadeLake-Server-eVMCS
+> or whatever so that the features that are unlikely be supported for eVMCS are off by
+> default.
 
-I did not, I will add this test.
+I completely agree that what I'm trying to achieve here could've been
+done in QEMU from day 1 but we now have what we have: KVM silently
+filtering out certain VMX features and zero indication to userspace
+VMM whether filtering is being done or not (besides this
+CPUID.0x4000000A.EBX BIT(0) bit but I'm not even sure we analyze
+source's CPUID data upon migration).
 
+>  This is no different than QEMU not including nested TSC_SCALING in any of
+> the predefined models; the developers _know_ KVM doesn't widely support TSC_SCALING,
+> so it was omitted, even though a real CLX CPU is guaranteed to support TSC_SCALING.
+>
 
-> 
->>       for (i = 0; i < machine->smp.cpus; i++) {
->>           s390x_new_cpu(machine->cpu_type, i, &error_fatal);
->>       }
->> @@ -306,6 +308,10 @@ static void s390_cpu_plug(HotplugHandler 
->> *hotplug_dev,
->>       g_assert(!ms->possible_cpus->cpus[cpu->env.core_id].cpu);
->>       ms->possible_cpus->cpus[cpu->env.core_id].cpu = OBJECT(dev);
->> +    if (!s390_topology_new_cpu(ms, cpu->env.core_id, errp)) {
->> +        return;
->> +    }
->> +
->>       if (dev->hotplugged) {
->>           raise_irq_cpu_hotplug();
->>       }
-> 
->   Thomas
-> 
+Out of curiosity, what happens if someone sends the following patch to
+QEMU:
 
-Thanks Thomas,
+diff --git a/target/i386/cpu.c b/target/i386/cpu.c
+index 1db1278a599b..2278f4522b44 100644
+--- a/target/i386/cpu.c
++++ b/target/i386/cpu.c
+@@ -3191,6 +3191,12 @@ static const X86CPUDefinition builtin_x86_defs[] = {
+                   { "vmx-xsaves", "on" },
+                   { /* end of list */ }
+               },
++            { .version = 6,
++              .note = "ARCH_CAPABILITIES, EPT switching, XSAVES, no TSX, TSC_SCALING",
++              .props = (PropValue[]) {
++                  { "vmx-tsc-scaling", "on" },
++                  { /* end of list */ }
++              },
+             },
+             { /* end of list */ }
+         }
 
-Regards,
-Pierre
+Will Paolo remember about eVMCS and reject it?
+
+> It's non-trivial maintenance for KVM because it would require defining new versions
+> every time an eVMCS field is added, allowing userspace to specify and restrict
+> features based on arbitrary versions, and do all of that without conflicting with
+> whatever PV enumeration Microsoft adds.
+
+The update at hand comes with a feature bit so no mater what we do, we
+will need a new QEMU flag to support this feature bit. My suggestion was
+just that we stretch its definition a bit and encode not only
+PERF_GLOBAL_CTRL but all fields which were added. At the same time we
+can switch to filtering host reads and failing host writes for what's
+missing (and to do so we'll likely need to invert the logic and
+explicitly list what eVMCS supports) so we're better prepared to the
+next update.
 
 -- 
-Pierre Morel
-IBM Lab Boeblingen
+Vitaly
+
