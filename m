@@ -2,158 +2,152 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id CE07E59CD0E
-	for <lists+kvm@lfdr.de>; Tue, 23 Aug 2022 02:16:45 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id E30D659CD15
+	for <lists+kvm@lfdr.de>; Tue, 23 Aug 2022 02:17:41 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238154AbiHWAQm (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 22 Aug 2022 20:16:42 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44668 "EHLO
+        id S239033AbiHWAQ5 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 22 Aug 2022 20:16:57 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51598 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S239119AbiHWAQ0 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 22 Aug 2022 20:16:26 -0400
-Received: from mail-pf1-x429.google.com (mail-pf1-x429.google.com [IPv6:2607:f8b0:4864:20::429])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CF1757673
-        for <kvm@vger.kernel.org>; Mon, 22 Aug 2022 17:15:55 -0700 (PDT)
-Received: by mail-pf1-x429.google.com with SMTP id g129so8591689pfb.8
-        for <kvm@vger.kernel.org>; Mon, 22 Aug 2022 17:15:55 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc;
-        bh=5ONLOfjRsoyPNCSm/9MdBrJPI+jYBbaqSy2BAfAUm/Q=;
-        b=OkDfM0p2XEu+RyEIar6eQhsqQQAAvfk5Y2ZPxRZvU28SOe4SV20koCjbQp5WYjV4MV
-         10gDz1F5TcGWIN808P9wVGirnJYR45Bt4Z2T8MsF5VvTDh3GS7EPh28GF/ta2jmIFGss
-         PzvrdDz10j8/IoefmrDSD23meeYWgxV+B2YhU+mtXDNWT805kwcHSOoo/HlFxaP40rnz
-         poybFV1BbAE1QkifbrdVRWaYUv0wow4JkyiN//9CoBd0Ck0hBgIxi0BPjRKFNFYQE05+
-         dvEIvK/A/DjdDqToAX2Iwx4TDgN1D7VmcjolXuL/ucnPneinOEZEWKKUksBc44dV3BI3
-         Ml4Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc;
-        bh=5ONLOfjRsoyPNCSm/9MdBrJPI+jYBbaqSy2BAfAUm/Q=;
-        b=eexYaTOcs3zzuOWpcB1b5DsXEwJOrw2C8VwjfUzhx6tiPh9dxt/Bl61rx6T2rjNW1W
-         UVFatHg877ZLswObM/5B8+8PSZLsKTTkvPHTutVBugTCTgITAF+NPzQkP4EVnQ4W05f0
-         6QO4JDUlhdAAPH+XFix+jQSlsER8lkvoEoxS/P0UJCINr7VFkQUE+4RWxI63j46iX7Q2
-         7j3xW3ee9Z4nT/tK7mY6jVZorLP6r5vKsQXCRQfxqfNnsIUwA+v98Je/u1e6yVIT/1Il
-         eYds9yBmE0CPXHjS+KVbpdD4S37PZKG/zJZ9HatpmrGWO+sgDENv3071ARrFn+3zpnTv
-         CBFQ==
-X-Gm-Message-State: ACgBeo30gfL+r9s3gajHqJuVmO2iFKpGeWNr40qIVVPafLdWEUTu9sKd
-        6dfOY96Z0CsFyhetS9zIocdtJFlWCVwcxw==
-X-Google-Smtp-Source: AA6agR5bcsmhKNFUmJDECvCD72+wAIOTlxVXT6dxVHmC9aW2Q+UHWDFuOGMUuBSeKiY0xtcD2Gl16Q==
-X-Received: by 2002:a63:1208:0:b0:423:c60e:ed09 with SMTP id h8-20020a631208000000b00423c60eed09mr18237602pgl.385.1661213755177;
-        Mon, 22 Aug 2022 17:15:55 -0700 (PDT)
-Received: from google.com (7.104.168.34.bc.googleusercontent.com. [34.168.104.7])
-        by smtp.gmail.com with ESMTPSA id m11-20020a170902db0b00b001637529493esm9055688plx.66.2022.08.22.17.15.54
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 22 Aug 2022 17:15:54 -0700 (PDT)
-Date:   Tue, 23 Aug 2022 00:15:51 +0000
-From:   Sean Christopherson <seanjc@google.com>
-To:     "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Cc:     kvm@vger.kernel.org, pbonzini@redhat.com, tglx@linutronix.de,
-        leobras@redhat.com, linux-kernel@vger.kernel.org, mingo@redhat.com,
-        bp@alien8.de, dave.hansen@linux.intel.com, x86@kernel.org
-Subject: Re: [PATCH] KVM: x86: Always enable legacy fp/sse
-Message-ID: <YwQcN0GKMeZXNmhF@google.com>
-References: <20220816175936.23238-1-dgilbert@redhat.com>
- <YvwODUu/rdzjzDjk@google.com>
- <YvzK+slWoAvm0/Wn@work-vm>
+        with ESMTP id S239029AbiHWAQw (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 22 Aug 2022 20:16:52 -0400
+Received: from mailtransmit05.runbox.com (mailtransmit05.runbox.com [IPv6:2a0c:5a00:149::26])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BB06CC02
+        for <kvm@vger.kernel.org>; Mon, 22 Aug 2022 17:16:49 -0700 (PDT)
+Received: from mailtransmit03.runbox ([10.9.9.163] helo=aibo.runbox.com)
+        by mailtransmit05.runbox.com with esmtps  (TLS1.2) tls TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256
+        (Exim 4.93)
+        (envelope-from <mhal@rbox.co>)
+        id 1oQHb4-00Bkgy-HL; Tue, 23 Aug 2022 02:16:46 +0200
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=rbox.co;
+        s=selector2; h=Content-Transfer-Encoding:Content-Type:In-Reply-To:From:
+        References:Cc:To:Subject:MIME-Version:Date:Message-ID;
+        bh=HTJw75iycaZewoe7HywmIg0hisjG3sBsQG26be+L0q8=; b=jlNnHVuvCiNcnsyyGriOMsaqpz
+        pAH0WIPwo2OmhNHLgiNsvw+dqFXO+wWsm2Qd/p9CK74vKwy7pU7tmTIxLglkzukyHs3HcHA+7NeSM
+        iVDoRb55bvLqnyG+ais3DIzctBSSWvMVzl0utDeJ0wHaWFMzjpkrzSGH+ADQUCoPU1P5+ivA+OEwR
+        3+bdvKZoVqdlpShNlu3K7htO7kSGGVLqvW30gbN0ozRwVaVKvSOacsCZK/pO068f4h9siWTlBNuBd
+        zGr6psgCD7CwskJ7ShlH38mKwBm83gRirX1X3NwqTKDshyZx99iG5ownwWaZCGUr8rKIPle2oYm1D
+        ByBg3T6Q==;
+Received: from [10.9.9.73] (helo=submission02.runbox)
+        by mailtransmit03.runbox with esmtp (Exim 4.86_2)
+        (envelope-from <mhal@rbox.co>)
+        id 1oQHb4-0002t9-5X; Tue, 23 Aug 2022 02:16:46 +0200
+Received: by submission02.runbox with esmtpsa  [Authenticated ID (604044)]  (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+        (Exim 4.90_1)
+        id 1oQHal-0003Bo-78; Tue, 23 Aug 2022 02:16:27 +0200
+Message-ID: <6d19f78f-120a-936b-3eba-e949ecc3509f@rbox.co>
+Date:   Tue, 23 Aug 2022 02:16:25 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <YvzK+slWoAvm0/Wn@work-vm>
-X-Spam-Status: No, score=-14.5 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        ENV_AND_HDR_SPF_MATCH,FSL_HELO_FAKE,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,
-        SPF_PASS,T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL
-        autolearn=no autolearn_force=no version=3.4.6
+User-Agent: Thunderbird
+Subject: Re: [kvm-unit-tests PATCH] x86/emulator: Test POP-SS blocking
+Content-Language: en-US
+To:     Sean Christopherson <seanjc@google.com>
+Cc:     kvm@vger.kernel.org, pbonzini@redhat.com
+References: <20220821215900.1419215-1-mhal@rbox.co>
+ <20220821220647.1420411-1-mhal@rbox.co>
+ <9b853239-a3df-f124-e793-44cbadfbbd8f@rbox.co> <YwOj6tzvIoG34/sF@google.com>
+From:   Michal Luczaj <mhal@rbox.co>
+In-Reply-To: <YwOj6tzvIoG34/sF@google.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-Spam-Status: No, score=-2.8 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,RCVD_IN_DNSWL_LOW,
+        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Aug 17, 2022, Dr. David Alan Gilbert wrote:
-> * Sean Christopherson (seanjc@google.com) wrote:
-> > On Tue, Aug 16, 2022, Dr. David Alan Gilbert (git) wrote:
-> > > diff --git a/arch/x86/kvm/cpuid.c b/arch/x86/kvm/cpuid.c
-> > > index de6d44e07e34..3b2319cecfd1 100644
-> > > --- a/arch/x86/kvm/cpuid.c
-> > > +++ b/arch/x86/kvm/cpuid.c
-> > > @@ -298,7 +298,8 @@ static void kvm_vcpu_after_set_cpuid(struct kvm_vcpu *vcpu)
-> > >  	guest_supported_xcr0 =
-> > >  		cpuid_get_supported_xcr0(vcpu->arch.cpuid_entries, vcpu->arch.cpuid_nent);
-> > >  
-> > > -	vcpu->arch.guest_fpu.fpstate->user_xfeatures = guest_supported_xcr0;
-> > > +	vcpu->arch.guest_fpu.fpstate->user_xfeatures = guest_supported_xcr0 |
-> > > +		XFEATURE_MASK_FPSSE;
+On 8/22/22 17:42, Sean Christopherson wrote:
+>> On 8/22/22 00:06, Michal Luczaj wrote:
+>> test can be simplified to something like
+>>
+>> 	asm volatile("push %[ss]\n\t"
+>> 		     __ASM_TRY(KVM_FEP "pop %%ss", "1f")
+>> 		     "ex_blocked: mov $1, %[success]\n\t"
 > 
-> Hi Sean,
->   Thanks for the reply,
-> 
-> > I don't think this is correct.  This will allow the guest to set the SSE bit
-> > even when XSAVE isn't supported due to kvm_guest_supported_xcr0() returning
-> > user_xfeatures.
-> > 
-> >   static inline u64 kvm_guest_supported_xcr0(struct kvm_vcpu *vcpu)
-> >   {
-> > 	return vcpu->arch.guest_fpu.fpstate->user_xfeatures;
-> >   }
-> > 
-> > I believe the right place to fix this is in validate_user_xstate_header().  It's
-> > reachable if and only if XSAVE is supported in the host, and when XSAVE is _not_
-> > supported, the kernel unconditionally allows FP+SSE.  So it follows that the kernel
-> > should also allow FP+SSE when using XSAVE too.  That would also align the logic
-> > with fpu_copy_guest_fpstate_to_uabi(), which fordces the FPSSE flags.  Ditto for
-> > the non-KVM save_xstate_epilog().
-> 
-> OK, yes, I'd followed the check that failed down to this test; although
-> by itself this test works until Leo's patch came along later; so I
-> wasn't sure where to fix it.
-> 
-> > Aha!  And fpu__init_system_xstate() ensure the host supports FP+SSE when XSAVE
-> > is enabled (knew their had to be a sanity check somewhere).
-> > 
-> > ---
-> >  arch/x86/kernel/fpu/xstate.c | 9 +++++++--
-> >  1 file changed, 7 insertions(+), 2 deletions(-)
-> > 
-> > diff --git a/arch/x86/kernel/fpu/xstate.c b/arch/x86/kernel/fpu/xstate.c
-> > index c8340156bfd2..83b9a9653d47 100644
-> > --- a/arch/x86/kernel/fpu/xstate.c
-> > +++ b/arch/x86/kernel/fpu/xstate.c
-> > @@ -399,8 +399,13 @@ int xfeature_size(int xfeature_nr)
-> >  static int validate_user_xstate_header(const struct xstate_header *hdr,
-> >  				       struct fpstate *fpstate)
-> >  {
-> > -	/* No unknown or supervisor features may be set */
-> > -	if (hdr->xfeatures & ~fpstate->user_xfeatures)
-> > +	/*
-> > +	 * No unknown or supervisor features may be set.  Userspace is always
-> > +	 * allowed to restore FP+SSE state (XSAVE/XRSTOR are used by the kernel
-> > +	 * if and only if FP+SSE are supported in xstate).
-> > +	 */
-> > +	if (hdr->xfeatures & ~fpstate->user_xfeatures &
-> > +	    ~(XFEATURE_MASK_FP | XFEATURE_MASK_SSE))
-> >  		return -EINVAL;
-> > 
-> >  	/* Userspace must use the uncompacted format */
-> 
-> That passes the small smoke test for me; will you repost that then?
+> So I'm 99% certain this only passes because KVM doesn't emulate the `mov $1, %[success]`.
+> kvm_vcpu_check_code_breakpoint() honors EFLAGS.RF, but not MOV/POP_SS blocking.
+> I.e. I would expect this to fail if the `mov` were also tagged KVM_FEP.
 
-*sigh*
+I wasn't sure if I understood you correctly, so, FWIW, I've ran:
 
-The bug is more subtle than just failing to restore.  Saving can also "fail".  If
-XSAVE is hidden from the guest on an XSAVE-capable host, __copy_xstate_to_uabi_buf()
-will happily reinitialize FP+SSE state and thus corrupt guest FPU state on migration.
+static void test_pop_ss_blocking_try(void)
+{
+	int success;
 
-And not that it matters now, but before realizing that KVM_GET_XSAVE is also broken,
-I decided I like Dave's patch better because KVM really should separate what userspace
-can save/restore from what the guest can access.
+	write_dr7(DR7_FIXED_1 |
+		  DR7_GLOBAL_ENABLE_DRx(0) |
+		  DR7_EXECUTE_DRx(0) |
+		  DR7_LEN_1_DRx(0));
 
-Amusingly, there's actually another bug lurking with respect to usurping user_xfeatures
-to represent supported_guest_xcr0.  The latter is zero-initialized, whereas
-user_xfeatures is set to the "default" features on initialization, i.e. migrating a
-VM without ever doing KVM_SET_CPUID2 would do odd things.
+#define POPSS(desc, fep1, fep2)					\
+	asm volatile("mov $0, %[success]\n\t"			\
+		     "lea 1f, %%eax\n\r"			\
+		     "mov %%eax, %%dr0\n\r"			\
+		     "push %%ss\n\t"				\
+		     __ASM_TRY(fep1 "pop %%ss", "2f")		\
+		     "1:" fep2 "mov $1, %[success]\n\t"		\
+		     "2:"					\
+		     : [success] "=g" (success)			\
+		     :						\
+		     : "eax", "memory");			\
+	report(success, desc ": #DB suppressed after POP SS")
 
-Sending a v2 shortly to reinstate guest_supported_xcr0 before landing Dave's patch.
+	POPSS("no fep", "", "");
+	POPSS("fep pop-ss", KVM_FEP, "");
+	POPSS("fep mov-1", "", KVM_FEP);
+	POPSS("fep pop-ss/fep mov-1", KVM_FEP, KVM_FEP);
+
+	write_dr7(DR7_FIXED_1);
+}
+
+and got:
+
+em_pop_sreg unpatched:
+PASS: no fep: #DB suppressed after POP SS
+FAIL: fep pop-ss: #DB suppressed after POP SS
+PASS: fep mov-1: #DB suppressed after POP SS
+FAIL: fep pop-ss/fep mov-1: #DB suppressed after POP SS
+
+em_pop_sreg patched:
+PASS: no fep: #DB suppressed after POP SS
+PASS: fep pop-ss: #DB suppressed after POP SS
+PASS: fep mov-1: #DB suppressed after POP SS
+PASS: fep pop-ss/fep mov-1: #DB suppressed after POP SS
+
+For the sake of completeness: basically the same, but MOV SS, i.e.
+
+	asm volatile("mov $0, %[success]\n\t"			\
+		     "lea 1f, %%eax\n\r"			\
+		     "mov %%eax, %%dr0\n\r"			\
+		     "mov %%ss, %%eax\n\t"			\
+		     __ASM_TRY(fep1 "mov %%eax, %%ss", "2f")	\
+		     "1:" fep2 "mov $1, %[success]\n\t"		\
+		     "2:"					\
+		     : [success] "=g" (success)			\
+		     :						\
+		     : "eax", "memory");			\
+
+PASS: no fep: #DB suppressed after MOV SS
+PASS: fep mov-ss: #DB suppressed after MOV SS
+PASS: fep mov-1: #DB suppressed after MOV SS
+PASS: fep mov-ss/fep mov-1: #DB suppressed after MOV SS
+
+> The reason I say the setup_idt() change is a moot point is because I think it
+> would be better to put this testcase into debug.c (where "this" testcase is really
+> going to be multiple testcases).  With macro shenanigans (or code patching), it
+> should be fairly easy to run all testcases with both FEP=0 and FEP=1.
+>
+> Then it's "just" a matter of adding a code #DB testcase.  __run_single_step_db_test()
+> and run_ss_db_test() aren't fundamentally tied to single-step, i.e. can simply be
+> renamed.  For simplicity, I'd say just skip the usermode test for code #DBs, IMO
+> it's not worth the extra coverage.
+
+So that would involve a 32-bit segment for POP SS and making use of DR0/DR7 instead
+of single stepping? I guess I can try.
+
+Thanks,
+Michal
