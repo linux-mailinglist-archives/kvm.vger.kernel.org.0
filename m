@@ -2,239 +2,286 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id E72D659EBCB
-	for <lists+kvm@lfdr.de>; Tue, 23 Aug 2022 21:07:49 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 8F3FD59EC28
+	for <lists+kvm@lfdr.de>; Tue, 23 Aug 2022 21:22:57 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229774AbiHWTHY (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 23 Aug 2022 15:07:24 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40602 "EHLO
+        id S231230AbiHWTWw (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 23 Aug 2022 15:22:52 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37958 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231436AbiHWTHG (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 23 Aug 2022 15:07:06 -0400
-Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8CEE2A5C46
-        for <kvm@vger.kernel.org>; Tue, 23 Aug 2022 10:45:01 -0700 (PDT)
-Received: from pps.filterd (m0098399.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.17.1.5/8.17.1.5) with ESMTP id 27NHJcGI029303;
-        Tue, 23 Aug 2022 17:41:45 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
- mime-version : subject : to : cc : references : from : in-reply-to :
- content-type : content-transfer-encoding; s=pp1;
- bh=ep6N8wfv5H5CpVl1jG1UdwUu6elobdYYVHkA6qqxA08=;
- b=D7/ajZAc4berYw89xPFNaIuwJZ/J7zn1+Q29fTSkkbngDTHHYjRY4IhuEfAQzDoYV9Pn
- RPyLkRYErD5VDxZhpz6hf/m6aUTWnStVqAlRNL7Wqz4U5TR4ldBkLyF2o+efNi0m4nSn
- hvXTNdGc5o8KmzjXt4rCEg6M6AKFo9YqbTBavCiiLEQAQj0duiQ7Oj5ovnQHtC84d+uh
- jo4XO738Q0aA1y2Vzgpc39fIu+Sz2nkTtK+DyEwOxk6DBr9CUzv101Lkt0GRLN9aQYdV
- usXJPUT7aED/a4dYe9rjt0+lWGziWmmMawbWnbE+vbbeAgoftIXuBgZXQREZYcvWnhHm VQ== 
+        with ESMTP id S233218AbiHWTWb (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 23 Aug 2022 15:22:31 -0400
+Received: from mx0a-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0C9789E692;
+        Tue, 23 Aug 2022 11:03:29 -0700 (PDT)
+Received: from pps.filterd (m0098419.ppops.net [127.0.0.1])
+        by mx0b-001b2d01.pphosted.com (8.17.1.5/8.17.1.5) with ESMTP id 27NHhY9w007681;
+        Tue, 23 Aug 2022 18:02:11 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : subject :
+ from : to : cc : date : in-reply-to : references : content-type :
+ content-transfer-encoding : mime-version; s=pp1;
+ bh=AgNvVG0edT28hv7MtckHKr3I12mN1X1DVyBIWBmN+64=;
+ b=P2bOHPMLBZ0qinqhiYDgQ3XA1V90Bye5C39eepSCqIkVuS9K3ImN2geB9SPq93vLOeWu
+ R8iSFpN009pIcb6gujsqXEKv3SAvrFsETzEg0G0ORP0N8OQyjoeyvliXHLflF3MHZC2l
+ w1Q9I4qo/qt5bPEY6Dtfgb36EZBtgOUkmhKDvlmvbqklElZUDvy0RNyWV9rLy9Tl1Cvs
+ PgCuqlSYcTNmH9Th2w4bNVlfjjAxnt9MCSvnCM4XguLmyQ19eqT16bsJyrpGW2QHOuIk
+ /dgptvCUd7cZP6allweIZeDb2Rwi+8lrR46IKqoxGJ6azroQS0b2/H+Q7HVDxTibovHR Rg== 
 Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3j536srssy-1
+        by mx0b-001b2d01.pphosted.com (PPS) with ESMTPS id 3j53hugj86-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 23 Aug 2022 17:41:44 +0000
-Received: from m0098399.ppops.net (m0098399.ppops.net [127.0.0.1])
-        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 27NHJusd030425;
-        Tue, 23 Aug 2022 17:41:44 GMT
-Received: from ppma03fra.de.ibm.com (6b.4a.5195.ip4.static.sl-reverse.com [149.81.74.107])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3j536srsr4-1
+        Tue, 23 Aug 2022 18:02:11 +0000
+Received: from m0098419.ppops.net (m0098419.ppops.net [127.0.0.1])
+        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 27NHkJtr017952;
+        Tue, 23 Aug 2022 18:02:11 GMT
+Received: from ppma01dal.us.ibm.com (83.d6.3fa9.ip4.static.sl-reverse.com [169.63.214.131])
+        by mx0b-001b2d01.pphosted.com (PPS) with ESMTPS id 3j53hugj7n-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 23 Aug 2022 17:41:44 +0000
-Received: from pps.filterd (ppma03fra.de.ibm.com [127.0.0.1])
-        by ppma03fra.de.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 27NHKetw025068;
-        Tue, 23 Aug 2022 17:41:41 GMT
-Received: from b06cxnps3075.portsmouth.uk.ibm.com (d06relay10.portsmouth.uk.ibm.com [9.149.109.195])
-        by ppma03fra.de.ibm.com with ESMTP id 3j2q8930v8-1
+        Tue, 23 Aug 2022 18:02:11 +0000
+Received: from pps.filterd (ppma01dal.us.ibm.com [127.0.0.1])
+        by ppma01dal.us.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 27NHoVPl017411;
+        Tue, 23 Aug 2022 18:02:10 GMT
+Received: from b01cxnp22036.gho.pok.ibm.com (b01cxnp22036.gho.pok.ibm.com [9.57.198.26])
+        by ppma01dal.us.ibm.com with ESMTP id 3j2q8a1kjd-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 23 Aug 2022 17:41:41 +0000
-Received: from b06wcsmtp001.portsmouth.uk.ibm.com (b06wcsmtp001.portsmouth.uk.ibm.com [9.149.105.160])
-        by b06cxnps3075.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 27NHfcBH29557094
+        Tue, 23 Aug 2022 18:02:10 +0000
+Received: from b01ledav002.gho.pok.ibm.com (b01ledav002.gho.pok.ibm.com [9.57.199.107])
+        by b01cxnp22036.gho.pok.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 27NI29IH18154254
         (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Tue, 23 Aug 2022 17:41:38 GMT
-Received: from b06wcsmtp001.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 425D1A4060;
-        Tue, 23 Aug 2022 17:41:38 +0000 (GMT)
-Received: from b06wcsmtp001.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 5156FA4054;
-        Tue, 23 Aug 2022 17:41:37 +0000 (GMT)
-Received: from [9.171.74.130] (unknown [9.171.74.130])
-        by b06wcsmtp001.portsmouth.uk.ibm.com (Postfix) with ESMTP;
-        Tue, 23 Aug 2022 17:41:37 +0000 (GMT)
-Message-ID: <ca410180-1699-7a04-6417-b59540edc87d@linux.ibm.com>
-Date:   Tue, 23 Aug 2022 19:41:36 +0200
+        Tue, 23 Aug 2022 18:02:09 GMT
+Received: from b01ledav002.gho.pok.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 0AA4C124053;
+        Tue, 23 Aug 2022 18:02:09 +0000 (GMT)
+Received: from b01ledav002.gho.pok.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 4B266124052;
+        Tue, 23 Aug 2022 18:02:08 +0000 (GMT)
+Received: from li-479af74c-31f9-11b2-a85c-e4ddee11713b.ibm.com (unknown [9.160.161.42])
+        by b01ledav002.gho.pok.ibm.com (Postfix) with ESMTP;
+        Tue, 23 Aug 2022 18:02:08 +0000 (GMT)
+Message-ID: <1e9beb36fca72f1dccc217321b2bbbf31c1c1723.camel@linux.ibm.com>
+Subject: Re: [PATCH 03/14] vfio/mdev: make mdev.h standalone includable
+From:   Eric Farman <farman@linux.ibm.com>
+To:     Christoph Hellwig <hch@lst.de>,
+        Kirti Wankhede <kwankhede@nvidia.com>,
+        Tony Krowiak <akrowiak@linux.ibm.com>,
+        Halil Pasic <pasic@linux.ibm.com>,
+        Jason Herne <jjherne@linux.ibm.com>,
+        Matthew Rosato <mjrosato@linux.ibm.com>,
+        Zhenyu Wang <zhenyuw@linux.intel.com>,
+        Zhi Wang <zhi.a.wang@intel.com>,
+        Alex Williamson <alex.williamson@redhat.com>
+Cc:     Jason Gunthorpe <jgg@nvidia.com>, kvm@vger.kernel.org,
+        linux-s390@vger.kernel.org, intel-gvt-dev@lists.freedesktop.org,
+        Kevin Tian <kevin.tian@intel.com>
+Date:   Tue, 23 Aug 2022 14:02:07 -0400
+In-Reply-To: <20220822062208.152745-4-hch@lst.de>
+References: <20220822062208.152745-1-hch@lst.de>
+         <20220822062208.152745-4-hch@lst.de>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+User-Agent: Evolution 3.44.4 (3.44.4-1.fc36) 
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.3.0
-Subject: Re: [PATCH v8 02/12] s390x/cpu_topology: CPU topology objects and
- structures
-Content-Language: en-US
-To:     Thomas Huth <thuth@redhat.com>, qemu-s390x@nongnu.org
-Cc:     qemu-devel@nongnu.org, borntraeger@de.ibm.com, pasic@linux.ibm.com,
-        richard.henderson@linaro.org, david@redhat.com, cohuck@redhat.com,
-        mst@redhat.com, pbonzini@redhat.com, kvm@vger.kernel.org,
-        ehabkost@redhat.com, marcel.apfelbaum@gmail.com, eblake@redhat.com,
-        armbru@redhat.com, seiden@linux.ibm.com, nrb@linux.ibm.com,
-        frankja@linux.ibm.com
-References: <20220620140352.39398-1-pmorel@linux.ibm.com>
- <20220620140352.39398-3-pmorel@linux.ibm.com>
- <b6c981e0-56f5-25c3-3422-ed72c8561712@redhat.com>
-From:   Pierre Morel <pmorel@linux.ibm.com>
-In-Reply-To: <b6c981e0-56f5-25c3-3422-ed72c8561712@redhat.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
 X-TM-AS-GCONF: 00
-X-Proofpoint-ORIG-GUID: vv93dxGvL4Lvz80gn-SSFRHGT7BSZH6g
-X-Proofpoint-GUID: N2781TFnLTAZup-Tnig54yOBXbyRrLK7
+X-Proofpoint-GUID: vqWB3DDdlpD1oFBTsjI6HEJ1hsxEDs7d
+X-Proofpoint-ORIG-GUID: J_XRo1RCwCmak8PMqElH5G5o9gaVUQkV
 X-Proofpoint-Virus-Version: vendor=baseguard
  engine=ICAP:2.0.205,Aquarius:18.0.895,Hydra:6.0.517,FMLib:17.11.122.1
  definitions=2022-08-23_07,2022-08-22_02,2022-06-22_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 bulkscore=0 phishscore=0
- clxscore=1015 priorityscore=1501 lowpriorityscore=0 suspectscore=0
- malwarescore=0 spamscore=0 adultscore=0 mlxscore=0 mlxlogscore=999
- impostorscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 clxscore=1015 mlxlogscore=999
+ priorityscore=1501 malwarescore=0 impostorscore=0 lowpriorityscore=0
+ bulkscore=0 adultscore=0 phishscore=0 mlxscore=0 spamscore=0
+ suspectscore=0 classifier=spam adjust=0 reason=mlx scancount=1
  engine=8.12.0-2207270000 definitions=main-2208230069
 X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,
-        SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no
-        version=3.4.6
+        DKIM_VALID,DKIM_VALID_EF,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_PASS,
+        T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+On Mon, 2022-08-22 at 08:21 +0200, Christoph Hellwig wrote:
+> Include <linux/device.h> and <linux/uuid.h> so that users of this
+> headers
+> don't need to do that and remove those includes that aren't needed
+> any more.
+>=20
+> Signed-off-by: Christoph Hellwig <hch@lst.de>
+> Reviewed-by: Jason Gunthorpe <jgg@nvidia.com>
+> Reviewed-by: Kevin Tian <kevin.tian@intel.com>
+> Reviewed By: Kirti Wankhede <kwankhede@nvidia.com>
 
+Reviewed-by: Eric Farman <farman@linux.ibm.com>
 
-On 8/23/22 15:30, Thomas Huth wrote:
-> On 20/06/2022 16.03, Pierre Morel wrote:
->> We use new objects to have a dynamic administration of the CPU topology.
->> The highest level object in this implementation is the s390 book and
->> in this first implementation of CPU topology for S390 we have a single
->> book.
->> The book is built as a SYSBUS bridge during the CPU initialization.
->> Other objects, sockets and core will be built after the parsing
->> of the QEMU -smp argument.
->>
->> Every object under this single book will be build dynamically
->> immediately after a CPU has be realized if it is needed.
->> The CPU will fill the sockets once after the other, according to the
->> number of core per socket defined during the smp parsing.
->>
->> Each CPU inside a socket will be represented by a bit in a 64bit
->> unsigned long. Set on plug and clear on unplug of a CPU.
->>
->> For the S390 CPU topology, thread and cores are merged into
->> topology cores and the number of topology cores is the multiplication
->> of cores by the numbers of threads.
->>
->> Signed-off-by: Pierre Morel <pmorel@linux.ibm.com>
->> ---
->>   hw/s390x/cpu-topology.c         | 391 ++++++++++++++++++++++++++++++++
->>   hw/s390x/meson.build            |   1 +
->>   hw/s390x/s390-virtio-ccw.c      |   6 +
->>   include/hw/s390x/cpu-topology.h |  74 ++++++
->>   target/s390x/cpu.h              |  47 ++++
->>   5 files changed, 519 insertions(+)
->>   create mode 100644 hw/s390x/cpu-topology.c
->>   create mode 100644 include/hw/s390x/cpu-topology.h
-> ...
->> +bool s390_topology_new_cpu(MachineState *ms, int core_id, Error **errp)
->> +{
->> +    S390TopologyBook *book;
->> +    S390TopologySocket *socket;
->> +    S390TopologyCores *cores;
->> +    int nb_cores_per_socket;
->> +    int origin, bit;
->> +
->> +    book = s390_get_topology();
->> +
->> +    nb_cores_per_socket = ms->smp.cores * ms->smp.threads;
->> +
->> +    socket = s390_get_socket(ms, book, core_id / nb_cores_per_socket, 
->> errp);
->> +    if (!socket) {
->> +        return false;
->> +    }
->> +
->> +    /*
->> +     * At the core level, each CPU is represented by a bit in a 64bit
->> +     * unsigned long. Set on plug and clear on unplug of a CPU.
->> +     * The firmware assume that all CPU in the core description have 
->> the same
->> +     * type, polarization and are all dedicated or shared.
->> +     * In the case a socket contains CPU with different type, 
->> polarization
->> +     * or dedication then they will be defined in different CPU 
->> containers.
->> +     * Currently we assume all CPU are identical and the only reason 
->> to have
->> +     * several S390TopologyCores inside a socket is to have more than 
->> 64 CPUs
->> +     * in that case the origin field, representing the offset of the 
->> first CPU
->> +     * in the CPU container allows to represent up to the maximal 
->> number of
->> +     * CPU inside several CPU containers inside the socket container.
->> +     */
->> +    origin = 64 * (core_id / 64);
-> 
-> Maybe faster:
-> 
->      origin = core_id & ~63;
-> 
-> By the way, where is this limitation to 64 coming from? Just because 
-> we're using a "unsigned long" for now? Or is this a limitation from the 
-> architecture?
-> 
->> +    cores = s390_get_cores(ms, socket, origin, errp);
->> +    if (!cores) {
->> +        return false;
->> +    }
->> +
->> +    bit = 63 - (core_id - origin);
->> +    set_bit(bit, &cores->mask);
->> +    cores->origin = origin;
->> +
->> +    return true;
->> +}
-> ...
->> diff --git a/hw/s390x/s390-virtio-ccw.c b/hw/s390x/s390-virtio-ccw.c
->> index cc3097bfee..a586875b24 100644
->> --- a/hw/s390x/s390-virtio-ccw.c
->> +++ b/hw/s390x/s390-virtio-ccw.c
->> @@ -43,6 +43,7 @@
->>   #include "sysemu/sysemu.h"
->>   #include "hw/s390x/pv.h"
->>   #include "migration/blocker.h"
->> +#include "hw/s390x/cpu-topology.h"
->>   static Error *pv_mig_blocker;
->> @@ -89,6 +90,7 @@ static void s390_init_cpus(MachineState *machine)
->>       /* initialize possible_cpus */
->>       mc->possible_cpu_arch_ids(machine);
->> +    s390_topology_setup(machine);
-> 
-> Is this safe with regards to migration? Did you tried a ping-pong 
-> migration from an older QEMU to a QEMU with your modifications and back 
-> to the older one? If it does not work, we might need to wire this setup 
-> to the machine types...
+> ---
+> =C2=A0drivers/gpu/drm/i915/gvt/kvmgt.c=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 | 2 =
+--
+> =C2=A0drivers/s390/cio/vfio_ccw_drv.c=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+ | 1 -
+> =C2=A0drivers/s390/crypto/vfio_ap_private.h | 1 -
+> =C2=A0drivers/vfio/mdev/mdev_core.c=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0 | 2 --
+> =C2=A0drivers/vfio/mdev/mdev_driver.c=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+ | 1 -
+> =C2=A0drivers/vfio/mdev/mdev_sysfs.c=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0 | 2 --
+> =C2=A0include/linux/mdev.h=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 | 3 +++
+> =C2=A0samples/vfio-mdev/mbochs.c=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0 | 1 -
+> =C2=A0samples/vfio-mdev/mdpy.c=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 | 1 -
+> =C2=A0samples/vfio-mdev/mtty.c=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 | 2 --
+> =C2=A010 files changed, 3 insertions(+), 13 deletions(-)
+>=20
+> diff --git a/drivers/gpu/drm/i915/gvt/kvmgt.c
+> b/drivers/gpu/drm/i915/gvt/kvmgt.c
+> index 91ba675a2fb8c..92bb9e7548b12 100644
+> --- a/drivers/gpu/drm/i915/gvt/kvmgt.c
+> +++ b/drivers/gpu/drm/i915/gvt/kvmgt.c
+> @@ -34,7 +34,6 @@
+> =C2=A0 */
+> =C2=A0
+> =C2=A0#include <linux/init.h>
+> -#include <linux/device.h>
+> =C2=A0#include <linux/mm.h>
+> =C2=A0#include <linux/kthread.h>
+> =C2=A0#include <linux/sched/mm.h>
+> @@ -43,7 +42,6 @@
+> =C2=A0#include <linux/rbtree.h>
+> =C2=A0#include <linux/spinlock.h>
+> =C2=A0#include <linux/eventfd.h>
+> -#include <linux/uuid.h>
+> =C2=A0#include <linux/mdev.h>
+> =C2=A0#include <linux/debugfs.h>
+> =C2=A0
+> diff --git a/drivers/s390/cio/vfio_ccw_drv.c
+> b/drivers/s390/cio/vfio_ccw_drv.c
+> index 86d9e428357b0..e9985c63dc6bf 100644
+> --- a/drivers/s390/cio/vfio_ccw_drv.c
+> +++ b/drivers/s390/cio/vfio_ccw_drv.c
+> @@ -12,7 +12,6 @@
+> =C2=A0
+> =C2=A0#include <linux/module.h>
+> =C2=A0#include <linux/init.h>
+> -#include <linux/device.h>
+> =C2=A0#include <linux/slab.h>
+> =C2=A0#include <linux/mdev.h>
+> =C2=A0
+> diff --git a/drivers/s390/crypto/vfio_ap_private.h
+> b/drivers/s390/crypto/vfio_ap_private.h
+> index d782cf463eaba..163eeaaf24cee 100644
+> --- a/drivers/s390/crypto/vfio_ap_private.h
+> +++ b/drivers/s390/crypto/vfio_ap_private.h
+> @@ -13,7 +13,6 @@
+> =C2=A0#define _VFIO_AP_PRIVATE_H_
+> =C2=A0
+> =C2=A0#include <linux/types.h>
+> -#include <linux/device.h>
+> =C2=A0#include <linux/mdev.h>
+> =C2=A0#include <linux/delay.h>
+> =C2=A0#include <linux/mutex.h>
+> diff --git a/drivers/vfio/mdev/mdev_core.c
+> b/drivers/vfio/mdev/mdev_core.c
+> index b8b9e7911e559..2c32923fbad27 100644
+> --- a/drivers/vfio/mdev/mdev_core.c
+> +++ b/drivers/vfio/mdev/mdev_core.c
+> @@ -8,9 +8,7 @@
+> =C2=A0 */
+> =C2=A0
+> =C2=A0#include <linux/module.h>
+> -#include <linux/device.h>
+> =C2=A0#include <linux/slab.h>
+> -#include <linux/uuid.h>
+> =C2=A0#include <linux/sysfs.h>
+> =C2=A0#include <linux/mdev.h>
+> =C2=A0
+> diff --git a/drivers/vfio/mdev/mdev_driver.c
+> b/drivers/vfio/mdev/mdev_driver.c
+> index 9c2af59809e2e..7bd4bb9850e81 100644
+> --- a/drivers/vfio/mdev/mdev_driver.c
+> +++ b/drivers/vfio/mdev/mdev_driver.c
+> @@ -7,7 +7,6 @@
+> =C2=A0 *=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0 Kirti Wankhede <kwankhede@nvidia.com>
+> =C2=A0 */
+> =C2=A0
+> -#include <linux/device.h>
+> =C2=A0#include <linux/iommu.h>
+> =C2=A0#include <linux/mdev.h>
+> =C2=A0
+> diff --git a/drivers/vfio/mdev/mdev_sysfs.c
+> b/drivers/vfio/mdev/mdev_sysfs.c
+> index 0ccfeb3dda245..4bfbf49aaa66a 100644
+> --- a/drivers/vfio/mdev/mdev_sysfs.c
+> +++ b/drivers/vfio/mdev/mdev_sysfs.c
+> @@ -9,9 +9,7 @@
+> =C2=A0
+> =C2=A0#include <linux/sysfs.h>
+> =C2=A0#include <linux/ctype.h>
+> -#include <linux/device.h>
+> =C2=A0#include <linux/slab.h>
+> -#include <linux/uuid.h>
+> =C2=A0#include <linux/mdev.h>
+> =C2=A0
+> =C2=A0#include "mdev_private.h"
+> diff --git a/include/linux/mdev.h b/include/linux/mdev.h
+> index 47ad3b104d9e7..a5d8ae6132a20 100644
+> --- a/include/linux/mdev.h
+> +++ b/include/linux/mdev.h
+> @@ -10,6 +10,9 @@
+> =C2=A0#ifndef MDEV_H
+> =C2=A0#define MDEV_H
+> =C2=A0
+> +#include <linux/device.h>
+> +#include <linux/uuid.h>
+> +
+> =C2=A0struct mdev_type;
+> =C2=A0
+> =C2=A0struct mdev_device {
+> diff --git a/samples/vfio-mdev/mbochs.c b/samples/vfio-mdev/mbochs.c
+> index 344c2901a82bf..d0d1bb7747240 100644
+> --- a/samples/vfio-mdev/mbochs.c
+> +++ b/samples/vfio-mdev/mbochs.c
+> @@ -21,7 +21,6 @@
+> =C2=A0 */
+> =C2=A0#include <linux/init.h>
+> =C2=A0#include <linux/module.h>
+> -#include <linux/device.h>
+> =C2=A0#include <linux/kernel.h>
+> =C2=A0#include <linux/slab.h>
+> =C2=A0#include <linux/vmalloc.h>
+> diff --git a/samples/vfio-mdev/mdpy.c b/samples/vfio-mdev/mdpy.c
+> index e8c46eb2e2468..0c4ca1f4be7ed 100644
+> --- a/samples/vfio-mdev/mdpy.c
+> +++ b/samples/vfio-mdev/mdpy.c
+> @@ -17,7 +17,6 @@
+> =C2=A0 */
+> =C2=A0#include <linux/init.h>
+> =C2=A0#include <linux/module.h>
+> -#include <linux/device.h>
+> =C2=A0#include <linux/kernel.h>
+> =C2=A0#include <linux/slab.h>
+> =C2=A0#include <linux/vmalloc.h>
+> diff --git a/samples/vfio-mdev/mtty.c b/samples/vfio-mdev/mtty.c
+> index f42a59ed2e3fe..4f5a6f2d3629d 100644
+> --- a/samples/vfio-mdev/mtty.c
+> +++ b/samples/vfio-mdev/mtty.c
+> @@ -12,7 +12,6 @@
+> =C2=A0
+> =C2=A0#include <linux/init.h>
+> =C2=A0#include <linux/module.h>
+> -#include <linux/device.h>
+> =C2=A0#include <linux/kernel.h>
+> =C2=A0#include <linux/fs.h>
+> =C2=A0#include <linux/poll.h>
+> @@ -20,7 +19,6 @@
+> =C2=A0#include <linux/cdev.h>
+> =C2=A0#include <linux/sched.h>
+> =C2=A0#include <linux/wait.h>
+> -#include <linux/uuid.h>
+> =C2=A0#include <linux/vfio.h>
+> =C2=A0#include <linux/iommu.h>
+> =C2=A0#include <linux/sysfs.h>
 
-I checked with the follow-up series :
-OLD-> NEW -> OLD -> NEW
-
-It is working fine, of course we need to fence the CPU topology facility 
-with ctop=off on the new QEMU to avoid authorizing the new instructions, 
-PTF and STSI(15).
-
-The new series will also be much simpler, 725 LOCs including a 
-documentation against ... 1377 without documentation.
-
-I let fall a lot of QEMU objects that did not have really a use on the 
-advise from Janis and also simplified the STSI handling.
-
-I still need to had more comments so it will grow again but for a good 
-reason.
-
-Regards,
-Pierre
-
-
--- 
-Pierre Morel
-IBM Lab Boeblingen
