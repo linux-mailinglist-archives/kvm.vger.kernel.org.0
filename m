@@ -2,152 +2,160 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id E30D659CD15
-	for <lists+kvm@lfdr.de>; Tue, 23 Aug 2022 02:17:41 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 4EF9F59CD62
+	for <lists+kvm@lfdr.de>; Tue, 23 Aug 2022 02:48:19 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S239033AbiHWAQ5 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 22 Aug 2022 20:16:57 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51598 "EHLO
+        id S239074AbiHWAqr (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 22 Aug 2022 20:46:47 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45642 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S239029AbiHWAQw (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 22 Aug 2022 20:16:52 -0400
-Received: from mailtransmit05.runbox.com (mailtransmit05.runbox.com [IPv6:2a0c:5a00:149::26])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BB06CC02
-        for <kvm@vger.kernel.org>; Mon, 22 Aug 2022 17:16:49 -0700 (PDT)
-Received: from mailtransmit03.runbox ([10.9.9.163] helo=aibo.runbox.com)
-        by mailtransmit05.runbox.com with esmtps  (TLS1.2) tls TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256
-        (Exim 4.93)
-        (envelope-from <mhal@rbox.co>)
-        id 1oQHb4-00Bkgy-HL; Tue, 23 Aug 2022 02:16:46 +0200
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=rbox.co;
-        s=selector2; h=Content-Transfer-Encoding:Content-Type:In-Reply-To:From:
-        References:Cc:To:Subject:MIME-Version:Date:Message-ID;
-        bh=HTJw75iycaZewoe7HywmIg0hisjG3sBsQG26be+L0q8=; b=jlNnHVuvCiNcnsyyGriOMsaqpz
-        pAH0WIPwo2OmhNHLgiNsvw+dqFXO+wWsm2Qd/p9CK74vKwy7pU7tmTIxLglkzukyHs3HcHA+7NeSM
-        iVDoRb55bvLqnyG+ais3DIzctBSSWvMVzl0utDeJ0wHaWFMzjpkrzSGH+ADQUCoPU1P5+ivA+OEwR
-        3+bdvKZoVqdlpShNlu3K7htO7kSGGVLqvW30gbN0ozRwVaVKvSOacsCZK/pO068f4h9siWTlBNuBd
-        zGr6psgCD7CwskJ7ShlH38mKwBm83gRirX1X3NwqTKDshyZx99iG5ownwWaZCGUr8rKIPle2oYm1D
-        ByBg3T6Q==;
-Received: from [10.9.9.73] (helo=submission02.runbox)
-        by mailtransmit03.runbox with esmtp (Exim 4.86_2)
-        (envelope-from <mhal@rbox.co>)
-        id 1oQHb4-0002t9-5X; Tue, 23 Aug 2022 02:16:46 +0200
-Received: by submission02.runbox with esmtpsa  [Authenticated ID (604044)]  (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
-        (Exim 4.90_1)
-        id 1oQHal-0003Bo-78; Tue, 23 Aug 2022 02:16:27 +0200
-Message-ID: <6d19f78f-120a-936b-3eba-e949ecc3509f@rbox.co>
-Date:   Tue, 23 Aug 2022 02:16:25 +0200
-MIME-Version: 1.0
-User-Agent: Thunderbird
-Subject: Re: [kvm-unit-tests PATCH] x86/emulator: Test POP-SS blocking
-Content-Language: en-US
-To:     Sean Christopherson <seanjc@google.com>
-Cc:     kvm@vger.kernel.org, pbonzini@redhat.com
-References: <20220821215900.1419215-1-mhal@rbox.co>
- <20220821220647.1420411-1-mhal@rbox.co>
- <9b853239-a3df-f124-e793-44cbadfbbd8f@rbox.co> <YwOj6tzvIoG34/sF@google.com>
-From:   Michal Luczaj <mhal@rbox.co>
-In-Reply-To: <YwOj6tzvIoG34/sF@google.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-2.8 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,RCVD_IN_DNSWL_LOW,
-        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
-        autolearn_force=no version=3.4.6
+        with ESMTP id S239016AbiHWAqq (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 22 Aug 2022 20:46:46 -0400
+Received: from mail-pg1-x54a.google.com (mail-pg1-x54a.google.com [IPv6:2607:f8b0:4864:20::54a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E3C164D153
+        for <kvm@vger.kernel.org>; Mon, 22 Aug 2022 17:46:43 -0700 (PDT)
+Received: by mail-pg1-x54a.google.com with SMTP id l190-20020a6388c7000000b00429eadd0a58so5401297pgd.19
+        for <kvm@vger.kernel.org>; Mon, 22 Aug 2022 17:46:43 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112;
+        h=cc:to:from:subject:mime-version:message-id:date:from:to:cc;
+        bh=+5ILiONNT2Raf8lvKVWoFP9Lx9r+QT/j1xkxXvfLAg4=;
+        b=o+XzIuiX0mVrmTljlwxKQE5BPa7fWhxeXonBF2ujsHDIIkmrP/BArjGG8vKGXZzxHZ
+         aGCyHZQGHV5fEhDCrdkCSs+rAYyXOsbuGhwIvEGUIpM+alq9pj57H5dboCmNEc09TK0z
+         c6heO/8eSor/4/h1izel8Myn9DtJfj72/a/q7U1fFyl1Dno74zfJPMJQRSCl7AkmFpA2
+         YVxX7c0VRywxlO0x4/jEhIDRhafho11s7qXBSJr3SCWVNdlEtnYGvZenzxKVAARYwX+f
+         oi9flWWlqVqqz3XGywpOOfYXa3KiMvQtqdVJT3SmOpYgrc6NAr9neqgsbzx2bpt4Hix/
+         1rNA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=cc:to:from:subject:mime-version:message-id:date:x-gm-message-state
+         :from:to:cc;
+        bh=+5ILiONNT2Raf8lvKVWoFP9Lx9r+QT/j1xkxXvfLAg4=;
+        b=m6ECFsRF/WCRPuy+/5hkxv2qGTbcXZj/Xp6Tj9Ub2M1l8UfC3RhhJizGM4k4a7BVD3
+         +ayHVxXT4VdHHA7BFylPL3g5Db1d0dHSxzas+rIxHQya/RySm4osPs9K8ew2Oks2Zu6I
+         ZjWcnvRnbbpl7opydFpxStlMoKnZ4rs5plQQXMfX2Yy47+IzEpdo2jEXtpKQy/6FV+1H
+         b7iTiNOo1dTLhSpn56/fJO0JOTTMqSMnVPN9/zmqAxoYwAK9lQTLC61Vj1SYvVW6Fn2C
+         pm0yOFRFXQc+z0RC26hg9HwNAKtZBq1koBa8ERk9GH43I1JQzXvOYBilsmxz9ybEodjE
+         q2+Q==
+X-Gm-Message-State: ACgBeo3mC0cMsCiaprzfjX/7epDhbF543ziPoaDLV9XA9YGJA3HSFEGr
+        hsygu0KXa0I2cShhC23uuxV0MArhO/lMiC1H
+X-Google-Smtp-Source: AA6agR7n4HaZkWJXrjZPxJF0LYP1shjmb62PXEmeLlBFj/2/BudXQckF9s5n2JZ4jSwiCza7N/CifAgyNs456d/H
+X-Received: from yosry.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:2327])
+ (user=yosryahmed job=sendgmr) by 2002:a17:90b:4c8c:b0:1fa:c44f:473a with SMTP
+ id my12-20020a17090b4c8c00b001fac44f473amr840678pjb.195.1661215603362; Mon,
+ 22 Aug 2022 17:46:43 -0700 (PDT)
+Date:   Tue, 23 Aug 2022 00:46:35 +0000
+Message-Id: <20220823004639.2387269-1-yosryahmed@google.com>
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.37.1.595.g718a3a8f04-goog
+Subject: [PATCH v7 0/4] KVM: mm: count KVM mmu usage in memory stats
+From:   Yosry Ahmed <yosryahmed@google.com>
+To:     Tejun Heo <tj@kernel.org>, Johannes Weiner <hannes@cmpxchg.org>,
+        Zefan Li <lizefan.x@bytedance.com>,
+        Marc Zyngier <maz@kernel.org>,
+        James Morse <james.morse@arm.com>,
+        Alexandru Elisei <alexandru.elisei@arm.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Sean Christopherson <seanjc@google.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        Michal Hocko <mhocko@kernel.org>,
+        Roman Gushchin <roman.gushchin@linux.dev>,
+        Shakeel Butt <shakeelb@google.com>,
+        Oliver Upton <oupton@google.com>
+Cc:     Huang@google.com, Shaoqin <shaoqin.huang@intel.com>,
+        cgroups@vger.kernel.org, linux-kernel@vger.kernel.org,
+        linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
+        kvm@vger.kernel.org, linux-mm@kvack.org,
+        Yosry Ahmed <yosryahmed@google.com>
+Content-Type: text/plain; charset="UTF-8"
+X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 8/22/22 17:42, Sean Christopherson wrote:
->> On 8/22/22 00:06, Michal Luczaj wrote:
->> test can be simplified to something like
->>
->> 	asm volatile("push %[ss]\n\t"
->> 		     __ASM_TRY(KVM_FEP "pop %%ss", "1f")
->> 		     "ex_blocked: mov $1, %[success]\n\t"
-> 
-> So I'm 99% certain this only passes because KVM doesn't emulate the `mov $1, %[success]`.
-> kvm_vcpu_check_code_breakpoint() honors EFLAGS.RF, but not MOV/POP_SS blocking.
-> I.e. I would expect this to fail if the `mov` were also tagged KVM_FEP.
+Add NR_SECONDARY_PAGETABLE memory stat and use it to account KVM mmu
+usage as the first type of accounted secondary page tables. This stat
+can be later extended to account for other types of secondary pages
+tables (e.g. iommu page tables).
 
-I wasn't sure if I understood you correctly, so, FWIW, I've ran:
+Rationale behind why this is useful and link to extended discussion in
+the first patch.
 
-static void test_pop_ss_blocking_try(void)
-{
-	int success;
+---
 
-	write_dr7(DR7_FIXED_1 |
-		  DR7_GLOBAL_ENABLE_DRx(0) |
-		  DR7_EXECUTE_DRx(0) |
-		  DR7_LEN_1_DRx(0));
+Changes in V7:
+- Rebased on top of kvm/queue.
+- Fixed doc spaces in proc.rst (Sean).
+- Commit message s/kvm/KVM (Sean).
+- Example of NR_SECONDARY_PAGETABLE s/KVM shadow pagetables/KVM pagetables
+  (Sean).
+- Added comment that kvm_account_pgtable_pages() is thread-safe (Sean).
+- Collected Acks and Reviewed-by's from Sean and Marc (Thanks!).
 
-#define POPSS(desc, fep1, fep2)					\
-	asm volatile("mov $0, %[success]\n\t"			\
-		     "lea 1f, %%eax\n\r"			\
-		     "mov %%eax, %%dr0\n\r"			\
-		     "push %%ss\n\t"				\
-		     __ASM_TRY(fep1 "pop %%ss", "2f")		\
-		     "1:" fep2 "mov $1, %[success]\n\t"		\
-		     "2:"					\
-		     : [success] "=g" (success)			\
-		     :						\
-		     : "eax", "memory");			\
-	report(success, desc ": #DB suppressed after POP SS")
+Changes in V6:
+- Rebased on top of kvm/queue and fixed conflicts.
+- Fixed docs spaces and tabs (Sean).
+- More narrative commit logs (Sean and Oliver).
+- Updated kvm_account_pgtable_pages() documentation to describe the
+  rules of using it more clearly (Sean).
+- Collected Acks and Reviewed-by's by Shakeel and Oliver (Thanks!)
 
-	POPSS("no fep", "", "");
-	POPSS("fep pop-ss", KVM_FEP, "");
-	POPSS("fep mov-1", "", KVM_FEP);
-	POPSS("fep pop-ss/fep mov-1", KVM_FEP, KVM_FEP);
+Changes in V5:
+- Updated cover letter to explain more the rationale behind the change
+  (Thanks to contributions by Sean Christopherson).
+- Removed extraneous + in arm64 patch (Oliver Upton, Marc Zyngier).
+- Shortened secondary_pagetables to sec_pagetables (Shakeel Butt).
+- Removed dependency on other patchsets (applies to queue branch).
 
-	write_dr7(DR7_FIXED_1);
-}
+Changes in V4:
+- Changed accounting hooks in arm64 to only account s2 page tables and
+  refactored them to a much cleaner form, based on recommendations from
+  Oliver Upton and Marc Zyngier.
+- Dropped patches for mips and riscv. I am not interested in those archs
+  anyway and don't have the resources to test them. I posted them for
+  completeness but it doesn't seem like anyone was interested.
 
-and got:
+Changes in V3:
+- Added NR_SECONDARY_PAGETABLE instead of piggybacking on NR_PAGETABLE
+  stats.
 
-em_pop_sreg unpatched:
-PASS: no fep: #DB suppressed after POP SS
-FAIL: fep pop-ss: #DB suppressed after POP SS
-PASS: fep mov-1: #DB suppressed after POP SS
-FAIL: fep pop-ss/fep mov-1: #DB suppressed after POP SS
+Changes in V2:
+- Added accounting stats for other archs than x86.
+- Changed locations in the code where x86 KVM page table stats were
+  accounted based on suggestions from Sean Christopherson.
 
-em_pop_sreg patched:
-PASS: no fep: #DB suppressed after POP SS
-PASS: fep pop-ss: #DB suppressed after POP SS
-PASS: fep mov-1: #DB suppressed after POP SS
-PASS: fep pop-ss/fep mov-1: #DB suppressed after POP SS
+---
 
-For the sake of completeness: basically the same, but MOV SS, i.e.
+Yosry Ahmed (4):
+  mm: add NR_SECONDARY_PAGETABLE to count secondary page table uses.
+  KVM: mmu: add a helper to account memory used by KVM MMU.
+  KVM: x86/mmu: count KVM mmu usage in secondary pagetable stats.
+  KVM: arm64/mmu: count KVM s2 mmu usage in secondary pagetable stats
 
-	asm volatile("mov $0, %[success]\n\t"			\
-		     "lea 1f, %%eax\n\r"			\
-		     "mov %%eax, %%dr0\n\r"			\
-		     "mov %%ss, %%eax\n\t"			\
-		     __ASM_TRY(fep1 "mov %%eax, %%ss", "2f")	\
-		     "1:" fep2 "mov $1, %[success]\n\t"		\
-		     "2:"					\
-		     : [success] "=g" (success)			\
-		     :						\
-		     : "eax", "memory");			\
+ Documentation/admin-guide/cgroup-v2.rst |  5 ++++
+ Documentation/filesystems/proc.rst      |  4 +++
+ arch/arm64/kvm/mmu.c                    | 36 ++++++++++++++++++++++---
+ arch/x86/kvm/mmu/mmu.c                  | 16 +++++++++--
+ arch/x86/kvm/mmu/tdp_mmu.c              | 12 +++++++++
+ drivers/base/node.c                     |  2 ++
+ fs/proc/meminfo.c                       |  2 ++
+ include/linux/kvm_host.h                | 13 +++++++++
+ include/linux/mmzone.h                  |  1 +
+ mm/memcontrol.c                         |  1 +
+ mm/page_alloc.c                         |  6 ++++-
+ mm/vmstat.c                             |  1 +
+ 12 files changed, 92 insertions(+), 7 deletions(-)
 
-PASS: no fep: #DB suppressed after MOV SS
-PASS: fep mov-ss: #DB suppressed after MOV SS
-PASS: fep mov-1: #DB suppressed after MOV SS
-PASS: fep mov-ss/fep mov-1: #DB suppressed after MOV SS
+-- 
+2.37.1.595.g718a3a8f04-goog
 
-> The reason I say the setup_idt() change is a moot point is because I think it
-> would be better to put this testcase into debug.c (where "this" testcase is really
-> going to be multiple testcases).  With macro shenanigans (or code patching), it
-> should be fairly easy to run all testcases with both FEP=0 and FEP=1.
->
-> Then it's "just" a matter of adding a code #DB testcase.  __run_single_step_db_test()
-> and run_ss_db_test() aren't fundamentally tied to single-step, i.e. can simply be
-> renamed.  For simplicity, I'd say just skip the usermode test for code #DBs, IMO
-> it's not worth the extra coverage.
-
-So that would involve a 32-bit segment for POP SS and making use of DR0/DR7 instead
-of single stepping? I guess I can try.
-
-Thanks,
-Michal
