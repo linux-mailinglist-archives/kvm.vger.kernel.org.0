@@ -2,155 +2,112 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id ECC9859DC4E
-	for <lists+kvm@lfdr.de>; Tue, 23 Aug 2022 14:23:57 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 9DA9E59E1E5
+	for <lists+kvm@lfdr.de>; Tue, 23 Aug 2022 14:41:21 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S244395AbiHWLdN (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 23 Aug 2022 07:33:13 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48712 "EHLO
+        id S242527AbiHWLT1 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 23 Aug 2022 07:19:27 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42098 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1355917AbiHWLbg (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 23 Aug 2022 07:31:36 -0400
-Received: from mx0a-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9CA6FC59CE
-        for <kvm@vger.kernel.org>; Tue, 23 Aug 2022 02:25:40 -0700 (PDT)
-Received: from pps.filterd (m0098419.ppops.net [127.0.0.1])
-        by mx0b-001b2d01.pphosted.com (8.17.1.5/8.17.1.5) with ESMTP id 27N8VNYm017421
-        for <kvm@vger.kernel.org>; Tue, 23 Aug 2022 08:45:31 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=from : to : cc : subject
- : date : message-id : in-reply-to : references : mime-version :
- content-transfer-encoding; s=pp1;
- bh=PU1StoXkNQmYX8u/0kwrq1ZBaFqJ2PF4srIyXuZuGQw=;
- b=GMiu8WKZFw7tp+Ht3fHLHYTcnlwT2pwUi/jh/EQiSHDgu7NH+bgcSbhr4TXtGSrJl0I7
- 4ly6qHDaQ4chu2kiii79TVaY6qmY0K1L2cBm6XMfKQECxwr4+OL0DkWuXkfb2c+zbfr5
- gKorRnSRHBratlh9JL6XULa2XYl78k1CYIkjxm8oahqTONzOsd/Soy/ls85Z0SalNcp+
- RCK1AwjDO9PxEGtsiDYtg9r7lqGLX3YDxdCX8w1WhmsZAmlOHnUHgvH7Ifpn0LMskUzo
- 8TLXkRQfCajxuY3ccl6hVKpdAuUCZ0NzuInHcfr4PcVyEkBm9ZC852pcJn4jNHyx0Rv8 JA== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0b-001b2d01.pphosted.com (PPS) with ESMTPS id 3j4uf60atr-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT)
-        for <kvm@vger.kernel.org>; Tue, 23 Aug 2022 08:45:31 +0000
-Received: from m0098419.ppops.net (m0098419.ppops.net [127.0.0.1])
-        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 27N8dWrQ016335
-        for <kvm@vger.kernel.org>; Tue, 23 Aug 2022 08:45:31 GMT
-Received: from ppma03fra.de.ibm.com (6b.4a.5195.ip4.static.sl-reverse.com [149.81.74.107])
-        by mx0b-001b2d01.pphosted.com (PPS) with ESMTPS id 3j4uf60at1-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 23 Aug 2022 08:45:31 +0000
-Received: from pps.filterd (ppma03fra.de.ibm.com [127.0.0.1])
-        by ppma03fra.de.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 27N8KApl018292;
-        Tue, 23 Aug 2022 08:45:29 GMT
-Received: from b06avi18626390.portsmouth.uk.ibm.com (b06avi18626390.portsmouth.uk.ibm.com [9.149.26.192])
-        by ppma03fra.de.ibm.com with ESMTP id 3j2q892j2c-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 23 Aug 2022 08:45:29 +0000
-Received: from d06av26.portsmouth.uk.ibm.com (d06av26.portsmouth.uk.ibm.com [9.149.105.62])
-        by b06avi18626390.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 27N8gSDP28639670
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Tue, 23 Aug 2022 08:42:28 GMT
-Received: from d06av26.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 43F9CAE051;
-        Tue, 23 Aug 2022 08:45:26 +0000 (GMT)
-Received: from d06av26.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 1371BAE055;
-        Tue, 23 Aug 2022 08:45:26 +0000 (GMT)
-Received: from a46lp57.lnxne.boe (unknown [9.152.108.100])
-        by d06av26.portsmouth.uk.ibm.com (Postfix) with ESMTP;
-        Tue, 23 Aug 2022 08:45:26 +0000 (GMT)
-From:   Nico Boehr <nrb@linux.ibm.com>
-To:     kvm@vger.kernel.org
-Cc:     frankja@linux.ibm.com, imbrenda@linux.ibm.com, thuth@redhat.com
-Subject: [kvm-unit-tests PATCH v5 2/4] lib/s390x: add CPU timer related defines and functions
-Date:   Tue, 23 Aug 2022 10:45:23 +0200
-Message-Id: <20220823084525.52365-3-nrb@linux.ibm.com>
-X-Mailer: git-send-email 2.36.1
-In-Reply-To: <20220823084525.52365-1-nrb@linux.ibm.com>
-References: <20220823084525.52365-1-nrb@linux.ibm.com>
+        with ESMTP id S244332AbiHWLRM (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 23 Aug 2022 07:17:12 -0400
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B9965BD760;
+        Tue, 23 Aug 2022 02:20:35 -0700 (PDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id 29CFA6122D;
+        Tue, 23 Aug 2022 09:20:18 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 88A0BC433D7;
+        Tue, 23 Aug 2022 09:20:17 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1661246417;
+        bh=E5E6YqheunirZWVRILdnP1fmydkijA605aVw9h45w54=;
+        h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+        b=lNIMtUlYb2oThTM3KA8GuBXUuMf8SCxgSlhXoMHAHnuc/TXp679M6qx2q1wb8FDHJ
+         pjEmJK14tnqDdFKTRXzMI+h420ap1y/uLepZ9bbFYtBSBCRsKtn3+cl2jXtu8HiHvt
+         kLfdd4nYE4QxAoZca01QrifXWxL+W+hAmOvWsXC7qqdRa3mXvMEKVmG2Y57+xRYSXN
+         E40ySzqpbHlSohsmANHbJic/uEbt31aftBq96h/2McHYZCt72nuKw/qvbT9cCcmZbe
+         cjTtd/u4yrhCmshGLpJUO4uOakEw7ncW7Z4flpGvb9JyeLakMk+esGFcx6krlfcN89
+         fnu0wcI7jDrgQ==
+Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
+        by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 67C11E2A041;
+        Tue, 23 Aug 2022 09:20:17 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: Nv4k8L2QNZ3VpaL1AVbEY3f9LZYQyEEP
-X-Proofpoint-ORIG-GUID: imgMM1Sphh8HMeCpICFbYY4IJc_IhdA2
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.205,Aquarius:18.0.895,Hydra:6.0.517,FMLib:17.11.122.1
- definitions=2022-08-23_03,2022-08-22_02,2022-06-22_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxscore=0 impostorscore=0
- mlxlogscore=889 adultscore=0 clxscore=1015 suspectscore=0 bulkscore=0
- malwarescore=0 priorityscore=1501 lowpriorityscore=0 spamscore=0
- phishscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2207270000 definitions=main-2208230032
-X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_EF,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_PASS,
-        T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
+Subject: Re: [PATCH net-next v4 0/9] vsock: updates for SO_RCVLOWAT handling
+From:   patchwork-bot+netdevbpf@kernel.org
+Message-Id: <166124641741.3613.14462529402245081458.git-patchwork-notify@kernel.org>
+Date:   Tue, 23 Aug 2022 09:20:17 +0000
+References: <de41de4c-0345-34d7-7c36-4345258b7ba8@sberdevices.ru>
+In-Reply-To: <de41de4c-0345-34d7-7c36-4345258b7ba8@sberdevices.ru>
+To:     Arseniy Krasnov <AVKrasnov@sberdevices.ru>
+Cc:     sgarzare@redhat.com, davem@davemloft.net, edumazet@google.com,
+        kuba@kernel.org, pabeni@redhat.com, kys@microsoft.com,
+        haiyangz@microsoft.com, sthemmin@microsoft.com, wei.liu@kernel.org,
+        decui@microsoft.com, stefanha@redhat.com, bryantan@vmware.com,
+        vdasa@vmware.com, oxffffaa@gmail.com, mst@redhat.com,
+        virtualization@lists.linux-foundation.org, netdev@vger.kernel.org,
+        linux-kernel@vger.kernel.org, linux-hyperv@vger.kernel.org,
+        kvm@vger.kernel.org, kernel@sberdevices.ru, pv-drivers@vmware.com
+X-Spam-Status: No, score=-7.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_HI,
+        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Upcoming changes will make use of the CPU timer, so add some defines and
-functions to work with the CPU timer.
+Hello:
 
-Since shifts for both CPU timer and TOD clock are the same, introduce a
-new define S390_CLOCK_SHIFT_US. The respective shifts for CPU timer and
-TOD clock reference it, so the semantic difference between the two
-defines is kept.
+This series was applied to netdev/net-next.git (master)
+by Paolo Abeni <pabeni@redhat.com>:
 
-Also add a define for the CPU timer subclass mask.
+On Fri, 19 Aug 2022 05:21:58 +0000 you wrote:
+> Hello,
+> 
+> This patchset includes some updates for SO_RCVLOWAT:
+> 
+> 1) af_vsock:
+>    During my experiments with zerocopy receive, i found, that in some
+>    cases, poll() implementation violates POSIX: when socket has non-
+>    default SO_RCVLOWAT(e.g. not 1), poll() will always set POLLIN and
+>    POLLRDNORM bits in 'revents' even number of bytes available to read
+>    on socket is smaller than SO_RCVLOWAT value. In this case,user sees
+>    POLLIN flag and then tries to read data(for example using  'read()'
+>    call), but read call will be blocked, because  SO_RCVLOWAT logic is
+>    supported in dequeue loop in af_vsock.c. But the same time,  POSIX
+>    requires that:
+> 
+> [...]
 
-Signed-off-by: Nico Boehr <nrb@linux.ibm.com>
----
- lib/s390x/asm/arch_def.h |  1 +
- lib/s390x/asm/time.h     | 17 ++++++++++++++++-
- 2 files changed, 17 insertions(+), 1 deletion(-)
+Here is the summary with links:
+  - [net-next,v4,1/9] vsock: SO_RCVLOWAT transport set callback
+    https://git.kernel.org/netdev/net-next/c/e38f22c860ed
+  - [net-next,v4,2/9] hv_sock: disable SO_RCVLOWAT support
+    https://git.kernel.org/netdev/net-next/c/24764f8d3c31
+  - [net-next,v4,3/9] virtio/vsock: use 'target' in notify_poll_in callback
+    https://git.kernel.org/netdev/net-next/c/e7a3266c9167
+  - [net-next,v4,4/9] vmci/vsock: use 'target' in notify_poll_in callback
+    https://git.kernel.org/netdev/net-next/c/a274f6ff3c5c
+  - [net-next,v4,5/9] vsock: pass sock_rcvlowat to notify_poll_in as target
+    https://git.kernel.org/netdev/net-next/c/ee0b3843a269
+  - [net-next,v4,6/9] vsock: add API call for data ready
+    https://git.kernel.org/netdev/net-next/c/f2fdcf67aceb
+  - [net-next,v4,7/9] virtio/vsock: check SO_RCVLOWAT before wake up reader
+    https://git.kernel.org/netdev/net-next/c/39f1ed33a448
+  - [net-next,v4,8/9] vmci/vsock: check SO_RCVLOWAT before wake up reader
+    https://git.kernel.org/netdev/net-next/c/e061aed99855
+  - [net-next,v4,9/9] vsock_test: POLLIN + SO_RCVLOWAT test
+    https://git.kernel.org/netdev/net-next/c/b1346338fbae
 
-diff --git a/lib/s390x/asm/arch_def.h b/lib/s390x/asm/arch_def.h
-index e7ae454b3a33..b92291e8ae3f 100644
---- a/lib/s390x/asm/arch_def.h
-+++ b/lib/s390x/asm/arch_def.h
-@@ -78,6 +78,7 @@ struct cpu {
- #define CTL0_EMERGENCY_SIGNAL			(63 - 49)
- #define CTL0_EXTERNAL_CALL			(63 - 50)
- #define CTL0_CLOCK_COMPARATOR			(63 - 52)
-+#define CTL0_CPU_TIMER				(63 - 53)
- #define CTL0_SERVICE_SIGNAL			(63 - 54)
- #define CR0_EXTM_MASK			0x0000000000006200UL /* Combined external masks */
- 
-diff --git a/lib/s390x/asm/time.h b/lib/s390x/asm/time.h
-index 7652a151e87a..d8d91d68a667 100644
---- a/lib/s390x/asm/time.h
-+++ b/lib/s390x/asm/time.h
-@@ -11,9 +11,13 @@
- #ifndef _ASMS390X_TIME_H_
- #define _ASMS390X_TIME_H_
- 
--#define STCK_SHIFT_US	(63 - 51)
-+#define S390_CLOCK_SHIFT_US	(63 - 51)
-+
-+#define STCK_SHIFT_US	S390_CLOCK_SHIFT_US
- #define STCK_MAX	((1UL << 52) - 1)
- 
-+#define CPU_TIMER_SHIFT_US	S390_CLOCK_SHIFT_US
-+
- static inline uint64_t get_clock_us(void)
- {
- 	uint64_t clk;
-@@ -45,4 +49,15 @@ static inline void mdelay(unsigned long ms)
- 	udelay(ms * 1000);
- }
- 
-+static inline void cpu_timer_set_ms(int64_t timeout_ms)
-+{
-+	int64_t timer_value = (timeout_ms * 1000) << CPU_TIMER_SHIFT_US;
-+
-+	asm volatile (
-+		"spt %[timer_value]\n"
-+		:
-+		: [timer_value] "Q" (timer_value)
-+	);
-+}
-+
- #endif
+You are awesome, thank you!
 -- 
-2.36.1
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
 
