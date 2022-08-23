@@ -2,194 +2,150 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 26AEB59D224
-	for <lists+kvm@lfdr.de>; Tue, 23 Aug 2022 09:33:19 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id D53A759D252
+	for <lists+kvm@lfdr.de>; Tue, 23 Aug 2022 09:39:22 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S241033AbiHWHdM (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 23 Aug 2022 03:33:12 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40380 "EHLO
+        id S240863AbiHWHhR (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 23 Aug 2022 03:37:17 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45506 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S240520AbiHWHdK (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 23 Aug 2022 03:33:10 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D291A63F2C
-        for <kvm@vger.kernel.org>; Tue, 23 Aug 2022 00:33:09 -0700 (PDT)
+        with ESMTP id S240494AbiHWHhO (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 23 Aug 2022 03:37:14 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7B6B8647C9
+        for <kvm@vger.kernel.org>; Tue, 23 Aug 2022 00:37:13 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1661239989;
+        s=mimecast20190719; t=1661240232;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=2ONerqKdocOJl27KKdUeRrTYuQ3xXPZVssG9HygGkPU=;
-        b=GM/S4tTvhoaYro50MtCG6DTtGTaIBR/5ANWpRaLr4mb8FK5dUfl21T1ZArKsOCkF315S37
-        M0OG4yaewpA3FQlHF2c/XFNiFpoxYswmI+CL4qtDM0nu07TFuU2QRRdEoEH+EPzxEMTYDc
-        HEvNdL1Ge4K1zzxmeZ//7+XLNI6vtOE=
-Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
- [209.85.128.69]) by relay.mimecast.com with ESMTP with STARTTLS
+        bh=HohlDOM1an5R3Aeg0WJ6GQRtA32+l/PSRz3n64TVcFI=;
+        b=F8UFVaOpUKLnAPbZY5BDbh5cCH523dBc/Sd8j5y0Je0vnNi0KPpn1ExG4tHLknD8e4cD9y
+        WdqGEVGCkHdMrkjVCafn6ywWqHL1RBykmSRWinoJ4ktg6Z3yHl24toiZOV84HiUueFceze
+        es4OhKPP7S8v/OLPVNOg2mxsSLQXoJ8=
+Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
+ [209.85.221.71]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_128_GCM_SHA256) id
- us-mta-170-DDPVf_L1OuiWgD_75wyTaQ-1; Tue, 23 Aug 2022 03:33:07 -0400
-X-MC-Unique: DDPVf_L1OuiWgD_75wyTaQ-1
-Received: by mail-wm1-f69.google.com with SMTP id az42-20020a05600c602a00b003a552086ba9so9853434wmb.6
-        for <kvm@vger.kernel.org>; Tue, 23 Aug 2022 00:33:07 -0700 (PDT)
+ us-mta-507-KEPII2IMMne9UWoDh6TZNQ-1; Tue, 23 Aug 2022 03:37:01 -0400
+X-MC-Unique: KEPII2IMMne9UWoDh6TZNQ-1
+Received: by mail-wr1-f71.google.com with SMTP id g11-20020adfa48b000000b002250d091f76so2024136wrb.3
+        for <kvm@vger.kernel.org>; Tue, 23 Aug 2022 00:37:00 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=mime-version:message-id:date:references:in-reply-to:subject:cc:to
-         :from:x-gm-message-state:from:to:cc;
-        bh=2ONerqKdocOJl27KKdUeRrTYuQ3xXPZVssG9HygGkPU=;
-        b=Kt0iGjjT17VCAIAVBmZrByLb8u044aG7K+D42/WCh6wiAbJnWrCz3/XmbxRm1ZRdUe
-         1UKvt/qjsffMphBgHL+7T4ru/J4pxvX5sjIr2CG1nAe1LnMKjytYqb9yAofFUF3NgCm2
-         T4fzoh6BdVFfVyp+bRu+tZncbowCcyGBnaHgCe9qowIY4ZPTXaYyN7Ve5UK5J8U69gXm
-         qdALzWJ/rqHFS/avRJRScQKMKAHE7F7/BZNfNKYoNNJvsRgswqkUEFix4KMp5fuJuCmR
-         0hdjdNlkyv3u5ONxRf5dIEYkduBgmpzmEQ+FTFpBLrwYdXcBVzW796dNfsgo4qAVK8O1
-         pMEQ==
-X-Gm-Message-State: ACgBeo2OW8T11mqq9P5c3uu2D6IOYydGU/be84GMqlIeQUHfvKV7Smya
-        uVCwdqnIS6WFj6yjekB6LAAZciFo+lM2cmoTKn2xKNHPcrAzgJJuQEtpYIwC5uH+65wYKu7TD9j
-        2wWOHuylmFfPi
-X-Received: by 2002:adf:e18b:0:b0:225:644c:59c2 with SMTP id az11-20020adfe18b000000b00225644c59c2mr1763279wrb.673.1661239986471;
-        Tue, 23 Aug 2022 00:33:06 -0700 (PDT)
-X-Google-Smtp-Source: AA6agR6hwzHxlbGc8XuBX/h1Dx9/8oX54010sDfiLiygEgsGTbYt//zKkeH4Afdfph4nQolz745tNQ==
-X-Received: by 2002:adf:e18b:0:b0:225:644c:59c2 with SMTP id az11-20020adfe18b000000b00225644c59c2mr1763265wrb.673.1661239986213;
-        Tue, 23 Aug 2022 00:33:06 -0700 (PDT)
-Received: from fedora (nat-2.ign.cz. [91.219.240.2])
-        by smtp.gmail.com with ESMTPSA id p15-20020adfcc8f000000b002252ec781f7sm13612694wrj.8.2022.08.23.00.33.05
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 23 Aug 2022 00:33:05 -0700 (PDT)
-From:   Vitaly Kuznetsov <vkuznets@redhat.com>
-To:     Sean Christopherson <seanjc@google.com>
-Cc:     kvm@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>,
-        Anirudh Rayabharam <anrayabh@linux.microsoft.com>,
+        h=content-transfer-encoding:in-reply-to:organization:from:references
+         :cc:to:content-language:subject:user-agent:mime-version:date
+         :message-id:x-gm-message-state:from:to:cc;
+        bh=HohlDOM1an5R3Aeg0WJ6GQRtA32+l/PSRz3n64TVcFI=;
+        b=REmwCEjOsfwtegnr14YUeslPG6Bi6/P79YmZgisIL08VWl5KtGRQv1XnHR6jCuWzpe
+         iG9DfQvQCljHEue0FoLfIrAyhO3bcYqjeXDD1aXgm4iwHVvHMbzCF497MIgGlFuR6l0b
+         jwoCjGwkqQgPzCYEiQmq+Xv6eU0tH0vgO7pgiOmum28EQ28EmizKRgdyzBNMqf5M85Ft
+         8BoU+UjfQhdfS5MawegX7amj6ylFX9FPz58sTYse3b8qa5WtOvotpIKAps5jpkhlx241
+         M4dWh/0hdyy2lvKwccnEgkuEk2wKPZ5c6cIT5aHrm/Cpnb8En6mwvELCVtlB0VDNWrHn
+         bbyw==
+X-Gm-Message-State: ACgBeo2qOsJXphDkxGx82JENO0H4HtQf+cw8pmDuZM8dsweIOOJCRo0t
+        bI8UwngoUJy8dmKetNN3XXiCkHE4E2DyPAX7pTgLaJZFsamda04u4B2gx2MIfeXF1dQ3daJu+pQ
+        bfBEsG20dfXL5
+X-Received: by 2002:a05:600c:4e04:b0:3a5:a34e:ae81 with SMTP id b4-20020a05600c4e0400b003a5a34eae81mr1210658wmq.147.1661240219940;
+        Tue, 23 Aug 2022 00:36:59 -0700 (PDT)
+X-Google-Smtp-Source: AA6agR4NUFG4IFicJqv+j50eM5lq6Rzd1ri/9X+RKdy6Bv7oWpP5THIKdol8DYBnS2vZ39y/40KufQ==
+X-Received: by 2002:a05:600c:4e04:b0:3a5:a34e:ae81 with SMTP id b4-20020a05600c4e0400b003a5a34eae81mr1210635wmq.147.1661240219655;
+        Tue, 23 Aug 2022 00:36:59 -0700 (PDT)
+Received: from ?IPV6:2003:cb:c70b:1600:c48b:1fab:a330:5182? (p200300cbc70b1600c48b1faba3305182.dip0.t-ipconnect.de. [2003:cb:c70b:1600:c48b:1fab:a330:5182])
+        by smtp.gmail.com with ESMTPSA id u18-20020adfdb92000000b0021eaf4138aesm16379582wri.108.2022.08.23.00.36.57
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 23 Aug 2022 00:36:59 -0700 (PDT)
+Message-ID: <8f6f428b-85e6-a188-7f32-512b6aae0abf@redhat.com>
+Date:   Tue, 23 Aug 2022 09:36:57 +0200
+MIME-Version: 1.0
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.11.0
+Subject: Re: [PATCH v7 01/14] mm: Add F_SEAL_AUTO_ALLOCATE seal to memfd
+Content-Language: en-US
+To:     "Kirill A. Shutemov" <kirill@shutemov.name>,
+        Paolo Bonzini <pbonzini@redhat.com>
+Cc:     Chao Peng <chao.p.peng@linux.intel.com>, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org, linux-mm@kvack.org,
+        linux-fsdevel@vger.kernel.org, linux-api@vger.kernel.org,
+        linux-doc@vger.kernel.org, qemu-devel@nongnu.org,
+        linux-kselftest@vger.kernel.org, Jonathan Corbet <corbet@lwn.net>,
+        Sean Christopherson <seanjc@google.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
         Wanpeng Li <wanpengli@tencent.com>,
         Jim Mattson <jmattson@google.com>,
-        Maxim Levitsky <mlevitsk@redhat.com>,
-        Nathan Chancellor <nathan@kernel.org>,
-        Michael Kelley <mikelley@microsoft.com>,
-        linux-hyperv@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v5 03/26] x86/hyperv: Update 'struct
- hv_enlightened_vmcs' definition
-In-Reply-To: <YwPLt2e7CuqMzjt1@google.com>
-References: <20220802160756.339464-1-vkuznets@redhat.com>
- <20220802160756.339464-4-vkuznets@redhat.com>
- <Yv5ZFgztDHzzIQJ+@google.com> <875yiptvsc.fsf@redhat.com>
- <Yv59dZwP6rNUtsrn@google.com> <87czcsskkj.fsf@redhat.com>
- <YwOm7Ph54vIYAllm@google.com> <87edx8xn8h.fsf@redhat.com>
- <YwO2fSCGXnE/9mc2@google.com> <878rngxjb7.fsf@redhat.com>
- <YwPLt2e7CuqMzjt1@google.com>
-Date:   Tue, 23 Aug 2022 09:33:04 +0200
-Message-ID: <87wnazwh1r.fsf@redhat.com>
-MIME-Version: 1.0
-Content-Type: text/plain
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=unavailable
-        autolearn_force=no version=3.4.6
+        Joerg Roedel <joro@8bytes.org>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+        x86@kernel.org, "H . Peter Anvin" <hpa@zytor.com>,
+        Hugh Dickins <hughd@google.com>,
+        Jeff Layton <jlayton@kernel.org>,
+        "J . Bruce Fields" <bfields@fieldses.org>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        Shuah Khan <shuah@kernel.org>, Mike Rapoport <rppt@kernel.org>,
+        Steven Price <steven.price@arm.com>,
+        "Maciej S . Szmigiero" <mail@maciej.szmigiero.name>,
+        Vlastimil Babka <vbabka@suse.cz>,
+        Vishal Annapurve <vannapurve@google.com>,
+        Yu Zhang <yu.c.zhang@linux.intel.com>,
+        "Kirill A . Shutemov" <kirill.shutemov@linux.intel.com>,
+        luto@kernel.org, jun.nakajima@intel.com, dave.hansen@intel.com,
+        ak@linux.intel.com, aarcange@redhat.com, ddutile@redhat.com,
+        dhildenb@redhat.com, Quentin Perret <qperret@google.com>,
+        Michael Roth <michael.roth@amd.com>, mhocko@suse.com,
+        Muchun Song <songmuchun@bytedance.com>
+References: <20220706082016.2603916-1-chao.p.peng@linux.intel.com>
+ <20220706082016.2603916-2-chao.p.peng@linux.intel.com>
+ <f39c4f63-a511-4beb-b3a4-66589ddb5475@redhat.com>
+ <472207cf-ff71-563b-7b66-0c7bea9ea8ad@redhat.com>
+ <20220817234120.mw2j3cgshmuyo2vw@box.shutemov.name>
+From:   David Hildenbrand <david@redhat.com>
+Organization: Red Hat
+In-Reply-To: <20220817234120.mw2j3cgshmuyo2vw@box.shutemov.name>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-Spam-Status: No, score=-2.8 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
+        RCVD_IN_DNSWL_LOW,SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE
+        autolearn=unavailable autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Sean Christopherson <seanjc@google.com> writes:
+On 18.08.22 01:41, Kirill A. Shutemov wrote:
+> On Fri, Aug 05, 2022 at 07:55:38PM +0200, Paolo Bonzini wrote:
+>> On 7/21/22 11:44, David Hildenbrand wrote:
+>>>
+>>> Also, I*think*  you can place pages via userfaultfd into shmem. Not
+>>> sure if that would count "auto alloc", but it would certainly bypass
+>>> fallocate().
+>>
+>> Yeah, userfaultfd_register would probably have to forbid this for
+>> F_SEAL_AUTO_ALLOCATE vmas.  Maybe the memfile_node can be reused for this,
+>> adding a new MEMFILE_F_NO_AUTO_ALLOCATE flags?  Then userfault_register
+>> would do something like memfile_node_get_flags(vma->vm_file) and check the
+>> result.
+> 
+> I donno, memory allocation with userfaultfd looks pretty intentional to
+> me. Why would F_SEAL_AUTO_ALLOCATE prevent it?
+> 
 
-> On Mon, Aug 22, 2022, Vitaly Kuznetsov wrote:
->> Sean Christopherson <seanjc@google.com> writes:
->> 
->> > On Mon, Aug 22, 2022, Vitaly Kuznetsov wrote:
->> >> My initial implementation was inventing 'eVMCS revision' concept:
->> >> https://lore.kernel.org/kvm/20220629150625.238286-7-vkuznets@redhat.com/
->> >> 
->> >> which is needed if we don't gate all these new fields on CPUID.0x4000000A.EBX BIT(0).
->> >> 
->> >> Going forward, we will still (likely) need something when new fields show up.
->> >
->> > My comments from that thread still apply.  Adding "revisions" or feature flags
->> > isn't maintanable, e.g. at best KVM will end up with a ridiculous number of flags.
->> >
->> > Looking at QEMU, which I strongly suspect is the only VMM that enables
->> > KVM_CAP_HYPERV_ENLIGHTENED_VMCS, it does the sane thing of enabling the capability
->> > before grabbing the VMX MSRs.
->> >
->> > So, why not simply apply filtering for host accesses as well?
->> 
->> (I understand that using QEMU to justify KVM's behavior is flawed but...)
->> 
->> QEMU's migration depends on the assumption that identical QEMU's command
->> lines create identical (from guest PoV) configurations. Assume we have
->> (simplified)
->> 
->> "-cpu CascadeLake-Sever,hv-evmcs"
->> 
->> on both source and destination but source host is newer, i.e. its KVM
->> knows about TSC Scaling in eVMCS and destination host has no idea about
->> it. If we just apply filtering upon vCPU creation, guest visible MSR
->> values are going to be different, right? Ok, assuming QEMU also migrates
->> VMX feature MSRs (TODO: check if that's true), we will be able to fail
->> mirgration late (which is already much worse than not being able to
->> create the desired configuration on destination, 'fail early') if we use
->> in-KVM filtering to throw an error to userspace. But if we blindly
->> filter control MSRs on the destination, 'TscScaling' will just disapper
->> undreneath the guest. This is unlikely to work.
->
-> But all of that holds true irrespetive of eVMCS.  If QEMU attempts to migrate a
-> nested guest from a KVM that supports TSC_SCALING to a KVM that doesn't support
-> TSC_SCALING, then TSC_SCALING is going to disappear and VM-Entry on the dest will
-> fail.  I.e. QEMU _must_ be able to detect the incompatibility and not attempt
-> the migration.  And with that code in place, QEMU doesn't need to do anything new
-> for eVMCS, it Just Works.
+Can't we say the same about a write()?
 
-I'm obviously missing something. "-cpu CascadeLake-Sever" presumes
-cetain features, including VMX features (e.g. TSC_SCALING), an attempt
-to create such vCPU on a CPU which doesn't support it will lead to
-immediate failure. So two VMs created on different hosts with
+> Maybe we would need it in the future for post-copy migration or something?
+> 
+> Or existing practises around userfaultfd touch memory randomly and
+> therefore incompatible with F_SEAL_AUTO_ALLOCATE intent?
+> 
+> Note, that userfaultfd is only relevant for shared memory as it requires
+> VMA which we don't have for MFD_INACCESSIBLE.
 
--cpu CascadeLake-Sever
-
-are guaranteed to look exactly the same from guest PoV. This is not true
-for '-cpu CascadeLake-Sever,hv-evmcs' (if we do it the way you suggest)
-as 'hv-evmcs' will be a *different* filter on each host (which is going
-to depend on KVM version, not even on the host's hardware).
-
->
->> In any case, what we need, is an option for VMM (read: QEMU) to create
->> the configuration with 'TscScaling' filtered out even KVM supports the
->> bit in eVMCS. This way the guest will be able to migrate backwards to an
->> older KVM which doesn't support it, i.e.
->> 
->> '-cpu CascadeLake-Sever,hv-evmcs'
->>  creates the 'origin' eVMCS configuration, no TscScaling
->> 
->> '-cpu CascadeLake-Sever,hv-evmcs,hv-evmcs-2022' creates the updated one.
->
-> Again, this conundrum exists irrespective of eVMCS.  Properly solve the problem
-> for regular nVMX and eVMCS should naturally work.
-
-I don't think we have this problem for VMX features as named CPU models
-in QEMU encode all of them explicitly, they *must* be present whenever
-such vCPU is created.
-
->
->> KVM_CAP_HYPERV_ENLIGHTENED_VMCS is bad as it only takes 'eVMCS' version
->> as a parameter (as we assumed it will always change when new fields are
->> added, but that turned out to be false). That's why I suggested
->> KVM_CAP_HYPERV_ENLIGHTENED_VMCS2.
->
-> Enumerating features via versions is such a bad API though, e.g. if there's a
-> bug with nested TSC_SCALING, userspace can't disable just nested TSC_SCALING
-> without everything else under the inscrutable "hv-evmcs-2022" being collateral
-> damage.
-
-Why? Something like 
-
-"-cpu CascadeLake-Sever,hv-evmcs,hv-evmcs-2022,-vmx-tsc-scaling" 
-
-should work well, no? 'hv-evmcs*' are just filters, if the VMX feature
-is not there -- it's not there.
-
-We can certainly make this fine-grained and introduce
-KVM_CAP_HYPERV_EVMCS_TSC_SCALING instead and make a 'hv-*' flag for it,
-however, with Hyper-V and Windows I really don't like 'frankenstein'
-Hyper-V configurations which look nothing like genuine Hyper-V as nobody
-at Microsoft tests new Windows builds with such configurations. And yes,
-bugs were discovered in the past (e.g. PerfGlobalCtrl and Win11).
+This feature (F_SEAL_AUTO_ALLOCATE) is independent of all the lovely
+encrypted VM stuff, so it doesn't matter how it relates to MFD_INACCESSIBLE.
 
 -- 
-Vitaly
+Thanks,
+
+David / dhildenb
 
