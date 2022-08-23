@@ -2,150 +2,148 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id D53A759D252
-	for <lists+kvm@lfdr.de>; Tue, 23 Aug 2022 09:39:22 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 44B4659D264
+	for <lists+kvm@lfdr.de>; Tue, 23 Aug 2022 09:39:28 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S240863AbiHWHhR (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 23 Aug 2022 03:37:17 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45506 "EHLO
+        id S240083AbiHWHiN (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 23 Aug 2022 03:38:13 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46148 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S240494AbiHWHhO (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 23 Aug 2022 03:37:14 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7B6B8647C9
-        for <kvm@vger.kernel.org>; Tue, 23 Aug 2022 00:37:13 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1661240232;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=HohlDOM1an5R3Aeg0WJ6GQRtA32+l/PSRz3n64TVcFI=;
-        b=F8UFVaOpUKLnAPbZY5BDbh5cCH523dBc/Sd8j5y0Je0vnNi0KPpn1ExG4tHLknD8e4cD9y
-        WdqGEVGCkHdMrkjVCafn6ywWqHL1RBykmSRWinoJ4ktg6Z3yHl24toiZOV84HiUueFceze
-        es4OhKPP7S8v/OLPVNOg2mxsSLQXoJ8=
-Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
- [209.85.221.71]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_128_GCM_SHA256) id
- us-mta-507-KEPII2IMMne9UWoDh6TZNQ-1; Tue, 23 Aug 2022 03:37:01 -0400
-X-MC-Unique: KEPII2IMMne9UWoDh6TZNQ-1
-Received: by mail-wr1-f71.google.com with SMTP id g11-20020adfa48b000000b002250d091f76so2024136wrb.3
-        for <kvm@vger.kernel.org>; Tue, 23 Aug 2022 00:37:00 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=content-transfer-encoding:in-reply-to:organization:from:references
-         :cc:to:content-language:subject:user-agent:mime-version:date
-         :message-id:x-gm-message-state:from:to:cc;
-        bh=HohlDOM1an5R3Aeg0WJ6GQRtA32+l/PSRz3n64TVcFI=;
-        b=REmwCEjOsfwtegnr14YUeslPG6Bi6/P79YmZgisIL08VWl5KtGRQv1XnHR6jCuWzpe
-         iG9DfQvQCljHEue0FoLfIrAyhO3bcYqjeXDD1aXgm4iwHVvHMbzCF497MIgGlFuR6l0b
-         jwoCjGwkqQgPzCYEiQmq+Xv6eU0tH0vgO7pgiOmum28EQ28EmizKRgdyzBNMqf5M85Ft
-         8BoU+UjfQhdfS5MawegX7amj6ylFX9FPz58sTYse3b8qa5WtOvotpIKAps5jpkhlx241
-         M4dWh/0hdyy2lvKwccnEgkuEk2wKPZ5c6cIT5aHrm/Cpnb8En6mwvELCVtlB0VDNWrHn
-         bbyw==
-X-Gm-Message-State: ACgBeo2qOsJXphDkxGx82JENO0H4HtQf+cw8pmDuZM8dsweIOOJCRo0t
-        bI8UwngoUJy8dmKetNN3XXiCkHE4E2DyPAX7pTgLaJZFsamda04u4B2gx2MIfeXF1dQ3daJu+pQ
-        bfBEsG20dfXL5
-X-Received: by 2002:a05:600c:4e04:b0:3a5:a34e:ae81 with SMTP id b4-20020a05600c4e0400b003a5a34eae81mr1210658wmq.147.1661240219940;
-        Tue, 23 Aug 2022 00:36:59 -0700 (PDT)
-X-Google-Smtp-Source: AA6agR4NUFG4IFicJqv+j50eM5lq6Rzd1ri/9X+RKdy6Bv7oWpP5THIKdol8DYBnS2vZ39y/40KufQ==
-X-Received: by 2002:a05:600c:4e04:b0:3a5:a34e:ae81 with SMTP id b4-20020a05600c4e0400b003a5a34eae81mr1210635wmq.147.1661240219655;
-        Tue, 23 Aug 2022 00:36:59 -0700 (PDT)
-Received: from ?IPV6:2003:cb:c70b:1600:c48b:1fab:a330:5182? (p200300cbc70b1600c48b1faba3305182.dip0.t-ipconnect.de. [2003:cb:c70b:1600:c48b:1fab:a330:5182])
-        by smtp.gmail.com with ESMTPSA id u18-20020adfdb92000000b0021eaf4138aesm16379582wri.108.2022.08.23.00.36.57
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 23 Aug 2022 00:36:59 -0700 (PDT)
-Message-ID: <8f6f428b-85e6-a188-7f32-512b6aae0abf@redhat.com>
-Date:   Tue, 23 Aug 2022 09:36:57 +0200
+        with ESMTP id S241079AbiHWHiK (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 23 Aug 2022 03:38:10 -0400
+Received: from mx0a-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 746AA647FC
+        for <kvm@vger.kernel.org>; Tue, 23 Aug 2022 00:38:08 -0700 (PDT)
+Received: from pps.filterd (m0098419.ppops.net [127.0.0.1])
+        by mx0b-001b2d01.pphosted.com (8.17.1.5/8.17.1.5) with ESMTP id 27N7Ufqg007321
+        for <kvm@vger.kernel.org>; Tue, 23 Aug 2022 07:38:07 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
+ mime-version : subject : from : to : cc : references : in-reply-to :
+ content-type : content-transfer-encoding; s=pp1;
+ bh=BT9Ps1I0Tzjy1+ZbWt+9rDmpfaiU9sl7PZd1XASzrVA=;
+ b=VHMuGJpVu8mUebHi1C8QDqG5wz7l8OmXFsl3LFQpBJuz5ai3rTq5qZStL2dVYSS1KBcK
+ s00TM4X8VWHPergEMIbI8Qvea+xh9tcQOGKGGSVA9sI7qmeVKUla7X604V5WSehSVHab
+ /8Uje8vI3nxApnejh39Nn5/G1iR39iaCx3p3UEprjZtjcDENBIGdX3nxD6/QAPF0tsz/
+ 564iqIJK0BkY+woENQiNilSysgI1k3farpLGUeEBB/EptP3UQ/Bmp3G2wCnuftQM/e7X
+ z1nbueGgRE0VqIfR7zncYgBCaotxXTkL5nK0z2vzJ6qxTVTD7QjmS4vithD7nzYJ8Mix Mw== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0b-001b2d01.pphosted.com (PPS) with ESMTPS id 3j4tjn854s-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT)
+        for <kvm@vger.kernel.org>; Tue, 23 Aug 2022 07:38:07 +0000
+Received: from m0098419.ppops.net (m0098419.ppops.net [127.0.0.1])
+        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 27N7XQjt018477
+        for <kvm@vger.kernel.org>; Tue, 23 Aug 2022 07:38:07 GMT
+Received: from ppma04ams.nl.ibm.com (63.31.33a9.ip4.static.sl-reverse.com [169.51.49.99])
+        by mx0b-001b2d01.pphosted.com (PPS) with ESMTPS id 3j4tjn8542-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Tue, 23 Aug 2022 07:38:06 +0000
+Received: from pps.filterd (ppma04ams.nl.ibm.com [127.0.0.1])
+        by ppma04ams.nl.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 27N7bLv2007493;
+        Tue, 23 Aug 2022 07:38:05 GMT
+Received: from b06cxnps4076.portsmouth.uk.ibm.com (d06relay13.portsmouth.uk.ibm.com [9.149.109.198])
+        by ppma04ams.nl.ibm.com with ESMTP id 3j2q88udu9-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Tue, 23 Aug 2022 07:38:05 +0000
+Received: from d06av22.portsmouth.uk.ibm.com (d06av22.portsmouth.uk.ibm.com [9.149.105.58])
+        by b06cxnps4076.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 27N7c1Zf25624900
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Tue, 23 Aug 2022 07:38:01 GMT
+Received: from d06av22.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id CD42C4C04A;
+        Tue, 23 Aug 2022 07:38:01 +0000 (GMT)
+Received: from d06av22.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 867C54C044;
+        Tue, 23 Aug 2022 07:38:01 +0000 (GMT)
+Received: from [9.145.84.26] (unknown [9.145.84.26])
+        by d06av22.portsmouth.uk.ibm.com (Postfix) with ESMTP;
+        Tue, 23 Aug 2022 07:38:01 +0000 (GMT)
+Message-ID: <4d00e7ff-f90a-cae1-b8cd-7d56a0b4e455@linux.ibm.com>
+Date:   Tue, 23 Aug 2022 09:38:01 +0200
 MIME-Version: 1.0
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.11.0
-Subject: Re: [PATCH v7 01/14] mm: Add F_SEAL_AUTO_ALLOCATE seal to memfd
+ Thunderbird/91.9.0
+Subject: Re: [kvm-unit-tests PATCH v1 1/1] lib/s390x: fix SMP setup bug
 Content-Language: en-US
-To:     "Kirill A. Shutemov" <kirill@shutemov.name>,
-        Paolo Bonzini <pbonzini@redhat.com>
-Cc:     Chao Peng <chao.p.peng@linux.intel.com>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org, linux-mm@kvack.org,
-        linux-fsdevel@vger.kernel.org, linux-api@vger.kernel.org,
-        linux-doc@vger.kernel.org, qemu-devel@nongnu.org,
-        linux-kselftest@vger.kernel.org, Jonathan Corbet <corbet@lwn.net>,
-        Sean Christopherson <seanjc@google.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        x86@kernel.org, "H . Peter Anvin" <hpa@zytor.com>,
-        Hugh Dickins <hughd@google.com>,
-        Jeff Layton <jlayton@kernel.org>,
-        "J . Bruce Fields" <bfields@fieldses.org>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        Shuah Khan <shuah@kernel.org>, Mike Rapoport <rppt@kernel.org>,
-        Steven Price <steven.price@arm.com>,
-        "Maciej S . Szmigiero" <mail@maciej.szmigiero.name>,
-        Vlastimil Babka <vbabka@suse.cz>,
-        Vishal Annapurve <vannapurve@google.com>,
-        Yu Zhang <yu.c.zhang@linux.intel.com>,
-        "Kirill A . Shutemov" <kirill.shutemov@linux.intel.com>,
-        luto@kernel.org, jun.nakajima@intel.com, dave.hansen@intel.com,
-        ak@linux.intel.com, aarcange@redhat.com, ddutile@redhat.com,
-        dhildenb@redhat.com, Quentin Perret <qperret@google.com>,
-        Michael Roth <michael.roth@amd.com>, mhocko@suse.com,
-        Muchun Song <songmuchun@bytedance.com>
-References: <20220706082016.2603916-1-chao.p.peng@linux.intel.com>
- <20220706082016.2603916-2-chao.p.peng@linux.intel.com>
- <f39c4f63-a511-4beb-b3a4-66589ddb5475@redhat.com>
- <472207cf-ff71-563b-7b66-0c7bea9ea8ad@redhat.com>
- <20220817234120.mw2j3cgshmuyo2vw@box.shutemov.name>
-From:   David Hildenbrand <david@redhat.com>
-Organization: Red Hat
-In-Reply-To: <20220817234120.mw2j3cgshmuyo2vw@box.shutemov.name>
-Content-Type: text/plain; charset=UTF-8
+From:   Janosch Frank <frankja@linux.ibm.com>
+To:     Claudio Imbrenda <imbrenda@linux.ibm.com>
+Cc:     kvm@vger.kernel.org, thuth@redhat.com, nrb@linux.ibm.com,
+        scgl@linux.ibm.com, seiden@linux.ibm.com
+References: <20220818152114.213135-1-imbrenda@linux.ibm.com>
+ <d65e5beb-e417-b13d-f5f6-eb0e91ccc1f3@linux.ibm.com>
+ <20220819111210.4b1e3fe6@p-imbrenda>
+ <8f9714f6-3780-1499-70db-38c74136ae50@linux.ibm.com>
+In-Reply-To: <8f9714f6-3780-1499-70db-38c74136ae50@linux.ibm.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-2.8 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
-        RCVD_IN_DNSWL_LOW,SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE
-        autolearn=unavailable autolearn_force=no version=3.4.6
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: rTddkX-zqkXd6yfrwc3JTrk1HEUC0b07
+X-Proofpoint-ORIG-GUID: zobAWb9gsCvsKMVgVJGiZcbf-95jxpSG
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.205,Aquarius:18.0.895,Hydra:6.0.517,FMLib:17.11.122.1
+ definitions=2022-08-23_02,2022-08-22_02,2022-06-22_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 phishscore=0 impostorscore=0
+ suspectscore=0 malwarescore=0 mlxscore=0 lowpriorityscore=0 spamscore=0
+ clxscore=1015 priorityscore=1501 adultscore=0 bulkscore=0 mlxlogscore=641
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2207270000
+ definitions=main-2208230027
+X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,
+        SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no
+        version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 18.08.22 01:41, Kirill A. Shutemov wrote:
-> On Fri, Aug 05, 2022 at 07:55:38PM +0200, Paolo Bonzini wrote:
->> On 7/21/22 11:44, David Hildenbrand wrote:
->>>
->>> Also, I*think*  you can place pages via userfaultfd into shmem. Not
->>> sure if that would count "auto alloc", but it would certainly bypass
->>> fallocate().
+On 8/19/22 12:31, Janosch Frank wrote:
+> On 8/19/22 11:12, Claudio Imbrenda wrote:
+>> On Fri, 19 Aug 2022 10:52:40 +0200
+>> Janosch Frank <frankja@linux.ibm.com> wrote:
 >>
->> Yeah, userfaultfd_register would probably have to forbid this for
->> F_SEAL_AUTO_ALLOCATE vmas.  Maybe the memfile_node can be reused for this,
->> adding a new MEMFILE_F_NO_AUTO_ALLOCATE flags?  Then userfault_register
->> would do something like memfile_node_get_flags(vma->vm_file) and check the
->> result.
+>>> On 8/18/22 17:21, Claudio Imbrenda wrote:
+>>>> The lowcore pointer pointing to the current CPU (THIS_CPU) was not
+>>>> initialized for the boot CPU. The pointer is needed for correct
+>>>> interrupt handling, which is needed in the setup process before the
+>>>> struct cpu array is allocated.
+>>>>
+>>>> The bug went unnoticed because some environments (like qemu/KVM) clear
+>>>> all memory and don't write anything in the lowcore area before starting
+>>>> the payload. The pointer thus pointed to 0, an area of memory also not
+>>>> used. Other environments will write to memory before starting the
+>>>> payload, causing the unit tests to crash at the first interrupt.
+>>>>
+>>>> Fix by assigning a temporary struct cpu before the rest of the setup
+>>>> process, and assigning the pointer to the correct allocated struct
+>>>> during smp initialization.
+>>>>
+>>>> Fixes: 4e5dd758 ("lib: s390x: better smp interrupt checks")
+>>>> Signed-off-by: Claudio Imbrenda <imbrenda@linux.ibm.com>
+>>>
+>>> I've considered letting the IPL cpu have a static struct cpu and setting
+>>> it up in cstart64.S. But that would mean that we would need extra
+>>> handling when using smp functions and that'll look even worse.
+>>>
+>>> Reported-by: Janosch Frank <frankja@linux.ibm.com>
+>>>
+[...]
+>>
+>> this temporary struct is then not accessible from smp_setup, so it
+>> can't be memcpy-ed.
+>>
+>> if you really want something meaningful in the temporary struct, it has
+>> to be initialized in smp.c and called in io.c (something like
+>> smp_boot_cpu_tmp_setup(&this_cpu_tmp) ), but then still no memcpy.
+>>
+>> in the end the struct cpu is needed only to allow interrupts to happen
+>> without crashes, I don't think we strictly need initialization
 > 
-> I donno, memory allocation with userfaultfd looks pretty intentional to
-> me. Why would F_SEAL_AUTO_ALLOCATE prevent it?
+> Ugh, this feels like a quick fix.
+> But alright, I've just tried setting it up from cstart64.S and it's way
+> more ugly code so let's stick with this for now.
 > 
 
-Can't we say the same about a write()?
+Anyway:
+Reviewed-by: Janosch Frank <frankja@linux.ibm.com>
 
-> Maybe we would need it in the future for post-copy migration or something?
-> 
-> Or existing practises around userfaultfd touch memory randomly and
-> therefore incompatible with F_SEAL_AUTO_ALLOCATE intent?
-> 
-> Note, that userfaultfd is only relevant for shared memory as it requires
-> VMA which we don't have for MFD_INACCESSIBLE.
-
-This feature (F_SEAL_AUTO_ALLOCATE) is independent of all the lovely
-encrypted VM stuff, so it doesn't matter how it relates to MFD_INACCESSIBLE.
-
--- 
-Thanks,
-
-David / dhildenb
-
+Thanks, picked
