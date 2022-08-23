@@ -2,97 +2,88 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 7511F59EDD7
-	for <lists+kvm@lfdr.de>; Tue, 23 Aug 2022 22:57:16 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 62A2B59EE19
+	for <lists+kvm@lfdr.de>; Tue, 23 Aug 2022 23:20:46 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229773AbiHWU5J (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 23 Aug 2022 16:57:09 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35942 "EHLO
+        id S231340AbiHWVUn (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 23 Aug 2022 17:20:43 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36178 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229733AbiHWU5I (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 23 Aug 2022 16:57:08 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 319D26F251
-        for <kvm@vger.kernel.org>; Tue, 23 Aug 2022 13:57:07 -0700 (PDT)
+        with ESMTP id S230099AbiHWVUj (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 23 Aug 2022 17:20:39 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BA9476CF7C
+        for <kvm@vger.kernel.org>; Tue, 23 Aug 2022 14:20:37 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1661288226;
+        s=mimecast20190719; t=1661289636;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=3Ye9Fi4oA+sgS1EZvFu2xD8Gq2Q7V2mGd9cMXbr5HfE=;
-        b=M5lkpdiJ6Gbd1EZg3Yc1yf+6u2VORasYLIt0WZSwVAlg6jenFZSYVqGYqYQap74dYj93vp
-        79LIYe+JcN6NAkqfcDTevziFZyXQ21KK4wn3Yd/JvoYtYn4PNvly0xR8NQbmA7cqrfZR6u
-        p7sHV1fPYYThQf174McRiADXHZ8PXUU=
-Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
- [209.85.128.70]) by relay.mimecast.com with ESMTP with STARTTLS
+        bh=kDxp6lecacjb98wPWPmNSJC/XwpRER4yjzQFhNWbLNM=;
+        b=ZoE3UX16c4zx7qcTgxd/GfxOMUJMObxDPsHMaSJ5wmggIKD1UI+5u4uP/+OrkA+voDTUE0
+        y8sNmBhM5r0CKPXeEE4pyeDzeahnJDoqSx8nMNLZQKpOHJAadQBLRDGt29IEQXJDbGuUlY
+        NsNWAYOWGs1oKd1lDTyyH1nN3oyUl64=
+Received: from mail-qt1-f197.google.com (mail-qt1-f197.google.com
+ [209.85.160.197]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_128_GCM_SHA256) id
- us-mta-288-1qcRcXFVNIebEmsyJTcCNQ-1; Tue, 23 Aug 2022 16:57:05 -0400
-X-MC-Unique: 1qcRcXFVNIebEmsyJTcCNQ-1
-Received: by mail-wm1-f70.google.com with SMTP id j22-20020a05600c485600b003a5e4420552so10780618wmo.8
-        for <kvm@vger.kernel.org>; Tue, 23 Aug 2022 13:57:04 -0700 (PDT)
+ us-mta-427-n5qGKAwLMvOxf73I8Rnfpg-1; Tue, 23 Aug 2022 17:20:35 -0400
+X-MC-Unique: n5qGKAwLMvOxf73I8Rnfpg-1
+Received: by mail-qt1-f197.google.com with SMTP id e30-20020ac8011e000000b00342f61e67aeso11433933qtg.3
+        for <kvm@vger.kernel.org>; Tue, 23 Aug 2022 14:20:35 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=content-transfer-encoding:mime-version:user-agent:references
-         :in-reply-to:date:cc:to:from:subject:message-id:x-gm-message-state
-         :from:to:cc;
-        bh=3Ye9Fi4oA+sgS1EZvFu2xD8Gq2Q7V2mGd9cMXbr5HfE=;
-        b=OCWIiW/PYCSOA+elndPsUUV/ivFAcRragubxAjleNFYa1x+T5WnsgHZOrxKqaIVw5/
-         O6C/2GmJCjrUqcgc0qgQwYmU+KY+PZBf7ed6hSin2lGeqDHIkmxrpbPKdeX8PXcH1MRA
-         4bsLJlinYCgvtdI8QWTWL3kb8Me/2oPLw+BuPaEl+gA98Lj3ZzjBy+uk1MwIyfSY2Y9D
-         +S2wNg767JOv7LbHpWoyYFtQ0NJ96X/41ywfLZ1IVYvb/9dq25g6u+LMcMOpMhn26fP5
-         RQtWnl0v562jXtBjOiooXYz/0cZ1ypDia68XIdgDqUxz+sUuTealszGa2dzP52COTJOP
-         tfpg==
-X-Gm-Message-State: ACgBeo34TZVxSu1YfdbIuy2nPC2Xpwvgg+JVwIHO+iWVBLGw9jxL1tQg
-        9NT9Nv+/g0dDnzJB5kAovlDXGmMjbUskO7eHmPiUFj0tugjLYgesNlQNQDhlJWohT4V/g5+ZHE+
-        AHjzkyyurTpRs
-X-Received: by 2002:a5d:6d8c:0:b0:225:57a2:9564 with SMTP id l12-20020a5d6d8c000000b0022557a29564mr7076790wrs.139.1661288223799;
-        Tue, 23 Aug 2022 13:57:03 -0700 (PDT)
-X-Google-Smtp-Source: AA6agR54Q25oOQQy6ncWsx6VrUpN/F0yvxwJjNCy88FJ6OQgWy/SD0qe1rcQwPjDrsdsaDlIGDXXRg==
-X-Received: by 2002:a5d:6d8c:0:b0:225:57a2:9564 with SMTP id l12-20020a5d6d8c000000b0022557a29564mr7076778wrs.139.1661288223584;
-        Tue, 23 Aug 2022 13:57:03 -0700 (PDT)
-Received: from gerbillo.redhat.com (146-241-97-176.dyn.eolo.it. [146.241.97.176])
-        by smtp.gmail.com with ESMTPSA id 25-20020a05600c029900b003a62bc1735asm280179wmk.9.2022.08.23.13.57.02
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc;
+        bh=kDxp6lecacjb98wPWPmNSJC/XwpRER4yjzQFhNWbLNM=;
+        b=eP8HBCl62CtQ939ggOtqhArLvw+dSuhguoN4GhrmhNl8OFKXCPJBIiPr9gMZN97wSm
+         StodxZkoztW8A8aHKJjgC7oFjZ5Ri3PIHatOLFa9VmJz/gjrsagOc9Kr5wQb7ApnNf88
+         rmR7WrecvnWGQVA+SmIHe9Nn5QyKtEg0eg0oU0G4dTCbLzukeNywBq2oNnPWNjk0Le9C
+         r24JPwjBCjdfbKXRJWS/6XaQETSI5CNv1AtjZIebBekY2g51kBzZTelPtxeo+QibGov4
+         B+37PdoqzxsfuPlBje/pEJbd1afICZJdonhHAOukhCDtLzXowMQRzIAOGoYacN8t/jv6
+         BcHQ==
+X-Gm-Message-State: ACgBeo3TqbSj++I60OZ5qge8k3hKAVQ+I+6g4BuDcxMMUabpKECPII+u
+        2UzFlQGuJK8nGH2PIFVKt4TMFDIF8CMgF3y4nXQuU9BOisjCb4QygOPuoh2tMi/ZNhB5CqHpaZB
+        Ty5Ggep4nLgGJ
+X-Received: by 2002:a05:6214:260e:b0:496:a6eb:94f8 with SMTP id gu14-20020a056214260e00b00496a6eb94f8mr22195743qvb.85.1661289635345;
+        Tue, 23 Aug 2022 14:20:35 -0700 (PDT)
+X-Google-Smtp-Source: AA6agR4GdFOFVsCT3Z0e/Gt12h73jfCtvxPLR/EbAAo1gDtVfbTot9LLeAXrj+uVOfZeMFzXQ4FYkQ==
+X-Received: by 2002:a05:6214:260e:b0:496:a6eb:94f8 with SMTP id gu14-20020a056214260e00b00496a6eb94f8mr22195695qvb.85.1661289634982;
+        Tue, 23 Aug 2022 14:20:34 -0700 (PDT)
+Received: from xz-m1.local (bras-base-aurron9127w-grc-35-70-27-3-10.dsl.bell.ca. [70.27.3.10])
+        by smtp.gmail.com with ESMTPSA id q8-20020a05620a2a4800b006bb756ce754sm14406977qkp.55.2022.08.23.14.20.32
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 23 Aug 2022 13:57:03 -0700 (PDT)
-Message-ID: <5174d4ef7fe3928472d5a575c87ee627bfb4c129.camel@redhat.com>
-Subject: Re: [PATCH net-next v4 0/9] vsock: updates for SO_RCVLOWAT handling
-From:   Paolo Abeni <pabeni@redhat.com>
-To:     Stefan Hajnoczi <stefanha@redhat.com>,
-        Jakub Kicinski <kuba@kernel.org>
-Cc:     Arseniy Krasnov <AVKrasnov@sberdevices.ru>,
-        Stefano Garzarella <sgarzare@redhat.com>,
-        "David S. Miller" <davem@davemloft.net>,
-        "edumazet@google.com" <edumazet@google.com>,
-        "kys@microsoft.com" <kys@microsoft.com>,
-        "haiyangz@microsoft.com" <haiyangz@microsoft.com>,
-        "sthemmin@microsoft.com" <sthemmin@microsoft.com>,
-        "wei.liu@kernel.org" <wei.liu@kernel.org>,
-        Dexuan Cui <decui@microsoft.com>,
-        Bryan Tan <bryantan@vmware.com>,
-        Vishnu Dasa <vdasa@vmware.com>,
-        Krasnov Arseniy <oxffffaa@gmail.com>,
-        "Michael S. Tsirkin" <mst@redhat.com>,
-        "virtualization@lists.linux-foundation.org" 
-        <virtualization@lists.linux-foundation.org>,
-        "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "linux-hyperv@vger.kernel.org" <linux-hyperv@vger.kernel.org>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        kernel <kernel@sberdevices.ru>,
-        VMware PV-Drivers Reviewers <pv-drivers@vmware.com>
-Date:   Tue, 23 Aug 2022 22:57:01 +0200
-In-Reply-To: <YwU443jzc/N4fV3A@fedora>
-References: <de41de4c-0345-34d7-7c36-4345258b7ba8@sberdevices.ru>
-         <YwUnAhWauSFSJX+g@fedora> <20220823121852.1fde7917@kernel.org>
-         <YwU443jzc/N4fV3A@fedora>
-Content-Type: text/plain; charset="UTF-8"
-User-Agent: Evolution 3.42.4 (3.42.4-2.fc35) 
+        Tue, 23 Aug 2022 14:20:34 -0700 (PDT)
+Date:   Tue, 23 Aug 2022 17:20:32 -0400
+From:   Peter Xu <peterx@redhat.com>
+To:     Marc Zyngier <maz@kernel.org>
+Cc:     Gavin Shan <gshan@redhat.com>, kvmarm@lists.cs.columbia.edu,
+        linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org, linux-doc@vger.kernel.org,
+        linux-kselftest@vger.kernel.org, pbonzini@redhat.com,
+        corbet@lwn.net, james.morse@arm.com, alexandru.elisei@arm.com,
+        suzuki.poulose@arm.com, oliver.upton@linux.dev,
+        catalin.marinas@arm.com, will@kernel.org, shuah@kernel.org,
+        seanjc@google.com, drjones@redhat.com, dmatlack@google.com,
+        bgardon@google.com, ricarkol@google.com, zhenyzha@redhat.com,
+        shan.gavin@gmail.com
+Subject: Re: [PATCH v1 1/5] KVM: arm64: Enable ring-based dirty memory
+ tracking
+Message-ID: <YwVEoM1pj2MPCELp@xz-m1.local>
+References: <20220819005601.198436-1-gshan@redhat.com>
+ <20220819005601.198436-2-gshan@redhat.com>
+ <87lerkwtm5.wl-maz@kernel.org>
+ <41fb5a1f-29a9-e6bb-9fab-4c83a2a8fce5@redhat.com>
+ <87fshovtu0.wl-maz@kernel.org>
+ <171d0159-4698-354b-8b2f-49d920d03b1b@redhat.com>
+ <YwTc++Lz6lh3aR4F@xz-m1.local>
+ <87bksawz0w.wl-maz@kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=unavailable
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <87bksawz0w.wl-maz@kernel.org>
+X-Spam-Status: No, score=-2.8 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,
+        SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -100,26 +91,63 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, 2022-08-23 at 16:30 -0400, Stefan Hajnoczi wrote:
-> On Tue, Aug 23, 2022 at 12:18:52PM -0700, Jakub Kicinski wrote:
-> > On Tue, 23 Aug 2022 15:14:10 -0400 Stefan Hajnoczi wrote:
-> > > Stefano will be online again on Monday. I suggest we wait for him to
-> > > review this series. If it's urgent, please let me know and I'll take a
-> > > look.
-> > 
-> > It was already applied, sorry about that. But please continue with
-> > review as if it wasn't. We'll just revert based on Stefano's feedback
-> > as needed.
+On Tue, Aug 23, 2022 at 08:17:03PM +0100, Marc Zyngier wrote:
+> I don't think we really need this check on the hot path. All we need
+> is to make the request sticky until userspace gets their act together
+> and consumes elements in the ring. Something like:
 > 
-> Okay, no problem.
+> diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
+> index 986cee6fbc7f..e8ed5e1af159 100644
+> --- a/arch/arm64/kvm/arm.c
+> +++ b/arch/arm64/kvm/arm.c
+> @@ -747,6 +747,14 @@ static int check_vcpu_requests(struct kvm_vcpu *vcpu)
+>  
+>  		if (kvm_check_request(KVM_REQ_SUSPEND, vcpu))
+>  			return kvm_vcpu_suspend(vcpu);
+> +
+> +		if (kvm_check_request(KVM_REQ_RING_SOFT_FULL, vcpu) &&
+> +		    kvm_dirty_ring_soft_full(vcpu)) {
+> +			kvm_make_request(KVM_REQ_RING_SOFT_FULL, vcpu);
+> +			vcpu->run->exit_reason = KVM_EXIT_DIRTY_RING_FULL;
+> +			trace_kvm_dirty_ring_exit(vcpu);
+> +			return 0;
+> +		}
+>  	}
+>  
+>  	return 1;
 
-For the records, I applied the series since it looked to me Arseniy
-addressed all the feedback from Stefano on the first patch (the only
-one still lacking an acked-by/reviewed-by tag) and I thought it would
-be better avoiding such delay.
+Right, this seems working.  We can also use kvm_test_request() here.
 
-We are still early in this net-next cycle, I think it can be improved
-incrementally as needed.
+> 
+> 
+> However, I'm a bit concerned by the reset side of things. It iterates
+> over the vcpus and expects the view of each ring to be consistent,
+> even if userspace is hacking at it from another CPU. For example, I
+> can't see what guarantees that the kernel observes the writes from
+> userspace in the order they are being performed (the documentation
+> provides no requirements other than "it must collect the dirty GFNs in
+> sequence", which doesn't mean much from an ordering perspective).
+> 
+> I can see that working on a strongly ordered architecture, but on
+> something as relaxed as ARM, the CPUs may^Wwill aggressively reorder
+> stuff that isn't explicitly ordered. I have the feeling that a CAS
+> operation on both sides would be enough, but someone who actually
+> understands how this works should have a look...
 
-Paolo
+I definitely don't think I 100% understand all the ordering things since
+they're complicated.. but my understanding is that the reset procedure
+didn't need memory barrier (unlike pushing, where we have explicit wmb),
+because we assumed the userapp is not hostile so logically it should only
+modify the flags which is a 32bit field, assuming atomicity guaranteed.
+
+IIRC we used to discuss similar questions on "what if the user is hostile
+and wants to hack the process by messing up with the ring", and our
+conclusion was as long as the process wouldn't mess up anything outside
+itself it should be okay. E.g. It should not be able to either cause the
+host to misfunction, or trigger kernel warnings in dmesg, etc..
+
+Thanks,
+
+-- 
+Peter Xu
 
