@@ -2,148 +2,207 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 44B4659D264
-	for <lists+kvm@lfdr.de>; Tue, 23 Aug 2022 09:39:28 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id C952759D2A1
+	for <lists+kvm@lfdr.de>; Tue, 23 Aug 2022 09:52:57 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S240083AbiHWHiN (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 23 Aug 2022 03:38:13 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46148 "EHLO
+        id S241307AbiHWHuw (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 23 Aug 2022 03:50:52 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60918 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S241079AbiHWHiK (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 23 Aug 2022 03:38:10 -0400
-Received: from mx0a-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 746AA647FC
-        for <kvm@vger.kernel.org>; Tue, 23 Aug 2022 00:38:08 -0700 (PDT)
-Received: from pps.filterd (m0098419.ppops.net [127.0.0.1])
-        by mx0b-001b2d01.pphosted.com (8.17.1.5/8.17.1.5) with ESMTP id 27N7Ufqg007321
-        for <kvm@vger.kernel.org>; Tue, 23 Aug 2022 07:38:07 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
- mime-version : subject : from : to : cc : references : in-reply-to :
- content-type : content-transfer-encoding; s=pp1;
- bh=BT9Ps1I0Tzjy1+ZbWt+9rDmpfaiU9sl7PZd1XASzrVA=;
- b=VHMuGJpVu8mUebHi1C8QDqG5wz7l8OmXFsl3LFQpBJuz5ai3rTq5qZStL2dVYSS1KBcK
- s00TM4X8VWHPergEMIbI8Qvea+xh9tcQOGKGGSVA9sI7qmeVKUla7X604V5WSehSVHab
- /8Uje8vI3nxApnejh39Nn5/G1iR39iaCx3p3UEprjZtjcDENBIGdX3nxD6/QAPF0tsz/
- 564iqIJK0BkY+woENQiNilSysgI1k3farpLGUeEBB/EptP3UQ/Bmp3G2wCnuftQM/e7X
- z1nbueGgRE0VqIfR7zncYgBCaotxXTkL5nK0z2vzJ6qxTVTD7QjmS4vithD7nzYJ8Mix Mw== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0b-001b2d01.pphosted.com (PPS) with ESMTPS id 3j4tjn854s-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT)
-        for <kvm@vger.kernel.org>; Tue, 23 Aug 2022 07:38:07 +0000
-Received: from m0098419.ppops.net (m0098419.ppops.net [127.0.0.1])
-        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 27N7XQjt018477
-        for <kvm@vger.kernel.org>; Tue, 23 Aug 2022 07:38:07 GMT
-Received: from ppma04ams.nl.ibm.com (63.31.33a9.ip4.static.sl-reverse.com [169.51.49.99])
-        by mx0b-001b2d01.pphosted.com (PPS) with ESMTPS id 3j4tjn8542-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 23 Aug 2022 07:38:06 +0000
-Received: from pps.filterd (ppma04ams.nl.ibm.com [127.0.0.1])
-        by ppma04ams.nl.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 27N7bLv2007493;
-        Tue, 23 Aug 2022 07:38:05 GMT
-Received: from b06cxnps4076.portsmouth.uk.ibm.com (d06relay13.portsmouth.uk.ibm.com [9.149.109.198])
-        by ppma04ams.nl.ibm.com with ESMTP id 3j2q88udu9-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 23 Aug 2022 07:38:05 +0000
-Received: from d06av22.portsmouth.uk.ibm.com (d06av22.portsmouth.uk.ibm.com [9.149.105.58])
-        by b06cxnps4076.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 27N7c1Zf25624900
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Tue, 23 Aug 2022 07:38:01 GMT
-Received: from d06av22.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id CD42C4C04A;
-        Tue, 23 Aug 2022 07:38:01 +0000 (GMT)
-Received: from d06av22.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 867C54C044;
-        Tue, 23 Aug 2022 07:38:01 +0000 (GMT)
-Received: from [9.145.84.26] (unknown [9.145.84.26])
-        by d06av22.portsmouth.uk.ibm.com (Postfix) with ESMTP;
-        Tue, 23 Aug 2022 07:38:01 +0000 (GMT)
-Message-ID: <4d00e7ff-f90a-cae1-b8cd-7d56a0b4e455@linux.ibm.com>
-Date:   Tue, 23 Aug 2022 09:38:01 +0200
+        with ESMTP id S241284AbiHWHuo (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 23 Aug 2022 03:50:44 -0400
+Received: from mga05.intel.com (mga05.intel.com [192.55.52.43])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id ED7F365540;
+        Tue, 23 Aug 2022 00:50:42 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1661241042; x=1692777042;
+  h=date:from:to:cc:subject:message-id:references:
+   in-reply-to:mime-version;
+  bh=+N2EYIj5Y/kAfNRjxZ9A6hyRC0mYBBeB8H9Ch63v6B0=;
+  b=ZL0EPOtpjn+LGc109FFJW8xM0TrvMQo3YipCAKJE/cuPvOPTDVueU/kj
+   0UnT/1D8ilBlCXlDl2EaKDY+BC27bbgV7xqLBK+SIK7UUqX9/D9evmuT9
+   nm4EJ3nt8zMh148dVP+ZG7bmQ9l8/R5mQfTxqIZh0hs9ZbcOVSHpLB/dl
+   2zAknY6Q4m3FXwMkbRDxYgXhLvj6hvewmsnNVL7sOfAr34Dsl3U7GxWTh
+   M6Yqxu7mprDYNwZPSnZMrfVupYPdWvbPGJaiWIecyZ8o3xT3AalAyAerI
+   M4J4CU4G502uydYhwhnFxW95Hy4tZ1N++pnbD/S5mhNsAp4J1NrcKxWeq
+   w==;
+X-IronPort-AV: E=McAfee;i="6500,9779,10447"; a="379909972"
+X-IronPort-AV: E=Sophos;i="5.93,256,1654585200"; 
+   d="scan'208";a="379909972"
+Received: from orsmga003.jf.intel.com ([10.7.209.27])
+  by fmsmga105.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 23 Aug 2022 00:50:42 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.93,256,1654585200"; 
+   d="scan'208";a="560065993"
+Received: from orsmsx602.amr.corp.intel.com ([10.22.229.15])
+  by orsmga003.jf.intel.com with ESMTP; 23 Aug 2022 00:50:17 -0700
+Received: from orsmsx612.amr.corp.intel.com (10.22.229.25) by
+ ORSMSX602.amr.corp.intel.com (10.22.229.15) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2375.31; Tue, 23 Aug 2022 00:50:17 -0700
+Received: from orsedg603.ED.cps.intel.com (10.7.248.4) by
+ orsmsx612.amr.corp.intel.com (10.22.229.25) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2375.31 via Frontend Transport; Tue, 23 Aug 2022 00:50:17 -0700
+Received: from NAM10-MW2-obe.outbound.protection.outlook.com (104.47.55.108)
+ by edgegateway.intel.com (134.134.137.100) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2375.31; Tue, 23 Aug 2022 00:50:17 -0700
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=TnZxVY7v/1pOi3ykG4dzFMaIrCG6rj7ovQFeCjkqXGAbKrmxNYY6PXLp1phzIJ0ga+jphG+llzB2cjYU5oojxao4gTg9Gf3g8hORcLueDCVDZcJhZRTka61jmY3SNjJZee/ZBa9s2RMP/evvyiOfH+JVMLrNcvDxT9NtJsq5vWCSrsCSXWSeVDr93iHsgx37ZyPx9Yt3KCaRUc6niMHnVnKH6MXpCYEqdqpKPr0GiiX9GZo7gO+PsmMm86ThDMczZk+VOzZS1IDTR4DVixTfoPKyn6AR6fDBIfuB7gvoPtno+c/rgn9I+tB+VF58q3Q+81buRb/lKMpY+9KKOu71Mg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=hOFcFosSlPHdejH5jJXmzVxjaO1fGWlLXcpNWCU6X4U=;
+ b=Kw74IVDkjNWEuAXIfU8mDivfs4eN0HC4RqUCOBee4GZvH3y7CxMQgfKYfttRLydoKC5ZAhmIXy7hya5hVrfEQ6G6ymKujNVZmIWctDhVk3ysFlY+75BPbwRjy7gm6x38H8z3a7AsSoccs9WpEuObwI/2hdYF8xNuKjbCq9gDM5l5x4poXjDXXwkKz0rJBpD4lOrhArOm4FKDu6T15ugFD5+WByTV6+YCjOx+GCaeCCXmEbNcQrHGBDae0su0BbCi8iCIzGeFE5oC8BNnSm03oTWnnr0cfuo4FEHzWwYmprfT/iGpC7gsHw25uWiEJyymhwSE77yvhuKEvNvothyj8w==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+Received: from MWHPR1101MB2221.namprd11.prod.outlook.com
+ (2603:10b6:301:53::18) by DM4PR11MB6066.namprd11.prod.outlook.com
+ (2603:10b6:8:62::13) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5546.22; Tue, 23 Aug
+ 2022 07:50:15 +0000
+Received: from MWHPR1101MB2221.namprd11.prod.outlook.com
+ ([fe80::e9a3:201:f95c:891e]) by MWHPR1101MB2221.namprd11.prod.outlook.com
+ ([fe80::e9a3:201:f95c:891e%6]) with mapi id 15.20.5546.022; Tue, 23 Aug 2022
+ 07:50:15 +0000
+Date:   Tue, 23 Aug 2022 15:50:09 +0800
+From:   Chao Gao <chao.gao@intel.com>
+To:     <isaku.yamahata@intel.com>
+CC:     <kvm@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+        <isaku.yamahata@gmail.com>, Paolo Bonzini <pbonzini@redhat.com>,
+        "Sean Christopherson" <seanjc@google.com>,
+        Kai Huang <kai.huang@intel.com>,
+        "Will Deacon" <will@kernel.org>
+Subject: Re: [RFC PATCH 12/18] KVM: Do processor compatibility check on cpu
+ online and resume
+Message-ID: <YwSGsbpuJ5cdNmDG@gao-cwp>
+References: <cover.1660974106.git.isaku.yamahata@intel.com>
+ <60f9ec74499c673c474e9d909c2f3176bc6711c3.1660974106.git.isaku.yamahata@intel.com>
+Content-Type: text/plain; charset="us-ascii"
+Content-Disposition: inline
+In-Reply-To: <60f9ec74499c673c474e9d909c2f3176bc6711c3.1660974106.git.isaku.yamahata@intel.com>
+X-ClientProxiedBy: SG2PR02CA0098.apcprd02.prod.outlook.com
+ (2603:1096:4:92::14) To MWHPR1101MB2221.namprd11.prod.outlook.com
+ (2603:10b6:301:53::18)
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.9.0
-Subject: Re: [kvm-unit-tests PATCH v1 1/1] lib/s390x: fix SMP setup bug
-Content-Language: en-US
-From:   Janosch Frank <frankja@linux.ibm.com>
-To:     Claudio Imbrenda <imbrenda@linux.ibm.com>
-Cc:     kvm@vger.kernel.org, thuth@redhat.com, nrb@linux.ibm.com,
-        scgl@linux.ibm.com, seiden@linux.ibm.com
-References: <20220818152114.213135-1-imbrenda@linux.ibm.com>
- <d65e5beb-e417-b13d-f5f6-eb0e91ccc1f3@linux.ibm.com>
- <20220819111210.4b1e3fe6@p-imbrenda>
- <8f9714f6-3780-1499-70db-38c74136ae50@linux.ibm.com>
-In-Reply-To: <8f9714f6-3780-1499-70db-38c74136ae50@linux.ibm.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: rTddkX-zqkXd6yfrwc3JTrk1HEUC0b07
-X-Proofpoint-ORIG-GUID: zobAWb9gsCvsKMVgVJGiZcbf-95jxpSG
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.205,Aquarius:18.0.895,Hydra:6.0.517,FMLib:17.11.122.1
- definitions=2022-08-23_02,2022-08-22_02,2022-06-22_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 phishscore=0 impostorscore=0
- suspectscore=0 malwarescore=0 mlxscore=0 lowpriorityscore=0 spamscore=0
- clxscore=1015 priorityscore=1501 adultscore=0 bulkscore=0 mlxlogscore=641
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2207270000
- definitions=main-2208230027
-X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,
-        SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no
-        version=3.4.6
+X-MS-PublicTrafficType: Email
+X-MS-Office365-Filtering-Correlation-Id: 6c1f5945-c0a2-466b-78db-08da84dc1dd4
+X-MS-TrafficTypeDiagnostic: DM4PR11MB6066:EE_
+X-LD-Processed: 46c98d88-e344-4ed4-8496-4ed7712e255d,ExtAddr
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: uUPFlfpis/gFUjzYXD2NiEcNncCIK2omVYQPldntjr2cvjrqV15p8jek0QAqQzBUlCPLv7OdrhLo3h0M0XlxD59cCBE7Wy+qjUCwmZYC/X7J+LLww2QbTBrVRdP9eCW0m/fIgDz/OCKmh3zuY5HRdLU8CegqK5ccyRuJZtvY9e8KpXb9PAcNncOvoSEAgGvt/yEIB8mFLJxAliG8gh1Xh//3mhp8bXJUMHqc5uLlUGYLR58P3nmvD0OFhUPaOrd2zk6K5X0nI6hgr4LIFVT1MN751hiHECcNnXnzT7j6KKjSJjWRxycipXeWL2StLZaEqQ+rPbQ4kMjdKdxGlKLAfNngflLri30DR11uHdXhM8zpdSeW5FWE37J/q7tre0RRF2nPdotOiTAH0cP7XVaqmiykD0R+4TiI+whgL2OtCk46hhTuM6XNEzzVrYeXMl9dMGuHv+ZZbnQ+bzru+DJunY7gXYCh8o3cmtdu0SvFsYozZ5XkwOEytvZd2awl6u0AexGpijHZD1kfD40CvVF7Pir0gbB2a1IzhH0+QgjKHrBG0ex8kIV3jZPSxa7y+XpcfISe8onGHUoeVrG/Q6PVtPr6FHfXNofjsn5MwIfCiCktgyiL0kutsLBU+i55hT6Z8zKfb6JwAvi1eYvyYasyEJQpsV6p46wYjnUdAxAE80TOppa0p6dyhjWBzejaJtw1XMMymAjYgcs95iUaFqrwEw==
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:MWHPR1101MB2221.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230016)(7916004)(39860400002)(366004)(376002)(396003)(136003)(346002)(38100700002)(6636002)(316002)(86362001)(34206002)(8936002)(82960400001)(66946007)(66476007)(66556008)(5660300002)(8676002)(2906002)(4326008)(9686003)(6512007)(6506007)(33716001)(6486002)(44832011)(478600001)(54906003)(83380400001)(186003)(41300700001)(26005)(6666004);DIR:OUT;SFP:1102;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?LkqPJkguJ0hJ+aopFOv1tKxsusEgkmBoZj5i1v2AZuLg5YOcYJl6gcl1AV3x?=
+ =?us-ascii?Q?LHcZ3XARJDYsnNYOVQNApdvcFcivQMcZA1db1pNwVI95EsoIKbbz5knnD8Nh?=
+ =?us-ascii?Q?xRMv5l7zC6qdCCXVoubtSjRS/Omm0Xed2WILEZIk6CIAMPYHVkMaIHstJ0tK?=
+ =?us-ascii?Q?4tPulVUIXxRBg1dYE7SK3W9+O6Ih4FItf0QWdrB1proOKyUmTtbsyg6DneJq?=
+ =?us-ascii?Q?uw2IKnF/BKDSsIU7+UbD/3fHh05Xw9I1Yx79tRFIj0xwJpYzFIp6Cwlan+eU?=
+ =?us-ascii?Q?dATKITaxEAYlq1Go+ItS/IyfUEafLV6Vh0CZ7wLlXhSJq+wLbD7BFs3jbt5n?=
+ =?us-ascii?Q?y69GljZNAT4xAN6OaSK3xID+0DhaRFyLyTrVyt6vlo/9t6BJAVan9ORP5fPe?=
+ =?us-ascii?Q?6dlI8cJnWj8biWD1VOC+wP2O3cKEjzxgxLARoBQZKfnmbVluUNw93msNO7PF?=
+ =?us-ascii?Q?B4zxXdjBTXYLgdAurXJmBWrGv0X61Scd1zpCNtcx4nxbGi3B9pXc7Yw5odu7?=
+ =?us-ascii?Q?nnAIT36gQ8nWd0L2FkMx5NRgsyTbDB7FPiZqP1RO28i03b1LicoxMaupTq17?=
+ =?us-ascii?Q?TZNfytJl6utrFiDXI69sHc7MT+BjtvjlAu3sulwME1jnU4FYA3tA/ZBQbm4F?=
+ =?us-ascii?Q?/WeFGnoBWslryxX3n5AMywqxwLP1ngCTXePOcujl5R6MlNMmXkfCs3HcbL79?=
+ =?us-ascii?Q?hfNiLqycRgcEo2c9ns+3dC0HR4McfH4T6NbxhuJC2M69dyjhi8ojXyD0obqA?=
+ =?us-ascii?Q?PX7Ruc1wcbBCqVlftVBqxIK4/x2ZUBSCdg/bdrOQhh3oe8j6vZJBsOMk6xML?=
+ =?us-ascii?Q?o2FzAh+X1jziiM/p8Zx++ju5DZb/GLBNk5l8ShhZod34nm6j0SgmQBwKSz9O?=
+ =?us-ascii?Q?oiAYXybZEWlpXilEAZ7xE6EBR51cmJWr3qghY9xpFrfw1LM96pyvM8Z0p2vt?=
+ =?us-ascii?Q?L0XymTGsxKpbn6e58SWTB3pdEyedOkgceO5dKrqz7W071YqvM9/9ZOwBmfmN?=
+ =?us-ascii?Q?JPjh9ePbjwUBYKDYU+I5ooiuCjsTdsmc8gs0pKCLhukeTZFIB+9CyFpvI/Z4?=
+ =?us-ascii?Q?1i2gUJZe6HZNQJAkvXwL84gPPaPGg5ZodjATFSb3p1qPElITJIDz3sfoQ/cI?=
+ =?us-ascii?Q?+lmtsn7tt0pRNAK4iMa72pYKSWPWPYOkDptUwztOe22kbxRnVhjO9tQ16RBf?=
+ =?us-ascii?Q?XLXEJYgaqnegHw9ST1CfMoChIOh2pWA1vU8uJFwDNchdcR8IPwneFnFLn1XX?=
+ =?us-ascii?Q?yDbjhJ8mwxxvtfd59tHofmSmW9YiaJWjqqJXVHDSyNDxwo3Fc0jRCxI2uCDh?=
+ =?us-ascii?Q?QNslCApXMYZswMA0ap5VFFYoriLpOYhpLtSD5JlGAR+OK4mfyfvGRU9TXCOr?=
+ =?us-ascii?Q?xtbu9FWVVyRnK2Z2eOQp0B6r5OnY8r2GdOaFpi/ZyLrgJV5j91EuZ8Z2koys?=
+ =?us-ascii?Q?PjYkyaBgin8a3RZGVgJDQ0sOeMn2pas9/KUb/Pnysq+dPKQdvTX343Pv/7eB?=
+ =?us-ascii?Q?/CVkv0vzcTeTqaHXuHua/uaQAinYn9SzK1r/X/hs9C14f/abwyDhwdgJSkhb?=
+ =?us-ascii?Q?DOhm8IiOl8BuCi2NMrE3K+Gt412uJyheYS+HWHrR?=
+X-MS-Exchange-CrossTenant-Network-Message-Id: 6c1f5945-c0a2-466b-78db-08da84dc1dd4
+X-MS-Exchange-CrossTenant-AuthSource: MWHPR1101MB2221.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 23 Aug 2022 07:50:15.6200
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: tZTh6ItXi4hI1SM8FYU+VXQ8Fngjd9a88V1RYdEdkOSG109duZ5kU0OM/lHuhPwVwW5xRiNCB+okbG//TsyCGQ==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM4PR11MB6066
+X-OriginatorOrg: intel.com
+X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
+        SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 8/19/22 12:31, Janosch Frank wrote:
-> On 8/19/22 11:12, Claudio Imbrenda wrote:
->> On Fri, 19 Aug 2022 10:52:40 +0200
->> Janosch Frank <frankja@linux.ibm.com> wrote:
->>
->>> On 8/18/22 17:21, Claudio Imbrenda wrote:
->>>> The lowcore pointer pointing to the current CPU (THIS_CPU) was not
->>>> initialized for the boot CPU. The pointer is needed for correct
->>>> interrupt handling, which is needed in the setup process before the
->>>> struct cpu array is allocated.
->>>>
->>>> The bug went unnoticed because some environments (like qemu/KVM) clear
->>>> all memory and don't write anything in the lowcore area before starting
->>>> the payload. The pointer thus pointed to 0, an area of memory also not
->>>> used. Other environments will write to memory before starting the
->>>> payload, causing the unit tests to crash at the first interrupt.
->>>>
->>>> Fix by assigning a temporary struct cpu before the rest of the setup
->>>> process, and assigning the pointer to the correct allocated struct
->>>> during smp initialization.
->>>>
->>>> Fixes: 4e5dd758 ("lib: s390x: better smp interrupt checks")
->>>> Signed-off-by: Claudio Imbrenda <imbrenda@linux.ibm.com>
->>>
->>> I've considered letting the IPL cpu have a static struct cpu and setting
->>> it up in cstart64.S. But that would mean that we would need extra
->>> handling when using smp functions and that'll look even worse.
->>>
->>> Reported-by: Janosch Frank <frankja@linux.ibm.com>
->>>
-[...]
->>
->> this temporary struct is then not accessible from smp_setup, so it
->> can't be memcpy-ed.
->>
->> if you really want something meaningful in the temporary struct, it has
->> to be initialized in smp.c and called in io.c (something like
->> smp_boot_cpu_tmp_setup(&this_cpu_tmp) ), but then still no memcpy.
->>
->> in the end the struct cpu is needed only to allow interrupts to happen
->> without crashes, I don't think we strictly need initialization
+On Fri, Aug 19, 2022 at 11:00:18PM -0700, isaku.yamahata@intel.com wrote:
+>From: Isaku Yamahata <isaku.yamahata@intel.com>
+>
+>So far the processor compatibility check is not done for newly added CPU.
+>It should be done.
+>
+>Signed-off-by: Isaku Yamahata <isaku.yamahata@intel.com>
+>---
+> virt/kvm/kvm_arch.c | 20 +++++++++++++++-----
+> 1 file changed, 15 insertions(+), 5 deletions(-)
+>
+>diff --git a/virt/kvm/kvm_arch.c b/virt/kvm/kvm_arch.c
+>index 2ed8de0591c9..20971f43df95 100644
+>--- a/virt/kvm/kvm_arch.c
+>+++ b/virt/kvm/kvm_arch.c
+>@@ -99,9 +99,15 @@ __weak int kvm_arch_del_vm(int usage_count)
 > 
-> Ugh, this feels like a quick fix.
-> But alright, I've just tried setting it up from cstart64.S and it's way
-> more ugly code so let's stick with this for now.
+> __weak int kvm_arch_online_cpu(unsigned int cpu, int usage_count)
+> {
+>-	if (usage_count)
+>-		return __hardware_enable();
+>-	return 0;
+>+	int r;
+>+
+>+	if (!usage_count)
+>+		return 0;
+>+
+>+	r = kvm_arch_check_processor_compat();
+>+	if (r)
+>+		return r;
+
+I think kvm_arch_check_processor_compat() should be called even when
+usage_count is 0. Otherwise, compatibility checks may be missing on some
+CPUs if no VM is running when those CPUs becomes online.
+
+>+	return __hardware_enable();
+> }
 > 
+> __weak int kvm_arch_offline_cpu(unsigned int cpu, int usage_count)
+>@@ -126,6 +132,10 @@ __weak int kvm_arch_suspend(int usage_count)
+> 
+> __weak void kvm_arch_resume(int usage_count)
+> {
+>-	if (usage_count)
+>-		(void)__hardware_enable();
+>+	if (!usage_count)
+>+		return;
+>+
+>+	if (kvm_arch_check_processor_compat())
+>+		return; /* FIXME: disable KVM */
 
-Anyway:
-Reviewed-by: Janosch Frank <frankja@linux.ibm.com>
+Ditto.
 
-Thanks, picked
+>+	(void)__hardware_enable();
+> }
+>-- 
+>2.25.1
+>
