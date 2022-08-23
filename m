@@ -2,248 +2,169 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id C56EC59DFCF
-	for <lists+kvm@lfdr.de>; Tue, 23 Aug 2022 14:36:30 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id D6AF759DE51
+	for <lists+kvm@lfdr.de>; Tue, 23 Aug 2022 14:30:41 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1358422AbiHWLyU (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 23 Aug 2022 07:54:20 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35518 "EHLO
+        id S1358587AbiHWL4y (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 23 Aug 2022 07:56:54 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42202 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1358700AbiHWLw6 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 23 Aug 2022 07:52:58 -0400
-Received: from mail-pf1-x42c.google.com (mail-pf1-x42c.google.com [IPv6:2607:f8b0:4864:20::42c])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F3960D59A7;
-        Tue, 23 Aug 2022 02:33:04 -0700 (PDT)
-Received: by mail-pf1-x42c.google.com with SMTP id p9so11852422pfq.13;
-        Tue, 23 Aug 2022 02:33:04 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc;
-        bh=/IKVzfhBQXEpapBjo70h6YuHbpTsL9mny3LHoRffMJs=;
-        b=FZnyOdE08/dlPRvpgom/0NDmrRE8eCsvTigdBVJpLqkOFIqIHAGsbM/UkMSiJJVvA0
-         6+2jt2IzlwbPGX8z2DAZEE+20fnE+yqR3312eUjFDr4uGrHNaWFPTFGf+NaAmdFgZtkw
-         Gci9cc7sjc21GJeE/WgBnjrnvwDl16b9Q/CtmbdlAvHgk/HOLuR3pOUIQQurh+2CzE8q
-         0IISZ1+L+8tbGh0VKWDtGkOSTGex7OsQ7CtM/FwoW6rej0aVaspiO7XVnN1CvD1znr9l
-         eMidWn/4QPuB8RkvVlwNv5HNqKLpko64lhOC2PxSiuvJi1pwi9CSf4qqA2i3oSBc1Lqc
-         yXGg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc;
-        bh=/IKVzfhBQXEpapBjo70h6YuHbpTsL9mny3LHoRffMJs=;
-        b=WVFfMKdMKYGoKVKkKOKeJNSC+ysephMgSE7zQbZFSQ9U2k4cIWDNOL0P8hPvmykfUI
-         5TahmKW5Tqka+qIuBD/lfEbLRAR1sSGwJJlu3fZo2gTBlil30yBkUHAWe2CV8IGzKYlX
-         yAdsdI7P2Pyy9qVOWKDfYhooJJuvKTJOXlJ49w9bjYPDyj24s/aqC6G5nqJWPqiJAgwr
-         XUuCel4hXeynpwoIOJJQ8rxWn9zVWDSDCqzB4GqwGh2tf4wJij+Ek+4KqbcNMA/kIhG6
-         IeOG9vHdN9mqs0a8irDj9CBVWtPxoza7vMMse6meFzViL03V8RUmDqT/d4PMA76rQxOx
-         eSOA==
-X-Gm-Message-State: ACgBeo3bAPwQp8krqcKcEDsN7aT1CvVzzeTTFwBCUqPXUZkJMiaaksGh
-        tHvYWeyWRTi/5DnlM2NcmG0=
-X-Google-Smtp-Source: AA6agR7vZf0um13O/sGVqgfT8zI+7tCAywQiXHqFbDS2ImQPFFukABtRQjPXXgbogJ+X5X3lzen2tw==
-X-Received: by 2002:a05:6a00:1a44:b0:52a:ecd5:bbef with SMTP id h4-20020a056a001a4400b0052aecd5bbefmr24021554pfv.28.1661247180774;
-        Tue, 23 Aug 2022 02:33:00 -0700 (PDT)
-Received: from localhost.localdomain ([103.7.29.32])
-        by smtp.gmail.com with ESMTPSA id 13-20020a170902c24d00b0017297a6b39dsm10057212plg.265.2022.08.23.02.32.58
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 23 Aug 2022 02:33:00 -0700 (PDT)
-From:   Like Xu <like.xu.linux@gmail.com>
-X-Google-Original-From: Like Xu <likexu@tencent.com>
-To:     Sean Christopherson <seanjc@google.com>,
-        Paolo Bonzini <pbonzini@redhat.com>
-Cc:     Jim Mattson <jmattson@google.com>, linux-kernel@vger.kernel.org,
-        kvm@vger.kernel.org
-Subject: [PATCH RESEND v2 8/8] KVM: x86/svm/pmu: Rewrite get_gp_pmc_amd() for more counters scalability
-Date:   Tue, 23 Aug 2022 17:32:21 +0800
-Message-Id: <20220823093221.38075-9-likexu@tencent.com>
-X-Mailer: git-send-email 2.37.2
-In-Reply-To: <20220823093221.38075-1-likexu@tencent.com>
-References: <20220823093221.38075-1-likexu@tencent.com>
+        with ESMTP id S1359106AbiHWL4O (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 23 Aug 2022 07:56:14 -0400
+Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BD03C61B18
+        for <kvm@vger.kernel.org>; Tue, 23 Aug 2022 02:33:43 -0700 (PDT)
+Received: from pps.filterd (m0187473.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.17.1.5/8.17.1.5) with ESMTP id 27N9PkDO006145
+        for <kvm@vger.kernel.org>; Tue, 23 Aug 2022 09:33:04 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
+ mime-version : subject : to : cc : references : from : in-reply-to :
+ content-type : content-transfer-encoding; s=pp1;
+ bh=b6dqE6UCH9iwpg7GH/G2+Owpl3OruNl8AoChxtxWGgs=;
+ b=BNu7DeYHeYYyPGGfPK35iUkO5rtT96Nhf48Q2tW3sKrVLR6LvxTsMkcg4FPMMh0QrtxN
+ QGdcZJgacZkjxnrveGBLU0YGR2dW6nLbt4gIV3kw/CFWw/B3olAlLMrzWUjab7mvCh0r
+ M7TEnfRxGsVSXRnT0Y7hviyXdkXz44P9uLDa3IucSHkq35yylU51XYIRBaTwGJLZwR2n
+ 47gjfuGBQqihsjJtGpLQBdylh9/mEpaHtmKcjKYoc1ByOMc7gWPpCVl2sWUAZ5IBMwYy
+ I1k0AHokGT9vVZ4jX24ikuBrOJ9psgEAH1J9kAk9+pfWwO1MlNtVuMlv2ljxVx3InJ2t 0Q== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3j4v8nr5ed-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT)
+        for <kvm@vger.kernel.org>; Tue, 23 Aug 2022 09:33:02 +0000
+Received: from m0187473.ppops.net (m0187473.ppops.net [127.0.0.1])
+        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 27N9RY2g010596
+        for <kvm@vger.kernel.org>; Tue, 23 Aug 2022 09:33:02 GMT
+Received: from ppma04fra.de.ibm.com (6a.4a.5195.ip4.static.sl-reverse.com [149.81.74.106])
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3j4v8nr5db-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Tue, 23 Aug 2022 09:33:01 +0000
+Received: from pps.filterd (ppma04fra.de.ibm.com [127.0.0.1])
+        by ppma04fra.de.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 27N9LHY1022447;
+        Tue, 23 Aug 2022 09:32:59 GMT
+Received: from b06cxnps4076.portsmouth.uk.ibm.com (d06relay13.portsmouth.uk.ibm.com [9.149.109.198])
+        by ppma04fra.de.ibm.com with ESMTP id 3j2q88tk52-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Tue, 23 Aug 2022 09:32:59 +0000
+Received: from b06wcsmtp001.portsmouth.uk.ibm.com (b06wcsmtp001.portsmouth.uk.ibm.com [9.149.105.160])
+        by b06cxnps4076.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 27N9Wuac31785420
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Tue, 23 Aug 2022 09:32:56 GMT
+Received: from b06wcsmtp001.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 3D133A405B;
+        Tue, 23 Aug 2022 09:32:56 +0000 (GMT)
+Received: from b06wcsmtp001.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 08CFBA4054;
+        Tue, 23 Aug 2022 09:32:56 +0000 (GMT)
+Received: from [9.145.84.26] (unknown [9.145.84.26])
+        by b06wcsmtp001.portsmouth.uk.ibm.com (Postfix) with ESMTP;
+        Tue, 23 Aug 2022 09:32:55 +0000 (GMT)
+Message-ID: <46d331ac-5a87-2ea5-4def-ce3076595420@linux.ibm.com>
+Date:   Tue, 23 Aug 2022 11:32:55 +0200
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
-        RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
-        autolearn=ham autolearn_force=no version=3.4.6
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.9.0
+Subject: Re: [kvm-unit-tests PATCH v5 2/4] lib/s390x: add CPU timer related
+ defines and functions
+Content-Language: en-US
+To:     Nico Boehr <nrb@linux.ibm.com>, kvm@vger.kernel.org
+Cc:     imbrenda@linux.ibm.com, thuth@redhat.com
+References: <20220823084525.52365-1-nrb@linux.ibm.com>
+ <20220823084525.52365-3-nrb@linux.ibm.com>
+From:   Janosch Frank <frankja@linux.ibm.com>
+In-Reply-To: <20220823084525.52365-3-nrb@linux.ibm.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-ORIG-GUID: gtsRVD6wwAWDupr7IzBfxp3ZyU7TEPAb
+X-Proofpoint-GUID: J6juC6_x7O8nwv5mqZ4UkjdJBNvjjNvX
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.205,Aquarius:18.0.895,Hydra:6.0.517,FMLib:17.11.122.1
+ definitions=2022-08-23_04,2022-08-22_02,2022-06-22_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 bulkscore=0
+ lowpriorityscore=0 clxscore=1015 suspectscore=0 malwarescore=0
+ mlxlogscore=999 impostorscore=0 priorityscore=1501 adultscore=0
+ phishscore=0 mlxscore=0 spamscore=0 classifier=spam adjust=0 reason=mlx
+ scancount=1 engine=8.12.0-2207270000 definitions=main-2208230036
+X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,
+        SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no
+        version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-From: Like Xu <likexu@tencent.com>
+On 8/23/22 10:45, Nico Boehr wrote:
+> Upcoming changes will make use of the CPU timer, so add some defines and
+> functions to work with the CPU timer.
+> 
+> Since shifts for both CPU timer and TOD clock are the same, introduce a
+> new define S390_CLOCK_SHIFT_US. The respective shifts for CPU timer and
 
-If the number of AMD gp counters continues to grow, the code will
-be very clumsy and the switch-case design of inline get_gp_pmc_amd()
-will also bloat the kernel text size.
+introduce the new constant "S390_CLOCK_SHIFT_US" for that value
 
-The target code is taught to manage two groups of MSRs, each
-representing a different version of the AMD PMU counter MSRs.
-The MSR addresses of each group are contiguous, with no holes,
-and there is no intersection between two sets of addresses,
-but they are discrete in functionality by design like this:
+> TOD clock reference it, so the semantic difference between the two
+> defines is kept.
+> 
+> Also add a define for the CPU timer subclass mask.
 
-[Group A : All counter MSRs are tightly bound to all event select MSRs ]
+Constant
 
-  MSR_K7_EVNTSEL0			0xc0010000
-  MSR_K7_EVNTSELi			0xc0010000 + i
-  ...
-  MSR_K7_EVNTSEL3			0xc0010003
-  MSR_K7_PERFCTR0			0xc0010004
-  MSR_K7_PERFCTRi			0xc0010004 + i
-  ...
-  MSR_K7_PERFCTR3			0xc0010007
+> 
+> Signed-off-by: Nico Boehr <nrb@linux.ibm.com>
 
-[Group B : The counter MSRs are interleaved with the event select MSRs ]
+Reviewed-by: Janosch Frank <frankja@linux.ibm.com>
 
-  MSR_F15H_PERF_CTL0		0xc0010200
-  MSR_F15H_PERF_CTR0		(0xc0010200 + 1)
-  ...
-  MSR_F15H_PERF_CTLi		(0xc0010200 + 2 * i)
-  MSR_F15H_PERF_CTRi		(0xc0010200 + 2 * i + 1)
-  ...
-  MSR_F15H_PERF_CTL5		(0xc0010200 + 2 * 5)
-  MSR_F15H_PERF_CTR5		(0xc0010200 + 2 * 5 + 1)
-
-Rewrite get_gp_pmc_amd() in this way: first determine which group of
-registers is accessed, then determine if it matches its requested type,
-applying different scaling ratios respectively, and finally get pmc_idx
-to pass into amd_pmc_idx_to_pmc().
-
-Signed-off-by: Like Xu <likexu@tencent.com>
----
- arch/x86/kvm/svm/pmu.c | 85 +++++++++---------------------------------
- 1 file changed, 17 insertions(+), 68 deletions(-)
-
-diff --git a/arch/x86/kvm/svm/pmu.c b/arch/x86/kvm/svm/pmu.c
-index e57eb0555a04..c7ff6a910679 100644
---- a/arch/x86/kvm/svm/pmu.c
-+++ b/arch/x86/kvm/svm/pmu.c
-@@ -23,90 +23,49 @@ enum pmu_type {
- 	PMU_TYPE_EVNTSEL,
- };
- 
--enum index {
--	INDEX_ZERO = 0,
--	INDEX_ONE,
--	INDEX_TWO,
--	INDEX_THREE,
--	INDEX_FOUR,
--	INDEX_FIVE,
--	INDEX_ERROR,
--};
--
--static enum index msr_to_index(u32 msr)
-+static struct kvm_pmc *amd_pmc_idx_to_pmc(struct kvm_pmu *pmu, int pmc_idx)
- {
--	switch (msr) {
--	case MSR_F15H_PERF_CTL0:
--	case MSR_F15H_PERF_CTR0:
--	case MSR_K7_EVNTSEL0:
--	case MSR_K7_PERFCTR0:
--		return INDEX_ZERO;
--	case MSR_F15H_PERF_CTL1:
--	case MSR_F15H_PERF_CTR1:
--	case MSR_K7_EVNTSEL1:
--	case MSR_K7_PERFCTR1:
--		return INDEX_ONE;
--	case MSR_F15H_PERF_CTL2:
--	case MSR_F15H_PERF_CTR2:
--	case MSR_K7_EVNTSEL2:
--	case MSR_K7_PERFCTR2:
--		return INDEX_TWO;
--	case MSR_F15H_PERF_CTL3:
--	case MSR_F15H_PERF_CTR3:
--	case MSR_K7_EVNTSEL3:
--	case MSR_K7_PERFCTR3:
--		return INDEX_THREE;
--	case MSR_F15H_PERF_CTL4:
--	case MSR_F15H_PERF_CTR4:
--		return INDEX_FOUR;
--	case MSR_F15H_PERF_CTL5:
--	case MSR_F15H_PERF_CTR5:
--		return INDEX_FIVE;
--	default:
--		return INDEX_ERROR;
--	}
-+	unsigned int num_counters = pmu->nr_arch_gp_counters;
-+
-+	if (pmc_idx >= num_counters)
-+		return NULL;
-+
-+	return &pmu->gp_counters[array_index_nospec(pmc_idx, num_counters)];
- }
- 
- static inline struct kvm_pmc *get_gp_pmc_amd(struct kvm_pmu *pmu, u32 msr,
- 					     enum pmu_type type)
- {
- 	struct kvm_vcpu *vcpu = pmu_to_vcpu(pmu);
-+	unsigned int idx;
- 
- 	if (!vcpu->kvm->arch.enable_pmu)
- 		return NULL;
- 
- 	switch (msr) {
--	case MSR_F15H_PERF_CTL0:
--	case MSR_F15H_PERF_CTL1:
--	case MSR_F15H_PERF_CTL2:
--	case MSR_F15H_PERF_CTL3:
--	case MSR_F15H_PERF_CTL4:
--	case MSR_F15H_PERF_CTL5:
-+	case MSR_F15H_PERF_CTL0 ... MSR_F15H_PERF_CTR5:
- 		if (!guest_cpuid_has(vcpu, X86_FEATURE_PERFCTR_CORE))
- 			return NULL;
--		fallthrough;
-+		idx = (unsigned int)((msr - MSR_F15H_PERF_CTL0) / 2);
-+		if ((msr == (MSR_F15H_PERF_CTL0 + 2 * idx)) !=
-+		    (type == PMU_TYPE_EVNTSEL))
-+			return NULL;
-+		break;
- 	case MSR_K7_EVNTSEL0 ... MSR_K7_EVNTSEL3:
- 		if (type != PMU_TYPE_EVNTSEL)
- 			return NULL;
-+		idx = msr - MSR_K7_EVNTSEL0;
- 		break;
--	case MSR_F15H_PERF_CTR0:
--	case MSR_F15H_PERF_CTR1:
--	case MSR_F15H_PERF_CTR2:
--	case MSR_F15H_PERF_CTR3:
--	case MSR_F15H_PERF_CTR4:
--	case MSR_F15H_PERF_CTR5:
--		if (!guest_cpuid_has(vcpu, X86_FEATURE_PERFCTR_CORE))
--			return NULL;
--		fallthrough;
- 	case MSR_K7_PERFCTR0 ... MSR_K7_PERFCTR3:
- 		if (type != PMU_TYPE_COUNTER)
- 			return NULL;
-+		idx = msr - MSR_K7_PERFCTR0;
- 		break;
- 	default:
- 		return NULL;
- 	}
- 
--	return &pmu->gp_counters[msr_to_index(msr)];
-+	return amd_pmc_idx_to_pmc(pmu, idx);
- }
- 
- static bool amd_hw_event_available(struct kvm_pmc *pmc)
-@@ -122,16 +81,6 @@ static bool amd_pmc_is_enabled(struct kvm_pmc *pmc)
- 	return true;
- }
- 
--static struct kvm_pmc *amd_pmc_idx_to_pmc(struct kvm_pmu *pmu, int pmc_idx)
--{
--	unsigned int num_counters = pmu->nr_arch_gp_counters;
--
--	if (pmc_idx >= num_counters)
--		return NULL;
--
--	return &pmu->gp_counters[array_index_nospec(pmc_idx, num_counters)];
--}
--
- static bool amd_is_valid_rdpmc_ecx(struct kvm_vcpu *vcpu, unsigned int idx)
- {
- 	struct kvm_pmu *pmu = vcpu_to_pmu(vcpu);
--- 
-2.37.2
+> ---
+>   lib/s390x/asm/arch_def.h |  1 +
+>   lib/s390x/asm/time.h     | 17 ++++++++++++++++-
+>   2 files changed, 17 insertions(+), 1 deletion(-)
+> 
+> diff --git a/lib/s390x/asm/arch_def.h b/lib/s390x/asm/arch_def.h
+> index e7ae454b3a33..b92291e8ae3f 100644
+> --- a/lib/s390x/asm/arch_def.h
+> +++ b/lib/s390x/asm/arch_def.h
+> @@ -78,6 +78,7 @@ struct cpu {
+>   #define CTL0_EMERGENCY_SIGNAL			(63 - 49)
+>   #define CTL0_EXTERNAL_CALL			(63 - 50)
+>   #define CTL0_CLOCK_COMPARATOR			(63 - 52)
+> +#define CTL0_CPU_TIMER				(63 - 53)
+>   #define CTL0_SERVICE_SIGNAL			(63 - 54)
+>   #define CR0_EXTM_MASK			0x0000000000006200UL /* Combined external masks */
+>   
+> diff --git a/lib/s390x/asm/time.h b/lib/s390x/asm/time.h
+> index 7652a151e87a..d8d91d68a667 100644
+> --- a/lib/s390x/asm/time.h
+> +++ b/lib/s390x/asm/time.h
+> @@ -11,9 +11,13 @@
+>   #ifndef _ASMS390X_TIME_H_
+>   #define _ASMS390X_TIME_H_
+>   
+> -#define STCK_SHIFT_US	(63 - 51)
+> +#define S390_CLOCK_SHIFT_US	(63 - 51)
+> +
+> +#define STCK_SHIFT_US	S390_CLOCK_SHIFT_US
+>   #define STCK_MAX	((1UL << 52) - 1)
+>   
+> +#define CPU_TIMER_SHIFT_US	S390_CLOCK_SHIFT_US
+> +
+>   static inline uint64_t get_clock_us(void)
+>   {
+>   	uint64_t clk;
+> @@ -45,4 +49,15 @@ static inline void mdelay(unsigned long ms)
+>   	udelay(ms * 1000);
+>   }
+>   
+> +static inline void cpu_timer_set_ms(int64_t timeout_ms)
+> +{
+> +	int64_t timer_value = (timeout_ms * 1000) << CPU_TIMER_SHIFT_US;
+> +
+> +	asm volatile (
+> +		"spt %[timer_value]\n"
+> +		:
+> +		: [timer_value] "Q" (timer_value)
+> +	);
+> +}
+> +
+>   #endif
 
