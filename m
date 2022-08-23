@@ -2,60 +2,60 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id EDAD859E26B
-	for <lists+kvm@lfdr.de>; Tue, 23 Aug 2022 14:42:19 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 2CDF359DDF9
+	for <lists+kvm@lfdr.de>; Tue, 23 Aug 2022 14:29:37 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1358706AbiHWLxG (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 23 Aug 2022 07:53:06 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35534 "EHLO
+        id S1358782AbiHWLyM (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 23 Aug 2022 07:54:12 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57108 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1358488AbiHWLwW (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 23 Aug 2022 07:52:22 -0400
-Received: from mail-pg1-x52f.google.com (mail-pg1-x52f.google.com [IPv6:2607:f8b0:4864:20::52f])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 87FE9D51FE;
-        Tue, 23 Aug 2022 02:32:53 -0700 (PDT)
-Received: by mail-pg1-x52f.google.com with SMTP id 73so11763411pgb.9;
-        Tue, 23 Aug 2022 02:32:53 -0700 (PDT)
+        with ESMTP id S1358685AbiHWLwz (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 23 Aug 2022 07:52:55 -0400
+Received: from mail-pg1-x529.google.com (mail-pg1-x529.google.com [IPv6:2607:f8b0:4864:20::529])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 58A62D571E;
+        Tue, 23 Aug 2022 02:32:55 -0700 (PDT)
+Received: by mail-pg1-x529.google.com with SMTP id r69so11784629pgr.2;
+        Tue, 23 Aug 2022 02:32:55 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc;
-        bh=kmsJThxMpL4fKPHkENmuVnZ9XORtMvlqpgm9TJ9ODsE=;
-        b=A78yrInV0cuSgnOfsAcBxJ2wwQwZnjaetvznU7KHMasPcl5tGc/vCy5XkFeeJsp9Dg
-         yj7JFhMbZY2O50EgTz/ZJEBG3Ilx1Y6cCptOo7dzs9v2egnU491pA0hWHWKtHRqxAS3i
-         xFdZLebCQQzIu3Ax9ombfuzz9pHrzcWPITLttqnTPWiIm3sKBvvfcSwbdwBWRh1C67Zn
-         rk33b/2gc77Ft5eZFZEJj0ftfSMZ2CXPb+erGDUENXe2u82Pv2Np84UUWq3KC362LRrD
-         0UicxLweea7YS3m/WitDmisYaCZm0p++jTcRIBNgUINoybOZ8fuo3ne5MkcNheOgb1Jt
-         GYyQ==
+        bh=CAfa2n1KTOfIPyRv+epAHCxbtQ7Xsz015iAg4y1XQaI=;
+        b=Wd7ldfFhVFtiRs1Gcwu96YKIrY8Gq3FVAlGT9F3hBwayZrVYO0GH2Rd5eJ6CrOt42S
+         z1z6y7tvtrOr2tOl+cO3IUBPAWGPLX1x+YuLOoeQnaHSGSCEwDPFxHRdZxlv57c4uDde
+         Xe+I6eSxBb+8M3GRcEWVhmeENqcBAy+O21O2aFp7JoXVSbAovWH+yshuHghUF3zke3Mp
+         E7UyTMQHvoeBmEhVEOWTiMei3WSg1Zb/6KmHGNv8oBi6jolxwIhh7n6tckv2dwIlzFwl
+         o/Tx6BmCA0yzQTOCws5a5EDh7OXlmqGHigkyAdrgG41pAZGdkJXq7FDCToEeAQTjaEeD
+         2cOA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc;
-        bh=kmsJThxMpL4fKPHkENmuVnZ9XORtMvlqpgm9TJ9ODsE=;
-        b=x2FJAym2m0Aa4nLNMJZHIdcF9RzTwY9RKM8IyWUALHdw+DSYz7ds0+PJVUF63xKcrk
-         XxNI4zFl+R43VSUm31WMHj0kdpViPT2oiOYSUXCYFF9Yq11g7wG4gJPb75N/RBLeQMUr
-         sripSH8VyWbNCd75gn/WyR7UbhAgTX6ueixPdkAGk1phcilpgJ+YASsx6JcPaNainChg
-         BBVKFH/1W9iLDpJOHoJ3yiRkOhNL9O6DBsgUiCNUv+hjk++I7pKP0aQI52b+rn5WK41u
-         ZREqtPIk7Fzz+cHyN8TLxb6KdVm66T+XI/2BESs+KBViYWUF5zJTiXkUFk/7WykoMsqA
-         9gWA==
-X-Gm-Message-State: ACgBeo1pY1Ukfo3Xt9B9tRSNSTp8A3c1/4uxD9KnmTQPWLSrth3Dmbfx
-        LVOEpNkDJpt8I5kTHfSNU9U=
-X-Google-Smtp-Source: AA6agR7SWSvgMJUf1OLU12wjPib4Z+Of0SWDD5+MxpFkkxBSgGnm77bzrRK3Lgrjff+7U4dumFRNVQ==
-X-Received: by 2002:a65:49c8:0:b0:415:e89d:ea1a with SMTP id t8-20020a6549c8000000b00415e89dea1amr19965937pgs.266.1661247171182;
-        Tue, 23 Aug 2022 02:32:51 -0700 (PDT)
+        bh=CAfa2n1KTOfIPyRv+epAHCxbtQ7Xsz015iAg4y1XQaI=;
+        b=NIJUnlYGojwsEoiWsbPkmG6M1i8g8aNOEVLYZfcsLr942QKbQbdH/Ex02zkiGYuRHF
+         1LQGVd0kTwRbMTSX6ce4ap8EKz8UzTHoPtrfprKSRwmwX0m89p4sLaZUmc9HtenroVTb
+         gc2d3vSol/dcoNA/f4tY5tH4yxnPLVuIPomeVi9hG0hjMUBirlUae+IajuWN8G+11u9r
+         Nd8xpE9lbUQ4nzgkOt6ncYHDFKv4albNQE+EDu1i2+CHT6Qm2e5XzHWRRXM0PF42Hb04
+         gnvfqVDlYe8nqxnHCxjBVeXFG7nPLbZIq+/FVyvLnUW2rUC+VPogbeSUpQ6V9f/nLxtd
+         SchQ==
+X-Gm-Message-State: ACgBeo2RTnOFZ5Rv3bW1/TVD34V4yGMTtdJq6EmxkwkVaCRBRt3PVBGg
+        aX+znj1MtfUaqkFu9nzxQHy0YfAdFog=
+X-Google-Smtp-Source: AA6agR5OKXfHmRfMtQ6PyilKMX43lH3PA2Vu+bqjib+lxTHFZnMVsib9S66F1x7+8+CNnuiC0ENrjQ==
+X-Received: by 2002:a05:6a02:10e:b0:42a:b42b:5692 with SMTP id bg14-20020a056a02010e00b0042ab42b5692mr7416921pgb.67.1661247173287;
+        Tue, 23 Aug 2022 02:32:53 -0700 (PDT)
 Received: from localhost.localdomain ([103.7.29.32])
-        by smtp.gmail.com with ESMTPSA id 13-20020a170902c24d00b0017297a6b39dsm10057212plg.265.2022.08.23.02.32.49
+        by smtp.gmail.com with ESMTPSA id 13-20020a170902c24d00b0017297a6b39dsm10057212plg.265.2022.08.23.02.32.51
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 23 Aug 2022 02:32:50 -0700 (PDT)
+        Tue, 23 Aug 2022 02:32:53 -0700 (PDT)
 From:   Like Xu <like.xu.linux@gmail.com>
 X-Google-Original-From: Like Xu <likexu@tencent.com>
 To:     Sean Christopherson <seanjc@google.com>,
         Paolo Bonzini <pbonzini@redhat.com>
 Cc:     Jim Mattson <jmattson@google.com>, linux-kernel@vger.kernel.org,
         kvm@vger.kernel.org
-Subject: [PATCH RESEND v2 4/8] KVM: x86/pmu: Avoid using PEBS perf_events for normal counters
-Date:   Tue, 23 Aug 2022 17:32:17 +0800
-Message-Id: <20220823093221.38075-5-likexu@tencent.com>
+Subject: [PATCH RESEND v2 5/8] KVM: x86/pmu: Defer reprogram_counter() to kvm_pmu_handle_event()
+Date:   Tue, 23 Aug 2022 17:32:18 +0800
+Message-Id: <20220823093221.38075-6-likexu@tencent.com>
 X-Mailer: git-send-email 2.37.2
 In-Reply-To: <20220823093221.38075-1-likexu@tencent.com>
 References: <20220823093221.38075-1-likexu@tencent.com>
@@ -73,96 +73,121 @@ X-Mailing-List: kvm@vger.kernel.org
 
 From: Like Xu <likexu@tencent.com>
 
-The check logic in the pmc_resume_counter() to determine whether
-a perf_event is reusable is partial and flawed, especially when it
-comes to a pseudocode sequence (not correct but clearly valid) like:
+During a KVM-trap from vm-exit to vm-entry, requests from different
+sources will try to create one or more perf_events via reprogram_counter(),
+which will allow some predecessor actions to be undone posteriorly,
+especially repeated calls to some perf subsystem interfaces. These
+repetitive calls can be omitted because only the final state of the
+perf_event and the hardware resources it occupies will take effect
+for the guest right before the vm-entry.
 
-  - enabling a counter and its PEBS bit
-  - enable global_ctrl
-  - run workload
-  - disable only the PEBS bit, leaving the global_ctrl bit enabled
+To realize this optimization, KVM marks the creation requirements via
+an inline version of reprogram_counter(), and then defers the actual
+execution with the help of vcpu KVM_REQ_PMU request.
 
-In this corner case, a perf_event created for PEBS can be reused by
-a normal counter before it has been released and recreated, and when this
-normal counter overflows, it triggers a PEBS interrupt (precise_ip != 0).
+Opportunistically update related comments to avoid misunderstandings.
 
-To address this issue, the reuse check has been revamped and KVM will
-go back to do reprogram_counter() when any bit of guest PEBS_ENABLE
-msr has changed, which is similar to what global_ctrl_changed() does.
-
-Fixes: 79f3e3b58386 ("KVM: x86/pmu: Reprogram PEBS event to emulate guest PEBS counter")
 Signed-off-by: Like Xu <likexu@tencent.com>
 ---
- arch/x86/kvm/pmu.c           |  4 ++--
- arch/x86/kvm/vmx/pmu_intel.c | 14 +++++++-------
- 2 files changed, 9 insertions(+), 9 deletions(-)
+ arch/x86/include/asm/kvm_host.h |  1 +
+ arch/x86/kvm/pmu.c              | 16 +++++++++-------
+ arch/x86/kvm/pmu.h              |  6 +++++-
+ 3 files changed, 15 insertions(+), 8 deletions(-)
 
+diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
+index 2c96c43c313a..4e568a7ef464 100644
+--- a/arch/x86/include/asm/kvm_host.h
++++ b/arch/x86/include/asm/kvm_host.h
+@@ -493,6 +493,7 @@ struct kvm_pmc {
+ 	struct perf_event *perf_event;
+ 	struct kvm_vcpu *vcpu;
+ 	/*
++	 * only for creating or reusing perf_event,
+ 	 * eventsel value for general purpose counters,
+ 	 * ctrl value for fixed counters.
+ 	 */
 diff --git a/arch/x86/kvm/pmu.c b/arch/x86/kvm/pmu.c
-index 390d697efde1..d9b9a0f0db17 100644
+index d9b9a0f0db17..6940cbeee54d 100644
 --- a/arch/x86/kvm/pmu.c
 +++ b/arch/x86/kvm/pmu.c
-@@ -237,8 +237,8 @@ static bool pmc_resume_counter(struct kvm_pmc *pmc)
- 			      get_sample_period(pmc, pmc->counter)))
- 		return false;
+@@ -101,7 +101,7 @@ static inline void __kvm_perf_overflow(struct kvm_pmc *pmc, bool in_pmi)
+ 	struct kvm_pmu *pmu = pmc_to_pmu(pmc);
+ 	bool skip_pmi = false;
  
--	if (!test_bit(pmc->idx, (unsigned long *)&pmc_to_pmu(pmc)->pebs_enable) &&
--	    pmc->perf_event->attr.precise_ip)
-+	if (test_bit(pmc->idx, (unsigned long *)&pmc_to_pmu(pmc)->pebs_enable) !=
-+	    (!!pmc->perf_event->attr.precise_ip))
- 		return false;
+-	/* Ignore counters that have been reprogrammed already. */
++	/* Ignore counters that have not been reprogrammed. */
+ 	if (test_and_set_bit(pmc->idx, pmu->reprogram_pmi))
+ 		return;
  
- 	/* reuse perf_event to serve as pmc_reprogram_counter() does*/
-diff --git a/arch/x86/kvm/vmx/pmu_intel.c b/arch/x86/kvm/vmx/pmu_intel.c
-index d595ff33d32d..6242b0b81116 100644
---- a/arch/x86/kvm/vmx/pmu_intel.c
-+++ b/arch/x86/kvm/vmx/pmu_intel.c
-@@ -68,15 +68,11 @@ static struct kvm_pmc *intel_pmc_idx_to_pmc(struct kvm_pmu *pmu, int pmc_idx)
- 	}
+@@ -293,7 +293,7 @@ static bool check_pmu_event_filter(struct kvm_pmc *pmc)
+ 	return allow_event;
  }
  
--/* function is called when global control register has been updated. */
--static void global_ctrl_changed(struct kvm_pmu *pmu, u64 data)
-+static void reprogram_counters(struct kvm_pmu *pmu, u64 diff)
+-void reprogram_counter(struct kvm_pmc *pmc)
++static void __reprogram_counter(struct kvm_pmc *pmc)
  {
- 	int bit;
--	u64 diff = pmu->global_ctrl ^ data;
- 	struct kvm_pmc *pmc;
+ 	struct kvm_pmu *pmu = pmc_to_pmu(pmc);
+ 	u64 eventsel = pmc->eventsel;
+@@ -335,7 +335,6 @@ void reprogram_counter(struct kvm_pmc *pmc)
+ 			      !(eventsel & ARCH_PERFMON_EVENTSEL_OS),
+ 			      eventsel & ARCH_PERFMON_EVENTSEL_INT);
+ }
+-EXPORT_SYMBOL_GPL(reprogram_counter);
  
--	pmu->global_ctrl = data;
--
- 	for_each_set_bit(bit, (unsigned long *)&diff, X86_PMC_IDX_MAX) {
- 		pmc = intel_pmc_idx_to_pmc(pmu, bit);
- 		if (pmc)
-@@ -397,7 +393,7 @@ static int intel_pmu_set_msr(struct kvm_vcpu *vcpu, struct msr_data *msr_info)
- 	struct kvm_pmc *pmc;
- 	u32 msr = msr_info->index;
- 	u64 data = msr_info->data;
--	u64 reserved_bits;
-+	u64 reserved_bits, diff;
+ void kvm_pmu_handle_event(struct kvm_vcpu *vcpu)
+ {
+@@ -345,11 +344,12 @@ void kvm_pmu_handle_event(struct kvm_vcpu *vcpu)
+ 	for_each_set_bit(bit, pmu->reprogram_pmi, X86_PMC_IDX_MAX) {
+ 		struct kvm_pmc *pmc = static_call(kvm_x86_pmu_pmc_idx_to_pmc)(pmu, bit);
  
- 	switch (msr) {
- 	case MSR_CORE_PERF_FIXED_CTR_CTRL:
-@@ -418,7 +414,9 @@ static int intel_pmu_set_msr(struct kvm_vcpu *vcpu, struct msr_data *msr_info)
- 		if (pmu->global_ctrl == data)
- 			return 0;
- 		if (kvm_valid_perf_global_ctrl(pmu, data)) {
--			global_ctrl_changed(pmu, data);
-+			diff = pmu->global_ctrl ^ data;
-+			pmu->global_ctrl = data;
-+			reprogram_counters(pmu, diff);
- 			return 0;
+-		if (unlikely(!pmc || !pmc->perf_event)) {
++		if (unlikely(!pmc)) {
+ 			clear_bit(bit, pmu->reprogram_pmi);
+ 			continue;
  		}
- 		break;
-@@ -433,7 +431,9 @@ static int intel_pmu_set_msr(struct kvm_vcpu *vcpu, struct msr_data *msr_info)
- 		if (pmu->pebs_enable == data)
- 			return 0;
- 		if (!(data & pmu->pebs_enable_mask)) {
-+			diff = pmu->pebs_enable ^ data;
- 			pmu->pebs_enable = data;
-+			reprogram_counters(pmu, diff);
- 			return 0;
- 		}
- 		break;
+-		reprogram_counter(pmc);
++
++		__reprogram_counter(pmc);
+ 	}
+ 
+ 	/*
+@@ -527,7 +527,7 @@ static void kvm_pmu_incr_counter(struct kvm_pmc *pmc)
+ 	prev_count = pmc->counter;
+ 	pmc->counter = (pmc->counter + 1) & pmc_bitmask(pmc);
+ 
+-	reprogram_counter(pmc);
++	__reprogram_counter(pmc);
+ 	if (pmc->counter < prev_count)
+ 		__kvm_perf_overflow(pmc, false);
+ }
+@@ -542,7 +542,9 @@ static inline bool eventsel_match_perf_hw_id(struct kvm_pmc *pmc,
+ static inline bool cpl_is_matched(struct kvm_pmc *pmc)
+ {
+ 	bool select_os, select_user;
+-	u64 config = pmc->current_config;
++	u64 config = pmc_is_gp(pmc) ? pmc->eventsel :
++		(u64)fixed_ctrl_field(pmc_to_pmu(pmc)->fixed_ctr_ctrl,
++				      pmc->idx - INTEL_PMC_IDX_FIXED);
+ 
+ 	if (pmc_is_gp(pmc)) {
+ 		select_os = config & ARCH_PERFMON_EVENTSEL_OS;
+diff --git a/arch/x86/kvm/pmu.h b/arch/x86/kvm/pmu.h
+index 5cc5721f260b..d193d1dc6de0 100644
+--- a/arch/x86/kvm/pmu.h
++++ b/arch/x86/kvm/pmu.h
+@@ -183,7 +183,11 @@ static inline void kvm_init_pmu_capability(void)
+ 					     KVM_PMC_MAX_FIXED);
+ }
+ 
+-void reprogram_counter(struct kvm_pmc *pmc);
++static inline void reprogram_counter(struct kvm_pmc *pmc)
++{
++	__set_bit(pmc->idx, pmc_to_pmu(pmc)->reprogram_pmi);
++	kvm_make_request(KVM_REQ_PMU, pmc->vcpu);
++}
+ 
+ void kvm_pmu_deliver_pmi(struct kvm_vcpu *vcpu);
+ void kvm_pmu_handle_event(struct kvm_vcpu *vcpu);
 -- 
 2.37.2
 
