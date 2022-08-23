@@ -2,97 +2,209 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id A356859E748
-	for <lists+kvm@lfdr.de>; Tue, 23 Aug 2022 18:31:47 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 5824559E825
+	for <lists+kvm@lfdr.de>; Tue, 23 Aug 2022 18:56:48 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S244695AbiHWQaP (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 23 Aug 2022 12:30:15 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45630 "EHLO
+        id S245598AbiHWQxp (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 23 Aug 2022 12:53:45 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44942 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S242703AbiHWQ3x (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 23 Aug 2022 12:29:53 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2C0171F2FF
-        for <kvm@vger.kernel.org>; Tue, 23 Aug 2022 05:57:12 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1661259431;
+        with ESMTP id S242879AbiHWQxY (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 23 Aug 2022 12:53:24 -0400
+Received: from mail.skyhub.de (mail.skyhub.de [5.9.137.197])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E7A38131A02;
+        Tue, 23 Aug 2022 06:21:39 -0700 (PDT)
+Received: from zn.tnic (p200300ea971b9893329c23fffea6a903.dip0.t-ipconnect.de [IPv6:2003:ea:971b:9893:329c:23ff:fea6:a903])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by mail.skyhub.de (SuperMail on ZX Spectrum 128k) with ESMTPSA id CA7901EC059D;
+        Tue, 23 Aug 2022 15:21:33 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alien8.de; s=dkim;
+        t=1661260893;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding;
-        bh=Y9LKZY2kmFCyQs+oe+1C/W64milf2e76Lj/8BkwVowc=;
-        b=OoXFronLAd10Lti+nAB6Co2Ik7NajBLpua+iCDSBrajmceLBkLiTnI2TJ7U53yi4l96KoI
-        7crkX9ApvjphK8a4d/oxHoT0FfehwkIzq5EogKhe1+yLL+WgcSUilAp2lU88ZpHw3h8FHn
-        hB6LenWuyujgeCWE+/rLv406tmc8DOs=
-Received: from mail-qv1-f70.google.com (mail-qv1-f70.google.com
- [209.85.219.70]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_128_GCM_SHA256) id
- us-mta-638-hD-5Wq9_Pq6BzzMpAbzPng-1; Tue, 23 Aug 2022 08:57:07 -0400
-X-MC-Unique: hD-5Wq9_Pq6BzzMpAbzPng-1
-Received: by mail-qv1-f70.google.com with SMTP id n9-20020a0cfbc9000000b00496bb293f1fso7001940qvp.1
-        for <kvm@vger.kernel.org>; Tue, 23 Aug 2022 05:57:07 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=content-transfer-encoding:mime-version:user-agent:date:cc:to:from
-         :subject:message-id:x-gm-message-state:from:to:cc;
-        bh=Y9LKZY2kmFCyQs+oe+1C/W64milf2e76Lj/8BkwVowc=;
-        b=yqI/5tU/GsJk8EU6iyuD4MwbSZCLgrxQ5uGAbM78YJhxBi08i9mrSRf5xkeMDlBTnp
-         zFDx0pPMhTxs9cYau5B8COO8kCeJkaWb7I3EJQNjm895eWpRN90S7wEswVmY5ackDng0
-         yL8TbihApMxbTMU5i8drq8BQij7Ls/sTbqbpVJ9qHO38nqDdcz/VSc3TqKFuu8scCvHK
-         2YBVEwdNvcMV8A7/0zXloU9nMTBLsCB4OPRgsk3EkYvzrFSRPciB3nk8C1NiLHtbzHAt
-         nKzrbh+IZeRXLS6Ly0op+163EIYkGYEBKWQS1Fuk0TnroxeCx5GPwray4aO40omebntG
-         SJog==
-X-Gm-Message-State: ACgBeo3yIHkrRrf2p8wYttTFkeEOW6YhTiXrsRyzk2QLpBTERG6MAOb2
-        6gzqEBNJW/SgyUDobzpOqbz42Ek9ptHh7dEVegrJGiPYVOZVj5gioye8+fiGoRCVoVW2db/kwNk
-        Oo403oXYdAfyN
-X-Received: by 2002:ac8:5889:0:b0:344:57e5:dc54 with SMTP id t9-20020ac85889000000b0034457e5dc54mr19480634qta.465.1661259426808;
-        Tue, 23 Aug 2022 05:57:06 -0700 (PDT)
-X-Google-Smtp-Source: AA6agR7B7cu076JtEOfRpGLIW8wss7Qd+yeJoVC+QUZHOm2ldYv0lpde6xlWoWAqGD+Hv2kV2iJ2kQ==
-X-Received: by 2002:ac8:5889:0:b0:344:57e5:dc54 with SMTP id t9-20020ac85889000000b0034457e5dc54mr19480618qta.465.1661259426610;
-        Tue, 23 Aug 2022 05:57:06 -0700 (PDT)
-Received: from [10.35.4.238] (bzq-82-81-161-50.red.bezeqint.net. [82.81.161.50])
-        by smtp.gmail.com with ESMTPSA id q15-20020ac8450f000000b003447ee0a6bfsm10709695qtn.17.2022.08.23.05.57.05
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 23 Aug 2022 05:57:06 -0700 (PDT)
-Message-ID: <cdbe3d8d07557d73d7a96cd4a69e717574494e34.camel@redhat.com>
-Subject: FYI:  xapic_state_test selftest fails with avic enabled
-From:   Maxim Levitsky <mlevitsk@redhat.com>
-To:     Sean Christopherson <seanjc@google.com>
-Cc:     kvm@vger.kernel.org, pbonzini@redhat.com,
-        Suravee Suthikulpanit <suravee.suthikulpanit@amd.com>
-Date:   Tue, 23 Aug 2022 15:57:03 +0300
-Content-Type: text/plain; charset="UTF-8"
-User-Agent: Evolution 3.40.4 (3.40.4-5.fc34) 
+         content-transfer-encoding:in-reply-to:in-reply-to:  references:references;
+        bh=88b9dtw5SGZz9ByR4SVq5jtelPnssUL5tht/iXbNMr0=;
+        b=pdIFFaLF2Q5y9bCJ1IXNDS6T4Wx4YgPc/b9z/mTBbXwTqFdUzRZMyThTsuC8nQblA+NIw+
+        yLDo4nIEPl/nfBvIJrqm5PSxkopiA4U0cqHMfliR6HYmWQcLLLGLR9WlAvXHJ9LuGWac95
+        qZyJxJ6DZFrPdZlQdErBqscKg5MLx5I=
+Date:   Tue, 23 Aug 2022 15:21:29 +0200
+From:   Borislav Petkov <bp@alien8.de>
+To:     Ashish Kalra <Ashish.Kalra@amd.com>
+Cc:     x86@kernel.org, linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        linux-coco@lists.linux.dev, linux-mm@kvack.org,
+        linux-crypto@vger.kernel.org, tglx@linutronix.de, mingo@redhat.com,
+        jroedel@suse.de, thomas.lendacky@amd.com, hpa@zytor.com,
+        ardb@kernel.org, pbonzini@redhat.com, seanjc@google.com,
+        vkuznets@redhat.com, jmattson@google.com, luto@kernel.org,
+        dave.hansen@linux.intel.com, slp@redhat.com, pgonda@google.com,
+        peterz@infradead.org, srinivas.pandruvada@linux.intel.com,
+        rientjes@google.com, dovmurik@linux.ibm.com, tobin@ibm.com,
+        michael.roth@amd.com, vbabka@suse.cz, kirill@shutemov.name,
+        ak@linux.intel.com, tony.luck@intel.com, marcorr@google.com,
+        sathyanarayanan.kuppuswamy@linux.intel.com, alpergun@google.com,
+        dgilbert@redhat.com, jarkko@kernel.org
+Subject: Re: [PATCH Part2 v6 10/49] x86/fault: Add support to dump RMP entry
+ on fault
+Message-ID: <YwTUWUkDVW+936VR@zn.tnic>
+References: <cover.1655761627.git.ashish.kalra@amd.com>
+ <af381cc88410c0e2c48fda5732741edd0d7609ac.1655761627.git.ashish.kalra@amd.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham
-        autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <af381cc88410c0e2c48fda5732741edd0d7609ac.1655761627.git.ashish.kalra@amd.com>
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,SPF_HELO_NONE,SPF_PASS,
+        T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi!
+On Mon, Jun 20, 2022 at 11:03:58PM +0000, Ashish Kalra wrote:
+> From: Brijesh Singh <brijesh.singh@amd.com>
+> 
+> When SEV-SNP is enabled globally, a write from the host goes through the
+> RMP check. If the hardware encounters the check failure, then it raises
+> the #PF (with RMP set). Dump the RMP entry at the faulting pfn to help
+> the debug.
+> 
+> Signed-off-by: Brijesh Singh <brijesh.singh@amd.com>
+> ---
+>  arch/x86/include/asm/sev.h |  7 +++++++
+>  arch/x86/kernel/sev.c      | 43 ++++++++++++++++++++++++++++++++++++++
+>  arch/x86/mm/fault.c        | 17 +++++++++++----
+>  include/linux/sev.h        |  2 ++
+>  4 files changed, 65 insertions(+), 4 deletions(-)
+> 
+> diff --git a/arch/x86/include/asm/sev.h b/arch/x86/include/asm/sev.h
+> index 6ab872311544..c0c4df817159 100644
+> --- a/arch/x86/include/asm/sev.h
+> +++ b/arch/x86/include/asm/sev.h
+> @@ -113,6 +113,11 @@ struct __packed rmpentry {
+>  
+>  #define rmpentry_assigned(x)	((x)->info.assigned)
+>  #define rmpentry_pagesize(x)	((x)->info.pagesize)
+> +#define rmpentry_vmsa(x)	((x)->info.vmsa)
+> +#define rmpentry_asid(x)	((x)->info.asid)
+> +#define rmpentry_validated(x)	((x)->info.validated)
+> +#define rmpentry_gpa(x)		((unsigned long)(x)->info.gpa)
+> +#define rmpentry_immutable(x)	((x)->info.immutable)
 
-I just noticed that this test fails when the AVIC is enabled.
+If you're going to do that, use inline functions pls so that it checks
+the argument at least.
 
-It seems that it exposes actual shortcomings in the AVIC hardware implementation,
-although these should not matter in real life usage of it.
+Also, add such functions only when they're called multiple times - no
+need to add one for every field if you're going to access that field
+only once in the whole kernel.
 
+>  
+>  #define RMPADJUST_VMSA_PAGE_BIT		BIT(16)
+>  
+> @@ -205,6 +210,7 @@ void snp_set_wakeup_secondary_cpu(void);
+>  bool snp_init(struct boot_params *bp);
+>  void snp_abort(void);
+>  int snp_issue_guest_request(u64 exit_code, struct snp_req_data *input, unsigned long *fw_err);
+> +void dump_rmpentry(u64 pfn);
+>  #else
+>  static inline void sev_es_ist_enter(struct pt_regs *regs) { }
+>  static inline void sev_es_ist_exit(void) { }
+> @@ -229,6 +235,7 @@ static inline int snp_issue_guest_request(u64 exit_code, struct snp_req_data *in
+>  {
+>  	return -ENOTTY;
+>  }
+> +static inline void dump_rmpentry(u64 pfn) {}
+>  #endif
+>  
+>  #endif
+> diff --git a/arch/x86/kernel/sev.c b/arch/x86/kernel/sev.c
+> index 734cddd837f5..6640a639fffc 100644
+> --- a/arch/x86/kernel/sev.c
+> +++ b/arch/x86/kernel/sev.c
+> @@ -2414,6 +2414,49 @@ static struct rmpentry *__snp_lookup_rmpentry(u64 pfn, int *level)
+>  	return entry;
+>  }
+>  
+> +void dump_rmpentry(u64 pfn)
 
-First of all it seems that AVIC just allows to set the APIC_ICR_BUSY bit (it should be read-only)
-and it never clears it if set.
+External function - it better belong to a namespace:
 
-Second AVIC seems to drop writes to low 24 bits of to ICR2, because these are not really used,
-although technically not marked as reserved in the spec (though APIC_ID register in AMD spec,
-states explicity that only bits 24-31 can be set, and the rest are reserved).
+sev_dump_rmpentry()
 
-And finally AVIC inhibit when x2apic is exposed to the guest was recently removed,
-because in this case AVIC also works just fine (but with msr emulation) and that
-means that we don't need anymore to hide x2apic from the guest to avoid AVIC inhibit.
+> +{
+> +	unsigned long pfn_end;
+> +	struct rmpentry *e;
+> +	int level;
+> +
+> +	e = __snp_lookup_rmpentry(pfn, &level);
+> +	if (!e) {
+> +		pr_alert("failed to read RMP entry pfn 0x%llx\n", pfn);
 
-Best regards,
-	Maxim Levitsky
+Why alert?
 
+Dumping stuff is either pr_debug or pr_info...
+
+> +		return;
+> +	}
+> +
+> +	if (rmpentry_assigned(e)) {
+> +		pr_alert("RMPEntry paddr 0x%llx [assigned=%d immutable=%d pagesize=%d gpa=0x%lx"
+> +			" asid=%d vmsa=%d validated=%d]\n", pfn << PAGE_SHIFT,
+> +			rmpentry_assigned(e), rmpentry_immutable(e), rmpentry_pagesize(e),
+> +			rmpentry_gpa(e), rmpentry_asid(e), rmpentry_vmsa(e),
+> +			rmpentry_validated(e));
+> +		return;
+> +	}
+> +
+> +	/*
+> +	 * If the RMP entry at the faulting pfn was not assigned, then we do not
+
+Who's "we"?
+
+> +	 * know what caused the RMP violation. To get some useful debug information,
+> +	 * let iterate through the entire 2MB region, and dump the RMP entries if
+> +	 * one of the bit in the RMP entry is set.
+> +	 */
+> +	pfn = pfn & ~(PTRS_PER_PMD - 1);
+> +	pfn_end = pfn + PTRS_PER_PMD;
+> +
+> +	while (pfn < pfn_end) {
+> +		e = __snp_lookup_rmpentry(pfn, &level);
+> +		if (!e)
+> +			return;
+> +
+> +		if (e->low || e->high)
+
+This is going to confuse people because they're going to miss a zero
+entry. Just dump the whole thing.
+
+...
+
+> @@ -579,7 +588,7 @@ show_fault_oops(struct pt_regs *regs, unsigned long error_code, unsigned long ad
+>  		show_ldttss(&gdt, "TR", tr);
+>  	}
+>  
+> -	dump_pagetable(address);
+> +	dump_pagetable(address, error_code & X86_PF_RMP);
+
+Eww.
+
+I'd prefer to see
+
+	pfn = dump_pagetable(address);
+
+	if (error_code & X86_PF_RMP)
+		sev_dump_rmpentry(pfn);
+
+instead of passing around this SEV-specific arg in generic x86 fault code.
+
+The change to return the pfn from dump_pagetable() should be a pre-patch ofc.
+
+Thx.
+
+-- 
+Regards/Gruss,
+    Boris.
+
+https://people.kernel.org/tglx/notes-about-netiquette
