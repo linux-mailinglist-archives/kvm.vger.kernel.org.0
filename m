@@ -2,101 +2,101 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 356915A003B
-	for <lists+kvm@lfdr.de>; Wed, 24 Aug 2022 19:19:18 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 47D8C5A003E
+	for <lists+kvm@lfdr.de>; Wed, 24 Aug 2022 19:20:02 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S240028AbiHXRTQ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 24 Aug 2022 13:19:16 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56104 "EHLO
+        id S239983AbiHXRT6 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 24 Aug 2022 13:19:58 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57348 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S240019AbiHXRTO (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 24 Aug 2022 13:19:14 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AD8927C337
-        for <kvm@vger.kernel.org>; Wed, 24 Aug 2022 10:19:13 -0700 (PDT)
+        with ESMTP id S238271AbiHXRT4 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 24 Aug 2022 13:19:56 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8C3EE2B27E
+        for <kvm@vger.kernel.org>; Wed, 24 Aug 2022 10:19:54 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1661361552;
+        s=mimecast20190719; t=1661361593;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=5fR3F9GSGdIyjl4KjQVv2PTUvzcBxFqMQTexQHu1cYQ=;
-        b=IXIqFOeGBGrbRH8Vf4lPvfhRcJ0hhIXVZAPMM5H/Hun7OFC3omKXuFGoMQI/YlwF0X2ACU
-        j7+OAKZgf6NcDrv1uy3U+Bniq9a/EN/Y65ilCmC5osEB0GibAY0fM1Ki2V0WLkQi5E1M9J
-        Z7plCyzfaO3GIai5qDwMdQDW7Nh1Du0=
-Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
- [209.85.221.70]) by relay.mimecast.com with ESMTP with STARTTLS
+        bh=htSTO8x0Cj6KPZv2uj2h4VO+F7UUjPoTVomapi+SfYc=;
+        b=iaxTX6wzT8Y7p3E6YSBWvCibh68F47Pe5AfkIZblsnGQ4F0MXBdL1RU45R7n/oLsK/7JeM
+        //GmsHUt+867wQFlalNKHjM4N2WAMw2xQy+vAGRcXqvD9ukQNBv0YeLacRgZ+J8Bz+Pxxt
+        2drkMubPtRLQoF0drjmNxaxJ332tJpM=
+Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
+ [209.85.128.71]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_128_GCM_SHA256) id
- us-mta-192-yUi_G0YxOgam0xEk7JWUoQ-1; Wed, 24 Aug 2022 13:19:11 -0400
-X-MC-Unique: yUi_G0YxOgam0xEk7JWUoQ-1
-Received: by mail-wr1-f70.google.com with SMTP id s20-20020adfbc14000000b002252dae05f7so2964055wrg.20
-        for <kvm@vger.kernel.org>; Wed, 24 Aug 2022 10:19:11 -0700 (PDT)
+ us-mta-351-wzfxF12kMhKpZA-X4FZqmQ-1; Wed, 24 Aug 2022 13:19:50 -0400
+X-MC-Unique: wzfxF12kMhKpZA-X4FZqmQ-1
+Received: by mail-wm1-f71.google.com with SMTP id c66-20020a1c3545000000b003a5f6dd6a25so1102925wma.1
+        for <kvm@vger.kernel.org>; Wed, 24 Aug 2022 10:19:50 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=content-transfer-encoding:in-reply-to:from:references:cc:to
          :content-language:subject:user-agent:mime-version:date:message-id
          :x-gm-message-state:from:to:cc;
-        bh=5fR3F9GSGdIyjl4KjQVv2PTUvzcBxFqMQTexQHu1cYQ=;
-        b=XixXMULEjrS8+4E9wdMB6tUOlaiUmHaYlab1CelsiQjn6lhC5rwkiMaitdwDjLEAIh
-         vmTZA8CiDY2liMddxbn/m3YUsjXzu/kcXHg02bE70l2mfbG9wpu7d8EkOH0kYKk1cTBN
-         SlJMsHeHaLxhw5p3g5heIHmDOqcyrIIZaxhQ1gIQTAfnZBLXuXYLXWDsH5da4rZqB9J0
-         Z0lHdS3rDlxOk2Kd0lFo0/3f7hH9vRSzV9xh5DJS2v4RgAtqOwklKdk4polPbFMi42/o
-         my7/MGm4Cs53IY+RWSrLEEpnEwN+V7D+7Gf8TZjGvNNwMCPSUvNF4zm0Q6KtZ04Eum5v
-         4Wug==
-X-Gm-Message-State: ACgBeo2UsGMhi2G6ovOWXF5HpfgUh3qTqg4C/RrM1MfS/rwv9TP/Oeb/
-        fOGaIJeIl8QOkkkNA7tDmek0wj8V7V0u9pWXKAzRwAR+nQjGtbt+QUcGO88lFMj+dFCjgXyHIxJ
-        5NIBRS/+VZGd1
-X-Received: by 2002:a5d:64c3:0:b0:225:4f81:d060 with SMTP id f3-20020a5d64c3000000b002254f81d060mr132898wri.536.1661361550179;
-        Wed, 24 Aug 2022 10:19:10 -0700 (PDT)
-X-Google-Smtp-Source: AA6agR5ttdjMug0iYpQ5JQgsxkf6+CYDrKkbKyoW3tlDFCWtG6u7rvpOI69IoXi/6KTMQNrqkEgTuA==
-X-Received: by 2002:a5d:64c3:0:b0:225:4f81:d060 with SMTP id f3-20020a5d64c3000000b002254f81d060mr132886wri.536.1661361549968;
-        Wed, 24 Aug 2022 10:19:09 -0700 (PDT)
+        bh=htSTO8x0Cj6KPZv2uj2h4VO+F7UUjPoTVomapi+SfYc=;
+        b=gki0/26GSqy2twjgIqVwV1h9GtQPPu8Z72Qp/i30QmJi3BsqagFVWZ8CBk9DVPrxTo
+         lNzYhS1UjcaCSZhekUQixPi3ReQGWJRbWm8IR4yeakjfWsEAEKFoTivHKH3z0RzX5Ac8
+         /fFpiLNDxGgD2Vk/Srfb1pOLDyapZYG4Of5bs/hAjW3N6W7xxkmSCxiUUn4KonoyVKkV
+         l2+Ok6vUjdThzSIw18sIgsdlb1/Ee/YFR1Q2/mcEku77i9oSqB8DXzpg12NtBJBIKYf5
+         dcGX4Hnoqo+gdX+saNwZpoxc//oLvASikDEQ6iWHh6C+UrMVhiNTJtQ/pagCL9qjNVuB
+         rCrw==
+X-Gm-Message-State: ACgBeo1VcxC19wqL1gVZxbRPuVbSIQs2/RY5W2kTBFNBVCuDpLvTi4R6
+        rErWs5Uc+MuT0kDyz0iRS9u/UGeqRsRGwkk+yCRAk/UjaaDr3qMhtAVJRO1A0Ht+uqduEpMqx7e
+        1YZ5fzGkLGKb4
+X-Received: by 2002:a05:6000:18af:b0:222:c48d:9064 with SMTP id b15-20020a05600018af00b00222c48d9064mr153474wri.18.1661361589148;
+        Wed, 24 Aug 2022 10:19:49 -0700 (PDT)
+X-Google-Smtp-Source: AA6agR522n77IX34OfIqY48YVItbyp3nWng/H47uaIhpZa58w6cK9bPh77nndiUAFiwlqROo2tDd/A==
+X-Received: by 2002:a05:6000:18af:b0:222:c48d:9064 with SMTP id b15-20020a05600018af00b00222c48d9064mr153462wri.18.1661361588902;
+        Wed, 24 Aug 2022 10:19:48 -0700 (PDT)
 Received: from ?IPV6:2001:b07:6468:f312:9af8:e5f5:7516:fa89? ([2001:b07:6468:f312:9af8:e5f5:7516:fa89])
-        by smtp.googlemail.com with ESMTPSA id o8-20020a05600c4fc800b003a603fbad5bsm2635447wmq.45.2022.08.24.10.19.09
+        by smtp.googlemail.com with ESMTPSA id u11-20020a05600c210b00b003a531c7aa66sm2464531wml.1.2022.08.24.10.19.48
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 24 Aug 2022 10:19:09 -0700 (PDT)
-Message-ID: <f1598980-92a8-267c-cade-8f62d7653017@redhat.com>
-Date:   Wed, 24 Aug 2022 19:19:08 +0200
+        Wed, 24 Aug 2022 10:19:48 -0700 (PDT)
+Message-ID: <1ef45852-7acd-21e2-5a92-326c6ce771da@redhat.com>
+Date:   Wed, 24 Aug 2022 19:19:47 +0200
 MIME-Version: 1.0
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
  Thunderbird/91.12.0
-Subject: Re: [PATCH] KVM: x86: use TPAUSE to replace PAUSE in halt polling
+Subject: Re: [PATCH] KVM: x86/emulator: Fix handing of POP SS to correctly set
+ interruptibility
 Content-Language: en-US
 To:     Sean Christopherson <seanjc@google.com>,
-        Dapeng Mi <dapeng1.mi@intel.com>
-Cc:     rafael@kernel.org, daniel.lezcano@linaro.org,
-        linux-pm@vger.kernel.org, linux-kernel@vger.kernel.org,
-        kvm@vger.kernel.org, zhenyuw@linux.intel.com
-References: <20220824091117.767363-1-dapeng1.mi@intel.com>
- <YwZDL4yv7F2Y4JBP@google.com>
+        Michal Luczaj <mhal@rbox.co>
+Cc:     kvm@vger.kernel.org
+References: <20220821215900.1419215-1-mhal@rbox.co>
+ <YwVusiSjT8xINz2q@google.com>
 From:   Paolo Bonzini <pbonzini@redhat.com>
-In-Reply-To: <YwZDL4yv7F2Y4JBP@google.com>
+In-Reply-To: <YwVusiSjT8xINz2q@google.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+X-Spam-Status: No, score=-2.8 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
-        RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE
-        autolearn=unavailable autolearn_force=no version=3.4.6
+        RCVD_IN_DNSWL_LOW,SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 8/24/22 17:26, Sean Christopherson wrote:
-> I say "if", because I think this needs to come with performance numbers to show
-> the impact on guest latency so that KVM and its users can make an informed decision.
-> And if it's unlikely that anyone will ever want to enable TPAUSE for halt polling,
-> then it's not worth the extra complexity in KVM.
+On 8/24/22 02:20, Sean Christopherson wrote:
+>    Fixes: a5457e7bcf9a ("KVM: emulate: POP SS triggers a MOV SS shadow too")
+> 
+> and probably
+> 
+>    Cc:stable@vger.kernel.org
+> 
+> even though I'd be amazed if this actually fixes anyone's workloads:-)
+> 
+> Reviewed-by: Sean Christopherson<seanjc@google.com>
+> 
+> 
+> Paolo, do you want to grab this for 6.0, or should I throw it in the queue for 6.1?
 
-Yeah, halt polling works around perhaps the biggest performance issue 
-with VMs compared to bare metal (so much that it's even possible to move 
-halt polling _inside_ the guest for extra performance).
-
-I am ready to be proven wrong but I doubt TPAUSE will have a small 
-effect, and if one wants the most power saving they should disable halt 
-polling.  Perhaps KVM could do it automatically if the powersaving 
-governor is in effect?
+Go ahead for 6.1.
 
 Paolo
 
