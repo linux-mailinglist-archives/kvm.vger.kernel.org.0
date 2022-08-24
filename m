@@ -2,223 +2,176 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id ED51E59FE49
-	for <lists+kvm@lfdr.de>; Wed, 24 Aug 2022 17:26:51 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id D781F59FE5F
+	for <lists+kvm@lfdr.de>; Wed, 24 Aug 2022 17:31:02 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S239530AbiHXP0u (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 24 Aug 2022 11:26:50 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53836 "EHLO
+        id S232474AbiHXPbA (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 24 Aug 2022 11:31:00 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59166 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S238525AbiHXP0s (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 24 Aug 2022 11:26:48 -0400
-Received: from mail-pj1-x1032.google.com (mail-pj1-x1032.google.com [IPv6:2607:f8b0:4864:20::1032])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8789A9A687
-        for <kvm@vger.kernel.org>; Wed, 24 Aug 2022 08:26:44 -0700 (PDT)
-Received: by mail-pj1-x1032.google.com with SMTP id m15so9359594pjj.3
-        for <kvm@vger.kernel.org>; Wed, 24 Aug 2022 08:26:44 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc;
-        bh=7cYr8vAfRHCWuiirD4vPsPn+6q5Wbv188oHbQU7Rxhk=;
-        b=mgRkttJT3eCwZMRg+uvkdAvCsSWdhcCN9w9fVa3lDY8f/I4OgJwYT2zDhiFRZHZA8Q
-         qX4oX5RQiF26QWesS358K6RkTJId0PuSWWLSd1tmG0sq+8IMis3L7hBwoptwTfXT5EiW
-         M5UB4ltzcs5FDAKDpj+i88uB3XsIIX6mk3ftHKylzKRAM/BxmXMOMwMnqYauTifoghcE
-         s9OhNfLStbubvbhs8v6JFMGt71eSlVtJCBi6koG9daNoODMbScFqlVtMWdpW9C4lYlHI
-         eUVdmVyFvq4o48IUZUoWMuDpvFBOZ+X4KAG0UxrAovnc1f3LICr55Ghq97sE4LuTsklX
-         q/AQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc;
-        bh=7cYr8vAfRHCWuiirD4vPsPn+6q5Wbv188oHbQU7Rxhk=;
-        b=YjJli1xY0mrvls+yALYjfxAiVh6Pk64vb5ZOVpyafkS6c8gOXc/KnA62uCbEvA/N53
-         l0+MJlogr8veCCvt44KXGivs1jHKJxohKtEGCc7KK9rGyGWEYwlyBhGKBH5M7fC5ribK
-         Wh/9qVWwuwKSo/tzal9DpPdWwKriRjtswGnu7oVaUKbsOXJ4mP+/JxyNmsgC9k1TIgsr
-         ptniVvvVQLkuUU0Bl/JeI1kvKVgv9/ZtQcvHeJbvqa1QJz8snrC4zWOYGQvHzoDwKbz7
-         sT5QvdnQv7PPHfB7BTtuN2BSra65VODOJZhTkQAyscVQzY51TJR8f7Gw5SjZoGzJh1Df
-         s8tw==
-X-Gm-Message-State: ACgBeo1FPIyhhqn+21/B9pXGGKVRaDZuXaG946+53i0DT33j+SNFYB4c
-        8GJTyVp2PcFTX+xtIjJaeugOS3xg6KZnaw==
-X-Google-Smtp-Source: AA6agR5piYiLGl91DJ+WGiCQqFgwEJssZpJdddayt4oyPxEfPJpGKcc+JSQkywuvBiPbxPtQrUz4Kg==
-X-Received: by 2002:a17:903:11c7:b0:170:cde7:d24a with SMTP id q7-20020a17090311c700b00170cde7d24amr29338758plh.91.1661354803396;
-        Wed, 24 Aug 2022 08:26:43 -0700 (PDT)
-Received: from google.com (7.104.168.34.bc.googleusercontent.com. [34.168.104.7])
-        by smtp.gmail.com with ESMTPSA id qi3-20020a17090b274300b001f3162e4e55sm1538091pjb.35.2022.08.24.08.26.42
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 24 Aug 2022 08:26:43 -0700 (PDT)
-Date:   Wed, 24 Aug 2022 15:26:39 +0000
-From:   Sean Christopherson <seanjc@google.com>
-To:     Dapeng Mi <dapeng1.mi@intel.com>
-Cc:     rafael@kernel.org, daniel.lezcano@linaro.org, pbonzini@redhat.com,
-        linux-pm@vger.kernel.org, linux-kernel@vger.kernel.org,
-        kvm@vger.kernel.org, zhenyuw@linux.intel.com
-Subject: Re: [PATCH] KVM: x86: use TPAUSE to replace PAUSE in halt polling
-Message-ID: <YwZDL4yv7F2Y4JBP@google.com>
-References: <20220824091117.767363-1-dapeng1.mi@intel.com>
+        with ESMTP id S235300AbiHXPa2 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 24 Aug 2022 11:30:28 -0400
+Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1C1FADEB2;
+        Wed, 24 Aug 2022 08:30:26 -0700 (PDT)
+Received: from pps.filterd (m0127361.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.17.1.5/8.17.1.5) with ESMTP id 27OFDjwh024804;
+        Wed, 24 Aug 2022 15:30:22 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=from : to : cc : subject
+ : date : message-id : mime-version : content-transfer-encoding; s=pp1;
+ bh=AlgD0tRJZancLsm5tjdFdyG0SXTnhtFLMqnPKtXUupo=;
+ b=iW9lv4HWZjY1FZWRcPPxN6V8AaZ8PFc3be9arX09imaJcQvoz96h8HAObp0421lteM2L
+ 2HpfofsPOBzZyxQl0fmy9hwX92ousYPstawghhZqLRIkvGgI3unYswcxTcjEdIQ9CqaI
+ S5EC7C077WcT/NJm4+n9Q3am9b0w63C5PKItUUJcve866XscHFn6Nun2RVVkJhwvzWoI
+ qn/jcEMmcS1yQZMaF8D8ODE+VImAgTwenpcgPPIoSVp7QK7UJHNh12M4f5CsWjn1Ma9A
+ ujcLl5WjFJjqxXG2b9nc7wndr2Oh1DKOVfY8quxhKnu5kPnaLoixYwnAf2gybldLEHKl Bg== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3j5pemrgwx-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Wed, 24 Aug 2022 15:30:22 +0000
+Received: from m0127361.ppops.net (m0127361.ppops.net [127.0.0.1])
+        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 27OFDinv024795;
+        Wed, 24 Aug 2022 15:30:21 GMT
+Received: from ppma03ams.nl.ibm.com (62.31.33a9.ip4.static.sl-reverse.com [169.51.49.98])
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3j5pemrgw1-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Wed, 24 Aug 2022 15:30:21 +0000
+Received: from pps.filterd (ppma03ams.nl.ibm.com [127.0.0.1])
+        by ppma03ams.nl.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 27OFLLt7008739;
+        Wed, 24 Aug 2022 15:30:19 GMT
+Received: from b06cxnps3075.portsmouth.uk.ibm.com (d06relay10.portsmouth.uk.ibm.com [9.149.109.195])
+        by ppma03ams.nl.ibm.com with ESMTP id 3j2q88w9pg-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Wed, 24 Aug 2022 15:30:19 +0000
+Received: from d06av26.portsmouth.uk.ibm.com (d06av26.portsmouth.uk.ibm.com [9.149.105.62])
+        by b06cxnps3075.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 27OFUGu631981862
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Wed, 24 Aug 2022 15:30:16 GMT
+Received: from d06av26.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 2021CAE055;
+        Wed, 24 Aug 2022 15:30:16 +0000 (GMT)
+Received: from d06av26.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id B3370AE051;
+        Wed, 24 Aug 2022 15:30:15 +0000 (GMT)
+Received: from tuxmaker.boeblingen.de.ibm.com (unknown [9.152.85.9])
+        by d06av26.portsmouth.uk.ibm.com (Postfix) with ESMTP;
+        Wed, 24 Aug 2022 15:30:15 +0000 (GMT)
+From:   Janis Schoetterl-Glausch <scgl@linux.ibm.com>
+To:     Christian Borntraeger <borntraeger@linux.ibm.com>,
+        Janosch Frank <frankja@linux.ibm.com>,
+        Claudio Imbrenda <imbrenda@linux.ibm.com>,
+        Heiko Carstens <hca@linux.ibm.com>,
+        Vasily Gorbik <gor@linux.ibm.com>,
+        Alexander Gordeev <agordeev@linux.ibm.com>
+Cc:     Janis Schoetterl-Glausch <scgl@linux.ibm.com>,
+        kernel test robot <lkp@intel.com>,
+        Dan Carpenter <dan.carpenter@oracle.com>,
+        David Hildenbrand <david@redhat.com>,
+        Sven Schnelle <svens@linux.ibm.com>, kvm@vger.kernel.org,
+        linux-s390@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: [PATCH] KVM: s390: Pass initialized arg even if unused
+Date:   Wed, 24 Aug 2022 17:30:11 +0200
+Message-Id: <20220824153011.4004573-1-scgl@linux.ibm.com>
+X-Mailer: git-send-email 2.34.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20220824091117.767363-1-dapeng1.mi@intel.com>
-X-Spam-Status: No, score=-14.5 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        ENV_AND_HDR_SPF_MATCH,FSL_HELO_FAKE,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,
-        SPF_PASS,T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL
-        autolearn=no autolearn_force=no version=3.4.6
+Content-Transfer-Encoding: 8bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: 4e7T6gqiij7L_CGOGcuryjplXCHzmwma
+X-Proofpoint-ORIG-GUID: 6TBa3dtzGeF1ThkojpgOzt90lCDzYBxm
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.205,Aquarius:18.0.895,Hydra:6.0.517,FMLib:17.11.122.1
+ definitions=2022-08-24_07,2022-08-22_02,2022-06-22_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 phishscore=0 suspectscore=0
+ malwarescore=0 clxscore=1011 priorityscore=1501 mlxlogscore=999
+ lowpriorityscore=0 spamscore=0 mlxscore=0 impostorscore=0 adultscore=0
+ bulkscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2207270000 definitions=main-2208240057
+X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_EF,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_PASS,
+        T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Aug 24, 2022, Dapeng Mi wrote:
-> TPAUSE is a new instruction on Intel processors which can instruct
-> processor enters a power/performance optimized state. Halt polling
-> uses PAUSE instruction to wait vCPU is waked up. The polling time
-> could be long and cause extra power consumption in some cases.
-> 
-> Use TPAUSE to replace the PAUSE instruction in halt polling to get
-> a better power saving and performance.
+This silences smatch warnings reported by kbuild bot:
+arch/s390/kvm/gaccess.c:859 guest_range_to_gpas() error: uninitialized symbol 'prot'.
+arch/s390/kvm/gaccess.c:1064 access_guest_with_key() error: uninitialized symbol 'prot'.
 
-Better power savings, yes.  Better performance?  Not necessarily.  Using TPAUSE
-for  a "successful" halt poll is likely to yield _worse_ performance from the
-vCPU's perspective due to the increased latency.
+This is because it cannot tell that the value is not used in this case.
+The trans_exc* only examine prot if code is PGM_PROTECTION.
+Pass a dummy value for other codes.
 
-> Signed-off-by: Dapeng Mi <dapeng1.mi@intel.com>
-> ---
->  drivers/cpuidle/poll_state.c |  3 ++-
->  include/linux/kvm_host.h     | 20 ++++++++++++++++++++
->  virt/kvm/kvm_main.c          |  2 +-
->  3 files changed, 23 insertions(+), 2 deletions(-)
-> 
-> diff --git a/drivers/cpuidle/poll_state.c b/drivers/cpuidle/poll_state.c
-> index f7e83613ae94..51ec333cbf80 100644
-> --- a/drivers/cpuidle/poll_state.c
-> +++ b/drivers/cpuidle/poll_state.c
-> @@ -7,6 +7,7 @@
->  #include <linux/sched.h>
->  #include <linux/sched/clock.h>
->  #include <linux/sched/idle.h>
-> +#include <linux/kvm_host.h>
->  
->  #define POLL_IDLE_RELAX_COUNT	200
->  
-> @@ -25,7 +26,7 @@ static int __cpuidle poll_idle(struct cpuidle_device *dev,
->  		limit = cpuidle_poll_time(drv, dev);
->  
->  		while (!need_resched()) {
-> -			cpu_relax();
-> +			kvm_cpu_poll_pause(limit);
+Reported-by: kernel test robot <lkp@intel.com>
+Reported-by: Dan Carpenter <dan.carpenter@oracle.com>
+Signed-off-by: Janis Schoetterl-Glausch <scgl@linux.ibm.com>
+---
+ arch/s390/kvm/gaccess.c | 15 ++++++++++++---
+ 1 file changed, 12 insertions(+), 3 deletions(-)
 
-poll_idle() absolutely should not be calling into KVM code.
+diff --git a/arch/s390/kvm/gaccess.c b/arch/s390/kvm/gaccess.c
+index 082ec5f2c3a5..89186701116a 100644
+--- a/arch/s390/kvm/gaccess.c
++++ b/arch/s390/kvm/gaccess.c
+@@ -489,6 +489,8 @@ enum prot_type {
+ 	PROT_TYPE_ALC  = 2,
+ 	PROT_TYPE_DAT  = 3,
+ 	PROT_TYPE_IEP  = 4,
++	/* Dummy value for passing an initialized value when code != PGM_PROTECTION */
++	PROT_NONE,
+ };
+ 
+ static int trans_exc_ending(struct kvm_vcpu *vcpu, int code, unsigned long gva, u8 ar,
+@@ -503,6 +505,7 @@ static int trans_exc_ending(struct kvm_vcpu *vcpu, int code, unsigned long gva,
+ 
+ 	switch (code) {
+ 	case PGM_PROTECTION:
++		WARN(unlikely(prot == PROT_NONE), "Invalid prot argument");
+ 		switch (prot) {
+ 		case PROT_TYPE_IEP:
+ 			tec->b61 = 1;
+@@ -519,6 +522,8 @@ static int trans_exc_ending(struct kvm_vcpu *vcpu, int code, unsigned long gva,
+ 		case PROT_TYPE_DAT:
+ 			tec->b61 = 1;
+ 			break;
++		case PROT_NONE:
++			/* We should never get here, acts like termination */
+ 		}
+ 		if (terminate) {
+ 			tec->b56 = 0;
+@@ -968,8 +973,10 @@ static int guest_range_to_gpas(struct kvm_vcpu *vcpu, unsigned long ga, u8 ar,
+ 				return rc;
+ 		} else {
+ 			gpa = kvm_s390_real_to_abs(vcpu, ga);
+-			if (kvm_is_error_gpa(vcpu->kvm, gpa))
++			if (kvm_is_error_gpa(vcpu->kvm, gpa)) {
+ 				rc = PGM_ADDRESSING;
++				prot = PROT_NONE;
++			}
+ 		}
+ 		if (rc)
+ 			return trans_exc(vcpu, rc, ga, ar, mode, prot);
+@@ -1112,8 +1119,6 @@ int access_guest_with_key(struct kvm_vcpu *vcpu, unsigned long ga, u8 ar,
+ 		if (rc == PGM_PROTECTION && try_storage_prot_override)
+ 			rc = access_guest_page_with_key(vcpu->kvm, mode, gpas[idx],
+ 							data, fragment_len, PAGE_SPO_ACC);
+-		if (rc == PGM_PROTECTION)
+-			prot = PROT_TYPE_KEYC;
+ 		if (rc)
+ 			break;
+ 		len -= fragment_len;
+@@ -1123,6 +1128,10 @@ int access_guest_with_key(struct kvm_vcpu *vcpu, unsigned long ga, u8 ar,
+ 	if (rc > 0) {
+ 		bool terminate = (mode == GACC_STORE) && (idx > 0);
+ 
++		if (rc == PGM_PROTECTION)
++			prot = PROT_TYPE_KEYC;
++		else
++			prot = PROT_NONE;
+ 		rc = trans_exc_ending(vcpu, rc, ga, ar, mode, prot, terminate);
+ 	}
+ out_unlock:
+-- 
+2.34.1
 
->  			if (loop_count++ < POLL_IDLE_RELAX_COUNT)
->  				continue;
->  
-> diff --git a/include/linux/kvm_host.h b/include/linux/kvm_host.h
-> index f4519d3689e1..810e749949b7 100644
-> --- a/include/linux/kvm_host.h
-> +++ b/include/linux/kvm_host.h
-> @@ -35,6 +35,7 @@
->  #include <linux/interval_tree.h>
->  #include <linux/rbtree.h>
->  #include <linux/xarray.h>
-> +#include <linux/delay.h>
->  #include <asm/signal.h>
->  
->  #include <linux/kvm.h>
-> @@ -2247,6 +2248,25 @@ static inline void kvm_handle_signal_exit(struct kvm_vcpu *vcpu)
->  }
->  #endif /* CONFIG_KVM_XFER_TO_GUEST_WORK */
->  
-> +/*
-> + * This function is intended to replace the cpu_relax function in
-> + * halt polling. If TPAUSE instruction is supported, use TPAUSE
-> + * instead fo PAUSE to get better power saving and performance.
-> + * Selecting 1 us is a compromise between scheduling latency and
-> + * power saving time.
-> + */
-> +static inline void kvm_cpu_poll_pause(u64 timeout_ns)
-> +{
-> +#ifdef CONFIG_X86
-
-This is not preferred the way to insert arch-specific behavior into common KVM code.
-Assuming the goal is to avoid a function call, use an #ifndef here and then #define
-the flag in x86's kvm_host.h, e.g.
-
-#ifndef CONFIG_HAVE_KVM_ARCH_HALT_POLL_PAUSE
-static inline kvm_cpu_halt_poll_pause(u64 timeout_ns)
-{
-	cpu_relax();
-}
-#endif
-
-It's not obvious that we need to avoid a call here though, in which case a
-
-  __weak void kvm_arch_cpu_halt_poll_pause(struct kvm *kvm)
-  {
-
-  }
-
-with an x86 implementation will suffice.
-
-
-> +	if (static_cpu_has(X86_FEATURE_WAITPKG) && timeout_ns > 1000)
-> +		udelay(1);
-
-This is far too arbitrary.  Wake events from other vCPU are not necessarily
-accompanied by an IRQ, which means that delaying for 1us may really truly delay
-for 1us before detecting a pending wake event.
-
-If this is something we want to utilize in KVM, it should be controllable by
-userspace, probably via module param, and likely off by default.
-
-E.g. 
-
-  unsigned int halt_poll_tpause_ns;
-
-and then
-
-  if (timeout_ns >= halt_poll_tpause_ns)
-  	udelay(halt_poll_tpause_ns);
-
-with halt_poll_tpause_ns zeroed out during setup if TPAUSE isn't supported.
-
-I say "if", because I think this needs to come with performance numbers to show
-the impact on guest latency so that KVM and its users can make an informed decision.
-And if it's unlikely that anyone will ever want to enable TPAUSE for halt polling,
-then it's not worth the extra complexity in KVM.
-
-> +	else
-> +		cpu_relax();
-> +#else
-> +	cpu_relax();
-> +#endif
-> +}
-> +
->  /*
->   * This defines how many reserved entries we want to keep before we
->   * kick the vcpu to the userspace to avoid dirty ring full.  This
-> diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
-> index 584a5bab3af3..4afa776d21bd 100644
-> --- a/virt/kvm/kvm_main.c
-> +++ b/virt/kvm/kvm_main.c
-> @@ -3510,7 +3510,7 @@ void kvm_vcpu_halt(struct kvm_vcpu *vcpu)
->  			 */
->  			if (kvm_vcpu_check_block(vcpu) < 0)
->  				goto out;
-> -			cpu_relax();
-> +			kvm_cpu_poll_pause(vcpu->halt_poll_ns);
-
-This is wrong, vcpu->halt_poll_ns is the total poll time, not the time remaining.
-E.g. if the max poll time is 1001 ns, and KVM has already waited for 1000 ns, then
-udelay(1) will cause KVM to wait for ~2000ns total.  There's always going to be
-some amount of overrun, but overrun by a few ns is quite different than overrun
-by a few thousand ns.
-
->  			poll_end = cur = ktime_get();
->  		} while (kvm_vcpu_can_poll(cur, stop));
->  	}
-> -- 
-> 2.34.1
-> 
