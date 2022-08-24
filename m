@@ -2,123 +2,154 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 890945A017A
-	for <lists+kvm@lfdr.de>; Wed, 24 Aug 2022 20:40:48 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 681285A0219
+	for <lists+kvm@lfdr.de>; Wed, 24 Aug 2022 21:29:44 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238885AbiHXSkn (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 24 Aug 2022 14:40:43 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50568 "EHLO
+        id S235377AbiHXT3F (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 24 Aug 2022 15:29:05 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53674 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232226AbiHXSkm (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 24 Aug 2022 14:40:42 -0400
-Received: from mail-pj1-x1033.google.com (mail-pj1-x1033.google.com [IPv6:2607:f8b0:4864:20::1033])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8C8E877EB1
-        for <kvm@vger.kernel.org>; Wed, 24 Aug 2022 11:40:41 -0700 (PDT)
-Received: by mail-pj1-x1033.google.com with SMTP id s36-20020a17090a69a700b001faad0a7a34so2535615pjj.4
-        for <kvm@vger.kernel.org>; Wed, 24 Aug 2022 11:40:41 -0700 (PDT)
+        with ESMTP id S239936AbiHXT3C (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 24 Aug 2022 15:29:02 -0400
+Received: from mail-lj1-x22e.google.com (mail-lj1-x22e.google.com [IPv6:2a00:1450:4864:20::22e])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AF85F78BCB
+        for <kvm@vger.kernel.org>; Wed, 24 Aug 2022 12:29:00 -0700 (PDT)
+Received: by mail-lj1-x22e.google.com with SMTP id q18so16356658ljg.12
+        for <kvm@vger.kernel.org>; Wed, 24 Aug 2022 12:29:00 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc;
-        bh=zKrcyI4NdZI9bZZEmwNsgQE4n+sk2wdFxpPb/RBahho=;
-        b=gkBzGho07n2pnXH7iSbrOAxMTv9ZNEy7E4NneT3Q6BJcBU4kqTWYjlho5xKuxnQzOE
-         3c/JAdsmNc1lvxS4LAi0aALGSZyJhUE5lNtJ+qkrcrS4DLRO78dxaNRqSOv0nor2JSue
-         45GvxRk1T4Di03U9JksAYcTaThEXno/b18BsHGkAGTZ6hBpnPdr7ze9hAjFlrdTVnnSU
-         SOSo/kidfJAbokaNSSs0zyu7RjthvY6nhPH7xF2jbdi2RcBTGzhqgWvDufJCJJM9JeRu
-         z0TGJugEC7vjwbUsI+sxGROU/wWx4s6nNgjzkC8rN/TZbyOYuOR4iUaq4RIqanprPDG9
-         YNyA==
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc;
+        bh=ud6LSmJPhrEe1O3tH9bfACVlWJ+Fj1pwj346rUu8aFw=;
+        b=Z2jM1L6bkJVPjP2DKAJljcsyrOOrVaGqJLAqzlKrZ639M1ou4W+gt6VEnZfM9GIMCF
+         SeUBSTwTEy/ugCEIoJSMg5gpQiXV/YW8/zFDEiaz/lWm7DXElQFdhc17HKi9O+Y2CZkL
+         LhgOKoPXstdnGWEeMhiyY+aOF3HfM663rHuZK+6w6NIL9v3qCSiPAEZX+aiF0FQg3jWf
+         pv7cfJk+q0TMm2WecwsV5HTEjCEihc3UL8NuZ65x8xj93UAjZQQwIdmU3F/yvrkvP4aa
+         azCkdsSTY4R3TVzoCkUDFq7dX8KwGtjjKyO7z02ZdXK1aG1zPFzRiwWJpd0Ss4+9b9BD
+         INIw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc;
-        bh=zKrcyI4NdZI9bZZEmwNsgQE4n+sk2wdFxpPb/RBahho=;
-        b=bGaHKMuWGd77yVfzUr+MRIkA9mAcwA1jdbgWSOYqnzs69f+yOp8JvUcZGSBN4Jcml8
-         e8vIdWp8UKZZVIPW6lblp8p17SYGQHeo9G/zr4Pt+BpSu18FUeWbOdeuJ853WAoPZz6r
-         hxTytzhrpfXoHt/mswzGGDwx1GMGKX/HoPKmbAYW+AAE776zAwN2PugFN3aGmc/H9Uog
-         mWsPylz5PkfYoZ7lmqVWfl0gM4EI61G0GduzGBZXEALk2YgMyXO0veQ27Kq8UM/22cEK
-         YyV3q3hSqOjBPhuhGTufHy8kN6MI7Mpj1Nezrl4z2fJ6ZO1yOwLBQlxdnP8lNWDoUe1N
-         Yobw==
-X-Gm-Message-State: ACgBeo0bAhokJmQCJfWQRVo/Qjf89yjixJQdwhlUXuSRYBmD57GUmU/j
-        6gN9R0NfpO5Mj39JsLvayeXm5Qcahh6IzQ==
-X-Google-Smtp-Source: AA6agR7rwZt6Zsn6B7NcjDmbQ6qvxGRFm9nsc3ccOesJTd/rgd2aVUB7WvutW1Gmt7sbM7jVM3Zqfg==
-X-Received: by 2002:a17:90b:3684:b0:1fa:f48e:abd0 with SMTP id mj4-20020a17090b368400b001faf48eabd0mr466684pjb.180.1661366440946;
-        Wed, 24 Aug 2022 11:40:40 -0700 (PDT)
-Received: from google.com (7.104.168.34.bc.googleusercontent.com. [34.168.104.7])
-        by smtp.gmail.com with ESMTPSA id mz16-20020a17090b379000b001f50c1f896esm1780827pjb.5.2022.08.24.11.40.40
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 24 Aug 2022 11:40:40 -0700 (PDT)
-Date:   Wed, 24 Aug 2022 18:40:36 +0000
-From:   Sean Christopherson <seanjc@google.com>
-To:     Maxim Levitsky <mlevitsk@redhat.com>
-Cc:     Oliver Upton <oupton@google.com>,
-        Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        David Dunn <daviddunn@google.com>,
-        Peter Shier <pshier@google.com>
-Subject: Re: [PATCH 1/2] KVM: x86: Allow userspace to opt out of hypercall
- patching
-Message-ID: <YwZwpA2Mg+IOprBp@google.com>
-References: <20220316005538.2282772-2-oupton@google.com>
- <Yjyt7tKSDhW66fnR@google.com>
- <2a438f7c-4dea-c674-86c0-9164cbad0813@redhat.com>
- <YjzBB6GzNGrJdRC2@google.com>
- <Yj5V4adpnh8/B/K0@google.com>
- <YkHwMd37Fo8Zej59@google.com>
- <YkH+X9c0TBSGKtzj@google.com>
- <48030e75b36b281d4441d7dba729889aa9641125.camel@redhat.com>
- <YwY5AxXHAAxjJEPB@google.com>
- <4c7f4ba7d6f4f796a2e7347113b280373a077d8a.camel@redhat.com>
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc;
+        bh=ud6LSmJPhrEe1O3tH9bfACVlWJ+Fj1pwj346rUu8aFw=;
+        b=dgxEUSW5/9jMUfgdy3uRJ+Sp6EHP2ybEEgM8AAAGRTguAU+7a9LW3ZUIPVA3AEg8NQ
+         WJHXJQYeiizPCC+tZ6lmfhbEAaVLVUOsxtThPtXc1q7DlNvmfiOChNwtJ0nN0KVeLsgL
+         hx/qf0GQHpFgLs3VHrrapTuhxAnS95kv1jv6I7SJwogMNRtBUg9aLBI/Oo2YcKMzK4RF
+         +xt1eHapHcG4F0QoMuLGVbvfADpP7CzSo+a8J7akIUQvb+NO98iBYZ4Nh8VLnK0Lfvcg
+         w5fSHerQ1fYDtNKVNkm5PrCskCTmaRUaRA2Fie8xyn1Zbu5RG4qwuG55ne1LKPlxk1n0
+         IoVQ==
+X-Gm-Message-State: ACgBeo04p+5dU2A8U/W6uUEO3u3JDRwNX1c8fglYQzXLN9eWXUtYpl/3
+        qxHqxs+CoPqAjilxVx+I3sW+mmQ50o9dk6RPtiKzNQ==
+X-Google-Smtp-Source: AA6agR6qzB+SDh82GOibU+ibPmxm9norlNaWBI74hZciCbfvsiOsZDachVztTY0d9cfRDTTu6O2cHU/LynXQAo0SUJw=
+X-Received: by 2002:a2e:9ad2:0:b0:261:cbdd:1746 with SMTP id
+ p18-20020a2e9ad2000000b00261cbdd1746mr181526ljj.486.1661369338801; Wed, 24
+ Aug 2022 12:28:58 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <4c7f4ba7d6f4f796a2e7347113b280373a077d8a.camel@redhat.com>
-X-Spam-Status: No, score=-14.5 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+References: <20220307213356.2797205-1-brijesh.singh@amd.com>
+ <20220307213356.2797205-44-brijesh.singh@amd.com> <CAAH4kHYm1BhjJXUMH12kzR0Xun=fUTj-3Hy6At0XR_09Bf0Ccw@mail.gmail.com>
+In-Reply-To: <CAAH4kHYm1BhjJXUMH12kzR0Xun=fUTj-3Hy6At0XR_09Bf0Ccw@mail.gmail.com>
+From:   Peter Gonda <pgonda@google.com>
+Date:   Wed, 24 Aug 2022 13:28:47 -0600
+Message-ID: <CAMkAt6oKQ3CnmNdrJLMWreExkN56t9vs=B883_JD+HtiNYw9HA@mail.gmail.com>
+Subject: Re: [PATCH v12 43/46] virt: Add SEV-SNP guest driver
+To:     Dionna Amalie Glaze <dionnaglaze@google.com>
+Cc:     Brijesh Singh <brijesh.singh@amd.com>,
+        "the arch/x86 maintainers" <x86@kernel.org>,
+        LKML <linux-kernel@vger.kernel.org>,
+        "open list:X86 KVM CPUs" <kvm@vger.kernel.org>,
+        linux-efi <linux-efi@vger.kernel.org>,
+        platform-driver-x86@vger.kernel.org, linux-coco@lists.linux.dev,
+        Linux Memory Management List <linux-mm@kvack.org>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Joerg Roedel <jroedel@suse.de>,
+        Tom Lendacky <thomas.lendacky@amd.com>,
+        "H. Peter Anvin" <hpa@zytor.com>, Ard Biesheuvel <ardb@kernel.org>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Sean Christopherson <seanjc@google.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Jim Mattson <jmattson@google.com>,
+        Andy Lutomirski <luto@kernel.org>,
+        Dave Hansen <dave.hansen@linux.intel.com>,
+        Sergio Lopez <slp@redhat.com>,
+        Peter Zijlstra <peterz@infradead.org>,
+        Srinivas Pandruvada <srinivas.pandruvada@linux.intel.com>,
+        David Rientjes <rientjes@google.com>,
+        Dov Murik <dovmurik@linux.ibm.com>,
+        Tobin Feldman-Fitzthum <tobin@ibm.com>,
+        Borislav Petkov <bp@alien8.de>,
+        Michael Roth <michael.roth@amd.com>,
+        Vlastimil Babka <vbabka@suse.cz>,
+        "Kirill A . Shutemov" <kirill.shutemov@linux.intel.com>,
+        Andi Kleen <ak@linux.intel.com>,
+        "Dr . David Alan Gilbert" <dgilbert@redhat.com>,
+        brijesh.ksingh@gmail.com, Tony Luck <tony.luck@intel.com>,
+        Marc Orr <marcorr@google.com>,
+        Kuppuswamy Sathyanarayanan 
+        <sathyanarayanan.kuppuswamy@linux.intel.com>
+Content-Type: text/plain; charset="UTF-8"
+X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        ENV_AND_HDR_SPF_MATCH,FSL_HELO_FAKE,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,
-        SPF_PASS,T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL
-        autolearn=no autolearn_force=no version=3.4.6
+        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
+        T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL
+        autolearn=unavailable autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Aug 24, 2022, Maxim Levitsky wrote:
-> On Wed, 2022-08-24 at 14:43 +0000, Sean Christopherson wrote:
-> > On Wed, Aug 24, 2022, Maxim Levitsky wrote:
-> > > I noticed that 'fix_hypercall_test' selftest fails if run in a VM. The reason is
-> > > that L0 patches the hypercall before L1 sees it so it can't really do anything
-> > > about it.
-> > > 
-> > > Do you think we can always stop patching hypercalls for the nested guest regardless
-> > > of the quirk, or that too will be considered breaking backwards compatability?
-> > 
-> > Heh, go run it on Intel, problem solved ;-)
-> > 
-> > As discussed last year[*], it's impossible to get this right in all cases, ignoring
-> > the fact that patching in the first place is arguably wrong.  E.g. if KVM is running
-> > on AMD hardware and L0 exposes an Intel vCPU to L1, then it sadly becomes KVM's
-> > responsibility to patch L2 because from L1's perspective, a #UD on Intel's VMCALL
-> > in L2 is spurious.
-> > 
-> > Regardless of what path we take, I do think we should align VMX and SVM on exception
-> > intercept behavior.
-> 
-> Maybe then we should at least skip the unit test if running nested (should be
-> easy to check the hypervisor cpuid)?
+On Wed, Aug 24, 2022 at 12:01 PM Dionna Amalie Glaze
+<dionnaglaze@google.com> wrote:
+>
+> Apologies for the necropost, but I noticed strange behavior testing my
+> own Golang-based wrapper around the /dev/sev-guest driver.
+>
+> > +
+> > +static int handle_guest_request(struct snp_guest_dev *snp_dev, u64 exit_code, int msg_ver,
+> > +                               u8 type, void *req_buf, size_t req_sz, void *resp_buf,
+> > +                               u32 resp_sz, __u64 *fw_err)
+> > +{
+> > +       unsigned long err;
+> > +       u64 seqno;
+> > +       int rc;
+> > +
+> > +       /* Get message sequence and verify that its a non-zero */
+> > +       seqno = snp_get_msg_seqno(snp_dev);
+> > +       if (!seqno)
+> > +               return -EIO;
+> > +
+> > +       memset(snp_dev->response, 0, sizeof(struct snp_guest_msg));
+> > +
+> > +       /* Encrypt the userspace provided payload */
+> > +       rc = enc_payload(snp_dev, seqno, msg_ver, type, req_buf, req_sz);
+> > +       if (rc)
+> > +               return rc;
+> > +
+> > +       /* Call firmware to process the request */
+> > +       rc = snp_issue_guest_request(exit_code, &snp_dev->input, &err);
+> > +       if (fw_err)
+> > +               *fw_err = err;
+> > +
+> > +       if (rc)
+> > +               return rc;
+> > +
+>
+> The fw_err is written back regardless of rc, so since err is
+> uninitialized, you can end up with garbage written back. I've worked
+> around this by only caring about fw_err when the result is -EIO, but
+> thought that I should bring this up.
 
-My preference is to keep the test as is.  It's not completely useless in a VM,
-e.g. Intel works (currently), non-KVM VMs may or may not work, and VMMs that disable
-the quirk in L0 will also work.
+I also noticed that we use a u64 in snp_guest_request_ioctl.fw_err and
+u32 in sev_issue_cmd.error when these should be errors from the
+sev_ret_code enum IIUC.
 
-max_guest_memory_test is in a similar boat.  Running that in L1 is not recommended
-as KVM's shadow paging just can't keep up.  But that doesn't mean that the test
-should _never_ be run in L1.
+We can fix snp_issue_guest_request() to set |fw_err| to zero when it
+returns 0 but what should we return to userspace if we encounter an
+error that prevents the FW from even being called? In ` crypto: ccp -
+Ensure psp_ret is always init'd in __sev_platform_init_locked()` we
+set the return to -1 so we could continue that convection here and
+better codify it in the sev_ret_code enum.
 
-If we have the test skip itself, then opting in requires a code change.  On the
-other hand, skipping the test in whatever script is being used to run selftests
-is easy enough, e.g. `grep hypervisor /proc/cpuinfo`.  IMO running test via `make`
-is a complete mess and should be avoided anyways :-)
+>
+> --
+> -Dionna Glaze, PhD (she/her)
