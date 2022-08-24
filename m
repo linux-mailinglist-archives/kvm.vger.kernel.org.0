@@ -2,138 +2,204 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id D0B775A0392
-	for <lists+kvm@lfdr.de>; Thu, 25 Aug 2022 00:02:10 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id DD0425A03B6
+	for <lists+kvm@lfdr.de>; Thu, 25 Aug 2022 00:06:17 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238726AbiHXWCJ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 24 Aug 2022 18:02:09 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60730 "EHLO
+        id S240876AbiHXWGL (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 24 Aug 2022 18:06:11 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38180 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231190AbiHXWCI (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 24 Aug 2022 18:02:08 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C383A75CC3
-        for <kvm@vger.kernel.org>; Wed, 24 Aug 2022 15:02:06 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1661378525;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=KuQP2Wdk1ChLsQt933Dx50eCztce+E2B3cpbYWabPRQ=;
-        b=SR2sc3tDDxw1H7UZ6O3ZdE4RrkZy8KKK7wBz7F3fcDaHa77luC64KlgqSyd/4bZ8BbkHeQ
-        vEdRVr9UKWD2Go+t5sXACDzx6smPKOVBU8ShUGJjC0l9+YTXsMAbUsddvUddpnQH8zcIu2
-        DnjweDi+/vD3JU0HuuwfWU0po1+yeBM=
-Received: from mail-io1-f69.google.com (mail-io1-f69.google.com
- [209.85.166.69]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_128_GCM_SHA256) id
- us-mta-625-1wUM5kp8MgGo_ZnmJJYRHg-1; Wed, 24 Aug 2022 18:02:04 -0400
-X-MC-Unique: 1wUM5kp8MgGo_ZnmJJYRHg-1
-Received: by mail-io1-f69.google.com with SMTP id z30-20020a05660217de00b00688bd42dc1dso10143120iox.15
-        for <kvm@vger.kernel.org>; Wed, 24 Aug 2022 15:02:04 -0700 (PDT)
+        with ESMTP id S240870AbiHXWGI (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 24 Aug 2022 18:06:08 -0400
+Received: from mail-pg1-x52a.google.com (mail-pg1-x52a.google.com [IPv6:2607:f8b0:4864:20::52a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 37BBC7CAB4
+        for <kvm@vger.kernel.org>; Wed, 24 Aug 2022 15:06:06 -0700 (PDT)
+Received: by mail-pg1-x52a.google.com with SMTP id w13so11121602pgq.7
+        for <kvm@vger.kernel.org>; Wed, 24 Aug 2022 15:06:06 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc;
+        bh=nJk22XJ7wOcvuCzoRyIGvhgc9X2oEpNpAmvbdRYC9rU=;
+        b=tUTOy/np2IJItYhuVGMMnsrVV+ydgrkxKJ+hYrUWTxm8CN+LahtWN5HL5rBpOxN1Ll
+         HaSnQBQJoGwN/gJUgT53N+Sb7uHbUmEO/A1JtN7AdFlLyLSBsAGc/pQb/p4j0mLzC6wM
+         8XTxdBUnMNqZvR46FJNZQb4s4rhCuTBLox4PkBdTgDZayH7cCle+3f5Xs9UdZwLzRy8U
+         qIOIjtPp24yLO6PZWUCpafE8jlzslVX/sYBHu1NBOtHHeu6v/qp9sdmVQTw5JK4/HavL
+         fTwLARDDsxC9bUo6LKINSnvapDHbN+ubIqs/NI4dqQ3opt4imjH19+mKz6dJLVL1xx/G
+         wkDA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=content-transfer-encoding:mime-version:organization:references
-         :in-reply-to:message-id:subject:cc:to:from:date:x-gm-message-state
-         :from:to:cc;
-        bh=KuQP2Wdk1ChLsQt933Dx50eCztce+E2B3cpbYWabPRQ=;
-        b=7tX5ZsF3HsW8RnB5BSDjGUIpCFo6qQIP7X9lgiqpGV/KybSDHI2OHIT+j5TnAAIba4
-         Z+vsqzdPJJ2v8VSQLI2sypJMvZwLnwMD7ZT/+IBAG0dS6Bis/hrwCTOT88jNkQw5ecFN
-         wWm+vR/yYzc4ZcE3cYFKFPDaDSJ7q0fqpxQoJBoCeuSZWSk7WgFs5xIdR9+1uNv3DSJY
-         ztBThGbywGZUGGDBcQmaO+8pFQ/kk8QlFTpEflcg7PBChWh6qYqEnJ8A3/urUo0JcLzQ
-         Yth0SP4f7euXcWg4qsJPNxZyBwp9zaoC+zE629c7EHS5Cat8JtBT0VWy3DXNTYmTQmQG
-         znUg==
-X-Gm-Message-State: ACgBeo1LYBOj6G5Cs7n5gRZvTpgdVrdOMZvjJjmTHWxh6wEqCU3lRYvM
-        KUgM1pmuP+/LxmcOjfAQlg8BpMJrY9kJL4WVCup8VYrSLsuA69NiUKs7KF1kCFlLW/UfsBpBSVe
-        22kFkpQELpWSl
-X-Received: by 2002:a05:6e02:2163:b0:2ea:367:f1be with SMTP id s3-20020a056e02216300b002ea0367f1bemr423787ilv.213.1661378523902;
-        Wed, 24 Aug 2022 15:02:03 -0700 (PDT)
-X-Google-Smtp-Source: AA6agR6OcDOv1g3eAR8zX8TubDTh4L3RUBfXNTsHKzBzv76JrasNZgOAoXk+Cohwa2e935sVI3/6sA==
-X-Received: by 2002:a05:6e02:2163:b0:2ea:367:f1be with SMTP id s3-20020a056e02216300b002ea0367f1bemr423775ilv.213.1661378523664;
-        Wed, 24 Aug 2022 15:02:03 -0700 (PDT)
-Received: from redhat.com ([38.15.36.239])
-        by smtp.gmail.com with ESMTPSA id bc9-20020a0566383cc900b00349d0b0b67dsm273208jab.120.2022.08.24.15.02.03
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc;
+        bh=nJk22XJ7wOcvuCzoRyIGvhgc9X2oEpNpAmvbdRYC9rU=;
+        b=z5LK2fu8x1hEEOpGJVrhMYoFxHa5UHOXcvRS2wwKx5qN9ZwURyuMqdZtSim83mcB98
+         tFP/4nM7GcG1LjagRz0wlAU/NwuHk+JtNQLagCnBBRAgOnWr6bHE1FoPFNW6viogFa0b
+         bPxJ7bBJT+1wZvnzFe/FVzmN7X+7FbZp8KB2Y7PDVyf+PwaAVy88ZW2O8P6a2wMv7hGZ
+         Ge3AQaL1Ozsg8PEgeEcr/rvx1TbywUO4GFbX22HXEAgrfSqvdC5tzDYtazC4a0rfFwMr
+         nkp0wMv5tLXl6LIvTsoi5YbCdGOg8BC14Vr0XvjTnwo07sH5Sb4Z70oMqI8CrzRXLony
+         6mEg==
+X-Gm-Message-State: ACgBeo1f/+VdSleZG0+O7EI6guI/bz8fMPmJLfuPkPxMtAd3DvtD16Jx
+        kr/6ksdv+LWTe0AY3ROVkJ8ttw==
+X-Google-Smtp-Source: AA6agR4nCg320FC5ogznqsjn0vPK5nuwzVFzRHaOV7SdrQv7eMc2KV4zVEPpadFc/buFs9qVKWflIA==
+X-Received: by 2002:a65:4cc7:0:b0:41a:4df2:4839 with SMTP id n7-20020a654cc7000000b0041a4df24839mr768027pgt.37.1661378765493;
+        Wed, 24 Aug 2022 15:06:05 -0700 (PDT)
+Received: from google.com (7.104.168.34.bc.googleusercontent.com. [34.168.104.7])
+        by smtp.gmail.com with ESMTPSA id u9-20020a170902e5c900b00172fad607b3sm5234217plf.207.2022.08.24.15.06.05
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 24 Aug 2022 15:02:03 -0700 (PDT)
-Date:   Wed, 24 Aug 2022 16:02:01 -0600
-From:   Alex Williamson <alex.williamson@redhat.com>
-To:     Jason Gunthorpe <jgg@nvidia.com>
-Cc:     "Tian, Kevin" <kevin.tian@intel.com>,
-        Cornelia Huck <cohuck@redhat.com>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "Liu, Yi L" <yi.l.liu@intel.com>
-Subject: Re: [PATCH v2] vfio: Remove vfio_group dev_counter
-Message-ID: <20220824160201.1902d6c4.alex.williamson@redhat.com>
-In-Reply-To: <20220824003808.GE4090@nvidia.com>
-References: <0-v2-d4374a7bf0c9+c4-vfio_dev_counter_jgg@nvidia.com>
-        <BN9PR11MB5276281FEDA2BC42DF67885E8C719@BN9PR11MB5276.namprd11.prod.outlook.com>
-        <20220822123532.49dd0e0e.alex.williamson@redhat.com>
-        <BN9PR11MB5276323D5F9515E42CDBCDBD8C709@BN9PR11MB5276.namprd11.prod.outlook.com>
-        <20220824003808.GE4090@nvidia.com>
-Organization: Red Hat
+        Wed, 24 Aug 2022 15:06:05 -0700 (PDT)
+Date:   Wed, 24 Aug 2022 22:06:01 +0000
+From:   Sean Christopherson <seanjc@google.com>
+To:     Maxim Levitsky <mlevitsk@redhat.com>
+Cc:     kvm@vger.kernel.org, Borislav Petkov <bp@alien8.de>,
+        Dave Hansen <dave.hansen@linux.intel.com>,
+        linux-kernel@vger.kernel.org, Wanpeng Li <wanpengli@tencent.com>,
+        Ingo Molnar <mingo@redhat.com>, x86@kernel.org,
+        Jim Mattson <jmattson@google.com>,
+        Kees Cook <keescook@chromium.org>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        "H. Peter Anvin" <hpa@zytor.com>, Joerg Roedel <joro@8bytes.org>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Paolo Bonzini <pbonzini@redhat.com>
+Subject: Re: [PATCH v3 07/13] KVM: x86: emulator/smm: add structs for KVM's
+ smram layout
+Message-ID: <YwagyQu5X8N/w8UV@google.com>
+References: <20220803155011.43721-1-mlevitsk@redhat.com>
+ <20220803155011.43721-8-mlevitsk@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-2.8 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,
-        SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham
-        autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20220803155011.43721-8-mlevitsk@redhat.com>
+X-Spam-Status: No, score=-14.5 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+        ENV_AND_HDR_SPF_MATCH,FSL_HELO_FAKE,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,
+        SPF_PASS,T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL
+        autolearn=no autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, 23 Aug 2022 21:38:08 -0300
-Jason Gunthorpe <jgg@nvidia.com> wrote:
-> So, I would prefer to comment it like this and if someone comes with a
-> driver that wants to use it in some other way they have to address
-> these problems so it works generally and correctly. I don't want to
-> write more code to protect against something that auditing tells us
-> doesn't happen today.
+On Wed, Aug 03, 2022, Maxim Levitsky wrote:
+> Those structs will be used to read/write the smram state image.
 > 
-> The whole thing should naturally become fixed fairly soon, as once we
-> have Yishai and Joao's changes there will be no use for the dirty
-> tracking code in type1 that is causing this problem.
-
-I assume this is referring to the DMA logging interface and
-implementation for mlx5[1], but I don't see anyone else getting on board
-with that proposal (or reviewing).  AIUI, most are waiting for system
-IOMMU DMA logging, so the above seems a bit of a bold claim.  Do we
-expect system IOMMU logging flowing through this device feature or will
-there be an interface at the shared IOMMU context level?  Do we expect
-mdev drivers supporting migration to track their dirty iovas locally
-and implement this feature? 
-
-And touching on this question that wasn't addressed...
-
-On Tue, 23 Aug 2022 01:31:11 +0000
-"Tian, Kevin" <kevin.tian@intel.com> wrote:
-> > From: Alex Williamson <alex.williamson@redhat.com>
-> > Sent: Tuesday, August 23, 2022 2:36 AM
-> > It's related to the dirty page scope.  Use of the pinned page interface
-> > is essentially a contract with the IOMMU back-end that only pinned pages
-> > will be considered for the dirty page scope.  However, type1 operates
-> > on groups, therefore we needed to create a restriction that only
-> > singleton groups could make use of page pinning such that the dirty
-> > page scope could be attached to the group.  
+> Also document the differences between KVM's SMRAM layout and SMRAM
+> layout that is used by real Intel/AMD cpus.
 > 
-> I get the former part but not the latter. Can you elaborate why
-> multi-device group can not be attached by the dirty page scope?
-> It's kind of sharing the scope by all devices in the group.
+> Signed-off-by: Maxim Levitsky <mlevitsk@redhat.com>
+> ---
+>  arch/x86/kvm/emulate.c     |   6 +
+>  arch/x86/kvm/kvm_emulate.h | 218 +++++++++++++++++++++++++++++++++++++
+>  arch/x86/kvm/x86.c         |   1 +
+>  3 files changed, 225 insertions(+)
+> 
+> diff --git a/arch/x86/kvm/emulate.c b/arch/x86/kvm/emulate.c
+> index 18551611cb13af..55d9328e6074a2 100644
+> --- a/arch/x86/kvm/emulate.c
+> +++ b/arch/x86/kvm/emulate.c
+> @@ -5864,3 +5864,9 @@ bool emulator_can_use_gpa(struct x86_emulate_ctxt *ctxt)
+>  
+>  	return true;
+>  }
+> +
+> +void  __init kvm_emulator_init(void)
+> +{
+> +	__check_smram32_offsets();
+> +	__check_smram64_offsets();
+> +}
 
-There's no fundamental reason we couldn't do it.  At the time it wasn't
-necessary and wasn't convenient since type1 operated exclusively on
-groups.  Now maybe we'd expand the device_list beyond just devices with
-dma_unmap callbacks and link page pinning to the device rather than the
-group to get better granularity, but that all seems to be work in the
-opposite direction from where we want the IOMMU uAPI to go.  If type1
-dirty logging goes away and moves to the drivers, we could scrap the
-singleton requirement, but as Jason notes, expanding its use to hack
-around regions that can't fault is a bit of an abuse of the intended
-use case.  Thanks,
+...
 
-Alex
+> +static inline void __check_smram64_offsets(void)
 
-[1]20220815151109.180403-1-yishaih@nvidia.com
+Why double underscores?  Same question for the macros.
 
+> +{
+> +#define __CHECK_SMRAM64_OFFSET(field, offset) \
+> +	ASSERT_STRUCT_OFFSET(struct kvm_smram_state_64, field, offset - 0xFE00)
+> +
+> +	__CHECK_SMRAM64_OFFSET(es,			0xFE00);
+> +	__CHECK_SMRAM64_OFFSET(cs,			0xFE10);
+> +	__CHECK_SMRAM64_OFFSET(ss,			0xFE20);
+> +	__CHECK_SMRAM64_OFFSET(ds,			0xFE30);
+> +	__CHECK_SMRAM64_OFFSET(fs,			0xFE40);
+> +	__CHECK_SMRAM64_OFFSET(gs,			0xFE50);
+> +	__CHECK_SMRAM64_OFFSET(gdtr,			0xFE60);
+> +	__CHECK_SMRAM64_OFFSET(ldtr,			0xFE70);
+> +	__CHECK_SMRAM64_OFFSET(idtr,			0xFE80);
+> +	__CHECK_SMRAM64_OFFSET(tr,			0xFE90);
+> +	__CHECK_SMRAM64_OFFSET(io_restart_rip,		0xFEA0);
+> +	__CHECK_SMRAM64_OFFSET(io_restart_rcx,		0xFEA8);
+> +	__CHECK_SMRAM64_OFFSET(io_restart_rsi,		0xFEB0);
+> +	__CHECK_SMRAM64_OFFSET(io_restart_rdi,		0xFEB8);
+> +	__CHECK_SMRAM64_OFFSET(io_restart_dword,	0xFEC0);
+> +	__CHECK_SMRAM64_OFFSET(reserved1,		0xFEC4);
+> +	__CHECK_SMRAM64_OFFSET(io_inst_restart,		0xFEC8);
+> +	__CHECK_SMRAM64_OFFSET(auto_hlt_restart,	0xFEC9);
+> +	__CHECK_SMRAM64_OFFSET(reserved2,		0xFECA);
+> +	__CHECK_SMRAM64_OFFSET(efer,			0xFED0);
+> +	__CHECK_SMRAM64_OFFSET(svm_guest_flag,		0xFED8);
+> +	__CHECK_SMRAM64_OFFSET(svm_guest_vmcb_gpa,	0xFEE0);
+> +	__CHECK_SMRAM64_OFFSET(svm_guest_virtual_int,	0xFEE8);
+> +	__CHECK_SMRAM64_OFFSET(reserved3,		0xFEF0);
+> +	__CHECK_SMRAM64_OFFSET(smm_revison,		0xFEFC);
+> +	__CHECK_SMRAM64_OFFSET(smbase,			0xFF00);
+> +	__CHECK_SMRAM64_OFFSET(reserved4,		0xFF04);
+> +	__CHECK_SMRAM64_OFFSET(ssp,			0xFF18);
+> +	__CHECK_SMRAM64_OFFSET(svm_guest_pat,		0xFF20);
+> +	__CHECK_SMRAM64_OFFSET(svm_host_efer,		0xFF28);
+> +	__CHECK_SMRAM64_OFFSET(svm_host_cr4,		0xFF30);
+> +	__CHECK_SMRAM64_OFFSET(svm_host_cr3,		0xFF38);
+> +	__CHECK_SMRAM64_OFFSET(svm_host_cr0,		0xFF40);
+> +	__CHECK_SMRAM64_OFFSET(cr4,			0xFF48);
+> +	__CHECK_SMRAM64_OFFSET(cr3,			0xFF50);
+> +	__CHECK_SMRAM64_OFFSET(cr0,			0xFF58);
+> +	__CHECK_SMRAM64_OFFSET(dr7,			0xFF60);
+> +	__CHECK_SMRAM64_OFFSET(dr6,			0xFF68);
+> +	__CHECK_SMRAM64_OFFSET(rflags,			0xFF70);
+> +	__CHECK_SMRAM64_OFFSET(rip,			0xFF78);
+> +	__CHECK_SMRAM64_OFFSET(gprs,			0xFF80);
+> +#undef __CHECK_SMRAM64_OFFSET
+> +}
+> +
+> +union kvm_smram {
+> +	struct kvm_smram_state_64 smram64;
+> +	struct kvm_smram_state_32 smram32;
+> +	u8 bytes[512];
+> +};
+> +
+> +void  __init kvm_emulator_init(void);
+> +
+> +
+
+Unnecessary newline.
+
+>  /* Host execution mode. */
+>  #if defined(CONFIG_X86_32)
+>  #define X86EMUL_MODE_HOST X86EMUL_MODE_PROT32
+> diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+> index 33560bfa0cac6e..bea7e5015d592e 100644
+> --- a/arch/x86/kvm/x86.c
+> +++ b/arch/x86/kvm/x86.c
+> @@ -13355,6 +13355,7 @@ EXPORT_TRACEPOINT_SYMBOL_GPL(kvm_vmgexit_msr_protocol_exit);
+>  static int __init kvm_x86_init(void)
+>  {
+>  	kvm_mmu_x86_module_init();
+> +	kvm_emulator_init();
+
+Please don't add an init call that is nop at runtime, e.g. I was _really_ curious
+what initialization needed to be done in the emulator.  And it makes it look like
+kvm_x86_exit() forgot to call kvm_emulator_exit().
+
+em_rsm() already ends up with
+
+	BUILD_BUG_ON(sizeof(smram) != 512);
+
+just put all the assertions there.
+
+>  	return 0;
+>  }
+>  module_init(kvm_x86_init);
+> -- 
+> 2.26.3
+> 
