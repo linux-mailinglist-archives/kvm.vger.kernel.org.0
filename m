@@ -2,113 +2,118 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 885E559FD19
-	for <lists+kvm@lfdr.de>; Wed, 24 Aug 2022 16:22:24 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 22BDE59FD30
+	for <lists+kvm@lfdr.de>; Wed, 24 Aug 2022 16:25:36 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237222AbiHXOWU (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 24 Aug 2022 10:22:20 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38520 "EHLO
+        id S239142AbiHXOZT (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 24 Aug 2022 10:25:19 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42926 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235208AbiHXOWU (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 24 Aug 2022 10:22:20 -0400
-Received: from mga02.intel.com (mga02.intel.com [134.134.136.20])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 483F622BCC
-        for <kvm@vger.kernel.org>; Wed, 24 Aug 2022 07:22:19 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1661350939; x=1692886939;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=L3X04e2cHtS9lSBq9xAoEisrpqNf957ajU4Fhv193ZU=;
-  b=Zel/uGZnPKXtNT05ejLZO9pqnC29TCjXx9cZTJhQMmsNg4j/bZOD9+yb
-   ijb/0m1Ikb9xn1GiLIuPUcl8E0AA11Ps8kx1dRMTdBC3N8RXmwk8tXZZH
-   hfeXKo3gxCLsRfvXr24KvwXl9xutiMGKI81XxmgdkaY6T2u/4mlZO+2FA
-   VYb+81RZ0/HfNdiroRqeOmSv1gycfUltyQbOY/WfZy1BVfR0zHdSlQuzi
-   ZpaMTR9QaiRseMgwYCH4BnAvf4nd1+C0oLS4s8Ek+qR4CJmE/0a26yLxw
-   oFWHPv5fwBe4mvmWTHLI8zQCcaXpai3uelwUzHpu15FW3ZgXGZEIJHV75
-   w==;
-X-IronPort-AV: E=McAfee;i="6500,9779,10449"; a="280952485"
-X-IronPort-AV: E=Sophos;i="5.93,260,1654585200"; 
-   d="scan'208";a="280952485"
-Received: from fmsmga003.fm.intel.com ([10.253.24.29])
-  by orsmga101.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 24 Aug 2022 07:22:18 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.93,260,1654585200"; 
-   d="scan'208";a="699089796"
-Received: from lkp-server02.sh.intel.com (HELO 34e741d32628) ([10.239.97.151])
-  by FMSMGA003.fm.intel.com with ESMTP; 24 Aug 2022 07:22:15 -0700
-Received: from kbuild by 34e741d32628 with local (Exim 4.96)
-        (envelope-from <lkp@intel.com>)
-        id 1oQrGo-0000bx-2f;
-        Wed, 24 Aug 2022 14:22:14 +0000
-Date:   Wed, 24 Aug 2022 22:21:17 +0800
-From:   kernel test robot <lkp@intel.com>
-To:     David Matlack <dmatlack@google.com>,
-        Paolo Bonzini <pbonzini@redhat.com>
-Cc:     kbuild-all@lists.01.org, Sean Christopherson <seanjc@google.com>,
-        Borislav Petkov <bp@suse.de>,
-        "Paul E. McKenney" <paulmck@kernel.org>,
-        Kees Cook <keescook@chromium.org>,
-        Peter Zijlstra <peterz@infradead.org>,
+        with ESMTP id S239157AbiHXOZM (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 24 Aug 2022 10:25:12 -0400
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D4050BF6C;
+        Wed, 24 Aug 2022 07:25:09 -0700 (PDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id 6268D6181B;
+        Wed, 24 Aug 2022 14:25:09 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id B45EEC433C1;
+        Wed, 24 Aug 2022 14:25:08 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1661351108;
+        bh=GlyJJ9dV5dcNN4e8F/+zW4aKoVpKrRpQG5FduS6xj60=;
+        h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+        b=RlOFCFyOYvgDsmtvh7bI4fnzpALdN2M/t7Sdx3OBkKjuNIOEGaxCSeasH5M/MQcVu
+         39MlyXzAx5P4sTw6vHcANvoZt5XNpo4DlF7c3sYHlUc18EhnOJ+Nx/MvsFzgmvBHY4
+         mnjdD22AawdV/zG7YInQPGZCdQ59QpasRPsWlEDIns2MvGoYCbBB1Zlc8Zx17VlJKx
+         WlpiSr2SvuWNUu+CiU1aCrccEOnvIj7LHy6SiOm7h2HB/+9dhcnJIKX7ihFSu2bagl
+         8lmZ+3PVbzSvTHGsjmudsOHkifF0MknUFCc1OryZ69NDWLBrFdNJWFGyy08RVV1UqF
+         GXox+Ellgocog==
+Received: from [12.191.126.171] (helo=wait-a-minute.misterjones.org)
+        by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+        (Exim 4.95)
+        (envelope-from <maz@kernel.org>)
+        id 1oQrJa-005SYH-2A;
+        Wed, 24 Aug 2022 15:25:06 +0100
+Date:   Wed, 24 Aug 2022 15:24:57 +0100
+Message-ID: <87zgftra6e.wl-maz@kernel.org>
+From:   Marc Zyngier <maz@kernel.org>
+To:     Ryan Roberts <ryan.roberts@arm.com>
+Cc:     Yosry Ahmed <yosryahmed@google.com>, Tejun Heo <tj@kernel.org>,
+        Johannes Weiner <hannes@cmpxchg.org>,
+        Zefan Li <lizefan.x@bytedance.com>,
+        James Morse <james.morse@arm.com>,
+        Alexandru Elisei <alexandru.elisei@arm.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Sean Christopherson <seanjc@google.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>,
         Andrew Morton <akpm@linux-foundation.org>,
-        Linux Memory Management List <linux-mm@kvack.org>,
-        Randy Dunlap <rdunlap@infradead.org>,
-        Damien Le Moal <damien.lemoal@opensource.wdc.com>,
-        kvm@vger.kernel.org, David Matlack <dmatlack@google.com>
-Subject: Re: [PATCH 2/9] KVM: x86/mmu: Drop kvm->arch.tdp_mmu_enabled
-Message-ID: <202208242248.quWrDOnO-lkp@intel.com>
-References: <20220815230110.2266741-3-dmatlack@google.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20220815230110.2266741-3-dmatlack@google.com>
-X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
-        RCVD_IN_MSPIKE_H3,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE,
-        T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED autolearn=ham autolearn_force=no
-        version=3.4.6
+        Michal Hocko <mhocko@kernel.org>,
+        Roman Gushchin <roman.gushchin@linux.dev>,
+        Shakeel Butt <shakeelb@google.com>,
+        Oliver Upton <oupton@google.com>, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org, Huang@google.com,
+        Shaoqin <shaoqin.huang@intel.com>, linux-mm@kvack.org,
+        cgroups@vger.kernel.org, kvmarm@lists.cs.columbia.edu,
+        linux-arm-kernel@lists.infradead.org, nd@arm.com
+Subject: Re: [PATCH v7 4/4] KVM: arm64/mmu: count KVM s2 mmu usage in secondary pagetable stats
+In-Reply-To: <319904e0-3722-8ab1-cf74-491b9c32e23b@arm.com>
+References: <20220823004639.2387269-1-yosryahmed@google.com>
+        <20220823004639.2387269-5-yosryahmed@google.com>
+        <319904e0-3722-8ab1-cf74-491b9c32e23b@arm.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/27.1
+ (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 12.191.126.171
+X-SA-Exim-Rcpt-To: ryan.roberts@arm.com, yosryahmed@google.com, tj@kernel.org, hannes@cmpxchg.org, lizefan.x@bytedance.com, james.morse@arm.com, alexandru.elisei@arm.com, suzuki.poulose@arm.com, pbonzini@redhat.com, seanjc@google.com, vkuznets@redhat.com, wanpengli@tencent.com, jmattson@google.com, joro@8bytes.org, akpm@linux-foundation.org, mhocko@kernel.org, roman.gushchin@linux.dev, shakeelb@google.com, oupton@google.com, kvm@vger.kernel.org, linux-kernel@vger.kernel.org, Huang@google.com, shaoqin.huang@intel.com, linux-mm@kvack.org, cgroups@vger.kernel.org, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org, nd@arm.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+X-Spam-Status: No, score=-7.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_HI,
+        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi David,
+On Wed, 24 Aug 2022 14:43:43 +0100,
+Ryan Roberts <ryan.roberts@arm.com> wrote:
+> 
+> > Count the pages used by KVM in arm64 for stage2 mmu in memory stats
+> > under secondary pagetable stats (e.g. "SecPageTables" in /proc/meminfo)
+> > to give better visibility into the memory consumption of KVM mmu in a
+> > similar way to how normal user page tables are accounted.
+> > 
+> > Signed-off-by: Yosry Ahmed <yosryahmed@google.com>
+> > Reviewed-by: Oliver Upton <oliver.upton@linux.dev>
+> > Reviewed-by: Marc Zyngier <maz@kernel.org>
+> > ---
+> 
+> I see that you are not including the memory reserved for the host
+> stage2 table when using protected KVM. Is this something worth adding?
+> (See arch/arm64/kvm/pkvm.c:kvm_hyp_reserve()).
+> 
+> This reservation is done pretty early on in bootmem_init() so not sure
+> if this could cause some init ordering issues that might be tricky to
+> solve though.
 
-Thank you for the patch! Yet something to improve:
+I also don't see what this buys us. This memory can't be reclaimed,
+and is not part of KVM's job for the purpose of running guests, which
+is what this series is about.
 
-[auto build test ERROR on 93472b79715378a2386598d6632c654a2223267b]
+If anything, it should be accounted separately.
 
-url:    https://github.com/intel-lab-lkp/linux/commits/David-Matlack/KVM-x86-mmu-Always-enable-the-TDP-MMU-when-TDP-is-enabled/20220816-135710
-base:   93472b79715378a2386598d6632c654a2223267b
-config: i386-debian-10.3-kselftests (https://download.01.org/0day-ci/archive/20220824/202208242248.quWrDOnO-lkp@intel.com/config)
-compiler: gcc-11 (Debian 11.3.0-5) 11.3.0
-reproduce (this is a W=1 build):
-        # https://github.com/intel-lab-lkp/linux/commit/05144150ed5b370369565be6b75d7504e64f3ba7
-        git remote add linux-review https://github.com/intel-lab-lkp/linux
-        git fetch --no-tags linux-review David-Matlack/KVM-x86-mmu-Always-enable-the-TDP-MMU-when-TDP-is-enabled/20220816-135710
-        git checkout 05144150ed5b370369565be6b75d7504e64f3ba7
-        # save the config file
-        mkdir build_dir && cp config build_dir/.config
-        make W=1 O=build_dir ARCH=i386 SHELL=/bin/bash
-
-If you fix the issue, kindly add following tag where applicable
-Reported-by: kernel test robot <lkp@intel.com>
-
-All errors (new ones prefixed by >>, old ones prefixed by <<):
-
->> ERROR: modpost: "kvm_tdp_mmu_test_age_gfn" [arch/x86/kvm/kvm.ko] undefined!
->> ERROR: modpost: "kvm_tdp_mmu_zap_all" [arch/x86/kvm/kvm.ko] undefined!
->> ERROR: modpost: "kvm_tdp_mmu_clear_dirty_pt_masked" [arch/x86/kvm/kvm.ko] undefined!
->> ERROR: modpost: "kvm_tdp_mmu_age_gfn_range" [arch/x86/kvm/kvm.ko] undefined!
->> ERROR: modpost: "kvm_tdp_mmu_zap_leafs" [arch/x86/kvm/kvm.ko] undefined!
->> ERROR: modpost: "kvm_tdp_mmu_unmap_gfn_range" [arch/x86/kvm/kvm.ko] undefined!
->> ERROR: modpost: "kvm_tdp_mmu_invalidate_all_roots" [arch/x86/kvm/kvm.ko] undefined!
->> ERROR: modpost: "kvm_tdp_mmu_get_vcpu_root_hpa" [arch/x86/kvm/kvm.ko] undefined!
->> ERROR: modpost: "kvm_tdp_mmu_set_spte_gfn" [arch/x86/kvm/kvm.ko] undefined!
-ERROR: modpost: "kvm_tdp_mmu_wrprot_slot" [arch/x86/kvm/kvm.ko] undefined!
-WARNING: modpost: suppressed 5 unresolved symbol warnings because there were too many)
+	M.
 
 -- 
-0-DAY CI Kernel Test Service
-https://01.org/lkp
+Without deviation from the norm, progress is not possible.
