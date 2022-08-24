@@ -2,131 +2,126 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 2027E5A0364
-	for <lists+kvm@lfdr.de>; Wed, 24 Aug 2022 23:49:27 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id C53785A036A
+	for <lists+kvm@lfdr.de>; Wed, 24 Aug 2022 23:51:40 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232245AbiHXVtZ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 24 Aug 2022 17:49:25 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39972 "EHLO
+        id S240037AbiHXVuy (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 24 Aug 2022 17:50:54 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43402 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229805AbiHXVtX (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 24 Aug 2022 17:49:23 -0400
-Received: from mailtransmit05.runbox.com (mailtransmit05.runbox.com [IPv6:2a0c:5a00:149::26])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CD00620A
-        for <kvm@vger.kernel.org>; Wed, 24 Aug 2022 14:49:21 -0700 (PDT)
-Received: from mailtransmit02.runbox ([10.9.9.162] helo=aibo.runbox.com)
-        by mailtransmit05.runbox.com with esmtps  (TLS1.2) tls TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256
-        (Exim 4.93)
-        (envelope-from <mhal@rbox.co>)
-        id 1oQyFT-00GvKd-3i; Wed, 24 Aug 2022 23:49:19 +0200
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=rbox.co;
-        s=selector2; h=Content-Transfer-Encoding:Content-Type:In-Reply-To:From:
-        References:Cc:To:Subject:MIME-Version:Date:Message-ID;
-        bh=eHgommjf2h7GBOukRi97jsdSDkdqQqF0uiaRunyg2LM=; b=jHrbS8wvkAad1QMu8tSqyiYY9G
-        iiN2dCtpAxvl8ITDgZ8s7OIhScLa5yiGL2h4O1OVjigAwx2M1HyIUkARN4YSAvZULAEnkxOT+eMFl
-        jy3PfOk5MTEdmXZvBNd0NYaSn7ZRVpcDpyDNo/2L+Rs88QYr/2031ER56YdfgMYKIHjucbqaHP6Bu
-        5A4PcobsGGaRxQIhglaOOEKra7FBj6bSifNYeMh/EqTIG03eqeiwm7XOGpIXkS3FQbxq9hxiM2rqw
-        fa6a/5FIH2gK0gBtWi7nix1jr9Cq8AftSm62rlwiAMzMw31kgeYpnl6eOHKvzaUQy5R+83mSUAyqk
-        UvKQVzdg==;
-Received: from [10.9.9.73] (helo=submission02.runbox)
-        by mailtransmit02.runbox with esmtp (Exim 4.86_2)
-        (envelope-from <mhal@rbox.co>)
-        id 1oQyFS-0000dR-JJ; Wed, 24 Aug 2022 23:49:18 +0200
-Received: by submission02.runbox with esmtpsa  [Authenticated ID (604044)]  (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
-        (Exim 4.90_1)
-        id 1oQyFI-0007uH-20; Wed, 24 Aug 2022 23:49:08 +0200
-Message-ID: <69d74e6a-dd6b-28bb-8011-e204d4ab0253@rbox.co>
-Date:   Wed, 24 Aug 2022 23:49:06 +0200
+        with ESMTP id S239703AbiHXVut (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 24 Aug 2022 17:50:49 -0400
+Received: from mail-pl1-x636.google.com (mail-pl1-x636.google.com [IPv6:2607:f8b0:4864:20::636])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 910F0647ED
+        for <kvm@vger.kernel.org>; Wed, 24 Aug 2022 14:50:48 -0700 (PDT)
+Received: by mail-pl1-x636.google.com with SMTP id v23so11560233plo.9
+        for <kvm@vger.kernel.org>; Wed, 24 Aug 2022 14:50:48 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc;
+        bh=RUPC3jPCalHtDBNfvRBs/lbqBPlwSNYiWYp0S4PJ/XU=;
+        b=gIHmiktIXmAFUsCwbcPQOlxaKONLU3DwN4gqqDggiCoauGYVwUhDfJClUivkb6m2Iv
+         toLhTLkqj3XOWZpAw9II5tGSbwNROBX/IP6Zb6Ri7ytnYYdwXmP1ehzyWzJ5cAb4x+Va
+         60vPXyXiLoAWo8bdcrLv3e6mY3NT7sSJAfZDIPbQCewkc5mIx0lb2NXbmQCvdZixU4lm
+         cIhaOpV0cL+IQEegjVrvRDZ6m+n2v2J6sqw6PjLykeDZdygsooLa5ljtW3a2TVk3nbEm
+         oWyPqnvSBvW39n9klYGMrBuWLr+zi1xW0NW2O3B/ufPQ0uyMBosPRp1bblSqKkb/aA1v
+         +szg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc;
+        bh=RUPC3jPCalHtDBNfvRBs/lbqBPlwSNYiWYp0S4PJ/XU=;
+        b=3Bi/CasNxX0xdfIPED55SYDEMnIIIymNr0AS6r7wocvGrvwGOaAQWeSLbPT152RHVZ
+         KV/2wkF3abphMBDh4V9CKCgUOiReLblish7kzVfTiNRfSHpszcPQosDbIkr/paQ4ULEQ
+         vYetWxFB3iBYvpaQVZAyVXaoCaLkXx2R4NmLmZr8+t4/qSCDL0n6ZuFjQXCrDmGu7Pqi
+         Fc9by3IA9MqdiDejv3RDPrwnjxnsx/UVREoQQuotu6OE4cp5oi8mhtC7+x3spa2INCKe
+         uayPaJz94p7/95SU2QDhI1kn0evAOat6kN1mPJj5ij6rAxe4o2x63e7loA+t8SJ0SIGD
+         AtYg==
+X-Gm-Message-State: ACgBeo1k4QKXKz71PnbLv4nFz/20YhINHqqYsvTNFKb9OOUnKdkCZM48
+        sVQitxK9aVEVw0QTpzXyPFS2eQ==
+X-Google-Smtp-Source: AA6agR4Lo5G4GBoW0Csa2WkXlDva4B14EmccEzjTBr/lql7tOsivvXBIhVjphGHfixlQZH/MIcds6A==
+X-Received: by 2002:a17:902:a60c:b0:171:407d:16f8 with SMTP id u12-20020a170902a60c00b00171407d16f8mr767658plq.58.1661377847914;
+        Wed, 24 Aug 2022 14:50:47 -0700 (PDT)
+Received: from google.com (7.104.168.34.bc.googleusercontent.com. [34.168.104.7])
+        by smtp.gmail.com with ESMTPSA id q11-20020a170902f78b00b001709e3c750dsm2366264pln.194.2022.08.24.14.50.47
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 24 Aug 2022 14:50:47 -0700 (PDT)
+Date:   Wed, 24 Aug 2022 21:50:43 +0000
+From:   Sean Christopherson <seanjc@google.com>
+To:     Maxim Levitsky <mlevitsk@redhat.com>
+Cc:     kvm@vger.kernel.org, Borislav Petkov <bp@alien8.de>,
+        Dave Hansen <dave.hansen@linux.intel.com>,
+        linux-kernel@vger.kernel.org, Wanpeng Li <wanpengli@tencent.com>,
+        Ingo Molnar <mingo@redhat.com>, x86@kernel.org,
+        Jim Mattson <jmattson@google.com>,
+        Kees Cook <keescook@chromium.org>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        "H. Peter Anvin" <hpa@zytor.com>, Joerg Roedel <joro@8bytes.org>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Paolo Bonzini <pbonzini@redhat.com>
+Subject: Re: [PATCH v3 04/13] KVM: x86: emulator: update the emulation mode
+ after rsm
+Message-ID: <YwadM2Y3FCMutSpt@google.com>
+References: <20220803155011.43721-1-mlevitsk@redhat.com>
+ <20220803155011.43721-5-mlevitsk@redhat.com>
 MIME-Version: 1.0
-User-Agent: Thunderbird
-Subject: Re: [kvm-unit-tests PATCH] x86/emulator: Test POP-SS blocking
-Content-Language: pl-PL
-To:     Sean Christopherson <seanjc@google.com>
-Cc:     kvm@vger.kernel.org, pbonzini@redhat.com
-References: <20220821215900.1419215-1-mhal@rbox.co>
- <20220821220647.1420411-1-mhal@rbox.co>
- <9b853239-a3df-f124-e793-44cbadfbbd8f@rbox.co> <YwOj6tzvIoG34/sF@google.com>
- <6d19f78f-120a-936b-3eba-e949ecc3509f@rbox.co> <YwZu1K5Rgb1sevsy@google.com>
-From:   Michal Luczaj <mhal@rbox.co>
-In-Reply-To: <YwZu1K5Rgb1sevsy@google.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-2.8 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,RCVD_IN_DNSWL_LOW,
-        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED
-        autolearn=ham autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20220803155011.43721-5-mlevitsk@redhat.com>
+X-Spam-Status: No, score=-14.5 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+        ENV_AND_HDR_SPF_MATCH,FSL_HELO_FAKE,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,
+        SPF_PASS,T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL
+        autolearn=no autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 8/24/22 20:32, Sean Christopherson wrote:
-> Eh, let's completely skip usermode for code #DBs and not tweak __run_single_step_db_test().
-> It's easier to just have a standalone function.
+On Wed, Aug 03, 2022, Maxim Levitsky wrote:
 
-Something like this?
+Please make the changelog standalone, even though it means restating the shortlog
+in most cases.  When viewing git commits, the shortlog+changelog are bundled
+fairly close together, but when viewing patches in a mail client, e.g. when doing
+initial review, the shortlog is in the subject which may be far away or even
+completely hidden.
 
-static void test_pop_ss_code_db(bool fep_available)
-{
-	write_ss(KERNEL_DS);
+> This ensures that RIP will be correctly written back,
+> because the RSM instruction can switch the CPU mode from
+> 32 bit (or less) to 64 bit.
 
-	write_dr7(DR7_FIXED_1 |
-		  DR7_ENABLE_DRx(0) |
-		  DR7_EXECUTE_DRx(0) |
-		  DR7_LEN_1_DRx(0));
+Wrap closer to ~75 chars.
 
-#define POPSS_DB(desc, fep1, fep2)				\
-({								\
-	unsigned int r;						\
-								\
-	n = 0;							\
-	asm volatile(/* jump to 32-bit code segment */		\
-		     "ljmp *1f\n\t"				\
-		     "1:\n\t"					\
-		     "	.long 2f\n\t"				\
-		     "	.word " xstr(KERNEL_CS32) "\n\t"	\
-		     /* exercise POP SS blocking */		\
-		     ".code32\n\t"				\
-		     "2: lea 3f, %0\n\t"			\
-		     "mov %0, %%dr0\n\t"			\
-		     "push %%ss\n\t"				\
-		     fep1 "pop %%ss\n\t"			\
-		     fep2 "3: xor %0, %0\n\t"			\
-		     /* back to long mode */			\
-		     "ljmp %[cs64], $4f\n\t"			\
-		     ".code64\n\t"				\
-		     "4:"					\
-		     : "=R" (r)					\
-		     : [cs64] "i" (KERNEL_CS64)			\
-		     : "memory");				\
-								\
-	report(!n && !r, desc ": #DB suppressed after POP SS"); \
-})
+> 
+> This fixes a guest crash in case the #SMI is received
+> while the guest runs a code from an address > 32 bit.
+> 
+> Signed-off-by: Maxim Levitsky <mlevitsk@redhat.com>
+> ---
+>  arch/x86/kvm/emulate.c | 5 +++++
+>  1 file changed, 5 insertions(+)
+> 
+> diff --git a/arch/x86/kvm/emulate.c b/arch/x86/kvm/emulate.c
+> index bc70caf403c2b4..5e91b26cc1d8aa 100644
+> --- a/arch/x86/kvm/emulate.c
+> +++ b/arch/x86/kvm/emulate.c
+> @@ -2666,6 +2666,11 @@ static int em_rsm(struct x86_emulate_ctxt *ctxt)
+>  	if (ret != X86EMUL_CONTINUE)
+>  		goto emulate_shutdown;
+>  
+> +
 
-	POPSS_DB("no fep", "", "");
-	if (fep_available) {
-		POPSS_DB("fep POP-SS", KVM_FEP, "");
-		POPSS_DB("fep XOR", "", KVM_FEP);
-		POPSS_DB("fep POP-SS/fep XOR", KVM_FEP, KVM_FEP);
-	}
+Unnecessary newline.
 
-	write_dr7(DR7_FIXED_1);
-}
-
-Results:
-
-em_pop_sreg unpatched
-PASS: no fep: #DB suppressed after POP SS
-FAIL: fep POP-SS: #DB suppressed after POP SS
-PASS: fep XOR: #DB suppressed after POP SS
-PASS: fep POP-SS/fep XOR: #DB suppressed after POP SS
-
-em_pop_sreg patched
-PASS: no fep: #DB suppressed after POP SS
-PASS: fep POP-SS: #DB suppressed after POP SS
-PASS: fep XOR: #DB suppressed after POP SS
-PASS: fep POP-SS/fep XOR: #DB suppressed after POP SS
-
-thanks,
-Michal
+> +	ret = emulator_recalc_and_set_mode(ctxt);
+> +	if (ret != X86EMUL_CONTINUE)
+> +		goto emulate_shutdown;
+> +
+>  	/*
+>  	 * Note, the ctxt->ops callbacks are responsible for handling side
+>  	 * effects when writing MSRs and CRs, e.g. MMU context resets, CPUID
+> -- 
+> 2.26.3
+> 
