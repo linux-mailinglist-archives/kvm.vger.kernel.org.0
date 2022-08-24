@@ -2,58 +2,58 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 69D2D59F1B8
-	for <lists+kvm@lfdr.de>; Wed, 24 Aug 2022 05:04:12 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 1FE4C59F1BA
+	for <lists+kvm@lfdr.de>; Wed, 24 Aug 2022 05:04:17 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234512AbiHXDEL (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 23 Aug 2022 23:04:11 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41596 "EHLO
+        id S234515AbiHXDEM (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 23 Aug 2022 23:04:12 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40322 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234405AbiHXDD1 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 23 Aug 2022 23:03:27 -0400
-Received: from mail-pf1-x449.google.com (mail-pf1-x449.google.com [IPv6:2607:f8b0:4864:20::449])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2BBC681695
-        for <kvm@vger.kernel.org>; Tue, 23 Aug 2022 20:02:06 -0700 (PDT)
-Received: by mail-pf1-x449.google.com with SMTP id a21-20020a62bd15000000b005360da6b25aso5509259pff.23
-        for <kvm@vger.kernel.org>; Tue, 23 Aug 2022 20:02:06 -0700 (PDT)
+        with ESMTP id S234325AbiHXDD2 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 23 Aug 2022 23:03:28 -0400
+Received: from mail-pj1-x1049.google.com (mail-pj1-x1049.google.com [IPv6:2607:f8b0:4864:20::1049])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C5F2C81B04
+        for <kvm@vger.kernel.org>; Tue, 23 Aug 2022 20:02:08 -0700 (PDT)
+Received: by mail-pj1-x1049.google.com with SMTP id 92-20020a17090a09e500b001d917022847so6795036pjo.1
+        for <kvm@vger.kernel.org>; Tue, 23 Aug 2022 20:02:08 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
         h=cc:to:from:subject:references:mime-version:message-id:in-reply-to
          :date:reply-to:from:to:cc;
-        bh=91ku6RdHYBVIaVIyy/W5J3MfuUKqpZqv38drWe4lttw=;
-        b=cQD/3UZPCHVctBss2P9faccqu201X9id+2CcOrsoc7jc7da6SnbyTyGdPn3uOFckNL
-         QfvjIYXk+m1BTF5skHwXrgBNQ1EwaRIDIEk7SDWe7g5xnLWi7fsI3QgWlXJ++MUeuZjr
-         GFX026uaosgJpd637LTmw8dhK9Ap4zprYBOH9VebMyyHLhkUXsqZCcrcpSsF9Qruxs63
-         UVHDGFyI+XimJFcPsgZ/67RHhadLS8RXnlbT2u4n00eg5Cpp29hCZe4zyB66e27bzFeG
-         pGG1vgYqMgloayDkLbbGytAogaBShSXtZtFV4BrgFTyCffRcJMt3+deWBK1nGGVanFui
-         Z5Uw==
+        bh=KI/24KnUjxSS1U7iLRPsISVjUAiS4VwqnKygYJAuFJQ=;
+        b=mPUvxavvILOuvHhnMLLeve1ndxVxn38/NmkFtlENfJJo4vJw3+2sJuhGsh3rj5LOPV
+         RCMAZaQPdzPXgEB7PAYMjHcmQamSXw8RADVdmUrWWrQWox0zmUyPtzkHu+JjvS0GA7iw
+         /JGqaC+3W467+krm+KFzxnMzfz0LOgn8xeDJggTAvolQvHHzPNawlY3iC4MfRUmZ8kO3
+         0ZugtzISUQkjYxsWYhGF9f2qjlRZ8H+PkIGufCo7SN0mHK1T56rrDrSQ6v5s7jrgdLv9
+         VT6rthWclqcGshYR9GFozoqJiEGDodvVKd4ey70goSN+qs/wCGCD1oWQ10UusqYAkLV1
+         P7gw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=cc:to:from:subject:references:mime-version:message-id:in-reply-to
          :date:reply-to:x-gm-message-state:from:to:cc;
-        bh=91ku6RdHYBVIaVIyy/W5J3MfuUKqpZqv38drWe4lttw=;
-        b=dRbKu8kk8hkWONj2SAV/0T5SZWLyECy2TbGAK6l5oHRaNOwtNfZABme+6KiQPSn3MJ
-         sjZ6GX6Ume6t7LNfQ+67uWRsJ8yfgsl4ziWfg7hIF05qdjsOFnZC4Rquxxf0Q9Fa2QaH
-         9KUPxGg6mNHrUB1wOu9riKktkpPLFy5NgTXWOHcqNQ5YjWfg2jeYQAGk/TOmqLMlf/O8
-         syTzdUAzjT/uwbBXQN0COaMZuToFPGhCPY2ov+FHrNKtdkLBUHIitGPclZnf/77OaljG
-         xelJxIhas+CI+YogClzS5ssgwFzdYG5IGn+SyhJNFcMBCp2vsyXqhSfuJTV97rL0LY3I
-         OcxA==
-X-Gm-Message-State: ACgBeo3vBvO4q+QS5GAo71KWip6B9MVvZ9fVxZm7XYFeuvf+ZV4Ei5Is
-        2TOcHxhqJLlWmzmr7qtrUIw8G+NBupU=
-X-Google-Smtp-Source: AA6agR5Q5fNAf++EwcnGT+aUtNbo5VR4lcoJFKOiZDUzNHDq2SQdbUFAoXX/hZmTLTGpCI9mIh0iG0iegj8=
+        bh=KI/24KnUjxSS1U7iLRPsISVjUAiS4VwqnKygYJAuFJQ=;
+        b=gOfJkGtxEHf0mjNATlZz8cngzb0Sf6mB4Zpl04GICnLdrbMbytLVxsXcQt/0Sn8f79
+         bvX6lbocrDXK6GgVuEFKGHyfmpyjWtBiHMqQDnYJSIBiSEdWv7+OR+Zn7qoVHLv/ZJuB
+         ZfySJgbVAIBBf9ZrE21bj7eUfGKT/dAWFlcvoPVWbDpIUrdu7bqMJo4ABZX0/8emsBsV
+         jJNolUsM3Myu1Tq2tQSRgAz1KCkm/ZJcuCEWOgFr8VtDbXBm+RgWHVrtvK1hg/I61mJE
+         WOUorBKVxzUPHSpd2PDiJH98CvKE85ZGTcJTolnxRa8mBaJucdf/z0mGWsbUJD3DVtsW
+         Y8Ww==
+X-Gm-Message-State: ACgBeo0o0aQJNThzBk1RQNSsTPsYTiNwIHfnukbB/HnVHyWKb6xbZTuz
+        ifGhpfkMbLhzL35Iitm8JxsArS/4vDE=
+X-Google-Smtp-Source: AA6agR4TT/sFZAWS1sxeMwq+tA1u5u8XFM0JFPVRJ143pt+DvPA6Ezejoqz6+ncMlnZs5wqaMu/CkB1VqvM=
 X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a63:1854:0:b0:41d:e04b:44fc with SMTP id
- 20-20020a631854000000b0041de04b44fcmr22683994pgy.237.1661310126559; Tue, 23
- Aug 2022 20:02:06 -0700 (PDT)
+ (user=seanjc job=sendgmr) by 2002:a05:6a00:1a0b:b0:52f:3789:9604 with SMTP id
+ g11-20020a056a001a0b00b0052f37899604mr28287650pfv.61.1661310128053; Tue, 23
+ Aug 2022 20:02:08 -0700 (PDT)
 Reply-To: Sean Christopherson <seanjc@google.com>
-Date:   Wed, 24 Aug 2022 03:01:17 +0000
+Date:   Wed, 24 Aug 2022 03:01:18 +0000
 In-Reply-To: <20220824030138.3524159-1-seanjc@google.com>
-Message-Id: <20220824030138.3524159-16-seanjc@google.com>
+Message-Id: <20220824030138.3524159-17-seanjc@google.com>
 Mime-Version: 1.0
 References: <20220824030138.3524159-1-seanjc@google.com>
 X-Mailer: git-send-email 2.37.1.595.g718a3a8f04-goog
-Subject: [RFC PATCH v6 15/36] KVM: nVMX: WARN once and fail VM-Enter if eVMCS
- sees VMFUNC[63:32] != 0
+Subject: [RFC PATCH v6 16/36] KVM: nVMX: Support PERF_GLOBAL_CTRL with
+ enlightened VMCS
 From:   Sean Christopherson <seanjc@google.com>
 To:     Vitaly Kuznetsov <vkuznets@redhat.com>
 Cc:     kvm@vger.kernel.org
@@ -68,36 +68,114 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-WARN and reject nested VM-Enter if KVM is using eVMCS and manages to
-allow a non-zero value in the upper 32 bits of VM-function controls.  The
-eVMCS code assumes all inputs are 32-bit values and subtly drops the
-upper bits.  WARN instead of adding proper "support", it's unlikely the
-upper bits will be defined/used in the next decade.
+From: Vitaly Kuznetsov <vkuznets@redhat.com>
 
+Enlightened VMCS v1 got updated and now includes the required fields
+for loading PERF_GLOBAL_CTRL upon VMENTER/VMEXIT features. For KVM on
+Hyper-V enablement, KVM can just observe VMX control MSRs and use the
+features (with or without eVMCS) when possible.
+
+Hyper-V on KVM is messier as Windows 11 guests fail to boot if the
+controls are advertised and a new PV feature flag, CPUID.0x4000000A.EBX
+BIT(0), is not set.  Honor the Hyper-V CPUID feature flag to play nice
+with Windows guests.
+
+Signed-off-by: Vitaly Kuznetsov <vkuznets@redhat.com>
 Signed-off-by: Sean Christopherson <seanjc@google.com>
 ---
- arch/x86/kvm/vmx/evmcs.c | 8 ++++++++
- 1 file changed, 8 insertions(+)
+ arch/x86/kvm/hyperv.c    |  2 +-
+ arch/x86/kvm/vmx/evmcs.c | 32 ++++++++++++++++++++++++++++++++
+ arch/x86/kvm/vmx/evmcs.h |  7 ++-----
+ 3 files changed, 35 insertions(+), 6 deletions(-)
 
+diff --git a/arch/x86/kvm/hyperv.c b/arch/x86/kvm/hyperv.c
+index a7478b61088b..0adf4a437e85 100644
+--- a/arch/x86/kvm/hyperv.c
++++ b/arch/x86/kvm/hyperv.c
+@@ -2546,7 +2546,7 @@ int kvm_get_hv_cpuid(struct kvm_vcpu *vcpu, struct kvm_cpuid2 *cpuid,
+ 		case HYPERV_CPUID_NESTED_FEATURES:
+ 			ent->eax = evmcs_ver;
+ 			ent->eax |= HV_X64_NESTED_MSR_BITMAP;
+-
++			ent->ebx |= HV_X64_NESTED_EVMCS1_PERF_GLOBAL_CTRL;
+ 			break;
+ 
+ 		case HYPERV_CPUID_SYNDBG_VENDOR_AND_MAX_FUNCTIONS:
 diff --git a/arch/x86/kvm/vmx/evmcs.c b/arch/x86/kvm/vmx/evmcs.c
-index ce358b13b75b..bd1dcc077c85 100644
+index bd1dcc077c85..38ec41939cab 100644
 --- a/arch/x86/kvm/vmx/evmcs.c
 +++ b/arch/x86/kvm/vmx/evmcs.c
-@@ -486,6 +486,14 @@ int nested_evmcs_check_controls(struct kvm_vcpu *vcpu, struct vmcs12 *vmcs12)
- 					       vmcs12->vm_entry_controls)))
- 		return -EINVAL;
+@@ -442,6 +442,23 @@ u64 nested_evmcs_get_unsupported_ctrls(struct vcpu_vmx *vmx, u32 msr_index)
+ 	return 0;
+ }
  
-+	/*
-+	 * VM-Func controls are 64-bit, but KVM currently doesn't support any
-+	 * controls in bits 63:32, i.e. dropping those bits on the consistency
-+	 * check is intentional.
-+	 */
-+	if (WARN_ON_ONCE(vmcs12->vm_function_control >> 32))
-+		return -EINVAL;
++static bool evmcs_has_perf_global_ctrl(struct kvm_vcpu *vcpu)
++{
++	struct kvm_vcpu_hv *hv_vcpu = to_hv_vcpu(vcpu);
 +
- 	if (CC(!nested_evmcs_is_valid_controls(vcpu, EVMCS_VMFUNC,
- 					       vmcs12->vm_function_control)))
- 		return -EINVAL;
++	/*
++	 * PERF_GLOBAL_CTRL has a quirk where some Windows guests may fail to
++	 * boot if a PV CPUID feature flag is not also set.  Treat the fields
++	 * as unsupported if the flag is not set in guest CPUID.  This should
++	 * be called only for guest accesses, and all guest accesses should be
++	 * gated on Hyper-V being enabled and initialized.
++	 */
++	if (WARN_ON_ONCE(!hv_vcpu))
++		return false;
++
++	return hv_vcpu->cpuid_cache.nested_ebx & HV_X64_NESTED_EVMCS1_PERF_GLOBAL_CTRL;
++}
++
+ void nested_evmcs_filter_control_msr(struct kvm_vcpu *vcpu,
+ 				     struct msr_data *msr_info)
+ {
+@@ -455,6 +472,21 @@ void nested_evmcs_filter_control_msr(struct kvm_vcpu *vcpu,
+ 		return;
+ 
+ 	unsupported_ctrls = nested_evmcs_get_unsupported_ctrls(vmx, msr_info->index);
++	switch (msr_info->index) {
++	case MSR_IA32_VMX_EXIT_CTLS:
++	case MSR_IA32_VMX_TRUE_EXIT_CTLS:
++		if (!evmcs_has_perf_global_ctrl(vcpu))
++			unsupported_ctrls |= VM_EXIT_LOAD_IA32_PERF_GLOBAL_CTRL;
++		break;
++	case MSR_IA32_VMX_ENTRY_CTLS:
++	case MSR_IA32_VMX_TRUE_ENTRY_CTLS:
++		if (!evmcs_has_perf_global_ctrl(vcpu))
++			unsupported_ctrls |= VM_ENTRY_LOAD_IA32_PERF_GLOBAL_CTRL;
++		break;
++	default:
++		break;
++	}
++
+ 	if (msr_info->index == MSR_IA32_VMX_VMFUNC)
+ 		msr_info->data &= ~unsupported_ctrls;
+ 	else
+diff --git a/arch/x86/kvm/vmx/evmcs.h b/arch/x86/kvm/vmx/evmcs.h
+index e2b3aeee57ac..35b326386c50 100644
+--- a/arch/x86/kvm/vmx/evmcs.h
++++ b/arch/x86/kvm/vmx/evmcs.h
+@@ -43,8 +43,6 @@ DECLARE_STATIC_KEY_FALSE(enable_evmcs);
+  *	PLE_GAP                         = 0x00004020,
+  *	PLE_WINDOW                      = 0x00004022,
+  *	VMX_PREEMPTION_TIMER_VALUE      = 0x0000482E,
+- *      GUEST_IA32_PERF_GLOBAL_CTRL     = 0x00002808,
+- *      HOST_IA32_PERF_GLOBAL_CTRL      = 0x00002c04,
+  *
+  * Currently unsupported in KVM:
+  *	GUEST_IA32_RTIT_CTL		= 0x00002814,
+@@ -62,9 +60,8 @@ DECLARE_STATIC_KEY_FALSE(enable_evmcs);
+ 	 SECONDARY_EXEC_TSC_SCALING |					\
+ 	 SECONDARY_EXEC_PAUSE_LOOP_EXITING)
+ #define EVMCS1_UNSUPPORTED_VMEXIT_CTRL					\
+-	(VM_EXIT_LOAD_IA32_PERF_GLOBAL_CTRL |				\
+-	 VM_EXIT_SAVE_VMX_PREEMPTION_TIMER)
+-#define EVMCS1_UNSUPPORTED_VMENTRY_CTRL (VM_ENTRY_LOAD_IA32_PERF_GLOBAL_CTRL)
++	(VM_EXIT_SAVE_VMX_PREEMPTION_TIMER)
++#define EVMCS1_UNSUPPORTED_VMENTRY_CTRL (0)
+ #define EVMCS1_UNSUPPORTED_VMFUNC (VMX_VMFUNC_EPTP_SWITCHING)
+ 
+ /* TODO: explicitly define these */
 -- 
 2.37.1.595.g718a3a8f04-goog
 
