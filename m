@@ -2,52 +2,52 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id DD0425A03B6
-	for <lists+kvm@lfdr.de>; Thu, 25 Aug 2022 00:06:17 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 9379B5A03E9
+	for <lists+kvm@lfdr.de>; Thu, 25 Aug 2022 00:25:35 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S240876AbiHXWGL (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 24 Aug 2022 18:06:11 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38180 "EHLO
+        id S229718AbiHXWZe (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 24 Aug 2022 18:25:34 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40604 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S240870AbiHXWGI (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 24 Aug 2022 18:06:08 -0400
-Received: from mail-pg1-x52a.google.com (mail-pg1-x52a.google.com [IPv6:2607:f8b0:4864:20::52a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 37BBC7CAB4
-        for <kvm@vger.kernel.org>; Wed, 24 Aug 2022 15:06:06 -0700 (PDT)
-Received: by mail-pg1-x52a.google.com with SMTP id w13so11121602pgq.7
-        for <kvm@vger.kernel.org>; Wed, 24 Aug 2022 15:06:06 -0700 (PDT)
+        with ESMTP id S229652AbiHXWZd (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 24 Aug 2022 18:25:33 -0400
+Received: from mail-pg1-x52f.google.com (mail-pg1-x52f.google.com [IPv6:2607:f8b0:4864:20::52f])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 520FE66105
+        for <kvm@vger.kernel.org>; Wed, 24 Aug 2022 15:25:31 -0700 (PDT)
+Received: by mail-pg1-x52f.google.com with SMTP id v4so16212824pgi.10
+        for <kvm@vger.kernel.org>; Wed, 24 Aug 2022 15:25:31 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:from:to:cc;
-        bh=nJk22XJ7wOcvuCzoRyIGvhgc9X2oEpNpAmvbdRYC9rU=;
-        b=tUTOy/np2IJItYhuVGMMnsrVV+ydgrkxKJ+hYrUWTxm8CN+LahtWN5HL5rBpOxN1Ll
-         HaSnQBQJoGwN/gJUgT53N+Sb7uHbUmEO/A1JtN7AdFlLyLSBsAGc/pQb/p4j0mLzC6wM
-         8XTxdBUnMNqZvR46FJNZQb4s4rhCuTBLox4PkBdTgDZayH7cCle+3f5Xs9UdZwLzRy8U
-         qIOIjtPp24yLO6PZWUCpafE8jlzslVX/sYBHu1NBOtHHeu6v/qp9sdmVQTw5JK4/HavL
-         fTwLARDDsxC9bUo6LKINSnvapDHbN+ubIqs/NI4dqQ3opt4imjH19+mKz6dJLVL1xx/G
-         wkDA==
+        bh=qiO4ppR0T8BP0+C3qIBhC5C9nbxN/Jb16A7FZnxBJK8=;
+        b=n8ebhRfmV7w8m+N14bzabc1U8Q2dZYqaTiY5bBvktt2WetO+N8zs0ZFgyEmHogbQg7
+         PhogcQxRJ5maeKPNpcReR0Z01c4YTwopu7UtCkEXzGLtoAr5yJ6j13ga1V0RGpw3N2a+
+         e6SAvjX+GhCz4Bf29qHKByJwiIuNULbHVygmCygVocFemoGRfS7J20xF9F04oD1q0hZ7
+         5yh2sXq79plrZ8y+p/qsvhmppMBhk/QLP53vA22QdlpfEiDwH1P3W5HaE7Fi3QmZgWZ4
+         KCnlWFCnXM5FtxbOVZZb74rMlcn9c8+u5d2MOioA8boJPDsAwQ+fSr0cycGpnWJ0mdqN
+         bNxQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:x-gm-message-state:from:to:cc;
-        bh=nJk22XJ7wOcvuCzoRyIGvhgc9X2oEpNpAmvbdRYC9rU=;
-        b=z5LK2fu8x1hEEOpGJVrhMYoFxHa5UHOXcvRS2wwKx5qN9ZwURyuMqdZtSim83mcB98
-         tFP/4nM7GcG1LjagRz0wlAU/NwuHk+JtNQLagCnBBRAgOnWr6bHE1FoPFNW6viogFa0b
-         bPxJ7bBJT+1wZvnzFe/FVzmN7X+7FbZp8KB2Y7PDVyf+PwaAVy88ZW2O8P6a2wMv7hGZ
-         Ge3AQaL1Ozsg8PEgeEcr/rvx1TbywUO4GFbX22HXEAgrfSqvdC5tzDYtazC4a0rfFwMr
-         nkp0wMv5tLXl6LIvTsoi5YbCdGOg8BC14Vr0XvjTnwo07sH5Sb4Z70oMqI8CrzRXLony
-         6mEg==
-X-Gm-Message-State: ACgBeo1f/+VdSleZG0+O7EI6guI/bz8fMPmJLfuPkPxMtAd3DvtD16Jx
-        kr/6ksdv+LWTe0AY3ROVkJ8ttw==
-X-Google-Smtp-Source: AA6agR4nCg320FC5ogznqsjn0vPK5nuwzVFzRHaOV7SdrQv7eMc2KV4zVEPpadFc/buFs9qVKWflIA==
-X-Received: by 2002:a65:4cc7:0:b0:41a:4df2:4839 with SMTP id n7-20020a654cc7000000b0041a4df24839mr768027pgt.37.1661378765493;
-        Wed, 24 Aug 2022 15:06:05 -0700 (PDT)
+        bh=qiO4ppR0T8BP0+C3qIBhC5C9nbxN/Jb16A7FZnxBJK8=;
+        b=4bmstO3mvb2i7juD6BjytvyYGl0USfyLu+J6VBrmi9mYgPWdX+s0Hp5G8AN9ArjQJE
+         JpmHIxfspMTargwutiP25RBKYgMA/Xz4bNirXJY0VCebm7JjhXFoXr+w5o3/xKG9Q4fr
+         zq1MNCqgjLo9XRnYGOGc6UC5WVfoU7TnS1D2nJZtUtGY9pjVvmKf65otAh8joYeZFrOm
+         7gjMbdq1yNhfPbz+wQ0k/OeXh5R3JAqHx0chFEDQTrpkeQuckBv8lYgJWvXRsQvPMvFo
+         Zw1QdZR4HIpyQ7nz2M/b19ZK9DX/Wcfuni3dgoRFUa5/aycFa7L5PAPZXduMyojbAnBF
+         e5Uw==
+X-Gm-Message-State: ACgBeo0MZu6l4e4xm7R3yc4zOIAHeBWqFIDRMP5wSscwLOyv4XYppQNK
+        SLdUj2//+uviJTpY/9hCep7vmg==
+X-Google-Smtp-Source: AA6agR5nbWCZWOrhJIOYmflUtFmVApPFjLX2pDGDgrqrjv5V2LC99ew+kBuVcPLXgZvTrNBmvUiU/Q==
+X-Received: by 2002:a63:1e5f:0:b0:419:d6bf:b9d7 with SMTP id p31-20020a631e5f000000b00419d6bfb9d7mr789552pgm.593.1661379930521;
+        Wed, 24 Aug 2022 15:25:30 -0700 (PDT)
 Received: from google.com (7.104.168.34.bc.googleusercontent.com. [34.168.104.7])
-        by smtp.gmail.com with ESMTPSA id u9-20020a170902e5c900b00172fad607b3sm5234217plf.207.2022.08.24.15.06.05
+        by smtp.gmail.com with ESMTPSA id ij19-20020a170902ab5300b0016c50179b1esm13088867plb.152.2022.08.24.15.25.30
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 24 Aug 2022 15:06:05 -0700 (PDT)
-Date:   Wed, 24 Aug 2022 22:06:01 +0000
+        Wed, 24 Aug 2022 15:25:30 -0700 (PDT)
+Date:   Wed, 24 Aug 2022 22:25:26 +0000
 From:   Sean Christopherson <seanjc@google.com>
 To:     Maxim Levitsky <mlevitsk@redhat.com>
 Cc:     kvm@vger.kernel.org, Borislav Petkov <bp@alien8.de>,
@@ -60,15 +60,15 @@ Cc:     kvm@vger.kernel.org, Borislav Petkov <bp@alien8.de>,
         "H. Peter Anvin" <hpa@zytor.com>, Joerg Roedel <joro@8bytes.org>,
         Vitaly Kuznetsov <vkuznets@redhat.com>,
         Paolo Bonzini <pbonzini@redhat.com>
-Subject: Re: [PATCH v3 07/13] KVM: x86: emulator/smm: add structs for KVM's
- smram layout
-Message-ID: <YwagyQu5X8N/w8UV@google.com>
+Subject: Re: [PATCH v3 08/13] KVM: x86: emulator/smm: use smram structs in
+ the common code
+Message-ID: <YwalVvBbfL1u3H8b@google.com>
 References: <20220803155011.43721-1-mlevitsk@redhat.com>
- <20220803155011.43721-8-mlevitsk@redhat.com>
+ <20220803155011.43721-9-mlevitsk@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20220803155011.43721-8-mlevitsk@redhat.com>
+In-Reply-To: <20220803155011.43721-9-mlevitsk@redhat.com>
 X-Spam-Status: No, score=-14.5 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
         ENV_AND_HDR_SPF_MATCH,FSL_HELO_FAKE,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,
@@ -81,125 +81,278 @@ List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
 On Wed, Aug 03, 2022, Maxim Levitsky wrote:
-> Those structs will be used to read/write the smram state image.
-> 
-> Also document the differences between KVM's SMRAM layout and SMRAM
-> layout that is used by real Intel/AMD cpus.
+> Switch from using a raw array to 'union kvm_smram'.
 > 
 > Signed-off-by: Maxim Levitsky <mlevitsk@redhat.com>
 > ---
->  arch/x86/kvm/emulate.c     |   6 +
->  arch/x86/kvm/kvm_emulate.h | 218 +++++++++++++++++++++++++++++++++++++
->  arch/x86/kvm/x86.c         |   1 +
->  3 files changed, 225 insertions(+)
+>  arch/x86/include/asm/kvm_host.h |  5 +++--
+>  arch/x86/kvm/emulate.c          | 12 +++++++-----
+>  arch/x86/kvm/kvm_emulate.h      |  3 ++-
+>  arch/x86/kvm/svm/svm.c          |  8 ++++++--
+>  arch/x86/kvm/vmx/vmx.c          |  4 ++--
+>  arch/x86/kvm/x86.c              | 16 ++++++++--------
+>  6 files changed, 28 insertions(+), 20 deletions(-)
 > 
+> diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
+> index e8281d64a4315a..d752fabde94ad2 100644
+> --- a/arch/x86/include/asm/kvm_host.h
+> +++ b/arch/x86/include/asm/kvm_host.h
+> @@ -204,6 +204,7 @@ typedef enum exit_fastpath_completion fastpath_t;
+>  
+>  struct x86_emulate_ctxt;
+>  struct x86_exception;
+> +union kvm_smram;
+>  enum x86_intercept;
+>  enum x86_intercept_stage;
+>  
+> @@ -1600,8 +1601,8 @@ struct kvm_x86_ops {
+>  	void (*setup_mce)(struct kvm_vcpu *vcpu);
+>  
+>  	int (*smi_allowed)(struct kvm_vcpu *vcpu, bool for_injection);
+> -	int (*enter_smm)(struct kvm_vcpu *vcpu, char *smstate);
+> -	int (*leave_smm)(struct kvm_vcpu *vcpu, const char *smstate);
+> +	int (*enter_smm)(struct kvm_vcpu *vcpu, union kvm_smram *smram);
+> +	int (*leave_smm)(struct kvm_vcpu *vcpu, const union kvm_smram *smram);
+>  	void (*enable_smi_window)(struct kvm_vcpu *vcpu);
+>  
+>  	int (*mem_enc_ioctl)(struct kvm *kvm, void __user *argp);
 > diff --git a/arch/x86/kvm/emulate.c b/arch/x86/kvm/emulate.c
-> index 18551611cb13af..55d9328e6074a2 100644
+> index 55d9328e6074a2..610978d00b52b0 100644
 > --- a/arch/x86/kvm/emulate.c
 > +++ b/arch/x86/kvm/emulate.c
-> @@ -5864,3 +5864,9 @@ bool emulator_can_use_gpa(struct x86_emulate_ctxt *ctxt)
->  
->  	return true;
->  }
-> +
-> +void  __init kvm_emulator_init(void)
-> +{
-> +	__check_smram32_offsets();
-> +	__check_smram64_offsets();
-> +}
-
-...
-
-> +static inline void __check_smram64_offsets(void)
-
-Why double underscores?  Same question for the macros.
-
-> +{
-> +#define __CHECK_SMRAM64_OFFSET(field, offset) \
-> +	ASSERT_STRUCT_OFFSET(struct kvm_smram_state_64, field, offset - 0xFE00)
-> +
-> +	__CHECK_SMRAM64_OFFSET(es,			0xFE00);
-> +	__CHECK_SMRAM64_OFFSET(cs,			0xFE10);
-> +	__CHECK_SMRAM64_OFFSET(ss,			0xFE20);
-> +	__CHECK_SMRAM64_OFFSET(ds,			0xFE30);
-> +	__CHECK_SMRAM64_OFFSET(fs,			0xFE40);
-> +	__CHECK_SMRAM64_OFFSET(gs,			0xFE50);
-> +	__CHECK_SMRAM64_OFFSET(gdtr,			0xFE60);
-> +	__CHECK_SMRAM64_OFFSET(ldtr,			0xFE70);
-> +	__CHECK_SMRAM64_OFFSET(idtr,			0xFE80);
-> +	__CHECK_SMRAM64_OFFSET(tr,			0xFE90);
-> +	__CHECK_SMRAM64_OFFSET(io_restart_rip,		0xFEA0);
-> +	__CHECK_SMRAM64_OFFSET(io_restart_rcx,		0xFEA8);
-> +	__CHECK_SMRAM64_OFFSET(io_restart_rsi,		0xFEB0);
-> +	__CHECK_SMRAM64_OFFSET(io_restart_rdi,		0xFEB8);
-> +	__CHECK_SMRAM64_OFFSET(io_restart_dword,	0xFEC0);
-> +	__CHECK_SMRAM64_OFFSET(reserved1,		0xFEC4);
-> +	__CHECK_SMRAM64_OFFSET(io_inst_restart,		0xFEC8);
-> +	__CHECK_SMRAM64_OFFSET(auto_hlt_restart,	0xFEC9);
-> +	__CHECK_SMRAM64_OFFSET(reserved2,		0xFECA);
-> +	__CHECK_SMRAM64_OFFSET(efer,			0xFED0);
-> +	__CHECK_SMRAM64_OFFSET(svm_guest_flag,		0xFED8);
-> +	__CHECK_SMRAM64_OFFSET(svm_guest_vmcb_gpa,	0xFEE0);
-> +	__CHECK_SMRAM64_OFFSET(svm_guest_virtual_int,	0xFEE8);
-> +	__CHECK_SMRAM64_OFFSET(reserved3,		0xFEF0);
-> +	__CHECK_SMRAM64_OFFSET(smm_revison,		0xFEFC);
-> +	__CHECK_SMRAM64_OFFSET(smbase,			0xFF00);
-> +	__CHECK_SMRAM64_OFFSET(reserved4,		0xFF04);
-> +	__CHECK_SMRAM64_OFFSET(ssp,			0xFF18);
-> +	__CHECK_SMRAM64_OFFSET(svm_guest_pat,		0xFF20);
-> +	__CHECK_SMRAM64_OFFSET(svm_host_efer,		0xFF28);
-> +	__CHECK_SMRAM64_OFFSET(svm_host_cr4,		0xFF30);
-> +	__CHECK_SMRAM64_OFFSET(svm_host_cr3,		0xFF38);
-> +	__CHECK_SMRAM64_OFFSET(svm_host_cr0,		0xFF40);
-> +	__CHECK_SMRAM64_OFFSET(cr4,			0xFF48);
-> +	__CHECK_SMRAM64_OFFSET(cr3,			0xFF50);
-> +	__CHECK_SMRAM64_OFFSET(cr0,			0xFF58);
-> +	__CHECK_SMRAM64_OFFSET(dr7,			0xFF60);
-> +	__CHECK_SMRAM64_OFFSET(dr6,			0xFF68);
-> +	__CHECK_SMRAM64_OFFSET(rflags,			0xFF70);
-> +	__CHECK_SMRAM64_OFFSET(rip,			0xFF78);
-> +	__CHECK_SMRAM64_OFFSET(gprs,			0xFF80);
-> +#undef __CHECK_SMRAM64_OFFSET
-> +}
-> +
-> +union kvm_smram {
-> +	struct kvm_smram_state_64 smram64;
-> +	struct kvm_smram_state_32 smram32;
-> +	u8 bytes[512];
-> +};
-> +
-> +void  __init kvm_emulator_init(void);
-> +
-> +
-
-Unnecessary newline.
-
->  /* Host execution mode. */
->  #if defined(CONFIG_X86_32)
->  #define X86EMUL_MODE_HOST X86EMUL_MODE_PROT32
-> diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-> index 33560bfa0cac6e..bea7e5015d592e 100644
-> --- a/arch/x86/kvm/x86.c
-> +++ b/arch/x86/kvm/x86.c
-> @@ -13355,6 +13355,7 @@ EXPORT_TRACEPOINT_SYMBOL_GPL(kvm_vmgexit_msr_protocol_exit);
->  static int __init kvm_x86_init(void)
+> @@ -2594,16 +2594,18 @@ static int rsm_load_state_64(struct x86_emulate_ctxt *ctxt,
+>  static int em_rsm(struct x86_emulate_ctxt *ctxt)
 >  {
->  	kvm_mmu_x86_module_init();
-> +	kvm_emulator_init();
+>  	unsigned long cr0, cr4, efer;
+> -	char buf[512];
+> +	const union kvm_smram smram;
 
-Please don't add an init call that is nop at runtime, e.g. I was _really_ curious
-what initialization needed to be done in the emulator.  And it makes it look like
-kvm_x86_exit() forgot to call kvm_emulator_exit().
+This is blatantly wrong, ctxt->ops->read_phys() writes to the buffer.  I assume
+you did this to make it more difficult to modify the buffer after reading from
+guest memory, but IMO that's not worth misleading readers.
 
-em_rsm() already ends up with
+>  	u64 smbase;
+>  	int ret;
+>  
+> +	BUILD_BUG_ON(sizeof(smram) != 512);
+> +
+>  	if ((ctxt->ops->get_hflags(ctxt) & X86EMUL_SMM_MASK) == 0)
+>  		return emulate_ud(ctxt);
+>  
+>  	smbase = ctxt->ops->get_smbase(ctxt);
+>  
+> -	ret = ctxt->ops->read_phys(ctxt, smbase + 0xfe00, buf, sizeof(buf));
+> +	ret = ctxt->ops->read_phys(ctxt, smbase + 0xfe00, (void *)&smram, sizeof(smram));
 
-	BUILD_BUG_ON(sizeof(smram) != 512);
+The point of the union + bytes is so that KVM doesn't have to cast.
 
-just put all the assertions there.
+	kvm_vcpu_write_guest(vcpu, vcpu->arch.smbase + 0xfe00,
+			     smram.bytes, sizeof(smram));
 
+>  	if (ret != X86EMUL_CONTINUE)
+>  		return X86EMUL_UNHANDLEABLE;
+>  
+> @@ -2653,15 +2655,15 @@ static int em_rsm(struct x86_emulate_ctxt *ctxt)
+>  	 * state (e.g. enter guest mode) before loading state from the SMM
+>  	 * state-save area.
+>  	 */
+> -	if (ctxt->ops->leave_smm(ctxt, buf))
+> +	if (ctxt->ops->leave_smm(ctxt, &smram))
+>  		goto emulate_shutdown;
+>  
+>  #ifdef CONFIG_X86_64
+>  	if (emulator_has_longmode(ctxt))
+> -		ret = rsm_load_state_64(ctxt, buf);
+> +		ret = rsm_load_state_64(ctxt, (const char *)&smram);
+>  	else
+>  #endif
+> -		ret = rsm_load_state_32(ctxt, buf);
+> +		ret = rsm_load_state_32(ctxt, (const char *)&smram);
+
+Same thing here, though this is temporary.  And it's kinda silly, but I think it
+makes sense to avoid the cast here by tweaking the rsm_load_state_*() helpers to
+take "u8 *" instead of "char *".
+
+>  	if (ret != X86EMUL_CONTINUE)
+>  		goto emulate_shutdown;
+
+> diff --git a/arch/x86/kvm/svm/svm.c b/arch/x86/kvm/svm/svm.c
+> index 38f873cb6f2c14..688315d1dfabd1 100644
+> --- a/arch/x86/kvm/svm/svm.c
+> +++ b/arch/x86/kvm/svm/svm.c
+> @@ -4433,12 +4433,14 @@ static int svm_smi_allowed(struct kvm_vcpu *vcpu, bool for_injection)
+>  	return 1;
+>  }
+>  
+> -static int svm_enter_smm(struct kvm_vcpu *vcpu, char *smstate)
+> +static int svm_enter_smm(struct kvm_vcpu *vcpu, union kvm_smram *smram)
+>  {
+>  	struct vcpu_svm *svm = to_svm(vcpu);
+>  	struct kvm_host_map map_save;
+>  	int ret;
+>  
+> +	char *smstate = (char *)smram;
+
+Again temporary, but since this is new code, just make it
+
+	u8 *smstate = smram->bytes;
+
+> +
+>  	if (!is_guest_mode(vcpu))
+>  		return 0;
+>  
+> @@ -4480,7 +4482,7 @@ static int svm_enter_smm(struct kvm_vcpu *vcpu, char *smstate)
 >  	return 0;
 >  }
->  module_init(kvm_x86_init);
-> -- 
-> 2.26.3
-> 
+>  
+> -static int svm_leave_smm(struct kvm_vcpu *vcpu, const char *smstate)
+> +static int svm_leave_smm(struct kvm_vcpu *vcpu, const union kvm_smram *smram)
+>  {
+>  	struct vcpu_svm *svm = to_svm(vcpu);
+>  	struct kvm_host_map map, map_save;
+> @@ -4488,6 +4490,8 @@ static int svm_leave_smm(struct kvm_vcpu *vcpu, const char *smstate)
+>  	struct vmcb *vmcb12;
+>  	int ret;
+>  
+> +	const char *smstate = (const char *)smram;
+> +
+
+And here.
+
+>  	if (!guest_cpuid_has(vcpu, X86_FEATURE_LM))
+>  		return 0;
+>  
+
+E.g. this compiles cleanly on top
+
+---
+ arch/x86/kvm/emulate.c | 17 +++++++++--------
+ arch/x86/kvm/svm/svm.c |  4 ++--
+ arch/x86/kvm/x86.c     |  7 ++++---
+ 3 files changed, 15 insertions(+), 13 deletions(-)
+
+diff --git a/arch/x86/kvm/emulate.c b/arch/x86/kvm/emulate.c
+index dd0a08af1dd9..b2ef63cf6cff 100644
+--- a/arch/x86/kvm/emulate.c
++++ b/arch/x86/kvm/emulate.c
+@@ -2357,7 +2357,7 @@ static void rsm_set_desc_flags(struct desc_struct *desc, u32 flags)
+ 	desc->type = (flags >>  8) & 15;
+ }
+
+-static int rsm_load_seg_32(struct x86_emulate_ctxt *ctxt, const char *smstate,
++static int rsm_load_seg_32(struct x86_emulate_ctxt *ctxt, const u8 *smstate,
+ 			   int n)
+ {
+ 	struct desc_struct desc;
+@@ -2379,7 +2379,7 @@ static int rsm_load_seg_32(struct x86_emulate_ctxt *ctxt, const char *smstate,
+ }
+
+ #ifdef CONFIG_X86_64
+-static int rsm_load_seg_64(struct x86_emulate_ctxt *ctxt, const char *smstate,
++static int rsm_load_seg_64(struct x86_emulate_ctxt *ctxt, const u8 *smstate,
+ 			   int n)
+ {
+ 	struct desc_struct desc;
+@@ -2446,7 +2446,7 @@ static int rsm_enter_protected_mode(struct x86_emulate_ctxt *ctxt,
+ }
+
+ static int rsm_load_state_32(struct x86_emulate_ctxt *ctxt,
+-			     const char *smstate)
++			     const u8 *smstate)
+ {
+ 	struct desc_struct desc;
+ 	struct desc_ptr dt;
+@@ -2507,7 +2507,7 @@ static int rsm_load_state_32(struct x86_emulate_ctxt *ctxt,
+
+ #ifdef CONFIG_X86_64
+ static int rsm_load_state_64(struct x86_emulate_ctxt *ctxt,
+-			     const char *smstate)
++			     const u8 *smstate)
+ {
+ 	struct desc_struct desc;
+ 	struct desc_ptr dt;
+@@ -2580,7 +2580,7 @@ static int rsm_load_state_64(struct x86_emulate_ctxt *ctxt,
+ static int em_rsm(struct x86_emulate_ctxt *ctxt)
+ {
+ 	unsigned long cr0, cr4, efer;
+-	const union kvm_smram smram;
++	union kvm_smram smram;
+ 	u64 smbase;
+ 	int ret;
+
+@@ -2591,7 +2591,8 @@ static int em_rsm(struct x86_emulate_ctxt *ctxt)
+
+ 	smbase = ctxt->ops->get_smbase(ctxt);
+
+-	ret = ctxt->ops->read_phys(ctxt, smbase + 0xfe00, (void *)&smram, sizeof(smram));
++	ret = ctxt->ops->read_phys(ctxt, smbase + 0xfe00,
++				   smram.bytes, sizeof(smram));
+ 	if (ret != X86EMUL_CONTINUE)
+ 		return X86EMUL_UNHANDLEABLE;
+
+@@ -2646,10 +2647,10 @@ static int em_rsm(struct x86_emulate_ctxt *ctxt)
+
+ #ifdef CONFIG_X86_64
+ 	if (emulator_has_longmode(ctxt))
+-		ret = rsm_load_state_64(ctxt, (const char *)&smram);
++		ret = rsm_load_state_64(ctxt, smram.bytes);
+ 	else
+ #endif
+-		ret = rsm_load_state_32(ctxt, (const char *)&smram);
++		ret = rsm_load_state_32(ctxt, smram.bytes);
+
+ 	if (ret != X86EMUL_CONTINUE)
+ 		goto emulate_shutdown;
+diff --git a/arch/x86/kvm/svm/svm.c b/arch/x86/kvm/svm/svm.c
+index 5d748b10c5be..ecf11c8a052e 100644
+--- a/arch/x86/kvm/svm/svm.c
++++ b/arch/x86/kvm/svm/svm.c
+@@ -4439,7 +4439,7 @@ static int svm_enter_smm(struct kvm_vcpu *vcpu, union kvm_smram *smram)
+ 	struct kvm_host_map map_save;
+ 	int ret;
+
+-	char *smstate = (char *)smram;
++	u8 *smstate = smram->bytes;
+
+ 	if (!is_guest_mode(vcpu))
+ 		return 0;
+@@ -4490,7 +4490,7 @@ static int svm_leave_smm(struct kvm_vcpu *vcpu, const union kvm_smram *smram)
+ 	struct vmcb *vmcb12;
+ 	int ret;
+
+-	const char *smstate = (const char *)smram;
++	const char *smstate = smram->bytes;
+
+ 	if (!guest_cpuid_has(vcpu, X86_FEATURE_LM))
+ 		return 0;
+diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+index ca558674b07b..09268c2335a8 100644
+--- a/arch/x86/kvm/x86.c
++++ b/arch/x86/kvm/x86.c
+@@ -9985,10 +9985,10 @@ static void enter_smm(struct kvm_vcpu *vcpu)
+ 	memset(smram.bytes, 0, sizeof(smram.bytes));
+ #ifdef CONFIG_X86_64
+ 	if (guest_cpuid_has(vcpu, X86_FEATURE_LM))
+-		enter_smm_save_state_64(vcpu, (char *)&smram);
++		enter_smm_save_state_64(vcpu, smram.bytes);
+ 	else
+ #endif
+-		enter_smm_save_state_32(vcpu, (char *)&smram);
++		enter_smm_save_state_32(vcpu, smram.bytes);
+
+ 	/*
+ 	 * Give enter_smm() a chance to make ISA-specific changes to the vCPU
+@@ -9998,7 +9998,8 @@ static void enter_smm(struct kvm_vcpu *vcpu)
+ 	static_call(kvm_x86_enter_smm)(vcpu, &smram);
+
+ 	kvm_smm_changed(vcpu, true);
+-	kvm_vcpu_write_guest(vcpu, vcpu->arch.smbase + 0xfe00, &smram, sizeof(smram));
++	kvm_vcpu_write_guest(vcpu, vcpu->arch.smbase + 0xfe00,
++			     smram.bytes, sizeof(smram));
+
+ 	if (static_call(kvm_x86_get_nmi_mask)(vcpu))
+ 		vcpu->arch.hflags |= HF_SMM_INSIDE_NMI_MASK;
+
+base-commit: 0708faef18ff51a2b2dba546961d843223331138
+--
+
