@@ -2,154 +2,207 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 681285A0219
-	for <lists+kvm@lfdr.de>; Wed, 24 Aug 2022 21:29:44 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id D3EDD5A0317
+	for <lists+kvm@lfdr.de>; Wed, 24 Aug 2022 22:57:27 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235377AbiHXT3F (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 24 Aug 2022 15:29:05 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53674 "EHLO
+        id S240543AbiHXU5Z (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 24 Aug 2022 16:57:25 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41380 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S239936AbiHXT3C (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 24 Aug 2022 15:29:02 -0400
-Received: from mail-lj1-x22e.google.com (mail-lj1-x22e.google.com [IPv6:2a00:1450:4864:20::22e])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AF85F78BCB
-        for <kvm@vger.kernel.org>; Wed, 24 Aug 2022 12:29:00 -0700 (PDT)
-Received: by mail-lj1-x22e.google.com with SMTP id q18so16356658ljg.12
-        for <kvm@vger.kernel.org>; Wed, 24 Aug 2022 12:29:00 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc;
-        bh=ud6LSmJPhrEe1O3tH9bfACVlWJ+Fj1pwj346rUu8aFw=;
-        b=Z2jM1L6bkJVPjP2DKAJljcsyrOOrVaGqJLAqzlKrZ639M1ou4W+gt6VEnZfM9GIMCF
-         SeUBSTwTEy/ugCEIoJSMg5gpQiXV/YW8/zFDEiaz/lWm7DXElQFdhc17HKi9O+Y2CZkL
-         LhgOKoPXstdnGWEeMhiyY+aOF3HfM663rHuZK+6w6NIL9v3qCSiPAEZX+aiF0FQg3jWf
-         pv7cfJk+q0TMm2WecwsV5HTEjCEihc3UL8NuZ65x8xj93UAjZQQwIdmU3F/yvrkvP4aa
-         azCkdsSTY4R3TVzoCkUDFq7dX8KwGtjjKyO7z02ZdXK1aG1zPFzRiwWJpd0Ss4+9b9BD
-         INIw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc;
-        bh=ud6LSmJPhrEe1O3tH9bfACVlWJ+Fj1pwj346rUu8aFw=;
-        b=dgxEUSW5/9jMUfgdy3uRJ+Sp6EHP2ybEEgM8AAAGRTguAU+7a9LW3ZUIPVA3AEg8NQ
-         WJHXJQYeiizPCC+tZ6lmfhbEAaVLVUOsxtThPtXc1q7DlNvmfiOChNwtJ0nN0KVeLsgL
-         hx/qf0GQHpFgLs3VHrrapTuhxAnS95kv1jv6I7SJwogMNRtBUg9aLBI/Oo2YcKMzK4RF
-         +xt1eHapHcG4F0QoMuLGVbvfADpP7CzSo+a8J7akIUQvb+NO98iBYZ4Nh8VLnK0Lfvcg
-         w5fSHerQ1fYDtNKVNkm5PrCskCTmaRUaRA2Fie8xyn1Zbu5RG4qwuG55ne1LKPlxk1n0
-         IoVQ==
-X-Gm-Message-State: ACgBeo04p+5dU2A8U/W6uUEO3u3JDRwNX1c8fglYQzXLN9eWXUtYpl/3
-        qxHqxs+CoPqAjilxVx+I3sW+mmQ50o9dk6RPtiKzNQ==
-X-Google-Smtp-Source: AA6agR6qzB+SDh82GOibU+ibPmxm9norlNaWBI74hZciCbfvsiOsZDachVztTY0d9cfRDTTu6O2cHU/LynXQAo0SUJw=
-X-Received: by 2002:a2e:9ad2:0:b0:261:cbdd:1746 with SMTP id
- p18-20020a2e9ad2000000b00261cbdd1746mr181526ljj.486.1661369338801; Wed, 24
- Aug 2022 12:28:58 -0700 (PDT)
-MIME-Version: 1.0
-References: <20220307213356.2797205-1-brijesh.singh@amd.com>
- <20220307213356.2797205-44-brijesh.singh@amd.com> <CAAH4kHYm1BhjJXUMH12kzR0Xun=fUTj-3Hy6At0XR_09Bf0Ccw@mail.gmail.com>
-In-Reply-To: <CAAH4kHYm1BhjJXUMH12kzR0Xun=fUTj-3Hy6At0XR_09Bf0Ccw@mail.gmail.com>
-From:   Peter Gonda <pgonda@google.com>
-Date:   Wed, 24 Aug 2022 13:28:47 -0600
-Message-ID: <CAMkAt6oKQ3CnmNdrJLMWreExkN56t9vs=B883_JD+HtiNYw9HA@mail.gmail.com>
-Subject: Re: [PATCH v12 43/46] virt: Add SEV-SNP guest driver
-To:     Dionna Amalie Glaze <dionnaglaze@google.com>
-Cc:     Brijesh Singh <brijesh.singh@amd.com>,
-        "the arch/x86 maintainers" <x86@kernel.org>,
-        LKML <linux-kernel@vger.kernel.org>,
-        "open list:X86 KVM CPUs" <kvm@vger.kernel.org>,
-        linux-efi <linux-efi@vger.kernel.org>,
-        platform-driver-x86@vger.kernel.org, linux-coco@lists.linux.dev,
-        Linux Memory Management List <linux-mm@kvack.org>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Joerg Roedel <jroedel@suse.de>,
-        Tom Lendacky <thomas.lendacky@amd.com>,
-        "H. Peter Anvin" <hpa@zytor.com>, Ard Biesheuvel <ardb@kernel.org>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Sean Christopherson <seanjc@google.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Jim Mattson <jmattson@google.com>,
-        Andy Lutomirski <luto@kernel.org>,
-        Dave Hansen <dave.hansen@linux.intel.com>,
-        Sergio Lopez <slp@redhat.com>,
-        Peter Zijlstra <peterz@infradead.org>,
-        Srinivas Pandruvada <srinivas.pandruvada@linux.intel.com>,
-        David Rientjes <rientjes@google.com>,
-        Dov Murik <dovmurik@linux.ibm.com>,
-        Tobin Feldman-Fitzthum <tobin@ibm.com>,
-        Borislav Petkov <bp@alien8.de>,
-        Michael Roth <michael.roth@amd.com>,
-        Vlastimil Babka <vbabka@suse.cz>,
-        "Kirill A . Shutemov" <kirill.shutemov@linux.intel.com>,
-        Andi Kleen <ak@linux.intel.com>,
-        "Dr . David Alan Gilbert" <dgilbert@redhat.com>,
-        brijesh.ksingh@gmail.com, Tony Luck <tony.luck@intel.com>,
-        Marc Orr <marcorr@google.com>,
-        Kuppuswamy Sathyanarayanan 
-        <sathyanarayanan.kuppuswamy@linux.intel.com>
-Content-Type: text/plain; charset="UTF-8"
-X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-        T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL
-        autolearn=unavailable autolearn_force=no version=3.4.6
+        with ESMTP id S230515AbiHXU5X (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 24 Aug 2022 16:57:23 -0400
+Received: from ams.source.kernel.org (ams.source.kernel.org [IPv6:2604:1380:4601:e00::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0DF9A59267;
+        Wed, 24 Aug 2022 13:57:19 -0700 (PDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by ams.source.kernel.org (Postfix) with ESMTPS id BE31CB826B6;
+        Wed, 24 Aug 2022 20:57:17 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6E7E5C433D6;
+        Wed, 24 Aug 2022 20:57:16 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1661374636;
+        bh=qM0hODjskpwb8x7NIPhJ6OvYS94mu8gyRtyJsdL5qbc=;
+        h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+        b=WKWbhn9ebHbZ2iDprTkgAxT0HGOGVyijsRF2LE8IUHP7lZK/KRbPBixXcC6IMyQ/o
+         IiWahFF8wh+Of+babvKKdHCxBt/nrCu30JKP94TZkTDUprcFCLN1dYa3XtehR+fmHA
+         /S4DR1i/6njbLlr/PyQRJ1eiA/dkz6Z808gZSZyGwoMyWwm42hAnE1rhEEl1NP9CIL
+         Tnou1IeIhBIzmu3HtFyRuEvTbxEg1PIaM6UzVthy3jp6ROfmJRpTSFQHGS7aDEYA3k
+         gEVg14UNCy9692EJv7aPsTsvuPiawl/cUTzj46qSd6xFAT71gXhD8QGNy9tXKAgTJd
+         zVlmsMZSUyZwg==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=why.misterjones.org)
+        by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+        (Exim 4.95)
+        (envelope-from <maz@kernel.org>)
+        id 1oQxR4-005Wpl-4q;
+        Wed, 24 Aug 2022 21:57:14 +0100
+Date:   Wed, 24 Aug 2022 21:57:13 +0100
+Message-ID: <877d2xweae.wl-maz@kernel.org>
+From:   Marc Zyngier <maz@kernel.org>
+To:     Peter Xu <peterx@redhat.com>
+Cc:     Gavin Shan <gshan@redhat.com>, kvmarm@lists.cs.columbia.edu,
+        linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org, linux-doc@vger.kernel.org,
+        linux-kselftest@vger.kernel.org, pbonzini@redhat.com,
+        corbet@lwn.net, james.morse@arm.com, alexandru.elisei@arm.com,
+        suzuki.poulose@arm.com, oliver.upton@linux.dev,
+        catalin.marinas@arm.com, will@kernel.org, shuah@kernel.org,
+        seanjc@google.com, dmatlack@google.com, bgardon@google.com,
+        ricarkol@google.com, zhenyzha@redhat.com, shan.gavin@gmail.com
+Subject: Re: [PATCH v1 1/5] KVM: arm64: Enable ring-based dirty memory tracking
+In-Reply-To: <YwZQHqS5DZBloYPZ@xz-m1.local>
+References: <87lerkwtm5.wl-maz@kernel.org>
+        <41fb5a1f-29a9-e6bb-9fab-4c83a2a8fce5@redhat.com>
+        <87fshovtu0.wl-maz@kernel.org>
+        <171d0159-4698-354b-8b2f-49d920d03b1b@redhat.com>
+        <YwTc++Lz6lh3aR4F@xz-m1.local>
+        <87bksawz0w.wl-maz@kernel.org>
+        <YwVEoM1pj2MPCELp@xz-m1.local>
+        <878rnewpaw.wl-maz@kernel.org>
+        <YwVgaGp3HOGzC8k2@xz-m1.local>
+        <87y1vdr98o.wl-maz@kernel.org>
+        <YwZQHqS5DZBloYPZ@xz-m1.local>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/27.1
+ (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: peterx@redhat.com, gshan@redhat.com, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org, linux-kernel@vger.kernel.org, linux-doc@vger.kernel.org, linux-kselftest@vger.kernel.org, pbonzini@redhat.com, corbet@lwn.net, james.morse@arm.com, alexandru.elisei@arm.com, suzuki.poulose@arm.com, oliver.upton@linux.dev, catalin.marinas@arm.com, will@kernel.org, shuah@kernel.org, seanjc@google.com, dmatlack@google.com, bgardon@google.com, ricarkol@google.com, zhenyzha@redhat.com, shan.gavin@gmail.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+X-Spam-Status: No, score=-7.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_HI,
+        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Aug 24, 2022 at 12:01 PM Dionna Amalie Glaze
-<dionnaglaze@google.com> wrote:
->
-> Apologies for the necropost, but I noticed strange behavior testing my
-> own Golang-based wrapper around the /dev/sev-guest driver.
->
-> > +
-> > +static int handle_guest_request(struct snp_guest_dev *snp_dev, u64 exit_code, int msg_ver,
-> > +                               u8 type, void *req_buf, size_t req_sz, void *resp_buf,
-> > +                               u32 resp_sz, __u64 *fw_err)
-> > +{
-> > +       unsigned long err;
-> > +       u64 seqno;
-> > +       int rc;
-> > +
-> > +       /* Get message sequence and verify that its a non-zero */
-> > +       seqno = snp_get_msg_seqno(snp_dev);
-> > +       if (!seqno)
-> > +               return -EIO;
-> > +
-> > +       memset(snp_dev->response, 0, sizeof(struct snp_guest_msg));
-> > +
-> > +       /* Encrypt the userspace provided payload */
-> > +       rc = enc_payload(snp_dev, seqno, msg_ver, type, req_buf, req_sz);
-> > +       if (rc)
-> > +               return rc;
-> > +
-> > +       /* Call firmware to process the request */
-> > +       rc = snp_issue_guest_request(exit_code, &snp_dev->input, &err);
-> > +       if (fw_err)
-> > +               *fw_err = err;
-> > +
-> > +       if (rc)
-> > +               return rc;
-> > +
->
-> The fw_err is written back regardless of rc, so since err is
-> uninitialized, you can end up with garbage written back. I've worked
-> around this by only caring about fw_err when the result is -EIO, but
-> thought that I should bring this up.
+On Wed, 24 Aug 2022 17:21:50 +0100,
+Peter Xu <peterx@redhat.com> wrote:
+> 
+> On Wed, Aug 24, 2022 at 03:45:11PM +0100, Marc Zyngier wrote:
+> > On Wed, 24 Aug 2022 00:19:04 +0100,
+> > Peter Xu <peterx@redhat.com> wrote:
+> > > 
+> > > On Tue, Aug 23, 2022 at 11:47:03PM +0100, Marc Zyngier wrote:
+> > > > Atomicity doesn't guarantee ordering, unfortunately.
+> > > 
+> > > Right, sorry to be misleading.  The "atomicity" part I was trying to say
+> > > the kernel will always see consistent update on the fields.
+> > >
+> > > The ordering should also be guaranteed, because things must happen with
+> > > below sequence:
+> > > 
+> > >   (1) kernel publish dirty GFN data (slot, offset)
+> > >   (2) kernel publish dirty GFN flag (set to DIRTY)
+> > >   (3) user sees DIRTY, collects (slots, offset)
+> > >   (4) user sets it to RESET
+> > >   (5) kernel reads RESET
+> > 
+> > Maybe. Maybe not. The reset could well be sitting in the CPU write
+> > buffer for as long as it wants and not be seen by the kernel if the
+> > read occurs on another CPU. And that's the crucial bit: single-CPU is
+> > fine, but cross CPU isn't. Unfortunately, the userspace API is per-CPU
+> > on collection, and global on reset (this seems like a bad decision,
+> > but it is too late to fix this).
+> 
+> Regarding the last statement, that's something I had question too and
+> discussed with Paolo, even though at that time it's not a outcome of
+> discussing memory ordering issues.
+> 
+> IIUC the initial design was trying to avoid tlb flush flood when vcpu
+> number is large (each RESET per ring even for one page will need all vcpus
+> to flush, so O(N^2) flushing needed). With global RESET it's O(N).  So
+> it's kind of a trade-off, and indeed until now I'm not sure which one is
+> better.  E.g., with per-ring reset, we can have locality too in userspace,
+> e.g. the vcpu thread might be able to recycle without holding global locks.
 
-I also noticed that we use a u64 in snp_guest_request_ioctl.fw_err and
-u32 in sev_issue_cmd.error when these should be errors from the
-sev_ret_code enum IIUC.
+I don't get that. On x86, each CPU must perform the TLB invalidation
+(there is an IPI for that). So whether you do a per-CPU scan of the
+ring or a global scan is irrelevant: each entry you find in any of the
+rings must result in a global invalidation, since you've updated the
+PTE to make the page RO.
 
-We can fix snp_issue_guest_request() to set |fw_err| to zero when it
-returns 0 but what should we return to userspace if we encounter an
-error that prevents the FW from even being called? In ` crypto: ccp -
-Ensure psp_ret is always init'd in __sev_platform_init_locked()` we
-set the return to -1 so we could continue that convection here and
-better codify it in the sev_ret_code enum.
+The same is true on ARM, except that the broadcast is done in HW
+instead of being tracked in SW.
+
+Buy anyway, this is all moot. The API is what it is, and it isn't
+going to change any time soon. All we can do is add some
+clarifications to the API for the more relaxed architectures, and make
+sure the kernel behaves accordingly.
+
+[...]
+
+> > It may be safe, but it isn't what the userspace API promises.
+> 
+> The document says:
+> 
+>   After processing one or more entries in the ring buffer, userspace calls
+>   the VM ioctl KVM_RESET_DIRTY_RINGS to notify the kernel about it, so that
+>   the kernel will reprotect those collected GFNs.  Therefore, the ioctl
+>   must be called *before* reading the content of the dirty pages.
+> 
+> I'd say it's not an explicit promise, but I think I agree with you that at
+> least it's unclear on the behavior.
+
+This is the least problematic part of the documentation. The bit I
+literally choke on is this:
+
+<quote>
+It's not necessary for userspace to harvest the all dirty GFNs at once.
+However it must collect the dirty GFNs in sequence, i.e., the userspace
+program cannot skip one dirty GFN to collect the one next to it.
+</quote>
+
+This is the core of the issue. Without ordering rules, the consumer on
+the other side cannot observe the updates correctly, even if userspace
+follows the above to the letter. Of course, the kernel itself must do
+the right thing (I guess it amounts to the kernel doing a
+load-acquire, and userspace doing a store-release -- effectively
+emulating x86...).
+
+> Since we have a global recycle mechanism, most likely the app (e.g. current
+> qemu impl) will use the same thread to collect/reset dirty GFNs, and
+> trigger the RESET ioctl().  In that case it's safe, IIUC, because no
+> cross-core ops.
+> 
+> QEMU even guarantees this by checking it (kvm_dirty_ring_reap_locked):
+> 
+>     if (total) {
+>         ret = kvm_vm_ioctl(s, KVM_RESET_DIRTY_RINGS);
+>         assert(ret == total);
+>     }
+> 
+> I think the assert() should never trigger as mentioned above.  But ideally
+> maybe it should just be a loop until cleared gfns match total.
+
+Right. If userspace calls the ioctl on every vcpu, then things should
+work correctly. It is only that the overhead is higher than what it
+should be if multiple vcpus perform a reset at the same time.
 
 >
-> --
-> -Dionna Glaze, PhD (she/her)
+> > In other words, without further straightening of the API, this doesn't
+> > work as expected on relaxed memory architectures. So before this gets
+> > enabled on arm64, this whole ordering issue must be addressed.
+> 
+> How about adding some more documentation for KVM_RESET_DIRTY_RINGS on the
+> possibility of recycling partial of the pages, especially when collection
+> and the ioctl() aren't done from the same thread?
+
+I'd rather tell people about the ordering rules. That will come at
+zero cost on x86.
+
+> Any suggestions will be greatly welcomed.
+
+I'll write a couple of patch when I get the time, most likely next
+week. Gavin will hopefully be able to take them as part of his series.
+
+	M.
+
+-- 
+Without deviation from the norm, progress is not possible.
