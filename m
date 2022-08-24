@@ -2,54 +2,57 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 5DD4459F1AA
+	by mail.lfdr.de (Postfix) with ESMTP id 1523559F1A9
 	for <lists+kvm@lfdr.de>; Wed, 24 Aug 2022 05:03:37 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234406AbiHXDDf (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 23 Aug 2022 23:03:35 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43766 "EHLO
+        id S234330AbiHXDDd (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 23 Aug 2022 23:03:33 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41596 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234107AbiHXDC4 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        with ESMTP id S234196AbiHXDC4 (ORCPT <rfc822;kvm@vger.kernel.org>);
         Tue, 23 Aug 2022 23:02:56 -0400
-Received: from mail-pf1-x44a.google.com (mail-pf1-x44a.google.com [IPv6:2607:f8b0:4864:20::44a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5CE9580024
-        for <kvm@vger.kernel.org>; Tue, 23 Aug 2022 20:01:41 -0700 (PDT)
-Received: by mail-pf1-x44a.google.com with SMTP id g9-20020a056a00078900b005366c5fa183so3504307pfu.12
-        for <kvm@vger.kernel.org>; Tue, 23 Aug 2022 20:01:41 -0700 (PDT)
+Received: from mail-pf1-x449.google.com (mail-pf1-x449.google.com [IPv6:2607:f8b0:4864:20::449])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0703480353
+        for <kvm@vger.kernel.org>; Tue, 23 Aug 2022 20:01:43 -0700 (PDT)
+Received: by mail-pf1-x449.google.com with SMTP id o17-20020a056a0015d100b00536fc93b990so1822971pfu.14
+        for <kvm@vger.kernel.org>; Tue, 23 Aug 2022 20:01:43 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
-        h=cc:to:from:subject:mime-version:message-id:date:reply-to:from:to:cc;
-        bh=r91HPYYSFxJTMnEEF3lOsKE2BxxHHOfpoW4lW10n2hI=;
-        b=YLFmtV1Aa9GbipE/ETNTMxuY9ueT/8rwnpjs+PH17Oo9mXeApnc9/gr6d4sO4DqrVF
-         eRkeSv8ZT19EZ84Km8xgl6Hx7l81c0W0/v5Dunm+WonMgpQAbcf/5BIlNqDJWM2SMsJN
-         GNDTGORZJAdq3jxwAOXMBBTA+t6oYnLvEuwdSEzWqh7V9jArwaqlIT0wj8NbQgtRjtqM
-         H907sRUgrJwnKFUuLLl4m63Rh8M2gTMZ8CB9Gdj4zgDQAAbA5gd/CV5Vao8X0TjTuZ6O
-         Ldf68WV047iZrpE+lV+g0qO4peeI2lCjjKBgO3zqQNMJFKc+JcIAkALGSlykdWhgU3C4
-         snqw==
+        h=cc:to:from:subject:references:mime-version:message-id:in-reply-to
+         :date:reply-to:from:to:cc;
+        bh=oUV8wY28pMmJmcPl2/RqP8e8EGWbztH4dG0hihA7UIA=;
+        b=A2E6f34ENqSDSsBvaEMa64oIPMDPWf77P5uOhkFl/r4lyOba5sWFMSPU/mbHHxKzig
+         A3l4IQBzoo4nzd6j7TaNBCu+rB7XUQCPIDqBzfRFDXpnkIR1pIcWt9r7UQRbBt56FbrG
+         12Na5/33ve0BDBX6vg6M4f+T7n44ifMGEAJi4ds4T49CD1T/A/wfqXlvi7U5QNe+e6tv
+         D2vsOi1ur+668GGhbj4hsuHG5Zdr+JftGVOchEwj7deGN3pLaj3JmF2QIPkb61Gqdedj
+         O/Qlh5zETCohtjVKRztWPKDQuExLXDY8S08PnpLCy4UR1cNT1r2bj+KbtzriGvAvGtbm
+         AeFA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=cc:to:from:subject:mime-version:message-id:date:reply-to
-         :x-gm-message-state:from:to:cc;
-        bh=r91HPYYSFxJTMnEEF3lOsKE2BxxHHOfpoW4lW10n2hI=;
-        b=3rlS0VRvWUXaZXFa7fDQ9pcxiu63WmxtMC00cTr+3lsKU2526guKCUXX6WFUl/FSWk
-         8ljwunuJ0WzeAsu5QT5vX5iDIZA3WLlGBrnfCopGETO09xvStaXzw4PKJPK7LZNdS/Ny
-         B/7ZAFFKQuZ0wTW7ebkRLkGdXeLsFKmyGPFOG9qkPW1kzWGrfc+ma6+YW2tCxryE/hQ0
-         hbpvBTiWQjPUWy30EAvek8YydaYT3JAp1sOhCUcH493dAKFy/L8jDQJ9RBqFssKWGm3s
-         6m7iHhPGeo+Qj0vceuhT3G2BZLhoY3FEO+BLh0jdCCbH5ptOTQObplpD0Z/axmLcV/yk
-         Olbg==
-X-Gm-Message-State: ACgBeo1fcBiTkta/2V6l4FXLbumnBsKDrwZSvxtshAzypmT4W5Z8P948
-        7yj1DwPrt+zpTvQqfk2fN1NWH5VqMHc=
-X-Google-Smtp-Source: AA6agR4Z4J5nWYOpFczf3c/pjLjed/4kSGGe0KAychpW+Qr+UZ+TfTCwsu25A4sCxRr99CeYwlVoImgz4wk=
+        h=cc:to:from:subject:references:mime-version:message-id:in-reply-to
+         :date:reply-to:x-gm-message-state:from:to:cc;
+        bh=oUV8wY28pMmJmcPl2/RqP8e8EGWbztH4dG0hihA7UIA=;
+        b=7KJuws9pa1T6AASWd58VjxcGEyaBp9l7qXYQ3YXOLihnvuUiSo/DtgtaiNWU1vhdg0
+         Q0keb3cHD6rSkEv9B57RXtrcnPdZ43ONBAX1x6QaRda3Uba9IMJWCWBHvZ5wSZNaLs7a
+         EMFAFjIU7d/51ZekdzzPL9p/+1aI+sZv3p4KSzDuJ0nPCtQHsK5krxvfSi7hZhga8Fqo
+         58v4ppDnY9Wcv1umKPxSBFm+46HXQduJP6fkiffbBOUibOzLHcVmSUAEIg9radjYIi7J
+         rFm6tGM+yTIffJJEFS1O0bRzJf3MZzl9FxcCTjzIenPdkhxAps69Wua2/zrTbJC6AYeX
+         0LYQ==
+X-Gm-Message-State: ACgBeo2q5EDiaVmL+osXvZ/uH6VJAJO9RsJ4jV+3MmkolEwIDdojKGl/
+        0hhNIUqaUXLzuqvLTSvyd0kjQvN5E5I=
+X-Google-Smtp-Source: AA6agR4MvWiMqw6opMbcJIlre8rIR6OqZCQ8jiMxOMwFgX5UYr9JJ7rBiLfI9aPLgskr9RsqHjBbgMc8jJ4=
 X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a17:903:2c5:b0:172:d1f2:401d with SMTP id
- s5-20020a17090302c500b00172d1f2401dmr17622925plk.56.1661310100972; Tue, 23
- Aug 2022 20:01:40 -0700 (PDT)
+ (user=seanjc job=sendgmr) by 2002:a17:90b:3b8d:b0:1fb:72f5:2d1e with SMTP id
+ pc13-20020a17090b3b8d00b001fb72f52d1emr3704588pjb.135.1661310102440; Tue, 23
+ Aug 2022 20:01:42 -0700 (PDT)
 Reply-To: Sean Christopherson <seanjc@google.com>
-Date:   Wed, 24 Aug 2022 03:01:02 +0000
-Message-Id: <20220824030138.3524159-1-seanjc@google.com>
+Date:   Wed, 24 Aug 2022 03:01:03 +0000
+In-Reply-To: <20220824030138.3524159-1-seanjc@google.com>
+Message-Id: <20220824030138.3524159-2-seanjc@google.com>
 Mime-Version: 1.0
+References: <20220824030138.3524159-1-seanjc@google.com>
 X-Mailer: git-send-email 2.37.1.595.g718a3a8f04-goog
-Subject: [RFC PATCH v6 00/36] KVM: x86: eVMCS rework
+Subject: [RFC PATCH v6 01/36] x86/hyperv: Fix 'struct hv_enlightened_vmcs' definition
 From:   Sean Christopherson <seanjc@google.com>
 To:     Vitaly Kuznetsov <vkuznets@redhat.com>
 Cc:     kvm@vger.kernel.org
@@ -64,91 +67,61 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-This is what I ended up with as a way to dig ourselves out of the eVMCS
-conundrum.  Not well tested, though KUT and selftests pass.  The enforcement
-added by "KVM: nVMX: Enforce unsupported eVMCS in VMX MSRs for host accesses"
-is not tested at all (and lacks a changelog).
+From: Vitaly Kuznetsov <vkuznets@redhat.com>
 
-I don't care if we add a new capability or extend the existing one, my goal
-was purely to frame in the KVM internals and show _a_ way to let userspace
-opt-in.  I do think we need something that isn't CPUID-based though.
+Section 1.9 of TLFS v6.0b says:
 
-Everything from patch 22 onwards should be unchanged from your v5.
+"All structures are padded in such a way that fields are aligned
+naturally (that is, an 8-byte field is aligned to an offset of 8 bytes
+and so on)".
 
-Jim Mattson (1):
-  KVM: x86: VMX: Replace some Intel model numbers with mnemonics
+'struct enlightened_vmcs' has a glitch:
 
-Sean Christopherson (10):
-  KVM: x86: Check for existing Hyper-V vCPU in kvm_hv_vcpu_init()
-  KVM: x86: Report error when setting CPUID if Hyper-V allocation fails
-  KVM: nVMX: Treat eVMCS as enabled for guest iff Hyper-V is also
-    enabled
-  KVM: nVMX: Use CC() macro to handle eVMCS unsupported controls checks
-  KVM: nVMX: Enforce unsupported eVMCS in VMX MSRs for host accesses
-  KVM: nVMX: WARN once and fail VM-Enter if eVMCS sees VMFUNC[63:32] !=
-    0
-  KVM: nVMX: Don't propagate vmcs12's PERF_GLOBAL_CTRL settings to
-    vmcs02
-  KVM: nVMX: Always emulate PERF_GLOBAL_CTRL VM-Entry/VM-Exit controls
-  KVM: VMX: Don't toggle VM_ENTRY_IA32E_MODE for 32-bit kernels/KVM
-  KVM: VMX: Adjust CR3/INVPLG interception for EPT=y at runtime, not
-    setup
+...
+        struct {
+                u32                nested_flush_hypercall:1; /*   836: 0  4 */
+                u32                msr_bitmap:1;         /*   836: 1  4 */
+                u32                reserved:30;          /*   836: 2  4 */
+        } hv_enlightenments_control;                     /*   836     4 */
+        u32                        hv_vp_id;             /*   840     4 */
+        u64                        hv_vm_id;             /*   844     8 */
+        u64                        partition_assist_page; /*   852     8 */
+...
 
-Vitaly Kuznetsov (25):
-  x86/hyperv: Fix 'struct hv_enlightened_vmcs' definition
-  x86/hyperv: Update 'struct hv_enlightened_vmcs' definition
-  KVM: x86: Zero out entire Hyper-V CPUID cache before processing
-    entries
-  KVM: nVMX: Refactor unsupported eVMCS controls logic to use 2-d array
-  KVM: VMX: Define VMCS-to-EVMCS conversion for the new fields
-  KVM: nVMX: Support several new fields in eVMCSv1
-  KVM: x86: hyper-v: Cache HYPERV_CPUID_NESTED_FEATURES CPUID leaf
-  KVM: selftests: Add ENCLS_EXITING_BITMAP{,HIGH} VMCS fields
-  KVM: selftests: Switch to updated eVMCSv1 definition
-  KVM: nVMX: Support PERF_GLOBAL_CTRL with enlightened VMCS
-  KVM: nVMX: Support TSC scaling with enlightened VMCS
-  KVM: selftests: Enable TSC scaling in evmcs selftest
-  KVM: VMX: Get rid of eVMCS specific VMX controls sanitization
-  KVM: VMX: Check VM_ENTRY_IA32E_MODE in setup_vmcs_config()
-  KVM: VMX: Check CPU_BASED_{INTR,NMI}_WINDOW_EXITING in
-    setup_vmcs_config()
-  KVM: VMX: Tweak the special handling of SECONDARY_EXEC_ENCLS_EXITING
-    in setup_vmcs_config()
-  KVM: VMX: Extend VMX controls macro shenanigans
-  KVM: VMX: Move CPU_BASED_CR8_{LOAD,STORE}_EXITING filtering out of
-    setup_vmcs_config()
-  KVM: VMX: Add missing VMEXIT controls to vmcs_config
-  KVM: VMX: Add missing CPU based VM execution controls to vmcs_config
-  KVM: VMX: Move LOAD_IA32_PERF_GLOBAL_CTRL errata handling out of
-    setup_vmcs_config()
-  KVM: nVMX: Always set required-1 bits of pinbased_ctls to
-    PIN_BASED_ALWAYSON_WITHOUT_TRUE_MSR
-  KVM: nVMX: Use sanitized allowed-1 bits for VMX control MSRs
-  KVM: VMX: Cache MSR_IA32_VMX_MISC in vmcs_config
-  KVM: nVMX: Use cached host MSR_IA32_VMX_MISC value for setting up
-    nested MSR
+And the observed values in 'partition_assist_page' make no sense at
+all. Fix the layout by padding the structure properly.
 
- arch/x86/include/asm/hyperv-tlfs.h            |  22 +-
- arch/x86/include/asm/kvm_host.h               |   6 +-
- arch/x86/kvm/cpuid.c                          |  18 +-
- arch/x86/kvm/hyperv.c                         |  70 +++--
- arch/x86/kvm/hyperv.h                         |   6 +-
- arch/x86/kvm/vmx/capabilities.h               |  14 +-
- arch/x86/kvm/vmx/evmcs.c                      | 249 +++++++++++-----
- arch/x86/kvm/vmx/evmcs.h                      |  30 +-
- arch/x86/kvm/vmx/nested.c                     | 109 ++++---
- arch/x86/kvm/vmx/nested.h                     |   2 +-
- arch/x86/kvm/vmx/vmx.c                        | 265 ++++++++----------
- arch/x86/kvm/vmx/vmx.h                        | 174 ++++++++++--
- arch/x86/kvm/x86.c                            |   8 +-
- include/uapi/linux/kvm.h                      |   1 +
- .../selftests/kvm/include/x86_64/evmcs.h      |  45 ++-
- .../selftests/kvm/include/x86_64/vmx.h        |   2 +
- .../testing/selftests/kvm/x86_64/evmcs_test.c |  31 +-
- 17 files changed, 695 insertions(+), 357 deletions(-)
+Fixes: 68d1eb72ee99 ("x86/hyper-v: define struct hv_enlightened_vmcs and clean field bits")
+Reviewed-by: Maxim Levitsky <mlevitsk@redhat.com>
+Reviewed-by: Michael Kelley <mikelley@microsoft.com>
+Signed-off-by: Vitaly Kuznetsov <vkuznets@redhat.com>
+Signed-off-by: Sean Christopherson <seanjc@google.com>
+---
+ arch/x86/include/asm/hyperv-tlfs.h | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-
-base-commit: 372d07084593dc7a399bf9bee815711b1fb1bcf2
+diff --git a/arch/x86/include/asm/hyperv-tlfs.h b/arch/x86/include/asm/hyperv-tlfs.h
+index 0a9407dc0859..6f0acc45e67a 100644
+--- a/arch/x86/include/asm/hyperv-tlfs.h
++++ b/arch/x86/include/asm/hyperv-tlfs.h
+@@ -546,7 +546,7 @@ struct hv_enlightened_vmcs {
+ 	u64 guest_rip;
+ 
+ 	u32 hv_clean_fields;
+-	u32 hv_padding_32;
++	u32 padding32_1;
+ 	u32 hv_synthetic_controls;
+ 	struct {
+ 		u32 nested_flush_hypercall:1;
+@@ -554,7 +554,7 @@ struct hv_enlightened_vmcs {
+ 		u32 reserved:30;
+ 	}  __packed hv_enlightenments_control;
+ 	u32 hv_vp_id;
+-
++	u32 padding32_2;
+ 	u64 hv_vm_id;
+ 	u64 partition_assist_page;
+ 	u64 padding64_4[4];
 -- 
 2.37.1.595.g718a3a8f04-goog
 
