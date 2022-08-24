@@ -2,120 +2,135 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 691B459FA9F
-	for <lists+kvm@lfdr.de>; Wed, 24 Aug 2022 14:57:30 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 565FC59FAAC
+	for <lists+kvm@lfdr.de>; Wed, 24 Aug 2022 14:58:50 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237709AbiHXM5O (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 24 Aug 2022 08:57:14 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58864 "EHLO
+        id S237815AbiHXM6a (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 24 Aug 2022 08:58:30 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60204 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S237556AbiHXM5N (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 24 Aug 2022 08:57:13 -0400
-Received: from vps-vb.mhejs.net (vps-vb.mhejs.net [37.28.154.113])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 27E5F85FFF;
-        Wed, 24 Aug 2022 05:57:11 -0700 (PDT)
-Received: from MUA
-        by vps-vb.mhejs.net with esmtps  (TLS1.2) tls TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256
-        (Exim 4.94.2)
-        (envelope-from <mail@maciej.szmigiero.name>)
-        id 1oQpwN-0005wX-Rc; Wed, 24 Aug 2022 14:57:03 +0200
-Message-ID: <f96b867f-4c32-4950-8508-234fe2cda7b9@maciej.szmigiero.name>
-Date:   Wed, 24 Aug 2022 14:56:57 +0200
-MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.9.0
-Content-Language: en-US
-To:     "Shukla, Santosh" <santosh.shukla@amd.com>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>,
-        Sean Christopherson <seanjc@google.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        Tom Lendacky <thomas.lendacky@amd.com>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org, mlevitsk@redhat.com
-References: <20220810061226.1286-1-santosh.shukla@amd.com>
- <20220810061226.1286-6-santosh.shukla@amd.com>
- <bf9e8a9c-5172-b61a-be6e-87a919442fbd@maciej.szmigiero.name>
- <e10b3de6-2df0-1339-4574-8477a924b78e@amd.com>
-From:   "Maciej S. Szmigiero" <mail@maciej.szmigiero.name>
-Subject: Re: [PATCHv3 5/8] KVM: SVM: Add VNMI support in inject_nmi
-In-Reply-To: <e10b3de6-2df0-1339-4574-8477a924b78e@amd.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
+        with ESMTP id S237739AbiHXM60 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 24 Aug 2022 08:58:26 -0400
+Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 48BFD979E6;
+        Wed, 24 Aug 2022 05:58:25 -0700 (PDT)
+Received: from pps.filterd (m0098399.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.17.1.5/8.17.1.5) with ESMTP id 27OCv9VW011828;
+        Wed, 24 Aug 2022 12:58:25 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=from : to : cc : subject
+ : date : message-id : content-transfer-encoding : mime-version; s=pp1;
+ bh=xpeuA/gVNbFDVbnwhd5uP1sycDEY6zoMLly7uoTpo0E=;
+ b=YyfxGMCvbdsZhel3H29Zu87bDy5iz1UqHYI8c37I5WvuWopdJHD6y5WmSWt4Tv1kPAWg
+ QmKQRj4vvmkysTD4FR4Ml+6/IIHjyCzzpxM+TuvTcF9mpu+tXh+VY2r2dAcbmw/WnpZn
+ bvxwD90UsbLZD+C6REJ+iDwRLTpXgEmMywg4OwkND6VIGZmLpAaTo6sNs7hlkY6WgWhV
+ CyfDQLmJ/bO42qq1oR54M+XmleRx/CZhAfwrsmCDWh5tokKNW1Eh0fEV0EVA2B40Dpxt
+ 5fbuaBI6ZYr4tM4N+whwV3gyui3plim3qKxLYnNjtrkv8+pZ5/eWwlMg50I+nGp3EwNN VA== 
+Received: from ppma04ams.nl.ibm.com (63.31.33a9.ip4.static.sl-reverse.com [169.51.49.99])
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3j5meq80np-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Wed, 24 Aug 2022 12:58:24 +0000
+Received: from pps.filterd (ppma04ams.nl.ibm.com [127.0.0.1])
+        by ppma04ams.nl.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 27OCrAV1032585;
+        Wed, 24 Aug 2022 12:58:22 GMT
+Received: from b06cxnps4074.portsmouth.uk.ibm.com (d06relay11.portsmouth.uk.ibm.com [9.149.109.196])
+        by ppma04ams.nl.ibm.com with ESMTP id 3j2q88w58g-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Wed, 24 Aug 2022 12:58:22 +0000
+Received: from d06av24.portsmouth.uk.ibm.com (d06av24.portsmouth.uk.ibm.com [9.149.105.60])
+        by b06cxnps4074.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 27OCwILd31719910
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Wed, 24 Aug 2022 12:58:18 GMT
+Received: from d06av24.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id C9D534203F;
+        Wed, 24 Aug 2022 12:58:18 +0000 (GMT)
+Received: from d06av24.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 924ED42041;
+        Wed, 24 Aug 2022 12:58:18 +0000 (GMT)
+Received: from t35lp63.lnxne.boe (unknown [9.152.108.100])
+        by d06av24.portsmouth.uk.ibm.com (Postfix) with ESMTP;
+        Wed, 24 Aug 2022 12:58:18 +0000 (GMT)
+From:   Nico Boehr <nrb@linux.ibm.com>
+To:     borntraeger@linux.ibm.com, frankja@linux.ibm.com,
+        imbrenda@linux.ibm.com
+Cc:     kvm@vger.kernel.org, linux-s390@vger.kernel.org
+Subject: [v1] KVM: s390: pv: fix external interruption loop not always detected
+Date:   Wed, 24 Aug 2022 14:58:18 +0200
+Message-Id: <20220824125818.15904-1-nrb@linux.ibm.com>
+X-Mailer: git-send-email 2.35.3
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: yAKHeNhJSlDPB8Fu0umuWdd1-1a38G7u
+X-Proofpoint-ORIG-GUID: yAKHeNhJSlDPB8Fu0umuWdd1-1a38G7u
 Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,NICE_REPLY_A,
-        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
-        autolearn_force=no version=3.4.6
+X-Proofpoint-UnRewURL: 0 URL was un-rewritten
+MIME-Version: 1.0
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.205,Aquarius:18.0.895,Hydra:6.0.517,FMLib:17.11.122.1
+ definitions=2022-08-24_06,2022-08-22_02,2022-06-22_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 spamscore=0
+ lowpriorityscore=0 adultscore=0 priorityscore=1501 clxscore=1015
+ malwarescore=0 phishscore=0 bulkscore=0 impostorscore=0 mlxlogscore=774
+ suspectscore=0 mlxscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2207270000 definitions=main-2208240047
+X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_EF,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_PASS,
+        T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 24.08.2022 14:13, Shukla, Santosh wrote:
-> Hi Maciej,
-> 
-> On 8/11/2022 2:54 AM, Maciej S. Szmigiero wrote:
->> On 10.08.2022 08:12, Santosh Shukla wrote:
->>> Inject the NMI by setting V_NMI in the VMCB interrupt control. processor
->>> will clear V_NMI to acknowledge processing has started and will keep the
->>> V_NMI_MASK set until the processor is done with processing the NMI event.
->>>
->>> Signed-off-by: Santosh Shukla <santosh.shukla@amd.com>
->>> ---
->>> v3:
->>> - Removed WARN_ON check.
->>>
->>> v2:
->>> - Added WARN_ON check for vnmi pending.
->>> - use `get_vnmi_vmcb` to get correct vmcb so to inject vnmi.
->>>
->>>    arch/x86/kvm/svm/svm.c | 7 +++++++
->>>    1 file changed, 7 insertions(+)
->>>
->>> diff --git a/arch/x86/kvm/svm/svm.c b/arch/x86/kvm/svm/svm.c
->>> index e260e8cb0c81..8c4098b8a63e 100644
->>> --- a/arch/x86/kvm/svm/svm.c
->>> +++ b/arch/x86/kvm/svm/svm.c
->>> @@ -3479,7 +3479,14 @@ static void pre_svm_run(struct kvm_vcpu *vcpu)
->>>    static void svm_inject_nmi(struct kvm_vcpu *vcpu)
->>>    {
->>>        struct vcpu_svm *svm = to_svm(vcpu);
->>> +    struct vmcb *vmcb = NULL;
->>>    +    if (is_vnmi_enabled(svm)) {
->>
->> I guess this should be "is_vnmi_enabled(svm) && !svm->nmi_l1_to_l2"
->> since if nmi_l1_to_l2 is true then the NMI to be injected originally
->> comes from L1's VMCB12 EVENTINJ field.
->>
-> 
-> Not sure if I understood the case fully.. so trying to sketch scenario here -
-> if nmi_l1_to_l2 is true then event is coming from EVTINJ. .which could
-> be one of following case -
-> 1) L0 (vnmi enabled) and L1 (vnmi disabled)
+To determine whether the guest has caused an external interruption loop
+upon code 20 (external interrupt) intercepts, the ext_new_psw needs to
+be inspected to see whether external interrupts are enabled.
 
-As far as I can see in this case:
-is_vnmi_enabled() returns whether VMCB02's int_ctl has V_NMI_ENABLE bit set.
+Under non-PV, ext_new_psw can simply be taken from guest lowcore. Under
+PV, KVM can only access the encrypted guest lowcore and hence the
+ext_new_psw must not be taken from guest lowcore.
 
-This field in VMCB02 comes from nested_vmcb02_prepare_control() which
-in the !nested_vnmi_enabled() case (L1 is not using vNMI) copies these bits
-from VMCB01:
-> int_ctl_vmcb01_bits |= (V_NMI_PENDING | V_NMI_ENABLE | V_NMI_MASK);
+handle_external_interrupt() incorrectly did that and hence was not able
+to reliably tell whether an external interruption loop is happening or
+not. False negatives cause spurious failures of my kvm-unit-test
+for extint loops[1] under PV.
 
-So in this case (L0 uses vNMI) V_NMI_ENABLE will be set in VMCB01, right?
+Since code 20 is only caused under PV if and only if the guest's
+ext_new_psw is enabled for external interrupts, false positive detection
+of a external interruption loop can not happen.
 
-This bit will then be copied to VMCB02 so re-injection will attempt to use
-vNMI instead of EVTINJ.
+Fix this issue by instead looking at the guest PSW in the state
+description. Since the PSW swap for external interrupt is done by the
+ultravisor before the intercept is caused, this reliably tells whether
+the guest is enabled for external interrupts in the ext_new_psw.
 
-> 2) L0 & L1 both vnmi disabled.
+[1] https://lore.kernel.org/kvm/20220812062151.1980937-4-nrb@linux.ibm.com/
 
-This case is ok.
+Signed-off-by: Nico Boehr <nrb@linux.ibm.com>
+---
+ arch/s390/kvm/intercept.c | 11 ++++++++---
+ 1 file changed, 8 insertions(+), 3 deletions(-)
 
-> 
-> In both cases the vnmi check will fail for L1 and execution path
-> will fall back to default - right?
-> 
-> Thanks,
-> Santosh
+diff --git a/arch/s390/kvm/intercept.c b/arch/s390/kvm/intercept.c
+index 88112065d941..bf875da86289 100644
+--- a/arch/s390/kvm/intercept.c
++++ b/arch/s390/kvm/intercept.c
+@@ -285,9 +285,14 @@ static int handle_external_interrupt(struct kvm_vcpu *vcpu)
+ 
+ 	vcpu->stat.exit_external_interrupt++;
+ 
+-	rc = read_guest_lc(vcpu, __LC_EXT_NEW_PSW, &newpsw, sizeof(psw_t));
+-	if (rc)
+-		return rc;
++	if (kvm_s390_pv_cpu_is_protected(vcpu))
++		newpsw = vcpu->arch.sie_block->gpsw;
++	else {
++		rc = read_guest_lc(vcpu, __LC_EXT_NEW_PSW, &newpsw, sizeof(psw_t));
++		if (rc)
++			return rc;
++	}
++
+ 	/* We can not handle clock comparator or timer interrupt with bad PSW */
+ 	if ((eic == EXT_IRQ_CLK_COMP || eic == EXT_IRQ_CPU_TIMER) &&
+ 	    (newpsw.mask & PSW_MASK_EXT))
+-- 
+2.35.3
 
-Thanks,
-Maciej
