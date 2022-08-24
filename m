@@ -2,57 +2,57 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id C9D6259F1B9
-	for <lists+kvm@lfdr.de>; Wed, 24 Aug 2022 05:04:16 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 4F84359F1BB
+	for <lists+kvm@lfdr.de>; Wed, 24 Aug 2022 05:04:20 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234527AbiHXDEO (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 23 Aug 2022 23:04:14 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43774 "EHLO
+        id S234395AbiHXDEP (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 23 Aug 2022 23:04:15 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43986 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234326AbiHXDDd (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 23 Aug 2022 23:03:33 -0400
-Received: from mail-pl1-x64a.google.com (mail-pl1-x64a.google.com [IPv6:2607:f8b0:4864:20::64a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B55ED81B34
-        for <kvm@vger.kernel.org>; Tue, 23 Aug 2022 20:02:10 -0700 (PDT)
-Received: by mail-pl1-x64a.google.com with SMTP id q6-20020a17090311c600b0017266460b8fso10123996plh.4
-        for <kvm@vger.kernel.org>; Tue, 23 Aug 2022 20:02:10 -0700 (PDT)
+        with ESMTP id S234222AbiHXDDg (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 23 Aug 2022 23:03:36 -0400
+Received: from mail-pg1-x549.google.com (mail-pg1-x549.google.com [IPv6:2607:f8b0:4864:20::549])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EE35B81B38
+        for <kvm@vger.kernel.org>; Tue, 23 Aug 2022 20:02:11 -0700 (PDT)
+Received: by mail-pg1-x549.google.com with SMTP id 201-20020a6300d2000000b0042a89089736so4032802pga.9
+        for <kvm@vger.kernel.org>; Tue, 23 Aug 2022 20:02:11 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
         h=cc:to:from:subject:references:mime-version:message-id:in-reply-to
          :date:reply-to:from:to:cc;
-        bh=YM7JSeVcS+HwQdrx/vBWzPhi0KTmrUluEtn+awxo6AQ=;
-        b=nz1PVYqvFMt9vNH/OnwmO+jkIyK4grXfn7MjvxSyvJUqwg3ICWzYG4a5F/xBR9Mg9t
-         1TKmniazUdE/xP5lzkeAWsCJB5C88Njfx0cXcYPsdyMZjboFD3BHrbQN7jHWEw8HlTwu
-         ii1xyA8cQT4RbyiMnZ6URV/ZQEQmSYhO3V8lq0b856WwIatEdnZQq2EryVv8gGdTMF3l
-         b9FkHBCIEzZXE5nL/CUeIhmk6fMOcpSp6ExuEwPH4ZRLSDbQZqkzoAdYJFxDd/l1+i9Y
-         D09m8H+Gw+4TWpfu18bQVbLEZDzDk5T+akQV1KNETWv0wX8VGcGskAuDP7G9OQCsIb8F
-         uiGg==
+        bh=+SIhYTBUYTFAvpLW0Up8qzMwlBeVs3qNEniJXYGsmJ4=;
+        b=TFX+J/2SpUqaDOI4whujTsMB6JVeMbPd+LA/pH53Jrc9ZqmZDkwOacMhRIX2Z7ebhl
+         kYLlj/eubz0nYDI2JiXKFUQId/kJmjm8eX4lPjTg972bGN5kpgQeU/YI3O02HJ+QaaEZ
+         Xafn+rPAtVZ8Tro82nrTWhBAjmbxzzEcRXYswfQV2OKrJHRroIkFo6Debom2cZr96FS8
+         C3pxwCuu2eSfthEcfjKlL8uD2feVJeS79NKyJNhfv4nTyeekE8sHTPh9bdCEAm5F0k/H
+         ltlqgZfIEF0/A9pMXpApPqaGuiqhzKb03J3GkVAGuaETu8kHewDmcTFopu1Lq9Xuc1fJ
+         YlbA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=cc:to:from:subject:references:mime-version:message-id:in-reply-to
          :date:reply-to:x-gm-message-state:from:to:cc;
-        bh=YM7JSeVcS+HwQdrx/vBWzPhi0KTmrUluEtn+awxo6AQ=;
-        b=nCJAR6+EEeUpvq/U4PNQbSsFtYbx/zDSKP5c8uRXfcSsMs5QsGDL29bxCyFbyJOFm4
-         IOtTfSd3ObqkkToa5112/zWDTl9grUGKbNDoutjY9OtNqHR+Pk4vHpQThiLtOs3ShxDo
-         5J2C/C99blXB5mOG6P3aXISFDPhPmqUVrteD6LhyuaXiKb1tVqITKFtAH1NxYcKECKDk
-         AhP483QPw07IL8QJ/tyugaAj2g8OUVM5kYgF/a0bDn2auVoeEZGBLHFiNIC4UW5HXGH9
-         Jwa0SJhXhcuk4LO2uN92Hv5GZQLtK1uMMIZ14e0kI7UuXQJIZtBjNu2NV2X+/Ns1wuqG
-         y2Lw==
-X-Gm-Message-State: ACgBeo1dCMwnTfxg322bEzWxfYleb0uGgrNfk/Xa/tAlyu4rLKv7+8tg
-        M7snGIh5HdX2ytGIUtV0vcV4j2nyR24=
-X-Google-Smtp-Source: AA6agR4ismyR8tcM7v3iIG+Y4p7YUQbe+jeFc5trchChOk0L2qUE7cuYbY4g00pV+ZPJteJKiL8rd0ixQ+Q=
+        bh=+SIhYTBUYTFAvpLW0Up8qzMwlBeVs3qNEniJXYGsmJ4=;
+        b=Q95+LEc41bB2MoJCgdopQdb2y/7n5ZN2xeQgt9KhUtdDRLngOWYlT8YmT6B+5HBQLn
+         D4dzeGg5WGPz49rU/myycY9HIc4/bE4KpQHwEENzoHLaW2xhxnnlEZaOmZBBWzmDnGoo
+         8wMWGBMdmQ0S7d63fZSmHc/cnhXBUgQsnXCu3b5PKbbZow/OgAaGLtKHTv/gYKP+/BBx
+         Q4dtySAjWklU7lWYNYo7ItBMqk5EtutOrPa7yksPuJ1fc3kqKuCGISPYxtONIR26tE6E
+         +wK5zLXlgPW32V9x6Yn9KDqHNOz9Ygek3nxBialTEODIzzpTw668p9Np9BgZMZ/0h7iD
+         ICdQ==
+X-Gm-Message-State: ACgBeo1dhQkLRP4CKTUBTycoW9ZLmH3qgqKSmK+GqNw52V6rJSNjKpdX
+        hrEe9RM6t/N/r318OQUQYiipLg4Ndmo=
+X-Google-Smtp-Source: AA6agR6+w843iTwZa71KnypAwmGm026ypbyC/fQGxkvO86tdoUEpnh7s0norch8SieartxtTYzWKCPogeoY=
 X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a17:902:708b:b0:172:5267:ed95 with SMTP id
- z11-20020a170902708b00b001725267ed95mr26352404plk.3.1661310129997; Tue, 23
- Aug 2022 20:02:09 -0700 (PDT)
+ (user=seanjc job=sendgmr) by 2002:a62:b50a:0:b0:536:3a64:3492 with SMTP id
+ y10-20020a62b50a000000b005363a643492mr20177206pfe.52.1661310131554; Tue, 23
+ Aug 2022 20:02:11 -0700 (PDT)
 Reply-To: Sean Christopherson <seanjc@google.com>
-Date:   Wed, 24 Aug 2022 03:01:19 +0000
+Date:   Wed, 24 Aug 2022 03:01:20 +0000
 In-Reply-To: <20220824030138.3524159-1-seanjc@google.com>
-Message-Id: <20220824030138.3524159-18-seanjc@google.com>
+Message-Id: <20220824030138.3524159-19-seanjc@google.com>
 Mime-Version: 1.0
 References: <20220824030138.3524159-1-seanjc@google.com>
 X-Mailer: git-send-email 2.37.1.595.g718a3a8f04-goog
-Subject: [RFC PATCH v6 17/36] KVM: nVMX: Support TSC scaling with enlightened VMCS
+Subject: [RFC PATCH v6 18/36] KVM: selftests: Enable TSC scaling in evmcs selftest
 From:   Sean Christopherson <seanjc@google.com>
 To:     Vitaly Kuznetsov <vkuznets@redhat.com>
 Cc:     kvm@vger.kernel.org
@@ -69,38 +69,94 @@ X-Mailing-List: kvm@vger.kernel.org
 
 From: Vitaly Kuznetsov <vkuznets@redhat.com>
 
-Enlightened VMCS v1 got updated and now includes the required fields for
-TSC scaling, enable TSC scaling for both KVM-on-HyperV and HyperV-on-KVM
-simply by dropping the relevant fields from the unsupported controls.
+The updated Enlightened VMCS v1 definition enables TSC scaling, test
+that SECONDARY_EXEC_TSC_SCALING can now be enabled.
 
+Reviewed-by: Maxim Levitsky <mlevitsk@redhat.com>
 Signed-off-by: Vitaly Kuznetsov <vkuznets@redhat.com>
-[sean: split to separate patch (from PERF_GLOBAL_CTRL)]
 Signed-off-by: Sean Christopherson <seanjc@google.com>
 ---
- arch/x86/kvm/vmx/evmcs.h | 3 ---
- 1 file changed, 3 deletions(-)
+ .../testing/selftests/kvm/x86_64/evmcs_test.c | 31 +++++++++++++++++--
+ 1 file changed, 29 insertions(+), 2 deletions(-)
 
-diff --git a/arch/x86/kvm/vmx/evmcs.h b/arch/x86/kvm/vmx/evmcs.h
-index 35b326386c50..a2e21bdd17bb 100644
---- a/arch/x86/kvm/vmx/evmcs.h
-+++ b/arch/x86/kvm/vmx/evmcs.h
-@@ -38,8 +38,6 @@ DECLARE_STATIC_KEY_FALSE(enable_evmcs);
-  *	EPTP_LIST_ADDRESS               = 0x00002024,
-  *	VMREAD_BITMAP                   = 0x00002026,
-  *	VMWRITE_BITMAP                  = 0x00002028,
-- *
-- *	TSC_MULTIPLIER                  = 0x00002032,
-  *	PLE_GAP                         = 0x00004020,
-  *	PLE_WINDOW                      = 0x00004022,
-  *	VMX_PREEMPTION_TIMER_VALUE      = 0x0000482E,
-@@ -57,7 +55,6 @@ DECLARE_STATIC_KEY_FALSE(enable_evmcs);
- 	 SECONDARY_EXEC_ENABLE_PML |					\
- 	 SECONDARY_EXEC_ENABLE_VMFUNC |					\
- 	 SECONDARY_EXEC_SHADOW_VMCS |					\
--	 SECONDARY_EXEC_TSC_SCALING |					\
- 	 SECONDARY_EXEC_PAUSE_LOOP_EXITING)
- #define EVMCS1_UNSUPPORTED_VMEXIT_CTRL					\
- 	(VM_EXIT_SAVE_VMX_PREEMPTION_TIMER)
+diff --git a/tools/testing/selftests/kvm/x86_64/evmcs_test.c b/tools/testing/selftests/kvm/x86_64/evmcs_test.c
+index 99bc202243d2..21a7a792a010 100644
+--- a/tools/testing/selftests/kvm/x86_64/evmcs_test.c
++++ b/tools/testing/selftests/kvm/x86_64/evmcs_test.c
+@@ -18,6 +18,9 @@
+ 
+ #include "vmx.h"
+ 
++/* Test flags */
++#define HOST_HAS_TSC_SCALING BIT(0)
++
+ static int ud_count;
+ 
+ static void guest_ud_handler(struct ex_regs *regs)
+@@ -64,11 +67,14 @@ void l2_guest_code(void)
+ 	vmcall();
+ 	rdmsr_gs_base(); /* intercepted */
+ 
++	/* TSC scaling */
++	vmcall();
++
+ 	/* Done, exit to L1 and never come back.  */
+ 	vmcall();
+ }
+ 
+-void guest_code(struct vmx_pages *vmx_pages)
++void guest_code(struct vmx_pages *vmx_pages, u64 test_flags)
+ {
+ #define L2_GUEST_STACK_SIZE 64
+ 	unsigned long l2_guest_stack[L2_GUEST_STACK_SIZE];
+@@ -150,6 +156,18 @@ void guest_code(struct vmx_pages *vmx_pages)
+ 	GUEST_ASSERT(vmreadz(VM_EXIT_REASON) == EXIT_REASON_VMCALL);
+ 	GUEST_SYNC(11);
+ 
++	if (test_flags & HOST_HAS_TSC_SCALING) {
++		GUEST_ASSERT((rdmsr(MSR_IA32_VMX_PROCBASED_CTLS2) >> 32) &
++			     SECONDARY_EXEC_TSC_SCALING);
++		/* Try enabling TSC scaling */
++		vmwrite(SECONDARY_VM_EXEC_CONTROL, vmreadz(SECONDARY_VM_EXEC_CONTROL) |
++			SECONDARY_EXEC_TSC_SCALING);
++		vmwrite(TSC_MULTIPLIER, 1);
++	}
++	GUEST_ASSERT(!vmresume());
++	GUEST_ASSERT(vmreadz(VM_EXIT_REASON) == EXIT_REASON_VMCALL);
++	GUEST_SYNC(12);
++
+ 	/* Try enlightened vmptrld with an incorrect GPA */
+ 	evmcs_vmptrld(0xdeadbeef, vmx_pages->enlightened_vmcs);
+ 	GUEST_ASSERT(vmlaunch());
+@@ -204,6 +222,7 @@ int main(int argc, char *argv[])
+ 	struct kvm_vm *vm;
+ 	struct kvm_run *run;
+ 	struct ucall uc;
++	u64 test_flags = 0;
+ 	int stage;
+ 
+ 	vm = vm_create_with_one_vcpu(&vcpu, guest_code);
+@@ -212,11 +231,19 @@ int main(int argc, char *argv[])
+ 	TEST_REQUIRE(kvm_has_cap(KVM_CAP_NESTED_STATE));
+ 	TEST_REQUIRE(kvm_has_cap(KVM_CAP_HYPERV_ENLIGHTENED_VMCS));
+ 
++	if ((kvm_get_feature_msr(MSR_IA32_VMX_PROCBASED_CTLS2) >> 32) &
++	    SECONDARY_EXEC_TSC_SCALING) {
++		test_flags |= HOST_HAS_TSC_SCALING;
++		pr_info("TSC scaling is supported, adding to test\n");
++	} else {
++		pr_info("TSC scaling is not supported\n");
++	}
++
+ 	vcpu_set_hv_cpuid(vcpu);
+ 	vcpu_enable_evmcs(vcpu);
+ 
+ 	vcpu_alloc_vmx(vm, &vmx_pages_gva);
+-	vcpu_args_set(vcpu, 1, vmx_pages_gva);
++	vcpu_args_set(vcpu, 2, vmx_pages_gva, test_flags);
+ 
+ 	vm_init_descriptor_tables(vm);
+ 	vcpu_init_descriptor_tables(vcpu);
 -- 
 2.37.1.595.g718a3a8f04-goog
 
