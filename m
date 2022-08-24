@@ -2,92 +2,74 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id DCEFA59F7FE
-	for <lists+kvm@lfdr.de>; Wed, 24 Aug 2022 12:42:39 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id ACC9359F89F
+	for <lists+kvm@lfdr.de>; Wed, 24 Aug 2022 13:31:56 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236359AbiHXKme (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 24 Aug 2022 06:42:34 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58692 "EHLO
+        id S237061AbiHXLby (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 24 Aug 2022 07:31:54 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54794 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235425AbiHXKmc (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 24 Aug 2022 06:42:32 -0400
-Received: from mga06.intel.com (mga06b.intel.com [134.134.136.31])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CBB0381B24;
-        Wed, 24 Aug 2022 03:42:31 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1661337751; x=1692873751;
-  h=date:from:to:cc:subject:message-id:reply-to:references:
-   mime-version:in-reply-to;
-  bh=lnG4/IetgJJiCFvYl2XSmHM42xhaifZaMgp7nfdirTE=;
-  b=eNZsqDl4c8MZlLJ2p0h20eTzbb5c754AMOUHjTxenfjCe6a5zRuA3vdB
-   JpIIgiJbkGJ2YxTocSYwyLXKU6TW1aEZ4/DimabkqBATW7lS47yBDKJWT
-   RBM3hvH78/yAmYocq20gokL8cRZ2w3XaKOQXMvJIhutN5YJoQC5mZNZYC
-   8kVpnUIzYIHzIGP0nfhPOTzp6JfZn/5ThXoMNwF7ujFQBZXf0OSUERmgK
-   4f9sVKh6c2AkR24KPiw6ew1FgLJwQTrCkqctXLWqcXVrJeYyZbMbbUuYP
-   834PtJ9Jbyia4YGVAeNOAOwcomG+ME3BZ9d6+Y3dbrXZA+7s/Q1o6HNGe
-   g==;
-X-IronPort-AV: E=McAfee;i="6500,9779,10448"; a="355660053"
-X-IronPort-AV: E=Sophos;i="5.93,260,1654585200"; 
-   d="scan'208";a="355660053"
-Received: from orsmga007.jf.intel.com ([10.7.209.58])
-  by orsmga104.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 24 Aug 2022 03:42:31 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.93,260,1654585200"; 
-   d="scan'208";a="605989312"
-Received: from chaop.bj.intel.com (HELO localhost) ([10.240.193.75])
-  by orsmga007.jf.intel.com with ESMTP; 24 Aug 2022 03:42:21 -0700
-Date:   Wed, 24 Aug 2022 18:37:38 +0800
-From:   Chao Peng <chao.p.peng@linux.intel.com>
-To:     Vishal Annapurve <vannapurve@google.com>
-Cc:     kvm list <kvm@vger.kernel.org>,
-        LKML <linux-kernel@vger.kernel.org>, linux-mm@kvack.org,
-        linux-fsdevel@vger.kernel.org, linux-api@vger.kernel.org,
-        linux-doc@vger.kernel.org, qemu-devel@nongnu.org,
-        linux-kselftest@vger.kernel.org,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Jonathan Corbet <corbet@lwn.net>,
-        Sean Christopherson <seanjc@google.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        x86 <x86@kernel.org>, "H . Peter Anvin" <hpa@zytor.com>,
-        Hugh Dickins <hughd@google.com>,
-        Jeff Layton <jlayton@kernel.org>,
-        "J . Bruce Fields" <bfields@fieldses.org>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        Shuah Khan <shuah@kernel.org>, Mike Rapoport <rppt@kernel.org>,
-        Steven Price <steven.price@arm.com>,
-        "Maciej S . Szmigiero" <mail@maciej.szmigiero.name>,
-        Vlastimil Babka <vbabka@suse.cz>,
-        Yu Zhang <yu.c.zhang@linux.intel.com>,
-        "Kirill A . Shutemov" <kirill.shutemov@linux.intel.com>,
-        Andy Lutomirski <luto@kernel.org>,
-        Jun Nakajima <jun.nakajima@intel.com>,
-        Dave Hansen <dave.hansen@intel.com>,
-        Andi Kleen <ak@linux.intel.com>,
-        David Hildenbrand <david@redhat.com>, aarcange@redhat.com,
-        ddutile@redhat.com, dhildenb@redhat.com,
-        Quentin Perret <qperret@google.com>,
-        Michael Roth <michael.roth@amd.com>, mhocko@suse.com,
-        Muchun Song <songmuchun@bytedance.com>
-Subject: Re: [PATCH v7 11/14] KVM: Register/unregister the guest private
- memory regions
-Message-ID: <20220824103738.GA1386620@chaop.bj.intel.com>
-Reply-To: Chao Peng <chao.p.peng@linux.intel.com>
-References: <20220706082016.2603916-1-chao.p.peng@linux.intel.com>
- <20220706082016.2603916-12-chao.p.peng@linux.intel.com>
- <CAGtprH9xyw6bt4=RBWF6-v2CSpabOCpKq5rPz+e-9co7EisoVQ@mail.gmail.com>
+        with ESMTP id S235216AbiHXLbx (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 24 Aug 2022 07:31:53 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A77B37CB55
+        for <kvm@vger.kernel.org>; Wed, 24 Aug 2022 04:31:52 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1661340711;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=NXZfj2s190ISAGXONt5w3kxpRbp3A0q+eb86yI+SwmU=;
+        b=HjnR+uqbr7IVPf7UexJgdLQ2RvydkN+IU1C3x5joeVvxfZPwFSaFDIVpVth9tRh9+dtgZY
+        LpWl8G8LttXxxzAQ4cPPlFcsjqGTF3ciOCOOuWTp2kGZyviOIGSfjdbN/YQZHvLhy4rEyh
+        AcELfKvA2CvvRkTg7Sc7/sUMDPdw0u8=
+Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
+ [209.85.128.71]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_128_GCM_SHA256) id
+ us-mta-362-ybBmagGTNLCaSlzSvLkqYQ-1; Wed, 24 Aug 2022 07:31:50 -0400
+X-MC-Unique: ybBmagGTNLCaSlzSvLkqYQ-1
+Received: by mail-wm1-f71.google.com with SMTP id j22-20020a05600c485600b003a5e4420552so694610wmo.8
+        for <kvm@vger.kernel.org>; Wed, 24 Aug 2022 04:31:50 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=user-agent:in-reply-to:content-disposition:mime-version:references
+         :message-id:subject:cc:to:from:date:x-gm-message-state:from:to:cc;
+        bh=NXZfj2s190ISAGXONt5w3kxpRbp3A0q+eb86yI+SwmU=;
+        b=33zoowSfHoPqh/ajIXx927AtSaRLfAQkLADPxBpfu0qnEjlRay30p08l7MQe7qdstm
+         9HJi8jMTZ5XcmgUNkK1l28g/vcpmVYOH6P5Wh+hQPIMR0gSc5GEqpVl9wfvjQoI05+/2
+         PbTNnOVwrE6P/R7k9hj7PEoSSsYcMPDiCUlIcd2+lScnp7ku/K8tMMR33m5F5tb9/9r/
+         4KQHIIvaoXuY7vT5FXwPJm/UJxnrLA8mZRq23pRjf+KTtWIbLacduXEq4eNHtT+ofEwj
+         0sdhO1KrNiTh8cdtzmQhw9ZiJZdaQ1V1bR4oNNt0z05hTcOj1xFti+MneOXTVAx2l8Aw
+         CM3A==
+X-Gm-Message-State: ACgBeo2zZIogodbjwe2Wv2ktdWI0MhSfsCfiMZK0inx9VlnFbPlHzoUW
+        bhp2EbdKmD9kFPhnaAfgEbG7G0+It5WJyrPi6WsqQpaZRlau7NrrOLRanBHGZcgYiMRTM55TWDc
+        OFUum+aV/PPAJ
+X-Received: by 2002:a5d:4649:0:b0:225:309d:1d51 with SMTP id j9-20020a5d4649000000b00225309d1d51mr16181963wrs.450.1661340709395;
+        Wed, 24 Aug 2022 04:31:49 -0700 (PDT)
+X-Google-Smtp-Source: AA6agR4i+1qd54vzbvs4QScz2m2JIdiVf8ThPgMMJ3+2r+1NSyen7peRW4L0istbQ+UTyFa3u9T9Ww==
+X-Received: by 2002:a5d:4649:0:b0:225:309d:1d51 with SMTP id j9-20020a5d4649000000b00225309d1d51mr16181947wrs.450.1661340709129;
+        Wed, 24 Aug 2022 04:31:49 -0700 (PDT)
+Received: from work-vm (cpc109025-salf6-2-0-cust480.10-2.cable.virginm.net. [82.30.61.225])
+        by smtp.gmail.com with ESMTPSA id bi19-20020a05600c3d9300b003a3170a7af9sm1945872wmb.4.2022.08.24.04.31.48
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 24 Aug 2022 04:31:48 -0700 (PDT)
+Date:   Wed, 24 Aug 2022 12:31:46 +0100
+From:   "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+To:     Sean Christopherson <seanjc@google.com>
+Cc:     Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org, Leonardo Bras <leobras@redhat.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>
+Subject: Re: [PATCH 0/3] KVM: x86: Fix XSAVE related bugs
+Message-ID: <YwYMInTCevZ/FYNl@work-vm>
+References: <20220824033057.3576315-1-seanjc@google.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <CAGtprH9xyw6bt4=RBWF6-v2CSpabOCpKq5rPz+e-9co7EisoVQ@mail.gmail.com>
-X-Spam-Status: No, score=-4.3 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,SPF_HELO_NONE,
-        SPF_NONE,T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED autolearn=ham
+In-Reply-To: <20220824033057.3576315-1-seanjc@google.com>
+User-Agent: Mutt/2.2.6 (2022-06-05)
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=unavailable
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -95,58 +77,44 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Aug 19, 2022 at 12:37:42PM -0700, Vishal Annapurve wrote:
-> > ...
-> > diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
-> > index 230c8ff9659c..bb714c2a4b06 100644
-> > --- a/virt/kvm/kvm_main.c
-> > +++ b/virt/kvm/kvm_main.c
-> > @@ -914,6 +914,35 @@ static int kvm_init_mmu_notifier(struct kvm *kvm)
-> >
-> >  #endif /* CONFIG_MMU_NOTIFIER && KVM_ARCH_WANT_MMU_NOTIFIER */
-> >
-> > +#ifdef CONFIG_HAVE_KVM_PRIVATE_MEM
-> > +#define KVM_MEM_ATTR_PRIVATE   0x0001
-> > +static int kvm_vm_ioctl_set_encrypted_region(struct kvm *kvm, unsigned int ioctl,
-> > +                                            struct kvm_enc_region *region)
-> > +{
-> > +       unsigned long start, end;
-> > +       void *entry;
-> > +       int r;
-> > +
-> > +       if (region->size == 0 || region->addr + region->size < region->addr)
-> > +               return -EINVAL;
-> > +       if (region->addr & (PAGE_SIZE - 1) || region->size & (PAGE_SIZE - 1))
-> > +               return -EINVAL;
-> > +
-> > +       start = region->addr >> PAGE_SHIFT;
-> > +       end = (region->addr + region->size - 1) >> PAGE_SHIFT;
-> > +
-> > +       entry = ioctl == KVM_MEMORY_ENCRYPT_REG_REGION ?
-> > +                               xa_mk_value(KVM_MEM_ATTR_PRIVATE) : NULL;
-> > +
-> > +       r = xa_err(xa_store_range(&kvm->mem_attr_array, start, end,
-> > +                                       entry, GFP_KERNEL_ACCOUNT));
+* Sean Christopherson (seanjc@google.com) wrote:
+> Patch 2 (from Dave) is the headliner and fixes a bug where KVM clear the
+> FP+SSE bits in user_xfeatures when XSAVE is hidden from the guest and thus
+> prevent userspace from saving/restoring FP+SSE state on XSAVE host.  This
+> most visibily manifests as a failed migration (KVM_GET_XSAVE succeeds on a
+> non-XSAVE host and KVM_SET_XSAVE fails on an XSAVE host), but also causes
+> KVM_GET_SAVE on XSAVE hosts to effectively corrupt guest FP+SSE state.
 > 
-> xa_store_range seems to create multi-index entries by default.
-> Subsequent xa_store_range call changes all the entries stored
-> previously.
-
-By using xa_store_range and storing them as multi-index entries I
-expected to save some memory for continuous pages originally.
-
-But sounds like the current multi-index store behaviour isn't quite
-ready for our usage.
-
-Chao
-> xa_store needs to be used here instead of xa_store_range to achieve
-> the intended behavior.
+> Patch 1 fixes a mostly theoretical bug, and is also a prerequisite for
+> patch 2.
 > 
-> > +
-> > +       kvm_zap_gfn_range(kvm, start, end + 1);
-> > +
-> > +       return r;
-> > +}
-> > +#endif /* CONFIG_HAVE_KVM_PRIVATE_MEM */
-> > +
-> > ...
+> Patch 3 fixes a bug found by inspection when staring at all of this.  KVM
+> fails to check CR4.OSXSAVE when emulating XSETBV (the interception case
+> gets away without the check because the intercept happens after hardware
+> checks CR4).
+
+Thanks for pulling those together; the set of 3 passes my same (light) smoke test.
+
+Dave
+> 
+> Dr. David Alan Gilbert (1):
+>   KVM: x86: Always enable legacy FP/SSE in allowed user XFEATURES
+> 
+> Sean Christopherson (2):
+>   KVM: x86: Reinstate kvm_vcpu_arch.guest_supported_xcr0
+>   KVM: x86: Inject #UD on emulated XSETBV if XSAVES isn't enabled
+> 
+>  arch/x86/include/asm/kvm_host.h |  1 +
+>  arch/x86/kvm/cpuid.c            | 11 ++++++++---
+>  arch/x86/kvm/emulate.c          |  3 +++
+>  arch/x86/kvm/x86.c              | 10 +++-------
+>  4 files changed, 15 insertions(+), 10 deletions(-)
+> 
+> 
+> base-commit: 372d07084593dc7a399bf9bee815711b1fb1bcf2
+> -- 
+> 2.37.1.595.g718a3a8f04-goog
+> 
+-- 
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+
