@@ -2,58 +2,58 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 9FEB159F1C0
+	by mail.lfdr.de (Postfix) with ESMTP id E889159F1C1
 	for <lists+kvm@lfdr.de>; Wed, 24 Aug 2022 05:04:38 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234504AbiHXDEf (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 23 Aug 2022 23:04:35 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42458 "EHLO
+        id S234590AbiHXDEg (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 23 Aug 2022 23:04:36 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40420 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234372AbiHXDDo (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 23 Aug 2022 23:03:44 -0400
-Received: from mail-pf1-x44a.google.com (mail-pf1-x44a.google.com [IPv6:2607:f8b0:4864:20::44a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 138A682856
-        for <kvm@vger.kernel.org>; Tue, 23 Aug 2022 20:02:20 -0700 (PDT)
-Received: by mail-pf1-x44a.google.com with SMTP id p47-20020a056a0026ef00b005360f6163bcso5428694pfw.10
-        for <kvm@vger.kernel.org>; Tue, 23 Aug 2022 20:02:20 -0700 (PDT)
+        with ESMTP id S234394AbiHXDDq (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 23 Aug 2022 23:03:46 -0400
+Received: from mail-pj1-x104a.google.com (mail-pj1-x104a.google.com [IPv6:2607:f8b0:4864:20::104a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5E1017E32D
+        for <kvm@vger.kernel.org>; Tue, 23 Aug 2022 20:02:21 -0700 (PDT)
+Received: by mail-pj1-x104a.google.com with SMTP id r13-20020a17090a454d00b001f04dfc6195so152777pjm.2
+        for <kvm@vger.kernel.org>; Tue, 23 Aug 2022 20:02:21 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
         h=cc:to:from:subject:references:mime-version:message-id:in-reply-to
          :date:reply-to:from:to:cc;
-        bh=uRd7R7pLzjjdZjW8Dyqy1bvANP+JYwMiuQ0F7wNsDhs=;
-        b=Bn6pY2X+mNhutKjw0WJ4Z0rCGfykuTPTqiod60A/wDGyowMjItziPTDmUt7ounASKO
-         EBTmgh9tuCiEhtAFEogGLKDZbWKmysX4e/x3ow6HLMt6tnjddmRkXqlpq2TH7R7O7x4l
-         1Z6SODsxZK3g+84luLzD0iQmMPeiyl7PEceLlhPM6FfJBV+/1Mt5bMZ5z7YhbDzQjxWG
-         3t8YgYHUhy9hjF/LqiVj0s4bRsHWmz9x4nqM5WH54NpeWxmOLBKoFQ1JG0yuuI5glRy1
-         aOLfbz1dKCqOO8Pz+tvIRvJw+zcn5QvvhZHwjgp4utnE3mezaoDmgAd6grmoGme9pWK0
-         fcxw==
+        bh=100R8KB8sp54zNizYkSyo3dwNXMydCkPPZEmTAWlwFQ=;
+        b=RxX89c1Ei1n7hs3jaYncBNDrkTFCFWhYi1TMfRTr+jZ+lxMy+UcPgpoShGIYY3Jgzw
+         H5LD7MKw4KtNlZOdpz5sWrSSmapT3d4lAd+o9O2gNxtWu5ooE1/yNYtxwk2zRSVWQY3y
+         RuqyG0eWgGpKTp58/dKgbYaggk+4MtQGLjtSN0BGgWiOg1XTTuByELx8cDkinZGnnxAH
+         RUZgB916eHhRgnFgv5jcdvRVQl0axZJbrZrpGQi5sFSHl1+pFz7Q4ezQJnXfNpKqEqlD
+         kkiFa3yjtuUb8vnlduDijHUYnY2RNyid9cibM2glE8kav0Tv2E2pxGH7oTZpJ+qEFyIW
+         vROg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=cc:to:from:subject:references:mime-version:message-id:in-reply-to
          :date:reply-to:x-gm-message-state:from:to:cc;
-        bh=uRd7R7pLzjjdZjW8Dyqy1bvANP+JYwMiuQ0F7wNsDhs=;
-        b=tV737zAiT320tbtbFsP6Nwa0fcQDG0ngATXDKzCCDuzr+bLYOGw0cSLneyvApECrjc
-         wBDWbK4OsyZ18Aejc7vKOR0PbAxV//l0AT+ERHrTapnmURfFV0vq5jxV6tTJSCb++5M3
-         Ze3O0VB2ohj8b7mEs2jkW+xYnHKFsYMuMquVTQ4GKCcetGgWb3lLn+JwhAZmDd7DDCpT
-         Bk0CMf3ImzdtnwsuozT5ArjlernYY4bnb1HDbk3LTiJ7CoX9mT/xPdmFPYkkvoN6+WZl
-         wD19sGyl6pxZb2FOmc82rRa/V7SGLGC+c51ASbfDQxZNaMb1S9Jsr8G7atjb0y0Aw2eP
-         yxCQ==
-X-Gm-Message-State: ACgBeo2IGmoo1tsKh2r0pV8c4nf4XKZpTjhnsuqcrSrbIVMEph4beg+J
-        qJZHyu0mBspzIPew1fTNLbycY69JhtI=
-X-Google-Smtp-Source: AA6agR7HbknG7E6mJGXBd6mD7ITvU67NQ2fCBY81Rg6k1JhanbZ5C2rsOA093HzI3RNysDz4SWWeZOaM8e0=
+        bh=100R8KB8sp54zNizYkSyo3dwNXMydCkPPZEmTAWlwFQ=;
+        b=T89N8f7V/SQxt1+Hlxe2PFlinVKka/p92c85B72q9HFshpoPzXVnJW/v3QNtHluhvq
+         py4CwIBEkaXNRuVm97eFJ9YtDuI2yxQBBClvHJzVgeTxyXcSdlURLSMeMpAUolQyd5fz
+         Nbi1KvRO+0np1bZTAW/RYIKdweExpdPEajebIKtLFNlNE3EXPhgW26QUpNce6kaMrqA5
+         YouIXlyljtFRduBjQYsrjYBRmtBiKMsd1Ako6nDoMYhRh686lOVCwQs69O7Cwv2B9Cxi
+         6RhU1Bz1nm7axOmlYP3uaolKCemvldptMqReDRb6/Yx/nMqFiRo33hcA/DI8lNC0y7Fs
+         UUZw==
+X-Gm-Message-State: ACgBeo3VTUEEq7g8TaD0E60Tmw0XjDtboPrHDfKKHA43ptLJMW0vcgZd
+        p69D2mfdB8hGIHXOzpTFgQCghLdIwnQ=
+X-Google-Smtp-Source: AA6agR73cypLE3h+YuYEF24Aao/vV9s2yWoQYOl4a+gS75cmqkeFSwVp47ayhmIriH05EXE/MB1LlCSQOWI=
 X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a17:903:41c5:b0:172:fc8b:d186 with SMTP id
- u5-20020a17090341c500b00172fc8bd186mr6870843ple.90.1661310139643; Tue, 23 Aug
- 2022 20:02:19 -0700 (PDT)
+ (user=seanjc job=sendgmr) by 2002:aa7:9486:0:b0:536:b212:172f with SMTP id
+ z6-20020aa79486000000b00536b212172fmr11167373pfk.70.1661310141375; Tue, 23
+ Aug 2022 20:02:21 -0700 (PDT)
 Reply-To: Sean Christopherson <seanjc@google.com>
-Date:   Wed, 24 Aug 2022 03:01:25 +0000
+Date:   Wed, 24 Aug 2022 03:01:26 +0000
 In-Reply-To: <20220824030138.3524159-1-seanjc@google.com>
-Message-Id: <20220824030138.3524159-24-seanjc@google.com>
+Message-Id: <20220824030138.3524159-25-seanjc@google.com>
 Mime-Version: 1.0
 References: <20220824030138.3524159-1-seanjc@google.com>
 X-Mailer: git-send-email 2.37.1.595.g718a3a8f04-goog
-Subject: [RFC PATCH v6 23/36] KVM: VMX: Check CPU_BASED_{INTR,NMI}_WINDOW_EXITING
- in setup_vmcs_config()
+Subject: [RFC PATCH v6 24/36] KVM: VMX: Tweak the special handling of
+ SECONDARY_EXEC_ENCLS_EXITING in setup_vmcs_config()
 From:   Sean Christopherson <seanjc@google.com>
 To:     Vitaly Kuznetsov <vkuznets@redhat.com>
 Cc:     kvm@vger.kernel.org
@@ -70,68 +70,49 @@ X-Mailing-List: kvm@vger.kernel.org
 
 From: Vitaly Kuznetsov <vkuznets@redhat.com>
 
-CPU_BASED_{INTR,NMI}_WINDOW_EXITING controls are toggled dynamically by
-vmx_enable_{irq,nmi}_window, handle_interrupt_window(), handle_nmi_window()
-but setup_vmcs_config() doesn't check their existence. Add the check and
-filter the controls out in vmx_exec_control().
+SECONDARY_EXEC_ENCLS_EXITING is the only control which is conditionally
+added to the 'optional' checklist in setup_vmcs_config() but the special
+case can be avoided by always checking for its presence first and filtering
+out the result later.
 
-Note: KVM explicitly supports CPUs without VIRTUAL_NMIS and all these CPUs
-are supposedly lacking NMI_WINDOW_EXITING too. Adjust cpu_has_virtual_nmis()
-accordingly.
+Note: the situation when SECONDARY_EXEC_ENCLS_EXITING is present but
+cpu_has_sgx() is false is possible when SGX is "soft-disabled", e.g. if
+software writes MCE control MSRs or there's an uncorrectable #MC.
 
-No functional change intended.
-
+Reviewed-by: Jim Mattson <jmattson@google.com>
 Reviewed-by: Maxim Levitsky <mlevitsk@redhat.com>
-Reviewed-by: Sean Christopherson <seanjc@google.com>
 Signed-off-by: Vitaly Kuznetsov <vkuznets@redhat.com>
 Signed-off-by: Sean Christopherson <seanjc@google.com>
 ---
- arch/x86/kvm/vmx/capabilities.h | 3 ++-
- arch/x86/kvm/vmx/vmx.c          | 8 +++++++-
- 2 files changed, 9 insertions(+), 2 deletions(-)
+ arch/x86/kvm/vmx/vmx.c | 9 ++++++---
+ 1 file changed, 6 insertions(+), 3 deletions(-)
 
-diff --git a/arch/x86/kvm/vmx/capabilities.h b/arch/x86/kvm/vmx/capabilities.h
-index c5e5dfef69c7..faee1db8b0e0 100644
---- a/arch/x86/kvm/vmx/capabilities.h
-+++ b/arch/x86/kvm/vmx/capabilities.h
-@@ -82,7 +82,8 @@ static inline bool cpu_has_vmx_basic_inout(void)
- 
- static inline bool cpu_has_virtual_nmis(void)
- {
--	return vmcs_config.pin_based_exec_ctrl & PIN_BASED_VIRTUAL_NMIS;
-+	return vmcs_config.pin_based_exec_ctrl & PIN_BASED_VIRTUAL_NMIS &&
-+	       vmcs_config.cpu_based_exec_ctrl & CPU_BASED_NMI_WINDOW_EXITING;
- }
- 
- static inline bool cpu_has_vmx_preemption_timer(void)
 diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
-index eff38cbe6d35..7acbe43030e4 100644
+index 7acbe43030e4..e694eb2190f3 100644
 --- a/arch/x86/kvm/vmx/vmx.c
 +++ b/arch/x86/kvm/vmx/vmx.c
-@@ -2560,10 +2560,12 @@ static __init int setup_vmcs_config(struct vmcs_config *vmcs_conf,
- 	      CPU_BASED_MWAIT_EXITING |
- 	      CPU_BASED_MONITOR_EXITING |
- 	      CPU_BASED_INVLPG_EXITING |
--	      CPU_BASED_RDPMC_EXITING;
-+	      CPU_BASED_RDPMC_EXITING |
-+	      CPU_BASED_INTR_WINDOW_EXITING;
- 
- 	opt = CPU_BASED_TPR_SHADOW |
- 	      CPU_BASED_USE_MSR_BITMAPS |
-+	      CPU_BASED_NMI_WINDOW_EXITING |
- 	      CPU_BASED_ACTIVATE_SECONDARY_CONTROLS |
- 	      CPU_BASED_ACTIVATE_TERTIARY_CONTROLS;
- 	if (adjust_vmx_controls(min, opt, MSR_IA32_VMX_PROCBASED_CTLS,
-@@ -4374,6 +4376,10 @@ static u32 vmx_exec_control(struct vcpu_vmx *vmx)
- {
- 	u32 exec_control = vmcs_config.cpu_based_exec_ctrl;
- 
-+	/* INTR_WINDOW_EXITING and NMI_WINDOW_EXITING are toggled dynamically */
-+	exec_control &= ~(CPU_BASED_INTR_WINDOW_EXITING |
-+			  CPU_BASED_NMI_WINDOW_EXITING);
+@@ -2601,9 +2601,9 @@ static __init int setup_vmcs_config(struct vmcs_config *vmcs_conf,
+ 			SECONDARY_EXEC_PT_CONCEAL_VMX |
+ 			SECONDARY_EXEC_ENABLE_VMFUNC |
+ 			SECONDARY_EXEC_BUS_LOCK_DETECTION |
+-			SECONDARY_EXEC_NOTIFY_VM_EXITING;
+-		if (cpu_has_sgx())
+-			opt2 |= SECONDARY_EXEC_ENCLS_EXITING;
++			SECONDARY_EXEC_NOTIFY_VM_EXITING |
++			SECONDARY_EXEC_ENCLS_EXITING;
 +
- 	if (vmx->vcpu.arch.switch_db_regs & KVM_DEBUGREG_WONT_EXIT)
- 		exec_control &= ~CPU_BASED_MOV_DR_EXITING;
+ 		if (adjust_vmx_controls(min2, opt2,
+ 					MSR_IA32_VMX_PROCBASED_CTLS2,
+ 					&_cpu_based_2nd_exec_control) < 0)
+@@ -2650,6 +2650,9 @@ static __init int setup_vmcs_config(struct vmcs_config *vmcs_conf,
+ 		vmx_cap->vpid = 0;
+ 	}
+ 
++	if (!cpu_has_sgx())
++		_cpu_based_2nd_exec_control &= ~SECONDARY_EXEC_ENCLS_EXITING;
++
+ 	if (_cpu_based_exec_control & CPU_BASED_ACTIVATE_TERTIARY_CONTROLS) {
+ 		u64 opt3 = TERTIARY_EXEC_IPI_VIRT;
  
 -- 
 2.37.1.595.g718a3a8f04-goog
