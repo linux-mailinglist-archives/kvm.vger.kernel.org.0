@@ -2,137 +2,223 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 75CA159FDE0
-	for <lists+kvm@lfdr.de>; Wed, 24 Aug 2022 17:07:55 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id ED51E59FE49
+	for <lists+kvm@lfdr.de>; Wed, 24 Aug 2022 17:26:51 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238037AbiHXPHx (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 24 Aug 2022 11:07:53 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37224 "EHLO
+        id S239530AbiHXP0u (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 24 Aug 2022 11:26:50 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53836 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S237858AbiHXPHv (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 24 Aug 2022 11:07:51 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 20EDD98CA2
-        for <kvm@vger.kernel.org>; Wed, 24 Aug 2022 08:07:51 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1661353667;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=wdIG6PU+ZoI8/MHv/fssQMQ8BX31h7J6VpOJjMYBwoA=;
-        b=T+SCLsekjNAu6jsqF0qMOAFRAs6lyjzaqHt3fRn1HQ+OKWyvfPTWuRlN+lGCqsFdAdCbi8
-        uwPVUcb36ToMOB8kPqUe9kWy9iwbtNAAE8dr8m+PatbnO4tQ43T3v2IghRcWFZVDfoLLXI
-        CgXGUAnm7yWMD5cSV0Buo3Jr1sIC0ao=
-Received: from mimecast-mx02.redhat.com (mx3-rdu2.redhat.com
- [66.187.233.73]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-628-CmKKTN7AO42VhOHOPNCaxw-1; Wed, 24 Aug 2022 11:07:14 -0400
-X-MC-Unique: CmKKTN7AO42VhOHOPNCaxw-1
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.rdu2.redhat.com [10.11.54.5])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id E7B9E1C09C9D;
-        Wed, 24 Aug 2022 15:06:08 +0000 (UTC)
-Received: from starship (unknown [10.40.194.96])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 3DBAF9459C;
-        Wed, 24 Aug 2022 15:06:06 +0000 (UTC)
-Message-ID: <4c7f4ba7d6f4f796a2e7347113b280373a077d8a.camel@redhat.com>
-Subject: Re: [PATCH 1/2] KVM: x86: Allow userspace to opt out of hypercall
- patching
-From:   Maxim Levitsky <mlevitsk@redhat.com>
-To:     Sean Christopherson <seanjc@google.com>
-Cc:     Oliver Upton <oupton@google.com>,
-        Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        David Dunn <daviddunn@google.com>,
-        Peter Shier <pshier@google.com>
-Date:   Wed, 24 Aug 2022 18:06:05 +0300
-In-Reply-To: <YwY5AxXHAAxjJEPB@google.com>
-References: <20220316005538.2282772-1-oupton@google.com>
-         <20220316005538.2282772-2-oupton@google.com> <Yjyt7tKSDhW66fnR@google.com>
-         <2a438f7c-4dea-c674-86c0-9164cbad0813@redhat.com>
-         <YjzBB6GzNGrJdRC2@google.com> <Yj5V4adpnh8/B/K0@google.com>
-         <YkHwMd37Fo8Zej59@google.com> <YkH+X9c0TBSGKtzj@google.com>
-         <48030e75b36b281d4441d7dba729889aa9641125.camel@redhat.com>
-         <YwY5AxXHAAxjJEPB@google.com>
-Content-Type: text/plain; charset="UTF-8"
-User-Agent: Evolution 3.36.5 (3.36.5-2.fc32) 
+        with ESMTP id S238525AbiHXP0s (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 24 Aug 2022 11:26:48 -0400
+Received: from mail-pj1-x1032.google.com (mail-pj1-x1032.google.com [IPv6:2607:f8b0:4864:20::1032])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8789A9A687
+        for <kvm@vger.kernel.org>; Wed, 24 Aug 2022 08:26:44 -0700 (PDT)
+Received: by mail-pj1-x1032.google.com with SMTP id m15so9359594pjj.3
+        for <kvm@vger.kernel.org>; Wed, 24 Aug 2022 08:26:44 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc;
+        bh=7cYr8vAfRHCWuiirD4vPsPn+6q5Wbv188oHbQU7Rxhk=;
+        b=mgRkttJT3eCwZMRg+uvkdAvCsSWdhcCN9w9fVa3lDY8f/I4OgJwYT2zDhiFRZHZA8Q
+         qX4oX5RQiF26QWesS358K6RkTJId0PuSWWLSd1tmG0sq+8IMis3L7hBwoptwTfXT5EiW
+         M5UB4ltzcs5FDAKDpj+i88uB3XsIIX6mk3ftHKylzKRAM/BxmXMOMwMnqYauTifoghcE
+         s9OhNfLStbubvbhs8v6JFMGt71eSlVtJCBi6koG9daNoODMbScFqlVtMWdpW9C4lYlHI
+         eUVdmVyFvq4o48IUZUoWMuDpvFBOZ+X4KAG0UxrAovnc1f3LICr55Ghq97sE4LuTsklX
+         q/AQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc;
+        bh=7cYr8vAfRHCWuiirD4vPsPn+6q5Wbv188oHbQU7Rxhk=;
+        b=YjJli1xY0mrvls+yALYjfxAiVh6Pk64vb5ZOVpyafkS6c8gOXc/KnA62uCbEvA/N53
+         l0+MJlogr8veCCvt44KXGivs1jHKJxohKtEGCc7KK9rGyGWEYwlyBhGKBH5M7fC5ribK
+         Wh/9qVWwuwKSo/tzal9DpPdWwKriRjtswGnu7oVaUKbsOXJ4mP+/JxyNmsgC9k1TIgsr
+         ptniVvvVQLkuUU0Bl/JeI1kvKVgv9/ZtQcvHeJbvqa1QJz8snrC4zWOYGQvHzoDwKbz7
+         sT5QvdnQv7PPHfB7BTtuN2BSra65VODOJZhTkQAyscVQzY51TJR8f7Gw5SjZoGzJh1Df
+         s8tw==
+X-Gm-Message-State: ACgBeo1FPIyhhqn+21/B9pXGGKVRaDZuXaG946+53i0DT33j+SNFYB4c
+        8GJTyVp2PcFTX+xtIjJaeugOS3xg6KZnaw==
+X-Google-Smtp-Source: AA6agR5piYiLGl91DJ+WGiCQqFgwEJssZpJdddayt4oyPxEfPJpGKcc+JSQkywuvBiPbxPtQrUz4Kg==
+X-Received: by 2002:a17:903:11c7:b0:170:cde7:d24a with SMTP id q7-20020a17090311c700b00170cde7d24amr29338758plh.91.1661354803396;
+        Wed, 24 Aug 2022 08:26:43 -0700 (PDT)
+Received: from google.com (7.104.168.34.bc.googleusercontent.com. [34.168.104.7])
+        by smtp.gmail.com with ESMTPSA id qi3-20020a17090b274300b001f3162e4e55sm1538091pjb.35.2022.08.24.08.26.42
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 24 Aug 2022 08:26:43 -0700 (PDT)
+Date:   Wed, 24 Aug 2022 15:26:39 +0000
+From:   Sean Christopherson <seanjc@google.com>
+To:     Dapeng Mi <dapeng1.mi@intel.com>
+Cc:     rafael@kernel.org, daniel.lezcano@linaro.org, pbonzini@redhat.com,
+        linux-pm@vger.kernel.org, linux-kernel@vger.kernel.org,
+        kvm@vger.kernel.org, zhenyuw@linux.intel.com
+Subject: Re: [PATCH] KVM: x86: use TPAUSE to replace PAUSE in halt polling
+Message-ID: <YwZDL4yv7F2Y4JBP@google.com>
+References: <20220824091117.767363-1-dapeng1.mi@intel.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.11.54.5
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham
-        autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20220824091117.767363-1-dapeng1.mi@intel.com>
+X-Spam-Status: No, score=-14.5 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+        ENV_AND_HDR_SPF_MATCH,FSL_HELO_FAKE,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,
+        SPF_PASS,T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL
+        autolearn=no autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, 2022-08-24 at 14:43 +0000, Sean Christopherson wrote:
-> On Wed, Aug 24, 2022, Maxim Levitsky wrote:
-> > On Mon, 2022-03-28 at 18:28 +0000, Sean Christopherson wrote:
-> > > On Mon, Mar 28, 2022, Oliver Upton wrote:
-> > > > While I was looking at #UD under nested for this issue, I noticed:
-> > > > 
-> > > > Isn't there a subtle inversion on #UD intercepts for nVMX? L1 gets first dibs
-> > > > on #UD, even though it is possible that L0 was emulating an instruction not
-> > > > present in hardware (like RDPID). If L1 passed through RDPID the #UD
-> > > > should not be reflected to L1.
-> > > 
-> > > Yes, it's a known bug.
-> > > 
-> > > > I believe this would require that we make the emulator aware of nVMX which
-> > > > sounds like a science project on its own.
-> > > 
-> > > I don't think it would require any new awareness in the emulator proper, KVM
-> > > would "just" need to ensure it properly morphs the resulting reflected #UD to a
-> > > nested VM-Exit if the emulator doesn't "handle" the #UD.  In theory, that should
-> > > Just Work...
-> > > 
-> > > > Do we write this off as another erratum of KVM's (virtual) hardware on VMX? :)
-> > > 
-> > > I don't think we write it off entirely, but it's definitely on the backburner
-> > > because there are so precious few cases where KVM emulates on #UD.  And for good
-> > > reason, e.g. the RDPID case takes an instruction that exists purely to optimize
-> > > certain flows and turns them into dreadfully sloooow paths.
-> > > 
-> > 
-> > I noticed that 'fix_hypercall_test' selftest fails if run in a VM. The reason is
-> > that L0 patches the hypercall before L1 sees it so it can't really do anything
-> > about it.
-> > 
-> > Do you think we can always stop patching hypercalls for the nested guest regardless
-> > of the quirk, or that too will be considered breaking backwards compatability?
+On Wed, Aug 24, 2022, Dapeng Mi wrote:
+> TPAUSE is a new instruction on Intel processors which can instruct
+> processor enters a power/performance optimized state. Halt polling
+> uses PAUSE instruction to wait vCPU is waked up. The polling time
+> could be long and cause extra power consumption in some cases.
 > 
-> Heh, go run it on Intel, problem solved ;-)
+> Use TPAUSE to replace the PAUSE instruction in halt polling to get
+> a better power saving and performance.
+
+Better power savings, yes.  Better performance?  Not necessarily.  Using TPAUSE
+for  a "successful" halt poll is likely to yield _worse_ performance from the
+vCPU's perspective due to the increased latency.
+
+> Signed-off-by: Dapeng Mi <dapeng1.mi@intel.com>
+> ---
+>  drivers/cpuidle/poll_state.c |  3 ++-
+>  include/linux/kvm_host.h     | 20 ++++++++++++++++++++
+>  virt/kvm/kvm_main.c          |  2 +-
+>  3 files changed, 23 insertions(+), 2 deletions(-)
 > 
-> As discussed last year[*], it's impossible to get this right in all cases, ignoring
-> the fact that patching in the first place is arguably wrong.  E.g. if KVM is running
-> on AMD hardware and L0 exposes an Intel vCPU to L1, then it sadly becomes KVM's
-> responsibility to patch L2 because from L1's perspective, a #UD on Intel's VMCALL
-> in L2 is spurious.
+> diff --git a/drivers/cpuidle/poll_state.c b/drivers/cpuidle/poll_state.c
+> index f7e83613ae94..51ec333cbf80 100644
+> --- a/drivers/cpuidle/poll_state.c
+> +++ b/drivers/cpuidle/poll_state.c
+> @@ -7,6 +7,7 @@
+>  #include <linux/sched.h>
+>  #include <linux/sched/clock.h>
+>  #include <linux/sched/idle.h>
+> +#include <linux/kvm_host.h>
+>  
+>  #define POLL_IDLE_RELAX_COUNT	200
+>  
+> @@ -25,7 +26,7 @@ static int __cpuidle poll_idle(struct cpuidle_device *dev,
+>  		limit = cpuidle_poll_time(drv, dev);
+>  
+>  		while (!need_resched()) {
+> -			cpu_relax();
+> +			kvm_cpu_poll_pause(limit);
+
+poll_idle() absolutely should not be calling into KVM code.
+
+>  			if (loop_count++ < POLL_IDLE_RELAX_COUNT)
+>  				continue;
+>  
+> diff --git a/include/linux/kvm_host.h b/include/linux/kvm_host.h
+> index f4519d3689e1..810e749949b7 100644
+> --- a/include/linux/kvm_host.h
+> +++ b/include/linux/kvm_host.h
+> @@ -35,6 +35,7 @@
+>  #include <linux/interval_tree.h>
+>  #include <linux/rbtree.h>
+>  #include <linux/xarray.h>
+> +#include <linux/delay.h>
+>  #include <asm/signal.h>
+>  
+>  #include <linux/kvm.h>
+> @@ -2247,6 +2248,25 @@ static inline void kvm_handle_signal_exit(struct kvm_vcpu *vcpu)
+>  }
+>  #endif /* CONFIG_KVM_XFER_TO_GUEST_WORK */
+>  
+> +/*
+> + * This function is intended to replace the cpu_relax function in
+> + * halt polling. If TPAUSE instruction is supported, use TPAUSE
+> + * instead fo PAUSE to get better power saving and performance.
+> + * Selecting 1 us is a compromise between scheduling latency and
+> + * power saving time.
+> + */
+> +static inline void kvm_cpu_poll_pause(u64 timeout_ns)
+> +{
+> +#ifdef CONFIG_X86
+
+This is not preferred the way to insert arch-specific behavior into common KVM code.
+Assuming the goal is to avoid a function call, use an #ifndef here and then #define
+the flag in x86's kvm_host.h, e.g.
+
+#ifndef CONFIG_HAVE_KVM_ARCH_HALT_POLL_PAUSE
+static inline kvm_cpu_halt_poll_pause(u64 timeout_ns)
+{
+	cpu_relax();
+}
+#endif
+
+It's not obvious that we need to avoid a call here though, in which case a
+
+  __weak void kvm_arch_cpu_halt_poll_pause(struct kvm *kvm)
+  {
+
+  }
+
+with an x86 implementation will suffice.
+
+
+> +	if (static_cpu_has(X86_FEATURE_WAITPKG) && timeout_ns > 1000)
+> +		udelay(1);
+
+This is far too arbitrary.  Wake events from other vCPU are not necessarily
+accompanied by an IRQ, which means that delaying for 1us may really truly delay
+for 1us before detecting a pending wake event.
+
+If this is something we want to utilize in KVM, it should be controllable by
+userspace, probably via module param, and likely off by default.
+
+E.g. 
+
+  unsigned int halt_poll_tpause_ns;
+
+and then
+
+  if (timeout_ns >= halt_poll_tpause_ns)
+  	udelay(halt_poll_tpause_ns);
+
+with halt_poll_tpause_ns zeroed out during setup if TPAUSE isn't supported.
+
+I say "if", because I think this needs to come with performance numbers to show
+the impact on guest latency so that KVM and its users can make an informed decision.
+And if it's unlikely that anyone will ever want to enable TPAUSE for halt polling,
+then it's not worth the extra complexity in KVM.
+
+> +	else
+> +		cpu_relax();
+> +#else
+> +	cpu_relax();
+> +#endif
+> +}
+> +
+>  /*
+>   * This defines how many reserved entries we want to keep before we
+>   * kick the vcpu to the userspace to avoid dirty ring full.  This
+> diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
+> index 584a5bab3af3..4afa776d21bd 100644
+> --- a/virt/kvm/kvm_main.c
+> +++ b/virt/kvm/kvm_main.c
+> @@ -3510,7 +3510,7 @@ void kvm_vcpu_halt(struct kvm_vcpu *vcpu)
+>  			 */
+>  			if (kvm_vcpu_check_block(vcpu) < 0)
+>  				goto out;
+> -			cpu_relax();
+> +			kvm_cpu_poll_pause(vcpu->halt_poll_ns);
+
+This is wrong, vcpu->halt_poll_ns is the total poll time, not the time remaining.
+E.g. if the max poll time is 1001 ns, and KVM has already waited for 1000 ns, then
+udelay(1) will cause KVM to wait for ~2000ns total.  There's always going to be
+some amount of overrun, but overrun by a few ns is quite different than overrun
+by a few thousand ns.
+
+>  			poll_end = cur = ktime_get();
+>  		} while (kvm_vcpu_can_poll(cur, stop));
+>  	}
+> -- 
+> 2.34.1
 > 
-> Regardless of what path we take, I do think we should align VMX and SVM on exception
-> intercept behavior.
-
-Maybe then we should at least skip the unit test if running nested (should be easy to check the hypervisor
-cpuid)?
-
-Oh well, I do understand you that the whole 'patching' thing is one big mess :(
-
-I wonder how hard it will be to ask Qemu to disable this quirk....
-
-Best regards,
-	Maxim Levitsky
-
-> 
-> [*] https://lore.kernel.org/all/YEZUhbBtNjWh0Zka@google.com
-> 
-
-
