@@ -2,57 +2,56 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 9D43E5A0855
-	for <lists+kvm@lfdr.de>; Thu, 25 Aug 2022 07:10:26 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id F142F5A0858
+	for <lists+kvm@lfdr.de>; Thu, 25 Aug 2022 07:10:28 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233262AbiHYFKZ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 25 Aug 2022 01:10:25 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37882 "EHLO
+        id S233467AbiHYFK1 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 25 Aug 2022 01:10:27 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37918 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233348AbiHYFKU (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 25 Aug 2022 01:10:20 -0400
-Received: from mail-pj1-x1049.google.com (mail-pj1-x1049.google.com [IPv6:2607:f8b0:4864:20::1049])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8B0F39A9E0
-        for <kvm@vger.kernel.org>; Wed, 24 Aug 2022 22:10:19 -0700 (PDT)
-Received: by mail-pj1-x1049.google.com with SMTP id bf3-20020a17090b0b0300b001fb29d80046so4709184pjb.0
-        for <kvm@vger.kernel.org>; Wed, 24 Aug 2022 22:10:19 -0700 (PDT)
+        with ESMTP id S233371AbiHYFKY (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 25 Aug 2022 01:10:24 -0400
+Received: from mail-yw1-x1149.google.com (mail-yw1-x1149.google.com [IPv6:2607:f8b0:4864:20::1149])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3AFB180F7B
+        for <kvm@vger.kernel.org>; Wed, 24 Aug 2022 22:10:21 -0700 (PDT)
+Received: by mail-yw1-x1149.google.com with SMTP id 00721157ae682-33da75a471cso59064257b3.20
+        for <kvm@vger.kernel.org>; Wed, 24 Aug 2022 22:10:21 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
         h=cc:to:from:subject:references:mime-version:message-id:in-reply-to
          :date:from:to:cc;
-        bh=pEzlhIhHkJ9oe9us+Ap6efv2GvV7LuN1d5BuceK5HtQ=;
-        b=GDyPQuvB4CGkscQbFZesosca0zjSklRpbtqexkueZNX0/pQlIx18BczSNbJOP6N52r
-         VK0YZIjzcrbwa8JnR5p94cA3vM3FOALNsiaDpTwkEQ5sYP8zR2+ZCDGSbAHtV1d2ntKO
-         1nscFoy1pN1GJ/KqunnMWBDzX60HpvGeV1ZFpeTg2j/LI9cFvBStu4bK+XXveF0y/P93
-         iIpNZOY8Cm/V3G+MHqg8np+I0RwEFmMV9x4YMP+uyhlRuqHaRf87tYe6/Jaha/2Nqe24
-         hjZfCUriCXxAGqR5uLeTWRpq8z3vDgesV9E3/ACXNMNELEY5hwkQ7ZH9wBrfCwDKEHHR
-         b/+w==
+        bh=EmnP6URNfHv6I0nbxGmg1XJ0KHdi317moIKFVeeAsc8=;
+        b=odzh+413GPIsjI66IJBEHSOJ1TAozjY8/5h10hAgbwXYR+m8+Bq098asyIJO31M6XX
+         FG6XQOp4j4ukN2HsJ06YJmmH7orlAaws2A+dvnD8GzU49lsEM59llnl7vYysAlJjgJkB
+         Z9sSIQCG/bNvPvmJkwVn3TuSSS3HX7RGRbtoLkCPKctFswbbcSHV14tjLpeVjQWTS/3U
+         74fuO1j9abX4bH4TwtyH1divYl7Kc0o51RcxSyPowqEfdSqwcMMuUC8p7UUGhR3wso3K
+         bgUqyEQlUfxjPBGEj9/3GzXGK/Y/DNJHWiAHHQS6DuztTtwkFMrAa/O5D1XFFaAaC9wU
+         XO+Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=cc:to:from:subject:references:mime-version:message-id:in-reply-to
          :date:x-gm-message-state:from:to:cc;
-        bh=pEzlhIhHkJ9oe9us+Ap6efv2GvV7LuN1d5BuceK5HtQ=;
-        b=qSxF8ZmmDz4rmxdFSOckH1A3Khn3vYZXVxDU+DfGl+PRbtMMYWqJe/it6YIGgDwWur
-         XaISYt+fNBizL9mZOVTC7wSr4r4v6vYA0LBSb5YyNDQiUV5u2O6ASMpdvAg6htZA1982
-         ef+UQlzk69oQ2HX5SaIAyvXiaVIoFgjx8uo7XvB8HMqySpCeTdXNolfgt1L/HLvo9LCF
-         DUzBKutOQhdXKiOQpTCh2Z3FGsCqXakUCj5IQjYJq7FS3q+8Vo75hVtzZeQjZxIVHyUp
-         n8r5eKynwSwRHEvdVb62c3uQDrID0/FgIlVD8CAhZN2ut4jBykJLSocTQ8SWm7P6SiSD
-         ED2w==
-X-Gm-Message-State: ACgBeo3IN2ikYH1v+dJuyQHOcwu94x7ghI1MHXdGm3wG256vnQd14hAJ
-        /k9azRJcN9CCAzcv1xLgGhzd+CX8NR4=
-X-Google-Smtp-Source: AA6agR4QwGnPgJc9EXrJlzOPJDZW1awp7QnK0mmHC+92n4anJ3Yqks2hO/x4pF1tFVBJVUjLL44mvc2Kwdg=
+        bh=EmnP6URNfHv6I0nbxGmg1XJ0KHdi317moIKFVeeAsc8=;
+        b=2wfJV2AO6kUATxLmLyU/UTje4kBkFNW8CsH9qJBxbpCV1T6zMN01XXeOw0aREcuICc
+         ovfmqPIdYBW962KPtR10/vWX8puIxRiqXidT4IFFUeOGDzVWce01niU+tVTA4P3qfr/7
+         jJaspKMuOqHNiw8hF0COOCKOr6sHkq/jdc4OmdWwqn7cpyKX5wIs2jcKPhkjrTI14qB6
+         EcenBGNUK7dQCm4rjceaDqJ+fk/c7CLNaLjdH97N3E+YGAHixrdkp7QuNHvmkYFi2qeB
+         mstjV5f2GJbHLcLZlFl8c3+Xr0iankEklbefJ1HsC0E+VTAgjKeIA8S7WYJohz48KwM0
+         mWLw==
+X-Gm-Message-State: ACgBeo1+D2GSlJAspAYKxSFLmHEWaKvEdLVol87KodmDQam+odatwVyC
+        dJi4xbJS7eYl5MtOueU8dcyJxyrgytE=
+X-Google-Smtp-Source: AA6agR4ONormzDuDs7YpdVMH6kwTbayc6AXSuIT5cwIOH9liK5R8puxixgYLfHyko+rG1K4Ic3X2+t6qTmc=
 X-Received: from reijiw-west4.c.googlers.com ([fda3:e722:ac3:cc00:20:ed76:c0a8:aa1])
- (user=reijiw job=sendgmr) by 2002:a17:90a:de96:b0:1fa:e427:e18e with SMTP id
- n22-20020a17090ade9600b001fae427e18emr12097875pjv.116.1661404218605; Wed, 24
- Aug 2022 22:10:18 -0700 (PDT)
-Date:   Wed, 24 Aug 2022 22:08:42 -0700
+ (user=reijiw job=sendgmr) by 2002:a5b:dd2:0:b0:695:7965:1747 with SMTP id
+ t18-20020a5b0dd2000000b0069579651747mr1981297ybr.415.1661404221149; Wed, 24
+ Aug 2022 22:10:21 -0700 (PDT)
+Date:   Wed, 24 Aug 2022 22:08:43 -0700
 In-Reply-To: <20220825050846.3418868-1-reijiw@google.com>
-Message-Id: <20220825050846.3418868-6-reijiw@google.com>
+Message-Id: <20220825050846.3418868-7-reijiw@google.com>
 Mime-Version: 1.0
 References: <20220825050846.3418868-1-reijiw@google.com>
 X-Mailer: git-send-email 2.37.1.595.g718a3a8f04-goog
-Subject: [PATCH 5/9] KVM: arm64: selftests: Have debug_version() use
- cpuid_get_ufield() helper
+Subject: [PATCH 6/9] KVM: arm64: selftests: Change debug_version() to take ID_AA64DFR0_EL1
 From:   Reiji Watanabe <reijiw@google.com>
 To:     Marc Zyngier <maz@kernel.org>, kvmarm@lists.cs.columbia.edu
 Cc:     kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
@@ -77,27 +76,51 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Change debug_version() to use cpuid_get_ufield() to extract DebugVer
-field from the AA64DFR0_EL1 register value.
+Change debug_version() to take the ID_AA64DFR0_EL1 value instead of
+vcpu as an argument, and change its callsite to read ID_AA64DFR0_EL1
+(and pass it to debug_version()).
+Subsequent patches will reuse the register value in the callsite.
 
 Signed-off-by: Reiji Watanabe <reijiw@google.com>
 ---
- tools/testing/selftests/kvm/aarch64/debug-exceptions.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ tools/testing/selftests/kvm/aarch64/debug-exceptions.c | 9 ++++-----
+ 1 file changed, 4 insertions(+), 5 deletions(-)
 
 diff --git a/tools/testing/selftests/kvm/aarch64/debug-exceptions.c b/tools/testing/selftests/kvm/aarch64/debug-exceptions.c
-index 713c7240b680..17b17359ac41 100644
+index 17b17359ac41..ab8860e3a9fa 100644
 --- a/tools/testing/selftests/kvm/aarch64/debug-exceptions.c
 +++ b/tools/testing/selftests/kvm/aarch64/debug-exceptions.c
-@@ -320,7 +320,7 @@ static int debug_version(struct kvm_vcpu *vcpu)
- 	uint64_t id_aa64dfr0;
- 
- 	vcpu_get_reg(vcpu, KVM_ARM64_SYS_REG(SYS_ID_AA64DFR0_EL1), &id_aa64dfr0);
--	return id_aa64dfr0 & 0xf;
-+	return cpuid_get_ufield(id_aa64dfr0, ID_AA64DFR0_DEBUGVER_SHIFT);
+@@ -315,11 +315,8 @@ static void guest_svc_handler(struct ex_regs *regs)
+ 	svc_addr = regs->pc;
  }
  
- int main(int argc, char *argv[])
+-static int debug_version(struct kvm_vcpu *vcpu)
++static int debug_version(uint64_t id_aa64dfr0)
+ {
+-	uint64_t id_aa64dfr0;
+-
+-	vcpu_get_reg(vcpu, KVM_ARM64_SYS_REG(SYS_ID_AA64DFR0_EL1), &id_aa64dfr0);
+ 	return cpuid_get_ufield(id_aa64dfr0, ID_AA64DFR0_DEBUGVER_SHIFT);
+ }
+ 
+@@ -329,6 +326,7 @@ int main(int argc, char *argv[])
+ 	struct kvm_vm *vm;
+ 	struct ucall uc;
+ 	int stage;
++	uint64_t aa64dfr0;
+ 
+ 	vm = vm_create_with_one_vcpu(&vcpu, guest_code);
+ 	ucall_init(vm, NULL);
+@@ -336,7 +334,8 @@ int main(int argc, char *argv[])
+ 	vm_init_descriptor_tables(vm);
+ 	vcpu_init_descriptor_tables(vcpu);
+ 
+-	__TEST_REQUIRE(debug_version(vcpu) >= 6,
++	vcpu_get_reg(vcpu, KVM_ARM64_SYS_REG(SYS_ID_AA64DFR0_EL1), &aa64dfr0);
++	__TEST_REQUIRE(debug_version(aa64dfr0) >= 6,
+ 		       "Armv8 debug architecture not supported.");
+ 
+ 	vm_install_sync_handler(vm, VECTOR_SYNC_CURRENT,
 -- 
 2.37.1.595.g718a3a8f04-goog
 
