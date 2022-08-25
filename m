@@ -2,128 +2,127 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 751A25A1752
-	for <lists+kvm@lfdr.de>; Thu, 25 Aug 2022 18:58:31 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 5C1635A179E
+	for <lists+kvm@lfdr.de>; Thu, 25 Aug 2022 19:04:11 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S242631AbiHYQ63 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 25 Aug 2022 12:58:29 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41552 "EHLO
+        id S241701AbiHYREF (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 25 Aug 2022 13:04:05 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52524 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S239344AbiHYQ6Y (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 25 Aug 2022 12:58:24 -0400
-Received: from out0.migadu.com (out0.migadu.com [IPv6:2001:41d0:2:267::])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 58857AFAE4
-        for <kvm@vger.kernel.org>; Thu, 25 Aug 2022 09:58:23 -0700 (PDT)
-Date:   Thu, 25 Aug 2022 09:58:09 -0700
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-        t=1661446701;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=23LQr+BJhfVdQfv6GAKyN2WcdFY338AxJHz2RBNuoO0=;
-        b=C/uCf0Lc2rScl/KZeL7T6K12Gtj0qfj9SX4MfVwAvFeXiaWQmHIFyOhv8HJqSOm4ZujbLX
-        uYgcabc7AWWiuKfiCv2o0nSdiM208/HH9sQs89lXqq+blkCq1iAOabOfvxSJMLiPPpHfNA
-        pHAz3AOn2NJyI9GHeCh4zAoYvcPK8sU=
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From:   Oliver Upton <oliver.upton@linux.dev>
-To:     Ricardo Koller <ricarkol@google.com>
-Cc:     Reiji Watanabe <reijiw@google.com>, kvm@vger.kernel.org,
-        Marc Zyngier <maz@kernel.org>,
-        Andrew Jones <andrew.jones@linux.dev>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
-Subject: Re: [PATCH 1/9] KVM: arm64: selftests: Add helpers to extract a
- field of an ID register
-Message-ID: <YweqIefFbP107fe+@google.com>
-References: <20220825050846.3418868-1-reijiw@google.com>
- <20220825050846.3418868-2-reijiw@google.com>
- <Ywen44OKe8gGcOcW@google.com>
- <Yweo5cmA6D0pxwmJ@google.com>
+        with ESMTP id S240821AbiHYREB (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 25 Aug 2022 13:04:01 -0400
+Received: from mail-pl1-x634.google.com (mail-pl1-x634.google.com [IPv6:2607:f8b0:4864:20::634])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AA597B7753
+        for <kvm@vger.kernel.org>; Thu, 25 Aug 2022 10:03:58 -0700 (PDT)
+Received: by mail-pl1-x634.google.com with SMTP id d12so350183plr.6
+        for <kvm@vger.kernel.org>; Thu, 25 Aug 2022 10:03:58 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc;
+        bh=wtCfQVk2hYCo/4eE2g12ZC1mwyOqJt01e7eHWQ9hAis=;
+        b=Fy3+5Mj3vjR0pCTpQMmjzMmJuN4iZQa0pTJVCfpRFmSA+qdUpk0lWiSkH9CHOLfmpv
+         VVXdp6X7D89f/PBNwGVcCVYKqpzBsF7j14+aOmBt/3tSkWLarMUy+epZG2ncXMWTXzmY
+         LA8qVVPHiCBFd4lk/ymeK+jpu/UTIcfTXnuFQNss6puZjvPfesOXpJPZ37g/oFqFhvJD
+         iWWCRzaFgpFLKK9CHUH5Stl0zIQzeW/ArSFy4RHxNjtcFHtIGAvLTOPrzPQga98iKpui
+         n+0niHRDtkT2iDMTjhHky6xdBR3flTBJnIeo1XJdjf68MswgO3TxRhZnm/o6jL39BsPk
+         ep5w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc;
+        bh=wtCfQVk2hYCo/4eE2g12ZC1mwyOqJt01e7eHWQ9hAis=;
+        b=q9NAixzvFmhKqzd+jTPJmxK0WxzaMpCpVWFbLY9AD2YgAYFGrh9ULoirTDjzFrmFBm
+         QYRTP7ww5uCYOvmYcix6YGwe9GhM/Pk3aQIHOqB5XXLcbLtXKpfeJi6MOodKC9eKIyG8
+         xqJIWxGtrqzcSAboFvNXWfelaglkUrNePEdocDdpeuNG7hHd3hpgtW+nsHR4QO2TkJbI
+         76RcPnTuxOZW2athAR+MaaDEMZq0l2uvYzJTpdCUOOhHjVY047074Vno6IHMcaj2DXyq
+         oI28luLig/IsowyOPVHvmu4FN2FHZy4V3C/nPQd62u41i/TN3unplWWbdpaIBpzIeRBo
+         joLQ==
+X-Gm-Message-State: ACgBeo0JpJOKSWZMjGSvQLOqxzbsaMZtwPlh65MsBjkyjZD+x93WWjE1
+        QfoGeRFAxGCw85C0UjiTGufBzLZmWCgyfw==
+X-Google-Smtp-Source: AA6agR612y0OOZu/ohzPzfoak4TDFJI4ZaXeFvuCAcm/MAJIp7LJKrmaoQKMs2tQQmvL3xXTW3LucQ==
+X-Received: by 2002:a17:90a:5d8a:b0:1f7:3c7a:9cc7 with SMTP id t10-20020a17090a5d8a00b001f73c7a9cc7mr32928pji.207.1661447037664;
+        Thu, 25 Aug 2022 10:03:57 -0700 (PDT)
+Received: from google.com (7.104.168.34.bc.googleusercontent.com. [34.168.104.7])
+        by smtp.gmail.com with ESMTPSA id y190-20020a6232c7000000b005368fcfb7f8sm9492863pfy.89.2022.08.25.10.03.57
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 25 Aug 2022 10:03:57 -0700 (PDT)
+Date:   Thu, 25 Aug 2022 17:03:53 +0000
+From:   Sean Christopherson <seanjc@google.com>
+To:     Michal Luczaj <mhal@rbox.co>
+Cc:     kvm@vger.kernel.org, pbonzini@redhat.com
+Subject: Re: [kvm-unit-tests PATCH] x86/emulator: Test POP-SS blocking
+Message-ID: <YwereSW3UPhDNsnh@google.com>
+References: <20220821215900.1419215-1-mhal@rbox.co>
+ <20220821220647.1420411-1-mhal@rbox.co>
+ <9b853239-a3df-f124-e793-44cbadfbbd8f@rbox.co>
+ <YwOj6tzvIoG34/sF@google.com>
+ <6d19f78f-120a-936b-3eba-e949ecc3509f@rbox.co>
+ <YwZu1K5Rgb1sevsy@google.com>
+ <69d74e6a-dd6b-28bb-8011-e204d4ab0253@rbox.co>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <Yweo5cmA6D0pxwmJ@google.com>
-X-Migadu-Flow: FLOW_OUT
-X-Migadu-Auth-User: linux.dev
-X-Spam-Status: No, score=-2.8 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,SPF_HELO_PASS,
-        SPF_PASS,T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED autolearn=ham
-        autolearn_force=no version=3.4.6
+In-Reply-To: <69d74e6a-dd6b-28bb-8011-e204d4ab0253@rbox.co>
+X-Spam-Status: No, score=-14.5 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+        ENV_AND_HDR_SPF_MATCH,FSL_HELO_FAKE,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,
+        SPF_PASS,T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL
+        autolearn=no autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Aug 25, 2022 at 09:52:53AM -0700, Ricardo Koller wrote:
-> On Thu, Aug 25, 2022 at 09:48:35AM -0700, Oliver Upton wrote:
-> > Hi Reiji,
-> > 
-> > On Wed, Aug 24, 2022 at 10:08:38PM -0700, Reiji Watanabe wrote:
-> > > Introduce helpers to extract a field of an ID register.
-> > > Subsequent patches will use those helpers.
-> > > 
-> > > Signed-off-by: Reiji Watanabe <reijiw@google.com>
-> > > ---
-> > >  .../selftests/kvm/include/aarch64/processor.h     |  2 ++
-> > >  .../testing/selftests/kvm/lib/aarch64/processor.c | 15 +++++++++++++++
-> > >  2 files changed, 17 insertions(+)
-> > > 
-> > > diff --git a/tools/testing/selftests/kvm/include/aarch64/processor.h b/tools/testing/selftests/kvm/include/aarch64/processor.h
-> > > index a8124f9dd68a..a9b4b4e0e592 100644
-> > > --- a/tools/testing/selftests/kvm/include/aarch64/processor.h
-> > > +++ b/tools/testing/selftests/kvm/include/aarch64/processor.h
-> > > @@ -193,4 +193,6 @@ void smccc_hvc(uint32_t function_id, uint64_t arg0, uint64_t arg1,
-> > >  
-> > >  uint32_t guest_get_vcpuid(void);
-> > >  
-> > > +int cpuid_get_sfield(uint64_t val, int field_shift);
-> > > +unsigned int cpuid_get_ufield(uint64_t val, int field_shift);
-> > >  #endif /* SELFTEST_KVM_PROCESSOR_H */
-> > > diff --git a/tools/testing/selftests/kvm/lib/aarch64/processor.c b/tools/testing/selftests/kvm/lib/aarch64/processor.c
-> > > index 6f5551368944..0b2ad46e7ff5 100644
-> > > --- a/tools/testing/selftests/kvm/lib/aarch64/processor.c
-> > > +++ b/tools/testing/selftests/kvm/lib/aarch64/processor.c
-> > > @@ -528,3 +528,18 @@ void smccc_hvc(uint32_t function_id, uint64_t arg0, uint64_t arg1,
-> > >  		       [arg4] "r"(arg4), [arg5] "r"(arg5), [arg6] "r"(arg6)
-> > >  		     : "x0", "x1", "x2", "x3", "x4", "x5", "x6", "x7");
-> > >  }
-> > > +
-> > > +/* Helpers to get a signed/unsigned feature field from ID register value */
-> > > +int cpuid_get_sfield(uint64_t val, int field_shift)
-> > > +{
-> > > +	int width = 4;
-> > > +
-> > > +	return (int64_t)(val << (64 - width - field_shift)) >> (64 - width);
-> > > +}
-> > 
-> > I don't believe this helper is ever used.
-> > 
-> > > +unsigned int cpuid_get_ufield(uint64_t val, int field_shift)
-> > > +{
-> > > +	int width = 4;
-> > > +
-> > > +	return (uint64_t)(val << (64 - width - field_shift)) >> (64 - width);
-> > > +}
-> > 
-> > I would recommend not open-coding this and instead make use of
-> > ARM64_FEATURE_MASK(). You could pull in linux/bitfield.h to tools, or do
-> > something like this:
-> > 
-> >   #define ARM64_FEATURE_GET(ftr, val)					\
-> >   	  	  ((ARM64_FEATURE_MASK(ftr) & val) >> ftr##_SHIFT)
-> > 
-> > Slight preference for FIELD_{GET,SET}() as it matches the field
-> > extraction in the kernel as well.
+On Wed, Aug 24, 2022, Michal Luczaj wrote:
+> On 8/24/22 20:32, Sean Christopherson wrote:
+> > Eh, let's completely skip usermode for code #DBs and not tweak __run_single_step_db_test().
+> > It's easier to just have a standalone function.
 > 
-> Was doing that with this commit:
+> Something like this?
 > 
-> 	[PATCH v5 05/13] tools: Copy bitfield.h from the kernel sources
+> static void test_pop_ss_code_db(bool fep_available)
+> {
+> 	write_ss(KERNEL_DS);
 > 
-> Maybe you could just use it given that it's already reviewed.
+> 	write_dr7(DR7_FIXED_1 |
+> 		  DR7_ENABLE_DRx(0) |
+> 		  DR7_EXECUTE_DRx(0) |
+> 		  DR7_LEN_1_DRx(0));
+> 
+> #define POPSS_DB(desc, fep1, fep2)				\
+> ({								\
+> 	unsigned int r;						\
+> 								\
+> 	n = 0;							\
+> 	asm volatile(/* jump to 32-bit code segment */		\
+> 		     "ljmp *1f\n\t"				\
+> 		     "1:\n\t"					\
+> 		     "	.long 2f\n\t"				\
+> 		     "	.word " xstr(KERNEL_CS32) "\n\t"	\
+> 		     /* exercise POP SS blocking */		\
+> 		     ".code32\n\t"				\
+> 		     "2: lea 3f, %0\n\t"			\
+> 		     "mov %0, %%dr0\n\t"			\
+> 		     "push %%ss\n\t"				\
+> 		     fep1 "pop %%ss\n\t"			\
+> 		     fep2 "3: xor %0, %0\n\t"			\
+> 		     /* back to long mode */			\
+> 		     "ljmp %[cs64], $4f\n\t"			\
+> 		     ".code64\n\t"				\
 
-Oops, thanks for the reminder Ricardo! Yeah, let's go that route then.
+Ooh, I see what you meant by temporarily switching to 32-bit mode.  I was thinking
+we could just make the POP SS testcase 32-bit only, but I didn't realize this test
+is 64-bit only.  Argh, and so is emulate.c.  And now I get why you added a brand
+new test.
 
---
-Thanks,
-Oliver
+Let's just add a new test.  The above can work, but it relies on the code and
+stack being mapped with a 32-bit address, e.g. will break if KUT is ever changed
+to not map everything low in the virtual address space.
+
+I think it makes sense to rename emulator.c => emulator64.c, and then start a new
+emulator.c for tests that apply to both 32-bit and 64-bit KUT.
+
+I'll send a small series, the behavior is also different for AMD CPUs (I coded up
+99% of this yesterday before realizing this morning that debug.c is 64-bit only).
