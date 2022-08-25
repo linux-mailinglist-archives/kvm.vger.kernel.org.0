@@ -2,394 +2,274 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 30C135A19E9
-	for <lists+kvm@lfdr.de>; Thu, 25 Aug 2022 22:00:09 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id C847C5A1A0B
+	for <lists+kvm@lfdr.de>; Thu, 25 Aug 2022 22:09:47 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S243291AbiHYUAB (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 25 Aug 2022 16:00:01 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:32768 "EHLO
+        id S243554AbiHYUJp (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 25 Aug 2022 16:09:45 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46412 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S243294AbiHYT75 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 25 Aug 2022 15:59:57 -0400
-Received: from mail-pf1-x44a.google.com (mail-pf1-x44a.google.com [IPv6:2607:f8b0:4864:20::44a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A7352DFA0
-        for <kvm@vger.kernel.org>; Thu, 25 Aug 2022 12:59:52 -0700 (PDT)
-Received: by mail-pf1-x44a.google.com with SMTP id e9-20020aa78249000000b00537a62a6175so852528pfn.20
-        for <kvm@vger.kernel.org>; Thu, 25 Aug 2022 12:59:52 -0700 (PDT)
+        with ESMTP id S243520AbiHYUJl (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 25 Aug 2022 16:09:41 -0400
+Received: from mail-vs1-xe35.google.com (mail-vs1-xe35.google.com [IPv6:2607:f8b0:4864:20::e35])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F1107BFE92
+        for <kvm@vger.kernel.org>; Thu, 25 Aug 2022 13:09:38 -0700 (PDT)
+Received: by mail-vs1-xe35.google.com with SMTP id c3so21999497vsc.6
+        for <kvm@vger.kernel.org>; Thu, 25 Aug 2022 13:09:38 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:reply-to:from:to:cc;
-        bh=WCanU/WvurWlCk0haGu24nPC8b5BSQpGv4G8wUSLb0E=;
-        b=Mcd107OosjddvTS4i09OTt7HigFVU4ChHjtjQqF+Mw142rTNj/m0uGOABhXLmODlB4
-         y7eVAF5lbMIi45AvMEBp2Fo1R2oyJJIwUQJFP96txW8hunvU/IBsyHo3qcO4c/sQ6Ld4
-         gHMqyQ6HezTuiiHCw6gO16YOsvT/mvAQUwYPF7hGb2KxGTpuiUsp2Lc8JE64ytc8T2J3
-         o/7iCMt/Wll6kqIE+hfHQxeEz4dyR5L2PQdxx1ebtOhRLgoSiKHBCGwkBEtc6inu/nft
-         WmSzosA2cxqLYrBKsy+3HfWyIuzdMmXLwqPVVKU4HUbyIv+4jh8KgSdxUhIbFS4payJN
-         JOUg==
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc;
+        bh=/o5u98fJkAPGGPRvZ0JnL9MrzWUgTcXH/oohHXk3MD8=;
+        b=Ezi3cLxl5SBn+0WFQppba1X7+DdHeAZwd+3+8yyHBkZ8p32tIpXd4owl1HlE83sJlO
+         35tGqyLcydDFnVxl+CllN9bqMX9roI42WPfmwop0omLlw8YncOW+c8HsYJX/9B/vbTyJ
+         G0ggnVxnzwnyWSTVI870+xJVwDivl/otgYRGldLDtzhFC+NR8TQKY25dlVrK2AY5pxqg
+         j8+1wMEzuZoPbCH0bnMmY/aShcHogX5ZkHm8OOmT0W1plozwcVxwRnNem25RQcP/v+8v
+         cOYAMOSYJKqvLMMxImuVQpmqla9mEyo5zBXp/yPnp1NiDw1AX/9F/iOoYCV+y7vg+ryK
+         bZNg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:reply-to:x-gm-message-state:from:to:cc;
-        bh=WCanU/WvurWlCk0haGu24nPC8b5BSQpGv4G8wUSLb0E=;
-        b=3YWiFX7cZ9PP7pSztfX3ABzWmswdMPyGXY+8WiEa2TQui2L799Vud/jSsin8RiiNbO
-         fXotCEjOdM08amD2jdJlcO6FNktxeMT6ocjd+VNASkQ3Wc10O9Fy8bEZgW8T1qKbY+3e
-         y+UB2MpmE71qW+k73VKInwfOE2nn+IBlk3pi/mm+Qjtf6lzXXbDuBFl2mEbTQl4FPSP3
-         ZphhlmCUCt9u/7D5smkiOhCN9nEcZ/xZH4C4EMkDeUiZ6e9xDnWsbTTXVOuKI9ilbBdE
-         0vJWJdORyw1sXrXJucHfReJWDRXFsJoL2SU4ZHI6sx3R3VvICV6fIQiRozZ5cRL2Hkxm
-         2LUQ==
-X-Gm-Message-State: ACgBeo1tgUGFIn1uUBIMaGbYHjqLRxcGxvgajlhb+cccPeVhFxfgeYvo
-        pEA5x4nlT66i9xmxttvts2COb/VDgbs=
-X-Google-Smtp-Source: AA6agR45kDIkdI6X9IQHDcjiebTB62mSsgtOm+ORuQ2MhwaZxC4EL98S1bcmnnKOv24AydVColMLXUxR5Cs=
-X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a17:90a:e7c2:b0:1f5:85ab:938c with SMTP id
- kb2-20020a17090ae7c200b001f585ab938cmr732119pjb.133.1661457591417; Thu, 25
- Aug 2022 12:59:51 -0700 (PDT)
-Reply-To: Sean Christopherson <seanjc@google.com>
-Date:   Thu, 25 Aug 2022 19:59:39 +0000
-In-Reply-To: <20220825195939.3959292-1-seanjc@google.com>
-Mime-Version: 1.0
-References: <20220825195939.3959292-1-seanjc@google.com>
-X-Mailer: git-send-email 2.37.2.672.g94769d06f0-goog
-Message-ID: <20220825195939.3959292-6-seanjc@google.com>
-Subject: [kvm-unit-tests PATCH v2 5/5] x86/emulator: Convert remaining spaces
- to tabs (indentation)
-From:   Sean Christopherson <seanjc@google.com>
-To:     Paolo Bonzini <pbonzini@redhat.com>
-Cc:     kvm@vger.kernel.org, Sean Christopherson <seanjc@google.com>,
-        Michal Luczaj <mhal@rbox.co>
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc;
+        bh=/o5u98fJkAPGGPRvZ0JnL9MrzWUgTcXH/oohHXk3MD8=;
+        b=PgoGeUYaUQesFgwrP8setewo70O9EvNnbwI+JqOCHqpTYyZvc6sUtK0W0fKXRd7aK2
+         ifF4GrKRkMQ6FgPJSg45reEkMfQcEh9wHQLfeKeTNIaaNliqp7cjHxbFuN4SIwkIeq6O
+         Wz/Hl3RbnpqxoRI/CCtc2EbuNd5gTp5HLUFABS9+bmWJ1rfCcVVSvCO8r2O0jk9qH/HN
+         JOJG5DHvI6rAq2h5Ctcri1fMc0gF8qASBdLHJRhz/Hk0oNkRwMvLqiw0PZpqeGCu1Ip7
+         dKvsFpDexVYwgPBzDDvUd8SexFJ2yDl4ou3Rv6C0ICabr4InM8YNoP6nuAbPanjdQGzd
+         n6Fg==
+X-Gm-Message-State: ACgBeo01pBsKiEPksGNh98UkXWKyuTJgFlud18Kldj4soSLHgacGIySE
+        yvi5XL5C7EPl1YCq9Oj0uLZOe64m8jU28G6AY9OL+Q==
+X-Google-Smtp-Source: AA6agR7nyEzEvgpeTs849VA7+3zgZ0xGJ1Pxf0VO2EuGO24TVf9MLwl1oV6f4IzTsrHTAKLU/CRN4th7Cmzsf8Yp7TA=
+X-Received: by 2002:a67:fd0e:0:b0:390:1d9a:2455 with SMTP id
+ f14-20020a67fd0e000000b003901d9a2455mr2104726vsr.78.1661458177919; Thu, 25
+ Aug 2022 13:09:37 -0700 (PDT)
+MIME-Version: 1.0
+References: <20220307213356.2797205-1-brijesh.singh@amd.com>
+ <20220307213356.2797205-44-brijesh.singh@amd.com> <CAAH4kHYm1BhjJXUMH12kzR0Xun=fUTj-3Hy6At0XR_09Bf0Ccw@mail.gmail.com>
+ <CAMkAt6oKQ3CnmNdrJLMWreExkN56t9vs=B883_JD+HtiNYw9HA@mail.gmail.com> <51298b17-9e12-7a08-7322-594deac52f53@amd.com>
+In-Reply-To: <51298b17-9e12-7a08-7322-594deac52f53@amd.com>
+From:   Peter Gonda <pgonda@google.com>
+Date:   Thu, 25 Aug 2022 14:09:26 -0600
+Message-ID: <CAMkAt6qBd7uoR-9NW7HbcE-N7w++3vGsviGLkhmVbnZ5TH3ZOg@mail.gmail.com>
+Subject: Re: [PATCH v12 43/46] virt: Add SEV-SNP guest driver
+To:     Tom Lendacky <thomas.lendacky@amd.com>
+Cc:     Dionna Amalie Glaze <dionnaglaze@google.com>,
+        Brijesh Singh <brijesh.singh@amd.com>,
+        "the arch/x86 maintainers" <x86@kernel.org>,
+        LKML <linux-kernel@vger.kernel.org>,
+        "open list:X86 KVM CPUs" <kvm@vger.kernel.org>,
+        linux-efi <linux-efi@vger.kernel.org>,
+        platform-driver-x86@vger.kernel.org, linux-coco@lists.linux.dev,
+        Linux Memory Management List <linux-mm@kvack.org>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Joerg Roedel <jroedel@suse.de>,
+        "H. Peter Anvin" <hpa@zytor.com>, Ard Biesheuvel <ardb@kernel.org>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Sean Christopherson <seanjc@google.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Jim Mattson <jmattson@google.com>,
+        Andy Lutomirski <luto@kernel.org>,
+        Dave Hansen <dave.hansen@linux.intel.com>,
+        Sergio Lopez <slp@redhat.com>,
+        Peter Zijlstra <peterz@infradead.org>,
+        Srinivas Pandruvada <srinivas.pandruvada@linux.intel.com>,
+        David Rientjes <rientjes@google.com>,
+        Dov Murik <dovmurik@linux.ibm.com>,
+        Tobin Feldman-Fitzthum <tobin@ibm.com>,
+        Borislav Petkov <bp@alien8.de>,
+        Michael Roth <michael.roth@amd.com>,
+        Vlastimil Babka <vbabka@suse.cz>,
+        "Kirill A . Shutemov" <kirill.shutemov@linux.intel.com>,
+        Andi Kleen <ak@linux.intel.com>,
+        "Dr . David Alan Gilbert" <dgilbert@redhat.com>,
+        brijesh.ksingh@gmail.com, Tony Luck <tony.luck@intel.com>,
+        Marc Orr <marcorr@google.com>,
+        Kuppuswamy Sathyanarayanan 
+        <sathyanarayanan.kuppuswamy@linux.intel.com>
 Content-Type: text/plain; charset="UTF-8"
-X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL
-        autolearn=ham autolearn_force=no version=3.4.6
+X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
+        T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL
+        autolearn=unavailable autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Fix the remaining instances of bad indentation in the emulator test.
+On Thu, Aug 25, 2022 at 12:54 PM Tom Lendacky <thomas.lendacky@amd.com> wrote:
+>
+> On 8/24/22 14:28, Peter Gonda wrote:
+> > On Wed, Aug 24, 2022 at 12:01 PM Dionna Amalie Glaze
+> > <dionnaglaze@google.com> wrote:
+> >>
+> >> Apologies for the necropost, but I noticed strange behavior testing my
+> >> own Golang-based wrapper around the /dev/sev-guest driver.
+> >>
+> >>> +
+> >>> +static int handle_guest_request(struct snp_guest_dev *snp_dev, u64 exit_code, int msg_ver,
+> >>> +                               u8 type, void *req_buf, size_t req_sz, void *resp_buf,
+> >>> +                               u32 resp_sz, __u64 *fw_err)
+> >>> +{
+> >>> +       unsigned long err;
+> >>> +       u64 seqno;
+> >>> +       int rc;
+> >>> +
+> >>> +       /* Get message sequence and verify that its a non-zero */
+> >>> +       seqno = snp_get_msg_seqno(snp_dev);
+> >>> +       if (!seqno)
+> >>> +               return -EIO;
+> >>> +
+> >>> +       memset(snp_dev->response, 0, sizeof(struct snp_guest_msg));
+> >>> +
+> >>> +       /* Encrypt the userspace provided payload */
+> >>> +       rc = enc_payload(snp_dev, seqno, msg_ver, type, req_buf, req_sz);
+> >>> +       if (rc)
+> >>> +               return rc;
+> >>> +
+> >>> +       /* Call firmware to process the request */
+> >>> +       rc = snp_issue_guest_request(exit_code, &snp_dev->input, &err);
+> >>> +       if (fw_err)
+> >>> +               *fw_err = err;
+> >>> +
+> >>> +       if (rc)
+> >>> +               return rc;
+> >>> +
+> >>
+> >> The fw_err is written back regardless of rc, so since err is
+> >> uninitialized, you can end up with garbage written back. I've worked
+> >> around this by only caring about fw_err when the result is -EIO, but
+> >> thought that I should bring this up.
+> >
+> > I also noticed that we use a u64 in snp_guest_request_ioctl.fw_err and
+> > u32 in sev_issue_cmd.error when these should be errors from the
+> > sev_ret_code enum IIUC.
+>
+> The reason for the u64 is that the Extended Guest Request can return a
+> firmware error or a hypervisor error. To distinguish between the two, a
+> firmware error is contained in the lower 32-bits, while a hypervisor error
+> is contained in the upper 32-bits (e.g. when not enough contiguous pages
+> of memory have been supplied).
 
-Signed-off-by: Sean Christopherson <seanjc@google.com>
----
- x86/emulator.c | 238 ++++++++++++++++++++++++-------------------------
- 1 file changed, 118 insertions(+), 120 deletions(-)
+Ah, makes sense. I was trying to think of a way to codify the state
+described above where we error so early in the IOCTL or call that the
+PSP is never called, something like below. I think using UINT32_MAX
+still works with how u64 of Extended Guest Request is spec'd. Is this
+interesting to clean up the PSP driver and internal calls, and the new
+sev-guest driver?
 
-diff --git a/x86/emulator.c b/x86/emulator.c
-index a92fc19..ad94374 100644
---- a/x86/emulator.c
-+++ b/x86/emulator.c
-@@ -176,44 +176,44 @@ static void test_scas(void *mem)
- 
- static void test_incdecnotneg(void *mem)
- {
--    unsigned long *m = mem, v = 1234;
--    unsigned char *mb = mem, vb = 66;
-+	unsigned long *m = mem, v = 1234;
-+	unsigned char *mb = mem, vb = 66;
- 
--    *m = 0;
-+	*m = 0;
- 
--    asm volatile ("incl %0":"+m"(*m));
--    report(*m == 1, "incl");
--    asm volatile ("decl %0":"+m"(*m));
--    report(*m == 0, "decl");
--    asm volatile ("incb %0":"+m"(*m));
--    report(*m == 1, "incb");
--    asm volatile ("decb %0":"+m"(*m));
--    report(*m == 0, "decb");
-+	asm volatile ("incl %0":"+m"(*m));
-+	report(*m == 1, "incl");
-+	asm volatile ("decl %0":"+m"(*m));
-+	report(*m == 0, "decl");
-+	asm volatile ("incb %0":"+m"(*m));
-+	report(*m == 1, "incb");
-+	asm volatile ("decb %0":"+m"(*m));
-+	report(*m == 0, "decb");
- 
--    asm volatile ("lock incl %0":"+m"(*m));
--    report(*m == 1, "lock incl");
--    asm volatile ("lock decl %0":"+m"(*m));
--    report(*m == 0, "lock decl");
--    asm volatile ("lock incb %0":"+m"(*m));
--    report(*m == 1, "lock incb");
--    asm volatile ("lock decb %0":"+m"(*m));
--    report(*m == 0, "lock decb");
-+	asm volatile ("lock incl %0":"+m"(*m));
-+	report(*m == 1, "lock incl");
-+	asm volatile ("lock decl %0":"+m"(*m));
-+	report(*m == 0, "lock decl");
-+	asm volatile ("lock incb %0":"+m"(*m));
-+	report(*m == 1, "lock incb");
-+	asm volatile ("lock decb %0":"+m"(*m));
-+	report(*m == 0, "lock decb");
- 
--    *m = v;
-+	*m = v;
- 
- #ifdef __x86_64__
--    asm ("lock negq %0" : "+m"(*m)); v = -v;
--    report(*m == v, "lock negl");
--    asm ("lock notq %0" : "+m"(*m)); v = ~v;
--    report(*m == v, "lock notl");
-+	asm ("lock negq %0" : "+m"(*m)); v = -v;
-+	report(*m == v, "lock negl");
-+	asm ("lock notq %0" : "+m"(*m)); v = ~v;
-+	report(*m == v, "lock notl");
- #endif
- 
--    *mb = vb;
-+	*mb = vb;
- 
--    asm ("lock negb %0" : "+m"(*mb)); vb = -vb;
--    report(*mb == vb, "lock negb");
--    asm ("lock notb %0" : "+m"(*mb)); vb = ~vb;
--    report(*mb == vb, "lock notb");
-+	asm ("lock negb %0" : "+m"(*mb)); vb = -vb;
-+	report(*mb == vb, "lock negb");
-+	asm ("lock notb %0" : "+m"(*mb)); vb = ~vb;
-+	report(*mb == vb, "lock notb");
- }
- 
- static void test_smsw(unsigned long *h_mem)
-@@ -387,14 +387,13 @@ typedef unsigned __attribute__((vector_size(16))) sse128;
- 
- static bool sseeq(uint32_t *v1, uint32_t *v2)
- {
--    bool ok = true;
--    int i;
-+	bool ok = true;
-+	int i;
- 
--    for (i = 0; i < 4; ++i) {
--	ok &= v1[i] == v2[i];
--    }
-+	for (i = 0; i < 4; ++i)
-+		ok &= v1[i] == v2[i];
- 
--    return ok;
-+	return ok;
- }
- 
- static __attribute__((target("sse2"))) void test_sse(uint32_t *mem)
-@@ -497,12 +496,12 @@ static __attribute__((target("sse2"))) void test_sse_exceptions(void *cross_mem)
- 
- static void test_shld_shrd(u32 *mem)
- {
--    *mem = 0x12345678;
--    asm("shld %2, %1, %0" : "+m"(*mem) : "r"(0xaaaaaaaaU), "c"((u8)3));
--    report(*mem == ((0x12345678 << 3) | 5), "shld (cl)");
--    *mem = 0x12345678;
--    asm("shrd %2, %1, %0" : "+m"(*mem) : "r"(0x55555555U), "c"((u8)3));
--    report(*mem == ((0x12345678 >> 3) | (5u << 29)), "shrd (cl)");
-+	*mem = 0x12345678;
-+	asm("shld %2, %1, %0" : "+m"(*mem) : "r"(0xaaaaaaaaU), "c"((u8)3));
-+	report(*mem == ((0x12345678 << 3) | 5), "shld (cl)");
-+	*mem = 0x12345678;
-+	asm("shrd %2, %1, %0" : "+m"(*mem) : "r"(0x55555555U), "c"((u8)3));
-+	report(*mem == ((0x12345678 >> 3) | (5u << 29)), "shrd (cl)");
- }
- 
- static void test_smsw_reg(uint64_t *mem)
-@@ -561,15 +560,15 @@ static void test_illegal_lea(void)
- 
- static void test_crosspage_mmio(volatile uint8_t *mem)
- {
--    volatile uint16_t w, *pw;
-+	volatile uint16_t w, *pw;
- 
--    pw = (volatile uint16_t *)&mem[4095];
--    mem[4095] = 0x99;
--    mem[4096] = 0x77;
--    asm volatile("mov %1, %0" : "=r"(w) : "m"(*pw) : "memory");
--    report(w == 0x7799, "cross-page mmio read");
--    asm volatile("mov %1, %0" : "=m"(*pw) : "r"((uint16_t)0x88aa));
--    report(mem[4095] == 0xaa && mem[4096] == 0x88, "cross-page mmio write");
-+	pw = (volatile uint16_t *)&mem[4095];
-+	mem[4095] = 0x99;
-+	mem[4096] = 0x77;
-+	asm volatile("mov %1, %0" : "=r"(w) : "m"(*pw) : "memory");
-+	report(w == 0x7799, "cross-page mmio read");
-+	asm volatile("mov %1, %0" : "=m"(*pw) : "r"((uint16_t)0x88aa));
-+	report(mem[4095] == 0xaa && mem[4096] == 0x88, "cross-page mmio write");
- }
- 
- static void test_string_io_mmio(volatile uint8_t *mem)
-@@ -588,33 +587,31 @@ static void test_string_io_mmio(volatile uint8_t *mem)
- #if 0
- static void test_lgdt_lidt(volatile uint8_t *mem)
- {
--    struct descriptor_table_ptr orig, fresh = {};
-+	struct descriptor_table_ptr orig, fresh = {};
- 
--    sgdt(&orig);
--    *(struct descriptor_table_ptr *)mem = (struct descriptor_table_ptr) {
--	.limit = 0xf234,
--	.base = 0x12345678abcd,
--    };
--    cli();
--    asm volatile("lgdt %0" : : "m"(*(struct descriptor_table_ptr *)mem));
--    sgdt(&fresh);
--    lgdt(&orig);
--    sti();
--    report(orig.limit == fresh.limit && orig.base == fresh.base,
--           "lgdt (long address)");
-+	sgdt(&orig);
-+	*(struct descriptor_table_ptr *)mem = (struct descriptor_table_ptr) {
-+		.limit = 0xf234,
-+		.base = 0x12345678abcd,
-+	};
-+	cli();
-+	asm volatile("lgdt %0" : : "m"(*(struct descriptor_table_ptr *)mem));
-+	sgdt(&fresh);
-+	lgdt(&orig);
-+	sti();
-+	report(orig.limit == fresh.limit && orig.base == fresh.base, "lgdt (long address)");
- 
--    sidt(&orig);
--    *(struct descriptor_table_ptr *)mem = (struct descriptor_table_ptr) {
--	.limit = 0x432f,
--	.base = 0xdbca87654321,
--    };
--    cli();
--    asm volatile("lidt %0" : : "m"(*(struct descriptor_table_ptr *)mem));
--    sidt(&fresh);
--    lidt(&orig);
--    sti();
--    report(orig.limit == fresh.limit && orig.base == fresh.base,
--           "lidt (long address)");
-+	sidt(&orig);
-+	*(struct descriptor_table_ptr *)mem = (struct descriptor_table_ptr) {
-+		.limit = 0x432f,
-+		.base = 0xdbca87654321,
-+	};
-+	cli();
-+	asm volatile("lidt %0" : : "m"(*(struct descriptor_table_ptr *)mem));
-+	sidt(&fresh);
-+	lidt(&orig);
-+	sti();
-+	report(orig.limit == fresh.limit && orig.base == fresh.base, "lidt (long address)");
- }
- #endif
- 
-@@ -622,40 +619,41 @@ static void test_lgdt_lidt(volatile uint8_t *mem)
- #if 0
- static void test_lldt(volatile uint16_t *mem)
- {
--    u64 gdt[] = { 0, /* null descriptor */
-+	u64 gdt[] = { 0, /* null descriptor */
- #ifdef __X86_64__
--		  0, /* ldt descriptor is 16 bytes in long mode */
-+		0, /* ldt descriptor is 16 bytes in long mode */
- #endif
--		  0x0000f82000000ffffull /* ldt descriptor */ };
--    struct descriptor_table_ptr gdt_ptr = { .limit = sizeof(gdt) - 1,
--					    .base = (ulong)&gdt };
--    struct descriptor_table_ptr orig_gdt;
-+		0x0000f82000000ffffull /* ldt descriptor */
-+	};
-+	struct descriptor_table_ptr gdt_ptr = { .limit = sizeof(gdt) - 1,
-+						.base = (ulong)&gdt };
-+	struct descriptor_table_ptr orig_gdt;
- 
--    cli();
--    sgdt(&orig_gdt);
--    lgdt(&gdt_ptr);
--    *mem = 0x8;
--    asm volatile("lldt %0" : : "m"(*mem));
--    lgdt(&orig_gdt);
--    sti();
--    report(sldt() == *mem, "lldt");
-+	cli();
-+	sgdt(&orig_gdt);
-+	lgdt(&gdt_ptr);
-+	*mem = 0x8;
-+	asm volatile("lldt %0" : : "m"(*mem));
-+	lgdt(&orig_gdt);
-+	sti();
-+	report(sldt() == *mem, "lldt");
- }
- #endif
- 
- static void test_ltr(volatile uint16_t *mem)
- {
--    struct descriptor_table_ptr gdt_ptr;
--    uint64_t *gdt, *trp;
--    uint16_t tr = str();
--    uint64_t busy_mask = (uint64_t)1 << 41;
-+	struct descriptor_table_ptr gdt_ptr;
-+	uint64_t *gdt, *trp;
-+	uint16_t tr = str();
-+	uint64_t busy_mask = (uint64_t)1 << 41;
- 
--    sgdt(&gdt_ptr);
--    gdt = (uint64_t *)gdt_ptr.base;
--    trp = &gdt[tr >> 3];
--    *trp &= ~busy_mask;
--    *mem = tr;
--    asm volatile("ltr %0" : : "m"(*mem) : "memory");
--    report(str() == tr && (*trp & busy_mask), "ltr");
-+	sgdt(&gdt_ptr);
-+	gdt = (uint64_t *)gdt_ptr.base;
-+	trp = &gdt[tr >> 3];
-+	*trp &= ~busy_mask;
-+	*mem = tr;
-+	asm volatile("ltr %0" : : "m"(*mem) : "memory");
-+	report(str() == tr && (*trp & busy_mask), "ltr");
- }
- 
- static void test_mov(void *mem)
-@@ -674,27 +672,27 @@ static void test_mov(void *mem)
- 
- static void test_simplealu(u32 *mem)
- {
--    *mem = 0x1234;
--    asm("or %1, %0" : "+m"(*mem) : "r"(0x8001));
--    report(*mem == 0x9235, "or");
--    asm("add %1, %0" : "+m"(*mem) : "r"(2));
--    report(*mem == 0x9237, "add");
--    asm("xor %1, %0" : "+m"(*mem) : "r"(0x1111));
--    report(*mem == 0x8326, "xor");
--    asm("sub %1, %0" : "+m"(*mem) : "r"(0x26));
--    report(*mem == 0x8300, "sub");
--    asm("clc; adc %1, %0" : "+m"(*mem) : "r"(0x100));
--    report(*mem == 0x8400, "adc(0)");
--    asm("stc; adc %1, %0" : "+m"(*mem) : "r"(0x100));
--    report(*mem == 0x8501, "adc(0)");
--    asm("clc; sbb %1, %0" : "+m"(*mem) : "r"(0));
--    report(*mem == 0x8501, "sbb(0)");
--    asm("stc; sbb %1, %0" : "+m"(*mem) : "r"(0));
--    report(*mem == 0x8500, "sbb(1)");
--    asm("and %1, %0" : "+m"(*mem) : "r"(0xfe77));
--    report(*mem == 0x8400, "and");
--    asm("test %1, %0" : "+m"(*mem) : "r"(0xf000));
--    report(*mem == 0x8400, "test");
-+	*mem = 0x1234;
-+	asm("or %1, %0" : "+m"(*mem) : "r"(0x8001));
-+	report(*mem == 0x9235, "or");
-+	asm("add %1, %0" : "+m"(*mem) : "r"(2));
-+	report(*mem == 0x9237, "add");
-+	asm("xor %1, %0" : "+m"(*mem) : "r"(0x1111));
-+	report(*mem == 0x8326, "xor");
-+	asm("sub %1, %0" : "+m"(*mem) : "r"(0x26));
-+	report(*mem == 0x8300, "sub");
-+	asm("clc; adc %1, %0" : "+m"(*mem) : "r"(0x100));
-+	report(*mem == 0x8400, "adc(0)");
-+	asm("stc; adc %1, %0" : "+m"(*mem) : "r"(0x100));
-+	report(*mem == 0x8501, "adc(0)");
-+	asm("clc; sbb %1, %0" : "+m"(*mem) : "r"(0));
-+	report(*mem == 0x8501, "sbb(0)");
-+	asm("stc; sbb %1, %0" : "+m"(*mem) : "r"(0));
-+	report(*mem == 0x8500, "sbb(1)");
-+	asm("and %1, %0" : "+m"(*mem) : "r"(0xfe77));
-+	report(*mem == 0x8400, "and");
-+	asm("test %1, %0" : "+m"(*mem) : "r"(0xf000));
-+	report(*mem == 0x8400, "test");
- }
- 
- static void test_illegal_movbe(void)
--- 
-2.37.2.672.g94769d06f0-goog
+diff --git a/arch/x86/kernel/sev.c b/arch/x86/kernel/sev.c
+index 63dc626627a0..d1e605567d5e 100644
+--- a/arch/x86/kernel/sev.c
++++ b/arch/x86/kernel/sev.c
+@@ -22,6 +22,7 @@
+ #include <linux/efi.h>
+ #include <linux/platform_device.h>
+ #include <linux/io.h>
++#include <linux/psp-sev.h>
 
+ #include <asm/cpu_entry_area.h>
+ #include <asm/stacktrace.h>
+@@ -2177,6 +2178,8 @@ int snp_issue_guest_request(u64 exit_code,
+struct snp_req_data *input, unsigned
+        if (!fw_err)
+                return -EINVAL;
+
++       fw_err = SEV_RET_NO_FW_CALL;
++
+        /*
+         * __sev_get_ghcb() needs to run with IRQs disabled because it is using
+         * a per-CPU GHCB.
+@@ -2209,6 +2212,8 @@ int snp_issue_guest_request(u64 exit_code,
+struct snp_req_data *input, unsigned
+                *fw_err = ghcb->save.sw_exit_info_2;
+
+                ret = -EIO;
++       } else {
++               *fw_err = 0;
+        }
+
+ e_put:
+diff --git a/drivers/crypto/ccp/sev-dev.c b/drivers/crypto/ccp/sev-dev.c
+index 9f588c9728f8..e71d6e39aa2b 100644
+--- a/drivers/crypto/ccp/sev-dev.c
++++ b/drivers/crypto/ccp/sev-dev.c
+@@ -439,7 +439,7 @@ static int __sev_platform_init_locked(int *error)
+ {
+        struct psp_device *psp = psp_master;
+        struct sev_device *sev;
+-       int rc, psp_ret = -1;
++       int rc, psp_ret = SEV_RET_NO_FW_CALL;
+        int (*init_function)(int *error);
+
+        if (!psp || !psp->sev_data)
+diff --git a/include/uapi/linux/psp-sev.h b/include/uapi/linux/psp-sev.h
+index 91b4c63d5cbf..b8f2c129d63d 100644
+--- a/include/uapi/linux/psp-sev.h
++++ b/include/uapi/linux/psp-sev.h
+@@ -36,6 +36,11 @@ enum {
+  * SEV Firmware status code
+  */
+...skipping...
+
+ #include <asm/cpu_entry_area.h>
+ #include <asm/stacktrace.h>
+@@ -2177,6 +2178,8 @@ int snp_issue_guest_request(u64 exit_code,
+struct snp_req_data *input, unsigned
+        if (!fw_err)
+                return -EINVAL;
+
++       fw_err = SEV_RET_NO_FW_CALL;
++
+        /*
+         * __sev_get_ghcb() needs to run with IRQs disabled because it is using
+         * a per-CPU GHCB.
+@@ -2209,6 +2212,8 @@ int snp_issue_guest_request(u64 exit_code,
+struct snp_req_data *input, unsigned
+                *fw_err = ghcb->save.sw_exit_info_2;
+
+                ret = -EIO;
++       } else {
++               *fw_err = 0;
+        }
+
+ e_put:
+diff --git a/drivers/crypto/ccp/sev-dev.c b/drivers/crypto/ccp/sev-dev.c
+index 9f588c9728f8..e71d6e39aa2b 100644
+--- a/drivers/crypto/ccp/sev-dev.c
++++ b/drivers/crypto/ccp/sev-dev.c
+@@ -439,7 +439,7 @@ static int __sev_platform_init_locked(int *error)
+ {
+        struct psp_device *psp = psp_master;
+        struct sev_device *sev;
+-       int rc, psp_ret = -1;
++       int rc, psp_ret = SEV_RET_NO_FW_CALL;
+        int (*init_function)(int *error);
+
+        if (!psp || !psp->sev_data)
+diff --git a/include/uapi/linux/psp-sev.h b/include/uapi/linux/psp-sev.h
+index 91b4c63d5cbf..b8f2c129d63d 100644
+--- a/include/uapi/linux/psp-sev.h
++++ b/include/uapi/linux/psp-sev.h
+@@ -36,6 +36,11 @@ enum {
+  * SEV Firmware status code
+  */
+ typedef enum {
++       /*
++        * This error code is not in the SEV spec but is added to convey that
++        * there was an error that prevented the SEV Firmware from being called.
++        */
++       SEV_RET_NO_FW_CALL = -1,
+        SEV_RET_SUCCESS = 0,
+        SEV_RET_INVALID_PLATFORM_STATE,
+        SEV_RET_INVALID_GUEST_STATE,
+
+
+
+
+> >
+> >>
+> >> --
+> >> -Dionna Glaze, PhD (she/her)
