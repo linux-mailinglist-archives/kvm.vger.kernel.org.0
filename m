@@ -2,72 +2,74 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 946D05A1A4A
-	for <lists+kvm@lfdr.de>; Thu, 25 Aug 2022 22:26:28 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 43AF75A1A67
+	for <lists+kvm@lfdr.de>; Thu, 25 Aug 2022 22:35:50 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S243650AbiHYU0X (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 25 Aug 2022 16:26:23 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37938 "EHLO
+        id S243830AbiHYUf0 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 25 Aug 2022 16:35:26 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53830 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S243854AbiHYUZ3 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 25 Aug 2022 16:25:29 -0400
-Received: from mail-pf1-x431.google.com (mail-pf1-x431.google.com [IPv6:2607:f8b0:4864:20::431])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BE84518366;
-        Thu, 25 Aug 2022 13:24:49 -0700 (PDT)
-Received: by mail-pf1-x431.google.com with SMTP id x15so19989072pfp.4;
-        Thu, 25 Aug 2022 13:24:49 -0700 (PDT)
+        with ESMTP id S243688AbiHYUfU (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 25 Aug 2022 16:35:20 -0400
+Received: from mail-pj1-x1032.google.com (mail-pj1-x1032.google.com [IPv6:2607:f8b0:4864:20::1032])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8A7E9A261C
+        for <kvm@vger.kernel.org>; Thu, 25 Aug 2022 13:35:18 -0700 (PDT)
+Received: by mail-pj1-x1032.google.com with SMTP id c16-20020a17090aa61000b001fb3286d9f7so6183642pjq.1
+        for <kvm@vger.kernel.org>; Thu, 25 Aug 2022 13:35:18 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc;
-        bh=S9g7MXdcvL7H7GmvpAVrocnqG/EzeqzT/WOXXOV+r7g=;
-        b=P7Nc+wAPyu7jIH5gbbuQSHFYHvzrHfwdtcJsoDqBrU6qcVb6Ln5BcY60GKvOiFYIP2
-         F3IrjARdGoonVB9h+ki4wATWsPTkHEIG6/Ketu0NeB49SuqVl26LhbHnKWjm7FITVvS9
-         Uq9cQ03Zd3B7xeUNPMtm0R9La+CUImj2Znkce3/irTCpzpk5i9S1YDaE7rO85gIRkCKx
-         v8Gi01wMHhRWp9mPD1BFxzxCpNFRCjqtOl4pirpwGIif8Dofv10xNV5DR34t9T2GjkF3
-         mXv340l6KMLud7dBlcyvPiKcP9Ld4Q3WTZS5g9z6UNvi/MI5o8B1Vg3KFqjo+2LQDZWr
-         ULzw==
+        d=google.com; s=20210112;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc;
+        bh=L4DrXRzmNACqrECbSvsoVicvWrBCIZ0K0tYDPC755BI=;
+        b=E2Qo9lmSdvHNWGIs6lAZ5j37P2g3qIVLKFFOIMnIZ8CqtisQAIrQv9ttEGVpxQup0s
+         5+vGZ6blXM5E2Vhr8bmyMavsA2SmlLJA/ZCaGnbD2ORKjPjeIKNojZDKQ0To0sPChhXS
+         7Q9iUTpx5d1SUtlPk28AEJ2kf9I2Zp78vZnoZ68nDPViNZLYboEKhqKVAi5552sK0vl8
+         W06LiOnz/JU6PABom0KwymcUfUcnS3iiCRLwRz/YyZEysCG6nBCwdSh/S87Tw0DihSkX
+         LhaEBKDqPNbN3toikdU4bXfqK2jd1N8h6OXTWoG/aFYobxRRVPWcdnH9IlE5f9cWUOFK
+         wuEg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc;
-        bh=S9g7MXdcvL7H7GmvpAVrocnqG/EzeqzT/WOXXOV+r7g=;
-        b=VUD0gyqcjQc2cKmg1ndp1rIxVLia24WWI+aKsEXiNuVg7No5lWYMrZg4MoyKZy2F56
-         Se88utsdbhasVpF5QnT+taC3JCjUNx8ZKlzBlEB8zz13A8aHOGBcMAJtORl6PsnMgvBR
-         8PgRs2/Jq6/wJ59XD21QcmGX9OmL7QDxaRaN46P6xjviyjVZmesYgRj7n33KWjz6EGJH
-         RrSJKdgltm0EIzge+Rinx0j/RbFJi/MzMZhiD5/SDG2ithh4+Pk7iOmZu4t/wHYenxnS
-         Swwk8wY9UtQAAfbLpssjWE6ThspJpfSo1tzKZoqc307hGpn9Sv1LzJUcbl4jSilXer8H
-         Zntg==
-X-Gm-Message-State: ACgBeo0QgXjgLFnT845Wqa7YLC6GY+oPyeRMx6Hoa3SOXNl18EukLcp/
-        Y9TES/L6coBcypTQe10cUx8=
-X-Google-Smtp-Source: AA6agR4lcFTN1LrYYyb5e6Puze6XoLf+UrsAmc7u0xgOpJa5pL/JP3lgXi4D2wh7NvQpuORP3BunBg==
-X-Received: by 2002:a63:5d46:0:b0:41c:861:d0d2 with SMTP id o6-20020a635d46000000b0041c0861d0d2mr640095pgm.184.1661459088556;
-        Thu, 25 Aug 2022 13:24:48 -0700 (PDT)
-Received: from localhost ([192.55.55.51])
-        by smtp.gmail.com with ESMTPSA id p66-20020a625b45000000b0052e5bb18a41sm50831pfb.58.2022.08.25.13.24.47
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 25 Aug 2022 13:24:47 -0700 (PDT)
-Date:   Thu, 25 Aug 2022 13:24:46 -0700
-From:   Isaku Yamahata <isaku.yamahata@gmail.com>
-To:     Binbin Wu <binbin.wu@linux.intel.com>
-Cc:     isaku.yamahata@intel.com, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org, isaku.yamahata@gmail.com,
-        Paolo Bonzini <pbonzini@redhat.com>, erdemaktas@google.com,
-        Sean Christopherson <seanjc@google.com>,
-        Sagi Shahar <sagis@google.com>
-Subject: Re: [PATCH v8 009/103] KVM: TDX: Initialize the TDX module when
- loading the KVM intel kernel module
-Message-ID: <20220825202446.GC2538772@ls.amr.corp.intel.com>
-References: <cover.1659854790.git.isaku.yamahata@intel.com>
- <b6f8588f51f530e3904d2b98199aba6547032ea4.1659854790.git.isaku.yamahata@intel.com>
- <cb23e06b-6b3e-22af-f5de-a13af7aab1e4@linux.intel.com>
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc;
+        bh=L4DrXRzmNACqrECbSvsoVicvWrBCIZ0K0tYDPC755BI=;
+        b=3Dc+ywvAaL2POdc4nAke0uYUQTdQXSKKIVfqiRXVvtxoeW+5vLAWHgMZMEUaWomi2T
+         OMuqcYi/Bb+Gg926BLB/as6tCiXsbVTAgqYrvZ0Um6RCwgMUvaOhqceOI9HJxr7yiYSo
+         zpuPIAHLN4ggCjPkJTUQy+GxhO+tbB5N2wGd4JRbQO1ElWWtGvA1DYoGjiAS+EQCEvet
+         bbgYreokLXvQZP39YPVopUcdv48Nzhfv3vaP6H+qo9h9UGHEoTuHo3DtaQR7wVR0cJrU
+         IaJzfGpafWDEV8LK5HsWM15lM33wux1Cd7macvpow4SRL3u13Y2zX/Nse61UxWDE83i5
+         C8dA==
+X-Gm-Message-State: ACgBeo0iIas5gpf9KqiqONFzyjyrMJFD7Mj1zYKAA/Z5fB3pQ96cc7OA
+        UZjLg6+JHDRgCKbrf+b+Sboj74WmIORQkiGQ4ypBPw==
+X-Google-Smtp-Source: AA6agR5o/BI5hIFitjoAA8GeVFQrA/Hf1t0B93XoID64kS4s2RWTTnHZFlYS56lDiYyaqqA3tqiPfDZbeTvqlHi5JxU=
+X-Received: by 2002:a17:902:f681:b0:172:f8ee:b1f7 with SMTP id
+ l1-20020a170902f68100b00172f8eeb1f7mr659020plg.19.1661459717768; Thu, 25 Aug
+ 2022 13:35:17 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <cb23e06b-6b3e-22af-f5de-a13af7aab1e4@linux.intel.com>
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
-        RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
+References: <20220802230718.1891356-1-mizhang@google.com> <20220802230718.1891356-2-mizhang@google.com>
+ <b03adf94-5af2-ff5e-1dbb-6dd212790083@redhat.com> <CAL715WLQa5yz7SWAfOBUzQigv2JG1Ao+rwbeSJ++rKccVoZeag@mail.gmail.com>
+ <17505e309d02cf5a96e33f75ccdd6437a8c79222.camel@redhat.com>
+ <Ywa+QL/kDp9ibkbC@google.com> <CALMp9eSZ-C4BSSm6c5HBayjEVBdEwTBFcOw37yrd014cRwKPug@mail.gmail.com>
+ <YweJ+hX8Ayz11jZi@google.com> <CAL715WK4eqxX9EUHzwqT4o-OX4S_1-WcTr5UuGnc-KEb7pk6EQ@mail.gmail.com>
+ <Ywe3IC7OlF/jYU1X@google.com>
+In-Reply-To: <Ywe3IC7OlF/jYU1X@google.com>
+From:   Mingwei Zhang <mizhang@google.com>
+Date:   Thu, 25 Aug 2022 13:35:06 -0700
+Message-ID: <CAL715WJEkT6heVT1P2RZw_5NxBcORCrBTS60L_RZT-05zr_zsw@mail.gmail.com>
+Subject: Re: [PATCH 1/5] KVM: x86: Get vmcs12 pages before checking pending interrupts
+To:     Sean Christopherson <seanjc@google.com>
+Cc:     Jim Mattson <jmattson@google.com>,
+        Maxim Levitsky <mlevitsk@redhat.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Joerg Roedel <joro@8bytes.org>, kvm <kvm@vger.kernel.org>,
+        LKML <linux-kernel@vger.kernel.org>,
+        Oliver Upton <oupton@google.com>
+Content-Type: text/plain; charset="UTF-8"
+X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
+        T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL
         autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -75,99 +77,62 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Aug 10, 2022 at 04:18:01PM +0800,
-Binbin Wu <binbin.wu@linux.intel.com> wrote:
+> There are two uses of KVM_REQ_GET_NESTED_STATE_PAGES:
+>
+>   1. Defer loads when leaving SMM.
+>
+>   2: Defer loads for KVM_SET_NESTED_STATE.
+>
+> #1 is fully solvable without a request, e.g. split ->leave_smm() into two helpers,
+> one that restores whatever metadata is needed before restoring from SMRAM, and
+> a second to load guest virtualization state that _after_ restoring all other guest
+> state from SMRAM.
+>
+> #2 is done because of the reasons Jim listed above, which are specific to demand
+> paging (including userfaultfd).  There might be some interactions with other
+> ioctls() (KVM_SET_SREGS?) that are papered over by the request, but that can be
+> solved without a full request since only the first KVM_RUN after KVM_SET_NESTED_STATE
+> needs to refresh things (though ideally we'd avoid that).
 
-> 
-> On 2022/8/8 6:00, isaku.yamahata@intel.com wrote:
-> > From: Isaku Yamahata <isaku.yamahata@intel.com>
-> > 
-> > TDX requires several initialization steps for KVM to create guest TDs.
-> > Detect CPU feature, enable VMX (TDX is based on VMX), detect the TDX module
-> > availability, and initialize it.  This patch implements those steps.
-> > 
-> > There are several options on when to initialize the TDX module.  A.) kernel
-> > module loading time, B.) the first guest TD creation time.  A.) was chosen.
-> > With B.), a user may hit an error of the TDX initialization when trying to
-> > create the first guest TD.  The machine that fails to initialize the TDX
-> > module can't boot any guest TD further.  Such failure is undesirable and a
-> > surprise because the user expects that the machine can accommodate guest
-> > TD, but actually not.  So A.) is better than B.).
-> > 
-> > Introduce a module parameter, enable_tdx, to explicitly enable TDX KVM
-> > support.  It's off by default to keep same behavior for those who don't use
-> > TDX.  Implement hardware_setup method to detect TDX feature of CPU.
-> > Because TDX requires all present CPUs to enable VMX (VMXON).  The x86
-> > specific kvm_arch_post_hardware_enable_setup overrides the existing weak
-> > symbol of kvm_arch_post_hardware_enable_setup which is called at the KVM
-> > module initialization.
-> > 
-> > Suggested-by: Sean Christopherson <seanjc@google.com>
-> > Signed-off-by: Isaku Yamahata <isaku.yamahata@intel.com>
-> > ---
-> >   arch/x86/include/asm/kvm_host.h |  1 +
-> >   arch/x86/kvm/Makefile           |  1 +
-> >   arch/x86/kvm/vmx/main.c         | 29 ++++++++++-
-> >   arch/x86/kvm/vmx/tdx.c          | 89 +++++++++++++++++++++++++++++++++
-> >   arch/x86/kvm/vmx/tdx.h          |  4 ++
-> >   arch/x86/kvm/vmx/x86_ops.h      |  6 +++
-> >   arch/x86/kvm/x86.c              |  8 +++
-> >   arch/x86/virt/vmx/tdx/tdx.c     |  1 +
-> >   8 files changed, 138 insertions(+), 1 deletion(-)
-> >   create mode 100644 arch/x86/kvm/vmx/tdx.c
-> > 
-> > diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
-> > index 3d000f060077..f432ad32515c 100644
-> > --- a/arch/x86/include/asm/kvm_host.h
-> > +++ b/arch/x86/include/asm/kvm_host.h
-> > @@ -1659,6 +1659,7 @@ struct kvm_x86_init_ops {
-> >   	int (*cpu_has_kvm_support)(void);
-> >   	int (*disabled_by_bios)(void);
-> >   	int (*hardware_setup)(void);
-> > +	int (*post_hardware_enable_setup)(void);
-> >   	unsigned int (*handle_intel_pt_intr)(void);
-> >   	struct kvm_x86_ops *runtime_ops;
-> > diff --git a/arch/x86/kvm/Makefile b/arch/x86/kvm/Makefile
-> > index ee4d0999f20f..e2c05195cb95 100644
-> > --- a/arch/x86/kvm/Makefile
-> > +++ b/arch/x86/kvm/Makefile
-> > @@ -24,6 +24,7 @@ kvm-$(CONFIG_KVM_XEN)	+= xen.o
-> >   kvm-intel-y		+= vmx/vmx.o vmx/vmenter.o vmx/pmu_intel.o vmx/vmcs12.o \
-> >   			   vmx/evmcs.o vmx/nested.o vmx/posted_intr.o vmx/main.o
-> >   kvm-intel-$(CONFIG_X86_SGX_KVM)	+= vmx/sgx.o
-> > +kvm-intel-$(CONFIG_INTEL_TDX_HOST)	+= vmx/tdx.o
-> >   kvm-amd-y		+= svm/svm.o svm/vmenter.o svm/pmu.o svm/nested.o svm/avic.o svm/sev.o
-> > diff --git a/arch/x86/kvm/vmx/main.c b/arch/x86/kvm/vmx/main.c
-> > index a0252cc0b48d..ac788af17d92 100644
-> > --- a/arch/x86/kvm/vmx/main.c
-> > +++ b/arch/x86/kvm/vmx/main.c
-> > @@ -7,6 +7,32 @@
-> >   #include "pmu.h"
-> >   #include "tdx.h"
-> > +static bool __read_mostly enable_tdx = IS_ENABLED(CONFIG_INTEL_TDX_HOST);
-> 
-> So, if CONFIG_INTEL_TDX_HOST is opt-in in kconfig, the code will try to
-> enable TDX.
-> 
-> The behavior seems a bit different from what you mentioned in the commit
-> message about the option to "explicitly enable TDX KVM
-> support".
+Ack on the fact that the 2-step process is specific to demand paging.
 
-Oops.  For least surpise, I'll fix it as follows.
+Currently, KVM_SET_NESTED_STATE is a two-step process in which the 1st
+step does not require vmcs12 to be ready. So, I am thinking about what
+it means to deprecate KVM_REQ_GET_NESTED_STATE_PAGES?
 
-diff --git a/arch/x86/kvm/vmx/main.c b/arch/x86/kvm/vmx/main.c
-index ac788af17d92..973c437f1a4e 100644
---- a/arch/x86/kvm/vmx/main.c
-+++ b/arch/x86/kvm/vmx/main.c
-@@ -7,7 +7,7 @@
- #include "pmu.h"
- #include "tdx.h"
- 
--static bool __read_mostly enable_tdx = IS_ENABLED(CONFIG_INTEL_TDX_HOST);
-+static bool __read_mostly enable_tdx;
- module_param_named(tdx, enable_tdx, bool, 0444);
- 
- static __init int vt_hardware_setup(void)
+For case #2, I think there might be two options if we deprecate it:
 
--- 
-Isaku Yamahata <isaku.yamahata@gmail.com>
+ - Ensuring vmcs12 ready during the call to
+ioctl(KVM_SET_NESTED_STATE). This requires, as Jim mentioned, that the
+thread who is listening to the remote page request ready to serve
+before this call (this is true regardless of uffd based or Google base
+demand paging). We definitely can solve this ordering problem, but
+that is beyond KVM scope. It basically requires our userspace to
+cooperate.
+
+ - Ensuring vmcs12 ready before vmenter. This basically defers the
+vmcs12 checks to the last second. I think this might be a better one.
+However, isn't it the same as the original implementation, i.e.,
+instead of using KVM_REQ_GET_NESTED_STATE_PAGES, we have to use some
+other flags to tell KVM to load a vmcs12?
+
+Thanks.
+-Mingwei
+>
+> In other words, if the demand paging use case goes away, then KVM can get rid of
+> KVM_REQ_GET_NESTED_STATE_PAGES.
+>
+> > KVM_SET_NESTED_STATE in VMX, while in SVM implementation, it is simply
+> > just a kvm_make_request(KVM_REQ_GET_NESTED_STATE_PAGES, vcpu);
+>
+> svm_set_nested_state() very rougly open codes enter_svm_guest_mode().  VMX could
+> do the same, but that may or may not be a net positive.
+>
+> > hmm... so is the nested_vmx_enter_non_root_mode() call in vmx
+> > KVM_SET_NESTED_STATE ioctl() still necessary? I am thinking that
+> > because the same function is called again in nested_vmx_run().
+>
+> nested_vmx_run() is used only to emulate VMLAUNCH/VMRESUME and wont' be invoked
+> if the vCPU is already running L2 at the time of migration.
+
+Ack.
