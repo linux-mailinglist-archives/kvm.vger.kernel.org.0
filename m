@@ -2,78 +2,70 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 6FD335A182A
-	for <lists+kvm@lfdr.de>; Thu, 25 Aug 2022 19:53:44 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 64E855A182E
+	for <lists+kvm@lfdr.de>; Thu, 25 Aug 2022 19:56:55 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S242909AbiHYRxn (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 25 Aug 2022 13:53:43 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37670 "EHLO
+        id S242458AbiHYR4x (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 25 Aug 2022 13:56:53 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42784 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231437AbiHYRxm (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 25 Aug 2022 13:53:42 -0400
-Received: from mail-pf1-x434.google.com (mail-pf1-x434.google.com [IPv6:2607:f8b0:4864:20::434])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0D8A7BC808
-        for <kvm@vger.kernel.org>; Thu, 25 Aug 2022 10:53:41 -0700 (PDT)
-Received: by mail-pf1-x434.google.com with SMTP id 142so1407769pfu.10
-        for <kvm@vger.kernel.org>; Thu, 25 Aug 2022 10:53:41 -0700 (PDT)
+        with ESMTP id S231437AbiHYR4v (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 25 Aug 2022 13:56:51 -0400
+Received: from mail-pl1-x62e.google.com (mail-pl1-x62e.google.com [IPv6:2607:f8b0:4864:20::62e])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id ED1BDBD09F
+        for <kvm@vger.kernel.org>; Thu, 25 Aug 2022 10:56:50 -0700 (PDT)
+Received: by mail-pl1-x62e.google.com with SMTP id d12so467920plr.6
+        for <kvm@vger.kernel.org>; Thu, 25 Aug 2022 10:56:50 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:from:to:cc;
-        bh=90EPMom+jYdpBxTP3FD4EfoORY6QrTIXIC7G3bK5i0A=;
-        b=L6nxnUiDyq/nkQIZIXWZYPZH3qDP9PJR0LwIB/l3ZCG1xLCYkNuv3hLyYuI4kHqTjM
-         GuH2KQp6vq+nHI5v/UHpfFq04smWnKN1uTR+e9Ojy8RKoDE6CUQYj2uZXO1n8qiO5fGG
-         BN/gOKQvvSrmaJakEHC6SPLv93ys6f31FpPTtFjXlsH4Is9hoaUfozTtaKur/F8KED6T
-         UPTpK6y6R0VwV+MRP+ZvSbG71FqS0t0CpSBqgs20NmgV2YpuuMYH0HTDi3e5wLRYyZTH
-         BOfNbsA+TcUOd40h0QUwXc/ALQdBnv1maoA4mhdLzP2Fp/LuIl9ZMLYZMYO9x4OxulIc
-         gePA==
+        bh=fCNAfd5H6F6g3vYAdurwuCycLOs3svay2SQDs0FC2Yw=;
+        b=PuJSRTP2DRF+HsJ7C3XKmvNhIB4xxcyxpRZEVP8wpa6Zhin2o02JlZ5IIcsowqRpJT
+         ZDeZQ8iytFuvyVIxsEBRLW2/AV9KroFkw0bNwLy+sFWnt3g2zFpiinmZlijUOQNfFjBA
+         iX5dkcBletB6WKh9PqCwZDCTp5NC9LKwTQp+TllhOU6ljzUsMf5iluWE/Jo0ujpz9BlN
+         dv5HkCSZiad7EF4mqRB+KEnPWmZmp1omZtbhRbPlKVtJze9RwT0RbNtFqjYIWr9kWzac
+         ohonS9qo+8Y6QP+MwmyrEXa/spTzoW+WJNeTy7E+6uZoJfJdvECNlrBNZn7sEuzpfCdZ
+         2yQQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:x-gm-message-state:from:to:cc;
-        bh=90EPMom+jYdpBxTP3FD4EfoORY6QrTIXIC7G3bK5i0A=;
-        b=H3Dot5Y8jE9pU3ub1W8inqNNbh/QGAkQ1clkNOzkKse+H70aHbIABCltli/G78zIIR
-         M6L0P/zlV0Lgj/krpJRvyfQkmM14MUU7ubKUG115QGnID7xYpEblsgapOZTHSrudn1ox
-         j3ZbkEG+2yvoo8wtU6uO1JGoO4Fg9LHRcjsjGyyntrJgQrL7ur6YEaUb7pKNSwBmk1uG
-         0TB3Hysv2NPD83OFj94ffBPHlr6Cpn5ikVAOouQqp6z8/IZ9GW1SB9qlYqYygt4QsKIq
-         4gMCPLhEh5exDyrvkHI1Kse+BVi26loDQbrL16iiaHCcJk0+IE7cTV1Vc211gW9Jtd8X
-         ypjg==
-X-Gm-Message-State: ACgBeo0pjZYa6/Byp7wj48hoOD/cqDs4JLEpJ90NJ8r9AU31w/dcONKK
-        pTAFfZrLIPyXpBKv6ZsauTK2mg==
-X-Google-Smtp-Source: AA6agR4zpkDCMUp1mZwYSQegasbdZPyw7MXkrTYAZpI7WXZOPru3TM4Ttm+x+vOzwr/vPWHTOnI0Lw==
-X-Received: by 2002:a63:4558:0:b0:429:b6e6:6638 with SMTP id u24-20020a634558000000b00429b6e66638mr199821pgk.83.1661450020377;
-        Thu, 25 Aug 2022 10:53:40 -0700 (PDT)
+        bh=fCNAfd5H6F6g3vYAdurwuCycLOs3svay2SQDs0FC2Yw=;
+        b=QJ+xdDtfhuCFpgDRTj9DZXj6/io0+9KjcsTsw3k4gBvJt3hm12L7QSABwvj6jE8xRl
+         eArQtKewQTB8GZ7so4sJwkpm36ZD11JPLmKtSkqn8n7Gj36NZEqstzrHBnbS05nFg/TU
+         1fxLBaA8Fo1zacpgb5UMiTRm0HBQSWuoctVH5/CEIUSUl2sxIFiFHqOt8M4+HH34WoI7
+         5laWf2tDtqjU1tn3zEBDwJAwonovkHMYvch3aey+l4u1LrN+ml0/SR+qarzj0uf5HUSz
+         IoT6TGbd3MYhCQVjGp2mpuj5Vgsn1pIBoA7Gv/FBO6ukEaZLFOcVXiufGkE0SCUXR0YX
+         LdrA==
+X-Gm-Message-State: ACgBeo2Ckzhk7vR8Yn7SYuO3AdVW3RcFfhH44Pg3cMJYpoDEG6TA6CuL
+        RJT4HI372RV6yaSnSq+uMg0vEw==
+X-Google-Smtp-Source: AA6agR4i36BKwnhFzbt5nrofdMI9zguLVFQDptYJPNzHeD2uaBjyeKwY6sGj/7hgkqv4/4I0GyS3ig==
+X-Received: by 2002:a17:903:41c4:b0:16d:cb15:290f with SMTP id u4-20020a17090341c400b0016dcb15290fmr138336ple.47.1661450210299;
+        Thu, 25 Aug 2022 10:56:50 -0700 (PDT)
 Received: from google.com (7.104.168.34.bc.googleusercontent.com. [34.168.104.7])
-        by smtp.gmail.com with ESMTPSA id nh20-20020a17090b365400b001fbc350a223sm538783pjb.55.2022.08.25.10.53.39
+        by smtp.gmail.com with ESMTPSA id o6-20020a170902d4c600b0016b8746132esm5344240plg.105.2022.08.25.10.56.49
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 25 Aug 2022 10:53:39 -0700 (PDT)
-Date:   Thu, 25 Aug 2022 17:53:36 +0000
+        Thu, 25 Aug 2022 10:56:49 -0700 (PDT)
+Date:   Thu, 25 Aug 2022 17:56:46 +0000
 From:   Sean Christopherson <seanjc@google.com>
-To:     Mingwei Zhang <mizhang@google.com>
-Cc:     Jim Mattson <jmattson@google.com>,
-        Maxim Levitsky <mlevitsk@redhat.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Joerg Roedel <joro@8bytes.org>, kvm <kvm@vger.kernel.org>,
-        LKML <linux-kernel@vger.kernel.org>,
-        Oliver Upton <oupton@google.com>
-Subject: Re: [PATCH 1/5] KVM: x86: Get vmcs12 pages before checking pending
- interrupts
-Message-ID: <Ywe3IC7OlF/jYU1X@google.com>
-References: <20220802230718.1891356-1-mizhang@google.com>
- <20220802230718.1891356-2-mizhang@google.com>
- <b03adf94-5af2-ff5e-1dbb-6dd212790083@redhat.com>
- <CAL715WLQa5yz7SWAfOBUzQigv2JG1Ao+rwbeSJ++rKccVoZeag@mail.gmail.com>
- <17505e309d02cf5a96e33f75ccdd6437a8c79222.camel@redhat.com>
- <Ywa+QL/kDp9ibkbC@google.com>
- <CALMp9eSZ-C4BSSm6c5HBayjEVBdEwTBFcOw37yrd014cRwKPug@mail.gmail.com>
- <YweJ+hX8Ayz11jZi@google.com>
- <CAL715WK4eqxX9EUHzwqT4o-OX4S_1-WcTr5UuGnc-KEb7pk6EQ@mail.gmail.com>
+To:     Michal Luczaj <mhal@rbox.co>
+Cc:     kvm@vger.kernel.org, pbonzini@redhat.com
+Subject: Re: [kvm-unit-tests PATCH] x86/emulator: Test POP-SS blocking
+Message-ID: <Ywe33k3yvXCzSh8a@google.com>
+References: <20220821215900.1419215-1-mhal@rbox.co>
+ <20220821220647.1420411-1-mhal@rbox.co>
+ <9b853239-a3df-f124-e793-44cbadfbbd8f@rbox.co>
+ <YwOj6tzvIoG34/sF@google.com>
+ <6d19f78f-120a-936b-3eba-e949ecc3509f@rbox.co>
+ <YwZu1K5Rgb1sevsy@google.com>
+ <69d74e6a-dd6b-28bb-8011-e204d4ab0253@rbox.co>
+ <YwereSW3UPhDNsnh@google.com>
+ <635a6f6b-a3b0-401f-dfd4-3a8c27f65774@rbox.co>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <CAL715WK4eqxX9EUHzwqT4o-OX4S_1-WcTr5UuGnc-KEb7pk6EQ@mail.gmail.com>
+In-Reply-To: <635a6f6b-a3b0-401f-dfd4-3a8c27f65774@rbox.co>
 X-Spam-Status: No, score=-14.5 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
         ENV_AND_HDR_SPF_MATCH,FSL_HELO_FAKE,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,
@@ -85,82 +77,39 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Aug 25, 2022, Mingwei Zhang wrote:
-> On Thu, Aug 25, 2022 at 7:41 AM Sean Christopherson <seanjc@google.com> wrote:
+On Thu, Aug 25, 2022, Michal Luczaj wrote:
+> On 8/25/22 19:03, Sean Christopherson wrote:
+> > On Wed, Aug 24, 2022, Michal Luczaj wrote:
+> >> 								\
+> >> 	n = 0;							\
+> >> 	asm volatile(/* jump to 32-bit code segment */		\
+> >> 		     "ljmp *1f\n\t"				\
+> >> 		     "1:\n\t"					\
+> >> 		     "	.long 2f\n\t"				\
+> >> 		     "	.word " xstr(KERNEL_CS32) "\n\t"	\
+> >> 		     /* exercise POP SS blocking */		\
+> >> 		     ".code32\n\t"				\
+> >> 		     "2: lea 3f, %0\n\t"			\
+> >> 		     "mov %0, %%dr0\n\t"			\
+> >> 		     "push %%ss\n\t"				\
+> >> 		     fep1 "pop %%ss\n\t"			\
+> >> 		     fep2 "3: xor %0, %0\n\t"			\
+> >> 		     /* back to long mode */			\
+> >> 		     "ljmp %[cs64], $4f\n\t"			\
+> >> 		     ".code64\n\t"				\
+> > 
+> > Ooh, I see what you meant by temporarily switching to 32-bit mode.  I was thinking
+> > we could just make the POP SS testcase 32-bit only, but I didn't realize this test
+> > is 64-bit only.  Argh, and so is emulate.c.  And now I get why you added a brand
+> > new test.
 > >
-> > On Wed, Aug 24, 2022, Jim Mattson wrote:
-> > > On Wed, Aug 24, 2022 at 5:11 PM Sean Christopherson <seanjc@google.com> wrote:
-> > >
-> > > > @google folks, what would it take for us to mark KVM_REQ_GET_NESTED_STATE_PAGES
-> > > > as deprecated in upstream and stop accepting patches/fixes?  IIUC, when we eventually
-> > > > move to userfaultfd, all this goes away, i.e. we do want to ditch this at some point.
-> > >
-> > > Userfaultfd is a red herring. There were two reasons that we needed
-> > > this when nested live migration was implemented:
-> > > 1) our netlink socket mechanism for funneling remote page requests to
-> > > a userspace listener was broken.
-> > > 2) we were not necessarily prepared to deal with remote page requests
-> > > during VM setup.
-> > >
-> > > (1) has long since been fixed. Though our preference is to exit from
-> > > KVM_RUN and get the vCPU thread to request the remote page itself, we
-> > > are now capable of queuing a remote page request with a separate
-> > > listener thread and blocking in the kernel until the page is received.
-> > > I believe that mechanism is functionally equivalent to userfaultfd,
-> > > though not as elegant.
-> > > I don't know about (2). I'm not sure when the listener thread is set
-> > > up, relative to all of the other setup steps. Eliminating
-> > > KVM_REQ_GET_NESTED_STATE_PAGES means that userspace must be prepared
-> > > to fetch a remote page by the first call to KVM_SET_NESTED_STATE. The
-> > > same is true when using userfaultfd.
-> > >
-> > > These new ordering constraints represent a UAPI breakage, but we don't
-> > > seem to be as concerned about that as we once were. Maybe that's a
-> > > good thing. Can we get rid of all of the superseded ioctls, like
-> > > KVM_SET_CPUID, while we're at it?
-> >
-> > I view KVM_REQ_GET_NESTED_STATE_PAGES as a special case.  We are likely the only
-> > users, we can (eventually) wean ourselves off the feature, and we can carry
-> > internal patches (which we are obviously already carrying) until we transition
-> > away.  And unlike KVM_SET_CPUID and other ancient ioctls() that are largely
-> > forgotten, this feature is likely to be a maintenance burden as long as it exists.
+> > Let's just add a new test.  The above can work, but it relies on the code and
+> > stack being mapped with a 32-bit address, e.g. will break if KUT is ever changed
+> > to not map everything low in the virtual address space.
 > 
-> KVM_REQ_GET_NESTED_STATE_PAGES has been uniformly used in
-> KVM_SET_NESTED_STATE ioctl in VMX (including eVMCS) and SVM, it is
-> basically a two-step setting up of a nested state mechanism.
-> 
-> We can change that, but this may have side effects and I think this
-> usage case has nothing to do with demand paging.
+> Yeah, it is fragile in that sense. But does it mean code such as
+> vmx_tests.c:into_guest_main() or svm_tests.c:svm_of_test_guest() should be moved
+> to 32-bit binaries?
 
-There are two uses of KVM_REQ_GET_NESTED_STATE_PAGES:
-
-  1. Defer loads when leaving SMM.
-
-  2: Defer loads for KVM_SET_NESTED_STATE.
-
-#1 is fully solvable without a request, e.g. split ->leave_smm() into two helpers,
-one that restores whatever metadata is needed before restoring from SMRAM, and
-a second to load guest virtualization state that _after_ restoring all other guest
-state from SMRAM.
-
-#2 is done because of the reasons Jim listed above, which are specific to demand
-paging (including userfaultfd).  There might be some interactions with other
-ioctls() (KVM_SET_SREGS?) that are papered over by the request, but that can be
-solved without a full request since only the first KVM_RUN after KVM_SET_NESTED_STATE
-needs to refresh things (though ideally we'd avoid that).
-
-In other words, if the demand paging use case goes away, then KVM can get rid of
-KVM_REQ_GET_NESTED_STATE_PAGES.  
-
-> KVM_SET_NESTED_STATE in VMX, while in SVM implementation, it is simply
-> just a kvm_make_request(KVM_REQ_GET_NESTED_STATE_PAGES, vcpu);
-
-svm_set_nested_state() very rougly open codes enter_svm_guest_mode().  VMX could
-do the same, but that may or may not be a net positive.
-
-> hmm... so is the nested_vmx_enter_non_root_mode() call in vmx
-> KVM_SET_NESTED_STATE ioctl() still necessary? I am thinking that
-> because the same function is called again in nested_vmx_run().
-
-nested_vmx_run() is used only to emulate VMLAUNCH/VMRESUME and wont' be invoked
-if the vCPU is already running L2 at the time of migration.
+Ideally?  Yeah.  In practice, it's just not worth replicating all the nSVM/nVMX
+setup for 32-bit binaries.
