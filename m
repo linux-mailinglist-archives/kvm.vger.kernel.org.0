@@ -2,104 +2,133 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id B5A915A0774
-	for <lists+kvm@lfdr.de>; Thu, 25 Aug 2022 04:51:58 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 74C8D5A0799
+	for <lists+kvm@lfdr.de>; Thu, 25 Aug 2022 05:26:08 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231453AbiHYCvx (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 24 Aug 2022 22:51:53 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38762 "EHLO
+        id S232272AbiHYD0H (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 24 Aug 2022 23:26:07 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39898 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229741AbiHYCvw (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 24 Aug 2022 22:51:52 -0400
-Received: from mail-oa1-x36.google.com (mail-oa1-x36.google.com [IPv6:2001:4860:4864:20::36])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3067D9CCCD
-        for <kvm@vger.kernel.org>; Wed, 24 Aug 2022 19:51:51 -0700 (PDT)
-Received: by mail-oa1-x36.google.com with SMTP id 586e51a60fabf-11d2dcc31dbso15127713fac.7
-        for <kvm@vger.kernel.org>; Wed, 24 Aug 2022 19:51:51 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc;
-        bh=cZ5gzNCrmdm3hLAPODSo3m8ewJ0Yui1XSuajAwlxh4E=;
-        b=JQ4b7CBxWO7nskQf5m+6YvtLrJeNJcHsCNDT7BpIszut0+dYBhEt+GVITxHEMQyCGS
-         a1IsOxh/8/92ZfwljodwkTWc4Nv+tnPKeMdGHX6M8uqQuf5950C03dhiyRVoWrSY6kn+
-         Tdb1qY/XexGGue2BHOyvHrYYM4x3AyQ+THW4IL6pnIIktKXE7u9E7pDYguV/Sr89OoRj
-         aIk/b3HE5dH+DkcSgKKpM1InPEpSXnSPOPpTOlOJJ00i22Cq/Je9rJs2UbhAKYs0kU8j
-         h9SEe31FmmJ2jOvaa4z+ZpVOSUGzo7kSgUxwiquPw99yLyzHtkcUCPEudegUNbt8cnHw
-         cluQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc;
-        bh=cZ5gzNCrmdm3hLAPODSo3m8ewJ0Yui1XSuajAwlxh4E=;
-        b=itM4BksDD8FFMyDFqf/1URk3wDBT4FbzumnLDoM69OT4g421//nPLEpjjox5BanWsv
-         zHbCg4++DOGi7wtZ/EME9jRDyP27y/VITuohiF2mFLiEY6nfOK2LrbE5ug3hIYtsXK7A
-         XnijOfzwqU4JQFO2UIJFYb9qHdJgOV1Oqzsw8j3wVvYI/gAcfKVfvyKKIRh9j+9aI8ax
-         LYHR9x6PzRzqd+jO8nGhzsl67sLJj4s0l7k4Fxwqe3YDieItv9FzHIXGWToIxYiAQ7eI
-         zF5BMtM47sng6VGPNXKYHh0sNOwXEg8Z3alszZBo/XPamck9nDhguAnuG6/M/zazqPRM
-         LF3w==
-X-Gm-Message-State: ACgBeo31ggdpnrRIDAtGo6UUhw/XRWtA7xS84y8MsnRfbvZbfJF83YGG
-        YfZc2ighR7Er1q+x11d00VFg8UJZBqmxa5XjDl/F9Q==
-X-Google-Smtp-Source: AA6agR7vXKkTOGXcGEwZmzfAc5VUk0nraiOrDnZju3zQi5V4WprV0/ul8/7Z0aqc6ZWW6iZJyMIiYITSg9m+8k1wtME=
-X-Received: by 2002:a05:6870:c596:b0:101:6409:ae62 with SMTP id
- ba22-20020a056870c59600b001016409ae62mr5053901oab.112.1661395910321; Wed, 24
- Aug 2022 19:51:50 -0700 (PDT)
-MIME-Version: 1.0
-References: <20220802230718.1891356-1-mizhang@google.com> <20220802230718.1891356-2-mizhang@google.com>
- <b03adf94-5af2-ff5e-1dbb-6dd212790083@redhat.com> <CAL715WLQa5yz7SWAfOBUzQigv2JG1Ao+rwbeSJ++rKccVoZeag@mail.gmail.com>
- <17505e309d02cf5a96e33f75ccdd6437a8c79222.camel@redhat.com> <Ywa+QL/kDp9ibkbC@google.com>
-In-Reply-To: <Ywa+QL/kDp9ibkbC@google.com>
-From:   Jim Mattson <jmattson@google.com>
-Date:   Wed, 24 Aug 2022 19:51:39 -0700
-Message-ID: <CALMp9eSZ-C4BSSm6c5HBayjEVBdEwTBFcOw37yrd014cRwKPug@mail.gmail.com>
-Subject: Re: [PATCH 1/5] KVM: x86: Get vmcs12 pages before checking pending interrupts
-To:     Sean Christopherson <seanjc@google.com>
-Cc:     Maxim Levitsky <mlevitsk@redhat.com>,
-        Mingwei Zhang <mizhang@google.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Joerg Roedel <joro@8bytes.org>, kvm <kvm@vger.kernel.org>,
-        LKML <linux-kernel@vger.kernel.org>,
-        Oliver Upton <oupton@google.com>
-Content-Type: text/plain; charset="UTF-8"
-X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-        T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL
-        autolearn=ham autolearn_force=no version=3.4.6
+        with ESMTP id S232235AbiHYD0F (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 24 Aug 2022 23:26:05 -0400
+Received: from mga18.intel.com (mga18.intel.com [134.134.136.126])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5BFA23F337
+        for <kvm@vger.kernel.org>; Wed, 24 Aug 2022 20:26:01 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1661397961; x=1692933961;
+  h=from:to:cc:subject:date:message-id;
+  bh=QfU5n0LNLrsAsHbr2o9JAswWSZVSgNUI7m3XVlMIrJw=;
+  b=BxKFdkIqVn+T6NARu7Ryz9Lu5xUNcDaZZMFofKILMEguESvQIVjMIU6o
+   x2OhKAAzh/RMh5IrlxZXC2eRKa/6JS1UQppzm1em7dxNPsuuf9QW/VKPL
+   XsZBcOHdCSiRE9JwbJIHH2Z3lWSV6Rk1B6wKA8FgfPh5Elhy87S/QJNjq
+   G9ezlrMikJdtEsmJlYkcBTkgA9PNeZWTmNqtehD/e/ivK5dC3B+wZ8WK+
+   Ighz69d1BTVg4qR+GSsaWKmcgbi4b8uydkJGEiDS71fLTt+0d6cQCwSA+
+   NesQECV+iLZ5pb58LUWZuKKRASD/AsoGcDQ2xPp8FDevXW/Lstnbo8jG9
+   w==;
+X-IronPort-AV: E=McAfee;i="6500,9779,10449"; a="277155882"
+X-IronPort-AV: E=Sophos;i="5.93,262,1654585200"; 
+   d="scan'208";a="277155882"
+Received: from fmsmga008.fm.intel.com ([10.253.24.58])
+  by orsmga106.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 24 Aug 2022 20:26:00 -0700
+X-IronPort-AV: E=Sophos;i="5.93,262,1654585200"; 
+   d="scan'208";a="670792058"
+Received: from arthur-vostro-3668.sh.intel.com ([10.238.200.53])
+  by fmsmga008-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 24 Aug 2022 20:25:50 -0700
+From:   Zeng Guang <guang.zeng@intel.com>
+To:     Paolo Bonzini <pbonzini@redhat.com>,
+        Sean Christopherson <seanjc@google.com>,
+        "Michael S . Tsirkin" <mst@redhat.com>,
+        Marcel Apfelbaum <marcel.apfelbaum@gmail.com>,
+        Richard Henderson <richard.henderson@linaro.org>,
+        Eduardo Habkost <eduardo@habkost.net>,
+        Marcelo Tosatti <mtosatti@redhat.com>
+Cc:     qemu-devel@nongnu.org, kvm@vger.kernel.org,
+        Gao Chao <chao.gao@intel.com>,
+        Zeng Guang <guang.zeng@intel.com>
+Subject: [PATCH v3] target/i386: Set maximum APIC ID to KVM prior to vCPU creation
+Date:   Thu, 25 Aug 2022 10:52:46 +0800
+Message-Id: <20220825025246.26618-1-guang.zeng@intel.com>
+X-Mailer: git-send-email 2.17.1
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,SPF_HELO_NONE,
+        SPF_NONE,T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Aug 24, 2022 at 5:11 PM Sean Christopherson <seanjc@google.com> wrote:
+Specify maximum possible APIC ID assigned for current VM session to KVM
+prior to the creation of vCPUs. By this setting, KVM can set up VM-scoped
+data structure indexed by the APIC ID, e.g. Posted-Interrupt Descriptor
+pointer table to support Intel IPI virtualization, with the most optimal
+memory footprint.
 
-> @google folks, what would it take for us to mark KVM_REQ_GET_NESTED_STATE_PAGES
-> as deprecated in upstream and stop accepting patches/fixes?  IIUC, when we eventually
-> move to userfaultfd, all this goes away, i.e. we do want to ditch this at some point.
+It can be achieved by calling KVM_ENABLE_CAP for KVM_CAP_MAX_VCPU_ID
+capability once KVM has enabled it. Ignoring the return error if KVM
+doesn't support this capability yet.
 
-Userfaultfd is a red herring. There were two reasons that we needed
-this when nested live migration was implemented:
-1) our netlink socket mechanism for funneling remote page requests to
-a userspace listener was broken.
-2) we were not necessarily prepared to deal with remote page requests
-during VM setup.
+Signed-off-by: Zeng Guang <guang.zeng@intel.com>
+---
+ hw/i386/x86.c              | 4 ++++
+ target/i386/kvm/kvm-stub.c | 5 +++++
+ target/i386/kvm/kvm.c      | 5 +++++
+ target/i386/kvm/kvm_i386.h | 1 +
+ 4 files changed, 15 insertions(+)
 
-(1) has long since been fixed. Though our preference is to exit from
-KVM_RUN and get the vCPU thread to request the remote page itself, we
-are now capable of queuing a remote page request with a separate
-listener thread and blocking in the kernel until the page is received.
-I believe that mechanism is functionally equivalent to userfaultfd,
-though not as elegant.
-I don't know about (2). I'm not sure when the listener thread is set
-up, relative to all of the other setup steps. Eliminating
-KVM_REQ_GET_NESTED_STATE_PAGES means that userspace must be prepared
-to fetch a remote page by the first call to KVM_SET_NESTED_STATE. The
-same is true when using userfaultfd.
+diff --git a/hw/i386/x86.c b/hw/i386/x86.c
+index 050eedc0c8..4831193c86 100644
+--- a/hw/i386/x86.c
++++ b/hw/i386/x86.c
+@@ -139,6 +139,10 @@ void x86_cpus_init(X86MachineState *x86ms, int default_cpu_version)
+         exit(EXIT_FAILURE);
+     }
+ 
++    if (kvm_enabled()) {
++        kvm_set_max_apic_id(x86ms->apic_id_limit);
++    }
++
+     possible_cpus = mc->possible_cpu_arch_ids(ms);
+     for (i = 0; i < ms->smp.cpus; i++) {
+         x86_cpu_new(x86ms, possible_cpus->cpus[i].arch_id, &error_fatal);
+diff --git a/target/i386/kvm/kvm-stub.c b/target/i386/kvm/kvm-stub.c
+index f6e7e4466e..e052f1c7b0 100644
+--- a/target/i386/kvm/kvm-stub.c
++++ b/target/i386/kvm/kvm-stub.c
+@@ -44,3 +44,8 @@ bool kvm_hyperv_expand_features(X86CPU *cpu, Error **errp)
+ {
+     abort();
+ }
++
++void kvm_set_max_apic_id(uint32_t max_apic_id)
++{
++    return;
++}
+diff --git a/target/i386/kvm/kvm.c b/target/i386/kvm/kvm.c
+index f148a6d52f..af4ef1e8f0 100644
+--- a/target/i386/kvm/kvm.c
++++ b/target/i386/kvm/kvm.c
+@@ -5428,3 +5428,8 @@ void kvm_request_xsave_components(X86CPU *cpu, uint64_t mask)
+         mask &= ~BIT_ULL(bit);
+     }
+ }
++
++void kvm_set_max_apic_id(uint32_t max_apic_id)
++{
++    kvm_vm_enable_cap(kvm_state, KVM_CAP_MAX_VCPU_ID, 0, max_apic_id);
++}
+diff --git a/target/i386/kvm/kvm_i386.h b/target/i386/kvm/kvm_i386.h
+index 4124912c20..c133b32a58 100644
+--- a/target/i386/kvm/kvm_i386.h
++++ b/target/i386/kvm/kvm_i386.h
+@@ -54,4 +54,5 @@ uint64_t kvm_swizzle_msi_ext_dest_id(uint64_t address);
+ bool kvm_enable_sgx_provisioning(KVMState *s);
+ void kvm_request_xsave_components(X86CPU *cpu, uint64_t mask);
+ 
++void kvm_set_max_apic_id(uint32_t max_apic_id);
+ #endif
+-- 
+2.27.0
 
-These new ordering constraints represent a UAPI breakage, but we don't
-seem to be as concerned about that as we once were. Maybe that's a
-good thing. Can we get rid of all of the superseded ioctls, like
-KVM_SET_CPUID, while we're at it?
