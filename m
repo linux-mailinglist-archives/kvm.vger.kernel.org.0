@@ -2,120 +2,126 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id DA7FE5A148F
-	for <lists+kvm@lfdr.de>; Thu, 25 Aug 2022 16:43:20 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 809CA5A1498
+	for <lists+kvm@lfdr.de>; Thu, 25 Aug 2022 16:44:04 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S241223AbiHYOnN (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 25 Aug 2022 10:43:13 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47074 "EHLO
+        id S242694AbiHYOnw (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 25 Aug 2022 10:43:52 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47702 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S242608AbiHYOmp (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 25 Aug 2022 10:42:45 -0400
-Received: from mail-pg1-x531.google.com (mail-pg1-x531.google.com [IPv6:2607:f8b0:4864:20::531])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3852BB81F4
-        for <kvm@vger.kernel.org>; Thu, 25 Aug 2022 07:41:04 -0700 (PDT)
-Received: by mail-pg1-x531.google.com with SMTP id d71so18051387pgc.13
-        for <kvm@vger.kernel.org>; Thu, 25 Aug 2022 07:41:04 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc;
-        bh=ZbQl5zmcQJYLrJInunPEiMFIWd9Xor7csOXerZPZEys=;
-        b=Y5yVxnEfhqYg2VzNtwH3XMv1GhyAfwGAK9sKYjHECt3tGSTlM8/jHpaJ/RPHG9QSz0
-         to4y3mp5uLhUUXaLCxd/nkp+Hmjce8XXsze0vkJhV0dwKK9DUt7jHaQCYY27ATKLgS7A
-         jtaiS6QU0ypyCmP0meBxTp6VRT9g6u5PDKGQXpZKgwkpeX5B07/FpfLyetM8EhKI0TdP
-         4fHkOuv7ceFmC/Wrbxbmn17N5OPQETlK4iaNPXONDzpmbLTfwtPlwdVHQcxmntM0VBmC
-         1pnrH7IlaJ0TqdXPjM/NsN5epj8IIt2UcdiQ0kJc+B9yezkUPKD7RoX6wNmjPMjFgEld
-         trXw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc;
-        bh=ZbQl5zmcQJYLrJInunPEiMFIWd9Xor7csOXerZPZEys=;
-        b=JeCFTex/v825ZvKCuT6jn7ooUOBaRBrqK61GovlWPBm8Rr1Qz/DaBxVRTULimRU60o
-         aM71PkGRa5aYrufGEbs2NJbHLSgG2MFRAonog/p6wH+sfZ88+li78wfOuW2qSTxJLpLS
-         v2CVrLnBB6Jnktgn+u/aPAU5uPcCHTQFfbM1UUzcrJmPuI9uwZmlJK4QXmzMSFz6slpz
-         Wv+qM5K8JwfValDK0Fy2nLzAHMck0PBKD4BbOYizUa8KHFPvNu2xFnI5NduvnXAkOp7b
-         MIji0EtKmAYRHfa/A5PNtum8yNp8WaLLWfRUjdJ3lLLSJ1eqcKqYHjAvE/z4GQJkXpnH
-         uVOw==
-X-Gm-Message-State: ACgBeo14EikFqBfLT7IYdz8k0GDZ7l1nY/hm+avTECTNPalds/QODOlp
-        +84wINHhuZ86CRI6MHvRXxAoow==
-X-Google-Smtp-Source: AA6agR4Ka0ia2RlVLxccKqyQLqGJRXHZxx+pW2ufMgWCmxj1CFpAQiHUKWE3BTbxQkewk98fa1GugQ==
-X-Received: by 2002:a63:5c42:0:b0:42b:452f:8e66 with SMTP id n2-20020a635c42000000b0042b452f8e66mr3578134pgm.323.1661438463043;
-        Thu, 25 Aug 2022 07:41:03 -0700 (PDT)
-Received: from google.com (7.104.168.34.bc.googleusercontent.com. [34.168.104.7])
-        by smtp.gmail.com with ESMTPSA id v68-20020a626147000000b0052e6c058bccsm13273939pfb.61.2022.08.25.07.41.02
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 25 Aug 2022 07:41:02 -0700 (PDT)
-Date:   Thu, 25 Aug 2022 14:40:58 +0000
-From:   Sean Christopherson <seanjc@google.com>
-To:     Jim Mattson <jmattson@google.com>
-Cc:     Maxim Levitsky <mlevitsk@redhat.com>,
-        Mingwei Zhang <mizhang@google.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Joerg Roedel <joro@8bytes.org>, kvm <kvm@vger.kernel.org>,
-        LKML <linux-kernel@vger.kernel.org>,
-        Oliver Upton <oupton@google.com>
-Subject: Re: [PATCH 1/5] KVM: x86: Get vmcs12 pages before checking pending
- interrupts
-Message-ID: <YweJ+hX8Ayz11jZi@google.com>
-References: <20220802230718.1891356-1-mizhang@google.com>
- <20220802230718.1891356-2-mizhang@google.com>
- <b03adf94-5af2-ff5e-1dbb-6dd212790083@redhat.com>
- <CAL715WLQa5yz7SWAfOBUzQigv2JG1Ao+rwbeSJ++rKccVoZeag@mail.gmail.com>
- <17505e309d02cf5a96e33f75ccdd6437a8c79222.camel@redhat.com>
- <Ywa+QL/kDp9ibkbC@google.com>
- <CALMp9eSZ-C4BSSm6c5HBayjEVBdEwTBFcOw37yrd014cRwKPug@mail.gmail.com>
+        with ESMTP id S242147AbiHYOne (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 25 Aug 2022 10:43:34 -0400
+Received: from mga06.intel.com (mga06b.intel.com [134.134.136.31])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 57136BCBD
+        for <kvm@vger.kernel.org>; Thu, 25 Aug 2022 07:42:41 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1661438561; x=1692974561;
+  h=message-id:date:mime-version:subject:to:cc:references:
+   from:in-reply-to:content-transfer-encoding;
+  bh=ZVTIjYVchpIcQqqc0ZaCjQcEwojmXfhbS+FFEpZPwJM=;
+  b=lFqaUKdCZdf/WbE0M+pqxMy3w6rM3mAFk9pbXSAcpQ90k0yndIKYTLcN
+   JEM/X2uDwR40Xz8Bpbi2KkppNg7rGo+9Q6lmLMpNFYP9edgfUvPMPJe6d
+   w8tWVpOFQHrRiSXvkYOMPXtVDJCBzSUzCnAZZgX6dDcnyKVUz+Vnw3oAd
+   GaERQhMzwf/TMWO0YTS3Vgq/gIbMxzeqXLdzTUBLswDVQ2MYTAX3ExT7U
+   fyv8tESG0m2oy8HQhOd2sExIm05HeDL+knTty8IgTIxjCa5saSx6V0gLU
+   x706pwkgyZ1tsx5DNjeykcLjnXWb6iPeEIdkWpFjRN//+5pyu5BuUDwB3
+   g==;
+X-IronPort-AV: E=McAfee;i="6500,9779,10450"; a="355974937"
+X-IronPort-AV: E=Sophos;i="5.93,263,1654585200"; 
+   d="scan'208";a="355974937"
+Received: from fmsmga008.fm.intel.com ([10.253.24.58])
+  by orsmga104.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 25 Aug 2022 07:42:40 -0700
+X-IronPort-AV: E=Sophos;i="5.93,263,1654585200"; 
+   d="scan'208";a="671011415"
+Received: from xiaoyaol-hp-g830.ccr.corp.intel.com (HELO [10.255.29.55]) ([10.255.29.55])
+  by fmsmga008-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 25 Aug 2022 07:42:36 -0700
+Message-ID: <389a2212-56b8-938b-22e5-24ae2bc73235@intel.com>
+Date:   Thu, 25 Aug 2022 22:42:34 +0800
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <CALMp9eSZ-C4BSSm6c5HBayjEVBdEwTBFcOw37yrd014cRwKPug@mail.gmail.com>
-X-Spam-Status: No, score=-14.5 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        ENV_AND_HDR_SPF_MATCH,FSL_HELO_FAKE,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,
-        SPF_PASS,T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL
-        autolearn=no autolearn_force=no version=3.4.6
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:91.0) Gecko/20100101
+ Firefox/91.0 Thunderbird/91.12.0
+Subject: Re: [PATCH v1 15/40] i386/tdx: Add property sept-ve-disable for
+ tdx-guest object
+Content-Language: en-US
+To:     Gerd Hoffmann <kraxel@redhat.com>
+Cc:     Paolo Bonzini <pbonzini@redhat.com>,
+        Isaku Yamahata <isaku.yamahata@gmail.com>,
+        =?UTF-8?Q?Daniel_P=2e_Berrang=c3=a9?= <berrange@redhat.com>,
+        =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>,
+        Richard Henderson <richard.henderson@linaro.org>,
+        "Michael S . Tsirkin" <mst@redhat.com>,
+        Marcel Apfelbaum <marcel.apfelbaum@gmail.com>,
+        Cornelia Huck <cohuck@redhat.com>,
+        Marcelo Tosatti <mtosatti@redhat.com>,
+        Laszlo Ersek <lersek@redhat.com>,
+        Eric Blake <eblake@redhat.com>,
+        Connor Kuehl <ckuehl@redhat.com>, erdemaktas@google.com,
+        kvm@vger.kernel.org, qemu-devel@nongnu.org, seanjc@google.com
+References: <20220802074750.2581308-1-xiaoyao.li@intel.com>
+ <20220802074750.2581308-16-xiaoyao.li@intel.com>
+ <20220825113636.qlqmflxcxemh2lmf@sirius.home.kraxel.org>
+From:   Xiaoyao Li <xiaoyao.li@intel.com>
+In-Reply-To: <20220825113636.qlqmflxcxemh2lmf@sirius.home.kraxel.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Spam-Status: No, score=-2.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,HK_RANDOM_ENVFROM,
+        HK_RANDOM_FROM,NICE_REPLY_A,RCVD_IN_DNSWL_MED,SPF_HELO_NONE,SPF_NONE,
+        T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED autolearn=ham autolearn_force=no
+        version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Aug 24, 2022, Jim Mattson wrote:
-> On Wed, Aug 24, 2022 at 5:11 PM Sean Christopherson <seanjc@google.com> wrote:
+On 8/25/2022 7:36 PM, Gerd Hoffmann wrote:
+> On Tue, Aug 02, 2022 at 03:47:25PM +0800, Xiaoyao Li wrote:
+>> Bit 28, named SEPT_VE_DISABLE, disables	EPT violation conversion to #VE
+>> on guest TD access of PENDING pages when set to 1. Some guest OS (e.g.,
+>> Linux TD guest) may require this bit set as 1. Otherwise refuse to boot.
 > 
-> > @google folks, what would it take for us to mark KVM_REQ_GET_NESTED_STATE_PAGES
-> > as deprecated in upstream and stop accepting patches/fixes?  IIUC, when we eventually
-> > move to userfaultfd, all this goes away, i.e. we do want to ditch this at some point.
+> --verbose please.  That somehow doesn't make sense to me.
 > 
-> Userfaultfd is a red herring. There were two reasons that we needed
-> this when nested live migration was implemented:
-> 1) our netlink socket mechanism for funneling remote page requests to
-> a userspace listener was broken.
-> 2) we were not necessarily prepared to deal with remote page requests
-> during VM setup.
-> 
-> (1) has long since been fixed. Though our preference is to exit from
-> KVM_RUN and get the vCPU thread to request the remote page itself, we
-> are now capable of queuing a remote page request with a separate
-> listener thread and blocking in the kernel until the page is received.
-> I believe that mechanism is functionally equivalent to userfaultfd,
-> though not as elegant.
-> I don't know about (2). I'm not sure when the listener thread is set
-> up, relative to all of the other setup steps. Eliminating
-> KVM_REQ_GET_NESTED_STATE_PAGES means that userspace must be prepared
-> to fetch a remote page by the first call to KVM_SET_NESTED_STATE. The
-> same is true when using userfaultfd.
-> 
-> These new ordering constraints represent a UAPI breakage, but we don't
-> seem to be as concerned about that as we once were. Maybe that's a
-> good thing. Can we get rid of all of the superseded ioctls, like
-> KVM_SET_CPUID, while we're at it?
+> A guest is either TDX-aware (which should be the case for linux 5.19+),
+> or it is not.  My expectation would be that guests which are not
+> TDX-aware will be disturbed by any #VE exception, not only the ones
+> triggered by EPT violations.  So I'm wondering what this config bit
+> actually is useful for ...
 
-I view KVM_REQ_GET_NESTED_STATE_PAGES as a special case.  We are likely the only
-users, we can (eventually) wean ourselves off the feature, and we can carry
-internal patches (which we are obviously already carrying) until we transition
-away.  And unlike KVM_SET_CPUID and other ancient ioctls() that are largely
-forgotten, this feature is likely to be a maintenance burden as long as it exists.
+This bit, including other properties of tdx-guest object, are supposed 
+to be configured for TD only. On VM creation phase, user needs to decide 
+if it's a TD (TDX VM) or non-TD (previous normal VM) by attaching 
+tdx-guest object or not.
+
+If it's a TD when VM creation, but the guest kernel is not 
+TDX-capable/-aware, it's doomed to fail booting.
+
+For TD guest kernel, it has its own reason to turn SEPT_VE on or off. 
+E.g., linux TD guest requires SEPT_VE to be disabled to avoid #VE on 
+syscall gap [1]. Frankly speaking, this bit is better to be configured 
+by TD guest kernel, however current TDX architecture makes the design to 
+let VMM configure.
+
+
+[1]: TD pages that are not accepted cause a #VE exception.
+It is possible for a hypervisor to take away a guest page
+and thus trigger a #VE the next time it is accessed.
+Normally the guest would just panic in such a case, but
+for that it first needs to execute the #VE handler
+reliably.
+
+This can cause problems with the "system call gap": a malicious
+hypervisor might trigger a #VE for example on the system call entry
+code, and when a user process does a system call it would trigger a
+and SYSCALL relies on the kernel code to switch to the kernel stack,
+this would lead to kernel code running on the ring 3 stack.  This could
+be exploited by a combination of malicious host and malicious ring 3
+program to attack the kernel.
+
+
+> take care,
+>    Gerd
+> 
+
