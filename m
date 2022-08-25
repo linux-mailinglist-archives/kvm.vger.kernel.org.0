@@ -2,224 +2,140 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 3DA345A0A9D
-	for <lists+kvm@lfdr.de>; Thu, 25 Aug 2022 09:46:20 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id A3D815A0B80
+	for <lists+kvm@lfdr.de>; Thu, 25 Aug 2022 10:31:02 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238446AbiHYHpT (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 25 Aug 2022 03:45:19 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41208 "EHLO
+        id S236304AbiHYIa7 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 25 Aug 2022 04:30:59 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38150 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S238542AbiHYHpK (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 25 Aug 2022 03:45:10 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D49FA1A04E
-        for <kvm@vger.kernel.org>; Thu, 25 Aug 2022 00:44:58 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1661413497;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=zWHJOua38RJS2VpD323EH8m9oocDDSERK05+Run3Kgw=;
-        b=Cn4a36+pAlLqtFvozHucJSfObtk/j6MgF5jPPgiZ1FLg+zLrx59SPHbSc+UerGE6E8VYKJ
-        eqvza90QBqIzYOC9WA8V6QQEzGjtuoYS/6i6Utwk2GDJIhni/DRuFc4Hd6Z+AmTPjMB1C6
-        7hcS8/auePgW1ialHfEI6mmpRq0lHQE=
-Received: from mail-pl1-f200.google.com (mail-pl1-f200.google.com
- [209.85.214.200]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_128_GCM_SHA256) id
- us-mta-540-c9t77qFkO-mkxHpjalsUQg-1; Thu, 25 Aug 2022 03:44:56 -0400
-X-MC-Unique: c9t77qFkO-mkxHpjalsUQg-1
-Received: by mail-pl1-f200.google.com with SMTP id b9-20020a170903228900b001730a0e11e5so3866481plh.19
-        for <kvm@vger.kernel.org>; Thu, 25 Aug 2022 00:44:55 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc;
-        bh=zWHJOua38RJS2VpD323EH8m9oocDDSERK05+Run3Kgw=;
-        b=QY8noBqvo2opCeC9B2vFs5O7Hofsyu1zeLOubicSbgOs2YItOVOJDGv2f/FPoBcEWr
-         8uX3mfXUDNFOsDF1ELzGOky+7Usxg7pju2yvg9ale3NWQ6U/Je3CKtbDtFuvpxpJ3iBO
-         eVUOyRbdgPJIGV0Ga96RS94htOg62RpHZlCw22zj+SO98P5ne/9Ec/NMg25rJRJXajpG
-         iW6N4HROwNLaRfD/K3yFU/seaHjtwMVex0UI7/RhpT60eUYaFS9uOp1zZm7VNXQ6d9aQ
-         qL58xqhL4xkmRFzuoU6xqf1cbecc8Gk5dNP2Xtg5OlyyBQXMkiP5XC5K3VqpnpM3ag5F
-         fKBQ==
-X-Gm-Message-State: ACgBeo1TCwus7PBcqyUt4NQDyypsddqa4CY/AFHxQbFrbD4jKQ4PZVE1
-        6a/pynE2APKrxTcD8fC4B6+fkTyiJSe/zhpNoKS9VC6rC2ZFqNYzd7tlzsAzi7V4cCyKX7Tod+V
-        RX7/8WUMb2OCf
-X-Received: by 2002:a65:6949:0:b0:41c:cb9d:3d1f with SMTP id w9-20020a656949000000b0041ccb9d3d1fmr2255952pgq.334.1661413494953;
-        Thu, 25 Aug 2022 00:44:54 -0700 (PDT)
-X-Google-Smtp-Source: AA6agR75sNLCKhijU2tO7/6br2jUgmaSbR8Md7x1+OjmLVGn+Q+XRO2Hc97nH7XGtW3SfJCxbzuBEQ==
-X-Received: by 2002:a65:6949:0:b0:41c:cb9d:3d1f with SMTP id w9-20020a656949000000b0041ccb9d3d1fmr2255934pgq.334.1661413494644;
-        Thu, 25 Aug 2022 00:44:54 -0700 (PDT)
-Received: from [10.72.12.107] ([209.132.188.80])
-        by smtp.gmail.com with ESMTPSA id z24-20020aa79f98000000b0053627e0e860sm11687572pfr.27.2022.08.25.00.44.50
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 25 Aug 2022 00:44:54 -0700 (PDT)
-Message-ID: <ebf4b376-6a5c-3cfa-38ab-1559ace13b27@redhat.com>
-Date:   Thu, 25 Aug 2022 15:44:41 +0800
+        with ESMTP id S235539AbiHYIa5 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 25 Aug 2022 04:30:57 -0400
+Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6A2A173917;
+        Thu, 25 Aug 2022 01:30:56 -0700 (PDT)
+Received: from pps.filterd (m0127361.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.17.1.5/8.17.1.5) with ESMTP id 27P7hbJY006639;
+        Thu, 25 Aug 2022 08:30:32 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=date : from : to : cc :
+ subject : message-id : references : mime-version : content-type :
+ in-reply-to; s=pp1; bh=OMmWGgs6vn9kUJMlHv3vwopOndmuKt1TnFR7XsnYx2c=;
+ b=ElpG8HKOkwXNv3EQEfn/Vmm7HOPfJ3Ov4bf3mPYEwUcoiPv7DHeiKQEMd1mgIA/5FWal
+ mCNU+pEFLUmZQ9u0wgQKbOrJwi8QSj8k/tOyvBoOR2YQwpFEQF0eU4vbd0qfM99/iG31
+ zz7iB1Mv1QN4yTjgYCDYhtg+rfpMvI3MnEzz6fbx1koX02dLCkADKM9q3c/4/SeS2Qrh
+ rMvdss44EHeDRdYBCcG2gBkDq2R3TSjCcp81zyijQN+YRyiud8t30tR0ZwF89NOyl81l
+ vCsFmQDeTkUhL776U8Nccq3iRQbLLOz5l2RMbkUMTq8ECS9FQ64CyStUgMo3Xi9h0YD/ JA== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3j64xj9saw-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Thu, 25 Aug 2022 08:30:31 +0000
+Received: from m0127361.ppops.net (m0127361.ppops.net [127.0.0.1])
+        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 27P7iMVm010001;
+        Thu, 25 Aug 2022 08:30:31 GMT
+Received: from ppma03ams.nl.ibm.com (62.31.33a9.ip4.static.sl-reverse.com [169.51.49.98])
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3j64xj9s9y-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Thu, 25 Aug 2022 08:30:31 +0000
+Received: from pps.filterd (ppma03ams.nl.ibm.com [127.0.0.1])
+        by ppma03ams.nl.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 27P8LGKk025828;
+        Thu, 25 Aug 2022 08:30:29 GMT
+Received: from b06avi18878370.portsmouth.uk.ibm.com (b06avi18878370.portsmouth.uk.ibm.com [9.149.26.194])
+        by ppma03ams.nl.ibm.com with ESMTP id 3j2q88x4y3-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Thu, 25 Aug 2022 08:30:29 +0000
+Received: from d06av23.portsmouth.uk.ibm.com (d06av23.portsmouth.uk.ibm.com [9.149.105.59])
+        by b06avi18878370.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 27P8UkSN43647262
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Thu, 25 Aug 2022 08:30:47 GMT
+Received: from d06av23.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 37B7DA4057;
+        Thu, 25 Aug 2022 08:30:26 +0000 (GMT)
+Received: from d06av23.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id C0D27A4051;
+        Thu, 25 Aug 2022 08:30:25 +0000 (GMT)
+Received: from osiris (unknown [9.152.212.241])
+        by d06av23.portsmouth.uk.ibm.com (Postfix) with ESMTPS;
+        Thu, 25 Aug 2022 08:30:25 +0000 (GMT)
+Date:   Thu, 25 Aug 2022 10:30:25 +0200
+From:   Heiko Carstens <hca@linux.ibm.com>
+To:     Janis Schoetterl-Glausch <scgl@linux.ibm.com>
+Cc:     Christian Borntraeger <borntraeger@linux.ibm.com>,
+        Janosch Frank <frankja@linux.ibm.com>,
+        Claudio Imbrenda <imbrenda@linux.ibm.com>,
+        Vasily Gorbik <gor@linux.ibm.com>,
+        Alexander Gordeev <agordeev@linux.ibm.com>,
+        kernel test robot <lkp@intel.com>,
+        Dan Carpenter <dan.carpenter@oracle.com>,
+        David Hildenbrand <david@redhat.com>,
+        Sven Schnelle <svens@linux.ibm.com>, kvm@vger.kernel.org,
+        linux-s390@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH] KVM: s390: Pass initialized arg even if unused
+Message-ID: <YwczITkxvvghyvWq@osiris>
+References: <20220824153011.4004573-1-scgl@linux.ibm.com>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:91.0)
- Gecko/20100101 Thunderbird/91.13.0
-Subject: Re: [RFC v2 6/7] virtio: in order support for virtio_ring
-Content-Language: en-US
-To:     Guo Zhi <qtxuning1999@sjtu.edu.cn>, eperezma@redhat.com,
-        sgarzare@redhat.com, mst@redhat.com
-Cc:     netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
-        kvm@vger.kernel.org, virtualization@lists.linux-foundation.org
-References: <20220817135718.2553-1-qtxuning1999@sjtu.edu.cn>
- <20220817135718.2553-7-qtxuning1999@sjtu.edu.cn>
-From:   Jason Wang <jasowang@redhat.com>
-In-Reply-To: <20220817135718.2553-7-qtxuning1999@sjtu.edu.cn>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
-        RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE,
-        URIBL_BLOCKED autolearn=unavailable autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20220824153011.4004573-1-scgl@linux.ibm.com>
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: 5C8nJE7uOf4tY54ddV2fCifhenVmKfAD
+X-Proofpoint-ORIG-GUID: _VtMFW8bFbPGvLC4RSTO0qGpF_UZqb8s
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.205,Aquarius:18.0.895,Hydra:6.0.517,FMLib:17.11.122.1
+ definitions=2022-08-25_03,2022-08-22_02,2022-06-22_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 lowpriorityscore=0
+ malwarescore=0 priorityscore=1501 phishscore=0 spamscore=0 bulkscore=0
+ adultscore=0 mlxscore=0 suspectscore=0 clxscore=1011 mlxlogscore=999
+ impostorscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2207270000 definitions=main-2208250028
+X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_EF,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_PASS,
+        T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-
-在 2022/8/17 21:57, Guo Zhi 写道:
-> If in order feature negotiated, we can skip the used ring to get
-> buffer's desc id sequentially.
->
-> Signed-off-by: Guo Zhi <qtxuning1999@sjtu.edu.cn>
+On Wed, Aug 24, 2022 at 05:30:11PM +0200, Janis Schoetterl-Glausch wrote:
+> This silences smatch warnings reported by kbuild bot:
+> arch/s390/kvm/gaccess.c:859 guest_range_to_gpas() error: uninitialized symbol 'prot'.
+> arch/s390/kvm/gaccess.c:1064 access_guest_with_key() error: uninitialized symbol 'prot'.
+> 
+> This is because it cannot tell that the value is not used in this case.
+> The trans_exc* only examine prot if code is PGM_PROTECTION.
+> Pass a dummy value for other codes.
+> 
+> Reported-by: kernel test robot <lkp@intel.com>
+> Reported-by: Dan Carpenter <dan.carpenter@oracle.com>
+> Signed-off-by: Janis Schoetterl-Glausch <scgl@linux.ibm.com>
 > ---
->   drivers/virtio/virtio_ring.c | 53 ++++++++++++++++++++++++++++++------
->   1 file changed, 45 insertions(+), 8 deletions(-)
->
-> diff --git a/drivers/virtio/virtio_ring.c b/drivers/virtio/virtio_ring.c
-> index 1c1b3fa376a2..143184ebb5a1 100644
-> --- a/drivers/virtio/virtio_ring.c
-> +++ b/drivers/virtio/virtio_ring.c
-> @@ -144,6 +144,9 @@ struct vring_virtqueue {
->   			/* DMA address and size information */
->   			dma_addr_t queue_dma_addr;
->   			size_t queue_size_in_bytes;
-> +
-> +			/* In order feature batch begin here */
+>  arch/s390/kvm/gaccess.c | 15 ++++++++++++---
+>  1 file changed, 12 insertions(+), 3 deletions(-)
+...
+> @@ -503,6 +505,7 @@ static int trans_exc_ending(struct kvm_vcpu *vcpu, int code, unsigned long gva,
+>  
+>  	switch (code) {
+>  	case PGM_PROTECTION:
+> +		WARN(unlikely(prot == PROT_NONE), "Invalid prot argument");
 
+The WARN macro comes with unlikely, please get rid of unlikely here. Also:
 
-We need tweak the comment, it's not easy for me to understand the 
-meaning here.
+> +		case PROT_NONE:
+> +			/* We should never get here, acts like termination */
 
+Why not put it here? And make it WARN_ON_ONCE() in addition?
 
-> +			u16 next_desc_begin;
->   		} split;
->   
->   		/* Available for packed ring */
-> @@ -702,8 +705,13 @@ static void detach_buf_split(struct vring_virtqueue *vq, unsigned int head,
->   	}
->   
->   	vring_unmap_one_split(vq, i);
-> -	vq->split.desc_extra[i].next = vq->free_head;
-> -	vq->free_head = head;
-> +	/* In order feature use desc in order,
-> +	 * that means, the next desc will always be free
-> +	 */
-
-
-Maybe we should add something like "The descriptors are prepared in order".
-
-
-> +	if (!virtio_has_feature(vq->vq.vdev, VIRTIO_F_IN_ORDER)) {
-> +		vq->split.desc_extra[i].next = vq->free_head;
-> +		vq->free_head = head;
-> +	}
->   
->   	/* Plus final descriptor */
->   	vq->vq.num_free++;
-> @@ -745,7 +753,7 @@ static void *virtqueue_get_buf_ctx_split(struct virtqueue *_vq,
->   {
->   	struct vring_virtqueue *vq = to_vvq(_vq);
->   	void *ret;
-> -	unsigned int i;
-> +	unsigned int i, j;
->   	u16 last_used;
->   
->   	START_USE(vq);
-> @@ -764,11 +772,38 @@ static void *virtqueue_get_buf_ctx_split(struct virtqueue *_vq,
->   	/* Only get used array entries after they have been exposed by host. */
->   	virtio_rmb(vq->weak_barriers);
->   
-> -	last_used = (vq->last_used_idx & (vq->split.vring.num - 1));
-> -	i = virtio32_to_cpu(_vq->vdev,
-> -			vq->split.vring.used->ring[last_used].id);
-> -	*len = virtio32_to_cpu(_vq->vdev,
-> -			vq->split.vring.used->ring[last_used].len);
-> +	if (virtio_has_feature(_vq->vdev, VIRTIO_F_IN_ORDER)) {
-> +		/* Skip used ring and get used desc in order*/
-> +		i = vq->split.next_desc_begin;
-> +		j = i;
-> +		/* Indirect only takes one descriptor in descriptor table */
-> +		while (!vq->indirect && (vq->split.desc_extra[j].flags & VRING_DESC_F_NEXT))
-> +			j = (j + 1) % vq->split.vring.num;
-
-
-Let's move the expensive mod outside the loop. Or it's split so we can 
-use and here actually since the size is guaranteed to be power of the 
-two? Another question, is it better to store the next_desc in e.g 
-desc_extra?
-
-And this seems very expensive if the device doesn't do the batching 
-(which is not mandatory).
-
-
-> +		/* move to next */
-> +		j = (j + 1) % vq->split.vring.num;
-> +		/* Next buffer will use this descriptor in order */
-> +		vq->split.next_desc_begin = j;
-> +		if (!vq->indirect) {
-> +			*len = vq->split.desc_extra[i].len;
-> +		} else {
-> +			struct vring_desc *indir_desc =
-> +				vq->split.desc_state[i].indir_desc;
-> +			u32 indir_num = vq->split.desc_extra[i].len, buffer_len = 0;
-> +
-> +			if (indir_desc) {
-> +				for (j = 0; j < indir_num / sizeof(struct vring_desc); j++)
-> +					buffer_len += indir_desc[j].len;
-
-
-So I think we need to finalize this, then we can have much more stress 
-on the cache:
-
-https://lkml.org/lkml/2021/10/26/1300
-
-It was reverted since it's too aggressive, we should instead:
-
-1) do the validation only for morden device
-
-2) fail only when we enable the validation via (e.g a module parameter).
-
-Thanks
-
-
+>  			gpa = kvm_s390_real_to_abs(vcpu, ga);
+> -			if (kvm_is_error_gpa(vcpu->kvm, gpa))
+> +			if (kvm_is_error_gpa(vcpu->kvm, gpa)) {
+>  				rc = PGM_ADDRESSING;
+> +				prot = PROT_NONE;
 > +			}
-> +
-> +			*len = buffer_len;
-> +		}
-> +	} else {
-> +		last_used = (vq->last_used_idx & (vq->split.vring.num - 1));
-> +		i = virtio32_to_cpu(_vq->vdev,
-> +				    vq->split.vring.used->ring[last_used].id);
-> +		*len = virtio32_to_cpu(_vq->vdev,
-> +				       vq->split.vring.used->ring[last_used].len);
-> +	}
->   
->   	if (unlikely(i >= vq->split.vring.num)) {
->   		BAD_RING(vq, "id %u out of range\n", i);
-> @@ -2236,6 +2271,8 @@ struct virtqueue *__vring_new_virtqueue(unsigned int index,
->   	vq->split.avail_flags_shadow = 0;
->   	vq->split.avail_idx_shadow = 0;
->   
-> +	vq->split.next_desc_begin = 0;
-> +
->   	/* No callback?  Tell other side not to bother us. */
->   	if (!callback) {
->   		vq->split.avail_flags_shadow |= VRING_AVAIL_F_NO_INTERRUPT;
+...
+> +		if (rc == PGM_PROTECTION)
+> +			prot = PROT_TYPE_KEYC;
+> +		else
+> +			prot = PROT_NONE;
 
+For both cases I would suggest to preinitialize prot with PROT_NONE in
+order to keep the code smaller - but not my call.
