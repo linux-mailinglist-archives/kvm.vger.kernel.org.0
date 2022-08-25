@@ -2,85 +2,109 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 433985A0F76
-	for <lists+kvm@lfdr.de>; Thu, 25 Aug 2022 13:41:30 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 14ED35A0F8F
+	for <lists+kvm@lfdr.de>; Thu, 25 Aug 2022 13:50:27 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S239693AbiHYLlZ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 25 Aug 2022 07:41:25 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36544 "EHLO
+        id S241171AbiHYLuY (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 25 Aug 2022 07:50:24 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52730 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S239962AbiHYLlJ (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 25 Aug 2022 07:41:09 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BBA525E676
-        for <kvm@vger.kernel.org>; Thu, 25 Aug 2022 04:41:07 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1661427667;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=E0mFnAJaTo0vs3DF6YcPVBkxdY7PonUFjnB5NPBiVwc=;
-        b=gPE70LBVgb3fdx69a1jF5Zd+8/LBxtn9cPFz/EImqQEbakU5v6DjzQw68MGvLp7JZhaVJ1
-        WflE4WWgjxE3hUXuy0SzShzL26YdJRCkdBh2I49pK43ZoeI5Xo/I0inXuPoYS5iWOYqhcC
-        /VookOsMbH89hSW+SkGVLwwWNnJjWIY=
-Received: from mimecast-mx02.redhat.com (mx3-rdu2.redhat.com
- [66.187.233.73]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-447-nkgjkZKEOiqx9_kRQduuNg-1; Thu, 25 Aug 2022 07:41:05 -0400
-X-MC-Unique: nkgjkZKEOiqx9_kRQduuNg-1
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.rdu2.redhat.com [10.11.54.8])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 4B9481C07553;
-        Thu, 25 Aug 2022 11:41:05 +0000 (UTC)
-Received: from sirius.home.kraxel.org (unknown [10.39.195.82])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id 0CE5AC15BBA;
-        Thu, 25 Aug 2022 11:41:05 +0000 (UTC)
-Received: by sirius.home.kraxel.org (Postfix, from userid 1000)
-        id C34BC180039B; Thu, 25 Aug 2022 13:41:03 +0200 (CEST)
-Date:   Thu, 25 Aug 2022 13:41:03 +0200
-From:   Gerd Hoffmann <kraxel@redhat.com>
-To:     Xiaoyao Li <xiaoyao.li@intel.com>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>,
-        Isaku Yamahata <isaku.yamahata@gmail.com>,
-        Daniel P =?utf-8?B?LiBCZXJyYW5nw6k=?= <berrange@redhat.com>,
-        Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <f4bug@amsat.org>,
-        Richard Henderson <richard.henderson@linaro.org>,
-        "Michael S . Tsirkin" <mst@redhat.com>,
-        Marcel Apfelbaum <marcel.apfelbaum@gmail.com>,
-        Cornelia Huck <cohuck@redhat.com>,
-        Marcelo Tosatti <mtosatti@redhat.com>,
-        Laszlo Ersek <lersek@redhat.com>,
-        Eric Blake <eblake@redhat.com>,
-        Connor Kuehl <ckuehl@redhat.com>, erdemaktas@google.com,
-        kvm@vger.kernel.org, qemu-devel@nongnu.org, seanjc@google.com
-Subject: Re: [PATCH v1 18/40] i386/tdx: Implement user specified tsc frequency
-Message-ID: <20220825114103.fm52vcmoemi5pjlc@sirius.home.kraxel.org>
-References: <20220802074750.2581308-1-xiaoyao.li@intel.com>
- <20220802074750.2581308-19-xiaoyao.li@intel.com>
+        with ESMTP id S241164AbiHYLuX (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 25 Aug 2022 07:50:23 -0400
+Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D59D94BD33
+        for <kvm@vger.kernel.org>; Thu, 25 Aug 2022 04:50:22 -0700 (PDT)
+Received: from pps.filterd (m0098409.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.17.1.5/8.17.1.5) with ESMTP id 27PBftTA020152
+        for <kvm@vger.kernel.org>; Thu, 25 Aug 2022 11:50:22 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=from : to : cc : subject
+ : date : message-id : mime-version : content-transfer-encoding; s=pp1;
+ bh=wK7IB1VNlo00HGvgAN/kM7EAuHoumrbVlBZBH8YX6ZQ=;
+ b=A8PtV4lGuixJiyjJo4j9n+vss+SzIasxwMVJf1SuXSaBQ7WAhyezVIDB7+Ryy/0i4Nii
+ MD0W3yTGgHQpcruUiU6uqiM4kQ6DGl2n1nuzOvV/gtnsIZd9XfW2YiyrmHp1Xo2zjZhx
+ 8orlZ0HNF/zUGwztZNHr851moq5t7u+o+2vtAEa3kirvRcAtAOSsaawk9HbadAI1vPgW
+ xPykDSuQJeS1b0bv2pLrv0I65ZgeylAAo0RfUJ1MfumahN2HAlCK3FoclxrluMHgPCBR
+ Y8h2EBOmYMkh8rZWzcm51APHepQvVZZE37/4w03zTwACu6KbKCiimBfGKrnxkj21BqIL Bw== 
+Received: from ppma06ams.nl.ibm.com (66.31.33a9.ip4.static.sl-reverse.com [169.51.49.102])
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3j68e9r73a-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT)
+        for <kvm@vger.kernel.org>; Thu, 25 Aug 2022 11:50:22 +0000
+Received: from pps.filterd (ppma06ams.nl.ibm.com [127.0.0.1])
+        by ppma06ams.nl.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 27PBZQWK015756
+        for <kvm@vger.kernel.org>; Thu, 25 Aug 2022 11:50:20 GMT
+Received: from b06cxnps3074.portsmouth.uk.ibm.com (d06relay09.portsmouth.uk.ibm.com [9.149.109.194])
+        by ppma06ams.nl.ibm.com with ESMTP id 3j2pvj6cjk-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT)
+        for <kvm@vger.kernel.org>; Thu, 25 Aug 2022 11:50:20 +0000
+Received: from d06av25.portsmouth.uk.ibm.com (d06av25.portsmouth.uk.ibm.com [9.149.105.61])
+        by b06cxnps3074.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 27PBoGSn38994216
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Thu, 25 Aug 2022 11:50:16 GMT
+Received: from d06av25.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 505C211C04A;
+        Thu, 25 Aug 2022 11:50:16 +0000 (GMT)
+Received: from d06av25.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 1336A11C04C;
+        Thu, 25 Aug 2022 11:50:16 +0000 (GMT)
+Received: from a46lp57.lnxne.boe (unknown [9.152.108.100])
+        by d06av25.portsmouth.uk.ibm.com (Postfix) with ESMTP;
+        Thu, 25 Aug 2022 11:50:16 +0000 (GMT)
+From:   Nico Boehr <nrb@linux.ibm.com>
+To:     kvm@vger.kernel.org
+Cc:     frankja@linux.ibm.com, imbrenda@linux.ibm.com,
+        borntraeger@linux.ibm.com
+Subject: [RFC PATCH v1 0/1] KVM: s390: pv: fix clock comparator late after suspend/resume
+Date:   Thu, 25 Aug 2022 13:50:14 +0200
+Message-Id: <20220825115015.45545-1-nrb@linux.ibm.com>
+X-Mailer: git-send-email 2.36.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20220802074750.2581308-19-xiaoyao.li@intel.com>
-X-Scanned-By: MIMEDefang 2.85 on 10.11.54.8
-X-Spam-Status: No, score=-2.8 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,
-        SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham
-        autolearn_force=no version=3.4.6
+Content-Transfer-Encoding: 8bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: N9pT7iIcavLtvTzaY0IAj2d88s2zBmoL
+X-Proofpoint-ORIG-GUID: N9pT7iIcavLtvTzaY0IAj2d88s2zBmoL
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.205,Aquarius:18.0.895,Hydra:6.0.517,FMLib:17.11.122.1
+ definitions=2022-08-25_05,2022-08-25_01,2022-06-22_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 malwarescore=0 spamscore=0
+ priorityscore=1501 lowpriorityscore=0 mlxlogscore=653 adultscore=0
+ mlxscore=0 bulkscore=0 phishscore=0 clxscore=1015 impostorscore=0
+ suspectscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2207270000 definitions=main-2208250045
+X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_EF,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_PASS,
+        T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Aug 02, 2022 at 03:47:28PM +0800, Xiaoyao Li wrote:
-> Reuse "-cpu,tsc-frequency=" to get user wanted tsc frequency and call VM
-> scope VM_SET_TSC_KHZ to set the tsc frequency of TD before KVM_TDX_INIT_VM.
-> 
-> Besides, sanity check the tsc frequency to be in the legal range and
-> legal granularity (required by TDX module).
-> 
-> Signed-off-by: Xiaoyao Li <xiaoyao.li@intel.com>
+After a PV guest in QEMU has been paused and resumed, clock comparator
+interrupts are delivered to the guest much too late.
 
-Acked-by: Gerd Hoffmann <kraxel@redhat.com>
+This is caused by QEMU's tod-kvm device restoring the guest's TOD clock
+upon guest resume. This is not possible with PV, since the guest's TOD
+clock is controlled by the ultravisor.
+
+Even if not allowed under PV, KVM allowed the respective call from
+userspace (VM attribute KVM_S390_VM_TOD) and updated its internal data
+structures on this call. This can make the ultravisor's and KVM's view
+of the guest TOD clock inconsistent. This in turn can lead to the late
+delivery of clock comparator interrupts when KVM calculates when to wake
+the guest.
+
+This fixes the kernel portion of the problem by disallowing the vm attr
+call for the guest TOD clock so userspace cannot mess up KVM's view of
+the guest TOD. This fix causes an ugly warning in QEMU though, hence
+another fix is due for QEMU to simply not even attempt to set the guest
+TOD on resume.
+
+Nico Boehr (1):
+  KVM: s390: pv: don't allow userspace to set the clock under PV
+
+ arch/s390/kvm/kvm-s390.c | 9 +++++++++
+ 1 file changed, 9 insertions(+)
+
+-- 
+2.36.1
 
