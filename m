@@ -2,100 +2,149 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 3CE4E5A19A2
-	for <lists+kvm@lfdr.de>; Thu, 25 Aug 2022 21:38:10 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 6662C5A19CA
+	for <lists+kvm@lfdr.de>; Thu, 25 Aug 2022 21:48:36 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S243454AbiHYTiB (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 25 Aug 2022 15:38:01 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55704 "EHLO
+        id S242702AbiHYTsf (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 25 Aug 2022 15:48:35 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45362 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S243425AbiHYTh7 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 25 Aug 2022 15:37:59 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 511FCBD77F
-        for <kvm@vger.kernel.org>; Thu, 25 Aug 2022 12:37:59 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1661456278;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=bPWa+tzTBG+iL60ZzcAk1+gPnoGOubAk1xJV1dc/DQY=;
-        b=W4Zs/mKfIiUumBqPzgXU54zsNwwXggxa4mC9vbEtta1Oqv22daJ1tI0/3VxSUcNZl3lcU7
-        jDdHo4bs8CDy9ABNIpk3SNfg2+DseKn1/zhrBdjQ+K+kD+TUOU6Awgxw6P/MOV3blDg5ug
-        v0QaYwgjJanZa6Tc36fMH9QqoGUlEMo=
-Received: from mail-io1-f72.google.com (mail-io1-f72.google.com
- [209.85.166.72]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_128_GCM_SHA256) id
- us-mta-533-6fAYpZL-P9GMdk9BaLqcVQ-1; Thu, 25 Aug 2022 15:37:51 -0400
-X-MC-Unique: 6fAYpZL-P9GMdk9BaLqcVQ-1
-Received: by mail-io1-f72.google.com with SMTP id x9-20020a056602210900b006897b3869e4so9776869iox.16
-        for <kvm@vger.kernel.org>; Thu, 25 Aug 2022 12:37:51 -0700 (PDT)
+        with ESMTP id S237407AbiHYTsd (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 25 Aug 2022 15:48:33 -0400
+Received: from mail-pf1-x42f.google.com (mail-pf1-x42f.google.com [IPv6:2607:f8b0:4864:20::42f])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 45F515FAEB;
+        Thu, 25 Aug 2022 12:48:32 -0700 (PDT)
+Received: by mail-pf1-x42f.google.com with SMTP id 142so1690499pfu.10;
+        Thu, 25 Aug 2022 12:48:32 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date:from:to
+         :cc;
+        bh=OaWDF3tpGoRU6/AyqqMW1f8xc8xe3+LZ3UaQBdMhu3Q=;
+        b=WCHeoWbSf1BohfDyzd2zo93eEPPd8iwfLlbtwZkoab5FdZ1UdnKuf6zi6qtolgo8Ey
+         LSJwtiaW60/iAEXoYZobmBHVjzbgV2TC7pOHtziyD9corHwWfIiBqu38D8HdKVx3wYUW
+         WrcI3rfAXg0Tw8+i+aEaXbEKoZ8r+apcq5FOZ5Tp81H/Keuk7pBaHYba8aw06y5hSIy9
+         SfVW63p7UQdaGNdyjGhbsKVFtJ4KU0stUnhfnu90oHS7qMwGLNgfLVe7N9Et5268H+UG
+         q849NA46Ap4HeXO8daH2i9l0BCSxwn05ad33ptRyM06BNtZkNgXJVRVpEux7M5wIKI1V
+         EdUQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=content-transfer-encoding:mime-version:organization:references
-         :in-reply-to:message-id:subject:cc:to:from:date:x-gm-message-state
-         :from:to:cc;
-        bh=bPWa+tzTBG+iL60ZzcAk1+gPnoGOubAk1xJV1dc/DQY=;
-        b=YDdAzddaMWrkERh7mQnUzoYlMQJsU9WbrUJ3c1BdkbIcWL8NAhy9/7qhftM78p3AbY
-         Hqlx6QyzR6iIUts5vg9L9941Eo9IiOSghvLc6If++R5ctHbe9G5IEnMAbQgp+40CGwz1
-         sL6f+C0sh+Z2hgHyjAlUNS2TFDYXtpKUatX0sT0zjd+0RN4AZjSUkboP7E0iA1p3Aq/G
-         s4LCGH00GixLUv8hpHbmZsgabeC84/XVxpCLsUKalfMZEBJ9fg3voH/NjCtInLF6XyOs
-         CFArgYP9hRhZKUmf6tNDsJ9alrXHYsZK9wG1GmdlaaiBcJ8ca4k5Hj42YmGsSIrcBMUE
-         qv7A==
-X-Gm-Message-State: ACgBeo1Hjayl6VdFuH7uagFmMVXuKh6nSMpno6CA0f3taNMPPoKYl/1E
-        ajJWHn4vl2SkbtOddVdcHsZ7Pb8piYf2vGLVAxg4YV1j1MQktxYFHW/pb5I1dcCh9jjHV8LF1aJ
-        Hg8J/eVwC0eve
-X-Received: by 2002:a02:caa6:0:b0:349:bbca:9a90 with SMTP id e6-20020a02caa6000000b00349bbca9a90mr2651629jap.203.1661456271133;
-        Thu, 25 Aug 2022 12:37:51 -0700 (PDT)
-X-Google-Smtp-Source: AA6agR6uSXM7JpieCkAL/ZWJiy8snaZElDHAaeSiWAhWn8tGuMwjSwo6rhFGPS2VGsYxErUfUXGbsA==
-X-Received: by 2002:a02:caa6:0:b0:349:bbca:9a90 with SMTP id e6-20020a02caa6000000b00349bbca9a90mr2651614jap.203.1661456270935;
-        Thu, 25 Aug 2022 12:37:50 -0700 (PDT)
-Received: from redhat.com ([38.15.36.239])
-        by smtp.gmail.com with ESMTPSA id i13-20020a056e02054d00b002e4d61ca3e2sm159664ils.0.2022.08.25.12.37.50
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date
+         :x-gm-message-state:from:to:cc;
+        bh=OaWDF3tpGoRU6/AyqqMW1f8xc8xe3+LZ3UaQBdMhu3Q=;
+        b=wbSs/h1/aCfMqj1vS2sYaYDLGihod74KB7N55ofbBD1XrLYmBX+SSWwiDg0xMD5rUy
+         SCVTW690Wqnm29axDA2b1woT2fHMcwxB1+goGBRal2qWwU8cJQKLo6u2LtEhmQzQQgoV
+         t0tXfisge17XI4vvjUNLtqkAfU4EcgyJKpsU1/3Y6qjE7tmfcjGEGb5JK/Vm13rE/JJ7
+         XWB6Nbzxbn+26z1dVRilDHKWeQqUyFqevjEq6ISaU6To3vAEHOqRxWI9hIobGOKmCfty
+         pGwh36jPGNA3jmWIn8NEWUJJ8u39Oi4Gtry6I3FbepMVCGm/6vCqOAmhQ4Vg5Yp60ppx
+         mTqQ==
+X-Gm-Message-State: ACgBeo2Csp6o2eudrBB85Wt4Ul55zb9K/Ki1cC6nDqbQR2odYDo+lRMr
+        ZlYziDI8afWGJyyLuSpt+qU=
+X-Google-Smtp-Source: AA6agR7nPfIyGzudfXlCB8kQRsVjW8mcqYegG9oGUzyJ33skMukzMcWIEgc8+8mazIXS2dw4sByPYg==
+X-Received: by 2002:a63:4c:0:b0:42b:2673:2180 with SMTP id 73-20020a63004c000000b0042b26732180mr514022pga.491.1661456911653;
+        Thu, 25 Aug 2022 12:48:31 -0700 (PDT)
+Received: from localhost ([192.55.55.51])
+        by smtp.gmail.com with ESMTPSA id g10-20020a17090a67ca00b001fa79c1de15sm106388pjm.24.2022.08.25.12.48.30
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 25 Aug 2022 12:37:50 -0700 (PDT)
-Date:   Thu, 25 Aug 2022 13:37:49 -0600
-From:   Alex Williamson <alex.williamson@redhat.com>
-To:     Yishai Hadas <yishaih@nvidia.com>
-Cc:     <jgg@nvidia.com>, <saeedm@nvidia.com>, <kvm@vger.kernel.org>,
-        <netdev@vger.kernel.org>, <kuba@kernel.org>,
-        <kevin.tian@intel.com>, <joao.m.martins@oracle.com>,
-        <leonro@nvidia.com>, <maorg@nvidia.com>, <cohuck@redhat.com>
-Subject: Re: [PATCH V4 vfio 00/10] Add device DMA logging support for mlx5
- driver
-Message-ID: <20220825133749.34281d14.alex.williamson@redhat.com>
-In-Reply-To: <e6e79361-a19c-9ad6-403b-9a08f8abcf34@nvidia.com>
-References: <20220815151109.180403-1-yishaih@nvidia.com>
-        <e6e79361-a19c-9ad6-403b-9a08f8abcf34@nvidia.com>
-Organization: Red Hat
+        Thu, 25 Aug 2022 12:48:31 -0700 (PDT)
+Date:   Thu, 25 Aug 2022 12:48:29 -0700
+From:   Isaku Yamahata <isaku.yamahata@gmail.com>
+To:     "Huang, Kai" <kai.huang@intel.com>
+Cc:     "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "Yamahata, Isaku" <isaku.yamahata@intel.com>,
+        "pbonzini@redhat.com" <pbonzini@redhat.com>,
+        "Shahar, Sagi" <sagis@google.com>,
+        "Aktas, Erdem" <erdemaktas@google.com>,
+        "isaku.yamahata@gmail.com" <isaku.yamahata@gmail.com>,
+        "Christopherson,, Sean" <seanjc@google.com>
+Subject: Re: [PATCH v8 002/103] Partially revert "KVM: Pass kvm_init()'s
+ opaque param to additional arch funcs"
+Message-ID: <20220825194829.GA2538772@ls.amr.corp.intel.com>
+References: <cover.1659854790.git.isaku.yamahata@intel.com>
+ <3af25cc7502769b98755920807bc8a1010de1d45.1659854790.git.isaku.yamahata@intel.com>
+ <c2e61778ca549e8ee4cb44194df367455a20f645.camel@intel.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-X-Spam-Status: No, score=-2.8 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,
-        SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=unavailable
-        autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <c2e61778ca549e8ee4cb44194df367455a20f645.camel@intel.com>
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
+        RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, 25 Aug 2022 14:13:01 +0300
-Yishai Hadas <yishaih@nvidia.com> wrote:
-> Alex,
->=20
-> Can we please proceed with sending PR for the series to be accepted ?=C2=
-=A0=20
-> (i.e. as of the first two net/mlx5 patches).
->=20
-> The comments that were given in the previous kernel cycle were addressed=
-=20
-> and there is no open comment here for few weeks already.
+On Thu, Aug 11, 2022 at 09:59:34AM +0000,
+"Huang, Kai" <kai.huang@intel.com> wrote:
 
-Hmm, it's only been posted since last week.  I still find the iova
-bitmap code to be quite a mess, I just sent comments.  Thanks,
+> On Sun, 2022-08-07 at 15:00 -0700, isaku.yamahata@intel.com wrote:
+> > From: Chao Gao <chao.gao@intel.com>
+> > 
+> > This partially reverts commit b99040853738 ("KVM: Pass kvm_init()'s opaque
+> > param to additional arch funcs") remove opaque from
+> > kvm_arch_check_processor_compat because no one uses this opaque now.
+> > Address conflicts for ARM (due to file movement) and manually handle RISC-V
+> > which comes after the commit.  The change about kvm_arch_hardware_setup()
+> > in original commit are still needed so they are not reverted.
+> > 
+> > The current implementation enables hardware (e.g. enable VMX on all CPUs),
+> > arch-specific initialization for VM creation, 
+> > 
+> 
+> I guess you need to point out _first_ VM?
 
-Alex
+Yes. I'll add "first".
 
+> 
+> > and disables hardware (in
+> > x86, disable VMX on all CPUs) for last VM destruction.
+> > 
+> > TDX requires its initialization on loading KVM module with VMX enabled on
+> > all available CPUs. It needs to enable/disable hardware on module
+> > initialization.  To reuse the same logic, one way is to pass around the
+> 
+> To reuse the same logic for what?  I think you need to be specific (and focus)
+> on why we need this patch:  we will opportunistically move CPU compatibility
+> check to hardware_enable_nolock(), which doesn't take any argument, and this
+> patch is a preparation to do that.
+> 
+> 
+> > unused opaque argument, another way is to remove the unused opaque
+> > argument.  This patch is a preparation for the latter by removing the
+> > argument
+> 
+> So how about replacing the last two paragraphs with:
+> 
+> "
+> Initializing TDX will be done during module loading time, and in order to do
+> that hardware_enable_all() will be done during module loading time too, as
+> initializing TDX requires all cpus being in VMX operation.  As a result, CPU
+> compatibility check will be opportunistically moved to hardware_enable_nolock(),
+> which doesn't take any argument.  Instead of passing 'opaque' around to
+> hardware_enable_nolock() and hardware_enable_all(), just remove the unused
+> 'opaque' argument from kvm_arch_check_processor_compat().
+> "
+> 
+> Or even simpler:
+> 
+> "
+> To support TDX, hardware_enable_all() will be done during module loading time. 
+> As a result, CPU compatibility check will be opportunistically moved to
+> hardware_enable_nolock(), which doesn't take any argument.  Instead of passing
+> 'opaque' around to hardware_enable_nolock() and hardware_enable_all(), just
+> remove the unused 'opaque' argument from kvm_arch_check_processor_compat().
+> "
+> 
+> With changelog updated:
+
+Thanks, I'll adapt the simpler one.
+
+-- 
+Isaku Yamahata <isaku.yamahata@gmail.com>
