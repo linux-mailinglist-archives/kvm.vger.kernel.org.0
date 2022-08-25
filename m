@@ -2,304 +2,250 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id C3E525A1D20
-	for <lists+kvm@lfdr.de>; Fri, 26 Aug 2022 01:27:24 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id BBBBF5A1D4A
+	for <lists+kvm@lfdr.de>; Fri, 26 Aug 2022 01:42:59 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S244537AbiHYXZw (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 25 Aug 2022 19:25:52 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40374 "EHLO
+        id S244584AbiHYXm4 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 25 Aug 2022 19:42:56 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:32938 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S244526AbiHYXZo (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 25 Aug 2022 19:25:44 -0400
-Received: from mail-oo1-xc4a.google.com (mail-oo1-xc4a.google.com [IPv6:2607:f8b0:4864:20::c4a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E6BDD58515
-        for <kvm@vger.kernel.org>; Thu, 25 Aug 2022 16:25:37 -0700 (PDT)
-Received: by mail-oo1-xc4a.google.com with SMTP id g24-20020a4a6b18000000b0042886f34138so60871ooc.19
-        for <kvm@vger.kernel.org>; Thu, 25 Aug 2022 16:25:37 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:reply-to:from:to:cc;
-        bh=P2RgcF+gBHFPYTEvaTfo6AUsgguGiX9tPlCot3RYgGs=;
-        b=SQlk6JoM9pPHFnCVZCc0ePWkuMHGeijaVL83mtpLkCr48WVn0+0gDXr/NuYB1zXSVO
-         GPRiPy85aSM+mIC3yV0GAUcA/pDxT4NHPXYB+k8l/pDyY0rcK6NFayKYt+lmzF4+YMLK
-         txAL8zPFasMqUjJqK1GnvSpPbY5DfVcxLT3ZUUYd8NRiael/0olsW4RcRdZBwGGB8x21
-         L/R24+VZiiccgoc/C5RvauNC9ujJknNlbnB+rtYvuJrj6wYuk/wD6iCQWgJ0FMpLLkdK
-         HG8TrVwe7K0xOMjVu9uiaeNiHKTm3rTfJGVakSCdj8sRZn7o4jm3P8cc3mUCDNSs8gWr
-         UdKw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:reply-to:x-gm-message-state:from:to:cc;
-        bh=P2RgcF+gBHFPYTEvaTfo6AUsgguGiX9tPlCot3RYgGs=;
-        b=Gmvsaym1mMHCncSGgDLchiuDioyrHidhzGcUlHHFyIpZJXwcrgbUNqLJf04V8ijKMR
-         riQlASLera21j6gqm8/Hoyopvl58Zx5OmB8KhJ88HooeB9JgWA/y+d+MievfTBgk2jOz
-         0onJVy2cwmI/VS+eK7sOVH2rUxuSln/ZspkKxyVdd1CBVqousDsfwMuk85DBPthoT1JM
-         bidLz1NnqENHuGa3oJ5aACt91W1R/5pfJzMaQP6215Ih0q2PkTYj+k0nrYWFb2B58FS+
-         F8BtLd6cKbq3lp+497IwTNgLF443ryLZA9rKhGp/pnVk+hvLkoopgt2cqmVe/DDUd6rh
-         fs3g==
-X-Gm-Message-State: ACgBeo1j7kEEI+/zVQRrHg7XU0S98BE7+2AUdbd2X+M/S7AJOZobA6BY
-        YErxNfQ2Tjop6c031oPBRY33E9K9g9Q=
-X-Google-Smtp-Source: AA6agR6pzAdCDgmgO0oso/HoE5WH7WCkL3PKyA8KRrEe2RCrD5ZThqMcZM2sOfAjsU0cXCoGFEqZmqOEaDw=
-X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a05:6870:a90f:b0:11e:5773:84c5 with SMTP id
- eq15-20020a056870a90f00b0011e577384c5mr448463oab.75.1661469936767; Thu, 25
- Aug 2022 16:25:36 -0700 (PDT)
-Reply-To: Sean Christopherson <seanjc@google.com>
-Date:   Thu, 25 Aug 2022 23:25:22 +0000
-In-Reply-To: <20220825232522.3997340-1-seanjc@google.com>
-Mime-Version: 1.0
-References: <20220825232522.3997340-1-seanjc@google.com>
-X-Mailer: git-send-email 2.37.2.672.g94769d06f0-goog
-Message-ID: <20220825232522.3997340-8-seanjc@google.com>
-Subject: [PATCH v5 7/7] KVM: selftests: Add ucall pool based implementation
-From:   Sean Christopherson <seanjc@google.com>
-To:     Paolo Bonzini <pbonzini@redhat.com>, Marc Zyngier <maz@kernel.org>,
-        Anup Patel <anup@brainfault.org>,
-        Paul Walmsley <paul.walmsley@sifive.com>,
-        Palmer Dabbelt <palmer@dabbelt.com>,
-        Albert Ou <aou@eecs.berkeley.edu>,
-        Christian Borntraeger <borntraeger@linux.ibm.com>,
-        Janosch Frank <frankja@linux.ibm.com>,
-        Claudio Imbrenda <imbrenda@linux.ibm.com>,
-        Nathan Chancellor <nathan@kernel.org>,
-        Nick Desaulniers <ndesaulniers@google.com>
-Cc:     James Morse <james.morse@arm.com>,
-        Alexandru Elisei <alexandru.elisei@arm.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
-        Oliver Upton <oliver.upton@linux.dev>,
-        Atish Patra <atishp@atishpatra.org>,
-        David Hildenbrand <david@redhat.com>,
-        Tom Rix <trix@redhat.com>, kvm@vger.kernel.org,
-        linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
-        kvm-riscv@lists.infradead.org, linux-riscv@lists.infradead.org,
-        llvm@lists.linux.dev, linux-kernel@vger.kernel.org,
-        Colton Lewis <coltonlewis@google.com>,
-        Peter Gonda <pgonda@google.com>,
-        Andrew Jones <andrew.jones@linux.dev>,
-        Sean Christopherson <seanjc@google.com>
-Content-Type: text/plain; charset="UTF-8"
-X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL
-        autolearn=ham autolearn_force=no version=3.4.6
+        with ESMTP id S230215AbiHYXmx (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 25 Aug 2022 19:42:53 -0400
+Received: from mga09.intel.com (mga09.intel.com [134.134.136.24])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3A557B7EF4;
+        Thu, 25 Aug 2022 16:42:52 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1661470972; x=1693006972;
+  h=from:to:cc:subject:date:message-id:
+   content-transfer-encoding:mime-version;
+  bh=7Fz5dyyX+/YdhjbMg04tyVUtHtuaDFuJrD8QRk+E2eY=;
+  b=fZCqbdefiY2Y//o718kuAMZ+QLQunttpeLG5g/0nGtQyHYDAzAQ0VxGS
+   jXCrBRe6vX7wccvBPTyXQbwgF7lGRxdjeN69VuRVKb9ZATamhzrv7nSyX
+   +49jW/0FIRBgnHuB/P/puGEzSkN62AwB0kVDwR1nT6JGMOtWfJ9aFygMu
+   vF0bNdoUvLBOPQ3bbp7OitO62O00XoyN/uD5+ZJyzecCu0QUjZgO6Zg1I
+   6TIJGHiBG3zrILxWWH9i4DLawO59PCk/xxccGo4xsAEB8ZIFR/ZOn9JaE
+   g9nnB3jMzSKxSsK4F48PIyfDbAsTK3sVApL6RkjHkO8B4lyyA2I9hpusb
+   A==;
+X-IronPort-AV: E=McAfee;i="6500,9779,10450"; a="295162739"
+X-IronPort-AV: E=Sophos;i="5.93,264,1654585200"; 
+   d="scan'208";a="295162739"
+Received: from fmsmga004.fm.intel.com ([10.253.24.48])
+  by orsmga102.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 25 Aug 2022 16:42:51 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.93,264,1654585200"; 
+   d="scan'208";a="678658422"
+Received: from fmsmsx603.amr.corp.intel.com ([10.18.126.83])
+  by fmsmga004.fm.intel.com with ESMTP; 25 Aug 2022 16:42:51 -0700
+Received: from fmsmsx607.amr.corp.intel.com (10.18.126.87) by
+ fmsmsx603.amr.corp.intel.com (10.18.126.83) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2375.31; Thu, 25 Aug 2022 16:42:51 -0700
+Received: from fmsmsx608.amr.corp.intel.com (10.18.126.88) by
+ fmsmsx607.amr.corp.intel.com (10.18.126.87) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2375.31; Thu, 25 Aug 2022 16:42:51 -0700
+Received: from FMSEDG603.ED.cps.intel.com (10.1.192.133) by
+ fmsmsx608.amr.corp.intel.com (10.18.126.88) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2375.31 via Frontend Transport; Thu, 25 Aug 2022 16:42:50 -0700
+Received: from NAM02-SN1-obe.outbound.protection.outlook.com (104.47.57.47) by
+ edgegateway.intel.com (192.55.55.68) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2375.31; Thu, 25 Aug 2022 16:42:50 -0700
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=FttSdbbaRt63KfvxoO2Q/rr7HP4+dzWrBaX0g5GC+aSbKLq+VU/nPCU1aBjMrTgVIFFLc5Ts5zngK/moBQ+S2sYxRv6G827z279bmbJhUVnrobxARaK8NF/S21IBiDqXgCNaWnuCRhFAaLXzcQJOfDYnVS6zeFfm8kLfU3jhn4AFaYGy2WXVUkE2gy832Z/GUM6GO1AjwWDoSGX+TNhjaE/7W+LD2eePScgYCIrx6S941zCGgqINkJuMnD8KVOD3G+eanYA/7fUtx6kitvM5HhQNkBNIMtczUCpEGEtDEQ4bPe/ThpCoBeaoLpexdlnGaDq+kuzA1SNMLwgUMA3oIw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=Fz6lBvDnGoo1hd4s/R9aBSvSiA1N4HsbxO0aG/a8PZg=;
+ b=kvj1OLKSyWA5hZsDy/CXC3ft3cGrNUSCAuBubbUd4vkWATm8TQjCGmOK9Tt3TQKcJMQzfaFLlVX+nNWqR42EMGzFfavFKc9R6yCe67d9EkKw1PQGb9bC+m/VxldNJs76tybUNw8U/IqiMstNlxth+rgByqjKkaNcCEtY2i60pjnSc1ko/a9KcUdfydMqf3c1bMwtfHvz0Qfa8n6dzy/vAgALMKpWfVcUEdwAd44gyHlph2455966tnkHPsTnPKH6logrtUoVxQwUX3LYsABiO73tj/mIqzZbfVYBFAr6dZ75vYJ2h90m+9H9ZSF7R3nOuH8o6brh0HnWnWB8NG18aA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Received: from DM6PR11MB3113.namprd11.prod.outlook.com (2603:10b6:5:69::19) by
+ MWHPR11MB2062.namprd11.prod.outlook.com (2603:10b6:300:2a::16) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.5546.21; Thu, 25 Aug 2022 23:42:47 +0000
+Received: from DM6PR11MB3113.namprd11.prod.outlook.com
+ ([fe80::7100:8281:521b:ff31]) by DM6PR11MB3113.namprd11.prod.outlook.com
+ ([fe80::7100:8281:521b:ff31%5]) with mapi id 15.20.5566.015; Thu, 25 Aug 2022
+ 23:42:47 +0000
+From:   "Laba, SlawomirX" <slawomirx.laba@intel.com>
+To:     "linux-pci@vger.kernel.org" <linux-pci@vger.kernel.org>,
+        "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "regressions@lists.linux.dev" <regressions@lists.linux.dev>,
+        "bhelgaas@google.com" <bhelgaas@google.com>,
+        "alex.williamson@redhat.com" <alex.williamson@redhat.com>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "linux-mm@kvack.org" <linux-mm@kvack.org>,
+        "songmuchun@bytedance.com" <songmuchun@bytedance.com>,
+        "mike.kravetz@oracle.com" <mike.kravetz@oracle.com>
+CC:     "Brandeburg, Jesse" <jesse.brandeburg@intel.com>,
+        "Nguyen, Anthony L" <anthony.l.nguyen@intel.com>
+Subject: BUG: Virtual machine fails to start on 6.0-rc2
+Thread-Topic: BUG: Virtual machine fails to start on 6.0-rc2
+Thread-Index: Adi42gn6sxbvtLg7QcKy/nSIRHLahA==
+Date:   Thu, 25 Aug 2022 23:42:47 +0000
+Message-ID: <DM6PR11MB3113DF6EC61D0AB73F3A2FE387729@DM6PR11MB3113.namprd11.prod.outlook.com>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+dlp-version: 11.6.500.17
+dlp-product: dlpe-windows
+dlp-reaction: no-action
+authentication-results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+x-ms-publictraffictype: Email
+x-ms-office365-filtering-correlation-id: 53a45f0a-83c6-4da7-8ba2-08da86f383f1
+x-ms-traffictypediagnostic: MWHPR11MB2062:EE_
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam: BCL:0;
+x-microsoft-antispam-message-info: 4hBaZ/0gE8wfnFlUzURp+nUYDLv/UgVr7jaM9Ktuvd//yKYOiRJqXshIqjQpcDrm3Ioea+xNEZD8m8DPAga88vP/taVCqyHlQoiV+gXbVNVhHA3LRj938WHqamA8NVSnblJaYjBYPJ9x0OhrZF8pDDFzjlLtf6Is3vhb0SXXi3ORtD7B+Z2yNToyKSZYM+nrK1KGNEgJQPy6vGFwgdkLdHWedO943l9iSeW5JfDY8GibGrrzVtDbr7aF5dlf2edqKNPJZzlMR/qZIzdN65pVCZipo/RGNpH5eZcB6+aWjZCSWbjggMKVy6QEt4uj17zZEYWARlCSx08JEAx2g2DPqBldrNRdbNLaNMFdjd20qBWfmBANTy5GtyPvF/KQsBytpiq8QyMXzdvGFyVPxQVku4iD4n92XYUHhovqE6urQ4B16k16SDkt3+4VTDfg6GrnRVwql/pV4Nw69hd/oJIoI0FiVQu1X5g5kI8Hd1SFujGRbUvOxCSF5SQW5YbOJGg3b4c6v5+dkm5CfcCI3hvgKVvaqna3fw/HC8BWwfPdT8lO8S/QU+vG3AZtMSvPAxqaWDpLhDQGTgzSYH1OT04QvX0Of2/oXmabzDJbzUouUFbkG7tEyrFx/w6KWm2PIleoJxGLB3FKSbjV6bB+HJJ4vgVpuTCNCr8sgfs41c45dGtulAhbxOp1EYOkmi7P8LBCIdE90p2JJ9NuFbB7J6mQPZx/sBRpkXcBw2rjmbg1vh4Z6OKL133Ahz0fo4DM/lPGBJn3BPZZIP6l/if5WGxRnFg3CNK2kzFsfzFPZUrdFsc=
+x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM6PR11MB3113.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230016)(376002)(366004)(136003)(346002)(396003)(39860400002)(9686003)(26005)(7696005)(54906003)(478600001)(41300700001)(316002)(110136005)(122000001)(86362001)(38100700002)(71200400001)(6506007)(38070700005)(186003)(82960400001)(83380400001)(921005)(4326008)(8676002)(66446008)(66556008)(66476007)(64756008)(33656002)(66946007)(76116006)(8936002)(5660300002)(52536014)(7416002)(55016003)(107886003)(2906002);DIR:OUT;SFP:1102;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0: =?us-ascii?Q?cXDnHVyV5Tmqx8f8t5nMRdDiqB8uDMH+WNV16LiryFXduQwLZqfEOXKkbvTL?=
+ =?us-ascii?Q?4QV92E2pC/Io4iw6Ls8lBiwGxXwSRWR25MXnWUAehGz5MJToia4szWw5CqFr?=
+ =?us-ascii?Q?TCYPe3khCsyDazk30ir9U6SbUoUzElC15vz2dYj6SDWqwsC5cpQXK84UyFgc?=
+ =?us-ascii?Q?PDvXtOeW1oc6jQcmyX4uy+cAffDnPtgAjYA0ApGuZ/QDmilcgpZsErFRub1a?=
+ =?us-ascii?Q?WGvvPl7jwgDLkkSrWrvoeWJAPslfsxM0UtMnLAn8Y58SrCSeEHMhLuKTyM3i?=
+ =?us-ascii?Q?zcoIKc9qNMhm4o8RcuTHypEC6Qr78YRfdwplk29ktvQke3csSTADQUPZuVpe?=
+ =?us-ascii?Q?sAYbjPrdjj3A/JtSeUWbXi3tT6NYS/ZTBmMzGB5g4VtYa7tmEnnh5eWQYL7G?=
+ =?us-ascii?Q?uKinfjqFHcQEK+bsdqXUEVlYaLVkEKE9S1VDkKEUb/BAsRGaNwF+iGP+PYtf?=
+ =?us-ascii?Q?0Io5ZD6oZINTEtcoovv1LadThlcZDgU9wukYHDoU17z7WASlhdoU+6XqHTDw?=
+ =?us-ascii?Q?D/E1AP3jQDMtGq0G3mtacSURmokpaUfApDVdjtbWwFuAAkC0gRFHGH3b5cWS?=
+ =?us-ascii?Q?q+wUac61/berVQjqLyeDaRbQJKG9xZzlDKviLy2ZbPYwnS8iiPqltekwym79?=
+ =?us-ascii?Q?42bUKczhzQJ+UPLyx4OqewBuJdoqaGWtsnukHdAArVMDQ3Y95knCaaIF7Myp?=
+ =?us-ascii?Q?L2WxZRHVVKs8oktYZydq+UPzqeBfSK3En7SpvBo6yM+6vo3nxCTmvNHky90A?=
+ =?us-ascii?Q?ZQwGBnVXOto2G+5cl+/dOPtt4U4zwIhSrO+WI2J0vvvgpoAjyw7m/SneaBCG?=
+ =?us-ascii?Q?rmkda51VC9NgRb3LfCB2IwgtOH+IOrW1cBOLdwLWCs0/mcXCLsN6Zgs86ENR?=
+ =?us-ascii?Q?8PBV7/kvj3NTcCD96PuB2lzTXVowatUAWyFerDOtj24CzM8lvuJt7Rtyf3dL?=
+ =?us-ascii?Q?Ub+ywOqYY54lqIObDePjxmPePdR3iAyOgVh7zW21q6vC9yOAH80dPePo4zP5?=
+ =?us-ascii?Q?Y69uqruCiZb2e30iGD4QFoY6lmTj5FNast0vH2r4LnZQ+V3eMyh7IofJ5FDV?=
+ =?us-ascii?Q?1PQ8EKn+8zWTtmhTvOdoAfC4CVqR0AjmaNunagNEecFv7lKSLUGuEhHzutDr?=
+ =?us-ascii?Q?xwtHF+14Wk5iDRTfCWQcur3O6UfaQq4wwdZuum0Uf3Js74MdUGPdfnouOz4K?=
+ =?us-ascii?Q?yV7Kr+WRjK7jPL82NMkweVI4n2ua/45UfkXF5kuxFVr0RBCAxZNnUAtxOlHf?=
+ =?us-ascii?Q?382uTxOu5uWqU1LdIhmWS+J9YVMgdSUDQFbAB48vSjZEE6dyvcSj4DD0Hj6S?=
+ =?us-ascii?Q?LiWkSE7Ff90/URcUkXoKpy9V4+3UOnoh4TBNt1sIy1Dr3/K6qH7t09ZunOGR?=
+ =?us-ascii?Q?1qHHv+/qT0JhZrOtVzqdZAzgFDBnQqEfrad+heK9zwwTP3eGTcRJ+wdrfTvi?=
+ =?us-ascii?Q?vOs35tbR5thZx+lU1uO52OsZlLQFcoNInfdqILAOGLChVokLF6mmYkwJhPuF?=
+ =?us-ascii?Q?t1+Qtq9SpRM0N4n8CWQa2T74UUEIdJ52p44EKFjtdCvQzYDcf8BUrjOKfJ0n?=
+ =?us-ascii?Q?KDrM+DXqw0LiMPd1POApByO6FYOuiCN2JVXFL1nS?=
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
+MIME-Version: 1.0
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: DM6PR11MB3113.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 53a45f0a-83c6-4da7-8ba2-08da86f383f1
+X-MS-Exchange-CrossTenant-originalarrivaltime: 25 Aug 2022 23:42:47.4854
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: cnEeNt2IpxhgLC6MsFIMQrHoAg6dx0ZaXtfs+3jPHVNuyzRLSYK9nB9pCO0OLL+IbD+8moC09JxTLGuJ5+8v+0PwJWaRzAf0hvOg3buBK/A=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: MWHPR11MB2062
+X-OriginatorOrg: intel.com
+X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
+        RCVD_IN_MSPIKE_H3,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE,
+        T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED autolearn=ham autolearn_force=no
+        version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-From: Peter Gonda <pgonda@google.com>
+We were testing the changes for our VF devices and noticed an issue when st=
+arting VMs with passthrough VFs. We then moved back to mainline kernel and =
+reproduced the issue on 6.0-rc2
 
-To play nice with guests whose stack memory is encrypted, e.g. AMD SEV,
-introduce a new "ucall pool" implementation that passes the ucall struct
-via dedicated memory (which can be mapped shared, a.k.a. as plain text).
+We noticed that the startup of the KVM hangs.
 
-Because not all architectures have access to the vCPU index in the guest,
-use a bitmap with atomic accesses to track which entries in the pool are
-free/used.  A list+lock could also work in theory, but synchronizing the
-individual pointers to the guest would be a mess.
+Steps to reproduce:
+Create a VF from the PF interface.
+Configure VM XML with the VF PCI.
+Start the KVM.
 
-Note, there's no need to rewalk the bitmap to ensure success.  If all
-vCPUs are simply allocating, success is guaranteed because there are
-enough entries for all vCPUs.  If one or more vCPUs are freeing and then
-reallocating, success is guaranteed because vCPUs _always_ walk the
-bitmap from 0=>N; if vCPU frees an entry and then wins a race to
-re-allocate, then either it will consume the entry it just freed (bit is
-the first free bit), or the losing vCPU is guaranteed to see the freed
-bit (winner consumes an earlier bit, which the loser hasn't yet visited).
+To isolate the issue we moved back to kernel 5.19 and it was working fine.
 
-Signed-off-by: Peter Gonda <pgonda@google.com>
-Co-developed-by: Sean Christopherson <seanjc@google.com>
-Signed-off-by: Sean Christopherson <seanjc@google.com>
----
- .../selftests/kvm/include/ucall_common.h      |  9 ++-
- .../testing/selftests/kvm/lib/aarch64/ucall.c |  7 +-
- tools/testing/selftests/kvm/lib/riscv/ucall.c |  2 +-
- tools/testing/selftests/kvm/lib/s390x/ucall.c |  2 +-
- .../testing/selftests/kvm/lib/ucall_common.c  | 71 +++++++++++++++++--
- .../testing/selftests/kvm/lib/x86_64/ucall.c  |  2 +-
- 6 files changed, 76 insertions(+), 17 deletions(-)
+Working tag v5.19
+Tested failing commit 4c612826bec1
 
-diff --git a/tools/testing/selftests/kvm/include/ucall_common.h b/tools/testing/selftests/kvm/include/ucall_common.h
-index 2662a4352a8c..bdd373189a77 100644
---- a/tools/testing/selftests/kvm/include/ucall_common.h
-+++ b/tools/testing/selftests/kvm/include/ucall_common.h
-@@ -22,6 +22,9 @@ enum {
- struct ucall {
- 	uint64_t cmd;
- 	uint64_t args[UCALL_MAX_ARGS];
-+
-+	/* Host virtual address of this struct. */
-+	struct ucall *hva;
- };
- 
- void ucall_arch_init(struct kvm_vm *vm, vm_paddr_t mmio_gpa);
-@@ -30,11 +33,7 @@ void *ucall_arch_get_ucall(struct kvm_vcpu *vcpu);
- 
- void ucall(uint64_t cmd, int nargs, ...);
- uint64_t get_ucall(struct kvm_vcpu *vcpu, struct ucall *uc);
--
--static inline void ucall_init(struct kvm_vm *vm, vm_paddr_t mmio_gpa)
--{
--	ucall_arch_init(vm, mmio_gpa);
--}
-+void ucall_init(struct kvm_vm *vm, vm_paddr_t mmio_gpa);
- 
- #define GUEST_SYNC_ARGS(stage, arg1, arg2, arg3, arg4)	\
- 				ucall(UCALL_SYNC, 6, "hello", stage, arg1, arg2, arg3, arg4)
-diff --git a/tools/testing/selftests/kvm/lib/aarch64/ucall.c b/tools/testing/selftests/kvm/lib/aarch64/ucall.c
-index 21d73afcb14f..562c16dfbb00 100644
---- a/tools/testing/selftests/kvm/lib/aarch64/ucall.c
-+++ b/tools/testing/selftests/kvm/lib/aarch64/ucall.c
-@@ -32,12 +32,9 @@ void *ucall_arch_get_ucall(struct kvm_vcpu *vcpu)
- 
- 	if (run->exit_reason == KVM_EXIT_MMIO &&
- 	    run->mmio.phys_addr == vcpu->vm->ucall_mmio_addr) {
--		vm_vaddr_t gva;
--
--		TEST_ASSERT(run->mmio.is_write && run->mmio.len == 8,
-+		TEST_ASSERT(run->mmio.is_write && run->mmio.len == sizeof(uint64_t),
- 			    "Unexpected ucall exit mmio address access");
--		memcpy(&gva, run->mmio.data, sizeof(gva));
--		return addr_gva2hva(vcpu->vm, gva);
-+		return (void *)(*((uint64_t *)run->mmio.data));
- 	}
- 
- 	return NULL;
-diff --git a/tools/testing/selftests/kvm/lib/riscv/ucall.c b/tools/testing/selftests/kvm/lib/riscv/ucall.c
-index 78acdb084ab0..9a3476a2dfca 100644
---- a/tools/testing/selftests/kvm/lib/riscv/ucall.c
-+++ b/tools/testing/selftests/kvm/lib/riscv/ucall.c
-@@ -55,7 +55,7 @@ void *ucall_arch_get_ucall(struct kvm_vcpu *vcpu)
- 	    run->riscv_sbi.extension_id == KVM_RISCV_SELFTESTS_SBI_EXT) {
- 		switch (run->riscv_sbi.function_id) {
- 		case KVM_RISCV_SELFTESTS_SBI_UCALL:
--			return addr_gva2hva(vcpu->vm, run->riscv_sbi.args[0]);
-+			return (void *)run->riscv_sbi.args[0];
- 		case KVM_RISCV_SELFTESTS_SBI_UNEXP:
- 			vcpu_dump(stderr, vcpu, 2);
- 			TEST_ASSERT(0, "Unexpected trap taken by guest");
-diff --git a/tools/testing/selftests/kvm/lib/s390x/ucall.c b/tools/testing/selftests/kvm/lib/s390x/ucall.c
-index cbee520a26f2..a7f02dc372cf 100644
---- a/tools/testing/selftests/kvm/lib/s390x/ucall.c
-+++ b/tools/testing/selftests/kvm/lib/s390x/ucall.c
-@@ -26,7 +26,7 @@ void *ucall_arch_get_ucall(struct kvm_vcpu *vcpu)
- 	    (run->s390_sieic.ipb >> 16) == 0x501) {
- 		int reg = run->s390_sieic.ipa & 0xf;
- 
--		return addr_gva2hva(vcpu->vm, run->s.regs.gprs[reg]);
-+		return (void *)run->s.regs.gprs[reg];
- 	}
- 	return NULL;
- }
-diff --git a/tools/testing/selftests/kvm/lib/ucall_common.c b/tools/testing/selftests/kvm/lib/ucall_common.c
-index ced480860746..cc79d497b6b4 100644
---- a/tools/testing/selftests/kvm/lib/ucall_common.c
-+++ b/tools/testing/selftests/kvm/lib/ucall_common.c
-@@ -1,22 +1,85 @@
- // SPDX-License-Identifier: GPL-2.0-only
- #include "kvm_util.h"
-+#include "linux/types.h"
-+#include "linux/bitmap.h"
-+#include "linux/atomic.h"
-+
-+struct ucall_header {
-+	DECLARE_BITMAP(in_use, KVM_MAX_VCPUS);
-+	struct ucall ucalls[KVM_MAX_VCPUS];
-+};
-+
-+/*
-+ * ucall_pool holds per-VM values (global data is duplicated by each VM), it
-+ * must not be accessed from host code.
-+ */
-+static struct ucall_header *ucall_pool;
-+
-+void ucall_init(struct kvm_vm *vm, vm_paddr_t mmio_gpa)
-+{
-+	struct ucall_header *hdr;
-+	struct ucall *uc;
-+	vm_vaddr_t vaddr;
-+	int i;
-+
-+	vaddr = vm_vaddr_alloc(vm, sizeof(*hdr), KVM_UTIL_MIN_VADDR);
-+	hdr = (struct ucall_header *)addr_gva2hva(vm, vaddr);
-+	memset(hdr, 0, sizeof(*hdr));
-+
-+	for (i = 0; i < KVM_MAX_VCPUS; ++i) {
-+		uc = &hdr->ucalls[i];
-+		uc->hva = uc;
-+	}
-+
-+	write_guest_global(vm, ucall_pool, (struct ucall_header *)vaddr);
-+
-+	ucall_arch_init(vm, mmio_gpa);
-+}
-+
-+static struct ucall *ucall_alloc(void)
-+{
-+	struct ucall *uc;
-+	int i;
-+
-+	GUEST_ASSERT(ucall_pool && ucall_pool->in_use);
-+
-+	for (i = 0; i < KVM_MAX_VCPUS; ++i) {
-+		if (!atomic_test_and_set_bit(i, ucall_pool->in_use)) {
-+			uc = &ucall_pool->ucalls[i];
-+			memset(uc->args, 0, sizeof(uc->args));
-+			return uc;
-+		}
-+	}
-+	GUEST_ASSERT(0);
-+	return NULL;
-+}
-+
-+static void ucall_free(struct ucall *uc)
-+{
-+	/* Beware, here be pointer arithmetic.  */
-+	clear_bit(uc - ucall_pool->ucalls, ucall_pool->in_use);
-+}
- 
- void ucall(uint64_t cmd, int nargs, ...)
- {
--	struct ucall uc = {};
-+	struct ucall *uc;
- 	va_list va;
- 	int i;
- 
--	WRITE_ONCE(uc.cmd, cmd);
-+	uc = ucall_alloc();
-+
-+	WRITE_ONCE(uc->cmd, cmd);
- 
- 	nargs = min(nargs, UCALL_MAX_ARGS);
- 
- 	va_start(va, nargs);
- 	for (i = 0; i < nargs; ++i)
--		WRITE_ONCE(uc.args[i], va_arg(va, uint64_t));
-+		WRITE_ONCE(uc->args[i], va_arg(va, uint64_t));
- 	va_end(va);
- 
--	ucall_arch_do_ucall((vm_vaddr_t)&uc);
-+	ucall_arch_do_ucall((vm_vaddr_t)uc->hva);
-+
-+	ucall_free(uc);
- }
- 
- uint64_t get_ucall(struct kvm_vcpu *vcpu, struct ucall *uc)
-diff --git a/tools/testing/selftests/kvm/lib/x86_64/ucall.c b/tools/testing/selftests/kvm/lib/x86_64/ucall.c
-index eb8bf55b359a..4d41dc63cc9e 100644
---- a/tools/testing/selftests/kvm/lib/x86_64/ucall.c
-+++ b/tools/testing/selftests/kvm/lib/x86_64/ucall.c
-@@ -26,7 +26,7 @@ void *ucall_arch_get_ucall(struct kvm_vcpu *vcpu)
- 		struct kvm_regs regs;
- 
- 		vcpu_regs_get(vcpu, &regs);
--		return addr_gva2hva(vcpu->vm, regs.rdi);
-+		return (void *)regs.rdi;
- 	}
- 	return NULL;
- }
--- 
-2.37.2.672.g94769d06f0-goog
+[root@localhost sl]# uname -r
+6.0.0-rc2-00159-g4c612826bec1
+[root@localhost sl]# echo 1 > /sys/class/net/ens785f3/device/sriov_numvfs
+[root@localhost sl]# virsh start rhel_9_0_first
+^C
+[root@localhost sl]# virsh list --all
+ Id   Name             State
+-------------------------------
+ 1    rhel_9_0_first   paused=09
 
+Dmesg:
+[  +0.042400] iavf: Intel(R) Ethernet Adaptive Virtual Function Network Dri=
+ver
+[  +0.000004] Copyright (c) 2013 - 2018 Intel Corporation.
+[  +0.000309] iavf 0000:18:19.0: enabling device (0000 -> 0002)
+[  +0.073471] iavf 0000:18:19.0: Invalid MAC address 00:00:00:00:00:00, usi=
+ng random
+[  +0.000674] iavf 0000:18:19.0: Multiqueue Enabled: Queue pair count =3D 1=
+6
+[  +0.000466] iavf 0000:18:19.0: MAC address: 5a:0c:b5:f7:4f:0b
+[  +0.000003] iavf 0000:18:19.0: GRO is enabled
+[  +0.005941] iavf 0000:18:19.0 ens785f3v0: renamed from eth0
+[  +0.179174] IPv6: ADDRCONF(NETDEV_CHANGE): ens785f3v0: link becomes ready
+[  +0.000040] iavf 0000:18:19.0 ens785f3v0: NIC Link is Up Speed is 25 Gbps=
+ Full Duplex
+[ +26.408503] bridge: filtering via arp/ip/ip6tables is no longer available=
+ by default. Update your scripts to load br_netfilter if you need this.
+[  +0.399621] VFIO - User Level meta-driver version: 0.3
+[  +0.151579] iavf 0000:18:19.0: Remove device
+[  +0.292158] ice 0000:18:00.3 ens785f3: Setting MAC 52:54:00:9f:ea:de on V=
+F 0. VF driver will be reinitialized
+[  +0.083676] ice 0000:18:00.3: Clearing port VLAN on VF 0
+[  +0.155905] tun: Universal TUN/TAP device driver, 1.6
+[  +0.000976] virbr0: port 1(vnet0) entered blocking state
+[  +0.000017] virbr0: port 1(vnet0) entered disabled state
+[  +0.000052] device vnet0 entered promiscuous mode
+[  +0.000244] virbr0: port 1(vnet0) entered blocking state
+[  +0.000003] virbr0: port 1(vnet0) entered listening state
+[  +2.019924] virbr0: port 1(vnet0) entered learning state
+[  +2.047997] virbr0: port 1(vnet0) entered forwarding state
+[  +0.000018] virbr0: topology change detected, propagating
+[Aug25 19:12] INFO: task khugepaged:507 blocked for more than 122 seconds.
+[  +0.000016]       Tainted: G        W I        6.0.0-rc2-00159-g4c612826b=
+ec1 #1
+[  +0.000010] "echo 0 > /proc/sys/kernel/hung_task_timeout_secs" disables t=
+his message.
+[  +0.000010] task:khugepaged      state:D stack:    0 pid:  507 ppid:     =
+2 flags:0x00004000
+[  +0.000004] Call Trace:
+[  +0.000001]  <TASK>
+[  +0.000003]  __schedule+0x1bc/0x550
+[  +0.000006]  ? osq_unlock+0xf/0x90
+[  +0.000005]  schedule+0x5d/0xd0
+[  +0.000002]  rwsem_down_write_slowpath+0x2c9/0x5e0
+[  +0.000004]  ? find_vma+0x64/0x70
+[  +0.000004]  collapse_huge_page+0x1f8/0x8a0
+[  +0.000004]  ? _raw_spin_unlock+0x14/0x30
+[  +0.000002]  ? preempt_count_add+0x70/0xa0
+[  +0.000005]  ? _raw_spin_lock_irqsave+0x21/0x30
+[  +0.000001]  ? lock_timer_base+0x61/0x80
+[  +0.000005]  khugepaged_scan_pmd+0x33d/0x7b0
+[  +0.000003]  khugepaged_scan_mm_slot+0x155/0x440
+[  +0.000003]  khugepaged+0x189/0x3e0
+[  +0.000002]  ? preempt_count_add+0x70/0xa0
+[  +0.000002]  ? _raw_spin_unlock_irqrestore+0x1e/0x40
+[  +0.000002]  ? khugepaged_scan_mm_slot+0x440/0x440
+[  +0.000001]  kthread+0xf0/0x120
+[  +0.000003]  ? kthread_complete_and_exit+0x20/0x20
+[  +0.000003]  ret_from_fork+0x1f/0x30
+[  +0.000006]  </TASK>
+
+On the working version there is a line that enables the interface for the V=
+F which is missing on non-working one:
+[  +0.911730] vfio-pci 0000:18:19.0: enabling device (0000 -> 0002)
