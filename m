@@ -2,88 +2,80 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 62E725A1C6F
-	for <lists+kvm@lfdr.de>; Fri, 26 Aug 2022 00:32:49 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id B88C45A1CAB
+	for <lists+kvm@lfdr.de>; Fri, 26 Aug 2022 00:47:00 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S244317AbiHYWcr (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 25 Aug 2022 18:32:47 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45500 "EHLO
+        id S237117AbiHYWq6 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 25 Aug 2022 18:46:58 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37124 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S243177AbiHYWcp (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 25 Aug 2022 18:32:45 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 63D95BA154
-        for <kvm@vger.kernel.org>; Thu, 25 Aug 2022 15:32:45 -0700 (PDT)
+        with ESMTP id S230181AbiHYWq4 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 25 Aug 2022 18:46:56 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D00C1C6529
+        for <kvm@vger.kernel.org>; Thu, 25 Aug 2022 15:46:55 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1661466764;
+        s=mimecast20190719; t=1661467614;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=Oy2aubXb5hLNj8VJ/ILuyIzESlVY8G+jddCf/KXjxGU=;
-        b=HFNSVFlTxa3afw+pvVRY6hjU06cuoOVBVqf0sDSpdBpfzHYK6kyU4HpysU8QnWr24DNAov
-        9XaDPGgmstRMh7m8iyrBcSjMwS2hkL88Qy4ot5eHfeDwcWZ2BlhpUneoNfETMldUpc+oAY
-        1yWQIrSZfRHHx3SyoibIn6EMsC5DZy8=
-Received: from mail-il1-f197.google.com (mail-il1-f197.google.com
- [209.85.166.197]) by relay.mimecast.com with ESMTP with STARTTLS
+        bh=uqKD+aCTNkWDNnveoC2FpK22eYkx9sFAuDbWp9S4k98=;
+        b=eie86jL6TZEAArsrHWcS/szTwbXIzaR3zpcu7beq02qXbG8eB2DNMTyKMuX0MIomKMcucH
+        vqaoNpgOjKB6Z85X75TVdxaUiQilEEyB1cnwuw32BSY5FBZ/UjcK5w8JkT2JcyRplJgn5X
+        OXgAT+hWVAc52ypLqlU4J+YUMrwPU34=
+Received: from mail-io1-f71.google.com (mail-io1-f71.google.com
+ [209.85.166.71]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_128_GCM_SHA256) id
- us-mta-626-IQTNLMNlPjmv30LHI-4lnQ-1; Thu, 25 Aug 2022 18:32:42 -0400
-X-MC-Unique: IQTNLMNlPjmv30LHI-4lnQ-1
-Received: by mail-il1-f197.google.com with SMTP id n13-20020a056e02140d00b002dfa5464967so15745631ilo.19
-        for <kvm@vger.kernel.org>; Thu, 25 Aug 2022 15:32:42 -0700 (PDT)
+ us-mta-645-HbuT-FbVPjibJrjuJHp9Xw-1; Thu, 25 Aug 2022 18:46:53 -0400
+X-MC-Unique: HbuT-FbVPjibJrjuJHp9Xw-1
+Received: by mail-io1-f71.google.com with SMTP id i14-20020a5d934e000000b006892db5bcd4so12189786ioo.22
+        for <kvm@vger.kernel.org>; Thu, 25 Aug 2022 15:46:53 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=content-transfer-encoding:mime-version:organization:references
          :in-reply-to:message-id:subject:cc:to:from:date:x-gm-message-state
          :from:to:cc;
-        bh=Oy2aubXb5hLNj8VJ/ILuyIzESlVY8G+jddCf/KXjxGU=;
-        b=HVbzJNQecASbwLvoFSxBKqder80vnA1TLn+QCNgtMtOFqyO4/b5RQA8vPEi45wYekl
-         k4+2gQLMclCfoeX1z0N8Jwp2+AucIRzXlqgHam6/EriJ5c4eArKvQ0RSDSgYu2Q2e7WD
-         hvWP3g1Q/DbNPilBQWk0+/yfRctGjp29HEI1XtXg5Ix/MNVuFbbNXuH82Q4MGv6ulz/l
-         XFzWNe3kbFu0HQuU0hv+JzQGmjrIbbNIa4E5jJDcNjjLx1wPaX5j6RW3oYTFMPpe7Oqp
-         oL2l0svmy435hzJapB1XVXQICn5ZupUYyqIIHOAkaUCIyLx3ESNQ32QDg6INDj6aQ6cn
-         2EUw==
-X-Gm-Message-State: ACgBeo1NuTyt742wIIlF+1rKBGOwImbqASAGlZjbcHfOmZ+ryEAKmcce
-        uS5Uwbv3k6GWOqb5f6zy14t5L1G/zTqhzFpNaH3XJNo0G3gYhbvIWHWj1xbVCsqlv6fG5i6V75O
-        8O9r6qDu/TRk/
-X-Received: by 2002:a02:1d09:0:b0:33b:a8cc:17d3 with SMTP id 9-20020a021d09000000b0033ba8cc17d3mr2742330jaj.25.1661466762088;
-        Thu, 25 Aug 2022 15:32:42 -0700 (PDT)
-X-Google-Smtp-Source: AA6agR5DxfwLwJkfemFe6fofZO7Sa2Jt0xLr+PHGNw1XLZEm3kULrHFXM6KOQKsSVRF5mDTKeRkUZg==
-X-Received: by 2002:a02:1d09:0:b0:33b:a8cc:17d3 with SMTP id 9-20020a021d09000000b0033ba8cc17d3mr2742320jaj.25.1661466761898;
-        Thu, 25 Aug 2022 15:32:41 -0700 (PDT)
+        bh=uqKD+aCTNkWDNnveoC2FpK22eYkx9sFAuDbWp9S4k98=;
+        b=HZLtmXPbb0uhF3H8meVap3u1mBJXdiGxCSUOxlpqBsDGm2HRgrp6m4DpLCfsVsdWyg
+         mtgCjo4QuhhiveDEbMoCb9reZppijlmjbSlu3aDbDuOVRTB+uf0Ao1q4XlG4vIhO2xpB
+         3cyuhkOFTQEb2t98tUyMMBbi1QXbY9ssq8BQwGUhjm70skCl/sYDjGKZhZ9vENb10QVy
+         w0WFLexnz2AcqzVbPftkFVDhqoWzRYHvQH0xbnelO6Detb8llc6vLn/Q1AoRicSRGSnP
+         N7NbebMCUWJY0DuYwcjXB0QnKMhrXPbc1QWms/baI+yPBiPogGywI9DD6DKb1EgYUDkb
+         M7ug==
+X-Gm-Message-State: ACgBeo3qrG40a1YGiJPbC+PB29Tr5CLkr0laN7XK0rOi5SHnYv4yAxeb
+        0t6y0WsPfDdXSzCSrEGiNqkGDl8tDN0oLMOrC8K4lRjKE3BQqjH9tmxuvHNRXgvQ63LU0Bap7N5
+        MHQL1jMqvuVbr
+X-Received: by 2002:a05:6e02:194d:b0:2ea:373a:cbe4 with SMTP id x13-20020a056e02194d00b002ea373acbe4mr2812324ilu.127.1661467612893;
+        Thu, 25 Aug 2022 15:46:52 -0700 (PDT)
+X-Google-Smtp-Source: AA6agR7G6uZF/Oy4Zo7uASD5B5uM03NtH89MksJbC4xi2D2xDl1qqgFc1KtFhyZCcfwXXDiYgEtQsQ==
+X-Received: by 2002:a05:6e02:194d:b0:2ea:373a:cbe4 with SMTP id x13-20020a056e02194d00b002ea373acbe4mr2812309ilu.127.1661467612664;
+        Thu, 25 Aug 2022 15:46:52 -0700 (PDT)
 Received: from redhat.com ([38.15.36.239])
-        by smtp.gmail.com with ESMTPSA id t14-20020a056e02010e00b002e93764c9e3sm278115ilm.54.2022.08.25.15.32.41
+        by smtp.gmail.com with ESMTPSA id g11-20020a056602072b00b00688509947e4sm226460iox.17.2022.08.25.15.46.52
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 25 Aug 2022 15:32:41 -0700 (PDT)
-Date:   Thu, 25 Aug 2022 16:32:40 -0600
+        Thu, 25 Aug 2022 15:46:52 -0700 (PDT)
+Date:   Thu, 25 Aug 2022 16:46:51 -0600
 From:   Alex Williamson <alex.williamson@redhat.com>
-To:     Abhishek Sahu <abhsahu@nvidia.com>
-Cc:     Jason Gunthorpe <jgg@nvidia.com>,
-        Cornelia Huck <cohuck@redhat.com>,
-        Yishai Hadas <yishaih@nvidia.com>,
-        Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>,
-        Kevin Tian <kevin.tian@intel.com>,
-        "Rafael J . Wysocki" <rafael@kernel.org>,
-        Max Gurtovoy <mgurtovoy@nvidia.com>,
-        Bjorn Helgaas <bhelgaas@google.com>,
-        linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-        linux-pm@vger.kernel.org, linux-pci@vger.kernel.org
-Subject: Re: [PATCH v6 5/5] vfio/pci: Implement
- VFIO_DEVICE_FEATURE_LOW_POWER_ENTRY_WITH_WAKEUP
-Message-ID: <20220825163240.274950c8.alex.williamson@redhat.com>
-In-Reply-To: <62e6d510-8e7c-8a31-fb7f-905bb13afe67@nvidia.com>
-References: <20220817051323.20091-1-abhsahu@nvidia.com>
-        <20220817051323.20091-6-abhsahu@nvidia.com>
-        <Yvzy0VOfKkKod0OV@nvidia.com>
-        <5363303b-30bb-3c4a-bf42-426dd7f8138d@nvidia.com>
-        <Yv0oH23UYbI/LI+X@nvidia.com>
-        <62e6d510-8e7c-8a31-fb7f-905bb13afe67@nvidia.com>
+To:     Joao Martins <joao.m.martins@oracle.com>
+Cc:     Yishai Hadas <yishaih@nvidia.com>, jgg@nvidia.com,
+        saeedm@nvidia.com, kvm@vger.kernel.org, netdev@vger.kernel.org,
+        kuba@kernel.org, kevin.tian@intel.com, leonro@nvidia.com,
+        maorg@nvidia.com, cohuck@redhat.com
+Subject: Re: [PATCH V4 vfio 05/10] vfio: Introduce the DMA logging feature
+ support
+Message-ID: <20220825164651.384bf099.alex.williamson@redhat.com>
+In-Reply-To: <8342117f-87ab-d38e-6fcd-aaa947dbeaaf@oracle.com>
+References: <20220815151109.180403-1-yishaih@nvidia.com>
+        <20220815151109.180403-6-yishaih@nvidia.com>
+        <20220825144944.237eb78f.alex.williamson@redhat.com>
+        <8342117f-87ab-d38e-6fcd-aaa947dbeaaf@oracle.com>
 Organization: Red Hat
 MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+X-Spam-Status: No, score=-2.8 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,
         SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=unavailable
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
@@ -92,51 +84,78 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, 18 Aug 2022 22:31:03 +0530
-Abhishek Sahu <abhsahu@nvidia.com> wrote:
+On Thu, 25 Aug 2022 23:26:04 +0100
+Joao Martins <joao.m.martins@oracle.com> wrote:
 
-> On 8/17/2022 11:10 PM, Jason Gunthorpe wrote:
-> > On Wed, Aug 17, 2022 at 09:34:30PM +0530, Abhishek Sahu wrote:  
-> >> On 8/17/2022 7:23 PM, Jason Gunthorpe wrote:  
-> >>> On Wed, Aug 17, 2022 at 10:43:23AM +0530, Abhishek Sahu wrote:
-> >>>  
-> >>>> +static int
-> >>>> +vfio_pci_core_pm_entry_with_wakeup(struct vfio_device *device, u32 flags,
-> >>>> +				   void __user *arg, size_t argsz)  
-> >>>
-> >>> This should be
-> >>>   struct vfio_device_low_power_entry_with_wakeup __user *arg
-> >>>  
-> >>
-> >>  Thanks Jason.
-> >>
-> >>  I can update this.
-> >>
-> >>  But if we look the existing code, for example
-> >>  (vfio_ioctl_device_feature_mig_device_state()), then there it still uses
-> >>  'void __user *arg' only. Is this a new guideline which we need to take
-> >>  care ?  
+> On 8/25/22 21:49, Alex Williamson wrote:
+> > On Mon, 15 Aug 2022 18:11:04 +0300
+> > Yishai Hadas <yishaih@nvidia.com> wrote:  
+> >> +static int
+> >> +vfio_ioctl_device_feature_logging_report(struct vfio_device *device,
+> >> +					 u32 flags, void __user *arg,
+> >> +					 size_t argsz)
+> >> +{
+> >> +	size_t minsz =
+> >> +		offsetofend(struct vfio_device_feature_dma_logging_report,
+> >> +			    bitmap);
+> >> +	struct vfio_device_feature_dma_logging_report report;
+> >> +	struct iova_bitmap_iter iter;
+> >> +	int ret;
+> >> +
+> >> +	if (!device->log_ops)
+> >> +		return -ENOTTY;
+> >> +
+> >> +	ret = vfio_check_feature(flags, argsz,
+> >> +				 VFIO_DEVICE_FEATURE_GET,
+> >> +				 sizeof(report));
+> >> +	if (ret != 1)
+> >> +		return ret;
+> >> +
+> >> +	if (copy_from_user(&report, arg, minsz))
+> >> +		return -EFAULT;
+> >> +
+> >> +	if (report.page_size < PAGE_SIZE || !is_power_of_2(report.page_size))  
 > > 
-> > I just sent a patch that fixes that too
-> >   
+> > Why is PAGE_SIZE a factor here?  I'm under the impression that
+> > iova_bitmap is intended to handle arbitrary page sizes.  Thanks,  
 > 
->  Thanks for the update.
->  I will change this. 
+> Arbritary page sizes ... which are powers of 2. We use page shift in iova bitmap.
+> While it's not hard to lose this restriction (trading a shift over a slower mul)
+> ... I am not sure it is worth supporting said use considering that there aren't
+> non-powers of 2 page sizes right now?
 > 
-> >>  Do we need to keep the IOCTL name alphabetically sorted in the case list.
-> >>  Currently, I have added in the order of IOCTL numbers.  
-> > 
-> > It is generally a good practice to sort lists of things.
-> > 
-> > Jason  
-> 
->  Sure. I will make the sorted list.
+> The PAGE_SIZE restriction might be that it's supposed to be the lowest possible page_size.
 
-The series looks good to me, so I'd suggest to rebase on Jason's
-patches[1][2] so you can easily sort out the above.  Thanks,
+Sorry, I was unclear.  Size relative to PAGE_SIZE was my only question,
+not that we shouldn't require power of 2 sizes.  We're adding device
+level dirty tracking, where the device page size granularity might be
+4K on a host with a CPU 64K page size.  Maybe there's a use case for
+that.  Given the flexibility claimed by the iova_bitmap support,
+requiring reported page size less than system PAGE_SIZE seems
+unjustified.  Thanks,
 
 Alex
 
-[1]https://lore.kernel.org/all/0-v1-da6fc51ee22e+562-vfio_pci_priv_jgg@nvidia.com/
-[2]https://lore.kernel.org/all/0-v1-11d8272dc65a+4bd-vfio_ioctl_split_jgg@nvidia.com/
+> >> +		return -EINVAL;
+> >> +
+> >> +	ret = iova_bitmap_iter_init(&iter, report.iova, report.length,
+> >> +				    report.page_size,
+> >> +				    u64_to_user_ptr(report.bitmap));
+> >> +	if (ret)
+> >> +		return ret;
+> >> +
+> >> +	for (; !iova_bitmap_iter_done(&iter) && !ret;
+> >> +	     ret = iova_bitmap_iter_advance(&iter)) {
+> >> +		ret = device->log_ops->log_read_and_clear(device,
+> >> +			iova_bitmap_iova(&iter),
+> >> +			iova_bitmap_length(&iter), &iter.dirty);
+> >> +		if (ret)
+> >> +			break;
+> >> +	}
+> >> +
+> >> +	iova_bitmap_iter_free(&iter);
+> >> +	return ret;
+> >> +}  
+> >   
+> 
 
