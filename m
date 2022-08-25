@@ -2,138 +2,224 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id F37AE5A18E0
-	for <lists+kvm@lfdr.de>; Thu, 25 Aug 2022 20:39:08 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id BC24E5A1930
+	for <lists+kvm@lfdr.de>; Thu, 25 Aug 2022 20:54:40 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S243433AbiHYSjH (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 25 Aug 2022 14:39:07 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58396 "EHLO
+        id S243591AbiHYSyh (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 25 Aug 2022 14:54:37 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59212 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S242925AbiHYSjG (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 25 Aug 2022 14:39:06 -0400
-Received: from mail-yw1-x1130.google.com (mail-yw1-x1130.google.com [IPv6:2607:f8b0:4864:20::1130])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D6F14A3D51
-        for <kvm@vger.kernel.org>; Thu, 25 Aug 2022 11:39:04 -0700 (PDT)
-Received: by mail-yw1-x1130.google.com with SMTP id 00721157ae682-32a09b909f6so564564037b3.0
-        for <kvm@vger.kernel.org>; Thu, 25 Aug 2022 11:39:04 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc;
-        bh=B+6GHANqVGrhre1yIICjUKUVABFJYsXY9KlsXWrq0g0=;
-        b=B85LgmnE6J6rXg7BVngfQTw4IEjIKrGKdqIeDIjR3AWtFqojLHLJcIFpUb/kio7nLp
-         Q+Ui7InM8EeA6fFs7Ovf0/ZosbdTVjCy7D8cMlV6fDhzod2KJN/4nk9mVhQ0FZQbE+Ky
-         QstKO/uftXpVDD4tBNkWiPAMtu3ZT8/ej/ZSvGUcLEWZFY0lt12Otkn4bzRlVnhh1rx6
-         v1MWHoVRbsz20H7ZjCC6iSK7MQfC7xupNt5YGgKQ0K9Dy210qTIgMkNTvPpIjL3nfH+N
-         uZ86ViMYJrB57R5lrqCVZJvZgKRj3BRPaPN1gFz3nUQyy9V9YzX1BsykChMTGDUfqP+t
-         jUKA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc;
-        bh=B+6GHANqVGrhre1yIICjUKUVABFJYsXY9KlsXWrq0g0=;
-        b=nyhpHQkFeTXWo0e/3nJHO1KX3nkDT+OTRYZ6lpmZasm1QXrlyErxDRgqI5PySk+A7S
-         URJSHrA0UW325eGOq1QhjvAjZvbwgxB1LEF3IKSk2jZ4bt+APuNGGfhBhbIuCcS5M3tB
-         l1pRLd5ZXjkvBqqCeiLb2AhIeaWfY8yqnCHl9ZtPSMCTrfmDjDnIOeyBUyOqKiMWs2vy
-         GKElEH35Ed9EeOed71adKfXBZcjx/vamLPvyyraoEalbY5CAqNRAkt3l0k6YSF+ExVBO
-         XQek0cGaAX8Kpx5vVlZMP+/tmdhnp3Lr3cyQKq6MYIWs1OSrHCtpNlYYMSRj0DeblUG1
-         5JPQ==
-X-Gm-Message-State: ACgBeo1DcpFCDkHkm76ixOUXhpENptD2I4fdAkQL1CH7htXGFIJwNEN7
-        /JNHmFVS4VtN93DZ81EA6ByrFBASI6ZTJFY7wg0nyg==
-X-Google-Smtp-Source: AA6agR7rapIlRr0/fCZEKhWKbo6XO2p0rUFCMJJnqLNETdiYbschnHcx4RcKE15j7E+GKxzg5bqk9rgOYhmm6A46bj4=
-X-Received: by 2002:a25:94b:0:b0:68f:4e05:e8f0 with SMTP id
- u11-20020a25094b000000b0068f4e05e8f0mr4506829ybm.115.1661452743474; Thu, 25
- Aug 2022 11:39:03 -0700 (PDT)
+        with ESMTP id S243546AbiHYSye (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 25 Aug 2022 14:54:34 -0400
+Received: from NAM10-BN7-obe.outbound.protection.outlook.com (mail-bn7nam10on2081.outbound.protection.outlook.com [40.107.92.81])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C1D9AB600D;
+        Thu, 25 Aug 2022 11:54:32 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=Uy8s61Kx8jXB3D4jYeuk+3wkNZh0jozmNo/ca3oa59ZfLbcmQwr91B4IGZVFYr2V69De5V+Lo/3n8XRT8u4Bmm395gsfp1iApM/JaVSNUm4hvJvjVShNN2YTsN0Xlk9OjVIfQO/O6jeNO16chCkb1OmYHkHOZDkZdTtI4azQvAuD9n3NhRLJaeD/fefFICsFEoo0EyQe3ZompPnF3DCS6ikWRMQM2lYqrUO8BGXPCadcmfjNOudDZy9FiOjXyr4rrAmIcTfmQ9PX3ih4/BZkBKpP/EhMlOPdm1ifELpQ8tZTZf7prFa2Fi27LxUiPx+SqbtNgVqtZXa9l8bfL1aMXQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=wDqf3BZ8ibbAPiKX9oOdFOG0P14Pgbu62x2xGtd7Yx0=;
+ b=g8yxz8n+ckisaUfUt1bXq1AcbaoHaftdX2/JwxUUHUWm2fJbvWWo3PfuP49ggCFAjXK9n/VgukgyRq3amOOKp2Qm5DEwRlgll1GzpWcQcj1G7aJ3NX7ibAMKhMJAxQNrBmVS2YH5pcYdGDetyX7lbHg5eM2H+m3OuM83ygoV3a8DLz2UmwBf3lnadjMioGJ2aQdtsynOlTZPfklsETA17yRGjNxdthqnpY737tl8pMTrLqptAOZoHElbxOCB7jCLF7z+QAwLtMzZCIvcfhnzB8TK/HWFD6+MydoC8nvsrHuHrueFI0I8TrOFompWXNMBZ07EtXBKacuN0jTEB26H1w==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
+ header.d=amd.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=wDqf3BZ8ibbAPiKX9oOdFOG0P14Pgbu62x2xGtd7Yx0=;
+ b=cTz7ODzF4tXNSlpjOdce/OfBnkKt5cOyZSXO3SSjPaESlqpdV/LU0Q9f4+1El/TOK1jZhfGbjbkmm4hsMESyUrOJMqQz+eW9OrceiIT7Kh8tr48nI6oq8j+ooAcelpSvYi2yieEh2F3oVi6PdMIQjmCN8r5aHKWkoIzDiOGw24E=
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=amd.com;
+Received: from DM4PR12MB5229.namprd12.prod.outlook.com (2603:10b6:5:398::12)
+ by BYAPR12MB4742.namprd12.prod.outlook.com (2603:10b6:a03:9f::33) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5546.21; Thu, 25 Aug
+ 2022 18:54:29 +0000
+Received: from DM4PR12MB5229.namprd12.prod.outlook.com
+ ([fe80::c175:4c:c0d:1396]) by DM4PR12MB5229.namprd12.prod.outlook.com
+ ([fe80::c175:4c:c0d:1396%4]) with mapi id 15.20.5566.015; Thu, 25 Aug 2022
+ 18:54:29 +0000
+Message-ID: <51298b17-9e12-7a08-7322-594deac52f53@amd.com>
+Date:   Thu, 25 Aug 2022 13:54:26 -0500
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.11.0
+Subject: Re: [PATCH v12 43/46] virt: Add SEV-SNP guest driver
+Content-Language: en-US
+To:     Peter Gonda <pgonda@google.com>,
+        Dionna Amalie Glaze <dionnaglaze@google.com>
+Cc:     Brijesh Singh <brijesh.singh@amd.com>,
+        the arch/x86 maintainers <x86@kernel.org>,
+        LKML <linux-kernel@vger.kernel.org>,
+        "open list:X86 KVM CPUs" <kvm@vger.kernel.org>,
+        linux-efi <linux-efi@vger.kernel.org>,
+        platform-driver-x86@vger.kernel.org, linux-coco@lists.linux.dev,
+        Linux Memory Management List <linux-mm@kvack.org>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Joerg Roedel <jroedel@suse.de>,
+        "H. Peter Anvin" <hpa@zytor.com>, Ard Biesheuvel <ardb@kernel.org>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Sean Christopherson <seanjc@google.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Jim Mattson <jmattson@google.com>,
+        Andy Lutomirski <luto@kernel.org>,
+        Dave Hansen <dave.hansen@linux.intel.com>,
+        Sergio Lopez <slp@redhat.com>,
+        Peter Zijlstra <peterz@infradead.org>,
+        Srinivas Pandruvada <srinivas.pandruvada@linux.intel.com>,
+        David Rientjes <rientjes@google.com>,
+        Dov Murik <dovmurik@linux.ibm.com>,
+        Tobin Feldman-Fitzthum <tobin@ibm.com>,
+        Borislav Petkov <bp@alien8.de>,
+        Michael Roth <michael.roth@amd.com>,
+        Vlastimil Babka <vbabka@suse.cz>,
+        "Kirill A . Shutemov" <kirill.shutemov@linux.intel.com>,
+        Andi Kleen <ak@linux.intel.com>,
+        "Dr . David Alan Gilbert" <dgilbert@redhat.com>,
+        brijesh.ksingh@gmail.com, Tony Luck <tony.luck@intel.com>,
+        Marc Orr <marcorr@google.com>,
+        Kuppuswamy Sathyanarayanan 
+        <sathyanarayanan.kuppuswamy@linux.intel.com>
+References: <20220307213356.2797205-1-brijesh.singh@amd.com>
+ <20220307213356.2797205-44-brijesh.singh@amd.com>
+ <CAAH4kHYm1BhjJXUMH12kzR0Xun=fUTj-3Hy6At0XR_09Bf0Ccw@mail.gmail.com>
+ <CAMkAt6oKQ3CnmNdrJLMWreExkN56t9vs=B883_JD+HtiNYw9HA@mail.gmail.com>
+From:   Tom Lendacky <thomas.lendacky@amd.com>
+In-Reply-To: <CAMkAt6oKQ3CnmNdrJLMWreExkN56t9vs=B883_JD+HtiNYw9HA@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: CH0PR03CA0249.namprd03.prod.outlook.com
+ (2603:10b6:610:e5::14) To DM4PR12MB5229.namprd12.prod.outlook.com
+ (2603:10b6:5:398::12)
 MIME-Version: 1.0
-References: <20220803122655.100254-1-nipun.gupta@amd.com> <20220817150542.483291-1-nipun.gupta@amd.com>
- <20220817150542.483291-3-nipun.gupta@amd.com> <Yv0KHROjESUI59Pd@kroah.com>
- <DM6PR12MB3082D966CFC0FA1C2148D8FAE8719@DM6PR12MB3082.namprd12.prod.outlook.com>
- <YwOEv6107RfU5p+H@kroah.com> <DM6PR12MB3082B4BDD39632264E7532B8E8739@DM6PR12MB3082.namprd12.prod.outlook.com>
- <YwYVhJCSAuYcgj1/@kroah.com> <20220824233122.GA4068@nvidia.com>
-In-Reply-To: <20220824233122.GA4068@nvidia.com>
-From:   Saravana Kannan <saravanak@google.com>
-Date:   Thu, 25 Aug 2022 11:38:27 -0700
-Message-ID: <CAGETcx846Pomh_DUToncbaOivHMhHrdt-MTVYqkfLUKvM8b=6w@mail.gmail.com>
-Subject: Re: [RFC PATCH v2 2/6] bus/cdx: add the cdx bus driver
-To:     Jason Gunthorpe <jgg@nvidia.com>
-Cc:     Greg KH <gregkh@linuxfoundation.org>,
-        "Gupta, Nipun" <Nipun.Gupta@amd.com>,
-        Robin Murphy <robin.murphy@arm.com>,
-        "robh+dt@kernel.org" <robh+dt@kernel.org>,
-        "krzysztof.kozlowski+dt@linaro.org" 
-        <krzysztof.kozlowski+dt@linaro.org>,
-        "rafael@kernel.org" <rafael@kernel.org>,
-        "eric.auger@redhat.com" <eric.auger@redhat.com>,
-        "alex.williamson@redhat.com" <alex.williamson@redhat.com>,
-        "cohuck@redhat.com" <cohuck@redhat.com>,
-        "Gupta, Puneet (DCG-ENG)" <puneet.gupta@amd.com>,
-        "song.bao.hua@hisilicon.com" <song.bao.hua@hisilicon.com>,
-        "mchehab+huawei@kernel.org" <mchehab+huawei@kernel.org>,
-        "maz@kernel.org" <maz@kernel.org>,
-        "f.fainelli@gmail.com" <f.fainelli@gmail.com>,
-        "jeffrey.l.hugo@gmail.com" <jeffrey.l.hugo@gmail.com>,
-        "Michael.Srba@seznam.cz" <Michael.Srba@seznam.cz>,
-        "mani@kernel.org" <mani@kernel.org>,
-        "yishaih@nvidia.com" <yishaih@nvidia.com>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "devicetree@vger.kernel.org" <devicetree@vger.kernel.org>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "okaya@kernel.org" <okaya@kernel.org>,
-        "Anand, Harpreet" <harpreet.anand@amd.com>,
-        "Agarwal, Nikhil" <nikhil.agarwal@amd.com>,
-        "Simek, Michal" <michal.simek@amd.com>,
-        "git (AMD-Xilinx)" <git@amd.com>
-Content-Type: text/plain; charset="UTF-8"
-X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-        T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL
-        autolearn=unavailable autolearn_force=no version=3.4.6
+X-MS-PublicTrafficType: Email
+X-MS-Office365-Filtering-Correlation-Id: a8e91f02-b9d5-49b5-091e-08da86cb3d70
+X-MS-TrafficTypeDiagnostic: BYAPR12MB4742:EE_
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: q4RvBjkxWnZMvJ2Xbr828CTXQtZZDPkqqcmT1YjeolgaTSo19ILJ981MeuY+t3XNfk53qv8yNPxnLgKQ/FoJkW/qBctiuZ8Zp9+wMt5I+uDMrL9R7vNTrB0FvrXi0tjOTkkeHHLMAo9xI9/Cw3F3Afv8YvGCrwUKCpS8GRQAmDOzWPn29sMgBwvt6ZaEXE2SB8v26HIRqoIG0vN3JIvxxhBSuDd6upFrSI+eUR1u1fx75xt8PXRJJOdtFW9LyzOrpuMR3T8ezxXhhIiR1hjSNCBndShMMeL/SiPz6uYIzk2xxU2nH+go7d1UzfgPnqR9+rN5o++URfkInX+WW/jYwuEEidcRYc45E1cKkYKzYAENsb7khmDKI0UEiRxCeIuCAMMTGGEtNLmVIN3rhIRY1MvfZWbka/4yPyiaXi8ck0eQVkeml1HequR1/ZxQqbUoNSykmpYsMEbVPVAhemwIvxOFAq88+tQAjgy1hBBS+G32vwenRJLSfoGcTLpxGd0wTN820tC93wibvGts3ys2d3izcC+khjdEfG4kjGXvrv5+SvuhQj9mUH3Ib+cjoD+lhUJuuiCTF0kmuhHSzn8O2GhwVsgNHiXbTOf6AxHkhedQBajGkXYSqP1OJcwPRz0lDznoPGRH/E8Pyw4O0ZMRI+DSO26U1b2WoWM5zLZD+gG0FwI0cAh2OsCiFKv0M0rOP034kCFZrctE4ZX8SNkFN3tMnPsqsQ7gDz0puM4/WhzaMFy+s94Lv5H5LEgdJmZ8ELwoX8m80Rd7ZE7ui9BSczEMWR4PmGqaWUQawkNleiA=
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM4PR12MB5229.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230016)(4636009)(39860400002)(376002)(396003)(136003)(346002)(366004)(54906003)(66946007)(66556008)(110136005)(6486002)(316002)(66476007)(31686004)(4326008)(8936002)(8676002)(5660300002)(41300700001)(7406005)(7416002)(478600001)(36756003)(6666004)(186003)(53546011)(6506007)(2616005)(83380400001)(6512007)(26005)(2906002)(38100700002)(31696002)(86362001)(45980500001)(43740500002);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?VGpJdW5qL2RKTnlQbytnblA3TDVVREhQYmRJT1ZFalhuZ0V4SVhQYkp1ZmU2?=
+ =?utf-8?B?aThFclZpYU1pZXJqQ2pWbS9BajdHZUVoOUdYQjRkMDJBTHk3U3ZLZXJJSkRn?=
+ =?utf-8?B?WGg4M09aZngySkJNWnpnMEtpVTF0UUZoY3VUZWUyL3hoU1pZZGhwTkFod3ZV?=
+ =?utf-8?B?Rk5FWFU3MnRhM1B3QzVqNldhYTFuaDVaU3VVaWt5UHBBTDRBbkg2aGI2Y0dM?=
+ =?utf-8?B?ZHhDVWxrNzBZQllwNWlpYnd2cVVpdi9HQVBjQkQydDl1QnNkT0p6SVhVdmlw?=
+ =?utf-8?B?YXlJR3V5OVFTTkN4S016RTh1NGppM094VXM4WWx5aVYxY3NPZGZJWGF5Zmcv?=
+ =?utf-8?B?ZUJvNDdqQUkySTQ3L3VDYWIzN005YUE5RVQ2bVJZZHpVTkt3c3doL0s2SWdV?=
+ =?utf-8?B?T3A0MWM0L0RULzhPakFvZ0FWQW1Hd2lwSWF1TGMxdzBMM1hvT0xFOUd3eHlq?=
+ =?utf-8?B?Zmh5VHk2dUZTaC9RSUs4Z242UTQrQ0NhZGZLTExWMWtZSWFJYTBGbUlBNlhx?=
+ =?utf-8?B?MWdLdExYZStDVEVhYU5KRld1dmQ2ckpIUTJQa01EV3NiL0pnVVhVaWVKUHQ2?=
+ =?utf-8?B?bjZYZXBlblVwdVhkQ0M5RXRDTEJ4L3FUanBEV294RFhDZXR4a2JyMms1SDlZ?=
+ =?utf-8?B?YTFXdnQvMGNzZjNmR2lXK2daSWRiRmtFLzl4M0MrWmpDOFNzaXNFa3hJTWQv?=
+ =?utf-8?B?RFo0clFUVU9tM2RFMzFuMU1jakV2dWdJNmtYM0c5bStDVkRWVXdKQTdGRDBr?=
+ =?utf-8?B?aHJ0cHVNTGpLeXJSeEZvcWRaak5EUmRwSDczcVhqaFJBcEJ4eE4vbnBGUTFN?=
+ =?utf-8?B?aHdESEVKU0Y4a0hJdjFxQk1WNm1wT2N2ejhHWDczWjRieksvSTJyUFlIT0lK?=
+ =?utf-8?B?YkVHSm56eko5cmdmRC9QM2dwazFEaU9xN1dvT1VaYlpBM1NrQlZZZXJEK0o0?=
+ =?utf-8?B?NWdIS0xFNWwxWVpDcFRjSzc3QTVZbjVYM0RldkxWUCt3RDRSRlo2REExdHB0?=
+ =?utf-8?B?UEtPaWp1aU5pYk5oS3EwVkdXNTdQRTh3L01FWkJpTnZmSW5xNGdwcTJRdUVt?=
+ =?utf-8?B?QzkxTTdzajF4VkYzSnN3RmdMZHNIZkNmb1Z0d0tkdWx1cWk2TGE2QXFvSTlB?=
+ =?utf-8?B?RzFsc3RYME1mWE1GVXZNZExBUStheXEwSjRCa1Z4dXhLdWlkdi9ONlhVQzBv?=
+ =?utf-8?B?RXpJWUt6aHQ3a0tRSVlzeUx4ZVZRZmZiaDBQUUxsTWlFcDAwMnRmcVdQK25H?=
+ =?utf-8?B?Mm9SR0JqcVlKemQrTHlOd0RlK1NqQ3FNaGg5eDB1MUZhN09LbHExOWZ1cGh4?=
+ =?utf-8?B?NDFEckNtZVdFWGJIeFFSdkxpbW5WZ1J3bVlvVjFDTTFLV1psbnlWV05TZUh4?=
+ =?utf-8?B?TjhqMis5THNnWTdwL21MMUIxejgxeFpqRnlWZ1dJRkVsV0tHOHYwUVMwNElP?=
+ =?utf-8?B?b1pocUs1MjdjcEFrZlQ1L04zazNVVmZIcTA4bDYwdWdTVlM4amhNT0dQYjUz?=
+ =?utf-8?B?RzdZSGdJM1NrQTdUakVaYmlhWXNINlBXMCthTkVPeVFsVFZETEhnZWdtRElq?=
+ =?utf-8?B?YVE4UHJYam1zcVdQRnAyZS8xTUtaNGtRUENCdXkrdjFHeFd2bElvVW1EZnVT?=
+ =?utf-8?B?dWlxM1JVVnpqeXV0bzFmWFRvV0t6NnRLbWJXQVNZOHhZNUJyZW1jb3h3Tlla?=
+ =?utf-8?B?VkkxOTNib0lQT1NwSUd5Y2hicTBsOEVwY0FzSEh1YzRmSmR0TkpvOWt5dXdQ?=
+ =?utf-8?B?bWFZMzB6b0pmVzFNK0ZHV3c3c1FjOEpIVEdLQmpyb0xhZW8vV1NPZzBFakx1?=
+ =?utf-8?B?OE80RUd1Z0NEdm4zWXdqSHBiZGE4RW9ZYkNzRHNjR2ptaENNWEw0U1Z1Y0JT?=
+ =?utf-8?B?S3FzZC9UL0NDKzV4U0tUc1d1azkvRE9VU1BmQ3F2T21SeksyMC9TM0FkTEdx?=
+ =?utf-8?B?STZZbmhXN2UvKzhaMG1FM093MDE0ZU1yUGp0NStCSStFb0VvTHB6dlA5cHdM?=
+ =?utf-8?B?bGYwSmRkUlRoYW1WYUtGMFExZ3pvaDlvcTYvWmxDNnZaNzArUmU5Tmw3aHc3?=
+ =?utf-8?B?cXdFN3dRNlZBOHIvZk9hbU5rVEtscCt1aTB4ODJ3NDBVczkrWUhkMnU1WVRN?=
+ =?utf-8?Q?8yWnSbNT+YbtzkeVaiAD70a6y?=
+X-OriginatorOrg: amd.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: a8e91f02-b9d5-49b5-091e-08da86cb3d70
+X-MS-Exchange-CrossTenant-AuthSource: DM4PR12MB5229.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 25 Aug 2022 18:54:29.6394
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: h+NV2oIV8ktVImJn3Np3WMHm8EdDNkrbjlS9OBfn2svKwaFrz/VaGUW4LaTtI2foqYwGa/GJAd2humZG2Jmfkw==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: BYAPR12MB4742
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_DNSWL_NONE,
+        RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_PASS,T_SCC_BODY_TEXT_LINE,
+        URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Aug 24, 2022 at 4:31 PM Jason Gunthorpe <jgg@nvidia.com> wrote:
->
-> On Wed, Aug 24, 2022 at 02:11:48PM +0200, Greg KH wrote:
-> > > We can share the RFC in case you are interested in looking at code flow
-> > > using the of_dynamic approach.
-> >
-> > Please no more abuse of the platform device.
->
-> Last time this came up there was some disagreement from the ARM folks,
-> they were not keen on having xx_drivers added all over the place to
-> support the same OF/DT devices just discovered in a different way. It is
-> why ACPI is mapped to platform_device even in some cases.
->
-> I think if you push them down this path they will get resistance to
-> get the needed additional xx_drivers into the needed places.
->
-> > If your device can be discovered by scanning a bus, it is not a platform
-> > device.
->
-> A DT fragment loaded during boot binds a driver using a
-> platform_driver, why should a DT fragment loaded post-boot bind using
-> an XX_driver and further why should the CDX way of getting the DT
-> raise to such importantance that it gets its own cdx_driver ?
->
-> In the end the driver does not care about how the DT was loaded.
-> None of these things are on a discoverable bus in any sense like PCI
-> or otherwise. They are devices described by a DT fragement and they
-> take all their parameters from that chunk of DT.
->
-> How the DT was loaded into the system is not a useful distinction that
-> raises the level of needing an entire new set of xx_driver structs all
-> over the tree, IMHO.
+On 8/24/22 14:28, Peter Gonda wrote:
+> On Wed, Aug 24, 2022 at 12:01 PM Dionna Amalie Glaze
+> <dionnaglaze@google.com> wrote:
+>>
+>> Apologies for the necropost, but I noticed strange behavior testing my
+>> own Golang-based wrapper around the /dev/sev-guest driver.
+>>
+>>> +
+>>> +static int handle_guest_request(struct snp_guest_dev *snp_dev, u64 exit_code, int msg_ver,
+>>> +                               u8 type, void *req_buf, size_t req_sz, void *resp_buf,
+>>> +                               u32 resp_sz, __u64 *fw_err)
+>>> +{
+>>> +       unsigned long err;
+>>> +       u64 seqno;
+>>> +       int rc;
+>>> +
+>>> +       /* Get message sequence and verify that its a non-zero */
+>>> +       seqno = snp_get_msg_seqno(snp_dev);
+>>> +       if (!seqno)
+>>> +               return -EIO;
+>>> +
+>>> +       memset(snp_dev->response, 0, sizeof(struct snp_guest_msg));
+>>> +
+>>> +       /* Encrypt the userspace provided payload */
+>>> +       rc = enc_payload(snp_dev, seqno, msg_ver, type, req_buf, req_sz);
+>>> +       if (rc)
+>>> +               return rc;
+>>> +
+>>> +       /* Call firmware to process the request */
+>>> +       rc = snp_issue_guest_request(exit_code, &snp_dev->input, &err);
+>>> +       if (fw_err)
+>>> +               *fw_err = err;
+>>> +
+>>> +       if (rc)
+>>> +               return rc;
+>>> +
+>>
+>> The fw_err is written back regardless of rc, so since err is
+>> uninitialized, you can end up with garbage written back. I've worked
+>> around this by only caring about fw_err when the result is -EIO, but
+>> thought that I should bring this up.
+> 
+> I also noticed that we use a u64 in snp_guest_request_ioctl.fw_err and
+> u32 in sev_issue_cmd.error when these should be errors from the
+> sev_ret_code enum IIUC.
 
-Jason, I see your point or rather the point the ARM folks might have
-made. But in this case, why not use DT overlays to add these devices?
-IIRC there's an in kernel API to add DT overlays. If so, should this
-be more of a FPGA driver that reads FPGA stuff and adds DT overlays?
-That'd at least make a stronger case for why this isn't a separate
-bus.
+The reason for the u64 is that the Extended Guest Request can return a 
+firmware error or a hypervisor error. To distinguish between the two, a 
+firmware error is contained in the lower 32-bits, while a hypervisor error 
+is contained in the upper 32-bits (e.g. when not enough contiguous pages 
+of memory have been supplied).
 
+Thanks,
+Tom
 
--Saravana
+> 
+> We can fix snp_issue_guest_request() to set |fw_err| to zero when it
+> returns 0 but what should we return to userspace if we encounter an
+> error that prevents the FW from even being called? In ` crypto: ccp -
+> Ensure psp_ret is always init'd in __sev_platform_init_locked()` we
+> set the return to -1 so we could continue that convection here and
+> better codify it in the sev_ret_code enum.
+> 
+>>
+>> --
+>> -Dionna Glaze, PhD (she/her)
