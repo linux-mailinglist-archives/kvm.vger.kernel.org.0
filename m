@@ -2,162 +2,518 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 32F505A1CE0
-	for <lists+kvm@lfdr.de>; Fri, 26 Aug 2022 00:59:28 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id D5C3D5A1CF9
+	for <lists+kvm@lfdr.de>; Fri, 26 Aug 2022 01:15:44 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S244468AbiHYW6W (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 25 Aug 2022 18:58:22 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52594 "EHLO
+        id S243718AbiHYXPm (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 25 Aug 2022 19:15:42 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53810 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S244444AbiHYW6M (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 25 Aug 2022 18:58:12 -0400
-Received: from mail-yw1-x1149.google.com (mail-yw1-x1149.google.com [IPv6:2607:f8b0:4864:20::1149])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BA7B9C6EA7
-        for <kvm@vger.kernel.org>; Thu, 25 Aug 2022 15:58:10 -0700 (PDT)
-Received: by mail-yw1-x1149.google.com with SMTP id 00721157ae682-33da75a471cso98165737b3.20
-        for <kvm@vger.kernel.org>; Thu, 25 Aug 2022 15:58:10 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:reply-to:from:to:cc;
-        bh=FD82s3MMzYB8GBAJIpK/z/0Hk3ArgyOBmCxF7AYV4Cw=;
-        b=ZQhMXb9SCtgugfP2YGQ8gvz7CKQhTwhyoZC4VMPZHBCSmXHYO030MCNd3v3RgyMOy4
-         HfDu3XCP8ZLM9/2iaQzIjq5h+5WyVcqAwWVJvpexrPuhKzO0J2bPEkA4KX9BFrB3nVaR
-         V6bSWzS2bJLU+9zwJnsoiMt4Gg+2ir4kh+SrvFOi0qXsEEE1K6Wx+fuhqR7yDUi3S8nU
-         U+XVhuhk+RBX9NvremewdIM8xAWrJ3z5VPJmfxSq7zMRw+0Mi9naHNo/3vSjaZY1iWaX
-         rytGD8qTy74x7wqSEiwqKZabtnX+/+Z+qTq6gD4dUtMwsixPxlnfASYlV46FmTV2D6cb
-         T6CQ==
+        with ESMTP id S229462AbiHYXPl (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 25 Aug 2022 19:15:41 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7AB9843E57
+        for <kvm@vger.kernel.org>; Thu, 25 Aug 2022 16:15:38 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1661469337;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=pnP/qB8WmkipkkDdmE+1Py5IGWD3/b+anGuFhF93kRs=;
+        b=TsuyrZsNmWLnXUUBWvZwSPUCojAOagoUHElaZq/JotKscNbkoFDkriy9Jq1iud4OouYqxH
+        6xcbLgaxS0Ik6L+bHPr6RqQ0wRcsadeiWjQhpbgvZp7EhYDobBr1V8VEK1RS6AO0KLcLf2
+        TY0RV9nuqsKin/WPmReyvP1XqGj1iIE=
+Received: from mail-il1-f200.google.com (mail-il1-f200.google.com
+ [209.85.166.200]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_128_GCM_SHA256) id
+ us-mta-572-UEjXdDjLPSGLKGE1vWvKTA-1; Thu, 25 Aug 2022 19:15:36 -0400
+X-MC-Unique: UEjXdDjLPSGLKGE1vWvKTA-1
+Received: by mail-il1-f200.google.com with SMTP id k1-20020a92c241000000b002e9caf63a57so9200806ilo.20
+        for <kvm@vger.kernel.org>; Thu, 25 Aug 2022 16:15:36 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:reply-to:x-gm-message-state:from:to:cc;
-        bh=FD82s3MMzYB8GBAJIpK/z/0Hk3ArgyOBmCxF7AYV4Cw=;
-        b=CijXx9jMvEgrjOznloIdEkbzqbvy+dsy8VPFQOceCkX/+urV39qPlElATR8d87mQye
-         ALLUVPX6B0B1YIqkiDHdp4pao1y8Cw2UO0uaBF9ZkhEXquPwqR39dPNSxfHFY8gdP99V
-         v94T0O94k0k/OoWWz5JXy/62VMB+4pmb3WDxrluI+Td7cZGr4ivTIehcbn3kLMxOdO6v
-         MG7V3eCmhg/rWTd5kOxlhFE7n8UeDwUt+L9NQIJDRwe0aLOaZ0EhuXGCpKa5FF3+cBM7
-         gQ1ZHCKK4BxKkmabvaIzH7SQYm/CC2H8q0bUn9i0C2OHci9rEXLNaG8y88TINd3vOxZh
-         diiA==
-X-Gm-Message-State: ACgBeo0CdSMQzUJb7AwzJ0jAPu+8fsYcOC48SZi6w+nJBklb26hUyKkt
-        d7SHJPB5JdPk0nJNTJWkEHlNxoMHz517
-X-Google-Smtp-Source: AA6agR6aWBJdKui7yBrmJ2lo0BpaVF02BfZ3BGPvA+/LtdtBaRS2qe9gMialtqsarsKsgczy3mWWisqFHQXQ
-X-Received: from mizhang-super.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:1071])
- (user=mizhang job=sendgmr) by 2002:a25:bb44:0:b0:677:24c:308f with SMTP id
- b4-20020a25bb44000000b00677024c308fmr5394791ybk.433.1661468290101; Thu, 25
- Aug 2022 15:58:10 -0700 (PDT)
-Reply-To: Mingwei Zhang <mizhang@google.com>
-Date:   Thu, 25 Aug 2022 22:57:55 +0000
-In-Reply-To: <20220825225755.907001-1-mizhang@google.com>
-Mime-Version: 1.0
-References: <20220825225755.907001-1-mizhang@google.com>
-X-Mailer: git-send-email 2.37.2.672.g94769d06f0-goog
-Message-ID: <20220825225755.907001-4-mizhang@google.com>
-Subject: [PATCH v4 3/3] KVM: x86: Print guest pgd in kvm_nested_vmenter()
-From:   Mingwei Zhang <mizhang@google.com>
-To:     Sean Christopherson <seanjc@google.com>,
-        Paolo Bonzini <pbonzini@redhat.com>
-Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Mingwei Zhang <mizhang@google.com>,
-        David Matlack <dmatlack@google.com>
-Content-Type: text/plain; charset="UTF-8"
-X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        h=content-transfer-encoding:mime-version:organization:references
+         :in-reply-to:message-id:subject:cc:to:from:date:x-gm-message-state
+         :from:to:cc;
+        bh=pnP/qB8WmkipkkDdmE+1Py5IGWD3/b+anGuFhF93kRs=;
+        b=AlRl6mrlBFfGMoyy4FPSwSffwvuUIGvhmTUeGsbuEdiVJaI138dp+fwU4UXnuJuAHb
+         oYWPq9wqfHlETBu1XWYvW1JbZFblRKLRa0zqH1bNHfPoNgh1PnTjDLBDiS9pGJGV3V76
+         moKNiBwp72jN1i14lZTJ3p8Ch7aQPHuzqpNZrUys8a0bvKA71Iv9vVy+60e/+Zs7se9x
+         /oQ/i2tFlLDhJDZ9Iw5s7aVxV9W8VkdgLQL0Xaa09CUZyipEPot39c8kr6VGwbtunEkX
+         37SGQRPUVSDOiJ8UGtIERz6Z3GbYx8nW+UITRTRGw3TsxL/IiJdBQkvOGfjMBzSZi1BT
+         BiJA==
+X-Gm-Message-State: ACgBeo0+DboGzFeO1gFtp18obbyOG9qffrBSc26LmAS1ZyuKtN+oB75e
+        p+uyQP6AZaRcilgUKpQn+rRLf9ze5s2BPI2ZXFyn9tiKSYFZfLWsLJucNmCFMpzE9NYMK/0yweH
+        dX3bYCH2209Jn
+X-Received: by 2002:a02:9f0d:0:b0:349:ea4f:af3a with SMTP id z13-20020a029f0d000000b00349ea4faf3amr2839123jal.214.1661469334819;
+        Thu, 25 Aug 2022 16:15:34 -0700 (PDT)
+X-Google-Smtp-Source: AA6agR6mLWHpA1xXpnVkkf5UDlIkiRC7a6ABVYxpA+bNXS6mTAZeUp1UDH0RU0OvzWAODi/97CdzLg==
+X-Received: by 2002:a02:9f0d:0:b0:349:ea4f:af3a with SMTP id z13-20020a029f0d000000b00349ea4faf3amr2839100jal.214.1661469334401;
+        Thu, 25 Aug 2022 16:15:34 -0700 (PDT)
+Received: from redhat.com ([38.15.36.239])
+        by smtp.gmail.com with ESMTPSA id e18-20020a056638021200b00349e045f08asm252140jaq.172.2022.08.25.16.15.33
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 25 Aug 2022 16:15:33 -0700 (PDT)
+Date:   Thu, 25 Aug 2022 17:15:32 -0600
+From:   Alex Williamson <alex.williamson@redhat.com>
+To:     Joao Martins <joao.m.martins@oracle.com>
+Cc:     Yishai Hadas <yishaih@nvidia.com>, jgg@nvidia.com,
+        saeedm@nvidia.com, kvm@vger.kernel.org, netdev@vger.kernel.org,
+        kuba@kernel.org, kevin.tian@intel.com, leonro@nvidia.com,
+        maorg@nvidia.com, cohuck@redhat.com
+Subject: Re: [PATCH V4 vfio 04/10] vfio: Add an IOVA bitmap support
+Message-ID: <20220825171532.0123cbac.alex.williamson@redhat.com>
+In-Reply-To: <b230f8e1-1519-3164-fe0e-abf1aa55e5d4@oracle.com>
+References: <20220815151109.180403-1-yishaih@nvidia.com>
+        <20220815151109.180403-5-yishaih@nvidia.com>
+        <20220825132701.07f9a1c3.alex.williamson@redhat.com>
+        <b230f8e1-1519-3164-fe0e-abf1aa55e5d4@oracle.com>
+Organization: Red Hat
+MIME-Version: 1.0
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL
-        autolearn=unavailable autolearn_force=no version=3.4.6
+        SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Print guest pgd in kvm_nested_vmenter() to enrich the information for
-tracing. When tdp is enabled, print the value of tdp page table (EPT/NPT);
-when tdp is disabled, print the value of non-nested CR3.
+On Thu, 25 Aug 2022 23:24:39 +0100
+Joao Martins <joao.m.martins@oracle.com> wrote:
 
-Suggested-by: Sean Christopherson <seanjc@google.com>
-Signed-off-by: Mingwei Zhang <mizhang@google.com>
----
- arch/x86/kvm/svm/nested.c |  2 ++
- arch/x86/kvm/trace.h      | 13 +++++++++----
- arch/x86/kvm/vmx/nested.c |  2 ++
- 3 files changed, 13 insertions(+), 4 deletions(-)
+> On 8/25/22 20:27, Alex Williamson wrote:
+> > On Mon, 15 Aug 2022 18:11:03 +0300
+> > Yishai Hadas <yishaih@nvidia.com> wrote:
+> >   
+> >> From: Joao Martins <joao.m.martins@oracle.com>
+> >>
+> >> The new facility adds a bunch of wrappers that abstract how an IOVA
+> >> range is represented in a bitmap that is granulated by a given
+> >> page_size. So it translates all the lifting of dealing with user
+> >> pointers into its corresponding kernel addresses backing said user
+> >> memory into doing finally the (non-atomic) bitmap ops to change
+> >> various bits.
+> >>
+> >> The formula for the bitmap is:
+> >>
+> >>    data[(iova / page_size) / 64] & (1ULL << (iova % 64))
+> >>
+> >> Where 64 is the number of bits in a unsigned long (depending on arch)
+> >>
+> >> It introduces an IOVA iterator that uses a windowing scheme to minimize
+> >> the pinning overhead, as opposed to be pinning it on demand 4K at a  
+> > 
+> > s/ be / /
+> >   
+> Will fix.
+> 
+> >> time. So on a 512G and with base page size it would iterate in ranges of
+> >> 64G at a time, while pinning 512 pages at a time leading to fewer  
+> > 
+> > "on a 512G" what?  The overall size of the IOVA range is somewhat
+> > irrelevant here and it's unclear where 64G comes from without reading
+> > deeper into the series.  Maybe this should be something like:
+> > 
+> > "Assuming a 4K kernel page and 4K requested page size, we can use a
+> > single kernel page to hold 512 page pointers, mapping 2M of bitmap,
+> > representing 64G of IOVA space."
+> >   
+> Much more readable indeed. Will use that.
+> 
+> >> atomics (specially if the underlying user memory are hugepages).
+> >>
+> >> An example usage of these helpers for a given @base_iova, @page_size, @length  
+> > 
+> > Several long lines here that could be wrapped.
+> >   
+> It's already wrapped (by my editor) and also at 75 columns. I can do a
+> bit shorter if that's hurting readability.
 
-diff --git a/arch/x86/kvm/svm/nested.c b/arch/x86/kvm/svm/nested.c
-index 835c508eed8e..05b7994244c5 100644
---- a/arch/x86/kvm/svm/nested.c
-+++ b/arch/x86/kvm/svm/nested.c
-@@ -787,6 +787,8 @@ int enter_svm_guest_mode(struct kvm_vcpu *vcpu, u64 vmcb12_gpa,
- 			       vmcb12->control.int_ctl,
- 			       vmcb12->control.event_inj,
- 			       vmcb12->control.nested_ctl,
-+			       vmcb12->control.nested_cr3,
-+			       vmcb12->save.cr3,
- 			       KVM_ISA_SVM);
- 
- 	trace_kvm_nested_intercepts(vmcb12->control.intercepts[INTERCEPT_CR] & 0xffff,
-diff --git a/arch/x86/kvm/trace.h b/arch/x86/kvm/trace.h
-index e7f0da9474f0..b2be0348bb14 100644
---- a/arch/x86/kvm/trace.h
-+++ b/arch/x86/kvm/trace.h
-@@ -591,9 +591,10 @@ TRACE_EVENT(kvm_pv_eoi,
-  */
- TRACE_EVENT(kvm_nested_vmenter,
- 	    TP_PROTO(__u64 rip, __u64 vmcb, __u64 nested_rip, __u32 int_ctl,
--		     __u32 event_inj, bool tdp_enabled, __u32 isa),
-+		     __u32 event_inj, bool tdp_enabled, __u64 guest_tdp,
-+		     __u64 guest_cr3, __u32 isa),
- 	    TP_ARGS(rip, vmcb, nested_rip, int_ctl, event_inj, tdp_enabled,
--		    isa),
-+		    guest_tdp, guest_cr3, isa),
- 
- 	TP_STRUCT__entry(
- 		__field(	__u64,		rip		)
-@@ -602,6 +603,7 @@ TRACE_EVENT(kvm_nested_vmenter,
- 		__field(	__u32,		int_ctl		)
- 		__field(	__u32,		event_inj	)
- 		__field(	bool,		tdp_enabled	)
-+		__field(	__u64,		guest_pgd	)
- 		__field(	__u32,		isa		)
- 	),
- 
-@@ -612,11 +614,13 @@ TRACE_EVENT(kvm_nested_vmenter,
- 		__entry->int_ctl	= int_ctl;
- 		__entry->event_inj	= event_inj;
- 		__entry->tdp_enabled	= tdp_enabled;
-+		__entry->guest_pgd	= tdp_enabled ? guest_tdp : guest_cr3;
- 		__entry->isa		= isa;
- 	),
- 
- 	TP_printk("rip: 0x%016llx %s: 0x%016llx nested_rip: 0x%016llx "
--		  "int_ctl: 0x%08x event_inj: 0x%08x nested_%s: %s",
-+		  "int_ctl: 0x%08x event_inj: 0x%08x nested_%s: %s, "
-+		  "guest_pgd: 0x%016llx",
- 		__entry->rip,
- 		__entry->isa == KVM_ISA_VMX ? "vmcs" : "vmcb",
- 		__entry->vmcb,
-@@ -624,7 +628,8 @@ TRACE_EVENT(kvm_nested_vmenter,
- 		__entry->int_ctl,
- 		__entry->event_inj,
- 		__entry->isa == KVM_ISA_VMX ? "ept" : "npt",
--		__entry->tdp_enabled ? "on" : "off")
-+		__entry->tdp_enabled ? "on" : "off",
-+		__entry->guest_pgd)
- );
- 
- TRACE_EVENT(kvm_nested_intercepts,
-diff --git a/arch/x86/kvm/vmx/nested.c b/arch/x86/kvm/vmx/nested.c
-index f72fe9452391..f963e5ce0a28 100644
---- a/arch/x86/kvm/vmx/nested.c
-+++ b/arch/x86/kvm/vmx/nested.c
-@@ -3370,6 +3370,8 @@ enum nvmx_vmentry_status nested_vmx_enter_non_root_mode(struct kvm_vcpu *vcpu,
- 				 vmcs12->guest_intr_status,
- 				 vmcs12->vm_entry_intr_info_field,
- 				 vmcs12->secondary_vm_exec_control & SECONDARY_EXEC_ENABLE_EPT,
-+				 vmcs12->ept_pointer,
-+				 vmcs12->guest_cr3,
- 				 KVM_ISA_VMX);
- 
- 	kvm_service_local_tlb_flush_requests(vcpu);
--- 
-2.37.2.672.g94769d06f0-goog
+78 chars above, but git log indents by another 4 spaces, so they do
+wrap.  Something around 70/72 seems better for commit logs.
+
+> >> and __user @data:
+> >>
+> >> 	ret = iova_bitmap_iter_init(&iter, base_iova, page_size, length, data);
+> >> 	if (ret)
+> >> 		return -ENOMEM;
+> >>
+> >> 	for (; !iova_bitmap_iter_done(&iter) && !ret;
+> >> 	     ret = iova_bitmap_iter_advance(&iter)) {
+> >> 		dirty_reporter_ops(&iter.dirty, iova_bitmap_iova(&iter),
+> >> 				   iova_bitmap_length(&iter));
+> >> 	}
+> >>
+> >> 	iova_bitmap_iter_free(&iter);
+> >>
+> >> An implementation of the lower end -- referred to above as dirty_reporter_ops
+> >> to exemplify -- that is tracking dirty bits would mark an IOVA as dirty
+> >> as following:
+> >>
+> >> 	iova_bitmap_set(&iter.dirty, iova, page_size);
+> >>
+> >> or a contiguous range (example two pages):
+> >>
+> >> 	iova_bitmap_set(&iter.dirty, iova, 2 * page_size);
+> >>
+> >> The facility is intended to be used for user bitmaps representing
+> >> dirtied IOVAs by IOMMU (via IOMMUFD) and PCI Devices (via vfio-pci).
+> >>
+> >> Signed-off-by: Joao Martins <joao.m.martins@oracle.com>
+> >> Signed-off-by: Yishai Hadas <yishaih@nvidia.com>
+> >> ---
+> >>  drivers/vfio/Makefile       |   6 +-
+> >>  drivers/vfio/iova_bitmap.c  | 224 ++++++++++++++++++++++++++++++++++++
+> >>  include/linux/iova_bitmap.h | 189 ++++++++++++++++++++++++++++++
+> >>  3 files changed, 417 insertions(+), 2 deletions(-)
+> >>  create mode 100644 drivers/vfio/iova_bitmap.c
+> >>  create mode 100644 include/linux/iova_bitmap.h
+> >>
+> >> diff --git a/drivers/vfio/Makefile b/drivers/vfio/Makefile
+> >> index 1a32357592e3..1d6cad32d366 100644
+> >> --- a/drivers/vfio/Makefile
+> >> +++ b/drivers/vfio/Makefile
+> >> @@ -1,9 +1,11 @@
+> >>  # SPDX-License-Identifier: GPL-2.0
+> >>  vfio_virqfd-y := virqfd.o
+> >>  
+> >> -vfio-y += vfio_main.o
+> >> -
+> >>  obj-$(CONFIG_VFIO) += vfio.o
+> >> +
+> >> +vfio-y := vfio_main.o \
+> >> +          iova_bitmap.o \
+> >> +
+> >>  obj-$(CONFIG_VFIO_VIRQFD) += vfio_virqfd.o
+> >>  obj-$(CONFIG_VFIO_IOMMU_TYPE1) += vfio_iommu_type1.o
+> >>  obj-$(CONFIG_VFIO_IOMMU_SPAPR_TCE) += vfio_iommu_spapr_tce.o
+> >> diff --git a/drivers/vfio/iova_bitmap.c b/drivers/vfio/iova_bitmap.c
+> >> new file mode 100644
+> >> index 000000000000..6b6008ef146c
+> >> --- /dev/null
+> >> +++ b/drivers/vfio/iova_bitmap.c
+> >> @@ -0,0 +1,224 @@
+> >> +// SPDX-License-Identifier: GPL-2.0
+> >> +/*
+> >> + * Copyright (c) 2022, Oracle and/or its affiliates.
+> >> + * Copyright (c) 2021-2022, NVIDIA CORPORATION & AFFILIATES. All rights reserved
+> >> + */
+> >> +#include <linux/iova_bitmap.h>
+> >> +#include <linux/highmem.h>
+> >> +
+> >> +#define BITS_PER_PAGE (PAGE_SIZE * BITS_PER_BYTE)
+> >> +
+> >> +static void iova_bitmap_iter_put(struct iova_bitmap_iter *iter);
+> >> +
+> >> +/*
+> >> + * Converts a relative IOVA to a bitmap index.
+> >> + * The bitmap is viewed an array of u64, and each u64 represents  
+> > 
+> > "The bitmap is viewed as an u64 array and each u64 represents"
+> >   
+> Will use that.
+> 
+> >> + * a range of IOVA, and the whole pinned pages to the range window.  
+> > 
+> > I think this phrase after the comma is trying to say something about the
+> > windowed mapping, but I don't know what.
+> >   
+> Yes. doesn't add much in the context of the function.
+> 
+> > This function provides the index into that u64 array for a given IOVA
+> > offset.
+> >   
+> I'll use this instead.
+> 
+> >> + * Relative IOVA means relative to the iter::dirty base IOVA (stored
+> >> + * in dirty::iova). All computations in this file are done using
+> >> + * relative IOVAs and thus avoid an extra subtraction against
+> >> + * dirty::iova. The user API iova_bitmap_set() always uses a regular
+> >> + * absolute IOVAs.  
+> > 
+> > So why don't we use variables that make it clear when an IOVA is an
+> > IOVA and when it's an offset?
+> >   
+> I was just sticking the name @offset to how we iterate towards the u64s
+> to avoid confusion. Should I switch to offset here I should probably change
+> @offset of the struct into something else. But I see you suggested something
+> like that too further below.
+> 
+> >> + */
+> >> +static unsigned long iova_bitmap_iova_to_index(struct iova_bitmap_iter *iter,
+> >> +					       unsigned long iova)  
+> > 
+> > iova_bitmap_offset_to_index(... unsigned long offset)?
+> >   
+> >> +{OK.  
+> 
+> >> +	unsigned long pgsize = 1 << iter->dirty.pgshift;
+> >> +
+> >> +	return iova / (BITS_PER_TYPE(*iter->data) * pgsize);  
+> > 
+> > Why do we name the bitmap "data" rather than "bitmap"?
+> >   
+> I was avoid overusing the word bitmap given structure is already called @bitmap.
+> At the end of the day it's a user data pointer. But I can call it @bitmap.
+
+@data is not very descriptive, and finding a pointer to a bitmap inside
+a struct iova_bitmap feels like a fairly natural thing to me ;)
+
+> > Why do we call the mapped section "dirty" rather than "mapped"?  It's
+> > not necessarily dirty, it's just the window that's current mapped.
+> >   
+> Good point. Dirty is just what we tracked, but the structure ::dirty is closer
+> to representing what's actually mapped yes. I'll switch to mapped.
+> 
+> >> +}
+> >> +
+> >> +/*
+> >> + * Converts a bitmap index to a *relative* IOVA.
+> >> + */
+> >> +static unsigned long iova_bitmap_index_to_iova(struct iova_bitmap_iter *iter,
+> >> +					       unsigned long index)  
+> > 
+> > iova_bitmap_index_to_offset()?
+> >   
+> ack
+> 
+> >> +{
+> >> +	unsigned long pgshift = iter->dirty.pgshift;
+> >> +
+> >> +	return (index * BITS_PER_TYPE(*iter->data)) << pgshift;
+> >> +}
+> >> +
+> >> +/*
+> >> + * Pins the bitmap user pages for the current range window.
+> >> + * This is internal to IOVA bitmap and called when advancing the
+> >> + * iterator.
+> >> + */
+> >> +static int iova_bitmap_iter_get(struct iova_bitmap_iter *iter)
+> >> +{
+> >> +	struct iova_bitmap *dirty = &iter->dirty;
+> >> +	unsigned long npages;
+> >> +	u64 __user *addr;
+> >> +	long ret;
+> >> +
+> >> +	/*
+> >> +	 * @offset is the cursor of the currently mapped u64 words  
+> > 
+> > So it's an index?  I don't know what a cursor is.    
+> 
+> In my "english" 'cursor' as a synonym for index yes.
+> 
+> > If we start using
+> > "offset" to describe a relative iova, maybe this becomes something more
+> > descriptive, mapped_base_index?
+> >   
+> I am not very fond of long names, @mapped_index maybe hmm
+> 
+> >> +	 * that we have access. And it indexes u64 bitmap word that is
+> >> +	 * mapped. Anything before @offset is not mapped. The range
+> >> +	 * @offset .. @count is mapped but capped at a maximum number
+> >> +	 * of pages.  
+> > 
+> > @total_indexes rather than @count maybe?
+> >   
+> It's still a count of indexes, I thought @count was explicit already without
+> being too wordy. I can suffix with indexes if going with mapped_index. Or maybe
+> @mapped_count maybe
+
+I was trying to get "index" in there somehow to make it stupid obvious
+that it's a count of indexes.
+
+> >> +	 */
+> >> +	npages = DIV_ROUND_UP((iter->count - iter->offset) *
+> >> +			      sizeof(*iter->data), PAGE_SIZE);
+> >> +
+> >> +	/*
+> >> +	 * We always cap at max number of 'struct page' a base page can fit.
+> >> +	 * This is, for example, on x86 means 2M of bitmap data max.
+> >> +	 */
+> >> +	npages = min(npages,  PAGE_SIZE / sizeof(struct page *));
+> >> +	addr = iter->data + iter->offset;  
+> > 
+> > Subtle pointer arithmetic.
+> >   
+> >> +	ret = pin_user_pages_fast((unsigned long)addr, npages,
+> >> +				  FOLL_WRITE, dirty->pages);
+> >> +	if (ret <= 0)
+> >> +		return -EFAULT;
+> >> +
+> >> +	dirty->npages = (unsigned long)ret;
+> >> +	/* Base IOVA where @pages point to i.e. bit 0 of the first page */
+> >> +	dirty->iova = iova_bitmap_iova(iter);  
+> > 
+> > If we're operating on an iterator, wouldn't convention suggest this is
+> > an iova_bitmap_itr_FOO function?  mapped_iova perhaps.
+> >   
+> 
+> Yes.
+> 
+> Given your earlier comment, mapped iova is a bit more obvious.
+> 
+> >> +
+> >> +	/*
+> >> +	 * offset of the page where pinned pages bit 0 is located.
+> >> +	 * This handles the case where the bitmap is not PAGE_SIZE
+> >> +	 * aligned.
+> >> +	 */
+> >> +	dirty->start_offset = offset_in_page(addr);  
+> > 
+> > Maybe pgoff to avoid confusion with relative iova offsets.
+> >   
+> Will fix. And it's also convention in mm code, so I should stick with that.
+> 
+> > It seems suspect that the length calculations don't take this into
+> > account.
+> >   
+> The iova/length/indexes functions only work over bit/iova "quantity" and indexing of it
+> without needing to know where the first bit of the mapped range starts. So the pgoff
+> is only important when we actually set bits on the bitmap i.e. iova_bitmap_set().
+
+Ok
+
+> >> +	return 0;
+> >> +}
+> >> +
+> >> +/*
+> >> + * Unpins the bitmap user pages and clears @npages
+> >> + * (un)pinning is abstracted from API user and it's done
+> >> + * when advancing or freeing the iterator.
+> >> + */
+> >> +static void iova_bitmap_iter_put(struct iova_bitmap_iter *iter)
+> >> +{
+> >> +	struct iova_bitmap *dirty = &iter->dirty;
+> >> +
+> >> +	if (dirty->npages) {
+> >> +		unpin_user_pages(dirty->pages, dirty->npages);
+> >> +		dirty->npages = 0;
+> >> +	}
+> >> +}
+> >> +
+> >> +int iova_bitmap_iter_init(struct iova_bitmap_iter *iter,
+> >> +			  unsigned long iova, unsigned long length,
+> >> +			  unsigned long page_size, u64 __user *data)
+> >> +{
+> >> +	struct iova_bitmap *dirty = &iter->dirty;
+> >> +
+> >> +	memset(iter, 0, sizeof(*iter));
+> >> +	dirty->pgshift = __ffs(page_size);
+> >> +	iter->data = data;
+> >> +	iter->count = iova_bitmap_iova_to_index(iter, length - 1) + 1;
+> >> +	iter->iova = iova;
+> >> +	iter->length = length;
+> >> +
+> >> +	dirty->iova = iova;
+> >> +	dirty->pages = (struct page **)__get_free_page(GFP_KERNEL);
+> >> +	if (!dirty->pages)
+> >> +		return -ENOMEM;
+> >> +
+> >> +	return iova_bitmap_iter_get(iter);
+> >> +}
+> >> +
+> >> +void iova_bitmap_iter_free(struct iova_bitmap_iter *iter)
+> >> +{
+> >> +	struct iova_bitmap *dirty = &iter->dirty;
+> >> +
+> >> +	iova_bitmap_iter_put(iter);
+> >> +
+> >> +	if (dirty->pages) {
+> >> +		free_page((unsigned long)dirty->pages);
+> >> +		dirty->pages = NULL;
+> >> +	}
+> >> +
+> >> +	memset(iter, 0, sizeof(*iter));
+> >> +}
+> >> +
+> >> +unsigned long iova_bitmap_iova(struct iova_bitmap_iter *iter)
+> >> +{
+> >> +	unsigned long skip = iter->offset;
+> >> +
+> >> +	return iter->iova + iova_bitmap_index_to_iova(iter, skip);
+> >> +}
+> >> +
+> >> +/*
+> >> + * Returns the remaining bitmap indexes count to process for the currently pinned
+> >> + * bitmap pages.
+> >> + */
+> >> +static unsigned long iova_bitmap_iter_remaining(struct iova_bitmap_iter *iter)  
+> > 
+> > iova_bitmap_iter_mapped_remaining()?
+> >   
+> Yes.
+> 
+> >> +{
+> >> +	unsigned long remaining = iter->count - iter->offset;
+> >> +
+> >> +	remaining = min_t(unsigned long, remaining,
+> >> +		     (iter->dirty.npages << PAGE_SHIFT) / sizeof(*iter->data));
+> >> +
+> >> +	return remaining;
+> >> +}
+> >> +
+> >> +unsigned long iova_bitmap_length(struct iova_bitmap_iter *iter)  
+> > 
+> > iova_bitmap_iter_mapped_length()?
+> >   
+> Yes.
+> 
+> I don't particularly like long names, but doesn't seem to have better alternatives.
+> 
+> Part of the reason the names look 'shortened' was because the object we pass
+> is already an iterator, so it's implicit that we only fetch the under-iteration/mapped
+> iova. Or that was at least the intention.
+
+Yes, but that means you need to look at the function declaration to
+know that it takes an iova_bitmap_iter rather than an iova_bitmap,
+which already means it's not intuitive enough.
+
+> > Maybe it doesn't really make sense to differentiate the iterator from
+> > the bitmap in the API.  In fact, couldn't we reduce the API to simply:
+> > 
+> > int iova_bitmap_init(struct iova_bitmap *bitmap, dma_addr_t iova,
+> > 		     size_t length, size_t page_size, u64 __user *data);
+> > 
+> > int iova_bitmap_for_each(struct iova_bitmap *bitmap, void *data,
+> > 			 int (*fn)(void *data, dma_addr_t iova,
+> > 			 	   size_t length,
+> > 				   struct iova_bitmap *bitmap));
+> > 
+> > void iova_bitmap_free(struct iova_bitmap *bitmap);
+> > 
+> > unsigned long iova_bitmap_set(struct iova_bitmap *bitmap,
+> > 			      dma_addr_t iova, size_t length);
+> > 
+> > Removes the need for the API to have done, advance, iova, and length
+> > functions.
+> >   
+> True, it would be simpler.
+> 
+> Could also allow us to hide the iterator details enterily and switch to
+> container_of() from iova_bitmap pointer. Though, from caller, it would be
+> weird to do:
+> 
+> struct iova_bitmap_iter iter;
+> 
+> iova_bitmap_init(&iter.dirty, ....);
+> 
+> Hmm, maybe not that strange.
+> 
+> Unless you are trying to suggest to merge both struct iova_bitmap and
+> iova_bitmap_iter together? I was trying to keep them separate more for
+> the dirty tracker (IOMMUFD/VFIO, to just be limited to iova_bitmap_set()
+> with the generic infra being the one managing that iterator state in a
+> separate structure.
+
+Not suggesting the be merged, but why does the embedded mapping
+structure need to be exposed to the API?  That's an implementation
+detail that's causing confusion and naming issues for which structure
+is passed and how do we represent that in the function name.  Thanks,
+
+Alex
 
