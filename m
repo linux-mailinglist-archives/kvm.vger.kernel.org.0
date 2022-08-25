@@ -2,54 +2,58 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 467235A1D16
-	for <lists+kvm@lfdr.de>; Fri, 26 Aug 2022 01:25:37 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 379A15A1D26
+	for <lists+kvm@lfdr.de>; Fri, 26 Aug 2022 01:27:27 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S244306AbiHYXZd (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 25 Aug 2022 19:25:33 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39112 "EHLO
+        id S244494AbiHYXZh (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 25 Aug 2022 19:25:37 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39318 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S244336AbiHYXZ1 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 25 Aug 2022 19:25:27 -0400
-Received: from mail-yw1-x1149.google.com (mail-yw1-x1149.google.com [IPv6:2607:f8b0:4864:20::1149])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 572A252821
-        for <kvm@vger.kernel.org>; Thu, 25 Aug 2022 16:25:25 -0700 (PDT)
-Received: by mail-yw1-x1149.google.com with SMTP id 00721157ae682-3328a211611so362777327b3.5
-        for <kvm@vger.kernel.org>; Thu, 25 Aug 2022 16:25:25 -0700 (PDT)
+        with ESMTP id S244389AbiHYXZ3 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 25 Aug 2022 19:25:29 -0400
+Received: from mail-pl1-x64a.google.com (mail-pl1-x64a.google.com [IPv6:2607:f8b0:4864:20::64a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 838AD558CB
+        for <kvm@vger.kernel.org>; Thu, 25 Aug 2022 16:25:27 -0700 (PDT)
+Received: by mail-pl1-x64a.google.com with SMTP id z18-20020a170903019200b00172dd6da065so78395plg.14
+        for <kvm@vger.kernel.org>; Thu, 25 Aug 2022 16:25:27 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
-        h=cc:to:from:subject:message-id:mime-version:date:reply-to:from:to:cc;
-        bh=y2TyZVHOzKZlb9wECS9yMCNcXCNpwqCPWpTxl29+IMY=;
-        b=dkM+A09pjx32V3tjxCAZAaj4iTr2QWwZFTx14MwcUXXnZscAY3fsOcj6h5WXQXxdoD
-         pE2ASAcwod4FD0N0sCT4FjUT0tg9Opertqs8xb3KgjTkUGEmN0krLyCYuuqUGRjMcltU
-         i55uCtWc8Su1TGA6H/a9JTuhvCJcNgBM50Y1A4ihMCdqTUfplBKQUaiEUX2n1Vh4N710
-         3yOt5OJYxOGq7VwXawE8F72ZOkRT8JCFAjGnVJAcUhtb87iwBUwK1cOzoECBWrP6U0Ke
-         ZtEkGqxLhvl3GVE9ZNy1Tt1CBoQxoOnHS9H5jY9/byfHRVWvrd+Zhz17D7ZlFyP3ffIM
-         c1wA==
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:reply-to:from:to:cc;
+        bh=WVoCyvXVPjpeDFUwtieogxiQyL0ixvjoEtsbh2waqlE=;
+        b=mHXxStMO4DZHK2FtRaoroj8IQznCkxrfjK2IZOiS74RFF8ZQPw3apfq9XRiL4XRFfs
+         nU8DfAmlUCU8iH3OqO27wdq1c52LkquaUSjcwJOAIlaEmJHqDbWoH0uaGC4rws/KaQi5
+         Dcj/nDkjjTV/3xZNo+SOJCj7tXNCVpEC7BynKlWiwM8zMC0Lo/XfBgKGsNkomsCEZ0XJ
+         ESZQdKcF+bSNu8nSodFEVPvQvEqDMhNOUpheX7HaioIq2QZEQyLfhOnd2BZBHXrHxphY
+         pjPGcY6GM9/io72BJm0PJVRLgHgrz5fyViZbP7pn0IjMSEMiTNY6NHFeAqLfHvzbQRm6
+         dmww==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=cc:to:from:subject:message-id:mime-version:date:reply-to
-         :x-gm-message-state:from:to:cc;
-        bh=y2TyZVHOzKZlb9wECS9yMCNcXCNpwqCPWpTxl29+IMY=;
-        b=HgVlho/T6ijbY51NBFbaJvL0XlthdGIMbPUkKH55sE2UsbGX9d1wzM74q8orB7mS+b
-         +qXOgbqXwzGx77vaysiHNvxfGEXwN/sP1M2wyNNlj6TrFa0zh3JMFz+MKXfx1r9xdvgM
-         AIdV+8A0o0JIZCjU+Z3VJWEHYww5m4cSSzlBVcEcwgFgcvE8URli2yFh7CYer1bpRCMO
-         cGEacicAl1lVSPrZ95E3uSl2hmGoc8IL/plJcSwPdUG5wSIcJyH8WQf+cujhu7cDQfo3
-         UGVP2pJ3GLWnsRvgHm85F6HmRxUJYmKLowuMbTDM2bZ/4Ar6c/wYIHyMJ197QTq57P6i
-         wv8w==
-X-Gm-Message-State: ACgBeo2ItrbmeXkmAKXVk0c0QQlWz/i2xNQpXSIs+7Yq2rZ8/CwVsCE2
-        UAOCTV+KBOdl2j9YNoo7Knww2hZyqCo=
-X-Google-Smtp-Source: AA6agR4iAX55dcIo3IUqvlfKkqmyFpPiECgmLWRpTah2t3s+pqlFTA2hJbEvjHCDMn3ntt/fdb4I5rKg3Mw=
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:reply-to:x-gm-message-state:from:to:cc;
+        bh=WVoCyvXVPjpeDFUwtieogxiQyL0ixvjoEtsbh2waqlE=;
+        b=757MXFyvR4D36IQFUp4IGVrTe0Xl99JOgi2QxKxc5QEomF/4exPQHZeazRk/ykI6yE
+         lE3093HvN5ow5u2dNSIHB5tPtNezIXNOAxtiTIMIGeuZ7PjR+imOSD3IRPvzJFpT634g
+         i6aFpIa6K1nwkMMRsoNd9T61aFOeuv8Pzme3WUoVUz6rHUiYwifJh6BQgY7/NdWNfGwh
+         SiAfe8L5OgXTCJ4b02ww7ffeWZMhzFzaTYKkoZ8yIsluDf5irfARceav9/xMRETDq0EM
+         fySl0Oyetw966kZBAsm+B14tKd6JtNb86KTZPrYZCJbqcSkrZiI86XOYA9ZXVQGBIgQY
+         iR0Q==
+X-Gm-Message-State: ACgBeo2KA93+EXsPq5P6rmNBfNtGNmTQqPDG7AlhBJpZ8OAgdbi9K7SJ
+        mMJpDiL8wW/DFtmR+A+MfxmhnhoOO4o=
+X-Google-Smtp-Source: AA6agR7lHRKThmk7X2zofozCzMf5HYjABDoBaoUaJOeVidnimKhXexRVRdX5pFXl6DhppVgbzNaR4qooQ6w=
 X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a81:6143:0:b0:335:3076:168e with SMTP id
- v64-20020a816143000000b003353076168emr5851445ywb.460.1661469924695; Thu, 25
- Aug 2022 16:25:24 -0700 (PDT)
+ (user=seanjc job=sendgmr) by 2002:a05:6a00:114f:b0:528:2c7a:634c with SMTP id
+ b15-20020a056a00114f00b005282c7a634cmr1316116pfm.41.1661469926494; Thu, 25
+ Aug 2022 16:25:26 -0700 (PDT)
 Reply-To: Sean Christopherson <seanjc@google.com>
-Date:   Thu, 25 Aug 2022 23:25:15 +0000
+Date:   Thu, 25 Aug 2022 23:25:16 +0000
+In-Reply-To: <20220825232522.3997340-1-seanjc@google.com>
 Mime-Version: 1.0
+References: <20220825232522.3997340-1-seanjc@google.com>
 X-Mailer: git-send-email 2.37.2.672.g94769d06f0-goog
-Message-ID: <20220825232522.3997340-1-seanjc@google.com>
-Subject: [PATCH v5 0/7] KVM: selftests: Implement ucall "pool" (for SEV)
+Message-ID: <20220825232522.3997340-2-seanjc@google.com>
+Subject: [PATCH v5 1/7] KVM: selftests: Consolidate common code for populating
+ ucall struct
 From:   Sean Christopherson <seanjc@google.com>
 To:     Paolo Bonzini <pbonzini@redhat.com>, Marc Zyngier <maz@kernel.org>,
         Anup Patel <anup@brainfault.org>,
@@ -79,73 +83,296 @@ Content-Type: text/plain; charset="UTF-8"
 X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
         SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL
-        autolearn=unavailable autolearn_force=no version=3.4.6
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Non-KVM folks, y'all got pulled in because of the atomic_test_and_set_bit()
-patch.
+Make ucall() a common helper that populates struct ucall, and only calls
+into arch code to make the actually call out to userspace.
 
-Rework the ucall infrastructure to use a pool of ucall structs to pass
-memory instead of using the guest's stack.  For confidential VMs with
-encrypted memory, e.g. SEV, the guest's stack "needs" to be private memory
-and so can't be used to communicate with the host.
+Rename all arch-specific helpers to make it clear they're arch-specific,
+and to avoid collisions with common helpers (one more on its way...)
 
-Convert all implementations to the pool as all of the complexity is hidden
-in common code, and supporting multiple interfaces adds its own kind of
-complexity. 
+Add WRITE_ONCE() to stores in ucall() code (as already done to aarch64
+code in commit 9e2f6498efbb ("selftests: KVM: Handle compiler
+optimizations in ucall")) to prevent clang optimizations breaking ucalls.
 
-Tested on x86 and ARM, compile tested on s390 and RISC-V.
-
-v5:
- - Use less convoluted method of writing per-VM "globals". [Oliver]
- - Add patch to drop ucall_uninit().
-
-v4: https://lore.kernel.org/all/20220824032115.3563686-1-seanjc@google.com
-
-Peter Gonda (2):
-  tools: Add atomic_test_and_set_bit()
-  KVM: selftests: Add ucall pool based implementation
-
-Sean Christopherson (5):
-  KVM: selftests: Consolidate common code for populating ucall struct
-  KVM: selftests: Consolidate boilerplate code in get_ucall()
-  KVM: selftests: Automatically do init_ucall() for non-barebones VMs
-  KVM: selftests: Make arm64's MMIO ucall multi-VM friendly
-  KVM: selftest: Drop now-unnecessary ucall_uninit()
-
- tools/arch/x86/include/asm/atomic.h           |   7 ++
- tools/include/asm-generic/atomic-gcc.h        |  12 +++
- tools/testing/selftests/kvm/Makefile          |   1 +
- .../selftests/kvm/aarch64/arch_timer.c        |   1 -
- .../selftests/kvm/aarch64/debug-exceptions.c  |   1 -
- .../selftests/kvm/aarch64/hypercalls.c        |   1 -
- .../testing/selftests/kvm/aarch64/psci_test.c |   1 -
- .../testing/selftests/kvm/aarch64/vgic_init.c |   2 -
- .../testing/selftests/kvm/aarch64/vgic_irq.c  |   1 -
- tools/testing/selftests/kvm/dirty_log_test.c  |   3 -
- .../selftests/kvm/include/kvm_util_base.h     |  15 +++
- .../selftests/kvm/include/ucall_common.h      |  10 +-
- .../selftests/kvm/kvm_page_table_test.c       |   2 -
- .../testing/selftests/kvm/lib/aarch64/ucall.c | 102 +++---------------
- tools/testing/selftests/kvm/lib/kvm_util.c    |  11 ++
- .../selftests/kvm/lib/perf_test_util.c        |   3 -
- tools/testing/selftests/kvm/lib/riscv/ucall.c |  42 ++------
- tools/testing/selftests/kvm/lib/s390x/ucall.c |  39 ++-----
- .../testing/selftests/kvm/lib/ucall_common.c  | 102 ++++++++++++++++++
- .../testing/selftests/kvm/lib/x86_64/ucall.c  |  39 ++-----
- .../testing/selftests/kvm/memslot_perf_test.c |   1 -
- tools/testing/selftests/kvm/rseq_test.c       |   1 -
- tools/testing/selftests/kvm/steal_time.c      |   1 -
- .../kvm/system_counter_offset_test.c          |   1 -
- 24 files changed, 189 insertions(+), 210 deletions(-)
+Cc: Colton Lewis <coltonlewis@google.com>
+Cc: Peter Gonda <pgonda@google.com>
+Reviewed-by: Andrew Jones <andrew.jones@linux.dev>
+Signed-off-by: Sean Christopherson <seanjc@google.com>
+---
+ tools/testing/selftests/kvm/Makefile          |  1 +
+ .../selftests/kvm/include/ucall_common.h      | 23 ++++++++++++++++---
+ .../testing/selftests/kvm/lib/aarch64/ucall.c | 22 ++++--------------
+ tools/testing/selftests/kvm/lib/riscv/ucall.c | 23 ++++---------------
+ tools/testing/selftests/kvm/lib/s390x/ucall.c | 23 ++++---------------
+ .../testing/selftests/kvm/lib/ucall_common.c  | 20 ++++++++++++++++
+ .../testing/selftests/kvm/lib/x86_64/ucall.c  | 23 ++++---------------
+ 7 files changed, 61 insertions(+), 74 deletions(-)
  create mode 100644 tools/testing/selftests/kvm/lib/ucall_common.c
 
-
-base-commit: 372d07084593dc7a399bf9bee815711b1fb1bcf2
+diff --git a/tools/testing/selftests/kvm/Makefile b/tools/testing/selftests/kvm/Makefile
+index 4c122f1b1737..23649c5d42fc 100644
+--- a/tools/testing/selftests/kvm/Makefile
++++ b/tools/testing/selftests/kvm/Makefile
+@@ -47,6 +47,7 @@ LIBKVM += lib/perf_test_util.c
+ LIBKVM += lib/rbtree.c
+ LIBKVM += lib/sparsebit.c
+ LIBKVM += lib/test_util.c
++LIBKVM += lib/ucall_common.c
+ 
+ LIBKVM_x86_64 += lib/x86_64/apic.c
+ LIBKVM_x86_64 += lib/x86_64/handlers.S
+diff --git a/tools/testing/selftests/kvm/include/ucall_common.h b/tools/testing/selftests/kvm/include/ucall_common.h
+index ee79d180e07e..5a85f5318bbe 100644
+--- a/tools/testing/selftests/kvm/include/ucall_common.h
++++ b/tools/testing/selftests/kvm/include/ucall_common.h
+@@ -24,10 +24,27 @@ struct ucall {
+ 	uint64_t args[UCALL_MAX_ARGS];
+ };
+ 
+-void ucall_init(struct kvm_vm *vm, void *arg);
+-void ucall_uninit(struct kvm_vm *vm);
++void ucall_arch_init(struct kvm_vm *vm, void *arg);
++void ucall_arch_uninit(struct kvm_vm *vm);
++void ucall_arch_do_ucall(vm_vaddr_t uc);
++uint64_t ucall_arch_get_ucall(struct kvm_vcpu *vcpu, struct ucall *uc);
++
+ void ucall(uint64_t cmd, int nargs, ...);
+-uint64_t get_ucall(struct kvm_vcpu *vcpu, struct ucall *uc);
++
++static inline void ucall_init(struct kvm_vm *vm, void *arg)
++{
++	ucall_arch_init(vm, arg);
++}
++
++static inline void ucall_uninit(struct kvm_vm *vm)
++{
++	ucall_arch_uninit(vm);
++}
++
++static inline uint64_t get_ucall(struct kvm_vcpu *vcpu, struct ucall *uc)
++{
++	return ucall_arch_get_ucall(vcpu, uc);
++}
+ 
+ #define GUEST_SYNC_ARGS(stage, arg1, arg2, arg3, arg4)	\
+ 				ucall(UCALL_SYNC, 6, "hello", stage, arg1, arg2, arg3, arg4)
+diff --git a/tools/testing/selftests/kvm/lib/aarch64/ucall.c b/tools/testing/selftests/kvm/lib/aarch64/ucall.c
+index ed237b744690..3630708c32d6 100644
+--- a/tools/testing/selftests/kvm/lib/aarch64/ucall.c
++++ b/tools/testing/selftests/kvm/lib/aarch64/ucall.c
+@@ -21,7 +21,7 @@ static bool ucall_mmio_init(struct kvm_vm *vm, vm_paddr_t gpa)
+ 	return true;
+ }
+ 
+-void ucall_init(struct kvm_vm *vm, void *arg)
++void ucall_arch_init(struct kvm_vm *vm, void *arg)
+ {
+ 	vm_paddr_t gpa, start, end, step, offset;
+ 	unsigned int bits;
+@@ -64,30 +64,18 @@ void ucall_init(struct kvm_vm *vm, void *arg)
+ 	TEST_FAIL("Can't find a ucall mmio address");
+ }
+ 
+-void ucall_uninit(struct kvm_vm *vm)
++void ucall_arch_uninit(struct kvm_vm *vm)
+ {
+ 	ucall_exit_mmio_addr = 0;
+ 	sync_global_to_guest(vm, ucall_exit_mmio_addr);
+ }
+ 
+-void ucall(uint64_t cmd, int nargs, ...)
++void ucall_arch_do_ucall(vm_vaddr_t uc)
+ {
+-	struct ucall uc = {};
+-	va_list va;
+-	int i;
+-
+-	WRITE_ONCE(uc.cmd, cmd);
+-	nargs = min(nargs, UCALL_MAX_ARGS);
+-
+-	va_start(va, nargs);
+-	for (i = 0; i < nargs; ++i)
+-		WRITE_ONCE(uc.args[i], va_arg(va, uint64_t));
+-	va_end(va);
+-
+-	WRITE_ONCE(*ucall_exit_mmio_addr, (vm_vaddr_t)&uc);
++	WRITE_ONCE(*ucall_exit_mmio_addr, uc);
+ }
+ 
+-uint64_t get_ucall(struct kvm_vcpu *vcpu, struct ucall *uc)
++uint64_t ucall_arch_get_ucall(struct kvm_vcpu *vcpu, struct ucall *uc)
+ {
+ 	struct kvm_run *run = vcpu->run;
+ 	struct ucall ucall = {};
+diff --git a/tools/testing/selftests/kvm/lib/riscv/ucall.c b/tools/testing/selftests/kvm/lib/riscv/ucall.c
+index 087b9740bc8f..b1598f418c1f 100644
+--- a/tools/testing/selftests/kvm/lib/riscv/ucall.c
++++ b/tools/testing/selftests/kvm/lib/riscv/ucall.c
+@@ -10,11 +10,11 @@
+ #include "kvm_util.h"
+ #include "processor.h"
+ 
+-void ucall_init(struct kvm_vm *vm, void *arg)
++void ucall_arch_init(struct kvm_vm *vm, void *arg)
+ {
+ }
+ 
+-void ucall_uninit(struct kvm_vm *vm)
++void ucall_arch_uninit(struct kvm_vm *vm)
+ {
+ }
+ 
+@@ -44,27 +44,14 @@ struct sbiret sbi_ecall(int ext, int fid, unsigned long arg0,
+ 	return ret;
+ }
+ 
+-void ucall(uint64_t cmd, int nargs, ...)
++void ucall_arch_do_ucall(vm_vaddr_t uc)
+ {
+-	struct ucall uc = {
+-		.cmd = cmd,
+-	};
+-	va_list va;
+-	int i;
+-
+-	nargs = min(nargs, UCALL_MAX_ARGS);
+-
+-	va_start(va, nargs);
+-	for (i = 0; i < nargs; ++i)
+-		uc.args[i] = va_arg(va, uint64_t);
+-	va_end(va);
+-
+ 	sbi_ecall(KVM_RISCV_SELFTESTS_SBI_EXT,
+ 		  KVM_RISCV_SELFTESTS_SBI_UCALL,
+-		  (vm_vaddr_t)&uc, 0, 0, 0, 0, 0);
++		  uc, 0, 0, 0, 0, 0);
+ }
+ 
+-uint64_t get_ucall(struct kvm_vcpu *vcpu, struct ucall *uc)
++uint64_t ucall_arch_get_ucall(struct kvm_vcpu *vcpu, struct ucall *uc)
+ {
+ 	struct kvm_run *run = vcpu->run;
+ 	struct ucall ucall = {};
+diff --git a/tools/testing/selftests/kvm/lib/s390x/ucall.c b/tools/testing/selftests/kvm/lib/s390x/ucall.c
+index 73dc4e21190f..114cb4af295f 100644
+--- a/tools/testing/selftests/kvm/lib/s390x/ucall.c
++++ b/tools/testing/selftests/kvm/lib/s390x/ucall.c
+@@ -6,34 +6,21 @@
+  */
+ #include "kvm_util.h"
+ 
+-void ucall_init(struct kvm_vm *vm, void *arg)
++void ucall_arch_init(struct kvm_vm *vm, void *arg)
+ {
+ }
+ 
+-void ucall_uninit(struct kvm_vm *vm)
++void ucall_arch_uninit(struct kvm_vm *vm)
+ {
+ }
+ 
+-void ucall(uint64_t cmd, int nargs, ...)
++void ucall_arch_do_ucall(vm_vaddr_t uc)
+ {
+-	struct ucall uc = {
+-		.cmd = cmd,
+-	};
+-	va_list va;
+-	int i;
+-
+-	nargs = min(nargs, UCALL_MAX_ARGS);
+-
+-	va_start(va, nargs);
+-	for (i = 0; i < nargs; ++i)
+-		uc.args[i] = va_arg(va, uint64_t);
+-	va_end(va);
+-
+ 	/* Exit via DIAGNOSE 0x501 (normally used for breakpoints) */
+-	asm volatile ("diag 0,%0,0x501" : : "a"(&uc) : "memory");
++	asm volatile ("diag 0,%0,0x501" : : "a"(uc) : "memory");
+ }
+ 
+-uint64_t get_ucall(struct kvm_vcpu *vcpu, struct ucall *uc)
++uint64_t ucall_arch_get_ucall(struct kvm_vcpu *vcpu, struct ucall *uc)
+ {
+ 	struct kvm_run *run = vcpu->run;
+ 	struct ucall ucall = {};
+diff --git a/tools/testing/selftests/kvm/lib/ucall_common.c b/tools/testing/selftests/kvm/lib/ucall_common.c
+new file mode 100644
+index 000000000000..2395c7f1d543
+--- /dev/null
++++ b/tools/testing/selftests/kvm/lib/ucall_common.c
+@@ -0,0 +1,20 @@
++// SPDX-License-Identifier: GPL-2.0-only
++#include "kvm_util.h"
++
++void ucall(uint64_t cmd, int nargs, ...)
++{
++	struct ucall uc = {};
++	va_list va;
++	int i;
++
++	WRITE_ONCE(uc.cmd, cmd);
++
++	nargs = min(nargs, UCALL_MAX_ARGS);
++
++	va_start(va, nargs);
++	for (i = 0; i < nargs; ++i)
++		WRITE_ONCE(uc.args[i], va_arg(va, uint64_t));
++	va_end(va);
++
++	ucall_arch_do_ucall((vm_vaddr_t)&uc);
++}
+diff --git a/tools/testing/selftests/kvm/lib/x86_64/ucall.c b/tools/testing/selftests/kvm/lib/x86_64/ucall.c
+index e5f0f9e0d3ee..9f532dba1003 100644
+--- a/tools/testing/selftests/kvm/lib/x86_64/ucall.c
++++ b/tools/testing/selftests/kvm/lib/x86_64/ucall.c
+@@ -8,34 +8,21 @@
+ 
+ #define UCALL_PIO_PORT ((uint16_t)0x1000)
+ 
+-void ucall_init(struct kvm_vm *vm, void *arg)
++void ucall_arch_init(struct kvm_vm *vm, void *arg)
+ {
+ }
+ 
+-void ucall_uninit(struct kvm_vm *vm)
++void ucall_arch_uninit(struct kvm_vm *vm)
+ {
+ }
+ 
+-void ucall(uint64_t cmd, int nargs, ...)
++void ucall_arch_do_ucall(vm_vaddr_t uc)
+ {
+-	struct ucall uc = {
+-		.cmd = cmd,
+-	};
+-	va_list va;
+-	int i;
+-
+-	nargs = min(nargs, UCALL_MAX_ARGS);
+-
+-	va_start(va, nargs);
+-	for (i = 0; i < nargs; ++i)
+-		uc.args[i] = va_arg(va, uint64_t);
+-	va_end(va);
+-
+ 	asm volatile("in %[port], %%al"
+-		: : [port] "d" (UCALL_PIO_PORT), "D" (&uc) : "rax", "memory");
++		: : [port] "d" (UCALL_PIO_PORT), "D" (uc) : "rax", "memory");
+ }
+ 
+-uint64_t get_ucall(struct kvm_vcpu *vcpu, struct ucall *uc)
++uint64_t ucall_arch_get_ucall(struct kvm_vcpu *vcpu, struct ucall *uc)
+ {
+ 	struct kvm_run *run = vcpu->run;
+ 	struct ucall ucall = {};
 -- 
 2.37.2.672.g94769d06f0-goog
 
