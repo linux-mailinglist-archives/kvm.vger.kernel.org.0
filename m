@@ -2,153 +2,103 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id F25015A10E9
-	for <lists+kvm@lfdr.de>; Thu, 25 Aug 2022 14:46:13 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 4A6E15A11B4
+	for <lists+kvm@lfdr.de>; Thu, 25 Aug 2022 15:16:27 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S241119AbiHYMqM (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 25 Aug 2022 08:46:12 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40010 "EHLO
+        id S242434AbiHYNQQ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 25 Aug 2022 09:16:16 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34778 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234338AbiHYMqL (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 25 Aug 2022 08:46:11 -0400
-Received: from vps-vb.mhejs.net (vps-vb.mhejs.net [37.28.154.113])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 011E74D17E;
-        Thu, 25 Aug 2022 05:46:06 -0700 (PDT)
-Received: from MUA
-        by vps-vb.mhejs.net with esmtps  (TLS1.2) tls TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256
-        (Exim 4.94.2)
-        (envelope-from <mail@maciej.szmigiero.name>)
-        id 1oRCFC-0002Ci-QW; Thu, 25 Aug 2022 14:45:58 +0200
-Message-ID: <3752b74b-74e1-00fd-d80d-41104e07fe95@maciej.szmigiero.name>
-Date:   Thu, 25 Aug 2022 14:45:53 +0200
+        with ESMTP id S242429AbiHYNQK (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 25 Aug 2022 09:16:10 -0400
+Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 32B82A99EC
+        for <kvm@vger.kernel.org>; Thu, 25 Aug 2022 06:16:07 -0700 (PDT)
+Received: from pps.filterd (m0098409.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.17.1.5/8.17.1.5) with ESMTP id 27PCx3NL019284
+        for <kvm@vger.kernel.org>; Thu, 25 Aug 2022 13:16:07 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=from : to : cc : subject
+ : date : message-id : mime-version : content-transfer-encoding; s=pp1;
+ bh=8qwGLlpvWI9hi21F4ewUDUo4JmXVtxDCP2E6eRerLpg=;
+ b=QjMYbbWQFrPtXZZ2ZRYz3xOZJCqamr/B248cp8M0PxK4RIwQUE8S3/LC6nQWEnEAlnVQ
+ kZtCb+Ns6/qefvXDw4x6gfU3+5SJjGkmCe1L5PmWcXRzfUSF8Qc1Z1DiFfiTgkxoAvvk
+ 8a65X0mK4TWY/WzVfjKAaJgBLYZSeb2FM4CO0ZkaQkuocSIgCMJvhXKR2uCR5KYkZOGn
+ VsNPZqUtTnN621HafJTnG/9uFr8kZaTlRlp+Wi5bCVra2YlO3EYgVdIcWeRv1r0aGxKJ
+ Aom9FieDwJFcVf3/7CPjjZ3ee5Y6IpZaXYzS/4ZMjvYiiAwr2jtlrCJO+etbFvGm7oxV Pw== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3j69jn8p60-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT)
+        for <kvm@vger.kernel.org>; Thu, 25 Aug 2022 13:16:06 +0000
+Received: from m0098409.ppops.net (m0098409.ppops.net [127.0.0.1])
+        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 27PCxhvH022186
+        for <kvm@vger.kernel.org>; Thu, 25 Aug 2022 13:16:06 GMT
+Received: from ppma02fra.de.ibm.com (47.49.7a9f.ip4.static.sl-reverse.com [159.122.73.71])
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3j69jn8p5a-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Thu, 25 Aug 2022 13:16:06 +0000
+Received: from pps.filterd (ppma02fra.de.ibm.com [127.0.0.1])
+        by ppma02fra.de.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 27PCp4JZ025342;
+        Thu, 25 Aug 2022 13:16:03 GMT
+Received: from b06avi18878370.portsmouth.uk.ibm.com (b06avi18878370.portsmouth.uk.ibm.com [9.149.26.194])
+        by ppma02fra.de.ibm.com with ESMTP id 3j2q88vqt3-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Thu, 25 Aug 2022 13:16:03 +0000
+Received: from d06av21.portsmouth.uk.ibm.com (d06av21.portsmouth.uk.ibm.com [9.149.105.232])
+        by b06avi18878370.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 27PDGL1k41550332
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Thu, 25 Aug 2022 13:16:21 GMT
+Received: from d06av21.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 95C3E5204E;
+        Thu, 25 Aug 2022 13:16:00 +0000 (GMT)
+Received: from a46lp57.lnxne.boe (unknown [9.152.108.100])
+        by d06av21.portsmouth.uk.ibm.com (Postfix) with ESMTP id 55EDC5204F;
+        Thu, 25 Aug 2022 13:16:00 +0000 (GMT)
+From:   Nico Boehr <nrb@linux.ibm.com>
+To:     kvm@vger.kernel.org
+Cc:     frankja@linux.ibm.com, imbrenda@linux.ibm.com, thuth@redhat.com
+Subject: [kvm-unit-tests PATCH v2 0/2] s390x: dump support for PV tests
+Date:   Thu, 25 Aug 2022 15:15:58 +0200
+Message-Id: <20220825131600.115920-1-nrb@linux.ibm.com>
+X-Mailer: git-send-email 2.36.1
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.9.0
-Content-Language: en-US
-To:     "Shukla, Santosh" <santosh.shukla@amd.com>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>,
-        Sean Christopherson <seanjc@google.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        Tom Lendacky <thomas.lendacky@amd.com>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org, mlevitsk@redhat.com
-References: <20220810061226.1286-1-santosh.shukla@amd.com>
- <20220810061226.1286-6-santosh.shukla@amd.com>
- <bf9e8a9c-5172-b61a-be6e-87a919442fbd@maciej.szmigiero.name>
- <e10b3de6-2df0-1339-4574-8477a924b78e@amd.com>
- <f96b867f-4c32-4950-8508-234fe2cda7b9@maciej.szmigiero.name>
- <1062bf85-0d44-011b-2377-d6be1485ce65@amd.com>
-From:   "Maciej S. Szmigiero" <mail@maciej.szmigiero.name>
-Subject: Re: [PATCHv3 5/8] KVM: SVM: Add VNMI support in inject_nmi
-In-Reply-To: <1062bf85-0d44-011b-2377-d6be1485ce65@amd.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,NICE_REPLY_A,
-        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
-        autolearn_force=no version=3.4.6
+X-TM-AS-GCONF: 00
+X-Proofpoint-ORIG-GUID: vOUrKZAUazRMebsXFwghqwQJ_BsKY4U6
+X-Proofpoint-GUID: MM9J1tV6M_4M-odqrXpmt5XNqW7QrO7j
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.205,Aquarius:18.0.895,Hydra:6.0.517,FMLib:17.11.122.1
+ definitions=2022-08-25_05,2022-08-25_01,2022-06-22_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxscore=0 suspectscore=0
+ phishscore=0 priorityscore=1501 bulkscore=0 mlxlogscore=509
+ impostorscore=0 clxscore=1015 adultscore=0 spamscore=0 malwarescore=0
+ lowpriorityscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2207270000 definitions=main-2208250050
+X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_EF,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_PASS,
+        T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 25.08.2022 12:56, Shukla, Santosh wrote:
-> On 8/24/2022 6:26 PM, Maciej S. Szmigiero wrote:
->> On 24.08.2022 14:13, Shukla, Santosh wrote:
->>> Hi Maciej,
->>>
->>> On 8/11/2022 2:54 AM, Maciej S. Szmigiero wrote:
->>>> On 10.08.2022 08:12, Santosh Shukla wrote:
->>>>> Inject the NMI by setting V_NMI in the VMCB interrupt control. processor
->>>>> will clear V_NMI to acknowledge processing has started and will keep the
->>>>> V_NMI_MASK set until the processor is done with processing the NMI event.
->>>>>
->>>>> Signed-off-by: Santosh Shukla <santosh.shukla@amd.com>
->>>>> ---
->>>>> v3:
->>>>> - Removed WARN_ON check.
->>>>>
->>>>> v2:
->>>>> - Added WARN_ON check for vnmi pending.
->>>>> - use `get_vnmi_vmcb` to get correct vmcb so to inject vnmi.
->>>>>
->>>>>     arch/x86/kvm/svm/svm.c | 7 +++++++
->>>>>     1 file changed, 7 insertions(+)
->>>>>
->>>>> diff --git a/arch/x86/kvm/svm/svm.c b/arch/x86/kvm/svm/svm.c
->>>>> index e260e8cb0c81..8c4098b8a63e 100644
->>>>> --- a/arch/x86/kvm/svm/svm.c
->>>>> +++ b/arch/x86/kvm/svm/svm.c
->>>>> @@ -3479,7 +3479,14 @@ static void pre_svm_run(struct kvm_vcpu *vcpu)
->>>>>     static void svm_inject_nmi(struct kvm_vcpu *vcpu)
->>>>>     {
->>>>>         struct vcpu_svm *svm = to_svm(vcpu);
->>>>> +    struct vmcb *vmcb = NULL;
->>>>>     +    if (is_vnmi_enabled(svm)) {
->>>>
->>>> I guess this should be "is_vnmi_enabled(svm) && !svm->nmi_l1_to_l2"
->>>> since if nmi_l1_to_l2 is true then the NMI to be injected originally
->>>> comes from L1's VMCB12 EVENTINJ field.
->>>>
->>>
->>> Not sure if I understood the case fully.. so trying to sketch scenario here -
->>> if nmi_l1_to_l2 is true then event is coming from EVTINJ. .which could
->>> be one of following case -
->>> 1) L0 (vnmi enabled) and L1 (vnmi disabled)
->>
->> As far as I can see in this case:
->> is_vnmi_enabled() returns whether VMCB02's int_ctl has V_NMI_ENABLE bit set.
->>
-> 
-> For L1 with vnmi disabled case - is_vnmi_enabled()->get_vnmi_vmcb() will return false so the
-> execution path will opt EVTINJ model for re-injection.
+v1->v2:
+---
+- add newline after genprotimg_args (thanks Janosch)
+- add a comment explaining what the CCK is (thanks Janosch)
 
-I guess by "get_vnmi_vmcb() will return false" you mean it will return NULL,
-since this function returns a pointer, not a bool.
+With the upcoming possibility to dump PV guests under s390x, we should
+be able to dump kvm-unit-tests for debugging, too.
 
-I can't see however, how this will happen:
->static inline struct vmcb *get_vnmi_vmcb(struct vcpu_svm *svm)
->{
->	if (!vnmi)
->		return NULL;
-         ^ "vnmi" variable controls whether L0 uses vNMI,
-	   so this variable is true in our case
+Add the necessary flags to genprotimg to allow dumping.
 
->
->	if (is_guest_mode(&svm->vcpu))
->		return svm->nested.vmcb02.ptr;
-		^ this should be always non-NULL.
+Nico Boehr (2):
+  s390x: factor out common args for genprotimg
+  s390x: create persistent comm-key
 
-So get_vnmi_vmcb() will return VMCB02 pointer in our case, not NULL...
+ s390x/Makefile | 27 ++++++++++++++++++++++-----
+ 1 file changed, 22 insertions(+), 5 deletions(-)
 
-> 
-> Thanks,
-> Santosh
-> 
->> This field in VMCB02 comes from nested_vmcb02_prepare_control() which
->> in the !nested_vnmi_enabled() case (L1 is not using vNMI) copies these bits
->> from VMCB01:
->>> int_ctl_vmcb01_bits |= (V_NMI_PENDING | V_NMI_ENABLE | V_NMI_MASK);
->>
->> So in this case (L0 uses vNMI) V_NMI_ENABLE will be set in VMCB01, right?
->>
->> This bit will then be copied to VMCB02 
+-- 
+2.36.1
 
-... and due to the above is_vnmi_enabled() will return true, so
-re-injection will attempt to use vNMI instead of EVTINJ (wrong).
-
->>> 2) L0 & L1 both vnmi disabled.
->>
->> This case is ok.
->>
->>>
->>> In both cases the vnmi check will fail for L1 and execution path
->>> will fall back to default - right?
->>>
->>> Thanks,
->>> Santosh
->>
-
-Thanks,
-Maciej
