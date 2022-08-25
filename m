@@ -2,41 +2,41 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 4A89F5A0BFC
-	for <lists+kvm@lfdr.de>; Thu, 25 Aug 2022 10:56:55 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id AFDF85A0BFA
+	for <lists+kvm@lfdr.de>; Thu, 25 Aug 2022 10:56:54 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235143AbiHYI4i (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 25 Aug 2022 04:56:38 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41432 "EHLO
+        id S235888AbiHYI4m (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 25 Aug 2022 04:56:42 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41446 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233561AbiHYI4d (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 25 Aug 2022 04:56:33 -0400
+        with ESMTP id S233514AbiHYI4h (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 25 Aug 2022 04:56:37 -0400
 Received: from mga11.intel.com (mga11.intel.com [192.55.52.93])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 78AEBA8957;
-        Thu, 25 Aug 2022 01:56:29 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E11F4A8949;
+        Thu, 25 Aug 2022 01:56:32 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1661417789; x=1692953789;
-  h=from:to:cc:subject:date:message-id:mime-version:
-   content-transfer-encoding;
-  bh=WE76IHyjGNLDBHekXScu1Y9Yvmw3u3Jm3KDNzWpAI5w=;
-  b=WE33CwEooipdXi4/GUCj65Y4mx7ksgKN/pXiNqQ9l8TuJpGTir2FP3Ag
-   pJKMildbOpM5qd/zogL6SnvXca8iliSO0xhXlR2yjRNwOIPVp+TCEylAX
-   sUonvieKwvNTfgKxoiL+i6dIuazV2s8XMardHO7b+mZnV0tt2qpRDDmjw
-   u9r5HT0zSJI5TveLviNpHQNk3ZalRmbhUd3IPbF/1g9CBTIuIudvoWsd1
-   CcTkC3oey3m5fyD9DjzFnwxYyASxzs+F2ciQw3bHB246lPzo7DFoIPZjG
-   QhlBfoc7SAOuwK2yYSb2xuTC7GX2o2kIuD8qAuqUY+W7dM2i7Fb66YtLR
-   Q==;
-X-IronPort-AV: E=McAfee;i="6500,9779,10449"; a="291756597"
+  t=1661417794; x=1692953794;
+  h=from:to:cc:subject:date:message-id:in-reply-to:
+   references:mime-version:content-transfer-encoding;
+  bh=xVtDh+LKAsKn8mzusCLTl5XWtgVfaTRuzuXZ6EiKo/U=;
+  b=JEvzeOYSjqBvu4QQT4xekKZNQzm4Qmkt/2JP6B0wV2yXQUw0yVGmduq7
+   0b7BH/kIUpy8R4NZnM0ZmoWS84wHesvVHW35+0rpaJ3QC5uM8WJPl4h4O
+   z3J5R7beqKXQtkgH2/BFu7nzrurZTwSs1sAkmSvIwAGIJ9OiAdcsrpoFh
+   TOKsIYMYST4vZW8yBTnACvMSBwNkF6S4besoX62h85p3c3reDWjAmWP06
+   15csre5SY9VClweru025UkieIBIcU+0A64eGVuLpLQfzH3AgbQW7R3Rei
+   YnvOCYbTh99E+DImw9fnvk9femivB+IQhxSYi9TfR16v/+90sBA/Y2Q1d
+   A==;
+X-IronPort-AV: E=McAfee;i="6500,9779,10449"; a="291756602"
 X-IronPort-AV: E=Sophos;i="5.93,262,1654585200"; 
-   d="scan'208";a="291756597"
+   d="scan'208";a="291756602"
 Received: from orsmga008.jf.intel.com ([10.7.209.65])
-  by fmsmga102.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 25 Aug 2022 01:56:29 -0700
+  by fmsmga102.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 25 Aug 2022 01:56:32 -0700
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="5.93,262,1654585200"; 
-   d="scan'208";a="639505149"
+   d="scan'208";a="639505171"
 Received: from lxy-dell.sh.intel.com ([10.239.48.38])
-  by orsmga008.jf.intel.com with ESMTP; 25 Aug 2022 01:56:26 -0700
+  by orsmga008.jf.intel.com with ESMTP; 25 Aug 2022 01:56:29 -0700
 From:   Xiaoyao Li <xiaoyao.li@intel.com>
 To:     Peter Zijlstra <peterz@infradead.org>,
         Arnaldo Carvalho de Melo <acme@kernel.org>,
@@ -49,10 +49,12 @@ To:     Peter Zijlstra <peterz@infradead.org>,
 Cc:     Xiaoyao Li <xiaoyao.li@intel.com>,
         linux-perf-users@vger.kernel.org, linux-kernel@vger.kernel.org,
         kvm@vger.kernel.org
-Subject: [RFC PATCH 0/2] KVM: VMX: Fix VM entry failure on PT_MODE_HOST_GUEST while host is using PT
-Date:   Thu, 25 Aug 2022 16:56:23 +0800
-Message-Id: <20220825085625.867763-1-xiaoyao.li@intel.com>
+Subject: [RFC PATCH 1/2] perf/x86/intel/pt: Introduce intel_pt_{stop,resume}()
+Date:   Thu, 25 Aug 2022 16:56:24 +0800
+Message-Id: <20220825085625.867763-2-xiaoyao.li@intel.com>
 X-Mailer: git-send-email 2.27.0
+In-Reply-To: <20220825085625.867763-1-xiaoyao.li@intel.com>
+References: <20220825085625.867763-1-xiaoyao.li@intel.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-Spam-Status: No, score=-5.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
@@ -66,42 +68,101 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-There is one bug in KVM that can hit vm-entry failure 100% on platform
-supporting PT_MODE_HOST_GUEST mode following below steps:
+KVM supports PT_MODE_HOST_GUEST mode for Intel PT that host and guest
+have separate Intel PT configurations and work independently. In that
+mdoe, KVM needs to context switch all the Intel PT configurations
+between host and guest on VM-entry and VM-exit.
 
-  1. #modprobe -r kvm_intel
-  2. #modprobe kvm_intel pt_mode=1
-  3. start a VM with QEMU
-  4. on host: #perf record -e intel_pt//
+Before VM-entry, if Intel PT is enabled on host, KVM needs to disable it
+first so as to context switch the PT configurations. After VM exit, KVM
+needs to re-enable Intel PT for host. Currently, KVM achieves it by
+manually toggle MSR_IA32_RTIT_CTL.TRACEEN bit to en/dis-able Intel PT.
 
-The vm-entry failure happens because it violates the requirement stated
-in Intel SDM 26.2.1.1 VM-Execution Control Fields
+However, PT PMI can be delivered after MSR_IA32_RTIT_CTL.TRACEEN bit is
+cleared. PT PMI handler changes PT MSRs and re-enable PT, that leads to
+1) VM-entry failure of guest 2) KVM stores stale value of PT MSRs.
 
-  If the logical processor is operating with Intel PT enabled (if
-  IA32_RTIT_CTL.TraceEn = 1) at the time of VM entry, the "load
-  IA32_RTIT_CTL" VM-entry control must be 0.
+To solve the problems, expose two interfaces for KVM to stop and
+resume the PT tracing.
 
-On PT_MODE_HOST_GUEST node, PT_MODE_HOST_GUEST is always set. Thus KVM
-needs to ensure IA32_RTIT_CTL.TraceEn is 0 before VM-entry. Currently KVM
-manually WRMSR(IA32_RTIT_CTL) to clear TraceEn bit. However, it doesn't
-work everytime since there is a posibility that IA32_RTIT_CTL.TraceEn is
-re-enabled in PT PMI handler before vm-entry. This series tries to fix
-the issue by exposing two interfaces from Intel PT driver for the purose
-to stop and resume Intel PT on host. It prevents PT PMI handler from
-re-enabling PT. By the way, it also fixes another issue that PT PMI
-touches PT MSRs whihc leads to what KVM stores for host bemomes stale.
-
-Xiaoyao Li (2):
-  perf/x86/intel/pt: Introduce intel_pt_{stop,resume}()
-  KVM: VMX: Stop/resume host PT before/after VM entry when
-    PT_MODE_HOST_GUEST
-
+Signed-off-by: Xiaoyao Li <xiaoyao.li@intel.com>
+---
  arch/x86/events/intel/pt.c      | 11 ++++++++++-
  arch/x86/include/asm/intel_pt.h |  6 ++++--
  arch/x86/kernel/crash.c         |  4 ++--
- arch/x86/kvm/vmx/vmx.c          | 11 ++++++++++-
- 4 files changed, 26 insertions(+), 6 deletions(-)
+ 3 files changed, 16 insertions(+), 5 deletions(-)
 
+diff --git a/arch/x86/events/intel/pt.c b/arch/x86/events/intel/pt.c
+index 82ef87e9a897..55fc02036ff1 100644
+--- a/arch/x86/events/intel/pt.c
++++ b/arch/x86/events/intel/pt.c
+@@ -1730,13 +1730,22 @@ static int pt_event_init(struct perf_event *event)
+ 	return 0;
+ }
+ 
+-void cpu_emergency_stop_pt(void)
++void intel_pt_stop(void)
+ {
+ 	struct pt *pt = this_cpu_ptr(&pt_ctx);
+ 
+ 	if (pt->handle.event)
+ 		pt_event_stop(pt->handle.event, PERF_EF_UPDATE);
+ }
++EXPORT_SYMBOL_GPL(intel_pt_stop);
++
++void intel_pt_resume(void) {
++	struct pt *pt = this_cpu_ptr(&pt_ctx);
++
++	if (pt->handle.event)
++		pt_event_start(pt->handle.event, 0);
++}
++EXPORT_SYMBOL_GPL(intel_pt_resume);
+ 
+ int is_intel_pt_event(struct perf_event *event)
+ {
+diff --git a/arch/x86/include/asm/intel_pt.h b/arch/x86/include/asm/intel_pt.h
+index c796e9bc98b6..fdfa4d31740c 100644
+--- a/arch/x86/include/asm/intel_pt.h
++++ b/arch/x86/include/asm/intel_pt.h
+@@ -27,12 +27,14 @@ enum pt_capabilities {
+ };
+ 
+ #if defined(CONFIG_PERF_EVENTS) && defined(CONFIG_CPU_SUP_INTEL)
+-void cpu_emergency_stop_pt(void);
++void intel_pt_stop(void);
++void intel_pt_resume(void);
+ extern u32 intel_pt_validate_hw_cap(enum pt_capabilities cap);
+ extern u32 intel_pt_validate_cap(u32 *caps, enum pt_capabilities cap);
+ extern int is_intel_pt_event(struct perf_event *event);
+ #else
+-static inline void cpu_emergency_stop_pt(void) {}
++static inline void intel_pt_stop(void) {}
++static inline void intel_pt_resume(void) {}
+ static inline u32 intel_pt_validate_hw_cap(enum pt_capabilities cap) { return 0; }
+ static inline u32 intel_pt_validate_cap(u32 *caps, enum pt_capabilities capability) { return 0; }
+ static inline int is_intel_pt_event(struct perf_event *event) { return 0; }
+diff --git a/arch/x86/kernel/crash.c b/arch/x86/kernel/crash.c
+index 9730c88530fc..2f2f72a209c0 100644
+--- a/arch/x86/kernel/crash.c
++++ b/arch/x86/kernel/crash.c
+@@ -93,7 +93,7 @@ static void kdump_nmi_callback(int cpu, struct pt_regs *regs)
+ 	/*
+ 	 * Disable Intel PT to stop its logging
+ 	 */
+-	cpu_emergency_stop_pt();
++	intel_pt_stop();
+ 
+ 	disable_local_APIC();
+ }
+@@ -158,7 +158,7 @@ void native_machine_crash_shutdown(struct pt_regs *regs)
+ 	/*
+ 	 * Disable Intel PT to stop its logging
+ 	 */
+-	cpu_emergency_stop_pt();
++	intel_pt_stop();
+ 
+ #ifdef CONFIG_X86_IO_APIC
+ 	/* Prevent crash_kexec() from deadlocking on ioapic_lock. */
 -- 
 2.27.0
 
