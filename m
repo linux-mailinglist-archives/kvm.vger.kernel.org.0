@@ -2,214 +2,298 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id ED7635A0EB3
-	for <lists+kvm@lfdr.de>; Thu, 25 Aug 2022 13:08:20 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 529E35A0EC9
+	for <lists+kvm@lfdr.de>; Thu, 25 Aug 2022 13:13:27 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S239563AbiHYLIT (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 25 Aug 2022 07:08:19 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44662 "EHLO
+        id S241203AbiHYLNN (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 25 Aug 2022 07:13:13 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50178 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231190AbiHYLIS (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 25 Aug 2022 07:08:18 -0400
-Received: from mga05.intel.com (mga05.intel.com [192.55.52.43])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A15F6AE84C;
-        Thu, 25 Aug 2022 04:08:17 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1661425697; x=1692961697;
-  h=from:to:cc:subject:date:message-id:references:
-   in-reply-to:content-transfer-encoding:mime-version;
-  bh=765f1Y0gC7zPP4fZqG+Ba70pNtRH7gN/Hb1LIpRZM+8=;
-  b=aHbMelbmAfAdVri4/yjkVFot2BGBCa8L21mFMIxSflSfuddifwnGTO0q
-   tYm6HVgMLAXBI1ZPGRndIiak9TEba0H2gpyd50NnbFivm+XAYdiS14EHR
-   kVLQn1TzOHPHWkYP4VUYoJBQKcQbXz3pQ+gPjwezr7z0taJJ5purdrbrh
-   EjtVNmywRiKffySk7n9Q3Bk8TcV4X52tttlMmQOcQzVJJuJK2jVdqcie5
-   g5IoK0ME+F7btNhJybBOVpxzm1CwLwCBKWYm+Tq/qzxLVXxPzOrIgRI09
-   JSH5I+l66ZA+QRFrxYhX773qAYaxQ3tKDS8DKRBkirxGuhJYfvYr0n9OS
-   Q==;
-X-IronPort-AV: E=McAfee;i="6500,9779,10449"; a="380503719"
-X-IronPort-AV: E=Sophos;i="5.93,262,1654585200"; 
-   d="scan'208";a="380503719"
-Received: from orsmga005.jf.intel.com ([10.7.209.41])
-  by fmsmga105.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 25 Aug 2022 04:08:17 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.93,262,1654585200"; 
-   d="scan'208";a="785969944"
-Received: from orsmsx601.amr.corp.intel.com ([10.22.229.14])
-  by orsmga005.jf.intel.com with ESMTP; 25 Aug 2022 04:08:17 -0700
-Received: from orsmsx611.amr.corp.intel.com (10.22.229.24) by
- ORSMSX601.amr.corp.intel.com (10.22.229.14) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2375.31; Thu, 25 Aug 2022 04:08:16 -0700
-Received: from orsmsx607.amr.corp.intel.com (10.22.229.20) by
- ORSMSX611.amr.corp.intel.com (10.22.229.24) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2375.31; Thu, 25 Aug 2022 04:08:16 -0700
-Received: from orsedg603.ED.cps.intel.com (10.7.248.4) by
- orsmsx607.amr.corp.intel.com (10.22.229.20) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2375.31 via Frontend Transport; Thu, 25 Aug 2022 04:08:16 -0700
-Received: from NAM12-DM6-obe.outbound.protection.outlook.com (104.47.59.170)
- by edgegateway.intel.com (134.134.137.100) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2375.31; Thu, 25 Aug 2022 04:08:16 -0700
+        with ESMTP id S236708AbiHYLNL (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 25 Aug 2022 07:13:11 -0400
+Received: from NAM04-BN8-obe.outbound.protection.outlook.com (mail-bn8nam04on2079.outbound.protection.outlook.com [40.107.100.79])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 80794AE9F1;
+        Thu, 25 Aug 2022 04:13:10 -0700 (PDT)
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=Rn+o9iF3neQdhGIYD1vONqAaUKdrsMba6sLkaj3nkhlJV9CbeBYUL5accjdijWBSm+n6IKk3ESZ1o8lZrDwBx6xAWOL+QSB/Cj/pqa62ZjlQhhyA0qOdFb1kmDLYgkZzLs0NiTptUNTihBikvZv10UzzssUwC04c8dNNAkOTTN0Z2yaOy7sZ2O2vhNfOQuGGP6oKD2ahZQ0yJ2x0ICI4V0fmTYx5lxpya+kBro8lSUbKHRZM6Sif7M6j/MrtL/FKdeTwP8L1Htrd861Gzq9JW4I9xGNp3Y/4HqXfVEpqkxH/cg8Nsl8l60FfV6x+WNSKwzBFwz8BIQ5MDEQe0E4hlw==
+ b=PBxXyNuuDrPTIJej/+TW3Rtw+3YJ3HTus/cNM2hgec31xCR+Xfjv6vSddiYm+lHWxhIR8q68Yb59ru7XwacvBthzdgBNQxsszEYeqTVIHm8q8AgE7ZtrpE9RrHBVMuWmtZy5JbW9UzxID+xqtvyI1LhwfLoA3gP8wGsByWVfialLp6DOmG/oTYtT7tYOC3AvG2CxkWpi+61yiKTWAjyOQYbZo2b0Sx2tTkNcMNj3x2lvyi6xnu6H35Kz4CT3toWA3yp/rEOtCx5nOqDyCBBe5YNEtDCZQTGKo7nG/ueiYOrF0au+PeFBkyuCAdYXNJ+UK1ouQw3c1pWRxfts81dtGw==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=765f1Y0gC7zPP4fZqG+Ba70pNtRH7gN/Hb1LIpRZM+8=;
- b=WpGATlm9X/wYRmxBALHv1pVKbpwhZI/tREPCQlSH2dL4l1BI2WeyY5IRU+7Tjb/Q5ns8iV4qnXzQ/7IBnlFbJzK+5lXwvmHadpVDfMNXMgutxtXxukTDDGLFsgiBMGuhk7eDDvXirC/lpQsYeebpt/JpkHjsRZvVHXRmu3ni0pcZnMrKvcBOd4Ox2a5gUB5eKIW51Yi9MPHgQqE3Rc1AV4OmfB8f2AzM0ccorCMyrUi7osOnJe4nA4W7CJG6+qoS5SyVmg7XRORzoTJL9V5n7RB1ny+HQMY2/wlF9jxvbihmCq0/eN2K3qjUJJXZfEOWgEoR/KysQVLhBC97xwCoxw==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-Received: from PH0PR11MB4824.namprd11.prod.outlook.com (2603:10b6:510:38::13)
- by MN2PR11MB3840.namprd11.prod.outlook.com (2603:10b6:208:ea::16) with
+ bh=nyiAWbh8bF3/cgJFzNAv6JsCMhVnIHYm47fa6qku+YM=;
+ b=W/gKvrGVEWFUBGf+Phn15ZRhwW6j3rdGtbXboQ6Yj0JrbyiLtqQpHU8upwmksbbIQ6Va93Mi2Vhb2Fv04ENzI6yQHYk8TN6ra9LuBdsztMPXe56qaPpR5NAj/4fyz6cdTh0345X0gClRXXToiB5F5IG/hwEziAjp/ARqSEYX8XHz9TXZOejkq/AbZZPDkI0t1Ry+sqnjZwkmJ3qP9w9vnHJ4iJVFM1js0FPguOhlS6GnTTeiOy49DAL1VofhYZxqIRuStjjd+SltRrJsYvSSsS3x4/EccrKYKQNXg/B45tbEC6nmvnlA8zKmBP4zJlRyzZIB/LP3XsNq3E1FU0bZkA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
+ 12.22.5.234) smtp.rcpttodomain=intel.com smtp.mailfrom=nvidia.com; dmarc=pass
+ (p=reject sp=reject pct=100) action=none header.from=nvidia.com; dkim=none
+ (message not signed); arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=nyiAWbh8bF3/cgJFzNAv6JsCMhVnIHYm47fa6qku+YM=;
+ b=mtvwBfTFSTSnlQ1W3z/e2Trw/iLZyXs2nqqIukOW08i4N2501HCE8KtLdA2lNt4myY0I2yhDqIuOlGtL1p0j51NOrwLnpvxmEgG3gNAfEM+sXZDyOXajsZCymesIit0bA0gAUfa+i8+AuLp9/yWJbvnjisXuKj5F+KPl7wWFBS9eFWtkyo8fMXOy+sKiKdSBrNq8+3IZl+B+Rqy2WVrdDg6jUXE23bn7W3x4zw11oNRHU6eblPJRIlP2tvtmdskxplxHmVb5H0sbuUistq5aGFVxSl3xk8W2apxkzSsWXH76LACaSxCdFEe1kadVu9TyVZyuXcz1QEIoZJeRpvR0OA==
+Received: from BN9PR03CA0843.namprd03.prod.outlook.com (2603:10b6:408:13d::8)
+ by MN2PR12MB4046.namprd12.prod.outlook.com (2603:10b6:208:1da::23) with
  Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5566.15; Thu, 25 Aug
- 2022 11:08:14 +0000
-Received: from PH0PR11MB4824.namprd11.prod.outlook.com
- ([fe80::adb4:9c0e:5140:9596]) by PH0PR11MB4824.namprd11.prod.outlook.com
- ([fe80::adb4:9c0e:5140:9596%4]) with mapi id 15.20.5566.015; Thu, 25 Aug 2022
- 11:08:14 +0000
-From:   "Mi, Dapeng1" <dapeng1.mi@intel.com>
-To:     David Laight <David.Laight@ACULAB.COM>,
-        "rafael@kernel.org" <rafael@kernel.org>,
-        "daniel.lezcano@linaro.org" <daniel.lezcano@linaro.org>,
-        "pbonzini@redhat.com" <pbonzini@redhat.com>
-CC:     "linux-pm@vger.kernel.org" <linux-pm@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "zhenyuw@linux.intel.com" <zhenyuw@linux.intel.com>
-Subject: RE: [PATCH] KVM: x86: use TPAUSE to replace PAUSE in halt polling
-Thread-Topic: [PATCH] KVM: x86: use TPAUSE to replace PAUSE in halt polling
-Thread-Index: AQHYt5jfiwON7Q5LUE+jIx7HUxEKwK2+FrcAgADk8MA=
-Date:   Thu, 25 Aug 2022 11:08:14 +0000
-Message-ID: <PH0PR11MB48244A3109FA7A060AB5280ACD729@PH0PR11MB4824.namprd11.prod.outlook.com>
-References: <20220824091117.767363-1-dapeng1.mi@intel.com>
- <66ba8291b33e440280ead8418b8b21ee@AcuMS.aculab.com>
-In-Reply-To: <66ba8291b33e440280ead8418b8b21ee@AcuMS.aculab.com>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-dlp-reaction: no-action
-dlp-version: 11.6.500.17
-dlp-product: dlpe-windows
-authentication-results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=intel.com;
-x-ms-publictraffictype: Email
-x-ms-office365-filtering-correlation-id: ca7f1a57-467a-4a4d-ed14-08da868a1aec
-x-ms-traffictypediagnostic: MN2PR11MB3840:EE_
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info: zqPb1VQcYICvs2wtFNa0h9/0H7zFsGJFMAv0dCV4gEMudzMpvTGmiL+EBLG9Y5v5544NA5L7m+G+gOKpKLQGG1biKNzvgu3ZuyoLEWoZN1heyPXuPNUdIYrqcrZymKkYKWwNgiPvF4tIJKZetwN3kGw7AxGEe6ME3qFTIxwYAosJSREFizfblG9WpIFByCsZdYkzluusBZEE+brV8cx/2tnPDrELitUxwFc/4EMFku1PTXKR5STz1SU5tJW+xZwnZE69IpVflFuc6Ej+mMvX65AIRYZTki5vTCvJip8k2ECbPFI69jV+hTIRz5FfUKa8/RKRI1O5njTQjnxTJnKm9O6Xtx3OqmhHDv7V7qUUwDLNB5ZCehskZICMrFrc2sDgJLq56xT8451Gmca1cR9sVWQKaZ6xewx9cBOnpK+OM/kOanJWIn2ml0ys5MgmW18ragGVprt8zTeFjuePZe5oFHkov/4jW/geFDZYpjBpWi8IseCKjAJl7wpNUQE39IxHxSYuru5raRQWnJ8g5yOwl8bB/69korFQagKd5TW2DipF23DVqXQxUjdm78bvHMi7ZPJAV+mI3YuYW0OH8PRPC9detAoRlv70E7QUYE3gRcozCN/oBHBTzJ9aIULdpXhtT96saSaVuwmWR3fXyERdGJbN/Re5lgeH5kRjpRE1/89Vfv9CHKF2ZdHtZlBtNSFitwm5bbYeBHEoqIiQiXlh2IVrU3Xs56P4vmhrvn8RleIihG7II0S2of62LwLpNNSNbiXRLe3T6qQ2mz9AFFtzkA==
-x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PH0PR11MB4824.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230016)(376002)(396003)(39860400002)(346002)(366004)(136003)(66446008)(4326008)(8676002)(2906002)(66476007)(54906003)(64756008)(76116006)(66946007)(66556008)(55016003)(110136005)(5660300002)(8936002)(38100700002)(122000001)(316002)(86362001)(38070700005)(41300700001)(52536014)(6506007)(82960400001)(53546011)(26005)(478600001)(71200400001)(9686003)(7696005)(83380400001)(33656002)(186003);DIR:OUT;SFP:1102;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0: =?utf-8?B?YnFkWlBMYVJ6T24wNHJCa09VdjFDWkthbGRhVUEybWdsRVZzMllzK2ZTazBJ?=
- =?utf-8?B?bXQ3TWw0YTZkTDhGcWZtWWY4bU9hV1pZSkJPOHk2WldTemxyQjBRTlB3SFVU?=
- =?utf-8?B?RzJVajZGMmlSWTl0eFVDU2FVWDlQK1ZnTFlJaVQ0VkxybEhkV1kvNXIzOG1n?=
- =?utf-8?B?cDZyRWZ2WjN1dXpVQ0NJVmpvVnFSTXkyVVRxRFYrS1hNTTkrRFdLQmUxWkw3?=
- =?utf-8?B?TE9EK1hoT3NOZnZMY0FqK3pYLzJMNVdWSzh6MHh5NytmdnkvZFROVFhzQVhT?=
- =?utf-8?B?QzBsSUhvZ0kzcWFsS2dFbnRaeHNqK2g2NnVBcGd5aVptdVY1Tlh0V0ltd3RM?=
- =?utf-8?B?cEhVYTB4ZWJUcjdjWFlvbnkwd3pDSHFrKzlsK0syVWxNZWd2aklBYVBpNnZN?=
- =?utf-8?B?d0dTcDNYSFJRb3J6TzRFYTRnZ2J0SXArM2dqN3BhNERrNXpoMHlhVnZFUmdv?=
- =?utf-8?B?SFl2aUtWaE5aY3ZQSzZUcEkzdFQ1TDBpVHVlTXhUYWRIUzBDNjdxd0FnYThY?=
- =?utf-8?B?OXFIQ0J0RjZkWGpGMkVEM2tmb0lQWGJsdnZmOVlHQ3NTamcwZEtWVmh1VEFt?=
- =?utf-8?B?aUJSTDV3dTl2Uis5Q1VIb1duZFRjZEFEODg3NjcrWXdvR0NpMnNiUENmMVFK?=
- =?utf-8?B?dVpPa09KTllMWG5tTHpDbjMwa0hXTUJmNWxxQXBpcGxBa3Q0WXl2QTNtL0Rz?=
- =?utf-8?B?WUJnYTYvU3BIZmVIOE1hSFdidnRqQzJiMWxTemZCQkhFTGtsamR6cWpzakRm?=
- =?utf-8?B?cjN4aEhjcE85a3FoY295T3lLQ1BDMWNjTlE5b3lETnNGbkJSQ1hKbGFkL3BJ?=
- =?utf-8?B?ZWYwWjUxaTlLbXpnckpCdmREL1NHQXdzcjdDQnE0ajBzL2djRlVUblpwMDhY?=
- =?utf-8?B?NXRxTUtJV2IwaFFTdDhmK0hBdFQxSzdsVGNyNnNjWDZWT0gveDh6N3lTa2s1?=
- =?utf-8?B?Q2ZyQis0cWhaYmFzeEVkKy9GNG5OZ002U1V4NmpwM3BYNERIUzBMRkhhMGNK?=
- =?utf-8?B?Y3FiS2dFbkJJOXZ2OE41Tno0TCtZSWtUTXg4b3ZNTjFOZVNtN25IMWkxaDA0?=
- =?utf-8?B?dmZVMGU0QkFZK0FTRVRocytQem5QOUpuSnRuV015SzIvUVlDZ3RYSHpXME9M?=
- =?utf-8?B?SG9PbEgydTdyc3dlYUlleko5ZHZiN3FBWEJRS2N0ZjlmdS9oaE5TcVM0MWZM?=
- =?utf-8?B?MXJTaVRwdWlqN1NVaGpLTDhJcDRkdTJSS21DcGhKRS8vKzVTdnlwTmVXS2lu?=
- =?utf-8?B?OUtTZ2NVZXczd0tUcmE2YVJSd2pkRU9xN2xyanBLTmx5ZzVZSWZPQTh0YUFH?=
- =?utf-8?B?ZGxnZFN5OEFSYzc4RWMzZk5ZMlhmUVlZbThUVk1GaVVXRlM5NXlkY2l1SXk4?=
- =?utf-8?B?NXNHNUFxMkpmeDZsaWNmZnQxWVlUV0xaVDh5NUsvMVlmTE9SNU9PVzFETlJ0?=
- =?utf-8?B?c3I2Z1Y1NEVOQlhaYlBTQmdFdXgyVk55RjI0a0xzb1lyN3d6MHI1YW84M2R5?=
- =?utf-8?B?MnBkdmVLVzVwWXJjZGZWb1RvYkRZbVVnM01EQVl1Q3YxS3JBWlN4ZGRaOU00?=
- =?utf-8?B?clVCazlvcFVUZmRDczJwbG91cU5VUmkrNWd4UG4yNzJTS1VaNFVidTlvMmFu?=
- =?utf-8?B?elB6MWZTWEYxTFhaMm9sNE1jK29ieUlGdTYvbkJTbmFCOENESFZjcXE3ZC92?=
- =?utf-8?B?UTIwUkJFUDFMOGNpSGtkeTJad2N3a0tpOXdYTHhzb3hmeTZ6SEhGOXpvVmRj?=
- =?utf-8?B?cmozYWt0a0UwOW9hTFpsbnNXNld5QmpIWlY0NCtYcmxMYjJqakdkdm5sV2JU?=
- =?utf-8?B?eUExUVhDYm5nWHRmSUxLeU1Gd3N5ZEx1cjNDRHMvNlI0eWdHR1JEZ2JhOFoz?=
- =?utf-8?B?V29zUVlYNW91alV0MktveTVmNFU0MVU2QkdyUnY1c01RMlp1amlwaGdCaERB?=
- =?utf-8?B?aTFWdGpoRHYzVjY5bHN2MThoQXVQS0RlUzRhWURROVJKMnp0MzBJVEVOWE9V?=
- =?utf-8?B?cFVZT0s2K1didWlWNDNmcWJHWWo4ajVTY2JhWVAwODE3UDNEbXBSUHdhc3FJ?=
- =?utf-8?B?ckcxeTBaR01XdDlheE03YzhpM0lFU2tPK3NKNDdNWGt1OWg0YlJzc1JyQ3BF?=
- =?utf-8?Q?ZNnuryNyw6v70vKNAjbn0M36Q?=
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
+ 2022 11:13:08 +0000
+Received: from BN8NAM11FT083.eop-nam11.prod.protection.outlook.com
+ (2603:10b6:408:13d:cafe::65) by BN9PR03CA0843.outlook.office365.com
+ (2603:10b6:408:13d::8) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5566.15 via Frontend
+ Transport; Thu, 25 Aug 2022 11:13:08 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 12.22.5.234)
+ smtp.mailfrom=nvidia.com; dkim=none (message not signed)
+ header.d=none;dmarc=pass action=none header.from=nvidia.com;
+Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
+ 12.22.5.234 as permitted sender) receiver=protection.outlook.com;
+ client-ip=12.22.5.234; helo=mail.nvidia.com; pr=C
+Received: from mail.nvidia.com (12.22.5.234) by
+ BN8NAM11FT083.mail.protection.outlook.com (10.13.177.75) with Microsoft SMTP
+ Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384) id
+ 15.20.5566.15 via Frontend Transport; Thu, 25 Aug 2022 11:13:08 +0000
+Received: from rnnvmail201.nvidia.com (10.129.68.8) by DRHQMAIL101.nvidia.com
+ (10.27.9.10) with Microsoft SMTP Server (TLS) id 15.0.1497.38; Thu, 25 Aug
+ 2022 11:13:07 +0000
+Received: from [172.27.13.80] (10.126.230.35) by rnnvmail201.nvidia.com
+ (10.129.68.8) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.986.29; Thu, 25 Aug
+ 2022 04:13:03 -0700
+Message-ID: <e6e79361-a19c-9ad6-403b-9a08f8abcf34@nvidia.com>
+Date:   Thu, 25 Aug 2022 14:13:01 +0300
 MIME-Version: 1.0
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: PH0PR11MB4824.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: ca7f1a57-467a-4a4d-ed14-08da868a1aec
-X-MS-Exchange-CrossTenant-originalarrivaltime: 25 Aug 2022 11:08:14.1066
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:91.0) Gecko/20100101
+ Thunderbird/91.13.0
+Subject: Re: [PATCH V4 vfio 00/10] Add device DMA logging support for mlx5
+ driver
+Content-Language: en-US
+To:     <alex.williamson@redhat.com>, <jgg@nvidia.com>
+CC:     <saeedm@nvidia.com>, <kvm@vger.kernel.org>,
+        <netdev@vger.kernel.org>, <kuba@kernel.org>,
+        <kevin.tian@intel.com>, <joao.m.martins@oracle.com>,
+        <leonro@nvidia.com>, <maorg@nvidia.com>, <cohuck@redhat.com>
+References: <20220815151109.180403-1-yishaih@nvidia.com>
+From:   Yishai Hadas <yishaih@nvidia.com>
+In-Reply-To: <20220815151109.180403-1-yishaih@nvidia.com>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
+Content-Transfer-Encoding: 8bit
+X-Originating-IP: [10.126.230.35]
+X-ClientProxiedBy: rnnvmail201.nvidia.com (10.129.68.8) To
+ rnnvmail201.nvidia.com (10.129.68.8)
+X-EOPAttributedMessage: 0
+X-MS-PublicTrafficType: Email
+X-MS-Office365-Filtering-Correlation-Id: 70ef73e0-daa2-42ba-a644-08da868aca38
+X-MS-TrafficTypeDiagnostic: MN2PR12MB4046:EE_
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: =?utf-8?B?eGc3YVMrZUg4b05qNmFMc25RS2JaUWJoZTVxWExwajVDdVF2Z1d3MjdvWVVj?=
+ =?utf-8?B?blVQUDAxUmdjdis0L3VKN2Q5MjV5ZlpBanNTZTAxZ1dkaFNRR1BzbFVvL3I5?=
+ =?utf-8?B?enhQWW5MV3F0Tm1hU0ZIYWRTTGtkMXRnUXlRQTJZQklXenJNNWwxNUhjTDAr?=
+ =?utf-8?B?ZjFhU3ZvckY3QzlwTTBBMEFRUjByL2FXSG11TmVna2tJM2hYS3MwVUc2YTNu?=
+ =?utf-8?B?S3kxMk53eUZ4WmFuR0crSXh1dVpvcW1aS1h3b2VFUUFsaGxJbGt4dGdvUmlB?=
+ =?utf-8?B?S2QyL3QzOGdHdkk4YVJwZW9MdHBWaE12bGIvY0IvWTMrZE1pL1hucHZXdWcx?=
+ =?utf-8?B?dVZtb2ZVUENRaDE1NlJVaTUrZEQraWxrbzdaSEZSNTFwOUZ1ZlRNR1pVbWRW?=
+ =?utf-8?B?QnpZSWpQNmxTaG1jaVhtVjJ5TkZiald4K1lpQlpPMCtUSUw4N2htZkJCcnV5?=
+ =?utf-8?B?SHJyOWpDamdwSlRGOWUwbkt3NHZaUmJ0NnNmNHI2c2ZVa1FaUVl6b0VmQ3lC?=
+ =?utf-8?B?YVhlMVhCZXpoMjFmRTFrTzBOWGo1Um9zaVgvbG9qdDMrNFhORWVQUEEvWnVD?=
+ =?utf-8?B?eHBLMFpreG1sSmgzdGwwWkN0cFZRU2VRSUFYSzJoMmxiQTRtOUQ0MGZxbncx?=
+ =?utf-8?B?SHF3QzNTQnRXL1pabmh2eTlVSVRLS0x0THN4alhibTBHcm9Bbmt0a2pydGpY?=
+ =?utf-8?B?QkNpMWlQMWNWU1MyTWR0SzFlRmFmYzBmMHp6emxhWVdoL3M0b0F1eTJSNXlR?=
+ =?utf-8?B?ZVllNDBia0tXLzk0VmNtS2psK0ZjSjhwQmF1Zlg1QVBnWGkvKzA4NmtuYVdT?=
+ =?utf-8?B?NnhXdUo3V21KOGlRSXlyWGgxeVgrUnRaT3VLQnBQbFg1dmE5RjA4Y1dFbk1D?=
+ =?utf-8?B?d0NkWGNtWXpKVFNOYkR6YXB2U3JaRXU5akZNME5xQmlwb3VUVytPaGtndlNZ?=
+ =?utf-8?B?anN6RnprQjZCK2xVandJOUlWVXhFVFZWSmJobXoyZjF3K3BkeHdOMVNQcFNV?=
+ =?utf-8?B?bUZuMm5SYnpXWUdjL1pBZHQ1QlFmUWVlNDBRaG5jb0xlclRJdjlBOVlrWmkr?=
+ =?utf-8?B?djNiVTBrd0dWTUdnV1dGNnJEMWQxWWhDNHNkdXhUTXoxV2NoeE9yemRMd1pF?=
+ =?utf-8?B?VUU0RENNVGRsZVY1OFh0V2tqTXd0Z2JZU1NVZ1MzRGExVjd5NDQzVXpYYy9C?=
+ =?utf-8?B?R1Z5QWl4a000Q3ZZZElRSXFiRWZ2SFlwZmYzeE1UUG8zb3RTU2FrQktkNUJF?=
+ =?utf-8?B?MWJiMG9tK0Zmb1RqeWRsOHc4MmtFc25WcWhSZTJXelFvQ245QT09?=
+X-Forefront-Antispam-Report: CIP:12.22.5.234;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:InfoNoRecords;CAT:NONE;SFS:(13230016)(4636009)(346002)(376002)(136003)(396003)(39860400002)(40470700004)(46966006)(36840700001)(5660300002)(2616005)(8676002)(82740400003)(4326008)(70586007)(110136005)(70206006)(36756003)(36860700001)(81166007)(31696002)(86362001)(31686004)(356005)(16526019)(336012)(47076005)(26005)(426003)(41300700001)(8936002)(478600001)(966005)(82310400005)(54906003)(6636002)(40460700003)(186003)(2906002)(16576012)(83380400001)(316002)(40480700001)(53546011)(43740500002)(36900700001);DIR:OUT;SFP:1101;
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 25 Aug 2022 11:13:08.0790
  (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: skmQmVBB0djxxVBZQEvjJWkgXPAlyM2GqNEnL4VpFw2JtA3mY5uhQL0XOsKGjGRTNQuga9E/ac0yg9J90ddQgA==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: MN2PR11MB3840
-X-OriginatorOrg: intel.com
-X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
-        SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED
-        autolearn=ham autolearn_force=no version=3.4.6
+X-MS-Exchange-CrossTenant-Network-Message-Id: 70ef73e0-daa2-42ba-a644-08da868aca38
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[12.22.5.234];Helo=[mail.nvidia.com]
+X-MS-Exchange-CrossTenant-AuthSource: BN8NAM11FT083.eop-nam11.prod.protection.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Anonymous
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: MN2PR12MB4046
+X-Spam-Status: No, score=-1.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FORGED_SPF_HELO,
+        NICE_REPLY_A,RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,
+        SPF_NONE,T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED autolearn=no
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-PiBGcm9tOiBEYXZpZCBMYWlnaHQgPERhdmlkLkxhaWdodEBBQ1VMQUIuQ09NPg0KPiBTZW50OiBX
-ZWRuZXNkYXksIEF1Z3VzdCAyNCwgMjAyMiAxMDowOCBQTQ0KPiBUbzogTWksIERhcGVuZzEgPGRh
-cGVuZzEubWlAaW50ZWwuY29tPjsgcmFmYWVsQGtlcm5lbC5vcmc7DQo+IGRhbmllbC5sZXpjYW5v
-QGxpbmFyby5vcmc7IHBib256aW5pQHJlZGhhdC5jb20NCj4gQ2M6IGxpbnV4LXBtQHZnZXIua2Vy
-bmVsLm9yZzsgbGludXgta2VybmVsQHZnZXIua2VybmVsLm9yZzsNCj4ga3ZtQHZnZXIua2VybmVs
-Lm9yZzsgemhlbnl1d0BsaW51eC5pbnRlbC5jb20NCj4gU3ViamVjdDogUkU6IFtQQVRDSF0gS1ZN
-OiB4ODY6IHVzZSBUUEFVU0UgdG8gcmVwbGFjZSBQQVVTRSBpbiBoYWx0IHBvbGxpbmcNCj4gDQo+
-IEZyb206IERhcGVuZyBNaQ0KPiA+IFNlbnQ6IDI0IEF1Z3VzdCAyMDIyIDEwOjExDQo+ID4NCj4g
-PiBUUEFVU0UgaXMgYSBuZXcgaW5zdHJ1Y3Rpb24gb24gSW50ZWwgcHJvY2Vzc29ycyB3aGljaCBj
-YW4gaW5zdHJ1Y3QNCj4gPiBwcm9jZXNzb3IgZW50ZXJzIGEgcG93ZXIvcGVyZm9ybWFuY2Ugb3B0
-aW1pemVkIHN0YXRlLiBIYWx0IHBvbGxpbmcNCj4gPiB1c2VzIFBBVVNFIGluc3RydWN0aW9uIHRv
-IHdhaXQgdkNQVSBpcyB3YWtlZCB1cC4gVGhlIHBvbGxpbmcgdGltZQ0KPiA+IGNvdWxkIGJlIGxv
-bmcgYW5kIGNhdXNlIGV4dHJhIHBvd2VyIGNvbnN1bXB0aW9uIGluIHNvbWUgY2FzZXMuDQo+ID4N
-Cj4gPiBVc2UgVFBBVVNFIHRvIHJlcGxhY2UgdGhlIFBBVVNFIGluc3RydWN0aW9uIGluIGhhbHQg
-cG9sbGluZyB0byBnZXQgYQ0KPiA+IGJldHRlciBwb3dlciBzYXZpbmcgYW5kIHBlcmZvcm1hbmNl
-Lg0KPiANCj4gV2hhdCBpcyB0aGUgZWZmZWN0IG9uIHdha2V1cCBsYXRlbmN5Pw0KPiBRdWl0ZSBv
-ZnRlbiB0aGF0IGlzIGZhciBtb3JlIGltcG9ydGFudCB0aGFuIGEgYml0IG9mIHBvd2VyIHNhdmlu
-Zy4NCg0KSW4gdGhlb3J5LCB0aGUgaW5jcmVhc2VkIHdha2V1cCBsYXRlbmN5IHNob3VsZCBiZSBs
-ZXNzIHRoYW4gMXVzLiBJIHRob3VnaHQgdGhpcyBsYXRlbmN5IGltcGFjdGlvbiBzaG91bGQgYmUg
-bWluaW1hbC4gSSBldmVyIHJ1biB0d28gc2NoZWR1bGluZyByZWxhdGVkIGJlbmNobWFya3MsIGhh
-Y2tiZW5jaCBhbmQgc2NoYmVuY2guICBJIGRpZG4ndCBzZWUgdGhpcyBjaGFuZ2Ugd291bGQgb2J2
-aW91c2x5IGltcGFjdCB0aGUgcGVyZm9ybWFuY2UuDQoNCldoZW4gcnVubmluZyB0aGVzZSB0d28g
-c2NoZWR1bGluZyBiZW5jaG1hcmtzIG9uIGhvc3QsIGEgRklPIHdvcmtsb2FkIGlzIHJ1bm5pbmcg
-aW4gYSBMaW51eCBWTSBzaW11bHRhbmVvdXNseSwgRklPIHdvdWxkIHRyaWdnZXIgYSBsYXJnZSBu
-dW1iZXIgb2YgSExUIFZNLWV4aXQgYW5kIHRoZW4gdHJpZ2dlciBoYWx0cG9sbGluZywgdGhlbiB3
-ZSBjYW4gc2VlIGhvdyBUUEFVU0UgY2FuIGltcGFjdCB0aGUgcGVyZm9ybWFuY2UuDQoNCkhlcmUg
-YXJlIHRoZSBoYWNrYmVuY2ggYW5kIHNjaGJlbmNoIGRhdGEgb24gSW50ZWwgQURMIHBsYXRmb3Jt
-Lg0KDQpIYWNrYmVuY2ggCQliYXNlCQlUUEFVU0UJCSVkZWx0YQ0KR3JvdXAtMQkJMC4wNTYJCTAu
-MDUyCQk3LjE0JQ0KR3JvdXAtNAkJMC4xNjUJCTAuMTY0CQkwLjYxJQ0KR3JvdXAtOAkJMC4zMTMJ
-CTAuMzA5CQkxLjI4JQ0KR3JvdXAtMTYJCTAuODM0CQkwLjg0MgkJLTAuOTYlDQoNClNjaGJlbmNo
-IC0gTGF0ZW5jeSBwZXJjZW50aWxlcyAodXNlYykJCWJhc2UgCQlUUEFVU0UJDQouL3NjaGJlbmNo
-IC1tIDENCgk1MC4wdGgJCQkJCTE1CQkxMwkJDQoJOTkuMHRoCQkJCQkyMjEJCTIwMw0KLi9zY2hi
-ZW5jaCAtbSAyDQoJNTAuMHRoCQkJCQkyNgkJMjMNCgk5OS4wdGgJCQkJCTE2MzY4CQkxNjU0NA0K
-Li9zY2hiZW5jaCAtbSA0DQoJNTAuMHRoCQkJCQk1NgkJNjANCgk5OS4wdGgJCQkJCTMzOTg0CQkz
-NDExMg0KIA0KU2luY2UgdGhlIHNjaGJlbmNoIGJlbmNobWFyayBpcyBub3Qgc28gc3RhYmxlLCBi
-dXQgSSBjYW4gc2VlIHRoZSBkYXRhIGlzIG9uIGEgc2FtZSBsZXZlbC4NCg0KPiBUaGUgYXV0b21h
-dGljIGVudHJ5IG9mIHNsZWVwIHN0YXRlcyBpcyBhIFBJVEEgYWxyZWFkeS4NCj4gQmxvY2sgMzAg
-UlQgdGhyZWFkcyBpbiBjdl93YWl0KCkgYW5kIHRoZW4gZG8gY3ZfYnJvYWRjYXN0KCkuDQo+IFVz
-ZSBmdHJhY2UgdG8gc2VlIGp1c3QgaG93IGxvbmcgaXQgdGFrZXMgdGhlIGxhc3QgdGhyZWFkIHRv
-IHdha2UgdXAuDQoNCkkgdGhpbmsgdGhpcyB0ZXN0IGlzIGZhbWlsaWFyIHdpdGggdGhlIGhhY2ti
-ZW5jaCBhbmQgc2NoYmVuY2gsIGl0IHNob3VsZCBoYXZlIHNpbWlsYXIgcmVzdWx0Lg0KDQpBbnl3
-YXksIHBlcmZvcm1hbmNlIGFuZCBwb3dlciBpcyBhIHRyYWRlb2ZmLCBpdCBkZXBlbmRzIG9uIHdo
-aWNoIHNpZGUgd2UgdGhpbmsgaXMgbW9yZSBpbXBvcnRhbnQuDQoNCj4gDQo+IAlEYXZpZA0KPiAN
-Cj4gLQ0KPiBSZWdpc3RlcmVkIEFkZHJlc3MgTGFrZXNpZGUsIEJyYW1sZXkgUm9hZCwgTW91bnQg
-RmFybSwgTWlsdG9uIEtleW5lcywgTUsxDQo+IDFQVCwgVUsgUmVnaXN0cmF0aW9uIE5vOiAxMzk3
-Mzg2IChXYWxlcykNCg0K
+On 15/08/2022 18:10, Yishai Hadas wrote:
+> This series adds device DMA logging uAPIs and their implementation as
+> part of mlx5 driver.
+>
+> DMA logging allows a device to internally record what DMAs the device is
+> initiating and report them back to userspace. It is part of the VFIO
+> migration infrastructure that allows implementing dirty page tracking
+> during the pre copy phase of live migration. Only DMA WRITEs are logged,
+> and this API is not connected to VFIO_DEVICE_FEATURE_MIG_DEVICE_STATE.
+>
+> The uAPIs are based on the FEATURE ioctl as were introduced earlier by
+> the below RFC [1] and follows the notes that were discussed in the
+> mailing list.
+>
+> It includes:
+> - A PROBE option to detect if the device supports DMA logging.
+> - A SET option to start device DMA logging in given IOVAs ranges.
+> - A GET option to read back and clear the device DMA log.
+> - A SET option to stop device DMA logging that was previously started.
+>
+> Extra details exist as part of relevant patches in the series.
+>
+> In addition, the series adds some infrastructure support for managing an
+> IOVA bitmap done by Joao Martins.
+>
+> It abstracts how an IOVA range is represented in a bitmap that is
+> granulated by a given page_size. So it translates all the lifting of
+> dealing with user pointers into its corresponding kernel addresses.
+> This new functionality abstracts the complexity of user/kernel bitmap
+> pointer usage and finally enables an API to set some bits.
+>
+> This functionality will be used as part of IOMMUFD series for the system
+> IOMMU tracking.
+>
+> Finally, we come with mlx5 implementation based on its device
+> specification for the DMA logging APIs.
+>
+> The matching qemu changes can be previewed here [2].
+> They come on top of the v2 migration protocol patches that were sent
+> already to the mailing list.
+>
+> Note:
+> - As this series touched mlx5_core parts we may need to send the
+>    net/mlx5 patches as a pull request format to VFIO to avoid conflicts
+>    before acceptance.
+>
+> [1] https://lore.kernel.org/all/20220501123301.127279-1-yishaih@nvidia.com/T/
+> [2] https://github.com/avihai1122/qemu/commits/device_dirty_tracking
+>
+> Changes from V3: https://lore.kernel.org/all/202207011231.1oPQhSzo-lkp@intel.com/t/
+> Rebase on top of v6.0 rc1.
+> Patch #3:
+> - Drop the documentation note regarding the 'atomic OR' usage of the bitmap
+>    as part of VFIO_DEVICE_FEATURE_DMA_LOGGING_REPORT.
+>    This deletion was missed as part of V3 to match kernel code.
+>    To better clarify, as part of testing V3, we could see a big penalty in
+>    performance (*2 in some cases) when the iova bitmap patch used atomic
+>    bit operations. As QEMU doesn't really share bitmaps between multiple
+>    trackers we saw no reason to use atomics and get a bad performance.
+>    If in the future, will be a real use case that will justify it, we can
+>    come with VFIO_DEVICE_FEATURE_DMA_LOGGING_REPORT_ATOMIC new option with
+>    the matching kernel code.
+> Patch #4:
+> - The rename patch from vfio.c to vfio_main.c was accepted already, not
+>    part of this series anymore.
+>
+> Changes from V2: https://lore.kernel.org/netdev/20220726151232.GF4438@nvidia.com/t/
+> Patch #1
+> - Add some reserved fields that were missed.
+> Patch #3:
+> - Improve the UAPI documentation in few places as was asked by Alex and
+>    Kevin, based on the discussion in the mailing list.
+> Patch #5:
+> - Improvements from Joao for his IOVA bitmap patch to be
+>    cleaner/simpler as was asked by Alex. It includes the below:
+>     * Make iova_to_index and index_to_iova fully symmetrical.
+>     * Use 'sizeof(*iter->data) * BITS_PER_BYTE' in both index_to_iova
+>       and iova_to_index.
+>     * Remove iova_bitmap_init() and just stay with iova_bitmap_iter_init().
+>     * s/left/remaining/
+>     * To not use @remaining variable for both index and iova/length.
+>     * Remove stale comment on max dirty bitmap bits.
+>     * Remove DIV_ROUNDUP from iova_to_index() helper and replace with a
+>       division.
+>     * Use iova rather than length where appropriate, while noting with
+>       commentary the usage of length as next relative IOVA.
+>     * Rework pinning to be internal and remove that from the iova iter
+>       API caller.
+>     * get() and put() now teardown iova_bitmap::dirty npages.
+>     * Move unnecessary includes into the C file.
+>     * Add theory of operation and theory of usage in the header file.
+>     * Add more comments on private helpers on less obvious logic
+>     * Add documentation on all public APIs.
+>    * Change commit to reflect new usage of APIs.
+> Patch #6:
+> - Drop the hard-coded 1024 for LOG_MAX_RANGES and replace to consider
+>    PAGE_SIZE as was suggested by Jason.
+> - Return -E2BIG as Alex suggested.
+> - Adapt the loop upon logging report to new IOVA bit map stuff.
+>
+> Changes from V1: https://lore.kernel.org/netdev/202207052209.x00Iykkp-lkp@intel.com/T/
+>
+> - Patch #6: Fix a note given by krobot, select INTERVAL_TREE for VFIO.
+>
+> Changes from V0: https://lore.kernel.org/netdev/202207011231.1oPQhSzo-lkp@intel.com/T/
+>
+> - Drop the first 2 patches that Alex merged already.
+> - Fix a note given by krobot, based on Jason's suggestion.
+> - Some improvements from Joao for his IOVA bitmap patch to be
+>    cleaner/simpler. It includes the below:
+>      * Rename iova_bitmap_array_length to iova_bitmap_iova_to_index.
+>      * Rename iova_bitmap_index_to_length to iova_bitmap_index_to_iova.
+>      * Change iova_bitmap_iova_to_index to take an iova_bitmap_iter
+>        as an argument to pair with iova_bitmap_index_to_length.
+>      * Make iova_bitmap_iter_done() use >= instead of
+>        substraction+comparison. This fixes iova_bitmap_iter_done()
+>        return as it was previously returning when !done.
+>      * Remove iova_bitmap_iter_length().
+>      * Simplify iova_bitmap_length() overcomplicated trailing end check
+>      * Convert all sizeof(u64) into sizeof(*iter->data).
+>      * Use u64 __user for ::data instead of void in both struct and
+>        initialization of iova_bitmap.
+>
+> Yishai
+>
+> Joao Martins (1):
+>    vfio: Add an IOVA bitmap support
+>
+> Yishai Hadas (9):
+>    net/mlx5: Introduce ifc bits for page tracker
+>    net/mlx5: Query ADV_VIRTUALIZATION capabilities
+>    vfio: Introduce DMA logging uAPIs
+>    vfio: Introduce the DMA logging feature support
+>    vfio/mlx5: Init QP based resources for dirty tracking
+>    vfio/mlx5: Create and destroy page tracker object
+>    vfio/mlx5: Report dirty pages from tracker
+>    vfio/mlx5: Manage error scenarios on tracker
+>    vfio/mlx5: Set the driver DMA logging callbacks
+>
+>   drivers/net/ethernet/mellanox/mlx5/core/fw.c  |   6 +
+>   .../net/ethernet/mellanox/mlx5/core/main.c    |   1 +
+>   drivers/vfio/Kconfig                          |   1 +
+>   drivers/vfio/Makefile                         |   6 +-
+>   drivers/vfio/iova_bitmap.c                    | 224 ++++
+>   drivers/vfio/pci/mlx5/cmd.c                   | 995 +++++++++++++++++-
+>   drivers/vfio/pci/mlx5/cmd.h                   |  63 +-
+>   drivers/vfio/pci/mlx5/main.c                  |   9 +-
+>   drivers/vfio/pci/vfio_pci_core.c              |   5 +
+>   drivers/vfio/vfio_main.c                      | 159 +++
+>   include/linux/iova_bitmap.h                   | 189 ++++
+>   include/linux/mlx5/device.h                   |   9 +
+>   include/linux/mlx5/mlx5_ifc.h                 |  83 +-
+>   include/linux/vfio.h                          |  21 +-
+>   include/uapi/linux/vfio.h                     |  86 ++
+>   15 files changed, 1837 insertions(+), 20 deletions(-)
+>   create mode 100644 drivers/vfio/iova_bitmap.c
+>   create mode 100644 include/linux/iova_bitmap.h
+>
+Alex,
+
+Can we please proceed with sending PR for the series to be accepted ?  
+(i.e. as of the first two net/mlx5 patches).
+
+The comments that were given in the previous kernel cycle were addressed 
+and there is no open comment here for few weeks already.
+
+Yishai
+
