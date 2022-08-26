@@ -2,62 +2,63 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 6D8B65A3260
-	for <lists+kvm@lfdr.de>; Sat, 27 Aug 2022 01:12:25 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 994135A3261
+	for <lists+kvm@lfdr.de>; Sat, 27 Aug 2022 01:12:44 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236873AbiHZXMU (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 26 Aug 2022 19:12:20 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39112 "EHLO
+        id S1344817AbiHZXMg (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 26 Aug 2022 19:12:36 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39250 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230416AbiHZXMS (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 26 Aug 2022 19:12:18 -0400
-Received: from mail-lj1-x230.google.com (mail-lj1-x230.google.com [IPv6:2a00:1450:4864:20::230])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 00710CD530
-        for <kvm@vger.kernel.org>; Fri, 26 Aug 2022 16:12:17 -0700 (PDT)
-Received: by mail-lj1-x230.google.com with SMTP id z23so34182ljk.1
-        for <kvm@vger.kernel.org>; Fri, 26 Aug 2022 16:12:17 -0700 (PDT)
+        with ESMTP id S1345073AbiHZXMd (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 26 Aug 2022 19:12:33 -0400
+Received: from mail-yw1-x114a.google.com (mail-yw1-x114a.google.com [IPv6:2607:f8b0:4864:20::114a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 826A4E0FCF
+        for <kvm@vger.kernel.org>; Fri, 26 Aug 2022 16:12:31 -0700 (PDT)
+Received: by mail-yw1-x114a.google.com with SMTP id 00721157ae682-33dc888dc62so47633627b3.4
+        for <kvm@vger.kernel.org>; Fri, 26 Aug 2022 16:12:31 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc;
-        bh=bcpllnDDUjEEd+wUXluJ4IX3cQLIlgFD+9YxERhv87Q=;
-        b=gFZ8GTGNVwWTSW6Jg1/TczQDjeK7J+SO8o721CQDkCo6KO5B25oui0xwwHekHnI0g7
-         QDrktay4Ab/UZ81pmy9uNvtqqDmBL+PpxcOAyY8LZ4SeJ7B0bLtOknGWViA1ob5zWZtC
-         tR79+06L+ws42pWZHxZIqWrNe4G6sGhr8SpsT1+sORoeAG0JrL7GExrlQQqvaSVPlKyw
-         a06zr9RDIgsntaohkuD/sb6sqC/DLFtzRHDOxaSYcEtuxSr1+XQdgxo4pP0itS3VMjwL
-         P+ORoGij0CfgoSdhYTO1Ea6gBkL3wWwJ5oZsb7rsYzmHRvGCdEQLA0mD8sFJVEguY1Yy
-         N5IQ==
+        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc;
+        bh=yrCSotaULNTTVXdK8iDHV7jTejyPhwdaEx0i2dIbtHM=;
+        b=bmNYpDLupSkR8/KtS6WUEXRozCi+1NP1UafS+i9UqJw1YOnjvppa+1dnBbAKdfwiN6
+         TEiXNA5lmQ+TDRs7Fg5cm226SRrB6ear7NWBzRpGMg98pFREu9DIj3KeQeQWhfstQDw8
+         EcavclXmHkuABLDjM99wgSZt1WHqu9fHXrKHVwZp0nj2Vp2adHKdYrftYAAqtzBT8QYM
+         zaM4OQZR7uEsROvh0pbhZnccWj7URMNJZHlJ+TtXXEy/zYn1XF1ER7dXK46T/b5XF7Dd
+         i0920kpFMg11Qov5NRVK3WfvtD9ha0luTFeOpqt5vLXa6sni5MP2OsNHfa2145d+jCJN
+         +j+Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc;
-        bh=bcpllnDDUjEEd+wUXluJ4IX3cQLIlgFD+9YxERhv87Q=;
-        b=DOghPk36BvBgxs9sEmomBq1VMiAUk82xUP1HEaoaU5Ita6EFndOJV1X4+3F9fZQ8nH
-         1Q8Gd2Vtiwm2+lhrL/yjUGIPlqpOQYUfNkAi6NnJL0LwGUkoGvVP2pW5suIbBZJzi5o3
-         BppfIwVa631xy64/NdDNd4xQ9yS8NkpSYTD1O4xDRt6ZRdOejF+sJHMquC3f4cs/GjV+
-         bauyvs7W4HDgEgLyJ9gT1/bGyIMD18fkI60ku3U14wd6IGsFj3VKguGrEsvmac6Twqz7
-         N7YlGwG92h/+WMIjDYAum94bUf540m6CG31EaE0jZf7mTZrbGppIw0OIX4B9vSFMsQiE
-         +LGQ==
-X-Gm-Message-State: ACgBeo2/XwJ3En8pn183oIktS7oDo81zkFaHghPGJNhCAZJPxqTnZpKR
-        HU/Hu8u+kZR0NJAkHfGArj+MxLVJt9tj8ATxSLAVv1FrVc4=
-X-Google-Smtp-Source: AA6agR5uIBKA1qNVqysCeImLqGbO4IB/aaGsUp31T59H6SmMvsyFehn2c3CUEVtGuInf67sqzVo8ZI7u0zugZnW6Gss=
-X-Received: by 2002:a2e:920d:0:b0:262:fe4d:c475 with SMTP id
- k13-20020a2e920d000000b00262fe4dc475mr291453ljg.18.1661555536148; Fri, 26 Aug
- 2022 16:12:16 -0700 (PDT)
-MIME-Version: 1.0
-References: <20220826224755.1330512-1-jmattson@google.com>
-In-Reply-To: <20220826224755.1330512-1-jmattson@google.com>
-From:   Vipin Sharma <vipinsh@google.com>
-Date:   Fri, 26 Aug 2022 16:11:39 -0700
-Message-ID: <CAHVum0ewJAF2W+x_ycrrcD2Lyttx8VSydbzPmY+TFeWer9OJmg@mail.gmail.com>
-Subject: Re: [PATCH] KVM: x86: Mask off unsupported and unknown bits of IA32_ARCH_CAPABILITIES
-To:     Jim Mattson <jmattson@google.com>
-Cc:     kvm@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>
+        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
+         :from:to:cc;
+        bh=yrCSotaULNTTVXdK8iDHV7jTejyPhwdaEx0i2dIbtHM=;
+        b=nY5jG9ycibgmokbMYOTwpbk+mbqS95FMZs4g9uDSKMGFdcln0olHTgPgdYgzbMq0q3
+         9KykO2IZQs3YWOcPyGsCWr77jvLgwz88zjpTVVYBuvSTButFMjZOCtv0IgFhOgpHEzP4
+         3+O+jK1aPvK24rn70WjpmDcgsVCTh53kiHsI/6dk8YUKWPs1M1dstxLIEEq8wvYTusjc
+         uHf9Y1QMgTV3nrfTpg6Wz31FxfNjesH3ag+2F1I2BHaFcjNKHknAVGnw10JmGA3lNy9j
+         d3II0L1jEdIpWFwuhyaCo+D8+fHWEA5rBPv14DEMJkGnc9SafqZ1vnOjy3KeQ2SUrbXY
+         9x5A==
+X-Gm-Message-State: ACgBeo09IVFv+Tq7B0cVTs3oL8h+MA1tb/KqEbeCD/NqEjG6N9hgR42j
+        IU2//3wecxOa8uD7BqXQFBlmvrncCC2TXg==
+X-Google-Smtp-Source: AA6agR5xxmqnxC39+fH1w3r+qRd0elMT8D7dnC/glCFqqSOs9+RkAEqBvHUx8an4RD8BxqUMDFfinx3JOHBUcQ==
+X-Received: from dmatlack-n2d-128.c.googlers.com ([fda3:e722:ac3:cc00:20:ed76:c0a8:1309])
+ (user=dmatlack job=sendgmr) by 2002:a0d:e850:0:b0:33d:c65e:db0f with SMTP id
+ r77-20020a0de850000000b0033dc65edb0fmr2022158ywe.253.1661555550863; Fri, 26
+ Aug 2022 16:12:30 -0700 (PDT)
+Date:   Fri, 26 Aug 2022 16:12:17 -0700
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.37.2.672.g94769d06f0-goog
+Message-ID: <20220826231227.4096391-1-dmatlack@google.com>
+Subject: [PATCH v2 00/10] KVM: x86/mmu: Make tdp_mmu read-only and clean up
+ TPD MMU fault handler
+From:   David Matlack <dmatlack@google.com>
+To:     Paolo Bonzini <pbonzini@redhat.com>
+Cc:     Sean Christopherson <seanjc@google.com>, kvm@vger.kernel.org,
+        David Matlack <dmatlack@google.com>,
+        Kai Huang <kai.huang@intel.com>, Peter Xu <peterx@redhat.com>
 Content-Type: text/plain; charset="UTF-8"
-X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-        T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL
+X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL
         autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -65,86 +66,46 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Aug 26, 2022 at 3:48 PM Jim Mattson <jmattson@google.com> wrote:
->
-> KVM should not claim to virtualize unknown IA32_ARCH_CAPABILITIES
-> bits. When kvm_get_arch_capabilities() was originally written, there
-> were only a few bits defined in this MSR, and KVM could virtualize all
-> of them. However, over the years, several bits have been defined that
-> KVM cannot just blindly pass through to the guest without additional
-> work (such as virtualizing an MSR promised by the
-> IA32_ARCH_CAPABILITES feature bit).
->
-> Define a mask of supported IA32_ARCH_CAPABILITIES bits, and mask off
-> any other bits that are set in the hardware MSR.
->
-> Cc: Paolo Bonzini <pbonzini@redhat.com>
-> Fixes: 5b76a3cff011 ("KVM: VMX: Tell the nested hypervisor to skip L1D flush on vmentry")
-> Signed-off-by: Jim Mattson <jmattson@google.com>
-> ---
->  arch/x86/kvm/x86.c | 25 +++++++++++++++++++++----
->  1 file changed, 21 insertions(+), 4 deletions(-)
->
-> diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-> index 205ebdc2b11b..ae6be8b2ecfe 100644
-> --- a/arch/x86/kvm/x86.c
-> +++ b/arch/x86/kvm/x86.c
-> @@ -1557,12 +1557,32 @@ static const u32 msr_based_features_all[] = {
->  static u32 msr_based_features[ARRAY_SIZE(msr_based_features_all)];
->  static unsigned int num_msr_based_features;
->
-> +/*
-> + * IA32_ARCH_CAPABILITIES bits deliberately omitted are:
+This series changes the tdp_mmu module parameter to read-only so that
+the TDP MMU can be tracked in a global variable instead of per-VM
+state. Then it splits out a separate page fault handler for the TDP MMU
+and makes some clean ups along the way.
 
-Why are these deliberately omitted? Maybe a comment will help future
-readers and present ones like me who don't know.
+v2:
+ - Make tdp_mmu read-only instead of deleting it entirely [Paolo]
+ - Fix 32-bit compilation failures [kernel test robot]
 
-> + *   10 - MISC_PACKAGE_CTRLS
-> + *   11 - ENERGY_FILTERING_CTL
-> + *   12 - DOITM
-> + *   18 - FB_CLEAR_CTRL
-> + *   21 - XAPIC_DISABLE_STATUS
-> + *   23 - OVERCLOCKING_STATUS
-> + */
-> +
-> +#define KVM_SUPPORTED_ARCH_CAP \
-> +       (ARCH_CAP_RDCL_NO | ARCH_CAP_IBRS_ALL | ARCH_CAP_RSBA | \
-> +        ARCH_CAP_SKIP_VMENTRY_L1DFLUSH | ARCH_CAP_SSB_NO | ARCH_CAP_MDS_NO | \
-> +        ARCH_CAP_PSCHANGE_MC_NO | ARCH_CAP_TSX_CTRL_MSR | ARCH_CAP_TAA_NO | \
-> +        ARCH_CAP_SBDR_SSDP_NO | ARCH_CAP_FBSDP_NO | ARCH_CAP_PSDP_NO | \
-> +        ARCH_CAP_FB_CLEAR | ARCH_CAP_RRSBA | ARCH_CAP_PBRSB_NO)
-> +
-> +
+v1: https://lore.kernel.org/kvm/20220815230110.2266741-1-dmatlack@google.com/
 
-Nit: Extra blank line.
+Cc: Kai Huang <kai.huang@intel.com>
+Cc: Peter Xu <peterx@redhat.com>
 
->  static u64 kvm_get_arch_capabilities(void)
->  {
->         u64 data = 0;
->
-> -       if (boot_cpu_has(X86_FEATURE_ARCH_CAPABILITIES))
-> +       if (boot_cpu_has(X86_FEATURE_ARCH_CAPABILITIES)) {
->                 rdmsrl(MSR_IA32_ARCH_CAPABILITIES, data);
-> +               data &= KVM_SUPPORTED_ARCH_CAP;
-> +       }
->
->         /*
->          * If nx_huge_pages is enabled, KVM's shadow paging will ensure that
-> @@ -1610,9 +1630,6 @@ static u64 kvm_get_arch_capabilities(void)
->                  */
->         }
->
-> -       /* Guests don't need to know "Fill buffer clear control" exists */
-> -       data &= ~ARCH_CAP_FB_CLEAR_CTRL;
-> -
->         return data;
->  }
->
-> --
-> 2.37.2.672.g94769d06f0-goog
->
+David Matlack (10):
+  KVM: x86/mmu: Change tdp_mmu to a read-only parameter
+  KVM: x86/mmu: Move TDP MMU VM init/uninit behind tdp_mmu_enabled
+  KVM: x86/mmu: Grab mmu_invalidate_seq in kvm_faultin_pfn()
+  KVM: x86/mmu: Handle error PFNs in kvm_faultin_pfn()
+  KVM: x86/mmu: Avoid memslot lookup during KVM_PFN_ERR_HWPOISON
+    handling
+  KVM: x86/mmu: Handle no-slot faults in kvm_faultin_pfn()
+  KVM: x86/mmu: Initialize fault.{gfn,slot} earlier for direct MMUs
+  KVM: x86/mmu: Split out TDP MMU page fault handling
+  KVM: x86/mmu: Stop needlessly making MMU pages available for TDP MMU
+    faults
+  KVM: x86/mmu: Rename __direct_map() to direct_map()
 
-Verified, at least all the capabilities in the
-kvm_get_arch_capabilities() are in the KVM_SUPPORTED_ARCH_CAP macro.
+ arch/x86/include/asm/kvm_host.h |   9 --
+ arch/x86/kvm/mmu.h              |  11 +-
+ arch/x86/kvm/mmu/mmu.c          | 241 ++++++++++++++++++++------------
+ arch/x86/kvm/mmu/mmu_internal.h |   8 +-
+ arch/x86/kvm/mmu/paging_tmpl.h  |  12 +-
+ arch/x86/kvm/mmu/tdp_mmu.c      |  11 --
+ arch/x86/kvm/mmu/tdp_mmu.h      |   7 +-
+ 7 files changed, 170 insertions(+), 129 deletions(-)
 
-Reviewed-By: Vipin Sharma <vipinsh@google.com>
+
+base-commit: 372d07084593dc7a399bf9bee815711b1fb1bcf2
+prerequisite-patch-id: 2e3661ba8856c29b769499bac525b6943d9284b8
+-- 
+2.37.2.672.g94769d06f0-goog
+
