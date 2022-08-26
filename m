@@ -2,170 +2,156 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id B9C4A5A2B58
-	for <lists+kvm@lfdr.de>; Fri, 26 Aug 2022 17:36:44 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id DD5A75A2BB4
+	for <lists+kvm@lfdr.de>; Fri, 26 Aug 2022 17:51:35 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235867AbiHZPgE (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 26 Aug 2022 11:36:04 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60250 "EHLO
+        id S1344685AbiHZPuS (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 26 Aug 2022 11:50:18 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57030 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1343978AbiHZPf5 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 26 Aug 2022 11:35:57 -0400
-Received: from mail-pj1-x1029.google.com (mail-pj1-x1029.google.com [IPv6:2607:f8b0:4864:20::1029])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BF59C32DBE
-        for <kvm@vger.kernel.org>; Fri, 26 Aug 2022 08:35:53 -0700 (PDT)
-Received: by mail-pj1-x1029.google.com with SMTP id s31-20020a17090a2f2200b001faaf9d92easo8415486pjd.3
-        for <kvm@vger.kernel.org>; Fri, 26 Aug 2022 08:35:53 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc;
-        bh=v4f55tB6LpMB6qzJlij3nDx/2y9fqNcIxEdXWIyFCqg=;
-        b=oiKhCk3413IsNcAtel5Y+SNqkFDisFy0d6Wmt8ZxA7p7WQKZJIpQuwZabNCJAF774m
-         MuQb7J6P9vrnDmg6xgin3pivFzbHQNEawpq+vjitSPmUTIVufOZPJfteItGbSAvuqQ3M
-         mCzK2C1Vn8HYqehashp3BfsMBNGRwbDZqgN70F9mF1JJPuF46NWEAx/8TUqDFZpikQZe
-         88DoKuH2ws22j0PI2HdLyKiOR9ik11wbSur0W3rR1zjOWcPQKrPrsEA1SN/IKFhIv8F4
-         T32RYhI6xs+xPV96uh6FDAac4XKfFAxKvJcwyfo+mmrehOmKZrKExrS9Twd9QTI9aHKA
-         7tzQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc;
-        bh=v4f55tB6LpMB6qzJlij3nDx/2y9fqNcIxEdXWIyFCqg=;
-        b=jv45HxOn9kYRik2NU56Q8C6lRW8e7Q5EU8ZFNOIKOMK6GkpGDuhnzXtnqm55dGCtAY
-         /k3Mv+k8VJGvwcAb7hKzvDxxtWT7kD6rvk+4CchFZXRS6Ex3hXijSH/r7JXOxXgRuc5f
-         2lgDh+ev00ofggQrsmhLhtM+pH275EszAj67S6Ew13Cui0/KLU//24dMJvX+x4DwqVED
-         oQXg2YGfzZeU5lIhmjqV0NChw4CcksthIgcwo7xECGFPoDfRtBE/nL7mG5m0vJmm2B7b
-         BDmiiuB8zNPuQNRabOuFPbgd7x6FWVX+PUhltXe5GruUIhm5Q9byTy0FjB8agjX70Ogp
-         BUog==
-X-Gm-Message-State: ACgBeo1uWfCDAVOEvTBVUpr1Nz6nUL400xqmFizJCuWpndCepQiZx84h
-        goTwiplvAzCnM6sm3KPpgUpP/g==
-X-Google-Smtp-Source: AA6agR7IHY3uESv8bxhhnN8uS2VNtnBQ04kLtlD7XvOpLWcCXuXK8b7JCwh2UmXFuV3zYfh5BInO/w==
-X-Received: by 2002:a17:902:b190:b0:172:e555:72e3 with SMTP id s16-20020a170902b19000b00172e55572e3mr4167496plr.74.1661528153147;
-        Fri, 26 Aug 2022 08:35:53 -0700 (PDT)
-Received: from google.com (7.104.168.34.bc.googleusercontent.com. [34.168.104.7])
-        by smtp.gmail.com with ESMTPSA id k2-20020aa79982000000b00535e49245d6sm1945044pfh.12.2022.08.26.08.35.52
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 26 Aug 2022 08:35:52 -0700 (PDT)
-Date:   Fri, 26 Aug 2022 15:35:48 +0000
-From:   Sean Christopherson <seanjc@google.com>
-To:     Li RongQing <lirongqing@baidu.com>
-Cc:     x86@kernel.org, kvm@vger.kernel.org
-Subject: Re: [PATCH] KVM: SVM: move dest calculation out of loop
-Message-ID: <YwjoVPTzaZsfT6f/@google.com>
-References: <1661492603-52093-1-git-send-email-lirongqing@baidu.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <1661492603-52093-1-git-send-email-lirongqing@baidu.com>
-X-Spam-Status: No, score=-14.5 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        ENV_AND_HDR_SPF_MATCH,FSL_HELO_FAKE,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,
-        SPF_PASS,T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL
-        autolearn=no autolearn_force=no version=3.4.6
+        with ESMTP id S1344732AbiHZPtw (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 26 Aug 2022 11:49:52 -0400
+Received: from ams.source.kernel.org (ams.source.kernel.org [145.40.68.75])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 19F7260E3;
+        Fri, 26 Aug 2022 08:49:47 -0700 (PDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by ams.source.kernel.org (Postfix) with ESMTPS id B19FEB831BF;
+        Fri, 26 Aug 2022 15:49:45 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5FA0AC433D6;
+        Fri, 26 Aug 2022 15:49:44 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1661528984;
+        bh=K54SpPn1dkF1YSkCv3pZX5DMshbcliLagDP1w7JkHK8=;
+        h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+        b=XyGtAHQC8bDQuh5z3roeuf3F7oOT/o24TT23/VB0gxzu/pRzuOmh7+qQIrWBSiYxX
+         +SIitVbdoYfIY2BQgQwcAGyXLjkqcYnDRsh24xpK5O2FuH5dbgYZ0Jyr2YPTWu3Sj9
+         B/PjOu5a0atbxONek8h/twl3bXND9jqNDTZmChRmPscKr3KwBiDyjvgf0dIAwxZBkU
+         xA0G/XSK7CrIGEMFg0RobNRKgCJNxfikx8UWoZevnrrdT8+2IFDGIsrhtq/yuhRWuH
+         +aJqN0S38A6pFafmjSqOO0plKjcIyGKVTyP51CRHkix/OOEWXrvSNjaExHGVOoMIMn
+         Tx3NWbRclwQuQ==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=why.misterjones.org)
+        by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+        (Exim 4.95)
+        (envelope-from <maz@kernel.org>)
+        id 1oRbaY-005zap-Bd;
+        Fri, 26 Aug 2022 16:49:42 +0100
+Date:   Fri, 26 Aug 2022 16:49:41 +0100
+Message-ID: <8735djvwbu.wl-maz@kernel.org>
+From:   Marc Zyngier <maz@kernel.org>
+To:     Paolo Bonzini <pbonzini@redhat.com>
+Cc:     Peter Xu <peterx@redhat.com>, Gavin Shan <gshan@redhat.com>,
+        kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org,
+        kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+        linux-doc@vger.kernel.org, linux-kselftest@vger.kernel.org,
+        corbet@lwn.net, james.morse@arm.com, alexandru.elisei@arm.com,
+        suzuki.poulose@arm.com, oliver.upton@linux.dev,
+        catalin.marinas@arm.com, will@kernel.org, shuah@kernel.org,
+        seanjc@google.com, dmatlack@google.com, bgardon@google.com,
+        ricarkol@google.com, zhenyzha@redhat.com, shan.gavin@gmail.com
+Subject: Re: [PATCH v1 1/5] KVM: arm64: Enable ring-based dirty memory tracking
+In-Reply-To: <9e7cb09c-82c5-9492-bccd-5511f5bede26@redhat.com>
+References: <20220819005601.198436-1-gshan@redhat.com>
+        <20220819005601.198436-2-gshan@redhat.com>
+        <87lerkwtm5.wl-maz@kernel.org>
+        <41fb5a1f-29a9-e6bb-9fab-4c83a2a8fce5@redhat.com>
+        <87fshovtu0.wl-maz@kernel.org>
+        <171d0159-4698-354b-8b2f-49d920d03b1b@redhat.com>
+        <YwTc++Lz6lh3aR4F@xz-m1.local>
+        <87bksawz0w.wl-maz@kernel.org>
+        <YwVEoM1pj2MPCELp@xz-m1.local>
+        <878rnewpaw.wl-maz@kernel.org>
+        <9e7cb09c-82c5-9492-bccd-5511f5bede26@redhat.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/27.1
+ (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: pbonzini@redhat.com, peterx@redhat.com, gshan@redhat.com, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org, linux-kernel@vger.kernel.org, linux-doc@vger.kernel.org, linux-kselftest@vger.kernel.org, corbet@lwn.net, james.morse@arm.com, alexandru.elisei@arm.com, suzuki.poulose@arm.com, oliver.upton@linux.dev, catalin.marinas@arm.com, will@kernel.org, shuah@kernel.org, seanjc@google.com, dmatlack@google.com, bgardon@google.com, ricarkol@google.com, zhenyzha@redhat.com, shan.gavin@gmail.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+X-Spam-Status: No, score=-7.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_HI,
+        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Aug 26, 2022, Li RongQing wrote:
-> There is no need to calculate dest in each vcpu iteration
-> since dest is not change
+On Fri, 26 Aug 2022 11:50:24 +0100,
+Paolo Bonzini <pbonzini@redhat.com> wrote:
 > 
-> Signed-off-by: Li RongQing <lirongqing@baidu.com>
-> ---
->  arch/x86/kvm/svm/avic.c | 13 +++++++------
->  1 file changed, 7 insertions(+), 6 deletions(-)
+> On 8/24/22 00:47, Marc Zyngier wrote:
+> >> I definitely don't think I 100% understand all the ordering things since
+> >> they're complicated.. but my understanding is that the reset procedure
+> >> didn't need memory barrier (unlike pushing, where we have explicit wmb),
+> >> because we assumed the userapp is not hostile so logically it should only
+> >> modify the flags which is a 32bit field, assuming atomicity guaranteed.
+> > Atomicity doesn't guarantee ordering, unfortunately. Take the
+> > following example: CPU0 is changing a bunch of flags for GFNs A, B, C,
+> > D that exist in the ring in that order, and CPU1 performs an ioctl to
+> > reset the page state.
+> > 
+> > CPU0:
+> >      write_flag(A, KVM_DIRTY_GFN_F_RESET)
+> >      write_flag(B, KVM_DIRTY_GFN_F_RESET)
+> >      write_flag(C, KVM_DIRTY_GFN_F_RESET)
+> >      write_flag(D, KVM_DIRTY_GFN_F_RESET)
+> >      [...]
+> > 
+> > CPU1:
+> >     ioctl(KVM_RESET_DIRTY_RINGS)
+> > 
+> > Since CPU0 writes do not have any ordering, CPU1 can observe the
+> > writes in a sequence that have nothing to do with program order, and
+> > could for example observe that GFN A and D have been reset, but not B
+> > and C. This in turn breaks the logic in the reset code (B, C, and D
+> > don't get reset), despite userspace having followed the spec to the
+> > letter. If each was a store-release (which is the case on x86), it
+> > wouldn't be a problem, but nothing calls it in the documentation.
+> > 
+> > Maybe that's not a big deal if it is expected that each CPU will issue
+> > a KVM_RESET_DIRTY_RINGS itself, ensuring that it observe its own
+> > writes. But expecting this to work across CPUs without any barrier is
+> > wishful thinking.
 > 
-> diff --git a/arch/x86/kvm/svm/avic.c b/arch/x86/kvm/svm/avic.c
-> index 6919dee..087c073 100644
-> --- a/arch/x86/kvm/svm/avic.c
-> +++ b/arch/x86/kvm/svm/avic.c
-> @@ -451,6 +451,7 @@ static int avic_kick_target_vcpus_fast(struct kvm *kvm, struct kvm_lapic *source
->  static void avic_kick_target_vcpus(struct kvm *kvm, struct kvm_lapic *source,
->  				   u32 icrl, u32 icrh, u32 index)
->  {
-> +	u32 dest;
->  	unsigned long i;
->  	struct kvm_vcpu *vcpu;
->  
-> @@ -465,13 +466,13 @@ static void avic_kick_target_vcpus(struct kvm *kvm, struct kvm_lapic *source,
->  	 * vCPUs that were in guest at the time of the IPI, and vCPUs that have
->  	 * since entered the guest will have processed pending IRQs at VMRUN.
->  	 */
-> -	kvm_for_each_vcpu(i, vcpu, kvm) {
-> -		u32 dest;
->  
-> -		if (apic_x2apic_mode(vcpu->arch.apic))
-> -			dest = icrh;
-> -		else
-> -			dest = GET_XAPIC_DEST_FIELD(icrh);
-> +	if (apic_x2apic_mode(vcpu->arch.apic))
+> Agreed, but that's a problem for userspace to solve.  If userspace
+> wants to reset the fields in different CPUs, it has to synchronize
+> with its own invoking of the ioctl.
 
-Please try to actually test patches before posting.  "vcpu" is quite clearly accessed
-uninitialized.  gcc isn't smart enough to warn, but clang is.  I realize that testing
-AVIC is more difficult than it should be, but it's not prohitively difficult.
+userspace has no choice. It cannot order on its own the reads that the
+kernel will do to *other* rings.
 
-arch/x86/kvm/svm/avic.c:470:23: error: variable 'vcpu' is uninitialized when used here [-Werror,-Wuninitialized]
-        if (apic_x2apic_mode(vcpu->arch.apic))
-                             ^~~~
-arch/x86/kvm/svm/avic.c:456:23: note: initialize the variable 'vcpu' to silence this warning
-        struct kvm_vcpu *vcpu;
-                             ^
-                              = NULL
+> That is, CPU0 must ensure that a ioctl(KVM_RESET_DIRTY_RINGS) is done
+> after (in the memory-ordering sense) its last write_flag(D,
+> KVM_DIRTY_GFN_F_RESET).  If there's no such ordering, there's no
+> guarantee that the write_flag will have any effect.
 
+The problem isn't on CPU0 The problem is that CPU1 does observe
+inconsistent data on arm64, and I don't think this difference in
+behaviour is acceptable. Nothing documents this, and there is a baked
+in assumption that there is a strong ordering between writes as well
+as between writes and read.
 
-That said, there is actually a functional bug here.  "dest" needs to be computed
-using the source x2APIC status.
+> The main reason why I preferred a global KVM_RESET_DIRTY_RINGS ioctl
+> was because it takes kvm->slots_lock so the execution would be
+> serialized anyway.  Turning slots_lock into an rwsem would be even
+> worse because it also takes kvm->mmu_lock (since slots_lock is a
+> mutex, at least two concurrent invocations won't clash with each other
+> on the mmu_lock).
 
-I'll send a small series, there are more cleanups than can be done by moving the
-dissection of ichr/ichl into avic_kick_target_vcpus() instead of duplicating the
-code in avic_kick_target_vcpus_fast().
+Whatever the reason, the behaviour should be identical on all
+architectures. As is is, it only really works on x86, and I contend
+this is a bug that needs fixing.
 
---
-From: Sean Christopherson <seanjc@google.com>
-Date: Fri, 26 Aug 2022 08:30:57 -0700
-Subject: [PATCH] KVM: SVM: Compute dest based on sender's x2APIC status for
- AVIC kick
+Thankfully, this can be done at zero cost for x86, and at that of a
+set of load-acquires on other architectures.
 
-Compute the destination from ICRH using the sender's x2APIC status, not
-each (potential) target's x2APIC status.
+	M.
 
-Fixes: c514d3a348ac ("KVM: SVM: Update avic_kick_target_vcpus to support 32-bit APIC ID")
-Cc: Li RongQing <lirongqing@baidu.com>
-Signed-off-by: Sean Christopherson <seanjc@google.com>
----
- arch/x86/kvm/svm/avic.c | 8 +-------
- 1 file changed, 1 insertion(+), 7 deletions(-)
-
-diff --git a/arch/x86/kvm/svm/avic.c b/arch/x86/kvm/svm/avic.c
-index 6919dee69f18..623431289d88 100644
---- a/arch/x86/kvm/svm/avic.c
-+++ b/arch/x86/kvm/svm/avic.c
-@@ -451,6 +451,7 @@ static int avic_kick_target_vcpus_fast(struct kvm *kvm, struct kvm_lapic *source
- static void avic_kick_target_vcpus(struct kvm *kvm, struct kvm_lapic *source,
- 				   u32 icrl, u32 icrh, u32 index)
- {
-+	u32 dest = apic_x2apic_mode(source) ? icrh : GET_XAPIC_DEST_FIELD(icrh);
- 	unsigned long i;
- 	struct kvm_vcpu *vcpu;
-
-@@ -466,13 +467,6 @@ static void avic_kick_target_vcpus(struct kvm *kvm, struct kvm_lapic *source,
- 	 * since entered the guest will have processed pending IRQs at VMRUN.
- 	 */
- 	kvm_for_each_vcpu(i, vcpu, kvm) {
--		u32 dest;
--
--		if (apic_x2apic_mode(vcpu->arch.apic))
--			dest = icrh;
--		else
--			dest = GET_XAPIC_DEST_FIELD(icrh);
--
- 		if (kvm_apic_match_dest(vcpu, source, icrl & APIC_SHORT_MASK,
- 					dest, icrl & APIC_DEST_MASK)) {
- 			vcpu->arch.apic->irr_pending = true;
-
-base-commit: 372d07084593dc7a399bf9bee815711b1fb1bcf2
---
-
+-- 
+Without deviation from the norm, progress is not possible.
