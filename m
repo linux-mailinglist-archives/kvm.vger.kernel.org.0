@@ -1,188 +1,173 @@
 Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from out1.vger.email (unknown [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id B21595A1D94
-	for <lists+kvm@lfdr.de>; Fri, 26 Aug 2022 02:08:43 +0200 (CEST)
+Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
+	by mail.lfdr.de (Postfix) with ESMTP id AAE245A1D9D
+	for <lists+kvm@lfdr.de>; Fri, 26 Aug 2022 02:09:56 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S244479AbiHZAIR (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 25 Aug 2022 20:08:17 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35662 "EHLO
+        id S244611AbiHZAIs (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 25 Aug 2022 20:08:48 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36598 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S243919AbiHZAIP (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 25 Aug 2022 20:08:15 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 68321C8880
-        for <kvm@vger.kernel.org>; Thu, 25 Aug 2022 17:08:11 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1661472491;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=hdzMOeIUQobXozAoBo+0gU24p6eUcuhYf3lPGxm6UuE=;
-        b=cbS30Nct+PcjmSUNNYl0efTN02WEn3Uj9cyjbMVtK0KIfwjSICmSfVTqCxErWrlvKbJ0rX
-        /2Ebeisx2J0StlmkEH8uMmRxG2+hJrnlUKCDRRiFEHb/wTqamUxOaKj8UOzP+jbRfsu+SG
-        HtgAtftbe/ig+ACgNrKZZmEmTtwDuNk=
-Received: from mail-io1-f72.google.com (mail-io1-f72.google.com
- [209.85.166.72]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_128_GCM_SHA256) id
- us-mta-198-ii6FcPy_M2OV-eAT6VGwbQ-1; Thu, 25 Aug 2022 20:08:10 -0400
-X-MC-Unique: ii6FcPy_M2OV-eAT6VGwbQ-1
-Received: by mail-io1-f72.google.com with SMTP id o10-20020a6b5a0a000000b0068aba769d73so33031iob.4
-        for <kvm@vger.kernel.org>; Thu, 25 Aug 2022 17:08:10 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=content-transfer-encoding:mime-version:organization:references
-         :in-reply-to:message-id:subject:cc:to:from:date:x-gm-message-state
-         :from:to:cc;
-        bh=hdzMOeIUQobXozAoBo+0gU24p6eUcuhYf3lPGxm6UuE=;
-        b=n6VeQ8S8H/0H7vn1N90A5Ro0WlFVzkJo7sKmFW9HAkP2ESEyki4UuwiQFWo26RGNI+
-         LQTGGglpnD8WcqQ0qefAIiuafJis+/FCuonCsTgYUKPrTDfGIr/aB2WMSVIeNaVwaGxZ
-         t08cGD/pYiK2I8eTsxROUmAk0v5uQkc45GfEM//A3Mks7cWTGsEbq6ZT7rzXbnqY2neQ
-         7fAC0xY2qowhTDWFZ0yCQxDZdukMudPqmQNU2XfnjRBNavEJVmsbIRNSyEs2lB6G2tsz
-         YRh1e0me5UED8tJYSFGNsPP933x8E4h/mk1hPCy6b4tPfMZqaTUGq8W8LopgLrsHN7o2
-         19Ew==
-X-Gm-Message-State: ACgBeo3+08FvpSMB3RXXQB2LBJi/M0lbwAHMmh+pVAUyl2ay2CfsOmqD
-        dUR6qVf1Le3VRCH7jCQFoJgVopRSYEea9NL7Y/ioXPjuUeYlmr0e6FYxCz5NIOzeY89aZFSbkAS
-        niHNoyfgewYsy
-X-Received: by 2002:a05:6638:248c:b0:349:fddf:b80c with SMTP id x12-20020a056638248c00b00349fddfb80cmr2976470jat.261.1661472489139;
-        Thu, 25 Aug 2022 17:08:09 -0700 (PDT)
-X-Google-Smtp-Source: AA6agR7ipYtHVVpEtusLYEDloHY4DKd6rUFDwJESB2zw/7x6ZSRdqLCMTAAE/E8tx/dwxcID0l2k4g==
-X-Received: by 2002:a05:6638:248c:b0:349:fddf:b80c with SMTP id x12-20020a056638248c00b00349fddfb80cmr2976462jat.261.1661472488897;
-        Thu, 25 Aug 2022 17:08:08 -0700 (PDT)
-Received: from redhat.com ([38.15.36.239])
-        by smtp.gmail.com with ESMTPSA id v6-20020a6bac06000000b00688dd369c7esm295480ioe.55.2022.08.25.17.08.08
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 25 Aug 2022 17:08:08 -0700 (PDT)
-Date:   Thu, 25 Aug 2022 18:08:07 -0600
-From:   Alex Williamson <alex.williamson@redhat.com>
-To:     "Laba, SlawomirX" <slawomirx.laba@intel.com>
-Cc:     "linux-pci@vger.kernel.org" <linux-pci@vger.kernel.org>,
-        "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+        with ESMTP id S244161AbiHZAIo (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 25 Aug 2022 20:08:44 -0400
+Received: from NAM04-BN8-obe.outbound.protection.outlook.com (mail-bn8nam04on2057.outbound.protection.outlook.com [40.107.100.57])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 22530C88BE;
+        Thu, 25 Aug 2022 17:08:29 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=Ku0Qia1O7KMEPDnjhTV6JHO0WeYr9MDwWxceYdLqGq497jCGMgs+CzRALn+hPbMDrR9H8FazjC63Rgk+8LtWlZlGg05SaoSNUPH4R+71F9jQDq+7D0q/O3jLQ5ICEP7/YEItwmT6kyWPZAepCVnNt9G7wtI6+7GPuF3RiHwHwKvTjOmZ5oT4v7sVOv1M3mgn0VmPD25thenY9xFYG/IbkvLqRIcrdApb7/JAWhDHUSNB7mp8igZdZ4EYQRXbSwzwt5ebf1jO/aeOGDKwc1d3cHKcXjjsj89hgkFFJG4HbqJgsmflnVjIqr92vyY+y3JrSb0++wrIGLJJJSULf+hYkQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=sQgwSDnbotnPTmknADKeY+EkkBgHv4es45bKT6i4JC0=;
+ b=IoOPOInsOqlkeQ9qomWd+mfisT/mJ99LEFcAa7uxs7vYAM9ymLxIRj+9lge4vY/a3qOnFYVUTFtOaoZgfBUsq589iN0l7HMMVpBZGRTzbXHp8+Z7Kf0cDZxvNHJ2cS7mycZNNkOZrkr7xT4VB85AkVhFHuqb872WaSFobzIklxPJsK8hR1hcAfwv6SPP7vrvhlhhVqQTpc9IXP0MiiHHLLoi1PpnQ18RU8IWnsTL+gjCVeOAzwL8r3EolOruMWVTH5NsP1m+6mLfcPBzZqsCg9pacMzGhS+HvrWPQIjHn3hFpxiFiTn0+YHpEkze1kkMHzu6VPH+BKfxmuMqRa1vag==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
+ dkim=pass header.d=nvidia.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=sQgwSDnbotnPTmknADKeY+EkkBgHv4es45bKT6i4JC0=;
+ b=GSRRZTlB5doUoWpYmO77N9ZN/ZS9BukHmLdphR4MQr/6tupXxRAG5xM4krxr7NlYq5oIRzadrxOq0UWXP97/6gkpP0wEYMLGKUl8EYuFhqCKU4j4Ko13TOHt+oPONhFrA9Ib5AC4JYDsMWxaR7TESLa+4tw+i39OPIuo5Ku8fm8QM2hwD+d723KiUiZERdkpm6LXf6zjRbz27njgXd/h4Pe3nLBKHxSq/8NiblxorXKp+REYXFh3gqe+aJDe4hOLr8aCypH2yF28rLUXZWFtk4f4aaCeG6HYOx6M91FxfWvuNzJi58kw9tJVONbCBUI7RuJvbZ1/lIe3vwyf2cEJkw==
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=nvidia.com;
+Received: from MN2PR12MB4192.namprd12.prod.outlook.com (2603:10b6:208:1d5::15)
+ by SJ0PR12MB5502.namprd12.prod.outlook.com (2603:10b6:a03:300::7) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5566.14; Fri, 26 Aug
+ 2022 00:08:20 +0000
+Received: from MN2PR12MB4192.namprd12.prod.outlook.com
+ ([fe80::462:7fe:f04f:d0d5]) by MN2PR12MB4192.namprd12.prod.outlook.com
+ ([fe80::462:7fe:f04f:d0d5%8]) with mapi id 15.20.5566.015; Fri, 26 Aug 2022
+ 00:08:20 +0000
+Date:   Thu, 25 Aug 2022 21:08:18 -0300
+From:   Jason Gunthorpe <jgg@nvidia.com>
+To:     Robin Murphy <robin.murphy@arm.com>
+Cc:     Saravana Kannan <saravanak@google.com>,
+        Greg KH <gregkh@linuxfoundation.org>,
+        "Gupta, Nipun" <Nipun.Gupta@amd.com>,
+        "robh+dt@kernel.org" <robh+dt@kernel.org>,
+        "krzysztof.kozlowski+dt@linaro.org" 
+        <krzysztof.kozlowski+dt@linaro.org>,
+        "rafael@kernel.org" <rafael@kernel.org>,
+        "eric.auger@redhat.com" <eric.auger@redhat.com>,
+        "alex.williamson@redhat.com" <alex.williamson@redhat.com>,
+        "cohuck@redhat.com" <cohuck@redhat.com>,
+        "Gupta, Puneet (DCG-ENG)" <puneet.gupta@amd.com>,
+        "song.bao.hua@hisilicon.com" <song.bao.hua@hisilicon.com>,
+        "mchehab+huawei@kernel.org" <mchehab+huawei@kernel.org>,
+        "maz@kernel.org" <maz@kernel.org>,
+        "f.fainelli@gmail.com" <f.fainelli@gmail.com>,
+        "jeffrey.l.hugo@gmail.com" <jeffrey.l.hugo@gmail.com>,
+        "Michael.Srba@seznam.cz" <Michael.Srba@seznam.cz>,
+        "mani@kernel.org" <mani@kernel.org>,
+        "yishaih@nvidia.com" <yishaih@nvidia.com>,
         "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "regressions@lists.linux.dev" <regressions@lists.linux.dev>,
-        "bhelgaas@google.com" <bhelgaas@google.com>,
+        "devicetree@vger.kernel.org" <devicetree@vger.kernel.org>,
         "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "linux-mm@kvack.org" <linux-mm@kvack.org>,
-        "songmuchun@bytedance.com" <songmuchun@bytedance.com>,
-        "mike.kravetz@oracle.com" <mike.kravetz@oracle.com>,
-        "Brandeburg, Jesse" <jesse.brandeburg@intel.com>,
-        "Nguyen, Anthony L" <anthony.l.nguyen@intel.com>,
-        Andrew Morton <akpm@linux-foundation.org>
-Subject: Re: BUG: Virtual machine fails to start on 6.0-rc2
-Message-ID: <20220825180807.020471c8.alex.williamson@redhat.com>
-In-Reply-To: <DM6PR11MB3113DF6EC61D0AB73F3A2FE387729@DM6PR11MB3113.namprd11.prod.outlook.com>
-References: <DM6PR11MB3113DF6EC61D0AB73F3A2FE387729@DM6PR11MB3113.namprd11.prod.outlook.com>
-Organization: Red Hat
+        "okaya@kernel.org" <okaya@kernel.org>,
+        "Anand, Harpreet" <harpreet.anand@amd.com>,
+        "Agarwal, Nikhil" <nikhil.agarwal@amd.com>,
+        "Simek, Michal" <michal.simek@amd.com>,
+        "git (AMD-Xilinx)" <git@amd.com>
+Subject: Re: [RFC PATCH v2 2/6] bus/cdx: add the cdx bus driver
+Message-ID: <YwgO8oCNn/QFM76V@nvidia.com>
+References: <20220817150542.483291-1-nipun.gupta@amd.com>
+ <20220817150542.483291-3-nipun.gupta@amd.com>
+ <Yv0KHROjESUI59Pd@kroah.com>
+ <DM6PR12MB3082D966CFC0FA1C2148D8FAE8719@DM6PR12MB3082.namprd12.prod.outlook.com>
+ <YwOEv6107RfU5p+H@kroah.com>
+ <DM6PR12MB3082B4BDD39632264E7532B8E8739@DM6PR12MB3082.namprd12.prod.outlook.com>
+ <YwYVhJCSAuYcgj1/@kroah.com>
+ <20220824233122.GA4068@nvidia.com>
+ <CAGETcx846Pomh_DUToncbaOivHMhHrdt-MTVYqkfLUKvM8b=6w@mail.gmail.com>
+ <a6ca5a5a-8424-c953-6f76-c9212db88485@arm.com>
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <a6ca5a5a-8424-c953-6f76-c9212db88485@arm.com>
+X-ClientProxiedBy: BL1P222CA0007.NAMP222.PROD.OUTLOOK.COM
+ (2603:10b6:208:2c7::12) To MN2PR12MB4192.namprd12.prod.outlook.com
+ (2603:10b6:208:1d5::15)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=unavailable
-        autolearn_force=no version=3.4.6
+X-MS-PublicTrafficType: Email
+X-MS-Office365-Filtering-Correlation-Id: 6a0ac167-a2b5-4543-6aa6-08da86f7153c
+X-MS-TrafficTypeDiagnostic: SJ0PR12MB5502:EE_
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: HTzkhWFVJH544bScjA36U/GljkChlTMSDMydsE1gGw7awYiRws3es1dul0nYN2402XLoFp4E/mQFNJjCSsbxQ9Layv3ZlEVe+Xss6D/WmRnq2V4IGIdD78mndkPayPo6Sq8Jkt6TYkV6BLEoLIGxNQZ6Uq996G9hgJ+dedQL+/VRz8klHYEJp2F9Ep8SLUsAB8wFtpfimEaYD4bBdLtZeX7LXaHmck8zH/JueqsWKA7wnsdqDxVtCMm5/wQrMVSyFFClj0LeKApj0qzVsbXcN0zmf/nGiDWxiqJJUToN+4+BvITcFLj4dXpY79TSkr9DjbP2kRBTOyw+KJzgvWCIiMyb0KDU8lRK44flI9fQMrXovGGRV4UveJphXhXbVCnRCcMg9xadNYAzQeOhQ9CUv1WEXHCU9I5/QRzZC8hy+wfVSeJE2IxYoCDWstjG2YISwTg5dnBmg6zLpdk1V21EFHOgsQbWO4eV8ekjxObCFrONBTp8UAEqnu7CZG7i8V1DU0bvA+U2fMhyZCWEHEnU7F0dO1Wq/uvMhXDKyEa4HtdIuY1GupKFk7lNyNIH9NKUsO6nCh1M3sjOvn6kYaKLg6sHSuXzo4ZebJueRp6EGbrJuFAcXVyGQoEZz7iFQCrIgFGdnv0oLmoa42XzcklhErR7/MedBt9TPgMHoRxgSvkB2lrSKUoOMvr3O8IXHmbUKCnHUMy+tLwlwdUyoJSO5w==
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:MN2PR12MB4192.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230016)(4636009)(136003)(366004)(39860400002)(396003)(346002)(376002)(186003)(6506007)(2906002)(7416002)(8936002)(478600001)(5660300002)(2616005)(41300700001)(86362001)(66556008)(8676002)(26005)(316002)(66946007)(36756003)(6916009)(4326008)(66476007)(6512007)(54906003)(6486002)(38100700002);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?AgIYYZXYCHNfqG/vSnXbeEGF4QpGpojcdrqMXth5eBCYVLiRJ1QAASSN+o8/?=
+ =?us-ascii?Q?4TQo/5BPmxg/0m7kCV446okLuujFvVhK4GKo0jNJa/+k3jbhZFh6F49G3cEa?=
+ =?us-ascii?Q?L70zMhESyNt5nw/3mtf14ikj11XNKp9kPtXp17vls11lv6u/P8dy3F1VCaKP?=
+ =?us-ascii?Q?PKMgpZm38fhOpG8aRMpudOBOkQFGIInJc6VxHUjLGxbflljpO3GoXiBLKtqz?=
+ =?us-ascii?Q?ofGCCgXBrX8hZ7UMVWkohMSvjhEQuxMe+eLVv+aLj6J3voT/UValsyRn+ezY?=
+ =?us-ascii?Q?vpI+CKhTK8TCeAQZ49rt3LQowMahE7PtCvvreivTfNJw7iG13EWndpratTRK?=
+ =?us-ascii?Q?oO9tzlgCezaZRrzQBtKXSfYvW/hW8GJfWCdVBDlIyTpfrpnmXocA4Y7d4Aiy?=
+ =?us-ascii?Q?xBJ1cclRGNPJsJcTU88thhsLycmyzHvrEl+QDNKYefcTViuuGVS2TgrGwS4F?=
+ =?us-ascii?Q?8OmcoiXWaRvt64zfil3jXpnew57p3BLZ5U9rf35lew7nn4+/HaPKWcy5o62N?=
+ =?us-ascii?Q?Ppmx7WORgMKxeL5ybyoArOmo9d2Y5f78jJJnT00yJb6BPNSLxadIgOYUN5DN?=
+ =?us-ascii?Q?WveRQj6qo3VxORayzi26qIaPZdr6xTp5TEYhLCF/8iE9niv2oXWKfOZ79KTS?=
+ =?us-ascii?Q?y7PwTlocwepgO7LPIsm9lrFg+1IZ1HLFHykZVbtaOkoeJDE9Wz8sU6dxMHTS?=
+ =?us-ascii?Q?FRtQR1ZzEeM1Y8Azqm3nYnMw3t+Z9aA/tbcyTmE/O9AvGBzM6aWUdiKDdkJ2?=
+ =?us-ascii?Q?uE5hjsF4lm0MZFiL0VqCofnx3duLo7L3gzfQ9m9+N6Q/dRTY6wpGQPCRSAc/?=
+ =?us-ascii?Q?jZMcOXASh7cjBy2omswQ6hgli4q8nX4yFGfhQa7iFscB472+BRvIquyRzGNj?=
+ =?us-ascii?Q?UneM1awhVkGwzUZAMEC0v+HXybcJbR3CzngDsOSr3853mJSgWjOFZoPM7D/y?=
+ =?us-ascii?Q?ffqvicaX94ByKwOV3M+WYIw/ZwCtOZClYL9am8+JnTWVT/slrrdzK3Nv4CpT?=
+ =?us-ascii?Q?xCdsCbN6+k0/hT7WqmOIp09gNyfTt8xx00f1T+J7nlgbLTl7QivqxXfRo1Gu?=
+ =?us-ascii?Q?5O8A8CsjQHIBvnRvHNNmDVa5z/EwyhM02Kh5Y3NEdA5X7yBsT2vgPVrnWoEP?=
+ =?us-ascii?Q?xzatx62L9X2RIhNe6AAYNXyAuUFV34WtW0Q/nXh22FRJa4AmknOTu0vdcaKj?=
+ =?us-ascii?Q?j2w7PLnYtsurWniwwlCZWYv07IASxRhPV/RiHX4FQTmorv6i0EnhX6e33TpF?=
+ =?us-ascii?Q?IUxhC15ZrB7SSfKhtUfbtk6oM1+1asrMuvpKwf+Yt6G5I0tgGIsXu1M/rzAE?=
+ =?us-ascii?Q?lBGps2zfLMOUnykV7QhQqePYsU50BGoOI9Q4mKm1e++yYUflJ2tAbR8Et/HZ?=
+ =?us-ascii?Q?4/sl82gnaRo/8pZaIYlLgnClj1U42IJCjKGaD/6CDxiofdTIi2KzV4xghWyI?=
+ =?us-ascii?Q?R5QYZPwA/x7ngevG28djRWK8DX5EJjKUvSl1V12+ZXcpMH3IcJzMg72GW5IY?=
+ =?us-ascii?Q?zmsjq1UlGtbnYB+YBFoDqcfl7frXH6QD0PsM4m6EQatdZPy4aFD6mxaQ5I7I?=
+ =?us-ascii?Q?oGLiCtLcvzcQXWyQJi8BKfVOB6HX9oSboDEn7TDy?=
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 6a0ac167-a2b5-4543-6aa6-08da86f7153c
+X-MS-Exchange-CrossTenant-AuthSource: MN2PR12MB4192.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 26 Aug 2022 00:08:20.3141
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: JbwfFVF9m5oLQcesN4qSzg9l0rlOqRCedGAFnPYrOkdW7RyPVr5aD+vbi/ygBUTd
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SJ0PR12MB5502
+X-Spam-Status: No, score=-1.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FORGED_SPF_HELO,
+        RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_NONE,
+        T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED autolearn=no autolearn_force=no
+        version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, 25 Aug 2022 23:42:47 +0000
-"Laba, SlawomirX" <slawomirx.laba@intel.com> wrote:
+On Thu, Aug 25, 2022 at 08:57:49PM +0100, Robin Murphy wrote:
 
-> We were testing the changes for our VF devices and noticed an issue
-> when starting VMs with passthrough VFs. We then moved back to
-> mainline kernel and reproduced the issue on 6.0-rc2
-> 
-> We noticed that the startup of the KVM hangs.
-> 
-> Steps to reproduce:
-> Create a VF from the PF interface.
-> Configure VM XML with the VF PCI.
-> Start the KVM.
-> 
-> To isolate the issue we moved back to kernel 5.19 and it was working
-> fine.
-> 
-> Working tag v5.19
-> Tested failing commit 4c612826bec1
+> To my mind, it would definitely help to understand if this is a *real*
+> discoverable bus in hardware, i.e. does one have to configure one's device
+> with some sort of CDX wrapper at FPGA synthesis time, that then physically
+> communicates with some sort of CDX controller to identify itself once
+> loaded; or is it "discoverable" in the sense that there's some firmware on
+> an MCU controlling what gets loaded into the FPGA, and software can query
+> that and get back whatever precompiled DTB fragment came bundled with the
+> bitstream, i.e. it's really more like fpga-mgr in a fancy hat?
 
-Does this resolve the issue?
+So much of the IP that you might want to put in a FPGA needs DT, I
+don't thing a simplistic AMBA like discoverable thing would be that
+interesting.
 
-https://lore.kernel.org/all/166015037385.760108.16881097713975517242.stgit@omen/
+Think about things like FPGA GPIOs being configured as SPI/I2C, then
+describing the board config of SPI/I2C busses, setting up PCI bridges,
+flash storage controllers and all sorts of other typically embedded
+stuff that really relies on DT these days.
 
-This is currently in Andrew's mm-hotfixes-unstable branch and we're
-waiting for it to be merged to mainline.  Thanks,
+It would be nice if Xilinx could explain more about what environment
+this is targetting. Is it Zynq-like stuff?
 
-Alex
- 
-> [root@localhost sl]# uname -r
-> 6.0.0-rc2-00159-g4c612826bec1
-> [root@localhost sl]# echo 1 >
-> /sys/class/net/ens785f3/device/sriov_numvfs [root@localhost sl]#
-> virsh start rhel_9_0_first ^C
-> [root@localhost sl]# virsh list --all
->  Id   Name             State
-> -------------------------------
->  1    rhel_9_0_first   paused	
-> 
-> Dmesg:
-> [  +0.042400] iavf: Intel(R) Ethernet Adaptive Virtual Function
-> Network Driver [  +0.000004] Copyright (c) 2013 - 2018 Intel
-> Corporation. [  +0.000309] iavf 0000:18:19.0: enabling device (0000
-> -> 0002) [  +0.073471] iavf 0000:18:19.0: Invalid MAC address
-> 00:00:00:00:00:00, using random [  +0.000674] iavf 0000:18:19.0:
-> Multiqueue Enabled: Queue pair count = 16 [  +0.000466] iavf
-> 0000:18:19.0: MAC address: 5a:0c:b5:f7:4f:0b [  +0.000003] iavf
-> 0000:18:19.0: GRO is enabled [  +0.005941] iavf 0000:18:19.0
-> ens785f3v0: renamed from eth0 [  +0.179174] IPv6:
-> ADDRCONF(NETDEV_CHANGE): ens785f3v0: link becomes ready [  +0.000040]
-> iavf 0000:18:19.0 ens785f3v0: NIC Link is Up Speed is 25 Gbps Full
-> Duplex [ +26.408503] bridge: filtering via arp/ip/ip6tables is no
-> longer available by default. Update your scripts to load br_netfilter
-> if you need this. [  +0.399621] VFIO - User Level meta-driver
-> version: 0.3 [  +0.151579] iavf 0000:18:19.0: Remove device [
-> +0.292158] ice 0000:18:00.3 ens785f3: Setting MAC 52:54:00:9f:ea:de
-> on VF 0. VF driver will be reinitialized [  +0.083676] ice
-> 0000:18:00.3: Clearing port VLAN on VF 0 [  +0.155905] tun: Universal
-> TUN/TAP device driver, 1.6 [  +0.000976] virbr0: port 1(vnet0)
-> entered blocking state [  +0.000017] virbr0: port 1(vnet0) entered
-> disabled state [  +0.000052] device vnet0 entered promiscuous mode [
-> +0.000244] virbr0: port 1(vnet0) entered blocking state [  +0.000003]
-> virbr0: port 1(vnet0) entered listening state [  +2.019924] virbr0:
-> port 1(vnet0) entered learning state [  +2.047997] virbr0: port
-> 1(vnet0) entered forwarding state [  +0.000018] virbr0: topology
-> change detected, propagating [Aug25 19:12] INFO: task khugepaged:507
-> blocked for more than 122 seconds. [  +0.000016]       Tainted: G
->    W I        6.0.0-rc2-00159-g4c612826bec1 #1 [  +0.000010] "echo 0
-> > /proc/sys/kernel/hung_task_timeout_secs" disables this message. [
-> > +0.000010] task:khugepaged      state:D stack:    0 pid:  507 ppid:
-> >     2 flags:0x00004000 [  +0.000004] Call Trace:
-> [  +0.000001]  <TASK>
-> [  +0.000003]  __schedule+0x1bc/0x550
-> [  +0.000006]  ? osq_unlock+0xf/0x90
-> [  +0.000005]  schedule+0x5d/0xd0
-> [  +0.000002]  rwsem_down_write_slowpath+0x2c9/0x5e0
-> [  +0.000004]  ? find_vma+0x64/0x70
-> [  +0.000004]  collapse_huge_page+0x1f8/0x8a0
-> [  +0.000004]  ? _raw_spin_unlock+0x14/0x30
-> [  +0.000002]  ? preempt_count_add+0x70/0xa0
-> [  +0.000005]  ? _raw_spin_lock_irqsave+0x21/0x30
-> [  +0.000001]  ? lock_timer_base+0x61/0x80
-> [  +0.000005]  khugepaged_scan_pmd+0x33d/0x7b0
-> [  +0.000003]  khugepaged_scan_mm_slot+0x155/0x440
-> [  +0.000003]  khugepaged+0x189/0x3e0
-> [  +0.000002]  ? preempt_count_add+0x70/0xa0
-> [  +0.000002]  ? _raw_spin_unlock_irqrestore+0x1e/0x40
-> [  +0.000002]  ? khugepaged_scan_mm_slot+0x440/0x440
-> [  +0.000001]  kthread+0xf0/0x120
-> [  +0.000003]  ? kthread_complete_and_exit+0x20/0x20
-> [  +0.000003]  ret_from_fork+0x1f/0x30
-> [  +0.000006]  </TASK>
-> 
-> On the working version there is a line that enables the interface for
-> the VF which is missing on non-working one: [  +0.911730] vfio-pci
-> 0000:18:19.0: enabling device (0000 -> 0002)
-> 
-
+Jason
