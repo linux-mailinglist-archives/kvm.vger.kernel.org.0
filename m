@@ -2,86 +2,85 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id DC79E5A2623
-	for <lists+kvm@lfdr.de>; Fri, 26 Aug 2022 12:51:34 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 4C6945A2665
+	for <lists+kvm@lfdr.de>; Fri, 26 Aug 2022 13:02:05 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1344008AbiHZKud (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 26 Aug 2022 06:50:33 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49418 "EHLO
+        id S245545AbiHZLCB (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 26 Aug 2022 07:02:01 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60302 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1343994AbiHZKub (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 26 Aug 2022 06:50:31 -0400
+        with ESMTP id S230052AbiHZLB3 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 26 Aug 2022 07:01:29 -0400
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 213B81A39C
-        for <kvm@vger.kernel.org>; Fri, 26 Aug 2022 03:50:30 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 46E0BDCFF0
+        for <kvm@vger.kernel.org>; Fri, 26 Aug 2022 03:58:41 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1661511029;
+        s=mimecast20190719; t=1661511510;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=pLii0dfj1y7lFu87Lg22T36M6OnU1zUptup5Hy8q+CA=;
-        b=OO2eonGXI9WqD0QmWdZnmaxtBbAOekzMpYI+f2KtcvxrIDcXWsOoK27oQWiCmnWAoRHATe
-        FOjQM5g5kGBXFCRv7aP+wrFE0FfLVsVfdnpefR2C8q2RYyZaqpiV6wB+waagVuEv7Ux8RJ
-        Zb71dA6MZmzsniqX861DzKSsu4NZlNM=
+        bh=jMnbTKtNSpTsqq0eZVxc5+MQ+KePmpUNSlwTet2oL2k=;
+        b=bE9OteKOkVFMONTJmbeIcTAi1j1NFwELW2T3b3lZyvJlWfPe4RzqUYTFyQntcb3u5dEk1o
+        Y7Jr4sW3Z0LO3A1iYWtSOhn4WvXEJfdSq+yybv6EdfN4n7ziWyVZ0W6bjd2zsjM+IvVXAo
+        c+V8P4BvVUFFKLM/9A5PLfZgNKSv5u0=
 Received: from mail-ed1-f70.google.com (mail-ed1-f70.google.com
  [209.85.208.70]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_128_GCM_SHA256) id
- us-mta-325-BMKWdWzLORyJp6exdQOhlw-1; Fri, 26 Aug 2022 06:50:28 -0400
-X-MC-Unique: BMKWdWzLORyJp6exdQOhlw-1
-Received: by mail-ed1-f70.google.com with SMTP id m16-20020a056402431000b0044662a0ba2cso889025edc.13
-        for <kvm@vger.kernel.org>; Fri, 26 Aug 2022 03:50:27 -0700 (PDT)
+ us-mta-645-lGdmfvi1MJ6wPznMg85eMg-1; Fri, 26 Aug 2022 06:58:29 -0400
+X-MC-Unique: lGdmfvi1MJ6wPznMg85eMg-1
+Received: by mail-ed1-f70.google.com with SMTP id c14-20020a05640227ce00b0043e5df12e2cso902134ede.15
+        for <kvm@vger.kernel.org>; Fri, 26 Aug 2022 03:58:29 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=content-transfer-encoding:in-reply-to:subject:from:references:cc:to
          :content-language:user-agent:mime-version:date:message-id
          :x-gm-message-state:from:to:cc;
-        bh=pLii0dfj1y7lFu87Lg22T36M6OnU1zUptup5Hy8q+CA=;
-        b=0iFZi0JBcCpHQgudXc4aZAWOFIGt9CY+0GxSM8/NP87gMJ3jjeb+K6uFHi/JBuECoE
-         AAxP7xia9J05CJ9My8UV9jukmObS7gaJVsJDsfElkU7HQtQMkPHfa3kgzaeOlykcIFbd
-         Jtd1pxmj2T58OEsGqt10K87xreHLtXOA+9HsQcoUqwJnWwQmV6itlXSIUsXgpuny4Bq8
-         JM4lxbEdGwq8o9ApThdiTyj0FICFUc9+pw8SlNt0yY/OuKNqSzJxGL+nQFVMHbynDNZy
-         rTZEn6iczAQwHnZiMnkrG3qRNRKHl6PVKmR6lkElx5tZdtkI95ziUGQBXgqFXsjUNFP/
-         kTJw==
-X-Gm-Message-State: ACgBeo22CrUTEwm9skSKtb1LcA/lEBtxaKwdxphjJX1Hh/St1zBqYUxj
-        bVOx90YQ23TybW0ftmYu6Waip76NhDWjyGFO7opbCgsOlZu+teGiNToHVVIqEkzxjz0QvTKu7rT
-        1/Oyib3yC3CCU
-X-Received: by 2002:a17:907:84a:b0:733:735:2b1a with SMTP id ww10-20020a170907084a00b0073307352b1amr5021043ejb.290.1661511026927;
-        Fri, 26 Aug 2022 03:50:26 -0700 (PDT)
-X-Google-Smtp-Source: AA6agR7I33tIVReqn9qteZcQFjZQwkCSQgOePSldWnAYXVK6po7eIEvLdgg+W/uNc+AQTkft1CgJvQ==
-X-Received: by 2002:a17:907:84a:b0:733:735:2b1a with SMTP id ww10-20020a170907084a00b0073307352b1amr5021032ejb.290.1661511026688;
-        Fri, 26 Aug 2022 03:50:26 -0700 (PDT)
+        bh=jMnbTKtNSpTsqq0eZVxc5+MQ+KePmpUNSlwTet2oL2k=;
+        b=Bnbxi3Gr/KNpDrMg4HX7ct1LYVCGcS0zVV/cKueTFUGyuG8m3SWoOIND+OMFQozQN2
+         CLO6DtBNUlHPqfYxNEdgxjCAdn8GBG7wBhXPi4v3AG93Af7CBLBow85fgIWXVDd45OS7
+         j3L+YO8cavdBQha+AYlwDT/1vnaWXArSo7fym6sBt3x31rds++cCS8ld6A+eEzAl4KNd
+         jSawO3osZPmjENRFkQvF8dwIAndZUEQBvZt+V1UZQQuzap3AiGaLqnKZ6VdTZ4EXL5Ol
+         CXZATaD2fsJVaKzS0qPqhqBSGoTxhEynzKA5uB6G/FKBDMrvCXtFwwZwskfbUI9CNGXr
+         4vaQ==
+X-Gm-Message-State: ACgBeo0YfBEYZa7W9irditS60msiL/SIk9BEZhNCUbueZZsvClUKX5EX
+        dMI4kF2NwkjRXHHpSsdqgut2P4+CeaaG7GBGsl5B9tkhJvtrPNYSxb9+4tATzUr7ZOfY9cUG2jm
+        2oa5l+eT5j0ei
+X-Received: by 2002:a05:6402:5150:b0:447:933d:ec65 with SMTP id n16-20020a056402515000b00447933dec65mr6212669edd.80.1661511508657;
+        Fri, 26 Aug 2022 03:58:28 -0700 (PDT)
+X-Google-Smtp-Source: AA6agR4J7blDIUmOh5lFPHJwf/tJLIYkgJgvljjD4T11ziyn6v4vnxonXD5Bpxyrz7ntlO6vhSx/Hw==
+X-Received: by 2002:a05:6402:5150:b0:447:933d:ec65 with SMTP id n16-20020a056402515000b00447933dec65mr6212653edd.80.1661511508460;
+        Fri, 26 Aug 2022 03:58:28 -0700 (PDT)
 Received: from ?IPV6:2001:b07:6468:f312:9af8:e5f5:7516:fa89? ([2001:b07:6468:f312:9af8:e5f5:7516:fa89])
-        by smtp.googlemail.com with ESMTPSA id 1-20020a170906218100b0072af4af2f46sm750652eju.74.2022.08.26.03.50.25
+        by smtp.googlemail.com with ESMTPSA id p17-20020a50cd91000000b004479cec6496sm1102859edi.75.2022.08.26.03.58.09
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 26 Aug 2022 03:50:26 -0700 (PDT)
-Message-ID: <9e7cb09c-82c5-9492-bccd-5511f5bede26@redhat.com>
-Date:   Fri, 26 Aug 2022 12:50:24 +0200
+        Fri, 26 Aug 2022 03:58:27 -0700 (PDT)
+Message-ID: <99364855-b4e9-8a69-e1ca-ed09d103e4c8@redhat.com>
+Date:   Fri, 26 Aug 2022 12:58:08 +0200
 MIME-Version: 1.0
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
  Thunderbird/91.12.0
 Content-Language: en-US
-To:     Marc Zyngier <maz@kernel.org>, Peter Xu <peterx@redhat.com>
+To:     Marc Zyngier <maz@kernel.org>,
+        Oliver Upton <oliver.upton@linux.dev>
 Cc:     Gavin Shan <gshan@redhat.com>, kvmarm@lists.cs.columbia.edu,
         linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org,
         linux-kernel@vger.kernel.org, linux-doc@vger.kernel.org,
-        linux-kselftest@vger.kernel.org, corbet@lwn.net,
+        linux-kselftest@vger.kernel.org, peterx@redhat.com, corbet@lwn.net,
         james.morse@arm.com, alexandru.elisei@arm.com,
-        suzuki.poulose@arm.com, oliver.upton@linux.dev,
-        catalin.marinas@arm.com, will@kernel.org, shuah@kernel.org,
-        seanjc@google.com, dmatlack@google.com, bgardon@google.com,
-        ricarkol@google.com, zhenyzha@redhat.com, shan.gavin@gmail.com
+        suzuki.poulose@arm.com, catalin.marinas@arm.com, will@kernel.org,
+        shuah@kernel.org, seanjc@google.com, drjones@redhat.com,
+        dmatlack@google.com, bgardon@google.com, ricarkol@google.com,
+        zhenyzha@redhat.com, shan.gavin@gmail.com
 References: <20220819005601.198436-1-gshan@redhat.com>
  <20220819005601.198436-2-gshan@redhat.com> <87lerkwtm5.wl-maz@kernel.org>
  <41fb5a1f-29a9-e6bb-9fab-4c83a2a8fce5@redhat.com>
- <87fshovtu0.wl-maz@kernel.org>
- <171d0159-4698-354b-8b2f-49d920d03b1b@redhat.com>
- <YwTc++Lz6lh3aR4F@xz-m1.local> <87bksawz0w.wl-maz@kernel.org>
- <YwVEoM1pj2MPCELp@xz-m1.local> <878rnewpaw.wl-maz@kernel.org>
+ <87fshovtu0.wl-maz@kernel.org> <YwTn2r6FLCx9mAU7@google.com>
+ <87a67uwve8.wl-maz@kernel.org>
 From:   Paolo Bonzini <pbonzini@redhat.com>
 Subject: Re: [PATCH v1 1/5] KVM: arm64: Enable ring-based dirty memory
  tracking
-In-Reply-To: <878rnewpaw.wl-maz@kernel.org>
+In-Reply-To: <87a67uwve8.wl-maz@kernel.org>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 X-Spam-Status: No, score=-2.8 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
@@ -94,54 +93,40 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 8/24/22 00:47, Marc Zyngier wrote:
->> I definitely don't think I 100% understand all the ordering things since
->> they're complicated.. but my understanding is that the reset procedure
->> didn't need memory barrier (unlike pushing, where we have explicit wmb),
->> because we assumed the userapp is not hostile so logically it should only
->> modify the flags which is a 32bit field, assuming atomicity guaranteed.
-> Atomicity doesn't guarantee ordering, unfortunately. Take the
-> following example: CPU0 is changing a bunch of flags for GFNs A, B, C,
-> D that exist in the ring in that order, and CPU1 performs an ioctl to
-> reset the page state.
-> 
-> CPU0:
->      write_flag(A, KVM_DIRTY_GFN_F_RESET)
->      write_flag(B, KVM_DIRTY_GFN_F_RESET)
->      write_flag(C, KVM_DIRTY_GFN_F_RESET)
->      write_flag(D, KVM_DIRTY_GFN_F_RESET)
->      [...]
-> 
-> CPU1:
->     ioctl(KVM_RESET_DIRTY_RINGS)
-> 
-> Since CPU0 writes do not have any ordering, CPU1 can observe the
-> writes in a sequence that have nothing to do with program order, and
-> could for example observe that GFN A and D have been reset, but not B
-> and C. This in turn breaks the logic in the reset code (B, C, and D
-> don't get reset), despite userspace having followed the spec to the
-> letter. If each was a store-release (which is the case on x86), it
-> wouldn't be a problem, but nothing calls it in the documentation.
-> 
-> Maybe that's not a big deal if it is expected that each CPU will issue
-> a KVM_RESET_DIRTY_RINGS itself, ensuring that it observe its own
-> writes. But expecting this to work across CPUs without any barrier is
-> wishful thinking.
+On 8/23/22 22:35, Marc Zyngier wrote:
+>> Heh, yeah I need to get that out the door. I'll also note that Gavin's
+>> changes are still relevant without that series, as we do write unprotect
+>> in parallel at PTE granularity after commit f783ef1c0e82 ("KVM: arm64:
+>> Add fast path to handle permission relaxation during dirty logging").
+>
+> Ah, true. Now if only someone could explain how the whole
+> producer-consumer thing works without a trace of a barrier, that'd be
+> great...
 
-Agreed, but that's a problem for userspace to solve.  If userspace wants 
-to reset the fields in different CPUs, it has to synchronize with its 
-own invoking of the ioctl.
+Do you mean this?
 
-That is, CPU0 must ensure that a ioctl(KVM_RESET_DIRTY_RINGS) is done 
-after (in the memory-ordering sense) its last write_flag(D, 
-KVM_DIRTY_GFN_F_RESET).  If there's no such ordering, there's no 
-guarantee that the write_flag will have any effect.
+void kvm_dirty_ring_push(struct kvm_dirty_ring *ring, u32 slot, u64 offset)
+{
+         struct kvm_dirty_gfn *entry;
 
-The main reason why I preferred a global KVM_RESET_DIRTY_RINGS ioctl was 
-because it takes kvm->slots_lock so the execution would be serialized 
-anyway.  Turning slots_lock into an rwsem would be even worse because it 
-also takes kvm->mmu_lock (since slots_lock is a mutex, at least two 
-concurrent invocations won't clash with each other on the mmu_lock).
+         /* It should never get full */
+         WARN_ON_ONCE(kvm_dirty_ring_full(ring));
+
+         entry = &ring->dirty_gfns[ring->dirty_index & (ring->size - 1)];
+
+         entry->slot = slot;
+         entry->offset = offset;
+         /*
+          * Make sure the data is filled in before we publish this to
+          * the userspace program.  There's no paired kernel-side reader.
+          */
+         smp_wmb();
+         kvm_dirty_gfn_set_dirtied(entry);
+         ring->dirty_index++;
+         trace_kvm_dirty_ring_push(ring, slot, offset);
+}
+
+The matching smp_rmb() is in userspace.
 
 Paolo
 
