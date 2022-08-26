@@ -2,93 +2,66 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id E50505A1D50
-	for <lists+kvm@lfdr.de>; Fri, 26 Aug 2022 01:43:46 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 435885A1D76
+	for <lists+kvm@lfdr.de>; Fri, 26 Aug 2022 02:05:16 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S244231AbiHYXni (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 25 Aug 2022 19:43:38 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33404 "EHLO
+        id S243843AbiHZAFL (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 25 Aug 2022 20:05:11 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59506 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S244614AbiHYXnd (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 25 Aug 2022 19:43:33 -0400
-Received: from mail-pl1-x630.google.com (mail-pl1-x630.google.com [IPv6:2607:f8b0:4864:20::630])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CA2E5B8A62
-        for <kvm@vger.kernel.org>; Thu, 25 Aug 2022 16:43:32 -0700 (PDT)
-Received: by mail-pl1-x630.google.com with SMTP id p18so151700plr.8
-        for <kvm@vger.kernel.org>; Thu, 25 Aug 2022 16:43:32 -0700 (PDT)
+        with ESMTP id S229680AbiHZAFI (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 25 Aug 2022 20:05:08 -0400
+Received: from mail-pl1-x635.google.com (mail-pl1-x635.google.com [IPv6:2607:f8b0:4864:20::635])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9EFD278226
+        for <kvm@vger.kernel.org>; Thu, 25 Aug 2022 17:05:07 -0700 (PDT)
+Received: by mail-pl1-x635.google.com with SMTP id f12so26366plb.11
+        for <kvm@vger.kernel.org>; Thu, 25 Aug 2022 17:05:07 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:from:to:cc;
-        bh=CrkUDi4mYcC3qOEbpgTO1y4xAYzFYl9qfJxBFAO1WQU=;
-        b=oH89fuC7/OCch4BVe3RICsoOXGZYywI31GBVdOyyzkOO7DEQwz0A3bC8XVXdtvCwd1
-         6++QpYTFdw9m4hHnWiKtTIpB7Hi5ELfJeZuqNN9uFKSo7WfdJ9G1Mhm4JK6AV2WHzXjJ
-         VbNzkpdmEXJLIC2dBL9fBoXXr3+4Uapf2ay+q5o5OiTRLYNgKYonwB+ySRb6B5oDeL1+
-         dAGtJD3OxzwN4u/yHADk0FqkEVYKITXRoFTnTIyXKBO0WL66kWEVFTEfNMRKnT8HVrqd
-         r0phSuI2WdqgmUZxadQTwthKDt4ZrV+UeAwXIY6ktT0Ll4TYsN0WDJRL1/UrY3DGWEjg
-         ExLw==
+        bh=6AiKwkDcKOsh0d0RBuOF7pp4bP8c0lf/dlSyLeEcbss=;
+        b=l9li/7PCCJgOYQIZ/T7Pj5f0q+kL6RP1A8OCFyL0o3MZnN8hZV5lw2x87yGkbVgh3Z
+         lgaQZJp+D7XYltGhUrjVoy0cycpSFfA0fE4gp/3WMXS/3au+ggHFkO/M+stoE7b2FNj6
+         PDMTbTZk/pTs2vG212P2nm4jHIPzi+YHnHIGpF55mC3ij/KHYjueWmyFXh4lxFuyKq3y
+         tLQIn6kk3yhivxBduLAazn/q54EvcRA2hqSi+ty7ge0NuK67o6mA271huLoh5ADeq0op
+         uG6xO7E5UfQh2e1I6FvkArhZ4wyJbsxuqfzy82D+aiLWkui8q4TcHPZWdoU59dKoeD68
+         6Yog==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:x-gm-message-state:from:to:cc;
-        bh=CrkUDi4mYcC3qOEbpgTO1y4xAYzFYl9qfJxBFAO1WQU=;
-        b=ttCyIlWMrjnyRij9/sRQBNXzk9tVHKvb2r96oRI/Dqm7ZPFaPZIYOIlhQDUzVT4H4L
-         dAtsXcdaifOCFjX3lxKR7iQqrECIyGNBiwGwcxYarI9QfBsaHC4W8BVeN9jnWDEKxpf6
-         c7vHHymaIwvaEpOSiZxCqVFL5r7BYEy69MpMu4VMuPkBPRtlPy8OfK2gqRkqp7ZcQChp
-         FRIH1+zFgEjwLV5w81ETQL8tAmBko9byggIb1bWevZBIywqMGLmNlLdrit0Xc7QEMtya
-         mf8a8NCnlTqqn7faSTV+mgzy05FR+lMELnpeotZdfK/YmeTObsZWsZ3ts/nydVNiL5xy
-         13DA==
-X-Gm-Message-State: ACgBeo0KKjhb4iBMKtacOnoDef2HtrvQ0R6NlH9Xp5SETIER5Lt44mmR
-        HyGzIJcj0TfeXwKqQMyG+loYmg==
-X-Google-Smtp-Source: AA6agR7uDYeONp1wM5VEYWT/Ep3xp8EiV6yvT/4U8QUXuA4MqoQg5QOZ3aLyR1Qey0199Sw+p/pMAg==
-X-Received: by 2002:a17:90b:2390:b0:1fa:c680:1f63 with SMTP id mr16-20020a17090b239000b001fac6801f63mr1464578pjb.16.1661471012094;
-        Thu, 25 Aug 2022 16:43:32 -0700 (PDT)
+        bh=6AiKwkDcKOsh0d0RBuOF7pp4bP8c0lf/dlSyLeEcbss=;
+        b=loPu1+gs4bo9idWYDF4gH0b/bGCkdtu8KkkVkjI9XTrko8VzbvmbtfbCXL6cXMaq/I
+         Nly5gzCOQfa8pg3l84ucbvaMPE0GkiBZL2EoNrAREQab4VYNyQupVbqogN8Wmoaj3gul
+         dlQgm6KTb5BTdlLgnQQN3CX7J8fAbTBYbOLJuyrHpK51xM4aEX8Pq5hOau0mDgq1nDKW
+         sJxwRTWdkyFOfVu6kD2GwuZAzgj0Fw5quvsjPCIjChCGqf9B6jjdPEw9nvLFfebAuTvE
+         OQXq3zfcONH1+N8kkFcSRC+qFa7dUm5fjKZqA/ORgjQ0sAtHctPaMi9mrBl4OxEN581O
+         ezcQ==
+X-Gm-Message-State: ACgBeo1GkFSJopk/TRNfsJ4e6ERHVnUquUW7Edi9RMJUAX/hF+DkfAVM
+        IHWTsZZUf9tChG1xP1ufkKwy36hQnKRyUw==
+X-Google-Smtp-Source: AA6agR7RRqll1LbG38UTTjdk8smXbr3pUNh9agoHWb3kNNlVDcswHYB6qyQuYmjrAb6qBzPqTw4PWA==
+X-Received: by 2002:a17:902:b7c8:b0:172:ba7e:e546 with SMTP id v8-20020a170902b7c800b00172ba7ee546mr1324289plz.22.1661472306941;
+        Thu, 25 Aug 2022 17:05:06 -0700 (PDT)
 Received: from google.com (7.104.168.34.bc.googleusercontent.com. [34.168.104.7])
-        by smtp.gmail.com with ESMTPSA id a9-20020aa78e89000000b005379fb50ff0sm216131pfr.50.2022.08.25.16.43.31
+        by smtp.gmail.com with ESMTPSA id b11-20020a170902650b00b00172a567d910sm118008plk.289.2022.08.25.17.05.06
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 25 Aug 2022 16:43:31 -0700 (PDT)
-Date:   Thu, 25 Aug 2022 23:43:27 +0000
+        Thu, 25 Aug 2022 17:05:06 -0700 (PDT)
+Date:   Fri, 26 Aug 2022 00:05:02 +0000
 From:   Sean Christopherson <seanjc@google.com>
-To:     "Kirill A. Shutemov" <kirill@shutemov.name>
-Cc:     Chao Peng <chao.p.peng@linux.intel.com>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org, linux-mm@kvack.org,
-        linux-fsdevel@vger.kernel.org, linux-api@vger.kernel.org,
-        linux-doc@vger.kernel.org, qemu-devel@nongnu.org,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Jonathan Corbet <corbet@lwn.net>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        x86@kernel.org, "H . Peter Anvin" <hpa@zytor.com>,
-        Hugh Dickins <hughd@google.com>,
-        Jeff Layton <jlayton@kernel.org>,
-        "J . Bruce Fields" <bfields@fieldses.org>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        Mike Rapoport <rppt@kernel.org>,
-        Steven Price <steven.price@arm.com>,
-        "Maciej S . Szmigiero" <mail@maciej.szmigiero.name>,
-        Vlastimil Babka <vbabka@suse.cz>,
-        Vishal Annapurve <vannapurve@google.com>,
-        Yu Zhang <yu.c.zhang@linux.intel.com>,
-        "Kirill A . Shutemov" <kirill.shutemov@linux.intel.com>,
-        luto@kernel.org, jun.nakajima@intel.com, dave.hansen@intel.com,
-        ak@linux.intel.com, david@redhat.com, aarcange@redhat.com,
-        ddutile@redhat.com, dhildenb@redhat.com,
-        Quentin Perret <qperret@google.com>,
-        Michael Roth <michael.roth@amd.com>, mhocko@suse.com
-Subject: Re: [PATCH v6 6/8] KVM: Handle page fault for private memory
-Message-ID: <YwgJH0TRZO4ie4z8@google.com>
-References: <20220519153713.819591-1-chao.p.peng@linux.intel.com>
- <20220519153713.819591-7-chao.p.peng@linux.intel.com>
- <YqzyjZnflCMPo8b/@google.com>
- <20220819004018.mgdvxhl6dj3ujl3f@box.shutemov.name>
+To:     Vasant Karasulli <vkarasulli@suse.de>
+Cc:     Thomas.Lendacky@amd.com, bp@suse.de, erdemaktas@google.com,
+        jroedel@suse.de, kvm@vger.kernel.org, marcorr@google.com,
+        pbonzini@redhat.com, rientjes@google.com, zxwang42@gmail.com
+Subject: Re: [kvm-unit-tests PATCH v3 04/11] lib: x86: Import insn decoder
+ from Linux
+Message-ID: <YwgOLu6qS0PEw5fL@google.com>
+References: <Ylm0ZmhaklG9AqND@google.com>
+ <20220825164221.17971-1-vkarasulli@suse.de>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20220819004018.mgdvxhl6dj3ujl3f@box.shutemov.name>
+In-Reply-To: <20220825164221.17971-1-vkarasulli@suse.de>
 X-Spam-Status: No, score=-14.5 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
         ENV_AND_HDR_SPF_MATCH,FSL_HELO_FAKE,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,
@@ -100,30 +73,20 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Aug 19, 2022, Kirill A. Shutemov wrote:
-> On Fri, Jun 17, 2022 at 09:30:53PM +0000, Sean Christopherson wrote:
-> > > @@ -4088,7 +4144,12 @@ static int direct_page_fault(struct kvm_vcpu *vcpu, struct kvm_page_fault *fault
-> > >  		read_unlock(&vcpu->kvm->mmu_lock);
-> > >  	else
-> > >  		write_unlock(&vcpu->kvm->mmu_lock);
-> > > -	kvm_release_pfn_clean(fault->pfn);
-> > > +
-> > > +	if (fault->is_private)
-> > > +		kvm_private_mem_put_pfn(fault->slot, fault->pfn);
-> > 
-> > Why does the shmem path lock the page, and then unlock it here?
-> 
-> Lock is require to avoid race with truncate / punch hole. Like if truncate
-> happens after get_pfn(), but before it gets into SEPT we are screwed.
+On Thu, Aug 25, 2022, Vasant Karasulli wrote:
+>      There is at least one test that I know uses string IO i.e. x86/amd_sev.c.
 
-Getting the PFN into the SPTE doesn't provide protection in and of itself.  The
-protection against truncation and whatnot comes from KVM getting a notification
-and either retrying the fault (notification acquires mmu_lock before
-direct_page_fault()), or blocking the notification (truncate / punch hole) until
-after KVM installs the SPTE.  I.e. KVM just needs to ensure it doesn't install a
-SPTE _after_ getting notified.
+That one should be easy to convert to directly do #VMGEXIT when SEV-ES is enabled.
+Or maybe delete it an enlighten emulator.c's version?
 
-If the API is similar to gup(), i.e. only elevates the refcount but doesn't lock
-the page, then there's no need for a separate kvm_private_mem_put_pfn(), and in
-fact no need for ->put_unlock_pfn() because can KVM do set_page_dirty() and
-put_page() directly as needed using all of KVM's existing mechanisms.
+>      I will check if there are more.
+
+Tests that explicitly validate string I/O aren't all that interesting, we really
+only need one string I/O test for SEV-ES.  I supposed one could make the argument
+that it'd be useful to ensure that string I/O generates #VC as expected, but that
+can be done without actually decoding the I/O.
+
+Hmm, or cheat.  E.g. write up a dedicated #VC handler in x86/amd_sev.c for the
+string I/O test to forward the #VMGEXIT, but rely on the existing checks in
+test_stringio() to ensure it was done correctly.  That way there's no need to do
+fancy decoding, but the "spirit" of the test is kept intact.
