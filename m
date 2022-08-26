@@ -2,57 +2,56 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id C47655A3267
+	by mail.lfdr.de (Postfix) with ESMTP id 7C1A25A3266
 	for <lists+kvm@lfdr.de>; Sat, 27 Aug 2022 01:12:58 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1345443AbiHZXMp (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 26 Aug 2022 19:12:45 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39470 "EHLO
+        id S1345433AbiHZXMr (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 26 Aug 2022 19:12:47 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39534 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1345433AbiHZXMo (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 26 Aug 2022 19:12:44 -0400
-Received: from mail-yw1-x1149.google.com (mail-yw1-x1149.google.com [IPv6:2607:f8b0:4864:20::1149])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2DE54E9A9B
-        for <kvm@vger.kernel.org>; Fri, 26 Aug 2022 16:12:41 -0700 (PDT)
-Received: by mail-yw1-x1149.google.com with SMTP id 00721157ae682-33e1114437fso47203077b3.19
-        for <kvm@vger.kernel.org>; Fri, 26 Aug 2022 16:12:41 -0700 (PDT)
+        with ESMTP id S1345444AbiHZXMq (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 26 Aug 2022 19:12:46 -0400
+Received: from mail-yw1-x114a.google.com (mail-yw1-x114a.google.com [IPv6:2607:f8b0:4864:20::114a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8A3D7EA144
+        for <kvm@vger.kernel.org>; Fri, 26 Aug 2022 16:12:44 -0700 (PDT)
+Received: by mail-yw1-x114a.google.com with SMTP id 00721157ae682-33dd097f993so47975537b3.10
+        for <kvm@vger.kernel.org>; Fri, 26 Aug 2022 16:12:44 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc;
-        bh=ZdVaRkEUTVQaIKJDT/Ddx7gK3/urPJpcKKVV/+iYZKk=;
-        b=baz/ChvqaA1ic/giek/4j38FjrCjwyfUIdIepPFprrdCeLvp8yEh6JkYWW49DK3M7C
-         cp9S9eruQAdJLXMCSm47CFIVOMGBT6rjZ7SdU1liU4t8QVcPPRJ7+6zWILg/6yFThQR+
-         s99AjJN1qnr9sp/+0say2Cg1YI/CFuxC+8O+qOSjG0sepSkl29DjMc8wCqjYojIi09IV
-         R2qpqlBjuquno+1mWai8ZWsluUZBQF0cCscGMKpUZBIEnfRLG0N0BStxNsCTfxZdaN55
-         Ma669WJHagR3AoxlT4AA3HErdIF8+f+Rz4cLW72U61oIqdsPe3wcRL1AgofZsVBLqAu+
-         Go+Q==
+        bh=5b6tbkW/gcuFTQ/42n9E+pTWoQyrg4G/ccr6zGe/V3I=;
+        b=E126LBnYe38LghXA6KOo/f8vh2Gz9Xy0x++mEi9UU1DPDZG1dBvp6UNu5eq1fPpqyM
+         8kG8b2qaJ63z70VERvWGeaZdQuecwqCg7gMbnLqNgvjhYaTKoUG9v1YM1DbXeZrlit38
+         K98Q0r5bazp+m5TTNnPngHSIuRepZX+HkeditJQeNALQC2rjMaDPDBrcQKsHwLgiks0T
+         hFBw7uKmc6IBb24L34jRmOK64qtHvAmfDkbLm42zCV8SMG46jLj7Rysa4OmyxawY5QGX
+         3ImQ8d7NX9q7h9Ope0FAE7Zr/YaZnuuAsSr2tMJzdBPsLrhZGVU7gUW8Clt2FVz2SNWY
+         bcGA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc;
-        bh=ZdVaRkEUTVQaIKJDT/Ddx7gK3/urPJpcKKVV/+iYZKk=;
-        b=hSPCh9rQnU2huOhtjaclzDPBWA6GN4C/n8SzIuExWTE3Ag4BNNefAY6m54+KrzNxJ+
-         ubEl6U5Ug4K3/BBn5djC8PUKuv0Q3URjpC5FtHzu7uhfpsM+34dhezGpaa4OYra0a4DF
-         H5KFG1AE7p7LHTm+eykBXT/qUWYjpcPnQaV2Ox2YJ1ZYWz6lYUN6oQzSeq0J1LFnzibq
-         W3UPZ6qZXMnwI0Sejo3q0SlUSaPW62M0bPF12776niIQwSLMdNayBjW3NtjKu8WVmDEI
-         s7WumYhvuuSTEr4UQqpl0ySmc39LbqlqFMJ58KTEj6cklBSHAoiBbB+JsiP4tVGDPEpP
-         EyBw==
-X-Gm-Message-State: ACgBeo1fkheYf3uicE2ofDfH+D5eNbLkfClNjcbj0JoI2t2CHNbxKdXt
-        oKdEX2MR9IoD4agTzX+uOVWT6cuOLy4mEw==
-X-Google-Smtp-Source: AA6agR7rHVGOeSA3/FNrEeO0s8W3z+dkxeb3bte6aN2PALIH3udZnZ2Pw7ShkuwEFl5arnEFIIUY6I3ulllwTA==
+        bh=5b6tbkW/gcuFTQ/42n9E+pTWoQyrg4G/ccr6zGe/V3I=;
+        b=1fKXCnTqoMUCgNbTOiWXT4PGLc7QAPQuwxWTxisYde+/pipP7bmMQDbKj265naskZS
+         5RY5R8KpXa3oKrpbhqbQGpnqoB6SxcotvcunaqVEn92G4UA0aD8w6oQ6E9r11IG5cEfa
+         cfhP1Wr6KcEhf5+Bf+vaLaoXng5g3m71QmiLwrLrHEzd0VDHVbabevcLwz6SDARvEuRI
+         pxeIQETnMvfjphuFkxDJb4FCPSMT0tfRbZCscPGm42u//69ILsWgtgLFhp3QMCEDuPRP
+         Lno+qWNFonR0cKq3U/8/3dljIwed0yyWORGevrcqh3YxrCayUfm+b6rTeFEUBg961/ic
+         Sw9Q==
+X-Gm-Message-State: ACgBeo08kf7tB5+/qcSMXT9E6DLiE4ZxZFh6sNL59ym4psGquNIjrH7+
+        Vsb06WFknHNVv476ANjjYRtz3GuIUILYmA==
+X-Google-Smtp-Source: AA6agR5E/w+rSFNHY4wQXj7GqF6U/qnnxfbqRlV+1G2PWK0Yn6P4TRreo6zBy6IOfpAkorowAGPsJJ2JxxDUiA==
 X-Received: from dmatlack-n2d-128.c.googlers.com ([fda3:e722:ac3:cc00:20:ed76:c0a8:1309])
- (user=dmatlack job=sendgmr) by 2002:a5b:790:0:b0:671:5d18:3a3 with SMTP id
- b16-20020a5b0790000000b006715d1803a3mr1801788ybq.169.1661555561261; Fri, 26
- Aug 2022 16:12:41 -0700 (PDT)
-Date:   Fri, 26 Aug 2022 16:12:22 -0700
+ (user=dmatlack job=sendgmr) by 2002:a5b:c4c:0:b0:696:114c:ad25 with SMTP id
+ d12-20020a5b0c4c000000b00696114cad25mr1670427ybr.13.1661555563375; Fri, 26
+ Aug 2022 16:12:43 -0700 (PDT)
+Date:   Fri, 26 Aug 2022 16:12:23 -0700
 In-Reply-To: <20220826231227.4096391-1-dmatlack@google.com>
 Mime-Version: 1.0
 References: <20220826231227.4096391-1-dmatlack@google.com>
 X-Mailer: git-send-email 2.37.2.672.g94769d06f0-goog
-Message-ID: <20220826231227.4096391-6-dmatlack@google.com>
-Subject: [PATCH v2 05/10] KVM: x86/mmu: Avoid memslot lookup during
- KVM_PFN_ERR_HWPOISON handling
+Message-ID: <20220826231227.4096391-7-dmatlack@google.com>
+Subject: [PATCH v2 06/10] KVM: x86/mmu: Handle no-slot faults in kvm_faultin_pfn()
 From:   David Matlack <dmatlack@google.com>
 To:     Paolo Bonzini <pbonzini@redhat.com>
 Cc:     Sean Christopherson <seanjc@google.com>, kvm@vger.kernel.org,
@@ -69,63 +68,129 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Pass the kvm_page_fault struct down to kvm_handle_error_pfn() to avoid a
-memslot lookup when handling KVM_PFN_ERR_HWPOISON. Opportunistically
-move the gfn_to_hva_memslot() call and @current down into
-kvm_send_hwpoison_signal() to cut down on line lengths.
+Handle faults on GFNs that do not have a backing memslot in
+kvm_faultin_pfn() and drop handle_abnormal_pfn(). This eliminates
+duplicate code in the various page fault handlers.
+
+Opportunistically tweak the comment about handling gfn > host.MAXPHYADDR
+to reflect that the effect of returning RET_PF_EMULATE at that point is
+to avoid creating an MMIO SPTE for such GFNs.
 
 No functional change intended.
 
 Signed-off-by: David Matlack <dmatlack@google.com>
 ---
- arch/x86/kvm/mmu/mmu.c | 16 +++++++++-------
- 1 file changed, 9 insertions(+), 7 deletions(-)
+ arch/x86/kvm/mmu/mmu.c         | 56 ++++++++++++++++++----------------
+ arch/x86/kvm/mmu/paging_tmpl.h |  6 +---
+ 2 files changed, 31 insertions(+), 31 deletions(-)
 
 diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
-index 273e1771965c..fb30451f4b47 100644
+index fb30451f4b47..86282df37217 100644
 --- a/arch/x86/kvm/mmu/mmu.c
 +++ b/arch/x86/kvm/mmu/mmu.c
-@@ -3139,23 +3139,25 @@ static int __direct_map(struct kvm_vcpu *vcpu, struct kvm_page_fault *fault)
- 	return ret;
+@@ -3164,28 +3164,32 @@ static int kvm_handle_error_pfn(struct kvm_page_fault *fault)
+ 	return -EFAULT;
  }
  
--static void kvm_send_hwpoison_signal(unsigned long address, struct task_struct *tsk)
-+static void kvm_send_hwpoison_signal(struct kvm_memory_slot *slot, gfn_t gfn)
+-static int handle_abnormal_pfn(struct kvm_vcpu *vcpu, struct kvm_page_fault *fault,
+-			       unsigned int access)
++static int kvm_handle_noslot_fault(struct kvm_vcpu *vcpu,
++				   struct kvm_page_fault *fault,
++				   unsigned int access)
  {
--	send_sig_mceerr(BUS_MCEERR_AR, (void __user *)address, PAGE_SHIFT, tsk);
-+	unsigned long hva = gfn_to_hva_memslot(slot, gfn);
+-	if (unlikely(!fault->slot)) {
+-		gva_t gva = fault->is_tdp ? 0 : fault->addr;
++	gva_t gva = fault->is_tdp ? 0 : fault->addr;
+ 
+-		vcpu_cache_mmio_info(vcpu, gva, fault->gfn,
+-				     access & shadow_mmio_access_mask);
+-		/*
+-		 * If MMIO caching is disabled, emulate immediately without
+-		 * touching the shadow page tables as attempting to install an
+-		 * MMIO SPTE will just be an expensive nop.  Do not cache MMIO
+-		 * whose gfn is greater than host.MAXPHYADDR, any guest that
+-		 * generates such gfns is running nested and is being tricked
+-		 * by L0 userspace (you can observe gfn > L1.MAXPHYADDR if
+-		 * and only if L1's MAXPHYADDR is inaccurate with respect to
+-		 * the hardware's).
+-		 */
+-		if (unlikely(!enable_mmio_caching) ||
+-		    unlikely(fault->gfn > kvm_mmu_max_gfn()))
+-			return RET_PF_EMULATE;
+-	}
++	vcpu_cache_mmio_info(vcpu, gva, fault->gfn,
++			     access & shadow_mmio_access_mask);
 +
-+	send_sig_mceerr(BUS_MCEERR_AR, (void __user *)hva, PAGE_SHIFT, current);
- }
- 
--static int kvm_handle_error_pfn(struct kvm_vcpu *vcpu, gfn_t gfn, kvm_pfn_t pfn)
-+static int kvm_handle_error_pfn(struct kvm_page_fault *fault)
- {
- 	/*
- 	 * Do not cache the mmio info caused by writing the readonly gfn
- 	 * into the spte otherwise read access on readonly gfn also can
- 	 * caused mmio page fault and treat it as mmio access.
- 	 */
--	if (pfn == KVM_PFN_ERR_RO_FAULT)
-+	if (fault->pfn == KVM_PFN_ERR_RO_FAULT)
- 		return RET_PF_EMULATE;
- 
--	if (pfn == KVM_PFN_ERR_HWPOISON) {
--		kvm_send_hwpoison_signal(kvm_vcpu_gfn_to_hva(vcpu, gfn), current);
-+	if (fault->pfn == KVM_PFN_ERR_HWPOISON) {
-+		kvm_send_hwpoison_signal(fault->slot, fault->gfn);
- 		return RET_PF_RETRY;
- 	}
- 
-@@ -4197,7 +4199,7 @@ static int kvm_faultin_pfn(struct kvm_vcpu *vcpu, struct kvm_page_fault *fault)
- 		return ret;
- 
- 	if (unlikely(is_error_pfn(fault->pfn)))
--		return kvm_handle_error_pfn(vcpu, fault->gfn, fault->pfn);
-+		return kvm_handle_error_pfn(fault);
++	/*
++	 * If MMIO caching is disabled, emulate immediately without
++	 * touching the shadow page tables as attempting to install an
++	 * MMIO SPTE will just be an expensive nop.
++	 */
++	if (unlikely(!enable_mmio_caching))
++		return RET_PF_EMULATE;
++
++	/*
++	 * Do not create an MMIO SPTE for a gfn greater than host.MAXPHYADDR,
++	 * any guest that generates such gfns is running nested and is being
++	 * tricked by L0 userspace (you can observe gfn > L1.MAXPHYADDR if and
++	 * only if L1's MAXPHYADDR is inaccurate with respect to the
++	 * hardware's).
++	 */
++	if (unlikely(fault->gfn > kvm_mmu_max_gfn()))
++		return RET_PF_EMULATE;
  
  	return RET_PF_CONTINUE;
  }
+@@ -4187,7 +4191,8 @@ static int __kvm_faultin_pfn(struct kvm_vcpu *vcpu, struct kvm_page_fault *fault
+ 	return RET_PF_CONTINUE;
+ }
+ 
+-static int kvm_faultin_pfn(struct kvm_vcpu *vcpu, struct kvm_page_fault *fault)
++static int kvm_faultin_pfn(struct kvm_vcpu *vcpu, struct kvm_page_fault *fault,
++			   unsigned int access)
+ {
+ 	int ret;
+ 
+@@ -4201,6 +4206,9 @@ static int kvm_faultin_pfn(struct kvm_vcpu *vcpu, struct kvm_page_fault *fault)
+ 	if (unlikely(is_error_pfn(fault->pfn)))
+ 		return kvm_handle_error_pfn(fault);
+ 
++	if (unlikely(!fault->slot))
++		return kvm_handle_noslot_fault(vcpu, fault, access);
++
+ 	return RET_PF_CONTINUE;
+ }
+ 
+@@ -4251,11 +4259,7 @@ static int direct_page_fault(struct kvm_vcpu *vcpu, struct kvm_page_fault *fault
+ 	if (r)
+ 		return r;
+ 
+-	r = kvm_faultin_pfn(vcpu, fault);
+-	if (r != RET_PF_CONTINUE)
+-		return r;
+-
+-	r = handle_abnormal_pfn(vcpu, fault, ACC_ALL);
++	r = kvm_faultin_pfn(vcpu, fault, ACC_ALL);
+ 	if (r != RET_PF_CONTINUE)
+ 		return r;
+ 
+diff --git a/arch/x86/kvm/mmu/paging_tmpl.h b/arch/x86/kvm/mmu/paging_tmpl.h
+index 98f4abce4eaf..e014e09ac2c1 100644
+--- a/arch/x86/kvm/mmu/paging_tmpl.h
++++ b/arch/x86/kvm/mmu/paging_tmpl.h
+@@ -837,11 +837,7 @@ static int FNAME(page_fault)(struct kvm_vcpu *vcpu, struct kvm_page_fault *fault
+ 	else
+ 		fault->max_level = walker.level;
+ 
+-	r = kvm_faultin_pfn(vcpu, fault);
+-	if (r != RET_PF_CONTINUE)
+-		return r;
+-
+-	r = handle_abnormal_pfn(vcpu, fault, walker.pte_access);
++	r = kvm_faultin_pfn(vcpu, fault, walker.pte_access);
+ 	if (r != RET_PF_CONTINUE)
+ 		return r;
+ 
 -- 
 2.37.2.672.g94769d06f0-goog
 
