@@ -2,57 +2,56 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 144275A3269
-	for <lists+kvm@lfdr.de>; Sat, 27 Aug 2022 01:13:00 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 0A3B15A326B
+	for <lists+kvm@lfdr.de>; Sat, 27 Aug 2022 01:13:17 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1345459AbiHZXM5 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 26 Aug 2022 19:12:57 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39764 "EHLO
+        id S1345460AbiHZXNN (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 26 Aug 2022 19:13:13 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39810 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1345442AbiHZXMw (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 26 Aug 2022 19:12:52 -0400
+        with ESMTP id S1345470AbiHZXNF (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 26 Aug 2022 19:13:05 -0400
 Received: from mail-yw1-x114a.google.com (mail-yw1-x114a.google.com [IPv6:2607:f8b0:4864:20::114a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 32EC7EA174
-        for <kvm@vger.kernel.org>; Fri, 26 Aug 2022 16:12:50 -0700 (PDT)
-Received: by mail-yw1-x114a.google.com with SMTP id 00721157ae682-337ed9110c2so47556047b3.15
-        for <kvm@vger.kernel.org>; Fri, 26 Aug 2022 16:12:50 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6599CEA314
+        for <kvm@vger.kernel.org>; Fri, 26 Aug 2022 16:12:52 -0700 (PDT)
+Received: by mail-yw1-x114a.google.com with SMTP id 00721157ae682-33dd097f993so47979367b3.10
+        for <kvm@vger.kernel.org>; Fri, 26 Aug 2022 16:12:52 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc;
-        bh=wRixm1YVhAJ8xZe1pU1E4V06yoGJLAsGACDB692LvKs=;
-        b=a14Azz3UWEGB1TFiwilQsSdjjeYlNQ4qVw7ykdMcGxGgW/6E3YbcqSOVMYquc+yorh
-         7AjBfh2BJwFrNUrfuPm2NON91/U3D4qGTVfzFEmgRCYl4aISPTJmBVXpNEY/3aVgsPSL
-         yiziBrUYY2bvfLKvv8+989Eb4Jg2eI3qz/iVBrs+p7TW32dTqnjMKjfFdmZUCdkQH0cD
-         VKnNFkWNbek7VbykO5qfr6N74Sw89nsNQeC8NmWs4FzETAVR31NWebvmxMQ9VyNxp2we
-         AYF8ef9A+vKc8WAFUDnIJ5XawlK8mtISATVaGM08bCuTZnvvOcWCVTuA0MsZGzfa4uRE
-         /4Mg==
+        bh=Kff/0R5ZAb3eLKnoS/NhGeKWqIVOtWmm3mC7ca1Wnx0=;
+        b=ixJZSKVKYIY0ufhPfhIBQMcpSQDUn+9ZD2MAsqeYZdMVGdshQ61gEcp4PYT0sYiVc2
+         vw3hxhQEDlls3DH7HpeeJ18HVa+IBzAnbLPB1IRhSywYmZwYt6vSgVmLD7cBw2tuVlRn
+         ct5G9x6fogv27y461CRdh1djWGuYEfbmbFRGYR6t8Dlfs9bpHqeV3PbgI8G07+zkOI4w
+         0TN2RzBxAFuVTSCBVyHN+O6vogn9loFUiSrVk8LTVatcGjlbNs98lkL/FXPWnjD5gGHy
+         O0cBSRpyDIs2+L89qsRBdk+DsCKngf6xSx5I6Ps8Bjc62LMx30xcCb1RrQyjJ/H2/2WG
+         Fmuw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc;
-        bh=wRixm1YVhAJ8xZe1pU1E4V06yoGJLAsGACDB692LvKs=;
-        b=UTJf5KJW2bMElfP4YMax4plPW+LXEKtaigVwyN8/AHzVJrrj8n/RLIOrvKeVakZHqC
-         2YFtpvtC03gp+krV/1vFH6q6SpBVxdNkMiiEqaEYQ6aIAdpbjGSy9CansLjZGKYjHtGo
-         5TkYJgx7VRtG4oyVcyVXyVEgkC5KmuIIp7nA6uubz5yOJEale9xgGWlHmkkr7B7KyUok
-         /vLB7z5V7Zn75oRfWMgDRqC8zAGVRhefvdutxpxuhUsOwtAE/niBKLGr1p+kAqZviMDI
-         ofcuA6BLczNueEJ+XwMUdZtrtA7LixCVL7gHmrDv+TYiUwSykV+aZi1qyMMYgcBPP9Ry
-         mYiA==
-X-Gm-Message-State: ACgBeo1Fgq9xhJYrfixzi/lm5AsrGZsYgsilrzdRD0a2/IotIVPKW3UW
-        gvCKe67QL3qI3D5dPh2bHGIhk2Uy9CWiCg==
-X-Google-Smtp-Source: AA6agR6VUHye4G1LZsaLksi0vReDzr2WREV02PyvuI7HuGwzk6GDhtr9ZRr03Ja4sHSp0q2KH3JjxHoiTQEQ6w==
+        bh=Kff/0R5ZAb3eLKnoS/NhGeKWqIVOtWmm3mC7ca1Wnx0=;
+        b=JvHR1G9UOvbgqlXNi5El7PYHdGuHNGjJ368hB+DFDuH2oh56Nf8T1+3KZ3X+L9q8x8
+         JxlPnzdKlvdyo9ZJ/OG0Lvileykpc9806ilDBJPM+O06nnFvF/PFTcMaFMBsPsbd1lGo
+         lGo72aa88JdYvS1wElHX6fRw8YcVMmiz1Km7fhRdVtJm/793uU2ii5JbfUl1Vbx1KamH
+         glwX5OJSssAno8+TrJ8q5KXelsSA46T+EppXT4TlzfKQYqah0TL3kqXTNl7M5lVP47L4
+         MK3Xo6P3YuvRtgf/6VSXPUetnVBfDlAJxHOhh8/87FcwN3oRZVAo0MWctAir7/I/hF8F
+         YPtg==
+X-Gm-Message-State: ACgBeo1QbRq2rFUa8F3D3KuAWQJ6zcK7kPkaf69tALnv8TMxGUQo/Jyt
+        3YPUyOAwDQIdy0EUl8JtvDrRJXZl7rn9Kw==
+X-Google-Smtp-Source: AA6agR5MMe7z+aB+vesbd3gopa7ekwSpPGMtzaYXWCWtGv/bgz/4TA6dFHt3Hk/sN5a7sRfWLiyJ2f2gS9Hn8A==
 X-Received: from dmatlack-n2d-128.c.googlers.com ([fda3:e722:ac3:cc00:20:ed76:c0a8:1309])
- (user=dmatlack job=sendgmr) by 2002:a25:24c4:0:b0:696:3e03:2d0e with SMTP id
- k187-20020a2524c4000000b006963e032d0emr1785534ybk.104.1661555569856; Fri, 26
- Aug 2022 16:12:49 -0700 (PDT)
-Date:   Fri, 26 Aug 2022 16:12:26 -0700
+ (user=dmatlack job=sendgmr) by 2002:a25:d791:0:b0:695:9953:d27b with SMTP id
+ o139-20020a25d791000000b006959953d27bmr1677782ybg.61.1661555571929; Fri, 26
+ Aug 2022 16:12:51 -0700 (PDT)
+Date:   Fri, 26 Aug 2022 16:12:27 -0700
 In-Reply-To: <20220826231227.4096391-1-dmatlack@google.com>
 Mime-Version: 1.0
 References: <20220826231227.4096391-1-dmatlack@google.com>
 X-Mailer: git-send-email 2.37.2.672.g94769d06f0-goog
-Message-ID: <20220826231227.4096391-10-dmatlack@google.com>
-Subject: [PATCH v2 09/10] KVM: x86/mmu: Stop needlessly making MMU pages
- available for TDP MMU faults
+Message-ID: <20220826231227.4096391-11-dmatlack@google.com>
+Subject: [PATCH v2 10/10] KVM: x86/mmu: Rename __direct_map() to direct_map()
 From:   David Matlack <dmatlack@google.com>
 To:     Paolo Bonzini <pbonzini@redhat.com>
 Cc:     Sean Christopherson <seanjc@google.com>, kvm@vger.kernel.org,
@@ -69,31 +68,76 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Stop calling make_mmu_pages_available() when handling TDP MMU faults.
-The TDP MMU does not participate in the "available MMU pages" tracking
-and limiting so calling this function is unnecessary work when handling
-TDP MMU faults.
+Rename __direct_map() to direct_map() since the leading underscores are
+unnecessary. This also makes the page fault handler names more
+consistent: kvm_tdp_mmu_page_fault() calls kvm_tdp_mmu_map() and
+direct_page_fault() calls direct_map().
+
+Opportunistically make some trivial cleanups to comments that had to be
+modified anyway since they mentioned __direct_map(). Specifically, use
+"()" when referring to functions, and include kvm_tdp_mmu_map() among
+the various callers of disallowed_hugepage_adjust().
+
+No functional change intended.
 
 Signed-off-by: David Matlack <dmatlack@google.com>
 ---
- arch/x86/kvm/mmu/mmu.c | 4 ----
- 1 file changed, 4 deletions(-)
+ arch/x86/kvm/mmu/mmu.c          | 14 +++++++-------
+ arch/x86/kvm/mmu/mmu_internal.h |  2 +-
+ 2 files changed, 8 insertions(+), 8 deletions(-)
 
 diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
-index 8f124a23ab4c..803aed2c0e74 100644
+index 803aed2c0e74..2d68adc3bfb1 100644
 --- a/arch/x86/kvm/mmu/mmu.c
 +++ b/arch/x86/kvm/mmu/mmu.c
-@@ -4347,10 +4347,6 @@ int kvm_tdp_mmu_page_fault(struct kvm_vcpu *vcpu,
- 	if (is_page_fault_stale(vcpu, fault))
+@@ -3082,11 +3082,11 @@ void disallowed_hugepage_adjust(struct kvm_page_fault *fault, u64 spte, int cur_
+ 	    is_shadow_present_pte(spte) &&
+ 	    !is_large_pte(spte)) {
+ 		/*
+-		 * A small SPTE exists for this pfn, but FNAME(fetch)
+-		 * and __direct_map would like to create a large PTE
+-		 * instead: just force them to go down another level,
+-		 * patching back for them into pfn the next 9 bits of
+-		 * the address.
++		 * A small SPTE exists for this pfn, but FNAME(fetch),
++		 * direct_map(), or kvm_tdp_mmu_map() would like to create a
++		 * large PTE instead: just force them to go down another level,
++		 * patching back for them into pfn the next 9 bits of the
++		 * address.
+ 		 */
+ 		u64 page_mask = KVM_PAGES_PER_HPAGE(cur_level) -
+ 				KVM_PAGES_PER_HPAGE(cur_level - 1);
+@@ -3095,7 +3095,7 @@ void disallowed_hugepage_adjust(struct kvm_page_fault *fault, u64 spte, int cur_
+ 	}
+ }
+ 
+-static int __direct_map(struct kvm_vcpu *vcpu, struct kvm_page_fault *fault)
++static int direct_map(struct kvm_vcpu *vcpu, struct kvm_page_fault *fault)
+ {
+ 	struct kvm_shadow_walk_iterator it;
+ 	struct kvm_mmu_page *sp;
+@@ -4269,7 +4269,7 @@ static int direct_page_fault(struct kvm_vcpu *vcpu, struct kvm_page_fault *fault
+ 	if (r)
  		goto out_unlock;
  
--	r = make_mmu_pages_available(vcpu);
--	if (r)
--		goto out_unlock;
--
- 	r = kvm_tdp_mmu_map(vcpu, fault);
+-	r = __direct_map(vcpu, fault);
++	r = direct_map(vcpu, fault);
  
  out_unlock:
+ 	write_unlock(&vcpu->kvm->mmu_lock);
+diff --git a/arch/x86/kvm/mmu/mmu_internal.h b/arch/x86/kvm/mmu/mmu_internal.h
+index 1e91f24bd865..b8c116ec1a89 100644
+--- a/arch/x86/kvm/mmu/mmu_internal.h
++++ b/arch/x86/kvm/mmu/mmu_internal.h
+@@ -198,7 +198,7 @@ struct kvm_page_fault {
+ 
+ 	/*
+ 	 * Maximum page size that can be created for this fault; input to
+-	 * FNAME(fetch), __direct_map and kvm_tdp_mmu_map.
++	 * FNAME(fetch), direct_map() and kvm_tdp_mmu_map().
+ 	 */
+ 	u8 max_level;
+ 
 -- 
 2.37.2.672.g94769d06f0-goog
 
