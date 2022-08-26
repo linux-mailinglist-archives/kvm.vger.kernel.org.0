@@ -2,216 +2,171 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 12AAD5A1F63
-	for <lists+kvm@lfdr.de>; Fri, 26 Aug 2022 05:18:46 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 90EA35A1F93
+	for <lists+kvm@lfdr.de>; Fri, 26 Aug 2022 06:00:20 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S244887AbiHZDS2 convert rfc822-to-8bit (ORCPT
-        <rfc822;lists+kvm@lfdr.de>); Thu, 25 Aug 2022 23:18:28 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41362 "EHLO
+        id S230259AbiHZEAQ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 26 Aug 2022 00:00:16 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34820 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230106AbiHZDS0 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 25 Aug 2022 23:18:26 -0400
-Received: from smtp236.sjtu.edu.cn (smtp236.sjtu.edu.cn [202.120.2.236])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 711E1CACA0;
-        Thu, 25 Aug 2022 20:18:25 -0700 (PDT)
-Received: from mta90.sjtu.edu.cn (unknown [10.118.0.90])
-        by smtp236.sjtu.edu.cn (Postfix) with ESMTPS id 0AFF01008B38D;
-        Fri, 26 Aug 2022 11:18:22 +0800 (CST)
-Received: from localhost (localhost.localdomain [127.0.0.1])
-        by mta90.sjtu.edu.cn (Postfix) with ESMTP id C742D37C893;
-        Fri, 26 Aug 2022 11:18:22 +0800 (CST)
-X-Virus-Scanned: amavisd-new at 
-Received: from mta90.sjtu.edu.cn ([127.0.0.1])
-        by localhost (mta90.sjtu.edu.cn [127.0.0.1]) (amavisd-new, port 10026)
-        with ESMTP id Ac8wfnO9bUGB; Fri, 26 Aug 2022 11:18:22 +0800 (CST)
-Received: from mstore105.sjtu.edu.cn (mstore101.sjtu.edu.cn [10.118.0.105])
-        by mta90.sjtu.edu.cn (Postfix) with ESMTP id 9995E37C894;
-        Fri, 26 Aug 2022 11:18:22 +0800 (CST)
-Date:   Fri, 26 Aug 2022 11:18:21 +0800 (CST)
-From:   Guo Zhi <qtxuning1999@sjtu.edu.cn>
-To:     jasowang <jasowang@redhat.com>
-Cc:     eperezma <eperezma@redhat.com>, sgarzare <sgarzare@redhat.com>,
-        Michael Tsirkin <mst@redhat.com>,
-        netdev <netdev@vger.kernel.org>,
-        linux-kernel <linux-kernel@vger.kernel.org>,
-        kvm list <kvm@vger.kernel.org>,
-        virtualization <virtualization@lists.linux-foundation.org>
-Message-ID: <1625987692.9093267.1661483901701.JavaMail.zimbra@sjtu.edu.cn>
-In-Reply-To: <ebf4b376-6a5c-3cfa-38ab-1559ace13b27@redhat.com>
-References: <20220817135718.2553-1-qtxuning1999@sjtu.edu.cn> <20220817135718.2553-7-qtxuning1999@sjtu.edu.cn> <ebf4b376-6a5c-3cfa-38ab-1559ace13b27@redhat.com>
-Subject: Re: [RFC v2 6/7] virtio: in order support for virtio_ring
+        with ESMTP id S229556AbiHZEAP (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 26 Aug 2022 00:00:15 -0400
+Received: from mga04.intel.com (mga04.intel.com [192.55.52.120])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3F8D022BCC
+        for <kvm@vger.kernel.org>; Thu, 25 Aug 2022 21:00:13 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1661486413; x=1693022413;
+  h=message-id:date:mime-version:subject:to:cc:references:
+   from:in-reply-to:content-transfer-encoding;
+  bh=LYpXOeGCv0D8LEuZ5rlYMSsbSL41VeqEWm/6QNHip1A=;
+  b=fCsdUEKXMpq9hQJ7GAkvOXgZIMFjfQPlzQGDwPgsTNuogYo7z+eP7Hf9
+   UgPvjqC1DAr/Yfcw6p1PbgmpERraBoBUGPGMfBdkZhQ3QHOK/uDq1vtVs
+   FDYXlfNEb54bCptQpQe6c1EUtwktYA4ZKtB9S0avdGCE+y2rslKYYfLFX
+   W4RU+CCtf/UTA7l4gBfdMFSrW+77ni1mfWWxQ1CsS444CHtbEW1GJnrGs
+   fITzb+Vx4XcADzdPHEu9O3m8DhAb6QAvvtR1MhpwPzsHO6M+s4nJZ4klS
+   tb8hGV09ezZ5J4lRoHUeEMpHt1xgJoWXYcrVbEyePvkTbHQIAqjHIctqy
+   g==;
+X-IronPort-AV: E=McAfee;i="6500,9779,10450"; a="293157247"
+X-IronPort-AV: E=Sophos;i="5.93,264,1654585200"; 
+   d="scan'208";a="293157247"
+Received: from fmsmga008.fm.intel.com ([10.253.24.58])
+  by fmsmga104.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 25 Aug 2022 21:00:13 -0700
+X-IronPort-AV: E=Sophos;i="5.93,264,1654585200"; 
+   d="scan'208";a="671294986"
+Received: from xiaoyaol-hp-g830.ccr.corp.intel.com (HELO [10.255.29.246]) ([10.255.29.246])
+  by fmsmga008-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 25 Aug 2022 21:00:09 -0700
+Message-ID: <45f5c26a-4ed6-3364-304e-b91060dd608a@intel.com>
+Date:   Fri, 26 Aug 2022 12:00:06 +0800
 MIME-Version: 1.0
-Content-Type: text/plain; charset=GB2312
-Content-Transfer-Encoding: 8BIT
-X-Originating-IP: [10.166.246.247]
-X-Mailer: Zimbra 8.8.15_GA_4308 (ZimbraWebClient - GC104 (Mac)/8.8.15_GA_3928)
-Thread-Topic: virtio: in order support for virtio_ring
-Thread-Index: 1vFj+paB+wRk8wd+9SUq6j4kd2DDhA==
-X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,SPF_HELO_NONE,
-        SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no
-        version=3.4.6
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:91.0) Gecko/20100101
+ Firefox/91.0 Thunderbird/91.12.0
+Subject: Re: [PATCH v1 08/40] i386/tdx: Adjust the supported CPUID based on
+ TDX restrictions
+Content-Language: en-US
+To:     Chenyi Qiang <chenyi.qiang@intel.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Isaku Yamahata <isaku.yamahata@gmail.com>,
+        Gerd Hoffmann <kraxel@redhat.com>,
+        =?UTF-8?Q?Daniel_P_=2e_Berrang=c3=a9?= <berrange@redhat.com>,
+        =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>,
+        Richard Henderson <richard.henderson@linaro.org>,
+        "Michael S . Tsirkin" <mst@redhat.com>,
+        Marcel Apfelbaum <marcel.apfelbaum@gmail.com>,
+        Cornelia Huck <cohuck@redhat.com>,
+        Marcelo Tosatti <mtosatti@redhat.com>,
+        Laszlo Ersek <lersek@redhat.com>,
+        Eric Blake <eblake@redhat.com>
+Cc:     Connor Kuehl <ckuehl@redhat.com>, erdemaktas@google.com,
+        kvm@vger.kernel.org, qemu-devel@nongnu.org, seanjc@google.com
+References: <20220802074750.2581308-1-xiaoyao.li@intel.com>
+ <20220802074750.2581308-9-xiaoyao.li@intel.com>
+ <200d5aa2-f1e3-2b8b-7963-e605f9a5731e@intel.com>
+From:   Xiaoyao Li <xiaoyao.li@intel.com>
+In-Reply-To: <200d5aa2-f1e3-2b8b-7963-e605f9a5731e@intel.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-Spam-Status: No, score=-2.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,HK_RANDOM_ENVFROM,
+        HK_RANDOM_FROM,NICE_REPLY_A,RCVD_IN_DNSWL_MED,SPF_HELO_NONE,SPF_NONE,
+        T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-
-
------ Original Message -----
-> From: "jasowang" <jasowang@redhat.com>
-> To: "Guo Zhi" <qtxuning1999@sjtu.edu.cn>, "eperezma" <eperezma@redhat.com>, "sgarzare" <sgarzare@redhat.com>, "Michael
-> Tsirkin" <mst@redhat.com>
-> Cc: "netdev" <netdev@vger.kernel.org>, "linux-kernel" <linux-kernel@vger.kernel.org>, "kvm list" <kvm@vger.kernel.org>,
-> "virtualization" <virtualization@lists.linux-foundation.org>
-> Sent: Thursday, August 25, 2022 3:44:41 PM
-> Subject: Re: [RFC v2 6/7] virtio: in order support for virtio_ring
-
-> �� 2022/8/17 21:57, Guo Zhi д��:
->> If in order feature negotiated, we can skip the used ring to get
->> buffer's desc id sequentially.
+On 8/3/2022 3:33 PM, Chenyi Qiang wrote:
+> 
+> 
+> On 8/2/2022 3:47 PM, Xiaoyao Li wrote:
+>> According to Chapter "CPUID Virtualization" in TDX module spec, CPUID
+>> bits of TD can be classified into 6 types:
 >>
->> Signed-off-by: Guo Zhi <qtxuning1999@sjtu.edu.cn>
->> ---
->>   drivers/virtio/virtio_ring.c | 53 ++++++++++++++++++++++++++++++------
->>   1 file changed, 45 insertions(+), 8 deletions(-)
+>> ------------------------------------------------------------------------
+>> 1 | As configured | configurable by VMM, independent of native value;
+>> ------------------------------------------------------------------------
+>> 2 | As configured | configurable by VMM if the bit is supported natively
+>>      (if native)   | Otherwise it equals as native(0).
+>> ------------------------------------------------------------------------
+>> 3 | Fixed         | fixed to 0/1
+>> ------------------------------------------------------------------------
+>> 4 | Native        | reflect the native value
+>> ------------------------------------------------------------------------
+>> 5 | Calculated    | calculated by TDX module.
+>> ------------------------------------------------------------------------
+>> 6 | Inducing #VE  | get #VE exception
+>> ------------------------------------------------------------------------
 >>
->> diff --git a/drivers/virtio/virtio_ring.c b/drivers/virtio/virtio_ring.c
->> index 1c1b3fa376a2..143184ebb5a1 100644
->> --- a/drivers/virtio/virtio_ring.c
->> +++ b/drivers/virtio/virtio_ring.c
->> @@ -144,6 +144,9 @@ struct vring_virtqueue {
->>   			/* DMA address and size information */
->>   			dma_addr_t queue_dma_addr;
->>   			size_t queue_size_in_bytes;
->> +
->> +			/* In order feature batch begin here */
+>> Note:
+>> 1. All the configurable XFAM related features and TD attributes related
+>>     features fall into type #2. And fixed0/1 bits of XFAM and TD
+>>     attributes fall into type #3.
+>>
+>> 2. For CPUID leaves not listed in "CPUID virtualization Overview" table
+>>     in TDX module spec. When they are queried, TDX module injects #VE to
+>>     TDs. For this case, TDs can request CPUID emulation from VMM via
+>>     TDVMCALL and the values are fully controlled by VMM.
+>>
+>> Due to TDX module has its own virtualization policy on CPUID bits, it 
+>> leads
+>> to what reported via KVM_GET_SUPPORTED_CPUID diverges from the supported
+>> CPUID bits for TDS. In order to keep a consistent CPUID configuration
+>> between VMM and TDs. Adjust supported CPUID for TDs based on TDX
+>> restrictions.
+>>
+>> Currently only focus on the CPUID leaves recognized by QEMU's
+>> feature_word_info[] that are indexed by a FeatureWord.
+>>
+>> Introduce a TDX CPUID lookup table, which maintains 1 entry for each
+>> FeatureWord. Each entry has below fields:
+>>
+>>   - tdx_fixed0/1: The bits that are fixed as 0/1;
+>>
+>>   - vmm_fixup:   The bits that are configurable from the view of TDX 
+>> module.
+>>                  But they requires emulation of VMM when they are 
+>> configured
+>>             as enabled. For those, they are not supported if VMM doesn't
+>>         report them as supported. So they need be fixed up by
+>>         checking if VMM supports them.
+>>
+>>   - inducing_ve: TD gets #VE when querying this CPUID leaf. The result is
+>>                  totally configurable by VMM.
+>>
+>>   - supported_on_ve: It's valid only when @inducing_ve is true. It 
+>> represents
+>>             the maximum feature set supported that be emulated
+>>             for TDs.
+>>
+>> By applying TDX CPUID lookup table and TDX capabilities reported from
+>> TDX module, the supported CPUID for TDs can be obtained from following
+>> steps:
+>>
+>> - get the base of VMM supported feature set;
+>>
+>> - if the leaf is not a FeatureWord just return VMM's value without
+>>    modification;
+>>
+>> - if the leaf is an inducing_ve type, applying supported_on_ve mask and
+>>    return;
+>>
+>> - include all native bits, it covers type #2, #4, and parts of type #1.
+>>    (it also includes some unsupported bits. The following step will
+>>     correct it.)
+>>
+>> - apply fixed0/1 to it (it covers #3, and rectifies the previous step);
+>>
+>> - add configurable bits (it covers the other part of type #1);
+>>
+>> - fix the ones in vmm_fixup;
+>>
+>> - filter the one has valid .supported field;
 > 
-> 
-> We need tweak the comment, it's not easy for me to understand the
-> meaning here.
-> 
-> 
->> +			u16 next_desc_begin;
->>   		} split;
->>   
->>   		/* Available for packed ring */
->> @@ -702,8 +705,13 @@ static void detach_buf_split(struct vring_virtqueue *vq,
->> unsigned int head,
->>   	}
->>   
->>   	vring_unmap_one_split(vq, i);
->> -	vq->split.desc_extra[i].next = vq->free_head;
->> -	vq->free_head = head;
->> +	/* In order feature use desc in order,
->> +	 * that means, the next desc will always be free
->> +	 */
-> 
-> 
-> Maybe we should add something like "The descriptors are prepared in order".
-> 
-> 
->> +	if (!virtio_has_feature(vq->vq.vdev, VIRTIO_F_IN_ORDER)) {
->> +		vq->split.desc_extra[i].next = vq->free_head;
->> +		vq->free_head = head;
->> +	}
->>   
->>   	/* Plus final descriptor */
->>   	vq->vq.num_free++;
->> @@ -745,7 +753,7 @@ static void *virtqueue_get_buf_ctx_split(struct virtqueue
->> *_vq,
->>   {
->>   	struct vring_virtqueue *vq = to_vvq(_vq);
->>   	void *ret;
->> -	unsigned int i;
->> +	unsigned int i, j;
->>   	u16 last_used;
->>   
->>   	START_USE(vq);
->> @@ -764,11 +772,38 @@ static void *virtqueue_get_buf_ctx_split(struct virtqueue
->> *_vq,
->>   	/* Only get used array entries after they have been exposed by host. */
->>   	virtio_rmb(vq->weak_barriers);
->>   
->> -	last_used = (vq->last_used_idx & (vq->split.vring.num - 1));
->> -	i = virtio32_to_cpu(_vq->vdev,
->> -			vq->split.vring.used->ring[last_used].id);
->> -	*len = virtio32_to_cpu(_vq->vdev,
->> -			vq->split.vring.used->ring[last_used].len);
->> +	if (virtio_has_feature(_vq->vdev, VIRTIO_F_IN_ORDER)) {
->> +		/* Skip used ring and get used desc in order*/
->> +		i = vq->split.next_desc_begin;
->> +		j = i;
->> +		/* Indirect only takes one descriptor in descriptor table */
->> +		while (!vq->indirect && (vq->split.desc_extra[j].flags & VRING_DESC_F_NEXT))
->> +			j = (j + 1) % vq->split.vring.num;
-> 
-> 
-> Let's move the expensive mod outside the loop. Or it's split so we can
-> use and here actually since the size is guaranteed to be power of the
-> two? Another question, is it better to store the next_desc in e.g
-> desc_extra?
-> 
-> And this seems very expensive if the device doesn't do the batching
-> (which is not mandatory).
-> 
-> 
->> +		/* move to next */
->> +		j = (j + 1) % vq->split.vring.num;
->> +		/* Next buffer will use this descriptor in order */
->> +		vq->split.next_desc_begin = j;
->> +		if (!vq->indirect) {
->> +			*len = vq->split.desc_extra[i].len;
->> +		} else {
->> +			struct vring_desc *indir_desc =
->> +				vq->split.desc_state[i].indir_desc;
->> +			u32 indir_num = vq->split.desc_extra[i].len, buffer_len = 0;
->> +
->> +			if (indir_desc) {
->> +				for (j = 0; j < indir_num / sizeof(struct vring_desc); j++)
->> +					buffer_len += indir_desc[j].len;
-> 
-> 
-> So I think we need to finalize this, then we can have much more stress
-> on the cache:
-> 
-> https://lkml.org/lkml/2021/10/26/1300
-> 
-> It was reverted since it's too aggressive, we should instead:
-> 
-> 1) do the validation only for morden device
-> 
-> 2) fail only when we enable the validation via (e.g a module parameter).
-> 
-> Thanks
+> What does .supported field filter mean here?
 > 
 
-Sorry for this obsolete implementation, we will not get buffer'len like this(in a loop).
-Actually, for not skipped buffers, we can get length from used ring directly, for skipped buffers
-I think we don��t have to get the length, because the driver is not interested in the skipped buffers(tx)�� length.
+Sorry I missed this comment before.
 
-> 
->> +			}
->> +
->> +			*len = buffer_len;
->> +		}
->> +	} else {
->> +		last_used = (vq->last_used_idx & (vq->split.vring.num - 1));
->> +		i = virtio32_to_cpu(_vq->vdev,
->> +				    vq->split.vring.used->ring[last_used].id);
->> +		*len = virtio32_to_cpu(_vq->vdev,
->> +				       vq->split.vring.used->ring[last_used].len);
->> +	}
->>   
->>   	if (unlikely(i >= vq->split.vring.num)) {
->>   		BAD_RING(vq, "id %u out of range\n", i);
->> @@ -2236,6 +2271,8 @@ struct virtqueue *__vring_new_virtqueue(unsigned int
->> index,
->>   	vq->split.avail_flags_shadow = 0;
->>   	vq->split.avail_idx_shadow = 0;
->>   
->> +	vq->split.next_desc_begin = 0;
->> +
->>   	/* No callback?  Tell other side not to bother us. */
->>   	if (!callback) {
->>   		vq->split.avail_flags_shadow |= VRING_AVAIL_F_NO_INTERRUPT;
+Above statement is the leftover during internal development. It needs to 
+be removed actually.
