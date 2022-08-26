@@ -2,139 +2,144 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id C312C5A2D4E
-	for <lists+kvm@lfdr.de>; Fri, 26 Aug 2022 19:19:40 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 5198B5A2E0D
+	for <lists+kvm@lfdr.de>; Fri, 26 Aug 2022 20:11:20 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S245143AbiHZRTX (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 26 Aug 2022 13:19:23 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43182 "EHLO
+        id S1344969AbiHZSKp (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 26 Aug 2022 14:10:45 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43264 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S242903AbiHZRTV (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 26 Aug 2022 13:19:21 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AE101E1141
-        for <kvm@vger.kernel.org>; Fri, 26 Aug 2022 10:19:20 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1661534359;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=KNtDntk3ILRkVsRUqlZtymDlMNGzf32/o/DGAYxJZSM=;
-        b=KVZfLVNyqNCNr34rWzw0N/cRuuC3ySySs8szAYKytoXZIC7N4cyEkN11jbdnoEwtUWIzg3
-        UUNWaAqLoacP+pInNjGUzL8+bfvdF5mS7nbJm26oevaQbxttawBg+6nuovP30w8oMQQypq
-        0VRN3kwBAYhW8xBgVnA8GNSEAOyyYrA=
-Received: from mail-ej1-f71.google.com (mail-ej1-f71.google.com
- [209.85.218.71]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_128_GCM_SHA256) id
- us-mta-274-xbDrAOMYOxaoVeUPu7WB9g-1; Fri, 26 Aug 2022 13:19:18 -0400
-X-MC-Unique: xbDrAOMYOxaoVeUPu7WB9g-1
-Received: by mail-ej1-f71.google.com with SMTP id ho13-20020a1709070e8d00b00730a655e173so838277ejc.8
-        for <kvm@vger.kernel.org>; Fri, 26 Aug 2022 10:19:18 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=mime-version:message-id:date:references:in-reply-to:subject:cc:to
-         :from:x-gm-message-state:from:to:cc;
-        bh=KNtDntk3ILRkVsRUqlZtymDlMNGzf32/o/DGAYxJZSM=;
-        b=O4P9mKppDaBFS3P82FxLNSuwFajz3haDGUEFxjtXDM/Fz6yGGIYl8KzA/7w2/ATLtp
-         E8Z9DrIlUOqAAFF9XiWTB4OyJ8GU1QDuVTb8ZIFbQOYjIu6MfThqlC03UUIYzZnIZp1h
-         ylCxscCdkPD3EbVSFekaUWdp21u5usbN6qJwDBegRh+t3wzmL+Z6bHk732hBcLdZmPqf
-         8URjdQowv3Am7LEYlXytqEkR609Sq6BHsI69cQtPqeklpTqHxAcsb05ejAGPOGOQUFPm
-         QSEnxnn9kbhns7GzByjOOJiM+wkkpiPU6lStDNNZn6SDsQvjrNJunCX51hARH4KvLrn1
-         Qp/g==
-X-Gm-Message-State: ACgBeo15Ph/j+JCIEQ+PnntY0HAJweJ3jC/56+vH/6RHbQ6nXksc6Ij/
-        ArA0stgW+rSNQ7ZnNHc0JvjOXKs7gY+xBXHJkmjg/mln6cpkbsBcdzvtW/0tZjRDBFTkGCdYQNX
-        FupcS9sqQNA5C
-X-Received: by 2002:a17:907:72d0:b0:734:b451:c8d9 with SMTP id du16-20020a17090772d000b00734b451c8d9mr6040596ejc.272.1661534357186;
-        Fri, 26 Aug 2022 10:19:17 -0700 (PDT)
-X-Google-Smtp-Source: AA6agR7egS8XZ/9y1jzO+KrFQa9stkpRp4RqjeAJ5xBRkiEAMOcQc2cFjSnuogHsEtpidkiVaGUeZQ==
-X-Received: by 2002:a17:907:72d0:b0:734:b451:c8d9 with SMTP id du16-20020a17090772d000b00734b451c8d9mr6040586ejc.272.1661534356929;
-        Fri, 26 Aug 2022 10:19:16 -0700 (PDT)
-Received: from fedora (nat-2.ign.cz. [91.219.240.2])
-        by smtp.gmail.com with ESMTPSA id bt21-20020a170906b15500b0073dbc35a0desm1123212ejb.100.2022.08.26.10.19.16
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 26 Aug 2022 10:19:16 -0700 (PDT)
-From:   Vitaly Kuznetsov <vkuznets@redhat.com>
-To:     Sean Christopherson <seanjc@google.com>
-Cc:     kvm@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>
-Subject: Re: [RFC PATCH v6 00/36] KVM: x86: eVMCS rework
-In-Reply-To: <Ywe/j3fqfj9qJgEV@google.com>
-References: <20220824030138.3524159-1-seanjc@google.com>
- <87fshkw5zo.fsf@redhat.com> <Ywe/j3fqfj9qJgEV@google.com>
-Date:   Fri, 26 Aug 2022 19:19:15 +0200
-Message-ID: <87v8qevs6k.fsf@redhat.com>
+        with ESMTP id S1344948AbiHZSKg (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 26 Aug 2022 14:10:36 -0400
+Received: from NAM10-DM6-obe.outbound.protection.outlook.com (mail-dm6nam10on2046.outbound.protection.outlook.com [40.107.93.46])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 72EFABD1D2;
+        Fri, 26 Aug 2022 11:10:35 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=EstCAFLvDH/peylH1Ig571g34OXOIRJHfVjeY13LYAkuKFi4+QXVriK8gK6MuAyVSPFnJjjEge/4R/DRTwPTygH6VFNNBtYUqJbhftl30uWffZvhUac37PywTw6cSvVIE07niPTVb9yNSGUkTEFx1lE3xoUH3KT4+U3Zom8ESrO3JU2tB+NNAn3yr5ndxRpEuUJ4wFnQFuT64Ddvpe1fcqI0GOImrzAdu670Mg/gnQuAr8WI/slHn8/tG/UWdKv9efI83a1sr0RefPKx1s65eWvzO/EvLmYNe3T1G2rVKls/+8s+1e/Npl4it/JLDb8jEroQZFrwGR7lubCCZkUO3g==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=TuJoj7hld2EeSSN3LhJ3+Si9zZbkdaroRJY+9G8cEdM=;
+ b=oRzrTBTs0BpbO1MlUK7CGzBZvACVhQI3QEj8mvEXt8TuLUL/P3sVVnkb51Q3KlioFhqezq1rbNqBUHXltPOV+NibnO9VZQlWxlrSgn/klnHIHtW5mkXwLTjxYXxieO/shovYTQ/05ELC67DQs3ga9T45zAVNBJBFbwKQKpPivfbbmoNHEA5dT+gwM+S4+VfJuVgSwROPMLdn0pse84XlbU4trZ1hhYy7cZGTK3ApvJj2IUJn7Bc1roEQNsAkLOsFBD/0qqgcZrmgo6DId1ReR4w4iMWY7O+DxPzkrcoDGLZ6+ORYSwqxB0SnAxdgGJ0ia+DmTN7ZtjP2YRXr+2MbqA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
+ dkim=pass header.d=nvidia.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=TuJoj7hld2EeSSN3LhJ3+Si9zZbkdaroRJY+9G8cEdM=;
+ b=mIEOsXe/CdvBc53h05oD4SHgKfjEOyyQ3yNEuMw8nRh0IjZcNWEffbT8cBytQAzZuE8dyjo+9xDZKCgR4mESwXMcuhvLqBwYKigJNgnDtSeZ2OIXH1SnV61fxua10a6bCchllbCtJe2QP6n4O+WBuMtShnfHxdxKTcY1o657OjCqESUpgoAMI+P48b0v4plpI3WBbiLxWvs8wWQ6RQ/L+958QpmhYa4H/UJCeFWDbIuOKmeSS/6SmQrrNFsimX3rNNlcVsgyQl6HjVbwOkejXp1i/ygpRBlt5TAnPlQbXaU7DlGFilS6TE1/Ivi+yFJs/zQRJY182Zv+CZa7K5/ORg==
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=nvidia.com;
+Received: from MN2PR12MB4192.namprd12.prod.outlook.com (2603:10b6:208:1d5::15)
+ by CY5PR12MB6180.namprd12.prod.outlook.com (2603:10b6:930:23::8) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5566.15; Fri, 26 Aug
+ 2022 18:10:33 +0000
+Received: from MN2PR12MB4192.namprd12.prod.outlook.com
+ ([fe80::462:7fe:f04f:d0d5]) by MN2PR12MB4192.namprd12.prod.outlook.com
+ ([fe80::462:7fe:f04f:d0d5%8]) with mapi id 15.20.5566.016; Fri, 26 Aug 2022
+ 18:10:33 +0000
+Date:   Fri, 26 Aug 2022 15:10:32 -0300
+From:   Jason Gunthorpe <jgg@nvidia.com>
+To:     Oded Gabbay <ogabbay@kernel.org>
+Cc:     Alex Williamson <alex.williamson@redhat.com>,
+        Christian =?utf-8?B?S8O2bmln?= <christian.koenig@amd.com>,
+        Cornelia Huck <cohuck@redhat.com>,
+        Maling list - DRI developers 
+        <dri-devel@lists.freedesktop.org>, KVM list <kvm@vger.kernel.org>,
+        "moderated list:DMA BUFFER SHARING FRAMEWORK" 
+        <linaro-mm-sig@lists.linaro.org>,
+        Linux Media Mailing List <linux-media@vger.kernel.org>,
+        Sumit Semwal <sumit.semwal@linaro.org>,
+        Daniel Vetter <daniel.vetter@ffwll.ch>,
+        Leon Romanovsky <leon@kernel.org>,
+        linux-rdma <linux-rdma@vger.kernel.org>,
+        Maor Gottlieb <maorg@nvidia.com>
+Subject: Re: Fwd: [PATCH 4/4] vfio/pci: Allow MMIO regions to be exported
+ through dma-buf
+Message-ID: <YwkMmFjpsKuJroBz@nvidia.com>
+References: <0-v1-9e6e1739ed95+5fa-vfio_dma_buf_jgg@nvidia.com>
+ <4-v1-9e6e1739ed95+5fa-vfio_dma_buf_jgg@nvidia.com>
+ <CAFCwf13kOBri3NDO=6SGHOXq-M=wndbdcMxik9bf8H1AUCE1tQ@mail.gmail.com>
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CAFCwf13kOBri3NDO=6SGHOXq-M=wndbdcMxik9bf8H1AUCE1tQ@mail.gmail.com>
+X-ClientProxiedBy: BL1PR13CA0268.namprd13.prod.outlook.com
+ (2603:10b6:208:2ba::33) To MN2PR12MB4192.namprd12.prod.outlook.com
+ (2603:10b6:208:1d5::15)
 MIME-Version: 1.0
-Content-Type: text/plain
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham
-        autolearn_force=no version=3.4.6
+X-MS-PublicTrafficType: Email
+X-MS-Office365-Filtering-Correlation-Id: 496c1765-6208-46f4-aa50-08da878e4497
+X-MS-TrafficTypeDiagnostic: CY5PR12MB6180:EE_
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: wDBO32CR5YRONTjlTkB73qExBL4EIVO0zEhxQvMDlAvcVGciGfKgfTukqgrb/axadQu++NTMKcnjTCl3i6XqiMJvR63VO3JfE6RGee84AJQOXhCbf2hKwudHYJCjXvnaN2TjbrW9PXxc9i0RhBGK6XQLaOUAVa7n7t1BsEgmA7QkTrx7IT3B/CB0M5fIprvnKvrEKlQH+4VukbUF07qeAW3RCLDU68TT6SBJ8Yd4ozgC0I6jNgedcUNMdnWUsXa9ghf7EYkBfktZgHv6InTkU9H52PxayBWxjQiZdvqhqziRUQ+edN+pPTfTv+kKeDgYMg9x2MhtJAEf0XEl/BBKs1vFvg11Q4CvWnonpngo7Effkx7E4hQjh+tDyItHqMm+Nk6swhFlcOMYS2tVck60i3fk1vGPFcD0zY7p3BW+0Zu/F5uhKqQ5nFytF/jBWxiXQM5YaG3NFP+MAcv9PoOB5/NSb1zPTgHr6q49J6R51FtW7I7A22/mDYoY6sqZp2t/sMyHRlnV/mgbZX+jpcOMMzJxGdn7oZQgZKwGNhFJ/zhBMMCO8Y2M1XLQPa7ibm+0gupuyZ2n1T/T6+feKWgY00d7rN4+WZ1c21RI8dSzlrBUV+Bytv4y6UyL94bkphNUpZPO6eHpVRmeKiC/EjH9hpJrNos+7TPGEYSeaFs5xousDbonZnkz1VKYwmfTcBSjlADRZ+UKv167h0bAqWmanQ==
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:MN2PR12MB4192.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230016)(4636009)(396003)(376002)(346002)(39860400002)(136003)(366004)(316002)(86362001)(8936002)(6916009)(4326008)(8676002)(66946007)(66556008)(66476007)(54906003)(26005)(83380400001)(6512007)(2616005)(7416002)(186003)(6486002)(478600001)(6506007)(38100700002)(2906002)(107886003)(41300700001)(36756003)(5660300002)(4744005);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?r8tIeO7XypHpu0U3gaORBl840X7xXAXx/UGCKaHtsql7BdFGEznCy1DAzH8W?=
+ =?us-ascii?Q?1VpIb+I4dZD16shjHLq1UHzJwTfjvZLn7drXWiytercDa7KrHAbGqIgGA1IZ?=
+ =?us-ascii?Q?MLHsNXEKUki0o/PF9yU5J7RY2Y3HwqSBvbquSR3iZTlq2oFYyHiMXNoNw7Hz?=
+ =?us-ascii?Q?/AffYUtunSZtf/c24XJJo9OGdX7Qa3R5832Auq5BMY1oXlYx6cxCD23z6nGc?=
+ =?us-ascii?Q?+68IQxQrwnmulZku2FKVZaOFCFVnZnnbX27+QPMSllwFUUSwGcr1AkEqBC0A?=
+ =?us-ascii?Q?6LzD14AdHFUxouG8ZIRaw/ri+6yw9BXqSAPLdG6kTRQf4rseDugOfNOGdu1w?=
+ =?us-ascii?Q?ayTAAkXQL8k9xCumptmpsSl8vgSJ1wdfPlbdjMW5HenPYyybI5Nj5adYJ85t?=
+ =?us-ascii?Q?KPf9iOK6NBHaIsFPubP8YqU/aXX/hk6+WjCfpbVFiBL8AwADGrL0oJiHCC6Y?=
+ =?us-ascii?Q?yOF/UCti0lZE/kB0Uih6kWpsnKRgFdFI3Xw+wx6FHZeHUpnCYF2V/9/OWc94?=
+ =?us-ascii?Q?frCmBO18+5xt/aVrRx/SQWS7AaAbRJBTWQ6aybJUTu0bJGU7MrayyFwB5Dgr?=
+ =?us-ascii?Q?P7XURzowXpSkSyXxq1S0UZXrgpqgDh2BmEEWHGPfliZBuqgEaZBggcHnM7Ku?=
+ =?us-ascii?Q?twC39BO9Ooo1GL/Dir5BRSAcfBt1asLCQwwz2oz50IN3LJ2mp4NVMXZ0oKYE?=
+ =?us-ascii?Q?tNk112u7P/LATJwVpwCzzeC4JKFI+e3Syx+DnzCaSc9vYv/KtKEyycH2THja?=
+ =?us-ascii?Q?WTzRfdfhBfbTBtjvsLi+Os/slmQ8r/7hkhDkAM7wyNoGnA/wo5Er2t0ohfw1?=
+ =?us-ascii?Q?rJzkvnhCCTSUNiQ3i1qATjEAX9PY4ZXr9mFLd0Y2sJ7gkSSd5k4RJ894Oc3w?=
+ =?us-ascii?Q?EyZFASCErXagTGcBCXZ1cw1poAz+/wmoOpbZrRFelPZqatyqMqIQPybgLUn3?=
+ =?us-ascii?Q?8TAvT/ppfWi1r+Hl+c8FxGQfUuKzQxcLkkxFL9B9T1Y2sZ5BkGe3QCHB2XHv?=
+ =?us-ascii?Q?W3a2R2UD+dEu0U4/X2geSQ14R2VVXTFdaWkLKh9Ust454218pQC0QLmI8qH+?=
+ =?us-ascii?Q?uWinoQ/+/Zpm8fAFLLIXywHLh0vYfjx8cGAUgW8qOsRpiKDv7Vmx/Sg0zkCt?=
+ =?us-ascii?Q?7yurMBb58p98ajBvr39UJ2VgFdIsBhoph83wQWLvmAcoqk9DHdqJuiUpchQx?=
+ =?us-ascii?Q?XCPPI73xxnGrCvo+DQYFaMXS+Qzq7bhCrOzo7vxdF1Tvcfw/S2BUu3WW+rjD?=
+ =?us-ascii?Q?hlrFaNYWBdYOD9WWrQ/58zjh6EwC0Kv9qGUvABkr2mZG4USZD7Puco4rvweT?=
+ =?us-ascii?Q?ygLEYKtBZrXZ9ERzl/m26KiwvDR0qsEaVrvlvANb/j+H3m1+3xoPOonzOGxI?=
+ =?us-ascii?Q?BU1LyVKUHcSB9Y9Y775QhFSRIC83zcjY6YJp37xoVcL4hcrTRCM1lpK0NmP6?=
+ =?us-ascii?Q?37/WmQLUzRQGqEesPDND3BAaZPm12de9teCQwP97hLZf7MR7QHelbYonhWvK?=
+ =?us-ascii?Q?NJ6u6fzN4fYiDRZByZA1Z7WUvrCA3Q0w4C0E/AxTdZGPgSlkky5Nt4DwxRob?=
+ =?us-ascii?Q?b+buYN4/lEesnAQgBeDKP1+b5kyHCqM03h5WzczF?=
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 496c1765-6208-46f4-aa50-08da878e4497
+X-MS-Exchange-CrossTenant-AuthSource: MN2PR12MB4192.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 26 Aug 2022 18:10:33.4430
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: 6aNmX6VLedMHvn98GkrIymcqtfJCX0BtjGN6bjR7S/jS03Rj3DkVKR79uVxLTVpG
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: CY5PR12MB6180
+X-Spam-Status: No, score=-1.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FORGED_SPF_HELO,
+        RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_NONE,
+        T_SCC_BODY_TEXT_LINE autolearn=no autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Sean Christopherson <seanjc@google.com> writes:
+On Sun, Aug 21, 2022 at 04:51:34PM +0300, Oded Gabbay wrote:
 
-> On Thu, Aug 25, 2022, Vitaly Kuznetsov wrote:
->> Sean Christopherson <seanjc@google.com> writes:
->> 
->> > This is what I ended up with as a way to dig ourselves out of the eVMCS
->> > conundrum.  Not well tested, though KUT and selftests pass.  The enforcement
->> > added by "KVM: nVMX: Enforce unsupported eVMCS in VMX MSRs for host accesses"
->> > is not tested at all (and lacks a changelog).
->> 
->> Trying to enable KVM_CAP_HYPERV_ENLIGHTENED_VMCS2 in its new shape in
->> QEMU so I can test it and I immediately stumble upon
->> 
->> ~/qemu/build/qemu-system-x86_64 -machine q35,accel=kvm,kernel-irqchip=split -cpu host,hv-evmcs-2022,hv-evmcs,hv-vpindex,hv-vapic 
->> qemu-system-x86_64: error: failed to set MSR 0x48d to 0xff00000016
->> qemu-system-x86_64: ../target/i386/kvm/kvm.c:3107: kvm_buf_set_msrs: Assertion `ret == cpu->kvm_msr_buf->nmsrs' failed.
->> 
->> Turns out, at least with "-cpu host" QEMU reads VMX feature MSRs first
->> and enables eVMCS after.
->
-> Heh, of course there had to be a corner case.
->
+> > +static void vfio_pci_dma_buf_unmap(struct dma_buf_attachment *attachment,
+> > +                                  struct sg_table *sgt,
+> > +                                  enum dma_data_direction dir)
+> > +{
+> > +       struct vfio_pci_dma_buf *priv = attachment->dmabuf->priv;
+> > +
+> > +       dma_unmap_resource(attachment->dev, sg_dma_address(sgt->sgl),
+> > +                          priv->dmabuf->size, dir, DMA_ATTR_SKIP_CPU_SYNC);
+> > +       sg_free_table(sgt);
+> Before calling sg_free_table(), you need to restore the orig_nents as
+> it is used in that function to free the allocated memory of the sgt.
 
-Unfortunatelly, it's not a corner case, named CPU models in QEMU behave
-exactly the same (I've just forgotten to add '+vmx' yesterday). In fact,
-it seems QEMU uses system-wide KVM_GET_MSRS (which results in
-vmx_get_msr_feature() for our case) which gives unfiltered values. As it
-is system wide it just can't filter anything. This happens even before
-KVM_CREATE_VCPU is called so switching to per-vCPU ioctl is not an
-option. What's worse is that all the discovered features (including VMX
-features) are passed to upper layers of the virtualization stack,
-starting with libvirt and upper layers may want to enable some of the
-"available" features explicitly. Teaching everyone what's available with
-eVMCS and what's not seems to be a hard task.
+Oops, right, thanks good catch
 
-This use-case can probably be solved by making eVMCS enablement a per-VM
-thing (already did locally) and creating a per-VM version of
-KVM_GET_MSRS which will give us filtered VMX MSRs when eVMCS was
-enabled.
-
-Note: silently filtering out features when vCPUs are created is bad as
-the list of such features will change over time. This is guaranteed to
-break migrations.
-
-Honestly I'm starting to think the 'evmcs revisions' idea (to keep
-the exact list of features in KVM and update them every couple years
-when new Hyper-V releases) is easier. It's just a list, it doesn't
-require much. The main downside, as was already named, is that userspace
-VMM doesn't see which VMX features are actually passed to the guest
-unless it is also taught about these "evmcs revisions" (more than what's
-the latest number available). This, to certain extent, can probably be
-solved by VMM itself by doing KVM_GET_MSRS after vCPU is created (this
-won't help much with feature discovery by upper layers, tough). This,
-however, is a new use-case, unsupported with the current
-KVM_CAP_HYPERV_ENLIGHTENED_VMCS implementation.
-
-eVMCS seems to be special in a way that a) it evolves over time b) it is
-mutually exclusive with *some* other features but the list changes. We
-don't seem to have anything like that in KVM/QEMU, thus all the
-confusion.
-
--- 
-Vitaly
-
+Jason
