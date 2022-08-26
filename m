@@ -2,269 +2,206 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id F03FF5A2F49
-	for <lists+kvm@lfdr.de>; Fri, 26 Aug 2022 20:52:30 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 61BE05A2F6D
+	for <lists+kvm@lfdr.de>; Fri, 26 Aug 2022 20:58:58 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1345311AbiHZStv (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 26 Aug 2022 14:49:51 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55450 "EHLO
+        id S1345416AbiHZS5W (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 26 Aug 2022 14:57:22 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51338 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1345315AbiHZStK (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 26 Aug 2022 14:49:10 -0400
-Received: from mail-pf1-x44a.google.com (mail-pf1-x44a.google.com [IPv6:2607:f8b0:4864:20::44a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3778AEA8B0
-        for <kvm@vger.kernel.org>; Fri, 26 Aug 2022 11:46:07 -0700 (PDT)
-Received: by mail-pf1-x44a.google.com with SMTP id a21-20020a62bd15000000b005360da6b25aso1248094pff.23
-        for <kvm@vger.kernel.org>; Fri, 26 Aug 2022 11:46:07 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc;
-        bh=stpKDIZUfAsiCHACs7kxVCVZD/2HAYo+g81a4039rSM=;
-        b=JLKuVXKrzJAX9lRDhFsvN8/57xqI44Ve65I6izBKMAWQAMDfeEvNRM8DT3GncC3jwZ
-         C5mD65vLDnS6SAxPZoqbFr5f7WpXMTrxN/dyNDj4aqpZvCoZugfQPwalqA6vRAitkQQ+
-         iVq0c8TSx43/2GslVLWOp4abBXvIvl2/YnUmXq+KQOBelyY9wT8h7qhoazsR714fkWZ1
-         sd/h8qjuKJ+2YBKQQ0LS2IX6ai5LBKslrfp8j7nMI82yApy++/Q7osQdgMMx85/E/pSr
-         M2nnRFjmfvS/DvYqbuzLCnbHCCSa9wxSi81pxM1dOSbEKgcyRA3ov+eLejm79JsPxgRX
-         O5jA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc;
-        bh=stpKDIZUfAsiCHACs7kxVCVZD/2HAYo+g81a4039rSM=;
-        b=vWXLiTrSfeV9wKGdFX55LWgN1UHkFEQN2XEDSuBVacx9Pph2RrBLa/YyZ1F7QJyNyA
-         I3N4S85JIF2BcVCc59d0kQ+VXzdchTS3I4APF4NzA08hUzhWgzQ+K/CzcXNtFb0qahFH
-         ynHBBUqsOvvhHAKm/JYhMRsowVjzJ93fXyB5fHXSyDiLjTLrQA9Lz6Y2JDSEOiSZY5vZ
-         3ONMeookgX7bFnjyEXP67PW9KsdtuXrWiY0YA8Wzm2So08JL8su3SNPKnFtCOwpe2304
-         HsJUKLiqVC8pIOYpafjCbLY3fgDnFDJPoNY/ZcldJQRRdu06GcFzNwgueaV1rPrQYsP0
-         /21w==
-X-Gm-Message-State: ACgBeo1lVWA9MWHXOK+VBXTCVLRdUQcs7RgF8ek+Tvgy7u4acex4jYcH
-        y6+n6+HjKPaAvoSFZnBEarkg9Wm9xm/2
-X-Google-Smtp-Source: AA6agR54JHf5XDCzHtZ9WW+dQdBMo2qJwzcI8ikqfIIMo2VhpBmsWT3mg59hNVT6q78/LP+pCPy1siiXW+CB
-X-Received: from vipin.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:479f])
- (user=vipinsh job=sendgmr) by 2002:a05:6a00:ad1:b0:530:2cb7:84e2 with SMTP id
- c17-20020a056a000ad100b005302cb784e2mr5057556pfl.18.1661539566895; Fri, 26
- Aug 2022 11:46:06 -0700 (PDT)
-Date:   Fri, 26 Aug 2022 11:45:00 -0700
-In-Reply-To: <20220826184500.1940077-1-vipinsh@google.com>
-Mime-Version: 1.0
-References: <20220826184500.1940077-1-vipinsh@google.com>
-X-Mailer: git-send-email 2.37.2.672.g94769d06f0-goog
-Message-ID: <20220826184500.1940077-5-vipinsh@google.com>
-Subject: [PATCH v3 4/4] KVM: selftests: Run dirty_log_perf_test on specific cpus
-From:   Vipin Sharma <vipinsh@google.com>
-To:     seanjc@google.com, dmatlack@google.com, pbonzini@redhat.com
-Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Vipin Sharma <vipinsh@google.com>
-Content-Type: text/plain; charset="UTF-8"
-X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL
-        autolearn=unavailable autolearn_force=no version=3.4.6
+        with ESMTP id S1344628AbiHZS5G (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 26 Aug 2022 14:57:06 -0400
+Received: from NAM10-DM6-obe.outbound.protection.outlook.com (mail-dm6nam10on2052.outbound.protection.outlook.com [40.107.93.52])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 91ECFE992A;
+        Fri, 26 Aug 2022 11:54:18 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=kwyKXSAf6QciXywyKla37NH02WqNYzeDjVYAqK7iR7UL3qTQ4OmBnlaBQoZa81bZQ8Kk3jbBKqjHXDC3r/VVm+ATDakVUcZSJhFxvRRap5lR+HUAEFLpKb/7Pu6fNw4Yz8RQF/xhbb78WDA+00OzgpuVUsHiJwn2/qgGJBmyh+YE2XmMYhJcBus/vWFbvFkK78KszOB/QsM6byymKoojgFs2lmQKAoUDLo70LjtK1hl2MjPywk39zLCRPbI7G54YFpfs8DfgMnGRdCVkDamV8/1G0vzL6EopyCCjnl73FXxQIoezzYZ/okoDS8vsp+jzxmSmds0PsZ9XS4JVnMKsYQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=gneMpFXbSfSSGxFzBh6BzQ8YVboIqIR9/wGD3KPAYGI=;
+ b=fm2uGlp+plueiGUoDnmIInFAu7bxKzYdwydLfu44Wowj3KSaEgU3tB7h2q+Z90cbAp1pvtbpRIW3xm67m0W3N8qYlAsMAx+hlgn19TXciCP+08QH96LAci2OBXeFRYPoQmAO8cS4qyZx3AFRb1e1UOKDVDx3LKQRNk1v/6/O5qP6PX8L6xQfSPfEIthdzZi2rZEhhOOq2CFw7NQNhc68YOj6hjiCJseDLQ9h4biNDYxl399/Vo2WS7YYjTPQ8T+jap4YEzQp3Yzi58iYQRTQXeT9s5xMn6teT5GxhSVLesnAObyK7VyWzf8nZ1k63eCrmoyG8PiTmODuhA148qc0Sw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
+ header.d=amd.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=gneMpFXbSfSSGxFzBh6BzQ8YVboIqIR9/wGD3KPAYGI=;
+ b=tY/cFMmXGrMVLcDki9VsR+cpnqO8Ahkk1DksgG7j6IFKQgA63ia78HXGi5wDb9XrHjom/qJPHTreAGbrXdeYOUQozAPhN6QldlI3K3n8X0mrU51ZOGdCFiIjGF7XNuPAN6S0+tq7fMJJMpwaWfBsIz0LBIC2lzRnfElm39HjH0I=
+Received: from SN6PR12MB2767.namprd12.prod.outlook.com (2603:10b6:805:75::23)
+ by BL1PR12MB5334.namprd12.prod.outlook.com (2603:10b6:208:31d::17) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5566.15; Fri, 26 Aug
+ 2022 18:54:16 +0000
+Received: from SN6PR12MB2767.namprd12.prod.outlook.com
+ ([fe80::fc65:3a28:fdd0:ce9f]) by SN6PR12MB2767.namprd12.prod.outlook.com
+ ([fe80::fc65:3a28:fdd0:ce9f%7]) with mapi id 15.20.5566.015; Fri, 26 Aug 2022
+ 18:54:16 +0000
+From:   "Kalra, Ashish" <Ashish.Kalra@amd.com>
+To:     Jarkko Sakkinen <jarkko@kernel.org>,
+        Peter Gonda <pgonda@google.com>
+CC:     the arch/x86 maintainers <x86@kernel.org>,
+        LKML <linux-kernel@vger.kernel.org>,
+        kvm list <kvm@vger.kernel.org>,
+        "linux-coco@lists.linux.dev" <linux-coco@lists.linux.dev>,
+        "linux-mm@kvack.org" <linux-mm@kvack.org>,
+        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Joerg Roedel <jroedel@suse.de>,
+        "Lendacky, Thomas" <Thomas.Lendacky@amd.com>,
+        "H. Peter Anvin" <hpa@zytor.com>, Ard Biesheuvel <ardb@kernel.org>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Sean Christopherson <seanjc@google.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Andy Lutomirski <luto@kernel.org>,
+        Dave Hansen <dave.hansen@linux.intel.com>,
+        Sergio Lopez <slp@redhat.com>,
+        Peter Zijlstra <peterz@infradead.org>,
+        Srinivas Pandruvada <srinivas.pandruvada@linux.intel.com>,
+        David Rientjes <rientjes@google.com>,
+        Dov Murik <dovmurik@linux.ibm.com>,
+        Tobin Feldman-Fitzthum <tobin@ibm.com>,
+        Borislav Petkov <bp@alien8.de>,
+        "Roth, Michael" <Michael.Roth@amd.com>,
+        Vlastimil Babka <vbabka@suse.cz>,
+        "Kirill A . Shutemov" <kirill@shutemov.name>,
+        Andi Kleen <ak@linux.intel.com>,
+        Tony Luck <tony.luck@intel.com>, Marc Orr <marcorr@google.com>,
+        Sathyanarayanan Kuppuswamy 
+        <sathyanarayanan.kuppuswamy@linux.intel.com>,
+        Alper Gun <alpergun@google.com>,
+        "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Subject: RE: [PATCH Part2 v6 02/49] iommu/amd: Introduce function to check
+ SEV-SNP support
+Thread-Topic: [PATCH Part2 v6 02/49] iommu/amd: Introduce function to check
+ SEV-SNP support
+Thread-Index: AQHYhYN//Jq12JdNiEyvNHxMVTEAQ61aILsggAADK4CAZRTwgIAAAKeAgAK0CKA=
+Date:   Fri, 26 Aug 2022 18:54:16 +0000
+Message-ID: <SN6PR12MB27678E2944605E11B37267CC8E759@SN6PR12MB2767.namprd12.prod.outlook.com>
+References: <cover.1655761627.git.ashish.kalra@amd.com>
+ <12df64394b1788156c8a3c2ee8dfd62b51ab3a81.1655761627.git.ashish.kalra@amd.com>
+ <CAMkAt6r+WSYXLZj-Bs5jpo4CR3+H5cpND0GHjsmgPacBK1GH_Q@mail.gmail.com>
+ <SN6PR12MB2767A51D40E7F53395770DE58EB39@SN6PR12MB2767.namprd12.prod.outlook.com>
+ <CAMkAt6qorwbAXaPaCaSm0SC9o2uQ9ZQzB6s1kBkvAv2D4tkUug@mail.gmail.com>
+ <YwbQKeDRQF0XGWo7@kernel.org> <YwbQtaaCkBwezpB+@kernel.org>
+In-Reply-To: <YwbQtaaCkBwezpB+@kernel.org>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+msip_labels: MSIP_Label_4342314e-0df4-4b58-84bf-38bed6170a0f_Enabled=true;
+ MSIP_Label_4342314e-0df4-4b58-84bf-38bed6170a0f_SetDate=2022-08-26T18:47:21Z;
+ MSIP_Label_4342314e-0df4-4b58-84bf-38bed6170a0f_Method=Standard;
+ MSIP_Label_4342314e-0df4-4b58-84bf-38bed6170a0f_Name=General;
+ MSIP_Label_4342314e-0df4-4b58-84bf-38bed6170a0f_SiteId=3dd8961f-e488-4e60-8e11-a82d994e183d;
+ MSIP_Label_4342314e-0df4-4b58-84bf-38bed6170a0f_ActionId=01131e74-f26b-4805-aa08-cfbb5956557d;
+ MSIP_Label_4342314e-0df4-4b58-84bf-38bed6170a0f_ContentBits=1
+msip_label_4342314e-0df4-4b58-84bf-38bed6170a0f_enabled: true
+msip_label_4342314e-0df4-4b58-84bf-38bed6170a0f_setdate: 2022-08-26T18:54:14Z
+msip_label_4342314e-0df4-4b58-84bf-38bed6170a0f_method: Standard
+msip_label_4342314e-0df4-4b58-84bf-38bed6170a0f_name: General
+msip_label_4342314e-0df4-4b58-84bf-38bed6170a0f_siteid: 3dd8961f-e488-4e60-8e11-a82d994e183d
+msip_label_4342314e-0df4-4b58-84bf-38bed6170a0f_actionid: 29ebba62-13a9-4b86-8b1b-a974f6f5188d
+msip_label_4342314e-0df4-4b58-84bf-38bed6170a0f_contentbits: 0
+authentication-results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=amd.com;
+x-ms-publictraffictype: Email
+x-ms-office365-filtering-correlation-id: fc5bf462-8a5f-4767-6e92-08da87946010
+x-ms-traffictypediagnostic: BL1PR12MB5334:EE_
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam: BCL:0;
+x-microsoft-antispam-message-info: Jthyv26BinNazs79ZmJ5P8A58XuiV68hlnvcWLUb9YPe0/j8jN/OCKhSW5m2ub1Yi/xWj/x/D5NFU2ai6YBmmq0ftcgqidwB/e3SLteBfBNOpDFjE7E7/WBH8VGJbRfX2XeOxsiam8lRqBeKCMWkMtQwuHhlRt7R+nj11FVuPn7HfyNj7Pop6t20ndBaoQRFsyHPqUm5LQS96tHtUhsxv5d4IlouQiI+p9yT1pApQRsz3+btiv2Too+zTjJC1VPpemolo5rHtXKP6ZW1sI2NgOkGVvaDB/TFpvYYuRETmylW9OzHQ3VCtCE3sZsA9cfwlNG7jR0VWfQre/A6ylUrqrPaTl6kwJN5otk/iWtLzNVb5jGZTd5T0bI3PLbDNmsWdY0XAf+lkn27GWRkEsKdQ3Q9wy9wNZfX+4oba1IWS5zAtLZXyc1fNMomxXSCmmOCDDsWgwJ7gRvaKbayivm6Z/xLdjYDRLA173WVsh2ap8F2dSx7+0078xC3mEtpbq7HHrv6cmN8umz20eZZSRKfaov1D4i2PP5yRt1xPCCzlZ9THL9VyZlFBvcGF650fMhxxyHpxe0u5Lj+O+zvbl9MkLI/eLd1EjH5AuvbiJ6V8uCR20tsKuePI0N08SBDKoBZHu9Xn8DN7iVRevS7Pq54kI1HytIXbU/FhrQf0V4IRijXfD9o8a0irsPUgwITuTTLtj2FniS/ohb8OyTPkxO0fjdrXGVIDD9SK7M6BTZe06P/BdAmXFFpYXQASIiXx0L3GF4uHiwKyYQ5HPvJazsSiA==
+x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SN6PR12MB2767.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230016)(4636009)(346002)(366004)(39860400002)(376002)(136003)(396003)(86362001)(38070700005)(122000001)(54906003)(316002)(110136005)(76116006)(52536014)(38100700002)(186003)(2906002)(7416002)(7406005)(66946007)(66556008)(66476007)(66446008)(64756008)(8676002)(4326008)(5660300002)(83380400001)(478600001)(55016003)(71200400001)(6506007)(26005)(9686003)(7696005)(41300700001)(8936002)(33656002);DIR:OUT;SFP:1101;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0: =?us-ascii?Q?lR8URrnwzDvQxGRI+gqh5IjjdsASRCFUZvwqNMJOZWakYWJ2RX9G7vQIwB4R?=
+ =?us-ascii?Q?wmEOhFRNUx0ziSLQ+PxGDDGaL0YCN7q5Y8rTuxesns+BHt1ICRqCgrY94FBy?=
+ =?us-ascii?Q?zHj+wVny1XjytwXNGwl7cPP/kA8Aqg03fbV/nloqd0e7wEb/dYFMFAWkdeDk?=
+ =?us-ascii?Q?OObASgkdsCi3KPMgGEdyNgTBf1BWOWIRDRQzNhgWGy3oMmDXUDHMvTe62skK?=
+ =?us-ascii?Q?F7fD3o9oLcOZMGApQ49OJ0ZuZYZOWTDMvVZS52I3VQZFyCRinPM6oORXBnQW?=
+ =?us-ascii?Q?d9XovvO6ELzYDw5d8gDCrRrZ/kETppC0ZJcAcZMaZHeJyt0FH1aZYYEJWjiu?=
+ =?us-ascii?Q?vIIgv9yk1CWWW/zkFVq8Naj/JwkE965+UfF6nNqYjBy8UgY6+ndfXWqw3poq?=
+ =?us-ascii?Q?bPT90NL0jSRZqQNEixoRa7IN6cjkbYmuBWrcmt4MuY6K6roXVRGJBZWZ9LcD?=
+ =?us-ascii?Q?NFIYqMDKsZnkxrjaonsAKYFYD+ItuetZRzkHSxXjRd8aeB67KHafhxUB5wDM?=
+ =?us-ascii?Q?v0exyxM9Itvnbwbts0XHS07mvxwo3Yi2hhuEsFg4YaEw9I6JDkAdYYd9CwAC?=
+ =?us-ascii?Q?H72kfcMRKk0RsIXrwifvDS8MbI1OGuNF6hNaAA66CgAg8XxFWZrfkd5BxmbI?=
+ =?us-ascii?Q?K8X1i3Y3KGjwNonkAern6k/OImYXi9tw8olKJK77QxSHaCWtl48bB+d3yN1X?=
+ =?us-ascii?Q?B1yFdAMHlypXaHkb4Djf2cQtpRHo5W7JJIakDfVpiRBcyh95LOLJzT6AEpa/?=
+ =?us-ascii?Q?bJubg7to5VyBXPks0iEJrlkc8jWF/hwAKlyVXzrNujm6M69TMqJ4cYZBKHm4?=
+ =?us-ascii?Q?412XWS8SNczXCuhn11Sg1f9TB3roiwKGWsM2hxj36xwGUTkc58VVCYv4lvKJ?=
+ =?us-ascii?Q?C7aklXUEYWW+5SoVVqJVYJT0opyOObvlmSxTrtO8eL/OJ2kEsEKJfQ1MNaXl?=
+ =?us-ascii?Q?mH7YdYDpVGMPPZGQJUrwV4oygSnyCqabnVEcsJFHwMusqCcKLkCYxsf0BESG?=
+ =?us-ascii?Q?QMftIUehCVfxUzx4QWvx3c+uy3qUAGCD7sKG9QF9iFEQhfZxUoD0/QQgWd8m?=
+ =?us-ascii?Q?AsnTeqa4Q29wx6bay0qGPgtsYegRq8xrMYvGgktjXl6aGCLZ1CxXrFv8ev/l?=
+ =?us-ascii?Q?zcq1LAIao0i8/AkH0WpVmlrnMF0ItWL2+c98RSpSdQOzeToccVunSD4MyXZs?=
+ =?us-ascii?Q?6bQ/5PHzUadJdYZsgm1F7kNJschN4OrWXooNlkIpPmWLlSBN5pzqVGSvX/Qy?=
+ =?us-ascii?Q?gN9Q1TI4dAtgERMdRN+ACG61HHRvVOy2VLpFJCcVrcyidUIayowqdtcYHm5T?=
+ =?us-ascii?Q?UQSB/jRRXq5s8k4hVL00ltajBxAaa52bLtTfm3Low95DhrqTHE9CiY3wrfHi?=
+ =?us-ascii?Q?G6wjycdA2n6dHWO/IRSxJyVYIecJejzT0NntdON3qq5jP2FEecnW73Vn61K6?=
+ =?us-ascii?Q?oAx2vdatZa3kxb7n+mwyqmhpXh9vXaz34WBrO0XEgX2bcvZEsWSyR3pYmhrv?=
+ =?us-ascii?Q?yJlxp5LmoIMG3RBaAAMSIZqHYKA4xU47iXaNYwLC9kVMCh+RlGzCqIRinjo/?=
+ =?us-ascii?Q?2ur3BTwpSJZfvasUw0k=3D?=
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
+MIME-Version: 1.0
+X-OriginatorOrg: amd.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: SN6PR12MB2767.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: fc5bf462-8a5f-4767-6e92-08da87946010
+X-MS-Exchange-CrossTenant-originalarrivaltime: 26 Aug 2022 18:54:16.2633
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 3dd8961f-e488-4e60-8e11-a82d994e183d
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: UroD/I0WsGYZZCb/6XOqTlndwb1wq8INQAVry840mSLb/8eVTaNiimKyz1DOsagqBzdIqaEPtEGYiq5EUX0U9g==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: BL1PR12MB5334
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_PASS,T_SCC_BODY_TEXT_LINE
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Add command line options, -c,  to run the vcpus and optionally the main
-process on the specific cpus on a host machine. This is useful as it
-provides a way to analyze performance based on the vcpus and dirty log
-worker locations, like on the different numa nodes or on the same numa
-nodes.
+[AMD Official Use Only - General]
 
-Link: https://lore.kernel.org/lkml/20220801151928.270380-1-vipinsh@google.com
-Signed-off-by: Vipin Sharma <vipinsh@google.com>
-Suggested-by: David Matlack <dmatlack@google.com>
-Suggested-by: Sean Christopherson <seanjc@google.com>
-Suggested-by: Paolo Bonzini <pbonzini@redhat.com>
----
- .../selftests/kvm/dirty_log_perf_test.c       | 23 ++++++-
- .../selftests/kvm/include/perf_test_util.h    |  4 ++
- .../selftests/kvm/lib/perf_test_util.c        | 62 ++++++++++++++++++-
- 3 files changed, 86 insertions(+), 3 deletions(-)
+Hello Jarkko,
 
-diff --git a/tools/testing/selftests/kvm/dirty_log_perf_test.c b/tools/testing/selftests/kvm/dirty_log_perf_test.c
-index 1346f6b5a9bd..9514b5f28b67 100644
---- a/tools/testing/selftests/kvm/dirty_log_perf_test.c
-+++ b/tools/testing/selftests/kvm/dirty_log_perf_test.c
-@@ -353,7 +353,7 @@ static void help(char *name)
- 	puts("");
- 	printf("usage: %s [-h] [-i iterations] [-p offset] [-g] "
- 	       "[-m mode] [-n] [-b vcpu bytes] [-v vcpus] [-o] [-s mem type]"
--	       "[-x memslots]\n", name);
-+	       "[-x memslots] [-c physical cpus to run test on]\n", name);
- 	puts("");
- 	printf(" -i: specify iteration counts (default: %"PRIu64")\n",
- 	       TEST_HOST_LOOP_N);
-@@ -383,6 +383,18 @@ static void help(char *name)
- 	backing_src_help("-s");
- 	printf(" -x: Split the memory region into this number of memslots.\n"
- 	       "     (default: 1)\n");
-+	printf(" -c: Comma separated values of the physical CPUs, which will run\n"
-+	       "     the vCPUs, optionally, followed by the main application thread cpu.\n"
-+	       "     Number of values must be at least the number of vCPUs.\n"
-+	       "     The very next number is used to pin main application thread.\n\n"
-+	       "     Example: ./dirty_log_perf_test -v 3 -c 22,23,24,50\n"
-+	       "     This means that the vcpu 0 will run on the physical cpu 22,\n"
-+	       "     vcpu 1 on the physical cpu 23, vcpu 2 on the physical cpu 24\n"
-+	       "     and the main thread will run on cpu 50.\n\n"
-+	       "     Example: ./dirty_log_perf_test -v 3 -c 22,23,24\n"
-+	       "     Same as the previous example except now main application\n"
-+	       "     thread can run on any physical cpu\n\n"
-+	       "     (default: No cpu mapping)\n");
- 	puts("");
- 	exit(0);
- }
-@@ -398,6 +410,7 @@ int main(int argc, char *argv[])
- 		.slots = 1,
- 	};
- 	int opt;
-+	const char *pcpu_list = NULL;
- 
- 	dirty_log_manual_caps =
- 		kvm_check_cap(KVM_CAP_MANUAL_DIRTY_LOG_PROTECT2);
-@@ -406,11 +419,14 @@ int main(int argc, char *argv[])
- 
- 	guest_modes_append_default();
- 
--	while ((opt = getopt(argc, argv, "b:ef:ghi:m:nop:s:v:x:")) != -1) {
-+	while ((opt = getopt(argc, argv, "b:c:ef:ghi:m:nop:s:v:x:")) != -1) {
- 		switch (opt) {
- 		case 'b':
- 			guest_percpu_mem_size = parse_size(optarg);
- 			break;
-+		case 'c':
-+			pcpu_list = optarg;
-+			break;
- 		case 'e':
- 			/* 'e' is for evil. */
- 			run_vcpus_while_disabling_dirty_logging = true;
-@@ -459,6 +475,9 @@ int main(int argc, char *argv[])
- 		}
- 	}
- 
-+	if (pcpu_list)
-+		perf_test_setup_pinning(pcpu_list, nr_vcpus);
-+
- 	TEST_ASSERT(p.iterations >= 2, "The test should have at least two iterations");
- 
- 	pr_info("Test iterations: %"PRIu64"\n",	p.iterations);
-diff --git a/tools/testing/selftests/kvm/include/perf_test_util.h b/tools/testing/selftests/kvm/include/perf_test_util.h
-index eaa88df0555a..d02619f153a2 100644
---- a/tools/testing/selftests/kvm/include/perf_test_util.h
-+++ b/tools/testing/selftests/kvm/include/perf_test_util.h
-@@ -27,6 +27,8 @@ struct perf_test_vcpu_args {
- 	/* Only used by the host userspace part of the vCPU thread */
- 	struct kvm_vcpu *vcpu;
- 	int vcpu_idx;
-+	bool pin_pcpu;
-+	int pcpu;
- };
- 
- struct perf_test_args {
-@@ -60,4 +62,6 @@ void perf_test_guest_code(uint32_t vcpu_id);
- uint64_t perf_test_nested_pages(int nr_vcpus);
- void perf_test_setup_nested(struct kvm_vm *vm, int nr_vcpus, struct kvm_vcpu *vcpus[]);
- 
-+int perf_test_setup_pinning(const char *pcpus_string, int nr_vcpus);
-+
- #endif /* SELFTEST_KVM_PERF_TEST_UTIL_H */
-diff --git a/tools/testing/selftests/kvm/lib/perf_test_util.c b/tools/testing/selftests/kvm/lib/perf_test_util.c
-index 9618b37c66f7..7a1e8223e7c7 100644
---- a/tools/testing/selftests/kvm/lib/perf_test_util.c
-+++ b/tools/testing/selftests/kvm/lib/perf_test_util.c
-@@ -2,7 +2,10 @@
- /*
-  * Copyright (C) 2020, Google LLC.
-  */
-+#define _GNU_SOURCE
-+
- #include <inttypes.h>
-+#include <sched.h>
- 
- #include "kvm_util.h"
- #include "perf_test_util.h"
-@@ -240,9 +243,26 @@ void __weak perf_test_setup_nested(struct kvm_vm *vm, int nr_vcpus, struct kvm_v
- 	exit(KSFT_SKIP);
- }
- 
-+static void pin_me_to_pcpu(int pcpu)
-+{
-+	cpu_set_t cpuset;
-+	int err;
-+
-+	CPU_ZERO(&cpuset);
-+	CPU_SET(pcpu, &cpuset);
-+	errno = 0;
-+	err = sched_setaffinity(0, sizeof(cpu_set_t), &cpuset);
-+	TEST_ASSERT(err == 0, "sched_setaffinity errored out: %d\n", errno);
-+}
-+
- static void *vcpu_thread_main(void *data)
- {
- 	struct vcpu_thread *vcpu = data;
-+	int idx = vcpu->vcpu_idx;
-+	struct perf_test_vcpu_args *vcpu_args = &perf_test_args.vcpu_args[idx];
-+
-+	if (vcpu_args->pin_pcpu)
-+		pin_me_to_pcpu(vcpu_args->pcpu);
- 
- 	WRITE_ONCE(vcpu->running, true);
- 
-@@ -255,7 +275,7 @@ static void *vcpu_thread_main(void *data)
- 	while (!READ_ONCE(all_vcpu_threads_running))
- 		;
- 
--	vcpu_thread_fn(&perf_test_args.vcpu_args[vcpu->vcpu_idx]);
-+	vcpu_thread_fn(vcpu_args);
- 
- 	return NULL;
- }
-@@ -292,3 +312,43 @@ void perf_test_join_vcpu_threads(int nr_vcpus)
- 	for (i = 0; i < nr_vcpus; i++)
- 		pthread_join(vcpu_threads[i].thread, NULL);
- }
-+
-+int perf_test_setup_pinning(const char *pcpus_string, int nr_vcpus)
-+{
-+	char delim[2] = ",";
-+	char *cpu, *cpu_list;
-+	int i = 0, pcpu_num;
-+
-+	cpu_list = strdup(pcpus_string);
-+	TEST_ASSERT(cpu_list, "strdup() allocation failed.\n");
-+
-+	cpu = strtok(cpu_list, delim);
-+
-+	// 1. Get all pcpus for vcpus
-+	while (cpu && i < nr_vcpus) {
-+		pcpu_num = atoi_paranoid(cpu);
-+		TEST_ASSERT(pcpu_num >= 0, "Invalid cpu number: %d\n", pcpu_num);
-+
-+		perf_test_args.vcpu_args[i].pin_pcpu = true;
-+		perf_test_args.vcpu_args[i++].pcpu = pcpu_num;
-+
-+		cpu = strtok(NULL, delim);
-+	}
-+
-+	TEST_ASSERT(i == nr_vcpus,
-+		    "Number of pcpus (%d) not sufficient for the number of vcpus (%d).",
-+		    i, nr_vcpus);
-+
-+	// 2. Check if main worker is provided
-+	if (cpu) {
-+		pcpu_num = atoi_paranoid(cpu);
-+		TEST_ASSERT(pcpu_num >= 0, "Invalid cpu number: %d\n", pcpu_num);
-+
-+		pin_me_to_pcpu(pcpu_num);
-+
-+		cpu = strtok(NULL, delim);
-+	}
-+
-+	free(cpu_list);
-+	return i;
-+}
--- 
-2.37.2.672.g94769d06f0-goog
+>>=20
+>> It really should be, in order to have any practical use:
+>>=20
+>> 	if (no_iommu) {
+>> 		pr_err("SEV-SNP: IOMMU is disabled.\n");
+>> 		return false;
+>> 	}
+>>=20
+>> 	if (iommu_default_passthrough()) {
+>> 		pr_err("SEV-SNP: IOMMU is configured in passthrough mode.\n");
+>> 		return false;
+>> 	}
+>>=20
+>> The comment is *completely* redundant, it absolutely does not serve=20
+>> any sane purpose. It just tells what the code already clearly stating.
+>>=20
+>> The combo error message on the other hand leaves you to the question=20
+>> "which one was it", and for that reason combining the checks leaves=20
+>> you to a louse debugging experience.
 
+>Also, are those really *errors*? That implies that there is something wron=
+g.
+
+>Since you can have a legit configuration, IMHO they should be either warn =
+or info. What do you think?
+
+>They are definitely not errors
+
+Yes, they can be warn or info, but as I mentioned above this patch is now p=
+art of IOMMU + SNP series,
+so these comments are now relevant for that.
+
+Thanks,
+Ashish
