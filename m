@@ -2,53 +2,57 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 8EAEE5A2F4B
-	for <lists+kvm@lfdr.de>; Fri, 26 Aug 2022 20:52:31 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id C64DB5A2F3A
+	for <lists+kvm@lfdr.de>; Fri, 26 Aug 2022 20:52:24 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1345137AbiHZStI (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 26 Aug 2022 14:49:08 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55390 "EHLO
+        id S239748AbiHZStN (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 26 Aug 2022 14:49:13 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55452 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1345285AbiHZSsY (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 26 Aug 2022 14:48:24 -0400
-Received: from mail-pg1-x54a.google.com (mail-pg1-x54a.google.com [IPv6:2607:f8b0:4864:20::54a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 46766E833B
-        for <kvm@vger.kernel.org>; Fri, 26 Aug 2022 11:45:30 -0700 (PDT)
-Received: by mail-pg1-x54a.google.com with SMTP id a33-20020a630b61000000b00429d91cc649so1207943pgl.8
-        for <kvm@vger.kernel.org>; Fri, 26 Aug 2022 11:45:30 -0700 (PDT)
+        with ESMTP id S1345299AbiHZSsc (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 26 Aug 2022 14:48:32 -0400
+Received: from mail-pg1-x549.google.com (mail-pg1-x549.google.com [IPv6:2607:f8b0:4864:20::549])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8FFEFE86BC
+        for <kvm@vger.kernel.org>; Fri, 26 Aug 2022 11:45:45 -0700 (PDT)
+Received: by mail-pg1-x549.google.com with SMTP id z22-20020a630a56000000b0041b98176de9so1213220pgk.15
+        for <kvm@vger.kernel.org>; Fri, 26 Aug 2022 11:45:45 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
-        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc;
-        bh=GiOMEUaR02qX5Gm07mLfZU1zm4cqDTei2RBST1bzNRA=;
-        b=eW5ZYnSw2FOj4BYqOIscZSQtmCy1Z9DUTbXt7t6DlXZNbbmggQqECy5jRGeakjYSEG
-         IA/hJ+NwGniKMtcJbqDxDsxbLCa+ENZdG7T6IOF+ih0iHy8Nxz65CdZ6LR4Fhu1R1ybY
-         xASdoztO1dAtm2byb0nbg32VdoNR9v6cuaJssFtbsS6mc8CDorVkNkd14/MLSX/Iz5z8
-         KSXf9mQZrzG1dXA1ubOvPSpTa8/vYHOd2Q1O4E1O06fv47y8C6Yjst8w5m1DBXxM9cxd
-         /rQlbDMwM9da0WxKRI59Qu3Ypzc5nKL01Ef77u6JGu77v9ucP3fbnPZ9F/hwlaubthdf
-         4jAQ==
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc;
+        bh=ybKUjgg6ch0GYw6EETwzWzCbbwkxj1dVORCeP7ssStQ=;
+        b=bhdBMEDzmkep7dAIdCuBqStPdNwlsq4AV2zkIiFFXbPVDlm46CrTBdBALQLBVEhgtc
+         g35/2jujy3+oZbNteXe+2HRA3wsitfCWoc9f3qMlgOr7RRJm9UsRtFhalkjq/1eTp0Sc
+         +d8CmSax4UEaJWeCXHtFN3FFcgx8GklKf9T9yRr8nuyCUUIcsYdan/duqFkIYd1Jh9LH
+         xeL5hBxRXYML7vrQk3v8TsgvgUdmKvv/0h3sWnrFdrQXptMlCY/fWBHfK6YJoIOqbj6I
+         vGpVaXscpsFrK3stnZj8usGtgx8LbqcIsTYK/iwFLeJAg7kIG3x3opMd3o88b3zpNROg
+         wkEQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
-         :from:to:cc;
-        bh=GiOMEUaR02qX5Gm07mLfZU1zm4cqDTei2RBST1bzNRA=;
-        b=rcVXLZ8rlt0Le1aAw+UdJIR0UrskMXacxpS4GeOYD/4ISLMIiF9YviO/CZd3285THP
-         f8XsCZ6yFJnUyEsmEkwWmZeQPSXXluKAr80o6xGlC++v2qaEsBkyV8v/sYD+CiRrrKH/
-         xQLXXHixEwGFaI2NjfH+l8qb8FYI9bdQr4pq7rO1h2sk2lby6LsREhyTGgwhQAiQK2Hy
-         qJBMuHQdiEUmnO+JSwAY5mz6CNcnVCQm0pOaZmfDEQ4eYN1samkjHrPny46yUFgoeVNt
-         DQYGYFwAv1IzURQ3YgJN4rpOI0BnG2sTj6kzTW88qrJpQw+deRYTDrdcYtPTWk9y91Fk
-         5Y0Q==
-X-Gm-Message-State: ACgBeo0JEOEZMtt6h69XAZJydck2rkulqOoMtN0pGvsAEZkQZmTU2ViG
-        faAAtwA8CrKj+zKsoGmrS1tvxsax0niY
-X-Google-Smtp-Source: AA6agR7mFSwSnqWdxTD7kgZ4nilCuP+7FqhRjsqpyZTvySv5Vwa3ZJHVWYpKDp2AUsGE9NSWPLJYgD2JoxRa
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc;
+        bh=ybKUjgg6ch0GYw6EETwzWzCbbwkxj1dVORCeP7ssStQ=;
+        b=hYDjX4VwNL2WeXmgUJ3vgDlmf6mly4aMHf7g330zXHE7W9X1GoOVGDZzSvyT9Pyjiy
+         PvUrA4Cy6QvMorfA8uhSyK0QGt3C36qIFqncfdB52Vop7QYIcrDKNUS//qKgsbpbZK2V
+         UcScRjBtCFM6dZFjZX+3mI2Fu2eFl8xI0e09RBYNyjlH2QiQnXaipV56I7Ont75HkbvH
+         dfPUyRg7cS+2JOioVtdAdftp5VCqpkVWmtc/DmpUwKRuREUKxwuNSU6rphtUQk/+qjl1
+         rgfZtAx3VB/PaWleqt0STomZwlVYTDp/nZ7W/8AYqNh2ctXBzvSu30uwD5sQ07MMthxs
+         gfXQ==
+X-Gm-Message-State: ACgBeo2Qqs8n+nJsMLmmOBqWvwgjHvB8/k0q0sNByZzNZQubDQSALgMX
+        Y1zN+dXOJPmNeQDWs2C1l6cgmSPQEzPB
+X-Google-Smtp-Source: AA6agR40C4F/nP90aB06KBuicRVB8I2AEbMJTiexNJ65vSnFWjzRvwni2isMe6nRr7wWNlzAB4A19RsNV660
 X-Received: from vipin.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:479f])
- (user=vipinsh job=sendgmr) by 2002:a05:6a00:114c:b0:528:2c7a:630e with SMTP
- id b12-20020a056a00114c00b005282c7a630emr5038459pfm.86.1661539529715; Fri, 26
- Aug 2022 11:45:29 -0700 (PDT)
-Date:   Fri, 26 Aug 2022 11:44:56 -0700
+ (user=vipinsh job=sendgmr) by 2002:aa7:9ac5:0:b0:537:e34f:c09c with SMTP id
+ x5-20020aa79ac5000000b00537e34fc09cmr897487pfp.63.1661539545151; Fri, 26 Aug
+ 2022 11:45:45 -0700 (PDT)
+Date:   Fri, 26 Aug 2022 11:44:57 -0700
+In-Reply-To: <20220826184500.1940077-1-vipinsh@google.com>
 Mime-Version: 1.0
+References: <20220826184500.1940077-1-vipinsh@google.com>
 X-Mailer: git-send-email 2.37.2.672.g94769d06f0-goog
-Message-ID: <20220826184500.1940077-1-vipinsh@google.com>
-Subject: [PATCH v3 0/4] dirty_log_perf_test cpu pinning and some goodies
+Message-ID: <20220826184500.1940077-2-vipinsh@google.com>
+Subject: [PATCH v3 1/4] KVM: selftests: Explicitly set variables based on
+ options in dirty_log_perf_test
 From:   Vipin Sharma <vipinsh@google.com>
 To:     seanjc@google.com, dmatlack@google.com, pbonzini@redhat.com
 Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
@@ -57,63 +61,37 @@ Content-Type: text/plain; charset="UTF-8"
 X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
         SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL
-        autolearn=unavailable autolearn_force=no version=3.4.6
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Pin vcpus to a host physical cpus in dirty_log_perf_test and optionally
-pin the main application thread to a physical cpu if provided. All tests
-based on perf_test_util framework can take advantage of it if needed.
+Variable set via -g are also indirectly set by -e option by omitting
+break statement. Set them explicitly so that movement of switch-case
+statements does not unintentionally break features.
 
-While at it, I changed atoi() to atoi_paranoid() in other tests, sorted
-command line options alphabetically, and made switch case logic of -e
-option less error prone to code changes by adding break and decoupling
-it from -g.
+No functional change intended.
 
-v3:
-- Moved atoi_paranoid() to test_util.c and replaced all atoi() usage
-  with atoi_paranoid()
-- Sorted command line options alphabetically.
-- Instead of creating a vcpu thread on a specific pcpu the thread will
-  migrate to the provided pcpu after its creation.
-- Decoupled -e and -g option.
+Signed-off-by: Vipin Sharma <vipinsh@google.com>
+---
+ tools/testing/selftests/kvm/dirty_log_perf_test.c | 2 ++
+ 1 file changed, 2 insertions(+)
 
-v2: https://lore.kernel.org/lkml/20220819210737.763135-1-vipinsh@google.com/
-- Removed -d option.
-- One cpu list passed as option, cpus for vcpus, followed by
-  application thread cpu.
-- Added paranoid cousin of atoi().
-
-v1: https://lore.kernel.org/lkml/20220817152956.4056410-1-vipinsh@google.com
-
-Vipin Sharma (4):
-  KVM: selftests: Explicitly set variables based on options in
-    dirty_log_perf_test
-  KVM: selftests: Put command line options in alphabetical order in
-    dirty_log_perf_test
-  KVM: selftests: Add atoi_paranoid to catch errors missed by atoi
-  KVM: selftests: Run dirty_log_perf_test on specific cpus
-
- .../selftests/kvm/aarch64/arch_timer.c        |  8 +--
- .../testing/selftests/kvm/aarch64/vgic_irq.c  |  6 +-
- .../selftests/kvm/access_tracking_perf_test.c |  2 +-
- .../selftests/kvm/demand_paging_test.c        |  2 +-
- .../selftests/kvm/dirty_log_perf_test.c       | 65 +++++++++++++------
- .../selftests/kvm/include/perf_test_util.h    |  4 ++
- .../testing/selftests/kvm/include/test_util.h |  2 +
- .../selftests/kvm/kvm_page_table_test.c       |  2 +-
- .../selftests/kvm/lib/perf_test_util.c        | 62 +++++++++++++++++-
- tools/testing/selftests/kvm/lib/test_util.c   | 14 ++++
- .../selftests/kvm/max_guest_memory_test.c     |  6 +-
- .../kvm/memslot_modification_stress_test.c    |  4 +-
- .../testing/selftests/kvm/memslot_perf_test.c | 10 +--
- .../selftests/kvm/set_memory_region_test.c    |  2 +-
- .../selftests/kvm/x86_64/nx_huge_pages_test.c |  4 +-
- 15 files changed, 148 insertions(+), 45 deletions(-)
-
+diff --git a/tools/testing/selftests/kvm/dirty_log_perf_test.c b/tools/testing/selftests/kvm/dirty_log_perf_test.c
+index f99e39a672d3..a03db7f9f4c0 100644
+--- a/tools/testing/selftests/kvm/dirty_log_perf_test.c
++++ b/tools/testing/selftests/kvm/dirty_log_perf_test.c
+@@ -411,6 +411,8 @@ int main(int argc, char *argv[])
+ 		case 'e':
+ 			/* 'e' is for evil. */
+ 			run_vcpus_while_disabling_dirty_logging = true;
++			dirty_log_manual_caps = 0;
++			break;
+ 		case 'g':
+ 			dirty_log_manual_caps = 0;
+ 			break;
 -- 
 2.37.2.672.g94769d06f0-goog
 
