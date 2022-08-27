@@ -2,173 +2,128 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id F2DB95A3572
-	for <lists+kvm@lfdr.de>; Sat, 27 Aug 2022 09:10:00 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 45E2C5A35D3
+	for <lists+kvm@lfdr.de>; Sat, 27 Aug 2022 10:27:19 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233006AbiH0HJt (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sat, 27 Aug 2022 03:09:49 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38476 "EHLO
+        id S233508AbiH0I1Q (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sat, 27 Aug 2022 04:27:16 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50334 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231216AbiH0HJs (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sat, 27 Aug 2022 03:09:48 -0400
-Received: from mail-ua1-x92e.google.com (mail-ua1-x92e.google.com [IPv6:2607:f8b0:4864:20::92e])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F155CF8
-        for <kvm@vger.kernel.org>; Sat, 27 Aug 2022 00:09:44 -0700 (PDT)
-Received: by mail-ua1-x92e.google.com with SMTP id e3so1293076uax.4
-        for <kvm@vger.kernel.org>; Sat, 27 Aug 2022 00:09:44 -0700 (PDT)
+        with ESMTP id S231222AbiH0I1P (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sat, 27 Aug 2022 04:27:15 -0400
+Received: from mail-ed1-x52b.google.com (mail-ed1-x52b.google.com [IPv6:2a00:1450:4864:20::52b])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C5305A5C45;
+        Sat, 27 Aug 2022 01:27:12 -0700 (PDT)
+Received: by mail-ed1-x52b.google.com with SMTP id t5so4583052edc.11;
+        Sat, 27 Aug 2022 01:27:12 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc;
-        bh=hOP43ttmkQC9HNoIqURH8XQ98joZKhQ/WbmApXVIzDI=;
-        b=cc+De/pHnnseJwJ1fzFU/Jo0du7DszIyB4BPIb3YqH+GyvN57Vn7KVJHwIPHpdIrde
-         YIj3FMJCKey9bHezR33TLtCqi5U8+C/5E8VNNd4gHMO8iwtrotv4DIuI07Bp5RBMqLrL
-         hA2gVVYsfKxn0zu6nBempwFGWgJbV/kulmHv0WPguyM8pC6Cw7pXWn4ro4riXkh66R7n
-         j5AA+dF4oaUa7YVXw3DwY26//92ToWPjIJLD1pi7pTzlcTxD24N4w5DGgWw4vS0eNtIV
-         Dtfe1DhquPeJgWvdg5keb3MFDY3h/LRyzdl8jahYO89woRQNBSzAQo/EbXoUQPtQZR2C
-         7GdQ==
+        d=gmail.com; s=20210112;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :sender:from:to:cc;
+        bh=db6wHPl1NoBxSkqFEqmoNM4w13Oy0TZZkviyKHiod6c=;
+        b=UEYLobTe2AZYd65vehbSh24XDhaWFDZNCGL1gdVQxc452u7u2Q4Y0f66RZocX0c5TR
+         DdJwU7CRlQgFC6BGI+qrfrE8odV1ul43ApbvWCBwVJ+CO5ykyfdKL69XWCEz4AxBVoPc
+         Fw9/BZpE/pwvSNqV+U8bI4UFaXmNWqGWUpCFIcgHDmb/R5YJHvw+l1Nl4PI62pOc0Mlu
+         G6Xxx2tmIx2MgPkjxhb9Qr8ZtxLsw5z8IGCfxtj4gjhzdE7BqdYB4NS6TbXn8rmeHOgA
+         wuLPmYOYHGXF2RHYZcgbY4nK+iZs8S8bbVCuzl21nt3v+hkpld1DBAXs+elsDk4x4Ohv
+         QRlw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc;
-        bh=hOP43ttmkQC9HNoIqURH8XQ98joZKhQ/WbmApXVIzDI=;
-        b=ATZaqTTARGAeP47fqkbUewiwFCVFAuqYTElj2OW2Mv+JOMFJFArfhyZY3wUfmzXctw
-         y4nwB5e3xc367tGT/MDZgoLXoD1XgCTd66yDGZVN0JsERXNr9rYZkcPe/JQDYGgSaASv
-         FHDu/v3sU62cLABzzylpF9jnxifM3y4MeBttZ9oDPbDgpIAIgiE1i3n1nJdmewtuu/Mz
-         FE+rPke9Rsys3Q3yMrwHbo0eQYTSTE1ldSUN2q1C9uro/XuoYy4uH/9YQd+om1hBvXZj
-         RxPBAg97UO4IkvmI4vDiCTHzvRidtusYi/bWPsVy5/re8+LBLZhjIz+DT9LNP/4Ku9t+
-         Ic/Q==
-X-Gm-Message-State: ACgBeo0d+GWn2exnC5KOc33SPSMEXHvaEdnhrdQuRQDoiyZrzqgUOYKI
-        fRpYuzZJclZODshvIQSxl5j8UDKuVVn9inYRX0W5hA==
-X-Google-Smtp-Source: AA6agR4P7MaQO2fX5+HZrXvJcV+khsr2kac7vbPBefszN5df6rtRUpFHJZo9PakcpOptZ5eF33X4f6YvH9J8sEeOvEU=
-X-Received: by 2002:ab0:32da:0:b0:39f:61f6:ef6a with SMTP id
- f26-20020ab032da000000b0039f61f6ef6amr1019646uao.106.1661584184002; Sat, 27
- Aug 2022 00:09:44 -0700 (PDT)
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :sender:x-gm-message-state:from:to:cc;
+        bh=db6wHPl1NoBxSkqFEqmoNM4w13Oy0TZZkviyKHiod6c=;
+        b=E4s2TfDpp7rRteYRFYRQ1zF9senJSzOH7NjijCc4GnaQ4C0Q2yY5B08FPLLhRh8LkI
+         DsaSQIoDe1Svv0TtRc/tY17tOAfrDbDQMaeWcRa8DV28yugNvhWlneekcjG3taBv1337
+         hiJdcWSRT0Jt9X0Bn0luXru8dzNOMCu31beASejJqWBHAN0gKkxuFIOi8RjPu7u4brpc
+         fTIp9Q5/F4ZLkSnFBVJdrVOVDPaGH6mDuP0ZgAnILqm8XfPFKlz3yq5+zO/wGypHgR8y
+         wpzEVYg93p4Xawa8Ksnoxr2ljqv/Q5FiTeLzH4iJUUuiTKDgDX3pYXT+nzaoVYqf5POl
+         i/jA==
+X-Gm-Message-State: ACgBeo3fJ2AhkeSEVr8edb1GxsWgBdGWN4/4te4too66nb+CiWbntbkr
+        v5LT9QW1d4TU/ZLmA1gr4+Q=
+X-Google-Smtp-Source: AA6agR7k4MkhXbRXPVNIpqB7niZw9Vuq4+jhvWLePL+17JoEYc9ENHX7DdgLIO1WI1Mrtg/N6ODRPw==
+X-Received: by 2002:a05:6402:71a:b0:447:ebb2:18f2 with SMTP id w26-20020a056402071a00b00447ebb218f2mr4862760edx.408.1661588831315;
+        Sat, 27 Aug 2022 01:27:11 -0700 (PDT)
+Received: from ?IPV6:2001:b07:6468:f312:5e2c:eb9a:a8b6:fd3e? ([2001:b07:6468:f312:5e2c:eb9a:a8b6:fd3e])
+        by smtp.googlemail.com with ESMTPSA id m18-20020a056402511200b0043d5ead65a6sm2485422edd.84.2022.08.27.01.27.09
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Sat, 27 Aug 2022 01:27:10 -0700 (PDT)
+Sender: Paolo Bonzini <paolo.bonzini@gmail.com>
+Message-ID: <79cc1418-2448-6a80-e4b8-2041f94c419e@redhat.com>
+Date:   Sat, 27 Aug 2022 10:27:08 +0200
 MIME-Version: 1.0
-References: <20220805135813.2102034-1-maz@kernel.org> <20220805135813.2102034-9-maz@kernel.org>
- <YvNbPm7WAhUCRkx/@google.com> <87sfm4v45i.wl-maz@kernel.org>
-In-Reply-To: <87sfm4v45i.wl-maz@kernel.org>
-From:   Reiji Watanabe <reijiw@google.com>
-Date:   Sat, 27 Aug 2022 00:09:28 -0700
-Message-ID: <CAAeT=FxfWO0b8qRPc9kzjJfN1yKxXA=7VuGhWwnizZzC=BrnNA@mail.gmail.com>
-Subject: Re: [PATCH 8/9] KVM: arm64: PMU: Implement PMUv3p5 long counter support
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.12.0
+Subject: Re: [PATCH v1 1/5] KVM: arm64: Enable ring-based dirty memory
+ tracking
+Content-Language: en-US
 To:     Marc Zyngier <maz@kernel.org>
-Cc:     Oliver Upton <oliver.upton@linux.dev>, kvm@vger.kernel.org,
-        kernel-team@android.com, kvmarm@lists.cs.columbia.edu,
-        Linux ARM <linux-arm-kernel@lists.infradead.org>
-Content-Type: text/plain; charset="UTF-8"
-X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-        T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL
-        autolearn=ham autolearn_force=no version=3.4.6
+Cc:     Peter Xu <peterx@redhat.com>, Gavin Shan <gshan@redhat.com>,
+        kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org,
+        kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+        linux-doc@vger.kernel.org, linux-kselftest@vger.kernel.org,
+        corbet@lwn.net, james.morse@arm.com, alexandru.elisei@arm.com,
+        suzuki.poulose@arm.com, oliver.upton@linux.dev,
+        catalin.marinas@arm.com, will@kernel.org, shuah@kernel.org,
+        seanjc@google.com, dmatlack@google.com, bgardon@google.com,
+        ricarkol@google.com, zhenyzha@redhat.com, shan.gavin@gmail.com
+References: <20220819005601.198436-1-gshan@redhat.com>
+ <20220819005601.198436-2-gshan@redhat.com> <87lerkwtm5.wl-maz@kernel.org>
+ <41fb5a1f-29a9-e6bb-9fab-4c83a2a8fce5@redhat.com>
+ <87fshovtu0.wl-maz@kernel.org>
+ <171d0159-4698-354b-8b2f-49d920d03b1b@redhat.com>
+ <YwTc++Lz6lh3aR4F@xz-m1.local> <87bksawz0w.wl-maz@kernel.org>
+ <YwVEoM1pj2MPCELp@xz-m1.local> <878rnewpaw.wl-maz@kernel.org>
+ <9e7cb09c-82c5-9492-bccd-5511f5bede26@redhat.com>
+ <8735djvwbu.wl-maz@kernel.org>
+From:   Paolo Bonzini <pbonzini@redhat.com>
+In-Reply-To: <8735djvwbu.wl-maz@kernel.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Spam-Status: No, score=-1.5 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_EF,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+        HEADER_FROM_DIFFERENT_DOMAINS,NICE_REPLY_A,RCVD_IN_DNSWL_NONE,
+        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=no
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Aug 10, 2022 at 2:28 AM Marc Zyngier <maz@kernel.org> wrote:
->
-> On Wed, 10 Aug 2022 08:16:14 +0100,
-> Oliver Upton <oliver.upton@linux.dev> wrote:
-> >
-> > Hi Marc,
-> >
-> > On Fri, Aug 05, 2022 at 02:58:12PM +0100, Marc Zyngier wrote:
-> > > PMUv3p5 (which is mandatory with ARMv8.5) comes with some extra
-> > > features:
-> > >
-> > > - All counters are 64bit
-> > >
-> > > - The overflow point is controlled by the PMCR_EL0.LP bit
-> > >
-> > > Add the required checks in the helpers that control counter
-> > > width and overflow, as well as the sysreg handling for the LP
-> > > bit. A new kvm_pmu_is_3p5() helper makes it easy to spot the
-> > > PMUv3p5 specific handling.
-> > >
-> > > Signed-off-by: Marc Zyngier <maz@kernel.org>
-> > > ---
-> > >  arch/arm64/kvm/pmu-emul.c | 8 +++++---
-> > >  arch/arm64/kvm/sys_regs.c | 4 ++++
-> > >  include/kvm/arm_pmu.h     | 8 ++++++++
-> > >  3 files changed, 17 insertions(+), 3 deletions(-)
-> > >
-> > > diff --git a/arch/arm64/kvm/pmu-emul.c b/arch/arm64/kvm/pmu-emul.c
-> > > index 33a88ca7b7fd..b33a2953cbf6 100644
-> > > --- a/arch/arm64/kvm/pmu-emul.c
-> > > +++ b/arch/arm64/kvm/pmu-emul.c
-> > > @@ -50,13 +50,15 @@ static u32 kvm_pmu_event_mask(struct kvm *kvm)
-> > >   */
-> > >  static bool kvm_pmu_idx_is_64bit(struct kvm_vcpu *vcpu, u64 select_idx)
-> > >  {
-> > > -   return (select_idx == ARMV8_PMU_CYCLE_IDX);
-> > > +   return (select_idx == ARMV8_PMU_CYCLE_IDX || kvm_pmu_is_3p5(vcpu));
-> > >  }
-> > >
-> > >  static bool kvm_pmu_idx_has_64bit_overflow(struct kvm_vcpu *vcpu, u64 select_idx)
-> > >  {
-> > > -   return (select_idx == ARMV8_PMU_CYCLE_IDX &&
-> > > -           __vcpu_sys_reg(vcpu, PMCR_EL0) & ARMV8_PMU_PMCR_LC);
-> > > +   u64 val = __vcpu_sys_reg(vcpu, PMCR_EL0);
-> > > +
-> > > +   return (select_idx < ARMV8_PMU_CYCLE_IDX && (val & ARMV8_PMU_PMCR_LP)) ||
-> > > +          (select_idx == ARMV8_PMU_CYCLE_IDX && (val & ARMV8_PMU_PMCR_LC));
-> > >  }
-> > >
-> > >  static bool kvm_pmu_counter_can_chain(struct kvm_vcpu *vcpu, u64 idx)
-> > > diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
-> > > index c0595f31dab8..2b5e0ec5c100 100644
-> > > --- a/arch/arm64/kvm/sys_regs.c
-> > > +++ b/arch/arm64/kvm/sys_regs.c
-> > > @@ -654,6 +654,8 @@ static void reset_pmcr(struct kvm_vcpu *vcpu, const struct sys_reg_desc *r)
-> > >            | (ARMV8_PMU_PMCR_MASK & 0xdecafbad)) & (~ARMV8_PMU_PMCR_E);
+On 8/26/22 17:49, Marc Zyngier wrote:
+>> Agreed, but that's a problem for userspace to solve.  If userspace
+>> wants to reset the fields in different CPUs, it has to synchronize
+>> with its own invoking of the ioctl.
+> 
+> userspace has no choice. It cannot order on its own the reads that the
+> kernel will do to *other* rings.
 
-Not directly related to this series, but using 0xdecafbad above
-appears to be odd. I think that would lead the bit 3 and 5 to be
-unconditionally set in the register's reset value that the guest will
-initially see even on the configuration where those should be RES0.
+Those reads will never see KVM_DIRTY_GFN_F_RESET in the flags however, 
+if userspace has never interacted with the ring.  So there will be 
+exactly one read on those rings, and there's nothing to reorder.
 
-> > >     if (!system_supports_32bit_el0())
-> > >             val |= ARMV8_PMU_PMCR_LC;
-> > > +   if (!kvm_pmu_is_3p5(vcpu))
-> > > +           val &= ~ARMV8_PMU_PMCR_LP;
-> > >     __vcpu_sys_reg(vcpu, r->reg) = val;
-> > >  }
-> > >
-> > > @@ -703,6 +705,8 @@ static bool access_pmcr(struct kvm_vcpu *vcpu, struct sys_reg_params *p,
-> > >             val |= p->regval & ARMV8_PMU_PMCR_MASK;
-> > >             if (!system_supports_32bit_el0())
-> > >                     val |= ARMV8_PMU_PMCR_LC;
-> > > +           if (!kvm_pmu_is_3p5(vcpu))
-> > > +                   val &= ~ARMV8_PMU_PMCR_LP;
-> > >             __vcpu_sys_reg(vcpu, PMCR_EL0) = val;
-> > >             kvm_pmu_handle_pmcr(vcpu, val);
-> > >             kvm_vcpu_pmu_restore_guest(vcpu);
-> > > diff --git a/include/kvm/arm_pmu.h b/include/kvm/arm_pmu.h
-> > > index 6bda9b071084..846502251923 100644
-> > > --- a/include/kvm/arm_pmu.h
-> > > +++ b/include/kvm/arm_pmu.h
-> > > @@ -89,6 +89,13 @@ void kvm_vcpu_pmu_restore_host(struct kvm_vcpu *vcpu);
-> > >                     vcpu->arch.pmu.events = *kvm_get_pmu_events();  \
-> > >     } while (0)
-> > >
-> > > +/*
-> > > + * Evaluates as true when emulating PMUv3p5, and false otherwise.
-> > > + */
-> > > +#define kvm_pmu_is_3p5(vcpu)                                               \
-> > > +   (vcpu->kvm->arch.dfr0_pmuver >= ID_AA64DFR0_PMUVER_8_5 &&       \
-> > > +    vcpu->kvm->arch.dfr0_pmuver != ID_AA64DFR0_PMUVER_IMP_DEF)
-> >
-> > I don't believe the IMP_DEF condition will ever evaluate to false as
-> > dfr0_pmuver is sanitized at initialization and writes from userspace.
->
-> Good point. That's a leftover from a previous version. I'll fix that.
+If that's too tricky and you want to add a load-acquire I have no 
+objection though.  It also helps avoiding read-read reordering between 
+one entry's flags to the next one's, so it's a good idea to have it anyway.
 
-With the current series, I think the dfr0_pmuver could be IMP_DEF
-due to the same bug that I mentioned for the patch-6.
-(https://lore.kernel.org/all/20220214065746.1230608-11-reijiw@google.com/)
+>> The main reason why I preferred a global KVM_RESET_DIRTY_RINGS ioctl
+>> was because it takes kvm->slots_lock so the execution would be
+>> serialized anyway.  Turning slots_lock into an rwsem would be even
+>> worse because it also takes kvm->mmu_lock (since slots_lock is a
+>> mutex, at least two concurrent invocations won't clash with each other
+>> on the mmu_lock).
+> 
+> Whatever the reason, the behaviour should be identical on all
+> architectures. As is is, it only really works on x86, and I contend
+> this is a bug that needs fixing.
+> 
+> Thankfully, this can be done at zero cost for x86, and at that of a
+> set of load-acquires on other architectures.
 
-Thank you,
-Reiji
+Yes, the global-ness of the API is orthogonal to the memory ordering 
+issue.  I just wanted to explain why a per-vCPU API probably isn't going 
+to work great.
+
+Paolo
