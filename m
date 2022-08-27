@@ -2,158 +2,137 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id A251E5A38EA
-	for <lists+kvm@lfdr.de>; Sat, 27 Aug 2022 18:55:03 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id EB14B5A39C6
+	for <lists+kvm@lfdr.de>; Sat, 27 Aug 2022 21:42:39 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233655AbiH0QzB (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sat, 27 Aug 2022 12:55:01 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47080 "EHLO
+        id S230240AbiH0Tmh (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sat, 27 Aug 2022 15:42:37 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44456 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230024AbiH0Qy7 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sat, 27 Aug 2022 12:54:59 -0400
-Received: from mail-oi1-x22d.google.com (mail-oi1-x22d.google.com [IPv6:2607:f8b0:4864:20::22d])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 98EEF25294
-        for <kvm@vger.kernel.org>; Sat, 27 Aug 2022 09:54:56 -0700 (PDT)
-Received: by mail-oi1-x22d.google.com with SMTP id t140so5717035oie.8
-        for <kvm@vger.kernel.org>; Sat, 27 Aug 2022 09:54:56 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date;
-        bh=2PKxcqSiq+Wi8toMC3SKuzn+e1vjHoNl5VKdMZbjbyo=;
-        b=Uw00xRqLOZi2ywzANeGmio6hEmsoNdyWeW8eHXkDL57oS7oatSpIfagMsyBCbvTV/y
-         DC2zb+kL/+EOXM+1F9QuOlZpEzH3As+E7ndl2OXQK/eYyA/ouqdRX2VIC/hNzhMvNyH6
-         4vZPSQBQ2zBjOi/EF+aohswcUqBQ+GqaPOAkPQXCksKiCR1QANUKy7SN5GhAWA3xes1b
-         mTxwInUJ35KRN+bWSPEcUG/f+f8bV2Vw75Qa0DfAJrNlmG0FnsU+9BqKcDU7dgIUIakH
-         ZtFj8jwssWOH446S0eqXQO77pxpx7MgIn99ZV98A9JqKUnVITepfVCnO4ehkTR0dJSA1
-         ATbw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date;
-        bh=2PKxcqSiq+Wi8toMC3SKuzn+e1vjHoNl5VKdMZbjbyo=;
-        b=qHs9LEZv4K2Ut2wjEGaFIS9KzUSRzo7RL5ZIQ7beVgPmqNaT8nUBZALi7i2XeLdhsg
-         U0Gk1ZLlNPExA3M74Q/F+U/a6DHatHXYA7BPBtaJ86SapF66YbO3gacruga2j/ZoGdco
-         ZrzvQksOWZ7l2V/EtEadFIM5Lyo7c+XdYzaXnSjmig1V93Y4a/U2u4wRgbh12c+4GFID
-         Z1CJNCHPkPWtQAUUojbWJGBDAEjn6vPYjImAVPLuT1oXPaQYBHcfoPchbxcAsEWFQ2iw
-         2lmACPPmdJOB9fayRuCDxRDG0VmhGLA//cAIQo7V+VjeisqSrhLq2MEy3ym+icFpe2Ou
-         dm7Q==
-X-Gm-Message-State: ACgBeo2yFfWJDvs7mN0DsD8rWdgRPODT0uQxISUr/Bsmqm/k4POy7pIk
-        LKSZKVCMiIz2dJHkwQqVTWvtTUp2XqOMvZAi2YB1hg==
-X-Google-Smtp-Source: AA6agR6N6ukgmk9PS/TpzgujUuK7TGVPgl9UU9jBUruia4ZEO0iXm6lK2mg4z4nqZNlgEkESWUeOgETwvf67xe1m50g=
-X-Received: by 2002:aca:170f:0:b0:343:171f:3596 with SMTP id
- j15-20020aca170f000000b00343171f3596mr3738809oii.181.1661619295759; Sat, 27
- Aug 2022 09:54:55 -0700 (PDT)
-MIME-Version: 1.0
-References: <20220826224755.1330512-1-jmattson@google.com> <CAHVum0ewJAF2W+x_ycrrcD2Lyttx8VSydbzPmY+TFeWer9OJmg@mail.gmail.com>
-In-Reply-To: <CAHVum0ewJAF2W+x_ycrrcD2Lyttx8VSydbzPmY+TFeWer9OJmg@mail.gmail.com>
-From:   Jim Mattson <jmattson@google.com>
-Date:   Sat, 27 Aug 2022 09:54:45 -0700
-Message-ID: <CALMp9eT7rdyw9mfKdfT_gz9z41RA5-FXQZ2vJgiMHDM=p-WBJQ@mail.gmail.com>
-Subject: Re: [PATCH] KVM: x86: Mask off unsupported and unknown bits of IA32_ARCH_CAPABILITIES
-To:     Vipin Sharma <vipinsh@google.com>
-Cc:     kvm@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>
+        with ESMTP id S229490AbiH0Tmg (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sat, 27 Aug 2022 15:42:36 -0400
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 332624AD6B
+        for <kvm@vger.kernel.org>; Sat, 27 Aug 2022 12:42:36 -0700 (PDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id C14F660E9F
+        for <kvm@vger.kernel.org>; Sat, 27 Aug 2022 19:42:35 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 276D9C433B5
+        for <kvm@vger.kernel.org>; Sat, 27 Aug 2022 19:42:35 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1661629355;
+        bh=Dpj+w742vv8Q9/d2Qx1ahhVLXPtkhG/pLzN/sIYBxJc=;
+        h=From:To:Subject:Date:In-Reply-To:References:From;
+        b=gPgo+ZFKmPK0GhGMxwtmEoYTTiJURmYmNAvUPYTWkuNyIb9vaHe/BSQAHBoppRsGf
+         R6J8Sopno4Qmi/EC6pGXW/3SN2yduUAQ5UmmRBFGdskugaHDC9X+qG6eennMPvAt56
+         cZgrNMWPoLdkbZqQbRe0l84SqA61BW6uB9NcSTc7nNhiHUZdltSxcbKpjkcNXv7A2B
+         30t7oN9vU60amp3vgy2LYj4k6CeVMvskjuQDiitZW6RnsTPlpHNhTR4xVZhCi1f2y8
+         rnKDFdvRzWyiQAr0lYX0DLEADQaDMsSH3nT+PL64lUqtD3uzjALMVAUxu4A/mFwcq7
+         HDxPQpXVIwbnA==
+Received: by aws-us-west-2-korg-bugzilla-1.web.codeaurora.org (Postfix, from userid 48)
+        id 129B0C433E6; Sat, 27 Aug 2022 19:42:35 +0000 (UTC)
+From:   bugzilla-daemon@kernel.org
+To:     kvm@vger.kernel.org
+Subject: [Bug 216388] On Host, kernel errors in KVM, on guests, it shows CPU
+ stalls
+Date:   Sat, 27 Aug 2022 19:42:34 +0000
+X-Bugzilla-Reason: None
+X-Bugzilla-Type: changed
+X-Bugzilla-Watch-Reason: AssignedTo virtualization_kvm@kernel-bugs.osdl.org
+X-Bugzilla-Product: Virtualization
+X-Bugzilla-Component: kvm
+X-Bugzilla-Version: unspecified
+X-Bugzilla-Keywords: 
+X-Bugzilla-Severity: high
+X-Bugzilla-Who: nanook@eskimo.com
+X-Bugzilla-Status: NEW
+X-Bugzilla-Resolution: 
+X-Bugzilla-Priority: P1
+X-Bugzilla-Assigned-To: virtualization_kvm@kernel-bugs.osdl.org
+X-Bugzilla-Flags: 
+X-Bugzilla-Changed-Fields: 
+Message-ID: <bug-216388-28872-Bw2DeK04yH@https.bugzilla.kernel.org/>
+In-Reply-To: <bug-216388-28872@https.bugzilla.kernel.org/>
+References: <bug-216388-28872@https.bugzilla.kernel.org/>
 Content-Type: text/plain; charset="UTF-8"
-X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-        T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL
-        autolearn=ham autolearn_force=no version=3.4.6
+Content-Transfer-Encoding: quoted-printable
+X-Bugzilla-URL: https://bugzilla.kernel.org/
+Auto-Submitted: auto-generated
+MIME-Version: 1.0
+X-Spam-Status: No, score=-7.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_HI,
+        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Aug 26, 2022 at 4:12 PM Vipin Sharma <vipinsh@google.com> wrote:
->
-> On Fri, Aug 26, 2022 at 3:48 PM Jim Mattson <jmattson@google.com> wrote:
-> >
-> > KVM should not claim to virtualize unknown IA32_ARCH_CAPABILITIES
-> > bits. When kvm_get_arch_capabilities() was originally written, there
-> > were only a few bits defined in this MSR, and KVM could virtualize all
-> > of them. However, over the years, several bits have been defined that
-> > KVM cannot just blindly pass through to the guest without additional
-> > work (such as virtualizing an MSR promised by the
-> > IA32_ARCH_CAPABILITES feature bit).
-> >
-> > Define a mask of supported IA32_ARCH_CAPABILITIES bits, and mask off
-> > any other bits that are set in the hardware MSR.
-> >
-> > Cc: Paolo Bonzini <pbonzini@redhat.com>
-> > Fixes: 5b76a3cff011 ("KVM: VMX: Tell the nested hypervisor to skip L1D flush on vmentry")
-> > Signed-off-by: Jim Mattson <jmattson@google.com>
-> > ---
-> >  arch/x86/kvm/x86.c | 25 +++++++++++++++++++++----
-> >  1 file changed, 21 insertions(+), 4 deletions(-)
-> >
-> > diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-> > index 205ebdc2b11b..ae6be8b2ecfe 100644
-> > --- a/arch/x86/kvm/x86.c
-> > +++ b/arch/x86/kvm/x86.c
-> > @@ -1557,12 +1557,32 @@ static const u32 msr_based_features_all[] = {
-> >  static u32 msr_based_features[ARRAY_SIZE(msr_based_features_all)];
-> >  static unsigned int num_msr_based_features;
-> >
-> > +/*
-> > + * IA32_ARCH_CAPABILITIES bits deliberately omitted are:
->
-> Why are these deliberately omitted? Maybe a comment will help future
-> readers and present ones like me who don't know.
+https://bugzilla.kernel.org/show_bug.cgi?id=3D216388
 
-All of these bits require KVM to virtualize an MSR not currently
-virtualized. I'll add a comment to that effect.
+--- Comment #4 from Robert Dinse (nanook@eskimo.com) ---
+     I am not seeing this particular CPU stall on 5.19.4, but I am seeing o=
+ther
+CPU stalls.  I've opened three different tickets on CPU stalls because they=
+'ve
+all been in completely different tasks but at this point I have to wonder if
+there isn't some common code that they are all calling or a broken structure
+they are all using or something similar.  Rather than open 40 more tickets =
+that
+all end up being a duplicate, perhaps someone familiar with the internal
+workings could look at these two tickets in addition to this one, #216399,
+which is a stall on an MDRAID task, and #216405, and then before I open yet
+another ticket, here is yet another CPU stall in a task worker:
 
-Note that some trivially virtualizable bits are also omitted simply
-because there are no macros defined for them in msr-index.h. I have
-said nothing about those.
+[  489.383957] INFO: task worker:11403 blocked for more than 122 seconds.
+[  489.383962]       Not tainted 5.19.4 #1
+[  489.383964] "echo 0 > /proc/sys/kernel/hung_task_timeout_secs" disables =
+this
+message.
+[  489.383965] task:worker          state:D stack:    0 pid:11403 ppid:    =
+ 1
+flags:0x00004002
+[  489.383968] Call Trace:
+[  489.383970]  <TASK>
+[  489.383973]  __schedule+0x367/0x1400
+[  489.383980]  schedule+0x58/0xf0
+[  489.383983]  io_schedule+0x46/0x80
+[  489.383985]  folio_wait_bit_common+0x11e/0x350
+[  489.383989]  ? filemap_invalidate_unlock_two+0x50/0x50
+[  489.383992]  folio_wait_bit+0x18/0x20
+[  489.383994]  folio_wait_writeback+0x2c/0x80
+[  489.383997]  wait_on_page_writeback+0x18/0x50
+[  489.383999]  __filemap_fdatawait_range+0x98/0x140
+[  489.384003]  file_write_and_wait_range+0x83/0xb0
+[  489.384005]  ext4_sync_file+0xf3/0x320
+[  489.384009]  __x64_sys_fdatasync+0x4e/0xa0
+[  489.384012]  ? syscall_enter_from_user_mode+0x50/0x70
+[  489.384014]  do_syscall_64+0x58/0x80
+[  489.384017]  ? sysvec_apic_timer_interrupt+0x4b/0xa0
+[  489.384020]  entry_SYSCALL_64_after_hwframe+0x63/0xcd
+[  489.384022] RIP: 0033:0x7f96e331bb1b
+[  489.384025] RSP: 002b:00007f96788c75d0 EFLAGS: 00000293 ORIG_RAX:
+000000000000004b
+[  489.384027] RAX: ffffffffffffffda RBX: 00005639414e0860 RCX:
+00007f96e331bb1b
+[  489.384029] RDX: 0000000000000000 RSI: 0000000000000000 RDI:
+000000000000000b
+[  489.384030] RBP: 0000563941270890 R08: 0000000000000000 R09:
+0000000000000000
+[  489.384031] R10: 00007f96788c75f0 R11: 0000000000000293 R12:
+0000000000000000
+[  489.384033] R13: 00005639412708f8 R14: 00005639425cedd0 R15:
+00007ffded76f3d0
+[  489.384036]  </TASK>
 
-> > + *   10 - MISC_PACKAGE_CTRLS
-> > + *   11 - ENERGY_FILTERING_CTL
-> > + *   12 - DOITM
-> > + *   18 - FB_CLEAR_CTRL
-> > + *   21 - XAPIC_DISABLE_STATUS
-> > + *   23 - OVERCLOCKING_STATUS
-> > + */
-> > +
-> > +#define KVM_SUPPORTED_ARCH_CAP \
-> > +       (ARCH_CAP_RDCL_NO | ARCH_CAP_IBRS_ALL | ARCH_CAP_RSBA | \
-> > +        ARCH_CAP_SKIP_VMENTRY_L1DFLUSH | ARCH_CAP_SSB_NO | ARCH_CAP_MDS_NO | \
-> > +        ARCH_CAP_PSCHANGE_MC_NO | ARCH_CAP_TSX_CTRL_MSR | ARCH_CAP_TAA_NO | \
-> > +        ARCH_CAP_SBDR_SSDP_NO | ARCH_CAP_FBSDP_NO | ARCH_CAP_PSDP_NO | \
-> > +        ARCH_CAP_FB_CLEAR | ARCH_CAP_RRSBA | ARCH_CAP_PBRSB_NO)
-> > +
-> > +
->
-> Nit: Extra blank line.
->
-> >  static u64 kvm_get_arch_capabilities(void)
-> >  {
-> >         u64 data = 0;
-> >
-> > -       if (boot_cpu_has(X86_FEATURE_ARCH_CAPABILITIES))
-> > +       if (boot_cpu_has(X86_FEATURE_ARCH_CAPABILITIES)) {
-> >                 rdmsrl(MSR_IA32_ARCH_CAPABILITIES, data);
-> > +               data &= KVM_SUPPORTED_ARCH_CAP;
-> > +       }
-> >
-> >         /*
-> >          * If nx_huge_pages is enabled, KVM's shadow paging will ensure that
-> > @@ -1610,9 +1630,6 @@ static u64 kvm_get_arch_capabilities(void)
-> >                  */
-> >         }
-> >
-> > -       /* Guests don't need to know "Fill buffer clear control" exists */
-> > -       data &= ~ARCH_CAP_FB_CLEAR_CTRL;
-> > -
-> >         return data;
-> >  }
-> >
-> > --
-> > 2.37.2.672.g94769d06f0-goog
-> >
->
-> Verified, at least all the capabilities in the
-> kvm_get_arch_capabilities() are in the KVM_SUPPORTED_ARCH_CAP macro.
->
-> Reviewed-By: Vipin Sharma <vipinsh@google.com>
+If this appears to be related I will not generate a ticket but I am not
+knowledgable enough about the internals to know.
+
+--=20
+You may reply to this email to add a comment.
+
+You are receiving this mail because:
+You are watching the assignee of the bug.=
