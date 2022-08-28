@@ -1,103 +1,118 @@
 Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from out1.vger.email (unknown [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 448F65A3FD6
-	for <lists+kvm@lfdr.de>; Sun, 28 Aug 2022 23:09:24 +0200 (CEST)
+Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
+	by mail.lfdr.de (Postfix) with ESMTP id 487605A4002
+	for <lists+kvm@lfdr.de>; Mon, 29 Aug 2022 00:25:51 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229679AbiH1VJC (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sun, 28 Aug 2022 17:09:02 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36482 "EHLO
+        id S229518AbiH1WZt (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sun, 28 Aug 2022 18:25:49 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40266 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229445AbiH1VI4 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sun, 28 Aug 2022 17:08:56 -0400
-Received: from ams.source.kernel.org (ams.source.kernel.org [145.40.68.75])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1C4A631DF6
-        for <kvm@vger.kernel.org>; Sun, 28 Aug 2022 14:08:56 -0700 (PDT)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by ams.source.kernel.org (Postfix) with ESMTPS id BF8DEB80C76
-        for <kvm@vger.kernel.org>; Sun, 28 Aug 2022 21:08:54 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 6C956C433C1
-        for <kvm@vger.kernel.org>; Sun, 28 Aug 2022 21:08:53 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1661720933;
-        bh=1uHYzSoZVm6C9fVvJ7XSBzlotoGT43QZR48ylGsSXIQ=;
-        h=From:To:Subject:Date:In-Reply-To:References:From;
-        b=px7fXxqmD/pjoIUJ5b4z6rMhGLRkLfKqUQdbkLJaYBmVUguneoyklQ7ZNrBZPIJmn
-         m1sdvz+wathu8mygvQxxQye+B+5nhYfyP9lR0E6j3+0l81kTCCQ5Cal6YjNOOEXF57
-         ixHbDZqhEZtChtWe8mBrPihAs/VCYTj/cLK4jOPAOSC9HuldWg9l4R2I02lbfVkRnU
-         iQoEab6MCcLxX59JIcHJDpzkvtN4uQhtfsjLnhTpQkgaOCL24mSpVV/SGIlNqi2bew
-         bYCQaQf99GupVL4pe1i7m6ZPNB1Tba4qm8YH1g+555CyvT7eU19QelZZ0/sCZCwW7P
-         pMlE11pgPwOiA==
-Received: by aws-us-west-2-korg-bugzilla-1.web.codeaurora.org (Postfix, from userid 48)
-        id 566DEC433E9; Sun, 28 Aug 2022 21:08:53 +0000 (UTC)
-From:   bugzilla-daemon@kernel.org
-To:     kvm@vger.kernel.org
-Subject: [Bug 216388] On Host, kernel errors in KVM, on guests, it shows CPU
- stalls
-Date:   Sun, 28 Aug 2022 21:08:53 +0000
-X-Bugzilla-Reason: None
-X-Bugzilla-Type: changed
-X-Bugzilla-Watch-Reason: AssignedTo virtualization_kvm@kernel-bugs.osdl.org
-X-Bugzilla-Product: Virtualization
-X-Bugzilla-Component: kvm
-X-Bugzilla-Version: unspecified
-X-Bugzilla-Keywords: 
-X-Bugzilla-Severity: high
-X-Bugzilla-Who: nanook@eskimo.com
-X-Bugzilla-Status: NEW
-X-Bugzilla-Resolution: 
-X-Bugzilla-Priority: P1
-X-Bugzilla-Assigned-To: virtualization_kvm@kernel-bugs.osdl.org
-X-Bugzilla-Flags: 
-X-Bugzilla-Changed-Fields: 
-Message-ID: <bug-216388-28872-pJkc0r710c@https.bugzilla.kernel.org/>
-In-Reply-To: <bug-216388-28872@https.bugzilla.kernel.org/>
-References: <bug-216388-28872@https.bugzilla.kernel.org/>
+        with ESMTP id S229459AbiH1WZs (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sun, 28 Aug 2022 18:25:48 -0400
+Received: from mail-pl1-x64a.google.com (mail-pl1-x64a.google.com [IPv6:2607:f8b0:4864:20::64a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5E80513FB7
+        for <kvm@vger.kernel.org>; Sun, 28 Aug 2022 15:25:47 -0700 (PDT)
+Received: by mail-pl1-x64a.google.com with SMTP id a13-20020a170902eccd00b001730da9d40fso5037596plh.10
+        for <kvm@vger.kernel.org>; Sun, 28 Aug 2022 15:25:47 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112;
+        h=cc:to:from:subject:message-id:mime-version:date:reply-to:from:to:cc;
+        bh=OZhf1uLaFuTr7gNYIqPUtAOr7HAQ3vHIoIbMPBfApMc=;
+        b=JPuD5nYGhdwKLryC9iwHbJ7Izxhehx2hV8SaHN/50E6ywE9gtWKZnTzIgEqObCx6GE
+         lAeGZulG9oRDFPoRDJIUte96qFkl0ihFHbX4b6wZILmK0YXx9eb+ibzJsD5YQCFx5PG1
+         Dghur25hLe2I3Nn6GfdCIoJ4YGk3P5wLkwceUF1B6PquiVaxKsmPxIZ9zjsNgvdJhwji
+         lXoSQAUlEhWJhCp7GpxfHNou05vfKwDzeOhfAaomByUE+Z70b1XxFN4BMOlv6gWYDHcL
+         ST2AphaibY/HsXDK9Z23DixYcIxBL0eiXKjxtENNR3eX36fXBdrFiPJLML8CY9tLE6mv
+         fBcQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=cc:to:from:subject:message-id:mime-version:date:reply-to
+         :x-gm-message-state:from:to:cc;
+        bh=OZhf1uLaFuTr7gNYIqPUtAOr7HAQ3vHIoIbMPBfApMc=;
+        b=05fLjwktjRD7+lJbZaCyrYc14s+aJWrUz+xZyIqoX+eUeyg5LNXQpJ/pL4JMjQgC0e
+         f8xchtoxA2MU9H2cl+daZ4sLnI23Z23GDUCrAwxL/mcnlADg81/CJknjrUqMMU0Yfahm
+         1pK2dW+gfN/7H2gc9z10iTIw1rtBPy7VyYJQDMVqc3fA4KJej9u2u223+Lgmy7Assirs
+         5yUcBIl9d6OJvO+kXgRUnfkzfWnaFWZSBFXbiUpTYcR7ZESbDV/ckHWx5x028N7SmMcp
+         rxRoql+41Ly2QQ1hQJWCS7OTbWxXbeO4qiOAo6mHaaIUqrdA36h1hU26NAG9Svtgc8S8
+         sE8A==
+X-Gm-Message-State: ACgBeo3XZdkSNBDd9D8Tll/FfqEQpnf3nFNxYvyyhCRi4bWvMFKWhhFe
+        4bifGoruygcswPvLYmFUkBkSqc8cG5AV
+X-Google-Smtp-Source: AA6agR7eSg54S0xB6NTMDfsxMenogaDTicI0NMHcR/8VnjedLqa3FE08FM0kXjaail3+A2otm8Q6rsoOX67E
+X-Received: from mizhang-super.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:1071])
+ (user=mizhang job=sendgmr) by 2002:a05:6a00:26e2:b0:538:23a6:4d62 with SMTP
+ id p34-20020a056a0026e200b0053823a64d62mr3811336pfw.26.1661725546957; Sun, 28
+ Aug 2022 15:25:46 -0700 (PDT)
+Reply-To: Mingwei Zhang <mizhang@google.com>
+Date:   Sun, 28 Aug 2022 22:25:40 +0000
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.37.2.672.g94769d06f0-goog
+Message-ID: <20220828222544.1964917-1-mizhang@google.com>
+Subject: [PATCH v2 0/4] Fix a race between posted interrupt delivery and
+ migration in a nested VM
+From:   Mingwei Zhang <mizhang@google.com>
+To:     Sean Christopherson <seanjc@google.com>,
+        Paolo Bonzini <pbonzini@redhat.com>
+Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Maxim Levitsky <mlevitsk@redhat.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Oliver Upton <oupton@google.com>,
+        Mingwei Zhang <mizhang@google.com>,
+        Jim Mattson <jmattson@google.com>
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Bugzilla-URL: https://bugzilla.kernel.org/
-Auto-Submitted: auto-generated
-MIME-Version: 1.0
-X-Spam-Status: No, score=-7.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_HI,
-        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
-        autolearn_force=no version=3.4.6
+X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-https://bugzilla.kernel.org/show_bug.cgi?id=3D216388
+This patch set aims to fix a race condition between posted interrupt
+delivery and migration for a nested VM. In particular, we proves that when
+a nested vCPU is halted and just migrated, it will lose a posted
+interrupt from another vCPU in the same VM.
 
---- Comment #5 from Robert Dinse (nanook@eskimo.com) ---
-Here is another example:
+Changelog:
 
-[98519.357381] Task dump for CPU 10:
-[98519.357382] task:Embedded solr q state:R  running task     stack:    0
-pid:607931 ppid:     1 flags:0x00000000
-[98519.357389] Call Trace:
-[98519.357393]  <TASK>
-[98519.357399]  ? kvm_clock_get_cycles+0x11/0x20
-[98519.357408]  ? ktime_get+0x46/0xc0
-[98519.357411]  ? lapic_next_deadline+0x2c/0x40
-[98519.357414]  ? clockevents_program_event+0xae/0x130
-[98519.357418]  ? tick_program_event+0x43/0x90
-[98519.357420]  ? hrtimer_interrupt+0x11f/0x220
-[98519.357423]  ? exit_to_user_mode_prepare+0x41/0x1e0
-[98519.357427]  ? irqentry_exit_to_user_mode+0x9/0x30
-[98519.357430]  ? irqentry_exit+0x1d/0x30
-[98519.357432]  ? sysvec_apic_timer_interrupt+0x4b/0xa0
-[98519.357436]  ? asm_sysvec_apic_timer_interrupt+0x1b/0x20
-[98519.357442]  </TASK>
+v1 -> v2:
+ - Replace the original vmcs12 bug fix patch into one that processes nested
+   state pages request in a common function [paolo].
+ - Update the commit messages [seanjc, oupton].
+ - Remove vcpu_run_interruptable(), use __vcpu_run() instead [seanjc].
+ - Fix format issue in prepare_posted_intr_desc() [seanjc].
+ - Rebase to kvm/queue.
 
-As you can see these are happening all over hell and back.
+v1 link:
+ - https://lore.kernel.org/lkml/20220802230718.1891356-6-mizhang@google.com/t/
 
---=20
-You may reply to this email to add a comment.
 
-You are receiving this mail because:
-You are watching the assignee of the bug.=
+Jim Mattson (1):
+  KVM: selftests: Test if posted interrupt delivery race with migration
+
+Mingwei Zhang (3):
+  KVM: x86: move the event handling of KVM_REQ_GET_VMCS12_PAGES into a
+    common function
+  KVM: selftests: Save/restore vAPIC state in migration tests
+  KVM: selftests: Add support for posted interrupt handling in L2
+
+ arch/x86/kvm/x86.c                            |  29 +-
+ tools/testing/selftests/kvm/.gitignore        |   1 +
+ tools/testing/selftests/kvm/Makefile          |   1 +
+ .../selftests/kvm/include/kvm_util_base.h     |  10 +
+ .../selftests/kvm/include/x86_64/processor.h  |   1 +
+ .../selftests/kvm/include/x86_64/vmx.h        |  10 +
+ .../selftests/kvm/lib/x86_64/processor.c      |   2 +
+ tools/testing/selftests/kvm/lib/x86_64/vmx.c  |  14 +
+ .../kvm/x86_64/vmx_migrate_pi_pending.c       | 291 ++++++++++++++++++
+ 9 files changed, 353 insertions(+), 6 deletions(-)
+ create mode 100644 tools/testing/selftests/kvm/x86_64/vmx_migrate_pi_pending.c
+
+
+base-commit: 372d07084593dc7a399bf9bee815711b1fb1bcf2
+-- 
+2.37.2.672.g94769d06f0-goog
+
