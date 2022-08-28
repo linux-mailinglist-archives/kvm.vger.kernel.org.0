@@ -2,122 +2,139 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id B7C4A5A3AE3
-	for <lists+kvm@lfdr.de>; Sun, 28 Aug 2022 04:36:30 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 6D5FA5A3B68
+	for <lists+kvm@lfdr.de>; Sun, 28 Aug 2022 06:18:17 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229572AbiH1Cg1 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sat, 27 Aug 2022 22:36:27 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47142 "EHLO
+        id S229778AbiH1ESO (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sun, 28 Aug 2022 00:18:14 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36414 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229445AbiH1Cg0 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sat, 27 Aug 2022 22:36:26 -0400
-Received: from mail-pg1-x530.google.com (mail-pg1-x530.google.com [IPv6:2607:f8b0:4864:20::530])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DF5FC286F3;
-        Sat, 27 Aug 2022 19:36:25 -0700 (PDT)
-Received: by mail-pg1-x530.google.com with SMTP id q63so4798729pga.9;
-        Sat, 27 Aug 2022 19:36:25 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc;
-        bh=Vt0ILN7wMQkAMWEjrtKY9877O8UHxMRMoUBo6n0fbjU=;
-        b=FB7n3W0yOW5wxgowSbdgIMg8FvMwKP+AqovJhgMjyArTk58dxRHakZgo2XQ090kyGo
-         vWG5v7sg6qxFpJvxHjM3X7kqXVsfKr8HV0KsMHh/P4L+DJSLnGpF2AlvniDZB6vcAsR4
-         IPBkUGh95JMdGqhOqhkcZ/9eMIqE3zBFvO+Ov/AXBarhHniKa4ea1mB3w0q2qN+GcpZX
-         oYazyQESn1ypsNYjL3Tlaqji3VJ+xxAThYItzjlg/B3Dj0+U91/ZbPzYimLrI7QMimS4
-         WwTw2MVwnCikOSP5SiAVdACyMSpNGjONUPs+sdiQPaE76+rQ0RSBX/X9GlmDTFJL3hS7
-         S5MA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc;
-        bh=Vt0ILN7wMQkAMWEjrtKY9877O8UHxMRMoUBo6n0fbjU=;
-        b=azFiUcDws9JcnhhsxwD8yCwafPdMouQWMgp3ASrRZwC+mwEJiOf9wKg17Fu48//wde
-         WVE0ZPDYZD4EP6GD4o7JTaeO9Lpm+BJ2djoHKobYC87kuGdtj3RzVBHaE2lmQTqPpQGT
-         rHRVxHfyaCcHGw36pXe8dgOC3fFm4GauYVW5zBQaUokfx8DbJCazNnrXa9SKnFMJS0MS
-         p7pqKmcd31gJTD92NiGfnhBDMG2mMXE+0Q5LwOeT7O7SwLa4iBxI135ZM/MUKQr+YUKY
-         Xv6R8AgC0OWqHQmS02mWdTHswyEZsWZ2q4gJ+ICplwDKy4nUIXF07cWZ3SA+/bBnfWFr
-         ADZw==
-X-Gm-Message-State: ACgBeo0rBXF6xGhsmnFWPQUZ9JhDBTCF0RB1dr9CbUYWCTd8fFE1g70Q
-        0c5IRTyovN5Ky+kmC+3I7HiRbuTJA9U=
-X-Google-Smtp-Source: AA6agR4ILNCZ7hj58HTJ4hJaJsskJSrrpogW8J4wBXBKuG7b2ZWK6QWWiPEEvMl+8GLu5BD115pVYg==
-X-Received: by 2002:a05:6a00:26e2:b0:538:23a6:4d62 with SMTP id p34-20020a056a0026e200b0053823a64d62mr631612pfw.26.1661654185390;
-        Sat, 27 Aug 2022 19:36:25 -0700 (PDT)
-Received: from localhost.localdomain ([106.208.147.142])
-        by smtp.gmail.com with ESMTPSA id y12-20020a17090322cc00b00172dd10f64fsm4368823plg.263.2022.08.27.19.36.20
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sat, 27 Aug 2022 19:36:25 -0700 (PDT)
-From:   Akhil Raj <lf32.dev@gmail.com>
-To:     skhan@linuxfoundation.org, pbonzini@redhat.com, shuah@kernel.org
-Cc:     Akhil Raj <lf32.dev@gmail.com>, kvm@vger.kernel.org,
-        linux-kselftest@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: [PATCH] kvm/rseq_test.c:Correct gettid func name kselftest
-Date:   Sun, 28 Aug 2022 08:06:00 +0530
-Message-Id: <20220828023600.3914-1-lf32.dev@gmail.com>
-X-Mailer: git-send-email 2.17.1
+        with ESMTP id S229445AbiH1ESN (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sun, 28 Aug 2022 00:18:13 -0400
+Received: from ams.source.kernel.org (ams.source.kernel.org [145.40.68.75])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5C4643CBE0;
+        Sat, 27 Aug 2022 21:18:12 -0700 (PDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by ams.source.kernel.org (Postfix) with ESMTPS id 14947B80AB0;
+        Sun, 28 Aug 2022 04:18:11 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4A00DC433D6;
+        Sun, 28 Aug 2022 04:18:09 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1661660289;
+        bh=b1DxuemUuHqOzbSQHotO5yGNBJEyQ9fNAcJWznoBnHo=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=nmqpvICagbOYzuUK7zRSHuKWYR4Q6wHz8Z9BkMNnSLOBbT3S9p5jf0P52D7k/ZA34
+         bP6vV99xNBskD3SnyAx9kgBAXl7RZWs0v8z8zyi4DZ49GSquJa1D52Nop6T5IsWn9b
+         50PJkZjDYXCr5OT1/m3MiZSXOT4WN1QSb+9RZEawAlQPjul2E9aPJSWl0qAp/0zVP0
+         TLRINEII6KF7d2AcAPgWVRhqFhnirzGoVeJ73gOpnN7pybKLs78LO5I1El23pKyXGq
+         jPA+f4DkI4LJcocNVCzvyeTM7yQdnYM+rQTA8bHrXCWMPlN69lDOPDJAvOETpgzis/
+         8N8bc3zBd4WMw==
+Date:   Sun, 28 Aug 2022 07:18:02 +0300
+From:   Jarkko Sakkinen <jarkko@kernel.org>
+To:     "Kalra, Ashish" <Ashish.Kalra@amd.com>
+Cc:     Peter Gonda <pgonda@google.com>,
+        the arch/x86 maintainers <x86@kernel.org>,
+        LKML <linux-kernel@vger.kernel.org>,
+        kvm list <kvm@vger.kernel.org>,
+        "linux-coco@lists.linux.dev" <linux-coco@lists.linux.dev>,
+        "linux-mm@kvack.org" <linux-mm@kvack.org>,
+        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Joerg Roedel <jroedel@suse.de>,
+        "Lendacky, Thomas" <Thomas.Lendacky@amd.com>,
+        "H. Peter Anvin" <hpa@zytor.com>, Ard Biesheuvel <ardb@kernel.org>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Sean Christopherson <seanjc@google.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Andy Lutomirski <luto@kernel.org>,
+        Dave Hansen <dave.hansen@linux.intel.com>,
+        Sergio Lopez <slp@redhat.com>,
+        Peter Zijlstra <peterz@infradead.org>,
+        Srinivas Pandruvada <srinivas.pandruvada@linux.intel.com>,
+        David Rientjes <rientjes@google.com>,
+        Dov Murik <dovmurik@linux.ibm.com>,
+        Tobin Feldman-Fitzthum <tobin@ibm.com>,
+        Borislav Petkov <bp@alien8.de>,
+        "Roth, Michael" <Michael.Roth@amd.com>,
+        Vlastimil Babka <vbabka@suse.cz>,
+        "Kirill A . Shutemov" <kirill@shutemov.name>,
+        Andi Kleen <ak@linux.intel.com>,
+        Tony Luck <tony.luck@intel.com>, Marc Orr <marcorr@google.com>,
+        Sathyanarayanan Kuppuswamy 
+        <sathyanarayanan.kuppuswamy@linux.intel.com>,
+        Alper Gun <alpergun@google.com>,
+        "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Subject: Re: [PATCH Part2 v6 02/49] iommu/amd: Introduce function to check
+ SEV-SNP support
+Message-ID: <YwrseptOq4tFPylD@kernel.org>
+References: <cover.1655761627.git.ashish.kalra@amd.com>
+ <12df64394b1788156c8a3c2ee8dfd62b51ab3a81.1655761627.git.ashish.kalra@amd.com>
+ <CAMkAt6r+WSYXLZj-Bs5jpo4CR3+H5cpND0GHjsmgPacBK1GH_Q@mail.gmail.com>
+ <SN6PR12MB2767A51D40E7F53395770DE58EB39@SN6PR12MB2767.namprd12.prod.outlook.com>
+ <CAMkAt6qorwbAXaPaCaSm0SC9o2uQ9ZQzB6s1kBkvAv2D4tkUug@mail.gmail.com>
+ <YwbQKeDRQF0XGWo7@kernel.org>
+ <YwbQtaaCkBwezpB+@kernel.org>
+ <SN6PR12MB27678E2944605E11B37267CC8E759@SN6PR12MB2767.namprd12.prod.outlook.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
-        RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
-        autolearn=ham autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <SN6PR12MB27678E2944605E11B37267CC8E759@SN6PR12MB2767.namprd12.prod.outlook.com>
+X-Spam-Status: No, score=-7.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_HI,
+        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-I got the following error message when I ran
+On Fri, Aug 26, 2022 at 06:54:16PM +0000, Kalra, Ashish wrote:
+> [AMD Official Use Only - General]
+> 
+> Hello Jarkko,
+> 
+> >> 
+> >> It really should be, in order to have any practical use:
+> >> 
+> >> 	if (no_iommu) {
+> >> 		pr_err("SEV-SNP: IOMMU is disabled.\n");
+> >> 		return false;
+> >> 	}
+> >> 
+> >> 	if (iommu_default_passthrough()) {
+> >> 		pr_err("SEV-SNP: IOMMU is configured in passthrough mode.\n");
+> >> 		return false;
+> >> 	}
+> >> 
+> >> The comment is *completely* redundant, it absolutely does not serve 
+> >> any sane purpose. It just tells what the code already clearly stating.
+> >> 
+> >> The combo error message on the other hand leaves you to the question 
+> >> "which one was it", and for that reason combining the checks leaves 
+> >> you to a louse debugging experience.
+> 
+> >Also, are those really *errors*? That implies that there is something wrong.
+> 
+> >Since you can have a legit configuration, IMHO they should be either warn or info. What do you think?
+> 
+> >They are definitely not errors
+> 
+> Yes, they can be warn or info, but as I mentioned above this patch is now part of IOMMU + SNP series,
+> so these comments are now relevant for that.
 
-make kselftest summary=1 TARGETS=kvm
+Yeah, warn/info/error is less relevant than the
+second point I was making.
 
-rseq_test.c: In function ‘main’:
-rseq_test.c:230:33: warning: implicit declaration of function ‘gettid’;
- did you mean ‘getgid’? [-Wimplicit-function-declaration]
-          (void *)(unsigned long)gettid());
-                                 ^~~~~~
-                                 getgid
-/tmp/ccNexT4G.o: In function `main':
-linux_mainline/tools/testing/selftests/kvm/rseq_test.c:230:
-	undefined reference to `gettid'
-collect2: error: ld returned 1 exit status
-../lib.mk:136:
-	recipe for target 'linux_mainline/tools/testing/selftests/kvm/rseq_test' failed
+It's a good idea to spit out two instead of one
+to make best of spitting out anything in the first
+place :-) That way you make no mistake interpreting
+what does the log message connect to, which can
+sometimes make a difference while debugging a
+kernel issue.
 
-As per suggestion
-
-I renamed gettid to getgid
-
-after rerunning the kselftest command
-
-the following selftests messages were returned
-
-not ok 7 selftests: kvm: hyperv_clock # exit=254
-not ok 11 selftests: kvm: kvm_clock_test # exit=254
-not ok 51 selftests: kvm: access_tracking_perf_test # exit=254
-not ok 53 selftests: kvm: dirty_log_test # exit=254
-not ok 58 selftests: kvm: max_guest_memory_test # TIMEOUT 120 seconds
-not ok 60 selftests: kvm: memslot_perf_test # exit=142
-
-Signed-off-by: Akhil Raj <lf32.dev@gmail.com>
----
- tools/testing/selftests/kvm/rseq_test.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
-
-diff --git a/tools/testing/selftests/kvm/rseq_test.c b/tools/testing/selftests/kvm/rseq_test.c
-index fac248a43666..aa83a0537f0c 100644
---- a/tools/testing/selftests/kvm/rseq_test.c
-+++ b/tools/testing/selftests/kvm/rseq_test.c
-@@ -227,7 +227,7 @@ int main(int argc, char *argv[])
- 	ucall_init(vm, NULL);
- 
- 	pthread_create(&migration_thread, NULL, migration_worker,
--		       (void *)(unsigned long)gettid());
-+		       (void *)(unsigned long)getgid());
- 
- 	for (i = 0; !done; i++) {
- 		vcpu_run(vcpu);
--- 
-2.17.1
-
+BR, Jarkko
