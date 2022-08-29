@@ -2,57 +2,57 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id ECFA75A52D1
-	for <lists+kvm@lfdr.de>; Mon, 29 Aug 2022 19:11:22 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 88F1D5A52D3
+	for <lists+kvm@lfdr.de>; Mon, 29 Aug 2022 19:11:23 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231388AbiH2RLI (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 29 Aug 2022 13:11:08 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52756 "EHLO
+        id S231407AbiH2RLL (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 29 Aug 2022 13:11:11 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52482 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231343AbiH2RLD (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 29 Aug 2022 13:11:03 -0400
-Received: from mail-yw1-x114a.google.com (mail-yw1-x114a.google.com [IPv6:2607:f8b0:4864:20::114a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5CEC165647
-        for <kvm@vger.kernel.org>; Mon, 29 Aug 2022 10:10:59 -0700 (PDT)
-Received: by mail-yw1-x114a.google.com with SMTP id 00721157ae682-33dc390f26cso137209947b3.9
-        for <kvm@vger.kernel.org>; Mon, 29 Aug 2022 10:10:58 -0700 (PDT)
+        with ESMTP id S231347AbiH2RLE (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 29 Aug 2022 13:11:04 -0400
+Received: from mail-pl1-x64a.google.com (mail-pl1-x64a.google.com [IPv6:2607:f8b0:4864:20::64a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 35C8B69F4F
+        for <kvm@vger.kernel.org>; Mon, 29 Aug 2022 10:11:00 -0700 (PDT)
+Received: by mail-pl1-x64a.google.com with SMTP id b9-20020a170903228900b001730a0e11e5so6498272plh.19
+        for <kvm@vger.kernel.org>; Mon, 29 Aug 2022 10:11:00 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
         h=cc:to:from:subject:references:mime-version:message-id:in-reply-to
          :date:from:to:cc;
-        bh=BWDSIQFh5SU/Yj/rdeVVfM86JlFg7CLWWjt3RvlTVT8=;
-        b=rPBdqSr3qzyN9GHMLkW1dGpcU20ZGIp9yOgxBxxd8cBGRmLCfZnbqe4DSJ7oY2X2bd
-         qW4QITYBAmBXXFANzMZWokFig9TMa6Jc9r1UjxOZBX+JEX2LlkYY1W5stRYLZGjSFbDw
-         OoOOnSa6zorbTcaJ8xWoGDtkO3ABEhj2JjidS1J/yfkKWck3bLv7Enfko42XSCMXlJbY
-         akDfphYzbvDGHyG7eHqozDh/M1LlbSe5xe9rsZe5XOXzRtWBVGL30zE/27rEgOtgcsug
-         B5DvBGYu+dEbOTmrllEVg+V4TyhQFHahfO4T9BOBGDdz2rb2EhaG3au38yO1FVB3U5XF
-         xbaw==
+        bh=DjSpUEd4vF4lOtP0B99mET3glfEYpz5arg2nPAewBOU=;
+        b=dbslTdjbaCy+F+LzP2tdEdjdbHXFFIR9slvTIDv3G6gdLS8Qx074F0vFDwHlu3al4c
+         A434GfDVx+TxN4m0G5IjSxevmn0DuZUadZ9rw3Y5icqBrmUSAVSufMrMYkQXMKC0b5n5
+         ZYxZlrAXGNXMnM/LsEwEPxa5hrbYCgKgeJHhc+8PXU+zzj4crGvHR0tQo4V2sGnLQhHq
+         udJom4hoMCj13IDh89VngNXEDoagGF85oXzRbQ4ijVTNZRO4QnpYS783ZiYe0w5svsDT
+         ysB2X/wirzxvzXpYf1izcVDqMZm5medbG2Y80uoHLoi4s11tyHOdAn4Tnd93KtgVdd63
+         Bohw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=cc:to:from:subject:references:mime-version:message-id:in-reply-to
          :date:x-gm-message-state:from:to:cc;
-        bh=BWDSIQFh5SU/Yj/rdeVVfM86JlFg7CLWWjt3RvlTVT8=;
-        b=LANTt6UpdbQCrRH/zMi++7v01+oHG4ycCkvQgGqcPTIdQ6DBn6jIHyc+VvlcHS1Obg
-         moyngx3C3heXMyHAQwbQak+Oo7lSvs97djmz0Q3NVPMqzvxN7CFFqMxTBvFszUtEYuuc
-         54UuJM/hKq3LugrgN5Ylj3plX3gLlG3kakloFqsoJ373mQj9HI9wQUxGgB6kR0UH0kmL
-         zX+1U2oGN5lmd90B4Z0CWBJUsGg888Wq4DuIGU1VCXis8o02LTnn3kKHSvNNezsr8jHe
-         0o23jojGikbO+z1kwQR+6FZ5EatxNcb/0ravUqSUEZ8r9EcTqLh2Swm0L7rdKRMNgAdX
-         avTQ==
-X-Gm-Message-State: ACgBeo3KESS42TheNEq6HaXV30uSGwNkHTCqcRFoP+lWrdoXksEI3aYF
-        55ymigDeraMJ0ke0sy2EZkKWQVSBPSB+x28vEHy7xHCVMSRllyWcLIDjqkESP2sXy8eS3hJoPPl
-        xcFPFKq2w32s7Xp0KNCxU78qLfT983Z4FLy+jP7ekl2tvbNodANuz/bbJuQ==
-X-Google-Smtp-Source: AA6agR67NBL7H7Y4dIIhiq7N/9qsKQbiKZwmYiZZSoWxuyk6Bkle2OXlTT7glTdGNJi02DHYb8dMtiobkL0=
+        bh=DjSpUEd4vF4lOtP0B99mET3glfEYpz5arg2nPAewBOU=;
+        b=6iijwJrFSXTK12Yi++1Ek93IGbt/0ncyeyJTsndzvD12fivAalgAx39SeitNhRHRwo
+         HEv/6cfJ+tSwFoVkfxNUz0MQ3mXTCrSooCLiyyVO+ofO2H301q/zZaLMzHu+XI2RFcQZ
+         fNIIspL3vP/1gtVchAjMULxMglF4lz/Biwv3SGx1YFBLBZjBrm1f0ROXULYTB5T6G8L9
+         YYcuSyt1jjy2F8ODmVeBmYB+DjKEnW6TKGmlQqM2rNzrqfIFtrRk2SNyaqQPfg4Z/bs/
+         i+Xi8lSzmpkrg9fWH3cQHX9tSssfQiqnCM21eb/e+xsBI5GYDH6iQ9DVtkJnlrsmKQ2b
+         HXGg==
+X-Gm-Message-State: ACgBeo26IC6lEb8GyoDQ2Cxgz5TO79P1Fxkhi3jNJ5okNU3KR3u0F0B0
+        ss1cQxntXwhOVVrGbIogDs95UYMzpE2WBa3MGNaIr2s1H93rxgO4MiUTtMvHS/l4GBxetCLOjTW
+        v69Twez2nijRlb8GF/aPdKKJzebMAAEgpvbN95kKWFVUZtAPhJlOVIQtx2w==
+X-Google-Smtp-Source: AA6agR4t3eAZwrotYfOGWZoVzAPy8mVfbIrrH8RjKkVrjJizM8PQCYVxyMvRapKjxvgGRdCoqyB8Ze3Acc8=
 X-Received: from pgonda1.kir.corp.google.com ([2620:15c:29:203:cddb:77a7:c55e:a7a2])
- (user=pgonda job=sendgmr) by 2002:a81:7346:0:b0:329:ca9b:a53 with SMTP id
- o67-20020a817346000000b00329ca9b0a53mr11121530ywc.377.1661793057997; Mon, 29
- Aug 2022 10:10:57 -0700 (PDT)
-Date:   Mon, 29 Aug 2022 10:10:17 -0700
+ (user=pgonda job=sendgmr) by 2002:a17:90b:1e08:b0:1f5:1f0d:3736 with SMTP id
+ pg8-20020a17090b1e0800b001f51f0d3736mr19635518pjb.58.1661793059938; Mon, 29
+ Aug 2022 10:10:59 -0700 (PDT)
+Date:   Mon, 29 Aug 2022 10:10:18 -0700
 In-Reply-To: <20220829171021.701198-1-pgonda@google.com>
-Message-Id: <20220829171021.701198-5-pgonda@google.com>
+Message-Id: <20220829171021.701198-6-pgonda@google.com>
 Mime-Version: 1.0
 References: <20220829171021.701198-1-pgonda@google.com>
 X-Mailer: git-send-email 2.37.2.672.g94769d06f0-goog
-Subject: [V4 4/8] KVM: selftests: handle encryption bits in page tables
+Subject: [V4 5/8] KVM: selftests: add support for encrypted vm_vaddr_* allocations
 From:   Peter Gonda <pgonda@google.com>
 To:     kvm@vger.kernel.org
 Cc:     linux-kernel@vger.kernel.org, marcorr@google.com,
@@ -72,168 +72,93 @@ X-Mailing-List: kvm@vger.kernel.org
 
 From: Michael Roth <michael.roth@amd.com>
 
-SEV guests rely on an encyption bit which resides within the range that
-current code treats as address bits. Guest code will expect these bits
-to be set appropriately in their page tables, whereas the rest of the
-kvm_util functions will generally expect these bits to not be present.
-Introduce addr_gpa2raw()/addr_raw2gpa() to add/remove these bits, then
-use them where appropriate.
+The default policy for whether to handle allocations as encrypted or
+shared pages is currently determined by vm_phy_pages_alloc(), which in
+turn uses the policy defined by vm->memcrypt.enc_by_default.
+
+Test programs may wish to allocate shared vaddrs for things like
+sharing memory with the guest. Since enc_by_default will be true in the
+case of SEV guests (since it's required in order to have the initial
+ELF binary and page table become part of the initial guest payload), an
+interface is needed to explicitly request shared pages.
+
+Implement this by splitting the common code out from vm_vaddr_alloc()
+and introducing a new vm_vaddr_alloc_shared().
 
 Signed-off-by: Michael Roth <michael.roth@amd.com>
 Signed-off-by: Peter Gonda <pgonda@google.com>
 ---
- .../selftests/kvm/include/kvm_util_base.h     |  2 +
- tools/testing/selftests/kvm/lib/kvm_util.c    | 55 ++++++++++++++++++-
- .../selftests/kvm/lib/x86_64/processor.c      | 15 +++--
- 3 files changed, 66 insertions(+), 6 deletions(-)
+ .../selftests/kvm/include/kvm_util_base.h     |  1 +
+ tools/testing/selftests/kvm/lib/kvm_util.c    | 21 +++++++++++++++----
+ 2 files changed, 18 insertions(+), 4 deletions(-)
 
 diff --git a/tools/testing/selftests/kvm/include/kvm_util_base.h b/tools/testing/selftests/kvm/include/kvm_util_base.h
-index 5ecde5ad4c2f..dda8467d1434 100644
+index dda8467d1434..489e8c833e5f 100644
 --- a/tools/testing/selftests/kvm/include/kvm_util_base.h
 +++ b/tools/testing/selftests/kvm/include/kvm_util_base.h
-@@ -401,6 +401,8 @@ void *addr_gpa2hva(struct kvm_vm *vm, vm_paddr_t gpa);
- void *addr_gva2hva(struct kvm_vm *vm, vm_vaddr_t gva);
- vm_paddr_t addr_hva2gpa(struct kvm_vm *vm, void *hva);
- void *addr_gpa2alias(struct kvm_vm *vm, vm_paddr_t gpa);
-+vm_paddr_t addr_raw2gpa(struct kvm_vm *vm, vm_vaddr_t gpa_raw);
-+vm_paddr_t addr_gpa2raw(struct kvm_vm *vm, vm_vaddr_t gpa);
+@@ -392,6 +392,7 @@ void vm_mem_region_move(struct kvm_vm *vm, uint32_t slot, uint64_t new_gpa);
+ void vm_mem_region_delete(struct kvm_vm *vm, uint32_t slot);
+ struct kvm_vcpu *__vm_vcpu_add(struct kvm_vm *vm, uint32_t vcpu_id);
+ vm_vaddr_t vm_vaddr_alloc(struct kvm_vm *vm, size_t sz, vm_vaddr_t vaddr_min);
++vm_vaddr_t vm_vaddr_alloc_shared(struct kvm_vm *vm, size_t sz, vm_vaddr_t vaddr_min);
+ vm_vaddr_t vm_vaddr_alloc_pages(struct kvm_vm *vm, int nr_pages);
+ vm_vaddr_t vm_vaddr_alloc_page(struct kvm_vm *vm);
  
- void vcpu_run(struct kvm_vcpu *vcpu);
- int _vcpu_run(struct kvm_vcpu *vcpu);
 diff --git a/tools/testing/selftests/kvm/lib/kvm_util.c b/tools/testing/selftests/kvm/lib/kvm_util.c
-index 53b9a509c1d5..de13be62d52d 100644
+index de13be62d52d..ffdf39a5b12d 100644
 --- a/tools/testing/selftests/kvm/lib/kvm_util.c
 +++ b/tools/testing/selftests/kvm/lib/kvm_util.c
-@@ -1388,6 +1388,58 @@ void virt_map(struct kvm_vm *vm, uint64_t vaddr, uint64_t paddr,
- 	}
+@@ -1273,12 +1273,13 @@ static vm_vaddr_t vm_vaddr_unused_gap(struct kvm_vm *vm, size_t sz,
  }
  
-+/*
-+ * Mask off any special bits from raw GPA
-+ *
-+ * Input Args:
-+ *   vm - Virtual Machine
-+ *   gpa_raw - Raw VM physical address
-+ *
-+ * Output Args: None
-+ *
-+ * Return:
-+ *   GPA with special bits (e.g. shared/encrypted) masked off.
-+ */
-+vm_paddr_t addr_raw2gpa(struct kvm_vm *vm, vm_paddr_t gpa_raw)
+ /*
+- * VM Virtual Address Allocate
++ * VM Virtual Address Allocate Shared/Encrypted
+  *
+  * Input Args:
+  *   vm - Virtual Machine
+  *   sz - Size in bytes
+  *   vaddr_min - Minimum starting virtual address
++ *   encrypt - Whether the region should be handled as encrypted
+  *
+  * Output Args: None
+  *
+@@ -1291,13 +1292,15 @@ static vm_vaddr_t vm_vaddr_unused_gap(struct kvm_vm *vm, size_t sz,
+  * a unique set of pages, with the minimum real allocation being at least
+  * a page.
+  */
+-vm_vaddr_t vm_vaddr_alloc(struct kvm_vm *vm, size_t sz, vm_vaddr_t vaddr_min)
++static vm_vaddr_t
++_vm_vaddr_alloc(struct kvm_vm *vm, size_t sz, vm_vaddr_t vaddr_min, bool encrypt)
+ {
+ 	uint64_t pages = (sz >> vm->page_shift) + ((sz % vm->page_size) != 0);
+ 
+ 	virt_pgd_alloc(vm);
+-	vm_paddr_t paddr = vm_phy_pages_alloc(vm, pages,
+-					      KVM_UTIL_MIN_PFN * vm->page_size, 0);
++	vm_paddr_t paddr = _vm_phy_pages_alloc(vm, pages,
++					       KVM_UTIL_MIN_PFN * vm->page_size,
++					       0, encrypt);
+ 
+ 	/*
+ 	 * Find an unused range of virtual page addresses of at least
+@@ -1318,6 +1321,16 @@ vm_vaddr_t vm_vaddr_alloc(struct kvm_vm *vm, size_t sz, vm_vaddr_t vaddr_min)
+ 	return vaddr_start;
+ }
+ 
++vm_vaddr_t vm_vaddr_alloc(struct kvm_vm *vm, size_t sz, vm_vaddr_t vaddr_min)
 +{
-+	if (!vm->memcrypt.has_enc_bit)
-+		return gpa_raw;
-+
-+	return gpa_raw & ~(1ULL << vm->memcrypt.enc_bit);
++	return _vm_vaddr_alloc(vm, sz, vaddr_min, vm->memcrypt.enc_by_default);
 +}
 +
-+/*
-+ * Add special/encryption bits to a GPA based on encryption bitmap.
-+ *
-+ * Input Args:
-+ *   vm - Virtual Machine
-+ *   gpa - VM physical address
-+ *
-+ * Output Args: None
-+ *
-+ * Return:
-+ *   GPA with special bits (e.g. shared/encrypted) added in.
-+ */
-+vm_paddr_t addr_gpa2raw(struct kvm_vm *vm, vm_paddr_t gpa)
++vm_vaddr_t vm_vaddr_alloc_shared(struct kvm_vm *vm, size_t sz, vm_vaddr_t vaddr_min)
 +{
-+	struct userspace_mem_region *region;
-+	sparsebit_idx_t pg;
-+	vm_paddr_t gpa_raw = gpa;
-+
-+	TEST_ASSERT(addr_raw2gpa(vm, gpa) == gpa, "Unexpected bits in GPA: %lx",
-+		    gpa);
-+
-+	if (!vm->memcrypt.has_enc_bit)
-+		return gpa;
-+
-+	region = userspace_mem_region_find(vm, gpa, gpa);
-+	pg = gpa >> vm->page_shift;
-+	if (sparsebit_is_set(region->encrypted_phy_pages, pg))
-+		gpa_raw |= (1ULL << vm->memcrypt.enc_bit);
-+
-+	return gpa_raw;
++	return _vm_vaddr_alloc(vm, sz, vaddr_min, false);
 +}
 +
  /*
-  * Address VM Physical to Host Virtual
+  * VM Virtual Address Allocate Pages
   *
-@@ -1405,9 +1457,10 @@ void virt_map(struct kvm_vm *vm, uint64_t vaddr, uint64_t paddr,
-  * address providing the memory to the vm physical address is returned.
-  * A TEST_ASSERT failure occurs if no region containing gpa exists.
-  */
--void *addr_gpa2hva(struct kvm_vm *vm, vm_paddr_t gpa)
-+void *addr_gpa2hva(struct kvm_vm *vm, vm_paddr_t gpa_raw)
- {
- 	struct userspace_mem_region *region;
-+	vm_paddr_t gpa = addr_raw2gpa(vm, gpa_raw);
- 
- 	region = userspace_mem_region_find(vm, gpa, gpa);
- 	if (!region) {
-diff --git a/tools/testing/selftests/kvm/lib/x86_64/processor.c b/tools/testing/selftests/kvm/lib/x86_64/processor.c
-index 2e6e61bbe81b..b2df259ce706 100644
---- a/tools/testing/selftests/kvm/lib/x86_64/processor.c
-+++ b/tools/testing/selftests/kvm/lib/x86_64/processor.c
-@@ -118,7 +118,7 @@ void virt_arch_pgd_alloc(struct kvm_vm *vm)
- 
- 	/* If needed, create page map l4 table. */
- 	if (!vm->pgd_created) {
--		vm->pgd = vm_alloc_page_table(vm);
-+		vm->pgd = addr_gpa2raw(vm, vm_alloc_page_table(vm));
- 		vm->pgd_created = true;
- 	}
- }
-@@ -140,13 +140,15 @@ static uint64_t *virt_create_upper_pte(struct kvm_vm *vm,
- 				       int target_level)
- {
- 	uint64_t *pte = virt_get_pte(vm, pt_pfn, vaddr, current_level);
-+	uint64_t paddr_raw = addr_gpa2raw(vm, paddr);
- 
- 	if (!(*pte & PTE_PRESENT_MASK)) {
- 		*pte = PTE_PRESENT_MASK | PTE_WRITABLE_MASK;
- 		if (current_level == target_level)
--			*pte |= PTE_LARGE_MASK | (paddr & PHYSICAL_PAGE_MASK);
-+			*pte |= PTE_LARGE_MASK | (paddr_raw & PHYSICAL_PAGE_MASK);
- 		else
--			*pte |= vm_alloc_page_table(vm) & PHYSICAL_PAGE_MASK;
-+			*pte |= addr_gpa2raw(vm, vm_alloc_page_table(vm)) & PHYSICAL_PAGE_MASK;
-+
- 	} else {
- 		/*
- 		 * Entry already present.  Assert that the caller doesn't want
-@@ -184,6 +186,8 @@ void __virt_pg_map(struct kvm_vm *vm, uint64_t vaddr, uint64_t paddr, int level)
- 		    "Physical address beyond maximum supported,\n"
- 		    "  paddr: 0x%lx vm->max_gfn: 0x%lx vm->page_size: 0x%x",
- 		    paddr, vm->max_gfn, vm->page_size);
-+	TEST_ASSERT(addr_raw2gpa(vm, paddr) == paddr,
-+		    "Unexpected bits in paddr: %lx", paddr);
- 
- 	/*
- 	 * Allocate upper level page tables, if not already present.  Return
-@@ -206,7 +210,8 @@ void __virt_pg_map(struct kvm_vm *vm, uint64_t vaddr, uint64_t paddr, int level)
- 	pte = virt_get_pte(vm, PTE_GET_PFN(*pde), vaddr, PG_LEVEL_4K);
- 	TEST_ASSERT(!(*pte & PTE_PRESENT_MASK),
- 		    "PTE already present for 4k page at vaddr: 0x%lx\n", vaddr);
--	*pte = PTE_PRESENT_MASK | PTE_WRITABLE_MASK | (paddr & PHYSICAL_PAGE_MASK);
-+	*pte = PTE_PRESENT_MASK | PTE_WRITABLE_MASK |
-+	       (addr_gpa2raw(vm, paddr) & PHYSICAL_PAGE_MASK);
- }
- 
- void virt_arch_pg_map(struct kvm_vm *vm, uint64_t vaddr, uint64_t paddr)
-@@ -515,7 +520,7 @@ vm_paddr_t addr_arch_gva2gpa(struct kvm_vm *vm, vm_vaddr_t gva)
- 	if (!(pte[index[0]] & PTE_PRESENT_MASK))
- 		goto unmapped_gva;
- 
--	return (PTE_GET_PFN(pte[index[0]]) * vm->page_size) + (gva & ~PAGE_MASK);
-+	return addr_raw2gpa(vm, PTE_GET_PFN(pte[index[0]]) * vm->page_size) + (gva & ~PAGE_MASK);
- 
- unmapped_gva:
- 	TEST_FAIL("No mapping for vm virtual address, gva: 0x%lx", gva);
 -- 
 2.37.2.672.g94769d06f0-goog
 
