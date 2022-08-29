@@ -2,156 +2,141 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 6AA0A5A5024
-	for <lists+kvm@lfdr.de>; Mon, 29 Aug 2022 17:26:04 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 9D4D45A502C
+	for <lists+kvm@lfdr.de>; Mon, 29 Aug 2022 17:28:16 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229883AbiH2P0C (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 29 Aug 2022 11:26:02 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52306 "EHLO
+        id S229828AbiH2P2N (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 29 Aug 2022 11:28:13 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53976 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229616AbiH2P0A (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 29 Aug 2022 11:26:00 -0400
-Received: from mga07.intel.com (mga07.intel.com [134.134.136.100])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A225E4057F;
-        Mon, 29 Aug 2022 08:25:59 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1661786759; x=1693322759;
-  h=date:from:to:cc:subject:message-id:reply-to:references:
-   mime-version:in-reply-to;
-  bh=xYdvX1PhD3Iug/xG1oZ0ioxeY0YVxwImFkNf9/6SStg=;
-  b=hWdzhzZFwVFA5mNu2jfoAjjGOwCGsK2Gc/vg0/6FixGLwv3ntrqwitCK
-   VE6ndI3r/6otqMBw8JEsVzE5Uvbi/ZSAQykMllBg3Os/pnVAIiKDQ3HlU
-   xY8Mm+ZFTSV9saVBR+6PNPX7tq+VZ9yawCIUBIumHjZdFcPxvgBx/E3Wf
-   JUsBTpRrE9g78IiId9/G7QTrxEnvaGlM/RBE6JeQtJBDW59hyOHCPVh3l
-   fzXbNNS8fkrr/PwYRG00grNSj7LWGVQw2NMn4yVzBs2ZVxNvrULoSRhqH
-   HXjd3AKajILPJoJ8tZPmlIueFtvJCTwUtMVM2nS+Sq6ft3iTb/SW5KvIP
-   w==;
-X-IronPort-AV: E=McAfee;i="6500,9779,10454"; a="358886403"
-X-IronPort-AV: E=Sophos;i="5.93,272,1654585200"; 
-   d="scan'208";a="358886403"
-Received: from orsmga008.jf.intel.com ([10.7.209.65])
-  by orsmga105.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 29 Aug 2022 08:25:59 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.93,272,1654585200"; 
-   d="scan'208";a="640973244"
-Received: from chaop.bj.intel.com (HELO localhost) ([10.240.193.75])
-  by orsmga008.jf.intel.com with ESMTP; 29 Aug 2022 08:25:49 -0700
-Date:   Mon, 29 Aug 2022 23:21:07 +0800
-From:   Chao Peng <chao.p.peng@linux.intel.com>
-To:     Fuad Tabba <tabba@google.com>
-Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
-        linux-mm@kvack.org, linux-fsdevel@vger.kernel.org,
-        linux-api@vger.kernel.org, linux-doc@vger.kernel.org,
-        qemu-devel@nongnu.org, linux-kselftest@vger.kernel.org,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Jonathan Corbet <corbet@lwn.net>,
-        Sean Christopherson <seanjc@google.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        x86@kernel.org, "H . Peter Anvin" <hpa@zytor.com>,
-        Hugh Dickins <hughd@google.com>,
-        Jeff Layton <jlayton@kernel.org>,
-        "J . Bruce Fields" <bfields@fieldses.org>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        Shuah Khan <shuah@kernel.org>, Mike Rapoport <rppt@kernel.org>,
-        Steven Price <steven.price@arm.com>,
-        "Maciej S . Szmigiero" <mail@maciej.szmigiero.name>,
-        Vlastimil Babka <vbabka@suse.cz>,
-        Vishal Annapurve <vannapurve@google.com>,
-        Yu Zhang <yu.c.zhang@linux.intel.com>,
-        "Kirill A . Shutemov" <kirill.shutemov@linux.intel.com>,
-        luto@kernel.org, jun.nakajima@intel.com, dave.hansen@intel.com,
-        ak@linux.intel.com, david@redhat.com, aarcange@redhat.com,
-        ddutile@redhat.com, dhildenb@redhat.com,
-        Quentin Perret <qperret@google.com>,
-        Michael Roth <michael.roth@amd.com>, mhocko@suse.com,
-        Muchun Song <songmuchun@bytedance.com>
-Subject: Re: [PATCH v7 11/14] KVM: Register/unregister the guest private
- memory regions
-Message-ID: <20220829152107.GD1586678@chaop.bj.intel.com>
-Reply-To: Chao Peng <chao.p.peng@linux.intel.com>
-References: <20220706082016.2603916-1-chao.p.peng@linux.intel.com>
- <20220706082016.2603916-12-chao.p.peng@linux.intel.com>
- <CA+EHjTzpb2PcGBbN61YqMWdQ5f-55Lt12ALHQ0pdwtGvV8nS8g@mail.gmail.com>
-MIME-Version: 1.0
+        with ESMTP id S229469AbiH2P2M (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 29 Aug 2022 11:28:12 -0400
+Received: from NAM12-DM6-obe.outbound.protection.outlook.com (mail-dm6nam12on2054.outbound.protection.outlook.com [40.107.243.54])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9278F7642
+        for <kvm@vger.kernel.org>; Mon, 29 Aug 2022 08:28:10 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=bCM/1efBEIbRu5Gkt2fSXhRJAtxNBlZ2qYAKuedzym9tv75pjH5nYtXysVI+yGpwA8t41fOky7JX8mqUyuZhyTELpF6gQs4o+eK6fxmqE6h87ZloCb/S3MUY7b2zj/S9Ub9SoMxD9n1yHM1K7Jap5GXz8TXkjFfTMrtKlRu22e2zDTRyPzwhrZJnLz6dCp3dovlAPpGukeatpW3JOjwJ9OnOzRWF4bAQVUgK3/2yOaoarShlJb/n+YXWbJoRHa2rI6bs5st7fRbrUybSc1dov4WiKA+/ponG4MfFVuiN7L2wFJKTJIAn5bjxs3j+xt/iHkeHFfIt7HAEYHH+2VBwYA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=25H4UfrFaXOMo2c/qEP2G3KxMrZuu2NR9ZzgYFF+/k8=;
+ b=I7uc5pOllJ6iv5dssn6S71ptLEf5Hva9t1R7Q+ip3ND7r5PssAqMU8gwkS+Ns77OeftWYToMZWFHBJ6axK5zT4uv0mtCNXJezcxJC8JSNcCTQfQk1urBPGMHMFbP97n+VNYPSAYtR3PmaPouJ4p90BKs3P7WWNw0TurpRjy2EHQqbIPxbGJb7QosNpHQtu3oAfrouVkPgA1tlrbyswIHxvitSei4VQn7qk7qjGryGvxyK8R72r3BcWefYacbP5/ecWe9xr5FfHtqcoPWjXeQ7lRZPbWtnX9xttjDW5FKQjKzMsSngNd6vxlsExx7V+MEBTXdl87goH/g8fROt1+Uqw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
+ dkim=pass header.d=nvidia.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=25H4UfrFaXOMo2c/qEP2G3KxMrZuu2NR9ZzgYFF+/k8=;
+ b=SGb28/4V8J8P8S4AC2UO1kp4U/k2HLBmJ4p1Awj1c1yH/vUl8o4jaSWubYW4/5E4eBV55K4v4fU9RHES2+aHIN2aj+wLe9rPRlPS86ZzaPpMwEd0Sy8iGmlet48yA9xyTxwwjMSbXrbzDc/pFvqfXDfRbwwATdtcSKasfJpSXDniTWIPdMcSmzOwFqEq39WxtnO5lfBXMaHOLNwyF7eqE13lt7SrZe0wwsT2SFKGE/BCTzC2q7snMmugR0JcnzCCdAmI8+qspDldAmXAY1f2z4uR5AHS5z/aVI+zjgE1qAKVD5MT2v7jF8frP7Fml4jSOiOKJCjr9+5EZ6upSQRZzQ==
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=nvidia.com;
+Received: from MN2PR12MB4192.namprd12.prod.outlook.com (2603:10b6:208:1d5::15)
+ by MW3PR12MB4444.namprd12.prod.outlook.com (2603:10b6:303:5c::10) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5566.14; Mon, 29 Aug
+ 2022 15:28:09 +0000
+Received: from MN2PR12MB4192.namprd12.prod.outlook.com
+ ([fe80::462:7fe:f04f:d0d5]) by MN2PR12MB4192.namprd12.prod.outlook.com
+ ([fe80::462:7fe:f04f:d0d5%8]) with mapi id 15.20.5566.021; Mon, 29 Aug 2022
+ 15:28:08 +0000
+Date:   Mon, 29 Aug 2022 12:28:07 -0300
+From:   Jason Gunthorpe <jgg@nvidia.com>
+To:     "Tian, Kevin" <kevin.tian@intel.com>
+Cc:     Alex Williamson <alex.williamson@redhat.com>,
+        Cornelia Huck <cohuck@redhat.com>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "llvm@lists.linux.dev" <llvm@lists.linux.dev>,
+        Nathan Chancellor <nathan@kernel.org>,
+        Nick Desaulniers <ndesaulniers@google.com>,
+        Tom Rix <trix@redhat.com>
+Subject: Re: [PATCH 7/8] vfio: Follow the naming pattern for
+ vfio_group_ioctl_unset_container()
+Message-ID: <YwzbB5NZGOqOsOVK@nvidia.com>
+References: <0-v1-11d8272dc65a+4bd-vfio_ioctl_split_jgg@nvidia.com>
+ <7-v1-11d8272dc65a+4bd-vfio_ioctl_split_jgg@nvidia.com>
+ <BN9PR11MB5276B0A8F6DD36C6482F37038C769@BN9PR11MB5276.namprd11.prod.outlook.com>
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <CA+EHjTzpb2PcGBbN61YqMWdQ5f-55Lt12ALHQ0pdwtGvV8nS8g@mail.gmail.com>
-X-Spam-Status: No, score=-4.3 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,SPF_HELO_NONE,
-        SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no
-        version=3.4.6
+In-Reply-To: <BN9PR11MB5276B0A8F6DD36C6482F37038C769@BN9PR11MB5276.namprd11.prod.outlook.com>
+X-ClientProxiedBy: MN2PR05CA0062.namprd05.prod.outlook.com
+ (2603:10b6:208:236::31) To MN2PR12MB4192.namprd12.prod.outlook.com
+ (2603:10b6:208:1d5::15)
+MIME-Version: 1.0
+X-MS-PublicTrafficType: Email
+X-MS-Office365-Filtering-Correlation-Id: 31c058b7-427d-42ec-14bb-08da89d3137b
+X-MS-TrafficTypeDiagnostic: MW3PR12MB4444:EE_
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: PTRBi/H8MlSpWHvfJdRGu5f+gY8y/QUjTximG4/eF6kW1txhNm449W8OtOiwsHsb3G2SOZCUSog3+ev/jlMZdU1tJYcYMA3ccslY2P3L7H5rTrNVv3+m3MCZsTs3YbWkBncHmJBO9lrh+RzJHNfYgwMfmxURoYEGPLUv+qZw6Hjl/XDy7pkVtLPc4vaL8+BtC9rKeazKJ2XP/COf8TqbjWm9cnLOhiclDGSqMH3+FtclIaOB5vwZrcQXvHCT4gD92Mn9WCjcwBkc/pb5EB0Xy04Gv/gqAEd2Z49VUMN1eRCvGUAkkbewHIa7zPFfoGxKA86YIQQpGOWeKIWFHfmMSK5oB7vym/0PhbdRWl2hZHiCfa8FbvQHs5cJ9B916hpmNNXeRbSHH425X5CbOsq0PjFOokfdNHKN8KNU/6TZgo4HNnrKiFg/RZQc7AIbNvUQbuYE3M/iw9C5XiJDXbOssInf+/xYOpn7hU7ZhrXOdFF+Oa0vs0ptRKGD3j3bk2zK5gDIvxXrLJnsbkpeq4bAdKa6hUXSZYGwIKmlyIypI26vhRABpsW1JZVDAmtUgxD9f4vrCoUrnOdPdi3eOiqbRKaIdVeY6JYMdfaHKMU/618HOKSyvzjgrQBwlfpy0pSKlDCcGtlASavY2EXngrERaVtdbLg3ToG2VTH8F+L9tmZBE9I84MXMgEjxGKe2yUY8VsBvyEGM82Pgez4bPfVRRA==
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:MN2PR12MB4192.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230016)(4636009)(346002)(376002)(136003)(39860400002)(366004)(396003)(26005)(6512007)(6486002)(478600001)(86362001)(6506007)(41300700001)(186003)(38100700002)(2616005)(66476007)(6916009)(66946007)(5660300002)(66556008)(8676002)(8936002)(4326008)(316002)(54906003)(2906002)(36756003)(4744005);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?itX/6ZYqlp09kV7PI3A83Q4ReauxVd6765nwPEHH4wzGsIT+o51DlixRk9qv?=
+ =?us-ascii?Q?RC6UmzSzI6lTDBM1FQhYjq8uwrrzMj/ywaH6O+M1UstxB2MzK37XV++YMUDV?=
+ =?us-ascii?Q?A2Ygo2mz6y0jGWi5biEeyV2TId3SYXnyYgkVUkiu0oKo3trrTIH4UdhlMhKs?=
+ =?us-ascii?Q?vs3dfjVLW+xO3YxvsAJSHvh3KgvgFecdgfLK1gkuHYEuiHUSA7pCCEn1vOk1?=
+ =?us-ascii?Q?uER5hBV8iohRrCoTBBE1W8ak+n2kJEJS78qKXd0GKV1JGl9OS/++h99yUhP+?=
+ =?us-ascii?Q?N8idO3KvkQ9LhgxXEsY/9SRdm58s8WHflK+kZMoCen94wLWAp/8We07jP1xu?=
+ =?us-ascii?Q?JCfsfZ2HsznUVjh9C4a/48J0TBxVlT1/r0q0R+XzfVuKPsuYgRHqEt7Wmu0Y?=
+ =?us-ascii?Q?XZjMex9h9B9XDS/waP2BqbufV9m1x54SQE82viGcoTeykvGmHLpEHidm9aBU?=
+ =?us-ascii?Q?EGubVy9ydKMYizRh2K6+xEkah7fVmbVmGO0hk9LV68FxDLKsXezXtYe97/Ll?=
+ =?us-ascii?Q?p5tJ+WdKSDkThfFE3Lc7iMMCUKum9H8sFG50wNIEBKQu3G0hzqu+wKav2GnT?=
+ =?us-ascii?Q?+uBllZlyAXjHjaAkf39kPski/EFWNSq9tUJXCyO8D8SVjFTMjAOhPxq+derV?=
+ =?us-ascii?Q?cNErmJYUnRwhc7uKPoHaTh9Rg6l8ex6x5xFoJNBagizUbEdrMIBoRNrQfRcM?=
+ =?us-ascii?Q?qKLnSqp2GT/nWSQzT9Sb4nACmwWmC1fZQVYf+t3pj+zGHQTai1FM3j9zOY82?=
+ =?us-ascii?Q?Oehx8MnnjfuoGD45itOB0p0jvy2Rm60cqhMHFgxT8ivt671VK7gAIQg1GvS0?=
+ =?us-ascii?Q?+6qp1Zmvs8BtDXhoGH9wsMFEvMnwgzBkHb5YRKuJXw6fw+R4WaIP40hdhK+J?=
+ =?us-ascii?Q?wi+HTuWaIKg0iGs/1w1Rl0SlWt/51691Lh6UijaoQL/eRwGoBmJzCaaOYgsv?=
+ =?us-ascii?Q?a81o2TDaX0UN9mxVAs0ogMQ1ycuYN6uXEbpCjUjc5FU6poHu2edqRPEIKrAy?=
+ =?us-ascii?Q?blOlbrX7HveQSnlZ3HZ9Y0fo9INlAqZNpodamCA1YAHTVbTq1Yb8I8P/35AB?=
+ =?us-ascii?Q?0c46XefKzNVJwNlkK2tNp++evSG6kLUN2rqp6RcOF+amKe19nwn8BxtVOG7K?=
+ =?us-ascii?Q?Ub9/c0F1Tudf5XiO2DlKLsv6B5ra5E0viwVnbz1kJm6wuZgPn2DQr8N/KO7X?=
+ =?us-ascii?Q?cH2NqsAeRRnimxTKKNsobrIdYK3EDqWbaaMEXYkf9ZhATvqAfrKFGrtG7oMR?=
+ =?us-ascii?Q?ZICm/hWzC+o5fzW0aHEzmg0pC9glQumU+fVW9UUh8fcABrZ0Wc8zqZfJHUhN?=
+ =?us-ascii?Q?8C6ZRvb4on4q0C6m9t+iDW+QzvdVw52P3lCJ06uPi8bEPQzmgdmOiyJ7n2CO?=
+ =?us-ascii?Q?2gfpUFN0dbKHzeHU0AlDNGs3ynQej1JMSjVWnTkDcqtEJ0GRVivKW61SKedl?=
+ =?us-ascii?Q?3xF1nXrbCRx9WoqtYKxFTSCI+Xfci4aA/nvzmxRnFjDj+CAXQcIpWWjXqZkO?=
+ =?us-ascii?Q?A+aLpT1SHSpbXlTBlsttUE9Y5U+gkO/HAKdn5iXYv1HOJTMeDgS+PSJ50TgN?=
+ =?us-ascii?Q?tlPPtFo7hyIfZz2ul35ZDvUa5cwVmfxzqrambdmB?=
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 31c058b7-427d-42ec-14bb-08da89d3137b
+X-MS-Exchange-CrossTenant-AuthSource: MN2PR12MB4192.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 29 Aug 2022 15:28:08.5846
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: fw3nXdLvDQqYMhkX4ZmRqaKgw6s5XSmFDs1YM03Tnap1QAdp2Aeu/9kVpL/b0IcT
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: MW3PR12MB4444
+X-Spam-Status: No, score=-1.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FORGED_SPF_HELO,
+        RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_NONE,
+        T_SCC_BODY_TEXT_LINE autolearn=no autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Aug 26, 2022 at 04:19:43PM +0100, Fuad Tabba wrote:
-> > +bool __weak kvm_arch_private_mem_supported(struct kvm *kvm)
-> > +{
-> > +       return false;
-> > +}
-> > +
-> >  static int check_memory_region_flags(const struct kvm_user_mem_region *mem)
-> >  {
-> >         u32 valid_flags = KVM_MEM_LOG_DIRTY_PAGES;
-> > @@ -4689,6 +4729,22 @@ static long kvm_vm_ioctl(struct file *filp,
-> >                 r = kvm_vm_ioctl_set_memory_region(kvm, &mem);
-> >                 break;
-> >         }
-> > +#ifdef CONFIG_HAVE_KVM_PRIVATE_MEM
-> > +       case KVM_MEMORY_ENCRYPT_REG_REGION:
-> > +       case KVM_MEMORY_ENCRYPT_UNREG_REGION: {
-> > +               struct kvm_enc_region region;
-> > +
-> > +               if (!kvm_arch_private_mem_supported(kvm))
-> > +                       goto arch_vm_ioctl;
-> > +
-> > +               r = -EFAULT;
-> > +               if (copy_from_user(&region, argp, sizeof(region)))
-> > +                       goto out;
-> > +
-> > +               r = kvm_vm_ioctl_set_encrypted_region(kvm, ioctl, &region);
-> > +               break;
-> > +       }
-> > +#endif
-> >         case KVM_GET_DIRTY_LOG: {
-> >                 struct kvm_dirty_log log;
-> >
-> > @@ -4842,6 +4898,7 @@ static long kvm_vm_ioctl(struct file *filp,
-> >                 r = kvm_vm_ioctl_get_stats_fd(kvm);
-> >                 break;
-> >         default:
-> > +arch_vm_ioctl:
+On Mon, Aug 29, 2022 at 12:41:30AM +0000, Tian, Kevin wrote:
+> > From: Jason Gunthorpe <jgg@nvidia.com>
+> > Sent: Thursday, August 18, 2022 12:07 AM
+> > 
+> > Make it clear that this is the body of the ioctl - keep the mutex outside
+> > the function since this function doesn't have and wouldn't benefit from
+> > error unwind.
 > 
-> It might be good to make this label conditional on
-> CONFIG_HAVE_KVM_PRIVATE_MEM, otherwise you get a warning if
-> CONFIG_HAVE_KVM_PRIVATE_MEM isn't defined.
+> but doing so make unset_container() unpair with set_container() and
+> be the only one doing additional things in main ioctl body.
 > 
-> +#ifdef CONFIG_HAVE_KVM_PRIVATE_MEM
->  arch_vm_ioctl:
-> +#endif
+> I'd prefer to moving mutex inside unset_container() for better readability.
 
-Right, as the bot already complains.
+Yes, I tried both ways and ended up here since adding the goto unwind
+was kind of ungainly for this function. Don't mind either way
 
-Chao
-> 
-> Cheers,
-> /fuad
-> 
-> 
-> 
-> 
-> 
-> >                 r = kvm_arch_vm_ioctl(filp, ioctl, arg);
-> >         }
-> >  out:
-> > --
-> > 2.25.1
-> >
+The functions are not intended as strict pairs, they are ioctl
+dispatch functions.
+
+Jason
