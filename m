@@ -2,114 +2,128 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 06B535A4D1B
-	for <lists+kvm@lfdr.de>; Mon, 29 Aug 2022 15:11:18 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 2E7FA5A4E12
+	for <lists+kvm@lfdr.de>; Mon, 29 Aug 2022 15:29:42 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229975AbiH2NLO (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 29 Aug 2022 09:11:14 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59330 "EHLO
+        id S229946AbiH2N3l (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 29 Aug 2022 09:29:41 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35376 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230272AbiH2NK4 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 29 Aug 2022 09:10:56 -0400
-Received: from mail-lf1-x136.google.com (mail-lf1-x136.google.com [IPv6:2a00:1450:4864:20::136])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0A5E4DF0
-        for <kvm@vger.kernel.org>; Mon, 29 Aug 2022 06:09:50 -0700 (PDT)
-Received: by mail-lf1-x136.google.com with SMTP id bt10so11102056lfb.1
-        for <kvm@vger.kernel.org>; Mon, 29 Aug 2022 06:09:50 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=to:subject:message-id:date:from:sender:mime-version:from:to:cc;
-        bh=5SGZXXm779vUUr1cqzGV/gRigE4jlSEMeyxYIdb55pM=;
-        b=iObZ0xpxUo4F6FQeuqDr20wj+qJl4swprLp7h7p/I+T8MuvV6pE5/x6nT3E8BXnNvg
-         ws/v7GF+CCDkYQwyJ7mT5TYHFa26Uf7+ksZZWsxaihsJ50rGHRH5wUfTT0bPKuKqMmOA
-         LKiYq65SmeSRwXYivbo/SCsEoH89z07f4NJVt8Km213oIv6xphoMHIKipaZ1n/SlEcOV
-         7QwRkOds75mXTISRhRSSCmtimrVXT3mSvHQn+/Q8bZieXszdeElN9HxI2kLOpoTP8uSq
-         8MWz9dNOeyZIDqwVH2QlMBLJO3Ee3dVudPpb1fkITWuBkyQoAwTRSGqqC7sV8Yvgo+n0
-         i2BQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=to:subject:message-id:date:from:sender:mime-version
-         :x-gm-message-state:from:to:cc;
-        bh=5SGZXXm779vUUr1cqzGV/gRigE4jlSEMeyxYIdb55pM=;
-        b=yi9RGsJuDIq7/tGKqfBUkQHmz31H9j9mTEkV6EAyCU4mKAq4fWoeXL3y1vMVEDX4T6
-         pfmhbsijIwu3uknMNvINlmJsTQSSMukx6QjB+JXKumlMmPxOiWrLZDdG8l1Chpw1R/Ee
-         ay4pLSxeMfxL3PR1wfYEG4iP4vDiGkr/cT9MEysHwUAzWsrJZgMY/KWSJ0AfqUc7eHir
-         No77OiWcFkW4WllqavcH7WyRPw9Nnu/IkCH/NilimAD7co8uS2+RIMRs0Zi0ivWWCX3K
-         xWlSaRwahFA7npbAkfsoPv7XR2iMCXbVRpd0tyNfIKzdteKArkHaVj6qmkasFoVLIF+v
-         OJAQ==
-X-Gm-Message-State: ACgBeo06HWJAzqfEhg1lxWmOedO6c7zKwIvqM87R845WOcfdco2+2NC/
-        KXxZNi6FFUyvZyyfge0841XExF4CJg2nu04BTCQ=
-X-Google-Smtp-Source: AA6agR5aEjA6Ppeoo35yA7LRqA9ciD/2p6ronzJEGLGVrPID6MLuOxc8A9xu/fuGPMGIfX+ZrLbLLTcXTPxTcVAFfbs=
-X-Received: by 2002:a05:6512:a88:b0:492:ea6a:12bc with SMTP id
- m8-20020a0565120a8800b00492ea6a12bcmr6207046lfu.229.1661778584887; Mon, 29
- Aug 2022 06:09:44 -0700 (PDT)
+        with ESMTP id S230215AbiH2N3S (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 29 Aug 2022 09:29:18 -0400
+Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2302E79A74;
+        Mon, 29 Aug 2022 06:28:55 -0700 (PDT)
+Received: from pps.filterd (m0098421.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.17.1.5/8.17.1.5) with ESMTP id 27TDE5I4010778;
+        Mon, 29 Aug 2022 13:28:54 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
+ mime-version : subject : from : to : cc : references : in-reply-to :
+ content-type : content-transfer-encoding; s=pp1;
+ bh=dXD9swvkZ5AaQz5vGXwU9H/FB+K5Bq2dj89N70m7cBI=;
+ b=i7FMxb3rwOYlbiC4VTqqBnaLcoU0UZ+LXsLUyTtwKrEQXLewKARiEZa9rMWypmMGyi+R
+ Rz/piiiOtuPbUwlIoGSERpvxTv9eXzckDazbZcKRnH6rv0DDlPe1wQBTZuSmWFMmw1IF
+ Ouxo5xR+8mf4j3dLbCB/UUQ6omUfDg3FMzK4GWtjZfJbnvhFCfjsfx8dqdxLB7lsW1Ct
+ bWXOPo/Mm204TSSM663QBZIU3Erbak6ydDxNrch3Yuvqi04PkzB1U1ibnNbFGEKy1eql
+ 8ig7v8UOoXZb6ncPPyLewnfmcs3a3U8BLFChWJLOdv3eTkezEapKV37yqEPO4wUSik5x 5g== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3j8x5d8djk-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Mon, 29 Aug 2022 13:28:54 +0000
+Received: from m0098421.ppops.net (m0098421.ppops.net [127.0.0.1])
+        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 27TDEBxq011393;
+        Mon, 29 Aug 2022 13:28:54 GMT
+Received: from ppma03dal.us.ibm.com (b.bd.3ea9.ip4.static.sl-reverse.com [169.62.189.11])
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3j8x5d8dj9-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Mon, 29 Aug 2022 13:28:53 +0000
+Received: from pps.filterd (ppma03dal.us.ibm.com [127.0.0.1])
+        by ppma03dal.us.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 27TDK9xI030512;
+        Mon, 29 Aug 2022 13:28:53 GMT
+Received: from b01cxnp23033.gho.pok.ibm.com (b01cxnp23033.gho.pok.ibm.com [9.57.198.28])
+        by ppma03dal.us.ibm.com with ESMTP id 3j7awagnqt-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Mon, 29 Aug 2022 13:28:53 +0000
+Received: from b01ledav001.gho.pok.ibm.com (b01ledav001.gho.pok.ibm.com [9.57.199.106])
+        by b01cxnp23033.gho.pok.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 27TDSqA842598728
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Mon, 29 Aug 2022 13:28:52 GMT
+Received: from b01ledav001.gho.pok.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 125A32805A;
+        Mon, 29 Aug 2022 13:28:52 +0000 (GMT)
+Received: from b01ledav001.gho.pok.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 943E828059;
+        Mon, 29 Aug 2022 13:28:51 +0000 (GMT)
+Received: from [9.160.64.167] (unknown [9.160.64.167])
+        by b01ledav001.gho.pok.ibm.com (Postfix) with ESMTP;
+        Mon, 29 Aug 2022 13:28:51 +0000 (GMT)
+Message-ID: <1e3a21be-c103-3478-ae91-2f5a721c465d@linux.ibm.com>
+Date:   Mon, 29 Aug 2022 09:28:51 -0400
 MIME-Version: 1.0
-Sender: sorerachid81@gmail.com
-Received: by 2002:a05:6520:6104:b0:213:94e:9775 with HTTP; Mon, 29 Aug 2022
- 06:09:44 -0700 (PDT)
-From:   sofiaoleksander <sofiaoleksander2@gmail.com>
-Date:   Mon, 29 Aug 2022 14:09:44 +0100
-X-Google-Sender-Auth: X638rAywS2ZYbnJ3RfC9kRRcMIo
-Message-ID: <CAKL4mRfVCSmchPUooXW7KC4x_HepntXgg89Z7YL_wMyUZ-DF8A@mail.gmail.com>
-Subject: Hello my dear,
-To:     undisclosed-recipients:;
-Content-Type: text/plain; charset="UTF-8"
-X-Spam-Status: Yes, score=5.1 required=5.0 tests=BAYES_99,BAYES_999,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        FREEMAIL_ENVFROM_END_DIGIT,FREEMAIL_FROM,LOTS_OF_MONEY,MILLION_USD,
-        RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,
-        UNDISC_MONEY autolearn=no autolearn_force=no version=3.4.6
-X-Spam-Report: * -0.0 RCVD_IN_DNSWL_NONE RBL: Sender listed at
-        *      https://www.dnswl.org/, no trust
-        *      [2a00:1450:4864:20:0:0:0:136 listed in]
-        [list.dnswl.org]
-        *  3.5 BAYES_99 BODY: Bayes spam probability is 99 to 100%
-        *      [score: 1.0000]
-        *  0.2 BAYES_999 BODY: Bayes spam probability is 99.9 to 100%
-        *      [score: 1.0000]
-        *  0.0 SPF_HELO_NONE SPF: HELO does not publish an SPF Record
-        *  0.2 FREEMAIL_ENVFROM_END_DIGIT Envelope-from freemail username ends
-        *       in digit
-        *      [sorerachid81[at]gmail.com]
-        *  0.0 FREEMAIL_FROM Sender email is commonly abused enduser mail
-        *      provider
-        *      [sofiaoleksander2[at]gmail.com]
-        * -0.0 SPF_PASS SPF: sender matches SPF record
-        *  0.1 MILLION_USD BODY: Talks about millions of dollars
-        * -0.1 DKIM_VALID Message has at least one valid DKIM or DK signature
-        * -0.1 DKIM_VALID_AU Message has a valid DKIM or DK signature from
-        *      author's domain
-        *  0.1 DKIM_SIGNED Message has a DKIM or DK signature, not necessarily
-        *       valid
-        * -0.1 DKIM_VALID_EF Message has a valid DKIM or DK signature from
-        *      envelope-from domain
-        * -0.0 T_SCC_BODY_TEXT_LINE No description available.
-        *  0.0 LOTS_OF_MONEY Huge... sums of money
-        *  1.3 UNDISC_MONEY Undisclosed recipients + money/fraud signs
-X-Spam-Level: *****
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.11.0
+Subject: Re: [PATCH v3 0/2] s390/vfio-ap: fix two problems discovered in the
+ vfio_ap driver
+Content-Language: en-US
+From:   Anthony Krowiak <akrowiak@linux.ibm.com>
+To:     linux-s390@vger.kernel.org, linux-kernel@vger.kernel.org,
+        kvm@vger.kernel.org
+Cc:     jjherne@linux.ibm.com, borntraeger@de.ibm.com, cohuck@redhat.com,
+        mjrosato@linux.ibm.com, pasic@linux.ibm.com,
+        alex.williamson@redhat.com
+References: <20220823150643.427737-1-akrowiak@linux.ibm.com>
+In-Reply-To: <20220823150643.427737-1-akrowiak@linux.ibm.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-ORIG-GUID: P-ahZGfK52ObdocQsludQcSGk1o9yIKX
+X-Proofpoint-GUID: 5cWLmAV-JK548-Bp0Lf1dOQe1g3zJ1d9
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.205,Aquarius:18.0.895,Hydra:6.0.517,FMLib:17.11.122.1
+ definitions=2022-08-29_07,2022-08-25_01,2022-06-22_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501
+ suspectscore=0 mlxscore=0 bulkscore=0 spamscore=0 phishscore=0
+ impostorscore=0 mlxlogscore=999 adultscore=0 malwarescore=0 clxscore=1015
+ lowpriorityscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2207270000 definitions=main-2208290060
+X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,
+        SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no
+        version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hello my dear,
+These two patches fix a couple of bugs in the vfio_ap driver code, it 
+would be nice to get some r-b action so we can merge these fixes ASAP. 
+Thanks.
 
-    My Name is, sofia oleksander, a 20 years old girl from Ukraine and
-I'm presently in a refugee camp here in Poland. I lost my parents in
-the recent war in Ukraine, right now I'm in a refugee camp in Poland.
-Please I'm in great need of your help in transferring my late father
-deposited fund, the sum of $3.5 MILLION UNITED STATES DOLLAR, he
-deposited  in a bank in United State.
-
-the deposited money was from the sale of the company shares death
-benefits payment, and entitlements of my deceased father by his
-company.  i have every necessary document for the fund, i seek for an
-honest foreigner who will stand as my foreign partner and investor. i
-just need this fund to be transferred to your bank account so that I
-will come over to your country and complete my education over there in
-your country. as you know, my country has been in a deep crisis due to
-the recent war and I cannot go back.
-
-Please I need your urgent,
-sofia oleksander,
+On 8/23/22 11:06 AM, Tony Krowiak wrote:
+> Two problems have been discovered with the vfio_ap device driver since the
+> hot plug support was recently introduced:
+>
+> 1. Attempting to remove a matrix mdev after assigning a duplicate adapter
+>     or duplicate domain results in a hang.
+>
+> 2. The queues associated with an adapter or domain being unassigned from
+>     the matrix mdev do not get unlinked from it.
+>
+> Two patches are provided to resolve these problems.
+>
+> Change log v2 => v3:
+> --------------------
+> * Replaced the wrong commit IDs in the 'Fixes' tags in both patches.
+>    (Halil and Alexander)
+>
+> * Changed the subject line and description of patch 01/02 to better reflect the
+>    code changes in the patch. (Halil)
+>
+> Tony Krowiak (2):
+>    s390/vfio-ap: bypass unnecessary processing of AP resources
+>    s390/vfio-ap: fix unlinking of queues from the mdev
+>
+>   drivers/s390/crypto/vfio_ap_ops.c | 36 +++++++++++++++++++++++++++----
+>   1 file changed, 32 insertions(+), 4 deletions(-)
+>
