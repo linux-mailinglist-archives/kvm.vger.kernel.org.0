@@ -2,32 +2,32 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 7D0625A46A6
-	for <lists+kvm@lfdr.de>; Mon, 29 Aug 2022 12:00:24 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 716AE5A46A7
+	for <lists+kvm@lfdr.de>; Mon, 29 Aug 2022 12:00:40 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229895AbiH2KAX convert rfc822-to-8bit (ORCPT
-        <rfc822;lists+kvm@lfdr.de>); Mon, 29 Aug 2022 06:00:23 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46684 "EHLO
+        id S229463AbiH2KAi convert rfc822-to-8bit (ORCPT
+        <rfc822;lists+kvm@lfdr.de>); Mon, 29 Aug 2022 06:00:38 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48396 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229980AbiH2KAS (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 29 Aug 2022 06:00:18 -0400
-Received: from szxga03-in.huawei.com (szxga03-in.huawei.com [45.249.212.189])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 27212A185
-        for <kvm@vger.kernel.org>; Mon, 29 Aug 2022 03:00:12 -0700 (PDT)
-Received: from dggemv711-chm.china.huawei.com (unknown [172.30.72.57])
-        by szxga03-in.huawei.com (SkyGuard) with ESMTP id 4MGQqj2j1mzHnVS;
-        Mon, 29 Aug 2022 17:58:25 +0800 (CST)
-Received: from kwepemm600015.china.huawei.com (7.193.23.52) by
- dggemv711-chm.china.huawei.com (10.1.198.66) with Microsoft SMTP Server
+        with ESMTP id S229921AbiH2KAe (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 29 Aug 2022 06:00:34 -0400
+Received: from szxga02-in.huawei.com (szxga02-in.huawei.com [45.249.212.188])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 22F74A189
+        for <kvm@vger.kernel.org>; Mon, 29 Aug 2022 03:00:33 -0700 (PDT)
+Received: from dggemv703-chm.china.huawei.com (unknown [172.30.72.55])
+        by szxga02-in.huawei.com (SkyGuard) with ESMTP id 4MGQpF5rDyzlWW6;
+        Mon, 29 Aug 2022 17:57:09 +0800 (CST)
+Received: from kwepemm000013.china.huawei.com (7.193.23.81) by
+ dggemv703-chm.china.huawei.com (10.3.19.46) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2375.24; Mon, 29 Aug 2022 18:00:10 +0800
+ 15.1.2375.24; Mon, 29 Aug 2022 18:00:31 +0800
 Received: from lhrpeml500005.china.huawei.com (7.191.163.240) by
- kwepemm600015.china.huawei.com (7.193.23.52) with Microsoft SMTP Server
+ kwepemm000013.china.huawei.com (7.193.23.81) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2375.24; Mon, 29 Aug 2022 18:00:09 +0800
+ 15.1.2375.24; Mon, 29 Aug 2022 18:00:30 +0800
 Received: from lhrpeml500005.china.huawei.com ([7.191.163.240]) by
  lhrpeml500005.china.huawei.com ([7.191.163.240]) with mapi id 15.01.2375.024;
- Mon, 29 Aug 2022 11:00:07 +0100
+ Mon, 29 Aug 2022 11:00:28 +0100
 From:   Shameerali Kolothum Thodi <shameerali.kolothum.thodi@huawei.com>
 To:     Joao Martins <joao.m.martins@oracle.com>,
         "iommu@lists.linux-foundation.org" <iommu@lists.linux-foundation.org>
@@ -47,17 +47,18 @@ CC:     Joerg Roedel <joro@8bytes.org>,
         Yi Liu <yi.l.liu@intel.com>,
         Alex Williamson <alex.williamson@redhat.com>,
         "Cornelia Huck" <cohuck@redhat.com>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>
-Subject: RE: [PATCH RFC 15/19] iommu/arm-smmu-v3: Add
- set_dirty_tracking_range() support
-Thread-Topic: [PATCH RFC 15/19] iommu/arm-smmu-v3: Add
- set_dirty_tracking_range() support
-Thread-Index: AQHYW0SOJt+hrtPz+UGjCaMWTRJpLK3GS1vw
-Date:   Mon, 29 Aug 2022 10:00:07 +0000
-Message-ID: <0ec9388a1db441c79c8f38d2d2e8f1c2@huawei.com>
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        jiangkunkun <jiangkunkun@huawei.com>
+Subject: RE: [PATCH RFC 16/19] iommu/arm-smmu-v3: Enable HTTU for stage1 with
+ io-pgtable mapping
+Thread-Topic: [PATCH RFC 16/19] iommu/arm-smmu-v3: Enable HTTU for stage1 with
+ io-pgtable mapping
+Thread-Index: AQHYW0SR1twbeG3dsECjk3V3+BLoTK3GTk/w
+Date:   Mon, 29 Aug 2022 10:00:28 +0000
+Message-ID: <52ac76ef336b48f2b16aeb001cc9cbf5@huawei.com>
 References: <20220428210933.3583-1-joao.m.martins@oracle.com>
- <20220428210933.3583-16-joao.m.martins@oracle.com>
-In-Reply-To: <20220428210933.3583-16-joao.m.martins@oracle.com>
+ <20220428210933.3583-17-joao.m.martins@oracle.com>
+In-Reply-To: <20220428210933.3583-17-joao.m.martins@oracle.com>
 Accept-Language: en-GB, en-US
 Content-Language: en-US
 X-MS-Has-Attach: 
@@ -80,7 +81,7 @@ X-Mailing-List: kvm@vger.kernel.org
 
 > -----Original Message-----
 > From: Joao Martins [mailto:joao.m.martins@oracle.com]
-> Sent: 28 April 2022 22:09
+> Sent: 28 April 2022 22:10
 > To: iommu@lists.linux-foundation.org
 > Cc: Joao Martins <joao.m.martins@oracle.com>; Joerg Roedel
 > <joro@8bytes.org>; Suravee Suthikulpanit
@@ -93,161 +94,110 @@ X-Mailing-List: kvm@vger.kernel.org
 > Chen <nicolinc@nvidia.com>; Yishai Hadas <yishaih@nvidia.com>; Kevin Tian
 > <kevin.tian@intel.com>; Eric Auger <eric.auger@redhat.com>; Yi Liu
 > <yi.l.liu@intel.com>; Alex Williamson <alex.williamson@redhat.com>;
-> Cornelia Huck <cohuck@redhat.com>; kvm@vger.kernel.org
-> Subject: [PATCH RFC 15/19] iommu/arm-smmu-v3: Add
-> set_dirty_tracking_range() support
+> Cornelia Huck <cohuck@redhat.com>; kvm@vger.kernel.org; jiangkunkun
+> <jiangkunkun@huawei.com>
+> Subject: [PATCH RFC 16/19] iommu/arm-smmu-v3: Enable HTTU for stage1
+> with io-pgtable mapping
 > 
-> Similar to .read_and_clear_dirty() use the page table
-> walker helper functions and set DBM|RDONLY bit, thus
-> switching the IOPTE to writeable-clean.
+> From: Kunkun Jiang <jiangkunkun@huawei.com>
 > 
+> As nested mode is not upstreamed now, we just aim to support dirty log
+> tracking for stage1 with io-pgtable mapping (means not support SVA
+> mapping). If HTTU is supported, we enable HA/HD bits in the SMMU CD and
+> transfer ARM_HD quirk to io-pgtable.
+> 
+> We additionally filter out HD|HA if not supportted. The CD.HD bit is not
+> particularly useful unless we toggle the DBM bit in the PTE entries.
+> 
+> Co-developed-by: Keqian Zhu <zhukeqian1@huawei.com>
+> Signed-off-by: Keqian Zhu <zhukeqian1@huawei.com>
+> Signed-off-by: Kunkun Jiang <jiangkunkun@huawei.com> [joaomart:Convey
+> HD|HA bits over to the context descriptor  and update commit message]
 > Signed-off-by: Joao Martins <joao.m.martins@oracle.com>
 > ---
->  drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3.c | 29 ++++++++++++
->  drivers/iommu/io-pgtable-arm.c              | 52
-> +++++++++++++++++++++
->  2 files changed, 81 insertions(+)
+>  drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3.c | 11 +++++++++++
+> drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3.h |  3 +++
+>  include/linux/io-pgtable.h                  |  1 +
+>  3 files changed, 15 insertions(+)
 > 
 > diff --git a/drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3.c
 > b/drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3.c
-> index 232057d20197..1ca72fcca930 100644
+> index 1ca72fcca930..5f728f8f20a2 100644
 > --- a/drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3.c
 > +++ b/drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3.c
-> @@ -2769,6 +2769,34 @@ static int
-> arm_smmu_read_and_clear_dirty(struct iommu_domain *domain,
->  	return ret;
->  }
+> @@ -1077,10 +1077,18 @@ int arm_smmu_write_ctx_desc(struct
+> arm_smmu_domain *smmu_domain, int ssid,
+>  		 * this substream's traffic
+>  		 */
+>  	} else { /* (1) and (2) */
+> +		struct arm_smmu_device *smmu = smmu_domain->smmu;
+> +		u64 tcr = cd->tcr;
+> +
+>  		cdptr[1] = cpu_to_le64(cd->ttbr & CTXDESC_CD_1_TTB0_MASK);
+>  		cdptr[2] = 0;
+>  		cdptr[3] = cpu_to_le64(cd->mair);
 > 
-> +static int arm_smmu_set_dirty_tracking(struct iommu_domain *domain,
-> +				       unsigned long iova, size_t size,
-> +				       struct iommu_iotlb_gather *iotlb_gather,
-> +				       bool enabled)
-> +{
-> +	struct arm_smmu_domain *smmu_domain =
-> to_smmu_domain(domain);
-> +	struct io_pgtable_ops *ops = smmu_domain->pgtbl_ops;
-> +	struct arm_smmu_device *smmu = smmu_domain->smmu;
-> +	int ret;
+> +		if (!(smmu->features & ARM_SMMU_FEAT_HD))
+> +			tcr &= ~CTXDESC_CD_0_TCR_HD;
+> +		if (!(smmu->features & ARM_SMMU_FEAT_HA))
+> +			tcr &= ~CTXDESC_CD_0_TCR_HA;
 > +
-> +	if (!(smmu->features & ARM_SMMU_FEAT_HD) ||
-> +	    !(smmu->features & ARM_SMMU_FEAT_BBML2))
-> +		return -ENODEV;
-> +
-> +	if (smmu_domain->stage != ARM_SMMU_DOMAIN_S1)
-> +		return -EINVAL;
-> +
-> +	if (!ops || !ops->set_dirty_tracking) {
-> +		pr_err_once("io-pgtable don't support dirty tracking\n");
-> +		return -ENODEV;
-> +	}
-> +
-> +	ret = ops->set_dirty_tracking(ops, iova, size, enabled);
-> +	iommu_iotlb_gather_add_range(iotlb_gather, iova, size);
-> +
-> +	return ret;
-> +}
-> +
->  static int arm_smmu_of_xlate(struct device *dev, struct of_phandle_args
-> *args)
->  {
->  	return iommu_fwspec_add_ids(dev, args->args, 1);
-> @@ -2898,6 +2926,7 @@ static struct iommu_ops arm_smmu_ops = {
->  		.enable_nesting		= arm_smmu_enable_nesting,
->  		.free			= arm_smmu_domain_free,
->  		.read_and_clear_dirty	= arm_smmu_read_and_clear_dirty,
-> +		.set_dirty_tracking_range = arm_smmu_set_dirty_tracking,
->  	}
->  };
+>  		/*
+>  		 * STE is live, and the SMMU might read dwords of this CD in any
+>  		 * order. Ensure that it observes valid values before reading @@
+> -2100,6 +2108,7 @@ static int arm_smmu_domain_finalise_s1(struct
+> arm_smmu_domain *smmu_domain,
+>  			  FIELD_PREP(CTXDESC_CD_0_TCR_ORGN0, tcr->orgn) |
+>  			  FIELD_PREP(CTXDESC_CD_0_TCR_SH0, tcr->sh) |
+>  			  FIELD_PREP(CTXDESC_CD_0_TCR_IPS, tcr->ips) |
+> +			  CTXDESC_CD_0_TCR_HA | CTXDESC_CD_0_TCR_HD |
+>  			  CTXDESC_CD_0_TCR_EPD1 | CTXDESC_CD_0_AA64;
+>  	cfg->cd.mair	= pgtbl_cfg->arm_lpae_s1_cfg.mair;
 > 
-> diff --git a/drivers/iommu/io-pgtable-arm.c
-> b/drivers/iommu/io-pgtable-arm.c
-> index 3c99028d315a..361410aa836c 100644
-> --- a/drivers/iommu/io-pgtable-arm.c
-> +++ b/drivers/iommu/io-pgtable-arm.c
-> @@ -76,6 +76,7 @@
->  #define ARM_LPAE_PTE_NSTABLE		(((arm_lpae_iopte)1) << 63)
->  #define ARM_LPAE_PTE_XN			(((arm_lpae_iopte)3) << 53)
->  #define ARM_LPAE_PTE_DBM		(((arm_lpae_iopte)1) << 51)
-> +#define ARM_LPAE_PTE_DBM_BIT		51
->  #define ARM_LPAE_PTE_AF			(((arm_lpae_iopte)1) << 10)
->  #define ARM_LPAE_PTE_SH_NS		(((arm_lpae_iopte)0) << 8)
->  #define ARM_LPAE_PTE_SH_OS		(((arm_lpae_iopte)2) << 8)
-> @@ -836,6 +837,56 @@ static int arm_lpae_read_and_clear_dirty(struct
-> io_pgtable_ops *ops,
->  				     __arm_lpae_read_and_clear_dirty, dirty);
->  }
+> @@ -2203,6 +2212,8 @@ static int arm_smmu_domain_finalise(struct
+> iommu_domain *domain,
+>  		.iommu_dev	= smmu->dev,
+>  	};
 > 
-> +static int __arm_lpae_set_dirty_modifier(unsigned long iova, size_t size,
-> +					 arm_lpae_iopte *ptep, void *opaque)
-> +{
-> +	bool enabled = *((bool *) opaque);
-> +	arm_lpae_iopte pte;
-> +
-> +	pte = READ_ONCE(*ptep);
-> +	if (WARN_ON(!pte))
-> +		return -EINVAL;
-> +
-> +	if ((pte & ARM_LPAE_PTE_AP_WRITABLE) ==
-> ARM_LPAE_PTE_AP_RDONLY)
-> +		return -EINVAL;
-> +
-> +	if (!(enabled ^ !(pte & ARM_LPAE_PTE_DBM)))
-> +		return 0;
+> +	if (smmu->features & ARM_SMMU_FEAT_HD)
+> +		pgtbl_cfg.quirks |= IO_PGTABLE_QUIRK_ARM_HD;
 
-Does the above needs to be double negative?
-
-if (!(enabled ^ !!(pte & ARM_LPAE_PTE_DBM)))
+Setting these quirk bits requires updating the check in arm_64_lpae_alloc_pgtable_s1()
+in drivers/iommu/io-pgtable-arm.c
 
 Thanks,
 Shameer
 
-> +
-> +	pte = enabled ? pte | (ARM_LPAE_PTE_DBM |
-> ARM_LPAE_PTE_AP_RDONLY) :
-> +		pte & ~(ARM_LPAE_PTE_DBM | ARM_LPAE_PTE_AP_RDONLY);
-> +
-> +	WRITE_ONCE(*ptep, pte);
-> +	return 0;
-> +}
-> +
-> +
-> +static int arm_lpae_set_dirty_tracking(struct io_pgtable_ops *ops,
-> +				       unsigned long iova, size_t size,
-> +				       bool enabled)
-> +{
-> +	struct arm_lpae_io_pgtable *data = io_pgtable_ops_to_data(ops);
-> +	struct io_pgtable_cfg *cfg = &data->iop.cfg;
-> +	arm_lpae_iopte *ptep = data->pgd;
-> +	int lvl = data->start_level;
-> +	long iaext = (s64)iova >> cfg->ias;
-> +
-> +	if (WARN_ON(!size || (size & cfg->pgsize_bitmap) != size))
-> +		return -EINVAL;
-> +
-> +	if (cfg->quirks & IO_PGTABLE_QUIRK_ARM_TTBR1)
-> +		iaext = ~iaext;
-> +	if (WARN_ON(iaext))
-> +		return -EINVAL;
-> +
-> +	if (data->iop.fmt != ARM_64_LPAE_S1 &&
-> +	    data->iop.fmt != ARM_32_LPAE_S1)
-> +		return -EINVAL;
-> +
-> +	return __arm_lpae_iopte_walk(data, iova, size, lvl, ptep,
-> +				     __arm_lpae_set_dirty_modifier, &enabled);
-> +}
-> +
->  static void arm_lpae_restrict_pgsizes(struct io_pgtable_cfg *cfg)
->  {
->  	unsigned long granule, page_sizes;
-> @@ -917,6 +968,7 @@ arm_lpae_alloc_pgtable(struct io_pgtable_cfg *cfg)
->  		.unmap_pages	= arm_lpae_unmap_pages,
->  		.iova_to_phys	= arm_lpae_iova_to_phys,
->  		.read_and_clear_dirty = arm_lpae_read_and_clear_dirty,
-> +		.set_dirty_tracking   = arm_lpae_set_dirty_tracking,
->  	};
+>  	if (smmu->features & ARM_SMMU_FEAT_BBML1)
+>  		pgtbl_cfg.quirks |= IO_PGTABLE_QUIRK_ARM_BBML1;
+>  	else if (smmu->features & ARM_SMMU_FEAT_BBML2) diff --git
+> a/drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3.h
+> b/drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3.h
+> index e15750be1d95..ff32242f2fdb 100644
+> --- a/drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3.h
+> +++ b/drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3.h
+> @@ -292,6 +292,9 @@
+>  #define CTXDESC_CD_0_TCR_IPS		GENMASK_ULL(34, 32)
+>  #define CTXDESC_CD_0_TCR_TBI0		(1ULL << 38)
 > 
->  	return data;
+> +#define CTXDESC_CD_0_TCR_HA            (1UL << 43)
+> +#define CTXDESC_CD_0_TCR_HD            (1UL << 42)
+> +
+>  #define CTXDESC_CD_0_AA64		(1UL << 41)
+>  #define CTXDESC_CD_0_S			(1UL << 44)
+>  #define CTXDESC_CD_0_R			(1UL << 45)
+> diff --git a/include/linux/io-pgtable.h b/include/linux/io-pgtable.h index
+> d7626ca67dbf..a11902ae9cf1 100644
+> --- a/include/linux/io-pgtable.h
+> +++ b/include/linux/io-pgtable.h
+> @@ -87,6 +87,7 @@ struct io_pgtable_cfg {
+>  	#define IO_PGTABLE_QUIRK_ARM_OUTER_WBWA	BIT(6)
+>  	#define IO_PGTABLE_QUIRK_ARM_BBML1      BIT(7)
+>  	#define IO_PGTABLE_QUIRK_ARM_BBML2      BIT(8)
+> +	#define IO_PGTABLE_QUIRK_ARM_HD         BIT(9)
+> 
+>  	unsigned long			quirks;
+>  	unsigned long			pgsize_bitmap;
 > --
 > 2.17.2
 
