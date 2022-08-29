@@ -2,367 +2,337 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 70A3A5A52FE
-	for <lists+kvm@lfdr.de>; Mon, 29 Aug 2022 19:21:14 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id EF1395A5317
+	for <lists+kvm@lfdr.de>; Mon, 29 Aug 2022 19:25:24 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231428AbiH2RVM (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 29 Aug 2022 13:21:12 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42446 "EHLO
+        id S229965AbiH2RZX (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 29 Aug 2022 13:25:23 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48118 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229598AbiH2RVL (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 29 Aug 2022 13:21:11 -0400
-Received: from mail-pg1-x534.google.com (mail-pg1-x534.google.com [IPv6:2607:f8b0:4864:20::534])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6BF496EF3F
-        for <kvm@vger.kernel.org>; Mon, 29 Aug 2022 10:21:05 -0700 (PDT)
-Received: by mail-pg1-x534.google.com with SMTP id 69so6631385pgb.13
-        for <kvm@vger.kernel.org>; Mon, 29 Aug 2022 10:21:05 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc;
-        bh=N8v9XiNinBwgapG6G2g4Lw1ZeaB/KtBqvxLAMxYhJZ0=;
-        b=NfRnBVW89tj7Au3HywW16OEWiHNb4GaSjmEwi+NAYqoi4cwMah/XZ+pxiE6BS8poL0
-         UdYe4SvnI/d5a6fn/U641J7UGrFUDWekiE8WvIqGr3l7yoGjhl7gm72dVy6sdoRFh94q
-         f4HkXyu6iAPgnszZSoF+rlGzgjNO9e1M+Ibx53ObMMOboc3gEbUNQgvsg3JHyXuPgZyn
-         zJMFCtgsQcBDAxXnjn8bhI7UZnooOFoaMWgwsZ0IWOUTSEnRV2f6OFgerv4vtIFcn7L2
-         81VRdZ6M5MiDiQm6AgkLwtFaUIGoHu0cB47KIiWYfnZX4bDFK36L82NehZYsgO/aOq/M
-         YA8g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc;
-        bh=N8v9XiNinBwgapG6G2g4Lw1ZeaB/KtBqvxLAMxYhJZ0=;
-        b=KuD9qHA8r3Y71hyipWcLBO1+GsUZIbBju2mPNq8ghYQS7nNOgH/Ck36LY+uleIqOPx
-         ivG2d7MH3kyJ8dq9ND0Wh65XAFrXG93zsMCyTkId41COiWdJOUWuETvlT38eR7bmZ7hy
-         F0ejUx4jQNSoFNTJ9soqVkgtXJLgXcoqTEWtLdybWxFpsX4zPU/7VGRXTIjDhXd5xXI1
-         b36jYyqWVXZXcu0X7c24eG5St9/dokw1W14E/dbEUrcxYjvBHwkxOxFU3xStAfC34Lpv
-         mDYQi29zZMppPqPodnn8KyjmQGXFJGuIf3l3rri6kVMKhk5naMTbvfFGDCRMggRcNBdI
-         bekw==
-X-Gm-Message-State: ACgBeo2MQhTjrONuSmpgT5vF4UMykqGp8/xSjZKHg5rNyaBAJeLzEkKx
-        zLG5k/F6Kn3LPnSfjyEQMIEchg==
-X-Google-Smtp-Source: AA6agR7JVkZEqiHBQMT3/HK53IbqnS0HPUadhw2Pc+wlqYBU/5llkrjsnpQV1BRpTuK0X2jptbEaPQ==
-X-Received: by 2002:a05:6a00:21c2:b0:52b:ff44:6680 with SMTP id t2-20020a056a0021c200b0052bff446680mr17655948pfj.57.1661793664751;
-        Mon, 29 Aug 2022 10:21:04 -0700 (PDT)
-Received: from google.com (7.104.168.34.bc.googleusercontent.com. [34.168.104.7])
-        by smtp.gmail.com with ESMTPSA id b4-20020a170902d50400b00175111a277dsm136685plg.185.2022.08.29.10.21.04
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 29 Aug 2022 10:21:04 -0700 (PDT)
-Date:   Mon, 29 Aug 2022 17:21:00 +0000
-From:   Sean Christopherson <seanjc@google.com>
-To:     Mingwei Zhang <mizhang@google.com>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org, Maxim Levitsky <mlevitsk@redhat.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Oliver Upton <oupton@google.com>,
-        Jim Mattson <jmattson@google.com>
-Subject: Re: [PATCH v2 4/4] KVM: selftests: Test if posted interrupt delivery
- race with migration
-Message-ID: <Ywz1fJlkuhY/vMEU@google.com>
-References: <20220828222544.1964917-1-mizhang@google.com>
- <20220828222544.1964917-5-mizhang@google.com>
+        with ESMTP id S229487AbiH2RZU (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 29 Aug 2022 13:25:20 -0400
+Received: from out2.migadu.com (out2.migadu.com [IPv6:2001:41d0:2:aacc::])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C3CB61FCD0
+        for <kvm@vger.kernel.org>; Mon, 29 Aug 2022 10:25:17 -0700 (PDT)
+Date:   Mon, 29 Aug 2022 19:25:08 +0200
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+        t=1661793916;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=SY3qaOTb2VJb+wLuf/E+vyY5qSaIIyhVKf+yCSPeXAI=;
+        b=rSOBzKUgQDoEc8aNdwhRmKFlA1doBbu+4jtJjCD8BJEGRKzeay1ijiek4S6cV+YNHE9AhJ
+        ewI51PQ9ZH65CX78gTRu7EmULuFq8fCghb+k7yA8q1+p1o9JZQeY1FxJ8Jj4kf/h7GJSIr
+        ekQ5fAwlzRf2Flt6y1BbNgoqZUF/+kU=
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From:   Andrew Jones <andrew.jones@linux.dev>
+To:     Ricardo Koller <ricarkol@google.com>
+Cc:     kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu,
+        pbonzini@redhat.com, maz@kernel.org, seanjc@google.com,
+        alexandru.elisei@arm.com, eric.auger@redhat.com, oupton@google.com,
+        reijiw@google.com, rananta@google.com, bgardon@google.com,
+        dmatclack@google.com, axelrasmussen@google.com
+Subject: Re: [PATCH v5 07/13] KVM: selftests: Change ____vm_create() to take
+ struct kvm_vm_mem_params
+Message-ID: <20220829172508.oc3rr44q2irwudi5@kamzik>
+References: <20220823234727.621535-1-ricarkol@google.com>
+ <20220823234727.621535-8-ricarkol@google.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20220828222544.1964917-5-mizhang@google.com>
-X-Spam-Status: No, score=-14.9 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        ENV_AND_HDR_SPF_MATCH,FSL_HELO_FAKE,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,
-        SPF_PASS,T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL
-        autolearn=no autolearn_force=no version=3.4.6
+In-Reply-To: <20220823234727.621535-8-ricarkol@google.com>
+X-Migadu-Flow: FLOW_OUT
+X-Migadu-Auth-User: linux.dev
+X-Spam-Status: No, score=-2.8 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,SPF_HELO_PASS,
+        SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no
+        version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Sun, Aug 28, 2022, Mingwei Zhang wrote:
-> From: Jim Mattson <jmattson@google.com>
+On Tue, Aug 23, 2022 at 11:47:21PM +0000, Ricardo Koller wrote:
+> The vm_create() helpers are hardcoded to place most page types (code,
+> page-tables, stacks, etc) in the same memslot #0, and always backed with
+> anonymous 4K.  There are a couple of issues with that.  First, tests willing to
+> differ a bit, like placing page-tables in a different backing source type must
+> replicate much of what's already done by the vm_create() functions.  Second,
+> the hardcoded assumption of memslot #0 holding most things is spreaded
+> everywhere; this makes it very hard to change.
 > 
-> Test if posted interrupt delivery race with migration. Add a selftest
-> to demonstrate a race condition between migration and posted
-> interrupt for a nested VM. The consequence of this race condition causes
-> the loss of a posted interrupt for a nested vCPU after migration and
-> triggers a warning for unpatched kernel.
+> Fix the above issues by having selftests specify how they want memory to be
+> laid out: define the memory regions to use for code, pt (page-tables), and
+> data. Introduce a new structure, struct kvm_vm_mem_params, that defines: guest
+> mode, a list of memory region descriptions, and some fields specifying what
+> regions to use for code, pt, and data.
 > 
-> The selftest demonstrates that if a L2 vCPU is in halted state before
-> migration, then after migration, it is not able to receive a posted
-> interrupt from another vCPU within the same VM.
-
-For tests, try to phrase the changelog in terms of what architectural behavior is
-being tested, as opposed to stating what exact KVM bug is being targeted.  It's
-definitely helpful to call out the KVM bug, but do that _after_ explaining the
-test itself.  The problem with talking about a specific KVM bug is that 
-
-IIUC, this can be:
-
-  Add a test to verify that a posted interrupt wakes the target vCPU from
-  a halted state if the VM is migrated while the vCPU is halted.
-
-and then something like this to call out the known KVM bug
-
-  This test exposes a bug where KVM checks the vAPIC page before loading
-  nested pages when the vCPU is blocking.
-
-> The fundamental problem is deeply buried in the kernel logic where
-> vcpu_block() will directly check vmcs12 related mappings before having a
-> valid vmcs12 ready.  Because of that, it fails to process the posted
-> interrupt and triggers the warning in vmx_guest_apic_has_interrupt()
+> There is no functional change intended. The current commit adds a default
+> struct kvm_vm_mem_params that lays out memory exactly as before. The next
+> commit will change the allocators to get the region they should be using,
+> e.g.,: like the page table allocators using the pt memslot.
 > 
-> static bool vmx_guest_apic_has_interrupt(struct kvm_vcpu *vcpu)
-> {
-> 	...
-> 	if (WARN_ON_ONCE(!is_guest_mode(vcpu)) ||
-> 		!nested_cpu_has_vid(get_vmcs12(vcpu)) ||
-> 		WARN_ON_ONCE(!vmx->nested.virtual_apic_map.gfn)) <= HERE
-> 		return false;
-> 	...
-> }
-> +static void vcpu0_ipi_handler(struct ex_regs *regs)
-
-This needs to clarify that it's an L2 handler, that info is _extremely_ important
-to understanding this sequence.  And even if that info were superfluous, it's still
-a good habit to use consistent namespacing.
-
-> +{
-> +	 asm volatile("inb %%dx, %%al"
-> +		      : : [port] "d" (PORT_L0_EXIT) : "rax");
-
-Can't this use GUEST_SYNC()?
-
-> +	asm volatile("vmcall");
-
-A comment would be helpful, but not as necessary if this is vcpu0_l2_ipi_handler().
-
-> +}
+> Cc: Sean Christopherson <seanjc@google.com>
+> Cc: Andrew Jones <andrew.jones@linux.dev>
+> Signed-off-by: Ricardo Koller <ricarkol@google.com>
+> ---
+>  .../selftests/kvm/include/kvm_util_base.h     | 61 ++++++++++++++++-
+>  .../selftests/kvm/lib/aarch64/processor.c     |  3 +-
+>  tools/testing/selftests/kvm/lib/kvm_util.c    | 65 +++++++++++++++++--
+>  3 files changed, 119 insertions(+), 10 deletions(-)
+> 
+> diff --git a/tools/testing/selftests/kvm/include/kvm_util_base.h b/tools/testing/selftests/kvm/include/kvm_util_base.h
+> index b2dbe253d4d0..abe6c4e390ff 100644
+> --- a/tools/testing/selftests/kvm/include/kvm_util_base.h
+> +++ b/tools/testing/selftests/kvm/include/kvm_util_base.h
+> @@ -93,6 +93,16 @@ struct kvm_vm {
+>  	int stats_fd;
+>  	struct kvm_stats_header stats_header;
+>  	struct kvm_stats_desc *stats_desc;
 > +
-> +static void l2_vcpu0_guest_code(void)
-
-I have a slight preference for
-
-	vcpu0_l2_ipi_handler()
-	vcpu0_l2_guest_code()
-
-	vcpu1_l1_guest_code()
-
-because the "vcpu0 vs. vcpu1" is the broader scope, and then "l1 vs. l2" further
-clarifies the exact scope of the function.
-
-> +{
-> +	asm volatile("cli");
-> +	asm volatile("sti; nop; hlt");
-
-What is this code trying to do?  Assuming the intent is to ensure the posted IRQ
-arrives after "hlt", this needs to be:
-
-	GUEST_ASSERT(!irqs_enabled());
-	asm volatile("sti; hlt");
-
-because if interrupts are enabled when l2_vcpu0_guest_code() starts running, then
-the IRQ can arrive before CLI.  And the "nop" needs to go because the nop will
-consume the STI shadow, i.e. the IRQ can arrive before the "hlt".  irqs_enabled()
-needs to be defined, but it's fairly straightfoward; something like this:
-
-static __always_inline bool irqs_enabled(void)
-{
-	unsigned long flags;
-
-	asm volatile("pushf ; pop %0"
-		     : "=rm" (flags)
-		     :
-		     : "memory");
-
-	return flags & X86_EFLAGS_IF;
-}
-
-If my assuming is wrong, then this needs a very verbose comment.
-
-> +static void post_intr(u8 vector, void *pi_desc)
-> +{
-> +       set_bit(vector, pi_desc);
-> +       set_bit(PI_ON_BIT, pi_desc);
-> +}
-> +
-> +static void l1_vcpu1_guest_code(void *vcpu0_pi_desc)
-> +{
-> +       post_intr(L2_INTR, vcpu0_pi_desc);
-
-Open code post_intr() here.  I would expect a "post_intr()" helper to actually do
-the notification.  Separating the two things confused me.
-
-> +       x2apic_enable();
-
-Why take a dependency on x2APIC?  Either way, enable x2APIC, then post the
-interrupt.  Again, it's weird splitting "set info in PI descriptor" from the
-notification.
-
-> +       x2apic_write_reg(APIC_ICR, ((u64)VCPU_ID0 << 32) |
-> +                        APIC_DEST_PHYSICAL | APIC_DM_FIXED | PI_NV);
-> +       GUEST_DONE();
-> +}
-
-...
-
-> +void *create_and_run_vcpu1(void *arg)
-> +{
-> +	struct ucall uc;
-> +	struct kvm_run *run;
-> +	struct kvm_mp_state vcpu0_mp_state;
-> +
-> +	pthread_cpu1 = pthread_self();
-> +
-> +	/* Keep trying to kick out vcpu0 until it is in halted state. */
-> +	for (;;) {
-> +		WRITE_ONCE(vcpu0_can_run, true);
-> +		sleep(1);
-> +		WRITE_ONCE(vcpu0_can_run, false);
-> +		pthread_kill(pthread_cpu0, SIGUSR1);
-> +		printf("vcpu1: Sent SIGUSR1 to vcpu0\n");
-
-Use pr_debug(), this has the potential to spam the console.  And then probably use
-pr_info() for the other printfs so that they can be turned off via QUIET.
-
-> +
-> +		while (READ_ONCE(vcpu0_running))
-> +			;
-
-vcpu0_running is unnecessary.  KVM needs to acquire vcpu->mutex to do KVM_GET_MP_STATE,
-i.e. vcpu_mp_state_get() will block until KVM_RUN completes.  Nothing guarantees
-vcpu0_running will be set from main() before this gets to the while-loop, so
-vcpu_mp_state_get() racing with KVM_RUN is already possible.
-
-> +
-> +		vcpu_mp_state_get(vcpu0, &vcpu0_mp_state);
-> +		if (vcpu0_mp_state.mp_state == KVM_MP_STATE_HALTED)
-> +			break;
-> +	}
-> +
-> +	printf("vcpu1: Kicked out vcpu0 and ensure vcpu0 is halted\n");
-> +
-> +	/* Use save_restore_vm() to simulate a VM migration. */
-> +	save_restore_vm(vm);
-> +
-> +	printf("vcpu1: Finished save and restore vm.\n");
-
-Uber nit, be consistent on whether or not the test uses punctionation.
-
-> +	vcpu1 = vm_vcpu_add(vm, VCPU_ID1, l1_vcpu1_guest_code);
-> +	vcpu_args_set(vcpu1, 1, vmx->posted_intr_desc);
-> +
-> +	/* Start an L1 in vcpu1 and send a posted interrupt to halted L2 in vcpu0. */
-> +	for (;;) {
-> +		run = vcpu1->run;
-> +		vcpu_run(vcpu1);
-> +
-> +		TEST_ASSERT(run->exit_reason == KVM_EXIT_IO,
-> +			    "vcpu1: Got exit_reason other than KVM_EXIT_IO: %u (%s)\n",
-> +			    run->exit_reason,
-> +			    exit_reason_str(run->exit_reason));
-> +
-> +		switch (get_ucall(vcpu1, &uc)) {
-> +		case UCALL_ABORT:
-> +			TEST_FAIL("%s", (const char *)uc.args[0]);
-> +			/* NOT REACHED */
-
-			REPORT_GUEST_ASSERT(...)
-
-> +		case UCALL_DONE:
-> +			printf("vcpu1: Successfully send a posted interrupt to vcpu0\n");
-> +			goto done;
-> +		default:
-> +			TEST_FAIL("vcpu1: Unknown ucall %lu", uc.cmd);
-> +		}
-> +	}
-> +
-> +done:
 > +	/*
-> +	 * Allow vcpu0 resume execution from L0 userspace and check if the
-> +	 * posted interrupt get executed.
+> +	 * KVM region slots. These are the default memslots used by page
+> +	 * allocators, e.g., lib/elf uses the code memslot.
 > +	 */
-> +	WRITE_ONCE(vcpu0_can_run, true);
-> +	sleep(1);
-
-What guarantees that sleep(1) is sufficient for vCPU to get back into the guest?
-This might be a good candidate for a sempahore?
-
-> +	TEST_ASSERT(READ_ONCE(pi_executed),
-> +		    "vcpu0 did not execute the posted interrupt.\n");
+> +	struct {
+> +		uint32_t code;
+> +		uint32_t pt;
+> +		uint32_t data;
+> +	} memslot;
+>  };
+>  
+>  
+> @@ -105,6 +115,21 @@ struct kvm_vm {
+>  struct userspace_mem_region *
+>  memslot2region(struct kvm_vm *vm, uint32_t memslot);
+>  
+> +inline struct userspace_mem_region *vm_get_code_region(struct kvm_vm *vm)
+> +{
+> +	return memslot2region(vm, vm->memslot.code);
+> +}
 > +
-> +	return NULL;
+> +inline struct userspace_mem_region *vm_get_pt_region(struct kvm_vm *vm)
+> +{
+> +	return memslot2region(vm, vm->memslot.pt);
+> +}
+> +
+> +inline struct userspace_mem_region *vm_get_data_region(struct kvm_vm *vm)
+> +{
+> +	return memslot2region(vm, vm->memslot.data);
 > +}
 
-...
+I feel we'll be revisiting this frequently when more and more region types
+are desired. For example, Sean wants a read-only memory region for ucall
+exits. How about putting a mem slot array in struct kvm_vm, defining an
+enum to index it (which will expand), and then single helper function,
+something like
 
-> +       TEST_REQUIRE(kvm_has_cap(KVM_CAP_NESTED_STATE));
-> +       TEST_REQUIRE(kvm_cpu_has(X86_FEATURE_VMX));
-
-This also requires APICv / posted interrupts, and x2APIC if that hardcoded behavior
-is kept.
-
-> +	for (;;) {
-> +		struct kvm_run *run = vcpu0->run;
-> +		struct ucall uc;
-> +		int rc;
-> +
-> +		while (!READ_ONCE(vcpu0_can_run))
-> +			;
-> +
-> +		WRITE_ONCE(vcpu0_running, true);
-> +
-> +		rc = __vcpu_run(vcpu0);
-> +
-> +		vcpu0->run->immediate_exit = 0;
-
-Why?  vcpu_run_complete_io() is the only thing that sets immediate_exit, and it
-clears the flag after doing __vcpu_run().
+ inline struct userspace_mem_region *
+ vm_get_mem_region(struct kvm_vm *vm, enum memslot_type mst)
+ {
+    return memslot2region(vm, vm->memslots[mst]);
+ }
 
 > +
+>  /* Minimum allocated guest virtual and physical addresses */
+>  #define KVM_UTIL_MIN_VADDR		0x2000
+>  #define KVM_GUEST_PAGE_TABLE_MIN_PADDR	0x180000
+> @@ -637,19 +662,51 @@ vm_paddr_t vm_phy_pages_alloc(struct kvm_vm *vm, size_t num,
+>  			      vm_paddr_t paddr_min, uint32_t memslot);
+>  vm_paddr_t vm_alloc_page_table(struct kvm_vm *vm);
+>  
+> +#define MEM_PARAMS_MAX_MEMSLOTS 3
+
+And this becomes MEMSLOT_MAX of the enum proposed above
+
+ enum memslot_type {
+     MEMSLOT_CODE,
+     MEMSLOT_PT,
+     MEMSLOT_DATA,
+     MEMSLOT_MAX,
+ };
+
+> +
+> +struct kvm_vm_mem_params {
+> +	enum vm_guest_mode mode;
+> +
+> +	struct {
+> +		enum vm_mem_backing_src_type src_type;
+> +		uint64_t guest_paddr;
 > +		/*
-> +		 * When vCPU is kicked out by a signal, ensure a consistent vCPU
-> +		 * state to prepare for migration before setting the
-> +		 * vcpu_running flag to false.
+> +		 * KVM region slot (same meaning as in struct
+> +		 * kvm_userspace_memory_region).
 > +		 */
-> +		if (rc == -1 && run->exit_reason == KVM_EXIT_INTR) {
-> +			vcpu_run_complete_io(vcpu0);
+> +		uint32_t slot;
+> +		uint64_t npages;
+> +		uint32_t flags;
+> +		bool enabled;
+> +	} region[MEM_PARAMS_MAX_MEMSLOTS];
 > +
-> +			WRITE_ONCE(vcpu0_running, false);
+> +	/* Indexes into the above array. */
+> +	struct {
+> +		uint16_t code;
+> +		uint16_t pt;
+> +		uint16_t data;
+> +	} region_idx;
+
+And this changes to another array of memslots also indexed with
+enum memslot_type.
+
+> +};
 > +
+> +extern struct kvm_vm_mem_params kvm_vm_mem_default;
+> +
+>  /*
+>   * ____vm_create() does KVM_CREATE_VM and little else.  __vm_create() also
+>   * loads the test binary into guest memory and creates an IRQ chip (x86 only).
+>   * __vm_create() does NOT create vCPUs, @nr_runnable_vcpus is used purely to
+>   * calculate the amount of memory needed for per-vCPU data, e.g. stacks.
+>   */
+> -struct kvm_vm *____vm_create(enum vm_guest_mode mode, uint64_t nr_pages);
+> +struct kvm_vm *____vm_create(struct kvm_vm_mem_params *mem_params);
+>  struct kvm_vm *__vm_create(enum vm_guest_mode mode, uint32_t nr_runnable_vcpus,
+>  			   uint64_t nr_extra_pages);
+>  
+>  static inline struct kvm_vm *vm_create_barebones(void)
+>  {
+> -	return ____vm_create(VM_MODE_DEFAULT, 0);
+> +	struct kvm_vm_mem_params params_wo_memslots = {
+> +		.mode = kvm_vm_mem_default.mode,
+> +	};
+> +
+> +	return ____vm_create(&params_wo_memslots);
+>  }
+>  
+>  static inline struct kvm_vm *vm_create(uint32_t nr_runnable_vcpus)
+> diff --git a/tools/testing/selftests/kvm/lib/aarch64/processor.c b/tools/testing/selftests/kvm/lib/aarch64/processor.c
+> index 26f0eccff6fe..5a31dc85d054 100644
+> --- a/tools/testing/selftests/kvm/lib/aarch64/processor.c
+> +++ b/tools/testing/selftests/kvm/lib/aarch64/processor.c
+> @@ -508,7 +508,8 @@ void aarch64_get_supported_page_sizes(uint32_t ipa,
+>   */
+>  void __attribute__((constructor)) init_guest_modes(void)
+>  {
+> -       guest_modes_append_default();
+> +	guest_modes_append_default();
+> +	kvm_vm_mem_default.mode = VM_MODE_DEFAULT;
+>  }
+>  
+>  void smccc_hvc(uint32_t function_id, uint64_t arg0, uint64_t arg1,
+> diff --git a/tools/testing/selftests/kvm/lib/kvm_util.c b/tools/testing/selftests/kvm/lib/kvm_util.c
+> index 5a9f080ff888..91b42d6b726b 100644
+> --- a/tools/testing/selftests/kvm/lib/kvm_util.c
+> +++ b/tools/testing/selftests/kvm/lib/kvm_util.c
+> @@ -143,12 +143,41 @@ const struct vm_guest_mode_params vm_guest_mode_params[] = {
+>  _Static_assert(sizeof(vm_guest_mode_params)/sizeof(struct vm_guest_mode_params) == NUM_VM_MODES,
+>  	       "Missing new mode params?");
+>  
+> -struct kvm_vm *____vm_create(enum vm_guest_mode mode, uint64_t nr_pages)
+> +/* A single memslot #0 for code, data, and page tables. */
+> +struct kvm_vm_mem_params kvm_vm_mem_default = {
+> +#if defined(__aarch64__)
+> +	/* arm64 is the only arch without a true default mode. */
+> +	.mode = NUM_VM_MODES,
+
+How about
+
+ #ifndef __arch64__
+   /* arm64 kvm_vm_mem_default.mode set in init_guest_modes() */
+   .mode = VM_MODE_DEFAULT,
+ #endif
+
+> +#else
+> +	.mode = VM_MODE_DEFAULT,
+> +#endif
+> +	.region[0] = {
+> +		.src_type = VM_MEM_SRC_ANONYMOUS,
+> +		.guest_paddr = 0,
+> +		.slot = 0,
+> +		/*
+> +		 * 4mb when page size is 4kb. Note that vm_nr_pages_required(),
+> +		 * the function used by most tests to calculate guest memory
+> +		 * requirements uses around ~520 pages for more tests.
+
+...requirements, currently returns ~520 pages for the majority of tests.
+
+> +		 */
+> +		.npages = 1024,
+
+And here we double it, but it's still fragile. I see we override this
+in __vm_create() below though, so now I wonder why we set it at all.
+
+> +		.flags = 0,
+> +		.enabled = true,
+> +	},
+> +	.region_idx = {
+> +		.code = 0,
+> +		.pt = 0,
+> +		.data = 0,
+> +	},
+> +};
+> +
+> +struct kvm_vm *____vm_create(struct kvm_vm_mem_params *mem_params)
+>  {
+> +	enum vm_guest_mode mode = mem_params->mode;
+>  	struct kvm_vm *vm;
+> +	int idx;
+>  
+> -	pr_debug("%s: mode='%s' pages='%ld'\n", __func__,
+> -		 vm_guest_mode_string(mode), nr_pages);
+> +	pr_debug("%s: mode='%s'\n", __func__, vm_guest_mode_string(mode));
+>  
+>  	vm = calloc(1, sizeof(*vm));
+>  	TEST_ASSERT(vm != NULL, "Insufficient Memory");
+> @@ -245,9 +274,28 @@ struct kvm_vm *____vm_create(enum vm_guest_mode mode, uint64_t nr_pages)
+>  
+>  	/* Allocate and setup memory for guest. */
+>  	vm->vpages_mapped = sparsebit_alloc();
+> -	if (nr_pages != 0)
+> -		vm_userspace_mem_region_add(vm, VM_MEM_SRC_ANONYMOUS,
+> -					    0, 0, nr_pages, 0);
+> +
+> +	/* Setup the code, pt, and data memslots according to the spec */
+> +	for (idx = 0; idx < MEM_PARAMS_MAX_MEMSLOTS; idx++) {
+> +		if (!mem_params->region[idx].enabled)
 > +			continue;
-> +		}
 > +
-> +		WRITE_ONCE(vcpu0_running, false);
-> +
-> +		if (run->io.port == PORT_L0_EXIT) {
-
-One of the motivations for using GUEST_SYNC() instead of PORT_L0_EXIT is that
-this test could (very theoretically) get a false pass if GUEST_DONE() is reached
-before PORT_L0_EXIT is encountered.
-
-> +			printf("vcpu0: Executed the posted interrupt\n");
-> +			WRITE_ONCE(pi_executed, true);
-> +			continue;
-> +		}
-> +
-> +		switch (get_ucall(vcpu0, &uc)) {
-> +		case UCALL_ABORT:
-> +			TEST_FAIL("%s", (const char *)uc.args[0]);
-
-			REPORT_GUEST_ASSERT(...)
-
-> +			/* NOT REACHED */
-> +		case UCALL_DONE:
-> +			goto done;
-
-Just break?
-
-> +		default:
-> +			TEST_FAIL("vcpu0: Unknown ucall %lu", uc.cmd);
-> +		}
+> +		vm_userspace_mem_region_add(vm,
+> +			mem_params->region[idx].src_type,
+> +			mem_params->region[idx].guest_paddr,
+> +			mem_params->region[idx].slot,
+> +			mem_params->region[idx].npages,
+> +			mem_params->region[idx].flags);
 > +	}
 > +
-> +done:
-> +	kvm_vm_free(vm);
-> +	return 0;
-> +}
+> +	TEST_ASSERT(mem_params->region_idx.code < MEM_PARAMS_MAX_MEMSLOTS &&
+> +		    mem_params->region_idx.pt < MEM_PARAMS_MAX_MEMSLOTS &&
+> +		    mem_params->region_idx.data < MEM_PARAMS_MAX_MEMSLOTS,
+> +		    "region_idx should be valid indexes\n");
+> +
+> +	vm->memslot.code = mem_params->region[mem_params->region_idx.code].slot;
+> +	vm->memslot.pt = mem_params->region[mem_params->region_idx.pt].slot;
+> +	vm->memslot.data = mem_params->region[mem_params->region_idx.data].slot;
+>  
+>  	return vm;
+>  }
+> @@ -292,9 +340,12 @@ struct kvm_vm *__vm_create(enum vm_guest_mode mode, uint32_t nr_runnable_vcpus,
+>  {
+>  	uint64_t nr_pages = vm_nr_pages_required(mode, nr_runnable_vcpus,
+>  						 nr_extra_pages);
+> +	struct kvm_vm_mem_params mem_params = kvm_vm_mem_default;
+>  	struct kvm_vm *vm;
+>  
+> -	vm = ____vm_create(mode, nr_pages);
+> +	mem_params.region[0].npages = nr_pages;
+> +	mem_params.mode = mode;
+> +	vm = ____vm_create(&mem_params);
+>  
+>  	kvm_vm_elf_load(vm, program_invocation_name);
+>  
 > -- 
-> 2.37.2.672.g94769d06f0-goog
-> 
+> 2.37.1.595.g718a3a8f04-goog
+>
+
+Thanks,
+drew
