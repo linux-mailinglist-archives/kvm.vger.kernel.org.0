@@ -2,494 +2,267 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id A6A0B5A4492
-	for <lists+kvm@lfdr.de>; Mon, 29 Aug 2022 10:08:47 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 8ACE55A456E
+	for <lists+kvm@lfdr.de>; Mon, 29 Aug 2022 10:49:25 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229889AbiH2IIo (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 29 Aug 2022 04:08:44 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49906 "EHLO
+        id S229783AbiH2ItY (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 29 Aug 2022 04:49:24 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60774 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229815AbiH2IIi (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 29 Aug 2022 04:08:38 -0400
-Received: from mga04.intel.com (mga04.intel.com [192.55.52.120])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 74FCC52DEE;
-        Mon, 29 Aug 2022 01:08:37 -0700 (PDT)
+        with ESMTP id S229559AbiH2ItW (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 29 Aug 2022 04:49:22 -0400
+Received: from mga12.intel.com (mga12.intel.com [192.55.52.136])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8557A59272;
+        Mon, 29 Aug 2022 01:49:21 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1661760517; x=1693296517;
-  h=message-id:date:mime-version:subject:to:cc:references:
-   from:in-reply-to:content-transfer-encoding;
-  bh=hnGGzz7rb30Yf1wkcH4KKj/nvxN2nIt8sWNih0EyD6o=;
-  b=EPGo8Dnc6F/WecrMRXoQ4Oc/UzRjmj3B1f5fSlv55Pq6vE8dlE88Uyfs
-   jeFcaZvZslhQELOEeAp4A5H5GDIH5Plpe6mvinPerujesjEvv6LY8iIg5
-   7YlmceZhExT13FCrZ1tARtkLo+beJSNtmIOBh3hVW3lokd5qpGLZ6ESCo
-   29rnN7/bIKA2+UU2j9rMBudrjOTgZEHlK9DKK1i6X0ZfFWAk7t4TPUXCr
-   Lw6w2Cf9hkwCISlmpHAYc4b7YYGtNYMMjHYCKLdBcYkwWKGJ6a4fIJItv
-   FZEBBXMbS+pi38O04hvTy9gB+xpzXrOB+N97ZshFRMNUIPL/TRg0BF1mV
-   A==;
-X-IronPort-AV: E=McAfee;i="6500,9779,10453"; a="293583139"
+  t=1661762961; x=1693298961;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=2ObKuzaqIZ1Rg14Vzt9ik07/GpOD7ZdWW5+fcgog20c=;
+  b=EZG/hZ/4HYM19byzXo0NngN5vUkHi9v9NLYnTSJI8EDUN4HvSrPeiGJn
+   5DKQYyKFQWJv0fQVuhdCP8kaUzwY2PH9rUT4fN44YyPI6WMoRzClZY2o7
+   Bswm0tV7JPfWVx2CcsJG6yeOKPyjgELX/rSr9UB2EN4JifmJepv9lmCiI
+   famW8Zl8w1xwvv8DdTvUuYM7f/RbAgmfD8EVRBaMYSqne97fEidahNH+Q
+   gUz2MGmDx/pV/Zqi9d5SzC8L3rty3S0uqqi8OA+/qs8NZnwkgZM9nXhPn
+   n+KKlz+TbSQj8KJBc3zX0Zqz9XQjLM5dVoPyc66s73rWjVEtr2ixwXb0Y
+   Q==;
+X-IronPort-AV: E=McAfee;i="6500,9779,10453"; a="274595491"
 X-IronPort-AV: E=Sophos;i="5.93,272,1654585200"; 
-   d="scan'208";a="293583139"
-Received: from fmsmga008.fm.intel.com ([10.253.24.58])
-  by fmsmga104.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 29 Aug 2022 01:08:37 -0700
+   d="scan'208";a="274595491"
+Received: from orsmga008.jf.intel.com ([10.7.209.65])
+  by fmsmga106.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 29 Aug 2022 01:49:21 -0700
+X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="5.93,272,1654585200"; 
-   d="scan'208";a="672287933"
-Received: from binbinwu-mobl.ccr.corp.intel.com (HELO [10.238.0.236]) ([10.238.0.236])
-  by fmsmga008-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 29 Aug 2022 01:08:33 -0700
-Message-ID: <221a9cff-a6f8-36ef-6a7c-a03a8cdd19fa@linux.intel.com>
-Date:   Mon, 29 Aug 2022 16:08:18 +0800
-MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
- Thunderbird/102.1.2
-Subject: Re: [PATCH v8 023/103] KVM: TDX: initialize VM with TDX specific
- parameters
-To:     isaku.yamahata@intel.com, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-Cc:     isaku.yamahata@gmail.com, Paolo Bonzini <pbonzini@redhat.com>,
+   d="scan'208";a="640858509"
+Received: from yy-desk-7060.sh.intel.com (HELO localhost) ([10.239.159.76])
+  by orsmga008.jf.intel.com with ESMTP; 29 Aug 2022 01:49:18 -0700
+Date:   Mon, 29 Aug 2022 16:49:18 +0800
+From:   Yuan Yao <yuan.yao@linux.intel.com>
+To:     isaku.yamahata@intel.com
+Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+        isaku.yamahata@gmail.com, Paolo Bonzini <pbonzini@redhat.com>,
         erdemaktas@google.com, Sean Christopherson <seanjc@google.com>,
         Sagi Shahar <sagis@google.com>
+Subject: Re: [PATCH v8 008/103] x86/virt/tdx: Add a helper function to return
+ system wide info about TDX module
+Message-ID: <20220829084918.cjut472qelst7zkh@yy-desk-7060>
 References: <cover.1659854790.git.isaku.yamahata@intel.com>
- <031bea8db0c579b4866a33faeb85ce4d461dc8a3.1659854790.git.isaku.yamahata@intel.com>
-From:   Binbin Wu <binbin.wu@linux.intel.com>
-In-Reply-To: <031bea8db0c579b4866a33faeb85ce4d461dc8a3.1659854790.git.isaku.yamahata@intel.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+ <27ed4f21b23b9679919f2941ed50a4a55a76c3ad.1659854790.git.isaku.yamahata@intel.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <27ed4f21b23b9679919f2941ed50a4a55a76c3ad.1659854790.git.isaku.yamahata@intel.com>
+User-Agent: NeoMutt/20171215
 X-Spam-Status: No, score=-4.3 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_DNSWL_MED,
-        SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham
-        autolearn_force=no version=3.4.6
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,SPF_HELO_PASS,
+        SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no
+        version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+On Sun, Aug 07, 2022 at 03:00:53PM -0700, isaku.yamahata@intel.com wrote:
+> From: Isaku Yamahata <isaku.yamahata@intel.com>
+>
+> TDX KVM needs system-wide information about the TDX module, struct
+> tdsysinfo_struct.  Add a helper function tdx_get_sysinfo() to return it
+> instead of KVM getting it with various error checks.  Move out the struct
+> definition about it to common place arch/x86/include/asm/tdx.h.
 
-On 2022/8/8 6:01, isaku.yamahata@intel.com wrote:
-> From: Xiaoyao Li <xiaoyao.li@intel.com>
+Will this be one of TDX's host patch set? The changes for
+arch/x86/include/asm/tdx.h looks like exposing some struct definitaion
+as part of API to user of TDX (now it's KVM).
+
 >
-> TDX requires additional parameters for TDX VM for confidential execution to
-> protect its confidentiality of its memory contents and its CPU state from
-> any other software, including VMM. When creating guest TD VM before
-> creating vcpu, the number of vcpu, TSC frequency (that is same among
-> vcpus. and it can't be changed.)  CPUIDs which is emulated by the TDX
-> module. It means guest can trust those CPUIDs. and sha384 values for
-> measurement.
->
-> Add new subcommand, KVM_TDX_INIT_VM, to pass parameters for TDX guest.  It
-> assigns encryption key to the TDX guest for memory encryption.  TDX
-> encrypts memory per-guest bases.  It assigns device model passes per-VM
-> parameters for the TDX guest.  The maximum number of vcpus, tsc frequency
-> (TDX guest has fised VM-wide TSC frequency. not per-vcpu.  The TDX guest
-> can not change it.), attributes (production or debug), available extended
-> features (which is reflected into guest XCR0, IA32_XSS MSR), cpuids, sha384
-> measurements, and etc.
->
-> This subcommand is called before creating vcpu and KVM_SET_CPUID2, i.e.
-> cpuids configurations aren't available yet.  So CPUIDs configuration values
-> needs to be passed in struct kvm_init_vm.  It's device model responsibility
-> to make this cpuid config for KVM_TDX_INIT_VM and KVM_SET_CPUID2.
->
-> Signed-off-by: Xiaoyao Li <xiaoyao.li@intel.com>
 > Signed-off-by: Isaku Yamahata <isaku.yamahata@intel.com>
 > ---
->   arch/x86/include/asm/tdx.h            |   3 +
->   arch/x86/include/uapi/asm/kvm.h       |  33 +++++
->   arch/x86/kvm/vmx/tdx.c                | 199 ++++++++++++++++++++++++++
->   arch/x86/kvm/vmx/tdx.h                |  22 +++
->   tools/arch/x86/include/uapi/asm/kvm.h |  33 +++++
->   5 files changed, 290 insertions(+)
+>  arch/x86/include/asm/tdx.h  | 55 +++++++++++++++++++++++++++++++++++++
+>  arch/x86/virt/vmx/tdx/tdx.c | 20 +++++++++++---
+>  arch/x86/virt/vmx/tdx/tdx.h | 52 -----------------------------------
+>  3 files changed, 71 insertions(+), 56 deletions(-)
 >
 > diff --git a/arch/x86/include/asm/tdx.h b/arch/x86/include/asm/tdx.h
-> index a32e8881e758..8a1905ae3ad6 100644
+> index 801f6e10b2db..dfea0dd71bc1 100644
 > --- a/arch/x86/include/asm/tdx.h
 > +++ b/arch/x86/include/asm/tdx.h
-> @@ -89,6 +89,9 @@ static inline long tdx_kvm_hypercall(unsigned int nr, unsigned long p1,
->   #endif /* CONFIG_INTEL_TDX_GUEST && CONFIG_KVM_GUEST */
->   
->   #ifdef CONFIG_INTEL_TDX_HOST
+> @@ -89,11 +89,66 @@ static inline long tdx_kvm_hypercall(unsigned int nr, unsigned long p1,
+>  #endif /* CONFIG_INTEL_TDX_GUEST && CONFIG_KVM_GUEST */
+>
+>  #ifdef CONFIG_INTEL_TDX_HOST
+> +struct tdx_cpuid_config {
+> +	u32	leaf;
+> +	u32	sub_leaf;
+> +	u32	eax;
+> +	u32	ebx;
+> +	u32	ecx;
+> +	u32	edx;
+> +} __packed;
 > +
-> +/* -1 indicates CPUID leaf with no sub-leaves. */
-> +#define TDX_CPUID_NO_SUBLEAF	((u32)-1)
->   struct tdx_cpuid_config {
->   	u32	leaf;
->   	u32	sub_leaf;
-> diff --git a/arch/x86/include/uapi/asm/kvm.h b/arch/x86/include/uapi/asm/kvm.h
-> index 9effc64e547e..97ce34d746af 100644
-> --- a/arch/x86/include/uapi/asm/kvm.h
-> +++ b/arch/x86/include/uapi/asm/kvm.h
-> @@ -538,6 +538,7 @@ struct kvm_pmu_event_filter {
->   /* Trust Domain eXtension sub-ioctl() commands. */
->   enum kvm_tdx_cmd_id {
->   	KVM_TDX_CAPABILITIES = 0,
-> +	KVM_TDX_INIT_VM,
->   
->   	KVM_TDX_CMD_NR_MAX,
->   };
-> @@ -583,4 +584,36 @@ struct kvm_tdx_capabilities {
->   	struct kvm_tdx_cpuid_config cpuid_configs[0];
->   };
->   
-> +struct kvm_tdx_init_vm {
-> +	__u64 attributes;
-> +	__u32 max_vcpus;
-> +	__u32 padding;
-> +	__u64 mrconfigid[6];	/* sha384 digest */
-> +	__u64 mrowner[6];	/* sha384 digest */
-> +	__u64 mrownerconfig[6];	/* sha348 digest */
-> +	union {
-> +		/*
-> +		 * KVM_TDX_INIT_VM is called before vcpu creation, thus before
-> +		 * KVM_SET_CPUID2.  CPUID configurations needs to be passed.
-> +		 *
-> +		 * This configuration supersedes KVM_SET_CPUID{,2}.
-> +		 * The user space VMM, e.g. qemu, should make them consistent
-> +		 * with this values.
-> +		 * sizeof(struct kvm_cpuid_entry2) * KVM_MAX_CPUID_ENTRIES(256)
-> +		 * = 8KB.
-> +		 */
-> +		struct {
-> +			struct kvm_cpuid2 cpuid;
-> +			/* 8KB with KVM_MAX_CPUID_ENTRIES. */
-> +			struct kvm_cpuid_entry2 entries[];
-> +		};
-> +		/*
-> +		 * For future extensibility.
-> +		 * The size(struct kvm_tdx_init_vm) = 16KB.
-> +		 * This should be enough given sizeof(TD_PARAMS) = 1024
-> +		 */
-> +		__u64 reserved[2028];
-> +	};
-> +};
+> +#define TDSYSINFO_STRUCT_SIZE		1024
+> +#define TDSYSINFO_STRUCT_ALIGNMENT	1024
 > +
->   #endif /* _ASM_X86_KVM_H */
-> diff --git a/arch/x86/kvm/vmx/tdx.c b/arch/x86/kvm/vmx/tdx.c
-> index d3b9f653da4b..dcd2f460275e 100644
-> --- a/arch/x86/kvm/vmx/tdx.c
-> +++ b/arch/x86/kvm/vmx/tdx.c
-> @@ -424,6 +424,202 @@ int tdx_dev_ioctl(void __user *argp)
->   	return 0;
->   }
->   
-> +/*
-> + * cpuid entry lookup in TDX cpuid config way.
-> + * The difference is how to specify index(subleaves).
-> + * Specify index to TDX_CPUID_NO_SUBLEAF for CPUID leaf with no-subleaves.
-> + */
-> +static const struct kvm_cpuid_entry2 *tdx_find_cpuid_entry(
-> +	const struct kvm_cpuid2 *cpuid, u32 function, u32 index)
-> +{
-> +	int i;
-> +
-> +	/* In TDX CPU CONFIG, TDX_CPUID_NO_SUBLEAF means index = 0. */
-> +	if (index == TDX_CPUID_NO_SUBLEAF)
-> +		index = 0;
-> +
-> +	for (i = 0; i < cpuid->nent; i++) {
-> +		const struct kvm_cpuid_entry2 *e = &cpuid->entries[i];
-> +
-> +		if (e->function == function &&
-> +		    (e->index == index ||
-> +		     !(e->flags & KVM_CPUID_FLAG_SIGNIFCANT_INDEX)))
-> +			return e;
-> +	}
-> +	return NULL;
-> +}
-> +
-> +static int setup_tdparams(struct kvm *kvm, struct td_params *td_params,
-> +			struct kvm_tdx_init_vm *init_vm)
-> +{
-> +	const struct kvm_cpuid2 *cpuid = &init_vm->cpuid;
-> +	const struct kvm_cpuid_entry2 *entry;
-> +	u64 guest_supported_xcr0;
-> +	u64 guest_supported_xss;
-> +	int max_pa;
-> +	int i;
-> +
-> +	td_params->max_vcpus = init_vm->max_vcpus;
-> +
-> +	td_params->attributes = init_vm->attributes;
-> +	if (td_params->attributes & TDX_TD_ATTRIBUTE_PERFMON) {
-> +		/*
-> +		 * TODO: save/restore PMU related registers around TDENTER.
-> +		 * Once it's done, remove this guard.
-> +		 */
-> +		pr_warn("TD doesn't support perfmon yet. KVM needs to save/restore "
-> +			"host perf registers properly.\n");
-> +		return -EOPNOTSUPP;
-> +	}
-> +
-> +	for (i = 0; i < tdx_caps.nr_cpuid_configs; i++) {
-> +		const struct tdx_cpuid_config *config = &tdx_caps.cpuid_configs[i];
-> +		const struct kvm_cpuid_entry2 *entry =
-> +			tdx_find_cpuid_entry(cpuid, config->leaf, config->sub_leaf);
-> +		struct tdx_cpuid_value *value = &td_params->cpuid_values[i];
-> +
-> +		if (!entry)
-> +			continue;
-> +
-> +		value->eax = entry->eax & config->eax;
-> +		value->ebx = entry->ebx & config->ebx;
-> +		value->ecx = entry->ecx & config->ecx;
-> +		value->edx = entry->edx & config->edx;
-
-Add some comments about the meaning of bits in config->eax/ebx...?
-
-
-> +	}
-> +
-> +	max_pa = 36;
-> +	entry = tdx_find_cpuid_entry(cpuid, 0x80000008, 0);
-> +	if (entry)
-> +		max_pa = entry->eax & 0xff;
-> +
-> +	td_params->eptp_controls = VMX_EPTP_MT_WB;
+> +struct tdsysinfo_struct {
+> +	/* TDX-SEAM Module Info */
+> +	u32	attributes;
+> +	u32	vendor_id;
+> +	u32	build_date;
+> +	u16	build_num;
+> +	u16	minor_version;
+> +	u16	major_version;
+> +	u8	reserved0[14];
+> +	/* Memory Info */
+> +	u16	max_tdmrs;
+> +	u16	max_reserved_per_tdmr;
+> +	u16	pamt_entry_size;
+> +	u8	reserved1[10];
+> +	/* Control Struct Info */
+> +	u16	tdcs_base_size;
+> +	u8	reserved2[2];
+> +	u16	tdvps_base_size;
+> +	u8	tdvps_xfam_dependent_size;
+> +	u8	reserved3[9];
+> +	/* TD Capabilities */
+> +	u64	attributes_fixed0;
+> +	u64	attributes_fixed1;
+> +	u64	xfam_fixed0;
+> +	u64	xfam_fixed1;
+> +	u8	reserved4[32];
+> +	u32	num_cpuid_config;
 > +	/*
-> +	 * No CPU supports 4-level && max_pa > 48.
-> +	 * "5-level paging and 5-level EPT" section 4.1 4-level EPT
-> +	 * "4-level EPT is limited to translating 48-bit guest-physical
-> +	 *  addresses."
-> +	 * cpu_has_vmx_ept_5levels() check is just in case.
+> +	 * The actual number of CPUID_CONFIG depends on above
+> +	 * 'num_cpuid_config'.  The size of 'struct tdsysinfo_struct'
+> +	 * is 1024B defined by TDX architecture.  Use a union with
+> +	 * specific padding to make 'sizeof(struct tdsysinfo_struct)'
+> +	 * equal to 1024.
 > +	 */
-> +	if (cpu_has_vmx_ept_5levels() && max_pa > 48) {
-> +		td_params->eptp_controls |= VMX_EPTP_PWL_5;
-> +		td_params->exec_controls |= TDX_EXEC_CONTROL_MAX_GPAW;
-> +	} else {
-> +		td_params->eptp_controls |= VMX_EPTP_PWL_4;
-> +	}
-> +
-> +	/* Setup td_params.xfam */
-> +	entry = tdx_find_cpuid_entry(cpuid, 0xd, 0);
-> +	if (entry)
-> +		guest_supported_xcr0 = (entry->eax | ((u64)entry->edx << 32));
-> +	else
-> +		guest_supported_xcr0 = 0;
-> +	guest_supported_xcr0 &= kvm_caps.supported_xcr0;
-> +
-> +	entry = tdx_find_cpuid_entry(cpuid, 0xd, 1);
-> +	if (entry)
-> +		guest_supported_xss = (entry->ecx | ((u64)entry->edx << 32));
-> +	else
-> +		guest_supported_xss = 0;
-> +	/* PT can be exposed to TD guest regardless of KVM's XSS support */
-> +	guest_supported_xss &= (kvm_caps.supported_xss | XFEATURE_MASK_PT);
-> +
-> +	td_params->xfam = guest_supported_xcr0 | guest_supported_xss;
-> +	if (td_params->xfam & XFEATURE_MASK_LBR) {
-> +		/*
-> +		 * TODO: once KVM supports LBR(save/restore LBR related
-> +		 * registers around TDENTER), remove this guard.
-> +		 */
-> +		pr_warn("TD doesn't support LBR yet. KVM needs to save/restore "
-> +			"IA32_LBR_DEPTH properly.\n");
-> +		return -EOPNOTSUPP;
-> +	}
-> +
-> +	if (td_params->xfam & XFEATURE_MASK_XTILE) {
-> +		/*
-> +		 * TODO: once KVM supports AMX(save/restore AMX related
-> +		 * registers around TDENTER), remove this guard.
-> +		 */
-> +		pr_warn("TD doesn't support AMX yet. KVM needs to save/restore "
-> +			"IA32_XFD, IA32_XFD_ERR properly.\n");
-> +		return -EOPNOTSUPP;
-> +	}
-> +
-> +	td_params->tsc_frequency =
-> +		TDX_TSC_KHZ_TO_25MHZ(kvm->arch.default_tsc_khz);
-> +
-> +#define MEMCPY_SAME_SIZE(dst, src)				\
-> +	do {							\
-> +		BUILD_BUG_ON(sizeof(dst) != sizeof(src));	\
-> +		memcpy((dst), (src), sizeof(dst));		\
-> +	} while (0)
-> +
-> +	MEMCPY_SAME_SIZE(td_params->mrconfigid, init_vm->mrconfigid);
-> +	MEMCPY_SAME_SIZE(td_params->mrowner, init_vm->mrowner);
-> +	MEMCPY_SAME_SIZE(td_params->mrownerconfig, init_vm->mrownerconfig);
-> +
-> +	return 0;
-> +}
-> +
-> +static int tdx_td_init(struct kvm *kvm, struct kvm_tdx_cmd *cmd)
-> +{
-> +	struct kvm_tdx *kvm_tdx = to_kvm_tdx(kvm);
-> +	struct kvm_tdx_init_vm *init_vm = NULL;
-> +	struct td_params *td_params = NULL;
-> +	struct tdx_module_output out;
-> +	int ret;
-> +	u64 err;
-> +
-> +	BUILD_BUG_ON(sizeof(*init_vm) != 16 * 1024);
-> +	BUILD_BUG_ON((sizeof(*init_vm) - offsetof(typeof(*init_vm), entries)) /
-> +		     sizeof(init_vm->entries[0]) < KVM_MAX_CPUID_ENTRIES);
-> +	BUILD_BUG_ON(sizeof(struct td_params) != 1024);
-> +
-> +	if (is_td_initialized(kvm))
-> +		return -EINVAL;
-> +
-> +	if (cmd->flags)
-> +		return -EINVAL;
-> +
-> +	init_vm = kzalloc(sizeof(*init_vm), GFP_KERNEL);
-> +	if (copy_from_user(init_vm, (void __user *)cmd->data, sizeof(*init_vm))) {
-
-Does copy_from_user accept null pointer as destination?
-
-
-> +		ret = -EFAULT;
-> +		goto out;
-> +	}
-> +
-> +	if (init_vm->max_vcpus > KVM_MAX_VCPUS) {
-> +		ret = -EINVAL;
-> +		goto out;
-> +	}
-> +
-> +	td_params = kzalloc(sizeof(struct td_params), GFP_KERNEL);
-> +	if (!td_params) {
-> +		ret = -ENOMEM;
-> +		goto out;
-> +	}
-> +
-> +	ret = setup_tdparams(kvm, td_params, init_vm);
-> +	if (ret)
-> +		goto out;
-> +
-> +	err = tdh_mng_init(kvm_tdx->tdr.pa, __pa(td_params), &out);
-> +	if (WARN_ON_ONCE(err)) {
-> +		pr_tdx_error(TDH_MNG_INIT, err, &out);
-> +		ret = -EIO;
-> +		goto out;
-> +	}
-> +
-> +	kvm_tdx->tsc_offset = td_tdcs_exec_read64(kvm_tdx, TD_TDCS_EXEC_TSC_OFFSET);
-> +	kvm_tdx->attributes = td_params->attributes;
-> +	kvm_tdx->xfam = td_params->xfam;
-> +	kvm->max_vcpus = td_params->max_vcpus;
-> +
-> +out:
-> +	/* kfree() accepts NULL. */
-> +	kfree(init_vm);
-> +	kfree(td_params);
-> +	return ret;
-> +}
-> +
->   int tdx_vm_ioctl(struct kvm *kvm, void __user *argp)
->   {
->   	struct kvm_tdx_cmd tdx_cmd;
-> @@ -437,6 +633,9 @@ int tdx_vm_ioctl(struct kvm *kvm, void __user *argp)
->   	mutex_lock(&kvm->lock);
->   
->   	switch (tdx_cmd.id) {
-> +	case KVM_TDX_INIT_VM:
-> +		r = tdx_td_init(kvm, &tdx_cmd);
-> +		break;
->   	default:
->   		r = -EINVAL;
->   		goto out;
-> diff --git a/arch/x86/kvm/vmx/tdx.h b/arch/x86/kvm/vmx/tdx.h
-> index 8058b6b153f8..3e5782438dc9 100644
-> --- a/arch/x86/kvm/vmx/tdx.h
-> +++ b/arch/x86/kvm/vmx/tdx.h
-> @@ -20,7 +20,11 @@ struct kvm_tdx {
->   	struct tdx_td_page tdr;
->   	struct tdx_td_page *tdcs;
->   
-> +	u64 attributes;
-> +	u64 xfam;
->   	int hkid;
-> +
-> +	u64 tsc_offset;
->   };
->   
->   struct vcpu_tdx {
-> @@ -50,6 +54,11 @@ static inline struct vcpu_tdx *to_tdx(struct kvm_vcpu *vcpu)
->   	return container_of(vcpu, struct vcpu_tdx, vcpu);
->   }
->   
-> +static inline bool is_td_initialized(struct kvm *kvm)
-> +{
-> +	return !!kvm->max_vcpus;
-> +}
-> +
->   static __always_inline void tdvps_vmcs_check(u32 field, u8 bits)
->   {
->   	BUILD_BUG_ON_MSG(__builtin_constant_p(field) && (field) & 0x1,
-> @@ -135,6 +144,19 @@ TDX_BUILD_TDVPS_ACCESSORS(64, VMCS, vmcs);
->   TDX_BUILD_TDVPS_ACCESSORS(64, STATE_NON_ARCH, state_non_arch);
->   TDX_BUILD_TDVPS_ACCESSORS(8, MANAGEMENT, management);
->   
-> +static __always_inline u64 td_tdcs_exec_read64(struct kvm_tdx *kvm_tdx, u32 field)
-> +{
-> +	struct tdx_module_output out;
-> +	u64 err;
-> +
-> +	err = tdh_mng_rd(kvm_tdx->tdr.pa, TDCS_EXEC(field), &out);
-> +	if (unlikely(err)) {
-> +		pr_err("TDH_MNG_RD[EXEC.0x%x] failed: 0x%llx\n", field, err);
-> +		return 0;
-
-So, the caller doesn't know whether the function succeeded or not.
-
-Would it cause any issue if the tdh_mng_rd failed and the right value is 
-not 0?
-
-
-
-> +	}
-> +	return out.r8;
-> +}
-> +
->   #else
->   static inline int tdx_module_setup(void) { return -ENODEV; };
->   
-> diff --git a/tools/arch/x86/include/uapi/asm/kvm.h b/tools/arch/x86/include/uapi/asm/kvm.h
-> index ca85a070ac19..965a1c2e347d 100644
-> --- a/tools/arch/x86/include/uapi/asm/kvm.h
-> +++ b/tools/arch/x86/include/uapi/asm/kvm.h
-> @@ -532,6 +532,7 @@ struct kvm_pmu_event_filter {
->   /* Trust Domain eXtension sub-ioctl() commands. */
->   enum kvm_tdx_cmd_id {
->   	KVM_TDX_CAPABILITIES = 0,
-> +	KVM_TDX_INIT_VM,
->   
->   	KVM_TDX_CMD_NR_MAX,
->   };
-> @@ -577,4 +578,36 @@ struct kvm_tdx_capabilities {
->   	struct kvm_tdx_cpuid_config cpuid_configs[0];
->   };
->   
-> +struct kvm_tdx_init_vm {
-> +	__u64 attributes;
-> +	__u32 max_vcpus;
-> +	__u32 padding;
-> +	__u64 mrconfigid[6];    /* sha384 digest */
-> +	__u64 mrowner[6];       /* sha384 digest */
-> +	__u64 mrownerconfig[6]; /* sha348 digest */
 > +	union {
-> +		/*
-> +		 * KVM_TDX_INIT_VM is called before vcpu creation, thus before
-> +		 * KVM_SET_CPUID2.  CPUID configurations needs to be passed.
-> +		 *
-> +		 * This configuration supersedes KVM_SET_CPUID{,2}.
-> +		 * The user space VMM, e.g. qemu, should make them consistent
-> +		 * with this values.
-> +		 * sizeof(struct kvm_cpuid_entry2) * KVM_MAX_CPUID_ENTRIES(256)
-> +		 * = 8KB.
-> +		 */
-> +		struct {
-> +			struct kvm_cpuid2 cpuid;
-> +			/* 8KB with KVM_MAX_CPUID_ENTRIES. */
-> +			struct kvm_cpuid_entry2 entries[];
-> +		};
-> +		/*
-> +		 * For future extensibility.
-> +		 * The size(struct kvm_tdx_init_vm) = 16KB.
-> +		 * This should be enough given sizeof(TD_PARAMS) = 1024
-> +		 */
-> +		__u64 reserved[2028];
+> +		struct tdx_cpuid_config	cpuid_configs[0];
+> +		u8			reserved5[892];
 > +	};
-> +};
+> +} __packed __aligned(TDSYSINFO_STRUCT_ALIGNMENT);
 > +
->   #endif /* _ASM_X86_KVM_H */
+>  bool platform_tdx_enabled(void);
+>  int tdx_init(void);
+> +const struct tdsysinfo_struct *tdx_get_sysinfo(void);
+>  #else	/* !CONFIG_INTEL_TDX_HOST */
+>  static inline bool platform_tdx_enabled(void) { return false; }
+>  static inline int tdx_init(void)  { return -ENODEV; }
+> +struct tdsysinfo_struct;
+> +static inline const struct tdsysinfo_struct *tdx_get_sysinfo(void) { return NULL; }
+>  #endif	/* CONFIG_INTEL_TDX_HOST */
+>
+>  #endif /* !__ASSEMBLY__ */
+> diff --git a/arch/x86/virt/vmx/tdx/tdx.c b/arch/x86/virt/vmx/tdx/tdx.c
+> index 787b26de8f53..b9567a2217df 100644
+> --- a/arch/x86/virt/vmx/tdx/tdx.c
+> +++ b/arch/x86/virt/vmx/tdx/tdx.c
+> @@ -354,9 +354,9 @@ static int check_cmrs(struct cmr_info *cmr_array, int *actual_cmr_num)
+>  	return 0;
+>  }
+>
+> -static int tdx_get_sysinfo(struct tdsysinfo_struct *tdsysinfo,
+> -			   struct cmr_info *cmr_array,
+> -			   int *actual_cmr_num)
+> +static int __tdx_get_sysinfo(struct tdsysinfo_struct *tdsysinfo,
+> +			     struct cmr_info *cmr_array,
+> +			     int *actual_cmr_num)
+>  {
+>  	struct tdx_module_output out;
+>  	u64 ret;
+> @@ -383,6 +383,18 @@ static int tdx_get_sysinfo(struct tdsysinfo_struct *tdsysinfo,
+>  	return check_cmrs(cmr_array, actual_cmr_num);
+>  }
+>
+> +const struct tdsysinfo_struct *tdx_get_sysinfo(void)
+> +{
+> +       const struct tdsysinfo_struct *r = NULL;
+> +
+> +       mutex_lock(&tdx_module_lock);
+> +       if (tdx_module_status == TDX_MODULE_INITIALIZED)
+> +	       r = &tdx_sysinfo;
+> +       mutex_unlock(&tdx_module_lock);
+> +       return r;
+> +}
+> +EXPORT_SYMBOL_GPL(tdx_get_sysinfo);
+> +
+>  /*
+>   * Skip the memory region below 1MB.  Return true if the entire
+>   * region is skipped.  Otherwise, the updated range is returned.
+> @@ -1106,7 +1118,7 @@ static int init_tdx_module(void)
+>  	if (ret)
+>  		goto out;
+>
+> -	ret = tdx_get_sysinfo(&tdx_sysinfo, tdx_cmr_array, &tdx_cmr_num);
+> +	ret = __tdx_get_sysinfo(&tdx_sysinfo, tdx_cmr_array, &tdx_cmr_num);
+>  	if (ret)
+>  		goto out;
+>
+> diff --git a/arch/x86/virt/vmx/tdx/tdx.h b/arch/x86/virt/vmx/tdx/tdx.h
+> index e0309558be13..c08e4ee2d0bf 100644
+> --- a/arch/x86/virt/vmx/tdx/tdx.h
+> +++ b/arch/x86/virt/vmx/tdx/tdx.h
+> @@ -65,58 +65,6 @@ struct cmr_info {
+>  #define MAX_CMRS			32
+>  #define CMR_INFO_ARRAY_ALIGNMENT	512
+>
+> -struct cpuid_config {
+> -	u32	leaf;
+> -	u32	sub_leaf;
+> -	u32	eax;
+> -	u32	ebx;
+> -	u32	ecx;
+> -	u32	edx;
+> -} __packed;
+> -
+> -#define TDSYSINFO_STRUCT_SIZE		1024
+> -#define TDSYSINFO_STRUCT_ALIGNMENT	1024
+> -
+> -struct tdsysinfo_struct {
+> -	/* TDX-SEAM Module Info */
+> -	u32	attributes;
+> -	u32	vendor_id;
+> -	u32	build_date;
+> -	u16	build_num;
+> -	u16	minor_version;
+> -	u16	major_version;
+> -	u8	reserved0[14];
+> -	/* Memory Info */
+> -	u16	max_tdmrs;
+> -	u16	max_reserved_per_tdmr;
+> -	u16	pamt_entry_size;
+> -	u8	reserved1[10];
+> -	/* Control Struct Info */
+> -	u16	tdcs_base_size;
+> -	u8	reserved2[2];
+> -	u16	tdvps_base_size;
+> -	u8	tdvps_xfam_dependent_size;
+> -	u8	reserved3[9];
+> -	/* TD Capabilities */
+> -	u64	attributes_fixed0;
+> -	u64	attributes_fixed1;
+> -	u64	xfam_fixed0;
+> -	u64	xfam_fixed1;
+> -	u8	reserved4[32];
+> -	u32	num_cpuid_config;
+> -	/*
+> -	 * The actual number of CPUID_CONFIG depends on above
+> -	 * 'num_cpuid_config'.  The size of 'struct tdsysinfo_struct'
+> -	 * is 1024B defined by TDX architecture.  Use a union with
+> -	 * specific padding to make 'sizeof(struct tdsysinfo_struct)'
+> -	 * equal to 1024.
+> -	 */
+> -	union {
+> -		struct cpuid_config	cpuid_configs[0];
+> -		u8			reserved5[892];
+> -	};
+> -} __packed __aligned(TDSYSINFO_STRUCT_ALIGNMENT);
+> -
+>  struct tdmr_reserved_area {
+>  	u64 offset;
+>  	u64 size;
+> --
+> 2.25.1
+>
