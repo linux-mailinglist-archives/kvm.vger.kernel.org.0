@@ -2,161 +2,306 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 339815A503A
-	for <lists+kvm@lfdr.de>; Mon, 29 Aug 2022 17:31:57 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 7BE275A504B
+	for <lists+kvm@lfdr.de>; Mon, 29 Aug 2022 17:39:05 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229995AbiH2Pbw (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 29 Aug 2022 11:31:52 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59114 "EHLO
+        id S229538AbiH2PjD (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 29 Aug 2022 11:39:03 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37378 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229475AbiH2Pbt (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 29 Aug 2022 11:31:49 -0400
-Received: from NAM10-DM6-obe.outbound.protection.outlook.com (mail-dm6nam10on2062.outbound.protection.outlook.com [40.107.93.62])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 289D57B28A;
-        Mon, 29 Aug 2022 08:31:48 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=JgcgtidJwyElAY9D1kx1olEJD6/eyCgqn0o+3t1LQaDmKF6yZDkJjwE3pO7KbCYLLKV7m7pkHMnd/Mipaoz8QgftXp1qCewEXZ33jF0Sh8PY/W/o5pU1H+3n9D/aY55DzBErtRkS7PZvzCoI03panI0D8peE8BQmQRCfj+Eyio6BNiw4Nip73pfQjAYwB4PS7hpqw0G1LdMs+Mxpc9eN9Y0bhg7VuwCa/BkJQSuHuaun4rcZ9qmDfMj4//sqj81W2z3AZxnt8hfK0JRvkFk9Tm0cL46/9/E/YDPdkqq2BRKj/0YkmmBtubspoSG27C9CBbIM325Gk5ibacTcypwd+g==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=ppye9aaNmVhn00F4831Q4UHRsnxuZjKUYm/8hll8VqE=;
- b=Y5AKR3M978/ygVocJs+hk2zvWT/Z66bu2vNEwWA+gYalj1qkvWHNf62dseznoiC6gvDRelEm5leqXI7t+e3b+K9uVhdn6kZ530RM6ecJtjWpXv51nW/rB6wdeP5phSoywAf3iGgWYPvsFzAim5d59Xu4WjezC0/HOtajrftKMFM+B2NLMBGGHtvZEwt+dn7TtQgXngR1pfpRA0Onck907Lu2xxR8Fd2y6hWxLVKh4kMG9IgKvk/E9YIC6oiH/9J2pw9+HZHXCAl5clVCe9ArbJwKMjlAJ2mPkZPC7P9cmUhuvrF1KyTjwnFoA7T8U2slbLA9Uc1erek70yIHKkDuzw==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
- dkim=pass header.d=nvidia.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=ppye9aaNmVhn00F4831Q4UHRsnxuZjKUYm/8hll8VqE=;
- b=ZlxXQY8a2SMs7hMaCEHfLnvOhuCx2YG6gqF3+fQdxJ23QwC4QnMNJCRu1KDb5fYtJ4MeEA9j9LeFMA1FMY+ryDUfG4zF16IJKq8RAuPxSwcvKpfqRhNcy5Tmo6ESz5HWRIeIZBPRgGv4TyBMSiIA3SUEykRKCuAMcnNAAJtP9caG1Zs66PgcaM5eEeTEKY7mWu+tkUj58Gi5cJW+fZ44GvSa3QsQLApSYBwUDNQkW3WerKv+5S6VV3Cboe92ifDufBfga7X2Zj6xBZlJebF3UN7437J7ye/O2VpMi7EVn/cq5Wyb9EonQ8FtvhfPJmUDf4RLP3Q4vyy3fQ2aPzt5cA==
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nvidia.com;
-Received: from MN2PR12MB4192.namprd12.prod.outlook.com (2603:10b6:208:1d5::15)
- by CY4PR12MB1750.namprd12.prod.outlook.com (2603:10b6:903:11c::21) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5566.14; Mon, 29 Aug
- 2022 15:31:46 +0000
-Received: from MN2PR12MB4192.namprd12.prod.outlook.com
- ([fe80::462:7fe:f04f:d0d5]) by MN2PR12MB4192.namprd12.prod.outlook.com
- ([fe80::462:7fe:f04f:d0d5%8]) with mapi id 15.20.5566.021; Mon, 29 Aug 2022
- 15:31:46 +0000
-Date:   Mon, 29 Aug 2022 12:31:45 -0300
-From:   Jason Gunthorpe <jgg@nvidia.com>
-To:     "Gupta, Nipun" <Nipun.Gupta@amd.com>
-Cc:     Robin Murphy <robin.murphy@arm.com>,
-        Saravana Kannan <saravanak@google.com>,
-        Greg KH <gregkh@linuxfoundation.org>,
-        "robh+dt@kernel.org" <robh+dt@kernel.org>,
-        "krzysztof.kozlowski+dt@linaro.org" 
-        <krzysztof.kozlowski+dt@linaro.org>,
-        "rafael@kernel.org" <rafael@kernel.org>,
-        "eric.auger@redhat.com" <eric.auger@redhat.com>,
-        "alex.williamson@redhat.com" <alex.williamson@redhat.com>,
-        "cohuck@redhat.com" <cohuck@redhat.com>,
-        "Gupta, Puneet (DCG-ENG)" <puneet.gupta@amd.com>,
-        "song.bao.hua@hisilicon.com" <song.bao.hua@hisilicon.com>,
-        "mchehab+huawei@kernel.org" <mchehab+huawei@kernel.org>,
-        "maz@kernel.org" <maz@kernel.org>,
-        "f.fainelli@gmail.com" <f.fainelli@gmail.com>,
-        "jeffrey.l.hugo@gmail.com" <jeffrey.l.hugo@gmail.com>,
-        "Michael.Srba@seznam.cz" <Michael.Srba@seznam.cz>,
-        "mani@kernel.org" <mani@kernel.org>,
-        "yishaih@nvidia.com" <yishaih@nvidia.com>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "devicetree@vger.kernel.org" <devicetree@vger.kernel.org>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "okaya@kernel.org" <okaya@kernel.org>,
-        "Anand, Harpreet" <harpreet.anand@amd.com>,
-        "Agarwal, Nikhil" <nikhil.agarwal@amd.com>,
-        "Simek, Michal" <michal.simek@amd.com>,
-        "git (AMD-Xilinx)" <git@amd.com>
-Subject: Re: [RFC PATCH v2 2/6] bus/cdx: add the cdx bus driver
-Message-ID: <Ywzb4RmbgbnQYTIl@nvidia.com>
-References: <20220817150542.483291-3-nipun.gupta@amd.com>
- <Yv0KHROjESUI59Pd@kroah.com>
- <DM6PR12MB3082D966CFC0FA1C2148D8FAE8719@DM6PR12MB3082.namprd12.prod.outlook.com>
- <YwOEv6107RfU5p+H@kroah.com>
- <DM6PR12MB3082B4BDD39632264E7532B8E8739@DM6PR12MB3082.namprd12.prod.outlook.com>
- <YwYVhJCSAuYcgj1/@kroah.com>
- <20220824233122.GA4068@nvidia.com>
- <CAGETcx846Pomh_DUToncbaOivHMhHrdt-MTVYqkfLUKvM8b=6w@mail.gmail.com>
- <a6ca5a5a-8424-c953-6f76-c9212db88485@arm.com>
- <DM6PR12MB30824C5129A7251C589F1461E8769@DM6PR12MB3082.namprd12.prod.outlook.com>
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <DM6PR12MB30824C5129A7251C589F1461E8769@DM6PR12MB3082.namprd12.prod.outlook.com>
-X-ClientProxiedBy: MN2PR20CA0058.namprd20.prod.outlook.com
- (2603:10b6:208:235::27) To MN2PR12MB4192.namprd12.prod.outlook.com
- (2603:10b6:208:1d5::15)
+        with ESMTP id S229447AbiH2PjB (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 29 Aug 2022 11:39:01 -0400
+Received: from mail-lj1-x235.google.com (mail-lj1-x235.google.com [IPv6:2a00:1450:4864:20::235])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D10678A6CC
+        for <kvm@vger.kernel.org>; Mon, 29 Aug 2022 08:38:59 -0700 (PDT)
+Received: by mail-lj1-x235.google.com with SMTP id bx38so8409479ljb.10
+        for <kvm@vger.kernel.org>; Mon, 29 Aug 2022 08:38:59 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc;
+        bh=qtzMJN2IhwIOKg+LEINBh2ep7v5OmXo7vf2/7aGCYLw=;
+        b=Uou770Z69zcy9Fx491hC0/9hhWGQ5eEEbqSRe/YlCorX0tbOdNIUazpXYiYK8Of6Ol
+         dC/EY0JbyhxTSGbA+pnZtzbggRVE/nHVKt/oQ4UN8/1oUYcxndBsxiCvusjqNp/lz/B8
+         dNQ8kPplmMJZpkBjGEZ4iIrwy3pcW03sTp/65tKECv+EPgAygoLPl2KEfv8B/T277sEz
+         6XvtDO3E8e4ALPfDD5XXu/98juMN2M/v/gtB3vkPZOBopuyYwuO9QT/vRsFPzyUPx2H+
+         1j5jH254P5XYLaKqlLZMATHmRI8SCJXTwrMrR18BYhElKqiRRQyKBAFfVuwpnqr0d4/t
+         DIUQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc;
+        bh=qtzMJN2IhwIOKg+LEINBh2ep7v5OmXo7vf2/7aGCYLw=;
+        b=HZmohkfpo0FWq4y+BwFzwx9MSa4zn76moGuuLD+E9rIYjGqVmxYApQtiqmwHSVlQLe
+         hNWWAxpODDpM7vyc/cqrh0TqOc+TW6Y2fTMGnkYxCY0HvWax9YJnHshyMkqg/ctnZ2No
+         BR0ZOYoYONfkDf7rJ9c6xekjfVHv6SNiBfHjlvQaK9V8deMsnAbEKlb2nnuIWV7VIlrZ
+         6sqhKRJ0EcibnLpKV1HD/Z0d0qjNvSiHLLyyPMYrsYPUdzrGKMwtEWxH+ybFxjCyNUKq
+         dkSeTbj5K+9ezH9/zW7WWyujmTFFGhOZRMROIhNuKj3aICiXuuYEPPmjqK5K09umNViA
+         EC0A==
+X-Gm-Message-State: ACgBeo1a9JZ3fkP5zdhwk3nUo76CBG0zfA4LZTBcDGC0VTIMFHlePuVP
+        OyHVXWmJkKxTR90wCTw25jZ5aYRwoQYMbQX+CPZI+g==
+X-Google-Smtp-Source: AA6agR62YqFrZZsQGwicm8/fjP4Jpt/uuJYGWEFHNIbGeY3FG1XsTaQ6pSWykQej8AxLmdziTLzvGGo8QOdl7C5gCOA=
+X-Received: by 2002:a2e:a552:0:b0:25e:6fa1:a6c4 with SMTP id
+ e18-20020a2ea552000000b0025e6fa1a6c4mr5489880ljn.90.1661787537928; Mon, 29
+ Aug 2022 08:38:57 -0700 (PDT)
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: 6844f3c6-8fb7-49fe-35fe-08da89d3952c
-X-MS-TrafficTypeDiagnostic: CY4PR12MB1750:EE_
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: sNjs2qmSUZIjSHwe8RpzyYw4TollK0gBdOwA60mni12SMI87vyZD5UqagusYlF7/BQVRHVF+DWGqWaGe0zsZ4UObKRwTBL27Umq4Kp5fPSe9yDEA7lZ+12FVp/RuaFDm4mqZxgvgpifpMeYB/eyTnllM4XOzHwvaDp0ejN8Ec+aZmXyd43L0NvWmiGcqbAySjeboSSxoG641jbG0Sm8sbsx2YLYfasfq2zbNt1qLM7P5o+DP60guZA/VU0urs3hPIpU3e36PHWUkG8YVPLdyPi9bnoDbINrqPzC6rlsyYzt3ecvF/+lzcu8m0ZvW7MtCj2w5RU1gBXoJKr7Uho+G8WfMnW2LCOzh1S1DD3YfnWINpzz0E/HgnQXHx9JwwGazzkkNfFgBoKZixFjoEMl0wefgv14X9Q5ZGM0Ipa73j73Tzfe8+gNC2L74404y6pmVpmb3kw/ihJeElNc0GiTdyzOYu38Jxw1xNoL2JF9J0rnv04YmB5mIiSsi1mll3Agea4LQtWUWBCwi3230JBAJigmybYeXrKhhZyWgJIrQkzc2kXqfvel/y3uYHBdMkjYEorbH6NXQ18LhQl2vOR89Gdriuhh+homwyec4xz7rZaFRvxTGDrhchsN4tTnPKGwfD8Xc3M1kmD3t6fwK6TpXcKhuOaUobu2ohn2ixv8Ld1iD1M5Ou8kOI1Dz93EsW/Wgwc7Vds8akf73+tIkFU3rJw==
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:MN2PR12MB4192.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230016)(4636009)(396003)(376002)(366004)(346002)(39860400002)(136003)(316002)(6916009)(54906003)(8676002)(86362001)(4326008)(6486002)(66946007)(66556008)(66476007)(478600001)(5660300002)(36756003)(41300700001)(8936002)(7416002)(4744005)(2616005)(6506007)(38100700002)(2906002)(26005)(6512007)(186003);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?9bkRGbJPxgfjbMDcdNxAuOPUxsRM0UhIRk0g01UaQb6nfbvvMhTHEJqsyHqO?=
- =?us-ascii?Q?h6Hw4wykvDLkoWrxYCFBaBaR7WjkCkOoGfhVlhowwYZd7BltNqObYOpHUeXC?=
- =?us-ascii?Q?ljAMhQg6Abf/CtcnwEyfpnx/FGmURVhe0J1WZ/bQ0A8cFcDP4RsvNjkTkAb9?=
- =?us-ascii?Q?QHzjkSZ6tJfVVWYct6vaUW7+kWJnU07nNPB35NaWgpDMHX+EttekyYUD4oMm?=
- =?us-ascii?Q?BTG+WhIupHr+57IKH1TeazSSEiLGJLTKGVdh2j5pHU6qiIeNsr0vBChZczqa?=
- =?us-ascii?Q?xBE6dKN9SGeI5oU06hWt7gXLipCL3aYOxA9RDWzCeFniKfaIrd4CqXrnVoq5?=
- =?us-ascii?Q?odANncBcAJNmP7wChwH/MukZPQVnipTRelVDZTJK6UqtG50w9ZVjuI43sF89?=
- =?us-ascii?Q?UFGdpB6g0LeAczKmbcxEhWFieptOkXTADPxSrI0CAH03TNZzFYNSwWGw4UII?=
- =?us-ascii?Q?GoLkTfSuNHTf0ssINVc7WZf09pxCyL5qiQvxVJY5BC3bkYwSSoEZsDL7Wuk5?=
- =?us-ascii?Q?3stFH2Vc/pFXixBb0Je7yfrXkpxMOGWDjaCt1RSn6mckKCtwVI7dr5z3wc0y?=
- =?us-ascii?Q?LOnvqC9ZvUkh16SFK7LbI/vcuW3BjKTLoa12KLylwSzuG8ugIS35OqrFsRqq?=
- =?us-ascii?Q?WEnQ0cI2PoMyw0dRiTr8ZSPjo6moky+ykru715Y+RrdLhLeOdRnCJmxpC8GI?=
- =?us-ascii?Q?y6KLj9ICxxTPLNzCO/+mX4dt7BSi+z6Oo119lnRIeTv+0sxPmFdaZecVOjHv?=
- =?us-ascii?Q?+J/ewURqAYJzllWBgp1MzKiuAQzaXmkSI5WnlxXZrjJWf61ZLbSEJbNqgPfp?=
- =?us-ascii?Q?LAXXE13TNNlhF9n6UhlZLtTXmosDrSiogMmDyrFtp0WrrDE2NfstnrMNCXTK?=
- =?us-ascii?Q?c0VImDxJ6CGs8k8WvnfW67/4VFZgoWAielrDnVPl/i7I5yAmPTbiFBKn8YDY?=
- =?us-ascii?Q?GZCqQrkri6Z6bAD50mIPpcxOk8oFxsWuXoGFKulzNG2xlC0/Dcs8nBeEs3EX?=
- =?us-ascii?Q?tl8yrc849gA9EKko5brKBH7NCyEAaIMDQ/CNPKK+EzBnHEAGhmNKhs1TSKP1?=
- =?us-ascii?Q?ogo0xr8owLaG7yKnsPC1ZTdbYiqUoFm+5TKMGt7BlwE6QsbRPcGZ0XCf3RL5?=
- =?us-ascii?Q?HNCzIUigspt94tXdHmXV8//u38Rfm+/C7g7OGxa1ZNiQmbJZv7rGZG9xGE+L?=
- =?us-ascii?Q?YB9ecNWHVLKeltFftOt+TH+OpZ0RMJkWCbgSp9faPCpLonjNiMoSh+K+2q17?=
- =?us-ascii?Q?Ad3bfteBCf6XSlCJxhblYRkjygZXB5oluDwzuS3fQdcouR3UM85tNPKmRnlZ?=
- =?us-ascii?Q?BIWe9ptcen2RnfDjab/fiis4NiMLlByrkEe9VoTymTGyFniYpBjGjqD3SMjM?=
- =?us-ascii?Q?zedy1R/gP0oN7ak4yf5UdE40/xK+L4mueFxc+cQLxzRwYRdonh5UH7lt/yFD?=
- =?us-ascii?Q?YZ+ltAh5/J6Wb8AEo42Pmn6l1hjZgVfQCb4rcQ0rYg9+Z8uDnqNXNVHujvu7?=
- =?us-ascii?Q?MeR8pmZYG5+t+WJcag1aiKEcgzaZF5zWz5rAn+RI6aMAxnwcx9saRtvH9AV3?=
- =?us-ascii?Q?a8I4IM4pKJbdCV4m8rl78AO/MrlvEJrPIF4mLgMl?=
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 6844f3c6-8fb7-49fe-35fe-08da89d3952c
-X-MS-Exchange-CrossTenant-AuthSource: MN2PR12MB4192.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 29 Aug 2022 15:31:46.2965
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: ItY5JfFvpl7l6i5tvWvD06aeZxtiDbDKGm2bgPP5nl11vn+4RZpoIECYjqMFXWbJ
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: CY4PR12MB1750
-X-Spam-Status: No, score=-1.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FORGED_SPF_HELO,
-        RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_NONE,
-        T_SCC_BODY_TEXT_LINE autolearn=no autolearn_force=no version=3.4.6
+References: <20220810152033.946942-1-pgonda@google.com> <20220810152033.946942-12-pgonda@google.com>
+ <Yv2GN1WPvi7K8LdI@google.com>
+In-Reply-To: <Yv2GN1WPvi7K8LdI@google.com>
+From:   Peter Gonda <pgonda@google.com>
+Date:   Mon, 29 Aug 2022 09:38:46 -0600
+Message-ID: <CAMkAt6qo624CvoA==+umFJJtAiG4XOL277xOwwznZ9EmPzTxjw@mail.gmail.com>
+Subject: Re: [V3 11/11] KVM: selftests: Add simple sev vm testing
+To:     Sean Christopherson <seanjc@google.com>
+Cc:     kvm list <kvm@vger.kernel.org>,
+        LKML <linux-kernel@vger.kernel.org>,
+        Marc Orr <marcorr@google.com>,
+        Michael Roth <michael.roth@amd.com>,
+        "Lendacky, Thomas" <thomas.lendacky@amd.com>,
+        Joerg Roedel <joro@8bytes.org>,
+        Mingwei Zhang <mizhang@google.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Andrew Jones <andrew.jones@linux.dev>,
+        Vishal Annapurve <vannapurve@google.com>
+Content-Type: text/plain; charset="UTF-8"
+X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
+        T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL
+        autolearn=unavailable autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Aug 29, 2022 at 04:49:02AM +0000, Gupta, Nipun wrote:
+On Wed, Aug 17, 2022 at 6:22 PM Sean Christopherson <seanjc@google.com> wrote:
+>
+> /sev_vm_launch_measurOn Wed, Aug 10, 2022, Peter Gonda wrote:
+> > diff --git a/tools/testing/selftests/kvm/include/x86_64/sev.h b/tools/testing/selftests/kvm/include/x86_64/sev.h
+> > index 2f7f7c741b12..b6552ea1c716 100644
+> > --- a/tools/testing/selftests/kvm/include/x86_64/sev.h
+> > +++ b/tools/testing/selftests/kvm/include/x86_64/sev.h
+> > @@ -22,6 +22,9 @@
+> >  #define SEV_POLICY_NO_DBG    (1UL << 0)
+> >  #define SEV_POLICY_ES                (1UL << 2)
+> >
+> > +#define CPUID_MEM_ENC_LEAF 0x8000001f
+> > +#define CPUID_EBX_CBIT_MASK 0x3f
+>
+> Ha!  I was going to say "put these in processor.h", but I have an even better idea.
+> I'll try to a series posted tomorrow (compile tested only at this point), but what
+> I'm hoping to do is to allow automagic retrieval of multi-bit CPUID properties, a la
+> the existing this_cpu_has() stuff.
+>
+> E.g.
+>
+>         #define X86_PROPERTY_CBIT_LOCATION              KVM_X86_CPU_PROPERTY(0x8000001F, 0, EBX, 0, 5)
+>
+> and then
+>
+>         sev->enc_bit = this_cpu_property(X86_PROPERTY_CBIT_LOCATION);
+>
+> LOL, now I see that the defines in sev.c were introduced back in patch 08.  That's
+> probably fine for your submission so as not to take a dependency on the "property"
+> idea.  This patch doesn't need to move the CPUID_* defines because it can use
+> this_cpu_has(X86_FEATURE_SEV) and avoid referencing CPUID_MEM_ENC_LEAF.
 
-> Devices are created in FPFGA with a CDX wrapper, and CDX controller(firmware)
-> reads that CDX wrapper to find out new devices. Host driver then interacts with
-> firmware to find newly discovered devices. This bus aligns with PCI infrastructure.
-> It happens to be an embedded interface as opposed to off-chip connection.
+OK I've put these into sev.c instead of the header. I can clean up
+after you property patch series goes in.
 
-Why do you need an FW in all of this?
+>
+> >  enum {
+> >       SEV_GSTATE_UNINIT = 0,
+> >       SEV_GSTATE_LUPDATE,
+> > diff --git a/tools/testing/selftests/kvm/lib/x86_64/sev.c b/tools/testing/selftests/kvm/lib/x86_64/sev.c
+> > index 3abcf50c0b5d..8f9f55c685a7 100644
+> > --- a/tools/testing/selftests/kvm/lib/x86_64/sev.c
+> > +++ b/tools/testing/selftests/kvm/lib/x86_64/sev.c
+> > @@ -13,8 +13,6 @@
+> >  #include "sev.h"
+> >
+> >  #define PAGE_SHIFT           12
+>
+> Already defined in processor.h
 
-And why do you need DT at all?
+Removed
 
-It is still not clear
+>
+> > -#define CPUID_MEM_ENC_LEAF 0x8000001f
+> > -#define CPUID_EBX_CBIT_MASK 0x3f
+> >
+> >  struct sev_vm {
+> >       struct kvm_vm *vm;
+> > diff --git a/tools/testing/selftests/kvm/x86_64/sev_all_boot_test.c b/tools/testing/selftests/kvm/x86_64/sev_all_boot_test.c
+> > new file mode 100644
+> > index 000000000000..b319d18bdb60
+> > --- /dev/null
+> > +++ b/tools/testing/selftests/kvm/x86_64/sev_all_boot_test.c
+> > @@ -0,0 +1,131 @@
+> > +// SPDX-License-Identifier: GPL-2.0-only
+> > +/*
+> > + * Basic SEV boot tests.
+> > + *
+> > + * Copyright (C) 2021 Advanced Micro Devices
+> > + */
+> > +#define _GNU_SOURCE /* for program_invocation_short_name */
+> > +#include <fcntl.h>
+> > +#include <stdio.h>
+> > +#include <stdlib.h>
+> > +#include <string.h>
+> > +#include <sys/ioctl.h>
+> > +
+> > +#include "test_util.h"
+> > +
+> > +#include "kvm_util.h"
+> > +#include "processor.h"
+> > +#include "svm_util.h"
+> > +#include "linux/psp-sev.h"
+> > +#include "sev.h"
+> > +
+> > +#define VCPU_ID                      2
+>
+> Nooooooo.  Unless there is a really, REALLY good reason this needs to be '2', just
+> pass '0' as a literal to vm_vcpu_add() and delete VCPU_ID.
 
-Jason
+Not needed, removed.
+
+>
+> > +#define PAGE_STRIDE          32
+> > +
+> > +#define SHARED_PAGES         8192
+> > +#define SHARED_VADDR_MIN     0x1000000
+> > +
+> > +#define PRIVATE_PAGES                2048
+> > +#define PRIVATE_VADDR_MIN    (SHARED_VADDR_MIN + SHARED_PAGES * PAGE_SIZE)
+> > +
+> > +#define TOTAL_PAGES          (512 + SHARED_PAGES + PRIVATE_PAGES)
+> > +
+> > +#define NR_SYNCS 1
+> > +
+> > +static void guest_run_loop(struct kvm_vcpu *vcpu)
+> > +{
+> > +     struct ucall uc;
+> > +     int i;
+> > +
+> > +     for (i = 0; i <= NR_SYNCS; ++i) {
+> > +             vcpu_run(vcpu);
+> > +             switch (get_ucall(vcpu, &uc)) {
+> > +             case UCALL_SYNC:
+> > +                     continue;
+> > +             case UCALL_DONE:
+> > +                     return;
+> > +             case UCALL_ABORT:
+> > +                     TEST_ASSERT(false, "%s at %s:%ld\n\tvalues: %#lx, %#lx",
+> > +                                 (const char *)uc.args[0], __FILE__,
+> > +                                 uc.args[1], uc.args[2], uc.args[3]);
+> > +             default:
+> > +                     TEST_ASSERT(
+> > +                             false, "Unexpected exit: %s",
+> > +                             exit_reason_str(vcpu->run->exit_reason));
+> > +             }
+> > +     }
+> > +}
+> > +
+> > +static void __attribute__((__flatten__)) guest_sev_code(void)
+>
+> Is __flatten__ strictly necessary?  I don't see this being copied over anything
+> that would require it to be a contiguous chunk.
+
+Nope, removed.
+
+>
+> > +{
+> > +     uint32_t eax, ebx, ecx, edx;
+> > +     uint64_t sev_status;
+> > +
+> > +     GUEST_SYNC(1);
+> > +
+> > +     cpuid(CPUID_MEM_ENC_LEAF, &eax, &ebx, &ecx, &edx);
+> > +     GUEST_ASSERT(eax & (1 << 1));
+>
+>         GUEST_ASSERT(this_cpu_has(X86_FEATURE_SEV));
+
+Done.
+
+> > +
+> > +     sev_status = rdmsr(MSR_AMD64_SEV);
+> > +     GUEST_ASSERT((sev_status & 0x1) == 1);
+> > +
+> > +     GUEST_DONE();
+> > +}
+> > +
+> > +static struct sev_vm *setup_test_common(void *guest_code, uint64_t policy,
+> > +                                     struct kvm_vcpu **vcpu)
+> > +{
+> > +     uint8_t measurement[512];
+> > +     struct sev_vm *sev;
+> > +     struct kvm_vm *vm;
+> > +     int i;
+> > +
+> > +     sev = sev_vm_create(policy, TOTAL_PAGES);
+>
+>         TEST_ASSERT(sev, ...) so that this doesn't silently "pass"?
+
+Done.
+
+>
+> > +     if (!sev)
+> > +             return NULL;
+> > +     vm = sev_get_vm(sev);
+> > +
+> > +     /* Set up VCPU and initial guest kernel. */
+> > +     *vcpu = vm_vcpu_add(vm, VCPU_ID, guest_code);
+> > +     kvm_vm_elf_load(vm, program_invocation_name);
+> > +
+> > +     /* Allocations/setup done. Encrypt initial guest payload. */
+> > +     sev_vm_launch(sev);
+> > +
+> > +     /* Dump the initial measurement. A test to actually verify it would be nice. */
+> > +     sev_vm_launch_measure(sev, measurement);
+> > +     pr_info("guest measurement: ");
+> > +     for (i = 0; i < 32; ++i)
+> > +             pr_info("%02x", measurement[i]);
+> > +     pr_info("\n");
+> > +
+> > +     sev_vm_launch_finish(sev);
+> > +
+> > +     return sev;
+> > +}
+> > +
+> > +static void test_sev(void *guest_code, uint64_t policy)
+> > +{
+> > +     struct sev_vm *sev;
+> > +     struct kvm_vcpu *vcpu;
+> > +
+> > +     sev = setup_test_common(guest_code, policy, &vcpu);
+> > +     if (!sev)
+> > +             return;
+>
+> And with an assert above, this return goes away.  Or better yet, fold setup_test_common()
+> into test_sev(), there's only the one user of the so called "common" function.
+
+Done.
+
+>
+> > +
+> > +     /* Guest is ready to run. Do the tests. */
+> > +     guest_run_loop(vcpu);
+> > +
+> > +     pr_info("guest ran successfully\n");
+> > +
+> > +     sev_vm_free(sev);
+> > +}
+> > +
+> > +int main(int argc, char *argv[])
+> > +{
+> > +     /* SEV tests */
+> > +     test_sev(guest_sev_code, SEV_POLICY_NO_DBG);
+> > +     test_sev(guest_sev_code, 0);
+> > +
+> > +     return 0;
+> > +}
+> > --
+> > 2.37.1.559.g78731f0fdb-goog
+> >
