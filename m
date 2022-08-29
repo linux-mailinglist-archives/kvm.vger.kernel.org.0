@@ -2,43 +2,43 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 527675A46D4
-	for <lists+kvm@lfdr.de>; Mon, 29 Aug 2022 12:10:36 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 4ABE05A46D6
+	for <lists+kvm@lfdr.de>; Mon, 29 Aug 2022 12:11:10 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230010AbiH2KKf (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 29 Aug 2022 06:10:35 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60628 "EHLO
+        id S229881AbiH2KLI (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 29 Aug 2022 06:11:08 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60842 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229911AbiH2KKK (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 29 Aug 2022 06:10:10 -0400
-Received: from NAM02-BN1-obe.outbound.protection.outlook.com (mail-bn1nam07on2068.outbound.protection.outlook.com [40.107.212.68])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A4B7663D0;
-        Mon, 29 Aug 2022 03:10:00 -0700 (PDT)
+        with ESMTP id S229977AbiH2KKr (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 29 Aug 2022 06:10:47 -0400
+Received: from NAM11-BN8-obe.outbound.protection.outlook.com (mail-bn8nam11on2040.outbound.protection.outlook.com [40.107.236.40])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A0F50636C;
+        Mon, 29 Aug 2022 03:10:31 -0700 (PDT)
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=gyUHgqfFSVeX1J8VC/P6BFFXB13YVHTvdXUwA7q8Hv72Gdf5gP2cCtZJD7U0/yK2oaC0Rkx9pGyNs6O23IsJS5UO030+PDr9Ct3PFZQPUpEuiEt4kdHqgvxDn6OeCHDhXg17dgR9rXUZvrIgF63NLQnHiS6zEsTkeg1lKaSWivYj+YGvM+57ADZxzkdBnDvoIXwqY0Gtbi5wa2Z24gnEuiCyXQqoP6KPG3LhFLTdDALm11Sb7HcPY33Fq8LWJpqgHT5hl1ph9NX3zvBOdBPXiCEdVxOguy10EEg/XVrxUOH/VeHQww/yjRFgBnPqiucluGCYd7ZFvZWT7yY9wF0y8g==
+ b=Xl0dm4QhrKLTopKRABFoAtmsTn6x30gAPOj0iaCaIr/UKpmxPqalAr4a/Gbw2fXB3vUzILdCd5F2OAdPS3OuR9WnuIbgWcnI1jBnQenHtbj4W7V+2i3cABTm/375HpnS1+eelRDnqRCArWha4MeoO3LhwlPcrnxN6mvaSUhXCtH7XDHzWU8bN2IFyrEA2Ny8JmqKkYFLpP1k7+dvSBmgpu38Fp09gn0ZG5QVkkb4G1dFB3dSG2CLHcE4/P9PXGMiBGrtwaIzmt9x3ROkjRlmHGUEn5uW7t2odhuEAQQ0d/vVzfoDFPXGMeFIovRHkAq9KGlcBQfHh6/rv2pL0iBjnA==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=GAu3xcWGgzkvSilv3WWelZnCfuOZEVIzuB/OeMv+Zv8=;
- b=i0EmETw8MFCScwZyRFQqEiF6GiTo2J+wqZwiH5vGcbRruzxzLiVfqiUcOKqvOY9ZdZiYtPKEePlRt8J9F15ofZXZDdGzg8m4fPpue+kLDMTqrReI5kkycyWRga3+dU/DKrtnd+InsH9nx5nkHTQVmawSSLHv6CJ5CMOnl3MCHmbu7QFFXuzIiW9ph8vDthfWEJxOkhfwZDo6dacyMYoVPWNHfJGI9gtp17NdN+Ay+5LAvkBSfM6vU/21jzTKA8r64z5YMEVJmvKDq2ddVJkSyL4C6YmcQXUadU5TgJ8PGBARuYT3/T5VUy7tRv9Ah5U6A/NnA9W74XP/CFeVP/BM5Q==
+ bh=d4hWf2cX8HyJA6YkFBwdnL3SgpKG6/MFN+iTFTu3cas=;
+ b=SgRBWNzYONcAm4oRTtDe7ge3aU1HfYWOE42/jWcj5GxXjTNeFwmZBIzvK02Djw3y+wFDojKouG6+DTw5S6wlgkHLvmvX8CvFwc2ySmLtIo+OtZ7psBTOaO+kCQRzSoJHsQ9DbDZm78C/2wd45VebHtGky30A/J3HBGKXR5z8GinX43OBcHUdbG4Y6vwn8VFUzzBmYmIQeiPNWSzHlUNRa83cRTLYDQlcaQoEI3Ub1FqgzH7wM2vP4jkYP2u1/Y4t9XrIPdmC13iR4NXPpPZsj8Bc18rf8A9//x6MFdsRZOuyWFQ6f3il3M18hUBEVrTG+mozUsdxRMXMXUmT79oeiA==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
  165.204.84.17) smtp.rcpttodomain=redhat.com smtp.mailfrom=amd.com; dmarc=pass
  (p=quarantine sp=quarantine pct=100) action=none header.from=amd.com;
  dkim=none (message not signed); arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=GAu3xcWGgzkvSilv3WWelZnCfuOZEVIzuB/OeMv+Zv8=;
- b=tVqeiPCvaIysbzjk/gEqv/aGfVh5TVlTz6K1vx/49l910/ZF0QsHqwfSaOvWjKRfKoja4lw5FYUWAMChHCpl0sZnVI2P6M3yq143e7rwpICYIXbs37b65PCoqdMe6nZb7kO52705+d2IMBMcjoK12jQWjsZq8RHMo/RlXOJp0qU=
-Received: from BYAPR04CA0023.namprd04.prod.outlook.com (2603:10b6:a03:40::36)
- by SN7PR12MB6689.namprd12.prod.outlook.com (2603:10b6:806:273::17) with
+ bh=d4hWf2cX8HyJA6YkFBwdnL3SgpKG6/MFN+iTFTu3cas=;
+ b=HtSsJpuu45KE2ekyhIWdeB6MqX7f8yzbVkPPr3s6xOeOeY82BdugORkr/JvLB9b/tlaEMjrffqJMTEV/rloOKN5jOD0/w7WvJMzjmlDoZY6KsLRffwRFJYOD2gEd7OPspLaujz8udgd8VCXL5cg+4s0RxMxEfSdqm+cSH28wy+g=
+Received: from BYAPR04CA0026.namprd04.prod.outlook.com (2603:10b6:a03:40::39)
+ by PH7PR12MB7113.namprd12.prod.outlook.com (2603:10b6:510:1ec::8) with
  Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5566.16; Mon, 29 Aug
- 2022 10:09:58 +0000
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5566.15; Mon, 29 Aug
+ 2022 10:10:28 +0000
 Received: from CO1PEPF00001A64.namprd05.prod.outlook.com
- (2603:10b6:a03:40:cafe::7f) by BYAPR04CA0023.outlook.office365.com
- (2603:10b6:a03:40::36) with Microsoft SMTP Server (version=TLS1_2,
+ (2603:10b6:a03:40:cafe::ec) by BYAPR04CA0026.outlook.office365.com
+ (2603:10b6:a03:40::39) with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5566.15 via Frontend
- Transport; Mon, 29 Aug 2022 10:09:58 +0000
+ Transport; Mon, 29 Aug 2022 10:10:28 +0000
 X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 165.204.84.17)
  smtp.mailfrom=amd.com; dkim=none (message not signed)
  header.d=none;dmarc=pass action=none header.from=amd.com;
@@ -48,11 +48,11 @@ Received-SPF: Pass (protection.outlook.com: domain of amd.com designates
 Received: from SATLEXMB04.amd.com (165.204.84.17) by
  CO1PEPF00001A64.mail.protection.outlook.com (10.167.241.11) with Microsoft
  SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.20.5588.7 via Frontend Transport; Mon, 29 Aug 2022 10:09:57 +0000
+ 15.20.5588.7 via Frontend Transport; Mon, 29 Aug 2022 10:10:28 +0000
 Received: from BLR-5CG113396M.amd.com (10.180.168.240) by SATLEXMB04.amd.com
  (10.181.40.145) with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2375.28; Mon, 29 Aug
- 2022 05:09:50 -0500
+ 2022 05:10:22 -0500
 From:   Santosh Shukla <santosh.shukla@amd.com>
 To:     Paolo Bonzini <pbonzini@redhat.com>
 CC:     Sean Christopherson <seanjc@google.com>,
@@ -62,9 +62,9 @@ CC:     Sean Christopherson <seanjc@google.com>,
         Tom Lendacky <thomas.lendacky@amd.com>, <kvm@vger.kernel.org>,
         <linux-kernel@vger.kernel.org>, <santosh.shukla@amd.com>,
         <mlevitsk@redhat.com>, <mail@maciej.szmigiero.name>
-Subject: [PATCHv4 2/8] KVM: SVM: Add VNMI bit definition
-Date:   Mon, 29 Aug 2022 15:38:44 +0530
-Message-ID: <20220829100850.1474-3-santosh.shukla@amd.com>
+Subject: [PATCHv4 3/8] KVM: SVM: Add VNMI support in get/set_nmi_mask
+Date:   Mon, 29 Aug 2022 15:38:45 +0530
+Message-ID: <20220829100850.1474-4-santosh.shukla@amd.com>
 X-Mailer: git-send-email 2.25.1
 In-Reply-To: <20220829100850.1474-1-santosh.shukla@amd.com>
 References: <20220829100850.1474-1-santosh.shukla@amd.com>
@@ -76,23 +76,23 @@ X-ClientProxiedBy: SATLEXMB04.amd.com (10.181.40.145) To SATLEXMB04.amd.com
  (10.181.40.145)
 X-EOPAttributedMessage: 0
 X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: e4bc9b0f-a117-4e11-0981-08da89a6a0b0
-X-MS-TrafficTypeDiagnostic: SN7PR12MB6689:EE_
+X-MS-Office365-Filtering-Correlation-Id: 6cc8280b-669f-43f6-c5af-08da89a6b2e2
+X-MS-TrafficTypeDiagnostic: PH7PR12MB7113:EE_
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: xW496eBmalKV83pC+gpzOLMujkbN63Gk3Y8jLGxKMFJWmJWUIQWKFiPxJxoK7oS0Ju4/1/4gReIrSjmHS/fkjlhhattfLPM3AEiLWKlHl9VaVUHpKbi2KQ9eN8p35BUAPzJSei05EdAjUosBl4QTRjy8t1GPJhdUrLnfHkZwlcP9qAh8U6iPwY1UqOcma3iiJ4q51MrXNRrCUt64UrzlK8MknOihh1UwDv8X6FZhvz+EIED199gXxoMcQ8uJljRo9VGXJXCOmsDYyIqR6IDxJa57ikEGixV6nnYFo5ZlE3mzVeIAMbxx66ZEjZXudj5e4nrC1tRLhh2a7JsHP8x5LcDhpryBM64sLoHdVXQfOu7GcvDhsmphnoVLl+nDVgHM8hZgJncUxSlnMZXJqMDDYBIGmVCRO3SCA0nDA/oq34ERZXIIcBH9rzXhpTORIoL5lIBIViZmcZFS0tYnNQ4qeRm2emlgQYpBqnDjbEKyVwyqqwVPzijpautCO1XUWsxEWhvppYmtMqNTazKzF1XYDul0tZz6mTqkPyOF4gH1r5ir6cKISPMxfKjD7R7FPHINs4zumfNHCYsuHQQU73KY8KzS4NmU4sZsOGw7E+2l2rM5j8HXUhlsQ8s4EgkDHEBnuBNTRoM91reyv4HBbbVE+sc+XS27Q4OZL22vxT8SiG8wSsL6+ZPN2vSjzMCP9oSRoHekTAwnX4NvYTXoqjJ8xbpkuytnv1oFrnJkjgLePWgc6D/fWzFq/bh5tGV9KPdeszSo4ToqrpWspkH4BLuiOC+CIOIrIFyHrQkRfWaT4EWk/EZGv8M4YrwqEw6CGYaF
-X-Forefront-Antispam-Report: CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:SATLEXMB04.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230016)(4636009)(346002)(136003)(39860400002)(396003)(376002)(46966006)(36840700001)(40470700004)(336012)(16526019)(1076003)(47076005)(186003)(426003)(2616005)(26005)(41300700001)(6666004)(7696005)(36860700001)(44832011)(8936002)(8676002)(4326008)(40480700001)(5660300002)(82310400005)(40460700003)(2906002)(478600001)(70586007)(54906003)(70206006)(6916009)(82740400003)(316002)(356005)(81166007)(36756003)(86362001)(36900700001);DIR:OUT;SFP:1101;
+X-Microsoft-Antispam-Message-Info: 3zfXCdNpGXmvzHtOZu+RhYXt3cXQVPxlM6a6QQvi9yvTVV+19+cSODizVk4CPFahfzuhxSvF6B+Xm9d8P3XSS21PmMVfwiBXVaRaZHC/2sz2ke8uZe4VvyYpy8mHKUAbixUNxD3egPI1QYqpgEF84udRdLKPkMkE/RnmlF8LBqh/LeLgM5jFt/KEXTii+T340BL5zHgSQ88pjwhpnTcSUlPzlgbPynGrW80K7h7Qvph50eMASk1xGsNHVti/MjN3HPlrSNCqGTqfDHOxWX43dmElODaz8doDAbkaVYhEe5VAAejUSfG9zDy492xMLNyjl+Lm0nsRv1wx4U8oPZGN+FYpb6y8fhfN765Rev5i9mNTmHa00a/r4KtFnmFo13KfJNYaN7SFR7l3bUco+zJueophnb2qGh8JXwNpvYaoeBe19WBaObWVKX6ClTqjJz68NLsZOabK3EZUl/h6SR/fIMkS+o09N5QoEq+UkxThm8qtn7FY+iPeOJjGHFTmMVEOagc1rCGeaFwXXihU7146Rtu7btU4JImVaAKv5dNE08k9+o7EE2Ny/HVVFywjFVsQHayf1qh0sb9sBKmyEde+c0pT8FporRTN2dY9PLqMA2t0JrOZUlxdovf0/zvr9tPMbO9ou1rhAAjHVmEMzpWPP/9l0l0ELImDTurDn5U2G+x7OyyfjEVEPV2NLN7ff6fdFQ75Co0c8seap4VRP3mJHy729eOlmVRPeY9zpFMxaGfdlD2Jr/4jCnxndmfToG7cPhJ+yWmrIpYAEuFjzS0wlUK8JWHqHO79fPaSgU9M7mCzWZgkzD/A9BGXmcGWEYY/
+X-Forefront-Antispam-Report: CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:SATLEXMB04.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230016)(4636009)(376002)(346002)(136003)(39860400002)(396003)(46966006)(36840700001)(40470700004)(83380400001)(81166007)(40460700003)(16526019)(426003)(86362001)(36860700001)(1076003)(47076005)(186003)(336012)(2616005)(356005)(44832011)(82740400003)(5660300002)(36756003)(4326008)(8676002)(70586007)(70206006)(2906002)(82310400005)(40480700001)(41300700001)(478600001)(7696005)(6666004)(26005)(54906003)(8936002)(316002)(6916009)(36900700001);DIR:OUT;SFP:1101;
 X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 29 Aug 2022 10:09:57.7939
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 29 Aug 2022 10:10:28.3254
  (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: e4bc9b0f-a117-4e11-0981-08da89a6a0b0
+X-MS-Exchange-CrossTenant-Network-Message-Id: 6cc8280b-669f-43f6-c5af-08da89a6b2e2
 X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
 X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=3dd8961f-e488-4e60-8e11-a82d994e183d;Ip=[165.204.84.17];Helo=[SATLEXMB04.amd.com]
 X-MS-Exchange-CrossTenant-AuthSource: CO1PEPF00001A64.namprd05.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Anonymous
 X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SN7PR12MB6689
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH7PR12MB7113
 X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
         DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
         RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_PASS,T_SCC_BODY_TEXT_LINE
@@ -103,71 +103,135 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-VNMI exposes 3 capability bits (V_NMI, V_NMI_MASK, and V_NMI_ENABLE) to
-virtualize NMI and NMI_MASK, Those capability bits are part of
-VMCB::intr_ctrl -
-V_NMI(11) - Indicates whether a virtual NMI is pending in the guest.
-V_NMI_MASK(12) - Indicates whether virtual NMI is masked in the guest.
-V_NMI_ENABLE(26) - Enables the NMI virtualization feature for the guest.
+VMCB intr_ctrl bit12 (V_NMI_MASK) is set by the processor when handling
+NMI in guest and is cleared after the NMI is handled. Treat V_NMI_MASK
+as read-only in the hypervisor except for the SMM case where hypervisor
+before entring and after leaving SMM mode requires to set and unset
+V_NMI_MASK.
 
-When Hypervisor wants to inject NMI, it will set V_NMI bit, Processor
-will clear the V_NMI bit and Set the V_NMI_MASK which means the Guest is
-handling NMI, After the guest handled the NMI, The processor will clear
-the V_NMI_MASK on the successful completion of IRET instruction Or if
-VMEXIT occurs while delivering the virtual NMI.
+Adding API(get_vnmi_vmcb) in order to return the correct vmcb for L1 or
+L2, and also API(clear/set_vnmi_mask) to clear and set mask.
 
-To enable the VNMI capability, Hypervisor need to program
-V_NMI_ENABLE bit 1.
-
-Reviewed-by: Maxim Levitsky <mlevitsk@redhat.com>
 Signed-off-by: Santosh Shukla <santosh.shukla@amd.com>
 ---
- arch/x86/include/asm/svm.h | 7 +++++++
- arch/x86/kvm/svm/svm.c     | 6 ++++++
- 2 files changed, 13 insertions(+)
+v3:
+* Handle SMM case
+* Added set/clear_vnmi_mask() API.
 
-diff --git a/arch/x86/include/asm/svm.h b/arch/x86/include/asm/svm.h
-index 0361626841bc..73bf97e04fe3 100644
---- a/arch/x86/include/asm/svm.h
-+++ b/arch/x86/include/asm/svm.h
-@@ -198,6 +198,13 @@ struct __attribute__ ((__packed__)) vmcb_control_area {
- #define X2APIC_MODE_SHIFT 30
- #define X2APIC_MODE_MASK (1 << X2APIC_MODE_SHIFT)
- 
-+#define V_NMI_PENDING_SHIFT 11
-+#define V_NMI_PENDING (1 << V_NMI_PENDING_SHIFT)
-+#define V_NMI_MASK_SHIFT 12
-+#define V_NMI_MASK (1 << V_NMI_MASK_SHIFT)
-+#define V_NMI_ENABLE_SHIFT 26
-+#define V_NMI_ENABLE (1 << V_NMI_ENABLE_SHIFT)
-+
- #define LBR_CTL_ENABLE_MASK BIT_ULL(0)
- #define VIRTUAL_VMLOAD_VMSAVE_ENABLE_MASK BIT_ULL(1)
- 
+v2:
+- Added get_vnmi_vmcb API to return vmcb for l1 and l2.
+- Use get_vnmi_vmcb to get correct vmcb in func -
+  is_vnmi_enabled/_mask_set()
+- removed vnmi check from is_vnmi_enabled() func.
+
+ arch/x86/kvm/svm/svm.c | 17 +++++++++++++-
+ arch/x86/kvm/svm/svm.h | 52 ++++++++++++++++++++++++++++++++++++++++++
+ 2 files changed, 68 insertions(+), 1 deletion(-)
+
 diff --git a/arch/x86/kvm/svm/svm.c b/arch/x86/kvm/svm/svm.c
-index f3813dbacb9f..38db96121c32 100644
+index 38db96121c32..ab5df74da626 100644
 --- a/arch/x86/kvm/svm/svm.c
 +++ b/arch/x86/kvm/svm/svm.c
-@@ -229,6 +229,8 @@ module_param(dump_invalid_vmcb, bool, 0644);
- bool intercept_smi = true;
- module_param(intercept_smi, bool, 0444);
+@@ -3621,13 +3621,28 @@ static int svm_nmi_allowed(struct kvm_vcpu *vcpu, bool for_injection)
  
-+bool vnmi = true;
-+module_param(vnmi, bool, 0444);
- 
- static bool svm_gp_erratum_intercept = true;
- 
-@@ -5063,6 +5065,10 @@ static __init int svm_hardware_setup(void)
- 		svm_x86_ops.vcpu_get_apicv_inhibit_reasons = NULL;
- 	}
- 
-+	vnmi = vnmi && boot_cpu_has(X86_FEATURE_V_NMI);
-+	if (vnmi)
-+		pr_info("V_NMI enabled\n");
+ static bool svm_get_nmi_mask(struct kvm_vcpu *vcpu)
+ {
+-	return !!(vcpu->arch.hflags & HF_NMI_MASK);
++	struct vcpu_svm *svm = to_svm(vcpu);
 +
- 	if (vls) {
- 		if (!npt_enabled ||
- 		    !boot_cpu_has(X86_FEATURE_V_VMSAVE_VMLOAD) ||
++	if (is_vnmi_enabled(svm))
++		return is_vnmi_mask_set(svm);
++	else
++		return !!(vcpu->arch.hflags & HF_NMI_MASK);
+ }
+ 
+ static void svm_set_nmi_mask(struct kvm_vcpu *vcpu, bool masked)
+ {
+ 	struct vcpu_svm *svm = to_svm(vcpu);
+ 
++	if (is_vnmi_enabled(svm)) {
++		if (is_smm(vcpu)) {
++			if (masked)
++				set_vnmi_mask(svm);
++			else
++				clear_vnmi_mask(svm);
++		}
++		return;
++	}
++
+ 	if (masked) {
+ 		vcpu->arch.hflags |= HF_NMI_MASK;
+ 		if (!sev_es_guest(vcpu->kvm))
+diff --git a/arch/x86/kvm/svm/svm.h b/arch/x86/kvm/svm/svm.h
+index 6a7686bf6900..cc98ec7bd119 100644
+--- a/arch/x86/kvm/svm/svm.h
++++ b/arch/x86/kvm/svm/svm.h
+@@ -35,6 +35,7 @@ extern u32 msrpm_offsets[MSRPM_OFFSETS] __read_mostly;
+ extern bool npt_enabled;
+ extern int vgif;
+ extern bool intercept_smi;
++extern bool vnmi;
+ 
+ enum avic_modes {
+ 	AVIC_MODE_NONE = 0,
+@@ -532,6 +533,57 @@ static inline bool is_x2apic_msrpm_offset(u32 offset)
+ 	       (msr < (APIC_BASE_MSR + 0x100));
+ }
+ 
++static inline struct vmcb *get_vnmi_vmcb(struct vcpu_svm *svm)
++{
++	if (!vnmi)
++		return NULL;
++
++	if (is_guest_mode(&svm->vcpu))
++		return svm->nested.vmcb02.ptr;
++	else
++		return svm->vmcb01.ptr;
++}
++
++static inline bool is_vnmi_enabled(struct vcpu_svm *svm)
++{
++	struct vmcb *vmcb = get_vnmi_vmcb(svm);
++
++	if (vmcb)
++		return !!(vmcb->control.int_ctl & V_NMI_ENABLE);
++	else
++		return false;
++}
++
++static inline bool is_vnmi_mask_set(struct vcpu_svm *svm)
++{
++	struct vmcb *vmcb = get_vnmi_vmcb(svm);
++
++	if (vmcb)
++		return !!(vmcb->control.int_ctl & V_NMI_MASK);
++	else
++		return false;
++}
++
++static inline void set_vnmi_mask(struct vcpu_svm *svm)
++{
++	struct vmcb *vmcb = get_vnmi_vmcb(svm);
++
++	if (vmcb)
++		vmcb->control.int_ctl |= V_NMI_MASK;
++	else
++		svm->vcpu.arch.hflags |= HF_GIF_MASK;
++}
++
++static inline void clear_vnmi_mask(struct vcpu_svm *svm)
++{
++	struct vmcb *vmcb = get_vnmi_vmcb(svm);
++
++	if (vmcb)
++		vmcb->control.int_ctl &= ~V_NMI_MASK;
++	else
++		svm->vcpu.arch.hflags &= ~HF_GIF_MASK;
++}
++
+ /* svm.c */
+ #define MSR_INVALID				0xffffffffU
+ 
 -- 
 2.25.1
 
